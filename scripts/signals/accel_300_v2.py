@@ -295,14 +295,13 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
             cross_bar = idx
             break
     bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
-    is_fresh_cross_short = bars_since_cross <= V2_FRESH_CROSS_BARS and direction == 'SHORT'
 
-    if not is_fresh_cross_short:
-        # Standard accel check
-        if direction == 'LONG' and gap_acceleration < V2_MIN_GAP_ACCEL:
-            return None
-        if direction == 'SHORT' and gap_acceleration > -V2_MIN_GAP_ACCEL:
-            return None
+    # Standard accel check — NO bypass for fresh cross SHORT
+    # (fresh cross SHORT was allowing wrong-direction and wrong-momentum trades)
+    if direction == 'LONG' and gap_acceleration < V2_MIN_GAP_ACCEL:
+        return None
+    if direction == 'SHORT' and gap_acceleration > -V2_MIN_GAP_ACCEL:
+        return None
 
     # ── FILTER 4: Price velocity (must be moving in direction) ────────────
     if latest_idx < V2_VELOCITY_WINDOW:
@@ -483,6 +482,25 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
                   f"gap_vel={sig['gap_velocity']:.3f}% "
                   f"trend_1h={trend_1h} [{source}]")
             continue
+
+        # Staleness check — verify gap is still valid at current price
+        # Prevents stale signals where price moved before execution
+        current_ema = _ema_series([float(p['price']) for p in prices], PERIOD)[-1]
+        if current_ema and current_ema > 0:
+            current_gap = (price - current_ema) / current_ema * 100
+            # Direction must still be correct
+            if direction == 'LONG' and current_gap <= 0:
+                continue  # gap flipped negative — stale
+            if direction == 'SHORT' and current_gap >= 0:
+                continue  # gap flipped positive — stale
+            # Gap must still be in valid range
+            abs_current_gap = abs(current_gap)
+            if direction == 'LONG':
+                if abs_current_gap < ACCEL_300_V2_LONG_MIN_GAP or abs_current_gap > ACCEL_300_V2_LONG_MAX_GAP:
+                    continue
+            else:
+                if abs_current_gap < ACCEL_300_V2_SHORT_MIN_GAP or abs_current_gap > ACCEL_300_V2_SHORT_MAX_GAP:
+                    continue
 
         try:
             sid = add_signal(
