@@ -70,6 +70,7 @@
     .atr-profit-row { background: #22dd8810 !important; }
     .fav-star { color: #ff4488; font-size: 1.3em; margin-left: 2px; vertical-align: middle; }
     .fav-star-top { color: #ffd700; font-size: 1em; margin-left: 2px; vertical-align: middle; }
+    .loser-icon { color: #ff4444; font-size: 1em; margin-left: 2px; vertical-align: middle; opacity: 0.7; }
     .sortable { cursor: pointer; user-select: none; }
     .sortable:hover { background: #00ff8822; }
     .sort-arrow { font-size: 0.7em; margin-left: 2px; }
@@ -203,17 +204,26 @@
     }
     let FAVORITES = new Set();
     let TOP_FAVS = [];
+    let LOSERS = new Set();
 
     async function loadFavorites() {
       try {
-        const r = await fetch('/data/favorites_performance.json?t=' + Date.now());
-        const data = await r.json();
-        const favs = data.favorites || [];
+        const [favR, losR] = await Promise.all([
+          fetch('/data/favorites_performance.json?t=' + Date.now()),
+          fetch('/data/losers_performance.json?t=' + Date.now()).catch(() => null)
+        ]);
+        const favData = await favR.json();
+        const favs = favData.favorites || [];
         FAVORITES = new Set(favs.map(f => f.token));
         // Top 5 by PnL
         TOP_FAVS = favs.sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt)
                         .slice(0, 5)
                         .map(f => f.token);
+        // Load losers
+        if (losR && losR.ok) {
+          const losData = await losR.json();
+          LOSERS = new Set((losData.losers || []).map(l => l.token));
+        }
       } catch(e) {
         // Fallback if fetch fails
         FAVORITES = new Set(['BABY','CAKE','CHIP','DOGE','FIL','GMT','HBAR','LDO','NXPC','SEI','SYRUP','ZRO']);
@@ -222,6 +232,7 @@
     }
 
     function favHtml(sym) {
+      if (LOSERS.has(sym)) return '<span class="loser-icon" title="Loser">🗑️</span>';
       if (TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="Top Favorite">⭐</span>';
       if (FAVORITES.has(sym)) return '<span class="fav-star" title="Favorite">❤</span>';
       return '';

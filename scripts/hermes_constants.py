@@ -265,8 +265,50 @@ FAVORITES_RESIDENCY_DECAY = 0.12  # Staleness decay rate for favorites (default 
 # Penalty list — consistent underperformers get deprioritized (not blacklisted).
 # Blacklist = never trade. Penalty = tradeable but low priority.
 # Auto-updated by favorites_updater.py.
-PENALTY_TOKENS = set()
+PENALTY_TOKENS = {'ALT','BIGTIME','BLUR','BTC','CASHCAT','CC','COMP','ENS','ETH','MERL','MET','MON','NEO','POL','PUMP','WLFI'}
 PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_signal()
+
+# ── Losers List — underperformers get deprioritized ──────────────────────────
+# AUTO-UPDATED daily by losers_tracker.py
+# Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
+LOSERS = {
+    'ALT',
+    'BIGTIME',
+    'BLUR',
+    'BTC',
+    'CASHCAT',
+    'CC',
+    'COMP',
+    'ENS',
+    'ETH',
+    'MERL',
+    'MET',
+    'MON',
+    'NEO',
+    'POL',
+    'PUMP',
+    'WLFI'
+}
+
+
+# Promotion criteria (add to losers)
+LOSERS_MIN_TRADES = 5              # Minimum trades in 7d to evaluate
+LOSERS_ADD_WR_THRESHOLD = 45.0     # Below this WR → add
+LOSERS_ADD_PNL_THRESHOLD = -0.50   # Below this PnL → add
+LOSERS_ADD_CONSECUTIVE_LOSSES = 5  # This many losses in a row → add
+LOSERS_ADD_WR_COLLAPSE = 20.0      # Dropped this much from 30d avg → add
+LOSERS_AUTO_DISABLE_WR = 30.0      # Below this WR with 10+ trades → permanent disable
+LOSERS_AUTO_DISABLE_MIN_TRADES = 10
+
+# Demotion criteria (remove from losers)
+LOSERS_REMOVE_WR_THRESHOLD = 55.0  # Must be above this to exit
+LOSERS_REMOVE_PNL_THRESHOLD = 0.0  # Must be profitable to exit
+LOSERS_COOLDOWN_DAYS = 3           # Must be out for 3 days before re-adding
+
+# Multipliers
+LOSERS_MULT = 0.5                  # 50% score penalty in signal_compactor
+LOSERS_SIZE_MULT = 0.5            # 50% position size reduction
+LOSERS_CONF_PENALTY = -15         # Confidence point penalty
 
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset

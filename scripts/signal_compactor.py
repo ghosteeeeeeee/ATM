@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -861,7 +861,13 @@ def _score_signal(token, direction, conf, source, signal_type,
     favorites_mult = FAVORITES_MULT if FAVORITES and token in FAVORITES else 1.0
 
     # Penalty list — underperformers get deprioritized
-    penalty_mult = PENALTY_MULT if PENALTY_TOKENS and token in PENALTY_TOKENS else 1.0
+    # Losers get stronger penalty (0.5x) than regular penalty tokens (0.7x)
+    if LOSERS and token in LOSERS:
+        penalty_mult = LOSERS_MULT
+    elif PENALTY_TOKENS and token in PENALTY_TOKENS:
+        penalty_mult = PENALTY_MULT
+    else:
+        penalty_mult = 1.0
 
     # ── Volatility Gate V2: combined phase+lifecycle+inverse multiplier ──
     # When V2 is enabled, it replaces the separate phase/inverse/lifecycle multipliers

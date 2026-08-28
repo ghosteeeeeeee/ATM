@@ -213,7 +213,7 @@ def _get_hotset_last_updated():
     return 0
 
 
-from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_SIZE_MULT
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_SIZE_MULT, LOSERS, LOSERS_SIZE_MULT
 
 from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -272,12 +272,17 @@ def _has_enough_trades(token, min_trades=5, days=7):
 
 
 def _get_favorite_size_mult(token):
-    """Get position size multiplier for favorites based on winrate.
-    - 75%+ WR: 1.8x (extra bump for proven performers)
-    - 50%+ WR: 1.5x (standard favorites boost)
-    - <50% WR: 1.2x (reduced size for underperformers)
-    Returns 1.0 for non-favorites.
+    """Get position size multiplier based on favorites/losers status.
+    - Losers: 0.5x (penalized)
+    - Favorites 75%+ WR: 1.8x (extra bump)
+    - Favorites 50%+ WR: 1.5x (standard boost)
+    - Favorites <50% WR: 1.2x (reduced)
+    - Normal: 1.0x
     """
+    # Losers get penalized first
+    if LOSERS and token.upper() in LOSERS:
+        return LOSERS_SIZE_MULT
+
     if token.upper() not in FAVORITES:
         return 1.0
     if not _has_enough_trades(token):
@@ -3002,6 +3007,12 @@ def run(dry_run=False):
             log(f'  ✅ [CTX-GATE] {token} {direction} GO (hebbian adj {ctx_penalty:+d}): {ctx_reason} (conf → {confidence:.0f}%)')
         else:
             log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
+
+        # Losers confidence penalty
+        if LOSERS and token.upper() in LOSERS:
+            from hermes_constants import LOSERS_CONF_PENALTY
+            confidence = max(confidence + LOSERS_CONF_PENALTY, 0)
+            log(f'  🗑️ [LOSERS] {token} {direction}: confidence penalty {LOSERS_CONF_PENALTY} → {confidence:.0f}%')
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
