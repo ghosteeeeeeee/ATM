@@ -16833,3 +16833,63 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 
 **Open Questions:**
 - accel-300-v2+ continues bleeding (-$0.16 24h) but no kill trigger yet
+
+## [2026-08-28 08:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed (4W 1L)
+**PnL:** +$0.06 (WR: 80%)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 93% (67/76 24h) but avg +$0.004 — structural breakeven
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 5/hr normal
+- Hourly trend: 4/5 last hours positive
+- bb-bounce-short 4T 75%WR -$0.04 — small sample, no kill trigger
+- accel-300-v2+ 6T 33%WR -$0.16 — bleeding but no kill trigger (0T last hour)
+- 5 open positions all SHORT, stable
+- System healthy, consecutive positive hours
+
+**Open Questions:**
+- bb_bounce+ 1T 0%WR -$0.19 — monitor, not enough trades to kill
+- accel-300-v2+ persistent bleed — watch next hour
+
+## [2026-08-28 09:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L)
+**PnL:** -$0.18 (WR: 25%)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit dominant (87% 24h) but avg +$0.000 — structural breakeven, not a problem
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- accel-300-v2+ 6T 33%WR -$0.16 — bleeding but 0T last hour, no kill trigger
+- Trade freq 4/hr normal
+- Last hour rough (25% WR, -$0.18) but preceded by 80% WR hour — normal variance
+- 2 open positions (FOGO +$0.15, SUSHI +$0.01)
+- System stable, 24h still net positive +$1.03
+
+**Open Questions:**
+- accel-300-v2+ persistent bleed — continues, still below kill threshold
+- bb_bounce-short 4T 75%WR -$0.04 — minor, no action
+
+## [2026-08-28 10:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W, 1L)
+**PnL:** -$0.01 (WR: 50%)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 88% (66/75 24h) avg -$0.001 structural breakeven — not a problem
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 2/hr normal
+- 24h 75T 54.7%WR +$0.36 still net positive
+- 5 open SHORT positions (all accel-300-v2-), flat
+- System healthy, last hour flat ($-0.01)
+
+**Open Questions:**
+- accel-300-v2+ 6T 33%WR -$0.16 24h — bleeding but 0T last hour, still below kill threshold
+- bb_bounce+ 1T 0%WR -$0.19 — tiny sample, no action
