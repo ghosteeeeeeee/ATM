@@ -83,6 +83,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
+        'bb-bounce-short',  # standalone SHORT bounce signal
         'accel-300-vel',
         'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
@@ -114,6 +115,7 @@ REGIME_SIGNALS = {
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
+        'bb-bounce-short',  # standalone SHORT bounce signal
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
