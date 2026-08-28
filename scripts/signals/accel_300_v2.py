@@ -49,7 +49,7 @@ _PRICE_DB = STATIC_DB
 _CANDLES_DB = CANDLES_DB
 
 # ── V2 Signal constants ──────────────────────────────────────────────────────
-V2_MIN_GAP_ACCEL = 0.10        # min gap acceleration — production cooldown handles over-firing
+V2_MIN_GAP_ACCEL = 0.20        # min gap acceleration — 0.10 was too weak (25% WR at conf<70), 0.20 forces genuine momentum
 V2_GAP_ACCEL_WINDOW = 10       # bars to measure gap acceleration
 V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
 V2_PERSISTENCE_BARS = 3        # min bars price must stay on same side of EMA (raised from 2)
@@ -314,6 +314,13 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     if direction == 'SHORT' and price_velocity >= price_epsilon:
         return None  # price rising — not momentum
 
+    # ── FILTER 4b: Minimum velocity magnitude ─────────────────────────────
+    # Price must be moving with conviction, not just barely in the right direction.
+    # Require at least 0.03% move over velocity window (5 bars = 5 min).
+    min_velocity = abs(closes[latest_idx]) * 0.0003
+    if abs(price_velocity) < min_velocity:
+        return None  # price barely moving — no conviction
+
     # ── FILTER 5: Persistence — price must stay on same side of EMA ───────
     persist_start = latest_idx - V2_PERSISTENCE_BARS + 1
     if persist_start < 0:
@@ -353,13 +360,28 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     if gap_prev is None or gap_prev2 is None:
         return None
     gap_velocity = gap_now - gap_prev
-    # Allow slight narrowing (noise) but velocity should generally confirm
-    if direction == 'LONG' and gap_velocity < -0.05:
-        return None  # gap narrowing too fast — reversal risk
-    if direction == 'SHORT' and gap_velocity > 0.05:
-        return None
+    # Allow tiny narrowing (noise) but velocity should generally confirm
+    # 0.02 tolerance — 0.05 was too loose (allowed fading momentum entries)
+    if direction == 'LONG' and gap_velocity < -0.02:
+        return None  # gap narrowing — reversal risk
+    if direction == 'SHORT' and gap_velocity > 0.02:
+        return None  # gap narrowing — momentum fading
 
-    # ── FILTER 8: Fresh cross gap check ───────────────────────────────────
+    # ── FILTER 8: Multi-bar gap confirmation ──────────────────────────────
+    # 10-bar accel can be positive while last 3 bars show fading momentum.
+    # Require gap to not narrow significantly over last 3 bars.
+    if latest_idx >= 3:
+        gap_3_ago = gap_pcts[latest_idx - 3]
+        if gap_3_ago is not None:
+            gap_change_3 = gap_now - gap_3_ago
+            # For SHORT: gap_now and gap_3_ago are negative. Gap widening = gap_change_3 < 0
+            # If gap_change_3 > 0.03, gap narrowed by >0.03% over 3 bars — momentum fading
+            if direction == 'SHORT' and gap_change_3 > 0.03:
+                return None  # gap narrowing over 3 bars — momentum fading
+            if direction == 'LONG' and gap_change_3 < -0.03:
+                return None  # gap narrowing over 3 bars — momentum fading
+
+    # ── FILTER 9: Fresh cross gap check ───────────────────────────────────
     # cross_bar and bars_since_cross already computed above (for accel check)
     fresh_cross = bars_since_cross <= V2_FRESH_CROSS_BARS
 
