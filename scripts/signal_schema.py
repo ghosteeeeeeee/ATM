@@ -14,6 +14,18 @@ from _secrets import BRAIN_DB_DICT
 
 from paths import *
 
+
+def _ema(data, period):
+    """Exponential moving average. SMA-seeded for accuracy."""
+    if len(data) < period:
+        return None
+    k = 2 / (period + 1)
+    val = sum(data[:period]) / period
+    for v in data[period:]:
+        val = v * k + val * (1 - k)
+    return val
+
+
 # Legacy path (deprecated — kept for migration reference only)
 LEGACY_DB   = '/root/.openclaw/workspace/data/signals.db'  # noqa: F841
 
@@ -436,12 +448,6 @@ def _enrich_indicators(token):
             avg_l = sum(losses) / 14 if losses else 0
             result['rsi_14'] = 100.0 if avg_l == 0 else round(100 - 100 / (1 + avg_g / avg_l), 2)
         # MACD(12,26,9)
-        def _ema(vals, period):
-            k = 2 / (period + 1)
-            e = sum(vals[:period]) / period
-            for v in vals[period:]:
-                e = v * k + e * (1 - k)
-            return e
         if len(prices) >= 35:
             macd_line = _ema(prices[-35:], 12) - _ema(prices[-35:], 26)
             macd_vals = []
@@ -557,14 +563,6 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
 
                     if _rows and len(_rows) >= TREND_FILTER_EMA_SLOW:
                         _closes = [r[0] for r in reversed(_rows)]
-                        # Compute EMAs
-                        def _ema(data, period):
-                            k = 2 / (period + 1)
-                            val = data[0]
-                            for v in data[1:]:
-                                val = v * k + val * (1 - k)
-                            return val
-
                         ema_fast = _ema(_closes, TREND_FILTER_EMA_FAST)
                         ema_slow = _ema(_closes, TREND_FILTER_EMA_SLOW)
 
@@ -628,13 +626,6 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         if not _rows or len(_rows) < lookback:
                             return None
                         _closes = [r[0] for r in reversed(_rows)]
-
-                        def _ema(data, period):
-                            k = 2 / (period + 1)
-                            val = data[0]
-                            for v in data[1:]:
-                                val = v * k + val * (1 - k)
-                            return val
 
                         _ema_fast = _ema(_closes, 20)
                         _ema_slow = _ema(_closes, 50)
@@ -2719,17 +2710,8 @@ def compute_macd(token, fast=12, slow=26, signal=9, lookback_minutes=60*24):
         return None
     closes = [r[1] for r in rows]
 
-    def ema(data, period):
-        if len(data) < period:
-            return None
-        k = 2 / (period + 1)
-        ema_val = sum(data[:period]) / period
-        for price in data[period:]:
-            ema_val = price * k + ema_val * (1 - k)
-        return ema_val
-
-    ef = ema(closes, fast)
-    es = ema(closes, slow)
+    ef = _ema(closes, fast)
+    es = _ema(closes, slow)
     if ef is None or es is None:
         return None
     macd_line = ef - es

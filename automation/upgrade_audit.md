@@ -183,21 +183,24 @@
 
 ---
 
-## Summary (Updated 2026-08-26)
+## Summary (Updated 2026-08-28)
 
 | Status | Count | Plans |
 |--------|-------|-------|
 | IMPLEMENTED | 18 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence, regime-transition, **exit-mechanics-v2**, **exit-mechanics-ownership** |
-| PARTIALLY IMPLEMENTED | 3 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion |
+| PARTIALLY IMPLEMENTED | 4 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion, **ponytail-audit** |
 | PENDING | 5 | btc-crash-filter, dashboard-enhancements, retroactive-scan, fish-finder-species-census, automation-team-improvements |
+| NEW PENDING | 3 | **signal-regime-memory** (L3-4), **volume-profile-signal** (L2), **beta-decoupler-signal** (L2) |
 
-**Scanned: 37 plans (20 new this session)**
-**Implemented: 18 (49%)**
-**Partially implemented: 3 (8%)**
-**Pending: 5 (14%)**
-**Skipped (analysis-only): 11 (30%)**
+**Scanned: 40 plans (3 new this session)**
+**Implemented: 18 (45%)**
+**Partially implemented: 4 (10%)**
+**Pending: 8 (20%)**
+**Skipped (analysis-only): 10 (25%)**
 
-### Level 1-2 actions taken this session (2026-08-26):
+### Level 1-2 actions taken this session (2026-08-28):
+1. **_ema() dedup**: Extracted 4 duplicate _ema() definitions in signal_schema.py → 1 module-level function (~12 LOC removed, zero behavior change).
+2. **Ponytail audit verification**: Confirmed zombie files deleted, vortex_break disabled, signal registry pruned (65→17), bypass list fixed, velocity tiers upgraded. Most Level 1 items already done.
 1. **exit-mechanics-v2**: Fixed PROFIT_MONSTER_BYPASS_SIGNALS — removed `ct-hot+`/`ct-hot-` (losing signals, PM Trail should help), added `bb_bounce+`/`confluence` (proven, shouldn't have PM Trail).
 2. **atr-sl-widen**: Widened MAE Guard BASE_THRESHOLD from 2.0% to 3.0% — backtest showed -$5.43/wk at 1.5%, -$2.82/wk at 2.0%, -$2.69/wk at 3.0%. Only catches true crashes now.
 3. **features_recorded bug**: Already fixed — 2633/2633 trades with entry_rsi_14 have features_recorded=TRUE.
@@ -226,12 +229,26 @@
 - **copy-trader-entry-timing-deep-dive**: IMPLEMENTED. SHORT copy disabled, exit correlation enabled.
 - **copy-trader-dashboard-enhancements**: PENDING. Phase 2-4 not yet implemented.
 - **copy-trader-evolution-spec**: IMPLEMENTED. Per-trader performance + exit correlation.
+- **2026-08-27_ponytail-full-audit**: PARTIALLY IMPLEMENTED. 80 dead scripts, zombie files, vortex_break, signal registry, bypass list, velocity tiers all done. Remaining: _ema extraction (DONE this session), dead code blocks in position_manager/signal_schema, sys.path boilerplate, blacklist dedup.
+- **spec-signal-regime-memory**: PENDING. Level 3-4. Major architecture — persist regime at entry, regime-aware lifecycle, dormant state. CEO priority.
+- **fish-finder-species-census**: PENDING. Level 2-3. Volume Profile (P0), Beta Decoupler (P1), Regime Transition (P1). Blindspot analysis.
+- **automation-team-improvements**: PARTIALLY IMPLEMENTED. A/B learner deleted (not found). Self-learner PARAM_CONFIG expansion pending (Level 2). Session learner → OpenMemory bridge pending (Level 2).
+- **spec-signal-regime-memory**: PENDING. Level 3-4. Regime-aware signal lifecycle — prevent premature signal death.
+
+### Actions taken this session (2026-08-28):
+1. **_ema() dedup**: Extracted 4 duplicate _ema() definitions in signal_schema.py into 1 module-level function. ~12 lines removed, zero behavior change.
+2. **Verified ponytail audit items**: zombie files already deleted, vortex_break already disabled, signal registry already pruned, bypass list already fixed, velocity tiers already upgraded. Most Level 1 ponytail items already done.
+3. **Skipped CEO_PROTECTED_FLAGS/RESEARCH_FLAGS removal**: Actually used by self_learner.py as real guard. Not yagni.
+4. **Skipped doubly-dead flag removal**: NEVER_REENABLE_FLAGS actively used by self_learner to prevent re-enabling. Flags serve documentation purpose.
+5. **Skipped _get_confluence_signals_legacy removal**: Still covers 7K rows (10.8%) with NULL signal_types. Not dead.
 
 ### Remaining items (prioritized):
 1. **Self-learner PARAM_CONFIG expansion** (Level 2, automation-team-improvements) — unlocks auto-tuning of 15+ params
 2. **BTC acceleration detection backtest** (Level 2, btc-crash-filter-plan) — needs 30d data
-3. **Delete A/B learner** (Level 1, automation-team-improvements) — cleanup, no risk
-4. **Coin tracker confirming analyses** (Level 2, coin_tracker_setup_improvements)
+3. **Signal regime memory** (Level 3-4, spec-signal-regime-memory) — regime-aware lifecycle, dormant state
+4. **Volume Profile signal** (Level 2, fish-finder-species-census) — CEO P0, +5-8% WR projected
+5. **Beta Decoupler signal** (Level 2, fish-finder-species-census) — CEO P1, +3-5% WR projected
+6. **Coin tracker confirming analyses** (Level 2, coin_tracker_setup_improvements)
 5. **Market Phase Gate** (Level 2-3, signal-cluster-brainstorm) — +5-10% WR projected
 6. **Confluence Scorer** (Level 2, signal-cluster-brainstorm) — +5-8% WR projected
 7. **Retroactive scan** (Level 3, retroactive-scan-delayed-entry)
