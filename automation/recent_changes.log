@@ -1,3 +1,7 @@
+[2026-08-28 23:05 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (4W 1L +$0.06 all bb-bounce-short atr_sl_hit). 24h 89T 51W 57.3% +$1.72 strong. atr_sl_hit 85T 95.5% but PnL +$1.45 — trailing SL profitable. accel-300-v2- 63T 54%WR +$1.47 workhorse. bb-bounce-short 11T 82%WR +$0.20 emerging star. 3 open SHORT (MET/ICP/AVAX). No kill candidates (0 signals 0%WR 3+T). Trade freq 3.7/hr normal. No consecutive neg hours. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 00:05 UTC
 [2026-08-28 12:05 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour (8T last 2h all atr_sl_hit). 24h 81T 42W 51.9% -$0.07 breakeven. accel-300-v2- 41T 49%WR +$0.11 only profitable signal. 3 open SHORT (ONDO/ME/BABY). 4 consecutive negative hours (08-11 UTC) -$0.40 total — small. No kill candidates (0 signals 0%WR 3+T). Trade freq 3.5/hr normal. Pipeline healthy. System stable, watching consecutive neg trend.
   BY: auto_1hr

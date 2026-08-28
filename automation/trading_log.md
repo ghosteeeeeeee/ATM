@@ -1,5 +1,32 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-28 23:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed (4W, 1L) — **+$0.06**
+- HBAR bb-bounce-short SHORT atr_sl_hit +$0.08
+- AIXBB bb-bounce-short SHORT atr_sl_hit -$0.10
+- LDO bb-bounce-short SHORT atr_sl_hit +$0.06
+- FIL bb-bounce-short SHORT atr_sl_hit +$0.01
+- IMX bb-bounce-short SHORT atr_sl_hit +$0.01
+
+**24h:** 89T, 51W, 57.3% WR, +$1.72 (strong)
+- atr_sl_hit 85T 95.5% of closes, +$1.45 — trailing SL working profitably
+- accel-300-v2- 63T 54%WR +$1.47 — workhorse
+- bb-bounce-short 11T 82%WR +$0.20 — emerging star
+
+**Open:** 3 SHORT (MET accel-300-v2-, ICP bb-bounce-short, AVAX bb-bounce-short)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last 3h
+- atr_sl_hit 95.5% of exits but PnL +$1.45 — trailing SL profitable by design
+- Trade freq 3.7/hr normal
+- No consecutive negative hours
+- bb-bounce-short 82%WR today — strong secondary signal
+
+---
+
 ## [2026-08-28 18:28 UTC] Orchestrator Daily Run
 
 **Status:** System GREEN, no implementation needed
@@ -17103,3 +17130,46 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 **Open Questions:**
 - Trade volume dropped significantly (9T→1T) — regime or just quiet hour?
 - bb-bounce-short emerging as secondary signal — worth watching
+
+## LOSERS Update — 2026-08-28 22:37 UTC
+- ADD WLFI (WR=46.2%, PnL=$-1.13, negative_pnl ($-1.13))
+- ADD PUMP (WR=23.1%, PnL=$-0.81, dead_zone (23.1% WR, 13 trades))
+- ADD MET (WR=60.0%, PnL=$-0.79, negative_pnl ($-0.79))
+- ADD CC (WR=27.3%, PnL=$-0.74, dead_zone (27.3% WR, 11 trades))
+- ADD ETH (WR=35.7%, PnL=$-0.65, low_wr (35.7%))
+- ADD BTC (WR=41.7%, PnL=$-0.61, low_wr (41.7%))
+- ADD BIGTIME (WR=62.5%, PnL=$-0.52, negative_pnl ($-0.52))
+- ADD ALT (WR=22.2%, PnL=$-0.51, low_wr (22.2%))
+- ADD MERL (WR=16.7%, PnL=$-0.38, low_wr (16.7%))
+- ADD BLUR (WR=37.5%, PnL=$-0.27, low_wr (37.5%))
+- ADD MON (WR=42.9%, PnL=$-0.25, low_wr (42.9%))
+- ADD CASHCAT (WR=44.4%, PnL=$-0.19, low_wr (44.4%))
+- ADD NEO (WR=42.9%, PnL=$-0.17, low_wr (42.9%))
+- ADD COMP (WR=33.3%, PnL=$-0.01, low_wr (33.3%))
+- ADD ENS (WR=28.6%, PnL=$0.11, low_wr (28.6%))
+- ADD POL (WR=25.0%, PnL=$0.19, low_wr (25.0%))
+
+Final set: ['ALT', 'BIGTIME', 'BLUR', 'BTC', 'CASHCAT', 'CC', 'COMP', 'ENS', 'ETH', 'MERL', 'MET', 'MON', 'NEO', 'POL', 'PUMP', 'WLFI']
+
+## LOSERS Update — 2026-08-28 22:51 UTC
+- ADD MET (WR=60.0%, PnL=$-0.79, negative_pnl ($-0.79))
+- ADD BIGTIME (WR=62.5%, PnL=$-0.52, negative_pnl ($-0.52))
+- ADD HYPE (WR=55.6%, PnL=$-0.18, low_wr (55.6%))
+- ADD CAKE (WR=57.1%, PnL=$-0.11, low_wr (57.1%))
+- ADD ENA (WR=45.5%, PnL=$0.02, low_wr (45.5%))
+- ADD IMX (WR=57.1%, PnL=$0.08, low_wr (57.1%))
+- ADD DYDX (WR=57.1%, PnL=$0.11, low_wr (57.1%))
+- ADD WLD (WR=50.0%, PnL=$0.25, low_wr (50.0%))
+- ADD HBAR (WR=57.1%, PnL=$0.50, low_wr (57.1%))
+
+Final set: ['ALT', 'BIGTIME', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYDX', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'IMX', 'MERL', 'MET', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
+
+## LOSERS Update — 2026-08-28 22:52 UTC
+- ADD CAKE (WR=57.1%, PnL=$-0.11, low_wr (57.1%))
+
+Final set: ['ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYDX', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'IMX', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
+
+## LOSERS Update — 2026-08-28 22:54 UTC
+- ADD AIXBT (WR=40.0%, PnL=$-0.22, low_wr (40.0%))
+
+Final set: ['AIXBT', 'ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYDX', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'IMX', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
