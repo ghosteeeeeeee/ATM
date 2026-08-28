@@ -279,9 +279,7 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
         return None
     gap_acceleration = gap_now - gap_then  # positive = gap widening for LONG
 
-    # For fresh cross SHORT, skip accel check — cross itself is the signal
-    # (gap just started forming, hasn't had time to accelerate yet)
-    is_fresh_cross_short = False
+    # Find cross bar for fresh cross detection
     cross_bar = None
     for idx in range(latest_idx, PERIOD - 1, -1):
         prev_idx = idx - 1
@@ -356,8 +354,7 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     if latest_idx < 3:
         return None
     gap_prev = gap_pcts[latest_idx - 1]
-    gap_prev2 = gap_pcts[latest_idx - 2]
-    if gap_prev is None or gap_prev2 is None:
+    if gap_prev is None:
         return None
     gap_velocity = gap_now - gap_prev
     # Allow tiny narrowing (noise) but velocity should generally confirm
