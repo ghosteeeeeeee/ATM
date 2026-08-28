@@ -16815,3 +16815,21 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 1. Signal_analyst MUST deliver backbone signal
 2. Monitor legacy age-out
 3. Monitor bb-bounce-short performance
+
+## [2026-08-28 07:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.13 (WR: 0%)
+
+**Changes:**
+- None
+
+**No Change Needed:**
+- atr_sl_hit dominant (86%) but avg +$0.003 — structural breakeven, not a problem
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- POL 3/3 recent losses but net +$0.34 lifetime — not worth blacklisting
+- Trade freq 3/hr normal
+- System stable, 06:00 -$0.13 within normal variance
+
+**Open Questions:**
+- accel-300-v2+ continues bleeding (-$0.16 24h) but no kill trigger yet
