@@ -1,4 +1,4 @@
-## CEO Report — 2026-08-28 ~15:32 UTC (282nd run)
+## CEO Report — 2026-08-28 ~19:00 UTC (Losers List Spec Review)
 
 ### Diagnosis
 System FLAT, 5 positions all small ($0.00 unrealized). Verified DB: 24h 85T 49.4% WR -$0.47. 7d: 430T 47.9% WR -$6.18. Today Aug 28: 57T 52.6% WR -$0.04 (flat). Daily trend: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 -$0.04 (stable).
@@ -48,3 +48,48 @@ No code changes this run. System self-resolving via legacy age-out.
 - Daily trend improving: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 -$0.04
 - 5 open positions, all small
 - Pipeline: running, 0 errors
+
+---
+
+## Losers List Spec Review — CEO Recommendations
+
+### Spec Summary
+Losers = coins with <45% WR, <-$0.50 PnL, 5+ consecutive losses, or WR collapse >20pp. Penalties: 0.5x score, 0.5x size, -15pt confidence. Runs daily 06:05 UTC. New `losers_tracker.py`.
+
+### Q1: Block or Penalize?
+**Penalize (0.5x), don't block.** Rationale:
+- Market regimes rotate — a loser in bear market may lead in bull market
+- ct-hot+ example: was a loser for weeks, then one good week covers all losses
+- Blocking is binary and creates cliff effects; penalizing is gradual and self-correcting
+- We already have PENALTY_TOKENS (0.7x) in hermes_constants.py — LOSERS would be a superset with stronger penalties
+
+### Q2: Severe Losers Tier?
+**Yes, but simpler: auto-disable at <30% WR with 10+ trades.** Rationale:
+- At <30% WR you're literally worse than random — no amount of penalty helps
+- Keep the 0.5x penalty tier for 30-45% WR (graduated deprioritization)
+- Auto-disable for <30% WR with enough sample (10+ trades) avoids the CEO_PROTECTED problem
+- This is what auto_1hr and signal_reporter already do for signals — extend to tokens
+
+### Q3: Visible on Dashboard?
+**Yes — add to coin_tracker page.** Rationale:
+- Transparency helps debugging
+- Visual 🗑️ icon is good UX
+- But keep it low-profile — don't create anxiety over small-sample variance
+
+### Q4: Concerns?
+**Three concerns:**
+
+1. **Don't duplicate PENALTY_TOKENS.** LOSERS should be the populated version of PENALTY_TOKENS, not a parallel system. The spec should write to the same set. Current PENALTY_TOKENS is empty — LOSERS tracker would fill it.
+
+2. **Minimum sample size is critical.** 7d rolling with <5 trades is noise. The spec says "7d rolling" but doesn't set a minimum trade count. Recommend: minimum 5 trades in 7d window before flagging as loser. Otherwise a coin with 1 loss gets penalized.
+
+3. **Don't penalize CEO_PROTECTED tokens.** The spec doesn't mention this edge case. If a CEO_PROTECTED token hits loser criteria, we should LOG it and RECOMMEND T disable it — same protocol as now. The system should not auto-penalize protected tokens.
+
+### Recommendation: Build It
+The spec is solid. It mirrors FAVORITES (which works) and uses existing infrastructure (PENALTY_TOKENS). Implementation is low-risk:
+- `losers_tracker.py` — new script, daily timer
+- Writes to PENALTY_TOKENS in hermes_constants.py (existing mechanism)
+- signal_compactor already applies penalty_mult (line 864)
+- decider_run can add LOSERS size penalty (mirror of FAVORITES_SIZE_MULT)
+
+**Priority: MEDIUM.** System is already improving with legacy age-out. Losers list adds value but isn't urgent. Build after backbone signal is delivered.
