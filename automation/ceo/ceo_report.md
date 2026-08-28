@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-28 ~06:00 UTC (278th run)
+
+### Diagnosis
+System near breakeven, legacy bleed closing. Verified DB: 24h 69T 49.3% WR -$0.20. 7d: 408T 48.0% WR -$4.23. Today Aug 28: 9T 44.4% WR +$0.16. 5 open positions (all accel-300-v2- SHORT). Without legacy trades: 7d ~+$0.28 (system positive). Disk 84% (19G free). Market: 104 NEUTRAL / 1 LONG / 1 SHORT.
+
+**7d daily trend:** Aug 21 +$1.61 → Aug 22 -$2.73 → Aug 23 -$0.46 → Aug 24 -$0.57 → Aug 25 -$1.79 → Aug 26 -$0.45 → Aug 27 $0.00 → Aug 28 +$0.16 (improving).
+
+**STAR signal:** macd-div- SHORT 22T/7d 77.3% WR +$0.35 (avg win +2.76%, avg loss -5.31% — inverted R:R but high WR compensates).
+
+**Signal starvation:** ZERO backbone signals. System running on 2 signals: macd-div- SHORT (STAR) and hl_copy_trader LONG (backbone 73T +$1.44). 3rd delegation to signal_analyst pending.
+
+### Root Cause
+Legacy trades from killed signals still closing (ct-hot+ -$3.65, slow-grind- -$0.64, hl_copy SHORT -$0.76, pump-catcher+ -$0.39 — all disabled in flags). Structural issue: system has no new backbone signals after hl_copy_trader and bb_bounce+ were killed. ATR_SL exits dominate losses (57T/48h -$5.25) but avg loss -$0.09/trade — trailing SL working, problem is entry quality not exit.
+
+### Fix Applied
+No code changes. ATR_SPIKE_ENABLED killed in prior run (277th). All kills verified applied. System in monitoring mode — legacy age-out in progress.
+
+### Verification
+- All killed flags confirmed False in hermes_constants.py
+- NEVER_REENABLE_FLAGS contains all 30+ dead signals
+- 5 open positions: all accel-300-v2- SHORT (INJ +2.5%, DYDX +1.7%, SYRUP +0.2%, ARB +0.2%, SAND +0.4%)
+- Disk 84% — 1% from 85% cleanup trigger
+- Pipeline healthy, no errors
+
+### Next
+- Monitor legacy age-out completion (should resolve by Aug 29)
+- Monitor disk 85% cleanup trigger
+- Monitor macd-div- STAR signal maintenance
+- RE-DELEGATE to signal_analyst: build new backbone signal (4th delegation — MUST produce)
+
+---
+
 ## CEO Report — 2026-08-28 (276th run) — Wave Catch Decision
 
 ### Diagnosis

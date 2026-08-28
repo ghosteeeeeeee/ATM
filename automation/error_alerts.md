@@ -1344,3 +1344,8 @@ ALERTS:
 - **AUTO-FIX**: No action needed — signals already claimed by another process (likely concurrent pipeline/hl-sync-guardian). Pipeline runs are completing successfully despite these.
 - **WARN**: `hotset.json is empty — no signals survived compaction` — 0 signals above 50% confidence
 - **INFO**: Disk at 84% (19G free) — approaching threshold but not critical yet
+
+## Error Alerts — 2026-08-28 02:04 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`

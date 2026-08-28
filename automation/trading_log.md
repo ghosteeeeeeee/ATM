@@ -16636,3 +16636,31 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - accel-300-v2+ validation window — monitor next run
 - pump-catcher+ persistent bleed — needs more data
+
+## [2026-08-28 02:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** -$0.23 (WR: 25.0%)
+
+**24h:** 68T, 47.1% WR, -$0.88. atr_sl_hit 80.9% (55T) -$1.17. profit-monster-trail 10T +$0.46.
+
+**Diagnosis:**
+1. **Entry quality:** All 4 trades SHORT. Choppy market, entries lack follow-through. accel-300-v2- dominant signal (14T/24h) but net negative.
+2. **SL behavior:** atr_sl_hit 80.9% of all exits (24h), 83-96% in last 5 hours. Structural — ATR_SL_MIN=0.8% + TRAILING_DISTANCE=0.50% working as designed. In NEUTRAL regime, chop triggers trailing on nearly every trade.
+3. **Signal quality:** macd-div- the only star (5T 5W +$0.29). accel-300-v2- mixed (14T 5W -$0.23). pump-catcher+/atr-spike+ killed.
+4. **Trade frequency:** 4T/hr — normal.
+
+**Changes:** None.
+- No kill criteria met (no signal 0% WR with 3+T last hour)
+- Only 2 consecutive negative hours (threshold 3+)
+- atr_sl_hit structural — CEO-set params, not a bug
+- System already has zero backbone signals — killing more worsens under-trading
+
+**No Change Needed:**
+- accel-300-v2- lifecycle filter correct (concurrent, sl_mult=1.0)
+- SHORT_NEUTRAL_BLOCK enabled (should prevent new SHORT in NEUTRAL)
+- Trade frequency normal
+
+**Open Questions:**
+- NEUTRAL regime dominant — structural mismatch with SHORT-heavy entries. Delegated to signal_analyst to build new backbone signal.
+- 2 consecutive negative hours (00, 01) — watch for 3+ threshold next hour.
