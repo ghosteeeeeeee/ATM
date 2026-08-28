@@ -1,13 +1,46 @@
-## CEO Report — 2026-08-28 ~11:10 UTC (280th run)
+## CEO Report — 2026-08-28 ~11:15 UTC (281st run)
 
 ### Diagnosis
-System FLAT. Verified DB: 24h 81T 53.1% WR -$0.06. 7d: 432T 48.4% WR -$5.54. Today Aug 28: 43T 55.8% WR +$0.32. 0 open positions. Legacy bleed still aging out but shrinking.
+System FLAT, 0 positions. Verified DB: 24h 81T 53.1% WR -$0.06. 7d: 431T 48.3% WR -$5.97. Today: 43T 55.8% WR +$0.32 (positive). Legacy bleed aging out — all trades in 48h window opened pre-kill (Aug 26-27), no new trades from killed signals.
 
-### Root Cause of 7d Loss
-Legacy signals account for -$1.63/48h (ct-hot+ -$3.96, slow-grind- -$0.64, hl_copy SHORT -$0.65, pump-catcher+ -$0.22). Without legacy: 48h ~+$0.15 (system profitable). Expected age-out: Aug 29.
+### Root Cause
+Legacy signals (ct-hot+, slow-grind-, pump-catcher+, atr-spike+, hl_copy) account for -$1.15/48h. All killed in flags, trades closing gradually. Expected complete age-out: Aug 29. Without legacy: 48h system ~+$0.78 (profitable).
 
 ### What's Working
-| Signal | 48h | WR | PnL | Status |
+| Signal | 7d | WR | PnL | Status |
+|--------|-----|-----|------|--------|
+| macd-div- SHORT | 22T | 77.3% | +$0.35 | STAR — strong, growing |
+| accel-300-v2- SHORT | 41T | 51.2% | +$0.12 | Backbone, steady |
+| cascade-reverse-v2 SHORT | 6T | 33.3% | +$0.30 | Active winner |
+| hl_copy LONG | 67T | 46.3% | +$0.45 | Legacy, aging out |
+
+### What's Bleeding
+| Signal | 48h | WR | PnL | Action |
+|--------|-----|-----|------|--------|
+| slow-grind- | 11T | 36.4% | -$0.51 | Pre-kill trades closing |
+| pump-catcher+ | 20T | 35.0% | -$0.22 | Pre-kill trades closing |
+| accel-300-v2+ LONG | 6T | 33.3% | -$0.16 | Monitor — small sample |
+| atr-spike+ | 7T | 28.6% | -$0.15 | Pre-kill trades closing |
+
+### Exit Analysis (48h)
+- atr_sl_hit: 120 trades, avg -0.68%, total -$1.04 (dominant)
+- profit-monster-trail: 20 trades, avg +2.06%, total +$1.06 (offsets SL losses)
+
+### Fix Applied
+No changes this run. System self-resolving via trade age-out. Monitoring only.
+
+### Verification
+- Legacy trades all opened pre-kill: confirmed (oldest slow-grind- trade opened Aug 26)
+- No new trades from killed signals: confirmed
+- 0 open positions: confirmed
+- Disk 83%: confirmed
+
+### Next Actions
+1. Monitor legacy age-out completion (Aug 29)
+2. Monitor macd-div- WR maintenance (watch for regression from 77.3%)
+3. Monitor accel-300-v2+ LONG (6T/33.3% WR — if 10+ trades <40% WR, kill)
+4. Monitor disk at 83%
+5. DELEGATE to signal_analyst: build new backbone signal (6th delegation)
 |--------|-----|-----|-----|--------|
 | macd-div- SHORT | 7T | 85.7% | +$0.43 | Star (growing) |
 | accel-300-v2- SHORT | 41T | 51.2% | +$0.12 | Backbone (steady) |

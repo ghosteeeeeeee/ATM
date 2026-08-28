@@ -1,39 +1,42 @@
 # Signal Performance Report
-**Generated:** 2026-08-28 11:02 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-28 18:30 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 1,599 | **WR:** 49.0% | **PnL:** -84.26%
-- **Date range:** 2026-07-29 → 2026-08-28
-
----
-
-## WINNERS (WR > 55%, PnL > 0)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb-bounce-short | SHORT | 3 | 66.7% | -0.04 | 5 | 80.0% | +0.48 | ENABLED |
+## Overall Stats (24h)
+- **Total trades:** 81 | **WR:** ~49% | **PnL:** -$0.06
 
 ---
 
-## LOSERS (WR < 30%, PnL < -2%)
+## KILLED (executed this cycle)
 
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| accel-300-v2+ | LONG | 6 | 33.3% | -3.68 | DISABLED | Borderline |
-| engulfing+,r2-trend-long4 | LONG | 2 | 50.0% | -0.99 | ENABLED | Needs more data |
-| r2-trend-long4 | LONG | 2 | 50.0% | -0.37 | ❓ | Needs more data |
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | accel-300-v2+ already disabled 2026-08-27 |
 
 ---
 
-## DISABLED BUT GOOD (candidates for re-enabling)
+## BOOSTED (executed this cycle)
 
-None found. Top performers are already enabled.
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No boost candidates with sufficient conviction |
+
+---
+
+## WINNERS (24h)
+
+| Signal | Dir | WR | PnL | Trades | Tokens | Status |
+|--------|-----|-----|-----|--------|--------|--------|
+| macd-div- | SHORT | 100.0% | $0.11 | 3 | WLD, USUAL, STX | ENABLED — watch for more trades |
+| accel-300-v2- | SHORT | 51.2% | $0.12 | 41 | multiple | ENABLED — healthy |
+| bb-bounce-short | SHORT | 80.0% | $0.04 | 5 | POL, WLD, BANANA, FOGO | ENABLED — watch (all-time 70% WR, -$0.07) |
+
+---
+
+## LOSERS / WATCH LIST (24h)
+
+| Signal | Dir | WR | PnL | Trades | Status | Note |
+|--------|-----|-----|-----|--------|--------|------|
+| accel-300-v2+ | LONG | 33.3% | -$0.16 | 6 | DISABLED | In NEVER_REENABLE since 2026-08-27 |
 
 ---
 
@@ -43,32 +46,21 @@ None found. Top performers are already enabled.
 
 ---
 
+## 6h SNAPSHOT
+
+| Signal | Dir | WR | PnL | Trades |
+|--------|-----|-----|-----|--------|
+| accel-300-v2- | SHORT | 47.4% | -$0.45 | 19 |
+| bb-bounce-short | SHORT | 66.7% | -$0.01 | 3 |
+
+---
+
 ## RECOMMENDATIONS
 
-1. **[WATCH] accel-300-v2+ LONG** — WR=33.3%, PnL=-3.68% over 6 trades. Monitor next cycle.
-2. **[WATCH] engulfing+,r2-trend-long4 LONG** — WR=50.0%, PnL=-0.99% over 2 trades. Monitor next cycle.
-3. **[WATCH] r2-trend-long4 LONG** — WR=50.0%, PnL=-0.37% over 2 trades. Monitor next cycle.
-4. **[KEEP] 1 winning combos** — bb-bounce-short. LONG side dominant.
+1. **[WATCH] macd-div- SHORT** — 100% WR but only 3 trades. Needs 5+ for boost consideration.
+2. **[WATCH] bb-bounce-short SHORT** — 80% WR 24h, all-time still -$0.07. Monitor for consistency.
+3. **[KEEP] accel-300-v2- SHORT** — 41 trades, 51.2% WR, $0.12. System workhorse.
 
 ---
 
 *Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-08-28 | 6a628b5 | Orchestrator daily run 2026-08-28: disk cleanup, status upda... |
-| 2026-08-28 | 6f938e5 | tune: accel-300-v2 — lower SHORT min gap 1.0% -> 0.5% |
-| 2026-08-28 | f77f59d | CEO: monitoring run 278 — verified 24h 69T 49.3% WR -$0.20, ... |
-| 2026-08-28 | df57f5b | tune: accel-300-v2 — raise SHORT min gap 0.5% -> 1.0% |
-| 2026-08-28 | 1756135 | tune: accel-300-v2 — raise SHORT min gap 0.3% -> 0.5% |
-| 2026-08-27 | 0844c77 | signals: kill accel-300-v2+ LONG — 33.3% WR, -$0.16 (48h), 6... |
-| 2026-08-27 | e91ac1e | CEO: Fix slow-grind- flag bug (2nd time kill not applied) |
-| 2026-08-27 | f50e91b | signals: re-enable slow_grind_short for TESTING |
-| 2026-08-27 | d3101a2 | signals: raise slow_grind MAX_DECLINE_FROM_HIGH from 1.0% to... |
-| 2026-08-27 | 9393d46 | refactor: move V2 constants to hermes_constants.py + tighten... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
