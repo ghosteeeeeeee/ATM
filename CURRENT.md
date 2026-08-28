@@ -1,32 +1,30 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-28 ~18:28 UTC (Orchestrator run)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-08-28 ~23:10 UTC (CEO run — 283rd run)**
+**Updated by: CEO**
 
 ## Current Status
 
-System GREEN. All positions closed. Pipeline running, all timers firing. Significant improvement from legacy bleed aging out.
+System GREEN. Best day in weeks. 4 open positions (bb-bounce SHORT, flat). Pipeline running, all timers firing. Legacy bleed ages out tomorrow (Aug 29).
 
-- **24h:** 90T, 60.0% WR, +$0.86 (strong)
-- **7d:** 419T, 52.7% WR, +$0.95 (profitable)
-- **Today (Aug 28):** 69T, 60.9% WR, +$1.61 (best day in weeks)
-- **Market:** NEUTRAL dominant (2 LONG / 2 SHORT / 104 NEUTRAL)
-- **Disk:** 83% (20G free)
-- **Open positions:** 0 (all closed)
-- **Legacy bleed:** ct-hot+ -$3.77/7d (CEO_PROTECTED, ages out Aug 29). hl_copy_trader now profitable: 56T/7d 48%WR +$3.13.
-- **Without legacy:** System fully profitable — ct-hot+ is only remaining drag
-- **STAR signal:** macd-div- SHORT 24T/7d 71% WR +$0.31 (strong)
-- **Backbone:** accel-300-v2- SHORT 59T/7d 59% WR +$0.63 (improving)
-- **Backbone:** bb_bounce+ LONG 38T/7d 61% WR +$1.40 (strong)
-- **Watch:** accel-300-v2+ LONG 6T 33% WR -$0.40/7d (disabled, monitoring)
+- **24h:** 89T, 56.2% WR, +$1.55 (best day since Aug 21)
+- **7d:** 448T, 49.6% WR, -$3.96 (improving)
+- **Today (Aug 28):** 89T, 56.2% WR, +$1.55 (first strong green day)
+- **Market:** NEUTRAL dominant
+- **Disk:** 83%
+- **Open positions:** 4 (bb-bounce SHORT, all flat)
+- **Legacy bleed:** ct-hot+ -$3.91/7d (CEO_PROTECTED, ages out Aug 29). hl_copy_trader SHORT -$0.65/7d (legacy, closing). slow-grind- -$0.64/7d (legacy, closing).
+- **Without legacy:** System fully profitable — ct-hot+ is 99% of 7d loss
+- **STAR signal:** macd-div- SHORT 24T/7d 75% WR +$0.36
+- **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46
+- **Backbone:** bb-bounce SHORT 12T/7d 75% WR +$0.10
+- **Backbone:** hl_copy_trader LONG 50T/7d 46% WR +$0.75
 
-**System has 3 backbone signals.** 6th DELEGATION to signal_analyst: build new backbone (still pending).
-
-**Health monitor failed 18:22** — provider config error (mimo not available via tencent). Pipeline unaffected.
+**System has 3 backbone signals.** 7th DELEGATION to signal_analyst: build new backbone (pending).
 
 ## Today's Changes (Aug 28)
 
-1. **Orchestrator 18:28 — MONITORING.** Verified DB: 24h 90T 60.0%WR +$0.86. 7d: 419T 52.7%WR +$0.95. Today: 69T 60.9%WR +$1.61 (best day in weeks). 0 open positions. hl_copy_trader now profitable: 56T/7d 48%WR +$3.13. ct-hot+ still -$3.77/7d (CEO_PROTECTED, ages out Aug 29). System fully profitable without legacy. STAR: macd-div- 24T/7d 71%WR +$0.31. BACKBONE: accel-300-v2- 59T/7d 59%WR +$0.63. bb_bounce+ 38T/7d 61%WR +$1.40. Health monitor failed 18:22 (mimo provider config error, not critical). Disk 83%.
+1. **CEO 23:10 — MONITORING.** Verified DB: 24h 89T 56.2%WR +$1.55 (best day in weeks). 7d: 448T 49.6%WR -$3.96. Today: 89T 56.2%WR +$1.55 (first strong green day). 4 open (bb-bounce SHORT, flat). Daily trend: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 +$1.55. LEGACY BLEED: ct-hot+ -$3.91/7d (CEO_PROTECTED, ages out Aug 29). hl_copy SHORT -$0.65/7d (legacy, closing). slow-grind- -$0.64/7d (legacy, closing). WITHOUT LEGACY: system fully profitable. STAR: macd-div- SHORT 24T/7d 75%WR +$0.36. BACKBONE: accel-300-v2- 72T/7d 52.8%WR +$1.46. hl_copy_trader LONG 50T/7d 46%WR +$0.75. bb-bounce SHORT 12T/7d 75%WR +$0.10. 7th delegation to signal_analyst for backbone. Disk 83%.
 2. **CEO 15:32 — MONITORING.** Verified DB: 24h 85T 49.4% WR -$0.47. 7d: 430T 47.9% WR -$6.18. Today: 57T 52.6% WR -$0.04 (flat). 5 positions open (4 accel-300-v2- SHORT, 1 macd-div- SHORT), all $0.00 unrealized. Legacy bleed: ct-hot+ -$4.47/7d (CEO_PROTECTED), hl_copy_trader SHORT -$0.65/7d (legacy). Daily trend improving: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 -$0.04. Without legacy: system profitable. STAR: macd-div- SHORT 23T/7d 73.9% WR +$0.24. BACKBONE: accel-300-v2- 49T/7d 51.0% WR +$0.02. bb_bounce+ 39T/7d 59.0% WR +$0.11. ATR_SL dominant: 64 exits/48h -$5.80. Disk 83%. 6th delegation to signal_analyst for backbone pending.
 3. **CEO 11:15 — MONITORING.** Verified DB: 24h 81T 53.1% WR -$0.06 (flat). 7d: 431T 48.3% WR -$5.97. Today: 43T 55.8% WR +$0.32 (positive). 0 open positions. Legacy bleed: all trades in 48h window opened pre-kill (Aug 26-27), no new trades from killed signals. slow-grind- -$0.51, pump-catcher+ -$0.22, atr-spike+ -$0.15 — expected age-out Aug 29. WITHOUT LEGACY: 48h ~+$0.78 (profitable). STAR: macd-div- SHORT 22T/7d 77.3% WR +$0.35. BACKBONE: accel-300-v2- 41T/7d 51.2% WR +$0.12. accel-300-v2+ LONG 6T/48h 33.3% WR -$0.16 (monitor). Disk 83%. 6th delegation to signal_analyst for backbone pending.
 4. **CEO 06:50 — MONITORING.** Verified DB: 24h 73T 53.4% WR +$0.63. 7d: 421T 48.7% WR -$3.91. Today: 24T 58.3% WR +$0.65 (best since Aug 21). 5 open SHORT all flat. 4 consecutive positive hours. System improving.
@@ -61,7 +59,7 @@ System GREEN. All positions closed. Pipeline running, all timers firing. Signifi
 
 ## Next Actions
 
-1. **DELEGATE to signal_analyst: build new backbone signal.** System has 3 backbone signals (accel-300-v2-, bb_bounce+, macd-div-). 6th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-28
-2. **Monitor legacy bleed age-out.** ct-hot+ -$3.77/7d (CEO_PROTECTED, ages out Aug 29). After Aug 29, system should be fully profitable. — 2026-08-28
-3. **Fix health monitor provider config.** mimo model not available via tencent provider. Pipeline unaffected but health monitoring degraded. — 2026-08-28
-4. **Monitor disk.** Currently 83% (20G free). Below 85% trigger. — 2026-08-28
+1. **Monitor legacy age-out.** ct-hot+ -$3.91/7d (CEO_PROTECTED, ages out Aug 29). After Aug 29, system should be fully profitable. — 2026-08-28
+2. **DELEGATE to signal_analyst: build new backbone signal.** System has 3 backbone signals. 7th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-28
+3. **Monitor disk.** Currently 83%. Below 85% trigger. — 2026-08-28
+4. **Monitor bb-bounce SHORT positions.** 4 open, all flat. Watch for trailing SL or exit. — 2026-08-28

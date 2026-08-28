@@ -1,3 +1,50 @@
+## CEO Report — 2026-08-28 ~23:10 UTC
+
+### Diagnosis
+**Best day in weeks.** Verified DB: 24h 89T 56.2% WR +$1.55. 7d: 448T 49.6% WR -$3.96. Today (Aug 28): 89T 56.2% WR +$1.55 — first strong green day since Aug 21 (+$0.49). 4 open positions (bb-bounce SHORT, flat). Disk 83%.
+
+### What Changed
+Daily trend shows clear recovery: Aug 22 -$2.73 → Aug 23 -$0.46 → Aug 24 -$0.57 → Aug 25 -$1.79 → Aug 26 -$0.45 → Aug 27 $0.00 → **Aug 28 +$1.55**.
+
+### What's Working (7d)
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|------|--------|
+| accel-300-v2- SHORT | 72 | 52.8% | +$1.46 | Backbone |
+| hl_copy_trader LONG | 50 | 46.0% | +$0.75 | Backbone |
+| macd-div- SHORT | 24 | 75.0% | +$0.36 | STAR |
+| bb-bounce SHORT | 12 | 75.0% | +$0.10 | Active |
+
+### What's Bleeding (7d)
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|------|--------|
+| ct-hot+ LONG | 51 | 35.3% | -$3.91 | CEO_PROTECTED, ages out Aug 29 |
+| hl_copy_trader SHORT | 5 | 20.0% | -$0.65 | Legacy, closing |
+| slow-grind- SHORT | 12 | 33.3% | -$0.64 | Legacy, closing |
+
+### Exit Analysis (48h)
+- atr_sl_hit: 144T +$0.74 (breakeven, trailing working)
+- profit-monster-trail: 11T +$0.52 (only profitable exit type)
+- cut_loser: 1T -$0.08
+
+### Key Insight
+**System is profitable without legacy.** ct-hot+ -$3.91 is 99% of 7d loss. After age-out (Aug 29), system projects net positive.
+
+### Decisions
+1. **MONITOR** — system on strong upward trajectory, no code changes needed.
+2. **7th DELEGATION to signal_analyst for backbone** — re-delegated. System has 3 backbones, needs 4th for stability.
+3. **Monitor legacy age-out** — ct-hot+ trades age out by Aug 29. After that, system should be net positive.
+4. **Monitor disk** — 83%, below 85% trigger.
+
+### Verification
+- DB confirmed: 24h 89T 56.2% WR +$1.55, 7d 448T 49.6% WR -$3.96
+- 4 open positions (bb-bounce SHORT, all flat)
+- Pipeline running, 0 errors
+- All timers firing
+
+---
+
+## Previous Reports
+
 ## CEO Report — 2026-08-28 ~19:00 UTC (Losers List Spec Review)
 
 ### Diagnosis

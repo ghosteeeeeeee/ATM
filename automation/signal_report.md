@@ -1,38 +1,26 @@
-# Signal Performance Report
-**Generated:** 2026-08-28 17:10 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-08-28 23:08 UTC — Last 6h | 24h
 
-## 24h Summary
-- **Total:** 94 trades | 54.3% WR | +$1.28 PnL
-- **6h:** 20 trades | 75% WR | +$1.46 PnL (accel-300-v2- SHORT dominant)
+KILLED (executed):
+None — no signals meet kill criteria (WR < 30% with 5+ trades AND PnL < -$0.10 over 24h).
 
----
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-short | SHORT | 81.8% | +$0.20 | 11 | Already boosted (compactor weight 1.5x) |
 
-## KILLED (executed this run)
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| accel-300-v2- | SHORT | 33.3% | $0.00 | 12 (6h) | Flat in last 6h; 24h WR 53.2% +$1.41 — not a kill |
 
-None — no signals meet kill criteria.
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| accel-300-v2- | SHORT | 53.2% | +$1.41 | 62 (24h) | Volume workhorse, steady profit |
+| bb-bounce-short | SHORT | 81.8% | +$0.20 | 11 (24h) | High WR, consistent across tokens |
 
-`accel-300-v2+` LONG (6T, 33.3% WR, -$0.16) already disabled + NEVER_REENABLE.
-
-## BOOSTED (executed this run)
-
-None — `accel-300-v2-` SHORT already 63% of all trades (59/94). Concentration risk limits boost.
-
-## LOSERS (watch list)
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| accel-300-v2+ | LONG | 6 | 33.3% | -$0.16 | DISABLED (NEVER_REENABLE) |
-
-## WINNERS
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| accel-300-v2- | SHORT | 59 | 57.6% | +$1.56 | ENABLED — workhorse, 15+ tokens |
-| bb-bounce-short | SHORT | 5 | 80.0% | +$0.12 | ENABLED — good, small sample |
-| macd-div- | SHORT | 3 | 66.7% | +$0.05 | ENABLED |
-
-## ISSUES
-
-- **No signal inversions.**
-- **Concentration:** accel-300-v2- SHORT = 63% of trades. Monitor for staleness.
-- **Sample sizes:** Only 1 signal has 10+ trades. Most <5 trades — low statistical significance.
+ISSUES:
+- No signal inversions detected.
+- `accel-300-v2-` had 0% WR on 5 tokens in last 6h (ZEN, CC, HYPE, PUMP, YGG) — each -$.09. Likely noise, not a kill signal yet. Monitor.
+- Combined signal names (e.g. `accel-300-v2-,rs-r156`) show scattered 1-trade losses — these are compactor combos, not standalone signal failures.
