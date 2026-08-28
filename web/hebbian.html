@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hebbian Brain — Correlation Engine</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d1117; color: #c9d1d9; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+  .header { background: #161b22; padding: 16px 24px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 18px; color: #58a6ff; }
+  .header .stats { color: #8b949e; font-size: 12px; }
+  .tabs { display: flex; gap: 0; background: #161b22; border-bottom: 1px solid #30363d; }
+  .tab { padding: 10px 20px; cursor: pointer; color: #8b949e; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab:hover { color: #c9d1d9; }
+  .tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+  .content { padding: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card h3 { color: #58a6ff; font-size: 14px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: #8b949e; font-size: 11px; text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid #30363d; }
+  td { padding: 6px 8px; border-bottom: 1px solid #21262d; }
+  tr:hover { background: #1c2128; }
+  .wr-high { color: #3fb950; }
+  .wr-mid { color: #d29922; }
+  .wr-low { color: #f85149; }
+  .lift { color: #79c0ff; }
+  .pnl-pos { color: #3fb950; }
+  .pnl-neg { color: #f85149; }
+  .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  .badge-green { background: #1a3a2a; color: #3fb950; }
+  .badge-yellow { background: #3a3a1a; color: #d29922; }
+  .badge-red { background: #3a1a1a; color: #f85149; }
+  .graph-container { width: 100%; height: 500px; position: relative; overflow: hidden; }
+  canvas { width: 100%; height: 100%; }
+  .heatmap { display: grid; grid-template-columns: repeat(24, 1fr); gap: 1px; }
+  .heatmap-cell { aspect-ratio: 1; border-radius: 2px; cursor: pointer; position: relative; }
+  .heatmap-cell:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #30363d; padding: 4px 8px; border-radius: 4px; white-space: nowrap; z-index: 10; font-size: 11px; }
+  .search { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 8px 12px; border-radius: 6px; width: 200px; font-family: inherit; }
+  .search:focus { outline: none; border-color: #58a6ff; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .chain-path { font-size: 14px; color: #58a6ff; margin-bottom: 12px; padding: 8px; background: #1c2128; border-radius: 6px; }
+  .chain-path span { color: #3fb950; }
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧠 Hebbian Brain — Correlation Engine</h1>
+  <div class="stats" id="header-stats">Loading...</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showSection('chains')">🔗 Chains</div>
+  <div class="tab" onclick="showSection('graph')">🕸️ Graph</div>
+  <div class="tab" onclick="showSection('signals')">🎯 Signals</div>
+  <div class="tab" onclick="showSection('cadence')">⏰ Cadence</div>
+  <div class="tab" onclick="showSection('hubs')">🌐 Hubs</div>
+  <div class="tab" onclick="showSection('avoid')">🚫 Avoid</div>
+</div>
+
+<div class="content">
+
+  <!-- CHAINS SECTION -->
+  <div class="section active" id="chains">
+    <div style="margin-bottom:12px">
+      <input class="search" id="chain-search" placeholder="Filter tokens..." oninput="filterChains()">
+    </div>
+    <div class="card">
+      <h3>Strongest Token Chains</h3>
+      <table>
+        <thead><tr><th>Leader</th><th>→</th><th>Follower</th><th>n</th><th>WR</th><th>Lift</th><th>Conf</th><th>Avg PnL</th></tr></thead>
+        <tbody id="chains-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GRAPH SECTION -->
+  <div class="section" id="graph">
+    <div class="card">
+      <h3>Token Relationship Graph</h3>
+      <p style="color:#8b949e;margin-bottom:12px;font-size:12px">Nodes = tokens, Edges = chains (green = high WR, red = low WR). Size = connections.</p>
+      <div class="graph-container">
+        <canvas id="graph-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNALS SECTION -->
+  <div class="section" id="signals">
+    <div style="margin-bottom:12px">
+      <input class="search" id="signal-search" placeholder="Filter tokens..." oninput="filterSignals()">
+    </div>
+    <div class="card">
+      <h3>Signal + Token Effectiveness</h3>
+      <table>
+        <thead><tr><th>Token</th><th>Signal</th><th>Dir</th><th>n</th><th>WR</th><th>Conf</th><th>Avg PnL</th></tr></thead>
+        <tbody id="signals-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CADENCE SECTION -->
+  <div class="section" id="cadence">
+    <div class="card">
+      <h3>Token Trading Hours (Heatmap)</h3>
+      <p style="color:#8b949e;margin-bottom:12px;font-size:12px">Darker = more active at that hour (UTC). Top tokens by trade count.</p>
+      <div id="cadence-heatmap"></div>
+    </div>
+  </div>
+
+  <!-- HUBS SECTION -->
+  <div class="section" id="hubs">
+    <div class="card">
+      <h3>Most Connected Tokens (Hubs)</h3>
+      <table>
+        <thead><tr><th>Token</th><th>Connections</th><th>Avg WR</th><th>Avg Lift</th><th>Good Chains</th><th>Score</th></tr></thead>
+        <tbody id="hubs-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AVOID SECTION -->
+  <div class="section" id="avoid">
+    <div class="card">
+      <h3>Chains to AVOID (Low Win Rate)</h3>
+      <table>
+        <thead><tr><th>Leader</th><th>→</th><th>Follower</th><th>n</th><th>WR</th><th>Avg PnL</th></tr></thead>
+        <tbody id="avoid-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let DATA = null;
+
+async function loadData() {
+  const resp = await fetch('/data/hebbian_data.json');
+  DATA = await resp.json();
+  document.getElementById('header-stats').textContent =
+    `${DATA.stats.total_chains} chains · ${DATA.stats.tokens_covered} tokens · ${DATA.stats.total_signals} signals`;
+  renderChains();
+  renderSignals();
+  renderCadence();
+  renderHubs();
+  renderAvoid();
+  renderGraph();
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'graph') renderGraph();
+}
+
+function wrClass(wr) { return wr >= 0.6 ? 'wr-high' : wr >= 0.45 ? 'wr-mid' : 'wr-low'; }
+function pnlClass(p) { return p >= 0 ? 'pnl-pos' : 'pnl-neg'; }
+function wrBadge(wr) {
+  if (wr >= 0.7) return `<span class="badge badge-green">${(wr*100).toFixed(0)}%</span>`;
+  if (wr >= 0.5) return `<span class="badge badge-yellow">${(wr*100).toFixed(0)}%</span>`;
+  return `<span class="badge badge-red">${(wr*100).toFixed(0)}%</span>`;
+}
+
+function renderChains() {
+  const search = document.getElementById('chain-search').value.toUpperCase();
+  const chains = DATA.strong_chains.filter(c =>
+    !search || c.a.includes(search) || c.b.includes(search)
+  );
+  document.getElementById('chains-body').innerHTML = chains.map(c => `
+    <tr>
+      <td>${c.a}</td>
+      <td style="color:#58a6ff">→</td>
+      <td>${c.b}</td>
+      <td>${c.n}</td>
+      <td>${wrBadge(c.wr)}</td>
+      <td class="lift">${c.lift.toFixed(1)}x</td>
+      <td>${c.conf.toFixed(2)}</td>
+      <td class="${pnlClass(c.pnl)}">${c.pnl >= 0 ? '+' : ''}${(c.pnl*100).toFixed(2)}%</td>
+    </tr>
+  `).join('');
+}
+
+function filterChains() { renderChains(); }
+
+function renderSignals() {
+  const search = document.getElementById('signal-search').value.toUpperCase();
+  const signals = DATA.signals.filter(s =>
+    !search || s.token.includes(search) || s.signal.toUpperCase().includes(search)
+  ).slice(0, 50);
+  document.getElementById('signals-body').innerHTML = signals.map(s => `
+    <tr>
+      <td>${s.token}</td>
+      <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis">${s.signal}</td>
+      <td>${s.dir}</td>
+      <td>${s.n}</td>
+      <td>${wrBadge(s.wr)}</td>
+      <td>${s.conf.toFixed(2)}</td>
+      <td class="${pnlClass(s.pnl)}">${s.pnl >= 0 ? '+' : ''}${(s.pnl*100).toFixed(2)}%</td>
+    </tr>
+  `).join('');
+}
+function filterSignals() { renderSignals(); }
+
+function renderCadence() {
+  const top = DATA.cadence.slice(0, 15);
+  const hours = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+  let html = '<div style="display:grid;grid-template-columns:60px 1fr;gap:2px;align-items:center">';
+  html += '<div></div><div style="display:grid;grid-template-columns:repeat(24,1fr);gap:1px;text-align:center;font-size:10px;color:#8b949e">' +
+    hours.map(h => `<div>${h}</div>`).join('') + '</div>';
+  top.forEach(c => {
+    const max = Math.max(...c.hours) || 1;
+    html += `<div style="font-size:11px;text-align:right;padding-right:8px">${c.token}</div>`;
+    html += '<div class="heatmap">';
+    c.hours.forEach((h, i) => {
+      const intensity = h / max;
+      const color = `rgba(88, 166, 255, ${intensity})`;
+      html += `<div class="heatmap-cell" style="background:${color}" data-tip="${c.token} ${i}:00 — ${(h*100).toFixed(1)}%"></div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('cadence-heatmap').innerHTML = html;
+}
+
+function renderHubs() {
+  document.getElementById('hubs-body').innerHTML = DATA.hubs.map((h, i) => {
+    const score = (h.degree * h.avg_lift * h.good).toFixed(0);
+    return `<tr>
+      <td>${i < 3 ? '🏆 ' : ''}${h.token}</td>
+      <td>${h.degree}</td>
+      <td>${wrBadge(h.avg_wr)}</td>
+      <td class="lift">${h.avg_lift.toFixed(1)}x</td>
+      <td>${h.good}</td>
+      <td style="color:#58a6ff;font-weight:bold">${score}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAvoid() {
+  document.getElementById('avoid-body').innerHTML = DATA.inverse_chains.map(c => `
+    <tr>
+      <td>${c.a}</td>
+      <td style="color:#f85149">→</td>
+      <td>${c.b}</td>
+      <td>${c.n}</td>
+      <td>${wrBadge(c.wr)}</td>
+      <td class="pnl-neg">${c.pnl >= 0 ? '+' : ''}${(c.pnl*100).toFixed(2)}%</td>
+    </tr>
+  `).join('');
+}
+
+function renderGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * 2;
+  canvas.height = rect.height * 2;
+  ctx.scale(2, 2);
+  const W = rect.width, H = rect.height;
+
+  // Build node set from strong chains
+  const nodeSet = new Set();
+  DATA.strong_chains.forEach(c => { nodeSet.add(c.a); nodeSet.add(c.b); });
+  const nodes = Array.from(nodeSet);
+
+  // Position nodes in a force-directed-ish layout (circular for now)
+  const pos = {};
+  nodes.forEach((n, i) => {
+    const angle = (i / nodes.length) * Math.PI * 2;
+    const r = Math.min(W, H) * 0.35;
+    pos[n] = { x: W/2 + Math.cos(angle) * r, y: H/2 + Math.sin(angle) * r, vx: 0, vy: 0 };
+  });
+
+  // Simple force simulation
+  for (let iter = 0; iter < 100; iter++) {
+    // Repulsion
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const a = pos[nodes[i]], b = pos[nodes[j]];
+        let dx = a.x - b.x, dy = a.y - b.y;
+        let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        let force = 2000 / (dist * dist);
+        a.vx += dx/dist * force; a.vy += dy/dist * force;
+        b.vx -= dx/dist * force; b.vy -= dy/dist * force;
+      }
+    }
+    // Attraction along edges
+    DATA.strong_chains.forEach(c => {
+      if (!pos[c.a] || !pos[c.b]) return;
+      const a = pos[c.a], b = pos[c.b];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      let force = (dist - 100) * 0.01;
+      a.vx += dx/dist * force; a.vy += dy/dist * force;
+      b.vx -= dx/dist * force; b.vy -= dy/dist * force;
+    });
+    // Apply
+    nodes.forEach(n => {
+      pos[n].x += pos[n].vx * 0.1;
+      pos[n].y += pos[n].vy * 0.1;
+      pos[n].vx *= 0.8; pos[n].vy *= 0.8;
+      pos[n].x = Math.max(40, Math.min(W-40, pos[n].x));
+      pos[n].y = Math.max(40, Math.min(H-40, pos[n].y));
+    });
+  }
+
+  // Draw edges
+  DATA.strong_chains.forEach(c => {
+    if (!pos[c.a] || !pos[c.b]) return;
+    const a = pos[c.a], b = pos[c.b];
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.strokeStyle = c.wr >= 0.7 ? 'rgba(63,185,80,0.4)' : c.wr >= 0.5 ? 'rgba(210,153,34,0.3)' : 'rgba(248,81,73,0.2)';
+    ctx.lineWidth = Math.min(3, c.n / 3);
+    ctx.stroke();
+    // Arrow
+    const angle = Math.atan2(b.y - a.y, b.x - a.x);
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    ctx.beginPath();
+    ctx.moveTo(mx + 5*Math.cos(angle), my + 5*Math.sin(angle));
+    ctx.lineTo(mx - 4*Math.cos(angle-0.5), my - 4*Math.sin(angle-0.5));
+    ctx.lineTo(mx - 4*Math.cos(angle+0.5), my - 4*Math.sin(angle+0.5));
+    ctx.fillStyle = c.wr >= 0.7 ? 'rgba(63,185,80,0.6)' : 'rgba(210,153,34,0.4)';
+    ctx.fill();
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const p = pos[n];
+    const connections = DATA.strong_chains.filter(c => c.a === n || c.b === n).length;
+    const radius = 8 + connections * 2;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#1c2128';
+    ctx.fill();
+    ctx.strokeStyle = '#58a6ff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = '#c9d1d9';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(n, p.x, p.y + radius + 14);
+  });
+}
+
+loadData();
+setInterval(loadData, 60000); // Refresh every minute
+</script>
+</body>
+</html>
