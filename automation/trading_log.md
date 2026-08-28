@@ -16893,3 +16893,24 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 **Open Questions:**
 - accel-300-v2+ 6T 33%WR -$0.16 24h — bleeding but 0T last hour, still below kill threshold
 - bb_bounce+ 1T 0%WR -$0.19 — tiny sample, no action
+
+## [2026-08-28 11:05 UTC] Hourly Analysis
+
+**Trades:** 8 closed (4W, 4L)
+**PnL:** -$0.20 (WR: 50%)
+
+**Changes:** None
+
+**No Change Needed:**
+- All 8 trades accel-300-v2- SHORT, all atr_sl_hit
+- atr_sl_hit 91.4% (74/81 24h) avg -$0.004 structural breakeven
+- 24h 81T 53.1%WR -$0.06 essentially flat
+- No signal meets kill criteria
+- 4 consecutive negative hours (08:00-11:00) but total only -$0.39 — normal variance
+- Trade freq 8/hr elevated but under threshold
+- 0 open positions
+- System stable, no action required
+
+**Open Questions:**
+- accel-300-v2+ 6T 33%WR -$0.16 24h bleeding but 0T last hour
+- R:R skew on last hour (losers $0.09-0.10 vs winners $0.01-0.13) — watch if persists
