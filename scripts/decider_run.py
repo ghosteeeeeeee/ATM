@@ -2964,7 +2964,7 @@ def run(dry_run=False):
         # Re-run detect_accel_300_v2() with fresh prices. If conditions no longer
         # valid, block the trade. Prevents executing stale signals where
         # gap_acceleration, price_velocity, etc. have reversed.
-        if 'accel-300-v2' in (source or '') and 'inverse' not in (source or ''):
+        if 'accel-300-v2' in (source or '') and 'inv-' not in (source or ''):
             try:
                 from signals.accel_300_v2 import detect_accel_300_v2, _get_1m_prices
                 fresh_prices = _get_1m_prices(token)
