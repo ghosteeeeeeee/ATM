@@ -62,6 +62,7 @@ def save_state(state):
 
 def get_all_token_stats():
     """Query 7d and 30d stats for all tokens with enough trades."""
+    conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
@@ -104,25 +105,23 @@ def get_all_token_stats():
 
         stats_30d = {row[0]: row[1] for row in cur.fetchall()}
 
-        # Consecutive losses
-        cur.execute("""
-            SELECT token, COUNT(*) as losses
-            FROM (
-                SELECT token, close_time,
-                    ROW_NUMBER() OVER (PARTITION BY token ORDER BY close_time DESC) as rn
-                FROM trades
-                WHERE status = 'closed'
-                  AND server = 'Hermes'
-                  AND pnl_pct <= 0
+        # Consecutive losses — count losses from most recent trade backward
+        consec_losses = {}
+        for token in stats_7d:
+            cur.execute("""
+                SELECT pnl_pct FROM trades
+                WHERE token = %s AND status = 'closed' AND server = 'Hermes'
                   AND close_time > NOW() - INTERVAL '7 days'
-            ) sub
-            WHERE rn = (SELECT COUNT(*) FROM trades WHERE token = sub.token AND status = 'closed' AND server = 'Hermes' AND close_time > NOW() - INTERVAL '7 days')
-            GROUP BY token
-        """)
-
-        consec_losses = {row[0]: row[1] for row in cur.fetchall()}
-
-        conn.close()
+                ORDER BY close_time DESC
+            """, (token,))
+            losses = 0
+            for (pnl,) in cur.fetchall():
+                if pnl is not None and pnl <= 0:
+                    losses += 1
+                else:
+                    break
+            if losses > 0:
+                consec_losses[token] = losses
 
         # Merge stats
         for token in stats_7d:
@@ -134,6 +133,10 @@ def get_all_token_stats():
     except Exception as e:
         log(f"DB query error: {e}")
         return {}
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def is_blacklisted(token):
@@ -184,6 +187,9 @@ def run():
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
         log("Another instance running — skipping")
+        if lock_fd:
+            try: lock_fd.close()
+            except Exception: pass
         return
 
     try:
@@ -270,21 +276,6 @@ def run():
             log(f"Updated LOSERS: {len(current_losers)} → {len(new_losers)} tokens")
             for change in changes:
                 log(f"  {change}")
-
-            # Update PENALTY_TOKENS (CEO recommendation)
-            # This ensures signal_compactor's existing penalty logic works
-            try:
-                with open(CONSTANTS_FILE, 'r') as f:
-                    content = f.read()
-                penalty_block = "PENALTY_TOKENS = {" + \
-                    ','.join(f"'{t}'" for t in sorted(new_losers)) + \
-                    "}" if new_losers else "PENALTY_TOKENS = set()"
-                content = re.sub(r"^PENALTY_TOKENS = \{.*?\}|^PENALTY_TOKENS = set\(\)",
-                                penalty_block, content, flags=re.MULTILINE)
-                with open(CONSTANTS_FILE, 'w') as f:
-                    f.write(content)
-            except Exception as e:
-                log(f"Warning: could not update PENALTY_TOKENS: {e}")
 
             # Log to trading_log.md
             try:
