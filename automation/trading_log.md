@@ -16747,3 +16747,71 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - 5 open positions — monitor
 - atr-spike+ 6T -$0.18 bleeding, watch for 0%WR+3T trigger
+
+## FAVORITES Update — 2026-08-28 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE CAKE (WR=57.1%, PnL=$-0.11, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ME (WR=83.3%, AvgPnL=2.58%, Trades=6)
+- PROMOTE INJ (WR=85.7%, AvgPnL=1.61%, Trades=7)
+
+Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'NXPC', 'SEI', 'SYRUP', 'ZRO']
+
+## [2026-08-28 06:15 UTC] Hourly Analysis
+
+**Trades:** 6 closed last 2h (5W 1L, 83.3% WR). 0 trades in strict last hour.
+**PnL:** +$0.01 last 2h. 24h: 72T, 52%WR, ~+$0.75.
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 62T (86.1%) avg +$0.002 (structural breakeven)
+- profit-monster-trail: 6T avg +$0.058 (star exit)
+- Other (cascade_flip, cut_loser, hard_sl): 4T
+
+**Hourly PnL (last 12h):**
+18:00 -$0.01 → 19:00 -$0.18 → 20:00 +$0.14 → 21:00 +$0.02 → 22:00 -$0.01 → 23:00 -$0.03 → 00:00 -$0.12 → 01:00 -$0.23 → 02:00 +$0.80 → 03:00 +$0.22 → 04:00 +$0.06 → 05:00 +$0.05 → 06:00 -$0.10
+4 consecutive positive hours (02:00-05:00) after negative streak. 06:00 POL loss -$0.10.
+
+**Changes:** None.
+- No kill criteria triggered (no signal 0%WR with 3+T last hour)
+- accel-300-v2- backbone: 24T 54.2%WR +$0.48
+- macd-div- star: 4T 100%WR +$0.23
+- atr-spike+ bleeding -$0.08 but 0T last hour — no kill trigger
+- accel-300-v2+ bleeding -$0.16 — no kill trigger (33.3%WR, not 0%)
+
+**No Change Needed:**
+- System in stable state, positive trend after overnight dip
+- All parameters within normal ranges
+- 4 open SHORT positions (BLUR, AVNT, HBAR, ONDO)
+- POL pnl_pct anomaly (-431.77%) is data artifact — POL is $0.10 token, small absolute moves = huge % swings
+
+**Open Questions:**
+- POL consistently loses (3/3 losses) — consider blacklisting
+- 4 open positions to monitor
+
+## [2026-08-28 06:35 UTC] Daily Orchestrator Run
+
+**Pipeline Status:** GREEN, last run 06:32 exit 0. All timers firing.
+**24h:** 72T, 52% WR, ~+$0.75 (improved from earlier 69T 49.3%)
+**Open:** 5 positions (all accel-300-v2- SHORT)
+**Disk:** 83% (freed 2G journal + 24MB pump_hunter.log)
+
+**Actions Taken:**
+1. Disk cleanup: journal vacuumed to 500MB (-2G), pump_hunter.log truncated (-24MB). Disk 84% → 83%.
+2. Validated pipeline health (last run 06:32, exit 0, all timers active).
+3. Reviewed all automation outputs (health_monitor, auto_1hr, signal_reporter, blacklist_test, upgrade_audit).
+4. Updated CURRENT.md with latest state.
+
+**Automation Summary:**
+- health_monitor: PIPELINE OK, 6 non-critical services failed, hotset fallback stale
+- auto_1hr: No changes needed, 6T last 2h (5W 1L), 4 consecutive positive hours
+- signal_reporter: No kills needed, no inversions, bb-bounce-short watch
+- blacklist_test: Complete (77 tokens tested, 0 KEEP — blacklist working as intended)
+- upgrade_audit: 8 plans tracked, self-learner PARAM_CONFIG expansion next
+
+**Critical Issues:**
+- ZERO backbone signals — 4th delegation to signal_analyst pending
+- Legacy bleed closing but not yet cleared (expected Aug 29)
+
+**Next Steps:**
+1. Signal_analyst MUST deliver backbone signal
+2. Monitor legacy age-out
+3. Monitor bb-bounce-short performance

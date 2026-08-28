@@ -1,10 +1,10 @@
-# Signal Research — 2026-08-27 17:42 UTC
+# Signal Research — 2026-08-28 05:42 UTC
 
 ## Hypotheses Tested
 
 | Pattern | Tokens | Trades | WR | Avg PnL | Verdict |
 |---------|--------|--------|-----|---------|--------|
-| bollinger_squeeze | 20 | 1507 | 0.0% | +0.0000% | ❌ FAIL |
+| bollinger_squeeze | 20 | 1503 | 0.0% | +0.0000% | ❌ FAIL |
 | volume_breakout | 17 | 95 | 0.0% | +0.0000% | ❌ FAIL |
 | consecutive_3_candles | 16 | 93 | 0.0% | +0.0000% | ❌ FAIL |
 

@@ -1362,3 +1362,13 @@ ALERTS:
 ## Error Alerts — 2026-08-28 04:21 UTC
 - **WARN** (Nx): `Disk usage at 84% (19G free) — approaching 85% warning threshold`
 - **AUTO-FIX**: None applied. Monitor if usage continues climbing.
+
+## Error Alerts — 2026-08-28 06:04 UTC
+- **REPEATED** (36x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-08-28 06:22 UTC
+
+- **WARN** (1x): `hotset fallback DB query returned 0 tokens` — hotset dashboard may show stale data
+- **WARN** (6x): Services in failed state: hermes-better-coder, hermes-bug-hunter, hermes-git-release, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-wasp
+- **WARN** (1x): Disk at 84% — approaching 85% threshold
+- **INFO**: 6 services in `activating/auto-restart` (health-monitor, price-collector, coding-mcp, daily-commit, away-detector, pipeline) — normal for timer-triggered services
