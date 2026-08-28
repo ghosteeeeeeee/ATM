@@ -266,31 +266,7 @@ def run():
                 new_losers.add(token)
                 changes.append(f"ADD {token} (WR={wr}%, PnL=${pnl:.2f}, {reason})")
 
-        if not changes:
-            log(f"No changes needed (losers={len(current_losers)})")
-            save_state(state)
-            return
-
-        # Apply changes
-        if update_constants_file(new_losers):
-            log(f"Updated LOSERS: {len(current_losers)} → {len(new_losers)} tokens")
-            for change in changes:
-                log(f"  {change}")
-
-            # Log to trading_log.md
-            try:
-                log_path = '/root/.hermes/automation/trading_log.md'
-                os.makedirs(os.path.dirname(log_path), exist_ok=True)
-                with open(log_path, 'a') as f:
-                    ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
-                    f.write(f"\n## LOSERS Update — {ts}\n")
-                    for change in changes:
-                        f.write(f"- {change}\n")
-                    f.write(f"\nFinal set: {sorted(new_losers)}\n")
-            except Exception:
-                pass
-
-        # Write performance JSON
+        # Always write performance JSON first
         try:
             losers_data = []
             for token in sorted(new_losers):
@@ -323,6 +299,31 @@ def run():
                 pass
         except Exception as e:
             log(f"Error writing performance JSON: {e}")
+
+        if not changes:
+            log(f"No changes needed (losers={len(current_losers)})")
+            save_state(state)
+            return
+
+        # Apply changes
+        if changes:
+            if update_constants_file(new_losers):
+                log(f"Updated LOSERS: {len(current_losers)} → {len(new_losers)} tokens")
+                for change in changes:
+                    log(f"  {change}")
+
+                # Log to trading_log.md
+                try:
+                    log_path = '/root/.hermes/automation/trading_log.md'
+                    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+                    with open(log_path, 'a') as f:
+                        ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+                        f.write(f"\n## LOSERS Update — {ts}\n")
+                        for change in changes:
+                            f.write(f"- {change}\n")
+                        f.write(f"\nFinal set: {sorted(new_losers)}\n")
+                except Exception:
+                    pass
 
         save_state(state)
 
