@@ -1349,3 +1349,16 @@ ALERTS:
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-08-28 03:21 UTC
+- **CRITICAL** (1x): `hermes-pipeline.service` was inactive (deactivated)
+- **AUTO-FIX**: Restarted hermes-pipeline.service — now active
+- **WARN** (1x): Disk at 84% — approaching 85% threshold
+- **WARN** (144x): Phantom trades detected (|pnl| < $0.01)
+
+## Error Alerts — 2026-08-28 04:04 UTC
+- **NEW** (1x): `Aug N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-08-28 04:21 UTC
+- **WARN** (Nx): `Disk usage at 84% (19G free) — approaching 85% warning threshold`
+- **AUTO-FIX**: None applied. Monitor if usage continues climbing.

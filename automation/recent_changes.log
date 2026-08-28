@@ -1,3 +1,7 @@
+[2026-08-28 02:15 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (4W 0L +$0.80 100% WR — excellent). 24h 69T 30W 43.5% -$0.50 near-breakeven. accel-300-v2- 16T 44%WR +$0.33 star workhorse. macd-div- 5T 100%WR +$0.29 star. atr_sl_hit 57T 82.6% of closes — elevated but PnL -$0.50 ($0.007/trade) structural trailing SL working as designed. profit-monster-trail 9T +$0.45 only profitable exit type. 5 open all SHORT all accel-300-v2- (full). Trade freq 4/hr normal. No kill criteria — no signal 0%WR with 3+T last hour. No consecutive neg hours. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 03:15 UTC
 [2026-08-27 03:05 UTC] auto_1hr: FIXED slow_grind_short lifecycle classification
   WHY: slow-grind- 12T 33%WR -$0.64/24h — #1 money loser. Root cause: lifecycle filter classified slow_grind_short as 'lagging' → 0.8x SL mult (tighter SL). But slow_grind fires DURING grinding downtrends, not after — tighter SL = premature exits. Same issue bb_bounce had (fixed 20:10 UTC Aug 26). Changed to 'concurrent' (1.0x SL). Also: pump-catcher+ 20T 35%WR -$0.28, 74% hit atr_sl_hit (SL at 0.8% floor — can't tighten). bb_bounce+ still degraded (17%WR) but 6T below kill threshold. 4 open positions. atr_sl_hit 60% (threshold 40%). No consecutive negative hours. Trade freq 2.7/hr normal.
   BY: auto_1hr
@@ -377,3 +381,11 @@
   WHY: 5T last hour (2W 3L ~$0.00). accel-300-v2- 4T 2W +$0.08, cascade-reverse-v2 1T -$0.09. 73T 24h 57.5%WR ~+$0.21. atr_sl_hit 80.8% (59/73) avg -$0.006 structural trailing. profit-monster-trail 11T +$0.52 only profitable exit. macd-div- 5T 100%WR +$0.29 star. accel-300-v2+ 5T 20%WR -$0.20 bleeding but 0T last hr no kill trigger. Kill criteria not triggered. Trade freq 5/hr normal. 4 open positions.
   BY: auto_1hr
   NEXT: Re-run at 23:55 UTC
+[2026-08-28 04:10 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 20T last 6h (13W 7L). 71T 24h 52%WR +$0.56. accel-300-v2- 21T 52%WR +$0.56 backbone, macd-div- 4T 100%WR +$0.23 star. atr_sl_hit 83.1% avg -$0.002 breakeven. Hourly PnL reversed positive (02:00 +$0.80, 03:00 +$0.22). No kill criteria triggered. System stable. 5 open SHORTs.
+  BY: auto_1hr
+  NEXT: Re-run at 05:10 UTC
+[2026-08-28 05:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +$0.06). All SHORT (BIGTIME, APT, SAND) all atr_sl_hit all positive PnL. 72T 24h 52%WR +$0.75. atr_sl_hit 84.7% avg +$0.001 breakeven. profit-monster-trail 7T +$0.37 star exit. macd-div- 4T 100%WR +$0.23 star signal. accel-300-v2- backbone 22T +$0.57. 3 consecutive positive hours. No kill criteria triggered. Trade freq 3/hr normal. 5 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 06:05 UTC

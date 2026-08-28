@@ -1,5 +1,38 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-28 02:15 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W, 0L) — **+$0.80**
+- INJ accel-300-v2- SHORT atr_sl_hit +$0.29
+- TURBO r2-trend-short3,rs-r100,rs-r101,rs-r99 SHORT atr_sl_hit +$0.22
+- ME accel-300-v2- SHORT hard_sl +$0.27
+- ZRO accel-300-v2-,rs-r111 SHORT atr_sl_hit +$0.02
+
+**24h:** 69T, 43.5% WR, -$0.50 (near breakeven)
+- atr_sl_hit 57T 82.6% of closes — elevated but PnL -$0.50 (trailing SL working as designed, many exits profit-taking)
+- profit-monster-trail 9T +$0.45 — only profitable exit type
+- accel-300-v2- 16T 44%WR +$0.33 — workhorse
+- macd-div- 5T 100%WR +$0.29 — star
+- accel-300-v2+ 6T 33%WR -$0.16 — monitoring
+- atr-spike+ 7T 29%WR -$0.15 — monitoring
+
+**Open:** 5 SHORT (all accel-300-v2-), full positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last hour
+- Trade freq 4/hr normal
+- Last hour was excellent (4W/0L)
+- atr_sl_hit elevated at 82.6% but PnL near-zero ($0.007/trade) — structural trailing SL, working as designed
+- No consecutive negative hours
+
+**Open Questions:**
+- accel-300-v2- dominating position allocation (5/5 open) — is signal diversity suffering?
+- 24h WR at 43.5% — below 50% but PnL near-zero due to win size > loss size (R:R working)
+
+---
+
 ## [2026-08-27 18:35 UTC] Daily Orchestrator Report
 
 **Pipeline Status:** 5 open (all SHORT) | 62 closed today | -34.7% PnL
@@ -16664,3 +16697,53 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - NEUTRAL regime dominant — structural mismatch with SHORT-heavy entries. Delegated to signal_analyst to build new backbone signal.
 - 2 consecutive negative hours (00, 01) — watch for 3+ threshold next hour.
+
+## [2026-08-28 04:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 20 closed last 6h (13W, 7L).
+
+**24h:** 71T, 52%WR, ~+$0.56. accel-300-v2- 21T +$0.56 (backbone). macd-div- 4T 100%WR +$0.23 (star). atr_sl_hit 83.1% (59/71) avg -$0.002 (breakeven).
+
+**Hourly PnL (last 8h):** +$0.02 → -$0.03 → -$0.12 → -$0.01 → -$0.23 → **+$0.22 → +$0.80** — reversed to positive.
+
+**Diagnosis:**
+1. **Entry quality:** 0 trades last hour — quiet period, no new entries. 5 open positions (all SHORT).
+2. **SL behavior:** atr_sl_hit 83.1% of exits, avg -$0.002 (breakeven). Structural — trailing SL working as designed.
+3. **Signal quality:** accel-300-v2- 21T 52%WR +$0.56 backbone. macd-div- 4T 100%WR +$0.23 star. No signal 0% WR with 3+T.
+4. **Trade frequency:** ~4T/hr — normal.
+
+**Changes:** None.
+- No kill criteria met
+- Trend reversed positive (02:00 +$0.80, 03:00 +$0.22)
+- No signal bleeding below threshold
+
+**No Change Needed:**
+- System in stable state
+- 2 consecutive positive hours after negative streak
+- All parameters within normal ranges
+
+**Open Questions:**
+- 5 open SHORT positions — monitor for adverse move
+
+## [2026-08-28 05:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (3W 0L). All SHORT (BIGTIME, APT, SAND). All atr_sl_hit — all positive PnL.
+
+**24h:** 72T, 52% WR, ~+$0.75. atr_sl_hit 84.7% (61/72) avg +$0.001 (breakeven). profit-monster-trail 7T +$0.37 star exit.
+
+**Hourly PnL:** +$0.02 → -$0.03 → -$0.12 → -$0.23 → **+$0.80 → +$0.22 → +$0.06** — 3 consecutive positive hours.
+
+**Changes:** None.
+
+**No Change Needed:**
+- All 3 last-hour trades profitable (SL hit but positive PnL = trailing working)
+- No signal 0% WR with 3+T last hour
+- Trade freq 3/hr — normal
+- 3 consecutive positive hours — trending well
+- accel-300-v2- backbone solid (22T 52%WR +$0.57)
+- macd-div- star (4T 100%WR +$0.23)
+- atr-spike+ bleeding -$0.18 but 0T last hour, no kill trigger
+
+**Open Questions:**
+- 5 open positions — monitor
+- atr-spike+ 6T -$0.18 bleeding, watch for 0%WR+3T trigger
