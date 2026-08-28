@@ -2955,6 +2955,30 @@ def run(dry_run=False):
                     skipped += 1
                     continue
 
+        # ── Accel-300-v2 Staleness Re-check ──────────────────────────────────────
+        # Re-run detect_accel_300_v2() with fresh prices. If conditions no longer
+        # valid, block the trade. Prevents executing stale signals where
+        # gap_acceleration, price_velocity, etc. have reversed.
+        if 'accel-300-v2' in (source or '') and 'inverse' not in (source or ''):
+            try:
+                from signals.accel_300_v2 import detect_accel_300_v2, _get_1m_prices
+                fresh_prices = _get_1m_prices(token)
+                if not fresh_prices:
+                    log(f'  🚫 [ACCEL-V2-STALE] {token} {direction} blocked: no fresh price data for staleness check')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+                fresh_result = detect_accel_300_v2(token, fresh_prices)
+                if fresh_result is None or fresh_result.get('direction') != direction:
+                    log(f'  🚫 [ACCEL-V2-STALE] {token} {direction} blocked: conditions no longer valid at execution time')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+            except Exception as e:
+                log(f'  [WARN] accel-v2 re-check failed: {e}', 'WARN')
+
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
         # Rule-based = hard block (SKIP) or FLIP (direction change). LLM/similar setup = soft advisory (WARN → confidence penalty).
