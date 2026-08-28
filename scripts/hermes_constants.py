@@ -272,28 +272,37 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
+    'AIXBT',
     'ALT',
-    'BIGTIME',
     'BLUR',
     'BTC',
+    'CAKE',
     'CASHCAT',
     'CC',
     'COMP',
+    'DYDX',
+    'ENA',
     'ENS',
     'ETH',
+    'HBAR',
+    'HYPE',
+    'IMX',
     'MERL',
-    'MET',
     'MON',
     'NEO',
     'POL',
     'PUMP',
+    'WLD',
     'WLFI'
 }
 
 
+
+
+
 # Promotion criteria (add to losers)
 LOSERS_MIN_TRADES = 5              # Minimum trades in 7d to evaluate
-LOSERS_ADD_WR_THRESHOLD = 45.0     # Below this WR → add
+LOSERS_ADD_WR_THRESHOLD = 60.0     # Below this WR → add (coins with 60%+ WR should not be losers)
 LOSERS_ADD_PNL_THRESHOLD = -0.50   # Below this PnL → add
 LOSERS_ADD_CONSECUTIVE_LOSSES = 5  # This many losses in a row → add
 LOSERS_ADD_WR_COLLAPSE = 20.0      # Dropped this much from 30d avg → add
@@ -301,7 +310,7 @@ LOSERS_AUTO_DISABLE_WR = 30.0      # Below this WR with 10+ trades → permanent
 LOSERS_AUTO_DISABLE_MIN_TRADES = 10
 
 # Demotion criteria (remove from losers)
-LOSERS_REMOVE_WR_THRESHOLD = 55.0  # Must be above this to exit
+LOSERS_REMOVE_WR_THRESHOLD = 65.0  # Must be above this to exit (above the add threshold)
 LOSERS_REMOVE_PNL_THRESHOLD = 0.0  # Must be profitable to exit
 LOSERS_COOLDOWN_DAYS = 3           # Must be out for 3 days before re-adding
 

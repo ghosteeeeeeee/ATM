@@ -4,11 +4,14 @@ losers_tracker.py — Auto-update LOSERS set based on rolling performance.
 
 Runs daily (06:05 UTC, after favorites_updater). Identifies underperforming coins.
 
-Promotion: 7d WR < 45% OR PnL < -$0.50 OR 5+ consecutive losses OR WR collapse >20pp
-Demotion: 7d WR >= 55% AND PnL > $0 (must be out for 3 days)
+Promotion: 7d WR < 60% (coins with 60%+ WR are not losers)
+  - Auto-disable: < 30% WR with 10+ trades
+  - Consecutive losses: 5+ in a row
+  - WR collapse: dropped >20pp from 30d avg
+Demotion: 7d WR >= 65% AND PnL > $0 (must be out for 3 days)
 
 Reads: brain DB (trades), hermes_constants.py (current LOSERS)
-Writes: hermes_constants.py (updated LOSERS + PENALTY_TOKENS), data/losers_performance.json
+Writes: hermes_constants.py (updated LOSERS), data/losers_performance.json
 
 Run via: python3 scripts/losers_tracker.py
 Timer: hermes-losers-tracker.timer (daily 06:05 UTC)
@@ -242,25 +245,25 @@ def run():
 
             reason = None
 
-            # Check auto-disable (dead zone)
+            # Only add to losers if WR < 60% (coins with 60%+ WR are not losers)
+            if wr >= LOSERS_ADD_WR_THRESHOLD:
+                continue
+
+            # Check auto-disable (dead zone) — worst first
             if wr < LOSERS_AUTO_DISABLE_WR and trades >= LOSERS_AUTO_DISABLE_MIN_TRADES:
                 reason = f"dead_zone ({wr}% WR, {trades} trades)"
-
-            # Check low WR
-            elif wr < LOSERS_ADD_WR_THRESHOLD:
-                reason = f"low_wr ({wr}%)"
-
-            # Check negative PnL
-            elif pnl < LOSERS_ADD_PNL_THRESHOLD:
-                reason = f"negative_pnl (${pnl:.2f})"
-
             # Check consecutive losses
             elif consec >= LOSERS_ADD_CONSECUTIVE_LOSSES:
                 reason = f"consecutive_losses ({consec})"
-
             # Check WR collapse
             elif wr_30d and (wr_30d - wr) >= LOSERS_ADD_WR_COLLAPSE:
                 reason = f"wr_collapse ({wr_30d}% → {wr}%)"
+            # Check negative PnL (only if WR is already below threshold)
+            elif pnl < LOSERS_ADD_PNL_THRESHOLD:
+                reason = f"negative_pnl (${pnl:.2f})"
+            # Default: low WR
+            else:
+                reason = f"low_wr ({wr}%)"
 
             if reason:
                 new_losers.add(token)
