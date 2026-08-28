@@ -16580,3 +16580,59 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - accel-300-v2+ 5T/20%WR/-$0.20 24h — trending poorly, monitor
 - atr-spike+ 7T/28.6%WR/-$0.15 — below kill threshold but persistent bleed
+
+## [2026-08-27 23:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W, 2L) — **-$0.08**
+- APT SHORT (multi-signal) atr_sl_hit -$0.01
+- NXPC LONG accel-300-v2+ atr_sl_hit +$0.04
+- MON SHORT accel-300-v2- atr_sl_hit -$0.11
+
+**24h:** 72T, 47.2% WR, -$0.07 (near breakeven)
+- atr_sl_hit 58T (80.6% of exits) — elevated but trailing SL working as designed
+- profit-monster-trail 11T +$0.52 — only profitable exit type
+- macd-div- 5T 100%WR +$0.29 — star signal
+- accel-300-v2+ 6T 33%WR -$0.16 — in validation window, monitoring
+- atr-spike+/pump-catcher+/bb_bounce+ trades are residual from pre-kill positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour with 0% WR
+- Trade freq ~2/hr normal
+- 4 open positions (all SHORT), system at capacity
+- No consecutive negative hours (last 6h alternating +/-)
+- atr_sl_hit at 80.6% is structural — trailing SL working correctly, not a bug
+- accel-300-v2+ at -$0.16 in validation — needs more data before action
+
+**Open Questions:**
+- accel-300-v2+ validation window — will it improve with more samples?
+- System operating at 4/5 max positions SHORT — NEUTRAL regime dominant, structural mismatch but no new entries possible anyway
+
+## [2026-08-28 01:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W, 1L, 1BE) — **-$0.12**
+- CC SHORT accel-300-v2- atr_sl_hit -$0.12
+- DYDX SHORT accel-300-v2- atr_sl_hit $0.00
+
+**24h:** 66T, ~50%WR, ~+$0.17
+- atr_sl_hit 55T/83.3% avg -$0.016 — structural, trailing SL working
+- profit-monster-trail 11T +$0.52 avg — only profitable exit
+- macd-div- 5T 100%WR +$0.29 — star signal
+- accel-300-v2- 12T 41.7%WR -$0.06 — underperforming
+- accel-300-v2+ 6T 33%WR -$0.16 — bleeding, 0T last hour
+- atr-spike+ 7T 28.6%WR -$0.15 — bleeding
+- pump-catcher+ 6T 33%WR -$0.14 — bleeding
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered — no signal 3+T/0%WR last hour
+- Trade freq 2/hr normal
+- 3/5 max positions (all SHORT)
+- atr_sl_hit 83.3% structural consistent with prior hours
+- accel-300-v2+ at -$0.16 in 24h trending poorly but below kill threshold
+
+**Open Questions:**
+- accel-300-v2+ validation window — monitor next run
+- pump-catcher+ persistent bleed — needs more data

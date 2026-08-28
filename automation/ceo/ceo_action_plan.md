@@ -1,3 +1,47 @@
+## CEO Action Plan — 2026-08-28 (Wave Catch Decision)
+
+### Priority 1: Backtest Wave Catch Signals (THIS WEEK)
+**Owner:** signal_analyst
+**Task:** Backtest all 1285 support_resistance LONG signals (Aug 14-22)
+**Steps:**
+1. Query trades table for support_resistance LONG signals with outcomes
+2. For signals without recorded outcomes, fetch historical price data (5m candles)
+3. Simulate entry at signal time, track price for 72h
+4. Calculate: WR, avg win%, avg loss%, R:R, max drawdown
+5. Break down by: regime (NEUTRAL vs LONG_BIAS), coin, confidence tier
+6. Return: full statistical report with confidence intervals
+
+**Decision gate:** If backtest WR > 55% with 50+ outcomes → approve Phase 2. Otherwise, kill proposal.
+
+### Priority 2: Fix NEUTRAL Confluence Scoring (BEFORE Wave Catch)
+**Owner:** CEO + signal_analyst
+**Task:** Reduce NEUTRAL regime penalty from 50% to 25% for tested signals
+**Rationale:** Wave catch signals fire in NEUTRAL. Current penalty suppresses them. Need confluence scoring fix before wave catch can be evaluated.
+**Blocker:** Must not weaken confluence gate for untested signals. Only reduce penalty for signals with proven edge.
+
+### Priority 3: Build Backbone Signal (ALREADY DELEGATED)
+**Owner:** signal_analyst
+**Task:** Build new volume+momentum backbone signal
+**Status:** 3rd delegation — must produce
+**Rationale:** System has ZERO backbone signals. This is more urgent than wave catch.
+
+### Priority 4: Wave Catch Risk Module (IF Phase 1 PASSES)
+**Owner:** signal_analyst + CEO
+**Task:** Design risk module that bypasses Cut Loser, Profit Monster, MAE Guard
+**Requirements:**
+- Must have its own position sizing rules
+- Must have its own stop loss (3% trailing)
+- Must NOT interfere with existing risk management for other signals
+- Must have separate kill switch
+- Must pass code review before live
+
+### Priority 5: Paper Trading (IF Phase 2 APPROVED)
+**Owner:** signal_analyst
+**Task:** Shadow mode for 48h (log signals without trading)
+**Gate:** >55% WR with 50+ signals → enable live
+
+---
+
 ## CEO Action Plan — 2026-08-11
 
 ### Priority 1: Unfreeze Volatility Gate (TODAY)

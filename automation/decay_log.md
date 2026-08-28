@@ -750,3 +750,9 @@
 [2026-08-27 17:07 UTC]   🟢 OK: macd-div-: 5 trades, 80.0% WR, PnL=2.86
 [2026-08-27 17:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-27 17:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-27 23:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-27 23:07 UTC]   🟢 OK: accel-300-v2+: 6 trades, 33.3% WR, PnL=-3.68
+[2026-08-27 23:07 UTC]   🟢 OK: accel-300-v2-: 9 trades, 66.7% WR, PnL=1.14
+[2026-08-27 23:07 UTC]   🟢 OK: macd-div-: 5 trades, 100.0% WR, PnL=3.34
+[2026-08-27 23:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-27 23:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

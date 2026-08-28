@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-27 13:12:44",
+  "timestamp": "2026-08-27 21:12:44",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -7,19 +7,19 @@
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "106 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "82 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
     {
       "name": "sql_injection",
-      "msg": "45 files with f-string SQL",
+      "msg": "35 files with f-string SQL",
       "file": "token_performance_monitor.py:28",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {
       "name": "cursor_leaks",
-      "msg": "116 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "77 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,31 +31,31 @@
     },
     {
       "name": "bare_except",
-      "msg": "100 bare except clauses in 37 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "63 bare except clauses in 20 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), wasp.py(8))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
     {
       "name": "connection_leaks",
-      "msg": "114 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "85 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
     {
       "name": "non_atomic_json",
-      "msg": "88 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, dsh_sessions_to_openmemory.py",
+      "msg": "62 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, coin_tracker_api.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
     {
       "name": "hardcoded_passwords",
-      "msg": "5 files with hardcoded passwords: study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, rebuild_ab_results.py, trading-checklist.py",
+      "msg": "4 files with hardcoded passwords: study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, trading-checklist.py",
       "file": "",
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     },
     {
       "name": "dead_imports",
-      "msg": "16 imports of defunct modules: volume_hl_signals.py\u2192signal_gen, ma_cross_5m.py\u2192signal_gen, check_filter_chain.py\u2192signal_gen",
+      "msg": "7 imports of defunct modules: position_manager.py\u2192signal_gen, decider_run.py\u2192signal_gen, zscore_momentum.py\u2192signal_gen",
       "file": "",
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
