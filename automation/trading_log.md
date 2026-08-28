@@ -17079,3 +17079,27 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 **Open Questions:**
 - Hour 16 spike (10T, +$1.80) — one-off cluster or regime shift?
 - POL LONG is only open LONG — watching for regime consistency
+
+## [2026-08-28 19:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**PnL:** +$0.02 (WR: 100%)
+
+**Key Data:**
+- 24h: 87T 53%WR +$1.31 (solid)
+- atr_sl_hit: 83/87 (95.4%) avg +$0.016 — structural, profitable
+- accel-300-v2-: 64T 53.1%WR +$1.36 — dominant signal, working well
+- Trade freq: 1/hr — quiet period
+- bb-bounce-short: 6T 83.3%WR +$0.14 — small sample but positive
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 1/hr — well under threshold
+- 24h PnL +$1.31 — system profitable
+- All signals non-negative PnL at 24h level
+
+**Open Questions:**
+- Trade volume dropped significantly (9T→1T) — regime or just quiet hour?
+- bb-bounce-short emerging as secondary signal — worth watching

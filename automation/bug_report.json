@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-28 13:12:45",
+  "timestamp": "2026-08-28 21:12:46",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -55,7 +55,7 @@
     },
     {
       "name": "dead_imports",
-      "msg": "7 imports of defunct modules: position_manager.py\u2192signal_gen, decider_run.py\u2192signal_gen, zscore_momentum.py\u2192signal_gen",
+      "msg": "5 imports of defunct modules: zscore_momentum.py\u2192signal_gen, exhaustion_signals.py\u2192signal_gen, trend_purity_signals.py\u2192signal_gen",
       "file": "",
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }

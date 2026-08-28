@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-28 17:18 UTC
+# Signal Rotation — 2026-08-28 21:18 UTC
 
 ## Market Regime: NEUTRAL
 
