@@ -1431,3 +1431,60 @@ ALERTS:
 
 ## Error Alerts — 2026-08-28 11:04 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`
+
+## Error Alerts — 2026-08-28 11:22 UTC (Health Monitor)
+- **[WARN]** (6x): `6 services in failed state` — better-coder (missing dispatcher module), bug-hunter (exits 1 on findings), git-release (push failed), mtf-macd-tuner (missing warmup attr), trading-checklist (1 warning), wasp (crash)
+- **[WARN]** (1x): `Disk at 83%` — 92G/118G, trending up
+- **[WARN]** (1x): `0 hot tokens` — market quiet, 86 warm 8 cold
+- **[INFO]**: Pipeline running, hl-sync-guardian active, 51 signals (1h), 42 trades closed today, $0.08 PnL, 57.1% WR
+- **No auto-fixes needed** — all failed services are non-critical to pipeline operation
+
+## Error Alerts — 2026-08-28 13:21 UTC
+- **WARN** (6): Non-critical services failed: better-coder, bug-hunter, git-release, trading-checklist, wasp, mtf-macd-tuner
+- **WARN** (665): Phantom trades with <0.01% PnL (total -0.90 USDT)
+- **AUTO-FIX**: None needed — pipeline healthy, timers firing, prices fresh
+
+## Error Alerts — 2026-08-28 14:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(ME): HL TOK failed — Reduce only order would increase position. asset=N`
+
+## Error Alerts — 2026-08-28 15:04 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3541s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3540s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3240s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3187s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3308s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3125s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3246s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2947s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3067s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] W TOK BLOCKED — TOK in cooldown (3487s left, N failures)`
+
+## Error Alerts — 2026-08-28 16:22 UTC
+- **INFO**: Pipeline HEALTHY — running, 106 signals generated, 4 open / 91 closed today
+- **WARN** (7): Non-critical services failed: better-coder (import error), bug-hunter, ceo, git-release, mtf-macd-tuner, trading-checklist (1 warning), wasp
+- **WARN**: Disk 83% used (20G free) — approaching threshold
+- **INFO**: SHORT cooldowns blocking 5+ tokens — normal behavior
+- **INFO**: Market SHORT_BIAS — 46 short / 60 neutral / 0 long
+- **INFO**: Weekly perf: 432 trades, 51% WR, -0.40% avg PnL
+- **AUTO-FIX**: None needed — pipeline healthy, no critical failures
+
+## Error Alerts — 2026-08-28 17:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3480s left, N failures)`
+
+## Error Alerts — 2026-08-28 18:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3360s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3185s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3123s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3003s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2942s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2164s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3536s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3479s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3416s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3360s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2998s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2936s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2875s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2820s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2277s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1918s left, N failures)`

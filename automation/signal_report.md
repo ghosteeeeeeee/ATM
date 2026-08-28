@@ -1,66 +1,38 @@
 # Signal Performance Report
-**Generated:** 2026-08-28 18:30 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-28 17:10 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats (24h)
-- **Total trades:** 81 | **WR:** ~49% | **PnL:** -$0.06
-
----
-
-## KILLED (executed this cycle)
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | accel-300-v2+ already disabled 2026-08-27 |
+## 24h Summary
+- **Total:** 94 trades | 54.3% WR | +$1.28 PnL
+- **6h:** 20 trades | 75% WR | +$1.46 PnL (accel-300-v2- SHORT dominant)
 
 ---
 
-## BOOSTED (executed this cycle)
+## KILLED (executed this run)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No boost candidates with sufficient conviction |
+None — no signals meet kill criteria.
 
----
+`accel-300-v2+` LONG (6T, 33.3% WR, -$0.16) already disabled + NEVER_REENABLE.
 
-## WINNERS (24h)
+## BOOSTED (executed this run)
 
-| Signal | Dir | WR | PnL | Trades | Tokens | Status |
-|--------|-----|-----|-----|--------|--------|--------|
-| macd-div- | SHORT | 100.0% | $0.11 | 3 | WLD, USUAL, STX | ENABLED — watch for more trades |
-| accel-300-v2- | SHORT | 51.2% | $0.12 | 41 | multiple | ENABLED — healthy |
-| bb-bounce-short | SHORT | 80.0% | $0.04 | 5 | POL, WLD, BANANA, FOGO | ENABLED — watch (all-time 70% WR, -$0.07) |
+None — `accel-300-v2-` SHORT already 63% of all trades (59/94). Concentration risk limits boost.
 
----
+## LOSERS (watch list)
 
-## LOSERS / WATCH LIST (24h)
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| accel-300-v2+ | LONG | 6 | 33.3% | -$0.16 | DISABLED (NEVER_REENABLE) |
 
-| Signal | Dir | WR | PnL | Trades | Status | Note |
-|--------|-----|-----|-----|--------|--------|------|
-| accel-300-v2+ | LONG | 33.3% | -$0.16 | 6 | DISABLED | In NEVER_REENABLE since 2026-08-27 |
+## WINNERS
 
----
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| accel-300-v2- | SHORT | 59 | 57.6% | +$1.56 | ENABLED — workhorse, 15+ tokens |
+| bb-bounce-short | SHORT | 5 | 80.0% | +$0.12 | ENABLED — good, small sample |
+| macd-div- | SHORT | 3 | 66.7% | +$0.05 | ENABLED |
 
-## SIGNAL INVERSIONS (24h)
+## ISSUES
 
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## 6h SNAPSHOT
-
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| accel-300-v2- | SHORT | 47.4% | -$0.45 | 19 |
-| bb-bounce-short | SHORT | 66.7% | -$0.01 | 3 |
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] macd-div- SHORT** — 100% WR but only 3 trades. Needs 5+ for boost consideration.
-2. **[WATCH] bb-bounce-short SHORT** — 80% WR 24h, all-time still -$0.07. Monitor for consistency.
-3. **[KEEP] accel-300-v2- SHORT** — 41 trades, 51.2% WR, $0.12. System workhorse.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+- **No signal inversions.**
+- **Concentration:** accel-300-v2- SHORT = 63% of trades. Monitor for staleness.
+- **Sample sizes:** Only 1 signal has 10+ trades. Most <5 trades — low statistical significance.

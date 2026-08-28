@@ -1,5 +1,25 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-28 18:28 UTC] Orchestrator Daily Run
+
+**Status:** System GREEN, no implementation needed
+
+**Pipeline:** 5 open | 91 closed today | +48.48% PnL
+
+**Key Findings:**
+- 24h: 90T 60.0%WR +$0.86 (strong)
+- Today: 69T 60.9%WR +$1.61 (best day in weeks)
+- 7d: 419T 52.7%WR +$0.95 (profitable)
+- hl_copy_trader now profitable: 56T/7d 48%WR +$3.13
+- ct-hot+ -$3.77/7d (CEO_PROTECTED, ages out Aug 29)
+- Health monitor failed 18:22 (mimo provider config, not critical)
+
+**Actions Taken:**
+- Updated CURRENT.md with fresh data
+- No implementation tasks pending
+
+**No Action Needed:** System improving, all automations stable, no kill/boost criteria met.
+
 ## [2026-08-28 12:05 UTC] Hourly Analysis
 
 **Trades:** 0 closed in last hour (8 in last 2h)
@@ -16935,3 +16955,127 @@ Final set: ['BABY', 'CHIP', 'DOGE', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'N
 **Open Questions:**
 - accel-300-v2+ 6T 33%WR -$0.16 24h bleeding but 0T last hour
 - R:R skew on last hour (losers $0.09-0.10 vs winners $0.01-0.13) — watch if persists
+
+## [2026-08-28 12:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W, 1L)
+**PnL:** -$0.11 (WR: 0%)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 91.3% (73/80 24h) avg -$0.005 structural breakeven — not a problem
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 1/hr low, under threshold
+- 24h 80T 51.3%WR -$0.13 essentially flat
+- 5 open SHORT positions, all flat
+- System in choppy regime (5 of last 6 hours red) but within normal variance
+- accel-300-v2+ 6T 33%WR -$0.16 24h — bleeding but 0T last hour, still below kill threshold
+
+**Open Questions:**
+- 24h PnL flipped negative (-$0.13) after earlier being +$0.75 — watch if trend continues
+- accel-300-v2+ persistent bleed — continues, still below kill threshold
+
+## [2026-08-28 14:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W, 0L)
+**PnL:** +$0.25 (WR: 100%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Last hour perfect: 3T 100%WR +$0.25 (PUMP +$0.05, NEAR +$0.12, ME +$0.08)
+- 6h trend shows recovery: 08:00-12:00 all red → 13:00 +$0.20, 14:00 +$0.05
+- 24h 82T 53.7%WR +$0.23 — positive after morning dip
+- atr_sl_hit 91.5% (75/82 24h) avg $0.000 structural breakeven — not a problem
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 3/hr normal
+- 3 open positions
+- accel-300-v2+ 6T 33%WR -$0.16 24h but 0T last hour — below kill threshold
+- bb-bounce-short 6T 83.3%WR +$0.16 — star signal
+- accel-300-v2- 43T 51.2%WR +$0.24 — backbone
+- System stable, no action required
+
+**Open Questions:**
+- accel-300-v2+ persistent bleed but inactive last hour — monitor
+
+## [2026-08-28 15:06 UTC] Hourly Analysis
+
+**Trades:** 10 closed (4W, 6L)
+**PnL:** -$0.37 (WR: 40%)
+
+**Key Data:**
+- 24h: 87T 50.6%WR -$0.42 (slightly underwater)
+- atr_sl_hit: 81/87 (93%) avg -$0.008 — structural, not a problem
+- atr_tp_hit: 1/87 (1%) — PM_TRAIL handles winners, by design
+- Hour 14 rough: 11T 5W -$0.44 (worst hour in 24h)
+- Last 6h: 5 of 6 hours red, only hour 13 green (+$0.20)
+- 6 hour trend: -$0.11→-$0.10→-$0.11→+$0.20→-$0.44
+
+**Diagnosis:**
+1. **Entry quality**: 50.6% WR 24h is borderline. Losers hit SL at -0.80% with adverse excursion -0.96% to -1.22% (trailing SL tightens). No edge degradation.
+2. **SL behavior**: atr_sl_hit 93% — by design with 0.8% SL floor. Not a problem.
+3. **Signal quality**: accel-300-v2+ 6T/7d 33%WR -$0.16 persistent bleed but only 6 trades total. Below kill threshold.
+4. **Trade frequency**: 87T/24h = ~3.6/hr. Normal.
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 10/hr (elevated but not over threshold of 20)
+- 24h PnL -$0.42 within normal variance for 0.8% SL / 50% WR profile
+- System in choppy regime (5/6 hours red) but no structural issue identified
+- accel-300-v2+ bleed persistent but too few trades to act
+
+**Open Questions:**
+- 24h trend: was +$0.75 at 08:00, now -$0.42.1.17 decline over 7 hours. Monitor if continues.
+- Hour 14 cluster of SHORT stops — possible local resistance test that failed
+
+## [2026-08-28 16:06 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W, 1L)
+**PnL:** +$0.41 (WR: 50%)
+
+**Key Data:**
+- 24h: 87T 49.4%WR -$0.06 (breakeven)
+- atr_sl_hit: 82/87 (94.3%) avg -$0.003 — structural
+- Trade freq: 2/hr — calm after 10T spike last hour
+- 24h PnL recovered from -$0.42 → -$0.06 (5 of last 6 hours red but small losses)
+- 3 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Trade freq 2/hr normal
+- accel-300-v2+ 6T 33%WR -$0.16 — below kill threshold
+- System stable, 24h nearly breakeven
+
+**Open Questions:**
+- Hour 15 spike (10T) was one-off, not systemic
+
+## [2026-08-28 18:15 UTC] Hourly Analysis
+
+**Trades:** 9 closed (9W, 0L)
+**PnL:** +$1.25 (WR: 100%)
+
+**Key Data:**
+- 24h: 94T 54.3%WR +$1.93 (solid recovery)
+- atr_sl_hit: 89/94 (94.7%) avg +$0.012 — structural, profitable
+- Last hour: accel-300-v2- 8T 100%WR +$1.13, macd-div- 1T 100%WR +$0.12
+- Trade freq: 9/hr elevated but all winners — no action needed
+- 3 open positions (2 SHORT, 1 LONG)
+- 24h hourly: Hour 16 was +$1.80 (10T), Hour 17 was -$0.27 (3T)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- All signals profitable last hour
+- 24h PnL +$1.93 — system healthy
+- Trade freq 9/hr elevated but quality is high (100% WR)
+- accel-300-v2+ still 33%WR -$0.16 24h but only 6T — below threshold
+
+**Open Questions:**
+- Hour 16 spike (10T, +$1.80) — one-off cluster or regime shift?
+- POL LONG is only open LONG — watching for regime consistency

@@ -409,3 +409,19 @@
   WHY: 2T last hour (1W 1L -$0.01). 75T 24h 54.7%WR +$0.36. atr_sl_hit 88% avg -$0.001 structural breakeven. No kill criteria triggered. Trade freq 2/hr normal. 5 open SHORTs all accel-300-v2-. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 11:05 UTC
+[2026-08-28 12:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.11). BABY SHORT macd-div- atr_sl_hit. 80T 24h 51.3%WR -$0.13. atr_sl_hit 91.3% avg -$0.005. No kill criteria triggered. Trade freq 1/hr low. 5 open SHORTs flat. System in choppy regime (5 of last 6 hrs red) but within normal variance.
+  BY: auto_1hr
+  NEXT: Re-run at 13:05 UTC
+[2026-08-28 14:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +$0.25). Perfect hour. 82T 24h 53.7%WR +$0.23. atr_sl_hit 91.5% avg $0.000 structural breakeven. No kill criteria triggered. Trade freq 3/hr normal. 3 open positions. System recovered from choppy morning (08:00-12:00 all red → 13:00-14:00 green). No action required.
+  BY: auto_1hr
+  NEXT: Re-run at 15:05 UTC
+[2026-08-28 15:06 UTC] auto_1hr: NO CHANGES
+  WHY: 10T last hour (4W 6L -$0.37). 87T 24h 50.6%WR -$0.42. atr_sl_hit 93% avg -$0.008 structural. No kill criteria triggered. Trade freq 10/hr elevated but under 20 threshold. 24h trend declining (+$0.75→-$0.42 over7h) but within normal variance. accel-300-v2+ persistent bleed but below kill threshold. Choppy regime (5/6 hrs red) but no structural issue.
+  BY: auto_1hr
+  NEXT: Re-run at 16:06 UTC
+[2026-08-28 16:06 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +/usr/bin/bash.41). 87T 24h 49.4%WR -$0.06 breakeven. atr_sl_hit 94.3% avg -$0.003 structural. No kill criteria triggered. Trade freq 2/hr low. System stable, no action required.
+  BY: auto_1hr
+  NEXT: Re-run at 17:06 UTC
