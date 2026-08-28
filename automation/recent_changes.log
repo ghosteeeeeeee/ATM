@@ -393,3 +393,15 @@
   WHY: 0T last hour, 6T last 2h (5W 1L +$0.01). 72T 24h 52%WR +$0.75. atr_sl_hit 86.1% (62/72) avg +$0.002 structural breakeven. profit-monster-trail 6T +$0.35 star exit. macd-div- 4T 100%WR +$0.23 star signal. accel-300-v2- backbone 24T +$0.48. Hourly trend: 4 consecutive positive hours (02:00-05:00) after overnight dip. 06:00 -$0.10 POL loss. No kill criteria triggered — no signal 0%WR with 3+T last hour. Trade freq 3/hr normal. 4 open SHORT positions (BLUR, AVNT, HBAR, ONDO). System stable.
   BY: auto_1hr
   NEXT: Re-run at 07:15 UTC
+[2026-08-28 08:05 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (4W 1L +$0.06). 76T 24h 52%WR +$1.21. atr_sl_hit 93% avg +$0.004 structural breakeven. No signal meets kill criteria. Trade freq 5/hr normal. 4/5 last hours positive. 5 open SHORT positions. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 09:05 UTC
+[2026-08-28 09:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L -$0.18). 80T 24h 52.5%WR +$1.03. atr_sl_hit dominant (87% 24h) avg +$0.000 structural breakeven. profit-monster-trail 6T +$0.35 star exit. macd-div- 4T 100%WR +$0.23 star signal. accel-300-v2+ 6T 33%WR -$0.16 bleeding but 0T last hr no kill trigger. No signal meets kill criteria. Trade freq 4/hr normal. Last hour rough (25% WR -$0.18) but preceded by 80% WR hour — normal variance. 2 open positions (FOGO +$0.15, SUSHI +$0.01). System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 10:05 UTC
+[2026-08-28 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.01). 75T 24h 54.7%WR +$0.36. atr_sl_hit 88% avg -$0.001 structural breakeven. No kill criteria triggered. Trade freq 2/hr normal. 5 open SHORTs all accel-300-v2-. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC
