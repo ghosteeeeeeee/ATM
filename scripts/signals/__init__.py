@@ -4,6 +4,7 @@ Signal Registry — scripts/signals/__init__.py
 
 Active signals only. Dead signals pruned 2026-08-27 (ponytail audit).
 Registry: 65 → 15 entries. Flags preserved in hermes_constants.py.
+2026-08-28: Removed bb_bounce (NEVER_REENABLED) and atr_spike (NEVER_REENABLED).
 """
 
 from __future__ import annotations
@@ -13,12 +14,11 @@ from hermes_constants import (
     HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
     RS_ENABLED, RS_PLUS_ENABLED, RS_MINUS_ENABLED,
     R2_TREND_SHORT_ENABLED, R2_TREND_LONG_ENABLED,
-    BB_BOUNCE_ENABLED, BB_BOUNCE_SHORT_ENABLED,
+    BB_BOUNCE_SHORT_ENABLED,
     RETURN_EXHAUSTION_SHORT_ENABLED,
     ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
     CONTINUATION_ENABLED, CONTINUATION_PLUS_ENABLED,
     SPIKE_EXHAUSTION_SHORT_ENABLED, SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED,
-    ATR_SPIKE_ENABLED, ATR_SPIKE_PLUS_ENABLED,
     LIQUIDATION_HUNT_ENABLED, LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
     MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
     CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
@@ -50,11 +50,6 @@ except Exception:
     _r2_trend_long_run = None
 
 try:
-    from signals.bb_bounce import run as _bb_bounce_run
-except Exception:
-    _bb_bounce_run = None
-
-try:
     from signals.bb_bounce_short import run as _bb_bounce_short_run
 except Exception:
     _bb_bounce_short_run = None
@@ -78,11 +73,6 @@ try:
     from signals.spike_exhaustion_short import run as _spike_exhaustion_short_run
 except Exception:
     _spike_exhaustion_short_run = None
-
-try:
-    from signals.atr_spike import run as _atr_spike_run
-except Exception:
-    _atr_spike_run = None
 
 try:
     from signals.liquidation_hunt import run as _liquidation_hunt_run
@@ -125,13 +115,11 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'rs',                       'enabled': 'RS_ENABLED',                   'run': _rs_run},
     {'name': 'r2_trend_short',           'enabled': 'R2_TREND_SHORT_ENABLED',       'run': _r2_trend_short_run},
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
-    {'name': 'bb_bounce',                'enabled': 'BB_BOUNCE_ENABLED',            'run': _bb_bounce_run},
     {'name': 'bb_bounce_short',          'enabled': 'BB_BOUNCE_SHORT_ENABLED',      'run': _bb_bounce_short_run},
     {'name': 'return_exhaustion_short',  'enabled': 'RETURN_EXHAUSTION_SHORT_ENABLED', 'run': _return_exhaustion_short_run},
     {'name': 'engulfing',                'enabled': 'ENGULFING_ENABLED',            'run': _engulfing_run},
     {'name': 'continuation',             'enabled': 'CONTINUATION_ENABLED',         'run': _continuation_run},
     {'name': 'spike_exhaustion_short',   'enabled': 'SPIKE_EXHAUSTION_SHORT_ENABLED', 'run': _spike_exhaustion_short_run},
-    {'name': 'atr_spike',                'enabled': 'ATR_SPIKE_ENABLED',            'run': _atr_spike_run},
     {'name': 'liquidation_hunt',         'enabled': 'LIQUIDATION_HUNT_ENABLED',     'run': _liquidation_hunt_run},
     {'name': 'macd_divergence',          'enabled': 'MACD_DIVERGENCE_ENABLED',      'run': _macd_divergence_run},
     {'name': 'chain_fire',               'enabled': 'CHAIN_FIRE_ENABLED',           'run': _chain_fire_run},

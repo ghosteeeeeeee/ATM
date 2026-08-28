@@ -1687,12 +1687,8 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
         if token and token not in momentum_by_token:
-            try:
-                from signal_gen import get_momentum_stats
-                ms = get_momentum_stats(token)
-                momentum_by_token[token] = ms
-            except Exception:
-                momentum_by_token[token] = None
+            # ponytail: signal_gen removed — momentum_stats defaults to None
+            momentum_by_token[token] = None
         if token and token not in speed_by_token:
             try:
                 sd = SPEED_TRACKER.get_token_speed(token) if SPEED_TRACKER else None

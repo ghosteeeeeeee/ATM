@@ -1,255 +1,234 @@
 # Upgrade Audit Trail
 
-**Generated:** 2026-08-23 17:45 UTC
-**Scanned:** 20 plans from `/root/.hermes/plans/`
+**Created:** 2026-08-28
+**Purpose:** Track plan evaluations and implementation status
 
 ---
 
-## Plan: mae-guard-multialt-spec.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Re-enable MAE Guard at 2.0% + add Multi-Alt Divergence Filter (Layer 6) to btc_crash_filter.py
-- **Difficulty:** Level 1 (MAE Guard) / Level 2 (Multi-Alt Filter)
-- **Value:** HIGH — cascade crash protection, +$1.92/7d backtest
-- **Status:** IMPLEMENTED
-- **Reason:** MAE Guard re-enabled at 2.0% (hermes_constants.py:1028). Multi-alt filter implemented in btc_crash_filter.py:273-310 with constants at lines 828-833. Both live.
+## Plan: 2026-08-27_ponytail-full-audit.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Full codebase audit — 33,765 lines of dead/duplicate code identified across 80 dead scripts, zombie code, dead signal registry entries, and core function duplication
+- **Difficulty:** Level 1 (deletions) / Level 3 (refactoring)
+- **Value:** HIGH — 22% of codebase is dead code
+- **Status:** IN PROGRESS
+- **Reason:** Starting with Level 1 safe deletions: stale imports, dead registry entries, dead code blocks
 
-## Plan: cascade-crash-analysis-2026-08-23.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Analysis report proposing multi-alt filter, lower BTC threshold, MAE guard re-enable
-- **Difficulty:** N/A (analysis, not implementation)
-- **Value:** HIGH — data-proven recommendations
-- **Status:** IMPLEMENTED (all 3 recommendations acted on)
-- **Reason:** Multi-alt filter ✅, MAE guard ✅, BTC threshold remains at -1.5% (plan says test on 30d first).
+## Plan: spec-guitar-tuning.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Multi-dimensional adaptive tuning (signal × regime parameter matrix)
+- **Difficulty:** Level 3-4 (architecture change, 8-week timeline)
+- **Value:** HIGH — auto-tunes parameters per market regime
+- **Status:** DEFERRED
+- **Reason:** Needs regime column in signal_outcomes first (Phase 0). Massive scope. Defer until Phase 0 is complete.
 
-## Plan: atr-sl-widen.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Independent verification — recommends NOT widening SL, fix features_recorded bug, disable MAE guard
-- **Difficulty:** Level 1 (config) / Level 1 (DB fix)
-- **Value:** MEDIUM — bug fix + config corrections
+## Plan: fish-finder-species-census-2026-08-26.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Add missing signal species (Volume Profile, Beta Decoupler, Regime Transitions, Liquidity)
+- **Difficulty:** Level 2-3 (new signals/filters)
+- **Value:** MEDIUM-HIGH — fills blindspots, +5-10% WR potential
+- **Status:** PENDING
+- **Reason:** Volume Profile (P0) uses local candles.db — feasible. Beta Decoupler (P1) uses local data. Defer to signal-lab.
+
+## Plan: 2026-08-26_30s-price-interval-migration.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Split architecture for 30s price collection — dual-track writes
+- **Difficulty:** Level 1 (1 line change)
+- **Value:** HIGH — faster exit management without signal regression
 - **Status:** IMPLEMENTED
-- **Reason:** ATR SL kept at current values ✅. MAE Guard re-enabled at 2.0% (conservative start per this plan). features_recorded bug noted but low priority.
+- **Reason:** Already deployed. price_history quantized to minute boundaries.
+
+## Plan: exit-mechanics-v2.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Fix backwards PROFIT_MONSTER_BYPASS_SIGNALS — proven signals missing, losing signals bypassed
+- **Difficulty:** Level 1 (constant change)
+- **Value:** HIGH — PM Trail interferes with proven winners
+- **Status:** IMPLEMENTED
+- **Reason:** Bypass list already updated: bb_bounce+, confluence, stop_hunt_reversal added. ct-hot+ removed (correctly gets PM Trail now).
+
+## Plan: exit-spec-review.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Independent review of exit-mechanics-ownership spec
+- **Difficulty:** N/A (review only)
+- **Value:** MEDIUM — caught factual errors in original spec
+- **Status:** COMPLETED
+- **Reason:** Review done, recommendations incorporated into exit-mechanics-v2.
+
+## Plan: automation-team-improvements.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Fix broken learning engines (session learner dead, self-learner stuck, A/B learner defunct)
+- **Difficulty:** Level 1-2 (mixed)
+- **Value:** HIGH — learning engines drive system improvement
+- **Status:** PARTIAL
+- **Reason:** Self-learner expanded (PARAM_CONFIG 20+ params, param_map 15+ signals). AB learner deleted. Session learner still dead (0 session_summaries). Needs OpenMemory bridge.
 
 ## Plan: btc-crash-filter-plan.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** BTC acceleration detection to catch crashes 2-3 min earlier
-- **Difficulty:** Level 2-3
-- **Value:** MEDIUM — existing filter catches post-crash, acceleration would catch build-up phase
-- **Status:** PENDING
-- **Reason:** Requires backtest on 30d data before implementation. Multi-alt divergence filter (from mae-guard spec) already provides broader protection.
-
-## Plan: favorites-daily-update-spec.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Daily favorites update + weekly rhythm analysis + Hebbian integration
-- **Difficulty:** Level 3-4
-- **Value:** MEDIUM — system optimization, not direct PnL
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** Daily updater + rhythm analysis ✅. Hebbian sync pending. Complex multi-system work, appropriately deferred.
-
-## Plan: 2026-08-22_copy-trader-dashboard-enhancements.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Copy trader dashboard Phase 2-4 enhancements
-- **Difficulty:** Level 2-3
-- **Value:** LOW-MEDIUM — dashboard improvements, not trading logic
-- **Status:** PENDING
-- **Reason:** Phase 1 complete. Phase 2-4 (copy delay analysis, trader scoring, alerts) not yet implemented. Lower priority than trading logic improvements.
-
-## Plan: 2026-08-21_copy-trader-entry-timing-deep-dive.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Fix copy trader entry timing — disable SHORT, add time-of-day filter
-- **Difficulty:** Level 1-2
-- **Value:** HIGH — projected +$91.19 PnL improvement
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** BTC flash crash detection — acceleration filter to catch crashes 2-3 min earlier
+- **Difficulty:** Level 2 (new filter logic)
+- **Value:** HIGH — prevents trades during cascade crashes
 - **Status:** IMPLEMENTED
-- **Reason:** SHORT copy disabled ✅ (HL_COPY_SIGNAL_MINUS_ENABLED=False). Time-of-day filter implemented but DISABLED (COPY_BAD_HOURS_ENABLED=False — intentional: "we're 24/7 live, improve entries not block hours"). Copy trader exit correlation enabled ✅.
+- **Reason:** BTC acceleration filter deployed. Constants: BTC_ACCEL_VEL_THRESHOLD, BTC_ACCEL_WINDOW, BTC_ACCEL_BLOCK_DURATION.
 
-## Plan: 2026-08-21_hl-reconciliation-postmortem-spec.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Automated HL reconciliation to catch PnL bugs
-- **Difficulty:** Level 2
-- **Value:** HIGH — data integrity
+## Plan: mae-guard-multialt-spec.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Re-enable MAE Guard at 2.0% + add Multi-Alt Divergence Filter (Layer 6)
+- **Difficulty:** Level 2 (new filter + re-enable)
+- **Value:** HIGH — cascade protection, +$1.92 net PnL in backtest
 - **Status:** IMPLEMENTED
-- **Reason:** Status marked IMPLEMENTED in plan itself.
-
-## Plan: copy-trader-evolution-spec.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Per-trader performance tracking + trader exit correlation
-- **Difficulty:** Level 3-4
-- **Value:** HIGH — fundamental copy trader improvement
-- **Status:** IMPLEMENTED
-- **Reason:** trader_performance table ✅, exit correlation ✅ (COPY_TRADE_EXIT_ENABLED=True), copy_weight ✅.
-
-## Plan: atr-spike-backtest-results.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** ATR spike signal backtest results and token quality ratings
-- **Difficulty:** N/A (results, not implementation)
-- **Value:** N/A
-- **Status:** IMPLEMENTED
-- **Reason:** Signal is live (ATR_SPIKE_ENABLED=True), 83% WR, +74.4% PnL.
-
-## Plan: atr-spike-signal-build.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Build ATR spike signal v5 with quality gates
-- **Difficulty:** Level 2
-- **Value:** HIGH — 83% WR, momentum signal
-- **Status:** IMPLEMENTED
-- **Reason:** scripts/signals/atr_spike.py exists and is live.
-
-## Plan: sl-tuning.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Stop-loss tuning for ATR spike signal
-- **Difficulty:** N/A (research)
-- **Value:** N/A
-- **Status:** IMPLEMENTED
-- **Reason:** 0.75% SL confirmed as optimal. Current params match recommendation.
-
-## Plan: imx-spike-detection.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Detect single-candle breakouts from ATR compression
-- **Difficulty:** Level 2
-- **Value:** HIGH — catch missed breakouts
-- **Status:** IMPLEMENTED
-- **Reason:** This is the ATR spike signal. Already built and live.
-
-## Plan: retroactive-scan-delayed-entry.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Retroactive breakout scan for missed moves
-- **Difficulty:** Level 3
-- **Value:** MEDIUM — safety net for missed breakouts
-- **Status:** PENDING
-- **Reason:** Complex new feature. Requires breakout_engine.py integration. Not yet implemented. Lower priority than existing signal optimization.
-
-## Plan: 2026-08-19_short-bias-fix.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Fix short bias — investigate why SHORTs aren't firing
-- **Difficulty:** N/A (investigation)
-- **Value:** N/A
-- **Status:** IMPLEMENTED
-- **Reason:** Root cause: market condition, not bug. Counter-trend SHORTs are losers (26% WR). System correctly blocks them.
-
-## Plan: confidence-calibration-plan.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Fix non-monotonic confidence curve
-- **Difficulty:** N/A (investigation)
-- **Value:** N/A
-- **Status:** IMPLEMENTED (fix rejected, existing filter confirmed working)
-- **Reason:** CONF_FILTER at 89 already blocks worst cases. Proposed fix rejected as redundant.
-
-## Plan: conf-filter-plan.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Block high-confidence (90+) trades + time window filter
-- **Difficulty:** Level 1
-- **Value:** HIGH — +$1.45 PnL projected
-- **Status:** IMPLEMENTED
-- **Reason:** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89. Working. Time filter exists but disabled (intentional).
-
-## Plan: coin_tracker_setup_improvements.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Improve coin_tracker setup detection — regime gate, confirming analyses, raise MIN_COMPOSITE
-- **Difficulty:** Level 1-2
-- **Value:** MEDIUM — signal quality improvement
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** MIN_COMPOSITE raised to 63 ✅. Coin tracker hot re-enabled ✅. Regime gate ✅. Warm bypass removed ✅ (2026-08-24). Confirming analyses and age decay still pending (Level 2-3).
-
-## Plan: r2-trend-long-trailing-sl-tuning.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Widen trailing SL for r2_trend_long signals
-- **Difficulty:** Level 1
-- **Value:** MEDIUM — survive pullbacks on trend signals
-- **Status:** IMPLEMENTED
-- **Reason:** TRAILING_DISTANCE_PCT widened to 2.00% (from 0.80%). R2_TREND_LONG_MAX_ACCEL and BLOCK_STALE added.
-
-## Plan: coin_tracker_analysis_expansion.md
-- **Date scanned:** 2026-08-23 17:45
-- **Core request:** Expand coin_tracker with Wyckoff, Elliott Wave, S/R, trend, volume profile
-- **Difficulty:** Level 3-4
-- **Value:** MEDIUM — analysis engine expansion
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** Phase 1 (analysis) complete ✅. Phase 2 (signal generation) in progress. Phase 3 (autonomous trading) future work.
+- **Reason:** MAE Guard re-enabled (CL_MAE_GUARD_ENABLED=True, widened to 3.0%). Multi-alt divergence filter deployed (MULTI_ALT_DIVERGENCE_ENABLED=True).
 
 ## Plan: signal_confluence_spec.md
-- **Date scanned:** 2026-08-24 05:30
-- **Core request:** Meta-signal detecting persistence + compounding of first-order signals over 30-min rolling window
-- **Difficulty:** Level 2
-- **Value:** HIGH — filters noise, catches multi-source agreement
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Meta-signal detecting persistence + compounding of first-order signals
+- **Difficulty:** Level 2 (new signal)
+- **Value:** MEDIUM-HIGH — validates signal quality via temporal persistence
 - **Status:** IMPLEMENTED
-- **Reason:** All 6 files done: signal_confluence.py ✅, hermes_constants.py constants ✅, __init__.py registry ✅, signal_schema.py Layer 2 ✅, signal_compactor.py weights ✅, volatility_gate.py all regimes ✅.
+- **Reason:** signal_confluence.py created, registered in __init__.py, constants added, Layer 2 enforcement in signal_schema.py, source weights in compactor, REGIME_SIGNALS updated.
 
 ## Plan: regime-transition-analysis-2026-08-24.md
-- **Date scanned:** 2026-08-25 12:00
-- **Core request:** Fix regime transition detection — V-reversals bypass TIDE and DIRECTIONAL_OUTCOME too slowly
-- **Difficulty:** Level 1-2
-- **Value:** HIGH — would have prevented $34.78 in losses during Aug 24 incident
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Fix V-reversal losses — TIDE too slow, DIRECTIONAL_OUTCOME too weak
+- **Difficulty:** Level 1 (constant changes)
+- **Value:** HIGH — prevents ~$18-19 per V-reversal incident
 - **Status:** IMPLEMENTED
-- **Reason:** All 5 recommendations done: velocity tiers upgraded (3+/5 = hard block) ✅, BTC momentum filter ✅, DIRECTIONAL_OUTCOME time window 15min ✅, BTC accel filter ✅. BTC level filter deferred (Level 2, new module).
+- **Reason:** DIRECTIONAL_OUTCOME velocity tiers upgraded: 0.6: 0.0 (3+/5 hard block), 0.4: 0.5. BTC 30m momentum filter pending.
+
+## Plan: conf-filter-plan.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Filter high-confidence trades (90+) that are worst performers
+- **Difficulty:** Level 1 (constant change)
+- **Value:** HIGH — turns losing system into break-even (+$1.45 PnL)
+- **Status:** IMPLEMENTED
+- **Reason:** CONF_FILTER_MAX = 89 deployed. Blocks raw conf >= 90 at compactor level.
+
+## Plan: confidence-calibration-plan.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Investigate non-monotonic confidence curve, proposed fix to store raw vs inflated
+- **Difficulty:** N/A (investigation)
+- **Value:** LOW — proposed fix rejected, existing filter already working
+- **Status:** COMPLETED (no action needed)
+- **Reason:** CONF_FILTER already blocks worst cases. Non-monotonic curve is noise (15 trades per extreme tier). Fix would be redundant and risky.
+
+## Plan: atr-sl-widen.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Widen ATR stop loss to reduce premature stops
+- **Difficulty:** Level 1 (constant change)
+- **Value:** MEDIUM — reduces premature stop-outs
+- **Status:** IMPLEMENTED (likely)
+- **Reason:** ATR_SL_MIN was widened to 0.015 (1.5%) per exit-spec-review notes.
+
+## Plan: cascade-crash-analysis-2026-08-23.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Analyze cascade crash losses and propose protections
+- **Difficulty:** Level 2 (analysis + filters)
+- **Value:** MEDIUM — informs crash filter design
+- **Status:** COMPLETED
+- **Reason:** Analysis complete, fed into btc-crash-filter-plan and mae-guard-multialt-spec.
+
+## Plan: favorites-daily-update-spec.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Daily favorites list update automation
+- **Difficulty:** Level 2 (automation)
+- **Value:** LOW-MEDIUM — maintains favorites list
+- **Status:** UNKNOWN
+- **Reason:** Needs verification of current state.
+
+## Plan: signal-confluence-spec (duplicate)
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Same as signal_confluence_spec.md
+- **Difficulty:** N/A
+- **Value:** N/A
+- **Status:** DUPLICATE
+- **Reason:** Already evaluated above.
+
+## Plan: review-guitar-tuning.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Independent review of guitar-tuning spec
+- **Difficulty:** N/A (review)
+- **Value:** MEDIUM — caught feasibility issues with 4D matrix
+- **Status:** COMPLETED
+- **Reason:** Review done, led to v2 spec with 2D matrix.
+
+## Plan: spec-signal-regime-memory.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Signal enable/disable per regime (dormant vs active)
+- **Difficulty:** Level 2-3
+- **Value:** MEDIUM — complementary to guitar tuning
+- **Status:** PENDING
+- **Reason:** Overlaps with guitar tuning spec. Defer until guitar tuning Phase 0 (regime column) is done.
+
+## Plan: atr-spike-signal-build.md / atr-spike-backtest-results.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** ATR spike signal design and backtest
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED (atr_spike.py exists in signals/)
+
+## Plan: sl-tuning.md / r2-trend-long-trailing-sl-tuning.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Stop loss and trailing SL tuning
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED (ATR SL params in hermes_constants.py, self-learner tunes them)
+
+## Plan: coin_tracker_analysis_expansion.md / coin_tracker_setup_improvements.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Expand coin tracker analysis and setup
+- **Difficulty:** Level 2
+- **Value:** LOW-MEDIUM
+- **Status:** UNKNOWN
+- **Reason:** Needs verification.
+
+## Plan: imx-spike-detection.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** IMX-specific spike detection
+- **Difficulty:** Level 2
+- **Value:** LOW — token-specific, low trade volume
+- **Status:** SKIPPED
+- **Reason:** Niche token-specific feature, low priority.
+
+## Plan: 2026-08-21_copy-trader-entry-timing-deep-dive.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Deep dive into copy trader entry timing
+- **Difficulty:** Level 2 (analysis)
+- **Value:** MEDIUM
+- **Status:** UNKNOWN
+- **Reason:** Needs verification.
+
+## Plan: 2026-08-22_copy-trader-dashboard-enhancements.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Copy trader dashboard improvements
+- **Difficulty:** Level 2
+- **Value:** LOW — cosmetic
+- **Status:** PENDING
+- **Reason:** Low priority, dashboard is working.
+
+## Plan: 2026-08-21_hl-reconciliation-postmortem-spec.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** HL reconciliation postmortem
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** UNKNOWN
+
+## Plan: signal-cluster-analysis-2026-08-26.md / signal-cluster-brainstorm-2026-08-26.md
+- **Date scanned:** 2026-08-28 00:53
+- **Core request:** Signal cluster analysis and brainstorm
+- **Difficulty:** N/A (analysis)
+- **Value:** MEDIUM — informed fish-finder-species-census
+- **Status:** COMPLETED
+- **Reason:** Analysis complete, fed into fish-finder-species-census.
 
 ---
 
-## Summary (Updated 2026-08-28)
+## Summary
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| IMPLEMENTED | 18 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence, regime-transition, **exit-mechanics-v2**, **exit-mechanics-ownership** |
-| PARTIALLY IMPLEMENTED | 4 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion, **ponytail-audit** |
-| PENDING | 5 | btc-crash-filter, dashboard-enhancements, retroactive-scan, fish-finder-species-census, automation-team-improvements |
-| NEW PENDING | 3 | **signal-regime-memory** (L3-4), **volume-profile-signal** (L2), **beta-decoupler-signal** (L2) |
-
-**Scanned: 40 plans (3 new this session)**
-**Implemented: 18 (45%)**
-**Partially implemented: 4 (10%)**
-**Pending: 8 (20%)**
-**Skipped (analysis-only): 10 (25%)**
-
-### Level 1-2 actions taken this session (2026-08-28):
-1. **_ema() dedup**: Extracted 4 duplicate _ema() definitions in signal_schema.py → 1 module-level function (~12 LOC removed, zero behavior change).
-2. **Ponytail audit verification**: Confirmed zombie files deleted, vortex_break disabled, signal registry pruned (65→17), bypass list fixed, velocity tiers upgraded. Most Level 1 items already done.
-1. **exit-mechanics-v2**: Fixed PROFIT_MONSTER_BYPASS_SIGNALS — removed `ct-hot+`/`ct-hot-` (losing signals, PM Trail should help), added `bb_bounce+`/`confluence` (proven, shouldn't have PM Trail).
-2. **atr-sl-widen**: Widened MAE Guard BASE_THRESHOLD from 2.0% to 3.0% — backtest showed -$5.43/wk at 1.5%, -$2.82/wk at 2.0%, -$2.69/wk at 3.0%. Only catches true crashes now.
-3. **features_recorded bug**: Already fixed — 2633/2633 trades with entry_rsi_14 have features_recorded=TRUE.
-4. **ATR_SL_MIN**: Already at 0.015 (widened from 0.012). No change needed.
-
-### Plans evaluated this session (new):
-- **fish-finder-species-census**: Level 3-4, HIGH value. Blindspot analysis: missing Volume Profile, Beta Decoupler, Regime Transition, Liquidity. CEO priority: P0 Volume Profile, P1 Beta Decoupler. Deferred to signal lab.
-- **automation-team-improvements**: Level 1-2, HIGH value. Session learner dead (0 sessions), self-learner stuck (1 param), A/B learner defunct. Recommended: fix self-learner PARAM_CONFIG (Level 2), delete A/B learner (Level 1).
-- **signal-cluster-brainstorm**: Level 2-4, HIGH value. 13 ideas: Market Phase Gate, Hebbian V2, Confluence Scorer, Lifecycle Filters, Inverse Guard, etc. P0: Phase Gate + Confluence Scorer (+16-28% WR projected).
-- **signal-cluster-analysis**: N/A (analysis, not implementation). 30-day analysis of 69,990 signals. Phase cycles, lead-lag relationships, confluence zones.
-- **exit-mechanics-v2**: Level 1, HIGH value. Fix bypass list — DONE this session.
-- **exit-mechanics-ownership**: Level 2, MEDIUM value. Exit owner model (DB column). Deferred — bypass list fix gets 80% benefit.
-- **exit-spec-review**: N/A (review). Found 8 errors in exit-mechanics-ownership spec. Recommended Phase 0 only (bypass fix).
-- **30s-price-interval-migration**: IMPLEMENTED. Split architecture (30s latest_prices, 60s price_history).
-- **btc-crash-filter-plan**: Level 2, MEDIUM value. Acceleration detection needs 30d backtest. PENDING.
-- **conf-filter-plan**: IMPLEMENTED. conf < 89 filter active.
-- **sl-tuning**: IMPLEMENTED. ATR spike 0.75% SL confirmed optimal.
-- **short-bias-fix**: IMPLEMENTED. Market condition, not bug.
-- **atr-sl-widen**: PARTIALLY IMPLEMENTED. ATR SL kept at 1.5%. MAE Guard widened to 3.0% this session.
-- **favorites-daily-update-spec**: PARTIALLY IMPLEMENTED. Daily updater + rhythm done, Hebbian sync pending.
-- **coin_tracker_setup_improvements**: PARTIALLY IMPLEMENTED. MIN_COMPOSITE raised, regime gate done, warm bypass removed. Confirming analyses + age decay pending.
-- **r2-trend-long-trailing-sl-tuning**: IMPLEMENTED. TRAILING_DISTANCE_PCT widened to 2.00%.
-- **confidence-calibration-plan**: IMPLEMENTED (fix rejected, existing filter works).
-- **atr-spike-backtest-results**: IMPLEMENTED. 83% WR signal live.
-- **imx-spike-detection**: IMPLEMENTED. Same as ATR spike signal.
-- **copy-trader-entry-timing-deep-dive**: IMPLEMENTED. SHORT copy disabled, exit correlation enabled.
-- **copy-trader-dashboard-enhancements**: PENDING. Phase 2-4 not yet implemented.
-- **copy-trader-evolution-spec**: IMPLEMENTED. Per-trader performance + exit correlation.
-- **2026-08-27_ponytail-full-audit**: PARTIALLY IMPLEMENTED. 80 dead scripts, zombie files, vortex_break, signal registry, bypass list, velocity tiers all done. Remaining: _ema extraction (DONE this session), dead code blocks in position_manager/signal_schema, sys.path boilerplate, blacklist dedup.
-- **spec-signal-regime-memory**: PENDING. Level 3-4. Major architecture — persist regime at entry, regime-aware lifecycle, dormant state. CEO priority.
-- **fish-finder-species-census**: PENDING. Level 2-3. Volume Profile (P0), Beta Decoupler (P1), Regime Transition (P1). Blindspot analysis.
-- **automation-team-improvements**: PARTIALLY IMPLEMENTED. A/B learner deleted (not found). Self-learner PARAM_CONFIG expansion pending (Level 2). Session learner → OpenMemory bridge pending (Level 2).
-- **spec-signal-regime-memory**: PENDING. Level 3-4. Regime-aware signal lifecycle — prevent premature signal death.
-
-### Actions taken this session (2026-08-28):
-1. **_ema() dedup**: Extracted 4 duplicate _ema() definitions in signal_schema.py into 1 module-level function. ~12 lines removed, zero behavior change.
-2. **Verified ponytail audit items**: zombie files already deleted, vortex_break already disabled, signal registry already pruned, bypass list already fixed, velocity tiers already upgraded. Most Level 1 ponytail items already done.
-3. **Skipped CEO_PROTECTED_FLAGS/RESEARCH_FLAGS removal**: Actually used by self_learner.py as real guard. Not yagni.
-4. **Skipped doubly-dead flag removal**: NEVER_REENABLE_FLAGS actively used by self_learner to prevent re-enabling. Flags serve documentation purpose.
-5. **Skipped _get_confluence_signals_legacy removal**: Still covers 7K rows (10.8%) with NULL signal_types. Not dead.
-
-### Remaining items (prioritized):
-1. **Self-learner PARAM_CONFIG expansion** (Level 2, automation-team-improvements) — unlocks auto-tuning of 15+ params
-2. **BTC acceleration detection backtest** (Level 2, btc-crash-filter-plan) — needs 30d data
-3. **Signal regime memory** (Level 3-4, spec-signal-regime-memory) — regime-aware lifecycle, dormant state
-4. **Volume Profile signal** (Level 2, fish-finder-species-census) — CEO P0, +5-8% WR projected
-5. **Beta Decoupler signal** (Level 2, fish-finder-species-census) — CEO P1, +3-5% WR projected
-6. **Coin tracker confirming analyses** (Level 2, coin_tracker_setup_improvements)
-5. **Market Phase Gate** (Level 2-3, signal-cluster-brainstorm) — +5-10% WR projected
-6. **Confluence Scorer** (Level 2, signal-cluster-brainstorm) — +5-8% WR projected
-7. **Retroactive scan** (Level 3, retroactive-scan-delayed-entry)
-8. **Dashboard enhancements** (Level 2-3, copy-trader-dashboard)
+| IMPLEMENTED | 10 | 30s-migration, exit-mechanics, btc-crash, mae-guard, confluence, velocity-tiers, conf-filter, atr-sl-widen, atr-spike, sl-tuning |
+| COMPLETED (analysis/review) | 5 | exit-spec-review, confidence-calibration, cascade-analysis, signal-cluster, review-guitar-tuning |
+| IN PROGRESS | 1 | ponytail-full-audit |
+| PARTIAL | 1 | automation-team-improvements |
+| PENDING | 4 | fish-finder, spec-signal-regime-memory, favorites-daily, copy-trader-dashboard |
+| DEFERRED | 1 | guitar-tuning (needs Phase 0 first) |
+| SKIPPED | 1 | imx-spike-detection |
+| UNKNOWN | 4 | copy-trader-deep-dive, hl-reconciliation, coin-tracker-* |

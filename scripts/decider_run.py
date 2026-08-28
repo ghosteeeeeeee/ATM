@@ -2286,20 +2286,8 @@ def _record_hotset_failure(token: str, direction: str, failures: dict):
 
 def _get_token_zscore(token: str) -> float:
     """
-    Get z-score for a token from signal_gen's zscore computation.
-    Returns 0.0 if unavailable.
+    Get z-score for a token. Returns 0.0 (signal_gen removed — dead import).
     """
-    try:
-        from signal_gen import get_tf_zscores
-        zscores = get_tf_zscores(token)
-        if zscores:
-            # Use the 1h z-score as the primary; fall back to shortest available
-            for tf in ('1h', '15m', '5m', '4h'):
-                if tf in zscores:
-                    z, _ = zscores[tf]
-                    return z if z is not None else 0.0
-    except Exception:
-        pass
     return 0.0
 
 
