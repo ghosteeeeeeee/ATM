@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favorites & Losers - Live</title>
+    <meta http-equiv="refresh" content="60">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.85em;
+        }
+        h1 { color: #00ff88; font-size: 20px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; margin-bottom: 16px; }
+        h2 { color: #00ff88; font-size: 14px; margin: 16px 0 8px; border-bottom: 1px solid #00ff8833; padding-bottom: 6px; }
+        a { color: #00ff88; text-decoration: none; }
+        
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .panel { flex: 1; min-width: 300px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1a1a2e; padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #666; }
+        td { padding: 8px 12px; border-bottom: 1px solid #1a1a2e; }
+        tr:hover { background: #1a1a2e44; }
+        
+        .fav-row { border-left: 3px solid #ff4488; }
+        .top-fav-row { border-left: 3px solid #ffd700; }
+        .loser-row { border-left: 3px solid #ff4444; }
+        .dead-row { border-left: 3px solid #ff0000; background: #ff000011; }
+        
+        .token { font-weight: bold; color: #00ff88; }
+        .wr-good { color: #00ff88; }
+        .wr-ok { color: #ffaa00; }
+        .wr-bad { color: #ff4444; }
+        .pnl-pos { color: #00ff88; }
+        .pnl-neg { color: #ff4444; }
+        
+        .badge { padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+        .badge-fav { background: #ff448822; color: #ff4488; }
+        .badge-top { background: #ffd70022; color: #ffd700; }
+        .badge-loser { background: #ff444422; color: #ff4444; }
+        .badge-dead { background: #ff000022; color: #ff0000; }
+        
+        .size-mult { color: #666; font-size: 10px; }
+        
+        .stats-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .stat { background: #1a1a2e; padding: 10px 14px; border-radius: 4px; border-left: 3px solid #00ff88; min-width: 120px; }
+        .stat-val { font-size: 18px; font-weight: bold; color: #00ff88; }
+        .stat-val.negative { color: #ff4444; }
+        .stat-label { color: #666; font-size: 10px; text-transform: uppercase; }
+        
+        .updated { color: #666; font-size: 11px; margin-top: 16px; }
+        .link { margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <h1>❤ Favorites & 🗑️ Losers <span style="font-size:12px;color:#666">Live Dashboard</span></h1>
+    
+    <div class="stats-bar" id="stats"></div>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>❤ Favorites</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Trades</th>
+                        <th>WR</th>
+                        <th>PnL</th>
+                        <th>Size</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="fav-table"></tbody>
+            </table>
+        </div>
+        
+        <div class="panel">
+            <h2>🗑️ Losers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Trades</th>
+                        <th>WR</th>
+                        <th>PnL</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="loser-table"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="updated" id="updated"></div>
+    <div class="link"><a href="/trades.html">← Back to Trades</a></div>
+    
+    <script>
+        function getSizeMult(wr) {
+            if (wr >= 75) return '1.8x';
+            if (wr >= 50) return '1.5x';
+            return '1.2x';
+        }
+        
+        function wrClass(wr) {
+            if (wr >= 60) return 'wr-good';
+            if (wr >= 45) return 'wr-ok';
+            return 'wr-bad';
+        }
+        
+        function pnlClass(pnl) {
+            return pnl >= 0 ? 'pnl-pos' : 'pnl-neg';
+        }
+        
+        function renderFavs(favs, topFavs) {
+            const tbody = document.getElementById('fav-table');
+            tbody.innerHTML = '';
+            
+            favs.sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt);
+            
+            favs.forEach(f => {
+                const isTop = topFavs.includes(f.token);
+                const rowClass = isTop ? 'top-fav-row' : 'fav-row';
+                const badge = isTop ? '<span class="badge badge-top">⭐ TOP</span>' : '<span class="badge badge-fav">❤</span>';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td class="token">${f.token}</td>
+                        <td>${f.trades}</td>
+                        <td class="${wrClass(f.winrate)}">${f.winrate.toFixed(1)}%</td>
+                        <td class="${pnlClass(f.total_pnl_usdt)}">$${f.total_pnl_usdt.toFixed(2)}</td>
+                        <td class="size-mult">${getSizeMult(f.winrate)}</td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function renderLosers(losers) {
+            const tbody = document.getElementById('loser-table');
+            tbody.innerHTML = '';
+            
+            losers.sort((a, b) => a.winrate - b.winrate);
+            
+            losers.forEach(l => {
+                const isDead = l.winrate < 30 && l.trades >= 10;
+                const rowClass = isDead ? 'dead-row' : 'loser-row';
+                const badge = isDead ? '<span class="badge badge-dead">💀 DEAD</span>' : '<span class="badge badge-loser">🗑️</span>';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td class="token">${l.token}</td>
+                        <td>${l.trades}</td>
+                        <td class="${wrClass(l.winrate)}">${l.winrate.toFixed(1)}%</td>
+                        <td class="${pnlClass(l.total_pnl_usdt)}">$${l.total_pnl_usdt.toFixed(2)}</td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function renderStats(favs, losers) {
+            const favCount = favs.length;
+            const loserCount = losers.length;
+            const favWr = favs.reduce((a, f) => a + f.winrate * f.trades, 0) / Math.max(1, favs.reduce((a, f) => a + f.trades, 0));
+            const favPnl = favs.reduce((a, f) => a + f.total_pnl_usdt, 0);
+            const loserPnl = losers.reduce((a, l) => a + l.total_pnl_usdt, 0);
+            const edge = favWr - (losers.reduce((a, l) => a + l.winrate * l.trades, 0) / Math.max(1, losers.reduce((a, l) => a + l.trades, 0)));
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat"><div class="stat-val">${favCount}</div><div class="stat-label">Favorites</div></div>
+                <div class="stat"><div class="stat-val ${favPnl < 0 ? 'negative' : ''}">${favWr.toFixed(1)}%</div><div class="stat-label">Fav WR</div></div>
+                <div class="stat"><div class="stat-val ${favPnl < 0 ? 'negative' : ''}">$${favPnl.toFixed(2)}</div><div class="stat-label">Fav PnL</div></div>
+                <div class="stat"><div class="stat-val">${loserCount}</div><div class="stat-label">Losers</div></div>
+                <div class="stat"><div class="stat-val negative">$${loserPnl.toFixed(2)}</div><div class="stat-label">Loser PnL</div></div>
+                <div class="stat"><div class="stat-val">+${edge.toFixed(1)}pp</div><div class="stat-label">Edge</div></div>
+            `;
+        }
+        
+        async function load() {
+            try {
+                const [favR, losR] = await Promise.all([
+                    fetch('/data/favorites_performance.json?t=' + Date.now()),
+                    fetch('/data/losers_performance.json?t=' + Date.now())
+                ]);
+                
+                const favData = await favR.json();
+                const losData = await losR.json();
+                
+                const favs = favData.favorites || [];
+                const losers = losData.losers || [];
+                
+                // Top 5 favorites by PnL
+                const topFavs = [...favs]
+                    .sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt)
+                    .slice(0, 5)
+                    .map(f => f.token);
+                
+                renderFavs(favs, topFavs);
+                renderLosers(losers);
+                renderStats(favs, losers);
+                
+                document.getElementById('updated').textContent = 
+                    `Favorites: ${favData.updated_at?.slice(0, 16) || 'N/A'} | Losers: ${losData.updated_at?.slice(0, 16) || 'N/A'}`;
+            } catch(e) {
+                document.getElementById('stats').innerHTML = '<div class="stat"><div class="stat-val">Loading...</div></div>';
+            }
+        }
+        
+        load();
+    </script>
+</body>
+</html>
