@@ -1589,8 +1589,8 @@ RANGE_BREAKOUT_RSI_SHORT_MIN = 30    # Skip SHORT if RSI below this (overextende
 
 # Mean-reversion velocity gate — block entries when price still trending against signal
 MEAN_REVERSION_VEL_ENABLED = True
-MEAN_REVERSION_VEL_THRESHOLD = 0.15   # CEO 2026-08-25 — tightened from 0.3. bb_bounce+ 8T/8h 12.5% WR -$2.02 — catches dead cat bounces in downtrends. 0.3% was too loose.
-MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6  # block SHORT if 15m velocity > 0.6% (price spiking against SHORT — higher threshold because spikes reverse faster)
+MEAN_REVERSION_VEL_THRESHOLD = 0.015  # V2 2026-08-29 — tightened from 0.15. MoE panel: 84.6% WR vs 58.9% baseline. Catches falling/rising knife entries.
+MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.015  # V2 2026-08-29 — tightened from 0.6. Symmetric with LONG threshold.
 
 # Spike exhaustion filter — block entries after sharp 5m moves (likely exhausted)
 # Applied to range_breakout, hzscore, bb_bounce to prevent chasing spikes
@@ -1600,7 +1600,7 @@ SPIKE_EXHAUSTION_VEL_5M_THRESHOLD = 0.5  # block if abs(5m velocity) > 0.5% (spi
 # Prevents entering after opportunity has passed (e.g., bb_bounce fires near lower BB,
 # price rallies to upper BB by execution time)
 SIGNAL_STALENESS_PRICE_PCT = 0.25  # block if price moved >0.25% since signal (bb_bounce-specific)
-SIGNAL_STALENESS_MAX_AGE_MIN = 3   # max minutes between signal generation and execution
+SIGNAL_STALENESS_MAX_AGE_MIN = 5   # V2 2026-08-29 — increased from 3. Code Architect: 3 min too tight for pipeline timing.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period

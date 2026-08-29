@@ -246,10 +246,13 @@ def detect_bb_bounce(token, closes):
         if bounce_pct < bounce_thresh:
             return None  # Bounce too weak
 
-        # FIX (2026-08-24): Removed momentum fade velocity gate.
-        # Same issue as hzscore — requiring vel_5m >= 0 means price must already be rising,
-        # but by then the bounce is over. The BB touch + RSI + bounce_pct filters are
-        # sufficient quality gates. The old velocity gate killed ALL bb_bounce signals.
+        # V2 (2026-08-29): Velocity filter — block if price still falling hard
+        # Catches "falling knife" entries where BB touch is premature
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        if MEAN_REVERSION_VEL_ENABLED:
+            vel = _get_15m_velocity(token)
+            if vel is not None and vel < -MEAN_REVERSION_VEL_THRESHOLD:
+                return None  # Price still falling, bounce not confirmed
 
         return {
             'direction': 'LONG',
@@ -283,8 +286,13 @@ def detect_bb_bounce(token, closes):
         if bounce_pct < bounce_thresh:
             return None
 
-        # FIX (2026-08-24): Removed momentum fade velocity gate for SHORT.
-        # Same fix as LONG — velocity confirmation comes too late.
+        # V2 (2026-08-29): Velocity filter — block if price still rising hard
+        # Catches "rising knife" entries where SHORT BB touch is premature
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD_SHORT
+        if MEAN_REVERSION_VEL_ENABLED:
+            vel = _get_15m_velocity(token)
+            if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                return None  # Price still rising, SHORT bounce not confirmed
 
         return {
             'direction': 'SHORT',
@@ -342,17 +350,8 @@ def scan_bb_bounce_signals(prices_dict):
         if direction == 'SHORT' and not BB_BOUNCE_MINUS_ENABLED:
             continue
 
-        # Velocity gate: skip if price still trending against signal
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD, MEAN_REVERSION_VEL_THRESHOLD_SHORT
-        if MEAN_REVERSION_VEL_ENABLED:
-            vel = _get_15m_velocity(token)
-            if vel is not None:
-                if direction == 'LONG' and vel < -MEAN_REVERSION_VEL_THRESHOLD:
-                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold -{MEAN_REVERSION_VEL_THRESHOLD}%)")
-                    continue
-                if direction == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
-                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD_SHORT}%)")
-                    continue
+        # V2 (2026-08-29): Velocity gate moved INTO detect_bb_bounce()
+        # Removed duplicate check from here — detection function owns all quality logic
 
         # Spike exhaustion filter: block entries after sharp 5m moves
         # FIX (2026-08-25): switched from price_history (stale) to candles_1m (accurate)
