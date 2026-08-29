@@ -1,34 +1,35 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-29 ~04:01 UTC (CEO run — 285th run)**
+**Last Updated: 2026-08-29 ~08:17 UTC (CEO run — 286th run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN. Legacy age-out COMPLETE — all legacy trades cleared. 3 open positions (bb-bounce SHORT: AVAX, BANANA, CFX). Pipeline running, all timers firing.
+System GREEN. Legacy age-out COMPLETE — all legacy trades cleared. 5 open SHORT positions (bb-bounce-short: SEI, DOGE, CRV, SYRUP, LTC). Pipeline running, all timers firing.
 
-- **24h:** 77T, 54.5% WR, +$0.71
-- **48h:** 149T, 52.3% WR, +$1.03
-- **7d:** 446T, 49.3% WR, -$4.43
-- **Today (Aug 29):** 4T, 25% WR, -$0.17 (just started)
-- **Daily trend:** Aug 22 -$2.54 → Aug 25 -$1.79 → Aug 27 $0.00 → Aug 28 +$1.55 → Aug 29 -$0.17 (just started)
+- **24h:** 68T, 52.9% WR, +$0.90
+- **48h:** 145T, 53.8% WR, +$1.23
+- **7d:** ~446T, 49.3% WR, -$4.43
+- **Today (Aug 29):** 10T, 40% WR, -$0.15
+- **Daily trend:** Aug 22 -$0.66 → Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.15
 - **Market:** NEUTRAL dominant
 - **Disk:** 84%
-- **Open positions:** 3 (bb-bounce SHORT: AVAX, BANANA, CFX)
-- **Legacy bleed:** ALL CLEARED. ct-hot+ 48T/7d -$3.73 — zero open, zero new trades 24h. slow-grind-, hl_copy SHORT, pump-catcher+, atr-spike+, continuation- all cleared.
-- **Without legacy:** System ~ -$0.70/7d (nearly breakeven). 48h +$1.03 (positive).
-- **STAR signal:** macd-div- SHORT 24T/7d 75% WR +$0.36
+- **Open positions:** 5 SHORT (bb-bounce-short: SEI -0.68%, DOGE -1.03%, CRV -0.69%, SYRUP -0.55%, LTC +0.05%)
+- **Legacy bleed:** ALL CLEARED. ct-hot+ 35T/7d -$1.09, slow-grind- -$0.64, hl_copy LONG -$0.62, hl_copy SHORT -$0.52, pump-catcher+ -$0.39, atr-spike+ -$0.15 — all zero open, zero new trades 24h.
+- **Without legacy:** System ~ -$0.07/7d (breakeven). 48h +$1.23 (positive).
+- **Confidence tiers (excl ct-hot+):** 75-84 164T +$0.09, 95+ 102T +$0.42 (profitable)
+- **STAR signal:** macd-div- SHORT 24T/7d 75% WR +$0.36 (inverted R:R avg win +2.79% avg loss -4.90%)
 - **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46
-- **Backbone:** hl_copy_trader LONG 48T/7d 43.8% WR +$0.14
-- **Backbone:** bb_bounce+ LONG 39T/7d 59% WR +$0.11
-- **Monitor:** bb-bounce-short SHORT 21T/7d 66.7% WR -$0.05 (slightly negative, watch)
+- **Emerging:** bb-bounce-short SHORT 26T/7d 65.4% WR +$0.07 (monitor for backbone candidate)
+- **Monitor:** hl_copy_trader LONG 35T/7d 37.1% WR -$0.62 (legacy, closing). bb_bounce+ LONG 39T/7d 59% WR +$0.11 (killed, legacy closing)
 
 **System has 3 backbone signals.** 8th DELEGATION to signal_analyst: build new backbone (pending).
 
 ## Today's Changes (Aug 29)
 
-1. **CEO 04:01 — MONITORING.** Verified DB: 24h 77T 54.5% WR +$0.71. 7d: 446T 49.3% WR -$4.43. 48h: 149T 52.3% WR +$1.03. Today: 4T 25% WR -$0.17 (just started). 3 open (bb-bounce SHORT: AVAX, BANANA, CFX). LEGACY FULLY CLEARED: ct-hot+ 48T/7d -$3.73 — zero open, zero new trades 24h. All other legacy cleared. WITHOUT LEGACY: system ~ -$0.70/7d (nearly breakeven). 48h +$1.03 (positive). STAR: macd-div- SHORT 24T/7d 75% WR +$0.36. BACKBONE: accel-300-v2- 72T/7d 52.8% WR +$1.46, hl_copy_trader LONG 48T/7d 43.8% WR +$0.14, bb_bounce+ 39T/7d 59% WR +$0.11. Disk 84%. All timers active. System now clean. 8th delegation to signal_analyst for backbone.
-2. **CEO 00:05 — MONITORING.** Verified DB: 24h 89T 56.2% WR +$1.55. 7d: 447T 49.4% WR -$4.45. Legacy age-out DAY — ct-hot+ trades closing today (CEO_PROTECTED). 4 open (bb-bounce SHORT: AVAX, CFX, BANANA, AVNT — all flat). Daily trend: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 +$1.55. WITHOUT LEGACY: system +$0.75/7d (profitable). STAR: macd-div- SHORT 24T/7d 75% WR +$0.36. BACKBONE: accel-300-v2- 72T/7d 52.8% WR +$1.46. MONITOR: accel-300-v2+ LONG 6T/48h 33.3% WR -$0.16 (approaching kill). Disk 83%. All timers active. 8th delegation to signal_analyst for backbone.
+1. **CEO 08:17 — MONITORING.** Verified DB: 24h 68T 52.9% WR +$0.90. 48h: 145T 53.8% WR +$1.23. 7d: ~446T 49.3% WR -$4.43. Today: 10T 40% WR -$0.15. 5 open SHORT (bb-bounce-short: SEI, DOGE, CFX, SYRUP, LTC — all flat). LEGACY FULLY CLEARED: ct-hot+ 35T/7d -$1.09, slow-grind- -$0.64, hl_copy LONG -$0.62, hl_copy SHORT -$0.52, pump-catcher+ -$0.39, atr-spike+ -$0.15 — all zero open, zero new 24h. WITHOUT LEGACY: system ~ -$0.07/7d (breakeven). Confidence tiers (excl ct-hot+): 75-84 164T +$0.09, 95+ 102T +$0.42. ATR_SL 56T/48h -$4.91 (dominant). STAR: macd-div- SHORT 24T/7d 75% WR +$0.36. BACKBONE: accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46. EMERGING: bb-bounce-short 26T/7d 65.4% WR +$0.07. Disk 84%. All timers active. 9th delegation to signal_analyst for backbone.
+2. **CEO 04:01 — MONITORING.** Verified DB: 24h 77T 54.5% WR +$0.71. 7d: 446T 49.3% WR -$4.43. Today Aug 29: 4T 25% WR -$0.17 (just started). 3 open (bb-bounce SHORT: AVAX, BANANA, CFX). LEGACY FULLY CLEARED. WITHOUT LEGACY: system ~ -$0.70/7d (nearly breakeven). 48h +$1.03 (positive). STAR: macd-div- SHORT 24T/7d 75% WR +$0.36. BACKBONE: accel-300-v2- 72T/7d 52.8% WR +$1.46. Disk 84%. 8th delegation to signal_analyst for backbone.
+3. **CEO 00:05 — MONITORING.** Verified DB: 24h 89T 56.2% WR +$1.55. 7d: 447T 49.4% WR -$4.45. Legacy age-out DAY — ct-hot+ trades closing today (CEO_PROTECTED). 4 open (bb-bounce SHORT: AVAX, CFX, BANANA, AVNT — all flat). Daily trend: Aug 22 -$2.73 → Aug 27 $0.00 → Aug 28 +$1.55. WITHOUT LEGACY: system +$0.75/7d (profitable). STAR: macd-div- SHORT 24T/7d 75% WR +$0.36. BACKBONE: accel-300-v2- 72T/7d 52.8% WR +$1.46. MONITOR: accel-300-v2+ LONG 6T/48h 33.3% WR -$0.16 (approaching kill). Disk 83%. All timers active. 8th delegation to signal_analyst for backbone.
 
 ## Today's Changes (Aug 28)
 
@@ -51,13 +52,13 @@ System GREEN. Legacy age-out COMPLETE — all legacy trades cleared. 3 open posi
 
 ## Active Decisions
 
-- **DELEGATED to signal_analyst: build new backbone signal.** Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market. — 2026-08-26 (RE-DELEGATED 2026-08-27, 8th delegation STILL PENDING)
+- **DELEGATED to signal_analyst: build new backbone signal.** Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market. — 2026-08-26 (RE-DELEGATED 2026-08-27, 9th delegation STILL PENDING)
 - **CONF_FILTER_MAX=89.** Blocks overconfident trades, 90+ tier now +$1.91/7d. — 2026-08-24
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True.** Uses 4h regime from PostgreSQL momentum_cache. — 2026-08-23
-- **macd-div- is STAR signal.** 24T/7d 75% WR +$0.36. Inverted R:R (avg win +2.76%, avg loss -4.90%). — 2026-08-29
+- **macd-div- is STAR signal.** 24T/7d 75% WR +$0.36. Inverted R:R (avg win +2.79%, avg loss -4.90%). — 2026-08-29
 - **tl_break_short INVERTED R:R.** 16T/7d 62.5% WR -$0.11 (avg win +2.13%, avg loss -5.19%). CEO_PROTECTED. — 2026-08-27
 - **hzscore- RE-ENABLED BY T.** SHORT 7d 10T +$0.09, 50% WR (inverted R:R). CEO_PROTECTED. Recommend T disable. — 2026-08-23
-- **bb-bounce-short BACKBONE.** 21T/7d 66.7% WR -$0.05 (slightly negative, watch). — 2026-08-29
+- **bb-bounce-short EMERGING.** 26T/7d 65.4% WR +$0.07. Monitor for backbone candidate. — 2026-08-29
 - **LEGACY AGE-OUT COMPLETE.** All legacy trades cleared (ct-hot+, slow-grind-, hl_copy SHORT, pump-catcher+, atr-spike+, continuation-). System now clean. — 2026-08-29
 
 ## What NOT To Do
@@ -68,7 +69,7 @@ System GREEN. Legacy age-out COMPLETE — all legacy trades cleared. 3 open posi
 
 ## Next Actions
 
-1. **DELEGATE to signal_analyst: build new backbone signal.** System has 3 backbone signals. 8th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-29
-2. **Monitor bb-bounce SHORT positions.** 3 open (AVAX, BANANA, CFX). Watch for trailing SL or exit. Signal slightly negative at 21T/7d 66.7% WR -$0.05. — 2026-08-29
+1. **DELEGATE to signal_analyst: build new backbone signal.** System has 2 backbone signals (accel-300-v2-, bb-bounce-short emerging). 9th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-29
+2. **Monitor bb-bounce-short SHORT positions.** 5 open (SEI, DOGE, CRV, SYRUP, LTC). Watch for trailing SL or exit. Signal 26T/7d 65.4% WR +$0.07 — emerging backbone candidate. — 2026-08-29
 3. **Monitor disk.** Currently 84%. Below 85% trigger. — 2026-08-29
-4. **Monitor system performance post-legacy.** Now clean — track if 7d improves without legacy bleed. — 2026-08-29
+4. **Monitor system performance post-legacy.** Now clean — track if 7d improves without legacy bleed. Currently ~ -$0.07/7d (breakeven). — 2026-08-29

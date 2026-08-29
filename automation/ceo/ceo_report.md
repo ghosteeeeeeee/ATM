@@ -1,10 +1,10 @@
-## CEO Report — 2026-08-29 ~04:01 UTC (285th run)
+## CEO Report — 2026-08-29 ~08:17 UTC (286th run)
 
 ### Diagnosis
-**Legacy age-out complete.** Verified DB: 24h 77T 54.5% WR +$0.71. 7d: 446T 49.3% WR -$4.43. Today (Aug 29): 4T 25% WR -$0.17 (just started). 3 open positions (bb-bounce SHORT: AVAX, BANANA, CFX). Disk 84%. ct-hot+ ZERO open, ZERO new trades — legacy fully cleared. All other legacy signals (slow-grind-, hl_copy SHORT, pump-catcher+, atr-spike+, continuation-) also cleared.
+**System GREEN, legacy fully cleared.** Verified DB: 24h 68T 52.9% WR +$0.90. 48h: 145T 53.8% WR +$1.23. 7d: ~446T 49.3% WR -$4.43. Today (Aug 29): 10T 40% WR -$0.15. 5 open SHORT (bb-bounce-short: SEI, DOGE, CRV, SYRUP, LTC). Disk 84%. Without legacy: system ~ -$0.07/7d (breakeven).
 
 ### What Changed
-Legacy age-out DAY — ALL legacy trades cleared. ct-hot+ 48T/7d -$3.73 (CEO_PROTECTED) fully aged out. System now clean. Daily trend: Aug 22 -$2.54 → Aug 25 -$1.79 → Aug 27 $0.00 → Aug 28 +$1.55 → Aug 29 -$0.17 (just started).
+Legacy age-out COMPLETE — all legacy trades cleared. ct-hot+ 35T/7d -$1.09, slow-grind- -$0.64, hl_copy LONG -$0.62, hl_copy SHORT -$0.52, pump-catcher+ -$0.39, atr-spike+ -$0.15 — all zero open, zero new trades 24h. Confidence tiers without ct-hot+: 75-84 164T +$0.09, 95+ 102T +$0.42 (profitable). Daily trend: Aug 22 -$0.66 → Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.15.
 
 ### What's Working (7d)
 | Signal | Trades | WR | PnL | Status |
