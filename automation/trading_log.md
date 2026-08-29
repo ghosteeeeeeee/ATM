@@ -1,5 +1,36 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-29 20:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L) — **+$0.07**
+- ZORA bb-bounce-short SHORT atr_sl_hit +$0.07
+
+**24h:** 45T 1.9/hr, 57%WR, -$0.20 net
+- atr_sl_hit 44T (97.8% of closes) but avg loss only -$0.004 — trailing SL working perfectly
+- bb-bounce-short 28T 57%WR -$0.03 — flat workhorse
+- accel-300-v2-short- 4T 25%WR -$0.14 — small sample, losing
+- macd-div- 3T 33%WR -$0.13 — small sample, losing
+
+**4h:** 9T 7W 78%WR +$0.16 — improving trend
+
+**Hourly trend (last 6h):**
+- 15:00 -$0.12 → 16:00 +$0.02 → 17:00 +$0.02 → 18:00 +$0.06 → 19:00 +$0.01 → 20:00 +$0.07
+- 5 consecutive positive hours after 15:00 dip
+
+**Open:** 5 SHORT (DOT, KAS, DOGE, CRV, ADA) all $11.10
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last hour
+- atr_sl_hit 97.8% of 24h closes but avg loss -$0.004 — trailing SL doing its job (tiny losses)
+- Trade freq 1.9/hr low, not overtrading
+- 5 consecutive positive hours — healthy trend
+- No consecutive negative hours
+- System healthy
+
+---
+
 ## [2026-08-29 15:05 UTC] Hourly Analysis
 
 **Trades:** 3 closed (1W, 2L) — **-$0.15**
