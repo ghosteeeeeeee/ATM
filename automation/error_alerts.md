@@ -1581,3 +1581,16 @@ ALERTS:
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-08-29 05:22 UTC
+- **INFO**: System healthy. Pipeline running, 145 signals/hr, 8 trades today, 0 errors.
+- **WATCH**: Disk at 84% (93G/118G). Will compress logs if >85%.
+
+## Error Alerts — 2026-08-29 06:04 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   [TOK-SIGNALS] write failed: name 'ACCEL_300_V2_LONG_5M_ENABLED' is not defined`
+
+## Error Alerts — 2026-08-29 07:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3055s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2935s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2755s left, N failures)`

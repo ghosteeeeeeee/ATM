@@ -17311,3 +17311,53 @@ Final set: ['AIXBT', 'ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYD
 - System healthy, low-vol quiet period
 
 **Open Questions:** None
+
+## FAVORITES Update — 2026-08-29 06:00 UTC
+- Regime: NEUTRAL
+- PROMOTE DYDX (WR=66.7%, AvgPnL=2.75%, Trades=6)
+- PROMOTE SAND (WR=83.3%, AvgPnL=2.18%, Trades=6)
+- PROMOTE AVNT (WR=63.6%, AvgPnL=0.73%, Trades=11)
+- PROMOTE BIGTIME (WR=71.4%, AvgPnL=0.46%, Trades=7)
+
+Final set: ['AVNT', 'BABY', 'BIGTIME', 'CHIP', 'DOGE', 'DYDX', 'FIL', 'GMT', 'HBAR', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'SEI', 'SYRUP', 'ZRO']
+
+## LOSERS Update — 2026-08-29 06:05 UTC
+- REMOVE DYDX (WR=66.7%, PnL=$0.36, recovered)
+- ADD CFX (WR=50.0%, PnL=$-0.27, low_wr (50.0%))
+- ADD ICP (WR=40.0%, PnL=$-0.14, low_wr (40.0%))
+- ADD BANANA (WR=54.5%, PnL=$0.05, low_wr (54.5%))
+
+Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'CFX', 'COMP', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'ICP', 'IMX', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
+
+## [2026-08-29 07:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 75T, $0.65, 52% WR
+
+**No Change Needed:**
+- 0 trades last hour — quiet low-vol period
+- 24h still positive ($0.65)
+- Kill criteria not triggered (no signal 0%WR with 3+T last hour)
+- atr_sl_hit 98.7% of exits but avg +$0.006 — trailing SL profitable by design
+- 5 open SHORT: 3 profitable (DOGE +26.8%, DOT +13.1%, LTC +4.3%), 2 slightly underwater (SEI -3.1%, KAS -9.3%)
+- Consecutive negative hours (01:00, 02:00, 04:00) but tiny amounts — not structural
+- System healthy, low-vol quiet period
+
+**Open Questions:** None
+
+## [2026-08-29 08:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 73T, $0.77, 52.8% WR
+**Open:** 4 SHORT (DOGE, SEI, LTC, KAS)
+
+**No Change Needed:**
+- 0 trades last hour — low-vol quiet period continues
+- 24h positive ($0.77, 52.8% WR)
+- Kill criteria not triggered (accel-300-v2-short- has 0%WR but only 2 trades, needs 3+)
+- atr_sl_hit 98.6% of exits but avg +$0.008 — trailing SL profitable by design
+- 6h trend: 5 negative hours, 1 positive, all tiny amounts — not structural
+- Trade freq 3/hr normal
+- System healthy
+
+**Open Questions:** None
