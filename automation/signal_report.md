@@ -1,67 +1,33 @@
-# Signal Performance Report
-**Generated:** 2026-08-29 17:02 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-08-29 11:15 UTC
 
-## Overall Stats
-- **Total trades (all time):** 1,673 | **WR:** 49.6% | **PnL:** -75.63%
-- **Date range:** 2026-07-29 → 2026-08-29
+Period: 6h | 24h | 7d
 
----
+KILLED (executed): None — no signal meets all kill criteria this cycle.
 
-## WINNERS (WR > 55%, PnL > 0)
+BOOSTED (executed): None — no signal meets all boost criteria this cycle.
 
-None found.
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| accel-300-v2-short- | SHORT | 25.0% | -$0.14 | 4T/24h | WATCH — below 30% WR but <5 trades (kill needs 5+). 7d: 4T 25% -$0.14. Already killed (ACCEL_300_V2_MINUS_ENABLED=False). |
+| accel-300-v2- | SHORT | 30.8% | -$0.10 | 13T/24h | WATCH — 30.8% WR borderline. 7d: 72T 52.8% +$1.46 (best performer). 24h dip is noise, not degradation. |
+| bb-bounce-short | SHORT | 42.9% | -$0.05 | 7T/6h | WATCH — 6h uptick negative but 7d: 35T 60% $0.00. Neutral. |
+| bb-bounce-short | SHORT | 54.2% | -$0.05 | 24T/24h | OK — 54% WR, tiny loss. 7d confirms break-even. |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| macd-div- | SHORT | 72.0% | +$0.24 | 25T/7d | STRONG — best 7d performer per trade. |
+| accel-300-v2- | SHORT | 52.8% | +$1.46 | 72T/7d | STRONG — highest total PnL. 24h dip is noise. |
+| bb_bounce+ | LONG | 59.0% | +$0.11 | 39T/7d | GOOD — steady performer. |
+| hzscore- | SHORT | 50.0% | +$0.09 | 10T/7d | OK — break-even to slight positive. |
+| r2-trend-short4 | SHORT | 100% | +$0.20 | 3T/7d | GOOD — small sample but perfect. |
 
-## LOSERS (WR < 30%, PnL < -2%)
+ISSUES:
+- No signal inversions detected.
+- All 24h exits are ATR_SL hits — system is getting stopped out frequently but losses are capped at -$0.08 to -$0.12 per trade. The tight ATR SL (0.8% min) is working as designed: small losses, no blowups.
+- 7d losers (slow_grind, hl_copy, pump_catcher, ct_hot, atr_spike, continuation) are all already killed in NEVER_REENABLE_FLAGS. No action needed.
+- System is in a low-volatility chop phase: many trades, tight stops, small losses. This is expected behavior, not a signal degradation.
 
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| accel-300-v2- | SHORT | 13 | 38.5% | -1.09 | DISABLED | Borderline |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] accel-300-v2- SHORT** — WR=38.5%, PnL=-1.09% over 13 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-08-29 | c027c84 | CEO: Kill ACCEL_300_V2_MINUS_ENABLED (4T/7d 25% WR bleeding ... |
-| 2026-08-29 | c89e22d | CEO: KILLED ACCEL_300_V2_LONG_ENABLED (dead signal, 0 trades... |
-| 2026-08-29 | ae44ca4 | CEO: killed 2 dead signals (inverse_accel_300_v2, accel_300_... |
-| 2026-08-29 | cc0ee0f | signals: add bb_bounce_long V2 solo variant |
-| 2026-08-29 | afed02b | signals: add accel_300_v2_long_5m — 5m timeframe LONG signal |
-| 2026-08-29 | 9c1f1f7 | signals: add accel-300-v2-long to STANDALONE_BYPASS_SIGNALS |
-| 2026-08-29 | 57f2ab4 | signals: ichimoku cooldown 4h → 1h |
-| 2026-08-29 | e96f691 | signals: add ichimoku_cloud — Tenkan/Kijun cross + cloud bre... |
-| 2026-08-29 | 0c18a83 | wave_classifier: Identify 5 wave pattern buckets across 20 t... |
-| 2026-08-29 | 9055ad0 | signals: rename accel_300_v2.py → accel_300_v2_short.py for ... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+ACTION: No changes to hermes_constants.py this cycle.
