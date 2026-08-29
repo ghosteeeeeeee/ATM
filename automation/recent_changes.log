@@ -453,3 +453,15 @@
   WHY: 4T last hour (AVAX $0.00, CFX +$0.06, MET -$0.10, BANANA -$0.01) net -$0.05. 78T 24h 98.7% atr_sl_hit avg +$0.007 — trailing SL profitable by design. No kill criteria (0 signals 0%WR 3+T last hour). Trade freq 4/hr normal. 1 open KAS bb-bounce-short +0.08%. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 06:05 UTC
+[2026-08-29 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (XPL -$0.09 atr_sl_hit). 66T 24h 53%WR +$0.84 healthy. atr_sl_hit 98.5% avg +$0.013 trailing SL profitable. No kill candidates (accel-300-v2-short- 0%WR but 2T, needs 3+). Trade freq 2.75/hr normal. No consecutive negative hours. 5 open SHORT all bb-bounce-short. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC
+[2026-08-29 11:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (DOGE +$0.07 atr_sl_hit). 59T 24h 53%WR +$1.12 healthy. atr_sl_hit 98.3% avg +$0.018 trailing SL profitable. No kill candidates (accel-300-v2-short- 0%WR 2T needs 3+). Trade freq 2.46/hr normal. No consecutive neg hours. 5 open SHORT all profitable. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 12:05 UTC
+[2026-08-29 12:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +$0.19 all atr_sl_hit). 24h 62T 36W 58.1% +$1.31 strong. accel-300-v2- 31T 58%WR +$1.35 workhorse. bb-bounce-short 19T 63%WR +$0.15 solid. atr_sl_hit 61T 98.4% but PnL +$1.22 — trailing SL profitable. 5 open SHORT. No kill candidates. Trade freq 3/hr normal. No consecutive neg hours. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 13:05 UTC

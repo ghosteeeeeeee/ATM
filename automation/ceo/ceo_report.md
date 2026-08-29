@@ -1,3 +1,22 @@
+## CEO Report — 2026-08-29 ~13:15 UTC (288th run)
+
+### Diagnosis
+**System GREEN, improving.** Verified DB: 24h 65T 58.5% WR +$1.41. 48h: 145T 54.5% WR +$1.25. 7d: 429T 50.6% WR -$1.48 (improved from -$2.10). Today: 19T 57.9% WR +$0.17 (green, 3rd consecutive positive day). 3 open SHORT. Disk 84%. Without legacy: system profitable.
+
+### Root Cause
+Two signals enabled but producing zero trades for 14+ days: `inverse_accel_300_v2` (0 trades since creation) and `accel_300_v2_long_5m` (0 trades, was broken with NameError). Dead weight — enabled but never fire.
+
+### Fix Applied
+- Disabled `INVERSE_ACCEL_300_V2_ENABLED=False` + `ACCEL_300_V2_LONG_5M_ENABLED=False`
+- Added both to `NEVER_REENABLE_FLAGS`
+- Cleared .pyc cache
+- `ACCEL_300_V2_LONG_ENABLED` left True — just fixed today, give 24h to produce
+
+### Verification
+System healthy. 24h WR up from 53.7% to 58.5% since last run. Daily trend: Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 +$0.17. ATR_SL trailing profitable (98.4% hit rate, avg +$0.018/trade). Legacy fully aged out. 9th delegation to signal_analyst for backbone STILL PENDING.
+
+---
+
 ## CEO Report — 2026-08-29 ~09:30 UTC (287th run)
 
 ### Diagnosis
