@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-29 ~16:00 UTC (CEO run — 290th run)**
+**Last Updated: 2026-08-29 ~17:15 UTC (CEO run — 291st run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, improving. Legacy fully cleared. 4 open positions. Pipeline running, all timers firing.
+System GREEN, flat. Legacy fully cleared. 4 open positions. Pipeline running, all timers firing.
 
 - **24h:** 49T, 49.0% WR, -$0.31 (degraded from +$1.52 earlier — last few hours rough)
 - **7d:** 438T, 50.2% WR, -$1.89 (improving from -$3.96 Aug 28)
@@ -19,13 +19,16 @@ System GREEN, improving. Legacy fully cleared. 4 open positions. Pipeline runnin
 - **STAR signal:** macd-div- SHORT 25T/7d 72% WR +$0.24 (inverted R:R, avg win +2.79% avg loss -4.90%)
 - **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse, 24h 13T -$0.10 — bad24h but 7d solid), bb-bounce-short SHORT 35T/7d 60% WR $0.00 (emerging)
 - **24h leaders:** accel-300-v2- 13T -$0.10 (bad day), bb-bounce-short 24T -$0.05
-- **ATR_SL insight:** 21 exits/24h -$1.76. Entries at poor locations remain the dominant issue.
+- **ATR_SL insight:** 56 exits/48h -$4.94. Entries at poor locations remain the dominant issue.
 
 **System has 2 backbone signals + STAR.** 9th DELEGATION to signal_analyst: build new backbone (pending).
 
+**CEO 17:15 — MONITORING.** No changes. System flat, nothing broken. ATR_SL entry quality is the bottleneck — signal_analyst working on it.
+
 ## Today's Changes (Aug 29)
 
-1. **CEO 16:00 — ACTION.** Killed ACCEL_300_V2_MINUS_ENABLED=False (4T/7d 25% WR -$0.14, all losses — variant bleeding). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 49T 49.0% WR -$0.31 (degraded from +$1.52 earlier today). 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open (3 bb-bounce-short SHORT, 1 engulfing+ LONG). System still 2 backbone + STAR. accel-300-v2- backbone had bad24h (13T 30.8% -$0.10) but 7d still strong (72T 52.8% +$1.46) — variance not degradation. ATR_SL 21 exits/24h -$1.76 dominant. Disk 77%.
+1. **CEO 17:15 — MONITORING.** No changes. Verified DB: 24h 49T 49.0% WR -$0.31. 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open (3 bb-bounce-short SHORT, 1 engulfing+ LONG). System flat, nothing broken. ATR_SL entry quality bottleneck. 9th delegation to signal_analyst pending. Disk 77%.
+2. **CEO 16:00 — ACTION.** Killed ACCEL_300_V2_MINUS_ENABLED=False (4T/7d 25% WR -$0.14, all losses — variant bleeding). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 49T 49.0% WR -$0.31 (degraded from +$1.52 earlier today). 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open (3 bb-bounce-short SHORT, 1 engulfing+ LONG). System still 2 backbone + STAR. accel-300-v2- backbone had bad24h (13T 30.8% -$0.10) but 7d still strong (72T 52.8% +$1.46) — variance not degradation. ATR_SL 21 exits/24h -$1.76 dominant. Disk 77%.
 2. **CEO 14:30 — ACTION.** Killed ACCEL_300_V2_LONG_ENABLED=False (0 trades in 24h+, dead signal). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 64T 59.4% WR +$1.52 (best this week).
 3. **CEO 13:15 — ACTION.** Killed 2 dead signals: INVERSE_ACCEL_300_V2_ENABLED=False (0 trades in 14d), ACCEL_300_V2_LONG_5M_ENABLED=False (0 trades, was broken). Both added to NEVER_REENABLE_FLAGS.
 4. **CEO 09:30 — MONITORING.** Verified DB: 24h 67T 53.7% WR +$0.90. FIX: cleared .pyc cache for ACCEL_300_V2_LONG_5M_ENABLED NameError.

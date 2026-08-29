@@ -1,45 +1,67 @@
-=== Signal Performance Report ===
-Generated: 2026-08-29 (6h cycle)
+# Signal Performance Report
+**Generated:** 2026-08-29 17:02 UTC | **Period:** Last 6h + 24h
 
-## 24h Summary
-Total: 59 trades | 55.9% WR | +$1.12 PnL
-Open positions: 5
+## Overall Stats
+- **Total trades (all time):** 1,673 | **WR:** 49.6% | **PnL:** -75.63%
+- **Date range:** 2026-07-29 → 2026-08-29
 
-## TOP PERFORMERS (24h)
-| Signal | Dir | Trades | WR | PnL | Avg PnL |
-|--------|-----|--------|-----|-----|---------|
-| accel-300-v2- | SHORT | 31 | 58.1% | +$1.35 | +$0.044 |
-| bb-bounce-short | SHORT | 18 | 61.1% | +$0.12 | +$0.007 |
-| macd-div- | SHORT | 2 | 50.0% | +$0.01 | +$0.005 |
+---
 
-## 72h Extended View (5+ trades)
-| Signal | Dir | Trades | WR | PnL | Avg PnL | Status |
-|--------|-----|--------|-----|-----|---------|--------|
-| accel-300-v2- | SHORT | 72 | 52.8% | +$1.46 | +$0.020 | Winner |
-| macd-div- | SHORT | 9 | 77.8% | +$0.44 | +$0.049 | Winner |
-| bb-bounce-short | SHORT | 25 | 60.0% | -$0.02 | -$0.001 | Breakeven |
-| slow-grind- | SHORT | 11 | 36.4% | -$0.51 | -$0.046 | DISABLED |
-| pump-catcher+ | LONG | 20 | 35.0% | -$0.22 | -$0.011 | DISABLED |
-| atr-spike+ | LONG | 7 | 28.6% | -$0.15 | -$0.021 | DISABLED |
+## WINNERS (WR > 55%, PnL > 0)
 
-## KILLS EXECUTED
-None this cycle. All known losers already disabled:
-- slow-grind-: SLOW_GRIND_SHORT_ENABLED = False
-- pump-catcher+: PUMP_CATCHER_ENABLED = False (all variants)
-- atr-spike+: ATR_SPIKE_ENABLED = False (all variants)
+None found.
 
-## WATCH LIST
-| Signal | Dir | Trades | WR | PnL | Note |
-|--------|-----|--------|-----|-----|------|
-| bb-bounce+ | LONG | 4 (72h) | 0% | -$0.62 | BB_BOUNCE_LONG_ENABLED = True. Only 4 trades, doesn't meet kill threshold (5+). Monitor. |
-| accel-300-v2-short- | SHORT | 2 (24h) | 0% | -$0.19 | Too few trades to judge. |
+---
 
-## ISSUES
-- No direction inversions detected
-- bb_bounce+ (LONG) has 0% WR but only 4 trades in 72h — below kill threshold
-- All top volume going SHORT (accel-300-v2- and bb-bounce-short dominate)
+## LOSERS (WR < 30%, PnL < -2%)
 
-## ACTIONS
-- No signals killed this cycle
-- No boosts applied — current winners already at max enabled state
-- Recommend monitoring bb_bounce+ LONG; kill if reaches 5+ trades with < 30% WR
+None found.
+
+---
+
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| accel-300-v2- | SHORT | 13 | 38.5% | -1.09 | DISABLED | Borderline |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] accel-300-v2- SHORT** — WR=38.5%, PnL=-1.09% over 13 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-29 | c027c84 | CEO: Kill ACCEL_300_V2_MINUS_ENABLED (4T/7d 25% WR bleeding ... |
+| 2026-08-29 | c89e22d | CEO: KILLED ACCEL_300_V2_LONG_ENABLED (dead signal, 0 trades... |
+| 2026-08-29 | ae44ca4 | CEO: killed 2 dead signals (inverse_accel_300_v2, accel_300_... |
+| 2026-08-29 | cc0ee0f | signals: add bb_bounce_long V2 solo variant |
+| 2026-08-29 | afed02b | signals: add accel_300_v2_long_5m — 5m timeframe LONG signal |
+| 2026-08-29 | 9c1f1f7 | signals: add accel-300-v2-long to STANDALONE_BYPASS_SIGNALS |
+| 2026-08-29 | 57f2ab4 | signals: ichimoku cooldown 4h → 1h |
+| 2026-08-29 | e96f691 | signals: add ichimoku_cloud — Tenkan/Kijun cross + cloud bre... |
+| 2026-08-29 | 0c18a83 | wave_classifier: Identify 5 wave pattern buckets across 20 t... |
+| 2026-08-29 | 9055ad0 | signals: rename accel_300_v2.py → accel_300_v2_short.py for ... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
