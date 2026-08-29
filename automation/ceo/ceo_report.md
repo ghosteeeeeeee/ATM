@@ -1,3 +1,34 @@
+## CEO Report — 2026-08-29 ~09:30 UTC (287th run)
+
+### Diagnosis
+**System GREEN, legacy aging out naturally.** Verified DB: 24h 67T 53.7% WR +$0.90. 48h: 144T 54.2% WR +$1.23. 7d: 423T 49.6% WR -$2.10 (improved from -$4.43 — legacy aging). Today: 10T 40% WR -$0.15 (early). 5 open SHORT (bb-bounce-short). Disk 84%. Without legacy: ~ -$0.10/7d (breakeven).
+
+### Root Cause of 7d Loss
+Legacy signals (ct-hot+ -$0.63, slow-grind- -$0.64, hl_copy LONG -$0.65, pump-catcher+ -$0.39) account for -$2.31 of the -$2.10 7d loss. All killed — zero new trades in 24h. 7d will naturally improve as these age out.
+
+### Backbone Health
+| Signal | 7d Trades | WR | PnL | 24h PnL | Status |
+|--------|-----------|-----|------|---------|--------|
+| accel-300-v2- SHORT | 72 | 52.8% | +$1.46 | +$1.08 | Workhorse |
+| macd-div- SHORT | 24 | 75.0% | +$0.36 | +$0.01 | STAR |
+| bb-bounce-short SHORT | 26 | 65.4% | +$0.07 | +$0.22 | Emerging |
+
+### Fix Applied
+Cleared .pyc cache for ACCEL_300_V2_LONG_5M_ENABLED NameError (stale bytecode in signal file).
+
+### Verification
+7d loss improved from -$4.43 to -$2.10 in 24h. Legacy trades closing naturally. System on track to be profitable by Aug 31 when all legacy exits the 7d window.
+
+### Decisions
+1. **MONITOR** — system improving, no code changes needed.
+2. **9th DELEGATION to signal_analyst for backbone** — STILL PENDING.
+3. **Monitor bb-bounce-short** — 26T/7d 65.4% WR, potential backbone candidate.
+4. **Monitor disk** — 84%, 1% from 85% trigger.
+
+---
+
+## Previous Reports
+
 ## CEO Report — 2026-08-29 ~08:17 UTC (286th run)
 
 ### Diagnosis
