@@ -1091,6 +1091,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # bb_bounce_long (V2 solo variant with velocity filter)
+            if _comp in ('bb_bounce_long', 'bb-bounce-long+'):
+                try:
+                    from hermes_constants import BB_BOUNCE_LONG_ENABLED
+                    if not BB_BOUNCE_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # range_finder
             if _comp == 'range_finder':
                 try:
@@ -2258,7 +2267,7 @@ def is_component_disabled(component: str) -> bool:
     if c in ('bb_bounce-', 'bb-bounce-'): return not BB_BOUNCE_MINUS_ENABLED
     if c == 'bb_bounce': return not BB_BOUNCE_ENABLED
     if c in ('bb_bounce_short', 'bb-bounce-short'): return not BB_BOUNCE_SHORT_ENABLED
-    if c in ('bb-bounce-long',): return not BB_BOUNCE_PLUS_ENABLED   # LONG-specific, same gate
+    if c in ('bb_bounce_long', 'bb-bounce-long', 'bb-bounce-long+'): return not BB_BOUNCE_LONG_ENABLED
     # range_finder
     if c in ('range_finder+',): return not RANGE_FINDER_PLUS_ENABLED
     if c in ('range_finder-',): return not RANGE_FINDER_MINUS_ENABLED

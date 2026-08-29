@@ -243,9 +243,12 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
+    'AVNT',
     'BABY',
+    'BIGTIME',
     'CHIP',
     'DOGE',
+    'DYDX',
     'FIL',
     'GMT',
     'HBAR',
@@ -253,6 +256,7 @@ FAVORITES = {
     'LDO',
     'ME',
     'NXPC',
+    'SAND',
     'SEI',
     'SYRUP',
     'ZRO'
@@ -274,18 +278,20 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 LOSERS = {
     'AIXBT',
     'ALT',
+    'BANANA',
     'BLUR',
     'BTC',
     'CAKE',
     'CASHCAT',
     'CC',
+    'CFX',
     'COMP',
-    'DYDX',
     'ENA',
     'ENS',
     'ETH',
     'HBAR',
     'HYPE',
+    'ICP',
     'IMX',
     'MERL',
     'MON',
@@ -295,6 +301,7 @@ LOSERS = {
     'WLD',
     'WLFI'
 }
+
 
 
 
@@ -1533,6 +1540,7 @@ BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. 
 BB_BOUNCE_PLUS_ENABLED = False  # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
+BB_BOUNCE_LONG_ENABLED = True     # bb_bounce_long — V2 solo variant with velocity filter (2026-08-29)
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
@@ -1904,7 +1912,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.39 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.4085 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────

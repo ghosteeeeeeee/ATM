@@ -14,7 +14,7 @@ from hermes_constants import (
     HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
     RS_ENABLED, RS_PLUS_ENABLED, RS_MINUS_ENABLED,
     R2_TREND_SHORT_ENABLED, R2_TREND_LONG_ENABLED,
-    BB_BOUNCE_SHORT_ENABLED,
+    BB_BOUNCE_SHORT_ENABLED, BB_BOUNCE_LONG_ENABLED,
     RETURN_EXHAUSTION_SHORT_ENABLED,
     ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
     CONTINUATION_ENABLED, CONTINUATION_PLUS_ENABLED,
@@ -54,6 +54,11 @@ try:
     from signals.bb_bounce_short import run as _bb_bounce_short_run
 except Exception:
     _bb_bounce_short_run = None
+
+try:
+    from signals.bb_bounce_long import run as _bb_bounce_long_run
+except Exception:
+    _bb_bounce_long_run = None
 
 try:
     from signals.return_exhaustion_short import run as _return_exhaustion_short_run
@@ -132,6 +137,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'r2_trend_short',           'enabled': 'R2_TREND_SHORT_ENABLED',       'run': _r2_trend_short_run},
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
     {'name': 'bb_bounce_short',          'enabled': 'BB_BOUNCE_SHORT_ENABLED',      'run': _bb_bounce_short_run},
+    {'name': 'bb_bounce_long',           'enabled': 'BB_BOUNCE_LONG_ENABLED',       'run': _bb_bounce_long_run},
     {'name': 'return_exhaustion_short',  'enabled': 'RETURN_EXHAUSTION_SHORT_ENABLED', 'run': _return_exhaustion_short_run},
     {'name': 'engulfing',                'enabled': 'ENGULFING_ENABLED',            'run': _engulfing_run},
     {'name': 'continuation',             'enabled': 'CONTINUATION_ENABLED',         'run': _continuation_run},
