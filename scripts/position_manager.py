@@ -1262,6 +1262,23 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         except Exception as hebb_err:
             log(f"[Position Manager] Hebbian learn_trade_outcome error (non-fatal): {hebb_err}")
 
+        # ── Correlation engine: ingest for pump chain learning ──────────────
+        # Independent of Hebbian — runs even if Hebbian fails.
+        try:
+            from correlation_engine import CorrelationEngine
+            from datetime import timezone as _tz_corr
+            _corr = CorrelationEngine()
+            _corr.ingest_trade(
+                token=token,
+                signal=signal_type or "unknown",
+                direction=direction or "unknown",
+                won=bool(actual_pnl_pct > 0),
+                pnl_pct=float(actual_pnl_pct or 0),
+                close_time=now.isoformat() if hasattr(now, 'isoformat') else str(now)
+            )
+        except Exception as corr_err:
+            pass  # fail-open
+
         # Loss cooldown — block re-entry after loss (prevents revenge trading)
         is_win = 1 if float(actual_pnl_usdt or 0) > 0 else 0
         if is_win == 0:
