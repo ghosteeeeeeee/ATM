@@ -2683,6 +2683,41 @@ def run(dry_run=False):
 
         if _skip_signal:
             continue
+
+        # V2 (2026-08-29): Signal staleness check — block if signal too old or price drifted
+        try:
+            from hermes_constants import SIGNAL_STALENESS_MAX_AGE_MIN, SIGNAL_STALENESS_PRICE_PCT
+            signal_created_at = sig.get('created_at')
+            if signal_created_at:
+                import datetime as _dt
+                # Parse SQLite datetime string
+                if isinstance(signal_created_at, str):
+                    try:
+                        sig_ts = _dt.datetime.strptime(signal_created_at, '%Y-%m-%d %H:%M:%S')
+                        sig_ts = sig_ts.replace(tzinfo=_dt.timezone.utc)
+                        now = _dt.datetime.now(_dt.timezone.utc)
+                        age_min = (now - sig_ts).total_seconds() / 60
+                        if age_min > SIGNAL_STALENESS_MAX_AGE_MIN:
+                            log(f'  🚫 [STALE] {token} {direction}: signal {age_min:.1f}min old (max {SIGNAL_STALENESS_MAX_AGE_MIN}min)')
+                            if sig_id:
+                                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                            skipped += 1
+                            continue
+                    except ValueError:
+                        pass  # unparseable timestamp — skip staleness check
+            # Price drift check
+            sig_price = sig.get('price')
+            if sig_price and price and sig_price > 0:
+                drift_pct = abs(price - sig_price) / sig_price * 100
+                if drift_pct > SIGNAL_STALENESS_PRICE_PCT:
+                    log(f'  🚫 [DRIFT] {token} {direction}: price drifted {drift_pct:.2f}% (max {SIGNAL_STALENESS_PRICE_PCT}%)')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+        except ImportError:
+            pass  # constants not available — skip staleness check
+
         price = sig.get('price') or get_current_price(token)
 
         if not price:

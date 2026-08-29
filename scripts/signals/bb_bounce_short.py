@@ -22,7 +22,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(__file__))
-from paths import RUNTIME_DB
+from paths import RUNTIME_DB, CANDLES_DB
 
 # ── SHORT-Specific Parameters ──────────────────────────────────────────────
 BB_PERIOD = 20
@@ -74,7 +74,7 @@ def _get_15m_trend(token):
     """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
             SELECT close FROM candles_15m
@@ -112,7 +112,7 @@ def _get_15m_trend(token):
 def _get_candles(token, lookback=100):
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
         cur.execute("""
             SELECT close FROM candles_5m
@@ -133,7 +133,7 @@ def _get_volume_avg(token, lookback=50):
     """Get average volume over last N candles."""
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
             SELECT volume FROM candles_5m
@@ -159,7 +159,7 @@ def _get_current_volume(token):
     """Get the most recent candle's volume."""
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
             SELECT volume FROM candles_5m
@@ -245,9 +245,10 @@ def detect_bb_bounce_short(token, closes):
     try:
         from speed_tracker import get_token_speed
         spd = get_token_speed(token)
-        vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
-        if vel_5m > 0:
-            return None  # price still rising, fade not confirmed
+        if spd and isinstance(spd, dict):
+            vel_5m = spd.get('price_velocity_5m', 0.0)
+            if vel_5m > 0:
+                return None  # price still rising, fade not confirmed
     except Exception:
         pass
 

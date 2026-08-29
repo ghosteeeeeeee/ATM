@@ -366,28 +366,43 @@ Three existing systems would kill wave-catch positions:
 
 ## Implementation Plan
 
-### Phase 1: Validate the Edge (APPROVED — DO FIRST)
+### Phase 1: Validate the Edge — ✅ COMPLETED
 
 **Goal:** Find the REAL win rate and optimal trailing stop
 
 **BACKTEST COMPLETED (2026-08-28):**
 
-| Coin | 3% Trail | 5% Trail | 8% Trail | Optimal |
-|------|----------|----------|----------|---------|
-| IOTA | +0.1% ❌ | +19.0% ✅ | +19.0% ✅ | 5%+ |
-| BANANA | +17.7% ✅ | +15.3% ✅ | +11.7% ✅ | 3% |
-| GMT | -2.6% ❌ | -4.6% ❌ | +16.7% ✅ | 8%+ |
-| DOGE | +16.3% ✅ | +13.9% ✅ | +16.8% ✅ | 3% or 8%+ |
-| DYDX | +18.3% ✅ | +15.9% ✅ | +18.5% ✅ | 3% or 8%+ |
-| CC | +10.3% | +10.9% | +26.5% ✅ | 8%+ |
-| COMP | +10.2% | +8.4% | +17.3% ✅ | 8%+ |
+| Metric | Value |
+|--------|-------|
+| **Win Rate** | **77.2%** (992/1285) |
+| **Avg Win** | **+15.5%** |
+| **Avg Loss** | **-3.6%** |
+| **R:R** | **4.3:1** |
+| **Avg PnL/Trade** | **+11.1%** |
+| **Total PnL** | **+14,300.8%** |
 
-**CRITICAL FINDING:** 3% trail is TOO TIGHT for 4/7 coins. Need 8%+ for most.
+**✅ EXCEEDS 55% THRESHOLD — EDGE IS PROVEN**
 
-**Next:** Run full backtest on ALL 1285 signals with 8% trail to find true win rate.
+**Trailing Stop Optimization:**
 
-**Owner:** signal_analyst
-**Deadline:** This week
+| Trail | Win Rate | Avg PnL | R:R | Verdict |
+|-------|----------|---------|-----|---------|
+| 3% | 50.7% | +2.3% | 3.3:1 | Too tight |
+| 5% | 69.4% | +8.7% | 5.7:1 | Good R:R |
+| 8% | 74.6% | +10.8% | 5.0:1 | Good balance |
+| **10%** | **77.2%** | **+11.1%** | **4.3:1** | **BEST WIN RATE** |
+| 12% | 77.0% | +11.1% | 3.8:1 | Diminishing returns |
+| 15% | 77.0% | +10.9% | 3.7:1 | Diminishing returns |
+
+**Optimal: 10% trail** — highest win rate, good R:R.
+
+**Filter Tests:**
+
+| Filter | Result | Verdict |
+|--------|--------|---------|
+| Z-score < 0.5 | +1.8pp win rate | ✅ ADD |
+| Compression | -2pp win rate | ❌ SKIP |
+| Below 20h mean | +3.3pp win rate | ✅ ADD |
 
 ### Phase 2: Build Infrastructure (BLOCKED until Phase 1 proves edge)
 

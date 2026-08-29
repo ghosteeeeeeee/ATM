@@ -174,12 +174,16 @@ If you skip this, the next session starts blind.
 **Location:** `/root/.hermes/skills/shared/` (symlinks to `/root/.config/opencode/skills/`)
 **MCP Config:** `/root/.hermes/config/shared-mcp.json`
 
-### Available Shared Skills (37)
-- **Verification:** `post-change`, `bug-hunter`
+### Available Shared Skills (38+)
+- **Verification:** `post-change`, `bug-hunter`, `own-conclusions` (independent audit — no priming, fresh eyes)
 - **Trading:** `signal-lab`, `signal-backtest`, `signal-quality-tuner`, `signal-combo-analyzer`, `trade-analysis`, `trade-stats`, `winrate-calculator`, `hotset-debug`, `phantom-trades`
-- **System:** `decisions`, `handoff`, `ceo-comm`, `pipeline-visualizer`
+- **System:** `decisions` (lists uncertain choices made during work), `handoff`, `ceo-comm`, `pipeline-visualizer`
 - **Content:** `graphify`, `transcript-miner`, `youtube-watch`, `download-pdfs`
 - **Books:** 16 trading books (Wyckoff, Price Action, etc.)
+
+### Skill Usage Notes
+- **`decisions`** — Run after any significant work to surface uncertain choices. Trigger: `/decisions`
+- **`own-conclusions`** — Independent verification agent. Give it data, it reads from scratch and makes its own conclusions. Trigger: "own conclusions", "verify independently", "fresh eyes". Saves verdicts to `brain/verdicts/`.
 
 ### Shared MCP Servers
 | Server | Purpose |
