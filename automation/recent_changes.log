@@ -437,3 +437,7 @@
   WHY: 0T last hour (2T last 2h both ICP/MET bb-bounce-short/accel-300-v2- atr_sl_hit, -$0.20). 24h 89T 50W 56.2% +$1.55 strong. accel-300-v2- 62T 53%WR +$1.40 workhorse. bb-bounce-short 12T 75%WR +$0.10 star. atr_sl_hit 85T 95.5% but PnL +$1.28 — trailing SL profitable by design. 4 open SHORT all bb-bounce-small (AVAX/CFX/BANANA/AVNT), all slightly underwater but small. No kill candidates (0 signals 0%WR 3+T). Trade freq 3.7/hr normal. No consecutive negative hours. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 01:05 UTC
+[2026-08-29 02:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (CFX -$0.09 atr_sl_hit). 84T 24h 58.3%WR +$1.81 healthy. atr_sl_hit 96.4% avg +$0.018 trailing SL profitable. No kill candidates (0 signals 0%WR 3+T). Trade freq 3.5/hr normal. 6h slight dip (-$0.28) but not 3 consecutive negative hours. 4 open SHORT all bb-bounce-short, 3/4 profitable. System healthy, quiet low-vol period.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC

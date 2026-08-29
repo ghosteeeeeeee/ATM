@@ -1551,3 +1551,19 @@ ALERTS:
 - **WARN** (Nx): `signals_runner: ERROR — name 'ACCEL_300_V2_LONG_ENABLED' is not defined` — occurred 00:12-00:15, self-resolved by 00:17. Transient import issue (likely .pyc cache or race condition). No auto-fix needed.
 - **WARN** (Nx): `ERR hermes-trades-api: Traceback` — occurred 00:13-00:15, self-resolved. Followed ACCEL_300_V2 error.
 - **WARN** (1): Phantom trade: W SHORT trade_id=14505 with 0% PnL / $0.00 — likely exchange tracking artifact. Recommend cleanup.
+
+## Error Alerts — 2026-08-29 01:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   Signal accel_300_v2: TOK → TOK: name 'ACCEL_300_V2_LONG_MIN_GAP' is not defined`
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'ACCEL_300_V2_LONG_ENABLED' is not defined`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2639s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2516s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1980s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1796s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1680s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1560s left, N failures)`
+
+## Error Alerts — 2026-08-29 02:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3540s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3476s left, N failures)`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3423s left, N failures)`

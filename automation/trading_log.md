@@ -17224,3 +17224,29 @@ Final set: ['AIXBT', 'ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYD
 
 **Open Questions:**
 - CFX -43.9% unrealized loss — should be handled by trailing SL, monitoring
+
+## [2026-08-29 02:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CFX bb-bounce-short -$0.09, atr_sl_hit)
+**PnL:** -$0.09 (quiet hour, low vol)
+
+**6h:** 11T, -$0.28, 54.5% — slight dip, not 3 consecutive negative hours
+**24h:** 84T, 58.3% WR, +$1.81 (healthy)
+
+**Signals (24h):**
+- accel-300-v2-: 58T 56.9%WR +$1.69 — workhorse
+- bb-bounce-short: 12T 66.7%WR +$0.00 — breakeven
+- atr_sl_hit: 81T 96.4% exits, avg +$0.018 — trailing SL profitable
+
+**Open:** 4 SHORT (all bb-bounce-short): FIL +26.8%, AVNT +17.7%, AVAX -0.1%, BANANA -15.8%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (no signal 0%WR with 3+T)
+- atr_sl_hit dominant but profitable — trailing SL working
+- Trade freq 3.5/hr normal
+- No consecutive negative hours in 6h window
+- System healthy, quiet low-vol period
+
+**Open Questions:** None
