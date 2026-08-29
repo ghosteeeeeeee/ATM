@@ -17561,3 +17561,90 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 **Open Concerns:**
 - DYDX SHORT -$0.08 unrealized (-69.4%) — open 2h25m, trailing SL hasn't triggered yet
 - bb-bounce-short 24h WR 54.2% but -$0.05 total — slight edge erosion
+
+## [2026-08-29 17:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) — **+$0.02**
+- INJ bb-bounce-short,ichimoku- SHORT +$0.02 (atr_sl_hit)
+
+**24h:** 49T, 26W, 53%WR, -$0.31
+- accel-300-v2- 13T 31%WR -$0.10 — degraded from yesterday's workhorse
+- bb-bounce-short 24T 54%WR -$0.05 — borderline
+- accel-300-v2-short- 4T 25%WR -$0.14 — underperforming, not kill-eligible
+- atr_sl_hit 49T 100% avg -$0.006 — trailing SL slightly negative this 24h window
+
+**Hourly trend (last 6h):** -$0.07, +$0.01, -$0.15, -$0.12, +$0.02 → mixed, no consecutive negative streak
+
+**Open:** 4 positions — ASTER SHORT +37%, DYDX SHORT +10%, USUAL LONG +71%, BCH SHORT -22%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0%WR with 3+T last hour
+- Trade freq 2/hr normal
+- No consecutive negative hours (last streak was 2h at 01:00-02:00)
+- 7-day stats: 438T 50.2%WR -$1.89 (~breakeven, -$0.004/trade)
+
+**Open Concerns:**
+- accel-300-v2- degraded from 58%WR to 31%WR in current 24h window — rolling window effect or real degradation? Need 48h+ to confirm
+- BCH SHORT -22% (3.1h open) — system managing via trailing SL
+- 7-day cumulative slightly negative (-$1.89) — within noise for this trade count
+
+## [2026-08-29 18:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) — **+$0.02**
+- USUAL engulfing+,rs-s103,rs-s99 LONG +$0.04 (atr_sl_hit)
+- CHIP macd-div- SHORT -$0.02 (cascade_flip_-0.24%)
+
+**24h:** 50T, 53%WR, -$0.20
+- atr_sl_hit 49T avg -$0.004 — trailing SL marginally negative
+- accel-300-v2-short- 4T 25%WR -$0.14 worst performer, not kill-eligible (0T last hour)
+- bb-bounce-short 24T -$0.05 flat
+- accel-300-v2- 12T -$0.01 flat
+
+**7-day:** 440T 50.2%WR -$1.87 — breakeven (~$0.004/trade)
+
+**Open:** 5 — DYDX SHORT +68%, ASTER SHORT +49%, SUSHI SHORT +20%, BCH SHORT -19%, CHIP LONG -31%
+
+**Hourly trend (6h):** -0.07, -0.15, -0.12, +0.02, +0.02 → recovering
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0%WR with 3+T last hour (0T last hour)
+- Trade freq 2/hr normal
+- No consecutive negative hours (streak ended at 15:00)
+- 7-day essentially flat — within noise
+- All open positions managed by trailing SL
+
+**Open Questions:**
+- CHIP LONG -$0.31 — new open position (cascade-reverse-v2), trail SL will manage
+- 7-day cumulative slightly negative — monitor if this persists into next week
+
+## [2026-08-29 18:32 UTC] Daily Orchestrator — Monitoring Run
+
+**Trades:** 0 new (pipeline running, 0 approved signals in NEUTRAL regime)
+
+**24h:** 51T, 51%WR, -$0.12
+- bb-bounce-short 25T 56%WR -$0.05 (emerging backbone)
+- accel-300-v2- 12T 33%WR -$0.01 (bad day, 7d still strong)
+- accel-300-v2-short- 4T 25%WR -$0.14 (worst performer)
+- macd-div- 2T 0%WR -$0.14 (STAR, small sample)
+- Confluence combos profitable
+
+**7-day:** 441T 54%WR ~$0.00 — improving from -$1.89
+
+**Open:** 3 — BCH SHORT -$0.08, DYDX SHORT +$0.03, SUSHI SHORT -$0.04
+
+**System Health:**
+- Pipeline: ✅ active, cycle running
+- Key timers: ✅ all firing (pipeline, auto-1hr, health-monitor, signal-reporter)
+- Errors: ✅ none in last 6h
+- Disk: 78% (26G free)
+- Phantom trades: 0
+
+**Changes:** None needed. System flat, nothing broken, no critical issues.
+
+**Pending:** 9th delegation to signal_analyst for backbone signal (still pending).
+
+**Status:** GREEN. Monitor only.
