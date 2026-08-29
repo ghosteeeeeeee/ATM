@@ -441,3 +441,7 @@
   WHY: 1T last hour (CFX -$0.09 atr_sl_hit). 84T 24h 58.3%WR +$1.81 healthy. atr_sl_hit 96.4% avg +$0.018 trailing SL profitable. No kill candidates (0 signals 0%WR 3+T). Trade freq 3.5/hr normal. 6h slight dip (-$0.28) but not 3 consecutive negative hours. 4 open SHORT all bb-bounce-short, 3/4 profitable. System healthy, quiet low-vol period.
   BY: auto_1hr
   NEXT: Re-run at 03:05 UTC
+[2026-08-29 03:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (ZRO -$0.09, AVNT $0.00). 82T 24h 57%WR +$1.25 healthy. atr_sl_hit 97.5% avg +$0.011 trailing SL profitable. No kill candidates. Trade freq 3.4/hr normal. No consecutive negative hours. Open 4 bb-bounce-short 3/4 profitable. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC
