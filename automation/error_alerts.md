@@ -1546,3 +1546,8 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2634s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2576s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2394s left, N failures)`
+
+## Error Alerts — 2026-08-29 00:22 UTC
+- **WARN** (Nx): `signals_runner: ERROR — name 'ACCEL_300_V2_LONG_ENABLED' is not defined` — occurred 00:12-00:15, self-resolved by 00:17. Transient import issue (likely .pyc cache or race condition). No auto-fix needed.
+- **WARN** (Nx): `ERR hermes-trades-api: Traceback` — occurred 00:13-00:15, self-resolved. Followed ACCEL_300_V2 error.
+- **WARN** (1): Phantom trade: W SHORT trade_id=14505 with 0% PnL / $0.00 — likely exchange tracking artifact. Recommend cleanup.
