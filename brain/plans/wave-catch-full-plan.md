@@ -396,6 +396,25 @@ Three existing systems would kill wave-catch positions:
 
 **Optimal: 10% trail** — highest win rate, good R:R.
 
+**Critical Insight: Even winners draw down 8.1% on average before winning.**
+
+| Stop | Stopped | Would Have Won | Missed Profits |
+|------|---------|----------------|----------------|
+| 5% | 916 (71%) | 702 (77%) | 702 winning trades killed |
+| 8% | 621 (48%) | 478 (77%) | 478 winning trades killed |
+| 10% | 474 (37%) | 375 (79%) | 375 winning trades killed |
+
+**The 10% stop is the price of admission.** Winners need room to breathe.
+
+**Alternative Approaches Tested:**
+
+| Approach | Win Rate | Avg PnL | R:R | Verdict |
+|----------|----------|---------|-----|---------|
+| 10% hard stop | 77.2% | +11.1% | 4.3:1 | **BEST BALANCE** |
+| 20% hard stop | 78.1% | +11.7% | 4.2:1 | Higher PnL, ties capital |
+| No stop (trail only) | 85.4% | +5.8% | 2.0:1 | Lower returns |
+| Time stop 48h | 70.2% | +4.5% | 3.1:1 | Too conservative |
+
 **Filter Tests:**
 
 | Filter | Result | Verdict |
