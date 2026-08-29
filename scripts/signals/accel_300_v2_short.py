@@ -10,7 +10,7 @@ SHORT fires when:
   3. Price velocity negative (price moving down)
   4. Price persisted below EMA for 3+ bars (not a cross wick)
   5. Linear regression slope negative (trending down)
-  6. 1h trend must be BEARISH or NEUTRAL
+  6. 15m trend must be BEARISH or NEUTRAL
 """
 
 import sys, os, sqlite3, time
@@ -132,14 +132,15 @@ def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
             conn.close()
 
 
-def _get_1h_trend(token: str) -> str:
-    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token: str) -> str:
+    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'.
+    Faster reaction than 1H — catches downtrends before 1H flips."""
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -404,9 +405,9 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
         if token.upper() in SHORT_BLACKLIST:
             continue
 
-        # 1h trend filter — SHORT needs BEARISH or NEUTRAL
-        trend_1h = _get_1h_trend(token)
-        if trend_1h == 'BULLISH':
+        # 15m trend filter — SHORT needs BEARISH or NEUTRAL
+        trend = _get_15m_trend(token)
+        if trend == 'BULLISH':
             continue
 
         # Volume confirmation
@@ -428,7 +429,7 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
         # Confidence: base on gap strength + acceleration
         gap_bonus = min(20, (abs(sig['gap_pct']) - V2_MIN_GAP_PCT) * 10)
         accel_bonus = min(15, abs(sig['gap_acceleration']) * 100)
-        trend_bonus = 5 if trend_1h != 'NEUTRAL' else 0
+        trend_bonus = 5 if trend != 'NEUTRAL' else 0
         fresh_bonus = 8 if sig.get('fresh_cross') else 0
         confidence = int(min(88, 62 + gap_bonus + accel_bonus + trend_bonus + fresh_bonus))
         confidence = max(60, confidence)
@@ -440,7 +441,7 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
                   f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                   f"accel={sig['gap_acceleration']:.3f}% "
                   f"gap_vel={sig['gap_velocity']:.3f}% "
-                  f"trend_1h={trend_1h} [{SOURCE}]")
+                  f"trend_15m={trend_15m} [{SOURCE}]")
             continue
 
         # Staleness check — verify gap is still valid at current price
@@ -474,7 +475,7 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"accel={sig['gap_acceleration']:.3f}% "
                       f"gap_vel={sig['gap_velocity']:.3f}% "
-                      f"trend_1h={trend_1h} [{SOURCE}]")
+                      f"trend_15m={trend_15m} [{SOURCE}]")
         except Exception as e:
             print(f"[accel-300-v2-short] add_signal error for {token}: {e}")
 
