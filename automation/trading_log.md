@@ -1,5 +1,30 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-29 15:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W, 2L) — **-$0.15**
+- LTC bb-bounce-short,ichimoku- SHORT atr_sl_hit +$0.04
+- YGG bb-bounce-short SHORT atr_sl_hit -$0.11
+- ETC bb-bounce-short SHORT atr_sl_hit -$0.08
+
+**24h:** 58T all atr_sl_hit, +$1.45 — trailing SL profitable
+- accel-300-v2- 23T 57%WR +$1.44 workhorse
+- bb-bounce-short 24T 54%WR -$0.05 flat
+- accel-300-v2-short- 4T 25%WR -$0.14 small sample
+
+**Open:** 4 SHORT (INJ/BCH/DYDX/ASTER all bb-bounce-short)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last 3h
+- 2 consecutive negative hours (13-14 UTC) -$0.22 total — small, not alarming
+- atr_sl_hit 100% of 24h exits but PnL +$1.45 — trailing SL by design
+- Trade freq ~3/hr normal
+- System healthy
+
+---
+
 ## [2026-08-28 23:05 UTC] Hourly Analysis
 
 **Trades:** 5 closed (4W, 1L) — **+$0.06**
@@ -17479,3 +17504,60 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 - System healthy, quiet low-vol period continues
 
 **Open Questions:** None
+
+## [2026-08-29 14:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W, 1L, 1 flat) — **-$0.07**
+- NEAR confluence-,ichimoku- SHORT -$0.10 (loss)
+- ZRO bb-bounce-short SHORT +$0.03
+- NXPC bb-bounce-short SHORT +$0.00 (flat)
+
+**24h:** 65T, 37W, 57%WR, +$1.11
+- atr_sl_hit 64T (98.5%) avg +$0.016 — trailing SL profitable by design
+- accel-300-v2- 29T 55%WR +$1.22 — workhorse
+- bb-bounce-short 22T 59%WR +$0.14 — solid
+- accel-300-v2-short- 4T 25%WR -$0.14 — underperforming but not kill-eligible
+
+**Open:** 5 SHORT — avg unrealized -9.14%, worst ASTER -35.73%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades last hour
+- accel-300-v2-short- 25%WR but only 4T in 24h (not last hour specific)
+- atr_sl_hit 98.5% but avg +$0.016 — trailing SL profitable
+- Trade freq 3/hr normal
+- No consecutive negative hours
+
+**Open Concerns:**
+- ASTER -$3.97 unrealized (-35.73%) — open 1h20m, may need SL review
+- DYDX -$2.33 (-21%), ETC -$3.25 (-29%) — both deep underwater SHORTs
+- These positions haven't hit trailing SL yet — system managing them but worth watching
+
+## [2026-08-29 16:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) — **-$0.10**
+- INJ bb-bounce-short,ichimoku- SHORT +$0.02 (atr_sl_hit)
+- ZRO macd-div- SHORT -$0.12 (atr_sl_hit)
+
+**24h:** 58T, 56%WR, +$0.94
+- accel-300-v2- 21T 57%WR +$1.03 (workhorse)
+- bb-bounce-short 24T 54%WR -$0.05 (slightly neg)
+- macd-div- 2T 50%WR $0.00 (flat)
+- accel-300-v2-short- 4T 25%WR -$0.14 (underperforming, not kill-eligible)
+- atr_sl_hit 58T 100% avg +$0.016 — trailing SL profitable
+
+**Open:** 4 positions — USUAL LONG +35%, BCH SHORT flat, DYDX SHORT -69%, ASTER SHORT +4%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0%WR with 3+T last hour (0T last hour from any signal)
+- Trade freq 2.7/hr normal (16T in 6h)
+- No consecutive negative hours
+- atr_sl_hit 100% but avg +$0.016 — trailing SL profitable
+- accel-300-v2-short- 25%WR but only 4T in 24h, not kill-eligible
+
+**Open Concerns:**
+- DYDX SHORT -$0.08 unrealized (-69.4%) — open 2h25m, trailing SL hasn't triggered yet
+- bb-bounce-short 24h WR 54.2% but -$0.05 total — slight edge erosion

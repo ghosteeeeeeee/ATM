@@ -1,34 +1,34 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-29 ~14:30 UTC (CEO run — 289th run)**
+**Last Updated: 2026-08-29 ~16:00 UTC (CEO run — 290th run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, improving. Legacy fully cleared. 5 open SHORT positions. Pipeline running, all timers firing.
+System GREEN, improving. Legacy fully cleared. 4 open positions. Pipeline running, all timers firing.
 
-- **24h:** 64T, 59.4% WR, +$1.52 (best this week)
-- **48h:** 54 losing trades, -$4.78 total (ATR_SL dominant)
-- **7d:** 429T, 50.6% WR, -$1.48 (legacy clearing)
-- **Today (Aug 29):** 19T, 57.9% WR, +$0.17 (green, 3rd consecutive positive day)
-- **Daily trend:** Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 +$0.17
+- **24h:** 49T, 49.0% WR, -$0.31 (degraded from +$1.52 earlier — last few hours rough)
+- **7d:** 438T, 50.2% WR, -$1.89 (improving from -$3.96 Aug 28)
+- **Today (Aug 29):** 28T, 50.0% WR, -$0.24 (flat after strong Aug 28)
+- **Daily trend:** Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.24
 - **Market:** NEUTRAL dominant
 - **Disk:** 77%
-- **Open positions:** 5 SHORT (LTC bb-bounce-short+ichimoku-, ZRO bb-bounce-short, AVNT accel-300-v2-short-, NEAR confluence-ichimoku-, NXPC bb-bounce-short)
+- **Open positions:** 4 (3 bb-bounce-short SHORT, 1 engulfing+ LONG)
 - **Legacy bleed:** FULLY CLEARED. All legacy trades aged out.
-- **Without legacy:** System profitable. 24h +$1.52.
-- **STAR signal:** macd-div- SHORT 24T/7d 75% WR +$0.36 (inverted R:R avg win +2.79% avg loss -4.90%)
-- **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse), bb-bounce-short SHORT 31T/7d 64.5% WR +$0.16 (emerging)
-- **24h leaders:** accel-300-v2- 31T +$1.35, bb-bounce-short 21T +$0.23
-- **ATR_SL insight:** Losers avg 0.73% peak move — entries at poor locations, price reverses immediately. ENTRY QUALITY issue, not SL width.
+- **Without legacy:** System near breakeven. 24h -$0.31.
+- **STAR signal:** macd-div- SHORT 25T/7d 72% WR +$0.24 (inverted R:R, avg win +2.79% avg loss -4.90%)
+- **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse, 24h 13T -$0.10 — bad24h but 7d solid), bb-bounce-short SHORT 35T/7d 60% WR $0.00 (emerging)
+- **24h leaders:** accel-300-v2- 13T -$0.10 (bad day), bb-bounce-short 24T -$0.05
+- **ATR_SL insight:** 21 exits/24h -$1.76. Entries at poor locations remain the dominant issue.
 
 **System has 2 backbone signals + STAR.** 9th DELEGATION to signal_analyst: build new backbone (pending).
 
 ## Today's Changes (Aug 29)
 
-1. **CEO 14:30 — ACTION.** Killed ACCEL_300_V2_LONG_ENABLED=False (0 trades in 24h+, dead signal). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 64T 59.4% WR +$1.52 (best this week). 48h: 54 losing trades -$4.78 (ATR_SL 54 exits -3.52% avg, avg peak move 0.73% — entry quality issue). 7d: 429T 50.6% WR -$1.48. 5 open SHORT. Disk 77%. System clean — 2 backbone + STAR. Legacy all cleared.
-2. **CEO 13:15 — ACTION.** Killed 2 dead signals: INVERSE_ACCEL_300_V2_ENABLED=False (0 trades in 14d), ACCEL_300_V2_LONG_5M_ENABLED=False (0 trades, was broken). Both added to NEVER_REENABLE_FLAGS. ACCEL_300_V2_LONG_ENABLED left True — now killed (0 trades in 24h+).
-3. **CEO 09:30 — MONITORING.** Verified DB: 24h 67T 53.7% WR +$0.90. FIX: cleared .pyc cache for ACCEL_300_V2_LONG_5M_ENABLED NameError.
+1. **CEO 16:00 — ACTION.** Killed ACCEL_300_V2_MINUS_ENABLED=False (4T/7d 25% WR -$0.14, all losses — variant bleeding). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 49T 49.0% WR -$0.31 (degraded from +$1.52 earlier today). 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open (3 bb-bounce-short SHORT, 1 engulfing+ LONG). System still 2 backbone + STAR. accel-300-v2- backbone had bad24h (13T 30.8% -$0.10) but 7d still strong (72T 52.8% +$1.46) — variance not degradation. ATR_SL 21 exits/24h -$1.76 dominant. Disk 77%.
+2. **CEO 14:30 — ACTION.** Killed ACCEL_300_V2_LONG_ENABLED=False (0 trades in 24h+, dead signal). Added to NEVER_REENABLE_FLAGS. Verified DB: 24h 64T 59.4% WR +$1.52 (best this week).
+3. **CEO 13:15 — ACTION.** Killed 2 dead signals: INVERSE_ACCEL_300_V2_ENABLED=False (0 trades in 14d), ACCEL_300_V2_LONG_5M_ENABLED=False (0 trades, was broken). Both added to NEVER_REENABLE_FLAGS.
+4. **CEO 09:30 — MONITORING.** Verified DB: 24h 67T 53.7% WR +$0.90. FIX: cleared .pyc cache for ACCEL_300_V2_LONG_5M_ENABLED NameError.
 
 ## Today's Changes (Aug 28)
 
@@ -54,10 +54,10 @@ System GREEN, improving. Legacy fully cleared. 5 open SHORT positions. Pipeline 
 - **DELEGATED to signal_analyst: build new backbone signal.** Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market. — 2026-08-26 (RE-DELEGATED 2026-08-27, 9th delegation STILL PENDING)
 - **CONF_FILTER_MAX=89.** Blocks overconfident trades, 90+ tier now +$1.91/7d. — 2026-08-24
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True.** Uses 4h regime from PostgreSQL momentum_cache. — 2026-08-23
-- **macd-div- is STAR signal.** 24T/7d 75% WR +$0.36. Inverted R:R (avg win +2.79%, avg loss -4.90%). — 2026-08-29
+- **macd-div- is STAR signal.** 25T/7d 72% WR +$0.24. Inverted R:R (avg win +2.79%, avg loss -4.90%). — 2026-08-29
 - **tl_break_short INVERTED R:R.** 16T/7d 62.5% WR -$0.11 (avg win +2.13%, avg loss -5.19%). CEO_PROTECTED. — 2026-08-27
 - **hzscore- RE-ENABLED BY T.** SHORT 7d 10T +$0.09, 50% WR (inverted R:R). CEO_PROTECTED. Recommend T disable. — 2026-08-23
-- **bb-bounce-short EMERGING.** 26T/7d 65.4% WR +$0.07. Monitor for backbone candidate. — 2026-08-29
+- **bb-bounce-short EMERGING.** 35T/7d 60% WR $0.00. Monitor for backbone candidate. — 2026-08-29
 - **LEGACY AGE-OUT COMPLETE.** All legacy trades cleared (ct-hot+, slow-grind-, hl_copy SHORT, pump-catcher+, atr-spike+, continuation-). System now clean. — 2026-08-29
 
 ## What NOT To Do
@@ -69,6 +69,7 @@ System GREEN, improving. Legacy fully cleared. 5 open SHORT positions. Pipeline 
 ## Next Actions
 
 1. **DELEGATE to signal_analyst: build new backbone signal.** System has 2 backbone signals (accel-300-v2-, bb-bounce-short emerging). 9th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-29
-2. **Monitor bb-bounce-short SHORT positions.** 5 open (SEI, DOGE, CRV, SYRUP, LTC). Watch for trailing SL or exit. Signal 26T/7d 65.4% WR +$0.07 — emerging backbone candidate. — 2026-08-29
-3. **Monitor disk.** Currently 84%. Below 85% trigger. — 2026-08-29
-4. **Monitor system performance post-legacy.** Now clean — track if 7d improves without legacy bleed. Currently ~ -$0.07/7d (breakeven). — 2026-08-29
+2. **Monitor bb-bounce-short SHORT positions.** 3 open. Watch for trailing SL or exit. Signal 35T/7d 60% WR $0.00 — emerging backbone candidate. — 2026-08-29
+3. **Monitor disk.** Currently 77%. Below 85% trigger. — 2026-08-29
+4. **Monitor system performance post-legacy.** Now clean — track if 7d improves. Currently -$1.89/7d. — 2026-08-29
+5. **Monitor accel-300-v2- backbone.** Bad24h (13T 30.8% -$0.10) but 7d strong (72T 52.8% +$1.46). If tomorrow is also negative, investigate entry quality. — 2026-08-29

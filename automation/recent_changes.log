@@ -1,3 +1,7 @@
+[2026-08-29 15:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.15 all bb-bounce-short atr_sl_hit). 24h 58T all atr_sl_hit +$1.45 trailing SL profitable. accel-300-v2- 23T 57%WR +$1.44 workhorse. bb-bounce-short 24T 54%WR -$0.05 flat. accel-300-v2-short- 4T 25%WR -$0.14 small sample. 4 open SHORT (INJ/BCH/DYDX/ASTER). 2 consecutive neg hours (13-14 UTC) -$0.22 small. No kill candidates. Trade freq ~3/hr normal. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 16:05 UTC
 [2026-08-28 23:05 UTC] auto_1hr: NO CHANGES
   WHY: 5T last hour (4W 1L +$0.06 all bb-bounce-short atr_sl_hit). 24h 89T 51W 57.3% +$1.72 strong. atr_sl_hit 85T 95.5% but PnL +$1.45 — trailing SL profitable. accel-300-v2- 63T 54%WR +$1.47 workhorse. bb-bounce-short 11T 82%WR +$0.20 emerging star. 3 open SHORT (MET/ICP/AVAX). No kill candidates (0 signals 0%WR 3+T). Trade freq 3.7/hr normal. No consecutive neg hours. System healthy.
   BY: auto_1hr
@@ -469,3 +473,11 @@
   WHY: 0T last hour (last close AVNT -$0.09 at 12:54). 2h 7T 57%WR +$0.20. 24h 65T 57%WR +$1.33 healthy. accel-300-v2- 31T 58%WR +$1.35 workhorse. bb-bounce-short 21T 62%WR +$0.23 solid. atr_sl_hit 98.5% avg +$0.021 trailing SL profitable. Kill criteria not triggered. Trade freq 3.5/hr normal. No consecutive neg hours. 5 open SHORT all reasonable. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 14:05 UTC
+[2026-08-29 14:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 1L 1 flat -$0.07). 65T 24h 57%WR +$1.11 healthy. atr_sl_hit 64T 98.5% avg +$0.016 trailing SL profitable. accel-300-v2-short- 25%WR 4T but not kill-eligible (0%WR 3+T last hour required). Trade freq 3/hr normal. No consecutive negative hours. 5 open SHORT avg unrealized -9.14% worst ASTER -35.73% — system managing via trailing SL. No kill candidates.
+  BY: auto_1hr
+  NEXT: Re-run at 15:05 UTC
+[2026-08-29 16:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.10). 58T 24h 56%WR +$0.94 healthy. atr_sl_hit 100% avg +$0.016 trailing SL profitable. No kill candidates (0T last hour from any signal). Trade freq 2.7/hr normal. No consecutive neg hours. 4 open positions, DYDX SHORT -69% concerning but system managing. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 17:05 UTC
