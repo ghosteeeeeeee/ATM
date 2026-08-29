@@ -247,7 +247,7 @@ def detect_bb_bounce_short(token, closes):
         spd = get_token_speed(token)
         if spd and isinstance(spd, dict):
             vel_5m = spd.get('price_velocity_5m', 0.0)
-            if vel_5m > 0:
+            if vel_5m is not None and vel_5m > 0:
                 return None  # price still rising, fade not confirmed
     except Exception:
         pass

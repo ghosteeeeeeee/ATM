@@ -2684,6 +2684,14 @@ def run(dry_run=False):
         if _skip_signal:
             continue
 
+        # V2 (2026-08-29): Get current price first (needed for staleness check)
+        price = sig.get('price') or get_current_price(token)
+
+        if not price:
+            log(f'SKIP: {token} — no price available')
+            skipped += 1
+            continue
+
         # V2 (2026-08-29): Signal staleness check — block if signal too old or price drifted
         try:
             from hermes_constants import SIGNAL_STALENESS_MAX_AGE_MIN, SIGNAL_STALENESS_PRICE_PCT
@@ -2717,8 +2725,6 @@ def run(dry_run=False):
                     continue
         except ImportError:
             pass  # constants not available — skip staleness check
-
-        price = sig.get('price') or get_current_price(token)
 
         if not price:
             log(f'SKIP: {token} — no price available')

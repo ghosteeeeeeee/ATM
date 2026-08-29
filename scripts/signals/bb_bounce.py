@@ -248,11 +248,14 @@ def detect_bb_bounce(token, closes):
 
         # V2 (2026-08-29): Velocity filter — block if price still falling hard
         # Catches "falling knife" entries where BB touch is premature
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
-        if MEAN_REVERSION_VEL_ENABLED:
-            vel = _get_15m_velocity(token)
-            if vel is not None and vel < -MEAN_REVERSION_VEL_THRESHOLD:
-                return None  # Price still falling, bounce not confirmed
+        try:
+            from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+            if MEAN_REVERSION_VEL_ENABLED:
+                vel = _get_15m_velocity(token)
+                if vel is not None and vel < -MEAN_REVERSION_VEL_THRESHOLD:
+                    return None  # Price still falling, bounce not confirmed
+        except ImportError:
+            pass
 
         return {
             'direction': 'LONG',
@@ -288,11 +291,14 @@ def detect_bb_bounce(token, closes):
 
         # V2 (2026-08-29): Velocity filter — block if price still rising hard
         # Catches "rising knife" entries where SHORT BB touch is premature
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD_SHORT
-        if MEAN_REVERSION_VEL_ENABLED:
-            vel = _get_15m_velocity(token)
-            if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
-                return None  # Price still rising, SHORT bounce not confirmed
+        try:
+            from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD_SHORT
+            if MEAN_REVERSION_VEL_ENABLED:
+                vel = _get_15m_velocity(token)
+                if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                    return None  # Price still rising, SHORT bounce not confirmed
+        except ImportError:
+            pass
 
         return {
             'direction': 'SHORT',
