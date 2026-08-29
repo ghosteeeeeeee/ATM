@@ -433,3 +433,7 @@
   WHY: 1T last hour (1W 1L +$0.02). 87T 24h 53%WR +$1.31. atr_sl_hit 95.4% avg +$0.016 structural profitable. No kill criteria triggered. Trade freq 1/hr low. 24h PnL +$1.31 healthy. No action required.
   BY: auto_1hr
   NEXT: Re-run at 20:15 UTC
+[2026-08-29 00:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (2T last 2h both ICP/MET bb-bounce-short/accel-300-v2- atr_sl_hit, -$0.20). 24h 89T 50W 56.2% +$1.55 strong. accel-300-v2- 62T 53%WR +$1.40 workhorse. bb-bounce-short 12T 75%WR +$0.10 star. atr_sl_hit 85T 95.5% but PnL +$1.28 — trailing SL profitable by design. 4 open SHORT all bb-bounce-small (AVAX/CFX/BANANA/AVNT), all slightly underwater but small. No kill candidates (0 signals 0%WR 3+T). Trade freq 3.7/hr normal. No consecutive negative hours. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 01:05 UTC

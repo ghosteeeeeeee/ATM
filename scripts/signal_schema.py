@@ -987,6 +987,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # accel-300-v2-long (branched LONG signal)
+            if _comp in ('accel-300-v2-long+', 'accel-300-v2-long-'):
+                try:
+                    from hermes_constants import ACCEL_300_V2_LONG_ENABLED
+                    if not ACCEL_300_V2_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'accel-300-v2-long':
+                try:
+                    from hermes_constants import ACCEL_300_V2_LONG_ENABLED
+                    if not ACCEL_300_V2_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-breakout (ultra-fast breakout)
             if _comp == 'accel-300-breakout':
                 try:
@@ -2036,7 +2053,7 @@ def is_component_disabled(component: str) -> bool:
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
-            ACCEL_300_V2_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
+            ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2225,9 +2242,12 @@ def is_component_disabled(component: str) -> bool:
     # inverse-accel-300-v2
     if c in ('inverse-accel-300-v2-', 'inv-accel-300-v2-'): return not INVERSE_ACCEL_300_V2_ENABLED
     if c in ('inverse-accel-300-v2', 'inv-accel-300-v2'): return not INVERSE_ACCEL_300_V2_ENABLED
-    # accel-300-v2
+    # accel-300-v2 (SHORT-only — LONG moved to accel-300-v2-long)
     if c in ('accel-300-v2+', 'accel-300-v2-'): return not ACCEL_300_V2_ENABLED
     if c == 'accel-300-v2': return not ACCEL_300_V2_ENABLED
+    # accel-300-v2-long (branched from accel-300-v2 for independent LONG tuning)
+    if c in ('accel-300-v2-long+', 'accel-300-v2-long-'): return not ACCEL_300_V2_LONG_ENABLED
+    if c == 'accel-300-v2-long': return not ACCEL_300_V2_LONG_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED

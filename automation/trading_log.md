@@ -17173,3 +17173,28 @@ Final set: ['ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYDX', 'ENA'
 - ADD AIXBT (WR=40.0%, PnL=$-0.22, low_wr (40.0%))
 
 Final set: ['AIXBT', 'ALT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'COMP', 'DYDX', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'IMX', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
+
+---
+
+## [2026-08-29 00:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (2 closed in trailing 2h: ICP -0.10, MET -0.10)
+**PnL:** -$0.20 (2L, 0W) — normal hourly variance
+
+**24h:** 89T, 50W, 56.2% WR, +$1.55 (strong)
+- accel-300-v2- 62T 53%WR +$1.40 — workhorse
+- bb-bounce-short 12T 75%WR +$0.10 — star
+- atr_sl_hit 85T 95.5% of exits, +$1.28 — trailing SL profitable
+
+**Open:** 4 SHORT (AVAX/CFX/BANANA/AVNT all bb-bounce-short)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered
+- atr_sl_hit dominant but PnL positive — trailing SL working
+- Trade freq normal
+- No consecutive negative hours
+- System healthy
+
+**Open Questions:** None

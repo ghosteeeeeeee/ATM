@@ -317,9 +317,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     # accel_300: accel-300 overall 35.9% WR, -0.340% avg PnL (2026-07-21 2-4h analysis)
     ('accel_300_long',  'accel-300+'):  0.3,   # LONG: 24.4% WR — heavy suppression
     ('accel_300_short', 'accel-300-'):  1.0,   # SHORT: 57.1% WR — no suppression
-    # accel_300_v2: strong trend momentum (2026-08-27)
-    ('accel_300_v2_long',  'accel-300-v2+'):  1.0,   # V2 LONG: new signal
-    ('accel_300_v2_short', 'accel-300-v2-'):  1.0,   # V2 SHORT: new signal
+    # accel_300_v2: strong trend momentum (2026-08-27) — SHORT-only, LONG branched
+    ('accel_300_v2_short', 'accel-300-v2-'):  1.0,   # V2 SHORT: proven winner
+    # accel_300_v2_long: branched from accel-300-v2 for independent LONG tuning
+    ('accel_300_v2_long',  'accel-300-v2-long'):  1.0,   # V2 LONG: new branched signal
     # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token
     ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
     ('inverse_accel_300_short', 'inv-accel-300-'):  0.6,  # SHORT: 31% WR, -$0.27 (7d) — suppressed
