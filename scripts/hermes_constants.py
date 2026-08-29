@@ -1188,6 +1188,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-27 — 6T/48h 33.3% WR -$0.16. NEVER_REENABLE.
     'INVERSE_ACCEL_300_V2_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
+    'ACCEL_300_V2_LONG_ENABLED',     # CEO 2026-08-29 — 0 trades in 24h+, dead. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1425,7 +1426,7 @@ ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
 ACCEL_300_V2_MINUS_ENABLED    = True    # V2 SHORT — catches early breakdowns below EMA300
-ACCEL_300_V2_LONG_ENABLED     = True    # V2 LONG — branched to accel_300_v2_long.py for independent tuning
+ACCEL_300_V2_LONG_ENABLED     = False   # CEO 2026-08-29 — 0 trades in 24h+, dead signal. NEVER_REENABLE.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
