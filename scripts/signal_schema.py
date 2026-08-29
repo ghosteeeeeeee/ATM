@@ -1004,6 +1004,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # accel-300-v2-long-5m (5m timeframe variant)
+            if _comp in ('accel-300-v2-long-5m+', 'accel-300-v2-long-5m-'):
+                try:
+                    from hermes_constants import ACCEL_300_V2_LONG_5M_ENABLED
+                    if not ACCEL_300_V2_LONG_5M_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_LONG_5M_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'accel-300-v2-long-5m':
+                try:
+                    from hermes_constants import ACCEL_300_V2_LONG_5M_ENABLED
+                    if not ACCEL_300_V2_LONG_5M_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_LONG_5M_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-breakout (ultra-fast breakout)
             if _comp == 'accel-300-breakout':
                 try:
@@ -2273,6 +2290,9 @@ def is_component_disabled(component: str) -> bool:
     # accel-300-v2-long (branched from accel-300-v2 for independent LONG tuning)
     if c in ('accel-300-v2-long+', 'accel-300-v2-long-'): return not ACCEL_300_V2_LONG_ENABLED
     if c == 'accel-300-v2-long': return not ACCEL_300_V2_LONG_ENABLED
+    # accel-300-v2-long-5m (5m timeframe variant)
+    if c in ('accel-300-v2-long-5m+', 'accel-300-v2-long-5m-'): return not ACCEL_300_V2_LONG_5M_ENABLED
+    if c == 'accel-300-v2-long-5m': return not ACCEL_300_V2_LONG_5M_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED

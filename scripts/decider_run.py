@@ -3006,10 +3006,21 @@ def run(dry_run=False):
         # valid, block the trade. Prevents executing stale signals where
         # gap_acceleration, price_velocity, etc. have reversed.
         _is_accel_v2 = 'accel-300-v2-short' in (source or '') and 'inv-' not in (source or '')
-        _is_accel_v2_long = 'accel-300-v2-long' in (source or '')
-        if _is_accel_v2 or _is_accel_v2_long:
+        _is_accel_v2_long = 'accel-300-v2-long' in (source or '') and '5m' not in (source or '')
+        _is_accel_v2_long_5m = 'accel-300-v2-long-5m' in (source or '')
+        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m:
             try:
-                if _is_accel_v2_long:
+                if _is_accel_v2_long_5m:
+                    from signals.accel_300_v2_long_5m import detect_accel_300_v2_long_5m, _get_5m_candles
+                    fresh_candles = _get_5m_candles(token)
+                    if not fresh_candles:
+                        log(f'  🚫 [ACCEL-V2-LONG-5M-STALE] {token} {direction} blocked: no fresh candle data for staleness check')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                    fresh_result = detect_accel_300_v2_long_5m(token, fresh_candles)
+                elif _is_accel_v2_long:
                     from signals.accel_300_v2_long import detect_accel_300_v2_long, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
                     if not fresh_prices:

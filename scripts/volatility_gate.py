@@ -36,7 +36,8 @@ REGIME_SIGNALS = {
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
         'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
-        'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum
+        'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum SHORT
+        'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal

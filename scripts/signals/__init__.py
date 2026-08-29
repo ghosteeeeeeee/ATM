@@ -23,7 +23,7 @@ from hermes_constants import (
     MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
     CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
     SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
-    ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
+    ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
     ICHIMOKU_ENABLED,
 )
 
@@ -106,6 +106,11 @@ except Exception:
     _accel_300_v2_long_run = None
 
 try:
+    from signals.accel_300_v2_long_5m import scan_accel_300_v2_long_5m_signals as _accel_300_v2_long_5m_run
+except Exception:
+    _accel_300_v2_long_5m_run = None
+
+try:
     from signals.inverse_accel_300_v2 import scan_inverse_accel_300_v2_signals as _inverse_accel_300_v2_run
 except Exception:
     _inverse_accel_300_v2_run = None
@@ -137,6 +142,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'signal_confluence',        'enabled': 'SIGNAL_CONFLUENCE_ENABLED',    'run': _signal_confluence_run},
     {'name': 'accel_300_v2_short',       'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_short_run},
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},
+    {'name': 'accel_300_v2_long_5m',     'enabled': ACCEL_300_V2_LONG_5M_ENABLED,   'run': _accel_300_v2_long_5m_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
     {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
 ]

@@ -1417,9 +1417,13 @@ ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT onl
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
 ACCEL_300_V2_MINUS_ENABLED    = True    # V2 SHORT — catches early breakdowns below EMA300
 ACCEL_300_V2_LONG_ENABLED     = True    # V2 LONG — branched to accel_300_v2_long.py for independent tuning
+ACCEL_300_V2_LONG_5M_ENABLED  = True    # V2 LONG 5m — 5-minute timeframe variant for less noise
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
 ACCEL_300_V2_LONG_MAX_GAP = 3.5     # LONG: max gap (sweet spot 1.5-3.5%)
+# ── accel-300-v2 LONG 5m params ────────────────────────────────────────────
+ACCEL_300_V2_LONG_5M_MIN_GAP = 1.5  # LONG 5m: min gap above EMA300
+ACCEL_300_V2_LONG_5M_MAX_GAP = 4.0  # LONG 5m: max gap (wider than 1m — 5m less noisy)
 # ── accel-300-v2 SHORT params (NEW: catch moves like CC 16:52) ────────────
 ACCEL_300_V2_SHORT_MIN_GAP = 1.0    # SHORT: min gap below EMA300 — raised from 0.7 CEO 2026-08-28, filters noise entries (94% ATR_SL exit rate)
 ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is #1 predictor of winner magnitude: gap>=2.5% avg +13.1% PnL vs gap<2.5% avg +2.5%. No loser had gap>2.0%.
@@ -1545,6 +1549,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
+    'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
