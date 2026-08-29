@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """Accel-300 V2 SHORT — Strong Trend Momentum Signal (SHORT-only).
 
-Branched from accel_300_v2.py to allow independent SHORT tuning.
-LONG logic moved to accel_300_v2_long.py.
-
 Catches accelerating moves where the gap BELOW EMA300 is large AND widening.
 Designed for strong downward momentum trades.
 
@@ -64,7 +61,7 @@ PERIOD = 300  # EMA300 period
 DRY_RUN = '--dry' in sys.argv
 
 SIGNAL_TYPE = 'accel_300_v2_short'
-SOURCE = 'accel-300-v2-'
+SOURCE = 'accel-300-v2-short-'
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -128,7 +125,7 @@ def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
         return [{'timestamp': r[0], 'price': r[1]} for r in rows]
 
     except Exception as e:
-        print(f"  [accel-300-v2] price_history error for {token}: {e}")
+        print(f"  [accel-300-v2-short] price_history error for {token}: {e}")
         return []
     finally:
         if conn:
@@ -212,7 +209,7 @@ def _check_volume(token: str) -> bool:
 # Detection — V2 Strong Trend Momentum
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
+def detect_accel_300_v2_short(token: str, prices: list) -> Optional[dict]:
     """Detect strong SHORT momentum — gap below EMA300 large AND accelerating.
 
     SHORT fires when:
@@ -356,7 +353,7 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
 # Scanner
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def scan_accel_300_v2_signals(prices_dict: dict) -> int:
+def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
     """Scan tokens for accel_300_v2_short (strong trend momentum SHORT) signals."""
     from hermes_constants import (
         ACCEL_300_V2_ENABLED,
@@ -392,7 +389,7 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
         if not prices or len(prices) < PERIOD + 30:
             continue
 
-        sig = detect_accel_300_v2(token, prices)
+        sig = detect_accel_300_v2_short(token, prices)
         if sig is None:
             continue
 
@@ -439,7 +436,7 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
         signal_price = float(sig['price'])
 
         if DRY_RUN:
-            _log(f"  [DRY] SHORT-accel-300-v2 {token:8s} conf={confidence:.0f}% "
+            _log(f"  [DRY] SHORT-accel-300-v2-short {token:8s} conf={confidence:.0f}% "
                   f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                   f"accel={sig['gap_acceleration']:.3f}% "
                   f"gap_vel={sig['gap_velocity']:.3f}% "
@@ -473,13 +470,13 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
             if sid:
                 added += 1
                 set_cooldown(token, 'SHORT', hours=V2_COOLDOWN_BARS / 60.0)
-                _log(f"  SHORT-accel-300-v2 {token:8s} conf={confidence:.0f}% "
+                _log(f"  SHORT-accel-300-v2-short {token:8s} conf={confidence:.0f}% "
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"accel={sig['gap_acceleration']:.3f}% "
                       f"gap_vel={sig['gap_velocity']:.3f}% "
                       f"trend_1h={trend_1h} [{SOURCE}]")
         except Exception as e:
-            print(f"[accel-300-v2] add_signal error for {token}: {e}")
+            print(f"[accel-300-v2-short] add_signal error for {token}: {e}")
 
     return added
 
@@ -525,10 +522,10 @@ if __name__ == '__main__':
             conn.close()
 
     mode = "DRY" if DRY_RUN else "LIVE"
-    print(f"[accel-300-v2] Testing on {len(prices)} tokens ({mode} mode)...")
+    print(f"[accel-300-v2-short] Testing on {len(prices)} tokens ({mode} mode)...")
     init_db()
-    n = scan_accel_300_v2_signals(prices)
-    print(f"[accel-300-v2] Done. {n} signals emitted.")
+    n = scan_accel_300_v2_short_signals(prices)
+    print(f"[accel-300-v2-short] Done. {n} signals emitted.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -540,4 +537,4 @@ def run(prices_dict=None):
     if prices_dict is None:
         from signal_schema import get_all_latest_prices
         prices_dict = get_all_latest_prices()
-    return scan_accel_300_v2_signals(prices_dict)
+    return scan_accel_300_v2_short_signals(prices_dict)

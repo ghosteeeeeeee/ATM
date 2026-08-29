@@ -36,7 +36,7 @@ REGIME_SIGNALS = {
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
         'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
-        'accel-300-v2+', 'accel-300-v2-',  # V2 strong trend momentum
+        'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
@@ -60,7 +60,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
-        'accel-300-v2+', 'accel-300-v2-',  # V2 strong trend momentum
+        'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-long', 'r2l',  # R² trend LONG (slow grinds)
         'r2-trend-short',  # R² downtrend SHORT detector
@@ -89,7 +89,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
-        'accel-300-v2+', 'accel-300-v2-',  # V2 strong trend momentum
+        'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
@@ -121,7 +121,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
-        'accel-300', 'accel-300-', 'accel-300-v2+', 'accel-300-v2-',  # trend momentum
+        'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-',  # trend momentum
     },
 }
 

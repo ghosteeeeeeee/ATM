@@ -2964,7 +2964,7 @@ def run(dry_run=False):
         # Re-run detection with fresh prices. If conditions no longer
         # valid, block the trade. Prevents executing stale signals where
         # gap_acceleration, price_velocity, etc. have reversed.
-        _is_accel_v2 = 'accel-300-v2' in (source or '') and 'inv-' not in (source or '')
+        _is_accel_v2 = 'accel-300-v2-short' in (source or '') and 'inv-' not in (source or '')
         _is_accel_v2_long = 'accel-300-v2-long' in (source or '')
         if _is_accel_v2 or _is_accel_v2_long:
             try:
@@ -2979,15 +2979,15 @@ def run(dry_run=False):
                         continue
                     fresh_result = detect_accel_300_v2_long(token, fresh_prices)
                 else:
-                    from signals.accel_300_v2 import detect_accel_300_v2, _get_1m_prices
+                    from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
                     if not fresh_prices:
-                        log(f'  🚫 [ACCEL-V2-STALE] {token} {direction} blocked: no fresh price data for staleness check')
+                        log(f'  🚫 [ACCEL-V2-SHORT-STALE] {token} {direction} blocked: no fresh price data for staleness check')
                         if sig_id:
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
                         continue
-                    fresh_result = detect_accel_300_v2(token, fresh_prices)
+                    fresh_result = detect_accel_300_v2_short(token, fresh_prices)
                 if fresh_result is None or fresh_result.get('direction') != direction:
                     log(f'  🚫 [ACCEL-V2-STALE] {token} {direction} blocked: conditions no longer valid at execution time')
                     if sig_id:

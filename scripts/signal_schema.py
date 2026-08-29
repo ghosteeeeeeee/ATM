@@ -970,8 +970,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
-            # accel-300-v2 (V2 strong trend momentum)
-            if _comp in ('accel-300-v2+', 'accel-300-v2-'):
+            # accel-300-v2-short (V2 strong trend momentum SHORT)
+            if _comp in ('accel-300-v2-short+', 'accel-300-v2-short-'):
                 try:
                     from hermes_constants import ACCEL_300_V2_ENABLED
                     if not ACCEL_300_V2_ENABLED:
@@ -979,7 +979,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
-            if _comp == 'accel-300-v2':
+            if _comp == 'accel-300-v2-short':
                 try:
                     from hermes_constants import ACCEL_300_V2_ENABLED
                     if not ACCEL_300_V2_ENABLED:
@@ -2242,9 +2242,9 @@ def is_component_disabled(component: str) -> bool:
     # inverse-accel-300-v2
     if c in ('inverse-accel-300-v2-', 'inv-accel-300-v2-'): return not INVERSE_ACCEL_300_V2_ENABLED
     if c in ('inverse-accel-300-v2', 'inv-accel-300-v2'): return not INVERSE_ACCEL_300_V2_ENABLED
-    # accel-300-v2 (SHORT-only — LONG moved to accel-300-v2-long)
-    if c in ('accel-300-v2+', 'accel-300-v2-'): return not ACCEL_300_V2_ENABLED
-    if c == 'accel-300-v2': return not ACCEL_300_V2_ENABLED
+    # accel-300-v2-short (SHORT-only)
+    if c in ('accel-300-v2-short+', 'accel-300-v2-short-'): return not ACCEL_300_V2_ENABLED
+    if c == 'accel-300-v2-short': return not ACCEL_300_V2_ENABLED
     # accel-300-v2-long (branched from accel-300-v2 for independent LONG tuning)
     if c in ('accel-300-v2-long+', 'accel-300-v2-long-'): return not ACCEL_300_V2_LONG_ENABLED
     if c == 'accel-300-v2-long': return not ACCEL_300_V2_LONG_ENABLED

@@ -1543,7 +1543,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
-    'accel-300-v2',  # strong trend momentum — structural breakout signal, works solo
+    'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',

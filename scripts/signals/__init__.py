@@ -95,9 +95,9 @@ except Exception:
     _signal_confluence_run = None
 
 try:
-    from signals.accel_300_v2 import scan_accel_300_v2_signals as _accel_300_v2_run
+    from signals.accel_300_v2_short import scan_accel_300_v2_short_signals as _accel_300_v2_short_run
 except Exception:
-    _accel_300_v2_run = None
+    _accel_300_v2_short_run = None
 
 try:
     from signals.accel_300_v2_long import scan_accel_300_v2_long_signals as _accel_300_v2_long_run
@@ -129,7 +129,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'macd_divergence',          'enabled': 'MACD_DIVERGENCE_ENABLED',      'run': _macd_divergence_run},
     {'name': 'chain_fire',               'enabled': 'CHAIN_FIRE_ENABLED',           'run': _chain_fire_run},
     {'name': 'signal_confluence',        'enabled': 'SIGNAL_CONFLUENCE_ENABLED',    'run': _signal_confluence_run},
-    {'name': 'accel_300_v2',             'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_run},
+    {'name': 'accel_300_v2_short',       'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_short_run},
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
 ]
