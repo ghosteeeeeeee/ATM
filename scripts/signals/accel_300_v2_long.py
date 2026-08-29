@@ -53,7 +53,7 @@ V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (positive for LONG)
 V2_MIN_GAP_PCT = 1.5           # min gap % for confidence bonus
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
-V2_FRESH_CROSS_MIN_GAP = 0.50  # min gap for fresh cross entry
+V2_FRESH_CROSS_MIN_GAP = 0.10  # min gap for fresh cross entry — lowered from 0.50 to catch TURBO-class tokens (crosses have 0.06-0.24% gaps)
 
 # Direction-specific gap thresholds (from hermes_constants.py)
 from hermes_constants import (
@@ -290,15 +290,17 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
         return None  # price barely moving — no conviction
 
     # ── FILTER 5: Persistence — price must stay above EMA ───────────────────
-    persist_start = latest_idx - V2_PERSISTENCE_BARS + 1
-    if persist_start < 0:
-        return None
-    for idx in range(persist_start, latest_idx + 1):
-        ema = ema300[idx]
-        if ema is None:
+    # SKIP for fresh crosses — the cross IS the entry signal, no need to wait
+    if not fresh_cross:
+        persist_start = latest_idx - V2_PERSISTENCE_BARS + 1
+        if persist_start < 0:
             return None
-        if closes[idx] <= ema:
-            return None
+        for idx in range(persist_start, latest_idx + 1):
+            ema = ema300[idx]
+            if ema is None:
+                return None
+            if closes[idx] <= ema:
+                return None
 
     # ── FILTER 6: Linear regression slope (must be positive for LONG) ───────
     slope_window = min(V2_SLOPE_WINDOW, len(closes))
