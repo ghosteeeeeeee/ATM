@@ -252,7 +252,7 @@ def detect_bb_bounce_long(token, closes):
 def scan_bb_bounce_long_signals(prices_dict):
     """Scan tokens for BB bounce LONG signals."""
     from signal_schema import add_signal, get_cooldown, set_cooldown
-    from signal_gen import is_delisted
+    from hyperliquid_exchange import is_delisted
 
     added = 0
     now = time.time()
