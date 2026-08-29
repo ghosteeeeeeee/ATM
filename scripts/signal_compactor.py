@@ -411,6 +411,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # pump_catcher — momentum breakout (early-stage velocity + acceleration)
     ('pump_catcher_long', 'pump-catcher+'):  1.6,  # boosted for hotset competitiveness
     ('pump_catcher_short', 'pump-catcher-'): 1.6,
+    # ichimoku_cloud — Tenkan/Kijun cross + cloud breakout + future cloud bias
+    ('ichimoku_long',  'ichimoku+'):  1.0,  # conservative start — needs backtest data
+    ('ichimoku_short', 'ichimoku-'):  1.0,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

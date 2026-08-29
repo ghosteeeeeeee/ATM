@@ -2293,3 +2293,30 @@ RR_ENGINE_BB_SQUEEZE_THRESH  = 0.04    # BB width < 4% = squeeze
 
 # Caching
 RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width per token
+
+# ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
+# ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
+# Thesis: Multi-component agreement = institutional trend confirmation.
+# Timeframe: 1h (Ichimoku needs 52+ period depth)
+ICHIMOKU_ENABLED = True                # master kill-switch
+ICHIMOKU_PLUS_ENABLED = True           # LONG direction
+ICHIMOKU_MINUS_ENABLED = True          # SHORT direction
+ICHIMOKU_COOLDOWN_HOURS = 4            # per token+direction cooldown (swing trade)
+
+# Ichimoku periods (standard 9/26/52)
+ICHIMOKU_TENKAN_PERIOD = 9             # Tenkan-sen (Conversion Line)
+ICHIMOKU_KIJUN_PERIOD = 26             # Kijun-sen (Base Line)
+ICHIMOKU_SENKOU_B_PERIOD = 52          # Senkou Span B
+ICHIMOKU_CLOUD_SHIFT = 26              # forward shift for Kumo
+
+# Entry filters
+ICHIMOKU_MIN_SEPARATION_PCT = 0.002    # 0.2% — min distance from cloud edge (filters noise)
+ICHIMOKU_CLOUD_BREAK_THRESHOLD = 0.01  # 1.0% — separation above this = strong breakout bonus
+ICHIMOKU_CLOUD_BREAK_BONUS = 5         # +5 conf for strong breakout (>1% above cloud)
+ICHIMOKU_TK_CROSS_BONUS = 3            # +3 conf for fresh TK cross (last 3 bars)
+ICHIMOKU_FUTURE_CLOUD_BONUS = 2        # +2 conf for cloud color alignment
+
+# Confidence bounds
+ICHIMOKU_CONF_BASE = 68                # base confidence
+ICHIMOKU_CONF_FLOOR = 55               # min confidence
+ICHIMOKU_CONF_CAP = 85                 # max confidence (system ceiling)

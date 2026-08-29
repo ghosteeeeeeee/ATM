@@ -24,6 +24,7 @@ from hermes_constants import (
     CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
     SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
     ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
+    ICHIMOKU_ENABLED,
 )
 
 
@@ -109,6 +110,11 @@ try:
 except Exception:
     _inverse_accel_300_v2_run = None
 
+try:
+    from signals.ichimoku_cloud import run as _ichimoku_run
+except Exception:
+    _ichimoku_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -132,13 +138,14 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'accel_300_v2_short',       'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_short_run},
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
+    {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
 ]
 
 
 # ── Registry Accessors ─────────────────────────────────────────────────────────
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence'}
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud'}
 
 
 def _resolve_enabled(entry):

@@ -1600,6 +1600,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # ichimoku
+            if _comp == 'ichimoku':
+                try:
+                    from hermes_constants import ICHIMOKU_ENABLED
+                    if not ICHIMOKU_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ICHIMOKU_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ichimoku+':
+                try:
+                    from hermes_constants import ICHIMOKU_PLUS_ENABLED
+                    if not ICHIMOKU_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ICHIMOKU_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ichimoku-':
+                try:
+                    from hermes_constants import ICHIMOKU_MINUS_ENABLED
+                    if not ICHIMOKU_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ICHIMOKU_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             if _comp == 'pump-catcher+':
                 try:
                     from hermes_constants import PUMP_CATCHER_PLUS_ENABLED
