@@ -1431,7 +1431,7 @@ ACCEL_300_V2_LONG_ENABLED     = False   # CEO 2026-08-29 — 0 trades in 24h+, d
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
-ACCEL_300_V2_LONG_MAX_GAP = 3.5     # LONG: max gap (sweet spot 1.5-3.5%)
+ACCEL_300_V2_LONG_MAX_GAP = 4.5     # LONG: max gap — raised from 3.5 to capture strong momentum like HEMI (3.77%)
 # ── accel-300-v2 LONG 5m params ────────────────────────────────────────────
 ACCEL_300_V2_LONG_5M_MIN_GAP = 1.5  # LONG 5m: min gap above EMA300
 ACCEL_300_V2_LONG_5M_MAX_GAP = 4.0  # LONG 5m: max gap (wider than 1m — 5m less noisy)
@@ -2338,3 +2338,41 @@ ICHIMOKU_FUTURE_CLOUD_BONUS = 2        # +2 conf for cloud color alignment
 ICHIMOKU_CONF_BASE = 68                # base confidence
 ICHIMOKU_CONF_FLOOR = 55               # min confidence
 ICHIMOKU_CONF_CAP = 85                 # max confidence (system ceiling)
+
+# ── Amplitude Classes — wave volatility classification ─────────────────────────
+# From amplitude-enhancement-brainstorm.md (2026-08-29)
+# Classifies tokens by average wave amplitude for dynamic SL/TP/position sizing.
+# Used by: wave_classifier.py, amplitude_cache.py (future), signal_compactor.py
+
+# Amplitude class thresholds (avg amplitude %)
+AMP_CLASS_LOW_MAX = 1.5               # <1.5% = LOW_AMP (BTC, ETH)
+AMP_CLASS_MED_MAX = 2.5               # 1.5-2.5% = MED_AMP (SOL, LINK, DOGE)
+# >2.5% = HIGH_AMP (ZRO, TRUMP, WIF)
+
+# Amplitude-weighted multipliers for signal_compactor confidence
+AMPLITUDE_COMPACTOR_MULT = {
+    'LOW_AMP':  1.10,   # Boost: stable, signals reliable
+    'MED_AMP':  1.00,   # Neutral
+    'HIGH_AMP': 0.85,   # Penalty: volatile, signals less reliable
+    'CHAOTIC':  0.70,   # Heavy penalty (WIF-like)
+}
+
+# Amplitude-weighted position sizing (multiplied against base size)
+AMPLITUDE_SIZE_MULT = {
+    'LOW_AMP':  1.0,    # Full size (BTC, ETH)
+    'MED_AMP':  0.9,    # 10% reduction
+    'HIGH_AMP': 0.7,    # 30% reduction
+    'CHAOTIC':  0.5,    # 50% reduction
+}
+
+# Dynamic stop loss: SL = avg_amp * multiplier
+# Calibrated to keep portfolio loss <=5% at 5x leverage
+AMPLITUDE_SL_MULT = {
+    'LOW_AMP':  1.5,    # 1.0% amp * 1.5 = 1.5% SL
+    'MED_AMP':  1.25,   # 2.0% amp * 1.25 = 2.5% SL
+    'HIGH_AMP': 1.0,    # 4.0% amp * 1.0 = 4.0% SL
+    'CHAOTIC':  0.75,   # 4.4% amp * 0.75 = 3.3% SL (tighter due to chaos)
+}
+
+# Max acceptable portfolio loss per trade (leverage-adjusted)
+AMPLITUDE_MAX_PORTFOLIO_LOSS = 0.05    # 5% max portfolio loss per trade
