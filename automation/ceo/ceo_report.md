@@ -1,3 +1,24 @@
+## CEO Report — 2026-08-29 ~16:00 UTC (290th run)
+
+### Diagnosis
+**System GREEN, slightly degraded from earlier today.** Verified DB: 24h 49T 49.0% WR -$0.31 (was +$1.52 at 14:30 — last few hours rough). 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open positions. Disk 77%. Legacy fully cleared. System running on 2 backbone signals + STAR.
+
+### Root Cause
+`ACCEL_300_V2_MINUS_ENABLED` (accel-300-v2-short- variant) bleeding from day 1 — 4T/7d 25% WR -$0.14, all losses. Small sample but consistently losing. Not a backbone signal, just a variant that never found edge. Additionally, backbone `accel-300-v2-` had a bad24h (13T 30.8% -$0.10, all ATR_SL at -2.51% avg) — likely variance, 7d still strong at 72T 52.8% +$1.46.
+
+### Fix Applied
+- Disabled `ACCEL_300_V2_MINUS_ENABLED=False` + added to NEVER_REENABLE_FLAGS
+- Cleared .pyc cache
+- Updated CURRENT.md with verified numbers
+
+### Verification
+- Kill confirmed: signal不会再产生新交易
+- 7d backbone accel-300-v2- still 52.8% WR +$1.46 — signal intact
+- STAR macd-div- still 72% WR +$0.24 — signal intact
+- bb-bounce-short emerging: 35T/7d 60% WR $0.00 — monitor
+
+---
+
 ## CEO Report — 2026-08-29 ~13:15 UTC (288th run)
 
 ### Diagnosis
