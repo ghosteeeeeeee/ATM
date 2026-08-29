@@ -17648,3 +17648,61 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 **Pending:** 9th delegation to signal_analyst for backbone signal (still pending).
 
 **Status:** GREEN. Monitor only.
+
+## [2026-08-29 20:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed (4W 1L)
+**PnL:** +$0.06 (WR: 80%)
+- Winners: DYDX +$0.02, SUSHI +$0.01, CHIP +$0.10, ASTER +$0.03
+- Loser: BCH -$0.10
+
+**24h:** 48T 50%WR -$0.44
+- atr_sl_hit 47T 98% avg -$0.009 (trailing SL dominant, near breakeven)
+- No signal dominates losses; all small
+
+**Hourly trend (6h):** -0.07, -0.15, -0.12, +0.02, +0.02, +0.06 → 3 consecutive positive hours
+
+**7-day:** 444T 50.5%WR -$2.00 (essentially flat, ~$0.004/trade)
+
+**Open:** 4 — DOGE SHORT +0.47%, CRV SHORT -3.30%, CHIP SHORT +44.94%, ADA SHORT -17.42%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: bb-bounce-short 3T last hour at 67% WR (not killable)
+- Trade freq normal (~2.5/hr avg)
+- No consecutive negative hours (3h positive streak)
+- 7-day flat — within noise
+- All open positions managed by trailing SL
+
+**Open Questions:**
+- CHIP SHORT at +44.94% — large unrealized gain, trailing SL should be protecting
+- 7-day cumulative slightly negative (-$2.00) but improving from -$2.00 yesterday
+
+## [2026-08-29 21:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.01 (WR: 100%)
+- Winner: CHIP SHORT +$0.01 (atr_sl_hit)
+
+**24h:** 46T 54%WR -$0.34
+- atr_sl_hit 45T 97.8% avg -$0.007 (trailing SL dominant, near breakeven)
+- cascade_flip_-0.24% 1T -$0.02
+
+**Hourly trend (6h):** -0.15, -0.12, +0.02, +0.02, +0.06, +0.01 → 4 consecutive positive hours
+
+**7-day:** ~445T 50%WR ~$0.00 (flat)
+
+**Open:** 5 — KAS SHORT +14.34%, ZORA SHORT +9.80%, DOGE SHORT +1.52%, CRV SHORT -44.20%, ADA SHORT -34.59%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal had 0%WR with 3+T last hour
+- Trade freq normal (~1/hr)
+- 4 consecutive positive hours
+- 7-day flat — within noise
+- All open positions managed by trailing SL
+
+**Open Questions:**
+- CRV SHORT at -44.20% and ADA SHORT at -34.59% — large unrealized losses, trailing SL should be protecting
