@@ -649,4 +649,5 @@ BTC_MOMENTUM_THRESHOLD = -0.15  # % per 30m
 | v2 | 2026-08-28 | Corrected signal entries (audit v1) |
 | v3 | 2026-08-28 | Corrected core problem: stop management (audit v2) |
 | v4 | 2026-08-28 | MoE panel + CEO decision: Phase 1 backtest approved |
-| **v5** | **2026-08-28** | **Added: zscore component, retroactive scanning, surfing philosophy** |
+| v5 | 2026-08-28 | Added: zscore component, retroactive scanning, surfing philosophy |
+| **v6** | **2026-08-28** | **MoE v2: 8% trail proven better, but full backtest REQUIRED. Elliott Wave DEFERRED.** |
