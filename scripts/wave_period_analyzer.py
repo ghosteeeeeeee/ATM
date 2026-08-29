@@ -57,14 +57,14 @@ def find_peaks_troughs(prices: np.ndarray, window: int = 5) -> list:
     n = len(prices)
     
     for i in range(window, n - window):
-        # Check if local maximum (peak)
-        if all(prices[i] >= prices[i-j] for j in range(1, window+1)) and \
-           all(prices[i] >= prices[i+j] for j in range(1, window+1)):
+        # Check if local maximum (peak) — strict > to avoid flat-price bias
+        if all(prices[i] > prices[i-j] for j in range(1, window+1)) and \
+           all(prices[i] > prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'peak'))
-        
-        # Check if local minimum (trough)
-        elif all(prices[i] <= prices[i-j] for j in range(1, window+1)) and \
-             all(prices[i] <= prices[i+j] for j in range(1, window+1)):
+
+        # Check if local minimum (trough) — strict < to avoid flat-price bias
+        elif all(prices[i] < prices[i-j] for j in range(1, window+1)) and \
+             all(prices[i] < prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'trough'))
     
     return extrema

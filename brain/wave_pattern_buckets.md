@@ -1,196 +1,110 @@
-# Wave Pattern Classification System
+# Wave Pattern Classification — CORRECTED
 
-## 5 Wave Pattern Buckets
-
-Based on analysis of 20 tokens across 720 1-hour candles each.
+**Last updated:** 2026-08-29 (post bug fix — see verdict in `brain/verdicts/`)
 
 ---
 
-### 1. HIGH_FREQ_OSCILLATOR (6 tokens)
-**Examples:** ZRO, ARB, HYPE, WLD, TURBO, FET
+## Critical Bug Fixed
+
+`find_peaks_troughs()` used `>=`/`<=` instead of strict `>`/`<`. Flat-price regions (35-44% of close transitions for low-liquidity tokens) always classified as peaks, creating a 5-7:1 peak bias and inflating "fast wave" counts.
+
+**Impact:** All 6 former "HIGH_FREQ_OSCILLATOR" tokens were misclassified.
+
+---
+
+## Corrected Pattern Buckets (20 tokens)
+
+### 1. MEDIUM_FREQ_TREND (19 tokens)
+**All major tokens fall here.** The dominant pattern.
 
 **Characteristics:**
-- Dominant period: **1-2 hours** (70%+ of all waves)
-- Average amplitude: **Low** (<1%)
-- High coefficient of variation (CV > 1.0)
-- Fast, noisy oscillations
+- 67-84% of waves are 2-8 hours
+- Average period: 4-19 hours (varies by token)
+- Rideable trends with clear swing structure
 
-**What it looks like:**
-```
-Period histogram:
-  1-2h: ████████████████████████████ (70-80%)
-  2-4h: ███ (5-10%)
-  4-8h: ████ (10-15%)
-  8h+:  ██ (3-6%)
-```
+**Tokens by amplitude:**
+
+| Sub-bucket | Tokens | Avg Amp | Notes |
+|------------|--------|---------|-------|
+| **LOW_AMP** (<1.5%) | BTC, ETH | 1.0-1.1% | Tightest ranges, most stable |
+| **MED_AMP** (1.5-2.5%) | SOL, LINK, HYPE, DOGE, AAVE, ONDO, POPCAT, KAS, XRP | 1.8-2.5% | Standard swing targets |
+| **HIGH_AMP** (>2.5%) | ARB, ZRO, TRUMP, SUI, WLD, TURBO, SPX, FET | 2.6-4.4% | Wide swings, volatile |
 
 **Trading implications:**
-- ❌ **AVOID** trend-following (too much noise)
-- ✅ **USE** mean-reversion strategies
-- ✅ **USE** tight stops (1-2% max)
-- ✅ **USE** lower timeframes (15m or 5m)
-- ⚠️ High frequency of whipsaws
+- ✅ Swing trade with trend-following (accel-300-v2 works here)
+- ✅ Use 1h/4h timeframes
+- ✅ Standard position sizing for MED_AMP
+- ⚠️ Wider stops for HIGH_AMP (3-5%)
+- ⚠️ Tighter stops for LOW_AMP (1-2%)
 
 ---
 
-### 2. MEDIUM_FREQ_TREND (10 tokens)
-**Examples:** BTC, ETH, SOL, TRUMP, DOGE, SUI, AAVE, POPCAT, SPX, KAS
+### 2. CHAOTIC (1 token)
+**WIF only** — no dominant wave frequency.
 
 **Characteristics:**
-- Dominant period: **4-8 hours** (60%+ of all waves)
-- Average amplitude: **Low to High** (varies by token)
-- Lower CV (0.5-1.0 for best cases)
-- Rideable trends with clear swings
-
-**What it looks like:**
-```
-Period histogram:
-  1-2h: ██ (5-15%)
-  2-4h: ████████████████ (30-40%)
-  4-8h: ██████████████████████ (40-50%)
-  8h+:  ████ (10-20%)
-```
+- 59.6% in 2-8h, but 39.3% in 8h+ (high tail)
+- Very high CV (6.90) — unpredictable wave lengths
+- HIGH amplitude (4.36%)
 
 **Trading implications:**
-- ✅ **BEST** for swing trading
-- ✅ **USE** trend-following strategies
-- ✅ **USE** MACD wave rider (existing system)
-- ✅ **USE** wider stops (2-4%)
-- ✅ **USE** 1h or 4h timeframes
-- 🎯 **IDEAL** for the accel-300-v2 signal
+- ❌ Avoid systematic strategies
+- ⚠️ Reduce position size
+- ✅ Discretionary only, wider stops
 
 ---
 
-### 3. BIMODAL (2 tokens)
-**Examples:** LINK, ONDO
+## What We Learned From The Bug
 
-**Characteristics:**
-- Two dominant periods: **1-2h AND 4-8h** (each 35-45%)
-- Regime-dependent behavior
-- Switches between fast chop and slow trends
-
-**What it looks like:**
-```
-Period histogram:
-  1-2h: ████████████████████ (40-45%)
-  2-4h: ████████ (15-20%)
-  4-8h: ████████████████████ (30-45%)
-  8h+:  ████ (10-15%)
-```
-
-**Trading implications:**
-- ⚠️ **COMPLEX** — requires regime detection
-- ✅ **USE** adaptive strategies
-- ✅ **SWITCH** between fast/slow modes
-- ⚠️ **AVOID** during regime transitions
-- 🎯 **BEST** when regime is clearly identified
+1. **Low-liquidity tokens have flat close prices** — many candles close at the same price as previous, creating `price[i] == price[i±j]` situations
+2. **`>=`/`<=` biases toward peaks** — checked first in if/elif, so flat regions always become "peaks"
+3. **This inflated "fast wave" counts** — flat regions spanning 1-2 candles appeared as rapid peak-trough-peak cycles
+4. **Data gaps compound the problem** — missing candles create artificial long periods that distort CV and averages
 
 ---
 
-### 4. CHAOTIC (1 token)
-**Examples:** WIF
+## Key Corrected Findings
 
-**Characteristics:**
-- No dominant period
-- Very high CV (>1.5)
-- Unpredictable wave lengths
-- High amplitude swings
-
-**What it looks like:**
-```
-Period histogram:
-  1-2h: ████████████ (30-35%)
-  2-4h: ████████████ (30-35%)
-  4-8h: █████████ (20-25%)
-  8h+:  █████ (10-15%)
-```
-
-**Trading implications:**
-- ❌ **AVOID** systematic strategies
-- ⚠️ **REDUCE** position size
-- ✅ **USE** wider stops (4%+)
-- ✅ **USE** higher timeframes only
-- 🎯 **BEST** for discretionary trading
+| Token | BEFORE (buggy) | AFTER (fixed) | Change |
+|-------|----------------|---------------|--------|
+| ZRO | HIGH_FREQ (78% fast) | MEDIUM_FREQ (67.5% med) | **Reclassified** |
+| ARB | HIGH_FREQ (77% fast) | MEDIUM_FREQ (76.3% med) | **Reclassified** |
+| HYPE | HIGH_FREQ (77% fast) | MEDIUM_FREQ (83.5% med) | **Reclassified** |
+| WLD | HIGH_FREQ (78% fast) | MEDIUM_FREQ (76.2% med) | **Reclassified** |
+| TURBO | HIGH_FREQ (74% fast) | MEDIUM_FREQ (67.1% med) | **Reclassified** |
+| FET | HIGH_FREQ (72% fast) | MEDIUM_FREQ (73.1% med) | **Reclassified** |
+| BTC | MEDIUM_FREQ | MEDIUM_FREQ | Same |
+| WIF | CHAOTIC | CHAOTIC | Same |
 
 ---
 
-### 5. TRANSITIONAL (1 token)
-**Examples:** XRP
+## Practical Takeaway
 
-**Characteristics:**
-- Flat distribution across all periods
-- No clear dominant frequency
-- Often in between pattern states
-- Low amplitude
+**ZRO's problem was never "high-frequency noise" — it's HIGH amplitude (4.28%) in a MEDIUM frequency pattern.**
 
-**What it looks like:**
-```
-Period histogram:
-  1-2h: ████████████ (30-35%)
-  2-4h: ██████████ (25-30%)
-  4-8h: ████████████ (30-35%)
-  8h+:  ████ (10-15%)
-```
+The choppy SHORT trades weren't because ZRO has fast 2h waves. They were because:
+1. ZRO moves 4%+ per swing (HIGH_AMP) — stops get hit easily
+2. The trades entered at bad wave positions (near troughs for SHORT)
+3. Wave frequency was accelerating at entry time
 
-**Trading implications:**
-- ⚠️ **WAIT** for pattern to emerge
-- ❌ **AVOID** forcing trades
-- ✅ **USE** smaller position sizes
-- 🎯 **BEST** when transitioning to MEDIUM_FREQ_TREND
+**This means the fix isn't "reduce size for high-freq tokens" — it's "use wider stops and better entry timing for HIGH_AMP tokens."**
 
 ---
 
-## Amplitude Classes
-
-| Class | Avg Amplitude | Tokens | Strategy |
-|-------|---------------|--------|----------|
-| **LOW_AMP** | <1.5% | BTC, ETH, LINK, ARB, ZRO, HYPE, ONDO, WLD, TURBO, XRP, FET | Tighter targets, more trades |
-| **MED_AMP** | 1.5-2.5% | SOL, WIF, DOGE, AAVE, POPCAT, KAS | Standard targets |
-| **HIGH_AMP** | >2.5% | TRUMP, SUI, SPX | Wider targets, fewer trades |
-
----
-
-## Cross-Classification Matrix
+## Cross-Classification Matrix (Corrected)
 
 | Pattern | LOW_AMP | MED_AMP | HIGH_AMP |
 |---------|---------|---------|----------|
-| **HIGH_FREQ_OSCILLATOR** | ARB, ZRO, HYPE, WLD, TURBO, FET | — | — |
-| **MEDIUM_FREQ_TREND** | BTC, ETH | SOL, DOGE, AAVE, POPCAT, KAS | TRUMP, SUI, SPX |
-| **BIMODAL** | LINK, ONDO | — | — |
-| **CHAOTIC** | — | WIF | — |
-| **TRANSITIONAL** | XRP | — | — |
+| **MEDIUM_FREQ_TREND** | BTC, ETH | SOL, LINK, HYPE, DOGE, AAVE, ONDO, POPCAT, KAS, XRP | ARB, ZRO, TRUMP, SUI, WLD, TURBO, SPX, FET |
+| **CHAOTIC** | — | — | WIF |
 
 ---
 
-## Key Insights
+## Revised Trading Rules by Amplitude
 
-1. **Most tokens are MEDIUM_FREQ_TREND** (50%) — the sweet spot for swing trading
-2. **HIGH_FREQ_OSCILLATOR** tokens (30%) are noise machines — avoid or mean-revert
-3. **Amplitude correlates with pattern** — high-amp tokens tend to be MEDIUM_FREQ
-4. **ZRO is a HIGH_FREQ_OSCILLATOR** — explains the choppy trades
-5. **BTC/ETH are clean MEDIUM_FREQ_TREND** — ideal for the existing wave rider system
-
----
-
-## Recommended Actions by Bucket
-
-### For MEDIUM_FREQ_TREND tokens:
-- Run accel-300-v2 signals as-is
-- Use 1h/4h timeframes
-- Standard position sizing
-
-### For HIGH_FREQ_OSCILLATOR tokens:
-- **Disable** trend-following signals
-- **Enable** mean-reversion signals
-- Use 15m timeframe
-- Reduce position size by 50%
-
-### For BIMODAL tokens:
-- Add regime detection layer
-- Switch strategies based on dominant period
-- Use adaptive position sizing
-
-### For CHAOTIC/TRANSITIONAL tokens:
-- **Reduce exposure** significantly
-- Use wider stops
-- Wait for pattern to stabilize
+| Amplitude | Stop Loss | Take Profit | Position Size | Timeframe |
+|-----------|-----------|-------------|---------------|-----------|
+| **LOW_AMP** (<1.5%) | 1-2% | 2-4% | Standard | 1h/4h |
+| **MED_AMP** (1.5-2.5%) | 2-3% | 4-6% | Standard | 1h/4h |
+| **HIGH_AMP** (>2.5%) | 3-5% | 6-10% | 75% size | 1h/4h |
+| **CHAOTIC** | 5%+ | Discretionary | 50% size | 4h only |

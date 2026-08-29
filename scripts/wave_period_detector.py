@@ -42,6 +42,35 @@ def get_candles(token: str, timeframe: str = '1h', lookback: int = 720) -> list:
     return list(reversed(rows))
 
 
+def filter_data_gaps(candles: list, max_gap_hours: float = 48.0) -> list:
+    """
+    Remove candles that are part of data gaps (missing data stretches).
+
+    A gap is detected when the time between consecutive candles exceeds max_gap_hours.
+    Candles within the gap are removed to avoid false extrema detection.
+
+    Args:
+        candles: List of candle dicts with 'ts' field
+        max_gap_hours: Maximum allowed gap between candles in hours
+
+    Returns:
+        Filtered list of candles with gaps removed
+    """
+    if not candles or len(candles) < 2:
+        return candles
+
+    max_gap_seconds = max_gap_hours * 3600
+    filtered = [candles[0]]
+
+    for i in range(1, len(candles)):
+        gap = candles[i]['ts'] - candles[i-1]['ts']
+        if gap <= max_gap_seconds:
+            filtered.append(candles[i])
+        # else: skip this candle (it's in a gap region)
+
+    return filtered
+
+
 def find_peaks_troughs(prices: np.ndarray, window: int = 3) -> list:
     """
     Find local peaks and troughs using sliding window.
@@ -57,14 +86,14 @@ def find_peaks_troughs(prices: np.ndarray, window: int = 3) -> list:
     n = len(prices)
     
     for i in range(window, n - window):
-        # Check if local maximum (peak)
-        if all(prices[i] >= prices[i-j] for j in range(1, window+1)) and \
-           all(prices[i] >= prices[i+j] for j in range(1, window+1)):
+        # Check if local maximum (peak) — strict > to avoid flat-price bias
+        if all(prices[i] > prices[i-j] for j in range(1, window+1)) and \
+           all(prices[i] > prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'peak'))
-        
-        # Check if local minimum (trough)
-        elif all(prices[i] <= prices[i-j] for j in range(1, window+1)) and \
-             all(prices[i] <= prices[i+j] for j in range(1, window+1)):
+
+        # Check if local minimum (trough) — strict < to avoid flat-price bias
+        elif all(prices[i] < prices[i-j] for j in range(1, window+1)) and \
+             all(prices[i] < prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'trough'))
     
     return extrema
@@ -379,7 +408,12 @@ def analyze_wave_periods(token: str, timeframe: str = '1h',
     candles = get_candles(token, timeframe, lookback)
     if not candles:
         return {'error': f'No data found for {token}'}
-    
+
+    # Filter data gaps (>48h gaps cause false extrema)
+    original_count = len(candles)
+    candles = filter_data_gaps(candles, max_gap_hours=48.0)
+    gaps_removed = original_count - len(candles)
+
     timestamps = np.array([c['ts'] for c in candles])
     closes = np.array([c['close'] for c in candles])
     

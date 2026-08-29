@@ -58,11 +58,11 @@ def find_peaks_troughs(prices: np.ndarray, window: int = 3) -> list:
     n = len(prices)
     
     for i in range(window, n - window):
-        if all(prices[i] >= prices[i-j] for j in range(1, window+1)) and \
-           all(prices[i] >= prices[i+j] for j in range(1, window+1)):
+        if all(prices[i] > prices[i-j] for j in range(1, window+1)) and \
+           all(prices[i] > prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'peak'))
-        elif all(prices[i] <= prices[i-j] for j in range(1, window+1)) and \
-             all(prices[i] <= prices[i+j] for j in range(1, window+1)):
+        elif all(prices[i] < prices[i-j] for j in range(1, window+1)) and \
+             all(prices[i] < prices[i+j] for j in range(1, window+1)):
             extrema.append((i, prices[i], 'trough'))
     
     return extrema
