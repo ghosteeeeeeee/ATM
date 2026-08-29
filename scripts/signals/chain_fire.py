@@ -62,24 +62,24 @@ def _get_recent_leaders():
 
 
 def _compute_confidence(chain_conf, lift, n):
-    """Scale chain correlation data to Hermes confidence range (65-88).
+    """Scale chain correlation data to Hermes confidence range (70-88).
 
-    Base: 75 — chain suggests but doesn't guarantee.
-    Boost: up to +13 based on lift, sample size, and chain confidence.
+    Base: 80 — data-driven signal deserves strong base.
+    Boost: up to +8 based on lift, sample size, and chain confidence.
     """
-    base = 75
+    base = 80
 
-    # Lift bonus: 1.5x → +5, 2.0x → +10, 3.0x → +10 (capped)
-    lift_bonus = min(10, int((lift - 1.0) * 10))
+    # Lift bonus: 1.5x → +3, 2.0x → +5, 3.0x → +8 (capped)
+    lift_bonus = min(8, int((lift - 1.0) * 5))
 
-    # Sample size bonus: n=5 → +0, n=10 → +2, n=20 → +6
-    sample_bonus = min(6, max(0, int((n - 5) * 0.4)))
+    # Sample size bonus: n=5 → +0, n=10 → +1, n=20 → +3
+    sample_bonus = min(3, max(0, int((n - 5) * 0.2)))
 
-    # Chain confidence bonus: 0.6 → +0, 0.8 → +2, 0.9+ → +3
-    conf_bonus = min(3, max(0, int((chain_conf - 0.6) * 7.5)))
+    # Chain confidence bonus: 0.6 → +0, 0.8 → +1, 0.9+ → +2
+    conf_bonus = min(2, max(0, int((chain_conf - 0.6) * 5)))
 
     raw = base + lift_bonus + sample_bonus + conf_bonus
-    return max(65, min(88, raw))
+    return max(70, min(88, raw))
 
 
 def _is_chain_cooling(token, direction):

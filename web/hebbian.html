@@ -55,7 +55,8 @@
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showSection('chains')">🔗 Chains</div>
+  <div class="tab active" onclick="showSection('loop')">🔄 Pump Loop</div>
+  <div class="tab" onclick="showSection('chains')">🔗 Chains</div>
   <div class="tab" onclick="showSection('graph')">🕸️ Graph</div>
   <div class="tab" onclick="showSection('signals')">🎯 Signals</div>
   <div class="tab" onclick="showSection('cadence')">⏰ Cadence</div>
@@ -65,8 +66,18 @@
 
 <div class="content">
 
+  <!-- PUMP LOOP SECTION -->
+  <div class="section active" id="loop">
+    <div class="card">
+      <h3>🔄 Pump Loop — Token Sequence Chain</h3>
+      <p style="color:#8b949e;margin-bottom:16px;font-size:12px">When any token in this loop fires, the others tend to follow in sequence. 10 nodes, 9 hops.</p>
+      <div id="loop-chain"></div>
+      <div id="loop-entries" style="margin-top:16px"></div>
+    </div>
+  </div>
+
   <!-- CHAINS SECTION -->
-  <div class="section active" id="chains">
+  <div class="section" id="chains">
     <div style="margin-bottom:12px">
       <input class="search" id="chain-search" placeholder="Filter tokens..." oninput="filterChains()">
     </div>
@@ -145,6 +156,7 @@ async function loadData() {
   DATA = await resp.json();
   document.getElementById('header-stats').textContent =
     `${DATA.stats.total_chains} chains · ${DATA.stats.tokens_covered} tokens · ${DATA.stats.total_signals} signals`;
+  renderLoop();
   renderChains();
   renderSignals();
   renderCadence();
@@ -159,6 +171,7 @@ function showSection(id) {
   document.getElementById(id).classList.add('active');
   event.target.classList.add('active');
   if (id === 'graph') renderGraph();
+  if (id === 'loop') renderLoop();
 }
 
 function wrClass(wr) { return wr >= 0.6 ? 'wr-high' : wr >= 0.45 ? 'wr-mid' : 'wr-low'; }
@@ -167,6 +180,64 @@ function wrBadge(wr) {
   if (wr >= 0.7) return `<span class="badge badge-green">${(wr*100).toFixed(0)}%</span>`;
   if (wr >= 0.5) return `<span class="badge badge-yellow">${(wr*100).toFixed(0)}%</span>`;
   return `<span class="badge badge-red">${(wr*100).toFixed(0)}%</span>`;
+}
+
+function renderLoop() {
+  const loop = DATA.pump_loop;
+  if (!loop || !loop.chain) return;
+
+  // Render chain as visual flow
+  let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px">';
+  loop.chain.forEach((token, i) => {
+    const link = loop.links[i];
+    // Token node
+    const wrColor = link ? (link.wr >= 0.7 ? '#3fb950' : link.wr >= 0.5 ? '#d29922' : '#f85149') : '#8b949e';
+    html += `<div style="background:#1c2128;border:2px solid ${wrColor};border-radius:8px;padding:10px 16px;text-align:center;min-width:80px">
+      <div style="font-size:16px;font-weight:bold;color:#c9d1d9">${token}</div>
+      ${link ? `<div style="font-size:11px;color:#8b949e;margin-top:4px">n=${link.n} wr=${(link.wr*100).toFixed(0)}%</div>` : '<div style="font-size:11px;color:#8b949e;margin-top:4px">ENTRY</div>'}
+    </div>`;
+    // Arrow with stats
+    if (i < loop.chain.length - 1) {
+      const link = loop.links[i];
+      if (link) {
+        const arrowColor = link.wr >= 0.7 ? '#3fb950' : link.wr >= 0.5 ? '#d29922' : '#f85149';
+        html += `<div style="text-align:center;min-width:60px">
+          <div style="color:${arrowColor};font-size:20px">→</div>
+          <div style="font-size:10px;color:#8b949e">${link.lift.toFixed(1)}x</div>
+          <div style="font-size:10px;color:#8b949e">+${(link.pnl*100).toFixed(2)}%</div>
+        </div>`;
+      }
+    }
+  });
+  html += '</div>';
+
+  // Stats summary
+  let totalPnl = loop.links.reduce((sum, l) => sum + l.pnl, 0);
+  let avgWr = loop.links.reduce((sum, l) => sum + l.wr, 0) / loop.links.length;
+  html += `<div style="display:flex;gap:24px;margin-top:12px;padding:12px;background:#1c2128;border-radius:6px">
+    <div><span style="color:#8b949e">Hops:</span> <span style="color:#58a6ff;font-weight:bold">${loop.links.length}</span></div>
+    <div><span style="color:#8b949e">Avg WR:</span> <span style="color:${avgWr >= 0.6 ? '#3fb950' : '#d29922'};font-weight:bold">${(avgWr*100).toFixed(0)}%</span></div>
+    <div><span style="color:#8b949e">Total PnL:</span> <span style="color:${totalPnl >= 0 ? '#3fb950' : '#f85149'};font-weight:bold">+${(totalPnl*100).toFixed(2)}%</span></div>
+  </div>`;
+
+  document.getElementById('loop-chain').innerHTML = html;
+
+  // Entry points
+  if (loop.entries && loop.entries.length) {
+    let entryHtml = '<h3 style="color:#58a6ff;font-size:14px;margin-bottom:8px">Entry Points</h3>';
+    entryHtml += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    loop.entries.forEach(([a, b]) => {
+      const link = loop.links.find(l => l.from === a && l.to === b);
+      if (link) {
+        entryHtml += `<div style="background:#1c2128;border:1px solid #30363d;border-radius:6px;padding:6px 12px;font-size:12px">
+          <span style="color:#58a6ff">${a}</span> → <span style="color:#c9d1d9">${b}</span>
+          <span style="color:#8b949e">(${link.lift}x, ${(link.wr*100).toFixed(0)}% WR)</span>
+        </div>`;
+      }
+    });
+    entryHtml += '</div>';
+    document.getElementById('loop-entries').innerHTML = entryHtml;
+  }
 }
 
 function renderChains() {

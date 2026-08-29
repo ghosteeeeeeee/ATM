@@ -94,7 +94,31 @@ def generate():
         for r in rows
     ][:20]
 
-    # 7. Stats
+    # 7. Pump Loop (longest chain)
+    data['pump_loop'] = {
+        'chain': ['ME', 'GRIFFAIN', 'SKR', 'BSV', 'ASTER', 'CAKE', '0G', 'BCH', 'MORPHO', 'XMR'],
+        'links': [],
+    }
+    for i in range(len(data['pump_loop']['chain']) - 1):
+        a, b = data['pump_loop']['chain'][i], data['pump_loop']['chain'][i+1]
+        r = conn.execute('''
+            SELECT co_fires, win_rate, lift, confidence, avg_pnl_after_a
+            FROM token_chains WHERE token_a=? AND token_b=?
+        ''', (a, b)).fetchone()
+        if r:
+            data['pump_loop']['links'].append({
+                'from': a, 'to': b, 'n': r[0],
+                'wr': round(r[1], 3), 'lift': round(r[2], 2),
+                'conf': round(r[3], 3), 'pnl': round(r[4], 4)
+            })
+
+    # Extended entry points
+    data['pump_loop']['entries'] = [
+        ('JUP', 'ME'), ('ONDO', 'FET'), ('FET', 'ASTER'),
+        ('XMR', 'ASTER'), ('LINK', 'ME'), ('UNI', 'MORPHO')
+    ]
+
+    # 8. Stats
     data['stats'] = {
         'total_chains': conn.execute('SELECT COUNT(*) FROM token_chains').fetchone()[0],
         'total_signals': conn.execute('SELECT COUNT(*) FROM signal_effectiveness').fetchone()[0],
