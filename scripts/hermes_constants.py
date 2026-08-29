@@ -2301,7 +2301,7 @@ RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width p
 ICHIMOKU_ENABLED = True                # master kill-switch
 ICHIMOKU_PLUS_ENABLED = True           # LONG direction
 ICHIMOKU_MINUS_ENABLED = True          # SHORT direction
-ICHIMOKU_COOLDOWN_HOURS = 4            # per token+direction cooldown (swing trade)
+ICHIMOKU_COOLDOWN_HOURS = 1            # per token+direction cooldown
 
 # Ichimoku periods (standard 9/26/52)
 ICHIMOKU_TENKAN_PERIOD = 9             # Tenkan-sen (Conversion Line)
