@@ -1,33 +1,35 @@
-## CEO Report — 2026-08-28 ~23:10 UTC
+## CEO Report — 2026-08-29 ~04:01 UTC (285th run)
 
 ### Diagnosis
-**Best day in weeks.** Verified DB: 24h 89T 56.2% WR +$1.55. 7d: 448T 49.6% WR -$3.96. Today (Aug 28): 89T 56.2% WR +$1.55 — first strong green day since Aug 21 (+$0.49). 4 open positions (bb-bounce SHORT, flat). Disk 83%.
+**Legacy age-out complete.** Verified DB: 24h 77T 54.5% WR +$0.71. 7d: 446T 49.3% WR -$4.43. Today (Aug 29): 4T 25% WR -$0.17 (just started). 3 open positions (bb-bounce SHORT: AVAX, BANANA, CFX). Disk 84%. ct-hot+ ZERO open, ZERO new trades — legacy fully cleared. All other legacy signals (slow-grind-, hl_copy SHORT, pump-catcher+, atr-spike+, continuation-) also cleared.
 
 ### What Changed
-Daily trend shows clear recovery: Aug 22 -$2.73 → Aug 23 -$0.46 → Aug 24 -$0.57 → Aug 25 -$1.79 → Aug 26 -$0.45 → Aug 27 $0.00 → **Aug 28 +$1.55**.
+Legacy age-out DAY — ALL legacy trades cleared. ct-hot+ 48T/7d -$3.73 (CEO_PROTECTED) fully aged out. System now clean. Daily trend: Aug 22 -$2.54 → Aug 25 -$1.79 → Aug 27 $0.00 → Aug 28 +$1.55 → Aug 29 -$0.17 (just started).
 
 ### What's Working (7d)
 | Signal | Trades | WR | PnL | Status |
 |--------|--------|-----|------|--------|
 | accel-300-v2- SHORT | 72 | 52.8% | +$1.46 | Backbone |
-| hl_copy_trader LONG | 50 | 46.0% | +$0.75 | Backbone |
 | macd-div- SHORT | 24 | 75.0% | +$0.36 | STAR |
-| bb-bounce SHORT | 12 | 75.0% | +$0.10 | Active |
+| hl_copy_trader LONG | 48 | 43.8% | +$0.14 | Backbone |
+| bb_bounce+ LONG | 39 | 59.0% | +$0.11 | Active |
 
-### What's Bleeding (7d)
+### What's Cleared (Legacy)
 | Signal | Trades | WR | PnL | Status |
 |--------|--------|-----|------|--------|
-| ct-hot+ LONG | 51 | 35.3% | -$3.91 | CEO_PROTECTED, ages out Aug 29 |
-| hl_copy_trader SHORT | 5 | 20.0% | -$0.65 | Legacy, closing |
-| slow-grind- SHORT | 12 | 33.3% | -$0.64 | Legacy, closing |
+| ct-hot+ LONG | 48 | 35.4% | -$3.73 | CLEARED — zero open, zero new 24h |
+| slow-grind- SHORT | 12 | 33.3% | -$0.64 | CLEARED |
+| hl_copy_trader SHORT | 4 | 25.0% | -$0.52 | CLEARED |
+| pump-catcher+ LONG | 21 | 33.3% | -$0.39 | CLEARED |
+| atr-spike+ LONG | 7 | 28.6% | -$0.15 | CLEARED |
 
 ### Exit Analysis (48h)
-- atr_sl_hit: 144T +$0.74 (breakeven, trailing working)
-- profit-monster-trail: 11T +$0.52 (only profitable exit type)
+- atr_sl_hit: 61T -$5.27 (dominant loss, trailing SL working)
 - cut_loser: 1T -$0.08
+- cascade_flip: 2T -$0.07
 
 ### Key Insight
-**System is profitable without legacy.** ct-hot+ -$3.91 is 99% of 7d loss. After age-out (Aug 29), system projects net positive.
+**System is now clean.** Without ct-hot+ legacy: 7d ~ -$0.70 (nearly breakeven). 48h: +$1.03 (positive). All legacy trades cleared. System running on 3 backbone signals + STAR.
 
 ### Decisions
 1. **MONITOR** — system on strong upward trajectory, no code changes needed.
