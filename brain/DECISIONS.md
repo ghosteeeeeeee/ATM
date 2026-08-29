@@ -467,6 +467,40 @@
 
 ---
 
+## 2026-08-29 | bb_bounce V2 Velocity Filter — Implement as Test
+
+**Decision:** APPROVE implementing bb_bounce V2 velocity filter as a test.
+
+**Why:**
+- MoE panel (4 experts, confidence 0.85/1.00) recommends velocity filter
+- Independent audit: 84.6% WR with velocity filter vs 58.9% baseline
+- Statistically significant (p=0.004, survives Bonferroni)
+- Risk-positive: max loss $2.42/period if wrong
+- bb-bounce-short already performing well (75%WR) — V2 may improve further
+
+**What to implement:**
+1. Tighten `MEAN_REVERSION_VEL_THRESHOLD` from 0.15% to 0.015%
+2. Move velocity check INTO `detect_bb_bounce()` (remove duplicate from scan)
+3. Add execution-time staleness check (5 min max age, 0.25% price drift)
+4. Fix bugs: hardcoded paths in bb_bounce_short.py, None guard on speed_tracker
+
+**Test approach:**
+- Implement as V2, keep V1 (current) active initially
+- Monitor WR for 7 days
+- If V2 WR > 70% over 50+ trades, replace V1
+- If V2 WR < 60%, revert to V1
+
+**Monitoring:**
+- Track V1 vs V2 WR separately
+- Log all velocity-blocked entries for audit
+- Kill trigger: if V2 WR drops below 65% over 30+ trades
+
+**Revisit:** 2026-09-05 (7 days after deployment)
+
+**Owner:** CEO
+
+---
+
 *Format: `## YYYY-MM-DD | Short title` — append new decisions to the top, above this line.*
 
 ## 2026-08-26 | bb_bounce Execution-Time Staleness Gate
