@@ -17454,3 +17454,28 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 - Trade freq 3/hr normal
 - No consecutive negative hours
 - All 3 last-hour trades were winners
+
+## [2026-08-29 13:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (AVNT closed at 12:54 was the last)
+**Last 2h:** 7T (4W, 3L) — **+$0.20**
+**24h:** 65T, 57%WR, +$1.43 — strong
+- accel-300-v2- 31T 58%WR +$1.35 (workhorse)
+- bb-bounce-short 21T 62%WR +$0.23 (solid)
+- atr_sl_hit 64T avg +$0.021 — trailing SL profitable by design
+- 1 atr_tp_hit +$0.09
+
+**Open:** 5 SHORT (ETC/NXPC/NEAR/ZRO/LTC) — all flat-to-slightly-up
+
+**Changes:** None
+
+**No Change Needed:**
+- No trades last hour, 0T → nothing to act on
+- Kill criteria not triggered (no signal has 0%WR with 3+ trades last hour)
+- atr_sl_hit 98.5% but avg +$0.021 — trailing SL profitable by design
+- Trade freq 3.5/hr normal (7T in 2h)
+- No consecutive negative hours
+- 5 open SHORT all reasonable sizes ($11.10 each)
+- System healthy, quiet low-vol period continues
+
+**Open Questions:** None
