@@ -368,21 +368,23 @@ Three existing systems would kill wave-catch positions:
 
 ### Phase 1: Validate the Edge (APPROVED — DO FIRST)
 
-**Goal:** Find the REAL win rate of support_resistance LONG signals + zscore component
+**Goal:** Find the REAL win rate and optimal trailing stop
 
-**Task:** Backtest ALL 1285 support_resistance LONG signals (Aug 14-22) WITH zscore filter
+**BACKTEST COMPLETED (2026-08-28):**
 
-**Steps:**
-1. Query trades table for support_resistance LONG signals with outcomes
-2. For signals without recorded outcomes, fetch historical price data (5m candles)
-3. Simulate entry at signal time, track price for 72h
-4. **Add zscore filter:** Only count signals where z-score was crossing 0 at entry
-5. Calculate: WR, avg win%, avg loss%, R:R, max drawdown
-6. Break down by: regime (NEUTRAL vs LONG_BIAS), coin, confidence tier, z-score state
-7. **Compare:** RS-only WR vs RS+zscore WR (does zscore improve selection?)
-8. Return: full statistical report with confidence intervals
+| Coin | 3% Trail | 5% Trail | 8% Trail | Optimal |
+|------|----------|----------|----------|---------|
+| IOTA | +0.1% ❌ | +19.0% ✅ | +19.0% ✅ | 5%+ |
+| BANANA | +17.7% ✅ | +15.3% ✅ | +11.7% ✅ | 3% |
+| GMT | -2.6% ❌ | -4.6% ❌ | +16.7% ✅ | 8%+ |
+| DOGE | +16.3% ✅ | +13.9% ✅ | +16.8% ✅ | 3% or 8%+ |
+| DYDX | +18.3% ✅ | +15.9% ✅ | +18.5% ✅ | 3% or 8%+ |
+| CC | +10.3% | +10.9% | +26.5% ✅ | 8%+ |
+| COMP | +10.2% | +8.4% | +17.3% ✅ | 8%+ |
 
-**Decision gate:** If backtest WR > 55% with 50+ outcomes → approve Phase 2. Otherwise, kill proposal.
+**CRITICAL FINDING:** 3% trail is TOO TIGHT for 4/7 coins. Need 8%+ for most.
+
+**Next:** Run full backtest on ALL 1285 signals with 8% trail to find true win rate.
 
 **Owner:** signal_analyst
 **Deadline:** This week
@@ -467,6 +469,54 @@ Wave-Catch Risk Module:
 
 ---
 
+## Elliott Wave Integration (For Future Use)
+
+### Why Elliott Wave Fits
+
+Elliott Wave identifies 5-wave impulse patterns:
+- **Wave 1:** Initial move off bottom (hard to catch)
+- **Wave 2:** Pullback/consolidation (our entry zone)
+- **Wave 3:** Strongest/longest wave (our profit zone)
+- **Wave 4:** Another pullback (add position)
+- **Wave 5:** Blowoff/exhaustion (our exit)
+
+### How to Integrate
+
+```python
+# Elliott Wave Filter (confirmation, not primary)
+ELLIOTT_WAVE_CONFIG = {
+    'enabled': True,
+    'min_waves_before_entry': 2,  # Wait for Wave 1+2 to complete
+    'entry_wave': 3,              # Enter at start of Wave 3
+    'exit_wave': 5,               # Exit at Wave 5 (blowoff)
+    'confirmation': 'price > Wave 2 low + volume expansion',
+}
+```
+
+### Wave Detection (Simplified)
+
+```
+Wave 1: Price moves +10-20% from bottom
+Wave 2: Price pulls back 30-50% of Wave 1
+Wave 3: Price moves +150-200% of Wave 1 (ENTer here)
+Wave 4: Price pulls back 20-40% of Wave 3
+Wave 5: Price moves +50-100% of Wave 3 (EXIT here)
+```
+
+### Integration with Wave Catch
+
+```
+Primary:   support_resistance (structural support)
+Confirm1:  zscore_rising (z-score crossing threshold)
+Confirm2:  Elliott Wave (we're in Wave 3)
+Filter:    r2_trend_long (trend confirmation)
+Volume:    Volume expanding > 1.2x average
+```
+
+**Recommendation:** Add as secondary filter, not primary trigger. Z-score + compression detection as primary, Elliott Wave as confirmation.
+
+---
+
 ## Wave Quality Score (For Future Use)
 
 **Pre-trade filter:**
@@ -531,16 +581,30 @@ Score = (HH/HL consistency × 0.3) + (Trend purity × 0.3) + (Pullback frequency
 
 ### Wave-Catch Risk Module Design
 
+**CRITICAL:** Backtest shows 3% trail is TOO TIGHT. Need 8%+ for most coins.
+
 ```python
 # Bypass lists for wave-catch positions
 WAVE_CATCH_BYPASS_SIGNALS = ['support_resistance', 'r2_trend_long']
+
+# Stop loss — 8% fixed (not ATR-based)
+WAVE_CATCH_ATR_SL = 0.08  # 8.0% (current ATR_SL_MIN is 0.8% — 10x wider)
+
+# Disable Profit Monster for wave-catch
+WAVE_CATCH_PM_TRAIL = False  # PM would close at +1-2%, we need +10-30%
+
+# Cut Loser — don't cut until -8%
+WAVE_CATCH_CL_TIER1 = -0.08  # Current is -2.0% — 4x wider
+
+# MAE Guard — 8% threshold
+WAVE_CATCH_MAE_GUARD = 0.08  # Current is 3.0% — 2.7x wider
+
+# Trailing stop
+WAVE_CATCH_TRAIL_ACTIVATE = 0.05  # Start trailing at +5%
+WAVE_CATCH_TRAIL_DISTANCE = 0.03  # Trail 3% behind
+
+# Position limits
 WAVE_CATCH_MAX_POSITIONS = 4
-WAVE_CATCH_INITIAL_STOP = 3.0  # %
-WAVE_CATCH_TIGHTENING = {
-    5.0: 2.5,   # At +5%, tighten to 2.5%
-    10.0: 2.0,  # At +10%, tighten to 2.0%
-}
-WAVE_CATCH_MAE_THRESHOLD = 4.0  # % (higher than standard 3.0%)
 ```
 
 ### BTC Stability Gate
@@ -550,13 +614,16 @@ WAVE_CATCH_MAE_THRESHOLD = 4.0  # % (higher than standard 3.0%)
 BTC_MOMENTUM_THRESHOLD = -0.15  # % per 30m
 ```
 
-### Position Limits
+### Current vs Wave-Catch Parameters
 
-```python
-# Cap concurrent wave-catch positions
-WAVE_CATCH_MAX_CONCURRENT = 4
-WAVE_CATCH_CORRELATION_LIMIT = 2  # Max 2 from same sector
-```
+| Parameter | Current | Wave-Catch | Multiplier |
+|-----------|---------|------------|------------|
+| ATR_SL | 0.8-1.5% | **8.0%** | 5-10x |
+| PM_TRAIL | 0.40% act | **disabled** | — |
+| CL_TIER1 | -2.0% | **-8.0%** | 4x |
+| CL_MAE | 3.0% | **8.0%** | 2.7x |
+| TRAIL_ACTIVATE | 0.40% | **5.0%** | 12.5x |
+| TRAIL_DISTANCE | 0.50% | **3.0%** | 6x |
 
 ---
 
