@@ -7,6 +7,7 @@ from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from wave_period_detector import get_candles, find_peaks_troughs, calculate_wave_periods
+from hermes_constants import AMP_CLASS_LOW_MAX, AMP_CLASS_MED_MAX
 
 tokens = ['BTC', 'ETH', 'SOL', 'LINK', 'ARB', 'ZRO', 'TRUMP', 'WIF', 'HYPE', 'DOGE',
           'SUI', 'AAVE', 'ONDO', 'WLD', 'TURBO', 'POPCAT', 'SPX', 'KAS', 'XRP', 'FET']
@@ -62,9 +63,9 @@ for token in tokens:
             desc = 'No clear dominant frequency'
 
         # Amplitude
-        if avg_amp > 2.5:
+        if avg_amp > AMP_CLASS_MED_MAX:
             amp_class = 'HIGH_AMP'
-        elif avg_amp > 1.5:
+        elif avg_amp > AMP_CLASS_LOW_MAX:
             amp_class = 'MED_AMP'
         else:
             amp_class = 'LOW_AMP'

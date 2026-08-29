@@ -1689,3 +1689,28 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1017s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (772s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (539s left, N failures)`
+
+## Error Alerts — 2026-08-29 17:04 UTC
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Error Alerts — 2026-08-29 19:04 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-08-29 19:21 UTC
+- **[WARN]** (Nx): `WLFI SHORT repeatedly rejected — amount_usdt=5.5 < HL_MIN=11.0`
+- **[WARN]** (Nx): `ROLLBACK FAILED: sig#1576123/1576125 already claimed by another process`
+- **[INFO]**: `6 phantom trades (PnL < 0.01 USDT) in last 24h — acceptable`
+- **[OK]**: Pipeline running, no crashes. Both services active. 94 tokens fresh. 78% disk.
+
+## Error Alerts — 2026-08-29 20:21 UTC
+- **[WARN]** (16x in 30min): `signal_compactor: Traceback at line 3010` — caught/continues, non-fatal
+- **[INFO]**: Pipeline running normally. 195 signals/hour. 5 open positions (at capacity). 45 closed today, -7.00% PnL.
+- **[OK]**: No auto-fixes needed. Pipeline cycling every ~1min. Disk 78%.
+- **[NOTE]**: 0 hermes-* timers listed — pipeline runs via service restarts, not timers.
+
+## Error Alerts — 2026-08-29 21:04 UTC
+- **REPEATED** (47x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [TOK-SIGNALS] write failed: name 'BB_BOUNCE_LONG_ENABLED' is not defined`

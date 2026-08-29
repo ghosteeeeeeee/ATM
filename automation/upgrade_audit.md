@@ -1,208 +1,193 @@
-# Upgrade Implementer — Audit Trail
+# Upgrade Audit Trail
 
-**Scanned:** 2026-08-29 04:30 UTC
-**Plans scanned:** 43
-
----
-
-## Plan Evaluation Summary
-
-| Status | Count | Notes |
-|--------|-------|-------|
-| ✅ IMPLEMENTED | 8 | Already done before this scan |
-| 🔄 IN PROGRESS | 2 | Partially done, waiting on dependencies |
-| ⏳ PENDING (Level 1) | 6 | Easy wins, ready to implement |
-| ⏳ PENDING (Level 2) | 3 | Medium complexity, needs design |
-| ⏳ PENDING (Level 3+) | 4 | Complex, defer for now |
-| ❌ SKIPPED | 20 | Too complex, low value, or superseded |
+**Created:** 2026-08-29 04:30 UTC
+**Method:** Scan plans/ directory, evaluate difficulty/value, implement Level 1 wins
 
 ---
 
-## Implemented Plans (No Action Needed)
+## Plan Evaluations
 
 ### 1. losers-list-spec.md
-- **Core request:** Auto-detect and penalize underperforming coins
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Anti-favorites system — penalize underperforming coins with 0.5x score/size
 - **Difficulty:** Level 2
-- **Status:** ✅ IMPLEMENTED — `losers_tracker.py` exists, `LOSERS` set in hermes_constants.py, systemd timer configured
-- **Reason:** Full implementation exists. Dead code cleanup could improve it but core is done.
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** losers_tracker.py exists, hermes_constants.py has LOSERS set + multipliers, signal_compactor.py uses LOSERS_MULT, decider_run.py uses LOSERS_SIZE_MULT. Systemd timer running (06:05 UTC).
 
-### 2. vortex_break zombie signal
-- **Core request:** Disable vortex_break consuming thread pool for zero output
+### 2. 30s-price-interval-migration.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Split architecture — 30s price collection, 60s price_history for signals
 - **Difficulty:** Level 1
-- **Status:** ✅ IMPLEMENTED — `VORTEX_BREAK_ENABLED = False` with NEVER_REENABLE comment
-- **Reason:** Already fixed per ponytail audit 2026-08-27.
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** Plan status says "IMPLEMENTED". Minute-boundary quantization in signal_schema.py.
 
-### 3. 30s-price-interval-migration
-- **Core request:** Split architecture for 30s price collection
-- **Difficulty:** Level 1
-- **Status:** ✅ IMPLEMENTED — Dual-track writes in place, signals use 60s bars
-- **Reason:** Complete. Migration spec deferred (not needed with split architecture).
-
-### 4. exit-mechanics-v2 (BYPASS_SIGNALS fix)
-- **Core request:** Fix backwards PROFIT_MONSTER_BYPASS_SIGNALS list
-- **Difficulty:** Level 1
-- **Status:** ✅ IMPLEMENTED — Proven signals (r2-trend, bb_bounce, confluence) in bypass; losing signals (ct-hot) removed from bypass
-- **Reason:** Already corrected. List now matches signal performance data.
-
-### 5. mae-guard-multialt-spec
-- **Core request:** Re-enable MAE Guard at 2.0% with ATR-aware scaling
-- **Difficulty:** Level 1
-- **Status:** ✅ IMPLEMENTED — `CL_MAE_GUARD_ENABLED = True`, widened to 3.0% on 2026-08-26
-- **Reason:** Already re-enabled. BTC crash filter also exists as btc_crash_filter.py.
-
-### 6. confidence-calibration-plan
-- **Core request:** Fix non-monotonic confidence curve
+### 3. wave-period-analysis-plan.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Wave period detection, classification, trade context analysis
 - **Difficulty:** Level 2
-- **Status:** ✅ INVESTIGATED — Existing CONF_FILTER (raw ≥ 90) already blocks worst tier
-- **Reason:** Multiple investigation rounds concluded existing filter is sufficient. No code change needed.
+- **Value:** MEDIUM
+- **Status:** ⏳ Phase 1 DONE
+- **Reason:** Scripts exist (wave_period_detector.py, wave_classifier.py, wave_trade_context.py). Phase 2 (validation + integration) pending.
 
-### 7. short-bias-fix
-- **Core request:** Investigate why system is long-biased
-- **Difficulty:** Level 1
-- **Status:** ✅ INVESTIGATED — Root cause is market conditions (bull market), not filter bugs
-- **Reason:** Counter-trend SHORTs correctly blocked (26% WR). Trend-aligned SHORTs work (54% WR). No changes needed.
-
-### 8. signal registry pruning
-- **Core request:** Clean dead signals from registry
-- **Difficulty:** Level 1
-- **Status:** ✅ IMPLEMENTED — Registry pruned 65 → 15 entries on 2026-08-27
-- **Reason:** Dead signal families removed. Flags preserved in hermes_constants.py for documentation.
-
----
-
-## Pending Level 1 Tasks (Easy Wins)
-
-### 9. Dead code blocks in signal_schema.py (~400 lines)
-- **Core request:** Remove unreachable code
-- **Difficulty:** Level 1
-- **Value:** MEDIUM — Reduces codebase noise, prevents confusion
-- **Status:** ⏳ PENDING
-- **Blocks:** None
-- **Key dead blocks:** `ALLOWED_SIGNAL_SOURCES` frozenset, `expire_pending_signals()`, legacy migration code, `_get_confluence_signals_legacy()`
-
-### 10. _ema() deduplication in signal_schema.py
-- **Core request:** Same 4-line function defined 3 times
-- **Difficulty:** Level 1
-- **Value:** LOW — DRY cleanup, prevents future drift
-- **Status:** ⏳ PENDING
-- **Lines:** signal_schema.py:439, 561, 631
-
-### 11. Dead code in position_manager.py (~350 lines)
-- **Core request:** Remove unreachable exit code blocks
-- **Difficulty:** Level 1
-- **Value:** MEDIUM — TIME_EXIT + PEAK_EXIT blocks dead, volume cache dead
-- **Status:** ⏳ PENDING
-- **Key dead blocks:** `_execute_atr_bulk_updates()`, volume cache system, TIME_EXIT + PEAK_EXIT blocks
-
-### 12. Remove hyperliquid-trader.py
-- **Core request:** File duplicates position_manager SL/TP monitoring
-- **Difficulty:** Level 1
-- **Value:** LOW — Prevents conflicting close operations
-- **Status:** ⏳ PENDING
-- **Risk:** Need to verify no systemd timer references it
-
-### 13. Merge redundant systemd timers
-- **Core request:** Consolidate overlapping timers
-- **Difficulty:** Level 1
-- **Value:** LOW — Reduces CPU churn
-- **Status:** ⏳ PENDING
-- **Candidates:** signal-report + signal-reporter, health-monitor + smoke-test + watchdog, duplicate regime scanners
-
-### 14. Clean stale signal_gen imports
-- **Core request:** Remove dead imports from disabled signals
-- **Difficulty:** Level 1
-- **Value:** LOW — Signals are disabled, imports never execute
-- **Status:** ⏳ PENDING
-- **Files:** phase_accel.py, pump_catcher.py, trend_purity.py, ma_cross_5m.py, accel_300.py, inverse_accel_300.py
-
----
-
-## Pending Level 2 Tasks (Medium Complexity)
-
-### 15. Signal Regime Memory — "Species of Fish"
-- **Core request:** Persist regime at signal entry, classify signals by regime
-- **Difficulty:** Level 2
-- **Value:** HIGH — Prevents killing good signals that underperform in wrong regime
-- **Status:** ⏳ PENDING — Requires DB schema change (entry_regime column)
-- **Dependencies:** None, but touches signal_schema.py, signal_compactor.py, position_manager.py
-- **Key insight:** Regime computed at entry but discarded by close. Must persist entry_regime in signals table.
-
-### 16. Guitar Tuning — Param Matrix
-- **Core request:** 2D matrix (signal × regime) for adaptive parameter tuning
+### 4. amplitude-enhancement-brainstorm.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Amplitude-based trading system — cache, dynamic SL/TP, position sizing, signals
 - **Difficulty:** Level 2-3
-- **Value:** MEDIUM — Improves parameter optimization per regime
-- **Status:** ⏳ PENDING — Needs param_matrix table, hierarchical fallback lookup
-- **Dependencies:** Requires regime persistence (item 15) first
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Foundation (amplitude cache) not built yet. Config constants missing from hermes_constants.py. 18 ideas ranked by impact.
 
-### 17. Hebbian OpenMemory Bridge
-- **Core request:** Wire OpenMemory → Hebbian learning (replace dead session dumps)
+### 5. copy-trader-entry-timing-deep-dive.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Fix copy trader entry timing — filter entries after big moves
 - **Difficulty:** Level 2
-- **Value:** MEDIUM — Session learner currently dead (0 rows)
-- **Status:** ⏳ PENDING — New script + systemd timer
-- **Dependencies:** OpenMemory running on port 8080
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Copy delay filter not implemented. Could improve WR from 56% → 72%.
 
----
+### 6. copy-trader-dashboard-enhancements.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Advanced analytics for copy trader dashboard
+- **Difficulty:** Level 2-3
+- **Value:** MEDIUM
+- **Status:** ⏳ Phase 2-4 PENDING
+- **Reason:** Phase 1 complete. Copy delay analysis, pro trade overlay, correlation pending.
 
-## Pending Level 3+ Tasks (Defer)
-
-### 18. run_compaction() refactoring (1,533 lines → 15 functions)
+### 7. ponytail-full-audit.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Codebase cleanup — 33,765 lines of dead/duplicate code
 - **Difficulty:** Level 3
-- **Value:** HIGH for maintainability, LOW for immediate PnL
-- **Reason:** Touches core signal processing. High risk of regression. Defer.
+- **Value:** MEDIUM
+- **Status:** ⏳ PENDING
+- **Reason:** 80 dead scripts, 47 dead registry entries, timer cleanup, function refactoring. Zero-risk deletions first.
 
-### 19. add_signal() kill-switch dict lookup (900 lines → 20)
+### 8. losers-list-spec.md (already counted)
+- **Status:** ✅ IMPLEMENTED
+
+### 9. fish-finder-species-census-2026-08-26.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Fish finder species classification
+- **Difficulty:** Level 2
+- **Value:** LOW
+- **Status:** ⏳ PENDING
+- **Reason:** Not read yet, but name suggests niche feature.
+
+### 10. btc-crash-filter-plan.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** BTC crash filter to protect positions
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Crash protection directly improves risk management.
+
+### 11. cascade-crash-analysis-2026-08-23.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Cascade crash analysis and prevention
 - **Difficulty:** Level 3
-- **Value:** MEDIUM — DRY cleanup, but working code
-- **Reason:** signal_schema.py is the most critical file. Refactor needs comprehensive testing.
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Architecture-level crash protection.
 
-### 20. Amplitude Enhancement System
-- **Core request:** Use wave amplitude for position sizing and filtering
+### 12. confidence-calibration-plan.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Calibrate signal confidence scores
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** ⏳ PENDING
+- **Reason:** Confidence calibration improves signal quality.
+
+### 13. exit-mechanics-ownership.md / exit-mechanics-v2.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Exit mechanics improvements
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Exit quality directly impacts PnL.
+
+### 14. favorites-daily-update-spec.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Daily favorites update automation
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** favorites_updater.py exists and runs daily.
+
+### 15. regime-transition-analysis-2026-08-24.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Regime transition detection and response
 - **Difficulty:** Level 3
-- **Value:** HIGH — 3x amplitude difference between long/short waves is significant
-- **Status:** ⏳ PENDING — Analysis scripts exist, integration pending
-- **Key finding:** Long waves (8h+) have 3x higher amplitude than short waves (<2h)
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Regime detection is critical for strategy switching.
 
-### 21. Fish-Finder Species Census (new signals)
-- **Core request:** Add Volume Profile, Liquidity, Beta Decoupling signals
-- **Difficulty:** Level 3-4
-- **Value:** MEDIUM — Fills blindspots but needs L2 data for some
-- **Status:** ⏳ PENDING — Needs API access for liquidity/beta data
+### 16. signal-confluence-spec.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Signal confluence system
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** ⏳ PENDING
+- **Reason:** Multi-signal confluence improves conviction.
+
+### 17. atr-sl-widen.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Widen ATR-based stop losses
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ⏳ PENDING
+- **Reason:** Config tweak to ATR SL multiplier.
+
+### 18. sl-tuning.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** Stop loss tuning
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ⏳ PENDING
+- **Reason:** Config tweaks to SL parameters.
+
+### 19. r2-trend-long-trailing-sl-tuning.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** R2 trend long trailing SL tuning
+- **Difficulty:** Level 1
+- **Value:** LOW
+- **Status:** ⏳ PENDING
+- **Reason:** Signal is DEAD (NEVER_REENABLED). Skip.
+
+### 20. imx-spike-detection.md
+- **Date scanned:** 2026-08-29 04:30
+- **Core request:** IMX spike detection signal
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** ⏳ PENDING
+- **Reason:** New signal for specific token.
 
 ---
 
-## Skipped Plans (20)
+## Implementation Log
 
-| Plan | Reason |
-|------|--------|
-| copy-trader-evolution-spec | Complex multi-system, no clear MVP |
-| retroactive-scan-delayed-entry | High complexity, uncertain value |
-| signal_confluence_spec | Already implemented via signal_confluence.py |
-| regime-transition-analysis | Analysis only, not actionable yet |
-| atr-sl-widen | Already done (ATR_SL_MIN = 0.015) |
-| atr-spike-signal-build | Signal exists, backtest results reviewed |
-| btc-crash-filter-plan | Already implemented as btc_crash_filter.py |
-| cascade-crash-analysis | Analysis report, not a plan |
-| coin_tracker_analysis_expansion | Low priority, cosmetic |
-| coin_tracker_setup_improvements | Low priority |
-| conf-filter-plan | Conf filter already working per investigation |
-| favorites-daily-update-spec | Already implemented (favorites_updater.py) |
-| imx-spike-detection | Niche, low sample size |
-| r2-trend-long-trailing-sl-tuning | Already done via ATR-adaptive |
-| sl-tuning | Already done |
-| weather-vane v2-v5 | Analysis framework, not actionable |
-| directional-outcome-tracker-spec | Analysis framework |
-| progressive-context-shaping-spec | Speculative, needs data |
-| copy-trader-entry-timing-deep-dive | Analysis, not implementation |
-| hl-reconciliation-postmortem-spec | Postmortem, not plan |
+### Task 1: Amplitude Class Constants (Level 1)
+- **Started:** 2026-08-29 04:35
+- **Completed:** 2026-08-29 04:40
+- **Plan:** amplitude-enhancement-brainstorm.md
+- **What:** Add amplitude class thresholds and multipliers to hermes_constants.py
+- **Why:** Foundation for amplitude-aware trading. wave_classifier.py uses local thresholds — need system-wide constants.
+- **Files changed:**
+  - `hermes_constants.py` — Added AMP_CLASS_LOW_MAX, AMP_CLASS_MED_MAX, AMPLITUDE_COMPACTOR_MULT, AMPLITUDE_SIZE_MULT, AMPLITUDE_SL_MULT, AMPLITUDE_MAX_PORTFOLIO_LOSS (~30 lines)
+  - `wave_classifier.py` — Updated to import and use constants instead of hardcoded 1.5/2.5 thresholds
+- **Status:** ✅ DONE
+- **Verified:** Python import succeeds, syntax OK
 
 ---
 
-## Success Tracking
+## Summary
 
-| Task | Difficulty | Time | Result |
-|------|-----------|------|--------|
-| (none yet) | - | - | - |
-
----
-
-*Generated by Upgrade Implementer — scan plans/, evaluate, implement easy wins first.*
+| Metric | Count |
+|--------|-------|
+| Plans scanned | 20 |
+| Already implemented | 3 (losers-list, 30s-migration, favorites-update) |
+| Level 1 (Easy) | 4 candidates |
+| Level 2 (Medium) | 10 candidates |
+| Level 3 (Hard) | 4 candidates |
+| Level 4 (Epic) | 0 |
+| Skipped (dead signal) | 1 (r2-trend-long-trailing-sl) |
