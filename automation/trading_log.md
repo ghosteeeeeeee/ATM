@@ -17960,3 +17960,65 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 **Open Questions:**
 - ONDO SHORT at -74% unrealized — trailing SL should manage, monitor next hour
 - macd-div- (33%WR) and confluence-,ichimoku- (33%WR) weak but below kill threshold
+
+## FAVORITES Update — 2026-08-30 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE AVNT (WR=58.3%, PnL=$0.09, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE USUAL (WR=80.0%, AvgPnL=1.21%, Trades=5)
+- PROMOTE STX (WR=80.0%, AvgPnL=1.36%, Trades=5)
+- PROMOTE GRASS (WR=60.0%, AvgPnL=0.57%, Trades=5)
+
+Final set: ['BABY', 'BIGTIME', 'CHIP', 'DOGE', 'DYDX', 'FIL', 'GMT', 'GRASS', 'HBAR', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'SEI', 'STX', 'SYRUP', 'USUAL', 'ZRO']
+
+## LOSERS Update — 2026-08-30 06:05 UTC
+- ADD AVNT (WR=58.3%, PnL=$0.09, low_wr (58.3%))
+
+Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'CFX', 'COMP', 'ENA', 'ENS', 'ETH', 'HBAR', 'HYPE', 'ICP', 'IMX', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI']
+
+## [2026-08-30 07:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L)
+**PnL:** -$0.08 (0% WR) — ONDO SHORT -$0.08 SL hit, ADA SHORT $0.00 breakeven
+
+**24h:** 37T 62%WR +$0.27
+**Hourly trend:** 2 consecutive negative hours (-$0.16) — normal variance after 7h positive streak
+
+**Close reason (24h):**
+- atr_sl_hit 36T (97.8%) avg +$0.008 — trailing SL working
+- cascade_flip 1T avg -$0.020
+
+**Signal breakdown (24h):**
+- bb-bounce-short: 20T 65%WR +$0.21 — workhorse
+- macd-div-: 3T 33%WR -$0.13 — bleeding, below kill threshold
+- confluence-,ichimoku-: 3T 33%WR -$0.20 — bleeding, below kill threshold
+
+**Open:** 4 SHORT (KAS -24%, MET +5%, SAND +5%, GMT +9%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal at 0% WR with 3+T last hour
+- Trade freq 1.5/hr normal
+- 24h still positive at +$0.27
+- atr_sl_hit trailing SL working correctly
+- 2 neg hours is normal variance, not a trend
+
+**Open Questions:**
+- KAS SHORT -24% unrealized — trailing SL will manage
+- macd-div- and confluence-,ichimoku- weak but tiny sample (3T each 24h)
+
+## [2026-08-30 07:10 UTC] Daily Orchestrator Run
+
+**Pipeline:** Healthy (cycle #177464). 4 open | 38 closed today | +6.71% PnL
+**Market:** ALL NEUTRAL (105 tokens, 0 trending)
+**24h:** 37T 62%WR +$0.27
+**Open:** 4 SHORT (KAS -24%, MET +5%, SAND +5%, GMT +9%)
+**Health:** 7 trades today 71.4% WR +$0.036
+**Signal reporter:** No kills needed. bb-bounce-short dominant (19T 68.4% WR +$0.29)
+**Auto-1hr:** No changes. 24h +$0.27. ATR_SL trailing 97.8% hit rate.
+**ATR_SL:** Trailing working. MIN_GAP=2.0 filtering weak entries.
+**Disk:** 78%
+**System:** Green, nothing broken. Signal starvation (market neutral).
+**10th delegation to signal_analyst:** STILL PENDING.
+**Changes:** None. System healthy, no implementation tasks.
+**CURRENT.md:** Updated with latest state. Trimmed stale entries.
