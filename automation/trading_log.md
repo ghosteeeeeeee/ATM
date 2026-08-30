@@ -18055,3 +18055,71 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 **Open Questions:**
 - FOGO LONG -27.6% unrealized — trailing SL will manage
 - macd-div- and confluence-,ichimoku- weak but sample too small to kill
+
+## [2026-08-30 09:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.07 (100% WR) — STX SHORT ichimoku-,r2-trend-short3 atr_sl_hit
+
+**24h:** 38T 57.9%WR +$0.18
+**7d:** 432T 51.4%WR -$2.24 (today 10T 60%WR +$0.04)
+
+**Close reason (24h):**
+- atr_sl_hit 37T 97.4% avg +$0.005 — trailing SL working
+- cascade_flip 1T avg -$0.020
+
+**Signal (24h):**
+- bb-bounce-short: 20T 60%WR +$0.07 — workhorse
+- macd-div-: 3T 33%WR -$0.13 — weak but tiny
+- confluence-,ichimoku-: 3T 33%WR -$0.20 — weak but tiny
+- Multi-signal combos all profitable
+
+**Open:** 4 (FOGO LONG -55.2%, YGG SHORT +64.1%, SAND SHORT -16.1%, GMT SHORT +24.5%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0% WR with 3+T last hour (only 1T last hour)
+- Trade freq 1/hr normal
+- 24h still positive at +$0.18
+- atr_sl_hit trailing SL working (97.4% hit rate, avg +$0.005)
+- Weak signals too small sample to kill
+
+**Open Questions:**
+- FOGO LONG -55.2% — trailing SL should manage
+- macd-div- and confluence-,ichimoku- weak but sample too small
+
+## [2026-08-30 10:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed last 2h (2W 1L) +$0.11
+**24h:** 40T 62.5% WR +$0.22
+
+**Close reason (24h):**
+- atr_sl_hit 39T 97.5% avg +$0.006 — trailing SL ideal
+- cascade_flip 1T avg -$0.020
+
+**Signal (24h):**
+- bb-bounce-short: 20T 60%WR +$0.07 — workhorse
+- Multi-signal combos profitable
+- macd-div- and confluence-,ichimoku- weak (3T each, 33%WR) — tiny sample
+
+**Open (5):**
+- SAND SHORT: -0.79% (5x lev) — price 0.016% from SL, will trigger naturally
+- FOGO LONG: -0.46% (3x lev) — price 0.3% below SL
+- TURBO LONG: -0.10% — manageable
+- APT LONG: -0.02% — manageable
+- GMT SHORT: -0.03% — manageable
+
+**Hourly freq:** 1-3/hr — normal, no overtrading
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- 24h WR 62.5% +$0.22 — system healthy
+- No consecutive negative hours
+- atr_sl_hit trailing SL working (97.5% hit rate)
+- Trade freq normal (1-3/hr)
+
+**Open Questions:**
+- SAND SHORT SL about to trigger (0.016% away) — no action needed, will close naturally
