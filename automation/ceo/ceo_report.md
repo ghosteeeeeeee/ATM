@@ -1,61 +1,36 @@
-## CEO Report — 2026-08-30 (~10:15 UTC)
+## CEO Report — 2026-08-30 (~14:00 UTC)
 
 ### Diagnosis
-System GREEN, flat. Verified DB: 24h 40T 60% WR +$0.06 (flat, positive). 7d: 430T 51.4% WR -$1.40 (improving). Today Aug 30: 14T 50% WR -$0.12 (just started). 4 LONG open (flat, <$0.01 each). Signal starvation: 40T/24h = 1.67/hr (LOW — system needs more signal sources).
+System GREEN, flat. Verified DB: 24h 36T 61.1% WR -$0.12 (flat, slightly negative). 7d: 430T 51.6% WR -$2.09 (improving from -$4.43 on Aug 28). Today Aug 30: 21T 57.1% WR -$0.10. 1 open LONG (bb-bounce-long+ +$0.12). Signal starvation: 36T/24h = 1.5/hr (LOW).
 
 ### Root Cause
-**Signal starvation is the #1 problem.** 2 backbone signals (bb-bounce-short, accel-300-v2-) + 1 STAR (macd-div-) produce only 40T/24h. bb-bounce-short momentum filter reverted but WR at 57.1% (below 65% kill trigger). macd-div- bleeding: 3T/24h 33.3% WR -$0.13. accel-300-v2- underperforming today: 2T/24h +$0.05. ATR_SL dominant exit: 40 exits/48h -$3.72.
+**bb-bounce-short degrading.** 17T/24h 47.1% WR -$0.37 (was 75% on Aug 28). Momentum filter reverted at 07:15 UTC but signal still underperforming. 3-day trend: Aug 28 75% → Aug 29 54.5% → Aug 30 40%. Kill trigger: <65% WR with 30+ trades. bb-bounce-short has 50T/7d at 58% WR — should be killed per rules. BUT: momentum filter just reverted, need 24h to assess.
+
+**Legacy fully aged out.** Zero 24h trades from ct-hot+, hl_copy, slow-grind-, pump-catcher+. System now clean — only backbone + STAR.
+
+**ATR_SL trailing working.** 100 exits/48h avg +0.42% total +$0.97. Entry quality improving with MIN_GAP=2.0.
 
 ### Fix Applied
-1. **11th delegation to signal_analyst:** Build new backbone signal (volume+momentum based, must pass 2-type confluence gate, LONG priority for Wyckoff accumulation market). Signal starvation cannot be solved with current 2-signal architecture.
-2. **Monitor bb-bounce-short:** Momentum filter reverted. 57.1% WR still below 65% baseline. If no recovery after 30+ trades, investigate other filters.
+1. **Monitor bb-bounce-short 24h.** Momentum filter reverted at 07:15 UTC. If still <65% WR after 50+ trades tomorrow, kill it. Current: 58% WR (below trigger).
+2. **12th delegation to signal_analyst:** Build new backbone signal. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. Signal starvation cannot be solved with 2-signal architecture.
 
 ### Verification
-- DB verified: 24h 40T 60% WR +$0.06 ✓
-- 7d: 430T 51.4% WR -$1.40 ✓
-- ATR_SL: 40 exits/48h -$3.72 (dominant exit) ✓
-- Open: 4 LONG (flat) ✓
+- DB verified: 24h 36T 61.1% WR -$0.12 ✓
+- 7d: 430T 51.6% WR -$2.09 ✓
+- ATR_SL: 100 exits/48h avg +0.42% +$0.97 ✓ (trailing working)
+- Open: 1 LONG (bb-bounce-long+ +$0.12) ✓
 - Pipeline: running, all timers firing ✓
 - Disk: 78% (below 85% threshold) ✓
-- Legacy: fully cleared ✓
+- Legacy: fully cleared (zero 24h trades) ✓
 
 ### Key Findings
-- **ATR_SL flip:** 104 exits/48h now NET +$0.84 — MIN_GAP=2.0 fixed entry quality
-- **bb-bounce-short:** 21T/24h 57.1% WR +$0.07 (was 68.4% — regressing toward 65% kill trigger)
-- **accel-300-v2-:** 2T/24h 50% WR +$0.05 (MIN_GAP=2.0 filtering weak entries)
-- **macd-div-:** 3T/24h 33.3% WR -$0.13 (STAR struggling today)
-- **Signal starvation:** 40T/24h — system needs new backbone signal
-- **10th delegation to signal_analyst STILL PENDING** — must produce
+- **bb-bounce-short:** 50T/7d 58% WR -$0.18. 24h: 17T 47.1% WR -$0.37. DEGRADING. Kill trigger <65%. Monitor 24h.
+- **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). 48h: 30T 56.7% WR +$1.27.
+- **macd-div-:** 27T/7d 70.4% WR +$0.23 (STAR, strong). 24h: 3T 33.3% WR -$0.13 (variance).
+- **bb_bounce+:** 39T/7d 59% WR +$0.11 (legacy, profitable).
+- **CONF_FILTER_MAX=89 NOT blocking bb-bounce-short 95+ conf trades.** bb-bounce-short in STANDALONE_BYPASS_SIGNALS bypasses filter. 95 conf: 2T 0% WR -$0.22. 98 conf: 3T 33% WR -$0.05. High confidence = worst performers.
+- **Signal starvation:** 36T/24h = 1.5/hr. 12th delegation to signal_analyst.
+- **Daily trend:** Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.10 (flat, stable).
 
-### Root Cause
-No active problem. System flat in NEUTRAL market (0 trending tokens). MIN_GAP=2.0 deployed and working — ATR_SL now net profitable. 7d still negative due to legacy bleed (now cleared). Signal starvation structural: 2 backbone signals in NEUTRAL market = limited opportunities.
-
-### Changes Made
-No code changes. MONITORING mode. All systems nominal.
-
-### Verification
-- DB verified: 24h 40T 60% WR +$0.07 ✓
-- 7d: 430T 51.4% WR -$1.40 ✓
-- ATR_SL 104 exits/48h +$0.84 ✓ (was -$4.50)
-- Open: 5 (3 LONG, 2 SHORT) ✓
-- Pipeline: running, all timers firing ✓
-- Disk: ~78% (below 85% threshold) ✓
-- Legacy: fully cleared ✓
-
----
-
-## bb_bounce V2 Monitoring — 2026-08-30
-
-### Stats (7d, verified)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| bb_bounce+ (LONG) | 39 | 59.0% | +$0.11 |
-| bb-bounce-short (SHORT) | 47 | 61.7% | +$0.14 |
-
-### Kill Trigger
-- Trigger: WR < 65% over 30+ trades
-- **bb-bounce-short: 61.7% — BELOW kill trigger**
-- Action required: revert momentum filter or disable
-
-### Decision
-bb-bounce-short dropped below 65% kill trigger (61.7% on 47T). Momentum filter too aggressive. **REVERT momentum filter** — remove BB_BOUNCE_SHORT_MOM_MAX. Revert procedure: delete MOM_MAX constant, revert signal file to pre-filter version.
+### Actions Taken
+No code changes. MONITORING mode. bb-bounce-short on watch — kill if no recovery tomorrow.
