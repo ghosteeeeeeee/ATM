@@ -1,5 +1,34 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-30 22:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L) +$0.07 (ZRO +$0.06, ETC +$0.15, GRASS -$0.14)
+**24h:** 36T 55.6%WR -$0.38 (flat, slightly negative)
+**Open:** 0 positions
+
+**Close reason (24h):** atr_sl_hit 36T 100% avg -$0.011 (trailing SL working perfectly — tiny losses)
+
+**Signal (24h):** macd-div- 2T 0W -$0.27 (below kill threshold). bb-bounce-short 12T 50%WR -$0.18 (biggest volume, marginal). Confluence combos mixed. Multi-signal combos positive.
+
+**Hourly trend (12h):** +$0.04 → +$0.01 → -$0.15 → +$0.12 → +$0.08 → -$0.28 → -$0.10 → +$0.03 → -$0.21 → +$0.01 → +$0.05 → +$0.07. **3 consecutive positive hours (19-21 UTC) +$0.13.**
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- Trade freq ~2/hr normal
+- 3 consecutive positive hours — healthy recovery
+- atr_sl_hit 100% but avg loss only -$0.011 — trailing SL doing its job
+- 0 open positions — clean slate
+- macd-div- 2T 0W below kill threshold (needs 3+T)
+- bb-bounce-short 12T 50%WR -$0.18 marginal but not kill-worthy
+
+**Open Questions:**
+- bb-bounce-short 12T 50%WR -$0.18 over 24h — not kill-worthy but watch if degrades further.
+- macd-div- 2T 0W — one more loss triggers kill threshold.
+
+---
+
 ## [2026-08-30 17:05 UTC] Hourly Analysis
 
 **Trades:** 1 closed (0W 1L) -$0.10 (APT ichimoku-,rs-r82 atr_sl_hit)

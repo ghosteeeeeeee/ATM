@@ -1993,6 +1993,21 @@ VOLUME_BREAKOUT_MOMENTUM_BARS = 3      # bars for price momentum
 VOLUME_BREAKOUT_RSI_PERIOD = 14        # RSI period
 VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 
+# ── Range Reversion Signal ─────────────────────────────────────────────────────
+# range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
+# Family: Range (pairs with Momentum/Trend for 2-type confluence)
+# NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
+RANGE_REVERSION_ENABLED = False          # master toggle — SHADOW MODE (not enabled yet)
+RANGE_REVERSION_PLUS_ENABLED = True      # LONG (buy at range bottom)
+RANGE_REVERSION_MINUS_ENABLED = True     # SHORT (sell at range top)
+RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed
+RANGE_REVERSION_BB_WIDTH_SQUEEZE = 0.025 # tight squeeze = higher confidence
+RANGE_REVERSION_TOUCH_ATR_MULT = 0.3    # price within 0.3*ATR of band = touch
+RANGE_REVERSION_RSI_OVERSOLD = 35        # LONG: RSI below this
+RANGE_REVERSION_RSI_OVERBOUGHT = 65      # SHORT: RSI above this
+RANGE_REVERSION_COOLDOWN_MINUTES = 45    # per token cooldown
+RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
+
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
 # ma_100_cross.py — Trend reversal at 100-period moving average
 # Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%

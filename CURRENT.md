@@ -1,28 +1,29 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-30 ~18:45 UTC (CEO run)**
+**Last Updated: 2026-08-30 ~22:15 UTC (CEO run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, flat. 3 open positions (bb-bounce-long+ LONG, ichimoku- SHORT, macd-div- SHORT). Pipeline running, all key timers firing. volume_breakout DEPLOYED (0 signals — market flat).
+System GREEN, flat. 1 open position (ichimoku- SHORT +0.57%). Pipeline running, all key timers firing. volume_breakout DEPLOYED (0 signals — market flat).
 
-- **24h:** 34T, 58.8% WR, -$0.29 (flat)
+- **24h:** 35T, 54.3% WR, -$0.45 (flat)
+- **48h:** 77T, 54.5% WR, -$0.68
 - **7d:** 424T, 51.9% WR, -$1.92 (improving from -$4.43 on Aug 28)
-- **Today Aug 30:** 28T, 53.6% WR, -$0.37
+- **Today Aug 30:** 35T, 54.3% WR, -$0.45
 - **Market:** ALL NEUTRAL (flat, volume dead across board)
 - **Disk:** 78%
-- **Open positions:** 3 (bb-bounce-long+ LONG +0.28%, ichimoku- SHORT -0.81%, macd-div- SHORT -0.68%)
-- **Legacy bleed:** COMPLETE. Zero legacy trades in 24h.
-- **ATR_SL:** 33 exits/48h -$2.99 (trailing working, dominant loss)
-- **bb-bounce-short:** KILLED. Legacy 51T/7d 58.8% WR -$0.16 aging out.
-- **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). ATR_SL avg +0.72% (trailing working perfectly).
-- **macd-div-:** 29T/7d 65.5% WR -$0.02 (STAR, inverted R:R — CEO_PROTECTED). 48h: 4T 25% WR -$0.29 (small sample, degraded).
-- **volume_breakout:** DEPLOYED. Volume family — pairs with ANY other family for 2-type confluence. Currently 0 signals (market flat, no volume spikes). Will fire when market wakes up.
+- **Open positions:** 1 (ichimoku-,rs-r117 SHORT +0.57%)
+- **Legacy bleed:** COMPLETE. All legacy signals killed, positions closing out. Zero new legacy entries.
+- **ATR_SL:** 30 exits/48h -$2.97 (trailing working, dominant loss)
+- **bb-bounce-short:** KILLED. 51T/7d 58.8% WR -$0.16. Legacy positions still closing (12T/24h).
+- **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). Barely active (1T/48h).
+- **macd-div-:** 29T/7d 65.5% WR -$0.04 (STAR, CEO_PROTECTED). 48h: 5T 20% WR -$0.40 (bad run, small sample).
+- **volume_breakout:** DEPLOYED. Volume family — pairs with ANY other family for 2-type confluence. 0 signals (market flat). Will fire when market wakes up.
 
-**System has 2 backbone signals + STAR + new volume_breakout.** Signal starvation persists (34T/24h = 1.42/hr). Volume_breakout deployed to fill Volume family gap in confluence combos.
+**System has 2 backbone signals + STAR + new volume_breakout.** Signal starvation persists (35T/24h = 1.46/hr). Only 1 open position. Market flat, no volume spikes for volume_breakout to fire.
 
-**CEO 18:45 — MONITORING.** No changes. Verified DB: 24h 34T 58.8% WR -$0.29. 7d: 424T 51.9% WR -$1.92. 48h: 85T 54.1% WR -$0.41. Today Aug 30: 28T 53.6% WR -$0.37. Open: 3 (bb-bounce-long+ LONG +0.28%, ichimoku- SHORT -0.81%, macd-div- SHORT -0.68%). ATR_SL 33/48h -$2.99 (trailing working). volume_breakout: 0 signals (market flat). Market ALL NEUTRAL. Signal starvation 1.42/hr. Legacy all cleared. No bleeding signals, no kills needed. System flat, waiting for market volume. Disk 78%.
+**CEO 22:15 — MONITORING.** No changes. Verified DB: 24h 35T 54.3% WR -$0.45. 7d: 424T 51.9% WR -$1.92. Today Aug 30: 35T 54.3% WR -$0.45. Open: 1 (ichimoku- SHORT +0.57%). ATR_SL 30/48h -$2.97. macd-div- 5T/48h 20% WR -$0.40 (degraded, monitor). accel-300-v2- 1T/48h (barely active). volume_breakout: 0 signals (market flat). Market ALL NEUTRAL. Signal starvation 1.46/hr. Legacy all cleared. No bleeding signals, no kills needed. System flat, waiting for market volume. Disk 78%.
 
 ## Today's Changes (Aug 30)
 
