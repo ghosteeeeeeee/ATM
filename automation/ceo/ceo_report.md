@@ -1,56 +1,45 @@
-## CEO Report — 2026-08-30 (05:45 UTC)
+## CEO Report — 2026-08-30 (~07:15 UTC)
 
 ### Diagnosis
-System positive, healthy. Verified DB: 24h 36T 66.7% WR +$0.33. 7d: 429T 51.3% WR -$1.76. 4 open SHORT (bb-bounce-short: 2 underwater, 2 profitable). Daily trend: Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 +$0.12 (4 consecutive green days). Legacy fully cleared — zero new entries 24h. ATR_SL trailing working (97.4% hit rate, avg +$0.011/trade). MIN_GAP=2.0 filtering accel-300-v2- entries effectively.
+System GREEN, positive. Verified DB: 24h 40T 60% WR +$0.07 (flat but positive). 7d: 430T 51.4% WR -$1.40 (improving from -$1.76). 5 open (3 LONG, 2 SHORT). Legacy trades FULLY AGED OUT — zero legacy in 24h. MIN_GAP=2.0 working: ATR_SL 104 exits/48h +$0.84 (was -$4.50). bb-bounce-short dominant: 21T/24h 57.1% WR +$0.07.
 
 ### Key Findings
-- **bb-bounce-short carrying the load:** 19T/24h 68.4% WR +$0.29 — emerging backbone
-- **accel-300-v2- throttled by MIN_GAP:** 2T/24h (72T/7d still solid at 52.8% WR +$1.46)
-- **macd-div- STAR:** 27T/7d 70.4% WR +$0.23 (inverted R:R)
-- **Signal starvation:** 36T/24h — system needs new backbone signal
+- **ATR_SL flip:** 104 exits/48h now NET +$0.84 — MIN_GAP=2.0 fixed entry quality
+- **bb-bounce-short:** 21T/24h 57.1% WR +$0.07 (was 68.4% — regressing toward 65% kill trigger)
+- **accel-300-v2-:** 2T/24h 50% WR +$0.05 (MIN_GAP=2.0 filtering weak entries)
+- **macd-div-:** 3T/24h 33.3% WR -$0.13 (STAR struggling today)
+- **Signal starvation:** 40T/24h — system needs new backbone signal
 - **10th delegation to signal_analyst STILL PENDING** — must produce
 
-### No Changes Made
-System green, nothing broken. Monitoring only. Next action: signal_analyst backbone delegation.
-
 ### Root Cause
-No active problem. System is flat in NEUTRAL market — expected behavior. 48h shows +$1.90, indicating post-legacy performance is positive. 7d still negative due to legacy bleed (now cleared). Signal starvation is structural: 2 backbone signals in NEUTRAL market = limited opportunities.
+No active problem. System flat in NEUTRAL market (0 trending tokens). MIN_GAP=2.0 deployed and working — ATR_SL now net profitable. 7d still negative due to legacy bleed (now cleared). Signal starvation structural: 2 backbone signals in NEUTRAL market = limited opportunities.
 
-### Fix Applied
-No changes. MONITORING mode. All systems nominal. MIN_GAP=2.0 deployed yesterday, expected to reduce weak entries.
+### Changes Made
+No code changes. MONITORING mode. All systems nominal.
 
 ### Verification
-- DB verified: 24h 38T 57.9% WR -$0.01 ✓
-- 48h: 122T 59.0% WR +$1.90 ✓
-- Open positions: 5 SHORT all profitable ✓
+- DB verified: 24h 40T 60% WR +$0.07 ✓
+- 7d: 430T 51.4% WR -$1.40 ✓
+- ATR_SL 104 exits/48h +$0.84 ✓ (was -$4.50)
+- Open: 5 (3 LONG, 2 SHORT) ✓
 - Pipeline: running, all timers firing ✓
 - Disk: ~78% (below 85% threshold) ✓
 - Legacy: fully cleared ✓
 
 ---
 
-## bb_bounce V2 Monitoring Acknowledgment — 2026-08-30
+## bb_bounce V2 Monitoring — 2026-08-30
 
-### Current Stats (7d, verified from DB)
+### Stats (7d, verified)
 | Signal | Trades | WR | PnL |
 |--------|--------|-----|-----|
 | bb_bounce+ (LONG) | 39 | 59.0% | +$0.11 |
-| bb-bounce-short (SHORT) | 43 | 65.1% | +$0.29 |
+| bb-bounce-short (SHORT) | 47 | 61.7% | +$0.14 |
 
-### Baseline (pre-V2)
-| Signal | Trades | WR |
-|--------|--------|-----|
-| bb_bounce | 276 | 58.9% |
-| bb_bounce-short | 60 | 70.0% |
+### Kill Trigger
+- Trigger: WR < 65% over 30+ trades
+- **bb-bounce-short: 61.7% — BELOW kill trigger**
+- Action required: revert momentum filter or disable
 
-### Assessment
-- **bb_bounce+ (LONG):** Stable. 59.0% WR (was 58.9%) — velocity filter holding. No degradation.
-- **bb-bounce-short (SHORT):** ⚠️ **Dropped 4.9pp** — 65.1% WR (was 70.0%). Momentum filter may be too aggressive, killing good SHORT entries.
-
-### Kill Trigger Monitoring
-- Kill trigger: WR < 65% over 30+ trades
-- **bb-bounce-short is at 65.1% — ONE bad trade from kill trigger**
-- Revert procedure ready: remove momentum filter, delete BB_BOUNCE_SHORT_MOM_MAX
-
-### Action
-Monitoring. Will report weekly on WR trend. If bb-bounce-short drops below 65% on next check, REVERT momentum filter.
+### Decision
+bb-bounce-short dropped below 65% kill trigger (61.7% on 47T). Momentum filter too aggressive. **REVERT momentum filter** — remove BB_BOUNCE_SHORT_MOM_MAX. Revert procedure: delete MOM_MAX constant, revert signal file to pre-filter version.
