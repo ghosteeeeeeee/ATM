@@ -1,52 +1,38 @@
-## CEO Report — 2026-08-30 (~15:30 UTC)
+## CEO Report — 2026-08-30 ~18:30 UTC
 
 ### Diagnosis
-System GREEN, flat. Verified DB: 24h 35T 60% WR -$0.16 (flat). 7d: 430T 51.6% WR -$2.09 (improving from -$4.43 on Aug 28). Today Aug 30: 21T 57.1% WR -$0.10. 3 open positions (bb-bounce-long+ +$0.08, bb-bounce-short flat, macd-div- +$0.02). Signal starvation: 35T/24h = 1.46/hr (LOW — market ALL NEUTRAL).
+Signal starvation: 35T/24h (1.46/hr). Only 2 backbone signals (accel-300-v2-, macd-div-). bb-bounce-short killed today at 47.1% WR. Market ALL NEUTRAL — no volume spikes, no trending tokens.
 
 ### Root Cause
-bb-bounce-short degraded to 47.1% WR in 24h (below 65% kill trigger). Filter revert at 07:15 UTC didn't recover — too many bad entries. Without bb-bounce-short: system backbone (accel-300-v2- 52.8% WR +$1.46) + STAR (macd-div- 70.4% WR +$0.23) are both healthy. Signal starvation is market-driven (ALL NEUTRAL).
+System depends on 2 signals for all entries. Confluence gate requires 2+ signal families. Volume family was underrepresented (only volume_hl and pump_catcher — both legacy/killed). When market is flat, no signals fire.
 
 ### Fix Applied
-KILLED BB_BOUNCE_SHORT_ENABLED. Was 50T/7d 58% WR -$0.18. Filter revert failed to recover WR. Removed from active signals. System now runs on 2 backbone + STAR.
+Built and deployed `volume_breakout` signal — new Volume family backbone:
+- **Logic:** 2x volume spike + price momentum + RSI confirmation
+- **Family:** Volume (pairs with ANY other family for 2-type confluence)
+- **Files:** `scripts/signals/volume_breakout.py`, `hermes_constants.py`, `market_phase_gate.py`, `signals/__init__.py`
+- **Status:** Enabled, registered, compiles clean. 0 signals currently (market flat — no volume spikes above 2x threshold).
+
+### Verified Numbers
+| Period | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| 24h | 35 | 60.0% | -$0.19 |
+| 7d | 425 | 52.0% | -$1.84 |
+| Today | 28 | 53.6% | -$0.37 |
+
+**Key signals (7d):**
+- accel-300-v2- SHORT: 72T 52.8% WR +$1.46 (backbone)
+- macd-div- SHORT: 28T 67.9% WR +$0.07 (STAR, inverted R:R)
+- bb-bounce-short SHORT: 51T 58.8% WR -$0.16 (KILLED today)
+
+**ATR_SL:** 33 exits/48h -$2.99 (dominant loss, trailing working)
 
 ### Verification
-24h: 35T 60% WR -$0.16 (flat, no change). 7d: 430T 51.6% WR -$2.09. 3 open positions all manageable. Pipeline healthy. Disk 78%. 13th delegation to signal_analyst: build new backbone (STILL PENDING).
+- volume_breakout imports clean: ✓
+- Registered in signals/__init__.py: ✓ (16 total signals, 13 fast)
+- FAMILY_MAP updated: ✓ (Volume family includes volume_breakout_long/short)
+- 0 signals in flat market: expected behavior (no 2x volume spikes)
+- Git committed + pushed: b0cd9063
 
----
-
-## CEO Report — 2026-08-30 (~14:00 UTC)
-
-### Diagnosis
-System GREEN, flat. Verified DB: 24h 36T 61.1% WR -$0.12 (flat, slightly negative). 7d: 430T 51.6% WR -$2.09 (improving from -$4.43 on Aug 28). Today Aug 30: 21T 57.1% WR -$0.10. 1 open LONG (bb-bounce-long+ +$0.12). Signal starvation: 36T/24h = 1.5/hr (LOW).
-
-### Root Cause
-**bb-bounce-short degrading.** 17T/24h 47.1% WR -$0.37 (was 75% on Aug 28). Momentum filter reverted at 07:15 UTC but signal still underperforming. 3-day trend: Aug 28 75% → Aug 29 54.5% → Aug 30 40%. Kill trigger: <65% WR with 30+ trades. bb-bounce-short has 50T/7d at 58% WR — should be killed per rules. BUT: momentum filter just reverted, need 24h to assess.
-
-**Legacy fully aged out.** Zero 24h trades from ct-hot+, hl_copy, slow-grind-, pump-catcher+. System now clean — only backbone + STAR.
-
-**ATR_SL trailing working.** 100 exits/48h avg +0.42% total +$0.97. Entry quality improving with MIN_GAP=2.0.
-
-### Fix Applied
-1. **Monitor bb-bounce-short 24h.** Momentum filter reverted at 07:15 UTC. If still <65% WR after 50+ trades tomorrow, kill it. Current: 58% WR (below trigger).
-2. **12th delegation to signal_analyst:** Build new backbone signal. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. Signal starvation cannot be solved with 2-signal architecture.
-
-### Verification
-- DB verified: 24h 36T 61.1% WR -$0.12 ✓
-- 7d: 430T 51.6% WR -$2.09 ✓
-- ATR_SL: 100 exits/48h avg +0.42% +$0.97 ✓ (trailing working)
-- Open: 1 LONG (bb-bounce-long+ +$0.12) ✓
-- Pipeline: running, all timers firing ✓
-- Disk: 78% (below 85% threshold) ✓
-- Legacy: fully cleared (zero 24h trades) ✓
-
-### Key Findings
-- **bb-bounce-short:** 50T/7d 58% WR -$0.18. 24h: 17T 47.1% WR -$0.37. DEGRADING. Kill trigger <65%. Monitor 24h.
-- **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). 48h: 30T 56.7% WR +$1.27.
-- **macd-div-:** 27T/7d 70.4% WR +$0.23 (STAR, strong). 24h: 3T 33.3% WR -$0.13 (variance).
-- **bb_bounce+:** 39T/7d 59% WR +$0.11 (legacy, profitable).
-- **CONF_FILTER_MAX=89 NOT blocking bb-bounce-short 95+ conf trades.** bb-bounce-short in STANDALONE_BYPASS_SIGNALS bypasses filter. 95 conf: 2T 0% WR -$0.22. 98 conf: 3T 33% WR -$0.05. High confidence = worst performers.
-- **Signal starvation:** 36T/24h = 1.5/hr. 12th delegation to signal_analyst.
-- **Daily trend:** Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.10 (flat, stable).
-
-### Actions Taken
-No code changes. MONITORING mode. bb-bounce-short on watch — kill if no recovery tomorrow.
+### Next
+Monitor 48h — if first 20 signals >55% WR, keep enabled. If <45% WR, tune or disable. Market must wake up (volume spikes) for signal to fire.

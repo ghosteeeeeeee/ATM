@@ -1,28 +1,28 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-30 ~18:30 UTC (CEO run)**
+**Last Updated: 2026-08-30 ~18:45 UTC (CEO run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, flat. 2 open positions (bb-bounce-long+ LONG, ichimoku- SHORT). Pipeline running, all key timers firing. NEW SIGNAL DEPLOYED: volume_breakout (Volume family).
+System GREEN, flat. 3 open positions (bb-bounce-long+ LONG, ichimoku- SHORT, macd-div- SHORT). Pipeline running, all key timers firing. volume_breakout DEPLOYED (0 signals — market flat).
 
-- **24h:** 35T, 60% WR, -$0.19 (flat, slightly negative)
-- **7d:** 425T, 52% WR, -$1.84 (improving from -$4.43 on Aug 28)
+- **24h:** 34T, 58.8% WR, -$0.29 (flat)
+- **7d:** 424T, 51.9% WR, -$1.92 (improving from -$4.43 on Aug 28)
 - **Today Aug 30:** 28T, 53.6% WR, -$0.37
 - **Market:** ALL NEUTRAL (flat, volume dead across board)
 - **Disk:** 78%
-- **Open positions:** 2 (bb-bounce-long+ LONG, ichimoku- SHORT)
+- **Open positions:** 3 (bb-bounce-long+ LONG +0.28%, ichimoku- SHORT -0.81%, macd-div- SHORT -0.68%)
 - **Legacy bleed:** COMPLETE. Zero legacy trades in 24h.
 - **ATR_SL:** 33 exits/48h -$2.99 (trailing working, dominant loss)
-- **bb-bounce-short:** KILLED 47.1% WR 24h (below 65% kill trigger). Filter revert at 07:15 didn't recover.
+- **bb-bounce-short:** KILLED. Legacy 51T/7d 58.8% WR -$0.16 aging out.
 - **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). ATR_SL avg +0.72% (trailing working perfectly).
-- **macd-div-:** 28T/7d 67.9% WR +$0.07 (STAR, inverted R:R — CEO_PROTECTED)
+- **macd-div-:** 29T/7d 65.5% WR -$0.02 (STAR, inverted R:R — CEO_PROTECTED). 48h: 4T 25% WR -$0.29 (small sample, degraded).
 - **volume_breakout:** DEPLOYED. Volume family — pairs with ANY other family for 2-type confluence. Currently 0 signals (market flat, no volume spikes). Will fire when market wakes up.
 
-**System has 2 backbone signals + STAR + new volume_breakout.** Signal starvation persists (35T/24h = 1.46/hr). Volume_breakout deployed to fill Volume family gap in confluence combos.
+**System has 2 backbone signals + STAR + new volume_breakout.** Signal starvation persists (34T/24h = 1.42/hr). Volume_breakout deployed to fill Volume family gap in confluence combos.
 
-**CEO 18:30 — ACTION.** Built and deployed volume_breakout signal (NEW). Verified DB: 24h 35T 60% WR -$0.19. 7d: 425T 52% WR -$1.84. Today Aug 30: 28T 53.6% WR -$0.37. ROOT CAUSE of signal starvation: only 2 backbone signals, NEUTRAL market kills most entries. FIX: built volume_breakout — Volume family signal that pairs with ANY other family for confluence. Fires on 2x volume spike + price momentum + RSI confirmation. Currently 0 signals (market flat, no volume spikes above 2x threshold). Expected: fires when market wakes up, contributes Volume family to confluence combos. Files: scripts/signals/volume_breakout.py, hermes_constants.py (VOLUME_BREAKOUT_ENABLED=True), market_phase_gate.py (FAMILY_MAP), signals/__init__.py (registry). 2 open. Disk 78%.
+**CEO 18:45 — MONITORING.** No changes. Verified DB: 24h 34T 58.8% WR -$0.29. 7d: 424T 51.9% WR -$1.92. 48h: 85T 54.1% WR -$0.41. Today Aug 30: 28T 53.6% WR -$0.37. Open: 3 (bb-bounce-long+ LONG +0.28%, ichimoku- SHORT -0.81%, macd-div- SHORT -0.68%). ATR_SL 33/48h -$2.99 (trailing working). volume_breakout: 0 signals (market flat). Market ALL NEUTRAL. Signal starvation 1.42/hr. Legacy all cleared. No bleeding signals, no kills needed. System flat, waiting for market volume. Disk 78%.
 
 ## Today's Changes (Aug 30)
 
