@@ -1,5 +1,29 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-30 15:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) +$0.08 (APT bb-bounce-long+,rs-s54 atr_sl_hit)
+**24h:** 34T 58.8%WR +$0.11 (flat)
+**Last 3h:** 6T 5W 1L +$0.05 (recovering from 12:00 dip)
+
+**Close reason (24h):** atr_sl_hit 33T 97% avg +$0.004 (trailing SL working perfectly). 1 cascade_flip -$0.02.
+
+**Signal (24h):** bb-bounce-short 15T 53%WR -$0.18 (weakest, 44% of trades). macd-div- 3T 33%WR -$0.13. Confluence combos mixed. Multi-signal combos positive.
+
+**Open (3):** ETC SHORT +$0.05 (+41.6%), TURBO LONG -$0.03 (-29.8%), JUP SHORT -$0.01 (-8.8%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- Trade freq ~1.4/hr normal
+- No consecutive negative hours
+- atr_sl_hit 97% trailing SL working perfectly
+- All 3 open positions manageable
+
+**Open Questions:**
+- bb-bounce-short 15T -$0.18 over 24h — not kill-worthy (53%WR) but weakest signal. Monitor.
+
 ## [2026-08-29 20:05 UTC] Hourly Analysis
 
 **Trades:** 1 closed (1W, 0L) — **+$0.07**
