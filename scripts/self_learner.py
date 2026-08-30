@@ -100,7 +100,7 @@ PARAM_CONFIG = {
     
     # ── Exit Parameters (global — affect all signals) ────────────────────
     'ATR_SL_MIN': {'min': 0.008, 'max': 0.025, 'step': 0.002, 'tighten': 'down'},
-    'ATR_SL_MAX': {'min': 0.020, 'max': 0.050, 'step': 0.005, 'tighten': 'up'},
+    'ATR_SL_MAX': {'min': 0.008, 'max': 0.050, 'step': 0.005, 'tighten': 'up'},
     'ATR_TP_MIN': {'min': 0.005, 'max': 0.015, 'step': 0.001, 'tighten': 'up'},
     'ATR_TP_MAX': {'min': 0.015, 'max': 0.040, 'step': 0.005, 'tighten': 'up'},
     'PM_TRAIL_ACTIVATE_PCT': {'min': 0.003, 'max': 0.008, 'step': 0.001, 'tighten': 'down'},

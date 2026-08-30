@@ -616,7 +616,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.008   # 0.8% floor — CEO Aug 26: simulation shows 0.8% SL = +$1.86 vs -$27.80 at 1.2%. Tighter SL = smaller losses. Monitor: atr_sl_hit %, avg loss, WR. REVERT if WR drops >5pp.
-ATR_SL_MAX             = 0.015  # 1.5% cap — CEO Aug 26: tightened from 3.0%. Max loss now bounded at 1.5%. Monitor: ATR_SL hit count, avg loss.
+ATR_SL_MAX             = 0.010  # 1.0% cap — tightened from 1.5%. Max loss now bounded at 1.0%. Monitor: ATR_SL hit count, avg loss.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.
@@ -631,12 +631,12 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.008  # 0.8% — CEO Aug 26. MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.015  # 1.5% — CEO Aug 26. MUST match ATR_SL_MAX
+ATR_SL_MAX_INIT    = 0.010  # 1.0% — MUST match ATR_SL_MAX
 SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable (matched to ATR_SL_MIN)
 TP_PCT_FALLBACK    = 0.030  # 3.0% fallback target (2:1 R:R with 1.5% SL)
 STOP_LOSS_DEFAULT  = 0.008  # 0.8% hard fallback (matched to ATR_SL_MIN)
 SL_PCT_MIN        = 0.008  # 0.8% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
-CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
+CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -1092,16 +1092,16 @@ PEAK_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/3), locking in lo
 # Trailing Loss: tracks worst point, cuts on recovery failure.
 CUT_LOSER_ENABLED      = True   # master switch
 
-# Tier 1: Quick Cut — -0.3% to -1.0%, fires frequently
+# Tier 1: Quick Cut — -1.0% to -2.0%, fires frequently
 CL_TIER1_MIN_PCT      = -2.0    # floor (don't cut deeper than this in T1)
 CL_TIER1_MAX_PCT      = -1.0    # ceiling (start cutting at -1.0%)
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 10   # don't touch bottom 10% worst losers
 CL_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}
 
-# Tier 2: Deep Cut — -1.0% to -3.0%, fires less frequently
+# Tier 2: Deep Cut — -1.5% to -5.0%, fires less frequently (ceiling above CUT_LOSER_PNL so Tier 2 has room)
 CL_TIER2_MIN_PCT      = -5.0    # floor
-CL_TIER2_MAX_PCT      = -2.0    # ceiling (T1 handles above this)
+CL_TIER2_MAX_PCT      = -1.5    # ceiling (T1 handles above this; must be > CUT_LOSER_PNL so Tier 2 isn't dead code)
 CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
 CL_TIER2_SKIP_BOTTOM_PCT = 20   # don't touch bottom 20% — let ATR SL handle catastrophic
 CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
