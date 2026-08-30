@@ -18123,3 +18123,23 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 
 **Open Questions:**
 - SAND SHORT SL about to trigger (0.016% away) — no action needed, will close naturally
+
+## [2026-08-30 13:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) +$0.04
+**24h:** 38T 57.9%WR -$0.15 (flat)
+**7-day:** 428T 51.9%WR -$1.47 (flat)
+
+**Close reason (24h):** atr_sl_hit 37T 97.4% avg -$0.004 (trailing SL working)
+**Signal (24h):** bb-bounce-short 19T -$0.04 (workhorse). confluence-,ichimoku- 3T 33%WR -$0.20, macd-div- 3T 0%WR -$0.13 (weakest, tiny samples).
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- Trade freq ~1.6/hr normal
+- No consecutive negative hours
+- atr_sl_hit trailing SL working (97.4%)
+- All 5 open positions manageable (APT +72%, KAS +31%, ATOM -60% but small $)
+
+**Open (5):** APT LONG +72%, KAS LONG +31%, FOGO LONG -9%, SEI SHORT -19%, ATOM SHORT -60%
