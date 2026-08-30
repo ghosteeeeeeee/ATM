@@ -243,7 +243,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
-    'AVNT',
     'BABY',
     'BIGTIME',
     'CHIP',
@@ -251,6 +250,7 @@ FAVORITES = {
     'DYDX',
     'FIL',
     'GMT',
+    'GRASS',
     'HBAR',
     'INJ',
     'LDO',
@@ -258,7 +258,9 @@ FAVORITES = {
     'NXPC',
     'SAND',
     'SEI',
+    'STX',
     'SYRUP',
+    'USUAL',
     'ZRO'
 }
 
@@ -278,6 +280,7 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 LOSERS = {
     'AIXBT',
     'ALT',
+    'AVNT',
     'BANANA',
     'BLUR',
     'BTC',
@@ -301,6 +304,7 @@ LOSERS = {
     'WLD',
     'WLFI'
 }
+
 
 
 
@@ -1917,7 +1921,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.4085 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.4728 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
@@ -2377,3 +2381,24 @@ AMPLITUDE_SL_MULT = {
 
 # Max acceptable portfolio loss per trade (leverage-adjusted)
 AMPLITUDE_MAX_PORTFOLIO_LOSS = 0.05    # 5% max portfolio loss per trade
+
+# Static token → amplitude class mapping (from 30-day 1h candle analysis, 2026-08-29)
+# Reclassify quarterly or when tokens show regime shifts
+TOKEN_AMP_CLASS = {
+    # LOW_AMP (<1.5%) — stable, signals reliable
+    'BTC': 'LOW_AMP', 'ETH': 'LOW_AMP',
+    # MED_AMP (1.5-2.5%) — standard volatility
+    'SOL': 'MED_AMP', 'LINK': 'MED_AMP', 'HYPE': 'MED_AMP', 'DOGE': 'MED_AMP',
+    'AAVE': 'MED_AMP', 'ONDO': 'MED_AMP', 'POPCAT': 'MED_AMP', 'KAS': 'MED_AMP',
+    'XRP': 'MED_AMP', 'AVAX': 'MED_AMP', 'DOT': 'MED_AMP', 'DYDX': 'MED_AMP',
+    'FIL': 'MED_AMP',
+    # HIGH_AMP (>2.5%) — volatile, signals less reliable
+    'ENA': 'HIGH_AMP', 'WIF': 'HIGH_AMP', 'ZRO': 'HIGH_AMP', 'TRUMP': 'HIGH_AMP',
+    'CRV': 'HIGH_AMP', 'WLD': 'HIGH_AMP', 'TURBO': 'HIGH_AMP', 'SPX': 'HIGH_AMP',
+    'SUI': 'HIGH_AMP', 'NEAR': 'HIGH_AMP', 'INJ': 'HIGH_AMP', 'FET': 'HIGH_AMP',
+    'UNI': 'HIGH_AMP', 'LDO': 'HIGH_AMP', 'ARB': 'HIGH_AMP',
+}
+
+def get_token_amp_class(token):
+    """Get amplitude class for a token. Returns 'MED_AMP' for unknown tokens (conservative default)."""
+    return TOKEN_AMP_CLASS.get(token.upper(), 'MED_AMP')
