@@ -17846,3 +17846,55 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 **Open Questions:**
 - accel-300-v2-short- (25%WR, 4T) weakest signal — monitor next hour
 - macd-div- (33%WR, 3T) second weakest — monitor
+
+## [2026-08-30 01:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L) — **+$0.10**
+- CRV bb-bounce-short SHORT atr_sl_hit +$0.10
+
+**24h:** 38T 55%WR +$0.18
+- atr_sl_hit 37T 97.4% of closes but avg +$0.005 — trailing SL working perfectly
+- bb-bounce-short 22T 59%WR +$0.25 — workhorse
+- accel-300-v2-short- 4T 25%WR -$0.14 — small sample, losing
+- macd-div- 3T 33%WR -$0.13 — small sample, losing
+
+**Open:** 4 SHORT (DYDX, DOT, DOGE, ADA all $11.10)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades last hour
+- Trade freq 0.5/hr very low, not overtrading
+- All signals within acceptable ranges despite small losing samples
+- System healthy
+
+---
+
+## [2026-08-30 03:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W, 0L) — **+$0.10**
+- DOT bb-bounce SHORT atr_sl_hit +$0.06
+- DYDX bb-bounce SHORT atr_sl_hit +$0.04
+
+**24h:** 38T 65.8%WR +$0.37
+- atr_sl_hit 37T (97.4%) avg +$0.011 — trailing SL capturing small wins, ideal
+- bb-bounce-short 23T 65.2%WR +$0.35 — dominant workhorse
+- accel-300-v2-short- 3T 33.3%WR -$0.05 — below kill threshold (needs 0% WR)
+- macd-div- 3T 33.3%WR -$0.13 — below kill threshold (needs 0% WR)
+
+**7-day:** 433T 51.3%WR -$2.11 (flat)
+
+**Open:** 2 SHORT — DOGE +42.42%, ADA +9.70%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+T last hour
+- Trade freq ~1.6/hr normal (well under 20/hr threshold)
+- 6 consecutive positive hours (since 21:00 UTC yesterday)
+- System healthy, trailing SL working perfectly
+- Weak signals (accel-300-v2-short-, macd-div-) below kill threshold
+
+**Open Questions:**
+- accel-300-v2-short- (33%WR, 3T/24h) and macd-div- (33%WR, 3T/24h) bleeding but not at kill threshold yet — monitor next hour
+- 7-day overall slightly negative (-$2.11) despite strong 24h — earlier losses being recovered

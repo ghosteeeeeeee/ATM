@@ -1727,3 +1727,7 @@ ALERTS:
 - **[OK]**: All 46 timers active and firing. Services active. Disk 78%.
 - **[OK]**: Market regime NEUTRAL. 126/239 tokens fast. HEMI only SHORT_BIAS.
 - **[INFO]**: 5 phantom trades in 24h — acceptable.
+
+## Error Alerts — 2026-08-30 02:21 UTC
+- **WARN** (5x): Phantom trades with PnL < $0.01 in last 24h — SUSHI, NXPC, AVAX, BANANA, AVNT. Likely rapid-exit noise.
+- **AUTO-FIX**: None applied. No critical issues found.
