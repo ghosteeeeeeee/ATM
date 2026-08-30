@@ -18284,3 +18284,23 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 
 **Open Questions:**
 - macd-div- at 2T 0%WR. One more loss = kill threshold. Monitor next hour.
+
+## [2026-08-30 21:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) -$0.09
+**24h:** 34T 53%WR -$0.59 (-$0.017/trade, near flat)
+**All exits:** 100% atr_sl_hit (trailing SL working)
+
+**Signal (24h):** macd-div- 2T 0%WR -$0.27 (watch, not kill — needs 3T). bb-bounce-short 12T 50%WR -$0.18 (workhorse). Combos 1T each.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal with 0%WR and 3+T last hour)
+- Trade freq 1.4/hr normal
+- No consecutive negative hours (alternating pattern)
+- atr_sl_hit 100% trailing SL working as designed
+- 2 open positions near breakeven (ZRO +$0.04, ETC +$0.16)
+
+**Open Questions:**
+- macd-div- at 2T 0%WR — one more loss = kill threshold. Monitor next hour.
