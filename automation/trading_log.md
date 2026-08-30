@@ -18143,3 +18143,22 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 - All 5 open positions manageable (APT +72%, KAS +31%, ATOM -60% but small $)
 
 **Open (5):** APT LONG +72%, KAS LONG +31%, FOGO LONG -9%, SEI SHORT -19%, ATOM SHORT -60%
+
+## [2026-08-30 14:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L) +$0.12 (BABY +$0.11, FOGO +$0.01)
+**24h:** 36T 50%WR -$0.12. atr_sl_hit 97.2% avg -$0.003 trailing SL working.
+**Signal (24h):** bb-bounce-short 17T 47%WR -$0.37 (weakest, biggest volume). macd-div- 3T -$0.13. Combos positive.
+**Open (2):** ETC SHORT +$0.00 (SL 0.44% away), APT LONG +$0.00 (SL 0.73% away).
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal with 0%WR and 3+T last hour)
+- Trade freq ~1.5/hr normal
+- No consecutive negative hours (last hour was +$0.12)
+- atr_sl_hit trailing SL working (97.2%)
+- Open positions manageable
+
+**Open Questions:**
+- bb-bounce-short is 47% of all trades but running -$0.37 over 24h. Monitor for continued degradation. Not kill-worthy yet (47%WR, not 0%).
