@@ -25,6 +25,7 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
     ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
     ICHIMOKU_ENABLED,
+    VOLUME_BREAKOUT_ENABLED,
 )
 
 
@@ -125,6 +126,11 @@ try:
 except Exception:
     _ichimoku_run = None
 
+try:
+    from signals.volume_breakout import run as _volume_breakout_run
+except Exception:
+    _volume_breakout_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -151,6 +157,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'accel_300_v2_long_5m',     'enabled': ACCEL_300_V2_LONG_5M_ENABLED,   'run': _accel_300_v2_long_5m_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
     {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
+    {'name': 'volume_breakout',           'enabled': 'VOLUME_BREAKOUT_ENABLED',     'run': _volume_breakout_run},
 ]
 
 

@@ -1,3 +1,7 @@
+[2026-08-30 17:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (APT SHORT -$0.10 ichimoku-,rs-r82 atr_sl_hit). 36T 24h 56%WR -$0.29 flat. atr_sl_hit 35T 97% avg -$0.004 trailing SL working perfectly. No kill candidates (0 signals 0%WR 3+T last hour). Trade freq ~1.4/hr normal. 3 open LONG (ETC/IO/ATOM all green). 2 consecutive neg hours (15-16 UTC) below 3h threshold. bb-bounce-short 16T 56%WR -$0.16 weakest but not kill-worthy. macd-div- 3T 33%WR -$0.17 small sample. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 18:05 UTC
 [2026-08-30 15:05 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (APT LONG +$0.08 atr_sl_hit). 34T 24h 58.8%WR +$0.11 flat. atr_sl_hit 33T 97% avg +$0.004 trailing SL ideal. No kill candidates (0T last hour from weak signals). Trade freq 1.4/hr normal. 3 open positions manageable (ETC SHORT +41.6%, TURBO LONG -29.8%, JUP SHORT -8.8%). No consecutive negative hours. bb-bounce-short 15T 53%WR -$0.18 weakest but not kill-worthy. System healthy.
   BY: auto_1hr
@@ -553,3 +557,11 @@
   WHY: 1T last hour (1W +$0.04 TURBO LONG atr_sl_hit). 38T 24h 57.9%WR -$0.15 flat. atr_sl_hit 97.4% avg -$0.004 trailing SL working. No kill candidates (0T last hour from weak signals). Trade freq ~1.6/hr normal. 5 open positions manageable. 7-day 428T 51.9%WR -$1.47 flat. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 14:05 UTC
+[2026-08-30 15:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.28). 35T 24h 54.3%WR -$0.05 near breakeven. atr_sl_hit 97.1% trailing SL working. No kill candidates (0 signals with 0%WR and 3+T last hour). Trade freq 2.1/hr normal. 5 open positions manageable. bb-bounce-short worst day (-$0.25) but 56%WR overall. Extreme PnL% on JUP/TURBO = tiny $11.10 positions.
+  BY: auto_1hr
+  NEXT: Re-run at 16:05 UTC
+[2026-08-30 17:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.03). 36T 24h 100% atr_sl_hit -$0.16 near flat. No kill candidates (0 signals with 0%WR and 3+T last hour). Trade freq 2/hr normal. No consecutive negative hours. 2 open positions manageable. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 18:05 UTC

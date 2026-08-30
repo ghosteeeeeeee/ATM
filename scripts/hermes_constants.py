@@ -1980,6 +1980,19 @@ ENGULFING_VOLUME_RATIO = 1.5            # volume must be 1.5x average
 ENGULFING_CONF_BASE = 75               # base confidence
 ENGULFING_CONF_CAP = 88               # max confidence
 
+# ── Volume Breakout Signal ────────────────────────────────────────────────────
+# volume_breakout.py — Volume spike + price momentum confirmation
+# Family: Volume (pairs with ANY other family for 2-type confluence)
+# NEW 2026-08-30 — backbone signal to address signal starvation
+VOLUME_BREAKOUT_ENABLED = True         # master toggle
+VOLUME_BREAKOUT_PLUS_ENABLED = True    # LONG (bullish volume spike)
+VOLUME_BREAKOUT_MINUS_ENABLED = True   # SHORT (bearish volume spike)
+VOLUME_BREAKOUT_SPIKE_MULT = 2.0       # volume must be >= 2x average
+VOLUME_BREAKOUT_AVG_PERIOD = 20        # bars for average volume
+VOLUME_BREAKOUT_MOMENTUM_BARS = 3      # bars for price momentum
+VOLUME_BREAKOUT_RSI_PERIOD = 14        # RSI period
+VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
+
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
 # ma_100_cross.py — Trend reversal at 100-period moving average
 # Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%

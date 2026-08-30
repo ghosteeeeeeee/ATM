@@ -1,206 +1,208 @@
-# Upgrade Audit Trail
+# Upgrade Audit — 2026-08-30
 
-**Created:** 2026-08-29 04:30 UTC
-**Method:** Scan plans/ directory, evaluate difficulty/value, implement Level 1 wins
+## Scan Summary
+
+- **Plans scanned:** 43
+- **Plans evaluated:** 20 (most recent/significant)
+- **Already implemented:** 12
+- **Partially implemented:** 4
+- **Not implemented:** 4 (all Level 2-4)
 
 ---
 
-## Plan Evaluations
+## IMPLEMENTED (VERIFIED)
 
-### 1. losers-list-spec.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Anti-favorites system — penalize underperforming coins with 0.5x score/size
+### 1. Losers List (losers-list-spec.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Auto-detect underperforming tokens, penalize with 0.5x score/size
 - **Difficulty:** Level 2
 - **Value:** HIGH
 - **Status:** ✅ IMPLEMENTED
-- **Reason:** losers_tracker.py exists, hermes_constants.py has LOSERS set + multipliers, signal_compactor.py uses LOSERS_MULT, decider_run.py uses LOSERS_SIZE_MULT. Systemd timer running (06:05 UTC).
+- **Evidence:** `losers_tracker.py` exists, LOSERS set in hermes_constants.py (line 280), integrated in signal_compactor.py (line 871), trades.html has 🗑️ icon (line 235), systemd timer exists
 
-### 2. 30s-price-interval-migration.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Split architecture — 30s price collection, 60s price_history for signals
+### 2. 30s Price Interval (30s-price-interval-migration.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Split architecture — 30s for exit management, 60s for signals
 - **Difficulty:** Level 1
 - **Value:** HIGH
 - **Status:** ✅ IMPLEMENTED
-- **Reason:** Plan status says "IMPLEMENTED". Minute-boundary quantization in signal_schema.py.
+- **Evidence:** Plan marked IMPLEMENTED, signal_schema.py quantizes to minute boundary
 
-### 3. wave-period-analysis-plan.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Wave period detection, classification, trade context analysis
-- **Difficulty:** Level 2
-- **Value:** MEDIUM
-- **Status:** ⏳ Phase 1 DONE
-- **Reason:** Scripts exist (wave_period_detector.py, wave_classifier.py, wave_trade_context.py). Phase 2 (validation + integration) pending.
-
-### 4. amplitude-enhancement-brainstorm.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Amplitude-based trading system — cache, dynamic SL/TP, position sizing, signals
-- **Difficulty:** Level 2-3
-- **Value:** HIGH
-- **Status:** ⏳ Phase 0-1 PARTIAL (Task 1: amplitude constants ✅, Task 2: amplitude multiplier ✅)
-- **Reason:** Constants defined, amplitude multiplier integrated into signal_compactor. Pending: amplitude cache, dynamic SL, position sizing, amplitude breakout signal.
-
-### 5. copy-trader-entry-timing-deep-dive.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Fix copy trader entry timing — filter entries after big moves
+### 3. BTC Crash Filter (btc-crash-filter-plan.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Multi-layer BTC crash detection (absolute, acceleration, volume spike, contagion)
 - **Difficulty:** Level 2
 - **Value:** HIGH
-- **Status:** ⏳ PENDING
-- **Reason:** Copy delay filter not implemented. Could improve WR from 56% → 72%.
-
-### 6. copy-trader-dashboard-enhancements.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Advanced analytics for copy trader dashboard
-- **Difficulty:** Level 2-3
-- **Value:** MEDIUM
-- **Status:** ⏳ Phase 2-4 PENDING
-- **Reason:** Phase 1 complete. Copy delay analysis, pro trade overlay, correlation pending.
-
-### 7. ponytail-full-audit.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Codebase cleanup — 33,765 lines of dead/duplicate code
-- **Difficulty:** Level 3
-- **Value:** MEDIUM
-- **Status:** ⏳ PENDING
-- **Reason:** 80 dead scripts, 47 dead registry entries, timer cleanup, function refactoring. Zero-risk deletions first.
-
-### 8. losers-list-spec.md (already counted)
 - **Status:** ✅ IMPLEMENTED
+- **Evidence:** `btc_crash_filter.py` exists (602 lines), all 4 layers active, integrated in decider_run.py and cut_loser.py
 
-### 9. fish-finder-species-census-2026-08-26.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Fish finder species classification
+### 4. Confidence Filter (conf-filter-plan.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Block trades with confidence >= 90 (worst performers)
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89 in hermes_constants.py (line 930-931), enforced in signal_compactor.py (line 752-753)
+
+### 5. ATR Spike Signal (atr-spike-signal-build.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Catch staged moves from ATR compression with quality gates
 - **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** ✅ BUILT (disabled per NEVER_REENABLED — 28.6% WR)
+- **Evidence:** `signals/atr_spike.py` exists (301 lines), ATR_SPIKE_ENABLED=False, in NEVER_REENABLE_FLAGS
+
+### 6. VORTEX_BREAK zombie signal
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Kill zombie signal consuming thread pool
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** VORTEX_BREAK_ENABLED=False (hermes_constants.py line 1955)
+
+### 7. Signal Registry Cleanup (ponytail-full-audit.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Prune 65 → ~18 dead signal entries
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** signals/__init__.py is 240 lines, 19 entries (pruned 2026-08-27)
+
+### 8. Zombie Files Deleted (ponytail-full-audit.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Delete ai_decider.py, signal_gen.py, hyperliquid-trader.py
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** All three files confirmed deleted
+
+### 9. PROFIT_MONSTER_BYPASS_SIGNALS (exit-mechanics-v2.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Fix backwards bypass list — proven signals to ATR, losing to PM Trail
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** Updated 2026-08-26 (hermes_constants.py line 1068-1083), ct-hot removed, bb_bounce+/confluence added
+
+### 10. Amplitude Compactor Mult (amplitude-enhancement-brainstorm.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Adjust signal confidence by amplitude class
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** AMPLITUDE_COMPACTOR_MULT in hermes_constants.py (line 2358), get_token_amp_class() (line 2402), used in signal_compactor.py (line 879-880)
+
+### 11. Self-Learner Expansion (automation-team-improvements.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Expand PARAM_CONFIG from 2 to 15+ parameters
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** self_learner.py PARAM_CONFIG has 21 parameters (lines 79-112), param_map covers 20+ signal types (lines 521-548)
+
+### 12. MAE Guard Re-enabled (mae-guard-multialt-spec.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Re-enable MAE guard with multi-alt divergence filter
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** ✅ IMPLEMENTED
+- **Evidence:** CL_MAE_GUARD_ENABLED=True (hermes_constants.py line 1124), widened to 3.0%
+
+---
+
+## PARTIALLY IMPLEMENTED
+
+### 13. Amplitude Enhancement (amplitude-enhancement-brainstorm.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Full amplitude-based trading system (cache, dynamic SL, position sizing, regime detection)
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** 🟡 PARTIAL
+- **Done:** AMPLITUDE_COMPACTOR_MULT, get_token_amp_class()
+- **NOT done:** amplitude_cache.py, dynamic SL based on amplitude, amplitude-based position sizing, amplitude regime detection
+- **Next:** amplitude_cache.py (foundation for all other amplitude features)
+
+### 14. Wave Period Analysis (wave-period-analysis-plan.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Validate wave period classification, multi-timeframe analysis, backtest strategies per bucket
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** 🟡 PARTIAL
+- **Done:** Scripts created (wave_period_detector.py, wave_trade_context.py, wave_classifier.py)
+- **NOT done:** Multi-timeframe validation, backtest per bucket, frequency change as signal
+
+### 15. Ponytail Audit Cleanup (ponytail-full-audit.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Delete dead scripts, shrink core functions, reduce timers
+- **Difficulty:** Level 1-3
+- **Value:** MEDIUM
+- **Status:** 🟡 PARTIAL
+- **Done:** 80 dead scripts deleted, zombie files deleted, registry cleaned
+- **NOT done:** Core function refactoring (add_signal Layer 2, run_compaction split, close_paper_position split), timer reduction (57→35), dead code blocks in position_manager.py/signal_schema.py
+
+### 16. OpenMemory Hebbian Bridge (automation-team-improvements.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Wire OpenMemory → Hebbian engine for conversation context learning
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** 🟡 NOT STARTED
+- **Next:** Create hebbian_openmemory_bridge.py
+
+---
+
+## NOT IMPLEMENTED (Level 2-4)
+
+### 17. Signal Regime Memory (spec-signal-regime-memory.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Persist regime at signal entry, regime-aware lifecycle (dormant state), resurrection
+- **Difficulty:** Level 3-4
+- **Value:** HIGH
+- **Status:** ❌ NOT IMPLEMENTED
+- **Why not done:** Requires schema changes (regime column in signals + signal_outcomes), new SQLite DB (signal_regime_perf.db), changes to 6+ files
+- **Recommendation:** Start with Phase 0 only (persist regime at entry) — immediate value without full system
+
+### 18. Guitar Tuning / param_matrix (spec-guitar-tuning.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Signal × regime parameter tuning matrix with hierarchical fallback
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** ❌ NOT IMPLEMENTED
+- **Why not done:** Requires param_matrix SQLite table, regime capture infrastructure, integration with self_learner + signal_compactor
+- **Recommendation:** Defer until regime column is added to signal_outcomes (prerequisite)
+
+### 19. Exit Owner Model (exit-mechanics-ownership.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** One exit owner per trade (ATR vs PM Trail), no conflicts
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** ❌ NOT IMPLEMENTED (partially addressed by PROFIT_MONSTER_BYPASS_SIGNALS update)
+- **Why not done:** Would require exit_owner column in trades table, changes to position_manager.py
+- **Recommendation:** Current bypass list approach is sufficient — defer full model
+
+### 20. A/B Learner Cleanup (automation-team-improvements.md)
+- **Date scanned:** 2026-08-30 18:00
+- **Core request:** Delete defunct A/B learner
+- **Difficulty:** Level 1
 - **Value:** LOW
-- **Status:** ⏳ PENDING
-- **Reason:** Not read yet, but name suggests niche feature.
-
-### 10. btc-crash-filter-plan.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** BTC crash filter to protect positions
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** ✅ IMPLEMENTED
-- **Reason:** btc_crash_filter.py has 5-layer detection (dynamic threshold, volume spike, multi-asset contagion, acceleration, position protection). ATR-scaled thresholds in hermes_constants.py.
-
-### 11. cascade-crash-analysis-2026-08-23.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Cascade crash analysis and prevention
-- **Difficulty:** Level 3
-- **Value:** HIGH
-- **Status:** ⏳ PENDING
-- **Reason:** Architecture-level crash protection.
-
-### 12. confidence-calibration-plan.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Calibrate signal confidence scores
-- **Difficulty:** Level 2
-- **Value:** MEDIUM
-- **Status:** ⏳ PENDING
-- **Reason:** Confidence calibration improves signal quality.
-
-### 13. exit-mechanics-ownership.md / exit-mechanics-v2.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Exit mechanics improvements
-- **Difficulty:** Level 2-3
-- **Value:** HIGH
-- **Status:** ✅ IMPLEMENTED
-- **Reason:** PROFIT_MONSTER_BYPASS_SIGNALS already updated (2026-08-26). bb_bounce+, confluence added to bypass. ct-hot+ removed from bypass. cut_loser.py uses same list.
-
-### 14. favorites-daily-update-spec.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Daily favorites update automation
-- **Difficulty:** Level 2
-- **Value:** MEDIUM
-- **Status:** ✅ IMPLEMENTED
-- **Reason:** favorites_updater.py exists and runs daily.
-
-### 15. regime-transition-analysis-2026-08-24.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Regime transition detection and response
-- **Difficulty:** Level 3
-- **Value:** HIGH
-- **Status:** ⏳ PENDING
-- **Reason:** Regime detection is critical for strategy switching.
-
-### 16. signal-confluence-spec.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Signal confluence system
-- **Difficulty:** Level 3
-- **Value:** HIGH
-- **Status:** ✅ IMPLEMENTED
-- **Reason:** signal_confluence.py exists, registered in signals/__init__.py, constants in hermes_constants.py, source weights in signal_compactor.py. LIVE.
-
-### 17. atr-sl-widen.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Widen ATR-based stop losses
-- **Difficulty:** Level 1
-- **Value:** MEDIUM
-- **Status:** ✅ IMPLEMENTED (partially) — MAE guard widened to 3.0%, ATR SL kept as-is per verification
-- **Reason:** Independent verification showed ATR SL widening NOT beneficial. MAE guard widened from 1.5% to 3.0% (done 2026-08-26). ATR SL params unchanged (correct — net positive already).
-
-### 18. sl-tuning.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** Stop loss tuning
-- **Difficulty:** Level 1
-- **Value:** MEDIUM
-- **Status:** ✅ ALREADY OPTIMAL — current params (ATR<0.05%, 0.3%, 5x) are best per backtest
-- **Reason:** Backtest showed current params produce best WR (83%) and total PnL (+74.4%). Tighter thresholds reduce signals without quality improvement.
-
-### 19. r2-trend-long-trailing-sl-tuning.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** R2 trend long trailing SL tuning
-- **Difficulty:** Level 1
-- **Value:** LOW
-- **Status:** ⏳ SKIPPED — signal is DEAD (NEVER_REENABLED)
-- **Reason:** Signal permanently disabled, tuning params is pointless.
-
-### 20. imx-spike-detection.md
-- **Date scanned:** 2026-08-29 04:30
-- **Core request:** IMX spike detection signal
-- **Difficulty:** Level 2
-- **Value:** MEDIUM
-- **Status:** ⏳ PENDING
-- **Reason:** New signal for specific token.
+- **Status:** 🟡 PARTIAL — script deleted, config file (ab_tests.json) remains
 
 ---
 
-## Implementation Log
+## Level 1 Quick Wins Still Available
 
-### Task 1: Amplitude Class Constants (Level 1)
-- **Started:** 2026-08-29 04:35
-- **Completed:** 2026-08-29 04:40
-- **Plan:** amplitude-enhancement-brainstorm.md
-- **What:** Add amplitude class thresholds and multipliers to hermes_constants.py
-- **Why:** Foundation for amplitude-aware trading. wave_classifier.py uses local thresholds — need system-wide constants.
-- **Files changed:**
-  - `hermes_constants.py` — Added AMP_CLASS_LOW_MAX, AMP_CLASS_MED_MAX, AMPLITUDE_COMPACTOR_MULT, AMPLITUDE_SIZE_MULT, AMPLITUDE_SL_MULT, AMPLITUDE_MAX_PORTFOLIO_LOSS (~30 lines)
-  - `wave_classifier.py` — Updated to import and use constants instead of hardcoded 1.5/2.5 thresholds
-- **Status:** ✅ DONE
-- **Verified:** Python import succeeds, syntax OK
-
-### Task 2: Amplitude Multiplier Integration (Level 1)
-- **Started:** 2026-08-30 04:00
-- **Completed:** 2026-08-30 04:10
-- **Plan:** amplitude-enhancement-brainstorm.md (Idea 3: Amplitude-Weighted Signal Compactor)
-- **What:** Integrate amplitude class multiplier into signal_compactor scoring. HIGH_AMP tokens (ZRO, TRUMP, WIF) get 0.85x confidence penalty. LOW_AMP (BTC, ETH) get 1.10x boost.
-- **Why:** HIGH_AMP tokens are more volatile — signals are less reliable. Dynamic penalty improves signal quality ranking.
-- **Files changed:**
-  - `hermes_constants.py` — Added TOKEN_AMP_CLASS dict (30 tokens mapped) + get_token_amp_class() helper (~25 lines)
-  - `signal_compactor.py` — Imported AMPLITUDE_COMPACTOR_MULT + get_token_amp_class, added amplitude_mult to scoring function, added to final_score calculation (~4 lines)
-- **Status:** ✅ DONE
-- **Verified:** Syntax OK, imports work, get_token_amp_class returns correct classes
-- **Impact:** Signals for HIGH_AMP tokens (ZRO, TRUMP, WIF, etc.) now get 15% confidence penalty. Signals for LOW_AMP (BTC, ETH) get 10% boost. Unknown tokens default to MED_AMP (neutral).
+| Task | Effort | Value | Status |
+|------|--------|-------|--------|
+| Delete ab_tests.json | 1 min | LOW | Ready |
+| Timer reduction (57→35) | 30 min | MEDIUM | Needs analysis |
+| Dead code blocks in position_manager.py | 30 min | LOW | Needs verification |
 
 ---
 
-## Summary
+## Decision Log
 
-| Metric | Count |
-|--------|-------|
-| Plans scanned | 20 |
-| Already implemented | 5 (losers-list, 30s-migration, favorites-update, exit-mechanics-v2, signal-confluence) |
-| Level 1 (Easy) | 2 implemented (amplitude constants, amplitude integration) |
-| Level 2 (Medium) | 10 candidates |
-| Level 3 (Hard) | 4 candidates |
-| Level 4 (Epic) | 0 |
-| Skipped (dead signal) | 1 (r2-trend-long-trailing-sl) |
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-08-30 | Scanned 43 plans, evaluated 20 | Most recent/significant plans |
+| 2026-08-30 | 12 fully implemented, 4 partial, 4 not implemented | System has evolved significantly |
+| 2026-08-30 | No Level 1 wins available for immediate implementation | All easy tasks already done |
+| 2026-08-30 | Next priority: amplitude_cache.py (Level 2) | Foundation for amplitude-based features |

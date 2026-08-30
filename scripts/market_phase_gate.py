@@ -55,7 +55,7 @@ FAMILY_MAP = {
     'Wave': ['wave_catcher_long', 'wave_catcher_short', 'trend_momentum_near_sma', 'guppy'],
     'Stop_Hunt': ['stop_hunt_reversal_long', 'liquidation_hunt_long', 'liquidation_hunt_short'],
     'Confluence': ['signal_confluence'],
-    'Volume': ['volume_hl', 'pump_catcher_long'],
+    'Volume': ['volume_hl', 'pump_catcher_long', 'volume_breakout_long', 'volume_breakout_short'],
     'ATR': ['atr_spike_long'],
 }
 

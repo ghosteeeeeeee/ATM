@@ -1752,3 +1752,8 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (2644s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (2582s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (2521s left, N failures)`
+
+## Error Alerts — 2026-08-30 18:21 UTC
+- **WARN** (1x): `hermes-hl-sync-guardian.timer` last ran 2 days ago — enabled but stale
+- **WARN** (1x): `hermes-hl-copy.timer` last ran 2 weeks ago — enabled but stale
+- **AUTO-FIX**: None applied — timers need manual investigation (may be intentionally disabled)

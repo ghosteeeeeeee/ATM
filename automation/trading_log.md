@@ -1,5 +1,29 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-30 17:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) -$0.10 (APT ichimoku-,rs-r82 atr_sl_hit)
+**24h:** 36T 56%WR -$0.29 (flat/slightly negative)
+**Today:** 26T 54%WR -$0.40
+
+**Close reason (24h):** atr_sl_hit 35T 97% avg -$0.004 (trailing SL working). 1 cascade_flip -$0.02.
+
+**Signal (24h):** bb-bounce-short 16T 56%WR -$0.16 (weakest, 44% of trades). macd-div- 3T 33%WR -$0.17. Confluence combos mixed. Multi-signal combos positive.
+
+**Open (3):** ETC LONG +0.53%, IO LONG +185.37%, ATOM LONG +42.40%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- Trade freq ~1.4/hr normal
+- Only 2 consecutive negative hours (15:00, 16:00) — below 3h threshold
+- atr_sl_hit 97% trailing SL working perfectly
+- All 3 open positions green
+
+**Open Questions:**
+- bb-bounce-short 16T -$0.16 over 24h — not kill-worthy (56%WR) but weakest signal. Monitor.
+
 ## [2026-08-30 15:05 UTC] Hourly Analysis
 
 **Trades:** 1 closed (1W 0L) +$0.08 (APT bb-bounce-long+,rs-s54 atr_sl_hit)
@@ -18186,3 +18210,36 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 
 **Open Questions:**
 - bb-bounce-short is 47% of all trades but running -$0.37 over 24h. Monitor for continued degradation. Not kill-worthy yet (47%WR, not 0%).
+
+## [2026-08-30 15:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L) -$0.28
+**24h:** 35T 54.3%WR -$0.05 (near breakeven)
+**Signal (24h):** bb-bounce-short 16T 56%WR -$0.16 (workhorse, today -$0.25 worst day). macd-div- 3T -$0.17. Combos positive.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals with 0%WR and 3+T last hour)
+- Trade freq 2.1/hr normal
+- atr_sl_hit 97.1% trailing SL working
+- Extreme PnL% on JUP/TURBO = tiny $11.10 positions, not bugs
+- 5 open positions manageable
+
+**Open Questions:**
+- bb-bounce-short worst day in 7 days (-$0.25). Monitor but not kill-worthy (56% WR).
+
+## [2026-08-30 17:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) +$0.03
+**24h:** 36T 100% atr_sl_hit -$0.16 (near flat, avg -$0.004/trade)
+**Signal (24h):** bb-bounce-short 16T -$0.16 (workhorse). macd-div- 2T -$0.15 (tiny sample). All others single trades.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal with 0%WR and 3+T last hour)
+- Trade freq 2/hr normal
+- No consecutive negative hours
+- atr_sl_hit 100% trailing SL working as designed
+- 2 open positions manageable (APT SHORT -$0.04, ATOM LONG +$0.02)
