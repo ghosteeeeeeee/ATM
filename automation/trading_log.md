@@ -18243,3 +18243,44 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 - No consecutive negative hours
 - atr_sl_hit 100% trailing SL working as designed
 - 2 open positions manageable (APT SHORT -$0.04, ATOM LONG +$0.02)
+
+## [2026-08-30 18:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L) -$0.21
+**24h:** 33T 100% atr_sl_hit -$0.43 (-$0.013/trade, near flat)
+**Signal (24h):** bb-bounce-short 13T 53.8%WR -$0.11 (workhorse). macd-div- 3T 33%WR -$0.26 (weakest). Combos positive.
+**Hourly (6h):** 13:00 +$0.12 | 14:00 +$0.08 | 15:00 -$0.28 | 16:00 -$0.10 | 17:00 +$0.03 | 18:00 -$0.21
+**7-day:** 423T 51.8%WR -$2.20 (flat)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (macd-div- has 3T last hour, needs 0%WR + 3T — it's at 33%WR)
+- Trade freq 1.5/hr normal
+- No consecutive negative hours
+- atr_sl_hit 100% trailing SL working as designed
+- 1 open position (ATOM LONG +$0.00, SL 0.39% away)
+
+**Open Questions:**
+- macd-div- at 33%WR with 3 trades in 24h. Close to kill threshold but not there yet.
+- bb-bounce-short at 53.8%WR is healthy. Day's losses are small ($-0.11).
+
+## [2026-08-30 20:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed in 19:00 hour (1W +$0.01)
+**24h:** 33T 54.5%WR -$0.43 (near flat, avg -$0.013/trade)
+**Signal (24h):** bb-bounce-short 13T 53.8%WR -$0.11 (workhorse). macd-div- 2T 0%WR -$0.27 (weakest). Combos positive.
+**Hourly (6h):** 14:00 +$0.08 | 15:00 -$0.28 | 16:00 -$0.10 | 17:00 +$0.03 | 18:00 -$0.21 | 19:00 +$0.01
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (macd-div- has 2T 0%WR — needs 3T minimum)
+- Trade freq 1.4/hr normal
+- No consecutive negative hours (alternating W/L pattern)
+- atr_sl_hit dominant close reason — trailing SL working as designed
+- 3 open positions near breakeven (GRASS +$0.00, APT -$0.03, ETC -$0.01)
+- 19 distinct signals in 24h — healthy diversity
+
+**Open Questions:**
+- macd-div- at 2T 0%WR. One more loss = kill threshold. Monitor next hour.

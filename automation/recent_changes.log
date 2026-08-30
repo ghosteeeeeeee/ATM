@@ -565,3 +565,11 @@
   WHY: 2T last hour (1W 1L +$0.03). 36T 24h 100% atr_sl_hit -$0.16 near flat. No kill candidates (0 signals with 0%WR and 3+T last hour). Trade freq 2/hr normal. No consecutive negative hours. 2 open positions manageable. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 18:05 UTC
+[2026-08-30 18:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.21 all atr_sl_hit). 33T 24h 100% atr_sl_hit -$0.43 near flat. No kill candidates (macd-div- 3T 33%WR, not 0%WR). Trade freq 1.5/hr normal. No consecutive negative hours. 1 open position (ATOM LONG +$0.00). 7-day 423T 51.8%WR -$2.20 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 19:05 UTC
+[2026-08-30 20:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.01 ATOM bb-bounce-long+ atr_sl_hit). 33T 24h 54.5%WR -$0.43 near flat. No kill candidates (macd-div- 2T 0%WR, needs 3T). Trade freq 1.4/hr normal. No consecutive negative hours. 3 open positions near breakeven. 7-day 423T 51.8%WR -$2.20 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 21:05 UTC
