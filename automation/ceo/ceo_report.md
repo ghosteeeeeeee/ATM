@@ -16,3 +16,31 @@ No changes. MONITORING mode. All systems nominal. MIN_GAP=2.0 deployed yesterday
 - Pipeline: running, all timers firing ✓
 - Disk: ~78% (below 85% threshold) ✓
 - Legacy: fully cleared ✓
+
+---
+
+## bb_bounce V2 Monitoring Acknowledgment — 2026-08-30
+
+### Current Stats (7d, verified from DB)
+| Signal | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| bb_bounce+ (LONG) | 39 | 59.0% | +$0.11 |
+| bb-bounce-short (SHORT) | 43 | 65.1% | +$0.29 |
+
+### Baseline (pre-V2)
+| Signal | Trades | WR |
+|--------|--------|-----|
+| bb_bounce | 276 | 58.9% |
+| bb_bounce-short | 60 | 70.0% |
+
+### Assessment
+- **bb_bounce+ (LONG):** Stable. 59.0% WR (was 58.9%) — velocity filter holding. No degradation.
+- **bb-bounce-short (SHORT):** ⚠️ **Dropped 4.9pp** — 65.1% WR (was 70.0%). Momentum filter may be too aggressive, killing good SHORT entries.
+
+### Kill Trigger Monitoring
+- Kill trigger: WR < 65% over 30+ trades
+- **bb-bounce-short is at 65.1% — ONE bad trade from kill trigger**
+- Revert procedure ready: remove momentum filter, delete BB_BOUNCE_SHORT_MOM_MAX
+
+### Action
+Monitoring. Will report weekly on WR trend. If bb-bounce-short drops below 65% on next check, REVERT momentum filter.
