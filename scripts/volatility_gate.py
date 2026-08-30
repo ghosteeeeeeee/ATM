@@ -52,6 +52,7 @@ REGIME_SIGNALS = {
         # Trend following + mean reversion in steady markets
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'accel-300-v2-long',  # V2 LONG momentum
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
         'bb-bounce-short',  # standalone SHORT bounce signal
@@ -84,6 +85,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'accel-300-v2-long',  # V2 LONG momentum
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'bb-bounce-short',  # standalone SHORT bounce signal
@@ -115,6 +117,7 @@ REGIME_SIGNALS = {
         'mover+', 'mover-',  # momentum spike detector
         'bb_bounce',
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'accel-300-v2-long',  # V2 LONG momentum
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
