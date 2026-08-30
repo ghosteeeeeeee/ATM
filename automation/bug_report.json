@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-29 21:12:48",
+  "timestamp": "2026-08-30 05:12:49",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "80 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "83 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },

@@ -17929,3 +17929,34 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 
 **Open Questions:**
 - macd-div- (33%WR, -$0.13/24h) and accel-300-v2-short- (33%WR, -$0.05/24h) bleeding but not at kill threshold — continue monitoring
+
+## [2026-08-30 05:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet 5am UTC)
+**24h:** 35T 69%WR +$0.34
+**6h:** 6T 83%WR +$0.20
+
+**Close reason (24h):**
+- atr_sl_hit 34T (97.1%) avg +$0.011 — trailing SL capturing wins, ideal
+- cascade_flip 1T avg -$0.020
+
+**Signal breakdown (24h):**
+- bb-bounce-short: 19T 68%WR +$0.29 — workhorse
+- macd-div-: 3T 33%WR -$0.13 — bleeding, below kill threshold
+- confluence-,ichimoku-: 3T 33%WR -$0.19 — bleeding, below kill threshold
+- accel-300-v2-short-: 2T 50%WR +$0.05 — improved
+
+**Open:** 3 SHORT (ONDO -74%, KAS -24%, ADA -6%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades last hour
+- Trade freq ~1.5/hr normal
+- 6 consecutive profitable hours
+- atr_sl_hit working perfectly (avg +$0.011)
+- System healthy
+
+**Open Questions:**
+- ONDO SHORT at -74% unrealized — trailing SL should manage, monitor next hour
+- macd-div- (33%WR) and confluence-,ichimoku- (33%WR) weak but below kill threshold

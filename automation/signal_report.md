@@ -1,24 +1,47 @@
-=== Signal Performance Report ===
-Generated: 2026-08-29 23:08 UTC | Period: Last 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-08-30 05:08 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed)
-None — no signal meets all kill criteria (WR<30%, 5+ trades, PnL<-$0.10, active>24h).
+## Overall Stats
+- **24h trades:** 35 closed | **WR:** 68.6% | **PnL:** +$0.33
+- **6h trades:** 5 closed | **WR:** 100% | **PnL:** +$0.19
+- **Open trades:** 3 (all SHORT, all bb-bounce-short variants)
+- **Inversions:** None
 
-## BOOSTED (executed)
-None — no signal has WR>55% with 5+ trades AND positive PnL in 24h that isn't already enabled.
+---
 
-## LOSERS (watch list — 24h)
-| Signal | Dir | WR | PnL | Trades | All-time WR | Status |
-|--------|-----|-----|-----|--------|-------------|--------|
-| accel-300-v2-short- | SHORT | 25.0% | -$0.14 | 4 | 25.0% (4t) | WATCH — 1 trade from kill threshold, active <24h |
-| macd-div- | SHORT | 33.3% | -$0.13 | 3 | 70.4% (27t) | NOISE — 3 trades only, all-time is 70.4% |
-| bb-bounce-short | SHORT | 50.0% | -$0.11 | 22 | 61.5% (39t) | NOISE — normal variance, 50% on 22t is fine |
+## WINNERS (WR > 55%, PnL > 0)
 
-## WINNERS (24h)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-short | SHORT | 75.0% | +$0.02 | 4 (6h) | Performing well last 6h |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| bb-bounce-short | SHORT | 4 | 100.0% | +0.27 | 19 | 68.4% | +0.29 | ENABLED — dominant signal, 15 tokens, 100% WR on 10 tokens |
+| bb-bounce-short,ichimoku- | SHORT | - | - | - | 2 | 100.0% | +0.06 | ENABLED |
+| bb-bounce-short,confluence-,ichimoku- | SHORT | - | - | - | 2 | 100.0% | +0.07 | ENABLED |
+| ichimoku-,rs-r84 | SHORT | 1 | 100.0% | +0.03 | - | - | - | ENABLED |
+
+---
+
+## LOSERS (WR < 30%, PnL < -$0.10, 5+ trades)
+
+None meet strict kill criteria.
+
+---
+
+## MARGINAL (30-50% WR, watch list)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| confluence-,ichimoku- | SHORT | 3 | 33.3% | -0.20 | WATCH | 3 trades only, needs more data before kill |
+| macd-div- | SHORT | 3 | 33.3% | -0.13 | WATCH | 3 trades only, needs more data before kill |
+| accel-300-v2-short- | SHORT | 2 | 50.0% | +0.05 | OK | Marginal |
+
+---
 
 ## ISSUES
-- None. No signal inversions detected (0 in 24h).
-- All flagged signals (BB_BOUNCE_SHORT, MACD_DIVERGENCE, ACCEL_300_V2) are enabled and performing within normal variance.
+- No inversions detected
+- No kills executed (no signals meet 5+ trades + WR<30% + PnL<-$0.10 threshold)
+- System healthy: 68.6% WR, +$0.33 PnL (24h)
+- `bb-bounce-short` continues to be the workhorse signal — dominant across 15 tokens
+
+## ACTIONS TAKEN
+- None — all signals within acceptable parameters
+- Monitoring `confluence-,ichimoku-` and `macd-div-` (33.3% WR, borderline)
