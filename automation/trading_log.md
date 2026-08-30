@@ -17737,3 +17737,112 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 
 **Open Questions:**
 - CRV SHORT at -44.20% and ADA SHORT at -34.59% — large unrealized losses, trailing SL should be protecting
+
+## [2026-08-29 22:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**PnL:** $0.00 (no activity)
+
+**24h:** 44T 48%WR -$0.22
+- atr_sl_hit 43T 97.7% avg -$0.005 (trailing SL near breakeven)
+- cascade_flip_-0.24% 1T -$0.02
+
+**Hourly trend (6h):** +0.02, +0.06, +0.01, +0.07 → 4 consecutive positive hours
+
+**Open:** 5 — KAS SHORT +90.37%, DOGE SHORT +35.27%, ADA SHORT -7.47%, DOT SHORT -14.12%, CRV SHORT -25.73%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (no 0%WR signals with 3+T last hour)
+- Trade freq normal (~1.8/hr)
+- 4 consecutive positive hours
+- 7-day flat — within noise
+- All positions managed by trailing SL
+
+**Open Questions:**
+- accel-300-v2-short- and macd-div- worst 24h performers but still within noise thresholds
+- CRV SHORT -25.73% largest unrealized loss but managed by trailing SL
+
+## [2026-08-29 23:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period since 20:42 UTC)
+**PnL:** $0.00 (no activity)
+
+**24h:** 39T 48%WR -$0.28
+- atr_sl_hit 38T 97.4% avg -$0.007 (trailing SL near breakeven)
+- cascade_flip_-0.24% 1T -$0.02
+
+**Hourly trend (6h):** +0.02, +0.06, +0.01, +0.07 → 4 consecutive positive hours
+
+**Open:** 5 — KAS SHORT +82.12%, DOGE SHORT +24.26%, DOT SHORT -69.76%, CRV SHORT -42.88%, ADA SHORT -15.28%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (0T last hour from any signal)
+- Trade freq normal (~1.6/hr)
+- 4 consecutive positive hours
+- 7-day 435T 51%WR -$1.79 flat — within noise
+- All open positions managed by trailing SL
+
+**Open Questions:**
+- accel-300-v2-short- (25%WR, 4T) and macd-div- (33%WR, 3T) weakest signals but below kill threshold
+- DOT SHORT -69.76% largest unrealized loss but managed by trailing SL
+- 2.5hr quiet period with no closes — normal for late UTC hours
+
+## [2026-08-30 00:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (KAS SHORT +$0.07, bb-bounce-short)
+**PnL:** $0.07 (100% WR)
+
+**24h:** 38T 51%WR +$0.01 — breakeven
+- atr_sl_hit 37T avg $0.000 (trailing SL working correctly)
+- cascade_flip 1T -$0.02
+
+**Signal performance (24h):**
+- bb-bounce-short: 22T 54.5%WR +$0.06 (primary signal, healthy)
+- accel-300-v2-short-: 4T 25%WR -$0.14 (weakest, below kill threshold)
+- macd-div-: 3T 33.3%WR -$0.13 (weak, below kill threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (no 0%WR signals with 3+T last hour)
+- Trade freq ~1.6/hr normal
+- 7-day 434T 51.2%WR -$1.73 flat
+- All 5 open positions managed by trailing SL
+- atr_sl_hit avg $0.000 = trailing SL correctly trailing to breakeven
+
+**Open Questions:**
+- accel-300-v2-short- and macd-div- continue to lose money but sample size too small for action
+- CRV SHORT -28.04% and ADA SHORT -28.87% largest unrealized losses but trailing SL active
+
+## [2026-08-30 01:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (late UTC quiet period)
+**PnL:** $0.00
+
+**24h:** 38T 50%WR +$0.01
+- atr_sl_hit 37T avg $0.000 (trailing SL at breakeven — ideal)
+- cascade_flip 1T -$0.02
+
+**Signal performance (24h):**
+- bb-bounce-short: 22T 54.5%WR +$0.06 (primary, healthy)
+- accel-300-v2-short-: 4T 25%WR -$0.14 (weak but below kill threshold)
+- macd-div-: 3T 33.3%WR -$0.13 (weak but below kill threshold)
+
+**Open:** 5 — DOT SHORT +55.76%, DOGE SHORT +22.62%, DYDX SHORT +5.51%, CRV SHORT -9.90%, ADA SHORT -10.45%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (no 0%WR signals with 3+T last hour)
+- Trade freq ~1.6/hr normal
+- 4 consecutive positive hours
+- 7-day 435T 51%WR -$1.79 flat
+- All open positions managed by trailing SL
+
+**Open Questions:**
+- accel-300-v2-short- (25%WR, 4T) weakest signal — monitor next hour
+- macd-div- (33%WR, 3T) second weakest — monitor

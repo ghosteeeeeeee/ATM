@@ -1,31 +1,32 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-29 ~19:00 UTC (CEO run — 292nd run)**
+**Last Updated: 2026-08-30 ~02:00 UTC (CEO run — 293rd run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, flat. Legacy fully cleared. 5 open positions. Pipeline running, all key timers firing.
+System GREEN, flat. Legacy fully cleared. 5 open positions (all profitable SHORT). Pipeline running, all key timers firing.
 
-- **24h:** 45T, 57.8% WR, -$0.20 (flat)
-- **7d:** 438T, 50.7% WR, -$2.04
-- **Today (Aug 29):** 37T, 56.8% WR, -$0.08 (flat)
-- **Daily trend:** Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.08
-- **Market:** NEUTRAL dominant (1 LONG, 0 SHORT, 105 NEUTRAL)
-- **Disk:** 78%
-- **Open positions:** 5 (4 bb-bounce-short SHORT, 1 ichimoku- SHORT)
+- **24h:** 38T, 50% WR, +$0.01 (flat)
+- **7d:** 435T, 51% WR, -$1.79 (flat)
+- **Today (Aug 29):** 38T, 50% WR, -$0.01 (flat)
+- **Daily trend:** Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.01
+- **Market:** NEUTRAL dominant
+- **Disk:** ~78%
+- **Open positions:** 5 SHORT all profitable (ADA +0.32%, CRV +0.53%, DOGE +0.39%, DOT +0.71%, DYDX +0.40%)
 - **Legacy bleed:** FULLY CLEARED. All legacy trades aged out.
-- **Without legacy:** System near breakeven. 24h -$0.20.
+- **Without legacy:** System near breakeven.
 - **STAR signal:** macd-div- SHORT 27T/7d 70.4% WR +$0.23 (inverted R:R)
-- **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse), bb-bounce-short SHORT 39T/7d 61.5% WR +$0.02 (emerging)
-- **ATR_SL insight:** ATR_SL 49 exits/48h -$4.50 dominant. Entry quality bottleneck — raised ACCEL_300_V2_SHORT_MIN_GAP 1.0→2.0 to filter weak entries.
+- **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse), bb-bounce-short SHORT 40T/7d 62.5% WR +$0.09 (emerging)
+- **ATR_SL:** Trailing working — 97.5% hit rate, avg -$0.007/trade (near breakeven). MIN_GAP=2.0 active.
 
-**System has 2 backbone signals + STAR.** 9th DELEGATION to signal_analyst: build new backbone (pending).
+**System has 2 backbone signals + STAR.** 10th DELEGATION to signal_analyst: build new backbone (pending).
 
-**CEO 19:00 — ACTION.** Raised ACCEL_300_V2_SHORT_MIN_GAP 1.0→2.0. Backtest: no loser had gap>2.0%. Filters weak entries. Verified DB: 24h 45T 57.8% WR -$0.20. 7d: 438T 50.7% WR -$2.04. Today: 37T 56.8% WR -$0.08. 5 open. Disk 78%.
+**CEO 02:00 — MONITORING.** No changes. Verified DB: 24h 38T 50% WR +$0.01. 7d: 435T 51% WR -$1.79. 5 open SHORT all profitable. ATR_SL trailing working (97.5% hit, avg -$0.007/trade). MIN_GAP=2.0 active. System flat, nothing broken. Signal starvation persists (38T/24h). Disk ~78%.
 
 ## Today's Changes (Aug 29)
 
+0. **CEO 02:00 — MONITORING.** No changes. Verified DB: 24h 38T 50% WR +$0.01. 7d: 435T 51% WR -$1.79. 5 open SHORT all profitable (ADA +0.32%, CRV +0.53%, DOGE +0.39%, DOT +0.71%, DYDX +0.40%). ATR_SL trailing working (97.5% hit rate, avg -$0.007/trade). MIN_GAP=2.0 active. System flat, nothing broken. Signal starvation persists (38T/24h). 10th delegation to signal_analyst for backbone STILL PENDING. Disk ~78%.
 1. **CEO 19:00 — ACTION.** Raised ACCEL_300_V2_SHORT_MIN_GAP 1.0→2.0. Verified DB: 24h 45T 57.8% WR -$0.20. 7d: 438T 50.7% WR -$2.04. Today: 37T 56.8% WR -$0.08. 5 open (4 bb-bounce-short SHORT, 1 ichimoku- SHORT). ROOT CAUSE: ATR_SL 49 exits/48h -$4.50 — entries at poor locations. accel-300-v2- 30 losers in 7d ALL atr_sl_hit, backtest says "No loser had gap>2.0%". FIX: raised MIN_GAP to 2.0 to filter weak entries. Expected: fewer trades, higher WR/PnL. Disk 78%.
 2. **Orchestrator 18:32 — MONITORING.** Verified DB: 24h 51T 51.0% WR -$0.12. 7d: 441T 54% WR ~$0.00. Today: 32T 53.1% WR -$0.09. 3 open (BCH, DYDX, SUSHI SHORT). Pipeline active, all key timers firing. No errors. No critical issues. System flat, nothing to implement. Legacy fully cleared.
 2. **CEO 17:15 — MONITORING.** No changes. Verified DB: 24h 49T 49.0% WR -$0.31. 7d: 438T 50.2% WR -$1.89. Today: 28T 50.0% WR -$0.24. 4 open (3 bb-bounce-short SHORT, 1 engulfing+ LONG). System flat, nothing broken. ATR_SL entry quality bottleneck. 9th delegation to signal_analyst pending. Disk 77%.
@@ -73,8 +74,8 @@ System GREEN, flat. Legacy fully cleared. 5 open positions. Pipeline running, al
 
 ## Next Actions
 
-1. **DELEGATE to signal_analyst: build new backbone signal.** System has 2 backbone signals (accel-300-v2-, bb-bounce-short emerging). 9th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-29
-2. **Monitor bb-bounce-short SHORT positions.** 3 open. Watch for trailing SL or exit. Signal 35T/7d 60% WR $0.00 — emerging backbone candidate. — 2026-08-29
-3. **Monitor disk.** Currently 77%. Below 85% trigger. — 2026-08-29
-4. **Monitor system performance post-legacy.** Now clean — track if 7d improves. Currently -$1.89/7d. — 2026-08-29
-5. **Monitor accel-300-v2- backbone.** Bad24h (13T 30.8% -$0.10) but 7d strong (72T 52.8% +$1.46). If tomorrow is also negative, investigate entry quality. — 2026-08-29
+1. **DELEGATE to signal_analyst: build new backbone signal.** System has 2 backbone signals (accel-300-v2-, bb-bounce-short emerging). 10th delegation — MUST produce. Volume+momentum, 2-type confluence gate, LONG priority for Wyckoff accumulation market. — 2026-08-30
+2. **Monitor 5 open SHORT positions.** All profitable. Watch for trailing SL or exit. — 2026-08-30
+3. **Monitor disk.** Currently ~78%. Below 85% trigger. — 2026-08-30
+4. **Monitor system performance post-legacy.** Now clean — track if 7d improves. Currently -$1.79/7d. — 2026-08-30
+5. **Monitor MIN_GAP=2.0 impact.** Effect should show in next 24h — fewer accel-300-v2- trades, higher WR. — 2026-08-30

@@ -1714,3 +1714,16 @@ ALERTS:
 ## Error Alerts — 2026-08-29 21:04 UTC
 - **REPEATED** (47x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [TOK-SIGNALS] write failed: name 'BB_BOUNCE_LONG_ENABLED' is not defined`
+
+## Error Alerts — 2026-08-29 21:22 UTC
+- **CRITICAL** (10x): `NameError: name 'BB_BOUNCE_LONG_ENABLED' is not defined` — signal_compactor crashed every cycle since ~21:12, hotset empty, zero new trade entries possible
+- **AUTO-FIX**: Added `BB_BOUNCE_LONG_ENABLED` to import in `signal_schema.py:2094`. Compactor verified clean — 1 hotset entry produced.
+
+## Error Alerts — 2026-08-29 23:04 UTC
+- **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Health Report — 2026-08-29 23:22 UTC
+- **[OK]**: Pipeline running, no crashes. 145 signals/hour. 37 trades today (64.9% WR, +$0.14).
+- **[OK]**: All 46 timers active and firing. Services active. Disk 78%.
+- **[OK]**: Market regime NEUTRAL. 126/239 tokens fast. HEMI only SHORT_BIAS.
+- **[INFO]**: 5 phantom trades in 24h — acceptable.

@@ -501,3 +501,19 @@
   WHY: 1T last hour (CHIP SHORT +$0.01 atr_sl_hit). 46T 24h 54%WR -$0.34. atr_sl_hit 97.8% avg -$0.007 trailing SL near breakeven. No kill candidates (0T last hour from any signal). Trade freq ~1/hr normal. 4 consecutive positive hours. 7-day flat. 5 open positions, 3 profitable, 2 large unrealized losses (CRV -44%, ADA -35%) managed by trailing SL. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 22:05 UTC
+[2026-08-29 22:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period). 44T 24h 48%WR -$0.22. atr_sl_hit 97.7% avg -$0.005 trailing SL near breakeven. No kill candidates (0T last hour from any signal). Trade freq ~1.8/hr normal. 4 consecutive positive hours. 5 open positions, 2 profitable (KAS +90%, DOGE +35%), 3 losing but managed. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 23:05 UTC
+[2026-08-29 23:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period). 39T 24h 48%WR -$0.28. atr_sl_hit 97.4% avg -$0.007 trailing SL near breakeven. No kill candidates (0T last hour). Trade freq ~1.6/hr normal. 4 consecutive positive hours. 5 open positions, 2 profitable (KAS +82%, DOGE +24%), 3 losing but managed by trailing SL. 7-day 435T 51%WR -$1.79 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 00:05 UTC
+[2026-08-30 00:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (KAS SHORT +$0.07). 38T 24h 51%WR +$0.01 breakeven. atr_sl_hit 97.4% avg $0.000 trailing SL ideal. No kill candidates (0T last hour from weak signals). Trade freq ~1.6/hr normal. 5 open positions, 2 profitable, 3 losing but managed. 7-day 434T 51.2%WR -$1.73 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 01:05 UTC
+[2026-08-30 01:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (late UTC). 38T 24h 50%WR +$0.01. atr_sl_hit 97.5% avg $0.000 trailing SL ideal. No kill candidates (0T last hour). Trade freq ~1.6/hr normal. 4 consecutive positive hours. 5 open positions, 3 profitable (DOT +56%, DOGE +23%, DYDX +6%), 2 losing small (-10%) managed. 7-day 435T 51%WR -$1.79 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 02:05 UTC
