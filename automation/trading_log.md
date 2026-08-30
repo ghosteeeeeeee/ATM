@@ -17898,3 +17898,34 @@ Final set: ['AIXBT', 'ALT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'C
 **Open Questions:**
 - accel-300-v2-short- (33%WR, 3T/24h) and macd-div- (33%WR, 3T/24h) bleeding but not at kill threshold yet — monitor next hour
 - 7-day overall slightly negative (-$2.11) despite strong 24h — earlier losses being recovered
+
+---
+
+## [2026-08-30 04:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet 4am UTC)
+**24h:** 37T 65%WR +$0.37
+**7-day:** 431T 51%WR -$2.22
+
+**Close reason (24h):**
+- atr_sl_hit 36T (97.3%) avg +$0.011 — trailing SL capturing small wins, ideal
+- cascade_flip 1T avg -$0.020
+
+**Signal breakdown (24h):**
+- bb-bounce-short: 22T 63.6%WR +$0.34 — workhorse
+- macd-div-: 3T 33.3%WR -$0.13 — bleeding, below kill threshold
+- accel-300-v2-short-: 3T 33.3%WR -$0.05 — bleeding, below kill threshold
+- confluence-,ichimoku-: 2T 50%WR -$0.09 — small sample
+
+**Open:** 4 SHORT (STX +0.6%, KAS +0.1%, DOGE -0.3%, ADA -0.1%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades last hour
+- Trade freq ~1.5/hr normal
+- atr_sl_hit working perfectly (avg positive)
+- System healthy, quiet period
+
+**Open Questions:**
+- macd-div- (33%WR, -$0.13/24h) and accel-300-v2-short- (33%WR, -$0.05/24h) bleeding but not at kill threshold — continue monitoring

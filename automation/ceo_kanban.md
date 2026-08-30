@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-08-30 04:05 UTC] auto_1hr: NO CHANGES — 0T last hour (quiet 4am UTC). 37T 24h 65%WR +$0.37 healthy. 97.3% atr_sl_hit avg +$0.011 trailing SL working perfectly. bb-bounce-short 22T 63.6%WR workhorse. Weak signals (macd-div-, accel-300-v2-short-) below kill threshold. 4 open SHORT. System healthy.
 - [2026-08-29 02:05 UTC] auto_1hr: NO CHANGES — 1T last hour (CFX -$0.09 atr_sl_hit). 84T 24h 58.3%WR +$1.81 healthy. No kill candidates. System healthy.
 - [2026-08-28 17:10 UTC] signal_reporter: No kills — only loser (accel-300-v2+ LONG, 33.3% WR -$0.16) already disabled+NEVER_REENABLE. No boosts — accel-300-v2- SHORT already 63% of trades, concentration risk. 24h 94T 54.3% WR +$1.28. No inversions. System healthy.
 - [2026-08-27 18:35 UTC] orchestrator: Daily run complete. System GREEN IDLE at 5/5 positions (all SHORT). Market heavily NEUTRAL. 24h 107T 47.7% WR -$0.43. All kill flags verified correct (10 flags False, 43 NEVER_REENABLE). accel_300_v2 fixed (V2_MIN_GAP_PCT). CURRENT.md cleaned 86→50 lines. ZERO backbone signals — DELEGATED to signal_analyst. Disk 83%. Legacy bleed age-out expected Aug 28. Committed + pushed.
