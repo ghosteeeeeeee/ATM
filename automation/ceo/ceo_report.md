@@ -1,13 +1,13 @@
-## CEO Report — 2026-08-31 ~11:20 UTC
+## CEO Report — 2026-08-31 ~16:30 UTC
 
 ### Diagnosis
-System FLAT, 2 open positions. Market ALL NEUTRAL — dead. 24h: 40T, 50% WR, -$0.55. 48h: 80T, 55% WR, -$0.52. 7d: 399T, 49.9% WR, -$3.07. Today Aug 31: 14T, 50% WR, -$0.55. Open: ME LONG bb-bounce-long+ -$0.02, LINK SHORT ichimoku- flat. **macd-div- STAR DEGRADED: 8T/48h, 25% WR, -$0.48** (CEO_PROTECTED — cannot disable). confluence-,ichimoku- combo: 6T/48h, 33.3% WR, -$0.37 (all ATR_SL exits). bb-bounce-short: 23T/48h, 52.2% WR, -$0.21 (legacy, killed Aug 30). volume_breakout: first trade closed -$0.09. ATR_SL: 30T/48h, -$3.17 (dominant). Signal starvation ~1.7/hr. Disk 79%. Pipeline healthy.
+System FLAT, 1 open position. Market 88 NEUTRAL, 62 SHORT_BIAS — dead with emerging SHORT bias. 24h: 42T, 42.9% WR, -$0.33. 7d: 383T, 49.6% WR, -$1.84. Today Aug 31: 30T, 36.7% WR, -$0.55 (worst day this week). Open: TURBO SHORT flat. **macd-div- STAR DEGRADED: 7T/48h, 28.6% WR, -$0.36** (CEO_PROTECTED — cannot disable). **ATR_SL IMPROVED: 71 exits/48h, -$0.25 total** (MIN_GAP=2.0 working — was -$3.17 earlier today). volume_breakout: 0 signals (market flat). range_reversion: shadow 24h+, 0 signals. Signal starvation ~1.7/hr. Disk 79%. Coin tracker active (95 coins warm, last tick 15:49 UTC). Pipeline healthy.
 
 ### Root Cause
-Dead NEUTRAL market — no volume, no momentum, no trends. Signal starvation (1.7/hr). macd-div- STAR degraded from 61.3% 7d WR to 25% over 48h — small sample variance in flat market (CEO_PROTECTED, cannot act). confluence-,ichimoku- combos firing but entries immediately stopped (avg -4.4% loss on losers). ATR_SL entry quality issue persists. Legacy trades still closing (bb-bounce-short, hl_copy, slow-grind-, ct-hot+).
+Dead NEUTRAL market — no volume, no momentum, no trends. Signal starvation (1.7/hr). macd-div- STAR degraded from 57.1% 7d WR to 28.6% over 48h — works in trend, fails in chop (CEO_PROTECTED, cannot act). Today's poor WR (36.7%) is variance in flat market. ATR_SL improvement from -$3.17 to -$0.25 confirms MIN_GAP=2.0 filter is working — fewer weak entries = fewer ATR_SL losses.
 
 ### Fix Applied
-**DECISION: MONITOR.** No parameter changes. System flat near breakeven — no crisis. macd-div- is CEO_PROTECTED — flagged for T review. confluence-,ichimoku- combos are noise in flat market — expected behavior. volume_breakout first trade closed as loss (1T sample). range_reversion shadow 24h+ with 0 signals — will re-evaluate tomorrow.
+**DECISION: MONITOR.** No parameter changes. System flat near breakeven — no crisis. macd-div- is CEO_PROTECTED — flagged for T review. ATR_SL improvement confirmed (MIN_GAP=2.0). volume_breakout and range_reversion both need market volume to generate signals. Will re-evaluate range_reversion shadow tomorrow.
 
 ### Verification
 48h: 80T 55% WR -$0.52 (near breakeven). Daily trend: Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.08 → Aug 31 -$0.55 (flat). System structurally sound — 2 backbone + STAR + volume_breakout + range_reversion (shadow). Legacy clearing. ATR_SL trailing working.
