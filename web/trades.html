@@ -293,8 +293,8 @@
         document.getElementById('stat-open').textContent = d.open_count || 0;
         document.getElementById('stat-closed').textContent = d.closed_count || 0;
         document.getElementById('stat-wr').textContent = total > 0 ? winRate + '%' : '--';
-        document.getElementById('stat-short-wr').textContent = shortTrades.length > 0 ? shortWR + '%' : '--';
-        document.getElementById('stat-long-wr').textContent = longTrades.length > 0 ? longWR + '%' : '--';
+        document.getElementById('stat-short-wr').textContent = shortTrades.length > 0 ? shortWR + '% ' + shortWins + '/' + shortTrades.length : '--';
+        document.getElementById('stat-long-wr').textContent = longTrades.length > 0 ? longWR + '% ' + longWins + '/' + longTrades.length : '--';
         document.getElementById('stat-win-streak').textContent = bestWin > 0 ? bestWin + 'W' : '--';
         document.getElementById('stat-loss-streak').textContent = bestLoss > 0 ? bestLoss + 'L' : '--';
         document.getElementById('stat-pnl').innerHTML = totalPnl > 0 ? '<span class="win">+' + totalPnl.toFixed(2) + '</span>' : '<span class="' + (totalPnl < 0 ? 'loss' : 'neutral') + '">' + totalPnl.toFixed(2) + '</span>';
