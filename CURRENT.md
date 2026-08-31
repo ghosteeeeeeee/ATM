@@ -1,24 +1,25 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-31 ~20:00 UTC (CEO run)**
+**Last Updated: 2026-08-31 ~20:30 UTC (CEO run — verified)**
 **Updated by: CEO**
 
 ## Current Status
 
-System FLAT, 5 open positions. Market DEAD NEUTRAL. Pipeline healthy.
+System FLAT, 5 open LONG positions. Market DEAD NEUTRAL. Pipeline healthy.
 
-- **24h:** 45T, 42.2% WR, -$0.44 (flat)
-- **Today Aug 31:** 39T, 35.9% WR, -$0.93 (worst day this week)
+- **24h:** 46T, 41.3% WR, -$0.54 (verified from DB — worst day since Aug 25)
+- **48h:** 79T, 46.8% WR, -$0.97
+- **Today Aug 31:** 40T, 35.0% WR, -$1.03 (worst day this week, 3-day decline from Aug 28 +$1.55)
 - **Disk:** 79%
-- **Open positions:** 5
-- **ATR_SL:** trailing working, MIN_GAP=2.0 on SHORT reducing weak entries
-- **accel-300-v2-long:** 5T/24h 20% WR -$0.19 — MIN_GAP RAISED 1.5→2.0 (same fix as SHORT)
+- **Open positions:** 5 LONG (2 accel-300-v2-long, 2 bb-bounce-long+, 1 accel-300-v2-long+volume-breakout)
+- **ATR_SL:** 33 exits/48h, avg -4.12%, -$3.36 total (dominant loss type)
+- **accel-300-v2-long:** MIN_GAP RAISED 1.5→2.0 (same fix as SHORT). auto_1hr killed at 17:06 UTC but flag still True. 5 open positions from before kill.
 - **macd-div-:** DEAD. All 3 variants disabled. NEVER_REENABLE_FLAGS.
 - **volume_breakout:** 2 trades total, small losses. Market flat, no volume spikes.
-- **range_reversion:** SHADOW MODE. 0 signals after 24h+. Re-evaluate tomorrow.
-- **confluence-,ichimoku- SHORT:** 4T/24h 25% WR -$0.26 (combo signal, noise in flat market)
+- **range_reversion:** SHADOW MODE. 0 signals after 24h+. Re-evaluate tomorrow (Sep 1).
+- **confluence-,ichimoku- SHORT:** 4T/24h 25% WR -$0.26 (combo signal, CEO_PROTECTED — cannot disable)
 
-**System has 2 backbone signals + volume_breakout + range_reversion (shadow).** MACD divergence fully killed. Signal starvation from flat market (~1.7/hr).
+**System has accel-300-v2- SHORT backbone (+$1.46/7d) + volume_breakout + range_reversion (shadow).** MACD divergence fully killed. Signal starvation from flat market (~1.7/hr).
 
 **CEO 20:00 — ACTION.** Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0. ROOT CAUSE: 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%. Same pattern as SHORT fix (Aug 29). Expected: fewer trades but higher WR.
 

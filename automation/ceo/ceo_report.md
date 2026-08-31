@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-31 ~20:00 UTC
+## CEO Report — 2026-08-31 ~20:30 UTC (verified)
 
 ### Diagnosis
-System FLAT, 5 open positions. Market ALL NEUTRAL (104/105 tokens). 24h: 45T, 42.2% WR, -$0.44. 7d: 364T, 50.5% WR, -$1.75. Today Aug 31: 39T, 35.9% WR, -$0.93 (worst day this week). **accel-300-v2-long LONG 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%.** confluence-,ichimoku- SHORT 4T/24h 25% WR, -$0.26 (combo signal, flat market noise). macd-div- DEAD. volume_breakout 2 trades total, small losses. range_reversion shadow 24h+, 0 signals. Signal starvation ~1.7/hr. Disk 79%. Pipeline healthy.
+System FLAT, 5 open LONG positions. Market DEAD NEUTRAL (104/105 tokens). **24h: 46T, 41.3% WR, -$0.54** (verified from DB — worst day since Aug 25 -$1.79). **48h: 79T, 46.8% WR, -$0.97.** 7d daily: Aug 28 +$1.55 → Aug 31 -$1.03 (3-day decline). Today Aug 31: 40T, 35.0% WR, -$1.03. **ATR_SL: 33 exits/48h, avg -4.12%, -$3.36 total** (dominant loss). confluence-,ichimoku- SHORT 4T/24h 25% WR, -$0.26 (combo signal, flat market noise — CEO_PROTECTED). accel-300-v2-long LONG killed by auto_1hr at 17:06 UTC (5T/24h, 20% WR, -$0.19 — ALL ATR_SL at -4.5% to -4.9%). macd-div- DEAD (all 3 variants, NEVER_REENABLE). volume_breakout 2 trades total, small losses. range_reversion shadow 24h+, 0 signals. Signal starvation ~1.7/hr. Disk 79%. Pipeline healthy.
 
 ### Root Cause
-accel-300-v2-long LONG MIN_GAP=1.5 lets in weak entries (gap <2.0% = all losers per backtest pattern — same as SHORT before its fix). 4/5 trades ATR_SL at -4.5% to -4.9%. Market dead (NEUTRAL) compounds the problem — no trend = no winners for trend-following signals.
+Market is DEAD NEUTRAL — no trend = no winners for trend-following signals. accel-300-v2-long was bleeding at MIN_GAP=1.5 (weak entries all hit ATR_SL at -4.5% to -4.9%). Same pattern as SHORT before its fix. confluence-,ichimoku- combo bleeds in flat market (25% WR) but is CEO_PROTECTED — cannot disable.
 
-### Fix Applied
-**Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0.** Same treatment as SHORT (raised 1.0→2.0 on Aug 29, worked). Filters entries where price is too close to EMA300. Expected: fewer trades but higher WR and PnL.
+### Fix Applied (this session)
+**Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0** at 20:00 UTC. Same treatment as SHORT (raised 1.0→2.0 on Aug 29, worked — SHORT now +$1.46/7d backbone). Filters entries where price is too close to EMA300. Note: auto_1hr also killed ACCEL_300_V2_LONG_ENABLED at 17:06 UTC — flag is still True (kill may not have persisted). MIN_GAP fix will apply when/if signal re-enabled. Expected: fewer trades but higher WR.
 
 ### Verification
-SHORT MIN_GAP fix (Aug 29): improved from bleeding to +$1.46/7d backbone. LONG fix applies same logic. Monitor 48h for WR improvement.
+No parameter changes needed this session beyond MIN_GAP fix. System is flat in dead market — nothing critically broken. Active losers are either CEO_PROTECTED (confluence-,ichimoku-) or legacy dead signals. Monitor 48h for MIN_GAP fix impact. Re-evaluate range_reversion shadow tomorrow (Sep 1) — 0 signals after 24h+ shadow in flat market.
 
 ## CEO Report — 2026-08-31 ~16:30 UTC
 
