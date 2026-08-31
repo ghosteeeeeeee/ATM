@@ -1782,3 +1782,9 @@ ALERTS:
 - Regime: NEUTRAL (2 LONG_BIAS, 0 SHORT)
 - Disk: 79% — Prices: 187 tokens fresh
 - No auto-fixes needed
+
+## Error Alerts — 2026-08-31 15:05 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`

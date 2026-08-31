@@ -625,3 +625,11 @@
   WHY: 1T last 2h (quiet market). 36T 24h 94.4% atr_sl_hit -$0.41 near flat. Kill criteria not met (no signal 0%WR with 3+ trades last hour). macd-div- 5T 20%WR 24h but all-time 61%WR — variance. 5 open positions all within normal SL range. Trade freq ~1.5/hr normal. No consecutive negative hours. System healthy, flat market.
   BY: auto_1hr
   NEXT: Re-run at 14:06 UTC
+[2026-08-31 14:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last 2h (CRV $0.00, ASTER +$0.02). 36T 24h -$0.41 (-$0.012/trade). 94.4% atr_sl_hit trailing SL working. Kill criteria not met (no signal 0%WR with 3+ trades last hour). macd-div- 5T 20%WR -$0.35 but all-time 61%WR — variance. 4 open positions all within normal SL range. Trade freq ~1.5/hr normal. No consecutive negative hours. 7d 386T 49.2%WR -$2.83. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 15:05 UTC
+[2026-08-31 01:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L $0.00 flat). 38T 24h 52.6%WR -$0.49 flat. atr_sl_hit 36T 94.7% avg -$0.014 trailing SL perfect. No kill candidates (0 signals 0%WR 3+T last hour). macd-div- 5T 20%WR -$0.35 bleeding but not 0%WR. confluence-,ichimoku- 4T 25%WR -$0.26 same. Trade freq ~1.25/hr normal. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 02:05 UTC
