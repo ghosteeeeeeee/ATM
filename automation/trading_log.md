@@ -1,5 +1,36 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-31 21:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed last 2h (2W 1L) +$0.28. 0 trades closed in strict 1h window.
+**24h:** 46T 15W 33%WR +$0.02 (nearly flat, recovered from -$0.43 at 18:45)
+**Open:** 4 LONG (PURR, YGG, ME, NXPC)
+
+**Close reason (24h):** atr_sl_hit 37T (80.4%) avg +$0.001 — trailing SL working perfectly. profit-monster-trail 3T +$0.02. test_cleanup 3T $0.00. cascade flips 2T -$0.10. MAE-GUARD 1T -$0.01.
+
+**Signal (24h):**
+- accel-300-v2-long: 5T 1W 20%WR -$0.19 — KILLED at 20:06 ✓ (flag properly set)
+- confluence-,ichimoku-: 4T 1W 25%WR -$0.26 — WEAK, monitoring
+- macd-div-: 3T 1W 33%WR -$0.08 — marginal
+- Multi-signal combos: mostly winners (ichimoku-,rs-r117 +$0.35, cascade-reverse-v2 +$0.23)
+
+**Hourly PnL (8h):** 13:00 +$0.02, 14:00 $0.00, 15:00 -$0.02, 16:00 -$0.21, 17:00 +$0.13, 18:00 -$0.30, 19:00 -$0.10, 20:00 +$0.38. Alternating pattern, no 3+ consecutive negatives. 20h recovered from 18-19h dip.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 trades closed last hour, no signal 0%WR with 3+T)
+- Trade freq ~1.5/hr normal
+- No 3+ consecutive negative hours
+- atr_sl_hit 80.4% trailing SL functioning as designed
+- 24h PnL recovered to +$0.02 (from -$0.43 at 18:45)
+- Previous accel-300-v2-long kill verified working (flag = False)
+
+**Open Questions:**
+- confluence-,ichimoku- 4T 25%WR -$0.26: one more loss may trigger kill criteria
+
+---
+
 ## [2026-08-31 20:06 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (1W 1L) +$0.05

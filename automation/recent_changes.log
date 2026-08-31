@@ -1,3 +1,7 @@
+[2026-08-31 21:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last 2h (2W 1L +$0.28), 0T strict last hour. 46T 24h 33%WR +$0.02 recovered from -$0.43. Kill criteria not met (0 trades last hour). atr_sl_hit 80.4% trailing SL working. confluence-,ichimoku- 4T 25%WR -$0.26 monitoring. macd-div- 3T 33%WR -$0.08 marginal. Trade freq ~1.5/hr normal. No 3+ consecutive negative hours. 4 open LONG positions normal SLs.
+  BY: auto_1hr
+  NEXT: Re-run at 22:05 UTC
 [2026-08-31 20:06 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED (real this time)
   WHY: 2T last hour (1W 1L +$0.05). 42T 24h 45%WR -$0.40. accel-300-v2-long 5T 20%WR -$0.19 — kill threshold met. Previous kill logged 17:06 but flag never changed from True (bug). 2 additional trades fired after logged kill. Flag now properly set to False. confluence-,ichimoku- 4T 25%WR -$0.26 approaching kill threshold. macd-div- 3T 33%WR -$0.08 marginal. Trade freq ~2.5/hr normal. 4 open positions.
   BY: auto_1hr
