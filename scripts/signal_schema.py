@@ -515,6 +515,12 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         print(f'  DEBUG add_signal BLOCKED: {token} {direction} conf={confidence} < {MIN_CONFIDENCE_FLOOR} [confidence floor]', flush=True)
         return None  # Silently skip low-confidence signals
 
+    # ── Price validation — block signals with invalid price ──────────────────
+    # FIX (2026-08-31): Defense-in-depth against price=0.0 signals
+    if price is not None and price <= 0:
+        print(f'  DEBUG add_signal BLOCKED: {token} {direction} price={price} [invalid price]', flush=True)
+        return None
+
     # ── Monte Carlo gate — block signal types with proven negative expectation ──
     try:
         from monte_carlo_gate import monte_carlo_gate
@@ -3066,11 +3072,14 @@ def set_cooldown(token, direction=None, hours=1):
         data[key] = {'expires': expires_ts, 'hours': hours, 'reason': 'signal'}
         with open(LOSS_COOLDOWN_FILE, 'w') as f:
             json.dump(data, f, indent=2)
-        return
+        # FIX (2026-08-31): Don't return early — also write to PostgreSQL
+        # so get_cooldown() can check signal_cooldowns table.
+        # The JSON path ignores reason='signal' (by design), so PostgreSQL
+        # is the only path that actually enforces signal cooldowns.
     except Exception as e:
         print(f"[signal_schema] set_cooldown JSON failed: {e}")
 
-    # Fallback: PostgreSQL
+    # PostgreSQL (authoritative for signal cooldowns)
     expires_dt = datetime.now() + timedelta(hours=hours)
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
