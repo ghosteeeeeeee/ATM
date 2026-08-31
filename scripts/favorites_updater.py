@@ -294,8 +294,41 @@ def run():
         today = datetime.now(timezone.utc).isoformat()
 
         # ── Demotions ───────────────────────────────────────────────────
+        # Also get stats for favorites with fewer than min trades (for demotion check)
+        fav_low_sample = {}
+        try:
+            import psycopg2
+            from _secrets import BRAIN_DB_DICT
+            conn_check = psycopg2.connect(**BRAIN_DB_DICT)
+            cur_check = conn_check.cursor()
+            cur_check.execute("""
+                SELECT
+                    token,
+                    COUNT(*) as trades,
+                    ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as winrate,
+                    ROUND(AVG(pnl_pct), 2) as avg_pnl_pct,
+                    ROUND(SUM(pnl_usdt), 2) as total_pnl_usdt
+                FROM trades
+                WHERE status = 'closed'
+                  AND server = 'Hermes'
+                  AND pnl_pct IS NOT NULL
+                  AND close_time > NOW() - INTERVAL '7 days'
+                  AND token = ANY(%s)
+                GROUP BY token
+            """, (list(current_favs),))
+            columns = [desc[0] for desc in cur_check.description]
+            for row in cur_check.fetchall():
+                d = dict(zip(columns, row))
+                if d['token'] not in [s['token'] for s in stats]:
+                    fav_low_sample[d['token']] = d
+            conn_check.close()
+        except Exception:
+            pass
+
         for token in list(current_favs):
             token_stats = next((s for s in stats if s['token'] == token), None)
+            if not token_stats:
+                token_stats = fav_low_sample.get(token)
             if not token_stats:
                 # No recent trades — inactivity demotion after 7 days
                 # Check how long since last trade
