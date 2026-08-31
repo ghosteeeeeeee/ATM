@@ -1131,7 +1131,7 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
                        AVG(pnl_pct) AS avg_pnl
                 FROM trades
                 WHERE close_time IS NOT NULL
-                    AND signal = %s AND direction = %s
+                    AND signal LIKE '%%' || %s || '%%' AND direction = %s
                     AND (%s IS NULL OR signal_z_score_tier = %s)
                     AND (%s IS NULL OR signal_rsi_14 IS NULL OR signal_rsi_14 BETWEEN %s AND %s)
             """, (source, direction, z_tier, z_tier, rsi,
