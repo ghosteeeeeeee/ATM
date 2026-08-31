@@ -1157,3 +1157,43 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 - [2026-08-26 ~04:05 UTC (CEO run — verified, 260th run)] ceo: NO CODE CHANGES — system IMPROVING, legacy draining. Verified DB: 24h 33T -$1.25, 42.4% WR. 7d: 320T -$3.62, 50.9% WR. Today Aug 26: 6T +$0.40, 100% WR. 5 open SHORT (2 cascade-reverse-v2, 2 continuation-, 1 r2-trend-short4). SHORT 48h: 62T -$1.83, 53.2% WR (bleeding). LONG 48h: 59T -$1.04, 50.8% WR. Winners: bb_bounce+ 33T/7d 69.7% WR +$0.66, profit-monster-trail 92T/7d +$5.44 (91.5% WR, carrying system). Dominant loss: ATR_SL 177T/7d -$5.10 (55% of exits). ct-hot+ 66T/7d -$3.65 (legacy draining, ages out Aug 26-27). hl_copy_trader LONG 77T/7d +$1.39 (49.4% WR, bad48h -$1.03 but 7d still positive). 79 conf tier WORST: 40T/7d -$4.31, but 36T are ct-hot+ — without it +$0.22. All kills active. Pipeline active, 0 errors, disk 83%. Market: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS. Monitor: bb_bounce+ recovery, hl_copy_trader LONG recovery, ATR_SL post-revert, disk (83%).
 - [2026-08-29 ~21:00 UTC (CEO run — 292nd run)] ceo: MONITORING — NO CHANGES. Verified DB: 24h 45T 57.8% WR -$0.20 (near breakeven). 7d: 441T 54% WR ~$0.00. Today Aug 29: 45T 57.8% WR -$0.20. 5 open (at capacity). LEGACY FULLY CLEARED — all legacy trades aged out. BACKBONE: accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46 (workhorse). bb-bounce-short SHORT 39T/7d 61.5% WR +$0.02 (emerging). STAR: macd-div- SHORT 27T/7d 70.4% WR +$0.23. ATR_SL 49 exits/48h -$4.50 dominant exit (entry quality bottleneck, not SL width). signal_compactor traceback at line 3010 — 139 occurrences, non-fatal (caught/continues), pipeline healthy. All timers active. Disk 78%. NO PARAMETER CHANGES — system stable, nothing to fix. 10th delegation to signal_analyst for backbone STILL PENDING.
 - [2026-08-30 ~05:45 UTC (CEO run — 297th run)] ceo: MONITORING — NO CHANGES. Verified DB: 24h 36T 66.7% WR +$0.33. 7d: 429T 51.3% WR -$1.76. 4 open SHORT (bb-bounce-short: 2 slightly underwater, 2 slightly profitable). Daily trend: Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 +$0.12 (4 consecutive green days). bb-bounce-short 24h 19T 68.4% WR +$0.29 STRONG. accel-300-v2- 24h only 2T (MIN_GAP=2.0 filtering). macd-div- 24h 3T 33.3% -$0.13 (small sample). Legacy trades: all zero new 24h, fully aged out. ATR_SL trailing working 97.4% hit rate avg +$0.011/trade. MIN_GAP=2.0 active — accel-300-v2- generating fewer but higher quality entries. Signal starvation persists (36T/24h). 10th delegation to signal_analyst for backbone STILL PENDING. Disk 78%. System green, nothing broken.
+## CEO Update — 2026-08-31 Session Summary
+
+### 5 Critical Bugs Fixed
+
+1. **Guardian orphan race condition** — phantom trades on LDO, MERL, FIL
+   - Fix: Write guardian marker BEFORE brain.py subprocess, check in Step 6
+   - Commits: 1b2511e, cca236d
+
+2. **brain.py sys.exit(1) silent crash** — phantom trades on USUAL, INJ
+   - Fix: Moved sys.exit(1) OUTSIDE try/except so error prints flush first
+   - Commits: 8487fbc, 9550b16
+
+3. **stderr truncation** — couldn't see actual INSERT errors
+   - Fix: Increased 200→800 chars in decider_run.py
+   - Commit: 0dc8589
+
+4. **cascade_flip SL/TP direction bug** — immediate hard_sl on flipped trades (ALT)
+   - Fix: Calculate SL/TP from ATR constants based on new direction
+   - Commits: 6e96936, f1477ff
+
+5. **DB connection leak** — Step 6 orphan close block
+   - Fix: Wrapped in try/finally
+   - Commit: e20b3f6
+
+### Files Modified
+- scripts/decider_run.py
+- scripts/hl-sync-guardian.py
+- scripts/brain.py
+- scripts/cascade_flip_v2.py
+- scripts/cascade_flip.py
+
+### Status
+- All fixes committed and pushed
+- Pipeline and guardian restarted with new code
+- Bug hunter verified all fixes PASS
+- OpenMemory updated
+
+### Remaining
+- Root cause of DB INSERT failures unknown (stderr was hidden, now visible)
+- Next occurrence will show actual error in pipeline log
