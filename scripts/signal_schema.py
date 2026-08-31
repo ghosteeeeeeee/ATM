@@ -1748,6 +1748,11 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             all_srcs = old_srcs | new_srcs
             merged_sources = ','.join(sorted(all_srcs))
 
+            # Block ichimoku+RS combo — ichimoku hurts RS performance (50% WR vs 70% WR standalone)
+            if 'ichimoku' in merged_sources and any(s.startswith('rs-') for s in all_srcs):
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{merged_sources}" ichimoku+RS combo', flush=True)
+                return None
+
             # Build merged signal_types
             old_types = set(existing_types.split(',')) if existing_types else set()
             new_types = {signal_type}
