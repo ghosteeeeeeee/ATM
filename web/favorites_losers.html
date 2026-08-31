@@ -43,6 +43,9 @@
         .badge-dead { background: #ff000022; color: #ff0000; }
         
         .size-mult { color: #666; font-size: 10px; }
+
+        .coin-icon { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; vertical-align: middle; margin-right: 4px; object-fit: contain; }
+        .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
         
         .stats-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
         .stat { background: #1a1a2e; padding: 10px 14px; border-radius: 4px; border-left: 3px solid #00ff88; min-width: 120px; }
@@ -98,6 +101,14 @@
     <div class="link"><a href="/trades.html">← Back to Trades</a></div>
     
     <script>
+        const ICON_MAP = {"BTC":"/coin_icons/btc.png","SOL":"/coin_icons/sol.png","ETH":"/coin_icons/eth.png","DOGE":"/coin_icons/doge.png","XRP":"/coin_icons/xrp.png","ADA":"/coin_icons/ada.png","AVAX":"/coin_icons/avax.png","DOT":"/coin_icons/dot.png","LINK":"/coin_icons/link.png","MATIC":"/coin_icons/matic.png","UNI":"/coin_icons/uni.png","ATOM":"/coin_icons/atom.png","ASTER":"/coin_icons/aster.png","WCT":"/coin_icons/wct.png","SYRUP":"/coin_icons/syrup.png","STBL":"/coin_icons/stbl.png","APEX":"/coin_icons/apex.png","POL":"/coin_icons/pol.png","HEMI":"/coin_icons/hemi.png","BSV":"/coin_icons/bsv.png","INJ":"/coin_icons/inj.png","BANANA":"/coin_icons/banana.png","MNT":"/coin_icons/mnt.png","DYDX":"/coin_icons/dydx.png","PUMP":"/coin_icons/pump.png","GMT":"/coin_icons/gmt.png","SUSHI":"/coin_icons/sushi.png","CC":"/coin_icons/cc.png","STX":"/coin_icons/stx.png","AIXBT":"/coin_icons/aixbt.png","SKR":"/coin_icons/skr.png","MOVE":"/coin_icons/move.png","GMX":"/coin_icons/gmx.png","NXPC":"/coin_icons/nxpc.png","MERL":"/coin_icons/merl.png","CHIP":"/coin_icons/chip.png","DOT":"/coin_icons/dot.png","ZRO":"/coin_icons/zro.png","ZEN":"/coin_icons/zen.png","ME":"/coin_icons/me.png","CFX":"/coin_icons/cfx.png","IMX":"/coin_icons/imx.png","KAS":"/coin_icons/kas.png","WLD":"/coin_icons/wld.png","YGG":"/coin_icons/ygg.png","ATOM":"/coin_icons/atom.png","GOAT":"/coin_icons/goat.png","IO":"/coin_icons/io.png","FIL":"/coin_icons/fil.png","DASH":"/coin_icons/dash.png","SUPER":"/coin_icons/super.png","CRV":"/coin_icons/crv.png","MET":"/coin_icons/met.png","GRAM":"/coin_icons/gram.png","TIA":"/coin_icons/tia.png","LDO":"/coin_icons/ldo.png","XPL":"/coin_icons/xpl.png","ALGO":"/coin_icons/algo.png","HYPE":"/coin_icons/hype.png","MORPHO":"/coin_icons/morpho.png","COMP":"/coin_icons/comp.png","ETC":"/coin_icons/etc.png","JUP":"/coin_icons/jup.png","CAKE":"/coin_icons/cake.png","ICP":"/coin_icons/icp.png","APT":"/coin_icons/apt.png","PEOPLE":"/coin_icons/people.png","IOTA":"/coin_icons/iota.png","USUAL":"/coin_icons/usual.png","ALT":"/coin_icons/alt.png","W":"/coin_icons/w.png","SAND":"/coin_icons/sand.png","TURBO":"/coin_icons/turbo.png","LTC":"/coin_icons/ltc.png","PURR":"/coin_icons/purr.png","SAGA":"/coin_icons/saga.png","PENDLE":"/coin_icons/pendle.png","ENS":"/coin_icons/ens.png","BCH":"/coin_icons/bch.png","ARB":"/coin_icons/arb.png","ENA":"/coin_icons/ena.png","SEI":"/coin_icons/sei.png","HBAR":"/coin_icons/hbar.png","NEAR":"/coin_icons/near.png","XLM":"/coin_icons/xlm.png","TRX":"/coin_icons/trx.png","RENDER":"/coin_icons/render.png","SUI":"/coin_icons/sui.png","OP":"/coin_icons/op.png","PEPE":"/coin_icons/pepe.png","FET":"/coin_icons/fet.png","WIF":"/coin_icons/wif.png","SHIB":"/coin_icons/shib.png","FLOKI":"/coin_icons/floki.png","BONK":"/coin_icons/bonk.png","TON":"/coin_icons/ton.png","UNI":"/coin_icons/uni.png","APT":"/coin_icons/apt.png","ARB":"/coin_icons/arb.png","SOLANA":"/coin_icons/sol.png","MATIC":"/coin_icons/matic.png","AAVE":"/coin_icons/aave.png","SNX":"/coin_icons/snx.png","MKR":"/coin_icons/mkr.png","1INCH":"/coin_icons/1inch.png","YFI":"/coin_icons/yfi.png","BAL":"/coin_icons/bal.png","MANA":"/coin_icons/mana.png","AXS":"/coin_icons/axs.png","GALA":"/coin_icons/gala.png","ILV":"/coin_icons/ilv.png","ALICE":"/coin_icons/alice.png","MYX":"/coin_icons/myx.png","RENDER":"/coin_icons/render.png","PYTH":"/coin_icons/pyth.png","RUNE":"/coin_icons/rune.png","MOG":"/coin_icons/mog.png","MOODENG":"/coin_icons/moodeng.png","MEW":"/coin_icons/mew.png","TRUMP":"/coin_icons/trump.png","GIGA":"/coin_icons/giga.png","BRETT":"/coin_icons/brett.png","KBONK":"/coin_icons/kbonk.png","KFLOKI":"/coin_icons/kfloki.png","KPEPE":"/coin_icons/kpepe.png","KSHIB":"/coin_icons/kshib.png"};
+
+        function iconHtml(sym) {
+          const src = ICON_MAP[sym];
+          if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${(sym||'?').slice(0,2)}</span>`;
+          return `<span class="coin-icon-fallback">${(sym||'?').slice(0,2)}</span>`;
+        }
+
         function getSizeMult(wr) {
             if (wr >= 75) return '1.8x';
             if (wr >= 50) return '1.5x';
@@ -127,7 +138,7 @@
                 
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
-                        <td class="token">${f.token}</td>
+                        <td class="token">${iconHtml(f.token)}${f.token}</td>
                         <td>${f.trades}</td>
                         <td class="${wrClass(f.winrate)}">${f.winrate.toFixed(1)}%</td>
                         <td class="${pnlClass(f.total_pnl_usdt)}">$${f.total_pnl_usdt.toFixed(2)}</td>
@@ -151,7 +162,7 @@
                 
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
-                        <td class="token">${l.token}</td>
+                        <td class="token">${iconHtml(l.token)}${l.token}</td>
                         <td>${l.trades}</td>
                         <td class="${wrClass(l.winrate)}">${l.winrate.toFixed(1)}%</td>
                         <td class="${pnlClass(l.total_pnl_usdt)}">$${l.total_pnl_usdt.toFixed(2)}</td>
