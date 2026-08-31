@@ -245,9 +245,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 FAVORITES = {
     'ARB',
     'BABY',
-    'BANANA',
     'BIGTIME',
-    'CRV',
     'DOGE',
     'DYDX',
     'FIL',
@@ -257,7 +255,6 @@ FAVORITES = {
     'ME',
     'NXPC',
     'SAND',
-    'SEI',
     'STX',
     'SYRUP',
     'USUAL',
@@ -1085,6 +1082,8 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
     'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
+    'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
+    'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
