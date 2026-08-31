@@ -4236,47 +4236,49 @@ def sync():
                 # Skip if already closed this cycle (dedup).
                 conn_orphan = get_db_connection()
                 if conn_orphan:
-                    cur_orphan = conn_orphan.cursor()
-                    cur_orphan.execute(
-                        "SELECT id FROM trades WHERE token=%s AND status='open' "
-                        "AND exchange='Hyperliquid' LIMIT 1",
-                        (coin.upper(),))
-                    orphan_row = cur_orphan.fetchone()
-                    close_ok = False  # default: not confirmed close (dedup/no-record cases)
-                    if orphan_row:
-                        orphan_id = orphan_row[0]
-                        if orphan_id in _CLOSED_THIS_CYCLE:
-                            log(f'  Dedup: orphan trade #{orphan_id} already closed, skipping', 'WARN')
-                        else:
-                            _CLOSED_THIS_CYCLE.add(orphan_id)
-                            _save_closed_set()  # BUG-4: persist orphan close
-                            # Compute actual HL notional from sz × entry_px (from hl_pos).
-                            # This replaces the $50 fallback for accurate PnL calculation.
-                            sz = float(p.get('size', 0))
-                            entry_px_raw = float(p.get('entry_px', 0))
-                            hl_notional_override = abs(sz * entry_px_raw) if sz > 0 and entry_px_raw > 0 else None
-                            if hl_notional_override:
-                                log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw:.6f}, HL_notional=${hl_notional_override:.2f}', 'INFO')
+                    try:
+                        cur_orphan = conn_orphan.cursor()
+                        cur_orphan.execute(
+                            "SELECT id FROM trades WHERE token=%s AND status='open' "
+                            "AND exchange='Hyperliquid' LIMIT 1",
+                            (coin.upper(),))
+                        orphan_row = cur_orphan.fetchone()
+                        close_ok = False  # default: not confirmed close (dedup/no-record cases)
+                        if orphan_row:
+                            orphan_id = orphan_row[0]
+                            if orphan_id in _CLOSED_THIS_CYCLE:
+                                log(f'  Dedup: orphan trade #{orphan_id} already closed, skipping', 'WARN')
                             else:
-                                log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw} — using DB/50 fallback for notional', 'WARN')
-                            close_ok = _close_orphan_paper_trade_by_id(
-                                orphan_id, coin, direction, entry_px, lev,
-                                'guardian_orphan',
-                                amount_usdt_override=hl_notional_override
-                            )
-                    # Only clear the closing marker if the DB was actually updated.
-                    # If _close_orphan_paper_trade_by_id returned False (no HL fill yet
-                    # or DB error), the marker stays active so decider_run keeps
-                    # blocking the token. It will be cleared on the next guardian
-                    # cycle when the position is gone from HL.
-                    if close_ok:
-                        _clear_closing_marker(coin)
-                        _CLOSED_HL_COINS.add(coin.upper())  # prevent Step 11 double-close
-                        _clear_pending_retry([coin.upper()])
-                    else:
-                        log(f'  Orphan close incomplete for {coin} — keeping closing marker active', 'WARN')
-                    cur_orphan.close()
-                    conn_orphan.close()
+                                _CLOSED_THIS_CYCLE.add(orphan_id)
+                                _save_closed_set()  # BUG-4: persist orphan close
+                                # Compute actual HL notional from sz × entry_px (from hl_pos).
+                                # This replaces the $50 fallback for accurate PnL calculation.
+                                sz = float(p.get('size', 0))
+                                entry_px_raw = float(p.get('entry_px', 0))
+                                hl_notional_override = abs(sz * entry_px_raw) if sz > 0 and entry_px_raw > 0 else None
+                                if hl_notional_override:
+                                    log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw:.6f}, HL_notional=${hl_notional_override:.2f}', 'INFO')
+                                else:
+                                    log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw} — using DB/50 fallback for notional', 'WARN')
+                                close_ok = _close_orphan_paper_trade_by_id(
+                                    orphan_id, coin, direction, entry_px, lev,
+                                    'guardian_orphan',
+                                    amount_usdt_override=hl_notional_override
+                                )
+                        # Only clear the closing marker if the DB was actually updated.
+                        # If _close_orphan_paper_trade_by_id returned False (no HL fill yet
+                        # or DB error), the marker stays active so decider_run keeps
+                        # blocking the token. It will be cleared on the next guardian
+                        # cycle when the position is gone from HL.
+                        if close_ok:
+                            _clear_closing_marker(coin)
+                            _CLOSED_HL_COINS.add(coin.upper())  # prevent Step 11 double-close
+                            _clear_pending_retry([coin.upper()])
+                        else:
+                            log(f'  Orphan close incomplete for {coin} — keeping closing marker active', 'WARN')
+                    finally:
+                        cur_orphan.close()
+                        conn_orphan.close()
             else:
                 # market_close failed — if already flat, clear marker; else keep + retry next cycle.
                 if not _hl_has_position(coin):
