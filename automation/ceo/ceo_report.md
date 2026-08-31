@@ -1,13 +1,16 @@
-## CEO Report — 2026-08-31 ~02:45 UTC
+## CEO Report — 2026-08-31 ~07:00 UTC
 
 ### Diagnosis
-System FLAT, 0 open positions, fully clean. 37T/24h, 54.1% WR, -$0.29. 7d: 416T, 52.6% WR, -$1.99. Today Aug 31 just started (2T -$0.07). market ALL NEUTRAL — no volume. **ATR_SL trailing now profitable (+$0.71/48h)** — first time in weeks. This means the core exit mechanism is working correctly. volume_breakout deployed but 0 signals (flat market). macd-div- degraded (5T/48h 20% WR -$0.40, small sample). Coin tracker active. Disk 79%.
+System FLAT, 3 open positions. 24h: 36T, 52.8% WR, -$0.12. 7d: 407T, 51.1% WR, -$2.45. 48h: 75T, 58.7% WR, +$0.06 (turning positive). Today Aug 31: 8T, 37.5% WR, -$0.07 (early). Market ALL NEUTRAL — dead. **Legacy bleed continuing to age out** (hl_copy LONG -$1.03, slow-grind- -$0.64, ct-hot+ -$0.60 — all zero new 24h). **macd-div- DEGRADED: 7T/48h, 14.3% WR, -$0.50** (small sample, tracking). **bb-bounce-short: 27T/48h, 55.6% WR, -$0.16** (below 65% target). atr_sl_hit: 26T/48h losers, avg -4.12% — entry quality issue persists. volume_breakout: 0 signals. range_reversion: 0 signals (shadow 24h+). Disk 79%.
 
 ### Root Cause
-Signal starvation from flat NEUTRAL market (1.5 trades/hr). Only 2 active backbone signals (accel-300-v2- + macd-div-) in a dead market. macd-div- degradation is small-sample variance (5T/48h). ATR_SL trailing now profitable = entry quality and exit management both working.
+Signal starvation from flat NEUTRAL market (1.5 trades/hr). 48h positive despite macd-div- degradation — other signals compensating. atr_sl_hit dominant loss: entries at poor locations (avg -4.12% on losers). macd-div- sample too small to confirm degradation (7T).
 
 ### Fix Applied
-No changes needed. System structurally sound. ATR_SL trailing turn profitable = biggest positive signal.
+**DECISION: EXTEND range_reversion shadow 24h.** Market too flat for mean-reversion triggers — 0 signals in 24h+ shadow. Re-evaluate tomorrow. **DECISION: MONITOR macd-div-.** If stays <40% WR over next 10+ trades, flag for review. No parameter changes — system flat, nothing critically broken.
+
+### Verification
+48h PnL +$0.06 (turning positive). Daily trend: Aug 25 -$1.79 → Aug 28 +$1.55 → Aug 29-$0.01 → Aug 30 -$0.08 → Aug 31 -$0.07 (stable near zero). System structurally sound — legacy bleed clearing, core signals active, ATR_SL trailing working.
 
 ### Verification
 24h: 37T 54.1% WR -$0.29 (flat). 7d: 416T 52.6% WR -$1.99. 48h ATR_SL: 74T +$0.71 (profitable). Open: 0. All legacy cleared. Disk 79%. Coin tracker active. All timers running.

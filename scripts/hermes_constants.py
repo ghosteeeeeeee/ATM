@@ -243,15 +243,15 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
+    'ARB',
     'BABY',
+    'BANANA',
     'BIGTIME',
-    'CHIP',
+    'CRV',
     'DOGE',
     'DYDX',
     'FIL',
     'GMT',
-    'GRASS',
-    'HBAR',
     'INJ',
     'LDO',
     'ME',
@@ -261,7 +261,7 @@ FAVORITES = {
     'STX',
     'SYRUP',
     'USUAL',
-    'ZRO'
+    'YGG'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -280,30 +280,37 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 LOSERS = {
     'AIXBT',
     'ALT',
+    'APT',
     'AVNT',
-    'BANANA',
     'BLUR',
     'BTC',
     'CAKE',
     'CASHCAT',
     'CC',
     'CFX',
+    'CHIP',
     'COMP',
     'ENA',
     'ENS',
+    'ETC',
     'ETH',
+    'GRASS',
     'HBAR',
     'HYPE',
     'ICP',
     'IMX',
+    'IO',
     'MERL',
     'MON',
     'NEO',
     'POL',
     'PUMP',
     'WLD',
-    'WLFI'
+    'WLFI',
+    'XPL',
+    'ZRO'
 }
+
 
 
 
@@ -1921,7 +1928,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.4728 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.5473 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────

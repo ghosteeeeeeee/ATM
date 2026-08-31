@@ -1764,3 +1764,9 @@ ALERTS:
 ## Error Alerts — 2026-08-31 01:22 UTC
 - **WARN** (1x): `hotset empty — no signals survived compaction`
 - **AUTO-FIX**: None needed — system in normal watch mode, 0 open positions
+
+## Error Alerts — 2026-08-31 05:05 UTC
+- **REPEATED** (11x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: CC TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Error Alerts — 2026-08-31 06:05 UTC
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
