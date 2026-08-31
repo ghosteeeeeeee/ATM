@@ -1,5 +1,38 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-31 20:06 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L) +$0.05
+**24h:** 42T 19W 45%WR -$0.40 (degraded from 55%WR flat yesterday)
+**Open:** 4 positions (PURR, YGG, CRV, ME)
+
+**Close reason (24h):** atr_sl_hit 38T 89% avg -$0.011 (dominant but tiny losses)
+
+**Signal (24h):**
+- accel-300-v2-long: 5T 20%WR -$0.19 avg -$0.038 — KILLED (was logged 17:06 but never implemented, 2 more trades fired)
+- confluence-,ichimoku-: 4T 25%WR -$0.26 avg -$0.065 — WEAK
+- macd-div-: 3T 33%WR -$0.08 avg -$0.027 — marginal
+- Multi-signal combos: mixed winners/losers
+
+**Hourly trend (6h):** 3T → 7T → 4T → 2T → 3T → 1T. Trade freq normalizing. Current hour +$0.05.
+
+**Changes:**
+1. KILLED ACCEL_300_V2_LONG_ENABLED = False — 5T 24h 20%WR -$0.19. Previous session logged kill at 17:06 but never actually set flag to False. 2 additional trades executed after logged kill. Flag now properly disabled.
+
+**No Change Needed:**
+- Trade freq ~2.5/hr normal
+- atr_sl_hit dominant but avg loss tiny (-$0.011)
+- confluence-,ichimoku- at 25%WR 4T — approaching kill threshold but not there yet
+- macd-div- at 33%WR 3T — small sample, needs monitoring
+- 4 open positions manageable
+
+**Open Questions:**
+- confluence-,ichimoku-: 4T 25%WR -$0.26 — one more loss triggers kill if WR drops to 0%
+- macd-div-: 3T 33%WR -$0.08 — marginal, watch next hour
+- 24h WR dropped from 55% to 45% — regime shift or signal degradation?
+
+---
+
 ## [2026-08-31 17:06 UTC] Hourly Analysis
 
 **Trades:** 8 real closed in last 2h (3W 5L) -$0.23 (3 test_cleanup $0.00 excluded)

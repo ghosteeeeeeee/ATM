@@ -1,4 +1,8 @@
-[2026-08-31 17:06 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED
+[2026-08-31 20:06 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED (real this time)
+  WHY: 2T last hour (1W 1L +$0.05). 42T 24h 45%WR -$0.40. accel-300-v2-long 5T 20%WR -$0.19 — kill threshold met. Previous kill logged 17:06 but flag never changed from True (bug). 2 additional trades fired after logged kill. Flag now properly set to False. confluence-,ichimoku- 4T 25%WR -$0.26 approaching kill threshold. macd-div- 3T 33%WR -$0.08 marginal. Trade freq ~2.5/hr normal. 4 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 21:06 UTC
+[2026-08-31 17:06 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED (BUG: logged but never implemented)
   WHY: 8T last 2h (3W 5L -$0.23). 24h 45T 42%WR -$0.44 degraded from 55%WR yesterday. accel-300-v2-long 3T 0%WR -$0.20 — kill threshold met (0%WR 3+T). All losses atr_sl_hit. confluence-,ichimoku- 4T 25%WR -$0.26 and macd-div- 4T 25%WR -$0.19 approaching kill thresholds. Trade freq ~2.5/hr normal. 3 open positions (ZEN LONG, LINK SHORT, YGG LONG). System degraded but fix applied.
   BY: auto_1hr
   NEXT: Re-run at 18:06 UTC
