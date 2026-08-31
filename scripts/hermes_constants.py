@@ -1580,7 +1580,7 @@ BB_BOUNCE_LONG_ENABLED = True     # bb_bounce_long — V2 solo variant with velo
 # CEO 2026-08-25 — removed 'hl_copy_trader' (5T/8h 0% WR -$2.41. Copy delay = enters after move over. Requires confluence to fire.)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long',
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
