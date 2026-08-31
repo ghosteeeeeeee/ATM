@@ -18789,3 +18789,49 @@ No critical issues, no CEO recommendations pending.
 - DEMOTE SEI (WR=50.0%, PnL=$0.10, 1 consecutive bad days, regime=NEUTRAL)
 
 Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'STX', 'SYRUP', 'USUAL', 'YGG']
+
+## [2026-08-31 17:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L) +$0.13
+**24h:** 45T ~47%WR -$0.08 (nearly flat)
+**Open:** 2 (LINK SHORT, DOGE SHORT)
+
+**Close reason 24h:** atr_sl_hit 36T 94.7% avg -$0.007 (trailing SL working perfectly). profit-monster-trail 3T +$0.02. cascade 2T. test_cleanup 3T.
+
+**Signal 24h:** confluence-,ichimoku- 4T 25%WR -$0.26 (bleeding). macd-div- 4T 25%WR -$0.19 (same). accel-300-v2-long 4T 25%WR -$0.08. All below kill threshold (need 0%WR 3+T last hour). Strong performers: cascade-reverse-v2 1T $0.23, ichimoku-,rs-r117 1T $0.35.
+
+**Hourly PnL 6h:** 13:00 +$0.02, 14:00 $0.00, 15:00 -$0.02, 16:00 -$0.21, 17:00 +$0.13. Two consecutive negatives (15-16h), recovered at 17h. No 3+ streak.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 2/hr — normal
+- No 3+ consecutive negative hours
+- atr_sl_hit 94.7% trailing SL working as designed
+- System healthy, flat market
+
+**Open Questions:** None
+
+## [2026-08-31 18:45 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L) -$0.30
+**24h:** 46T ~43%WR -$0.43
+**Open:** 2 (YGG LONG, PURR LONG)
+
+**Close reason 24h:** atr_sl_hit 37T (80.4%) avg -$0.009 trailing SL working. profit-monster-trail 3T +$0.02. test_cleanup 3T. cascade 2T. MAE-GUARD 1T.
+
+**Signal 24h:** accel-300-v2-long 5T 20%WR -$0.19. confluence-,ichimoku- 4T 25%WR -$0.26. macd-div- 3T 33%WR -$0.08. All bleeding but below kill threshold (need 0%WR 3+T last hour — last hour had only 1T each for any given signal).
+
+**Hourly PnL 6h:** 13:00 +$0.02, 14:00 $0.00, 15:00 -$0.02, 16:00 -$0.21, 17:00 +$0.13, 18:00 -$0.30. Alternating pattern, no 3+ consecutive negatives.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+ trades last hour)
+- Trade freq 3/hr — normal
+- No 3+ consecutive negative hours
+- atr_sl_hit dominant (80.4%) — trailing SL functioning as designed
+- System healthy, NEUTRAL regime
+
+**Open Questions:** None

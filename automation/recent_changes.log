@@ -641,3 +641,11 @@
   WHY: 8T last hour (2W 3L 3 cleanup ~$0.00 flat). 43T 24h -$0.40 83.7% atr_sl_hit trailing SL working. Kill criteria not met (no signal 0%WR 3+T last hour). ichimoku- 2T 0%WR but only 2T not 3+. Trade freq 8/hr elevated but <20. No consecutive negative hours. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 17:05 UTC
+[2026-08-31 17:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +$0.13 winning hour). 45T 24h ~47%WR -$0.08 flat. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 94.7% trailing SL working perfectly. 2 consecutive negative hours (15-16h) but recovered at 17h — no 3+ streak. Trade freq 2/hr normal. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 18:05 UTC
+[2026-08-31 18:45 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.30 all atr_sl_hit). 46T 24h 43%WR -$0.43. Kill criteria not met (no signal 0%WR 3+T last hour). accel-300-v2-long 5T 20%WR -$0.19 bleeding but not 0%WR. confluence-,ichimoku- 4T 25%WR -$0.26 same. Trade freq 3/hr normal. No consecutive negative hours (alternating pattern). System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 19:45 UTC
