@@ -352,10 +352,6 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
             if gap_change_3 < -0.05:
                 return None  # gap narrowing over 3 bars — momentum fading
 
-    # ── FILTER 9: Fresh cross gap check ─────────────────────────────────────
-    if fresh_cross and abs_gap < V2_FRESH_CROSS_MIN_GAP:
-        return None  # even fresh cross needs SOME gap
-
     return {
         'direction': 'LONG',
         'gap_pct': round(gap_now, 4),
