@@ -3021,8 +3021,8 @@ def run(dry_run=False):
                         continue
                     fresh_result = detect_accel_300_v2_long_5m(token, fresh_candles)
                 elif _is_accel_v2_long:
-                    # LONG staleness: only check direction (price above EMA300)
-                    # Full detection is too strict — conditions always change in 1-3 min
+                    # LONG staleness: check direction + acceleration
+                    # Full detection is too strict, but acceleration check catches reversals
                     from signals.accel_300_v2_long import _get_1m_prices, _ema_series, PERIOD
                     fresh_prices = _get_1m_prices(token)
                     if not fresh_prices:
@@ -3037,6 +3037,19 @@ def run(dry_run=False):
                     if fresh_gap <= 0:
                         log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: price below EMA300 (gap={fresh_gap:.3f}%)')
                         if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                    # Check acceleration — if negative, momentum has reversed
+                    fresh_idx = len(fresh_closes) - 1
+                    if fresh_idx >= 10 and fresh_ema[fresh_idx-10]:
+                        fresh_accel = fresh_gap - ((fresh_closes[fresh_idx-10] - fresh_ema[fresh_idx-10]) / fresh_ema[fresh_idx-10] * 100)
+                        if fresh_accel < 0:
+                            log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: acceleration reversed ({fresh_accel:+.3f}%)')
+                            if sig_id:
+                                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                            skipped += 1
+                            continue
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
                         continue
