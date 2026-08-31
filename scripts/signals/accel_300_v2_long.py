@@ -47,7 +47,7 @@ V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
 V2_PERSISTENCE_BARS = 3        # min bars price must stay above EMA
 V2_VOLUME_LOOKBACK = 30        # bars for average volume
 V2_VOLUME_MULT = 1.0           # volume must be >= average
-V2_COOLDOWN_BARS = 15          # cooldown between signals per token
+V2_COOLDOWN_BARS = 15          # cooldown between signals per token (15 min)
 V2_LOOKBACK_1M = 700           # 1m prices to fetch
 V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (positive for LONG)
@@ -405,8 +405,27 @@ def scan_accel_300_v2_long_signals(prices_dict: dict) -> int:
         if sig is None:
             continue
 
-        if get_cooldown(token, direction='LONG'):
-            continue
+        # Direct cooldown check — bypass broken cooldown system
+        # (cooldown system ignores reason='signal', so we check DB directly)
+        try:
+            import sqlite3 as _sqlite3
+            _conn = _sqlite3.connect(_RUNTIME_DB, timeout=5)
+            _cur = _conn.cursor()
+            _cur.execute("""
+                SELECT created_at FROM signals
+                WHERE token = ? AND direction = 'LONG' AND source = ?
+                ORDER BY created_at DESC LIMIT 1
+            """, (token.upper(), SOURCE))
+            _last = _cur.fetchone()
+            _conn.close()
+            if _last:
+                from datetime import datetime as _dt
+                _last_ts = _dt.fromisoformat(_last[0])
+                _elapsed = (_dt.now() - _last_ts).total_seconds() / 60
+                if _elapsed < V2_COOLDOWN_BARS:
+                    continue  # Still in cooldown
+        except Exception:
+            pass  # On error, don't block
 
         # Blacklist guard
         if token.upper() in LONG_BLACKLIST:
