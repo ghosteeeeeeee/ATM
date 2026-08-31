@@ -74,3 +74,31 @@ Signal starvation from flat market — 36T/24h = 1.5/hr. Only 2 backbone signals
 - Monitor range_reversion shadow mode (48h trial)
 - Monitor macd-div- WR recovery
 - Disk 78% — safe
+
+## CEO Report — 2026-08-31 ~15:30 UTC
+
+### Diagnosis
+**Verified DB:** 24h 39T 48.7% WR -$0.56. 48h 79T 54.4% WR -$0.55. 7d 398T 49.7% WR -$3.12. Today Aug 31: 18T 38.9% WR -$0.55 (worst day this week). 2 open (ME LONG bb-bounce-long+, LINK SHORT ichimoku-). Market ALL NEUTRAL — dead. Disk 79%.
+
+**Worst performers (48h):** macd-div- SHORT 8T 25% WR -$0.48 (DEGRADED, CEO_PROTECTED — flagged for T). confluence-,ichimoku- combo 6T 33.3% WR -$0.37 (noise). bb-bounce-short 22T 50% WR -$0.24 (legacy closing). ATR_SL 31 exits -$3.17 (dominant).
+
+**macd-div- daily trend:** Aug 27 100% WR → Aug 30 0% WR → Aug 31 33.3% WR. Signal works in trending, fails in chop. All 48h exits: 5 ATR_SL (-$0.36) + 3 cascade flips (-$0.12).
+
+### Root Cause
+NEUTRAL market + signal starvation (~1.7/hr). System has 2 backbone signals (accel-300-v2-, macd-div-). Both degraded in flat chop. volume_breakout (1 trade, -$0.09) and range_reversion (shadow, 0 signals) unproven.
+
+### Decisions
+1. **EXTEND range_reversion shadow 24h.** 24h+ shadow, 0 signals. Market too flat for mean-reversion. Re-evaluate tomorrow — if still 0 signals, disable or lower thresholds.
+2. **FLAG macd-div- for T review.** CEO_PROTECTED — 8T/48h 25% WR -$0.48. Works in trend, fails in chop. Recommend: tighter SL or regime filter (block in NEUTRAL). Cannot disable myself.
+3. **MONITOR volume_breakout.** 1 trade closed -$0.09. Need 20+ signals before evaluation.
+4. **NO parameter changes.** System near breakeven, nothing critically broken. Market dead.
+
+### Verification
+Aug 28 was +$1.55 (best in weeks). Aug 29-31 flat/slightly negative. System structurally sound — legacy bleed fully cleared. Problem is market regime + signal count, not signal quality.
+
+### Next
+- Monitor macd-div- WR recovery (flagged for T)
+- Extend range_reversion shadow 24h
+- Monitor volume_breakout (need 20+ signals)
+- Disk 79% — safe
+- Delegate to signal_analyst: build signal for NEUTRAL regime

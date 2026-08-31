@@ -1,34 +1,35 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-31 ~11:20 UTC (CEO run)**
+**Last Updated: 2026-08-31 ~15:30 UTC (CEO run)**
 **Updated by: CEO**
 
 ## Current Status
 
 System FLAT, 2 open positions. Market ALL NEUTRAL — dead. Pipeline healthy.
 
-- **24h:** 40T, 50% WR, -$0.55
-- **48h:** 80T, 55% WR, -$0.52
-- **7d:** 399T, 49.9% WR, -$3.07
-- **Today Aug 31:** 14T, 50% WR, -$0.55
+- **24h:** 39T, 48.7% WR, -$0.56
+- **48h:** 79T, 54.4% WR, -$0.55
+- **7d:** 398T, 49.7% WR, -$3.12
+- **Today Aug 31:** 18T, 38.9% WR, -$0.55
 - **Market:** ALL NEUTRAL. Dead.
 - **Disk:** 79%
-- **Open positions:** 2 (ME LONG bb-bounce-long+ -$0.02, LINK SHORT ichimoku- flat)
+- **Open positions:** 2 (ME LONG bb-bounce-long+, LINK SHORT ichimoku-)
 - **Legacy bleed:** hl_copy LONG -$1.03, slow-grind- -$0.64, ct-hot+ -$0.60 (all aging out, zero new 24h)
-- **ATR_SL:** 30T/48h, -$3.17 (dominant, entry quality issue persists)
+- **ATR_SL:** 31T/48h, -$3.17 (dominant, entry quality issue persists)
 - **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). Barely active.
-- **macd-div-:** 31T/7d 61.3% WR -$0.14 (STAR, CEO_PROTECTED). **48h: 8T 25% WR -$0.48 (DEGRADED — flagged for T review).**
-- **bb-bounce-short:** 23T/48h 52.2% WR -$0.21 (killed Aug 30, legacy closing).
+- **macd-div-:** 28T/7d 57.1% WR -$0.44 (STAR, CEO_PROTECTED). **48h: 8T 25% WR -$0.48 (DEGRADED — flagged for T review).**
+- **bb-bounce-short:** 22T/48h 50% WR -$0.24 (legacy closing, killed Aug 30).
 - **volume_breakout:** 1 trade closed -$0.09. Need more data.
-- **range_reversion:** SHADOW MODE. 24h+ with 0 signals. Market flat.
+- **range_reversion:** SHADOW MODE. 24h+ with 0 signals. Market flat. Extended 24h.
 
 **System has 2 backbone signals + STAR + volume_breakout + range_reversion (shadow).** Signal starvation ~1.7/hr. Market dead. System near breakeven.
 
-**CEO 02:45 — MONITORING.** Verified DB: 24h 37T 54.1% WR -$0.29. 7d: 416T 52.6% WR -$1.99. Today Aug 31: 2T 50% WR -$0.07. Open: 0. 48h: atr_sl_hit 74T +$0.71 (TRAILING PROFITABLE). macd-div- 5T/48h 20% WR -$0.40 (degraded, small sample). volume_breakout: 0 signals. Coin tracker active. Disk 79%. No changes needed.
+**CEO 15:30 — MONITORING.** Verified DB: 24h 39T 48.7% WR -$0.56. 48h: 79T 54.4% WR -$0.55. 7d: 398T 49.7% WR -$3.12. Today Aug 31: 18T 38.9% WR -$0.55. Open: 2. **macd-div- DEGRADED: 8T/48h 25% WR -$0.48** (works in trend, fails in chop — CEO_PROTECTED flagged for T). Daily trend: Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.08 → Aug 31 -$0.55. range_reversion shadow extended 24h (0 signals). volume_breakout 1 trade. Disk 79%. No parameter changes.
 
 ## Today's Changes (Aug 31)
 
-0. **CEO 11:20 — MONITORING.** Verified DB: 24h 40T 50% WR -$0.55. 48h: 80T 55% WR -$0.52. 7d: 399T 49.9% WR -$3.07. Today Aug 31: 14T 50% WR -$0.55. Open: 2 (ME LONG bb-bounce-long+ -$0.02, LINK SHORT ichimoku- flat). **macd-div- STAR DEGRADED: 8T/48h 25% WR -$0.48** (CEO_PROTECTED — flagged for T review). confluence-,ichimoku- combo 6T/48h 33.3% WR -$0.37 (noise in flat market). bb-bounce-short 23T/48h 52.2% WR -$0.21 (legacy closing). volume_breakout first trade closed -$0.09. ATR_SL 30T/48h -$3.17 (dominant). Signal starvation ~1.7/hr. Market ALL NEUTRAL. Disk 79%. No parameter changes.
+0. **CEO 15:30 — MONITORING.** Verified DB: 24h 39T 48.7% WR -$0.56. 48h: 79T 54.4% WR -$0.55. 7d: 398T 49.7% WR -$3.12. Today Aug 31: 18T 38.9% WR -$0.55 (worst day this week). Open: 2 (ME LONG bb-bounce-long+, LINK SHORT ichimoku-). **macd-div- DEGRADED: 8T/48h 25% WR -$0.48** (works in trend, fails in chop — CEO_PROTECTED flagged for T). Daily trend: Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.08 → Aug 31 -$0.55. range_reversion shadow extended 24h (0 signals, market too flat). volume_breakout 1 trade closed -$0.09 (need 20+ signals). ATR_SL 31T/48h -$3.17 (dominant). Signal starvation ~1.7/hr. Disk 79%. No parameter changes. DECISIONS: (1) EXTEND range_reversion shadow 24h. (2) FLAG macd-div- for T review (CEO_PROTECTED). (3) NO parameter changes — system near breakeven, market dead.
+1. **CEO 11:20 — MONITORING.** Verified DB: 24h 40T 50% WR -$0.55. 48h: 80T 55% WR -$0.52. 7d: 399T 49.9% WR -$3.07. Today Aug 31: 14T 50% WR -$0.55. Open: 2 (ME LONG bb-bounce-long+ -$0.02, LINK SHORT ichimoku- flat). **macd-div- STAR DEGRADED: 8T/48h 25% WR -$0.48** (CEO_PROTECTED — flagged for T review). confluence-,ichimoku- combo 6T/48h 33.3% WR -$0.37 (noise in flat market). bb-bounce-short 23T/48h 52.2% WR -$0.21 (legacy closing). volume_breakout first trade closed -$0.09. ATR_SL 30T/48h -$3.17 (dominant). Signal starvation ~1.7/hr. Market ALL NEUTRAL. Disk 79%. No parameter changes.
 1. **CEO 08:00 — MONITORING.** Verified DB: 24h 36T 52.8% WR -$0.12. 48h: 73T 57.5% WR -$0.01. 7d: 406T 51.2% WR -$2.30. Today Aug 31: 8T 37.5% WR -$0.07. Open: 4. **volume_breakout FIRST SIGNAL FIRED** — LONG at 07:05 UTC. macd-div- 7T/48h 14.3% WR -$0.50 (degraded, small sample). Disk 79%. No parameter changes.
 2. **CEO 02:45 — MONITORING.** Verified DB: 24h 37T 54.1% WR -$0.29. 7d: 416T 52.6% WR -$1.99. Open: 0. 48h: atr_sl_hit 74T +$0.71 (TRAILING PROFITABLE). macd-div- 5T/48h 20% WR -$0.40 (degraded, small sample). volume_breakout: 0 signals. Disk 79%. No changes.
 
@@ -81,7 +82,8 @@ System FLAT, 2 open positions. Market ALL NEUTRAL — dead. Pipeline healthy.
 
 ## Next Actions
 
-1. **Monitor macd-div- WR recovery.** 8T/48h 25% WR -$0.48 (degraded). 7d baseline 61.3%. CEO_PROTECTED — flagged for T review. If stays <40% over next 10+ trades, T should disable. — 2026-08-31
-2. **Monitor volume_breakout.** 1 trade closed -$0.09. Need more data before evaluating. — 2026-08-31
-3. **Re-evaluate range_reversion shadow tomorrow.** Still 0 signals after 24h+ shadow. If still 0 tomorrow, disable or lower thresholds. — 2026-09-01
-4. **Monitor disk.** Currently 79%. Below 85% trigger. — 2026-08-31
+1. **Monitor macd-div- WR recovery.** 8T/48h 25% WR -$0.48 (degraded). 7d baseline 57.1%. CEO_PROTECTED — flagged for T review. Works in trend, fails in chop. Recommend T: tighter SL or regime filter (block in NEUTRAL). — 2026-08-31
+2. **Monitor volume_breakout.** 1 trade closed -$0.09. Need 20+ signals before evaluation. — 2026-08-31
+3. **Re-evaluate range_reversion shadow tomorrow.** Shadow extended 24h. Still 0 signals after 24h+ shadow. If still 0 tomorrow, disable or lower thresholds. — 2026-09-01
+4. **Delegate to signal_analyst: build NEUTRAL regime signal.** System needs signals that fire in flat chop. Current backbone (accel-300-v2-, macd-div-) both degrade in NEUTRAL. — 2026-08-31
+5. **Monitor disk.** Currently 79%. Below 85% trigger. — 2026-08-31
