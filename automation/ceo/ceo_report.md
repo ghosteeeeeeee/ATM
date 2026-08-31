@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-31 ~20:00 UTC
+
+### Diagnosis
+System FLAT, 5 open positions. Market ALL NEUTRAL (104/105 tokens). 24h: 45T, 42.2% WR, -$0.44. 7d: 364T, 50.5% WR, -$1.75. Today Aug 31: 39T, 35.9% WR, -$0.93 (worst day this week). **accel-300-v2-long LONG 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%.** confluence-,ichimoku- SHORT 4T/24h 25% WR, -$0.26 (combo signal, flat market noise). macd-div- DEAD. volume_breakout 2 trades total, small losses. range_reversion shadow 24h+, 0 signals. Signal starvation ~1.7/hr. Disk 79%. Pipeline healthy.
+
+### Root Cause
+accel-300-v2-long LONG MIN_GAP=1.5 lets in weak entries (gap <2.0% = all losers per backtest pattern — same as SHORT before its fix). 4/5 trades ATR_SL at -4.5% to -4.9%. Market dead (NEUTRAL) compounds the problem — no trend = no winners for trend-following signals.
+
+### Fix Applied
+**Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0.** Same treatment as SHORT (raised 1.0→2.0 on Aug 29, worked). Filters entries where price is too close to EMA300. Expected: fewer trades but higher WR and PnL.
+
+### Verification
+SHORT MIN_GAP fix (Aug 29): improved from bleeding to +$1.46/7d backbone. LONG fix applies same logic. Monitor 48h for WR improvement.
+
 ## CEO Report — 2026-08-31 ~16:30 UTC
 
 ### Diagnosis

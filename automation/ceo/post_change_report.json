@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-08-31T15:53:23.836618+00:00",
+  "event": "changes_completed",
+  "summary": "Restored profit_monster.py (offline 4 days), tightened SL params per MoE panel, verified trailing working",
+  "files_changed": [
+    "scripts/profit_monster.py (restored from git)",
+    "scripts/hermes_constants.py (ATR_SL_MAX 1.5\u21921.0%, CUT_LOSER_PNL -2.0\u2192-1.75)",
+    "scripts/self_learner.py (PARAM_CONFIG min fix)",
+    "brain/verdicts/ (4 audit reports)"
+  ],
+  "bugs_fixed": [
+    "profit_monster.py deleted but timer still running (4-day outage)",
+    "self_learner PARAM_CONFIG ATR_SL_MAX min was 0.020, would override CEO value",
+    "CL_TIER2 range unreachable with new CUT_LOSER_PNL",
+    "ATR_SL_MAX_INIT contract violation"
+  ],
+  "decisions": [
+    "ATR_SL_MAX: 1.5% \u2192 1.0% (MoE panel: 4/4 experts approve, p<0.0001)",
+    "CUT_LOSER_PNL: -2.0% \u2192 -1.75% (compromise per Risk Manager)",
+    "TRAILING_DISTANCE_PCT: held at 0.50% (auditor confirmed trailing IS working)",
+    "PM_TRAIL_DISTANCE_PCT: held at 0.20% (93.1% WR, dont fix)"
+  ],
+  "estimated_improvement": "+$89/month (95% CI: +$46 to +$136)"
+}

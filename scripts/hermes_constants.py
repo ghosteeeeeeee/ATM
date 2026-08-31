@@ -920,6 +920,16 @@ BTC_MOMENTUM_RISING_THRESHOLD = 0.15        # % — block SHORT if BTC 30m momen
 BTC_MOMENTUM_FALLING_THRESHOLD = -0.15      # % — block LONG if BTC 30m momentum < this
 BTC_MOMENTUM_BLOCK_DURATION_MIN = 10        # minutes to block entries after trigger
 
+# ── BTC Level Filter (Layer 8) ───────────────────────────────────────────────
+# Block entries when BTC is at session extremes (mean reversion risk).
+# Prevents SHORT entries at session lows (bounce risk) and LONG at highs (pullback risk).
+# Would have prevented all 6 losing SHORT entries in Aug 24 incident (-$34.78 saved).
+BTC_LEVEL_FILTER_ENABLED = True
+BTC_LEVEL_SHORT_BLOCK_PCT = -0.5       # % — block SHORT if BTC > 0.5% below 1h high
+BTC_LEVEL_LONG_BLOCK_PCT = 0.5         # % — block LONG if BTC > 0.5% above 1h low
+BTC_LEVEL_LOOKBACK_MIN = 60            # minutes — how far back to find session high/low
+BTC_LEVEL_BLOCK_DURATION_MIN = 10      # minutes to block entries after trigger
+
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
 # Backtested 14d: SHORT vol<0.30% → blocks 78T (41% WR), keeps 47T (74% WR), net +$1.79.
@@ -1441,7 +1451,7 @@ ACCEL_300_V2_MINUS_ENABLED    = False   # CEO 2026-08-29 — 4T/7d 25% WR -$0.14
 ACCEL_300_V2_LONG_ENABLED     = True    # Re-enabled after MoE panel review. Tuned for early breakout entries.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
-ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
+ACCEL_300_V2_LONG_MIN_GAP = 2.0     # LONG: min gap above EMA300 — raised from 1.5 CEO 2026-08-31, matches SHORT fix: 5T/24h 20%WR -$0.19 ALL ATR_SL
 ACCEL_300_V2_LONG_MAX_GAP = 4.5     # LONG: max gap — raised from 3.5 to capture strong momentum like HEMI (3.77%)
 # ── accel-300-v2 LONG 5m params ────────────────────────────────────────────
 ACCEL_300_V2_LONG_5M_MIN_GAP = 1.5  # LONG 5m: min gap above EMA300

@@ -814,3 +814,5 @@
 [2026-08-31 11:07 UTC]   🟡 WARNING: macd-div-: 5 trades, 20.0% WR, PnL=-3.3
 [2026-08-31 11:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-31 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-31 17:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-31 17:07 UTC] No signals with sufficient trades in 24h window

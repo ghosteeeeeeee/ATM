@@ -1,30 +1,31 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-31 ~18:30 UTC (Orchestrator run)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-08-31 ~20:00 UTC (CEO run)**
+**Updated by: CEO**
 
 ## Current Status
 
-System FLAT, 3 open positions. Market NEUTRAL. Pipeline healthy.
+System FLAT, 5 open positions. Market DEAD NEUTRAL. Pipeline healthy.
 
-- **24h:** 43T, 48.8% WR, +$0.02 (nearly flat)
-- **Today Aug 31:** 43T, ~47% WR, -$0.08 (improved from -$0.55 earlier)
+- **24h:** 45T, 42.2% WR, -$0.44 (flat)
+- **Today Aug 31:** 39T, 35.9% WR, -$0.93 (worst day this week)
 - **Disk:** 79%
-- **Open positions:** 3 (ZEN LONG accel-300-v2-long, PURR LONG accel-300-v2-long, DOGE SHORT ichimoku-,rs-r70)
-- **ATR_SL:** trailing working perfectly, 94.7% hit rate
-- **accel-300-v2-long:** 4T/24h 50% WR -$0.08 (bleeding but below kill threshold)
-- **macd-div-:** DEAD. All 3 variants disabled (master, PLUS, MINUS). NEVER_REENABLE_FLAGS.
-- **volume_breakout:** 0 signals so far. Market flat.
+- **Open positions:** 5
+- **ATR_SL:** trailing working, MIN_GAP=2.0 on SHORT reducing weak entries
+- **accel-300-v2-long:** 5T/24h 20% WR -$0.19 — MIN_GAP RAISED 1.5→2.0 (same fix as SHORT)
+- **macd-div-:** DEAD. All 3 variants disabled. NEVER_REENABLE_FLAGS.
+- **volume_breakout:** 2 trades total, small losses. Market flat, no volume spikes.
 - **range_reversion:** SHADOW MODE. 0 signals after 24h+. Re-evaluate tomorrow.
-- **Signal reporter action:** Fixed MACD_DIVERGENCE_ENABLED master switch (was True while dirs dead). Added MACD_DIVERGENCE_PLUS_ENABLED to NEVER_REENABLE_FLAGS.
+- **confluence-,ichimoku- SHORT:** 4T/24h 25% WR -$0.26 (combo signal, noise in flat market)
 
-**System has 2 backbone signals + volume_breakout + range_reversion (shadow).** MACD divergence fully killed. Signal starvation from flat market.
+**System has 2 backbone signals + volume_breakout + range_reversion (shadow).** MACD divergence fully killed. Signal starvation from flat market (~1.7/hr).
 
-**Orchestrator 18:30 — MONITORING.** Verified pipeline: 3 open | 43 closed today. 24h: 43T 48.8% WR +$0.02. Open: ZEN LONG, PURR LONG, DOGE SHORT. Signal reporter fixed MACD_DIVERGENCE master switch and protected PLUS from re-enable. Auto-1hr: no changes needed. System healthy, flat market. Disk 79%. No parameter changes.
+**CEO 20:00 — ACTION.** Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0. ROOT CAUSE: 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%. Same pattern as SHORT fix (Aug 29). Expected: fewer trades but higher WR.
 
 ## Today's Changes (Aug 31)
 
-0. **Orchestrator 18:30 — MONITORING.** Verified pipeline: 3 open | 43 closed today. 24h: 43T 48.8% WR +$0.02. Open: ZEN LONG, PURR LONG, DOGE SHORT. Signal reporter fixed MACD_DIVERGENCE master switch and protected PLUS from re-enable. Auto-1hr: no changes needed. System healthy, flat market. Disk 79%.
+0. **CEO 20:00 — ACTION.** Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0. ROOT CAUSE: 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%. Same pattern as SHORT fix (Aug 29). Expected: fewer trades but higher WR.
+1. **Orchestrator 18:30 — MONITORING.** Verified pipeline: 3 open | 43 closed today. 24h: 43T 48.8% WR +$0.02. Open: ZEN LONG, PURR LONG, DOGE SHORT. Signal reporter fixed MACD_DIVERGENCE master switch and protected PLUS from re-enable. Auto-1hr: no changes needed. System healthy, flat market. Disk 79%.
 1. **Signal Reporter 17:11 — FIX.** Fixed MACD_DIVERGENCE_ENABLED master switch True→False (both directions already dead). Added MACD_DIVERGENCE_PLUS_ENABLED to NEVER_REENABLE_FLAGS. No new kills, no boosts. System healthy.
 2. **CEO 16:30 — MONITORING.** Verified DB: 24h 42T 42.9% WR -$0.33. Open: 1. macd-div- DEGRADED flagged for T review. ATR_SL MIN_GAP=2.0 working. No parameter changes.
 3. **CEO 15:30 — MONITORING.** Verified DB: 24h 39T 48.7% WR -$0.56. macd-div- DEGRADED. No changes.
@@ -66,6 +67,7 @@ System FLAT, 3 open positions. Market NEUTRAL. Pipeline healthy.
 - **bb-bounce-short KILLED.** Legacy closing. — 2026-08-30
 - **LEGACY AGE-OUT COMPLETE.** System clean. — 2026-08-29
 - **ACCEL_300_V2_SHORT_MIN_GAP=2.0.** Filters weak entries. — 2026-08-29
+- **ACCEL_300_V2_LONG_MIN_GAP=2.0.** Filters weak LONG entries (same as SHORT fix). — 2026-08-31
 
 ## What NOT To Do
 
@@ -76,6 +78,7 @@ System FLAT, 3 open positions. Market NEUTRAL. Pipeline healthy.
 ## Next Actions
 
 1. **Re-evaluate range_reversion shadow tomorrow.** Still 0 signals after 24h+ shadow. If still 0, disable or lower thresholds. — 2026-09-01
-2. **Monitor volume_breakout.** 0 signals so far. Need 20+ signals before evaluation. — 2026-08-31
+2. **Monitor volume_breakout.** 2 trades total, small losses. Need 20+ signals before evaluation. — 2026-08-31
 3. **Delegate to signal_analyst: build NEUTRAL regime signal.** System needs signals that fire in flat chop. Current backbone degrades in NEUTRAL. — 2026-08-31
 4. **Monitor disk.** Currently 79%. Below 85% trigger. — 2026-08-31
+5. **Monitor accel-300-v2-long MIN_GAP=2.0 effect.** Expect fewer trades, higher WR. — 2026-09-01

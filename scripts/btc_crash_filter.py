@@ -352,6 +352,51 @@ def _check_btc_momentum() -> Tuple[bool, str, float]:
     return False, '', momentum_pct
 
 
+# ── Layer 8: BTC Level Filter ────────────────────────────────────────────────
+
+def _check_btc_level() -> Tuple[bool, str, float, float]:
+    """Check BTC price level relative to session high/low (mean reversion risk).
+
+    When BTC is near session lows, SHORT entries risk getting caught in bounces.
+    When BTC is near session highs, LONG entries risk getting caught in pullbacks.
+
+    Returns: (should_block, direction_blocked, pct_from_high, pct_from_low)
+    """
+    from hermes_constants import (
+        BTC_LEVEL_FILTER_ENABLED,
+        BTC_LEVEL_SHORT_BLOCK_PCT,
+        BTC_LEVEL_LONG_BLOCK_PCT,
+        BTC_LEVEL_LOOKBACK_MIN,
+    )
+
+    if not BTC_LEVEL_FILTER_ENABLED:
+        return False, '', 0.0, 0.0
+
+    # Fetch 1m BTC candles — need enough for lookback window
+    btc_candles = _get_candles('BTC', '1m', BTC_LEVEL_LOOKBACK_MIN + 5)
+    if len(btc_candles) < BTC_LEVEL_LOOKBACK_MIN:
+        return False, '', 0.0, 0.0
+
+    closes = [c[4] for c in btc_candles]
+    current = closes[-1]
+    session_high = max(closes[-BTC_LEVEL_LOOKBACK_MIN:])
+    session_low = min(closes[-BTC_LEVEL_LOOKBACK_MIN:])
+
+    # Calculate distance from high and low
+    pct_from_high = ((current - session_high) / session_high * 100) if session_high > 0 else 0
+    pct_from_low = ((current - session_low) / session_low * 100) if session_low > 0 else 0
+
+    # Block SHORT when BTC is near session lows (bounce risk)
+    if pct_from_high < BTC_LEVEL_SHORT_BLOCK_PCT:
+        return True, 'SHORT', pct_from_high, pct_from_low
+
+    # Block LONG when BTC is near session highs (pullback risk)
+    if pct_from_low > BTC_LEVEL_LONG_BLOCK_PCT:
+        return True, 'LONG', pct_from_high, pct_from_low
+
+    return False, '', pct_from_high, pct_from_low
+
+
 # ── Main Crash Check ─────────────────────────────────────────────────────────
 
 def check_crash() -> CrashSignal:
@@ -446,6 +491,14 @@ def check_crash() -> CrashSignal:
         triggered_layers.append('MOMENTUM')
         signal.raw['momentum_dir'] = momentum_dir
 
+    # Layer 8: BTC Level Filter (mean reversion risk)
+    level_blocked, level_dir, pct_from_high, pct_from_low = _check_btc_level()
+    signal.raw['btc_pct_from_high'] = pct_from_high
+    signal.raw['btc_pct_from_low'] = pct_from_low
+    if level_blocked:
+        triggered_layers.append('BTC_LEVEL')
+        signal.raw['level_dir'] = level_dir
+
     # ── Severity Assessment ──────────────────────────────────────────────
     # EMERGENCY: Price crash + volume spike + contagion = confirmed cascade
     # CRITICAL:  Price crash + any 1 other layer
@@ -529,6 +582,30 @@ def check_crash() -> CrashSignal:
                 signal.blocked_direction = momentum_dir
                 signal.layer = '+'.join(triggered_layers)
                 signal.reason += f' | MOMENTUM: {momentum_pct:+.2f}% ({momentum_dir} blocked)'
+
+    # ── BTC_LEVEL independent block (Layer 8) ─────────────────────────────
+    # BTC level blocks entries in ONE direction only.
+    # Near session low → block SHORT (bounce risk); near session high → block LONG (pullback risk).
+    # Independent of other layers — applies its own block duration.
+    if level_blocked:
+        from hermes_constants import BTC_LEVEL_BLOCK_DURATION_MIN
+        level_block_sec = BTC_LEVEL_BLOCK_DURATION_MIN * 60  # 10 min
+
+        if not signal.blocked:
+            signal.blocked = True
+            signal.severity = 'WARNING'
+            signal.layer = 'BTC_LEVEL'
+            signal.blocked_direction = level_dir
+            signal.block_duration_sec = level_block_sec
+            signal.reason = (f'BTC level: {pct_from_high:+.2f}% from high, '
+                           f'{pct_from_low:+.2f}% from low — '
+                           f'blocking {level_dir} entries')
+        else:
+            if level_block_sec > signal.block_duration_sec:
+                signal.block_duration_sec = level_block_sec
+                signal.blocked_direction = level_dir
+                signal.layer = '+'.join(triggered_layers)
+                signal.reason += f' | BTC_LEVEL: {level_dir} blocked ({pct_from_high:+.2f}% from high)'
 
     if signal.blocked:
         signal.block_until = time.time() + signal.block_duration_sec

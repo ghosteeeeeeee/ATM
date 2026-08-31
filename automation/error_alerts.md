@@ -1791,3 +1791,14 @@ ALERTS:
 
 ## Error Alerts — 2026-08-31 15:21 UTC
 - **WARN** (1x): `brain.py race condition` — CRV LONG trade failed with "sig#1583404 already claimed by another process", stale-check then blocked. Pipeline self-recovered. No action needed.
+
+## Error Alerts — 2026-08-31 19:05 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (3539s left, N failures)`
+
+## Error Alerts — 2026-08-31 19:22 UTC
+- **WARN** (5x): Phantom trades detected — YGG, ARB, ASTER, ME, CRV closed with <0.01 USDT PnL
+- **WARN**: Market deeply NEUTRAL — 104/105 tokens neutral, only HEMI LONG_BIAS. Limited signal quality.
+- **INFO**: Today's PnL: -15.51% (43 closed). 4 positions open (JUP, YGG, PURR, +1 cascade).
+- **INFO**: BTC_LEVEL blocks active (2 recent). Cooldown blocks active (CASHCAT).
+- **STATUS**: No auto-fixes needed — all systems operational.
