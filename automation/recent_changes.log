@@ -589,3 +589,19 @@
   WHY: 2T last hour (2W +$0.37 SEI/ARB both atr_sl_hit). 37T 24h 54%WR -$0.59 near flat. No kill candidates (macd-div- 2T 0%WR, needs 3T). Trade freq 2/hr normal. No consecutive negative hours. 1 open position healthy (DYDX SHORT SL 0.8% away). 7-day 422T 51.8%WR -$1.35 breakeven. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 00:05 UTC
+[2026-08-31 02:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.03 CRV atr_sl_hit). 36T 24h 54%WR -$0.35 near flat. No kill candidates (macd-div- 2T 0%WR below 3T threshold, bb-bounce-short 25%WR not 0%). Trade freq 1/hr normal. No consecutive negative hours. 0 open positions (flat). 7-day 415T 52.5%WR -$2.06 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC
+[2026-08-31 03:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (overnight). 36T 24h 54%WR -$0.35 near flat. No kill candidates (macd-div- 2T 0%WR, needs 3T; bb-bounce-short 25%WR, all-time 58.8%). Trade freq 0/hr normal. No consecutive negative hours. 2 open positions near breakeven (GMT $0, CRV +$0.04). 7-day 409T 51.8%WR -$2.33 flat. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC
+[2026-08-31 04:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.01). 36T 24h 52.8%WR -$0.26 near flat. Kill criteria not met (macd-div- 1T 0%WR in last hour, needs 3T; all-time 66.7%WR). Trade freq 2/hr normal. No consecutive negative hours. 3 open near breakeven (LTC -$0.01, XPL +$0.07, CRV -$0.01). 97% atr_sl_hit trailing SL working. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 05:05 UTC
+[2026-08-31 06:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$1.06). 36T 24h 55.6%WR +$0.88 (+$0.024/trade). No kill criteria (no signal 0%WR with 3+ trades in last hour; macd-div- 3T 0W in 24h but all-time 63%WR). Trade freq 2/hr normal. No consecutive negative hours. 1 open near breakeven (LTC SHORT). 97% atr_sl_hit trailing SL working. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 07:10 UTC

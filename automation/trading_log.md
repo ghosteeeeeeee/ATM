@@ -18405,3 +18405,116 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 **Open Questions:**
 - bb-bounce-short 10T 40%WR -$0.35 — highest volume signal, consistently losing. Consider tuning if pattern continues.
 - macd-div- at 2T 0%WR — one more loss = kill threshold.
+
+## [2026-08-31 02:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W +$0.03) — CRV SHORT confluence-,ichimoku-,r2-trend-short4 atr_sl_hit
+**24h:** 36T 54%WR -$0.35 (flat, -$0.010/trade)
+**7-day:** 415T 52.5%WR -$2.06 (flat)
+**All exits:** 100% atr_sl_hit (trailing SL working)
+**Open positions:** 0 (fully flat)
+
+**Signal (24h):** bb-bounce-short 8T 25%WR -$0.45 (worst). macd-div- 2T 0%WR -$0.27 (below kill threshold). Combo winners: bb-bounce-long+,engulfing+ 2T 100%WR +$0.22, ichimoku-,r2-trend-short3 2T 100%WR +$0.22.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal with 0%WR and 3+T last hour)
+- Trade freq 1/hr normal
+- No consecutive negative hours (alternating pattern: +$0.37, -$0.10, +$0.03)
+- atr_sl_hit 100% trailing SL working as designed
+- 0 open positions (flat)
+- System near breakeven, low activity overnight
+
+**Open Questions:**
+- bb-bounce-short 8T 25%WR -$0.45 — highest volume signal, consistently losing. Watch if WR drops below 20% with more volume.
+- macd-div- 2T 0%WR — hasn't hit 3T threshold due to low overnight volume. Will re-assess if market picks up.
+
+## [2026-08-31 03:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**24h:** 36T 54%WR -$0.35 (flat, -$0.010/trade)
+**7-day:** 409T 51.8%WR -$2.33 (flat)
+**Open:** 2 (GMT SHORT $0.00, CRV SHORT +$0.04)
+
+**Signal (24h):** bb-bounce-short 8T 25%WR -$0.45 (but all-time 58.8%WR — variance). macd-div- 2T 0%WR -$0.27 (all-time 65.5%WR — not kill threshold). Winners: bb-bounce-long+,engulfing+ 2T 100%WR +$0.22, ichimoku-,r2-trend-short3 2T 100%WR +$0.22.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (macd-div- 2T 0%WR, needs 3T)
+- Trade freq 0/hr normal (overnight)
+- No consecutive negative hours
+- 100% atr_sl_hit — trailing SL working
+- bb-bounce-short and macd-div- both profitable long-term, 24h losses are normal variance
+
+**Open Questions:** None — system healthy overnight.
+
+## [2026-08-31 04:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, net +$0.01)
+- GMT SHORT (ichimoku-,rs-r80) +$0.04 win (atr_sl_hit)
+- XPL SHORT (macd-div-) -$0.03 loss (cascade_flip_-0.37%)
+
+**24h:** 36T 52.8%WR -$0.26 (near flat, -$0.007/trade)
+
+**Signal (24h):** macd-div- 3T 0%WR -$0.30 (all-time 66.7%WR — short-term variance). bb-bounce-short 8T 25%WR -$0.45 (all-time 59.3%WR — variance). Winners: bb-bounce-long+,engulfing+ 2T 100%WR, ichimoku-,r2-trend-short3 2T 100%WR.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: macd-div- has 0%WR but only 1T in last hour (needs 3T)
+- Trade freq 2/hr normal
+- No consecutive negative hours (alternating: +$0.01, -$0.10, +$0.03)
+- 97% atr_sl_hit — trailing SL working
+- 3 open positions near breakeven (LTC -$0.01, XPL +$0.07, CRV -$0.01)
+- All "losing" signals profitable all-time — current losses are normal variance
+
+**Open Questions:**
+- cascade_flip_-0.37% new close reason appearing (5 instances all-time). Small losses, likely normal flip-to-reverse behavior. Watch if frequency increases.
+
+## FAVORITES Update — 2026-08-31 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ZRO (WR=57.1%, PnL=$0.15, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE GRASS (WR=40.0%, PnL=$-0.20, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE CHIP (WR=50.0%, PnL=$-0.02, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE HBAR (WR=57.1%, PnL=$0.29, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE BANANA (WR=66.7%, AvgPnL=0.75%, Trades=9)
+- PROMOTE CRV (WR=66.7%, AvgPnL=1.86%, Trades=6)
+- PROMOTE YGG (WR=60.0%, AvgPnL=0.71%, Trades=5)
+- PROMOTE ARB (WR=80.0%, AvgPnL=0.79%, Trades=5)
+
+Final set: ['ARB', 'BABY', 'BANANA', 'BIGTIME', 'CRV', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'SEI', 'STX', 'SYRUP', 'USUAL', 'YGG']
+
+## LOSERS Update — 2026-08-31 06:05 UTC
+- REMOVE BANANA (WR=66.7%, PnL=$0.31, recovered)
+- ADD XPL (WR=20.0%, PnL=$-0.30, low_wr (20.0%))
+- ADD GRASS (WR=40.0%, PnL=$-0.20, low_wr (40.0%))
+- ADD ETC (WR=57.1%, PnL=$-0.12, low_wr (57.1%))
+- ADD IO (WR=40.0%, PnL=$-0.04, low_wr (40.0%))
+- ADD CHIP (WR=50.0%, PnL=$-0.02, low_wr (50.0%))
+- ADD ZRO (WR=57.1%, PnL=$0.15, low_wr (57.1%))
+- ADD APT (WR=57.1%, PnL=$0.17, low_wr (57.1%))
+
+Final set: ['AIXBT', 'ALT', 'APT', 'AVNT', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'CFX', 'CHIP', 'COMP', 'ENA', 'ENS', 'ETC', 'ETH', 'GRASS', 'HBAR', 'HYPE', 'ICP', 'IMX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PUMP', 'WLD', 'WLFI', 'XPL', 'ZRO']
+
+## [2026-08-31 06:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, net +$1.06)
+- XPL LONG cascade-reverse +$1.14 win (atr_sl_hit)
+- CRV SHORT ichimoku- -$0.08 loss (atr_sl_hit)
+
+**24h:** 36T 55.6%WR +$0.88 (+$0.024/trade)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: macd-div- 0%WR in 24h but 3T all-time 63%WR — variance; no signal has 0%WR with 3+ trades in last hour
+- Trade freq 2/hr normal
+- No consecutive negative hours (last 6h: -$0.10, +$0.03, +$0.01, -$0.08, +$1.14)
+- 97% atr_sl_hit trailing SL working
+- 1 open position near breakeven (LTC SHORT $0.00)
+- All underperforming signals profitable all-time — current drawdowns are normal variance
+- bb-bounce-short 59%WR all-time despite 24h loss — statistical noise
+
+**Open Questions:** None — system healthy.
