@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-08-31 12:00 UTC] signal_reporter: Killed macd-div- SHORT — 24h 5T/20%WR/-$0.35. 7d 57% WR but negative PnL (bad R:R). Added NEVER_REENABLE. No boost candidates. No inversions. Watch: confluence-,ichimoku- SHORT (33.3% WR, 3T).
 - [2026-08-30 04:05 UTC] auto_1hr: NO CHANGES — 0T last hour (quiet 4am UTC). 37T 24h 65%WR +$0.37 healthy. 97.3% atr_sl_hit avg +$0.011 trailing SL working perfectly. bb-bounce-short 22T 63.6%WR workhorse. Weak signals (macd-div-, accel-300-v2-short-) below kill threshold. 4 open SHORT. System healthy.
 - [2026-08-29 02:05 UTC] auto_1hr: NO CHANGES — 1T last hour (CFX -$0.09 atr_sl_hit). 84T 24h 58.3%WR +$1.81 healthy. No kill candidates. System healthy.
 - [2026-08-28 17:10 UTC] signal_reporter: No kills — only loser (accel-300-v2+ LONG, 33.3% WR -$0.16) already disabled+NEVER_REENABLE. No boosts — accel-300-v2- SHORT already 63% of trades, concentration risk. 24h 94T 54.3% WR +$1.28. No inversions. System healthy.
