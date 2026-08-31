@@ -605,3 +605,19 @@
   WHY: 2T last hour (1W 1L +$1.06). 36T 24h 55.6%WR +$0.88 (+$0.024/trade). No kill criteria (no signal 0%WR with 3+ trades in last hour; macd-div- 3T 0W in 24h but all-time 63%WR). Trade freq 2/hr normal. No consecutive negative hours. 1 open near breakeven (LTC SHORT). 97% atr_sl_hit trailing SL working. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 07:10 UTC
+[2026-08-31 08:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 38T 24h 52.6%WR -$0.19 near flat. Kill candidates: none (bb-bounce-short 7T 29%WR 24h but 58.8%WR all-time; macd-div- 4T 0%WR 24h but 61.3%WR all-time — variance not degradation). 94.7% atr_sl_hit trailing SL working. 5 open positions all within normal ATR SL range. Trade freq ~2/hr normal. No consecutive negative hours. 7d 404T 51%WR -$2.53 breakeven. System healthy, flat market.
+  BY: auto_1hr
+  NEXT: Re-run at 09:05 UTC
+[2026-08-31 09:05 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (2W 3L -/usr/bin/bash.26). 39T 24h 51.3%WR -/usr/bin/bash.49 near flat. Kill criteria not met (no signal 0%WR with 3+ trades last hour; bb-bounce-short 5T 20%WR all-time profitable; macd-div- 5T 20%WR all-time 61%WR). 97.4% atr_sl_hit trailing SL working. 2 open (ATOM SHORT, BANANA LONG) normal. Trade freq 5/hr acceptable. No consecutive negative hours. 7d 404T 51%WR -.53 breakeven. System healthy, flat market.
+  BY: auto_1hr
+  NEXT: Re-run at 10:05 UTC
+[2026-08-31 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet). 36T 24h 52.8%WR -$0.25 near flat. No kill candidates (no signal 0%WR with 3+ trades last hour). 94.4% atr_sl_hit trailing SL working. 3 open positions all within normal SL range. Trade freq ~1.5/hr normal. No consecutive negative hours. 7d 404T 51%WR -$2.53 breakeven. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC
+[2026-08-31 11:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.11). 39T 24h 49%WR -$0.44 near flat. Kill criteria not met (no signal 0%WR with 3+ trades last hour; macd-div- 5T 20%WR 24h but all-time 61%WR, 1T last hour). 95% atr_sl_hit trailing SL working. 2 open (ME LONG, BIGTIME SHORT) small losses within SL range. Trade freq 4/hr normal. No consecutive negative hours. System healthy, flat market.
+  BY: auto_1hr
+  NEXT: Re-run at 12:05 UTC

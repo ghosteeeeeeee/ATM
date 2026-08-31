@@ -1770,3 +1770,12 @@ ALERTS:
 
 ## Error Alerts — 2026-08-31 06:05 UTC
 - **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Health Check — 2026-08-31 07:22 UTC
+- **STATUS**: ALL OK
+- Pipeline running (cycle #178957), 0 errors in last 30min
+- 188 signals generated in last hour
+- 4 positions open (INJ SHORT, W LONG, DYDX, CRV cascade)
+- Regime: NEUTRAL (2 LONG_BIAS, 0 SHORT)
+- Disk: 79% — Prices: 187 tokens fresh
+- No auto-fixes needed
