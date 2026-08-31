@@ -53,7 +53,7 @@ V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (positive for LONG)
 V2_MIN_GAP_PCT = 1.5           # min gap % for confidence bonus
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
-V2_FRESH_CROSS_MIN_GAP = 0.10  # min gap for fresh cross entry — lowered from 0.50 to catch TURBO-class tokens (crosses have 0.06-0.24% gaps)
+V2_FRESH_CROSS_MIN_GAP = 0.30  # min gap for fresh cross entry — catches breakout from EMA300
 
 # Direction-specific gap thresholds (from hermes_constants.py)
 from hermes_constants import (
@@ -255,10 +255,6 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
 
     abs_gap = gap_now
 
-    # ── FILTER 1: Gap in valid range ────────────────────────────────────────
-    if abs_gap < ACCEL_300_V2_LONG_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
-        return None
-
     # ── FILTER 2: Gap acceleration (10-bar window, must be positive) ────────
     accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
     if accel_start < 0:
@@ -283,6 +279,16 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
             break
     bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
     fresh_cross = bars_since_cross <= V2_FRESH_CROSS_BARS
+
+    # ── FILTER 1: Gap in valid range (with fresh cross bypass) ─────────────
+    # Fresh crosses can enter with smaller gap (breakout thesis)
+    # Non-fresh crosses need larger gap (momentum continuation thesis)
+    if fresh_cross:
+        if abs_gap < V2_FRESH_CROSS_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
+            return None
+    else:
+        if abs_gap < ACCEL_300_V2_LONG_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
+            return None
 
     # ── FILTER 4: Price velocity (must be positive for LONG) ────────────────
     if latest_idx < V2_VELOCITY_WINDOW:
@@ -407,6 +413,7 @@ def scan_accel_300_v2_long_signals(prices_dict: dict) -> int:
 
         # Direct cooldown check — bypass broken cooldown system
         # (cooldown system ignores reason='signal', so we check DB directly)
+        _conn = None
         try:
             import sqlite3 as _sqlite3
             _conn = _sqlite3.connect(_RUNTIME_DB, timeout=5)
@@ -417,7 +424,6 @@ def scan_accel_300_v2_long_signals(prices_dict: dict) -> int:
                 ORDER BY created_at DESC LIMIT 1
             """, (token.upper(), SOURCE))
             _last = _cur.fetchone()
-            _conn.close()
             if _last:
                 from datetime import datetime as _dt
                 _last_ts = _dt.fromisoformat(_last[0])
@@ -426,6 +432,9 @@ def scan_accel_300_v2_long_signals(prices_dict: dict) -> int:
                     continue  # Still in cooldown
         except Exception:
             pass  # On error, don't block
+        finally:
+            if _conn:
+                _conn.close()
 
         # Blacklist guard
         if token.upper() in LONG_BLACKLIST:
