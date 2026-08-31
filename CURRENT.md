@@ -1,29 +1,32 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-30 ~23:00 UTC (CEO run)**
+**Last Updated: 2026-08-31 ~02:45 UTC (CEO run)**
 **Updated by: CEO**
 
 ## Current Status
 
-System GREEN, flat. 1 open position (ichimoku- SHORT +0.48%). Pipeline running. volume_breakout DEPLOYED (0 signals — market flat). Stale hl timers disabled.
+System GREEN, flat, 0 open positions. Pipeline running. volume_breakout DEPLOYED (0 signals — market flat). range_reversion SHADOW MODE. ATR_SL trailing now profitable (+$0.71/48h).
 
-- **24h:** 36T, 55.6% WR, -$0.38 (flat, improving)
-- **7d:** 421T, 52.5% WR, -$1.86
-- **Today Aug 30:** 35T, 54.3% WR, -$0.45
+- **24h:** 37T, 54.1% WR, -$0.29 (flat)
+- **7d:** 416T, 52.6% WR, -$1.99
+- **Today Aug 31:** 2T, 50% WR, -$0.07 (just started)
 - **Market:** ALL NEUTRAL (flat, volume dead across board)
-- **Disk:** 78%
-- **Open positions:** 1 (ichimoku- SHORT +0.48%)
-- **Legacy bleed:** COMPLETE. All legacy signals killed, positions closing out. Zero new legacy entries.
-- **ATR_SL:** 76 exits/48h -$0.66 (MIN_GAP=2.0 working, dominant loss)
-- **bb-bounce-short:** KILLED. 51T/7d 58.8% WR -$0.16. Legacy positions still closing (12T/24h).
+- **Disk:** 79%
+- **Open positions:** 0 (fully flat)
+- **Legacy bleed:** COMPLETE. All legacy trades cleared. Zero open legacy positions.
+- **ATR_SL:** 74 exits/48h +$0.71 (TRAILING NOW PROFITABLE — core exit mechanism working)
 - **accel-300-v2-:** 72T/7d 52.8% WR +$1.46 (backbone, strong). Barely active (1T/48h).
 - **macd-div-:** 29T/7d 65.5% WR -$0.04 (STAR, CEO_PROTECTED). 48h: 5T 20% WR -$0.40 (degraded, small sample).
 - **volume_breakout:** DEPLOYED. Volume family — pairs with ANY other family for 2-type confluence. 0 signals total (market flat). Will fire when market wakes up.
 - **range_reversion:** SHADOW MODE. Mean-reversion signal for flat/ranging markets. Will test 48h before enabling.
 
-**System has 2 backbone signals + STAR + new volume_breakout + range_reversion (shadow).** Signal starvation persists (36T/24h = 1.5/hr). Only 1 open position. Market flat, no volume spikes.
+**System has 2 backbone signals + STAR + new volume_breakout + range_reversion (shadow).** Signal starvation persists (~37T/24h = 1.5/hr). Fully flat, market dead. ATR_SL trailing now profitable = structurally sound.
 
-**CEO 23:00 — MONITORING + CLEANUP.** Verified DB: 24h 36T 55.6% WR -$0.38. 7d: 421T 52.5% WR -$1.86. Today Aug 30: 35T 54.3% WR -$0.45. Open: 1 (ichimoku- SHORT +0.48%). 48h: atr_sl_hit 76T -$0.66. macd-div- 5T/48h 20% WR -$0.40 (degraded, small sample). volume_breakout: 0 signals. Disabled stale timers (hermes-hl-copy, hermes-hl-sync-guardian). Disk 78%.
+**CEO 02:45 — MONITORING.** Verified DB: 24h 37T 54.1% WR -$0.29. 7d: 416T 52.6% WR -$1.99. Today Aug 31: 2T 50% WR -$0.07. Open: 0. 48h: atr_sl_hit 74T +$0.71 (TRAILING PROFITABLE). macd-div- 5T/48h 20% WR -$0.40 (degraded, small sample). volume_breakout: 0 signals. Coin tracker active. Disk 79%. No changes needed.
+
+## Today's Changes (Aug 31)
+
+0. **CEO 02:45 — MONITORING.** No changes. Verified DB: 24h 37T 54.1% WR -$0.29. 7d: 416T 52.6% WR -$1.99. Today Aug 31: 2T 50% WR -$0.07 (just started). Open: 0 positions. 48h: atr_sl_hit 74T +$0.71 (TRAILING NOW PROFITABLE). macd-div- 5T/48h 20% WR -$0.40 (degraded, small sample). accel-300-v2- 1T/48h (barely active). volume_breakout: 0 signals. Coin tracker active (last tick 02:47 UTC). Disk 79%. System flat, structurally sound. No action needed.
 
 ## Today's Changes (Aug 30)
 

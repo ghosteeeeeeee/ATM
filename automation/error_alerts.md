@@ -1760,3 +1760,7 @@ ALERTS:
 - **WARN** (1x): `hermes-hl-sync-guardian.timer` last ran 2 days ago — enabled but stale
 - **WARN** (1x): `hermes-hl-copy.timer` last ran 2 weeks ago — enabled but stale
 - **AUTO-FIX**: None applied — timers need manual investigation (may be intentionally disabled)
+
+## Error Alerts — 2026-08-31 01:22 UTC
+- **WARN** (1x): `hotset empty — no signals survived compaction`
+- **AUTO-FIX**: None needed — system in normal watch mode, 0 open positions
