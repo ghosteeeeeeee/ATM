@@ -715,11 +715,6 @@ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                 print(f"[brain.py]    ✅ HL rollback succeeded for {hype_token}")
             else:
                 print(f"[brain.py]    ⚠️ HL rollback returned: {result}")
-            # CRITICAL: Always exit with failure after HL rollback attempt.
-            # Without this, code falls through to line 748 where trade_id is
-            # undefined (NameError), producing a misleading "line 748" traceback
-            # that hides the real INSERT error. (USUAL 08-26, INJ 08-24)
-            sys.exit(1)
         except Exception as mc_err:
             print(f"[brain.py]    ⚠️ HL rollback failed: {mc_err} — {hype_token} may be orphaned on HL!")
             # ── AUDIT: Log failure with orphan flag ─────────────────────────
@@ -738,9 +733,11 @@ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
             print(f"[brain.py]       signal={signal} confidence={confidence}")
             print(f"[brain.py]       exception={type(mc_err).__name__}: {mc_err}")
             print(f"[brain.py]       HL position may be orphaned — guardian must detect on next sync")
-            # Exit with non-zero code so decider_run's signal rollback fires
-            # (decider_run.py line 1933 handles sig_id rollback when brain.py returns non-zero)
-            sys.exit(1)
+        # ALWAYS exit with failure when INSERT failed — HL was rolled back
+        # (or rollback failed). Without this, code falls through to line 748
+        # where trade_id is undefined (NameError). (USUAL 08-26, INJ 08-24)
+        # sys.exit OUTSIDE try/except so all error prints flush before exit.
+        sys.exit(1)
     finally:
         cur.close(); conn.close()
 
