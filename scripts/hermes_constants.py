@@ -1197,6 +1197,7 @@ NEVER_REENABLE_FLAGS = {
     'ATR_SPIKE_ENABLED',          # CEO 2026-08-28 — 7T/7d 28.6% WR -$0.15, ALL ATR_SL exits. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',   # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
     'ACCEL_300_V2_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-27 — 6T/48h 33.3% WR -$0.16. NEVER_REENABLE.
+    'MACD_DIVERGENCE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-31 — 5T/24h 20% WR -$0.35. 7d negative PnL. NEVER_REENABLE.
     'INVERSE_ACCEL_300_V2_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_ENABLED',     # CEO 2026-08-29 — 0 trades in 24h+, dead. NEVER_REENABLE.
@@ -1354,7 +1355,7 @@ MACD_ACCEL_MINUS_ENABLED      = True    # macd_accel- SHORT
 # macd_divergence.py — detects price/MACD histogram pivot divergence on 5m candles
 MACD_DIVERGENCE_ENABLED          = True    # master kill-switch
 MACD_DIVERGENCE_PLUS_ENABLED     = False   # CEO KILLED 2026-08-23 — 4T/7d 25% WR -$0.40. Dead signal, no edge.
-MACD_DIVERGENCE_MINUS_ENABLED    = True    # macd-div- SHORT (bearish divergence)
+MACD_DIVERGENCE_MINUS_ENABLED    = False   # KILLED 2026-08-31 signal_reporter — 24h 5T/20%WR/-$0.35. 7d negative PnL despite57% WR (bad R:R).
 MACD_DIV_FAST                    = 12      # MACD fast EMA period
 MACD_DIV_SLOW                    = 26      # MACD slow EMA period
 MACD_DIV_SIGNAL_PERIOD           = 9       # MACD signal line period
