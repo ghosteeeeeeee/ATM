@@ -1,5 +1,33 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-31 00:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) -$0.10 (DYDX confluence-,ichimoku- SHORT atr_sl_hit)
+**24h:** 38T 21W 55.3%WR -$0.18 flat
+**Open:** 0 positions
+
+**Close reason (24h):** atr_sl_hit 38T 100% avg -$0.005 (trailing SL working perfectly — tiny losses)
+
+**Signal (24h):** bb-bounce-short 11T 45%WR -$0.25 (weakest, 29% of trades). macd-div- 2T 0W -$0.27 (below kill threshold). confluence-,ichimoku- 3T 33%WR -$0.19. Multi-signal combos mixed.
+
+**Hourly trend (12h):** -$0.28 → +$0.12 → +$0.08 → -$0.10 → +$0.03 → -$0.21 → +$0.01 → +$0.05 → +$0.07 → +$0.37 → -$0.10. 3 consecutive positive (19-21h) +$0.13. Current hour -$0.10.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (0 signals 0%WR 3+T last hour)
+- macd-div- 2T 0W — one more loss triggers kill threshold
+- Trade freq ~1.6/hr normal
+- atr_sl_hit 100% but avg loss only -$0.005 — trailing SL perfect
+- 0 open positions clean slate
+- No consecutive negative hours
+
+**Open Questions:**
+- macd-div- 2T 0W -$0.27 — one more loss triggers kill threshold (3+T).
+- bb-bounce-short 11T 45%WR -$0.25 — not kill-worthy but watch if degrades.
+
+---
+
 ## [2026-08-30 22:06 UTC] Hourly Analysis
 
 **Trades:** 3 closed (2W 1L) +$0.07 (ZRO +$0.06, ETC +$0.15, GRASS -$0.14)
@@ -18330,6 +18358,28 @@ Final set: ['AIXBT', 'ALT', 'AVNT', 'BANANA', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 
 - No consecutive negative hours (alternating pattern)
 - atr_sl_hit 100% trailing SL working as designed
 - 2 open positions near breakeven (ZRO +$0.04, ETC +$0.16)
+
+**Open Questions:**
+- macd-div- at 2T 0%WR — one more loss = kill threshold. Monitor next hour.
+
+## [2026-08-30 23:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W +$0.37) — SEI SHORT +$0.35, ARB SHORT +$0.02
+**24h:** 37T 54%WR -$0.59 (near flat, -$0.016/trade)
+**7-day:** 422T 51.8%WR -$1.35 (breakeven)
+**All exits:** 100% atr_sl_hit (trailing SL working)
+
+**Signal (24h):** bb-bounce-short 11T 45%WR -$0.25 (workhorse). macd-div- 2T 0%WR -$0.27 (watch). Combos mixed.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (macd-div- 2T 0%WR, needs 3T minimum)
+- Trade freq 2/hr normal
+- No consecutive negative hours (22:00 gap, 23:00 +$0.37)
+- atr_sl_hit 100% trailing SL working as designed
+- 1 open position healthy (DYDX SHORT, SL 0.8% away)
+- System near breakeven, no intervention needed
 
 **Open Questions:**
 - macd-div- at 2T 0%WR — one more loss = kill threshold. Monitor next hour.
