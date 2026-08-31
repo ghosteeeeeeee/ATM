@@ -18899,3 +18899,28 @@ Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO'
 - System healthy, NEUTRAL regime
 
 **Open Questions:** None
+
+## [2026-08-31 21:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet session)
+**Hourly PnL:** +$0.38 at 20:00 (2T 2W) — last closes
+**24h:** 44T ~43%WR -$0.43
+**7d:** 373T 49.3%WR -$1.49
+**Open:** 4 (NXPC LONG 2h, ME LONG 2.2h, YGG LONG 3h, PURR LONG 4h)
+
+**Close reason 24h:** atr_sl_hit 35T (79.5%) avg -$0.005 trailing SL working. profit-monster-trail 3T +$0.02. test_cleanup 3T flat. cascade 2T -$0.10. cut-loser-MAE-GUARD 1T -$0.01.
+
+**Signal 24h losers:** confluence-,ichimoku- 4T 25%WR -$0.26. accel-300-v2-long 5T 20%WR -$0.19. macd-div- 3T 33%WR -$0.08. All bleeding but none hit kill threshold (0%WR 3+T last hour — last hour had 0 closes).
+
+**Hourly PnL 6h:** 16:00 -$0.22, 17:00 +$0.13, 18:00 -$0.30, 19:00 -$0.10, 20:00 +$0.38. Alternating pattern, no 3+ consecutive negative.
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet market, not overtrading
+- Kill criteria not met (0 signals 0%WR 3+T last hour)
+- atr_sl_hit 79.5% — trailing SL functioning normally
+- No 3+ consecutive negative hours (alternating W/L)
+- Open positions all within normal SL range
+
+**Open Questions:** None
