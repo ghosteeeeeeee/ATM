@@ -1,5 +1,36 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-31 17:06 UTC] Hourly Analysis
+
+**Trades:** 8 real closed in last 2h (3W 5L) -$0.23 (3 test_cleanup $0.00 excluded)
+**24h:** 45T 19W 42%WR -$0.44 (degraded from 55%WR flat yesterday)
+**Open:** 3 positions (ZEN LONG, LINK SHORT, YGG LONG)
+
+**Close reason (24h):** atr_sl_hit 37T 82% avg -$0.009 (trailing SL still working but WR degraded)
+
+**Signal (24h):**
+- confluence-,ichimoku-: 4T 25%WR -$0.26 avg -$0.065 — WEAK
+- macd-div-: 4T 25%WR -$0.19 avg -$0.0475 — WEAK
+- accel-300-v2-long: 3T 0%WR -$0.20 avg -$0.067 — KILLED (threshold met)
+
+**Hourly trend (6h):** 1T → 2T → 3T → 7T → 4T. 15:00 UTC spike 7T but not overtrading.
+
+**Changes:**
+1. KILLED ACCEL_300_V2_LONG_ENABLED = False — 3T 0%WR -$0.20/24h. Kill threshold met. All losses atr_sl_hit.
+
+**No Change Needed:**
+- Trade freq ~2.5/hr normal
+- atr_sl_hit still dominant but avg loss tiny (-$0.009)
+- confluence-,ichimoku- and macd-div- at 25%WR with 4T — approaching but not at kill threshold (needs 0%WR)
+- 3 open positions manageable
+
+**Open Questions:**
+- confluence-,ichimoku-: 4T 25%WR -$0.26 — one more loss could trigger kill if WR drops to 0%
+- macd-div-: 4T 25%WR -$0.19 — same, watch closely
+- 24h WR dropped from 55% to 42% — regime shift or signal degradation?
+
+---
+
 ## [2026-08-31 00:05 UTC] Hourly Analysis
 
 **Trades:** 1 closed (0W 1L) -$0.10 (DYDX confluence-,ichimoku- SHORT atr_sl_hit)
@@ -18729,3 +18760,32 @@ No critical issues, no CEO recommendations pending.
 
 **Open Questions:**
 - macd-div- and confluence-,ichimoku- bleeding slowly — watch next hour. If either hits 0%WR with 3+T, kill immediately.
+
+## [2026-08-31 16:05 UTC] Hourly Analysis
+
+**Trades:** 8 closed (2W 3L 3 cleanup) ~$0.00 flat
+**24h:** 43T -$0.40 83.7% atr_sl_hit trailing SL working
+
+**Exit reasons 24h:** atr_sl_hit 36T (83.7%), test_cleanup 3T (noise), cascade 2T, profit-monster-trail 1T, cut-loser-MAE-GUARD 1T
+
+**Signal 24h:** confluence-,ichimoku- 4T 25%WR -$0.26 (bleeding). macd-div- 4T 25%WR -$0.19. ichimoku- 2T 0%WR $0.00. Multiple 1T combos mixed.
+
+**Hourly PnL 6h:** Flat, no consecutive negatives.
+
+**Changes:** None — no kill candidates (no signal 0%WR with 3+T last hour). Trade freq 8/hr elevated but <20 threshold. System healthy.
+
+**No Change Needed:**
+- Kill criteria not met
+- Trade frequency moderate
+- No consecutive negative hours
+- Trailing SL working normally
+
+**Open Questions:** None
+
+## FAVORITES Update — 2026-08-31 16:39 UTC
+- Regime: NEUTRAL
+- DEMOTE BANANA (WR=55.6%, PnL=$0.10, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE CRV (WR=55.6%, PnL=$0.07, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE SEI (WR=50.0%, PnL=$0.10, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'STX', 'SYRUP', 'USUAL', 'YGG']

@@ -1,3 +1,7 @@
+[2026-08-31 17:06 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED
+  WHY: 8T last 2h (3W 5L -$0.23). 24h 45T 42%WR -$0.44 degraded from 55%WR yesterday. accel-300-v2-long 3T 0%WR -$0.20 — kill threshold met (0%WR 3+T). All losses atr_sl_hit. confluence-,ichimoku- 4T 25%WR -$0.26 and macd-div- 4T 25%WR -$0.19 approaching kill thresholds. Trade freq ~2.5/hr normal. 3 open positions (ZEN LONG, LINK SHORT, YGG LONG). System degraded but fix applied.
+  BY: auto_1hr
+  NEXT: Re-run at 18:06 UTC
 [2026-08-31 00:05 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (DYDX confluence-,ichimoku- SHORT -$0.10 atr_sl_hit). 38T 24h 55.3%WR -$0.18 flat. atr_sl_hit 38T 100% avg -$0.005 trailing SL working perfectly. No kill candidates (0 signals 0%WR 3+T last hour). macd-div- 2T 0W -$0.27 below kill threshold (needs 3+T). bb-bounce-short 11T 45%WR -$0.25 weakest but not kill-worthy. Trade freq ~1.6/hr normal. 0 open positions clean slate. No consecutive negative hours. System healthy.
   BY: auto_1hr
@@ -633,3 +637,7 @@
   WHY: 3T last hour (2W 1L $0.00 flat). 38T 24h 52.6%WR -$0.49 flat. atr_sl_hit 36T 94.7% avg -$0.014 trailing SL perfect. No kill candidates (0 signals 0%WR 3+T last hour). macd-div- 5T 20%WR -$0.35 bleeding but not 0%WR. confluence-,ichimoku- 4T 25%WR -$0.26 same. Trade freq ~1.25/hr normal. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 02:05 UTC
+[2026-08-31 16:05 UTC] auto_1hr: NO CHANGES
+  WHY: 8T last hour (2W 3L 3 cleanup ~$0.00 flat). 43T 24h -$0.40 83.7% atr_sl_hit trailing SL working. Kill criteria not met (no signal 0%WR 3+T last hour). ichimoku- 2T 0%WR but only 2T not 3+. Trade freq 8/hr elevated but <20. No consecutive negative hours. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 17:05 UTC
