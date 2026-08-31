@@ -3021,15 +3021,26 @@ def run(dry_run=False):
                         continue
                     fresh_result = detect_accel_300_v2_long_5m(token, fresh_candles)
                 elif _is_accel_v2_long:
-                    from signals.accel_300_v2_long import detect_accel_300_v2_long, _get_1m_prices
+                    # LONG staleness: only check direction (price above EMA300)
+                    # Full detection is too strict — conditions always change in 1-3 min
+                    from signals.accel_300_v2_long import _get_1m_prices, _ema_series, PERIOD
                     fresh_prices = _get_1m_prices(token)
                     if not fresh_prices:
-                        log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: no fresh price data for staleness check')
+                        log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: no fresh price data')
                         if sig_id:
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
                         continue
-                    fresh_result = detect_accel_300_v2_long(token, fresh_prices)
+                    fresh_closes = [float(p['price']) for p in fresh_prices]
+                    fresh_ema = _ema_series(fresh_closes, PERIOD)
+                    fresh_gap = (fresh_closes[-1] - fresh_ema[-1]) / fresh_ema[-1] * 100 if fresh_ema[-1] else 0
+                    if fresh_gap <= 0:
+                        log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: price below EMA300 (gap={fresh_gap:.3f}%)')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                    fresh_result = {'direction': 'LONG'}  # direction confirmed
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
