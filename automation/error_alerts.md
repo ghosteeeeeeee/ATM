@@ -1788,3 +1788,6 @@ ALERTS:
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-08-31 15:21 UTC
+- **WARN** (1x): `brain.py race condition` — CRV LONG trade failed with "sig#1583404 already claimed by another process", stale-check then blocked. Pipeline self-recovered. No action needed.
