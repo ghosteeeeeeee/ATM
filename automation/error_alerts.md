@@ -1802,3 +1802,7 @@ ALERTS:
 - **INFO**: Today's PnL: -15.51% (43 closed). 4 positions open (JUP, YGG, PURR, +1 cascade).
 - **INFO**: BTC_LEVEL blocks active (2 recent). Cooldown blocks active (CASHCAT).
 - **STATUS**: No auto-fixes needed — all systems operational.
+
+## Error Alerts — 2026-08-31 20:05 UTC
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CC TOK BLOCKED — TOK in cooldown (2520s left, N failures)`
