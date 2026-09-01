@@ -1,3 +1,7 @@
+[2026-09-01 09:05 UTC] auto_1hr: KILLED BB_BOUNCE_LONG_ENABLED
+  WHY: 5T/0%WR/-$0.47 last hour (kill threshold met: 0%WR with 3+T). 26T/24h 61.5%WR/-$0.10. All 5 last hour were atr_sl_hit LONG entries — entries into weakness, not bounce. BB_BOUNCE_LONG_ENABLED was True since 2026-08-29 creation, never killed. Added to NEVER_REENABLE_FLAGS. accel-300-v2-long already killed (flag=False). 2 open positions (AVAX, LTC) will exit via SLs. Trade freq ~3.5/hr normal. No 3+ consecutive negative hours. atr_sl_hit 60.9% of 24h exits but avg loss tiny (-$0.037) — trailing SL working. profit-monster-trail 20T +$0.91 carrying system.
+  BY: auto_1hr
+  NEXT: Re-run at 10:05 UTC
 [2026-09-01 01:06 UTC] auto_1hr: NO CHANGES
   WHY: 4T last hour (4W 0L +$0.22). 51T 24h 33%WR -$0.39 recovering. Kill criteria not met: accel-300-v2-long 10T 30%WR -$0.22 (not 0%WR with 3+T in last hour, last trade CRV +$0.06 winner). confluence-,ichimoku- 2T 0%WR -$0.18 (needs 3+T to trigger kill). macd-div- 3T 33%WR -$0.08 marginal. atr_sl_hit 74.5% trailing SL healthy. profit-monster-trail 13.7% avg +$0.027 working. Trade freq 4T/hr normal. No 3+ consecutive negative hours. 2 open SHORT positions (MNT, DOGE). Gap adjustment (MIN_GAP 2.0) may be helping accel-300-v2-long.
   BY: auto_1hr

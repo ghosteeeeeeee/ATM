@@ -1218,6 +1218,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_MINUS_ENABLED',    # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_ENABLED',     # SIGNAL REPORTER 2026-09-01 — 17T/24h 29.4% WR -$0.64. 2d consistent losses. NEVER_REENABLE.
+    'BB_BOUNCE_LONG_ENABLED',        # AUTO_1HR 2026-09-01 — 5T/0%WR/-$0.47 last hour, 26T/24h -$0.10. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1574,7 +1575,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
-BB_BOUNCE_LONG_ENABLED = True     # bb_bounce_long — V2 solo variant with velocity filter (2026-08-29)
+BB_BOUNCE_LONG_ENABLED = False    # AUTO_1HR KILLED 2026-09-01 09:05 UTC — 5T/0%WR/-$0.47 last hour, 26T/24h 61.5%WR/-$0.10. NEVER_REENABLE.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).

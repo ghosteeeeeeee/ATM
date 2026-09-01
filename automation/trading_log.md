@@ -1,5 +1,34 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-09-01 09:05 UTC] Hourly Analysis
+
+**Trades:** 7 closed last hour (1W 6L) -$0.44 (worst hour in 12h)
+**24h:** 69T 33W 47.8% WR -$0.80
+**Open:** 2 LONG (AVAX bb-bounce-long+, LTC bb-bounce-long+,range-reversion-long+)
+
+**Close reason (24h):** atr_sl_hit 42T (60.9%) avg -$0.037 — dominant but tiny losses. profit-monster-trail 20T (29%) avg +$0.046 — only profitable exit.
+
+**Signal (last hour):**
+- bb-bounce-long+ 5T 0W 0%WR -$0.47 — **KILLED** (0%WR with 3+T last hour)
+
+**Hourly trend (12h):** +$0.07 → -$0.24 → +$0.22 → +$0.09 → -$0.21 → -$0.16 → +$0.03 → -$0.03 → +$0.11 → +$0.08 → -$0.44. Current hour worst in session.
+
+**Changes:**
+1. KILLED BB_BOUNCE_LONG_ENABLED = False — 5T/0%WR/-$0.47 last hour, 26T/24h 61.5%WR/-$0.10. Kill threshold met (0%WR 3+T). Added to NEVER_REENABLE_FLAGS. Flag was True since 2026-08-29 creation — never killed before.
+
+**No Change Needed:**
+- Trade freq ~3.5/hr normal (7T this hour is spike from bb-bounce-long+ burst)
+- atr_sl_hit 60.9% of 24h exits but avg loss tiny (-$0.037) — trailing SL working
+- profit-monster-trail 20T +$0.91 carrying system
+- No 3+ consecutive negative hours (pattern alternating)
+- accel-300-v2-long already killed (flag=False, NEVER_REENABLED). Remaining trades are closing legacy positions.
+
+**Open Questions:**
+- With bb-bounce-long+ killed, trade volume may drop. bb-bounce-short still enabled (True, re-enabled 2026-08-30). Monitor for signal starvation.
+- 2 open LONG positions (AVAX, LTC) will exit via existing SLs/trails — no manual intervention.
+
+---
+
 ## [2026-09-01 01:06 UTC] Hourly Analysis
 
 **Trades:** 4 closed last hour (4W 0L) +$0.22
