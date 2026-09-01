@@ -1408,7 +1408,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
             unique_signal_types = len(set(_signal_type_key(p) for p in source_parts))
             source_count = len(source_parts)
-            bare_source = source.rstrip('+-') if source else ''
+            bare_source = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
 
             # ══ CONFLUENCE REQUIRED ══ — 2026-05-08
             # Rule: 2+ unique signal types required (when CONFLUENCE_REQUIRED=True).
@@ -1446,7 +1446,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 gate_msg = f'{unique_signal_types} unique types'
             elif _neutral_relax:
                 # NEUTRAL regime: allow single-type standalone bypass signals only
-                bare_src = source.rstrip('+-') if source else ''
+                bare_src = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
                 if bare_src in STANDALONE_BYPASS_SIGNALS:
                     pass_gate = True
                     gate_msg = f'NEUTRAL-relax: standalone bypass ({bare_src})'
@@ -1477,7 +1477,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     gate_msg = f'confluence signal ({source})'
                 else:
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
-                    bare_src = source.rstrip('+-') if source else ''
+                    bare_src = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
                     if bare_src in STANDALONE_BYPASS_SIGNALS:
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
@@ -1981,7 +1981,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # catches that edge case permanently.
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
-                bare_src = src.rstrip('+-') if src else ''
+                bare_src = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
                 if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                     # ── Contrarian flip: trend_momentum_near_sma ────────────────
@@ -1997,7 +1997,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
                 elif CONFLUENCE_NEUTRAL_RELAX:
                     _r4h, _ = get_regime_4h(tkn)
-                    bare_src_final = src.rstrip('+-') if src else ''
+                    bare_src_final = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
                     if _r4h == 'NEUTRAL' and bare_src_final in STANDALONE_BYPASS_SIGNALS:
                         log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} NEUTRAL-relax: standalone bypass ({bare_src_final}) at final guard (4h={_r4h})")
                     else:
@@ -2290,7 +2290,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [PENDING-DISABLED-BLOCK] {tok}:{d} — src='{source}' contains disabled component, skipping approval")
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
-                        bare_src = source.rstrip('+-') if source else ''
+                        bare_src = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
                         if bare_src in STANDALONE_BYPASS_SIGNALS:
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
                             # ── Contrarian flip at pending approve ────────────────────
@@ -2461,7 +2461,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # If a single-source entry somehow got past the confluence gate above,
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
-                bare_src = (src or '').rstrip('+-')
+                bare_src = re.sub(r'\d+$', '', (src or '').rstrip('+-'))
                 if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
                     # ── Contrarian flip at safety filter (last resort) ───────────
