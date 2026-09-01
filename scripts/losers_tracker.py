@@ -207,10 +207,15 @@ def run():
         changes = []
         today = datetime.now(timezone.utc).isoformat()
 
-        # ── Check for removals (recovery) ──────────────────────────────
+        # ── Check for removals (recovery or insufficient data) ──────────
         for token in list(current_losers):
             token_stats = stats.get(token)
-            if not token_stats:
+
+            # Remove if no recent trades or insufficient data
+            if not token_stats or token_stats.get('trades', 0) < LOSERS_MIN_TRADES:
+                new_losers.discard(token)
+                state.get('bad_days', {}).pop(token, None)
+                changes.append(f"REMOVE {token} (insufficient data)")
                 continue
 
             wr = token_stats['winrate']
