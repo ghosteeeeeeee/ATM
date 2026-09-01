@@ -129,6 +129,7 @@ def init_db():
             )""")
         sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_token ON price_history(token)')
         sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_ts ON price_history(timestamp)')
+        sc.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_ph_token_ts ON price_history(token, timestamp)')
         sc.execute("""
             CREATE TABLE IF NOT EXISTS latest_prices (
                 token TEXT PRIMARY KEY,
