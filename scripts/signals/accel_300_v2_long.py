@@ -53,7 +53,7 @@ V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (positive for LONG)
 V2_MIN_GAP_PCT = 1.5           # min gap % for confidence bonus
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
-V2_FRESH_CROSS_MIN_GAP = 0.30  # min gap for fresh cross entry — catches breakout from EMA300
+V2_FRESH_CROSS_MIN_GAP = 0.10  # min gap for fresh cross entry — catches FIL-class entries (gap50=0.008%)
 
 # Direction-specific gap thresholds (from hermes_constants.py)
 from hermes_constants import (
@@ -231,6 +231,8 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
       4. Price persisted above EMA for 3+ bars (not a cross wick)
       5. Linear regression slope positive (trending)
     """
+    if token == 'FIL':
+        print(f'DEBUG: detect_accel_300_v2_long called for {token} with {len(prices)} prices')
     min_rows = PERIOD + max(V2_GAP_ACCEL_WINDOW, V2_SLOPE_WINDOW, 10) + 10
     if len(prices) < min_rows:
         return None
@@ -249,23 +251,13 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
     if latest_ema is None or gap_now is None:
         return None
 
-    # ── LONG only — price must be above EMA300 ─────────────────────────────
-    if gap_now <= 0:
-        return None
-
-    abs_gap = gap_now
-
-    # ── LOCAL TOP FILTER — avoid entries at recent highs ──────────────────
-    # SHORT avoids local bottoms (mean reversion helps). LONG should avoid local tops
-    # (mean reversion hurts). Entry at recent high = likely pullback.
-    if latest_idx >= 20:
-        recent_20_high = max(closes[latest_idx-20:latest_idx+1])
-        pct_from_high = (closes[latest_idx] - recent_20_high) / recent_20_high * 100
-        if pct_from_high > -0.3:  # within 0.3% of recent high
-            return None  # at or near local top — likely pullback
-
-    # ── EMA50 cross detection (before acceleration check — allows relaxed thresholds) ──
+    # ── Compute EMA50 (needed for fresh cross and direction check) ────────
     ema50 = _ema_series(closes, 50)
+    gap50_now = 0
+    if ema50[latest_idx] is not None:
+        gap50_now = (closes[latest_idx] - ema50[latest_idx]) / ema50[latest_idx] * 100
+
+    # ── EMA50 cross detection (needed early for direction check) ───────────
     ema50_cross_bar = None
     if ema50[latest_idx] is not None:
         for idx in range(latest_idx, max(50, latest_idx - 30), -1):
@@ -276,24 +268,7 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
     bars_since_ema50_cross = latest_idx - ema50_cross_bar if ema50_cross_bar is not None else 999
     fresh_ema50_cross = bars_since_ema50_cross <= 20
 
-    # ── FILTER 2: Gap acceleration (10-bar window, must be positive) ────────
-    accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
-    if accel_start < 0:
-        return None
-    gap_then = gap_pcts[accel_start]
-    if gap_then is None:
-        return None
-    gap_acceleration = gap_now - gap_then  # positive = gap widening for LONG
-
-    # EMA50 fresh cross allows weaker acceleration (early entry thesis)
-    if fresh_ema50_cross:
-        if gap_acceleration < 0.10:  # relaxed from 0.20 for early entry
-            return None
-    else:
-        if gap_acceleration < V2_MIN_GAP_ACCEL:
-            return None
-
-    # ── FILTER 3: EMA300 cross detection (original — catches later momentum) ──
+    # ── EMA300 cross detection ───────────────────────────────────────────
     cross_bar = None
     for idx in range(latest_idx, PERIOD - 1, -1):
         prev_idx = idx - 1
@@ -309,10 +284,49 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
     # Use whichever cross is more recent
     fresh = fresh_cross or fresh_ema50_cross
 
+    # ── LONG only — price must be above EMA300 (or EMA50 for fresh cross) ──
+    if fresh and fresh_ema50_cross:
+        if gap50_now <= 0:
+            return None
+    else:
+        if gap_now <= 0:
+            return None
+
+    abs_gap = gap_now
+
+    # ── LOCAL TOP FILTER — avoid entries at recent highs ──────────────────
+    # EXCEPTION: EMA50 fresh cross — the cross IS the entry, even at local high
+    if not (fresh and fresh_ema50_cross):
+        if latest_idx >= 20:
+            recent_20_high = max(closes[latest_idx-20:latest_idx+1])
+            pct_from_high = (closes[latest_idx] - recent_20_high) / recent_20_high * 100
+            if pct_from_high > -0.3:
+                return None
+
+    # ── FILTER 2: Gap acceleration (10-bar window, must be positive) ────────
+    accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
+    if accel_start < 0:
+        return None
+    gap_then = gap_pcts[accel_start]
+    if gap_then is None:
+        return None
+    gap_acceleration = gap_now - gap_then
+
+    # EMA50 fresh cross allows weaker acceleration (early entry thesis)
+    if fresh_ema50_cross:
+        if gap_acceleration < 0.10:
+            return None
+    else:
+        if gap_acceleration < V2_MIN_GAP_ACCEL:
+            return None
+
     # ── FILTER 1: Gap in valid range (with fresh cross bypass) ─────────────
-    # Fresh crosses can enter with smaller gap (breakout thesis)
-    # Non-fresh crosses need larger gap (momentum continuation thesis)
-    if fresh:
+    if fresh and fresh_ema50_cross:
+        # EMA50 fresh cross — use gap50 for threshold check
+        gap50_check = (closes[latest_idx] - ema50[latest_idx]) / ema50[latest_idx] * 100 if ema50[latest_idx] else 0
+        if abs(gap50_check) < V2_FRESH_CROSS_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
+            return None
+    elif fresh:
         if abs_gap < V2_FRESH_CROSS_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
             return None
     else:
@@ -354,20 +368,22 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
                 return None
 
     # ── FILTER 6: Linear regression slope (must be positive for LONG) ───────
-    slope_window = min(V2_SLOPE_WINDOW, len(closes))
-    if slope_window >= 2:
-        slope_chunk = closes[-slope_window:]
-        x_mean = (slope_window - 1) / 2.0
-        y_mean = sum(slope_chunk) / slope_window
-        denominator = sum((x - x_mean) ** 2 for x in range(slope_window))
-        if denominator > 0 and y_mean != 0:
-            numerator = sum(
-                (x - x_mean) * (slope_chunk[x] - y_mean)
-                for x in range(slope_window)
-            )
-            pct_slope = (numerator / denominator) / y_mean * 100.0
-            if pct_slope <= V2_MIN_SLOPE_PCT:
-                return None
+    # EXCEPTION: EMA50 fresh cross — the cross IS the entry, slope may not be positive yet
+    if not (fresh and fresh_ema50_cross):
+        slope_window = min(V2_SLOPE_WINDOW, len(closes))
+        if slope_window >= 2:
+            slope_chunk = closes[-slope_window:]
+            x_mean = (slope_window - 1) / 2.0
+            y_mean = sum(slope_chunk) / slope_window
+            denominator = sum((x - x_mean) ** 2 for x in range(slope_window))
+            if denominator > 0 and y_mean != 0:
+                numerator = sum(
+                    (x - x_mean) * (slope_chunk[x] - y_mean)
+                    for x in range(slope_window)
+                )
+                pct_slope = (numerator / denominator) / y_mean * 100.0
+                if pct_slope <= V2_MIN_SLOPE_PCT:
+                    return None
 
     # ── FILTER 7: Gap velocity must confirm (not narrowing for LONG) ────────
     if latest_idx < 3:
@@ -376,8 +392,9 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
     if gap_prev is None:
         return None
     gap_velocity = gap_now - gap_prev
-    # Allow small noise but gap should not be narrowing
-    if gap_velocity < -0.05:
+    # Allow noise but gap should not be narrowing significantly
+    # -0.15 tolerance — catches trending assets with normal fluctuations
+    if gap_velocity < -0.15:
         return None  # gap narrowing — reversal risk
 
     # ── FILTER 8: Multi-bar gap confirmation ────────────────────────────────
@@ -385,7 +402,7 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
         gap_3_ago = gap_pcts[latest_idx - 3]
         if gap_3_ago is not None:
             gap_change_3 = gap_now - gap_3_ago
-            if gap_change_3 < -0.05:
+            if gap_change_3 < -0.15:
                 return None  # gap narrowing over 3 bars — momentum fading
 
     return {

@@ -1461,7 +1461,7 @@ ACCEL_300_V2_LONG_ENABLED     = True    # Re-enabled. Local top filter + stalene
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 2.0     # LONG: min gap above EMA300 — raised from 1.5 CEO 2026-08-31, matches SHORT fix: 5T/24h 20%WR -$0.19 ALL ATR_SL
-ACCEL_300_V2_LONG_MAX_GAP = 4.5     # LONG: max gap — raised from 3.5 to capture strong momentum like HEMI (3.77%)
+ACCEL_300_V2_LONG_MAX_GAP = 6.0     # LONG: max gap — raised from 4.5 to capture strong momentum like FIL (9.3%)
 # ── accel-300-v2 LONG 5m params ────────────────────────────────────────────
 ACCEL_300_V2_LONG_5M_MIN_GAP = 1.5  # LONG 5m: min gap above EMA300
 ACCEL_300_V2_LONG_5M_MAX_GAP = 4.0  # LONG 5m: max gap (wider than 1m — 5m less noisy)
