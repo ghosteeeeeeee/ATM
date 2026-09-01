@@ -830,3 +830,8 @@
 [2026-09-01 11:07 UTC]   🟢 OK: bb-bounce-short: 5 trades, 80.0% WR, PnL=0.26
 [2026-09-01 11:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-01 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-01 17:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-01 17:07 UTC]   🟢 OK: bb-bounce-long+: 18 trades, 55.6% WR, PnL=-0.66
+[2026-09-01 17:07 UTC]   🟢 OK: bb-bounce-short: 5 trades, 80.0% WR, PnL=0.26
+[2026-09-01 17:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-01 17:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

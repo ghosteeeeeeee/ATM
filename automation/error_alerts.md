@@ -1893,3 +1893,6 @@ ALERTS:
 - **WARN** (1x): `Disk at 80%` — 90G/118G used. Top consumers: hl_copy.db (1.9G), coin_tracker.db (1.8G), candles.db (781M). Compressed old logs (no reclaim — data DBs dominate).
 - **WARN** (2x): `Phantom trades` — 2 trades with <0.01% PnL in last 24h. Likely noise from signal compactor.
 - **INFO**: Pipeline healthy. 0 errors in last 30min. All timers firing. 163 active signals from 53 tokens.
+
+## Error Alerts — 2026-09-01 17:05 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
