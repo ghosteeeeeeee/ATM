@@ -1863,3 +1863,7 @@ ALERTS:
 - **WARN** (Nx): `MERL LONG rejected: amount_usdt=5.5 < HL_MIN=11.0` — repeated every pipeline cycle, signal never executes
 - **WARN** (Nx): `PHANTOM-WRITE NXPC LONG: BLOCKED tight SL=0.205333 entry=0.205130 dist=0.099%` — SL too close to entry, repeatedly blocked
 - **INFO**: No crashes, no tracebacks, no auto-fixes needed. All 46 timers active and firing.
+
+## Error Alerts — 2026-09-01 07:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: CC TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
