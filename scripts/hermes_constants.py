@@ -34,7 +34,7 @@ LIVE_TRADING_ENABLED = True
 
 SHORT_BLACKLIST = {
     # High-volatility / inverse-beta tokens (shorting meme coins = lottery)
-    'ACE','GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','ZETA','SPX','ARK','RUNE','AR',
+    'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','ZETA','SPX','ARK','RUNE','AR',
     # TST, NXPC, CELO, ACE, YZY, ZEREBRO, WLFI, HBAR, MEGA removed 2026-08-07 — no specific block reason
     # TRUMP added 2026-08-08 — political meme coin, high volatility
     # Historical 0% SHORT win rate (2026-04-01 analysis):
