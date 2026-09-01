@@ -701,3 +701,7 @@
   WHY: 2T last hour (2W 0L +$0.11 winning hour). 65T 24h 47%WR -$0.70. Kill criteria not met (accel-300-v2-long 0T last hour, not triggered; no signal 0%WR 3+T). atr_sl_hit 63% trailing SL working. profit-monster-trail 17T +$0.71 profitable. Trade freq 2/hr normal. No 3+ consecutive negative hours. 2 open trades green. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 09:05 UTC
+[2026-09-01 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.03 quiet). 70T 24h 48.6%WR -$0.77. Kill criteria not met (accel-300-v2-long 0T last hour, not triggered; no signal 0%WR 3+T). atr_sl_hit 60% trailing SL working. profit-monster-trail 21T +$0.94 profitable. Trade freq 1/hr normal. 4 consecutive positive hours. 1 open position (LTC) green. System healthy in recovery.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC

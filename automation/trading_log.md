@@ -19217,3 +19217,22 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - 24h WR improved from 47% to 50%
 
 **Open Questions:** System recovering. accel-300-v2-long properly disabled since last check.
+
+## [2026-09-01 10:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) +$0.03
+**24h:** 70T 48.6%WR -$0.77
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (accel-300-v2-long 0T last hour, no signal 0%WR 3+T)
+- atr_sl_hit 60% — trailing SL working normally (avg -$0.037/hit small)
+- profit-monster-trail 21T +$0.94 — profitable trailing exit system
+- Trade freq 1/hr — quiet hour, not overtrading
+- 4 consecutive positive hours (06:00 +$0.11, 07:00 +$0.08, 08:00 +$0.11, 09:00 +$0.03, 10:00 +$0.03)
+- 1 open position (LTC long range-reversion-long+) green at +$0.05
+- 24h WR improved from 50% to 48.6% (slight dip but still improving)
+- System recovering steadily
+
+**Open Questions:** accel-300-v2-long 17T 24h 29.4%WR -$0.64 remains main bleeder. If it triggers next hour with 0%WR 3+T, will hit kill threshold. System in recovery mode — 4 consecutive positive hours.
