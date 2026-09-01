@@ -10,7 +10,6 @@ SHORT fires when:
   3. Price velocity negative (price moving down)
   4. Price persisted below EMA for 3+ bars (not a cross wick)
   5. Linear regression slope negative (trending down)
-  6. Linear regression slope negative (trending down)
 """
 
 import sys, os, sqlite3, time
