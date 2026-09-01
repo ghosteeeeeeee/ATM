@@ -479,7 +479,7 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         if sig is None:
             continue
 
-        # Direct cooldown check
+        # Direct cooldown check — fail-closed (block on error, not pass-through)
         _conn = None
         try:
             import sqlite3 as _sqlite3
@@ -497,8 +497,9 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
                 _elapsed = (_dt.now() - _last_ts).total_seconds() / 60
                 if _elapsed < ACCEL_300_V3_LONG_COOLDOWN_BARS:
                     continue  # Still in cooldown
-        except Exception:
-            pass  # On error, don't block
+        except Exception as e:
+            print(f"  [accel-300-v3-long] cooldown check FAILED for {token}: {e} — BLOCKING", flush=True)
+            continue  # Fail-closed: block signal on DB error
         finally:
             if _conn:
                 _conn.close()
@@ -542,6 +543,10 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         confidence = max(ACCEL_300_V3_LONG_CONF_FLOOR, confidence)
 
         signal_price = float(sig['price'])
+
+        # Guard: skip if detection returned invalid price
+        if signal_price <= 0:
+            continue
 
         if DRY_RUN:
             _log(f"  [DRY] LONG-accel-300-v3-long {token:8s} conf={confidence:.0f}% "
