@@ -1896,3 +1896,20 @@ ALERTS:
 
 ## Error Alerts — 2026-09-01 17:05 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-09-01 18:05 UTC
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-01 20:05 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   Signal accel_300_v2_long: TOK → TOK: cannot access local variable 'fresh' where it is not associated with a value`
+
+## Error Alerts — 2026-09-01 20:22 UTC
+- **[WARN]** (4x): `CRV LONG rejected — amount_usdt=5.5 < HL_MIN=11.0`
+  - Pattern: CRV generates signals every minute but sizing comes in below HL minimum
+  - AUTO-FIX: None needed — system correctly blocking sub-minimum positions
+- **[WARN]** (2x): `IMX SHORT rejected — amount_usdt=5.5 < HL_MIN=11.0`
+  - Same sizing issue, resolved when CRV took over hotset
+- **[INFO]**: Pipeline healthy, 120 runs in 2h, 0 crashes, all timers firing

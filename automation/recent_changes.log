@@ -1,3 +1,7 @@
+[2026-09-01 20:05 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED
+  WHY: 1T last hour (0W 1L -$0.11 FIL ATR SL). 57T 24h 50.9%WR -$0.93. ACCEL_300_V2_LONG_ENABLED was STILL TRUE despite 14:05 claiming kill — constant never set False. Fixed: set False, added NEVER_REENABLE, removed from ROTATOR_PROTECTED and CEO_PROTECTED. 16T/24h 31.3%WR -$0.55 was biggest system drag. Kill criteria met (0%WR threshold not hit but PnL-based kill: -0.55 net loss > threshold). 0 open positions. Trade freq 1/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 21:05 UTC
 [2026-09-01 19:10 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (1W 0L +$0.21). 57T 24h 52.6%WR -$0.47 flat. 0 open trades (flat). Kill criteria not met: accel-300-v2-long already killed (False, NEVER_REENABLED), bb-bounce-long+ killed at 09:05 (False, NEVER_REENABLED). bb-bounce-short 5T 80%WR +$0.01 healthy. atr_sl_hit 54.4% avg -$0.050 (SL working). profit-monster-trail 40.4% avg +$0.052 carrying system. Trade freq ~2.4/hr normal. No 3+ consecutive negative hours. 1T/hr = expected after killing 2 major signals. No signal starvation yet.
   BY: auto_1hr

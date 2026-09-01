@@ -2725,6 +2725,15 @@ def _filter_safe_prev_hotset(prev_hotset):
         entry_staleness = entry.get('staleness', 0)
         if entry_staleness <= 0.01:
             continue  # too old — don't preserve
+        # ── CONF_FILTER: block preserved entries outside valid confidence range ──
+        # Without this, entries with conf >= CONF_FILTER_MAX or conf < CONF_FILTER_MIN
+        # survive through the preserved hotset path (they were added before the filter
+        # was implemented, or entered via a path that bypassed _score_signal).
+        from hermes_constants import CONF_FILTER_ENABLED as _CFE, CONF_FILTER_MAX as _CFX, CONF_FILTER_MIN as _CFN
+        _entry_conf = entry.get('confidence', 0)
+        if _CFE and (_entry_conf >= _CFX or _entry_conf < _CFN):
+            log(f"  🛡️  [CONF-FILTER-PRESERVE] {tok}:{direction} blocked — conf={_entry_conf:.0f} outside [{_CFN},{_CFX})")
+            continue
         src_str = src.strip() if src else ''
         # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
         from signal_schema import validate_source

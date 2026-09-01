@@ -19466,3 +19466,21 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - 3 consecutive negative hours (16:00 -$0.40, 17:00 +$0.02 break, 18:00 -$0.29) — SL doing its job, not alarming
 
 **Open Questions:** System in steady state. ATR SL exits dominate (55.2%) but each costs only avg -$0.057 while profit-monster-trail avg +$0.052 offsets. Net effect is small losses. accel-300-v2-long elimination should improve 24h stats as its trades roll off window.
+
+## [2026-09-01 20:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) — FIL (accel-300-v2-long) -$0.11 ATR SL
+**PnL:** -$0.11
+**24h:** 57T 50.9% WR -$0.93
+**Open:** 0 positions (clean slate)
+
+**Changes:**
+1. **KILLED ACCEL_300_V2_LONG_ENABLED** — 16T/24h 31.3% WR -$0.55. ALL ATR_SL exits. 14:05 kill attempt FAILED (constant was never actually set False). Fixed now: set False + added to NEVER_REENABLE + removed from ROTATOR_PROTECTED and CEO_PROTECTED.
+
+**No Change Needed:**
+- atr_sl_hit 54.4% (31/57) — dominant but avg -$0.065/hit small, profit-monster-trail 40.4% (23/57) avg +$0.052 offsets
+- Trade freq 1/hr — normal, not overtrading
+- 0 open positions — clean slate
+- bb-bounce-long+ 21T 52.4% WR -$0.34 — slight loss but not kill-worthy (WR >50%)
+
+**Open Questions:** With accel-300-v2-long killed, 24h loss should drop ~$0.55 as its trades roll off. Next analysis should show improvement.
