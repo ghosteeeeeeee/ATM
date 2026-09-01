@@ -1913,3 +1913,8 @@ ALERTS:
 - **[WARN]** (2x): `IMX SHORT rejected — amount_usdt=5.5 < HL_MIN=11.0`
   - Same sizing issue, resolved when CRV took over hotset
 - **[INFO]**: Pipeline healthy, 120 runs in 2h, 0 crashes, all timers firing
+
+## Error Alerts — 2026-09-01 21:22 UTC
+- **WARN** (1x): `NEGATIVE_PNL` — Today's PnL at -31.73% (57 trades closed). Bad day, monitor closely.
+- **WARN** (1x): `ALL_NEUTRAL_REGIME` — 104/104 tokens NEUTRAL regime. No directional bias. Trading will be choppy.
+- **WARN** (1x): `EMPTY_HOTSET` — Hotset empty after compaction. 0 signals above 50% confidence.

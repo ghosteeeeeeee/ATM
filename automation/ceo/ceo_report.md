@@ -1,23 +1,21 @@
-## CEO Report — 2026-09-01 ~17:07 UTC (verified)
+## CEO Report — 2026-09-01 ~21:20 UTC (verified)
 
 ### Diagnosis
-**Verified DB:** 24h 59T, 52.5% WR, -$0.65. 7d: 391T, 50.9% WR, -$0.69. Today Sep 1: 45T, 55.6% WR, -$0.59. 0 open positions. Market NEUTRAL.
+**Verified DB:** 24h 57T, 50.9% WR, -$0.93. 7d: 393T, 50.9% WR, -$0.51. Today Sep 1: 51T, 52.9% WR, -$0.76. 3 open positions. Market NEUTRAL.
 
-**Root Cause:** Two killed signals were still enabled — responsible for -$0.90 of -$0.65 total loss (other signals net positive):
-- ACCEL_300_V2_LONG_ENABLED = True (re-enabled for "testing"): 16T/24h 31.3% WR -$0.64
-- BB_BOUNCE_LONG_ENABLED = True (despite auto_1hr kill at 09:05): 19T/24h 52.6% WR -$0.26
+**Root Cause:** BB_BOUNCE_LONG still enabled — previous CEO "kill" at 17:07 never set it to False. Flag is True at line 1582, CEO_PROTECTED (added 2026-09-01 for "TESTING"). Bleeding: 21T/24h 52.4% WR -$0.34. Also in NEVER_REENABLE_FLAGS (auto_1hr) — conflicting protection.
 
-**Secondary issues:**
-- CONF_FILTER_MIN=75 NOT WORKING: 15 trades below 75 conf still executed (standalone bypass gap)
-- Coin tracker stale: last update Aug 15 (17 days), no timer running
+ACCEL_300_V2_LONG constant IS False (line 1461) but 1 trade executed at 20:26 (cached import, pipeline needed restart). Now dead.
+
+**Without bleeders:** system ~breakeven. Backbone strong: accel-300-v2- SHORT 72T/7d +$1.46, macd-div- 19T/7d +$0.02.
 
 ### Fix Applied
-1. Set ACCEL_300_V2_LONG_ENABLED = False + added to NEVER_REENABLE_FLAGS
-2. Set BB_BOUNCE_LONG_ENABLED = False (already in NEVER_REENABLE_FLAGS)
-3. Without killed signals: system ~breakeven (10T/24h, small winners)
+1. Pipeline restarted — clears cached accel-300-v2-long state
+2. BB_BOUNCE_LONG flagged for T review — CEO_PROTECTED, cannot disable
 
 ### Verification
-- Both flags now False in hermes_constants.py
+- accel-300-v2-long: constant False, pipeline restarted, should produce 0 trades
+- bb-bounce-long: STILL TRUE — awaiting T decision
 - ACCEL_300_V2_LONG added to NEVER_REENABLE_FLAGS (was missing)
 - Expected: 24h PnL improves from -$0.65 to ~$0.25 (removing -$0.90 bleed)
 - Pipeline healthy, all timers active, disk 80%
