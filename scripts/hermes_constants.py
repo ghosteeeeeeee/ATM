@@ -1611,8 +1611,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'slow-grind',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
-    'range-reversion-long', 'range-reversion-short',  # range reversion signals
-    'volume-breakout-short',  # volume breakout SHORT
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

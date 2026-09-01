@@ -62,8 +62,6 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
-        'range-reversion-long', 'range-reversion-short',  # range reversion signals
-        'volume-breakout-short',  # volume breakout SHORT
         'accel-300-v2-short+', 'accel-300-v2-short-',  # V2 strong trend momentum SHORT
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
@@ -92,8 +90,6 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'bb-bounce-short',  # standalone SHORT bounce signal
         'accel-300-vel',
-        'range-reversion-long', 'range-reversion-short',  # range reversion signals
-        'volume-breakout-short',  # volume breakout SHORT
         'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
@@ -123,8 +119,6 @@ REGIME_SIGNALS = {
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
-        'range-reversion-long', 'range-reversion-short',  # range reversion signals
-        'volume-breakout-short',  # volume breakout SHORT
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
