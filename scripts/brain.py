@@ -511,6 +511,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         _size_mult = 1.0 + (_cluster_size - 1) * HL_COPY_CLUSTER_SIZE_MULT
         print(f"[brain.py] 📊 Cluster bonus: {_cluster_size} traders → size_mult={_size_mult:.2f}")
 
+    # Apply favorites/losers multiplier
+    try:
+        from decider_run import _get_favorite_size_mult
+        _fav_mult = _get_favorite_size_mult(token)
+        if _fav_mult != 1.0:
+            _size_mult *= _fav_mult
+            print(f"[brain.py] ❤️ Favorites multiplier: {_fav_mult:.1f}x → size_mult={_size_mult:.2f}")
+    except Exception:
+        pass
+
     print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult})")
     result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
