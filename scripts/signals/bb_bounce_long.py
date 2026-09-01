@@ -292,9 +292,11 @@ def scan_bb_bounce_long_signals(prices_dict):
             continue
 
         # Confidence based on quality indicators
-        base_conf = 70
+        # CALIBRATED 2026-09-01: 80-84 tier has best WR (73.7%)
+        # Target: most signals land in 75-85 range
+        base_conf = 65
         if sig['rsi'] < 30:
-            base_conf += 10  # deeply oversold
+            base_conf += 5   # deeply oversold (reduced from 10)
         if sig['bounce_pct'] > 0.15:
             base_conf += 5   # strong bounce
         if sig['trend'] == 'BULLISH':
@@ -302,7 +304,7 @@ def scan_bb_bounce_long_signals(prices_dict):
 
         # Solo mode penalty (no co-signal confirmation)
         if sig['solo']:
-            base_conf -= 5
+            base_conf -= 3   # reduced from 5
 
         base_conf = min(max(base_conf, 50), 88)  # clamp
 
