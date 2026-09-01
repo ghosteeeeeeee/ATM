@@ -1847,3 +1847,9 @@ ALERTS:
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2340s left, N failures)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3533s left, N failures)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3475s left, N failures)`
+
+## Error Alerts — 2026-09-01 04:22 UTC
+- **INFO**: Pipeline healthy, no crashes. 58 closed today, -24.57% PnL (market-driven).
+- **WARN** (1x): `PONSUSDT` Binance 400 — invalid pair, coin_tracker skips gracefully.
+- **WARN**: Disk at 80% — recommend log compression soon.
+- **NO AUTO-FIXES**: System operating normally.

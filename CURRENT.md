@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-01 ~04:30 UTC (CEO run — verified)**
+**Last Updated: 2026-09-01 ~04:32 UTC (CEO run — verified)**
 **Updated by: CEO**
 
 ## Current Status
 
 System recovering. 4 open positions. Market NEUTRAL. Pipeline healthy.
 
-- **24h:** 61T, 45.9% WR, -$0.67 (verified)
-- **7d:** 382T, 50.0% WR, -$1.38
-- **Today Sep 1:** 15T, 73.3% WR, +$0.08
+- **24h:** 63T, 46.0% WR, -$0.73 (verified)
+- **7d:** 384T, 50.0% WR, -$1.38
+- **Today Sep 1:** 17T, 70.6% WR, +$0.02
 - **Disk:** 80%
 - **Open positions:** 4 (2 bb-bounce-long+ LONG, 2 accel-300-v2-long LONG)
 - **accel-300-v2-long MIN_GAP=2.0:** CEO_PROTECTED — 12T/7d 25% WR -$0.51. FLAGGED FOR T REVIEW. Standalone losing, but with volume_breakout confluence: 2T 100% WR +$0.38.

@@ -1,3 +1,27 @@
+## CEO Report — 2026-09-01 ~04:32 UTC (verified)
+
+### Diagnosis
+**Verified DB:** 24h 63T, 46.0% WR, -$0.73. 7d: 384T, 50.0% WR, -$1.38. Today Sep 1: 17T, 70.6% WR, +$0.02. Open: 4 positions. Market NEUTRAL. **range_reversion: SHADOW→LIVE at 04:30 UTC. No trades yet (2min old).**
+
+### Root Cause
+**accel-300-v2-long is the #1 bleeder:** 17T/24h, 28.6% WR, -$0.29 standalone. 15/17 exits = atr_sl_hit (82% SL rate). Only 2T with volume_breakout confluence: 100% WR +$0.38. Signal fires too freely in choppy LONG conditions — entries lack momentum confirmation. CEO_PROTECTED — flagged for T review.
+
+**Secondary losses:** confluence-,ichimoku- SHORT -$0.18, ichimoku- variants -$0.23, macd-div- -$0.08 — all CEO_PROTECTED or tiny samples.
+
+**Positive:** Sep 1 started at 70.6% WR (best start in days). accel-300-v2- SHORT backbone solid at +$1.46/7d 52.8% WR.
+
+### Fix Applied
+No parameter changes — accel-300-v2-long is CEO_PROTECTED, requires T approval to disable. range_reversion went LIVE at 04:30 (SHADOW_MODE=False). Monitoring 48h.
+
+### Verification
+- accel-300-v2-long: FLAGGED for T review (CEO_PROTECTED, 82% SL hit rate)
+- range_reversion: LIVE, 0 trades so far (too early)
+- volume_breakout: 2T confluence 100% WR — promising but tiny sample
+- Pipeline: healthy, all timers active
+- Disk: 80%
+
+---
+
 ## CEO Report — 2026-09-01 ~04:30 UTC (verified)
 
 ### Diagnosis
