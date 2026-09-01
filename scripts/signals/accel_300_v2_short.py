@@ -405,11 +405,6 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
         if token.upper() in SHORT_BLACKLIST:
             continue
 
-        # 15m trend filter — SHORT needs BEARISH or NEUTRAL
-        trend = _get_15m_trend(token)
-        if trend == 'BULLISH':
-            continue
-
         # Volume confirmation
         if not _check_volume(token):
             continue
@@ -429,9 +424,8 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
         # Confidence: base on gap strength + acceleration
         gap_bonus = min(20, (abs(sig['gap_pct']) - V2_MIN_GAP_PCT) * 10)
         accel_bonus = min(15, abs(sig['gap_acceleration']) * 100)
-        trend_bonus = 5 if trend != 'NEUTRAL' else 0
         fresh_bonus = 8 if sig.get('fresh_cross') else 0
-        confidence = int(min(88, 62 + gap_bonus + accel_bonus + trend_bonus + fresh_bonus))
+        confidence = int(min(88, 62 + gap_bonus + accel_bonus + fresh_bonus))
         confidence = max(60, confidence)
 
         signal_price = float(sig['price'])
@@ -441,7 +435,7 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
                   f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                   f"accel={sig['gap_acceleration']:.3f}% "
                   f"gap_vel={sig['gap_velocity']:.3f}% "
-                  f"trend_15m={trend_15m} [{SOURCE}]")
+                  f"[{SOURCE}]")
             continue
 
         # Staleness check — verify gap is still valid at current price
@@ -475,7 +469,7 @@ def scan_accel_300_v2_short_signals(prices_dict: dict) -> int:
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"accel={sig['gap_acceleration']:.3f}% "
                       f"gap_vel={sig['gap_velocity']:.3f}% "
-                      f"trend_15m={trend_15m} [{SOURCE}]")
+                      f"[{SOURCE}]")
         except Exception as e:
             print(f"[accel-300-v2-short] add_signal error for {token}: {e}")
 
