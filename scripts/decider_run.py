@@ -3040,19 +3040,17 @@ def run(dry_run=False):
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
                         continue
-                    # Check acceleration — if negative, momentum has reversed
+                    # Check acceleration — only block on SIGNIFICANT reversal
+                    # Tiny negative values (-0.1% to -0.3%) are normal 1-bar noise
                     fresh_idx = len(fresh_closes) - 1
                     if fresh_idx >= 10 and fresh_ema[fresh_idx-10]:
                         fresh_accel = fresh_gap - ((fresh_closes[fresh_idx-10] - fresh_ema[fresh_idx-10]) / fresh_ema[fresh_idx-10] * 100)
-                        if fresh_accel < 0:
+                        if fresh_accel < -0.5:
                             log(f'  🚫 [ACCEL-V2-LONG-STALE] {token} {direction} blocked: acceleration reversed ({fresh_accel:+.3f}%)')
                             if sig_id:
                                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                             skipped += 1
                             continue
-                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                        skipped += 1
-                        continue
                     fresh_result = {'direction': 'LONG'}  # direction confirmed
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
