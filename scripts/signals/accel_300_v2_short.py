@@ -10,7 +10,7 @@ SHORT fires when:
   3. Price velocity negative (price moving down)
   4. Price persisted below EMA for 3+ bars (not a cross wick)
   5. Linear regression slope negative (trending down)
-  6. 15m trend must be BEARISH or NEUTRAL
+  6. Linear regression slope negative (trending down)
 """
 
 import sys, os, sqlite3, time
@@ -127,46 +127,6 @@ def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
     except Exception as e:
         print(f"  [accel-300-v2-short] price_history error for {token}: {e}")
         return []
-    finally:
-        if conn:
-            conn.close()
-
-
-def _get_15m_trend(token: str) -> str:
-    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'.
-    Faster reaction than 1H — catches downtrends before 1H flips."""
-    conn = None
-    try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT close FROM candles_15m
-            WHERE token = ?
-            ORDER BY ts DESC
-            LIMIT 60
-        """, (token.upper(),))
-        rows = cur.fetchall()
-        if not rows or len(rows) < 50:
-            return 'NEUTRAL'
-        closes = [r[0] for r in reversed(rows)]
-
-        def ema(data, period):
-            k = 2.0 / (period + 1)
-            val = data[0]
-            for v in data[1:]:
-                val = v * k + val * (1.0 - k)
-            return val
-
-        ema20 = ema(closes, 20)
-        ema50 = ema(closes, 50)
-        if ema50 == 0:
-            return 'NEUTRAL'
-        spread = abs(ema20 - ema50) / ema50 * 100
-        if spread < 0.1:
-            return 'NEUTRAL'
-        return 'BULLISH' if ema20 > ema50 else 'BEARISH'
-    except Exception:
-        return 'NEUTRAL'
     finally:
         if conn:
             conn.close()
