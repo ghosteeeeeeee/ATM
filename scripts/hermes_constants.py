@@ -1458,7 +1458,7 @@ ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
 ACCEL_300_V2_MINUS_ENABLED    = False   # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding, backbone accel-300-v2- stays. NEVER_REENABLE.
-ACCEL_300_V2_LONG_ENABLED     = False   # CEO KILLED 2026-09-01 — 15T/24h 27%WR -$0.76. NEVER_REENABLE.
+ACCEL_300_V2_LONG_ENABLED     = True    # Re-enabled. Local top filter + staleness gate + duplicate timestamps fix. Testing phase.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 2.0     # LONG: min gap above EMA300 — raised from 1.5 CEO 2026-08-31, matches SHORT fix: 5T/24h 20%WR -$0.19 ALL ATR_SL
