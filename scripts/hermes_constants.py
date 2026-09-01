@@ -2017,7 +2017,7 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
 # Family: Range (pairs with Momentum/Trend for 2-type confluence)
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
-RANGE_REVERSION_ENABLED = False          # master toggle — SHADOW MODE (not enabled yet)
+RANGE_REVERSION_ENABLED = True           # CEO 2026-09-01 — was False (shadow bug: signal never ran). Now enabled with SHADOW_MODE guard in signal.
 RANGE_REVERSION_PLUS_ENABLED = True      # LONG (buy at range bottom)
 RANGE_REVERSION_MINUS_ENABLED = True     # SHORT (sell at range top)
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed

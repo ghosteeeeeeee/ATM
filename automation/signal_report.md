@@ -1,50 +1,46 @@
 === Signal Performance Report ===
-Generated: 2026-08-31 (auto_1hr run)
+Date: 2026-08-31 23:10 UTC | Period: Last 6h / 24h
 
-## Summary
-- **24h:** 45 trades, 42.2% WR, -$0.44 PnL
-- **6h:** 17 trades, 29.4% WR, -$0.32 PnL
+## 24h Summary
+- Trades closed: 48 | PnL: -$0.39 | WR: 39.6%
+- 7d: 376 trades | PnL: -$1.47 | WR: 49.2%
 
-## KILLED (executed this run)
+## KILLED (executed today)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| MACD_DIVERGENCE_ENABLED | master | — | — | — | Set False (master switch was True while both directions dead) |
-| MACD_DIVERGENCE_PLUS_ENABLED | LONG | — | — | — | Added to NEVER_REENABLE_FLAGS (CEO killed 2026-08-23, not protected) |
+| macd-div- | SHORT | 20% | -$0.35 | 5 | KILLED — NEVER_REENABLE (signal_reporter 2026-08-31) |
 
-## Already Killed (prior runs, still executing legacy trades)
-| Signal | Dir | WR | PnL | Trades | Action |
+## KILL CANDIDATES
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v2-long | LONG | 0% | -$0.20 | 3 | Auto-killed today by auto_1hr (line 1440) |
-| macd-div- | SHORT | 25% | -$0.19 | 4 | Killed 2026-08-31, in NEVER_REENABLE |
-| confluence-,ichimoku- | SHORT | 25% | -$0.26 | 4 | Combo signal — individual signals not killable |
+| (none) | — | — | — | — | No signals meet kill criteria (WR<30%, 5+ trades, PnL<-$0.10) |
 
-## BOOSTED (executed this run)
-| Signal | Dir | WR | PnL | Trades | Action |
+## BOOST CANDIDATES
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No candidates with sufficient sample size |
+| (none) | — | — | — | — | No signals meet boost criteria (WR>55%, 5+ trades, consistent) |
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v2-long | LONG | 0% | -$0.20 | 3 | Auto-killed, legacy trades |
-| macd-div- | SHORT | 25% | -$0.19 | 4 | Dead, legacy trades |
-| confluence-,ichimoku- | SHORT | 25% | -$0.26 | 4 | Combo — monitor underlying signals |
-| ichimoku-,macd-div- | SHORT | 50% | -$0.11 | 2 | Combo — small sample, neutral |
-| accel-300 | LONG | 33% | -$0.13 | 3 | rs-only LONG — small sample |
-| engulfing | LONG | 0% | -$0.13 | 2 | Small sample |
+| ichimoku- | SHORT | 40.0% | -$0.26 | 20 | Monitor — high volume, small losses |
+| confluence- | SHORT | 40.0% | -$0.23 | 5 | Borderline — at trade threshold |
+| macd-div- | SHORT | 50.0% | -$0.17 | 6 | Already killed as standalone |
+| accel-300-v2-long | LONG | 25.0% | -$0.21 | 8 | Watch — but combo version profitable |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ichimoku | SHORT | 50% | +$0.23 | 4 | Core SHORT signal — solid |
-| bb-bounce-long | LONG | 62.5% | +$0.15 | 8 | Best LONG performer, BB_BOUNCE_LONG_ENABLED=True |
-| cascade-reverse-v2 | LONG | 50% | +$0.12 | 2 | Small sample |
-| r2-trend | SHORT | 100% | +$0.05 | 1 | Tiny sample |
-| ichimoku-rs | SHORT | 44.4% | +$0.09 | 9 | Highest volume signal, slightly positive |
+| bb-bounce-long+ | LONG | 57.1% | +$0.05 | 7 | Healthy |
+| accel-300-v2-long | LONG | 36.4% | +$0.07 | 11 | Positive despite low WR (good R:R) |
+| accel-300-v2-long,volume-breakout-long+ | LONG | 100% | +$0.38 | 2 | Confluence boost working |
 
 ## ISSUES
-- No signal inversions found (LONG signals not firing SHORT or vice versa)
-- MACD_DIVERGENCE master switch was still True while both directions were dead — fixed this run
-- MACD_DIVERGENCE_PLUS_ENABLED was killed by CEO but not in NEVER_REENABLE_FLAGS — fixed this run
-- Overall 6h WR is very low (29.4%) — likely noise from low sample, monitor next cycle
-- All current losers were already killed prior to this run — no new kills needed
+- No direction inversions found
+- SHORT signals (ichimoku-, confluence-) are generating most volume but losing small amounts
+- System overall slightly negative (-$0.39/24h) — within noise range
+- MACD divergence already killed today — no further action needed
+
+## Action Taken
+- Killed `macd-div-` SHORT via NEVER_REENABLE_FLAGS (signal_reporter 2026-08-31)
+- No additional kills or boosts warranted — all signals within normal range

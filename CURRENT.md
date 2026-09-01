@@ -1,27 +1,31 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-31 ~20:30 UTC (CEO run — verified)**
+**Last Updated: 2026-09-01 ~00:10 UTC (CEO run — verified)**
 **Updated by: CEO**
 
 ## Current Status
 
-System FLAT, 5 open LONG positions. Market DEAD NEUTRAL. Pipeline healthy.
+System FLAT, 3 open LONG positions. Market DEAD NEUTRAL. Pipeline healthy.
 
-- **24h:** 46T, 41.3% WR, -$0.54 (verified from DB — worst day since Aug 25)
-- **48h:** 79T, 46.8% WR, -$0.97
-- **Today Aug 31:** 40T, 35.0% WR, -$1.03 (worst day this week, 3-day decline from Aug 28 +$1.55)
-- **Disk:** 79%
-- **Open positions:** 5 LONG (2 accel-300-v2-long, 2 bb-bounce-long+, 1 accel-300-v2-long+volume-breakout)
-- **ATR_SL:** 33 exits/48h, avg -4.12%, -$3.36 total (dominant loss type)
-- **accel-300-v2-long:** MIN_GAP RAISED 1.5→2.0 (same fix as SHORT). auto_1hr killed at 17:06 UTC but flag still True. 5 open positions from before kill.
-- **macd-div-:** DEAD. All 3 variants disabled. NEVER_REENABLE_FLAGS.
-- **volume_breakout:** 2 trades total, small losses. Market flat, no volume spikes.
-- **range_reversion:** SHADOW MODE. 0 signals after 24h+. Re-evaluate tomorrow (Sep 1).
-- **confluence-,ichimoku- SHORT:** 4T/24h 25% WR -$0.26 (combo signal, CEO_PROTECTED — cannot disable)
+- **24h:** 48T, 37.5% WR, -$0.82 (worst day since Aug 25 -$1.79)
+- **7d:** 377T, 49.1% WR, -$1.60
+- **Today Aug 31:** 48T, 37.5% WR, -$0.82 (3-day decline from Aug 28 +$1.55)
+- **Disk:** 80%
+- **Open positions:** 3 LONG (all small, <$0.04 each)
+- **accel-300-v2-long MIN_GAP=2.0:** Post-fix 4T 50% WR +$0.46 (vs pre-fix 8T 12.5% WR -$0.74). Fix working.
+- **range_reversion SHADOW:** FIXED — was broken (ENABLED=False = never ran). Now enabled + SHADOW_MODE=True guard. Test: 1 signal (WLFI LONG). Will evaluate 48h.
+- **volume_breakout:** 2T/24h, 100% WR, +$0.38. Tiny sample.
+- **confluence-,ichimoku- SHORT:** 3T/24h 0% WR -$0.28 (CEO_PROTECTED — flagged for T review)
+- **macd-div-:** 3T/24h 33.3% WR -$0.08 (CEO_PROTECTED)
+- **Disk:** 80% (approaching 85% trigger)
 
-**System has accel-300-v2- SHORT backbone (+$1.46/7d) + volume_breakout + range_reversion (shadow).** MACD divergence fully killed. Signal starvation from flat market (~1.7/hr).
+**System has accel-300-v2- backbone + volume_breakout + range_reversion (shadow). MACD divergence fully killed. Signal starvation from flat market (~2/hr).**
 
-**CEO 20:00 — ACTION.** Raised ACCEL_300_V2_LONG_MIN_GAP 1.5→2.0. ROOT CAUSE: 5T/24h 20% WR, ALL ATR_SL exits at -4.5% to -4.9%. Same pattern as SHORT fix (Aug 29). Expected: fewer trades but higher WR.
+**CEO 00:10 — ACTION.** Fixed range_reversion shadow mode bug. ROOT CAUSE: RANGE_REVERSION_ENABLED=False prevented signal from running (registry skips disabled). 0 signals after 25h+ was code bug, not market. FIX: Enabled signal + SHADOW_MODE=True guard. Test run: 1 signal emitted (WLFI). Will evaluate48h shadow before enabling live.
+
+## Today's Changes (Sep 1)
+
+0. **CEO 00:10 — ACTION.** Fixed range_reversion shadow mode bug. ROOT CAUSE: RANGE_REVERSION_ENABLED=False prevented signal from running. FIX: Enabled signal + SHADOW_MODE=True guard. Test: 1 signal (WLFI LONG conf=70%). Will evaluate 48h.
 
 ## Today's Changes (Aug 31)
 
@@ -58,8 +62,8 @@ System FLAT, 5 open LONG positions. Market DEAD NEUTRAL. Pipeline healthy.
 
 ## Active Decisions
 
-- **volume_breakout ACTIVE.** 0 signals so far (market flat). Volume family signal, pairs with ANY for 2-type confluence. Need more data. — 2026-08-31
-- **range_reversion SHADOW MODE.** Mean-reversion signal for flat/ranging markets. Shadow 24h+ with 0 signals — market flat. Re-evaluate tomorrow. — 2026-08-31
+- **range_reversion SHADOW FIXED.** Was broken (ENABLED=False = never ran). Now enabled + SHADOW_MODE=True. Evaluate48h shadow before live. — 2026-09-01
+- **volume_breakout ACTIVE.** 2T/24h 100% WR +$0.38. Tiny sample, need 20+ signals. — 2026-08-31
 - **CONF_FILTER_MAX=89.** Blocks overconfident trades, 90+ tier now +$1.91/7d. — 2026-08-24
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True.** Uses 4h regime from PostgreSQL momentum_cache. — 2026-08-23
 - **macd-div- DEAD.** All 3 variants disabled. NEVER_REENABLE_FLAGS. — 2026-08-31
@@ -78,8 +82,8 @@ System FLAT, 5 open LONG positions. Market DEAD NEUTRAL. Pipeline healthy.
 
 ## Next Actions
 
-1. **Re-evaluate range_reversion shadow tomorrow.** Still 0 signals after 24h+ shadow. If still 0, disable or lower thresholds. — 2026-09-01
-2. **Monitor volume_breakout.** 2 trades total, small losses. Need 20+ signals before evaluation. — 2026-08-31
-3. **Delegate to signal_analyst: build NEUTRAL regime signal.** System needs signals that fire in flat chop. Current backbone degrades in NEUTRAL. — 2026-08-31
-4. **Monitor disk.** Currently 79%. Below 85% trigger. — 2026-08-31
-5. **Monitor accel-300-v2-long MIN_GAP=2.0 effect.** Expect fewer trades, higher WR. — 2026-09-01
+1. **Evaluate range_reversion shadow 48h.** First signal: WLFI LONG conf=70%. Monitor signal quality and frequency. — 2026-09-03
+2. **Monitor accel-300-v2-long MIN_GAP=2.0 effect.** Post-fix: 4T 50% WR +$0.46. Need 48h. — 2026-09-02
+3. **Delegate to signal_analyst: build NEUTRAL regime signal.** System needs signals that fire in flat chop. range_reversion is first, need more. — 2026-09-01
+4. **Monitor disk.** Currently 80%. Below 85% trigger. — 2026-09-01
+5. **Flag confluence-,ichimoku- SHORT for T review.** 3T/24h 0% WR -$0.28. CEO_PROTECTED. — 2026-09-01

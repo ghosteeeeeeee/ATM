@@ -661,3 +661,11 @@
   WHY: 0T last hour — quiet session. 44T 24h ~43%WR -$0.43. atr_sl_hit 79.5% trailing SL working. Kill criteria not met (0 signals 0%WR 3+T last hour). Alternating hourly PnL pattern, no 3+ consecutive negatives. 4 open positions within normal SL range. 7d 373T 49.3%WR -$1.49. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 22:05 UTC
+[2026-08-31 23:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L -$0.18 all atr_sl_hit). 48T 24h 42%WR -$0.43. Kill criteria not met (no signal 0%WR 3+T last hour — accel-300-v2-long 3T last hour had 1W). atr_sl_hit 81.3% trailing SL working. Trade freq 2/hr normal. No 3+ consecutive negative hours. 4 open positions with proper SL/TP. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 00:05 UTC
+[2026-09-01 00:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.01 quiet). 48T 24h 37.5%WR -$0.82. Kill criteria not met (no signal 0%WR 3+T last hour — confluence-,ichimoku- has 0%WR 3T but over 24h, 0T last hour). atr_sl_hit 79.2% trailing SL working. Trade freq 2/hr normal. No 3+ consecutive negative hours. 3 open positions all green. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 01:05 UTC

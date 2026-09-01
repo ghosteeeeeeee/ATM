@@ -56,6 +56,7 @@ SIGNAL_TYPE_LONG = 'range_reversion_long'
 SIGNAL_TYPE_SHORT = 'range_reversion_short'
 SOURCE_LONG = 'range-reversion-long+'
 SOURCE_SHORT = 'range-reversion-short-'
+SHADOW_MODE = True  # CEO 2026-09-01 — log signals without trading. Set False to go live.
 
 
 def _log(msg: str) -> None:
@@ -265,6 +266,14 @@ def run(prices_dict=None) -> int:
         if get_cooldown(token, direction=direction):
             continue
 
+        tag = '[SHADOW]' if SHADOW_MODE else '[LIVE]'
+        _log(f"  {tag} {direction}-range-reversion {token:8s} conf={sig['confidence']}% "
+             f"bbw={sig['bb_width']:.3f} rsi={sig['rsi']} "
+             f"atr%={sig['atr_pct']:.3f} "
+             f"price={sig['price']:.8g} [{SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT}]")
+        if SHADOW_MODE:
+            added += 1
+            continue
         try:
             sid = add_signal(
                 token=token.upper(),
@@ -280,10 +289,6 @@ def run(prices_dict=None) -> int:
             if sid:
                 added += 1
                 set_cooldown(token, direction, hours=RR_COOLDOWN_MINUTES / 60.0)
-                _log(f"  {direction}-range-reversion {token:8s} conf={sig['confidence']}% "
-                     f"bbw={sig['bb_width']:.3f} rsi={sig['rsi']} "
-                     f"atr%={sig['atr_pct']:.3f} "
-                     f"price={sig['price']:.8g} [{SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT}]")
         except Exception as e:
             _log(f"  [range_reversion] add_signal error {token}: {e}")
 

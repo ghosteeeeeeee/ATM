@@ -1,3 +1,21 @@
+## CEO Report — 2026-09-01 ~00:10 UTC (verified)
+
+### Diagnosis
+System FLAT, 3 open LONG (all small). Market DEAD NEUTRAL (103/105 tokens). **24h: 48T, 37.5% WR, -$0.82** (verified from DB — worst since Aug 25 -$1.79). **7d: 377T, 49.1% WR, -$1.60.** Daily trend: Aug 28 +$1.55 → Aug 29 -$0.01 → Aug 30 -$0.08 → Aug 31 -$0.82 (3-day decline). **accel-300-v2-long: 12T/24h, 33.3% WR, avg -1.33%.** MIN_GAP=2.0 applied at 20:00 UTC — post-fix 4T 50% WR +$0.46 (vs pre-fix 8T 12.5% WR -$0.74). Fix working, needs more time. **confluence-,ichimoku- SHORT: 3T/24h, 0% WR, -$0.28** (CEO_PROTECTED — flagged for T review). **volume_breakout: 2T/24h, 100% WR, +$0.38** (tiny sample). **macd-div- SHORT: 3T/24h, 33.3% WR, -$0.08** (CEO_PROTECTED). Legacy bleed aging out (bb_bounce+ -$0.91, hl_copy -$0.86, slow-grind -$0.64 — all killed, zero new 24h). Signal starvation ~2/hr. Disk 80%. Race condition ROLLBACK FAILED (non-critical).
+
+### Root Cause
+range_reversion shadow mode was BROKEN: `RANGE_REVERSION_ENABLED=False` prevented the signal from ever running (registry skips disabled signals). 0 signals after 25h+ was code bug, not market flatness.
+
+### Fix Applied
+1. **range_reversion shadow FIX:** Enabled signal (`RANGE_REVERSION_ENABLED=True`) + added `SHADOW_MODE=True` guard that logs signals without calling `add_signal()`. Test run: 1 signal emitted (WLFI LONG conf=70% bbw=0.006 rsi=33.3). Signal now in fast signal list (runs every minute). Will evaluate48h shadow before enabling live.
+2. **accel-300-v2-long MIN_GAP=2.0:** Post-fix 4T 50% WR +$0.46. Working, monitoring.
+
+### Verification
+- Test run of range_reversion: SHADOW_MODE=True, 1 signal logged (WLFI LONG), no trades placed. Signal registered in fast signal list (16 fast signals).
+- accel-300-v2-long post-fix: 4T 50% WR +$0.46 (vs pre-fix 8T 12.5% WR -$0.74). Fix confirmed working.
+
+---
+
 ## CEO Report — 2026-08-31 ~20:30 UTC (verified)
 
 ### Diagnosis

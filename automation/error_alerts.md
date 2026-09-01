@@ -1806,3 +1806,17 @@ ALERTS:
 ## Error Alerts — 2026-08-31 20:05 UTC
 - **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CC TOK BLOCKED — TOK in cooldown (2520s left, N failures)`
+
+## Error Alerts — 2026-08-31 23:05 UTC
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (12x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-08-31 23:22 UTC
+- **WARN** (5x): `ROLLBACK FAILED: sig#1584894-1584910 already claimed by another process` — race condition on AVNT SHORT signal between concurrent pipeline runs
+- **WARN** (7): Services in failed state — better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, wasp, weather-station-api (all non-critical utilities)
+- **INFO**: Pipeline completed successfully at 23:21 (11s runtime, 3 open positions, 44 closed today, -0.36 USDT)
+- **INFO**: Market regime NEUTRAL — 103 tokens neutral, minimal directional conviction
+
+## Error Alerts — 2026-09-01 00:05 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`

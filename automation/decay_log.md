@@ -816,3 +816,7 @@
 [2026-08-31 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
 [2026-08-31 17:07 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-08-31 17:07 UTC] No signals with sufficient trades in 24h window
+[2026-08-31 23:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-31 23:07 UTC]   🟢 OK: accel-300-v2-long: 8 trades, 37.5% WR, PnL=-2.05
+[2026-08-31 23:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-31 23:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

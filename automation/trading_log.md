@@ -18924,3 +18924,59 @@ Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO'
 - Open positions all within normal SL range
 
 **Open Questions:** None
+
+## [2026-08-31 23:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L) -$0.18
+**24h:** 48T ~42%WR -$0.43
+**Open:** 4 (ME, NXPC, CRV, NOT)
+
+**Close reason 24h:** atr_sl_hit 39T (81.3%) avg -$0.008 trailing SL working. profit-monster-trail 3T +$0.02. test_cleanup 3T flat. cascade 2T -$0.10. cut-loser-MAE-GUARD 1T -$0.01.
+
+**Signal 24h losers (3+T):** confluence-,ichimoku- 4T 25%WR -$0.26. accel-300-v2-long 8T 25%WR -$0.21. macd-div- 3T 33%WR -$0.08. All bleeding but none hit kill threshold (need 0%WR 3+T last hour — accel-300-v2-long had 1W of 3T last hour).
+
+**Hourly PnL:** 23:00 -$0.18 (2L), 22:00 +$0.07, 20:00 +$0.38. No 3+ consecutive negative hours.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+ trades last hour)
+- atr_sl_hit 81.3% — trailing SL functioning normally
+- Trade freq 2/hr — not overtrading
+- No 3+ consecutive negative hours
+- All 4 open positions have proper SL/TP (NOT SL -0.8%, TP +1.2%)
+- System healthy
+
+**Open Questions:** None
+
+### 2026-08-31 23:10 UTC — Signal Performance Report (6h cycle)
+- 24h: 48 trades, -$0.39 PnL, 39.6% WR
+- Killed: macd-div- SHORT (20% WR, -$0.35) — added to NEVER_REENABLE
+- Watch: ichimoku- SHORT (20T, 40% WR, -$0.26), confluence- SHORT (5T, 40% WR, -$0.23)
+- Winners: bb-bounce-long+ (57.1% WR), accel-300-v2-long (36.4% WR but +$0.07)
+- No inversions, no critical issues
+
+## [2026-09-01 00:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) +$0.01 — quiet hour
+**24h:** 48T 37.5%WR -$0.82 avg$-0.017
+**Open:** 3 (CRV +$0.16, NXPC +$0.03, ME +$0.01)
+
+**Close reason 24h:** atr_sl_hit 38T (79.2%) avg -$0.019 trailing SL working. profit-monster-trail 4T +$0.03. test_cleanup 3T flat. cascade 2T -$0.10. cut-loser-MAE-GUARD 1T -$0.01.
+
+**Signal 24h losers (3+T):** confluence-,ichimoku- 3T 0%WR -$0.28 (at kill threshold). accel-300-v2-long 9T 22%WR -$0.28. macd-div- 3T 33%WR -$0.08.
+
+**Hourly PnL 6h:** 18:00 -$0.30, 19:00 -$0.10, 20:00 +$0.38, 22:00 +$0.07, 23:00 -$0.24. No 3+ consecutive negative.
+
+**Kill check:** confluence-,ichimoku- has 0%WR with 3T — BUT 3 trades are over 24h, not last hour (0T last hour). Does not meet kill rule (0%WR 3+T last hour). Watch for next hour.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- atr_sl_hit 79.2% — trailing SL functioning normally
+- Trade freq 2/hr — not overtrading
+- No 3+ consecutive negative hours
+- 3 open positions all green, within normal SL range
+
+**Open Questions:** confluence-,ichimoku- trending toward kill (0%WR 3T/24h) — will trigger next hour if another loss.
