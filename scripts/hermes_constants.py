@@ -1414,7 +1414,8 @@ R2_TREND_LONG_MAX_RSI       = 75      # max RSI — don't buy overbought (chasin
 R2_TREND_LONG_MIN_RSI       = 20      # min RSI — don't buy when oversold (falling knife risk). Losers avg RSI=27, winners avg RSI=58. RSI>=20 blocks 17/42 losses, 0/77 wins.
 R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some momentum
 R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
-R2_TREND_LONG_MIN_BB_POS    = 0.10    # min BB position — don't buy at band bottom (already dropping). Losers avg BB=0.02, winners avg BB=0.51. BB>=0.10 blocks 32/42 losses, 11/77 wins.
+# MIN_BB_POS REMOVED 2026-09-01 — signal's edge is catching pullbacks (low BB entries)
+# Last 7 days: MIN_BB=0.10 blocked 5W/2L, hurting WR by 13%. Winners have low BB.
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.

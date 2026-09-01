@@ -30,7 +30,6 @@ from hermes_constants import (
     R2_TREND_LONG_MIN_RSI,
     R2_TREND_LONG_MIN_SPEED,
     R2_TREND_LONG_MAX_BB_POS,
-    R2_TREND_LONG_MIN_BB_POS,
     R2_TREND_LONG_BLOCK_STALE,
     R2_TREND_LONG_MAX_ACCEL,
     R2_TREND_LONG_MIN_PRE_MOVE,
@@ -312,8 +311,6 @@ def scan_signals():
                 bb_pos = (closes_list[-1] - (mean_20 - 2 * std_20)) / (4 * std_20)
                 if bb_pos > R2_TREND_LONG_MAX_BB_POS:
                     continue
-                if bb_pos < R2_TREND_LONG_MIN_BB_POS:
-                    continue  # at band bottom — already dropping, skip LONG
 
         sid = add_signal(
             token=token.upper(),
