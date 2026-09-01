@@ -255,6 +255,15 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
 
     abs_gap = gap_now
 
+    # ── LOCAL TOP FILTER — avoid entries at recent highs ──────────────────
+    # SHORT avoids local bottoms (mean reversion helps). LONG should avoid local tops
+    # (mean reversion hurts). Entry at recent high = likely pullback.
+    if latest_idx >= 20:
+        recent_20_high = max(closes[latest_idx-20:latest_idx+1])
+        pct_from_high = (closes[latest_idx] - recent_20_high) / recent_20_high * 100
+        if pct_from_high > -0.3:  # within 0.3% of recent high
+            return None  # at or near local top — likely pullback
+
     # ── EMA50 cross detection (before acceleration check — allows relaxed thresholds) ──
     ema50 = _ema_series(closes, 50)
     ema50_cross_bar = None
