@@ -1,5 +1,10 @@
 # Error Alerts
 
+## 2026-09-01 08:22 UTC — Health Check: WARN
+- **[WARN]** Hotset empty — 0 signals survived compaction, 0 open positions. Market flat (103/104 NEUTRAL, 0% speed).
+- **[WARN]** -34.13% PnL today (32 trades closed). Rough day — review losing trades.
+- Pipeline running normally, timers firing, disk 80%. No auto-fixes needed.
+
 ## 2026-08-31 11:22 UTC — Health Check: All Clear
 No WARN or CRITICAL issues detected. Pipeline running normally. 2 open positions (LINK SHORT, ME LONG), 0 closed today. 40 trades in 24h at -$0.37 PnL. Market NEUTRAL (103/104 tokens). BTC $78,624. Disk 79%. 43 timers active. No errors, no auto-fixes needed.
 
@@ -1870,3 +1875,16 @@ ALERTS:
 
 ## Error Alerts — 2026-09-01 08:05 UTC
 - **REPEATED** (30x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-01 09:05 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-01 09:24 UTC
+- **WARN** (1x): `pipeline.log grew to 96MB` — **AUTO-FIX**: Rotated to pipeline.log.20260901_092354.gz (8.7MB), restarted pipeline
+
+## Error Alerts — 2026-09-01 11:28 UTC
+- **WARN** (1x): `disk 80%` — 90G/118G used. Large files: coin_tracker.db (1.8G), candles.db (816M). Consider cleanup.
+- **INFO**: `speeds.db empty` — 0 bytes. Speed data lives in signals_hermes_runtime.db instead. Not a bug.

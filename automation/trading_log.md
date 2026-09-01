@@ -19254,3 +19254,21 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - 24h WR stable at 50%, system recovering
 
 **Open Questions:** System healthy. accel-300-v2-long remains main bleeder at -$0.64/24h but properly disabled. Continue monitoring.
+
+## [2026-09-01 12:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 67T 50.7%WR -$0.40
+**Open:** KAS short (engulfing-,rs-r41) -$0.01
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR 3+T last hour; accel-300-v2-long 0T last hour, already disabled)
+- atr_sl_hit 55.2% (37/67) — trailing SL working normally, avg -$0.037/hit small
+- profit-monster-trail 23T +$1.09 (+$0.047 avg) — profitable trailing exit
+- Trade freq 1/hr — normal, not overtrading
+- 6 consecutive positive hours (06:00→11:00: +$0.40 net)
+- 24h WR 50.7%, system recovered from 47% low
+
+**Open Questions:** System healthy and in sustained recovery. accel-300-v2-long remains main 24h bleeder (-$0.64) but properly disabled. No action needed.

@@ -949,6 +949,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 89                    # block if confidence >= this value (raised from 85 — 90+ tier now +$1.91/7d without ct-hot+, 95+ tier most profitable)
+CONF_FILTER_MIN = 75                    # CEO 2026-09-01 — block if confidence < this value. <75 tier: 14T/24h 28.6% WR -$0.72 (biggest single loss source). 7d: 73T 46.6% WR -$0.62.
 
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
 # Penalty during 01:00-06:00 UTC (Asian session close, low-liquidity pre-market).

@@ -748,10 +748,12 @@ def _score_signal(token, direction, conf, source, signal_type,
             × source_mult     (from _get_source_weight)
             × speed_mult      (+15% if speed_percentile >= 80)
     """
-    # ── Confidence filter: block 90+ (worst performers, 48.7% WR) ──────────
-    from hermes_constants import CONF_FILTER_ENABLED, CONF_FILTER_MAX
+    # ── Confidence filter: block extremes (worst performers) ──────────────
+    from hermes_constants import CONF_FILTER_ENABLED, CONF_FILTER_MAX, CONF_FILTER_MIN
     if CONF_FILTER_ENABLED and conf >= CONF_FILTER_MAX:
-        return 0.0  # hard block
+        return 0.0  # hard block — overconfident trades buy the top
+    if CONF_FILTER_ENABLED and conf < CONF_FILTER_MIN:
+        return 0.0  # hard block — low-confidence signals are noise (CEO 2026-09-01: <75 tier 28.6% WR -$0.72/24h)
 
     # ── Time block: penalty during 01-06 UTC (low-liquidity pre-market) ───
     from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END, TIME_BLOCK_PENALTY
