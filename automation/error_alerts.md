@@ -1820,3 +1820,30 @@ ALERTS:
 ## Error Alerts — 2026-09-01 00:05 UTC
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`
+
+## Error Alerts — 2026-09-01 01:05 UTC
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-01 02:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3478s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3419s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3361s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3299s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3241s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3180s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2458s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2397s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2341s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2281s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2217s left, N failures)`
+
+## Error Alerts — 2026-09-01 03:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2340s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3533s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3475s left, N failures)`

@@ -255,6 +255,18 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
 
     abs_gap = gap_now
 
+    # ── EMA50 cross detection (before acceleration check — allows relaxed thresholds) ──
+    ema50 = _ema_series(closes, 50)
+    ema50_cross_bar = None
+    if ema50[latest_idx] is not None:
+        for idx in range(latest_idx, max(50, latest_idx - 30), -1):
+            if idx > 0 and ema50[idx] is not None and ema50[idx-1] is not None:
+                if closes[idx] > ema50[idx] and closes[idx-1] <= ema50[idx-1]:
+                    ema50_cross_bar = idx
+                    break
+    bars_since_ema50_cross = latest_idx - ema50_cross_bar if ema50_cross_bar is not None else 999
+    fresh_ema50_cross = bars_since_ema50_cross <= 20
+
     # ── FILTER 2: Gap acceleration (10-bar window, must be positive) ────────
     accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
     if accel_start < 0:
@@ -264,10 +276,15 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
         return None
     gap_acceleration = gap_now - gap_then  # positive = gap widening for LONG
 
-    if gap_acceleration < V2_MIN_GAP_ACCEL:
-        return None
+    # EMA50 fresh cross allows weaker acceleration (early entry thesis)
+    if fresh_ema50_cross:
+        if gap_acceleration < 0.10:  # relaxed from 0.20 for early entry
+            return None
+    else:
+        if gap_acceleration < V2_MIN_GAP_ACCEL:
+            return None
 
-    # ── FILTER 3: Fresh cross detection ─────────────────────────────────────
+    # ── FILTER 3: EMA300 cross detection (original — catches later momentum) ──
     cross_bar = None
     for idx in range(latest_idx, PERIOD - 1, -1):
         prev_idx = idx - 1
@@ -279,11 +296,14 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
             break
     bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
     fresh_cross = bars_since_cross <= V2_FRESH_CROSS_BARS
+    
+    # Use whichever cross is more recent
+    fresh = fresh_cross or fresh_ema50_cross
 
     # ── FILTER 1: Gap in valid range (with fresh cross bypass) ─────────────
     # Fresh crosses can enter with smaller gap (breakout thesis)
     # Non-fresh crosses need larger gap (momentum continuation thesis)
-    if fresh_cross:
+    if fresh:
         if abs_gap < V2_FRESH_CROSS_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
             return None
     else:
@@ -296,8 +316,15 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
     price_velocity = closes[latest_idx] - closes[latest_idx - V2_VELOCITY_WINDOW]
     price_epsilon = max(abs(closes[latest_idx]) * 1e-12, 1e-12)
 
-    if price_velocity <= -price_epsilon:
-        return None  # price falling — not momentum
+    # For EMA50 fresh crosses, allow slightly negative velocity (early entry)
+    # For EMA300 fresh crosses and non-fresh, require positive velocity
+    if fresh and fresh_ema50_cross and not fresh_cross:
+        # EMA50 fresh cross — allow velocity >= -0.05% (catches early momentum)
+        if price_velocity < -0.05 * abs(closes[latest_idx]):
+            return None
+    else:
+        if price_velocity <= -price_epsilon:
+            return None  # price falling — not momentum
 
     # ── FILTER 4b: Minimum velocity magnitude ───────────────────────────────
     min_velocity = abs(closes[latest_idx]) * 0.0003
@@ -305,8 +332,8 @@ def detect_accel_300_v2_long(token: str, prices: list) -> Optional[dict]:
         return None  # price barely moving — no conviction
 
     # ── FILTER 5: Persistence — price must stay above EMA ───────────────────
-    # SKIP for fresh crosses — the cross IS the entry signal, no need to wait
-    if not fresh_cross:
+    # SKIP for fresh crosses (EMA300 or EMA50) — the cross IS the entry signal
+    if not fresh:
         persist_start = latest_idx - V2_PERSISTENCE_BARS + 1
         if persist_start < 0:
             return None

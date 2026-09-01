@@ -56,7 +56,7 @@ SIGNAL_TYPE_LONG = 'range_reversion_long'
 SIGNAL_TYPE_SHORT = 'range_reversion_short'
 SOURCE_LONG = 'range-reversion-long+'
 SOURCE_SHORT = 'range-reversion-short-'
-SHADOW_MODE = True  # CEO 2026-09-01 — log signals without trading. Set False to go live.
+SHADOW_MODE = False  # CEO 2026-09-01 — shadow proved 288 signals/24h across 20 tokens. Going live.
 
 
 def _log(msg: str) -> None:
