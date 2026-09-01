@@ -320,9 +320,9 @@ def scan_bb_bounce_long_signals(prices_dict):
         if sid:
             added += 1
             _cooldown[token.upper()] = now
+            vel_str = f"{sig['velocity']:.3f}%" if sig['velocity'] is not None else "N/A"
             _log(f"{token} LONG conf={base_conf} rsi={sig['rsi']:.0f} "
-                 f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% "
-                 f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "vel=N/A")
+                 f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% vel={vel_str}")
 
     return added
 
@@ -343,9 +343,9 @@ if __name__ == '__main__':
     if closes:
         sig = detect_bb_bounce_long(token, closes)
         if sig:
+            vel_str = f"{sig['velocity']:.3f}%" if sig['velocity'] is not None else "N/A"
             print(f"{token} {sig['direction']} rsi={sig['rsi']:.0f} "
-                  f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% "
-                  f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "vel=N/A")
+                  f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% vel={vel_str}")
         else:
             print(f"{token}: no signal")
     else:
