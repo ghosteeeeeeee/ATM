@@ -1101,6 +1101,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
+    'accel-300-v3-long',   # V3 pullback LONG — manage via ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1472,6 +1473,28 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
+ACCEL_300_V3_LONG_ENABLED      = True    # NEW 2026-09-01 — pullback-entry LONG, fixes v2 local-top problem
+ACCEL_300_V3_LONG_MIN_GAP     = 1.5     # min gap above EMA300 — trend must be established
+ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
+ACCEL_300_V3_LONG_MIN_PULLBACK = 0.15   # min gap narrowing from peak — price must have retraced
+ACCEL_300_V3_LONG_MAX_PULLBACK = 2.5    # max pullback — don't catch falling knives
+ACCEL_300_V3_LONG_REEXPAND_MIN = 0.08   # min gap re-expansion — bounce must be confirmed
+ACCEL_300_V3_LONG_GAP_PEAK_WINDOW = 20  # bars to find recent gap peak
+ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW = 3  # bars to measure re-expansion
+ACCEL_300_V3_LONG_MIN_VELOCITY = 0.0002 # min velocity as fraction of price — bounce must have momentum
+ACCEL_300_V3_LONG_GREEN_CAP = 3         # max consecutive green candles — don't chase after spike
+ACCEL_300_V3_LONG_RSI_MAX = 72          # max RSI — don't enter overbought
+ACCEL_300_V3_LONG_RSI_MIN = 35          # min RSI — ensure some momentum exists
+ACCEL_300_V3_LONG_COOLDOWN_BARS = 20    # cooldown between signals (20 min)
+ACCEL_300_V3_LONG_LOOKBACK_1M = 700     # 1m prices to fetch
+ACCEL_300_V3_LONG_SLOPE_WINDOW = 20     # bars for linear regression slope
+ACCEL_300_V3_LONG_MIN_SLOPE_PCT = 0.0003 # min slope % per bar (positive for LONG)
+ACCEL_300_V3_LONG_PERSISTENCE_BARS = 5  # min bars price must stay above EMA
+ACCEL_300_V3_LONG_VOLUME_LOOKBACK = 30  # bars for average volume
+ACCEL_300_V3_LONG_VOLUME_MULT = 1.1     # volume must be >= 1.1x average on bounce
+ACCEL_300_V3_LONG_CONF_BASE = 72        # base confidence
+ACCEL_300_V3_LONG_CONF_FLOOR = 60       # min confidence
+ACCEL_300_V3_LONG_CONF_CAP = 88         # max confidence (system ceiling)
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
 INVERSE_ACCEL_300_V2_MIN_GAP_PCT = 3.5    # min gap above EMA300 to fire SHORT (backtested optimal)
@@ -1597,6 +1620,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
     'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant
+    'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',

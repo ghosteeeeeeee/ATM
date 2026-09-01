@@ -53,6 +53,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
+        'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
         'bb-bounce-short',  # standalone SHORT bounce signal
@@ -86,6 +87,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
+        'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'bb-bounce-short',  # standalone SHORT bounce signal
@@ -118,6 +120,7 @@ REGIME_SIGNALS = {
         'bb_bounce',
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
+        'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
