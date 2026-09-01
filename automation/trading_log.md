@@ -1,5 +1,37 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-09-01 01:06 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (4W 0L) +$0.22
+**24h:** 51T 33%WR -$0.39 (recovering from -$0.43 at 18:45)
+**Open:** 2 SHORT (MNT bb-bounce-short, DOGE bb-bounce-short+rs)
+
+**Close reason (24h):** atr_sl_hit 38T (74.5%) avg -$0.015 — trailing SL healthy. profit-monster-trail 7T (13.7%) avg +$0.027 — good winners. test_cleanup 3T $0.00. cascade flips 2T -$0.10. MAE-GUARD 1T -$0.01.
+
+**Signal (24h):**
+- accel-300-v2-long: 10T 3W 30%WR -$0.22 — STILL FIRING (kill attempts at 17:06, 20:06 never implemented, flag still True). Last trade CRV +$0.06 winner. Gap adjustment (MIN_GAP 2.0) may be helping. Monitoring.
+- confluence-,ichimoku-: 2T 0W 0%WR -$0.18 — APPROACHING kill threshold (1 more loss triggers kill)
+- macd-div-: 3T 1W 33%WR -$0.08 — marginal
+- Multi-signal combos: mostly winners (ichimoku-,rs-r117 +$0.35, cascade-reverse-v2 +$0.23)
+
+**Hourly PnL (12h):** 13:00 +$0.02, 14:00 $0.00, 15:00 -$0.02, 16:00 -$0.21, 17:00 +$0.13, 18:00 -$0.30, 19:00 -$0.10, 20:00 +$0.38, 21:00 gap, 22:00 +$0.07, 23:00 -$0.24, 00:00 +$0.22. No 3+ consecutive negatives. Recovery trend intact.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: accel-300-v2-long has 30% WR (not 0% with 3+T in last hour)
+- confluence-,ichimoku- at 2T (needs 3+T to trigger kill)
+- Trade freq 4T/hr normal
+- No 3+ consecutive negative hours
+- atr_sl_hit 74.5% trailing SL functioning as designed
+- Last hour 4W 0L +$0.22 excellent performance
+
+**Open Questions:**
+- accel-300-v2-long flag still True despite 2 logged kills — bug in kill implementation? Flag was set but may have been overwritten by another process
+- confluence-,ichimoku- 2T 0%WR — one more loss triggers kill threshold
+
+---
+
 ## [2026-08-31 21:05 UTC] Hourly Analysis
 
 **Trades:** 3 closed last 2h (2W 1L) +$0.28. 0 trades closed in strict 1h window.
@@ -18980,3 +19012,81 @@ Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO'
 - 3 open positions all green, within normal SL range
 
 **Open Questions:** confluence-,ichimoku- trending toward kill (0%WR 3T/24h) — will trigger next hour if another loss.
+
+## [2026-09-01 02:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L) +$0.01 — winning hour
+**24h:** 55T 38.2%WR -$0.49 avg$-0.009
+**Open:** 3 (CRV, NXPC, ME — all green)
+
+**Last hour:** JUP -$0.08 (atr_sl_hit), DOGE +$0.05, MNT +$0.03, TURBO +$0.01 (all profit-monster-trail). 3/4 winners exited via trailing SL — good profit capture.
+
+**Close reason 24h:** atr_sl_hit 39T (70.9%) avg -$0.017. profit-monster-trail 10T avg +$0.028. 2 cascade, 1 MAE-GUARD. Trailing SL healthy.
+
+**Signal 24h losers:** accel-300-v2-long 10T 30%WR -$0.22 (main bleeder but 0T last hour). confluence-,ichimoku- 2T 0%WR -$0.18 (needs 1 more loss to hit kill threshold).
+
+**Hourly PnL 6h:** 20:00 +$0.35, 22:00 +$0.07, 23:00 -$0.24, 00:00 +$0.22, 01:00 +$0.09, 02:00 +$0.01. Alternating positive — no 3+ consecutive negative.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (confluence-,ichimoku- 0%WR but 2T only, needs 3+T)
+- accel-300-v2-long 0T last hour — not in kill window
+- atr_sl_hit 70.9% — trailing SL working normally
+- Trade freq 4/hr — normal
+- No 3+ consecutive negative hours
+- 3 open positions all green
+
+**Open Questions:** accel-300-v2-long at -$0.22 bleeding over 24h. If it resumes trading and loses more, may need kill. Currently 0T last hour = dormant.
+
+## [2026-09-01 03:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) -$0.13 — quiet hour
+**24h:** 55T 38%WR -$0.49
+**Open:** 5 (ASTER, SUSHI, SYRUP, NXPC, TURBO — all bb-bounce-long+)
+
+**Last hour:** YGG SHORT +$0.03 (profit-monster-trail). ARB LONG -$0.16 (hard_sl — slippage: exit $0.11155 below SL $0.11226, not a signal issue).
+
+**Close reason 24h:** atr_sl_hit 38T (71%) avg -$0.018 trailing SL working. profit-monster-trail 11T avg +$0.028. hard_sl 1T -$0.16 (ARB slippage). cascade 2T -$0.10. test_cleanup 3T flat. MAE-GUARD 1T -$0.01.
+
+**Signal 24h losers (3+T):** accel-300-v2-long 10T 30%WR -$0.22 (0T last hour — dormant). confluence-,ichimoku- 2T 0%WR -$0.18 (needs 1 more loss for kill). bb-bounce-long+ 3T 33%WR -$0.18 but 64.7%WR all-time (+$0.14) — not a signal issue.
+
+**Hourly PnL 6h:** 22:00 +$0.07, 23:00 -$0.24, 00:00 +$0.22, 01:00 +$0.09, 02:00 -$0.21. Alternating — no 3+ consecutive negative.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- atr_sl_hit 71% — trailing SL functioning normally
+- Trade freq 2/hr — normal
+- No 3+ consecutive negative hours
+- bb-bounce-long+ profitable overall (64.7%WR +$0.14 all-time)
+- ARB hard_sl was slippage, not a signal defect
+
+**Open Questions:** accel-300-v2-long still bleeding at -$0.22/24h but 0T last hour (dormant). Watch if it resumes trading.
+
+## [2026-09-01 04:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L) -$0.16 — quiet hour
+**24h:** 60T 38%WR -$0.35
+**Open:** 3 (NXPC, SYRUP, ASTER — all bb-bounce-long+)
+
+**Last hour:** TURBO +$0.07, SUSHI +$0.06 (profit-monster-trail). NOT -$0.18, ARB -$0.11 (both atr_sl_hit on accel-300-v2-long). Profit capture healthy, SL hits normal.
+
+**Close reason 24h:** atr_sl_hit 40T (66.7%) avg -$0.025. profit-monster-trail 13T avg +$0.034. Trailing SL working — atr_sl_hit % declining from 71% → 66.7%.
+
+**Signal 24h losers (3+T):** accel-300-v2-long 12T 25%WR -$0.51 (main bleeder, 2T last hour both losses — 1 short of kill threshold). bb-bounce-long+ 5T 60%WR -$0.05 (normal variance, 60%WR healthy).
+
+**Hourly PnL 6h:** 22:00 +$0.07, 23:00 -$0.24, 00:00 +$0.22, 01:00 +$0.09, 02:00 -$0.21, 03:00 -$0.16. 2 consecutive negatives (threshold 3+).
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (accel-300-v2-long 0%WR last hour but 2T, needs 3+T)
+- atr_sl_hit 66.7% — trending down, trailing SL working
+- Trade freq 4/hr — normal
+- Only 2 consecutive negative hours (threshold 3+)
+- 3 open positions all within SL range
+- SYRUP trailing SL at 0.1864 (above entry 0.1858) — locking in profit
+
+**Open Questions:** accel-300-v2-long continues bleeding (-$0.51/24h). If it trades again next hour with losses, will hit 3+ loss kill threshold. Watch closely.

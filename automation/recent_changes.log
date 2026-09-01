@@ -1,3 +1,7 @@
+[2026-09-01 01:06 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (4W 0L +$0.22). 51T 24h 33%WR -$0.39 recovering. Kill criteria not met: accel-300-v2-long 10T 30%WR -$0.22 (not 0%WR with 3+T in last hour, last trade CRV +$0.06 winner). confluence-,ichimoku- 2T 0%WR -$0.18 (needs 3+T to trigger kill). macd-div- 3T 33%WR -$0.08 marginal. atr_sl_hit 74.5% trailing SL healthy. profit-monster-trail 13.7% avg +$0.027 working. Trade freq 4T/hr normal. No 3+ consecutive negative hours. 2 open SHORT positions (MNT, DOGE). Gap adjustment (MIN_GAP 2.0) may be helping accel-300-v2-long.
+  BY: auto_1hr
+  NEXT: Re-run at 02:06 UTC
 [2026-08-31 21:05 UTC] auto_1hr: NO CHANGES
   WHY: 3T last 2h (2W 1L +$0.28), 0T strict last hour. 46T 24h 33%WR +$0.02 recovered from -$0.43. Kill criteria not met (0 trades last hour). atr_sl_hit 80.4% trailing SL working. confluence-,ichimoku- 4T 25%WR -$0.26 monitoring. macd-div- 3T 33%WR -$0.08 marginal. Trade freq ~1.5/hr normal. No 3+ consecutive negative hours. 4 open LONG positions normal SLs.
   BY: auto_1hr
@@ -669,3 +673,15 @@
   WHY: 2T last hour (1W 1L +$0.01 quiet). 48T 24h 37.5%WR -$0.82. Kill criteria not met (no signal 0%WR 3+T last hour — confluence-,ichimoku- has 0%WR 3T but over 24h, 0T last hour). atr_sl_hit 79.2% trailing SL working. Trade freq 2/hr normal. No 3+ consecutive negative hours. 3 open positions all green. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 01:05 UTC
+[2026-09-01 02:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.01 winning hour). 55T 24h 38.2%WR -$0.49. Kill criteria not met (confluence-,ichimoku- 0%WR but 2T only, needs 3+T last hour; accel-300-v2-long 0T last hour). atr_sl_hit 70.9% trailing SL working. Trade freq 4/hr normal. No 3+ consecutive negative hours. 3 open positions green. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC
+[2026-09-01 03:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.13 quiet). 55T 24h 38%WR -$0.49. Kill criteria not met (no signal 0%WR 3+T last hour). ARB hard_sl was slippage (exit below SL), not signal defect. bb-bounce-long+ 64.7%WR all-time profitable. atr_sl_hit 71% trailing SL working. Trade freq 2/hr normal. No 3+ consecutive negative hours. 5 open positions all within SL range. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC
+[2026-09-01 04:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.16 quiet). 60T 24h 38%WR -$0.35. Kill criteria not met (accel-300-v2-long 0%WR last hour but only 2T, needs 3+T). atr_sl_hit 66.7% declining from 71% — trailing SL working. Trade freq 4/hr normal. Only 2 consecutive negative hours (threshold 3+). 3 open positions within SL range. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 05:05 UTC
