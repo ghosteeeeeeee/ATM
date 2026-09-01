@@ -1,29 +1,44 @@
 === Signal Performance Report ===
-Period: 2026-09-01 05:08 UTC | Last 6h + 24h
+Period: Last 6h | 24h
+Generated: 2026-09-01 ~12:00 UTC
 
-KILLED (executed):
+## 6h Performance (min 2 trades)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-bounce-long+ | LONG | 10 | 50.0% | -$0.18 |
+| bb-bounce-short | SHORT | 3 | 66.7% | -$0.03 |
+
+## 24h Performance (min 3 trades)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| accel-300-v2-long | LONG | 17 | 29.4% | -$0.64 |
+| bb-bounce-long+ | LONG | 17 | 58.8% | -$0.07 |
+| bb-bounce-short | SHORT | 5 | 80.0% | +$0.01 |
+
+## KILLED (already executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v2-long | LONG | 29.4% | -$0.64 | 17 | KILLED — 2d consistent losses, added to NEVER_REENABLE |
+| accel-300-v2-long | LONG | 29.4% | -$0.64 | 17 | Already killed — NEVER_REENABLE (2026-09-01) |
+| bb-bounce-long+ | LONG | 50% | -$0.18 | 10 (6h) | Already killed — NEVER_REENABLE (2026-09-01 AUTO_1HR) |
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
+## BOOSTED (candidates)
+None. bb-bounce-short (80% WR, +$0.01) is only 5 trades — insufficient for boost.
 
-LOSERS (watch list):
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| confluence-,ichimoku- | SHORT | 0% | -$0.18 | 2 | Watch — low sample |
-| macd-div- | SHORT | 50% | -$0.05 | 2 | Watch — marginal |
+| bb-bounce-long+ | LONG | 50% | -$0.18 | 10 (6h) | Killed — watch for resumption after NEVER_REENABLE expires |
 
-WINNERS:
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-long+ | LONG | 71.4% | +$0.11 | 7 | Active — strong |
-| bb-bounce-short | SHORT | 100% | +$0.04 | 2 | Active — low sample |
-| accel-300-v2-long,volume-breakout-long+ | LONG | 100% | +$0.38 | 2 | Active — strong combo |
+| bb-bounce-short | SHORT | 80% | +$0.01 | 5 | Healthy but low volume |
 
-ISSUES:
-- No signal inversions detected
-- ACCEL_300_V2_LONG killed: 17T/24h 29.4% WR -$0.64. Consistent losses across Aug 31 (22.2% WR, -$0.28) and Sep 1 (37.5% WR, -$0.36). Never profitable.
-- Removed from ROTATOR_PROTECTED_FLAGS and CEO_PROTECTED_FLAGS (was marked "improving" but wasn't)
+## ISSUES
+- No direction inversions detected
+- Only 3 active signal sources in 24h — signal diversity very low
+- bb-bounce-long+ degraded after CEO kill (was 61.5% WR 24h, dropped to 50% in 6h)
+- System is signal-starved: only 22 total trades in 24h across all signals
+
+## DECISIONS
+No new kills or boosts executed — all candidates already handled by previous reports.
