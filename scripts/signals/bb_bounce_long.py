@@ -147,26 +147,22 @@ def _get_15m_velocity(token):
             conn.close()
 
 
-def _get_candles(token, lookback=100, before_ts=None):
-    """Get 5m candles. If before_ts is set, only get candles up to that time."""
+def _get_candles(token, lookback=100, min_age_sec=600):
+    """Get 5m candles with minimum age filter.
+    min_age_sec=600 (10 min) ensures we only use confirmed candles, not the
+    current incomplete candle or very recent ones that may change."""
     conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
-        if before_ts:
-            cur.execute("""
-                SELECT close FROM candles_5m
-                WHERE token = ? AND ts <= ?
-                ORDER BY ts DESC
-                LIMIT ?
-            """, (token.upper(), before_ts, lookback))
-        else:
-            cur.execute("""
-                SELECT close FROM candles_5m
-                WHERE token = ?
-                ORDER BY ts DESC
-                LIMIT ?
-            """, (token.upper(), lookback))
+        import time as _time
+        max_ts = int(_time.time()) - min_age_sec
+        cur.execute("""
+            SELECT close FROM candles_5m
+            WHERE token = ? AND ts <= ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), max_ts, lookback))
         rows = cur.fetchall()
         return [r[0] for r in reversed(rows)] if rows else []
     except Exception:
@@ -287,11 +283,7 @@ def scan_bb_bounce_long_signals(prices_dict):
         if get_cooldown(token, direction='LONG'):
             continue
 
-        # V2 fix: Use current timestamp to get candles up to NOW
-        # This prevents the signal from seeing future data
-        import time as _time
-        now_ts = int(_time.time())
-        closes = _get_candles(token, 100, before_ts=now_ts)
+        closes = _get_candles(token, 100)
         if not closes:
             continue
 
@@ -330,7 +322,7 @@ def scan_bb_bounce_long_signals(prices_dict):
             _cooldown[token.upper()] = now
             _log(f"{token} LONG conf={base_conf} rsi={sig['rsi']:.0f} "
                  f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% "
-                 f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "")
+                 f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "vel=N/A")
 
     return added
 
@@ -353,7 +345,7 @@ if __name__ == '__main__':
         if sig:
             print(f"{token} {sig['direction']} rsi={sig['rsi']:.0f} "
                   f"trend={sig['trend']} bounce={sig['bounce_pct']:.2f}% "
-                  f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "")
+                  f"vel={sig['velocity']:.3f}%" if sig['velocity'] is not None else "vel=N/A")
         else:
             print(f"{token}: no signal")
     else:
