@@ -2040,7 +2040,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pe_src = pe.get('source', '')
                         pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
                         if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
-                            bare_pe = pe_src.rstrip('+-') if pe_src else ''
+                            bare_pe = re.sub(r'\d+$', '', pe_src.rstrip('+-')) if pe_src else ''
                             if bare_pe in STANDALONE_BYPASS_SIGNALS:
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} backtested standalone ({pe_src}) allowed at merge")
                                 # ── Contrarian flip for preserved entries ──────────
@@ -2749,7 +2749,7 @@ def _filter_safe_prev_hotset(prev_hotset):
             pass  # ponytail: CONFLUENCE_REQUIRED=False → single-source allowed through preserve
         elif len(sp) < 2:
             # Check if single-source signal is in the standalone bypass list
-            bare_src_check = src.rstrip('+-') if src else ''
+            bare_src_check = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
             if bare_src_check in STANDALONE_BYPASS_SIGNALS:
                 pass  # backtested standalone — allow through preserve
             else:
