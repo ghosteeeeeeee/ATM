@@ -273,15 +273,17 @@ def _has_enough_trades(token, min_trades=5, days=7):
 
 def _get_favorite_size_mult(token):
     """Get position size multiplier based on favorites/losers status.
-    - Losers: 0.5x (penalized)
+    - Losers: 0.5x (penalized), but never below HL_MIN_NOTIONAL_USDT
     - Favorites 75%+ WR: 1.8x (extra bump)
     - Favorites 50%+ WR: 1.5x (standard boost)
     - Favorites <50% WR: 1.2x (reduced)
     - Normal: 1.0x
     """
-    # Losers get penalized first
+    # Losers get penalized first, but don't go below minimum
     if LOSERS and token.upper() in LOSERS:
-        return LOSERS_SIZE_MULT
+        # Cap reduction so size stays >= HL_MIN_NOTIONAL_USDT
+        max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
+        return max(LOSERS_SIZE_MULT, max_reduction)
 
     if token.upper() not in FAVORITES:
         return 1.0
