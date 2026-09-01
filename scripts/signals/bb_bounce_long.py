@@ -147,17 +147,26 @@ def _get_15m_velocity(token):
             conn.close()
 
 
-def _get_candles(token, lookback=100):
+def _get_candles(token, lookback=100, before_ts=None):
+    """Get 5m candles. If before_ts is set, only get candles up to that time."""
     conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
-        cur.execute("""
-            SELECT close FROM candles_5m
-            WHERE token = ?
-            ORDER BY ts DESC
-            LIMIT ?
-        """, (token.upper(), lookback))
+        if before_ts:
+            cur.execute("""
+                SELECT close FROM candles_5m
+                WHERE token = ? AND ts <= ?
+                ORDER BY ts DESC
+                LIMIT ?
+            """, (token.upper(), before_ts, lookback))
+        else:
+            cur.execute("""
+                SELECT close FROM candles_5m
+                WHERE token = ?
+                ORDER BY ts DESC
+                LIMIT ?
+            """, (token.upper(), lookback))
         rows = cur.fetchall()
         return [r[0] for r in reversed(rows)] if rows else []
     except Exception:
@@ -278,7 +287,11 @@ def scan_bb_bounce_long_signals(prices_dict):
         if get_cooldown(token, direction='LONG'):
             continue
 
-        closes = _get_candles(token, 100)
+        # V2 fix: Use current timestamp to get candles up to NOW
+        # This prevents the signal from seeing future data
+        import time as _time
+        now_ts = int(_time.time())
+        closes = _get_candles(token, 100, before_ts=now_ts)
         if not closes:
             continue
 
