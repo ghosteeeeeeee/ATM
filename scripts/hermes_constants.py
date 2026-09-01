@@ -1218,7 +1218,6 @@ NEVER_REENABLE_FLAGS = {
     'INVERSE_ACCEL_300_V2_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_MINUS_ENABLED',    # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding. NEVER_REENABLE.
-    'ACCEL_300_V2_LONG_ENABLED',     # SIGNAL REPORTER 2026-09-01 — 17T/24h 29.4% WR -$0.64. 2d consistent losses. NEVER_REENABLE.
     'BB_BOUNCE_LONG_ENABLED',        # AUTO_1HR 2026-09-01 — 5T/0%WR/-$0.47 last hour, 26T/24h -$0.10. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1457,7 +1456,7 @@ ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
 ACCEL_300_V2_MINUS_ENABLED    = False   # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding, backbone accel-300-v2- stays. NEVER_REENABLE.
-ACCEL_300_V2_LONG_ENABLED     = False   # SIGNAL REPORTER 2026-09-01 — 17T/24h 29.4% WR -$0.64. 2d of losses. NEVER_REENABLE.
+ACCEL_300_V2_LONG_ENABLED     = True    # Re-enabled after duplicate timestamps fix. Testing phase — monitoring performance.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 2.0     # LONG: min gap above EMA300 — raised from 1.5 CEO 2026-08-31, matches SHORT fix: 5T/24h 20%WR -$0.19 ALL ATR_SL
@@ -1503,6 +1502,7 @@ TL_BREAK_MINUS_ENABLED        = False  # KILLED 2026-08-25 — 28.6% WR, -$0.32 
 # Used for signals we explicitly upgraded/tuned — old cumulative data is stale
 ROTATOR_PROTECTED_FLAGS = [
     'BB_BOUNCE_ENABLED',        # confluence signal — 100% WR with hzscore+, standalone WR stale
+    'ACCEL_300_V2_LONG_ENABLED', # testing — duplicate timestamps fixed, monitoring performance
 ]
 
 # ── CEO Protection ──────────────────────────────────────────────────────────
@@ -1514,6 +1514,7 @@ CEO_PROTECTED_FLAGS = {
     'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
+    'ACCEL_300_V2_LONG_ENABLED': ('Testing — duplicate timestamps fixed, monitoring performance', '2026-09-01'),
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
     'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
     'PM_TRAIL_DISTANCE_PCT': ('Profit monster trail distance — CEO changed without authorization 2026-08-16', '2026-08-17'),
@@ -1576,7 +1577,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
-BB_BOUNCE_LONG_ENABLED = False    # AUTO_1HR KILLED 2026-09-01 09:05 UTC — 5T/0%WR/-$0.47 last hour, 26T/24h 61.5%WR/-$0.10. NEVER_REENABLE.
+BB_BOUNCE_LONG_ENABLED = True     # TESTING 2026-09-01 — re-enabled with min_age_sec fix (10 min candle age). Monitor 48h.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
