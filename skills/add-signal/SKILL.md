@@ -262,7 +262,11 @@ Slow signals run every 5 min instead of every 1 min. Symptom of missing this: pi
 
 **File**: `/root/.hermes/scripts/signal_schema.py`
 
-In `add_signal()`, inside the `for _comp in _components:` loop (~line 657+), add:
+**Two locations to edit** — both are mandatory. Missing either causes crashes or silent bypasses.
+
+### 4A. `add_signal()` component loop (~line 990+)
+
+In `add_signal()`, inside the `for _comp in _components:` loop, add:
 
 ```python
 # your-signal
@@ -292,6 +296,31 @@ if _comp == 'your-signal-':
         pass
 ```
 
+### 4B. `is_component_disabled()` function (~line 2080+)
+
+**⚠️ CRITICAL — missing this = NameError crash that kills ALL signal compaction.**
+
+This function has its OWN import block at the top (~line 2082-2139). You must:
+
+1. Add your constant to the import block:
+```python
+# In the try/except ImportError block at the top of is_component_disabled():
+from hermes_constants import (
+    ...
+    YOUR_SIGNAL_ENABLED, YOUR_SIGNAL_PLUS_ENABLED, YOUR_SIGNAL_MINUS_ENABLED,
+)
+```
+
+2. Add the component checks in the function body:
+```python
+# your-signal (bare)
+if c == 'your-signal': return not YOUR_SIGNAL_ENABLED
+# your-signal+ (LONG)
+if c in ('your-signal+', 'your-signal-'): return not YOUR_SIGNAL_PLUS_ENABLED
+```
+
+**Why this matters:** `is_component_disabled()` is called by signal_compactor during hotset scoring. If your constant isn't imported, Python raises `NameError` which crashes the ENTIRE compaction run — no signals get compacted, not just yours.
+
 ### Source matching rules
 
 | Source format | Layer 2 match |
@@ -306,6 +335,7 @@ if _comp == 'your-signal-':
 **Bug patterns to avoid**:
 1. If your source is bare (no `+`/`-`), the `+`/`-` Layer 2 checks are dead code. Use `direction` param or add direction suffix to source.
 2. Asymmetric sources (different format per direction) — list BOTH variants in `_comp in (...)`.
+3. **Forgetting `is_component_disabled()`** — causes NameError crash in compactor. Always add BOTH locations.
 
 ---
 
@@ -319,6 +349,27 @@ In `SIGNAL_SOURCE_WEIGHTS` (~line 177-253):
 ('your_signal_long',  'your-signal+'):  1.0,
 ('your_signal_short', 'your-signal-'):  1.0,
 ```
+
+---
+
+## Step 5a: STANDALONE_BYPASS_SIGNALS (if signal works solo)
+
+**File**: `/root/.hermes/scripts/hermes_constants.py`
+
+If your signal fires on a single source (not a combo) and should bypass the confluence gate (which normally requires 2+ unique signal types), add it to `STANDALONE_BYPASS_SIGNALS`:
+
+```python
+STANDALONE_BYPASS_SIGNALS = (
+    ...,
+    'your-signal',  # structural breakout signal, works solo
+)
+```
+
+**When to add:** Momentum/structural signals that fire solo (e.g., `accel-300-v2-long`, `r2-trend-long`, `atr-spike`).
+
+**When NOT to add:** Combo/meta signals that rely on confluence (e.g., `confluence`, `signal_confluence`).
+
+**What happens without it:** The compactor's confluence gate blocks single-source signals unless they merge with another signal for the same token+direction. Your signal will fire but never reach the hotset.
 
 ---
 
@@ -392,19 +443,69 @@ assert result[0] == 'TRADE', f'BLOCKED: {result}'
 
 ---
 
+## Step 5c: PROFIT_MONSTER_BYPASS_SIGNALS (if signal manages its own exits)
+
+**File**: `/root/.hermes/scripts/hermes_constants.py`
+
+If your signal has its own ATR SL/TP logic and you don't want `profit_monster.py` to interfere with exits, add it to `PROFIT_MONSTER_BYPASS_SIGNALS`:
+
+```python
+PROFIT_MONSTER_BYPASS_SIGNALS = (
+    ...,
+    'your-signal',  # manage via ATR SL, not PM Trail
+)
+```
+
+**When to add:** Momentum signals with ATR-based trailing stops (e.g., `accel-300-v2-long`, `atr-spike`, `r2-trend-long`).
+
+**When NOT to add:** Signals that benefit from PM Trail's quick profit-taking (e.g., `bb-bounce`, `confluence`). These are losing signals that PM Trail helps cut quickly.
+
+**What happens without it:** profit_monster may close your winning trades early (at 0.5-2% profit via Tier 1) instead of letting ATR trailing capture the full move.
+
+---
+
 ## Step 6: Verification
 
 ```bash
-# 1. Syntax check all changed files
-python3 -c "import py_compile; py_compile.compile('scripts/signals/your_signal.py', doraise=True)"
-python3 -c "import py_compile; py_compile.compile('scripts/hermes_constants.py', doraise=True)"
-python3 -c "import py_compile; py_compile.compile('scripts/signals/__init__.py', doraise=True)"
-python3 -c "import py_compile; py_compile.compile('scripts/signal_schema.py', doraise=True)"
+# 1. Syntax check ALL changed files (not just your script)
+cd /root/.hermes/scripts
+python3 -c "
+import py_compile
+files = [
+    'signals/your_signal.py',
+    'hermes_constants.py',
+    'signals/__init__.py',
+    'signal_schema.py',
+    'signal_compactor.py',
+    'volatility_gate.py',
+]
+for f in files:
+    py_compile.compile(f, doraise=True)
+    print(f'{f}: OK')
+print('All syntax checks passed')
+"
 
-# 2. Dry run (--dry logs decisions but still writes to DB — not a true dry run)
-cd /root/.hermes/scripts && python3 signals/your_signal.py --dry
+# 2. Import chain verification — catches missing constants and circular imports
+cd /root/.hermes/scripts && python3 -c "
+from signals.your_signal import run
+from signals import get_fast_signals
+fast = get_fast_signals()
+your = [s for s in fast if s['name'] == 'your_signal']
+assert len(your) > 0, 'NOT in registry'
+assert your[0]['run'] is not None, 'run function is None'
+print(f'Registry: OK (enabled={your[0][\"enabled\"]})')
 
-# 3. Check logs
+from volatility_gate import REGIME_SIGNALS
+for regime in ['NORMAL', 'HIGH']:
+    found = any('your-signal' in s for s in REGIME_SIGNALS.get(regime, set()))
+    assert found, f'MISSING from {regime}'
+print('Volatility gate: OK')
+"
+
+# 3. Dry run
+cd /root/.hermes/scripts && timeout 30 python3 signals/your_signal.py --dry
+
+# 4. Check logs
 tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
 ```
 
@@ -421,6 +522,9 @@ tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
 | **Source not blacklisted** | `python3 -c "from signal_schema import validate_source; print(validate_source('your-signal+'))"` | Signal enters DB but gets blocked in hotset |
 | **Vol floor understood** | Signal will be blocked by Layer 3 if token vol < 0.15% — this is correct behavior | Low-vol tokens don't move enough to profit |
 | **In REGIME_SIGNALS** ⚠️ | `grep -n 'your-signal' volatility_gate.py` — MUST appear in correct regimes | `should_trade()` silently SKIPS your signal at Layer 3 |
+| **In `is_component_disabled()`** ⚠️ | `grep -n 'your-signal' signal_schema.py` — constant must be imported in that function | NameError crash kills ALL compaction |
+| **In STANDALONE_BYPASS** (if solo) | `grep -n 'your-signal' hermes_constants.py` — check STANDALONE_BYPASS_SIGNALS | Single-source signals blocked by confluence gate |
+| **In PROFIT_MONSTER_BYPASS** (if ATR-managed) | `grep -n 'your-signal' hermes_constants.py` — check PROFIT_MONSTER_BYPASS_SIGNALS | PM Trail cuts winners early |
 
 ---
 
@@ -432,15 +536,18 @@ Use the Task tool to run bug_hunter:
 
 ```
 You are the bug_hunter. Audit these files for bugs:
-- scripts/signals/your_signal.py
-- scripts/signal_schema.py (new Layer 2 entries)
-- scripts/hermes_constants.py (new constants)
+- scripts/signals/your_signal.py (new signal script)
+- scripts/signal_schema.py (Layer 2 entries in add_signal() AND is_component_disabled())
+- scripts/hermes_constants.py (new constants, STANDALONE_BYPASS_SIGNALS, PROFIT_MONSTER_BYPASS_SIGNALS)
 - scripts/signals/__init__.py (registry entry)
 - scripts/signal_compactor.py (new source weights)
+- scripts/volatility_gate.py (new REGIME_SIGNALS entries)
 
-Check: SQL injection, connection leaks, import safety, source string
-consistency between script/Layer 2/compactor, edge cases (empty data,
-None values, zero division), direction logic, hardcoded numbers.
+Check: SQL injection, connection leaks, import safety (especially
+is_component_disabled() import block), source string consistency between
+script/Layer 2/compactor, edge cases (empty data, None values, zero
+division), direction logic, hardcoded numbers, missing from
+STANDALONE_BYPASS_SIGNALS or PROFIT_MONSTER_BYPASS_SIGNALS.
 
 Return: bugs with file:line references, or ALL CLEAR.
 ```
@@ -463,13 +570,15 @@ Bug_hunter checks:
 
 ```bash
 cd /root/.hermes
-git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py scripts/signal_compactor.py
+git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py scripts/signal_compactor.py scripts/volatility_gate.py
 git commit -m "signals: add your_signal — <brief description>
 
 - New signal script: signals/your_signal.py
-- hermes_constants: YOUR_SIGNAL_ENABLED/PLUS/MINUS flags
+- hermes_constants: YOUR_SIGNAL_ENABLED/PLUS/MINUS flags + STANDALONE_BYPASS + PROFIT_MONSTER_BYPASS
 - signals/__init__.py: registry entry
-- signal_schema.py: Layer 2 enforcement"
+- signal_schema.py: Layer 2 enforcement + is_component_disabled
+- signal_compactor.py: source weight
+- volatility_gate.py: REGIME_SIGNALS entries"
 ```
 
 Then run `/wrapup` — this triggers the full post-change workflow (bug_hunter re-verify → OpenMemory → CEO → push). **Do not skip /wrapup.**
