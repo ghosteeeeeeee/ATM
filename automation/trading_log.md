@@ -1,5 +1,42 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-09-01 19:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) +$0.21 — quiet hour
+**24h:** 57T 30W 52.6%WR -$0.47 (flat, recovering)
+**Open:** 0 positions — flat
+
+**Close reason (24h):**
+- atr_sl_hit: 31T (54.4%) avg -$0.050 — dominant, tiny losses. SL healthy.
+- profit-monster-trail: 23T (40.4%) avg +$0.052 — only profitable exit type, carrying system.
+- Others: 3T mixed (atr_tp_hit, hard_sl, ORPHAN_PAPER).
+
+**Signal (24h, 3+ trades):**
+- bb-bounce-long+: 21T 52%WR -$0.34 — KILLED (False, NEVER_REENABLED) at 09:05. Draining legacy.
+- accel-300-v2-long: 15T 33%WR -$0.44 — KILLED (False, NEVER_REENABLED) at 20:06 Aug 31. Draining legacy.
+- bb-bounce-short: 5T 80%WR +$0.01 — performing well, only active signal.
+
+**Hourly PnL (6h):** 14:00 +$0.02, 15:00 -$0.17, 16:00 -$0.40, 17:00 +$0.02, 18:00 -$0.29, 19:00 +$0.21. Alternating, no 3+ consecutive negatives.
+
+**Changes:** None
+
+**No Change Needed:**
+- Trade frequency ~2.4/hr normal (57T/24h). No overtrading.
+- 1 trade last hour = expected after killing 2 major signals (bb-bounce-long+, accel-300-v2-long).
+- 0 open trades = flat. No intervention needed.
+- atr_sl_hit 54.4% but avg loss tiny (-$0.050). Trailing SL working.
+- profit-monster-trail 40.4% avg +$0.052 carrying system.
+- No 3+ consecutive negative hours (alternating pattern).
+- Kill thresholds not met for any remaining active signal.
+- bb-bounce-short (5T/80%WR) healthy — only active signal.
+
+**Open Questions:**
+- Trade volume may drop further with 2 signals killed. Monitor for signal starvation.
+- bb-bounce-short (5T/80%WR) remains enabled — watch for degradation.
+- Both bb-bounce-long+ and accel-300-v2-long still closing legacy positions. Will drain naturally.
+
+---
+
 ## [2026-09-01 13:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (1W 0L) +$0.09 — quiet hour

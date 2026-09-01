@@ -1,3 +1,7 @@
+[2026-09-01 19:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.21). 57T 24h 52.6%WR -$0.47 flat. 0 open trades (flat). Kill criteria not met: accel-300-v2-long already killed (False, NEVER_REENABLED), bb-bounce-long+ killed at 09:05 (False, NEVER_REENABLED). bb-bounce-short 5T 80%WR +$0.01 healthy. atr_sl_hit 54.4% avg -$0.050 (SL working). profit-monster-trail 40.4% avg +$0.052 carrying system. Trade freq ~2.4/hr normal. No 3+ consecutive negative hours. 1T/hr = expected after killing 2 major signals. No signal starvation yet.
+  BY: auto_1hr
+  NEXT: Re-run at 20:10 UTC
 [2026-09-01 13:10 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (1W 0L +$0.09). 66T 24h 51.5%WR -$0.33 near breakeven. 0 open trades (flat). Kill criteria not met: accel-300-v2-long already killed (False, NEVER_REENABLED), bb-bounce-long+ killed at 09:05 (False, NEVER_REENABLED). bb-bounce-short 5T 80%WR +$0.01 healthy. atr_sl_hit 53% avg -$0.039 (SL working). profit-monster-trail 36.4% avg +$0.049 carrying system. Trade freq ~2.75/hr normal. No 3+ consecutive negative hours. 1T/hr = expected after killing 2 major signals. No signal starvation yet.
   BY: auto_1hr
