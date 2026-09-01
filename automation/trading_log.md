@@ -19345,3 +19345,46 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - Open DYDX position -$0.06 within range (will close via ATR SL if triggered)
 
 **Open Questions:** DYDX accel-300-v2-long open position will remain until SL/TP hit. No new entries from this signal.
+
+## [2026-09-01 16:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.32 (DYDX -$0.13, LDO -$0.10, ASTER -$0.09) — all ATR SL hits
+**24h:** 60T 50%WR -$0.70
+
+**Open:** MET -$0.10 (-13.29%), HBAR +$0.01 (+6.98%), ME $0.00 (-4.88%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR 3+T last hour; all 3 trades from different signals)
+- atr_sl_hit 55% (33/60) — trailing SL working normally, avg -$0.053/hit small
+- profit-monster-trail 24T +$1.19 (+$0.050 avg) — profitable trailing exits
+- Trade freq 3/hr — normal, not overtrading
+- bb-bounce-long+ 18T 55.6% WR -$0.17 — essentially breakeven, not kill-worthy
+- accel-300-v2-long KILLED at 14:05 — DYDX was last open position, closed this hour as expected
+- 2 consecutive negative hours (15:00, 16:00) — watch, not alarming yet
+- MET -13.29% unrealized — large but r2-trend-long3, will close via SL
+
+**Open Questions:** System steady. 2 negative hours after a good run (06:00-13:00 +$0.69). Normal mean reversion. Watch if negative streak continues.
+
+## [2026-09-01 17:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L)
+**PnL:** -$0.18 (ME -$0.09, MET -$0.09) — both ATR SL exits
+**24h:** 59T 52.5%WR -$0.65
+
+**Open:** HBAR bb-bounce-long+ -19.72% (SL will close)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR 3+T last hour — bb-bounce-long+ 1T 0W, r2-trend-long3 1T 0W)
+- atr_sl_hit 55.9% (33/59) — trailing SL working normally, avg -$0.052/hit small
+- profit-monster-trail 23/59 = 39% of exits, avg +$0.052 — profitable trailing exits
+- Trade freq 2.5/hr — normal, not overtrading
+- accel-300-v2-long killed 14:05, no new entries from it
+- 2 consecutive negative hours (16:00, 17:00) after 6 positive — normal mean reversion
+- HBAR -19.72% unrealized — will close via ATR SL if triggered
+
+**Open Questions:** System steady. 3 consecutive losing trades (2 from different signals) — not alarming, just SL doing its job.
