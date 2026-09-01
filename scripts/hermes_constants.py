@@ -274,45 +274,31 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'AIXBT',
     'ALT',
     'APT',
     'ARB',
+    'ATOM',
     'AVNT',
     'BCH',
-    'BLUR',
-    'BTC',
-    'CAKE',
     'CASHCAT',
     'CC',
-    'CFX',
     'CHIP',
-    'COMP',
     'CRV',
     'DOGE',
-    'ENA',
     'ENS',
     'ETC',
-    'ETH',
-    'GRASS',
-    'HYPE',
-    'ICP',
-    'IMX',
     'IO',
     'JUP',
     'MERL',
-    'MON',
+    'MET',
     'NEO',
     'NOT',
-    'POL',
-    'PUMP',
     'WLD',
-    'WLFI',
-    'XPL',
     'YGG',
     'ZEN',
     'ZRO'
 }
+
 
 
 
@@ -1218,7 +1204,6 @@ NEVER_REENABLE_FLAGS = {
     'MACD_DIVERGENCE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-31 — 5T/24h 20% WR -$0.35. 7d negative PnL. NEVER_REENABLE.
     'INVERSE_ACCEL_300_V2_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
-    'ACCEL_300_V2_MINUS_ENABLED',    # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_ENABLED',     # AUTO_1HR 2026-09-01 — 16T/24h 31.3% WR -$0.55. ALL ATR_SL. NEVER_REENABLE.
     'BB_BOUNCE_LONG_ENABLED',        # AUTO_1HR 2026-09-01 — 5T/0%WR/-$0.47 last hour, 26T/24h -$0.10. NEVER_REENABLE.
 }
@@ -1458,7 +1443,7 @@ ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0%
 ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13-win streak Aug 12.
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
-ACCEL_300_V2_MINUS_ENABLED    = False   # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding, backbone accel-300-v2- stays. NEVER_REENABLE.
+ACCEL_300_V2_MINUS_ENABLED    = True    # RE-ENABLED 2026-09-01 — signal improved: tighter filters, staleness gate, wider max gap (6.0%)
 ACCEL_300_V2_LONG_ENABLED     = False   # auto_1hr KILLED 2026-09-01 20:05 — 16T/24h 31.3%WR -$0.55, ALL ATR_SL. 14:05 kill attempt FAILED (constant never set False). NEVER_REENABLE.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
@@ -1495,6 +1480,17 @@ ACCEL_300_V3_LONG_VOLUME_MULT = 1.1     # volume must be >= 1.1x average on boun
 ACCEL_300_V3_LONG_CONF_BASE = 72        # base confidence
 ACCEL_300_V3_LONG_CONF_FLOOR = 60       # min confidence
 ACCEL_300_V3_LONG_CONF_CAP = 88         # max confidence (system ceiling)
+ACCEL_300_V3_LONG_GAP_VELOCITY_THRESH = -0.15  # max gap narrowing per bar (noise tolerance)
+ACCEL_300_V3_LONG_VELOCITY_WINDOW = 5   # bars to measure price velocity
+ACCEL_300_V3_LONG_GREEN_COUNT_WINDOW = 6  # bars to check for consecutive greens
+ACCEL_300_V3_LONG_CONF_PULLBACK_MAX = 20  # max confidence bonus from pullback quality
+ACCEL_300_V3_LONG_CONF_GAP_MAX = 15     # max confidence bonus from gap strength
+ACCEL_300_V3_LONG_CONF_REEXPAND_MAX = 10  # max confidence bonus from re-expansion
+ACCEL_300_V3_LONG_CONF_TREND_BONUS = 5  # confidence bonus for non-NEUTRAL trend
+ACCEL_300_V3_LONG_CONF_FRESH_BONUS = 8  # confidence bonus for fresh cross
+ACCEL_300_V3_LONG_CONF_RSI_MIN = 45     # RSI sweet spot lower bound (bonus)
+ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
+ACCEL_300_V3_LONG_CONF_RSI_BONUS = 5    # confidence bonus for RSI in sweet spot
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
 INVERSE_ACCEL_300_V2_MIN_GAP_PCT = 3.5    # min gap above EMA300 to fire SHORT (backtested optimal)

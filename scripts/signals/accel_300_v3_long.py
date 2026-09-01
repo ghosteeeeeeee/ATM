@@ -70,6 +70,20 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_PERSISTENCE_BARS,
     ACCEL_300_V3_LONG_VOLUME_LOOKBACK,
     ACCEL_300_V3_LONG_VOLUME_MULT,
+    ACCEL_300_V3_LONG_CONF_BASE,
+    ACCEL_300_V3_LONG_CONF_FLOOR,
+    ACCEL_300_V3_LONG_CONF_CAP,
+    ACCEL_300_V3_LONG_GAP_VELOCITY_THRESH,
+    ACCEL_300_V3_LONG_VELOCITY_WINDOW,
+    ACCEL_300_V3_LONG_GREEN_COUNT_WINDOW,
+    ACCEL_300_V3_LONG_CONF_PULLBACK_MAX,
+    ACCEL_300_V3_LONG_CONF_GAP_MAX,
+    ACCEL_300_V3_LONG_CONF_REEXPAND_MAX,
+    ACCEL_300_V3_LONG_CONF_TREND_BONUS,
+    ACCEL_300_V3_LONG_CONF_FRESH_BONUS,
+    ACCEL_300_V3_LONG_CONF_RSI_MIN,
+    ACCEL_300_V3_LONG_CONF_RSI_MAX,
+    ACCEL_300_V3_LONG_CONF_RSI_BONUS,
 )
 
 PERIOD = 300  # EMA300 period
@@ -319,11 +333,9 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
         return None  # gap still narrowing — bounce not confirmed
 
     # ── FILTER 5: Price velocity positive (bounce has momentum) ────────────
-    velocity_window = 5
-    if latest_idx < velocity_window:
+    if latest_idx < ACCEL_300_V3_LONG_VELOCITY_WINDOW:
         return None
-    price_velocity = closes[latest_idx] - closes[latest_idx - velocity_window]
-    price_epsilon = max(abs(closes[latest_idx]) * 1e-12, 1e-12)
+    price_velocity = closes[latest_idx] - closes[latest_idx - ACCEL_300_V3_LONG_VELOCITY_WINDOW]
     if price_velocity <= 0:
         return None  # price falling — no bounce
 
@@ -334,7 +346,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
 
     # ── FILTER 6: Not chasing — cap consecutive green candles ──────────────
     green_count = 0
-    for i in range(latest_idx, max(latest_idx - 6, 0), -1):
+    for i in range(latest_idx, max(latest_idx - ACCEL_300_V3_LONG_GREEN_COUNT_WINDOW, 0), -1):
         if i > 0 and closes[i] > closes[i-1]:
             green_count += 1
         else:
@@ -397,7 +409,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
         return None
     gap_velocity = gap_now - gap_prev
     # Allow noise but gap should not be narrowing significantly
-    if gap_velocity < -0.15:
+    if gap_velocity < ACCEL_300_V3_LONG_GAP_VELOCITY_THRESH:
         return None  # gap narrowing — momentum fading
 
     # ── FILTER 12: Multi-bar gap confirmation ──────────────────────────────
@@ -405,7 +417,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
         gap_3_ago = gap_pcts[latest_idx - 3]
         if gap_3_ago is not None:
             gap_change_3 = gap_now - gap_3_ago
-            if gap_change_3 < -0.15:
+            if gap_change_3 < ACCEL_300_V3_LONG_GAP_VELOCITY_THRESH:
                 return None  # gap narrowing over 3 bars — momentum fading
 
     return {
@@ -517,17 +529,17 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             pass
 
         # Confidence: base on pullback quality + gap strength
-        pullback_quality = min(20, sig['pullback'] * 20)  # more pullback = better entry
-        gap_bonus = min(15, (sig['gap_pct'] - ACCEL_300_V3_LONG_MIN_GAP) * 5)
-        reexpand_bonus = min(10, sig['reexpansion'] * 100)
-        trend_bonus = 5 if trend_15m != 'NEUTRAL' else 0
-        fresh_bonus = 8 if sig.get('fresh_cross') else 0
-        rsi_bonus = 5 if 45 <= sig['rsi'] <= 65 else 0  # sweet spot
+        pullback_quality = min(ACCEL_300_V3_LONG_CONF_PULLBACK_MAX, sig['pullback'] * 20)
+        gap_bonus = min(ACCEL_300_V3_LONG_CONF_GAP_MAX, (sig['gap_pct'] - ACCEL_300_V3_LONG_MIN_GAP) * 5)
+        reexpand_bonus = min(ACCEL_300_V3_LONG_CONF_REEXPAND_MAX, sig['reexpansion'] * 100)
+        trend_bonus = ACCEL_300_V3_LONG_CONF_TREND_BONUS if trend_15m != 'NEUTRAL' else 0
+        fresh_bonus = ACCEL_300_V3_LONG_CONF_FRESH_BONUS if sig.get('fresh_cross') else 0
+        rsi_bonus = ACCEL_300_V3_LONG_CONF_RSI_BONUS if ACCEL_300_V3_LONG_CONF_RSI_MIN <= sig['rsi'] <= ACCEL_300_V3_LONG_CONF_RSI_MAX else 0
         confidence = int(min(
-            88,
-            72 + pullback_quality + gap_bonus + reexpand_bonus + trend_bonus + fresh_bonus + rsi_bonus
+            ACCEL_300_V3_LONG_CONF_CAP,
+            ACCEL_300_V3_LONG_CONF_BASE + pullback_quality + gap_bonus + reexpand_bonus + trend_bonus + fresh_bonus + rsi_bonus
         ))
-        confidence = max(60, confidence)
+        confidence = max(ACCEL_300_V3_LONG_CONF_FLOOR, confidence)
 
         signal_price = float(sig['price'])
 
