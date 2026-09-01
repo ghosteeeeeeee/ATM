@@ -1094,7 +1094,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'r2-trend-long',       # proven trend signal
     'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
-    'bb_bounce+',          # 71.9% WR, +0.89% avg — proven, ride ATR SL not PM Trail
     'confluence',          # meta-signal, proven — persistence + compounding validation
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
