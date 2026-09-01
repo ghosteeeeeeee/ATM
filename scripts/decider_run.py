@@ -1933,7 +1933,7 @@ def _run_hot_set():
                     if _crash_signal and _crash_signal.severity:
                         _crash_msg = f'{_crash_signal.severity} — {_crash_signal.layer}'
                     log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash_msg}')
-                    _record_hotset_failure(token, direction, failures)
+                    # NOTE: BTC-CRASH blocks do NOT count as failures — they're market-level, not token-level
                     continue
 
             # BTC ACCELERATION: block entries until block_until expires
@@ -1941,7 +1941,7 @@ def _run_hot_set():
                 if time.time() < _btc_block_until:
                     _remaining = (_btc_block_until - time.time()) / 60
                     log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_remaining:.1f}min remaining)')
-                    _record_hotset_failure(token, direction, failures)
+                    # NOTE: BTC-ACCEL blocks do NOT count as failures — they're market-level, not token-level
                     continue
                 else:
                     _btc_accel_blocked = False  # block expired
