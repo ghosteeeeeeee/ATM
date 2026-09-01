@@ -118,6 +118,7 @@ REGIME_SIGNALS = {
         'bb_bounce',
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
+        'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
