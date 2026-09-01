@@ -4505,13 +4505,15 @@ def sync():
                     try:
                         conn_trade = get_db_connection()
                         if conn_trade:
-                            cur_trade = conn_trade.cursor()
-                            cur_trade.execute(
-                                "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
-                                (trade_id,))
-                            row_trade = cur_trade.fetchone()
-                            cur_trade.close()
-                            conn_trade.close()
+                            try:
+                                cur_trade = conn_trade.cursor()
+                                cur_trade.execute(
+                                    "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
+                                    (trade_id,))
+                                row_trade = cur_trade.fetchone()
+                            finally:
+                                cur_trade.close()
+                                conn_trade.close()
                             sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
                             tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
                             direction = row_trade[2] if row_trade else t.get('direction', '')
