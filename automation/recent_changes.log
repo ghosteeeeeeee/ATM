@@ -729,3 +729,7 @@
   WHY: 1T last hour (1W 0L +$0.02 quiet). 58T 24h 51.7%WR -$0.76. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 55.2% trailing SL working. profit-monster-trail 23T +$1.20 profitable. Trade freq 1.5/hr normal. accel-300-v2-long killed 14:05, should roll off 24h stats soon. 1 open position (HBAR -27%). System healthy.
   BY: auto_1hr
   NEXT: Re-run at 19:05 UTC
+[2026-09-01 19:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.29) — all ATR SL exits. 58T 24h 51.7%WR -$0.75. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 55.2% trailing SL working (avg -$0.057/hit small). profit-monster-trail 23T +$1.20 profitable. Trade freq 3/hr normal. 0 open positions (clean slate). HBAR closed 18:22. System healthy in steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 20:05 UTC

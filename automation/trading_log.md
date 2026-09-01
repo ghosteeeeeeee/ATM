@@ -19409,3 +19409,23 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - HBAR open position at -27% — large unrealized loss, will close via SL if triggered
 
 **Open Questions:** System steady. accel-300-v2-long elimination should improve 24h stats as its trades roll off. Watch HBAR.
+
+## [2026-09-01 19:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.29 (MET -$0.11, ATOM -$0.08, HBAR -$0.10) — all ATR SL exits
+**24h:** 58T 51.7% WR -$0.75
+**Open:** 0 positions (clean slate)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour (volume-breakout-short- 1T, range-reversion-long+ 1T — both single trades)
+- accel-300-v2-long killed at 14:05, still showing 14T/24h -$0.65 but trades rolling off
+- atr_sl_hit 55.2% (32/58) — trailing SL working normally, avg -$0.057/hit small
+- profit-monster-trail 23/58 = 39.7% of exits, avg +$0.052 — profitable
+- Trade freq 3/hr — normal, not overtrading
+- HBAR closed at 18:22 — no more open positions with large unrealized losses
+- 3 consecutive negative hours (16:00 -$0.40, 17:00 +$0.02 break, 18:00 -$0.29) — SL doing its job, not alarming
+
+**Open Questions:** System in steady state. ATR SL exits dominate (55.2%) but each costs only avg -$0.057 while profit-monster-trail avg +$0.052 offsets. Net effect is small losses. accel-300-v2-long elimination should improve 24h stats as its trades roll off window.
