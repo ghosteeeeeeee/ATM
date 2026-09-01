@@ -19170,3 +19170,21 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - 2 open trades both green via profit-monster-trail
 
 **Open Questions:** accel-300-v2-long 17T 24h 29.4%WR -$0.64 remains main bleeder. Watch next hour — if it triggers with 0%WR 3+T, kill it. bb-bounce-long+ 77.8%WR +$0.22/24h is the system's best performer.
+
+## [2026-09-01 09:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L) +$0.11
+**24h:** 69T 50%WR -$0.59
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (accel-300-v2-long last trade 04:37 UTC, disabled and not triggering)
+- atr_sl_hit 64.6% — trailing SL working normally (42.9% protection rate)
+- profit-monster-trail 20T +$0.91 — profitable trailing exits
+- Trade freq 2-4/hr normal
+- 3 consecutive positive hours (06:00 +$0.11, 07:00 +$0.08, 08:00 +$0.03)
+- 4 open positions (NEAR, ADA, USUAL, SYRUP) all bb-bounce-long+, within SL range
+- 24h WR improved from 47% to 50%
+
+**Open Questions:** System recovering. accel-300-v2-long properly disabled since last check.
