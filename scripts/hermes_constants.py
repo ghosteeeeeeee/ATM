@@ -1458,7 +1458,7 @@ ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
 ACCEL_300_V2_MINUS_ENABLED    = False   # CEO 2026-08-29 — 4T/7d 25% WR -$0.14, all losses. Variant bleeding, backbone accel-300-v2- stays. NEVER_REENABLE.
-ACCEL_300_V2_LONG_ENABLED     = True    # Re-enabled. Duplicate timestamps fixed, staleness gate active. Testing phase.
+ACCEL_300_V2_LONG_ENABLED     = False   # CEO KILLED 2026-09-01 — 15T/24h 27%WR -$0.76. NEVER_REENABLE.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 2.0     # LONG: min gap above EMA300 — raised from 1.5 CEO 2026-08-31, matches SHORT fix: 5T/24h 20%WR -$0.19 ALL ATR_SL
@@ -1581,7 +1581,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
-BB_BOUNCE_LONG_ENABLED = True     # TESTING 2026-09-01 — re-enabled with min_age_sec fix + raised bounce threshold. Monitor 48h.
+BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-01 — 21T/24h 52%WR -$0.34. NEVER_REENABLE.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
@@ -1611,6 +1611,8 @@ STANDALONE_BYPASS_SIGNALS = (
     'slow-grind',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
+    'range-reversion-long', 'range-reversion-short',  # range reversion signals
+    'volume-breakout-short',  # volume breakout SHORT
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
