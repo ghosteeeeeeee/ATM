@@ -1853,3 +1853,8 @@ ALERTS:
 - **WARN** (1x): `PONSUSDT` Binance 400 — invalid pair, coin_tracker skips gracefully.
 - **WARN**: Disk at 80% — recommend log compression soon.
 - **NO AUTO-FIXES**: System operating normally.
+
+## Error Alerts — 2026-09-01 05:05 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=4h&limit=N`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=1h&limit=N`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=15m&limit=N`

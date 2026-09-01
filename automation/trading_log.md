@@ -19090,3 +19090,28 @@ Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO'
 - SYRUP trailing SL at 0.1864 (above entry 0.1858) — locking in profit
 
 **Open Questions:** accel-300-v2-long continues bleeding (-$0.51/24h). If it trades again next hour with losses, will hit 3+ loss kill threshold. Watch closely.
+
+## [2026-09-01 05:05 UTC] Hourly Analysis
+
+**Trades:** 8 closed (4W 4L) +$0.12 — winning hour
+**24h:** 66T 47%WR -$0.70
+**Open:** 2 (ASTER bb-bounce-long+, BCH bb-bounce-short)
+
+**Last hour:** SYRUP +$0.14, NOT +$0.09, PONS +$0.04, NOT +$0.04 (4 wins). CRV -$0.21, CRV -$0.01 (3 losses). CRV getting hammered by accel-300-v2-long — 3 SL hits in one hour.
+
+**Close reason 24h:** atr_sl_hit 43T (65.2%) avg -$0.025 — trailing SL working. profit-monster-trail 15T avg +$0.040 — healthy.
+
+**Signal 24h losers (3+T):** accel-300-v2-long 17T 29.4%WR -$0.64 (main bleeder — 14/17 exits are atr_sl_hit). CRV bleeding worst (5T 80% loss -$0.25) but NOT, ARB, SAND, SYRUP also negative. Signal quality degraded across coins.
+
+**Hourly PnL 12h:** Alternating +/-. No 3+ consecutive negative hours.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (accel-300-v2-long 40%WR last hour, not 0%)
+- atr_sl_hit 65.2% — trailing SL working normally
+- Trade freq 8/hr — normal
+- No 3+ consecutive negative hours
+- bb-bounce-long+ 71.4%WR +$0.11/24h — system's best performer
+
+**Open Questions:** accel-300-v2-long continues bleeding (-$0.64/24h). If it trades next hour with 0%WR and 3+T, will hit kill threshold. Watch CRV specifically — it's the worst performer on this signal.
