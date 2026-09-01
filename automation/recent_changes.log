@@ -725,3 +725,7 @@
   WHY: 18T/24h 27.8% WR -$0.72. ALL ATR_SL exits. Added to NEVER_REENABLE. Previous logs incorrectly said "already disabled" — it was NOT disabled. STX trade last hour confirmed signal still active.
   BY: auto_1hr
   NEXT: Re-run at 15:05 UTC
+[2026-09-01 18:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.02 quiet). 58T 24h 51.7%WR -$0.76. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 55.2% trailing SL working. profit-monster-trail 23T +$1.20 profitable. Trade freq 1.5/hr normal. accel-300-v2-long killed 14:05, should roll off 24h stats soon. 1 open position (HBAR -27%). System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 19:05 UTC

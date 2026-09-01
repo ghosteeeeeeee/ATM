@@ -19388,3 +19388,24 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - HBAR -19.72% unrealized — will close via ATR SL if triggered
 
 **Open Questions:** System steady. 3 consecutive losing trades (2 from different signals) — not alarming, just SL doing its job.
+
+## [2026-09-01 18:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) — FOGO +$0.02 profit-monster-trail
+**PnL:** +$0.02 (quiet hour)
+**24h:** 58T 51.7% WR -$0.76
+
+**Open:** HBAR bb-bounce-long+ -$0.00 (pnl_pct -27.1%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (FOGO 1T only; no signal 0%WR 3+T last hour)
+- atr_sl_hit 55.2% (32/58) — trailing SL working normally, avg -$0.057/hit
+- profit-monster-trail 23/58 = 39.7% of exits, avg +$0.052 — profitable
+- accel-300-v2-long already killed 14:05 — was the only major loser (-$0.76 of -$0.76 total)
+- bb-bounce-long+ 20T 55% WR -$0.24 — breakeven, not kill-worthy
+- Trade freq 1.5/hr — normal, not overtrading
+- HBAR open position at -27% — large unrealized loss, will close via SL if triggered
+
+**Open Questions:** System steady. accel-300-v2-long elimination should improve 24h stats as its trades roll off. Watch HBAR.
