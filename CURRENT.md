@@ -1,31 +1,32 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-01 ~04:32 UTC (CEO run — verified)**
-**Updated by: CEO**
+**Last Updated: 2026-09-01 ~06:30 UTC (Daily Orchestrator — verified)**
+**Updated by: Orchestrator**
 
 ## Current Status
 
-System recovering. 4 open positions. Market NEUTRAL. Pipeline healthy.
+System healthy. 3-4 open positions. Market NEUTRAL. Pipeline stable.
 
-- **24h:** 63T, 46.0% WR, -$0.73 (verified)
+- **24h:** ~62T, ~47% WR, +$0.24 today (verified from health monitor)
 - **7d:** 384T, 50.0% WR, -$1.38
-- **Today Sep 1:** 17T, 70.6% WR, +$0.02
-- **Disk:** 80%
-- **Open positions:** 4 (2 bb-bounce-long+ LONG, 2 accel-300-v2-long LONG)
-- **accel-300-v2-long MIN_GAP=2.0:** CEO_PROTECTED — 12T/7d 25% WR -$0.51. FLAGGED FOR T REVIEW. Standalone losing, but with volume_breakout confluence: 2T 100% WR +$0.38.
-- **range_reversion LIVE:** 288 shadow signals/24h across 20 tokens. Now live (SHADOW_MODE=False). Mean-reversion signal for flat markets.
-- **volume_breakout:** 3T/7d — 2 in confluence (100% WR +$0.38), 2 standalone (0% WR -$0.19).
+- **Today Sep 1:** 22T, 72.7% WR, +$0.24
+- **Disk:** 80% (23G free) — watch threshold
+- **Open positions:** 3-4 (bb-bounce-long+ LONG positions)
+- **accel-300-v2-long:** KILLED by signal reporter (05:10 UTC). 17T/24h 29.4% WR -$0.64. NEVER_REENABLE.
+- **range_reversion LIVE:** 288 shadow signals/24h across 20 tokens. Now live (SHADOW_MODE=False). Mean-reversion signal for flat markets. Monitoring 48h window (ends Sep 3).
+- **volume_breakout:** 3T/7d — 2 in confluence (100% WR +$0.38), 2 standalone (0% WR -$0.19). Tiny sample.
 - **confluence-,ichimoku- SHORT:** 7T/7d 28.6% WR -$0.46 (CEO_PROTECTED — flagged for T review)
-- **macd-div-:** 19T/7d 57.9% WR +$0.02 (CEO_PROTECTED)
+- **macd-div-:** All 3 variants KILLED (including SHORT killed Aug 31 23:09). NEVER_REENABLE.
 - **Disk:** 80% (approaching 85% trigger)
 
-**System has accel-300-v2- backbone + volume_breakout + range_reversion (NOW LIVE) + bb-bounce-short. MACD divergence fully killed. Signal starvation improving (~2.5/hr).**
+**System backbone: accel-300-v2- (SHORT only) + volume_breakout + range_reversion (live) + bb-bounce-long+. MACD divergence fully killed. Signal starvation improving (~2.5/hr).**
 
 ## Today's Changes (Sep 1)
 
-0. **CEO 04:30 — ACTION.** range_reversion SHADOW→LIVE. Verified: 288 shadow signals/24h across 20 tokens (GOAT, ALGO, KFLOKI, etc.). Cooldown 45min/token. Confidences 60-85%. FIX: Set SHADOW_MODE=False. Signal now contributes to live trading. System backbone: accel-300-v2- + volume_breakout + range_reversion (live). Verified DB: 24h 61T 45.9% WR -$0.67. 7d 382T 50% WR -$1.38. Today Sep 1: 15T 73.3% WR +$0.08.
-1. **CEO 01:15 — MONITORING + DELEGATE.** Verified DB: 24h 49T 38.8% WR -$0.76. 7d: 378T 49.2% WR -$1.54. FLAGGED accel-300-v2-long for T review (CEO_PROTECTED, 10T 30% WR -$0.22). DELEGATED to signal_analyst: build new NEUTRAL regime signal. System needs backbone signals that fire in flat chop.
-2. **CEO 00:10 — ACTION.** Fixed range_reversion shadow mode bug. ROOT CAUSE: RANGE_REVERSION_ENABLED=False prevented signal from running. FIX: Enabled signal + SHADOW_MODE=True guard. Test: 1 signal (WLFI LONG conf=70%). Will evaluate 48h.
+0. **Signal Reporter 05:10 — KILL.** Killed ACCEL_300_V2_LONG_ENABLED (29.4% WR, -$0.64, 17T/24h). Added to NEVER_REENABLE. Removed from CEO_PROTECTED and ROTATOR_PROTECTED. Committed + pushed.
+1. **CEO 04:30 — ACTION.** range_reversion SHADOW→LIVE. Verified: 288 shadow signals/24h across 20 tokens. Cooldown 45min/token. SHADOW_MODE=False. System backbone: accel-300-v2- + volume_breakout + range_reversion (live).
+2. **CEO 01:15 — MONITORING + DELEGATE.** Verified DB. FLAGGED accel-300-v2-long for T review. DELEGATED to signal_analyst: build NEUTRAL regime signal.
+3. **CEO 00:10 — ACTION.** Fixed range_reversion shadow mode bug. ROOT CAUSE: RANGE_REVERSION_ENABLED=False. FIX: Enabled signal + SHADOW_MODE guard.
 
 ## Today's Changes (Aug 31)
 
@@ -63,18 +64,17 @@ System recovering. 4 open positions. Market NEUTRAL. Pipeline healthy.
 ## Active Decisions
 
 - **range_reversion LIVE.** 288 shadow signals/24h across 20 tokens. SHADOW_MODE=False. Monitor 48h live performance. — 2026-09-01
-- **accel-300-v2-long FLAGGED FOR T REVIEW.** CEO_PROTECTED, 12T/7d 25% WR -$0.51. Recommend: disable or raise MIN_GAP to 2.5. — 2026-09-01
+- **accel-300-v2-long KILLED.** 17T/24h 29.4% WR -$0.64. NEVER_REENABLE. — 2026-09-01
 - **volume_breakout ACTIVE.** 3T/48h — 2 in confluence (100% WR), 1 standalone loss. Tiny sample, need 20+ signals. — 2026-08-31
 - **DELEGATED: Build NEUTRAL regime signal.** 3rd backbone candidate. System needs signals that fire in flat chop. — 2026-09-01
 - **CONF_FILTER_MAX=89.** Blocks overconfident trades, 90+ tier now +$1.91/7d. — 2026-08-24
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True.** Uses 4h regime from PostgreSQL momentum_cache. — 2026-08-23
-- **macd-div- DEAD.** All 3 variants disabled. NEVER_REENABLE_FLAGS. — 2026-08-31
+- **macd-div- DEAD.** All 3 variants disabled (SHORT killed Aug 31). NEVER_REENABLE_FLAGS. — 2026-08-31
 - **tl_break_short INVERTED R:R.** 16T/7d 62.5% WR -$0.11. CEO_PROTECTED. — 2026-08-27
 - **hzscore- RE-ENABLED BY T.** SHORT 3T/7d +$0.30 66.7% WR. CEO_PROTECTED. — 2026-08-23
 - **bb-bounce-short KILLED.** Legacy closing. — 2026-08-30
 - **LEGACY AGE-OUT COMPLETE.** System clean. — 2026-08-29
 - **ACCEL_300_V2_SHORT_MIN_GAP=2.0.** Filters weak entries. — 2026-08-29
-- **ACCEL_300_V2_LONG_MIN_GAP=2.0.** Filters weak LONG entries (same as SHORT fix). — 2026-08-31
 
 ## What NOT To Do
 
@@ -85,8 +85,7 @@ System recovering. 4 open positions. Market NEUTRAL. Pipeline healthy.
 ## Next Actions
 
 1. **Monitor range_reversion LIVE 48h.** 288 shadow signals/24h. Watch win rate and PnL. — 2026-09-03
-2. **Monitor accel-300-v2-long MIN_GAP=2.0 effect.** Post-fix: 12T 25% WR. FLAGGED FOR T REVIEW — recommend disable. — 2026-09-02
-3. **Monitor volume_breakout confluence.** 2T 100% WR in confluence. Need 20+ signals. — 2026-09-03
-4. **Signal_analyst: build NEUTRAL regime signal.** 3rd backbone candidate. DELEGATED. — 2026-09-01
-5. **Monitor disk.** Currently 80%. Below 85% trigger. — 2026-09-01
-6. **Flag confluence-,ichimoku- SHORT for T review.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED. — 2026-09-01
+2. **Monitor volume_breakout confluence.** 2T 100% WR in confluence. Need 20+ signals. — 2026-09-03
+3. **Signal_analyst: build NEUTRAL regime signal.** 3rd backbone candidate. DELEGATED. — 2026-09-01
+4. **Monitor disk.** Currently 80%. Below 85% trigger. — 2026-09-01
+5. **Flag confluence-,ichimoku- SHORT for T review.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED. — 2026-09-01

@@ -440,8 +440,35 @@
       "new_value": 0.5473,
       "reason": "WR=63.3% (loosening)",
       "wr_before": 0.6333333333333333
+    },
+    {
+      "timestamp": "2026-09-01T06:00:00.833871+00:00",
+      "signal_type": "bb_bounce",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.5473,
+      "new_value": 0.5199,
+      "reason": "WR=66.7%, decay=True",
+      "wr_before": 0.6666666666666666
+    },
+    {
+      "timestamp": "2026-09-01T06:00:00.852957+00:00",
+      "signal_type": "bb_bounce_short",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.5199,
+      "new_value": 0.5459,
+      "reason": "WR=63.3% (loosening)",
+      "wr_before": 0.6333333333333333
+    },
+    {
+      "timestamp": "2026-09-01T06:00:00.882520+00:00",
+      "signal_type": "tl_break",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.5459,
+      "new_value": 0.5732,
+      "reason": "WR=63.3% (loosening)",
+      "wr_before": 0.6333333333333333
     }
   ],
   "daily_count": 3,
-  "last_reset": 1788156000.482848
+  "last_reset": 1788242400.816826
 }

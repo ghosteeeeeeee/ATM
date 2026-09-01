@@ -689,3 +689,7 @@
   WHY: 8T last hour (4W 4L +$0.12 winning hour). 66T 24h 47%WR -$0.70. Kill criteria not met (accel-300-v2-long 40%WR last hour, not 0%). CRV bleeding on accel-300-v2-long (3 SL hits) but signal overall 40%WR not 0%. atr_sl_hit 65.2% trailing SL working. Trade freq 8/hr normal. No 3+ consecutive negative hours. 2 open positions (ASTER, BCH). System healthy. Watching accel-300-v2-long — if 0%WR 3+T next hour, kill it.
   BY: auto_1hr
   NEXT: Re-run at 06:05 UTC
+[2026-09-01 07:05 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.12 quiet). 64T 24h 47%WR -$0.70. Kill criteria not met (accel-300-v2-long 0T last hour, not triggered). atr_sl_hit 65.6% trailing SL working (42.9% of hits have SL above entry). Trade freq 1/hr normal. No 3+ consecutive negative hours. 3 open positions (ASTER, DOT, SEI) all bb-bounce-long+ slightly negative within normal range. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 08:05 UTC

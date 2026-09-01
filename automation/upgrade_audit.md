@@ -211,3 +211,28 @@ Generated: 2026-08-31 16:00 UTC
 ### Expected impact:
 - Would have prevented all 6 losing SHORT entries in Aug 24 incident
 - Estimated savings: ~$34.78 per incident
+
+---
+
+## Plan: exit-mechanics-v2.md
+- **Date scanned:** 2026-09-01 00:00
+- **Core request:** Fix backwards PROFIT_MONSTER_BYPASS_SIGNALS — proven signals should bypass PM Trail, losers should get it
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** Already done (comment on hermes_constants.py:1082 shows 2026-08-26 update). bb_bounce+/confluence in bypass, ct-hot+/- removed.
+
+## Plan: automation-team-improvements.md
+- **Date scanned:** 2026-09-01 00:00
+- **Core request:** Fix dead session learner, expand self_learner PARAM_CONFIG, delete defunct A/B learner
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** PARTIAL
+- **Reason:** Self-learner PARAM_CONFIG expanded to 25+ params (done). A/B learner deleted (done). Session learner → OpenMemory bridge NOT built (Level 2).
+
+## Level 1 Cleanup — Dead Code Removal
+- **Date:** 2026-09-01 00:00
+- **Changes:**
+  1. Deleted `update_regime_performance()` from volatility_gate.py (34 lines, zero callers)
+  2. Cleaned stale `ai_decider` and `ab_learner` references from brain/trading.md and docs/pipeline-diagram.md
+- **Skipped:** vortex_break.py deletion (too many cross-file references, not a clean removal)

@@ -1858,3 +1858,8 @@ ALERTS:
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=4h&limit=N`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=1h&limit=N`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] PONSUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PONSUSDT&interval=15m&limit=N`
+
+## Error Alerts — 2026-09-01 05:21 UTC
+- **WARN** (Nx): `MERL LONG rejected: amount_usdt=5.5 < HL_MIN=11.0` — repeated every pipeline cycle, signal never executes
+- **WARN** (Nx): `PHANTOM-WRITE NXPC LONG: BLOCKED tight SL=0.205333 entry=0.205130 dist=0.099%` — SL too close to entry, repeatedly blocked
+- **INFO**: No crashes, no tracebacks, no auto-fixes needed. All 46 timers active and firing.

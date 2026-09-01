@@ -44,10 +44,8 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 | Hot-set execution | Every 1 min | `decider_run.py` |
 | Position management | Every 1 min | `position_manager.py` |
 | Web dashboard JSON | Every 1 min | `hermes-trades-api.py` |
-| AI decision + hot-set compaction | Every 10 min (on 10s) | `ai_decider.py` |
 | Strategy optimizer | Every 10 min (on 10s) | `strategy_optimizer.py` |
 | A/B optimizer | Every 10 min (on 10s) | `ab_optimizer.py` |
-| A/B learner | Every 10 min (on 10s) | `ab_learner.py` |
 
 Timer: `hermes-pipeline.timer` — every 1 minute on the clock (`:0/1:00`).
 10-min steps run on minutes 0, 10, 20, 30, 40, 50 (when `minute % 10 == 0`).

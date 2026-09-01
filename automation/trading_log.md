@@ -19115,3 +19115,41 @@ Final set: ['ARB', 'BABY', 'BIGTIME', 'DOGE', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO'
 - bb-bounce-long+ 71.4%WR +$0.11/24h — system's best performer
 
 **Open Questions:** accel-300-v2-long continues bleeding (-$0.64/24h). If it trades next hour with 0%WR and 3+T, will hit kill threshold. Watch CRV specifically — it's the worst performer on this signal.
+
+## FAVORITES Update — 2026-09-01 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ARB (WR=55.6%, PnL=$-0.17, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE YGG (WR=57.1%, PnL=$-0.19, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE DOGE (WR=57.1%, PnL=$-0.06, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE TURBO (WR=75.0%, AvgPnL=0.26%, Trades=8)
+
+Final set: ['BABY', 'BIGTIME', 'DYDX', 'FIL', 'GMT', 'INJ', 'LDO', 'ME', 'NXPC', 'SAND', 'STX', 'SYRUP', 'TURBO', 'USUAL']
+
+## LOSERS Update — 2026-09-01 06:05 UTC
+- REMOVE HBAR (WR=66.7%, PnL=$0.37, recovered)
+- ADD JUP (WR=16.7%, PnL=$-0.52, wr_collapse (61.0% → 16.7%))
+- ADD ZEN (WR=33.3%, PnL=$-0.25, low_wr (33.3%))
+- ADD YGG (WR=57.1%, PnL=$-0.19, low_wr (57.1%))
+- ADD ARB (WR=55.6%, PnL=$-0.17, low_wr (55.6%))
+- ADD NOT (WR=50.0%, PnL=$-0.09, low_wr (50.0%))
+- ADD BCH (WR=40.0%, PnL=$-0.07, low_wr (40.0%))
+- ADD DOGE (WR=57.1%, PnL=$-0.06, low_wr (57.1%))
+- ADD CRV (WR=50.0%, PnL=$0.27, low_wr (50.0%))
+
+Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 'CASHCAT', 'CC', 'CFX', 'CHIP', 'COMP', 'CRV', 'DOGE', 'ENA', 'ENS', 'ETC', 'ETH', 'GRASS', 'HYPE', 'ICP', 'IMX', 'IO', 'JUP', 'MERL', 'MON', 'NEO', 'NOT', 'POL', 'PUMP', 'WLD', 'WLFI', 'XPL', 'YGG', 'ZEN', 'ZRO']
+
+## [2026-09-01 07:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) -$0.12
+**24h:** 64T 47%WR -$0.70
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (accel-300-v2-long 0T last hour, not triggered)
+- atr_sl_hit 65.6% — trailing SL working normally (42.9% of hits have SL above entry)
+- Trade freq 1/hr — quiet hour, not overtrading
+- No 3+ consecutive negative hours
+- Open positions (ASTER, DOT, SEI) all bb-bounce-long+ slightly negative, within normal range
+
+**Open Questions:** accel-300-v2-long 17T 24h 29.4%WR -$0.64 still the main bleeder. If it triggers next hour with 0%WR 3+T, will hit kill threshold. 42.9% trailing SL protection rate is healthy — system designed correctly.

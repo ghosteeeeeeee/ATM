@@ -251,40 +251,7 @@ def get_sl_multiplier(atr_pct):
         return 0  # don't trade
 
 
-def update_regime_performance(token, signal, direction, pnl_pct, atr_pct):
-    """Track signal performance by regime for auto-learning.
-    Called after each trade closes. Updates a local JSON file.
-    """
-    import json
-    from datetime import datetime
 
-    regime = classify_volatility(atr_pct)
-    key = f'{signal}:{direction}'
-    perf_file = f'{HERMES_DATA}/volatility_regime_perf.json'
-
-    try:
-        with open(perf_file) as f:
-            perf = json.load(f)
-    except Exception:
-        perf = {}
-
-    if key not in perf:
-        perf[key] = {}
-    if regime not in perf[key]:
-        perf[key][regime] = {'wins': 0, 'losses': 0, 'pnl': 0}
-
-    if pnl_pct > 0:
-        perf[key][regime]['wins'] += 1
-    else:
-        perf[key][regime]['losses'] += 1
-    perf[key][regime]['pnl'] += round(pnl_pct, 4)
-    perf[key][regime]['updated'] = datetime.now().isoformat()
-
-    try:
-        with open(perf_file, 'w') as f:
-            json.dump(perf, f, indent=2)
-    except Exception:
-        pass
 
 
 if __name__ == '__main__':

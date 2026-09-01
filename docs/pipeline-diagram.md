@@ -346,6 +346,6 @@ flowchart TD
 ```
 Every 1 min:  price_collector → signals → compactor → analyst → decider → position_manager
 Every 5 min:  slow signals (momentum, mtf_momentum)
-Every 10 min: strategy_optimizer, ab_optimizer, ab_learner
+Every 10 min: strategy_optimizer, ab_optimizer
 Separate:     profit_monster (1-10 min), cut_loser (frequent), guardian (60s)
 ```
