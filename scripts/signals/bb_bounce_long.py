@@ -44,7 +44,7 @@ RSI_PERIOD = 14
 RSI_OVERSOLD = 40        # confluence mode
 SOLO_RSI_OVERSOLD = 30   # solo mode (deeper oversold required)
 BOUNCE_MIN_PCT = 0.05    # confluence mode
-SOLO_BOUNCE_MIN_PCT = 0.03  # solo mode
+SOLO_BOUNCE_MIN_PCT = 0.05  # solo mode — raised from 0.03 to match confluence (2026-09-01)
 
 # V2 velocity filter
 VEL_THRESHOLD = 0.015    # block if 15m velocity < -0.015% (price still falling)
