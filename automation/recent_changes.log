@@ -1,3 +1,7 @@
+[2026-09-01 13:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.09). 66T 24h 51.5%WR -$0.33 near breakeven. 0 open trades (flat). Kill criteria not met: accel-300-v2-long already killed (False, NEVER_REENABLED), bb-bounce-long+ killed at 09:05 (False, NEVER_REENABLED). bb-bounce-short 5T 80%WR +$0.01 healthy. atr_sl_hit 53% avg -$0.039 (SL working). profit-monster-trail 36.4% avg +$0.049 carrying system. Trade freq ~2.75/hr normal. No 3+ consecutive negative hours. 1T/hr = expected after killing 2 major signals. No signal starvation yet.
+  BY: auto_1hr
+  NEXT: Re-run at 14:10 UTC
 [2026-09-01 09:05 UTC] auto_1hr: KILLED BB_BOUNCE_LONG_ENABLED
   WHY: 5T/0%WR/-$0.47 last hour (kill threshold met: 0%WR with 3+T). 26T/24h 61.5%WR/-$0.10. All 5 last hour were atr_sl_hit LONG entries — entries into weakness, not bounce. BB_BOUNCE_LONG_ENABLED was True since 2026-08-29 creation, never killed. Added to NEVER_REENABLE_FLAGS. accel-300-v2-long already killed (flag=False). 2 open positions (AVAX, LTC) will exit via SLs. Trade freq ~3.5/hr normal. No 3+ consecutive negative hours. atr_sl_hit 60.9% of 24h exits but avg loss tiny (-$0.037) — trailing SL working. profit-monster-trail 20T +$0.91 carrying system.
   BY: auto_1hr
@@ -713,3 +717,11 @@
   WHY: 0T last hour (quiet). 67T 24h 50.7%WR -$0.40. Kill criteria not met (accel-300-v2-long 0T last hour, disabled; no signal 0%WR 3+T). atr_sl_hit 55.2% trailing SL working. profit-monster-trail 23T +$1.09 profitable. Trade freq 1/hr normal. 6 consecutive positive hours. 1 open position (KAS) -$0.01 within range. System healthy in recovery.
   BY: auto_1hr
   NEXT: Re-run at 13:05 UTC
+[2026-09-01 13:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet). 67T 24h 50.7%WR -$0.40. Kill criteria not met (accel-300-v2-long 0T last hour, disabled; no signal 0%WR 3+T). atr_sl_hit 55.2% trailing SL working. profit-monster-trail 23T +$1.09 profitable. Trade freq 1/hr normal. 6 consecutive positive hours. 1 open position (KAS short) +$0.14 green. System healthy in recovery.
+  BY: auto_1hr
+  NEXT: Re-run at 14:05 UTC
+[2026-09-01 14:05 UTC] auto_1hr: KILLED ACCEL_300_V2_LONG_ENABLED
+  WHY: 18T/24h 27.8% WR -$0.72. ALL ATR_SL exits. Added to NEVER_REENABLE. Previous logs incorrectly said "already disabled" — it was NOT disabled. STX trade last hour confirmed signal still active.
+  BY: auto_1hr
+  NEXT: Re-run at 15:05 UTC

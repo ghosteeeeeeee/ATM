@@ -1,17 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-01 ~06:30 UTC (Daily Orchestrator — verified)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-09-01 ~12:50 UTC (CEO — verified)**
+**Updated by: CEO**
 
 ## Current Status
 
-System healthy. 3-4 open positions. Market NEUTRAL. Pipeline stable.
+System healthy. 1 open position. Market NEUTRAL. Pipeline stable.
 
-- **24h:** ~62T, ~47% WR, +$0.24 today (verified from health monitor)
-- **7d:** 384T, 50.0% WR, -$1.38
-- **Today Sep 1:** 22T, 72.7% WR, +$0.24
+- **24h:** 67T, 50.7% WR, -$0.40 (verified from DB)
+- **7d:** 389T, 51.4% WR, -$0.52
+- **Today Sep 1:** 37T, 62.2% WR, -$0.13
 - **Disk:** 80% (23G free) — watch threshold
-- **Open positions:** 3-4 (bb-bounce-long+ LONG positions)
+- **Open positions:** 1
+- **CONF_FILTER_MIN=75 ACTIVE.** Blocks <75 confidence (was 14T/24h 28.6% WR -$0.72 — biggest single loss source). Expected: flip day from -$0.40 to +$0.32.
 - **accel-300-v2-long:** KILLED by signal reporter (05:10 UTC). 17T/24h 29.4% WR -$0.64. NEVER_REENABLE.
 - **range_reversion LIVE:** 288 shadow signals/24h across 20 tokens. Now live (SHADOW_MODE=False). Mean-reversion signal for flat markets. Monitoring 48h window (ends Sep 3).
 - **volume_breakout:** 3T/7d — 2 in confluence (100% WR +$0.38), 2 standalone (0% WR -$0.19). Tiny sample.
@@ -23,7 +24,8 @@ System healthy. 3-4 open positions. Market NEUTRAL. Pipeline stable.
 
 ## Today's Changes (Sep 1)
 
-0. **Signal Reporter 05:10 — KILL.** Killed ACCEL_300_V2_LONG_ENABLED (29.4% WR, -$0.64, 17T/24h). Added to NEVER_REENABLE. Removed from CEO_PROTECTED and ROTATOR_PROTECTED. Committed + pushed.
+0. **CEO 12:50 — ACTION.** CONF_FILTER_MIN=75. ROOT CAUSE: <75 confidence tier 14T/24h 28.6% WR -$0.72 (biggest single loss source). FIX: Added CONF_FILTER_MIN to hermes_constants.py + filter in signal_compactor.py. Expected: flip day from -$0.40 to +$0.32.
+1. **Signal Reporter 05:10 — KILL.** Killed ACCEL_300_V2_LONG_ENABLED (29.4% WR, -$0.64, 17T/24h). Added to NEVER_REENABLE. Removed from CEO_PROTECTED and ROTATOR_PROTECTED. Committed + pushed.
 1. **CEO 04:30 — ACTION.** range_reversion SHADOW→LIVE. Verified: 288 shadow signals/24h across 20 tokens. Cooldown 45min/token. SHADOW_MODE=False. System backbone: accel-300-v2- + volume_breakout + range_reversion (live).
 2. **CEO 01:15 — MONITORING + DELEGATE.** Verified DB. FLAGGED accel-300-v2-long for T review. DELEGATED to signal_analyst: build NEUTRAL regime signal.
 3. **CEO 00:10 — ACTION.** Fixed range_reversion shadow mode bug. ROOT CAUSE: RANGE_REVERSION_ENABLED=False. FIX: Enabled signal + SHADOW_MODE guard.

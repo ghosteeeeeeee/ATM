@@ -1,5 +1,41 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-09-01 13:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) +$0.09 — quiet hour
+**24h:** 66T 34W 51.5%WR -$0.33 (near breakeven, recovering)
+**Open:** 0 positions — flat
+
+**Close reason (24h):**
+- atr_sl_hit: 35T (53%) avg -$0.039 — dominant, tiny losses. SL healthy.
+- profit-monster-trail: 24T (36.4%) avg +$0.049 — only profitable exit type, carrying system.
+- Others: 7T mixed (test_cleanup, ORPHAN_PAPER, hard_sl, MAE-GUARD, atr_tp_hit).
+
+**Signal (24h, 3+ trades):**
+- accel-300-v2-long: 17T 29%WR -$0.64 — KILLED (False, NEVER_REENABLED). Last trade NOT +$0.09 at 05:04.
+- bb-bounce-long+: 17T 59%WR -$0.07 — KILLED (False, NEVER_REENABLED) at 09:05.
+- bb-bounce-short: 5T 80%WR +$0.01 — performing well.
+
+**Hourly PnL (6h):** 08:00 -$0.47, 10:00 +$0.15, 11:00 +$0.03, 13:00 +$0.09. Recovery intact.
+
+**Changes:** None
+
+**No Change Needed:**
+- Trade frequency ~2.75/hr normal (66T/24h). No overtrading.
+- 1 trade last hour = expected after killing 2 major signals (bb-bounce-long+, accel-300-v2-long).
+- 0 open trades = flat. No intervention needed.
+- atr_sl_hit 53% but avg loss tiny (-$0.039). Trailing SL working.
+- profit-monster-trail 36.4% avg +$0.049 carrying system.
+- No 3+ consecutive negative hours.
+- Kill thresholds not met for any remaining active signal.
+
+**Open Questions:**
+- Trade volume may drop further with 2 signals killed. Monitor for signal starvation.
+- bb-bounce-short (5T/80%WR) remains enabled — watch for degradation.
+- accel-300-v2-long still closing legacy positions (NOT +$0.09 at 05:04). Will drain naturally.
+
+---
+
 ## [2026-09-01 09:05 UTC] Hourly Analysis
 
 **Trades:** 7 closed last hour (1W 6L) -$0.44 (worst hour in 12h)
@@ -19272,3 +19308,40 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - 24h WR 50.7%, system recovered from 47% low
 
 **Open Questions:** System healthy and in sustained recovery. accel-300-v2-long remains main 24h bleeder (-$0.64) but properly disabled. No action needed.
+
+## [2026-09-01 13:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 67T 50.7%WR -$0.40
+**Open:** KAS short (engulfing-,rs-r41) +$0.14 green
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR 3+T last hour; accel-300-v2-long 0T last hour, already disabled)
+- atr_sl_hit 55.2% (37/67) — trailing SL working normally, avg -$0.036/hit small
+- profit-monster-trail 23T +$1.09 (+$0.047 avg) — profitable trailing exits
+- Trade freq 1/hr — normal, not overtrading
+- 6 consecutive positive hours (06:00→11:00: +$0.40 net)
+- 24h WR stable at 50.7%, system recovered from 47% low
+- KAS short +$0.14 — first open position showing meaningful profit
+
+**Open Questions:** System healthy and in sustained recovery. accel-300-v2-long remains main 24h bleeder (-$0.64) but properly disabled. No action needed.
+
+## [2026-09-01 14:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L)
+**PnL:** -$0.15 (SEI +$0.02, ASTER -$0.09, STX -$0.08)
+**24h:** 66T 50.7%WR -$0.40
+
+**Changes:**
+1. KILLED `ACCEL_300_V2_LONG_ENABLED` — 18T/24h 27.8% WR -$0.72, ALL ATR_SL exits. Added to NEVER_REENABLE set. Previous logs incorrectly said "already disabled" — it was NOT disabled.
+
+**No Change Needed:**
+- atr_sl_hit 51.5% (34/66) — trailing SL working normally, avg -$0.045/hit small
+- profit-monster-trail 25T +$1.20 (+$0.048 avg) — profitable trailing exits
+- Trade freq 3/hr — normal, not overtrading
+- 24h WR 50.7% — system recovered from 47% low
+- Open DYDX position -$0.06 within range (will close via ATR SL if triggered)
+
+**Open Questions:** DYDX accel-300-v2-long open position will remain until SL/TP hit. No new entries from this signal.

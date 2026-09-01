@@ -1280,21 +1280,23 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     # Update entry price / direction / leverage from HL
                     try:
                         conn_upd = get_db_connection()
-                        cur_upd = conn_upd.cursor()
-                        # NOTE: stop_loss and target are NOT updated here.
-                        # SL/TP is owned by position_manager's ATR trailing engine.
-                        # Writing fixed-% SL/TP here would overwrite the ATR-computed values.
-                        cur_upd.execute("""
-                            UPDATE trades SET entry_price=%s, hl_entry_price=%s, direction=%s, leverage=%s,
-                                highest_price=%s, lowest_price=%s
-                            WHERE id=%s AND status='open'
-                        """, (reconciled_entry, reconciled_entry, direction, int(lev),
-                              reconciled_entry if direction == 'LONG' else 0,   # highest_price: LONG starts at entry
-                              reconciled_entry if direction == 'SHORT' else 0,  # lowest_price: SHORT starts at entry
-                              reconciled_id))
-                        conn_upd.commit()
-                        cur_upd.close()
-                        conn_upd.close()
+                        try:
+                            cur_upd = conn_upd.cursor()
+                            # NOTE: stop_loss and target are NOT updated here.
+                            # SL/TP is owned by position_manager's ATR trailing engine.
+                            # Writing fixed-% SL/TP here would overwrite the ATR-computed values.
+                            cur_upd.execute("""
+                                UPDATE trades SET entry_price=%s, hl_entry_price=%s, direction=%s, leverage=%s,
+                                    highest_price=%s, lowest_price=%s
+                                WHERE id=%s AND status='open'
+                            """, (reconciled_entry, reconciled_entry, direction, int(lev),
+                                  reconciled_entry if direction == 'LONG' else 0,   # highest_price: LONG starts at entry
+                                  reconciled_entry if direction == 'SHORT' else 0,  # lowest_price: SHORT starts at entry
+                                  reconciled_id))
+                            conn_upd.commit()
+                        finally:
+                            cur_upd.close()
+                            conn_upd.close()
                     except Exception as upd_err:
                         log(f'  Update reconciled trade failed: {upd_err}', 'WARN')
                     continue  # Don't create new record, don't add to updated_tokens
@@ -1306,13 +1308,15 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 # Skip pump_hunter records — they manage their own lifecycle.
                 try:
                     conn_dup = get_db_connection()
-                    cur_dup = conn_dup.cursor()
-                    cur_dup.execute(
-                        "SELECT id, signal, direction FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
-                        (coin.upper(),))
-                    dup_row = cur_dup.fetchone()
-                    cur_dup.close()
-                    conn_dup.close()
+                    try:
+                        cur_dup = conn_dup.cursor()
+                        cur_dup.execute(
+                            "SELECT id, signal, direction FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
+                            (coin.upper(),))
+                        dup_row = cur_dup.fetchone()
+                    finally:
+                        cur_dup.close()
+                        conn_dup.close()
                     if dup_row:
                         existing_id = dup_row[0]
                         existing_direction = dup_row[2]  # matched trade's direction, not HL coin's direction
@@ -1327,14 +1331,16 @@ def reconcile_hype_to_paper(hl_pos, prices):
                         log(f'  ⚠️ {coin} orphan HL position but paper trade #{existing_id} already exists — closing both with existing ID', 'WARN')
                         try:
                             conn_upd2 = get_db_connection()
-                            cur_upd2 = conn_upd2.cursor()
-                            cur_upd2.execute("""
-                                UPDATE trades SET entry_price=%s, hl_entry_price=%s, direction=%s, leverage=%s
-                                WHERE id=%s AND status='open'
-                            """, (dup_entry, dup_entry, existing_direction, int(lev), existing_id))
-                            conn_upd2.commit()
-                            cur_upd2.close()
-                            conn_upd2.close()
+                            try:
+                                cur_upd2 = conn_upd2.cursor()
+                                cur_upd2.execute("""
+                                    UPDATE trades SET entry_price=%s, hl_entry_price=%s, direction=%s, leverage=%s
+                                    WHERE id=%s AND status='open'
+                                """, (dup_entry, dup_entry, existing_direction, int(lev), existing_id))
+                                conn_upd2.commit()
+                            finally:
+                                cur_upd2.close()
+                                conn_upd2.close()
                         except Exception as upd_err2:
                             log(f'Update existing trade failed: {upd_err2}', 'WARN')
                         _mark_hl_reconciled(coin, existing_id, dup_entry, existing_direction)
@@ -1882,7 +1888,11 @@ def sync_pnl_from_hype(prices):
             pass
         log(f'  sync_pnl_from_hype failed: {e}', 'FAIL')
         log(f'  Traceback: {tb}', 'FAIL')
-        return
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 # ── Guardian hard-stop backup (emergency last line of defense) ─────────────────
@@ -3408,8 +3418,10 @@ def _ensure_self_close_table():
 def _upsert_self_close(coin: str, direction: str, size: float,
                         entry_px: float, sl_price: float, tp_price: float):
     """Store or update SL/TP for an unprotectable coin."""
+    conn = get_db_connection()
+    if not conn:
+        return
     try:
-        conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(f"""
             INSERT INTO {SELF_CLOSE_TABLE} (coin, direction, size, entry_px, sl_price, tp_price, updated_at)
@@ -3425,32 +3437,40 @@ def _upsert_self_close(coin: str, direction: str, size: float,
         """, (coin.upper(), direction.upper(), abs(float(size)),
               float(entry_px), float(sl_price), float(tp_price)))
         conn.commit()
-        cur.close()
-        conn.close()
     except Exception as e:
         log(f'  [SELF-CLOSE] DB upsert failed for {coin}: {e}', 'WARN')
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
 
 
 def _get_all_self_close_records() -> list:
     """Load all self-close TP/SL records from DB."""
+    conn = get_db_connection()
+    if not conn:
+        return []
     try:
-        conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(f"SELECT coin, direction, size, entry_px, sl_price, tp_price FROM {SELF_CLOSE_TABLE}")
         rows = cur.fetchall()
-        cur.close()
-        conn.close()
         return [{'coin': r[0], 'direction': r[1], 'size': r[2],
                  'entry_px': r[3], 'sl_price': r[4], 'tp_price': r[5]} for r in rows]
     except Exception as e:
         log(f'  [SELF-CLOSE] Failed to load records: {e}', 'WARN')
         return []
+    finally:
+        conn.close()
 
 
 def _mark_self_close_triggered(coin: str, result: dict):
     """Record that self-close was triggered."""
+    conn = get_db_connection()
+    if not conn:
+        return
     try:
-        conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(f"""
             UPDATE {SELF_CLOSE_TABLE}
@@ -3458,10 +3478,10 @@ def _mark_self_close_triggered(coin: str, result: dict):
             WHERE coin = %s
         """, (json.dumps(result), coin.upper()))
         conn.commit()
-        cur.close()
-        conn.close()
     except Exception as e:
         log(f'  [SELF-CLOSE] Failed to mark triggered for {coin}: {e}', 'WARN')
+    finally:
+        conn.close()
 
 
 # ── Breach detector (Step 11 — handles both normal + unprotectable coins) ───────
@@ -4387,13 +4407,15 @@ def sync():
                     try:
                         conn_trade = get_db_connection()
                         if conn_trade:
-                            cur_trade = conn_trade.cursor()
-                            cur_trade.execute(
-                                "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
-                                (trade_id,))
-                            row_trade = cur_trade.fetchone()
-                            cur_trade.close()
-                            conn_trade.close()
+                            try:
+                                cur_trade = conn_trade.cursor()
+                                cur_trade.execute(
+                                    "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
+                                    (trade_id,))
+                                row_trade = cur_trade.fetchone()
+                            finally:
+                                cur_trade.close()
+                                conn_trade.close()
                             sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
                             tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
                             direction = row_trade[2] if row_trade else ''

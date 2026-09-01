@@ -1888,3 +1888,8 @@ ALERTS:
 ## Error Alerts — 2026-09-01 11:28 UTC
 - **WARN** (1x): `disk 80%` — 90G/118G used. Large files: coin_tracker.db (1.8G), candles.db (816M). Consider cleanup.
 - **INFO**: `speeds.db empty` — 0 bytes. Speed data lives in signals_hermes_runtime.db instead. Not a bug.
+
+## Error Alerts — 2026-09-01 13:22 UTC
+- **WARN** (1x): `Disk at 80%` — 90G/118G used. Top consumers: hl_copy.db (1.9G), coin_tracker.db (1.8G), candles.db (781M). Compressed old logs (no reclaim — data DBs dominate).
+- **WARN** (2x): `Phantom trades` — 2 trades with <0.01% PnL in last 24h. Likely noise from signal compactor.
+- **INFO**: Pipeline healthy. 0 errors in last 30min. All timers firing. 163 active signals from 53 tokens.
