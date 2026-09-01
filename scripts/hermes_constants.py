@@ -1505,6 +1505,7 @@ TL_BREAK_MINUS_ENABLED        = False  # KILLED 2026-08-25 — 28.6% WR, -$0.32 
 ROTATOR_PROTECTED_FLAGS = [
     'BB_BOUNCE_ENABLED',        # confluence signal — 100% WR with hzscore+, standalone WR stale
     'ACCEL_300_V2_LONG_ENABLED', # testing — duplicate timestamps fixed, staleness gate active
+    'BB_BOUNCE_LONG_ENABLED',   # TESTING 2026-09-01 — min_age_sec fix + raised bounce threshold
 ]
 
 # ── CEO Protection ──────────────────────────────────────────────────────────
@@ -1516,6 +1517,7 @@ CEO_PROTECTED_FLAGS = {
     'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
+    'BB_BOUNCE_LONG_ENABLED': ('TESTING 2026-09-01 — min_age_sec fix + raised bounce threshold', '2026-09-01'),
     'ACCEL_300_V2_LONG_ENABLED': ('Testing — duplicate timestamps fixed, staleness gate active', '2026-09-01'),
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
     'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
