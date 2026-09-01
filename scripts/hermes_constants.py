@@ -1581,7 +1581,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
-BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-01 — 21T/24h 52%WR -$0.34. NEVER_REENABLE.
+BB_BOUNCE_LONG_ENABLED = True     # TESTING 2026-09-01 — re-enabled after CEO kill. min_age_sec fix + raised bounce threshold. CEO_PROTECTED.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
