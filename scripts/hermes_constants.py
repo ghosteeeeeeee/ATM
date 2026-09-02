@@ -1418,7 +1418,7 @@ SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking
 SLOW_GRIND_SHORT_RSI_MIN = 30      # min RSI — was 35, lowered to catch trends earlier (RSI often oversold in grinds)
 SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fading (was 55, BCH had RSI=62.8 at entry)
-SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA20 (was 0.1, require stronger bearish alignment)
+SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA50 (was 0.1, require stronger bearish alignment)
 SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT = 0.15  # max % price can rise from 10-bar low before entry (block chasing)
 SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL = True  # require 5m velocity negative (don't short into strength)
 SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 3.0  # max % decline from 60-bar high (was 1.5, raised to catch CHIP/SUSHI-style grinds)

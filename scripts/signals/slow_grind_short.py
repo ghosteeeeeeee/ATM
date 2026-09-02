@@ -302,7 +302,7 @@ def detect_slow_grind_short(token):
     conf += slope_bonus
     
     # Bonus: good EMA separation (clear bearish alignment)
-    ema_bonus = min(ema_sep_20 / SLOW_GRIND_SHORT_EMA_NORM * 5, SLOW_GRIND_SHORT_EMA_BONUS_MAX)
+    ema_bonus = min(ema_sep_50 / SLOW_GRIND_SHORT_EMA_NORM * 5, SLOW_GRIND_SHORT_EMA_BONUS_MAX)
     conf += ema_bonus
     
     # Bonus: low ATR (pure grind)
@@ -324,7 +324,7 @@ def detect_slow_grind_short(token):
         'slope_pct': round(slope_pct * 100, 4),
         'atr_pct': round(atr_pct, 4),
         'rsi': round(rsi, 2),
-        'ema_sep_20': round(ema_sep_20, 4),
+        'ema_sep_50': round(ema_sep_50, 4),
         'source': SOURCE,
         'signal_type': SIGNAL_TYPE,
     }
@@ -397,7 +397,7 @@ def scan_signals():
             print(f'  SHORT {token:8s} conf={sig["confidence"]:.0f}% '
                   f'r2={sig["r2"]:.3f} slope={sig["slope_pct"]:.4f}% '
                   f'atr={sig["atr_pct"]:.3f}% rsi={sig["rsi"]:.1f} '
-                  f'ema_sep={sig["ema_sep_20"]:.3f}% '
+                  f'ema_sep={sig["ema_sep_50"]:.3f}% '
                   f'price={sig["price"]:.6f} [{sig["source"]}]')
     
     return added

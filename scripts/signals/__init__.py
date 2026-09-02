@@ -106,6 +106,11 @@ except Exception:
     _chain_fire_run = None
 
 try:
+    from signals.slow_grind_short import run as _slow_grind_short_run
+except Exception:
+    _slow_grind_short_run = None
+
+try:
     from signals.signal_confluence import run as _signal_confluence_run
 except Exception:
     _signal_confluence_run = None
@@ -181,6 +186,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'liquidation_hunt',         'enabled': 'LIQUIDATION_HUNT_ENABLED',     'run': _liquidation_hunt_run},
     {'name': 'macd_divergence',          'enabled': 'MACD_DIVERGENCE_ENABLED',      'run': _macd_divergence_run},
     {'name': 'chain_fire',               'enabled': 'CHAIN_FIRE_ENABLED',           'run': _chain_fire_run},
+    {'name': 'slow_grind_short',         'enabled': 'SLOW_GRIND_SHORT_ENABLED',     'run': _slow_grind_short_run},
     {'name': 'signal_confluence',        'enabled': 'SIGNAL_CONFLUENCE_ENABLED',    'run': _signal_confluence_run},
     {'name': 'accel_300_v2_short',       'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_short_run},
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},
