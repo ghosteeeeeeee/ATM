@@ -803,3 +803,7 @@
   WHY: 3T last hour (2W 1L +/usr/bin/bash.03). 60T/24h 45%WR -.75. Kill criteria not met. Short signals profitable, long signals dragging but no signal meets kill criteria (0%WR 3+T last hour). atr_sl_hit 73% structural but PM trail offsets (/usr/bin/bash.051 vs -/usr/bin/bash.045 per hit). 5 open positions. AVNT atr_sl_hit positive (+/usr/bin/bash.05) confirms trailing working. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 19:15 UTC
+[2026-09-02 19:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.10). 59T/24h 47.5%WR -$1.56. Kill criteria not met. Short signals profitable, long signals dragging but no single signal meets kill criteria (0%WR 3+T last hour). atr_sl_hit 71% structural but PM trail offsets ($0.050 vs -$0.044 per hit). 3 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 20:15 UTC

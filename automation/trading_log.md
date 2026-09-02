@@ -20055,3 +20055,31 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - -$1.75/24h within -$5/day limit
 
 **Open Questions:** None
+
+## [2026-09-02 19:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.10 (50% WR)
+
+**Last hour:**
+- NXPC LONG r2-trend-long4: -$0.14 (atr_sl_hit)
+- ME LONG bb-bounce-v2-long+: +$0.04 (profit-monster-trail)
+
+**24h:** 59T, 47.5% WR, -$1.56
+- atr_sl_hit: 42T avg -$0.044 | profit-monster-trail: 14T avg +$0.050
+- Long signals: accel-300-v3-long+ -$0.87 (35%WR), range-reversion-long+ -$0.62 (17%WR)
+- Short signals: profitable (r2-trend-short4 +$0.19, bb-bounce-short +$0.06)
+- cut_loser: 3T -$0.43
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 2/hr normal
+- 3 open positions (WLFI LONG -0.69%, YGG SHORT -0.52%, AVAX SHORT +0.63%)
+- -$1.56/24h within -$5/day limit
+- r2-trend-long4: 1 loss last hour but only 1T/24h — not enough data to kill
+
+**Open Questions:**
+- accel-300-v3-long+ (17T, 35%WR) bleeding but spread across 24h — no single hour meets kill threshold
+- range-reversion-long+ (6T, 17%WR) same — already had filters added, improving
