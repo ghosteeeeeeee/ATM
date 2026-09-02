@@ -20030,3 +20030,28 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - -$1.65/24h within -$5/day limit
 
 **Open Questions:** None
+
+## [2026-09-02 18:15 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.03 (66.7% WR)
+
+**Last hour:**
+- CAKE SHORT bb-bounce-short: +$0.08 (profit-monster-trail)
+- AVNT LONG r2-trend-long3: +$0.05 (atr_sl_hit — positive due to trailing)
+- ONDO LONG volume-breakout-long+: -$0.10 (cut-loser)
+
+**24h:** 60T, 45% WR, -$1.75
+- atr_sl_hit: 44T avg -$0.045 | profit-monster-trail: 13T avg +$0.051
+- Short signals: profitable (r2-trend-short4 100%WR, bb-bounce-short 83%WR)
+- Long signals: dragging (accel-300-v3-long+ 35%WR -$0.87, range-reversion-long+ 17%WR -$0.62)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 3/hr normal
+- 5 open positions steady
+- -$1.75/24h within -$5/day limit
+
+**Open Questions:** None
