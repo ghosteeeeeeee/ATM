@@ -2022,3 +2022,6 @@ ALERTS:
 ## Health Check — 2026-09-02 14:25 UTC
 - **[WARN]** (1x): `169 phantom trades today — PnL < $0.01 each` — position sizing or stop placement may need tuning
 - **[INFO]**: Pipeline OK, 0 errors, 189 signals/1h, 44 trades today, -$1.25 PnL
+
+## Error Alerts — 2026-09-02 15:05 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`

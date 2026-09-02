@@ -791,3 +791,7 @@
   WHY: 2T last hour (1W 1L +$0.01). 62T/24h ~45%WR -$2.74. Kill criteria not met (range-reversion-long+ 1T last hour, already killed). atr_sl_hit 72.6% but PM trail offsets ($0.047 vs -$0.048 per hit) — net neutral. Short signals 100% WR all profitable. Trade freq 2/hr normal. Last 3h flat. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 15:15 UTC
+[2026-09-02 16:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet market). 62T/24h ~45%WR -$2.08. Kill criteria not met. Short signals profitable, long signals dragging but no single signal meets kill criteria (3+T 0%WR last hour). atr_sl_hit 74.2% structural but PM trail offsets ($0.046 vs -$0.047 per hit). 4 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 17:15 UTC
