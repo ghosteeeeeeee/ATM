@@ -19845,3 +19845,34 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - ZEN cut_loser normal stop management
 
 **Open Questions:** None
+
+## [2026-09-02 11:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.21 (0% WR)
+
+**24h:** 59T, 48.3%WR, -$0.87
+- atr_sl_hit: 41T avg -$0.041 | profit-monster-trail: 16T avg +$0.053 | cut_loser: 2T avg -$0.165
+
+**Last 6h hourly:** 04:-$0.24, 05:+$0.12, 06:-$0.06, 07:-$0.05, 08:-$0.21, 09:-$0.15, 10:-$0.21
+- 5 consecutive negative hours (6-10), all small losses (range: -$0.05 to -$0.24)
+
+**Signal breakdown (24h, worst):**
+- accel-300-v3-long+: 16T 37.5%WR -$0.70 — CEO-disabled, rolling off
+- r2-trend-long3: 6T 33.3%WR -$0.23 — not at kill threshold
+- accel-300-v2-short-: 7T 28.6%WR -$0.06 — already disabled
+- bb-bounce-long+: 8T 62.5%WR -$0.11 — high WR but large losses
+
+**Open positions:** 5 LONG (range-reversion-long+), all with 1.2% SL
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 69.5% structural but PM trail offsets ($0.053 vs -$0.041 per hit)
+- Trade freq 1.3/hr normal
+- 5 consecutive negative hours — ranging market, small losses, no signal degeneration
+- v3-long+ CEO-disabled, rolling off
+- SL width 1.2% appropriate for current volatility
+
+**Open Questions:** None

@@ -771,3 +771,7 @@
   WHY: 2T last hour (1W 1L -$0.06). 59T/24h 47.5%WR -$0.94. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 69.5% but PM trail offsets ($0.052 vs -$0.041 per hit). Trade freq 2/hr normal. 3 consecutive negative hours broken by positive hour. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 11:15 UTC
+[2026-09-02 11:15 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (BABY cut_loser -$0.21). 59T/24h 48.3%WR -$0.87. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 69.5% structural but PM trail offsets ($0.053 vs -$0.041 per hit). Trade freq 1.3/hr normal. 5 consecutive negative hours (6-10) — ranging market, small losses, no signal degeneration. v3-long+ CEO-disabled rolling off. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 12:15 UTC
