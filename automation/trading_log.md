@@ -19821,3 +19821,27 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - Last 3h small losses (-$0.09, -$0.05, -$0.06) — ranging market
 
 **Open Questions:** None
+
+## [2026-09-02 10:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.06 (1W 1L, 50% WR)
+
+**24h:** 59T, 47.5%WR, -$0.94
+- atr_sl_hit: 41T avg -$0.041 | profit-monster-trail: 17T avg +$0.052 | cut_loser: 1T avg -$0.120
+
+**Signal breakdown (24h, worst):**
+- accel-300-v3-long+: 16T 37.5%WR -$0.70 — CEO-disabled, rolling off
+- r2-trend-long3: 6T 33.3%WR -$0.23 — not at kill threshold
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 69.5% structural but PM trail offsets ($0.052 vs -$0.041 per hit)
+- Trade freq 2/hr normal
+- 3 consecutive negative hours (6,7,8) broken by positive hour 9
+- v3-long+ CEO-disabled, rolling off
+- ZEN cut_loser normal stop management
+
+**Open Questions:** None

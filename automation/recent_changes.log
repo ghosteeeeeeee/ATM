@@ -767,3 +767,7 @@
   WHY: 3T last hour (1W 2L -$0.14). 62T/24h 45.2%WR -$1.35. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 74% but PM trail offsets ($0.051 vs -$0.047 per hit). v3-long+ CEO-disabled rolling off. Trade freq 2.6/hr normal. Last 3h small losses in ranging market. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 10:15 UTC
+[2026-09-02 10:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.06). 59T/24h 47.5%WR -$0.94. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 69.5% but PM trail offsets ($0.052 vs -$0.041 per hit). Trade freq 2/hr normal. 3 consecutive negative hours broken by positive hour. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 11:15 UTC
