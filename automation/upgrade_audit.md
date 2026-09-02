@@ -176,16 +176,41 @@ Generated: 2026-09-02 04:30 UTC
 
 ## Implementation Log
 
-### 2026-09-02: Level 1 Cleanup Wave
+### 2026-09-02: Level 1 Cleanup Wave (Upgrade Implementer)
 
-| Task | Status | Lines Removed |
-|------|--------|---------------|
-| Dead signal registry cleanup | IN PROGRESS | ~2500 |
-| Duplicate _ema() removal | PENDING | ~8 |
-| Dead code blocks (signal_schema) | PENDING | ~400 |
-| Dead code blocks (position_manager) | PENDING | ~350 |
-| add_signal() Layer 2 dict lookup | PENDING | ~880 |
-| is_component_disabled() removal | PENDING | ~260 |
+| Task | Status | Lines Removed | Notes |
+|------|--------|---------------|-------|
+| Delete dead backtest scripts (38 files) | ✅ DONE | ~13,000 | All zero-import, zero-reference |
+| Delete dead analyze/audit/test scripts (21 files) | ✅ DONE | ~3,500 | All zero-import, zero-reference |
+| Delete dead signal/utility scripts (58 files) | ✅ DONE | ~6,500 | Verified against systemd timers |
+| Restore hebbian_api.py (false positive) | ✅ FIXED | — | Referenced by hermes-hebbian-api.service |
+| Dead signal registry cleanup | ✅ DONE (ponytail) | ~2500 | 65→17 entries |
+| Duplicate _ema() removal | SKIP | — | Only 1 definition exists (audit was wrong) |
+| Dead code blocks (signal_schema) | SKIP | — | _get_confluence_signals_legacy still used as fallback |
+| Dead code blocks (position_manager) | SKIP | — | _execute_atr_bulk_updates guarded by flag, not dead |
+| add_signal() Layer 2 dict lookup | PENDING | ~880 | Level 2 — needs testing |
+| is_component_disabled() removal | PENDING | ~260 | Level 2 — called 6x in signal_compactor |
+
+**Total deleted: 115 files, ~23,000 lines removed**
+**Scripts remaining: 105 (down from ~220)**
+
+### 2026-09-02: Plan Evaluation
+
+| Plan | Difficulty | Value | Status | Action Taken |
+|------|-----------|-------|--------|--------------|
+| 2026-09-02_regime-aware-signal-params | Level 3 | HIGH | PENDING | Needs backtest before implementation |
+| 2026-08-29_amplitude-enhancement | Level 3 | HIGH | PARTIAL | amplitude compactor exists, cache not built |
+| 2026-08-29_wave-period-analysis | Level 2 | MEDIUM | IMPLEMENTED | Scripts exist, backtest pending |
+| 2026-08-27_ponytail-full-audit | Level 4 | HIGH | IN PROGRESS | Dead scripts deleted, refactoring pending |
+| 2026-08-26_30s-price-interval | Level 1 | HIGH | IMPLEMENTED | Split architecture live |
+| 2026-08-22_copy-trader-dashboard | Level 1 | LOW | SKIPPED | Cosmetic, low priority |
+| 2026-08-21_copy-trader-entry-timing | Level 2 | MEDIUM | PARTIAL | SHORT disable done, time filter pending |
+| 2026-08-19_short-bias-fix | Level 1 | MEDIUM | IMPLEMENTED | Root cause = market condition |
+| 2026-08-15_weather-vane-v4 | Level 2 | HIGH | IMPLEMENTED | tide_detector.py exists |
+| 2026-08-15_weather-vane-v5 | Level 1 | HIGH | PARTIAL | volatility_gate exists, floor filter pending |
+| 2026-08-13_progressive-context-shaping | Level 2 | MEDIUM | NOT STARTED | Needs CURRENT.md creation |
+| 2026-08-12_directional-outcome-tracker | Level 1 | HIGH | IMPLEMENTED | Weather vane signal gate live |
+| automation-team-improvements | Level 2 | HIGH | PARTIAL | Self-learner expansion pending |
 
 ---
 
@@ -194,9 +219,9 @@ Generated: 2026-09-02 04:30 UTC
 | Metric | Count |
 |--------|-------|
 | Plans scanned | 20 |
-| IMPLEMENTED | 4 |
-| PARTIAL | 3 |
-| NOT IMPLEMENTED | 4 |
-| SKIPPED | 1 |
-| UNKNOWN | 8 |
-| **Success rate** | **4/8 evaluable (50%)** |
+| IMPLEMENTED | 6 |
+| PARTIAL | 4 |
+| NOT IMPLEMENTED | 3 |
+| SKIPPED | 2 |
+| UNKNOWN | 5 |
+| **Success rate** | **6/13 evaluable (46%)** |
