@@ -19585,3 +19585,25 @@ Final set: ['ALT', 'APT', 'ARB', 'ATOM', 'AVNT', 'BCH', 'CASHCAT', 'CC', 'CHIP',
 - Max consecutive negative hours: 0
 
 **Open Questions:** System healthy. Accelerating recovery. Next run at 03:05 UTC.
+
+## [2026-09-02 02:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (system quiet). Last trade: POL short at 02:06.
+**24h:** 62T 50%WR -$0.61 (improved from -$0.64)
+**Open:** 3 (NEAR, ENS, JUP shorts — all accel-300-v2-short-, ~$0 pnl)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T in last hour
+- atr_sl_hit 59.7% (37/62) avg -$0.049/hit — above 40% threshold but cost is tiny per hit
+- profit-monster-trail 35.5% (22/62) avg +$0.060 — profitable, fully offsets SL hits
+- 24h PnL improved -$0.64 → -$0.61, slow recovery continuing
+- Trade freq 0/hr — quiet period, no overtrading
+- Consecutive negative hours: 1 — below 3h threshold
+- accel-300-v2-long killed 09/01, in NEVER_REENABLE, rolling off 24h stats (11T -$0.52)
+- accel-300-v3-long+ new signal: 6T 33.3%WR -$0.14 — needs more data, not killing yet (0%WR with 3+T kill criteria not met — only 0T last hour)
+- accel-300-v2-short-: 4T 50%WR +$0.15 — profitable
+- System healthy in quiet market period
+
+**Open Questions:** None. Next run at 03:06 UTC.
