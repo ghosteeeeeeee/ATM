@@ -14,7 +14,7 @@ from hermes_constants import (
     HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
     RS_ENABLED, RS_PLUS_ENABLED, RS_MINUS_ENABLED,
     R2_TREND_SHORT_ENABLED, R2_TREND_LONG_ENABLED,
-    BB_BOUNCE_SHORT_ENABLED, BB_BOUNCE_LONG_ENABLED,
+    BB_BOUNCE_SHORT_ENABLED, BB_BOUNCE_LONG_ENABLED, BB_BOUNCE_V2_LONG_ENABLED,
     RETURN_EXHAUSTION_SHORT_ENABLED,
     ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
     CONTINUATION_ENABLED, CONTINUATION_PLUS_ENABLED,
@@ -64,6 +64,11 @@ try:
     from signals.bb_bounce_long import run as _bb_bounce_long_run
 except Exception:
     _bb_bounce_long_run = None
+
+try:
+    from signals.bb_bounce_v2_long import run as _bb_bounce_v2_long_run
+except Exception:
+    _bb_bounce_v2_long_run = None
 
 try:
     from signals.return_exhaustion_short import run as _return_exhaustion_short_run

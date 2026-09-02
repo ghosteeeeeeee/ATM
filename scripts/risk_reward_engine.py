@@ -897,5 +897,67 @@ if __name__ == '__main__':
                           f"what legacy {'allows' if legacy.get('pass') else 'blocks'}")
 
             print()
+
+
+# ── Confidence Multiplier (for signal_compactor integration) ────────────────
+
+def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_5m=None):
+    """Compute a confidence multiplier based on structural R:R quality.
+
+    Called by signal_compactor._score_signal() to adjust signal confidence
+    based on the risk-reward engine's assessment.
+
+    Returns:
+        float: multiplier from 0.0 (hard block) to 1.5 (strong boost)
+        str: reason string for logging
+
+    Multiplier logic:
+        R:R >= 4.0 + Grade A  → 1.30x (exceptional setup)
+        R:R >= 3.0 + Grade B  → 1.15x (strong setup)
+        R:R >= 2.0 + Grade C  → 1.00x (standard — no adjustment)
+        R:R >= 1.5            → 0.85x (mediocre — reduce confidence)
+        R:R >= 1.0            → 0.70x (poor — significant penalty)
+        R:R < 1.0             → 0.00x (hard block — risk > reward)
+        Grade F               → 0.00x (hard block — structural garbage)
+    """
+    try:
+        result = evaluate_rr(token, direction, price, candles_5m=candles_5m,
+                            signal_type=signal_type)
+
+        rr = result['rr_ratio']
+        score = result['score']
+        grade = result['grade']
+
+        # Hard block conditions
+        if grade == 'F':
+            return 0.0, f"RR HARD BLOCK: grade=F (score={score})"
+        if rr < 1.0:
+            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < 1.0 (risk > reward)"
+        if not result['pass'] and result.get('block_reason', '').startswith('Score'):
+            # Score-based block (below minimum)
+            return 0.0, f"RR HARD BLOCK: {result['block_reason']}"
+
+        # Graded multiplier
+        if rr >= 4.0 and grade == 'A':
+            mult = 1.30
+            reason = f"RR BOOST: R:R={rr:.2f} grade=A (exceptional)"
+        elif rr >= 3.0 and grade in ('A', 'B'):
+            mult = 1.15
+            reason = f"RR BOOST: R:R={rr:.2f} grade={grade} (strong)"
+        elif rr >= 2.0:
+            mult = 1.00
+            reason = f"RR NEUTRAL: R:R={rr:.2f} grade={grade} (standard)"
+        elif rr >= 1.5:
+            mult = 0.85
+            reason = f"RR PENALTY: R:R={rr:.2f} grade={grade} (mediocre)"
+        else:
+            mult = 0.70
+            reason = f"RR PENALTY: R:R={rr:.2f} grade={grade} (poor)"
+
+        return mult, reason
+
+    except Exception as e:
+        # Fail-open: don't block trades if engine fails
+        return 1.0, f"RR ENGINE ERROR (fail-open): {e}"
     else:
         parser.print_help()

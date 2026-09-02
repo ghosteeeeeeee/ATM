@@ -1629,6 +1629,7 @@ BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR 
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
+BB_BOUNCE_V2_LONG_ENABLED = True  # TESTING 2026-09-02 — new signal calibrated from SHORT winners. 7 filters: BB width, RSI, bounce, velocity, momentum, volatility, min_age.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
@@ -2426,6 +2427,20 @@ RR_ENGINE_BB_SQUEEZE_THRESH  = 0.04    # BB width < 4% = squeeze
 
 # Caching
 RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width per token
+
+# ── Risk-Reward Engine: Confidence Multiplier ──────────────────────────────
+# rr_confidence_multiplier() maps R:R quality to a score multiplier for signal_compactor.
+# Integrated into _score_signal() final_score formula as rr_mult.
+RR_ENGINE_CONF_ENABLED       = True    # master switch for RR confidence adjustment
+RR_ENGINE_CONF_SHADOW        = True    # True = log only, don't adjust (validate first)
+RR_ENGINE_CONF_HARD_BLOCK_RR = 1.0     # R:R below this = hard block (0.0x multiplier)
+RR_ENGINE_CONF_HARD_BLOCK_SCORE = 35   # Score below this = hard block (grade F)
+RR_ENGINE_CONF_BOOST_THRESHOLD_RR = 4.0  # R:R above this + Grade A = boost
+RR_ENGINE_CONF_BOOST_MULT    = 1.30    # multiplier for exceptional setups (R:R≥4 + Grade A)
+RR_ENGINE_CONF_STRONG_MULT   = 1.15    # multiplier for strong setups (R:R≥3 + Grade B+)
+RR_ENGINE_CONF_NEUTRAL_MULT  = 1.00    # standard (R:R≥2)
+RR_ENGINE_CONF_MEDIOCRE_MULT = 0.85    # mediocre (R:R 1.5-2.0)
+RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias

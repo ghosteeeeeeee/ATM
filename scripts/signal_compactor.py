@@ -986,7 +986,47 @@ def _score_signal(token, direction, conf, source, signal_type,
             _confluence_token_cache[token_key] = confluence_mult
             _confluence_cache_ts[token_key] = now_ts
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult
+    # ── Risk-Reward Engine: structural R:R confidence adjustment ────────────
+    rr_mult = 1.0
+    rr_reason = ''
+    try:
+        from hermes_constants import RR_ENGINE_CONF_ENABLED, RR_ENGINE_CONF_SHADOW
+        if RR_ENGINE_CONF_ENABLED:
+            from risk_reward_engine import rr_confidence_multiplier, evaluate_rr
+            # Get latest price for this token
+            _rr_price = None
+            try:
+                import sqlite3 as _sq3
+                _rr_conn = _sq3.connect(os.path.join(
+                    os.environ.get('HERMES_DATA_DIR',
+                        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')),
+                    'candles.db'), timeout=5)
+                _rr_cur = _rr_conn.cursor()
+                _rr_cur.execute("""
+                    SELECT close FROM candles_5m
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 1
+                """, (token.upper(),))
+                _rr_row = _rr_cur.fetchone()
+                _rr_cur.close(); _rr_conn.close()
+                if _rr_row:
+                    _rr_price = _rr_row[0]
+            except Exception:
+                pass
+
+            if _rr_price and _rr_price > 0:
+                rr_mult, rr_reason = rr_confidence_multiplier(
+                    token, direction, _rr_price, signal_type=signal_type)
+                if rr_mult != 1.0:
+                    log(f"  🎯 [RR-ENGINE] {token} {direction}: {rr_reason} → mult={rr_mult:.2f}")
+                if RR_ENGINE_CONF_SHADOW:
+                    rr_mult = 1.0  # shadow mode: log but don't adjust
+    except ImportError:
+        pass
+    except Exception as e:
+        log(f"  [WARN] RR engine failed (fail-open): {e}", 'WARN')
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult
     return final_score
 
 
