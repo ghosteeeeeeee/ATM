@@ -1988,3 +1988,6 @@ ALERTS:
 
 ## Error Alerts — 2026-09-02 07:05 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
+
+## Error Alerts — 2026-09-02 08:05 UTC
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`

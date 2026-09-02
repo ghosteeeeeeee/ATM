@@ -992,9 +992,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     try:
         from hermes_constants import RR_ENGINE_CONF_ENABLED, RR_ENGINE_CONF_SHADOW
         if RR_ENGINE_CONF_ENABLED:
-            from risk_reward_engine import rr_confidence_multiplier, evaluate_rr
+            from risk_reward_engine import rr_confidence_multiplier
             # Get latest price for this token
             _rr_price = None
+            _rr_conn = None
             try:
                 import sqlite3 as _sq3
                 _rr_conn = _sq3.connect(os.path.join(
@@ -1008,11 +1009,16 @@ def _score_signal(token, direction, conf, source, signal_type,
                     ORDER BY ts DESC LIMIT 1
                 """, (token.upper(),))
                 _rr_row = _rr_cur.fetchone()
-                _rr_cur.close(); _rr_conn.close()
                 if _rr_row:
                     _rr_price = _rr_row[0]
             except Exception:
                 pass
+            finally:
+                if _rr_conn:
+                    try:
+                        _rr_conn.close()
+                    except Exception:
+                        pass
 
             if _rr_price and _rr_price > 0:
                 rr_mult, rr_reason = rr_confidence_multiplier(

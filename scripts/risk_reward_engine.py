@@ -39,7 +39,7 @@ from volatility_gate import get_atr_pct, classify_volatility
 
 # rs_signals imports (swing detection + clustering)
 try:
-    from rs_signals import _find_swing_highs_lows, _cluster_levels, _build_level_touches
+    from rs_signals import _find_swing_highs_lows, _cluster_levels
     _HAS_RS_SIGNALS = True
 except ImportError:
     _HAS_RS_SIGNALS = False
@@ -54,8 +54,6 @@ except ImportError:
 # ── Cache ───────────────────────────────────────────────────────────────────
 _sr_cache = {}     # token -> (timestamp, sr_map)
 _vol_cache = {}    # token -> (timestamp, vol_width)
-_liq_cache = None  # global liquidation data (refreshed per call)
-_liq_cache_ts = 0
 _log_dedup = {}    # key -> last_log_ts (prevent spam)
 _LOG_DEDUP_TTL = 60  # don't repeat same log within 60s
 
@@ -110,7 +108,9 @@ def _build_candle_sr(candles_5m, atr_pct, lookback=None):
     if lookback is None:
         lookback = getattr(hc, 'RR_ENGINE_SR_LOOKBACK', 300)
 
-    if not candles_5m or len(candles_5m) < 30:
+    # Swing detection needs at least window*2+1 candles (window=20 → 41 candles)
+    min_candles = 20 * 2 + 1  # 41 candles minimum for swing detection
+    if not candles_5m or len(candles_5m) < min_candles:
         return []
 
     # Use last N candles for swing detection
@@ -574,11 +574,6 @@ def _legacy_rr(token, direction, price, candles_5m=None):
     try:
         from hermes_constants import ATR_SL_MIN, ATR_TP_MIN
 
-        # Get ATR% using the same logic as legacy rr_gate
-        atr_pct = get_atr_pct(token)
-        if atr_pct is None:
-            atr_pct = getattr(hc, 'ATR_PCT_FALLBACK', 0.03) * 100
-
         # Legacy SL/TP calculation
         sl_distance = price * ATR_SL_MIN * 1.0  # ENTRY_RR_SL_ATR_MULT = 1.0
         tp_distance = price * ATR_TP_MIN
@@ -597,7 +592,7 @@ def _legacy_rr(token, direction, price, candles_5m=None):
 
 # ── Scoring ─────────────────────────────────────────────────────────────────
 
-def _compute_score(rr_ratio, vol_width, liquidity, sr_map):
+def _compute_score(rr_ratio, vol_width, liquidity, sr_map, direction='LONG'):
     """Compute 0-100 composite quality score.
 
     Components:
@@ -622,16 +617,25 @@ def _compute_score(rr_ratio, vol_width, liquidity, sr_map):
 
     # 3. S/R Clarity (25 pts)
     # Clear target in sweet spot = full points, no target = 0
+    # Filter by direction: LONG → nearest resistance (TP target), SHORT → nearest support
     if sr_map:
-        nearest_dist = sr_map[0].get('distance_pct', 999)
-        if 0.3 < nearest_dist < 2.0:
-            score += 25  # clear target in sweet spot
-        elif nearest_dist < 0.3:
-            score += 12  # too close, may not reach
-        elif nearest_dist < 3.0:
-            score += 15  # a bit far but reachable
+        if direction == 'LONG':
+            target_levels = [l for l in sr_map if l.get('type') == 'resistance']
         else:
-            score += 5   # no clear target nearby
+            target_levels = [l for l in sr_map if l.get('type') == 'support']
+
+        if target_levels:
+            nearest_dist = target_levels[0].get('distance_pct', 999)
+            if 0.3 < nearest_dist < 2.0:
+                score += 25  # clear target in sweet spot
+            elif nearest_dist < 0.3:
+                score += 12  # too close, may not reach
+            elif nearest_dist < 3.0:
+                score += 15  # a bit far but reachable
+            else:
+                score += 5   # no clear target nearby
+        else:
+            score += 0      # no relevant S/R levels in trade direction
     else:
         score += 0      # no S/R data at all
 
@@ -694,7 +698,7 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         rr_min = _get_rr_min(regime)
 
         # Score
-        score, grade = _compute_score(rr_ratio, vol_width, liquidity, sr_map)
+        score, grade = _compute_score(rr_ratio, vol_width, liquidity, sr_map, direction)
 
         # Minimum score gate
         min_score = getattr(hc, 'RR_ENGINE_MIN_SCORE', 50)
@@ -919,6 +923,7 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         R:R >= 1.0            → 0.70x (poor — significant penalty)
         R:R < 1.0             → 0.00x (hard block — risk > reward)
         Grade F               → 0.00x (hard block — structural garbage)
+        Fail-open (rr=999)    → 1.00x (engine couldn't evaluate, don't boost)
     """
     try:
         result = evaluate_rr(token, direction, price, candles_5m=candles_5m,
@@ -928,30 +933,41 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         score = result['score']
         grade = result['grade']
 
+        # Fail-open detection: engine couldn't evaluate → return neutral
+        # Fail-open signature: rr_ratio=999, score=0, grade='A'
+        if rr >= 999 and score == 0:
+            return 1.0, "RR FAIL-OPEN: engine could not evaluate (no data)"
+
         # Hard block conditions
         if grade == 'F':
             return 0.0, f"RR HARD BLOCK: grade=F (score={score})"
-        if rr < 1.0:
-            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < 1.0 (risk > reward)"
+        if rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 1.0):
+            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 1.0)} (risk > reward)"
         if not result['pass'] and result.get('block_reason', '').startswith('Score'):
-            # Score-based block (below minimum)
             return 0.0, f"RR HARD BLOCK: {result['block_reason']}"
 
-        # Graded multiplier
-        if rr >= 4.0 and grade == 'A':
-            mult = 1.30
+        # Graded multiplier (using hermes_constants for all thresholds)
+        boost_rr = getattr(hc, 'RR_ENGINE_CONF_BOOST_THRESHOLD_RR', 4.0)
+        boost_mult = getattr(hc, 'RR_ENGINE_CONF_BOOST_MULT', 1.30)
+        strong_mult = getattr(hc, 'RR_ENGINE_CONF_STRONG_MULT', 1.15)
+        neutral_mult = getattr(hc, 'RR_ENGINE_CONF_NEUTRAL_MULT', 1.00)
+        mediocre_mult = getattr(hc, 'RR_ENGINE_CONF_MEDIOCRE_MULT', 0.85)
+        poor_mult = getattr(hc, 'RR_ENGINE_CONF_POOR_MULT', 0.70)
+
+        if rr >= boost_rr and grade == 'A':
+            mult = boost_mult
             reason = f"RR BOOST: R:R={rr:.2f} grade=A (exceptional)"
         elif rr >= 3.0 and grade in ('A', 'B'):
-            mult = 1.15
+            mult = strong_mult
             reason = f"RR BOOST: R:R={rr:.2f} grade={grade} (strong)"
         elif rr >= 2.0:
-            mult = 1.00
+            mult = neutral_mult
             reason = f"RR NEUTRAL: R:R={rr:.2f} grade={grade} (standard)"
         elif rr >= 1.5:
-            mult = 0.85
+            mult = mediocre_mult
             reason = f"RR PENALTY: R:R={rr:.2f} grade={grade} (mediocre)"
         else:
-            mult = 0.70
+            mult = poor_mult
             reason = f"RR PENALTY: R:R={rr:.2f} grade={grade} (poor)"
 
         return mult, reason
@@ -959,5 +975,3 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
     except Exception as e:
         # Fail-open: don't block trades if engine fails
         return 1.0, f"RR ENGINE ERROR (fail-open): {e}"
-    else:
-        parser.print_help()

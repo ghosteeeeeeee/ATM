@@ -19796,3 +19796,28 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - No overtrading (max 7T in any hour)
 
 **Open Questions:** None
+
+## [2026-09-02 09:15 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** -$0.14 (1W 2L, 33.3% WR)
+
+**24h:** 62T, 45.2%WR, -$1.35
+- atr_sl_hit: 46T avg -$0.047 | profit-monster-trail: 16T avg +$0.051
+
+**Signal breakdown (24h, top):**
+- accel-300-v3-long+: 16T 37.5%WR -$0.70 — CEO-disabled, rolling off
+- bb-bounce-long+: 13T 46.2%WR -$0.45 — marginal
+- accel-300-v2-short-: 7T 28.6%WR -$0.06 — already disabled
+- r2-trend-short4: 2T 100%WR +$0.19 — clean
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 74% but PM trail offsets ($0.051 vs -$0.047 per hit)
+- v3-long+ CEO-disabled, rolling off
+- Trade freq 2.6/hr normal
+- Last 3h small losses (-$0.09, -$0.05, -$0.06) — ranging market
+
+**Open Questions:** None
