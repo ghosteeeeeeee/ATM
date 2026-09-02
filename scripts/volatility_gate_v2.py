@@ -57,6 +57,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',
         'macd-div', 'macd-div+', 'macd-div-',
         'confluence+', 'confluence-',
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -83,6 +84,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',
         'macd-div', 'macd-div+', 'macd-div-',
         'confluence+', 'confluence-',
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -106,6 +108,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',

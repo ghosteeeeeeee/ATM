@@ -46,6 +46,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in range-bound
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'NORMAL': {
         # pump_catcher — momentum breakout (velocity + acceleration)
@@ -81,6 +82,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — trend exhaustion detector
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'HIGH': {
         # Breakout works in big moves
@@ -113,6 +115,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
+        'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
     },
     'EXTREME': {
         # Continuation works in storms
