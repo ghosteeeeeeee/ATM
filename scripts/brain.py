@@ -334,6 +334,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                leverage: int = 1, experiment: str = None,
                flipped_from_trade: bool = False,
                regime: str = None,
+               volatility_regime: str = None,  # NEW: FLAT/NORMAL/HIGH/EXTREME
                # ── Signal indicator fields (captured at entry from hotset) ──
                signal_z_score: float = None,
                signal_rsi_14: float = None,
@@ -364,6 +365,14 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # ── Normalize direction ──────────────────────────────────────────────
     side_type = side_type.lower() if side_type else 'long'
     direction = 'LONG' if side_type == 'long' else 'SHORT'
+    
+    # ── Auto-compute volatility regime if not provided ───────────────────
+    if volatility_regime is None:
+        try:
+            from signal_schema import _get_volatility_regime
+            volatility_regime = _get_volatility_regime(token)
+        except Exception:
+            volatility_regime = 'UNKNOWN'
 
     # ── Step 1: Pre-flight checks ───────────────────────────────────────
 
@@ -641,20 +650,21 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             (43,  '_signal_metadata',     json.dumps(signal_metadata, default=str) if signal_metadata else '{}'),
             (44,  '_exp_metadata',        _exp_metadata_str),
             (45,  'regime',               regime),
+            (46,  'volatility_regime',    volatility_regime),
         ]
         _params = [row[2] for row in _col_map]
         print(f"[brain.py] DEBUG _col_map: {len(_col_map)} entries → {len(_params)} params")
 
-        # Validate: 45 params must match 45 %s in VALUES
-        if len(_params) != 45:
-            print(f"[brain.py] ❌ MISMATCH: params={len(_params)} (need 45)")
+        # Validate: 46 params must match 46 %s in VALUES
+        if len(_params) != 46:
+            print(f"[brain.py] ❌ MISMATCH: params={len(_params)} (need 46)")
             for i, (col_num, col_name, val) in enumerate(_col_map):
                 print(f"  [{i:2d}] col={col_num:2d} {col_name:30s} = {repr(val)[:60]}")
         else:
-            print(f"[brain.py] ✅ 45 params ready")
+            print(f"[brain.py] ✅ 46 params ready")
 
         # ── ACTUAL INSERT with verbose error capture ─────────────────────────
-        # VALUES: 44 %s matching 44 _col_map params (open_time is explicit 'now' string)
+        # VALUES: 46 %s matching 46 _col_map params (open_time is explicit 'now' string)
         try:
             cur.execute("""
             INSERT INTO trades (token, direction, amount_usdt, entry_price,
@@ -670,8 +680,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                       signal_momentum_state, signal_z_score_tier,
                       signal_decision, signal_leverage, signal_created_at,
                       test_sl_variant, test_timing_variant, test_trailing_variant,
-                      _signal_metadata, _exp_metadata, regime)
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                      _signal_metadata, _exp_metadata, regime, volatility_regime)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """, tuple(_params))
         except Exception as _insert_err:

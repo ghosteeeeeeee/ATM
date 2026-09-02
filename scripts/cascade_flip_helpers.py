@@ -194,6 +194,13 @@ def insert_post_flip_trade(
 
         conn = get_db_connection()
         cur  = conn.cursor()
+        
+        # Auto-compute volatility_regime
+        try:
+            from signal_schema import _get_volatility_regime
+            vol_regime = _get_volatility_regime(token)
+        except Exception:
+            vol_regime = 'UNKNOWN'
 
         cur.execute("""
             INSERT INTO trades (
@@ -201,14 +208,14 @@ def insert_post_flip_trade(
                 amount_usdt, leverage, exchange, paper, status, open_time,
                 stop_loss, target, atr_managed, signal, signal_reason,
                 sl_distance, trailing_activation, trailing_distance,
-                guardian_closed, is_guardian_close, server
+                guardian_closed, is_guardian_close, server, volatility_regime
             )
             SELECT
                 %s, %s, %s, %s,
                 %s, %s, 'Hyperliquid', true, 'open', NOW(),
                 %s, %s, TRUE, %s, %s,
                 0.03, 0.01, 0.01,
-                FALSE, FALSE, 'Hermes'
+                FALSE, FALSE, 'Hermes', %s
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades
                 WHERE token = %s AND status = 'open'
@@ -221,6 +228,7 @@ def insert_post_flip_trade(
             amount_usdt, leverage,
             stop_loss, target,
             signal, signal_source,
+            vol_regime,
             token,
         ))
 

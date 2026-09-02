@@ -839,21 +839,28 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
         cur = conn.cursor()
         # Atomic: INSERT only if no open trade exists for this token.
         # Eliminates race condition between SELECT-then-INSERT.
+        # Auto-compute volatility_regime from candles_1h ATR.
+        try:
+            from signal_schema import _get_volatility_regime
+            vol_regime = _get_volatility_regime(token)
+        except Exception:
+            vol_regime = 'UNKNOWN'
+        
         cur.execute("""
             INSERT INTO trades (token, direction, amount_usdt, entry_price, hl_entry_price,
                 exchange, paper, stop_loss, target, server, status, open_time,
                 pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance,
                 guardian_closed, is_guardian_close,
-                signal_z_score)
+                signal_z_score, volatility_regime)
             SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
                    0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE,
-                   %s
+                   %s, %s
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
             )
             RETURNING id
         """, (token, direction, amount_usdt, entry_price, entry_price,
-              stop_loss, target, leverage, signal_z_score, token))
+              stop_loss, target, leverage, signal_z_score, vol_regime, token))
         row = cur.fetchone()
         if row is None:
             # No row returned = INSERT was skipped (open trade already exists)

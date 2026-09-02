@@ -158,6 +158,10 @@ class RegimeMemory:
         """Record a trade outcome for regime tracking."""
         self._ensure_signal(signal_type)
         
+        # Validate regime
+        if regime not in REGIMES:
+            regime = 'NORMAL'
+        
         if regime not in self._data['signals'][signal_type]['regimes']:
             self._data['signals'][signal_type]['regimes'][regime] = {
                 'trades': 0, 'wins': 0, 'total_pnl': 0.0,
@@ -175,6 +179,51 @@ class RegimeMemory:
         self._data['signals'][signal_type]['last_updated'] = datetime.now(timezone.utc).isoformat()
         
         self._save()
+    
+    def backfill_from_db(self, days=30):
+        """Backfill volatility_regime for existing trades that don't have it.
+        
+        This computes volatility_regime from candles_1h ATR for each trade
+        and updates the trades table. Run once after adding the column.
+        """
+        try:
+            import psycopg2
+            from signal_schema import _get_volatility_regime
+            
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            
+            # Get trades without volatility_regime
+            cur.execute("""
+                SELECT id, token FROM trades 
+                WHERE status = 'closed' 
+                AND close_time > NOW() - INTERVAL '%s days'
+                AND (volatility_regime IS NULL OR volatility_regime = '')
+                LIMIT 500
+            """, (days,))
+            
+            trades = cur.fetchall()
+            updated = 0
+            
+            for trade_id, token in trades:
+                try:
+                    vol_regime = _get_volatility_regime(token)
+                    cur.execute("""
+                        UPDATE trades SET volatility_regime = %s WHERE id = %s
+                    """, (vol_regime, trade_id))
+                    updated += 1
+                except Exception:
+                    pass
+            
+            conn.commit()
+            conn.close()
+            
+            print(f"Backfilled volatility_regime for {updated}/{len(trades)} trades")
+            return updated
+            
+        except Exception as e:
+            print(f"Error backfilling: {e}")
+            return 0
     
     def snapshot_params(self, signal_type, regime, params):
         """Save a snapshot of params that worked well in this regime."""
@@ -200,18 +249,19 @@ class RegimeMemory:
     def seed_from_db(self, signal_type=None, days=30):
         """Seed regime memory from existing trade data in PostgreSQL.
         
-        This is a one-time migration to populate regime memory from historical trades.
-        Uses entry_regime_4h as proxy for volatility regime.
+        Uses actual volatility_regime column when available (populated at trade entry).
+        Falls back to entry_regime_4h as proxy if volatility_regime is NULL.
         """
         try:
             import psycopg2
             conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
             cur = conn.cursor()
             
-            # Get trades with regime info
+            # Get trades with volatility_regime (actual) or entry_regime_4h (proxy)
             if signal_type:
                 cur.execute("""
-                    SELECT signal, entry_regime_4h, 
+                    SELECT signal, 
+                           COALESCE(volatility_regime, entry_regime_4h, 'NORMAL') as vol_regime,
                            SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins,
                            COUNT(*) as total,
                            COALESCE(SUM(pnl_usdt), 0) as total_pnl
@@ -219,18 +269,19 @@ class RegimeMemory:
                     WHERE status = 'closed' 
                     AND close_time > NOW() - INTERVAL '%s days'
                     AND signal LIKE %s
-                    GROUP BY signal, entry_regime_4h
+                    GROUP BY signal, vol_regime
                 """, (days, f'%{signal_type}%'))
             else:
                 cur.execute("""
-                    SELECT signal, entry_regime_4h, 
+                    SELECT signal, 
+                           COALESCE(volatility_regime, entry_regime_4h, 'NORMAL') as vol_regime,
                            SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins,
                            COUNT(*) as total,
                            COALESCE(SUM(pnl_usdt), 0) as total_pnl
                     FROM trades 
                     WHERE status = 'closed' 
                     AND close_time > NOW() - INTERVAL '%s days'
-                    GROUP BY signal, entry_regime_4h
+                    GROUP BY signal, vol_regime
                 """, (days,))
             
             for row in cur.fetchall():
@@ -238,15 +289,22 @@ class RegimeMemory:
                 if not sig or total < 3:
                     continue
                 
-                # Map trend regime to volatility regime (rough approximation)
-                regime_str = str(regime) if regime else 'NEUTRAL'
+                # Normalize regime string
+                regime_str = str(regime) if regime else 'NORMAL'
+                # Map old trend regimes to volatility regimes if needed
                 regime_map = {
                     'NEUTRAL': 'NORMAL',
                     'LONG_BIAS': 'NORMAL',
                     'SHORT_BIAS': 'NORMAL',
                     'RANGING': 'FLAT',
+                    'BULL': 'NORMAL',
+                    'BEAR': 'NORMAL',
                 }
-                vol_regime = regime_map.get(regime_str, 'NORMAL')
+                vol_regime = regime_map.get(regime_str, regime_str)
+                
+                # Only use valid volatility regimes
+                if vol_regime not in REGIMES:
+                    vol_regime = 'NORMAL'
                 
                 self._ensure_signal(sig)
                 if vol_regime not in self._data['signals'][sig]['regimes']:
