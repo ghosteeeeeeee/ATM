@@ -244,16 +244,16 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
+    'ASTER',
     'BABY',
     'BIGTIME',
     'DYDX',
-    'FIL',
-    'GMT',
+    'FOGO',
     'INJ',
-    'LDO',
+    'KAS',
+    'LTC',
     'ME',
     'NXPC',
-    'SAND',
     'STX',
     'SYRUP',
     'TURBO',
@@ -644,7 +644,7 @@ CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guar
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
 TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — FINALIZED 2026-08-16 eval: kept. PM_TRAIL handles most exits; this is fallback for non-PM_TRAIL trades.
-TRAILING_DISTANCE_PCT   = 0.0050  # 0.50% — CEO Aug 26: simulation shows 0.5% = +$2,383 vs +$2,313 at 1.0%. Tighter trail locks profits faster. Monitor: PM_TRAIL capture rate, WR.
+TRAILING_DISTANCE_PCT   = 0.0120  # 1.20% — CEO Aug 27: tighter trail caused too many premature exits. 1.2% gives trades room to breathe while still locking profits.
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -2001,7 +2001,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.5732 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.6 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
