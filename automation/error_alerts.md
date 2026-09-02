@@ -2028,3 +2028,8 @@ ALERTS:
 
 ## Error Alerts — 2026-09-02 17:05 UTC
 - **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-02 17:22 UTC
+- **WARN** (6x): `ERR decider_run: Traceback` in pipeline — non-fatal, pipeline continues
+- **WARN** (3x): `signal_compactor: timed out` — transient, service recovered and running normally
+- **NO AUTO-FIX NEEDED**: Both issues are transient/recurring non-fatal errors. Pipeline completed successfully.
