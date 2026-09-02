@@ -817,7 +817,7 @@ DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
 # Direction Lock: after severe loss (3+/5), lock direction for N minutes.
 # Prevents re-entry during clear bad streaks — no unsuppression during lock.
 DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
-DIRECTIONAL_OUTCOME_LOCK_MINUTES = 20         # lock duration after severe failure (lowered from 30 2026-09-02 — signals passing confluence but locked out)
+DIRECTIONAL_OUTCOME_LOCK_MINUTES = 10         # lock duration after severe failure (lowered from 20 2026-09-08 — too slow to recover after a win)
 DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.6       # loss_velocity threshold for lock activation (matches 0.6 tier)
 
 # ── Position Shield (Weather Vane Component 2) ─────────────────────────────
