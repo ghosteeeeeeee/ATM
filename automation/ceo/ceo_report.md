@@ -88,3 +88,36 @@ No parameter changes — both blockers are CEO_PROTECTED. FLAGGED for T:
 
 ### Expected Impact
 If T fixes both blockers: system goes from -$0.62/7d to approximately **+$1.72/7d** (+$2.34 improvement). That's the entire gap between losing and profitable.
+
+## CEO Report — 2026-09-02 ~22:35 UTC (325th run)
+
+### Diagnosis
+**24h: 62T, 45.2% WR, -$2.01.** ALL trades in NEUTRAL. LONG side bleeding, SHORT side mixed. V3_LONG was top loser (-$0.87/7d, 35.3% WR) but re-enabled at 20:25 with 48h lock — 0 new trades yet.
+
+**CRITICAL BUG: ENA SHORT infinite crash loop.** decider_run crashes every time it tries to execute ENA SHORT (accel-300-v3-short-). The signal rollback mechanism puts it back in hotset → next run crashes again → 671 log entries, all retries. This blocks OTHER signals from executing in that pipeline run.
+
+### Root Cause
+1. **LONG bleeding in NEUTRAL** — was the #1 problem. LONG_NEUTRAL_BLOCK deployed today at 14:40, working (logs show blocks). Effect will show in next 24h.
+2. **ENA SHORT crash** — code bug in decider_run.py at execution phase. Traceback truncated but consistently crashes on this specific token+signal combo. Non-fatal (pipeline continues) but wastes a full pipeline cycle retrying the same broken trade.
+3. **bb-bounce-v2-long+ TESTING** — 77 EXEC attempts, most blocked by CTX-GATE ("actively harmful"). 5 open positions. Sample too small to evaluate.
+
+### Fix Applied
+- **V3_LONG re-enabled** at 20:25 with 48h lock. Live tuning in progress. DO NOT DISABLE.
+- **LONG_NEUTRAL_BLOCK** confirmed working — blocking LONG entries in NEUTRAL regime.
+- **ENA SHORT crash** — FLAGGED FOR BUG_HUNTER. Needs code investigation. Infinite retry loop is the mechanism; the crash itself may be ENA-specific or signal-agnostic.
+
+### Verification
+- DB verified: 62T/24h -$2.01, 45.2% WR. All NEUTRAL.
+- SHORT backbone: accel-300-v2-short 72T/7d +$1.46 52.8% WR — still strong.
+- LONG_NEUTRAL_BLOCK: ✅ blocking (log confirmed).
+- V3_LONG: 0 trades since re-enable at 20:25.
+- ENA SHORT: 671 crash-retry loops in logs. Needs fix.
+- Open positions: 5 LONG (3 bb-bounce-v2-long, 2 slow-grind). All small.
+- Disk: 82%.
+
+### Next Actions
+1. **BUG_HUNTER: Fix ENA SHORT decider_run crash.** Infinite retry loop blocks other signals. Check decider_run.py line ~3273 (rollback logic) and the execution path for ENA.
+2. **Monitor LONG_NEUTRAL_BLOCK.** 24h evaluation window starts now.
+3. **Monitor V3_LONG.** 48h lock, re-enabled at 20:25. 0 trades so far.
+4. **Monitor bb-bounce-v2-long+.** TESTING mode, 5 open positions, CTX-GATE blocking most entries.
+5. **T: Review confluence-,ichimoku- SHORT.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED.

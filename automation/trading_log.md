@@ -20083,3 +20083,82 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 **Open Questions:**
 - accel-300-v3-long+ (17T, 35%WR) bleeding but spread across 24h — no single hour meets kill threshold
 - range-reversion-long+ (6T, 17%WR) same — already had filters added, improving
+
+## [2026-09-02 20:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.12 (0% WR)
+
+**Last hour:**
+- WLFI LONG r2-trend-long3: -$0.12 (atr_sl_hit)
+
+**24h:** 59T, 47.5% WR, -$1.56
+- atr_sl_hit: 42T avg -$0.051 | profit-monster-trail: 14T avg +$0.050
+- Long signals: accel-300-v3-long+ (-$0.87) and range-reversion-long+ (-$0.62) ALREADY KILLED (last trades ~15:19 and ~9:11 UTC)
+- Short signals: profitable (r2-trend-short4 +$0.19, bb-bounce-short +$0.06)
+- 4 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Previously bleeding long signals already killed
+- Trade freq 1/hr normal
+- 24h PnL -$1.56 within -$5/day limit
+- Short signals carrying the system
+
+**Open Questions:** None
+
+## [2026-09-02 21:15 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 orphan)
+**PnL:** +$0.11 (75% WR on real trades)
+
+**Last hour:**
+- AIXBT LONG bb-bounce-v2 combo: +$0.03 (profit-monster-trail) + $0.00 (ORPHAN_PAPER)
+- ASTER LONG bb-bounce-v2-long+: +$0.06 (profit-monster-trail)
+- MET LONG volume-breakout-long+: +$0.02 (profit-monster-trail)
+
+**24h:** 62T, 48.4% WR, -$1.58
+- atr_sl_hit: 41T avg -$0.050 | profit-monster-trail: 17T avg +$0.048 (net neutral)
+- accel-300-v3-long+: 17T 35%WR -$0.87 (CEO locked, live tuning — cannot disable)
+- Short signals: profitable (bb-bounce-short 83%WR +$0.010, r2-trend-short4 100%WR +$0.095)
+- Long signals: bb-bounce-long+ 100%WR, bb-bounce-v2-long+ 100%WR — combo entries working
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 4/hr normal
+- 24h PnL -$1.58 within -$5/day limit
+- Last hour was net positive (+$0.11)
+- accel-300-v3-long+ re-enabled at 20:25 — CEO lock, cannot touch for 48h
+
+**Open Questions:**
+- accel-300-v3-long+ performance to watch post-fix (staleness fix deployed)
+
+## [2026-09-02 22:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.07 (50% WR)
+
+**Last hour:**
+- POL LONG bb-bounce-v2-long+: +$0.06 (profit-monster-trail)
+- SEI LONG bb-bounce-v2-long+: -$0.13 (atr_sl_hit)
+
+**24h:** 61T, 45.9% WR, -$1.82
+- atr_sl_hit: 41T avg -$0.054 | profit-monster-trail: 16T avg +$0.051
+- accel-300-v3-long+: 17T 35%WR -$0.87 (CEO locked 48h)
+- Short signals: profitable (r2-trend-short4 100%WR, bb-bounce-short 83%WR)
+- Long signals: combo entries (bb-bounce-v2-long+) working, legacy longs already killed
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 2/hr normal
+- 24h PnL -$1.82 within -$5/day limit
+- atr_sl_hit structural — PM trail offsets net neutral
+- 4 open positions stable
+
+**Open Questions:** None

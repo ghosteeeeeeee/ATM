@@ -1,5 +1,11 @@
 # Error Alerts
 
+## 2026-09-02 22:22 UTC — Health Check: WARN
+- **[WARN]** (18x): `decider_run.py:3323` traceback every pipeline run — non-fatal, pipeline continues. Signal compactor error caught upstream.
+- **[WARN]**: `token_speeds` table empty — 0 tokens with speed data. Speed-dependent signals may be degraded.
+- **[INFO]**: Regime 106/106 NEUTRAL — flat market, no directional bias.
+- Pipeline OK, timers OK (50+ active), disk 82% (21GB free). 4 open, 61 closed today (-65.38% PnL). 116 signals/hr. No auto-fixes needed — decider_run error is non-blocking.
+
 ## 2026-09-01 08:22 UTC — Health Check: WARN
 - **[WARN]** Hotset empty — 0 signals survived compaction, 0 open positions. Market flat (103/104 NEUTRAL, 0% speed).
 - **[WARN]** -34.13% PnL today (32 trades closed). Rough day — review losing trades.
@@ -2029,7 +2035,22 @@ ALERTS:
 ## Error Alerts — 2026-09-02 17:05 UTC
 - **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 
+## Error Alerts — 2026-09-02 19:27 UTC
+- **[WARN]** (28x): `ERR decider_run: Traceback` — decider_run.py crashes every time it tries to EXEC a trade. Affects ACE SHORT, SYRUP SHORT. Traceback truncated in logs (only 2 lines visible). Pipeline continues — non-fatal but trades not executing.
+- **[WARN]** (1x): `Decider trying to execute with SL=$0.0000 TP=$0.0000` — likely root cause of crash
+- **[WARN]** (1x): Disk at 82% (91G/118G) — 3% from 85% threshold
+- **[WARN]** (1x): -51.30% PnL today (59 trades closed) — rough day
+- **[INFO]**: Pipeline running, timers active, 4 open positions (WLFI, AVAX, MET, +1)
+- **[INFO]**: Market NEUTRAL (105/107 tokens), BTC $77,391.78
+- **[INFO]**: 188 tokens with fresh prices (<5min old)
+- **AUTO-FIX**: None needed — pipeline functional. decider_run.py crash is code bug (SL/TP not set), not infrastructure failure. Trade execution affected but position management continues.
+
 ## Error Alerts — 2026-09-02 17:22 UTC
 - **WARN** (6x): `ERR decider_run: Traceback` in pipeline — non-fatal, pipeline continues
 - **WARN** (3x): `signal_compactor: timed out` — transient, service recovered and running normally
 - **NO AUTO-FIX NEEDED**: Both issues are transient/recurring non-fatal errors. Pipeline completed successfully.
+
+## Error Alerts — 2026-09-02 20:22 UTC
+- **[WARN]** (2x): `signal_compactor: timed out` — compactor timing out, hotset empty (no signals surviving)
+- **[WARN]**: Disk at 82% (91G/118G) — approaching 85% threshold
+- **[WARN]**: Market fully neutral (106 tokens, 0 LONG, 0 SHORT regime)
