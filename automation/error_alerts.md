@@ -1979,3 +1979,12 @@ ALERTS:
 - **[WARN]** (1x): `signal_compactor: timed out` at 05:07 UTC — self-recovered on next run
 - **[WARN]** (3x): `signals_runner [SLOW]` at 05:10, 05:15, 05:20 — signal generation slower than baseline
 - **INFO**: -28.92% PnL day (62 trades, 51.85% WR) — elevated loss, likely market chop
+
+## Error Alerts — 2026-09-02 06:22 UTC
+- **WARN** (4x): `[PHANTOM-WRITE] AVAX SHORT: BLOCKED tight SL` — phantom trade with <0.1% entry-SL distance
+- **WARN** (2x): `[ACCEL-V2-STALE] DOT SHORT blocked` — conditions invalid at execution time
+- **WARN**: Disk at 81% (91G/118G) — approaching 85% threshold
+- **INFO**: Regime all-neutral (105 tokens, 0 long/short bias) — unusual, no directional conviction
+
+## Error Alerts — 2026-09-02 07:05 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
