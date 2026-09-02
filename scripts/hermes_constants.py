@@ -2086,13 +2086,14 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
 # Family: Range (pairs with Momentum/Trend for 2-type confluence)
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
-RANGE_REVERSION_ENABLED = False          # CEO KILLED 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. Designed for NEUTRAL but failing there. NEVER_REENABLE.
-RANGE_REVERSION_PLUS_ENABLED = False      # DISABLED 2026-09-02 12:15 UTC — 0%WR last hour (0/3), all atr_sl_hit -$0.46. Averaging -$0.168/trade over 4 trades. Will re-evaluate after regime shift.
+RANGE_REVERSION_ENABLED = True            # Re-enabled 2026-09-02 — split into long/short, new filters applied
+RANGE_REVERSION_PLUS_ENABLED = True       # LONG enabled — new filters: bb_width_min=0.012, rsi_max=42, dist_lower>=0
 RANGE_REVERSION_MINUS_ENABLED = False    # SHORT DISABLED 2026-09-02 — backtest: 1/5 winners, bleeds in uptrend. Re-enable only in confirmed downtrend.
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed
+RANGE_REVERSION_BB_WIDTH_MIN = 0.012     # BB too tight = not enough room for reversion
 RANGE_REVERSION_BB_WIDTH_SQUEEZE = 0.025 # tight squeeze = higher confidence
 RANGE_REVERSION_TOUCH_ATR_MULT = 0.3    # price within 0.3*ATR of band = touch
-RANGE_REVERSION_RSI_OVERSOLD = 35        # LONG: RSI below this
+RANGE_REVERSION_RSI_OVERSOLD = 42        # LONG: RSI below this (was 35, raised to filter false oversold)
 RANGE_REVERSION_RSI_OVERBOUGHT = 65      # SHORT: RSI above this
 RANGE_REVERSION_COOLDOWN_MINUTES = 45    # per token cooldown
 RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise

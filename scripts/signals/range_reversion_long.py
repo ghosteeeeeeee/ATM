@@ -38,10 +38,11 @@ os.makedirs(os.path.dirname(_SIGNAL_LOG), exist_ok=True)
 RR_BB_PERIOD = 20
 RR_BB_STDDEV = 1.8
 RR_BB_WIDTH_MAX = 0.04       # narrow BB = range confirmed (4% width)
+RR_BB_WIDTH_MIN = 0.012      # BB too tight = not enough room for reversion
 RR_BB_WIDTH_SQUEEZE = 0.025  # tight squeeze = higher confidence
 RR_TOUCH_ATR_MULT = 0.3     # price within 0.3*ATR of band = "touch"
 RR_RSI_PERIOD = 14
-RR_RSI_OVERSOLD = 35         # LONG entry: RSI below this
+RR_RSI_OVERSOLD = 42         # LONG entry: RSI below this (was 35, raised to filter false oversold)
 RR_ATR_PERIOD = 14
 RR_MIN_BARS = 40
 RR_LOOKBACK_5M = 150
@@ -147,8 +148,10 @@ def detect_range_reversion_long(token: str, candles: list) -> Optional[dict]:
     lower = middle - RR_BB_STDDEV * std
     bb_width = (upper - lower) / middle if middle > 0 else 0
 
-    # Range filter: BB must be narrow
+    # Range filter: BB must be narrow (but not too tight — need room for reversion)
     if bb_width > RR_BB_WIDTH_MAX:
+        return None
+    if bb_width < RR_BB_WIDTH_MIN:
         return None
 
     # ATR filter: need some volatility to trade
@@ -173,6 +176,8 @@ def detect_range_reversion_long(token: str, candles: list) -> Optional[dict]:
     # LONG: price near lower band + oversold RSI + bounce starting
     if dist_lower > RR_TOUCH_ATR_MULT:
         return None
+    if dist_lower < 0:
+        return None  # price below lower band = falling knife, don't buy
     if rsi_val >= RR_RSI_OVERSOLD:
         return None
     if current <= prev:
@@ -184,8 +189,6 @@ def detect_range_reversion_long(token: str, candles: list) -> Optional[dict]:
         confidence += 10  # tight squeeze = high conviction
     if rsi_val < 25:
         confidence += 5   # deeply oversold
-    if dist_lower < 0:
-        confidence += 5   # price was below lower band (extreme)
     # Bounce strength
     bounce_pct = (current - prev) / prev * 100 if prev > 0 else 0
     if bounce_pct > 0.05:
