@@ -1493,6 +1493,32 @@ ACCEL_300_V3_LONG_CONF_FRESH_BONUS = 8  # confidence bonus for fresh cross
 ACCEL_300_V3_LONG_CONF_RSI_MIN = 45     # RSI sweet spot lower bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_BONUS = 5    # confidence bonus for RSI in sweet spot
+
+# ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
+ACCEL_300_V3_SHORT_ENABLED     = True    # NEW 2026-09-02 — anti-bottom-catch SHORT
+ACCEL_300_V3_SHORT_MIN_GAP     = 1.0     # min gap below EMA300
+ACCEL_300_V3_SHORT_MAX_GAP     = 6.0     # max gap
+ACCEL_300_V3_SHORT_MIN_GAP_ACCEL = 0.20  # min gap acceleration
+ACCEL_300_V3_SHORT_GAP_ACCEL_WINDOW = 10 # bars for gap acceleration
+ACCEL_300_V3_SHORT_VELOCITY_WINDOW = 5   # bars for price velocity
+ACCEL_300_V3_SHORT_MIN_VELOCITY = 0.0005 # min velocity as fraction of price (0.05%)
+ACCEL_300_V3_SHORT_PERSISTENCE_BARS = 3  # min bars below EMA
+ACCEL_300_V3_SHORT_SLOPE_WINDOW = 20     # bars for slope
+ACCEL_300_V3_SHORT_MIN_SLOPE_PCT = 0.0005 # min slope magnitude
+ACCEL_300_V3_SHORT_RSI_MAX     = 70      # max RSI — don't enter when oversold bounce risk
+ACCEL_300_V3_SHORT_RSI_MIN     = 30      # min RSI — ensure some selling pressure
+ACCEL_300_V3_SHORT_CHASE_DROP_MAX = 2.0  # max 30m drop % — don't chase extended moves
+ACCEL_300_V3_SHORT_CHASE_RSI_MIN = 30    # RSI must be above this when 30m drop exceeds CHASE_DROP_MAX
+ACCEL_300_V3_SHORT_VOLUME_LOOKBACK = 30  # bars for average volume
+ACCEL_300_V3_SHORT_VOLUME_MULT = 1.1     # volume must be >= 1.1x average
+ACCEL_300_V3_SHORT_COOLDOWN_BARS = 15    # cooldown between signals
+ACCEL_300_V3_SHORT_LOOKBACK_1M = 700     # 1m prices to fetch
+ACCEL_300_V3_SHORT_FRESH_CROSS_BARS = 8  # max bars since cross
+ACCEL_300_V3_SHORT_FRESH_CROSS_MIN_GAP = 0.20 # min gap for fresh cross
+ACCEL_300_V3_SHORT_CONF_BASE   = 62      # base confidence
+ACCEL_300_V3_SHORT_CONF_FLOOR  = 60      # min confidence
+ACCEL_300_V3_SHORT_CONF_CAP    = 88      # max confidence
+
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
 INVERSE_ACCEL_300_V2_MIN_GAP_PCT = 3.5    # min gap above EMA300 to fire SHORT (backtested optimal)

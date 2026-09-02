@@ -1,22 +1,22 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-02 ~01:40 UTC (CEO — verified)**
+**Last Updated: 2026-09-02 ~06:00 UTC (CEO — verified)**
 **Updated by: CEO**
 
 ## Current Status
 
-System PROFITABLE without legacy. 2 open SHORT. Market SHORT_BIAS. Pipeline stable.
+System PROFITABLE without legacy. 5 open SHORT (all slightly profitable). Market SHORT_BIAS. Pipeline stable. **accel-300-v2-long STILL TRADING despite kill — CODE BUG.**
 
-- **24h:** 62T, 48.4% WR, -$1.00 (verified from DB)
-- **7d:** 406T, 50.7% WR, -$0.61
-- **7d WITHOUT LEGACY/KILLED:** 333T, 54.7% WR, +$1.72 (system is profitable)
-- **Today Sep 2:** 10T, 40% WR, -$0.05 (early, 2 open SHORT)
+- **24h:** 60T, 46.7% WR, -$1.08 (verified from DB)
+- **48h:** 114T, 46.5% WR, -$1.49
+- **7d:** 405T, 50.6% WR, -$0.62
+- **7d WITHOUT LEGACY/KILLED:** ~+$1.72 (system is profitable)
+- **Today Sep 2:** 10T, 40% WR, -$0.05 (early, 5 open SHORT)
 - **Disk:** 81% (approaching 85% trigger)
-- **Open positions:** 2 SHORT (r2-trend-short3, r2-trend-short4)
-- **Market:** SHORT_BIAS dominant (59/107 tokens), NEUTRAL 32, LONG_BIAS 16
-- **BB_BOUNCE_LONG_ENABLED STILL TRUE.** T re-enabled for "TESTING" despite NEVER_REENABLE. CEO_PROTECTED. 24T/24h 56.5% WR -$0.28. FLAGGED FOR T REVIEW — disable it.
-- **confluence-,ichimoku- SHORT:** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED. FLAGGED FOR T REVIEW.
-- **accel-300-v2-long:** DEAD. Zero trades post-kill. Confirmed working.
+- **Open positions:** 5 SHORT (POL +0.06, YGG +0.13, NEAR +0.04, ENS +0.02, PUMP +0.05)
+- **Market:** SHORT_BIAS dominant
+- **BB_BOUNCE_LONG_ENABLED STILL TRUE.** T re-enabled for "TESTING" despite NEVER_REENABLE. CEO_PROTECTED. 23T/24h 56.5% WR -$0.28. FLAGGED FOR T REVIEW — disable it.
+- **accel-300-v2-long: STILL TRADING despite kill.** Constant is False but 11T/24h -0.52, 27.3% WR. CODE BUG — pipeline caching or signals_runner bypass. CRITICAL: biggest single loss source.
 - **Legacy (bb_bounce+, pump-catcher+, slow-grind-):** All dead. Zero new trades in 7d. Losses aging out.
 - **CONF_FILTER_MIN=75 ACTIVE but NOT WORKING for standalone signals.** Needs code fix.
 - **range_reversion LIVE:** Monitoring 48h window (ends Sep 3).
@@ -29,7 +29,8 @@ System PROFITABLE without legacy. 2 open SHORT. Market SHORT_BIAS. Pipeline stab
 
 ## Today's Changes (Sep 2)
 
-0. **CEO 01:40 — VERIFIED + FLAGGED.** DB: 24h 62T 48.4% WR -$1.00. 7d: 406T 50.7% WR -$0.61. WITHOUT LEGACY: +$1.72/7d 54.7% WR. accel-300-v2-long confirmed dead (zero trades post-kill). Legacy all dead (zero new 7d). FLAGGED bb-bounce-long+ ($0.28/24h bleeding, CEO_PROTECTED) and confluence-,ichimoku- SHORT (-$0.46/7d, CEO_PROTECTED) for T review. Market SHORT_BIAS. 2 open SHORT.
+0. **CEO 06:00 — VERIFIED + CRITICAL FLAG.** DB: 24h 60T 46.7% WR -$1.08. 7d: 405T 50.6% WR -$0.62. 48h: 114T 46.5% WR -$1.49. **CRITICAL DISCOVERY: accel-300-v2-long STILL TRADING despite constant=False.** 11T/24h -$0.52, 27.3% WR. Previous CEO run at 01:40 reported "DEAD (zero trades post-kill)" — WRONG. This is the #1 bleeding source. Needs CODE investigation — check signals_runner.py for cached imports or bypass paths. BB_BOUNCE_LONG_ENABLED still True, 23T/24h -$0.28 bleeding. 5 open SHORT (all slightly profitable). System profitable without these 2 blockers (+$1.72/7d).
+1. **CEO 01:40 — VERIFIED + FLAGGED.** DB: 24h 62T 48.4% WR -$1.00. 7d: 406T 50.7% WR -$0.61. WITHOUT LEGACY: +$1.72/7d 54.7% WR. FLAGGED bb-bounce-long+ and confluence-,ichimoku- for T review.
 
 ## Today's Changes (Sep 1)
 
@@ -76,8 +77,8 @@ System PROFITABLE without legacy. 2 open SHORT. Market SHORT_BIAS. Pipeline stab
 
 ## Active Decisions
 
-- **BB_BOUNCE_LONG_ENABLED STILL TRUE — FLAGGED FOR T.** CEO_PROTECTED + NEVER_REENABLE conflict. 21T/24h 52.4% WR -$0.34. Previous kill at 17:07 never applied. — 2026-09-01
-- **ACCEL_300_V2_LONG KILLED PERMANENTLY.** Constant False, pipeline restarted. 1 trade at 20:26 was cached import. — 2026-09-01
+- **ACCEL_300_V2_LONG STILL TRADING DESPITE KILL — CODE BUG.** Constant is False but 11T/24h -$0.52, 27.3% WR. Pipeline caching or signals_runner bypass. CRITICAL — biggest single loss source. — 2026-09-02
+- **BB_BOUNCE_LONG_ENABLED STILL TRUE — FLAGGED FOR T.** CEO_PROTECTED + NEVER_REENABLE conflict. 23T/24h 56.5% WR -$0.28. Previous kill at 17:07 never applied. — 2026-09-01
 - **CONF_FILTER_MIN=75 NOT WORKING for standalone signals.** 15 trades below 75 conf executed after filter was implemented. Needs code fix in signals_runner or standalone bypass path. — 2026-09-01
 - **range_reversion LIVE.** 288 shadow signals/24h across 20 tokens. SHADOW_MODE=False. Monitor 48h live performance. — 2026-09-01
 - **volume_breakout ACTIVE.** 3T/48h — 2 in confluence (100% WR), 1 standalone loss. Tiny sample, need 20+ signals. — 2026-08-31
@@ -99,11 +100,12 @@ System PROFITABLE without legacy. 2 open SHORT. Market SHORT_BIAS. Pipeline stab
 
 ## Next Actions
 
-1. **T: Disable BB_BOUNCE_LONG_ENABLED.** CEO_PROTECTED + NEVER_REENABLE conflict. 24T/24h 56.5% WR -$0.28 bleeding. Set False. — 2026-09-02
-2. **T: Review confluence-,ichimoku- SHORT.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED. Disable or add regime filter. — 2026-09-02
-3. **Fix CONF_FILTER for standalone signals.** 15 trades below 75 conf executed after filter. Need code fix in signals_runner. — 2026-09-02
-4. **Fix coin_tracker timer.** Last update Aug 15 (18 days stale). No timer running. — 2026-09-02
-5. **Monitor range_reversion LIVE 48h.** Ends Sep 3. Watch win rate and PnL. — 2026-09-03
+1. **CODE FIX: accel-300-v2-long still trades despite constant=False.** 11T/24h -$0.52, 27.3% WR. Check signals_runner.py for cached imports, signal_compactor.py for bypass paths. Pipeline may cache the module. — 2026-09-02
+2. **T: Disable BB_BOUNCE_LONG_ENABLED.** CEO_PROTECTED + NEVER_REENABLE conflict. 23T/24h 56.5% WR -$0.28 bleeding. Set False. — 2026-09-02
+3. **T: Review confluence-,ichimoku- SHORT.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED. Disable or add regime filter. — 2026-09-02
+4. **Fix CONF_FILTER for standalone signals.** 15 trades below 75 conf executed after filter. Need code fix in signals_runner. — 2026-09-02
+5. **Fix coin_tracker timer.** Last update Aug 15 (18 days stale). No timer running. — 2026-09-02
+6. **Monitor range_reversion LIVE 48h.** Ends Sep 3. Watch win rate and PnL. — 2026-09-03
 6. **Monitor volume_breakout.** Tiny sample, need 20+ signals. — 2026-09-03
 7. **Signal_analyst: build NEUTRAL regime signal.** 3rd backbone candidate. DELEGATED. — 2026-09-01
 8. **Monitor disk.** Currently 81%. Below 85% trigger. — 2026-09-02

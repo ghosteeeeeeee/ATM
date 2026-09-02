@@ -124,6 +124,11 @@ except Exception:
     _accel_300_v3_long_run = None
 
 try:
+    from signals.accel_300_v3_short import scan_accel_300_v3_short_signals as _accel_300_v3_short_run
+except Exception:
+    _accel_300_v3_short_run = None
+
+try:
     from signals.inverse_accel_300_v2 import scan_inverse_accel_300_v2_signals as _inverse_accel_300_v2_run
 except Exception:
     _inverse_accel_300_v2_run = None
@@ -168,6 +173,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},
     {'name': 'accel_300_v2_long_5m',     'enabled': ACCEL_300_V2_LONG_5M_ENABLED,   'run': _accel_300_v2_long_5m_run},
     {'name': 'accel_300_v3_long',        'enabled': ACCEL_300_V3_LONG_ENABLED,      'run': _accel_300_v3_long_run},
+    {'name': 'accel_300_v3_short',       'enabled': ACCEL_300_V3_SHORT_ENABLED,     'run': _accel_300_v3_short_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
     {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
     {'name': 'volume_breakout',           'enabled': 'VOLUME_BREAKOUT_ENABLED',     'run': _volume_breakout_run},

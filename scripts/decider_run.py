@@ -1458,8 +1458,8 @@ def context_gate(token, direction, source, sig):
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
         return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)
     if verdict == 'NAY':
-        log(f'  [CTX-GATE] {token}: LLM NAY → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
-        return ('WARN', f'LLM rejected: {reason or "setup is actively harmful"}', LLM_CONFIDENCE_PENALTY)
+        log(f'  [CTX-GATE] {token}: LLM NAY → BLOCKED: {reason or "setup is actively harmful"}')
+        return ('SKIP', f'LLM rejected: {reason or "setup is actively harmful"}', 0)
     # FLIP disabled 2026-08-01 — LLM FLIP was inverting 31% of trades to wrong direction
     if verdict == 'FLIP':
         log(f'  [CTX-GATE] {token}: LLM FLIP ignored (disabled) → treating as WARN')
@@ -3003,14 +3003,15 @@ def run(dry_run=False):
                     skipped += 1
                     continue
 
-        # ── Accel-300-v2 Staleness Re-check ──────────────────────────────────────
+        # ── Accel-300-v2/v3 Staleness Re-check ──────────────────────────────────
         # Re-run detection with fresh prices. If conditions no longer
         # valid, block the trade. Prevents executing stale signals where
         # gap_acceleration, price_velocity, etc. have reversed.
         _is_accel_v2 = 'accel-300-v2-short' in (source or '') and 'inv-' not in (source or '')
         _is_accel_v2_long = 'accel-300-v2-long' in (source or '') and '5m' not in (source or '')
         _is_accel_v2_long_5m = 'accel-300-v2-long-5m' in (source or '')
-        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m:
+        _is_accel_v3_short = 'accel-300-v3-short' in (source or '')
+        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short:
             try:
                 if _is_accel_v2_long_5m:
                     from signals.accel_300_v2_long_5m import detect_accel_300_v2_long_5m, _get_5m_candles
