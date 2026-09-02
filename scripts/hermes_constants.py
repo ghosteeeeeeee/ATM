@@ -1505,7 +1505,7 @@ ACCEL_300_V3_SHORT_PERSISTENCE_BARS = 3  # min bars below EMA
 ACCEL_300_V3_SHORT_SLOPE_WINDOW = 20     # bars for slope
 ACCEL_300_V3_SHORT_MIN_SLOPE_PCT = 0.0005 # min slope magnitude
 ACCEL_300_V3_SHORT_RSI_MAX     = 70      # max RSI — don't enter when oversold bounce risk
-ACCEL_300_V3_SHORT_RSI_MIN     = 30      # min RSI — ensure some selling pressure
+ACCEL_300_V3_SHORT_RSI_MIN     = 25      # min RSI — below this = oversold, bounce likely (catches JUP 22, ENS 17, NEAR 20)
 ACCEL_300_V3_SHORT_CHASE_DROP_MAX = 2.0  # max 30m drop % — don't chase extended moves
 ACCEL_300_V3_SHORT_CHASE_RSI_MIN = 30    # RSI must be above this when 30m drop exceeds CHASE_DROP_MAX
 ACCEL_300_V3_SHORT_VOLUME_LOOKBACK = 30  # bars for average volume

@@ -51,31 +51,31 @@ _RUNTIME_DB = RUNTIME_DB
 _PRICE_DB = STATIC_DB
 _CANDLES_DB = CANDLES_DB
 
-# ── V3 SHORT constants ───────────────────────────────────────────────────────
-# From hermes_constants.py (will be added there)
-# For now, define locally — will migrate to hermes_constants.py after testing
-V3_SHORT_MIN_GAP = 1.0            # min gap below EMA300
-V3_SHORT_MAX_GAP = 6.0            # max gap (same as v2)
-V3_SHORT_MIN_GAP_ACCEL = 0.20     # min gap acceleration (same as v2)
-V3_SHORT_GAP_ACCEL_WINDOW = 10    # bars for gap acceleration
-V3_SHORT_VELOCITY_WINDOW = 5      # bars for price velocity
-V3_SHORT_MIN_VELOCITY = 0.0005    # min velocity as fraction of price (0.05% — stricter than v2's 0.03%)
-V3_SHORT_PERSISTENCE_BARS = 3     # min bars below EMA
-V3_SHORT_SLOPE_WINDOW = 20        # bars for slope
-V3_SHORT_MIN_SLOPE_PCT = 0.0005   # min slope magnitude
-V3_SHORT_RSI_MAX = 70             # max RSI — don't enter when oversold bounce risk
-V3_SHORT_RSI_MIN = 25             # min RSI — below this = oversold, bounce likely (catches JUP 22, ENS 17, NEAR 20)
-V3_SHORT_CHASE_DROP_MAX = 2.0     # max 30m drop % — don't chase extended moves
-V3_SHORT_CHASE_RSI_MIN = 30       # RSI must be above this when 30m drop exceeds CHASE_DROP_MAX
-V3_SHORT_VOLUME_LOOKBACK = 30     # bars for average volume
-V3_SHORT_VOLUME_MULT = 1.1        # volume must be >= 1.1x average
-V3_SHORT_COOLDOWN_BARS = 15       # cooldown between signals
-V3_SHORT_LOOKBACK_1M = 700        # 1m prices to fetch
-V3_SHORT_FRESH_CROSS_BARS = 8     # max bars since cross
-V3_SHORT_FRESH_CROSS_MIN_GAP = 0.20  # min gap for fresh cross
-V3_SHORT_CONF_BASE = 62           # base confidence
-V3_SHORT_CONF_FLOOR = 60          # min confidence
-V3_SHORT_CONF_CAP = 88            # max confidence
+# ── V3 SHORT constants (from hermes_constants.py) ────────────────────────────
+from hermes_constants import (
+    ACCEL_300_V3_SHORT_MIN_GAP,
+    ACCEL_300_V3_SHORT_MAX_GAP,
+    ACCEL_300_V3_SHORT_MIN_GAP_ACCEL,
+    ACCEL_300_V3_SHORT_GAP_ACCEL_WINDOW,
+    ACCEL_300_V3_SHORT_VELOCITY_WINDOW,
+    ACCEL_300_V3_SHORT_MIN_VELOCITY,
+    ACCEL_300_V3_SHORT_PERSISTENCE_BARS,
+    ACCEL_300_V3_SHORT_SLOPE_WINDOW,
+    ACCEL_300_V3_SHORT_MIN_SLOPE_PCT,
+    ACCEL_300_V3_SHORT_RSI_MAX,
+    ACCEL_300_V3_SHORT_RSI_MIN,
+    ACCEL_300_V3_SHORT_CHASE_DROP_MAX,
+    ACCEL_300_V3_SHORT_CHASE_RSI_MIN,
+    ACCEL_300_V3_SHORT_VOLUME_LOOKBACK,
+    ACCEL_300_V3_SHORT_VOLUME_MULT,
+    ACCEL_300_V3_SHORT_COOLDOWN_BARS,
+    ACCEL_300_V3_SHORT_LOOKBACK_1M,
+    ACCEL_300_V3_SHORT_FRESH_CROSS_BARS,
+    ACCEL_300_V3_SHORT_FRESH_CROSS_MIN_GAP,
+    ACCEL_300_V3_SHORT_CONF_BASE,
+    ACCEL_300_V3_SHORT_CONF_FLOOR,
+    ACCEL_300_V3_SHORT_CONF_CAP,
+)
 
 PERIOD = 300  # EMA300 period
 DRY_RUN = '--dry' in sys.argv
