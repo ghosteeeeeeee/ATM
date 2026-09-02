@@ -1,45 +1,37 @@
 # Signal Performance Report
-**Generated:** 2026-09-02 05:08 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-09-02 11:03 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (24h):** 61 | **Open:** 3
-- **Last 6h:** 27 trades
-- **Close reasons (24h):** ATR SL: 44T (25% WR, -$2.18) | Profit Trail: 17T (100% WR, +$1.01)
+- **Total trades (all time):** 1,860 | **WR:** 49.9% | **PnL:** -93.33%
+- **Date range:** 2026-07-29 → 2026-09-02
 
 ---
 
-## KILLED (executed this cycle)
+## WINNERS (WR > 55%, PnL > 0)
 
-None. No signals meet all 3 kill criteria simultaneously:
-- `accel-300-v2-short-` — 28.6% WR, $-0.06 PnL, 7T. WR<30% ✓, 5+T ✓, but PnL > -$0.10 ✗. Already in NEVER_REENABLE.
-- `accel-300-v2-long` — 25.0% WR, $-0.10 PnL, 4T. Only 4 trades (needs 5+). Already killed by auto_1hr.
+None found.
 
 ---
 
-## BOOSTED
+## LOSERS (WR < 30%, PnL < -2%)
 
-None. No signals meet all boost criteria (WR>55%, PnL>0, 5+T).
-
----
-
-## LOSERS (watch list — not meeting kill criteria but underperforming)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | 6h T | 6h WR | 6h PnL | Status |
-|--------|-----|-------|--------|---------|------|-------|--------|--------|
-| accel-300-v3-long+ | LONG | 13 | 38.5% | $-0.59 | 13 | 38.5% | $-0.59 | ⚠️ TUNE |
-| bb-bounce-long+ | LONG | 17 | 52.9% | $-0.33 | — | — | — | ⚠️ R:R BAD |
-| accel-300-v2-short- | SHORT | 7 | 28.6% | $-0.06 | 7 | 28.6% | $-0.06 | DEAD (NEVER_REENABLE) |
-| accel-300-v2-long | LONG | 4 | 25.0% | $-0.10 | — | — | — | DEAD (auto_1hr killed) |
-| bb-bounce-short | SHORT | 3 | 66.7% | $-0.03 | — | — | — | Needs data |
-| r2-trend-long3 | LONG | 4 | 50.0% | $-0.02 | 2 | 50.0% | $0.04 | Needs data |
+None found.
 
 ---
 
-## WINNERS
+## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| profit-monster-trail | — | 17 | 100% | +$1.01 | Exit strategy working |
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| accel-300-v3-long+ | LONG | 16 | 37.5% | -4.43 | ❓ | Borderline |
+| r2-trend-long3 | LONG | 6 | 33.3% | -2.03 | ❓ | Borderline |
+| accel-300-v2-short- | SHORT | 7 | 42.9% | -0.58 | ❓ | Borderline |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
 
 ---
 
@@ -49,24 +41,11 @@ None. No signals meet all boost criteria (WR>55%, PnL>0, 5+T).
 
 ---
 
-## KEY FINDINGS
-
-1. **Stop losses dominate losses** — 44/61 trades (72%) hit ATR SL with 25% WR, contributing -$2.18. Only 17 trades hit profit trail (100% WR, +$1.01). The system is bleeding on stops.
-
-2. **accel-300-v3-long+ is the biggest loser** — 13T, 38.5% WR, -$0.59. All recent losses are ATR SL hits. Needs tighter entry filters or wider stops.
-
-3. **bb-bounce-long+ has broken R:R** — 52.9% WR but -$0.33 PnL. Wins avg ~$0.06, losses avg ~$0.10. R:R ~0.6:1. Needs wider TP or tighter SL.
-
-4. **No kills executed this cycle** — existing NEVER_REENABLE flags already cover dead signals. No new kills warranted by criteria.
-
----
-
 ## RECOMMENDATIONS
 
-1. **[TUNE] accel-300-v3-long+** — Raise MIN_PULLBACK or MIN_SLOPE_PCT to filter weak entries. Consider widening ATR SL multiplier.
-2. **[TUNE] bb-bounce-long+** — Raise profit target or widen SL. R:R must exceed 1:1 to be viable.
-3. **[MONITOR] bb-bounce-short** — Only 3T, too early. Keep enabled, check next cycle.
-4. **[MONITOR] r2-trend-long3** — Only 4T. Keep enabled, check next cycle.
+1. **[WATCH] accel-300-v3-long+ LONG** — WR=37.5%, PnL=-4.43% over 16 trades. Monitor next cycle.
+2. **[WATCH] r2-trend-long3 LONG** — WR=33.3%, PnL=-2.03% over 6 trades. Monitor next cycle.
+3. **[WATCH] accel-300-v2-short- SHORT** — WR=42.9%, PnL=-0.58% over 7 trades. Monitor next cycle.
 
 ---
 
@@ -78,15 +57,15 @@ None. No signals meet all boost criteria (WR>55%, PnL>0, 5+T).
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-09-02 | 550928b | signals: v3 add MIN_PEAK_DISTANCE filter — block local top e... |
-| 2026-09-02 | 746cea8 | signals: v3 fix confidence saturation + lower RSI_MAX to 68 |
-| 2026-09-02 | 6127479 | signals: fix v3 short constants — import from hermes_constan... |
-| 2026-09-02 | 383057f | signals: disable v2 short, add v3 short to bypass lists |
-| 2026-09-02 | 4316a8a | fix: candles_5m stale timer + context gate NAY override |
-| 2026-09-02 | 2bd681c | signals: add range_reversion to STANDALONE_BYPASS_SIGNALS |
-| 2026-09-02 | 20e77fd | fix: stronger loser filtering |
-| 2026-09-02 | 9e3b310 | signals: v3 filter tuning — block overbought chasing entries |
-| 2026-09-01 | ac5d65e | signals: accel_300_v3_long — fix own-conclusions audit findi... |
-| 2026-09-01 | bac2590 | fix: remove ACE from SHORT_BLACKLIST |
+| 2026-09-02 | 508d285 | CEO: Kill accel-300-v3-long (re-killed, added NEVER_REENABLE... |
+| 2026-09-02 | f7a5cbb | chore: post-change verification complete, all checks pass |
+| 2026-09-02 | 7f7e23e | fix: RR engine bug hunt fixes — 5 bugs resolved |
+| 2026-09-02 | ce3cccb | signals: add bb_bounce_v2_long (calibrated from SHORT winner... |
+| 2026-09-02 | b5c4e78 | feat: Risk-Reward Engine v2 — structural R:R gate + confiden... |
+| 2026-09-02 | ff0ef9b | signals: v3 re-enabled with tighter filters + research notes |
+| 2026-09-02 | 9df16a6 | hermes_constants: add range-reversion-long to PROFIT_MONSTER... |
+| 2026-09-02 | 1218897 | config: trailing distance 0.5% → 1.2% |
+| 2026-09-02 | 3304960 | CEO: Kill ACCEL_300_V3_LONG (-$0.51/24h, 42.9% WR, #1 loss s... |
+| 2026-09-02 | 2162bd1 | signals: split range_reversion into long/short files |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

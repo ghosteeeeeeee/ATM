@@ -1208,6 +1208,8 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_LONG_ENABLED',     # AUTO_1HR 2026-09-01 — 16T/24h 31.3% WR -$0.55. ALL ATR_SL. NEVER_REENABLE.
     'BB_BOUNCE_LONG_ENABLED',        # AUTO_1HR 2026-09-01 — 5T/0%WR/-$0.47 last hour, 26T/24h -$0.10. NEVER_REENABLE.
     'ACCEL_300_V3_LONG_ENABLED',     # CEO 2026-09-02 — 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. Tighter filters didn't fix. NEVER_REENABLE.
+    'ACCEL_300_V2_ENABLED',         # CEO 2026-09-02 — replaced by v3. 7T/24h 28.6% WR -$0.06. NEVER_REENABLE.
+    'ACCEL_300_V2_MINUS_ENABLED',   # CEO 2026-09-02 — replaced by v3. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -2082,7 +2084,7 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # Family: Range (pairs with Momentum/Trend for 2-type confluence)
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
 RANGE_REVERSION_ENABLED = True           # CEO 2026-09-01 — was False (shadow bug: signal never ran). Now enabled with SHADOW_MODE guard in signal.
-RANGE_REVERSION_PLUS_ENABLED = True      # LONG (buy at range bottom)
+RANGE_REVERSION_PLUS_ENABLED = False      # DISABLED 2026-09-02 12:15 UTC — 0%WR last hour (0/3), all atr_sl_hit -$0.46. Averaging -$0.168/trade over 4 trades. Will re-evaluate after regime shift.
 RANGE_REVERSION_MINUS_ENABLED = False    # SHORT DISABLED 2026-09-02 — backtest: 1/5 winners, bleeds in uptrend. Re-enable only in confirmed downtrend.
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed
 RANGE_REVERSION_BB_WIDTH_SQUEEZE = 0.025 # tight squeeze = higher confidence

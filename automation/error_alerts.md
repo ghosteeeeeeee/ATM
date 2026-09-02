@@ -2004,3 +2004,11 @@ ALERTS:
 - **REPEATED** (47x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-02 10:22 UTC
+- **WARN** (1x): `signal_compactor timed out` at 10:19:02 — self-recovered by next run
+- **WARN**: Today PnL -36.47% (59 closed trades, market overwhelmingly neutral/short-bias)
+- **INFO**: 1 phantom trade (STX SHORT +0.004%/$0.0007) — negligible
+
+## Error Alerts — 2026-09-02 11:05 UTC
+- **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`

@@ -1,35 +1,38 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-02 ~09:00 UTC (CEO)**
+**Last Updated: 2026-09-02 ~10:30 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-LONG side bleeding. SHORT profitable. V3_LONG RE-KILLED (was re-enabled after first kill). Coin tracker fixed.
+LONG side bleeding. SHORT profitable. V2_SHORT killed (was trading despite flag=False). V3_LONG dead.
 
-- **24h:** 60T, 48.3% WR, -$1.15 (verified from DB)
-- **48h:** 129T, 48.1% WR, -$1.95
-- **7d:** 418T, 50.5% WR, -$1.41
+- **24h:** 59T, 47.5% WR, -$1.18 (verified from DB)
+- **48h:** 128T, 47.7% WR, -$1.97
+- **7d:** 417T, 50.6% WR, -$1.12
 - **7d SHORT:** profitable (+$0.36/24h)
-- **7d LONG:** bleeding (-$1.51/24h)
-- **Today Sep 2:** 60T, 48.3% WR, -$1.15
+- **7d LONG:** bleeding (-$1.18/24h)
+- **Today Sep 2:** 37T, 48.6% WR, -$0.74
 - **Disk:** 82% (approaching 85% trigger)
-- **Open positions:** 5 (all range-reversion-long+ LONG: GRASS, SOL, NEO, ALT, DOGE)
-- **Market:** NEUTRAL
-- **ACCEL_300_V3_LONG KILLED (AGAIN).** Was re-enabled with tighter filters post-first kill. Still bleeding: 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. Added to NEVER_REENABLE_FLAGS.
-- **BB_BOUNCE_LONG KILLED.** Orchestrator 06:38. 17T/24h 52.9% WR -$0.36. Removed from CEO_PROTECTED, kept in NEVER_REENABLE.
-- **BB_BOUNCE_V2_LONG:** NameError auto-fixed at 08:25. Now live in TESTING mode.
+- **Open positions:** 5 (all range-reversion-long+ LONG: GRASS, SOL, NEO, ALT, DOGE — all breakeven)
+- **Market:** NEUTRAL (all 59 24h trades in NEUTRAL)
+- **ACCEL_300_V2_SHORT KILLED.** Was trading despite ACCEL_300_V2_ENABLED=False (flag set True until commit 383057fb at 02:59 UTC). 7T/24h 28.6% WR -$0.06. Added to NEVER_REENABLE_FLAGS.
+- **ACCEL_300_V3_LONG KILLED (permanently).** 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. In NEVER_REENABLE_FLAGS.
+- **BB_BOUNCE_LONG KILLED.** Orchestrator 06:38. In NEVER_REENABLE_FLAGS.
+- **BB_BOUNCE_V2_LONG:** Live in TESTING mode.
 - **Coin tracker:** FIXED. Timer enabled, running every 30min. 96 coins processed.
-- **CONF_FILTER_MIN=70.** Lowered from 75 — <75 tier had misclassified SL exits (now fixed).
+- **CONF_FILTER_MIN=70.** Lowered from 75.
 - **range_reversion LIVE:** 5 open positions. Monitoring 48h window (ends Sep 3).
 - **volume_breakout:** Tiny sample (4T/7d), mixed results. Need more data.
 - **Core backbone:** accel-300-v2- SHORT 72T/7d +$1.46 52.8% WR. profit-monster-trail 17T/24h 100% WR +$1.01.
+- **SHORT signals winning:** bb-bounce-short +$0.14/24h 100% WR, r2-trend-short +$0.25/24h 100% WR.
 
 **SHORT side profitable. LONG side bleeding. System needs SHORT-heavy allocation or LONG signal reduction.**
 
 ## Today's Changes (Sep 2)
 
-0. **CEO 09:00 — VERIFIED + ACTION.** DB: 24h 60T 48.3% WR -$1.15. 48h: 129T 48.1% WR -$1.95. 7d: 418T 50.5% WR -$1.41. **ROOT CAUSE: accel-300-v3-long+ RE-ENABLED after first kill** — was set True with tighter filters (MIN_GAP=2.0), still bleeding 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. **KILLED AGAIN + added to NEVER_REENABLE_FLAGS.** BB_BOUNCE_V2_LONG NameError auto-fixed at 08:25, now live TESTING. 5 open range-reversion-long+ positions (GRASS, SOL, NEO, ALT, DOGE). SHORT +$0.36/24h, LONG -$1.51/24h. confluence-,ichimoku- SHORT still CEO_PROTECTED bleeding -$0.46/7d — FLAGGED FOR T.
+0. **CEO 10:30 — VERIFIED + ACTION.** DB: 24h 59T 47.5% WR -$1.18. 48h: 128T 47.7% WR -$1.97. 7d: 417T 50.6% WR -$1.12. Today Sep 2: 37T 48.6% WR -$0.74. **BUG: accel-300-v2-short- still trading despite ACCEL_300_V2_ENABLED=False.** 7T/24h 28.6% WR -$0.06. Flag was True until commit 383057fb at 02:59 UTC. **FIX: Added ACCEL_300_V2_ENABLED + ACCEL_300_V2_MINUS_ENABLED to NEVER_REENABLE_FLAGS.** SHORT backbone 72T/7d +$1.46 52.8% WR strong. BB_BOUNCE_SHORT 4T/24h +$0.14 100% WR. 5 open range-reversion-long+ positions (breakeven). confluence-,ichimoku- SHORT still CEO_PROTECTED bleeding -$0.46/7d — FLAGGED FOR T. Market ALL NEUTRAL.
+1. **CEO 09:00 — VERIFIED + ACTION.** DB: 24h 60T 48.3% WR -$1.15. 48h: 129T 48.1% WR -$1.95. 7d: 418T 50.5% WR -$1.41. **ROOT CAUSE: accel-300-v3-long+ RE-ENABLED after first kill** — was set True with tighter filters (MIN_GAP=2.0), still bleeding 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. **KILLED AGAIN + added to NEVER_REENABLE_FLAGS.** BB_BOUNCE_V2_LONG NameError auto-fixed at 08:25, now live TESTING. 5 open range-reversion-long+ positions (GRASS, SOL, NEO, ALT, DOGE). SHORT +$0.36/24h, LONG -$1.51/24h. confluence-,ichimoku- SHORT still CEO_PROTECTED bleeding -$0.46/7d — FLAGGED FOR T.
 1. **Orchestrator 06:38 — ACTION.** Killed BB_BOUNCE_LONG_ENABLED. DB verified: 24h 64T 48.4% WR -$1.06, 7d 418T 50.5% WR -$1.11. BB_BOUNCE_LONG: 17T/24h 52.9% WR -$0.36. Removed from CEO_PROTECTED_FLAGS, kept in NEVER_REENABLE_FLAGS. Disk 82%. 1 open (DOGE SHORT flat). Signal reporter flagged accel-300-v3-long+ 15T/24h 40% WR -$0.62 for tuning. confluence-,ichimoku- SHORT 7T/7d 28.6% WR -$0.46 flagged for T review. CONF_FILTER_MIN lowered to70 (from 75) — stale issue resolved.
 1. **CEO 06:10 — VERIFIED + ACTION.** DB: 24h 63T 49.2% WR -$0.90 (improved from -$0.97). V3_LONG kill verified — last trade 05:15, no post-kill entries. **FIXED coin tracker timer** — 18 days stale → running every 30min, 96 coins processed. BB_BOUNCE_LONG still bleeding 18T/24h -$0.29, FLAGGED FOR T. CONF_FILTER_MIN gap — trades at conf=51,59,60,62 executing despite filter=70. 3 open positions. Daily trend: Aug 28 +$1.55 → Sep 2 -$0.24 (in progress).
 1. **CEO 07:30 — VERIFIED + ACTION.** DB: 24h 61T 47.5% WR -$0.97. 7d: 416T 50.0% WR -$1.31. 48h: 127T 47.2% WR -$1.71. **ROOT CAUSE CORRECTED: Previous CEO overcounted — combined accel-300-v2-long + v3-long as one signal.** Actual v2-long: only 4T/24h (closing old positions, not new entries). v3-long: 14T/24h -$0.51, 42.9% WR, ALL ATR_SL — the real #1 loss source. **KILLED ACCEL_300_V3_LONG_ENABLED.** NOT CEO_PROTECTED. BB_BOUNCE_LONG still True, CEO_PROTECTED, FLAGGED for T. 7d SHORT profitable (+$0.48), LONG bleeding (-$1.79). System needs SHORT-heavy allocation.

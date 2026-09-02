@@ -1,3 +1,22 @@
+## CEO Report — 2026-09-02 ~10:30 UTC (323rd run)
+
+### Diagnosis
+24h: 59T, 47.5% WR, -$1.18. 48h: 128T, 47.7% WR, -$1.97. 7d: 417T, 50.6% WR, -$1.12. SHORT +$0.36/24h (profitable). LONG -$1.18/24h (bleeding). All 24h trades in NEUTRAL. 5 open range-reversion-long+ positions (breakeven). #1 loss: accel-300-v3-long+ residual 16T/24h -0.70 (closing pre-kill positions). #2: r2-trend-long3 6T/24h -0.23 (trend signal in flat market). SHORT backbone strong: accel-300-v2-short 72T/7d +$1.46 52.8% WR. BB_BOUNCE_SHORT 4T/24h +$0.14 100% WR.
+
+### Root Cause
+accel-300-v2-short- was trading despite ACCEL_300_V2_ENABLED=False — flag was True until commit 383057fb at 02:59 UTC today. 30 signals in DB since Sep 1 22:44, 7T/24h executed. Pipeline log now shows function returning 0 (post-commit). LONG side structural issue: trend signals (v3-long, r2-trend-long) fire in NEUTRAL and bleed.
+
+### Fix Applied
+1. **Added ACCEL_300_V2_ENABLED + ACCEL_300_V2_MINUS_ENABLED to NEVER_REENABLE_FLAGS** — prevents signal_rotator from re-enabling
+2. V2_SHORT commit at 02:59 already set flags False — confirmed working (pipeline returns 0)
+
+### Verification
+- Pipeline log: `Signal accel_300_v2_short: 0` — confirmed dead
+- DB: last accel-300-v2-short- signal at 02:12 UTC, none after commit
+- NEVER_REENABLE_FLAGS now includes both v2 short flags
+
+---
+
 ## CEO Report — 2026-09-02 ~09:00 UTC (322nd run)
 
 ### Diagnosis

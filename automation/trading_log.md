@@ -19876,3 +19876,30 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - SL width 1.2% appropriate for current volatility
 
 **Open Questions:** None
+
+## [2026-09-02 12:15 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.46 (0% WR)
+
+**24h:** 60T, 23.3%WR, -$0.68
+- atr_sl_hit: 44T avg -$0.049 | profit-monster-trail: 14T avg +$0.050 | cut_loser: 2T avg -$0.165
+
+**Last 6h hourly:** 05:+$0.12, 06:-$0.06, 07:-$0.05, 08:-$0.21, 09:-$0.15, 10:-$0.46
+- 5 consecutive negative hours (6-10), ranging market small losses
+
+**Signal breakdown (24h, worst):**
+- range-reversion-long+: 4T 0%WR -$0.67 — **KILLED**
+- accel-300-v3-long+: 16T 37.5%WR -$0.70 — CEO-disabled, rolling off
+- r2-trend-long3: 6T 33.3%WR -$0.23 — not at kill threshold
+
+**Changes:**
+1. DISABLED `RANGE_REVERSION_PLUS_ENABLED` — 0%WR last hour (0/3), all atr_sl_hit -$0.46. Averaging -$0.168/trade over 4 trades.
+
+**No Change Needed:**
+- Trade freq 2/hr normal
+- 2 open positions remaining
+- atr_sl_hit 73% structural but PM trail offsets ($0.050 vs -$0.049 per hit)
+- Short signals (bb-bounce-short, r2-trend-short) profitable
+
+**Open Questions:** None

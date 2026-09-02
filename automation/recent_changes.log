@@ -775,3 +775,7 @@
   WHY: 1T last hour (BABY cut_loser -$0.21). 59T/24h 48.3%WR -$0.87. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 69.5% structural but PM trail offsets ($0.053 vs -$0.041 per hit). Trade freq 1.3/hr normal. 5 consecutive negative hours (6-10) — ranging market, small losses, no signal degeneration. v3-long+ CEO-disabled rolling off. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 12:15 UTC
+[2026-09-02 12:15 UTC] auto_1hr: DISABLED RANGE_REVERSION_PLUS_ENABLED
+  WHY: 3T last hour (0W 3L -$0.46). 60T/24h 23.3%WR -$0.68. Kill criteria met: 0%WR with 3+T last hour (range-reversion-long+). All atr_sl_hit -$0.46, avg -$0.168/trade. Short signals profitable (bb-bounce-short 3/3, r2-trend-short 2/2).
+  BY: auto_1hr
+  NEXT: Re-run at 13:15 UTC
