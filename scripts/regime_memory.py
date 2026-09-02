@@ -80,11 +80,16 @@ class RegimeMemory:
             with os.fdopen(fd, 'w') as f:
                 json.dump(self._data, f, indent=2)
             os.replace(tmp, self.memory_file)
-        except Exception:
+        except Exception as e:
+            try:
+                os.close(fd)
+            except Exception:
+                pass
             try:
                 os.unlink(tmp)
             except Exception:
                 pass
+            print(f"[regime-memory] WARNING: Save failed: {e}")
     
     def _ensure_signal(self, signal_type):
         """Ensure signal entry exists in memory."""
@@ -186,6 +191,7 @@ class RegimeMemory:
         This computes volatility_regime from candles_1h ATR for each trade
         and updates the trades table. Run once after adding the column.
         """
+        conn = None
         try:
             import psycopg2
             from signal_schema import _get_volatility_regime
@@ -216,14 +222,18 @@ class RegimeMemory:
                     pass
             
             conn.commit()
-            conn.close()
-            
             print(f"Backfilled volatility_regime for {updated}/{len(trades)} trades")
             return updated
             
         except Exception as e:
             print(f"Error backfilling: {e}")
             return 0
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
     
     def snapshot_params(self, signal_type, regime, params):
         """Save a snapshot of params that worked well in this regime."""
@@ -252,6 +262,7 @@ class RegimeMemory:
         Uses actual volatility_regime column when available (populated at trade entry).
         Falls back to entry_regime_4h as proxy if volatility_regime is NULL.
         """
+        conn = None
         try:
             import psycopg2
             conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
@@ -319,13 +330,18 @@ class RegimeMemory:
                 
                 self._recompute_regime_classification(sig)
             
-            conn.close()
             self._save()
             return True
             
         except Exception as e:
             print(f"Error seeding from DB: {e}")
             return False
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
     
     def get_summary(self):
         """Get a summary of all signals and their regime status."""
