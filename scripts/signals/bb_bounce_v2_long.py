@@ -37,33 +37,19 @@ from paths import RUNTIME_DB, CANDLES_DB
 from hermes_constants import (
     BB_BOUNCE_V2_LONG_ENABLED,
     LONG_BLACKLIST,
+    BB_BOUNCE_V2_BB_PERIOD as BB_PERIOD,
+    BB_BOUNCE_V2_BB_STDDEV as BB_STDDEV,
+    BB_BOUNCE_V2_BB_TOUCH_PCT as BB_TOUCH_PCT,
+    BB_BOUNCE_V2_BB_MIN_BARS as BB_MIN_BARS,
+    BB_BOUNCE_V2_BB_WIDTH_MAX as BB_WIDTH_MAX,
+    BB_BOUNCE_V2_RSI_PERIOD as RSI_PERIOD,
+    BB_BOUNCE_V2_RSI_MAX as RSI_MAX,
+    BB_BOUNCE_V2_BOUNCE_MIN_PCT as BOUNCE_MIN_PCT,
+    BB_BOUNCE_V2_VEL_MIN as VEL_MIN,
+    BB_BOUNCE_V2_MOM_MIN as MOM_MIN,
+    BB_BOUNCE_V2_VOL_MAX as VOL_MAX,
+    BB_BOUNCE_V2_MIN_AGE_SEC as MIN_AGE_SEC,
 )
-
-# BB parameters
-BB_PERIOD = 20
-BB_STDDEV = 1.8
-BB_TOUCH_PCT = 0.15      # max distance from lower band
-BB_MIN_BARS = 30
-BB_WIDTH_MAX = 0.5        # NEW: max BB width (tight squeeze required)
-
-# RSI parameters (calibrated from SHORT winners)
-RSI_PERIOD = 14
-RSI_MAX = 45              # NEW: max RSI (not too oversold — SHORT winners had ~61)
-
-# Bounce parameters (STRONGER than v1)
-BOUNCE_MIN_PCT = 0.10     # NEW: minimum bounce strength (was 0.05 in v1)
-
-# Velocity parameters
-VEL_MIN = -0.01           # NEW: minimum velocity (price not falling hard)
-
-# Momentum parameters
-MOM_MIN = 0.0             # NEW: minimum momentum (uptrend required)
-
-# Volatility parameters
-VOL_MAX = 0.5             # NEW: max volatility (low vol = less chop)
-
-# Time parameters
-MIN_AGE_SEC = 600         # 10 min minimum candle age
 
 # ── State ─────────────────────────────────────────────────────────────────
 _cooldown = {}

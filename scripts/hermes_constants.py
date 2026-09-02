@@ -1636,6 +1636,20 @@ BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → a
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
 BB_BOUNCE_V2_LONG_ENABLED = True  # TESTING 2026-09-02 — new signal calibrated from SHORT winners. 7 filters: BB width, RSI, bounce, velocity, momentum, volatility, min_age.
 
+# bb_bounce_v2_long parameters (calibrated from SHORT winner patterns)
+BB_BOUNCE_V2_BB_PERIOD = 20
+BB_BOUNCE_V2_BB_STDDEV = 1.8
+BB_BOUNCE_V2_BB_TOUCH_PCT = 0.15    # max distance from lower band
+BB_BOUNCE_V2_BB_MIN_BARS = 30
+BB_BOUNCE_V2_BB_WIDTH_MAX = 0.5     # max BB width (tight squeeze required)
+BB_BOUNCE_V2_RSI_PERIOD = 14
+BB_BOUNCE_V2_RSI_MAX = 45           # max RSI (not too oversold)
+BB_BOUNCE_V2_BOUNCE_MIN_PCT = 0.10  # minimum bounce strength
+BB_BOUNCE_V2_VEL_MIN = -0.01        # minimum velocity (price not falling hard)
+BB_BOUNCE_V2_MOM_MIN = 0.0          # minimum momentum (uptrend required)
+BB_BOUNCE_V2_VOL_MAX = 0.5          # max volatility (low vol = less chop)
+BB_BOUNCE_V2_MIN_AGE_SEC = 600      # 10 min minimum candle age
+
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
 # Backtested and proven edge when firing solo.
