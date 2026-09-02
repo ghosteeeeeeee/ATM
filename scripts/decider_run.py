@@ -3042,7 +3042,15 @@ def run(dry_run=False):
         if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short:
             # ── Maximum staleness check: block signals older than 10 minutes ──
             # Prevents compactor from executing stale combo signals
-            _entry_origin = hot_sig.get('entry_origin_ts', 0)
+            _entry_origin = sig.get('entry_origin_ts') or 0
+            if not _entry_origin and sig.get('created_at'):
+                try:
+                    import datetime as _dt
+                    _ca = _dt.datetime.strptime(sig['created_at'], '%Y-%m-%d %H:%M:%S')
+                    _ca = _ca.replace(tzinfo=_dt.timezone.utc)
+                    _entry_origin = _ca.timestamp()
+                except Exception:
+                    pass
             _hotset_age_min = (time.time() - _entry_origin) / 60.0 if _entry_origin else 0
             if _hotset_age_min > 10:
                 log(f'  🚫 [ACCEL-STALE-MAX] {token} {direction} BLOCKED — signal stale ({_hotset_age_min:.1f}min > 10min)')
