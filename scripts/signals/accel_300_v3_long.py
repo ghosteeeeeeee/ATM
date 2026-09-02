@@ -84,6 +84,8 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_CONF_RSI_MIN,
     ACCEL_300_V3_LONG_CONF_RSI_MAX,
     ACCEL_300_V3_LONG_CONF_RSI_BONUS,
+    ACCEL_300_V3_LONG_CHASE_MOVE_MAX,
+    ACCEL_300_V3_LONG_CHASE_RSI_MIN,
 )
 
 PERIOD = 300  # EMA300 period
@@ -360,6 +362,14 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
         return None  # overbought — pullback likely imminent
     if rsi < ACCEL_300_V3_LONG_RSI_MIN:
         return None  # too weak — no momentum
+
+    # ── FILTER 7b: Chase block — don't chase extended moves ────────────────
+    # Block entries after large upward moves with overbought RSI
+    # Catches SUSHI-type setups: +2.2% in 30m + RSI 77.5
+    if latest_idx >= 30:
+        move_30m = (closes[latest_idx] - closes[latest_idx - 30]) / closes[latest_idx - 30] * 100
+        if move_30m > ACCEL_300_V3_LONG_CHASE_MOVE_MAX and rsi > ACCEL_300_V3_LONG_CHASE_RSI_MIN:
+            return None  # chasing spike — pullback imminent
 
     # ── FILTER 8: Persistence — price must stay above EMA ──────────────────
     persist_start = latest_idx - ACCEL_300_V3_LONG_PERSISTENCE_BARS + 1
