@@ -1210,6 +1210,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V3_LONG_ENABLED',     # CEO 2026-09-02 — 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. Tighter filters didn't fix. NEVER_REENABLE.
     'ACCEL_300_V2_ENABLED',         # CEO 2026-09-02 — replaced by v3. 7T/24h 28.6% WR -$0.06. NEVER_REENABLE.
     'ACCEL_300_V2_MINUS_ENABLED',   # CEO 2026-09-02 — replaced by v3. NEVER_REENABLE.
+    'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1396,6 +1397,7 @@ R2_TREND_SHORT_MAX_ACCEL    = 0.005   # block SHORT when price_acceleration > th
 R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT when price rising before entry
 R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
 SHORT_NEUTRAL_BLOCK_ENABLED = True    # CEO 2026-08-22 — block SHORT in NEUTRAL regime (0% WR, -1.12/7d). No SHORT edge in flat market.
+LONG_NEUTRAL_BLOCK_ENABLED  = True    # CEO 2026-09-02 — block LONG in NEUTRAL regime (399T/7d -$2.33, ALL LONG signals bleed). No LONG edge in flat chop.
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
@@ -2083,7 +2085,7 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
 # Family: Range (pairs with Momentum/Trend for 2-type confluence)
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
-RANGE_REVERSION_ENABLED = True           # CEO 2026-09-01 — was False (shadow bug: signal never ran). Now enabled with SHADOW_MODE guard in signal.
+RANGE_REVERSION_ENABLED = False          # CEO KILLED 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. Designed for NEUTRAL but failing there. NEVER_REENABLE.
 RANGE_REVERSION_PLUS_ENABLED = False      # DISABLED 2026-09-02 12:15 UTC — 0%WR last hour (0/3), all atr_sl_hit -$0.46. Averaging -$0.168/trade over 4 trades. Will re-evaluate after regime shift.
 RANGE_REVERSION_MINUS_ENABLED = False    # SHORT DISABLED 2026-09-02 — backtest: 1/5 winners, bleeds in uptrend. Re-enable only in confirmed downtrend.
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed

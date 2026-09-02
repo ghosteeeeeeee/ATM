@@ -19903,3 +19903,82 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - Short signals (bb-bounce-short, r2-trend-short) profitable
 
 **Open Questions:** None
+
+## [2026-09-02 13:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+
+**24h:** 61T, 44.3%WR, -$1.77
+- atr_sl_hit: 44T avg -$0.049 | profit-monster-trail: 14T avg +$0.050 | cut_loser: 2T avg -$0.165
+
+**Signal breakdown (24h):**
+- Short signals: 6/6 wins, $0.40 combined — all profitable
+- Long signals: 21/55 wins, -$2.17 combined — drag
+- accel-300-v3-long+: 16T 37.5%WR -$0.70 — CEO-disabled, rolling off
+- range-reversion-long+: 5T 20%WR -$0.65 — KILLED at 12:15
+
+**Open positions:** 3 (ETH SHORT, GMT SHORT, DOGE LONG)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour — 0 trades last hour)
+- atr_sl_hit 72% structural but PM trail offsets ($0.050 vs -$0.049 per hit)
+- Trade freq normal
+- Short signals consistently profitable — no action needed
+
+**Open Questions:** None
+
+## [2026-09-02 14:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, +$0.01)
+**PnL:** +$0.01 (50% WR)
+
+**24h:** 62T, ~45%WR, -$2.74
+- atr_sl_hit: 45T avg -$0.048 | profit-monster-trail: 15T avg +$0.047 | cut_loser: 2T avg -$0.165
+
+**Signal breakdown (24h):**
+- Short signals: ALL winning — bb-bounce-short 4/4 +$0.12, r2-trend-short4 2/2 +$0.19, r2-trend-short3 1/1 +$0.06
+- Long signals: Dragging — accel-300-v3-long+ rolling off (CEO-disabled), range-reversion-long+ KILLED
+- Last hour: bb-bounce-short GMT +$0.01, range-reversion-long+ GRASS $0.00 (pre-kill close)
+
+**Open positions:** 4 (DOGE, ETH, WLFI, NXPC)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour — range-reversion-long+ had 1T, already killed)
+- atr_sl_hit 72.6% but PM trail offsets ($0.047 vs -$0.048 per hit) — net neutral
+- Trade freq 2/hr normal
+- Short signals 100% WR — no action needed
+- Last 3h flat (+$0.01, $0.00, -$0.46) — no consecutive negative streak
+
+**Open Questions:** None
+
+## [2026-09-02 15:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L, -$0.09)
+**PnL:** -$0.09 (0% WR)
+
+**24h:** 64T, 45.3%WR, -$1.65
+- atr_sl_hit: 47T avg -$0.048 | profit-monster-trail: 14T avg +$0.044 | cut_loser: 2T avg -$0.165
+
+**Signal breakdown (24h):**
+- Short signals: All profitable — bb-bounce-short 4/5 80%WR, r2-trend-short 3/3 100%WR
+- Long signals: Dragging — accel-300-v3-long+ KILLED, range-reversion-long+ KILLED, accel-300-v2-long 1/4 25%WR -$0.40
+- Last hour: DOGE range-reversion-long+ +$0.05 (pre-kill), ETH bb-bounce-short -$0.14
+
+**Open positions:** 2 (NXPC r2-trend-long4 -$0.01, WLFI r2-trend-long3 +$0.05)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour — 0 trades last hour)
+- atr_sl_hit 73.4% but PM trail offsets ($0.044 vs -$0.048 per hit) — net neutral
+- Trade freq 0/hr normal (quiet market)
+- Short signals consistently profitable
+- 24h loss -$1.65 manageable within -$5/day limit
+- 0 new opens last hour — market calm
+
+**Open Questions:** None

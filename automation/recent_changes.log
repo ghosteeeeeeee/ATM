@@ -1,3 +1,7 @@
+[2026-09-02 15:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.09). 64T/24h 45.3%WR -$1.65. Kill criteria not met (no 0%WR signal with 3+T last hour — 0 trades last hour). atr_sl_hit 73.4% but PM trail offsets ($0.044 vs -$0.048 per hit) — net neutral. Trade freq 0/hr normal (quiet market). Short signals profitable. 24h loss -$1.65 within limit. 2 open positions (NXPC, WLFI). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 16:15 UTC
 [2026-09-02 04:09 UTC] auto_1hr: NO CHANGES
   WHY: 6T last hour (3W 3L -$0.14). 67T 24h 47.8%WR -$0.81. 2 open positions (FIL LONG $16.60, CFX LONG $11.10). Kill criteria not met: accel-300-v3-long+ 12T 41.7%WR -$0.29 (new signal, 1 day old, not 0%WR with 3+T in last hour). bb-bounce-long+ (killed), accel-300-v2-long (killed), accel-300-v2-short- (killed) all draining legacy. bb-bounce-short 3T 66.7%WR -$0.03 healthy. atr_sl_hit 68.7% avg -$0.044 trailing SL working. profit-monster-trail 28.4% avg +$0.062 carrying system. Trade freq ~2.8/hr normal. 3 consecutive negative hours (02:00-04:00) but total only -$0.43. accel-300-v3-short enabled 0T (normal for new signal). No signal starvation yet.
   BY: auto_1hr
@@ -779,3 +783,11 @@
   WHY: 3T last hour (0W 3L -$0.46). 60T/24h 23.3%WR -$0.68. Kill criteria met: 0%WR with 3+T last hour (range-reversion-long+). All atr_sl_hit -$0.46, avg -$0.168/trade. Short signals profitable (bb-bounce-short 3/3, r2-trend-short 2/2).
   BY: auto_1hr
   NEXT: Re-run at 13:15 UTC
+[2026-09-02 13:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet market). 61T/24h 44.3%WR -$1.77. Kill criteria not met. Short signals 6/6 wins profitable. Long signals dragging but no 0%WR with 3+T last hour. atr_sl_hit 72% structural but PM trail offsets ($0.050 vs -$0.049 per hit). 3 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 14:15 UTC
+[2026-09-02 14:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.01). 62T/24h ~45%WR -$2.74. Kill criteria not met (range-reversion-long+ 1T last hour, already killed). atr_sl_hit 72.6% but PM trail offsets ($0.047 vs -$0.048 per hit) — net neutral. Short signals 100% WR all profitable. Trade freq 2/hr normal. Last 3h flat. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 15:15 UTC

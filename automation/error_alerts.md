@@ -2012,3 +2012,13 @@ ALERTS:
 
 ## Error Alerts — 2026-09-02 11:05 UTC
 - **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
+
+## Error Alerts — 2026-09-02 12:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-09-02 14:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MOMENTUM+BTC_LEVEL`
+
+## Health Check — 2026-09-02 14:25 UTC
+- **[WARN]** (1x): `169 phantom trades today — PnL < $0.01 each` — position sizing or stop placement may need tuning
+- **[INFO]**: Pipeline OK, 0 errors, 189 signals/1h, 44 trades today, -$1.25 PnL
