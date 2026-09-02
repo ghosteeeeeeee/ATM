@@ -567,7 +567,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             continue
 
         # Staleness check — verify gap is still valid at current price
-        current_ema = _ema_series([float(p['price']) for p in prices], PERIOD)[-1]
+        current_closes = [float(p['price']) for p in prices]
+        current_ema = _ema_series(current_closes, PERIOD)[-1]
         if current_ema and current_ema > 0:
             current_gap = (price - current_ema) / current_ema * 100
             if current_gap <= 0:
@@ -575,6 +576,10 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             abs_current_gap = abs(current_gap)
             if abs_current_gap < ACCEL_300_V3_LONG_MIN_GAP or abs_current_gap > ACCEL_300_V3_LONG_MAX_GAP:
                 continue
+            # Re-expansion re-check: verify bounce is still confirmed at execution time
+            # If gap has narrowed significantly since detection, the bounce failed
+            if current_gap < sig['gap_pct'] - 0.15:
+                continue  # gap narrowed since detection — bounce failed
 
         try:
             sid = add_signal(
