@@ -150,7 +150,7 @@ SHORT_BLACKLIST = {
     'BSV',    # 5T 20% WR, -$0.12. ext=4.4x, entered at bottom of -2.7% drop
     'DASH',   # 4T 25% WR, -$0.02. ext=5.4-5.8x, entered at bottom of -4.6% drop
     # 2026-08-24: extra fees — eats into margins
-    'GRAM',
+    'GRAM', 'ASTER',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -235,7 +235,7 @@ LONG_BLACKLIST = {
     'BSV',    # 5T 20% WR, -$0.12
     'DASH',   # 4T 25% WR, -$0.02
     # 2026-08-24: extra fees — eats into margins
-    'GRAM',
+    'GRAM', 'ASTER',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
