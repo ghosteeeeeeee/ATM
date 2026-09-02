@@ -820,3 +820,7 @@
   WHY: 2T last hour (1W 1L -$0.07). 61T/24h 45.9%WR -$1.82. Kill criteria not met. atr_sl_hit 67% structural but PM trail offsets net neutral. 4 open positions. 24h PnL within limit. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 23:15 UTC
+[2026-09-02 23:15 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L -$0.07). 62T/24h 46.8%WR -$1.93. Kill criteria not met. All PM trail exits last hour (bb-bounce-v2-long+ combo working). accel-300-v3-long+ CEO locked for 48h. 5 open positions. 24h PnL within limit. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 00:15 UTC
