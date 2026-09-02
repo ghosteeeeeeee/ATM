@@ -305,9 +305,24 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
     if gap_now <= 0:
         return None
 
-    # ── FILTER 2: Gap in valid range ───────────────────────────────────────
-    if gap_now < ACCEL_300_V3_LONG_MIN_GAP or gap_now > ACCEL_300_V3_LONG_MAX_GAP:
-        return None
+    # ── FILTER 1b: Fresh cross detection — allow small gap if just crossed ──
+    # The ideal entry is RIGHT AFTER the cross above EMA300, before gap widens.
+    # If cross is within 8 bars, allow gap < MIN_GAP (catches initial bounce)
+    cross_bar = None
+    for idx in range(latest_idx, max(PERIOD - 1, latest_idx - 20), -1):
+        prev_idx = idx - 1
+        if prev_idx < 0 or ema300[idx] is None or ema300[prev_idx] is None:
+            continue
+        if closes[idx] > ema300[idx] and closes[prev_idx] <= ema300[prev_idx]:
+            cross_bar = idx
+            break
+    bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
+    fresh_cross = bars_since_cross <= 8
+
+    # ── FILTER 2: Gap in valid range (bypass for fresh crosses) ─────────────
+    if not fresh_cross:
+        if gap_now < ACCEL_300_V3_LONG_MIN_GAP or gap_now > ACCEL_300_V3_LONG_MAX_GAP:
+            return None
 
     # ── FILTER 3: PULLBACK DETECTION — gap narrowed from recent peak ───────
     # Find the peak gap in the last N bars
@@ -416,18 +431,8 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
             if pct_slope <= ACCEL_300_V3_LONG_MIN_SLOPE_PCT:
                 return None
 
-    # ── FILTER 10: Fresh cross detection (bonus: earlier entry) ────────────
-    cross_bar = None
-    for idx in range(latest_idx, PERIOD - 1, -1):
-        prev_idx = idx - 1
-        if prev_idx < 0 or ema300[idx] is None or ema300[prev_idx] is None:
-            continue
-        crossed = closes[idx] > ema300[idx] and closes[prev_idx] <= ema300[prev_idx]
-        if crossed:
-            cross_bar = idx
-            break
-    bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
-    fresh_cross = bars_since_cross <= 8
+    # ── FILTER 10: Fresh cross already detected in FILTER 1b ────────────────
+    # bars_since_cross and fresh_cross are set in FILTER 1b above
 
     # ── FILTER 11: Gap velocity must confirm (not narrowing) ───────────────
     if latest_idx < 3:
