@@ -816,7 +816,7 @@ DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
 # Direction Lock: after severe loss (3+/5), lock direction for N minutes.
 # Prevents re-entry during clear bad streaks — no unsuppression during lock.
 DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
-DIRECTIONAL_OUTCOME_LOCK_MINUTES = 30         # lock duration after severe failure
+DIRECTIONAL_OUTCOME_LOCK_MINUTES = 20         # lock duration after severe failure (lowered from 30 2026-09-02 — signals passing confluence but locked out)
 DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.6       # loss_velocity threshold for lock activation (matches 0.6 tier)
 
 # ── Position Shield (Weather Vane Component 2) ─────────────────────────────
@@ -934,7 +934,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 89                    # block if confidence >= this value (raised from 85 — 90+ tier now +$1.91/7d without ct-hot+, 95+ tier most profitable)
-CONF_FILTER_MIN = 75                    # CEO 2026-09-01 — block if confidence < this value. <75 tier: 14T/24h 28.6% WR -$0.72 (biggest single loss source). 7d: 73T 46.6% WR -$0.62.
+CONF_FILTER_MIN = 70                    # lowered from 75 2026-09-02 — <75 tier had misclassified SL exits (now fixed). bb-bounce-short conf=60-70 was blocked.
 
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
 # Penalty during 01:00-06:00 UTC (Asian session close, low-liquidity pre-market).
@@ -1467,7 +1467,7 @@ ACCEL_300_V3_LONG_GAP_PEAK_WINDOW = 20  # bars to find recent gap peak
 ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW = 3  # bars to measure re-expansion
 ACCEL_300_V3_LONG_MIN_VELOCITY = 0.0002 # min velocity as fraction of price — bounce must have momentum
 ACCEL_300_V3_LONG_GREEN_CAP = 3         # max consecutive green candles — don't chase after spike
-ACCEL_300_V3_LONG_RSI_MAX = 70          # max RSI — don't enter overbought (lowered from 72: blocks ZRO at 70.7, SUSHI at 77.5)
+ACCEL_300_V3_LONG_RSI_MAX = 68          # max RSI — don't enter overbought (lowered from 70: catches SUSHI at 69.0)
 ACCEL_300_V3_LONG_RSI_MIN = 35          # min RSI — ensure some momentum exists
 ACCEL_300_V3_LONG_CHASE_MOVE_MAX = 2.0  # max 30m price move % — block entries chasing spikes (FIL had +1.58% and won, so 1.5 too tight)
 ACCEL_300_V3_LONG_CHASE_RSI_MIN = 65    # RSI must be below this when 30m move exceeds CHASE_MOVE_MAX
@@ -1478,20 +1478,20 @@ ACCEL_300_V3_LONG_MIN_SLOPE_PCT = 0.0003 # min slope % per bar (positive for LON
 ACCEL_300_V3_LONG_PERSISTENCE_BARS = 5  # min bars price must stay above EMA
 ACCEL_300_V3_LONG_VOLUME_LOOKBACK = 30  # bars for average volume
 ACCEL_300_V3_LONG_VOLUME_MULT = 1.1     # volume must be >= 1.1x average on bounce
-ACCEL_300_V3_LONG_CONF_BASE = 72        # base confidence
+ACCEL_300_V3_LONG_CONF_BASE = 55        # base confidence (lowered from 72 — all signals were saturating at 88 cap)
 ACCEL_300_V3_LONG_CONF_FLOOR = 60       # min confidence
 ACCEL_300_V3_LONG_CONF_CAP = 88         # max confidence (system ceiling)
 ACCEL_300_V3_LONG_GAP_VELOCITY_THRESH = -0.15  # max gap narrowing per bar (noise tolerance)
 ACCEL_300_V3_LONG_VELOCITY_WINDOW = 5   # bars to measure price velocity
 ACCEL_300_V3_LONG_GREEN_COUNT_WINDOW = 6  # bars to check for consecutive greens
-ACCEL_300_V3_LONG_CONF_PULLBACK_MAX = 20  # max confidence bonus from pullback quality
-ACCEL_300_V3_LONG_CONF_GAP_MAX = 15     # max confidence bonus from gap strength
-ACCEL_300_V3_LONG_CONF_REEXPAND_MAX = 10  # max confidence bonus from re-expansion
-ACCEL_300_V3_LONG_CONF_TREND_BONUS = 5  # confidence bonus for non-NEUTRAL trend
-ACCEL_300_V3_LONG_CONF_FRESH_BONUS = 8  # confidence bonus for fresh cross
+ACCEL_300_V3_LONG_CONF_PULLBACK_MAX = 10  # max confidence bonus from pullback quality (lowered from 20)
+ACCEL_300_V3_LONG_CONF_GAP_MAX = 8      # max confidence bonus from gap strength (lowered from 15)
+ACCEL_300_V3_LONG_CONF_REEXPAND_MAX = 8  # max confidence bonus from re-expansion (lowered from 10)
+ACCEL_300_V3_LONG_CONF_TREND_BONUS = 4  # confidence bonus for non-NEUTRAL trend (lowered from 5)
+ACCEL_300_V3_LONG_CONF_FRESH_BONUS = 5  # confidence bonus for fresh cross (lowered from 8)
 ACCEL_300_V3_LONG_CONF_RSI_MIN = 45     # RSI sweet spot lower bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
-ACCEL_300_V3_LONG_CONF_RSI_BONUS = 5    # confidence bonus for RSI in sweet spot
+ACCEL_300_V3_LONG_CONF_RSI_BONUS = 3    # confidence bonus for RSI in sweet spot (lowered from 5)
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
 ACCEL_300_V3_SHORT_ENABLED     = True    # NEW 2026-09-02 — anti-bottom-catch SHORT
