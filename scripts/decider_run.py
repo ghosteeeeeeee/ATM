@@ -3018,6 +3018,16 @@ def run(dry_run=False):
         _is_accel_v2_long_5m = 'accel-300-v2-long-5m' in (source or '')
         _is_accel_v3_short = 'accel-300-v3-short' in (source or '')
         if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short:
+            # ── Maximum staleness check: block signals older than 10 minutes ──
+            # Prevents compactor from executing stale combo signals
+            _entry_origin = hot_sig.get('entry_origin_ts', 0)
+            _hotset_age_min = (time.time() - _entry_origin) / 60.0 if _entry_origin else 0
+            if _hotset_age_min > 10:
+                log(f'  🚫 [ACCEL-STALE-MAX] {token} {direction} BLOCKED — signal stale ({_hotset_age_min:.1f}min > 10min)')
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                skipped += 1
+                continue
             try:
                 if _is_accel_v2_long_5m:
                     from signals.accel_300_v2_long_5m import detect_accel_300_v2_long_5m, _get_5m_candles
