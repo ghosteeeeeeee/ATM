@@ -325,7 +325,7 @@ LOSERS_COOLDOWN_DAYS = 3           # Must be out for 3 days before re-adding
 # Multipliers
 LOSERS_MULT = 0.5                  # 50% score penalty in signal_compactor
 LOSERS_SIZE_MULT = 0.5            # 50% position size reduction
-LOSERS_CONF_PENALTY = -15         # Confidence point penalty
+LOSERS_CONF_PENALTY = -30         # Confidence point penalty (heavy — losers rarely trade)
 
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset

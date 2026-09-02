@@ -3097,11 +3097,17 @@ def run(dry_run=False):
         else:
             log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
 
-        # Losers confidence penalty
+        # Losers confidence penalty — heavy penalty, block if still below threshold
         if LOSERS and token.upper() in LOSERS:
             from hermes_constants import LOSERS_CONF_PENALTY
             confidence = max(confidence + LOSERS_CONF_PENALTY, 0)
             log(f'  🗑️ [LOSERS] {token} {direction}: confidence penalty {LOSERS_CONF_PENALTY} → {confidence:.0f}%')
+            # Block losers with low confidence after penalty
+            if confidence < 50:
+                log(f'  🗑️ [LOSERS-BLOCK] {token} {direction}: confidence {confidence:.0f}% < 50% — SKIP')
+                skipped += 1
+                _record_hotset_failure(token, direction, failures)
+                continue
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
