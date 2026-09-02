@@ -2079,7 +2079,7 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
 RANGE_REVERSION_ENABLED = True           # CEO 2026-09-01 — was False (shadow bug: signal never ran). Now enabled with SHADOW_MODE guard in signal.
 RANGE_REVERSION_PLUS_ENABLED = True      # LONG (buy at range bottom)
-RANGE_REVERSION_MINUS_ENABLED = True     # SHORT (sell at range top)
+RANGE_REVERSION_MINUS_ENABLED = False    # SHORT DISABLED 2026-09-02 — backtest: 1/5 winners, bleeds in uptrend. Re-enable only in confirmed downtrend.
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed
 RANGE_REVERSION_BB_WIDTH_SQUEEZE = 0.025 # tight squeeze = higher confidence
 RANGE_REVERSION_TOUCH_ATR_MULT = 0.3    # price within 0.3*ATR of band = touch
