@@ -586,8 +586,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
                   f"greens={sig['green_count']} trend_15m={trend_15m} [{SOURCE}]")
             continue
 
-        # Staleness check — verify gap is still valid at current price
-        current_closes = [float(p['price']) for p in prices]
+        # Staleness check — verify gap is still valid at CURRENT price (not stale detection prices)
+        current_closes = [float(p['price']) for p in _get_1m_prices(token)]
         current_ema = _ema_series(current_closes, PERIOD)[-1]
         if current_ema and current_ema > 0:
             current_gap = (price - current_ema) / current_ema * 100
