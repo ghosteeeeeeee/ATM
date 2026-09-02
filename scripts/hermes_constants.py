@@ -1463,7 +1463,7 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
-ACCEL_300_V3_LONG_ENABLED      = True    # RE-ENABLED 2026-09-02 — 4 fixes applied: REEXPAND_MIN 0.20, MIN_PULLBACK 0.35, MIN_DATA_LENGTH 500, gap bottom confirmation
+ACCEL_300_V3_LONG_ENABLED      = False   # KILLED 2026-09-02 — 17T/24h 35.3% WR -$0.87. ALL ATR_SL in NEUTRAL. Fixes didn't help. NEVER_REENABLE.
 ACCEL_300_V3_LONG_MIN_GAP     = 2.0     # min gap above EMA300
 ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
 ACCEL_300_V3_LONG_MIN_PULLBACK = 0.35   # min gap narrowing from peak (raised from 0.30: filters BIGTIME at 0.30%)
@@ -2086,8 +2086,8 @@ VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
 # Family: Range (pairs with Momentum/Trend for 2-type confluence)
 # NEW 2026-08-30 — addresses signal starvation in NEUTRAL regime
-RANGE_REVERSION_ENABLED = True            # Re-enabled 2026-09-02 — split into long/short, new filters applied
-RANGE_REVERSION_PLUS_ENABLED = True       # LONG enabled — new filters: bb_width_min=0.012, rsi_max=42, dist_lower>=0
+RANGE_REVERSION_ENABLED = False           # KILLED 2026-09-02 — 6T/24h 16.7% WR -$0.62. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
+RANGE_REVERSION_PLUS_ENABLED = False      # KILLED 2026-09-02 — part of range_reversion kill
 RANGE_REVERSION_MINUS_ENABLED = False    # SHORT DISABLED 2026-09-02 — backtest: 1/5 winners, bleeds in uptrend. Re-enable only in confirmed downtrend.
 RANGE_REVERSION_BB_WIDTH_MAX = 0.04      # narrow BB = range confirmed
 RANGE_REVERSION_BB_WIDTH_MIN = 0.012     # BB too tight = not enough room for reversion

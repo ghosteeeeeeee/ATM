@@ -2025,3 +2025,6 @@ ALERTS:
 
 ## Error Alerts — 2026-09-02 15:05 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
+
+## Error Alerts — 2026-09-02 17:05 UTC
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

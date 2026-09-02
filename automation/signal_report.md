@@ -1,32 +1,42 @@
 === Signal Performance Report ===
-Period: 2026-09-02 ~13:00 UTC | Last 6h + 24h
+Period: Last 6h | 24h | 7d | Generated: 2026-09-02 16:10 UTC
 
-KILLED (executed earlier today):
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v3-long+ | LONG | 37.5% | -$0.70 | 16 | KILLED ~09:00 UTC (CEO) — ALL ATR_SL in NEUTRAL |
-| accel-300-v2-long | LONG | 25.0% | -$0.10 | 4 | KILLED 2026-09-01 (auto_1hr) — NEVER_REENABLE |
-| accel-300-v2-short- | SHORT | 28.6% | -$0.06 | 7 | KILLED today (CEO) — replaced by v3 |
-| bb-bounce-long+ | LONG | 62.5% | -$0.11 | 8 | KILLED today (CEO) — NEVER_REENABLE |
-| range-reversion-long+ | LONG | 0.0% | -$0.67 | 4 | KILLED 12:15 UTC (signal_reporter) — ALL ATR_SL |
+| accel-300-v3-long+ | LONG | 35.3% | -$0.87 | 17 (24h) | Set ACCEL_300_V3_LONG_ENABLED=False. In NEVER_REENABLE, re-enabled with fixes that didn't work. ALL ATR_SL hits. |
+| range-reversion-long+ | LONG | 16.7% | -$0.62 | 6 (24h) | Set RANGE_REVERSION_ENABLED=False, RANGE_REVERSION_PLUS_ENABLED=False. In NEVER_REENABLE, re-enabled with fixes that didn't work. ALL ATR_SL hits. |
 
-BOOSTED: None — no signal has 5+ trades at 55%+ WR in 24h.
-
-LOSERS (watch list):
+ALREADY KILLED (verified):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2-trend-long3 | LONG | 33.3% | -$0.23 | 6 | WATCH — needs 10+ trades to kill. 37.5% WR over7d |
+| accel-300-v2-long | LONG | 28.6% | -$0.74 | 21 (7d) | Already False. In NEVER_REENABLE. |
+| accel-300-v2-short- | SHORT | 27.3% | -$0.20 | 11 (7d) | Already False. In NEVER_REENABLE. |
+| pump-catcher+ | LONG | 29.4% | -$0.35 | 17 (7d) | Already False. In NEVER_REENABLE. |
+| atr-spike+ | LONG | 28.6% | -$0.15 | 7 (7d) | Already False. In NEVER_REENABLE. |
+
+WATCH LIST:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| slow-grind- | SHORT | 25.0% | -$0.30 | 4 (7d) | Borderline (4T < 5T kill threshold). All ATR_SL. Monitor. |
+| confluence-,ichimoku- | SHORT | 28.6% | -$0.46 | 7 (7d) | Combo signal — no individual kill flag. All ATR_SL. |
+| bb-bounce-short | SHORT | 60.3% | -$0.24 | 58 (7d) | High WR but negative PnL (avg -$0.004). Sizing issue? |
+| bb-bounce-long+ | LONG | 60.0% | -$0.18 | 25 (7d) | High WR but negative PnL. Sizing issue? |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-short | SHORT | 100% | +$0.11 | 3 | GOOD — 60.7% WR over7d. Low sample. |
-| r2-trend-short4 | SHORT | 100% | +$0.19 | 2 | GOOD — low sample, monitor |
+| accel-300-v2- | SHORT | 52.8% | +$1.46 | 72 (7d) | Best performer. No boost needed (already dominant). |
+| bb-bounce-long+ | LONG | 83.3% | +$0.08 | 6 (24h) | Strong 24h. Low sample. |
+| r2-trend-short4 | SHORT | 100% | +$0.19 | 2 (24h) | Perfect but too few trades. |
 
 ISSUES:
-- No signal inversions detected (24h)
-- All killed signals traded BEFORE their disable times — no stale trades after kills
-- r2-trend-long3 is the only active loser — below kill threshold (6T, needs 10+). Will re-evaluate next report.
-- Overall24h: 60 closed trades, net PnL negative. Most losses from already-killed signals.
+- Two NEVER_REENABLE signals (accel-300-v3-long, range-reversion) were re-enabled on 2026-09-02 with "fixes" that didn't work. Both killed again. NEVER_REENABLE should mean NEVER.
+- bb-bounce-short has 60.3% WR but negative PnL — suggests winning trades are small and losing trades are large. R:R imbalance.
+- 290 total trades in 7d with -$2.64 net PnL. System is net negative.
 
-SUMMARY: All bad signals already killed. No new actions needed. System is clean.
+STATS:
+- 6h: 4 trades, mixed results
+- 24h: 40 trades, $-0.87 net
+- 7d: 290 trades, $-2.64 net
+- Open positions: 5 (all fresh, $0.00 PnL)

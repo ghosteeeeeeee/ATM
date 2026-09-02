@@ -20008,3 +20008,25 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - 24h loss -$2.08 manageable within -$5/day limit
 
 **Open Questions:** None
+
+## [2026-09-02 17:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+
+**24h:** 58T, 48.3% WR, -$1.65
+- atr_sl_hit: 43T avg -$0.047 | profit-monster-trail: 13T avg +$0.046
+- Short signals: profitable (r2-trend-short4 +$0.19, bb-bounce-short +$0.08)
+- Long signals: dragging — accel-300-v3-long+ -$0.87 (35%WR), range-reversion-long+ -$0.62 (17%WR)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR 3+T last hour)
+- range-reversion-long+ re-enabled with filters — last 6h: 2T +$0.05 (filters working)
+- atr_sl_hit 74% structural but PM trail offsets net neutral
+- Trade freq 1/hr normal
+- 5 open positions steady
+- -$1.65/24h within -$5/day limit
+
+**Open Questions:** None
