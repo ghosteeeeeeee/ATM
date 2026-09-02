@@ -19,7 +19,7 @@ ENTRY CONDITIONS:
   3. Gap is re-expanding (bounce confirmed)
   4. Price velocity positive (bounce has momentum)
   5. Not after3+ consecutive green candles (avoid chasing)
-  6. RSI not overbought (< 72)
+  6. RSI not overbought (< 68)
   7. 15m trend must be BULLISH or NEUTRAL
   8. Linear regression slope positive (trending)
   9. Volume confirms bounce (≥ 1.1x average)
