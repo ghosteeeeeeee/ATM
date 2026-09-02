@@ -1870,8 +1870,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Global spike filter LONG: block LONG after recent bearish 5m candle ──
             # Mirror of SHORT spike filter — prevents entering LONG at dump lows
             # EXEMPT: v3 pullback signals (accel-300-v3-long+) — bearish candle IS the pullback
+            # EXEMPT: range_reversion_long — bearish candle IS the dip we're buying
             _is_v3_pullback = source and 'accel-300-v3-long' in source
-            if direction == 'LONG' and SPIKE_FILTER_ENABLED and not _is_v3_pullback:
+            _is_range_rev_long = source and 'range-reversion-long' in source
+            if direction == 'LONG' and SPIKE_FILTER_ENABLED and not _is_v3_pullback and not _is_range_rev_long:
                 _conn_sf2 = None
                 try:
                     _skip_long = False
