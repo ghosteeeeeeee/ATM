@@ -495,17 +495,29 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # Guardian checks this file to skip orphan creation for recently opened trades.
     # Must be written BEFORE mirror_open to prevent guardian from seeing HL position
     # before DB record exists.
+    # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
     try:
-        import json as _json
+        import fcntl
         _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
-        _marker = {}
-        if os.path.exists(_marker_path):
-            _marker = _json.loads(open(_marker_path).read())
-        _marker[token.upper()] = _time.time()
-        # Prune entries older than 60s
-        _marker = {k: v for k, v in _marker.items() if _time.time() - v < 60}
-        with open(_marker_path, 'w') as _f:
-            _json.dump(_marker, _f)
+        _marker_fd = open(_marker_path, 'r+' if os.path.exists(_marker_path) else 'w+')
+        try:
+            fcntl.flock(_marker_fd, fcntl.LOCK_EX)
+            _marker = {}
+            try:
+                _marker = json.loads(_marker_fd.read())
+            except (json.JSONDecodeError, ValueError):
+                _marker = {}
+            _marker_fd.seek(0)
+            _marker_fd.truncate()
+            _marker[token.upper()] = _time.time()
+            _marker = {k: v for k, v in _marker.items() if _time.time() - v < 60}
+            json.dump(_marker, _marker_fd)
+            _marker_fd.flush()
+        finally:
+            fcntl.flock(_marker_fd, fcntl.LOCK_UN)
+            _marker_fd.close()
+    except Exception:
+        pass
     except Exception:
         pass  # non-fatal
 

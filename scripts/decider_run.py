@@ -653,15 +653,27 @@ def process_delayed_entries(paper=False):
         _trade_size = _base_size * _get_favorite_size_mult(token)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
+        # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
         try:
             _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
-            _marker = {}
-            if os.path.exists(_marker_path):
-                _marker = json.loads(open(_marker_path).read())
-            _marker[token.upper()] = time.time()
-            _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
-            with open(_marker_path, 'w') as _f:
-                json.dump(_marker, _f)
+            import fcntl
+            _marker_fd = open(_marker_path, 'r+' if os.path.exists(_marker_path) else 'w+')
+            try:
+                fcntl.flock(_marker_fd, fcntl.LOCK_EX)
+                _marker = {}
+                try:
+                    _marker = json.loads(_marker_fd.read())
+                except (json.JSONDecodeError, ValueError):
+                    _marker = {}
+                _marker_fd.seek(0)
+                _marker_fd.truncate()
+                _marker[token.upper()] = time.time()
+                _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+                json.dump(_marker, _marker_fd)
+                _marker_fd.flush()
+            finally:
+                fcntl.flock(_marker_fd, fcntl.LOCK_UN)
+                _marker_fd.close()
         except Exception:
             pass
 
@@ -1661,17 +1673,27 @@ def execute_trade(token, direction, price, confidence, source,
                 # in stdout (e.g. INSERT failed silently), treat as failure — do NOT
                 # mark signal EXECUTED, let decider_run retry next cycle.
                 # MARKER: Write token to recently-opened file so guardian skips orphan creation
+                # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
                 try:
                     _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
-                    import json as _j
-                    _marker = {}
-                    if os.path.exists(_marker_path):
-                        _marker = json.loads(open(_marker_path).read())
-                    _marker[token.upper()] = time.time()
-                    # Prune entries older than 60s
-                    _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
-                    with open(_marker_path, 'w') as _f:
-                        json.dump(_marker, _f)
+                    import fcntl
+                    _marker_fd = open(_marker_path, 'r+' if os.path.exists(_marker_path) else 'w+')
+                    try:
+                        fcntl.flock(_marker_fd, fcntl.LOCK_EX)
+                        _marker = {}
+                        try:
+                            _marker = json.loads(_marker_fd.read())
+                        except (json.JSONDecodeError, ValueError):
+                            _marker = {}
+                        _marker_fd.seek(0)
+                        _marker_fd.truncate()
+                        _marker[token.upper()] = time.time()
+                        _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+                        json.dump(_marker, _marker_fd)
+                        _marker_fd.flush()
+                    finally:
+                        fcntl.flock(_marker_fd, fcntl.LOCK_UN)
+                        _marker_fd.close()
                 except Exception:
                     pass  # non-fatal
                 # ── Copy trader performance tracking ──────────────────────────────

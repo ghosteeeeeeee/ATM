@@ -1406,10 +1406,18 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 # FIX (2026-08-06): Race condition guard — if signal pipeline just opened
                 # a trade for this token (marker file), skip orphan creation. The DB
                 # record may not have committed yet when guardian queries.
+                # Uses file lock to prevent TOCTOU race with concurrent writers.
                 try:
                     _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
                     if os.path.exists(_marker_path):
-                        _marker = json.loads(open(_marker_path).read())
+                        import fcntl
+                        _marker_fd = open(_marker_path, 'r')
+                        try:
+                            fcntl.flock(_marker_fd, fcntl.LOCK_SH)
+                            _marker = json.loads(_marker_fd.read())
+                        finally:
+                            fcntl.flock(_marker_fd, fcntl.LOCK_UN)
+                            _marker_fd.close()
                         if coin.upper() in _marker:
                             _age = time.time() - _marker[coin.upper()]
                             if _age < 60:
@@ -4224,10 +4232,18 @@ def sync():
             # this token (marker file). The DB record may not have committed yet.
             # reconcile_hype_to_paper's marker check skipped it, but Step 6 would
             # still close it — must check here too.
+            # Uses file lock to prevent TOCTOU race with concurrent writers.
             try:
                 _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
                 if os.path.exists(_marker_path):
-                    _marker = json.loads(open(_marker_path).read())
+                    import fcntl
+                    _marker_fd = open(_marker_path, 'r')
+                    try:
+                        fcntl.flock(_marker_fd, fcntl.LOCK_SH)
+                        _marker = json.loads(_marker_fd.read())
+                    finally:
+                        fcntl.flock(_marker_fd, fcntl.LOCK_UN)
+                        _marker_fd.close()
                     if coin.upper() in _marker:
                         _age = time.time() - _marker[coin.upper()]
                         if _age < 60:
