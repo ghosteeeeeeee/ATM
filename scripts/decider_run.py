@@ -3055,6 +3055,16 @@ def run(dry_run=False):
                             skipped += 1
                             continue
                     fresh_result = {'direction': 'LONG'}  # direction confirmed
+                elif _is_accel_v3_short:
+                    from signals.accel_300_v3_short import detect_accel_300_v3_short, _get_1m_prices
+                    fresh_prices = _get_1m_prices(token)
+                    if not fresh_prices:
+                        log(f'  🚫 [ACCEL-V3-SHORT-STALE] {token} {direction} blocked: no fresh price data for staleness check')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                    fresh_result = detect_accel_300_v3_short(token, fresh_prices)
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
