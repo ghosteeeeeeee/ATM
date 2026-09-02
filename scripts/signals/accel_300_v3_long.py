@@ -580,6 +580,15 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             # If gap has narrowed significantly since detection, the bounce failed
             if current_gap < sig['gap_pct'] - 0.15:
                 continue  # gap narrowed since detection — bounce failed
+            # Reexp re-check: if reexp < 0 at execution, bounce has failed
+            # 5 of 6 losers had negative reexp at entry; all 3 winners had positive
+            current_ema_series = _ema_series(current_closes, PERIOD)
+            reexp_check_idx = max(0, len(current_closes) - 4)
+            if current_ema_series[reexp_check_idx] and current_ema_series[reexp_check_idx] > 0:
+                gap_3_ago = (current_closes[reexp_check_idx] - current_ema_series[reexp_check_idx]) / current_ema_series[reexp_check_idx] * 100
+                current_reexp = current_gap - gap_3_ago
+                if current_reexp < 0:
+                    continue  # reexp negative — bounce failed
 
         try:
             sid = add_signal(
