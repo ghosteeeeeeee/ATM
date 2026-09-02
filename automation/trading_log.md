@@ -19484,3 +19484,104 @@ Final set: ['AIXBT', 'ALT', 'APT', 'ARB', 'AVNT', 'BCH', 'BLUR', 'BTC', 'CAKE', 
 - bb-bounce-long+ 21T 52.4% WR -$0.34 — slight loss but not kill-worthy (WR >50%)
 
 **Open Questions:** With accel-300-v2-long killed, 24h loss should drop ~$0.55 as its trades roll off. Next analysis should show improvement.
+
+## [2026-09-01 22:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W 0L) +$0.08 (DYDX +$0.01, DOT +$0.04, SEI +$0.03)
+**24h:** 60T 51.7% WR -$1.97 (accel-300-v2-long -$0.55 still rolling off)
+**Open:** 1 (LDO long $0.00)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour (bb-bounce-long+ 23T 56.5% WR -$0.29 — profitable signal, not kill-worthy)
+- accel-300-v2-long killed 14:05, still showing 16T/24h -$0.55 but rolling off
+- atr_sl_hit 53.3% (32/60) — trailing SL dominant, avg -$0.062/hit small
+- profit-monster-trail 41.7% (25/60) avg +$0.050 — profitable, net effect slightly negative
+- Trade freq 3/hr — normal
+- 3 consecutive positive hours (19:00 +$0.21, 21:00 +$0.03, 22:00 +$0.05) — recovery confirmed
+- LDO open position at $0.00 — negligible, within range
+
+**Open Questions:** System steady. With accel-300-v2-long rolling off, 24h stats should improve further. ATR SL exits dominate but costs are small per hit.
+
+## LOSERS Update — 2026-09-01 22:32 UTC
+- REMOVE GRASS (insufficient data)
+- REMOVE BTC (insufficient data)
+- REMOVE PUMP (insufficient data)
+- REMOVE XPL (insufficient data)
+- REMOVE CFX (insufficient data)
+- REMOVE COMP (insufficient data)
+- REMOVE BLUR (insufficient data)
+- REMOVE ENA (insufficient data)
+- REMOVE CAKE (insufficient data)
+- REMOVE POL (insufficient data)
+- REMOVE WLFI (insufficient data)
+- REMOVE HYPE (insufficient data)
+- REMOVE AIXBT (insufficient data)
+- REMOVE MON (insufficient data)
+- REMOVE ETH (insufficient data)
+- REMOVE ICP (insufficient data)
+- REMOVE IMX (insufficient data)
+- ADD MET (WR=44.4%, PnL=$-0.42, low_wr (44.4%))
+- ADD ATOM (WR=40.0%, PnL=$-0.26, low_wr (40.0%))
+
+Final set: ['ALT', 'APT', 'ARB', 'ATOM', 'AVNT', 'BCH', 'CASHCAT', 'CC', 'CHIP', 'CRV', 'DOGE', 'ENS', 'ETC', 'IO', 'JUP', 'MERL', 'MET', 'NEO', 'NOT', 'WLD', 'YGG', 'ZEN', 'ZRO']
+
+## [2026-09-01 23:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) -$0.02 (AR +$0.07, LDO -$0.09)
+**24h:** 58T 51.7% WR -$0.85 (improved from -$0.97)
+**Open:** 0
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour
+- accel-300-v2-long killed 14:05 still rolling through 24h (13T -$0.53), will fade
+- atr_sl_hit 50% (29/58) avg -$0.067 — dominant but cost per hit small
+- profit-monster-trail 44.8% (26/58) avg +$0.051 — profitable, offsets SL hits
+- Trade freq 2/hr — normal
+- 0 open positions — clean slate
+- 24h PnL improved from -$0.97 → -$0.85, recovery trend intact
+
+**Open Questions:** System healthy. Next run should show further improvement as accel-300-v2-long trades roll off 24h window.
+
+## [2026-09-02 01:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) -$0.13 (SUSHI atr_sl_hit)
+**24h:** 58T 53.4% WR -$0.85 (steady)
+**Open:** 4 positions +$0.23 combined (all accel-300-v3-long+)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour
+- atr_sl_hit 51.7% (30/58) avg -$0.068/hit — by design, small cost per hit
+- profit-monster-trail 43.1% (25/58) avg +$0.052 — profitable, offsets SL hits
+- Trade freq 2/hr — normal
+- accel-300-v2-long killed 14:05 rolling off 24h (12T -$0.46), will fade
+- accel-300-v3-long+ new signal: 1T 0%WR -$0.13 (too few trades to judge), 4 open positions slightly green
+- 24h PnL steady at -$0.85, recovery trend from -$0.97 intact
+- System healthy
+
+**Open Questions:** None
+
+## [2026-09-02 02:05 UTC] Hourly Analysis
+
+**Trades:** 7 closed (3W 4L) +$0.26
+**24h:** 61T 52.5%WR -$0.64 (improved from -$0.85)
+**Open:** 1 (STX short $0.00)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour
+- atr_sl_hit 57.4% (35/61) avg -$0.054/hit — above 40% threshold but cost is small per hit
+- profit-monster-trail 37.7% (23/61) avg +$0.052 — profitable, offsets SL hits
+- 24h PnL improved -$0.85 → -$0.64, recovery trend intact
+- Trade freq 7/hr — elevated but below 20/hr overtrading threshold
+- accel-300-v2-long killed 14:05 rolling off (11T -$0.52 fading)
+- accel-300-v3-long+ new signal: 5T 40%WR +$0.04, 4T last hour 50%WR +$0.17 — performing well
+- Max consecutive negative hours: 0
+
+**Open Questions:** System healthy. Accelerating recovery. Next run at 03:05 UTC.

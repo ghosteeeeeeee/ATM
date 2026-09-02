@@ -741,3 +741,9 @@
   WHY: 3T last hour (0W 3L -$0.29) — all ATR SL exits. 58T 24h 51.7%WR -$0.75. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 55.2% trailing SL working (avg -$0.057/hit small). profit-monster-trail 23T +$1.20 profitable. Trade freq 3/hr normal. 0 open positions (clean slate). HBAR closed 18:22. System healthy in steady state.
   BY: auto_1hr
   NEXT: Re-run at 20:05 UTC
+[2026-09-01 22:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +/usr/bin/bash.08). 60T 24h 51.7%WR -.97. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 53.3% trailing SL working. profit-monster-trail 41.7% profitable. Trade freq 3/hr normal. 3 consecutive positive hours. 1 open position (LDO $0.00). accel-300-v2-long killed 14:05 rolling off. System healthy.
+[2026-09-01 23:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.02 flat). 58T 24h 51.7%WR -$0.85 (improved). Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 50% working. profit-monster-trail 44.8% profitable. Trade freq 2/hr normal. 0 open positions. accel-300-v2-long killed rolling off. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 00:05 UTC

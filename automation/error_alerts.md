@@ -1918,3 +1918,42 @@ ALERTS:
 - **WARN** (1x): `NEGATIVE_PNL` — Today's PnL at -31.73% (57 trades closed). Bad day, monitor closely.
 - **WARN** (1x): `ALL_NEUTRAL_REGIME` — 104/104 tokens NEUTRAL regime. No directional bias. Trading will be choppy.
 - **WARN** (1x): `EMPTY_HOTSET` — Hotset empty after compaction. 0 signals above 50% confidence.
+
+## Error Alerts — 2026-09-01 22:22 UTC — Health Check
+- **WARN** (11x): `brain.py REJECTED` — GRASS LONG repeatedly rejected: `amount_usdt=5.5 < HL_MIN=11.0`. Token generates signals every minute but sizing consistently below HL minimum. Not a bug — system correctly blocking sub-min positions.
+- **WARN** (11x): `ROLLBACK FAILED` — `sig#XXXXXX already claimed by another process`. Race condition: concurrent pipeline runs attempt rollback on same signal. Harmless — signal already consumed.
+- **WARN**: `ALL_NEUTRAL_REGIME` — 104/104 tokens NEUTRAL. No directional bias since 21:22 UTC.
+- **WARN**: `EMPTY_HOTSET` — 0 signals survived compaction. 0 open positions. Market in no-trade zone.
+- **WARN**: `NEGATIVE_PNL` — 52 trades today, 57.7% WR, -$0.38 PnL. Day slightly negative despite good WR.
+- **INFO**: Pipeline completed last run at 22:21:33. Timer active, all services healthy. No crashes.
+- **INFO**: 102 signals generated in last hour, 154 tokens tracked, 78,876 active signals total.
+- **INFO**: Disk 81% (22G free). No auto-fixes applied — all issues are operational noise.
+
+## Error Alerts — 2026-09-01 23:05 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: CASHCAT TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Error Alerts — 2026-09-01 23:22 UTC — Health Check
+- **[INFO]** Pipeline: OK — running on 1-min timer, last cycle completed 23:21:30
+- **[WARN]** Signal compactor: Macro gate FULL (regime=NEUTRAL, vol=0.005, wr=45%). 0 signals approved by design — system protecting capital in flat market.
+- **[WARN]** -22.78% PnL today (57 closed). Better than morning's -34%, still negative.
+- **[WARN]** momentum_cache: MISSING (checklist reported 127h stale). File not found in data/.
+- **[CRIT]** hermes-coding-mcp.service: **DISABLED** — was in crash loop (263,855 restarts), missing module `server`. Disabled to stop resource burn.
+- **[WARN]** hermes-better-coder.service: FAILED — missing module `dispatcher.dispatcher`
+- **[WARN]** hermes-wasp.service: FAILED — silent exit (no traceback visible)
+- **[WARN]** hermes-git-release.service: FAILED — git operation error
+- **[WARN]** weather-station-api.service: FAILED — script `/root/.hermes/scripts/weather_station_api.py` does not exist
+- **[WARN]** hermes-trading-checklist.service: CRITICAL=1, WARNINGS=3 (stale momentum_cache)
+- **[INFO]** Timers: 40+ active, all firing on schedule
+- **[INFO]** Disk: 81% (22G free) — healthy
+- **[INFO]** Open positions: 1 (CHIP LONG, +0.57%)
+- **AUTO-FIX**: Disabled hermes-coding-mcp.service (263K crash loop burning CPU)
+
+## Error Alerts — 2026-09-02 00:05 UTC
+- **REPEATED** (10x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=15m&limit=N`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=4h&limit=N`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=1h&limit=N`
+
+## Error Alerts — 2026-09-02 00:22 UTC
+- **[WARN]**: Hot set empty — compaction filtering all signals above 50% confidence. No new entries.
+- **[WARN]**: Disk at 81% (22G free). Monitor, compress logs if >85%.
+- **AUTO-FIX**: None required — system operational.
