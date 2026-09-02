@@ -221,7 +221,8 @@ def run():
             wr = token_stats['winrate']
             pnl = token_stats['total_pnl_usdt']
 
-            if wr >= LOSERS_REMOVE_WR_THRESHOLD and pnl >= LOSERS_REMOVE_PNL_THRESHOLD:
+            # Remove if WR >= 50% (not a loser regardless of PnL)
+            if wr >= LOSERS_REMOVE_WR_THRESHOLD:
                 # Check cooldown
                 last_demoted = state.get('last_demoted', {}).get(token)
                 if last_demoted:
