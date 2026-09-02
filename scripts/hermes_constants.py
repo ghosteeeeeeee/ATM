@@ -275,29 +275,27 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
     'ALT',
-    'APT',
-    'ARB',
     'ATOM',
-    'AVNT',
     'BCH',
-    'CASHCAT',
     'CC',
     'CHIP',
-    'CRV',
-    'DOGE',
     'ENS',
     'ETC',
     'IO',
     'JUP',
     'MERL',
     'MET',
+    'MON',
+    'NEAR',
     'NEO',
-    'NOT',
-    'WLD',
-    'YGG',
-    'ZEN',
-    'ZRO'
+    'POL',
+    'PUMP',
+    'XPL',
+    'ZEN'
 }
+
+
+
 
 
 
@@ -310,7 +308,7 @@ LOSERS = {
 
 # Promotion criteria (add to losers)
 LOSERS_MIN_TRADES = 5              # Minimum trades in 7d to evaluate
-LOSERS_ADD_WR_THRESHOLD = 60.0     # Below this WR → add (coins with 60%+ WR should not be losers)
+LOSERS_ADD_WR_THRESHOLD = 50.0     # Below this WR → add (coins with 50%+ WR should not be losers)
 LOSERS_ADD_PNL_THRESHOLD = -0.50   # Below this PnL → add
 LOSERS_ADD_CONSECUTIVE_LOSSES = 5  # This many losses in a row → add
 LOSERS_ADD_WR_COLLAPSE = 20.0      # Dropped this much from 30d avg → add
@@ -318,7 +316,7 @@ LOSERS_AUTO_DISABLE_WR = 30.0      # Below this WR with 10+ trades → permanent
 LOSERS_AUTO_DISABLE_MIN_TRADES = 10
 
 # Demotion criteria (remove from losers)
-LOSERS_REMOVE_WR_THRESHOLD = 65.0  # Must be above this to exit (above the add threshold)
+LOSERS_REMOVE_WR_THRESHOLD = 50.0  # Must be above this to exit (50%+ WR = not a loser)
 LOSERS_REMOVE_PNL_THRESHOLD = 0.0  # Must be profitable to exit
 LOSERS_COOLDOWN_DAYS = 3           # Must be out for 3 days before re-adding
 
@@ -1088,6 +1086,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-long',   # V3 pullback LONG — manage via ATR SL, not PM Trail
+    'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1441,9 +1440,9 @@ MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
 ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13-win streak Aug 12.
-ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — SHORT only (LONG moved to accel_300_v2_long)
+ACCEL_300_V2_ENABLED          = False   # REPLACED by accel_300_v3_short — anti-bottom-catch SHORT
 ACCEL_300_V2_PLUS_ENABLED     = False   # DEFUNCT — LONG moved to accel_300_v2_long.py. Do not re-enable.
-ACCEL_300_V2_MINUS_ENABLED    = True    # RE-ENABLED 2026-09-01 — signal improved: tighter filters, staleness gate, wider max gap (6.0%)
+ACCEL_300_V2_MINUS_ENABLED    = False   # REPLACED by accel_300_v3_short — v2 had RSI gap (catching bottoms)
 ACCEL_300_V2_LONG_ENABLED     = False   # auto_1hr KILLED 2026-09-01 20:05 — 16T/24h 31.3%WR -$0.55, ALL ATR_SL. 14:05 kill attempt FAILED (constant never set False). NEVER_REENABLE.
 ACCEL_300_V2_LONG_5M_ENABLED  = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
@@ -1645,6 +1644,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
     'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
+    'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
