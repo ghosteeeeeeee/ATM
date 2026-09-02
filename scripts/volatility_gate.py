@@ -47,6 +47,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in range-bound
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
     },
     'NORMAL': {
         # pump_catcher — momentum breakout (velocity + acceleration)
@@ -54,6 +55,7 @@ REGIME_SIGNALS = {
         # Trend following + mean reversion in steady markets
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
@@ -89,6 +91,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
@@ -123,6 +126,7 @@ REGIME_SIGNALS = {
         'mover+', 'mover-',  # momentum spike detector
         'bb_bounce',
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
+        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
