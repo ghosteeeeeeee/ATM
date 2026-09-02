@@ -1207,6 +1207,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_LONG_5M_ENABLED',  # CEO 2026-08-29 — 0 trades in 14d, dead. NEVER_REENABLE.
     'ACCEL_300_V2_LONG_ENABLED',     # AUTO_1HR 2026-09-01 — 16T/24h 31.3% WR -$0.55. ALL ATR_SL. NEVER_REENABLE.
     'BB_BOUNCE_LONG_ENABLED',        # AUTO_1HR 2026-09-01 — 5T/0%WR/-$0.47 last hour, 26T/24h -$0.10. NEVER_REENABLE.
+    'ACCEL_300_V3_LONG_ENABLED',     # CEO 2026-09-02 — 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. Tighter filters didn't fix. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1459,7 +1460,7 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
-ACCEL_300_V3_LONG_ENABLED      = True    # RE-ENABLED 2026-09-02 — tighter filters after 15T analysis (6W/9L → projected 5W/3L)
+ACCEL_300_V3_LONG_ENABLED      = False   # CEO KILLED 2026-09-02 ~09:00 UTC — 16T/24h -0.70 37.5% WR, ALL ATR_SL in NEUTRAL. Tighter filters (MIN_GAP=2.0) didn't fix. NEVER_REENABLE.
 ACCEL_300_V3_LONG_MIN_GAP     = 2.0     # min gap above EMA300 (raised from 1.5: filters weak trends like FIL-2 at 0.98%)
 ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
 ACCEL_300_V3_LONG_MIN_PULLBACK = 0.30   # min gap narrowing from peak (raised from 0.20: filters shallow pullbacks)

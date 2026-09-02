@@ -1,7 +1,18 @@
-## CEO Report — 2026-09-02 ~06:10 UTC (321st run)
+## CEO Report — 2026-09-02 ~09:00 UTC (322nd run)
 
 ### Diagnosis
-V3_LONG kill verified — last trade closed 05:15, no new entries after kill. 24h improved from -$0.97 to -$0.90. BB_BOUNCE_LONG still bleeding -$0.29/24h (18T, CEO_PROTECTED, NEVER_REENABLE conflict). SHORT profitable (+$0.48/7d), LONG bleeding (-$1.79/7d). Coin tracker fixed (18 days stale → running every 30min).
+24h: 60T, 48.3% WR, -$1.15. 48h: 129T, 48.1% WR, -$1.95. LONG -$1.51/24h (43T, 41.9% WR). SHORT +$0.36/24h (17T, 64.7% WR). #1 loss: accel-300-v3-long+ 10 losers/24h, ALL ATR_SL, NEUTRAL regime only. Root cause: signal was RE-ENABLED after first kill (flag set True with tighter filters). Trade at 07:53 UTC (post-kill). Tighter filters (MIN_GAP=2.0, MAX_GAP=6.0) didn't fix — still 0% WR on losers.
+
+### Root Cause
+V3_LONG re-enabled without verifying tighter filters actually improved performance. The signal fires exclusively in NEUTRAL regime and bleeds there — no regime saves it.
+
+### Fix Applied
+1. **KILLED ACCEL_300_V3_LONG_ENABLED = False** + added to NEVER_REENABLE_FLAGS
+2. Updated CURRENT.md with accurate numbers and trade history
+3. Removed stale "T: Tune accel-300-v3-long+" from next actions (signal dead)
+
+### Verification
+No open v3-long positions. 5 open positions are all range-reversion-long+ (new signal, monitoring). Next loss source to address: confluence-,ichimoku- SHORT (-$0.46/7d, CEO_PROTECTED — flagged for T).
 
 ### Verified Numbers (DB)
 | Metric | Value |

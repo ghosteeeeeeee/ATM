@@ -1991,3 +1991,16 @@ ALERTS:
 
 ## Error Alerts — 2026-09-02 08:05 UTC
 - **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+
+## Error Alerts — 2026-09-02 08:25 UTC
+- **CRITICAL** (N=~10): `NameError: name 'BB_BOUNCE_V2_LONG_ENABLED' is not defined` — signal_compactor crashed every cycle since new bb_bounce_v2_long signal was added
+- **AUTO-FIX**: Added `BB_BOUNCE_V2_LONG_ENABLED` to import block at signal_schema.py:2132. Verified: signal_compactor runs clean, 3 hotset entries approved.
+
+## Error Alerts — 2026-09-02 09:05 UTC
+- **REPEATED** (16x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+- **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-09-02 10:05 UTC
+- **REPEATED** (47x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
