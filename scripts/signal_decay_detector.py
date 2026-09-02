@@ -107,6 +107,14 @@ def main():
 
 def _main_impl():
     log("=== Signal Decay Detector (rapid-response) ===")
+    
+    # Import regime memory for habitat check
+    try:
+        from regime_memory import RegimeMemory
+        rm = RegimeMemory()
+        has_regime_memory = True
+    except Exception:
+        has_regime_memory = False
 
     performance = _get_signal_performance_24h()
     if not performance:
@@ -119,6 +127,14 @@ def _main_impl():
             continue
 
         if wr < RAPID_DISABLE_WR and trades >= RAPID_DISABLE_TRADES:
+            # REGIME-AWARE CHECK: Does this signal have a winning habitat?
+            if has_regime_memory:
+                winning = rm.get_winning_regimes(signal_type)
+                if winning:
+                    log(f"  🟡 RAPID DISABLE BLOCKED: {signal_type}: {wr}% WR but has winning regimes: {winning}")
+                    log(f"    → Keeping alive in habitat: {', '.join(winning)}")
+                    continue  # Species has a habitat — don't rapid-kill
+            
             log(f"  🔴 RAPID DISABLE: {signal_type}: {trades} trades, {wr}% WR, PnL={total_pnl}")
             if _disable_signal_rapid(signal_type):
                 disabled_count += 1

@@ -372,11 +372,23 @@ def _get_trades_exact(signal_type, limit=50):
 def _kill_underperformers():
     """Auto-disable signals with negative 50-trade PnL or 10+ consecutive losses.
     
+    REGIME-AWARE: Before killing, checks if signal has winning regimes.
+    If a signal wins in at least one regime, it stays alive (species with habitat).
+    Only kills if losing in ALL regimes or has no regime data.
+    
     Respects CEO_PROTECTED_FLAGS — won't touch protected signals.
     Returns number of signals disabled.
     """
     kills = 0
     signal_types = _get_all_active_signal_types()
+    
+    # Import regime memory for habitat check
+    try:
+        from regime_memory import RegimeMemory
+        rm = RegimeMemory()
+        has_regime_memory = True
+    except Exception:
+        has_regime_memory = False
     
     for signal_type in signal_types:
         # Skip already-disabled signals
@@ -407,6 +419,14 @@ def _kill_underperformers():
             kill_reason = f"{max_consec} consecutive losses >= {KILL_MAX_CONSEC}"
         
         if kill_reason:
+            # REGIME-AWARE CHECK: Does this signal have a winning habitat?
+            if has_regime_memory:
+                winning = rm.get_winning_regimes(signal_type)
+                if winning:
+                    _log(f"  KILL BLOCKED {signal_type}: {kill_reason} — but has winning regimes: {winning}")
+                    _log(f"    → Keeping alive in habitat: {', '.join(winning)}")
+                    continue  # Species has a habitat — don't kill it
+            
             _log(f"  KILL {signal_type}: {kill_reason}")
             _disable_signal(signal_type)
             kills += 1
