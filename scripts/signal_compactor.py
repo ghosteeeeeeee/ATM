@@ -1692,10 +1692,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 winner_s['score'] = winner_conf * 0.85
                 conflict_loser_signals.append(loser_s)
 
-        # Re-sort with penalized winner scores, then remove losers
+        # Re-sort with penalized winner scores, then remove losers from active list
+        # FIX 2026-09-02: Keep losers in recovery list — if winner gets killed by
+        # spike filter or other hotset_final filters, the loser gets a second chance.
         top_signals.sort(key=lambda x: x['score'], reverse=True)
-
-        # Loser is removed — it goes back to PENDING at Step 13, not APPROVED
+        conflict_loser_recovery = list(conflict_loser_signals)  # backup for rescue
         top_signals = [s for s in top_signals if s not in conflict_loser_signals]
 
         # ── Step 8: Deduplicate by token+direction ─────────────────────────────
@@ -1864,6 +1865,58 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _conn_sf:
                         try:
                             _conn_sf.close()
+                        except Exception:
+                            pass
+            # ── Global spike filter LONG: block LONG after recent bearish 5m candle ──
+            # Mirror of SHORT spike filter — prevents entering LONG at dump lows
+            # EXEMPT: v3 pullback signals (accel-300-v3-long+) — bearish candle IS the pullback
+            _is_v3_pullback = source and 'accel-300-v3-long' in source
+            if direction == 'LONG' and SPIKE_FILTER_ENABLED and not _is_v3_pullback:
+                _conn_sf2 = None
+                try:
+                    _skip_long = False
+                    _conn_sf2 = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_sf2 = _conn_sf2.cursor()
+                    _cur_sf2.execute("""
+                        SELECT close, open FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 3
+                    """, (tkn.upper(),))
+                    for _cl, _op in _cur_sf2.fetchall():
+                        if _op and _op > 0 and (_op - _cl) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
+                            log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — recent bearish 5m candle -{(_op-_cl)/_op*100:.3f}%")
+                            _skip_long = True
+                            break
+                    if not _skip_long:
+                        _cur_sf2.execute("""
+                            SELECT close FROM candles_5m
+                            WHERE token = ? AND is_closed = 1
+                            ORDER BY ts DESC LIMIT 15
+                        """, (tkn.upper(),))
+                        _closes_l = [r[0] for r in _cur_sf2.fetchall()]
+                        if len(_closes_l) >= 15:
+                            _deltas_l = [_closes_l[i] - _closes_l[i-1] for i in range(1, len(_closes_l))]
+                            _gains_l = [d if d > 0 else 0 for d in _deltas_l[-14:]]
+                            _losses_l = [-d if d < 0 else 0 for d in _deltas_l[-14:]]
+                            _ag_l = sum(_gains_l) / 14
+                            _al_l = sum(_losses_l) / 14
+                            if _al_l == 0 and _ag_l > 0:
+                                # All gains, no losses → RSI = 100 (max overbought) → block LONG
+                                log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI 100.0 > {100 - SPIKE_FILTER_RSI_THRESHOLD} (no losses in 14 periods)")
+                                _skip_long = True
+                            elif _al_l > 0:
+                                _rsi_l = 100 - (100 / (1 + _ag_l / _al_l))
+                                if _rsi_l > (100 - SPIKE_FILTER_RSI_THRESHOLD):
+                                    log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI {_rsi_l:.1f} > {100 - SPIKE_FILTER_RSI_THRESHOLD}")
+                                    _skip_long = True
+                    if _skip_long:
+                        continue
+                except Exception:
+                    pass
+                finally:
+                    if _conn_sf2:
+                        try:
+                            _conn_sf2.close()
                         except Exception:
                             pass
             # ── Global SHORT velocity filter (backtested: vel>0.1% OR last3_green>=3 → 12% WR) ──
@@ -2179,6 +2232,51 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"Merged {len(preserved)} preserved entries with {len(db_by_key)} DB entries")
             finally:
                 _upsert_conn.close()
+
+        # ── Conflict loser rescue ─────────────────────────────────────────────
+        # FIX 2026-09-02: If the conflict winner was killed by spike filter or
+        # other hotset_final filters, promote the loser so at least one direction enters.
+        if conflict_loser_recovery:
+            entered_tokens = {e['token'].upper() for e in hotset_final}
+            for loser in conflict_loser_recovery:
+                tok = loser['row'][0]
+                direc = loser['row'][1]
+                if tok.upper() not in entered_tokens:
+                    row = loser['row']
+                    l_token, l_direction, l_stype, l_conf, l_source = row[0], row[1], row[2], row[3], row[4]
+                    l_combo_key = loser.get('combo_key')
+                    l_spd = loser.get('speed_data', {})
+                    rescue_entry = {
+                        'token': l_token,
+                        'direction': l_direction.upper(),
+                        'confidence': l_conf,
+                        'final_confidence': l_conf,
+                        'source': l_source,
+                        'signal_type': l_stype,
+                        'z_score': row[7] if len(row) > 7 else 0,
+                        'combo_key': l_combo_key,
+                        'rounds': 1,
+                        'staleness': 1.0,
+                        'compact_rounds': row[13] if len(row) > 13 else 0,
+                        'survival_round': 1,
+                        'survival_score': 0.5,
+                        'age_m': loser.get('age_m', 0),
+                        'regime': loser.get('regime', 'NEUTRAL'),
+                        'regime_conf': loser.get('regime_conf', 0),
+                        'wave_phase': l_spd.get('wave_phase', 'neutral'),
+                        'is_overextended': l_spd.get('is_overextended', False),
+                        'price_acceleration': l_spd.get('price_acceleration', 0.0),
+                        'price_change_30m': l_spd.get('price_change_30m', 0.0),
+                        'momentum_score': l_spd.get('momentum_score', 50.0),
+                        'speed_percentile': l_spd.get('speed_percentile', 50.0),
+                        'score': loser.get('score', 0),
+                        'tp_bonus_mult': loser.get('tp_bonus_mult', 1.0),
+                        'entry_origin_ts': time.time(),
+                        'signal_metadata': row[15] if len(row) > 15 else None,
+                        'rsi_14': row[8] if len(row) > 8 else None,
+                    }
+                    hotset_final.append(rescue_entry)
+                    log(f"  🔄 [CONFLICT-RESCUE] {tok}:{direc} — winner killed, promoting conflict loser (src={l_source})")
 
         # Cap at 10
         hotset_final = hotset_final[:10]
