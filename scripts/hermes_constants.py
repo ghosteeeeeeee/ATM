@@ -1464,6 +1464,7 @@ ACCEL_300_V3_LONG_MIN_PULLBACK = 0.20   # min gap narrowing from peak — price 
 ACCEL_300_V3_LONG_MAX_PULLBACK = 2.5    # max pullback — don't catch falling knives
 ACCEL_300_V3_LONG_REEXPAND_MIN = 0.08   # min gap re-expansion — bounce must be confirmed
 ACCEL_300_V3_LONG_GAP_PEAK_WINDOW = 20  # bars to find recent gap peak
+ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE = 0.10  # min gap % below peak — block entries near local tops (SUSHI at 9.1% of peak was blocked; winners at 16-72%)
 ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW = 3  # bars to measure re-expansion
 ACCEL_300_V3_LONG_MIN_VELOCITY = 0.0002 # min velocity as fraction of price — bounce must have momentum
 ACCEL_300_V3_LONG_GREEN_CAP = 3         # max consecutive green candles — don't chase after spike

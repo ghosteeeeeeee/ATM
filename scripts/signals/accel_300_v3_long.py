@@ -86,6 +86,7 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_CONF_RSI_BONUS,
     ACCEL_300_V3_LONG_CHASE_MOVE_MAX,
     ACCEL_300_V3_LONG_CHASE_RSI_MIN,
+    ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE,
 )
 
 PERIOD = 300  # EMA300 period
@@ -322,6 +323,15 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
         return None  # no pullback — gap still near peak (chasing)
     if pullback > ACCEL_300_V3_LONG_MAX_PULLBACK:
         return None  # too much pullback — trend may be breaking
+
+    # ── FILTER 3b: MIN PEAK DISTANCE — don't enter at local tops ────────────
+    # Gap must be at least X% below recent peak — prevents chasing at peaks
+    # SUSHI had 9.1% distance from peak (entered at top, lost)
+    # Winners had 16-72% distance from peak (entered during pullback)
+    if gap_peak > 0:
+        pct_from_peak = (gap_peak - gap_now) / gap_peak
+        if pct_from_peak < ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE:
+            return None  # too close to peak — entering at local top
 
     # ── FILTER 4: RE-EXPANSION — gap is widening again (bounce confirmed) ──
     reexpand_start = latest_idx - ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW
