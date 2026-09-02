@@ -751,3 +751,7 @@
   WHY: 2T last hour (1W 1L -$0.02 flat). 58T 24h 51.7%WR -$0.85 (improved). Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 50% working. profit-monster-trail 44.8% profitable. Trade freq 2/hr normal. 0 open positions. accel-300-v2-long killed rolling off. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 00:05 UTC
+[2026-09-02 05:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour, 61T/24h 48.4%WR -$1.17. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 72% but per-hit cost tiny (-$0.050), PM trail offsets (+$0.059). v3-long+ 38.5%WR -$0.59 (ALL atr_sl_hit) — underperforming but not kill threshold. 3 consecutive negative hours but declining trade volume. System quiet in ranging market.
+  BY: auto_1hr
+  NEXT: Re-run at 06:15 UTC

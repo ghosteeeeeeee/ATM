@@ -19706,3 +19706,32 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENS', 'ETC', 'IO', 'JUP', 'MERL
 - 24h PnL improving from -$0.85 to -$0.63
 
 **Open Questions:** None. System healthy in quiet market.
+
+## [2026-09-02 05:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour, 2 open (ALT, SUSHI)
+**24h:** 61T 48.4%WR -$1.17
+**PnL by hour:** +$0.28 → -$0.09 → -$0.20 → -$0.38 (3 consecutive negative)
+
+**Signal breakdown (24h):**
+- accel-300-v3-long+: 13T 38.5%WR -$0.59 — ALL atr_sl_hit (structural issue)
+- bb-bounce-long+: 17T 52.9%WR -$0.33 — PM trail generates $0.42
+- accel-300-v2-short-: 7T 28.6%WR -$0.06 — already disabled
+- accel-300-v2-long: 4T 25%WR -$0.10 — already killed
+
+**Close reasons (24h):**
+- atr_sl_hit: 44T 72% avg -$0.050
+- profit-monster-trail: 17T 28% avg +$0.059 (fully offsets SL)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour (0 trades last hour)
+- v3-long+ underperforming (38.5%WR, -$0.59) but not at kill threshold
+- atr_sl_hit 72% > 40% but per-hit cost tiny, PM trail offsets
+- Trade freq 0/hr last hour — quiet market, normal
+- 3 consecutive negative hours but declining volume (6→5→3)
+
+**Open Questions:**
+- v3-long+ structural issue: 100% SL exits suggest entries catching falling knives in ranging market
+- No regime_state table to check market regime

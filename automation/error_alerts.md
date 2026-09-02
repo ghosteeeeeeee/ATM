@@ -1957,3 +1957,25 @@ ALERTS:
 - **[WARN]**: Hot set empty — compaction filtering all signals above 50% confidence. No new entries.
 - **[WARN]**: Disk at 81% (22G free). Monitor, compress logs if >85%.
 - **AUTO-FIX**: None required — system operational.
+
+## Error Alerts — 2026-09-02 03:05 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'ACCEL_300_V3_SHORT_ENABLED' is not defined`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`
+
+## Error Alerts — 2026-09-02 04:05 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] ZORAUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=ZORAUSDT&interval=15m&limit=N`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] ZORAUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=ZORAUSDT&interval=4h&limit=N`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   [fetch_binance_candles] ZORAUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=ZORAUSDT&interval=1h&limit=N`
+
+## Error Alerts — 2026-09-02 04:22 UTC
+- **WARN** (1x): `hermes-signal-compactor.timer` was inactive
+- **AUTO-FIX**: Timer restarted, now active
+
+## Error Alerts — 2026-09-02 05:05 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
+
+## Error Alerts — 2026-09-02 05:23 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 05:07 UTC — self-recovered on next run
+- **[WARN]** (3x): `signals_runner [SLOW]` at 05:10, 05:15, 05:20 — signal generation slower than baseline
+- **INFO**: -28.92% PnL day (62 trades, 51.85% WR) — elevated loss, likely market chop

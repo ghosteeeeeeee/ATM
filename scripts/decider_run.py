@@ -1453,6 +1453,12 @@ def context_gate(token, direction, source, sig):
         pass  # fail-open, never block trade
 
     # Still ambiguous → LLM (soft advisory or hard block)
+    # FAIL-OPEN: skip LLM when hebbian data is too thin (< min_n trades)
+    # LLM shouldn't hard-block on n=1-2 — not enough data to judge
+    heb_n = heb[1] if heb and len(heb) > 1 else 0
+    if heb_n > 0 and heb_n < HEBBIAN_AUTO_MIN_N:
+        log(f'  [CTX-GATE] {token}: skip LLM — hebbian n={heb_n} < {HEBBIAN_AUTO_MIN_N} (insufficient data, fail-open)')
+        return ('GO', None, 0)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')

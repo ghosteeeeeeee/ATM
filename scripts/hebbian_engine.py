@@ -288,10 +288,17 @@ class HebbianEngine:
             llm_concept = f'llm_{llm_decision.lower()}'
 
         # ── Exit reason tier ──────────────────────────────────────────────
+        # FIX 2026-09-02: Use PnL to classify exit, not just string matching.
+        # Trailing stops that hit in profit are NOT losses — they're profit exits.
         exit_tier = None
         if exit_reason:
             er = exit_reason.lower()
-            if 'profit' in er or 'tp' in er:
+            profitable = pnl_pct is not None and pnl_pct > 0
+            if profitable:
+                # PnL positive = profit exit regardless of reason string
+                # (trailing stop in profit, SL in profit, etc.)
+                exit_tier = 'exit_profit'
+            elif 'profit' in er or 'tp' in er:
                 exit_tier = 'exit_profit'
             elif 'sl' in er or 'stop' in er:
                 exit_tier = 'exit_sl'

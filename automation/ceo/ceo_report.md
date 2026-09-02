@@ -1,3 +1,31 @@
+## CEO Report — 2026-09-02 ~07:30 UTC
+
+### Diagnosis
+Previous CEO overcounted — combined accel-300-v2-long + v3-long as one signal. Corrected: v2-long only 4T/24h (closing old positions), v3-long 14T/24h -$0.51 (real #1 loss). LONG side bleeds -$1.79/7d, SHORT profitable +$0.48/7d.
+
+### Root Cause
+ACCEL_300_V3_LONG_ENABLED was added Sep 1 but bleeding immediately: 42.9% WR, ALL atr_sl_hit exits. Not CEO_PROTECTED. BB_BOUNCE_LONG still True, CEO_PROTECTED, flagged for T.
+
+### Verified Numbers
+| Metric | Value |
+|--------|-------|
+| 24h | 61T, 47.5% WR, -$0.97 |
+| 48h | 127T, 47.2% WR, -$1.71 |
+| 7d | 416T, 50.0% WR, -$1.31 |
+| 7d SHORT | 248T, 53.2% WR, +$0.48 |
+| 7d LONG | 168T, 45.2% WR, -$1.79 |
+| #1 loss | accel-300-v3-long: 14T/24h -$0.51 |
+| Carry | profit-monster-trail: 17T/24h +$1.01 |
+
+### Fix Applied
+- **KILLED ACCEL_300_V3_LONG_ENABLED.** Stops -$0.51/24h bleeding.
+- FLAGGED BB_BOUNCE_LONG for T (CEO_PROTECTED, can't disable).
+
+### Expected Impact
+System improves from -$0.97/24h to approximately -$0.46/24h (-$0.51 stopped). Need T to disable BB_BOUNCE_LONG for further improvement.
+
+---
+
 ## CEO Report — 2026-09-02
 
 ### Diagnosis
