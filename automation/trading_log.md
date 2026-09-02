@@ -19735,3 +19735,64 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENS', 'ETC', 'IO', 'JUP', 'MERL
 **Open Questions:**
 - v3-long+ structural issue: 100% SL exits suggest entries catching falling knives in ranging market
 - No regime_state table to check market regime
+
+## FAVORITES Update — 2026-09-02 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE SAND (WR=57.1%, PnL=$0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE GMT (WR=50.0%, PnL=$0.00, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE FIL (WR=57.1%, PnL=$-0.12, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE LDO (WR=50.0%, PnL=$-0.04, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE KAS (WR=80.0%, AvgPnL=1.02%, Trades=5)
+- PROMOTE FOGO (WR=83.3%, AvgPnL=0.56%, Trades=6)
+- PROMOTE ASTER (WR=62.5%, AvgPnL=0.23%, Trades=8)
+- PROMOTE LTC (WR=71.4%, AvgPnL=0.12%, Trades=7)
+
+Final set: ['ASTER', 'BABY', 'BIGTIME', 'DYDX', 'FOGO', 'INJ', 'KAS', 'LTC', 'ME', 'NXPC', 'STX', 'SYRUP', 'TURBO', 'USUAL']
+
+## LOSERS Update — 2026-09-02 06:05 UTC
+- REMOVE PUMP (WR=50.0%, PnL=$-0.10, recovered)
+- ADD ENA (WR=33.3%, PnL=$-0.16, low_wr (33.3%))
+
+Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP', 'MERL', 'MET', 'MON', 'NEAR', 'NEO', 'POL', 'XPL', 'ZEN']
+
+## [2026-09-02 07:15 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.09 (2W 1L, 66.7% WR)
+
+**24h:** 63T 48.3%WR -$0.90
+- atr_sl_hit: 44T avg -$0.045 | profit-monster-trail: 19T avg +$0.057
+
+**Signal breakdown (24h):**
+- r2-trend-short4: 1T +$0.16, 100%WR — clean
+- accel-300-v3-long+: 14T -$0.51, 42.9%WR — CEO killed, SUSHI was residual
+- accel-300-v2-short-: 7T -$0.06, 28.6%WR — already disabled
+- accel-300-v2-long: 4T -$0.10, 25%WR — already disabled
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- v3-long+ CEO-disabled, SUSHI was holdover position
+- atr_sl_hit 70% structural but PM trail fully offsets per-hit cost
+- Trade freq 2.5/hr normal
+- 3 negative hours earlier but last 3 hours positive ($0.12 + $0.14 + $0.08)
+
+**Open Questions:** None
+
+## [2026-09-02 08:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (last close 06:27 UTC)
+**24h:** 63T, 47.6% WR, -$1.10
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — system quiet in ranging market
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 71% but PM trail ($0.055/hit) offsets SL cost ($0.046/hit)
+- v3-long+ CEO-disabled, rolling off as positions close
+- Trade freq 2.6/hr normal
+- No overtrading (max 7T in any hour)
+
+**Open Questions:** None

@@ -755,3 +755,11 @@
   WHY: 0T last hour, 61T/24h 48.4%WR -$1.17. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 72% but per-hit cost tiny (-$0.050), PM trail offsets (+$0.059). v3-long+ 38.5%WR -$0.59 (ALL atr_sl_hit) — underperforming but not kill threshold. 3 consecutive negative hours but declining trade volume. System quiet in ranging market.
   BY: auto_1hr
   NEXT: Re-run at 06:15 UTC
+[2026-09-02 07:15 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.09). 63T/24h 48.3%WR -$0.90. Kill criteria not met. v3-long+ already CEO-disabled, SUSHI was residual close. atr_sl_hit 70% structural but PM trail offsets (+$0.057 vs -$0.045 per hit). Trade freq 2.5/hr normal. Last 3h all positive. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 08:15 UTC
+[2026-09-02 08:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet market), 63T/24h 47.6%WR -$1.10. Kill criteria not met. atr_sl_hit 71% but PM trail offsets (0.055 vs 0.046 per hit). v3-long+ CEO-disabled rolling off. Trade freq 2.6/hr normal. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 09:15 UTC
