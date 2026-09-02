@@ -173,6 +173,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
     {'name': 'bb_bounce_short',          'enabled': 'BB_BOUNCE_SHORT_ENABLED',      'run': _bb_bounce_short_run},
     {'name': 'bb_bounce_long',           'enabled': 'BB_BOUNCE_LONG_ENABLED',       'run': _bb_bounce_long_run},
+    {'name': 'bb_bounce_v2_long',        'enabled': 'BB_BOUNCE_V2_LONG_ENABLED',    'run': _bb_bounce_v2_long_run},
     {'name': 'return_exhaustion_short',  'enabled': 'RETURN_EXHAUSTION_SHORT_ENABLED', 'run': _return_exhaustion_short_run},
     {'name': 'engulfing',                'enabled': 'ENGULFING_ENABLED',            'run': _engulfing_run},
     {'name': 'continuation',             'enabled': 'CONTINUATION_ENABLED',         'run': _continuation_run},
