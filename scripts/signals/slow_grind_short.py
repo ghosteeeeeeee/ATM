@@ -63,7 +63,7 @@ SOURCE      = 'slow-grind-'
 # ── Lookback Windows ─────────────────────────────────────────────────────
 CANDLES_1M_LOOKBACK = 120   # 2 hours of 1m data
 CANDLES_5M_LOOKBACK = 60    # 5 hours of 5m data
-R2_WINDOW = 20              # bars for R² regression
+R2_WINDOW = 10              # bars for R² regression (was 20, shortened to catch trends earlier)
 
 # ── DB Path ──────────────────────────────────────────────────────────────
 _CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
@@ -217,15 +217,14 @@ def detect_slow_grind_short(token):
     if ema20 is None or ema50 is None:
         return None
     
-    # Price must be below both EMAs
-    if closes_1m[-1] > ema20 or closes_1m[-1] > ema50:
+    # Price must be below EMA50 (relaxed from EMA20+EMA50 to catch moves earlier)
+    if closes_1m[-1] > ema50:
         return None
-    
-    # Minimum separation from EMAs (not just barely below)
-    ema_sep_20 = (ema20 - closes_1m[-1]) / closes_1m[-1] * 100
+
+    # Minimum separation from EMA50 (not just barely below)
     ema_sep_50 = (ema50 - closes_1m[-1]) / closes_1m[-1] * 100
-    
-    if ema_sep_20 < SLOW_GRIND_SHORT_MIN_EMA_SEPARATION:
+
+    if ema_sep_50 < SLOW_GRIND_SHORT_MIN_EMA_SEPARATION:
         return None
     
     # ── ATR Check (low volatility = grinding) ──────────────────────────

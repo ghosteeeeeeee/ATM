@@ -1413,7 +1413,7 @@ R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when 
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = True    # TESTING — catches slow grinds like CHIP/SUSHI under EMA300. Monitor WR.
-SLOW_GRIND_SHORT_MIN_R2 = 0.55    # minimum R² threshold (confirmed trend, not chop)
+SLOW_GRIND_SHORT_MIN_R2 = 0.30    # minimum R² threshold (was 0.40, lowered to catch trends even earlier)
 SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price per candle (0.02%)
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking
 SLOW_GRIND_SHORT_RSI_MIN = 30      # min RSI — was 35, lowered to catch trends earlier (RSI often oversold in grinds)
@@ -1421,7 +1421,7 @@ SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fadin
 SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA20 (was 0.1, require stronger bearish alignment)
 SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT = 0.15  # max % price can rise from 10-bar low before entry (block chasing)
 SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL = True  # require 5m velocity negative (don't short into strength)
-SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 1.5  # max % decline from 60-bar high (was 1.0, raised to catch CC-style moves — GRAM was -2.38%)
+SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 3.0  # max % decline from 60-bar high (was 1.5, raised to catch CHIP/SUSHI-style grinds)
 SLOW_GRIND_SHORT_CONF_BASE = 65    # base confidence
 SLOW_GRIND_SHORT_CONF_CAP = 88     # max confidence (system ceiling)
 SLOW_GRIND_SHORT_COOLDOWN_HOURS = 3  # per token cooldown
