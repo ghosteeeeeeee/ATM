@@ -279,6 +279,7 @@ LOSERS = {
     'BCH',
     'CC',
     'CHIP',
+    'ENA',
     'ENS',
     'ETC',
     'IO',
@@ -289,10 +290,10 @@ LOSERS = {
     'NEAR',
     'NEO',
     'POL',
-    'PUMP',
     'XPL',
     'ZEN'
 }
+
 
 
 
@@ -1087,6 +1088,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-long',   # V3 pullback LONG — manage via ATR SL, not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
+    'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1551,7 +1553,7 @@ TL_BREAK_MINUS_ENABLED        = False  # KILLED 2026-08-25 — 28.6% WR, -$0.32 
 # Used for signals we explicitly upgraded/tuned — old cumulative data is stale
 ROTATOR_PROTECTED_FLAGS = [
     'BB_BOUNCE_ENABLED',        # confluence signal — 100% WR with hzscore+, standalone WR stale
-    'BB_BOUNCE_LONG_ENABLED',   # TESTING 2026-09-01 — min_age_sec fix + raised bounce threshold
+    'BB_BOUNCE_LONG_ENABLED',   # KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. NEVER_REENABLE.
 ]
 
 # ── CEO Protection ──────────────────────────────────────────────────────────
@@ -1563,7 +1565,7 @@ CEO_PROTECTED_FLAGS = {
     'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
-    'BB_BOUNCE_LONG_ENABLED': ('TESTING 2026-09-01 — min_age_sec fix + raised bounce threshold', '2026-09-01'),
+    # BB_BOUNCE_LONG_ENABLED — removed from CEO_PROTECTED 2026-09-02 (CEO kill, NEVER_REENABLE conflict)
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
     'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
     'PM_TRAIL_DISTANCE_PCT': ('Profit monster trail distance — CEO changed without authorization 2026-08-16', '2026-08-17'),
@@ -1626,7 +1628,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
-BB_BOUNCE_LONG_ENABLED = True     # TESTING 2026-09-01 — re-enabled after CEO kill. min_age_sec fix + raised bounce threshold. CEO_PROTECTED.
+BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
 
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
