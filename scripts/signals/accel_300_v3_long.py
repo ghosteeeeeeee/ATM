@@ -87,6 +87,8 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_CHASE_MOVE_MAX,
     ACCEL_300_V3_LONG_CHASE_RSI_MIN,
     ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE,
+    ACCEL_300_V3_LONG_GAP_BOTTOM_MIN,
+    ACCEL_300_V3_LONG_MIN_DATA_LENGTH,
 )
 
 PERIOD = 300  # EMA300 period
@@ -324,6 +326,12 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
     if pullback > ACCEL_300_V3_LONG_MAX_PULLBACK:
         return None  # too much pullback — trend may be breaking
 
+    # ── FILTER 3a: GAP BOTTOM CONFIRMATION — pullback must be complete ──────
+    # Gap must have narrowed by at least X% from peak BEFORE re-expanding
+    # Ensures the pullback bottomed, not still in progress
+    if pullback < ACCEL_300_V3_LONG_GAP_BOTTOM_MIN:
+        return None  # pullback too shallow — bottom not confirmed
+
     # ── FILTER 3b: MIN PEAK DISTANCE — don't enter at local tops ────────────
     # Gap must be at least X% below recent peak — prevents chasing at peaks
     # SUSHI had 9.1% distance from peak (entered at top, lost)
@@ -494,6 +502,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         prices = _get_1m_prices(token)
         if not prices or len(prices) < PERIOD + 30:
             continue
+        if len(prices) < ACCEL_300_V3_LONG_MIN_DATA_LENGTH:
+            continue  # insufficient data for reliable EMA300
 
         sig = detect_accel_300_v3_long(token, prices)
         if sig is None:
