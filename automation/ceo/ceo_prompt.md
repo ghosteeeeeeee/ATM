@@ -159,14 +159,62 @@ Query the DB for:
 Ask these questions:
 | Question | If Yes → Action |
 |----------|----------------|
-| Is a signal at 0% WR with 5+ trades? | Disable it |
-| Is a signal at <35% WR with 10+ trades? | Tune or disable |
+| Is a signal at 0% WR with 5+ trades? | Check regime — is it firing in the wrong volatility? |
+| Is a signal at <35% WR with 10+ trades? | Analyze: which regime is it losing in? Keep it alive in winning regimes |
 | Are SHORT signals negative overall? | Add regime filter |
 | Is atr_sl_hit the dominant close reason? | Widen SL or check tpsl_utils |
 | Is today worse than yesterday? | Investigate root cause |
 
+### Step 2b: REGIME-AWARE SIGNAL MANAGEMENT (NEW POLICY)
+
+**DO NOT blanket-kill signals.** Instead:
+
+1. **When a signal misbehaves**, query: *which volatility regime is it losing in?*
+2. **Find its winning regime** — query trades WHERE signal=X AND regime=Y, find where WR > 55%
+3. **Keep it alive in that regime** — disable it ONLY in the regimes where it loses
+4. **Snapshot the winning params** — record the param state when it was winning (RSI thresholds, gap sizes, cooldowns, etc.)
+5. **Save to `data/signal_regime_memory.json`** — so the system remembers what worked
+
+**Query pattern:**
+```sql
+-- Find which regime a signal wins in
+SELECT regime, COUNT(*) as trades, 
+       ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+       ROUND(SUM(pnl_usdt),2) as pnl
+FROM trades 
+WHERE signal LIKE '%bb_bounce%' AND status = 'closed' AND close_time > NOW() - INTERVAL '30 days'
+GROUP BY regime ORDER BY pnl DESC;
+```
+
+**Decision matrix:**
+| Signal Performance | Action |
+|-------------------|--------|
+| WR > 55% in ALL regimes | Keep enabled everywhere, tune for even better |
+| WR > 55% in SOME regimes | **Keep alive in winning regimes, disable in losing regimes** |
+| WR < 40% in ALL regimes | THEN disable — no regime saves it |
+| WR 40-55% mixed | Tune params per regime before killing |
+
+**Regime memory file (`data/signal_regime_memory.json`):**
+```json
+{
+  "bb_bounce": {
+    "winning_regimes": ["FLAT", "NORMAL"],
+    "losing_regimes": ["HIGH", "EXTREME"],
+    "best_params": {
+      "FLAT": {"RSI_MAX": 65, "MIN_BB_TOUCH": 0.02},
+      "NORMAL": {"RSI_MAX": 70, "MIN_BB_TOUCH": 0.03}
+    },
+    "snapshot_date": "2026-08-29",
+    "snapshot_wr": 0.62,
+    "total_trades": 145
+  }
+}
+```
+
+**This replaces the old "kill if WR < 40%" rule. Signals are species — they have habitats.**
+
 ### Step 3: Improve Winrate (ACTIVE — every run)
-**Don't just kill losers — make winners better.**
+**Don't just kill losers — find their habitat.**
 
 1. **Query best signals** — find top 5 by WR with 10+ trades (7d)
 2. **Analyze their exits** — what % hit ATR_TP vs ATR_SL vs trailing? Can params be tuned to improve?
@@ -177,8 +225,9 @@ Ask these questions:
 |---------------|--------|
 | Top performer (WR > 60%, 10+ trades) | Tune for even better R:R |
 | Good performer (WR 50-60%, 10+ trades) | Add entry filter to boost WR |
-| Mediocre (WR 40-50%, 10+ trades) | Evaluate: tune or disable |
-| Loser (WR < 40%, 10+ trades) | Disable or delegate for rebuild |
+| Mediocre (WR 40-50%, 10+ trades) | **Find its winning regime, keep alive there** |
+| Loser (WR < 40%, 10+ trades) | **Check regime first — only kill if losing in ALL regimes** |
+| Regime-specialist (WR > 60% in one regime, < 40% in another) | **Keep alive in winning regime, disable in losing regime, snapshot params** |
 
 ### Step 4: Develop New Signals (ACTIVE — every run)
 **The system needs new signal types to pass confluence.** Currently blocked: ct-hot+, engulfing, vortex_break, return_exhaustion — all single-type, all blocked by confluence gate.
@@ -235,14 +284,16 @@ The coin_tracker already computes:
 **Delegate to team:**
 | Problem | Delegate To | Task |
 |---------|-------------|------|
-| Signal 0% WR | self_learner | Disable it |
+| Signal losing in specific regime | self_learner | Disable in that regime, keep alive in others |
+| Signal needs regime-param tuning | signal_analyst | Backtest params per regime, snapshot winners |
 | Bug found | bug_hunter | Fix it |
-| Signal needs tuning | self_learner | Adjust params |
+| Signal needs general tuning | self_learner | Adjust params |
 | New signal needed | signal_analyst | Build it |
 | Best signal needs boost | signal_analyst | Tune entry criteria |
 | Confluence gap | signal_analyst | Build uncorrelated signal |
 | Coin tracker signal needed | signal_analyst | Build Wyckoff/Elliott/Volume signal |
 | Coin tracker scores stale | bug_hunter | Check coin_tracker.py runs |
+| Regime memory needs updating | self_learner | Query DB, update signal_regime_memory.json |
 
 ### Step 4: Log Everything
 1. **Git commit**: `git add -A && git commit -m "CEO: [what you did]"`
@@ -266,13 +317,15 @@ Every run, answer these:
 | Question | Data Source | Action |
 |----------|-------------|--------|
 | What's the PnL? | DB query | If negative, find why |
-| Which signal is worst? | DB query | Disable or tune |
+| Which signal is worst? | DB query | **Check regime — keep alive in winning regimes** |
 | Which signal is best? | DB query | Tune for even better WR |
 | Are SHORTs bleeding? | DB query | Add regime filter |
 | Is the pipeline healthy? | systemctl | Fix crashes |
 | Are there new errors? | error_alerts.md | Investigate |
 | What signals are blocked by confluence? | pipeline logs | Add to standalone bypass or build new signal |
 | What regime are we in? | regime scanner | If NEUTRAL, prioritize volume-generating signals |
+| **Which signals are regime-specialists?** | DB query (per-regime WR) | **Keep alive in winning regime, snapshot params** |
+| **Has regime memory been updated?** | signal_regime_memory.json | If stale >7d, update from DB |
 | How many new signals developed this week? | kanban | If < 1, delegate to signal_analyst |
 | Which coins are in accumulation phase? | coin_tracker.db | Build signal for phase transition |
 | Are coin_tracker scores updating? | coin_tracker.db | If stale, check coin_tracker.py timer |
