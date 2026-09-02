@@ -1,5 +1,47 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-09-02 04:09 UTC] Hourly Analysis
+
+**Trades:** 6 closed last hour (3W 3L) -$0.14 — quiet hour
+**24h:** 67T 32W 47.8%WR -$0.81 (slightly negative, tiny losses)
+**Open:** 2 positions (FIL LONG $16.60 via accel-300-v3-long+, CFX LONG $11.10 via r2-trend-long3)
+
+**Close reason (24h):**
+- atr_sl_hit: 46T (68.7%) avg -$0.044 — dominant, tiny losses. SL working.
+- profit-monster-trail: 19T (28.4%) avg +$0.062 — only profitable exit, carrying system.
+- Others: 2T mixed (atr_tp_hit, ORPHAN_PAPER).
+
+**Signal (24h, 3+ trades):**
+- bb-bounce-long+: 19T 57.9%WR -$0.17 — KILLED, draining legacy.
+- accel-300-v3-long+: 12T 41.7%WR -$0.29 — NEW (1 day old), monitoring. ARB 2T+$0.30, ENA 2T-$0.05. Losses tiny (avg -$0.024). Not kill-worthy yet.
+- accel-300-v2-long: 9T 33.3%WR -$0.23 — KILLED, draining.
+- accel-300-v2-short-: 7T 28.6%WR -$0.06 — KILLED, draining.
+- bb-bounce-short: 3T 66.7%WR -$0.03 — healthy.
+- r2-trend-long3: 3T 33.3%WR -$0.08 — marginal.
+- accel-300-v3-short: 0T — enabled, no setups yet (normal for new signal).
+
+**Hourly PnL (6h):** 22:00 -$0.02, 23:00 -$0.02, 00:00 $0.00, 01:00 +$0.28, 02:00 -$0.09, 03:00 -$0.20, 04:00 -$0.14. 3 consecutive negative hours (02:00-04:00) but total only -$0.43.
+
+**Changes:** None
+
+**No Change Needed:**
+- Trade frequency ~2.8/hr normal (67T/24h). No overtrading.
+- 6 trades last hour normal after killing 2 major signals.
+- No signal meets kill criteria (0%WR 3+T in last hour).
+- accel-300-v3-long+ new signal — needs more data before evaluation (12T/24h is borderline).
+- 3 consecutive negative hours but tiny losses (-$0.43 total). No regime data available.
+- atr_sl_hit 68.7% avg -$0.044 — trailing SL working as designed.
+- profit-monster-trail 28.4% avg +$0.062 carrying system.
+- Legacy positions (bb-bounce-long+, accel-300-v2-long, accel-300-v2-short) draining naturally.
+- accel-300-v3-short enabled but 0 trades — normal for new signal, market hasn't triggered SHORT setups.
+
+**Open Questions:**
+- accel-300-v3-long+ performance: 41.7%WR -$0.29/24h. Monitor — if it drops below 35%WR or -$0.50, consider kill.
+- Trade volume dropping with 2 signals killed. Signal starvation risk if accel-300-v3-long+ also degrades.
+- No regime data available — can't assess if losses are regime-driven.
+
+---
+
 ## [2026-09-01 19:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (1W 0L) +$0.21 — quiet hour
@@ -19607,3 +19649,60 @@ Final set: ['ALT', 'APT', 'ARB', 'ATOM', 'AVNT', 'BCH', 'CASHCAT', 'CC', 'CHIP',
 - System healthy in quiet market period
 
 **Open Questions:** None. Next run at 03:06 UTC.
+
+## LOSERS Update — 2026-09-02 02:52 UTC
+- REMOVE ARB (WR=60.0%, PnL=$0.04, recovered)
+- REMOVE APT (WR=57.1%, PnL=$0.17, recovered)
+- ADD MON (WR=0.0%, PnL=$-0.49, consecutive_losses (5))
+- ADD POL (WR=40.0%, PnL=$-0.16, low_wr (40.0%))
+- ADD PUMP (WR=40.0%, PnL=$-0.13, low_wr (40.0%))
+- ADD NEAR (WR=40.0%, PnL=$-0.13, low_wr (40.0%))
+- ADD XPL (WR=40.0%, PnL=$0.13, low_wr (40.0%))
+
+Final set: ['ALT', 'ATOM', 'AVNT', 'BCH', 'CASHCAT', 'CC', 'CHIP', 'CRV', 'DOGE', 'ENS', 'ETC', 'IO', 'JUP', 'MERL', 'MET', 'MON', 'NEAR', 'NEO', 'NOT', 'POL', 'PUMP', 'WLD', 'XPL', 'YGG', 'ZEN', 'ZRO']
+
+## LOSERS Update — 2026-09-02 02:55 UTC
+- REMOVE ZRO (WR=50.0%, PnL=$0.05, recovered)
+- REMOVE CRV (WR=50.0%, PnL=$0.27, recovered)
+- REMOVE WLD (WR=50.0%, PnL=$0.22, recovered)
+- REMOVE CASHCAT (WR=50.0%, PnL=$0.04, recovered)
+
+Final set: ['ALT', 'ATOM', 'AVNT', 'BCH', 'CC', 'CHIP', 'DOGE', 'ENS', 'ETC', 'IO', 'JUP', 'MERL', 'MET', 'MON', 'NEAR', 'NEO', 'NOT', 'POL', 'PUMP', 'XPL', 'YGG', 'ZEN']
+
+## LOSERS Update — 2026-09-02 02:57 UTC
+- REMOVE NOT (WR=50.0%, PnL=$-0.09, recovered)
+- REMOVE DOGE (WR=57.1%, PnL=$-0.06, recovered)
+- REMOVE AVNT (WR=50.0%, PnL=$-0.12, recovered)
+- REMOVE YGG (WR=62.5%, PnL=$-0.03, recovered)
+
+Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENS', 'ETC', 'IO', 'JUP', 'MERL', 'MET', 'MON', 'NEAR', 'NEO', 'POL', 'PUMP', 'XPL', 'ZEN']
+
+## [2026-09-02 03:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed in last hour (3 wins, 3 losses)
+**PnL:** -$0.09 (WR: 50.0%)
+**24h:** 65T 49.2%WR -$0.63
+
+**Signal breakdown (24h):**
+- accel-300-v2-long: 11T 27.3%WR -$0.52 — KILLED, rolling off stats
+- accel-300-v3-long+: 7T 42.9%WR +$0.07 — performing acceptably
+- accel-300-v2-short-: 7T 28.6%WR -$0.06 — DISABLED at 02:59, positions closing
+- bb-bounce-long+: 21T 61.9%WR -$0.04 — profitable WR, small avg loss
+
+**Close reasons (24h):**
+- atr_sl_hit: 42T 64.6% avg -$0.047 — dominant, tiny per-hit cost
+- profit-monster-trail: 21T 32.3% avg +$0.062 — profitable offset
+- atr_tp_hit: 1T +$0.04
+
+**Changes:** None needed
+
+**No Change Needed:**
+- Kill criteria not met: no signal 0%WR with 3+T last hour (v2-short had 4T but 28.6%WR)
+- v2-long and v2-short both disabled, rolling off 24h stats
+- v3-long+ and v3-short active and performing
+- atr_sl_hit 64.6% > 40% threshold but per-hit cost is tiny ($0.047)
+- profit-monster-trail fully offsets SL hits ($0.062 × 21T = +$1.30)
+- Trade freq 2.75/hr normal, no overtrading
+- 24h PnL improving from -$0.85 to -$0.63
+
+**Open Questions:** None. System healthy in quiet market.
