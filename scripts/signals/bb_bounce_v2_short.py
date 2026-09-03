@@ -21,24 +21,21 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 from paths import RUNTIME_DB, CANDLES_DB
 
-# ── Config ──────────────────────────────────────────────────────────────
-BB_PERIOD = 20
-BB_STDDEV = 1.8
-BB_TOUCH_PCT = 0.15        # Require very close to upper band
-BB_MIN_BARS = 30
-RSI_PERIOD = 14
-RSI_OVERBOUGHT = 55        # Require stronger overbought
-BOUNCE_MIN_PCT = 0.08      # Require stronger bounce
-MIN_VOLUME_RATIO = 1.0     # Volume confirmation
-REQUIRE_2_CANDLE = True    # Require 2 consecutive overbought candles
-
-# V2 filters
-VEL_5M_MAX = 0.0           # Block if 5m velocity > 0% (price still rising)
-MOM_MAX = 0.005            # Block if momentum > 0.005 (uptrend)
-MIN_PRICE_RANGE_PCT = 2.0  # Block low-vol tokens (2h range < 2%)
-
-# ── State ───────────────────────────────────────────────────────────────
-_cooldown = {}
+# ── Config (imported from hermes_constants.py) ──────────────────────────
+from hermes_constants import (
+    BB_BOUNCE_V2_SHORT_BB_PERIOD as BB_PERIOD,
+    BB_BOUNCE_V2_SHORT_BB_STDDEV as BB_STDDEV,
+    BB_BOUNCE_V2_SHORT_BB_TOUCH_PCT as BB_TOUCH_PCT,
+    BB_BOUNCE_V2_SHORT_BB_MIN_BARS as BB_MIN_BARS,
+    BB_BOUNCE_V2_SHORT_RSI_PERIOD as RSI_PERIOD,
+    BB_BOUNCE_V2_SHORT_RSI_OVERBOUGHT as RSI_OVERBOUGHT,
+    BB_BOUNCE_V2_SHORT_BOUNCE_MIN_PCT as BOUNCE_MIN_PCT,
+    BB_BOUNCE_V2_SHORT_VEL_5M_MAX as VEL_5M_MAX,
+    BB_BOUNCE_V2_SHORT_MOM_MAX as MOM_MAX,
+    BB_BOUNCE_V2_SHORT_MIN_PRICE_RANGE_PCT as MIN_PRICE_RANGE_PCT,
+    BB_BOUNCE_V2_SHORT_MIN_VOLUME_RATIO as MIN_VOLUME_RATIO,
+    BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE as REQUIRE_2_CANDLE,
+)
 
 
 def _log(msg):
@@ -167,26 +164,6 @@ def _get_current_volume(token):
         return row[0] if row and row[0] is not None else None
     except Exception:
         return None
-    finally:
-        if conn:
-            conn.close()
-
-
-def _is_solo(token, direction):
-    """Check if this token+direction has any other active signals in DB."""
-    conn = None
-    try:
-        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT COUNT(*) FROM signals
-            WHERE token = ? AND direction = ? AND signal_type != 'bb_bounce_v2_short'
-              AND created_at > datetime('now', '-10 minutes')
-        """, (token.upper(), direction))
-        count = cur.fetchone()[0]
-        return count == 0
-    except Exception:
-        return True
     finally:
         if conn:
             conn.close()

@@ -1729,6 +1729,20 @@ BB_BOUNCE_V2_MOM_MIN = 0.0          # minimum momentum (uptrend required)
 BB_BOUNCE_V2_VOL_MAX = 0.5          # max volatility (low vol = less chop)
 BB_BOUNCE_V2_MIN_AGE_SEC = 600      # 10 min minimum candle age
 
+# bb_bounce_v2_short parameters (calibrated from SHORT winner patterns)
+BB_BOUNCE_V2_SHORT_BB_PERIOD = 20
+BB_BOUNCE_V2_SHORT_BB_STDDEV = 1.8
+BB_BOUNCE_V2_SHORT_BB_TOUCH_PCT = 0.15    # max distance from upper band
+BB_BOUNCE_V2_SHORT_BB_MIN_BARS = 30
+BB_BOUNCE_V2_SHORT_RSI_PERIOD = 14
+BB_BOUNCE_V2_SHORT_RSI_OVERBOUGHT = 55    # require stronger overbought
+BB_BOUNCE_V2_SHORT_BOUNCE_MIN_PCT = 0.08  # minimum bounce strength
+BB_BOUNCE_V2_SHORT_VEL_5M_MAX = 0.0       # block if 5m velocity > 0% (price rising)
+BB_BOUNCE_V2_SHORT_MOM_MAX = 0.005        # block if momentum > 0.005 (uptrend)
+BB_BOUNCE_V2_SHORT_MIN_PRICE_RANGE_PCT = 2.0  # block low-vol tokens (2h range < 2%)
+BB_BOUNCE_V2_SHORT_MIN_VOLUME_RATIO = 1.0 # volume confirmation
+BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought candles
+
 # ── Standalone Bypass Signals ──────────────────────────────────────────────
 # Signals that can bypass the confluence gate (single-source allowed).
 # Backtested and proven edge when firing solo.

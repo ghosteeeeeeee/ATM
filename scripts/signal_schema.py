@@ -2183,6 +2183,7 @@ def is_component_disabled(component: str) -> bool:
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
+            BB_BOUNCE_V2_SHORT_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2361,6 +2362,7 @@ def is_component_disabled(component: str) -> bool:
     if c in ('bb_bounce_short', 'bb-bounce-short'): return not BB_BOUNCE_SHORT_ENABLED
     if c in ('bb_bounce_long', 'bb-bounce-long', 'bb-bounce-long+'): return not BB_BOUNCE_LONG_ENABLED
     if c in ('bb_bounce_v2_long', 'bb-bounce-v2-long', 'bb-bounce-v2-long+'): return not BB_BOUNCE_V2_LONG_ENABLED
+    if c in ('bb_bounce_v2_short', 'bb-bounce-v2-short', 'bb-v2-short'): return not BB_BOUNCE_V2_SHORT_ENABLED
     # range_finder
     if c in ('range_finder+',): return not RANGE_FINDER_PLUS_ENABLED
     if c in ('range_finder-',): return not RANGE_FINDER_MINUS_ENABLED
