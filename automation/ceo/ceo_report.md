@@ -1,3 +1,37 @@
+## CEO Report — 2026-09-03 ~02:15 UTC (325th run)
+
+### Diagnosis
+24h: 52T, 51.9% WR, -$1.86. 7d: 399T, 51.6% WR, -$2.35. LONG 167T/7d 47.3% WR -$2.97. SHORT 232T/7d 54.7% WR +$0.62. ALL 390/399 7d trades in NEUTRAL regime. Daily trend: Aug 28 +$1.55 → Aug 31 -$0.82 → Sep 1 -$0.72 → Sep 2 -$1.79 (3 consecutive negative days). ATR_SL dominant: 51 trades/48h -$5.98. 5 open positions (slow-grind-, ema300-dip x3, bb-bounce-v2-long+ combo).
+
+**Bleeding signals (CEO-PROTECTED — CANNOT DISABLE):**
+1. **r2-trend-long3** — 10T/7d 30% WR -$0.55 (CEO_PROTECTED since Aug 17). ALL in NEUTRAL. 6T/24h 33.3% WR -$0.38. ATR_SL exits.
+2. **accel-300-v3-long+** — 18T/7d 33.3% WR -$0.98 (CEO_PROTECTED until Sep 4 05:00 UTC). ALL ATR_SL exits. 12T/24h -$0.84.
+
+**Working signals:**
+- SHORT backbone: accel-300-v2-short 72T/7d 52.8% WR +$1.46
+- bb-bounce-v2-long+: 12T/7d 83.3% WR +$0.35 (TESTING, new signal)
+- bb-bounce-short: 59T/7d 61% WR -$0.16 (stable)
+- volume-breakout: 6T/7d — confluence trades 100% WR +$0.40, standalone 0% WR -$0.29
+
+### Root Cause
+Two CEO-protected LONG signals (r2-trend-long3, accel-300-v3-long+) bleed in NEUTRAL regime. LONG_NEUTRAL_BLOCK deployed Sep 2 14:40 UTC blocks NEW entries, but pre-block positions and bypass trades (2+ signal types) still execute. accel-300-v3-long+ is locked until Sep 4 05:00 UTC per CEO_PROTECTED_FLAGS note. r2-trend-long3 was CEO_PROTECTED on Aug 17 when it was winning — has since degraded to 30% WR in NEUTRAL.
+
+### Fix Applied
+**NONE — CEO-PROTECTED.** Both bleeding signals are in CEO_PROTECTED_FLAGS. Cannot disable without human approval.
+
+### Escalation Required
+1. **DISABLE r2-trend-long3** — 10T/7d 30% WR -$0.55. CEO_PROTECTED since Aug 17 (was winning then, now bleeding). Add to NEVER_REENABLE_FLAGS.
+2. **DISABLE accel-300-v3-long+ after Sep 4 05:00 UTC** — 18T/7d 33.3% WR -$0.98. CEO_PROTECTED until then.
+3. **Monitor bb-bounce-v2-long+** — 12T/7d 83.3% WR +$0.35. Strong candidate for full deployment.
+
+### Verification
+- DB query confirmed: 52T/24h -$1.86, 399T/7d -$2.35
+- LONG vs SHORT split verified: LONG -$2.97, SHORT +$0.62
+- All r2-trend-long trades in NEUTRAL regime
+- bb-bounce-v2-long+ performance verified (83.3% WR)
+
+---
+
 ## CEO Report — 2026-09-02 ~10:30 UTC (323rd run)
 
 ### Diagnosis

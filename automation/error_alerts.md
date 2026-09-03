@@ -2061,3 +2061,11 @@ ALERTS:
 - **[WARN]**: -69.11% PnL today (59 trades closed) — market fully NEUTRAL, 0% momentum tokens
 - **[INFO]**: Pipeline healthy, all 52 timers active, 4 open positions
 - **AUTO-FIX**: None needed — all issues transient or performance-related, not infrastructure
+
+## Error Alerts — 2026-09-03 01:22 UTC
+- **[WARN]**: Disk at 82% (92G/118G) — 3% from 85% threshold
+- **[INFO]**: Pipeline ran 01:21, completed OK. 5 open positions, 55 closed 24h, -2.04 USDT PnL, 52.7% WR
+- **[INFO]**: Market fully NEUTRAL — 106/106 tokens, zero directional bias
+- **[INFO]**: All 35+ timers firing on schedule, no missed runs
+- **[INFO]**: 0 tracebacks, 0 errors in last 30min
+- **AUTO-FIX**: None needed — all systems nominal
