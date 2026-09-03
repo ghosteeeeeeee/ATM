@@ -1409,6 +1409,19 @@ R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band 
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.
+# ── EMA300 Dip Buyer (buys dips to EMA300 during confirmed uptrends) ──────────
+# ema300_dip.py — catches shallow pullbacks in strong uptrends
+EMA300_DIP_ENABLED = True              # master switch
+EMA300_DIP_EMA_PERIOD = 300            # EMA period
+EMA300_DIP_MAX_DIST_PCT = 0.8          # max distance from EMA300 (%)
+EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
+EMA300_DIP_MAX_RSI = 40                # max RSI — don't chase (must be oversold bounce)
+EMA300_DIP_MIN_TREND_STRENGTH = 70     # min % of last 100 candles above EMA300
+EMA300_DIP_COOLDOWN = 30               # cooldown between entries (candles)
+EMA300_DIP_TP_PCT = 1.0                # take profit (%)
+EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
+# Backtest: 229 trades, 54% WR, +0.01% avg PnL (CFX: 70% WR, +12.69% total)
+# Optimal: TP 1.0% / SL 1.5% on tokens with 70%+ candles above EMA300
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = True    # TESTING — catches slow grinds like CHIP/SUSHI under EMA300. Monitor WR.
