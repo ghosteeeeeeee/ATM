@@ -1413,15 +1413,16 @@ R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when 
 # ema300_dip.py — catches shallow pullbacks in strong uptrends
 EMA300_DIP_ENABLED = True              # master switch
 EMA300_DIP_EMA_PERIOD = 300            # EMA period
-EMA300_DIP_MAX_DIST_PCT = 0.8          # max distance from EMA300 (%)
+EMA300_DIP_MAX_DIST_PCT = 0.5          # max distance from EMA300 (%) — TIGHTENED from 0.8
 EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
-EMA300_DIP_MAX_RSI = 40                # max RSI — don't chase (must be oversold bounce)
-EMA300_DIP_MIN_TREND_STRENGTH = 70     # min % of last 100 candles above EMA300
-EMA300_DIP_COOLDOWN = 30               # cooldown between entries (candles)
+EMA300_DIP_MAX_RSI = 35                # max RSI — TIGHTENED from 40 (more oversold)
+EMA300_DIP_MIN_TREND_STRENGTH = 80     # min % of last 100 candles above EMA300 — TIGHTENED from 70
+EMA300_DIP_COOLDOWN = 60               # cooldown between entries (candles) — TIGHTENED from 30
 EMA300_DIP_TP_PCT = 1.0                # take profit (%)
 EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
 # Backtest: 229 trades, 54% WR, +0.01% avg PnL (CFX: 70% WR, +12.69% total)
 # Optimal: TP 1.0% / SL 1.5% on tokens with 70%+ candles above EMA300
+# TIGHTENED: Reduced signal count from 27/hr to ~5/hr for quality over quantity
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = True    # TESTING — catches slow grinds like CHIP/SUSHI under EMA300. Monitor WR.
