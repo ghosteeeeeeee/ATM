@@ -303,3 +303,48 @@
 **Open Questions:**
 - accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
 - cut-loser-MAE-GUARD: new exit type, 1T so far — monitor for effectiveness
+
+## [2026-09-03 17:06 UTC] Hourly Analysis
+
+**Trades:** 7 closed last hour (6W 1L +$0.42, 85.7% WR)
+**24h Context:** 69T 66.7%WR +$0.40 (positive, improving steadily)
+**Today:** 52T 67.3%WR +$0.56
+
+**Last Hour Detail:**
+- 6 winners via profit-monster-trail: ACE +$0.19, ZRO +$0.11, DOGE +$0.08, STX +$0.07, GMT +$0.05, POL +$0.04
+- 1 loser: ENS -$0.12 (cut-loser-CL-T1, accel-300-v3-long+)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 48T (69.6%) 91.7%WR +$2.72 — carrying entire system PnL
+- atr_sl_hit: 12T (17.4%) 16.7%WR -$1.34 — well under 40% threshold
+- cut-loser-CL-T1: 7T 0%WR -$0.96 — normal stop exits
+
+**Signal Leaders (today):**
+- bb-bounce-v2-long+: 11T 90.9%WR +$0.72 ✅ elite
+- ema300-dip: 20T 70.0%WR +$0.29 ✅ workhorse
+- accel-300-v3-long+: 13T 53.8%WR $0.00 (breakeven, CEO_PROTECTED)
+
+**Signal Losers:**
+- bb-bounce-short: 3T 33.3%WR -$0.35 ⚠️ KILLED
+- r2-trend-long3: 1T 0%WR -$0.16 (already disabled)
+
+**Changes:**
+1. **KILLED bb-bounce-short** — 3T today, 33.3%WR, -$0.35, 2 consecutive losses (ME cut-loser-CL-T1, ALT atr_sl_hit). Below own 60% KILL_WR threshold. Trending worse.
+
+**No Change Needed:**
+- atr_sl_hit 17.4% — well under 40%
+- Trade freq max 9/hr — under 20
+- profit-monster-trail carrying system at 91.7% WR
+- accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00
+- MON open position -48.57% but SL not hit yet (0.026839 vs SL 0.02664636)
+
+**Open Positions:** 5 ($78.60)
+- DOT: +32.62% (ema300-dip)
+- MNT: +25.61% (ema300-dip)
+- ME: +7.90% (ema300-dip)
+- BABY: -1.75% (ema300-dip, just opened)
+- MON: -48.57% (accel-300-v3-long+, SL tight)
+
+**Open Questions:**
+- MON SL at 0.02664636 vs current 0.026839 — 0.7% away. 5x leverage magnifies.
+- accel-300-v3-long+ auto-disable after CEO lock expires Sep 4 05:00? Currently breakeven today.

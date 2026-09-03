@@ -1325,6 +1325,38 @@ MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blackl
 MA_CROSS_5M_MINUS_ENABLED = False
 TL_BREAK_ENABLED         = False  # KILLED 2026-08-25 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
 ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
+# ── Coiled Spring (volume contraction pullback in bullish trend) ────────────────
+# coiled_spring.py — LONG only. Catches volume dead zones during pullbacks
+# in established bullish trends, entries near EMA support.
+COILED_SPRING_ENABLED           = True    # master kill-switch
+COILED_SPRING_PLUS_ENABLED      = True    # LONG direction
+COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LONG-only)
+COILED_SPRING_COOLDOWN_HOURS    = 1       # per-token cooldown between fires
+# Detection parameters
+COILED_SPRING_LOOKBACK          = 500     # 5m candles to load
+COILED_SPRING_MIN_IMPULSE_PCT   = 1.5     # min % move from swing low to confirm impulse
+COILED_SPRING_COIL_MIN_BARS     = 4       # min consecutive bars with vol < threshold
+COILED_SPRING_COIL_VOL_RATIO_MAX = 0.65   # volume must be below this fraction of 20-bar avg
+COILED_SPRING_COIL_ATR_PCT_MAX  = 0.55    # ATR% must be below this (volatility compressed)
+COILED_SPRING_RSI_MIN           = 30      # RSI sweet spot lower bound
+COILED_SPRING_RSI_MAX           = 50      # RSI sweet spot upper bound
+COILED_SPRING_RSI_TRIGGER_MIN   = 45      # RSI must be above this in trigger mode
+COILED_SPRING_RSI_BONUS_MIN     = 35      # RSI bonus sweet spot lower bound
+COILED_SPRING_RSI_BONUS_MAX     = 45      # RSI bonus sweet spot upper bound
+COILED_SPRING_MIN_CONDITIONS    = 4       # minimum conditions (of 6) that must pass
+COILED_SPRING_MIN_COIL_FALLBACK = 3       # fallback coil bars requirement
+COILED_SPRING_TRIGGER_VOL_RATIO = 2.0     # breakout bar volume vs 20-bar avg
+COILED_SPRING_TRIGGER_BODY_PCT  = 0.5     # min body % of trigger candle
+# Risk management
+COILED_SPRING_SL_ATR_MULT       = 1.5     # stop loss = entry - (ATR * multiplier)
+COILED_SPRING_TP_ATR_MULT       = 4.0     # take profit = entry + (ATR * multiplier)
+# Confidence
+COILED_SPRING_CONF_BASE         = 55      # base confidence
+COILED_SPRING_CONF_FLOOR        = 50      # min confidence (signals below this are dropped)
+COILED_SPRING_CONF_CAP          = 88      # max confidence (system ceiling)
+COILED_SPRING_CONF_VOL_SPIKE_MAX = 25     # bonus for volume spike magnitude
+COILED_SPRING_CONF_RSI_BONUS_MAX = 10     # bonus for ideal RSI zone
+COILED_SPRING_CONF_STRUCT_MAX   = 10      # bonus for clean HH/HL structure
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
 # For each signal: _PLUS_ENABLED controls LONG, _MINUS_ENABLED controls SHORT.
@@ -1655,7 +1687,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
 BB_BOUNCE_PLUS_ENABLED = False  # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
-BB_BOUNCE_SHORT_ENABLED = True     # RE-ENABLED 2026-08-30 by T — 7d 61.4% WR +$0.05. CEO kill was based on wrong numbers. Monitor 48h.
+BB_BOUNCE_SHORT_ENABLED = False    # auto_1hr KILLED 2026-09-03 — 3T/33.3%WR/-$0.35 today. 2 consecutive losses (ME cut-loser, ALT atr_sl_hit). Below 60% KILL_WR threshold.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
