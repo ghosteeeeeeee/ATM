@@ -2480,7 +2480,7 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
 # Thesis: Multi-component agreement = institutional trend confirmation.
 # Timeframe: 1h (Ichimoku needs 52+ period depth)
-ICHIMOKU_ENABLED = True                # master kill-switch
+ICHIMOKU_ENABLED = False               # DISABLED 2026-08-31 — underperforms RS standalone (50% WR vs 70% WR)
 ICHIMOKU_PLUS_ENABLED = True           # LONG direction
 ICHIMOKU_MINUS_ENABLED = True          # SHORT direction
 ICHIMOKU_COOLDOWN_HOURS = 1            # per token+direction cooldown
