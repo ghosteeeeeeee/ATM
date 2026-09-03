@@ -1,26 +1,22 @@
 #!/usr/bin/env python3
 """
-coiled_spring.py — Volume Contraction Pullback in Bullish Trend.
+coiled_spring.py — Volume Contraction Pullback in Bullish Trend (LONG only).
 
-Catches the "coiled spring" pattern: after an initial impulse move establishes
-a bullish trend (HH/HL structure, EMA alignment), price pulls back with
+Catches the "coiled spring" pattern: after an initial impulse establishes a
+bullish trend (HH/HL structure, EMA alignment), price pulls back with
 declining volume and compressed volatility into a support zone. When volume
-returns, the next leg up fires.
+returns, the next leg fires.
 
-The pattern has 5 phases:
-  1. IMPULSE   — Initial push establishes bullish structure (higher lows)
-  2. PAUSE     — First consolidation, volume contracts moderately
+Phases:
+  1. IMPULSE     — Initial push establishes bullish structure (higher lows)
+  2. PAUSE       — First consolidation, volume contracts moderately
   3. SECOND_PUSH — Continuation confirms trend (new higher high)
-  4. COILED    — Price leaks lower on DEAD volume, ATR compresses, RSI cools
-  5. TRIGGER   — Volume spike breaks compression, re-enters trend
-
-Entry: During phase 4 (the coiled spring) or at phase 5 trigger.
-Best R:R because entry is near support with tight stop below recent swing low.
-
-Signal type: coiled_spring_long
-Source tags:  coil-spring@volX.X, coil-spring@rsiXX
+  4. COILED      — Price leaks lower on DEAD volume, ATR compresses, RSI cools
+  5. TRIGGER     — Volume spike breaks compression, re-enters trend
 
 Data: candles_5m from candles.db (local, zero API calls)
+Signal type: coiled_spring_long
+Source tags:  coil-spring+@coil{N} (coil mode), coil-spring+@vol{X} (trigger mode)
 """
 
 import sys
@@ -30,40 +26,46 @@ import time
 from typing import Optional, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, price_age_minutes
-from paths import RUNTIME_DB, CANDLES_DB
+from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
+from paths import HERMES_DATA
 
-# ── Constants ──────────────────────────────────────────────────────────────────
-LOOKBACK       = 500    # 5m candles to load
-SIGNAL_TYPE    = 'coiled_spring_long'
-SOURCE_TAG     = 'coil-spring'
+from hermes_constants import (
+    COILED_SPRING_ENABLED,
+    COILED_SPRING_PLUS_ENABLED,
+    COILED_SPRING_MINUS_ENABLED,
+    LONG_BLACKLIST,
+    SHORT_BLACKLIST,
+    COILED_SPRING_LOOKBACK,
+    COILED_SPRING_MIN_IMPULSE_PCT,
+    COILED_SPRING_COIL_MIN_BARS,
+    COILED_SPRING_COIL_VOL_RATIO_MAX,
+    COILED_SPRING_COIL_ATR_PCT_MAX,
+    COILED_SPRING_RSI_MIN,
+    COILED_SPRING_RSI_MAX,
+    COILED_SPRING_RSI_TRIGGER_MIN,
+    COILED_SPRING_RSI_BONUS_MIN,
+    COILED_SPRING_RSI_BONUS_MAX,
+    COILED_SPRING_MIN_CONDITIONS,
+    COILED_SPRING_MIN_COIL_FALLBACK,
+    COILED_SPRING_TRIGGER_VOL_RATIO,
+    COILED_SPRING_TRIGGER_BODY_PCT,
+    COILED_SPRING_SL_ATR_MULT,
+    COILED_SPRING_TP_ATR_MULT,
+    COILED_SPRING_CONF_BASE,
+    COILED_SPRING_CONF_VOL_SPIKE_MAX,
+    COILED_SPRING_CONF_RSI_BONUS_MAX,
+    COILED_SPRING_CONF_STRUCT_MAX,
+    COILED_SPRING_CONF_FLOOR,
+    COILED_SPRING_CONF_CAP,
+    COILED_SPRING_COOLDOWN_HOURS,
+)
 
-# Phase 2 — Trend establishment requirements
-MIN_IMPULSE_PCT     = 1.5    # min % move from swing low to confirm impulse
-MIN_HIGHER_LOW_GAP  = 0.3    # min % gap between successive swing lows
+SIGNAL_TYPE_LONG  = 'coiled_spring_long'
+SIGNAL_TYPE_SHORT = 'coiled_spring_short'
+SOURCE_LONG       = 'coil-spring+'
+SOURCE_SHORT      = 'coil-spring-'
 
-# Phase 4 — The coiled spring conditions
-COIL_MIN_BARS       = 4      # min consecutive bars with vol < threshold
-COIL_VOL_RATIO_MAX  = 0.65   # volume must be below this fraction of 20-bar avg
-COIL_ATR_PCT_MAX    = 0.55   # ATR% must be below this (volatility compressed)
-COIL_RSI_MIN        = 30     # RSI must be in this range (not too hot, not dead)
-COIL_RSI_MAX        = 50
-
-# Phase 5 — Trigger confirmation
-TRIGGER_VOL_RATIO   = 2.0    # breakout bar must have this much volume vs avg
-TRIGGER_BODY_PCT    = 0.5    # min body % of trigger candle
-
-# Risk management
-SL_ATR_MULT         = 1.5    # stop loss = 1.5x ATR below entry
-TP_ATR_MULT         = 4.0    # take profit = 4x ATR above entry
-
-# Confidence
-CONF_BASE           = 55
-CONF_VOL_SPIKE_MAX  = 25     # bonus for volume spike magnitude
-CONF_RSI_BONUS_MAX  = 10     # bonus for ideal RSI zone
-CONF_STRUCT_MAX     = 10     # bonus for clean HH/HL structure
-
-COOLDOWN_BARS       = 12     # 1 hour cooldown between fires (12 x 5m)
+_CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -121,7 +123,7 @@ def _vol_ma(volumes, period=20):
     return result
 
 
-def _find_swing_lows(closes, window=5):
+def _find_swing_lows(closes, window=3):
     """Find swing lows (local minima) in close prices."""
     lows = []
     for i in range(window, len(closes) - window):
@@ -131,14 +133,36 @@ def _find_swing_lows(closes, window=5):
     return lows
 
 
-def _find_swing_highs(closes, window=5):
-    """Find swing highs (local maxima) in close prices."""
-    highs = []
-    for i in range(window, len(closes) - window):
-        if all(closes[i] >= closes[i - j] for j in range(1, window + 1)) and \
-           all(closes[i] >= closes[i + j] for j in range(1, window + 1)):
-            highs.append(i)
-    return highs
+# ═══════════════════════════════════════════════════════════════════════════════
+# Data fetcher (with proper connection cleanup)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_candles_5m(token, lookback=None):
+    """Fetch 5m candles for token from local candles.db. Returns oldest-first."""
+    if lookback is None:
+        lookback = COILED_SPRING_LOOKBACK
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=30)
+        conn.execute("PRAGMA journal_mode=WAL")
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(ts) FROM candles_5m")
+        max_ts = cur.fetchone()[0]
+        if max_ts is None:
+            return []
+        since = max_ts - lookback * 300  # 5m bars
+        cur.execute("""
+            SELECT ts, open, high, low, close, volume
+            FROM candles_5m
+            WHERE token = ? AND ts >= ?
+            ORDER BY ts ASC
+        """, (token.upper(), since))
+        return cur.fetchall()
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -195,23 +219,20 @@ def detect_coiled_spring(rows):
     # CHECK 1: EMA alignment (bullish trend context)
     # ════════════════════════════════════════════════════════════════════════
     if not (ema9_now > ema21_now > ema50_now):
-        # Relaxed: allow price temporarily below EMA9 but EMA9 must still > EMA21
         if not (ema9_now > ema21_now):
             diag['reason'] = 'EMA not bullish'
             return None, diag
 
     # ════════════════════════════════════════════════════════════════════════
-    # CHECK 2: Higher lows structure (at least 2 higher lows in recent 100 bars)
+    # CHECK 2: Higher lows structure (at least 2 ascending swing lows)
     # ════════════════════════════════════════════════════════════════════════
     lookback_window = min(100, n)
-    recent_lows = lows[-lookback_window:]
     swing_low_idxs = _find_swing_lows(closes[-lookback_window:], window=3)
 
     if len(swing_low_idxs) < 2:
         diag['reason'] = f'insufficient swing lows ({len(swing_low_idxs)})'
         return None, diag
 
-    # Check that last 2 swing lows are ascending
     sl1 = closes[-lookback_window + swing_low_idxs[-2]]
     sl2 = closes[-lookback_window + swing_low_idxs[-1]]
     if sl2 <= sl1:
@@ -227,59 +248,51 @@ def detect_coiled_spring(rows):
     coil_bars = 0
     for j in range(i, max(i - 8, 0), -1):
         vr = volumes[j] / vm20[j] if vm20[j] > 0 else 1
-        if vr < COIL_VOL_RATIO_MAX:
+        if vr < COILED_SPRING_COIL_VOL_RATIO_MAX:
             coil_bars += 1
         else:
             break
 
     diag['coil_bars'] = coil_bars
 
-    if coil_bars < COIL_MIN_BARS:
-        # Also check: current bar itself might be the trigger (volume returns)
-        # So check if PREVIOUS bars were coiled
+    # Also check: current bar might be the trigger (volume returns after coil)
+    if coil_bars < COILED_SPRING_COIL_MIN_BARS:
         prev_coil = 0
         for j in range(i - 1, max(i - 8, 0), -1):
             vr = volumes[j] / vm20[j] if vm20[j] > 0 else 1
-            if vr < COIL_VOL_RATIO_MAX:
+            if vr < COILED_SPRING_COIL_VOL_RATIO_MAX:
                 prev_coil += 1
             else:
                 break
         diag['prev_coil_bars'] = prev_coil
-        if prev_coil < COIL_MIN_BARS:
+        if prev_coil < COILED_SPRING_COIL_MIN_BARS:
             diag['reason'] = f'insufficient coil (cur={coil_bars}, prev={prev_coil})'
             return None, diag
-        # Current bar IS the trigger — use prev coil count
         coil_bars = prev_coil
 
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 4: ATR compression
     # ════════════════════════════════════════════════════════════════════════
-    # Check that ATR% is compressed (below threshold or declining)
-    atr_compressed = atr_pct < COIL_ATR_PCT_MAX
-
-    # Also check if ATR is declining (even if absolute is still above threshold)
+    atr_compressed = atr_pct < COILED_SPRING_COIL_ATR_PCT_MAX
     if not atr_compressed and len(atr14) >= 10:
         recent_atrs = [a for a in atr14[-10:] if a is not None]
         if len(recent_atrs) >= 5:
             atr_trend = (sum(recent_atrs[-3:]) / 3) / (sum(recent_atrs[:3]) / 3)
-            atr_compressed = atr_trend < 0.85  # ATR declining by 15%+
-
+            atr_compressed = atr_trend < 0.85
     diag['atr_compressed'] = atr_compressed
 
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 5: RSI in the sweet spot
     # ════════════════════════════════════════════════════════════════════════
-    rsi_sweet = COIL_RSI_MIN <= rsi_now <= COIL_RSI_MAX
-    # Also accept if RSI recently dipped into the zone
+    rsi_sweet = COILED_SPRING_RSI_MIN <= rsi_now <= COILED_SPRING_RSI_MAX
     if not rsi_sweet and i >= 3:
         rsi_recent = [r for r in rsi14[i - 3:i] if r is not None]
-        rsi_sweet = any(COIL_RSI_MIN <= r <= COIL_RSI_MAX for r in rsi_recent)
+        rsi_sweet = any(COILED_SPRING_RSI_MIN <= r <= COILED_SPRING_RSI_MAX for r in rsi_recent)
     diag['rsi_sweet'] = rsi_sweet
 
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 6: Price near support (EMA21 or EMA50 zone)
     # ════════════════════════════════════════════════════════════════════════
-    # Price should be within 1 ATR of EMA21 or EMA50 (pullback to support)
     near_ema21 = abs(price - ema21_now) < atr_now * 1.5
     near_ema50 = abs(price - ema50_now) < atr_now * 1.5
     at_support = near_ema21 or near_ema50
@@ -288,55 +301,49 @@ def detect_coiled_spring(rows):
     diag['dist_ema50_pct'] = (price / ema50_now - 1) * 100
 
     # ════════════════════════════════════════════════════════════════════════
-    # CHECK 7: Impulse validation (recent move established the trend)
+    # CHECK 7: Impulse validation
     # ════════════════════════════════════════════════════════════════════════
-    # Find the most recent significant low and compute the impulse from it
     if len(swing_low_idxs) >= 1:
         recent_low_price = closes[-lookback_window + swing_low_idxs[-1]]
         impulse_pct = (price / recent_low_price - 1) * 100
         diag['impulse_pct'] = impulse_pct
-        # We want the impulse to have happened (move FROM the low)
-        # but now price is pulling back within the impulse
     else:
         impulse_pct = 0
 
     # ════════════════════════════════════════════════════════════════════════
-    # GATE: Must pass at least 4 of 6 conditions (excluding EMA which is hard gate)
+    # GATE: Determine mode and validate
     # ════════════════════════════════════════════════════════════════════════
     conditions = [
-        ('higher_lows', True),     # Always checked above
-        ('coil_volume', coil_bars >= COIL_MIN_BARS),
+        ('higher_lows', True),
+        ('coil_volume', coil_bars >= COILED_SPRING_COIL_MIN_BARS),
         ('atr_compressed', atr_compressed),
         ('rsi_sweet', rsi_sweet),
         ('at_support', at_support),
-        ('vol_trigger', vol_ratio > TRIGGER_VOL_RATIO),
+        ('vol_trigger', vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO),
     ]
     passed = sum(1 for _, ok in conditions if ok)
     diag['conditions_passed'] = f'{passed}/{len(conditions)}'
     diag['conditions'] = {name: ok for name, ok in conditions}
 
     # ── MODE 1: TRIGGER MODE (volume spike after coil) — highest quality ────
-    # This catches the EXACT entry: volume returns after compression
     is_trigger_mode = (
-        vol_ratio > TRIGGER_VOL_RATIO and
-        coil_bars >= 2 and  # at least 2 prior coil bars
-        rsi_now > 45 and    # RSI turning up
+        vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO and
+        coil_bars >= 2 and
+        rsi_now > COILED_SPRING_RSI_TRIGGER_MIN and
         ema9_now > ema21_now
     )
 
     # ── MODE 2: COIL MODE (buy the dip during compression) — good R:R ──────
-    # Catching the setup before it triggers
     is_coil_mode = (
-        coil_bars >= COIL_MIN_BARS and
+        coil_bars >= COILED_SPRING_COIL_MIN_BARS and
         atr_compressed and
         rsi_sweet and
         at_support and
-        vol_ratio < 1.0  # volume must still be quiet
+        vol_ratio < 1.0
     )
 
     if not (is_trigger_mode or is_coil_mode):
-        # Must pass at least 4 conditions AND be in one of the two modes
-        if not (passed >= 4 and (coil_bars >= 3 or vol_ratio > TRIGGER_VOL_RATIO)):
+        if not (passed >= COILED_SPRING_MIN_CONDITIONS and (coil_bars >= COILED_SPRING_MIN_COIL_FALLBACK or vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO)):
             diag['reason'] = f'not in trigger or coil mode (trigger={is_trigger_mode} coil={is_coil_mode} pass={passed})'
             return None, diag
 
@@ -348,23 +355,20 @@ def detect_coiled_spring(rows):
     # ════════════════════════════════════════════════════════════════════════
     # SIGNAL GENERATION
     # ════════════════════════════════════════════════════════════════════════
-
-    # Confidence scoring
-    confidence = CONF_BASE
+    confidence = COILED_SPRING_CONF_BASE
 
     # Volume spike bonus
-    if vol_ratio > TRIGGER_VOL_RATIO:
-        vol_bonus = min(CONF_VOL_SPIKE_MAX, (vol_ratio - 1) * 5)
+    if vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO:
+        vol_bonus = min(COILED_SPRING_CONF_VOL_SPIKE_MAX, (vol_ratio - 1) * 5)
         confidence += vol_bonus
         diag['conf_vol_bonus'] = vol_bonus
     elif coil_bars >= 5:
-        # Deep coil = high quality even without trigger
         confidence += 10
         diag['conf_deep_coil'] = 10
 
     # RSI bonus
-    if 35 <= rsi_now <= 45:
-        rsi_bonus = CONF_RSI_BONUS_MAX
+    if COILED_SPRING_RSI_BONUS_MIN <= rsi_now <= COILED_SPRING_RSI_BONUS_MAX:
+        rsi_bonus = COILED_SPRING_CONF_RSI_BONUS_MAX
         confidence += rsi_bonus
         diag['conf_rsi_bonus'] = rsi_bonus
 
@@ -372,16 +376,16 @@ def detect_coiled_spring(rows):
     if len(swing_low_idxs) >= 3:
         sl_all = [closes[-lookback_window + idx] for idx in swing_low_idxs[-3:]]
         if all(sl_all[k + 1] > sl_all[k] for k in range(len(sl_all) - 1)):
-            struct_bonus = min(CONF_STRUCT_MAX, 5 + len(swing_low_idxs) * 2)
+            struct_bonus = min(COILED_SPRING_CONF_STRUCT_MAX, 5 + len(swing_low_idxs) * 2)
             confidence += struct_bonus
             diag['conf_struct_bonus'] = struct_bonus
 
-    confidence = min(95, confidence)
+    confidence = max(COILED_SPRING_CONF_FLOOR, min(COILED_SPRING_CONF_CAP, confidence))
     diag['final_confidence'] = confidence
 
     # Stop loss and take profit
-    sl_price = price - atr_now * SL_ATR_MULT
-    tp_price = price + atr_now * TP_ATR_MULT
+    sl_price = price - atr_now * COILED_SPRING_SL_ATR_MULT
+    tp_price = price + atr_now * COILED_SPRING_TP_ATR_MULT
     rr_ratio = (tp_price - price) / (price - sl_price) if price > sl_price else 0
 
     diag['sl_price'] = sl_price
@@ -389,14 +393,16 @@ def detect_coiled_spring(rows):
     diag['rr_ratio'] = rr_ratio
 
     # Source tag
-    source = f"{SOURCE_TAG}@vol{vol_ratio:.1f}"
-    if vol_ratio <= 1:
-        source = f"{SOURCE_TAG}@coil{coil_bars}"
+    mode = 'TRIGGER' if vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO else 'COIL'
+    if mode == 'TRIGGER':
+        source = f"{SOURCE_LONG}@vol{vol_ratio:.1f}"
+    else:
+        source = f"{SOURCE_LONG}@coil{coil_bars}"
 
     return {
         'token': None,  # filled by scanner
         'direction': 'LONG',
-        'signal_type': SIGNAL_TYPE,
+        'signal_type': SIGNAL_TYPE_LONG,
         'source': source,
         'confidence': confidence,
         'value': round(impulse_pct, 2),
@@ -409,113 +415,40 @@ def detect_coiled_spring(rows):
         'tp_price': tp_price,
         'rr_ratio': rr_ratio,
         'coil_bars': coil_bars,
+        'mode': mode,
     }, diag
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# Data fetcher
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def _get_candles_5m(token, lookback=LOOKBACK):
-    """Fetch 5m candles for token from local candles.db."""
-    conn = sqlite3.connect(CANDLES_DB, timeout=30)
-    conn.execute("PRAGMA journal_mode=WAL")
-    cur = conn.cursor()
-    cur.execute("SELECT MAX(ts) FROM candles_5m")
-    max_ts = cur.fetchone()[0]
-    if max_ts is None:
-        conn.close()
-        return []
-    since = max_ts - lookback * 300
-
-    cur.execute("""
-        SELECT ts, open, high, low, close, volume
-        FROM candles_5m
-        WHERE token = ? AND ts >= ?
-        ORDER BY ts ASC
-    """, (token.upper(), since))
-    rows = cur.fetchall()
-    conn.close()
-    return rows
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Scanner
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _get_last_fire(token):
-    """Read last fire timestamp from runtime DB."""
-    conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS coil_spring_cooldown (
-                token TEXT PRIMARY KEY,
-                last_fire_ts INTEGER,
-                fires_count INTEGER DEFAULT 0
-            )
-        """)
-        cur.execute("SELECT last_fire_ts FROM coil_spring_cooldown WHERE token = ?", (token.upper(),))
-        row = cur.fetchone()
-        conn.close()
-        return row[0] if row else 0
-    except Exception:
-        conn.close()
-        return 0
-
-
-def _record_fire(token, ts):
-    """Record a fire event for cooldown tracking."""
-    conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS coil_spring_cooldown (
-                token TEXT PRIMARY KEY,
-                last_fire_ts INTEGER,
-                fires_count INTEGER DEFAULT 0
-            )
-        """)
-        cur.execute("""
-            INSERT OR REPLACE INTO coil_spring_cooldown (token, last_fire_ts, fires_count)
-            VALUES (?, ?, COALESCE((SELECT fires_count FROM coil_spring_cooldown WHERE token = ?), 0) + 1)
-        """, (token.upper(), ts, token.upper()))
-        conn.commit()
-    except Exception:
-        pass
-    finally:
-        conn.close()
-
-
-def scan_coiled_spring(prices_dict=None):
-    """
-    Scan all tokens for coiled spring patterns on 5m.
-    Returns: (count_of_signals_written, set_of_tokens_that_fired)
-    """
-    from hermes_constants import COILED_SPRING_ENABLED
-    if not COILED_SPRING_ENABLED:
-        return 0, set()
-
-    if prices_dict is None:
-        from signal_schema import get_all_latest_prices
-        prices_dict = get_all_latest_prices()
-
+def scan_coiled_spring():
+    """Scan all tokens for coiled spring patterns on 5m. Returns count of signals emitted."""
+    from signal_schema import get_all_latest_prices
     added = 0
-    fired = set()
+    prices_dict = get_all_latest_prices()
 
-    for token, data in prices_dict.items():
+    for token in prices_dict:
         if token.startswith('@'):
             continue
+        data = prices_dict[token]
         if not data.get('price') or data['price'] <= 0:
             continue
         if price_age_minutes(token) > 10:
             continue
 
-        # Per-token cooldown check
-        now_ts = int(time.time())
-        last_fire = _get_last_fire(token)
-        if now_ts - last_fire < COOLDOWN_BARS * 300:
-            continue  # Still in cooldown
+        # Layer 1: per-direction kill-switch
+        if not COILED_SPRING_PLUS_ENABLED:
+            continue
+
+        # Layer 1: blacklists
+        if token.upper() in LONG_BLACKLIST:
+            continue
+
+        # Layer 1: cooldown
+        if get_cooldown(token, direction='LONG'):
+            continue
 
         rows = _get_candles_5m(token)
         if not rows or len(rows) < 60:
@@ -528,43 +461,36 @@ def scan_coiled_spring(prices_dict=None):
         sig_kwargs['token'] = token
         confidence = sig_kwargs['confidence']
 
-        if confidence < 55:
+        if confidence < COILED_SPRING_CONF_FLOOR:
             continue
 
-        # Record fire for cooldown
-        _record_fire(token, rows[-1][0])
-
         sid = add_signal(
-            token=token,
+            token=token.upper(),
             direction=sig_kwargs['direction'],
             signal_type=sig_kwargs['signal_type'],
             source=sig_kwargs['source'],
             confidence=confidence,
             value=sig_kwargs['value'],
             price=sig_kwargs['price'],
-            exchange=sig_kwargs['exchange'],
-            timeframe=sig_kwargs['timeframe'],
+            exchange='hyperliquid',
+            timeframe='5m',
             z_score=sig_kwargs['z_score'],
-            z_score_tier=sig_kwargs['z_score_tier'],
+            z_score_tier=sig_kwargs.get('z_score_tier'),
         )
         if sid:
             added += 1
-            fired.add(token)
+            set_cooldown(token, direction='LONG', hours=COILED_SPRING_COOLDOWN_HOURS)
 
-    return added, fired
+    return added
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Entry point for signals_runner
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def run(prices_dict=None):
-    """Entry point for signals_runner."""
-    return scan_coiled_spring(prices_dict)
+def run():
+    """Entry point for signals_runner. Reads from DB directly (no prices_dict needed)."""
+    return scan_coiled_spring()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CLI backtest / analysis tool
+# CLI analysis tool
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def analyze(token='ENA'):
@@ -575,7 +501,6 @@ def analyze(token='ENA'):
         return
 
     print(f"Analyzing {token} — {len(rows)} candles loaded")
-    print(f"Latest: {rows[-1]}")
 
     sig, diag = detect_coiled_spring(rows)
     print(f"\nDiagnostics:")
@@ -583,8 +508,9 @@ def analyze(token='ENA'):
         print(f"  {k}: {v}")
 
     if sig:
-        print(f"\n🚨 SIGNAL FIRED!")
+        print(f"\nSIGNAL FIRED!")
         print(f"  Type: {sig['signal_type']}")
+        print(f"  Mode: {sig['mode']}")
         print(f"  Price: {sig['price']:.6f}")
         print(f"  Confidence: {sig['confidence']:.1f}")
         print(f"  SL: {sig['sl_price']:.6f}")

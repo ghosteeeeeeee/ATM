@@ -880,3 +880,14 @@
 [2026-09-03 05:07 UTC]   🟢 OK: bb-bounce-short: 7 trades, 85.7% WR, PnL=0.76
 [2026-09-03 05:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-03 05:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-03 11:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-03 11:07 UTC]   🟢 OK: ema300-dip: 14 trades, 71.4% WR, PnL=0.59
+[2026-09-03 11:07 UTC]   🟢 OK: bb-bounce-v2-long+: 13 trades, 76.9% WR, PnL=1.61
+[2026-09-03 11:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-03 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-03 17:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-03 17:07 UTC]   🟢 OK: accel-300-v3-long+: 13 trades, 61.5% WR, PnL=1.7
+[2026-09-03 17:07 UTC]   🟢 OK: ema300-dip: 20 trades, 70.0% WR, PnL=1.56
+[2026-09-03 17:07 UTC]   🟢 OK: bb-bounce-v2-long+: 20 trades, 85.0% WR, PnL=6.38
+[2026-09-03 17:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-03 17:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

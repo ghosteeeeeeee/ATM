@@ -30,6 +30,7 @@ from hermes_constants import (
     VOLUME_BREAKOUT_ENABLED,
     RANGE_REVERSION_ENABLED,
     RANGE_REVERSION_PLUS_ENABLED, RANGE_REVERSION_MINUS_ENABLED,
+    COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
 )
 
 
@@ -175,6 +176,11 @@ try:
 except Exception:
     _range_reversion_short_run = None
 
+try:
+    from signals.coiled_spring import run as _coiled_spring_run
+except Exception:
+    _coiled_spring_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -210,6 +216,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'volume_breakout',           'enabled': 'VOLUME_BREAKOUT_ENABLED',     'run': _volume_breakout_run},
     {'name': 'range_reversion_long',       'enabled': 'RANGE_REVERSION_PLUS_ENABLED',  'run': _range_reversion_long_run},
     {'name': 'range_reversion_short',      'enabled': 'RANGE_REVERSION_MINUS_ENABLED', 'run': _range_reversion_short_run},
+    {'name': 'coiled_spring',             'enabled': 'COILED_SPRING_ENABLED',         'run': _coiled_spring_run},
 ]
 
 

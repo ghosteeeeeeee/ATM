@@ -2083,3 +2083,13 @@ ALERTS:
 - **WARN** (35x): `signal_compactor: timed out` — 35 occurrences in last 6 hours (recurring)
 - **INFO**: BTC-CRASH guard active — CASHCAT SHORT entries blocked (5 blocks in 30min)
 - **STATUS**: Pipeline healthy, 5/5 positions open, 51 closed today. No auto-fix needed for timeouts (pipeline continues, signal_compactor skipped gracefully).
+
+## Error Alerts — 2026-09-03 11:22 UTC
+- **[WARN]** (5x): `signal_compactor: timed out` — in last 30 min (124 total in 24h, recurring)
+- **[WARN]**: Phantom trades — 132 trades with |pnl| < $0.01 (noise/jitter, not real losses)
+- **[WARN]**: Disk at 83% (92G/118G) — 2% from 85% threshold
+- **[INFO]**: Pipeline OK, completed 11:21:26 UTC. 5/5 positions open, 49 closed today
+- **[INFO]**: PnL today: -0.9 USDT, 64.6% WR (48 trades). Wins smaller than losses
+- **[INFO]**: Market regime: 106 NEUTRAL, 1 SHORT (HYPE), 0 LONG. Very flat
+- **INFO**: All timers firing, hl-sync-guardian active, no tracebacks
+- **AUTO-FIX**: None needed — compactor timeouts are non-fatal, pipeline continues

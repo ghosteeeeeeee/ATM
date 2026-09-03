@@ -722,6 +722,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
+            COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
         )
         from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
         # Fast path: if source is blocklisted, blacklist layer already caught it
@@ -1339,6 +1340,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import ATR_COMPRESSION_MINUS_ENABLED
                     if not ATR_COMPRESSION_MINUS_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_COMPRESSION_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # coiled_spring (source: coil-spring+@coil{N} or coil-spring+@vol{X})
+            if _comp.startswith('coil-spring') or _comp == 'coiled_spring':
+                try:
+                    from hermes_constants import COILED_SPRING_ENABLED
+                    if not COILED_SPRING_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COILED_SPRING_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp.startswith('coil-spring') and _comp.endswith('+'):
+                try:
+                    from hermes_constants import COILED_SPRING_PLUS_ENABLED
+                    if not COILED_SPRING_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COILED_SPRING_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp.startswith('coil-spring') and _comp.endswith('-'):
+                try:
+                    from hermes_constants import COILED_SPRING_MINUS_ENABLED
+                    if not COILED_SPRING_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COILED_SPRING_MINUS_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
@@ -2129,6 +2155,7 @@ def is_component_disabled(component: str) -> bool:
             VOLUME_HL_ENABLED, VOLUME_HL_PLUS_ENABLED, VOLUME_HL_MINUS_ENABLED,
             MA300_CANDLE_ENABLED, MA300_CANDLE_PLUS_ENABLED, MA300_CANDLE_MINUS_ENABLED,
             ATR_COMPRESSION_ENABLED, ATR_COMPRESSION_PLUS_ENABLED, ATR_COMPRESSION_MINUS_ENABLED,
+            COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
             EXHAUSTION_ENABLED, EXHAUSTION_PLUS_ENABLED, EXHAUSTION_MINUS_ENABLED,
             VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
             RETURN_EXHAUSTION_ENABLED, RETURN_EXHAUSTION_PLUS_ENABLED, RETURN_EXHAUSTION_MINUS_ENABLED,
@@ -2291,6 +2318,11 @@ def is_component_disabled(component: str) -> bool:
     if c == 'atr-compression+': return not ATR_COMPRESSION_PLUS_ENABLED
     if c == 'atr-compression-': return not ATR_COMPRESSION_MINUS_ENABLED
     if c == 'atr-compression': return not ATR_COMPRESSION_ENABLED
+    # coiled_spring
+    if c.startswith('coil-spring') and c.endswith('+'): return not COILED_SPRING_PLUS_ENABLED
+    if c.startswith('coil-spring') and c.endswith('-'): return not COILED_SPRING_MINUS_ENABLED
+    if c.startswith('coil-spring'): return not COILED_SPRING_ENABLED
+    if c == 'coiled_spring': return not COILED_SPRING_ENABLED
     # exhaustion
     if c == 'exhaustion+': return not EXHAUSTION_PLUS_ENABLED
     if c == 'exhaustion-': return not EXHAUSTION_MINUS_ENABLED

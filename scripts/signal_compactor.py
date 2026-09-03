@@ -342,6 +342,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuation V2 — smart re-entry with exhaustion detection (re-enabled 2026-08-25)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
+    # coiled_spring — volume contraction pullback in bullish trend (LONG only)
+    ('coiled_spring_long', 'coil-spring+'):   1.1,   # new signal, conservative start
     # trend_momentum_near_sma — uptrend + momentum + near SMA (47.8% WR, +$9.66/14d)
     ('trend_momentum_near_sma', 'trend_momentum_near_sma+'): 1.0,
     # stop_hunt_reversal_long — CEO KILLED 2026-08-21, 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10
@@ -370,7 +372,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # slow_grind_short — slow grinding downtrend detector (low volatility, high R²)
     ('slow_grind_short', 'slow-grind-'):   1.0,
     # ema300_dip — buy dips to EMA300 during strong uptrends
-    ('ema300_dip', 'ema300-dip'):  1.0,
+    ('ema300_dip', 'ema300-dip'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
+    # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
+    ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 85%WR +$0.74, 13 tokens
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
     ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)
