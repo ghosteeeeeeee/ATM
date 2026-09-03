@@ -42,10 +42,10 @@ from hermes_constants import (
 SIGNAL_TYPE = 'ema300_dip'
 SOURCE_PREFIX = 'ema300-dip'
 LOOKBACK_CANDLES = 700  # Need 700 candles for reliable EMA300 (matches accel_300_v2_long)
-MIN_CONFIDENCE = 65
-MAX_CONFIDENCE = 85
-BASE_CONFIDENCE = 70
-CONFIDENCE_BONUS_MAX = 15
+MIN_CONFIDENCE = 70
+MAX_CONFIDENCE = 88
+BASE_CONFIDENCE = 75
+CONFIDENCE_BONUS_MAX = 13
 
 _PRICE_DB = os.path.join(HERMES_DATA, 'signals_hermes.db')
 
@@ -144,9 +144,9 @@ def detect_ema300_dip(token, candles, price):
     # - Closer to EMA300 (better entry)
     # - Lower RSI (more oversold)
     # - Higher trend strength
-    dist_bonus = max(0, (EMA300_DIP_MAX_DIST_PCT - dist) / EMA300_DIP_MAX_DIST_PCT * 5)
-    rsi_bonus = max(0, (EMA300_DIP_MAX_RSI - rsi) / EMA300_DIP_MAX_RSI * 5)
-    trend_bonus = min(5, (trend_strength - EMA300_DIP_MIN_TREND_STRENGTH) / 30 * 5)
+    dist_bonus = max(0, (EMA300_DIP_MAX_DIST_PCT - dist) / EMA300_DIP_MAX_DIST_PCT * 6)
+    rsi_bonus = max(0, (EMA300_DIP_MAX_RSI - rsi) / EMA300_DIP_MAX_RSI * 6)
+    trend_bonus = min(6, (trend_strength - EMA300_DIP_MIN_TREND_STRENGTH) / 25 * 6)
     
     confidence = int(min(
         BASE_CONFIDENCE + dist_bonus + rsi_bonus + trend_bonus,
