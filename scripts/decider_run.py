@@ -3204,6 +3204,36 @@ def run(dry_run=False):
                 continue
             log(f'  ⚠️ sig_id=None for {token} {direction} — legacy hot-set format, proceeding via token+direction fallback claim')
         
+        # ── STALENESS CHECK: Don't execute expired signals ─────────────────
+        # Check if signal is still valid (not expired) before executing
+        if sig_id:
+            try:
+                _conn_check = sqlite3.connect(RUNTIME_DB, timeout=5)
+                _cur_check = _conn_check.cursor()
+                _cur_check.execute('''
+                    SELECT decision, created_at FROM signals WHERE id=?
+                ''', (sig_id,))
+                _sig_row = _cur_check.fetchone()
+                _conn_check.close()
+                if _sig_row:
+                    _sig_decision, _sig_created = _sig_row
+                    if _sig_decision == 'EXPIRED':
+                        log(f'SKIP: {token} {direction} — signal {sig_id} is EXPIRED (created={_sig_created}), not executing stale trade')
+                        skipped += 1
+                        continue
+                    # Check age: if signal is older than 15 minutes, skip
+                    if _sig_created:
+                        try:
+                            _sig_age_min = (time.time() - time.mktime(time.strptime(_sig_created, '%Y-%m-%d %H:%M:%S'))) / 60
+                            if _sig_age_min > 15:
+                                log(f'SKIP: {token} {direction} — signal {sig_id} is {_sig_age_min:.0f}min old (>15min), too stale to execute')
+                                skipped += 1
+                                continue
+                        except Exception:
+                            pass
+            except Exception as _e:
+                log(f'  WARN: staleness check failed for {token}: {_e}')
+        
         # ── Trade pending checkpoint ───────────────────────────────────
         try:
             checkpoint_write('trade_pending', {'token': token, 'direction': direction, 'original_direction': flipped_direction})
