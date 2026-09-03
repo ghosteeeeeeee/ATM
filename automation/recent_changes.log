@@ -1,3 +1,7 @@
+[2026-09-03 04:07 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.05). 51T/24h 60.8%WR ~-$1.48. Kill criteria not met: no 0%WR signal with 3+T last hour (ema300-dip 2T 50%WR, bb-bounce-short 1T 100%WR). atr_sl_hit 41.2% avg -$0.100 (down from 68.7% — PM trail占比提升). profit-monster-trail 49% avg +$0.050 carrying system. accel-300-v3-long+ 6T 16.7%WR -$0.69 but CEO_PROTECTED until 2026-09-04 05:00 UTC. range-reversion-long+ 6T 16.7%WR -$0.62 already killed (NEVER_REENABLE). Trade freq 2.1/hr normal. 4 open positions all small. ema300-dip new signal performing well (75%WR +$0.14). System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 05:07 UTC
 [2026-09-02 15:15 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (0W 2L -$0.09). 64T/24h 45.3%WR -$1.65. Kill criteria not met (no 0%WR signal with 3+T last hour — 0 trades last hour). atr_sl_hit 73.4% but PM trail offsets ($0.044 vs -$0.048 per hit) — net neutral. Trade freq 0/hr normal (quiet market). Short signals profitable. 24h loss -$1.65 within limit. 2 open positions (NXPC, WLFI). System steady state.
   BY: auto_1hr
@@ -832,3 +836,15 @@
   WHY: 1T last hour (0W 1L -$0.16 APT r2-trend-long3 atr_sl_hit). 56T/24h 48.2%WR -$2.08. Kill criteria not met. atr_sl_hit 58.9% structural. PM trail offsets net neutral. 5 open positions (3 LONG, 2 SHORT). 24h PnL within limit. bb-bounce-v2-long+ 78%WR and bb-bounce-short 83%WR strong. accel-300-v3-long+ CEO locked. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 02:15 UTC
+[2026-09-03 02:15 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +$0.20). 54T/24h 53.7%WR -$1.87. Kill criteria not met. All PM trail exits last hour — ideal. atr_sl_hit 50% structural, PM trail offsets net neutral. 5 open positions. 24h PnL within limit. bb-bounce-v2-long+ 83%WR and bb-bounce-short 83%WR strong. accel-300-v3-long+ CEO locked. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 03:15 UTC
+[2026-09-03 05:15 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.02 GRASS ema300-dip profit-monster-trail — likely stale entry price, -42% PnL on PM trail is anomalous). 50T/24h 60%WR ~-$1.48 (flat from last check). Kill criteria not met: no 0%WR signal with 3+T last hour (0 trades last hour). atr_sl_hit 38% avg -$0.098 (down from 41.2% — improving). profit-monster-trail 52% avg +$0.047 dominant and carrying system. accel-300-v3-long+ 5T 20%WR -$0.39 still CEO_PROTECTED until Sep 4 05:00 UTC. r2-trend-long3 5T 20%WR -$0.44 — not kill-worthy yet. range-reversion-long+ already killed. Trade freq 2.1/hr normal. 5 open positions all small ($11-20). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 06:15 UTC
+[2026-09-03 06:15 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (3W 3L -$0.34). 53T/24h 50.9%WR -$1.75. Kill criteria not met. atr_sl_hit 37.7% structural (under 40%). range-reversion-long+ trades all from before kill date (signal dead). accel-300-v3-long+ CEO locked until Sep 4 05:00. 2 open positions ($11-20). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 07:15 UTC
