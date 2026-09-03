@@ -2142,6 +2142,7 @@ def is_component_disabled(component: str) -> bool:
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
+            EMA300_DIP_ENABLED,
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
@@ -2254,6 +2255,8 @@ def is_component_disabled(component: str) -> bool:
     # r2-trend-short
     if c == 'r2-trend-short': return not R2_TREND_SHORT_ENABLED
     if c == 'r2-trend': return not R2_TREND_ENABLED
+    # ema300-dip
+    if c == 'ema300-dip': return not EMA300_DIP_ENABLED
     # slow-grind-short
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # volume-hl
