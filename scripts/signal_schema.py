@@ -858,6 +858,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if _comp == 'r2l-long' and not R2_TREND_LONG_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_TREND_LONG_ENABLED=False', flush=True)
                 return None
+            # r2_trend_v2_long — R² trend confirmation v2 for LONG
+            if _comp.startswith('r2v2-long'):
+                try:
+                    from hermes_constants import R2_TREND_V2_LONG_ENABLED
+                    if not R2_TREND_V2_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_TREND_V2_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # slow_grind_short — slow grinding downtrend detector
             if _comp == 'slow-grind-' and not SLOW_GRIND_SHORT_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_SHORT_ENABLED=False', flush=True)
@@ -2255,6 +2264,13 @@ def is_component_disabled(component: str) -> bool:
     # r2-trend-short
     if c == 'r2-trend-short': return not R2_TREND_SHORT_ENABLED
     if c == 'r2-trend': return not R2_TREND_ENABLED
+    # r2-trend-v2-long
+    if c.startswith('r2v2-long'):
+        try:
+            from hermes_constants import R2_TREND_V2_LONG_ENABLED
+            return not R2_TREND_V2_LONG_ENABLED
+        except ImportError:
+            return False
     # ema300-dip
     if c == 'ema300-dip': return not EMA300_DIP_ENABLED
     # slow-grind-short

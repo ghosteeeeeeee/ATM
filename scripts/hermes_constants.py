@@ -1403,6 +1403,21 @@ R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band 
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.
+
+# ── R2 Trend V2 LONG (independent copy for separate tuning) ──────────────
+# r2_trend_v2_long.py — R² trend confirmation v2, independent from r2_trend_long
+R2_TREND_V2_LONG_ENABLED        = True   # master kill-switch
+R2_TREND_V2_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized
+R2_TREND_V2_LONG_MIN_R2        = 0.70    # minimum R² threshold (confirmed trend)
+R2_TREND_V2_LONG_MAX_RSI       = 75      # max RSI — don't buy overbought
+R2_TREND_V2_LONG_MIN_RSI       = 20      # min RSI — don't buy when oversold (falling knife risk)
+R2_TREND_V2_LONG_MIN_SPEED     = 30      # min speed percentile — require some momentum
+R2_TREND_V2_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
+R2_TREND_V2_LONG_BLOCK_STALE   = True    # block signals on stale tokens
+R2_TREND_V2_LONG_MAX_ACCEL     = 0.005   # block LONG when price_acceleration > this
+R2_TREND_V2_LONG_MIN_PRE_MOVE  = 0.3     # min pre-entry move % — block LONG when price dropping
+R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LONG when extended
+R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip Buyer (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip.py — catches shallow pullbacks in strong uptrends
 EMA300_DIP_ENABLED = True              # master switch
@@ -1680,7 +1695,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
-    'r2l-long', 'r2-trend-long', 'r2-trend-short',
+    'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     'ema300-dip',  # EMA300 dip buyer — works solo in strong uptrends
     'tl_break_long', 'tl_break_short',
     'atr-spike',

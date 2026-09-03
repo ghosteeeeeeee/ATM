@@ -363,6 +363,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('range_breakout', 'range_breakout-'):  1.0,
     # r2_trend_long — R² trend confirmation for LONG (slow grinds, R²>0.6, slope>0)
     ('r2_trend_long', 'r2l-long'):          1.0,
+    # r2_trend_v2_long — R² trend confirmation v2 for LONG (independent copy)
+    ('r2_trend_v2_long', 'r2v2-long'):      1.0,
     # r2_trend_short — R² downtrend detector (SHORT only, R²>0.6, slope<0)
     ('r2_trend_short', 'r2-trend-short'):  1.0,
     # slow_grind_short — slow grinding downtrend detector (low volatility, high R²)
