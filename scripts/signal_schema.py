@@ -1344,6 +1344,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 except ImportError:
                     pass
             # coiled_spring (source: coil-spring+@coil{N} or coil-spring+@vol{X})
+            # Note: source has + before @, so we check '+@' or '+' at start of metadata
             if _comp.startswith('coil-spring') or _comp == 'coiled_spring':
                 try:
                     from hermes_constants import COILED_SPRING_ENABLED
@@ -1352,7 +1353,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
-            if _comp.startswith('coil-spring') and _comp.endswith('+'):
+            if _comp.startswith('coil-spring') and ('+@' in _comp or _comp.endswith('+')):
                 try:
                     from hermes_constants import COILED_SPRING_PLUS_ENABLED
                     if not COILED_SPRING_PLUS_ENABLED:
@@ -1360,7 +1361,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
-            if _comp.startswith('coil-spring') and _comp.endswith('-'):
+            if _comp.startswith('coil-spring') and ('-@' in _comp or _comp.endswith('-')):
                 try:
                     from hermes_constants import COILED_SPRING_MINUS_ENABLED
                     if not COILED_SPRING_MINUS_ENABLED:
@@ -2318,9 +2319,9 @@ def is_component_disabled(component: str) -> bool:
     if c == 'atr-compression+': return not ATR_COMPRESSION_PLUS_ENABLED
     if c == 'atr-compression-': return not ATR_COMPRESSION_MINUS_ENABLED
     if c == 'atr-compression': return not ATR_COMPRESSION_ENABLED
-    # coiled_spring
-    if c.startswith('coil-spring') and c.endswith('+'): return not COILED_SPRING_PLUS_ENABLED
-    if c.startswith('coil-spring') and c.endswith('-'): return not COILED_SPRING_MINUS_ENABLED
+    # coiled_spring (source: coil-spring+@coil{N} or coil-spring+@vol{X})
+    if c.startswith('coil-spring') and ('+@' in c or c.endswith('+')): return not COILED_SPRING_PLUS_ENABLED
+    if c.startswith('coil-spring') and ('-@' in c or c.endswith('-')): return not COILED_SPRING_MINUS_ENABLED
     if c.startswith('coil-spring'): return not COILED_SPRING_ENABLED
     if c == 'coiled_spring': return not COILED_SPRING_ENABLED
     # exhaustion
