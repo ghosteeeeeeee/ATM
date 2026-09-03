@@ -241,15 +241,16 @@ def detect_bb_bounce_short(token, closes):
             return None  # Insufficient volume
     # If no volume data or zero volume, allow (don't block on missing data)
 
-    # Momentum fade: require 5m velocity negative (price already falling)
+    # V2 (2026-09-03): Velocity filter — block if price still rising
+    # Catches "rising knife" entries where SHORT BB touch is premature
+    # Uses candles directly instead of speed_tracker (which can be stale)
     try:
-        from speed_tracker import get_token_speed
-        spd = get_token_speed(token)
-        if spd and isinstance(spd, dict):
-            vel_5m = spd.get('price_velocity_5m', 0.0)
-            if vel_5m is not None and vel_5m > 0:
-                return None  # price still rising, fade not confirmed
-    except Exception:
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD_SHORT
+        if MEAN_REVERSION_VEL_ENABLED and len(closes) >= 5:
+            vel_5m = (closes[-1] - closes[-5]) / closes[-5] * 100 if closes[-5] > 0 else 0
+            if vel_5m > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                return None  # Price still rising, SHORT risky
+    except ImportError:
         pass
 
     # V2 (2026-08-29): Momentum filter — block if price still rising (uptrend)
