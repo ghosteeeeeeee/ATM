@@ -1076,7 +1076,6 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Added bb_bounce+/confluence (proven signals, shouldn't have PM Trail interference).
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike',           # proven momentum breakout
-    'r2-trend-long',       # proven trend signal
     'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
     'confluence',          # meta-signal, proven — persistence + compounding validation
@@ -1086,7 +1085,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
-    'accel-300-v3-long',   # V3 pullback LONG — manage via ATR SL, not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
