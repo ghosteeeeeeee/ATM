@@ -5,14 +5,14 @@ ema300_dip.py — EMA300 Dip Buyer Signal for LONG entries.
 Buys dips to EMA300 during confirmed strong uptrends.
 Only fires when:
   1. Price > EMA300 (uptrend confirmed)
-  2. >70% of last 100 candles above EMA300 (trend strength)
+  2. >80% of last 100 candles above EMA300 (trend strength)
   3. EMA300 slope > 0 (uptrend is real)
-  4. Price within 0.8% of EMA300 (dip)
-  5. RSI < 40 (oversold within uptrend)
+  4. Price within 0.5% of EMA300 (dip)
+  5. RSI < 35 (oversold within uptrend)
   6. Green candle (bounce confirmation)
 
 Signal type: ema300_dip
-Source: ema300-dip{N}
+Source: ema300-dip
 """
 
 import sqlite3
@@ -70,10 +70,10 @@ def detect_ema300_dip(token, candles, price):
     
     Fires LONG when:
       - Price > EMA300 (uptrend confirmed)
-      - >70% of last 100 candles above EMA300 (trend strength)
+      - >80% of last 100 candles above EMA300 (trend strength)
       - EMA300 slope > 0 (uptrend is real)
-      - Price within 0.8% of EMA300 (dip)
-      - RSI < 40 (oversold within uptrend)
+      - Price within 0.5% of EMA300 (dip)
+      - RSI < 35 (oversold within uptrend)
       - Green candle (bounce confirmation)
     """
     n = len(candles)
