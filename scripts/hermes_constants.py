@@ -1426,6 +1426,7 @@ EMA300_DIP_MAX_DIST_PCT = 0.6          # max distance from EMA300 (%) — loosen
 EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
 EMA300_DIP_MAX_RSI = 38                # max RSI — loosened from 35
 EMA300_DIP_MIN_TREND_STRENGTH = 75     # min % of last 100 candles above EMA300 — loosened from 80
+EMA300_DIP_MIN_EMA_SLOPE = 0.0         # min EMA300 slope (%) — don't buy when EMA falling
 EMA300_DIP_COOLDOWN = 15               # cooldown between entries (candles = 15 min)
 EMA300_DIP_TP_PCT = 1.0                # take profit (%)
 EMA300_DIP_SL_PCT = 1.5                # stop loss (%)

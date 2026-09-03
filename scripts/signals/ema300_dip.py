@@ -31,6 +31,7 @@ from hermes_constants import (
     EMA300_DIP_MIN_RSI,
     EMA300_DIP_MAX_RSI,
     EMA300_DIP_MIN_TREND_STRENGTH,
+    EMA300_DIP_MIN_EMA_SLOPE,
     EMA300_DIP_COOLDOWN,
     EMA300_DIP_TP_PCT,
     EMA300_DIP_SL_PCT,
@@ -105,10 +106,10 @@ def detect_ema300_dip(token, candles, price):
     if trend_strength < EMA300_DIP_MIN_TREND_STRENGTH:
         return None
     
-    # ── Condition 3: EMA300 slope > 0 ──────────────────────────────────
+    # ── Condition 3: EMA300 slope > MIN_EMA_SLOPE ──────────────────────────
     if n >= 20:
         ema_slope = (ema_vals[-1] - ema_vals[-20]) / ema_vals[-20] * 100
-        if ema_slope <= 0:
+        if ema_slope <= EMA300_DIP_MIN_EMA_SLOPE:
             return None
     else:
         return None
