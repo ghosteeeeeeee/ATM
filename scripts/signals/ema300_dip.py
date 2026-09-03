@@ -19,7 +19,6 @@ import sqlite3
 import sys
 import os
 import time
-import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
@@ -42,7 +41,7 @@ from hermes_constants import (
 # ── Constants ─────────────────────────────────────────────────────────────
 SIGNAL_TYPE = 'ema300_dip'
 SOURCE_PREFIX = 'ema300-dip'
-LOOKBACK_CANDLES = 50
+LOOKBACK_CANDLES = 700  # Need 700 candles for reliable EMA300 (matches accel_300_v2_long)
 MIN_CONFIDENCE = 65
 MAX_CONFIDENCE = 85
 BASE_CONFIDENCE = 70
@@ -78,7 +77,7 @@ def detect_ema300_dip(token, candles, price):
       - Green candle (bounce confirmation)
     """
     n = len(candles)
-    if n < 100:
+    if n < 500:  # Need at least 500 candles for reliable EMA300
         return None
     
     closes = [c['close'] for c in candles]
@@ -226,7 +225,7 @@ def scan_signals(prices_dict=None):
             continue
         
         candles = _get_candles_1m(token)
-        if not candles or len(candles) < 100:
+        if not candles or len(candles) < 500:
             continue
         
         sig = detect_ema300_dip(token, candles, price)
@@ -248,7 +247,7 @@ def scan_signals(prices_dict=None):
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='LONG', hours=0.5)  # 30-min cooldown
+            set_cooldown(token, direction='LONG', hours=EMA300_DIP_COOLDOWN / 60)  # Convert candles to hours
             print(f'  LONG  {token:8s} conf={sig["confidence"]:.0f}% '
                   f'dist={sig["dist"]:+.2f}% rsi={sig["rsi"]:.1f} '
                   f'trend={sig["trend_strength"]:.0f}% ema_slope={sig["ema_slope"]:+.3f}% '
