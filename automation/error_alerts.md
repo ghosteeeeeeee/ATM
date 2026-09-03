@@ -2069,3 +2069,7 @@ ALERTS:
 - **[INFO]**: All 35+ timers firing on schedule, no missed runs
 - **[INFO]**: 0 tracebacks, 0 errors in last 30min
 - **AUTO-FIX**: None needed — all systems nominal
+
+## Error Alerts — 2026-09-03 03:22 UTC
+- **INFO** (3x): `signal_compactor: timed out` — non-fatal, pipeline continued. Occurred at 02:55, 03:04, 03:15.
+- **WARN**: Disk at 82% (92G/118G). Monitor; compress logs if >85%.

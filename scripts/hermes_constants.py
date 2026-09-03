@@ -246,7 +246,9 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 FAVORITES = {
     'ASTER',
     'BABY',
-    'BIGTIME',
+    'BANANA',
+    'BCH',
+    'DOT',
     'DYDX',
     'FOGO',
     'INJ',
@@ -254,6 +256,8 @@ FAVORITES = {
     'LTC',
     'ME',
     'NXPC',
+    'PUMP',
+    'SEI',
     'STX',
     'SYRUP',
     'TURBO',
@@ -274,25 +278,16 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'ALT',
-    'ATOM',
-    'BCH',
     'CC',
-    'CHIP',
-    'ENA',
-    'ENS',
-    'ETC',
-    'IO',
+    'GRASS',
     'JUP',
-    'MERL',
     'MET',
-    'MON',
-    'NEAR',
-    'NEO',
-    'POL',
+    'ONDO',
+    'W',
     'XPL',
     'ZEN'
 }
+
 
 
 
@@ -1207,6 +1202,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_ENABLED',         # CEO 2026-09-02 — replaced by v3. 7T/24h 28.6% WR -$0.06. NEVER_REENABLE.
     'ACCEL_300_V2_MINUS_ENABLED',   # CEO 2026-09-02 — replaced by v3. NEVER_REENABLE.
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
+    'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1394,7 +1390,7 @@ R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT whe
 R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
 SHORT_NEUTRAL_BLOCK_ENABLED = True    # CEO 2026-08-22 — block SHORT in NEUTRAL regime (0% WR, -1.12/7d). No SHORT edge in flat market.
 LONG_NEUTRAL_BLOCK_ENABLED  = True    # CEO 2026-09-02 — block LONG in NEUTRAL regime (399T/7d -$2.33, ALL LONG signals bleed). No LONG edge in flat chop.
-R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
+R2_TREND_LONG_ENABLED        = False   # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% WR -$0.46. ALL losers. NEVER_REENABLE.
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
