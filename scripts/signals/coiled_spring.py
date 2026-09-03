@@ -58,6 +58,20 @@ from hermes_constants import (
     COILED_SPRING_CONF_FLOOR,
     COILED_SPRING_CONF_CAP,
     COILED_SPRING_COOLDOWN_HOURS,
+    COILED_SPRING_MIN_BARS,
+    COILED_SPRING_SWING_LOOKBACK,
+    COILED_SPRING_COIL_SCAN_RANGE,
+    COILED_SPRING_ATR_TREND_THRESH,
+    COILED_SPRING_EMA_PROX_ATR_MULT,
+    COILED_SPRING_VOL_MODE_THRESH,
+    COILED_SPRING_VOL_BONUS_MULT,
+    COILED_SPRING_DEEP_COIL_BARS,
+    COILED_SPRING_DEEP_COIL_BONUS,
+    COILED_SPRING_STRUCT_BASE,
+    COILED_SPRING_STRUCT_PER_LOW,
+    COILED_SPRING_PRICE_AGE_MAX,
+    COILED_SPRING_RSI_FALLBACK,
+    COILED_SPRING_ATR_FALLBACK_PCT,
 )
 
 SIGNAL_TYPE_LONG  = 'coiled_spring_long'
@@ -177,13 +191,14 @@ def detect_coiled_spring(rows):
     Diagnostics always returned for logging.
     """
     n = len(rows)
-    if n < 60:
-        return None, {'reason': f'insufficient data ({n} bars)'}
+    if n < COILED_SPRING_MIN_BARS:
+        return None, {'reason': f'insufficient data ({n} bars, need {COILED_SPRING_MIN_BARS})'}
 
     closes  = [r[4] for r in rows]
     volumes = [r[5] for r in rows]
     highs   = [r[2] for r in rows]
     lows    = [r[3] for r in rows]
+    opens   = [r[1] for r in rows]
 
     # ── Indicators ──────────────────────────────────────────────────────────
     ema9  = _ema(closes, 9)
@@ -193,15 +208,15 @@ def detect_coiled_spring(rows):
     atr14 = _atr(rows, 14)
     vm20  = _vol_ma(volumes, 20)
 
-    # Current values
+    # Current values — use is not None to avoid RSI/ATR=0.0 being treated as missing
     i = n - 1
     price      = closes[i]
     vol_now    = volumes[i]
     ema9_now   = ema9[i]
     ema21_now  = ema21[i]
     ema50_now  = ema50[i]
-    rsi_now    = rsi14[i] if rsi14[i] else 50
-    atr_now    = atr14[i] if atr14[i] else price * 0.005
+    rsi_now    = rsi14[i] if rsi14[i] is not None else COILED_SPRING_RSI_FALLBACK
+    atr_now    = atr14[i] if atr14[i] is not None else price * COILED_SPRING_ATR_FALLBACK_PCT
     atr_pct    = atr_now / price * 100
     vol_ratio  = vol_now / vm20[i] if vm20[i] > 0 else 1
 
@@ -226,7 +241,7 @@ def detect_coiled_spring(rows):
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 2: Higher lows structure (at least 2 ascending swing lows)
     # ════════════════════════════════════════════════════════════════════════
-    lookback_window = min(100, n)
+    lookback_window = min(COILED_SPRING_SWING_LOOKBACK, n)
     swing_low_idxs = _find_swing_lows(closes[-lookback_window:], window=3)
 
     if len(swing_low_idxs) < 2:
@@ -246,7 +261,7 @@ def detect_coiled_spring(rows):
     # CHECK 3: Volume contraction (the coiled spring)
     # ════════════════════════════════════════════════════════════════════════
     coil_bars = 0
-    for j in range(i, max(i - 8, 0), -1):
+    for j in range(i, max(i - COILED_SPRING_COIL_SCAN_RANGE, 0), -1):
         vr = volumes[j] / vm20[j] if vm20[j] > 0 else 1
         if vr < COILED_SPRING_COIL_VOL_RATIO_MAX:
             coil_bars += 1
@@ -258,7 +273,7 @@ def detect_coiled_spring(rows):
     # Also check: current bar might be the trigger (volume returns after coil)
     if coil_bars < COILED_SPRING_COIL_MIN_BARS:
         prev_coil = 0
-        for j in range(i - 1, max(i - 8, 0), -1):
+        for j in range(i - 1, max(i - COILED_SPRING_COIL_SCAN_RANGE, 0), -1):
             vr = volumes[j] / vm20[j] if vm20[j] > 0 else 1
             if vr < COILED_SPRING_COIL_VOL_RATIO_MAX:
                 prev_coil += 1
@@ -278,7 +293,7 @@ def detect_coiled_spring(rows):
         recent_atrs = [a for a in atr14[-10:] if a is not None]
         if len(recent_atrs) >= 5:
             atr_trend = (sum(recent_atrs[-3:]) / 3) / (sum(recent_atrs[:3]) / 3)
-            atr_compressed = atr_trend < 0.85
+            atr_compressed = atr_trend < COILED_SPRING_ATR_TREND_THRESH
     diag['atr_compressed'] = atr_compressed
 
     # ════════════════════════════════════════════════════════════════════════
@@ -293,15 +308,15 @@ def detect_coiled_spring(rows):
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 6: Price near support (EMA21 or EMA50 zone)
     # ════════════════════════════════════════════════════════════════════════
-    near_ema21 = abs(price - ema21_now) < atr_now * 1.5
-    near_ema50 = abs(price - ema50_now) < atr_now * 1.5
+    near_ema21 = abs(price - ema21_now) < atr_now * COILED_SPRING_EMA_PROX_ATR_MULT
+    near_ema50 = abs(price - ema50_now) < atr_now * COILED_SPRING_EMA_PROX_ATR_MULT
     at_support = near_ema21 or near_ema50
     diag['at_support'] = at_support
     diag['dist_ema21_pct'] = (price / ema21_now - 1) * 100
     diag['dist_ema50_pct'] = (price / ema50_now - 1) * 100
 
     # ════════════════════════════════════════════════════════════════════════
-    # CHECK 7: Impulse validation
+    # CHECK 7: Impulse validation (minimum move from recent swing low)
     # ════════════════════════════════════════════════════════════════════════
     if len(swing_low_idxs) >= 1:
         recent_low_price = closes[-lookback_window + swing_low_idxs[-1]]
@@ -309,6 +324,18 @@ def detect_coiled_spring(rows):
         diag['impulse_pct'] = impulse_pct
     else:
         impulse_pct = 0
+        diag['impulse_pct'] = 0
+
+    # GATE: Impulse must be meaningful — otherwise no trend was established
+    if impulse_pct < COILED_SPRING_MIN_IMPULSE_PCT:
+        diag['reason'] = f'impulse too small ({impulse_pct:.2f}% < {COILED_SPRING_MIN_IMPULSE_PCT}%)'
+        return None, diag
+
+    # ════════════════════════════════════════════════════════════════════════
+    # CHECK 8: Trigger candle body quality (for trigger mode)
+    # ════════════════════════════════════════════════════════════════════════
+    trigger_body_pct = abs(closes[i] - opens[i]) / opens[i] * 100 if opens[i] > 0 else 0
+    diag['trigger_body_pct'] = trigger_body_pct
 
     # ════════════════════════════════════════════════════════════════════════
     # GATE: Determine mode and validate
@@ -326,20 +353,23 @@ def detect_coiled_spring(rows):
     diag['conditions'] = {name: ok for name, ok in conditions}
 
     # ── MODE 1: TRIGGER MODE (volume spike after coil) — highest quality ────
+    # Requires: volume spike + prior coil + RSI turning up + body quality
     is_trigger_mode = (
         vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO and
         coil_bars >= 2 and
         rsi_now > COILED_SPRING_RSI_TRIGGER_MIN and
-        ema9_now > ema21_now
+        ema9_now > ema21_now and
+        trigger_body_pct >= COILED_SPRING_TRIGGER_BODY_PCT
     )
 
     # ── MODE 2: COIL MODE (buy the dip during compression) — good R:R ──────
+    # Requires: sustained coil + ATR compressed + RSI in zone + at support
     is_coil_mode = (
         coil_bars >= COILED_SPRING_COIL_MIN_BARS and
         atr_compressed and
         rsi_sweet and
         at_support and
-        vol_ratio < 1.0
+        vol_ratio < COILED_SPRING_VOL_MODE_THRESH
     )
 
     if not (is_trigger_mode or is_coil_mode):
@@ -359,12 +389,12 @@ def detect_coiled_spring(rows):
 
     # Volume spike bonus
     if vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO:
-        vol_bonus = min(COILED_SPRING_CONF_VOL_SPIKE_MAX, (vol_ratio - 1) * 5)
+        vol_bonus = min(COILED_SPRING_CONF_VOL_SPIKE_MAX, (vol_ratio - 1) * COILED_SPRING_VOL_BONUS_MULT)
         confidence += vol_bonus
         diag['conf_vol_bonus'] = vol_bonus
-    elif coil_bars >= 5:
-        confidence += 10
-        diag['conf_deep_coil'] = 10
+    elif coil_bars >= COILED_SPRING_DEEP_COIL_BARS:
+        confidence += COILED_SPRING_DEEP_COIL_BONUS
+        diag['conf_deep_coil'] = COILED_SPRING_DEEP_COIL_BONUS
 
     # RSI bonus
     if COILED_SPRING_RSI_BONUS_MIN <= rsi_now <= COILED_SPRING_RSI_BONUS_MAX:
@@ -376,7 +406,8 @@ def detect_coiled_spring(rows):
     if len(swing_low_idxs) >= 3:
         sl_all = [closes[-lookback_window + idx] for idx in swing_low_idxs[-3:]]
         if all(sl_all[k + 1] > sl_all[k] for k in range(len(sl_all) - 1)):
-            struct_bonus = min(COILED_SPRING_CONF_STRUCT_MAX, 5 + len(swing_low_idxs) * 2)
+            struct_bonus = min(COILED_SPRING_CONF_STRUCT_MAX,
+                               COILED_SPRING_STRUCT_BASE + len(swing_low_idxs) * COILED_SPRING_STRUCT_PER_LOW)
             confidence += struct_bonus
             diag['conf_struct_bonus'] = struct_bonus
 
@@ -436,7 +467,7 @@ def scan_coiled_spring():
         data = prices_dict[token]
         if not data.get('price') or data['price'] <= 0:
             continue
-        if price_age_minutes(token) > 10:
+        if price_age_minutes(token) > COILED_SPRING_PRICE_AGE_MAX:
             continue
 
         # Layer 1: per-direction kill-switch
@@ -452,7 +483,7 @@ def scan_coiled_spring():
             continue
 
         rows = _get_candles_5m(token)
-        if not rows or len(rows) < 60:
+        if not rows or len(rows) < COILED_SPRING_MIN_BARS:
             continue
 
         sig_kwargs, diag = detect_coiled_spring(rows)

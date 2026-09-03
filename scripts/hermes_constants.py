@@ -1357,6 +1357,21 @@ COILED_SPRING_CONF_CAP          = 88      # max confidence (system ceiling)
 COILED_SPRING_CONF_VOL_SPIKE_MAX = 25     # bonus for volume spike magnitude
 COILED_SPRING_CONF_RSI_BONUS_MAX = 10     # bonus for ideal RSI zone
 COILED_SPRING_CONF_STRUCT_MAX   = 10      # bonus for clean HH/HL structure
+# Additional detection parameters
+COILED_SPRING_MIN_BARS          = 60      # minimum candles required for detection
+COILED_SPRING_SWING_LOOKBACK    = 100     # max lookback for swing low detection
+COILED_SPRING_COIL_SCAN_RANGE   = 8       # bars to scan back for coil detection
+COILED_SPRING_ATR_TREND_THRESH  = 0.85    # ATR trend ratio threshold (declining = compressed)
+COILED_SPRING_EMA_PROX_ATR_MULT = 1.5     # price within this * ATR of EMA = at support
+COILED_SPRING_VOL_MODE_THRESH   = 1.0     # volume ratio below this = coil mode candidate
+COILED_SPRING_VOL_BONUS_MULT    = 5       # volume spike bonus multiplier
+COILED_SPRING_DEEP_COIL_BARS    = 5       # bar count for "deep coil" bonus
+COILED_SPRING_DEEP_COIL_BONUS   = 10      # confidence bonus for deep coil
+COILED_SPRING_STRUCT_BASE       = 5       # structure bonus base
+COILED_SPRING_STRUCT_PER_LOW    = 2       # structure bonus per additional swing low
+COILED_SPRING_PRICE_AGE_MAX     = 10      # max price age in minutes before skipping
+COILED_SPRING_RSI_FALLBACK      = 50      # RSI fallback when None (neutral)
+COILED_SPRING_ATR_FALLBACK_PCT  = 0.005   # ATR fallback as fraction of price when None
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
 # For each signal: _PLUS_ENABLED controls LONG, _MINUS_ENABLED controls SHORT.
