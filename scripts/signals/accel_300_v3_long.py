@@ -610,8 +610,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             if current_ema_series[reexp_check_idx] and current_ema_series[reexp_check_idx] > 0:
                 gap_3_ago = (current_closes[reexp_check_idx] - current_ema_series[reexp_check_idx]) / current_ema_series[reexp_check_idx] * 100
                 current_reexp = current_gap - gap_3_ago
-                if current_reexp < 0:
-                    continue  # reexp negative — bounce failed
+                if current_reexp < ACCEL_300_V3_LONG_REEXPAND_MIN:
+                    continue  # reexp below threshold — bounce failed
 
         try:
             sid = add_signal(
