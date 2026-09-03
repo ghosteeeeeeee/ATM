@@ -336,25 +336,23 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
 
     # Pullback = gap narrowed from peak
     pullback = gap_peak - gap_now
-    if pullback < ACCEL_300_V3_LONG_MIN_PULLBACK:
-        return None  # no pullback — gap still near peak (chasing)
-    if pullback > ACCEL_300_V3_LONG_MAX_PULLBACK:
-        return None  # too much pullback — trend may be breaking
 
-    # ── FILTER 3a: GAP BOTTOM CONFIRMATION — pullback must be complete ──────
-    # Gap must have narrowed by at least X% from peak BEFORE re-expanding
-    # Ensures the pullback bottomed, not still in progress
-    if pullback < ACCEL_300_V3_LONG_GAP_BOTTOM_MIN:
-        return None  # pullback too shallow — bottom not confirmed
+    # For fresh crosses: bypass pullback/peak filters — the cross IS the entry
+    if not fresh_cross:
+        if pullback < ACCEL_300_V3_LONG_MIN_PULLBACK:
+            return None  # no pullback — gap still near peak (chasing)
+        if pullback > ACCEL_300_V3_LONG_MAX_PULLBACK:
+            return None  # too much pullback — trend may be breaking
 
-    # ── FILTER 3b: MIN PEAK DISTANCE — don't enter at local tops ────────────
-    # Gap must be at least X% below recent peak — prevents chasing at peaks
-    # SUSHI had 9.1% distance from peak (entered at top, lost)
-    # Winners had 16-72% distance from peak (entered during pullback)
-    if gap_peak > 0:
-        pct_from_peak = (gap_peak - gap_now) / gap_peak
-        if pct_from_peak < ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE:
-            return None  # too close to peak — entering at local top
+        # ── FILTER 3a: GAP BOTTOM CONFIRMATION — pullback must be complete ──
+        if pullback < ACCEL_300_V3_LONG_GAP_BOTTOM_MIN:
+            return None  # pullback too shallow — bottom not confirmed
+
+        # ── FILTER 3b: MIN PEAK DISTANCE — don't enter at local tops ──────
+        if gap_peak > 0:
+            pct_from_peak = (gap_peak - gap_now) / gap_peak
+            if pct_from_peak < ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE:
+                return None  # too close to peak — entering at local top
 
     # ── FILTER 4: RE-EXPANSION — gap is widening again (bounce confirmed) ──
     reexpand_start = latest_idx - ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW
@@ -595,7 +593,7 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         current_closes = [float(p['price']) for p in _get_1m_prices(token)]
         current_ema = _ema_series(current_closes, PERIOD)[-1]
         if current_ema and current_ema > 0:
-            current_gap = (price - current_ema) / current_ema * 100
+            current_gap = (current_closes[-1] - current_ema) / current_ema * 100
             if current_gap <= 0:
                 continue  # gap flipped negative — stale
             abs_current_gap = abs(current_gap)
