@@ -198,3 +198,108 @@
 
 **Open Questions:**
 - accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+
+## [2026-09-03 14:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (GRASS/DOT closed at 13:00, just before window)
+**PnL:** $0 (quiet period)
+**24h Context:** 48T 62.5%WR -$0.67 (improving)
+
+**24h by Close Reason:**
+- profit-monster-trail: 31T avg +$0.046 — dominant winner
+- atr_sl_hit: 11T (22.9%) avg -$0.135 — under 40% threshold
+- cut-loser-CL-T1: 5T avg -$0.124 — normal
+- ORPHAN_PAPER: 1T $0
+
+**Signal Leaders (24h):**
+- bb-bounce-v2-long+: 15T 80%WR +$0.27 — strong
+- ema300-dip: 15T 66.7%WR +$0.07 — slight pullback
+- accel-300-v3-long+: 4T 25%WR -$0.48 — CEO_PROTECTED until Sep 4 05:00
+- r2-trend-long3: 3T 33%WR -$0.23 — borderline, monitor
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: No 0%WR signal with 3+T last hour
+- atr_sl_hit 22.9% — well under 40%
+- Trade freq ~0/hr quiet period
+- 5 open positions ($64.30)
+- System steady state
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+- r2-trend-long3: 3T/24h 33%WR — borderline, next hour determines
+
+## [2026-09-03 15:06 UTC] Hourly Analysis
+
+**Trades:** 8 closed last hour (6W 2L +$0.07)
+**24h Context:** 56T 64.3%WR -$0.50
+
+**Last Hour:** 6 winners — bb-bounce-v2-long+ 3W (ETC +$0.18, AIXBT +$0.03, COMP +$0.02), accel-300-v3-long+ 1W (PONS +$0.10), ema300-dip 1W (ONDO +$0.12), slow-grind- 1W (YGG +$0.11). 2 losers — bb-bounce-short 2L (ALT -$0.17, ME -$0.22).
+
+**24h Breakdown:**
+- profit-monster-trail: 36T (64.3%) avg +$0.053 — carrying system
+- atr_sl_hit: 13T (23.2%) avg -$0.119 — well under 40%, healthy
+- cut-loser-CL-T1: 6T avg -$0.140 — normal
+
+**Signal Leaders (24h):**
+- bb-bounce-v2-long+: 18T 83.3%WR +$0.50
+- ema300-dip: 16T 68.8%WR +$0.19
+
+**Signal Losers (24h):**
+- accel-300-v3-long+: 5T 40%WR -$0.38 — CEO_PROTECTED until Sep 4 05:00
+- bb-bounce-short: 4T 50%WR -$0.27 — last hour 0%WR 2T (monitor, 1 from kill)
+- r2-trend-long3: 3T 33.3%WR -$0.23 — already disabled via R2_TREND_LONG_ENABLED
+
+**Open Positions:** 1 (KAS LONG $19.90)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: No 0%WR signal with 3+T last hour (bb-bounce-short at 2T)
+- atr_sl_hit 23.2% — well under 40%
+- accel-300-v3-long+ CEO locked until Sep 4 05:00
+- Trade freq 8/hr normal
+- System steady state — profit-monster-trail carrying all PnL
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+- bb-bounce-short: 0%WR last hour — if next hour adds 1+ loss, triggers kill
+
+## [2026-09-03 16:15 UTC] Hourly Analysis
+
+**Trades:** 8 closed last hour (4W 4L +$0.13)
+**24h Context:** 62T 64.5%WR -$0.02 (near breakeven, improving)
+
+**Last Hour:** 4 winners — ENA +$0.27, ADA +$0.07, KAS +$0.05, ATOM +$0.03 (all profit-monster-trail). 4 losers — CASHCAT -$0.14 (atr_sl_hit), PONS -$0.10, CHIP -$0.03, MNT -$0.02 (cut-loser-MAE-GUARD).
+
+**24h Breakdown:**
+- profit-monster-trail: 42T (67.7%) avg +$0.052 — carrying system PnL
+- atr_sl_hit: 12T (19.4%) avg -$0.112 — well under 40% threshold
+- cut-loser-CL-T1: 6T avg -$0.140 — normal
+- cut-loser-MAE-GUARD: 1T avg -$0.020 — new exit type, minimal
+
+**Signal Leaders (24h):**
+- bb-bounce-v2-long+: 19T 84.2%WR +$0.55 ✅
+- ema300-dip: 18T 66.7%WR +$0.20 ✅
+
+**Signal Losers (24h):**
+- accel-300-v3-long+: 9T 44.4%WR -$0.14 — CEO_PROTECTED until Sep 4 05:00
+- bb-bounce-short: 4T 50%WR -$0.27 — 0 trades last hour (quiet)
+- r2-trend-long3: 3T 33.3%WR -$0.23 — already disabled
+
+**Open Positions:** 2 ($22.20) — ZRO -$0.09, ENS -$0.13 (both accel-300-v3-long+)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: No 0%WR signal with 3+T last hour
+- atr_sl_hit 19.4% — well under 40%
+- accel-300-v3-long+ CEO locked until Sep 4 05:00
+- Trade freq 8/hr normal
+- System steadily improving: -$1.39 → -$0.70 → -$0.02 over 8h
+- profit-monster-trail carrying all PnL at avg +$0.052/trade
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+- cut-loser-MAE-GUARD: new exit type, 1T so far — monitor for effectiveness
