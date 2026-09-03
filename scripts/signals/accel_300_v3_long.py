@@ -89,6 +89,7 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE,
     ACCEL_300_V3_LONG_GAP_BOTTOM_MIN,
     ACCEL_300_V3_LONG_MIN_DATA_LENGTH,
+    ACCEL_300_V3_LONG_MAX_GAP_DECLINE,
 )
 
 PERIOD = 300  # EMA300 period
@@ -353,6 +354,16 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
             pct_from_peak = (gap_peak - gap_now) / gap_peak
             if pct_from_peak < ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE:
                 return None  # too close to peak — entering at local top
+
+    # ── FILTER 3c: MAX GAP DECLINE — block dead cat bounces ─────────────────
+    # If gap declined significantly from recent peak, the trend is weakening
+    # CASHCAT: gap peaked at 8.27%, declined to 4.69% (decline=4.02%) → dead cat bounce
+    recent_gaps_list = [g for g in gap_pcts[max(0, latest_idx-30):latest_idx] if g is not None]
+    if recent_gaps_list:
+        max_recent_gap = max(recent_gaps_list)
+        gap_decline = max_recent_gap - gap_now
+        if gap_decline > ACCEL_300_V3_LONG_MAX_GAP_DECLINE:
+            return None  # gap declined too much — dead cat bounce, trend weakening
 
     # ── FILTER 4: RE-EXPANSION — gap is widening again (bounce confirmed) ──
     reexpand_start = latest_idx - ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW

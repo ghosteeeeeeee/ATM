@@ -1545,6 +1545,7 @@ ACCEL_300_V3_LONG_GAP_PEAK_WINDOW = 20  # bars to find recent gap peak
 ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE = 0.05  # min gap % below peak — block entries at local tops (lowered from 10%: SUSHI at 14.5% was good but pending; 5% allows earlier entries while reexp + staleness re-checks protect)
 ACCEL_300_V3_LONG_GAP_REEXPAND_WINDOW = 3  # bars to measure re-expansion
 ACCEL_300_V3_LONG_GAP_BOTTOM_MIN = 0.30   # min gap narrowing from peak before re-expanding — ensures pullback is complete
+ACCEL_300_V3_LONG_MAX_GAP_DECLINE = 1.0   # max gap decline from recent 30-bar peak — blocks dead cat bounces (CASHCAT declined 4.02%, PONS declined 1.90%)
 ACCEL_300_V3_LONG_MIN_DATA_LENGTH = 500    # min candles for reliable EMA300 — filters bad data (FIL at 0.98% gap)
 ACCEL_300_V3_LONG_MIN_VELOCITY = 0.0002 # min velocity as fraction of price — bounce must have momentum
 ACCEL_300_V3_LONG_GREEN_CAP = 3         # max consecutive green candles — don't chase after spike
