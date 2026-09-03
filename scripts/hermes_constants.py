@@ -248,20 +248,22 @@ FAVORITES = {
     'BABY',
     'BANANA',
     'BCH',
+    'DOGE',
     'DOT',
     'DYDX',
+    'ETC',
     'FOGO',
     'INJ',
     'KAS',
     'LTC',
     'ME',
+    'MNT',
     'NXPC',
-    'PUMP',
     'SEI',
     'STX',
-    'SYRUP',
     'TURBO',
-    'USUAL'
+    'USUAL',
+    'YGG'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -1705,6 +1707,10 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 BB_BOUNCE_SHORT_ENABLED = False    # auto_1hr KILLED 2026-09-03 — 3T/33.3%WR/-$0.35 today. 2 consecutive losses (ME cut-loser, ALT atr_sl_hit). Below 60% KILL_WR threshold.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
+
+# ── BB Bounce V2 SHORT (improved) ──────────────────────────────────────
+BB_BOUNCE_V2_SHORT_ENABLED = True   # V2 short signal — improved velocity, momentum, volatility filters
+BB_BOUNCE_V2_SHORT_KILL_WR = 60.0   # Kill trigger: WR < 60% over 30+ trades
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
 BB_BOUNCE_V2_LONG_ENABLED = True  # TESTING 2026-09-02 — new signal calibrated from SHORT winners. 7 filters: BB width, RSI, bounce, velocity, momentum, volatility, min_age.
 

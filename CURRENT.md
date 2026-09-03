@@ -1,42 +1,41 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-03 ~10:32 UTC (CEO)**
+**Last Updated: 2026-09-03 ~17:22 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-Today (Sep 3) is BEST DAY since Aug 28: 65.4% WR. Kills verified working. accel-300-v3-long+ CEO_PROTECTION expires tomorrow Sep 4 05:00.
+Today (Sep 3) is BEST DAY since Aug 28: 67.2% WR, +$0.49. System trending positive. accel-300-v3-long+ CEO_PROTECTION expires tomorrow Sep 4 05:00 — auto_1hr or next CEO run MUST disable.
 
-- **24h:** 52T, 57.7% WR, -$1.16 (verified from DB)
-- **Today (Sep 3):** 26T, 65.4% WR, -$0.11 (best day since Aug 28)
-- **7d:** 399T, 51.6% WR, -$2.35
-- **7d LONG:** 167T 47.3% WR -$2.97 (bleeding — v3-long+ $1.18, v2-long $0.74 legacy)
-- **7d SHORT:** 232T 54.7% WR +$0.62 (profitable)
-- **Market:** NEUTRAL (100% of trades)
+- **24h:** 75T, 66.7% WR, +$0.30 (verified from DB — POSITIVE)
+- **Today (Sep 3):** 61T, 67.2% WR, +$0.49 (best day since Aug 28 +$1.55)
+- **7d:** 414T, 54.1% WR, -$1.40
+- **7d LONG:** ~180T ~48% WR ~-$3.2 (bleeding — v3-long+ $1.34, v2-long $0.74 legacy)
+- **7d SHORT:** ~234T ~54% WR ~+$1.8 (profitable)
+- **Market:** NEUTRAL (98% of trades)
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **RANGE_REVERSION KILLED.** Zero post-kill trades. NEVER_REENABLE_FLAGS.
 - **R2_TREND_LONG KILLED.** signal_reporter killed Sep 3. NEVER_REENABLE_FLAGS. 0 new trades post-kill.
-- **ACCEL_300_V3_LONG:** CEO_PROTECTED until Sep 4 05:00 UTC. 20T/7d 35% WR -$1.18. ALL ATR_SL. Needs T DISABLE after expiry.
-- **BB_BOUNCE_V2_LONG:** Live. 13T/7d 76.9% WR +$0.20. Strong performer.
-- **EMA300_DIP:** Live. 14T/7d 71.4% WR +$0.19. Strong performer.
+- **BB_BOUNCE_SHORT KILLED.** auto_1hr killed at 17:06 UTC. 3T/33.3% WR -$0.35 today. NEVER_REENABLE.
+- **ACCEL_300_V3_LONG:** CEO_PROTECTED until Sep 4 05:00 UTC. 35T/7d 42.9% WR -$1.34. ALL ATR_SL. MUST DISABLE after expiry.
+- **BB_BOUNCE_V2_LONG:** Live. 20T/7d 85% WR +$0.74. STAR performer.
+- **EMA300_DIP:** Live. 24T/7d 75% WR +$0.69. STAR performer.
 - **Coin tracker:** FIXED. Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.** Lowered from 75.
-- **Disk:** 82% (approaching 85% trigger)
-- **Open positions:** 5 (bb-bounce-v2-long+ x2, ema300-dip, bb-bounce-short, slow-grind-). ~$0 unrealized.
-- **Core backbone:** accel-300-v2- SHORT 72T/7d +$1.46 52.8% WR. bb-bounce-short 58T/7d 63.8% WR +$0.06.
-- **Top performer:** bb-bounce-v2-long+ 13T/7d 76.9% WR +$0.20. ema300-dip 14T/7d 71.4% WR +$0.19.
+- **Disk:** 83% (2% from 85% trigger)
+- **Open positions:** 5 LONG (ema300-dip x3, bb-bounce-v2-long+ x2). ~$0 unrealized.
+- **Core backbone:** accel-300-v2- SHORT 72T/7d +$1.46 52.8% WR. bb-bounce-v2-long+ 20T/7d 85% WR +$0.74. ema300-dip 24T/7d 75% WR +$0.69.
+- **Preserve mechanism bug:** STX LONG executed as v3 but detection returns None. Stale signal from hotset. Non-critical but flagged.
 
 **⚠️ CEO-PROTECTED BLEEDER (PENDING):**
-1. **accel-300-v3-long+** — 20T/7d 35% WR -$1.18. CEO_PROTECTED until Sep 4 05:00 UTC. Needs DISABLE after expiry.
+1. **accel-300-v3-long+** — 35T/7d 42.9% WR -$1.34. CEO_PROTECTED until Sep 4 05:00 UTC. MUST DISABLE after expiry.
 
 ## Today's Changes (Sep 3)
 
-0. **CEO 10:32 — VERIFIED + UPDATE.** DB: 24h 52T 57.7% WR -$1.16. Today: 26T 65.4% WR -$0.11 (BEST DAY since Aug 28). Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.11 (improving). 9 hours traded, 6 green hours. Kills verified: range-reversion 0 post-kill trades (last closed Sep 2 13:50), r2-trend-long3 0 post-kill trades (last closed Sep 3 01:02). accel-300-v3-long+ still CEO_PROTECTED, 4T/24h 25% WR -$0.48. Open positions flat (~$0 unrealized). No signal_compactor timeout issues in recent logs. **ACTIONS: (1) Updated CURRENT.md. (2) Prepared to disable accel-300-v3-long+ tomorrow. (3) Monitoring bb-bounce-v2-long+ and ema300-dip for expansion.**
-
-## Today's Changes (Sep 3)
-
-0. **CEO 06:34 — VERIFIED + UPDATE.** DB: 24h 52T 51.9% WR -$1.63. 7d: 399T 51.6% WR -$2.35. **r2-trend-long3 KILL CONFIRMED** — signal_reporter killed it, 0 new trades post-kill (last trade closed 01:02 UTC). accel-300-v3-long+ still CEO_PROTECTED, 4 trades/24h ALL ATR_SL losers (-$0.59). bb-bounce-v2-long+ 13T/7d 76.9% WR +$0.20 strong. ema300-dip 9T/7d 66.7% WR +$0.16. 5 open positions all small. Disk 82%. Market 100% NEUTRAL. Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.17 (improving).
-1. **CEO 02:15 — VERIFIED + ESCALATION.** DB: 24h 52T 51.9% WR -$1.86. 7d: 399T 51.6% WR -$2.35. 3 consecutive negative days. **ESCALATED to T: (1) DISABLE r2-trend-long3 — 10T/7d 30% WR -$0.55, CEO_PROTECTED since Aug 17, now bleeding. (2) DISABLE accel-300-v3-long+ after Sep 4 05:00 UTC — 18T/7d 33.3% WR -$0.98.** bb-bounce-v2-long+ 12T/7d 83.3% WR +$0.35 strong. volume-breakout 6T/7d confluence 100% WR. SHORT side +$0.62/7d profitable. System needs T approval to kill 2 protected bleeders.
+0. **CEO 17:22 — VERIFIED + ACTION.** DB: 24h 75T 66.7% WR +$0.30. Today: 61T 67.2% WR +$0.49 (BEST DAY since Aug 28 +$1.55). Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 +$0.49 (STRONG REVERSAL). 17h traded, system trending positive. ema300-dip 24T/7d 75% WR +$0.69 STAR. bb-bounce-v2-long+ 20T/7d 85% WR +$0.74 STAR. v3-long+ 35T/7d 42.9% WR -$1.34 CEO_PROTECTED until Sep 4 05:00. bb-bounce-short KILLED by auto_1hr at 17:06 (3T/33.3% WR -$0.35). 5 open LONG positions ~$0. Disk 83%. Preserve mechanism bug: STX LONG stale signal. **ACTIONS: (1) Updated CURRENT.md. (2) v3-long+ MUST disable after 05:00 UTC Sep 4. (3) System on 3 strong signals: accel-300-v2- SHORT, bb-bounce-v2-long+, ema300-dip.**
+1. **CEO 10:32 — VERIFIED + UPDATE.** DB: 24h 52T 57.7% WR -$1.16. Today: 26T 65.4% WR -$0.11 (best day since Aug 28). Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.11 (improving). 9 hours traded, 6 green hours. Kills verified: range-reversion 0 post-kill trades (last closed Sep 2 13:50), r2-trend-long3 0 post-kill trades (last closed Sep 3 01:02). accel-300-v3-long+ still CEO_PROTECTED, 4T/24h 25% WR -$0.48. Open positions flat (~$0 unrealized). No signal_compactor timeout issues in recent logs. **ACTIONS: (1) Updated CURRENT.md. (2) Prepared to disable accel-300-v3-long+ tomorrow. (3) Monitoring bb-bounce-v2-long+ and ema300-dip for expansion.**
+2. **CEO 06:34 — VERIFIED + UPDATE.** DB: 24h 52T 51.9% WR -$1.63. 7d: 399T 51.6% WR -$2.35. **r2-trend-long3 KILL CONFIRMED** — signal_reporter killed it, 0 new trades post-kill (last trade closed 01:02 UTC). accel-300-v3-long+ still CEO_PROTECTED, 4 trades/24h ALL ATR_SL losers (-$0.59). bb-bounce-v2-long+ 13T/7d 76.9% WR +$0.20 strong. ema300-dip 9T/7d 66.7% WR +$0.16. 5 open positions all small. Disk 82%. Market 100% NEUTRAL. Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.17 (improving).
+3. **CEO 02:15 — VERIFIED + ESCALATION.** DB: 24h 52T 51.9% WR -$1.86. 7d: 399T 51.6% WR -$2.35. 3 consecutive negative days. **ESCALATED to T: (1) DISABLE r2-trend-long3 — 10T/7d 30% WR -$0.55, CEO_PROTECTED since Aug 17, now bleeding. (2) DISABLE accel-300-v3-long+ after Sep 4 05:00 UTC — 18T/7d 33.3% WR -$0.98.** bb-bounce-v2-long+ 12T/7d 83.3% WR +$0.35 strong. volume-breakout 6T/7d confluence 100% WR. SHORT side +$0.62/7d profitable. System needs T approval to kill 2 protected bleeders.
 
 ## Today's Changes (Sep 2)
 
@@ -98,8 +97,10 @@ Today (Sep 3) is BEST DAY since Aug 28: 65.4% WR. Kills verified working. accel-
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Expected to stop -$1.50+/24h LONG bleeding. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **RANGE_REVERSION KILLED.** 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. Added to NEVER_REENABLE_FLAGS. — 2026-09-02
 - **R2_TREND_LONG KILLED.** signal_reporter killed Sep 3. NEVER_REENABLE_FLAGS. 0 new trades post-kill. — 2026-09-03
-- **ACCEL_300_V3_LONG CEO_PROTECTED until Sep 4 05:00.** 19T/7d 31.6% WR -$1.21. ALL ATR_SL. Needs T DISABLE after expiry. — 2026-09-02
-- **BB_BOUNCE_V2_LONG LIVE.** 13T/7d 76.9% WR +$0.20. Strong performer, candidate for expansion. — 2026-09-02
+- **BB_BOUNCE_SHORT KILLED.** auto_1hr killed at 17:06 UTC. 3T/33.3% WR -$0.35 today. NEVER_REENABLE. — 2026-09-03
+- **ACCEL_300_V3_LONG CEO_PROTECTED until Sep 4 05:00.** 35T/7d 42.9% WR -$1.34. ALL ATR_SL. MUST DISABLE after expiry. — 2026-09-02
+- **BB_BOUNCE_V2_LONG LIVE.** 20T/7d 85% WR +$0.74. STAR performer, candidate for expansion. — 2026-09-02
+- **EMA300_DIP LIVE.** 24T/7d 75% WR +$0.69. STAR performer, candidate for expansion. — 2026-09-03
 - **CONF_FILTER_MIN=70.** Lowered from 75. — 2026-09-02
 - **volume_breakout ACTIVE.** 6T/7d confluence 100% WR +$0.40, standalone 0% WR -$0.29. — 2026-08-31
 - **DELEGATED: Build NEUTRAL regime signal.** 3rd backbone candidate. — 2026-09-01
@@ -118,9 +119,9 @@ Today (Sep 3) is BEST DAY since Aug 28: 65.4% WR. Kills verified working. accel-
 
 ## Next Actions
 
-1. **T: DISABLE accel-300-v3-long+ after Sep 4 05:00 UTC.** 19T/7d 31.6% WR -$1.21. CEO_PROTECTED expires then. — 2026-09-04
-2. **Monitor bb-bounce-v2-long+.** 13T/7d 76.9% WR +$0.20. Consider expanding if holds. — 2026-09-03
-3. **Monitor ema300-dip.** 9T/7d 66.7% WR +$0.16. Good standalone performer. — 2026-09-03
+1. **CRITICAL: DISABLE accel-300-v3-long+ after Sep 4 05:00 UTC.** Remove from CEO_PROTECTED_FLAGS + set ACCEL_300_V3_LONG_ENABLED=False + add to NEVER_REENABLE_FLAGS. 35T/7d 42.9% WR -$1.34, ALL ATR_SL. This is the #1 bleeder. — 2026-09-04 05:00
+2. **Monitor bb-bounce-v2-long+.** 20T/7d 85% WR +$0.74. Consider expanding if holds. — 2026-09-03
+3. **Monitor ema300-dip.** 24T/7d 75% WR +$0.69. Strong standalone performer. — 2026-09-03
 4. **Monitor volume_breakout.** 6T/7d — confluence trades 100% WR, standalone 0%. Need more data. — 2026-09-03
-5. **Monitor disk.** Currently 82%. Below 85% trigger. — 2026-09-03
-6. **Monitor signal_compactor timeouts.** 6x in last 2h — non-fatal but investigate if persistent. — 2026-09-03
+5. **Monitor disk.** Currently 83%. Below 85% trigger. — 2026-09-03
+6. **Investigate preserve mechanism bug.** STX LONG stale signal from hotset. Non-critical. — 2026-09-03

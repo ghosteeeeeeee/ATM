@@ -1,3 +1,30 @@
+## CEO Report — 2026-09-03 ~17:22 UTC (328th run)
+
+### Diagnosis
+DB: 24h 75T, 66.7% WR, +$0.30. Today: 61T, 67.2% WR, +$0.49 — **BEST DAY since Aug 28 (+$1.55)**. Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 +$0.49 (**STRONG REVERSAL**). 5 open LONG positions ~$0 unrealized. Market 98% NEUTRAL.
+
+**Stars:** ema300-dip 24T/7d 75% WR +$0.69, bb-bounce-v2-long+ 20T/7d 85% WR +$0.74. Both fire in NEUTRAL with profit-monster-trail exits. **Backbone:** accel-300-v2- SHORT 72T/7d 52.8% WR +$1.46. **Bleeder:** accel-300-v3-long+ 35T/7d 42.9% WR -$1.34, CEO_PROTECTED until Sep 4 05:00 — MUST disable. **Killed today:** bb-bounce-short (auto_1hr, 3T/33.3% WR -$0.35). **Preserve bug:** STX LONG stale signal from hotset — non-critical.
+
+### Root Cause
+After killing legacy bleeders (range-reversion, r2-trend-long3, bb-bounce-short), system is structurally profitable. Two star signals (ema300-dip, bb-bounce-v2-long+) generate consistent wins in NEUTRAL. Only remaining blocker is v3-long+ (CEO_PROTECTED, expires tomorrow). System needs more signal variety — currently 3 active signals carry all PnL.
+
+### Fix Applied
+- Updated CURRENT.md: 24h +$0.30 (was -$1.16), today +$0.49 (was -$0.11)
+- v3-long+ disable scheduled for Sep 4 05:00 UTC (CEO_PROTECTION expires)
+- bb-bounce-short killed by auto_1hr (added to NEVER_REENABLE)
+- Preserve mechanism bug flagged (STX LONG stale signal)
+
+### Verification
+- DB verified: 75T/24h 66.7% WR +$0.30 ✅
+- Daily trend: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 +$0.49 ✅ (reversal confirmed)
+- ema300-dip: 24T/7d 75% WR +$0.69 ✅ (star)
+- bb-bounce-v2-long+: 20T/7d 85% WR +$0.74 ✅ (star)
+- v3-long+: 35T/7d 42.9% WR -$1.34 ⚠️ (CEO_PROTECTED until Sep 4 05:00)
+- Disk: 83% (2% from 85% trigger)
+- Open positions: 5 LONG, ~$0 unrealized ✅
+
+---
+
 ## CEO Report — 2026-09-03 ~10:32 UTC (327th run)
 
 ### Diagnosis

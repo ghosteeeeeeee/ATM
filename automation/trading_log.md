@@ -348,3 +348,42 @@
 **Open Questions:**
 - MON SL at 0.02664636 vs current 0.026839 — 0.7% away. 5x leverage magnifies.
 - accel-300-v3-long+ auto-disable after CEO lock expires Sep 4 05:00? Currently breakeven today.
+
+## [2026-09-03 18:06 UTC] Hourly Analysis
+
+**Trades:** 13 closed last hour (10W 3L +$0.31, 76.9% WR)
+**24h:** 72T 68.1%WR +$1.62
+**Today:** 58T 67.2%WR +$0.45
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 50T 91.7%WR +$2.78 (carrying system)
+- atr_sl_hit: 11T 16.7%WR -$1.39 (15%, healthy)
+- cut-loser-CL-T1: 7T 0%WR -$1.05
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 20T 85%WR +$0.74 ✅
+- ema300-dip: 23T 73.9%WR +$0.62 ✅
+- accel-300-v3-long+: 16T 50%WR -$0.44 ⚠️ CEO_PROTECTED
+- r2-trend-long3: 2T 0%WR -$0.28 ⚠️ 1T from kill
+
+**Changes:** None
+**No Change Needed:**
+- Kill criteria: r2-trend-long3 has 2T (needs 3T), monitoring
+- atr_sl_hit 15% well under 40%
+- Trade freq ~3/hr normal
+- All open positions within SL range
+
+**Open Questions:**
+- r2-trend-long3 — if next trade is loss, auto-kill
+- accel-300-v3-long+ CEO lock expires Sep 4 05:00
+
+## FAVORITES Update — 2026-09-03 18:28 UTC
+- Regime: NEUTRAL
+- DEMOTE SYRUP (WR=57.1%, PnL=$0.10, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE PUMP (WR=50.0%, PnL=$-0.25, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE MNT (WR=60.0%, AvgPnL=0.93%, Trades=5)
+- PROMOTE ETC (WR=66.7%, AvgPnL=1.41%, Trades=6)
+- PROMOTE DOGE (WR=75.0%, AvgPnL=0.86%, Trades=8)
+- PROMOTE YGG (WR=66.7%, AvgPnL=0.23%, Trades=9)
+
+Final set: ['ASTER', 'BABY', 'BANANA', 'BCH', 'DOGE', 'DOT', 'DYDX', 'ETC', 'FOGO', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'SEI', 'STX', 'TURBO', 'USUAL', 'YGG']

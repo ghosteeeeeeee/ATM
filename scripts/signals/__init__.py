@@ -82,6 +82,11 @@ except Exception:
     _bb_bounce_v2_long_run = None
 
 try:
+    from signals.bb_bounce_v2_short import run as _bb_bounce_v2_short_run
+except Exception:
+    _bb_bounce_v2_short_run = None
+
+try:
     from signals.return_exhaustion_short import run as _return_exhaustion_short_run
 except Exception:
     _return_exhaustion_short_run = None

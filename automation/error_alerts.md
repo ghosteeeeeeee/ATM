@@ -2093,3 +2093,7 @@ ALERTS:
 - **[INFO]**: Market regime: 106 NEUTRAL, 1 SHORT (HYPE), 0 LONG. Very flat
 - **INFO**: All timers firing, hl-sync-guardian active, no tracebacks
 - **AUTO-FIX**: None needed — compactor timeouts are non-fatal, pipeline continues
+
+## Error Alerts — 2026-09-03 17:22 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 17:16:02 — single occurrence, non-critical. Monitor next cycle.
+- **AUTO-FIX**: None needed. Pipeline healthy, auto-recovery expected.

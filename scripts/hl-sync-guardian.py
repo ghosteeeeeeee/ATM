@@ -1430,7 +1430,10 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 # Size is in contracts, price in USD per token
                 curr_price = prices.get(coin) if prices else entry_px
                 position_usd = abs(sz) * entry_px
-                amount_usdt = min(position_usd, 20.0)  # cap at $20
+                # FIX (2026-09-03): Don't overwrite amount_usdt if it already has a valid value.
+                # amount_usdt should store the INTENDED trade size ($11 or $16.50 for favorites).
+                # hl_notional_usdt stores the ACTUAL HL fill size.
+                # Guardian was overwriting amount_usdt with actual HL notional, losing intended size.
 
                 # FIX (2026-06-11): Use actual HL open fill price, not stale hype_cache entry_px.
                 # _poll_open_fill_once queries the 5-min window for 'Open' fills and returns
