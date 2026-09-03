@@ -848,3 +848,19 @@
   WHY: 6T last hour (3W 3L -$0.34). 53T/24h 50.9%WR -$1.75. Kill criteria not met. atr_sl_hit 37.7% structural (under 40%). range-reversion-long+ trades all from before kill date (signal dead). accel-300-v3-long+ CEO locked until Sep 4 05:00. 2 open positions ($11-20). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 07:15 UTC
+[2026-09-03 07:15 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.03 SUSHI volume-breakout-long+ PM trail). 52T/24h ~50%WR -$1.75. Kill criteria not met. atr_sl_hit 36.5% structural (under 40%). profit-monster-trail 52% avg +$0.050 carrying system. accel-300-v3-long+ CEO locked until Sep 4 05:00. r2-trend-long3 20%WR borderline but not kill-worthy. Trade freq ~2/hr normal. 5 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 08:15 UTC
+[2026-09-03 08:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period). 48T/24h ~50%WR -$1.62 (improving). Kill criteria not met (0 trades). atr_sl_hit 34.7% under 40% threshold, trending down. profit-monster-trail 26T avg +$0.050 carrying system. accel-300-v3-long+ CEO locked until Sep 4 05:00. Trade freq 0/hr normal quiet period. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 09:15 UTC
+[2026-09-03 09:06 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (5W 0L +/usr/bin/bash.13). All PM trail exits — ideal. 52T/24h ~50%WR -.39 (improving). Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 34% under 40%, trending down. profit-monster-trail 30T avg +/usr/bin/bash.046 carrying system. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00 UTC. Trade freq ~2/hr normal. 5 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 10:15 UTC
+[2026-09-03 10:06 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period). 51T/24h ~54%WR ~-$0.08 (improving — was -$1.39 at 09:06). Kill criteria not met (0 trades). atr_sl_hit 33% under 40%, trending down (38%→34.7%→33%). profit-monster-trail 30T avg +$0.046 carrying system. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00. ema300-dip and bb-bounce-v2-long+ both 76.9%WR strong. 5 open positions ($79). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 11:06 UTC

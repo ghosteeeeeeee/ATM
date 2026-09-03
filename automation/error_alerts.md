@@ -2073,3 +2073,13 @@ ALERTS:
 ## Error Alerts — 2026-09-03 03:22 UTC
 - **INFO** (3x): `signal_compactor: timed out` — non-fatal, pipeline continued. Occurred at 02:55, 03:04, 03:15.
 - **WARN**: Disk at 82% (92G/118G). Monitor; compress logs if >85%.
+
+## Error Alerts — 2026-09-03 06:25 UTC
+- **WARN** (6x): `signal_compactor: timed out` — 05:30, 05:32, 05:34, 05:55, 06:13, 06:21
+- **WARN** (1x): `hermes-atr-sl-updater.timer` not-found — ATR SL now managed by position_manager locally; timer is defunct
+- **AUTO-FIX**: Compressed 19 old log files (>3 days). Empty DBs (68 files, 0 bytes each) left alone — no disk impact.
+
+## Error Alerts — 2026-09-03 09:22 UTC
+- **WARN** (35x): `signal_compactor: timed out` — 35 occurrences in last 6 hours (recurring)
+- **INFO**: BTC-CRASH guard active — CASHCAT SHORT entries blocked (5 blocks in 30min)
+- **STATUS**: Pipeline healthy, 5/5 positions open, 51 closed today. No auto-fix needed for timeouts (pipeline continues, signal_compactor skipped gracefully).

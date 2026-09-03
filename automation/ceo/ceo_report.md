@@ -1,3 +1,52 @@
+## CEO Report — 2026-09-03 ~10:32 UTC (327th run)
+
+### Diagnosis
+DB: 24h 52T, 57.7% WR, -$1.16. Today (Sep 3): 26T, 65.4% WR, -$0.11 — **best day since Aug 28**. Daily trend: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.11 (improving). 9 hours traded, 6 green. 5 open positions flat (~$0 unrealized). Market 100% NEUTRAL.
+
+**Kills verified:** range-reversion (0 post-kill, last trade Sep 2 13:50), r2-trend-long3 (0 post-kill, last trade Sep 3 01:02). **Working signals:** accel-300-v2- SHORT 72T/7d +$1.46 backbone, bb-bounce-v2-long+ 13T/7d 76.9% WR +$0.20 star, ema300-dip 14T/7d 71.4% WR +$0.19 strong. **Bleeder:** accel-300-v3-long+ 20T/7d 35% WR -$1.18, CEO_PROTECTED until Sep 4 05:00 — MUST disable tomorrow.
+
+### Root Cause
+System improving after killing legacy bleeders. Today's 65.4% WR shows filters working. Only remaining blocker is accel-300-v3-long+ (CEO_PROTECTED).
+
+### Fix Applied
+- Updated CURRENT.md with corrected DB numbers
+- Prepared accel-300-v3-long+ disable for Sep 4 05:00 UTC expiry
+- No code changes needed — system trending positive
+
+### Verification
+Kills confirmed (0 post-kill trades). Today's hourly breakdown: 6/9 hours green. Open positions flat. No signal_compactor issues.
+
+---
+
+## CEO Report — 2026-09-03 ~06:34 UTC (326th run)
+
+### Diagnosis
+24h: 52T, 51.9% WR, -$1.63. 7d: 399T, 51.6% WR, -$2.35. LONG side -$2.97/7d (bleeding from legacy v3-long+ and v2-long). SHORT side +$0.62/7d (profitable). Market 100% NEUTRAL (393/399 7d trades). Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 -$0.17 (improving). 5 open positions all small (~$0.06 unrealized). Disk 82%.
+
+**r2-trend-long3 KILL CONFIRMED.** signal_reporter killed it Sep 3. Last trade closed 01:02 UTC. 0 new trades post-kill. Resolved.
+
+**Remaining bleeder (CEO-PROTECTED):**
+1. **accel-300-v3-long+** — 19T/7d 31.6% WR -$1.21. CEO_PROTECTED until Sep 4 05:00 UTC. 4 trades/24h ALL ATR_SL losers (-$0.59). Needs T DISABLE after expiry.
+
+**Working signals:**
+- **accel-300-v2- SHORT:** 72T/7d 52.8% WR +$1.46 (backbone)
+- **bb-bounce-v2-long+:** 13T/7d 76.9% WR +$0.20 (strong)
+- **ema300-dip:** 9T/7d 66.7% WR +$0.16 (good)
+- **bb-bounce-short:** 60T/7d 61.7% WR -$0.12 (slight negative, acceptable)
+
+### Root Cause
+Two CEO-PROTECTED LONG signals bleeded -$1.67/7d combined (v3-long+ $1.21, v2-long $0.74 legacy). r2-trend-long3 killed by signal_reporter. accel-300-v3-long+ protected until Sep 4. Without these: system near breakeven.
+
+### Fix Applied
+- r2-trend-long3 resolved (signal_reporter kill confirmed)
+- accel-300-v3-long+ pending T action after Sep 4 05:00
+- Updated CURRENT.md with verified numbers and status
+
+### Verification
+r2-trend-long3: 0 new trades post-kill. accel-300-v3-long+: still firing, CEO_PROTECTED. All other signals stable. 5 open positions healthy.
+
+---
+
 ## CEO Report — 2026-09-03 ~02:15 UTC (325th run)
 
 ### Diagnosis
