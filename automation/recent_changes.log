@@ -824,3 +824,11 @@
   WHY: 4T last hour (3W 1L -$0.07). 62T/24h 46.8%WR -$1.93. Kill criteria not met. All PM trail exits last hour (bb-bounce-v2-long+ combo working). accel-300-v3-long+ CEO locked for 48h. 5 open positions. 24h PnL within limit. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 00:15 UTC
+[2026-09-03 00:06 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (late night UTC). 62T/24h 46.8%WR -$1.66. Kill criteria not met. range-reversion-long+ killed 2026-09-02. accel-300-v3-long+ CEO locked for 48h. 4 open positions (2 LONG, 2 SHORT). 24h PnL within limit. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 01:15 UTC
+[2026-09-03 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.16 APT r2-trend-long3 atr_sl_hit). 56T/24h 48.2%WR -$2.08. Kill criteria not met. atr_sl_hit 58.9% structural. PM trail offsets net neutral. 5 open positions (3 LONG, 2 SHORT). 24h PnL within limit. bb-bounce-v2-long+ 78%WR and bb-bounce-short 83%WR strong. accel-300-v3-long+ CEO locked. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 02:15 UTC

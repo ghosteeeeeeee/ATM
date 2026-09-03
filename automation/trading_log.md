@@ -20193,3 +20193,64 @@ Final set: ['ALT', 'ATOM', 'BCH', 'CC', 'CHIP', 'ENA', 'ENS', 'ETC', 'IO', 'JUP'
 - accel-300-v3-long+ CEO locked, cannot touch
 
 **Open Questions:** None
+
+## [2026-09-03 00:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (late night UTC)
+**PnL:** $0.00
+
+**24h Context:** 62T, 46.8% WR, -$1.66
+- atr_sl_hit: 38T (61.3%) avg -$0.052 — structural, PM trail offsets net neutral
+- profit-monster-trail: 19T avg +$0.049 — perfect exit performance
+- 4 open positions (2 LONG, 2 SHORT)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 0/hr — expected at 00:06 UTC
+- 24h PnL -$1.66 within -$5/day limit
+- range-reversion-long+ already killed 2026-09-02 (NEVER_REENABLE)
+- accel-300-v3-long+ CEO locked for 48h
+- atr_sl_hit structural — PM trail offsets net neutral
+- All signals operating within acceptable ranges
+
+**Open Questions:** None
+
+---
+
+## [2026-09-03 01:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) -$0.16
+**24h:** 56T, 48.2% WR, -$2.08
+**Open:** 5 (3 LONG, 2 SHORT)
+
+**Last hour:**
+- APT LONG r2-trend-long3: -$0.16 (atr_sl_hit)
+
+**24h by signal (3+ trades):**
+- accel-300-v3-long+: 12T 4W 8L -$0.91 (33%WR) — CEO locked
+- range-reversion-long+: 6T 1W 5L -$0.62 (17%WR) — killed 2026-09-02
+- r2-trend-long3: 6T 2W 4L -$0.38 (33%WR)
+- accel-300-v2-short-: 6T 1W 5L -$0.19 (17%WR)
+- bb-bounce-v2-long+: 9T 7W 2L +$0.02 (78%WR) — strong
+- bb-bounce-short: 6T 5W 1L +$0.06 (83%WR) — strong
+
+**24h by close reason:**
+- atr_sl_hit: 33T (58.9%) avg -$0.071 — structural, PM trail offsets
+- profit-monster-trail: 18T avg +$0.049 — perfect exits
+- cut-loser variants: 4T mixed
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not met (no signal 0%WR with 3+T last hour)
+- Trade freq 1/hr normal (late night UTC)
+- 24h PnL -$2.08 within -$5/day limit
+- atr_sl_hit 58.9% structural — PM trail offsets net neutral
+- range-reversion-long+ already killed (NEVER_REENABLE)
+- accel-300-v3-long+ CEO locked for 48h
+- 5 open positions stable (3 LONG, 2 SHORT)
+- bb-bounce-v2-long+ and bb-bounce-short strong performers
+
+**Open Questions:** None
