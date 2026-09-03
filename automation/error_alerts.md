@@ -2054,3 +2054,10 @@ ALERTS:
 - **[WARN]** (2x): `signal_compactor: timed out` — compactor timing out, hotset empty (no signals surviving)
 - **[WARN]**: Disk at 82% (91G/118G) — approaching 85% threshold
 - **[WARN]**: Market fully neutral (106 tokens, 0 LONG, 0 SHORT regime)
+
+## Error Alerts — 2026-09-03 00:23 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 00:20:02 — transient, pipeline continued normally
+- **[WARN]**: Disk at 82% (92G/118G) — 3% from 85% threshold. Consider compressing old logs.
+- **[WARN]**: -69.11% PnL today (59 trades closed) — market fully NEUTRAL, 0% momentum tokens
+- **[INFO]**: Pipeline healthy, all 52 timers active, 4 open positions
+- **AUTO-FIX**: None needed — all issues transient or performance-related, not infrastructure
