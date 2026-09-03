@@ -270,6 +270,13 @@ def detect_bb_bounce_short(token, closes):
     except ImportError:
         pass
 
+    # V2 (2026-09-03): Volatility filter — block low-volatility tokens
+    # ALT/ME had 1% range → ATR stop hit before bounce. Need >2% range.
+    if len(closes) >= 24:
+        price_range = (max(closes[-24:]) - min(closes[-24:])) / min(closes[-24:]) * 100 if min(closes[-24:]) > 0 else 0
+        if price_range < 2.0:
+            return None  # Too quiet for mean reversion
+
     return {
         'direction': 'SHORT',
         'middle': middle,
