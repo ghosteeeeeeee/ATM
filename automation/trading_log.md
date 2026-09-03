@@ -96,3 +96,105 @@
 
 **Open Questions:**
 - accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+
+## [2026-09-03 11:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L -$0.07)
+**24h Context:** 49T ~50%WR -$0.70
+
+**24h Breakdown:**
+- profit-monster-trail: 30T avg +$0.046 — carrying system
+- atr_sl_hit: 14T avg -$0.113 — 28.6% of closes, trending down (33% → 28.6%)
+- cut-loser-CL-T1: 4T avg -$0.125 — normal
+- ORPHAN_PAPER: 1T $0
+
+**Signal Leaders (24h):**
+- bb-bounce-v2-long+: 13T 76.9%WR +$0.20
+- ema300-dip: 14T 71.4%WR +$0.19
+
+**Signal Losers (24h):**
+- accel-300-v3-long+: 4T 25%WR -$0.48 — CEO_PROTECTED until Sep 4 05:00
+- r2-trend-long3: 3T 33.3%WR -$0.23
+
+**Open Positions:** 5 ($78.6) — DOT, SYRUP, AIXBT, ME (SHORT), YGG (SHORT +$0.20)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0% WR with 3+ trades in last hour (1 trade only)
+- atr_sl_hit 28.6% — under 40%, trending down steadily
+- accel-300-v3-long+ CEO locked until Sep 4 05:00 UTC
+- Trade freq ~1/hr normal
+- System steady state — profit-monster-trail carrying all PnL
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+
+## [2026-09-03 12:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h Context:** 49T ~50%WR -$0.70
+
+**24h Close Reasons:**
+- profit-monster-trail: 30T avg +$0.046 — carrying system
+- atr_sl_hit: 14T avg -$0.113 — 28.6% of closes, trending down (38%→28.6%)
+- cut-loser-CL-T1: 4T avg -$0.125 — normal
+- ORPHAN_PAPER: 1T $0
+
+**Signal Leaders (24h, 3+ trades):**
+- bb-bounce-v2-long+: 13T 76.9%WR +$0.20
+- ema300-dip: 14T 71.4%WR +$0.19
+
+**Signal Losers (24h, 3+ trades):**
+- accel-300-v3-long+: 4T 25%WR -$0.48 — CEO_PROTECTED until Sep 4 05:00
+- r2-trend-long3: 3T 33.3%WR -$0.23
+
+**Open Positions:** 5 ($78.60)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: 0 trades last hour — no signal to evaluate
+- atr_sl_hit 28.6% — under 40%, trending down steadily
+- accel-300-v3-long+ CEO locked until Sep 4 05:00 UTC
+- r2-trend-long3 33%WR -$0.23 (24h) — not kill-worthy on strict criteria (needs 0% WR + 3T last hour)
+- Trade freq ~0/hr quiet period
+- System steady state — profit-monster-trail carrying all PnL
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
+- r2-trend-long3: 9T/48h -$0.46 33%WR — borderline, monitor next hour
+
+## [2026-09-03 13:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** -$0.05 (WR: 66.7%)
+
+**24h Context:** 50T ~50%WR +$0.76
+
+**Last Hour Breakdown:**
+- GRASS bb-bounce-v2-long+ profit-monster-trail +$0.03
+- DOT bb-bounce-v2-long+ profit-monster-trail +$0.04
+- SYRUP ema300-dip cut-loser-CL-T1 -$0.12
+
+**24h by Close Reason:**
+- profit-monster-trail: 31T avg +$0.046 — dominant winner
+- atr_sl_hit: 13T (26%) avg -$0.122 — trending down (28.6% → 26%)
+- cut-loser-CL-T1: 5T avg -$0.124 — normal
+- ORPHAN_PAPER: 1T $0
+
+**Signal Leaders (24h, 3+ trades):**
+- bb-bounce-v2-long+: 3W 0L +$0.07 (last hour) — strong
+- ema300-dip: 14T 71.4%WR +$0.19 (24h) — slight pullback last hour
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0% WR with 3+ trades last hour
+- atr_sl_hit 26% — under 40%, trending down (28.6% → 26%)
+- accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00 UTC
+- Trade freq 3/hr normal
+- System steady state — profit-monster-trail carrying all PnL
+
+**Open Questions:**
+- accel-300-v3-long+ auto-disable after CEO lock expires tomorrow?
