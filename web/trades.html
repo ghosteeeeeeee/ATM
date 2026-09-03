@@ -419,7 +419,7 @@
         const atrProfit = t.atr_managed && pnlUsdt > 0;
         const pmClose = (t.close_reason || '').includes('profit-monster') || (t.close_reason || '').includes('profit_monster');
         const closedIcon = pmClose ? 'pm' : atrProfit ? 'atr' : null;
-        return `<tr class="${pmClose || atrProfit ? 'atr-profit-row' : ''}">
+        return `<tr class="${pnlUsdt > 0 && (pmClose || atrProfit) ? 'atr-profit-row' : ''}">
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
           <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${closedIcon === 'pm' ? '<span class="pm-badge" title="Profit Monster trail closed">🐉</span>' : closedIcon === 'atr' ? '<span class="atr-badge" title="ATR SL — closed in profit">💵</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
