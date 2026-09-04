@@ -3180,7 +3180,8 @@ def run(dry_run=False):
         # Hard block: coins with WR < 40% are completely blocked
         from hermes_constants import LOSERS_HARD_BLOCK_WR
         if LOSERS and token.upper() in LOSERS:
-            # Check 7d WR for this token
+            # Check 7d WR for this token — fail CLOSED (block on error)
+            _conn = None
             try:
                 _conn = psycopg2.connect(**BRAIN_DB_DICT)
                 _cur = _conn.cursor()
@@ -3189,15 +3190,29 @@ def run(dry_run=False):
                     FROM trades WHERE token = %s AND server = 'Hermes' AND status = 'closed'
                       AND close_time > NOW() - INTERVAL '7 days'
                 """, (token,))
-                _wr = _cur.fetchone()[0]
-                _conn.close()
+                _row = _cur.fetchone()
+                _wr = _row[0] if _row else None
                 if _wr is not None and _wr < LOSERS_HARD_BLOCK_WR:
                     log(f'  🚫 [HARD-BLOCK] {token} {direction}: WR={_wr}% < {LOSERS_HARD_BLOCK_WR}% — BLOCKED')
                     skipped += 1
                     _record_hotset_failure(token, direction, failures)
                     continue
-            except Exception:
-                pass
+                elif _wr is None:
+                    # No trades data — fail closed (block)
+                    log(f'  🚫 [HARD-BLOCK] {token} {direction}: no trade data — BLOCKED (fail-closed)')
+                    skipped += 1
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+            except Exception as e:
+                # DB error — fail closed (block trade)
+                log(f'  🚫 [HARD-BLOCK] {token} {direction}: DB error ({e}) — BLOCKED (fail-closed)')
+                skipped += 1
+                _record_hotset_failure(token, direction, failures)
+                continue
+            finally:
+                if _conn:
+                    try: _conn.close()
+                    except Exception: pass
 
         # Losers confidence penalty — heavy penalty, block if still below threshold
         if LOSERS and token.upper() in LOSERS:

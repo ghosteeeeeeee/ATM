@@ -4,11 +4,11 @@ losers_tracker.py — Auto-update LOSERS set based on rolling performance.
 
 Runs daily (06:05 UTC, after favorites_updater). Identifies underperforming coins.
 
-Promotion: 7d WR < 60% (coins with 60%+ WR are not losers)
+Promotion: 7d WR < 50% (coins with 50%+ WR are not losers)
   - Auto-disable: < 30% WR with 10+ trades
   - Consecutive losses: 5+ in a row
   - WR collapse: dropped >20pp from 30d avg
-Demotion: 7d WR >= 65% AND PnL > $0 (must be out for 3 days)
+Demotion: 7d WR >= 50% (must be out for 3 days before re-adding)
 
 Reads: brain DB (trades), hermes_constants.py (current LOSERS)
 Writes: hermes_constants.py (updated LOSERS), data/losers_performance.json
