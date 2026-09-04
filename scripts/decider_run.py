@@ -3079,7 +3079,7 @@ def run(dry_run=False):
             # Neutral tier = z >= -1.0 (confirmed from momentum cache data)
             if _is_accel_v3_short:
                 try:
-                    _z = z_score  # z_score IS in hotset.json (set at line ~1959)
+                    _z = sig.get('z_score', 0.0) or 0.0 if sig else 0.0
                     if _z >= -1.0:
                         log(f'  🚫 [ACCEL-V3-WEAK] {token} {direction} BLOCKED — z_score={_z:.4f} too weak (need < -1.0)')
                         if sig_id:
