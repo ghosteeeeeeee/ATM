@@ -898,3 +898,32 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - ema300-dip R:R problem persists across multiple days. Winning exits are small (+$0.057 avg) while losing exits are 2.6x larger (-$0.149 avg). Worth tuning TP/SL ratio if this pattern continues.
 - System flat for 1+ hours — quiet afternoon period, normal.
+
+## [2026-09-04 19:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W +$0.03)
+**24h:** 64T 56.3%WR +$1.80 gross → -$1.89 net
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 35T (58%) avg +$0.051 — carrying system
+- atr_sl_hit: 20T (33%) avg -$0.117 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.148
+- hard_sl: 3T avg -$0.183
+
+**Signal Leaders (24h):**
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 14T 64.3%WR +$0.14 ⭐
+- ema300-dip: 31T 54.8%WR -$1.46 (R:R drag)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (draining legacy)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 33% — healthy, under 40%
+- ema300-dip tightened yesterday (MIN_TREND_STRENGTH 85, MIN_EMA_SLOPE 0.0) — need more data
+- Trade freq 1/hr — quiet market
+- 1 open position ($19.90)
+
+**Open Questions:**
+- ema300-dip R:R still problematic (avg_loss 2.5x avg_win). If tightened filters don't show improvement by tomorrow, consider reducing TP target or widening SL.

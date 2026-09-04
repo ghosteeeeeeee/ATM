@@ -623,8 +623,8 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.012   # 1.2% floor — CEO Aug 27: 0.8% too tight, SL hit before trades develop. 1.2% gives room.
-ATR_SL_MAX             = 0.015  # 1.5% cap — widened to accommodate 1.2% min with ATR scaling.
+ATR_SL_MIN             = 0.015   # 1.5% floor — CEO Sep 4: was 1.2%, avg loss $0.13 needs wider SL to avoid premature exits.
+ATR_SL_MAX             = 0.018  # 1.8% cap — CEO Sep 4: widened with ATR_SL_MIN, 0.3% spread.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.
@@ -638,12 +638,12 @@ ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits.
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.012  # 1.2% — CEO Aug 27. MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.015  # 1.5% — MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN)
-TP_PCT_FALLBACK    = 0.036  # 3.6% fallback target (3:1 R:R with 1.2% SL)
-STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN)
-SL_PCT_MIN        = 0.012  # 1.2% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
+ATR_SL_MIN_INIT    = 0.015  # 1.5% — CEO Sep 4. MUST match ATR_SL_MIN
+ATR_SL_MAX_INIT    = 0.018  # 1.8% — CEO Sep 4. MUST match ATR_SL_MAX
+SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN) — CEO Sep 4
+TP_PCT_FALLBACK    = 0.045  # 4.5% fallback target (3:1 R:R with 1.5% SL) — CEO Sep 4
+STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN) — CEO Sep 4
+SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — CEO Sep 4
 CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
@@ -652,7 +652,7 @@ CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guar
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — FINALIZED 2026-08-16 eval: kept. PM_TRAIL handles most exits; this is fallback for non-PM_TRAIL trades.
+TRAILING_ACTIVATION_PCT = 0.0060  # 0.60% — CEO Sep 4: was 0.40%, matches PM_TRAIL. Lets winners run further.
 TRAILING_DISTANCE_PCT   = 0.0120  # 1.20% — CEO Aug 27: tighter trail caused too many premature exits. 1.2% gives trades room to breathe while still locking profits.
 
 # ── Loss Cooldown Constants
@@ -1091,8 +1091,8 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%.
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40%
-PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20%
+PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO Sep 4: was 0.40%, winners avg $0.074 exits too early. Let winners run.
+PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% — CEO Sep 4: was 0.20%, wider trail = more profit captured
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1509,18 +1509,18 @@ R2_TREND_V2_LONG_MAX_ACCEL     = 0.005   # block LONG when price_acceleration > 
 R2_TREND_V2_LONG_MIN_PRE_MOVE  = 0.3     # min pre-entry move % — block LONG when price dropping
 R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LONG when extended
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
-# ── EMA300 Dip Buyer (buys dips to EMA300 during confirmed uptrends) ──────────
-# ema300_dip.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_ENABLED = False             # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13. 6h: 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
-EMA300_DIP_EMA_PERIOD = 300            # EMA period
-EMA300_DIP_MAX_DIST_PCT = 0.5          # max distance from EMA300 (%) — tightened from 0.6
-EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
-EMA300_DIP_MAX_RSI = 38                # max RSI — loosened from 35
-EMA300_DIP_MIN_TREND_STRENGTH = 85     # min % of last 100 candles above EMA300 — tightened from 75, R:R was 0.39:1
-EMA300_DIP_MIN_EMA_SLOPE = 0.0         # min EMA300 slope (%) — require positive slope, no falling EMA entries
-EMA300_DIP_COOLDOWN = 15               # cooldown between entries (candles = 15 min)
-EMA300_DIP_TP_PCT = 1.0                # take profit (%)
-EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
+# ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
+# ema300_dip_long.py — catches shallow pullbacks in strong uptrends
+EMA300_DIP_LONG_ENABLED = False           # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13. 6h: 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
+EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
+EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
+EMA300_DIP_LONG_MIN_RSI = 15              # min RSI — don't buy crashes
+EMA300_DIP_LONG_MAX_RSI = 38              # max RSI — loosened from 35
+EMA300_DIP_LONG_MIN_TREND_STRENGTH = 85   # min % of last 100 candles above EMA300 — tightened from 75, R:R was 0.39:1
+EMA300_DIP_LONG_MIN_EMA_SLOPE = 0.0       # min EMA300 slope (%) — require positive slope, no falling EMA entries
+EMA300_DIP_LONG_COOLDOWN = 15             # cooldown between entries (candles = 15 min)
+EMA300_DIP_LONG_TP_PCT = 1.0              # take profit (%)
+EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Backtest: 229 trades, 54% WR, +0.01% avg PnL (CFX: 70% WR, +12.69% total)
 # Optimal: TP 1.0% / SL 1.5% on tokens with 70%+ candles above EMA300
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
@@ -1823,7 +1823,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
-    'ema300-dip',  # EMA300 dip buyer — works solo in strong uptrends
+    'ema300-dip-long',  # EMA300 dip buyer — works solo in strong uptrends
     'ema300-dip-short',  # EMA300 rally seller — works solo in strong downtrends
     'tl_break_long', 'tl_break_short',
     'atr-spike',

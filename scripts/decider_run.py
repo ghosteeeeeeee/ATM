@@ -1479,6 +1479,13 @@ def context_gate(token, direction, source, sig):
     if heb_n > 0 and heb_n < HEBBIAN_AUTO_MIN_N:
         log(f'  [CTX-GATE] {token}: skip LLM — hebbian n={heb_n} < {HEBBIAN_AUTO_MIN_N} (insufficient data, fail-open)')
         return ('GO', None, 0)
+    # FAIL-OPEN: skip LLM when exit_quality shows profit dominance
+    # If exit_profit >> exit_sl, the signal has proven edge — LLM shouldn't override
+    if heb and len(heb) > 4:
+        _exit_quality = heb[4]
+        if _exit_quality and _exit_quality.get('profit_n', 0) > 0 and _exit_quality.get('sl_n', 0) == 0:
+            log(f'  [CTX-GATE] {token}: skip LLM — exit_quality profit dominant (profit={_exit_quality["profit_n"]}, sl={_exit_quality["sl_n"]})')
+            return ('GO', None, 0)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')

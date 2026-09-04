@@ -2207,7 +2207,7 @@ def is_component_disabled(component: str) -> bool:
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
-            EMA300_DIP_ENABLED,
+            EMA300_DIP_LONG_ENABLED,
             EMA300_DIP_SHORT_ENABLED,
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
             INVERSE_ACCEL_300_V2_ENABLED,
@@ -2329,8 +2329,8 @@ def is_component_disabled(component: str) -> bool:
             return not R2_TREND_V2_LONG_ENABLED
         except ImportError:
             return False
-    # ema300-dip
-    if c == 'ema300-dip': return not EMA300_DIP_ENABLED
+    # ema300-dip-long
+    if c == 'ema300-dip-long': return not EMA300_DIP_LONG_ENABLED
     if c == 'ema300-dip-short': return not EMA300_DIP_SHORT_ENABLED
     # slow-grind-short
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED

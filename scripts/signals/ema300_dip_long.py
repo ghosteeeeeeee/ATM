@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ema300_dip.py — EMA300 Dip Buyer Signal for LONG entries.
+ema300_dip_long.py — EMA300 Dip Buyer Signal for LONG entries.
 
 Buys dips to EMA300 during confirmed strong uptrends.
 Only fires when:
@@ -11,8 +11,8 @@ Only fires when:
   5. RSI < 35 (oversold within uptrend)
   6. Green candle (bounce confirmation)
 
-Signal type: ema300_dip
-Source: ema300-dip
+Signal type: ema300_dip_long
+Source: ema300-dip-long
 """
 
 import sqlite3
@@ -25,23 +25,23 @@ from signal_schema import add_signal, get_cooldown, price_age_minutes, set_coold
 from paths import HERMES_DATA, CANDLES_DB
 
 from hermes_constants import (
-    EMA300_DIP_ENABLED,
-    EMA300_DIP_EMA_PERIOD,
-    EMA300_DIP_MAX_DIST_PCT,
-    EMA300_DIP_MIN_RSI,
-    EMA300_DIP_MAX_RSI,
-    EMA300_DIP_MIN_TREND_STRENGTH,
-    EMA300_DIP_MIN_EMA_SLOPE,
-    EMA300_DIP_COOLDOWN,
-    EMA300_DIP_TP_PCT,
-    EMA300_DIP_SL_PCT,
+    EMA300_DIP_LONG_ENABLED,
+    EMA300_DIP_LONG_EMA_PERIOD,
+    EMA300_DIP_LONG_MAX_DIST_PCT,
+    EMA300_DIP_LONG_MIN_RSI,
+    EMA300_DIP_LONG_MAX_RSI,
+    EMA300_DIP_LONG_MIN_TREND_STRENGTH,
+    EMA300_DIP_LONG_MIN_EMA_SLOPE,
+    EMA300_DIP_LONG_COOLDOWN,
+    EMA300_DIP_LONG_TP_PCT,
+    EMA300_DIP_LONG_SL_PCT,
     CANDLES_STALENESS_SEC,
     LONG_BLACKLIST,
 )
 
 # ── Constants ─────────────────────────────────────────────────────────────
-SIGNAL_TYPE = 'ema300_dip'
-SOURCE_PREFIX = 'ema300-dip'
+SIGNAL_TYPE = 'ema300_dip_long'
+SOURCE_PREFIX = 'ema300-dip-long'
 LOOKBACK_CANDLES = 700  # Need 700 candles for reliable EMA300 (matches accel_300_v2_long)
 MIN_CONFIDENCE = 70
 MAX_CONFIDENCE = 88
@@ -66,7 +66,7 @@ def _compute_ema(prices, period):
 
 # ── Trend Detection ─────────────────────────────────────────────────────
 
-def detect_ema300_dip(token, candles, price):
+def detect_ema300_dip_long(token, candles, price):
     """Detect dip to EMA300 during confirmed uptrend.
     
     Fires LONG when:
@@ -86,7 +86,7 @@ def detect_ema300_dip(token, candles, price):
     # Compute EMA300
     ema_vals = []
     ema = closes[0]
-    k = 2.0 / (EMA300_DIP_EMA_PERIOD + 1)
+    k = 2.0 / (EMA300_DIP_LONG_EMA_PERIOD + 1)
     for c in closes:
         ema = c * k + ema * (1 - k)
         ema_vals.append(ema)
@@ -103,20 +103,20 @@ def detect_ema300_dip(token, candles, price):
     above_count = sum(1 for i in range(n - lookback, n) if closes[i] > ema_vals[i])
     trend_strength = above_count / lookback * 100
     
-    if trend_strength < EMA300_DIP_MIN_TREND_STRENGTH:
+    if trend_strength < EMA300_DIP_LONG_MIN_TREND_STRENGTH:
         return None
     
     # ── Condition 3: EMA300 slope > MIN_EMA_SLOPE ──────────────────────────
     if n >= 20:
         ema_slope = (ema_vals[-1] - ema_vals[-20]) / ema_vals[-20] * 100
-        if ema_slope <= EMA300_DIP_MIN_EMA_SLOPE:
+        if ema_slope <= EMA300_DIP_LONG_MIN_EMA_SLOPE:
             return None
     else:
         return None
     
     # ── Condition 4: Price within 0.8% of EMA300 (dip) ─────────────────
     dist = (current_price - current_ema) / current_ema * 100
-    if dist < 0 or dist > EMA300_DIP_MAX_DIST_PCT:
+    if dist < 0 or dist > EMA300_DIP_LONG_MAX_DIST_PCT:
         return None
     
     # ── Condition 5: RSI < 40 ──────────────────────────────────────────
@@ -131,7 +131,7 @@ def detect_ema300_dip(token, candles, price):
         else:
             rsi = 100.0
         
-        if rsi < EMA300_DIP_MIN_RSI or rsi > EMA300_DIP_MAX_RSI:
+        if rsi < EMA300_DIP_LONG_MIN_RSI or rsi > EMA300_DIP_LONG_MAX_RSI:
             return None
     else:
         return None
@@ -145,9 +145,9 @@ def detect_ema300_dip(token, candles, price):
     # - Closer to EMA300 (better entry)
     # - Lower RSI (more oversold)
     # - Higher trend strength
-    dist_bonus = max(0, (EMA300_DIP_MAX_DIST_PCT - dist) / EMA300_DIP_MAX_DIST_PCT * 6)
-    rsi_bonus = max(0, (EMA300_DIP_MAX_RSI - rsi) / EMA300_DIP_MAX_RSI * 6)
-    trend_bonus = min(6, (trend_strength - EMA300_DIP_MIN_TREND_STRENGTH) / 25 * 6)
+    dist_bonus = max(0, (EMA300_DIP_LONG_MAX_DIST_PCT - dist) / EMA300_DIP_LONG_MAX_DIST_PCT * 6)
+    rsi_bonus = max(0, (EMA300_DIP_LONG_MAX_RSI - rsi) / EMA300_DIP_LONG_MAX_RSI * 6)
+    trend_bonus = min(6, (trend_strength - EMA300_DIP_LONG_MIN_TREND_STRENGTH) / 25 * 6)
     
     confidence = int(min(
         BASE_CONFIDENCE + dist_bonus + rsi_bonus + trend_bonus,
@@ -201,7 +201,7 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
 # ── Scanner ─────────────────────────────────────────────────────────────
 
 def scan_signals(prices_dict=None):
-    if not EMA300_DIP_ENABLED:
+    if not EMA300_DIP_LONG_ENABLED:
         return 0
     
     if prices_dict is None:
@@ -229,7 +229,7 @@ def scan_signals(prices_dict=None):
         if not candles or len(candles) < 500:
             continue
         
-        sig = detect_ema300_dip(token, candles, price)
+        sig = detect_ema300_dip_long(token, candles, price)
         if sig is None:
             continue
         
@@ -248,7 +248,7 @@ def scan_signals(prices_dict=None):
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='LONG', hours=EMA300_DIP_COOLDOWN / 60)  # Convert candles to hours
+            set_cooldown(token, direction='LONG', hours=EMA300_DIP_LONG_COOLDOWN / 60)  # Convert candles to hours
             print(f'  LONG  {token:8s} conf={sig["confidence"]:.0f}% '
                   f'dist={sig["dist"]:+.2f}% rsi={sig["rsi"]:.1f} '
                   f'trend={sig["trend_strength"]:.0f}% ema_slope={sig["ema_slope"]:+.3f}% '
@@ -275,6 +275,6 @@ if __name__ == '__main__':
                    if k in ('ARB', 'CFX', 'FIL', 'AVNT', 'SYRUP') and v.get('price')}
     if not test_tokens:
         test_tokens = dict(list(prices.items())[:10])
-    print(f"[ema300_dip] Testing on {len(test_tokens)} tokens...")
+    print(f"[ema300_dip_long] Testing on {len(test_tokens)} tokens...")
     n = scan_signals(test_tokens)
-    print(f"[ema300_dip] Done. {n} signals emitted.")
+    print(f"[ema300_dip_long] Done. {n} signals emitted.")

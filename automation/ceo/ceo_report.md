@@ -284,3 +284,17 @@ This is a **repeatable pattern** that will happen over and over. The EMA300 cros
 - [ ] Go live
 
 **This is the highest-conviction setup in the system. Every other signal is a ripple; this is a tsunami.**
+
+## CEO Report — 2026-09-04 ~20:00 UTC
+
+### Diagnosis
+24h: 61T, 54.1% WR, -$1.93 (verified DB — worse than previous -$1.76). 7d: 384T, 53.6% WR, -$4.89. Today Sep 4: 39T, 48.7% WR, -$1.77. bb-bounce-v2-long+ STAR at 76.5% WR but R:R=0.57 — winners avg $0.074, losses avg $0.13. System needs 63.7% WR to break even. accel-300-v2-short- has best R:R (1.37) but only 27.3% WR — wins EXTREME only, 0% in NEUTRAL/HIGH.
+
+### Root Cause
+PM_TRAIL caps winners at 0.40% activation / 0.20% distance — avg win exits at $0.06. ATR_SL floor 1.2% means avg loss $0.13. R:R ratio 0.57 means system bleeds even at 54% WR.
+
+### Fix Applied
+PM_TRAIL_ACTIVATE_PCT: 0.40% → 0.60%. PM_TRAIL_DISTANCE_PCT: 0.20% → 0.40%. ATR_SL_MIN: 1.2% → 1.5%. ATR_SL_MAX: 1.5% → 1.8%. All fallback/floor constants updated (SL_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN, TP_PCT_FALLBACK 3.6%→4.5%, TRAILING_ACTIVATION_PCT 0.40%→0.60%). Total: 8 constants changed in hermes_constants.py.
+
+### Expected Impact
+Avg win $0.074 → $0.11+. R:R 0.57 → 0.73. Breakeven WR drops from 63.7% to 55.6%. System at 53.6% WR is now much closer to breakeven. Monitor 20+ new trades to verify.
