@@ -611,3 +611,37 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - CL-T1 exits 10T -$1.46 in 24h — 7 from ema300-dip. Signal still net positive via trailing but CL exits erode profits. Consider monitoring if CL-T1 share of exits grows above 15%.
 - 4 consecutive negative hours (03-07 UTC) — choppy NEUTRAL regime, not alarming
+
+## [2026-09-04 07:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**PnL:** +$0.07 (100%WR last hour)
+
+**24h:** 83T 60.2%WR -$0.70
+**24h Exit Breakdown:**
+- profit-monster-trail: 51T +$2.86 (carrying system)
+- atr_sl_hit: 16T -$1.75 (19.3% — healthy)
+- cut-loser-CL-T1: 10T -$1.46 (main drag)
+- hard_sl: 2T -$0.51
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 20T 75%WR +$0.66 ✅
+- ema300-dip: 35T 68.6%WR +$0.03 ✅
+- accel-300-v3-long+: 16T 56.3%WR -$0.13 (monitor)
+- accel-300-v3-short-: 3T 0%WR -$0.48 (KILLED)
+- bb-bounce-short: 2T 0%WR -$0.39 (KILLED)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 19.3% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 3/hr normal
+- 4 open positions ($53.20) all small
+- profit-monster-trail +$2.86 carrying system
+- All previously killed signals remain disabled
+- Hourly trend recovering after choppy 01-05 UTC
+
+**Open Questions:**
+- CL-T1 exits 10T -$1.46 in 24h — continues to be main PnL drag. 7 from ema300-dip but signal still net positive via trailing.
+- accel-300-v3-long+ at 56.3%WR -$0.13 — borderline. Not kill threshold (needs 0%WR with 3+T last hour). Monitor if WR drops below 50%.
