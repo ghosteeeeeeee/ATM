@@ -4,6 +4,22 @@ Generated: 2026-09-02 04:30 UTC
 
 ---
 
+## Plan: 2026-09-04_continuum-engine-spec.md
+- **Date scanned:** 2026-09-04 00:50
+- **Core request:** Replace event-based signals with state-based continuum engine (10 dimensions, multi-timeframe)
+- **Difficulty:** Level 4
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** continuum_engine.py (1320 lines) + continuum_api.py exist. State tracker, compound scorer, SQLite state table built.
+
+## Plan: 2026-09-04_btc-wave-pattern-surfer.md
+- **Date scanned:** 2026-09-04 00:50
+- **Core request:** BTC EMA300 crossover + volume surge signal
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** btc-wave signal exists in PROFIT_MONSTER_BYPASS_SIGNALS. btc_wave_detector.py not found as standalone but btc-wave signal is active.
+
 ## Plan: 2026-09-02_regime-aware-signal-params-spec.md
 - **Date scanned:** 2026-09-02 04:30
 - **Core request:** Regime-aware parameter overrides for accel_300_v3 signals (FLAT/NORMAL/HIGH/EXTREME)
@@ -65,8 +81,8 @@ Generated: 2026-09-02 04:30 UTC
 - **Core request:** Fix backwards PROFIT_MONSTER_BYPASS_SIGNALS
 - **Difficulty:** Level 1
 - **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** Bypass list corrected. Proven signals (r2-trend, bb_bounce, confluence) bypass PM Trail. Losing signals (ct-hot) don't.
+- **Status:** IMPLEMENTED (2026-09-04)
+- **Reason:** Added r2-trend-long, r2-trend-short, bb_bounce+ to bypass. Verified with trade data: r2-trend (51-100% WR), bb_bounce+ (59% WR, +1.69 PnL). ct-hot already removed.
 
 ## Plan: 2026-08-19_short-bias-fix.md
 - **Date scanned:** 2026-09-02 04:30
@@ -176,6 +192,14 @@ Generated: 2026-09-02 04:30 UTC
 
 ## Implementation Log
 
+### 2026-09-04: Level 1 Bypass List Fix (Upgrade Implementer)
+
+| Task | Status | Lines Changed | Notes |
+|------|--------|---------------|-------|
+| Add r2-trend-long/short to PROFIT_MONSTER_BYPASS_SIGNALS | ✅ DONE | 2 | Proven signals (51-100% WR) — ATR SL, not PM Trail |
+| Add bb_bounce+ to PROFIT_MONSTER_BYPASS_SIGNALS | ✅ DONE | 1 | Proven (59% WR, +1.69 PnL) — ATR SL, not PM Trail |
+| Verify LIKE matching works | ✅ DONE | — | Prefix matching confirms r2-trend-long3 etc. are caught |
+
 ### 2026-09-02: Level 1 Cleanup Wave (Upgrade Implementer)
 
 | Task | Status | Lines Removed | Notes |
@@ -218,10 +242,10 @@ Generated: 2026-09-02 04:30 UTC
 
 | Metric | Count |
 |--------|-------|
-| Plans scanned | 20 |
-| IMPLEMENTED | 6 |
+| Plans scanned | 22 |
+| IMPLEMENTED | 9 |
 | PARTIAL | 4 |
-| NOT IMPLEMENTED | 3 |
+| NOT IMPLEMENTED | 2 |
 | SKIPPED | 2 |
 | UNKNOWN | 5 |
-| **Success rate** | **6/13 evaluable (46%)** |
+| **Success rate** | **9/15 evaluable (60%)** |

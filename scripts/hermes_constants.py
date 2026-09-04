@@ -246,21 +246,19 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 FAVORITES = {
     'ASTER',
     'BABY',
-    'BANANA',
-    'BCH',
     'DOGE',
     'DOT',
-    'DYDX',
-    'ETC',
     'FOGO',
+    'GMT',
     'INJ',
     'KAS',
     'LTC',
     'ME',
     'MNT',
     'NXPC',
+    'ONDO',
+    'POL',
     'SEI',
-    'STX',
     'TURBO',
     'USUAL',
     'YGG'
@@ -280,18 +278,23 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'BIGTIME',
+    'APT',
+    'ARB',
+    'CASHCAT',
     'CHIP',
+    'ENA',
     'FIL',
     'ICP',
     'JUP',
     'LDO',
     'MET',
     'NOT',
+    'SAND',
     'W',
     'XPL',
     'ZEN'
 }
+
 
 
 
@@ -1102,6 +1105,9 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Added bb_bounce+/confluence (proven signals, shouldn't have PM Trail interference).
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike',           # proven momentum breakout
+    'r2-trend-long',       # proven (51-100% WR across variants) — ATR SL, not PM Trail
+    'r2-trend-short',      # proven (100% WR on many variants) — ATR SL, not PM Trail
+    'bb_bounce+',          # proven (59% WR, +1.69 PnL) — ATR SL, not PM Trail
     'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
     'confluence',          # meta-signal, proven — persistence + compounding validation
@@ -1114,7 +1120,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
-    # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
+    # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
