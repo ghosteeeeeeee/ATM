@@ -1515,8 +1515,8 @@ EMA300_DIP_EMA_PERIOD = 300            # EMA period
 EMA300_DIP_MAX_DIST_PCT = 0.5          # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
 EMA300_DIP_MAX_RSI = 38                # max RSI — loosened from 35
-EMA300_DIP_MIN_TREND_STRENGTH = 75     # min % of last 100 candles above EMA300 — loosened from 80
-EMA300_DIP_MIN_EMA_SLOPE = -0.4        # min EMA300 slope (%) — don't buy when EMA falling sharply
+EMA300_DIP_MIN_TREND_STRENGTH = 85     # min % of last 100 candles above EMA300 — tightened from 75, R:R was 0.39:1
+EMA300_DIP_MIN_EMA_SLOPE = 0.0         # min EMA300 slope (%) — require positive slope, no falling EMA entries
 EMA300_DIP_COOLDOWN = 15               # cooldown between entries (candles = 15 min)
 EMA300_DIP_TP_PCT = 1.0                # take profit (%)
 EMA300_DIP_SL_PCT = 1.5                # stop loss (%)

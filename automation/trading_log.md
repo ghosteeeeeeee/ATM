@@ -717,3 +717,69 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - accel-300-v3-long+ at 53.3%WR -$0.16 — borderline. Not kill threshold. Monitor if WR drops below 50%.
 - CL-T1 exits down to 9T -$1.39 — improving. 7 from ema300-dip but signal still net positive.
+
+## [2026-09-04 11:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W, 0L)
+**PnL:** +$0.15 (100%WR last hour)
+
+**24h:** ~88T, profit-monster-trail +$3.22 carrying system
+**24h Exit Breakdown:**
+- profit-monster-trail: 55T +$3.22 (AVG +$0.059) ✅
+- atr_sl_hit: 19T -$1.64 (21.6% — under 40% threshold) ✅
+- cut-loser-CL-T1: 9T -$1.39
+- hard_sl: 2T -$0.51
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 21T 76.2%WR +$0.68 ✅
+- continuation+: 4T 100%WR +$0.30 ✅
+- ema300-dip: 33T 69.7%WR +$0.14 ✅
+- accel-300-v3-long+: 15T 53.3%WR -$0.16 (borderline, monitor)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (killed)
+- bb-bounce-short: 2T 0%WR -$0.39 (killed)
+
+**Open:** 5 ema300-dip LONGs ($84.10): NXPC, SEI, YGG, GMT, ALT
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 21.6% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 3/hr normal
+- 5 open positions ($84.10) reasonable exposure
+- profit-monster-trail +$3.22 24h carrying system
+
+**Open Questions:**
+- accel-300-v3-long+ at 53.3%WR -$0.16 — borderline. Not kill threshold. Monitor if WR drops below 50%.
+
+## [2026-09-04 14:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 92T, ~60% WR, -$0.51
+**Last 2h:** 7T (1W 6L, -$1.13) — ema300-dip cluster stopped out
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 54T +$3.19 ✅
+- atr_sl_hit: 23T -$2.54 (25% — under 40%)
+- cut-loser-CL-T1: 8T -$1.27
+- hard_sl: 4T -$0.82
+
+**24h Signal Performance:**
+- ema300-dip: 39T 61.5%WR -$0.91 (R:R 0.39:1 — losses 2.5x wins)
+- bb-bounce-v2-long+: 19T 73.7%WR +$0.61 ✅
+- continuation+: 4T 100%WR +$0.30 ✅
+- accel-300-v3-long+: 15T 53.3%WR -$0.16 (borderline)
+
+**Changes:**
+1. Tightened ema300-dip trend filters: MIN_TREND_STRENGTH 75→85, MIN_EMA_SLOPE -0.4→0.0 — signal had 0.39:1 R:R, entering during choppy markets where EMA300 support fails. Require positive EMA slope and stronger trend confirmation.
+
+**No Change Needed:**
+- atr_sl_hit 25% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 0/hr quiet period
+- 0 open positions (clean slate)
+- profit-monster-trail +$3.19 24h carrying system
+
+**Open Questions:**
+- accel-300-v3-long+ at 53.3%WR -$0.16 — borderline. Monitor if WR drops below 50%.
+- ema300-dip now requires positive slope — will reduce trade frequency but should improve R:R.

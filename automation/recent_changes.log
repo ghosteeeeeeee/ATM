@@ -904,3 +904,8 @@
   WHY: 1T last hour (1W +$0.02). 84T/24h 60.7%WR -$0.66 (improving). Kill criteria not met (no 0%WR signal with 3+T last hour). atr_sl_hit 19.3% under 40%. profit-monster-trail 52T +$3.07 carrying system. accel-300-v3-long+ 53.3%WR borderline. Trade freq 1/hr quiet period. 4 open positions ($53.20). 6h trend all green. System steady state, recovering.
   BY: auto_1hr
   NEXT: Re-run at 11:06 UTC
+[2026-09-04 11:06 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W +$0.15). 88T/24h ~60%WR -$0.51. Kill criteria not met (no 0%WR signal with 3+T last hour). atr_sl_hit 21.6% under 40%. profit-monster-trail 55T +$3.22 carrying system. accel-300-v3-long+ 53.3%WR borderline (not kill threshold). Trade freq 3/hr normal. 5 open positions ($84.10) ema300-dip LONGs. System steady state, trending positive.
+  BY: auto_1hr
+  NEXT: Re-run at 12:06 UTC
+[2026-09-04 14:06 UTC] auto_1hr: TIGHTENED ema300-dip — MIN_TREND_STRENGTH 75→85, MIN_EMA_SLOPE -0.4→0.0. WHY: R:R was 0.39:1 (avg_loss 2.5x avg_win), 6 consecutive losses, entering during choppy markets. Require positive EMA slope and stronger trend. BY: auto_1hr
