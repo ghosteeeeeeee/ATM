@@ -927,3 +927,108 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 
 **Open Questions:**
 - ema300-dip R:R still problematic (avg_loss 2.5x avg_win). If tightened filters don't show improvement by tomorrow, consider reducing TP target or widening SL.
+
+## [2026-09-04 20:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 60T 53.3%WR -$1.99 net
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 31T (52%) avg +$0.055 — carrying system
+- atr_sl_hit: 20T (33%) avg -$0.117 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.148
+- hard_sl: 3T avg -$0.183
+
+**Signal Leaders (24h):**
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 14T 64.3%WR +$0.14 ⭐
+- ema300-dip: 29T 51.7%WR -$1.59 (R:R drag)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 33% — healthy, under 40%
+- Trade freq 0/hr — quiet market
+- 3 open positions ($42.10)
+
+**Open Positions:**
+- ME LONG via ema300-dip: $19.90 size
+- ETC SHORT via ema300-dip-short: $11.10 size
+- STX SHORT via ema300-dip-short: $11.10 size
+
+## [2026-09-04 21:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 55T 52.7%WR -$1.39 net
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 27T (49%) avg +$0.054 — carrying system ⭐
+- atr_sl_hit: 19T (34.5%) avg -$0.116 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.148
+- hard_sl: 3T avg -$0.183
+
+**Signal Leaders (24h):**
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 12T 58.3%WR -$0.05 (breakeven)
+- ema300-dip: 28T 50%WR -$1.63 (R:R drag — tightened at 14:06, no post-tightening data yet)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (not kill threshold)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (0T last hour, no 0%WR signal with 3+T)
+- atr_sl_hit 34.5% — healthy, under 40%
+- ema300-dip tightened at 14:06 UTC — only 7h post-change, no data to evaluate yet
+- Trade freq 0/hr — quiet market
+- 4 open positions ($53.20) all slightly negative, normal
+- profit-monster-trail still carrying system PnL
+
+**Open Positions:**
+- ME LONG via ema300-dip: $19.90 size
+- STX SHORT via ema300-dip-short combo: $11.10
+- ETC SHORT via ema300-dip-short: $11.10
+- NOT SHORT via ema300-dip-short: $11.10
+
+**Open Questions:**
+- ema300-dip tightening (MIN_TREND_STRENGTH 85, MIN_EMA_SLOPE 0.0) needs more trades to evaluate. Recheck tomorrow.
+- accel-300-v3-short- consistently low WR (25%) but trade count too low to auto-kill. If it fires 3+ times next hour with losses, will kill.
+
+## [2026-09-04 22:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 52T 48%WR -$2.07
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 25T (48%) avg +$0.055 — carrying system ⭐
+- atr_sl_hit: 18T (34.6%) avg -$0.116 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.148
+- hard_sl: 3T avg -$0.183
+- cascade_flip_-0.46%: 1T avg -$0.060
+
+**Signal Leaders (24h, 3+T):**
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 11T 54.5%WR -$0.07 (breakeven)
+- ema300-dip: 26T 50%WR -$1.60 (tightened at 14:06 UTC, 8h post-change)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (not kill threshold)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 34.6% — healthy, under 40%
+- ema300-dip tightened at 14:06 UTC — 8h post-change, needs overnight data
+- Trade freq 0/hr — quiet market, ~2/hr average
+- 5 open positions ($73.10)
+- profit-monster-trail carrying system PnL
+
+**Open Positions:**
+- NXPC LONG via bb-bounce-v2-long+: $19.90 (opened 20:36 UTC)
+- NOT SHORT via ema300-dip-short: $11.10 (opened 19:32 UTC)
+- ETC SHORT via ema300-dip-short: $11.10 (opened 18:37 UTC)
+- STX SHORT via ema300-dip-short: $11.10 (opened 18:31 UTC)
+- ME LONG via ema300-dip: $19.90 (opened 17:05 UTC)
+
+**Open Questions:**
+- accel-300-v3-short- at 25%WR with 4T — borderline. If it fires next hour with losses, will kill.
+- ema300-dip needs more post-tightening trades to evaluate.
