@@ -370,7 +370,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # r2_trend_short — R² downtrend detector (SHORT only, R²>0.6, slope<0)
     ('r2_trend_short', 'r2-trend-short'):  1.0,
     # slow_grind_short — slow grinding downtrend detector (low volatility, high R²)
-    ('slow_grind_short', 'slow-grind-'):   1.0,
+    ('slow_grind_short', 'slow-grind-'):   0.5,
     # ema300_dip — buy dips to EMA300 during strong uptrends
     ('ema300_dip', 'ema300-dip'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
