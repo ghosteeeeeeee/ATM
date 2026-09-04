@@ -2116,3 +2116,13 @@ ALERTS:
 - **WARN** (1x): `signal_compactor: timed out` at 05:21:02 — one-off, not recurring
 - **WARN** (recurring): `hotset fallback DB query returned 0 tokens` — hotset DB empty, may need investigation
 - **INFO**: Disk at 84% (93G/118G) — monitoring, no action needed yet
+
+## Error Alerts — 2026-09-04 07:22 UTC
+- **[WARN]** Disk at 84% (93G/118G) — approaching 85% threshold. Run `find /root/.hermes/logs -name "*.log" -mtime +7 -exec gzip {} \;` if it hits 85%.
+- **[INFO]** ARK token stale since 2026-07-19 — consider removing from hotset.
+
+## Error Alerts — 2026-09-04 09:23 UTC
+- **[CRITICAL]** coiled_spring signal crashing: `NameError: name 'mode' is not defined` (line 457). Signal returning None on every run.
+- **AUTO-FIX**: Added `mode = 'trigger' if is_trigger_mode else ('coil' if is_coil_mode else 'fallback')` before the mode gate. Fixed in `scripts/signals/coiled_spring.py:377`.
+- **[WARN]** Disk at 84% (93G/118G) — approaching threshold. Monitor.
+- **[INFO]** Pipeline: running. Services: 2/2 active. Timers: 10+ active. Prices: fresh (updated <1min ago). Regime: NEUTRAL. 0 open trades. 0 phantom trades. Kill switch: ON.

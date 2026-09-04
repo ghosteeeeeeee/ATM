@@ -374,6 +374,8 @@ def detect_coiled_spring(rows):
         vol_ratio < COILED_SPRING_VOL_MODE_THRESH
     )
 
+    mode = 'trigger' if is_trigger_mode else ('coil' if is_coil_mode else 'fallback')
+
     if not (is_trigger_mode or is_coil_mode):
         if not (passed >= COILED_SPRING_MIN_CONDITIONS and (coil_bars >= COILED_SPRING_MIN_COIL_FALLBACK or vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO)):
             diag['reason'] = f'not in trigger or coil mode (trigger={is_trigger_mode} coil={is_coil_mode} pass={passed})'
