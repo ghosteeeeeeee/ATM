@@ -496,12 +496,13 @@ STALE_LOSER_MAX_LOSS   = -0.6   # % loss required to be a "loser" (was -0.8%)
 
 # ── Cascade Flip Constants ──────────────────────────────────────────────────────
 # Used by cascade_flip.py and position_manager.py
-CASCADE_FLIP_ENABLED = True   # Master toggle — set True to enable cascade flip
+CASCADE_FLIP_ENABLED = False  # DISABLED 2026-09-04 — see brain/plans/cascade_flip_v3.md
 CASCADE_FLIP_MAX     = 3      # max flips per token before permanent lockout
 
 # ── Cascade Flip v2 Constants ──────────────────────────────────────────────────
 # v2: unified scoring engine with directional momentum + adaptive thresholds
-CASCADE_FLIP_V2_ENABLED = True   # v2 toggle — both this AND CASCADE_FLIP_ENABLED must be True
+# DISABLED 2026-09-04 — v2 flips on lagging indicators (MTF/MACD), catches waves too late
+CASCADE_FLIP_V2_ENABLED = False
 
 # Scoring weights (sum = 100 max)
 CFV2_MTF_MAX_PTS       = 30   # MTF alignment component
@@ -1608,7 +1609,7 @@ ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_BONUS = 3    # confidence bonus for RSI in sweet spot (lowered from 5)
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
-ACCEL_300_V3_SHORT_ENABLED     = True    # NEW 2026-09-02 — anti-bottom-catch SHORT
+ACCEL_300_V3_SHORT_ENABLED     = False   # auto_1hr KILLED 2026-09-04 — 3T/0%WR/-$0.48 24h, 3T/0%WR/-$0.48 7d. NEVER_REENABLE.
 ACCEL_300_V3_SHORT_MIN_GAP     = 1.0     # min gap below EMA300
 ACCEL_300_V3_SHORT_MAX_GAP     = 6.0     # max gap
 ACCEL_300_V3_SHORT_MIN_GAP_ACCEL = 0.20  # min gap acceleration

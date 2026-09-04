@@ -3182,7 +3182,6 @@ def run(dry_run=False):
         if LOSERS and token.upper() in LOSERS:
             # Check 7d WR for this token
             try:
-                from _secrets import BRAIN_DB_DICT
                 _conn = psycopg2.connect(**BRAIN_DB_DICT)
                 _cur = _conn.cursor()
                 _cur.execute("""

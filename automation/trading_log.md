@@ -491,3 +491,36 @@ Final set: ['BIGTIME', 'CHIP', 'FIL', 'ICP', 'JUP', 'LDO', 'MET', 'NOT', 'W', 'X
 **Open Questions:**
 - accel-300-v3-long+ lock expires 05:00 — review signal quality then
 - Short signals trending toward kill threshold if no wins next hour
+
+## [2026-09-04 05:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (0W 3L -$0.18)
+- ENA cascade-long: atr_sl_hit -$0.16
+- ENA accel-short: cascade_flip -$0.06
+- ALT ema300-dip: profit-monster-trail +$0.04
+
+**24h:** 87T 59.8%WR -$0.97
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 54T +$3.03 (carrying system)
+- atr_sl_hit: 18T -$2.13 (20.7% healthy)
+- cut-loser-CL-T1: 10T -$1.49
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 21T 71%WR +$0.51 ✅
+- ema300-dip: 37T 70%WR +$0.14 ✅
+- accel-300-v3-long+: 17T 53%WR -$0.36 (CEO killed, NEVER_REENABLE)
+- accel-300-v3-short-: 3T 0%WR -$0.48 ❌ KILLED
+
+**Changes:**
+1. KILLED ACCEL_300_V3_SHORT_ENABLED = False — 3T/0%WR/-$0.48 24h, 0%WR 7d. Meets kill criteria.
+
+**No Change Needed:**
+- atr_sl_hit 20.7% under 40% threshold
+- Trade freq 3/hr normal
+- 5 open positions ($64.30) all small
+- profit-monster-trail carrying system at $3.03
+
+**Open Questions:**
+- 24h still negative -$0.97 despite 59.8% WR — SL losses eating profits
+- Short signals collectively 0%WR (all killed or below threshold)
