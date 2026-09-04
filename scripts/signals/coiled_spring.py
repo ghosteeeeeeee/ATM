@@ -55,6 +55,8 @@ from hermes_constants import (
     COILED_SPRING_CONF_VOL_SPIKE_MAX,
     COILED_SPRING_CONF_RSI_BONUS_MAX,
     COILED_SPRING_CONF_STRUCT_MAX,
+    COILED_SPRING_CONF_DEEP_COIL_MAX,
+    COILED_SPRING_CONF_EMA_ALIGN_BONUS,
     COILED_SPRING_CONF_FLOOR,
     COILED_SPRING_CONF_CAP,
     COILED_SPRING_COOLDOWN_HOURS,
@@ -387,22 +389,25 @@ def detect_coiled_spring(rows):
     # ════════════════════════════════════════════════════════════════════════
     confidence = COILED_SPRING_CONF_BASE
 
-    # Volume spike bonus
+    # Volume spike bonus — strong confirmation of buyer interest
     if vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO:
-        vol_bonus = min(COILED_SPRING_CONF_VOL_SPIKE_MAX, (vol_ratio - 1) * COILED_SPRING_VOL_BONUS_MULT)
+        vol_bonus = min(COILED_SPRING_CONF_VOL_SPIKE_MAX, int((vol_ratio - 1) * COILED_SPRING_VOL_BONUS_MULT))
         confidence += vol_bonus
         diag['conf_vol_bonus'] = vol_bonus
-    elif coil_bars >= COILED_SPRING_DEEP_COIL_BARS:
-        confidence += COILED_SPRING_DEEP_COIL_BONUS
-        diag['conf_deep_coil'] = COILED_SPRING_DEEP_COIL_BONUS
 
-    # RSI bonus
+    # Deep coil bonus — sustained compression = spring loaded
+    if coil_bars >= COILED_SPRING_DEEP_COIL_BARS:
+        deep_bonus = min(COILED_SPRING_CONF_DEEP_COIL_MAX, COILED_SPRING_DEEP_COIL_BONUS)
+        confidence += deep_bonus
+        diag['conf_deep_coil'] = deep_bonus
+
+    # RSI bonus — ideal zone means room to run
     if COILED_SPRING_RSI_BONUS_MIN <= rsi_now <= COILED_SPRING_RSI_BONUS_MAX:
         rsi_bonus = COILED_SPRING_CONF_RSI_BONUS_MAX
         confidence += rsi_bonus
         diag['conf_rsi_bonus'] = rsi_bonus
 
-    # Structure bonus (clean HH/HL)
+    # Structure bonus — clean HH/HL = established trend
     if len(swing_low_idxs) >= 3:
         sl_all = [closes[-lookback_window + idx] for idx in swing_low_idxs[-3:]]
         if all(sl_all[k + 1] > sl_all[k] for k in range(len(sl_all) - 1)):
@@ -410,6 +415,12 @@ def detect_coiled_spring(rows):
                                COILED_SPRING_STRUCT_BASE + len(swing_low_idxs) * COILED_SPRING_STRUCT_PER_LOW)
             confidence += struct_bonus
             diag['conf_struct_bonus'] = struct_bonus
+
+    # EMA alignment bonus — full bullish stack (9>21>50) is strongest confirmation
+    if ema9_now > ema21_now > ema50_now:
+        ema_bonus = COILED_SPRING_CONF_EMA_ALIGN_BONUS
+        confidence += ema_bonus
+        diag['conf_ema_bonus'] = ema_bonus
 
     confidence = max(COILED_SPRING_CONF_FLOOR, min(COILED_SPRING_CONF_CAP, confidence))
     diag['final_confidence'] = confidence
