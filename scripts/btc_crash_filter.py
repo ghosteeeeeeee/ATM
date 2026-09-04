@@ -150,7 +150,8 @@ def _compute_eth_btc_divergence(btc_closes: list, eth_closes: list, window: int 
     eth_chg = (eth_closes[-1] - eth_closes[-(window+1)]) / eth_closes[-(window+1)] * 100 if eth_closes[-(window+1)] > 0 else 0
 
     # ETH falling more than BTC = contagion risk
-    return eth_chg - btc_chg
+    # Positive = ETH fell more than BTC = contagion risk
+    return btc_chg - eth_chg
 
 
 # ── Layer 1: Dynamic Price Crash Threshold ───────────────────────────────────
