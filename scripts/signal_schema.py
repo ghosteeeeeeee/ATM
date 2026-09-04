@@ -724,6 +724,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
             COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
             BTC_WAVE_DETECTOR_ENABLED,
+            PUMP_FLOW_ENABLED, PUMP_FLOW_PLUS_ENABLED, PUMP_FLOW_MINUS_ENABLED,
         )
         from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
         # Fast path: if source is blocklisted, blacklist layer already caught it
@@ -1743,6 +1744,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import BTC_WAVE_DETECTOR_ENABLED
                     if not BTC_WAVE_DETECTOR_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BTC_WAVE_DETECTOR_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # pump-chain (capital rotation flow signal)
+            if _comp == 'pump-chain+':
+                try:
+                    from hermes_constants import PUMP_FLOW_PLUS_ENABLED
+                    if not PUMP_FLOW_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_FLOW_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'pump-chain-':
+                try:
+                    from hermes_constants import PUMP_FLOW_MINUS_ENABLED
+                    if not PUMP_FLOW_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_FLOW_MINUS_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
