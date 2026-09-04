@@ -40,6 +40,7 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Bug Fix Rule:** If a bug fix is obvious, fix it directly without asking. Don't wait for approval.
 - **Do more actual work.** Don't go on endless loops looking at the same files and saying the same things.
 - **Think in systems and big picture.** Consider upstream/downstream results of your actions.
+- **See something, say something.** While working on any task, if you spot an unrelated issue — a broken signal, a stale import, a weird log error, a dead code path — flag it. Don't wait to be asked. Note it in your response as a separate finding with severity and suggested fix. Example: "While verifying the RR engine, I noticed `bb_bounce_v2_short` is erroring with `No module named 'signal_gen'` — defunct import, worth cleaning up." These sideways finds often catch bugs before they become pipeline failures.
 - **Verify, don't trust.** Look for ways to obfuscate all data and tracks. Complete need-to-know basis with external parties.
 - **Document everything** in brain + trading.md. "Never lose track again."
 - **Don't use cron jobs** — use systemd timers instead.
