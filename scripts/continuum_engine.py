@@ -27,13 +27,25 @@ from enum import Enum
 
 sys.path.insert(0, os.path.dirname(__file__))
 from paths import HERMES_DATA, WWW_DATA
+from continuum_constants import (
+    HYSTERESIS, EMA300_PERIOD, EMA300_ABOVE_BUFFER, EMA300_BELOW_BUFFER,
+    ZSCORE_LOOKBACK, ZSCORE_STRONG_NEG, ZSCORE_NEG, ZSCORE_POS, ZSCORE_STRONG_POS,
+    VOLUME_AVG_PERIOD, VOLUME_LOW_THRESHOLD, VOLUME_HIGH_THRESHOLD, VOLUME_PARABOLIC_THRESHOLD,
+    VELOCITY_FALLING, VELOCITY_SLOW_LOW, VELOCITY_SLOW_HIGH, VELOCITY_RISING, VELOCITY_FAST,
+    ACCEL_NEGATIVE, ACCEL_POSITIVE,
+    LINREG_1M_PERIOD, LINREG_5M_PERIOD, LINREG_15M_PERIOD, LINREG_1H_PERIOD,
+    LINREG_STEEP_UP, LINREG_UP, LINREG_FLAT_LOW, LINREG_FLAT_HIGH,
+    LINREG_DOWN, LINREG_STEEP_DOWN,
+    ENTRY_CROSS_MIN_DURATION, ENTRY_CONFIRM_MIN_DURATION,
+    SCORE_WEIGHTS, SCORE_EXIT_THRESHOLD,
+    EXIT_TIER3_EMA_BREAK,
+    POSITION_TAG, POSITION_FILE,
+)
 
-# ── Constants ──────────────────────────────────────────────────────────────────
+# ── Derived paths ──────────────────────────────────────────────────────────────
 CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
 HL_CACHE_FILE = os.path.join(WWW_DATA, 'hl_cache.json')
 CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
-
-TICK_INTERVAL = 30  # seconds between state updates
 
 # ── Enums ──────────────────────────────────────────────────────────────────────
 
@@ -96,6 +108,13 @@ class MarketPhase(Enum):
     STORMY = 'STORMY'
     RECOVERY = 'RECOVERY'
     DECLINING = 'DECLINING'
+
+class LinregSlope(Enum):
+    STEEP_UP = 'STEEP_UP'       # > 0.10% per candle
+    UP = 'UP'                   # 0.02% - 0.10%
+    FLAT = 'FLAT'               # -0.02% to 0.02%
+    DOWN = 'DOWN'               # -0.10% to -0.02%
+    STEEP_DOWN = 'STEEP_DOWN'   # < -0.10%
 
 # ── State Hysteresis Config ────────────────────────────────────────────────────
 # Per-state hysteresis: (candles_to_turn_ON, candles_to_turn_OFF)
@@ -171,6 +190,99 @@ def rsi(closes: List[float], period: int = 14) -> Optional[float]:
         return 100.0
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
+
+def linreg_slope(values: List[float], period: int) -> Optional[float]:
+    """
+    Linear regression slope (% per candle).
+    Returns slope as percentage change per candle.
+    Positive = uptrend, Negative = downtrend.
+    """
+    if len(values) < period:
+        return None
+    
+    window = values[-period:]
+    n = len(window)
+    
+    # Simple linear regression: y = mx + b
+    # m = (n*sum(xy) - sum(x)*sum(y)) / (n*sum(x²) - (sum(x))²)
+    sum_x = sum(range(n))
+    sum_y = sum(window)
+    sum_xy = sum(i * window[i] for i in range(n))
+    sum_x2 = sum(i * i for i in range(n))
+    
+    denominator = n * sum_x2 - sum_x * sum_x
+    if denominator == 0:
+        return 0.0
+    
+    slope = (n * sum_xy - sum_x * sum_y) / denominator
+    
+    # Normalize to % per candle relative to mean price
+    mean_price = sum_y / n
+    if mean_price == 0:
+        return 0.0
+    
+    return (slope / mean_price) * 100
+
+def linreg_slope_multi_tf(closes_1m: List[float], closes_5m: List[float] = None,
+                          closes_15m: List[float] = None, closes_1h: List[float] = None) -> dict:
+    """
+    Compute linear regression slope across multiple timeframes.
+    Returns dict with slope values and alignment score.
+    """
+    slopes = {}
+    
+    # 1m slope (1-hour lookback)
+    s1m = linreg_slope(closes_1m, LINREG_1M_PERIOD)
+    if s1m is not None:
+        slopes['1m'] = s1m
+    
+    # 5m slope (1-hour lookback = 12 candles)
+    if closes_5m and len(closes_5m) >= LINREG_5M_PERIOD:
+        s5m = linreg_slope(closes_5m, LINREG_5M_PERIOD)
+        if s5m is not None:
+            slopes['5m'] = s5m
+    
+    # 15m slope (2-hour lookback = 8 candles)
+    if closes_15m and len(closes_15m) >= LINREG_15M_PERIOD:
+        s15m = linreg_slope(closes_15m, LINREG_15M_PERIOD)
+        if s15m is not None:
+            slopes['15m'] = s15m
+    
+    # 1h slope (6-hour lookback = 6 candles)
+    if closes_1h and len(closes_1h) >= LINREG_1H_PERIOD:
+        s1h = linreg_slope(closes_1h, LINREG_1H_PERIOD)
+        if s1h is not None:
+            slopes['1h'] = s1h
+    
+    # Compute alignment: how many timeframes agree on direction?
+    if not slopes:
+        return {'slopes': {}, 'alignment': 0, 'direction': 'NEUTRAL'}
+    
+    positive = sum(1 for s in slopes.values() if s > 0.01)
+    negative = sum(1 for s in slopes.values() if s < -0.01)
+    total = len(slopes)
+    
+    if positive == total:
+        alignment = 1.0  # All timeframes bullish
+        direction = 'BULL'
+    elif negative == total:
+        alignment = 1.0  # All timeframes bearish
+        direction = 'BEAR'
+    elif positive > negative:
+        alignment = positive / total
+        direction = 'LEAN_BULL'
+    elif negative > positive:
+        alignment = negative / total
+        direction = 'LEAN_BEAR'
+    else:
+        alignment = 0.0
+        direction = 'NEUTRAL'
+    
+    return {
+        'slopes': slopes,
+        'alignment': alignment,
+        'direction': direction,
+    }
 
 
 # ── State Classification Functions ─────────────────────────────────────────────
@@ -306,6 +418,11 @@ class ContinuumState:
     velocity_val: float = 0.0
     acceleration_val: float = 0.0
     volume_ratio_val: float = 0.0
+    linreg_1m_slope: float = 0.0
+    linreg_5m_slope: float = 0.0
+    linreg_15m_slope: float = 0.0
+    linreg_1h_slope: float = 0.0
+    linreg_alignment: float = 0.0
     
     # Classified states
     ema300_position: str = 'AT'
@@ -314,6 +431,8 @@ class ContinuumState:
     volume_regime: str = 'NORMAL'
     velocity_state: str = 'SLOW'
     acceleration_state: str = 'FLAT'
+    linreg_slope_state: str = 'FLAT'
+    linreg_direction: str = 'NEUTRAL'
     
     # Extended states
     wyckoff_phase: str = 'UNKNOWN'
@@ -352,6 +471,7 @@ class ContinuumEngine:
             'volume_regime': HysteresisState('volume_regime', 3, 5),
             'velocity': HysteresisState('velocity', 3, 3),
             'acceleration': HysteresisState('acceleration', 3, 3),
+            'linreg_slope': HysteresisState('linreg_slope', 5, 5),
         }
         
         # Duration tracking
@@ -384,12 +504,19 @@ class ContinuumEngine:
                 velocity_val REAL,
                 acceleration_val REAL,
                 volume_ratio_val REAL,
+                linreg_1m_slope REAL,
+                linreg_5m_slope REAL,
+                linreg_15m_slope REAL,
+                linreg_1h_slope REAL,
+                linreg_alignment REAL,
                 ema300_position TEXT,
                 ema300_duration INTEGER,
                 zscore_tier TEXT,
                 volume_regime TEXT,
                 velocity_state TEXT,
                 acceleration_state TEXT,
+                linreg_slope_state TEXT,
+                linreg_direction TEXT,
                 wyckoff_phase TEXT,
                 ewave_count TEXT,
                 trend_quality TEXT,
@@ -533,6 +660,54 @@ class ContinuumEngine:
         atr_val = self._atr_pct(highs, lows, closes)
         market = self._detect_market_phase(rsi_val, atr_val, vol_ratio)
         
+        # Linear regression slope (multi-timeframe)
+        closes_1m = closes
+        closes_5m = None
+        closes_15m = None
+        closes_1h = None
+        
+        # Read higher timeframe candles for linreg
+        try:
+            candles_5m = self._read_candles('5m', limit=50)
+            if candles_5m:
+                closes_5m = [c['close'] for c in candles_5m]
+        except:
+            pass
+        try:
+            candles_15m = self._read_candles('15m', limit=50)
+            if candles_15m:
+                closes_15m = [c['close'] for c in candles_15m]
+        except:
+            pass
+        try:
+            candles_1h = self._read_candles('1h', limit=50)
+            if candles_1h:
+                closes_1h = [c['close'] for c in candles_1h]
+        except:
+            pass
+        
+        linreg_result = linreg_slope_multi_tf(closes_1m, closes_5m, closes_15m, closes_1h)
+        linreg_slopes = linreg_result['slopes']
+        linreg_alignment = linreg_result['alignment']
+        linreg_direction = linreg_result['direction']
+        
+        # Classify 1m linreg slope
+        slope_1m = linreg_slopes.get('1m', 0)
+        if slope_1m > LINREG_STEEP_UP:
+            raw_linreg = LinregSlope.STEEP_UP
+        elif slope_1m > LINREG_UP:
+            raw_linreg = LinregSlope.UP
+        elif slope_1m < LINREG_STEEP_DOWN:
+            raw_linreg = LinregSlope.STEEP_DOWN
+        elif slope_1m < LINREG_DOWN:
+            raw_linreg = LinregSlope.DOWN
+        else:
+            raw_linreg = LinregSlope.FLAT
+        
+        # Apply hysteresis to linreg
+        _, linreg_confirmed = self.hysteresis['linreg_slope'].update(raw_linreg)
+        linreg_state = self.hysteresis['linreg_slope'].get_confirmed() or raw_linreg
+        
         # Build state
         state = ContinuumState(
             token=self.token,
@@ -544,12 +719,19 @@ class ContinuumEngine:
             velocity_val=vel if vel is not None else 0,
             acceleration_val=acc if acc is not None else 0,
             volume_ratio_val=vol_ratio if vol_ratio is not None else 1,
+            linreg_1m_slope=linreg_slopes.get('1m', 0),
+            linreg_5m_slope=linreg_slopes.get('5m', 0),
+            linreg_15m_slope=linreg_slopes.get('15m', 0),
+            linreg_1h_slope=linreg_slopes.get('1h', 0),
+            linreg_alignment=linreg_alignment,
             ema300_position=ema300_pos.value,
             ema300_duration=self.ema300_duration,
             zscore_tier=zscore_tier.value,
             volume_regime=volume_reg.value,
             velocity_state=vel_state.value,
             acceleration_state=accel_state.value,
+            linreg_slope_state=linreg_state.value,
+            linreg_direction=linreg_direction,
             wyckoff_phase=wyckoff,
             ewave_count=ewave,
             trend_quality=trend,
@@ -706,6 +888,23 @@ class ContinuumEngine:
         }
         score += accel_pts.get(state.acceleration_state, 0)
         
+        # Linear regression slope (+/- 14 points) — highest weight
+        linreg_pts = {
+            'STEEP_UP': 14, 'UP': 7, 'FLAT': 0, 'DOWN': -7, 'STEEP_DOWN': -14
+        }
+        score += linreg_pts.get(state.linreg_slope_state, 0)
+        
+        # Linear regression alignment (+/- 10 points)
+        # alignment = fraction of timeframes agreeing on direction
+        if state.linreg_direction == 'BULL':
+            score += 10 * state.linreg_alignment
+        elif state.linreg_direction == 'BEAR':
+            score -= 10 * state.linreg_alignment
+        elif state.linreg_direction == 'LEAN_BULL':
+            score += 5 * state.linreg_alignment
+        elif state.linreg_direction == 'LEAN_BEAR':
+            score -= 5 * state.linreg_alignment
+        
         # Trend quality (+/- 8 points)
         trend_pts = {
             'STRONG_DOWN': -10, 'DOWN': -5, 'WEAK': 0, 'UP': 5, 'STRONG_UP': 10
@@ -826,18 +1025,24 @@ class ContinuumEngine:
             self.db.execute('''
                 INSERT OR REPLACE INTO continuum_states
                 (token, timeframe, ts, price, ema300, zscore_val, velocity_val,
-                 acceleration_val, volume_ratio_val, ema300_position, ema300_duration,
+                 acceleration_val, volume_ratio_val, linreg_1m_slope, linreg_5m_slope,
+                 linreg_15m_slope, linreg_1h_slope, linreg_alignment,
+                 ema300_position, ema300_duration,
                  zscore_tier, volume_regime, velocity_state, acceleration_state,
+                 linreg_slope_state, linreg_direction,
                  wyckoff_phase, ewave_count, trend_quality, market_phase,
                  state_score, entry_phase, position_side, position_size_pct,
                  consecutive_above, consecutive_below, last_cross_ts)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 state.token, state.timeframe, state.ts, state.price, state.ema300,
                 state.zscore_val, state.velocity_val, state.acceleration_val,
-                state.volume_ratio_val, state.ema300_position, state.ema300_duration,
+                state.volume_ratio_val, state.linreg_1m_slope, state.linreg_5m_slope,
+                state.linreg_15m_slope, state.linreg_1h_slope, state.linreg_alignment,
+                state.ema300_position, state.ema300_duration,
                 state.zscore_tier, state.volume_regime, state.velocity_state,
-                state.acceleration_state, state.wyckoff_phase, state.ewave_count,
+                state.acceleration_state, state.linreg_slope_state, state.linreg_direction,
+                state.wyckoff_phase, state.ewave_count,
                 state.trend_quality, state.market_phase, state.state_score,
                 state.entry_phase, state.position_side, state.position_size_pct,
                 state.consecutive_above, state.consecutive_below, state.last_cross_ts
@@ -900,7 +1105,7 @@ class ContinuumEngine:
                           f"EMA300:{state.ema300_position}({state.ema300_duration}m) | "
                           f"Z:{state.zscore_tier}({state.zscore_val:+.2f}) | "
                           f"Vol:{state.volume_regime} | "
-                          f"Vel:{state.velocity_state} | "
+                          f"LinReg:{state.linreg_slope_state}({state.linreg_direction}) | "
                           f"Score:{state.state_score:.1f} | "
                           f"Phase:{self.entry_phase} | "
                           f"Pos:{self.position_side}")
@@ -998,12 +1203,30 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
         raw_vel = classify_velocity(vel) if vel is not None else Velocity.SLOW
         raw_acc = classify_acceleration(acc) if acc is not None else Acceleration.FLAT
         
+        # Linear regression slope (1m only for backtest)
+        slope_1m = linreg_slope(closes, LINREG_1M_PERIOD)
+        if slope_1m is not None:
+            if slope_1m > LINREG_STEEP_UP:
+                raw_linreg = LinregSlope.STEEP_UP
+            elif slope_1m > LINREG_UP:
+                raw_linreg = LinregSlope.UP
+            elif slope_1m < LINREG_STEEP_DOWN:
+                raw_linreg = LinregSlope.STEEP_DOWN
+            elif slope_1m < LINREG_DOWN:
+                raw_linreg = LinregSlope.DOWN
+            else:
+                raw_linreg = LinregSlope.FLAT
+        else:
+            raw_linreg = LinregSlope.FLAT
+            slope_1m = 0
+        
         # Apply hysteresis
         _, ema_conf = engine.hysteresis['ema300_position'].update(raw_ema)
         _, z_conf = engine.hysteresis['zscore_tier'].update(raw_z)
         _, vol_conf = engine.hysteresis['volume_regime'].update(raw_vol)
         _, vel_conf = engine.hysteresis['velocity'].update(raw_vel)
         _, acc_conf = engine.hysteresis['acceleration'].update(raw_acc)
+        _, linreg_conf = engine.hysteresis['linreg_slope'].update(raw_linreg)
         
         ema_pos = engine.hysteresis['ema300_position'].get_confirmed() or raw_ema
         
@@ -1041,6 +1264,10 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
         acc_pts = {'NEGATIVE': -8, 'FLAT': 0, 'POSITIVE': 8}
         score += acc_pts.get(raw_acc.value, 0)
         
+        # Linear regression slope (+/- 14 points)
+        linreg_pts = {'STEEP_UP': 14, 'UP': 7, 'FLAT': 0, 'DOWN': -7, 'STEEP_DOWN': -14}
+        score += linreg_pts.get(raw_linreg.value, 0)
+        
         score = max(0, min(100, score))
         
         # Entry machine
@@ -1068,7 +1295,7 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
                   f"{ema_pos.value}({engine.ema300_duration}m) | "
                   f"Z:{raw_z.value}({z:+.2f}) | "
                   f"V:{raw_vol.value} | "
-                  f"Vel:{raw_vel.value} | "
+                  f"LR:{raw_linreg.value}({slope_1m:+.3f}) | "
                   f"Sc:{score:.1f} | "
                   f"Ph:{engine.entry_phase} | "
                   f"Pos:{engine.position_side}")
