@@ -3154,6 +3154,30 @@ def run(dry_run=False):
         else:
             log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
 
+        # Hard block: coins with WR < 40% are completely blocked
+        from hermes_constants import LOSERS_HARD_BLOCK_WR
+        if LOSERS and token.upper() in LOSERS:
+            # Check 7d WR for this token
+            try:
+                import psycopg2
+                from _secrets import BRAIN_DB_DICT
+                _conn = psycopg2.connect(**BRAIN_DB_DICT)
+                _cur = _conn.cursor()
+                _cur.execute("""
+                    SELECT ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1)
+                    FROM trades WHERE token = %s AND server = 'Hermes' AND status = 'closed'
+                      AND close_time > NOW() - INTERVAL '7 days'
+                """, (token,))
+                _wr = _cur.fetchone()[0]
+                _conn.close()
+                if _wr is not None and _wr < LOSERS_HARD_BLOCK_WR:
+                    log(f'  🚫 [HARD-BLOCK] {token} {direction}: WR={_wr}% < {LOSERS_HARD_BLOCK_WR}% — BLOCKED')
+                    skipped += 1
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+            except Exception:
+                pass
+
         # Losers confidence penalty — heavy penalty, block if still below threshold
         if LOSERS and token.upper() in LOSERS:
             from hermes_constants import LOSERS_CONF_PENALTY

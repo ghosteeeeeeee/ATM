@@ -323,6 +323,9 @@ LOSERS_MULT = 0.5                  # 50% score penalty in signal_compactor
 LOSERS_SIZE_MULT = 0.5            # 50% position size reduction
 LOSERS_CONF_PENALTY = -30         # Confidence point penalty (heavy — losers rarely trade)
 
+# Hard block — coins with WR below this are completely blocked from trading
+LOSERS_HARD_BLOCK_WR = 40.0       # Below this WR = no trading at all
+
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset
 SIGNAL_SOURCE_BLACKLIST = {
