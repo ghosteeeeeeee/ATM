@@ -1241,9 +1241,9 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_MINUS_ENABLED',   # CEO 2026-09-02 — replaced by v3. NEVER_REENABLE.
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
-    'ACCEL_300_V3_LONG_ENABLED',   # CEO 2026-09-04 — 35T/7d 42.9% WR -$1.34, ALL ATR_SL. CEO_PROTECTION expired. NEVER_REENABLE.
+    # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-04 — T re-enabled for live testing with new guards
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
-    'ACCEL_300_V3_SHORT_ENABLED',  # AUTO_1HR 2026-09-04 — 3T/0%WR/-$0.48. NEVER_REENABLE.
+    # ACCEL_300_V3_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-04 — T re-enabled for live testing with new guards
     'EMA300_DIP_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1590,7 +1590,7 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
-ACCEL_300_V3_LONG_ENABLED      = False   # CEO 2026-09-04 — 35T/7d 42.9% WR -$1.34, ALL ATR_SL. CEO_PROTECTION expired. NEVER_REENABLE.
+ACCEL_300_V3_LONG_ENABLED      = True    # RE-ENABLED 2026-09-04 — T live test with new guards. DO NOT DISABLE until 2026-09-06 05:00 UTC.
 ACCEL_300_V3_LONG_MIN_GAP     = 2.0     # min gap above EMA300
 ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
 ACCEL_300_V3_LONG_MIN_PULLBACK = 0.35   # min gap narrowing from peak (raised from 0.30: filters BIGTIME at 0.30%)
@@ -1631,7 +1631,7 @@ ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_BONUS = 3    # confidence bonus for RSI in sweet spot (lowered from 5)
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
-ACCEL_300_V3_SHORT_ENABLED     = False   # auto_1hr KILLED 2026-09-04 — 3T/0%WR/-$0.48 24h, 3T/0%WR/-$0.48 7d. NEVER_REENABLE.
+ACCEL_300_V3_SHORT_ENABLED     = True    # RE-ENABLED 2026-09-04 — T live test with new guards. DO NOT DISABLE until 2026-09-06 05:00 UTC.
 ACCEL_300_V3_SHORT_MIN_GAP     = 1.0     # min gap below EMA300
 ACCEL_300_V3_SHORT_MAX_GAP     = 6.0     # max gap
 ACCEL_300_V3_SHORT_MIN_GAP_ACCEL = 0.20  # min gap acceleration
@@ -1711,7 +1711,8 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
-    # ACCEL_300_V3_LONG_ENABLED — removed from CEO_PROTECTED 2026-09-04 (protection expired, NEVER_REENABLE)
+    'ACCEL_300_V3_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-06 05:00 UTC. T re-enabled', '2026-09-04'),
+    'ACCEL_300_V3_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-06 05:00 UTC. T re-enabled', '2026-09-04'),
 }
 
 # ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────
