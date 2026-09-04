@@ -2126,3 +2126,17 @@ ALERTS:
 - **AUTO-FIX**: Added `mode = 'trigger' if is_trigger_mode else ('coil' if is_coil_mode else 'fallback')` before the mode gate. Fixed in `scripts/signals/coiled_spring.py:377`.
 - **[WARN]** Disk at 84% (93G/118G) — approaching threshold. Monitor.
 - **[INFO]** Pipeline: running. Services: 2/2 active. Timers: 10+ active. Prices: fresh (updated <1min ago). Regime: NEUTRAL. 0 open trades. 0 phantom trades. Kill switch: ON.
+
+## Error Alerts — 2026-09-04 11:22 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 11:13 — resolved on next cycle, no action taken
+- **[WARN]** Disk 84% (93G/118G) — approaching 85% auto-clean threshold
+- **[WARN]** Daily PnL -11.66% — 85 closed trades
+
+## Error Alerts — 2026-09-04 12:25 UTC
+- **[WARN]** Disk at 84% (94G/118G) — approaching 85% auto-clean threshold. Consider compressing pipeline.log (82MB).
+- **[WARN]** Phantom trade: SOL LONG bb-bounce-v2-long+ (0.0016 USDT PnL) — negligible, flag for review.
+- **[INFO]** Pipeline running, no crashes. 0 open trades. 31 closed today, -3.77% PnL. Market NEUTRAL. All timers firing. BTC-CRASH blocks normal (8 blocked LONGs).
+
+## Error Alerts — 2026-09-04 13:22 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 13:19 — non-critical, cycle completed on next run
+- **INFO**: Pipeline auto-recovered, no fix needed

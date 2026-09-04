@@ -3134,6 +3134,23 @@ def run(dry_run=False):
                         skipped += 1
                         continue
                     fresh_result = detect_accel_300_v3_short(token, fresh_prices)
+                    # ── Price move check: block stale entries ──
+                    # If price moved > threshold from signal price, the entry is stale
+                    # Catches ENA (+0.4%), CRV (+0.76%), W (+0.64%) — all lost due to staleness
+                    try:
+                        from hermes_constants import ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE
+                        _signal_price = sig.get('price', 0) or 0
+                        _current_price = float(fresh_prices[-1]['price']) if fresh_prices else 0
+                        if _signal_price > 0 and _current_price > 0:
+                            _entry_move_pct = abs(_current_price - _signal_price) / _signal_price * 100
+                            if _entry_move_pct > ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE:
+                                log(f'  🚫 [ACCEL-V3-MOVE] {token} {direction} BLOCKED — price moved {_entry_move_pct:.2f}% from signal (max={ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE}%)')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                    except Exception as e:
+                        log(f'  [WARN] price move check failed: {e}', 'WARN')
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)

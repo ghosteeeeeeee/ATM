@@ -1641,6 +1641,7 @@ ACCEL_300_V3_SHORT_CONF_BASE   = 62      # base confidence
 ACCEL_300_V3_SHORT_CONF_FLOOR  = 60      # min confidence
 ACCEL_300_V3_SHORT_CONF_CAP    = 88      # max confidence
 ACCEL_300_V3_SHORT_Z_TIER_MIN  = 'low'   # min z_score_tier — reject 'neutral' (catches ZORA z=-0.91, CRV z=-0.88)
+ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE = 0.5  # max % price can move from signal price before entry — block stale entries (catches ENA +0.4%, CRV +0.76%, W +0.64%)
 
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
