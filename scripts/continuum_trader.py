@@ -109,13 +109,47 @@ def get_hl_position(token: str = 'BTC') -> Optional[Dict]:
         import sys as _sys
         _sys.path.insert(0, '/root/.hermes/scripts')
         from hyperliquid_exchange import get_open_hype_positions_curl
-        positions = get_open_hype_positions_curl()
-        if positions:
-            for pos in positions:
-                if pos.get('coin') == token:
+        print(f"[TRADER] Querying HL for {token} positions...")
+        result = get_open_hype_positions_curl()
+        
+        # Handle different return formats
+        if result is None:
+            print(f"[TRADER] HL returned None")
+            return None
+        
+        # If result is a string (error message)
+        if isinstance(result, str):
+            print(f"[TRADER] HL returned string: {result[:100]}")
+            return None
+        
+        # If result is a list of positions
+        if isinstance(result, list):
+            for pos in result:
+                if isinstance(pos, dict) and pos.get('coin') == token:
+                    print(f"[TRADER] HL position found: {pos.get('szi', 'N/A')} {token} @ {pos.get('entryPx', 'N/A')}")
                     return pos
+            print(f"[TRADER] No {token} position found on HL ({len(result)} total positions)")
+            return None
+        
+        # If result is a dict (single position or response)
+        if isinstance(result, dict):
+            if result.get('coin') == token:
+                print(f"[TRADER] HL position found: {result.get('szi', 'N/A')} {token}")
+                return result
+            # Check for nested positions
+            if 'positions' in result:
+                for pos in result['positions']:
+                    if isinstance(pos, dict) and pos.get('coin') == token:
+                        print(f"[TRADER] HL position found: {pos.get('szi', 'N/A')} {token}")
+                        return pos
+            print(f"[TRADER] HL returned dict but no {token} position: {list(result.keys())[:5]}")
+            return None
+        
+        print(f"[TRADER] HL returned unexpected type: {type(result).__name__}")
+        return None
+        
     except Exception as e:
-        print(f"[TRADER] Error getting HL position: {e}")
+        print(f"[TRADER] ERROR getting HL position: {type(e).__name__}: {e}")
     return None
 
 def place_hl_order(side: str, size_usd: float, token: str = 'BTC') -> dict:
@@ -123,36 +157,61 @@ def place_hl_order(side: str, size_usd: float, token: str = 'BTC') -> dict:
     try:
         import sys as _sys
         _sys.path.insert(0, '/root/.hermes/scripts')
-        from hyperliquid_exchange import place_order, get_prices
+        from hyperliquid_exchange import place_order, get_prices, is_live_trading_enabled as hl_live_check
+        
+        # Check HL live trading status
+        hl_enabled = hl_live_check()
+        print(f"[TRADER] HL live trading enabled: {hl_enabled}")
+        if not hl_enabled:
+            print(f"[TRADER] WARNING: HL live trading is DISABLED — order will fail")
         
         # Get current price
+        print(f"[TRADER] Fetching {token} price from HL...")
         prices = get_prices([token])
         price = prices.get(token, 0)
+        print(f"[TRADER] {token} price: ${price:.1f}")
+        
         if price <= 0:
-            return {'success': False, 'error': 'Could not get price'}
+            print(f"[TRADER] ERROR: Could not get price for {token} (got {price})")
+            return {'success': False, 'error': f'Could not get price for {token}'}
         
         # Calculate size in BTC
         sz = size_usd / price
+        print(f"[TRADER] Requested size: ${size_usd:.0f} = {sz:.6f} {token}")
         
         # Round to proper decimals
         from hyperliquid_exchange import _round_position_sz
         sz = _round_position_sz(sz, token)
+        print(f"[TRADER] Rounded size: {sz:.6f} {token}")
         
         if sz <= 0:
-            return {'success': False, 'error': 'Size too small'}
+            print(f"[TRADER] ERROR: Size too small after rounding (sz={sz})")
+            return {'success': False, 'error': 'Size too small after rounding'}
         
         # Place market order
+        order_side = 'BUY' if side == 'LONG' else 'SELL'
+        print(f"[TRADER] Placing {order_side} order: {sz} {token} @ Market (IOC)...")
         result = place_order(
             name=token,
-            side='BUY' if side == 'LONG' else 'SELL',
+            side=order_side,
             sz=sz,
             order_type='Market',
             tif='Ioc',
         )
         
+        # Log result
+        if result.get('success'):
+            print(f"[TRADER] ORDER SUCCESS: {order_side} {sz} {token} | Order ID: {result.get('order_id', 'N/A')}")
+        else:
+            print(f"[TRADER] ORDER FAILED: {result.get('error', 'Unknown error')}")
+            print(f"[TRADER] Full result: {json.dumps(result, indent=2)}")
+        
         return result
         
     except Exception as e:
+        print(f"[TRADER] ERROR placing order: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return {'success': False, 'error': str(e)}
 
 def close_hl_position(token: str = 'BTC') -> dict:
@@ -161,8 +220,18 @@ def close_hl_position(token: str = 'BTC') -> dict:
         import sys as _sys
         _sys.path.insert(0, '/root/.hermes/scripts')
         from hyperliquid_exchange import close_position
-        return close_position(token, slippage=0.02)
+        print(f"[TRADER] Closing {token} position on HL (slippage=2%)...")
+        result = close_position(token, slippage=0.02)
+        if result.get('success'):
+            print(f"[TRADER] POSITION CLOSED SUCCESSFULLY")
+        else:
+            print(f"[TRADER] CLOSE FAILED: {result.get('error', 'Unknown error')}")
+            print(f"[TRADER] Full result: {json.dumps(result, indent=2)}")
+        return result
     except Exception as e:
+        print(f"[TRADER] ERROR closing position: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return {'success': False, 'error': str(e)}
 
 # ── Trading Logic ──────────────────────────────────────────────────────────────
@@ -236,36 +305,47 @@ class ContinuumTrader:
         
     def run_tick(self):
         """Run one tick of the continuum trader."""
-        state = self.engine.compute_states('1m')
-        if not state:
-            return
-        
-        # Save state to DB
-        self.engine.save_state(state)
-        
-        # Check for entry signal
-        if state.entry_phase == 4 and self.last_entry_phase < 4:
-            self._handle_entry(state)
-        
-        # Check for exit signal
-        if state.position_side == 'NONE' and self.last_position_side != 'NONE':
-            self._handle_exit(state)
-        
-        # Update last known state
-        self.last_entry_phase = state.entry_phase
-        self.last_position_side = state.position_side
-        
-        # Print status
-        positions = get_our_positions()
-        pos_count = len(positions)
-        print(f"[TRADER] {state.ts} | "
-              f"Price:{state.price:.1f} | "
-              f"Score:{state.state_score:.1f} | "
-              f"Phase:{state.entry_phase} | "
-              f"Pos:{pos_count}/{MAX_CONTINUUM_POSITIONS} | "
-              f"LinReg:{state.linreg_slope_state}({state.linreg_direction}) | "
-              f"Trades:{self.trades_today}/{MAX_TRADES_PER_DAY} | "
-              f"{'PAPER' if PAPER_MODE else 'LIVE'}")
+        try:
+            state = self.engine.compute_states('1m')
+            if not state:
+                print(f"[TRADER] WARNING: compute_states returned None")
+                return
+            
+            # Save state to DB
+            self.engine.save_state(state)
+            
+            # Check for entry signal
+            if state.entry_phase == 4 and self.last_entry_phase < 4:
+                print(f"[TRADER] ENTRY SIGNAL DETECTED: Phase 4 reached")
+                self._handle_entry(state)
+            
+            # Check for exit signal
+            if state.position_side == 'NONE' and self.last_position_side != 'NONE':
+                print(f"[TRADER] EXIT SIGNAL DETECTED: Position side changed to NONE")
+                self._handle_exit(state)
+            
+            # Update last known state
+            self.last_entry_phase = state.entry_phase
+            self.last_position_side = state.position_side
+            
+            # Print status
+            positions = get_our_positions()
+            pos_count = len(positions)
+            print(f"[TRADER] {state.ts} | "
+                  f"Price:{state.price:.1f} | "
+                  f"Score:{state.state_score:.1f} | "
+                  f"Phase:{state.entry_phase} | "
+                  f"Pos:{pos_count}/{MAX_CONTINUUM_POSITIONS} | "
+                  f"EMA:{state.ema300_position}({state.ema300_duration}m) | "
+                  f"Z:{state.zscore_tier}({state.zscore_val:+.2f}) | "
+                  f"Vol:{state.volume_regime}({state.volume_ratio_val:.1f}x) | "
+                  f"LinReg:{state.linreg_slope_state}({state.linreg_direction}) | "
+                  f"Trades:{self.trades_today}/{MAX_TRADES_PER_DAY} | "
+                  f"{'PAPER' if PAPER_MODE else 'LIVE'}")
+        except Exception as e:
+            print(f"[TRADER] ERROR in run_tick: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _handle_entry(self, state: ContinuumState):
         """Handle entry signal."""
@@ -367,17 +447,38 @@ class ContinuumTrader:
         print(f"[TRADER] Tick interval: {TICK_INTERVAL}s")
         print(f"[TRADER] Max position: ${MAX_POSITION_USD}")
         print(f"[TRADER] Leverage: {LEVERAGE}x")
+        print(f"[TRADER] Max positions: {MAX_CONTINUUM_POSITIONS}")
+        print(f"[TRADER] Max trades/day: {MAX_TRADES_PER_DAY}")
+        print(f"[TRADER] Min time between trades: {MIN_TIME_BETWEEN_TRADES}s")
+        print(f"[TRADER] Kill switch: {KILL_SWITCH_FILE}")
+        print(f"[TRADER] Position file: {POSITION_FILE_PATH}")
         print(f"{'='*60}\n")
         
+        # Check initial HL status
+        if not PAPER_MODE:
+            print(f"[TRADER] Checking HL connection...")
+            hl_pos = get_hl_position('BTC')
+            if hl_pos:
+                print(f"[TRADER] Existing BTC position on HL: {hl_pos.get('szi', 'N/A')}")
+            else:
+                print(f"[TRADER] No existing BTC position on HL")
+        
+        tick_count = 0
         while True:
             try:
+                tick_count += 1
+                if tick_count % 100 == 0:
+                    print(f"[TRADER] --- Tick {tick_count} ---")
                 self.run_tick()
                 time.sleep(TICK_INTERVAL)
             except KeyboardInterrupt:
-                print("\n[TRADER] Shutting down")
+                print(f"\n[TRADER] Shutting down (KeyboardInterrupt)")
                 break
             except Exception as e:
-                print(f"[TRADER] Error: {e}")
+                print(f"[TRADER] ERROR in run loop: {type(e).__name__}: {e}")
+                import traceback
+                traceback.print_exc()
+                print(f"[TRADER] Retrying in 5s...")
                 time.sleep(5)
 
 
