@@ -41,10 +41,10 @@ from hermes_constants import (
     SHORT_BLACKLIST,
 )
 
-SIGNAL_TYPE_LONG  = 'pump_flow_long'
-SIGNAL_TYPE_SHORT = 'pump_flow_short'
-SOURCE_LONG       = 'pump-flow+'
-SOURCE_SHORT      = 'pump-flow-'
+SIGNAL_TYPE_LONG  = 'pump-chain'
+SIGNAL_TYPE_SHORT = 'pump-chain'
+SOURCE_LONG       = 'pump-chain+'
+SOURCE_SHORT      = 'pump-chain-'
 
 STATE_FILE = os.path.join(HERMES_DATA, 'pump_flow_state.json')
 FULL_STATE_FILE = os.path.join(WWW_DATA, 'pump_flow_data.json')
