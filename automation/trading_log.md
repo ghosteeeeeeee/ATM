@@ -645,3 +645,75 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - CL-T1 exits 10T -$1.46 in 24h — continues to be main PnL drag. 7 from ema300-dip but signal still net positive via trailing.
 - accel-300-v3-long+ at 56.3%WR -$0.13 — borderline. Not kill threshold (needs 0%WR with 3+T last hour). Monitor if WR drops below 50%.
+
+## [2026-09-04 08:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**PnL:** +$0.03 (100%WR last hour)
+
+**24h:** 83T 60.2%WR -$0.70
+**24h Exit Breakdown:**
+- profit-monster-trail: 52T +$2.89 (carrying system)
+- atr_sl_hit: 16T -$1.75 (19.3% — healthy)
+- cut-loser-CL-T1: 10T -$1.46 (main drag)
+- hard_sl: 2T -$0.51
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 20T 75%WR +$0.66 ✅
+- ema300-dip: 35T 68.6%WR +$0.03 ✅
+- accel-300-v3-long+: 16T 56.3%WR -$0.13 (monitor)
+- accel-300-v3-short-: 3T 0%WR -$0.48 (KILLED)
+- bb-bounce-short: 2T 0%WR -$0.39 (KILLED)
+
+**Open:** 4 positions ($53.20): GMT SHORT, ETH LONG, INJ SHORT, MET SHORT
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 19.3% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 1/hr — quiet period, no overtrading
+- 4 open positions ($53.20) all small
+- profit-monster-trail +$2.89 carrying system
+- All previously killed signals remain disabled
+
+**Open Questions:**
+- CL-T1 exits 10T -$1.46 in 24h — continues to be main PnL drag. 7 from ema300-dip but signal still net positive via trailing.
+- accel-300-v3-long+ at 56.3%WR -$0.13 — borderline. Not kill threshold (needs 0%WR with 3+T last hour). Monitor if WR drops below 50%.
+
+## [2026-09-04 10:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**PnL:** +$0.02 (100%WR last hour)
+
+**24h:** 84T 60.7%WR -$0.66 (improving from -$0.70)
+**24h Exit Breakdown:**
+- profit-monster-trail: 52T +$3.07 (carrying system)
+- atr_sl_hit: 19T -$1.64 (19.3% — healthy)
+- cut-loser-CL-T1: 9T -$1.39 (improved from 10T)
+- hard_sl: 2T -$0.51
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 21T 76.2%WR +$0.68 ✅
+- continuation+: 2T 100%WR +$0.18 ✅
+- ema300-dip: 32T 68.8%WR +$0.11 ✅
+- accel-300-v3-long+: 15T 53.3%WR -$0.16 (borderline, monitor)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (killed, still has stragglers)
+
+**Open:** 4 positions ($53.20): GMT SHORT, ETH LONG, INJ SHORT, MET SHORT
+
+**6h Trend:** All green hours 05-10 UTC. 08:00 best hour (3T +$0.33). Recovery after choppy midnight period.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 19.3% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 1/hr — quiet period, no overtrading
+- 4 open positions ($53.20) all small
+- profit-monster-trail +$3.07 24h carrying system
+- 6h trend all green, system recovering
+
+**Open Questions:**
+- accel-300-v3-long+ at 53.3%WR -$0.16 — borderline. Not kill threshold. Monitor if WR drops below 50%.
+- CL-T1 exits down to 9T -$1.39 — improving. 7 from ema300-dip but signal still net positive.
