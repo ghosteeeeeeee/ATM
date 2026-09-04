@@ -1032,3 +1032,28 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - accel-300-v3-short- at 25%WR with 4T — borderline. If it fires next hour with losses, will kill.
 - ema300-dip needs more post-tightening trades to evaluate.
+
+## [2026-09-04 23:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 47T ~48%WR -$2.07
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (43%) avg +$0.060 — carrying system
+- atr_sl_hit: 18T (38%) avg -$0.116 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.148
+- hard_sl: 3T avg -$0.183
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 38% — under 40% ✓
+- ema300-dip tightened at 14:06 UTC (10h post-change, overnight data pending)
+- accel-300-v3-short- 4T 25%WR below kill threshold
+- Trade freq 0/hr quiet
+- 5 open positions ($73.10)
+
+**Open Questions:**
+- accel-300-v3-short- borderline (25%WR, 4T)
+- ema300-dip needs post-tightening evaluation

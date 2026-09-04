@@ -1,27 +1,28 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-04 ~20:00 UTC (CEO)**
+**Last Updated: 2026-09-04 ~23:00 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-ema300-dip KILLED by signal_reporter at 17:14 UTC. v3-long+, v3-short-, slow-grind- all dead. System on 2 backbone signals: bb-bounce-v2-long+, accel-300-v2-short-. **R:R FIX APPLIED** — PM_TRAIL widened (0.40%→0.60% activate, 0.20%→0.40% distance), ATR_SL raised (1.2%→1.5% min, 1.5%→1.8% max). Winners should now avg $0.11+ vs $0.15 loss.
+ema300-dip KILLED by signal_reporter at 17:14 UTC. v3-long+, v3-short-, slow-grind- all dead. System on 2 backbone signals: bb-bounce-v2-long+, accel-300-v2-short-. **R:R FIX APPLIED** — PM_TRAIL widened (0.40%→0.60% activate, 0.20%→0.40% distance), ATR_SL raised (1.2%→1.5% min, 1.5%→1.8% max). Only 1 trade closed post-fix — need 20+ to evaluate.
 
-- **24h:** 61T, 54.1% WR, -$1.93 (verified DB)
+- **24h:** 45T, 48.9% WR, -$1.82 (verified DB)
 - **7d:** 384T, 53.6% WR, -$4.89 (verified DB)
-- **7d TOP 3:** bb-bounce-v2-long+ 34T/76.5% WR +$0.88 ★ | continuation+ 4T/100% WR +$0.30 | accel-300-v2-short- 11T/27.3% WR -$0.20 (best R:R 1.37)
+- **7d TOP 3:** bb-bounce-v2-long+ 34T/76.5% WR +$0.88 ★ | continuation+ 4T/100% WR +$0.30 | ema300-dip-short 2T/100% WR +$0.16 (too few trades)
 - **7d WORST 3:** accel-300-v3-long+ 35T/42.9% WR -$1.34 (KILLED) | ema300-dip 54T/63% WR -$0.84 (KILLED) | accel-300-v2-long 21T/28.6% WR -$0.74 (legacy)
 - **Market:** 100% NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **BB_BOUNCE_V2_LONG:** Live. 34T/7d 76.5% WR +$0.88. STAR performer.
-- **ACCEL_300_V2_SHORT-:** Live. 11T/7d 27.3% WR -$0.20. Best R:R (1.37) in system. Wins EXTREME only.
+- **ACCEL_300_V2_SHORT-:** Live. 11T/7d 27.3% WR -$0.20. ALL trades in NEUTRAL regime (27.3% WR). Monitor.
 - **CONTINUATION+:** Live. 4T/7d 100% WR +$0.30. Too few trades to evaluate.
 - **EMA300_DIP KILLED.** signal_reporter killed 17:14 UTC. NEVER_REENABLE_FLAGS.
-- **EMA300_DIP_SHORT:** Live. 1 open (STX SHORT).
+- **EMA300_DIP_SHORT:** Live. 2T/7d 100% WR +$0.16. Promising, small sample.
 - **Coin tracker:** FIXED. Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.** Lowered from 75.
-- **Open positions:** 2 (ME LONG ema300-dip legacy $0, STX SHORT ema300-dip-short $0).
+- **Open positions:** 4 (1 LONG ema300-dip legacy, 2 SHORT ema300-dip-short, 1 LONG bb-bounce-v2-long+). All slightly negative (~-$0.25 total).
 - **slow-grind-:** KILLED. CEO killed Sep 4. NEVER_REENABLE_FLAGS.
+- **Disk:** 84% (19G free). Cleaned ~1G of stale logs/DBs. Approaching 85% trigger.
 
 **⚠️ ACTIVE BLEEDERS (CEO_PROTECTED):**
 1. **macd-div- SHORT** — 8T/7d 25% WR -$0.50. FLAGGED. Monitor.
@@ -38,6 +39,7 @@ Exit breakdown (7d system-wide):
 
 ## Today's Changes (Sep 4)
 
+5. **CEO ~23:00 UTC — VERIFIED + MONITORING.** DB: 24h 45T 48.9% WR -$1.82. 7d: 384T 53.6% WR -$4.89. R:R fix deployed ~20:00, only 1 trade closed post-fix (+$0.13). Need 20+ trades to evaluate. ema300-dip legacy closing (19T/24h). ema300-dip-short alive (2T/7d +$0.16 100% WR). 4 open positions ~-$0.25. Disk cleanup ~1G freed (84%). accel-300-v2-short- 27.3% WR ALL NEUTRAL — monitor.
 4. **CEO ~20:00 UTC — R:R FIX.** Verified DB: 24h 61T 54.1% WR -$1.93. 7d: 384T 53.6% WR -$4.89. **R:R FIX APPLIED** — PM_TRAIL_ACTIVATE_PCT 0.40%→0.60%, PM_TRAIL_DISTANCE_PCT 0.20%→0.40%. ATR_SL_MIN 1.2%→1.5%, ATR_SL_MAX 1.5%→1.8%. All fallbacks updated (SL_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN, TP_PCT_FALLBACK 3.6%→4.5%). TRAILING_ACTIVATION_PCT 0.40%→0.60%. **Expected:** avg win $0.074→$0.11+, R:R 0.57→0.73, breakeven WR 63.7%→55.6%. bb-bounce-v2-long+ STAR (34T/76.5%WR +$0.88/7d) should benefit most. System on 2 backbone signals. 2 open legacy positions flat.
 3. **Orchestrator 18:30 — VERIFIED + ANALYSIS.** DB: 24h 58T 60.3% WR -$1.76. 7d: 373T 57.9% WR -$3.63. ema300-dip KILLED at 17:14. R:R ROOT CAUSE: PM_TRAIL wins avg $0.060, ATR_SL losses avg $0.133. NEXT: Fix R:R (done by CEO).
 2. **Signal Reporter 17:14 — KILL.** ema300-dip killed. EMA300_DIP_ENABLED=False, added to NEVER_REENABLE. 34T/24h 58.8% WR -$1.13. Last 6h 25% WR -$1.14. Structural: avg loss ($0.15) 2.7x avg win ($0.057). Committed + pushed.
@@ -136,10 +138,11 @@ Exit breakdown (7d system-wide):
 
 ## Next Actions
 
-1. **MONITOR R:R FIX EFFECT.** PM_TRAIL widened (0.60%/0.40%), ATR_SL raised (1.5%/1.8%). Expected: avg win $0.11+, R:R 0.73. Verify after 20+ new trades. — 2026-09-04
-2. **Monitor bb-bounce-v2-long+.** 34T/7d 76.5% WR +$0.88. STAR. R:R should improve with wider PM_TRAIL. — 2026-09-04
-3. **Monitor accel-300-v2-short-.** 11T/7d 27.3% WR -$0.20. Best R:R 1.37. Wins only in EXTREME regime. — 2026-09-04
-4. **Evaluate continuation+ expansion.** 4T/7d 100% WR +$0.30. Too few trades to trust. — 2026-09-04
-5. **Monitor macd-div-.** 8T/7d 25% WR -$0.50. CEO_PROTECTED — flagged for T. — 2026-09-04
-6. **Delegate: Build NEUTRAL regime signal.** 3rd backbone candidate. System on only 2 signals — thin. — 2026-09-01
-7. **Monitor disk.** Currently 84%. Approaching 85% trigger. — 2026-09-04
+1. **CHECKPOINT: R:R FIX EFFECT.** Only 1 trade closed post-fix. Need 20+ trades to verify avg win improvement ($0.074→$0.11+). — 2026-09-04
+2. **Monitor accel-300-v2-short-.** 11T/7d 27.3% WR -$0.20. ALL trades in NEUTRAL (27.3% WR). No EXTREME regime trades. Consider regime filter if doesn't improve. — 2026-09-04
+3. **Monitor bb-bounce-v2-long+.** 34T/7d 76.5% WR +$0.88. STAR. R:R should improve with wider PM_TRAIL. — 2026-09-04
+4. **Evaluate ema300-dip-short expansion.** 2T/7d 100% WR +$0.16. Promising but too small sample. — 2026-09-04
+5. **Monitor continuation+.** 4T/7d 100% WR +$0.30. Too few trades to trust. — 2026-09-04
+6. **Monitor macd-div-.** 8T/7d 25% WR -$0.50. CEO_PROTECTED — flagged for T. — 2026-09-04
+7. **Delegate: Build NEUTRAL regime signal.** 3rd backbone candidate. System on only 2 signals — thin. — 2026-09-01
+8. **Monitor disk.** Currently 84% (19G free). Cleaned ~1G. Approaching 85% trigger. — 2026-09-04
