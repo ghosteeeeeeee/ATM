@@ -288,24 +288,24 @@ def classify_ema300_position(price: float, ema300: float) -> EMA300Position:
 
 def classify_zscore(z: float) -> ZScoreTier:
     """Classify z-score into tiers."""
-    if z < -1.5:
+    if z < ZSCORE_STRONG_NEG:
         return ZScoreTier.STRONG_NEG
-    elif z < -0.5:
+    elif z < ZSCORE_NEG:
         return ZScoreTier.NEG
-    elif z < 0.5:
+    elif z < ZSCORE_POS:
         return ZScoreTier.NEUTRAL
-    elif z < 1.5:
+    elif z < ZSCORE_STRONG_POS:
         return ZScoreTier.POS
     else:
         return ZScoreTier.STRONG_POS
 
 def classify_volume(ratio: float) -> VolumeRegime:
     """Classify volume ratio into regimes."""
-    if ratio < 0.5:
+    if ratio < VOLUME_LOW_THRESHOLD:
         return VolumeRegime.LOW
-    elif ratio < 1.5:
+    elif ratio < VOLUME_HIGH_THRESHOLD:
         return VolumeRegime.NORMAL
-    elif ratio < 3.0:
+    elif ratio < VOLUME_PARABOLIC_THRESHOLD:
         return VolumeRegime.HIGH
     else:
         return VolumeRegime.PARABOLIC

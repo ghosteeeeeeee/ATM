@@ -890,3 +890,7 @@
   BY: auto_1hr
   NEXT: Re-run at 17:15 UTC
 [2026-09-03 17:06 UTC] auto_1hr: KILLED bb-bounce-short — 3T/33.3%WR/-/usr/bin/bash.35 today, 2 consecutive losses, below 60% KILL_WR. BB_BOUNCE_SHORT_ENABLED=False. System +/usr/bin/bash.56 today, profit-monster-trail 91.7%WR carrying PnL.
+[2026-09-04 04:06 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (1W 4L -$0.63). 85T/24h ~50%WR +$0.09. Kill criteria not met: accel-300-v3-short- 2T 0%WR and bb-bounce-short 2T 0%WR — both under 3T threshold. atr_sl_hit 20% under 40%. profit-monster-trail 54T avg +$0.055 carrying system. accel-300-v3-long+ CEO_PROTECTED until 05:00 UTC (~54min). Choppy market — 5 consecutive negative hours since midnight but 24h flat. Trade freq 5/hr normal. No changes — review accel-300-v3-long+ at 05:00 when lock expires.
+  BY: auto_1hr
+  NEXT: Re-run at 05:06 UTC

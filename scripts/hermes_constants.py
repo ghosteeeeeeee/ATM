@@ -1631,6 +1631,7 @@ ACCEL_300_V3_SHORT_FRESH_CROSS_MIN_GAP = 0.20 # min gap for fresh cross
 ACCEL_300_V3_SHORT_CONF_BASE   = 62      # base confidence
 ACCEL_300_V3_SHORT_CONF_FLOOR  = 60      # min confidence
 ACCEL_300_V3_SHORT_CONF_CAP    = 88      # max confidence
+ACCEL_300_V3_SHORT_Z_TIER_MIN  = 'low'   # min z_score_tier — reject 'neutral' (catches ZORA z=-0.91, CRV z=-0.88)
 
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────

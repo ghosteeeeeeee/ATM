@@ -415,3 +415,79 @@ Final set: ['ASTER', 'BABY', 'BANANA', 'BCH', 'DOGE', 'DOT', 'DYDX', 'ETC', 'FOG
 
 **Open Questions:**
 - accel-300-v3-long+ runs out of CEO protection in ~4h — review then
+
+## [2026-09-04 02:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 83T 69%WR +$1.70 (profit-monster-trail carrying)
+**5 Open:** $55.50 (SAND, ALT, ACE, MET, ZORA)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 56T 67%WR +$2.96 (carrying system)
+- atr_sl_hit: 14T 14%WR -$1.52 (17%, healthy)
+- cut-loser-CL-T1: 10T 30%WR -$1.49 (small losses, doing job)
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 20T 75%WR +$0.65 ✅
+- ema300-dip: 38T 66%WR +$0.03 ✅
+- accel-300-v3-long+: 17T 53%WR -$0.36 ⚠️ CEO_PROTECTED
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 0 trades last hour — quiet period
+- atr_sl_hit 17% well under 40%
+- No signal meets kill criteria (0%WR with 3+T last 24h)
+- 5 open positions, $55.50 exposure normal
+- accel-300-v3-long+ CEO_LOCK expires Sep 4 05:00
+
+**Open Questions:**
+- accel-300-v3-long+ runs out of CEO protection in ~3h — review then
+
+## LOSERS Update — 2026-09-04 03:09 UTC
+- REMOVE CC (insufficient data)
+- REMOVE ONDO (WR=50.0%, PnL=$0.01, recovered)
+- REMOVE GRASS (WR=50.0%, PnL=$-0.23, recovered)
+- ADD ICP (WR=20.0%, PnL=$-0.46, wr_collapse (46.7% → 20.0%))
+- ADD FIL (WR=42.9%, PnL=$-0.32, low_wr (42.9%))
+- ADD BIGTIME (WR=40.0%, PnL=$-0.25, low_wr (40.0%))
+- ADD NOT (WR=40.0%, PnL=$-0.20, low_wr (40.0%))
+- ADD LDO (WR=40.0%, PnL=$-0.11, low_wr (40.0%))
+- ADD CHIP (WR=40.0%, PnL=$0.04, low_wr (40.0%))
+
+Final set: ['BIGTIME', 'CHIP', 'FIL', 'ICP', 'JUP', 'LDO', 'MET', 'NOT', 'W', 'XPL', 'ZEN']
+
+## [2026-09-04 04:06 UTC] Hourly Analysis
+
+**Trades:** 5 closed last hour (1W 4L -$0.63)
+**24h:** 85T ~50%WR +$0.09
+
+**Last Hour Breakdown:**
+- profit-monster-trail: 1T +$0.06 (ALT)
+- atr_sl_hit: 3T -$0.45 (SAND, ZORA, ACE)
+- hard_sl: 1T -$0.24 (CASHCAT — deepest loss)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 54T 67%WR +$2.97 (carrying system)
+- atr_sl_hit: 17T 18%WR -$1.97 (20% of closes, healthy)
+- cut-loser-CL-T1: 10T 30%WR -$1.49 (small losses)
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 21T 71%WR +$0.51 ✅
+- ema300-dip: 37T 68%WR +$0.08 ✅
+- accel-300-v3-long+: 17T 53%WR -$0.36 ⚠️ CEO_LOCK expires 05:00 UTC
+- accel-300-v3-short-: 2T 0%WR -$0.42 ⚠️ (needs 3+T to kill)
+- bb-bounce-short: 2T 0%WR -$0.39 ⚠️ (needs 3+T to kill)
+
+**Changes:** None — accel-300-v3-long+ lock expires at 05:00 UTC, will review then.
+
+**No Change Needed:**
+- atr_sl_hit 20% well under 40%
+- Trade freq 5/hr normal
+- No signal meets kill criteria (0%WR with 3+T last hour)
+- Short signals 0%WR but only 2T each — monitor next hour
+- Choppy period (5 negative hours since midnight) but 24h still flat
+
+**Open Questions:**
+- accel-300-v3-long+ lock expires 05:00 — review signal quality then
+- Short signals trending toward kill threshold if no wins next hour

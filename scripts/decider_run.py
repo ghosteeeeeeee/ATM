@@ -1303,7 +1303,15 @@ def context_gate(token, direction, source, sig):
     # HIGH (1.0-1.5%): big waves — wider SL
     try:
         from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
-        vol_result, vol_regime = should_trade(token, signal=source)
+        # FIX 2026-09-04: Extract clean signal name from source string
+        # Source may contain chain correlation data (e.g., "APEX(1.75x),TAO(1.71x)),chain(STBL(1.97x),pump-chain+")
+        # volatility gate needs just the signal name part
+        _vol_source = source
+        if source and ('chain(' in source or 'APEX(' in source or 'TAO(' in source):
+            # Extract last comma-separated part as the actual signal
+            _parts = [p.strip() for p in source.split(',')]
+            _vol_source = _parts[-1] if _parts else source
+        vol_result, vol_regime = should_trade(token, signal=_vol_source)
         atr_pct = get_atr_pct(token)
         atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'
         log(f'  [VOL-GATE] {token}: ATR={atr_str} regime={vol_regime}')
@@ -3058,6 +3066,21 @@ def run(dry_run=False):
                     mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
+            # ── z_score minimum: reject weak signals ──
+            # Catches losers like ZORA (z=-0.91) and CRV (z=-0.88)
+            # NOTE: z_score_tier is NOT in hotset.json — compute from z_score
+            # Neutral tier = z >= -1.0 (confirmed from momentum cache data)
+            if _is_accel_v3_short:
+                try:
+                    _z = z_score  # z_score IS in hotset.json (set at line ~1959)
+                    if _z >= -1.0:
+                        log(f'  🚫 [ACCEL-V3-WEAK] {token} {direction} BLOCKED — z_score={_z:.4f} too weak (need < -1.0)')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                except Exception as e:
+                    log(f'  [WARN] z_tier check failed: {e}', 'WARN')
             try:
                 if _is_accel_v2_long_5m:
                     from signals.accel_300_v2_long_5m import detect_accel_300_v2_long_5m, _get_5m_candles

@@ -357,6 +357,28 @@
       "related_bugs": [
         "BUG-016"
       ]
+    },
+    {
+      "id": "BUG-020",
+      "title": "PRESERVE-APPROVED-UPSERT creates zombie loop — stale signals survive indefinitely via created_at=CURRENT_TIMESTAMP",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "scripts/signal_compactor.py",
+        "scripts/decider_run.py",
+        "scripts/signal_schema.py"
+      ],
+      "symptom": "Preserved hotset entries get APPROVED rows with created_at=CURRENT_TIMESTAMP, refreshing their age. The compactor's 10-minute query picks them up again, creating an infinite cycle: DB→hotset→preserve→UPSERT→DB. Signals like ema300-dip can maintain perpetual hotset slots, accumulating survival_rounds (observed up to 108) while the two staleness checks in decider_run.py are dead code because get_approved_signals() does not return created_at or entry_origin_ts.",
+      "root_cause": "Three interacting bugs: (1) PRESERVE-APPROVED-UPSERT (signal_compactor.py:2267-2285) writes APPROVED rows with CURRENT_TIMESTAMP, refreshing the signal's age to 'just now'. (2) get_approved_signals() (signal_schema.py:2645-2683) SQL SELECT does not include created_at or entry_origin_ts, so decider_run.py:2728 (V2 staleness check) and decider_run.py:3045 (accel staleness check) are dead code — sig.get('created_at') always returns None. (3) entry_origin_ts resets to time.time() (signal_compactor.py:1813) when a preserved entry drops and a new PENDING signal fires, restarting the staleness clock.",
+      "fix": "Two-pronged: (1) Add created_at to get_approved_signals() SQL SELECT so staleness checks in decider_run.py are no longer dead code. (2) Add maximum age guard to PRESERVE-APPROVED-UPSERT: if preserved entry's entry_origin_ts is >30 minutes old, don't write the APPROVED row — let it expire naturally.",
+      "verified_by": "Bug hunter audit: SQL queries confirmed no ema300-dip signal was ever APPROVED in DB (all EXPIRED/SKIPPED), yet ICP LONG trades were executed with ema300-dip source. signal_schema.py SELECT confirmed created_at not returned. decider_run.py confirmed sig.get('created_at') always None. signal_compactor.py confirmed CURRENT_TIMESTAMP in INSERT. DB confirmed survival_rounds up to 108 with hot_cycle_count=0.",
+      "date_found": "2026-09-04",
+      "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-014"
+      ]
     }
   ],
   "schema": {

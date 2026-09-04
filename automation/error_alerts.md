@@ -2097,3 +2097,15 @@ ALERTS:
 ## Error Alerts — 2026-09-03 17:22 UTC
 - **[WARN]** (1x): `signal_compactor: timed out` at 17:16:02 — single occurrence, non-critical. Monitor next cycle.
 - **AUTO-FIX**: None needed. Pipeline healthy, auto-recovery expected.
+
+## Error Alerts — 2026-09-04 03:23 UTC
+- **[WARN]** (120x today): `Rate limit check failed: cannot access local variable 'BRAIN_DB_DICT'` — scoping issue in rate limiter, gracefully degrades (proceeds without rate limit)
+- **[WARN]** (3x/30m): `signal_compactor: timed out` — transient, completes on retry (0.24s)
+- **[INFO]** Disk at 83% — monitor, auto-clean when >85%
+- **AUTO-FIX**: None required — all issues non-blocking
+
+## Error Alerts — 2026-09-04 03:23 UTC
+- **[WARN]** (120x today): `Rate limit check failed: cannot access local variable 'BRAIN_DB_DICT'` — scoping issue in rate limit check. Non-critical: proceeds without rate limit. Occurs in signals_runner path.
+- **[WARN]** (3x/30min): `signal_compactor: timed out` — transient, completes on retry (0.24s on latest successful run). Not blocking pipeline.
+- **[INFO]** Disk at 83% — approaching WARN threshold (85%). No action yet.
+- **AUTO-FIX**: None required — all issues non-blocking.

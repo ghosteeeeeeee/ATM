@@ -26,14 +26,14 @@ EMA300_BELOW_BUFFER = 0.001   # 0.1% below EMA300 = "BELOW"
 # ── Z-Score ───────────────────────────────────────────────────────────────────
 ZSCORE_LOOKBACK = 120         # candles for rolling mean/std
 ZSCORE_STRONG_NEG = -1.5
-ZSCORE_NEG = -0.5
-ZSCORE_POS = 0.5
+ZSCORE_NEG = -1.0
+ZSCORE_POS = 1.0              # Raised from 0.5 — filter weak entries
 ZSCORE_STRONG_POS = 1.5
 
 # ── Volume ────────────────────────────────────────────────────────────────────
 VOLUME_AVG_PERIOD = 60        # candles for rolling volume average
 VOLUME_LOW_THRESHOLD = 0.5    # < 0.5x avg = LOW
-VOLUME_HIGH_THRESHOLD = 1.5   # > 1.5x avg = HIGH
+VOLUME_HIGH_THRESHOLD = 2.5    # > 2.5x avg = HIGH (raised from 1.5x)
 VOLUME_PARABOLIC_THRESHOLD = 3.0  # > 3x avg = PARABOLIC
 
 # ── Velocity ──────────────────────────────────────────────────────────────────
