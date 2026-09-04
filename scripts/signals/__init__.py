@@ -69,6 +69,11 @@ except Exception:
     _ema300_dip_run = None
 
 try:
+    from signals.ema300_dip_short import run as _ema300_dip_short_run
+except Exception:
+    _ema300_dip_short_run = None
+
+try:
     from signals.bb_bounce_short import run as _bb_bounce_short_run
 except Exception:
     _bb_bounce_short_run = None
@@ -211,6 +216,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
     {'name': 'r2_trend_v2_long',         'enabled': 'R2_TREND_V2_LONG_ENABLED',     'run': _r2_trend_v2_long_run},
     {'name': 'ema300_dip',               'enabled': 'EMA300_DIP_ENABLED',           'run': _ema300_dip_run},
+    {'name': 'ema300_dip_short',         'enabled': 'EMA300_DIP_SHORT_ENABLED',     'run': _ema300_dip_short_run},
     {'name': 'bb_bounce_short',          'enabled': 'BB_BOUNCE_SHORT_ENABLED',      'run': _bb_bounce_short_run},
     {'name': 'bb_bounce_long',           'enabled': 'BB_BOUNCE_LONG_ENABLED',       'run': _bb_bounce_long_run},
     {'name': 'bb_bounce_v2_long',        'enabled': 'BB_BOUNCE_V2_LONG_ENABLED',    'run': _bb_bounce_v2_long_run},

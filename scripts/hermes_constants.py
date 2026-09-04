@@ -1523,6 +1523,19 @@ EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
 # Backtest: 229 trades, 54% WR, +0.01% avg PnL (CFX: 70% WR, +12.69% total)
 # Optimal: TP 1.0% / SL 1.5% on tokens with 70%+ candles above EMA300
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
+# ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
+# ema300_dip_short.py — catches shallow rallies in strong downtrends
+EMA300_DIP_SHORT_ENABLED = True       # master switch
+EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
+EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
+EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
+EMA300_DIP_SHORT_MAX_RSI = 85         # max RSI — don't short extreme overbought
+EMA300_DIP_SHORT_MIN_TREND_STRENGTH = 85  # min % of last 100 candles below EMA300
+EMA300_DIP_SHORT_MAX_EMA_SLOPE = 0.0  # max EMA300 slope (%) — require negative slope
+EMA300_DIP_SHORT_COOLDOWN = 15        # cooldown between entries (candles = 15 min)
+EMA300_DIP_SHORT_TP_PCT = 1.0         # take profit (%)
+EMA300_DIP_SHORT_SL_PCT = 1.5         # stop loss (%)
+# Mirror of LONG signal: sell rallies to EMA300 in downtrends
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = False   # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
@@ -1809,6 +1822,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     'ema300-dip',  # EMA300 dip buyer — works solo in strong uptrends
+    'ema300-dip-short',  # EMA300 rally seller — works solo in strong downtrends
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',

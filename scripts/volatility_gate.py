@@ -73,6 +73,7 @@ REGIME_SIGNALS = {
         'r2-trend-long', 'r2l', 'r2v2-long',  # R² trend LONG (slow grinds)
         'r2-trend-short',  # R² downtrend SHORT detector
         'ema300-dip',  # EMA300 dip buyer — trend following
+        'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
@@ -109,6 +110,7 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
         'ema300-dip',  # EMA300 dip buyer — trend following
+        'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
