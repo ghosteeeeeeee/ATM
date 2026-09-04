@@ -1,0 +1,8 @@
+[Unit]
+Description=Continuum Engine API Export
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/continuum_api.py
+WorkingDirectory=/root/.hermes/scripts
