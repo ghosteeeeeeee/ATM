@@ -280,15 +280,19 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'CC',
-    'GRASS',
+    'BIGTIME',
+    'CHIP',
+    'FIL',
+    'ICP',
     'JUP',
+    'LDO',
     'MET',
-    'ONDO',
+    'NOT',
     'W',
     'XPL',
     'ZEN'
 }
+
 
 
 
@@ -1379,12 +1383,14 @@ COILED_SPRING_TRIGGER_BODY_PCT  = 0.5     # min body % of trigger candle
 COILED_SPRING_SL_ATR_MULT       = 1.5     # stop loss = entry - (ATR * multiplier)
 COILED_SPRING_TP_ATR_MULT       = 4.0     # take profit = entry + (ATR * multiplier)
 # Confidence
-COILED_SPRING_CONF_BASE         = 55      # base confidence
-COILED_SPRING_CONF_FLOOR        = 50      # min confidence (signals below this are dropped)
+COILED_SPRING_CONF_BASE         = 72      # base confidence — competitive with range_breakout(70), engulfing(75)
+COILED_SPRING_CONF_FLOOR        = 60      # min confidence (signals below this are dropped)
 COILED_SPRING_CONF_CAP          = 88      # max confidence (system ceiling)
-COILED_SPRING_CONF_VOL_SPIKE_MAX = 25     # bonus for volume spike magnitude
-COILED_SPRING_CONF_RSI_BONUS_MAX = 10     # bonus for ideal RSI zone
-COILED_SPRING_CONF_STRUCT_MAX   = 10      # bonus for clean HH/HL structure
+COILED_SPRING_CONF_VOL_SPIKE_MAX = 16     # bonus for volume spike magnitude
+COILED_SPRING_CONF_RSI_BONUS_MAX = 8      # bonus for ideal RSI zone (35-45)
+COILED_SPRING_CONF_STRUCT_MAX   = 8       # bonus for clean HH/HL structure
+COILED_SPRING_CONF_DEEP_COIL_MAX = 8      # bonus for sustained coil (5+ bars)
+COILED_SPRING_CONF_EMA_ALIGN_BONUS = 4    # bonus for full EMA alignment (9>21>50)
 # Additional detection parameters
 COILED_SPRING_MIN_BARS          = 60      # minimum candles required for detection
 COILED_SPRING_SWING_LOOKBACK    = 100     # max lookback for swing low detection
@@ -1512,7 +1518,7 @@ EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = True    # TESTING — catches slow grinds like CHIP/SUSHI under EMA300. Monitor WR.
 SLOW_GRIND_SHORT_MIN_R2 = 0.30    # minimum R² threshold (was 0.40, lowered to catch trends even earlier)
-SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price per candle (0.02%)
+SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0005  # minimum slope magnitude as % of price per candle (0.05%, was 0.02%)
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking
 SLOW_GRIND_SHORT_RSI_MIN = 30      # min RSI — was 35, lowered to catch trends earlier (RSI often oversold in grinds)
 SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fading (was 55, BCH had RSI=62.8 at entry)
