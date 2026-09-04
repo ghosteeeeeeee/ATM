@@ -281,7 +281,7 @@ def classify_ema300_position(price: float, ema300: float) -> EMA300Position:
     """Classify price relative to EMA300."""
     if price > ema300 * (1 + EMA300_ABOVE_BUFFER):  # buffer to avoid noise
         return EMA300Position.ABOVE
-    elif price < ema300 * 0.999:
+    elif price < ema300 * (1 - EMA300_BELOW_BUFFER):
         return EMA300Position.BELOW
     else:
         return EMA300Position.AT
@@ -478,6 +478,9 @@ class ContinuumEngine:
         
         # Score smoothing
         self.smoothed_score = 50.0  # Start neutral
+        
+        # Phase reset tracking
+        self._below_count = 0  # Consecutive candles below EMA300
         
         # History for multi-TF
         self.state_history: List[ContinuumState] = []
@@ -751,6 +754,15 @@ class ContinuumEngine:
         # Update entry state machine
         self._update_entry_machine(state)
         
+        # Sync state with engine's internal phase
+        state.entry_phase = self.entry_phase
+        state.position_side = self.position_side
+        
+        # Debug: log phase changes
+        if hasattr(self, '_last_phase') and self._last_phase != self.entry_phase:
+            print(f"[CONTINUUM] Phase changed: {self._last_phase} → {self.entry_phase}")
+        self._last_phase = self.entry_phase
+        
         return state
     
     def _detect_wyckoff(self, closes: List[float], volumes: List[float]) -> str:
@@ -949,6 +961,15 @@ class ContinuumEngine:
         """
         side = 'LONG' if state.ema300_position == 'ABOVE' else 'SHORT'
         
+        # Debug: log entry to update method
+        print(f"[CONTINUUM] _update: phase={self.entry_phase}, side={side}, dur={state.ema300_duration}, z={state.zscore_tier}")
+        
+        # Track consecutive candles below EMA300 (for phase reset logic)
+        if state.ema300_position == 'BELOW':
+            self._below_count += 1
+        else:
+            self._below_count = 0
+        
         # Phase 0 → 1: EMA300 cross detected
         if self.entry_phase == 0:
             if state.ema300_duration >= ENTRY_CROSS_MIN_DURATION:
@@ -960,10 +981,7 @@ class ContinuumEngine:
             if state.ema300_duration >= ENTRY_CONFIRM_MIN_DURATION:
                 self.entry_phase = 2
                 print(f"[CONTINUUM] Phase 2: {side} confirmed, duration={state.ema300_duration}")
-            elif state.ema300_duration < 3:
-                # Fake-out, reset
-                self.entry_phase = 0
-                print(f"[CONTINUUM] Phase reset: EMA300 duration dropped to {state.ema300_duration}")
+            # No reset — once in Phase 1, stay until confirmed or exit condition breaks
         
         # Phase 2 → 3: Z-score aligning
         if self.entry_phase == 2:
@@ -973,8 +991,7 @@ class ContinuumEngine:
             elif side == 'SHORT' and state.zscore_tier in ('NEG', 'STRONG_NEG'):
                 self.entry_phase = 3
                 print(f"[CONTINUUM] Phase 3: SHORT z-score aligning: {state.zscore_tier}")
-            elif state.ema300_duration < 3:
-                self.entry_phase = 0
+            # No reset — once confirmed, stay until z-score aligns or exit
         
         # Phase 3 → 4: Volume confirmation (optional but boosts confidence)
         if self.entry_phase == 3:

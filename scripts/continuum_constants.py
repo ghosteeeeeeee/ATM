@@ -20,8 +20,8 @@ HYSTERESIS = {
 
 # ── EMA300 ────────────────────────────────────────────────────────────────────
 EMA300_PERIOD = 300
-EMA300_ABOVE_BUFFER = 0.001   # 0.1% above EMA300 = "ABOVE"
-EMA300_BELOW_BUFFER = 0.001   # 0.1% below EMA300 = "BELOW"
+EMA300_ABOVE_BUFFER = 0.0015  # 0.15% above EMA300 = "ABOVE"
+EMA300_BELOW_BUFFER = 0.0015  # 0.15% below EMA300 = "BELOW"
 
 # ── Z-Score ───────────────────────────────────────────────────────────────────
 ZSCORE_LOOKBACK = 120         # candles for rolling mean/std
