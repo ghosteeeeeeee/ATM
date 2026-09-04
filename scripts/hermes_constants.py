@@ -1244,6 +1244,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V3_LONG_ENABLED',   # CEO 2026-09-04 — 35T/7d 42.9% WR -$1.34, ALL ATR_SL. CEO_PROTECTION expired. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     'ACCEL_300_V3_SHORT_ENABLED',  # AUTO_1HR 2026-09-04 — 3T/0%WR/-$0.48. NEVER_REENABLE.
+    'EMA300_DIP_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1510,7 +1511,7 @@ R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LON
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip Buyer (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_ENABLED = True              # master switch
+EMA300_DIP_ENABLED = False             # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13. 6h: 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
 EMA300_DIP_EMA_PERIOD = 300            # EMA period
 EMA300_DIP_MAX_DIST_PCT = 0.5          # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes

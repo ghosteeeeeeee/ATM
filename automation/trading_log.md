@@ -1,5 +1,46 @@
 
 
+## [2026-09-04 15:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system flat since 12:47 UTC)
+**24h Context:** 84T 59.5%WR -$1.10 | atr_sl_hit 25% (under 40%)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 49T (58%) avg +$0.056 — carrying system
+- atr_sl_hit: 21T (25%) avg -$0.118 — under 40% threshold, acceptable
+- cut-loser-CL-T1: 7T avg -$0.150 — normal
+- hard_sl: 4T avg -$0.205 — rare, acceptable
+
+**Signal Leaders (24h):**
+- bb-bounce-v2-long+: 16T 68.8%WR +$0.38 ⭐
+- continuation+: 4T 100%WR +$0.30 ⭐
+- ema300-dip: 38T 60.5%WR -$1.03 (biggest drag but 60.5% WR)
+- accel-300-v3-long+: 14T 50%WR -$0.26 (killed, draining legacy)
+
+**Hourly Pattern (12h):**
+- 12:00 UTC was bad: 7T 14.3%WR -$1.17 (ema300-dip disaster)
+- 08:00-11:00 UTC: All green hours (100-75% WR)
+- 13:00-15:00 UTC: Dead period, no trades
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T in last hour → none to kill
+- atr_sl_hit 25% → well under 40% threshold
+- accel-300-v3-long+: already killed, draining legacy trades
+- accel-300-v3-short-: already killed
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System flat — no positions, no new entries since 12:47
+- atr_sl_hit 25% — healthy, well under 40%
+- ema300-dip: 60.5%WR 24h but -$1.03 PnL (R:R issue, not kill candidate — WR too high)
+- Trade freq 0/hr — quiet market, normal for UTC afternoon
+
+**Open Questions:**
+- ema300-dip R:R problem persists: 60.5%WR but -$1.03. Winning exits avg +$0.057, losing exits avg -$0.149. Not a kill (WR too high) but worth monitoring.
+- 12:00 UTC ema300-dip cluster: 7 entries in one hour, 6 losses. Signal may need cooldown adjustment if this pattern repeats.
+
 ## [2026-09-04 06:30 UTC] Daily Orchestrator Run
 
 **Pipeline Status:** Running, 5 open | 82 closed today | -24.8% PnL
@@ -783,3 +824,77 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - accel-300-v3-long+ at 53.3%WR -$0.16 — borderline. Monitor if WR drops below 50%.
 - ema300-dip now requires positive slope — will reduce trade frequency but should improve R:R.
+
+## [2026-09-04 15:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 76T, 60.5%WR, -$0.71
+**Open:** 0 positions (clean slate)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 43T +$2.45 ✅ (carrying system)
+- atr_sl_hit: 20T -$2.34 (26.3% — under 40%)
+- cut-loser-CL-T1: 7T -$1.05
+- hard_sl: 4T -$0.82
+
+**24h Signal Performance:**
+- profit-monster-trail: 43T +$2.45 (system backbone)
+- bb-bounce-v2-long+: 15T 66.7%WR +$0.33 ✅
+- continuation+: 4T 100%WR +$0.30 ✅
+- ema300-dip: 36T 61.1%WR -$1.04 (R:R still poor, fix deployed this hour)
+- accel-300-v3-long+: 9T 55.6%WR -$0.33 (borderline)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 26.3% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 0/hr quiet period
+- 0 open positions (clean slate)
+- ema300-dip fix deployed last hour (MIN_TREND_STRENGTH 85, MIN_EMA_SLOPE 0.0) — need more data to evaluate
+- profit-monster-trail +$2.45 24h carrying system
+
+**Open Questions:**
+- accel-300-v3-long+ at 55.6%WR -$0.33 — borderline but not kill threshold. Monitor.
+- ema300-dip R:R still 0.39:1 in 24h — tight filters need more time to show effect.
+
+## [2026-09-04 18:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system flat since 17:05)
+**PnL:** $0.00 (0 trades)
+**24h:** 70T 55.7% WR -$1.96
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 38T (54%) avg +$0.052 — carrying system
+- atr_sl_hit: 20T (29%) avg -$0.117 — under 40% threshold ✓
+- cut-loser-CL-T1: 6T avg -$0.155 — normal
+- hard_sl: 4T avg -$0.205 — rare
+
+**Signal Leaders (24h):**
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 14T 64.3%WR +$0.14 ⭐
+- ema300-dip: 34T 58.8%WR -$1.13 (R:R drag, not kill — WR too high)
+- accel-300-v3-long+: 6T 50%WR -$0.40 (killed, draining legacy)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (killed, draining legacy)
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T in last hour → none to kill
+- atr_sl_hit 29% → well under 40% threshold
+- accel-300-v3-long+ and short-: already killed, draining legacy trades
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System flat — no positions, no new entries since 17:05
+- atr_sl_hit 29% — healthy, well under 40%
+- ema300-dip 58.8%WR -$1.13: R:R problem (winners avg +$0.057, losers avg -$0.149). Not a kill (WR too high)
+- Trade freq 0/hr — quiet market
+
+**Open Positions:**
+- ME LONG via ema300-dip: $19.90 size, $0.00 PnL
+- HBAR SHORT via ema300-dip-short: $11.10 size, $0.00 PnL
+
+**Open Questions:**
+- ema300-dip R:R problem persists across multiple days. Winning exits are small (+$0.057 avg) while losing exits are 2.6x larger (-$0.149 avg). Worth tuning TP/SL ratio if this pattern continues.
+- System flat for 1+ hours — quiet afternoon period, normal.

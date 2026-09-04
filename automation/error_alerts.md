@@ -2140,3 +2140,13 @@ ALERTS:
 ## Error Alerts — 2026-09-04 13:22 UTC
 - **WARN** (1x): `signal_compactor: timed out` at 13:19 — non-critical, cycle completed on next run
 - **INFO**: Pipeline auto-recovered, no fix needed
+
+## Error Alerts — 2026-09-04 15:22 UTC
+- **[WARN]** (1x): Hotset empty — 0 tokens survived compaction (NEUTRAL regime, no contrarian signal). Auto: Expected behavior, not actionable.
+- **[WARN]** (1x): Disk at 84% (94G/118G) — 1% from 85% threshold. Auto: No old logs to compress (all <7 days). Monitor next 24h.
+
+## Error Alerts — 2026-09-04 16:23 UTC
+- **WARN** (2x): `signal_compactor: timed out` at 16:03 and 16:20
+- **AUTO-FIX**: None needed — pipeline self-recovered on next cycle (16:22 completed normally)
+- **NOTE**: Intermittent, not persistent. Monitor for escalation.
+

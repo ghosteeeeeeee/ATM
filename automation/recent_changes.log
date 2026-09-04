@@ -1,3 +1,7 @@
+[2026-09-04 15:06 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (system flat since 12:47 UTC). 84T/24h 59.5%WR -$1.10. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 25% under 40%. profit-monster-trail 49T +$2.74 carrying system. ema300-dip 38T 60.5%WR -$1.03 (R:R issue, not kill — WR too high). bb-bounce-v2-long+ 16T 68.8%WR +$0.38 star performer. continuation+ 4T 100%WR +$0.30 star. All killed signals (accel-300-v3-long+, accel-300-v3-short-, bb-bounce-short, slow-grind-) remain disabled. Trade freq 0/hr quiet period. 0 open positions. System steady state. 12:00 UTC was bad (7T 14.3%WR -$1.17 ema300-dip cluster) but no kill criteria met.
+  BY: auto_1hr
+  NEXT: Re-run at 16:06 UTC
 [2026-09-04 07:06 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (1L -$0.11). 84T/24h 59.5%WR. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 19.5% under 40%. profit-monster-trail 51T +$2.85 carrying system. All killed signals (accel-300-v3-long+, accel-300-v3-short-, bb-bounce-short) remain disabled. Trade freq 1/hr quiet period. 5 open positions ($64.30). System steady state. CL-T1 exits 10T -$1.46 24h monitored but not actionable.
   BY: auto_1hr
