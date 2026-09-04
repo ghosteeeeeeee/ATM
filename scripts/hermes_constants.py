@@ -1244,7 +1244,7 @@ NEVER_REENABLE_FLAGS = {
     # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-04 — T re-enabled for live testing with new guards
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     # ACCEL_300_V3_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-04 — T re-enabled for live testing with new guards
-    'EMA300_DIP_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
+    'EMA300_DIP_LONG_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
