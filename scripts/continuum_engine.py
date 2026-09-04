@@ -40,7 +40,7 @@ from continuum_constants import (
     SCORE_WEIGHTS, SCORE_EXIT_THRESHOLD,
     EXIT_TIER3_EMA_BREAK,
     POSITION_TAG, POSITION_FILE,
-    TICK_INTERVAL,
+    TICK_INTERVAL, SCORE_SMOOTHING,
 )
 
 # ── Derived paths ──────────────────────────────────────────────────────────────
@@ -476,6 +476,9 @@ class ContinuumEngine:
         self.position_size_pct = 0.0
         self.entry_ts = 0
         
+        # Score smoothing
+        self.smoothed_score = 50.0  # Start neutral
+        
         # History for multi-TF
         self.state_history: List[ContinuumState] = []
     
@@ -740,8 +743,10 @@ class ContinuumEngine:
             last_cross_ts=self.last_cross_ts,
         )
         
-        # Compute compound score
-        state.state_score = self._compute_score(state)
+        # Compute raw score and apply smoothing
+        raw_score = self._compute_score(state)
+        self.smoothed_score = SCORE_SMOOTHING * raw_score + (1 - SCORE_SMOOTHING) * self.smoothed_score
+        state.state_score = self.smoothed_score
         
         # Update entry state machine
         self._update_entry_machine(state)

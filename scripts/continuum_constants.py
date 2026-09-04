@@ -108,6 +108,11 @@ MIN_TIME_BETWEEN_EXITS = 600      # 10 minutes minimum between exits
 MAX_TRADES_PER_DAY = 6            # max 6 trades per day (3 round trips)
 COOLDOWN_AFTER_LOSS = 7200        # 2 hour cooldown after a losing trade
 
+# ── Score Smoothing ────────────────────────────────────────────────────────────
+SCORE_SMOOTHING = 0.3          # EMA alpha: 0.3 = fast response, 0.1 = slow/smooth
+                               # New score = alpha * raw_score + (1-alpha) * prev_score
+                               # 0.3 = 30% new info, 70% history
+
 # ── Tick Interval ─────────────────────────────────────────────────────────────
 TICK_INTERVAL = 30            # seconds between state updates
 
