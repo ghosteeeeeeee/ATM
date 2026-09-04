@@ -635,9 +635,10 @@ def _compute_score(rr_ratio, vol_width, liquidity, sr_map, direction='LONG'):
             else:
                 score += 5   # no clear target nearby
         else:
-            # No resistance above (LONG) or support below (SHORT) = room to run
-            # This is GOOD for trend trades — no ceiling/floor to hit
-            score += 20  # near full points — clear air trade
+            # No resistance above (LONG) or support below (SHORT) = open skies
+            # Price has broken through all levels — nothing stopping it
+            # This is BETTER than a nearby target (which caps profit)
+            score += 25  # full points — open skies trade
     else:
         score += 0      # no S/R data at all (can't assess)
 
