@@ -1497,7 +1497,7 @@ R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ema300_dip.py — catches shallow pullbacks in strong uptrends
 EMA300_DIP_ENABLED = True              # master switch
 EMA300_DIP_EMA_PERIOD = 300            # EMA period
-EMA300_DIP_MAX_DIST_PCT = 0.6          # max distance from EMA300 (%) — loosened from 0.5
+EMA300_DIP_MAX_DIST_PCT = 0.5          # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_MIN_RSI = 15                # min RSI — don't buy crashes
 EMA300_DIP_MAX_RSI = 38                # max RSI — loosened from 35
 EMA300_DIP_MIN_TREND_STRENGTH = 75     # min % of last 100 candles above EMA300 — loosened from 80
