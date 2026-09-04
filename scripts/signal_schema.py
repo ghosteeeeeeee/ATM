@@ -2642,6 +2642,7 @@ def get_approved_signals(hours=24):
 
     # BUG-26 fix: select id so callers can do atomic claim with signal_id
     # FIX: include signal_metadata so trader_wallet/score/win_rate flow to decider_run → brain.py
+    # FIX (2026-09-04): include created_at so decider_run can check signal staleness
     c.execute('''
         SELECT id, token, direction,
                COUNT(*) as count,
@@ -2651,6 +2652,7 @@ def get_approved_signals(hours=24):
                MAX(source) as source,
                MAX(price) as price,
                MAX(leverage) as leverage,
+               MAX(created_at) as created_at,
                MAX(COALESCE(
                    (SELECT survival_rounds FROM signals s2
                     WHERE s2.token=signals.token

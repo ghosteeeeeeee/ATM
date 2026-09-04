@@ -1803,6 +1803,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # This means a combo that survived 3 cycles has staleness computed from its
             # original entry, not from when it most recently fired. Age from DB created_at
             # is only used for score weighting in _score_signal (age_m parameter).
+            #
+            # FIX (2026-09-04): When prev_entry is None (entry dropped from hotset, new signal
+            # fires), carry forward entry_origin_ts from the DB signal's created_at instead of
+            # resetting to time.time(). This prevents the zombie loop where:
+            # 1. Signal drops (staleness=0) → removed from preserve
+            # 2. New PENDING signal fires → DB path picks it up
+            # 3. entry_origin_ts = time.time() → staleness resets to 1.0
+            # 4. Signal re-enters hotset → cycle repeats indefinitely
+            # With this fix, entry_origin_ts reflects the original signal creation time,
+            # preventing staleness resets on re-entry.
             if prev_entry:
                 prev_origin_ts = prev_entry.get('entry_origin_ts')
                 if isinstance(prev_origin_ts, (int, float)) and prev_origin_ts > 0:
@@ -1810,7 +1820,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     entry_origin_ts = time.time()
             else:
-                entry_origin_ts = time.time()
+                # Try to carry forward from DB signal's created_at
+                try:
+                    _db_created = row[5]  # created_at is at index 5 in the SELECT
+                    if _db_created:
+                        import datetime as _dt
+                        _ts = _dt.datetime.strptime(_db_created, '%Y-%m-%d %H:%M:%S')
+                        _ts = _ts.replace(tzinfo=_dt.timezone.utc)
+                        entry_origin_ts = _ts.timestamp()
+                    else:
+                        entry_origin_ts = time.time()
+                except Exception:
+                    entry_origin_ts = time.time()
             age_from_entry = (time.time() - entry_origin_ts) / 60.0
             staleness = max(0.0, 1.0 - (age_from_entry * 0.2))
 
@@ -2241,7 +2262,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # decider_run's get_approved_signals() returns [] and no trades fire — even
                         # though the token is legitimately in hotset.json. This ensures decider_run
                         # can find and execute the preserved entry.
-                        if _preserved_won and not dry:
+                        #
+                        # FIX (2026-09-04): Add max age guard — don't create APPROVED rows for
+                        # preserved entries older than PRESERVE_UPSERT_MAX_AGE_MIN (30 min).
+                        # Without this, PRESERVE-APPROVED-UPSERT creates fresh APPROVED rows
+                        # with CURRENT_TIMESTAMP every cycle, allowing signals to survive
+                        # indefinitely through the zombie cycle: DB→hotset→preserve→UPSERT→DB.
+                        _pe_age_min = (time.time() - pe.get('entry_origin_ts', time.time())) / 60.0 if pe.get('entry_origin_ts') else 0
+                        _preserve_max_age = 30  # max minutes for preserved entry to get UPSERT
+                        if _pe_age_min > _preserve_max_age:
+                            log(f"  🚫 [PRESERVE-APPROVED-AGE-BLOCK] {pe['token']}:{pe.get('direction')} — preserved entry too old ({_pe_age_min:.1f}min > {_preserve_max_age}min), skipping UPSERT")
+                        elif _preserved_won and not dry:
                             try:
                                 _pe_ck = pe.get('combo_key') or f"{pe['token']}:{pe['direction']}:{pe_src}"
                                 _cur.execute("""
@@ -2264,6 +2295,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         WHERE id=?
                                     """, (_new_sr, pe_src, _pe_ck, pe.get('signal_metadata'), _row[0]))
                                 else:
+                                    # FIX (2026-09-04): Use original entry_origin_ts as created_at
+                                    # instead of CURRENT_TIMESTAMP. This prevents the zombie loop
+                                    # where PRESERVE-APPROVED-UPSERT refreshes created_at every cycle,
+                                    # allowing signals to survive indefinitely through:
+                                    # DB→hotset→preserve→UPSERT→DB→hotset→...
+                                    _pe_origin_ts = pe.get('entry_origin_ts')
+                                    if _pe_origin_ts:
+                                        import datetime as _dt
+                                        _pe_created = _dt.datetime.fromtimestamp(_pe_origin_ts, tz=_dt.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+                                    else:
+                                        _pe_created = None  # fallback to DB default
                                     _cur.execute("""
                                         INSERT INTO signals (
                                             token, direction, signal_type, source, confidence,
@@ -2271,7 +2313,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             hot_cycle_count, combo_key, price, signal_metadata,
                                             created_at, updated_at
                                         ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?, ?,
-                                            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                                            ?, CURRENT_TIMESTAMP)
                                     """, (
                                         pe['token'], pe.get('direction',''),
                                         pe.get('signal_type','hot-set'),
@@ -2282,6 +2324,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         _pe_ck,
                                         pe.get('price') or 0,
                                         pe.get('signal_metadata') or '{}',
+                                        _pe_created,
                                     ))
                                 log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
                             except Exception as _e:
