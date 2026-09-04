@@ -174,21 +174,26 @@ def _seed_universe_candles(universe: list):
         idx = cursor % len(saved_tokens)
         token = saved_tokens[idx]
 
-        # Check if we already have recent 4h candles (within 2 hours)
+        # Check if we already have recent candles (1m within 5 min, 4h within 2 hours)
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         conn.execute("PRAGMA journal_mode=WAL")
         c = conn.cursor()
+        c.execute("SELECT MAX(ts) FROM candles_1m WHERE token=?", (token,))
+        row_1m = c.fetchone()
         c.execute("SELECT MAX(ts) FROM candles_4h WHERE token=?", (token,))
-        row = c.fetchone()
+        row_4h = c.fetchone()
         conn.close()
-        if row and row[0] and (int(time.time()) - row[0]) < 7200:
+        now = int(time.time())
+        # Skip if 1m is fresh (<5 min) AND 4h is fresh (<2 hours)
+        if (row_1m and row_1m[0] and (now - row_1m[0]) < 300 and
+            row_4h and row_4h[0] and (now - row_4h[0]) < 7200):
             cursor += 1
             continue  # Already fresh, skip
 
-        # Fetch 5m, 1h, 4h candles from Binance (volume data for Wyckoff/analysis).
-        # 1h/4h candles from price_history have volume=0 (no volume column).
-        # Binance candles have real volume, enabling Wyckoff climax detection.
-        for tf, limit in [('5m', 100), ('1h', 100), ('4h', 100)]:
+        # Fetch 1m, 5m, 1h, 4h candles from Binance (volume data for Wyckoff/analysis).
+        # 1m candles from HL have volume=0; Binance has real volume.
+        # Binance candles enable Wyckoff climax detection and continuum engine volume states.
+        for tf, limit in [('1m', 200), ('5m', 100), ('1h', 100), ('4h', 100)]:
             candles = _fetch_binance_candles(token, tf, limit)
             if candles:
                 _store_candles(token, tf, candles)
@@ -200,6 +205,11 @@ def _seed_universe_candles(universe: list):
     if seeded > 0:
         print(f'[candle_seed] Seeded {seeded}/{TOKENS_PER_RUN} tokens this run '
               f'(cursor={cursor}/{len(saved_tokens)})')
+
+    # Always fetch BTC 1m candles (needed for continuum engine)
+    btc_1m = _fetch_binance_candles('BTC', '1m', 200)
+    if btc_1m:
+        _store_candles('BTC', '1m', btc_1m)
 
 
 def fetch_all_prices():
