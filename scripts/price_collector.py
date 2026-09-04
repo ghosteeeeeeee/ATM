@@ -401,7 +401,8 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
         t = dev_ts - tf_seconds  # candidate window before first dev
         while t > lc:
             t -= tf_seconds
-        t += tf_seconds  # step forward to the highest valid closed window
+        # t is now <= lc — this IS the last closed window
+        # Do NOT add tf here — that would skip the window that needs closing
         last_closed_dict[token] = t
 
     # Use MAX(price_history.timestamp) as the clock — not time.time()
