@@ -31,9 +31,6 @@ from hermes_constants import (
     PUMP_FLOW_MINUS_ENABLED,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
-    PUMP_FLOW_MIN_VELOCITY,
-    PUMP_FLOW_MIN_CHAIN_LIFT,
-    PUMP_FLOW_MIN_CHAIN_CO_FIRES,
     PUMP_FLOW_COOLDOWN_HOURS,
     PUMP_FLOW_MAX_PER_CYCLE,
     PUMP_FLOW_MAX_PRICE_AGE,
@@ -65,13 +62,36 @@ def _log(msg):
 
 
 def _load_state():
-    """Load pump flow state — prefer full data file, fall back to compact."""
-    # Try full data file first (has complete phase dict)
+    """Load pump flow state — prefer full data file, fall back to compact.
+
+    Normalizes compact file format:
+      - phase as string → phase as dict
+      - direction → suggested_direction
+      - Missing flow_score/chain_evidence → defaults
+    Rejects stale data (>10 min old).
+    """
+    now = time.time()
+    MAX_STATE_AGE_SECS = 600  # 10 minutes
+
+    # Try full data file first (has complete phase dict with suggested_direction)
     for path in (FULL_STATE_FILE, STATE_FILE):
         try:
             with open(path) as f:
                 data = json.load(f)
-            # Normalize: compact file has phase as string, full has phase as dict
+
+            # Staleness check
+            ts_str = data.get('updated_at') or data.get('stats', {}).get('generated_at', '')
+            if ts_str:
+                try:
+                    ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+                    age_secs = (datetime.now(timezone.utc) - ts).total_seconds()
+                    if age_secs > MAX_STATE_AGE_SECS:
+                        _log(f"  [pump-flow] State file stale ({age_secs:.0f}s old, max {MAX_STATE_AGE_SECS}s)")
+                        continue
+                except Exception:
+                    pass  # if we can't parse timestamp, accept the data
+
+            # Normalize phase: compact file has phase as string
             if isinstance(data.get('phase'), str):
                 data['phase'] = {
                     'phase': data['phase'],
@@ -79,10 +99,21 @@ def _load_state():
                     'alt_signal': data.get('alt_signal', 'neutral'),
                     'reason': '',
                 }
+
+            # Normalize recommendations: compact uses 'direction', full uses 'suggested_direction'
+            recs = data.get('recommendations', [])
+            for rec in recs:
+                if 'suggested_direction' not in rec and 'direction' in rec:
+                    rec['suggested_direction'] = rec['direction']
+                # Ensure flow_score and chain_evidence exist (missing in compact)
+                rec.setdefault('flow_score', 0)
+                rec.setdefault('chain_evidence', [])
+
             return data
         except Exception:
             continue
-    _log(f"  [pump-flow] No state file found")
+
+    _log(f"  [pump-flow] No valid state file found")
     return None
 
 
@@ -175,6 +206,13 @@ def scan_signals():
     
     added = 0
     
+    # Hoist price lookup outside loop — one fetch for all recommendations
+    try:
+        from signal_schema import get_all_latest_prices
+        all_prices = get_all_latest_prices()
+    except Exception:
+        all_prices = {}
+    
     for rec in recommendations:
         if added >= PUMP_FLOW_MAX_PER_CYCLE:
             break
@@ -218,8 +256,9 @@ def scan_signals():
             _log(f"  [pump-flow] {token} {direction} conf={confidence} < {PUMP_FLOW_MIN_CONFIDENCE} [skip]")
             continue
         
-        # Get price
-        price = _get_current_price(token)
+        # Get price from pre-fetched lookup
+        price_data = all_prices.get(token, {})
+        price = price_data.get('price') if isinstance(price_data, dict) else None
         if price is None or price <= 0:
             continue
         
