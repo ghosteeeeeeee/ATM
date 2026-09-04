@@ -434,13 +434,9 @@ def detect_coiled_spring(rows):
     diag['tp_price'] = tp_price
     diag['rr_ratio'] = rr_ratio
 
-    # Source tag — format: coil-spring+@coil{N} or coil-spring+@vol{X}
-    # The + suffix is part of SOURCE_LONG, metadata goes after @
-    mode = 'TRIGGER' if vol_ratio > COILED_SPRING_TRIGGER_VOL_RATIO else 'COIL'
-    if mode == 'TRIGGER':
-        source = f"{SOURCE_LONG}@vol{vol_ratio:.1f}"
-    else:
-        source = f"{SOURCE_LONG}@coil{coil_bars}"
+    # Source tag — use clean directional format for standalone bypass matching
+    # Metadata (coil/vol) is logged in diagnostics, not in source field
+    source = SOURCE_LONG
 
     return {
         'token': None,  # filled by scanner

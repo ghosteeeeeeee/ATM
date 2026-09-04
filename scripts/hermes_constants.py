@@ -1808,6 +1808,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
+    'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
