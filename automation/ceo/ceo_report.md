@@ -231,3 +231,36 @@ If T fixes both blockers: system goes from -$0.62/7d to approximately **+$1.72/7
 3. **Monitor V3_LONG.** 48h lock, re-enabled at 20:25. 0 trades so far.
 4. **Monitor bb-bounce-v2-long+.** TESTING mode, 5 open positions, CTX-GATE blocking most entries.
 5. **T: Review confluence-,ichimoku- SHORT.** 7T/7d 28.6% WR -$0.46. CEO_PROTECTED.
+
+---
+
+## 🌊 NEW PRIORITY: BTC Wave Pattern Surfer (Sep 4, 2026)
+
+### What T Found
+BTC printed a **+5.10% move** (77,340 → 81,270) on Sep 3 in a clean, repeatable structure:
+- **01:00-10:00:** Chop/Coil — price oscillates around EMA300, multiple failed crosses, low volume
+- **11:04:** THE CROSS — price crosses above EMA300 and holds for **677 minutes** (11+ hours)
+- **12:30-15:00:** Volume Explosion — volume goes **38x parabolic** (20 → 757 BTC/5min), price rips +3.2%
+- **15:00-17:00:** Move ends, consolidation
+
+### Why This Is Priority #1
+This is a **repeatable pattern** that will happen over and over. The EMA300 crossover is the "paddle moment" — when we start paying attention. Volume confirmation is when the wave has energy. We need to catch this every single time.
+
+### What Needs Building
+1. **New signal:** `BTC_WAVE_START` — detects EMA300 crossover + volume surge on BTC 1m
+2. **Flows through:** signal_compactor → hotset → decider_run
+3. **Position size:** Full (high conviction)
+4. **Exit:** Trailing stop + time-based (12hr max)
+
+### Plan
+`/root/.hermes/plans/2026-09-04_btc-wave-pattern-surfer.md`
+
+### Status
+- [ ] Build `btc_wave_detector.py`
+- [ ] Add BTC_WAVE_START to signal_schema.py
+- [ ] Add wave parameters to hermes_constants.py
+- [ ] Backtest on historical data
+- [ ] Paper trade test
+- [ ] Go live
+
+**This is the highest-conviction setup in the system. Every other signal is a ripple; this is a tsunami.**

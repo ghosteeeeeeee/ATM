@@ -387,3 +387,31 @@
 - PROMOTE YGG (WR=66.7%, AvgPnL=0.23%, Trades=9)
 
 Final set: ['ASTER', 'BABY', 'BANANA', 'BCH', 'DOGE', 'DOT', 'DYDX', 'ETC', 'FOGO', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'SEI', 'STX', 'TURBO', 'USUAL', 'YGG']
+
+## [2026-09-04 01:06 UTC] Hourly Analysis
+
+**Trades:** 7 closed last hour (2W 5L -$0.27, 28.6% WR)
+**24h:** 89T 64%WR +$0.22
+**5 Open:** $60.90 (ETC, SAND, ALT, ACE, MET)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 61T 69%WR +$3.39 (carrying system)
+- atr_sl_hit: 16T 19%WR -$1.78 (18%, healthy)
+- cut-loser-CL-T1: 9T 22%WR -$1.31 (small losses, doing job)
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 23T 78%WR +$0.98 ✅
+- ema300-dip: 38T 68%WR +$0.24 ✅
+- accel-300-v3-long+: 18T 50%WR -$0.47 ⚠️ CEO_PROTECTED
+
+**Changes:** None needed
+
+**No Change Needed:**
+- atr_sl_hit 18% well under 40%
+- Trade freq 7/hr normal
+- No signal has 0%WR with 3+T last hour
+- Cut-loser working (small losses, not blowouts)
+- accel-300-v3-long+ CEO_LOCK until Sep 4 05:00
+
+**Open Questions:**
+- accel-300-v3-long+ runs out of CEO protection in ~4h — review then
