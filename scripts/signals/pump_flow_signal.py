@@ -262,15 +262,13 @@ def scan_signals():
         if price is None or price <= 0:
             continue
         
-        # Chain evidence for value
+        # Chain evidence (log only — don't pollute source tag)
         chains = rec.get('chain_evidence', [])
         chain_str = _format_chain_evidence(chains)
         
-        # Signal type and source
+        # Signal type and source — keep clean, no chain evidence in source
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
-        if chain_str:
-            source += f',chain({chain_str})'
         
         # Fire signal
         sid = add_signal(
