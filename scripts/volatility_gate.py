@@ -109,7 +109,7 @@ REGIME_SIGNALS = {
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
-        'ema300-dip',  # EMA300 dip buyer — trend following
+        'ema300-dip-long',  # EMA300 dip buyer — trend following
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
