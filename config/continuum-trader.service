@@ -1,0 +1,16 @@
+[Unit]
+Description=Continuum Engine Trader (LIVE)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/.hermes/scripts
+ExecStart=/usr/bin/python3 -u continuum_trader.py --live
+Restart=always
+RestartSec=10
+StandardOutput=append:/root/.hermes/logs/continuum_trader.log
+StandardError=append:/root/.hermes/logs/continuum_trader.log
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
