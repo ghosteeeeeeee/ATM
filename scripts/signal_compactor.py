@@ -426,6 +426,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # ichimoku_cloud — underperforms RS standalone (50% WR vs 70%), lowered to 0.5
     ('ichimoku_long',  'ichimoku+'):  0.5,
     ('ichimoku_short', 'ichimoku-'):  0.5,
+    # btc_wave_detector — BTC EMA300 crossover + volume surge (high-conviction wave pattern)
+    ('btc_wave_long', 'btc-wave+'):  1.5,  # boosted for hotset competitiveness (tsunami, not ripple)
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

@@ -31,6 +31,7 @@ from hermes_constants import (
     RANGE_REVERSION_ENABLED,
     RANGE_REVERSION_PLUS_ENABLED, RANGE_REVERSION_MINUS_ENABLED,
     COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
+    BTC_WAVE_DETECTOR_ENABLED,
 )
 
 
@@ -186,6 +187,11 @@ try:
 except Exception:
     _coiled_spring_run = None
 
+try:
+    from signals.btc_wave_detector import run as _btc_wave_detector_run
+except Exception:
+    _btc_wave_detector_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -223,6 +229,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'range_reversion_long',       'enabled': 'RANGE_REVERSION_PLUS_ENABLED',  'run': _range_reversion_long_run},
     {'name': 'range_reversion_short',      'enabled': 'RANGE_REVERSION_MINUS_ENABLED', 'run': _range_reversion_short_run},
     {'name': 'coiled_spring',             'enabled': 'COILED_SPRING_ENABLED',         'run': _coiled_spring_run},
+    {'name': 'btc_wave_detector',         'enabled': 'BTC_WAVE_DETECTOR_ENABLED',     'run': _btc_wave_detector_run},
 ]
 
 

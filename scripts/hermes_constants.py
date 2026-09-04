@@ -848,6 +848,27 @@ TIDE_SHORT_WR_WINDOW = 10        # trades for confirmation
 TIDE_SHORT_WR_THRESHOLD_HIGH = 55
 TIDE_SHORT_WR_THRESHOLD_LOW = 45
 
+# ── BTC Wave Detector (2026-09-04) ───────────────────────────────────────────
+# Detects the "wave pattern": BTC crosses above EMA300, holds for N minutes,
+# and volume begins accelerating. High-conviction LONG setup.
+# Plan: plans/2026-09-04_btc-wave-pattern-surfer.md
+# Backtest: 193 crossings, 52.9% base WR, 69.2% filtered (duration>120min + vol>5x)
+BTC_WAVE_DETECTOR_ENABLED = False   # start disabled, paper trade first
+BTC_WAVE_EMA_PERIOD = 300           # EMA period for crossover detection
+BTC_WAVE_HOLD_BARS = 60             # consecutive 1m bars above EMA300 (60 min)
+BTC_WAVE_VOLUME_MULT = 1.5          # 5m volume avg must be >= 1.5x of 1h avg
+BTC_WAVE_COOLDOWN_HOURS = 4         # hours between signals
+BTC_WAVE_MIN_CANDLES = 400          # minimum 1m candles needed (EMA300 + buffer)
+BTC_WAVE_ZSCORE_MAX = 2.0           # don't enter if z-score > 2.0 (overbought)
+BTC_WAVE_EMA_SLOPE_MIN = -0.2       # min EMA300 slope % at cross time (-0.2 = slightly down OK)
+BTC_WAVE_PRICE_AGE_MAX = 5          # max minutes since last price update
+BTC_WAVE_STALENESS_MAX = 180        # max seconds since most recent candle
+BTC_WAVE_VOL_SHORT = 5              # short volume window (5m)
+BTC_WAVE_VOL_LONG = 60              # long volume window (1h)
+BTC_WAVE_CONF_BASE = 70             # base confidence
+BTC_WAVE_CONF_CAP = 88              # max confidence (system ceiling)
+BTC_WAVE_CONF_BONUS_SLOPE = 0.01    # EMA300 slope % for confidence bonus
+
 # ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
 # Multi-layer crash detection using leading indicators:
 #   Layer 1: Dynamic price crash (ATR-scaled, not fixed %)
@@ -1084,6 +1105,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
+    'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1775,6 +1797,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
+    'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

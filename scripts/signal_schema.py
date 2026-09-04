@@ -723,6 +723,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
             COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
+            BTC_WAVE_DETECTOR_ENABLED,
         )
         from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
         # Fast path: if source is blocklisted, blacklist layer already caught it
@@ -1733,6 +1734,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import PUMP_CATCHER_MINUS_ENABLED
                     if not PUMP_CATCHER_MINUS_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CATCHER_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # btc-wave (BTC EMA300 crossover + volume surge)
+            if _comp == 'btc-wave+' and not BTC_WAVE_DETECTOR_ENABLED:
+                try:
+                    from hermes_constants import BTC_WAVE_DETECTOR_ENABLED
+                    if not BTC_WAVE_DETECTOR_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BTC_WAVE_DETECTOR_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
