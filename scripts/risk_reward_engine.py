@@ -635,9 +635,11 @@ def _compute_score(rr_ratio, vol_width, liquidity, sr_map, direction='LONG'):
             else:
                 score += 5   # no clear target nearby
         else:
-            score += 0      # no relevant S/R levels in trade direction
+            # No resistance above (LONG) or support below (SHORT) = room to run
+            # This is GOOD for trend trades — no ceiling/floor to hit
+            score += 20  # near full points — clear air trade
     else:
-        score += 0      # no S/R data at all
+        score += 0      # no S/R data at all (can't assess)
 
     # Grade
     if score >= 80:
