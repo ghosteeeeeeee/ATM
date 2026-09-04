@@ -97,8 +97,16 @@ EXIT_TIER2_STATES_DEGRADED = 2  # 2+ states degrade = close 50%
 EXIT_TIER3_EMA_BREAK = 3     # candles below EMA300 = close all
 
 # ── Position Sizing ───────────────────────────────────────────────────────────
-MAX_POSITION_USD = 50         # max position in USD (start small)
-LEVERAGE = 10                 # leverage multiplier
+MAX_POSITION_USD = 11          # HL minimum — start with one tiny position
+LEVERAGE = 10                  # leverage multiplier
+MAX_CONTINUUM_POSITIONS = 1    # ONLY 1 position at a time — no accumulation
+
+# ── Rate Limiting (anti pump_hunter) ──────────────────────────────────────────
+MIN_TIME_BETWEEN_TRADES = 3600   # 1 hour minimum between any trade (entry or exit)
+MIN_TIME_BETWEEN_ENTRIES = 7200   # 2 hours minimum between new entries
+MIN_TIME_BETWEEN_EXITS = 600      # 10 minutes minimum between exits
+MAX_TRADES_PER_DAY = 6            # max 6 trades per day (3 round trips)
+COOLDOWN_AFTER_LOSS = 7200        # 2 hour cooldown after a losing trade
 
 # ── Tick Interval ─────────────────────────────────────────────────────────────
 TICK_INTERVAL = 30            # seconds between state updates

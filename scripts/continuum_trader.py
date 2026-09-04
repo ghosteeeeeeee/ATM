@@ -26,6 +26,9 @@ from continuum_constants import (
     TICK_INTERVAL, MAX_POSITION_USD, LEVERAGE,
     POSITION_TAG, POSITION_FILE,
     SCORE_NO_TRADE, SCORE_EXIT_THRESHOLD,
+    MAX_CONTINUUM_POSITIONS,
+    MIN_TIME_BETWEEN_TRADES, MIN_TIME_BETWEEN_ENTRIES,
+    MIN_TIME_BETWEEN_EXITS, MAX_TRADES_PER_DAY, COOLDOWN_AFTER_LOSS,
 )
 from _secrets import BRAIN_DB_DICT
 
@@ -171,6 +174,65 @@ class ContinuumTrader:
         self.engine = ContinuumEngine('BTC')
         self.last_entry_phase = 0
         self.last_position_side = 'NONE'
+        self.last_trade_time = 0
+        self.last_entry_time = 0
+        self.last_exit_time = 0
+        self.trades_today = 0
+        self.last_loss_time = 0
+        self.last_trade_date = None
+        
+    def _can_trade(self) -> tuple:
+        """Check if we're allowed to trade. Returns (can_trade, reason)."""
+        now = time.time()
+        today = datetime.now(timezone.utc).date()
+        
+        # Reset daily counter
+        if self.last_trade_date != today:
+            self.trades_today = 0
+            self.last_trade_date = today
+        
+        # Check daily limit
+        if self.trades_today >= MAX_TRADES_PER_DAY:
+            return False, f"Daily limit reached ({MAX_TRADES_PER_DAY})"
+        
+        # Check cooldown after loss
+        if now - self.last_loss_time < COOLDOWN_AFTER_LOSS:
+            remaining = int((COOLDOWN_AFTER_LOSS - (now - self.last_loss_time)) / 60)
+            return False, f"Loss cooldown ({remaining}m remaining)"
+        
+        # Check min time between trades
+        if now - self.last_trade_time < MIN_TIME_BETWEEN_TRADES:
+            remaining = int((MIN_TIME_BETWEEN_TRADES - (now - self.last_trade_time)) / 60)
+            return False, f"Trade cooldown ({remaining}m remaining)"
+        
+        return True, "OK"
+    
+    def _can_enter(self) -> tuple:
+        """Check if we can open a new position."""
+        now = time.time()
+        
+        # Check position limit
+        positions = get_our_positions()
+        if len(positions) >= MAX_CONTINUUM_POSITIONS:
+            return False, f"Position limit ({len(positions)}/{MAX_CONTINUUM_POSITIONS})"
+        
+        # Check min time between entries
+        if now - self.last_entry_time < MIN_TIME_BETWEEN_ENTRIES:
+            remaining = int((MIN_TIME_BETWEEN_ENTRIES - (now - self.last_entry_time)) / 60)
+            return False, f"Entry cooldown ({remaining}m remaining)"
+        
+        return True, "OK"
+    
+    def _can_exit(self) -> tuple:
+        """Check if we can close a position."""
+        now = time.time()
+        
+        # Check min time between exits
+        if now - self.last_exit_time < MIN_TIME_BETWEEN_EXITS:
+            remaining = int((MIN_TIME_BETWEEN_EXITS - (now - self.last_exit_time)) / 60)
+            return False, f"Exit cooldown ({remaining}m remaining)"
+        
+        return True, "OK"
         
     def run_tick(self):
         """Run one tick of the continuum trader."""
@@ -194,17 +256,31 @@ class ContinuumTrader:
         self.last_position_side = state.position_side
         
         # Print status
+        positions = get_our_positions()
+        pos_count = len(positions)
         print(f"[TRADER] {state.ts} | "
               f"Price:{state.price:.1f} | "
               f"Score:{state.state_score:.1f} | "
               f"Phase:{state.entry_phase} | "
-              f"Pos:{state.position_side} | "
+              f"Pos:{pos_count}/{MAX_CONTINUUM_POSITIONS} | "
               f"LinReg:{state.linreg_slope_state}({state.linreg_direction}) | "
+              f"Trades:{self.trades_today}/{MAX_TRADES_PER_DAY} | "
               f"{'PAPER' if PAPER_MODE else 'LIVE'}")
     
     def _handle_entry(self, state: ContinuumState):
         """Handle entry signal."""
         side = 'LONG' if state.ema300_position == 'ABOVE' else 'SHORT'
+        
+        # Check rate limits
+        can_trade, reason = self._can_trade()
+        if not can_trade:
+            print(f"[TRADER] ENTRY BLOCKED: {reason}")
+            return
+        
+        can_enter, reason = self._can_enter()
+        if not can_enter:
+            print(f"[TRADER] ENTRY BLOCKED: {reason}")
+            return
         
         # Calculate position size based on score
         size_pct = state.position_size_pct / 100
@@ -215,6 +291,9 @@ class ContinuumTrader:
         if PAPER_MODE:
             print(f"[TRADER] PAPER TRADE: {side} ${size_usd:.0f} @ {state.price:.1f}")
             track_entry(side, state.price, size_usd, order_id='PAPER')
+            self.last_trade_time = time.time()
+            self.last_entry_time = time.time()
+            self.trades_today += 1
         else:
             if not is_live_trading_enabled():
                 print("[TRADER] Live trading disabled (kill switch)")
@@ -224,6 +303,9 @@ class ContinuumTrader:
             if result.get('success'):
                 print(f"[TRADER] ORDER PLACED: {side} ${size_usd:.0f} @ {state.price:.1f}")
                 track_entry(side, state.price, size_usd, order_id=result.get('order_id'))
+                self.last_trade_time = time.time()
+                self.last_entry_time = time.time()
+                self.trades_today += 1
             else:
                 print(f"[TRADER] ORDER FAILED: {result.get('error')}")
     
@@ -231,6 +313,17 @@ class ContinuumTrader:
         """Handle exit signal."""
         positions = get_our_positions()
         if not positions:
+            return
+        
+        # Check rate limits
+        can_trade, reason = self._can_trade()
+        if not can_trade:
+            print(f"[TRADER] EXIT BLOCKED: {reason}")
+            return
+        
+        can_exit, reason = self._can_exit()
+        if not can_exit:
+            print(f"[TRADER] EXIT BLOCKED: {reason}")
             return
         
         for pos in positions:
@@ -242,6 +335,12 @@ class ContinuumTrader:
             if PAPER_MODE:
                 print(f"[TRADER] PAPER EXIT: {pos['side']} @ {state.price:.1f} | PnL: ${pnl:+.2f}")
                 track_exit(pos['entry_price'], state.price, pnl)
+                self.last_trade_time = time.time()
+                self.last_exit_time = time.time()
+                self.trades_today += 1
+                if pnl < 0:
+                    self.last_loss_time = time.time()
+                    print(f"[TRADER] Loss recorded — {int(COOLDOWN_AFTER_LOSS/60)}m cooldown active")
             else:
                 if not is_live_trading_enabled():
                     print("[TRADER] Live trading disabled (kill switch)")
@@ -251,6 +350,12 @@ class ContinuumTrader:
                 if result.get('success'):
                     print(f"[TRADER] POSITION CLOSED: PnL ${pnl:+.2f}")
                     track_exit(pos['entry_price'], state.price, pnl)
+                    self.last_trade_time = time.time()
+                    self.last_exit_time = time.time()
+                    self.trades_today += 1
+                    if pnl < 0:
+                        self.last_loss_time = time.time()
+                        print(f"[TRADER] Loss recorded — {int(COOLDOWN_AFTER_LOSS/60)}m cooldown active")
                 else:
                     print(f"[TRADER] CLOSE FAILED: {result.get('error')}")
     
