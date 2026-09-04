@@ -32,6 +32,7 @@ from hermes_constants import (
     RANGE_REVERSION_PLUS_ENABLED, RANGE_REVERSION_MINUS_ENABLED,
     COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
     BTC_WAVE_DETECTOR_ENABLED,
+    PUMP_FLOW_ENABLED,
 )
 
 
@@ -192,6 +193,11 @@ try:
 except Exception:
     _btc_wave_detector_run = None
 
+try:
+    from signals.pump_flow_signal import run as _pump_flow_signal_run
+except Exception:
+    _pump_flow_signal_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -230,13 +236,15 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'range_reversion_short',      'enabled': 'RANGE_REVERSION_MINUS_ENABLED', 'run': _range_reversion_short_run},
     {'name': 'coiled_spring',             'enabled': 'COILED_SPRING_ENABLED',         'run': _coiled_spring_run},
     {'name': 'btc_wave_detector',         'enabled': 'BTC_WAVE_DETECTOR_ENABLED',     'run': _btc_wave_detector_run},
+    {'name': 'pump_flow_signal',          'enabled': 'PUMP_FLOW_ENABLED',             'run': _pump_flow_signal_run},
 ]
 
 
 # ── Registry Accessors ─────────────────────────────────────────────────────────
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud'}
+# pump_flow_signal reads from state file, runs on slow cadence
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'pump_flow_signal'}
 
 
 def _resolve_enabled(entry):

@@ -2667,3 +2667,24 @@ TOKEN_AMP_CLASS = {
 def get_token_amp_class(token):
     """Get amplitude class for a token. Returns 'MED_AMP' for unknown tokens (conservative default)."""
     return TOKEN_AMP_CLASS.get(token.upper(), 'MED_AMP')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PUMP FLOW CHAIN — Capital Rotation Signal
+# ═══════════════════════════════════════════════════════════════════════════════
+# Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
+# patterns are detected with high confidence.
+PUMP_FLOW_ENABLED = True               # master kill-switch
+PUMP_FLOW_PLUS_ENABLED = True          # LONG direction
+PUMP_FLOW_MINUS_ENABLED = True         # SHORT direction
+PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
+PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
+PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
+PUMP_FLOW_MIN_CHAIN_LIFT = 1.3         # minimum chain lift for recommendation
+PUMP_FLOW_MIN_CHAIN_CO_FIRES = 5       # minimum historical co-fires for chain
+PUMP_FLOW_COOLDOWN_HOURS = 4           # per-token cooldown after pump flow signal
+PUMP_FLOW_MAX_PER_CYCLE = 3            # max pump flow signals per pipeline run
+PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
+PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity
+PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
+PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal

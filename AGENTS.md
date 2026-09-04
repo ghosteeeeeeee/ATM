@@ -211,6 +211,7 @@ All dashboards served by nginx on port 54321.
 | Signals | `/signals.html` | `signals.json` | 1min |
 | Copy Trader | `/copy_trader.html` | `copy_trader.json` | 1min |
 | Coin Tracker | `/coin_tracker.html` | `coin_tracker_data.json` | 5min |
+| Pump Flow | `/pump_flow.html` | `pump_flow_data.json` | 2min |
 
 **File locations:**
 - HTML: `/root/.hermes/web/*.html` → copied to `/var/www/hermes/*.html`
