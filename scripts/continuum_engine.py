@@ -40,6 +40,7 @@ from continuum_constants import (
     SCORE_WEIGHTS, SCORE_EXIT_THRESHOLD,
     EXIT_TIER3_EMA_BREAK,
     POSITION_TAG, POSITION_FILE,
+    TICK_INTERVAL,
 )
 
 # ── Derived paths ──────────────────────────────────────────────────────────────
@@ -115,17 +116,6 @@ class LinregSlope(Enum):
     FLAT = 'FLAT'               # -0.02% to 0.02%
     DOWN = 'DOWN'               # -0.10% to -0.02%
     STEEP_DOWN = 'STEEP_DOWN'   # < -0.10%
-
-# ── State Hysteresis Config ────────────────────────────────────────────────────
-# Per-state hysteresis: (candles_to_turn_ON, candles_to_turn_OFF)
-
-HYSTERESIS = {
-    'ema300_position': (5, 3),      # 5 candles above to turn ON, 3 below to turn OFF
-    'zscore_tier': (3, 5),          # 3 candles to confirm, 5 to deconfirm
-    'volume_regime': (3, 5),        # 3 candles of high vol to confirm
-    'velocity': (3, 3),             # symmetric
-    'acceleration': (3, 3),         # symmetric
-}
 
 # ── Indicator Functions ────────────────────────────────────────────────────────
 
@@ -289,7 +279,7 @@ def linreg_slope_multi_tf(closes_1m: List[float], closes_5m: List[float] = None,
 
 def classify_ema300_position(price: float, ema300: float) -> EMA300Position:
     """Classify price relative to EMA300."""
-    if price > ema300 * 1.001:  # 0.1% buffer to avoid noise
+    if price > ema300 * (1 + EMA300_ABOVE_BUFFER):  # buffer to avoid noise
         return EMA300Position.ABOVE
     elif price < ema300 * 0.999:
         return EMA300Position.BELOW
@@ -478,6 +468,7 @@ class ContinuumEngine:
         self.ema300_direction = None  # 'ABOVE' or 'BELOW'
         self.ema300_duration = 0
         self.last_ema300_price = None
+        self.last_cross_ts = 0
         
         # Entry state machine
         self.entry_phase = 0
@@ -538,7 +529,10 @@ class ContinuumEngine:
     
     def _read_candles(self, timeframe: str, limit: int = 400) -> List[dict]:
         """Read recent candles from DB."""
+        # Validate timeframe to prevent SQL injection
+        assert timeframe in ('1m', '5m', '15m', '1h', '4h'), f"Invalid timeframe: {timeframe}"
         table = f'candles_{timeframe}'
+        conn = None
         try:
             conn = sqlite3.connect(CANDLES_DB)
             cur = conn.execute(
@@ -547,20 +541,25 @@ class ContinuumEngine:
                 (self.token, limit)
             )
             rows = cur.fetchall()
-            conn.close()
-            # Return oldest-first
-            return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 
-                     'close': r[4], 'volume': r[5]} for r in reversed(rows)]
+            cur.close()
+            # Return oldest-first, ensure numeric types
+            return [{'ts': int(r[0]), 'open': float(r[1]), 'high': float(r[2]), 
+                     'low': float(r[3]), 'close': float(r[4]), 
+                     'volume': float(r[5])} for r in reversed(rows)]
         except Exception as e:
             print(f"Error reading candles: {e}")
             return []
+        finally:
+            if conn:
+                conn.close()
     
     def _read_live_price(self) -> Optional[float]:
         """Read live price from hl_cache.json."""
         try:
             with open(HL_CACHE_FILE) as f:
                 cache = json.load(f)
-            return cache.get('allMids', {}).get(self.token)
+            price = cache.get('allMids', {}).get(self.token)
+            return float(price) if price is not None else None
         except Exception:
             return None
     
@@ -583,9 +582,9 @@ class ContinuumEngine:
         # Use live price if available, otherwise last candle close
         live_price = self._read_live_price()
         if live_price:
-            closes.append(live_price)
-        
-        price = closes[-1]
+            price = live_price
+        else:
+            price = closes[-1]
         
         # Compute indicators
         ema300_val = ema(closes, 300)
@@ -593,7 +592,7 @@ class ContinuumEngine:
             print("Not enough data for EMA300")
             return None
         
-        z = zscore(closes, lookback=120)
+        z = zscore(closes, lookback=ZSCORE_LOOKBACK)
         vel = velocity_5m(closes)
         acc = acceleration(closes)
         vol_ratio = volume_ratio(volumes, avg_period=60)
@@ -830,7 +829,7 @@ class ContinuumEngine:
         if rsi_val is None or atr_pct is None:
             return 'NEUTRAL'
         
-        if rsi_val > 60 and atr_pct > 0.5 and (vol_ratio or 1) > 1.5:
+        if rsi_val > 60 and atr_pct > 0.5 and (vol_ratio if vol_ratio is not None else 1) > 1.5:
             return 'STORMY'
         elif rsi_val < 40 and atr_pct > 0.5:
             return 'STORMY'
@@ -947,13 +946,13 @@ class ContinuumEngine:
         
         # Phase 0 → 1: EMA300 cross detected
         if self.entry_phase == 0:
-            if state.ema300_duration >= 5:
+            if state.ema300_duration >= ENTRY_CROSS_MIN_DURATION:
                 self.entry_phase = 1
                 print(f"[CONTINUUM] Phase 1: {side} EMA300 cross detected, duration={state.ema300_duration}")
         
         # Phase 1 → 2: Confirmed above/below (60+ minutes)
         if self.entry_phase == 1:
-            if state.ema300_duration >= 60:
+            if state.ema300_duration >= ENTRY_CONFIRM_MIN_DURATION:
                 self.entry_phase = 2
                 print(f"[CONTINUUM] Phase 2: {side} confirmed, duration={state.ema300_duration}")
             elif state.ema300_duration < 3:
@@ -997,7 +996,7 @@ class ContinuumEngine:
         """
         # Tier 3: Entry state machine breaks
         if self.position_side == 'LONG' and state.ema300_position == 'BELOW':
-            if state.ema300_duration >= 3:  # Below for 3+ candles
+            if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:  # Below for N candles
                 print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (below for {state.ema300_duration} candles)")
                 self.position_side = 'NONE'
                 self.position_size_pct = 0
@@ -1005,7 +1004,7 @@ class ContinuumEngine:
                 return
         
         if self.position_side == 'SHORT' and state.ema300_position == 'ABOVE':
-            if state.ema300_duration >= 3:
+            if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:
                 print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (above for {state.ema300_duration} candles)")
                 self.position_side = 'NONE'
                 self.position_size_pct = 0
@@ -1013,7 +1012,7 @@ class ContinuumEngine:
                 return
         
         # Score-based exit
-        if state.state_score < 20:
+        if state.state_score < SCORE_EXIT_THRESHOLD:
             print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Score below 20: {state.state_score:.1f}")
             self.position_side = 'NONE'
             self.position_size_pct = 0
@@ -1033,7 +1032,7 @@ class ContinuumEngine:
                  wyckoff_phase, ewave_count, trend_quality, market_phase,
                  state_score, entry_phase, position_side, position_size_pct,
                  consecutive_above, consecutive_below, last_cross_ts)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 state.token, state.timeframe, state.ts, state.price, state.ema300,
                 state.zscore_val, state.velocity_val, state.acceleration_val,
@@ -1059,20 +1058,26 @@ class ContinuumEngine:
                 (self.token,)
             )
             row = cur.fetchone()
+            cur.close()
             if row:
                 return ContinuumState(
                     token=row[1], timeframe=row[2], ts=row[3],
                     price=row[4], ema300=row[5], zscore_val=row[6],
                     velocity_val=row[7], acceleration_val=row[8],
-                    volume_ratio_val=row[9], ema300_position=row[10],
-                    ema300_duration=row[11], zscore_tier=row[12],
-                    volume_regime=row[13], velocity_state=row[14],
-                    acceleration_state=row[15], wyckoff_phase=row[16],
-                    ewave_count=row[17], trend_quality=row[18],
-                    market_phase=row[19], state_score=row[20],
-                    entry_phase=row[21], position_side=row[22],
-                    position_size_pct=row[23], consecutive_above=row[24],
-                    consecutive_below=row[25], last_cross_ts=row[26]
+                    volume_ratio_val=row[9],
+                    linreg_1m_slope=row[10], linreg_5m_slope=row[11],
+                    linreg_15m_slope=row[12], linreg_1h_slope=row[13],
+                    linreg_alignment=row[14],
+                    ema300_position=row[15], ema300_duration=row[16],
+                    zscore_tier=row[17], volume_regime=row[18],
+                    velocity_state=row[19], acceleration_state=row[20],
+                    linreg_slope_state=row[21], linreg_direction=row[22],
+                    wyckoff_phase=row[23], ewave_count=row[24],
+                    trend_quality=row[25], market_phase=row[26],
+                    state_score=row[27], entry_phase=row[28],
+                    position_side=row[29], position_size_pct=row[30],
+                    consecutive_above=row[31], consecutive_below=row[32],
+                    last_cross_ts=row[33],
                 )
         except Exception as e:
             print(f"Error reading state: {e}")
@@ -1162,6 +1167,7 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
     # Simulate
     closes = []
     volumes = []
+    score = 50.0  # Initialize in case < 300 candles
     
     for i, candle in enumerate(target_candles):
         closes.append(candle['close'])
@@ -1172,7 +1178,7 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
         
         # Compute indicators directly (not from DB)
         ema300_val = ema(closes, 300)
-        z = zscore(closes, lookback=120)
+        z = zscore(closes, lookback=ZSCORE_LOOKBACK)
         vel = velocity_5m(closes)
         acc = acceleration(closes)
         
@@ -1274,10 +1280,10 @@ def backtest(token: str = 'BTC', date_str: str = '2026-09-03'):
         engine._update_entry_machine(ContinuumState(
             token=token, timeframe='1m', ts=candle['ts'],
             price=price, ema300=ema300_val,
-            zscore_val=z if z else 0,
-            velocity_val=vel if vel else 0,
-            acceleration_val=acc if acc else 0,
-            volume_ratio_val=vol_ratio if vol_ratio else 1,
+            zscore_val=z if z is not None else 0,
+            velocity_val=vel if vel is not None else 0,
+            acceleration_val=acc if acc is not None else 0,
+            volume_ratio_val=vol_ratio if vol_ratio is not None else 1,
             ema300_position=ema_pos.value,
             ema300_duration=engine.ema300_duration,
             zscore_tier=raw_z.value,
