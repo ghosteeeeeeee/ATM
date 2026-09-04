@@ -238,14 +238,38 @@ Generated: 2026-09-02 04:30 UTC
 
 ---
 
+### 2026-09-04: Level 1 Implementation Wave (Upgrade Implementer)
+
+| Task | Status | Lines | Notes |
+|------|--------|-------|-------|
+| amplitude_cache.py — rolling amplitude cache | ✅ DONE | 220 | 30 tokens, P50/P75/P90/P95 percentiles, dynamic SL function |
+| regime_params.py — regime-aware param overrides | ✅ DONE | 150 | Infrastructure only (backtest before live deployment) |
+| Copy trader time-of-day filter | SKIP | — | Signal already killed (HL_COPY_SIGNAL_ENABLED=False), filter exists but disabled |
+| hl_reconciliation.py | SKIP | — | Needs HL API credentials, separate scope |
+
+**amplitude_cache.py** outputs: per-token amplitude class, avg/p50/p75/p90/p95 amplitude, wave period stats.
+**regime_params.py** outputs: per-token volatility regime detection + param overrides for accel_300_v3_long/short.
+
+---
+
 ## Summary
 
 | Metric | Count |
 |--------|-------|
-| Plans scanned | 22 |
-| IMPLEMENTED | 9 |
+| Plans scanned | 48 |
+| IMPLEMENTED | 10 |
 | PARTIAL | 4 |
+| INFRASTRUCTURE BUILT | 2 (amplitude_cache, regime_params) |
 | NOT IMPLEMENTED | 2 |
-| SKIPPED | 2 |
+| SKIPPED | 3 |
 | UNKNOWN | 5 |
-| **Success rate** | **9/15 evaluable (60%)** |
+| **Success rate** | **10/16 evaluable (63%)** |
+
+### Top Candidates (Next)
+
+| Plan | Difficulty | Value | Why |
+|------|-----------|-------|-----|
+| Regime params integration into accel_300_v3 | Level 2 | HIGH | Infrastructure built, needs signal file hookup + backtest |
+| Amplitude cache → signal_compactor integration | Level 1 | HIGH | Use rolling amplitude instead of static TOKEN_AMP_CLASS |
+| Dynamic SL in position_manager | Level 2 | HIGH | Use amplitude_cache.get_dynamic_sl() for per-token stops |
+| Ponytail audit Phase 3 (core refactoring) | Level 3 | HIGH | ~3500 lines of duplicated logic to consolidate |
