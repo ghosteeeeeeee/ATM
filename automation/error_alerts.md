@@ -2109,3 +2109,10 @@ ALERTS:
 - **[WARN]** (3x/30min): `signal_compactor: timed out` — transient, completes on retry (0.24s on latest successful run). Not blocking pipeline.
 - **[INFO]** Disk at 83% — approaching WARN threshold (85%). No action yet.
 - **AUTO-FIX**: None required — all issues non-blocking.
+
+## Error Alerts — 2026-09-04 05:25 UTC
+- **CRITICAL** (continuous): `UnboundLocalError: cannot access local variable 'BRAIN_DB_DICT'` in `decider_run.py:2474` — local import at line 3185 shadowed module-level import, causing every pipeline run to fail rate-limit check
+- **AUTO-FIX**: Removed redundant local `from _secrets import BRAIN_DB_DICT` at line 3185 inside `run()`. Module-level import at line 19 already provides the variable. Pipeline restarted.
+- **WARN** (1x): `signal_compactor: timed out` at 05:21:02 — one-off, not recurring
+- **WARN** (recurring): `hotset fallback DB query returned 0 tokens` — hotset DB empty, may need investigation
+- **INFO**: Disk at 84% (93G/118G) — monitoring, no action needed yet

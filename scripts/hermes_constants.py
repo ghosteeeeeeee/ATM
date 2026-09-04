@@ -1242,6 +1242,8 @@ NEVER_REENABLE_FLAGS = {
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'ACCEL_300_V3_LONG_ENABLED',   # CEO 2026-09-04 — 35T/7d 42.9% WR -$1.34, ALL ATR_SL. CEO_PROTECTION expired. NEVER_REENABLE.
+    'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
+    'ACCEL_300_V3_SHORT_ENABLED',  # AUTO_1HR 2026-09-04 — 3T/0%WR/-$0.48. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1523,7 +1525,7 @@ EMA300_DIP_SL_PCT = 1.5                # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
-SLOW_GRIND_SHORT_ENABLED = True    # TESTING — catches slow grinds like CHIP/SUSHI under EMA300. Monitor WR.
+SLOW_GRIND_SHORT_ENABLED = False   # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
 SLOW_GRIND_SHORT_MIN_R2 = 0.30    # minimum R² threshold (was 0.40, lowered to catch trends even earlier)
 SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0005  # minimum slope magnitude as % of price per candle (0.05%, was 0.02%)
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking

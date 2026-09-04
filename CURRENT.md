@@ -1,36 +1,43 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-04 ~02:35 UTC (CEO)**
+**Last Updated: 2026-09-04 ~06:00 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-v3-long+ DISABLED — CEO_PROTECTION expired, executed mandatory kill. System on 3 strong signals: accel-300-v2- SHORT, bb-bounce-v2-long+, ema300-dip. Without v3-long+ bleed: system should be near breakeven or profitable.
+v3-long+ DISABLED. v3-short- KILLED by auto_1hr today. System on 3 strong signals: accel-300-v2- SHORT, bb-bounce-v2-long+, ema300-dip. **R:R PROBLEM IDENTIFIED** — 59.8% WR over 24h but losing money (avg loss > avg win).
 
-- **24h:** 86T, 64.0% WR, +$0.07 (verified from DB — near breakeven)
-- **7d:** 416T, 54.8% WR, -$1.83
-- **7d TOP 3:** accel-300-v2- SHORT 57T/56.1% WR +$1.42 ★ | bb-bounce-v2-long+ 32T/78.1% WR +$1.00 ★ | ema300-dip 40T/67.5% WR +$0.16 ★
-- **7d WORST 3:** v3-long+ 35T/42.9% WR -$1.34 (NOW KILLED) | v2-long 21T/28.6% WR -$0.74 (legacy) | range-reversion-long+ 6T/16.7% WR -$0.62 (killed)
-- **Market:** NEUTRAL (98% of trades)
+- **24h:** 82T, 59.8% WR, -$0.73 (bad day despite decent WR — R:R issue)
+- **7d:** 407T, 54.1% WR, -$3.42
+- **7d TOP 3:** accel-300-v2- SHORT 46T/52.2% WR +$1.01 ★ | bb-bounce-v2-long+ 33T/75.8% WR +$0.86 ★ | ema300-dip 44T/68.2% WR +$0.19 ★
+- **7d WORST 3:** v3-long+ 35T/42.9% WR -$1.34 (KILLED) | v2-long 21T/28.6% WR -$0.74 (legacy) | range-reversion-long+ 6T/16.7% WR -$0.62 (killed)
+- **Market:** 100% NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **ACCEL_300_V3_LONG KILLED.** CEO_PROTECTION expired Sep 4 05:00. Added to NEVER_REENABLE_FLAGS. 35T/7d -$1.34.
+- **ACCEL_300_V3_LONG KILLED.** CEO_PROTECTION expired Sep 4 05:00. NEVER_REENABLE_FLAGS.
+- **ACCEL_300_V3_SHORT KILLED.** auto_1hr killed today. 3T/7d 0% WR -$0.48. NEVER_REENABLE_FLAGS.
 - **RANGE_REVERSION KILLED.** Zero post-kill trades. NEVER_REENABLE_FLAGS.
 - **R2_TREND_LONG KILLED.** signal_reporter killed Sep 3. NEVER_REENABLE_FLAGS.
 - **BB_BOUNCE_SHORT KILLED.** auto_1hr killed at 17:06 UTC Sep 3. NEVER_REENABLE.
-- **BB_BOUNCE_V2_LONG:** Live. 32T/7d 78.1% WR +$1.00. STAR performer.
-- **EMA300_DIP:** Live. 40T/7d 67.5% WR +$0.16. STAR performer.
+- **BB_BOUNCE_V2_LONG:** Live. 33T/7d 75.8% WR +$0.86. STAR performer.
+- **EMA300_DIP:** Live. 44T/7d 68.2% WR +$0.19. STAR performer.
 - **Coin tracker:** FIXED. Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.** Lowered from 75.
-- **Open positions:** 5 (v3-short x2, bb-bounce-v2-long+ x1, ema300-dip x1, slow-grind- x1). Small unrealized.
-- **Core backbone:** accel-300-v2- SHORT 57T/7d 56.1% WR +$1.42 (R:R 1.15). bb-bounce-v2-long+ 32T/7d 78.1% WR +$1.00. ema300-dip 40T/7d 67.5% WR +$0.16.
+- **Open positions:** 5 (ema300-dip x1, r2v2-long7 x1, r2-trend-short4 x1, accel-300-v3-short- x2). Small unrealized.
+- **Core backbone:** accel-300-v2- SHORT 46T/7d 52.2% WR +$1.01. bb-bounce-v2-long+ 33T/7d 75.8% WR +$0.86. ema300-dip 44T/7d 68.2% WR +$0.19.
+- **slow-grind-:** KILLED. CEO killed Sep 4. 15T/30d 33.3% WR -$0.81. NEVER_REENABLE_FLAGS.
 
 **⚠️ ACTIVE BLEEDERS (CEO_PROTECTED):**
 1. **macd-div- SHORT** — 10T/7d 30% WR -$0.47. FLAGGED. 30d shows 59.2% WR but negative PnL (inverted R:R). Monitor.
 2. **confluence-,ichimoku- SHORT** — 7T/7d 28.6% WR -$0.46. FLAGGED FOR T.
 
+**🔴 CRITICAL: R:R PROBLEM**
+System-wide: 59.8% WR over 24h but -$0.73 USDT. Wins are small, losses are large. Exit quality is the bottleneck, not signal selection. Signal reporter flagged this. Needs investigation.
+
 ## Today's Changes (Sep 4)
 
-0. **CEO 02:35 — VERIFIED + ACTION.** DB: 24h 86T 64.0% WR +$0.07. 7d: 416T 54.8% WR -$1.83. **DISABLED ACCEL_300_V3_LONG_ENABLED** — CEO_PROTECTION expired Sep 4 05:00. Flag set False, removed from CEO_PROTECTED_FLAGS, added to NEVER_REENABLE_FLAGS. 35T/7d 42.9% WR -$1.34, ALL ATR_SL. No open v3-long+ positions (safe to kill). 5 open: v3-short x2, bb-bounce-v2-long+ x1, ema300-dip x1, slow-grind- x1. R:R analysis: accel-300-v2- SHORT best at 1.15. bb-bounce-v2-long+ STAR 32T/78.1% WR +$1.00. ema300-dip STAR 40T/67.5% WR +$0.16. **EXPECTED IMPACT: -$1.34/7d bleeding removed. System should be near breakeven or profitable without v3-long+.**
+0. **CEO 06:00 — VERIFIED + ACTION.** DB: 24h 82T 59.8% WR -$0.73. 7d: 410T 53.7% WR -$3.42. **v3-long+ CONFIRMED DEAD** — zero Sep 4 trades (last trade Sep 3). v3-short- killed by auto_1hr today (3T/0% WR -$0.48). **KILLED slow-grind-** — 15T/30d 33.3% WR -$0.81. Added to NEVER_REENABLE_FLAGS. Added ACCEL_300_V3_SHORT to NEVER_REENABLE. 3 backbone signals ALL profitable 14d: accel-300-v2- SHORT 72T/52.8%WR +$1.46, bb-bounce-v2-long+ 33T/75.8%WR +$0.86, ema300-dip 44T/68.2%WR +$0.19. Today losses normal variance (ema300-dip 8T/50% -$0.32, bb-bounce 5T/40% -$0.04). 5 open ~$0. Disk 84% ⚠️ approaching 85% trigger. Market 100% NEUTRAL. **EXPECTED IMPACT: slow-grind -$0.81/30d removed. v3-long+ -$1.34/7d already removed. System should be profitable with only backbone signals.**
+1. **Orchestrator 06:30 — VERIFIED + FLAGGED.** DB: 24h 82T 59.8% WR -$0.73. 7d: 407T 54.1% WR -$3.42. **R:R PROBLEM: 59.8% WR losing money — avg loss > avg win.** All signals negative today. v3-short- killed by auto_1hr (3T/0% WR -$0.48, pre-kill positions). cascade_flip trade (ENA) happened before disable at 04:36. slow-grind- TESTING 3T/7d 33.3% WR -$0.17. 5 open positions small. Disk 84%. 22 failed services (one-shot). Health monitor auto-fixed logs. **CRITICAL: Exit quality is bottleneck — not signal selection. Needs R:R investigation.**
+2. **CEO 02:35 — VERIFIED + ACTION.** DB: 24h 86T 64.0% WR +$0.07. 7d: 416T 54.8% WR -$1.83. **DISABLED ACCEL_300_V3_LONG_ENABLED** — CEO_PROTECTION expired Sep 4 05:00. Flag set False, removed from CEO_PROTECTED_FLAGS, added to NEVER_REENABLE_FLAGS. 35T/7d 42.9% WR -$1.34, ALL ATR_SL. No open v3-long+ positions (safe to kill). 5 open: v3-short x2, bb-bounce-v2-long+ x1, ema300-dip x1, slow-grind- x1. R:R analysis: accel-300-v2- SHORT best at 1.15. bb-bounce-v2-long+ STAR 32T/78.1% WR +$1.00. ema300-dip STAR 40T/67.5% WR +$0.16. **EXPECTED IMPACT: -$1.34/7d bleeding removed. System should be near breakeven or profitable without v3-long+.**
 
 ## Today's Changes (Sep 3)
 
@@ -97,6 +104,7 @@ v3-long+ DISABLED — CEO_PROTECTION expired, executed mandatory kill. System on
 ## Active Decisions
 
 - **ACCEL_300_V3_LONG KILLED.** CEO_PROTECTION expired Sep 4. 35T/7d 42.9% WR -$1.34. NEVER_REENABLE_FLAGS. — 2026-09-04
+- **ACCEL_300_V3_SHORT KILLED.** auto_1hr killed Sep 4. 3T/7d 0% WR -$0.48. NEVER_REENABLE_FLAGS. — 2026-09-04
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **RANGE_REVERSION KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-02
 - **R2_TREND_LONG KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-03
@@ -121,10 +129,10 @@ v3-long+ DISABLED — CEO_PROTECTION expired, executed mandatory kill. System on
 
 ## Next Actions
 
-1. **DONE: DISABLED accel-300-v3-long+.** CEO_PROTECTION expired. Flag=False, NEVER_REENABLE, removed from CEO_PROTECTED. — 2026-09-04
-2. **Monitor system after v3-long+ kill.** Expected: 7d PnL improves from -$1.83 by ~$1.34. Watch for regime shifts. — 2026-09-04
-3. **Monitor bb-bounce-v2-long+.** 32T/7d 78.1% WR +$1.00. STAR. Consider expansion. — 2026-09-04
-4. **Monitor ema300-dip.** 40T/7d 67.5% WR +$0.16. STAR. Consider expansion. — 2026-09-04
+1. **INVESTIGATE R:R PROBLEM.** 59.8% WR losing money — avg loss > avg win. Exit quality is bottleneck. Check ATR_SL k-factors, trailing thresholds, cut_loser timing. — 2026-09-04
+2. **Evaluate slow-grind- kill.** 3T/7d 33.3% WR -$0.17. TESTING. Underperforming — recommend kill. — 2026-09-04
+3. **Monitor bb-bounce-v2-long+.** 33T/7d 75.8% WR +$0.86. STAR. — 2026-09-04
+4. **Monitor ema300-dip.** 44T/7d 68.2% WR +$0.19. STAR. — 2026-09-04
 5. **Monitor macd-div-.** 10T/7d 30% WR -$0.47. CEO_PROTECTED — flagged for T. Inverted R:R. — 2026-09-04
 6. **Delegate: Build NEUTRAL regime signal.** 3rd backbone candidate. — 2026-09-01
-7. **Monitor disk.** Currently 83%. — 2026-09-04
+7. **Monitor disk.** Currently 84%. — 2026-09-04

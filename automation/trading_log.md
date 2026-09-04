@@ -1,5 +1,36 @@
 
 
+## [2026-09-04 06:30 UTC] Daily Orchestrator Run
+
+**Pipeline Status:** Running, 5 open | 82 closed today | -24.8% PnL
+**24h:** 82T 59.8% WR -$0.73 USDT
+**7d:** 407T 54.1% WR -$3.42 USDT
+**Market:** 100% NEUTRAL
+**Disk:** 84% (1% from threshold)
+
+**Key Findings:**
+1. **R:R PROBLEM (CRITICAL):** 59.8% WR losing money — avg loss > avg win. Exit quality is bottleneck, not signal selection. All signals negative today. Signal reporter flagged this at 05:10.
+2. **v3-short- killed by auto_1hr:** 3T today (02:07-03:34 UTC, pre-kill). All losers. Added to NEVER_REENABLE.
+3. **cascade_flip trade (ENA):** Happened at 04:36 before CASCADE_FLIP_ENABLED was disabled. Not a bug — cascade was still enabled when trade opened.
+4. **slow-grind-:** TESTING, 3T/7d 33.3% WR -$0.17. Underperforming.
+5. **All signals negative today:** ema300-dip -$0.32, bb-bounce-v2-long+ -$0.04, v3-short- -$0.48, cascade -$0.16, slow-grind -$0.13.
+6. **Open positions:** 5 (ema300-dip ETH LONG -$0.01, r2v2-long7 W LONG +$0.01, r2-trend-short4 GMT SHORT +$0.03, accel-300-v3-short- MET SHORT +$0.16, accel-300-v3-short- INJ SHORT +$0.41).
+
+**Health Monitor (06:23 UTC):** Pipeline OK, 41 signals/hr, 22 failed services (one-shot), auto-fixed logs.
+
+**Signal Reporter (05:10 UTC):** All active signals winners (bb-bounce-v2-long+ 75.8% WR +$0.86/48h, ema300-dip 69.0% WR +$0.26/48h). Key finding: R:R problem — system losing despite 59.3% WR.
+
+**Actions Taken:**
+1. Updated CURRENT.md with fresh data
+2. Added ACCEL_300_V3_SHORT to NEVER_REENABLE_FLAGS
+3. Flagged R:R problem for CEO investigation
+4. Flagged slow-grind- for potential kill
+
+**Next Steps for CEO:**
+1. Investigate R:R problem — ATR_SL k-factors, trailing thresholds, cut_loser timing
+2. Decide on slow-grind- kill (3T/7d 33.3% WR -$0.17)
+3. Consider expansion of bb-bounce-v2-long+ and ema300-dip (STAR performers)
+
 ## [2026-09-03 08:15 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period)
@@ -524,3 +555,59 @@ Final set: ['BIGTIME', 'CHIP', 'FIL', 'ICP', 'JUP', 'LDO', 'MET', 'NOT', 'W', 'X
 **Open Questions:**
 - 24h still negative -$0.97 despite 59.8% WR — SL losses eating profits
 - Short signals collectively 0%WR (all killed or below threshold)
+
+## FAVORITES Update — 2026-09-04 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE BANANA (WR=50.0%, PnL=$-0.03, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ETC (WR=57.1%, PnL=$0.01, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE STX (WR=57.1%, PnL=$-0.14, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BCH (WR=57.1%, PnL=$-0.01, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE DYDX (WR=57.1%, PnL=$-0.21, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE POL (WR=75.0%, AvgPnL=0.61%, Trades=8)
+- PROMOTE GMT (WR=71.4%, AvgPnL=0.19%, Trades=7)
+- PROMOTE ONDO (WR=60.0%, AvgPnL=0.15%, Trades=5)
+
+Final set: ['ASTER', 'BABY', 'DOGE', 'DOT', 'FOGO', 'GMT', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'ONDO', 'POL', 'SEI', 'TURBO', 'USUAL', 'YGG']
+
+## LOSERS Update — 2026-09-04 06:05 UTC
+- REMOVE BIGTIME (insufficient data)
+- ADD CASHCAT (WR=20.0%, PnL=$-0.50, low_wr (20.0%))
+- ADD SAND (WR=40.0%, PnL=$-0.30, low_wr (40.0%))
+- ADD APT (WR=40.0%, PnL=$-0.23, wr_collapse (60.0% → 40.0%))
+- ADD ARB (WR=44.4%, PnL=$-0.19, low_wr (44.4%))
+- ADD ENA (WR=40.0%, PnL=$0.00, low_wr (40.0%))
+
+Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 'MET', 'NOT', 'SAND', 'W', 'XPL', 'ZEN']
+
+## [2026-09-04 07:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1L)
+**PnL:** -$0.11 (0%WR)
+
+**24h:** 84T 59.5%WR
+**24h Exit Breakdown:**
+- profit-monster-trail: 51T +$2.85 (carrying system)
+- atr_sl_hit: 16T -$1.75 (19.5% — healthy)
+- cut-loser-CL-T1: 10T -$1.46 (main drag)
+- hard_sl: 2T -$0.51
+
+**24h Signal Performance:**
+- bb-bounce-v2-long+: 20T 75%WR +$0.66 ✅
+- ema300-dip: 34T 67.6%WR -$0.01 (net flat — trailing covers losses)
+- accel-300-v3-long+: 16T 56.3%WR -$0.13
+- slow-grind-: 2T 50%WR -$0.02
+- accel-300-v3-short-: 3T 0%WR -$0.48 (KILLED)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 19.5% under 40% threshold ✅
+- No 0%WR signal with 3+T last hour (kill criteria not met)
+- Trade freq 1/hr normal (quiet period)
+- 5 open positions ($64.30) all small
+- profit-monster-trail +$2.85 carrying system
+- All previously killed signals remain disabled
+
+**Open Questions:**
+- CL-T1 exits 10T -$1.46 in 24h — 7 from ema300-dip. Signal still net positive via trailing but CL exits erode profits. Consider monitoring if CL-T1 share of exits grows above 15%.
+- 4 consecutive negative hours (03-07 UTC) — choppy NEUTRAL regime, not alarming

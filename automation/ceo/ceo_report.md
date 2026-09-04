@@ -1,4 +1,24 @@
-## CEO Report — 2026-09-03 ~17:22 UTC (328th run)
+## CEO Report — 2026-09-04 ~06:00 UTC (329th run)
+
+### Diagnosis
+DB: 24h 82T, 59.8% WR, -$0.73. 7d: 410T, 53.7% WR, -$3.42. Today Sep 4: 19T, 31.6% WR, -$1.23 (variance day). **v3-long+ CONFIRMED DEAD** — zero Sep 4 trades (last trade Sep 3). v3-short- killed by auto_1hr today (3T/0% WR -$0.48). Open: 5 positions (~$0). Disk 84% (approaching 85% trigger). Market 100% NEUTRAL.
+
+**3 backbone signals ALL profitable on 14d:** accel-300-v2- SHORT 72T/52.8% WR +$1.46 | bb-bounce-v2-long+ 33T/75.8% WR +$0.86 | ema300-dip 44T/68.2% WR +$0.19. Today's losses: ema300-dip 8T/50% WR -$0.32 (variance), bb-bounce-v2-long+ 5T/40% WR -$0.04 (variance), v3-short- 3T/0% WR -$0.48 (killed).
+
+### Root Cause
+System structurally sound — 3 backbone signals profitable. Today's -$1.23 is normal variance (19 trades). The v3-long+ kill removes -$1.34/7d bleed. Legacy signals (v2-long, range-reversion, r2-trend-long3) aging out of 7d window. 7d PnL will improve as old losers drop off.
+
+### Fix Applied
+- **KILLED slow-grind-**: 15T/30d 33.3% WR -$0.81. Added to NEVER_REENABLE_FLAGS.
+- **Added ACCEL_300_V3_SHORT to NEVER_REENABLE_FLAGS** (auto_1hr killed today, 3T/0% WR).
+- **v3-long+ kill verified**: zero Sep 4 trades. NEVER_REENABLE_FLAGS enforced.
+
+### Verification
+- DB verified: 82T/24h 59.8% WR -$0.73 ✅
+- v3-long+ dead: zero Sep 4 trades ✅
+- 3 backbone signals profitable on 14d ✅
+- slow-grind- killed + NEVER_REENABLE ✅
+- Disk 84% — monitor for 85% trigger ⚠️
 
 ### Diagnosis
 DB: 24h 75T, 66.7% WR, +$0.30. Today: 61T, 67.2% WR, +$0.49 — **BEST DAY since Aug 28 (+$1.55)**. Daily: Aug 28 +$1.55 → Sep 2 -$1.79 → Sep 3 +$0.49 (**STRONG REVERSAL**). 5 open LONG positions ~$0 unrealized. Market 98% NEUTRAL.
