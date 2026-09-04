@@ -33,7 +33,7 @@ ZSCORE_STRONG_POS = 1.5
 # ── Volume ────────────────────────────────────────────────────────────────────
 VOLUME_AVG_PERIOD = 60        # candles for rolling volume average
 VOLUME_LOW_THRESHOLD = 0.5    # < 0.5x avg = LOW
-VOLUME_HIGH_THRESHOLD = 2.5    # > 2.5x avg = HIGH (raised from 1.5x)
+VOLUME_HIGH_THRESHOLD = 3.0    # > 3.0x avg = HIGH (filters brief spikes)
 VOLUME_PARABOLIC_THRESHOLD = 3.0  # > 3x avg = PARABOLIC
 
 # ── Velocity ──────────────────────────────────────────────────────────────────
