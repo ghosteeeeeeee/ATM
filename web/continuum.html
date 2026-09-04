@@ -167,11 +167,8 @@ function render() {
     </div>
   `;
 
-  // State cards
+  // State cards (EMA300, Z-Score, Volume already in stats bar)
   const states = [
-    { name: 'EMA300 Position', value: c.ema300_position, detail: c.ema300_duration + ' min', cls: c.ema300_position === 'ABOVE' ? 'active' : c.ema300_position === 'BELOW' ? 'danger' : '' },
-    { name: 'Z-Score Tier', value: c.zscore_tier, detail: c.zscore_val.toFixed(2), cls: c.zscore_tier.includes('STRONG') ? (c.zscore_tier.includes('POS') ? 'active' : 'danger') : '' },
-    { name: 'Volume Regime', value: c.volume_regime, detail: c.volume_ratio_val.toFixed(1) + 'x avg', cls: c.volume_regime === 'PARABOLIC' ? 'active' : c.volume_regime === 'HIGH' ? 'warning' : '' },
     { name: 'Velocity', value: c.velocity_state, detail: c.velocity_val.toFixed(3) + '%', cls: c.velocity_state === 'RISING' || c.velocity_state === 'FAST' ? 'active' : c.velocity_state === 'FALLING' ? 'danger' : '' },
     { name: 'Acceleration', value: c.acceleration_state, detail: c.acceleration_val.toFixed(4), cls: c.acceleration_state === 'POSITIVE' ? 'active' : c.acceleration_state === 'NEGATIVE' ? 'danger' : '' },
     { name: 'Linreg Slope', value: c.linreg_slope_state, detail: c.linreg_1m_slope.toFixed(4) + '%/candle', cls: c.linreg_slope_state === 'UP' || c.linreg_slope_state === 'STEEP_UP' ? 'active' : c.linreg_slope_state === 'DOWN' || c.linreg_slope_state === 'STEEP_DOWN' ? 'danger' : '' },
