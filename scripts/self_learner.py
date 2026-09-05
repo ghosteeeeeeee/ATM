@@ -106,6 +106,38 @@ PARAM_CONFIG = {
     'PM_TRAIL_ACTIVATE_PCT': {'min': 0.003, 'max': 0.008, 'step': 0.001, 'tighten': 'down'},
     'PM_TRAIL_DISTANCE_PCT': {'min': 0.001, 'max': 0.005, 'step': 0.001, 'tighten': 'up'},
     
+    # ── BB Bounce V2 ─────────────────────────────────────────────────────
+    'BB_BOUNCE_V2_BB_TOUCH_PCT': {'min': 0.10, 'max': 0.25, 'step': 0.02, 'tighten': 'down'},
+    'BB_BOUNCE_V2_BB_WIDTH_MAX': {'min': 0.30, 'max': 0.60, 'step': 0.05, 'tighten': 'down'},
+    'BB_BOUNCE_V2_RSI_MAX': {'min': 35, 'max': 55, 'step': 5, 'tighten': 'down'},
+    'BB_BOUNCE_V2_BOUNCE_MIN_PCT': {'min': 0.05, 'max': 0.20, 'step': 0.02, 'tighten': 'up'},
+    
+    # ── Coiled Spring ────────────────────────────────────────────────────
+    'COILED_SPRING_MIN_IMPULSE_PCT': {'min': 1.0, 'max': 2.5, 'step': 0.25, 'tighten': 'up'},
+    'COILED_SPRING_RSI_MIN': {'min': 25, 'max': 40, 'step': 5, 'tighten': 'up'},
+    'COILED_SPRING_RSI_MAX': {'min': 40, 'max': 60, 'step': 5, 'tighten': 'down'},
+    'COILED_SPRING_COIL_VOL_RATIO_MAX': {'min': 0.50, 'max': 0.75, 'step': 0.05, 'tighten': 'down'},
+    'COILED_SPRING_TRIGGER_VOL_RATIO': {'min': 1.5, 'max': 3.0, 'step': 0.25, 'tighten': 'up'},
+    
+    # ── Chain Fire ───────────────────────────────────────────────────────
+    'CHAIN_FIRE_MIN_LIFT': {'min': 1.2, 'max': 2.5, 'step': 0.1, 'tighten': 'up'},
+    'CHAIN_FIRE_MIN_CONFIDENCE': {'min': 0.50, 'max': 0.80, 'step': 0.05, 'tighten': 'up'},
+    'CHAIN_FIRE_MIN_CO_FIRES': {'min': 3, 'max': 8, 'step': 1, 'tighten': 'up'},
+    
+    # ── Accel 300 V3 ────────────────────────────────────────────────────
+    'ACCEL_300_V3_LONG_MIN_GAP': {'min': 1.0, 'max': 3.0, 'step': 0.25, 'tighten': 'up'},
+    'ACCEL_300_V3_LONG_MIN_PULLBACK': {'min': 0.20, 'max': 0.50, 'step': 0.05, 'tighten': 'up'},
+    'ACCEL_300_V3_LONG_RSI_MAX': {'min': 60, 'max': 75, 'step': 5, 'tighten': 'down'},
+    'ACCEL_300_V3_LONG_CHASE_MOVE_MAX': {'min': 1.5, 'max': 3.0, 'step': 0.25, 'tighten': 'down'},
+    'ACCEL_300_V3_SHORT_MIN_GAP': {'min': 0.5, 'max': 2.0, 'step': 0.25, 'tighten': 'up'},
+    
+    # ── Volume Breakout ──────────────────────────────────────────────────
+    'VOLUME_BREAKOUT_SPIKE_MULT': {'min': 1.5, 'max': 3.0, 'step': 0.25, 'tighten': 'up'},
+    
+    # ── Ichimoku ─────────────────────────────────────────────────────────
+    'ICHIMOKU_TENKAN_PERIOD': {'min': 7, 'max': 12, 'step': 1, 'tighten': 'down'},
+    'ICHIMOKU_KIJUN_PERIOD': {'min': 20, 'max': 32, 'step': 2, 'tighten': 'up'},
+    
     # ── Macro / Kill Thresholds ──────────────────────────────────────────
     'MACRO_HIGH_VOL_THRESHOLD': {'min': 0.03, 'max': 0.08, 'step': 0.05, 'tighten': 'down'},
     'MACRO_LOW_WR_THRESHOLD': {'min': 20, 'max': 40, 'step': 0.05, 'tighten': 'up'},
@@ -539,31 +571,46 @@ def _find_weakest_param(signal_type):
     impactful tunable parameters. The first param in the list is tried first.
     """
     param_map = {
-        # ── Active Signal Families ────────────────────────────────────────
+        # ── BB Bounce Family ──────────────────────────────────────────────
         'bb_bounce': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
         'bb_bounce_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'bb_bounce_v2_long': ['BB_BOUNCE_V2_BB_TOUCH_PCT', 'BB_BOUNCE_V2_RSI_MAX', 'BB_BOUNCE_V2_BOUNCE_MIN_PCT'],
+        'bb_bounce_v2_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        # ── R2 Trend ─────────────────────────────────────────────────────
         'r2_trend_long': ['R2_TREND_LONG_MIN_R2', 'R2_TREND_LONG_MIN_SLOPE', 'R2_TREND_LONG_MAX_RSI', 'R2_TREND_LONG_MIN_PRE_MOVE'],
         'r2_trend_short': ['R2_TREND_LONG_MIN_R2', 'R2_TREND_LONG_MIN_SLOPE', 'R2_TREND_LONG_MAX_RSI'],
+        # ── Accel 300 ────────────────────────────────────────────────────
+        'accel_300_v3_long': ['ACCEL_300_V3_LONG_MIN_GAP', 'ACCEL_300_V3_LONG_MIN_PULLBACK', 'ACCEL_300_V3_LONG_RSI_MAX', 'ACCEL_300_V3_LONG_CHASE_MOVE_MAX'],
+        'accel_300_v3_short': ['ACCEL_300_V3_SHORT_MIN_GAP', 'SPEED_MIN_THRESHOLD'],
+        'accel_300_v2_long': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        # ── Coin Tracker ─────────────────────────────────────────────────
         'coin_tracker_hot': ['COIN_TRACKER_HOT_MIN_COMPOSITE', 'COIN_TRACKER_HOT_RECENCY_MIN', 'COIN_TRACKER_HOT_CLUSTER_MIN'],
+        # ── Coiled Spring ────────────────────────────────────────────────
+        'coiled_spring': ['COILED_SPRING_MIN_IMPULSE_PCT', 'COILED_SPRING_RSI_MIN', 'COILED_SPRING_RSI_MAX', 'COILED_SPRING_TRIGGER_VOL_RATIO'],
+        # ── Chain Fire ───────────────────────────────────────────────────
+        'chain_fire': ['CHAIN_FIRE_MIN_LIFT', 'CHAIN_FIRE_MIN_CONFIDENCE', 'CHAIN_FIRE_MIN_CO_FIRES'],
+        # ── Volume Breakout ──────────────────────────────────────────────
+        'volume_breakout': ['VOLUME_BREAKOUT_SPIKE_MULT', 'SPEED_MIN_THRESHOLD'],
+        # ── Ichimoku ─────────────────────────────────────────────────────
+        'ichimoku': ['ICHIMOKU_TENKAN_PERIOD', 'ICHIMOKU_KIJUN_PERIOD', 'TREND_FILTER_NEUTRAL_PCT'],
+        # ──通用 Filter Signals ───────────────────────────────────────────
         'hzscore': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'rs': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'tl_break': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'tl_break_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
         'stop_hunt_reversal_long': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'return_exhaustion': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'return_exhaustion_short': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'spike_exhaustion_short': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'wave_catcher': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'continuation': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
-        'atr_spike': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
-        'vortex_break': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
         'engulfing': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
-        'rs': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
-        # ── Legacy / less active ──────────────────────────────────────────
-        'pattern_wolf': ['SPEED_MIN_THRESHOLD'],
-        'accel_300': ['SPEED_MIN_THRESHOLD'],
-        'tl_break_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
-        # ── Global exit params (applied to all signals) ───────────────────
+        'liquidation_hunt': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'pump_flow': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'open_skies': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'signal_confluence': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        # ── Global params (applied to all signals) ───────────────────────
         '_global_exit': ['ATR_SL_MIN', 'ATR_SL_MAX', 'PM_TRAIL_ACTIVATE_PCT', 'PM_TRAIL_DISTANCE_PCT'],
-        # ── Global filter params (applied to all signals) ─────────────────
         '_global_filter': ['SIGNAL_FILTER_RSI_MAX', 'SIGNAL_FILTER_RSI_MIN', 'SIGNAL_FILTER_SPEED_MIN'],
     }
     params = param_map.get(signal_type, ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'])

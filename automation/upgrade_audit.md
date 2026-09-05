@@ -218,6 +218,17 @@ Generated: 2026-09-02 04:30 UTC
 **Total deleted: 115 files, ~23,000 lines removed**
 **Scripts remaining: 105 (down from ~220)**
 
+### 2026-09-05: Self-Learner Param Map Expansion (Upgrade Implementer)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Add 23 PARAM_CONFIG entries for signal-specific params | ✅ DONE | BB_BOUNCE_V2, COILED_SPRING, CHAIN_FIRE, ACCEL_300_V3, VOLUME_BREAKOUT, ICHIMOKU |
+| Add 15+ param_map entries for active signals | ✅ DONE | All enabled signals now have signal-specific tuning (was 15, now 30+ entries) |
+| Remove dead entries (vortex_break, atr_spike) | ✅ DONE | Both NEVER_REENABLED, no point tuning dead signals |
+| Verify self_learner runs cleanly | ✅ DONE | --dry run passes, 43 tunable params (was ~20) |
+
+**Impact:** Self-learner can now tune 6 new signal families (bb_bounce_v2, coiled_spring, chain_fire, accel_300_v3, volume_breakout, ichimoku) instead of falling back to generic SPEED_MIN_THRESHOLD for all.
+
 ### 2026-09-02: Plan Evaluation
 
 | Plan | Difficulty | Value | Status | Action Taken |
@@ -273,3 +284,4 @@ Generated: 2026-09-02 04:30 UTC
 | Amplitude cache → signal_compactor integration | Level 1 | HIGH | Use rolling amplitude instead of static TOKEN_AMP_CLASS |
 | Dynamic SL in position_manager | Level 2 | HIGH | Use amplitude_cache.get_dynamic_sl() for per-token stops |
 | Ponytail audit Phase 3 (core refactoring) | Level 3 | HIGH | ~3500 lines of duplicated logic to consolidate |
+| Self-learner feedback loop tracking | Level 1 | MEDIUM | Track before/after metrics per param adjustment |
