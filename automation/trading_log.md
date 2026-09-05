@@ -1187,3 +1187,67 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - accel-300-v3-short- borderline — will kill if next trades are losses
 - ema300-dip post-tightening continuing positive trend
+
+## [2026-09-05 04:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W +$0.14)
+**24h:** 38T 50%WR -$0.86
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 18T (47%) +$1.38 — carrying system
+- atr_sl_hit: 11T (29%) -$1.40 — under 40% ✓
+- cut-loser-CL-T1: 4T -$0.54
+- hard_sl: 3T -$0.55
+
+**24h Signal Breakdown:**
+- ema300-dip: 14T 50%WR -$1.00 (R:R drag, post-tightening improving)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (borderline)
+- continuation+: 4T 100%WR +$0.30 (star)
+- open-skies+: 3T 100%WR +$0.55 (star)
+- bb-bounce-v2-long+: 3T 66.7%WR -$0.08
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 29% — under 40% ✓
+- Trade freq 1/hr — quiet overnight
+- 4 open positions ($53.20) — light exposure
+- open-skies+ and continuation+ both 100%WR stars
+- ema300-dip post-tightening 66.7%WR — improving trend
+
+**Open Questions:**
+- accel-300-v3-short- borderline — will kill if next trades are losses
+- ema300-dip post-tightening continued improvement overnight
+
+## [2026-09-05 05:06 UTC] Hourly Analysis
+
+**Trades:** 0T last hour (quiet overnight). 34T/24h 61.8%WR -$0.38
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T (50%) +$1.32 — carrying system
+- atr_sl_hit: 8T (23.5%) -$0.95 — under 40% ✓
+- cut-loser-CL-T1: 4T -$0.54
+- hard_sl: 2T -$0.31
+
+**24h Signal Breakdown:**
+- ema300-dip: 14T 50%WR -$0.94 (R:R drag, post-tightening improving)
+- continuation+: 4T 100%WR +$0.30 (star)
+- open-skies+: 3T 100%WR +$0.55 (star)
+- accel-300-v3-short-: 2T 50%WR +$0.16 (improved from 25%WR)
+- bb-bounce-v2-long+: 2T 100%WR +$0.06
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 23.5% — under 40% ✓
+- Trade freq 0/hr — quiet overnight
+- 5 open positions ($73.10) — light exposure
+- open-skies+ and continuation+ both 100%WR stars
+- ema300-dip post-tightening 50%WR — improving trend
+- accel-300-v3-short- improved to 50%WR — no longer borderline
+
+**Open Questions:**
+- ema300-dip still biggest drag but trending positive post-tightening
+- System essentially breakeven over 24h — waiting for stars to compound
