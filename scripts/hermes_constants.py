@@ -1374,12 +1374,12 @@ COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LO
 COILED_SPRING_COOLDOWN_MINUTES  = 15      # per-token cooldown between fires
 # Detection parameters
 COILED_SPRING_LOOKBACK          = 500     # 5m candles to load
-COILED_SPRING_MIN_IMPULSE_PCT   = 1.5     # min % move from swing low to confirm impulse
+COILED_SPRING_MIN_IMPULSE_PCT   = 0.0     # min % move from swing low to confirm impulse — disabled for now
 COILED_SPRING_COIL_MIN_BARS     = 4       # min consecutive bars with vol < threshold
 COILED_SPRING_COIL_VOL_RATIO_MAX = 0.65   # volume must be below this fraction of 20-bar avg
 COILED_SPRING_COIL_ATR_PCT_MAX  = 0.55    # ATR% must be below this (volatility compressed)
 COILED_SPRING_RSI_MIN           = 30      # RSI sweet spot lower bound
-COILED_SPRING_RSI_MAX           = 45      # RSI sweet spot upper bound — tightened from 50 to avoid overbought entries
+COILED_SPRING_RSI_MAX           = 50      # RSI sweet spot upper bound
 COILED_SPRING_RSI_TRIGGER_MIN   = 45      # RSI must be above this in trigger mode
 COILED_SPRING_RSI_BONUS_MIN     = 35      # RSI bonus sweet spot lower bound
 COILED_SPRING_RSI_BONUS_MAX     = 45      # RSI bonus sweet spot upper bound
@@ -1405,7 +1405,7 @@ COILED_SPRING_SWING_LOOKBACK    = 100     # max lookback for swing low detection
 COILED_SPRING_COIL_SCAN_RANGE   = 8       # bars to scan back for coil detection
 COILED_SPRING_ATR_TREND_THRESH  = 0.85    # ATR trend ratio threshold (declining = compressed)
 COILED_SPRING_EMA_PROX_ATR_MULT = 1.0     # price within this * ATR of EMA = at support — tightened from 1.5
-COILED_SPRING_MAX_PRICE_ABOVE_EMA21 = 0.5  # max % above EMA21 allowed — prevents buying into resistance
+COILED_SPRING_MAX_PRICE_ABOVE_EMA21 = 0.75  # max % above EMA21 allowed — prevents buying into resistance
 COILED_SPRING_VOL_MODE_THRESH   = 1.0     # volume ratio below this = coil mode candidate
 COILED_SPRING_VOL_BONUS_MULT    = 5       # volume spike bonus multiplier
 COILED_SPRING_DEEP_COIL_BARS    = 5       # bar count for "deep coil" bonus

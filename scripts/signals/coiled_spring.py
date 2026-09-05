@@ -112,7 +112,6 @@ def _rsi(data, period=14):
         ag = (ag * (period - 1) + gains[i]) / period
         al = (al * (period - 1) + losses[i]) / period
         result.append(100 - 100 / (1 + ag / al) if al > 0 else 100)
-    result.append(None)  # pad for alignment
     return result
 
 
@@ -218,7 +217,8 @@ def detect_coiled_spring(rows):
     ema9_now   = ema9[i]
     ema21_now  = ema21[i]
     ema50_now  = ema50[i]
-    rsi_now    = rsi14[i] if rsi14[i] is not None else COILED_SPRING_RSI_FALLBACK
+    # RSI array is shorter by 1 (no padding), so use i-1 for current value
+    rsi_now    = rsi14[i-1] if i > 0 and rsi14[i-1] is not None else COILED_SPRING_RSI_FALLBACK
     atr_now    = atr14[i] if atr14[i] is not None else price * COILED_SPRING_ATR_FALLBACK_PCT
     atr_pct    = atr_now / price * 100
     vol_ratio  = vol_now / vm20[i] if vm20[i] > 0 else 1
@@ -259,7 +259,7 @@ def detect_coiled_spring(rows):
 
     sl1 = closes[-lookback_window + swing_low_idxs[-2]]
     sl2 = closes[-lookback_window + swing_low_idxs[-1]]
-    if sl2 <= sl1:
+    if sl2 < sl1:  # Allow equal lows (consolidation, not downtrend)
         diag['reason'] = f'not higher lows: {sl1:.6f} -> {sl2:.6f}'
         return None, diag
 
