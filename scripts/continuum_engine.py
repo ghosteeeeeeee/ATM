@@ -481,6 +481,7 @@ class ContinuumEngine:
         
         # Phase reset tracking
         self._below_count = 0  # Consecutive candles below EMA300
+        self._last_side = None  # Track EMA300 position for flip detection
         
         # History for multi-TF
         self.state_history: List[ContinuumState] = []
@@ -1003,6 +1004,13 @@ class ContinuumEngine:
                 print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime}")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
                 self.entry_phase = 2  # Step back but don't reset fully
+            elif (self._last_side == 'LONG' and side == 'SHORT') or (self._last_side == 'SHORT' and side == 'LONG'):
+                # EMA300 position flipped — reset phase
+                self.entry_phase = 0
+                print(f"[CONTINUUM] Phase reset: EMA300 flipped from {self._last_side} to {side}")
+        
+        # Track side for flip detection
+        self._last_side = side
         
         # Exit checks (if we have a position)
         if self.position_side != 'NONE':
