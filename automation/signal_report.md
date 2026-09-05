@@ -1,32 +1,33 @@
 === Signal Performance Report ===
-Period: 2026-09-05 03:30 UTC | Last 6h + 24h
+Period: 2026-09-05 09:30 UTC | Last 6h + 24h
 
 ## 24h Overview
-- Trades: 32 | WR: 65.6% | Total PnL: -$0.17 | Avg: -$0.01
+- Trades: 27 | WR: 59.3% | Total PnL: -$0.50 | Avg: -$0.02
+
+## 6h Overview
+- Trades: 6 | WR: 66.7% | Total PnL: +$0.05
 
 ## KILLED (executed this period)
-None. Previous kill `ema300-dip-long` (2026-09-04) confirmed working — 13 legacy trades bleeding out, zero new entries.
+None. Both ema300-dip variants already dead (flags OFF + NEVER_REENABLE since 09-04). Legacy trades closing out — 15 trades still in 24h window bleeding -$1.44.
 
 ## BOOSTED (executed this period)
-None. No signals with 5+ trades meeting all boost criteria.
+None. No signals with 5+ trades meeting all boost criteria with room to increase weight.
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ema300-dip | LONG | 46.2% | -$0.98 | 13 | DEAD — killed 09-04, legacy trades closing. In NEVER_REENABLE. |
-| ema300-dip-short | SHORT | 50.0% | -$0.15 | 4 | WATCH — need 10+ trades to evaluate. Borderline. |
-| ema300-dip-short,rs-r37 | SHORT | 0.0% | -$0.12 | 1 | WATCH — single trade, too early. |
+| ema300-dip | LONG | 33.3% | -$1.02 | 9 | DEAD — killed 09-04, NEVER_REENABLE. Legacy only. |
+| ema300-dip-short | SHORT | 33.3% | -$0.42 | 6 | DEAD — killed 09-04, NEVER_REENABLE. Legacy only. |
+| ema300-dip-short,rs-r37 | SHORT | 0.0% | -$0.12 | 1 | WATCH — composite signal, single trade. |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 100% | +$0.55 | 3 | STRONG — 3/3 wins, +$0.18 avg |
-| continuation+ | LONG | 100% | +$0.30 | 4 | STRONG — 4/4 wins, +$0.075 avg |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.09 | 2 | OK — small sample |
-
-## 6h Micro
-9 trades. Winners: open-skies+ ($0.55), ema300-dip ME ($0.12 legacy), bb-bounce-v2-long+ ($0.07). Losers: ema300-dip-short ($0.31 across 2 trades).
+| open-skies+ | LONG | 100% | +$0.64 | 5 | STRONG — 5/5 wins across LTC, TURBO, DYDX, SUSHI |
+| bb-bounce-v2-long+ | LONG | 100% | +$0.27 | 3 | STRONG — 3/3 wins across BLUR, NXPC, FOGO |
+| continuation+ | LONG | 100% | +$0.15 | 3 | STRONG — 3/3 wins across ME, ATOM |
 
 ## ISSUES
-- None. No direction inversions found.
-- Overall PnL -$0.17 despite 65.6% WR — losses are slightly larger than wins. Watch for drift.
+- No direction inversions found.
+- Overall PnL -$0.50 despite 59.3% WR — legacy ema300-dip trades account for -$1.44. Active signals net +$0.94. System healthy once legacy drains.
+- All active signals 100% WR — small sample, monitor for regression.

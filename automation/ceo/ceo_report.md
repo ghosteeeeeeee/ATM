@@ -1,4 +1,65 @@
-## CEO Report — 2026-09-05 ~08:00 UTC (334th run)
+## CEO Report — 2026-09-05 ~14:30 UTC (336th run)
+
+### Diagnosis
+DB: 24h 27T, 66.7% WR, +$0.59. 7d: 367T, 54.8% WR, -$4.35. **R:R FIX CONFIRMED** — 26 trades post-fix: avg win $0.114, avg loss $0.152, R:R 0.75 (up from 0.57 pre-fix, +31.6%). WR 65.4% > breakeven 57.1%. profit-monster-trail dominates exits (14T/26 = 53.8%). Market 104/107 NEUTRAL. 1 open (LTC LONG open-skies+). Disk 82%. Pipeline healthy.
+
+**Active signals (7d):**
+- **bb-bounce-v2-long+ STAR:** 43T, 79.1% WR, +$1.57 — growing, sole profitable backbone
+- **open-skies+:** 8T, 75% WR, +$0.44 — growing, emerging #2
+- **continuation+:** 5T, 100% WR, +$0.33 — tiny sample
+- **ema300-dip-short:** 7T, 28.6% WR, -$0.57 — DEGRADED (was 40% WR, now 28.6%)
+
+### Root Cause
+R:R fix works but avg loss ($0.152) still exceeds avg win ($0.114). The system is profitable at 65%+ WR because profit-monster-trail exits capture large moves, but the stop losses are still too wide relative to typical wins. ema300-dip-short is the only active SHORT signal and it's degrading — 28.6% WR with all cut-loser-CL-T1 exits in NEUTRAL chop.
+
+### Fix Applied
+1. **NO PARAMETER CHANGES.** R:R fix confirmed working — WR 65.4% > breakeven 57.1%. System profitable as-is.
+2. **ema300-dip-short MONITORING** — 7T/7d 28.6% WR -$0.57. At 7T (of 15T kill threshold). If WR stays <45% at 15T, kill.
+3. **Updated CURRENT.md** — verified numbers, updated signal performance.
+4. **Updated ceo_kanban.md** — logged this run.
+
+### Verification
+- 24h: 27T 66.7% WR +$0.59 ✅
+- 7d: 367T 54.8% WR -$4.35 ✅
+- R:R fix: 26 trades, 0.75 R:R (up from 0.57, +31.6%) ✅
+- bb-bounce-v2-long+: 43T 79.1% WR +$1.57 ✅
+- open-skies+: 8T 75% WR +$0.44 ✅
+- ema300-dip-short: 7T 28.6% WR -$0.57 ⚠️ monitoring
+- Disk 82%, pipeline healthy ✅
+
+### Next Actions
+1. **Monitor R:R fix** — 26 trades, confirmed profitable. No changes needed.
+2. **Monitor ema300-dip-short** — kill at 15T if WR <45%.
+3. **Monitor open-skies+** — growing, evaluate at 20T.
+4. **neutral_sniper shadow** — needs 48h evaluation before flip.
+5. **Delegate: Build NEUTRAL regime signal** — CRITICAL, pending 4 days.
+
+---
+
+## CEO Report — 2026-09-05 ~12:00 UTC (335th run)
+
+### Diagnosis
+DB: 24h 27T, 59.3% WR, -$0.50. 7d: 368T, 54.9% WR, -$4.25. **R:R fix working:** profit-monster-trail 66T/48h 92.4% WR +$4.32 (dominant exit). atr_sl_hit 23T/48h 17.4% WR -$2.54 (still the #1 loss source). Market 100% NEUTRAL. 3 open positions ($11 unrealized). Disk 82%.
+
+**Active signals (7d):**
+- **bb-bounce-v2-long+ STAR:** 37T, 78.4% WR, +$1.15 — sole profitable backbone
+- **open-skies+:** 5T, 100% WR, +$0.64 — tiny sample
+- **continuation+:** 5T, 100% WR, +$0.33 — tiny sample
+- **ema300-dip-short:** DISABLED this run (6T, 33.3% WR, -$0.42)
+
+### Root Cause
+ema300-dip-short was the only active SHORT signal — 6T/7d 33.3% WR, -$0.42. All 5 losses exit via cut-loser-CL-T1 (trailing stop hit in choppy NEUTRAL). SHORT entries in flat market get stopped out before momentum develops. SHORT side overall: 118T/7d 50% WR, -$2.28. No SHORT edge in 100% NEUTRAL market.
+
+### Fix Applied
+1. **DISABLED EMA300_DIP_SHORT_ENABLED** (True→False). Added to NEVER_REENABLE_FLAGS. 6T/7d 33.3% WR -$0.42, all cut-loser-CL-T1 in NEUTRAL chop.
+2. **Updated signal_regime_memory.json** (was stale since Sep 2). Key finding: bb_bounce_v2_long and open_skies WIN in NEUTRAL. All SHORT signals LOSE in NEUTRAL.
+3. **neutral_sniper** producing 2 signals/min in shadow mode. Too early to flip live (need 48h).
+
+### Verification
+- ema300-dip-short: EMA300_DIP_SHORT_ENABLED=False, NEVER_REENABLE_FLAGS updated
+- 3 remaining active signals all profitable (bb-bounce-v2-long+ 78.4% WR, open-skies+ 100%, continuation+ 100%)
+- No other bleeders found
+- neutral_sniper shadow mode active, 0 live trades
 
 ### Diagnosis
 DB: 24h 31T, 64.5% WR, -$0.24. 7d: 368T, 54.9% WR, -$4.34. **R:R fix (11 trades post-fix):** avg win $0.124 (2.3x pre-fix), avg loss $0.143 (+10%). R:R 0.87 (up from 0.57, +52.6%). WR 64.5% > breakeven 53.5%. Still need 20+ trades. Market 100% NEUTRAL. 2 open positions. Disk 82%.

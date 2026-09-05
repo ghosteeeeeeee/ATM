@@ -53,3 +53,24 @@
 - **[INFO]**: 0 phantom trades (cleaned up since 04:23)
 - **[INFO]**: `hermes-watchdog.service` failing — `pipeline_watchdog.py` missing (stale timer)
 - **AUTO-FIX**: Compressed old logs (saved minimal space). No critical action needed.
+
+## Error Alerts — 2026-09-05 08:22 UTC
+- **[WARN]**: 98/240 (40.8%) tokens stale — price feeds lagging for ~40% of tracked tokens
+- **[INFO]**: Regime fully neutral (0 long / 2 short / 105 neutral) — low conviction signals
+- **[OK]**: Pipeline healthy, 12 trades today, 66.7% WR, +$0.51 PnL
+- **AUTO-FIX**: None needed.
+
+## Error Alerts — 2026-09-05 13:23 UTC
+- **[CRITICAL]** (4x/day since Sep 4): `hermes-hl-reconciliation` failing — script `/root/.hermes/scripts/hl_reconciliation.py` does not exist.
+- **AUTO-FIX**: Disabled `hermes-hl-reconciliation.timer` to stop repeated failures.
+- **[WARN]** (3x/1h): `signal_compactor: timed out` — transient, pipeline recovered each time.
+- **[WARN]**: Disk at 82% (96G/118G) — approaching 85% threshold.
+- **[INFO]**: Pipeline OK (cycle #186514), 42 signals (1h), 23 trades today, +0.71 USDT, 65.2% WR, 0 open.
+
+## Error Alerts — 2026-09-05 14:23 UTC
+- **[WARN]** (3x/30min): `signal_compactor: timed out` at 13:55, 14:03, 14:13 — recurring ~60s timeout within pipeline (standalone timer OK). No data loss, pipeline recovers.
+- **[WARN]**: Disk at 82% (92G/118G) — stable, 26G free. Largest: coin_tracker.db 2.2G, hl_copy.db 1.9G.
+- **[INFO]**: Pipeline OK (last cycle #186573, 14:22), 65 signals active, 27 trades today, +0.84 USDT, 66.7% WR, 0 open trades.
+- **[INFO]**: Market 104/107 NEUTRAL (1 long, 2 short bias). PONS 97.8% speed, CASHCAT 91.3%.
+- **[INFO]**: 188 tokens fresh (<5min), 127 tokens >= 50% speed.
+- **AUTO-FIX**: None needed — all systems operational.
