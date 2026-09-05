@@ -785,16 +785,24 @@ def _check_directional_cap(direction: str) -> str | None:
         if total == 0:
             return None  # no open positions, always allowed
 
-        # Check if CURRENT ratio already at or above cap
-        # 4L/1S = 80% → ALLOWED (at cap). 5L/0S = 100% → BLOCKED (above cap).
+        # Cap only matters when BOTH directions have positions.
+        # If one direction has 0 positions, allow freely — the other direction
+        # needs to build up before the cap becomes meaningful.
+        # 2L/0S → LONG allowed (SHORT side empty, cap N/A)
+        # 4L/1S → LONG blocked (80% already at cap)
+        # 4L/1S → SHORT allowed (0% SHORT, can rebalance)
         if direction.upper() == 'LONG':
+            if short_count == 0:
+                return None  # no SHORTs yet — cap N/A, allow LONGs
             current_ratio = (long_count / total) * 100
             if current_ratio >= DIRECTIONAL_CAP_MAX_PCT:
-                return f"{long_count}/{total} LONG = {current_ratio:.0f}% already at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+                return f"{long_count}/{total} LONG = {current_ratio:.0f}% at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
         else:
+            if long_count == 0:
+                return None  # no LONGs yet — cap N/A, allow SHORTs
             current_ratio = (short_count / total) * 100
             if current_ratio >= DIRECTIONAL_CAP_MAX_PCT:
-                return f"{short_count}/{total} SHORT = {current_ratio:.0f}% already at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+                return f"{short_count}/{total} SHORT = {current_ratio:.0f}% at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
 
         return None  # within cap
     except Exception as e:
