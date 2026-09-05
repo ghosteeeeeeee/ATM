@@ -36,7 +36,6 @@ import sqlite3
 # ── Cache ─────────────────────────────────────────────────────────────────────
 _regime_cache = None
 _regime_cache_time = 0
-_REGIME_CACHE_TTL = 120  # 2 minutes — fast enough to detect transitions
 
 
 # ── Signal Family Classification ──────────────────────────────────────────────
@@ -119,6 +118,8 @@ def _check_directional_outcome() -> dict:
 
 def _check_btc_momentum() -> dict:
     """Check BTC 30m momentum. Returns {momentum_pct, is_flat}."""
+    from hermes_constants import CHOP_DETECTOR_BTC_MOM_THRESHOLD
+    conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
@@ -127,16 +128,18 @@ def _check_btc_momentum() -> dict:
             WHERE token = 'BTC' ORDER BY ts DESC LIMIT 30
         """)
         closes = [r[0] for r in cur.fetchall()]
-        conn.close()
 
         if len(closes) < 30:
             return {'momentum_pct': 0, 'is_flat': True}
 
         # 30m momentum: (current - 30 bars ago) / 30 bars ago * 100
         momentum = (closes[0] - closes[-1]) / closes[-1] * 100 if closes[-1] > 0 else 0
-        return {'momentum_pct': round(momentum, 3), 'is_flat': abs(momentum) < 0.15}
+        return {'momentum_pct': round(momentum, 3), 'is_flat': abs(momentum) < CHOP_DETECTOR_BTC_MOM_THRESHOLD}
     except Exception:
         return {'momentum_pct': 0, 'is_flat': True}
+    finally:
+        if conn:
+            conn.close()
 
 
 def _check_volatility_regime() -> str:
@@ -146,7 +149,7 @@ def _check_volatility_regime() -> str:
         atr = get_atr_pct('BTC')
         if atr is not None:
             return classify_volatility(atr)
-    except ImportError:
+    except Exception:
         pass
     return 'NORMAL'
 
@@ -157,7 +160,7 @@ def _check_market_phase() -> str:
         from market_phase_gate import detect_phase
         phase_info = detect_phase(lookback_days=1)
         return phase_info.get('phase', 'quiet')
-    except ImportError:
+    except Exception:
         return 'quiet'
 
 
@@ -176,8 +179,9 @@ def get_regime() -> dict:
     """
     global _regime_cache, _regime_cache_time
 
+    from hermes_constants import CHOP_DETECTOR_CACHE_TTL
     now = time.time()
-    if _regime_cache and (now - _regime_cache_time) < _REGIME_CACHE_TTL:
+    if _regime_cache and (now - _regime_cache_time) < CHOP_DETECTOR_CACHE_TTL:
         return _regime_cache
 
     # Gather inputs
@@ -186,15 +190,17 @@ def get_regime() -> dict:
     vol_regime = _check_volatility_regime()
     market_phase = _check_market_phase()
 
+    from hermes_constants import CHOP_DETECTOR_WR_THRESHOLD
+
     # Scoring: each input votes for TREND, CHOP, or CRISIS
     votes = {'TREND': 0, 'CHOP': 0, 'CRISIS': 0}
 
-    # 1. Directional outcome: WR < 50% = chop signal
+    # 1. Directional outcome: WR < threshold = chop signal
     for direction, data in dir_outcome.items():
         if data['total'] >= 3:
-            if data['wr'] < 35:
+            if data['wr'] < CHOP_DETECTOR_WR_THRESHOLD - 15:
                 votes['CRISIS'] += 2
-            elif data['wr'] < 50:
+            elif data['wr'] < CHOP_DETECTOR_WR_THRESHOLD:
                 votes['CHOP'] += 1
             else:
                 votes['TREND'] += 1
@@ -202,9 +208,9 @@ def get_regime() -> dict:
     # 2. BTC momentum: flat = chop, strong = trend
     if btc_momentum['is_flat']:
         votes['CHOP'] += 1
-    elif abs(btc_momentum['momentum_pct']) > 0.3:
+    elif abs(btc_momentum['momentum_pct']) > CHOP_DETECTOR_BTC_MOM_THRESHOLD * 2:
         votes['TREND'] += 2
-    elif abs(btc_momentum['momentum_pct']) > 0.15:
+    elif abs(btc_momentum['momentum_pct']) > CHOP_DETECTOR_BTC_MOM_THRESHOLD:
         votes['TREND'] += 1
 
     # 3. Volatility regime
