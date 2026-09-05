@@ -74,6 +74,7 @@ from hermes_constants import (
     COILED_SPRING_PRICE_AGE_MAX,
     COILED_SPRING_RSI_FALLBACK,
     COILED_SPRING_ATR_FALLBACK_PCT,
+    COILED_SPRING_MAX_PRICE_ABOVE_EMA21,
 )
 
 SIGNAL_TYPE_LONG  = 'coiled_spring_long'
@@ -239,6 +240,12 @@ def detect_coiled_spring(rows):
         if not (ema9_now > ema21_now):
             diag['reason'] = 'EMA not bullish'
             return None, diag
+
+    # CHECK 1b: Price not too far above EMA21 (prevents buying into resistance)
+    price_above_ema21_pct = (price / ema21_now - 1) * 100
+    if price_above_ema21_pct > COILED_SPRING_MAX_PRICE_ABOVE_EMA21:
+        diag['reason'] = f'price too far above EMA21 ({price_above_ema21_pct:.2f}% > {COILED_SPRING_MAX_PRICE_ABOVE_EMA21}%)'
+        return None, diag
 
     # ════════════════════════════════════════════════════════════════════════
     # CHECK 2: Higher lows structure (at least 2 ascending swing lows)
