@@ -1251,3 +1251,36 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - ema300-dip still biggest drag but trending positive post-tightening
 - System essentially breakeven over 24h — waiting for stars to compound
+
+## [2026-09-05 05:07 UTC] Hourly Analysis
+
+**Trades:** 1T last hour (1W +$0.03 FOGO bb-bounce-v2-long+). 32T/24h 53.1%WR -$1.47
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T (53%) +$1.31 — carrying system
+- atr_sl_hit: 7T (21.9%) -$0.79 — under 40% ✓
+- cut-loser-CL-T1: 4T -$0.54
+- hard_sl: 2T -$0.31
+- profit-monster-T1: 2T +$0.16
+
+**24h Signal Breakdown:**
+- ema300-dip: 13T 46.2%WR -$0.98 (biggest drag, avg -$0.075/trade)
+- continuation+: 4T 100%WR +$0.30 (star)
+- open-skies+: 3T 100%WR +$0.55 (star)
+- bb-bounce-v2-long+: 3T 100%WR +$0.09 (star)
+- ema300-dip-short: 4T 50%WR -$0.15 (marginal)
+- accel-300-v3-short-: 1T 100%WR +$0.22 (improved)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 21.9% — under 40% ✓
+- Trade freq 1/hr — quiet overnight
+- 5 open positions ($64.30) — light exposure
+- open-skies+, continuation+, bb-bounce-v2-long+ all 100%WR stars
+- ema300-dip only underperformer (46.2%WR, -$0.98) — not killable
+
+**Open Questions:**
+- ema300-dip still biggest drag at -$0.98/24h but not killable (46.2%WR)
+- System essentially breakeven — stars carrying, drag limiting upside
