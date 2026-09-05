@@ -1446,6 +1446,8 @@ COILED_SPRING_TRIGGER_LONG_COOLDOWN_MINUTES = 15
 COILED_SPRING_TRIGGER_LONG_CONF_BASE = 80      # higher base — volume confirmation = higher conviction
 COILED_SPRING_TRIGGER_LONG_CONF_FLOOR = 70     # floor still high — this is a quality signal
 COILED_SPRING_TRIGGER_LONG_CONF_CAP = 92       # can go higher than coil variant
+COILED_SPRING_TRIGGER_LONG_RSI_BONUS_MIN = 35  # RSI bonus sweet spot lower bound
+COILED_SPRING_TRIGGER_LONG_RSI_BONUS_MAX = 45  # RSI bonus sweet spot upper bound
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
 # For each signal: _PLUS_ENABLED controls LONG, _MINUS_ENABLED controls SHORT.
