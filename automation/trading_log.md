@@ -1,5 +1,41 @@
 
 
+## [2026-09-05 13:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period, 2 open)
+**24h Context:** 31T 55.6%WR +$0.60 | atr_sl_hit 3.2% (well under 40%)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 18T (58%) avg +$0.106 — carrying system
+- cut-loser-CL-T1: 10T (32%) avg -$0.152 — normal
+- profit-monster-T1: 2T (6%) avg +$0.080 — exit bonus
+- atr_sl_hit: 1T (3%) avg +$0.050 — healthy
+
+**24h Signal Leaders:**
+- open-skies+: 10T 70%WR +$0.50 ⭐
+- bb-bounce-v2-long+: 9T 88.9%WR +$0.69 ⭐
+- ema300-dip-short: 7T 28.6%WR -$0.57 (underperforming)
+- accel-300-v3-long+: 2T 50%WR -$0.05 (marginal)
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T in last hour → none to kill
+- atr_sl_hit 3% → healthy
+- ema300-dip-short 28.6%WR — not 0%, not kill criteria
+- Trade freq ~1.3/hr normal
+- 2 open positions ($22.20: ALT, COMP)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System net positive +$0.60/24h — first green run in a while
+- bb-bounce-v2-long+ star performer at 88.9%WR
+- atr_sl_hit 3% — trailing SL working perfectly
+- Trade freq 1.3/hr — quiet market, normal
+
+**Open Questions:**
+- ema300-dip-short continues drag at -$0.57/24h 28.6%WR. Not kill criteria but monitor.
+
 ## [2026-09-05 12:06 UTC] Hourly Analysis
 
 **Trades:** 3 closed last hour (1W 2L, -$0.25)
@@ -1632,3 +1668,24 @@ None — system healthy, WR climbing, stars dominant.
 - Open: 2 positions ($22.20)
 
 **Next:** Re-run at 17:07 UTC
+
+## [2026-09-05 18:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 24h: 30T 19W 11L 63.3%WR +$0.57
+
+**Close reasons (24h):** profit-monster-trail 17T +$1.88 dominant (56.7%). cut-loser-CL-T1 10T -$1.52. profit-monster-T1 2T +$0.16. atr_sl_hit 1T +$0.05 (3.3%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 9T 88.9%WR +$0.69, open-skies+ 10T 70%WR +$0.50
+- Drag: ema300-dip-short 6T 16.7%WR -$0.60 (not killable — 1 win in 6, not 0%WR with 3+ last hour)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: 0T last hour, no signal qualifies
+- atr_sl_hit: 3.3% well under 40%
+- Trade freq: 0/hr quiet period
+- Hourly PnL: 3+ consecutive negative hours — NO (2h streak ended at 16:00)
+- Open: 5 positions ($55.50 — COMP, ALT, NEAR, BTC, XPL)
+
+**Next:** Re-run at 19:07 UTC

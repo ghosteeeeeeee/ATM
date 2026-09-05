@@ -74,3 +74,14 @@
 - **[INFO]**: Market 104/107 NEUTRAL (1 long, 2 short bias). PONS 97.8% speed, CASHCAT 91.3%.
 - **[INFO]**: 188 tokens fresh (<5min), 127 tokens >= 50% speed.
 - **AUTO-FIX**: None needed — all systems operational.
+
+## Error Alerts — 2026-09-05 17:23 UTC
+- **[WARN]** (22x/1h): `decider_run: Traceback` — `name 'failures' is not defined` at decider_run.py:3325. BUG: `failures` variable referenced in `run()` but only defined inside `_run_hotset()`. All trades HARD-BLOCKED for LOSERS tokens.
+- **[INFO]**: Pipeline running (cycle #186754), 3 open trades, 31 closed today, +17.61% PnL.
+- **[INFO]**: Market 102/102 NEUTRAL. 56 signals in last hour, 127 tokens >= 50% speed.
+- **[INFO]**: Disk 82% (92G/118G), all timers active, hl-sync-guardian running.
+- **AUTO-FIX**: Added `failures = _load_hotset_failures()` at decider_run.py:2701. Next pipeline cycle will clear the NameError. Monitor for "HARD-BLOCK" messages disappearing.
+
+## Error Alerts — 2026-09-05 18:22 UTC
+- **WARN** (2x): `signal_compactor: timed out` at 18:20 and 18:22 — self-recovered, no fix needed
+- **WARN**: Disk at 82% (92G/118G) — approaching 85% threshold. Consider log cleanup.

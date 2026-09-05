@@ -1085,9 +1085,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%.
+PM_TRAIL_ENABLED     = True   # act 0.60%, dist 0.50%. Floor = +0.10%.
 PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO Sep 4: was 0.40%, winners avg $0.074 exits too early. Let winners run.
-PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% — CEO Sep 4: was 0.20%, wider trail = more profit captured
+PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — CEO Sep 5: was 0.40%, avg_win $0.111 vs avg_loss $0.152 (R:R 0.73). Widening to let winners run further.
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 

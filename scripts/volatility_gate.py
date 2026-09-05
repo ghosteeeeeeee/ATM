@@ -145,6 +145,8 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
+        'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum

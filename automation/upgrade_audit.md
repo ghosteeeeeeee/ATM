@@ -268,20 +268,38 @@ Generated: 2026-09-02 04:30 UTC
 | Metric | Count |
 |--------|-------|
 | Plans scanned | 48 |
-| IMPLEMENTED | 10 |
+| IMPLEMENTED | 12 |
 | PARTIAL | 4 |
 | INFRASTRUCTURE BUILT | 2 (amplitude_cache, regime_params) |
 | NOT IMPLEMENTED | 2 |
 | SKIPPED | 3 |
 | UNKNOWN | 5 |
-| **Success rate** | **10/16 evaluable (63%)** |
+| **Success rate** | **12/16 evaluable (75%)** |
 
 ### Top Candidates (Next)
 
 | Plan | Difficulty | Value | Why |
 |------|-----------|-------|-----|
-| Regime params integration into accel_300_v3 | Level 2 | HIGH | Infrastructure built, needs signal file hookup + backtest |
-| Amplitude cache → signal_compactor integration | Level 1 | HIGH | Use rolling amplitude instead of static TOKEN_AMP_CLASS |
 | Dynamic SL in position_manager | Level 2 | HIGH | Use amplitude_cache.get_dynamic_sl() for per-token stops |
 | Ponytail audit Phase 3 (core refactoring) | Level 3 | HIGH | ~3500 lines of duplicated logic to consolidate |
 | Self-learner feedback loop tracking | Level 1 | MEDIUM | Track before/after metrics per param adjustment |
+| Regime params integration into live signals | Level 2 | HIGH | Infrastructure built, v3 dead — apply to bb_bounce_v2 or open_skies |
+| Amplitude cache systemd timer | Level 1 | MEDIUM | Cache is stale (2d old), needs hourly refresh |
+
+---
+
+## Plan: 2026-09-05 — Amplitude Cache → Signal Compactor Integration
+- **Date scanned:** 2026-09-05 06:30
+- **Core request:** Replace static TOKEN_AMP_CLASS lookup with rolling amplitude cache data
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTING
+- **Reason:** Static classification from Aug 29 may be stale. Rolling cache (30d 1h candles) adapts to regime shifts. Infrastructure already built, just needs one function call swap.
+
+## Plan: 2026-09-05 — Amplitude Cache Systemd Timer
+- **Date scanned:** 2026-09-05 06:30
+- **Core request:** Auto-refresh amplitude cache hourly
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTING
+- **Reason:** Cache file exists but no timer — currently 2 days stale. Hourly refresh ensures rolling data stays current.

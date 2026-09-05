@@ -2698,6 +2698,7 @@ def run(dry_run=False):
 
     entered = 0
     skipped = 0
+    failures = _load_hotset_failures()  # ponytail: loaded once per run, _run_hot_set() also loads independently
     _processed_tokens_this_run = set()
     _regime = 'NEUTRAL'  # default — overridden per-token in hotset loop above
 

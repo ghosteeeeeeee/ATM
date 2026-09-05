@@ -23,7 +23,11 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, get_token_amp_class
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT
+try:
+    from amplitude_cache import get_cached as _get_amp_cache
+except ImportError:
+    _get_amp_cache = None
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -894,7 +898,9 @@ def _score_signal(token, direction, conf, source, signal_type,
         penalty_mult = 1.0
 
     # Amplitude class multiplier — HIGH_AMP tokens get confidence penalty (volatile, signals less reliable)
-    amp_class = get_token_amp_class(token)
+    # Use rolling amplitude cache (30d 1h candles) instead of static classification
+    _amp_data = _get_amp_cache(token) if _get_amp_cache else None
+    amp_class = _amp_data['amp_class'] if _amp_data else 'MED_AMP'
     amplitude_mult = AMPLITUDE_COMPACTOR_MULT.get(amp_class, 1.0)
 
     # ── Volatility Gate V2: combined phase+lifecycle+inverse multiplier ──

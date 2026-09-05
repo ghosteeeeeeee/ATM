@@ -1,38 +1,39 @@
-## CEO Report — 2026-09-05 ~14:30 UTC (336th run)
+## CEO Report — 2026-09-05 ~15:00 UTC (337th run)
 
 ### Diagnosis
-DB: 24h 27T, 66.7% WR, +$0.59. 7d: 367T, 54.8% WR, -$4.35. **R:R FIX CONFIRMED** — 26 trades post-fix: avg win $0.114, avg loss $0.152, R:R 0.75 (up from 0.57 pre-fix, +31.6%). WR 65.4% > breakeven 57.1%. profit-monster-trail dominates exits (14T/26 = 53.8%). Market 104/107 NEUTRAL. 1 open (LTC LONG open-skies+). Disk 82%. Pipeline healthy.
+DB: 24h 31T, 64.5% WR, +$0.70. 7d: 367T, 54.8% WR, -$4.35. **R:R STILL UNDERWATER** — 31 trades post-fix: avg win $0.111, avg loss $0.152, R:R 0.73. Breakeven WR for R:R 0.73 = 68.1%, actual 64.5%. Expected value +$0.019/trade (marginal). ema300-dip-short already killed (NEVER_REENABLE). 5 open positions, -$0.05 unrealized. Disk 82%. Market NEUTRAL.
 
 **Active signals (7d):**
 - **bb-bounce-v2-long+ STAR:** 43T, 79.1% WR, +$1.57 — growing, sole profitable backbone
-- **open-skies+:** 8T, 75% WR, +$0.44 — growing, emerging #2
+- **open-skies+:** 10T, 70% WR, +$0.50 — GROWING (was 8T at 14:30), emerging #2
 - **continuation+:** 5T, 100% WR, +$0.33 — tiny sample
-- **ema300-dip-short:** 7T, 28.6% WR, -$0.57 — DEGRADED (was 40% WR, now 28.6%)
+- **ema300-dip-short:** 8T/7d, 25% WR, -$0.69 — KILLED earlier today (NEVER_REENABLE)
 
 ### Root Cause
-R:R fix works but avg loss ($0.152) still exceeds avg win ($0.114). The system is profitable at 65%+ WR because profit-monster-trail exits capture large moves, but the stop losses are still too wide relative to typical wins. ema300-dip-short is the only active SHORT signal and it's degrading — 28.6% WR with all cut-loser-CL-T1 exits in NEUTRAL chop.
+R:R ratio 0.73 means avg_win ($0.111) is only 73% of avg_loss ($0.152). At 64.5% WR, the system is marginally profitable (+$0.019/trade) but fragile — one bad streak tips it negative. The PM_TRAIL captures winners but the trail distance (0.40%) is too tight, causing exits before moves fully develop. Widening to 0.50% should increase avg_win without affecting avg_loss.
 
 ### Fix Applied
-1. **NO PARAMETER CHANGES.** R:R fix confirmed working — WR 65.4% > breakeven 57.1%. System profitable as-is.
-2. **ema300-dip-short MONITORING** — 7T/7d 28.6% WR -$0.57. At 7T (of 15T kill threshold). If WR stays <45% at 15T, kill.
-3. **Updated CURRENT.md** — verified numbers, updated signal performance.
-4. **Updated ceo_kanban.md** — logged this run.
+1. **PM_TRAIL_DISTANCE_PCT 0.40%→0.50%** — lets winners run further before trailing kicks in. Expected: avg_win $0.111→$0.122, R:R 0.73→0.80, expected value +$0.019→+$0.033/trade.
+2. **ema300-dip-short ALREADY KILLED** — set False + NEVER_REENABLE by earlier CEO run today. 8T/7d are pre-kill legacy closing.
+3. **Updated ceo_kanban.md** — logged this run.
 
 ### Verification
-- 24h: 27T 66.7% WR +$0.59 ✅
+- 24h: 31T 64.5% WR +$0.70 ✅ (improved from +$0.59 at 14:30)
 - 7d: 367T 54.8% WR -$4.35 ✅
-- R:R fix: 26 trades, 0.75 R:R (up from 0.57, +31.6%) ✅
-- bb-bounce-v2-long+: 43T 79.1% WR +$1.57 ✅
-- open-skies+: 8T 75% WR +$0.44 ✅
-- ema300-dip-short: 7T 28.6% WR -$0.57 ⚠️ monitoring
+- R:R: 31 trades, 0.73 ratio — MARGINAL (breakeven at 68.1% WR)
+- bb-bounce-v2-long+: 9T/24h 88.9% WR +$0.69 ✅ STAR
+- open-skies+: 10T/24h 70% WR +$0.50 ✅ GROWING
+- ema300-dip-short: KILLED ✅
+- PM_TRAIL fix applied, needs 20+ trades to verify
 - Disk 82%, pipeline healthy ✅
 
 ### Next Actions
-1. **Monitor R:R fix** — 26 trades, confirmed profitable. No changes needed.
-2. **Monitor ema300-dip-short** — kill at 15T if WR <45%.
-3. **Monitor open-skies+** — growing, evaluate at 20T.
+1. **Verify PM_TRAIL_DISTANCE_PCT fix** — 20+ trades needed. Expected R:R 0.80.
+2. **Monitor open-skies+** — 10T/7d, evaluate at 20T for backbone status.
+3. **Monitor continuation+** — 5T/7d, 100% WR, tiny sample.
 4. **neutral_sniper shadow** — needs 48h evaluation before flip.
 5. **Delegate: Build NEUTRAL regime signal** — CRITICAL, pending 4 days.
+6. **Monitor SHORT side** — ema300-dip-short killed. No active SHORT backbone. System 100% LONG-dependent.
 
 ---
 
