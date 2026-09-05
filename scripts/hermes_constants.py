@@ -799,7 +799,7 @@ SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 gr
 # Forces diversification and prevents monoculture (e.g., 84% LONG concentration).
 # CEO recommendation: highest-impact mechanical fix for regime-transition giveback.
 DIRECTIONAL_CAP_ENABLED = True
-DIRECTIONAL_CAP_MAX_PCT = 65               # % — max open positions in one direction (65% = 2 out of 3)
+DIRECTIONAL_CAP_MAX_PCT = 80               # % — max open positions in one direction (80% = 4 out of 5). Only blocks at extreme concentration (5L/0S). Conservative — lets system ride winners.
 
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
