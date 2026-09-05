@@ -1137,6 +1137,8 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
+    'coil-spring',           # volume contraction pullback — own ATR SL/TP (1.5x/4.0x), no PM Trail benefit
+    'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1435,6 +1437,15 @@ COILED_SPRING_STRUCT_PER_LOW    = 2       # structure bonus per additional swing
 COILED_SPRING_PRICE_AGE_MAX     = 10      # max price age in minutes before skipping
 COILED_SPRING_RSI_FALLBACK      = 50      # RSI fallback when None (neutral)
 COILED_SPRING_ATR_FALLBACK_PCT  = 0.005   # ATR fallback as fraction of price when None
+
+# ── Coiled Spring Trigger (volume-confirmed variant) ───────────────────────────
+# coiled_spring_trigger.py — fires ONLY on volume spike after coil setup
+COILED_SPRING_TRIGGER_LONG_ENABLED = True
+COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED = True
+COILED_SPRING_TRIGGER_LONG_COOLDOWN_MINUTES = 15
+COILED_SPRING_TRIGGER_LONG_CONF_BASE = 80      # higher base — volume confirmation = higher conviction
+COILED_SPRING_TRIGGER_LONG_CONF_FLOOR = 70     # floor still high — this is a quality signal
+COILED_SPRING_TRIGGER_LONG_CONF_CAP = 92       # can go higher than coil variant
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
 # For each signal: _PLUS_ENABLED controls LONG, _MINUS_ENABLED controls SHORT.

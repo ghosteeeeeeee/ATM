@@ -1371,6 +1371,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # coiled_spring_trigger (source: coil-trigger+)
+            if _comp.startswith('coil-trigger') or _comp == 'coiled_spring_trigger':
+                try:
+                    from hermes_constants import COILED_SPRING_TRIGGER_LONG_ENABLED
+                    if not COILED_SPRING_TRIGGER_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COILED_SPRING_TRIGGER_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp.startswith('coil-trigger') and ('+@' in _comp or _comp.endswith('+')):
+                try:
+                    from hermes_constants import COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED
+                    if not COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # counter-flip
             if _comp == 'counter-flip':
                 try:
