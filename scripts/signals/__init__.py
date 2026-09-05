@@ -34,6 +34,7 @@ from hermes_constants import (
     BTC_WAVE_DETECTOR_ENABLED,
     PUMP_FLOW_ENABLED,
     OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
+    NEUTRAL_SNIPER_ENABLED, NEUTRAL_SNIPER_PLUS_ENABLED, NEUTRAL_SNIPER_MINUS_ENABLED,
 )
 
 
@@ -209,6 +210,11 @@ try:
 except Exception:
     _open_skies_run = None
 
+try:
+    from signals.neutral_sniper import run as _neutral_sniper_run
+except Exception:
+    _neutral_sniper_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -250,6 +256,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'btc_wave_detector',         'enabled': 'BTC_WAVE_DETECTOR_ENABLED',     'run': _btc_wave_detector_run},
     {'name': 'pump_flow_signal',          'enabled': 'PUMP_FLOW_ENABLED',             'run': _pump_flow_signal_run},
     {'name': 'open_skies',                'enabled': 'OPEN_SKIES_ENABLED',            'run': _open_skies_run},
+    {'name': 'neutral_sniper',            'enabled': 'NEUTRAL_SNIPER_ENABLED',        'run': _neutral_sniper_run},
 ]
 
 

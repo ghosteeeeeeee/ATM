@@ -1116,6 +1116,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     'coil-spring',           # volume contraction pullback — own ATR SL/TP (1.5x/4.0x), no PM Trail benefit
+    'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
@@ -1833,6 +1834,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
+    'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -2262,6 +2264,29 @@ RANGE_REVERSION_RSI_OVERSOLD = 42        # LONG: RSI below this (was 35, raised 
 RANGE_REVERSION_RSI_OVERBOUGHT = 65      # SHORT: RSI above this
 RANGE_REVERSION_COOLDOWN_MINUTES = 45    # per token cooldown
 RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
+
+# ── Neutral Sniper Signal ───────────────────────────────────────────────────────
+# neutral_sniper.py — Mean-reversion confluence for NEUTRAL regime
+# Family: MeanReversion (pairs with ANY other family for 2-type confluence)
+# NEW 2026-09-05 — addresses signal starvation in NEUTRAL regime
+# Uses Stochastic RSI + CMF + ATR range filter (different from BB/RSI signals)
+NEUTRAL_SNIPER_ENABLED = True            # master toggle
+NEUTRAL_SNIPER_PLUS_ENABLED = True       # LONG direction
+NEUTRAL_SNIPER_MINUS_ENABLED = True      # SHORT direction
+NEUTRAL_SNIPER_STOCH_RSI_PERIOD = 14     # RSI period for StochRSI
+NEUTRAL_SNIPER_STOCH_RSI_K = 3           # %K smoothing
+NEUTRAL_SNIPER_STOCH_RSI_D = 3           # %D smoothing
+NEUTRAL_SNIPER_OVERSOLD = 15             # LONG: K below this
+NEUTRAL_SNIPER_OVERBOUGHT = 85           # SHORT: K above this
+NEUTRAL_SNIPER_CMF_PERIOD = 20           # CMF period
+NEUTRAL_SNIPER_CMF_LONG_MIN = 0.0        # LONG: CMF must be > 0
+NEUTRAL_SNIPER_CMF_SHORT_MAX = 0.0       # SHORT: CMF must be < 0
+NEUTRAL_SNIPER_ATR_PERIOD = 14           # ATR period
+NEUTRAL_SNIPER_ATR_MAX_PCT = 1.2         # max ATR% (range filter)
+NEUTRAL_SNIPER_ATR_MIN_PCT = 0.05        # min ATR% (avoid dead tokens)
+NEUTRAL_SNIPER_COOLDOWN_MINUTES = 45     # per token+direction cooldown
+NEUTRAL_SNIPER_LOOKBACK_5M = 150         # 5m candles to fetch
+NEUTRAL_SNIPER_MIN_BARS = 40             # minimum candles for detection
 
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
 # ma_100_cross.py — Trend reversal at 100-period moving average
