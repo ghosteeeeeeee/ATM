@@ -1374,3 +1374,59 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CHIP', 'CRV', 'ENA', 'FIL', 'JUP', 
 - Tasks completed: 2/2 (disk cleanup, CURRENT.md update)
 - First-attempt success: 100%
 - System health: OK (1 compactor timeout recovered)
+
+## [2026-09-05 08:07 UTC] Hourly Analysis
+
+**Trades:** 0T last hour. 32T/24h, 20W 12L, 62.5% WR
+**PnL:** -$0.37 (24h). Stars carrying: open-skies+ +$0.55, continuation+ +$0.30, bb-bounce-v2-long+ +$0.09.
+**Open:** 3 positions ($42.10) — BLUR LONG, WLFI SHORT, ME LONG
+
+**Close reasons (24h):** profit-monster-trail 16T +$1.27 dominant. atr_sl_hit 7T 21.9% under 40%. cut-loser-CL-T1 5T -$0.70.
+
+**Signal health (24h):**
+- Stars: continuation+ 4T 100%WR, open-skies+ 3T 100%WR, bb-bounce-v2-long+ 3T 100%WR
+- Drag: ema300-dip 11T 45%WR -$0.91 (improving from -$0.98), ema300-dip-short 6T 33%WR -$0.42
+- No kill criteria met (need 0%WR + 3+T last hour; 0T last hour)
+
+**Changes:**
+None — kill criteria not met, atr_sl_hit under 40%, trade freq 0/hr quiet. System steady state.
+
+**No Change Needed:**
+- Kill criteria: 0 trades last hour, no signal qualifies
+- atr_sl_hit: 21.9% well under 40%
+- Trade freq: 0/hr quiet overnight
+
+**Open Questions:**
+- ema300-dip at -$0.91/24h still biggest drag — watch for further deterioration
+- 3 open positions small ($42.10) — low exposure
+- Overnight quiet — expect activity in US session
+
+**Next:** Re-run at 09:07 UTC
+
+## [2026-09-05 09:07 UTC] Hourly Analysis
+
+**Trades:** 2T last hour (2W +$0.23). 33T/24h, 21W 12L, 63.6% WR
+**PnL:** -$0.17 (24h). Stars dominating: open-skies+ 4T 100%WR +$0.58, continuation+ 4T 100%WR +$0.30, bb-bounce-v2-long+ 4T 100%WR +$0.29.
+**Open:** 2 positions — both winners last hour (BLUR LONG +$0.20, LTC LONG +$0.03)
+
+**Close reasons (24h):** profit-monster-trail 17T +$1.47 dominant. atr_sl_hit 7T 21.2% under 40%. cut-loser-CL-T1 5T -$0.70.
+
+**Signal health (24h):**
+- Stars: open-skies+ 4T 100%WR +$0.58, continuation+ 4T 100%WR +$0.30, bb-bounce-v2-long+ 4T 100%WR +$0.29
+- Drag: ema300-dip 11T 45.5%WR -$0.91, ema300-dip-short 6T 33.3%WR -$0.42
+- No kill criteria met (need 0%WR + 3+T last hour; 2T last hour both wins)
+
+**Changes:**
+None — system healthy, WR climbing, stars dominant.
+
+**No Change Needed:**
+- Kill criteria: 2T last hour both wins, no signal qualifies
+- atr_sl_hit: 21.2% well under 40%
+- Trade freq: 2/hr normal
+- WR trending up: 54.8% → 62.5% → 63.6%
+
+**Open Questions:**
+- ema300-dip still biggest drag (-$0.91/24h) but not killable (45.5% WR)
+- System on strong backbone of 3 star signals
+
+**Next:** Re-run at 10:07 UTC
