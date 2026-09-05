@@ -755,6 +755,54 @@ def get_zscore_accel_penalty(token: str, direction: str) -> float:
     return 1.0  # neutral quadrant
 
 
+# ── Directional Cap ──────────────────────────────────────────────────────────
+def _check_directional_cap(direction: str) -> str | None:
+    """
+    Check if adding a position in this direction would exceed the directional cap.
+    Returns None if allowed, or a reason string if blocked.
+
+    Uses PostgreSQL to count open positions by direction.
+    """
+    from hermes_constants import DIRECTIONAL_CAP_MAX_PCT
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                user='postgres', connect_timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT direction, COUNT(*) as cnt
+            FROM trades
+            WHERE status = 'open' AND server = 'Hermes'
+            GROUP BY direction
+        """)
+        counts = {row[0]: row[1] for row in cur.fetchall()}
+        cur.close(); conn.close()
+
+        long_count = counts.get('LONG', 0)
+        short_count = counts.get('SHORT', 0)
+        total = long_count + short_count
+
+        if total == 0:
+            return None  # no open positions, always allowed
+
+        # Check if adding this trade would exceed cap
+        if direction.upper() == 'LONG':
+            new_long = long_count + 1
+            ratio = (new_long / (total + 1)) * 100
+            if ratio > DIRECTIONAL_CAP_MAX_PCT:
+                return f"would be {new_long}/{total+1} LONG = {ratio:.0f}% > {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+        else:
+            new_short = short_count + 1
+            ratio = (new_short / (total + 1)) * 100
+            if ratio > DIRECTIONAL_CAP_MAX_PCT:
+                return f"would be {new_short}/{total+1} SHORT = {ratio:.0f}% > {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+
+        return None  # within cap
+    except Exception as e:
+        log(f"  [WARN] _check_directional_cap PostgreSQL error: {e}", 'WARN')
+        return None  # fail open — don't block trades on DB errors
+
+
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data):
@@ -774,6 +822,19 @@ def _score_signal(token, direction, conf, source, signal_type,
         return 0.0  # hard block — overconfident trades buy the top
     if CONF_FILTER_ENABLED and conf < CONF_FILTER_MIN:
         return 0.0  # hard block — low-confidence signals are noise (CEO 2026-09-01: <75 tier 28.6% WR -$0.72/24h)
+
+    # ── Directional Cap: prevent monoculture (2026-09-05) ────────────────
+    # CEO recommendation: cap open positions at 65% in one direction.
+    # Prevents regime-transition bleed when one direction dominates.
+    from hermes_constants import DIRECTIONAL_CAP_ENABLED, DIRECTIONAL_CAP_MAX_PCT
+    if DIRECTIONAL_CAP_ENABLED:
+        try:
+            _cap_result = _check_directional_cap(direction)
+            if _cap_result is not None:
+                log(f"  🧢 [DIR-CAP] {token} {direction}: BLOCKED — {_cap_result}")
+                return 0.0
+        except Exception as e:
+            log(f"  [WARN] Directional cap check failed: {e}", 'WARN')
 
     # ── Time block: penalty during 01-06 UTC (low-liquidity pre-market) ───
     from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END, TIME_BLOCK_PENALTY

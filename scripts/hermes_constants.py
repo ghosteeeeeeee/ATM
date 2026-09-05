@@ -793,6 +793,14 @@ SHORT_VEL_FILTER_ENABLED = True
 SHORT_VEL_FILTER_VEL_THRESHOLD = 0.3   # % — block SHORT if 5h velocity > this (raised from 0.1% — was blocking SHORTs on noise)
 SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 green candles blocked BCH SHORT (vel=-0.056%, last3g=3). 5 green candles = stronger signal SHORT is counter-trend. Monitor: SHORT WR (should stay ≥50%), daily trades (must ↑).
 
+# ── Directional Cap (2026-09-05) ──────────────────────────────────────────────
+# Prevents regime-transition bleed by capping how many open positions can be
+# in one direction. When cap is hit, new entries in that direction are blocked.
+# Forces diversification and prevents monoculture (e.g., 84% LONG concentration).
+# CEO recommendation: highest-impact mechanical fix for regime-transition giveback.
+DIRECTIONAL_CAP_ENABLED = True
+DIRECTIONAL_CAP_MAX_PCT = 65               # % — max open positions in one direction (65% = 2 out of 3)
+
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
 # Fires when 3+ of last 5 trades in same direction are losses within 30min.
