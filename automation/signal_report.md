@@ -1,33 +1,33 @@
 === Signal Performance Report ===
-Period: 2026-09-05 09:30 UTC | Last 6h + 24h
+Period: 2026-09-05 23:08 UTC | Last 6h + 24h
 
 ## 24h Overview
-- Trades: 27 | WR: 59.3% | Total PnL: -$0.50 | Avg: -$0.02
+- Trades: 26 | WR: 42.3% | Total PnL: -$0.43
 
 ## 6h Overview
-- Trades: 6 | WR: 66.7% | Total PnL: +$0.05
+- Trades: 5 | WR: 60.0% | Total PnL: +$0.26
 
 ## KILLED (executed this period)
-None. Both ema300-dip variants already dead (flags OFF + NEVER_REENABLE since 09-04). Legacy trades closing out — 15 trades still in 24h window bleeding -$1.44.
+None new. ema300-dip-short already dead (flag OFF + NEVER_REENABLE since 09-05 morning). Legacy trades still closing: 5 trades in 24h window, all cut-loser-CL-T1, -$0.73 PnL.
 
 ## BOOSTED (executed this period)
-None. No signals with 5+ trades meeting all boost criteria with room to increase weight.
+None. Top performers already at full weight in compactor.
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ema300-dip | LONG | 33.3% | -$1.02 | 9 | DEAD — killed 09-04, NEVER_REENABLE. Legacy only. |
-| ema300-dip-short | SHORT | 33.3% | -$0.42 | 6 | DEAD — killed 09-04, NEVER_REENABLE. Legacy only. |
+| ema300-dip-short | SHORT | 0.0% | -$0.73 | 5 | DEAD — killed 09-05, NEVER_REENABLE. All cut-loser-CL-T1. |
+| r2-trend-short3 | SHORT | 0.0% | -$0.20 | 1 | DEAD — NEVER_REENABLE. Single loser. |
 | ema300-dip-short,rs-r37 | SHORT | 0.0% | -$0.12 | 1 | WATCH — composite signal, single trade. |
+| coil-spring+ | LONG | 33.3% | -$0.07 | 3 | WATCH — 2 atr_sl_hit, 1 breakeven. Only 3 trades, not kill threshold. |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 100% | +$0.64 | 5 | STRONG — 5/5 wins across LTC, TURBO, DYDX, SUSHI |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.27 | 3 | STRONG — 3/3 wins across BLUR, NXPC, FOGO |
-| continuation+ | LONG | 100% | +$0.15 | 3 | STRONG — 3/3 wins across ME, ATOM |
+| bb-bounce-v2-long+ | LONG | 90.9% | +$1.02 | 11 | STRONG — 10/11 wins across 10 tokens. Best performer. |
+| open-skies+ | LONG | 63.6% | +$0.36 | 11 | SOLID — 7/11 wins, 5/8 tokens profitable. Consistent. |
 
 ## ISSUES
 - No direction inversions found.
-- Overall PnL -$0.50 despite 59.3% WR — legacy ema300-dip trades account for -$1.44. Active signals net +$0.94. System healthy once legacy drains.
-- All active signals 100% WR — small sample, monitor for regression.
+- ema300-dip-short legacy trades still bleeding in 24h window despite flag killed morning 09-05. Will clear by next report.
+- coil-spring+ not at kill threshold yet (3 trades, needs 5+). Monitor next cycle — if WR stays <30% with 5+ trades, kill it.
