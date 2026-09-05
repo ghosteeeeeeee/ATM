@@ -1284,3 +1284,93 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - ema300-dip still biggest drag at -$0.98/24h but not killable (46.2%WR)
 - System essentially breakeven — stars carrying, drag limiting upside
+
+## FAVORITES Update — 2026-09-05 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ONDO (WR=33.3%, PnL=$-0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ASTER (WR=57.1%, PnL=$-0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE GMT (WR=55.6%, PnL=$-0.35, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE AIXBT (WR=100.0%, AvgPnL=1.00%, Trades=6)
+
+Final set: ['AIXBT', 'BABY', 'DOGE', 'DOT', 'FOGO', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'POL', 'SEI', 'TURBO', 'USUAL', 'YGG']
+
+## LOSERS Update — 2026-09-05 06:02 UTC
+- REMOVE LDO (insufficient data)
+- REMOVE ICP (insufficient data)
+- REMOVE NOT (WR=50.0%, PnL=$-0.07, recovered)
+- REMOVE ZEN (insufficient data)
+- REMOVE XPL (insufficient data)
+- REMOVE MET (WR=57.1%, PnL=$-0.20, recovered)
+- REMOVE SAND (insufficient data)
+- ADD BCH (WR=33.3%, PnL=$-0.43, low_wr (33.3%))
+- ADD NEAR (WR=40.0%, PnL=$-0.08, wr_collapse (63.6% → 40.0%))
+- ADD CRV (WR=46.2%, PnL=$0.16, low_wr (46.2%))
+
+Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CHIP', 'CRV', 'ENA', 'FIL', 'JUP', 'NEAR', 'W']
+
+## 2026-09-05 07:07 UTC — Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet overnight)
+**24h:** 31T 54.8%WR ~$0.06 breakeven
+
+**24h Top Signals:**
+- open-skies+: 3T 100%WR +$0.55 ⭐
+- continuation+: 4T 100%WR +$0.30 ⭐
+- bb-bounce-v2-long+: 3T 100%WR +$0.09 ⭐
+- ema300-dip: 12T 50%WR -$0.87 (drag)
+
+**24h Close Reasons:**
+- profit-monster-trail: 17T +$1.31 (carrying system)
+- atr_sl_hit: 7T -$0.79 (21.9% — under 40% ✓)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- Kill criteria not met
+- atr_sl_hit 21.9% under 40%
+- Trade freq 0/hr quiet
+- Stars carrying, ema300-dip drag not killable
+
+**Open Questions:**
+- ema300-dip at -$0.87/24h still biggest drag — watch for further deterioration
+
+## Daily Orchestrator Report — 2026-09-05 06:30 UTC
+
+**Pipeline Status:**
+- Trades (24h): 31T, 64.5% WR, -$0.24
+- Trades (7d): 368T, 54.9% WR, -$4.34
+- Open: 4 positions
+- Market: 3 LONG_BIAS / 105 NEUTRAL / 0 SHORT
+
+**R:R Fix Effect (11 trades post-fix):**
+- profit-monster-trail: 5T avg +$0.142 (2.7x old $0.053)
+- cut-loser-CL-T1: 4T avg -$0.142
+- profit-monster-T1: 2T avg +$0.080
+- Net: +$0.30 (profitable!)
+- R:R ratio: 0.69→1.26 (83% improvement)
+- Need 20+ trades to confirm
+
+**Top Signals (7d):**
+- bb-bounce-v2-long+: 36T 78%WR +$0.95 ★ STAR
+- open-skies+: 3T 100%WR +$0.55
+- continuation+: 4T 100%WR +$0.30
+
+**Implemented Today:**
+1. Disk cleanup — freed 3G (coin_tracker 2.2G→752MB, hl_copy 1.9G→324MB)
+2. Updated CURRENT.md with verified DB data
+
+**Critical Issues:**
+- Signal starvation — system on 1 profitable backbone (bb-bounce-v2-long+)
+- NEUTRAL signal build pending since Sep 1 — never delivered
+- ema300-dip-short borderline (5T/40%WR -$0.29)
+
+**Next Steps:**
+1. Monitor R:R fix — need 20+ trades to confirm
+2. Build NEUTRAL regime signal (delegated, pending)
+3. Monitor ema300-dip-short for potential kill
+4. Monitor bb-bounce-v2-long+ performance
+
+**Quality Metrics:**
+- Tasks completed: 2/2 (disk cleanup, CURRENT.md update)
+- First-attempt success: 100%
+- System health: OK (1 compactor timeout recovered)

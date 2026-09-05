@@ -244,19 +244,17 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
-    'ASTER',
+    'AIXBT',
     'BABY',
     'DOGE',
     'DOT',
     'FOGO',
-    'GMT',
     'INJ',
     'KAS',
     'LTC',
     'ME',
     'MNT',
     'NXPC',
-    'ONDO',
     'POL',
     'SEI',
     'TURBO',
@@ -280,20 +278,17 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 LOSERS = {
     'APT',
     'ARB',
+    'BCH',
     'CASHCAT',
     'CHIP',
+    'CRV',
     'ENA',
     'FIL',
-    'ICP',
     'JUP',
-    'LDO',
-    'MET',
-    'NOT',
-    'SAND',
-    'W',
-    'XPL',
-    'ZEN'
+    'NEAR',
+    'W'
 }
+
 
 
 
@@ -1076,7 +1071,7 @@ HH_HL_CHOCH_MAX_BARS_SINCE   = 15  # reject if flip is older than this many bars
 # Never touches losing positions.
 # ── Profit Monster — Two-Tier Take-Profit ──────────────────────────────────────
 # Tier 1: Quick scalp — lower profit, fires frequently
-PM_TIER1_MIN_PCT    = 0.5    # min profit % to close
+PM_TIER1_MIN_PCT    = 0.65   # min profit % to close — raised from 0.5% to let PM_TRAIL (0.60%) activate first
 PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
 PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
 PM_TIER1_SKIP_TOP_PCT = 0    # don't touch top X% most profitable (0 = disabled)

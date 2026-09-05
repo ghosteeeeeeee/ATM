@@ -1,37 +1,32 @@
 === Signal Performance Report ===
-Period: 2026-09-04 11:08 UTC | 6h + 24h
+Period: 2026-09-05 03:30 UTC | Last 6h + 24h
 
-KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| ema300-dip | LONG | 58.8% (24h), 25% (6h) | -$1.13 | 34 | DISABLED — losses 2.7x wins, deteriorating |
+## 24h Overview
+- Trades: 32 | WR: 65.6% | Total PnL: -$0.17 | Avg: -$0.01
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 64.3% | $0.14 | 14 | Watch — healthy edge |
-| continuation+ | LONG | 100% | $0.30 | 4 | Watch — too few trades to boost |
+## KILLED (executed this period)
+None. Previous kill `ema300-dip-long` (2026-09-04) confirmed working — 13 legacy trades bleeding out, zero new entries.
 
-LOSERS (watch list):
+## BOOSTED (executed this period)
+None. No signals with 5+ trades meeting all boost criteria.
+
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v3-long+ | LONG | 40.0% | -$0.47 | 5 | Already killed (2026-09-04) |
-| accel-300-v3-short- | SHORT | 25.0% | -$0.26 | 4 | Already killed (2026-09-04) |
+| ema300-dip | LONG | 46.2% | -$0.98 | 13 | DEAD — killed 09-04, legacy trades closing. In NEVER_REENABLE. |
+| ema300-dip-short | SHORT | 50.0% | -$0.15 | 4 | WATCH — need 10+ trades to evaluate. Borderline. |
+| ema300-dip-short,rs-r37 | SHORT | 0.0% | -$0.12 | 1 | WATCH — single trade, too early. |
 
-WINNERS:
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 64.3% | $0.14 | 14 | Active — 64.3% WR, $0.07 avg win |
-| continuation+ | LONG | 100% | $0.30 | 4 | Active — clean, few trades |
+| open-skies+ | LONG | 100% | +$0.55 | 3 | STRONG — 3/3 wins, +$0.18 avg |
+| continuation+ | LONG | 100% | +$0.30 | 4 | STRONG — 4/4 wins, +$0.075 avg |
+| bb-bounce-v2-long+ | LONG | 100% | +$0.09 | 2 | OK — small sample |
 
-ISSUES:
-- ema300-dip structural problem: avg loss ($0.15) = 2.7x avg win ($0.05). 58.8% WR can't overcome this.
-- 6h ema300-dip: 25% WR, -$1.14 — signal is deteriorating in current market.
-- ATR_SL exits dominate losses (8/15 losses). Stop at 1.5% SL_PCT is too tight for current vol.
-- No signal inversions detected.
-- Total system 24h: 69 trades, 55.1% WR, -$2.03. ema300-dip was the drag.
+## 6h Micro
+9 trades. Winners: open-skies+ ($0.55), ema300-dip ME ($0.12 legacy), bb-bounce-v2-long+ ($0.07). Losers: ema300-dip-short ($0.31 across 2 trades).
 
-PREVIOUSLY KILLED (confirmed):
-- ACCEL_300_V3_LONG_ENABLED = False (CEO 2026-09-04)
-- ACCEL_300_V3_SHORT_ENABLED = False (AUTO_1HR 2026-09-04)
-- SLOW_GRIND_SHORT_ENABLED = False (CEO 2026-09-04)
+## ISSUES
+- None. No direction inversions found.
+- Overall PnL -$0.17 despite 65.6% WR — losses are slightly larger than wins. Watch for drift.

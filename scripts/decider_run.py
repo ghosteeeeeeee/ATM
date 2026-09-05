@@ -1284,14 +1284,10 @@ def hebbian_trade_boost(token, signal):
     if result is None:
         # FIX 2026-09-05: Even when WR lookup fails, return exit_quality if available
         # so the LLM fail-open can check profit dominance
-        try:
-            eq = engine.exit_quality_score(signal) if signal else None
-            if eq and eq.get('profit_n', 0) > 0 and eq.get('sl_n', 0) == 0:
-                log(f'  [HEBBIAN] {token} {signal}: no WR data but exit_quality profit dominant (profit={eq["profit_n"]}, sl={eq["sl_n"]})')
-                _hebbian_cache[cache_key] = (0.5, eq['profit_n'], 1.0, [], eq, [], now, True, None)
-                return (0.5, eq['profit_n'], 1.0, [], eq, [], True, None)
-        except Exception:
-            pass
+        if exit_quality and exit_quality.get('profit_n', 0) > 0 and exit_quality.get('sl_n', 0) == 0:
+            log(f'  [HEBBIAN] {token} {signal}: no WR data but exit_quality profit dominant (profit={exit_quality["profit_n"]}, sl={exit_quality["sl_n"]})')
+            _hebbian_cache[cache_key] = (0.5, exit_quality['profit_n'], 1.0, [], exit_quality, [], now, True, None)
+            return (0.5, exit_quality['profit_n'], 1.0, [], exit_quality, [], True, None)
         _hebbian_cache[cache_key] = (None, None, None, [], None, None, now, None, None)
         return None
     wr, n, weight = result
@@ -1963,13 +1959,105 @@ def _run_hot_set():
         except Exception as e:
             log(f'  ⚠️ [BTC-CRASH] filter failed: {e}')
 
-        # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
-        # Tokens that survived more compaction cycles have proven themselves against
-        # market volatility. Approve them FIRST so rate limits don't block veterans.
-        # Secondary sort: confidence desc (proven quality)
-        hotset_sorted = sorted(hotset,
-            key=lambda s: (-s.get('survival_round', 0), -s.get('confidence', 0)))
-        _order = [f"{s['token']}(r{s.get('survival_round', 0)})" for s in hotset_sorted[:10]]
+        # ── HOT-SET ITERATION ORDER: smart selection ──────────────────────────
+        # FIX 2026-09-04: Enhanced selection with WR and hebbian quality
+        # Previously: survival_rounds first, then confidence (no WR consideration)
+        # Now: composite score incorporating signal WR, token WR, and hebbian quality
+        def _hotset_selection_score(entry):
+            """Compute selection score for hotset ranking.
+            Higher = better candidate for execution."""
+            score = 0.0
+
+            # 1. Survival rounds (proven against market conditions)
+            survival = entry.get('survival_round', 0)
+            score += survival * 10  # +10 per round survived
+
+            # 2. Confidence (signal quality)
+            conf = entry.get('confidence', 0) or 0
+            score += conf * 0.5  # +0.5 per confidence point
+
+            # 3. Signal WR boost (cached from pre-computed dict)
+            _tok = entry.get('token', '').upper()
+            _dir = entry.get('direction', '').upper()
+            _src = entry.get('source', '')
+            _src_clean = (_src.split(',')[0].strip() if _src else '')
+            _sig_key = f"{_src_clean}:{_dir}"
+            if _sig_key in _sig_wr_cache:
+                score += _sig_wr_cache[_sig_key] * 30
+
+            # 4. Token WR boost (cached from pre-computed dict)
+            _tok_key = f"{_tok}:{_dir}"
+            if _tok_key in _tok_wr_cache:
+                score += _tok_wr_cache[_tok_key] * 20
+
+            # 5. Hebbian quality (cached from pre-computed dict)
+            if _src_clean in _hebbian_cache:
+                score += _hebbian_cache[_src_clean]
+
+            return score
+
+        # Pre-compute WR and hebbian data with single DB connection
+        _sig_wr_cache = {}
+        _tok_wr_cache = {}
+        _hebbian_cache = {}
+        try:
+            from signal_schema import _get_conn, _static
+            _conn = _get_conn(_static())
+            _cur = _conn.cursor()
+
+            # Signal WR: group by signal+direction
+            _cur.execute("""
+                SELECT signal, direction,
+                       SUM(CASE WHEN won=1 THEN 1 ELSE 0 END) as wins,
+                       COUNT(*) as total
+                FROM trade_log
+                GROUP BY signal, direction
+                HAVING COUNT(*) >= 3
+            """)
+            for _sig, _dir, _wins, _total in _cur.fetchall():
+                if _wins is not None and _total and _total > 0:
+                    _sig_wr_cache[f"{_sig}:{_dir}"] = (_wins or 0) / _total
+
+            # Token WR: group by token+direction
+            _cur.execute("""
+                SELECT token, direction,
+                       SUM(CASE WHEN won=1 THEN 1 ELSE 0 END) as wins,
+                       COUNT(*) as total
+                FROM trade_log
+                GROUP BY token, direction
+                HAVING COUNT(*) >= 3
+            """)
+            for _tok, _dir, _wins, _total in _cur.fetchall():
+                if _wins is not None and _total and _total > 0:
+                    _tok_wr_cache[f"{_tok}:{_dir}"] = (_wins or 0) / _total
+
+            _conn.close()
+        except Exception:
+            pass
+
+        # Hebbian quality: single engine instance
+        try:
+            from hebbian_engine import HebbianEngine
+            _he = HebbianEngine()
+            # Pre-fetch for common signals in hotset
+            _src_set = set()
+            for entry in hotset:
+                _s = entry.get('source', '')
+                if _s:
+                    _src_set.add(_s.split(',')[0].strip())
+            for _src_clean in _src_set:
+                try:
+                    _eq = _he.exit_quality_score(_src_clean)
+                    if _eq and (_eq['profit_n'] + _eq['sl_n']) >= 2:
+                        _ratio = (_eq['profit_n'] or 0) / max(_eq['sl_n'] or 0, 1)
+                        _hebbian_cache[_src_clean] = min(_ratio * 5, 25)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        hotset_sorted = sorted(hotset, key=_hotset_selection_score, reverse=True)
+        _order = [f"{s['token']}(r{s.get('survival_round', 0)} sc={_hotset_selection_score(s):.0f})" for s in hotset_sorted[:10]]
         log(f'  🔥 [HOT-SET] iteration order: {_order}...')
 
         # Iterate over canonical hot-set from JSON (SOLE source of truth)

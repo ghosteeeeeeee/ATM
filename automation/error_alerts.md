@@ -35,3 +35,21 @@
 - **[WARN]** (1x): `-32.01% PnL today` — 37 closed trades, performance issue.
 - **[INFO]** (15x): `Auxiliary services in failed state` — 5m-candle, daily-commit, error-analyzer, bug-hunter, wasp, watchdog, etc. None block core pipeline.
 - **AUTO-FIX**: None needed — pipeline operational, timers firing.
+
+## Error Alerts — 2026-09-05 03:22 UTC
+- **WARN** (1x): `Disk usage at 85%` — threshold hit
+- **AUTO-FIX**: Compressed logs older than 7 days, deleted .gz files older than 14 days
+- **NOTE**: Disk remains at 85% — hermes data dirs consume 9.9G (coin_tracker.db=2.2G, hl_copy.db=1.9G, candles.db=857M)
+
+## Error Alerts — 2026-09-05 04:23 UTC
+- **[WARN]** (5x): `signal_compactor: timed out` — recurring timeout in last hour
+- **[WARN]**: Disk at 85% (94G/118G) — coin_tracker.db 2.2G, hl_copy.db 1.9G
+- **[WARN]**: 171 phantom trades with |pnl| < 0.01 USDT
+- **AUTO-FIX**: No intervention needed — pipeline self-recovering
+
+## Error Alerts — 2026-09-05 06:22 UTC
+- **[LOW]** (1x): `signal_compactor: timed out` at 06:12 — one-off, recovered next cycle
+- **[WARN]**: Disk at 85% (94G/118G) — coin_tracker.db 2.2G, hl_copy.db 1.9G, candles.db 861M
+- **[INFO]**: 0 phantom trades (cleaned up since 04:23)
+- **[INFO]**: `hermes-watchdog.service` failing — `pipeline_watchdog.py` missing (stale timer)
+- **AUTO-FIX**: Compressed old logs (saved minimal space). No critical action needed.

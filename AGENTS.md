@@ -28,6 +28,7 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Lock file:** pipeline runs acquire `/tmp/hermes-pipeline.lock`. Check if stuck (auto-releases on exit).
 - **Two regimes run independently** — `4h_regime_scanner.py` and `15m_regime_scanner.py`. NOT in `run_pipeline.py` anymore.
 - **price_collector** runs via its own systemd timer, NOT from `run_pipeline.py`.
+- **STANDALONE_BYPASS_SIGNALS** — Pure confluence gate pass. Lets signals fire with 1 source type instead of requiring 2+. All other safety filters (blacklists, regime blocks, winrate, speed, etc.) still apply.
 
 ## Behavioral Directives
 
