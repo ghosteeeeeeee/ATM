@@ -1120,6 +1120,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
+    'coil-spring',           # volume contraction pullback — own ATR SL/TP (1.5x/4.0x), no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
