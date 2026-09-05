@@ -801,6 +801,19 @@ SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 gr
 DIRECTIONAL_CAP_ENABLED = True
 DIRECTIONAL_CAP_MAX_PCT = 80               # % — max open positions in one direction (80% = 4 out of 5). Only blocks at extreme concentration (5L/0S). Conservative — lets system ride winners.
 
+# ── Chop Detector (2026-09-05) ───────────────────────────────────────────────
+# Detects chop/transitions by combining 4 inputs:
+#   1. Directional outcome WR degradation
+#   2. BTC momentum (flat = chop)
+#   3. Volatility regime (FLAT = chop)
+#   4. Market phase (defensive/range = chop)
+# When CHOP detected: blocks momentum signals, allows mean-reversion.
+# Preserves momentum signal winrates for the next trend.
+CHOP_DETECTOR_ENABLED = True
+CHOP_DETECTOR_WR_THRESHOLD = 50            # % — directional outcome WR below this = chop vote
+CHOP_DETECTOR_BTC_MOM_THRESHOLD = 0.15     # % — BTC 30m momentum below this = flat = chop vote
+CHOP_DETECTOR_CACHE_TTL = 120              # seconds — regime cache lifetime
+
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
 # Fires when 3+ of last 5 trades in same direction are losses within 30min.
@@ -1123,7 +1136,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
-    'coil-spring',           # volume contraction pullback — own ATR SL/TP (1.5x/4.0x), no PM Trail benefit
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.

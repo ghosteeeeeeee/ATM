@@ -836,6 +836,22 @@ def _score_signal(token, direction, conf, source, signal_type,
         except Exception as e:
             log(f"  [WARN] Directional cap check failed: {e}", 'WARN')
 
+    # ── Chop Detector: preserve winrates during transitions (2026-09-05) ──
+    # Detects chop via WR degradation + BTC flatness + FLAT vol regime.
+    # Blocks momentum signals in chop (preserves their WR for next trend).
+    # Allows mean-reversion signals (they thrive in chop).
+    from hermes_constants import CHOP_DETECTOR_ENABLED
+    if CHOP_DETECTOR_ENABLED:
+        try:
+            from chop_detector import get_regime, should_trade_signal
+            _chop_regime = get_regime()
+            _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime)
+            if not _allowed:
+                log(f"  🌊 [CHOP] {token} {direction} {signal_type}: BLOCKED — {_chop_reason}")
+                return 0.0
+        except Exception as e:
+            log(f"  [WARN] Chop detector check failed: {e}", 'WARN')
+
     # ── Time block: penalty during 01-06 UTC (low-liquidity pre-market) ───
     from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END, TIME_BLOCK_PENALTY
     time_block_mult = 1.0
