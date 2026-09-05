@@ -343,7 +343,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
     # coiled_spring — volume contraction pullback in bullish trend (LONG only)
-    ('coiled_spring_long', 'coil-spring+'):   1.1,   # new signal, conservative start
+    ('coiled_spring_long', 'coil-spring+'):   1.3,   # boosted — backtested +3.3R, competitive with chain_fire/momentum
     # trend_momentum_near_sma — uptrend + momentum + near SMA (47.8% WR, +$9.66/14d)
     ('trend_momentum_near_sma', 'trend_momentum_near_sma+'): 1.0,
     # stop_hunt_reversal_long — CEO KILLED 2026-08-21, 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10
