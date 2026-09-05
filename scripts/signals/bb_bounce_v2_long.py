@@ -4,16 +4,16 @@
 V2 (2026-09-01): New signal calibrated from bb_bounce_short winner patterns.
 Key learnings from SHORT analysis:
   1. Bounce strength matters — winners have stronger bounce (0.13% vs 0.04%)
-  2. BB width matters — tighter squeeze = better (max 0.5%)
-  3. RSI matters — less extreme RSI is better (not too oversold)
+  2. BB width matters — wider BB can work for mean reversion (max 2.5%)
+  3. RSI matters — HIGHER RSI confirms bounce (RSI_MIN=35, not MAX)
   4. Velocity matters — lower velocity = better (price not extreme)
   5. Momentum matters — positive momentum for LONG (uptrend)
   6. Volatility matters — lower volatility = better (less choppy)
 
 Entry conditions:
 1. Price within 0.15% of lower BB
-2. RSI < 45 (not too oversold — SHORT winners had RSI ~61)
-3. BB width < 0.5% (tight squeeze)
+2. RSI > 35 (bounce confirmed — price recovering from oversold)
+3. BB width < 2.5% (not too wide)
 4. Bounce strength >= 0.10% (STRONGER than v1's 0.05%)
 5. 15m velocity > -0.01% (not falling hard)
 6. 30m momentum > 0 (uptrend confirmed)
@@ -43,7 +43,7 @@ from hermes_constants import (
     BB_BOUNCE_V2_BB_MIN_BARS as BB_MIN_BARS,
     BB_BOUNCE_V2_BB_WIDTH_MAX as BB_WIDTH_MAX,
     BB_BOUNCE_V2_RSI_PERIOD as RSI_PERIOD,
-    BB_BOUNCE_V2_RSI_MAX as RSI_MAX,
+    BB_BOUNCE_V2_RSI_MIN as RSI_MIN,
     BB_BOUNCE_V2_BOUNCE_MIN_PCT as BOUNCE_MIN_PCT,
     BB_BOUNCE_V2_VEL_MIN as VEL_MIN,
     BB_BOUNCE_V2_MOM_MIN as MOM_MIN,
@@ -67,7 +67,7 @@ def _compute_bb(closes, period=BB_PERIOD, stddev=BB_STDDEV):
     std = variance ** 0.5
     upper = middle + stddev * std
     lower = middle - stddev * std
-    width = (upper - lower) / middle if middle > 0 else 0
+    width = (upper - lower) / middle * 100 if middle > 0 else 0  # percentage
     return middle, upper, lower, width
 
 
@@ -270,9 +270,9 @@ def detect_bb_bounce_v2_long(token, closes):
         if width > BB_WIDTH_MAX:
             return None  # BB too wide, not a squeeze
 
-        # FILTER 2: RSI (not too oversold)
-        if rsi > RSI_MAX:
-            return None  # RSI too high, not oversold enough
+        # FILTER 2: RSI (bounce confirmation — price recovering)
+        if rsi < RSI_MIN:
+            return None  # RSI too low, bounce not confirmed
 
         # FILTER 3: Trend (not bearish)
         if trend == 'BEARISH':
@@ -357,11 +357,9 @@ def scan_bb_bounce_v2_long_signals(prices_dict):
 
         # Confidence based on calibrated factors
         base_conf = 70
-        if sig['rsi'] < 35:
-            base_conf += 5   # oversold
         if sig['bounce_pct'] > 0.20:
             base_conf += 5   # strong bounce
-        if sig['width'] < 0.3:
+        if sig['width'] < 1.5:
             base_conf += 5   # tight squeeze
         if sig['trend'] == 'BULLISH':
             base_conf += 5   # trend-aligned

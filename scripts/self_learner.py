@@ -108,8 +108,8 @@ PARAM_CONFIG = {
     
     # ── BB Bounce V2 ─────────────────────────────────────────────────────
     'BB_BOUNCE_V2_BB_TOUCH_PCT': {'min': 0.10, 'max': 0.25, 'step': 0.02, 'tighten': 'down'},
-    'BB_BOUNCE_V2_BB_WIDTH_MAX': {'min': 0.30, 'max': 0.60, 'step': 0.05, 'tighten': 'down'},
-    'BB_BOUNCE_V2_RSI_MAX': {'min': 35, 'max': 55, 'step': 5, 'tighten': 'down'},
+    'BB_BOUNCE_V2_BB_WIDTH_MAX': {'min': 1.5, 'max': 3.5, 'step': 0.25, 'tighten': 'down'},
+    'BB_BOUNCE_V2_RSI_MIN': {'min': 25, 'max': 45, 'step': 5, 'tighten': 'up'},
     'BB_BOUNCE_V2_BOUNCE_MIN_PCT': {'min': 0.05, 'max': 0.20, 'step': 0.02, 'tighten': 'up'},
     
     # ── Coiled Spring ────────────────────────────────────────────────────
@@ -574,7 +574,7 @@ def _find_weakest_param(signal_type):
         # ── BB Bounce Family ──────────────────────────────────────────────
         'bb_bounce': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
         'bb_bounce_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
-        'bb_bounce_v2_long': ['BB_BOUNCE_V2_BB_TOUCH_PCT', 'BB_BOUNCE_V2_RSI_MAX', 'BB_BOUNCE_V2_BOUNCE_MIN_PCT'],
+        'bb_bounce_v2_long': ['BB_BOUNCE_V2_BB_TOUCH_PCT', 'BB_BOUNCE_V2_RSI_MIN', 'BB_BOUNCE_V2_BOUNCE_MIN_PCT'],
         'bb_bounce_v2_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
         # ── R2 Trend ─────────────────────────────────────────────────────
         'r2_trend_long': ['R2_TREND_LONG_MIN_R2', 'R2_TREND_LONG_MIN_SLOPE', 'R2_TREND_LONG_MAX_RSI', 'R2_TREND_LONG_MIN_PRE_MOVE'],
