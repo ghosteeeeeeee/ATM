@@ -54,26 +54,30 @@ MEAN_REVERSION_FAMILIES = {
 # Signal-specific overrides (for signals that don't fit neatly into families)
 SIGNAL_OVERRIDES = {
     # Momentum signals — block in chop
-    'ema300-dip': 'MOMENTUM',
-    'ema300-dip-short': 'MOMENTUM',
-    'accel-300': 'MOMENTUM',
-    'accel-300-long': 'MOMENTUM',
-    'accel-300-short': 'MOMENTUM',
-    'continuation+': 'MOMENTUM',
+    'ema300_dip': 'MOMENTUM',
+    'ema300_dip_short': 'MOMENTUM',
+    'accel_300': 'MOMENTUM',
+    'accel_300_long': 'MOMENTUM',
+    'accel_300_short': 'MOMENTUM',
     'continuation': 'MOMENTUM',
-    'r2-trend-long': 'MOMENTUM',
-    'r2-trend-short': 'MOMENTUM',
+    'continuation_long': 'MOMENTUM',
+    'continuation_short': 'MOMENTUM',
+    'r2_trend_long': 'MOMENTUM',
+    'r2_trend_short': 'MOMENTUM',
 
     # Mean-reversion signals — always allowed
-    'bb-bounce-v2-long+': 'MEAN_REVERSION',
-    'bb-bounce-long+': 'MEAN_REVERSION',
-    'bb-bounce-short': 'MEAN_REVERSION',
-    'open-skies+': 'MEAN_REVERSION',
-    'range-reversion-long+': 'MEAN_REVERSION',
-    'return-exhaustion-long': 'MEAN_REVERSION',
-    'return-exhaustion-short': 'MEAN_REVERSION',
-    'coil-spring+': 'MEAN_REVERSION',
-    'liq-hunt+': 'MEAN_REVERSION',
+    'bb_bounce_v2_long': 'MEAN_REVERSION',
+    'bb_bounce_long': 'MEAN_REVERSION',
+    'bb_bounce_short': 'MEAN_REVERSION',
+    'open_skies': 'MEAN_REVERSION',
+    'open_skies_long': 'MEAN_REVERSION',
+    'range_reversion_long': 'MEAN_REVERSION',
+    'return_exhaustion_long': 'MEAN_REVERSION',
+    'return_exhaustion_short': 'MEAN_REVERSION',
+    'coiled_spring': 'MEAN_REVERSION',
+    'coiled_spring_long': 'MEAN_REVERSION',
+    'liquidation_hunt_long': 'MEAN_REVERSION',
+    'liquidation_hunt_short': 'MEAN_REVERSION',
 }
 
 
