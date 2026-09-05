@@ -1,5 +1,41 @@
 
 
+## [2026-09-05 12:06 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L, -$0.25)
+**24h Context:** 27T 51.9%WR -$0.89 | atr_sl_hit 14.8% (under 40%)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 12T (44%) avg +$0.100 — carrying system
+- cut-loser-CL-T1: 7T (26%) avg -$0.150 — normal
+- atr_sl_hit: 4T (15%) avg -$0.225 — healthy
+- hard_sl: 2T (7%) avg -$0.155 — rare
+
+**24h Signal Leaders:**
+- open-skies+: 7T 85.7%WR +$0.61 ⭐
+- bb-bounce-v2-long+: 4T 75%WR +$0.05 ⭐
+- ema300-dip-short: 6T 33.3%WR -$0.42
+- ema300-dip: 8T 25%WR -$1.05 (biggest drag)
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T in last hour → none to kill
+- atr_sl_hit 15% → well under 40%
+- ema300-dip: 25%WR (not 0%), 8T/24h — not kill criteria
+- Trade freq 3/hr normal
+- 5 open positions ($64.30)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 15% — healthy
+- Trade freq 3/hr — normal
+- ema300-dip drag ($1.05 loss) but 25%WR means not a kill candidate per rules
+
+**Open Questions:**
+- ema300-dip continues as biggest drag at -$1.05/24h with 25%WR. Not kill criteria but R:R problem persists.
+- ema300-dip-short also losing at -$0.42/24h. Both ema300 variants underperforming.
+
 ## [2026-09-04 15:06 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (system flat since 12:47 UTC)
@@ -1430,3 +1466,122 @@ None — system healthy, WR climbing, stars dominant.
 - System on strong backbone of 3 star signals
 
 **Next:** Re-run at 10:07 UTC
+
+## [2026-09-05 10:07 UTC] Hourly Analysis
+
+**Trades:** 2T last hour (2W +$0.09). 31T/24h, profit-monster-trail 17T +$1.45 dominant.
+**PnL:** +$0.09 last hour. System healthy.
+
+**Close reasons (24h):** profit-monster-trail 17T +$1.45, atr_sl_hit 5T -$1.04 (16.1%), cut-loser-CL-T1 5T -$0.70, hard_sl 2T -$0.31.
+
+**Signal health:** open-skies+/continuation+/bb-bounce-v2-long+ all 100%WR stars. ema300-dip 11T 45%WR -$0.91 biggest drag but not killable.
+
+**Changes:** None — kill criteria not met, atr_sl_hit 16.1% under 40%, trade freq 2/hr normal.
+
+**No Change Needed:**
+- Kill criteria: 2T last hour both wins
+- atr_sl_hit: 16.1% well under 40%
+- Trade freq: 2/hr normal
+
+**Next:** Re-run at 11:07 UTC
+
+## [2026-09-05 11:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 28T/24h, 17W 11L, 60.7% WR
+**PnL:** -$0.48 (24h). Last trade closed 09:04 UTC (SUSHI open-skies+ +$0.06).
+
+**Close reasons (24h):** profit-monster-trail 15T +$1.27 dominant. atr_sl_hit 4T -$0.90 (14.3%). cut-loser-CL-T1 5T -$0.70. hard_sl 2T -$0.31.
+
+**Signal health (24h):**
+- Stars: open-skies+ 5T 100%WR +$0.64, bb-bounce-v2-long+ 4T 100%WR +$0.29, continuation+ 3T 100%WR +$0.15
+- Drag: ema300-dip 9T 33.3%WR -$1.02, ema300-dip-short 6T 33.3%WR -$0.42
+- No kill criteria met (0T last hour)
+
+**Changes:** None — system healthy, no kill triggers.
+
+**No Change Needed:**
+- Kill criteria: 0T last hour, no signal qualifies
+- atr_sl_hit: 14.3% well under 40%
+- Trade freq: 0/hr quiet period
+- Stars all 100%WR
+
+**Open Questions:**
+- ema300-dip family still biggest drag but not killable (33.3% WR, not 0%)
+
+**Next:** Re-run at 12:07 UTC
+
+## [2026-09-05 12:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 27T/24h, 14W 13L, 51.9% WR
+**PnL:** -$0.50 (24h). Last trade closed 09:04 UTC (SUSHI open-skies+ +$0.06).
+
+**Close reasons (24h):** profit-monster-trail 14T +$1.25 dominant. cut-loser-CL-T1 5T -$0.70. atr_sl_hit 4T -$0.90 (14.8%). hard_sl 2T -$0.31. profit-monster-T1 2T +$0.16.
+
+**Signal health (24h):**
+- Stars: open-skies+ 5T 100%WR +$0.64, bb-bounce-v2-long+ 3T 100%WR +$0.27, continuation+ 3T 100%WR +$0.15
+- Drag: ema300-dip 9T 33.3%WR -$1.02, ema300-dip-short 6T 33.3%WR -$0.42
+- ema300-dip-short,rs-r37 1T 0%WR -$0.12 (only 1 trade, not killable)
+
+**Changes:** None — kill criteria not met, atr_sl_hit 14.8% under 40%, trade freq 0/hr quiet period.
+
+**No Change Needed:**
+- Kill criteria: 0T last hour, no signal qualifies
+- atr_sl_hit: 14.8% well under 40%
+- Trade freq: 0/hr quiet period
+- All star signals 100% WR
+
+**Open Questions:**
+- ema300-dip family biggest drag (-$1.44 combined) but not killable (33.3% WR)
+- 4 open positions ($53.20 exposure)
+
+**Next:** Re-run at 13:06 UTC
+
+## [2026-09-05 13:06 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L)
+**PnL:** +$0.34 (75% WR)
+**24h:** 24T 14W 10L 58.3%WR +$1.41
+
+**Close reasons (24h):** profit-monster-trail 14T +$1.67 dominant, cut-loser-CL-T1 8T -$1.22, profit-monster-T2 2T +$0.16. atr_sl_hit: 0%.
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 7T 85.7%WR +$0.56, open-skies+ 8T 75%WR +$0.44
+- Drag: ema300-dip-short 6T 33.3%WR -$0.42 (not killable)
+
+**Changes:** None — system healthy, no kill triggers, atr_sl_hit at 0%.
+
+**No Change Needed:**
+- Kill criteria: 0T last hour, no signal qualifies
+- atr_sl_hit: 0% — no issue
+- Trade freq: 4/hr normal
+- Open: 3 positions, $33.30 exposure
+
+**Next:** Re-run at 14:06 UTC
+
+## [2026-09-05 14:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2W 1L)
+**PnL:** -$0.02 (flat hour). 24h: 27T 18W 9L 66.7%WR +$0.59
+
+**Trades this hour:**
+- ALT LONG bb-bounce-v2-long+ → profit-monster-trail +$0.08 ✓
+- WLFI SHORT ema300-dip-short → cut-loser-CL-T1 -$0.15✗
+- IMX LONG bb-bounce-v2-long+ → atr_sl_hit +$0.05 ✓ (positive despite SL hit)
+
+**Close reasons (24h):** profit-monster-trail 15T +$1.75 dominant. cut-loser-CL-T1 9T -$1.37. profit-monster-T1 2T +$0.16. atr_sl_hit 1T +$0.05 (3.7%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 9T 88.9%WR +$0.69, open-skies+ 8T 75%WR +$0.44
+- Drag: ema300-dip-short 7T 28.6%WR -$0.57 (not killable)
+- ema300-dip-short,rs-r37 1T 0%WR -$0.12 (only 1 trade, not killable)
+
+**Changes:** None — no kill triggers, all healthy.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades
+- atr_sl_hit: 3.7% well under 40%
+- Trade freq: 3/hr normal
+- Hourly PnL: Not 3+ consecutive negative hours
+- Open: 1 position (LTC $19.90)
+
+**Next:** Re-run at 15:07 UTC

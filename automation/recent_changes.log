@@ -1,3 +1,7 @@
+[2026-09-05 12:06 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.25). 27T/24h 51.9%WR -$0.89. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 15% under 40%. profit-monster-trail 12T +$1.20 carrying system. open-skies+ 7T 85.7%WR +$0.61 star. bb-bounce-v2-long+ 4T 75%WR +$0.05 star. ema300-dip 8T 25%WR -$1.05 (biggest drag but not kill criteria — 25%WR not 0%). ema300-dip-short 6T 33.3%WR -$0.42 (also underperforming). Trade freq 3/hr normal. 5 open positions $64.30. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 13:06 UTC
 [2026-09-04 15:06 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour (system flat since 12:47 UTC). 84T/24h 59.5%WR -$1.10. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 25% under 40%. profit-monster-trail 49T +$2.74 carrying system. ema300-dip 38T 60.5%WR -$1.03 (R:R issue, not kill — WR too high). bb-bounce-v2-long+ 16T 68.8%WR +$0.38 star performer. continuation+ 4T 100%WR +$0.30 star. All killed signals (accel-300-v3-long+, accel-300-v3-short-, bb-bounce-short, slow-grind-) remain disabled. Trade freq 0/hr quiet period. 0 open positions. System steady state. 12:00 UTC was bad (7T 14.3%WR -$1.17 ema300-dip cluster) but no kill criteria met.
   BY: auto_1hr
@@ -951,3 +955,19 @@
   WHY: 0T last hour. 32T/24h 62.5%WR -$0.37. Kill criteria not met. atr_sl_hit 21.9% under 40%. open-skies+/continuation+/bb-bounce-v2-long+ all 100%WR stars. ema300-dip 11T 45%WR -$0.91 biggest drag but not killable. Trade freq 0/hr quiet overnight. 3 open positions ($42.10). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 09:07 UTC
+[2026-09-05 10:07 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +/usr/bin/bash.09). 31T/24h profit-monster-trail 17T +.45 dominant. Kill criteria not met. atr_sl_hit 16.1% under 40%. open-skies+/continuation+/bb-bounce-v2-long+ all 100%WR stars. ema300-dip 11T 45%WR -/usr/bin/bash.91 drag but not killable. Trade freq 2/hr normal. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 11:07 UTC
+[2026-09-05 11:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 28T/24h 60.7%WR -$0.48. Kill criteria not met (0T last hour). atr_sl_hit 14.3% under 40%. profit-monster-trail 15T +$1.27 dominant. open-skies+ 5T 100%WR +$0.64, bb-bounce-v2-long+ 4T 100%WR +$0.29, continuation+ 3T 100%WR +$0.15 all stars. ema300-dip 9T 33.3%WR -$1.02 biggest drag but not killable (33.3% WR, not 0%). Trade freq 0/hr quiet. 2 open positions ($11.14). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 12:07 UTC
+[2026-09-05 12:06 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 27T/24h 51.9%WR -$0.50. Kill criteria not met. atr_sl_hit 14.8% under 40%. profit-monster-trail 14T +$1.25 dominant. open-skies+ 5T 100%WR +$0.64, bb-bounce-v2-long+ 3T 100%WR +$0.27, continuation+ 3T 100%WR +$0.15 all stars. ema300-dip 9T 33.3%WR -$1.02, ema300-dip-short 6T 33.3%WR -$0.42 biggest drag but not killable. Trade freq 0/hr quiet. 4 open positions ($53.20). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 13:06 UTC
+[2026-09-05 14:07 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L -$0.02). 27T/24h 66.7%WR +$0.59. Kill criteria not met. atr_sl_hit 3.7% under 40%. profit-monster-trail 15T +$1.75 dominant. bb-bounce-v2-long+ 9T 88.9%WR +$0.69, open-skies+ 8T 75%WR +$0.44 stars. ema300-dip-short 7T 28.6%WR -$0.57 drag but not killable. Trade freq 3/hr normal. 1 open position ($19.90). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 15:07 UTC
