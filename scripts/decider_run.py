@@ -1250,6 +1250,10 @@ def hebbian_trade_boost(token, signal):
     cached = _hebbian_cache.get(cache_key)
     if cached and now - cached[6] < HEBBIAN_CACHE_TTL:
         if cached[0] is None:
+            # FIX 2026-09-05: Even when WR is None, check exit_quality for profit dominance
+            _cached_eq = cached[4] if len(cached) > 4 else None
+            if _cached_eq and _cached_eq.get('profit_n', 0) > 0 and _cached_eq.get('sl_n', 0) == 0:
+                return (0.5, _cached_eq['profit_n'], 1.0, [], _cached_eq, [], True, None)
             return None
         return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5], cached[7], cached[8])
     try:

@@ -1124,3 +1124,66 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 - accel-300-v3-short- borderline — if next trades are losses, will kill
 - ema300-dip post-tightening needs continued monitoring
 - Quiet overnight — system in steady state
+
+## [2026-09-05 02:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2W 1L, net +$0.26)
+**24h:** 37T ~54%WR net ~+$0.28
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T (46%) avg +$0.075 — carrying system
+- atr_sl_hit: 11T (30%) avg -$0.127 — under 40% ✓
+- cut-loser-CL-T1: 4T avg -$0.130
+- hard_sl: 3T avg -$0.183
+- profit-monster-T1: 1T avg +$0.040
+
+**24h Signal Breakdown:**
+- ema300-dip: 16T 50%WR -$1.08 (R:R drag, tightened yesterday, post-tighten trending positive)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (borderline, not kill threshold)
+- continuation+: 4T 100%WR +$0.30 (star)
+- bb-bounce-v2-long+: 3T 66.7%WR -$0.08 (neutral)
+- open-skies+: 1T 100%WR +$0.34
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 30% — under 40% ✓
+- ema300-dip post-tightening: positive early trend, needs continued monitoring
+- accel-300-v3-short- borderline — monitoring
+- Trade freq 1/hr — quiet overnight
+- 3 open positions ($50.90)
+
+**Open Questions:**
+- accel-300-v3-short- borderline — will kill if next trades are losses
+- ema300-dip post-tightening performance overnight
+
+## [2026-09-05 03:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L, net +$0.21)
+**24h:** 37T 54.1%WR -$1.27
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T (46%) +$1.24 — carrying system
+- atr_sl_hit: 11T (30%) -$1.40 — under 40% ✓
+- cut-loser-CL-T1: 4T -$0.54
+- hard_sl: 3T -$0.55
+
+**24h Signal Breakdown:**
+- open-skies+: 2T 100%WR +$0.41 (star)
+- continuation+: 4T 100%WR +$0.30 (star)
+- ema300-dip: 14T 50%WR -$1.00 (R:R drag, post-tightening improving)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (borderline, monitoring)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 30% — under 40% ✓
+- Trade freq 3/hr — normal overnight
+- 3 open positions ($42.10) — light exposure
+- open-skies+ and continuation+ both 100%WR stars
+
+**Open Questions:**
+- accel-300-v3-short- borderline — will kill if next trades are losses
+- ema300-dip post-tightening continuing positive trend

@@ -931,3 +931,7 @@
   WHY: 1T last hour (0W 1L -$0.11). 41T/24h ~46%WR -$1.25. Kill criteria not met. atr_sl_hit 32% under 40%. profit-monster-trail 19T +$1.18 carrying system. ema300-dip post-tightening 3T 66.7%WR +$0.05. accel-300-v3-short- 4T 25%WR borderline. Trade freq 1/hr quiet. 5 open positions ($81.90). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 02:06 UTC
+[2026-09-05 03:07 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.21). 37T/24h 54.1%WR -$1.27. Kill criteria not met. atr_sl_hit 30% under 40%. profit-monster-trail 17T +$1.24 carrying system. ema300-dip 14T 50%WR -$1.00 (post-tightening improving). accel-300-v3-short- 4T 25%WR borderline. open-skies+ 2T 100%WR +$0.41 star. Trade freq 3/hr normal. 3 open positions ($42.10). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 04:06 UTC

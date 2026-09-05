@@ -29,3 +29,9 @@
 - **WARN** (1x): `signal_compactor: timed out` at 00:21:02 — recovered on next cycle
 - **AUTO-FIX**: None needed — pipeline self-recovered, cycle #185735 ran compactor successfully after timeout
 - **MONITOR**: Disk at 84% (94G/118G) — approaching 85% threshold
+
+## Error Alerts — 2026-09-05 02:24 UTC
+- **[WARN]** (1x): `Disk at 84% (94G/118G)` — 1% from 85% threshold. Largest DBs: coin_tracker.db 2.2G, hl_copy.db 1.9G.
+- **[WARN]** (1x): `-32.01% PnL today` — 37 closed trades, performance issue.
+- **[INFO]** (15x): `Auxiliary services in failed state` — 5m-candle, daily-commit, error-analyzer, bug-hunter, wasp, watchdog, etc. None block core pipeline.
+- **AUTO-FIX**: None needed — pipeline operational, timers firing.
