@@ -125,6 +125,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'open-skies+',  # open skies breakout — works in volatile breakout markets
+        'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
     },
     'EXTREME': {
         # Continuation works in storms
