@@ -785,17 +785,16 @@ def _check_directional_cap(direction: str) -> str | None:
         if total == 0:
             return None  # no open positions, always allowed
 
-        # Check if adding this trade would exceed cap
+        # Check if CURRENT ratio already at or above cap
+        # 4L/1S = 80% → ALLOWED (at cap). 5L/0S = 100% → BLOCKED (above cap).
         if direction.upper() == 'LONG':
-            new_long = long_count + 1
-            ratio = (new_long / (total + 1)) * 100
-            if ratio > DIRECTIONAL_CAP_MAX_PCT:
-                return f"would be {new_long}/{total+1} LONG = {ratio:.0f}% > {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+            current_ratio = (long_count / total) * 100
+            if current_ratio >= DIRECTIONAL_CAP_MAX_PCT:
+                return f"{long_count}/{total} LONG = {current_ratio:.0f}% already at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
         else:
-            new_short = short_count + 1
-            ratio = (new_short / (total + 1)) * 100
-            if ratio > DIRECTIONAL_CAP_MAX_PCT:
-                return f"would be {new_short}/{total+1} SHORT = {ratio:.0f}% > {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
+            current_ratio = (short_count / total) * 100
+            if current_ratio >= DIRECTIONAL_CAP_MAX_PCT:
+                return f"{short_count}/{total} SHORT = {current_ratio:.0f}% already at {DIRECTIONAL_CAP_MAX_PCT:.0f}% cap"
 
         return None  # within cap
     except Exception as e:
