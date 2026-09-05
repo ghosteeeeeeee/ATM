@@ -1585,3 +1585,50 @@ None — system healthy, WR climbing, stars dominant.
 - Open: 1 position (LTC $19.90)
 
 **Next:** Re-run at 15:07 UTC
+
+## [2026-09-05 15:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 24h: 27T 18W 9L 66.7%WR +$0.59
+
+**Close reasons (24h):** profit-monster-trail 15T +$1.75 dominant (55.6% of closes). cut-loser-CL-T1 9T -$1.37. atr_sl_hit 1T +$0.05 (3.7%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 88.9%WR +$0.69, open-skies+ 75%WR +$0.44
+- Drag: ema300-dip-short 28.6%WR -$0.57 (not killable)
+
+**Changes:** None — system healthy, no kill triggers.
+
+**No Change Needed:**
+- Kill criteria: 0T last hour, no signal qualifies
+- atr_sl_hit: 3.7% well under 40%
+- Trade freq: 0/hr quiet period
+- Hourly PnL: 3+ consecutive negative hours — NO (only 1 flat)
+- Open: 1 position ($19.90)
+
+**Next:** Re-run at 16:07 UTC
+
+## [2026-09-05 16:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2W 1L)
+**PnL:** +$0.01. 24h: 30T 20W 10L 66.7%WR +$0.60
+
+**Trades this hour:**
+- LTC LONG open-skies+ → profit-monster-trail +$0.06 ✓
+- CAKE LONG accel-300-v3-long+ → cut-loser-CL-T1 -$0.15✗
+- CAKE LONG accel-300-v3-long+ → profit-monster-trail +$0.10 ✓
+
+**Close reasons (24h):** profit-monster-trail 17T +$1.91 dominant (56.7%). cut-loser-CL-T1 10T -$1.52. profit-monster-T1 2T +$0.16. atr_sl_hit 1T +$0.05 (3.3%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 9T 88.9%WR +$0.69, open-skies+ 9T 77.8%WR +$0.50
+- Drag: ema300-dip-short 7T 28.6%WR -$0.57 (not killable, WR > 0%)
+
+**Changes:** None — no kill triggers, all healthy.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 3.3% well under 40%
+- Trade freq: 3/hr normal
+- Open: 2 positions ($22.20)
+
+**Next:** Re-run at 17:07 UTC
