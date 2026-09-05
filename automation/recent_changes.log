@@ -987,3 +987,7 @@
   WHY: 3T last hour (2W +0.13). 34T/24h 64.7%WR +0.83. Kill criteria not met. atr_sl_hit 8.8% under 40%. profit-monster-trail 19T +2.21 dominant. bb-bounce-v2-long+ 11T 90.9%WR +1.02, open-skies+ 10T 70%WR +0.50 stars. ema300-dip-short 6T 16.7%WR -0.60 drag but not killable (1W in 6, not 0%WR). Trade freq 3/hr normal. 3 open positions ($33.30). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 21:26 UTC
+[2026-09-05 22:06 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1L -$0.20 XPL atr_sl_hit). 40T/24h 62.5%WR +$0.48. Kill criteria not met. atr_sl_hit 10% under 40%. profit-monster-trail 18T +$2.08 dominant. bb-bounce-v2-long+ 11T 90.9%WR +$1.02, open-skies+ 10T 70%WR +$0.50 stars. ema300-dip-short 5T 0%WR -$0.73 drag but not killable (0T last hour, not 3+ threshold). Trade freq 1/hr normal. 4 open positions ($44.40). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 23:06 UTC

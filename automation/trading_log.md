@@ -1755,3 +1755,25 @@ None — system healthy, WR climbing, stars dominant.
 - Open: 5 positions ($55.50 — ENS, SOL, COMP, XPL, BTC)
 
 **Next:** Re-run at 22:26 UTC
+
+## [2026-09-05 22:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (XPL SHORT, atr_sl_hit, -$0.20)
+**PnL:** -$0.20 (24h: 40T 25W 15L 62.5%WR +$0.48)
+
+**Close reasons (24h):** profit-monster-trail 18T +$2.08 (45%). cut-loser-CL-T1 10T -$1.52 (25%). atr_sl_hit 4T -$0.22 (10%). profit-monster-T1 2T +$0.16 (5%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 11T 90.9%WR +$1.02, open-skies+ 10T 70%WR +$0.50
+- Drag: ema300-dip-short 5T 0%WR -$0.73 (not killable — 0 trades last hour, not meeting 3+ threshold)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 10% well under 40%
+- Trade freq: 1/hr normal
+- Hourly PnL: No 3+ consecutive negative hours
+- Open: 4 positions ($44.40)
+
+**Next:** Re-run at 23:06 UTC
