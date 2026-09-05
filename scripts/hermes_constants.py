@@ -2428,7 +2428,7 @@ CONTINUATION_CONF_CAP = 90
 CONTINUATION_CONF_EXHAUST_BONUS = 5           # +5 for exhaustion fade (high conviction reversal)
 CONTINUATION_CONF_TREND_BONUS = 4             # +4 for strong trend continuation
 CONTINUATION_CONF_WAVE_PENALTY = 5            # -5 per wave beyond wave 1 (diminishing returns)
-CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
+CONTINUATION_COOLDOWN_MIN = 30                # per-token cooldown (lowered from 60 — allow faster re-entry)
 # V2 additional tunables
 CONTINUATION_PULLBACK_THRESHOLD = 1.0         # % — max pullback since close to still fire
 CONTINUATION_CONF_ORIG_HIGH = 3               # +conf when original signal conf >= 90
