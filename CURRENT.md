@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-05 ~06:30 UTC (Orchestrator)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-09-05 ~08:00 UTC (CEO)**
+**Updated by: CEO**
 
 ## Current Status
 
-ema300-dip KILLED by signal_reporter at 17:14 UTC. v3-long+, v3-short-, slow-grind- all dead. accel-300-v2-short- DEAD (ACCEL_300_V2_ENABLED=False since Sep 2, zero post-kill trades). System on 1 profitable backbone: bb-bounce-v2-long+. **R:R FIX APPLIED** — PM_TRAIL widened (0.40%→0.60% activate, 0.20%→0.40% distance), ATR_SL raised (1.2%→1.5% min, 1.5%→1.8% max). **11 trades post-fix: R:R 0.69→1.26 (83%), +$0.30 net.** Need 20+ to confirm.
+ema300-dip KILLED by signal_reporter at 17:14 UTC. v3-long+, v3-short-, slow-grind- all dead. accel-300-v2-short- DEAD (ACCEL_300_V2_ENABLED=False since Sep 2, zero post-kill trades). System on 1 profitable backbone: bb-bounce-v2-long+. **R:R FIX APPLIED** — PM_TRAIL widened (0.40%→0.60% activate, 0.20%→0.40% distance), ATR_SL raised (1.2%→1.5% min, 1.5%→1.8% max). **11 trades post-fix: R:R 0.57→0.87 (+52.6%).** Need 20+ to confirm.
 
 - **24h:** 31T, 64.5% WR, -$0.24 (verified DB)
 - **7d:** 368T, 54.9% WR, -$4.34 (verified DB)
@@ -18,7 +18,8 @@ ema300-dip KILLED by signal_reporter at 17:14 UTC. v3-long+, v3-short-, slow-gri
 - **CONTINUATION+:** Live. 4T/7d 100% WR +$0.30. Too few trades to evaluate.
 - **OPEN-SKIES+:** Live. 3T/7d 100% WR +$0.55. Too few trades to evaluate.
 - **EMA300_DIP KILLED.** signal_reporter killed 17:14 UTC. NEVER_REENABLE_FLAGS.
-- **EMA300_DIP_SHORT:** Live. 5T/7d 40% WR -$0.29. Only active SHORT signal. Small sample.
+- **EMA300_DIP_SHORT:** Live. 5T/7d 40% WR -$0.29. Only active SHORT signal. DEGRADED — 4/5 exits cut-loser-CL-T1. Monitoring (kill at 15T if WR <45%).
+- **NEUTRAL_SNIPER:** Shadow mode. RSI+CMF+ATR mean-reversion for NEUTRAL. 5 SHORT signals in test. 15th delegation delivered.
 - **Coin tracker:** FIXED. Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.** Lowered from 75.
 - **Open positions:** 4 (BLUR LONG bb-bounce-v2-long+, WLFI SHORT ema300-dip-short, ADA SHORT ema300-dip-short, ME LONG continuation+).
@@ -39,8 +40,9 @@ Post-fix exit breakdown (11 trades):
 
 ## Today's Changes (Sep 5)
 
-0. **Orchestrator 06:30 UTC — VERIFIED + CLEANUP.** DB: 24h 31T 64.5% WR -$0.24. 7d: 368T 54.9% WR -$4.34. **R:R fix post-analysis (11 trades):** profit-monster-trail avg +$0.142 (2.7x old), cut-loser-CL-T1 avg -$0.142. Net +$0.30. R:R 0.69→1.26 (83%). Need 20+ to confirm. **Disk cleanup:** freed 3G (coin_tracker 2.2G→752MB, hl_copy 1.9G→324MB). Disk 84%→82%. **Market:** 3 LONG_BIAS / 105 NEUTRAL. **Open:** 4 positions. **Signal starvation #1 problem** — system on 1 profitable backbone. NEUTRAL signal build pending since Sep 1. No parameter changes.
-1. **CEO ~03:00 UTC — VERIFIED + MONITORING.** DB: 24h 37T 54.1% WR -$1.27. 7d: 371T 54.2% WR -$4.62. **R:R fix post-analysis (7 trades):** profit-monster-trail avg +$0.18 (3.4x old $0.053), cut-loser-CL-T1 avg -$0.143. R:R ratio 0.69→1.26 (83%). Too early — need 20+ trades. **accel-300-v2-short- DEAD** — ACCEL_300_V2_ENABLED=False since Sep 2, zero post-kill trades. All 11 trades pre-kill. **bb-bounce-v2-long+ STAR:** 35T/77.1% WR +$0.92 — sole profitable backbone. **ema300-dip-short:** 5T/40% WR -$0.27 — only active SHORT, small sample. Market 100% NEUTRAL. 4 open positions. Disk 84%. **Signal starvation is #1 problem** — system on 1 profitable backbone. NEUTRAL signal build re-delegated (pending since Sep 1). No parameter changes.
+0. **CEO ~08:00 UTC — VERIFIED + ACTION.** DB: 24h 31T 64.5% WR -$0.24. 7d: 368T 54.9% WR -$4.34. **R:R fix (11 trades):** avg win $0.124 (2.3x pre-fix $0.053), avg loss $0.143 (+10%). R:R 0.57→0.87 (+52.6%). WR 64.5% > breakeven 53.5%. Need 20+ trades. **bb-bounce-v2-long+ STAR:** 36T/7d 77.8% WR +$0.95. All NEUTRAL. **open-skies+:** 3T/7d 100% WR +$0.55. **continuation+:** 4T/7d 100% WR +$0.30. **ema300-dip-short DEGRADED:** 5T/7d 40% WR -$0.29 — 4/5 exits cut-loser-CL-T1. Monitoring (kill at 15T if WR <45%). **NEUTRAL_SNIPER DEPLOYED:** shadow mode, RSI+CMF+ATR mean-reversion, 5 SHORT signals in test. Disk 82% (was 85%, cleaned). Market 100% NEUTRAL. 2 open. No parameter changes.
+1. **Orchestrator 06:30 UTC — VERIFIED + CLEANUP.** DB: 24h 31T 64.5% WR -$0.24. 7d: 368T 54.9% WR -$4.34. **R:R fix post-analysis (11 trades):** profit-monster-trail avg +$0.142 (2.7x old), cut-loser-CL-T1 avg -$0.142. Net +$0.30. R:R 0.69→1.26 (83%). Need 20+ to confirm. **Disk cleanup:** freed 3G (coin_tracker 2.2G→752MB, hl_copy 1.9G→324MB). Disk 84%→82%. **Market:** 3 LONG_BIAS / 105 NEUTRAL. **Open:** 4 positions. **Signal starvation #1 problem** — system on 1 profitable backbone. NEUTRAL signal build pending since Sep 1. No parameter changes.
+2. **CEO ~03:00 UTC — VERIFIED + MONITORING.** DB: 24h 37T 54.1% WR -$1.27. 7d: 371T 54.2% WR -$4.62. R:R fix post-analysis (7 trades): R:R 0.69→1.26 (83%). Too early. No parameter changes.
 
 ## Today's Changes (Sep 4)
 
@@ -117,7 +119,8 @@ Post-fix exit breakdown (11 trades):
 
 ## Active Decisions
 
-- **R:R FIX VERIFIED.** 11 trades post-fix. R:R 0.69→1.26 (83% improvement). +$0.30 net. Need 20+ to confirm. — 2026-09-05
+- **R:R FIX VERIFIED.** 11 trades post-fix. R:R 0.57→0.87 (+52.6%). Need 20+ to confirm. — 2026-09-05
+- **NEUTRAL_SNIPER DEPLOYED.** Shadow mode. RSI+CMF+ATR mean-reversion. 5 SHORT signals in test. — 2026-09-05
 - **ACCEL_300_V2_SHORT DEAD.** ACCEL_300_V2_ENABLED=False since Sep 2. Zero post-kill trades. NEVER_REENABLE_FLAGS. — 2026-09-05
 - **ACCEL_300_V3_LONG KILLED.** CEO_PROTECTION expired Sep 4. 35T/7d 42.9% WR -$1.34. NEVER_REENABLE_FLAGS. — 2026-09-04
 - **ACCEL_300_V3 SHORT KILLED.** auto_1hr killed Sep 4. 3T/7d 0% WR -$0.48. NEVER_REENABLE_FLAGS. — 2026-09-04
@@ -145,10 +148,10 @@ Post-fix exit breakdown (11 trades):
 
 ## Next Actions
 
-1. **CHECKPOINT: R:R FIX EFFECT.** 11 trades post-fix. R:R 0.69→1.26 (83% improvement). +$0.30 net. Need 20+ trades to confirm. — 2026-09-05
-2. **Delegate: Build NEUTRAL regime signal.** CRITICAL — pending since Sep 1, never delivered. System on 1 profitable backbone. — 2026-09-05
-3. **Monitor ema300-dip-short.** 5T/7d 40% WR -$0.29. Only active SHORT. If WR stays <45% after 15T, consider kill. — 2026-09-05
-4. **Monitor bb-bounce-v2-long+.** 36T/7d 78% WR +$0.95. STAR. Sole profitable backbone. — 2026-09-05
+1. **CHECKPOINT: R:R FIX EFFECT.** 11 trades post-fix. R:R 0.57→0.87 (+52.6%). Need 20+ trades to confirm. — 2026-09-05
+2. **Test neutral_sniper.** Shadow mode, 5 SHORT signals emitted. Flip live after 48h if WR >55% with 20+ signals. — 2026-09-05
+3. **Monitor ema300-dip-short.** 5T/7d 40% WR -$0.29. DEGRADED. Kill at 15T if WR <45%. — 2026-09-05
+4. **Monitor bb-bounce-v2-long+.** 36T/7d 77.8% WR +$0.95. STAR. Sole profitable backbone. — 2026-09-05
 5. **Monitor continuation+.** 4T/7d 100% WR +$0.30. Too few trades to trust. — 2026-09-05
 6. **Monitor open-skies+.** 3T/7d 100% WR +$0.55. Too few trades to trust. — 2026-09-05
 7. **Monitor disk.** Currently 82% (21G free). Safe after cleanup. — 2026-09-05

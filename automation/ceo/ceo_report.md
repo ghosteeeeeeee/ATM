@@ -1,23 +1,22 @@
-## CEO Report — 2026-09-05 ~03:00 UTC (333rd run)
+## CEO Report — 2026-09-05 ~08:00 UTC (334th run)
 
 ### Diagnosis
-DB: 24h 37T, 54.1% WR, -$1.27. 7d: 371T, 54.2% WR, -$4.62. **R:R fix post-analysis (7 trades):** profit-monster-trail avg +$0.18 (3.4x old $0.053), cut-loser-CL-T1 avg -$0.143. R:R ratio improved 0.69→1.26 (83%). Too early — need 20+ trades. Market 100% NEUTRAL. 4 open positions (ADA SHORT, LTC LONG, WLFI SHORT, ME LONG). Disk 84%.
+DB: 24h 31T, 64.5% WR, -$0.24. 7d: 368T, 54.9% WR, -$4.34. **R:R fix (11 trades post-fix):** avg win $0.124 (2.3x pre-fix), avg loss $0.143 (+10%). R:R 0.87 (up from 0.57, +52.6%). WR 64.5% > breakeven 53.5%. Still need 20+ trades. Market 100% NEUTRAL. 2 open positions. Disk 82%.
 
-**Active signals (7d, post-kill verified):**
-- **bb-bounce-v2-long+ STAR:** 35T, 77.1% WR, +$0.92 — sole profitable backbone
-- **continuation+:** 4T, 100% WR, +$0.30 — too small
-- **open-skies+:** 2T, 100% WR, +$0.41 — too small
-- **ema300-dip-short:** 5T, 40% WR, -$0.27 — only active SHORT, small sample
-- **accel-300-v2-short-: DEAD** — ACCEL_300_V2_ENABLED=False since Sep 2. All 11 trades pre-kill (Aug 29–Sep 2). Zero post-kill trades.
+**Active signals (7d):**
+- **bb-bounce-v2-long+ STAR:** 36T, 77.8% WR, +$0.95 — sole profitable backbone
+- **open-skies+:** 3T, 100% WR, +$0.55 — tiny sample
+- **continuation+:** 4T, 100% WR, +$0.30 — tiny sample
+- **ema300-dip-short:** 5T, 40% WR, -$0.29 — only active SHORT, DEGRADED
 
-**Exit analysis (24h):** profit-monster-trail 17T +$1.24 (avg +$0.073). atr_sl_hit 11T -$1.40 (avg -$0.127). cut-loser-CL-T1 4T -$0.54 (avg -$0.135). hard_sl 3T -$0.55.
+**Exit analysis (48h losses):** atr_sl_hit 19T -$3.06 (dominant). cut-loser-CL-T1 14T -$2.03. hard_sl 4T -$0.82.
 
 ### Root Cause
-Signal starvation is the #1 problem. System on 1 profitable backbone (bb-bounce-v2-long+). accel-300-v2-short- is dead (killed Sep 2). ema300-dip-short is the only SHORT, too small to evaluate. Market 100% NEUTRAL — trend signals starved. The R:R fix is working but needs volume.
+R:R fix working but needs volume. ema300-dip-short is the only active SHORT and it's bleeding (4/5 exits cut-loser-CL-T1). Signal starvation partially addressed — neutral_sniper built and in shadow mode.
 
 ### Fix Applied
-- **No parameter changes.** R:R fix needs 20+ trades. Not enough data to tune.
-- **NEUTRAL signal build re-delegated** — pending since Sep 1, never delivered. Critical gap.
+- **neutral_sniper DEPLOYED** — RSI+CMF+ATR mean-reversion for NEUTRAL. Shadow mode, 5 SHORT signals in test. 15th delegation delivered.
+- **No parameter changes.** R:R fix needs 20+ trades.
 
 ---
 
