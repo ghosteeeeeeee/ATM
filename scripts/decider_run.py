@@ -3330,6 +3330,11 @@ def run(dry_run=False):
                                 continue
                         except Exception:
                             pass
+                else:
+                    # Signal doesn't exist — block trade
+                    log(f'SKIP: {token} {direction} — signal {sig_id} does not exist in DB, blocking stale trade')
+                    skipped += 1
+                    continue
             except Exception as _e:
                 log(f'  WARN: staleness check failed for {token}: {_e}')
         
