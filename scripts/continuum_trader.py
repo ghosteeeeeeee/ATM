@@ -319,10 +319,27 @@ class ContinuumTrader:
                 print(f"[TRADER] ENTRY SIGNAL DETECTED: Phase 4 reached")
                 self._handle_entry(state)
             
-            # Check for exit signal
+            # Check for exit signal (engine says no position)
             if state.position_side == 'NONE' and self.last_position_side != 'NONE':
                 print(f"[TRADER] EXIT SIGNAL DETECTED: Position side changed to NONE")
                 self._handle_exit(state)
+            
+            # Reconcile: check for orphaned positions (file has position but engine doesn't)
+            tracked = get_our_positions()
+            if tracked and state.position_side == 'NONE':
+                print(f"[TRADER] RECONCILE: {len(tracked)} orphaned position(s) found, attempting close...")
+                for pos in tracked:
+                    pnl = (state.price - pos['entry_price']) * (1 if pos['side'] == 'LONG' else -1)
+                    print(f"[TRADER] Closing orphaned {pos['side']} @ entry ${pos['entry_price']:.1f}")
+                    if not PAPER_MODE:
+                        result = close_hl_position()
+                        if result.get('success'):
+                            print(f"[TRADER] Orphaned position closed")
+                            track_exit(pos['entry_price'], state.price, pnl)
+                        else:
+                            print(f"[TRADER] Close failed: {result.get('error')}")
+                    else:
+                        track_exit(pos['entry_price'], state.price, pnl)
             
             # Update last known state
             self.last_entry_phase = state.entry_phase
@@ -388,6 +405,8 @@ class ContinuumTrader:
                 self.trades_today += 1
             else:
                 print(f"[TRADER] ORDER FAILED: {result.get('error')}")
+                # Update last_trade_time to prevent retry spam
+                self.last_trade_time = time.time()
     
     def _handle_exit(self, state: ContinuumState):
         """Handle exit signal."""

@@ -626,7 +626,13 @@ class ContinuumEngine:
         accel_state = self.hysteresis['acceleration'].get_confirmed() or raw_accel
         
         # Track EMA300 duration
-        current_ema_direction = 'ABOVE' if price > ema300_val else 'BELOW'
+        # AT zone: hold previous direction (don't reset on noise)
+        if price > ema300_val * (1 + EMA300_ABOVE_BUFFER):
+            current_ema_direction = 'ABOVE'
+        elif price < ema300_val * (1 - EMA300_BELOW_BUFFER):
+            current_ema_direction = 'BELOW'
+        else:
+            current_ema_direction = self.ema300_direction or 'AT'  # Hold previous
         if current_ema_direction == self.ema300_direction:
             self.ema300_duration += 1  # +1 candle
         else:
@@ -960,7 +966,12 @@ class ContinuumEngine:
         3: Z-score aligning
         4: ENTRY SIGNAL (all states aligned)
         """
-        side = 'LONG' if state.ema300_position == 'ABOVE' else 'SHORT'
+        if state.ema300_position == 'ABOVE':
+            side = 'LONG'
+        elif state.ema300_position == 'BELOW':
+            side = 'SHORT'
+        else:
+            side = self._last_side or 'LONG'  # AT zone: hold previous or default LONG
         
         # Debug: log entry to update method
         print(f"[CONTINUUM] _update: phase={self.entry_phase}, side={side}, dur={state.ema300_duration}, z={state.zscore_tier}")
@@ -996,6 +1007,10 @@ class ContinuumEngine:
         
         # Phase 3 → 4: Volume confirmation (optional but boosts confidence)
         if self.entry_phase == 3:
+            # Score gate — don't enter with score below threshold
+            if state.state_score < SCORE_NO_TRADE:
+                return  # Score too low, don't enter
+            
             if state.volume_regime in ('HIGH', 'PARABOLIC'):
                 self.entry_phase = 4
                 self.position_side = side
@@ -1004,6 +1019,11 @@ class ContinuumEngine:
                 print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime}")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
                 self.entry_phase = 2  # Step back but don't reset fully
+            elif (side == 'LONG' and state.zscore_tier in ('NEG', 'STRONG_NEG')) or \
+                 (side == 'SHORT' and state.zscore_tier in ('POS', 'STRONG_POS')):
+                # Z-score reversed against trade direction — step back
+                self.entry_phase = 2
+                print(f"[CONTINUUM] Phase 3→2: z-score reversed ({state.zscore_tier} vs {side})")
             elif (self._last_side == 'LONG' and side == 'SHORT') or (self._last_side == 'SHORT' and side == 'LONG'):
                 # EMA300 position flipped — reset phase
                 self.entry_phase = 0
@@ -1043,7 +1063,7 @@ class ContinuumEngine:
         
         # Score-based exit
         if state.state_score < SCORE_EXIT_THRESHOLD:
-            print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Score below 20: {state.state_score:.1f}")
+            print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Score below {SCORE_EXIT_THRESHOLD}: {state.state_score:.1f}")
             self.position_side = 'NONE'
             self.position_size_pct = 0
             self.entry_phase = 0
