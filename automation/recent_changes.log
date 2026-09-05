@@ -923,3 +923,11 @@
   NEXT: Re-run at 22:00 UTC
 [2026-09-04 22:00 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour. 52T/24h 48%WR -$2.07. Kill criteria not met. atr_sl_hit 34.6% under 40%. profit-monster-trail 25T +$1.37 carrying system. ema300-dip tightened at 14:06 UTC (8h post-change, needs overnight data). accel-300-v3-short- 4T 25%WR below kill threshold. Trade freq 2/hr normal. 5 open positions ($73.10). System steady state.
+[2026-09-04 00:06 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.13). 44T/24h ~48%WR -$1.89. Kill criteria not met. atr_sl_hit 34% under 40%. profit-monster-trail 20T +$1.31 carrying system. ema300-dip post-tightening 2T 100%WR +$0.16 (early positive). accel-300-v3-short- 4T 25%WR below kill threshold. Trade freq 1/hr quiet. 4 open positions ($62.00). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 01:06 UTC
+[2026-09-05 01:06 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.11). 41T/24h ~46%WR -$1.25. Kill criteria not met. atr_sl_hit 32% under 40%. profit-monster-trail 19T +$1.18 carrying system. ema300-dip post-tightening 3T 66.7%WR +$0.05. accel-300-v3-short- 4T 25%WR borderline. Trade freq 1/hr quiet. 5 open positions ($81.90). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 02:06 UTC

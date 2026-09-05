@@ -1057,3 +1057,70 @@ Final set: ['APT', 'ARB', 'CASHCAT', 'CHIP', 'ENA', 'FIL', 'ICP', 'JUP', 'LDO', 
 **Open Questions:**
 - accel-300-v3-short- borderline (25%WR, 4T)
 - ema300-dip needs post-tightening evaluation
+
+## [2026-09-04 00:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W +$0.13)
+**24h:** 44T ~48%WR -$1.89
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (45%) avg +$0.066 — carrying system
+- atr_sl_hit: 15T (34%) avg -$0.108 — healthy, under 40% ✓
+- cut-loser-CL-T1: 4T avg -$0.140
+- hard_sl: 3T avg -$0.183
+- cascade_flip: 1T avg -$0.060
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 34% — under 40% ✓
+- ema300-dip tightened at 14:06 UTC — post-tightening: 2T 100%WR +$0.16 (tiny sample but positive early signal)
+- accel-300-v3-short- 4T 25%WR below kill threshold
+- Trade freq 1/hr — quiet market
+- 4 open positions ($62.00)
+- 6h trend: only 2 trades total — very quiet
+
+**Open Positions:**
+- NXPC LONG via bb-bounce-v2-long+: $19.90 (opened 20:36 UTC)
+- ETC SHORT via ema300-dip-short: $11.10 (opened 18:37 UTC)
+- STX SHORT via ema300-dip-short,rs-r37: $11.10 (opened 18:31 UTC)
+- ME LONG via ema300-dip: $19.90 (opened 17:05 UTC)
+
+**Open Questions:**
+- accel-300-v3-short- borderline (25%WR, 4T) — if next trades are losses, will kill
+- ema300-dip post-tightening needs more data (2T sample too small)
+- Quiet market overnight — system in steady state
+
+## [2026-09-05 01:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L -$0.11)
+**24h:** 41T ~46%WR -$1.25
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T (46%) avg +$0.062 — carrying system
+- atr_sl_hit: 13T (32%) avg -$0.127 — under 40% ✓
+- cut-loser-CL-T1: 5T avg -$0.134
+- hard_sl: 3T avg -$0.183
+- cascade_flip: 1T avg -$0.060
+
+**24h Signal Breakdown:**
+- ema300-dip: 18T 44.4%WR -$1.35 (R:R drag)
+- bb-bounce-v2-long+: 6T 50%WR -$0.02 (neutral)
+- accel-300-v3-short-: 4T 25%WR -$0.26 (borderline)
+- continuation+: 4T 100%WR +$0.30 (star)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met (no 0%WR signal with 3+T last hour)
+- atr_sl_hit 32% — under 40% ✓
+- ema300-dip post-tightening: 3T 66.7%WR +$0.05 (positive trend)
+- accel-300-v3-short- borderline (25%WR, 4T) — monitoring
+- Trade freq 1/hr — quiet overnight
+- 5 open positions ($81.90)
+
+**Open Questions:**
+- accel-300-v3-short- borderline — if next trades are losses, will kill
+- ema300-dip post-tightening needs continued monitoring
+- Quiet overnight — system in steady state
