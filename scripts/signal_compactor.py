@@ -1267,6 +1267,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass  # non-fatal: skip slope check if DB query fails
 
+            # ── EMA300 SLOPE FILTER (2026-09-05) ──────────────────────────────
+            # Block ema300-dip-short signals when EMA300 is rising.
+            # Re-validates the detection function's EMA slope condition at compactor time.
+            if source and 'ema300-dip-short' in source and direction.upper() == 'SHORT':
+                try:
+                    _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
+                    _ema_rows = _conn_ema.execute(
+                        "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 400",
+                        (token.upper(),)
+                    ).fetchall()
+                    _conn_ema.close()
+                    if _ema_rows and len(_ema_rows) >= 300:
+                        _prices = [r[0] for r in reversed(_ema_rows)]
+                        # Compute EMA300 values
+                        _ema_vals = []
+                        _ema_v = _prices[0]
+                        _k2 = 2.0 / 301
+                        for _p in _prices:
+                            _ema_v = _p * _k2 + _ema_v * (1 - _k2)
+                            _ema_vals.append(_ema_v)
+                        _ema_slope = (_ema_vals[-1] - _ema_vals[-20]) / _ema_vals[-20] * 100 if len(_ema_vals) >= 20 else 0
+                        if _ema_slope >= 0:
+                            log(f"  🚫 [EMA300-SLOPE-FILTER] {token} SHORT: EMA300 slope={_ema_slope:+.4f}% >= 0 — EMA rising, skip")
+                            continue
+                except Exception:
+                    pass  # non-fatal: skip EMA300 slope check if DB query fails
+
             # ── CONFLUENCE ENFORCEMENT (2026-04-18) ─────────────────────────────────
             # Single-source signals must NEVER be approved to hot-set.
             # They stay PENDING until a second source appears for the same token+direction.
@@ -2349,12 +2376,48 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         # ── Conflict loser rescue ─────────────────────────────────────────────
         # FIX 2026-09-02: If the conflict winner was killed by spike filter or
         # other hotset_final filters, promote the loser so at least one direction enters.
+        # FIX 2026-09-05: Run safety checks before promoting (blacklist, delisted, open-pos)
         if conflict_loser_recovery:
             entered_tokens = {e['token'].upper() for e in hotset_final}
+            _open_toks = {t.lower() for t in _get_open_tokens()} if '_get_open_tokens' in dir() else set()
             for loser in conflict_loser_recovery:
                 tok = loser['row'][0]
                 direc = loser['row'][1]
                 if tok.upper() not in entered_tokens:
+                    # Safety checks before rescue
+                    _rescue_ok = True
+                    if direc.upper() == 'SHORT' and tok.upper() in SHORT_BLACKLIST:
+                        _rescue_ok = False
+                    if direc.upper() == 'LONG' and tok.upper() in LONG_BLACKLIST:
+                        _rescue_ok = False
+                    if is_delisted(tok.upper()):
+                        _rescue_ok = False
+                    if tok.lower() in _open_toks:
+                        _rescue_ok = False
+                    # Spike filter check (same as hotset_final)
+                    if _rescue_ok and direc.upper() == 'SHORT' and SPIKE_FILTER_ENABLED:
+                        try:
+                            _sf_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                            _sf_cur = _sf_conn.cursor()
+                            _sf_cur.execute("SELECT close, open FROM candles_5m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 3", (tok.upper(),))
+                            for _cl, _op in _sf_cur.fetchall():
+                                if _op and _op > 0 and (_cl - _op) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
+                                    _rescue_ok = False
+                                    break
+                            _sf_conn.close()
+                        except Exception:
+                            pass
+                    # Volatility floor check
+                    if _rescue_ok:
+                        try:
+                            vol_ok = check_volatility_floor(tok)
+                            if vol_ok == 0.0:
+                                _rescue_ok = False
+                        except Exception:
+                            pass
+                    if not _rescue_ok:
+                        log(f"  🔄 [CONFLICT-RESCUE-BLOCK] {tok}:{direc} — safety check failed, not rescued")
+                        continue
                     row = loser['row']
                     l_token, l_direction, l_stype, l_conf, l_source = row[0], row[1], row[2], row[3], row[4]
                     l_combo_key = loser.get('combo_key')
