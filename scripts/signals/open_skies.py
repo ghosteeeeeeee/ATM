@@ -32,6 +32,7 @@ from hermes_constants import (
     OPEN_SKIES_MINUS_ENABLED,
     OPEN_SKIES_SMA_FAST,
     OPEN_SKIES_SMA_SLOW,
+    OPEN_SKIES_MAX_RSI,
     OPEN_SKIES_MIN_RETURN_20,
     OPEN_SKIES_VOL_SPIKE_RATIO,
     OPEN_SKIES_MIN_SUPPORT_LEVELS,
@@ -94,16 +95,32 @@ def _compute_sma(closes, period):
     return sum(closes[-period:]) / period
 
 
-def _count_higher_highs(closes, window=10):
+def _count_higher_highs(highs, window=10):
     """Count higher highs in last N bars. Each bar's high must exceed previous."""
-    if len(closes) < window:
+    if len(highs) < window:
         return 0
-    recent = closes[-window:]
+    recent = highs[-window:]
     count = 0
     for i in range(1, len(recent)):
         if recent[i] > recent[i - 1]:
             count += 1
     return count
+
+
+def _compute_rsi(closes, period=14):
+    """Compute RSI. Returns float or None."""
+    if len(closes) < period + 1:
+        return None
+    import numpy as np
+    deltas = np.diff(closes[-(period + 1):])
+    gains = np.where(deltas > 0, deltas, 0)
+    losses = np.where(deltas < 0, -deltas, 0)
+    avg_gain = np.mean(gains)
+    avg_loss = np.mean(losses)
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
 
 
 def _get_volume_ratio(candles, window=5):
@@ -153,8 +170,17 @@ def detect(token):
     if price <= 0:
         return None
 
-    # Close prices
+    # Close prices and high prices
     closes = [c[4] for c in candles]
+    highs = [c[2] for c in candles]
+
+    # ── Dead token filter: 20-bar range must be > 1% ──
+    if len(closes) >= 20:
+        high_20 = max(closes[-20:])
+        low_20 = min(closes[-20:])
+        range_20 = (high_20 - low_20) / low_20 * 100 if low_20 > 0 else 0
+        if range_20 < 1.0:
+            return None  # dead token, no real market
 
     # ── Condition 1 & 2: Price above SMA20 and SMA50 ──
     sma_fast = _compute_sma(closes, OPEN_SKIES_SMA_FAST)
@@ -165,6 +191,11 @@ def detect(token):
 
     if price <= sma_fast or price <= sma_slow:
         return None  # not in uptrend
+
+    # ── RSI guard: don't enter overbought ──
+    rsi = _compute_rsi(closes)
+    if rsi is not None and rsi > OPEN_SKIES_MAX_RSI:
+        return None  # overbought — chasing
 
     # ── Condition 3: No resistance levels (open skies) ──
     sr_map = _get_sr_map(token, price)
@@ -190,13 +221,15 @@ def detect(token):
     if ret_20 < OPEN_SKIES_MIN_RETURN_20:
         return None  # no momentum
 
-    # ── Condition 6: Volume spike ──
+    # ── Condition 6: Volume spike (must have volume data) ──
     vol_ratio = _get_volume_ratio(candles)
-    if vol_ratio is not None and vol_ratio < OPEN_SKIES_VOL_SPIKE_RATIO:
+    if vol_ratio is None:
+        return None  # no volume data — can't confirm breakout
+    if vol_ratio < OPEN_SKIES_VOL_SPIKE_RATIO:
         return None  # no volume confirmation
 
-    # ── Condition 7: Higher highs ──
-    hh_count = _count_higher_highs(closes, OPEN_SKIES_HH_WINDOW)
+    # ── Condition 7: Higher highs (using actual highs, not closes) ──
+    hh_count = _count_higher_highs(highs, OPEN_SKIES_HH_WINDOW)
     if hh_count < OPEN_SKIES_HH_MIN:
         return None  # not structurally bullish
 
