@@ -169,13 +169,13 @@ def _price_near_level(price: float, level: float, atr_pct: float, k: float = RS_
 
 
 def _bounce_confirmation(candles: list, level: float, direction: str,
-                          lookback: int = _BOUNCE_LOOKBACK) -> bool:
+                          lookback: int = _BOUNCE_LOOKBACK, atr_pct: float = 0.5) -> bool:
     """Check if price recently bounced from the level.
 
     For LONG (near support): check that at least one candle in the lookback
-    touched the level (low near level) and the close was higher than the touch.
+    touched the level (low near level) and formed a meaningful bullish candle.
     For SHORT (near resistance): check that at least one candle in the lookback
-    touched the level (high near level) and the close was lower than the touch.
+    touched the level (high near level) and formed a meaningful bearish candle.
 
     Returns True if bounce is confirmed.
     """
@@ -184,21 +184,28 @@ def _bounce_confirmation(candles: list, level: float, direction: str,
 
     recent = candles[-lookback:]
 
+    # ATR-normalized touch threshold (tighter for low-vol, wider for high-vol)
+    touch_threshold = max(0.15, 0.33 * atr_pct) if atr_pct > 0 else 0.20
+
     if direction == 'LONG':
-        # Support bounce: price touched level (low near level) and recovered
+        # Support bounce: price touched level and formed meaningful bullish candle
         for c in recent:
             touch_pct = abs(c['low'] - level) / level * 100.0
-            if touch_pct < 0.20:  # low came within 0.20% of level = touched
-                if c['close'] > c['open']:  # bullish candle
+            if touch_pct < touch_threshold:
+                # Require meaningful body (close > open by >0.05%)
+                body = (c['close'] - c['open']) / c['open'] * 100.0 if c['open'] > 0 else 0
+                if body > 0.05:  # meaningful bullish candle
                     return True
         return False
 
     else:  # SHORT
-        # Resistance rejection: price touched level (high near level) and reversed
+        # Resistance rejection: price touched level and formed meaningful bearish candle
         for c in recent:
             touch_pct = abs(c['high'] - level) / level * 100.0
-            if touch_pct < 0.20:  # high came within 0.20% of level = touched
-                if c['close'] < c['open']:  # bearish candle
+            if touch_pct < touch_threshold:
+                # Require meaningful body (close < open by >0.05%)
+                body = (c['close'] - c['open']) / c['open'] * 100.0 if c['open'] > 0 else 0
+                if body < -0.05:  # meaningful bearish candle
                     return True
         return False
 
@@ -361,13 +368,52 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
             best_resist_dist = dist_pct
             nearest_resistance = (level, touch_count)
 
+    # ── Level separation check: support and resistance must be meaningfully apart ──
+    # If they're within 0.5% of each other, it's a ranging market — no clear direction
+    if nearest_support and nearest_resistance:
+        separation = abs(nearest_support[0] - nearest_resistance[0]) / price * 100.0
+        if separation < 0.5:
+            return None  # ranging — support ≈ resistance, no edge
+
+    # ── Touch count normalization for tight-range tokens ──
+    # In tight ranges, every bar is a "touch" — inflate touch counts
+    # Normalize by the token's typical 20-bar range
+    if len(closes) >= 20:
+        high_20 = max(closes[-20:])
+        low_20 = min(closes[-20:])
+        range_20 = (high_20 - low_20) / low_20 * 100.0 if low_20 > 0 else 1.0
+    else:
+        range_20 = 1.0
+
+    def _normalize_touches(touch_count, range_20):
+        """Discount touch counts for tight-range tokens."""
+        if range_20 < 1.0:
+            # Tight range — touches are inflated, scale down
+            return max(1, int(touch_count * range_20))
+        return touch_count
+
+    # Apply normalization to nearest levels
+    if nearest_support:
+        norm_touches = _normalize_touches(nearest_support[1], range_20)
+        if norm_touches < RS_MIN_TOUCHES:
+            nearest_support = None  # normalized touches below threshold
+        else:
+            nearest_support = (nearest_support[0], norm_touches)
+
+    if nearest_resistance:
+        norm_touches = _normalize_touches(nearest_resistance[1], range_20)
+        if norm_touches < RS_MIN_TOUCHES:
+            nearest_resistance = None  # normalized touches below threshold
+        else:
+            nearest_resistance = (nearest_resistance[0], norm_touches)
+
     # Determine best signal
     signal = None
 
     # Check LONG: price near support level + bounce
     if nearest_support is not None:
         level, touch_count = nearest_support
-        bounces = _bounce_confirmation(candles, level, 'LONG')
+        bounces = _bounce_confirmation(candles, level, 'LONG', atr_pct=atr_pct)
         broken  = _level_recently_broken(candles, level)
         atr_dist = best_support_dist / atr_pct if atr_pct > 0 else 999
 
@@ -394,7 +440,7 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
     # Check SHORT: price near resistance level + rejection
     if nearest_resistance is not None:
         level, touch_count = nearest_resistance
-        bounces = _bounce_confirmation(candles, level, 'SHORT')
+        bounces = _bounce_confirmation(candles, level, 'SHORT', atr_pct=atr_pct)
         broken  = _level_recently_broken(candles, level)
         atr_dist = best_resist_dist / atr_pct if atr_pct > 0 else 999
 
