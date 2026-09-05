@@ -59,7 +59,7 @@ from hermes_constants import (
     COILED_SPRING_CONF_EMA_ALIGN_BONUS,
     COILED_SPRING_CONF_FLOOR,
     COILED_SPRING_CONF_CAP,
-    COILED_SPRING_COOLDOWN_HOURS,
+    COILED_SPRING_COOLDOWN_MINUTES,
     COILED_SPRING_MIN_BARS,
     COILED_SPRING_SWING_LOOKBACK,
     COILED_SPRING_COIL_SCAN_RANGE,
@@ -520,7 +520,7 @@ def scan_coiled_spring():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='LONG', hours=COILED_SPRING_COOLDOWN_HOURS)
+            set_cooldown(token, direction='LONG', hours=COILED_SPRING_COOLDOWN_MINUTES / 60)
 
     return added
 

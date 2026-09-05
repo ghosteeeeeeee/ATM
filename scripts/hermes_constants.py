@@ -1373,7 +1373,7 @@ ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 COILED_SPRING_ENABLED           = True    # master kill-switch
 COILED_SPRING_PLUS_ENABLED      = True    # LONG direction
 COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LONG-only)
-COILED_SPRING_COOLDOWN_HOURS    = 1       # per-token cooldown between fires
+COILED_SPRING_COOLDOWN_MINUTES  = 15      # per-token cooldown between fires
 # Detection parameters
 COILED_SPRING_LOOKBACK          = 500     # 5m candles to load
 COILED_SPRING_MIN_IMPULSE_PCT   = 1.5     # min % move from swing low to confirm impulse
@@ -1836,6 +1836,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
+    'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -2723,3 +2724,35 @@ PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
 PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity
 PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
 PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal
+
+# ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
+# LONG-only signal for coins with no resistance overhead (open skies).
+# Fires when price breaks through all resistance with strong momentum.
+OPEN_SKIES_ENABLED              = True    # master kill-switch
+OPEN_SKIES_PLUS_ENABLED         = True    # LONG direction
+OPEN_SKIES_MINUS_ENABLED        = False   # SHORT not applicable (open skies = bullish)
+
+# Trend filters
+OPEN_SKIES_SMA_FAST             = 20      # Fast MA period
+OPEN_SKIES_SMA_SLOW             = 50      # Slow MA period
+
+# Momentum
+OPEN_SKIES_MIN_RETURN_20        = 1.5     # % — minimum 20-bar return
+
+# Volume
+OPEN_SKIES_VOL_SPIKE_RATIO      = 1.5     # Last 5 avg must be 1.5× prev 5 avg
+
+# S/R structure
+OPEN_SKIES_MIN_SUPPORT_LEVELS   = 2       # Minimum support levels below price
+OPEN_SKIES_MAX_RESISTANCE       = 0       # Must be zero — that's the whole point
+
+# Higher highs
+OPEN_SKIES_HH_MIN               = 2       # Minimum higher highs in last N bars
+OPEN_SKIES_HH_WINDOW            = 10      # Bars to check for higher highs
+
+# Cooldown
+OPEN_SKIES_COOLDOWN_HOURS       = 4       # Per-token cooldown after fire
+
+# Confidence
+OPEN_SKIES_CONF_BASE            = 75      # base confidence
+OPEN_SKIES_CONF_CAP             = 88      # max confidence (system ceiling)
