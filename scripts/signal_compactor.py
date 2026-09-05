@@ -430,6 +430,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ichimoku_short', 'ichimoku-'):  0.5,
     # btc_wave_detector — BTC EMA300 crossover + volume surge (high-conviction wave pattern)
     ('btc_wave_long', 'btc-wave+'):  1.5,  # boosted for hotset competitiveness (tsunami, not ripple)
+    # open_skies — LONG-only open skies breakout (no resistance overhead)
+    ('open_skies_long', 'open-skies+'): 1.2,  # structural breakout signal, room to run
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

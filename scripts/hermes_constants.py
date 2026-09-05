@@ -2756,3 +2756,15 @@ OPEN_SKIES_COOLDOWN_HOURS       = 4       # Per-token cooldown after fire
 # Confidence
 OPEN_SKIES_CONF_BASE            = 75      # base confidence
 OPEN_SKIES_CONF_CAP             = 88      # max confidence (system ceiling)
+
+# Confidence bonuses
+OPEN_SKIES_VOL_SPIKE_STRONG     = 3.0     # volume ratio threshold for strong spike
+OPEN_SKIES_VOL_SPIKE_MODERATE   = 2.0     # volume ratio threshold for moderate spike
+OPEN_SKIES_BONUS_STRONG         = 5       # confidence bonus for strong volume spike
+OPEN_SKIES_BONUS_MODERATE       = 3       # confidence bonus for moderate volume spike
+OPEN_SKIES_RET_STRONG           = 3.0     # % — 20-bar return threshold for strong momentum
+OPEN_SKIES_RET_MODERATE         = 2.0     # % — 20-bar return threshold for moderate momentum
+OPEN_SKIES_SUPPORT_STRONG       = 5       # support levels for strong floor bonus
+OPEN_SKIES_SUPPORT_MODERATE     = 3       # support levels for moderate floor bonus
+OPEN_SKIES_SMA50_STRONG         = 3.0     # % — distance from SMA50 for strong trend bonus
+OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for moderate trend bonus

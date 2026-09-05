@@ -16,3 +16,16 @@
 - **WARN**: Disk at 84% (94G/118G) — 18GB free. pipeline.log=90MB, 15m_regime.log=50MB. Close to 85% threshold.
 - **INFO**: Market deeply NEUTRAL (105/106 tokens). Only DASH has LONG_BIAS. 1 signal in last hour, 0 open trades.
 - **AUTO-FIX LOG**: [22:22] health_monitor: Auto-fixed NameError in decider_run.py — z_score variable scope mismatch between _run_hot_set() and run(). Changed line 3082 to use sig.get('z_score', 0.0).
+
+## Error Alerts — 2026-09-04 23:22 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 23:20 — recurring intermittent timeout, recovered on next cycle
+- **WARN** (3x): Stale signals (>5min) — JUP SHORT (7.1min), AVAX SHORT (7.3min), conditions verified before entry
+- **WARN**: Disk at 84% (94G/118G) — holding steady, pipeline.log=5.7MB, old logs may need compression
+- **INFO**: 0 open trades in DB (5 live positions via HL), 37 closed today, WR=56.8%, PnL=-1.70 USDT
+- **INFO**: Market 105/106 NEUTRAL, only DASH LONG_BIAS. 97 signals generated last hour.
+- **NO AUTO-FIX NEEDED**: All issues self-recovered or below threshold. Timers all firing on schedule (47 active).
+
+## Error Alerts — 2026-09-05 00:22 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 00:21:02 — recovered on next cycle
+- **AUTO-FIX**: None needed — pipeline self-recovered, cycle #185735 ran compactor successfully after timeout
+- **MONITOR**: Disk at 84% (94G/118G) — approaching 85% threshold

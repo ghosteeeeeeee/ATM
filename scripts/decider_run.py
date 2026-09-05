@@ -1278,6 +1278,16 @@ def hebbian_trade_boost(token, signal):
     except Exception:
         return None
     if result is None:
+        # FIX 2026-09-05: Even when WR lookup fails, return exit_quality if available
+        # so the LLM fail-open can check profit dominance
+        try:
+            eq = engine.exit_quality_score(signal) if signal else None
+            if eq and eq.get('profit_n', 0) > 0 and eq.get('sl_n', 0) == 0:
+                log(f'  [HEBBIAN] {token} {signal}: no WR data but exit_quality profit dominant (profit={eq["profit_n"]}, sl={eq["sl_n"]})')
+                _hebbian_cache[cache_key] = (0.5, eq['profit_n'], 1.0, [], eq, [], now, True, None)
+                return (0.5, eq['profit_n'], 1.0, [], eq, [], True, None)
+        except Exception:
+            pass
         _hebbian_cache[cache_key] = (None, None, None, [], None, None, now, None, None)
         return None
     wr, n, weight = result
@@ -2750,12 +2760,13 @@ def run(dry_run=False):
                         sig_ts = sig_ts.replace(tzinfo=_dt.timezone.utc)
                         now = _dt.datetime.now(_dt.timezone.utc)
                         age_min = (now - sig_ts).total_seconds() / 60
+                        # FIX 2026-09-04: Remove hard 5min staleness block
+                        # Condition-based checks (ACCEL-V2-STALE, VOLATILITY GATE, price drift)
+                        # already verify validity. A signal with valid conditions should execute
+                        # regardless of age. The hard block was killing signals that survived
+                        # hotset rounds but couldn't execute before the 5min deadline.
                         if age_min > SIGNAL_STALENESS_MAX_AGE_MIN:
-                            log(f'  🚫 [STALE] {token} {direction}: signal {age_min:.1f}min old (max {SIGNAL_STALENESS_MAX_AGE_MIN}min)')
-                            if sig_id:
-                                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                            skipped += 1
-                            continue
+                            log(f'  ⏰ [STALE-WARN] {token} {direction}: signal {age_min:.1f}min old (max {SIGNAL_STALENESS_MAX_AGE_MIN}min) — conditions will be verified')
                     except ValueError:
                         pass  # unparseable timestamp — skip staleness check
             # Price drift check

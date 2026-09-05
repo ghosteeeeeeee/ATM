@@ -87,6 +87,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — trend exhaustion detector
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'open-skies+',  # open skies breakout — works in steady trend markets
     },
     'HIGH': {
         # Breakout works in big moves
@@ -123,6 +124,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'open-skies+',  # open skies breakout — works in volatile breakout markets
     },
     'EXTREME': {
         # Continuation works in storms
@@ -146,6 +148,7 @@ REGIME_SIGNALS = {
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum
+        'open-skies+',  # open skies breakout — structural, regime-agnostic
     },
 }
 

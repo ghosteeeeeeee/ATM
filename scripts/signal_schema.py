@@ -1764,6 +1764,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # open-skies (open skies breakout LONG)
+            if _comp == 'open-skies+':
+                try:
+                    from hermes_constants import OPEN_SKIES_PLUS_ENABLED
+                    if not OPEN_SKIES_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OPEN_SKIES_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2213,6 +2222,7 @@ def is_component_disabled(component: str) -> bool:
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
+            OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2446,6 +2456,9 @@ def is_component_disabled(component: str) -> bool:
     if c == 'confluence+': return not SIGNAL_CONFLUENCE_PLUS_ENABLED
     if c == 'confluence-': return not SIGNAL_CONFLUENCE_MINUS_ENABLED
     if c == 'confluence': return not SIGNAL_CONFLUENCE_ENABLED
+    # open-skies (open skies breakout LONG)
+    if c == 'open-skies+': return not OPEN_SKIES_PLUS_ENABLED
+    if c == 'open-skies': return not OPEN_SKIES_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

@@ -33,6 +33,7 @@ from hermes_constants import (
     COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
     BTC_WAVE_DETECTOR_ENABLED,
     PUMP_FLOW_ENABLED,
+    OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
 )
 
 
@@ -203,6 +204,11 @@ try:
 except Exception:
     _pump_flow_signal_run = None
 
+try:
+    from signals.open_skies import run as _open_skies_run
+except Exception:
+    _open_skies_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -243,6 +249,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'coiled_spring',             'enabled': 'COILED_SPRING_ENABLED',         'run': _coiled_spring_run},
     {'name': 'btc_wave_detector',         'enabled': 'BTC_WAVE_DETECTOR_ENABLED',     'run': _btc_wave_detector_run},
     {'name': 'pump_flow_signal',          'enabled': 'PUMP_FLOW_ENABLED',             'run': _pump_flow_signal_run},
+    {'name': 'open_skies',                'enabled': 'OPEN_SKIES_ENABLED',            'run': _open_skies_run},
 ]
 
 
