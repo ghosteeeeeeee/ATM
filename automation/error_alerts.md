@@ -85,3 +85,8 @@
 ## Error Alerts — 2026-09-05 18:22 UTC
 - **WARN** (2x): `signal_compactor: timed out` at 18:20 and 18:22 — self-recovered, no fix needed
 - **WARN**: Disk at 82% (92G/118G) — approaching 85% threshold. Consider log cleanup.
+
+## Error Alerts — 2026-09-05 19:23 UTC
+- **WARN** (4x): `ERROR signal_compactor: timed out` — compactor service exits OK but in-pipeline call times out. Hotset stays empty, no new trade entries.
+- **AUTO-FIX**: None applied — pipeline continues running, compactor fires on timer separately.
+- **INFO**: Disk at 82% — within limits but trending up.

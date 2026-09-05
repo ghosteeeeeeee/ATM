@@ -123,6 +123,7 @@ Post-fix exit breakdown (26 trades):
 
 ## Active Decisions
 
+- **DIRECTIONAL CAP RECOMMENDED.** Max 65% of open positions in one direction. Prevents regime-transition bleed. CEO report written. Awaiting T approval to build. — 2026-09-05
 - **PM_TRAIL WIDENED.** PM_TRAIL_DISTANCE_PCT 0.40%→0.50%. R:R 0.73, need 20+ trades to verify improvement to ~0.80. — 2026-09-05
 - **EMA300_DIP_SHORT KILLED.** 8T/7d 25% WR -$0.69. NEVER_REENABLE_FLAGS. — 2026-09-05
 - **R:R FIX VERIFIED.** 31 trades post-fix. R:R 0.73 (avg_win $0.111, avg_loss $0.152). Marginal (+$0.019/trade). — 2026-09-05
@@ -154,10 +155,11 @@ Post-fix exit breakdown (26 trades):
 
 ## Next Actions
 
-1. **Verify PM_TRAIL_DISTANCE_PCT fix.** 31 trades at old distance. Need 20+ new trades at 0.50% to confirm R:R improvement to ~0.80. — 2026-09-05
-2. **Monitor open-skies+.** 10T/7d 70% WR +$0.50. GROWING. Evaluate at 20T for backbone status. — 2026-09-05
-3. **Test neutral_sniper.** Shadow mode, 5 SHORT signals emitted. Flip live after 48h if WR >55% with 20+ signals. — 2026-09-05
-4. **Monitor continuation+.** 5T/7d 100% WR +$0.33. Too few trades to trust. — 2026-09-05
-5. **Delegate: Build SHORT backbone signal.** System 100% LONG-dependent. SHORT side has no active backbone. CRITICAL. — 2026-09-05
-6. **Monitor bb-bounce-v2-long+.** 43T/7d 79.1% WR +$1.57. STAR. — 2026-09-05
-7. **Monitor disk.** Currently 82% (21G free). Safe after cleanup. — 2026-09-05
+1. **BUILD directional cap (65%).** Highest-impact mechanical fix. Prevents regime-transition bleed. CEO report at automation/ceo/ceo_report.md. — 2026-09-05
+2. **DELEGATE SHORT backbone signal build.** System 100% LONG-dependent. SHORT has 0% WR today. CRITICAL. — 2026-09-05
+3. **Verify PM_TRAIL_DISTANCE_PCT fix.** 31 trades at old distance. Need 20+ new trades at 0.50% to confirm R:R improvement to ~0.80. — 2026-09-05
+4. **Monitor open-skies+.** 10T/7d 70% WR +$0.50. GROWING. Evaluate at 20T for backbone status. — 2026-09-05
+5. **Test neutral_sniper.** Shadow mode, 5 SHORT signals emitted. Flip live after 48h if WR >55% with 20+ signals. — 2026-09-05
+6. **Monitor continuation+.** 5T/7d 100% WR +$0.33. Too few trades to trust. — 2026-09-05
+7. **Monitor bb-bounce-v2-long+.** 43T/7d 79.1% WR +$1.57. STAR. — 2026-09-05
+8. **Monitor disk.** Currently 82% (21G free). Safe after cleanup. — 2026-09-05
