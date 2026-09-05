@@ -174,14 +174,6 @@ def detect(token):
     closes = [c[4] for c in candles]
     highs = [c[2] for c in candles]
 
-    # ── Dead token filter: 20-bar range must be > 1% ──
-    if len(closes) >= 20:
-        high_20 = max(closes[-20:])
-        low_20 = min(closes[-20:])
-        range_20 = (high_20 - low_20) / low_20 * 100 if low_20 > 0 else 0
-        if range_20 < 1.0:
-            return None  # dead token, no real market
-
     # ── Condition 1 & 2: Price above SMA20 and SMA50 ──
     sma_fast = _compute_sma(closes, OPEN_SKIES_SMA_FAST)
     sma_slow = _compute_sma(closes, OPEN_SKIES_SMA_SLOW)
