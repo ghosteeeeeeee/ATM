@@ -3353,6 +3353,37 @@ def run(dry_run=False):
                 _record_hotset_failure(token, direction, failures)
                 continue
 
+        # ── EMA300 CONDITION CHECK for SHORT trades ─────────────────────────
+        # Block SHORT trades when EMA300 is rising or price is above EMA300
+        if direction.upper() == 'SHORT' and 'ema300-dip-short' in (source or ''):
+            try:
+                _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
+                _ema_rows = _conn_ema.execute(
+                    "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 400",
+                    (token.upper(),)
+                ).fetchall()
+                _conn_ema.close()
+                if _ema_rows and len(_ema_rows) >= 300:
+                    _prices = [r[0] for r in reversed(_ema_rows)]
+                    _ema_vals = []
+                    _ema_v = _prices[0]
+                    _k2 = 2.0 / 301
+                    for _p in _prices:
+                        _ema_v = _p * _k2 + _ema_v * (1 - _k2)
+                        _ema_vals.append(_ema_v)
+                    _ema_slope = (_ema_vals[-1] - _ema_vals[-20]) / _ema_vals[-20] * 100 if len(_ema_vals) >= 20 else 0
+                    _dist = (_prices[-1] - _ema_vals[-1]) / _ema_vals[-1] * 100
+                    if _ema_slope >= 0:
+                        log(f'SKIP: {token} {direction} — EMA300 slope={_ema_slope:+.4f}% >= 0 (EMA rising), not valid SHORT')
+                        skipped += 1
+                        continue
+                    if _dist > 0:
+                        log(f'SKIP: {token} {direction} — price above EMA300 (dist={_dist:+.4f}%), not valid SHORT')
+                        skipped += 1
+                        continue
+            except Exception as _e:
+                log(f'  WARN: EMA300 check failed for {token}: {_e}')
+
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
             # Don't mark executed in dry-run — nothing is real

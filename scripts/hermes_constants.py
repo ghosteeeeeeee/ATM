@@ -1242,6 +1242,7 @@ NEVER_REENABLE_FLAGS = {
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     # ACCEL_300_V3_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-04 — T re-enabled for live testing with new guards
     'EMA300_DIP_LONG_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
+    'EMA300_DIP_SHORT_ENABLED',  # CEO 2026-09-05 — 6T/7d 33.3% WR -$0.42. All cut-loser-CL-T1 in NEUTRAL chop. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1523,7 +1524,7 @@ EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
 # ema300_dip_short.py — catches shallow rallies in strong downtrends
-EMA300_DIP_SHORT_ENABLED = True       # master switch
+EMA300_DIP_SHORT_ENABLED = False      # CEO 2026-09-05 — 6T/7d 33.3%WR -$0.42. All losses cut-loser-CL-T1 in NEUTRAL chop. No SHORT edge in flat market.
 EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
 EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
@@ -1821,7 +1822,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     'ema300-dip-long',  # EMA300 dip buyer — works solo in strong uptrends
-    'ema300-dip-short',  # EMA300 rally seller — works solo in strong downtrends
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',
@@ -2772,7 +2772,7 @@ OPEN_SKIES_HH_MIN               = 2       # Minimum higher highs in last N bars
 OPEN_SKIES_HH_WINDOW            = 10      # Bars to check for higher highs
 
 # Cooldown
-OPEN_SKIES_COOLDOWN_HOURS       = 4       # Per-token cooldown after fire
+OPEN_SKIES_COOLDOWN_HOURS       = 0.5     # Per-token cooldown after fire (30 min)
 
 # Confidence
 OPEN_SKIES_CONF_BASE            = 75      # base confidence
