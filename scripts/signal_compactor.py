@@ -856,7 +856,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         try:
             from chop_detector import get_regime, should_trade_signal
             _chop_regime = get_regime()
-            _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime)
+            _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime, token=token)
             if not _allowed:
                 log(f"  🌊 [CHOP] {token} {direction} {signal_type}: BLOCKED — {_chop_reason}")
                 return 0.0

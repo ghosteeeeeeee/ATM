@@ -84,6 +84,27 @@ SIGNAL_OVERRIDES = {
 }
 
 
+def _get_token_momentum(token: str) -> float:
+    """Get token's 1h momentum (% change). Returns positive if trending up."""
+    conn = None
+    try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1m
+            WHERE token = ? ORDER BY ts DESC LIMIT 60
+        """, (token.upper(),))
+        closes = [r[0] for r in cur.fetchall()]
+        if len(closes) < 60:
+            return 0.0
+        return (closes[0] - closes[-1]) / closes[-1] * 100 if closes[-1] > 0 else 0.0
+    except Exception:
+        return 0.0
+    finally:
+        if conn:
+            conn.close()
+
+
 def _classify_signal(signal_type: str) -> str:
     """Classify a signal as MOMENTUM or MEAN_REVERSION."""
     # Check overrides first
@@ -280,7 +301,7 @@ def get_regime() -> dict:
     return result
 
 
-def should_trade_signal(signal_type: str, regime: dict = None) -> tuple:
+def should_trade_signal(signal_type: str, regime: dict = None, token: str = None) -> tuple:
     """
     Check if a signal should be allowed in the current regime.
 
@@ -295,6 +316,15 @@ def should_trade_signal(signal_type: str, regime: dict = None) -> tuple:
     signal_class = _classify_signal(signal_type)
 
     if signal_class == 'MOMENTUM' and not regime['momentum_allowed']:
+        # Token-level check: if the token itself is trending strongly,
+        # allow momentum signals even in CHOP. BTC flat ≠ COMP flat.
+        if token:
+            try:
+                token_mom = _get_token_momentum(token)
+                if abs(token_mom) > 0.5:  # token trending >0.5% in 1h
+                    return True, f"CHOP bypass — {token} trending ({token_mom:+.2f}%), momentum OK"
+            except Exception:
+                pass
         return False, f"CHOP — momentum signal {signal_type} blocked (preserve winrate)"
 
     if signal_class == 'MEAN_REVERSION' and not regime['mean_reversion_allowed']:
