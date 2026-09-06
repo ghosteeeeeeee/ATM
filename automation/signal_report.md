@@ -1,32 +1,33 @@
 === Signal Performance Report ===
-Generated: 2026-09-06 ~16:00 UTC | Period: Last 6h / 24h
+Generated: 2026-09-06 ~18:30 UTC | Period: Last 6h / 24h
 
 ## SYSTEM TOTALS
-- 24h: 33 trades, 51.5% WR, -$0.21 PnL
-- 6h: 11 trades, 27.3% WR, -$0.64 PnL (dragged by now-killed coil-spring+)
+- 24h: 35 trades, 54.3% WR, -$0.27 PnL
+- 6h: 9 trades, 77.8% WR, +$0.28 PnL
 
 ## KILLED (already executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| coil-spring+ | LONG | 42.9% | -$0.65 | 21 | KILLED 2026-09-06 15:07 UTC |
+| coil-spring+ | LONG | 44.4% | -$0.58 | 18 | KILLED 2026-09-06 15:07 UTC — 0%WR last hour |
 
 ## BOOSTED (already executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 80.0% | +$0.78 | 10 | Conf weight 1.3 (8 tokens, consistent) |
+| bb-bounce-v2-long+ | LONG | 80.0% | +$0.53 | 10 | Conf weight 1.3 (8 tokens, 80% WR 7d) |
 
 ## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 0.0% | -$0.14 | 1 | Insufficient data |
-| r2-trend-short3 | SHORT | 0.0% | -$0.20 | 1 | Insufficient data |
+| continuation+ | LONG | 0.0% | -$0.28 | 1 | Insufficient data — monitor |
 
 ## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 80.0% | +$0.78 | 10 | Healthy, multi-token |
+| bb-bounce-v2-long+ | LONG | 80.0% | +$0.53 | 10 | Strong, 85.7% WR 48h, 80% WR 7d |
+| slow-grind+ | LONG | 100.0% | +$0.42 | 3 | Small sample, positive |
+| pump-chain+ | LONG | 100.0% | +$0.06 | 3 | Small sample, positive |
 
 ## ISSUES:
 - No direction inversions found
-- 6h system WR low (27.3%) but explained by coil-spring+ losses before kill
-- coil-spring+ master switch still True (COILED_SPRING_ENABLED=True) — only PLUS variant killed
+- coil-spring+ kill took effect — no new signals after 15:07 UTC
+- No kill candidates remaining (only coil-spring+ met criteria, already killed)
