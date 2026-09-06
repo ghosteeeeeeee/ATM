@@ -372,7 +372,7 @@ class HysteresisState:
         else:
             # Different direction — count mismatch
             self.current_value = raw_value
-            self.consecutive_match = 0
+            self.consecutive_match = 1  # First tick of new value counts as match=1
             self.consecutive_mismatch += 1
             
             # Check if we should deconfirm (turn OFF)
