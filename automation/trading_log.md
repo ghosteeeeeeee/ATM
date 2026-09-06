@@ -2234,3 +2234,35 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 2. Monitor neutral_sniper execution — waiting for BTC to stabilize
 3. Build directional cap (65%) — highest-impact pending feature
 4. Monitor disk (83%)
+
+## [2026-09-06 19:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (KAS bb-bounce-v2-long+ +$0.03 win)
+**24h:** 33T, 51.5% WR, -$0.31
+**24h excl coil-spring+:** 13T, 69.2% WR, +$0.47 (system performing, coil-spring drag rotating out)
+**Open:** 4 positions (CFX, ZRO, SYRUP near flat; BTC liq-hunt+ open 26h flat)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 18T +$1.65 avg+$0.09 (star exit)
+- cut-loser-CL-T1: 9T -$1.28 avg-$0.14 (expected loss)
+- atr_sl_hit: 6T -$0.68 avg-$0.11 (18.2% of closes, well under 40%)
+
+**24h Signal Breakdown:**
+- bb-bounce-v2-long+: 11T 81.8%WR +$0.81 (STAR)
+- coil-spring+: 20T 40%WR -$0.78 (killed 15:07 UTC, rotating out ~15:00 tomorrow)
+- open-skies+: 1T -$0.14 (too few)
+- r2-trend-short3: 1T -$0.20 (too few)
+
+**Changes:** None
+**Kill criteria:** Not met (no signal has 3+T 0%WR in last hour)
+**ATR SL:** 18.2% — well under 40% threshold
+**Trade freq:** 1/hr — normal
+
+**No Change Needed:**
+- System in steady state
+- coil-spring+ kill already applied 15:07 UTC — waiting for rotation
+- bb-bounce-v2-long+ continues as star performer
+- BTC liq-hunt+ flat after 26h — not losing, not alarming
+
+**Open Questions:**
+- BTC liq-hunt+ stale (26h open, flat). Monitor for next cycle.
