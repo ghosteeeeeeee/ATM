@@ -1091,10 +1091,10 @@ HH_HL_CHOCH_MAX_BARS_SINCE   = 15  # reject if flip is older than this many bars
 # Never touches losing positions.
 # ── Profit Monster — Two-Tier Take-Profit ──────────────────────────────────────
 # Tier 1: Quick scalp — lower profit, fires frequently
-PM_TIER1_MIN_PCT    = 0.65   # min profit % to close — raised from 0.5% to let PM_TRAIL (0.60%) activate first
+PM_TIER1_MIN_PCT    = 0.65   # min profit % to close — raised from 0.5% to let PM_TRAIL (0.40%) activate first
 PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
 PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
-PM_TIER1_SKIP_TOP_PCT = 0    # don't touch top X% most profitable (0 = disabled)
+PM_TIER1_SKIP_TOP_PCT = 20   # skip top 20% most profitable — let best runners go
 PM_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}   # minutes between fires
 
 # Tier 2: Runner — higher profit, fires less frequently
@@ -1132,8 +1132,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
-    'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
-    'slow-grind+',         # slow grinding uptrend — own ATR SL/TP, no PM Trail benefit
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
@@ -1144,7 +1142,16 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
+    # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
 )
+
+# Signals that bypass PM_TRAIL only — still get T1/T2 tier exits.
+# These signals have their own ATR SL/TP but benefit from tier profit-taking.
+PM_TRAIL_BYPASS_SIGNALS = (
+    'slow-grind',   # slow grinding downtrend — own ATR SL, but T1/T2 capture profits
+    'slow-grind+',  # slow grinding uptrend — own ATR SL, but T1/T2 capture profits
+)
+
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
 # ── Time / Peak Exit Kill Switches ──────────────────────────────────────────────
@@ -2491,10 +2498,12 @@ CONTINUATION_GAP_THRESHOLD = 0.3              # % — gap above/below EMA to con
 CONTINUATION_SLOPE_THRESHOLD = 0.01           # % per bar — min slope to consider trend alive
 CONTINUATION_VELOCITY_THRESHOLD = 0.005       # % per bar — min velocity to consider momentum alive
 # V2 exhaustion detection
-CONTINUATION_EXHAUST_RSI_LONG = 75            # RSI > this on 1h = LONG exhaustion → reverse
-CONTINUATION_EXHAUST_RSI_SHORT = 25           # RSI < this on 1h = SHORT exhaustion → reverse
+CONTINUATION_EXHAUST_RSI_LONG = 70            # RSI > this on 1h = LONG exhaustion → reverse (lowered from 75)
+CONTINUATION_EXHAUST_RSI_SHORT = 30           # RSI < this on 1h = SHORT exhaustion → reverse (raised from 25)
 CONTINUATION_EXHAUST_ZSCORE = 2.0             # |z| > this on 1h = exhaustion → reverse
 CONTINUATION_EXHAUST_GAP_PCT = 1.5            # % — gap above EMA + velocity dying = exhaustion
+# V2 peak guard — don't buy at the top
+CONTINUATION_PEAK_GUARD_PCT = 0.3             # % — if price within this of 30min high, skip LONG re-entry
 # V2 wave control
 CONTINUATION_WAVE_COOLDOWN_SEC = 7200         # seconds to count recent continuations (2 hours)
 CONTINUATION_WAVE_MAX = 3                     # max continuation signals per token in window

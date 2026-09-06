@@ -68,6 +68,7 @@ from hermes_constants import (
     CONTINUATION_MAX_MOVE_PCT,
     CONTINUATION_MAX_COUNTER_PCT,
     CONTINUATION_MIN_AVG_RANGE,
+    CONTINUATION_PEAK_GUARD_PCT,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -277,17 +278,20 @@ def _analyze_trend(token):
     else:
         result['move_30m'] = 0
     
-    # Avg 1m candle range (volatility proxy)
+    # Avg 1m candle range (volatility proxy) + 30min high for peak guard
     if len(closes_1m) >= 30:
         # Re-fetch candle ranges from DB for high/low data
         candles_raw = _get_candle_range(token, 'candles_1m', 30)
         if candles_raw:
             ranges = [(r[2] - r[3]) / r[1] * 100 for r in candles_raw if r[1] > 0]
             result['avg_range'] = sum(ranges) / len(ranges) if ranges else 0
+            result['high_30m'] = max(r[2] for r in candles_raw)  # highest high in 30min
         else:
             result['avg_range'] = 0
+            result['high_30m'] = closes_1m[-1]
     else:
         result['avg_range'] = 0
+        result['high_30m'] = closes_1m[-1] if closes_1m else 0
     
     return result
 
@@ -478,6 +482,15 @@ def detect_continuation(token, direction, close_info):
     # If price moved against us more than threshold since close, skip
     if pullback > CONTINUATION_PULLBACK_THRESHOLD:
         return None
+    
+    # ── Peak guard: don't buy at the top ─────────────────────────────────
+    # If price is within X% of the 30min high, it's a bad LONG entry
+    high_30m = trend.get('high_30m', 0)
+    if new_direction == 'LONG' and high_30m > 0:
+        dist_from_high = (high_30m - current_price) / high_30m * 100
+        if dist_from_high < CONTINUATION_PEAK_GUARD_PCT:
+            _log(f"  ⛔ [PEAK-GUARD] {token} LONG skipped — price {dist_from_high:.2f}% from 30min high ({current_price:.6f} vs {high_30m:.6f})")
+            return None
     
     # ── Pre-entry move filters (backtested: 8/8 losers caught, 0/2 winners killed) ──
     move_30m = trend.get('move_30m', 0)
