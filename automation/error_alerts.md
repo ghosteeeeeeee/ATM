@@ -90,3 +90,10 @@
 - **WARN** (4x): `ERROR signal_compactor: timed out` — compactor service exits OK but in-pipeline call times out. Hotset stays empty, no new trade entries.
 - **AUTO-FIX**: None applied — pipeline continues running, compactor fires on timer separately.
 - **INFO**: Disk at 82% — within limits but trending up.
+
+## Error Alerts — 2026-09-05 23:22 UTC
+- **WARN** (2x): `signal_compactor timed out` — transient, pipeline recovered
+- **WARN**: `ema300-dip-short` 0% WR today (4 trades, -0.6 USDT) — review signal quality
+- **WARN**: Disk at 83% (92G/118G) — approaching threshold
+- **WARN**: `hermes-5m-candle.service` failed — stale service, missing script `_aggregate_5m.py`
+- **INFO**: 1 near-zero PnL phantom trade (ENS coil-spring+, -0.0002 USDT)

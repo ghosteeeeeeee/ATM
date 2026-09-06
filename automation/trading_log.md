@@ -1777,3 +1777,69 @@ None — system healthy, WR climbing, stars dominant.
 - Open: 4 positions ($44.40)
 
 **Next:** Re-run at 23:06 UTC
+
+## [2026-09-05 23:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**PnL:** $0.00 (24h: 36T 19W 17L 52.8%WR +$0.36)
+
+**Close reasons (24h):** profit-monster-trail 18T +$2.08 (50%). cut-loser-CL-T1 11T -$1.66 (31%). atr_sl_hit 5T -$0.22 (14%). profit-monster-T1 2T +$0.16.
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 11T 91%WR +$1.02, open-skies+ 11T 64%WR +$0.36
+- Drag: ema300-dip-short 5T 0%WR -$0.73 (not killable — 0T last hour, not 3+ threshold)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 14% well under 40%
+- Trade freq: 0/hr quiet
+- Hourly PnL: No 3+ consecutive negative hours
+- Open: 2 positions ($22.20 — SOL, BTC)
+
+**Next:** Re-run at 00:06 UTC
+
+## [2026-09-06 00:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet overnight)
+**PnL:** $0.00 (24h: 35T 21W 14L 60.0%WR +$0.47)
+
+**Close reasons (24h):** profit-monster-trail 18T +$2.08 (51%). cut-loser-CL-T1 10T -$1.55 (29%). atr_sl_hit 5T -$0.22 (14%). profit-monster-T1 2T +$0.16 (6%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 11T 91%WR +$1.02, open-skies+ 11T 64%WR +$0.36
+- Drag: ema300-dip-short 4T 0%WR -$0.62 (not killable — 0T last hour, not 3+ threshold)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 14% well under 40%
+- Trade freq: 0/hr quiet
+- Hourly PnL: No 3+ consecutive negative hours
+- Open: 5 positions ($55.50 — CFX, ZRO, SAND, SOL, BTC)
+
+**Next:** Re-run at 01:06 UTC
+
+## [2026-09-06 01:06 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (overnight quiet)
+**PnL:** $0.00 (24h: 33T 20W 11L 60.6%WR +$0.55)
+
+**Close reasons (24h):** profit-monster-trail 18T +$2.08 (54.5%). cut-loser-CL-T1 9T -$1.43 (27.3%). atr_sl_hit 5T -$0.22 (15.2%). profit-monster-T1 1T +$0.12.
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 10T 90%WR +$0.98, open-skies+ 11T 63.6%WR +$0.36
+- Drag: ema300-dip-short 4T 0%WR -$0.62 (not killable — 0T last hour, not 3+ threshold)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 15.2% well under 40%
+- Trade freq: 0/hr quiet
+- Hourly PnL: No 3+ consecutive negative hours
+- Open: 5 positions ($55.50)
+
+**Next:** Re-run at 02:06 UTC

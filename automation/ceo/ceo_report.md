@@ -121,3 +121,54 @@ The cap alone won't fix the SHORT side. SHORT has 0% WR today, no active backbon
 2. **DELEGATE SHORT signal build** — system 100% LONG-dependent
 3. **Monitor PM_TRAIL_DISTANCE_PCT** — 31 trades at old distance, need 20+ at 0.50%
 4. **Monitor neutral_sniper** — shadow mode, 5 SHORT signals in test
+
+---
+
+## CEO Report — 2026-09-06 ~Spike Filter Decision
+
+### Decision: **GO (with modification)**
+
+### Problem
+Spike filter blocks LONG when any 5m candle has >0.3% bearish move. Catches minor pullbacks during strong rallies. 563 LONG signals blocked in 24h.
+
+### Data
+- open-skies+: 11 trades, 63.6% WR, +$0.36 — **profitable, wrongly blocked**
+- coil-spring+: 3 trades, 33.3% WR, -$0.07 — **neutral**
+- pump-chain+: 0 trades — **new signal**
+
+### Fix (Modified from Proposal)
+
+**Original proposal:**
+1. Raise threshold 0.3% → 0.5%
+2. Exempt momentum signals entirely
+3. Add trend filter: price > EMA20 → +50% threshold
+
+**CEO modification:**
+1. **Raise threshold 0.3% → 0.5%** — conservative, not reckless
+2. **Exempt momentum signals ONLY when trend filter confirms** (price > EMA20)
+   - Full exemption removes safety check in downtrends where pullbacks ARE danger
+   - Conditional exemption keeps safety in downtrends, freedom in uptrends
+3. **Trend filter: price > EMA20 → threshold 0.75%** (0.5% × 1.5)
+
+### Why GO
+- 563 blocked trades = massive opportunity cost
+- open-skies+ has 63.6% WR and is profitable — blocking it is counterproductive
+- 0.3% threshold conflates healthy pullbacks with reversal signals
+- Trend filter is the key piece — pullbacks in uptrends are buying opportunities, not danger
+
+### Why Modified
+- **Full momentum exemption is dangerous.** In downtrends, momentum signals still need spike protection. Conditional exemption (only when price > EMA20) keeps safety where it matters.
+
+### Expected Impact
+- Reclaims ~400+ blocked LONG trades per day (estimated 70% of 563)
+- Improves open-skies+ execution (currently 63.6% WR, should improve with less blocking)
+- Maintains protection in downtrends via trend filter
+
+### Verification
+- Log spike_filter blocks for 48h post-change
+- Compare blocked vs executed signals
+- Track if reclaimed trades improve or worsen WR
+- Monitor if false positives decrease
+
+### Action Required
+Implement in spike filter logic. No delegation needed — this is a param change + conditional logic.

@@ -1138,7 +1138,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
-    'coil-spring',           # volume contraction pullback — own ATR SL/TP (1.5x/4.0x), no PM Trail benefit
+    # REMOVED: 'coil-spring' — CEO wants PM Trail to manage these trades
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
