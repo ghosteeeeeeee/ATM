@@ -96,6 +96,7 @@ REGIME_SIGNALS = {
     'HIGH': {
         # Breakout works in big moves
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners

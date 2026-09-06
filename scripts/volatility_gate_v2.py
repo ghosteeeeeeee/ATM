@@ -61,6 +61,7 @@ REGIME_SIGNALS = {
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',
@@ -88,6 +89,7 @@ REGIME_SIGNALS = {
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',
@@ -121,6 +123,7 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
     },
 }
 
