@@ -1390,7 +1390,7 @@ ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 # coiled_spring.py — LONG only. Catches volume dead zones during pullbacks
 # in established bullish trends, entries near EMA support.
 COILED_SPRING_ENABLED           = True    # master kill-switch
-COILED_SPRING_PLUS_ENABLED      = True    # LONG direction
+COILED_SPRING_PLUS_ENABLED      = False   # KILLED 2026-09-06 15:07 UTC — 5T last hour 0%WR -$0.70. Kill criteria met.
 COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LONG-only)
 COILED_SPRING_COOLDOWN_MINUTES  = 15      # per-token cooldown between fires
 # Detection parameters

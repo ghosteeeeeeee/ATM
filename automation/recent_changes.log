@@ -1035,3 +1035,7 @@
   WHY: 2T last hour (0W 2L -$0.11). 30T/24h 57%WR +$0.48. Kill criteria not met. atr_sl_hit 16.7% under 40%. bb-bounce-v2-long+ 7T 86%WR +$0.88 star. coil-spring+ 17T 53%WR -$0.07 breakeven. Trade freq 2/hr normal. Open 5 ($64.30). System steady state. Note: pnl_pct column has inflated values (data quality issue, not affecting execution).
   BY: auto_1hr
   NEXT: Re-run at 15:07 UTC
+[2026-09-06 15:07 UTC] auto_1hr: KILLED coil-spring+
+  WHY: 6T last hour (0W 6L -$0.74). 36T/24h 50%WR -$0.26. Kill criteria met: coil-spring+ 5T last hour 0%WR -$0.70 (APT, ZRO, GMT, NOT, AIXBT — all cut-loser-CL-T1 or atr_sl_hit). COILED_SPRING_PLUS_ENABLED set False. bb-bounce-v2-long+ 9T 77.8%WR +$0.72 remains star. open-skies+ 3T 33.3%WR -$0.08 small drag not killable. accel-300-v3-long+ 2T 50%WR -$0.05 neutral. r2-trend-short3 1T 0%WR -$0.20 not killable. Trade freq 6/hr elevated (coil-spring was overfiring). Open 2 ($22.20). atr_sl_hit 6/36 = 16.7% under 40%.
+  BY: auto_1hr
+  NEXT: Re-run at 16:07 UTC

@@ -2110,3 +2110,29 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 **Open Questions:** None
 
 **Next:** Re-run at 15:07 UTC
+
+## [2026-09-06 15:07 UTC] Hourly Analysis
+
+**Trades:** 6 closed (0W, 6L) — PnL: -$0.74
+- APT coil-spring+: -$0.13 (cut-loser-CL-T1)
+- ZRO coil-spring+: -$0.10 (cut-loser-CL-T1)
+- GMT bb-bounce-v2-long+: -$0.17 (atr_sl_hit)
+- NOT coil-spring+: -$0.12 (cut-loser-CL-T1)
+- AIXBT coil-spring+: -$0.23 (cut-loser-CL-T1)
+- SOL bb-bounce-v2-long+: +$0.01 (profit-monster-trail)
+
+**24h:** 36T 50%WR -$0.26 | Open: 2 ($22.20)
+
+**Changes:**
+1. KILLED coil-spring+ (COILED_SPRING_PLUS_ENABLED = False) — 5T last hour 0%WR -$0.70. Kill criteria met: 0% WR with 3+ trades in last hour.
+
+**No Change Needed:**
+- atr_sl_hit: 6/36 = 16.7% — well under 40% threshold
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.72 (star, healthy)
+- open-skies+: 3T 33.3%WR -$0.08 (small drag, not killable — only 3T/24h)
+- accel-300-v3-long+: 2T 50%WR -$0.05 (neutral)
+- r2-trend-short3: 1T 0%WR -$0.20 (not killable — only 1T)
+- profit-monster-trail dominant exit at 56% — healthy
+
+**Open Questions:**
+- 24h now slightly negative (-$0.26). Will removing coil-spring+ restore positive edge? Monitor next hour.
