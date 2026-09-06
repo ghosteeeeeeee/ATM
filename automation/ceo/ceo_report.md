@@ -1,3 +1,19 @@
+## CEO Report — 2026-09-06 ~07:00 UTC
+
+### Diagnosis
+System profitable 24h (+$0.39, 58.8% WR, 34T). R:R 48h: 0.60 (avg_win $0.1003 vs avg_loss $0.1678) — still underwater. bb-bounce-v2-long+ STAR (90.9% WR 24h, 80.9% WR 7d +$2.24). coil-spring+ DEGRADED (60%→44.4% WR, -$0.21/24h). open-skies+ DEGRADED (63.6%→50% WR, -$0.19/24h). neutral_sniper LIVE but 0 signals in 4h — RSI thresholds too tight for NEUTRAL market. 5/5 positions full. 2 consecutive green days (Sep 5 +$0.47, Sep 6 +$0.20).
+
+### Root Cause
+neutral_sniper RSI thresholds (35/65) required actual oversold/overbought conditions. In 100% NEUTRAL market, RSI stays 45-55 — thresholds never triggered. coil-spring+ and open-skies+ degradation likely from same flat-market RSI compression.
+
+### Fix Applied
+Widened neutral_sniper RSI: LONG 35→40, SHORT 65→60 (neutral_sniper.py:50-51). Expected: signals fire within hours in flat market. No other parameter changes — monitoring coil-spring+ and open-skies+ before tuning.
+
+### Verification
+Pending — need to check signal log after next pipeline cycle for neutral_sniper signals. R:R at 0.60 (48h) still needs more time to reach 0.80+ target.
+
+---
+
 ## CEO Report — 2026-09-06 ~02:35 UTC
 
 ### Diagnosis

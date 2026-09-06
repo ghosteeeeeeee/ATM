@@ -1865,3 +1865,64 @@ None — system healthy, WR climbing, stars dominant.
 - Open: 5 positions (NOT, SAND, SOL, CFX, BTC)
 
 **Next:** Re-run at 03:06 UTC
+
+## [2026-09-06 03:50 UTC] Hourly Analysis
+
+**Trades:** 5 closed last 2h (4W 1L: AIXBT +0.03, SOL +0.32, LDO -0.13, CFX +0.02, SAND +0.01)
+**24h:** 34T 21W 13L 61.8%WR +$0.60
+
+**Close reasons (24h):** profit-monster-trail 20T +$2.18 (59%). cut-loser-CL-T1 9T -$1.36 (26%). atr_sl_hit 5T -$0.22 (15%).
+
+**Signal health (24h):**
+- Stars: bb-bounce-v2-long+ 12T 75%WR +$1.32
+- Neutral: coil-spring+ 7T +$0.11
+- Drag: open-skies+ 8T -$0.19, ema300-dip-short 3T 0%WR -$0.42 (not killable — 0T last hour)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 15% well under 40%
+- Trade freq: 0-3/hr normal
+- Hourly PnL: No 3+ consecutive negative hours
+- Open: 5 positions (BTC, NOT, NEO, YGG, CAKE) $61.00
+
+**Next:** Re-run at 04:50 UTC
+
+## FAVORITES Update — 2026-09-06 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE USUAL (WR=50.0%, PnL=$-0.09, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ZRO (WR=60.0%, AvgPnL=1.95%, Trades=5)
+
+Final set: ['AIXBT', 'BABY', 'DOGE', 'DOT', 'FOGO', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'POL', 'SEI', 'TURBO', 'YGG', 'ZRO']
+
+## LOSERS Update — 2026-09-06 06:05 UTC
+- REMOVE CHIP (insufficient data)
+- REMOVE ENA (WR=50.0%, PnL=$0.14, recovered)
+- REMOVE NEAR (WR=50.0%, PnL=$-0.05, recovered)
+- ADD LDO (WR=20.0%, PnL=$-0.30, wr_collapse (56.5% → 20.0%))
+
+Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
+
+## [2026-09-06 07:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**24h:** 34T 20W 14L 58.8%WR +$0.43
+
+**Close reasons (24h):** profit-monster-trail 19T +$2.15 (56%). cut-loser-CL-T1 10T -$1.50 (29%). atr_sl_hit 5T -$0.22 (15%).
+
+**Signal health (24h):**
+- Star: bb-bounce-v2-long+ 11T 90.9%WR +$1.29
+- Neutral: coil-spring+ 8T 50%WR -$0.03, open-skies+ 8T 50%WR -$0.19
+- Drag: ema300-dip-short 3T 0%WR -$0.42 (not killable — 0T last hour)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 15% well under 40%
+- Trade freq: 0-1/hr normal
+- 7-day: Improving — last 2 days positive (+$0.47, +$0.38 today)
+- Open: 5 positions ($61.00)
+
+**Next:** Re-run at 08:00 UTC

@@ -99,6 +99,19 @@ SIGNAL_TYPE = 'accel_300_v3_long'
 SOURCE = 'accel-300-v3-long+'
 
 
+def _get_token_params(token: str) -> dict:
+    """Get signal params with regime-specific overrides applied.
+
+    Returns dict of {full_constant_name: value}. Empty = use module-level defaults.
+    """
+    from regime_params import get_regime_params, apply_overrides, PARAM_MAP_LONG
+    overrides = get_regime_params(token, 'accel_300_v3_long')
+    if not overrides:
+        return {}
+    defaults = {k: v for k, v in globals().items() if k.startswith('ACCEL_300_V3_LONG_')}
+    return apply_overrides(defaults, overrides, PARAM_MAP_LONG)
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # EMA helper
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -233,8 +246,10 @@ def _get_15m_trend(token: str) -> str:
             conn.close()
 
 
-def _check_volume(token: str) -> bool:
+def _check_volume(token: str, volume_mult: float = None) -> bool:
     """Check if volume is available and reasonable. Returns True if OK."""
+    if volume_mult is None:
+        volume_mult = ACCEL_300_V3_LONG_VOLUME_MULT
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=5)
@@ -259,7 +274,7 @@ def _check_volume(token: str) -> bool:
         if avg_vol <= 0:
             return True  # stale data — don't block
 
-        return volumes[-1] >= avg_vol * ACCEL_300_V3_LONG_VOLUME_MULT
+        return volumes[-1] >= avg_vol * volume_mult
     except Exception:
         return True  # on error, don't block
     finally:
@@ -271,17 +286,34 @@ def _check_volume(token: str) -> bool:
 # Detection — LONG-only Pullback Entry
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
+def detect_accel_300_v3_long(token: str, prices: list, params: dict = None) -> Optional[dict]:
     """Detect pullback entry into established LONG trend.
 
     v3 fires when:
-      1. Price above EMA300 with gap ≥ 1.5% (trend established)
+      1. Price above EMA300 with gap >= 1.5% (trend established)
       2. Gap recently peaked and narrowed (pullback happened)
       3. Gap is re-expanding (bounce confirmed)
       4. Price velocity positive (bounce has momentum)
       5. Not chasing (not after3+ consecutive green candles)
       6. RSI not overbought
     """
+    # Apply regime-specific overrides (fall back to module defaults)
+    _p = params or {}
+    MIN_GAP = _p.get('ACCEL_300_V3_LONG_MIN_GAP', ACCEL_300_V3_LONG_MIN_GAP)
+    MAX_GAP = _p.get('ACCEL_300_V3_LONG_MAX_GAP', ACCEL_300_V3_LONG_MAX_GAP)
+    MIN_PULLBACK = _p.get('ACCEL_300_V3_LONG_MIN_PULLBACK', ACCEL_300_V3_LONG_MIN_PULLBACK)
+    MAX_PULLBACK = _p.get('ACCEL_300_V3_LONG_MAX_PULLBACK', ACCEL_300_V3_LONG_MAX_PULLBACK)
+    REEXPAND_MIN = _p.get('ACCEL_300_V3_LONG_REEXPAND_MIN', ACCEL_300_V3_LONG_REEXPAND_MIN)
+    RSI_MAX = _p.get('ACCEL_300_V3_LONG_RSI_MAX', ACCEL_300_V3_LONG_RSI_MAX)
+    RSI_MIN = _p.get('ACCEL_300_V3_LONG_RSI_MIN', ACCEL_300_V3_LONG_RSI_MIN)
+    CHASE_MOVE_MAX = _p.get('ACCEL_300_V3_LONG_CHASE_MOVE_MAX', ACCEL_300_V3_LONG_CHASE_MOVE_MAX)
+    GREEN_CAP = _p.get('ACCEL_300_V3_LONG_GREEN_CAP', ACCEL_300_V3_LONG_GREEN_CAP)
+    VOLUME_MULT = _p.get('ACCEL_300_V3_LONG_VOLUME_MULT', ACCEL_300_V3_LONG_VOLUME_MULT)
+    CONF_BASE = _p.get('ACCEL_300_V3_LONG_CONF_BASE', ACCEL_300_V3_LONG_CONF_BASE)
+    GAP_BOTTOM_MIN = _p.get('ACCEL_300_V3_LONG_GAP_BOTTOM_MIN', ACCEL_300_V3_LONG_GAP_BOTTOM_MIN)
+    MIN_PEAK_DISTANCE = _p.get('ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE', ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE)
+    MAX_GAP_DECLINE = _p.get('ACCEL_300_V3_LONG_MAX_GAP_DECLINE', ACCEL_300_V3_LONG_MAX_GAP_DECLINE)
+
     min_rows = PERIOD + max(ACCEL_300_V3_LONG_GAP_PEAK_WINDOW,
                             ACCEL_300_V3_LONG_SLOPE_WINDOW,
                             ACCEL_300_V3_LONG_PERSISTENCE_BARS, 20) + 10
@@ -322,7 +354,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
 
     # ── FILTER 2: Gap in valid range (bypass for fresh crosses) ─────────────
     if not fresh_cross:
-        if gap_now < ACCEL_300_V3_LONG_MIN_GAP or gap_now > ACCEL_300_V3_LONG_MAX_GAP:
+        if gap_now < MIN_GAP or gap_now > MAX_GAP:
             return None
 
     # ── FILTER 3: PULLBACK DETECTION — gap narrowed from recent peak ───────
@@ -340,19 +372,19 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
 
     # For fresh crosses: bypass pullback/peak filters — the cross IS the entry
     if not fresh_cross:
-        if pullback < ACCEL_300_V3_LONG_MIN_PULLBACK:
+        if pullback < MIN_PULLBACK:
             return None  # no pullback — gap still near peak (chasing)
-        if pullback > ACCEL_300_V3_LONG_MAX_PULLBACK:
+        if pullback > MAX_PULLBACK:
             return None  # too much pullback — trend may be breaking
 
         # ── FILTER 3a: GAP BOTTOM CONFIRMATION — pullback must be complete ──
-        if pullback < ACCEL_300_V3_LONG_GAP_BOTTOM_MIN:
+        if pullback < GAP_BOTTOM_MIN:
             return None  # pullback too shallow — bottom not confirmed
 
         # ── FILTER 3b: MIN PEAK DISTANCE — don't enter at local tops ──────
         if gap_peak > 0:
             pct_from_peak = (gap_peak - gap_now) / gap_peak
-            if pct_from_peak < ACCEL_300_V3_LONG_MIN_PEAK_DISTANCE:
+            if pct_from_peak < MIN_PEAK_DISTANCE:
                 return None  # too close to peak — entering at local top
 
     # ── FILTER 3c: MAX GAP DECLINE — block dead cat bounces ─────────────────
@@ -362,7 +394,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
     if recent_gaps_list:
         max_recent_gap = max(recent_gaps_list)
         gap_decline = max_recent_gap - gap_now
-        if gap_decline > ACCEL_300_V3_LONG_MAX_GAP_DECLINE:
+        if gap_decline > MAX_GAP_DECLINE:
             return None  # gap declined too much — dead cat bounce, trend weakening
 
     # ── FILTER 4: RE-EXPANSION — gap is widening again (bounce confirmed) ──
@@ -373,7 +405,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
     if gap_at_reexpand_start is None:
         return None
     reexpansion = gap_now - gap_at_reexpand_start
-    if reexpansion < ACCEL_300_V3_LONG_REEXPAND_MIN:
+    if reexpansion < REEXPAND_MIN:
         return None  # gap still narrowing — bounce not confirmed
 
     # ── FILTER 5: Price velocity positive (bounce has momentum) ────────────
@@ -395,14 +427,14 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
             green_count += 1
         else:
             break
-    if green_count > ACCEL_300_V3_LONG_GREEN_CAP:
+    if green_count > GREEN_CAP:
         return None  #3+ consecutive greens — chasing the spike
 
     # ── FILTER 7: RSI not overbought ──────────────────────────────────────
     rsi = _rsi(closes, 14)
-    if rsi > ACCEL_300_V3_LONG_RSI_MAX:
+    if rsi > RSI_MAX:
         return None  # overbought — pullback likely imminent
-    if rsi < ACCEL_300_V3_LONG_RSI_MIN:
+    if rsi < RSI_MIN:
         return None  # too weak — no momentum
 
     # ── FILTER 7b: Chase block — don't chase extended moves ────────────────
@@ -410,7 +442,7 @@ def detect_accel_300_v3_long(token: str, prices: list) -> Optional[dict]:
     # Catches SUSHI-type setups: +2.2% in 30m + RSI 77.5
     if latest_idx >= 30:
         move_30m = (closes[latest_idx] - closes[latest_idx - 30]) / closes[latest_idx - 30] * 100
-        if move_30m > ACCEL_300_V3_LONG_CHASE_MOVE_MAX and rsi > ACCEL_300_V3_LONG_CHASE_RSI_MIN:
+        if move_30m > CHASE_MOVE_MAX and rsi > ACCEL_300_V3_LONG_CHASE_RSI_MIN:
             return None  # chasing spike — pullback imminent
 
     # ── FILTER 8: Persistence — price must stay above EMA ──────────────────
@@ -519,7 +551,10 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         if len(prices) < ACCEL_300_V3_LONG_MIN_DATA_LENGTH:
             continue  # insufficient data for reliable EMA300
 
-        sig = detect_accel_300_v3_long(token, prices)
+        # Get regime-specific parameter overrides
+        token_params = _get_token_params(token)
+
+        sig = detect_accel_300_v3_long(token, prices, params=token_params)
         if sig is None:
             continue
 
@@ -539,7 +574,7 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
                 from datetime import datetime as _dt
                 _last_ts = _dt.fromisoformat(_last[0])
                 _elapsed = (_dt.now() - _last_ts).total_seconds() / 60
-                if _elapsed < ACCEL_300_V3_LONG_COOLDOWN_BARS:
+                if _elapsed < token_params.get('ACCEL_300_V3_LONG_COOLDOWN_BARS', ACCEL_300_V3_LONG_COOLDOWN_BARS):
                     continue  # Still in cooldown
         except Exception as e:
             print(f"  [accel-300-v3-long] cooldown check FAILED for {token}: {e} — BLOCKING", flush=True)
@@ -558,7 +593,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             continue
 
         # Volume confirmation
-        if not _check_volume(token):
+        vol_mult = token_params.get('ACCEL_300_V3_LONG_VOLUME_MULT', ACCEL_300_V3_LONG_VOLUME_MULT)
+        if not _check_volume(token, volume_mult=vol_mult):
             continue
 
         # Phase filter
@@ -574,6 +610,7 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             pass
 
         # Confidence: base on pullback quality + gap strength
+        conf_base = token_params.get('ACCEL_300_V3_LONG_CONF_BASE', ACCEL_300_V3_LONG_CONF_BASE)
         pullback_quality = min(ACCEL_300_V3_LONG_CONF_PULLBACK_MAX, sig['pullback'] * 20)
         gap_bonus = min(ACCEL_300_V3_LONG_CONF_GAP_MAX, (sig['gap_pct'] - ACCEL_300_V3_LONG_MIN_GAP) * 5)
         reexpand_bonus = min(ACCEL_300_V3_LONG_CONF_REEXPAND_MAX, sig['reexpansion'] * 100)
@@ -582,7 +619,7 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
         rsi_bonus = ACCEL_300_V3_LONG_CONF_RSI_BONUS if ACCEL_300_V3_LONG_CONF_RSI_MIN <= sig['rsi'] <= ACCEL_300_V3_LONG_CONF_RSI_MAX else 0
         confidence = int(min(
             ACCEL_300_V3_LONG_CONF_CAP,
-            ACCEL_300_V3_LONG_CONF_BASE + pullback_quality + gap_bonus + reexpand_bonus + trend_bonus + fresh_bonus + rsi_bonus
+            conf_base + pullback_quality + gap_bonus + reexpand_bonus + trend_bonus + fresh_bonus + rsi_bonus
         ))
         confidence = max(ACCEL_300_V3_LONG_CONF_FLOOR, confidence)
 
@@ -640,7 +677,8 @@ def scan_accel_300_v3_long_signals(prices_dict: dict) -> int:
             )
             if sid:
                 added += 1
-                set_cooldown(token, 'LONG', hours=ACCEL_300_V3_LONG_COOLDOWN_BARS / 60.0)
+                cd_hours = token_params.get('ACCEL_300_V3_LONG_COOLDOWN_BARS', ACCEL_300_V3_LONG_COOLDOWN_BARS) / 60.0
+                set_cooldown(token, 'LONG', hours=cd_hours)
                 _log(f"  LONG-accel-300-v3-long {token:8s} conf={confidence:.0f}% "
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"peak={sig['gap_peak']:.3f}% pullback={sig['pullback']:.3f}% "

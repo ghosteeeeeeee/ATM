@@ -108,6 +108,16 @@ SIGNAL_TYPE = 'accel_300_v3_short'
 SOURCE = 'accel-300-v3-short-'
 
 
+def _get_token_params(token: str) -> dict:
+    """Get signal params with regime-specific overrides applied."""
+    from regime_params import get_regime_params, apply_overrides, PARAM_MAP_SHORT
+    overrides = get_regime_params(token, 'accel_300_v3_short')
+    if not overrides:
+        return {}
+    defaults = {k: v for k, v in globals().items() if k.startswith('ACCEL_300_V3_SHORT_')}
+    return apply_overrides(defaults, overrides, PARAM_MAP_SHORT)
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # EMA helper
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -200,8 +210,10 @@ def _get_1m_prices(token: str, lookback: int = V3_SHORT_LOOKBACK_1M) -> list:
             conn.close()
 
 
-def _check_volume(token: str) -> bool:
+def _check_volume(token: str, volume_mult: float = None) -> bool:
     """Check if volume is available and reasonable. Returns True if OK."""
+    if volume_mult is None:
+        volume_mult = V3_SHORT_VOLUME_MULT
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=5)
@@ -226,7 +238,7 @@ def _check_volume(token: str) -> bool:
         if avg_vol <= 0:
             return True  # stale data — don't block
 
-        return volumes[-1] >= avg_vol * V3_SHORT_VOLUME_MULT
+        return volumes[-1] >= avg_vol * volume_mult
     except Exception:
         return True  # on error, don't block
     finally:
@@ -238,7 +250,7 @@ def _check_volume(token: str) -> bool:
 # Detection — V3 Anti-Bottom-Catch SHORT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def detect_accel_300_v3_short(token: str, prices: list) -> Optional[dict]:
+def detect_accel_300_v3_short(token: str, prices: list, params: dict = None) -> Optional[dict]:
     """Detect strong SHORT momentum — avoids bottom-catching.
 
     v3 adds to v2:
@@ -246,6 +258,16 @@ def detect_accel_300_v3_short(token: str, prices: list) -> Optional[dict]:
       - Chase block: don't enter after large 30m drops
       - Tighter velocity (0.05% min vs 0.03%)
     """
+    # Apply regime-specific overrides
+    _p = params or {}
+    MIN_GAP = _p.get('ACCEL_300_V3_SHORT_MIN_GAP', ACCEL_300_V3_SHORT_MIN_GAP)
+    MAX_GAP = _p.get('ACCEL_300_V3_SHORT_MAX_GAP', ACCEL_300_V3_SHORT_MAX_GAP)
+    MIN_GAP_ACCEL = _p.get('ACCEL_300_V3_SHORT_MIN_GAP_ACCEL', ACCEL_300_V3_SHORT_MIN_GAP_ACCEL)
+    CHASE_DROP_MAX = _p.get('ACCEL_300_V3_SHORT_CHASE_DROP_MAX', ACCEL_300_V3_SHORT_CHASE_DROP_MAX)
+    COOLDOWN_BARS = _p.get('ACCEL_300_V3_SHORT_COOLDOWN_BARS', ACCEL_300_V3_SHORT_COOLDOWN_BARS)
+    VOLUME_MULT = _p.get('ACCEL_300_V3_SHORT_VOLUME_MULT', ACCEL_300_V3_SHORT_VOLUME_MULT)
+    CONF_BASE = _p.get('ACCEL_300_V3_SHORT_CONF_BASE', ACCEL_300_V3_SHORT_CONF_BASE)
+
     min_rows = PERIOD + max(V3_SHORT_GAP_ACCEL_WINDOW, V3_SHORT_SLOPE_WINDOW, 10) + 10
     if len(prices) < min_rows:
         return None
@@ -271,7 +293,7 @@ def detect_accel_300_v3_short(token: str, prices: list) -> Optional[dict]:
     abs_gap = abs(gap_now)
 
     # ── FILTER 1: Gap in valid range ────────────────────────────────────────
-    if abs_gap < V3_SHORT_MIN_GAP or abs_gap > V3_SHORT_MAX_GAP:
+    if abs_gap < MIN_GAP or abs_gap > MAX_GAP:
         return None
 
     # ── FILTER 2: Gap acceleration (10-bar window, must be negative for SHORT) ─
@@ -283,7 +305,7 @@ def detect_accel_300_v3_short(token: str, prices: list) -> Optional[dict]:
         return None
     gap_acceleration = gap_now - gap_then  # negative = gap widening for SHORT
 
-    if gap_acceleration > -V3_SHORT_MIN_GAP_ACCEL:
+    if gap_acceleration > -MIN_GAP_ACCEL:
         return None
 
     # ── FILTER 3: Fresh cross detection ─────────────────────────────────────
@@ -351,7 +373,7 @@ def detect_accel_300_v3_short(token: str, prices: list) -> Optional[dict]:
     # Block entries after large downward moves (price already extended)
     if latest_idx >= 30:
         move_30m = (closes[latest_idx] - closes[latest_idx - 30]) / closes[latest_idx - 30] * 100
-        if move_30m < -V3_SHORT_CHASE_DROP_MAX and rsi < V3_SHORT_CHASE_RSI_MIN:
+        if move_30m < -CHASE_DROP_MAX and rsi < V3_SHORT_CHASE_RSI_MIN:
             return None  # chasing extended drop — bounce imminent
 
     # ── FILTER 9: Gap velocity must confirm (not narrowing for SHORT) ───────
@@ -428,7 +450,10 @@ def scan_accel_300_v3_short_signals(prices_dict: dict) -> int:
         if not prices or len(prices) < PERIOD + 30:
             continue
 
-        sig = detect_accel_300_v3_short(token, prices)
+        # Get regime-specific parameter overrides
+        token_params = _get_token_params(token)
+
+        sig = detect_accel_300_v3_short(token, prices, params=token_params)
         if sig is None:
             continue
 
@@ -448,7 +473,7 @@ def scan_accel_300_v3_short_signals(prices_dict: dict) -> int:
                 from datetime import datetime as _dt
                 _last_ts = _dt.fromisoformat(_last[0])
                 _elapsed = (_dt.now() - _last_ts).total_seconds() / 60
-                if _elapsed < V3_SHORT_COOLDOWN_BARS:
+                if _elapsed < token_params.get('ACCEL_300_V3_SHORT_COOLDOWN_BARS', V3_SHORT_COOLDOWN_BARS):
                     continue  # Still in cooldown
         except Exception as e:
             print(f"  [accel-300-v3-short] cooldown check FAILED for {token}: {e} — BLOCKING", flush=True)
@@ -478,13 +503,14 @@ def scan_accel_300_v3_short_signals(prices_dict: dict) -> int:
             pass
 
         # Confidence: base on gap strength + acceleration + RSI
+        conf_base = token_params.get('ACCEL_300_V3_SHORT_CONF_BASE', V3_SHORT_CONF_BASE)
         gap_bonus = min(20, (abs(sig['gap_pct']) - V3_SHORT_MIN_GAP) * 10)
         accel_bonus = min(15, abs(sig['gap_acceleration']) * 100)
         fresh_bonus = 8 if sig.get('fresh_cross') else 0
         # RSI bonus: sweet spot is 40-60 (not oversold, not too strong)
         rsi_bonus = 5 if 40 <= sig['rsi'] <= 60 else 0
         confidence = int(min(V3_SHORT_CONF_CAP,
-            V3_SHORT_CONF_BASE + gap_bonus + accel_bonus + fresh_bonus + rsi_bonus))
+            conf_base + gap_bonus + accel_bonus + fresh_bonus + rsi_bonus))
         confidence = max(V3_SHORT_CONF_FLOOR, confidence)
 
         signal_price = float(sig['price'])
@@ -524,7 +550,8 @@ def scan_accel_300_v3_short_signals(prices_dict: dict) -> int:
             )
             if sid:
                 added += 1
-                set_cooldown(token, 'SHORT', hours=V3_SHORT_COOLDOWN_BARS / 60.0)
+                cd_hours = token_params.get('ACCEL_300_V3_SHORT_COOLDOWN_BARS', V3_SHORT_COOLDOWN_BARS) / 60.0
+                set_cooldown(token, 'SHORT', hours=cd_hours)
                 _log(f"  SHORT-accel-300-v3-short {token:8s} conf={confidence:.0f}% "
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"accel={sig['gap_acceleration']:.3f}% "

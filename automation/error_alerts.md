@@ -102,3 +102,13 @@
 - **[WARN]** (Nx1): `price_history.db is 0 bytes` — price collector activating, will repopulate on next cycle
 - **[WARN]** (Nx1): `hermes-better-coder-audit.timer` last fired 6 days ago — may need re-enabling
 - **[WARN]** (Nx1): `hermes-hl-copy.timer` last fired 3 weeks ago (2026-08-15) — possibly intentionally disabled
+## Error Alerts — 2026-09-06 03:23 UTC
+- **[WARN]** (Nx2): `signal_compactor timed out` in pipeline logs (03:20, 03:22) — standalone service OK, pipeline step slow
+- **INFO**: All 55 timers active, pipeline running, 5/5 positions open, 57.7% WR weekly
+
+## Error Alerts — 2026-09-06 06:23 UTC
+- **[WARN]** (4x/30min): `signal_compactor: timed out` — recurring subprocess timeout. Pipeline restarted to clear.
+- **[INFO]**: Positions 5/5 (full) — system maxed out, 0 new entries possible.
+- **[INFO]**: 0 signals survived compaction cycle #187533.
+- **[INFO]**: Timers all inactive (pipeline runs on-demand from systemd).
+- **AUTO-FIX**: Restarted hermes-pipeline.service to resolve compactor timeout.
