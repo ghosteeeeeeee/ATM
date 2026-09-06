@@ -60,6 +60,8 @@ from hermes_constants import (
     COILED_SPRING_CONF_FLOOR,
     COILED_SPRING_CONF_CAP,
     COILED_SPRING_COOLDOWN_MINUTES,
+    COILED_SPRING_ENTRY_RSI_MAX,
+    COILED_SPRING_MAX_ENTRY_DELAY,
     COILED_SPRING_MIN_BARS,
     COILED_SPRING_SWING_LOOKBACK,
     COILED_SPRING_COIL_SCAN_RANGE,
@@ -505,6 +507,14 @@ def scan_coiled_spring():
         sig_kwargs, diag = detect_coiled_spring(rows)
         if sig_kwargs is None:
             continue
+
+        # ENTRY VALIDATION: Check current RSI is still in range
+        # This prevents late entries when price has already rallied
+        closes = [r[4] for r in rows]
+        rsi14 = _rsi(closes, 14)
+        current_rsi = rsi14[-2] if len(rsi14) > 1 and rsi14[-2] is not None else 50
+        if current_rsi > COILED_SPRING_ENTRY_RSI_MAX:
+            continue  # RSI too high at execution time — skip
 
         sig_kwargs['token'] = token
         confidence = sig_kwargs['confidence']
