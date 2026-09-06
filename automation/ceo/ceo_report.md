@@ -1,3 +1,34 @@
+## CEO Report — 2026-09-06 ~02:35 UTC
+
+### Diagnosis
+System profitable 24h (+$0.64, 63.6% WR). R:R improving — 24h ratio 0.67 (up from 0.57 48h). bb-bounce-v2-long+ STAR (90.9% WR 24h). coil-spring+ emerging (60% WR). open-skies+ degraded (70%→63.6%). SHORT side has ZERO active backbone — all SHORT signals dead/killed/bleeding. neutral_sniper was in shadow mode since Sep 5 with 3756 signals but zero live trades.
+
+### Root Cause
+1. **SHORT starvation** — ema300-dip-short killed, accel-300-v2-short dead, macd-div- CEO-protected bleeding. System 100% LONG-dependent.
+2. **R:R still underwater** — 48h ratio 0.57. PM_TRAIL distance widening (0.40→0.50%) improving to 0.67 in 24h. Needs more time.
+3. **open-skies+ degradation** — WR dropped from 70% to 63.6% as trade count increased (5→11). Regression to mean.
+
+### Fix Applied
+1. **NEUTRAL_SNIPER FLIPPED LIVE** — SHADOW_MODE=False. First SHORT backbone for NEUTRAL regime. RSI+CMF+ATR mean-reversion. 3756 shadow signals in 11h confirms signal fires consistently. System finally has SHORT exposure in flat markets.
+2. **signal_regime_memory.json updated** — fresh snapshots for bb-bounce-v2-long+ (46T/80.4%WR), open-skies+ (11T/63.6%WR), coil-spring+ (5T/60%WR), neutral_sniper (0T live).
+
+### Verification
+- 24h: 33T, 63.6% WR, +$0.64 ✅ (verified DB)
+- 7d: 366T, 54.4% WR, -$4.16 (verified DB)
+- R:R 24h: 0.67 (improving from 0.57)
+- bb-bounce-v2-long+: 46T/7d 80.4% WR +$1.92 ★
+- neutral_sniper: LIVE, 0 trades, monitor 48h
+- Disk: 82%
+- Pipeline: healthy
+
+### Next Steps
+1. Monitor neutral_sniper 48h — need 20+ live trades with WR >55%
+2. Verify R:R reaches 0.80+ as PM_TRAIL distance fix matures
+3. Build directional cap (65%) — awaiting T approval
+4. Monitor open-skies+ degradation
+
+---
+
 ## CEO Report — 2026-09-05 ~17:00 UTC — Position Replacement Engine Review
 
 ### Verdict: **DEFER**

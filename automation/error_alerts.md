@@ -97,3 +97,8 @@
 - **WARN**: Disk at 83% (92G/118G) — approaching threshold
 - **WARN**: `hermes-5m-candle.service` failed — stale service, missing script `_aggregate_5m.py`
 - **INFO**: 1 near-zero PnL phantom trade (ENS coil-spring+, -0.0002 USDT)
+
+## Error Alerts — 2026-09-06 02:23 UTC
+- **[WARN]** (Nx1): `price_history.db is 0 bytes` — price collector activating, will repopulate on next cycle
+- **[WARN]** (Nx1): `hermes-better-coder-audit.timer` last fired 6 days ago — may need re-enabling
+- **[WARN]** (Nx1): `hermes-hl-copy.timer` last fired 3 weeks ago (2026-08-15) — possibly intentionally disabled

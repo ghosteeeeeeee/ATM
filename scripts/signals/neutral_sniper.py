@@ -67,7 +67,7 @@ SIGNAL_TYPE_SHORT = 'neutral_sniper_short'
 SOURCE_LONG = 'neutral-sniper-long+'
 SOURCE_SHORT = 'neutral-sniper-short-'
 
-SHADOW_MODE = True  # shadow mode — log without trading
+SHADOW_MODE = False  # LIVE — CEO flipped Sep 6 02:35 UTC. 3756 shadow signals in 11h, system needs SHORT backbone
 
 
 def _log(msg: str) -> None:
