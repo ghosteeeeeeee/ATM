@@ -29,6 +29,7 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Two regimes run independently** — `4h_regime_scanner.py` and `15m_regime_scanner.py`. NOT in `run_pipeline.py` anymore.
 - **price_collector** runs via its own systemd timer, NOT from `run_pipeline.py`.
 - **STANDALONE_BYPASS_SIGNALS** — Pure confluence gate pass. Lets signals fire with 1 source type instead of requiring 2+. All other safety filters (blacklists, regime blocks, winrate, speed, etc.) still apply.
+- **Signal detection vs execution timing** — Signals are detected at one time but executed later. The v2 filters (BB width, RSI, bounce, momentum) check conditions at detection time. If conditions change between detection and execution, trades can pass filters that should block them. Example: CFX trade on 2026-09-06 17:16 — RSI was 44.6 at detection (passes RSI_MIN=35), but dropped to 31.28 by execution. The v2 filters don't re-validate at execution time.
 
 ## Behavioral Directives
 
