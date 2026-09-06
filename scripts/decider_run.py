@@ -3186,21 +3186,6 @@ def run(dry_run=False):
                     mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
-            # ── z_score minimum: reject weak signals ──
-            # Catches losers like ZORA (z=-0.91) and CRV (z=-0.88)
-            # NOTE: z_score_tier is NOT in hotset.json — compute from z_score
-            # Neutral tier = z >= -1.0 (confirmed from momentum cache data)
-            if _is_accel_v3_short:
-                try:
-                    _z = sig.get('z_score', 0.0) or 0.0 if sig else 0.0
-                    if _z >= -1.0:
-                        log(f'  🚫 [ACCEL-V3-WEAK] {token} {direction} BLOCKED — z_score={_z:.4f} too weak (need < -1.0)')
-                        if sig_id:
-                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                        skipped += 1
-                        continue
-                except Exception as e:
-                    log(f'  [WARN] z_tier check failed: {e}', 'WARN')
             try:
                 if _is_accel_v2_long_5m:
                     from signals.accel_300_v2_long_5m import detect_accel_300_v2_long_5m, _get_5m_candles

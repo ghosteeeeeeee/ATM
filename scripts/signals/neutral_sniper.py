@@ -47,8 +47,8 @@ os.makedirs(os.path.dirname(_SIGNAL_LOG), exist_ok=True)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 NS_RSI_PERIOD = 14
-NS_RSI_OVERSOLD = 40           # LONG: RSI below this (widened from 35 — NEUTRAL market RSI stays 45-55)
-NS_RSI_OVERBOUGHT = 60         # SHORT: RSI above this (widened from 65 — NEUTRAL market RSI stays 45-55)
+NS_RSI_OVERSOLD = 45           # LONG: RSI below this (widened from 40 — NEUTRAL market RSI clusters 45-55, 40 never hit)
+NS_RSI_OVERBOUGHT = 55         # SHORT: RSI above this (widened from 60 — NEUTRAL market RSI clusters 45-55, 60 never hit)
 
 NS_CMF_PERIOD = 20             # Chaikin Money Flow period
 NS_CMF_LONG_MIN = 0.0          # LONG: CMF must be > 0 (accumulation)

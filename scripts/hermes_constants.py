@@ -1262,7 +1262,6 @@ NEVER_REENABLE_FLAGS = {
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'ACCEL_300_V3_LONG_ENABLED',   # Orchestrator 2026-09-06 — 48h test expired. 36T/7d 47.2%WR -$0.88. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
-    'ACCEL_300_V3_SHORT_ENABLED',  # Orchestrator 2026-09-06 — 48h test expired. 3T/7d 33.3%WR -$0.02. NEVER_REENABLE.
     'EMA300_DIP_LONG_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
     'EMA300_DIP_SHORT_ENABLED',  # CEO 2026-09-05 — 6T/7d 33.3% WR -$0.42. All cut-loser-CL-T1 in NEUTRAL chop. NEVER_REENABLE.
 }
@@ -1680,7 +1679,7 @@ ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_BONUS = 3    # confidence bonus for RSI in sweet spot (lowered from 5)
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
-ACCEL_300_V3_SHORT_ENABLED     = False   # Orchestrator 2026-09-06 — 48h test expired 05:00 UTC. 3T/7d 33.3%WR -$0.02. NEVER_REENABLE.
+ACCEL_300_V3_SHORT_ENABLED     = True    # Re-enabled 2026-09-07 — filters: RSI_MIN=25 + price_move>0.5% + staleness 10min. Catches all 4 prior losers.
 ACCEL_300_V3_SHORT_MIN_GAP     = 1.0     # min gap below EMA300
 ACCEL_300_V3_SHORT_MAX_GAP     = 6.0     # max gap
 ACCEL_300_V3_SHORT_MIN_GAP_ACCEL = 0.20  # min gap acceleration

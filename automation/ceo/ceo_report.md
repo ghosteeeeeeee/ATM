@@ -1,3 +1,24 @@
+## CEO Report — 2026-09-06 ~10:35 UTC
+
+### Diagnosis
+System profitable 24h (+$0.51, 61.1% WR, 36T). Today Sep 6: 15T 73.3% WR +$0.51 (3rd green day). R:R 48h: 0.61 (avg_win $0.1026 vs avg_loss $0.1691) — still underwater. bb-bounce-v2-long+ STAR: 14T/48h 92.9% WR +$1.42 (carries system). open-skies+: 11T/48h 63.6% WR +$0.36. coil-spring+: 15T/48h 60% WR +$0.04 (near breakeven). neutral_sniper: 0 signals in8h despite RSI widened to 40/60 — STILL too tight. ema300-dip LEGACY: 55T/7d 63.6% WR -$0.72 (pre-kill, all NEUTRAL). 5/5 positions full. Market 100% NEUTRAL.
+
+### Root Cause
+1. **neutral_sniper RSI thresholds STILL too tight** — 40/60 doesn't trigger in NEUTRAL market (RSI clusters 45-55). Verified: 19 sample tokens, only 2/19 hit <40, 0/19 hit >60. Mean-reversion needs actual extremes to work.
+2. **R:R 0.61** — avg_loss ($0.1691) is 1.65x avg_win ($0.1026). cut-loser-CL-T1 exits avg -4.94% (limit-down gaps through SL). profit-monster-trail avg +3.62% (working but not enough).
+3. **Signal starvation** — 5/5 positions full, no new entries. System relies entirely on bb-bounce-v2-long+ (92.9% WR).
+
+### Fix Applied
+1. **PM_TRAIL_DISTANCE_PCT 0.50%→0.60%** (hermes_constants.py:1110). Lets winners run further before trailing. Expected: avg_win $0.1026→$0.12+, R:R 0.61→0.75+.
+2. **neutral_sniper RSI 40/60→45/55** (neutral_sniper.py:50-55). Verified: 58% of tokens now hit RSI extremes (vs ~10% before). After CMF+ATR filters, expect 2-5 signals per cycle. Tested: ACE LONG (RSI=23, conf=73), ALT LONG (RSI=39.4, conf=73), AR SHORT (RSI=57.2, conf=68).
+
+### Verification
+- R:R target 0.80+ — needs 20+ new trades post-fix (currently 63 trades in 48h window)
+- neutral_sniper signals — pipeline should produce signals within 1 cycle (tested OK)
+- 3 consecutive green days (Sep 4 -$1.75, Sep 5 +$0.47, Sep 6 +$0.51 in progress)
+
+---
+
 ## CEO Report — 2026-09-06 ~07:00 UTC
 
 ### Diagnosis

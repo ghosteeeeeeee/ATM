@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-09-06 11:08 UTC] signal_reporter: 24h 36T — bb-bounce-v2-long+ 90.9%WR +$1.15 star, coil-spring+ 60%WR +$0.04 solid. open-skies+ 33.3%WR -$0.28 on watchlist (active <36h, kill if no improvement next cycle). 0 kills executed (no signals met all criteria). 0 inversions. 7d losers already killed. System clean.
 - [2026-09-05 06:30 UTC] orchestrator: VERIFIED + CLEANUP. DB: 24h 31T 64.5%WR -$0.24. 7d: 368T 54.9%WR -$4.34. R:R fix post-analysis (11 trades): profit-monster-trail avg +$0.142 (2.7x), cut-loser-CL-T1 avg -$0.142. Net +$0.30. R:R 0.69→1.26 (83%). Disk cleanup freed 3G (84%→82%). Market 3 LONG_BIAS / 105 NEUTRAL. 4 open positions. Signal starvation #1 problem — system on 1 profitable backbone. NEUTRAL signal build pending since Sep 1.
 - [2026-09-02 10:15 UTC] auto_1hr: NO CHANGES — 2T last hour (1W 1L -$0.06). 59T/24h 47.5%WR -$0.94. Kill criteria not met. atr_sl_hit 69.5% but PM trail offsets. Trade freq 2/hr normal. System steady state.
 - [2026-08-31 18:00 UTC] signal_reporter: Fixed MACD_DIVERGENCE master switch (True→False, both directions dead). Added PLUS to NEVER_REENABLE. 45T/24h 42.2%WR -$0.44. No new kills needed — all losers already dead. No boost candidates (insufficient sample). No inversions. Watch: confluence-,ichimoku- SHORT (4T 25%WR -$0.26).

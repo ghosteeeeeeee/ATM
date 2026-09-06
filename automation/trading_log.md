@@ -1944,3 +1944,169 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 - STAR: bb-bounce-v2-long+ 11T/24h 90.9%WR +$1.29
 
 **Next:** Monitor neutral_sniper for first live trades post-chop-fix. R:R approaching 1.0 target.
+
+## [2026-09-06 08:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W, 1L) — net -$0.13
+**24h:** 34T 58.8%WR +$0.43
+**R:R:** 0.689 (avg_win $0.113, avg_loss $0.165) — below 1.0, win rate compensates
+
+**Close reasons (24h):** profit-monster-trail 20T +$2.20 (59%). cut-loser-CL-T1 9T -$1.41 (26%). atr_sl_hit 5T -$0.22 (15%).
+
+**Signal health (24h):**
+- STAR: bb-bounce-v2-long+ 11T 90.9%WR +$1.29
+- Neutral: coil-spring+ 10T 50%WR -$0.16, open-skies+ 8T 50%WR -$0.19
+- Drag: ema300-dip-short 1T 0%WR -$0.15 (not killable — only 1T last hour)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 15% well under 40%
+- Trade freq: 1/hr normal
+- 7-day: Recovering — last 2 days positive (+$0.47, +$0.25 today)
+- Open: 4 positions ($44.40)
+
+**Next:** Re-run at 09:00 UTC
+
+## [2026-09-06 09:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (5 in last 2h: 3W, 2L — net +$0.08)
+**24h:** 35T 60%WR +$0.39
+**7d:** 366T 54.4%WR -$4.10 (improving — last 2 days positive)
+**R:R:** 0.70 (avg_win $0.11, avg_loss $0.157) — below 1.0, WR compensates
+
+**Close reasons (24h):**
+- profit-monster-trail: 20T +$2.19 (dominant, working well)
+- cut-loser-CL-T1: 9T -$1.41
+- atr_sl_hit: 6T -$0.39 (17% — healthy, under 40% threshold)
+
+**Signal health (24h):**
+- STAR: bb-bounce-v2-long+ 11T 90.9%WR +$1.15
+- Workhorse: coil-spring+ 12T 50%WR -$0.17 (near breakeven)
+- Drag: open-skies+ 7T 42.9%WR -$0.22
+- Noise: ema300-dip-short 1T 0%WR -$0.15, r2-trend-short3 1T 0%WR -$0.20
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 17% well under 40%
+- Trade freq: 1-2/hr normal
+- 7-day: Improving trend
+- Open: 5 positions ($55.50)
+
+**Open Questions:**
+- coil-spring+ R:R is weak (wins avg $0.08, losses avg $0.15) — profit trail may be too tight for this signal
+- NOT trade had -459% pnl_pct — likely micro-cap data artifact, not a real issue
+
+**Next:** Re-run at 10:07 UTC
+
+## [2026-09-06 10:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W +$0.07 via profit-monster-trail)
+**24h:** 34T 58.8%WR +$0.37
+**Open:** 5 positions ($55.50)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 17% well under 40%
+- Trade freq: 1/hr normal
+- coil-spring+ 13T 54%WR -$0.10 near breakeven
+- open-skies+ 6T 33%WR -$0.28 small drag but only 6T/24h
+- bb-bounce-v2-long+ remains star: 11T 91%WR +$1.15
+
+**Next:** Re-run at 11:07 UTC
+
+## [2026-09-06 11:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 36T 61.1%WR +$0.51
+**Open:** 5 positions ($55.50)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 6/36 = 17% — well under 40% threshold
+- Trade freq: 0-4/hr normal
+- coil-spring+: 15T 60%WR +$0.04 (breakeven, within tolerance)
+- open-skies+: 6T 33%WR -$0.28 (small drag, not killable — only 6T/24h, not 3+ last hour)
+- bb-bounce-v2-long+: 11T 91%WR +$1.15 (star)
+- ema300-dip-short: 1T 0%WR -$0.15 (not killable — only 1T last hour)
+- r2-trend-short3: 1T 0%WR -$0.20 (not killable — only 1T last hour)
+
+**Open Questions:**
+- open-skies+ R:R weak (33%WR) — monitor, may need tuning if 7d negative
+
+**Next:** Re-run at 12:07 UTC
+
+## [2026-09-06 12:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 33T 61%WR +$0.76
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 6/33 = 18% — well under 40%
+- Trade freq: 0-4/hr normal
+- coil-spring+: 15T 60%WR +$0.04 (breakeven)
+- open-skies+: 4T 25%WR -$0.25 (small drag, not killable — 0T last hour)
+- bb-bounce-v2-long+: 10T 100%WR +$1.37 (star)
+- ema300-dip-short: 1T 0%WR -$0.15 (not killable)
+- r2-trend-short3: 1T 0%WR -$0.20 (not killable)
+- accel-300-v3-long+: 2T 50%WR -$0.05 (neutral)
+
+**Next:** Re-run at 13:07 UTC
+
+## [2026-09-06 13:08 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W, 1L) — PnL: +$0.15 (50% WR)
+**24h:** 31T 58%WR +$0.61 | Open: 3 ($33.30)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 6/31 = 19.4% — well under 40% threshold
+- Trade freq: 2/hr — normal
+- bb-bounce-v2-long+: 8T 100%WR +$1.01 (star performer)
+- coil-spring+: 16T 56%WR +$0.04 (breakeven, within tolerance)
+- open-skies+: 3T 33%WR -$0.08 (small drag, not killable — only 3T/24h)
+- Short signals (ema300, r2): 1T each, not killable by criteria
+- profit-monster-trail dominant exit at 61% of closes — healthy
+
+**Open Questions:** None
+
+**Next:** Re-run at 14:08 UTC
+
+## [2026-09-06 14:07 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W, 2L) — PnL: -$0.11
+- SAND coil-spring+: -$0.11 (cut-loser-CL-T1)
+- AVAX bb-bounce-v2-long+: $0.00 (profit-monster-trail)
+
+**24h:** 30T 57%WR +$0.48 | Open: 5 ($64.30)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- atr_sl_hit: 5/30 = 16.7% — well under 40% threshold
+- Trade freq: 2/hr — normal
+- bb-bounce-v2-long+: 7T 86%WR +$0.88 (star)
+- coil-spring+: 17T 53%WR -$0.07 (breakeven, within tolerance)
+- open-skies+: 3T 33%WR -$0.08 (small drag, not killable — only 3T/24h)
+- accel-300-v3-long+: 2T 50%WR -$0.05 (neutral)
+- r2-trend-short3: 1T 0%WR -$0.20 (not killable)
+- profit-monster-trail dominant exit at 63% — healthy
+
+**Note:** pnl_pct column shows inflated values (e.g. -500% on ~1% loss). Data quality issue, not affecting trade execution.
+
+**Open Questions:** None
+
+**Next:** Re-run at 15:07 UTC
