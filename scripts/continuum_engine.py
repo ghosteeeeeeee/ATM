@@ -359,26 +359,31 @@ class HysteresisState:
         """
         changed = False
         
-        if raw_value == self.current_value:
-            # Same direction — count up
-            self.consecutive_match += 1
+        # Track mismatch against CONFIRMED value (not current)
+        if self.confirmed_value is not None and raw_value != self.confirmed_value:
+            # Value differs from confirmed — count mismatch
+            self.consecutive_mismatch += 1
+            self.consecutive_match = 0
+            
+            # Check if we should deconfirm (turn OFF)
+            if self.consecutive_mismatch >= self.off_threshold:
+                self.confirmed_value = None
+                changed = True
+        else:
+            # Value matches confirmed (or no confirmed yet)
             self.consecutive_mismatch = 0
+            
+            # Track current value for confirmation
+            if raw_value == self.current_value:
+                self.consecutive_match += 1
+            else:
+                self.current_value = raw_value
+                self.consecutive_match = 1  # First tick counts as match=1
             
             # Check if we should confirm (turn ON)
             if self.confirmed_value != self.current_value:
                 if self.consecutive_match >= self.on_threshold:
                     self.confirmed_value = self.current_value
-                    changed = True
-        else:
-            # Different direction — count mismatch
-            self.current_value = raw_value
-            self.consecutive_match = 1  # First tick of new value counts as match=1
-            self.consecutive_mismatch += 1
-            
-            # Check if we should deconfirm (turn OFF)
-            if self.consecutive_mismatch >= self.off_threshold:
-                if self.confirmed_value is not None:
-                    self.confirmed_value = None
                     changed = True
         
         return changed, self.confirmed_value is not None
