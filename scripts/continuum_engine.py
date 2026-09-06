@@ -764,6 +764,7 @@ class ContinuumEngine:
         # Sync state with engine's internal phase
         state.entry_phase = self.entry_phase
         state.position_side = self.position_side
+        state.position_size_pct = self.position_size_pct
         
         # Debug: log phase changes
         if hasattr(self, '_last_phase') and self._last_phase != self.entry_phase:
