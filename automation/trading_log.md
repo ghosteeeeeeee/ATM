@@ -2331,3 +2331,39 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 
 **Open Questions:**
 - BTC liq-hunt+ stale (30h open, $0 PnL). Monitor for next cycle.
+
+## [2026-09-06 21:07 UTC] Hourly Analysis
+
+**Trades:** 5 closed (5 wins, 0 losses)
+**PnL:** $+0.45 (WR: 100%)
+
+**24h:** 35T 60%WR +$0.26 | excl coil-spring: 16T 81.3%WR +$0.84
+
+**Signal Performance (24h):**
+- slow-grind+: 3T 100%WR +$0.42 ⭐
+- pump-chain+: 2T 100%WR +$0.03
+- bb-bounce-v2-long+: 10T 80%WR +$0.53 ⭐
+- coil-spring+: 19T 42.1%WR -$0.58 (killed 15:07, rotating out)
+
+**Exit Breakdown (24h):**
+- profit-monster-trail: 19T +$1.40 avg+$0.074
+- cut-loser-CL-T1: 9T -$1.28 avg-$0.142
+- profit-monster-T1: 3T +$0.42 avg+$0.140
+- atr_sl_hit: 4T -$0.28 avg-$0.070 (11.4%)
+
+**Changes:** None
+
+**No Change Needed:**
+- 5/5 winners this hour — best hour since coil-spring kill
+- 24h excl coil-spring: 81.3% WR — system performing well
+- atr_sl_hit 11.4% — no SL tightness issue
+- Trade freq 5/hr — normal
+- No signal has 3+T 0%WR in last hour
+
+**Open Positions:** 3
+- BTC liq-hunt+ LONG — open 28h, flat (stale, SL at 79619)
+- ME slow-grind+ LONG — open 1.3h, flat
+- SEI continuation+ LONG — just opened
+
+**Open Questions:**
+- BTC liq-hunt+ 28h stale flat. SL at 79619 — monitor for next cycle. If BTC drops, it'll cut naturally.
