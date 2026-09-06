@@ -78,6 +78,9 @@ SIGNAL_OVERRIDES = {
     'coiled_spring_long': 'MEAN_REVERSION',
     'liquidation_hunt_long': 'MEAN_REVERSION',
     'liquidation_hunt_short': 'MEAN_REVERSION',
+    'neutral_sniper': 'MEAN_REVERSION',       # StochRSI+CMF mean-reversion — fires in chop, not momentum
+    'neutral_sniper_long': 'MEAN_REVERSION',
+    'neutral_sniper_short': 'MEAN_REVERSION',
 }
 
 

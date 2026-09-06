@@ -1,7 +1,7 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-06 ~07:00 UTC (CEO)**
-**Updated by: CEO**
+**Last Updated: 2026-09-06 ~07:00 UTC (CEO) + ~06:40 UTC (Orchestrator)**
+**Updated by: CEO + Orchestrator**
 
 ## Current Status
 
@@ -44,6 +44,7 @@ System PROFITABLE 24h. R:R 48h: 0.60 (avg_win $0.1003 vs avg_loss $0.1678) — s
 
 ## Today's Changes (Sep 6)
 
+3. **Orchestrator ~06:40 UTC — VERIFIED + ACTION.** DB: 24h 34T 58.8% WR +$0.55. 7d: 353T 57.5% WR -$2.76. R:R 24h: 0.904 (avg_win $0.122, avg_loss $0.135) — approaching breakeven. **KILLED ACCEL_300_V3_LONG + V3_SHORT** — CEO protection expired 05:00 UTC. Added to NEVER_REENABLE_FLAGS, removed from CEO_PROTECTED_FLAGS. 36T/7d v3-long 47.2%WR -$0.88, 3T/7d v3-short 33.3%WR -$0.02. **NEUTRAL_SNIPER ROOT CAUSE FOUND** — chop_detector.py classified neutral_sniper as MOMENTUM (default fallback), blocking it in CHOP regime. Fixed: added to SIGNAL_OVERRIDES as MEAN_REVERSION. 26 shadow signals in 48h, 0 live trades due to chop block. Expected: signals now fire in NEUTRAL. **5/5 positions full.** Disk 82%. Market 100% NEUTRAL.
 2. **CEO ~07:00 UTC — VERIFIED + ACTION.** DB: 24h 34T 58.8% WR +$0.39. 7d: 364T 54.4% WR -$4.11. **R:R 48h: 0.60** (avg_win $0.1003, avg_loss $0.1678). Still underwater. **NEUTRAL_SNIPER: 0 SIGNALS in 4h live.** Root cause: RSI thresholds (35/65) too extreme for 100% NEUTRAL market. **FIX: Widened RSI 35→40 (LONG), 65→60 (SHORT).** Expected: signals start firing. **bb-bounce-v2-long+ STAR:** 11T/24h 90.9% WR +$1.29. 47T/7d 80.9% WR +$2.24. **coil-spring+ DEGRADED:** 9T/24h 44.4% WR -$0.21 (was 60%). Monitor. **open-skies+ DEGRADED:** 8T/24h 50% WR -$0.19 (was 63.6%). Monitor. **5/5 positions full.** Disk 82%. Market 100% NEUTRAL. 2 consecutive green days.
 1. **CEO ~02:35 UTC — VERIFIED + ACTION.** DB: 24h 33T 63.6% WR +$0.64. 7d: 366T 54.4% WR -$4.16. **R:R IMPROVING:** 24h ratio 0.67 (avg_win $0.104, avg_loss $0.154). Up from 0.57 48h. PM_TRAIL distance widening working. **NEUTRAL_SNIPER FLIPPED LIVE** — 3756 shadow signals in 11h, system needs SHORT backbone for NEUTRAL. SHADOW_MODE=False. **bb-bounce-v2-long+ STAR:** 11T/24h 90.9% WR +$1.00, 46T/7d 80.4% WR +$1.92. **coil-spring+ EMERGING:** 5T/24h 60% WR +$0.21. **open-skies+ DEGRADED:** 9T/24h 55.6% WR -$0.05 (was 70% WR). Disk 82%. Market ~100% NEUTRAL. 5 open ~$0. Signal starvation partially resolved — neutral_sniper now live for SHORT.
 
@@ -130,14 +131,14 @@ System PROFITABLE 24h. R:R 48h: 0.60 (avg_win $0.1003 vs avg_loss $0.1678) — s
 
 ## Active Decisions
 
-- **NEUTRAL_SNIPER LIVE + RSI FIX.** Flipped SHADOW_MODE=False Sep 6 02:35 UTC. 0 signals in 4h — RSI thresholds too tight. FIXED: RSI 35→40 (LONG), 65→60 (SHORT). Monitor for signals. — 2026-09-06
+- **NEUTRAL_SNIPER LIVE + CHOP FIX.** Flipped SHADOW_MODE=False Sep 6 02:35 UTC. 0 trades in 48h — chop_detector classified as MOMENTUM (default). FIXED: added to SIGNAL_OVERRIDES as MEAN_REVERSION. Also widened RSI 35→40, 65→60. Monitor for first live trades. — 2026-09-06
 - **DIRECTIONAL CAP RECOMMENDED.** Max 65% of open positions in one direction. Prevents regime-transition bleed. CEO report written. Awaiting T approval to build. — 2026-09-05
-- **PM_TRAIL WIDENED.** PM_TRAIL_DISTANCE_PCT 0.40%→0.50%. R:R improving (0.57→0.67 in 24h). Need more time to reach 0.80+ target. — 2026-09-05
+- **PM_TRAIL WIDENED.** PM_TRAIL_DISTANCE_PCT 0.40%→0.50%. R:R improving (0.57→0.90 in 24h). Need more time to reach 0.80+ target. — 2026-09-05
 - **EMA300_DIP_SHORT KILLED.** 8T/7d 25% WR -$0.69. NEVER_REENABLE_FLAGS. — 2026-09-05
-- **R:R FIX IMPROVING.** 48h R:R 0.60, 24h R:R 0.72. PM_TRAIL working. Need more time. — 2026-09-06
+- **R:R FIX IMPROVING.** 24h R:R 0.90 (avg_win $0.122, avg_loss $0.135). PM_TRAIL working. Need more time. — 2026-09-06
 - **ACCEL_300_V2_SHORT DEAD.** ACCEL_300_V2_ENABLED=False since Sep 2. Zero post-kill trades. NEVER_REENABLE_FLAGS. — 2026-09-05
-- **ACCEL_300_V3_LONG KILLED.** CEO_PROTECTION expired Sep 4. 37T/7d 43.2% WR -$1.39. NEVER_REENABLE_FLAGS. — 2026-09-04
-- **ACCEL_300_V3 SHORT KILLED.** auto_1hr killed Sep 4. 4T/7d 25% WR -$0.26. NEVER_REENABLE_FLAGS. — 2026-09-04
+- **ACCEL_300_V3_LONG KILLED.** Orchestrator killed Sep 6 — CEO protection expired 05:00 UTC. 36T/7d 47.2% WR -$0.88. NEVER_REENABLE_FLAGS. — 2026-09-06
+- **ACCEL_300_V3_SHORT KILLED.** Orchestrator killed Sep 6 — CEO protection expired 05:00 UTC. 3T/7d 33.3% WR -$0.02. NEVER_REENABLE_FLAGS. — 2026-09-06
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **RANGE_REVERSION KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-02
 - **R2_TREND_LONG KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-03

@@ -1926,3 +1926,21 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 - Open: 5 positions ($61.00)
 
 **Next:** Re-run at 08:00 UTC
+
+## [2026-09-06 06:40 UTC] Orchestrator Run
+
+**Pipeline Status:** 5/5 positions full | 34 closed today | +$0.55 PnL | 58.8% WR
+**R:R:** 0.904 (avg_win $0.122, avg_loss $0.135) — approaching breakeven
+**Market:** 100% NEUTRAL | Disk 82%
+
+**Changes Made:**
+1. **KILLED ACCEL_300_V3_LONG_ENABLED + ACCEL_300_V3_SHORT_ENABLED** — CEO protection expired 05:00 UTC. Set False, added to NEVER_REENABLE_FLAGS, removed from CEO_PROTECTED_FLAGS. 36T/7d v3-long 47.2%WR -$0.88, 3T/7d v3-short 33.3%WR -$0.02.
+2. **FIXED neutral_sniper chop detector classification** — chop_detector.py classified neutral_sniper as MOMENTUM (default fallback), blocking it in CHOP regime. Added neutral_sniper, neutral_sniper_long, neutral_sniper_short to SIGNAL_OVERRIDES as MEAN_REVERSION. 26 shadow signals in 48h, 0 live trades due to chop block. Expected: signals now fire in NEUTRAL.
+
+**DB Verified:**
+- 24h: 34T 58.8%WR +$0.55
+- 7d: 353T 57.5%WR -$2.76
+- Active bleeders: coil-spring+ 9T/24h 44.4%WR -$0.19, open-skies+ 8T/24h 50%WR -$0.19
+- STAR: bb-bounce-v2-long+ 11T/24h 90.9%WR +$1.29
+
+**Next:** Monitor neutral_sniper for first live trades post-chop-fix. R:R approaching 1.0 target.
