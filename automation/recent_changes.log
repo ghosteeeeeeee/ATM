@@ -1039,3 +1039,11 @@
   WHY: 6T last hour (0W 6L -$0.74). 36T/24h 50%WR -$0.26. Kill criteria met: coil-spring+ 5T last hour 0%WR -$0.70 (APT, ZRO, GMT, NOT, AIXBT — all cut-loser-CL-T1 or atr_sl_hit). COILED_SPRING_PLUS_ENABLED set False. bb-bounce-v2-long+ 9T 77.8%WR +$0.72 remains star. open-skies+ 3T 33.3%WR -$0.08 small drag not killable. accel-300-v3-long+ 2T 50%WR -$0.05 neutral. r2-trend-short3 1T 0%WR -$0.20 not killable. Trade freq 6/hr elevated (coil-spring was overfiring). Open 2 ($22.20). atr_sl_hit 6/36 = 16.7% under 40%.
   BY: auto_1hr
   NEXT: Re-run at 16:07 UTC
+[2026-09-06 16:07 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.06). 34T/24h 50%WR -$0.21. Kill criteria not met. atr_sl_hit 20.6% under 40%. bb-bounce-v2-long+ 10T 78%WR +$0.78 star. coil-spring+ killed 15:07 UTC, 21T still in 24h window -$0.65. open-skies+ 2T 50%WR -$0.14 small drag not killable. Trade freq 1/hr normal. Open 1 ($11.10). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 17:07 UTC
+[2026-09-06 17:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 33T/24h 51.5%WR -$0.21. Kill criteria not met. atr_sl_hit 21.2% under 40%. bb-bounce-v2-long+ 10T 78%WR +$0.78 star. coil-spring+ killed 15:07 UTC, 21T still in 24h window -$0.65 (rotating out by ~15:00 UTC tomorrow). open-skies+ 1T -$0.14 not killable. r2-trend-short3 1T -$0.20 not killable. Trade freq 0/hr normal. Open 2 ($22.20 — SYRUP slow-grind+, BTC liq-hunt+). System steady state. Main 24h drag is residual coil-spring+ trades — no action, just wait for rotation.
+  BY: auto_1hr
+  NEXT: Re-run at 18:07 UTC

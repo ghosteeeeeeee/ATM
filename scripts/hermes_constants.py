@@ -1105,9 +1105,12 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # act 0.60%, dist 0.50%. Floor = +0.10%.
-PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO Sep 4: was 0.40%, winners avg $0.074 exits too early. Let winners run.
-PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO Sep 6: was 0.50%, avg_win $0.1026 vs avg_loss $0.1691 (R:R 0.61). Widening to let winners run further toward 0.80+ R:R target.
+PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%. DO NOT WIDEN — ATR SL beats wider trails.
+# ⚠️ DO NOT CHANGE THESE — CEO keeps widening, ATR SL always catches exits first.
+# ATR SL trails at ~0.15% from peak. Trail MUST be tighter (0.20%) to exit before ATR SL.
+# Widening trail = ATR SL wins the race = trail never fires = system broken.
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — activate sooner so trail catches profit before ATR SL
+PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (which trails at ~0.15%)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1704,6 +1707,8 @@ ACCEL_300_V3_SHORT_CONF_FLOOR  = 60      # min confidence
 ACCEL_300_V3_SHORT_CONF_CAP    = 88      # max confidence
 ACCEL_300_V3_SHORT_Z_TIER_MIN  = 'low'   # min z_score_tier — reject 'neutral' (catches ZORA z=-0.91, CRV z=-0.88)
 ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE = 0.5  # max % price can move from signal price before entry — block stale entries (catches ENA +0.4%, CRV +0.76%, W +0.64%)
+ACCEL_300_V3_SHORT_EXEC_RSI_MAX = 50     # max RSI at execution — block SHORT if RSI > 50 (catches 30 losses, 95.7% WR verified)
+ACCEL_300_V3_SHORT_EXEC_Z_MAX = 0        # max z_score at execution — block SHORT if z > 0 in HIGH regime (95.8% WR verified)
 
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
@@ -1751,8 +1756,8 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
     # BB_BOUNCE_LONG_ENABLED — removed from CEO_PROTECTED 2026-09-02 (CEO kill, NEVER_REENABLE conflict)
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
-    'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
-    'PM_TRAIL_DISTANCE_PCT': ('Profit monster trail distance — CEO changed without authorization 2026-08-16', '2026-08-17'),
+    'PM_TRAIL_ACTIVATE_PCT': ('MUST BE 0.40% — CEO kept raising, ATR SL catches exits first when trail is wide. DO NOT CHANGE.', '2026-09-06'),
+    'PM_TRAIL_DISTANCE_PCT': ('MUST BE 0.20% — CEO kept widening, ATR SL trails at 0.15% from peak, wider trail loses the race. DO NOT CHANGE.', '2026-09-06'),
     'ACCEL_300_MINUS_ENABLED': ('Winning SHORT signal — 13-win streak Aug 12. CEO killed, user re-enabled', '2026-08-17'),
     'RANGE_BREAKOUT_SHORT_ENABLED': ('Winning SHORT signal — 11-win streak Aug 12. CEO killed, user re-enabled', '2026-08-17'),
     'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),

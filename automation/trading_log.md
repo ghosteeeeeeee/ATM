@@ -2136,3 +2136,54 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 
 **Open Questions:**
 - 24h now slightly negative (-$0.26). Will removing coil-spring+ restore positive edge? Monitor next hour.
+
+## [2026-09-06 16:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L) — PnL: +$0.06
+- CFX bb-bounce-v2-long+: +$0.06 (atr_sl_hit)
+
+**24h:** 34T 50%WR -$0.21 | Open: 1 ($11.10)
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- coil-spring+ killed at 15:07 UTC — 24h window still shows 21T -$0.65 (will rotate out)
+- atr_sl_hit: 7/34 = 20.6% — under 40% threshold
+- Trade freq: 1/hr — normal
+- bb-bounce-v2-long+: 10T 78%WR +$0.78 (star)
+- open-skies+: 2T 50%WR -$0.14 (small drag, not killable)
+- r2-trend-short3: 1T 0%WR -$0.20 (not killable)
+- profit-monster-trail dominant exit at 53% — healthy
+- Open position: BTC liq-hunt+ $11.10 (low exposure)
+
+**Open Questions:**
+- 24h slightly negative (-$0.21). Expect improvement as coil-spring+ trades rotate out of window.
+
+## [2026-09-06 17:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed — quiet hour
+
+**24h:** 33T 51.5%WR -$0.21 | Open: 2 ($22.20)
+- bb-bounce-v2-long+: 10T 78%WR +$0.78 (star)
+- coil-spring+: 21T 38%WR -$0.65 (killed 15:07 UTC, rotating out of window)
+- open-skies+: 1T -$0.14 (not killable)
+- r2-trend-short3: 1T -$0.20 (not killable)
+
+**24h by exit reason:**
+- profit-monster-trail: 17T +$1.62 avg+$0.10
+- cut-loser-CL-T1: 9T -$1.28 avg-$0.14
+- atr_sl_hit: 7T -$0.55 avg-$0.08
+
+**Changes:** None — system steady state.
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour (0T)
+- coil-spring+ killed 15:07 UTC — 21T still in 24h window, will rotate out by ~15:00 UTC tomorrow
+- atr_sl_hit: 7/33 = 21.2% — under 40% threshold
+- Trade freq: 0/hr — normal (quiet market)
+- profit-monster-trail dominant exit at 52% — healthy
+- Open positions: SYRUP slow-grind+ $11.10, BTC liq-hunt+ $11.10 (low exposure, $22.20 total)
+
+**Open Questions:**
+- 24h still slightly negative (-$0.21). Main drag is residual coil-spring+ trades in window. No action needed — just wait for rotation.

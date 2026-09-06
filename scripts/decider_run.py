@@ -3243,7 +3243,11 @@ def run(dry_run=False):
                     # If price moved > threshold from signal price, the entry is stale
                     # Catches ENA (+0.4%), CRV (+0.76%), W (+0.64%) — all lost due to staleness
                     try:
-                        from hermes_constants import ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE
+                        from hermes_constants import (
+                            ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE,
+                            ACCEL_300_V3_SHORT_EXEC_RSI_MAX,
+                            ACCEL_300_V3_SHORT_EXEC_Z_MAX,
+                        )
                         _signal_price = sig.get('price', 0) or 0
                         _current_price = float(fresh_prices[-1]['price']) if fresh_prices else 0
                         if _signal_price > 0 and _current_price > 0:
@@ -3256,6 +3260,40 @@ def run(dry_run=False):
                                 continue
                     except Exception as e:
                         log(f'  [WARN] price move check failed: {e}', 'WARN')
+                    # ── RSI > 50 filter: block SHORT if RSI too high ──
+                    # Verified: RSI<=50 = 95.7% WR, RSI>50 = 31.2% WR (64.5pt gap)
+                    if _is_accel_v3_short and direction == 'SHORT':
+                        try:
+                            from signals.accel_300_v3_short import _rsi as _wilder_rsi
+                            _fresh_closes = [float(p['price']) for p in fresh_prices]
+                            _exec_rsi = _wilder_rsi(_fresh_closes, 14)
+                            if _exec_rsi and _exec_rsi > ACCEL_300_V3_SHORT_EXEC_RSI_MAX:
+                                log(f'  🚫 [ACCEL-V3-RSI] {token} {direction} BLOCKED — RSI={_exec_rsi:.1f} > {ACCEL_300_V3_SHORT_EXEC_RSI_MAX}')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                        except Exception as e:
+                            log(f'  [WARN] RSI check failed: {e}', 'WARN')
+                    # ── z_score > 0 filter: block SHORT if price above EMA300 ──
+                    # Verified: z<=0 in HIGH = 95.8% WR (23W/1L)
+                    if _is_accel_v3_short and direction == 'SHORT':
+                        try:
+                            from signals.accel_300_v3_short import _ema_series as _ema300
+                            _fresh_closes = [float(p['price']) for p in fresh_prices]
+                            if len(_fresh_closes) >= 300:
+                                _ema = _ema300(_fresh_closes, 300)
+                                if _ema and _ema[-1] and _ema[-1] > 0:
+                                    _exec_z = (_fresh_closes[-1] - _ema[-1]) / _ema[-1] * 100
+                                    _regime = sig.get('regime', '')
+                                    if _regime == 'HIGH' and _exec_z > ACCEL_300_V3_SHORT_EXEC_Z_MAX:
+                                        log(f'  🚫 [ACCEL-V3-Z] {token} {direction} BLOCKED — z={_exec_z:.4f} > {ACCEL_300_V3_SHORT_EXEC_Z_MAX} in HIGH regime')
+                                        if sig_id:
+                                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                        skipped += 1
+                                        continue
+                        except Exception as e:
+                            log(f'  [WARN] z_score check failed: {e}', 'WARN')
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
