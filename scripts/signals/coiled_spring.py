@@ -236,12 +236,11 @@ def detect_coiled_spring(rows):
     }
 
     # ════════════════════════════════════════════════════════════════════════
-    # CHECK 1: EMA alignment (bullish trend context)
+    # CHECK 1: EMA alignment (bullish trend context) — HARD GATE
     # ════════════════════════════════════════════════════════════════════════
     if not (ema9_now > ema21_now > ema50_now):
-        if not (ema9_now > ema21_now):
-            diag['reason'] = 'EMA not bullish'
-            return None, diag
+        diag['reason'] = f'EMA not aligned (9={ema9_now:.6f} 21={ema21_now:.6f} 50={ema50_now:.6f})'
+        return None, diag
 
     # CHECK 1b: Price not too far above EMA21 (prevents buying into resistance)
     price_above_ema21_pct = (price / ema21_now - 1) * 100
