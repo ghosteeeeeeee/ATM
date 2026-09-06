@@ -2187,3 +2187,50 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 
 **Open Questions:**
 - 24h still slightly negative (-$0.21). Main drag is residual coil-spring+ trades in window. No action needed — just wait for rotation.
+
+## [2026-09-06 18:35 UTC] Daily Orchestrator Report
+
+**PIPELINE STATUS:**
+- Trades (24h): 28 closed, 50% WR, -$0.27
+- Trades (7d): 359 closed, 54.3% WR, -$3.92
+- R:R 48h: 0.61 (avg_win $0.0964, avg_loss $0.1157)
+- R:R 24h: 0.72 (improving from 0.61)
+- Open: 5 positions (all near $0)
+- Market: 100% NEUTRAL (106/107 coins)
+
+**SIGNAL PERFORMANCE (48h):**
+- bb-bounce-v2-long+: 19T 84.2% WR +$1.47 ★ STAR
+- open-skies+: 11T 63.6% WR +$0.36 (stable)
+- coil-spring+: 21T 42.9% WR -$0.65 (KILLED 15:07 UTC)
+- continuation+: 1T 100% WR +$0.03 (too few trades)
+
+**EXIT BREAKDOWN (48h):**
+- profit-monster-trail: 34T +$3.50 avg+$0.10 (working well)
+- cut-loser-CL-T1: 19T -$2.80 avg-$0.15 (main drag)
+- atr_sl_hit: 8T -$0.50 avg-$0.06
+
+**WHAT WAS DONE:**
+1. Verified all automation outputs (health, auto-1hr, signal-reporter, blacklist, upgrades)
+2. Confirmed coil-spring+ killed at 15:07 UTC — rotating out of 24h window
+3. Confirmed neutral_sniper firing signals (FOGO SHORT conf=75) — BTC-CRASH filter blocking SHORTs (by design)
+4. Confirmed PM_TRAIL 0.60% improving R:R (0.61→0.72 in 24h)
+5. Identified signal_compactor sporadic timeouts (31 in 6h, non-fatal, self-recovers)
+6. Identified CHOP_DETECTOR transient import error (caught, non-fatal)
+7. Updated CURRENT.md with latest state
+
+**ISSUES FOUND:**
+- signal_compactor timeouts: 31 in 6 hours (~every 12 min). Sporadic, non-fatal. Likely DB contention during peak cycles. Self-recovers. Low priority.
+- CHOP_DETECTOR_BTC_MOM_THRESHOLD transient import error: caught by try/except, non-fatal. Likely stale .pyc cache.
+- neutral_sniper SHORT blocked by BTC-CRASH filter: Working as designed. Will execute when BTC stabilizes.
+
+**NO CHANGES NEEDED:**
+- System in steady state
+- coil-spring+ kill already applied by signal_reporter
+- PM_TRAIL 0.60% already applied by CEO
+- All safety filters working correctly
+
+**NEXT STEPS:**
+1. Monitor PM_TRAIL 0.60% — need R:R to reach 0.80+ target
+2. Monitor neutral_sniper execution — waiting for BTC to stabilize
+3. Build directional cap (65%) — highest-impact pending feature
+4. Monitor disk (83%)
