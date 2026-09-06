@@ -1,5 +1,31 @@
 
 
+## [2026-09-05 14:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W, +$0.05)
+**24h Context:** 31T 55.6%WR +$0.60 | atr_sl_hit 3.2%
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T (55%) avg +$0.081 — carrying system
+- cut-loser-CL-T1: 9T (29%) avg -$0.142 — normal
+- atr_sl_hit: 5T (16%) avg -$0.096 — healthy
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T last hour → none to kill
+- atr_sl_hit 3.2% → healthy
+- Trade freq 1.3/hr normal
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System net positive +$0.60/24h
+- profit-monster-trail carrying system at +$1.37/24h
+- All signals within normal bounds
+
+**Open Questions:**
+- ema300-dip-short 7T 28.6%WR -$0.57/24h — not kill criteria but persistent drag. Monitor.
+
 ## [2026-09-05 13:06 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period, 2 open)
