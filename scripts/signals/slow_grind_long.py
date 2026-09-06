@@ -247,11 +247,12 @@ def detect_slow_grind_long(token):
 
     # ── Rise From Low Filter ───────────────────────────────────────────
     # Block if price has already risen too much from recent low (chasing tops)
+    # Raised to 5% to allow strong trends (DASH was blocked at 5.0%)
     if len(closes_1m) >= 60:
         recent_low = min(closes_1m[-60:])
         if recent_low > 0:
             rise_from_low_pct = (closes_1m[-1] - recent_low) / recent_low * 100
-            if rise_from_low_pct > 3.0:
+            if rise_from_low_pct > 5.0:
                 return None  # already up too much
 
     # ── Confidence Scoring ─────────────────────────────────────────────

@@ -1601,10 +1601,10 @@ SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY = 5  # penalty for oversold RSI
 # slow_grind_long.py — catches slow, grinding uptrends with low volatility
 SLOW_GRIND_LONG_ENABLED = True              # master kill-switch
 SLOW_GRIND_LONG_MIN_R2 = 0.45              # minimum R² for trend quality
-SLOW_GRIND_LONG_MIN_SLOPE_PCT = 0.0002     # minimum slope % per bar (uptrend)
+SLOW_GRIND_LONG_MIN_SLOPE_PCT = 0.00025    # minimum slope % per bar (uptrend) — raised from 0.0002
 SLOW_GRIND_LONG_MAX_ATR_PCT = 1.0          # maximum ATR% (low vol = grind)
 SLOW_GRIND_LONG_RSI_MIN = 45               # RSI floor (not oversold)
-SLOW_GRIND_LONG_RSI_MAX = 65               # RSI ceiling (not overbought)
+SLOW_GRIND_LONG_RSI_MAX = 85               # RSI ceiling (raised to 85 to allow strong trends)
 SLOW_GRIND_LONG_MIN_EMA_SEPARATION = 0.1   # minimum % above EMA50
 SLOW_GRIND_LONG_CONF_BASE = 72             # base confidence
 SLOW_GRIND_LONG_CONF_CAP = 88              # max confidence (system ceiling)
