@@ -719,6 +719,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             TREND_PURITY_ENABLED, EMA9_SMA20_ENABLED,
             R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
+            SLOW_GRIND_LONG_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
@@ -873,6 +874,10 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # slow_grind_short — slow grinding downtrend detector
             if _comp == 'slow-grind-' and not SLOW_GRIND_SHORT_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_SHORT_ENABLED=False', flush=True)
+                return None
+            # slow_grind_long — slow grinding uptrend detector
+            if _comp == 'slow-grind+' and not SLOW_GRIND_LONG_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_LONG_ENABLED=False', flush=True)
                 return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
@@ -2233,11 +2238,13 @@ def is_component_disabled(component: str) -> bool:
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
+            SLOW_GRIND_LONG_ENABLED,
             EMA300_DIP_LONG_ENABLED,
             EMA300_DIP_SHORT_ENABLED,
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
+            ACCEL_300_V3_SHORT_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
         )
@@ -2361,6 +2368,8 @@ def is_component_disabled(component: str) -> bool:
     if c == 'ema300-dip-short': return not EMA300_DIP_SHORT_ENABLED
     # slow-grind-short
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
+    # slow-grind-long
+    if c == 'slow-grind+': return not SLOW_GRIND_LONG_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
     if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED
@@ -2457,6 +2466,9 @@ def is_component_disabled(component: str) -> bool:
     # accel-300-v3-long (pullback entry LONG)
     if c in ('accel-300-v3-long+', 'accel-300-v3-long-'): return not ACCEL_300_V3_LONG_ENABLED
     if c == 'accel-300-v3-long': return not ACCEL_300_V3_LONG_ENABLED
+    # accel-300-v3-short (anti-bottom-catch SHORT)
+    if c in ('accel-300-v3-short+', 'accel-300-v3-short-'): return not ACCEL_300_V3_SHORT_ENABLED
+    if c == 'accel-300-v3-short': return not ACCEL_300_V3_SHORT_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED

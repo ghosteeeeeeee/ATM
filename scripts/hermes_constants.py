@@ -774,7 +774,7 @@ SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50%
 # Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)
 # Backtested: spike>0.3% + RSI<30 blocks 2x more losers than winners (0.5x ratio)
 SPIKE_FILTER_ENABLED = True
-SPIKE_FILTER_5M_THRESHOLD = 0.3      # % — block SHORT if last 3 5m candles had bullish candle > this
+SPIKE_FILTER_5M_THRESHOLD = 0.5      # % — block LONG/SHORT if last 3 5m candles had candle > this (CEO: raised from 0.3 2026-09-06 — 0.3% was false positive factory)
 SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = bounce risk)
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
@@ -1131,6 +1131,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
     'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
+    'slow-grind+',         # slow grinding uptrend — own ATR SL/TP, no PM Trail benefit
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
@@ -1593,6 +1594,21 @@ SLOW_GRIND_SHORT_ATR_LOW_THRESHOLD = 0.3  # ATR% below this gets bonus (pure gri
 SLOW_GRIND_SHORT_ATR_LOW_BONUS = 5   # bonus for low ATR
 SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY_THRESHOLD = 40  # RSI below this gets penalty
 SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY = 5  # penalty for oversold RSI
+
+# ── slow_grind_long (steady uptrend detector) ──────────────────────────────
+# slow_grind_long.py — catches slow, grinding uptrends with low volatility
+SLOW_GRIND_LONG_ENABLED = True              # master kill-switch
+SLOW_GRIND_LONG_MIN_R2 = 0.45              # minimum R² for trend quality
+SLOW_GRIND_LONG_MIN_SLOPE_PCT = 0.0002     # minimum slope % per bar (uptrend)
+SLOW_GRIND_LONG_MAX_ATR_PCT = 1.0          # maximum ATR% (low vol = grind)
+SLOW_GRIND_LONG_RSI_MIN = 45               # RSI floor (not oversold)
+SLOW_GRIND_LONG_RSI_MAX = 65               # RSI ceiling (not overbought)
+SLOW_GRIND_LONG_MIN_EMA_SEPARATION = 0.1   # minimum % above EMA50
+SLOW_GRIND_LONG_CONF_BASE = 72             # base confidence
+SLOW_GRIND_LONG_CONF_CAP = 88              # max confidence (system ceiling)
+SLOW_GRIND_LONG_COOLDOWN_HOURS = 0.25      # 15min cooldown
+SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for steady trends)
+
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT

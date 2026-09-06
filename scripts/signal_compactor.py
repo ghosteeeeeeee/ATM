@@ -377,6 +377,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('r2_trend_short', 'r2-trend-short'):  1.0,
     # slow_grind_short — slow grinding downtrend detector (low volatility, high R²)
     ('slow_grind_short', 'slow-grind-'):   0.5,
+    # slow_grind_long — slow grinding uptrend detector (low volatility, high R²)
+    ('slow_grind_long', 'slow-grind+'):    1.0,
     # ema300_dip_long — buy dips to EMA300 during strong uptrends
     ('ema300_dip_long', 'ema300-dip-long'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # ema300_dip_short — sell rallies to EMA300 during strong downtrends
@@ -2079,24 +2081,45 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Mirror of SHORT spike filter — prevents entering LONG at dump lows
             # EXEMPT: v3 pullback signals (accel-300-v3-long+) — bearish candle IS the pullback
             # EXEMPT: range_reversion_long — bearish candle IS the dip we're buying
+            # CEO 2026-09-06: momentum signals exempt ONLY when price > EMA20 (uptrend)
             _is_v3_pullback = src and 'accel-300-v3-long' in src
             _is_range_rev_long = src and 'range-reversion-long' in src
+            _is_momentum_signal = src and any(s in src for s in ['open-skies', 'pump-chain', 'coil-spring'])
             if direction == 'LONG' and SPIKE_FILTER_ENABLED and not _is_v3_pullback and not _is_range_rev_long:
                 _conn_sf2 = None
                 try:
                     _skip_long = False
                     _conn_sf2 = sqlite3.connect(CANDLES_DB, timeout=5)
                     _cur_sf2 = _conn_sf2.cursor()
+                    # TREND FILTER: check if price > EMA20 (uptrend = healthy dip)
                     _cur_sf2.execute("""
-                        SELECT close, open FROM candles_5m
+                        SELECT close FROM candles_5m
                         WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 3
+                        ORDER BY ts DESC LIMIT 20
                     """, (tkn.upper(),))
-                    for _cl, _op in _cur_sf2.fetchall():
-                        if _op and _op > 0 and (_op - _cl) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
-                            log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — recent bearish 5m candle -{(_op-_cl)/_op*100:.3f}%")
-                            _skip_long = True
-                            break
+                    _ema20_closes = [r[0] for r in _cur_sf2.fetchall()]
+                    _in_uptrend = False
+                    _effective_threshold = SPIKE_FILTER_5M_THRESHOLD
+                    if len(_ema20_closes) >= 20:
+                        _ema20 = sum(_ema20_closes) / 20
+                        _current_price = _ema20_closes[0]
+                        if _current_price > _ema20:
+                            _in_uptrend = True
+                            _effective_threshold *= 1.5  # 50% more room in uptrend
+                    # CEO: momentum signals exempt ONLY in uptrend
+                    if _is_momentum_signal and _in_uptrend:
+                        log(f"  📈 [SPIKE-FILTER] {tkn}: momentum signal exempt (uptrend, price > EMA20)")
+                    else:
+                        _cur_sf2.execute("""
+                            SELECT close, open FROM candles_5m
+                            WHERE token = ? AND is_closed = 1
+                            ORDER BY ts DESC LIMIT 3
+                        """, (tkn.upper(),))
+                        for _cl, _op in _cur_sf2.fetchall():
+                            if _op and _op > 0 and (_op - _cl) / _op * 100 > _effective_threshold:
+                                log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — recent bearish 5m candle -{(_op-_cl)/_op*100:.3f}% > {_effective_threshold:.2f}%")
+                                _skip_long = True
+                                break
                     if not _skip_long:
                         _cur_sf2.execute("""
                             SELECT close FROM candles_5m
