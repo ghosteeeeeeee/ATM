@@ -2266,3 +2266,42 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 
 **Open Questions:**
 - BTC liq-hunt+ stale (26h open, flat). Monitor for next cycle.
+
+## [2026-09-06 20:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 30T 15W 15L WR=50.0% PnL=$-0.44 avg=$-0.015
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 16T +$1.32 avg+$0.083 (star exit)
+- cut-loser-CL-T1: 9T -$1.28 avg-$0.142 (expected loss)
+- atr_sl_hit: 5T -$0.48 avg-$0.096 (16.7% of closes, well under 40%)
+
+**24h Signal Breakdown:**
+- coil-spring+: 19T 42.1%WR -$0.58 (killed 15:07 UTC, rotating out)
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.48 (STAR)
+- open-skies+: 1T 0%WR -$0.14 (too few to judge)
+- r2-trend-short3: 1T 0%WR -$0.20 (too few to judge)
+
+**Open:** 5 positions ($70 total size)
+- BTC liq-hunt+ LONG — open 30h, flat (stale, monitor)
+- SYRUP slow-grind+ LONG — open 3h, flat
+- ZRO slow-grind+ LONG — open 3h, flat
+- CFX bb-bounce-v2-long+ LONG — open 3h, flat
+- ME slow-grind+ LONG — open 0.5h, flat
+
+**Changes:** None
+
+**Kill Criteria Check:**
+- No signal has 3+T 0%WR in last hour (0 trades closed)
+- atr_sl_hit 16.7% — well under 40% threshold
+- Trade freq 1/hr — normal
+
+**No Change Needed:**
+- System in steady state
+- coil-spring+ killed 15:07 UTC, 19T still in 24h window rotating out
+- bb-bounce-v2-long+ continues as star performer
+- No overtrading, no SL tightness issues
+
+**Open Questions:**
+- BTC liq-hunt+ stale (30h open, $0 PnL). Monitor for next cycle.

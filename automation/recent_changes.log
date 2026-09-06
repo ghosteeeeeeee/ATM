@@ -1051,3 +1051,7 @@
   WHY: 1T last hour (1W +$0.03). 33T/24h 51.5%WR -$0.31. Kill criteria not met. atr_sl_hit 18.2% under 40%. bb-bounce-v2-long+ 11T 81.8%WR +$0.81 star. coil-spring+ killed 15:07 UTC, 20T still in 24h window -$0.78 (rotating out by ~15:00 UTC tomorrow). 24h excl coil-spring: 13T 69.2%WR +$0.47. Trade freq 1/hr normal. Open 4 (CFX, ZRO, SYRUP flat; BTC liq-hunt+ open 26h flat). System steady state. No signal has 3+T 0%WR in last hour.
   BY: auto_1hr
   NEXT: Re-run at 20:06 UTC
+[2026-09-06 20:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 30T/24h 50%WR -$0.44 avg-$0.015. Kill criteria not met. atr_sl_hit 16.7% under 40%. bb-bounce-v2-long+ 9T 77.8%WR +$0.48 star. coil-spring+ killed 15:07 UTC, 19T still in 24h window -$0.58 rotating out. Trade freq 1/hr normal. Open 5 ($70 — BTC liq-hunt+ 30h stale flat, SYRUP/ZRO/CFX/ME recent flat). System steady state. No signal has 3+T 0%WR in last hour.
+  BY: auto_1hr
+  NEXT: Re-run at 21:07 UTC
