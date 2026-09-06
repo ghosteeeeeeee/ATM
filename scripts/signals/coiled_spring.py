@@ -508,14 +508,29 @@ def scan_coiled_spring():
         if sig_kwargs is None:
             continue
 
-        # ENTRY VALIDATION: Check current RSI is still in range
-        # This prevents late entries when price has already rallied
+        # ENTRY VALIDATION: Check current conditions are still valid
+        # This prevents entries when price has already moved against us
         closes = [r[4] for r in rows]
+        volumes = [r[5] for r in rows]
+        
+        # Check RSI at execution time
         rsi14 = _rsi(closes, 14)
         current_rsi = rsi14[-2] if len(rsi14) > 1 and rsi14[-2] is not None else 50
         if current_rsi > COILED_SPRING_ENTRY_RSI_MAX:
-            continue  # RSI too high at execution time — skip
-
+            continue  # RSI too high at execution time
+        
+        # Check EMA alignment at execution time (must still be bullish)
+        ema9_now = _ema(closes, 9)[-1]
+        ema21_now = _ema(closes, 21)[-1]
+        if ema9_now < ema21_now:
+            continue  # Short-term trend has turned bearish
+        
+        # Check price is still near support (not dropped through)
+        price_now = closes[-1]
+        atr_now = _atr(rows, 14)[-1] if len(rows) > 14 else price_now * 0.005
+        if price_now < ema21_now - atr_now:
+            continue  # Price has dropped below support
+        
         sig_kwargs['token'] = token
         confidence = sig_kwargs['confidence']
 
