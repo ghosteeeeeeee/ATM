@@ -510,6 +510,11 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" [DEAD_SIGNAL]', flush=True)
         return None
 
+    # ── DEBUG: Trace open-skies signal creation ──
+    if 'open-skies' in (source or ''):
+        print(f'  DEBUG add_signal OPEN-SKIES: token={token} direction={direction} source={source} '
+              f'signal_type={signal_type} conf={confidence} price={price}', flush=True)
+
     # ── Minimum confidence floor ─────────────────────────────────────────────
     MIN_CONFIDENCE_FLOOR = 50
     if confidence < MIN_CONFIDENCE_FLOOR:

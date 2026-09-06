@@ -1303,6 +1303,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     'zscore': zscore, 'rsi': rsi, 'price': price_val,
                     'blocked_by': block_reason, 'decision': 'BLOCKED' if block_reason else 'PASS'
                 })
+                # DEBUG: Trace open-skies signals in compaction
+                if 'open-skies' in (source or ''):
+                    log(f"  [DEBUG-COMPACT] open-skies: token={token} dir={direction} "
+                        f"source={source} conf={conf} price={price_val} block={block_reason}")
             import json as _json
             raw_path = '/var/www/hermes/data/raw_signals.json'
             with open(raw_path, 'w') as _f:

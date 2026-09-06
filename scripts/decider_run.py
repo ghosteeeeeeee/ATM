@@ -568,6 +568,10 @@ def process_delayed_entries(paper=False):
         token = entry['token']
         direction  = entry['direction']
         source = entry.get('source', '')
+        # DEBUG: Trace open-skies source extraction
+        if 'open-skies' in (source or ''):
+            log(f"  [DEBUG-HOTSET] open-skies: token={token} dir={direction} source={source} "
+                f"confidence={entry.get('confidence')} price={entry.get('price')}")
         # ── Signal Inversion (static + dynamic) for delayed entries ───────
         direction, _ = _apply_inversion(direction, source, token)
         entry['direction'] = direction
@@ -1593,6 +1597,11 @@ def execute_trade(token, direction, price, confidence, source,
 
     _base_size = _get_dynamic_position_size()
     _trade_size = _base_size * _get_favorite_size_mult(token)
+
+    # DEBUG: Trace open-skies trade opening
+    if 'open-skies' in (source or ''):
+        log(f"  [DEBUG-TRADE] open-skies: token={token} dir={cmd_side} price={price} "
+            f"source={source} conf={confidence} size={_trade_size}")
 
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
