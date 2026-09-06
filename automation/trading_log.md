@@ -2367,3 +2367,40 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 
 **Open Questions:**
 - BTC liq-hunt+ 28h stale flat. SL at 79619 — monitor for next cycle. If BTC drops, it'll cut naturally.
+
+## [2026-09-06 23:07 UTC] Hourly Analysis
+
+**Trades:** 6 closed since 21:07 (5W 1L, +$0.19)
+**24h:** 35T 57%WR +$0.16 | excl coil-spring: 17T 70.6%WR +$0.74
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 10T 80%WR +$0.53 ⭐
+- slow-grind+: 3T 100%WR +$0.42 ⭐ (3 wins in last 2h window)
+- pump-chain+: 3T 100%WR +$0.06
+- continuation+: 10T 50%WR -$0.38 overall (1T 0%WR last 24h — not killable)
+- coil-spring+: 18T 44%WR -$0.58 (killed, rotating out)
+
+**Exit Breakdown (24h):**
+- profit-monster-trail: 19T +$1.40 avg+$0.074
+- cut-loser-CL-T1: 9T -$1.42 avg-$0.158
+- profit-monster-T1: 3T +$0.42 avg+$0.140
+- atr_sl_hit: 4T -$0.25 avg-$0.063 (11.4%)
+
+**Changes:** None
+
+**No Change Needed:**
+- 5W 1L last 2h — system performing well
+- atr_sl_hit 11.4% — no SL tightness issue
+- Trade freq ~3/hr — normal
+- No signal has 3+T 0%WR in last hour
+- continuation+ only 1T in 24h window, overall 50%WR — not killable
+
+**Open Positions:** 4
+- BTC liq-hunt+ LONG — open 29.6h, flat (very stale, SL at 79619)
+- ME slow-grind+ LONG — open 3.3h, flat
+- CFX bb-bounce-v2-long+ LONG — open 0.4h, flat
+- BABY pullback-entry- SHORT — open 0.2h, flat
+
+**Open Questions:**
+- BTC liq-hunt+ 29.6h stale flat. SL at 79619 — monitor. Will cut naturally on BTC drop.
+- continuation+ mediocre long-term (50%WR, -$0.38) but not meeting kill threshold yet.
