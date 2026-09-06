@@ -64,9 +64,10 @@ from hermes_constants import (
     HEBBIAN_COMBO_PART_BOOST, HEBBIAN_TOKEN_WR_BOOST, HEBBIAN_TOKEN_WR_MIN_N,
     HEBBIAN_TOKEN_WR_RATIO_HIGH, HEBBIAN_TOKEN_WR_RATIO_LOW,
     HEBBIAN_CIRCUIT_BREAKER_WR, HEBBIAN_CIRCUIT_BREAKER_N, HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC,
-    TOKEN_SENTIMENT_ENABLED, TOKEN_SENTIMENT_K,
+     TOKEN_SENTIMENT_ENABLED, TOKEN_SENTIMENT_K,
     TOKEN_SENTIMENT_SKIP_THRESHOLD, TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD,
     TOKEN_SENTIMENT_BOOST_THRESHOLD, TOKEN_SENTIMENT_BOOST_AMOUNT,
+    AMPLITUDE_SIZE_MULT, TOKEN_AMP_CLASS,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -269,6 +270,14 @@ def _has_enough_trades(token, min_trades=5, days=7):
         if conn:
             try: conn.close()
             except Exception: pass
+
+
+def _get_amplitude_size_mult(token):
+    """Get position size multiplier based on token amplitude class.
+    HIGH_AMP tokens get reduced size to normalize risk across tokens.
+    """
+    amp_class = TOKEN_AMP_CLASS.get(token.upper(), 'MED_AMP')
+    return AMPLITUDE_SIZE_MULT.get(amp_class, 1.0)
 
 
 def _get_favorite_size_mult(token):
@@ -654,7 +663,7 @@ def process_delayed_entries(paper=False):
             exp_arg = ['--experiment', exp_json]
 
         _base_size = _get_dynamic_position_size()
-        _trade_size = _base_size * _get_favorite_size_mult(token)
+        _trade_size = _base_size * _get_favorite_size_mult(token) * _get_amplitude_size_mult(token)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
         # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
@@ -1596,7 +1605,7 @@ def execute_trade(token, direction, price, confidence, source,
     paper_flag = '--paper' if not live_trading else '--real'
 
     _base_size = _get_dynamic_position_size()
-    _trade_size = _base_size * _get_favorite_size_mult(token)
+    _trade_size = _base_size * _get_favorite_size_mult(token) * _get_amplitude_size_mult(token)
 
     # DEBUG: Trace open-skies trade opening
     if 'open-skies' in (source or ''):
@@ -3167,7 +3176,8 @@ def run(dry_run=False):
         _is_accel_v2_long = 'accel-300-v2-long' in (source or '') and '5m' not in (source or '')
         _is_accel_v2_long_5m = 'accel-300-v2-long-5m' in (source or '')
         _is_accel_v3_short = 'accel-300-v3-short' in (source or '')
-        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short:
+        _is_accel_v3_long = 'accel-300-v3-long' in (source or '')
+        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short or _is_accel_v3_long:
             # ── Maximum staleness check: block signals older than 10 minutes ──
             # Prevents compactor from executing stale combo signals
             _entry_origin = sig.get('entry_origin_ts') or 0
@@ -3294,6 +3304,47 @@ def run(dry_run=False):
                                         continue
                         except Exception as e:
                             log(f'  [WARN] z_score check failed: {e}', 'WARN')
+                elif _is_accel_v3_long:
+                    from signals.accel_300_v3_long import detect_accel_300_v3_long, _get_1m_prices
+                    fresh_prices = _get_1m_prices(token)
+                    if not fresh_prices:
+                        log(f'  🚫 [ACCEL-V3-LONG-STALE] {token} {direction} blocked: no fresh price data')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+                    fresh_result = detect_accel_300_v3_long(token, fresh_prices)
+                    # ── RSI < 50 filter: block LONG if RSI too low ──
+                    # Verified: RSI>=50 = 75% WR, RSI<50 = 4% WR
+                    if direction == 'LONG':
+                        try:
+                            from signals.accel_300_v3_short import _rsi as _wilder_rsi
+                            from hermes_constants import ACCEL_300_V3_LONG_EXEC_RSI_MIN
+                            _fresh_closes = [float(p['price']) for p in fresh_prices]
+                            _exec_rsi = _wilder_rsi(_fresh_closes, 14)
+                            if _exec_rsi and _exec_rsi < ACCEL_300_V3_LONG_EXEC_RSI_MIN:
+                                log(f'  🚫 [ACCEL-V3-LONG-RSI] {token} {direction} BLOCKED — RSI={_exec_rsi:.1f} < {ACCEL_300_V3_LONG_EXEC_RSI_MIN}')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                        except Exception as e:
+                            log(f'  [WARN] RSI check failed: {e}', 'WARN')
+                    # ── pre15 < 0 filter: block LONG if price was falling ──
+                    # Verified: pre15>=0 = 72% WR, pre15<0 = 7% WR
+                    if direction == 'LONG' and len(fresh_prices) >= 16:
+                        try:
+                            from hermes_constants import ACCEL_300_V3_LONG_EXEC_PRE15_MIN
+                            _fresh_closes = [float(p['price']) for p in fresh_prices]
+                            _pre15 = (_fresh_closes[-1] - _fresh_closes[-16]) / _fresh_closes[-16] * 100
+                            if _pre15 < ACCEL_300_V3_LONG_EXEC_PRE15_MIN:
+                                log(f'  🚫 [ACCEL-V3-LONG-PRE15] {token} {direction} BLOCKED — pre15={_pre15:.4f}% < {ACCEL_300_V3_LONG_EXEC_PRE15_MIN}%')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                        except Exception as e:
+                            log(f'  [WARN] pre15 check failed: {e}', 'WARN')
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)

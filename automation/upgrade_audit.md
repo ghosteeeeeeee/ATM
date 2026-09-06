@@ -48,8 +48,8 @@
 
 | Plan | Difficulty | Value | Status | What's Missing |
 |------|-----------|-------|--------|----------------|
-| `2026-09-02_regime-aware-signal-params-spec.md` | L2 | HIGH | PARTIALLY DONE | `regime_params.py` exists with overrides, but `accel_300_v3_long.py` and `accel_300_v3_short.py` don't import it. Final wiring step never done. |
-| `2026-08-29_amplitude-enhancement-brainstorm.md` | L2 | HIGH | PARTIALLY DONE | `get_dynamic_sl()` defined in amplitude_cache.py but not called by position_manager.py. `AMPLITUDE_SIZE_MULT` defined but never imported. |
+| `2026-09-02_regime-aware-signal-params-spec.md` | L2 | HIGH | ✅ DONE | `regime_params.py` wired into accel_300_v3 signals |
+| `2026-08-29_amplitude-enhancement-brainstorm.md` | L2 | HIGH | ✅ DONE | `AMPLITUDE_SIZE_MULT` wired into decider_run.py, amplitude SL floor wired into position_manager.py |
 | `2026-08-21_copy-trader-entry-timing-deep-dive.md` | L1 | MEDIUM | PARTIALLY DONE | Time filter code exists (`COPY_BAD_HOURS_ENABLED=False`). Intentionally disabled per comment. Low priority. |
 
 ### 📋 PENDING (New work required)

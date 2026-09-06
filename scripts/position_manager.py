@@ -39,6 +39,7 @@ from hermes_constants import (
     WEATHER_VANE_SHIELD_MAX_HOLD_MIN, WEATHER_VANE_SHIELD_LOSING_ONLY,
     DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_LOSS_THRESHOLD,
     DIRECTIONAL_OUTCOME_WR_THRESHOLD, DIRECTIONAL_OUTCOME_MIN_TRADES,
+    AMPLITUDE_SL_MULT, AMPLITUDE_MAX_PORTFOLIO_LOSS, TOKEN_AMP_CLASS,
 )
 from paths import *
 from _secrets import BRAIN_DB_DICT
@@ -1625,19 +1626,29 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
     effective_sl_pct = max(atr_distance / current_price, ATR_SL_MIN)
     effective_sl_pct = min(effective_sl_pct, ATR_SL_MAX)
 
+    # Amplitude-based SL floor: HIGH_AMP tokens need wider stops to avoid noise
+    amp_class = TOKEN_AMP_CLASS.get(token.upper(), 'MED_AMP')
+    amp_mult = AMPLITUDE_SL_MULT.get(amp_class, 1.25)
+    # Default avg amplitude by class: LOW=1.0%, MED=2.0%, HIGH=4.0%, CHAOTIC=4.4%
+    amp_defaults = {'LOW_AMP': 1.0, 'MED_AMP': 2.0, 'HIGH_AMP': 4.0, 'CHAOTIC': 4.4}
+    avg_amp_pct = amp_defaults.get(amp_class, 2.0)
+    amp_sl_pct = min(avg_amp_pct * amp_mult / 100, AMPLITUDE_MAX_PORTFOLIO_LOSS / 5.0)  # assume 5x lev
+    # Use wider of ATR SL and amplitude SL
+    effective_sl_pct = max(effective_sl_pct, amp_sl_pct)
+
     if direction == 'LONG':
         # SL = entry - k·ATR, never above current price (catches drops)
         sl = entry_price * (1 - effective_sl_pct)
         # Use ATR_SL_MIN_INIT as floor to prevent premature stops
         result = min(sl, current_price * (1 - ATR_SL_MIN_INIT))
-        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% amp_sl={amp_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
     else:
         # SHORT: SL = entry + k·ATR, never below current price (catches rallies)
         sl = entry_price * (1 + effective_sl_pct)
         # Use ATR_SL_MIN_INIT as floor to prevent premature stops
         result = max(sl, current_price * (1 + ATR_SL_MIN_INIT))
-        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% amp_sl={amp_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
 
 
