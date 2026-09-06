@@ -1765,8 +1765,8 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
-    # ACCEL_300_V3_LONG_ENABLED — removed from CEO_PROTECTED 2026-09-06 (test expired, killed)
-    # ACCEL_300_V3_SHORT_ENABLED — removed from CEO_PROTECTED 2026-09-06 (test expired, killed)
+    'ACCEL_300_V3_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
+    'ACCEL_300_V3_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
 }
 
 # ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────
