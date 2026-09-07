@@ -157,6 +157,23 @@ def detect_slow_grind_long(token):
     if not SLOW_GRIND_LONG_ENABLED:
         return None
 
+    # ── BTC Trend Filter (critical: 59% win rate when BTC UP, 9% when DOWN) ──
+    try:
+        btc_conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        btc_cur = btc_conn.cursor()
+        btc_cur.execute('SELECT close FROM candles_1h WHERE token=\"BTC\" ORDER BY ts DESC LIMIT 4')
+        btc_rows = btc_cur.fetchall()
+        btc_conn.close()
+        if len(btc_rows) >= 4:
+            btc_closes = [r[0] for r in reversed(btc_rows)]
+            btc_4h_ago = btc_closes[-4]
+            btc_now = btc_closes[-1]
+            btc_trend_pct = (btc_now - btc_4h_ago) / btc_4h_ago * 100
+            if btc_trend_pct < -0.1:
+                return None  # BTC trending down — too risky for LONG
+    except Exception:
+        pass  # fail-open: don't block on DB error
+
     # Fetch 1m candles
     closes_1m = _get_closes(token, 'candles_1m', CANDLES_1M_LOOKBACK)
     if len(closes_1m) < R2_WINDOW * 2:
