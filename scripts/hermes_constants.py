@@ -1457,8 +1457,8 @@ COILED_SPRING_ATR_FALLBACK_PCT  = 0.005   # ATR fallback as fraction of price wh
 
 # ── Coiled Spring Trigger (volume-confirmed variant) ───────────────────────────
 # coiled_spring_trigger.py — fires ONLY on volume spike after coil setup
-COILED_SPRING_TRIGGER_LONG_ENABLED = True
-COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED = True
+COILED_SPRING_TRIGGER_LONG_ENABLED = False   # SIGNAL REPORTER 2026-09-07 — 13T/24h 38.5% WR -$0.62, 5 consecutive losses. Main coil-spring+ already killed 2026-09-06.
+COILED_SPRING_TRIGGER_LONG_PLUS_ENABLED = False  # SIGNAL REPORTER 2026-09-07 — variant of killed coil-spring+. 5 consecutive losses.
 COILED_SPRING_TRIGGER_LONG_COOLDOWN_MINUTES = 15
 COILED_SPRING_TRIGGER_LONG_CONF_BASE = 80      # higher base — volume confirmation = higher conviction
 COILED_SPRING_TRIGGER_LONG_CONF_FLOOR = 70     # floor still high — this is a quality signal
@@ -2347,9 +2347,9 @@ RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
 # Family: MeanReversion (pairs with ANY other family for 2-type confluence)
 # NEW 2026-09-05 — addresses signal starvation in NEUTRAL regime
 # Uses Stochastic RSI + CMF + ATR range filter (different from BB/RSI signals)
-NEUTRAL_SNIPER_ENABLED = True            # master toggle
+NEUTRAL_SNIPER_ENABLED = False           # DISABLED 2026-09-07 — CEO request
 NEUTRAL_SNIPER_PLUS_ENABLED = False      # DISABLED 2026-09-07 — CEO request
-NEUTRAL_SNIPER_MINUS_ENABLED = True      # SHORT direction
+NEUTRAL_SNIPER_MINUS_ENABLED = False     # DISABLED 2026-09-07 — CEO request
 NEUTRAL_SNIPER_STOCH_RSI_PERIOD = 14     # RSI period for StochRSI
 NEUTRAL_SNIPER_STOCH_RSI_K = 3           # %K smoothing
 NEUTRAL_SNIPER_STOCH_RSI_D = 3           # %D smoothing
