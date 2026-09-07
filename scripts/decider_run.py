@@ -1699,6 +1699,29 @@ def execute_trade(token, direction, price, confidence, source,
     except Exception:
         pass  # non-fatal
 
+    # ── V2 EXECUTION-TIME RE-VALIDATION ──────────────────────────────────
+    # Re-check velocity and momentum before placing trade.
+    # Signals are detected at one time but executed later. Conditions may
+    # have changed between detection and execution (signal staleness).
+    if source and 'bb-bounce-v2-long' in source:
+        try:
+            import sys as _sys
+            _sys.path.insert(0, '/root/.hermes/scripts')
+            from signals.bb_bounce_v2_long import _get_15m_velocity, _get_30m_momentum
+            from hermes_constants import BB_BOUNCE_V2_VEL_MIN, BB_BOUNCE_V2_MOM_MIN
+            
+            _vel = _get_15m_velocity(token)
+            _mom = _get_30m_momentum(token)
+            
+            if _vel is not None and _vel < BB_BOUNCE_VEL_MIN:
+                log(f'  🚫 [V2-RECHECK] {token} {direction} BLOCKED — velocity {_vel:.3f}% < {BB_BOUNCE_VEL_MIN}% (still falling)')
+                return False, f'v2 recheck: velocity {_vel:.3f}% < {BB_BOUNCE_VEL_MIN}%'
+            if _mom is not None and _mom < BB_BOUNCE_V2_MOM_MIN:
+                log(f'  🚫 [V2-RECHECK] {token} {direction} BLOCKED — momentum {_mom:.4f} < {BB_BOUNCE_V2_MOM_MIN} (not uptrend)')
+                return False, f'v2 recheck: momentum {_mom:.4f} < {BB_BOUNCE_V2_MOM_MIN}'
+        except Exception as e:
+            log(f'  ⚠️ [V2-RECHECK] {token} {direction} — error {e} (fail-open)')
+
     try:
         log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
