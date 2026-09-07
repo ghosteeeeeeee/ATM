@@ -5,11 +5,12 @@ ema300_dip_long.py — EMA300 Dip Buyer Signal for LONG entries.
 Buys dips to EMA300 during confirmed strong uptrends.
 Only fires when:
   1. Price > EMA300 (uptrend confirmed)
-  2. >80% of last 100 candles above EMA300 (trend strength)
+  2. >85% of last 100 candles above EMA300 (trend strength)
   3. EMA300 slope > 0 (uptrend is real)
-  4. Price within 0.5% of EMA300 (dip)
-  5. RSI < 35 (oversold within uptrend)
+  4. Price within 0.3-0.5% of EMA300 (meaningful dip)
+  5. RSI < 38 (oversold within uptrend)
   6. Green candle (bounce confirmation)
+  7. BTC trend > 0.5% (BTC supporting, not crashing)
 
 Signal type: ema300_dip_long
 Source: ema300-dip-long
@@ -28,10 +29,12 @@ from hermes_constants import (
     EMA300_DIP_LONG_ENABLED,
     EMA300_DIP_LONG_EMA_PERIOD,
     EMA300_DIP_LONG_MAX_DIST_PCT,
+    EMA300_DIP_LONG_MIN_DIST_PCT,
     EMA300_DIP_LONG_MIN_RSI,
     EMA300_DIP_LONG_MAX_RSI,
     EMA300_DIP_LONG_MIN_TREND_STRENGTH,
     EMA300_DIP_LONG_MIN_EMA_SLOPE,
+    EMA300_DIP_LONG_MIN_BTC_TREND,
     EMA300_DIP_LONG_COOLDOWN,
     EMA300_DIP_LONG_TP_PCT,
     EMA300_DIP_LONG_SL_PCT,
@@ -114,10 +117,26 @@ def detect_ema300_dip_long(token, candles, price):
     else:
         return None
     
-    # ── Condition 4: Price within 0.8% of EMA300 (dip) ─────────────────
+    # ── Condition 4: Price within 0.3-0.5% of EMA300 (meaningful dip) ─────
     dist = (current_price - current_ema) / current_ema * 100
-    if dist < 0 or dist > EMA300_DIP_LONG_MAX_DIST_PCT:
+    if dist < EMA300_DIP_LONG_MIN_DIST_PCT or dist > EMA300_DIP_LONG_MAX_DIST_PCT:
         return None
+    
+    # ── Condition 4b: BTC trend must be supporting (> MIN_BTC_TREND) ─────
+    # Don't buy when BTC is crashing — token won't follow
+    try:
+        btc_conn = sqlite3.connect(_PRICE_DB, timeout=5)
+        btc_rows = btc_conn.execute('''SELECT price FROM price_history 
+            WHERE token='BTC' ORDER BY timestamp DESC LIMIT 360''').fetchall()
+        btc_conn.close()
+        
+        if len(btc_rows) >= 360:
+            btc_prices = [r[0] for r in reversed(btc_rows)]
+            btc_trend = (btc_prices[-1] - btc_prices[0]) / btc_prices[0] * 100
+            if btc_trend < EMA300_DIP_LONG_MIN_BTC_TREND:
+                return None  # BTC crashing — token won't follow
+    except Exception:
+        pass  # If BTC data unavailable, don't block
     
     # ── Condition 5: RSI < 40 ──────────────────────────────────────────
     if len(closes) >= 15:

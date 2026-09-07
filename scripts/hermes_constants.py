@@ -1563,14 +1563,16 @@ R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 EMA300_DIP_LONG_ENABLED = False           # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13. 6h: 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
 EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
 EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
+EMA300_DIP_LONG_MIN_DIST_PCT = 0.3        # min distance from EMA300 (%) — require meaningful dip, not noise
 EMA300_DIP_LONG_MIN_RSI = 15              # min RSI — don't buy crashes
 EMA300_DIP_LONG_MAX_RSI = 38              # max RSI — loosened from 35
 EMA300_DIP_LONG_MIN_TREND_STRENGTH = 85   # min % of last 100 candles above EMA300 — tightened from 75, R:R was 0.39:1
 EMA300_DIP_LONG_MIN_EMA_SLOPE = 0.0       # min EMA300 slope (%) — require positive slope, no falling EMA entries
+EMA300_DIP_LONG_MIN_BTC_TREND = 0.5       # min BTC 1h trend (%) — only buy when BTC supporting, not crashing
 EMA300_DIP_LONG_COOLDOWN = 15             # cooldown between entries (candles = 15 min)
 EMA300_DIP_LONG_TP_PCT = 1.0              # take profit (%)
 EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
-# Backtest: 229 trades, 54% WR, +0.01% avg PnL (CFX: 70% WR, +12.69% total)
+# Backtest: 52 trades, 63.5% WR (33W/19L). With MIN_DIST>=0.3% + BTC>0.5%: 75% WR (12W/4L)
 # Optimal: TP 1.0% / SL 1.5% on tokens with 70%+ candles above EMA300
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
