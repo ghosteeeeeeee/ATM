@@ -1087,3 +1087,11 @@
   WHY: 3T last hour (1W 2L -$0.03). 51T/24h 56.9%WR -$1.12. Kill criteria not met. atr_sl_hit 21.5% under 40%. slow-grind+ degraded 6 consecutive hours (14T 35.7%WR -$0.88) but no trades last hour so not killable by rule (needs 3+T at 0%WR). coil-spring+ 11T rotating out naturally. bb-bounce-v2-long+ 10T 80%WR +$0.31 star. pump-chain+ 8T 100%WR +$0.31 star. Trade freq 2/hr normal. Open 3 ($17 — TURBO SHORT r2-trend, SOL LONG slow-grind+, WLFI SHORT r2-trend). No signal has 3+T 0%WR in last hour. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 08:07 UTC
+[2026-09-07 08:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet). 48T/24h 56.2%WR -$1.17. Kill criteria not met (0 trades closed = no signal can trigger 3+T 0%WR). atr_sl_hit 21% healthy. slow-grind+ degraded 6h+ but no trades last hour so not killable by rule. bb-bounce-v2-long+ 9T 78%WR +$0.25 star. pump-chain+ 8T 100%WR +$0.31 star. coil-spring+ 9T rotating out naturally. Trade freq 0/hr. Open 3 ($39 — TURBO SHORT 6.2h stale, SOL LONG slow-grind+ 2.1h, WLFI SHORT 1.3h). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 09:07 UTC
+[2026-09-07 10:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.09). 50T/24h 56%WR -$1.09. Kill criteria not met. atr_sl_hit 24% healthy. slow-grind+ degraded 8h+ (14T 35.7%WR -$0.88) but 0T last hour not killable (needs 3+T at 0%WR). coil-spring+ 6T rotating out naturally. bb-bounce-v2-long+ 9T 77.8%WR +$0.25 star. pump-chain+ 11T 90.9%WR +$0.27 star. Trade freq 2/hr normal. Open 4 (SOL slow-grind+ 4.1h flat, WLFI r2-trend 3.4h flat, ATOM pump-chain+ 1.8h -$0.13, DYDX pump-chain+ 0.2h flat). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 11:10 UTC

@@ -1,4 +1,33 @@
 
+## [2026-09-07 10:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L -$0.09)
+**24h:** 50T 56%WR -$1.09
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (40%) avg +$0.047
+- cut-loser-CL-T1: 13T (26%) avg -$0.160
+- atr_sl_hit: 12T (24%) avg -$0.067
+- profit-monster-T1: 5T (10%) avg +$0.128
+
+**24h Signal Leaders:**
+- pump-chain+: 11T 90.9%WR +$0.27 (star)
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.25 (star)
+- slow-grind+: 14T 35.7%WR -$0.88 (degraded 8h+)
+- coil-spring+: 6T 0%WR -$0.69 (rotating out)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: no signal has 3+T 0%WR last hour
+- atr_sl_hit 24% healthy (under 40%)
+- Trade freq 1-5/hr normal
+- pump-chain+ and bb-bounce-v2-long+ both stars
+- coil-spring+ rotating out naturally
+
+**Open Questions:**
+- slow-grind+ degraded 8 consecutive hours (14T 35.7%WR -$0.88). SOL LONG open 4.1h at -$0.02 flat. No trades last hour so not killable by rule (needs 3+T 0%WR). Structural underperformance — if next burst loses, strongest preemptive kill candidate.
+- 24h PnL -$1.09 slightly negative. System performing at baseline, no edge degradation.
 
 ## [2026-09-07 06:07 UTC] Hourly Analysis
 
@@ -2660,3 +2689,63 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 **Open Questions:**
 - slow-grind+ degraded 6 consecutive hours. Still rotating — no trades last hour, 1 open SOL LONG flat. If next burst loses, becomes stronger candidate for preemptive kill despite strict rule.
 - coil-spring+ still in 24h window (11T -$0.49), rotating out naturally.
+
+## [2026-09-07 08:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**Open:** 3 ($39 — TURBO SHORT r2-trend 6.2h, SOL LONG slow-grind+ 2.1h, WLFI SHORT r2-trend 1.3h)
+**24h Context:** 48T 56.2%WR -$1.17
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (42%) avg +$0.046
+- cut-loser-CL-T1: 13T (27%) avg -$0.160
+- atr_sl_hit: 10T (21%) avg -$0.064
+- profit-monster-T1: 5T (10%) avg +$0.128
+
+**24h Signal Leaders:**
+- pump-chain+: 8T 100%WR +$0.31 (star)
+- bb-bounce-v2-long+: 9T 78%WR +$0.25 (star)
+- slow-grind+: 14T 36%WR -$0.88 (degraded 6h+)
+- coil-spring+: 9T 33%WR -$0.48 (rotating out)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: 0 trades closed last hour, no signal can trigger 3+T 0%WR
+- atr_sl_hit 21% healthy (under 40%)
+- Trade freq 0/hr normal
+- bb-bounce-v2-long+ and pump-chain+ both stars
+
+**Open Questions:**
+- slow-grind+ degraded 6+ consecutive hours. SOL LONG open at -$0.07. If next burst loses, becomes stronger kill candidate.
+- TURBO SHORT at 6.2h getting stale — not a signal issue, just age.
+- coil-spring+ still in 24h window (9T -$0.48) rotating out naturally.
+
+## [2026-09-07 09:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (3W 0L +$0.16)
+**24h:** 50T 55%WR -$1.09
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 21T (42%) avg +$0.047
+- cut-loser-CL-T1: 13T (26%) avg -$0.160
+- atr_sl_hit: 11T (22%) avg -$0.056
+- profit-monster-T1: 5T (10%) avg +$0.128
+
+**24h Signal Leaders:**
+- pump-chain+: 10T 100%WR +$0.45 (star)
+- bb-bounce-v2-long+: 9T 78%WR +$0.25 (star)
+- slow-grind+: 14T 36%WR -$0.88 (degraded 7h+)
+- coil-spring+: 8T 25%WR -$0.55 (rotating out)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: no signal has 3+T 0%WR last hour
+- atr_sl_hit 22% healthy (under 40%)
+- Trade freq 3/hr normal
+- pump-chain+ and bb-bounce-v2-long+ both stars
+
+**Open Questions:**
+- slow-grind+ degraded 7 consecutive hours (14T 35.7%WR -$0.88). SOL LONG open at 3.1h $11. Not killable by strict rule (0T last hour), but structural underperformance — if next burst loses, becomes strongest preemptive kill candidate.
+- coil-spring+ still in 24h window (8T -$0.55) rotating out naturally.
