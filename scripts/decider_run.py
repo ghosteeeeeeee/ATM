@@ -1713,9 +1713,9 @@ def execute_trade(token, direction, price, confidence, source,
             _vel = _get_15m_velocity(token)
             _mom = _get_30m_momentum(token)
             
-            if _vel is not None and _vel < BB_BOUNCE_VEL_MIN:
-                log(f'  🚫 [V2-RECHECK] {token} {direction} BLOCKED — velocity {_vel:.3f}% < {BB_BOUNCE_VEL_MIN}% (still falling)')
-                return False, f'v2 recheck: velocity {_vel:.3f}% < {BB_BOUNCE_VEL_MIN}%'
+            if _vel is not None and _vel < BB_BOUNCE_V2_VEL_MIN:
+                log(f'  🚫 [V2-RECHECK] {token} {direction} BLOCKED — velocity {_vel:.3f}% < {BB_BOUNCE_V2_VEL_MIN}% (still falling)')
+                return False, f'v2 recheck: velocity {_vel:.3f}% < {BB_BOUNCE_V2_VEL_MIN}%'
             if _mom is not None and _mom < BB_BOUNCE_V2_MOM_MIN:
                 log(f'  🚫 [V2-RECHECK] {token} {direction} BLOCKED — momentum {_mom:.4f} < {BB_BOUNCE_V2_MOM_MIN} (not uptrend)')
                 return False, f'v2 recheck: momentum {_mom:.4f} < {BB_BOUNCE_V2_MOM_MIN}'
