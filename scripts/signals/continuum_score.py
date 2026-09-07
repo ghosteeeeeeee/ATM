@@ -60,6 +60,10 @@ def detect():
     
     score, price, ts = result
     
+    # Null guard
+    if score is None:
+        return None
+    
     # Check staleness (should be within last 5 minutes)
     age_minutes = (time.time() - ts) / 60
     if age_minutes > 5:
@@ -126,7 +130,7 @@ def scan_signals():
     
     if sid:
         added += 1
-        set_cooldown('BTC', direction, minutes=CONTINUUM_SCORE_COOLDOWN_MIN)
+        set_cooldown('BTC', direction, hours=CONTINUUM_SCORE_COOLDOWN_MIN / 60.0)
         print(f"[continuum-score] Signal fired: {direction} | Score={sig['value']:.1f} | Price=${sig['price']:.1f}")
     
     return added
