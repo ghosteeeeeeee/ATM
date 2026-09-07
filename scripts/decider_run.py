@@ -3462,37 +3462,77 @@ def run(dry_run=False):
                 _record_hotset_failure(token, direction, failures)
                 continue
 
-        # ── EMA300 CONDITION CHECK for SHORT trades ─────────────────────────
-        # Block SHORT trades when EMA300 is rising or price is above EMA300
+        # ── EMA300 FULL CONDITION CHECK for SHORT trades ──────────────────────
+        # Re-validates ALL 6 detection conditions at execution time
+        # Prevents stale signals from executing when conditions have changed
         if direction.upper() == 'SHORT' and 'ema300-dip-short' in (source or ''):
-            log(f'  🔍 [EMA300-CHECK] {token} {direction} — checking EMA conditions...')
+            log(f'  🔍 [EMA300-CHECK] {token} {direction} — re-validating all conditions...')
             try:
                 _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
                 _ema_rows = _conn_ema.execute(
-                    "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 400",
+                    "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 700",
                     (token.upper(),)
                 ).fetchall()
                 _conn_ema.close()
-                if _ema_rows and len(_ema_rows) >= 300:
+                if _ema_rows and len(_ema_rows) >= 500:
                     _prices = [r[0] for r in reversed(_ema_rows)]
+                    # Compute EMA300
                     _ema_vals = []
                     _ema_v = _prices[0]
                     _k2 = 2.0 / 301
                     for _p in _prices:
                         _ema_v = _p * _k2 + _ema_v * (1 - _k2)
                         _ema_vals.append(_ema_v)
+                    _current_price = _prices[-1]
+                    _current_ema = _ema_vals[-1]
+                    _dist = (_current_price - _current_ema) / _current_ema * 100
                     _ema_slope = (_ema_vals[-1] - _ema_vals[-20]) / _ema_vals[-20] * 100 if len(_ema_vals) >= 20 else 0
-                    _dist = (_prices[-1] - _ema_vals[-1]) / _ema_vals[-1] * 100
-                    if _ema_slope >= 0:
-                        log(f'SKIP: {token} {direction} — EMA300 slope={_ema_slope:+.4f}% >= 0 (EMA rising), not valid SHORT')
-                        skipped += 1
-                        continue
+
+                    # C1: Price below EMA300
                     if _dist > 0:
-                        log(f'SKIP: {token} {direction} — price above EMA300 (dist={_dist:+.4f}%), not valid SHORT')
-                        skipped += 1
-                        continue
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C1: price above EMA300 (dist={_dist:+.4f}%)')
+                        skipped += 1; continue
+
+                    # C2: Strong downtrend (>85% candles below EMA300)
+                    _lookback = min(100, len(_prices))
+                    _above = sum(1 for i in range(len(_prices)-_lookback, len(_prices)) if _prices[i] > _ema_vals[i])
+                    _trend = 100 - (_above / _lookback * 100)
+                    if _trend < 85:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C2: weak downtrend ({_trend:.0f}% < 85%)')
+                        skipped += 1; continue
+
+                    # C3: EMA300 slope < 0 (falling)
+                    if _ema_slope >= 0:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C3: EMA rising ({_ema_slope:+.4f}%)')
+                        skipped += 1; continue
+
+                    # C4: Price within 0.5% of EMA300
+                    if abs(_dist) > 0.5:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C4: too far from EMA ({_dist:+.4f}%)')
+                        skipped += 1; continue
+
+                    # C5: RSI > 65 (overbought)
+                    _deltas = [_prices[i]-_prices[i-1] for i in range(1,len(_prices))]
+                    _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
+                    _losses_r = [-d if d < 0 else 0 for d in _deltas[-14:]]
+                    _avg_gain = sum(_gains)/14; _avg_loss = sum(_losses_r)/14
+                    _rsi = 100-(100/(1+_avg_gain/_avg_loss)) if _avg_loss > 0 else 100.0
+                    if _rsi < 65:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C5: RSI not overbought ({_rsi:.1f} < 65)')
+                        skipped += 1; continue
+
+                    # C6: Red candle (close < previous close)
+                    if _prices[-1] >= _prices[-2]:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C6: not red candle (close >= prev)')
+                        skipped += 1; continue
+
+                    log(f'  ✅ [EMA300-CHECK] {token} — all 6 conditions PASS')
+                else:
+                    log(f'  🚫 [EMA300-CHECK] {token} — not enough data ({len(_ema_rows)} rows)')
+                    skipped += 1; continue
             except Exception as _e:
-                log(f'  WARN: EMA300 check failed for {token}: {_e}')
+                log(f'  🚫 [EMA300-CHECK] {token} — ERROR: {_e} — BLOCKED (fail-closed)')
+                skipped += 1; continue
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
