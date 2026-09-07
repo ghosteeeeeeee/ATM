@@ -37,6 +37,8 @@ from hermes_constants import (
     OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
     NEUTRAL_SNIPER_ENABLED, NEUTRAL_SNIPER_PLUS_ENABLED, NEUTRAL_SNIPER_MINUS_ENABLED,
     SLOW_GRIND_LONG_ENABLED,
+    PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+    CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
 )
 
 
@@ -223,6 +225,16 @@ except Exception:
     _open_skies_run = None
 
 try:
+    from signals.pullback_entry import run as _pullback_entry_run
+except Exception:
+    _pullback_entry_run = None
+
+try:
+    from signals.continuum_score import run as _continuum_score_run
+except Exception:
+    _continuum_score_run = None
+
+try:
     from signals.neutral_sniper import run as _neutral_sniper_run
 except Exception:
     _neutral_sniper_run = None
@@ -271,6 +283,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pump_flow_signal',          'enabled': 'PUMP_FLOW_ENABLED',             'run': _pump_flow_signal_run},
     {'name': 'open_skies',                'enabled': 'OPEN_SKIES_ENABLED',            'run': _open_skies_run},
     {'name': 'neutral_sniper',            'enabled': 'NEUTRAL_SNIPER_ENABLED',        'run': _neutral_sniper_run},
+    {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
+    {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
 ]
 
 

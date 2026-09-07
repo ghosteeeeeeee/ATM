@@ -245,10 +245,13 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'AIXBT',
-    'BABY',
+    'ATOM',
+    'BLUR',
+    'CFX',
     'DOGE',
     'DOT',
     'FOGO',
+    'GRASS',
     'INJ',
     'KAS',
     'LTC',
@@ -256,9 +259,7 @@ FAVORITES = {
     'MNT',
     'NXPC',
     'POL',
-    'SEI',
     'TURBO',
-    'YGG',
     'ZRO'
 }
 
@@ -1899,6 +1900,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
+    'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -2856,3 +2858,44 @@ OPEN_SKIES_SUPPORT_STRONG       = 5       # support levels for strong floor bonu
 OPEN_SKIES_SUPPORT_MODERATE     = 3       # support levels for moderate floor bonus
 OPEN_SKIES_SMA50_STRONG         = 3.0     # % — distance from SMA50 for strong trend bonus
 OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for moderate trend bonus
+
+# ── pullback_entry (post-impulse consolidation) ─────────────────────────────
+# pullback_entry.py — buy low-volume pullbacks after strong moves, before continuation
+# Classification: Mean-reversion (buying the dip = contrarian, allowed in CHOP)
+PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
+PULLBACK_ENTRY_PLUS_ENABLED      = True    # LONG direction
+PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
+
+# Detection parameters
+PULLBACK_IMPULSE_MIN_PCT         = 0.3     # min % move for impulse
+PULLBACK_IMPULSE_LOOKBACK        = 10      # candles to look back for impulse
+PULLBACK_DIP_MIN_PCT             = 0.10    # min % drop from impulse high/low
+PULLBACK_VOLUME_RATIO            = 0.3     # volume < 30% of 20-period average
+PULLBACK_BB_WIDTH_MAX            = 0.8     # BB width < 0.8%
+PULLBACK_RSI_MIN                 = 45      # RSI > 45 (LONG) or < 55 (SHORT)
+PULLBACK_RSI_MAX                 = 70      # RSI < 70 (LONG) or > 30 (SHORT)
+PULLBACK_EMA_PERIOD              = 20      # EMA period for trend check
+
+# Risk management
+PULLBACK_ENTRY_COOLDOWN_HOURS    = 0.5     # per-token cooldown (30 min)
+
+# Confidence
+PULLBACK_CONF_BASE               = 75      # base confidence
+PULLBACK_CONF_CAP                = 88      # max confidence (system ceiling)
+
+# Confidence bonuses
+PULLBACK_CONF_IMPULSE_STRONG_PCT = 0.5     # impulse % threshold for strong bonus
+PULLBACK_CONF_VOL_DRY_THRESHOLD  = 0.15    # volume ratio threshold for dry bonus
+PULLBACK_CONF_BB_SQUEEZE_THRESHOLD = 0.2   # BB width threshold for squeeze bonus
+PULLBACK_CONF_BONUS_STRONG       = 5       # confidence bonus for strong impulse
+PULLBACK_CONF_BONUS_DRY          = 5       # confidence bonus for very low volume
+PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
+
+# ── Continuum Score Signal ───────────────────────────────────────────────────
+# continuum_score.py — fires signals when continuum engine reaches extreme scores
+CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
+CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction (score hits 100)
+CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction (score hits 0)
+CONTINUUM_SCORE_LONG_THRESHOLD       = 100     # score >= this → LONG signal
+CONTINUUM_SCORE_SHORT_THRESHOLD      = 0       # score <= this → SHORT signal
+CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
