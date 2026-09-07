@@ -2515,3 +2515,37 @@ Final set: ['AIXBT', 'ATOM', 'BLUR', 'CFX', 'DOGE', 'DOT', 'FOGO', 'GRASS', 'INJ
 **Open Questions:**
 - coil-spring+ 15T in 24h window, rotates out ~15:07 UTC today
 - 3h negative streak improving to flat (-$0.01 last hour)
+
+## [2026-09-07 04:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.13)
+**24h Context:** 46T 52.2%WR -$1.55
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 18T (39%) avg +$0.053 — carrying system
+- cut-loser-CL-T1: 15T (33%) avg -$0.160 — normal
+- atr_sl_hit: 8T (17%) avg -$0.093 — healthy
+- profit-monster-T1: 5T (11%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.28 — star
+- pump-chain+: 4T 100%WR +$0.11 — star
+- slow-grind+: 14T 35.7%WR -$0.88 — degraded 4 consecutive hours
+- coil-spring+: 14T 35.7%WR -$0.76 — rotating out
+
+**Kill Criteria Check:**
+- slow-grind+: 1T last hour at 0%WR — NOT killable (needs 3+T)
+- atr_sl_hit 17% — healthy
+- Trade freq 1/hr — normal
+- Open 2 ($27.70 — STX SHORT, TURBO SHORT)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System steady at 52.2% WR
+- slow-grind+ degraded but not killable
+- coil-spring+ rotating out naturally
+
+**Open Questions:**
+- slow-grind+ 4 consecutive negative hours. Was profitable at 23:00 UTC, then collapsed. Not killable by rule but trending badly. Monitor next hour — if still negative, consider preemptive kill.
