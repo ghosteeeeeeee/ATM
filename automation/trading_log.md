@@ -2625,3 +2625,38 @@ Final set: ['AIXBT', 'ATOM', 'BLUR', 'CFX', 'DOGE', 'DOT', 'FOGO', 'GRASS', 'INJ
 - ADD ETC (WR=40.0%, PnL=$-0.20, low_wr (40.0%))
 
 Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO', 'NOT', 'STX', 'W', 'ZEN']
+
+## [2026-09-07 07:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L, -$0.03)
+**Open:** 3 ($17 — TURBO SHORT r2-trend, SOL LONG slow-grind+, WLFI SHORT r2-trend)
+**24h Context:** 51T 56.9%WR -$1.12
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 22T (43%) avg +$0.051
+- cut-loser-CL-T1: 13T (25%) avg -$0.160
+- atr_sl_hit: 11T (22%) avg -$0.074
+- profit-monster-T1: 5T (10%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 10T 80%WR +$0.31 (star)
+- pump-chain+: 8T 100%WR +$0.31 (star)
+- slow-grind+: 14T 35.7%WR -$0.88 (degraded 6h)
+- coil-spring+: 11T 36.4%WR -$0.49 (rotating out)
+
+**Last Hour Closed:**
+- NEO bb-bounce-v2-long+ LONG: +$0.03 profit-monster-trail
+- WLD open-skies+ LONG: +$0.14 atr_sl_hit
+- USUAL open-skies+ LONG: -$0.20 atr_sl_hit
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: no signal has 3+T 0%WR last hour
+- atr_sl_hit 21.5% healthy (under 40%)
+- Trade freq 2/hr normal
+- bb-bounce-v2-long+ and pump-chain+ both stars
+
+**Open Questions:**
+- slow-grind+ degraded 6 consecutive hours. Still rotating — no trades last hour, 1 open SOL LONG flat. If next burst loses, becomes stronger candidate for preemptive kill despite strict rule.
+- coil-spring+ still in 24h window (11T -$0.49), rotating out naturally.

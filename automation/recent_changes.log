@@ -1083,3 +1083,7 @@
   WHY: 1T last hour (0W 1L -$0.13). 46T/24h 52.2%WR -$1.55. Kill criteria not met. atr_sl_hit 17% healthy. slow-grind+ degraded 4 consecutive hours (14T 35.7%WR -$0.88) but 1T last hour not killable (needs 3+T at 0%WR). Excl coil-spring: 32T 59.4%WR -$0.67. coil-spring+ 14T rotating out by ~15:00 UTC. Trade freq 1/hr normal. Open 2 ($27.70 — STX SHORT 3h, TURBO SHORT 2.2h both flat). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 05:07 UTC
+[2026-09-07 07:07 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.03). 51T/24h 56.9%WR -$1.12. Kill criteria not met. atr_sl_hit 21.5% under 40%. slow-grind+ degraded 6 consecutive hours (14T 35.7%WR -$0.88) but no trades last hour so not killable by rule (needs 3+T at 0%WR). coil-spring+ 11T rotating out naturally. bb-bounce-v2-long+ 10T 80%WR +$0.31 star. pump-chain+ 8T 100%WR +$0.31 star. Trade freq 2/hr normal. Open 3 ($17 — TURBO SHORT r2-trend, SOL LONG slow-grind+, WLFI SHORT r2-trend). No signal has 3+T 0%WR in last hour. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 08:07 UTC
