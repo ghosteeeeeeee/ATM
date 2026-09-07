@@ -2899,3 +2899,5 @@ CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction (score hits 0)
 CONTINUUM_SCORE_LONG_THRESHOLD       = 98      # score >= this → LONG signal
 CONTINUUM_SCORE_SHORT_THRESHOLD      = 2       # score <= this → SHORT signal
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
+CONTINUUM_SCORE_STALENESS_MIN        = 5       # max age of continuum data in minutes
+CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme scores

@@ -22,6 +22,8 @@ from hermes_constants import (
     CONTINUUM_SCORE_LONG_THRESHOLD,
     CONTINUUM_SCORE_SHORT_THRESHOLD,
     CONTINUUM_SCORE_COOLDOWN_MIN,
+    CONTINUUM_SCORE_STALENESS_MIN,
+    CONTINUUM_SCORE_CONF_BASE,
 )
 
 SIGNAL_TYPE_LONG = 'continuum_score_long'
@@ -66,7 +68,7 @@ def detect():
     
     # Check staleness (should be within last 5 minutes)
     age_minutes = (time.time() - ts) / 60
-    if age_minutes > 5:
+    if age_minutes > CONTINUUM_SCORE_STALENESS_MIN:
         print(f"[continuum-score] Stale data: {age_minutes:.0f}min old, skipping")
         return None
     
@@ -74,7 +76,7 @@ def detect():
     if score <= CONTINUUM_SCORE_SHORT_THRESHOLD:
         return {
             'direction': 'SHORT',
-            'confidence': 85,  # High confidence for extreme scores
+            'confidence': CONTINUUM_SCORE_CONF_BASE,
             'value': score,
             'price': price,
         }
@@ -83,7 +85,7 @@ def detect():
     if score >= CONTINUUM_SCORE_LONG_THRESHOLD:
         return {
             'direction': 'LONG',
-            'confidence': 85,  # High confidence for extreme scores
+            'confidence': CONTINUUM_SCORE_CONF_BASE,
             'value': score,
             'price': price,
         }
