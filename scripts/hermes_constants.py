@@ -1130,7 +1130,6 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike',           # proven momentum breakout
     'r2-trend-long',       # proven (51-100% WR across variants) — ATR SL, not PM Trail
-    'r2-trend-short',      # proven (100% WR on many variants) — ATR SL, not PM Trail
     'bb_bounce+',          # proven (59% WR, +1.69 PnL) — ATR SL, not PM Trail
     'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
@@ -1589,7 +1588,7 @@ EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
 EMA300_DIP_SHORT_MAX_RSI = 85         # max RSI — don't short extreme overbought
 EMA300_DIP_SHORT_MIN_TREND_STRENGTH = 85  # min % of last 100 candles below EMA300
-EMA300_DIP_SHORT_MAX_EMA_SLOPE = 0.0  # max EMA300 slope (%) — require negative slope
+EMA300_DIP_SHORT_MAX_EMA_SLOPE = -0.1  # max EMA300 slope (%) — require meaningful downtrend (was 0.0, too many weak signals)
 EMA300_DIP_SHORT_COOLDOWN = 15        # cooldown between entries (candles = 15 min)
 EMA300_DIP_SHORT_TP_PCT = 1.0         # take profit (%)
 EMA300_DIP_SHORT_SL_PCT = 1.5         # stop loss (%)
