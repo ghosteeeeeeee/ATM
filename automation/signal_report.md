@@ -1,38 +1,33 @@
 === Signal Performance Report ===
-Period: 2026-09-07 11:10 — 17:10 UTC (6h) / 2026-09-06 17:10 — 2026-09-07 17:10 UTC (24h)
-Total 24h: 47 trades, +$0.33 PnL
+Period: 2026-09-07 18:00 — 2026-09-08 00:00 UTC (6h) / 2026-09-07 00:00 — 2026-09-08 00:00 UTC (24h)
+Total 24h: 59 trades, 61% WR, +$0.19 PnL
 
 ## KILLED (executed this run)
-None — losers already killed:
-- `slow-grind+` LONG: killed by ORCHESTRATOR 2026-09-07 (SLOW_GRIND_LONG_ENABLED=False, NEVER_REENABLE). 15T/24h 40% WR -$0.80. Trades after kill are pipeline draining.
-- `coil-spring+` LONG: killed 2026-09-06 15:07 UTC (COILED_SPRING_PLUS_ENABLED=False).
+None — no active kill candidates. Losers already killed:
+- `slow-grind+` LONG: killed by ORCHESTRATOR 2026-09-07 (SLOW_GRIND_LONG_ENABLED=False, NEVER_REENABLE). 12T last 24h 25% WR -$1.22. Trades after kill are pipeline draining.
 
 ## BOOSTED (executed this run)
-None — no confidence/hotset changes made.
+None — no signals meet boost criteria (WR>55% + PnL>$0.05 + 5+ trades). Top performers already enabled.
 
 ## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Avg PnL | Status |
-|--------|-----|-----|-----|--------|---------|--------|
-| slow-grind+ | LONG | 40.0% | -$0.80 | 15 | -$0.053 | KILLED (already) |
-| open-skies+ | LONG | 50.0% | -$0.23 | 4 | -$0.058 | WATCH (low sample) |
-| continuation+ | LONG | 0.0% | -$0.28 | 1 | -$0.280 | WATCH (1 trade only) |
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| slow-grind+ | LONG | 25.0% | -$1.22 | 12 | KILLED (pipeline drain) |
 
 ## WINNERS
-| Signal | Dir | WR | PnL | Trades | Avg PnL | Status |
-|--------|-----|-----|-----|--------|---------|--------|
-| pump-chain+ | LONG | 89.5% | $0.64 | 19 | $0.034 | ACTIVE — top performer |
-| bb-bounce-v2-long+ | LONG | 77.8% | $0.41 | 9 | $0.046 | ACTIVE — strong, best avg PnL |
-
-## 6h Snapshot (active signals only)
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| pump-chain+ | LONG | 100% | $0.55 | 7 |
-| bb-bounce-v2-long+ | LONG | 60% | $0.21 | 5 |
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 83.3% | +$0.48 | 18 | ACTIVE |
+| bb-bounce-v2-long+ | LONG | 66.7% | +$0.28 | 9 | ACTIVE |
+| ema300-dip-short | SHORT | 75.0% | +$0.05 | 4 | ACTIVE |
+| open-skies+ | LONG | 60.0% | +$0.71 | 5 | ACTIVE |
 
 ## ISSUES
-- No signal inversions found (24h).
-- Total system PnL is +$0.33/24h — **first positive reading since kill cleanup**. Excluding killed signals (slow-grind -$0.80, coil-spring drained), active signals net +$1.13.
-- `pump-chain+` at 89.5% WR / 19 trades is the clear leader. 6h showing 100% WR — on a hot streak.
-- `bb-bounce-v2-long+` has better avg PnL/trade ($0.046 vs $0.034) despite lower WR — more efficient per trade.
-- `open-skies+` at 4 trades is too small to judge. Keep watching.
-- No new kills needed — all clear losers already disabled.
+- No direction inversions detected.
+- slow-grind+ trades draining (SLOW_GRIND_LONG_ENABLED=False, NEVER_REENABLE) — trades from before kill completing. Expected.
+- 6h window only 3 signals with 2+ trades: pump-chain+ (2T, 50% WR, -$0.10), bb-bounce-v2-long+ (2T, 50% WR, -$0.05), ema300-dip-short (4T, 75% WR, +$0.05). Low volume in 6h window — market may be in NEUTRAL regime or weekend slowdown.
+
+## SYSTEM HEALTH
+- Overall 24h WR: 61% (59 trades) — healthy
+- No signal flags need changing — all underperformers already killed
+- No boost candidates needing weight adjustments

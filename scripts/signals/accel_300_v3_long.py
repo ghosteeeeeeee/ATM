@@ -304,7 +304,7 @@ def detect_accel_300_v3_long(token: str, prices: list, params: dict = None) -> O
     MIN_PULLBACK = _p.get('ACCEL_300_V3_LONG_MIN_PULLBACK', ACCEL_300_V3_LONG_MIN_PULLBACK)
     MAX_PULLBACK = _p.get('ACCEL_300_V3_LONG_MAX_PULLBACK', ACCEL_300_V3_LONG_MAX_PULLBACK)
     REEXPAND_MIN = _p.get('ACCEL_300_V3_LONG_REEXPAND_MIN', ACCEL_300_V3_LONG_REEXPAND_MIN)
-    RSI_MAX = _p.get('ACCEL_300_V3_LONG_RSI_MAX', ACCEL_300_V3_LONG_RSI_MAX)
+    RSI_MAX = min(_p.get('ACCEL_300_V3_LONG_RSI_MAX', ACCEL_300_V3_LONG_RSI_MAX), 68)  # cap at 68 — regime overrides can't loosen this
     RSI_MIN = _p.get('ACCEL_300_V3_LONG_RSI_MIN', ACCEL_300_V3_LONG_RSI_MIN)
     CHASE_MOVE_MAX = _p.get('ACCEL_300_V3_LONG_CHASE_MOVE_MAX', ACCEL_300_V3_LONG_CHASE_MOVE_MAX)
     GREEN_CAP = _p.get('ACCEL_300_V3_LONG_GREEN_CAP', ACCEL_300_V3_LONG_GREEN_CAP)
@@ -440,9 +440,12 @@ def detect_accel_300_v3_long(token: str, prices: list, params: dict = None) -> O
     # ── FILTER 7b: Chase block — don't chase extended moves ────────────────
     # Block entries after large upward moves with overbought RSI
     # Catches SUSHI-type setups: +2.2% in 30m + RSI 77.5
+    # NOTE: Use max(CHASE_MOVE_MAX, 2.0) to prevent regime overrides from
+    # loosening this filter (EXTREME was setting 4.0, letting MON through)
+    _effective_chase_max = min(CHASE_MOVE_MAX, 2.0)  # cap at 2.0 — regime overrides can't loosen this
     if latest_idx >= 30:
         move_30m = (closes[latest_idx] - closes[latest_idx - 30]) / closes[latest_idx - 30] * 100
-        if move_30m > CHASE_MOVE_MAX and rsi > ACCEL_300_V3_LONG_CHASE_RSI_MIN:
+        if move_30m > _effective_chase_max and rsi > ACCEL_300_V3_LONG_CHASE_RSI_MIN:
             return None  # chasing spike — pullback imminent
 
     # ── FILTER 8: Persistence — price must stay above EMA ──────────────────

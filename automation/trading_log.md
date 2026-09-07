@@ -3101,3 +3101,23 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 **Open Questions:**
 - WLFI SHORT at 15.3h — monitor for staleness
 - continuation+ and pullback-entry- each 1T/0%WR — too few trades to kill, watch
+
+## [2026-09-07 22:57 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L -$0.07)
+**24h:** 59T 61%WR +$0.19
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 29T (49%) avg +$0.078 ⭐
+- cut-loser-CL-T1: 15T (25%) avg -$0.146
+- atr_sl_hit: 12T (20%) avg -$0.014 ✅
+
+**No Change Needed:**
+- Kill criteria: slow-grind+ already killed. No other signal at threshold.
+- atr_sl_hit 20% healthy ✅
+- Trade freq 2/hr normal ✅
+- 4 open positions (WLFI 16h stale, rest fresh)
+- 24h PnL improved to +$0.19
+
+**Open Questions:**
+- WLFI SHORT 16h stale — monitor

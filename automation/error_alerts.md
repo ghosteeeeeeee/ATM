@@ -89,3 +89,10 @@
 - **WARN**: 3 timers permanently broken (atr-sl-updater, ma-cross-5m-tuner, zscore-momentum-tuner) — no unit, never fired
 - **INFO**: hl-sync-guardian last fired 3 days ago (Sep 4) — may be stale
 - **AUTO-FIX**: None needed — all non-critical
+
+## Error Alerts — 2026-09-07 23:25 UTC
+- **WARN** (1x): `signal_compactor` timeout at 23:21:02 — transient, recovered on next run
+- **WARN** (ongoing): `chop_detector.py:155` — `CHOP_DETECTOR_BTC_MOM_THRESHOLD` import fails → defaults to conservative (is_flat=True), non-critical
+- **INFO**: Pipeline healthy — 61 trades today, +13.56% PnL, 4 open positions
+- **INFO**: Disk at 81% (91G/118G) — below 85% threshold
+- **AUTO-FIX**: None needed — all non-critical
