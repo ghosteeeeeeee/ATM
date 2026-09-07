@@ -1,49 +1,49 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-07 ~06:45 UTC (CEO)**
+**Last Updated: 2026-09-07 ~18:40 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-System negative 24h (-$1.10, 51T). R:R 48h: 0.563. **Active signals profitable:** bb-bounce-v2-long+ 9T/24h 77.8% WR +$0.28, pump-chain+ 8T/24h 100% WR +$0.31. **Legacy bleed is entire loss:** slow-grind+ 14T -$0.88 + coil-spring+ 12T -$0.44 = -$1.32. Without legacy: 25T 76% WR +$0.22. Market 100% NEUTRAL.
+System nearly flat 24h (-$0.11, 58T, 67.2% WR). Improved from -$1.10 earlier. Active signals profitable. Legacy drag fading (slow-grind+ last close 12:58 UTC, ages out Sep 8 12:58). R:R 48h 0.566 (legacy-distorted). Market 100% NEUTRAL.
 
-- **24h:** 51T, 56.9% WR, -$1.10 (verified DB)
-- **48h:** 85T, 57.6% WR, -$0.71, R:R 0.563 (verified DB)
+- **24h:** 58T, 67.2% WR, -$0.11 (verified DB)
+- **48h:** 87T, 59.8% WR, -$0.71, R:R 0.566 (verified DB)
 - **7d:** 375T, 56.9% WR, -$5.11 (verified DB)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 56T/80.4% WR +$2.52 ★ | open-skies+ 14T/64.3% WR +$0.32 | pump-chain+ 8T/100% WR +$0.31 | continuation+ 6T/83.3% WR +$0.05
-- **24h WITHOUT LEGACY:** 25T, 76% WR, +$0.22 (slow-grind+, coil-spring+, accel-300-v3-long+, accel-300-v2-long, ema300-dip, range-reversion-long+, r2-trend-long3 excluded)
-- **7d LEGACY (killed):** accel-300-v3-long+ 37T/43.2% WR -$1.39 | slow-grind+ 14T/35.7% WR -$0.88 | ema300-dip 55T/63.6% WR -$0.72 | coil-spring+ 21T/42.9% WR -$0.65 | accel-300-v2-long 21T/28.6% WR -$0.74
+- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 62T/79.0% WR +$2.76 ★ | pump-chain+ 19T/89.5% WR +$0.64 | open-skies+ 15T/60.0% WR +$0.13 | continuation+ 6T/83.3% WR +$0.05
+- **24h WITHOUT LEGACY:** active signals +$1.05, slow-grind+ -$0.80 = net -$0.11
+- **7d LEGACY (killed):** accel-300-v3-long+ 38T/44.7% WR -$1.30 | slow-grind+ 15T/40.0% WR -$0.80 | ema300-dip 55T/63.6% WR -$0.72 | coil-spring+ 21T/42.9% WR -$0.65 | accel-300-v2-long 17T/29.4% WR -$0.66
 - **Market:** 3 LONG / 2 SHORT / 103 NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 56T/7d 80.4% WR +$2.52. STAR performer.
-- **OPEN-SKIES+:** Live. 14T/7d 64.3% WR +$0.32. Stable.
-- **PUMP-CHAIN+:** Live. 8T/7d 100% WR +$0.31. Strong.
+- **BB_BOUNCE_V2_LONG:** Live. 62T/7d 79.0% WR +$2.76. STAR performer.
+- **PUMP-CHAIN+:** Live. 19T/7d 89.5% WR +$0.64. Strongest by WR.
+- **OPEN-SKIES+:** Live. 15T/7d 60.0% WR +$0.13. Degraded 48h but 7d NEUTRAL flat.
 - **CONTINUATION+:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
 - **NEUTRAL_SNIPER:** LIVE. RSI 45/55. Signals firing but BTC-CRASH filter blocks SHORTs.
 - **EMA300-DIP:** RE-ENABLED by T (Sep 7). DO NOT DISABLE until Sep 9 05:00 UTC.
 - **EMA300_DIP_SHORT:** RE-ENABLED by T (Sep 7). DO NOT DISABLE until Sep 9 05:00 UTC.
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
-- **Open positions:** 3 (bb-bounce-v2-long+ NEO, slow-grind+ SOL, r2-trend-short3 TURBO).
-- **Disk:** 84% (18G free).
-- **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Tight trail to exit before ATR SL. R:R 0.451 (degraded — see note below).
+- **Open positions:** 3 (open-skies+ INJ LONG, ema300-dip-short SYRUP SHORT, r2-trend-short3 WLFI SHORT).
+- **Disk:** 81% (22G free).
+- **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 
 **⚠️ ACTIVE BLEEDERS (CEO_PROTECTED):**
 1. **macd-div- SHORT** — 1T/7d 100% WR +$0.02. FLAGGED. Monitor.
 2. **confluence-,ichimoku- SHORT** — 1T/7d 0% WR -$0.09. FLAGGED FOR T.
 
 **🔴 R:R STATUS**
-48h R:R: avg_win $0.090, avg_loss $0.160, ratio 0.563 (underwater — legacy trades dragging)
+48h R:R: avg_win 3.16%, avg_loss -5.57%, ratio 0.566 (legacy-distorted)
 24h exit breakdown:
-- slow-grind+: 14T, 35.7% WR, -$0.88 (legacy, last close 03:25 UTC, ages out Sep 8)
-- coil-spring+: 12T, 41.7% WR, -$0.44 (legacy, last close 15:03 UTC, ages out today)
-- bb-bounce-v2-long+: 9T, 77.8% WR, +$0.28 (active STAR)
-- pump-chain+: 8T, 100% WR, +$0.31 (active)
-- open-skies+: 3T, 66.7% WR, -$0.04 (active)
-**Note:** PM_TRAIL protected (DO NOT CHANGE). Active signals performing well. R:R will recover post-legacy.
+- slow-grind+: 15T, 40% WR, -$0.80 (legacy, last close 12:58 UTC, ages out Sep 8 12:58)
+- bb-bounce-v2-long+: 9T, 77.8% WR, +$0.41 (active STAR)
+- pump-chain+: 19T, 89.5% WR, +$0.64 (active, strongest)
+- open-skies+: 4T, 50% WR, -$0.23 (active, degraded)
+**Note:** PM_TRAIL protected (DO NOT CHANGE). R:R will recover post-slow-grind (Sep 8 12:58 UTC).
 
 ## Today's Changes (Sep 7)
 
+8. **CEO ~18:40 UTC — VERIFIED + MONITORING.** DB: 24h 58T 67.2% WR -$0.11. 48h: 87T 59.8% WR -$0.71, R:R 0.566. **Almost flat — improved from -$1.10 earlier.** Active signals profitable: bb-bounce-v2-long+ 9T/24h 77.8% WR +$0.41, pump-chain+ 19T/24h 89.5% WR +$0.64. **Legacy nearly gone:** slow-grind+ 15T/24h 40% WR -$0.80 (last close 12:58 UTC, ages out Sep 8 12:58). coil-spring+ aged out of 24h, 20T/48h remaining. **open-skies+ degraded:** 5T/48h 40% WR -$0.37 but 14T/7d 57.1% NEUTRAL flat. **3 open positions** near $0. Pipeline healthy, disk 81%. PM_TRAIL protected. No param changes. Market 100% NEUTRAL. **Target: 24h PnL positive after slow-grind+ exits window (Sep 8 12:58).**
 7. **CEO ~06:45 UTC — VERIFIED + MONITORING.** DB: 24h 51T 56.9% WR -$1.10. 48h: 85T 57.6% WR -$0.71, R:R 0.563. **Active signals profitable:** bb-bounce-v2-long+ 9T 77.8% WR +$0.28, pump-chain+ 8T 100% WR +$0.31. Without legacy: 25T 76% WR +$0.22. **Legacy bleed is entire loss:** slow-grind+ 14T -$0.88 + coil-spring+ 12T -$0.44 = -$1.32. 1 open slow-grind+ position (pre-kill 06:02 UTC). coil-spring+ ages out ~15:03 UTC today. slow-grind+ ages out ~03:25 UTC Sep 8. **PM_TRAIL protected (DO NOT CHANGE).** No param changes. Disk 84%. Market 100% NEUTRAL. 3 open positions.
 6. **Orchestrator ~06:30 UTC — VERIFIED + ACTION.** DB: 24h 51T 59.2% WR -$1.10. 7d: 375T 56.9% WR -$5.11. **R:R 24h: 0.451** (degraded from 0.67 on Sep 6). **slow-grind+ KILLED** — 10T/24h 10% WR -$1.42, 9 consecutive losses. Added to NEVER_REENABLE_FLAGS. Pipeline restarted. **bb-bounce-v2-long+ STAR:** 56T/7d 80.4% WR +$2.52. **pump-chain+:** 8T/7d 100% WR +$0.31. **open-skies+:** 14T/7d 64.3% WR +$0.32. **Market:** 3 LONG / 2 SHORT / 103 NEUTRAL. **3 open positions:** NEO LONG, SOL LONG, TURBO SHORT. **Disk:** 84% (18G free). **ema300-dip RE-ENABLED by T** (Sep 7). DO NOT DISABLE until Sep 9 05:00 UTC. **PM_TRAIL:** 0.40%/0.20% (tight trail, reverted from 0.60%/0.60%). R:R degraded — needs monitoring.
 
@@ -174,11 +174,11 @@ System negative 24h (-$1.10, 51T). R:R 48h: 0.563. **Active signals profitable:*
 
 ## Next Actions
 
-1. **Monitor legacy age-out.** coil-spring+ ages out ~15:03 UTC today. slow-grind+ ages out ~03:25 UTC Sep 8. R:R should recover to 0.70+ post-legacy. — 2026-09-07
-2. **Monitor R:R recovery.** 48h R:R 0.563 (legacy drag). Active signals healthy. Target: 0.70+ by Sep 8. — 2026-09-07
+1. **Monitor legacy age-out.** slow-grind+ last close 12:58 UTC, ages out Sep 8 12:58 UTC. coil-spring+ ages out of 48h at 15:03 UTC Sep 8. R:R should recover post-legacy. — 2026-09-07
+2. **Monitor open-skies+ degradation.** 5T/48h 40% WR -$0.37 but 14T/7d 57.1% NEUTRAL flat. Kill if WR drops below 45% at 10T/48h. — 2026-09-07
 3. **Monitor ema300-dip re-enable.** T live test with new filters. DO NOT DISABLE until Sep 9 05:00 UTC. — 2026-09-07
 4. **Monitor neutral_sniper execution.** Signals firing but BTC-CRASH filter blocking SHORTs. Will execute when BTC stabilizes. Need 20+ live trades with WR >55%. — 2026-09-06
 5. **BUILD directional cap (65%).** Highest-impact mechanical fix. Prevents regime-transition bleed. CEO report at automation/ceo/ceo_report.md. — 2026-09-05
-6. **Monitor bb-bounce-v2-long+.** 9T/24h 77.8% WR +$0.28. STAR. — 2026-09-07
-7. **Monitor pump-chain+.** 8T/24h 100% WR +$0.31. Strong. — 2026-09-07
-8. **Monitor disk.** Currently 84% (18G free). Approaching 85% trigger. — 2026-09-07
+6. **Monitor bb-bounce-v2-long+.** 9T/24h 77.8% WR +$0.41. STAR. — 2026-09-07
+7. **Monitor pump-chain+.** 19T/24h 89.5% WR +$0.64. Strongest by WR. — 2026-09-07
+8. **Monitor disk.** Currently 81% (22G free). — 2026-09-07

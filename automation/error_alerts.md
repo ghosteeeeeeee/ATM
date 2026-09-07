@@ -74,3 +74,7 @@
 ## Error Alerts — 2026-09-07 13:22 UTC
 - **WARN** (2x): `signal_compactor: timed out` at 13:17 and 13:20 — pipeline continued, non-critical
 - **WARN** (1x): Disk at 85% — monitor trend, consider log compression if >90%
+
+## Error Alerts — 2026-09-07 18:24 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 18:16 — non-critical, pipeline continued normally
+- **WARN** (1x): Phantom trade — TURBO SHORT 0.0% PnL, 0.0 USDT
