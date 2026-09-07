@@ -1141,6 +1141,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
     # REMOVED: 'coil-spring' — CEO wants PM Trail to manage these trades
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
+    'open-skies',            # open skies breakout — ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
