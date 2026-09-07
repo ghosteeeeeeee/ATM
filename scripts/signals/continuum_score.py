@@ -72,19 +72,19 @@ def detect():
         print(f"[continuum-score] Stale data: {age_minutes:.0f}min old, skipping")
         return None
     
-    # Score 0 → SHORT signal (extremely bearish)
+    # Score ≤ 2 → LONG signal (contrarian: buy when extremely bearish)
     if score <= CONTINUUM_SCORE_SHORT_THRESHOLD:
         return {
-            'direction': 'SHORT',
+            'direction': 'LONG',
             'confidence': CONTINUUM_SCORE_CONF_BASE,
             'value': score,
             'price': price,
         }
     
-    # Score 100 → LONG signal (extremely bullish)
+    # Score ≥ 98 → SHORT signal (contrarian: sell when extremely bullish)
     if score >= CONTINUUM_SCORE_LONG_THRESHOLD:
         return {
-            'direction': 'LONG',
+            'direction': 'SHORT',
             'confidence': CONTINUUM_SCORE_CONF_BASE,
             'value': score,
             'price': price,
