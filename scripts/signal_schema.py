@@ -894,6 +894,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if _comp == 'pullback-entry-' and not PULLBACK_ENTRY_MINUS_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PULLBACK_ENTRY_MINUS_ENABLED=False', flush=True)
                 return None
+            # doji_top — doji exhaustion at top
+            if _comp == 'doji-top' and not DOJI_TOP_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" DOJI_TOP_ENABLED=False', flush=True)
+                return None
+            if _comp == 'doji-top-short' and not DOJI_TOP_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" DOJI_TOP_MINUS_ENABLED=False', flush=True)
+                return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_MACD_ENABLED=False', flush=True)
@@ -2281,6 +2288,7 @@ def is_component_disabled(component: str) -> bool:
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+            DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
         )
     except ImportError:
@@ -2409,6 +2417,11 @@ def is_component_disabled(component: str) -> bool:
     if c == 'pullback-entry': return not PULLBACK_ENTRY_ENABLED
     if c == 'pullback-entry+': return not PULLBACK_ENTRY_PLUS_ENABLED
     if c == 'pullback-entry-': return not PULLBACK_ENTRY_MINUS_ENABLED
+    # doji-top
+    if c == 'doji-top': return not DOJI_TOP_ENABLED
+    if c == 'doji-top+': return not DOJI_TOP_PLUS_ENABLED
+    if c == 'doji-top-': return not DOJI_TOP_MINUS_ENABLED
+    if c == 'doji-top-short': return not DOJI_TOP_MINUS_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
     if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED

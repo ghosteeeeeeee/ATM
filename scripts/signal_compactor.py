@@ -382,6 +382,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # pullback_entry — post-impulse consolidation (mean-reversion)
     ('pullback_entry_long', 'pullback-entry+'):  1.0,  # mean-reversion, standard weight
     ('pullback_entry_short', 'pullback-entry-'): 1.0,  # mean-reversion, standard weight
+    # doji_top — doji exhaustion at top (mean-reversion)
+    ('doji_top_short', 'doji-top-short'):  1.0,  # exit LONG / enter SHORT, standard weight
     # ema300_dip_long — buy dips to EMA300 during strong uptrends
     ('ema300_dip_long', 'ema300-dip-long'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # ema300_dip_short — sell rallies to EMA300 during strong downtrends
@@ -443,6 +445,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('btc_wave_long', 'btc-wave+'):  1.5,  # boosted for hotset competitiveness (tsunami, not ripple)
     # open_skies — LONG-only open skies breakout (no resistance overhead)
     ('open_skies_long', 'open-skies+'): 1.2,  # structural breakout signal, room to run
+    # continuum_score — extreme score signals from continuum engine
+    ('continuum_score_long', 'continuum+'): 1.5,   # contrarian LONG at extreme bearish
+    ('continuum_score_short', 'continuum-'): 1.5,  # contrarian SHORT at extreme bullish
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

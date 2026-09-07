@@ -277,16 +277,21 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'APT',
     'ARB',
     'BCH',
+    'BIGTIME',
     'CASHCAT',
     'CRV',
+    'ETC',
     'FIL',
     'JUP',
     'LDO',
-    'W'
+    'NOT',
+    'STX',
+    'W',
+    'ZEN'
 }
+
 
 
 
@@ -2901,6 +2906,24 @@ PULLBACK_CONF_BB_SQUEEZE_THRESHOLD = 0.2   # BB width threshold for squeeze bonu
 PULLBACK_CONF_BONUS_STRONG       = 5       # confidence bonus for strong impulse
 PULLBACK_CONF_BONUS_DRY          = 5       # confidence bonus for very low volume
 PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
+
+# ── doji_top (doji exhaustion at tops) ──────────────────────────────────────
+# doji_top.py — exit LONG / enter SHORT when doji appears after strong advance
+# Backtest: 40.4% reversal rate with RSI > 70 (104 patterns, 7 tokens)
+DOJI_TOP_ENABLED              = True    # master kill-switch
+DOJI_TOP_PLUS_ENABLED         = True    # LONG direction (not used — doji_top is SHORT-only)
+DOJI_TOP_MINUS_ENABLED        = True    # SHORT direction (exit LONG, enter SHORT)
+DOJI_BODY_MAX_PCT             = 15      # max body % for doji classification (relaxed from 10%)
+DOJI_ADVANCE_MIN_PCT          = 0.5     # min % advance before doji (prior move must be meaningful)
+DOJI_DECLINE_MIN_PCT          = 0.5     # min % decline for bottom signal (future: doji_bottom)
+DOJI_VOLUME_SPIKE_RATIO       = 1.5     # volume > 1.5x average for top confirmation
+DOJI_VOLUME_DRY_RATIO         = 0.5     # volume < 0.5x average for bottom confirmation
+DOJI_RSI_OVERBOUGHT           = 70      # RSI > 70 for top (validated: 40.4% reversal rate)
+DOJI_RSI_OVERSOLD             = 35      # RSI < 35 for bottom (future: doji_bottom)
+DOJI_LOOKBACK                 = 5       # candles to look back for advance/decline
+DOJI_COOLDOWN_HOURS           = 0.25    # 15 min cooldown between entries per token
+DOJI_CONF_BASE                = 75      # base confidence
+DOJI_CONF_CAP                 = 88      # max confidence (system ceiling)
 
 # ── Continuum Score Signal ───────────────────────────────────────────────────
 # continuum_score.py — fires signals when continuum engine reaches extreme scores

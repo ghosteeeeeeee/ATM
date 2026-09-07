@@ -1,6 +1,7 @@
 # Upgrade Audit Trail
 
 **Created:** 2026-09-06
+**Updated:** 2026-09-07
 **Scanned:** 49 plans in /root/.hermes/plans/
 
 ---
@@ -10,11 +11,11 @@
 | Metric | Count |
 |--------|-------|
 | Plans scanned | 49 |
-| Already implemented | 23 |
-| Pending (wirable) | 3 |
-| Pending (new work) | 1 |
+| Already implemented | 27 |
+| Pending (wirable) | 1 |
+| Pending (new work) | 2 |
 | Concluded (no action needed) | 2 |
-| **Total evaluated** | **29** |
+| **Total evaluated** | **32** |
 
 ---
 
@@ -42,14 +43,16 @@
 | `2026-09-04_btc-wave-pattern-surfer.md` | L3 | HIGH | IMPLEMENTED — btc_wave_detector.py exists |
 | `2026-09-04_continuum-engine-spec.md` | L4 | HIGH | IMPLEMENTED — continuum_engine.py exists |
 | `2026-08-13_progressive-context-shaping-spec.md` | L1 | LOW | Partially done — CURRENT.md pattern exists in brain/ |
-| `2026-08-15_weather-vane-v5-volatility-floor.md` | L1 | HIGH | IMPLEMENTED |
+| `2026-09-02_regime-aware-signal-params-spec.md` | L2 | HIGH | IMPLEMENTED — `regime_params.py` wired into accel_300_v3 signals |
+| `2026-09-06_pullback_entry_signal.md` | L2 | MEDIUM | IMPLEMENTED — `pullback_entry.py` signal live, all infrastructure connected |
+| `2026-09-07_accel300-long-fix-plan.md` | L1 | HIGH | IMPLEMENTED — RSI<50, pre15<0, mom=falling filters live in decider_run.py for V3 LONG |
+| `2026-09-07_accel300-v4-killer-signal.md` | L1 | HIGH | IMPLEMENTED — RSI>50 filter (SHORT), z>0 filter (HIGH regime) live in decider_run.py for V3 SHORT |
+| `2026-09-06_doji_signal_system.md` | L2 | HIGH | IMPLEMENTED — `doji_top.py` signal live, all infrastructure connected |
 
 ### ⏳ PENDING (Wirable — code exists but not connected)
 
 | Plan | Difficulty | Value | Status | What's Missing |
 |------|-----------|-------|--------|----------------|
-| `2026-09-02_regime-aware-signal-params-spec.md` | L2 | HIGH | ✅ DONE | `regime_params.py` wired into accel_300_v3 signals |
-| `2026-08-29_amplitude-enhancement-brainstorm.md` | L2 | HIGH | ✅ DONE | `AMPLITUDE_SIZE_MULT` wired into decider_run.py, amplitude SL floor wired into position_manager.py |
 | `2026-08-21_copy-trader-entry-timing-deep-dive.md` | L1 | MEDIUM | PARTIALLY DONE | Time filter code exists (`COPY_BAD_HOURS_ENABLED=False`). Intentionally disabled per comment. Low priority. |
 
 ### 📋 PENDING (New work required)
@@ -58,21 +61,17 @@
 |------|-----------|-------|--------|-------|
 | `2026-08-22_copy-trader-dashboard-enhancements.md` | L3 | MEDIUM | NOT STARTED | Phase 2 (copy delay analysis, pro portfolio view, regime performance) — all new dashboard features |
 | `exit-mechanics-ownership.md` | L3 | MEDIUM | NOT STARTED | Draft status — exit ownership model to resolve ATR SL vs PM Trail conflicts |
-| `losers-list-spec.md` | L2 | MEDIUM | IMPLEMENTED | (moved to IMPLEMENTED above) |
+| `2026-09-07_market-sync-protection-plan.md` | L2 | HIGH | DECISION NEEDED | Auditor found 88-92% false positive rate. Needs decision: integrate with MAE guard (Option A) or do nothing (Option C) |
 
 ---
 
 ## Recommended Implementation Order
 
-### Level 1 (EASY) — Do Now
-1. **Wire regime_params into accel_300_v3 signals** — ~50 LOC, connects existing infrastructure
-2. **Wire amplitude dynamic SL into position_manager** — ~30 LOC, connects existing function
-3. **Wire amplitude position sizing** — ~10 LOC, connects existing constant
-
-### Level 2 (MEDIUM) — Next
-4. Copy trader dashboard Phase 2 features
-5. Exit mechanics ownership model
+### Level 2 (MEDIUM) — Do Now
+1. Market sync protection — needs decision first (integrate with MAE guard vs do nothing)
+2. Copy trader dashboard Phase 2 features
+3. Exit mechanics ownership model
 
 ### Level 3+ (HARD) — Later
-6. Ponytail audit Phase 2 (timer cleanup)
-7. Ponytail audit Phase 3 (core function refactoring)
+4. Ponytail audit Phase 2 (timer cleanup)
+5. Ponytail audit Phase 3 (core function refactoring)

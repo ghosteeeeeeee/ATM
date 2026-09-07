@@ -41,6 +41,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
+        'doji-top-short',  # doji exhaustion at top — mean-reversion (exit LONG / enter SHORT)
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal

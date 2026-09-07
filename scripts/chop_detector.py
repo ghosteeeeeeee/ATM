@@ -84,6 +84,9 @@ SIGNAL_OVERRIDES = {
     'pullback_entry': 'MEAN_REVERSION',       # post-impulse consolidation — mean-reversion
     'pullback_entry_long': 'MEAN_REVERSION',
     'pullback_entry_short': 'MEAN_REVERSION',
+    'doji_top': 'MEAN_REVERSION',            # doji exhaustion at top — mean-reversion
+    'doji_top_short': 'MEAN_REVERSION',
+    'doji_top_exit': 'MEAN_REVERSION',
 }
 
 
