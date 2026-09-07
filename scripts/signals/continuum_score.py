@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 continuum_score.py — Fire signals to existing trading system when continuum
-engine reaches extreme scores (0 or 100).
+engine reaches extreme scores.
 
-Score 0 = extremely bearish → SHORT signal
-Score 100 = extremely bullish → LONG signal
+CONTRARIAN logic (buy fear, sell greed):
+  Score ≤ 5 → LONG signal (buy the dip when extremely bearish)
+  Score ≥ 95 → SHORT signal (sell the top when extremely bullish)
 
 Cooldown: 5 minutes between signals per direction.
 """
@@ -72,7 +73,7 @@ def detect():
         print(f"[continuum-score] Stale data: {age_minutes:.0f}min old, skipping")
         return None
     
-    # Score ≤ 2 → LONG signal (contrarian: buy when extremely bearish)
+    # Score ≤ 5 → LONG signal (contrarian: buy when extremely bearish)
     if score <= CONTINUUM_SCORE_SHORT_THRESHOLD:
         return {
             'direction': 'LONG',

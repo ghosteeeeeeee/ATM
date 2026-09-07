@@ -1810,6 +1810,24 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # continuum+
+            if _comp == 'continuum+':
+                try:
+                    from hermes_constants import CONTINUUM_SCORE_LONG_ENABLED
+                    if not CONTINUUM_SCORE_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_SCORE_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # continuum-
+            if _comp == 'continuum-':
+                try:
+                    from hermes_constants import CONTINUUM_SCORE_SHORT_ENABLED
+                    if not CONTINUUM_SCORE_SHORT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_SCORE_SHORT_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2263,6 +2281,7 @@ def is_component_disabled(component: str) -> bool:
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+            CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2508,6 +2527,10 @@ def is_component_disabled(component: str) -> bool:
     # open-skies (open skies breakout LONG)
     if c == 'open-skies+': return not OPEN_SKIES_PLUS_ENABLED
     if c == 'open-skies': return not OPEN_SKIES_ENABLED
+    # continuum-score
+    if c == 'continuum+': return not CONTINUUM_SCORE_LONG_ENABLED
+    if c == 'continuum-': return not CONTINUUM_SCORE_SHORT_ENABLED
+    if c == 'continuum': return not CONTINUUM_SCORE_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

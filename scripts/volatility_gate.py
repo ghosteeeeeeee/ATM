@@ -50,6 +50,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
+        'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
     },
     'NORMAL': {
         # pump_catcher — momentum breakout (velocity + acceleration)
@@ -94,6 +95,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'open-skies+',  # open skies breakout — works in steady trend markets
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
     },
     'HIGH': {
         # Breakout works in big moves
@@ -134,6 +136,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'open-skies+',  # open skies breakout — works in volatile breakout markets
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
     },
     'EXTREME': {
@@ -164,6 +167,7 @@ REGIME_SIGNALS = {
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum
         'open-skies+',  # open skies breakout — structural, regime-agnostic
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
     },
 }
 
