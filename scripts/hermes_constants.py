@@ -2896,6 +2896,6 @@ PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
 CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
 CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction (score hits 100)
 CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction (score hits 0)
-CONTINUUM_SCORE_LONG_THRESHOLD       = 100     # score >= this → LONG signal
-CONTINUUM_SCORE_SHORT_THRESHOLD      = 0       # score <= this → SHORT signal
+CONTINUUM_SCORE_LONG_THRESHOLD       = 98      # score >= this → LONG signal
+CONTINUUM_SCORE_SHORT_THRESHOLD      = 2       # score <= this → SHORT signal
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
