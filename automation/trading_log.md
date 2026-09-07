@@ -3041,3 +3041,22 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 **Open Questions:**
 - slow-grind+ persistent drag at -$0.80/24h but dormant — if trades resume and lose, strongest kill candidate
 - WLFI r2-trend-short3 at 11.7h — stale position, monitor
+
+## [2026-09-07 19:40 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L -$0.01)
+**24h:** 60T 65%WR -$0.33
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 29T (48%) avg +$0.072 ⭐
+- cut-loser-CL-T1: 13T (21%) avg -$0.159
+- atr_sl_hit: 12T (20%) avg -$0.090
+- profit-monster-T1: 6T (10%) avg +$0.120
+
+**No Change Needed:**
+- atr_sl_hit 20% — under 40% threshold ✅
+- No signal has 0%WR with 3+ trades last hour ✅
+- Trade freq 2/hr — normal ✅
+- pump-chain+ and bb-bounce-v2-long+ carrying system ⭐
+- slow-grind+ drain fading (ages out Sep 8)
+- 5 open positions, all small

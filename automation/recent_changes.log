@@ -1127,3 +1127,7 @@
   WHY: 1T last hour (1W +$0.11 AIXBT profit-monster-trail). 57T/24h 66.7%WR -$0.16. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 19% healthy. pump-chain+ 19T 89%WR +$0.64 star. bb-bounce-v2-long+ 9T 78%WR +$0.41 star. slow-grind+ 15T 40%WR -$0.80 dormant 5h+. Trade freq 1/hr normal. 4 open positions (WLFI 11.7h stale). System steady state.
   BY: auto_1hr
   NEXT: Re-run at 19:22 UTC
+[2026-09-07 19:40 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.01). 60T/24h 65%WR -$0.33. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 20% under 40%. pump-chain+ 19T 89.5%WR +$0.64 star. bb-bounce-v2-long+ 9T 77.8%WR +$0.50 star. slow-grind+ 15T 40%WR -$0.80 (already killed, ages out Sep 8). Trade freq 2/hr normal. 5 open positions. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 20:40 UTC
