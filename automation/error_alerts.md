@@ -78,3 +78,14 @@
 ## Error Alerts — 2026-09-07 18:24 UTC
 - **WARN** (1x): `signal_compactor: timed out` at 18:16 — non-critical, pipeline continued normally
 - **WARN** (1x): Phantom trade — TURBO SHORT 0.0% PnL, 0.0 USDT
+
+## Health Report — 2026-09-07 21:23 UTC
+- **PIPELINE**: OK — running, 0 open, 52 trades today, 57.7% WR, $0.09 PnL
+- **MARKET**: NEUTRAL (104/106 tokens), 2 LONG bias (SOPH, ACE), 0 SHORT bias
+- **SIGNALS**: 72 generated (1h), top speed: DOT 100%, BLZ 100%, MON 99.5%
+- **SYSTEM**: 44 timers active, disk 81% (91G/118G), prices fresh (<1min)
+- **WARN** (1x): `signal_compactor: timed out` at 21:22 — non-critical, self-recovered
+- **WARN** (1x): Phantom trade — STX SHORT -0.0055 USDT (-0.05%)
+- **WARN**: 3 timers permanently broken (atr-sl-updater, ma-cross-5m-tuner, zscore-momentum-tuner) — no unit, never fired
+- **INFO**: hl-sync-guardian last fired 3 days ago (Sep 4) — may be stale
+- **AUTO-FIX**: None needed — all non-critical

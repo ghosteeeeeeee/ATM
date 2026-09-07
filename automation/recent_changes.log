@@ -1,3 +1,7 @@
+[2026-09-07 21:07 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.99). 60T/24h 65%WR +$0.69. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 22% under 40%. cut-loser-CL-T1 22% avg -$0.159 (loss cutting working). profit-monster-trail 47% avg +$0.078 star. pump-chain+ 18T 88.9%WR +$0.63 star. bb-bounce-v2-long+ 8T 75%WR +$0.45 star. slow-grind+ 15T 40%WR -$0.80 (KILLED, ages out Sep 8). Trade freq 2.5/hr normal. 3 open positions (SEI/ALT/WLFI SHORTS). System improving — 24h PnL flipped positive.
+  BY: auto_1hr
+  NEXT: Re-run at 22:07 UTC
 [2026-09-07 06:07 UTC] auto_1hr: NO CHANGES
   WHY: 4T last hour (4W +$0.20 all pump-chain+ profit-monster-trail). 50T/24h 56%WR -$1.22. Kill criteria not met: no 0%WR signal with 3+T last hour. slow-grind+ 14T 35.7%WR -$0.88 (not 0%WR, persistent drag). coil-spring+ 13T 38.5%WR -$0.62 (already killed by signal reporter). atr_sl_hit 18% well under 40%. pump-chain+ 8T 100%WR +$0.31 star. bb-bounce-v2-long+ 9T 77.8%WR +$0.28 star. Trade freq 2/hr normal. 4 open positions (SOL slow-grind+, USUAL/WLD open-skies+, TURBO r2-trend-short3). System steady state.
   BY: auto_1hr
@@ -1131,3 +1135,7 @@
   WHY: 2T last hour (1W 1L -$0.01). 60T/24h 65%WR -$0.33. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 20% under 40%. pump-chain+ 19T 89.5%WR +$0.64 star. bb-bounce-v2-long+ 9T 77.8%WR +$0.50 star. slow-grind+ 15T 40%WR -$0.80 (already killed, ages out Sep 8). Trade freq 2/hr normal. 5 open positions. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 20:40 UTC
+[2026-09-07 20:50 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.24). 59T/24h ~65%WR -$0.33. Kill criteria not met: slow-grind+ (12T 25%WR -$1.22) already killed NEVER_REENABLE. No other signal at 3+T/≤25%WR threshold. atr_sl_hit 22% healthy. pump-chain+ 18T 88.9%WR +$0.64 star. bb-bounce-v2-long+ 9T 66.7%WR +$0.28 star. Trade freq 3/hr normal. 4 open positions (WLFI 15.3h stale). System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 21:50 UTC

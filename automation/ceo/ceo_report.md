@@ -1,23 +1,26 @@
-## CEO Report — 2026-09-07 ~18:40 UTC
+## CEO Report — 2026-09-07 ~21:00 UTC
 
 ### Diagnosis
-24h: 58T, 67.2% WR, -$0.11. **Almost flat** — improved from -$1.10 earlier today. 48h: 87T, 59.8% WR, -$0.71, R:R 0.566. **Active signals profitable:** bb-bounce-v2-long+ 9T/24h 77.8% WR +$0.41, pump-chain+ 19T/24h 89.5% WR +$0.64. **Legacy bleed nearly gone:** slow-grind+ 15T/24h 40% WR -$0.80 (last close 12:58 UTC, ages out ~12:58 UTC Sep 8). coil-spring+ aged out of 24h, 20T remaining in 48h window (ages out 15:03 UTC Sep 8). open-skies+ degraded: 5T/48h 40% WR -$0.37 but 14T/7d 57.1% WR -$0.01 in NEUTRAL — net flat structurally. **3 open positions** all near $0.
+24h: 58T, 62.1% WR, **+$0.29**. **FLIPPED POSITIVE** — improved from -$0.11 at 18:40. 48h: 92T, 62.0% WR, **+$0.41**. 7d: 375T, 57.6% WR, -$3.29 (improved from -$5.11). **Active signals all profitable:** bb-bounce-v2-long+ 9T/24h 66.7% WR +$0.28, pump-chain+ 18T/24h 88.9% WR +$0.64, open-skies+ 5T/24h 60% WR +$0.71. **Legacy still draining:** slow-grind+ 12T/24h 25% WR -$1.22 (ages out Sep 8). **open-skies+ emerging star:** R:R 1.88 (avg_win $0.37, avg_loss $0.20). **5 open positions** healthy. Disk 81%. Market 100% NEUTRAL.
 
 ### Root Cause
-Legacy trades rotating out as expected. slow-grind+ is last major drag (-$0.80/24h). Once it exits 24h window (Sep 8 12:58 UTC), system should be net positive. open-skies+ had bad 48h streak but 30-day NEUTRAL performance is flat — not structural bleed. R:R 0.471 (24h) distorted by legacy avg_loss 5.77% vs avg_win 2.72%.
+Legacy slow-grind+ is sole remaining drag (-$1.22/24h). Active signals profitable +$1.63/24h. System structural: profit-monster-trail exits working (+$2.19/24h), cut-loser-CL-T1 managing risk (-$2.06/24h). R:R 0.663 (legacy-distorted) — will recover post slow-grind age-out (Sep 8).
 
 ### Fix Applied
-**No parameter changes.** PM_TRAIL protected. Legacy age-out is the fix — no intervention needed. Pipeline healthy, disk 81%.
+**No parameter changes.** PM_TRAIL protected. Legacy age-out is the fix — slow-grind+ closes its last position by Sep 8 12:58 UTC. No intervention needed.
 
 ### Verification
-- Active 24h: +$1.05 (bb-bounce $0.41 + pump-chain $0.64)
-- Legacy 24h: -$0.80 (slow-grind+ only — coil-spring+ gone from 24h)
-- Net: -$0.11 (nearly flat)
-- R:R will recover when legacy exits drop off (~Sep 8 12:58 UTC)
-- open-skies+ monitoring: 5T/48h degraded, but 14T/7d NEUTRAL 57.1% WR flat
+- Active 24h: +$1.63 (bb-bounce $0.28 + pump-chain $0.64 + open-skies $0.71)
+- Legacy 24h: -$1.22 (slow-grind+ only)
+- Net: +$0.29 (POSITIVE)
+- 48h: +$0.41 (POSITIVE)
+- open-skies+ R:R 1.88 — best R:R of any signal
 
 ### Next Actions
-1. Monitor slow-grind+ age-out (last close 12:58 UTC → ages out Sep 8 12:58 UTC)
+1. Monitor slow-grind+ age-out (Sep 8 12:58 UTC)
+2. Monitor open-skies+ — 16T/7d 62.5% WR +$1.07, R:R 1.88. If maintains, consider confidence boost.
+3. Monitor ema300-dip re-enable (DO NOT DISABLE until Sep 9 05:00 UTC)
+4. Monitor neutral_sniper — signals firing but BTC-CRASH blocks SHORTs
 2. Monitor open-skies+ — if WR drops below 45% at 10T/48h, investigate
 3. Target: 24h PnL positive after slow-grind+ exits window
 3. Monitor bb-bounce-v2-long+ STAR (9T/24h 77.8% WR)

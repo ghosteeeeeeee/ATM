@@ -1,4 +1,18 @@
 
+## [2026-09-07 21:07 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (3W 1L +$0.99)
+**24h:** 60T 65%WR +$0.69 | R:R 0.65
+**48h:** 92T 60.9%WR
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 28T (47%) avg +$0.078 ⭐
+- cut-loser-CL-T1: 13T (22%) avg -$0.159
+- atr_sl_hit: 13T (22%) avg -$0.011
+- profit-monster-T1: 6T (10%) avg +$0.120
+
+**Changes:** None needed. Kill criteria not met. 24h PnL improved to +$0.69. slow-grind+ ages out Sep 8. All stars performing.
+
 ## [2026-09-07 18:40 UTC] Daily Orchestrator Run
 
 **Pipeline:** OK (58 closed today, 3 open)
@@ -3060,3 +3074,30 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 - pump-chain+ and bb-bounce-v2-long+ carrying system ⭐
 - slow-grind+ drain fading (ages out Sep 8)
 - 5 open positions, all small
+
+## [2026-09-07 20:50 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.24)
+**24h:** 59T ~65%WR -$0.33
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 28T (47%) avg +$0.078 ⭐
+- cut-loser-CL-T1: 15T (25%) avg -$0.156
+- atr_sl_hit: 13T (22%) avg -$0.011 ✅
+- profit-monster-T1: 3T (5%) avg +$0.100
+
+**Signal Leaders (24h):**
+- pump-chain+: 18T 88.9%WR +$0.64 ⭐
+- bb-bounce-v2-long+: 9T 66.7%WR +$0.28 ⭐
+- open-skies+: 5T 60%WR +$0.71 ⭐
+
+**No Change Needed:**
+- Kill criteria: slow-grind+ (12T 25%WR -$1.22) already killed (NEVER_REENABLE). No other signal at threshold.
+- atr_sl_hit 22% — well under 40% ✅
+- Trade freq 3/hr — normal ✅
+- 4 open positions (WLFI 15.3h stale, rest <3h)
+- Cut-loser exits averaging -$0.156 — reasonable stop distances
+
+**Open Questions:**
+- WLFI SHORT at 15.3h — monitor for staleness
+- continuation+ and pullback-entry- each 1T/0%WR — too few trades to kill, watch
