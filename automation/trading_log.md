@@ -2404,3 +2404,81 @@ Final set: ['APT', 'ARB', 'BCH', 'CASHCAT', 'CRV', 'FIL', 'JUP', 'LDO', 'W']
 **Open Questions:**
 - BTC liq-hunt+ 29.6h stale flat. SL at 79619 — monitor. Will cut naturally on BTC drop.
 - continuation+ mediocre long-term (50%WR, -$0.38) but not meeting kill threshold yet.
+
+## FAVORITES Update — 2026-09-07 00:56 UTC
+- Regime: NEUTRAL
+- DEMOTE YGG (WR=57.1%, PnL=$0.00, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BABY (WR=33.3%, PnL=$-0.39, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE SEI (WR=70.0%, PnL=$-0.26, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE BLUR (WR=100.0%, AvgPnL=2.15%, Trades=5)
+- PROMOTE CFX (WR=100.0%, AvgPnL=2.48%, Trades=5)
+- PROMOTE ATOM (WR=80.0%, AvgPnL=1.16%, Trades=5)
+- PROMOTE GRASS (WR=66.7%, AvgPnL=0.25%, Trades=6)
+
+Final set: ['AIXBT', 'ATOM', 'BLUR', 'CFX', 'DOGE', 'DOT', 'FOGO', 'GRASS', 'INJ', 'KAS', 'LTC', 'ME', 'MNT', 'NXPC', 'POL', 'TURBO', 'ZRO']
+
+## [2026-09-07 01:10 UTC] Hourly Analysis
+
+**Trades:** 6 closed (1W 5L, -$0.67)
+**24h:** 44T 57%WR +$0.08 | excl coil-spring: 26T 65%WR +$0.66
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 11T 81.8%WR +$0.62 ⭐
+- pump-chain+: 3T 100%WR +$0.06
+- liq-hunt+: 1T 100%WR +$0.04
+- slow-grind+: 10T 50%WR -$0.18 (degraded — was +$0.42 last check)
+- coil-spring+: 18T 44.4%WR -$0.58 (killed, rotating out)
+- continuation+: 1T 0%WR -$0.28 (only 1T, not killable)
+
+**Exit Breakdown (24h):**
+- profit-monster-trail: 21T +$1.53 avg+$0.073
+- cut-loser-CL-T1: 12T -$1.87 avg-$0.156
+- profit-monster-T1: 5T +$0.64 avg+$0.128
+- atr_sl_hit: 6T -$0.62 avg-$0.103 (13.6%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: atr_sl_hit 13.6% (<40%), no signal has 0%WR with 3+T
+- slow-grind+ 1W 5L last hour is a variance streak (50%WR overall in 24h)
+- Trade freq 6/hr — normal (<20)
+- Open 4 positions ($44.40 — all recent, no stale)
+- BTC liq-hunt+ stale position has closed naturally
+
+**Open Questions:**
+- slow-grind+ degraded from +$0.42 star (23:07) to -$0.18 now. 1W 5L last 2h in NEUTRAL regime. Monitor — if next hour is also negative, consider regime filter.
+- continuation+ 1T 0%WR — not killable yet, keep watching.
+
+## [2026-09-07 02:07 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W 2L -$0.42)
+**24h Context:** 46T 54.3%WR -$1.16 | atr_sl_hit 15.2%
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (43%) avg +$0.063 — carrying system
+- cut-loser-CL-T1: 14T (30%) avg -$0.161 — normal
+- atr_sl_hit: 7T (15%) avg -$0.114 — healthy
+- profit-monster-T1: 5T (11%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 11T 81.8%WR +$0.62 ⭐
+- pump-chain+: 3T 100%WR +$0.06 ⭐
+- slow-grind+: 13T 38.5%WR -$0.75 (degrading — 3 consecutive neg hours)
+- coil-spring+: 17T 41.2%WR -$0.85 (killed, rotating out by ~15:00 UTC)
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T last hour → none to kill
+- atr_sl_hit 15.2% → healthy
+- slow-grind+ 38.5%WR — not 0%, not killable
+- Trade freq 3.3/hr normal
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- System steady at 54.3% WR
+- bb-bounce-v2-long+ star performer
+- coil-spring+ rotating out naturally
+
+**Open Questions:**
+- slow-grind+ had 3 consecutive negative hours (last 3h: 12T 4W -$1.04). Was profitable 5-6h ago (+$0.42). Looks like regime variance not structural — monitor next hour. If negative again, consider regime filter or parameter tune.

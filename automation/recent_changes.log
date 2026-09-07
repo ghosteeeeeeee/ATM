@@ -1067,3 +1067,11 @@
   WHY: 6T since 21:07 (5W 1L +$0.19). 35T/24h 57%WR +$0.16. Excl coil-spring: 17T 70.6%WR +$0.74. Kill criteria not met. atr_sl_hit 11.4% under 40%. bb-bounce-v2-long+ 10T 80%WR +$0.53 star. slow-grind+ 3T 100%WR +$0.42 star. pump-chain+ 3T 100%WR +$0.06. coil-spring+ killed 15:07 UTC, 18T still in 24h window -$0.58 rotating out. continuation+ 10T 50%WR -$0.38 overall (1T 0%WR last 24h, not killable). Trade freq ~3/hr normal. Open 4 (BTC liq-hunt+ 29.6h stale flat, ME slow-grind+ 3.3h, CFX bb-bounce-v2-long+ 0.4h, BABY pullback-entry- 0.2h). System steady state. No signal has 3+T 0%WR in last hour.
   BY: auto_1hr
   NEXT: Re-run at 00:07 UTC
+[2026-09-07 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (1W 5L -$0.67). 44T/24h 57%WR +$0.08. Excl coil-spring: 26T 65%WR +$0.66. Kill criteria not met. atr_sl_hit 13.6% under 40%. slow-grind+ degraded last 2h (1W5L -$0.57) but 50%WR over 24h — variance streak. bb-bounce-v2-long+ 11T 81.8%WR +$0.62 star. coil-spring+ killed 15:07 UTC, 18T in 24h window -$0.58 rotating out. continuation+ 1T 0%WR not killable. Trade freq 6/hr normal. Open 4 ($44.40 — BABY SHORT 2.2h, NEAR LONG 1.2h, HBAR LONG 0.3h, STX SHORT 0.0h). System steady state. BTC liq-hunt+ stale position closed naturally.
+  BY: auto_1hr
+  NEXT: Re-run at 02:10 UTC
+[2026-09-07 02:07 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.42). 46T/24h 54.3%WR -$1.16. Kill criteria not met. atr_sl_hit 15.2% under 40%. slow-grind+ degraded 3 consecutive hours (12T 4W -$1.04) but was profitable 5-6h ago — regime variance not structural, monitor next hour. bb-bounce-v2-long+ 11T 81.8%WR +$0.62 star. coil-spring+ 17T rotating out by ~15:00 UTC. Trade freq 3.3/hr normal. Open 5 ($68.71 — BABY, STX, AVNT, TURBO, FOGO all flat to small). No signal has 3+T 0%WR in last hour. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 03:07 UTC
