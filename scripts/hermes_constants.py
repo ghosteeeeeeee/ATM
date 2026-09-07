@@ -1283,6 +1283,7 @@ NEVER_REENABLE_FLAGS = {
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
+    'SLOW_GRIND_LONG_ENABLED',     # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
     # EMA300_DIP_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
     # EMA300_DIP_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
 }
@@ -1620,7 +1621,7 @@ SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY = 5  # penalty for oversold RSI
 
 # ── slow_grind_long (steady uptrend detector) ──────────────────────────────
 # slow_grind_long.py — catches slow, grinding uptrends with low volatility
-SLOW_GRIND_LONG_ENABLED = True              # master kill-switch
+SLOW_GRIND_LONG_ENABLED = False             # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
 SLOW_GRIND_LONG_MIN_R2 = 0.45              # minimum R² for trend quality
 SLOW_GRIND_LONG_MIN_SLOPE_PCT = 0.00025    # minimum slope % per bar (uptrend) — raised from 0.0002
 SLOW_GRIND_LONG_MAX_ATR_PCT = 1.0          # maximum ATR% (low vol = grind)
