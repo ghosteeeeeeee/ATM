@@ -41,8 +41,8 @@ REGIME_PARAMS = {
             'MAX_GAP': 7.0,          # default 6.0 — allow more extension
             'MIN_PULLBACK': 0.45,    # default 0.35 — clearer pullback required
             'REEXPAND_MIN': 0.28,    # default 0.20 — stronger bounce confirmation
-            'RSI_MAX': 72,           # default 68 — more room in volatile markets
-            'CHASE_MOVE_MAX': 3.0,   # default 2.0 — more noise tolerance
+            'RSI_MAX': 68,           # default 68 — same as default (was 72, too loose)
+            'CHASE_MOVE_MAX': 2.5,   # default 2.0 — slightly more tolerance (was 3.0, too loose)
             'GREEN_CAP': 2,          # default 3 — less chasing in volatile
             'COOLDOWN_BARS': 25,     # default 20 — longer cooldown
             'VOLUME_MULT': 1.2,      # default 1.1 — volume more important
@@ -52,8 +52,8 @@ REGIME_PARAMS = {
             'MAX_GAP': 8.0,          # default 6.0 — extreme extension OK
             'MIN_PULLBACK': 0.55,    # default 0.35 — very clear pullback required
             'REEXPAND_MIN': 0.35,    # default 0.20 — strong bounce confirmation
-            'RSI_MAX': 70,           # default 68 — moderate room
-            'CHASE_MOVE_MAX': 4.0,   # default 2.0 — extreme noise
+            'RSI_MAX': 66,           # default 68 — MORE restrictive in EXTREME (was 70, too loose)
+            'CHASE_MOVE_MAX': 2.0,   # default 2.0 — SAME as default (was 4.0, too loose — caught MON)
             'GREEN_CAP': 2,          # default 3 — don't chase in storms
             'COOLDOWN_BARS': 30,     # default 20 — long cooldown
             'VOLUME_MULT': 1.3,      # default 1.1 — volume critical
