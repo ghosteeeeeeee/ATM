@@ -1,3 +1,29 @@
+## CEO Report — 2026-09-07 ~06:45 UTC
+
+### Diagnosis
+System 24h: 51T, 56.9% WR, -$1.10. 48h: 85T, 57.6% WR, -$0.71, R:R 0.563. **Active signals ARE profitable:** bb-bounce-v2-long+ 9T 77.8% WR +$0.28, pump-chain+ 8T 100% WR +$0.31. **Legacy bleed is the entire loss:** slow-grind+ 14T 35.7% WR -$0.88 + coil-spring+ 12T 41.7% WR -$0.44 = -$1.32 (more than total loss). Without legacy: 25T, 76% WR, **+$0.22**. System green on active signals.
+
+### Root Cause
+**Legacy trades still closing.** slow-grind+ last closed 03:25 UTC (ages out ~03:25 Sep 8). coil-spring+ last closed 15:03 UTC Sep 6 (ages out ~15:03 Sep 7). 1 open slow-grind+ position (opened 06:02 UTC, pre-kill). R:R 0.563 is entirely from legacy exits — active signal R:R is healthy (bb-bounce-v2-long+ profit-monster-trail avg +$0.056).
+
+### Fix Applied
+**No parameter changes.** PM_TRAIL is protected (DO NOT CHANGE — line 1782-1783). System is performing correctly on active signals. Legacy will age out within 24h.
+
+### Verification
+- Active signals: +$0.59/24h (bb-bounce + pump-chain + open-skies)
+- Legacy drag: -$1.32/24h (closing, zero new entries)
+- 1 open slow-grind+ position (pre-kill) — will close via normal exits
+- Target: R:R recovers to 0.70+ after legacy ages out (by Sep 8 03:25 UTC)
+
+### Next Actions
+1. Monitor legacy age-out (slow-grind+ closes by 03:25 UTC Sep 8)
+2. Verify R:R recovery post-legacy (target 0.70+ by Sep 8)
+3. Monitor bb-bounce-v2-long+ STAR (9T/24h 77.8% WR)
+4. Monitor pump-chain+ (8T/24h 100% WR)
+5. Disk 84% — approaching 85% trigger
+
+---
+
 ## CEO Report — 2026-09-06 ~10:35 UTC
 
 ### Diagnosis

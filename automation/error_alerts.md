@@ -32,3 +32,20 @@
 - **WARN** (3x): `signal_compactor: timed out` in standalone timer (23:11, 23:17, 23:22) — pipeline-internal compactor ran fine (0.29s). Non-critical.
 - **INFO**: Disk at 83% (93G/118G) — approaching 85% threshold. No action needed yet.
 - **INFO**: Empty `data/regime_5m.json` — stale file, nothing reads it (signals use `/var/www/hermes/data/`).
+
+## Health Report — 2026-09-07 03:23 UTC
+- **PIPELINE**: OK — last cycle 03:22:15, 14s CPU, completed successfully
+- **POSITION MANAGER**: 3 open → 0 open, 13 trades today, 30.8% WR, -$1.15 PnL (low vol, small sample)
+- **SIGNALS**: 149 generated (1h), latest 03:22:10. 0 signals blocked by filters
+- **MARKET**: NEUTRAL (105/107), 2 LONG bias (AEVO, CRV), 0 SHORT. BTC $79,806
+- **SYSTEM**: Guardian active, disk 83% (93G/118G), 0 phantom trades, prices fresh
+- **WARN** (11x in 2h): `signal_compactor: timed out` — recurring. Compactor self-completes (0.15-0.83s), timeout is cosmetic in pipeline runner. Non-fatal.
+- **WARN**: Win rate 30.8% today (13 trades) — small sample, not actionable yet
+- **AUTO-FIX**: None needed — all non-critical
+
+## Error Alerts — 2026-09-07 05:25 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 05:13 — single occurrence, recovered on next cycle. Cosmetic.
+- **WARN**: Disk 84% (118G total, 93G used). Below 85% threshold but trending up. Consider log rotation.
+- **WARN**: `slow-grind+` signal 0% winrate today (5 losses, -$0.77). Sample size low, monitor.
+- **WARN**: `price_staleness.json` not found — cannot verify price freshness.
+- **AUTO-FIX**: None needed — all non-critical.

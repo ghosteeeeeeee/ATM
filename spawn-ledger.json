@@ -1,0 +1,15 @@
+[
+  {
+    "pid": 3773475,
+    "create_time": 1788762136.55,
+    "purpose": "mcp-helper",
+    "install": "92d7eb9b82ba",
+    "spawner_pid": 3772654,
+    "spawner_create": 1788762126.78,
+    "registered_at": 1788762137.4997907,
+    "argv": "/usr/bin/python3 /root/.hermes/mcp/hermes-coding-mcp/server.py",
+    "host": "",
+    "port": null,
+    "profile": ""
+  }
+]

@@ -1,5 +1,43 @@
 
 
+## [2026-09-07 06:07 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (4W, +$0.20) — all pump-chain+ profit-monster-trail
+**24h Context:** 50T 56%WR -$1.22 | atr_sl_hit 18% (healthy)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 22T (44%) avg +$0.052 — carrying system
+- cut-loser-CL-T1: 14T (28%) avg -$0.161 — normal
+- atr_sl_hit: 9T (18%) avg -$0.083 — healthy
+- profit-monster-T1: 5T (10%) avg +$0.128 — bonus exits
+
+**24h Signal Leaders:**
+- pump-chain+: 8T 100%WR +$0.31 ⭐
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.28 ⭐
+- slow-grind+: 14T 35.7%WR -$0.88 (persistent drag)
+- coil-spring+: 13T 38.5%WR -$0.62 (persistent drag, already killed by signal reporter)
+
+**Kill Criteria Check:**
+- No 0%WR signal with 3+T last hour → none to kill
+- slow-grind+ 35.7%WR — not 0%, not kill criteria
+- coil-spring+ 38.5%WR — not 0%, not kill criteria
+- atr_sl_hit 18% → well under 40%
+- Trade freq ~2/hr normal
+- 4 open positions (SOL slow-grind+, USUAL/WLD open-skies+, TURBO r2-trend-short3)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 0%WR with 3+T last hour
+- Last hour 100% WR (4T all pump-chain+ profit-monster-trail)
+- atr_sl_hit 18% — healthy
+- pump-chain+ and bb-bounce-v2-long+ stars
+- slow-grind+ persistent drag but no kill trigger
+
+**Open Questions:**
+- slow-grind+ 14T 35.7%WR -$0.88 persistent drag. Not kill criteria (35.7%WR not 0%) but second biggest system loser after killed coil-spring+.
+- 24h -$1.22 net negative despite 56%WR — cut-loser-CL-T1 exits have high avg loss (-$0.161). R:R on losers could improve.
+
 ## [2026-09-05 14:06 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (1W, +$0.05)
@@ -2549,3 +2587,41 @@ Final set: ['AIXBT', 'ATOM', 'BLUR', 'CFX', 'DOGE', 'DOT', 'FOGO', 'GRASS', 'INJ
 
 **Open Questions:**
 - slow-grind+ 4 consecutive negative hours. Was profitable at 23:00 UTC, then collapsed. Not killable by rule but trending badly. Monitor next hour — if still negative, consider preemptive kill.
+
+## [2026-09-07 05:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 1 ($17 TURBO SHORT r2-trend-short3)
+**24h Context:** 46T 52%WR -$1.55
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 18T (39%) avg +$0.053
+- cut-loser-CL-T1: 14T (30%) avg -$0.161
+- atr_sl_hit: 9T (20%) avg -$0.083
+- profit-monster-T1: 5T (11%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.28 (star)
+- pump-chain+: 4T 100%WR +$0.11 (star)
+- coil-spring+: 13T 38.5%WR -$0.62 (rotating out)
+- slow-grind+: 14T 35.7%WR -$0.88 (degraded 5h)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- No signal has 3+T 0%WR last hour
+- atr_sl_hit 20% healthy
+- Quiet period, not overtrading
+
+**Open Questions:**
+- slow-grind+ degraded 5h straight. If next burst loses, becomes killable.
+
+## LOSERS Update — 2026-09-07 06:05 UTC
+- REMOVE APT (insufficient data)
+- ADD STX (WR=28.6%, PnL=$-0.54, wr_collapse (55.6% → 28.6%))
+- ADD BIGTIME (WR=33.3%, PnL=$-0.45, low_wr (33.3%))
+- ADD ZEN (WR=20.0%, PnL=$-0.38, low_wr (20.0%))
+- ADD NOT (WR=37.5%, PnL=$-0.36, low_wr (37.5%))
+- ADD ETC (WR=40.0%, PnL=$-0.20, low_wr (40.0%))
+
+Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO', 'NOT', 'STX', 'W', 'ZEN']

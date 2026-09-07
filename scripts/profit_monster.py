@@ -13,7 +13,7 @@ from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
-    PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS,
+    PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS, PM_TIER_BYPASS_SIGNALS,
 )
 # FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
 # Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
@@ -270,6 +270,10 @@ def run_tier(tier_name, min_pct, max_pct, max_close, skip_top_pct, fire_windows,
         return 0
 
     in_range = filter_by_pnl(positions, min_pct, max_pct)
+
+    # Skip signals in PM_TIER_BYPASS (ride ATR SL/TP only)
+    in_range = [p for p in in_range if not any(s in (p.get("signal", "") or "") for s in PM_TIER_BYPASS_SIGNALS)]
+
     log(f"  [{tier_name}] {len(in_range)} positions in [{min_pct}-{max_pct}%]")
 
     if not in_range:
