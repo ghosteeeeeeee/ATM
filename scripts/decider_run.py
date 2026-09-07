@@ -3465,6 +3465,7 @@ def run(dry_run=False):
         # ── EMA300 CONDITION CHECK for SHORT trades ─────────────────────────
         # Block SHORT trades when EMA300 is rising or price is above EMA300
         if direction.upper() == 'SHORT' and 'ema300-dip-short' in (source or ''):
+            log(f'  🔍 [EMA300-CHECK] {token} {direction} — checking EMA conditions...')
             try:
                 _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
                 _ema_rows = _conn_ema.execute(
