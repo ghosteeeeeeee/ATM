@@ -379,6 +379,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('slow_grind_short', 'slow-grind-'):   0.5,
     # slow_grind_long — slow grinding uptrend detector (low volatility, high R²)
     ('slow_grind_long', 'slow-grind+'):    1.0,
+    # pullback_entry — post-impulse consolidation (mean-reversion)
+    ('pullback_entry_long', 'pullback-entry+'):  1.0,  # mean-reversion, standard weight
+    ('pullback_entry_short', 'pullback-entry-'): 1.0,  # mean-reversion, standard weight
     # ema300_dip_long — buy dips to EMA300 during strong uptrends
     ('ema300_dip_long', 'ema300-dip-long'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # ema300_dip_short — sell rallies to EMA300 during strong downtrends

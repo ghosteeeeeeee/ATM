@@ -1606,6 +1606,8 @@ def execute_trade(token, direction, price, confidence, source,
 
     _base_size = _get_dynamic_position_size()
     _trade_size = _base_size * _get_favorite_size_mult(token) * _get_amplitude_size_mult(token)
+    # FIX 2026-09-06: Cap at HL_MIN after multipliers — amplitude/fav mults can reduce below minimum
+    _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
     # DEBUG: Trace open-skies trade opening
     if 'open-skies' in (source or ''):

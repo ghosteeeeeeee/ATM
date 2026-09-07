@@ -2482,3 +2482,36 @@ Final set: ['AIXBT', 'ATOM', 'BLUR', 'CFX', 'DOGE', 'DOT', 'FOGO', 'GRASS', 'INJ
 
 **Open Questions:**
 - slow-grind+ had 3 consecutive negative hours (last 3h: 12T 4W -$1.04). Was profitable 5-6h ago (+$0.42). Looks like regime variance not structural — monitor next hour. If negative again, consider regime filter or parameter tune.
+
+## [2026-09-07 03:07 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (2W 2L -$0.01)
+**24h Context:** 47T 52%WR -$1.07 | avg -$0.023
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (43%) avg +$0.065 — carrying system
+- cut-loser-CL-T1: 14T (30%) avg -$0.162 — normal
+- atr_sl_hit: 8T (17%) avg -$0.093 — healthy
+- profit-monster-T1: 5T (11%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 10T $0.60 — star
+- pump-chain+: 4T +$0.11 — star
+- slow-grind+: 13T -$0.75 — stopped firing this hour (self-correcting)
+- coil-spring+: 15T -$0.73 — killed 15:07 UTC, rotating out
+
+**Kill Criteria Check:**
+- No signal with 0%WR + 3+ trades last hour → none to kill
+- atr_sl_hit 17% → healthy
+- Trade freq 4/hr → normal
+- Open 3 ($116 — ETC, TURBO, STX)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- slow-grind+ stopped firing naturally — self-correcting
+- All thresholds healthy, system steady state
+
+**Open Questions:**
+- coil-spring+ 15T in 24h window, rotates out ~15:07 UTC today
+- 3h negative streak improving to flat (-$0.01 last hour)

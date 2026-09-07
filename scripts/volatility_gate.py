@@ -40,6 +40,7 @@ REGIME_SIGNALS = {
         'accel-300-v3-long+',  # V3 pullback LONG — works in all regimes (trend-based, not vol-based)
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
+        'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
@@ -79,6 +80,7 @@ REGIME_SIGNALS = {
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
+        'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
@@ -119,6 +121,7 @@ REGIME_SIGNALS = {
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
+        'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
         'hl_copy_trader',  # pro trader copy — works in all regimes
@@ -156,6 +159,7 @@ REGIME_SIGNALS = {
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
+        'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum

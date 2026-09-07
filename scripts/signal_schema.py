@@ -884,6 +884,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if _comp == 'slow-grind+' and not SLOW_GRIND_LONG_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_LONG_ENABLED=False', flush=True)
                 return None
+            # pullback_entry — post-impulse consolidation
+            if _comp == 'pullback-entry' and not PULLBACK_ENTRY_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PULLBACK_ENTRY_ENABLED=False', flush=True)
+                return None
+            if _comp == 'pullback-entry+' and not PULLBACK_ENTRY_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PULLBACK_ENTRY_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'pullback-entry-' and not PULLBACK_ENTRY_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PULLBACK_ENTRY_MINUS_ENABLED=False', flush=True)
+                return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_MACD_ENABLED=False', flush=True)
@@ -2252,6 +2262,7 @@ def is_component_disabled(component: str) -> bool:
             ACCEL_300_V3_SHORT_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
+            PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2375,6 +2386,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # slow-grind-long
     if c == 'slow-grind+': return not SLOW_GRIND_LONG_ENABLED
+    # pullback-entry
+    if c == 'pullback-entry': return not PULLBACK_ENTRY_ENABLED
+    if c == 'pullback-entry+': return not PULLBACK_ENTRY_PLUS_ENABLED
+    if c == 'pullback-entry-': return not PULLBACK_ENTRY_MINUS_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
     if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED

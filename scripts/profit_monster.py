@@ -13,7 +13,7 @@ from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
-    PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS,
+    PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS,
 )
 # FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
 # Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
@@ -69,7 +69,7 @@ def get_all_open_positions():
             bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
             params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
         cur.execute(f"""
-            SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
+            SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time, signal
             FROM trades
             WHERE server = 'Hermes' AND status = 'open'
               AND entry_price > 0 AND current_price > 0
@@ -79,7 +79,8 @@ def get_all_open_positions():
         rows = cur.fetchall()
         return [
             {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
-             "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
+             "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6],
+             "signal": r[7] or ""}
             for r in rows
         ]
     except Exception as e:
@@ -340,6 +341,15 @@ def run_trail(positions, dry_run):
         tid = str(pos["id"])
         pnl = pos.get("live_pnl_pct", pos["pnl_pct"])
         now = time.time()
+
+        # Skip trail for signals in PM_TRAIL_BYPASS (still get T1/T2)
+        signal = pos.get("signal", "")
+        if any(s in signal for s in PM_TRAIL_BYPASS_SIGNALS):
+            # Remove from trail state if it was previously trailing
+            if tid in state:
+                log(f"  [TRAIL] {pos['token']} bypassed (signal={signal}) — removing from trail state")
+                del state[tid]
+            continue
 
         if tid in state:
             # ── Already trailing ──────────────────────────────────────────

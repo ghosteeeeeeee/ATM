@@ -81,6 +81,9 @@ SIGNAL_OVERRIDES = {
     'neutral_sniper': 'MEAN_REVERSION',       # StochRSI+CMF mean-reversion — fires in chop, not momentum
     'neutral_sniper_long': 'MEAN_REVERSION',
     'neutral_sniper_short': 'MEAN_REVERSION',
+    'pullback_entry': 'MEAN_REVERSION',       # post-impulse consolidation — mean-reversion
+    'pullback_entry_long': 'MEAN_REVERSION',
+    'pullback_entry_short': 'MEAN_REVERSION',
 }
 
 
