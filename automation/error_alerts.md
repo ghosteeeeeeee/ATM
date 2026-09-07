@@ -28,6 +28,14 @@
 - **WARN**: Regime fully NEUTRAL (105/107 tokens) — low volatility environment
 - **AUTO-FIX**: None needed — all non-critical
 
+## Error Alerts — 2026-09-07 17:24 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 17:21 — non-fatal, pipeline completed on schedule
+- **INFO**: Pipeline OK — 3 open trades, 57 closed today, -4.71% PnL
+- **INFO**: Market NEUTRAL — 2 LONG bias / 1 SHORT / 103 neutral, 53% speed (127/240 tokens)
+- **INFO**: Disk 81% (91G/118G) — below threshold
+- **INFO**: Best signal today: pump_chain_long (87.5% WR, $0.60 PnL). Worst: slow_grind_long (18.2% WR, -$1.27)
+- **AUTO-FIX**: None needed — all non-critical
+
 ## Error Alerts — 2026-09-06 23:23 UTC
 - **WARN** (3x): `signal_compactor: timed out` in standalone timer (23:11, 23:17, 23:22) — pipeline-internal compactor ran fine (0.29s). Non-critical.
 - **INFO**: Disk at 83% (93G/118G) — approaching 85% threshold. No action needed yet.
@@ -49,3 +57,20 @@
 - **WARN**: `slow-grind+` signal 0% winrate today (5 losses, -$0.77). Sample size low, monitor.
 - **WARN**: `price_staleness.json` not found — cannot verify price freshness.
 - **AUTO-FIX**: None needed — all non-critical.
+
+## Error Alerts — 2026-09-07 10:25 UTC
+- **WARN** (1x): `disk_85pct` — Disk at 85% used (94G/118G). No single hog identified.
+- **WARN** (1x): `slow_grind_10pct_wr` — slow-grind signal: 10% winrate, -1.35 USDT. Candidate for disable.
+- **INFO**: No errors, no crashes, no phantom trades. Pipeline healthy.
+
+## Error Alerts — 2026-09-07 12:24 UTC
+- **WARN** (ongoing since Sep 4): `hermes-5m-candle.service` — script `_aggregate_5m.py` missing, service broken since Sep 4. price_collector handles 5m aggregation already.
+- **AUTO-FIX**: Disabled `hermes-5m-candle.service` + timer. Dead weight removed.
+- **WARN**: Disk at 84% (94G/118G). Compressed logs >7 days old.
+- **WARN**: `slow-grind+` signal: 35.7% WR, -$0.77 today (14 trades). Flat market = losses.
+- **WARN**: `coil-spring+` signal: 16.7% WR, -$0.74 today (6 trades). Worst performer.
+- **INFO**: Pipeline healthy, 5 open positions, 52 closed today. Market flat (104/106 NEUTRAL).
+
+## Error Alerts — 2026-09-07 13:22 UTC
+- **WARN** (2x): `signal_compactor: timed out` at 13:17 and 13:20 — pipeline continued, non-critical
+- **WARN** (1x): Disk at 85% — monitor trend, consider log compression if >90%

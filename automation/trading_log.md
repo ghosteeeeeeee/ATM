@@ -2749,3 +2749,256 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 **Open Questions:**
 - slow-grind+ degraded 7 consecutive hours (14T 35.7%WR -$0.88). SOL LONG open at 3.1h $11. Not killable by strict rule (0T last hour), but structural underperformance — if next burst loses, becomes strongest preemptive kill candidate.
 - coil-spring+ still in 24h window (8T -$0.55) rotating out naturally.
+
+## [2026-09-07 11:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L -$0.18)
+**24h:** 51T 54.9%WR -$1.49
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (39%) avg +$0.047
+- cut-loser-CL-T1: 14T (27%) avg -$0.161
+- atr_sl_hit: 12T (24%) avg -$0.067
+- profit-monster-T1: 5T (10%) avg +$0.128
+
+**24h Signal Leaders:**
+- pump-chain+: 12T 83.3%WR +$0.09 (positive)
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.25 (star)
+- slow-grind+: 14T 35.7%WR -$0.88 (degraded 9h+)
+- coil-spring+: 6T 0%WR -$0.69 (structural loser)
+- open-skies+: 3T 66.7%WR -$0.04 (flat)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: 1T last hour, no signal has 3+T 0%WR last hour
+- atr_sl_hit 24% healthy (under 40%)
+- Trade freq 1/hr normal
+- bb-bounce-v2-long+ and pump-chain+ both positive
+
+**Open Questions:**
+- coil-spring+ has 0%WR over 24h (6T, 0 wins, -$0.69). Strict kill rule requires 3+T last hour at 0%WR — not met. If it fires next hour and loses, becomes strongest kill candidate.
+- slow-grind+ degraded 9 consecutive hours (14T 35.7%WR -$0.88). Consistent with previous hours. Watchlist item.
+
+## [2026-09-07 12:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L +$0.04)
+**24h:** 52T 55.8%WR -$1.60
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 21T (39%) avg +$0.046
+- cut-loser-CL-T1: 14T (26%) avg -$0.161
+- atr_sl_hit: 12T (22%) avg -$0.067
+- profit-monster-T1: 5T (9%) avg +$0.128
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 10T 80%WR +$0.29 (star)
+- pump-chain+: 12T 83.3%WR +$0.09 (positive)
+- slow-grind+: 14T 35.7%WR -$0.88 (degraded 9h+)
+- coil-spring+: 6T 0%WR -$0.69 (structural loser, 0T last hour)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: 1T last hour, no signal has 3+T at 0%WR last hour
+- atr_sl_hit 22% healthy (under 40%)
+- Trade freq 1/hr normal
+- bb-bounce-v2-long+ and pump-chain+ both positive stars
+
+**Open Questions:**
+- coil-spring+ has 0%WR over 24h (6T, 0 wins, -$0.69). Strict rule not met (0T last hour). If next burst fires and loses, strongest kill candidate.
+- slow-grind+ degraded 9+ consecutive hours (14T 35.7%WR -$0.88). Watchlist.
+
+## [2026-09-07 13:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W 0L +$0.45)
+**24h:** 53T 58.5%WR -$1.15
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 21T (39%) avg +$0.057
+- cut-loser-CL-T1: 14T (26%) avg -$0.161
+- atr_sl_hit: 12T (22%) avg -$0.067
+- profit-monster-T1: 6T (11%) avg +$0.120
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 10T 80%WR +$0.49 (star)
+- pump-chain+: 13T 84.6%WR +$0.11 (star)
+- slow-grind+: 15T 40%WR -$0.80 (degraded 10h+, still winning occasionally)
+- coil-spring+: 5T 0%WR -$0.69 (structural loser, 0T last hour)
+
+**Changes:** None — kill criteria not met.
+
+**No Change Needed:**
+- Kill criteria not met: 3T last hour, no signal has 3+T at 0%WR last hour
+- atr_sl_hit 22% healthy
+- Trade freq 3/hr normal
+- All 3 trades winners this hour
+
+**Open Questions:**
+- coil-spring+ remains structural loser (5T 0%WR) but strict rule requires 3+T last hour at 0%WR — not firing.
+- slow-grind+ degraded 10 consecutive hours (15T 40%WR -$0.80) but still winning 40% — watchlist.
+
+## [2026-09-07 14:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W +$0.12 DYDX pump-chain+ profit-monster-trail)
+**24h:** 52T 54%WR -$0.21 | profit-monster-trail 21T avg +$0.062 carrying system
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 21T (40%) avg +$0.062
+- cut-loser-CL-T1: 13T (25%) avg -$0.165
+- atr_sl_hit: 12T (23%) avg -$0.067
+- profit-monster-T1: 6T (12%) avg +$0.120
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 9T 88.9%WR +$0.49 ⭐
+- pump-chain+: 14T 85.7%WR +$0.23 ⭐
+- slow-grind+: 15T 40%WR -$0.80 (persistent drag, dormant last 3h)
+- coil-spring+: 4T 0%WR -$0.58 (dormant last 8h, already rotating out)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no 0%WR signal with 3+T last hour
+- slow-grind+ 40%WR not 0%, no trades last 3h — rotating out naturally
+- coil-spring+ 0 trades last 8h — effectively dormant
+- atr_sl_hit 23% well under 40%
+- pump-chain+ and bb-bounce-v2-long+ both star performers
+- 3 open positions (WLFI r2-trend-short3, SOL bb-bounce-v2-long+, HBAR open-skies+) all flat
+
+**Open Questions:**
+- 24h PnL -$0.21 slightly negative. System at baseline. If slow-grind+ trades resume and lose, strongest preemptive kill candidate.
+
+## [2026-09-07 15:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 46T 56.5%WR -$0.18 | profit-monster-trail 20T avg +$0.065 carrying system
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T (43%) avg +$0.065
+- atr_sl_hit: 11T (24%) avg -$0.057
+- cut-loser-CL-T1: 9T (20%) avg -$0.174
+- profit-monster-T1: 6T (13%) avg +$0.120
+
+**24h Signal Leaders:**
+- bb-bounce-v2-long+: 7T 100%WR +$0.65 ⭐ (losers aged out)
+- pump-chain+: 14T 85.7%WR +$0.23 ⭐
+- slow-grind+: 15T 40%WR -$0.80 (dormant 2h+, watchlist)
+- coil-spring+: 0T naturally aged out of 24h window
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: 0 trades closed last hour, no signal qualifies
+- atr_sl_hit 24% healthy
+- Trade freq 0/hr (quiet hour), 2/hr avg normal
+- 5 open positions, WLFI r2-trend-short3 at 8.3h longest
+
+**Open Questions:**
+- slow-grind+ remains persistent drag but dormant — if trades resume and lose, strongest kill candidate
+- WLFI r2-trend-short3 open 8.3h — monitor for stale position
+
+## [2026-09-07 16:10 UTC] Hourly Analysis
+
+**Trades:** 8 closed (4W 4L)
+**PnL:** -$0.34 (WR: 50%)
+**24h:** 53T 64.2%WR -$0.58
+
+**Last Hour Breakdown:**
+- pump-chain+: 3T +$0.19 (3W profit-monster-trail) ✅
+- bb-bounce-v2-long+: 3T -$0.18 (1W profit-monster-trail, 2L cut-loser)
+- open-skies+: 1T -$0.19 (atr_sl_hit)
+- bb-bounce-v2-long+,rs-s35,rs-s37,rs-s64: 1T -$0.16 (cut-loser)
+
+**24h Exit Reasons:**
+- profit-monster-trail: 24T (45%) avg +$0.064 (main winner)
+- cut-loser-CL-T1: 12T (23%) avg -$0.163 (biggest drag)
+- atr_sl_hit: 11T (21%) avg -$0.080
+- profit-monster-T1: 6T (11%) avg +$0.120
+
+**24h Signal Leaders:**
+- pump-chain+: 17T 88.2%WR +$0.42 ⭐
+- bb-bounce-v2-long+: 9T 77.8%WR +$0.41 ⭐
+- slow-grind+: 15T 40%WR -$0.80 (dormant 3.2h, persistent drag)
+- open-skies+: 4T 50%WR -$0.23
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no 0%WR signal with 3+T last hour
+- slow-grind+ 40%WR — degraded but not 0%, 0T last 3h
+- atr_sl_hit 21% well under 40%
+- Trade freq 8/hr normal
+- pump-chain+ and bb-bounce-v2-long+ star performers
+- WLFI r2-trend-short3 9.4h flat (stale but flat, not losing)
+
+**Open Questions:**
+- slow-grind+ remains persistent drag at -$0.80/24h but dormant — if trades resume and lose, strongest kill candidate
+- WLFI r2-trend-short3 at 9.4h — monitor for stale position
+
+## [2026-09-07 17:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W 0L)
+**PnL:** +$0.58 (WR: 100%)
+**24h:** 56T 66.1%WR -$0.27
+
+**Last Hour Breakdown:**
+- pump-chain+: 3T +$0.29 (3W profit-monster-trail) ⭐
+- r2v2-long3: 1T +$0.09 (1W profit-monster-trail)
+
+**24h Exit Reasons:**
+- profit-monster-trail: 27T (48%) avg +$0.069 (main winner)
+- cut-loser-CL-T1: 12T (21%) avg -$0.163 (biggest drag)
+- atr_sl_hit: 11T (20%) avg -$0.080
+- profit-monster-T1: 6T (11%) avg +$0.120
+
+**24h Signal Leaders:**
+- pump-chain+: 19T 89%WR +$0.64 ⭐
+- bb-bounce-v2-long+: 9T 78%WR +$0.41 ⭐
+- slow-grind+: 15T 40%WR -$0.80 ⚠️ (dormant 6h+)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no 0%WR signal with 3+T last hour
+- atr_sl_hit 20% well under 40%
+- Trade freq 4/hr normal
+- All exits profit-monster-trail — healthy trailing behavior
+- pump-chain+ on a 6-trade win streak (star)
+- slow-grind+ dormant 6h+ — not trading, not losing
+
+**Open Questions:**
+- slow-grind+ persistent drag at -$0.80/24h but dormant — if trades resume and lose, strongest kill candidate
+- WLFI r2-trend-short3 at 10.3h — stale position, monitor
+
+## [2026-09-07 18:22 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.11 (WR: 100%)
+**24h:** 57T 66.7%WR -$0.16
+
+**Last Hour Breakdown:**
+- ema300-dip-short,rs-r83: 1T +$0.11 (1W AIXBT profit-monster-trail)
+
+**24h Exit Reasons:**
+- profit-monster-trail: 28T (49%) avg +$0.070 ⭐
+- cut-loser-CL-T1: 12T (21%) avg -$0.163 ⚠️
+- atr_sl_hit: 11T (19%) avg -$0.080
+- profit-monster-T1: 6T (11%) avg +$0.120
+
+**24h Signal Leaders:**
+- pump-chain+: 19T 89%WR +$0.64 ⭐
+- bb-bounce-v2-long+: 9T 78%WR +$0.41 ⭐
+- slow-grind+: 15T 40%WR -$0.80 ⚠️ (dormant 5h+)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no 0%WR signal with 3+T last hour
+- atr_sl_hit 19% well under 40%
+- Trade freq 1/hr normal
+- All exits profit-monster-trail — healthy trailing
+- slow-grind+ dormant 5h+ — frozen drag
+
+**Open Questions:**
+- slow-grind+ persistent drag at -$0.80/24h but dormant — if trades resume and lose, strongest kill candidate
+- WLFI r2-trend-short3 at 11.7h — stale position, monitor

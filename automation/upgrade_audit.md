@@ -1,8 +1,8 @@
 # Upgrade Audit Trail
 
 **Created:** 2026-09-06
-**Updated:** 2026-09-07
-**Scanned:** 49 plans in /root/.hermes/plans/
+**Updated:** 2026-09-07 07:30
+**Scanned:** 55 plans in /root/.hermes/plans/
 
 ---
 
@@ -10,12 +10,15 @@
 
 | Metric | Count |
 |--------|-------|
-| Plans scanned | 49 |
-| Already implemented | 27 |
+| Plans scanned | 55 |
+| Already implemented | 35 |
 | Pending (wirable) | 1 |
-| Pending (new work) | 2 |
-| Concluded (no action needed) | 2 |
-| **Total evaluated** | **32** |
+| Pending (new work) | 4 |
+| Concluded (no action needed) | 3 |
+| Rejected by verification | 2 |
+| Tooling (not trading) | 2 |
+| Analysis-only (no action) | 8 |
+| **Total evaluated** | **55** |
 
 ---
 
@@ -30,7 +33,6 @@
 | `2026-08-13_weather-vane-v2-spec.md` | L2 | HIGH | IMPLEMENTED — Hysteresis, Derivative, Integral, Off-course alarm all live |
 | `2026-08-13_weather-vane-v3-spec.md` | L2 | HIGH | IMPLEMENTED — Z-Score + Acceleration prediction live |
 | `2026-08-12_directional-outcome-tracker-spec.md` | L2 | HIGH | IMPLEMENTED — Weather Vane Component 1 live |
-| `2026-08-19_short-bias-fix.md` | L1 | MEDIUM | CONCLUDED — No changes needed, system working correctly |
 | `2026-08-21_hl-reconciliation-postmortem-spec.md` | L2 | HIGH | IMPLEMENTED — `hl_reconciliation.py` + systemd timer |
 | `2026-08-26_30s-price-interval-migration.md` | L1 | HIGH | IMPLEMENTED — minute-boundary quantization in signal_schema.py |
 | `2026-08-27_ponytail-full-audit.md` | L3 | HIGH | Phase 1 DONE — 80 dead scripts deleted, ai_decider/signal_gen removed, sys.path cleaned |
@@ -38,7 +40,6 @@
 | `2026-08-28_losers-list-spec.md` | L2 | MEDIUM | IMPLEMENTED — `losers_tracker.py`, score + position penalties live |
 | `2026-08-29_wave-period-analysis-plan.md` | L2 | MEDIUM | Phase 1 DONE — wave_period_detector.py created, classification complete |
 | `2026-08-29_amplitude-enhancement-brainstorm.md` | L3 | HIGH | Partially done — amplitude_cache.py exists, compactor multiplier live |
-| `confidence-calibration-plan.md` | L1 | LOW | CONCLUDED — No action needed, existing filters confirmed working |
 | `trade_velocity_tracking.md` | L2 | MEDIUM | IMPLEMENTED — velocity_backfill.py, signal_velocity_stats table in PostgreSQL |
 | `2026-09-04_btc-wave-pattern-surfer.md` | L3 | HIGH | IMPLEMENTED — btc_wave_detector.py exists |
 | `2026-09-04_continuum-engine-spec.md` | L4 | HIGH | IMPLEMENTED — continuum_engine.py exists |
@@ -48,6 +49,17 @@
 | `2026-09-07_accel300-long-fix-plan.md` | L1 | HIGH | IMPLEMENTED — RSI<50, pre15<0, mom=falling filters live in decider_run.py for V3 LONG |
 | `2026-09-07_accel300-v4-killer-signal.md` | L1 | HIGH | IMPLEMENTED — RSI>50 filter (SHORT), z>0 filter (HIGH regime) live in decider_run.py for V3 SHORT |
 | `2026-09-06_doji_signal_system.md` | L2 | HIGH | IMPLEMENTED — `doji_top.py` signal live, all infrastructure connected |
+| `atr-spike-signal-build.md` | L2 | HIGH | IMPLEMENTED — `signals/atr_spike.py` live, all params in hermes_constants.py |
+| `atr-spike-backtest-results.md` | L1 | MEDIUM | IMPLEMENTED — backtest confirms atr_spike signal quality, params tuned |
+| `imx-spike-detection.md` | L2 | HIGH | IMPLEMENTED — atr_spike signal was built from this spec |
+| `btc-crash-filter-plan.md` | L2 | HIGH | IMPLEMENTED — `btc_crash_filter.py` live, `BTC_CRASH_BLOCK_*` params active |
+| `cascade-crash-analysis-2026-08-23.md` | L2 | HIGH | IMPLEMENTED — `MULTI_ALT_DIVERGENCE_*` params live in btc_crash_filter.py |
+| `conf-filter-plan.md` | L1 | HIGH | IMPLEMENTED — `CONF_FILTER_ENABLED=True`, `CONF_FILTER_MAX=89` in signal_compactor.py |
+| `exit-mechanics-v2.md` | L1 | MEDIUM | IMPLEMENTED — bypass list fix done: bb_bounce+, confluence, stop_hunt_reversal all in PROFIT_MONSTER_BYPASS_SIGNALS |
+| `coin_tracker_analysis_expansion.md` | L3 | MEDIUM | Phase 1 DONE — Wyckoff, Elliott Wave, S/R, trend quality, volume profile all in coin_tracker_analysis.py |
+| `signal-cluster-analysis-2026-08-26.md` | L2 | LOW | Analysis complete — 69,990 signals analyzed, cascade patterns documented |
+| `signal-cluster-brainstorm-2026-08-26.md` | L2 | LOW | Analysis complete — no actionable implementation |
+| `signal_confluence_spec.md` | L3 | HIGH | IMPLEMENTED — `signals/confluence.py` exists and runs |
 
 ### ⏳ PENDING (Wirable — code exists but not connected)
 
@@ -59,19 +71,65 @@
 
 | Plan | Difficulty | Value | Status | Notes |
 |------|-----------|-------|--------|-------|
-| `2026-08-22_copy-trader-dashboard-enhancements.md` | L3 | MEDIUM | NOT STARTED | Phase 2 (copy delay analysis, pro portfolio view, regime performance) — all new dashboard features |
-| `exit-mechanics-ownership.md` | L3 | MEDIUM | NOT STARTED | Draft status — exit ownership model to resolve ATR SL vs PM Trail conflicts |
-| `2026-09-07_market-sync-protection-plan.md` | L2 | HIGH | DECISION NEEDED | Auditor found 88-92% false positive rate. Needs decision: integrate with MAE guard (Option A) or do nothing (Option C) |
+| `coin_tracker_setup_improvements.md` | L1 | HIGH | NOT STARTED | 5 fixes: regime gate, confirming analyses, MIN_COMPOSITE raise, age decay, kill warm bypass. Signal currently killed. |
+| `automation-team-improvements.md` | L2 | HIGH | NOT STARTED | Self-learner expansion (expand PARAM_CONFIG), session learner → OpenMemory bridge, delete defunct A/B learner |
+| `r2-trend-long-trailing-sl-tuning.md` | L1 | MEDIUM | NOT STARTED | Analysis recommends trail=2.0%, activation=0.8% for r2_trend_long. Current: 0.8%/0.8%. |
+| `exit-strategy-refactor.md` | L3 | MEDIUM | FUTURE | Per-signal exit strategy routing. Simple fix (bypass list split) already deployed. Full refactor deferred. |
+| `exit-mechanics-ownership.md` | L3 | MEDIUM | DRAFT | Exit ownership model — superseded by exit-mechanics-v2.md (bypass list fix already done) |
+| `2026-08-22_copy-trader-dashboard-enhancements.md` | L3 | MEDIUM | NOT STARTED | Phase 2 dashboard features (copy delay analysis, pro portfolio view, regime performance) |
+| `2026-09-07_market-sync-protection-plan.md` | L2 | HIGH | DECISION NEEDED | Auditor found 88-92% false positive rate. Needs decision: integrate with MAE guard or do nothing |
+
+### ❌ REJECTED (by verification agent)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| `atr-sl-widen.md` | L1 | HIGH | REJECTED | ATR SL widening to k=2.0-2.5 rejected — zero of 30 losing trades would be saved. Current values kept. |
+| `2026-08-19_short-bias-fix.md` | L1 | MEDIUM | CONCLUDED | No changes needed, system working correctly |
+
+### 🔧 TOOLING (not trading)
+
+| Plan | Difficulty | Value | Status | Notes |
+|------|-----------|-------|--------|-------|
+| `cronr-timer-plugin.md` | L3 | LOW | NOT STARTED | DSH/Cordis recurring timer plugin — separate from trading system |
+
+### 📊 ANALYSIS (informational only, no implementation needed)
+
+| Plan | Difficulty | Value | Status | Notes |
+|------|-----------|-------|--------|--------|
+| `exit-spec-review.md` | L1 | LOW | CONCLUDED | Independent review of exit-mechanics-ownership — recommended Phase 0 only (bypass fix, already done) |
+| `confidence-calibration-plan.md` | L1 | LOW | CONCLUDED | No action needed, existing filters confirmed working |
+| `2026-08-19_short-bias-fix.md` | L1 | MEDIUM | CONCLUDED | No changes needed |
+| `regime-transition-analysis-2026-08-24.md` | L2 | LOW | CONCLUDED | Incident analysis — documented, lessons applied to Weather Vane system |
+| `favorites-daily-update-spec.md` | L2 | MEDIUM | SPEC ONLY | Daily favorites update spec — not implemented, weekly updater still in place |
+| `fish-finder-species-census-2026-08-26.md` | L2 | LOW | CONCLUDED | Blindspot analysis — informational, no code changes needed |
+| `spec-guitar-tuning.md` | L3 | MEDIUM | SPEC NEEDS REVISION | Multi-dimensional adaptive tuning — verified needs revision, v2 addresses findings |
+| `review-guitar-tuning.md` | L1 | LOW | CONCLUDED | Independent verification of guitar-tuning spec |
+| `spec-signal-regime-memory.md` | L3 | MEDIUM | SPEC NEEDS REVISION | Signal regime memory — verified needs revision, v2 addresses findings |
+| `sl-tuning.md` | L1 | MEDIUM | CONCLUDED | Analysis recommends 0.75% SL for atr_spike — already implemented in atr_spike.py |
+
+### 🧹 CANDIDATES FOR DELETION
+
+| Plan | Reason |
+|------|--------|
+| `exit-mechanics-ownership.md` | Superseded by exit-mechanics-v2.md (bypass list fix done) |
+| `exit-spec-review.md` | Review document, not actionable |
+| `atr-spike-backtest-results.md` | Backtest results already consumed into atr_spike.py params |
+| `signal-cluster-brainstorm-2026-08-26.md` | Brainstorm, no actionable outcomes |
 
 ---
 
 ## Recommended Implementation Order
 
-### Level 2 (MEDIUM) — Do Now
-1. Market sync protection — needs decision first (integrate with MAE guard vs do nothing)
-2. Copy trader dashboard Phase 2 features
-3. Exit mechanics ownership model
+### Level 1 (EASY) — Do Now
+1. **coin_tracker_setup_improvements.md** — regime gate + kill warm bypass (2 line changes in coin_tracker_hot.py)
+2. **features_recorded bug** — fix flag in brain.py/position_manager.py (from atr-sl-widen.md recommendations)
+3. **r2-trend-long trailing SL tuning** — widen trail to 2.0% in hermes_constants.py
+
+### Level 2 (MEDIUM) — Do Next
+4. **automation-team-improvements.md** — expand self_learner PARAM_CONFIG
+5. **Market sync protection** — needs decision (integrate with MAE guard vs do nothing)
 
 ### Level 3+ (HARD) — Later
-4. Ponytail audit Phase 2 (timer cleanup)
-5. Ponytail audit Phase 3 (core function refactoring)
+6. **exit-strategy-refactor.md** — full per-signal exit routing (bypass list split already done)
+7. **spec-guitar-tuning.md** — multi-dimensional adaptive tuning (needs revision first)
+8. **spec-signal-regime-memory.md** — signal regime memory (needs revision first)
