@@ -1141,7 +1141,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
     # REMOVED: 'coil-spring' — CEO wants PM Trail to manage these trades
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
-    'open-skies',            # open skies breakout — ATR SL, not PM Trail
+    'open-skies',            # open skies breakout — ride ATR SL/TP only, no PM at all
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
@@ -1152,6 +1152,11 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
 PM_TRAIL_BYPASS_SIGNALS = (
     'slow-grind',   # slow grinding downtrend — own ATR SL, but T1/T2 capture profits
     'slow-grind+',  # slow grinding uptrend — own ATR SL, but T1/T2 capture profits
+)
+
+# Signals that bypass T1/T2 tiers — ride ATR SL/TP only, no tier profit-taking.
+PM_TIER_BYPASS_SIGNALS = (
+    # Add signals here that should bypass T1/T2 but keep trail active
 )
 
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
@@ -2897,8 +2902,8 @@ PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
 CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
 CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction (score hits 100)
 CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction (score hits 0)
-CONTINUUM_SCORE_LONG_THRESHOLD       = 98      # score >= this → LONG signal
-CONTINUUM_SCORE_SHORT_THRESHOLD      = 2       # score <= this → SHORT signal
+CONTINUUM_SCORE_LONG_THRESHOLD       = 95      # score >= this → SHORT signal
+CONTINUUM_SCORE_SHORT_THRESHOLD      = 5       # score <= this → LONG signal
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
 CONTINUUM_SCORE_STALENESS_MIN        = 5       # max age of continuum data in minutes
 CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme scores
