@@ -1278,8 +1278,8 @@ NEVER_REENABLE_FLAGS = {
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
-    'EMA300_DIP_LONG_ENABLED',  # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13, 6h 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
-    'EMA300_DIP_SHORT_ENABLED',  # CEO 2026-09-05 — 6T/7d 33.3% WR -$0.42. All cut-loser-CL-T1 in NEUTRAL chop. NEVER_REENABLE.
+    # EMA300_DIP_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
+    # EMA300_DIP_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1560,7 +1560,7 @@ R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LON
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip_long.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_LONG_ENABLED = False           # SIGNAL REPORTER 2026-09-04 — 34T/24h 58.8% WR -$1.13. 6h: 25% WR -$1.14. Losses 2.7x wins. NEVER_REENABLE.
+EMA300_DIP_LONG_ENABLED = True            # RE-ENABLED 2026-09-07 — T live test with new filters. DO NOT DISABLE until 2026-09-09 05:00 UTC.
 EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
 EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_LONG_MIN_DIST_PCT = 0.3        # min distance from EMA300 (%) — require meaningful dip, not noise
@@ -1577,7 +1577,7 @@ EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
 # ema300_dip_short.py — catches shallow rallies in strong downtrends
-EMA300_DIP_SHORT_ENABLED = False      # CEO 2026-09-05 — 6T/7d 33.3%WR -$0.42. All losses cut-loser-CL-T1 in NEUTRAL chop. No SHORT edge in flat market.
+EMA300_DIP_SHORT_ENABLED = True       # RE-ENABLED 2026-09-07 — T live test with new filters. DO NOT DISABLE until 2026-09-09 05:00 UTC.
 EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
 EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
@@ -1783,6 +1783,8 @@ CEO_PROTECTED_FLAGS = {
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
     'ACCEL_300_V3_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
     'ACCEL_300_V3_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
+    'EMA300_DIP_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. T re-enabled 2026-09-07', '2026-09-07'),
+    'EMA300_DIP_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. T re-enabled 2026-09-07', '2026-09-07'),
 }
 
 # ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────
@@ -2346,7 +2348,7 @@ RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
 # NEW 2026-09-05 — addresses signal starvation in NEUTRAL regime
 # Uses Stochastic RSI + CMF + ATR range filter (different from BB/RSI signals)
 NEUTRAL_SNIPER_ENABLED = True            # master toggle
-NEUTRAL_SNIPER_PLUS_ENABLED = True       # LONG direction
+NEUTRAL_SNIPER_PLUS_ENABLED = False      # DISABLED 2026-09-07 — CEO request
 NEUTRAL_SNIPER_MINUS_ENABLED = True      # SHORT direction
 NEUTRAL_SNIPER_STOCH_RSI_PERIOD = 14     # RSI period for StochRSI
 NEUTRAL_SNIPER_STOCH_RSI_K = 3           # %K smoothing
