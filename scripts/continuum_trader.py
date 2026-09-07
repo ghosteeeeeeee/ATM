@@ -29,6 +29,7 @@ from continuum_constants import (
     MAX_CONTINUUM_POSITIONS,
     MIN_TIME_BETWEEN_TRADES, MIN_TIME_BETWEEN_ENTRIES,
     MIN_TIME_BETWEEN_EXITS, MAX_TRADES_PER_DAY, COOLDOWN_AFTER_LOSS,
+    HL_MIN_ORDER_USD,
 )
 from _secrets import BRAIN_DB_DICT
 
@@ -382,6 +383,11 @@ class ContinuumTrader:
         # Calculate position size based on score
         size_pct = state.position_size_pct / 100
         size_usd = MAX_POSITION_USD * size_pct
+        
+        # Ensure minimum order size
+        if size_usd < HL_MIN_ORDER_USD:
+            print(f"[TRADER] ENTRY BLOCKED: Size ${size_usd:.0f} below HL minimum ${HL_MIN_ORDER_USD}")
+            return
         
         print(f"\n[TRADER] *** ENTRY SIGNAL *** {side} | Score:{state.state_score:.1f} | Size:${size_usd:.0f}")
         

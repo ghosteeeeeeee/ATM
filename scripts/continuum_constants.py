@@ -97,9 +97,10 @@ EXIT_TIER2_STATES_DEGRADED = 2  # 2+ states degrade = close 50%
 EXIT_TIER3_EMA_BREAK = 3     # candles below EMA300 = close all
 
 # ── Position Sizing ───────────────────────────────────────────────────────────
-MAX_POSITION_USD = 11          # HL minimum — start with one tiny position
+MAX_POSITION_USD = 15          # Above HL $10 minimum (15 × 75% = $11.25)
 LEVERAGE = 10                  # leverage multiplier
 MAX_CONTINUUM_POSITIONS = 1    # ONLY 1 position at a time — no accumulation
+HL_MIN_ORDER_USD = 10          # Hyperliquid minimum order size
 
 # ── Rate Limiting (anti pump_hunter) ──────────────────────────────────────────
 MIN_TIME_BETWEEN_TRADES = 3600   # 1 hour minimum between any trade (entry or exit)
