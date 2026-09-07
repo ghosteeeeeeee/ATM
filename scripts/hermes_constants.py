@@ -1894,6 +1894,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     'ema300-dip-long',  # EMA300 dip buyer — works solo in strong uptrends
+    'ema300-dip-short',  # EMA300 rally seller — works solo in strong downtrends
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',
