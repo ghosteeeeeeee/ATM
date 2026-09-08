@@ -1189,3 +1189,7 @@
   WHY: 5T last hour (2W 3L -$0.41). 73T/24h 61.6%WR +$1.65. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 15.1% healthy. Trade freq 5/hr normal. 4 open positions fresh. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 15:10 UTC
+[2026-09-08 15:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.17). 75T/24h 61.3%WR +$1.82. Kill criteria not met. atr_sl_hit 14.7% healthy. Trade freq 2/hr normal. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 16:10 UTC
