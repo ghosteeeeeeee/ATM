@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-08 ~19:00 UTC (CEO)**
+**Last Updated: 2026-09-08 ~22:30 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 71T, 52.1% WR, -$1.21. 48h: 129T, 58.9% WR, -$1.32. 7d: 200T, 57.5% WR, -$2.10. Today Sep 8: 59T, 50.8% WR, -$1.86 (legacy signal bleed). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
+24h: 70T, 45.7% WR, -$2.51. 48h: 128T, 53.1% WR, -$2.22. 7d: 387T, 56.1% WR, -$4.88. Today Sep 8: 66T, 43.9% WR, -$2.51 (worst day, R:R collapse). Market 100% NEUTRAL.
 
-- **24h:** 72T, 50.0% WR, -$1.21 (verified DB)
-- **48h:** 130T, 57.7% WR, -$1.32 (verified DB)
-- **7d:** 388T, 57.0% WR, -$4.24 (verified DB — legacy aging out)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 71T/74.6% WR +$2.19 ★ | open-skies+ 17T/64.7% WR +$1.55 ★ | pump-chain+ 34T/82.1% WR +$0.60 ★
+- **24h:** 70T, 45.7% WR, -$2.51 (verified DB)
+- **48h:** 128T, 53.1% WR, -$2.22 (verified DB)
+- **7d:** 387T, 56.1% WR, -$4.88 (verified DB — legacy aging out)
+- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 72T/73.6% WR +$1.99 ★ | open-skies+ 18T/61.1% WR +$1.55 ★ | pump-chain+ 37T/70.3% WR -$0.08
 - **7d LEGACY (killed):** accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | slow-grind+ 15T/40% WR -$0.80 | sma20-dip+ 19T/42.1% WR -$0.73 | coil-spring+ 21T/42.9% WR -$0.65
 - **Market:** 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -31,14 +31,16 @@
 2. **confluence-,ichimoku- SHORT** — 1T/7d 0% WR -$0.09. FLAGGED FOR T.
 
 **🔴 R:R STATUS (STRUCTURAL)**
-Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.612 | pump-chain+ 0.370
-24h R:R: 0.681 (avg_win $0.097, avg_loss $0.142). Breakeven WR = 59.5%. Actual 50.0%.
+Signal R:R (7d): open-skies+ 1.550 | bb-bounce-v2-long+ 0.617 | pump-chain+ 0.406
+24h R:R: 0.513 (avg_win 2.51%, avg_loss -4.90%). Breakeven WR = 66.6%. Actual 45.7%.
 24h exit breakdown (losses only):
-- cut-loser-CL-T1: 25T, avg -4.92%, -$3.55 — biggest loss driver
-- atr_sl_hit: 8T, avg -5.23%, -$1.15
-**Note:** PM_TRAIL protected. R:R compressed — system profitable at 59.5%+ WR. Today 48.3% = loss day. 4-day green streak (Sep 5-7 +$0.88) ended by today -$1.86. Legacy signals (ema300-dip-short, sma20-dip+) already killed, 24h losses aging out.
+- cut-loser-CL-T1: 24T, avg -4.84%, -$3.48 — #1 loss driver
+- atr_sl_hit: 13T, avg -2.44%, -$0.72
+**Note:** ATR_SL reverted to 1.2%-1.5% (was 1.5%-1.8%). Wider SL caused avg loss -4.84%, R:R collapsed to 0.51. Expected: tighter SL catches losses earlier, R:R improves to 0.70+. PM_TRAIL protected (0.40%/0.20%). Legacy signals aging out.
 
 ## Today's Changes (Sep 8)
+
+8. **CEO ~22:30 UTC — VERIFIED + ACTION.** DB: 24h 70T 45.7% WR -$2.51 (WORST DAY). 48h: 128T 53.1% WR -$2.22. 7d: 387T 56.1% WR -$4.88. Sep 8: 66T 43.9% WR -$2.51. **ROOT CAUSE: R:R COLLAPSE.** cut-loser-CL-T1 24 exits avg -4.84% = -$3.48. atr_sl_hit 13 exits avg -2.44% = -$0.72. Wins avg 2.51% vs losses avg -4.90% → R:R 0.513. **FIX: Reverted ATR_SL_MIN 1.5%→1.2%, ATR_SL_MAX 1.8%→1.5%.** All 6 fallbacks updated. Expected: avg loss drops from -4.84% to ~-2%, R:R from 0.51 to 0.70+. bb-bounce-v2-long+ 7T/28.6% WR -$0.74 (variance). ema300-dip-short 13T/38.5% WR -$0.96 (aging out). pump-chain+ 16T/50% WR -$0.62. open-skies+ 2T/50% WR +$0.48. 4 open. Disk 82%. PM_TRAIL protected. Market 100% NEUTRAL.
 
 7. **Orchestrator ~18:35 UTC — VERIFIED + NO CHANGES.** DB: 24h 71T 52.1% WR -$1.21. 48h: 129T 58.9% WR -$1.32. 7d: 200T 57.5% WR -$2.10. Sep 8: 59T 50.8% WR -$1.86. **SYSTEM STEADY STATE — no changes needed.** Pipeline active, 409 signals generating, health monitor OK. 5 open positions (all LONG, all slightly negative). **cut-loser-CL-T1 is #1 loss driver:** 21T/24h -$3.04 (exit management, not signal quality). **ema300-dip-short:** EMA300_DIP_SHORT_ENABLED still True in constants (auto_1hr kill at 16:10 overridden by T's re-enable commit). CEO protection until Sep 9 05:00. 12T/24h 41.7% WR -$0.96 — aging out. **sma20-dip+:** SMA20_DIP_PLUS_ENABLED=False (killed). 19T residual rotating out. **bb-bounce-v2-long+:** 6T/33.3% WR -$0.54 today (variance). 7d 37T/73.0% WR +$1.31 still strong. **open-skies+:** 1T/100% WR +$0.48 today. Only healthy R:R. **R:R 24h: 0.662** (breakeven WR 60.1%, actual 52.1%). Disk 82%. Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL. PM_TRAIL protected. No param changes. **Target: 48h positive by Sep 9 as legacy fully ages out.**
 
@@ -188,10 +190,10 @@ Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.612 | pump-chain+ 0.37
 
 ## Next Actions
 
-1. **Monitor ema300-dip re-enable.** DO NOT DISABLE until Sep 9 05:00 UTC. ema300-dip-short 12T/24h 41.7% WR -$0.96 — aging out. Protection expires Sep 9 05:00. — 2026-09-08
-2. **Monitor open-skies+ degradation.** 17T/7d 64.7% WR +$1.55 — holding steady. Kill if WR drops below 45% at 10T/48h. — 2026-09-07
-3. **Monitor neutral_sniper execution.** Signals firing but BTC-CRASH filter blocking SHORTs. Will execute when BTC stabilizes. Need 20+ live trades with WR >55%. — 2026-09-06
-4. **Monitor bb-bounce-v2-long+.** 37T/7d 73.0% WR +$1.31. Today 6T/33.3% WR -$0.54 (variance). Kill if WR drops below 40% at 15T/48h. — 2026-09-08
-5. **Monitor pump-chain+.** 34T/7d 76.5% WR +$0.26. R:R 0.370 (needs 73% WR to break even). — 2026-09-08
+1. **Verify ATR_SL fix impact.** Reverted ATR_SL to 1.2%-1.5%. Monitor next 24h: avg loss should drop from -4.84% to ~-2%, R:R should improve from 0.51 to 0.70+. — 2026-09-08
+2. **Monitor ema300-dip re-enable.** DO NOT DISABLE until Sep 9 05:00 UTC. Protection expires Sep 9 05:00. — 2026-09-08
+3. **Monitor open-skies+ degradation.** 18T/7d 61.1% WR +$1.55 — holding steady. Kill if WR drops below 45% at 10T/48h. — 2026-09-08
+4. **Monitor bb-bounce-v2-long+.** 72T/7d 73.6% WR +$1.99. Today 7T/28.6% WR -$0.74 (variance). Kill if WR drops below 40% at 15T/48h. — 2026-09-08
+5. **Monitor pump-chain+.** 37T/7d 70.3% WR -$0.08. R:R 0.406 (needs 71% WR to break even). — 2026-09-08
 6. **Monitor disk.** Currently 82% (21G free). — 2026-09-08
-7. **Investigate cut-loser-CL-T1.** 21T/24h -$3.04 — biggest loss driver. Exit management issue, not signal quality. — 2026-09-08
+7. **Monitor neutral_sniper execution.** Signals firing but BTC-CRASH filter blocking SHORTs. — 2026-09-06

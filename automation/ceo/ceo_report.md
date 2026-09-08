@@ -1,3 +1,19 @@
+## CEO Report — 2026-09-08 ~22:30 UTC
+
+### Diagnosis
+24h: 70T, 45.7% WR, -$2.51 (WORST DAY in 7d). 48h: 128T, 53.1% WR, -$2.22. 7d: 387T, 56.1% WR, -$4.88. **R:R COLLAPSE:** cut-loser-CL-T1 exits avg -4.84%, wins avg 2.51% → R:R 0.513. Breakeven WR 66.6%, actual 45.7%. Sep 8 daily R:R 0.513 vs Sep 5-7 avg 0.682 — 25% degradation.
+
+### Root Cause
+ATR_SL_MIN widened from 1.2% to 1.5% on Sep 4. Trades bleed to -4.84% avg before exit. Losses 1.95x wins. The wider SL was supposed to "avoid premature exits" but instead lets trades deteriorate past recovery.
+
+### Fix Applied
+Reverted ATR_SL_MIN 1.5%→1.2%, ATR_SL_MAX 1.8%→1.5%. All 6 fallbacks updated (SL_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN, TP_PCT_FALLBACK 4.5%→3.6%, init values). Expected: avg loss drops from -4.84% to ~-2%, R:R from 0.51 to 0.70+.
+
+### Verification
+Pipeline restarted with new settings. Monitor next 24h for R:R improvement. Target: 24h R:R >0.65, daily PnL positive.
+
+---
+
 ## CEO Report — 2026-09-08 ~19:00 UTC
 
 ### Diagnosis
