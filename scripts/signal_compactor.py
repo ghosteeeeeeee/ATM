@@ -379,6 +379,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('slow_grind_short', 'slow-grind-'):   0.5,
     # slow_grind_long — slow grinding uptrend detector (low volatility, high R²)
     ('slow_grind_long', 'slow-grind+'):    1.0,
+    # grind_breakout — steady grind + late breakout (RSI 35-65 quality filter)
+    ('grind_breakout_long',  'grind-breakout+'):  1.0,
+    ('grind_breakout_short', 'grind-breakout-'):  1.0,
     # pullback_entry — post-impulse consolidation (mean-reversion)
     ('pullback_entry_long', 'pullback-entry+'):  1.0,  # mean-reversion, standard weight
     ('pullback_entry_short', 'pullback-entry-'): 1.0,  # mean-reversion, standard weight
@@ -3130,6 +3133,17 @@ def _filter_safe_prev_hotset(prev_hotset):
         entry_staleness = entry.get('staleness', 0)
         if entry_staleness <= 0.01:
             continue  # too old — don't preserve
+        # ── TIME-BASED STALENESS: don't preserve entries older than 5 minutes ──
+        # FIX: Preserved entries bypass detection function — stale signals slip through
+        entry_time = entry.get('time', '')
+        if entry_time:
+            try:
+                entry_ts = time.mktime(time.strptime(entry_time[:19], '%Y-%m-%d %H:%M:%S'))
+                if time.time() - entry_ts > 300:  # 5 minutes
+                    log(f"  🚫 [PRESERVE-TIME-BLOCK] {tok}:{direction} preserved entry too old ({(time.time()-entry_ts)/60:.0f}min)")
+                    continue
+            except Exception:
+                pass
         # ── CONF_FILTER: block preserved entries outside valid confidence range ──
         # Without this, entries with conf >= CONF_FILTER_MAX or conf < CONF_FILTER_MIN
         # survive through the preserved hotset path (they were added before the filter
