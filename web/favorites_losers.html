@@ -64,7 +64,7 @@
     
     <div class="container">
         <div class="panel">
-            <h2>❤ Favorites</h2>
+            <h2>❤ Favorites (7d)</h2>
             <table>
                 <thead>
                     <tr>
@@ -79,9 +79,9 @@
                 <tbody id="fav-table"></tbody>
             </table>
         </div>
-        
+
         <div class="panel">
-            <h2>🗑️ Losers</h2>
+            <h2>🏆 Hall of Fame (30d)</h2>
             <table>
                 <thead>
                     <tr>
@@ -89,10 +89,42 @@
                         <th>Trades</th>
                         <th>WR</th>
                         <th>PnL</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="loser-table"></tbody>
+                <tbody id="hall-fame-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: 20px;">
+        <div class="panel">
+            <h2>📊 30d Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Token</th>
+                        <th>Trades</th>
+                        <th>WR</th>
+                        <th>PnL</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-table"></tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>💀 Hall of Shame (30d)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Trades</th>
+                        <th>WR</th>
+                        <th>PnL</th>
+                    </tr>
+                </thead>
+                <tbody id="hall-shame-table"></tbody>
             </table>
         </div>
     </div>
@@ -172,6 +204,59 @@
             });
         }
         
+        function renderLeaderboard(leaderboard) {
+            const tbody = document.getElementById('leaderboard-table');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            leaderboard.forEach((t, i) => {
+                const fav = t.is_favorite ? '❤' : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td class="token">${iconHtml(t.token)}${t.token} ${fav}</td>
+                        <td>${t.trades}</td>
+                        <td class="${wrClass(t.winrate)}">${t.winrate.toFixed(1)}%</td>
+                        <td class="${pnlClass(t.total_pnl_usdt)}">$${t.total_pnl_usdt.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderHallOfFame(hall) {
+            const tbody = document.getElementById('hall-fame-table');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            hall.forEach(t => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="token">${iconHtml(t.token)}${t.token}</td>
+                        <td>${t.trades}</td>
+                        <td class="wr-good">${t.winrate.toFixed(1)}%</td>
+                        <td class="pnl-pos">$${t.total_pnl_usdt.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderHallOfShame(hall) {
+            const tbody = document.getElementById('hall-shame-table');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            hall.forEach(t => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="token">${iconHtml(t.token)}${t.token}</td>
+                        <td>${t.trades}</td>
+                        <td class="wr-bad">${t.winrate.toFixed(1)}%</td>
+                        <td class="pnl-neg">$${t.total_pnl_usdt.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
         function renderStats(favs, losers) {
             const favCount = favs.length;
             const loserCount = losers.length;
@@ -179,7 +264,7 @@
             const favPnl = favs.reduce((a, f) => a + f.total_pnl_usdt, 0);
             const loserPnl = losers.reduce((a, l) => a + l.total_pnl_usdt, 0);
             const edge = favWr - (losers.reduce((a, l) => a + l.winrate * l.trades, 0) / Math.max(1, losers.reduce((a, l) => a + l.trades, 0)));
-            
+
             document.getElementById('stats').innerHTML = `
                 <div class="stat"><div class="stat-val">${favCount}</div><div class="stat-label">Favorites</div></div>
                 <div class="stat"><div class="stat-val ${favPnl < 0 ? 'negative' : ''}">${favWr.toFixed(1)}%</div><div class="stat-label">Fav WR</div></div>
@@ -192,29 +277,36 @@
         
         async function load() {
             try {
-                const [favR, losR] = await Promise.all([
+                const [favR, losR, lbR] = await Promise.all([
                     fetch('/data/favorites_performance.json?t=' + Date.now()),
-                    fetch('/data/losers_performance.json?t=' + Date.now())
+                    fetch('/data/losers_performance.json?t=' + Date.now()),
+                    fetch('/data/favorites_leaderboard.json?t=' + Date.now())
                 ]);
-                
+
                 const favData = await favR.json();
                 const losData = await losR.json();
-                
+                const lbData = await lbR.json();
+
                 const favs = favData.favorites || [];
                 const losers = losData.losers || [];
-                
+
                 // Top 5 favorites by PnL
                 const topFavs = [...favs]
                     .sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt)
                     .slice(0, 5)
                     .map(f => f.token);
-                
+
                 renderFavs(favs, topFavs);
                 renderLosers(losers);
                 renderStats(favs, losers);
-                
-                document.getElementById('updated').textContent = 
-                    `Favorites: ${favData.updated_at?.slice(0, 16) || 'N/A'} | Losers: ${losData.updated_at?.slice(0, 16) || 'N/A'}`;
+
+                // Render leaderboard sections
+                renderLeaderboard(lbData.leaderboard || []);
+                renderHallOfFame(lbData.hall_of_fame || []);
+                renderHallOfShame(lbData.hall_of_shame || []);
+
+                document.getElementById('updated').textContent =
+                    `Favorites: ${favData.updated_at?.slice(0, 16) || 'N/A'} | Leaderboard: ${lbData.updated_at?.slice(0, 16) || 'N/A'}`;
             } catch(e) {
                 document.getElementById('stats').innerHTML = '<div class="stat"><div class="stat-val">Loading...</div></div>';
             }
