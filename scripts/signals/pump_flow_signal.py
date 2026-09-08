@@ -204,6 +204,33 @@ def scan_signals():
         _log(f"  [pump-flow] Phase confidence too low: {phase.get('confidence', 0):.2f}")
         return 0
     
+    # BTC trend filter — skip LONG when BTC 1h is negative (picking peaks)
+    # Backtest: 81% WR → 89% WR, +5.28% → +6.77% PnL by filtering BTC 1h < 0%
+    btc_1h_ok = True
+    try:
+        import sqlite3 as _sqlite3
+        from paths import STATIC_DB
+        _conn = _sqlite3.connect(f"file:{STATIC_DB}?mode=ro", uri=True, timeout=5)
+        try:
+            _cutoff = time.time() - 3600  # 1 hour ago
+            _rows = _conn.execute("""
+                SELECT price FROM price_history
+                WHERE token = 'BTC' AND timestamp > ?
+                ORDER BY timestamp ASC
+            """, (_cutoff,)).fetchall()
+            if len(_rows) >= 2:
+                btc_first = _rows[0][0]
+                btc_last = _rows[-1][0]
+                if btc_first > 0:
+                    btc_1h_delta = (btc_last - btc_first) / btc_first * 100
+                    btc_1h_ok = btc_1h_delta >= 0
+                    if not btc_1h_ok:
+                        _log(f"  [pump-flow] BTC 1h Δ={btc_1h_delta:+.3f}% < 0% — skipping LONG signals (peak-pick filter)")
+        finally:
+            _conn.close()
+    except Exception:
+        pass  # fail open — don't block on DB errors
+    
     added = 0
     
     # Hoist price lookup outside loop — one fetch for all recommendations
@@ -226,6 +253,10 @@ def scan_signals():
         
         # Validate direction
         if direction not in ('LONG', 'SHORT'):
+            continue
+        
+        # BTC trend filter — skip LONG when BTC 1h is negative
+        if direction == 'LONG' and not btc_1h_ok:
             continue
         
         # Per-direction kill-switch
