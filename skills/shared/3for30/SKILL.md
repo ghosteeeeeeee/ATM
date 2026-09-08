@@ -1,54 +1,106 @@
 ---
 name: 3for30
-description: Monitor open trades every 3 minutes for 30 minutes. Tracks PnL, SL/TP proximity, and v3 signal state. Use when user says "follow every 3 mins", "3for30", "monitor trades", or "track position".
+description: Monitor a trade or signal every 3 minutes for 30 minutes (10 rounds). Agent stays present the entire time, reporting each round live. Use when user says "do a 3for30 on this trade" or "do a 3for30 on this signal".
 ---
 
-# 3for30 — Trade Monitor (3min x 30min)
+# 3for30 — Trade/Signal Monitor (3min x 30min)
 
-Monitor open trades every 3 minutes for 30 minutes (10 rounds). Tracks PnL, SL/TP proximity, and v3 signal health.
+Check on a trade or signal every 3 minutes for 30 minutes (10 rounds). **The agent stays in the conversation the entire time** — not a background script. Each round, the agent checks, reports, and waits for the next interval.
 
-## Usage
+## How It Works
 
-When invoked, run this script in the background:
+1. Parse the trade or signal from user input
+2. Run round 1 immediately — report results
+3. **Actually wait ~3 minutes** (use `sleep 180` or similar) — do NOT skip ahead
+4. Run round 2 — report results
+5. Repeat until round 10
+6. Print final summary
 
-```python
-import sys, os, sqlite3, time
-from datetime import datetime
-sys.path.insert(0, '/root/.hermes/scripts')
-from paths import STATIC_DB
-from signal_schema import get_all_latest_prices
-from signals.accel_300_v3_long import _ema_series, _rsi, detect_accel_300_v3_long
+**The agent is present and responsive the whole 30 minutes.** If the user asks a question mid-monitoring, answer it. If they say "stop", stop early. This is a live watch, not a fire-and-forget.
 
-# TRADES = list of open positions to track
-# Each: {'token': 'X', 'entry': 0.0, 'sl': 0.0, 'tp': 0.0, 'size': 11.1, 'lev': 3}
-```
+## CRITICAL: No Faking Rounds
 
-## Output Format
+- **Every round must be a real, fresh data fetch.** Do NOT copy previous round data.
+- **Do NOT skip rounds or jump to a summary.** All 10 rounds must actually execute.
+- **Do NOT fabricate rounds 4-10 with the same data.** If you only did 3 rounds, say so — don't invent the rest.
+- **Wait the full 3 minutes between rounds.** Use `sleep 180` in bash between checks.
+- If you can't complete all 10 rounds (session timeout, error, user interruption), report exactly which rounds you completed and why the rest didn't happen.
 
+## Two Modes
+
+### Mode 1: Trade Monitoring
+
+**Trigger:** "do a 3for30 on this trade: ..."
+
+The user pastes a trade row. Parse it and monitor the open position.
+
+**Each round, check:**
+- Current price vs entry (PnL % and $)
+- Distance to SL and TP (as %)
+- Signal health indicators: gap, RSI, pullback, reexpansion, 30-bar momentum
+- Whether the signal is still active (sig=YES/NO)
+
+**Output per round:**
 ```
 --- Round N/10 (HH:MM:SS) ---
   TOKEN    STATUS   $PRICE    pnl=+X.XX% $+X.XX | SL X.XX% TP X.XX%
            gap=X.XX% rsi=X.X pull=X.XX reexp=X.XX move30=X.XX sig=YES/NO
 ```
 
-## Status Codes
+**Status codes:** `GREEN` (profit) | `RED` (loss) | `SL HIT` | `TP HIT`
 
-- `GREEN` — in profit
-- `RED` — in loss
-- `SL HIT` — stop loss triggered
-- `TP HIT` — take profit triggered
+**Watch for:**
+1. SL distance < 0.3% → trade at risk
+2. RSI > 68 at peak → likely reversal
+3. Gap shrinking → momentum fading
+4. Reexp negative → bounce failed
+5. New signals firing on same token
 
-## What to Watch For
+---
 
-1. **SL proximity** — if SL distance < 0.3%, trade is at risk
-2. **RSI overbought** — RSI > 68 at peak = likely reversal
-3. **Gap narrowing** — gap shrinking = momentum fading
-4. **Reexp negative** — bounce failed, exit signal
-5. **New signals** — check if v3 fires again on same token
+### Mode 2: Signal Monitoring
+
+**Trigger:** "do a 3for30 on this signal: ..."
+
+The user pastes a signal row. Watch whether the signal becomes profitable.
+
+**Each round, check:**
+- Current price vs signal entry/target
+- PnL since signal fired
+- Whether the signal is still valid or invalidated
+- Volume/momentum confirming or fading
+
+**Output per round:**
+```
+--- Round N/10 (HH:MM:SS) ---
+  SIGNAL   ENTRY    $NOW     pnl=+X.XX% | TARGET X.XX%
+           vol=X.XX rsi=X.X status=ACTIVE/WEAK/INVALID
+```
+
+**Status codes:** `ACTIVE` (signal holding) | `WEAK` (fading) | `INVALID` (signal dead) | `TARGET HIT`
+
+**Watch for:**
+1. Price moving toward target → signal working
+2. Price stalling or reversing → signal weakening
+3. Volume dropping off → conviction fading
+4. Opposite signals firing → conflict
+
+---
+
+## Shared Behavior
+
+- **Round 1** runs immediately, then every ~3 minutes
+- **Agent stays present** — not a background task. Reports each round inline in the conversation
+- If trade closes or signal completes early, mark `DONE` and stop
+- If user interrupts with a question, answer it, then continue monitoring
+- If user says "stop" or "enough", end the monitoring early
+- If a check fails (API error, missing data), note it and continue to next round
+- Logs: `/root/.hermes/logs/3for30_<token>.log`
 
 ## After 30 Minutes
 
 Summarize:
-- Final PnL for each trade
-- Which filters worked / didn't work
-- Any patterns for signal tuning
+- Final status (PnL for trades, outcome for signals)
+- Trend across rounds (improving / stable / degrading)
+- What worked, what didn't
+- Any patterns worth tuning

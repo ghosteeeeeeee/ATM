@@ -393,3 +393,38 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 - Today's degradation: bb-bounce-v2-long+ went from 67%WR yesterday to 33%WR today. Market regime shift?
 - pump-chain+ degraded from 83%WR to 53%WR. Same pattern.
 - 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.48. System deteriorating.
+
+## [2026-09-08 21:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L, -$0.03)
+**24h:** 73T 48.6%WR -$0.55
+**Today:** 66T 43.9%WR -$2.51
+
+**Last hour:**
+- ETC pump-chain+ LONG: -$0.03 profit-monster-trail (breakeven exit)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 32T avg +$0.053 ⭐ (carrying system)
+- cut-loser-CL-T1: 26T avg -$0.144 (loss cutting)
+- atr_sl_hit: 13T 17.6% avg -$0.055 (healthy, under 40%)
+
+**24h Signal Performance (3+ trades):**
+- sma20-dip+: 19T 42%WR -$0.73 (killed, legacy trades settling)
+- pump-chain+: 18T 50%WR -$0.72 (degraded from 83%WR yesterday)
+- ema300-dip-short: 14T 43%WR -$0.90 (killed, legacy trades settling)
+- bb-bounce-v2-long+: 9T 33%WR -$0.89 (worst active, monitoring)
+- open-skies+: 2T 50%WR +$0.48
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour. Only 1T last hour.
+- atr_sl_hit 17.6% healthy ✅
+- Trade freq 1/hr normal
+- bb-bounce-v2-long+ 33%WR persistent drag but not at kill threshold
+- pump-chain+ degraded to 50%WR — 24h aggregate, not last-hour trigger
+
+**Open Questions:**
+- 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.51. System deteriorating. Market regime shift?
+- sma20-dip+ and ema300-dip-short legacy trades still settling (killed earlier today)
