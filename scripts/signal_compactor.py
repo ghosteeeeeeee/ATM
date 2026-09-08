@@ -2298,10 +2298,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _cur_vel.close()
                     if len(_vel_closes) >= 6:
                         _vel_5h = (_vel_closes[0] - _vel_closes[5]) / _vel_closes[5] * 100 if _vel_closes[5] > 0 else 0
-                        # Check newest 3 candles for green (DESC order: [0]=newest, [1]=2nd, [2]=3rd)
-                        _last3_green = sum(1 for i in range(3) if i + 1 < len(_vel_closes) and _vel_closes[i] > _vel_closes[i + 1])
-                        if _vel_5h > SHORT_VEL_FILTER_VEL_THRESHOLD or _last3_green >= SHORT_VEL_FILTER_GREEN_THRESHOLD:
-                            log(f"  🚫 [VEL-FILTER] {tkn}: SHORT blocked — vel={_vel_5h:+.3f}% last3g={_last3_green}")
+                        # Check newest N candles for green (DESC order: [0]=newest)
+                        # NOTE: range must match threshold — was range(3) with threshold=5 = dead code
+                        _lastN_green = sum(1 for i in range(SHORT_VEL_FILTER_GREEN_THRESHOLD) if i + 1 < len(_vel_closes) and _vel_closes[i] > _vel_closes[i + 1])
+                        if _vel_5h > SHORT_VEL_FILTER_VEL_THRESHOLD or _lastN_green >= SHORT_VEL_FILTER_GREEN_THRESHOLD:
+                            log(f"  🚫 [VEL-FILTER] {tkn}: SHORT blocked — vel={_vel_5h:+.3f}% lastNg={_lastN_green}")
                             continue
                 except Exception:
                     pass  # non-fatal

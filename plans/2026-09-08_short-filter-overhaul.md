@@ -180,19 +180,71 @@ if btc_momentum < -0.10:  # BTC falling
 
 ---
 
+## Independent Audit Findings (2026-09-08)
+
+**Verdict: UNSOUND (as originally written) — critical flaws identified**
+
+| Issue | Audit Finding | Severity |
+|-------|--------------|----------|
+| VEL-FILTER green candle check | **DEAD CODE** — `range(3)` can never reach threshold of 5. The OR condition is inert. Only velocity >0.3% actually blocks. | CRITICAL |
+| "146 blocked winners" claim | **UNVERIFIABLE** — no simulation script exists. System doesn't track forward returns of blocked signals. | HIGH |
+| Executed vs blocked comparison | **UNFAIR** — executed SHORTs have SL/TP applied (avg loss -1.09%), blocked SHORTs measured on raw candle move (no risk management). Not comparable. | HIGH |
+| 0.5% VEL threshold | **NO BACKTEST** — original backtest established 0.1%. Already raised 3x (0.1→0.3). Raising again without data. | MEDIUM |
+| SHORT-NEUTRAL "stale" | **MISLEADING** — block already has bypasses (SHORT_BIAS, strong confluence, standalone bypass). 2,146 SHORTs bypassed on Sep 8. Only 894 actually blocked. | MEDIUM |
+| Confluence gate | **NOT MENTIONED** — 3,058 SHORTs blocked by single-source requirement. This is the BIGGEST blocker, not the filters the plan focuses on. | MEDIUM |
+| SHORT R:R | **POOR** — avg win +0.31% vs avg loss -1.09% (0.28:1 R:R). Relaxing filters adds volume without fixing the underlying R:R problem. | MEDIUM |
+
 ## Risk Assessment
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| More bad SHORTs get through | Medium | Low (SL limits loss) | Monitor WR, revert if <45% |
+| More bad SHORTs get through | High | Medium (R:R is 0.28:1) | Monitor WR, revert if <45% |
 | LONG filters also get relaxed | Low | High | SHORT fixes are SHORT-specific |
 | Pipeline starvation (too many SHORTs) | Low | Medium | Rate limits still apply |
-| Overfitting to Sep 8 data | Medium | Medium | Validate on Sep 7-9 data |
+| Overfitting to Sep 8 data | High | High | Must validate on Sep 7-9 data |
+| Confluence gate change breaks LONG quality | Medium | High | Don't touch confluence for now |
+
+## Revised Recommendations
+
+### Fix 1: VEL-FILTER Dead Code (CRITICAL — do first)
+
+**File:** `signal_compactor.py:2302`
+**Bug:** `range(3)` can only produce values 0,1,2 — `_last3_green` max is 3, but threshold is 5. Green candle check is dead code.
+
+**Fix:** Change `range(3)` to `range(SHORT_VEL_FILTER_GREEN_THRESHOLD)` or change threshold back to 3.
+
+### Fix 2: Build Simulation Script (before any threshold changes)
+
+Need a script that:
+1. Takes all blocked SHORT signals
+2. Looks up token price at signal time and 30min/1hr later
+3. Applies same SL/TP logic as live trades
+4. Produces comparable PnL numbers
+
+Without this, all "would-have-won" claims are speculation.
+
+### Fix 3: Address SHORT R:R (higher impact than filter relaxation)
+
+The real problem: avg SHORT win is +0.31% but avg loss is -1.09%. Even with 50% WR, the system bleeds.
+
+Options:
+- Tighter SL on SHORTs (currently ATR-based, same as LONGs)
+- Wider TP target for SHORTs
+- Trailing stop on SHORTs (currently not implemented for SHORTs)
+
+### Fix 4: VEL-FILTER Threshold (only after simulation)
+
+If simulation confirms the 0.3% threshold blocks more winners than losers, raise to 0.4% (conservative, not 0.5%).
+
+### Fix 5: SHORT-NEUTRAL (only after data)
+
+The block already has bypasses. If BTC-aligned relaxation is needed, add it as a NEW bypass condition rather than removing the existing block.
 
 ---
 
 ## Files to Modify
 
-1. `scripts/hermes_constants.py` — Threshold changes
-2. `scripts/signal_compactor.py` — Filter logic changes
-3. `plans/2026-09-08_btc-alignment-crash-protection-overhaul.md` — Cross-reference with LONG filter plan
+1. `scripts/signal_compactor.py` — Fix dead code bug (line 2302)
+2. `scripts/hermes_constants.py` — Threshold changes (only after simulation)
+3. `scripts/simulate_blocked_shorts.py` — NEW: simulation script to verify claims
+4. `plans/2026-09-08_btc-alignment-crash-protection-overhaul.md` — Cross-reference with LONG filter plan
