@@ -98,7 +98,7 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',
         'range_breakout+', 'range_breakout_short',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',
-        'r2-trend-short',  # R² downtrend SHORT — works in all regimes
+        'r2-trend-long', 'r2-trend-short',  # R² trend detectors — LONG only in HIGH (74.1% WR)
         'slow-grind-',
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
