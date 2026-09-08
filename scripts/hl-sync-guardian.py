@@ -3697,7 +3697,8 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                             pass
                         breach_closed += 1
             else:
-                log(f'  [SELF-CLOSE] ❌ {coin} market close failed — will retry next cycle', 'FAIL')
+                _clear_closing_marker(coin)  # Clear marker so signal compactor isn't blocked (2026-09-08 fix)
+                log(f'  [SELF-CLOSE] ❌ {coin} market close failed — cleared closing marker, will retry next cycle', 'FAIL')
             time.sleep(3)
 
     # ── Normal breach check (protected coins with DB trades) ─────────────────────
@@ -3775,7 +3776,8 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
         success = close_position_hl(coin, breach_reason)
         if not success:
             _CLOSED_HL_COINS.discard(tok)  # Remove on failure, allow retry next cycle
-            log(f'  ❌ {coin} breach close failed — will retry next cycle', 'FAIL')
+            _clear_closing_marker(tok)  # Clear marker so signal compactor isn't blocked (2026-09-08 fix)
+            log(f'  ❌ {coin} breach close failed — cleared closing marker, will retry next cycle', 'FAIL')
             # Bug-fix: removed os.close(lock_fd) here — the `finally` block handles
             # lock release for ALL paths including this continue.
             continue
@@ -4155,7 +4157,7 @@ def sync():
     try:
         # _load_closing_markers() returns {TOK: {started, ...}} already unwrapped
         marker_map = _load_closing_markers()
-        _MARKER_MAX_AGE_S = 30 * 60  # 30 min — forever-block is worse than brief race
+        _MARKER_MAX_AGE_S = 5 * 60  # 5 min — was 30 min, caused phantom position blocks (BTC/HBAR stale markers 2026-09-08)
         now_ts = time.time()
         for tok in list(marker_map.keys()):
             tok_u = tok.upper()
