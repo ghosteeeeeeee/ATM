@@ -3462,11 +3462,14 @@ def run(dry_run=False):
                 _record_hotset_failure(token, direction, failures)
                 continue
 
-        # ── EMA300 FULL CONDITION CHECK for SHORT trades ──────────────────────
-        # Re-validates ALL 6 detection conditions at execution time
-        # Prevents stale signals from executing when conditions have changed
+        # ── EMA300 STABLE CONDITION CHECK for SHORT trades ────────────────────
+        # Re-validates only STABLE conditions at execution time.
+        # Detection conditions (C2 trend, C4 dist, C5 RSI, C6 red candle) are
+        # fragile — they shift in minutes between detection and execution.
+        # Stable conditions (C1 price<EMA, C3 slope<0, C7 consec below) don't
+        # change quickly and reliably block losers (all 9 losers had C1/C3/C7 fail).
         if direction.upper() == 'SHORT' and 'ema300-dip-short' in (source or ''):
-            log(f'  🔍 [EMA300-CHECK] {token} {direction} — re-validating all conditions...')
+            log(f'  🔍 [EMA300-CHECK] {token} {direction} — re-validating stable conditions...')
             try:
                 _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
                 _ema_rows = _conn_ema.execute(
@@ -3488,46 +3491,17 @@ def run(dry_run=False):
                     _dist = (_current_price - _current_ema) / _current_ema * 100
                     _ema_slope = (_ema_vals[-1] - _ema_vals[-20]) / _ema_vals[-20] * 100 if len(_ema_vals) >= 20 else 0
 
-                    # C1: Price below EMA300
+                    # C1: Price below EMA300 (ALL 9 losers had price ABOVE at execution)
                     if _dist > 0:
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C1: price above EMA300 (dist={_dist:+.4f}%)')
                         skipped += 1; continue
 
-                    # C2: Strong downtrend (>85% candles below EMA300)
-                    _lookback = min(100, len(_prices))
-                    _above = sum(1 for i in range(len(_prices)-_lookback, len(_prices)) if _prices[i] > _ema_vals[i])
-                    _trend = 100 - (_above / _lookback * 100)
-                    if _trend < 85:
-                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C2: weak downtrend ({_trend:.0f}% < 85%)')
-                        skipped += 1; continue
-
-                    # C3: EMA300 slope < 0 (falling) — ALL 9 losers had POSITIVE slope
+                    # C3: EMA300 slope < 0 (ALL 9 losers had POSITIVE slope)
                     if _ema_slope >= 0:
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C3: EMA rising ({_ema_slope:+.4f}%)')
                         skipped += 1; continue
 
-                    # C4: Price within 0.5% of EMA300
-                    if abs(_dist) > 0.5:
-                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C4: too far from EMA ({_dist:+.4f}%)')
-                        skipped += 1; continue
-
-                    # C5: RSI > 65 (overbought)
-                    _deltas = [_prices[i]-_prices[i-1] for i in range(1,len(_prices))]
-                    _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
-                    _losses_r = [-d if d < 0 else 0 for d in _deltas[-14:]]
-                    _avg_gain = sum(_gains)/14; _avg_loss = sum(_losses_r)/14
-                    _rsi = 100-(100/(1+_avg_gain/_avg_loss)) if _avg_loss > 0 else 100.0
-                    if _rsi < 65:
-                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C5: RSI not overbought ({_rsi:.1f} < 65)')
-                        skipped += 1; continue
-
-                    # C6: Red candle (close < previous close)
-                    if _prices[-1] >= _prices[-2]:
-                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C6: not red candle (close >= prev)')
-                        skipped += 1; continue
-
                     # C7: Sustained downtrend — price below EMA300 for 20+ consecutive candles
-                    # ALL 9 losers had consec_below=0 (just crossed above EMA)
                     _consec = 0
                     for _ci in range(len(_prices)-1, -1, -1):
                         if _prices[_ci] < _ema_vals[_ci]:
@@ -3538,7 +3512,7 @@ def run(dry_run=False):
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: not sustained ({_consec} consec below EMA < 20)')
                         skipped += 1; continue
 
-                    log(f'  ✅ [EMA300-CHECK] {token} — all 7 conditions PASS (consec_below={_consec})')
+                    log(f'  ✅ [EMA300-CHECK] {token} — stable conditions PASS (slope={_ema_slope:+.3f}% consec={_consec})')
                 else:
                     log(f'  🚫 [EMA300-CHECK] {token} — not enough data ({len(_ema_rows)} rows)')
                     skipped += 1; continue
