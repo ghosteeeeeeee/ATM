@@ -493,6 +493,22 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
                 'chain_evidence': chain_evidence[:3],
                 'flow_score': flow['flow_score'],
             })
+        
+        # SHORT recommendations for tokens with strong outflows during DISTRIBUTION
+        outflow_tokens = [f for f in active_flows if f['direction'] == 'OUT' and f['tier'] >= 2]
+        for flow in outflow_tokens[:5]:
+            conf = min(0.8, 0.3 + abs(flow['velocity_15m']) * 2)
+            if conf >= 0.4:
+                recommendations.append({
+                    'token': flow['token'],
+                    'tier': flow['tier'],
+                    'tier_name': flow['tier_name'],
+                    'reason': f"Capital outflow during distribution: {flow['velocity_15m']:.2f}% velocity",
+                    'confidence': round(conf, 3),
+                    'suggested_direction': 'SHORT',
+                    'chain_evidence': [],
+                    'flow_score': flow['flow_score'],
+                })
     
     elif phase_data['phase'] == 'MARKDOWN':
         # Capital fleeing — recommend watching BTC as safe haven
@@ -519,6 +535,25 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
                     'suggested_direction': 'SHORT',
                     'chain_evidence': [{'leader': 'BTC', 'lift': edge['lift'], 'wr': edge['wr']}],
                     'flow_score': -abs(edge['strength']),
+                })
+        
+        # SHORT recommendations for tokens with strong outflows (capital fleeing)
+        outflow_tokens = [f for f in active_flows if f['direction'] == 'OUT' and f['tier'] >= 2]
+        for flow in outflow_tokens[:5]:
+            # Skip if already recommended
+            if any(r['token'] == flow['token'] for r in recommendations):
+                continue
+            conf = min(0.8, 0.3 + abs(flow['velocity_15m']) * 2)
+            if conf >= 0.4:  # minimum confidence threshold
+                recommendations.append({
+                    'token': flow['token'],
+                    'tier': flow['tier'],
+                    'tier_name': flow['tier_name'],
+                    'reason': f"Capital outflow detected: {flow['velocity_15m']:.2f}% velocity, score={flow['flow_score']:.1f}",
+                    'confidence': round(conf, 3),
+                    'suggested_direction': 'SHORT',
+                    'chain_evidence': [],
+                    'flow_score': flow['flow_score'],
                 })
     
     elif phase_data['phase'] == 'MARKUP':
