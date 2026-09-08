@@ -3526,7 +3526,37 @@ def run(dry_run=False):
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C6: not red candle (close >= prev)')
                         skipped += 1; continue
 
-                    log(f'  ✅ [EMA300-CHECK] {token} — all 6 conditions PASS')
+                    # C7: Range-bound filter — count EMA300 crossings in last 48h
+                    # 0-1 crossings = solid downtrend → allow
+                    # 2+ crossings = oscillating/choppy → block
+                    try:
+                        _conn_wide = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
+                        _wide_rows = _conn_wide.execute(
+                            "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 2880",
+                            (token.upper(),)
+                        ).fetchall()
+                        _conn_wide.close()
+                        if _wide_rows and len(_wide_rows) >= 500:
+                            _wide_prices = [r[0] for r in reversed(_wide_rows)]
+                            _wide_ema_vals = []
+                            _wide_ema_v = _wide_prices[0]
+                            for _wp in _wide_prices:
+                                _wide_ema_v = _wp * _k2 + _wide_ema_v * (1 - _k2)
+                                _wide_ema_vals.append(_wide_ema_v)
+                            _crossings = 0
+                            for _ci in range(1, len(_wide_prices)):
+                                _was_above = _wide_prices[_ci-1] > _wide_ema_vals[_ci-1]
+                                _is_above = _wide_prices[_ci] > _wide_ema_vals[_ci]
+                                if _was_above != _is_above:
+                                    _crossings += 1
+                            if _crossings > 1:
+                                log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: range-bound ({_crossings} EMA300 crossings in 48h)')
+                                skipped += 1; continue
+                    except Exception as _we:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: wide query error ({_we}) — BLOCKED (fail-closed)')
+                        skipped += 1; continue
+
+                    log(f'  ✅ [EMA300-CHECK] {token} — all 7 conditions PASS')
                 else:
                     log(f'  🚫 [EMA300-CHECK] {token} — not enough data ({len(_ema_rows)} rows)')
                     skipped += 1; continue
