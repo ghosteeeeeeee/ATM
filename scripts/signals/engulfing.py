@@ -8,14 +8,14 @@ Detection (migrated to 5m 2026-09-08):
   1. Current candle body > previous candle body (true engulfing)
   2. Current candle moves > ENGULFING_MIN_MOVE% from previous close
   3. Previous N candles had tight range (< ENGULFING_PRIOR_RANGE%)
-  4. Volume confirms the move (> 1.2× average) — entry_gates.volume_gate
+  4. Volume confirms the move (> ENGULFING_VOLUME_RATIO× average) — entry_gates.volume_gate
   5. 15m EMA trend alignment — don't fire counter-trend
   6. S/R proximity — prefer bounces near structural levels
   7. R:R pre-check — suppress if < 2:1 — entry_gates.rr_gate
   8. Candle close confirmation — skip forming candles — entry_gates.candle_close_gate
   9. Session timing — skip Sunday early morning — entry_gates.session_timing_gate
 
-Based on MORPHO observation: 0.22% drop in 1 minute after tight consolidation.
+Based on MORPHO observation: sharp drop after tight consolidation.
 Book sources: Porwal (engulfing at S/R), Woods (engulfing + volume + context)
 """
 import sys
@@ -36,6 +36,7 @@ from hermes_constants import (
     ENGULFING_MIN_MOVE, ENGULFING_PRIOR_RANGE,
     ENGULFING_LOOKBACK,
     ENGULFING_CONF_BASE, ENGULFING_CONF_CAP,
+    ENGULFING_VOLUME_RATIO,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -52,8 +53,8 @@ def _log(msg):
     print(f"[engulfing] {msg}", flush=True)
 
 
-def _get_candles(token, table='candles_1m', limit=100):
-    """Fetch OHLCV candles. Returns list of {open, high, low, close, volume} oldest-first."""
+def _get_candles(token, table='candles_5m', limit=100):
+    """Fetch OHLCV candles. Returns list of {ts, open, high, low, close, volume} oldest-first."""
     _VALID_TABLES = {'candles_1m', 'candles_5m', 'candles_1h'}
     if table not in _VALID_TABLES:
         return []
@@ -62,7 +63,7 @@ def _get_candles(token, table='candles_1m', limit=100):
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         cur = conn.cursor()
         cur.execute(f"""
-            SELECT open, high, low, close, volume FROM {table}
+            SELECT ts, open, high, low, close, volume FROM {table}
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT ?
@@ -70,7 +71,7 @@ def _get_candles(token, table='candles_1m', limit=100):
         rows = cur.fetchall()
         if not rows or len(rows) < 10:
             return []
-        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
+        return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
                 for r in reversed(rows)]
     except Exception:
         return []
@@ -291,7 +292,7 @@ def scan_engulfing_signals():
             continue
 
         # GATE: Volume confirmation
-        if not volume_gate(candles, min_ratio=1.2):
+        if not volume_gate(candles, min_ratio=ENGULFING_VOLUME_RATIO):
             continue
 
         # GATE: R:R pre-check — use same 5m candles for S/R detection
@@ -302,7 +303,7 @@ def scan_engulfing_signals():
         # Confidence bonus: near S/R = higher quality entry
         near_sr = _is_near_sr(token, price, direction, raw_candles)
         if near_sr:
-            sig['confidence'] = min(sig['confidence'] + 5, 88)
+            sig['confidence'] = min(sig['confidence'] + 5, ENGULFING_CONF_CAP)
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
