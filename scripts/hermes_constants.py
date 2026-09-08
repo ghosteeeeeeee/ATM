@@ -1413,6 +1413,7 @@ COILED_SPRING_ENABLED           = True    # master kill-switch
 COILED_SPRING_PLUS_ENABLED      = False   # KILLED 2026-09-06 15:07 UTC — 5T last hour 0%WR -$0.70. Kill criteria met.
 COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LONG-only)
 COILED_SPRING_COOLDOWN_MINUTES  = 15      # per-token cooldown between fires
+COILED_SPRING_ALLOWED_REGIMES   = ['NORMAL']  # only trade in NORMAL regime (71% WR in NORMAL, 20-40% in others)
 # Detection parameters
 COILED_SPRING_LOOKBACK          = 500     # 5m candles to load
 COILED_SPRING_MIN_IMPULSE_PCT   = 0.0     # min % move from swing low to confirm impulse — disabled for now

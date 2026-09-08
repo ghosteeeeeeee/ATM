@@ -1662,6 +1662,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if ACCEL_300_V3_LONG_FLAT_BLOCK and _regime_4h == 'FLAT':
                     log(f"  🚫 [V3-LONG-FLAT] {token} LONG blocked — FLAT regime, no LONG edge (33% WR)")
                     continue
+            # ── Coiled Spring regime filter ──────────────────────────────────
+            # 71% WR in NORMAL, 20-40% in others — only trade NORMAL
+            if 'coil-spring' in bare_source:
+                try:
+                    from hermes_constants import COILED_SPRING_ALLOWED_REGIMES
+                    if _regime_4h not in COILED_SPRING_ALLOWED_REGIMES:
+                        log(f"  🚫 [COIL-SPRING-REGIME] {token} blocked — {bare_source} not allowed in {_regime_4h} regime (allowed: {COILED_SPRING_ALLOWED_REGIMES})")
+                        continue
+                except ImportError:
+                    pass
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True
