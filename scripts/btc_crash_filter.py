@@ -415,6 +415,7 @@ def check_crash() -> CrashSignal:
         BTC_ACCEL_ENABLED,
         BTC_CRASH_VOL_SPIKE_ENABLED,
         BTC_CRASH_CONTAGION_ENABLED,
+        MULTI_ALT_DIVERGENCE_THRESHOLD,
     )
 
     if not BTC_CRASH_BLOCK_ENABLED:
