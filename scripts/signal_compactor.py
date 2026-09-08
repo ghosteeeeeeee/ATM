@@ -87,6 +87,74 @@ _ATR_CACHE_TTL = 120          # 2 min cache, matches confluence
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
 _dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)
 _DIR_WR_CACHE_TTL = 300  # 5 min cache
+# ── 30d leaderboard cache ─────────────────────────────────────────────────────
+_leaderboard_cache = {}  # token_upper -> {'wr': float, 'pnl': float, 'trades': int}
+_leaderboard_cache_ts = 0
+_LEADERBOARD_CACHE_TTL = 300  # 5 min
+
+
+def _load_leaderboard():
+    """Load30d leaderboard data for scoring bonuses/penalties."""
+    global _leaderboard_cache, _leaderboard_cache_ts
+    import time
+    now = time.time()
+    if _leaderboard_cache and (now - _leaderboard_cache_ts) < _LEADERBOARD_CACHE_TTL:
+        return _leaderboard_cache
+
+    lb_file = os.path.join(HERMES_DATA, 'favorites_leaderboard.json')
+    try:
+        with open(lb_file) as f:
+            data = json.load(f)
+        cache = {}
+        # Add leaderboard tokens
+        for t in data.get('leaderboard', []):
+            cache[t['token'].upper()] = {
+                'wr': t.get('winrate', 50),
+                'pnl': t.get('total_pnl_usdt', 0),
+                'trades': t.get('trades', 0),
+                'is_favorite': t.get('is_favorite', False),
+            }
+        # Add hall of shame tokens (may not be in leaderboard)
+        for t in data.get('hall_of_shame', []):
+            token = t['token'].upper()
+            if token not in cache:
+                cache[token] = {
+                    'wr': t.get('winrate', 50),
+                    'pnl': t.get('total_pnl_usdt', 0),
+                    'trades': t.get('trades', 0),
+                    'is_favorite': False,
+                }
+        _leaderboard_cache = cache
+        _leaderboard_cache_ts = now
+        return cache
+    except Exception:
+        return _leaderboard_cache
+
+
+def _get_leaderboard_mult(token):
+    """Get score multiplier based on 30d performance.
+    - Hall of Fame (30d WR >=70%, 15+ trades): 1.3x bonus
+    - Strong (30d WR >=60%): 1.15x bonus
+    - Weak (30d WR <45%, 15+ trades): 0.7x penalty
+    - No data: 1.0x (neutral)
+    """
+    lb = _load_leaderboard()
+    data = lb.get(token.upper())
+    if not data or data['trades'] < 10:
+        return 1.0
+
+    wr = data['wr']
+    trades = data['trades']
+
+    if wr >= 70 and trades >= 15:
+        return 1.3   # Hall of Fame
+    elif wr >= 60:
+        return 1.15  # Strong performer
+    elif wr < 45 and trades >= 15:
+        return 0.7   # Hall of Shame
+    elif wr < 50:
+        return 0.85  # Below average
+    return 1.0
 
 
 def _get_token_wr(token: str, direction: str) -> tuple:
@@ -990,6 +1058,9 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Favorites score boost — proven tokens get higher ranking
     favorites_mult = FAVORITES_MULT if FAVORITES and token in FAVORITES else 1.0
 
+    # 30d leaderboard bonus/penalty — long-term performers get extra boost
+    leaderboard_mult = _get_leaderboard_mult(token)
+
     # Penalty list — underperformers get deprioritized
     # Losers get stronger penalty (0.5x) than regular penalty tokens (0.7x)
     if LOSERS and token in LOSERS:
@@ -1154,7 +1225,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     except Exception as e:
         log(f"  [WARN] RR engine failed (fail-open): {e}", 'WARN')
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult
     return final_score
 
 

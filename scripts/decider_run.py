@@ -280,12 +280,14 @@ def _get_amplitude_size_mult(token):
 
 
 def _get_favorite_size_mult(token):
-    """Get position size multiplier based on favorites/losers status.
+    """Get position size multiplier based on favorites/losers status +30d performance.
     - Losers: 0.5x (penalized), but never below HL_MIN_NOTIONAL_USDT
-    - Favorites 75%+ WR: 1.8x (extra bump)
-    - Favorites 50%+ WR: 1.5x (standard boost)
-    - Favorites <50% WR: 1.2x (reduced)
+    - Favorites 75%+ WR (7d): 1.8x (extra bump)
+    - Favorites 50%+ WR (7d): 1.5x (standard boost)
+    - Favorites <50% WR (7d): 1.2x (reduced)
     - Normal: 1.0x
+    - Bonus: +0.2x if 30d WR >=70% (hall of fame)
+    - Penalty: -0.3x if 30d WR <45% (hall of shame)
     """
     # Losers get penalized first, but don't go below minimum
     if LOSERS and token.upper() in LOSERS:
@@ -305,7 +307,7 @@ def _get_favorite_size_mult(token):
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("""
-            SELECT 
+            SELECT
                 ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
             FROM trades
             WHERE token = %s AND server = 'Hermes' AND status = 'closed'
@@ -315,11 +317,25 @@ def _get_favorite_size_mult(token):
         if row and row[0] is not None:
             wr = float(row[0])
             if wr >= 75:
-                return 1.8  # High conviction — extra bump
+                base_mult = 1.8  # High conviction — extra bump
             elif wr >= 50:
-                return 1.5  # Standard favorite
+                base_mult = 1.5  # Standard favorite
             else:
-                return 1.2  # Underperformer — reduced size
+                base_mult = 1.2  # Underperformer — reduced size
+
+            # Apply30d adjustment
+            try:
+                from signal_compactor import _get_leaderboard_mult
+                lb_mult = _get_leaderboard_mult(token)
+                if lb_mult >= 1.3:
+                    base_mult += 0.2  # Hall of fame bonus
+                elif lb_mult <= 0.7:
+                    base_mult -= 0.3  # Hall of shame penalty
+                base_mult = max(1.0, base_mult)  # Floor at 1.0
+            except Exception:
+                pass
+
+            return base_mult
         return FAVORITES_SIZE_MULT  # Default if no data
     except Exception:
         return FAVORITES_SIZE_MULT  # Fail open
