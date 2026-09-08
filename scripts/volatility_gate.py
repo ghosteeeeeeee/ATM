@@ -160,7 +160,6 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
-        'slow-grind+',  # slow grinding uptrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
