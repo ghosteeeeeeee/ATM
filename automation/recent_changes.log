@@ -1,3 +1,7 @@
+[2026-09-08 16:10 UTC] auto_1hr: KILLED ema300-dip-short
+  WHY: 7T last hour (2W 5L -$0.39). 75T/24h 54.7%WR -$0.45. Kill criteria met: ema300-dip-short 0%WR (0W4L) last hour, 17T/24h -$0.91 net negative. Redesign re-enabled today failed to improve. profit-monster-trail 38T +$2.49 carrying system. cut-loser-CL-T1 23T -$3.29 biggest drag. atr_sl_hit 12T +$0.33 healthy 16%. sma20-dip+ 19T -$0.73 underperforming but 52.6%WR not at kill threshold. Trade freq 2.3/hr normal. 0 open positions. R:R 0.74:1 (avg_win +$0.097 vs avg_loss -$0.131).
+  BY: auto_1hr
+  NEXT: Re-run at 17:10 UTC
 [2026-09-07 21:07 UTC] auto_1hr: NO CHANGES
   WHY: 4T last hour (3W 1L +$0.99). 60T/24h 65%WR +$0.69. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 22% under 40%. cut-loser-CL-T1 22% avg -$0.159 (loss cutting working). profit-monster-trail 47% avg +$0.078 star. pump-chain+ 18T 88.9%WR +$0.63 star. bb-bounce-v2-long+ 8T 75%WR +$0.45 star. slow-grind+ 15T 40%WR -$0.80 (KILLED, ages out Sep 8). Trade freq 2.5/hr normal. 3 open positions (SEI/ALT/WLFI SHORTS). System improving — 24h PnL flipped positive.
   BY: auto_1hr
