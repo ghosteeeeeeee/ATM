@@ -725,6 +725,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
+            GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
@@ -883,6 +884,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # slow_grind_long — slow grinding uptrend detector
             if _comp == 'slow-grind+' and not SLOW_GRIND_LONG_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_LONG_ENABLED=False', flush=True)
+                return None
+            # grind_breakout — steady grind + late breakout
+            if _comp == 'grind-breakout+' and not GRIND_BREAKOUT_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_BREAKOUT_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'grind-breakout-' and not GRIND_BREAKOUT_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_BREAKOUT_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'grind-breakout' and not GRIND_BREAKOUT_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_BREAKOUT_ENABLED=False', flush=True)
                 return None
             # pullback_entry — post-impulse consolidation
             if _comp == 'pullback-entry' and not PULLBACK_ENTRY_ENABLED:
@@ -2288,6 +2299,7 @@ def is_component_disabled(component: str) -> bool:
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
+            GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
             EMA300_DIP_LONG_ENABLED,
             EMA300_DIP_SHORT_ENABLED,
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
@@ -2423,6 +2435,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # slow-grind-long
     if c == 'slow-grind+': return not SLOW_GRIND_LONG_ENABLED
+    # grind-breakout
+    if c == 'grind-breakout+': return not GRIND_BREAKOUT_PLUS_ENABLED
+    if c == 'grind-breakout-': return not GRIND_BREAKOUT_MINUS_ENABLED
+    if c == 'grind-breakout': return not GRIND_BREAKOUT_ENABLED
     # pullback-entry
     if c == 'pullback-entry': return not PULLBACK_ENTRY_ENABLED
     if c == 'pullback-entry+': return not PULLBACK_ENTRY_PLUS_ENABLED

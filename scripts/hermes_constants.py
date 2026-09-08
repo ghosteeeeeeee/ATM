@@ -1663,8 +1663,16 @@ GRIND_BREAKOUT_CONF_SLOPE_BONUS = 5         # extra for steep slope
 GRIND_BREAKOUT_CONF_ACCEL_BONUS = 3         # extra for strong acceleration
 GRIND_BREAKOUT_CONF_BREAKOUT_BONUS = 2      # extra for clean breakout
 GRIND_BREAKOUT_CONF_PURITY_BONUS = 2        # extra for high purity
+GRIND_BREAKOUT_BREAKOUT_BONUS_BUFFER = 0.005  # 0.5% above range for breakout bonus
+GRIND_BREAKOUT_PURITY_BONUS_MIN = 0.80      # purity threshold for bonus
 # Data
 GRIND_BREAKOUT_LOOKBACK_1M = 200            # 1m bars to fetch
+GRIND_BREAKOUT_RSI_PERIOD = 14              # RSI period
+GRIND_BREAKOUT_MIN_BARS = 70               # min bars needed for detection
+GRIND_BREAKOUT_VEL_SHORT_BARS = 6           # bars for short-term velocity (5m proxy)
+GRIND_BREAKOUT_VEL_LONG_BARS = 16           # bars for long-term velocity (15m proxy)
+GRIND_BREAKOUT_CONSEC_LOOKBACK = 5          # bars for consecutive candle count
+GRIND_BREAKOUT_FRESHNESS_SECS = 600         # 10 min freshness window
 
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
