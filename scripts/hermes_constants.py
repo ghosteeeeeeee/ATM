@@ -3059,7 +3059,7 @@ RESISTANCE_BREAK_EMA_PERIOD     = 50    # EMA for trend filter
 RESISTANCE_BREAK_VOL_SPIKE_MIN  = 1.5   # minimum volume spike ratio
 
 # Cooldown
-RESISTANCE_BREAK_COOLDOWN_HOURS = 2     # per token cooldown
+RESISTANCE_BREAK_COOLDOWN_HOURS = 0.25   # per token cooldown (15 min)
 
 # Confidence
 RESISTANCE_BREAK_CONF_BASE      = 70    # base confidence
