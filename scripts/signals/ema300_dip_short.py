@@ -29,7 +29,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
-from paths import HERMES_DATA, CANDLES_DB
+from paths import HERMES_DATA
 
 from hermes_constants import (
     EMA300_DIP_SHORT_ENABLED,
@@ -111,8 +111,9 @@ def detect_ema300_dip_short(token, candles, price):
         return None
     
     # ── Condition 4: Price within 0.5% of EMA300 (rally) ────────────────
+    # dist is guaranteed negative here (C1 already ensured price < EMA)
     dist = (current_price - current_ema) / current_ema * 100
-    if dist > 0 or abs(dist) > EMA300_DIP_SHORT_MAX_DIST_PCT:
+    if abs(dist) > EMA300_DIP_SHORT_MAX_DIST_PCT:
         return None
     
     # ── Condition 5: RSI > 65 (overbought within downtrend) ──────────────
