@@ -1588,8 +1588,8 @@ EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
 EMA300_DIP_SHORT_MAX_RSI = 85         # max RSI — don't short extreme overbought
 EMA300_DIP_SHORT_MIN_TREND_STRENGTH = 85  # min % of last 100 candles below EMA300
-EMA300_DIP_SHORT_MAX_EMA_SLOPE = -0.1  # max EMA300 slope (%) — require meaningful downtrend (was 0.0, too many weak signals)
-EMA300_DIP_SHORT_RANGE_BOUND_DAYS = 3  # look back this many days — if price was above EMA300 at ANY point, it's range-bound
+EMA300_DIP_SHORT_MAX_EMA_SLOPE = 0.0   # max EMA300 slope (%) — must be negative (downtrend). -0.1 killed 5/7 winners.
+EMA300_DIP_SHORT_MIN_CONSEC_BELOW = 20  # min candles price stayed below EMA300 — confirms sustained downtrend, not just crossed below
 EMA300_DIP_SHORT_COOLDOWN = 15        # cooldown between entries (candles = 15 min)
 EMA300_DIP_SHORT_TP_PCT = 1.0         # take profit (%)
 EMA300_DIP_SHORT_SL_PCT = 1.5         # stop loss (%)

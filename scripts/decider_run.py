@@ -3501,7 +3501,7 @@ def run(dry_run=False):
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C2: weak downtrend ({_trend:.0f}% < 85%)')
                         skipped += 1; continue
 
-                    # C3: EMA300 slope < 0 (falling)
+                    # C3: EMA300 slope < 0 (falling) — ALL 9 losers had POSITIVE slope
                     if _ema_slope >= 0:
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C3: EMA rising ({_ema_slope:+.4f}%)')
                         skipped += 1; continue
@@ -3526,37 +3526,19 @@ def run(dry_run=False):
                         log(f'  🚫 [EMA300-CHECK] {token} FAIL C6: not red candle (close >= prev)')
                         skipped += 1; continue
 
-                    # C7: Range-bound filter — count EMA300 crossings in last 48h
-                    # 0-1 crossings = solid downtrend → allow
-                    # 2+ crossings = oscillating/choppy → block
-                    try:
-                        _conn_wide = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
-                        _wide_rows = _conn_wide.execute(
-                            "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 2880",
-                            (token.upper(),)
-                        ).fetchall()
-                        _conn_wide.close()
-                        if _wide_rows and len(_wide_rows) >= 500:
-                            _wide_prices = [r[0] for r in reversed(_wide_rows)]
-                            _wide_ema_vals = []
-                            _wide_ema_v = _wide_prices[0]
-                            for _wp in _wide_prices:
-                                _wide_ema_v = _wp * _k2 + _wide_ema_v * (1 - _k2)
-                                _wide_ema_vals.append(_wide_ema_v)
-                            _crossings = 0
-                            for _ci in range(1, len(_wide_prices)):
-                                _was_above = _wide_prices[_ci-1] > _wide_ema_vals[_ci-1]
-                                _is_above = _wide_prices[_ci] > _wide_ema_vals[_ci]
-                                if _was_above != _is_above:
-                                    _crossings += 1
-                            if _crossings > 1:
-                                log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: range-bound ({_crossings} EMA300 crossings in 48h)')
-                                skipped += 1; continue
-                    except Exception as _we:
-                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: wide query error ({_we}) — BLOCKED (fail-closed)')
+                    # C7: Sustained downtrend — price below EMA300 for 20+ consecutive candles
+                    # ALL 9 losers had consec_below=0 (just crossed above EMA)
+                    _consec = 0
+                    for _ci in range(len(_prices)-1, -1, -1):
+                        if _prices[_ci] < _ema_vals[_ci]:
+                            _consec += 1
+                        else:
+                            break
+                    if _consec < 20:
+                        log(f'  🚫 [EMA300-CHECK] {token} FAIL C7: not sustained ({_consec} consec below EMA < 20)')
                         skipped += 1; continue
 
-                    log(f'  ✅ [EMA300-CHECK] {token} — all 7 conditions PASS')
+                    log(f'  ✅ [EMA300-CHECK] {token} — all 7 conditions PASS (consec_below={_consec})')
                 else:
                     log(f'  🚫 [EMA300-CHECK] {token} — not enough data ({len(_ema_rows)} rows)')
                     skipped += 1; continue

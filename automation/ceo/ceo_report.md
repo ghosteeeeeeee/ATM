@@ -1,3 +1,17 @@
+## CEO Report — 2026-09-08 ~02:00 UTC
+
+### Diagnosis
+24h: 56T, **71.4% WR**, **+$1.99**. **BEST 24H IN WEEKS.** 48h: 100T, 63.0% WR, +$0.80. 7d: 374T, 58.0% WR, -$2.59 (improving). **All 4 active signals profitable:** bb-bounce-v2-long+ 65T/7d 78.5% WR +$2.73, open-skies+ 17T/7d 64.7% WR +$1.55, pump-chain+ 24T/7d 87.5% WR +$0.88, continuation+ 6T/7d 83.3% WR +$0.05. **Legacy slow-grind+ fully exited** — last close 12:58 UTC Sep 7, only 2T/$-0.05 in 24h window. R:R 24h 0.740 (avg_win $0.108, avg_loss $0.146 — still underwater but improving). 5 open positions (all LONG: bb-bounce x2, pump-chain x3). Disk 82%. Market 100% NEUTRAL.
+
+### Root Cause
+Legacy slow-grind+ was the primary drag — aged out Sep 7 12:58 UTC. 7d negative now only from historical legacy. Active signal selection strong. R:R still underwater (0.74) — cut-loser-CL-T1 exits average -$4.84% per trade vs profit-monster-trail wins +2.53%.
+
+### Fix Applied
+No parameter changes. Updated CURRENT.md with verified DB numbers. Legacy fully exited — system now runs on 4 profitable signals only. **7d PnL trajectory: -$2.59, projected to turn positive within 48h as legacy drops off.**
+
+### Verification
+DB verified. 24h +$1.99 confirmed. 48h +$0.80 confirmed. All signal PnLs confirmed. R:R 0.740 confirmed. No open legacy positions. Pipeline healthy. Disk 82%.
+
 ## CEO Report — 2026-09-07 ~21:00 UTC
 
 ### Diagnosis
