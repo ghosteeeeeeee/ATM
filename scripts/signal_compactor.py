@@ -1645,6 +1645,23 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
                     continue
+            # ── EXTREME/FLAT regime blocks for v3 signals ──────────────────────
+            # v3 SHORT: EXTREME 42% WR, FLAT 33% WR — no edge
+            # v3 LONG: EXTREME 42% WR, FLAT 33% WR — no edge
+            if 'accel-300-v3-short' in bare_source:
+                if ACCEL_300_V3_SHORT_EXTREME_BLOCK and _regime_4h == 'EXTREME':
+                    log(f"  🚫 [V3-SHORT-EXTREME] {token} SHORT blocked — EXTREME regime, no SHORT edge (42% WR)")
+                    continue
+                if ACCEL_300_V3_SHORT_FLAT_BLOCK and _regime_4h == 'FLAT':
+                    log(f"  🚫 [V3-SHORT-FLAT] {token} SHORT blocked — FLAT regime, no SHORT edge (33% WR)")
+                    continue
+            if 'accel-300-v3-long' in bare_source:
+                if ACCEL_300_V3_LONG_EXTREME_BLOCK and _regime_4h == 'EXTREME':
+                    log(f"  🚫 [V3-LONG-EXTREME] {token} LONG blocked — EXTREME regime, no LONG edge (42% WR)")
+                    continue
+                if ACCEL_300_V3_LONG_FLAT_BLOCK and _regime_4h == 'FLAT':
+                    log(f"  🚫 [V3-LONG-FLAT] {token} LONG blocked — FLAT regime, no LONG edge (33% WR)")
+                    continue
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True

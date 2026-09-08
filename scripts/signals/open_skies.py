@@ -220,7 +220,13 @@ def detect(token):
     if vol_ratio < OPEN_SKIES_VOL_SPIKE_RATIO:
         return None  # no volume confirmation
 
-    # ── Condition 7: Higher highs (using actual highs, not closes) ──
+    # ── Condition 7: Recent trend must be UP (don't buy falling knives) ──
+    if len(closes) >= 5:
+        recent_5 = closes[-5:]
+        if recent_5[-1] < recent_5[0]:
+            return None  # price falling in last 5 bars — don't enter
+
+    # ── Condition 8: Higher highs (using actual highs, not closes) ──
     hh_count = _count_higher_highs(highs, OPEN_SKIES_HH_WINDOW)
     if hh_count < OPEN_SKIES_HH_MIN:
         return None  # not structurally bullish

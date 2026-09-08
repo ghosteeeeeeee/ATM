@@ -1534,6 +1534,10 @@ R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT whe
 R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
 SHORT_NEUTRAL_BLOCK_ENABLED = True    # CEO 2026-08-22 — block SHORT in NEUTRAL regime (0% WR, -1.12/7d). No SHORT edge in flat market.
 LONG_NEUTRAL_BLOCK_ENABLED  = True    # CEO 2026-09-02 — block LONG in NEUTRAL regime (399T/7d -$2.33, ALL LONG signals bleed). No LONG edge in flat chop.
+ACCEL_300_V3_SHORT_EXTREME_BLOCK = True  # 2026-09-07 — block v3 SHORT in EXTREME (42% WR, -$0.34). No SHORT edge in extreme volatility.
+ACCEL_300_V3_SHORT_FLAT_BLOCK = True     # 2026-09-07 — block v3 SHORT in FLAT (33% WR). No SHORT edge in flat market.
+ACCEL_300_V3_LONG_EXTREME_BLOCK = True   # 2026-09-07 — block v3 LONG in EXTREME (42% WR, -$0.96). No LONG edge in extreme volatility.
+ACCEL_300_V3_LONG_FLAT_BLOCK = True      # 2026-09-07 — block v3 LONG in FLAT (33% WR). No LONG edge in flat market.
 R2_TREND_LONG_ENABLED        = False   # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% WR -$0.46. ALL losers. NEVER_REENABLE.
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels

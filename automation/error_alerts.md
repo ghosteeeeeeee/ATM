@@ -151,3 +151,11 @@
 - **[WARN]** (1x): `signal_compactor: timed out` — one-off timeout, pipeline recovered, no action needed
 - **[WARN]** (1x): Disk at 82% (21G free) — compressed old logs (>1 day)
 - **[INFO]** Pipeline ran 18:22:32 UTC, completed 18:22:34. 5/5 positions open, 71 closed today, -40.10% PnL. 109 signals in last hour. All timers firing.
+
+## Health Report — 2026-09-08 19:23 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 19:19:02 — recovered on next cycle (19:19:33). Recurring pattern, non-fatal.
+- **[WARN]**: Disk at 83% (92G/118G) — compressed old logs (>3 days), stable
+- **[INFO]** Pipeline ran 19:22:19 UTC, completed 19:22:33. 0 open, 74 closed today, -56.79% PnL. Hotset empty (no signals above 50% confidence).
+- **[INFO]** Market: 3 SHORT bias, 0 LONG bias, 104 tokens scanned. Regime NEUTRAL-leaning.
+- **[INFO]** 53 timers active, all firing on schedule. No crashes, no phantom trades.
+- **AUTO-FIX**: None needed — all issues non-critical, system self-recovers
