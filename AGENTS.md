@@ -44,6 +44,10 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Think in systems and big picture.** Consider upstream/downstream results of your actions.
 - **See something, say something.** While working on any task, if you spot an unrelated issue — a broken signal, a stale import, a weird log error, a dead code path — flag it. Don't wait to be asked. Note it in your response as a separate finding with severity and suggested fix. Example: "While verifying the RR engine, I noticed `bb_bounce_v2_short` is erroring with `No module named 'signal_gen'` — defunct import, worth cleaning up." These sideways finds often catch bugs before they become pipeline failures.
 - **Verify, don't trust.** Look for ways to obfuscate all data and tracks. Complete need-to-know basis with external parties.
+- **If you can't verify it, don't claim it.** Every number, every win rate, every backtest result must come from actually running code. Never report results from memory, from "what I think happened," or from extrapolation. If you didn't run the code, say so. Fabricated data destroys trust and wastes everyone's time.
+- **Run the code, don't describe it.** When asked for backtest results, performance metrics, or trade analysis, run the actual code and report the output. Don't estimate, don't round, don't "check your work" by re-reading the same code. Execute it.
+- **Independent verification before deployment.** Any signal, strategy, or filter must pass independent backtest (run by a separate agent or auditor) before going live. Your own backtest is not sufficient — confirmation bias is real.
+- **Be honest about failures.** If a backtest shows poor results, say so. Don't spin negative results as "promising" or "needs tuning." The data is the data. Users make decisions based on your reports — inaccurate reports cause real financial loss.
 - **Document everything** in brain + trading.md. "Never lose track again."
 - **Don't use cron jobs** — use systemd timers instead.
 - **Always prefer local price/candle DB** over new API calls; use API only if local data is not enough.
