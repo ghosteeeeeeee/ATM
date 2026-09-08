@@ -208,9 +208,8 @@ def scan_signals():
     # Backtest: 81% WR → 89% WR, +5.28% → +6.77% PnL by filtering BTC 1h < 0%
     btc_1h_ok = True
     try:
-        import sqlite3 as _sqlite3
         from paths import STATIC_DB
-        _conn = _sqlite3.connect(f"file:{STATIC_DB}?mode=ro", uri=True, timeout=5)
+        _conn = sqlite3.connect(f"file:{STATIC_DB}?mode=ro", uri=True, timeout=5)
         try:
             _cutoff = time.time() - 3600  # 1 hour ago
             _rows = _conn.execute("""
