@@ -986,3 +986,11 @@
 [2026-09-07 23:08 UTC]   🟢 OK: pump-chain+: 18 trades, 83.3% WR, PnL=4.52
 [2026-09-07 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-07 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-08 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-08 05:08 UTC]   🟢 OK: open-skies+: 5 trades, 60.0% WR, PnL=10.19
+[2026-09-08 05:08 UTC]   🟢 OK: bb-bounce-v2-long+: 11 trades, 63.6% WR, PnL=0.49
+[2026-09-08 05:08 UTC]   🟢 OK: ema300-dip-short: 6 trades, 66.7% WR, PnL=-0.46
+[2026-09-08 05:08 UTC]   🟢 OK: pump-chain+: 22 trades, 77.3% WR, PnL=3.85
+[2026-09-08 05:08 UTC]   🟢 OK: sma20-dip+: 5 trades, 80.0% WR, PnL=1.16
+[2026-09-08 05:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-08 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

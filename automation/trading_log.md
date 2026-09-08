@@ -95,3 +95,19 @@
 
 **Open Questions:**
 - None — system healthy and steady
+
+## [2026-09-08 05:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L, +$0.13)
+**24h:** 59T 69.5%WR +$1.83
+**Exit breakdown:** profit-monster-trail: 36T avg +$0.074 ⭐ | cut-loser-CL-T1: 12T avg -$0.148 | atr_sl_hit: 10T avg +$0.087
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 17% healthy
+- Trade freq 4/hr normal
+- 3 open positions fresh
+- All signals neutral/positive in 24h
+
+**Open Questions:**
+- None — system healthy

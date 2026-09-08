@@ -1155,3 +1155,7 @@
   WHY: 0T last hour. 56T/24h 69.6%WR +$1.69. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 20% healthy. Trade freq 2.3/hr normal. 4 open positions fresh. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 05:10 UTC
+[2026-09-08 05:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L +/usr/bin/bash.13). 59T/24h 69.5%WR +$1.83. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 17% healthy. Trade freq 4/hr normal. 3 open positions fresh. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 06:10 UTC

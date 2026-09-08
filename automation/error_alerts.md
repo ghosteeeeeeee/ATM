@@ -96,3 +96,11 @@
 - **INFO**: Pipeline healthy — 61 trades today, +13.56% PnL, 4 open positions
 - **INFO**: Disk at 81% (91G/118G) — below 85% threshold
 - **AUTO-FIX**: None needed — all non-critical
+
+## Error Alerts — 2026-09-08 04:23 UTC
+- **WARN** (4x): `signal_compactor` timeout at 04:18 and 04:21 — recurring, pipeline still completes successfully
+- **INFO**: Pipeline healthy —12 trades today, 2 closed (+0.04 USDT), 5 open positions
+- **INFO**: Disk at 82% (91G/118G) — below 85% threshold
+- **INFO**: Timers all firing on schedule —48 active hermes timers
+- **INFO**: Market regime — 3 LONG_BIAS, 2 SHORT_BIAS, 100 NEUTRAL (overall: NEUTRAL)
+- **AUTO-FIX**: Compressed 17 old log files (saved ~30MB)
