@@ -3121,3 +3121,36 @@ Final set: ['ARB', 'BCH', 'BIGTIME', 'CASHCAT', 'CRV', 'ETC', 'FIL', 'JUP', 'LDO
 
 **Open Questions:**
 - WLFI SHORT 16h stale — monitor
+
+## [2026-09-07 23:58 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L +$0.12)
+**24h:** 59T 61%WR +$0.06 (breakeven)
+
+**Last Hour:**
+- WLFI SHORT r2-trend-short3: +$0.05 (profit-monster-trail) ✅
+- APT LONG bb-bounce-v2-long+: +$0.02 (profit-monster-trail) ✅
+- SEI SHORT r2-trend-short3: +$0.05 (atr_sl_hit) — positive even on SL hit ✅
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 29T (49%) avg +$0.076 ⭐
+- cut-loser-CL-T1: 15T (25%) avg -$0.146
+- atr_sl_hit: 13T (22%) avg -$0.009 ✅
+- profit-monster-T1: 2T (5%) avg +$0.090
+
+**Signal Leaders (24h):**
+- pump-chain+: 18T 83.3%WR +$0.48 ⭐
+- bb-bounce-v2-long+: 9T 66.7%WR +$0.21 ⭐
+- open-skies+: 5T 60%WR +$0.71 ⭐
+- r2-trend-short3: 3T 100%WR +$0.12 ⭐
+
+**No Change Needed:**
+- Kill criteria: slow-grind+ (11T 18.2%WR -$1.34) already killed NEVER_REENABLE. No other signal at 3+T/≤25%WR threshold.
+- atr_sl_hit 22% — well under 40% ✅
+- Trade freq 3/hr — normal ✅
+- 4 open positions (WLD, NXPC, CAKE, HYPE — all fresh <1h)
+- 24h PnL essentially flat (+$0.06) — system surviving but not thriving
+
+**Open Questions:**
+- 24h PnL flat — should we tighten profit targets or widen SLs to push toward green?
+- r2-trend-short3 new signal: 3T 100%WR — encouraging early data
