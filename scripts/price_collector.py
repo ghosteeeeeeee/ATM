@@ -541,13 +541,20 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
             VALUES (?, ?, ?, ?, ?, ?, 0, 0)
         """, (token, current_window, open_px, high, low, close_px))
 
-    # Prune old closed candles to prevent table bloat (keep 72h)
+    # Prune old candles to prevent table bloat (keep 72h)
     if table == 'candles_5m':
+        # Prune old closed candles
         candle_cur.execute(f"""
             DELETE FROM {table} WHERE is_closed = 1 AND ts < ?
         """, (last_closed - 259200,))
         if candle_cur.rowcount > 0:
             print(f'  [{table}] Pruned {candle_cur.rowcount} old closed candles')
+        # Prune old developing candles (stale from past runs)
+        candle_cur.execute(f"""
+            DELETE FROM {table} WHERE is_closed = 0 AND ts < ?
+        """, (last_closed - 259200,))
+        if candle_cur.rowcount > 0:
+            print(f'  [{table}] Pruned {candle_cur.rowcount} old developing candles')
 
     candle_conn.commit()
     return last_closed
