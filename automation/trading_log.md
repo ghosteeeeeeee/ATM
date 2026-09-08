@@ -151,3 +151,36 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 
 **Open Questions:**
 - None — system healthy and steady
+
+## [2026-09-08 08:10 UTC] Hourly Analysis
+
+**Trades:** 5 closed (0W 5L, -$0.47)
+**24h:** 60T 68.3%WR +$1.42
+**Exit breakdown:** profit-monster-trail: 34T avg +$0.078 ⭐ | cut-loser-CL-T1: 15T avg -$0.139 | atr_sl_hit: 10T avg +$0.076
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- sma20-dip+ 0/3 last hour but 50%WR/24h — one bad cluster, not killable
+- atr_sl_hit 16.7% healthy
+- Trade freq 5/hr normal
+- 5 open positions fresh
+- pump-chain+ star (19T 73.7%WR +$0.26), open-skies+ strong (3T 66.7%WR +$1.23)
+
+**Open Questions:**
+- None — system steady state, negative hour absorbed by 24h positive
+
+## [2026-09-08 09:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L, -$0.05)
+**24h:** 63T 63.5%WR +$1.37
+**Exit breakdown:** profit-monster-trail: 36T avg +$0.076 ⭐ | cut-loser-CL-T1: 16T avg -$0.138 | atr_sl_hit: 10T avg +$0.076
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 15.9% healthy
+- Trade freq 3/hr normal
+- 3 open positions fresh
+- 24h PnL +$1.37, system steady state
+
+**Open Questions:**
+- None — system healthy
