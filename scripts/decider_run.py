@@ -3311,6 +3311,33 @@ def run(dry_run=False):
                         skipped += 1
                         continue
                     fresh_result = detect_accel_300_v3_short(token, fresh_prices)
+                    if fresh_result is None:
+                        # Debug: log which v3 condition failed
+                        try:
+                            from signals.accel_300_v3_short import (
+                                _ema_series as _v3_ema, PERIOD as _v3_period,
+                                V3_SHORT_GAP_ACCEL_WINDOW, V3_SHORT_VELOCITY_WINDOW,
+                                V3_SHORT_PERSISTENCE_BARS, V3_SHORT_SLOPE_WINDOW,
+                                V3_SHORT_RSI_MIN, V3_SHORT_RSI_MAX,
+                                V3_SHORT_MIN_VELOCITY, _rsi as _v3_rsi,
+                            )
+                            from hermes_constants import ACCEL_300_V3_SHORT_MIN_GAP, ACCEL_300_V3_SHORT_MAX_GAP, ACCEL_300_V3_SHORT_MIN_GAP_ACCEL
+                            _fc = [float(p['price']) for p in fresh_prices]
+                            _ema = _v3_ema(_fc, _v3_period)
+                            _gap_now = (_fc[-1] - _ema[-1]) / _ema[-1] * 100 if _ema[-1] else 0
+                            _reasons = []
+                            if _gap_now >= 0: _reasons.append(f'gap_above_ema({_gap_now:+.3f}%)')
+                            elif abs(_gap_now) < ACCEL_300_V3_SHORT_MIN_GAP: _reasons.append(f'gap_too_small({abs(_gap_now):.3f}%<{ACCEL_300_V3_SHORT_MIN_GAP}%)')
+                            elif abs(_gap_now) > ACCEL_300_V3_SHORT_MAX_GAP: _reasons.append(f'gap_too_large({abs(_gap_now):.3f}%>{ACCEL_300_V3_SHORT_MAX_GAP}%)')
+                            _vel = _fc[-1] - _fc[-1 - V3_SHORT_VELOCITY_WINDOW] if len(_fc) > V3_SHORT_VELOCITY_WINDOW else 0
+                            if _vel >= 0: _reasons.append(f'vel_positive({_vel:+.6f})')
+                            _rsi_val = _v3_rsi(_fc, 14)
+                            if _rsi_val and _rsi_val < V3_SHORT_RSI_MIN: _reasons.append(f'rsi_oversold({_rsi_val:.1f}<{V3_SHORT_RSI_MIN})')
+                            if _rsi_val and _rsi_val > V3_SHORT_RSI_MAX: _reasons.append(f'rsi_overbought({_rsi_val:.1f}>{V3_SHORT_RSI_MAX})')
+                            if _reasons:
+                                log(f'  🚫 [ACCEL-V3-SHORT-DEBUG] {token}: {" | ".join(_reasons)}')
+                        except Exception as _dbg_err:
+                            log(f'  [WARN] v3 debug logging failed: {_dbg_err}', 'WARN')
                     # ── Price move check: block stale entries ──
                     # If price moved > threshold from signal price, the entry is stale
                     # Catches ENA (+0.4%), CRV (+0.76%), W (+0.64%) — all lost due to staleness
