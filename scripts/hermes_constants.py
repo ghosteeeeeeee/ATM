@@ -2938,3 +2938,32 @@ CONTINUUM_SCORE_SHORT_THRESHOLD      = 5       # score <= this → LONG signal
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
 CONTINUUM_SCORE_STALENESS_MIN        = 5       # max age of continuum data in minutes
 CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme scores
+
+# ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
+# Buy pullback to SMA20 in established uptrends.
+# Reference: INJ LONG 2026-09-07 +40.57% (5x), entry at SMA20
+SMA20_DIP_ENABLED              = True    # master kill-switch
+SMA20_DIP_PLUS_ENABLED         = True    # LONG direction
+SMA20_DIP_MINUS_ENABLED        = False   # SHORT not applicable
+
+# Trend filters
+SMA20_DIP_SMA_FAST             = 20      # pullback target SMA
+SMA20_DIP_SMA_SLOW             = 50      # trend filter SMA
+SMA20_DIP_MAX_SMA20_DIST       = 1.0     # % — price must be within this of SMA20
+
+# RSI
+SMA20_DIP_RSI_MIN              = 55      # bullish momentum
+SMA20_DIP_RSI_MAX              = 75      # not extreme
+
+# Bollinger Bands
+SMA20_DIP_BB_MIN_POSITION      = 0.50    # above BB middle (= above SMA20)
+
+# Volume
+SMA20_DIP_MIN_AVG_VOL          = 50      # minimum average volume
+
+# Cooldown
+SMA20_DIP_COOLDOWN_HOURS       = 2       # per-token cooldown
+
+# Confidence
+SMA20_DIP_CONF_BASE            = 80      # base confidence
+SMA20_DIP_CONF_CAP             = 92      # max confidence
