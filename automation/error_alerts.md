@@ -125,3 +125,13 @@
 - **[INFO]**: 48 hermes timers active, all firing on schedule
 - **INFO**: Market NEUTRAL (103 neutral, 1 long bias), 137 signals/hr
 - **AUTO-FIX**: None needed — all systems nominal
+
+## Error Alerts — 2026-09-08 15:24 UTC
+- **CRITICAL** (1): `hermes-5m-candle.service repeatedly failing (exit code)`
+- **AUTO-FIX**: Attempted restart — failed with same exit code, needs manual investigation
+- **WARN** (1): `signal_compactor timeout at 15:18:02`
+- **AUTO-FIX**: Pipeline still completed; no action needed unless recurring
+- **WARN** (1): `FIL LONG blocked in cooldown (2 failures, ~59 min remaining)`
+- **AUTO-FIX**: None — cooldown is expected behavior after failures
+- **WARN** (1): `20+ auxiliary services in failed state`
+- **AUTO-FIX**: None — services like bug-hunter, better-coder, wasp are non-critical
