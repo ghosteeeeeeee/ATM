@@ -4,7 +4,7 @@
 Enter SHORT after bearish engulfing (price drops sharply).
 Enter LONG after bullish engulfing (price rises sharply).
 
-Detection (improved 2026-08-11):
+Detection (migrated to 5m 2026-09-08):
   1. Current candle body > previous candle body (true engulfing)
   2. Current candle moves > ENGULFING_MIN_MOVE% from previous close
   3. Previous N candles had tight range (< ENGULFING_PRIOR_RANGE%)
@@ -69,30 +69,6 @@ def _get_candles(token, table='candles_1m', limit=100):
         """, (token.upper(), limit))
         rows = cur.fetchall()
         if not rows or len(rows) < 10:
-            return []
-        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
-                for r in reversed(rows)]
-    except Exception:
-        return []
-    finally:
-        if conn:
-            conn.close()
-
-
-def _get_5m_candles(token, limit=100):
-    """Fetch 5m OHLCV candles for S/R detection."""
-    conn = None
-    try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT open, high, low, close, volume FROM candles_5m
-            WHERE token = ?
-            ORDER BY ts DESC
-            LIMIT ?
-        """, (token.upper(), limit))
-        rows = cur.fetchall()
-        if not rows:
             return []
         return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
                 for r in reversed(rows)]
@@ -273,13 +249,13 @@ def scan_engulfing_signals():
         if price_age_minutes(token) > 10:
             continue
 
-        # Get 1m candles
-        raw_candles = _get_candles(token, 'candles_1m', 100)
+        # Get 5m candles (changed from 1m for chart visibility)
+        raw_candles = _get_candles(token, 'candles_5m', 100)
         if not raw_candles:
             continue
 
         # GATE: Candle close — use only confirmed closes
-        candles = candle_close_gate(raw_candles, timeframe_seconds=60)
+        candles = candle_close_gate(raw_candles, timeframe_seconds=300)
         if len(candles) < 2:
             continue
 
@@ -318,14 +294,13 @@ def scan_engulfing_signals():
         if not volume_gate(candles, min_ratio=1.2):
             continue
 
-        # GATE: R:R pre-check — need 5m candles for S/R detection
-        candles_5m = _get_5m_candles(token, 100)
-        rr_pass, sl, tp, rr = rr_gate(token, direction, price, candles_5m)
+        # GATE: R:R pre-check — use same 5m candles for S/R detection
+        rr_pass, sl, tp, rr = rr_gate(token, direction, price, raw_candles)
         if not rr_pass:
             continue
 
         # Confidence bonus: near S/R = higher quality entry
-        near_sr = _is_near_sr(token, price, direction, candles_5m)
+        near_sr = _is_near_sr(token, price, direction, raw_candles)
         if near_sr:
             sig['confidence'] = min(sig['confidence'] + 5, 88)
 
@@ -341,7 +316,7 @@ def scan_engulfing_signals():
             value=sig['value'],
             price=sig['price'],
             exchange='hyperliquid',
-            timeframe='1m',
+            timeframe='5m',
         )
         if sid:
             added += 1
