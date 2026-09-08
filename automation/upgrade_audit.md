@@ -1,8 +1,8 @@
 # Upgrade Audit Trail
 
 **Created:** 2026-09-06
-**Updated:** 2026-09-07 07:30
-**Scanned:** 55 plans in /root/.hermes/plans/
+**Updated:** 2026-09-08 00:00
+**Scanned:** 56 plans in /root/.hermes/plans/
 
 ---
 
@@ -10,15 +10,15 @@
 
 | Metric | Count |
 |--------|-------|
-| Plans scanned | 55 |
+| Plans scanned | 56 |
 | Already implemented | 35 |
 | Pending (wirable) | 1 |
-| Pending (new work) | 4 |
+| Pending (new work) | 5 |
 | Concluded (no action needed) | 3 |
 | Rejected by verification | 2 |
 | Tooling (not trading) | 2 |
 | Analysis-only (no action) | 8 |
-| **Total evaluated** | **55** |
+| **Total evaluated** | **56** |
 
 ---
 
@@ -72,12 +72,13 @@
 | Plan | Difficulty | Value | Status | Notes |
 |------|-----------|-------|--------|-------|
 | `coin_tracker_setup_improvements.md` | L1 | HIGH | NOT STARTED | 5 fixes: regime gate, confirming analyses, MIN_COMPOSITE raise, age decay, kill warm bypass. Signal currently killed. |
-| `automation-team-improvements.md` | L2 | HIGH | NOT STARTED | Self-learner expansion (expand PARAM_CONFIG), session learner → OpenMemory bridge, delete defunct A/B learner |
+| `automation-team-improvements.md` | L2 | HIGH | PARTIALLY DONE | PARAM_CONFIG expanded (30+ params), param_map covers 20+ signals, A/B learner deleted. Remaining: OpenMemory bridge (L2), hebbian monitoring (L1). |
 | `r2-trend-long-trailing-sl-tuning.md` | L1 | MEDIUM | NOT STARTED | Analysis recommends trail=2.0%, activation=0.8% for r2_trend_long. Current: 0.8%/0.8%. |
 | `exit-strategy-refactor.md` | L3 | MEDIUM | FUTURE | Per-signal exit strategy routing. Simple fix (bypass list split) already deployed. Full refactor deferred. |
 | `exit-mechanics-ownership.md` | L3 | MEDIUM | DRAFT | Exit ownership model — superseded by exit-mechanics-v2.md (bypass list fix already done) |
 | `2026-08-22_copy-trader-dashboard-enhancements.md` | L3 | MEDIUM | NOT STARTED | Phase 2 dashboard features (copy delay analysis, pro portfolio view, regime performance) |
 | `2026-09-07_market-sync-protection-plan.md` | L2 | HIGH | DECISION NEEDED | Auditor found 88-92% false positive rate. Needs decision: integrate with MAE guard or do nothing |
+| `2026-09-07_partial-close-trailing-runner.md` | L2-L3 | HIGH | DEFERRED | 4 options: partial close (complex), regime trail, tiered trail, time trail. CEO pinned PM_TRAIL_DISTANCE_PCT at 0.20% — blocks trail widening. Needs backtest before any implementation. |
 
 ### ❌ REJECTED (by verification agent)
 
@@ -120,16 +121,15 @@
 
 ## Recommended Implementation Order
 
-### Level 1 (EASY) — Do Now
-1. **coin_tracker_setup_improvements.md** — regime gate + kill warm bypass (2 line changes in coin_tracker_hot.py)
-2. **features_recorded bug** — fix flag in brain.py/position_manager.py (from atr-sl-widen.md recommendations)
-3. **r2-trend-long trailing SL tuning** — widen trail to 2.0% in hermes_constants.py
+### Level 1 (EASY) — No remaining L1 HIGH-value work
+All L1 tasks from plans are either implemented, on killed signals, or rejected. See pending items for remaining work.
 
 ### Level 2 (MEDIUM) — Do Next
-4. **automation-team-improvements.md** — expand self_learner PARAM_CONFIG
-5. **Market sync protection** — needs decision (integrate with MAE guard vs do nothing)
+1. **automation-team-improvements.md** — OpenMemory bridge for session learner (remaining L2 item)
+2. **Market sync protection** — needs decision (88-92% false positive rate, integrate with MAE guard vs do nothing)
+3. **partial-close-trailing-runner.md** — needs backtest first (MFE > 2x realized PnL check). CEO pinned trail at 0.20%.
 
 ### Level 3+ (HARD) — Later
-6. **exit-strategy-refactor.md** — full per-signal exit routing (bypass list split already done)
-7. **spec-guitar-tuning.md** — multi-dimensional adaptive tuning (needs revision first)
-8. **spec-signal-regime-memory.md** — signal regime memory (needs revision first)
+4. **exit-strategy-refactor.md** — full per-signal exit routing (bypass list split already done)
+5. **spec-guitar-tuning.md** — multi-dimensional adaptive tuning (needs revision first)
+6. **spec-signal-regime-memory.md** — signal regime memory (needs revision first)
