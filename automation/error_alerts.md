@@ -19,6 +19,17 @@
 - **INFO**: Regime NEUTRAL, 0 open trades, 27 trades today (bb-bounce 88.9% WR, coil-spring 50% WR)
 - **AUTO-FIX**: None needed — pipeline healthy, all issues non-critical
 
+## Health Report — 2026-09-08 17:23 UTC
+- **PIPELINE**: OK — last ran 17:22 UTC, completed normally. 3 open, 71 closed today, -37.16% PnL
+- **MARKET**: NEUTRAL regime (102/104), 2 SHORT bias, 0 LONG bias
+- **SIGNALS**: 125 generated (1h) — healthy volume
+- **SYSTEM**: 50+ timers active, disk 82% (92G/118G), prices fresh (2min ago)
+- **WARN** (2x in 30min): `signal_compactor: timed out` — recurring, non-fatal. Pipeline completes despite timeouts.
+- **WARN**: 4 phantom trades today (<0.01 USDT PnL) — BANANA, SAND, USUAL, ICP
+- **WARN**: Disk at 82% — approaching85% threshold, compress logs if rising
+- **INFO**: pipeline.log at94MB — will need rotation soon
+- **AUTO-FIX**: None needed — all issues non-critical, system self-recovers
+
 ## Health Report — 2026-09-06 21:23 UTC
 - **PIPELINE**: OK — running, 4 open → 0 open, 30 trades today, 66.7% WR, $0.09 PnL
 - **MARKET**: NEUTRAL regime, 2 LONG bias / 0 SHORT / 105 neutral, 2% speed
@@ -135,3 +146,8 @@
 - **AUTO-FIX**: None — cooldown is expected behavior after failures
 - **WARN** (1): `20+ auxiliary services in failed state`
 - **AUTO-FIX**: None — services like bug-hunter, better-coder, wasp are non-critical
+
+## Health Report — 2026-09-08 18:23 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` — one-off timeout, pipeline recovered, no action needed
+- **[WARN]** (1x): Disk at 82% (21G free) — compressed old logs (>1 day)
+- **[INFO]** Pipeline ran 18:22:32 UTC, completed 18:22:34. 5/5 positions open, 71 closed today, -40.10% PnL. 109 signals in last hour. All timers firing.

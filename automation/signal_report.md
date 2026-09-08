@@ -1,36 +1,36 @@
 === Signal Performance Report ===
-Generated: 2026-09-08 11:10 UTC | 43 trades in 24h | Total PnL: +$0.69 | WR: 60.5%
+Generated: 2026-09-08 17:10 UTC | 73 trades in 24h
 
-KILLED (executed):
+KILLED (executed by auto_1hr):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signals meet all 3 kill criteria |
+| ema300-dip-short | SHORT | 47.1% | -$0.91 | 17 | KILLED 2026-09-08 16:10 UTC — 0%WR last hour, 17T/24h, redesign failed |
+| sma20-dip+ | LONG | 42.1% | -$0.73 | 19 | KILLED 2026-09-08 12:10 UTC — 0%WR 3T last hour, 47.1%WR all-time |
 
 BOOST CANDIDATES:
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 81.3% | +$0.51 | 16 | STRONG — consistent volume + high WR |
-| open-skies+ | LONG | 66.7% | +$1.23 | 3 | STRONG — highest PnL/trade, low sample |
+| pump-chain+ | LONG | 64.3% | -$0.26 | 14 | MIXED — high WR but bad R:R. 7d: +$0.38/78.8%WR. Keep enabled, monitor. |
+| open-skies+ | LONG | 100% | +$1.42 | 2 | STRONG — highest PnL/trade. Low sample, no action needed. |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| sma20-dip+ | LONG | 47.1% | -$0.42 | 17 | WATCH — active ~7h, too early to kill. WR below 50% but no kill criteria met. |
-| ema300-dip-short | SHORT | 55.6% | -$0.45 | 9 | WATCH — good WR but losses larger than wins. Active ~18h. |
-| bb-bounce-v2-long+ | LONG | 53.8% | -$0.18 | 13 | WATCH — thin negative, profit zone. |
+| bb-bounce-v2-long+ | LONG | 44.4% | -$0.57 | 9 | WATCH — 4 cut-loser exits ($0.59), 2 atr_sl ($0.15). Not at kill threshold yet. |
+| r2-trend-short5 | SHORT | 0% | -$0.14 | 1 | WATCH — 1 trade, too early. |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 81.3% | +$0.51 | 16 | STRONG |
-| open-skies+ | LONG | 66.7% | +$1.23 | 3 | STRONG |
+| open-skies+ | LONG | 100% | +$1.42 | 2 | STRONG |
 | r2-trend-short3 | SHORT | 100% | +$0.10 | 2 | PERFECT (low count) |
-| r2v2-long3 | LONG | 100% | +$0.09 | 1 | PERFECT (1 trade) |
+| r2-trend-short4 | SHORT | 100% | +$0.07 | 2 | PERFECT (low count) |
+| continuation+ | LONG | 83.3% | +$0.05 | 6 | STRONG |
+| bb-bounce-long+ | LONG | 83.3% | +$0.08 | 6 | STRONG |
 
 ISSUES:
-- No direction inversions detected
-- No signals meet all 3 kill criteria (WR<30%, PnL<-$0.10, active>24h)
-- sma20-dip+ — high volume (17 trades) but negative. 8 cut-loser-CL-T1 exits. Losses small individually ($0.09-$0.24) but accumulate. Needs >24h data before kill decision.
-- ema300-dip-short — decent WR (55.6%) but -$0.45 net. Large losses on MNT (-$0.22) and SYRUP (-$0.20) offset wins.
-- cut-loser-CL-T1 is dominant loss exit — stop-loss entries may be too tight or entries chasing.
-- ema300-dip-short protected test window evaluates after 2026-09-09 05:00 UTC.
+- cut-loser-CL-T1 is the dominant loss exit: 24 trades, -$3.43 total, avg -$0.14 each. This single exit type accounts for more losses than all other exits combined.
+- pump-chain+ has high WR (64.3%) but negative PnL — cut-loser losses ($0.62 from 4 trades) exceed profit-monster-trail wins ($0.53 from 8 trades). Risk-reward imbalance.
+- No direction inversions detected.
+- Both killed signals (ema300-dip-short, sma20-dip+) had their last trades close before the kill time — no post-kill firing detected.
+- 7-day picture: ema300-dip (-$0.72, 63.6%WR, 55T), accel-300-v3-long+ (-$1.41, 43.6%WR, 39T), slow-grind+ (-$0.80, 40%WR, 15T) are the biggest 7d losers. slow-grind+ already killed.

@@ -1,27 +1,26 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-08 ~16:00 UTC (CEO)**
+**Last Updated: 2026-09-08 ~19:00 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 73T, 54.8% WR, -$0.47 (was +$1.06 at 10:35). 48h: 121T, 58.7% WR, -$0.88. 7d: 376T, 57.7% WR, -$3.10. Today Sep 8: 48T, 50% WR, -$1.25 (worst day in 4, breaks 4-day green streak). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
+24h: 72T, 50.0% WR, -$1.21. 48h: 130T, 57.7% WR, -$1.32. 7d: 388T, 57.0% WR, -$4.24. Today Sep 8: 60T, 48.3% WR, -$1.86 (worst day in 7, legacy signal bleed). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
 
-- **24h:** 73T, 54.8% WR, -$0.47 (verified DB)
-- **48h:** 121T, 58.7% WR, -$0.88 (verified DB)
-- **7d:** 376T, 57.7% WR, -$3.10 (verified DB — legacy aging out)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 71T/74.6% WR +$2.19 ★ | open-skies+ 17T/64.7% WR +$1.55 ★ | pump-chain+ 28T/82.1% WR +$0.60 ★ | continuation+ 6T/83.3% WR +$0.05
-- **7d LEGACY (killed):** accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | coil-spring+ 21T/42.9% WR -$0.65 | slow-grind+ 15T/40% WR -$0.80 | accel-300-v2-long 4T/25% WR -$0.10 | range-reversion-long+ 6T/16.7% WR -$0.62 | sma20-dip+ KILLED 12:10 UTC
+- **24h:** 72T, 50.0% WR, -$1.21 (verified DB)
+- **48h:** 130T, 57.7% WR, -$1.32 (verified DB)
+- **7d:** 388T, 57.0% WR, -$4.24 (verified DB — legacy aging out)
+- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 71T/74.6% WR +$2.19 ★ | open-skies+ 17T/64.7% WR +$1.55 ★ | pump-chain+ 34T/82.1% WR +$0.60 ★ | continuation+ 6T/83.3% WR +$0.05
+- **7d LEGACY (killed):** ema300-dip-short 24T/41.7% WR -$1.48 | accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | slow-grind+ 15T/40% WR -$0.80 | sma20-dip+ 19T/42.1% WR -$0.73 | coil-spring+ 21T/42.9% WR -$0.65
 - **Market:** 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 71T/7d 74.6% WR +$2.19. STAR (degraded today: 13T/38.5% WR -$0.91).
-- **PUMP-CHAIN+:** Live. 28T/7d 82.1% WR +$0.60. Strongest WR. R:R 0.369 (needs 73% WR to break even).
-- **OPEN-SKIES+:** Live. 17T/7d 64.7% WR +$1.55. Only healthy R:R (1.303). 24h: 3T/66.7% WR +$1.23, R:R 3.737.
-- **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC (0%WR last hour, 47.1% all-time).
+- **BB_BOUNCE_V2_LONG:** Live. 71T/7d 74.6% WR +$2.19. STAR. Today 9T/44.4% WR -$0.57 (variance, R:R 0.612).
+- **PUMP-CHAIN+:** Live. 34T/7d 82.1% WR +$0.60. Strongest WR. R:R 0.370 (needs 73% WR to break even).
+- **OPEN-SKIES+:** Live. 17T/7d 64.7% WR +$1.55. Only healthy R:R (1.303). Today 2T/100% WR +$1.42.
+- **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC (0%WR last hour, 42.1% all-time).
 - **CONTINUATION+:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
 - **NEUTRAL_SNIPER:** LIVE. RSI 45/55. Signals firing but BTC-CRASH filter blocks SHORTs.
-- **EMA300-DIP:** RE-ENABLED by T (Sep 7). DO NOT DISABLE until Sep 9 05:00 UTC.
-- **EMA300_DIP_SHORT:** RE-ENABLED by T (Sep 7). DO NOT DISABLE until Sep 9 05:00 UTC. 12T/24h 66.7% WR -$0.30.
+- **EMA300-DIP-SHORT:** KILLED by auto_1hr at 16:10 UTC (0%WR last hour, 43.8% all-time). Was CEO-protected until Sep 9 but 0%WR triggered auto-kill.
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 82% (21G free).
@@ -32,15 +31,16 @@
 2. **confluence-,ichimoku- SHORT** — 1T/7d 0% WR -$0.09. FLAGGED FOR T.
 
 **🔴 R:R STATUS (STRUCTURAL)**
-Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.623 | pump-chain+ 0.369
-24h R:R: open-skies+ 3.737 | pump-chain+ 0.488 | bb-bounce-v2-long+ 0.329
-24h exit breakdown (ALL):
-- profit-monster-trail: 38T/52.1%, avg +2.08%, +$2.46 — working
-- cut-loser-CL-T1: 24T/32.9%, avg -4.98%, -$3.41 — biggest loss driver
-- atr_sl_hit: 11T/15.1%, avg +2.45%, +$0.48 — paradoxically profitable today
-**Note:** PM_TRAIL protected. R:R compressed — system profitable at 57.5%+ WR. Today 50% = loss day. 4-day green streak (Sep 5-7 +$0.88) ended by today -$1.25.
+Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.612 | pump-chain+ 0.370
+24h R:R: 0.681 (avg_win $0.097, avg_loss $0.142). Breakeven WR = 59.5%. Actual 50.0%.
+24h exit breakdown (losses only):
+- cut-loser-CL-T1: 25T, avg -4.92%, -$3.55 — biggest loss driver
+- atr_sl_hit: 8T, avg -5.23%, -$1.15
+**Note:** PM_TRAIL protected. R:R compressed — system profitable at 59.5%+ WR. Today 48.3% = loss day. 4-day green streak (Sep 5-7 +$0.88) ended by today -$1.86. Legacy signals (ema300-dip-short, sma20-dip+) already killed, 24h losses aging out.
 
 ## Today's Changes (Sep 8)
+
+6. **CEO ~19:00 UTC — VERIFIED + MONITORING.** DB: 24h 72T 50.0% WR -$1.21. 48h: 130T 57.7% WR -$1.32. 7d: 388T 57.0% WR -$4.24. Sep 8: 60T 48.3% WR -$1.86 (worst in 7d). **Legacy signal bleed is dominant:** ema300-dip-short 16T/43.8% WR -$0.96 (killed 16:10 UTC, aging out), sma20-dip+ 19T/42.1% WR -$0.73 (killed 12:10 UTC, aging out). **bb-bounce-v2-long+ variance:** 9T/44.4% WR -$0.57 today but 7d 71T/74.6% WR +$2.19 still strong, R:R 0.612. **open-skies+ only healthy signal:** 2T/24h 100% WR +$1.42, R:R 1.303. **R:R 24h: 0.681** (breakeven WR 59.5%, actual 50%). PM_TRAIL 0.20% tight — was 0.60% on Sep 6, reverted. 5 open flat. Disk 82%. **No param changes** — legacy aging out, active signals profitable on 7d. **Target: 48h positive by Sep 9 as legacy fully ages out.**
 
 5. **CEO ~16:00 UTC — VERIFIED + MONITORING.** DB: 24h 73T 54.8% WR -$0.47 (was +$1.06 at 10:35). 48h: 121T 58.7% WR -$0.88. Sep 8: 48T 50% WR -$1.25 (worst day in 4). **bb-bounce-v2-long+ STAR degraded** — 13T/38.5% WR -$0.91 (7d still 71T/74.6% WR +$2.19). cut-loser-CL-T1 7/13 exits at -5.32% avg. **sma20-dip+ KILLED** by auto_1hr at 12:10 UTC (0%WR last hour, 47.1% all-time). **ema300-dip-short** 12T/24h 66.7% WR -$0.30, protected until Sep 9. **open-skies+ ONLY healthy R:R** — 3T/24h 66.7% WR +$1.23, R:R 3.737. **No param changes** — bb-bounce 74.6% WR 7d is variance, not structural. PM_TRAIL protected. Legacy aging out. 5 open positions. Disk 82%. **Target: 48h positive as bb-bounce recovers and legacy ages out.**
 
