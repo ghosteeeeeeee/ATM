@@ -2315,6 +2315,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Backtest: ALL 10 losses had negative 30m velocity at entry, ALL 26 winners had positive
             # Catches reversals between signal creation and execution (e.g., GRASS +0.88% at signal → -1.60% at close)
             if direction == 'LONG' and 'pump-chain' in (src or ''):
+                _conn_vel_30 = None
                 try:
                     _conn_vel_30 = sqlite3.connect(CANDLES_DB, timeout=5)
                     _cur_vel_30 = _conn_vel_30.cursor()
@@ -2333,10 +2334,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass  # non-fatal
                 finally:
-                    try:
-                        _conn_vel_30.close()
-                    except Exception:
-                        pass
+                    if _conn_vel_30:
+                        try:
+                            _conn_vel_30.close()
+                        except Exception:
+                            pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
             vol_ok = check_volatility_floor(tkn)
             if vol_ok == 0.0:

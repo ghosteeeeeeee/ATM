@@ -497,6 +497,9 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
         # SHORT recommendations for tokens with strong outflows during DISTRIBUTION
         outflow_tokens = [f for f in active_flows if f['direction'] == 'OUT' and f['tier'] >= 2]
         for flow in outflow_tokens[:5]:
+            # Only recommend SHORT if velocity is negative (token declining)
+            if flow['velocity_15m'] >= 0:
+                continue
             conf = min(0.8, 0.3 + abs(flow['velocity_15m']) * 2)
             if conf >= 0.4:
                 recommendations.append({
@@ -542,6 +545,9 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
         for flow in outflow_tokens[:5]:
             # Skip if already recommended
             if any(r['token'] == flow['token'] for r in recommendations):
+                continue
+            # Only recommend SHORT if velocity is negative (token declining)
+            if flow['velocity_15m'] >= 0:
                 continue
             conf = min(0.8, 0.3 + abs(flow['velocity_15m']) * 2)
             if conf >= 0.4:  # minimum confidence threshold
