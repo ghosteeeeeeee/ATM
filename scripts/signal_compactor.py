@@ -1061,6 +1061,11 @@ def _score_signal(token, direction, conf, source, signal_type,
     # 30d leaderboard bonus/penalty — long-term performers get extra boost
     leaderboard_mult = _get_leaderboard_mult(token)
 
+    # Hall of Shame BLOCK — never trade consistent losers (30d WR <45%, 15+ trades)
+    if leaderboard_mult <= 0.7:
+        log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR <45%, consistent loser")
+        return 0.0
+
     # Penalty list — underperformers get deprioritized
     # Losers get stronger penalty (0.5x) than regular penalty tokens (0.7x)
     if LOSERS and token in LOSERS:
