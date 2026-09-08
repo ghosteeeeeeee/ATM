@@ -38,6 +38,7 @@ from hermes_constants import (
     PUMP_FLOW_CHAIN_BONUS,
     PUMP_FLOW_PHASE_BONUS,
     PUMP_FLOW_BTC_FILTER_THRESHOLD,
+    PUMP_FLOW_TOKEN_VEL_THRESHOLD,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -292,6 +293,28 @@ def scan_signals():
         price = price_data.get('price') if isinstance(price_data, dict) else None
         if price is None or price <= 0:
             continue
+        
+        # Token velocity filter — skip if token is already declining at entry
+        # Backtest: all 7 losses had 5m velocity < -0.3% at entry
+        # -0.2% threshold: 96% WR, +10.73% PnL (vs 77% WR, +2.79% unfiltered)
+        if direction == 'LONG':
+            try:
+                _conn_vel = sqlite3.connect(f"file:{STATIC_DB}?mode=ro", uri=True, timeout=5)
+                try:
+                    _vel_row = _conn_vel.execute("""
+                        SELECT price FROM price_history
+                        WHERE token = ? AND timestamp <= ? - 300
+                        ORDER BY timestamp DESC LIMIT 1
+                    """, (token, time.time())).fetchone()
+                    if _vel_row and _vel_row[0] > 0:
+                        token_5m_vel = (price - _vel_row[0]) / _vel_row[0] * 100
+                        if token_5m_vel < PUMP_FLOW_TOKEN_VEL_THRESHOLD:
+                            _log(f"  [pump-flow] {token} 5m Δ={token_5m_vel:+.3f}% < {PUMP_FLOW_TOKEN_VEL_THRESHOLD}% — skipping (token declining)")
+                            continue
+                finally:
+                    _conn_vel.close()
+            except Exception:
+                pass  # fail open
         
         # Chain evidence (log only — don't pollute source tag)
         chains = rec.get('chain_evidence', [])
