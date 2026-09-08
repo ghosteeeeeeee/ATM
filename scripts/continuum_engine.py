@@ -1011,28 +1011,21 @@ class ContinuumEngine:
                 print(f"[CONTINUUM] Phase 3: SHORT z-score aligning: {state.zscore_tier}")
             # No reset — once confirmed, stay until z-score aligns or exit
         
-        # Phase 3 → 4: Entry signal (z-score confirmed + EMA300 held)
+        # Phase 3 → 4: Volume confirmation (Sep 3 style entry)
         if self.entry_phase == 3:
             # Score gate — don't enter with score below threshold
             if state.state_score < SCORE_NO_TRADE:
                 return  # Score too low, don't enter
             
-            # Entry conditions: z-score aligned + EMA300 held for 60+ min
-            # Volume is OPTIONAL — boosts position size but doesn't block entry
-            if state.ema300_duration >= ENTRY_CONFIRM_MIN_DURATION:
+            # Entry requires volume confirmation (Sep 3 style)
+            # Volume must be HIGH (3.0x+) — this is the first confirmation
+            # that the wave has energy, before the explosion
+            if state.volume_regime in ('HIGH', 'PARABOLIC'):
                 self.entry_phase = 4
                 self.position_side = side
-                
-                # Position size based on volume (higher volume = larger position)
-                if state.volume_regime == 'PARABOLIC':
-                    self.position_size_pct = 100  # Full size on parabolic
-                elif state.volume_regime == 'HIGH':
-                    self.position_size_pct = 75   # Good size on high volume
-                else:
-                    self.position_size_pct = 50   # Smaller size on low volume (earlier entry)
-                
+                self.position_size_pct = 100 if state.volume_regime == 'PARABOLIC' else 75
                 self.entry_ts = state.ts
-                print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime} | Size={self.position_size_pct}%")
+                print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime}")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
                 self.entry_phase = 2  # Step back but don't reset fully
             elif (side == 'LONG' and state.zscore_tier in ('NEG', 'STRONG_NEG')) or \
