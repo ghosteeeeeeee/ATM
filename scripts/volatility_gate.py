@@ -78,8 +78,7 @@ REGIME_SIGNALS = {
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-long', 'r2l', 'r2v2-long',  # R² trend LONG (slow grinds)
         'r2-trend-short',  # R² downtrend SHORT detector
-        'ema300-dip',  # EMA300 dip buyer — trend following
-        'ema300-dip-short',  # EMA300 rally seller — trend following
+        'ema300-dip-long',  # EMA300 dip buyer — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
@@ -120,7 +119,7 @@ REGIME_SIGNALS = {
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
-        'ema300-dip',  # EMA300 dip buyer — trend following
+        'ema300-dip-long',  # EMA300 dip buyer — trend following
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
