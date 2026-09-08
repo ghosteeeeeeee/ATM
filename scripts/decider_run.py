@@ -3475,13 +3475,13 @@ def run(dry_run=False):
                 CANDLES_STALENESS_SEC,
             )
             log(f'  🔍 [EMA300-CHECK] {token} {direction} — re-validating stable conditions...')
+            _conn_ema = None
             try:
                 _conn_ema = sqlite3.connect(HERMES_DATA + '/signals_hermes.db', timeout=5)
                 _ema_rows = _conn_ema.execute(
                     "SELECT price, timestamp FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 700",
                     (token.upper(),)
                 ).fetchall()
-                _conn_ema.close()
                 if not _ema_rows or len(_ema_rows) < 500:
                     log(f'  🚫 [EMA300-CHECK] {token} — not enough data ({len(_ema_rows) if _ema_rows else 0} rows)')
                     skipped += 1; continue
@@ -3511,8 +3511,8 @@ def run(dry_run=False):
                     log(f'  🚫 [EMA300-CHECK] {token} FAIL C1: price above EMA300 (dist={_dist:+.4f}%)')
                     skipped += 1; continue
 
-                # C3: EMA300 slope < 0 (ALL 9 losers had POSITIVE slope)
-                if _ema_slope >= 0:
+                # C3: EMA300 slope < MAX_EMA_SLOPE (ALL 9 losers had POSITIVE slope)
+                if _ema_slope >= EMA300_DIP_SHORT_MAX_EMA_SLOPE:
                     log(f'  🚫 [EMA300-CHECK] {token} FAIL C3: EMA rising ({_ema_slope:+.4f}%)')
                     skipped += 1; continue
 
@@ -3531,6 +3531,9 @@ def run(dry_run=False):
             except Exception as _e:
                 log(f'  🚫 [EMA300-CHECK] {token} — ERROR: {_e} — BLOCKED (fail-closed)')
                 skipped += 1; continue
+            finally:
+                if _conn_ema:
+                    _conn_ema.close()
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
