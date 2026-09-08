@@ -237,3 +237,38 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 
 **Open Questions:**
 - None
+
+## [2026-09-08 13:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L, -$0.24)
+**24h:** 70T 62.9%WR +$0.52
+**Exit breakdown:** profit-monster-trail: 38T avg +$0.075 ⭐ | cut-loser-CL-T1: 22T avg -$0.141 | atr_sl_hit: 9T avg +$0.078
+
+**No Change Needed:**
+- Kill criteria: sma20-dip+ already killed at 12:10 — 2 legacy losses (NOT, LTC) expected
+- atr_sl_hit 12.9% healthy (threshold 40%)
+- Trade freq 3/hr normal
+- 1 open position fresh
+- ema300-dip-short won (HYPE +$0.07)
+- All other signals neutral/positive in 24h
+
+**Open Questions:**
+- None — system healthy, legacy losses expected from pre-kill positions
+
+## [2026-09-08 14:10 UTC] Hourly Analysis
+
+**Trades:** 5 closed (2W 3L, -$0.41)
+**24h:** 73T 61.6%WR +$1.65
+**Exit breakdown:** profit-monster-trail: 38T avg +$0.065 ⭐ | cut-loser-CL-T1: 24T avg -$0.142 | atr_sl_hit: 11T avg +$0.044
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 15.1% healthy (threshold 40%)
+- Trade freq 5/hr normal
+- 4 open positions fresh
+- sma20-dip+ killed at 12:10, 0 trades since kill ✓
+- pump-chain+ 68.8%WR positive, ema300-dip-short 66.7%WR (good WR, losing on exits)
+- bb-bounce-v2-long+ weakest (41.7%WR -$0.75) but only 1T last hour — no kill trigger
+
+**Open Questions:**
+- None — system healthy

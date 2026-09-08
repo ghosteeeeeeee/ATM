@@ -117,3 +117,11 @@
 - **[WARN]** (1x): `signal_compactor: timed out` at 06:18:02 — recurring, non-fatal
 - **INFO**: Pipeline healthy — 0 open, 21 closed today, 130 signals/hr, 82% disk
 - **INFO**: Market NEUTRAL (1 LONG_BIAS, 1 SHORT_BIAS, 103 neutral), BTC $78,590
+
+## Error Alerts — 2026-09-08 09:23 UTC
+- **[INFO]**: Pipeline healthy — 5 open, 64 closed today, +53.11% PnL
+- **[WARN]** (1x): `signal_compactor: timed out` at 09:19:02 — recurring pattern, self-recovered
+- **[INFO]**: Disk at 82% (91G/118G) — approaching 85% threshold
+- **[INFO]**: 48 hermes timers active, all firing on schedule
+- **INFO**: Market NEUTRAL (103 neutral, 1 long bias), 137 signals/hr
+- **AUTO-FIX**: None needed — all systems nominal
