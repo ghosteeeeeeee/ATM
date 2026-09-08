@@ -2830,6 +2830,8 @@ PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
 PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity
 PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
 PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal
+PUMP_FLOW_BTC_FILTER_THRESHOLD = -0.1  # min BTC 1h Δ% to allow LONG signals (peak-pick filter)
+                                       # Backtest: 81%→89% WR, +5.28%→+7.04% PnL at -0.1%
 
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).

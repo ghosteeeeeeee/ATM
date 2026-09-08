@@ -37,6 +37,7 @@ from hermes_constants import (
     PUMP_FLOW_VELOCITY_BONUS,
     PUMP_FLOW_CHAIN_BONUS,
     PUMP_FLOW_PHASE_BONUS,
+    PUMP_FLOW_BTC_FILTER_THRESHOLD,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -222,9 +223,9 @@ def scan_signals():
                 btc_last = _rows[-1][0]
                 if btc_first > 0:
                     btc_1h_delta = (btc_last - btc_first) / btc_first * 100
-                    btc_1h_ok = btc_1h_delta >= 0
+                    btc_1h_ok = btc_1h_delta >= PUMP_FLOW_BTC_FILTER_THRESHOLD
                     if not btc_1h_ok:
-                        _log(f"  [pump-flow] BTC 1h Δ={btc_1h_delta:+.3f}% < 0% — skipping LONG signals (peak-pick filter)")
+                        _log(f"  [pump-flow] BTC 1h Δ={btc_1h_delta:+.3f}% < {PUMP_FLOW_BTC_FILTER_THRESHOLD}% — skipping LONG (peak-pick filter)")
         finally:
             _conn.close()
     except Exception:
