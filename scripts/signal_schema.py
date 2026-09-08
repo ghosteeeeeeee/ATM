@@ -1828,6 +1828,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # resistance-break (resistance break + pullback LONG)
+            if _comp == 'resistance-break+':
+                try:
+                    from hermes_constants import RESISTANCE_BREAK_PLUS_ENABLED
+                    if not RESISTANCE_BREAK_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RESISTANCE_BREAK_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # sma20-dip (SMA20 pullback LONG)
             if _comp == 'sma20-dip+':
                 try:
@@ -2308,6 +2317,7 @@ def is_component_disabled(component: str) -> bool:
             ACCEL_300_V3_SHORT_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
+            RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
             SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
@@ -2566,6 +2576,9 @@ def is_component_disabled(component: str) -> bool:
     # open-skies (open skies breakout LONG)
     if c == 'open-skies+': return not OPEN_SKIES_PLUS_ENABLED
     if c == 'open-skies': return not OPEN_SKIES_ENABLED
+    # resistance-break (resistance break + pullback LONG)
+    if c == 'resistance-break+': return not RESISTANCE_BREAK_PLUS_ENABLED
+    if c == 'resistance-break': return not RESISTANCE_BREAK_ENABLED
     # sma20-dip (SMA20 pullback LONG)
     if c == 'sma20-dip+': return not SMA20_DIP_PLUS_ENABLED
     if c == 'sma20-dip-': return not SMA20_DIP_MINUS_ENABLED

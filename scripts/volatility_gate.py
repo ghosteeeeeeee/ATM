@@ -95,6 +95,7 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'resistance-break+',  # resistance break + pullback — works in trending markets
     },
     'HIGH': {
         # Breakout works in big moves
@@ -137,6 +138,7 @@ REGIME_SIGNALS = {
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
+        'resistance-break+',  # resistance break + pullback — works in volatile breakouts
     },
     'EXTREME': {
         # Continuation works in storms
@@ -166,6 +168,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'resistance-break+',  # resistance break + pullback — works in extreme vol
     },
 }
 

@@ -1205,3 +1205,7 @@
   WHY: 1T last hour (0W 1L -$0.12). 73T/24h 64.4%WR +$2.04. Kill criteria not met. atr_sl_hit 16.4% healthy. Trade freq 1/hr normal. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 18:25 UTC
+[2026-09-08 20:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (market quiet). 74T/24h 47.3%WR -$1.64. Today 65T 45%WR -$2.48 (worst day). Kill criteria not met: no signal at 0%WR with 3+T last hour (0 trades last hour). bb-bounce-v2-long+ 9T 33%WR -$0.89 worst performer but not at kill threshold. sma20-dip+ 19T 42%WR -$0.73 persistent drag. pump-chain+ 17T 53%WR -$0.69 degraded from 83%WR yesterday. open-skies+ 3T 67%WR +$1.42 star. atr_sl_hit 18.9% healthy. 0 open positions. ema300-dip-short killed 16:10. 3d trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.48 deteriorating.
+  BY: auto_1hr
+  NEXT: Re-run at 21:07 UTC

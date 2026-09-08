@@ -352,3 +352,44 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 
 **Open Questions:**
 - None
+
+## [2026-09-08 20:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0W 0L, $0.00)
+**24h:** 74T 35W 47.3%WR -$1.64
+**Today:** 65T 45%WR -$2.48 (worst day in 3d)
+
+**Last 2h (quiet market):**
+- SOL rs-s81,volume-breakout-long+: -$0.11 cut-loser-CL-T1 ❌
+- ATOM open-skies+: $0.00 atr_sl_hit (breakeven)
+- DOGE pump-chain+: -$0.17 atr_sl_hit ❌
+- AIXBT bb-bounce-v2-long+: -$0.20 cut-loser-CL-T1 ❌
+- GRASS pump-chain+: -$0.14 atr_sl_hit ❌
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 32T avg +$0.058 ⭐ (carrying system)
+- cut-loser-CL-T1: 26T avg -$0.144 (loss cutting working)
+- atr_sl_hit: 14T 18.9% avg +$0.016 (healthy, under 40%)
+
+**24h Signal Performance (3+ trades):**
+- open-skies+: 3T 67%WR +$1.42 ⭐ (star)
+- pump-chain+: 17T 53%WR -$0.69 (degraded from 83%WR yesterday)
+- sma20-dip+: 19T 42%WR -$0.73 (persistent drag)
+- ema300-dip-short: 15T 47%WR -$0.76 (killed 16:10, trades from before kill)
+- bb-bounce-v2-long+: 9T 33%WR -$0.89 (worst performer)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour. 0 trades last hour (market quiet).
+- atr_sl_hit 18.9% healthy ✅
+- Trade freq 0/hr (quiet market, not overtrading)
+- 0 open positions
+- ema300-dip-short already killed 16:10 ✅
+- bb-bounce-v2-long+ 33%WR doesn't meet kill threshold (0%WR), but monitoring
+
+**Open Questions:**
+- Today's degradation: bb-bounce-v2-long+ went from 67%WR yesterday to 33%WR today. Market regime shift?
+- pump-chain+ degraded from 83%WR to 53%WR. Same pattern.
+- 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.48. System deteriorating.

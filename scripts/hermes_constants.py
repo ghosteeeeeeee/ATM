@@ -1145,6 +1145,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     # REMOVED: 'coil-spring' — CEO wants PM Trail to manage these trades
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
     'open-skies',            # open skies breakout — ride ATR SL/TP only, no PM at all
+    'resistance-break',      # resistance break + pullback — ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
@@ -1965,6 +1966,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
+    'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
@@ -3037,3 +3039,28 @@ SMA20_DIP_BONUS_BB_THRESH      = 0.80    # BB threshold for strong trend bonus
 SMA20_DIP_MIN_CANDLES         = 60      # minimum candles for detection
 SMA20_DIP_CANDLE_LIMIT        = 100     # candles to fetch from DB
 SMA20_DIP_VOL_WINDOW          = 20      # candles for average volume
+
+# ── Resistance Break Signal (resistance_break.py) ───────────────────────────
+# Early breakout signal: detects resistance break + pullback retest
+RESISTANCE_BREAK_ENABLED        = True
+RESISTANCE_BREAK_PLUS_ENABLED   = True   # LONG direction
+RESISTANCE_BREAK_MINUS_ENABLED  = False  # SHORT not applicable (breakouts are bullish)
+
+# Detection
+RESISTANCE_BREAK_LOOKBACK       = 200    # 1m bars for resistance detection
+RESISTANCE_BREAK_MIN_TOUCHES    = 5     # minimum touches at resistance level
+RESISTANCE_BREAK_PULLBACK_PCT   = 0.005  # pullback must be within 0.5% of resistance
+RESISTANCE_BREAK_PULLBACK_WINDOW = 30    # bars to wait for pullback
+
+# Trend
+RESISTANCE_BREAK_EMA_PERIOD     = 50    # EMA for trend filter
+
+# Volume
+RESISTANCE_BREAK_VOL_SPIKE_MIN  = 1.5   # minimum volume spike ratio
+
+# Cooldown
+RESISTANCE_BREAK_COOLDOWN_HOURS = 2     # per token cooldown
+
+# Confidence
+RESISTANCE_BREAK_CONF_BASE      = 70    # base confidence
+RESISTANCE_BREAK_CONF_CAP       = 90    # max confidence
