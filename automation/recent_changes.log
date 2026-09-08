@@ -1167,3 +1167,17 @@
   WHY: 3T last hour (1W 2L -$0.05). 63T/24h 63.5%WR +$1.37. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 15.9% healthy. Trade freq 3/hr normal. 3 open positions fresh. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 10:10 UTC
+
+[2026-09-08 10:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.07). 63T/24h 65.1%WR +$1.24. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 14.3% healthy. Trade freq 3/hr normal. 3 open positions fresh. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 11:10 UTC
+
+[2026-09-08 11:10 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (3W 2L -$0.19). 66T/24h 64.5%WR +$1.05. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 13.6% healthy. Trade freq 5/hr normal. 5 open positions fresh. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 12:10 UTC
+[2026-09-08 12:10 UTC] auto_1hr: KILLED sma20-dip+
+  WHY: 3T last hour (0W 3L -$0.42). Kill criteria triggered: 0%WR with 3+T last hour. All-time 47.1%WR -$0.42 PnL — net loser. 24h: 68T 63.2%WR +$0.63. atr_sl_hit 13.2% healthy. Trade freq 3/hr normal. 3 open positions fresh. System steady state.
+  BY: auto_1hr
+  NEXT: Re-run at 13:10 UTC

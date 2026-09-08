@@ -184,3 +184,56 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 
 **Open Questions:**
 - None — system healthy
+
+## [2026-09-08 10:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L, +$0.07)
+**24h:** 63T 65.1%WR +$1.24
+**Exit breakdown:** profit-monster-trail: 36T avg +$0.077 ⭐ | cut-loser-CL-T1: 17T avg -$0.144 | atr_sl_hit: 9T avg +$0.082
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 14.3% healthy (threshold 40%)
+- Trade freq 3/hr normal
+- 3 open positions fresh
+- All signals neutral/positive in 24h
+- sma20-dip+ weakest (13T -0.01 PnL) but 53.8%WR — not killable
+
+**Open Questions:**
+- None — system healthy and steady
+
+
+## [2026-09-08 11:10 UTC] Hourly Analysis
+
+**Trades:** 5 closed (3W 2L, -$0.19)
+**24h:** 66T 64.5%WR +$1.05
+**Exit breakdown:** profit-monster-trail: 38T avg +$0.074 ⭐ | cut-loser-CL-T1: 18T avg -$0.142 | atr_sl_hit: 9T avg +$0.078
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 13.6% healthy (threshold 40%)
+- Trade freq 5/hr normal
+- 5 open positions fresh
+- pump-chain+ star (17T 76.5%WR), open-skies+ strong (3T 66.7%WR +$1.23)
+- ema300-dip-short weakest (-$0.45/24h) but 55.6%WR — not killable
+
+**Open Questions:**
+- None — system healthy and steady
+
+## [2026-09-08 12:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L, -$0.42)
+**24h:** 68T 63.2%WR +$0.63
+**Exit breakdown:** profit-monster-trail: 38T avg +$0.074 ⭐ | cut-loser-CL-T1: 20T avg -$0.140 | atr_sl_hit: 9T avg +$0.078
+
+**Changes:**
+1. KILLED sma20-dip+ — 0%WR 3T last hour, 47.1%WR all-time, -$0.42 net loser
+
+**No Change Needed:**
+- atr_sl_hit 13.2% healthy (threshold 40%)
+- Trade freq 3/hr normal
+- 3 open positions fresh
+- pump-chain+ star (16T 81.2%WR), open-skies+ strong (3T 66.7%WR +$1.23)
+
+**Open Questions:**
+- None
