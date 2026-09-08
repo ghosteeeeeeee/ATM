@@ -93,7 +93,7 @@ def _remove_from_paper_db(order_id):
         
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute("UPDATE hl_trades SET status = 'CLOSED' WHERE order_id = %s", (str(order_id),))
+        cur.execute("UPDATE hyperliquid_trades SET status = 'closed' WHERE metadata->>'order_id' = %s", (str(order_id),))
         conn.commit()
         cur.close()
         conn.close()
@@ -453,11 +453,12 @@ class ContinuumTrader:
             conn = psycopg2.connect(**BRAIN_DB_DICT)
             cur = conn.cursor()
             
-            # Insert into hl_trades table (used by guardian)
+            # Insert into hyperliquid_trades table (used by guardian)
             cur.execute("""
-                INSERT INTO hl_trades (token, side, entry_price, size, order_id, source, status, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-            """, ('BTC', side, entry_price, size_btc, str(order_id), 'CONTINUUM', 'OPEN'))
+                INSERT INTO hyperliquid_trades (symbol, side, size, price, value_usd, order_type, status, filled_at, created_at, metadata)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
+            """, ('BTC', side, size_btc, entry_price, size_btc * entry_price, 'market', 'open', 
+                  json.dumps({'source': 'CONTINUUM', 'order_id': str(order_id)})))
             
             conn.commit()
             cur.close()
