@@ -111,3 +111,43 @@
 
 **Open Questions:**
 - None — system healthy
+
+## FAVORITES Update — 2026-09-08 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE MNT (WR=50.0%, PnL=$0.24, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ATOM (WR=57.1%, PnL=$-0.25, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE NXPC (WR=62.5%, PnL=$-0.31, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ENA (WR=62.5%, AvgPnL=1.66%, Trades=8)
+- PROMOTE ACE (WR=60.0%, AvgPnL=0.79%, Trades=5)
+- PROMOTE DYDX (WR=80.0%, AvgPnL=0.91%, Trades=5)
+
+Final set: ['ACE', 'AIXBT', 'BLUR', 'CFX', 'DOGE', 'DOT', 'DYDX', 'ENA', 'FOGO', 'GRASS', 'INJ', 'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'ZRO']
+
+## LOSERS Update — 2026-09-08 06:05 UTC
+- REMOVE W (insufficient data)
+- REMOVE ETC (WR=50.0%, PnL=$0.13, recovered)
+- REMOVE ZEN (insufficient data)
+- REMOVE JUP (insufficient data)
+- REMOVE ARB (insufficient data)
+- REMOVE CRV (insufficient data)
+- REMOVE NOT (insufficient data)
+- ADD SAND (WR=40.0%, PnL=$-0.36, low_wr (40.0%))
+- ADD SYRUP (WR=42.9%, PnL=$-0.22, low_wr (42.9%))
+
+Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
+
+## [2026-09-08 07:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W 0L, +$0.23)
+**24h:** 58T 69%WR +$1.86
+**Exit breakdown:** profit-monster-trail: 35T avg +$0.077 ⭐ | cut-loser-CL-T1: 12T avg -$0.148 | atr_sl_hit: 10T avg +$0.087
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 17% healthy
+- Trade freq 3/hr normal
+- 3 open positions fresh
+- All signals neutral/positive in 24h
+
+**Open Questions:**
+- None — system healthy and steady
