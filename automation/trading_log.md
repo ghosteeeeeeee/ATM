@@ -428,3 +428,38 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 **Open Questions:**
 - 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.51. System deteriorating. Market regime shift?
 - sma20-dip+ and ema300-dip-short legacy trades still settling (killed earlier today)
+
+## [2026-09-08 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 70T 45.7%WR -$2.51
+**Today:** 66T 43.9%WR -$2.51
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 31T avg +$0.054 ⭐
+- cut-loser-CL-T1: 24T avg -$0.145
+- atr_sl_hit: 13T 18.6% avg -$0.055 (healthy)
+- HL_CLOSED: 1T +$0.02
+
+**24h Signal Performance (3+ trades):**
+- sma20-dip+: 19T 37%WR -$0.73 (killed, legacy settling)
+- pump-chain+: 17T 41%WR -$0.75 (degraded)
+- ema300-dip-short: 14T 36%WR -$0.90 (killed, legacy settling)
+- bb-bounce-v2-long+: 8T 38%WR -$0.72 (worst active)
+- open-skies+: 2T 100%WR +$0.48
+
+**Open Positions:** 4 (APT SHORT, AIXBT LONG, IMX LONG, NEO LONG)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour (0 trades last hour)
+- atr_sl_hit 18.6% healthy ✅
+- Trade freq 0/hr (quiet market)
+- No 3+ trade signals at 0%WR in 24h
+
+**Open Questions:**
+- 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.51. Market regime shift?
+- bb-bounce-v2-long+ 38%WR persistent drag (killed earlier but legacy settling)
+- pump-chain+ degraded to 41%WR

@@ -3418,7 +3418,8 @@ def run(dry_run=False):
                         continue
                     fresh_result = detect_accel_300_v2_short(token, fresh_prices)
                 if fresh_result is None or fresh_result.get('direction') != direction:
-                    log(f'  🚫 [ACCEL-V2-STALE] {token} {direction} blocked: conditions no longer valid at execution time')
+                    _stale_tag = 'V3-SHORT' if _is_accel_v3_short else 'V3-LONG' if _is_accel_v3_long else 'V2-SHORT' if _is_accel_v2 else 'V2-LONG' if _is_accel_v2_long else 'V2'
+                    log(f'  🚫 [ACCEL-{_stale_tag}-STALE] {token} {direction} blocked: conditions no longer valid at execution time')
                     if sig_id:
                         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                     skipped += 1
