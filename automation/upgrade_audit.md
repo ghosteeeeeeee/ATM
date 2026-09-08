@@ -1,8 +1,8 @@
 # Upgrade Audit Trail
 
 **Created:** 2026-09-06
-**Updated:** 2026-09-08 00:00
-**Scanned:** 56 plans in /root/.hermes/plans/
+**Updated:** 2026-09-08 17:30
+**Scanned:** 62 plans in /root/.hermes/plans/
 
 ---
 
@@ -10,15 +10,15 @@
 
 | Metric | Count |
 |--------|-------|
-| Plans scanned | 56 |
-| Already implemented | 35 |
+| Plans scanned | 62 |
+| Already implemented | 37 |
 | Pending (wirable) | 1 |
-| Pending (new work) | 5 |
+| Pending (new work) | 7 |
 | Concluded (no action needed) | 3 |
 | Rejected by verification | 2 |
 | Tooling (not trading) | 2 |
-| Analysis-only (no action) | 8 |
-| **Total evaluated** | **56** |
+| Analysis-only (no action) | 10 |
+| **Total evaluated** | **62** |
 
 ---
 
@@ -49,6 +49,9 @@
 | `2026-09-07_accel300-long-fix-plan.md` | L1 | HIGH | IMPLEMENTED — RSI<50, pre15<0, mom=falling filters live in decider_run.py for V3 LONG |
 | `2026-09-07_accel300-v4-killer-signal.md` | L1 | HIGH | IMPLEMENTED — RSI>50 filter (SHORT), z>0 filter (HIGH regime) live in decider_run.py for V3 SHORT |
 | `2026-09-06_doji_signal_system.md` | L2 | HIGH | IMPLEMENTED — `doji_top.py` signal live, all infrastructure connected |
+| `2026-09-08_grind-breakout-signal-spec.md` | L2 | HIGH | IMPLEMENTED — `grind_breakout.py` committed (b77064d0), RSI 35-65 quality filter applied, AVNT LONG blacklisted |
+| `2026-09-08_grind-breakout-quality-filters.md` | L1 | HIGH | IMPLEMENTED — RSI 35-65 filter in grind_breakout spec, params updated |
+| `2026-09-08_grind-breakout-backtest-data.md` | L1 | LOW | Analysis only — backtest data consumed into grind_breakout.py params |
 | `atr-spike-signal-build.md` | L2 | HIGH | IMPLEMENTED — `signals/atr_spike.py` live, all params in hermes_constants.py |
 | `atr-spike-backtest-results.md` | L1 | MEDIUM | IMPLEMENTED — backtest confirms atr_spike signal quality, params tuned |
 | `imx-spike-detection.md` | L2 | HIGH | IMPLEMENTED — atr_spike signal was built from this spec |
@@ -79,6 +82,8 @@
 | `2026-08-22_copy-trader-dashboard-enhancements.md` | L3 | MEDIUM | NOT STARTED | Phase 2 dashboard features (copy delay analysis, pro portfolio view, regime performance) |
 | `2026-09-07_market-sync-protection-plan.md` | L2 | HIGH | DECISION NEEDED | Auditor found 88-92% false positive rate. Needs decision: integrate with MAE guard or do nothing |
 | `2026-09-07_partial-close-trailing-runner.md` | L2-L3 | HIGH | DEFERRED | 4 options: partial close (complex), regime trail, tiered trail, time trail. CEO pinned PM_TRAIL_DISTANCE_PCT at 0.20% — blocks trail widening. Needs backtest before any implementation. |
+| `trend_momentum_spec.md` | L2 | HIGH | NOT STARTED | Full trend_momentum signal (EMA alignment + slope + acceleration). Backtested: 35% WR, 3.0:1 R:R, +67.89% net PnL over 14d. Only killed near_sma variant exists. |
+| `trend_momentum_v4_spec.md` | L1 | HIGH | NOT STARTED | V4 filters for trend_momentum: SKIP_HOURS, AFTER_WIN_ONLY, token blacklist. +7.9% WR improvement. Requires trend_momentum signal first (L2). |
 
 ### ❌ REJECTED (by verification agent)
 
@@ -121,15 +126,20 @@
 
 ## Recommended Implementation Order
 
-### Level 1 (EASY) — No remaining L1 HIGH-value work
-All L1 tasks from plans are either implemented, on killed signals, or rejected. See pending items for remaining work.
+### Level 1 (EASY) — Completed
+- ✅ AVNT added to LONG_BLACKLIST (grind_breakout 10% WR, trend_momentum 12% WR)
+- ✅ conf < 90 filter implemented
+- ✅ accel300 RSI < 50 filter implemented
+- ✅ pullback_entry signal implemented
+- ✅ doji_top exit signal implemented
 
 ### Level 2 (MEDIUM) — Do Next
-1. **automation-team-improvements.md** — OpenMemory bridge for session learner (remaining L2 item)
-2. **Market sync protection** — needs decision (88-92% false positive rate, integrate with MAE guard vs do nothing)
-3. **partial-close-trailing-runner.md** — needs backtest first (MFE > 2x realized PnL check). CEO pinned trail at 0.20%.
+1. **trend_momentum signal** — full EMA alignment + slope + acceleration signal (~250 LOC). Backtested: 35% WR, 3.0:1 R:R. v4 filters add +7.9% WR.
+2. **automation-team-improvements.md** — OpenMemory bridge for session learner (remaining L2 item)
+3. **Market sync protection** — needs decision (88-92% false positive rate, integrate with MAE guard vs do nothing)
+4. **partial-close-trailing-runner.md** — needs backtest first (MFE > 2x realized PnL check). CEO pinned trail at 0.20%.
 
 ### Level 3+ (HARD) — Later
-4. **exit-strategy-refactor.md** — full per-signal exit routing (bypass list split already done)
-5. **spec-guitar-tuning.md** — multi-dimensional adaptive tuning (needs revision first)
-6. **spec-signal-regime-memory.md** — signal regime memory (needs revision first)
+5. **exit-strategy-refactor.md** — full per-signal exit routing (bypass list split already done)
+6. **spec-guitar-tuning.md** — multi-dimensional adaptive tuning (needs revision first)
+7. **spec-signal-regime-memory.md** — signal regime memory (needs revision first)

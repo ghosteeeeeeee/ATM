@@ -236,6 +236,9 @@ LONG_BLACKLIST = {
     'DASH',   # 4T 25% WR, -$0.02
     # 2026-08-24: extra fees — eats into margins
     'GRAM', 'ASTER',
+    # 2026-09-08: grind_breakout backtest — 10% WR LONG, -2.742% avg PnL (tight params)
+    # trend_momentum backtest — 12% WR, -2.07% (listed as top underperformer)
+    'AVNT',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
