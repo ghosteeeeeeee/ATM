@@ -381,6 +381,7 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
         if now - cached_at < _DIR_WR_TTL:
             return cached_wr, cached_count
 
+    conn = None
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
@@ -393,7 +394,6 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
               AND close_time >= NOW() - INTERVAL '7 days'
         """, (token.upper(), direction.upper()))
         row = cur.fetchone()
-        cur.close(); conn.close()
         total = row[0] or 0
         wins = row[1] or 0
         wr = (wins / total * 100) if total >= 3 else 50.0  # need at least 3 trades to judge
@@ -401,6 +401,10 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
         return wr, total
     except Exception:
         return 50.0, 0  # neutral if DB error
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 # ─── Per-token Leverage Cache ──────────────────────────────────────────────────

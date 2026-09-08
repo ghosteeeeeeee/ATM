@@ -146,9 +146,9 @@ def _get_leaderboard_mult(token):
     wr = data['wr']
     trades = data['trades']
 
-    if wr >= 70 and trades >= 15:
-        return 1.3   # Hall of Fame
-    elif wr >= 60:
+    if wr >= 60 and trades >= 15:
+        return 1.3   # Hall of Fame (matches dashboard threshold)
+    elif wr >= 50:
         return 1.15  # Strong performer
     elif wr < 45 and trades >= 15:
         return 0.7   # Hall of Shame
@@ -167,6 +167,7 @@ def _get_token_wr(token: str, direction: str) -> tuple:
         cached_wr, cached_count, cached_at = _dir_wr_cache[key]
         if now - cached_at < _DIR_WR_CACHE_TTL:
             return cached_wr, cached_count
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
@@ -181,7 +182,6 @@ def _get_token_wr(token: str, direction: str) -> tuple:
               AND close_time >= NOW() - INTERVAL '7 days'
         """, (token.upper(), direction.upper()))
         row = cur.fetchone()
-        cur.close(); conn.close()
         total = row[0] or 0
         wins = row[1] or 0
         if total == 0:
@@ -194,6 +194,10 @@ def _get_token_wr(token: str, direction: str) -> tuple:
         return wr, total
     except Exception:
         return 50.0, 0  # neutral on error
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def _get_open_tokens() -> set:
@@ -803,19 +807,24 @@ def get_zscore_accel_penalty(token: str, direction: str) -> float:
     if not ZSCORE_ACCEL_ENABLED:
         return 1.0
 
-    conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT price_acceleration FROM token_speeds WHERE token = ?
-    """, (token.upper(),))
-    speed_row = cur.fetchone()
-    cur.execute("""
-        SELECT z_score FROM signals
-        WHERE token = ? AND z_score IS NOT NULL
-        ORDER BY created_at DESC LIMIT 1
-    """, (token.upper(),))
-    z_row = cur.fetchone()
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT price_acceleration FROM token_speeds WHERE token = ?
+        """, (token.upper(),))
+        speed_row = cur.fetchone()
+        cur.execute("""
+            SELECT z_score FROM signals
+            WHERE token = ? AND z_score IS NOT NULL
+            ORDER BY created_at DESC LIMIT 1
+        """, (token.upper(),))
+        z_row = cur.fetchone()
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
     if not speed_row or not z_row:
         return 1.0
