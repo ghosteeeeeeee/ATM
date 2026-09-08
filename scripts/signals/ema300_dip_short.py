@@ -124,6 +124,24 @@ def detect_ema300_dip_short(token, candles, price):
     dist = (current_price - current_ema) / current_ema * 100
     if abs(dist) > EMA300_DIP_SHORT_MAX_DIST_PCT:
         return None
+    if abs(dist) < EMA300_DIP_SHORT_MIN_DIST_PCT:
+        return None  # Too close to EMA — noise, not meaningful rally
+    
+    # ── Condition 4b: BTC trend must be supporting (> MIN_BTC_TREND) ─────
+    # Don't SHORT when BTC is crashing — token won't follow
+    try:
+        conn_btc = sqlite3.connect(CANDLES_DB, timeout=5)
+        btc_rows = conn_btc.execute(
+            "SELECT close FROM candles_1m WHERE token='BTC' ORDER BY ts DESC LIMIT 60"
+        ).fetchall()
+        conn_btc.close()
+        if btc_rows and len(btc_rows) >= 60:
+            btc_prices = [r[0] for r in reversed(btc_rows)]
+            btc_trend = (btc_prices[-1] - btc_prices[0]) / btc_prices[0] * 100
+            if btc_trend > EMA300_DIP_SHORT_MIN_BTC_TREND:
+                return None  # BTC rising — don't SHORT, token won't follow
+    except Exception:
+        pass  # If BTC data unavailable, don't block
     
     # ── Condition 5: RSI > 65 (overbought within downtrend) ──────────────
     if len(closes) >= 15:

@@ -1590,6 +1590,8 @@ EMA300_DIP_SHORT_COOLDOWN = 15        # cooldown between entries (candles = 15 m
 EMA300_DIP_SHORT_TP_PCT = 1.0         # take profit (%)
 EMA300_DIP_SHORT_SL_PCT = 1.5         # stop loss (%)
 EMA300_DIP_SHORT_MAX_CROSSINGS = 10   # max EMA crossings in 100 bars — block chop (was unlimited)
+EMA300_DIP_SHORT_MIN_DIST_PCT = 0.3   # min distance from EMA300 (%) — require meaningful rally, not noise
+EMA300_DIP_SHORT_MIN_BTC_TREND = 0.5  # min BTC 1h trend (%) — only SHORT when BTC supporting downtrend
 # Mirror of LONG signal: sell rallies to EMA300 in downtrends
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
@@ -1629,6 +1631,40 @@ SLOW_GRIND_LONG_CONF_BASE = 72             # base confidence
 SLOW_GRIND_LONG_CONF_CAP = 88              # max confidence (system ceiling)
 SLOW_GRIND_LONG_COOLDOWN_HOURS = 0.25      # 15min cooldown
 SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for steady trends)
+
+# ── grind_breakout (steady grind + late breakout) ──────────────────────────
+# grind_breakout.py — catches grind→breakout patterns with RSI 35-65 quality filter
+GRIND_BREAKOUT_ENABLED = True               # master kill-switch
+GRIND_BREAKOUT_PLUS_ENABLED = True          # LONG direction
+GRIND_BREAKOUT_MINUS_ENABLED = True         # SHORT direction
+GRIND_BREAKOUT_COOLDOWN_HOURS = 3           # per token+direction cooldown
+# Trend detection
+GRIND_BREAKOUT_PURITY_MIN = 0.60            # min % bars above/below EMA20
+GRIND_BREAKOUT_SLOPE_MIN = 0.0005           # min normalized regression slope
+GRIND_BREAKOUT_EMA_PERIOD = 20              # EMA period
+GRIND_BREAKOUT_PURPOSE_LOOKBACK = 30        # bars for purity/slope check
+# Acceleration
+GRIND_BREAKOUT_ACCEL_MULT = 1.2             # vel_5m must be 1.2x vel_15m
+GRIND_BREAKOUT_MIN_VELOCITY = 0.1           # min absolute vel_5m (%)
+# Breakout
+GRIND_BREAKOUT_BREAKOUT_WINDOW = 20         # bars for range high/low
+GRIND_BREAKOUT_BREAKOUT_BUFFER = 0.001      # 0.1% above range high to confirm
+# Quality filter (RSI — the key improvement)
+GRIND_BREAKOUT_RSI_MAX = 65                 # not overbought
+GRIND_BREAKOUT_RSI_MIN = 35                 # not oversold
+# Safety
+GRIND_BREAKOUT_MAX_CONSEC_GREEN = 3         # don't chase 4+ green candles
+GRIND_BREAKOUT_MAX_CONSEC_RED = 3           # SHORT mirror
+# Confidence
+GRIND_BREAKOUT_CONF_BASE = 75               # base confidence
+GRIND_BREAKOUT_CONF_FLOOR = 50              # min confidence
+GRIND_BREAKOUT_CONF_CAP = 88                # max confidence (system ceiling)
+GRIND_BREAKOUT_CONF_SLOPE_BONUS = 5         # extra for steep slope
+GRIND_BREAKOUT_CONF_ACCEL_BONUS = 3         # extra for strong acceleration
+GRIND_BREAKOUT_CONF_BREAKOUT_BONUS = 2      # extra for clean breakout
+GRIND_BREAKOUT_CONF_PURITY_BONUS = 2        # extra for high purity
+# Data
+GRIND_BREAKOUT_LOOKBACK_1M = 200            # 1m bars to fetch
 
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
