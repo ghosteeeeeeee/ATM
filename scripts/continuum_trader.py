@@ -226,8 +226,9 @@ def close_hl_position(token: str = 'BTC') -> dict:
         if result.get('success'):
             print(f"[TRADER] POSITION CLOSED SUCCESSFULLY")
         else:
-            print(f"[TRADER] CLOSE FAILED: {result.get('error', 'Unknown error')}")
-            print(f"[TRADER] Full result: {json.dumps(result, indent=2)}")
+            # Handle different error formats from HL
+            error_msg = result.get('error') or result.get('message') or 'Unknown error'
+            print(f"[TRADER] CLOSE RESULT: {error_msg}")
         return result
     except Exception as e:
         print(f"[TRADER] ERROR closing position: {type(e).__name__}: {e}")
