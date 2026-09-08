@@ -58,6 +58,7 @@ FAMILY_MAP = {
     'Confluence': ['signal_confluence'],
     'Volume': ['volume_hl', 'pump_catcher_long', 'volume_breakout_long', 'volume_breakout_short'],
     'ATR': ['atr_spike_long'],
+    'Coiled_Spring': ['coiled_spring_long', 'coiled_spring_short'],
 }
 
 # Reverse lookup: signal_type → family

@@ -71,8 +71,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',
         'accel-300', 'accel-300-',
         'range_breakout+', 'range_breakout_short',
-        'r2-trend-long', 'r2l',
-        'r2-trend-short',
+        'r2-trend-short',  # R² downtrend SHORT — works in all regimes
         'slow-grind-',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',
         'mover', 'mover+', 'mover-',
@@ -99,7 +98,7 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',
         'range_breakout+', 'range_breakout_short',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',
-        'r2-trend-long', 'r2-trend-short',
+        'r2-trend-short',  # R² downtrend SHORT — works in all regimes
         'slow-grind-',
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
@@ -190,6 +189,11 @@ VOL_PHASE_MULTS = {
         'Bollinger': 0.4,       # Don't fade storms
         'Trendline': 0.5,       # Structural breaks unreliable
         'Exhaustion': 0.3,      # Storms don't exhaust
+        'Coiled_Spring': 0.0,   # BLOCKED — 40% WR in EXTREME, only trade NORMAL
+    },
+    # HIGH volatility: Volatile — coiled_spring has 20% WR here
+    ('HIGH', '*'): {
+        'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
     },
 }
 
