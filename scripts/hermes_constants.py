@@ -1916,6 +1916,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
+    'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
 )
@@ -2966,4 +2967,22 @@ SMA20_DIP_COOLDOWN_HOURS       = 2       # per-token cooldown
 
 # Confidence
 SMA20_DIP_CONF_BASE            = 80      # base confidence
-SMA20_DIP_CONF_CAP             = 92      # max confidence
+SMA20_DIP_CONF_CAP             = 88      # max confidence (matches add_signal cap)
+
+# Confidence bonuses
+SMA20_DIP_BONUS_CLOSE          = 5       # bonus for SMA20 dist < 0.3%
+SMA20_DIP_BONUS_NEAR           = 3       # bonus for SMA20 dist < 0.5%
+SMA20_DIP_BONUS_RSI_SWEET      = 3       # bonus for RSI 65-75
+SMA20_DIP_BONUS_BB_STRONG      = 3       # bonus for BB > 0.80
+SMA20_DIP_BONUS_VOL_CONFIRM    = 2       # bonus for vol > 1x avg
+SMA20_DIP_BONUS_VOL_THRESH     = 1.0     # vol ratio threshold for bonus
+SMA20_DIP_BONUS_CLOSE_THRESH   = 0.3     # % — threshold for close bonus
+SMA20_DIP_BONUS_NEAR_THRESH    = 0.5     # % — threshold for near bonus
+SMA20_DIP_BONUS_RSI_LOW        = 65      # RSI sweet spot low
+SMA20_DIP_BONUS_RSI_HIGH       = 75      # RSI sweet spot high
+SMA20_DIP_BONUS_BB_THRESH      = 0.80    # BB threshold for strong trend bonus
+
+# Candle fetch
+SMA20_DIP_MIN_CANDLES         = 60      # minimum candles for detection
+SMA20_DIP_CANDLE_LIMIT        = 100     # candles to fetch from DB
+SMA20_DIP_VOL_WINDOW          = 20      # candles for average volume

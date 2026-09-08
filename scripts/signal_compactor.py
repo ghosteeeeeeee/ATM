@@ -445,6 +445,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('btc_wave_long', 'btc-wave+'):  1.5,  # boosted for hotset competitiveness (tsunami, not ripple)
     # open_skies — LONG-only open skies breakout (no resistance overhead)
     ('open_skies_long', 'open-skies+'): 1.2,  # structural breakout signal, room to run
+    # sma20_dip — LONG-only SMA20 pullback in uptrend (mean reversion)
+    ('sma20_dip_long', 'sma20-dip+'): 1.2,  # pullback entry at SMA20, proven INJ pattern
     # continuum_score — extreme score signals from continuum engine
     ('continuum_score_long', 'continuum+'): 1.5,   # contrarian LONG at extreme bearish
     ('continuum_score_short', 'continuum-'): 1.5,  # contrarian SHORT at extreme bullish

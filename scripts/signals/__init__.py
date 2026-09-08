@@ -245,6 +245,11 @@ try:
 except Exception:
     _neutral_sniper_run = None
 
+try:
+    from signals.sma20_dip import run as _sma20_dip_run
+except Exception:
+    _sma20_dip_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -292,6 +297,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
+    {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
 ]
 
 

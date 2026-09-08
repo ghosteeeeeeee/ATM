@@ -1817,6 +1817,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # sma20-dip (SMA20 pullback LONG)
+            if _comp == 'sma20-dip+':
+                try:
+                    from hermes_constants import SMA20_DIP_PLUS_ENABLED
+                    if not SMA20_DIP_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SMA20_DIP_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # continuum+
             if _comp == 'continuum+':
                 try:
@@ -2287,6 +2296,7 @@ def is_component_disabled(component: str) -> bool:
             ACCEL_300_V3_SHORT_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
+            SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
@@ -2540,6 +2550,10 @@ def is_component_disabled(component: str) -> bool:
     # open-skies (open skies breakout LONG)
     if c == 'open-skies+': return not OPEN_SKIES_PLUS_ENABLED
     if c == 'open-skies': return not OPEN_SKIES_ENABLED
+    # sma20-dip (SMA20 pullback LONG)
+    if c == 'sma20-dip+': return not SMA20_DIP_PLUS_ENABLED
+    if c == 'sma20-dip-': return not SMA20_DIP_MINUS_ENABLED
+    if c == 'sma20-dip': return not SMA20_DIP_ENABLED
     # continuum-score
     if c == 'continuum+': return not CONTINUUM_SCORE_LONG_ENABLED
     if c == 'continuum-': return not CONTINUUM_SCORE_SHORT_ENABLED

@@ -38,6 +38,20 @@ from hermes_constants import (
     SMA20_DIP_COOLDOWN_HOURS,
     SMA20_DIP_CONF_BASE,
     SMA20_DIP_CONF_CAP,
+    SMA20_DIP_BONUS_CLOSE,
+    SMA20_DIP_BONUS_NEAR,
+    SMA20_DIP_BONUS_RSI_SWEET,
+    SMA20_DIP_BONUS_BB_STRONG,
+    SMA20_DIP_BONUS_VOL_CONFIRM,
+    SMA20_DIP_BONUS_CLOSE_THRESH,
+    SMA20_DIP_BONUS_NEAR_THRESH,
+    SMA20_DIP_BONUS_RSI_LOW,
+    SMA20_DIP_BONUS_RSI_HIGH,
+    SMA20_DIP_BONUS_BB_THRESH,
+    SMA20_DIP_BONUS_VOL_THRESH,
+    SMA20_DIP_MIN_CANDLES,
+    SMA20_DIP_CANDLE_LIMIT,
+    SMA20_DIP_VOL_WINDOW,
     LONG_BLACKLIST,
 )
 
@@ -101,8 +115,8 @@ def detect(token):
     Returns {direction, confidence, value, price} or None.
     """
     # Get candles
-    candles = _get_candles(token, 'candles_1m', 100)
-    if not candles or len(candles) < 60:
+    candles = _get_candles(token, 'candles_1m', SMA20_DIP_CANDLE_LIMIT)
+    if not candles or len(candles) < SMA20_DIP_MIN_CANDLES:
         return None
 
     # Current price
@@ -151,7 +165,7 @@ def detect(token):
 
     # ── Condition 6: Volume active ──
     volumes = [c[5] for c in candles]
-    avg_vol = np.mean(volumes[-20:]) if len(volumes) >= 20 else None
+    avg_vol = np.mean(volumes[-SMA20_DIP_VOL_WINDOW:]) if len(volumes) >= SMA20_DIP_VOL_WINDOW else None
     if avg_vol is None or avg_vol < SMA20_DIP_MIN_AVG_VOL:
         return None  # no volume data or dead market
 
@@ -159,29 +173,29 @@ def detect(token):
     conf = SMA20_DIP_CONF_BASE
 
     # Bonus: tight SMA20 proximity (closer = better entry)
-    if sma20_dist < 0.3:
-        conf += 5  # very close to SMA20
-    elif sma20_dist < 0.5:
-        conf += 3  # close to SMA20
+    if sma20_dist < SMA20_DIP_BONUS_CLOSE_THRESH:
+        conf += SMA20_DIP_BONUS_CLOSE
+    elif sma20_dist < SMA20_DIP_BONUS_NEAR_THRESH:
+        conf += SMA20_DIP_BONUS_NEAR
 
-    # Bonus: RSI sweet spot (65-75 = strong but not extreme)
-    if 65 <= rsi_val <= 75:
-        conf += 3
+    # Bonus: RSI sweet spot
+    if SMA20_DIP_BONUS_RSI_LOW <= rsi_val <= SMA20_DIP_BONUS_RSI_HIGH:
+        conf += SMA20_DIP_BONUS_RSI_SWEET
 
-    # Bonus: strong trend (BB > 0.80)
-    if bb_pos > 0.80:
-        conf += 3
+    # Bonus: strong trend (BB)
+    if bb_pos > SMA20_DIP_BONUS_BB_THRESH:
+        conf += SMA20_DIP_BONUS_BB_STRONG
 
-    # Bonus: volume confirmation (>1x avg)
+    # Bonus: volume confirmation
     vol_ratio = volumes[-1] / avg_vol if avg_vol > 0 else 0
-    if vol_ratio > 1.0:
-        conf += 2
+    if vol_ratio > SMA20_DIP_BONUS_VOL_THRESH:
+        conf += SMA20_DIP_BONUS_VOL_CONFIRM
 
     conf = min(conf, SMA20_DIP_CONF_CAP)
 
     # Notes
     notes = (
-        f"SMA20 dip: price=\${price:.4f} SMA20=\${sma20:.4f} dist={sma20_dist:.2f}% "
+        f"SMA20 dip: price=${price:.4f} SMA20=${sma20:.4f} dist={sma20_dist:.2f}% "
         f"RSI={rsi_val:.1f} BB={bb_pos:.3f} vol={vol_ratio:.1f}x"
     )
 

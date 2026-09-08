@@ -96,6 +96,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'open-skies+',  # open skies breakout — works in steady trend markets
+        'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
     },
     'HIGH': {
@@ -137,6 +138,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'open-skies+',  # open skies breakout — works in volatile breakout markets
+        'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
     },
@@ -168,6 +170,7 @@ REGIME_SIGNALS = {
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum
         'open-skies+',  # open skies breakout — structural, regime-agnostic
+        'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
     },
 }
