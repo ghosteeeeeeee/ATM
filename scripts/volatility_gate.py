@@ -146,7 +146,6 @@ REGIME_SIGNALS = {
         'mover+', 'mover-',  # momentum spike detector
         'bb_bounce',
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
-        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
