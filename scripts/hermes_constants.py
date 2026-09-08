@@ -244,20 +244,20 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
+    'ACE',
     'AIXBT',
-    'ATOM',
     'BLUR',
     'CFX',
     'DOGE',
     'DOT',
+    'DYDX',
+    'ENA',
     'FOGO',
     'GRASS',
     'INJ',
     'KAS',
     'LTC',
     'ME',
-    'MNT',
-    'NXPC',
     'POL',
     'TURBO',
     'ZRO'
@@ -277,20 +277,16 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'ARB',
     'BCH',
     'BIGTIME',
     'CASHCAT',
-    'CRV',
-    'ETC',
     'FIL',
-    'JUP',
     'LDO',
-    'NOT',
+    'SAND',
     'STX',
-    'W',
-    'ZEN'
+    'SYRUP'
 }
+
 
 
 

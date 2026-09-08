@@ -3472,6 +3472,7 @@ def run(dry_run=False):
             from hermes_constants import (
                 EMA300_DIP_SHORT_EMA_PERIOD,
                 EMA300_DIP_SHORT_MIN_CONSEC_BELOW,
+                EMA300_DIP_SHORT_MAX_EMA_SLOPE,
                 CANDLES_STALENESS_SEC,
             )
             log(f'  🔍 [EMA300-CHECK] {token} {direction} — re-validating stable conditions...')

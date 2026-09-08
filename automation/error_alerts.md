@@ -104,3 +104,16 @@
 - **INFO**: Timers all firing on schedule —48 active hermes timers
 - **INFO**: Market regime — 3 LONG_BIAS, 2 SHORT_BIAS, 100 NEUTRAL (overall: NEUTRAL)
 - **AUTO-FIX**: Compressed 17 old log files (saved ~30MB)
+
+## Error Alerts — 2026-09-08 05:23 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 05:20:02 — recovered on next cycle
+- **[WARN]**: Disk at 82% (21G free) — approaching threshold
+- **[INFO]**: 15+ auxiliary services in failed state (non-critical)
+- **AUTO-FIX**: None needed — pipeline healthy, signal_compactor self-recovered
+
+## Error Alerts — 2026-09-08 06:24 UTC
+- **[CRITICAL]** (42x in 30min): `EMA300_DIP_SHORT_MAX_EMA_SLOPE` NameError in `decider_run.py:3515` — constant used but not imported
+- **AUTO-FIX**: Added missing import in `decider_run.py:3472`. Restarted pipeline. Verified fix — no more EMA300 errors.
+- **[WARN]** (1x): `signal_compactor: timed out` at 06:18:02 — recurring, non-fatal
+- **INFO**: Pipeline healthy — 0 open, 21 closed today, 130 signals/hr, 82% disk
+- **INFO**: Market NEUTRAL (1 LONG_BIAS, 1 SHORT_BIAS, 103 neutral), BTC $78,590

@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-08 ~06:30 UTC (Orchestrator)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-09-08 ~07:00 UTC (CEO)**
+**Updated by: CEO**
 
 ## Current Status
 
-24h STRONG (58T, 67.2% WR, +$1.73). 48h positive (109T, 62.4% WR, +$0.63). 7d improving (372T, 57.8% WR, -$2.64 — legacy aging out). All 4 active signals profitable. R:R 24h 0.73 (avg_win $0.109, avg_loss $0.149 — still underwater but improving). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
+24h STRONG (58T, 67.2% WR, +$1.73). 48h positive (109T, 62.4% WR, +$0.63). 7d improving (372T, 57.8% WR, -$2.64 — legacy aging out). All 4 active signals profitable. R:R 24h 0.733 (avg_win $0.109, avg_loss $0.149 — still underwater but improving). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
 
 - **24h:** 58T, 67.2% WR, +$1.73 (verified DB)
 - **48h:** 109T, 62.4% WR, +$0.63 (verified DB)
@@ -33,7 +33,7 @@
 2. **confluence-,ichimoku- SHORT** — 1T/7d 0% WR -$0.09. FLAGGED FOR T.
 
 **🔴 R:R STATUS**
-24h R:R: avg_win $0.109, avg_loss $0.149, ratio 0.731
+24h R:R: avg_win $0.109, avg_loss $0.149, ratio 0.733
 24h exit breakdown:
 - profit-monster-trail: 35T, +$2.69 (dominant exit, working)
 - atr_sl_hit: 8T, +$0.93 (SL wins)
@@ -42,6 +42,8 @@
 **Note:** PM_TRAIL protected (DO NOT CHANGE). R:R still underwater but improving. Legacy fully exited — next 24h should be cleaner.
 
 ## Today's Changes (Sep 8)
+
+3. **CEO ~07:00 UTC — VERIFIED + MONITORING.** DB: 24h 58T 67.2% WR +$1.73. 48h: 109T 62.4% WR +$0.63. 7d: 372T 57.8% WR -$2.64. **4 CONSECUTIVE GREEN DAYS** (Sep 5 +$0.47, Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 +$0.42 in progress). **open-skies+ RECOVERED:** 6T/48h 66.7% WR +$1.19 (was 40% WR -$0.37 at Sep 7 18:40). All 5 exits atr_sl_hit. **ema300-dip SHORT 6T/24h -$0.13** — T re-enabled, protected until Sep 9 05:00. **cut-loser-CL-T1 14T/24h -$1.97** — biggest drag, avg -$0.141. All other signals profitable. **Daily: Sep 2 -$1.79 → Sep 3 +$0.33 → Sep 4 -$1.75 → Sep 5 +$0.47 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 +$0.42.** R:R 0.733. 5 open positions -$0.40 unrealized. Disk 82%. Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL. PM_TRAIL protected. No param changes. **Target: 7d PnL turns positive by Sep 9 as legacy fully exits.**
 
 2. **Orchestrator ~06:30 UTC — VERIFIED + NO CHANGES.** DB: 24h 58T 67.2% WR +$1.73. 48h: 109T 62.4% WR +$0.63. 7d: 372T 57.8% WR -$2.64 (improving from -$2.59 at 02:00). **SYSTEM STEADY STATE — no changes needed.** All signals healthy: bb-bounce-v2-long+ 67T/7d 77.6% WR +$2.62, pump-chain+ 27T/7d 81.5% WR +$0.57, open-skies+ 17T/7d 64.7% WR +$1.55, sma20-dip+ 9T/24h 55.6% WR +$0.15. R:R 0.731 (avg_win $0.109, avg_loss $0.149). **Health monitor auto-fixed EMA300 NameError** (missing import in decider_run.py:3472 — 42 crashes in 30min → 0 after fix). signal_compactor timeout recurring but non-fatal. 5 open positions (bb-bounce-v2-long+ x2, sma20-dip+ x2, ema300-dip-short x1). Disk 82%. Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL. PM_TRAIL protected. No param changes. **Target: 7d PnL turns positive within 48h as legacy fully exits.**
 
