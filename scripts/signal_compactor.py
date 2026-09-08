@@ -2198,6 +2198,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel.close()
                         except Exception:
                             pass
+            # ── Pump-chain LONG velocity filter: block LONG when token 30m velocity negative ──
+            # Backtest: ALL 10 losses had negative 30m velocity at entry, ALL 26 winners had positive
+            # Catches reversals between signal creation and execution (e.g., GRASS +0.88% at signal → -1.60% at close)
+            if direction == 'LONG' and 'pump-chain' in (src or ''):
+                try:
+                    _conn_vel_30 = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_vel_30 = _conn_vel_30.cursor()
+                    _cur_vel_30.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 6
+                    """, (tkn.upper(),))
+                    _vel_30_closes = [r[0] for r in _cur_vel_30.fetchall()]
+                    _cur_vel_30.close()
+                    if len(_vel_30_closes) >= 6 and _vel_30_closes[-1] > 0:
+                        _vel_30m = (_vel_30_closes[0] - _vel_30_closes[-1]) / _vel_30_closes[-1] * 100
+                        if _vel_30m < 0:
+                            log(f"  🚫 [PUMP-CHAIN-VEL] {tkn}: LONG blocked — 30m vel={_vel_30m:+.3f}% (token declining)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    try:
+                        _conn_vel_30.close()
+                    except Exception:
+                        pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
             vol_ok = check_volatility_floor(tkn)
             if vol_ok == 0.0:
