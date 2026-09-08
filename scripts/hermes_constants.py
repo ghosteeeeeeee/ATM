@@ -2940,7 +2940,7 @@ CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme sco
 # Buy pullback to SMA20 in established uptrends.
 # Reference: INJ LONG 2026-09-07 +40.57% (5x), entry at SMA20
 SMA20_DIP_ENABLED              = True    # master kill-switch
-SMA20_DIP_PLUS_ENABLED         = True    # LONG direction
+SMA20_DIP_PLUS_ENABLED         = False   # LONG direction — killed 2026-09-08 12:10 UTC: 0%WR 3T last hour, 47.1%WR all-time, -$0.42 PnL
 SMA20_DIP_MINUS_ENABLED        = False   # SHORT not applicable
 
 # Trend filters
