@@ -2951,8 +2951,8 @@ SMA20_DIP_SMA_SLOW             = 50      # trend filter SMA
 SMA20_DIP_MAX_SMA20_DIST       = 1.0     # % — price must be within this of SMA20
 
 # RSI
-SMA20_DIP_RSI_MIN              = 55      # bullish momentum
-SMA20_DIP_RSI_MAX              = 75      # not extreme
+SMA20_DIP_RSI_MIN              = 45      # bullish momentum (backtested: 45-65 = 100% WR)
+SMA20_DIP_RSI_MAX              = 65      # not extreme (backtested: 45-65 = 100% WR)
 
 # Bollinger Bands
 SMA20_DIP_BB_MIN_POSITION      = 0.50    # above BB middle (= above SMA20)
