@@ -76,8 +76,7 @@ REGIME_SIGNALS = {
         'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # V2 strong trend momentum SHORT
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
-        'r2-trend-long', 'r2l', 'r2v2-long',  # R² trend LONG (slow grinds)
-        'r2-trend-short',  # R² downtrend SHORT detector
+        'r2-trend-short',  # R² downtrend SHORT detector — works in all regimes
         'ema300-dip-long',  # EMA300 dip buyer — trend following
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
@@ -147,7 +146,7 @@ REGIME_SIGNALS = {
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
-        'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
+        'r2-trend-short',  # R² downtrend SHORT — works in all regimes
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
