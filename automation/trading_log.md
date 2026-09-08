@@ -1,3 +1,36 @@
+## [2026-09-08 17:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, net -$0.10)
+**24h:** 73T 52.1%WR -$0.93
+
+**Last Hour:**
+- BLUR pump-chain+: +$0.04 profit-monster-trail ✅
+- SUSHI r2-trend-short5: -$0.14 cut-loser-CL-T1 ❌
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 35T avg +$0.061 ⭐ (carrying system)
+- cut-loser-CL-T1: 24T avg -$0.143 (losses contained)
+- atr_sl_hit: 12T 16.4% avg +$0.028 ✅ (healthy)
+
+**24h Signal Performance (3+ trades):**
+- pump-chain+: 14T 64.3%WR -$0.019 (best WR)
+- sma20-dip+: 19T 42.1%WR -$0.038 (underperforming)
+- ema300-dip-short: 17T 47.1%WR -$0.054 (already killed 16:10)
+- bb-bounce-v2-long+: 9T 44.4%WR -$0.063 (underperforming)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at0%WR with 3+T last hour. r2-trend-short5 1T 0%WR but only 1 trade (not 3+).
+- atr_sl_hit 16.4% healthy ✅
+- Trade freq 2/hr normal ✅
+- 3 open positions (SOL, BIGTIME, DOGE)
+- ema300-dip-short already killed last hour ✅
+
+**Open Questions:**
+- r2-trend-short5 has no signal file — ghost signal, trade logged under non-existent module. Not causing harm but worth cleaning up.
+
 ## [2026-09-08 16:10 UTC] Hourly Analysis
 
 **Trades:** 7 closed (2W 5L, net -$0.39 excl test)
@@ -296,6 +329,25 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 - Trade freq 2/hr normal
 - 2 trades last hour both winners (CHIP, LTC via profit-monster-trail)
 - pump-chain+ strong (16T), open-skies+ star ($1.23 avg)
+- System steady state
+
+**Open Questions:**
+- None
+
+## [2026-09-08 17:25 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L, -$0.12)
+**24h:** 73T 64.4%WR +$2.04
+**Exit breakdown:** profit-monster-trail: 34T avg +$0.060 ⭐ | cut-loser-CL-T1: 25T avg -$0.142 | atr_sl_hit: 12T avg +$0.028
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 16.4% healthy (threshold 40%)
+- Trade freq 1/hr normal
+- 1 open position fresh
+- pump-chain+ negative (-$0.38) but 60%WR — cut-loser exits larger than winners, not signal quality issue
+- ema300-dip-short -$0.91 worst performer but 47.1%WR — within range
+- bb-bounce-v2-long+ -$0.57, 44.4%WR — borderline but no kill trigger
 - System steady state
 
 **Open Questions:**
