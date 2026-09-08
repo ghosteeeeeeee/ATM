@@ -5,13 +5,13 @@
 
 ## Current Status
 
-24h: 72T, 50.0% WR, -$1.21. 48h: 130T, 57.7% WR, -$1.32. 7d: 388T, 57.0% WR, -$4.24. Today Sep 8: 60T, 48.3% WR, -$1.86 (worst day in 7, legacy signal bleed). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
+24h: 71T, 52.1% WR, -$1.21. 48h: 129T, 58.9% WR, -$1.32. 7d: 200T, 57.5% WR, -$2.10. Today Sep 8: 59T, 50.8% WR, -$1.86 (legacy signal bleed). Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL.
 
 - **24h:** 72T, 50.0% WR, -$1.21 (verified DB)
 - **48h:** 130T, 57.7% WR, -$1.32 (verified DB)
 - **7d:** 388T, 57.0% WR, -$4.24 (verified DB — legacy aging out)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 71T/74.6% WR +$2.19 ★ | open-skies+ 17T/64.7% WR +$1.55 ★ | pump-chain+ 34T/82.1% WR +$0.60 ★ | continuation+ 6T/83.3% WR +$0.05
-- **7d LEGACY (killed):** ema300-dip-short 24T/41.7% WR -$1.48 | accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | slow-grind+ 15T/40% WR -$0.80 | sma20-dip+ 19T/42.1% WR -$0.73 | coil-spring+ 21T/42.9% WR -$0.65
+- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 71T/74.6% WR +$2.19 ★ | open-skies+ 17T/64.7% WR +$1.55 ★ | pump-chain+ 34T/82.1% WR +$0.60 ★
+- **7d LEGACY (killed):** accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | slow-grind+ 15T/40% WR -$0.80 | sma20-dip+ 19T/42.1% WR -$0.73 | coil-spring+ 21T/42.9% WR -$0.65
 - **Market:** 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **BB_BOUNCE_V2_LONG:** Live. 71T/7d 74.6% WR +$2.19. STAR. Today 9T/44.4% WR -$0.57 (variance, R:R 0.612).
@@ -20,7 +20,7 @@
 - **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC (0%WR last hour, 42.1% all-time).
 - **CONTINUATION+:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
 - **NEUTRAL_SNIPER:** LIVE. RSI 45/55. Signals firing but BTC-CRASH filter blocks SHORTs.
-- **EMA300-DIP-SHORT:** KILLED by auto_1hr at 16:10 UTC (0%WR last hour, 43.8% all-time). Was CEO-protected until Sep 9 but 0%WR triggered auto-kill.
+- **EMA300-DIP-SHORT:** LIVE (protected until Sep 9 05:00 UTC). EMA300_DIP_SHORT_ENABLED=True. auto_1hr kill at 16:10 overridden by T's re-enable commit. 12T/24h 41.7% WR -$0.96 — aging out.
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 82% (21G free).
@@ -39,6 +39,8 @@ Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.612 | pump-chain+ 0.37
 **Note:** PM_TRAIL protected. R:R compressed — system profitable at 59.5%+ WR. Today 48.3% = loss day. 4-day green streak (Sep 5-7 +$0.88) ended by today -$1.86. Legacy signals (ema300-dip-short, sma20-dip+) already killed, 24h losses aging out.
 
 ## Today's Changes (Sep 8)
+
+7. **Orchestrator ~18:35 UTC — VERIFIED + NO CHANGES.** DB: 24h 71T 52.1% WR -$1.21. 48h: 129T 58.9% WR -$1.32. 7d: 200T 57.5% WR -$2.10. Sep 8: 59T 50.8% WR -$1.86. **SYSTEM STEADY STATE — no changes needed.** Pipeline active, 409 signals generating, health monitor OK. 5 open positions (all LONG, all slightly negative). **cut-loser-CL-T1 is #1 loss driver:** 21T/24h -$3.04 (exit management, not signal quality). **ema300-dip-short:** EMA300_DIP_SHORT_ENABLED still True in constants (auto_1hr kill at 16:10 overridden by T's re-enable commit). CEO protection until Sep 9 05:00. 12T/24h 41.7% WR -$0.96 — aging out. **sma20-dip+:** SMA20_DIP_PLUS_ENABLED=False (killed). 19T residual rotating out. **bb-bounce-v2-long+:** 6T/33.3% WR -$0.54 today (variance). 7d 37T/73.0% WR +$1.31 still strong. **open-skies+:** 1T/100% WR +$0.48 today. Only healthy R:R. **R:R 24h: 0.662** (breakeven WR 60.1%, actual 52.1%). Disk 82%. Market 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL. PM_TRAIL protected. No param changes. **Target: 48h positive by Sep 9 as legacy fully ages out.**
 
 6. **CEO ~19:00 UTC — VERIFIED + MONITORING.** DB: 24h 72T 50.0% WR -$1.21. 48h: 130T 57.7% WR -$1.32. 7d: 388T 57.0% WR -$4.24. Sep 8: 60T 48.3% WR -$1.86 (worst in 7d). **Legacy signal bleed is dominant:** ema300-dip-short 16T/43.8% WR -$0.96 (killed 16:10 UTC, aging out), sma20-dip+ 19T/42.1% WR -$0.73 (killed 12:10 UTC, aging out). **bb-bounce-v2-long+ variance:** 9T/44.4% WR -$0.57 today but 7d 71T/74.6% WR +$2.19 still strong, R:R 0.612. **open-skies+ only healthy signal:** 2T/24h 100% WR +$1.42, R:R 1.303. **R:R 24h: 0.681** (breakeven WR 59.5%, actual 50%). PM_TRAIL 0.20% tight — was 0.60% on Sep 6, reverted. 5 open flat. Disk 82%. **No param changes** — legacy aging out, active signals profitable on 7d. **Target: 48h positive by Sep 9 as legacy fully ages out.**
 
@@ -186,10 +188,10 @@ Signal R:R (7d): open-skies+ 1.303 | bb-bounce-v2-long+ 0.612 | pump-chain+ 0.37
 
 ## Next Actions
 
-1. **Monitor ema300-dip re-enable.** DO NOT DISABLE until Sep 9 05:00 UTC. ema300-dip-short 6T/24h 66.7% WR -$0.13 — slight loss, in protected test window. — 2026-09-07
+1. **Monitor ema300-dip re-enable.** DO NOT DISABLE until Sep 9 05:00 UTC. ema300-dip-short 12T/24h 41.7% WR -$0.96 — aging out. Protection expires Sep 9 05:00. — 2026-09-08
 2. **Monitor open-skies+ degradation.** 17T/7d 64.7% WR +$1.55 — holding steady. Kill if WR drops below 45% at 10T/48h. — 2026-09-07
 3. **Monitor neutral_sniper execution.** Signals firing but BTC-CRASH filter blocking SHORTs. Will execute when BTC stabilizes. Need 20+ live trades with WR >55%. — 2026-09-06
-4. **BUILD directional cap (65%).** Highest-impact mechanical fix. Prevents regime-transition bleed. CEO report at automation/ceo/ceo_report.md. — 2026-09-05
-5. **Monitor bb-bounce-v2-long+.** 67T/7d 77.6% WR +$2.62. STAR. — 2026-09-08
-6. **Monitor pump-chain+.** 27T/7d 81.5% WR +$0.57. Strongest by WR. — 2026-09-08
-7. **Monitor disk.** Currently 82% (27G free). — 2026-09-08
+4. **Monitor bb-bounce-v2-long+.** 37T/7d 73.0% WR +$1.31. Today 6T/33.3% WR -$0.54 (variance). Kill if WR drops below 40% at 15T/48h. — 2026-09-08
+5. **Monitor pump-chain+.** 34T/7d 76.5% WR +$0.26. R:R 0.370 (needs 73% WR to break even). — 2026-09-08
+6. **Monitor disk.** Currently 82% (21G free). — 2026-09-08
+7. **Investigate cut-loser-CL-T1.** 21T/24h -$3.04 — biggest loss driver. Exit management issue, not signal quality. — 2026-09-08
