@@ -74,3 +74,24 @@
 
 **Open Questions:**
 - None — system healthy
+
+## [2026-09-08 04:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour. 4 open positions (USUAL, SAND, IMX, GMT — all fresh)
+**24h:** 56T 69.6%WR +$1.69 | 12h: 30T 70%WR +$1.44 | 4h: 11T 63.6%WR +$0.20
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 32T avg +$0.079 ⭐
+- cut-loser-CL-T1: 12T avg -$0.148 (losses contained)
+- atr_sl_hit: 11T avg +$0.078 ✅ (SL hits profitable)
+- profit-monster-T1: 1T +$0.08
+
+**No Change Needed:**
+- Kill criteria: no signal at ≤25%WR with 3+T last hour
+- atr_sl_hit 20% healthy (11/56)
+- Trade freq 2.3/hr normal
+- 4 open positions fresh
+- All signals neutral or positive in 4h window
+
+**Open Questions:**
+- None — system healthy and steady
