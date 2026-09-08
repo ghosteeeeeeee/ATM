@@ -76,10 +76,29 @@ def track_exit(entry_price: float, exit_price: float, pnl: float):
     # Find and remove the position
     for i, pos in enumerate(positions):
         if abs(pos['entry_price'] - entry_price) < 1:  # Match by entry price
+            # Remove from paper DB
+            _remove_from_paper_db(pos.get('order_id'))
             positions.pop(i)
             break
     save_positions(positions)
     print(f"[TRADER] Tracked exit: PnL ${pnl:+.2f}")
+
+def _remove_from_paper_db(order_id):
+    """Remove position from paper DB when closing."""
+    if not order_id:
+        return
+    try:
+        from _secrets import BRAIN_DB_DICT
+        import psycopg2
+        
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("UPDATE hl_trades SET status = 'CLOSED' WHERE order_id = %s", (str(order_id),))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"[TRADER] WARNING: Failed to remove from paper DB: {e}")
 
 def get_our_positions() -> list:
     """Get positions that belong to the continuum engine."""
@@ -405,8 +424,18 @@ class ContinuumTrader:
             
             result = place_hl_order(side, size_usd)
             if result.get('success'):
-                print(f"[TRADER] ORDER PLACED: {side} ${size_usd:.0f} @ {state.price:.1f}")
-                track_entry(side, state.price, size_usd, order_id=result.get('order_id'))
+                # Extract fill info from HL response
+                fill_info = result.get('result', {}).get('response', {}).get('data', {}).get('statuses', [{}])[0].get('filled', {})
+                fill_price = float(fill_info.get('avgPx', state.price))
+                fill_size = float(fill_info.get('totalSz', 0))
+                order_id = fill_info.get('oid')
+                
+                print(f"[TRADER] ORDER FILLED: {side} {fill_size} BTC @ ${fill_price:.1f} | OID: {order_id}")
+                track_entry(side, fill_price, size_usd, order_id=str(order_id))
+                
+                # Register in paper DB to prevent guardian from closing as orphan
+                self._register_in_paper_db(side, fill_price, fill_size, order_id)
+                
                 self.last_trade_time = time.time()
                 self.last_entry_time = time.time()
                 self.trades_today += 1
@@ -414,6 +443,29 @@ class ContinuumTrader:
                 print(f"[TRADER] ORDER FAILED: {result.get('error')}")
                 # Update last_trade_time to prevent retry spam
                 self.last_trade_time = time.time()
+    
+    def _register_in_paper_db(self, side: str, entry_price: float, size_btc: float, order_id):
+        """Register continuum position in paper DB to prevent guardian from closing as orphan."""
+        try:
+            from _secrets import BRAIN_DB_DICT
+            import psycopg2
+            
+            conn = psycopg2.connect(**BRAIN_DB_DICT)
+            cur = conn.cursor()
+            
+            # Insert into hl_trades table (used by guardian)
+            cur.execute("""
+                INSERT INTO hl_trades (token, side, entry_price, size, order_id, source, status, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            """, ('BTC', side, entry_price, size_btc, str(order_id), 'CONTINUUM', 'OPEN'))
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            print(f"[TRADER] Registered in paper DB: {side} BTC @ ${entry_price:.1f}")
+        except Exception as e:
+            print(f"[TRADER] WARNING: Failed to register in paper DB: {e}")
+            # Non-fatal — position still tracked in continuum_positions.json
     
     def _handle_exit(self, state: ContinuumState):
         """Handle exit signal."""
