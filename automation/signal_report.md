@@ -1,36 +1,33 @@
 === Signal Performance Report ===
-Generated: 2026-09-08 17:10 UTC | 73 trades in 24h
+Generated: 2026-09-08 22:40 UTC | 69 trades in 24h | System PnL: -$2.76
 
-KILLED (executed by auto_1hr):
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| ema300-dip-short | SHORT | 47.1% | -$0.91 | 17 | KILLED 2026-09-08 16:10 UTC — 0%WR last hour, 17T/24h, redesign failed |
-| sma20-dip+ | LONG | 42.1% | -$0.73 | 19 | KILLED 2026-09-08 12:10 UTC — 0%WR 3T last hour, 47.1%WR all-time |
+| (none) | — | — | — | — | No candidates meet all 3 kill criteria |
 
-BOOST CANDIDATES:
+TUNING CANDIDATES (blocked):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 64.3% | -$0.26 | 14 | MIXED — high WR but bad R:R. 7d: +$0.38/78.8%WR. Keep enabled, monitor. |
-| open-skies+ | LONG | 100% | +$1.42 | 2 | STRONG — highest PnL/trade. Low sample, no action needed. |
+| ema300-dip-short | SHORT | 38.5% | -$0.96 | 13 | TUNING — 38.5% WR, 13T. BUT CEO_PROTECTED until 2026-09-09 05:00 UTC. Cannot touch. |
+| bb-bounce-v2-long+ | LONG | 37.5% | -$0.72 | 8 | WATCH — 37.5% WR, 8T. Below 10-trade tuning threshold. Re-check at 15+ trades. |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 44.4% | -$0.57 | 9 | WATCH — 4 cut-loser exits ($0.59), 2 atr_sl ($0.15). Not at kill threshold yet. |
-| r2-trend-short5 | SHORT | 0% | -$0.14 | 1 | WATCH — 1 trade, too early. |
+| pump-chain+ | LONG | 47.1% | -$0.94 | 17 | DETERIORATING — 47.1% WR 24h but 0% WR in last 6h (5T/-$0.78). All 6h trades lost. Wins are small ($0.03-$0.13), losses larger ($0.12-$0.32). 7 wins from profit-monster-trail, 8 losses from atr_sl/cut-loser. |
+| sma20-dip+ | LONG | 42.1% | -$0.73 | 19 | ALREADY KILLED — SMA20_DIP_PLUS_ENABLED=False since 2026-09-08 12:10 UTC. Trades are pre-kill. |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 100% | +$1.42 | 2 | STRONG |
+| open-skies+ | LONG | 50.0% | +$0.48 | 2 | STEADY — low count, positive PnL |
 | r2-trend-short3 | SHORT | 100% | +$0.10 | 2 | PERFECT (low count) |
-| r2-trend-short4 | SHORT | 100% | +$0.07 | 2 | PERFECT (low count) |
-| continuation+ | LONG | 83.3% | +$0.05 | 6 | STRONG |
-| bb-bounce-long+ | LONG | 83.3% | +$0.08 | 6 | STRONG |
 
 ISSUES:
-- cut-loser-CL-T1 is the dominant loss exit: 24 trades, -$3.43 total, avg -$0.14 each. This single exit type accounts for more losses than all other exits combined.
-- pump-chain+ has high WR (64.3%) but negative PnL — cut-loser losses ($0.62 from 4 trades) exceed profit-monster-trail wins ($0.53 from 8 trades). Risk-reward imbalance.
-- No direction inversions detected.
-- Both killed signals (ema300-dip-short, sma20-dip+) had their last trades close before the kill time — no post-kill firing detected.
-- 7-day picture: ema300-dip (-$0.72, 63.6%WR, 55T), accel-300-v3-long+ (-$1.41, 43.6%WR, 39T), slow-grind+ (-$0.80, 40%WR, 15T) are the biggest 7d losers. slow-grind+ already killed.
+- **6h window is 0% WR** — all 8 trades lost in last 6 hours (-$1.09). System-wide drawdown.
+- **pump-chain+ deteriorating** — 0% WR in 6h with 5 trades. All losses are atr_sl_hit or cut-loser. The signal fires on capital rotation momentum but entries are getting stopped out. Not at kill threshold yet (47.1% WR 24h) but trending badly.
+- **ema300-dip-short protected** — 38.5% WR, 13T, -$0.96. Would be a tuning candidate but CEO_PROTECTED until 2026-09-09 05:00 UTC. Review after protection expires.
+- **No direction inversions detected.**
+- **Loss pattern** — atr_sl_hit and cut-loser-CL-T1 dominate exits. Average loss ~$0.15, average win ~$0.07. R:R imbalance across all signals.
+- **bb-bounce-v2-long+** — testing signal since 2026-09-02, 37.5% WR with 8 trades. Close to tuning threshold but needs more data.
