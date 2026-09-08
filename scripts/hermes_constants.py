@@ -1589,6 +1589,7 @@ EMA300_DIP_SHORT_MIN_CONSEC_BELOW = 20  # min candles price stayed below EMA300 
 EMA300_DIP_SHORT_COOLDOWN = 15        # cooldown between entries (candles = 15 min)
 EMA300_DIP_SHORT_TP_PCT = 1.0         # take profit (%)
 EMA300_DIP_SHORT_SL_PCT = 1.5         # stop loss (%)
+EMA300_DIP_SHORT_MAX_CROSSINGS = 10   # max EMA crossings in 100 bars — block chop (was unlimited)
 # Mirror of LONG signal: sell rallies to EMA300 in downtrends
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)

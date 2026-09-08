@@ -102,6 +102,14 @@ def detect_ema300_dip_short(token, candles, price):
     if trend_strength < EMA300_DIP_SHORT_MIN_TREND_STRENGTH:
         return None
     
+    # ── Condition 2b: Not choppy (few EMA crossings) ──────────────────────
+    crossings = 0
+    for i in range(n - lookback + 1, n):
+        if (closes[i] > ema_vals[i]) != (closes[i-1] > ema_vals[i-1]):
+            crossings += 1
+    if crossings > EMA300_DIP_SHORT_MAX_CROSSINGS:
+        return None  # Too many crossings = chop, not trend
+    
     # ── Condition 3: EMA300 slope < MAX_EMA_SLOPE (negative) ──────────────
     if n >= 20:
         ema_slope = (ema_vals[-1] - ema_vals[-20]) / ema_vals[-20] * 100
