@@ -159,3 +159,14 @@
 - **[INFO]** Market: 3 SHORT bias, 0 LONG bias, 104 tokens scanned. Regime NEUTRAL-leaning.
 - **[INFO]** 53 timers active, all firing on schedule. No crashes, no phantom trades.
 - **AUTO-FIX**: None needed — all issues non-critical, system self-recovers
+
+## Health Report — 2026-09-08 22:23 UTC
+- **[CRITICAL]** (1x): Portfolio PnL at **-96.28%** (PostgreSQL `trades` table). Dropped from -40% at 18:23 → -56% at 19:23 → -96% at 22:23. 5 open positions with heavy unrealized losses dragging total PnL.
+- **[WARN]** (1x): Hotset empty — no signals survived compaction. 0 signals above 50% confidence. System is managing 5 open positions but not entering new ones.
+- **[WARN]** (1x): `signal_compactor: timed out` — recurring pattern, self-recovered. Non-fatal.
+- **[INFO]** Pipeline ran 22:22:33 UTC, completed normally. 5/5 positions open, 69 closed today. Position manager healthy (0 closed, 0 adjusted this cycle).
+- **[INFO]** Market: 104 tokens scanned, regime NEUTRAL (103 neutral, 1 long bias). Speed data unavailable (schema mismatch).
+- **[INFO]** 55 timers active, all firing on schedule. No crashes, no phantom trades.
+- **[INFO]** Disk at 83% (92G/118G) — stable, below 85% threshold.
+- **[INFO]** Live trading enabled (`hype_live_trading.json`: true).
+- **AUTO-FIX**: None applied — PnL issue requires manual review of open positions and risk parameters. No system failures to restart.
