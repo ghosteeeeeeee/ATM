@@ -2792,6 +2792,24 @@ def run(dry_run=False):
         # This prevents double-execution when multiple scripts run same minute.
         sig_id = sig.get('signal_id')
 
+        # ── BTC-CRASH FILTER (defense-in-depth in exec loop) ─────────────────
+        # _run_hot_set() is READ-ONLY and can't block execution. This check in the
+        # main exec loop is the actual enforcement point. Without this, BTC-CRASH
+        # "BLOCKED" logs are cosmetic — trades execute anyway. (BANANA 09-08 loop)
+        try:
+            from btc_crash_filter import check_crash
+            _crash = check_crash()
+            if _crash.blocked:
+                _block_dir = getattr(_crash, 'blocked_direction', None) or ''
+                if not _block_dir or direction.upper() == _block_dir.upper():
+                    log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash.severity}: {_crash.reason}')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+        except Exception as _e:
+            log(f'  ⚠️ [BTC-CRASH] filter error in exec loop: {_e} (fail-open)')
+
         # ── Layer 3: Kill-Switch Execution Gate ────────────────────────────────
         # This is the FINAL gate before execution — even if a signal survived
         # add_signal() (Layer 2), it gets stopped here if its *_ENABLED flag is False.
@@ -3690,16 +3708,13 @@ def run(dry_run=False):
         else:
             # BUG-26 fix: rollback the atomic claim since trade failed.
             # Revert executed=0 so the signal can be picked up on next run.
+            # BUG-FIX (2026-09-08): Do NOT rollback when brain.py fails — this creates
+            # phantom trade loops. brain.py opens HL, DB INSERT fails, HL rollback,
+            # sys.exit(1). Signal rollback lets it retry next cycle → same result → loop.
+            # Keep signal as "executed" so it doesn't retry. Fresh signals from next
+            # pipeline cycle will re-approve if conditions still warrant.
             if sig_id:
-                try:
-                    from signal_schema import rollback_signal_executed
-                    rolled = rollback_signal_executed(token, direction, signal_id=sig_id)
-                    if rolled:
-                        log(f'  🔁 SIGNAL ROLLED BACK: {token} {direction} (sig#{sig_id}) — stays in hot-set for retry')
-                    else:
-                        log(f'  ⚠️ ROLLBACK FAILED: sig#{sig_id} already claimed by another process')
-                except Exception as rb_e:
-                    log(f'  ⚠️ ROLLBACK ERROR for sig#{sig_id}: {rb_e}')
+                log(f'  ⚠️ TRADE FAILED: {token} {direction} — signal NOT rolled back (prevents retry loop)')
             else:
                 # [FIX-BUG1] sig_id=None (legacy hot-set without signal_id):
                 # Try token+direction fallback rollback so signal isn't stuck permanently.

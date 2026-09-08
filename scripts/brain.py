@@ -675,33 +675,44 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         else:
             print(f"[brain.py] ✅ 46 params ready")
 
-        # ── ACTUAL INSERT with verbose error capture ─────────────────────────
-        # VALUES: 46 %s matching 46 _col_map params (open_time is explicit 'now' string)
-        try:
-            cur.execute("""
-            INSERT INTO trades (token, direction, amount_usdt, entry_price,
-                      exchange, strategy, paper, stop_loss, target, server, status, open_time,
-                      signal, confidence, token_address, pnl_usdt, pnl_pct,
-                      sl_distance, trailing_activation, trailing_distance,
-                      trailing_phase2_dist, leverage, experiment,
-                      flipped_from_trade, flip_variant,
-                      hl_entry_price, hl_notional_usdt,
-                      highest_price, lowest_price,
-                      signal_z_score, signal_rsi_14, signal_macd_hist,
-                      signal_macd_value, signal_macd_signal,
-                      signal_momentum_state, signal_z_score_tier,
-                      signal_decision, signal_leverage, signal_created_at,
-                      test_sl_variant, test_timing_variant, test_trailing_variant,
-                      _signal_metadata, _exp_metadata, regime, volatility_regime)
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id
-            """, tuple(_params))
-        except Exception as _insert_err:
-            print(f"[brain.py] ❌ INSERT EXCEPTION: type={type(_insert_err).__name__} msg={_insert_err}")
-            print(f"[brain.py]    params len={len(_params)} first={_params[0] if _params else 'EMPTY'}")
-            raise
-        trade_id = cur.fetchone()[0]
-        conn.commit()
+        # ── ACTUAL INSERT with retry logic ────────────────────────────────────
+        # Retry up to 3 times on transient errors (connection, lock, serialization).
+        _max_retries = 3
+        _trade_id = None
+        for _attempt in range(_max_retries):
+            try:
+                cur.execute("""
+                INSERT INTO trades (token, direction, amount_usdt, entry_price,
+                          exchange, strategy, paper, stop_loss, target, server, status, open_time,
+                          signal, confidence, token_address, pnl_usdt, pnl_pct,
+                          sl_distance, trailing_activation, trailing_distance,
+                          trailing_phase2_dist, leverage, experiment,
+                          flipped_from_trade, flip_variant,
+                          hl_entry_price, hl_notional_usdt,
+                          highest_price, lowest_price,
+                          signal_z_score, signal_rsi_14, signal_macd_hist,
+                          signal_macd_value, signal_macd_signal,
+                          signal_momentum_state, signal_z_score_tier,
+                          signal_decision, signal_leverage, signal_created_at,
+                          test_sl_variant, test_timing_variant, test_trailing_variant,
+                          _signal_metadata, _exp_metadata, regime, volatility_regime)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                RETURNING id
+                """, tuple(_params))
+                _trade_id = cur.fetchone()[0]
+                conn.commit()
+                break  # success
+            except Exception as _insert_err:
+                _err_msg = str(_insert_err).lower()
+                _is_transient = any(k in _err_msg for k in ['lock', 'deadlock', 'serialization', 'connection', 'timeout', 'could not'])
+                if _is_transient and _attempt < _max_retries - 1:
+                    print(f"[brain.py] INSERT attempt {_attempt+1}/{_max_retries} failed (transient): {_insert_err}")
+                    time.sleep(1)
+                    conn.rollback()
+                    continue
+                print(f"[brain.py] INSERT EXCEPTION (attempt {_attempt+1}/{_max_retries}): {type(_insert_err).__name__}: {_insert_err}")
+                raise
+        trade_id = _trade_id
         print(f"[brain.py] ✅ {hype_token} {direction} trade #{trade_id} confirmed on HL @ ${hl_entry:.6f}")
         print(f"[brain.py]    📊 PnL notional: signal-level=${result.get('notional_usdt', 'N/A')} → actual HL=${hl_notional} "
               f"(ratio: {round(hl_notional / float(result.get('notional_usdt', 1)) * 100, 1) if (hl_notional and result.get('notional_usdt')) else 'N/A'}%)")
