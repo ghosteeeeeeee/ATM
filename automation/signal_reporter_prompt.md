@@ -64,20 +64,35 @@ conn.close()
 
 ## Step 3: Execute Kills
 
-**You can disable signals directly** — don't wait for CEO approval on clear losers.
+**⚠️ REGIME-BASED BLOCKING FIRST — DO NOT BLANKET-KILL**
+
+Before disabling any signal, check regime performance:
 
 ```python
-# Check current status
-import sys
-sys.path.insert(0, '/root/.hermes/scripts')
-from hermes_constants import *
-
-# Example: if inv-accel-300- has 0% WR with 10+ trades
-# INVERSE_ACCEL_300_MINUS_ENABLED = False  # Kill it
+# Query regime performance before killing
+import psycopg2
+conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+cur = conn.cursor()
+cur.execute('''
+    SELECT volatility_regime, COUNT(*), 
+           SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END),
+           ROUND(SUM(pnl_usdt), 2)
+    FROM trades 
+    WHERE signal LIKE '%SIGNAL_NAME%' AND status = 'closed'
+    GROUP BY volatility_regime
+    HAVING COUNT(*) >= 3
+''')
+# If ANY regime has >= 55% WR → block only losing regimes via volatility_gate_v2.py
+# If ALL regimes have < 50% WR → blanket kill is appropriate
 ```
 
-For each kill:
-1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False` (MUST actually change True→False)
+**If signal wins in ANY regime:**
+1. Add 0.0x multiplier in `scripts/volatility_gate_v2.py` for losing regimes
+2. Add signal to FAMILY_MAP in `scripts/market_phase_gate.py`
+3. DO NOT set `*_ENABLED = False`
+
+**If signal loses in ALL regimes:**
+1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False`
 2. Add to `NEVER_REENABLE_FLAGS` if it's a repeat offender
 3. **VERIFY the flag is actually False** — re-read the file and confirm the line reads `= False`
 4. Git commit: `git commit -m "signals: kill [signal] — X% WR, $Y PnL (24h)"`
