@@ -625,3 +625,36 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 - ema300-dip-short protection expires 05:00 UTC — 11T 36.4%WR -$0.78, consider killing
 - pump-chain+ all LONG in downtrend — directional mismatch
 - Market quiet, 0 trades last hour
+
+## [2026-09-09 03:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W 0L +$0.14)
+**24h:** 62T 44%WR -$2.62
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 26T avg +$0.048 ⭐
+- cut-loser-CL-T1: 19T avg -$0.139
+- atr_sl_hit: 15T 24% avg -$0.108
+- HL_CLOSED: 1T +$0.02
+- test_cleanup: 1T $0.00
+
+**Last Hour Trades:**
+- APT SHORT pump_chain: +$0.01 (atr_sl_hit)
+- BANANA SHORT mover: +$0.03 (profit-monster-trail) ⭐
+- ZRO SHORT mover: +$0.01 (profit-monster-trail) ⭐
+- CC LONG pump_chain: +$0.09 (atr_sl_hit)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour
+- atr_sl_hit 24% healthy ✅
+- Trade freq 4/hr normal
+- pump_chain 4T last hour all winners — strong
+- mover 2T both trails — strong
+- cut-loser-CL-T1 19T -$2.65 worst exit reason — structural issue, not signal-specific
+
+**Open Questions:**
+- cut-loser-CL-T1 contributes -$2.65 of -$2.62 total 24h loss (over 100%). Other exits compensate.
+- 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$0.14 (improving)
