@@ -806,3 +806,36 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - pump-chain- at -$2.20/24h — if negative next hour, consider kill
 - atr_sl_hit 65%+ sustained — structural SL issue, CEO decision if widening needed
+
+## [2026-09-09 18:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, -$0.18)
+**24h:** 42T 41%WR -$0.22
+
+**Last Hour Breakdown:**
+- mover-: 1T 1W +$0.05 (JUP SHORT, trail)
+- open-skies+: 1T 0W 1L -$0.23 (BLUR LONG, rr_engine_resistance)
+
+**24h Exit Reasons:**
+- atr_sl_hit: 27T 64.3% avg -$0.017 (flat, systemic)
+- profit-monster-trail: 7T avg +$0.043 (healthy)
+- cut-loser-CL-T1: 2T avg -$0.155 (structural)
+
+**24h Signal PnL (worst):**
+- pump-chain-: 6T 50%WR -$0.63
+- open-skies+: 2T 0%WR -$0.49 (below kill threshold)
+- pullback-entry+: 4T 25%WR -$0.34 (killed 15:10)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no 0%WR signal with 3+T last hour
+- open-skies+ 2T only — monitor next hour
+- atr_sl_hit 64.3% systemic but flat — not crisis
+- Trade freq 2/hr healthy
+- 0 open positions
+- 3d trend recovering
+
+**Open Questions:**
+- open-skies+ if drops to 0%WR with 3+T next hour → kill
+- pump-chain- at -$0.63/24h but 50%WR — structural not signal

@@ -187,7 +187,7 @@ def detect(token):
     if direction == 'SHORT' and (rsi < (100 - PULLBACK_RSI_MAX) or rsi > (100 - PULLBACK_RSI_MIN)):
         return None
 
-    # 6. Support level check (price near recent swing low for LONG, high for SHORT)
+    # 6. Support/Resistance level check (price near recent swing low for LONG, high for SHORT)
     # Already handled by pullback detection above
 
     # Calculate confidence

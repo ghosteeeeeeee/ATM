@@ -1253,3 +1253,7 @@
   WHY: 6T last hour (3W 3L -$0.36). 41T/24h 41%WR -$0.22. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 65.9% above threshold but avg -$0.017 (flat). pump-chain- 6T/24h -$2.20 worst signal but has wins. Trade freq 6/hr normal. 0 open positions. 3d trend: Sep 8 -$2.74 → Sep 9 -$0.22 (improving).
   BY: auto_1hr
   NEXT: Re-run at 18:10 UTC
+[2026-09-09 18:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.18). 42T/24h 41%WR -$0.22. Kill criteria not met: no 0%WR signal with 3+T last hour. open-skies+ 2T 0%WR -$0.49 below threshold. atr_sl_hit 64.3% systemic but flat (-$0.017 avg). Trade freq 2/hr normal. 0 open positions. 3d trend recovering: Sep 8 -$2.74 → Sep 9 -$0.22.
+  BY: auto_1hr
+  NEXT: Re-run at 19:10 UTC

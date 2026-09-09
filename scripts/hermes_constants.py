@@ -1374,8 +1374,10 @@ NEVER_REENABLE_FLAGS = {
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_LONG_ENABLED',     # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
-    # EMA300_DIP_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
-    # EMA300_DIP_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-07 — T re-enabled for live testing
+    'EMA300_DIP_LONG_ENABLED',     # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
+    'EMA300_DIP_SHORT_ENABLED',    # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
+    'ACCEL_300_V3_LONG_ENABLED',   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE.
+    'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1661,7 +1663,7 @@ R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LON
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip_long.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_LONG_ENABLED = True            # RE-ENABLED 2026-09-07 — T live test with new filters. DO NOT DISABLE until 2026-09-09 05:00 UTC.
+EMA300_DIP_LONG_ENABLED = False           # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
 EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
 EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_LONG_MIN_DIST_PCT = 0.3        # min distance from EMA300 (%) — require meaningful dip, not noise
@@ -1678,7 +1680,7 @@ EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
 # ema300_dip_short.py — catches shallow rallies in strong downtrends
-EMA300_DIP_SHORT_ENABLED = True       # RE-ENABLED 2026-09-08 — T made changes, re-enabling for live test. Protected until 2026-09-09 05:00 UTC.
+EMA300_DIP_SHORT_ENABLED = False      # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
 EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
 EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
@@ -1833,7 +1835,7 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
-ACCEL_300_V3_LONG_ENABLED      = True    # Re-enabled 2026-09-07 — filters: RSI>=50 + pre15>=0. 75% WR verified.
+ACCEL_300_V3_LONG_ENABLED      = False   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE.
 ACCEL_300_V3_LONG_MIN_GAP     = 2.0     # min gap above EMA300
 ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
 ACCEL_300_V3_LONG_MIN_PULLBACK = 0.35   # min gap narrowing from peak (raised from 0.30: filters BIGTIME at 0.30%)
@@ -1893,7 +1895,7 @@ BREAKOUT_LONG_CONF_CAP = 88             # max confidence
 BREAKOUT_LONG_COOLDOWN_HOURS = 3        # per token cooldown
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
-ACCEL_300_V3_SHORT_ENABLED     = True    # Re-enabled 2026-09-07 — filters: RSI_MIN=25 + price_move>0.5% + staleness 10min. Catches all 4 prior losers.
+ACCEL_300_V3_SHORT_ENABLED     = False   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR +$1.52 but 7d 4T -4.21%. NEVER_REENABLE.
 ACCEL_300_V3_SHORT_MIN_GAP     = 1.0     # min gap below EMA300
 ACCEL_300_V3_SHORT_MAX_GAP     = 6.0     # max gap
 ACCEL_300_V3_SHORT_MIN_GAP_ACCEL = 0.20  # min gap acceleration
@@ -2009,10 +2011,6 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
-    'ACCEL_300_V3_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
-    'ACCEL_300_V3_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. After that: only disable if 48hr WR < 55%. T re-enabled 2026-09-07', '2026-09-07'),
-    'EMA300_DIP_LONG_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. T re-enabled 2026-09-07', '2026-09-07'),
-    'EMA300_DIP_SHORT_ENABLED': ('48h live test — DO NOT DISABLE until 2026-09-09 05:00 UTC. T re-enabled 2026-09-07', '2026-09-07'),
 }
 
 # ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────

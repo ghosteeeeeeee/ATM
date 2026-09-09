@@ -1,29 +1,36 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-09 ~02:40 UTC (CEO)**
-**Updated by: CEO**
+**Last Updated: 2026-09-09 ~18:35 UTC (Orchestrator)**
+**Updated by: Orchestrator**
 
 ## Current Status
 
-24h: 63T, 39.7% WR, -$3.57. 7d: 387T, 56.1% WR, -$4.88. Sep 8: 68T, 44.1% WR, -$2.74 (worst day). Sep 9: 2T, 50% WR, -$0.14 (just started). Market 100% NEUTRAL.
+24h: 42T, 47.6% WR, -28.94% (pnl_pct sum). 7d: 371T, 58.8% WR, -100.96%. Sep 9: 42T, 47.6% WR. Market 3 SHORT / 0 LONG / 115 NEUTRAL (SHORT_BIAS).
 
-- **24h:** 63T, 39.7% WR, -$3.57 (verified DB)
-- **7d:** 387T, 56.1% WR, -$4.88 (verified DB)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 73T/74.0% WR +$2.08 ★ | open-skies+ 19T/63.2% WR +$1.56 ★ | pump-chain+ 39T/66.7% WR -$0.55
-- **7d LEGACY (killed):** ema300-dip-short 24T/41.7% WR -$1.48 | sma20-dip+ 19T/42.1% WR -$0.73 | ema300-dip 55T/63.6% WR -$0.72
-- **Market:** 100% NEUTRAL (363/370 7d trades in NEUTRAL)
+- **24h:** 42T, 47.6% WR (verified brain DB). Avg win +3.24%, avg loss -4.46%.
+- **7d:** 371T, 58.8% WR, -100.96% (pnl_pct sum). Avg win +2.81%, avg loss -4.78%.
+- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 73T/74.0% WR +76.77% ★ | open_skies 19T/63.2% WR +61.24% ★ | pump_chain 43T/67.4% WR +13.53%
+- **7d LEGACY (killed):** ema300_dip_short 24T/41.7% WR -60.03% | sma20_dip 19T/47.4% WR -27.02% | ema300_dip 55T/63.6% WR -28.83%
+- **Market:** 3 SHORT / 0 LONG / 115 NEUTRAL (SHORT_BIAS) as of 18:17 UTC.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 73T/7d 74.0% WR +$2.08. STAR. Today 8T/37.5% WR -$0.65 (variance + cut-loser bug).
-- **PUMP-CHAIN+:** Live. 39T/7d 66.7% WR -$0.55. Today 15T/33.3% WR -$1.43 (degraded).
-- **OPEN-SKIES+:** Live. 19T/7d 63.2% WR +$1.56. Only healthy R:R. Today 2T/50% WR +$0.01.
-- **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC Sep 8.
-- **CONTINUATION+:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
-- **NEUTRAL_SNIPER:** LIVE. RSI 45/55. Signals firing but BTC-CRASH filter blocks SHORTs.
-- **EMA300-DIP-SHORT:** LIVE (protected until Sep 9 05:00 UTC). 24T/7d 41.7% WR -$1.48 — WILL DISABLE after protection expires.
+- **BB_BOUNCE_V2_LONG:** Live. 73T/7d 74.0% WR +76.77%. STAR. Today 2T/50% WR +0.98%.
+- **PUMP_CHAIN:** Live. 43T/7d 67.4% WR +13.53%. Today 9T/33.3% WR +3.14%.
+- **OPEN_SKIES:** Live. 19T/7d 63.2% WR +61.24%. Today 2T/50% WR -6.59% (variance).
+- **CONTINUATION:** Live. 6T/7d 83.3% WR +5.16%. Low volume.
+- **PULLBACK_ENTRY-:** Live. 3T/7d 100% WR +3.65%. SHORT only.
+- **PUMP-CHAIN-:** KILLED by signal_reporter 17:12 UTC. 6T/24h 50%WR -$0.63 (losses 8.8x wins).
+- **PULLBACK_ENTRY+:** KILLED by auto_1hr 15:10 UTC. 4T/24h 25%WR -$0.34.
+- **PUMP_FLOW+:** KILLED by auto_1hr 03:10 UTC. 8T/24h 25%WR.
+- **EMA300-DIP-LONG:** KILLED by orchestrator. Protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
+- **EMA300-DIP-SHORT:** KILLED by orchestrator. Protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
+- **ACCEL_300_V3_LONG:** KILLED by orchestrator. Protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE.
+- **ACCEL_300_V3_SHORT:** KILLED by orchestrator. Protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
-- **Disk:** 83% (92G/118G).
+- **Disk:** 84% (19G free).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
+- **ATR_SL:** MIN 1.2%, MAX 1.5% (reverted from 1.5%/1.8% on Sep 8).
+- **Cut-loser fix:** VERIFIED in position_manager.py:363. threshold = -sl_dist * 100 * leverage.
 
 **🔴 R:R STATUS (STRUCTURAL — IMPROVING)**
 24h exit breakdown (losses only):
@@ -32,6 +39,10 @@
 
 **🔴 CRITICAL BUG FIX: cut-loser sl_distance vs leveraged pnl_pct**
 `should_cut_loser()` Priority 2 compared `sl_distance` (price-move %) against `pnl_pct` (LEVERAGED). With leverage=3 and sl_distance=0.015: a 0.5% price drop = -1.5% leveraged pnl → cut-loser fires at -0.5% instead of -1.5%. This made effective SL 3x tighter than intended. **FIX: threshold = -sl_dist * 100 * leverage (was / leverage).** Pipeline restarted. Expected: cut-loser fires at correct 1.2%-1.5% price move, avg loss drops from -4.98% to ~-2%, R:R improves.
+
+## Today's Changes (Sep 9)
+
+1. **Orchestrator ~18:35 UTC — ACTION.** DB: 42T/24h 47.6% WR. 7d: 371T 58.8% WR -100.96%. Market 3 SHORT / 115 NEUTRAL (SHORT_BIAS). **KILLED 4 PROTECTED SIGNALS** (protection expired 05:00 UTC): EMA300_DIP_LONG (3T/48h 33.3%WR -$4.18), EMA300_DIP_SHORT (16T/48h 43.8%WR -$36.54), ACCEL_300_V3_LONG (1T/48h 0%WR -$5.10), ACCEL_300_V3_SHORT (2T/48h 50%WR 7d -4.21%). All added to NEVER_REENABLE_FLAGS, removed from CEO_PROTECTED_FLAGS. **Cut-loser fix VERIFIED** in position_manager.py:363 (threshold = -sl_dist * 100 * leverage). **ATR_SL reverted to 1.2%-1.5%** (Sep8). **Signal reporter killed PUMP_CHAIN- SHORT** (6T/50%WR -$0.63, losses 8.8x wins). **auto_1hr killed PULLBACK_ENTRY+** (4T/25%WR -$0.34) and **PUMP_FLOW+** (8T/25%WR). 2 open positions (ONDO SHORT +0.11%, YGG SHORT -0.07%). Disk 84%. signal_compactor 3x timeout/hr (recurring, non-fatal). Pipeline restarted. **Active signals: bb_bounce_v2_long ★, pump_chain, open_skies, continuation, pullback-entry-.**
 
 ## Today's Changes (Sep 8)
 
@@ -151,7 +162,7 @@
 ## Active Decisions
 
 - **SLOW_GRIND+ KILLED.** Orchestrator killed Sep 7 — 10T/24h 10% WR -$1.42, 9 consecutive losses. NEVER_REENABLE_FLAGS. — 2026-09-07
-- **EMA300-DIP RE-ENABLED by T.** Live test with new filters. DO NOT DISABLE until Sep 9 05:00 UTC. — 2026-09-07
+- **EMA300-DIP KILLED (both).** Orchestrator killed Sep 9 — protection expired 05:00 UTC. LONG: 3T/48h 33.3%WR -$4.18. SHORT: 16T/48h 43.8%WR -$36.54. NEVER_REENABLE_FLAGS. — 2026-09-09
 - **NEUTRAL_SNIPER LIVE + CHOP FIX + BTC-CRASH BLOCK.** Flipped SHADOW_MODE=False Sep 6 02:35 UTC. chop_detector fixed (MEAN_REVERSION override). RSI widened 40/60→45/55. Signals firing (FOGO SHORT conf=75) but BTC-CRASH filter blocks all SHORTs during BTC weakness. 0 live trades. Will execute when BTC stabilizes. — 2026-09-06
 - **DIRECTIONAL CAP RECOMMENDED.** Max 65% of open positions in one direction. Prevents regime-transition bleed. CEO report written. Awaiting T approval to build. — 2026-09-05
 - **PM_TRAIL WIDENED.** PM_TRAIL_DISTANCE_PCT 0.40%→0.50%. R:R improving (0.57→0.90 in 24h). Need more time to reach 0.80+ target. — 2026-09-05
@@ -159,8 +170,9 @@
 - **R:R FIX IMPROVING.** 24h R:R 0.90 (avg_win $0.122, avg_loss $0.135). PM_TRAIL working. Need more time. — 2026-09-06
 - **COIL-SPRING+ KILLED.** signal_reporter killed at 15:07 UTC. 21T still in 24h window rotating out. — 2026-09-06
 - **ACCEL_300_V2_SHORT DEAD.** ACCEL_300_V2_ENABLED=False since Sep 2. Zero post-kill trades. NEVER_REENABLE_FLAGS. — 2026-09-05
-- **ACCEL_300_V3_LONG KILLED.** Orchestrator killed Sep 6 — CEO protection expired 05:00 UTC. 36T/7d 47.2% WR -$0.88. NEVER_REENABLE_FLAGS. — 2026-09-06
-- **ACCEL_300_V3_SHORT KILLED.** Orchestrator killed Sep 6 — CEO protection expired 05:00 UTC. 3T/7d 33.3% WR -$0.02. NEVER_REENABLE_FLAGS. — 2026-09-06
+- **ACCEL_300_V3_LONG KILLED (again).** Orchestrator killed Sep 9 — protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE_FLAGS. — 2026-09-09
+- **ACCEL_300_V3_SHORT KILLED (again).** Orchestrator killed Sep 9 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE_FLAGS. — 2026-09-09
+- **PUMP_CHAIN- KILLED.** signal_reporter killed Sep 9 17:12 UTC. 6T/50%WR -$0.63, losses 8.8x wins. NEVER_REENABLE. — 2026-09-09
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **RANGE_REVERSION KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-02
 - **R2_TREND_LONG KILLED.** NEVER_REENABLE_FLAGS. — 2026-09-03
@@ -185,10 +197,10 @@
 
 ## Next Actions
 
-1. **Verify ATR_SL fix impact.** Reverted ATR_SL to 1.2%-1.5%. Monitor next 24h: avg loss should drop from -4.84% to ~-2%, R:R should improve from 0.51 to 0.70+. — 2026-09-08
-2. **Monitor ema300-dip re-enable.** DO NOT DISABLE until Sep 9 05:00 UTC. Protection expires Sep 9 05:00. — 2026-09-08
-3. **Monitor open-skies+ degradation.** 18T/7d 61.1% WR +$1.55 — holding steady. Kill if WR drops below 45% at 10T/48h. — 2026-09-08
-4. **Monitor bb-bounce-v2-long+.** 72T/7d 73.6% WR +$1.99. Today 7T/28.6% WR -$0.74 (variance). Kill if WR drops below 40% at 15T/48h. — 2026-09-08
-5. **Monitor pump-chain+.** 37T/7d 70.3% WR -$0.08. R:R 0.406 (needs 71% WR to break even). — 2026-09-08
-6. **Monitor disk.** Currently 82% (21G free). — 2026-09-08
-7. **Monitor neutral_sniper execution.** Signals firing but BTC-CRASH filter blocking SHORTs. — 2026-09-06
+1. **Monitor cut-loser fix impact.** Fix verified in code (position_manager.py:363). ATR_SL reverted to 1.2%-1.5%. Monitor 24h: avg loss should drop from -4.46% toward -2%. — 2026-09-09
+2. **Monitor open-skies degradation.** 19T/7d 63.2% WR +61.24% — today 2T/50% WR -6.59%. Kill if WR drops below 45% at 10T/48h. — 2026-09-09
+3. **Monitor bb_bounce_v2_long.** 73T/7d 74.0% WR +76.77% ★. Today 2T/50% WR +0.98%. Kill if WR drops below 40% at 15T/48h. — 2026-09-09
+4. **Monitor pump_chain.** 43T/7d 67.4% WR +13.53%. Today 9T/33.3% WR +3.14%. Kill if WR drops below 45% at 10T/48h. — 2026-09-09
+5. **Monitor signal_compactor timeouts.** 3x/hour recurring. Non-fatal but investigate if it worsens. — 2026-09-09
+6. **Monitor disk.** Currently 84% (19G free). — 2026-09-09
+7. **SHORT side dependency.** System has no LONG backbone in NEUTRAL market. bb_bounce_v2_long is only active LONG signal. — 2026-09-09
