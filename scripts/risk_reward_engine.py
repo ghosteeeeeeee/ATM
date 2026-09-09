@@ -1107,7 +1107,8 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 atr_pct = vol_width.get('atr_pct', 1.0)
                 atr_trail_pct = atr_pct / 100.0 * 0.5
                 atr_new_sl = current_price + (current_price * atr_trail_pct)
-                if best_trail is None or atr_new_sl < best_trail:
+                # For SHORT: SL must stay ABOVE current price
+                if atr_new_sl > current_price and (best_trail is None or atr_new_sl < best_trail):
                     best_trail = atr_new_sl
                 
                 # Apply tightest trail
