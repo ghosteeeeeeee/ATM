@@ -2147,6 +2147,8 @@ STANDALONE_BYPASS_SIGNALS = (
     'mover', 'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
+    'squeeze-reversal', 'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
+    'grind-breakout', 'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -3146,6 +3148,7 @@ PULLBACK_MIN_CANDLES             = 20      # min candles required for detection
 PULLBACK_VOL_LOOKBACK            = 20      # volume lookback period
 PULLBACK_CANDLE_FETCH            = 50      # candles to fetch from DB
 PULLBACK_STALENESS_MIN           = 10      # max age in minutes for price data
+PULLBACK_RS_PROXIMITY_PCT        = 2.0     # max % distance from support/resistance level
 
 # Risk management
 PULLBACK_ENTRY_COOLDOWN_HOURS    = 0.5     # per-token cooldown (30 min)

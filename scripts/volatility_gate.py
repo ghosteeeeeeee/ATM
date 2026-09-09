@@ -97,6 +97,8 @@ REGIME_SIGNALS = {
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'resistance-break+',  # resistance break + pullback — works in trending markets
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
     },
     'HIGH': {
         # Breakout works in big moves
@@ -143,6 +145,8 @@ REGIME_SIGNALS = {
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
         'resistance-break+',  # resistance break + pullback — works in volatile breakouts
         'open-skies+',  # open skies breakout — structural, regime-agnostic
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
     },
     'EXTREME': {
         # Continuation works in storms
@@ -160,6 +164,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
         'bb-bounce-short',  # standalone SHORT bounce signal
+        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
@@ -174,6 +179,8 @@ REGIME_SIGNALS = {
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'resistance-break+',  # resistance break + pullback — works in extreme vol
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
     },
 }
 

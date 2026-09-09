@@ -267,6 +267,11 @@ except Exception:
     _grind_breakout_run = None
 
 try:
+    from signals.squeeze_reversal import run as _squeeze_reversal_run
+except Exception:
+    _squeeze_reversal_run = None
+
+try:
     from signals.resistance_break import run as _resistance_break_run
 except Exception:
     _resistance_break_run = None
@@ -328,6 +333,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'neutral_sniper',            'enabled': 'NEUTRAL_SNIPER_ENABLED',        'run': _neutral_sniper_run},
     {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
+    {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
     {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
