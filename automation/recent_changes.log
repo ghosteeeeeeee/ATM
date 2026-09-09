@@ -1,3 +1,7 @@
+[2026-09-09 22:07 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet since 21:00). 44T/24h 59% atr_sl_hit +$0.38 net improving. Kill criteria not met: no signal at 0%WR with 3+T last hour. profit-monster-trail 9T +$0.37 star. rr_engine_support_tp 5T +$0.26 star. pump_chain 6T 50%WR +$1.06 star. pump-chain- 6T 50%WR -$0.63 R:R 0.11:1 structural drag. pullback-entry+ 4T 25%WR -$0.34 monitoring. open-skies+ 2T 0%WR -$0.49 below threshold. Trade freq 0/hr quiet. 5 open SHORTs (WLD, ADA, ENA, COMP, ONDO) all pullback-entry-. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$0.38 improving.
+  BY: auto_1hr
+  NEXT: Re-run at 23:07 UTC
 [2026-09-09 21:00 UTC] auto_1hr: NO CHANGES
   WHY: 6T last hour (2W 4L -$0.05). 44T/24h 54.5%WR +$0.22 (improved from -$3.08). Kill criteria not met: no signal at 0%WR with 3+T last hour. Real atr_sl_stop rate 29.5% (13/44) well below 40%. profit-monster-trail 9T 88.9%WR +$0.37 star. rr_engine_support_tp 5T 80%WR +$0.26 star. pump_chain 6T 50%WR +$1.06 star. pump-chain- 6T 50%WR -$0.63 — R:R 0.11:1 structural drag (avg_win $0.03 vs avg_loss -$0.24). pullback-entry+ 4T 25%WR -$0.34 monitoring. open-skies+ 2T 0%WR -$0.49 below kill threshold. Trade freq 6/hr normal. 4 open SHORT positions. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$0.22 improving. pump-chain+ kill from 03:10 UTC confirmed working.
   BY: auto_1hr

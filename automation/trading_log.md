@@ -1,3 +1,35 @@
+## [2026-09-09 22:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 21:00 UTC)
+**24h:** 44T 59% atr_sl_hit +$0.38 net (improving from -$3.08 on Sep 8)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 9T +$0.37 ⭐
+- rr_engine_support_tp: 5T +$0.26 ⭐
+- atr_sl_hit: 26T (59%) -$0.16 (avg loss tiny -$0.006)
+- rr_engine_resistance: 2T -$0.25
+
+**24h Signal Performance (2+ trades):**
+- pump_chain: 6T 50%WR +$1.06 ⭐
+- pullback-entry-: 8T 62.5%WR +$0.33 ⭐
+- mover-: 3T 66.7%WR +$0.05 ⭐
+- pump-chain-: 6T 50%WR -$0.63 ⚠️ (R:R 0.11:1 structural)
+- pullback-entry+: 4T 25%WR -$0.34 ⚠️
+- open-skies+: 2T 0%WR -$0.49 ⚠️
+
+**Changes:** None — 0 trades last hour, no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- Trade freq normal, quiet evening
+- pump-chain- R:R 0.11:1 structural — needs TPSL review, not killable
+- open-skies+ 0%WR only 2T below threshold
+
+**Open Questions:**
+- pump-chain- R:R 0.11:1 worst structural drag
+- pullback-entry+ 4T 25%WR approaching kill threshold
+- 5 open SHORTs all pullback-entry- — concentrated exposure
+
 ## [2026-09-09 21:00 UTC] Hourly Analysis
 
 **Trades:** 6 closed (2W 4L -$0.05)

@@ -205,3 +205,14 @@
 - **[INFO]** Disk at 84% (19G free) — approaching 85% threshold, compress logs soon
 - **[INFO]** hl-sync-guardian active. No crashes, no phantom trades.
 - **AUTO-FIX**: None needed — all issues non-critical
+
+## Health Report — 2026-09-09 22:25 UTC
+- **PIPELINE**: OK — completed at 22:22:33, no errors
+- **[INFO]** 5 open trades (AIXBT SHORT, DOGE SHORT, LTC SHORT, ENA SHORT, COMP SHORT), +57.11% PnL reported
+- **[INFO]** 59 signals/hr, 0 errors in last hour
+- **[INFO]** 241 tokens tracked, avg speed pctl 48.3%
+- **[INFO]** HL sync guardian: active, no entries (healthy idle)
+- **[WARN]** Disk at 84% (19G free) — approaching 85% threshold, compress logs soon
+- **[INFO]** 5m and 1m candle timers disabled — candle collection via price_collector.py (running, PID 861175) and pipeline execution. Not a bug.
+- **[INFO]** Regime: unknown (regime_5m.json missing or empty)
+- **AUTO-FIX**: None needed — no critical issues

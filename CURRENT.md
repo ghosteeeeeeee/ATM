@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-09 ~19:10 UTC (CEO)**
+**Last Updated: 2026-09-09 ~22:30 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 42T, 47.6% WR, -$0.72. 7d: 371T, 57.7% WR, -$3.31. Sep 9: 34T, 55.9% WR, +$0.16. Market SHORT_BIAS (3 SHORT / 0 LONG / 115 NEUTRAL).
+24h: 48T, 58.3% WR, +$1.66. 7d: 373T, 58.2% WR, -$1.21. Sep 9: 48T, 58.3% WR, +$1.66. Market SHORT_BIAS (3 SHORT / 0 LONG / 115 NEUTRAL).
 
-- **24h:** 42T, 47.6% WR, -$0.72 (verified brain DB). Avg win +3.24%, avg loss -4.46%.
-- **7d:** 371T, 57.7% WR, -$3.31. Avg win +2.81%, avg loss -4.78%.
-- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 73T/74.0% WR +$2.08 ★ | open_skies 19T/63.2% WR +$1.56 ★ | pump_chain 43T/67.4% WR +$1.11 | continuation 6T/83.3% WR +$0.05
+- **24h:** 48T, 58.3% WR, +$1.66 (verified brain DB). Avg win +4.77%, avg loss -3.88%. R:R 1.23.
+- **7d:** 373T, 58.2% WR, -$1.21 (improved from -$3.31 at 19:10). Legacy aging out fast.
+- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 68T/75.0% WR +$2.24 ★ | open_skies 19T/63.2% WR +$1.56 ★ | pump_chain 41T/68.3% WR +$1.11 | pullback_entry- 11T/72.7% WR +$1.35 | continuation 6T/83.3% WR +$0.05
 - **7d LEGACY (killed, aging out):** ema300_dip_short 24T/41.7% WR -$1.48 | sma20_dip 19T/42.1% WR -$0.73 | ema300_dip 55T/63.6% WR -$0.72
 - **Market:** 3 SHORT / 0 LONG / 115 NEUTRAL (SHORT_BIAS) as of 18:17 UTC.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
