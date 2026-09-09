@@ -1016,19 +1016,36 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         vol_width = result.get('vol_width', {})
         regime = vol_width.get('atr_regime', 'NORMAL')
 
-        # Rule 1: TP at structural level
-        # LONG → TP at resistance (price rises to ceiling)
-        # SHORT → TP at support (price drops to floor)
+        # Rule 1: TP at structural level (with touch confirmation)
+        # LONG → TP at resistance (price touched and rejected)
+        # SHORT → TP at support (price touched and bounced)
+        # KEY: Don't exit just because price is NEAR the level.
+        # Exit only when price has actually TOUCHED the level recently.
         resistance_dist = getattr(hc, 'RR_EXIT_RESISTANCE_DIST', 0.003)
         tp_type = 'resistance' if direction == 'LONG' else 'support'
         for level in sr_map:
             if level.get('type') == tp_type:
-                dist = abs(level['price'] - current_price) / current_price
-                if dist < resistance_dist:
+                level_price = level['price']
+                dist = abs(level_price - current_price) / current_price
+                level_touches = level.get('touches', level.get('strength', 0))
+                
+                # Check if price actually touched the level recently
+                # "Touched" means price was within 0.1% of the level in recent history
+                # We approximate by checking if current price is VERY close (< 0.1%)
+                # AND moving away from the level (bounce/rejection confirmed)
+                touched = dist < 0.001  # within 0.1% = touched
+                moving_away = False
+                if direction == 'SHORT' and current_price > level_price:
+                    moving_away = True  # price bounced above support
+                elif direction == 'LONG' and current_price < level_price:
+                    moving_away = True  # price rejected below resistance
+                
+                # Exit if: price touched level AND is moving away AND level is significant
+                if touched and moving_away and level_touches >= 5:
                     return {
                         'action': 'TAKE_PROFIT',
                         'price': current_price,
-                        'reason': f'{tp_type}_tp: {level["price"]:.4f} ({level.get("source", "?")})',
+                        'reason': f'{tp_type}_tp: {level_price:.4f} ({level.get("source", "?")}) touches={level_touches}',
                         'new_sl': None,
                     }
 
