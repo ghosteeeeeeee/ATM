@@ -1,3 +1,24 @@
+## CEO Report — 2026-09-09 ~02:50 UTC
+
+### Critical Bug Fix: Signal Type Data Integrity
+
+**Issue:** The `signal` field in PostgreSQL trades table was set to `source` (merged tags like `pump-chain+,support_resistance+`) instead of actual `signal_type` (e.g., `support_resistance`, `ema300_dip`). This inflated pump-chain stats and corrupted all signal performance analysis.
+
+**Root Cause:** `decider_run.py` passed `source` to `brain.py` as `--signal` parameter instead of the actual `signal_type` from the signals table.
+
+**Impact:** All pump-chain win rate calculations were wrong — trades from other signals were being counted as pump-chain.
+
+**Fix Applied:**
+1. `signal_compactor.py`: Added `signal_type` field to `hotset_output` (line 3039)
+2. `decider_run.py`: Added `signal_type` parameter to `execute_trade()` function
+3. `decider_run.py`: Passes `sig.get('signal_type', '')` to `execute_trade()`
+
+**Verification:** Bug-hunter verified all 3 parts. Data flow confirmed end-to-end.
+
+**Note:** Existing trades in database still have wrong signal_type. Historical stats are corrupted until data migration is performed.
+
+---
+
 ## CEO Report — 2026-09-08 ~22:30 UTC
 
 ### Diagnosis
