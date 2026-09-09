@@ -1819,6 +1819,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # btc-pump-rider (BTC breakout → alt lagging LONG)
+            if _comp == 'btc-pump-rider+':
+                try:
+                    from hermes_constants import BTC_PUMP_RIDER_ENABLED
+                    if not BTC_PUMP_RIDER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BTC_PUMP_RIDER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # open-skies (open skies breakout LONG)
             if _comp == 'open-skies+':
                 try:
@@ -2322,6 +2331,7 @@ def is_component_disabled(component: str) -> bool:
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
+            BTC_PUMP_RIDER_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2587,6 +2597,8 @@ def is_component_disabled(component: str) -> bool:
     if c == 'continuum+': return not CONTINUUM_SCORE_LONG_ENABLED
     if c == 'continuum-': return not CONTINUUM_SCORE_SHORT_ENABLED
     if c == 'continuum': return not CONTINUUM_SCORE_ENABLED
+    # btc-pump-rider
+    if c == 'btc-pump-rider+': return not BTC_PUMP_RIDER_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

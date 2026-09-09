@@ -57,6 +57,7 @@ REGIME_SIGNALS = {
         # pump_catcher — momentum breakout (velocity + acceleration)
         'pump-catcher+', 'pump-catcher-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in NORMAL
         # Trend following + mean reversion in steady markets
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
@@ -101,6 +102,7 @@ REGIME_SIGNALS = {
         # Breakout works in big moves
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in high vol
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
@@ -139,6 +141,7 @@ REGIME_SIGNALS = {
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
         'resistance-break+',  # resistance break + pullback — works in volatile breakouts
+        'open-skies+',  # open skies breakout — structural, regime-agnostic
     },
     'EXTREME': {
         # Continuation works in storms

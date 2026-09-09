@@ -900,6 +900,26 @@ BTC_WAVE_CONF_BASE = 70             # base confidence
 BTC_WAVE_CONF_CAP = 88              # max confidence (system ceiling)
 BTC_WAVE_CONF_BONUS_SLOPE = 0.01    # EMA300 slope % for confidence bonus
 
+# ── BTC Pump Rider (2026-09-08) ──────────────────────────────────────────────
+# Catches BTC breakouts and rides the pump to correlated alts.
+# When BTC breaks resistance with volume, alts follow within 1-5 minutes.
+# Fires LONG on lagging alts that haven't moved yet.
+BTC_PUMP_RIDER_ENABLED = True
+BTC_PUMP_RIDER_BREAKOUT_VOL_MULT = 3.0    # volume must be 3x avg on breakout candle
+BTC_PUMP_RIDER_BREAKOUT_VOL_WINDOW = 20   # bars for average volume
+BTC_PUMP_RIDER_BREAKOUT_VEL_MIN = 0.15    # min % price move in breakout candle
+BTC_PUMP_RIDER_BREAKOUT_FOLLOWUP = 2      # min candles continuing upward after breakout
+BTC_PUMP_RIDER_ALT_MAX_LAG_PCT = 0.3      # alt must be within 0.3% of price 5min ago
+BTC_PUMP_RIDER_ALT_MIN_BETA = 0.5         # minimum correlation with BTC (0-1)
+BTC_PUMP_RIDER_ALT_RSI_MAX = 75           # don't buy overbought alts
+BTC_PUMP_RIDER_ALT_RSI_MIN = 30           # don't buy deeply oversold
+BTC_PUMP_RIDER_ALT_VOLUME_MIN = 100       # minimum volume to be tradeable
+BTC_PUMP_RIDER_CONF_BASE = 75             # base confidence
+BTC_PUMP_RIDER_CONF_VOLUME_BOOST = 5      # extra conf per 1x above volume threshold
+BTC_PUMP_RIDER_CONF_CAP = 92              # max confidence (system ceiling)
+BTC_PUMP_RIDER_CONF_BETA_BOOST = 3        # extra conf per 0.1 beta above minimum
+BTC_PUMP_RIDER_COOLDOWN_MINUTES = 15      # cooldown between signals per token
+
 # ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
 # Multi-layer crash detection using leading indicators:
 #   Layer 1: Dynamic price crash (ATR-scaled, not fixed %)
@@ -2046,6 +2066,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'macd-div',  # MACD divergence — counter-trend, works solo
     'slow-grind',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
+    'btc-pump-rider',  # BTC breakout → alt lagging LONG — works solo
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
     'pump-chain', 'pump-chain+', 'pump-chain-',  # renamed from pump-catcher — chain correlation momentum
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass

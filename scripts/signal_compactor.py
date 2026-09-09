@@ -332,6 +332,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('macd_divergence_short', 'macd-div-'):  1.25, # SHORT: 80% WR, 5T/24h +$0.24 — boosted 2026-08-27
     ('chain_fire_long',  'chain_fire+'):  1.2,  # data-driven chain signal — slightly boosted
     ('chain_fire_short', 'chain_fire-'):  1.2,  # data-driven chain signal — slightly boosted
+    ('btc_pump_rider_long', 'btc-pump-rider+'): 1.3,  # BTC breakout → alt lagging LONG
     ('momentum',  'momentum+'):    1.25,  # combined pct-hermes + accel LONG (77% hit rate)
     ('momentum',  'momentum-'):    1.25,  # combined pct-hermes + accel SHORT (77% hit rate)
     ('mtf_zscore','hzscore,pct-hermes,momentum'): 1.1,  # triple combo — slightly boosted
