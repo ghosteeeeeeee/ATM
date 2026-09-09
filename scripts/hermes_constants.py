@@ -1376,7 +1376,7 @@ NEVER_REENABLE_FLAGS = {
     'SLOW_GRIND_LONG_ENABLED',     # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
     'EMA300_DIP_LONG_ENABLED',     # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
     'EMA300_DIP_SHORT_ENABLED',    # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
-    'ACCEL_300_V3_LONG_ENABLED',   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE.
+    # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1835,7 +1835,7 @@ ACCEL_300_V2_SHORT_MAX_GAP = 6.0    # SHORT: max gap — raised from 4.5. Gap is
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
-ACCEL_300_V3_LONG_ENABLED      = False   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 1T/48h 0%WR -$5.10. NEVER_REENABLE.
+ACCEL_300_V3_LONG_ENABLED      = True    # RE-ENABLED 2026-09-09 — 75%WR in HIGH, 100%WR in NORMAL. BLOCKED in EXTREME via volatility_gate_v2.
 ACCEL_300_V3_LONG_MIN_GAP     = 2.0     # min gap above EMA300
 ACCEL_300_V3_LONG_MAX_GAP     = 6.0     # max gap — avoid extreme overextension
 ACCEL_300_V3_LONG_MIN_PULLBACK = 0.35   # min gap narrowing from peak (raised from 0.30: filters BIGTIME at 0.30%)
