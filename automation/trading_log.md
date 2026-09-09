@@ -1,3 +1,72 @@
+## [2026-09-09 03:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.15)
+**24h:** 60T 41.7%WR -$3.08
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 25T avg +$0.050 ⭐
+- cut-loser-CL-T1: 19T avg -$0.139 (all losses by design)
+- atr_sl_hit: 14T 21% avg -$0.122 (healthy)
+- HL_CLOSED: 1T +$0.02
+
+**24h Worst Signals:**
+- pump-chain+: 13T 35.7%WR -$1.28 (worst) — ALL LONG in downtrend
+- ema300-dip-short: 11T 36.4%WR -$0.78 (protection expired)
+- sma20-dip+: 19T 42.1%WR -$0.73 (legacy, killed yesterday)
+- bb-bounce-v2-long+: 8T 37.5%WR -$0.65
+
+**Star:** open-skies+: 3T 67%WR +$1.42
+
+**Changes:**
+1. KILL pump-chain+ LONG (`PUMP_FLOW_PLUS_ENABLED = False`) — 13T 35.7%WR -$1.28, all LONG entries in a downtrend. SHORT stays active.
+
+**No Change Needed:**
+- Kill criteria: pump-chain+ was above 0%WR threshold but 35.7%WR degraded enough to kill long direction
+- atr_sl_hit 21% healthy ✅
+- Trade freq 1/hr normal (quiet market 03:10 UTC)
+- ema300-dip-short 11T 36.4%WR — protection expired, monitoring for next kill cycle
+- bb-bounce-v2-long+ 37.5%WR monitoring
+
+**Open Questions:**
+- 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 -$0.14 (just started)
+- ema300-dip-short protection expired — next candidate if WR doesn't improve
+- Open positions: 5 (BANANA SHORT, ZRO SHORT, GRASS LONG, CC LONG, APT SHORT)
+
+## [2026-09-09 01:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, net +$0.01)
+**24h:** 47T 46.8%WR -$1.81
+
+**Last Hour:**
+- ATOM open-skies+: +$0.01 atr_sl_hit (breakeven) ✅
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 27T avg +$0.058 ⭐ (carrying system)
+- cut-loser-CL-T1: 23T avg -$0.146 (losses contained)
+- atr_sl_hit: 14T 18.7% avg -$0.077 (healthy range, slightly negative avg)
+- HL_CLOSED: 1T +$0.02
+
+**24h Signal Performance (3+ trades):**
+- open-skies+: 3T 66.7%WR +$0.49 ⭐ (best, small sample)
+- sma20-dip+: 19T 42.1%WR -$0.73 (persistent drag)
+- pump-chain+: 16T 43.8%WR -$0.97 (degraded from 64.3%WR yesterday, -$0.35 in last 2h)
+- ema300-dip-short: 12T 33.3%WR -$0.99 (trades from before 16:10 kill)
+- bb-bounce-v2-long+: 8T 37.5%WR -$0.65 (underperforming)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour. Only 1 trade last hour.
+- atr_sl_hit 18.7% healthy ✅
+- Trade freq 1/hr normal ✅
+- 4 open positions (GRASS/CC/IMX LONG pump-chain+, APT SHORT pump-chain-)
+- ema300-dip-short confirmed killed — 0 trades post-16:10 ✅
+
+**Open Questions:**
+- pump-chain+ WR dropping from 64.3% to 43.8% over 24h. Monitor next hour — if continues negative, may need param tuning.
+- sma20-dip+ persistent drag (19T -$0.73) but 42.1%WR not at kill threshold.
+
 ## [2026-09-08 17:10 UTC] Hourly Analysis
 
 **Trades:** 2 closed (1W 1L, net -$0.10)
@@ -520,3 +589,39 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 - 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 (just started)
 - pump-chain+ degraded but not at kill threshold (0%WR required)
 - Market regime shift? Low trade volume suggests quiet market
+
+## [2026-09-09 02:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0W 0L +$0.00)
+**24h:** 62T 40.3%WR -$3.42
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 25T avg +$0.050 ⭐
+- cut-loser-CL-T1: 22T avg -$0.143
+- atr_sl_hit: 13T 21% avg -$0.120 (healthy)
+- HL_CLOSED: 1T +$0.02
+
+**24h Worst Signals:**
+- pump-chain+: 14T 35.7%WR -$1.28 (worst)
+- ema300-dip-short: 11T 36.4%WR -$0.78 (legacy, protected until 05:00 UTC)
+- sma20-dip+: 19T 42.1%WR -$0.73 (legacy)
+- bb-bounce-v2-long+: 8T 37.5%WR -$0.65
+
+**Open Positions:** 5 (GRASS LONG, CC LONG, APT SHORT, IMX LONG, ZRO SHORT)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour (0T last hour)
+- atr_sl_hit 21% healthy ✅
+- Trade freq 0/hr (market quiet 02:10 UTC)
+- pump-chain+ 35.7%WR degraded but above kill threshold (0%WR required)
+- ema300-dip-short protected until 05:00 UTC — will re-evaluate then
+- bb-bounce-v2-long+ 37.5%WR monitoring
+
+**Open Questions:**
+- 3-day trend: Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74. Deteriorating.
+- ema300-dip-short protection expires 05:00 UTC — 11T 36.4%WR -$0.78, consider killing
+- pump-chain+ all LONG in downtrend — directional mismatch
+- Market quiet, 0 trades last hour

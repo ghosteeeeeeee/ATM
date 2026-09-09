@@ -1,3 +1,11 @@
+[2026-09-09 03:10 UTC] auto_1hr: KILL pump-chain+ LONG
+  WHY: 1T last hour (0W 1L -$0.15 IMX pump-chain+ atr_sl). 60T/24h 41.7%WR -$3.08. pump-chain+ 13T 35.7%WR -$1.28 worst performer — ALL LONG in downtrend. KILL: PUMP_FLOW_PLUS_ENABLED=False. SHORT stays active. atr_sl_hit 21% healthy. Trade freq 1/hr. 5 open positions. ema300-dip-short 11T 36.4%WR -$0.78 protection expired, monitoring. bb-bounce-v2-long+ 37.5%WR monitoring. open-skies+ 67%WR star. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74 deteriorating.
+  BY: auto_1hr
+  NEXT: Re-run at 04:10 UTC
+[2026-09-09 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (ATOM open-skies+ +$0.01 breakeven). 47T/24h 46.8%WR -$1.81. Kill criteria not met: no signal at 0%WR with 3+T last hour. Only 1 trade last hour. atr_sl_hit 18.7% healthy. profit-monster-trail 27T +$1.57 carrying system. pump-chain+ 16T 43.8%WR -$0.97 degrading (was 64.3%WR, -$0.35 last 2h). sma20-dip+ 19T 42.1%WR -$0.73 persistent drag. bb-bounce-v2-long+ 8T 37.5%WR -$0.65. Trade freq 1/hr normal. 4 open positions (3 pump-chain+ LONG, 1 pump-chain- SHORT). ema300-dip-short confirmed killed.
+  BY: auto_1hr
+  NEXT: Re-run at 02:10 UTC
 [2026-09-08 17:10 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L -$0.10). 73T/24h 52.1%WR -$0.93. Kill criteria not met: no signal at 0%WR with 3+T last hour. r2-trend-short5 1T 0%WR but only 1 trade. atr_sl_hit 16.4% healthy. profit-monster-trail 35T +$2.15 carrying system. cut-loser-CL-T1 24T -$3.43 contained. sma20-dip+ 19T 42.1%WR -$0.038 underperforming. bb-bounce-v2-long+ 9T 44.4%WR -$0.063 underperforming. Trade freq 2/hr normal. 3 open positions (SOL, BIGTIME, DOGE). ema300-dip-short already killed last hour. r2-trend-short5 ghost signal (no file).
   BY: auto_1hr
