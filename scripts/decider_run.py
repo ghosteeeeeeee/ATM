@@ -1545,6 +1545,7 @@ def context_gate(token, direction, source, sig):
 # ─── Trade Execution ──────────────────────────────────────────────
 
 def execute_trade(token, direction, price, confidence, source,
+                  signal_type=None,  # actual signal_type from DB (not merged source tags)
                   leverage=10, paper=False, sl_pct=0.02,
                   trailing_activation=TRAILING_ACTIVATION_PCT, trailing_distance=TRAILING_DISTANCE_PCT,
                   trailing_phase2_dist=None,
@@ -1635,7 +1636,7 @@ def execute_trade(token, direction, price, confidence, source,
 
     # Use signal_type from hotset (actual signal type from DB) instead of source (merged tags)
     # This fixes the bug where trades had wrong signal type (e.g., 'pump-chain+' instead of 'support_resistance')
-    _signal_for_trade = entry.get('signal_type', '') or source
+    _signal_for_trade = signal_type or source
 
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
@@ -3686,6 +3687,7 @@ def run(dry_run=False):
 
         success, msg = execute_trade(
             token, direction, price, confidence, source,
+            signal_type=sig.get('signal_type', ''),
             leverage=lev, paper=paper, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
