@@ -418,6 +418,28 @@ def init_db():
 
 # ── Signals (runtime DB) ──────────────────────────────────────────────────────
 
+def _get_closes_from_candles_1m(token, lookback=50):
+    """Get close prices from candles_1m (OHLC data) for accurate RSI/BB."""
+    conn = None
+    try:
+        from paths import CANDLES_DB
+        conn = _sqlite3.connect(CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT close FROM (
+                SELECT close FROM candles_1m
+                WHERE token = ? ORDER BY ts DESC LIMIT ?
+            ) sub ORDER BY ts ASC
+        """, (token.upper(), lookback))
+        rows = c.fetchall()
+        return [r[0] for r in rows] if rows else []
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
 def _enrich_indicators(token):
     """Compute standard indicators from price_history and token_speeds.
     Returns dict with z_score, z_score_tier, rsi_14, macd_*, momentum_state, bb_position,
@@ -440,9 +462,10 @@ def _enrich_indicators(token):
             result['z_score_tier'] = ('extreme_high' if z > 2 else 'high' if z > 1 else
                                       'extreme_low' if z < -2 else 'low' if z < -1 else 'neutral')
             result['bb_position'] = round((last - (mean - 2 * std)) / (4 * std), 4)
-        # RSI(14)
-        if len(prices) >= 15:
-            changes = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+        # RSI(14) — use candles_1m for accuracy (matches signal filters)
+        closes_1m = _get_closes_from_candles_1m(token, lookback=50)
+        if len(closes_1m) >= 15:
+            changes = [closes_1m[i] - closes_1m[i-1] for i in range(1, len(closes_1m))]
             gains = [c for c in changes[-14:] if c > 0]
             losses = [-c for c in changes[-14:] if c < 0]
             avg_g = sum(gains) / 14 if gains else 0
