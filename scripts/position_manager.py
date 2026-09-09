@@ -352,11 +352,15 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
             except (TypeError, ValueError):
                 pass
 
-        # Priority 2: sl_distance from A/B test
+        # Priority 2: sl_distance from A/B test — multiply by leverage
+        # sl_distance is a price-move % (e.g. 0.015 = 1.5%), but pnl_pct is
+        # LEVERAGED (price_move * leverage).  A 1.5% price drop at 3x = -4.5%
+        # leveraged PnL, so threshold must be -1.5% * leverage = -4.5%.
         sl_dist = trade.get('sl_distance') or trade.get('sl_group')
         if sl_dist is not None:
             try:
-                threshold = -float(sl_dist) * 100  # sl_dist=0.015 → -1.5%
+                lev = float(trade.get('leverage') or 1)
+                threshold = -float(sl_dist) * 100 * max(lev, 1)  # leveraged threshold
                 return pnl_pct <= threshold
             except (TypeError, ValueError):
                 pass
@@ -2455,6 +2459,40 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             live_pnl = compute_live_pnl(entry, cur, direction)   # pnl_utils
         else:
             live_pnl = pnl_pct
+
+        # ── 0. RR Engine structural exit (for configured signals) ──────────────
+        # Check if this trade's signal uses RR engine exits
+        signal = str(pos.get("signal", "") or "")
+        from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
+        if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine':
+            try:
+                from risk_reward_engine import manage_exit
+                current_sl = float(pos.get("stop_loss") or 0)
+                entry_price = float(pos.get("entry_price") or 0)
+                rr_result = manage_exit(token, direction, cur, entry_price, current_sl if current_sl > 0 else None)
+                rr_action = rr_result.get('action', 'HOLD')
+                if rr_action in ('TAKE_PROFIT', 'CUT_LOSS', 'EXIT'):
+                    reason = f"rr_engine_{rr_result.get('reason', rr_action).replace(' ', '_')}"
+                    hits.append({
+                        'trade_id': trade_id,
+                        'token': token,
+                        'direction': direction,
+                        'hit_reason': reason,
+                        'current_price': cur,
+                        'stop_loss': current_sl,
+                        'target': None,
+                    })
+                    log(f"  [RR-ENGINE] {token} {direction}: {rr_action} — {rr_result.get('reason', '')}")
+                    continue  # skip other exit checks
+                elif rr_action == 'TRAIL_SL':
+                    # Update SL in memory
+                    new_sl = rr_result.get('new_sl')
+                    if new_sl and new_sl > 0:
+                        pos['stop_loss'] = new_sl
+                        adjusted_count += 1
+                        log(f"  [RR-ENGINE] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+            except Exception as e:
+                log(f"  [RR-ENGINE] {token} {direction}: error — {e}", "WARN")
 
         # ── 1. ATR TP/SL hit detection (internal close) ────────────────────────
         # ATR TP/SL is the primary exit — run FIRST so standard exits always fire
