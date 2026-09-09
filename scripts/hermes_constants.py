@@ -2531,18 +2531,22 @@ MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for h
 MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
 MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
 
-# ── Mover Signal (fast mover detection) ───────────────────────────────────
-# mover.py — detects fastest moving coins, trades momentum direction
+# ── Mover Signal v2 (trend-following fast mover detection) ────────────────
+# mover.py — catches coins in strong directional moves, avoids peaks/valleys
 MOVER_ENABLED = True                    # master kill-switch
 MOVER_PLUS_ENABLED = True               # LONG direction
 MOVER_MINUS_ENABLED = True              # SHORT direction
 MOVER_TOP_N = 20                        # top N candidates to evaluate
-MOVER_VELOCITY_MIN = 0.3                # min velocity % to qualify (5m window)
+MOVER_VELOCITY_MIN = 1.0                # min velocity % to qualify (real moves only)
 MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)
 MOVER_VOLUME_RATIO = 1.3                # volume must be 1.3x average
 MOVER_COOLDOWN_HOURS = 2                # per token+direction cooldown
 MOVER_CONF_BASE = 75                    # base confidence
 MOVER_CONF_CAP = 88                     # max confidence (system ceiling)
+MOVER_RSI_MIN = 30                      # don't short below this RSI (oversold)
+MOVER_RSI_MAX = 70                      # don't buy above this RSI (overbought)
+MOVER_BB_POSITION_MAX = 0.85            # don't enter above this BB position (0=lower, 1=upper)
+MOVER_PROXIMITY_PCT = 0.5               # % — don't enter within this % of recent high/low
 
 # ── Continuation V2 (smart re-entry after profitable close) ─────────────
 # continuation.py V2 — assess trend state, fire same-dir or fade exhaustion

@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-mover.py — Fast Mover Signal.
+mover.py — Fast Mover Signal v2.
 
-Detects the fastest moving coins and trades in the direction of momentum.
-Uses velocity (rate of price change) across multiple timeframes to identify
-institutions or algos driving price.
+Trend-following signal that catches coins in strong directional moves.
+Avoids entering at peaks (LONG) or valleys (SHORT) — waits for pullbacks
+within the trend for better R:R entries.
 
 Signal types:
-  - mover_long  : LONG (fastest upward mover with volume confirmation)
-  - mover_short : SHORT (fastest downward mover with volume confirmation)
+  - mover_long  : LONG (upward trend, not overextended)
+  - mover_short : SHORT (downward trend, not oversold)
 
 Thesis: Fast movers attract more capital (momentum begets momentum).
-The key is catching the move early with volume confirmation, not chasing.
+Key: Catch the move early, avoid chasing at extremes.
 """
 
 import os
@@ -35,6 +35,10 @@ from hermes_constants import (
     MOVER_CONF_BASE,
     MOVER_CONF_CAP,
     MOVER_COOLDOWN_HOURS,
+    MOVER_RSI_MIN,
+    MOVER_RSI_MAX,
+    MOVER_BB_POSITION_MAX,
+    MOVER_PROXIMITY_PCT,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -159,17 +163,93 @@ def compute_velocity_acceleration(closes, short_window=None, long_window=None):
     return short_vel - long_vel * (short_window / long_window)
 
 
+def compute_rsi(closes, period=14):
+    """Compute RSI. Returns value 0-100."""
+    if len(closes) < period + 1:
+        return 50  # neutral default
+
+    deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
+    gains = [d if d > 0 else 0 for d in deltas]
+    losses = [-d if d < 0 else 0 for d in deltas]
+
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+
+    if avg_loss == 0:
+        return 100
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+
+def compute_bb_position(closes, period=20, stddev=2.0):
+    """Compute position within Bollinger Bands (0 = lower band, 1 = upper band).
+
+    Returns value 0-1 (can exceed if price outside bands).
+    """
+    if len(closes) < period:
+        return 0.5  # neutral
+
+    window = closes[-period:]
+    sma = sum(window) / period
+    variance = sum((x - sma) ** 2 for x in window) / period
+    std = variance ** 0.5
+
+    if std == 0:
+        return 0.5
+
+    upper = sma + stddev * std
+    lower = sma - stddev * std
+    price = closes[-1]
+
+    if upper == lower:
+        return 0.5
+    return (price - lower) / (upper - lower)
+
+
+def is_near_recent_extreme(closes, direction, lookback=20, proximity_pct=None):
+    """Check if price is near recent high (LONG) or low (SHORT).
+
+    For trend following: avoid entering at peaks/valleys.
+    Returns True if too close to extreme (should NOT enter).
+    """
+    if proximity_pct is None:
+        proximity_pct = MOVER_PROXIMITY_PCT
+
+    if len(closes) < lookback:
+        return False
+
+    recent = closes[-lookback:]
+    current = closes[-1]
+
+    if direction == 'LONG':
+        # Don't buy near recent high — wait for pullback
+        recent_high = max(recent)
+        if recent_high == 0:
+            return False
+        dist_to_high = (recent_high - current) / recent_high * 100
+        return dist_to_high < proximity_pct  # too close to high = bad entry
+    else:
+        # Don't short near recent low — wait for bounce
+        recent_low = min(recent)
+        if recent_low == 0:
+            return False
+        dist_to_low = (current - recent_low) / recent_low * 100
+        return dist_to_low < proximity_pct  # too close to low = bad entry
+
+
 def detect_mover(token):
     """Detect if token is a fast mover worth trading.
 
+    Trend-following: catches moves in progress, avoids extremes.
+
     Returns {direction, confidence, value, price} or None.
     """
-    # Get 5m candles for velocity
+    # Get 5m candles for velocity and trend
     closes_5m = _get_closes(token, 'candles_5m', 100)
     if len(closes_5m) < MOVER_VELOCITY_WINDOW + 1:
         return None
 
-    # Get 1m candles for entry timing
+    # Get 1m candles for entry timing and volume
     candles_1m = _get_candles(token, 'candles_1m', 100)
     if len(candles_1m) < 20:
         return None
@@ -179,9 +259,32 @@ def detect_mover(token):
     if direction is None:
         return None
 
-    # Filter: minimum velocity threshold
+    # Filter: minimum velocity threshold (1.0% = real move)
     if abs(velocity) < MOVER_VELOCITY_MIN:
         return None
+
+    # ── PEAK/VALLEY FILTER (trend following) ──────────────────────────────
+    # Don't enter at extremes — wait for pullback within trend
+
+    # RSI filter: avoid overbought (LONG) or oversold (SHORT)
+    rsi = compute_rsi(closes_5m)
+    if direction == 'LONG' and rsi > MOVER_RSI_MAX:
+        return None  # too overextended, wait for pullback
+    if direction == 'SHORT' and rsi < MOVER_RSI_MIN:
+        return None  # too oversold, wait for bounce
+
+    # BB position filter: don't buy at top of bands, don't short at bottom
+    bb_pos = compute_bb_position(closes_5m)
+    if direction == 'LONG' and bb_pos > MOVER_BB_POSITION_MAX:
+        return None  # price at top of range
+    if direction == 'SHORT' and bb_pos < (1 - MOVER_BB_POSITION_MAX):
+        return None  # price at bottom of range
+
+    # Recent extreme proximity: don't chase new highs/lows
+    if is_near_recent_extreme(closes_5m, direction):
+        return None
+
+    # ── END PEAK/VALLEY FILTER ────────────────────────────────────────────
 
     # Compute acceleration (is the move speeding up?)
     acceleration = compute_velocity_acceleration(closes_5m)
@@ -222,6 +325,8 @@ def detect_mover(token):
         'value': round(velocity, 4),
         'price': price,
         'acceleration': round(acceleration, 4),
+        'rsi': round(rsi, 2),
+        'bb_position': round(bb_pos, 4),
     }
 
 
@@ -306,7 +411,8 @@ def scan_mover_signals():
             added += 1
             set_cooldown(token, direction, hours=MOVER_COOLDOWN_HOURS)
             _log(f"{token} {direction} vel={sig['value']:.3f}% "
-                 f"accel={sig['acceleration']:.3f}% conf={sig['confidence']}")
+                 f"accel={sig['acceleration']:.3f}% rsi={sig['rsi']:.1f} "
+                 f"bb={sig['bb_position']:.3f} conf={sig['confidence']}")
 
     return added
 
