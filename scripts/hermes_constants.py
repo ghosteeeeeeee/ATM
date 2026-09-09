@@ -1185,6 +1185,9 @@ SIGNAL_EXIT_CONFIG = {
     # Pump catcher: ATR SL (proven)
     'pump-catcher+': 'atr',
     'pump-catcher-': 'atr',
+    # Pump chain: structural exit (resistance/support)
+    'pump-chain+': 'rr_engine',
+    'pump-chain-': 'rr_engine',
     # Default: PM trail (current behavior for all signals not listed)
 }
 
