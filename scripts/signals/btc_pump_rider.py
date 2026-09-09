@@ -130,12 +130,12 @@ def detect_btc_breakout() -> dict | None:
     lookback = btc_candles[-60:] if len(btc_candles) >= 60 else btc_candles[:-1]
     prev_high = max(c[2] for c in lookback[:-1])  # high of all candles except current
 
-    # Check: did current candle break above 1h high?
-    if curr_high <= prev_high:
+    # Check: did current candle break above 1h high? (close must confirm, not just wick)
+    if curr_high <= prev_high or curr_close <= prev_high:
         return None  # no breakout
 
     # Volume spike check
-    vol_window = btc_candles[-(BTC_BREAKOUT_VOL_AVG_WINDOW + 1):-1]
+    vol_window = btc_candles[-(BTC_PUMP_RIDER_BREAKOUT_VOL_WINDOW + 1):-1]
     avg_vol = sum(c[5] for c in vol_window) / len(vol_window) if vol_window else 0
     if avg_vol <= 0:
         return None
@@ -152,7 +152,7 @@ def detect_btc_breakout() -> dict | None:
     # Follow-through: check if last N candles are also up
     followup_candles = btc_candles[-(BTC_PUMP_RIDER_BREAKOUT_FOLLOWUP + 1):-1]
     followup_up = sum(1 for c in followup_candles if c[4] > c[1])
-    if followup_up < BTC_BREAKOUT_FOLLOWUP_MIN:
+    if followup_up < BTC_PUMP_RIDER_BREAKOUT_FOLLOWUP:
         return None  # no follow-through yet
 
     # BTC velocity (5-candle momentum)
@@ -228,8 +228,8 @@ def find_lagging_alts(btc_info: dict) -> list:
         if conn:
             conn.close()
 
-    # Get BTC 1m closes for beta calculation
-    btc_candles = _get_candles('BTC', 'candles_1m', 30)
+    # Get BTC 1m closes for beta calculation (200 candles = 3.3 hours for meaningful correlation)
+    btc_candles = _get_candles('BTC', 'candles_1m', 200)
     btc_closes = [c[4] for c in btc_candles]
 
     candidates = []
@@ -287,7 +287,7 @@ def find_lagging_alts(btc_info: dict) -> list:
 
     # Sort by beta (highest correlation first)
     candidates.sort(key=lambda x: -x['beta'])
-    return candidates[:10]  # top 10
+    return candidates[:5]  # top 5 (limit concentrated risk)
 
 
 def fire_signal(token: str, price: float, btc_info: dict, beta: float, rsi: float) -> bool:
