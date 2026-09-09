@@ -3036,6 +3036,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'final_confidence': e.get('final_confidence', e['confidence']),  # decider_run reads this
                 'reason': e['reason'],
                 'source': src,
+                'signal_type': e.get('signal_type', ''),  # actual signal_type from DB (not merged source)
                 'entries_count': entries_count,
                 'z_score': e.get('z_score', 0),
                 'rsi_14': e.get('rsi_14', 50),             # RSI at entry

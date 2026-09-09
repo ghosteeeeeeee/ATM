@@ -1633,6 +1633,10 @@ def execute_trade(token, direction, price, confidence, source,
         log(f"  [DEBUG-TRADE] open-skies: token={token} dir={cmd_side} price={price} "
             f"source={source} conf={confidence} size={_trade_size}")
 
+    # Use signal_type from hotset (actual signal type from DB) instead of source (merged tags)
+    # This fixes the bug where trades had wrong signal type (e.g., 'pump-chain+' instead of 'support_resistance')
+    _signal_for_trade = entry.get('signal_type', '') or source
+
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
            '--exchange', 'Hyperliquid',
@@ -1641,7 +1645,7 @@ def execute_trade(token, direction, price, confidence, source,
            '--sl', str(round(sl, 6)),
            '--target', str(round(tp, 6)),
            '--server', SERVER,
-           '--signal', source,
+           '--signal', _signal_for_trade,
            '--confidence', str(round(confidence, 1)),
            '--leverage', str(leverage),
            '--sl-distance', str(sl_pct_val),
