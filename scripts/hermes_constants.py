@@ -1167,12 +1167,58 @@ PM_TIER_BYPASS_SIGNALS = (
 
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
+# ── Signal Exit Configuration ─────────────────────────────────────────────────
+# Maps signal types to their exit systems.
+# Options: 'atr', 'pm_trail', 'pm_tiers', 'rr_engine', 'cut_loser'
+# Combos: 'atr+pm_tiers', 'rr_engine+pm_tiers', etc.
+# Default: 'pm_trail' (current behavior for all signals)
+SIGNAL_EXIT_CONFIG = {
+    # Open-skies: structural exit (resistance/support) + ATR SL as floor
+    'open-skies+': 'rr_engine',
+    'open-skies-': 'rr_engine',
+    # Trend ignition: same as open-skies
+    'trend-ignition+': 'rr_engine',
+    'trend-ignition-': 'rr_engine',
+    # ATR spike: proven ATR SL
+    'atr-spike+': 'atr',
+    'atr-spike-': 'atr',
+    # R2 trend: ATR SL (proven)
+    'r2l-long': 'atr',
+    'r2-trend-short': 'atr',
+    # Pump catcher: ATR SL (proven)
+    'pump-catcher+': 'atr',
+    'pump-catcher-': 'atr',
+    # Default: PM trail (current behavior)
+    # Everything not listed above uses pm_trail
+}
+
 # ── Time / Peak Exit Kill Switches ──────────────────────────────────────────────
 # position_manager.py — controls time-based and peak-reversal exits.
 # Both had 0% WR across 7 trades (2026-08-01 analysis). Disabling to let
 # ATR SL/TP and trailing handle exits instead.
 TIME_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/4), closing positions at small losses
 PEAK_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/3), locking in losses on reversals
+
+# ── RR Engine Exit System ────────────────────────────────────────────────────
+# Structural exit management using the RR engine.
+# Re-evaluates structural levels periodically during open trades.
+RR_EXIT_ENABLED = True
+
+# Re-evaluation frequency (seconds)
+RR_EXIT_FREQ_FLAT = 600         # 10 min — low volatility
+RR_EXIT_FREQ_NORMAL = 300       # 5 min — standard
+RR_EXIT_FREQ_HIGH = 180         # 3 min — fast moves
+RR_EXIT_FREQ_EXTREME = 60       # 1 min — cascade risk
+
+# Exit thresholds
+RR_EXIT_RESISTANCE_DIST = 0.003   # within 0.3% of resistance = take profit
+RR_EXIT_SUPPORT_BREAK缓冲 = 0.001   # 0.1% below support = structural break
+RR_EXIT_LIQUIDATION_DIST = 0.005  # within 0.5% of cluster = exit
+RR_EXIT_RR_MIN = 1.0             # R:R below 1:1 = deterioration exit
+
+# Trail logic
+RR_EXIT_TRAIL_ENABLED = True
+RR_EXIT_TRAIL_BUFFER = 0.002      # 0.2% below support for SL placement
 
 # ── Cut Loser v2 ──────────────────────────────────────────────────────────────
 # cut_loser.py — Two-tier loss cutting + trailing loss. Mirror of profit_monster.
@@ -2925,7 +2971,7 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = True          # LONG direction
+PUMP_FLOW_PLUS_ENABLED = False         # auto_1hr KILLED 2026-09-09 03:10 UTC — 13T/35.7%WR/-$1.28 (24h worst). All LONG in downtrend. SHORT stays active.
 PUMP_FLOW_MINUS_ENABLED = True         # SHORT direction
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
