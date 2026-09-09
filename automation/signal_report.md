@@ -1,33 +1,31 @@
 === Signal Performance Report ===
-Generated: 2026-09-08 22:40 UTC | 69 trades in 24h | System PnL: -$2.76
+Period: Last 6h | 24h
+Generated: 2026-09-09
 
 KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No candidates meet all 3 kill criteria |
+None — no signals met kill criteria (WR < 30%, 5+ trades, active > 24h)
 
-TUNING CANDIDATES (blocked):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| ema300-dip-short | SHORT | 38.5% | -$0.96 | 13 | TUNING — 38.5% WR, 13T. BUT CEO_PROTECTED until 2026-09-09 05:00 UTC. Cannot touch. |
-| bb-bounce-v2-long+ | LONG | 37.5% | -$0.72 | 8 | WATCH — 37.5% WR, 8T. Below 10-trade tuning threshold. Re-check at 15+ trades. |
+BOOSTED (executed):
+None — no clear winners above 55% WR with 5+ trades
 
-LOSERS (watch list):
+LOSERS (watch list — tune candidates):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 47.1% | -$0.94 | 17 | DETERIORATING — 47.1% WR 24h but 0% WR in last 6h (5T/-$0.78). All 6h trades lost. Wins are small ($0.03-$0.13), losses larger ($0.12-$0.32). 7 wins from profit-monster-trail, 8 losses from atr_sl/cut-loser. |
-| sma20-dip+ | LONG | 42.1% | -$0.73 | 19 | ALREADY KILLED — SMA20_DIP_PLUS_ENABLED=False since 2026-09-08 12:10 UTC. Trades are pre-kill. |
+| sma20_dip | LONG | 35.7% | -$0.90 | 14 | Tune: WR < 40% with 10+ trades. SMA20_DIP_PLUS already killed 2026-09-08 |
+| ema300_dip_short | SHORT | 36.4% | -$0.78 | 11 | Tune: WR < 40% with 10+ trades. Under test protection until 2026-09-09 05:00 UTC |
+| bb_bounce_v2_long | LONG | 33.3% | -$0.54 | 6 | Watch: WR < 40%, only 6 trades (below 10 threshold) |
+| r2_trend_short | SHORT | 33.3% | -$0.13 | 3 | Watch: only 3 trades, too early to judge |
+| pump_chain | LONG | 42.9% | -$0.97 | 14 | Watch: WR borderline, highest PnL loss in absolute terms |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 50.0% | +$0.48 | 2 | STEADY — low count, positive PnL |
-| r2-trend-short3 | SHORT | 100% | +$0.10 | 2 | PERFECT (low count) |
+| mover | SHORT | 100% | +$0.04 | 2 | N/A — 2 trades only |
+| open_skies | LONG | 50% | +$0.01 | 2 | N/A — 2 trades only |
 
 ISSUES:
-- **6h window is 0% WR** — all 8 trades lost in last 6 hours (-$1.09). System-wide drawdown.
-- **pump-chain+ deteriorating** — 0% WR in 6h with 5 trades. All losses are atr_sl_hit or cut-loser. The signal fires on capital rotation momentum but entries are getting stopped out. Not at kill threshold yet (47.1% WR 24h) but trending badly.
-- **ema300-dip-short protected** — 38.5% WR, 13T, -$0.96. Would be a tuning candidate but CEO_PROTECTED until 2026-09-09 05:00 UTC. Review after protection expires.
-- **No direction inversions detected.**
-- **Loss pattern** — atr_sl_hit and cut-loser-CL-T1 dominate exits. Average loss ~$0.15, average win ~$0.07. R:R imbalance across all signals.
-- **bb-bounce-v2-long+** — testing signal since 2026-09-02, 37.5% WR with 8 trades. Close to tuning threshold but needs more data.
+- No signal inversions detected (24h)
+- No signals meet strict kill criteria (WR < 30% + 5+ trades + active > 24h)
+- `sma20_dip LONG` is the strongest tune candidate: 14 trades, 35.7% WR, -$0.90 PnL
+- `ema300_dip_short SHORT` protected until 2026-09-09 05:00 UTC — cannot kill before then
+- 6h volume is low (3 signal combos with 2+ trades) — limited data for action
