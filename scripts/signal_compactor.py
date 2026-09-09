@@ -2343,6 +2343,31 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel_30.close()
                         except Exception:
                             pass
+            # ── Pump-chain SHORT velocity filter: block SHORT when token 30m velocity positive ──
+            # Mirror of LONG filter — SHORT needs price declining, block if rising
+            if direction == 'SHORT' and 'pump-chain' in (src or ''):
+                try:
+                    _conn_vel_30s = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_vel_30s = _conn_vel_30s.cursor()
+                    _cur_vel_30s.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 6
+                    """, (tkn.upper(),))
+                    _vel_30_closes_s = [r[0] for r in _cur_vel_30s.fetchall()]
+                    _cur_vel_30s.close()
+                    if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[-1] > 0:
+                        _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
+                        if _vel_30m_s > 0:
+                            log(f"  🚫 [PUMP-CHAIN-VEL-SHORT] {tkn}: SHORT blocked — 30m vel={_vel_30m_s:+.3f}% (token rising)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    try:
+                        _conn_vel_30s.close()
+                    except Exception:
+                        pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
             vol_ok = check_volatility_floor(tkn)
             if vol_ok == 0.0:
