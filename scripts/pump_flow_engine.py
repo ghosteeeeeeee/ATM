@@ -586,16 +586,42 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
     
     elif phase_data['phase'] == 'ACCUMULATION':
         # Choppy — low conviction, recommend patience
-        recommendations.append({
-            'token': 'BTC',
-            'tier': 0,
-            'tier_name': 'BTC',
-            'reason': "Accumulation phase — choppy markets. Low conviction, recommend patience.",
-            'confidence': 0.2,
-            'suggested_direction': 'WAIT',
-            'chain_evidence': [],
-            'flow_score': 0,
-        })
+        # BUT: if individual tokens have very strong velocity, recommend them anyway
+        strong_momentum = [f for f in active_flows if f['direction'] == 'IN' and f['velocity_15m'] > 1.0]
+        
+        for flow in strong_momentum[:5]:
+            chain_evidence = []
+            for edge in flow_graph.get('edges', []):
+                if edge['from'] == flow['token'] and edge['lift'] >= 1.3:
+                    chain_evidence.append({
+                        'follower': edge['to'],
+                        'lift': edge['lift'],
+                        'wr': edge['wr'],
+                    })
+            
+            conf = min(0.8, 0.3 + flow['velocity_15m'] * 0.3)
+            recommendations.append({
+                'token': flow['token'],
+                'tier': flow['tier'],
+                'tier_name': flow['tier_name'],
+                'reason': f"Strong momentum in choppy market: +{flow['velocity_15m']:.1f}% velocity",
+                'confidence': round(conf, 3),
+                'suggested_direction': 'LONG',
+                'chain_evidence': chain_evidence[:3],
+                'flow_score': flow['flow_score'],
+            })
+        
+        if not strong_momentum:
+            recommendations.append({
+                'token': 'BTC',
+                'tier': 0,
+                'tier_name': 'BTC',
+                'reason': "Accumulation phase — choppy markets. Low conviction, recommend patience.",
+                'confidence': 0.2,
+                'suggested_direction': 'WAIT',
+                'chain_evidence': [],
+                'flow_score': 0,
+            })
     
     # Sort by confidence
     recommendations.sort(key=lambda x: x['confidence'], reverse=True)
