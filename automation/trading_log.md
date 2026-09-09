@@ -708,3 +708,37 @@ Final set: ['ACE', 'AIXBT', 'BLUR', 'CFX', 'COMP', 'DOGE', 'DOT', 'DYDX', 'ENA',
 - ADD ETC (WR=44.4%, PnL=$0.10, low_wr (44.4%))
 
 Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
+
+## [2026-09-09 15:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0W 4L -$0.36)
+**24h:** 40T 40%WR -$0.98
+
+**Last Hour Breakdown:**
+- pullback-entry+: 3T 0%WR (NEO -$0.15 atr_sl, AIXBT -$0.21 atr_sl, ETH -$0.02 rr_engine)
+- pullback-entry-: 1T 1W (LTC +$0.02 rr_engine_support_tp)
+
+**24h Exit Reasons:**
+- atr_sl_hit: 22/40 = **55%** — above 40% threshold → SL too tight
+- profit-monster-trail: 7T +$0.20 (good)
+- cut-loser-CL-T1: 6T -$0.84 (structural)
+- rr_engine: 2T mixed
+
+**24h Signal PnL (worst first):**
+- ema300_dip_short: 5T 0%WR -$0.61 — protection expired, chronic loser
+- pullback-entry+: 4T 25%WR -$0.34
+- open-skies+: 1T 0%WR -$0.26
+- pump_chain: 13T 46%WR +$0.69 (best)
+
+**Changes:**
+1. **KILLED pullback-entry+** — 0%WR with 3+T last hour (auto kill rule)
+   - Disabled PULLBACK_ENTRY_PLUS_ENABLED
+   - pullback-entry- remains enabled (1W last hour)
+
+**No Change Needed:**
+- ema300_dip_short: protection expired but 0T last hour → doesn't meet kill criteria
+- atr_sl_hit 55%: systemic issue, SL params are CEO-locked
+
+**Open Questions:**
+- atr_sl_hit at 55% is the dominant close reason — SL may need widening (CEO decision)
+- pump_chain+ at 47%WR degraded but still positive PnL — monitor
