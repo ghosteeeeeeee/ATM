@@ -1168,17 +1168,14 @@ PM_TIER_BYPASS_SIGNALS = (
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
 # ── Signal Exit Configuration ─────────────────────────────────────────────────
-# Maps signal types to their exit systems.
+# Maps signal sources to their exit systems.
 # Options: 'atr', 'pm_trail', 'pm_tiers', 'rr_engine', 'cut_loser'
 # Combos: 'atr+pm_tiers', 'rr_engine+pm_tiers', etc.
-# Default: 'pm_trail' (current behavior for all signals)
+# Default: 'pm_trail' (current behavior for all signals not listed)
 SIGNAL_EXIT_CONFIG = {
     # Open-skies: structural exit (resistance/support) + ATR SL as floor
     'open-skies+': 'rr_engine',
     'open-skies-': 'rr_engine',
-    # Trend ignition: same as open-skies
-    'trend-ignition+': 'rr_engine',
-    'trend-ignition-': 'rr_engine',
     # ATR spike: proven ATR SL
     'atr-spike+': 'atr',
     'atr-spike-': 'atr',
@@ -1188,8 +1185,7 @@ SIGNAL_EXIT_CONFIG = {
     # Pump catcher: ATR SL (proven)
     'pump-catcher+': 'atr',
     'pump-catcher-': 'atr',
-    # Default: PM trail (current behavior)
-    # Everything not listed above uses pm_trail
+    # Default: PM trail (current behavior for all signals not listed)
 }
 
 # ── Time / Peak Exit Kill Switches ──────────────────────────────────────────────
@@ -1212,7 +1208,7 @@ RR_EXIT_FREQ_EXTREME = 60       # 1 min — cascade risk
 
 # Exit thresholds
 RR_EXIT_RESISTANCE_DIST = 0.003   # within 0.3% of resistance = take profit
-RR_EXIT_SUPPORT_BREAK缓冲 = 0.001   # 0.1% below support = structural break
+RR_EXIT_SUPPORT_BREAK_BUFFER = 0.001   # 0.1% below support = structural break
 RR_EXIT_LIQUIDATION_DIST = 0.005  # within 0.5% of cluster = exit
 RR_EXIT_RR_MIN = 1.0             # R:R below 1:1 = deterioration exit
 

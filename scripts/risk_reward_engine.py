@@ -760,7 +760,7 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
             'grade': grade,
             'block_reason': block_reason,
             'notes': notes,
-            'sr_map': sr_map[:5],  # top 5 levels for logging
+            'sr_map': sr_map,  # full map for exit rules
             'vol_width': vol_width,
             'liquidity': liquidity,
             'legacy_rr': legacy,
@@ -1016,31 +1016,36 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         vol_width = result.get('vol_width', {})
         regime = vol_width.get('atr_regime', 'NORMAL')
 
-        # Rule 1: TP at resistance
+        # Rule 1: TP at structural level
+        # LONG → TP at resistance (price rises to ceiling)
+        # SHORT → TP at support (price drops to floor)
         resistance_dist = getattr(hc, 'RR_EXIT_RESISTANCE_DIST', 0.003)
+        tp_type = 'resistance' if direction == 'LONG' else 'support'
         for level in sr_map:
-            if level.get('type') == 'resistance':
+            if level.get('type') == tp_type:
                 dist = abs(level['price'] - current_price) / current_price
                 if dist < resistance_dist:
                     return {
                         'action': 'TAKE_PROFIT',
                         'price': current_price,
-                        'reason': f'resistance_tp: {level["price"]:.4f} ({level.get("source", "?")})',
+                        'reason': f'{tp_type}_tp: {level["price"]:.4f} ({level.get("source", "?")})',
                         'new_sl': None,
                     }
 
-        # Rule 2: SL at support break
-        support_break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK缓冲', 0.001)
+        # Rule 2: SL at structural break
+        # LONG → SL at support break (price drops below floor)
+        # SHORT → SL at resistance break (price rises above ceiling)
+        support_break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
+        break_type = 'support' if direction == 'LONG' else 'resistance'
         for level in sr_map:
-            if level.get('type') == 'support':
+            if level.get('type') == break_type:
                 level_price = level['price']
-                # Only check support levels BELOW current price (structural floor)
                 if direction == 'LONG' and level_price < current_price:
                     if current_price < level_price * (1 - support_break_buffer):
                         return {
                             'action': 'CUT_LOSS',
                             'price': current_price,
-                            'reason': f'support_break: {level_price:.4f} broken',
+                            'reason': f'{break_type}_break: {level_price:.4f} broken',
                             'new_sl': None,
                         }
                 if direction == 'SHORT' and level_price > current_price:
@@ -1048,24 +1053,26 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         return {
                             'action': 'CUT_LOSS',
                             'price': current_price,
-                            'reason': f'support_break: {level_price:.4f} broken',
+                            'reason': f'{break_type}_break: {level_price:.4f} broken',
                             'new_sl': None,
                         }
 
-        # Rule 3: Trail SL to support
+        # Rule 3: Trail SL to structural level
+        # LONG → trail to support below (floor rises)
+        # SHORT → trail to resistance above (ceiling falls)
         if getattr(hc, 'RR_EXIT_TRAIL_ENABLED', True) and current_sl is not None:
             trail_buffer = getattr(hc, 'RR_EXIT_TRAIL_BUFFER', 0.002)
+            trail_type = 'support' if direction == 'LONG' else 'resistance'
             for level in sr_map:
-                if level.get('type') == 'support':
+                if level.get('type') == trail_type:
                     level_price = level['price']
-                    # Only trail to support BELOW current price (structural floor)
                     if direction == 'LONG' and level_price < current_price:
                         new_sl = level_price - (current_price * trail_buffer)
                         if new_sl > current_sl:
                             return {
                                 'action': 'TRAIL_SL',
                                 'price': current_price,
-                                'reason': f'trail_to_support: {level_price:.4f}',
+                                'reason': f'trail_to_{trail_type}: {level_price:.4f}',
                                 'new_sl': new_sl,
                             }
                     if direction == 'SHORT' and level_price > current_price:
@@ -1074,21 +1081,28 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                             return {
                                 'action': 'TRAIL_SL',
                                 'price': current_price,
-                                'reason': f'trail_to_support: {level_price:.4f}',
+                                'reason': f'trail_to_{trail_type}: {level_price:.4f}',
                                 'new_sl': new_sl,
                             }
 
         # Rule 4: Exit before liquidation cluster
         liquidation_dist = getattr(hc, 'RR_EXIT_LIQUIDATION_DIST', 0.005)
-        for cluster in liquidity.get('clusters_ahead_data', []):
-            dist = abs(cluster.get('price', 0) - current_price) / current_price
-            if dist < liquidation_dist:
-                return {
-                    'action': 'EXIT',
-                    'price': current_price,
-                    'reason': f'liquidation_zone: {cluster.get("price", 0):.4f}',
-                    'new_sl': None,
-                }
+        # Try to get raw cluster data from load_clusters()
+        try:
+            if _HAS_LIQ_MAP:
+                raw_data = load_clusters()
+                raw_clusters = raw_data.get('liquidation_clusters', {}).get(token.upper(), [])
+                for cluster in raw_clusters:
+                    dist = abs(cluster.get('distance_pct', 999)) / 100.0  # convert % to decimal
+                    if dist < liquidation_dist:
+                        return {
+                            'action': 'EXIT',
+                            'price': current_price,
+                            'reason': f'liquidation_zone: {cluster.get("price", 0):.4f}',
+                            'new_sl': None,
+                        }
+        except Exception:
+            pass  # fail-open
 
         # Rule 5: R:R deterioration (DISABLED — too aggressive, exits winners early)
         # As price moves in your favor, R:R naturally decreases. This is expected,
