@@ -2005,8 +2005,8 @@ STANDALONE_BYPASS_SIGNALS = (
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
-    'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
-    'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
+    'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
+    'mover', 'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
 )
