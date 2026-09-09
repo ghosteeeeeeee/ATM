@@ -1017,10 +1017,10 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         regime = vol_width.get('atr_regime', 'NORMAL')
 
         # Rule 1: TP at structural level (with touch confirmation)
-        # LONG → TP at resistance (price touched and rejected)
-        # SHORT → TP at support (price touched and bounced)
+        # LONG → TP at resistance (price touched and rejected = exit in profit)
+        # SHORT → TP at support (price touched and bounced = exit in profit)
         # KEY: Don't exit just because price is NEAR the level.
-        # Exit only when price has actually TOUCHED the level recently.
+        # Exit only when price has actually TOUCHED the level AND is moving in PROFIT direction.
         resistance_dist = getattr(hc, 'RR_EXIT_RESISTANCE_DIST', 0.003)
         tp_type = 'resistance' if direction == 'LONG' else 'support'
         for level in sr_map:
@@ -1030,18 +1030,17 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 level_touches = level.get('touches', level.get('strength', 0))
                 
                 # Check if price actually touched the level recently
-                # "Touched" means price was within 0.1% of the level in recent history
-                # We approximate by checking if current price is VERY close (< 0.1%)
-                # AND moving away from the level (bounce/rejection confirmed)
                 touched = dist < 0.001  # within 0.1% = touched
-                moving_away = False
-                if direction == 'SHORT' and current_price > level_price:
-                    moving_away = True  # price bounced above support
-                elif direction == 'LONG' and current_price < level_price:
-                    moving_away = True  # price rejected below resistance
                 
-                # Exit if: price touched level AND is moving away AND level is significant
-                if touched and moving_away and level_touches >= 5:
+                # Check if price is in PROFIT direction (moving away from entry)
+                in_profit = False
+                if direction == 'LONG' and current_price > level_price:
+                    in_profit = True  # price is above resistance (profit for LONG)
+                elif direction == 'SHORT' and current_price < level_price:
+                    in_profit = True  # price is below support (profit for SHORT)
+                
+                # Exit if: price touched level AND is in profit AND level is significant
+                if touched and in_profit and level_touches >= 5:
                     return {
                         'action': 'TAKE_PROFIT',
                         'price': current_price,
