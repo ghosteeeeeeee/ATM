@@ -1137,6 +1137,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — own TP/SL/trailing
+    'pump_chain', 'pump_chain+', 'pump_chain-',  # underscore variant (actual DB values)
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
@@ -1188,6 +1189,9 @@ SIGNAL_EXIT_CONFIG = {
     # Pump chain: structural exit (resistance/support)
     'pump-chain+': 'rr_engine',
     'pump-chain-': 'rr_engine',
+    'pump_chain+': 'rr_engine',  # underscore variant
+    'pump_chain-': 'rr_engine',  # underscore variant
+    'pump_chain': 'rr_engine',    # bare variant
     # Default: PM trail (current behavior for all signals not listed)
 }
 
@@ -3015,7 +3019,7 @@ OPEN_SKIES_HH_MIN               = 2       # Minimum higher highs in last N bars
 OPEN_SKIES_HH_WINDOW            = 10      # Bars to check for higher highs
 
 # Cooldown
-OPEN_SKIES_COOLDOWN_HOURS       = 0.5     # Per-token cooldown after fire (30 min)
+OPEN_SKIES_COOLDOWN_HOURS       = 0.25    # Per-token cooldown after fire (15 min)
 
 # Confidence
 OPEN_SKIES_CONF_BASE            = 75      # base confidence
