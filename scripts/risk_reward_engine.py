@@ -1016,12 +1016,34 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         vol_width = result.get('vol_width', {})
         regime = vol_width.get('atr_regime', 'NORMAL')
 
-        # Rule 1: TP at structural level (with touch confirmation)
-        # LONG → TP at resistance (price touched and rejected = exit in profit)
-        # SHORT → TP at support (price touched and bounced = exit in profit)
-        # KEY: Don't exit just because price is NEAR the level.
-        # Exit only when price has actually TOUCHED the level AND is moving in PROFIT direction.
-        resistance_dist = getattr(hc, 'RR_EXIT_RESISTANCE_DIST', 0.003)
+        # Rule 1: SL at structural break (PRIMARY EXIT)
+        # LONG → exit when price breaks BELOW support (structural floor broken)
+        # SHORT → exit when price breaks ABOVE resistance (structural ceiling broken)
+        # KEY: Hold until the level BREAKS, not just touches it.
+        break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
+        break_type = 'support' if direction == 'LONG' else 'resistance'
+        for level in sr_map:
+            if level.get('type') == break_type:
+                level_price = level['price']
+                level_touches = level.get('touches', level.get('strength', 0))
+                
+                if direction == 'LONG' and current_price < level_price * (1 - break_buffer):
+                    return {
+                        'action': 'CUT_LOSS',
+                        'price': current_price,
+                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches})',
+                        'new_sl': None,
+                    }
+                if direction == 'SHORT' and current_price > level_price * (1 + break_buffer):
+                    return {
+                        'action': 'CUT_LOSS',
+                        'price': current_price,
+                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches})',
+                        'new_sl': None,
+                    }
+
+        # Rule 2: Take profit ONLY at extremely strong levels (15+ touches)
+        # This is a safety valve — most trades exit via structural break, not TP
         tp_type = 'resistance' if direction == 'LONG' else 'support'
         for level in sr_map:
             if level.get('type') == tp_type:
@@ -1029,49 +1051,21 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 dist = abs(level_price - current_price) / current_price
                 level_touches = level.get('touches', level.get('strength', 0))
                 
-                # Check if price actually touched the level recently
-                touched = dist < 0.001  # within 0.1% = touched
-                
-                # Check if price is in PROFIT direction (moving away from entry)
+                touched = dist < 0.001
                 in_profit = False
                 if direction == 'LONG' and current_price > level_price:
-                    in_profit = True  # price is above resistance (profit for LONG)
+                    in_profit = True
                 elif direction == 'SHORT' and current_price < level_price:
-                    in_profit = True  # price is below support (profit for SHORT)
+                    in_profit = True
                 
-                # Exit if: price touched level AND is in profit AND level is significant
-                if touched and in_profit and level_touches >= 5:
+                # Only exit at very strong levels (15+ touches)
+                if touched and in_profit and level_touches >= 15:
                     return {
                         'action': 'TAKE_PROFIT',
                         'price': current_price,
                         'reason': f'{tp_type}_tp: {level_price:.4f} ({level.get("source", "?")}) touches={level_touches}',
                         'new_sl': None,
                     }
-
-        # Rule 2: SL at structural break
-        # LONG → SL at support break (price drops below floor)
-        # SHORT → SL at resistance break (price rises above ceiling)
-        support_break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
-        break_type = 'support' if direction == 'LONG' else 'resistance'
-        for level in sr_map:
-            if level.get('type') == break_type:
-                level_price = level['price']
-                if direction == 'LONG' and level_price < current_price:
-                    if current_price < level_price * (1 - support_break_buffer):
-                        return {
-                            'action': 'CUT_LOSS',
-                            'price': current_price,
-                            'reason': f'{break_type}_break: {level_price:.4f} broken',
-                            'new_sl': None,
-                        }
-                if direction == 'SHORT' and level_price > current_price:
-                    if current_price > level_price * (1 + support_break_buffer):
-                        return {
-                            'action': 'CUT_LOSS',
-                            'price': current_price,
-                            'reason': f'{break_type}_break: {level_price:.4f} broken',
-                            'new_sl': None,
-                        }
 
         # Rule 3: Trail SL to structural level
         # LONG → trail to support below (floor rises)
