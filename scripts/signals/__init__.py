@@ -45,6 +45,7 @@ from hermes_constants import (
     RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
     MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
     BTC_PUMP_RIDER_ENABLED,
+    BREAKOUT_LONG_ENABLED, BREAKOUT_LONG_PLUS_ENABLED, BREAKOUT_LONG_MINUS_ENABLED,
 )
 
 
@@ -275,6 +276,11 @@ try:
 except Exception:
     _mover_run = None
 
+try:
+    from signals.breakout_long import run as _breakout_long_run
+except Exception:
+    _breakout_long_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -327,6 +333,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
     {'name': 'resistance_break',         'enabled': 'RESISTANCE_BREAK_ENABLED',     'run': _resistance_break_run},
     {'name': 'mover',                    'enabled': 'MOVER_ENABLED',               'run': _mover_run},
+    {'name': 'breakout_long',            'enabled': 'BREAKOUT_LONG_ENABLED',       'run': _breakout_long_run},
 ]
 
 

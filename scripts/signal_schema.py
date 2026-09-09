@@ -1098,6 +1098,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # breakout-long (volume-confirmed breakout LONG)
+            if _comp == 'breakout-long+':
+                try:
+                    from hermes_constants import BREAKOUT_LONG_PLUS_ENABLED
+                    if not BREAKOUT_LONG_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BREAKOUT_LONG_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'breakout-long-':
+                try:
+                    from hermes_constants import BREAKOUT_LONG_MINUS_ENABLED
+                    if not BREAKOUT_LONG_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BREAKOUT_LONG_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'breakout-long':
+                try:
+                    from hermes_constants import BREAKOUT_LONG_ENABLED
+                    if not BREAKOUT_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BREAKOUT_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-v2-long-5m (5m timeframe variant)
             if _comp in ('accel-300-v2-long-5m+', 'accel-300-v2-long-5m-'):
                 try:
@@ -2344,6 +2369,7 @@ def is_component_disabled(component: str) -> bool:
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
             ACCEL_300_V3_SHORT_ENABLED,
+            BREAKOUT_LONG_ENABLED, BREAKOUT_LONG_PLUS_ENABLED, BREAKOUT_LONG_MINUS_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
             RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
@@ -2352,6 +2378,18 @@ def is_component_disabled(component: str) -> bool:
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
             BTC_PUMP_RIDER_ENABLED,
+            MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
+            CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
+            ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
+            LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
+            SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED,
+            WAVE_CATCHER_PLUS_ENABLED, WAVE_CATCHER_MINUS_ENABLED,
+            STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED,
+            TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED,
+            ICHIMOKU_ENABLED, ICHIMOKU_PLUS_ENABLED, ICHIMOKU_MINUS_ENABLED,
+            MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
+            PATTERN_CHANNEL_ENABLED, PATTERN_FLAG_ENABLED, PATTERN_MICRO_FLAG_ENABLED, PATTERN_WOLF_ENABLED,
+            OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_MTF_RSI_ENABLED, OC_PENDING_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2596,6 +2634,10 @@ def is_component_disabled(component: str) -> bool:
     # accel-300-v3-short (anti-bottom-catch SHORT)
     if c in ('accel-300-v3-short+', 'accel-300-v3-short-'): return not ACCEL_300_V3_SHORT_ENABLED
     if c == 'accel-300-v3-short': return not ACCEL_300_V3_SHORT_ENABLED
+    # breakout-long (volume-confirmed breakout LONG)
+    if c == 'breakout-long+': return not BREAKOUT_LONG_PLUS_ENABLED
+    if c == 'breakout-long-': return not BREAKOUT_LONG_MINUS_ENABLED
+    if c == 'breakout-long': return not BREAKOUT_LONG_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED

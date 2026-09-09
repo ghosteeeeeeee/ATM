@@ -400,6 +400,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('accel_300_v2_long',  'accel-300-v2-long'):  1.0,   # V2 LONG: new branched signal
     # accel_300_v3_long: pullback entry LONG — fixes v2 local-top problem
     ('accel_300_v3_long',  'accel-300-v3-long+'):  1.0,   # V3 LONG: pullback entry
+    # breakout_long: volume-confirmed breakout LONG
+    ('breakout_long',  'breakout-long+'):  1.0,   # Breakout LONG: ATR compression + volume spike
     # accel_300_v2_long_5m: 5m timeframe variant for less noise
     ('accel_300_v2_long_5m',  'accel-300-v2-long-5m'):  1.0,   # V2 LONG 5m: 5m timeframe
     # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token

@@ -190,3 +190,9 @@
 - **[WARN]** (Nx): `CTX-GATE blocking 100% of signals — 115 signals generated, 0 executed. LLM NAY on CRV, POL: "setup is actively harmful"`
 - **[WARN]** (1x): `hermes-hl-sync-guardian last fired ~12h ago (2026-09-08 16:37 UTC)`
 - **AUTO-FIX**: none needed — pipeline and timers healthy
+
+## Error Alerts — 2026-09-09 15:24 UTC
+- **WARN** (N=5): `signal_compactor: timed out` in pipeline — recurring, not blocking
+- **WARN**: 72,466 active signals backlog (since Aug 10) — signal_purge underperforming
+- **WARN**: Disk at 83% — approaching 85% threshold, compress old logs
+- **INFO**: Pipeline "5 open/37 closed/-29%" vs DB "0 open/22 closed/+$0.97" — timing mismatch between exchange positions and DB records

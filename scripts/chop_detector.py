@@ -224,7 +224,7 @@ def get_regime() -> dict:
     vol_regime = _check_volatility_regime()
     market_phase = _check_market_phase()
 
-    from hermes_constants import CHOP_DETECTOR_WR_THRESHOLD
+    from hermes_constants import CHOP_DETECTOR_WR_THRESHOLD, CHOP_DETECTOR_BTC_MOM_THRESHOLD
 
     # Scoring: each input votes for TREND, CHOP, or CRISIS
     votes = {'TREND': 0, 'CHOP': 0, 'CRISIS': 0}

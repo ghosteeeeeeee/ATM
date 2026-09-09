@@ -742,3 +742,67 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - atr_sl_hit at 55% is the dominant close reason — SL may need widening (CEO decision)
 - pump_chain+ at 47%WR degraded but still positive PnL — monitor
+
+## [2026-09-09 16:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L +$0.16)
+**24h:** 37T 43%WR -$0.18
+
+**Last Hour Breakdown:**
+- pump-chain-: 2T 1W 1L -$0.40 (KAS -$0.42, CAKE +$0.02)
+- accel-300-v3-short-: 1W +$0.09 (INJ)
+- pullback-entry+,rs-s45: 1W +$0.15 (SYRUP) — pre-kill trade, signal disabled since 15:10
+
+**24h Exit Reasons:**
+- atr_sl_hit: 24/37 = 65% — above 40% threshold BUT net PnL -$0.18 (nearly flat)
+- profit-monster-trail: 6T +$0.17 (good)
+- cut-loser-CL-T1: 4T -$0.57 (structural, not signal-specific)
+- rr_engine: 2T mixed
+
+**24h Signal PnL (worst first):**
+- pump-chain-: 4T 50%WR -$0.48
+- pullback-entry+: 4T 25%WR -$0.34 (killed 15:10)
+- open-skies+: 1T 0%WR -$0.26
+- pump_chain: 11T 36%WR +$0.64 (best earner)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no 0%WR signal with 3+T last hour
+- atr_sl_hit 65%: trades are flat, not a tuning crisis
+- Trade freq 4/hr: healthy
+- 3d trend: recovering (Sep 8 -$2.74 → Sep 9 +$0.52)
+
+**Open Questions:**
+- pump-chain- at 4T -$0.48 is negative but 50%WR — monitor for next hour
+- cut-loser-CL-T1 structural drag (-$0.57/24h) — not addressable via signal tuning
+
+## [2026-09-09 17:07 UTC] Hourly Analysis
+
+**Trades:** 6 closed (3W 3L, -$0.36)
+**24h:** 41T 41%WR -$0.22
+
+**Last Hour Breakdown:**
+- pump-chain-: 2T 1W 1L -$0.13
+- accel-300-v3-short-: 1T 0W 1L -$0.04
+- mover+: 1T 1W +$0.12
+- pullback-entry-: 1T 1W +$0.03
+- r2v2-long3: 1T 0W 1L -$0.14
+
+**24h Exit Reasons:**
+- atr_sl_hit: 27/41 = 65.9% — above 40% threshold but avg -$0.017 (flat)
+- profit-monster-trail: 6T +$0.25
+- cut-loser-CL-T1: 3T -$0.43
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no 0%WR signal with 3+T last hour
+- pump-chain- worst 24h (-$2.20) but has wins — monitor
+- atr_sl_hit 65.9% systemic — trades flat, not crisis-level
+- Trade freq 6/hr healthy
+- 0 open positions
+
+**Open Questions:**
+- pump-chain- at -$2.20/24h — if negative next hour, consider kill
+- atr_sl_hit 65%+ sustained — structural SL issue, CEO decision if widening needed

@@ -1165,6 +1165,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'accel-300-v4-short',  # V4 earlier-entry SHORT — manage via ATR SL, not PM Trail
+    'breakout-long',  # Volume-confirmed breakout LONG — manage via ATR SL, not PM Trail
     'ema300-dip-long',     # EMA300 dip buyer — structural exit
     'ema300-dip-short',    # EMA300 rally seller — structural exit
     'pullback-entry+',     # pullback entry LONG — structural exit
@@ -2119,6 +2120,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
     'accel-300-v4-short',  # V4 earlier-entry SHORT — fires before drop, pre-drop detection
+    'breakout-long',  # Volume-confirmed breakout LONG — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',

@@ -1022,3 +1022,8 @@
 [2026-09-09 11:08 UTC]   🟢 OK: ema300-dip-short: 7 trades, 42.9% WR, PnL=-4.41
 [2026-09-09 11:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-09 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-09 17:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-09 17:08 UTC]   🟢 OK: pump-chain+: 8 trades, 25.0% WR, PnL=-7.29
+[2026-09-09 17:08 UTC]   🟢 OK: pump-chain-: 6 trades, 50.0% WR, PnL=-3.82
+[2026-09-09 17:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-09 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

@@ -140,6 +140,8 @@ def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
 
     # ── FILTER 2: Range breakout ───────────────────────────────────────
     range_high = max(highs[latest_idx - BREAKOUT_LONG_RANGE_PERIOD:latest_idx])
+    if range_high <= 0:
+        return None  # degenerate data
     breakout_threshold = range_high * (1 + BREAKOUT_LONG_BREAKOUT_PCT / 100)
     if price <= breakout_threshold:
         return None  # no breakout
@@ -157,9 +159,7 @@ def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
         return None  # weak close
 
     # ── Confidence ─────────────────────────────────────────────────────
-    # Higher volume ratio = higher confidence
     vol_bonus = min(15, (vol_ratio - 2.0) * 5)
-    # Higher breakout magnitude = higher confidence
     breakout_mag = (price - range_high) / range_high * 100
     breakout_bonus = min(10, breakout_mag * 5)
     confidence = int(min(BREAKOUT_LONG_CONF_CAP,

@@ -1241,3 +1241,15 @@
   WHY: 1T last hour (0W 1L -$0.14 ICP pump_chain atr_sl). 59T/24h 44%WR -$2.74. Kill criteria not met: no 0%WR signal with 3+T last hour (1T). atr_sl_hit 27% healthy. Trade freq 1/hr normal. pump-chain+ 47%WR above kill threshold. cut-loser-CL-T1 -$2.65 structural drag but not signal-specific. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 -$0.14 (early).
   BY: auto_1hr
   NEXT: Re-run at 05:10 UTC
+[2026-09-09 15:10 UTC] auto_1hr: KILL pullback-entry+
+  WHY: 3T last hour all losses (0%WR). NE$0.15 atr_sl, AIXBT -$0.21 atr_sl, ETH -$0.02 rr_engine. Kill criteria met (0%WR with 3+T last hour). pullback-entry- remains enabled (1W last hour).
+  BY: auto_1hr
+  NEXT: Re-run at 16:10 UTC
+[2026-09-09 16:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.16). 37T/24h 43%WR -$0.18. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 65% above threshold but trades flat (-$0.18 total). cut-loser-CL-T1 4T -$0.57 structural drag (not signal-specific). Trade freq 4/hr normal. 3 open positions. pump_chain 11T +$0.64 best earner. pump-chain- 4T -$0.48 monitoring. 3d trend recovering: Sep 8 -$2.74 → Sep 9 +$0.52.
+  BY: auto_1hr
+  NEXT: Re-run at 17:10 UTC
+[2026-09-09 17:07 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (3W 3L -$0.36). 41T/24h 41%WR -$0.22. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 65.9% above threshold but avg -$0.017 (flat). pump-chain- 6T/24h -$2.20 worst signal but has wins. Trade freq 6/hr normal. 0 open positions. 3d trend: Sep 8 -$2.74 → Sep 9 -$0.22 (improving).
+  BY: auto_1hr
+  NEXT: Re-run at 18:10 UTC
