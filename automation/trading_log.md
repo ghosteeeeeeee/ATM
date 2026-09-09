@@ -934,3 +934,27 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - pump-chain- at -$0.63/24h but 50%WR — monitor
 - open-skies+ if drops to 3+T 0%WR → kill
+
+## [2026-09-09 20:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W 0L, +$1.44)
+**24h:** 47T 53%WR +$2.12
+
+**24h Exit Reasons:**
+- atr_sl_hit: 29T 61.7% avg +$0.055 (profitable)
+- profit-monster-trail: 9T avg +$0.041 (healthy)
+- rr_engine_support_tp: 5T avg +$0.052 (healthy)
+- rr_engine_resistance: 2T avg -$0.125 (structural)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no 0%WR signal with 3+T last hour
+- open-skies+ 2T 0%WR below threshold — monitor next hour
+- atr_sl_hit 61.7% but avg +$0.055 — profitable, not crisis
+- Trade freq 4/hr normal
+- 3d trend: Sep 8 -$2.74 → Sep 9 +$2.12 (recovering)
+
+**Open Questions:**
+- pump-chain- -$0.63/24h but 50%WR — structural drag
+- open-skies+ if drops to 3+T 0%WR → kill

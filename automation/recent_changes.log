@@ -1269,3 +1269,7 @@
   WHY: 2T last hour (2W +$0.14). 39T/24h 54%WR +$0.04. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 61.5% above threshold but avg -$0.006 (flat). Trade freq 2/hr normal. 5 open positions all green (+$0.96 unrealized). 3d trend recovering: Sep 8 -$2.74 → Sep 9 +$0.30.
   BY: auto_1hr
   NEXT: Re-run at 20:10 UTC
+[2026-09-09 20:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour all winners (4W +$1.44). 47T/24h 53%WR +$2.12. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 61.7% but avg +$0.055 (profitable). Trade freq 4/hr normal. 3d trend recovering: Sep 8 -$2.74 → Sep 9 +$2.12.
+  BY: auto_1hr
+  NEXT: Re-run at 21:10 UTC
