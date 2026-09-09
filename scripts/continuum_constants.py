@@ -12,7 +12,7 @@ Everything lives here. Import with: from continuum_constants import *
 HYSTERESIS = {
     'ema300_position':   (5, 3),    # 5 candles above to confirm, 3 below to deconfirm
     'zscore_tier':       (3, 5),    # 3 candles to confirm z-score tier, 5 to deconfirm
-    'volume_regime':     (3, 5),    # 3 candles of high vol to confirm
+    'volume_regime':     (2, 1),    # 2 candles to confirm, 1 to deconfirm (instant response)
     'velocity':          (3, 3),    # symmetric
     'acceleration':      (3, 3),    # symmetric
     'linreg_slope':      (5, 5),    # 5 candles to confirm slope change
