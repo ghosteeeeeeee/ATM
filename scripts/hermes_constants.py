@@ -1225,6 +1225,10 @@ SIGNAL_EXIT_CONFIG = {
     # Pullback entry: structural exit
     'pullback-entry+': 'rr_engine',
     'pullback-entry-': 'rr_engine',
+    # Accel 300 V3 SHORT: structural exit
+    'accel-300-v3-short+': 'rr_engine',
+    'accel-300-v3-short-': 'rr_engine',
+    'accel-300-v3-short': 'rr_engine',
     # Default: PM trail (current behavior for all signals not listed)
 }
 
@@ -1869,6 +1873,23 @@ ACCEL_300_V3_LONG_CONF_RSI_MAX = 65     # RSI sweet spot upper bound (bonus)
 ACCEL_300_V3_LONG_CONF_RSI_BONUS = 3    # confidence bonus for RSI in sweet spot (lowered from 5)
 ACCEL_300_V3_LONG_EXEC_RSI_MIN = 50     # min RSI at execution — block LONG if RSI < 50 (75% WR verified)
 ACCEL_300_V3_LONG_EXEC_PRE15_MIN = 0    # min pre15_move — block LONG if price was falling (72% WR verified)
+
+# ── breakout_long.py — Volume-confirmed breakout LONG ─────────────────────────
+# Catches breakouts from consolidation: low ATR + volume spike + range breakout
+BREAKOUT_LONG_ENABLED = True
+BREAKOUT_LONG_PLUS_ENABLED = True       # LONG only
+BREAKOUT_LONG_MINUS_ENABLED = False     # SHORT not implemented yet
+BREAKOUT_LONG_ATR_PERIOD = 14           # ATR period (5m candles)
+BREAKOUT_LONG_ATR_MAX_PCT = 0.5         # max ATR% for consolidation
+BREAKOUT_LONG_RANGE_PERIOD = 60         # bars to find range high (5h)
+BREAKOUT_LONG_BREAKOUT_PCT = 0.3        # min % above range high
+BREAKOUT_LONG_CLOSE_STRENGTH = 0.997    # candle strength (close > high * this)
+BREAKOUT_LONG_VOL_LOOKBACK = 20         # bars for average volume
+BREAKOUT_LONG_VOL_MULT = 2.0            # volume must be > 2x average
+BREAKOUT_LONG_CONF_BASE = 75            # base confidence
+BREAKOUT_LONG_CONF_FLOOR = 60           # min confidence
+BREAKOUT_LONG_CONF_CAP = 88             # max confidence
+BREAKOUT_LONG_COOLDOWN_HOURS = 3        # per token cooldown
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
 ACCEL_300_V3_SHORT_ENABLED     = True    # Re-enabled 2026-09-07 — filters: RSI_MIN=25 + price_move>0.5% + staleness 10min. Catches all 4 prior losers.
