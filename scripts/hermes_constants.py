@@ -1162,6 +1162,10 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'accel-300-v4-short',  # V4 earlier-entry SHORT — manage via ATR SL, not PM Trail
+    'ema300-dip-long',     # EMA300 dip buyer — structural exit
+    'ema300-dip-short',    # EMA300 rally seller — structural exit
+    'pullback-entry+',     # pullback entry LONG — structural exit
+    'pullback-entry-',     # pullback entry SHORT — structural exit
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
@@ -1212,6 +1216,12 @@ SIGNAL_EXIT_CONFIG = {
     'pump_chain+': 'rr_engine',  # underscore variant
     'pump_chain-': 'rr_engine',  # underscore variant
     'pump_chain': 'rr_engine',    # bare variant
+    # EMA300 dip: structural exit
+    'ema300-dip-long': 'rr_engine',
+    'ema300-dip-short': 'rr_engine',
+    # Pullback entry: structural exit
+    'pullback-entry+': 'rr_engine',
+    'pullback-entry-': 'rr_engine',
     # Default: PM trail (current behavior for all signals not listed)
 }
 
