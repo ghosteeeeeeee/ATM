@@ -224,6 +224,28 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
             conn.close()
 
 
+def _get_closes_from_candles_1m(token, lookback=50):
+    """Get close prices from candles_1m (OHLC data) for accurate RSI/BB."""
+    conn = None
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT close FROM (
+                SELECT close FROM candles_1m
+                WHERE token = ? ORDER BY ts DESC LIMIT ?
+            ) sub ORDER BY ts ASC
+        """, (token.upper(), lookback))
+        rows = c.fetchall()
+        return [r[0] for r in rows] if rows else []
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
 # ── Scanner ─────────────────────────────────────────────────────────────
 
 def scan_signals():
@@ -278,8 +300,11 @@ def scan_signals():
         if sig is None:
             continue
 
-        # ── RSI filter: don't buy overbought or oversold ────────────────
-        closes_list = [c['close'] for c in candles]
+        # ── RSI filter: use candles_1m for accurate data ─────────────────
+        closes_list = _get_closes_from_candles_1m(token, 50)
+        if not closes_list or len(closes_list) < 15:
+            continue  # no accurate data available
+
         if len(closes_list) >= 15:
             deltas = [closes_list[i] - closes_list[i-1] for i in range(1, len(closes_list))]
             gains = [d if d > 0 else 0 for d in deltas[-14:]]
@@ -295,7 +320,7 @@ def scan_signals():
             if rsi < R2_TREND_V2_LONG_MIN_RSI:
                 continue  # oversold — falling knife risk, skip LONG
 
-        # ── BB position filter: don't chase at band top ─────────────────
+        # ── BB position filter: use candles_1m for accurate data ──────────
         if len(closes_list) >= 20:
             mean_20 = np.mean(closes_list[-20:])
             std_20 = np.std(closes_list[-20:])

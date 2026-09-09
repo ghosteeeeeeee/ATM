@@ -120,7 +120,7 @@ REGIME_SIGNALS = {
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
-        'r2-trend-long', 'r2-trend-short', 'r2v2-long',  # R² trend detectors
+        'r2-trend-long', 'r2-trend-short',  # R² trend detectors (v2 removed EXTREME — too risky for trend-following)
         'ema300-dip-long',  # EMA300 dip buyer — trend following
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector
