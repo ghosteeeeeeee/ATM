@@ -3064,7 +3064,7 @@ def get_token_amp_class(token):
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = False         # auto_1hr KILLED 2026-09-09 03:10 UTC — 13T/35.7%WR/-$1.28 (24h worst). All LONG in downtrend. SHORT stays active.
-PUMP_FLOW_MINUS_ENABLED = True         # SHORT direction
+PUMP_FLOW_MINUS_ENABLED = False        # SIGNAL REPORTER 2026-09-09 — 6T/24h 50%WR/-$0.63. Losses 8.8x wins (KAS -$0.42 alone). LONG already dead.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
