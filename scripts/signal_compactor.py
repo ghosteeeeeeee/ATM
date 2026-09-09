@@ -2512,6 +2512,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _has_disabled:
                             log(f"  🚫 [PRESERVE-DISABLED-BLOCK] {pe['token']}:{pe['direction']} src='{pe_src}' — contains disabled component(s)")
                             continue
+                        # ── EMA300-DIP-LONG RE-VALIDATION (2026-09-09) ──────────────────
+                        # FIX: Preserved entries bypass detection function — stale filters slip through
+                        # Re-run detection to verify signal still passes new filters
+                        if pe_src == 'ema300-dip-long' and pe.get('direction', '').upper() == 'LONG':
+                            try:
+                                from signals.ema300_dip_long import detect_ema300_dip_long, _get_candles_1m
+                                _re_candles = _get_candles_1m(pe['token'])
+                                if _re_candles and len(_re_candles) >= 500:
+                                    _re_price = pe.get('price', 0)
+                                    _re_result = detect_ema300_dip_long(pe['token'], _re_candles, _re_price)
+                                    if _re_result is None:
+                                        log(f"  🚫 [PRESERVE-REVALIDATE-BLOCK] {pe['token']}:{pe['direction']} ema300-dip-long — detection function returned None (filters not passed)")
+                                        continue
+                            except Exception as _re_e:
+                                log(f"  ⚠️ [PRESERVE-REVALIDATE-ERROR] {pe['token']}:{pe['direction']} re-validation failed: {_re_e}")
                         # ── SPIKE FILTER for preserved SHORT entries ──────────────────────
                         # FIX: Preserved entries skip pre-filter, so oversold SHORT signals
                         # (RSI < 30) slip through and get stopped out (BLUR/BCH pattern).
