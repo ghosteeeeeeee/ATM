@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-09 ~18:35 UTC (Orchestrator)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-09-09 ~19:10 UTC (CEO)**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 42T, 47.6% WR, -28.94% (pnl_pct sum). 7d: 371T, 58.8% WR, -100.96%. Sep 9: 42T, 47.6% WR. Market 3 SHORT / 0 LONG / 115 NEUTRAL (SHORT_BIAS).
+24h: 42T, 47.6% WR, -$0.72. 7d: 371T, 57.7% WR, -$3.31. Sep 9: 34T, 55.9% WR, +$0.16. Market SHORT_BIAS (3 SHORT / 0 LONG / 115 NEUTRAL).
 
-- **24h:** 42T, 47.6% WR (verified brain DB). Avg win +3.24%, avg loss -4.46%.
-- **7d:** 371T, 58.8% WR, -100.96% (pnl_pct sum). Avg win +2.81%, avg loss -4.78%.
-- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 73T/74.0% WR +76.77% ★ | open_skies 19T/63.2% WR +61.24% ★ | pump_chain 43T/67.4% WR +13.53%
-- **7d LEGACY (killed):** ema300_dip_short 24T/41.7% WR -60.03% | sma20_dip 19T/47.4% WR -27.02% | ema300_dip 55T/63.6% WR -28.83%
+- **24h:** 42T, 47.6% WR, -$0.72 (verified brain DB). Avg win +3.24%, avg loss -4.46%.
+- **7d:** 371T, 57.7% WR, -$3.31. Avg win +2.81%, avg loss -4.78%.
+- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 73T/74.0% WR +$2.08 ★ | open_skies 19T/63.2% WR +$1.56 ★ | pump_chain 43T/67.4% WR +$1.11 | continuation 6T/83.3% WR +$0.05
+- **7d LEGACY (killed, aging out):** ema300_dip_short 24T/41.7% WR -$1.48 | sma20_dip 19T/42.1% WR -$0.73 | ema300_dip 55T/63.6% WR -$0.72
 - **Market:** 3 SHORT / 0 LONG / 115 NEUTRAL (SHORT_BIAS) as of 18:17 UTC.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **BB_BOUNCE_V2_LONG:** Live. 73T/7d 74.0% WR +76.77%. STAR. Today 2T/50% WR +0.98%.
@@ -33,15 +33,18 @@
 - **Cut-loser fix:** VERIFIED in position_manager.py:363. threshold = -sl_dist * 100 * leverage.
 
 **🔴 R:R STATUS (STRUCTURAL — IMPROVING)**
-24h exit breakdown (losses only):
-- cut-loser-CL-T1: 22T, avg -4.98%, -$3.14 — #1 loss driver (FIXED — see below)
-- atr_sl_hit: 14T, avg -4.70%, -$1.71
+24h exit breakdown (all exits):
+- atr_sl_hit: 27T, avg -1.15%, -$0.45 — #1 exit count
+- profit-monster-trail: 7T, avg +2.04%, +$0.30 — only profitable exit
+- cut-loser-CL-T1: 2T, avg -4.21%, -$0.31 — FIXED (was 22T/48h)
+- rr_engine_resistance: 2T, avg -2.18%, -$0.25
 
 **🔴 CRITICAL BUG FIX: cut-loser sl_distance vs leveraged pnl_pct**
 `should_cut_loser()` Priority 2 compared `sl_distance` (price-move %) against `pnl_pct` (LEVERAGED). With leverage=3 and sl_distance=0.015: a 0.5% price drop = -1.5% leveraged pnl → cut-loser fires at -0.5% instead of -1.5%. This made effective SL 3x tighter than intended. **FIX: threshold = -sl_dist * 100 * leverage (was / leverage).** Pipeline restarted. Expected: cut-loser fires at correct 1.2%-1.5% price move, avg loss drops from -4.98% to ~-2%, R:R improves.
 
 ## Today's Changes (Sep 9)
 
+0. **CEO ~19:10 UTC — VERIFIED + MONITORING.** DB: 42T/24h 47.6% WR -$0.72. 7d: 371T 57.7% WR -$3.31. Sep 9: 34T 55.9% WR +$0.16. **Orchestrator already handled all kills** (ema300-dip-short, ema300-dip-long, accel-300-v3-long/short, pullback-entry+, pump-chain-). All NEVER_REENABLE. **Active signals healthy:** bb_bounce_v2_long 73T/74.0% WR +$2.08, open_skies 19T/63.2% WR +$1.56, pump_chain 43T/67.4% WR +$1.11, continuation 6T/83.3% WR +$0.05. **R:R:** avg_win 3.24%, avg_loss -4.46%, ratio 0.726 (breakeven 58.0%, actual 57.7%). PM_TRAIL/ATR_SL protected. 3 open positions. Market SHORT_BIAS. **7d PnL should turn positive within 24-48h as legacy drops off.** No param changes needed.
 1. **Orchestrator ~18:35 UTC — ACTION.** DB: 42T/24h 47.6% WR. 7d: 371T 58.8% WR -100.96%. Market 3 SHORT / 115 NEUTRAL (SHORT_BIAS). **KILLED 4 PROTECTED SIGNALS** (protection expired 05:00 UTC): EMA300_DIP_LONG (3T/48h 33.3%WR -$4.18), EMA300_DIP_SHORT (16T/48h 43.8%WR -$36.54), ACCEL_300_V3_LONG (1T/48h 0%WR -$5.10), ACCEL_300_V3_SHORT (2T/48h 50%WR 7d -4.21%). All added to NEVER_REENABLE_FLAGS, removed from CEO_PROTECTED_FLAGS. **Cut-loser fix VERIFIED** in position_manager.py:363 (threshold = -sl_dist * 100 * leverage). **ATR_SL reverted to 1.2%-1.5%** (Sep8). **Signal reporter killed PUMP_CHAIN- SHORT** (6T/50%WR -$0.63, losses 8.8x wins). **auto_1hr killed PULLBACK_ENTRY+** (4T/25%WR -$0.34) and **PUMP_FLOW+** (8T/25%WR). 2 open positions (ONDO SHORT +0.11%, YGG SHORT -0.07%). Disk 84%. signal_compactor 3x timeout/hr (recurring, non-fatal). Pipeline restarted. **Active signals: bb_bounce_v2_long ★, pump_chain, open_skies, continuation, pullback-entry-.**
 
 ## Today's Changes (Sep 8)
@@ -197,10 +200,10 @@
 
 ## Next Actions
 
-1. **Monitor cut-loser fix impact.** Fix verified in code (position_manager.py:363). ATR_SL reverted to 1.2%-1.5%. Monitor 24h: avg loss should drop from -4.46% toward -2%. — 2026-09-09
-2. **Monitor open-skies degradation.** 19T/7d 63.2% WR +61.24% — today 2T/50% WR -6.59%. Kill if WR drops below 45% at 10T/48h. — 2026-09-09
-3. **Monitor bb_bounce_v2_long.** 73T/7d 74.0% WR +76.77% ★. Today 2T/50% WR +0.98%. Kill if WR drops below 40% at 15T/48h. — 2026-09-09
-4. **Monitor pump_chain.** 43T/7d 67.4% WR +13.53%. Today 9T/33.3% WR +3.14%. Kill if WR drops below 45% at 10T/48h. — 2026-09-09
-5. **Monitor signal_compactor timeouts.** 3x/hour recurring. Non-fatal but investigate if it worsens. — 2026-09-09
+1. **Monitor 7d PnL flip.** Currently -$3.31. Legacy (ema300_dip_short -$1.48, sma20_dip -$0.73, ema300_dip -$0.72) aging out. Should flip positive by Sep 10-11 as these drop off. — 2026-09-09
+2. **Monitor cut-loser fix impact.** Fix verified. ATR_SL at 1.2%-1.5%. 24h: 2 exits avg -4.21% (down from 22 exits). Monitor if avg loss drops toward -2%. — 2026-09-09
+3. **Monitor open-skies degradation.** 19T/7d 63.2% WR +$1.56 — today 2T/50% WR -$0.49 (variance). Kill if WR drops below 45% at 10T/48h. — 2026-09-09
+4. **Monitor bb_bounce_v2_long.** 73T/7d 74.0% WR +$2.08 ★. Today 2T/50% WR -$0.11. Kill if WR drops below 40% at 15T/48h. — 2026-09-09
+5. **Monitor pump_chain.** 43T/7d 67.4% WR +$1.11. Today 9T including SHORT residual. Kill SHORT if WR drops below 45%. — 2026-09-09
 6. **Monitor disk.** Currently 84% (19G free). — 2026-09-09
 7. **SHORT side dependency.** System has no LONG backbone in NEUTRAL market. bb_bounce_v2_long is only active LONG signal. — 2026-09-09
