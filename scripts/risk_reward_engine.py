@@ -978,3 +978,148 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
     except Exception as e:
         # Fail-open: don't block trades if engine fails
         return 1.0, f"RR ENGINE ERROR (fail-open): {e}"
+
+
+# ── Exit Management ──────────────────────────────────────────────────────────
+
+def get_exit_frequency(regime):
+    """Get re-evaluation frequency based on volatility regime."""
+    freq_map = {
+        'FLAT': getattr(hc, 'RR_EXIT_FREQ_FLAT', 600),
+        'NORMAL': getattr(hc, 'RR_EXIT_FREQ_NORMAL', 300),
+        'HIGH': getattr(hc, 'RR_EXIT_FREQ_HIGH', 180),
+        'EXTREME': getattr(hc, 'RR_EXIT_FREQ_EXTREME', 60),
+    }
+    return freq_map.get(regime, 300)
+
+
+def manage_exit(token, direction, current_price, entry_price=None, current_sl=None):
+    """Manage exit using RR engine structural analysis.
+
+    Called periodically during an open trade to evaluate whether to exit.
+
+    Returns dict with:
+        action: 'HOLD', 'TAKE_PROFIT', 'CUT_LOSS', 'TRAIL_SL', 'EXIT'
+        price: current price
+        reason: why exit was triggered
+        new_sl: updated SL if trailing (None otherwise)
+    """
+    try:
+        if not getattr(hc, 'RR_EXIT_ENABLED', True):
+            return {'action': 'HOLD', 'price': current_price, 'reason': 'engine_disabled'}
+
+        # Re-evaluate RR engine at current price
+        result = evaluate_rr(token, direction, current_price)
+        sr_map = result.get('sr_map', [])
+        liquidity = result.get('liquidity', {})
+        rr_ratio = result.get('rr_ratio', 0)
+        vol_width = result.get('vol_width', {})
+        regime = vol_width.get('atr_regime', 'NORMAL')
+
+        # Rule 1: TP at resistance
+        resistance_dist = getattr(hc, 'RR_EXIT_RESISTANCE_DIST', 0.003)
+        for level in sr_map:
+            if level.get('type') == 'resistance':
+                dist = abs(level['price'] - current_price) / current_price
+                if dist < resistance_dist:
+                    return {
+                        'action': 'TAKE_PROFIT',
+                        'price': current_price,
+                        'reason': f'resistance_tp: {level["price"]:.4f} ({level.get("source", "?")})',
+                        'new_sl': None,
+                    }
+
+        # Rule 2: SL at support break
+        support_break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK缓冲', 0.001)
+        for level in sr_map:
+            if level.get('type') == 'support':
+                level_price = level['price']
+                # Only check support levels BELOW current price (structural floor)
+                if direction == 'LONG' and level_price < current_price:
+                    if current_price < level_price * (1 - support_break_buffer):
+                        return {
+                            'action': 'CUT_LOSS',
+                            'price': current_price,
+                            'reason': f'support_break: {level_price:.4f} broken',
+                            'new_sl': None,
+                        }
+                if direction == 'SHORT' and level_price > current_price:
+                    if current_price > level_price * (1 + support_break_buffer):
+                        return {
+                            'action': 'CUT_LOSS',
+                            'price': current_price,
+                            'reason': f'support_break: {level_price:.4f} broken',
+                            'new_sl': None,
+                        }
+
+        # Rule 3: Trail SL to support
+        if getattr(hc, 'RR_EXIT_TRAIL_ENABLED', True) and current_sl is not None:
+            trail_buffer = getattr(hc, 'RR_EXIT_TRAIL_BUFFER', 0.002)
+            for level in sr_map:
+                if level.get('type') == 'support':
+                    level_price = level['price']
+                    # Only trail to support BELOW current price (structural floor)
+                    if direction == 'LONG' and level_price < current_price:
+                        new_sl = level_price - (current_price * trail_buffer)
+                        if new_sl > current_sl:
+                            return {
+                                'action': 'TRAIL_SL',
+                                'price': current_price,
+                                'reason': f'trail_to_support: {level_price:.4f}',
+                                'new_sl': new_sl,
+                            }
+                    if direction == 'SHORT' and level_price > current_price:
+                        new_sl = level_price + (current_price * trail_buffer)
+                        if new_sl < current_sl:
+                            return {
+                                'action': 'TRAIL_SL',
+                                'price': current_price,
+                                'reason': f'trail_to_support: {level_price:.4f}',
+                                'new_sl': new_sl,
+                            }
+
+        # Rule 4: Exit before liquidation cluster
+        liquidation_dist = getattr(hc, 'RR_EXIT_LIQUIDATION_DIST', 0.005)
+        for cluster in liquidity.get('clusters_ahead_data', []):
+            dist = abs(cluster.get('price', 0) - current_price) / current_price
+            if dist < liquidation_dist:
+                return {
+                    'action': 'EXIT',
+                    'price': current_price,
+                    'reason': f'liquidation_zone: {cluster.get("price", 0):.4f}',
+                    'new_sl': None,
+                }
+
+        # Rule 5: R:R deterioration (DISABLED — too aggressive, exits winners early)
+        # As price moves in your favor, R:R naturally decreases. This is expected,
+        # not a sign the setup is broken. Only exit if structural damage occurs
+        # (support break, resistance rejection, liquidation zone).
+        #
+        # rr_min = getattr(hc, 'RR_EXIT_RR_MIN', 1.0)
+        # if rr_ratio < rr_min and entry_price is not None:
+        #     entry_result = evaluate_rr(token, direction, entry_price)
+        #     entry_rr = entry_result.get('rr_ratio', 0)
+        #     if entry_rr > rr_min and rr_ratio < rr_min:
+        #         return {
+        #             'action': 'EXIT',
+        #             'price': current_price,
+        #             'reason': f'rr_deterioration: {entry_rr:.2f} → {rr_ratio:.2f}',
+        #             'new_sl': None,
+        #         }
+
+        # No exit signal — hold
+        return {
+            'action': 'HOLD',
+            'price': current_price,
+            'reason': None,
+            'new_sl': None,
+        }
+
+    except Exception as e:
+        # Fail-open: don't exit if engine fails
+        return {
+            'action': 'HOLD',
+            'price': current_price,
+            'reason': f'engine_error: {e}',
+            'new_sl': None,
+        }
