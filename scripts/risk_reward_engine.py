@@ -1068,32 +1068,56 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                     }
 
         # Rule 3: Trail SL to structural level
-        # LONG → trail to support below (floor rises)
-        # SHORT → trail to resistance above (ceiling falls)
+        # LONG → trail to support below (floor rises as price rises)
+        # SHORT → trail DOWN to support below (floor drops as price drops)
+        # If no structural levels to trail to, use ATR as fallback trail
         if getattr(hc, 'RR_EXIT_TRAIL_ENABLED', True) and current_sl is not None:
             trail_buffer = getattr(hc, 'RR_EXIT_TRAIL_BUFFER', 0.002)
-            trail_type = 'support' if direction == 'LONG' else 'resistance'
-            for level in sr_map:
-                if level.get('type') == trail_type:
-                    level_price = level['price']
-                    if direction == 'LONG' and level_price < current_price:
-                        new_sl = level_price - (current_price * trail_buffer)
+            
+            # For LONG: trail UP to support below price
+            if direction == 'LONG':
+                for level in sr_map:
+                    if level.get('type') == 'support' and level['price'] < current_price:
+                        new_sl = level['price'] - (current_price * trail_buffer)
                         if new_sl > current_sl:
                             return {
                                 'action': 'TRAIL_SL',
                                 'price': current_price,
-                                'reason': f'trail_to_{trail_type}: {level_price:.4f}',
+                                'reason': f'trail_to_support: {level["price"]:.4f}',
                                 'new_sl': new_sl,
                             }
-                    if direction == 'SHORT' and level_price > current_price:
+            
+            # For SHORT: trail DOWN — pick tightest SL from structural + ATR
+            elif direction == 'SHORT':
+                best_trail = None
+                
+                # Structural trails (resistance above + support below)
+                for level in sr_map:
+                    level_price = level['price']
+                    if level.get('type') == 'resistance' and level_price > current_price:
                         new_sl = level_price + (current_price * trail_buffer)
-                        if new_sl < current_sl:
-                            return {
-                                'action': 'TRAIL_SL',
-                                'price': current_price,
-                                'reason': f'trail_to_{trail_type}: {level_price:.4f}',
-                                'new_sl': new_sl,
-                            }
+                        if best_trail is None or new_sl < best_trail:
+                            best_trail = new_sl
+                    if level.get('type') == 'support' and level_price < current_price:
+                        new_sl = level_price + (current_price * trail_buffer)
+                        if best_trail is None or new_sl < best_trail:
+                            best_trail = new_sl
+                
+                # ATR trail
+                atr_pct = vol_width.get('atr_pct', 1.0)
+                atr_trail_pct = atr_pct / 100.0 * 0.5
+                atr_new_sl = current_price + (current_price * atr_trail_pct)
+                if best_trail is None or atr_new_sl < best_trail:
+                    best_trail = atr_new_sl
+                
+                # Apply tightest trail
+                if best_trail and best_trail < current_sl:
+                    return {
+                        'action': 'TRAIL_SL',
+                        'price': current_price,
+                        'reason': f'trail_sl: {best_trail:.4f}',
+                        'new_sl': best_trail,
+                    }
 
         # Rule 4: Exit before liquidation cluster
         liquidation_dist = getattr(hc, 'RR_EXIT_LIQUIDATION_DIST', 0.005)
