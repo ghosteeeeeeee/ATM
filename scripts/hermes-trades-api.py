@@ -898,18 +898,50 @@ def write_signal_config():
             sig_raw = row[0] or ''
             pnl = float(row[1]) if row[1] else 0
             # Normalize: replace hyphens with underscores, strip trailing +/- suffixes
-            sig_norm = sig_raw.replace('-', '_').rstrip('+-')
-            # Also try without trailing underscore (e.g. "pullback_entry_" -> "pullback_entry")
-            sig_norm = sig_norm.rstrip('_')
+            sig_norm = sig_raw.replace('-', '_').rstrip('+-').rstrip('_')
             if sig_norm not in signal_winrates:
                 signal_winrates[sig_norm] = {'wins': 0, 'total': 0}
             signal_winrates[sig_norm]['total'] += 1
             if pnl > 0:
                 signal_winrates[sig_norm]['wins'] += 1
+
+            # Also index compound signals (comma-separated)
+            # e.g. "bb_bounce_long+,engulfing" -> also count for "engulfing"
+            parts = [p.strip().rstrip('+-').rstrip('_') for p in sig_raw.split(',')]
+            for part in parts:
+                if part and part != sig_norm:
+                    if part not in signal_winrates:
+                        signal_winrates[part] = {'wins': 0, 'total': 0}
+                    signal_winrates[part]['total'] += 1
+                    if pnl > 0:
+                        signal_winrates[part]['wins'] += 1
         cur.close()
         conn.close()
     except Exception as e:
         _log.warning(f"[write_signal_config] winrate query failed: {e}")
+
+    # Alias mapping: signal_config name -> trades DB signal patterns to search for
+    _SIGNAL_ALIASES = {
+        'chain_fire': ['pump_chain', 'chain_fire'],
+        'macd_divergence': ['macd_div', 'macd_divergence'],
+        'grind_breakout': ['slow_grind', 'grind_breakout'],
+        'squeeze_reversal': ['bb_squeeze', 'squeeze_reversal'],
+        'engulfing': ['engulfing'],
+        'doji_top': ['doji_top', 'doji'],
+        'continuum_score': ['continuum', 'continuum_score'],
+        'resistance_break': ['range_breakout', 'resistance_break'],
+        'breakout_long': ['breakout_long', 'range_breakout_long'],
+        'btc_pump_rider': ['btc_pump', 'pump_rider'],
+        'pump_flow_signal': ['pump_flow', 'pump_flow_signal'],
+        'r2_trend_v2_long': ['r2_trend_v2_long', 'r2_trend_long'],
+        'bb_bounce_v2_short': ['bb_bounce_v2_short', 'bb_bounce_short'],
+        'rs': ['rs_r', 'rs_s', 'rs'],
+        'signal_confluence': ['confluence', 'signal_confluence'],
+        'coiled_spring_trigger': ['coil_spring', 'coiled_spring'],
+        'ichimoku_cloud': ['ichimoku', 'ichimoku_cloud'],
+        'btc_wave_detector': ['btc_wave', 'btc_wave_detector'],
+        'neutral_sniper': ['neutral', 'neutral_sniper'],
+    }
 
     config = []
     for s in SIGNAL_REGISTRY:
@@ -921,8 +953,14 @@ def write_signal_config():
                 base = _re.sub(r'_(PLUS|MINUS|LONG|SHORT|NEW)$', '', flag_name)
                 if hasattr(_hc, base):
                     flag_name = base
-        # Look up winrate — try exact match, then without _long/_short suffix
+        # Look up winrate — try exact match, aliases, then without _long/_short suffix
         wr_data = signal_winrates.get(name)
+        if not wr_data and name in _SIGNAL_ALIASES:
+            # Try each alias
+            for alias in _SIGNAL_ALIASES[name]:
+                wr_data = signal_winrates.get(alias)
+                if wr_data:
+                    break
         if not wr_data:
             # Try stripping direction suffix (e.g. bb_bounce_v2_long -> bb_bounce_v2)
             base = _re.sub(r'_(long|short)$', '', name)

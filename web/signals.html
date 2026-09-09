@@ -501,8 +501,9 @@
             const bp = s.bypass ? '<span class="bp" title="standalone bypass">🪙</span>' : '';
             const total = s.total || 0;
             const wins = s.wins || 0;
-            const wrClass = total > 0 ? (wins / total >= 0.5 ? 'good' : 'bad') : '';
-            const wrText = total > 0 ? `<span class="wr ${wrClass}" title="${wins}/${total} wins">(${wins}/${total})</span>` : '';
+            const wrPct = total > 0 ? Math.round(wins / total * 100) : 0;
+            const wrClass = total > 0 ? (wrPct >= 50 ? 'good' : 'bad') : '';
+            const wrText = total > 0 ? `<span class="wr ${wrClass}" title="${wins}/${total} wins (${wrPct}%)">(${wrPct}%)</span>` : '';
             return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}${bp}${wrText}</span>`;
           }).join('') +
           `<button class="show-toggle" onclick="toggleShowAll(this)">${showAll ? 'hide off' : `+${off} off`}</button>` +
