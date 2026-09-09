@@ -883,6 +883,34 @@ def write_signal_config():
         'r2l_long': 'r2_trend_long',
     }
     bypass_normalized = {_BYPASS_ALIASES.get(s, s) for s in bypass_raw}
+
+    # Pre-fetch winrate data for all signals from trades DB
+    signal_winrates = {}
+    try:
+        conn = psycopg2.connect(BRAIN_DB)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT signal, pnl_usdt
+            FROM trades
+            WHERE status = 'closed' AND server = 'Hermes' AND signal IS NOT NULL
+        """)
+        for row in cur.fetchall():
+            sig_raw = row[0] or ''
+            pnl = float(row[1]) if row[1] else 0
+            # Normalize: replace hyphens with underscores, strip trailing +/- suffixes
+            sig_norm = sig_raw.replace('-', '_').rstrip('+-')
+            # Also try without trailing underscore (e.g. "pullback_entry_" -> "pullback_entry")
+            sig_norm = sig_norm.rstrip('_')
+            if sig_norm not in signal_winrates:
+                signal_winrates[sig_norm] = {'wins': 0, 'total': 0}
+            signal_winrates[sig_norm]['total'] += 1
+            if pnl > 0:
+                signal_winrates[sig_norm]['wins'] += 1
+        cur.close()
+        conn.close()
+    except Exception as e:
+        _log.warning(f"[write_signal_config] winrate query failed: {e}")
+
     config = []
     for s in SIGNAL_REGISTRY:
         name = s['name']
@@ -893,11 +921,21 @@ def write_signal_config():
                 base = _re.sub(r'_(PLUS|MINUS|LONG|SHORT|NEW)$', '', flag_name)
                 if hasattr(_hc, base):
                     flag_name = base
+        # Look up winrate — try exact match, then without _long/_short suffix
+        wr_data = signal_winrates.get(name)
+        if not wr_data:
+            # Try stripping direction suffix (e.g. bb_bounce_v2_long -> bb_bounce_v2)
+            base = _re.sub(r'_(long|short)$', '', name)
+            wr_data = signal_winrates.get(base)
+        wins = wr_data['wins'] if wr_data else 0
+        total = wr_data['total'] if wr_data else 0
         config.append({
             'name': name,
             'enabled': _resolve_enabled(s),
             'flag': flag_name,
             'bypass': name in bypass_normalized,
+            'wins': wins,
+            'total': total,
         })
     _atomic_write({'signals': config, 'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}, SIGNAL_CONFIG_JSON)
 

@@ -96,6 +96,9 @@
     .signal-badges .show-toggle { background: none; border: 1px dashed #444; color: #666; padding: 2px 7px; border-radius: 3px; font-size: 0.65em; cursor: pointer; font-family: monospace; }
     .signal-badges .show-toggle:hover { border-color: #00ff88; color: #00ff88; }
     .signal-badge .bp { color: #ffd700; font-size: 0.9em; margin-left: 3px; text-shadow: 0 0 4px #ffd70066; }
+    .signal-badge .wr { color: #666; font-size: 0.85em; margin-left: 3px; }
+    .signal-badge .wr.good { color: #00ff88; }
+    .signal-badge .wr.bad { color: #ff4444; }
   </style>
 </head>
 <body>
@@ -496,7 +499,11 @@
           signals.map(s => {
             const cls = s.enabled ? ('on' + (s.name.includes('_short') ? ' short' : '')) : 'off';
             const bp = s.bypass ? '<span class="bp" title="standalone bypass">🪙</span>' : '';
-            return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}${bp}</span>`;
+            const total = s.total || 0;
+            const wins = s.wins || 0;
+            const wrClass = total > 0 ? (wins / total >= 0.5 ? 'good' : 'bad') : '';
+            const wrText = total > 0 ? `<span class="wr ${wrClass}" title="${wins}/${total} wins">(${wins}/${total})</span>` : '';
+            return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}${bp}${wrText}</span>`;
           }).join('') +
           `<button class="show-toggle" onclick="toggleShowAll(this)">${showAll ? 'hide off' : `+${off} off`}</button>` +
           `<span style="color:#666;font-size:0.65em;margin-left:4px">${on}/${signals.length}</span>`;
