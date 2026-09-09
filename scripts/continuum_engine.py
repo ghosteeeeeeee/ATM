@@ -447,6 +447,7 @@ class ContinuumState:
     consecutive_above: int = 0
     consecutive_below: int = 0
     last_cross_ts: int = 0
+    sustained_high_score_count: int = 0  # Consecutive 95+ score ticks
 
 
 class ContinuumEngine:
@@ -771,6 +772,7 @@ class ContinuumEngine:
         state.entry_phase = self.entry_phase
         state.position_side = self.position_side
         state.position_size_pct = self.position_size_pct
+        state.sustained_high_score_count = self._sustained_high_score_count
         
         # Debug: log phase changes
         if hasattr(self, '_last_phase') and self._last_phase != self.entry_phase:

@@ -373,6 +373,7 @@ class ContinuumTrader:
                   f"Price:{state.price:.1f} | "
                   f"Score:{state.state_score:.1f} | "
                   f"Phase:{state.entry_phase} | "
+                  f"Sustained:{state.sustained_high_score_count}/20 | "
                   f"Pos:{pos_count}/{MAX_CONTINUUM_POSITIONS} | "
                   f"EMA:{state.ema300_position}({state.ema300_duration}m) | "
                   f"Z:{state.zscore_tier}({state.zscore_val:+.2f}) | "

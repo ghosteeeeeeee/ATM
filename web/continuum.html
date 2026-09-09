@@ -138,7 +138,11 @@ function render() {
          c.zscore_tier.includes('POS') ? 'bullish' : c.zscore_tier.includes('NEG') ? 'bearish' : 'neutral'),
     stat('Volume', c.volume_regime, c.volume_ratio_val.toFixed(1) + 'x',
          c.volume_regime === 'PARABOLIC' ? 'bullish' : c.volume_regime === 'HIGH' ? 'bullish' : 'neutral'),
-    stat('Phase', 'Phase ' + c.entry_phase, c.entry_phase === 4 ? 'ACTIVE' : ''),
+    stat('Phase', 'Phase ' + c.entry_phase, 
+         c.entry_phase === 6 ? '🟢 ENTRY' : 
+         c.entry_phase === 5 ? '⏳ SUSTAINED' : 
+         c.entry_phase === 4 ? '📊 VOL CONFIRMED' : ''),
+    stat('Sustained', (c._sustained_high_score_count || 0) + '/20', 'ticks @ 95+'),
     stat('Ticks', data.stats.total_ticks || 0),
   ];
   document.getElementById('stats-bar').innerHTML = statsHtml.join('');
