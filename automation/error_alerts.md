@@ -196,3 +196,12 @@
 - **WARN**: 72,466 active signals backlog (since Aug 10) — signal_purge underperforming
 - **WARN**: Disk at 83% — approaching 85% threshold, compress old logs
 - **INFO**: Pipeline "5 open/37 closed/-29%" vs DB "0 open/22 closed/+$0.97" — timing mismatch between exchange positions and DB records
+
+## Health Report — 2026-09-09 20:25 UTC
+- **[WARN]** (1x): `signal_compactor: timed out` at 20:22:02 — recurring pattern, recovered on next cycle
+- **[INFO]** Pipeline completed at 20:22:44. 4 open, 37 closed today, +$0.61 PnL, 59.5% WR
+- **[INFO]** Market: 96 NEUTRAL / 7 SHORT / 0 LONG (SHORT_BIAS). Top shorts: PUMP (-7.5%), SOPH (-6.3%)
+- **[INFO]** 72 signals/hr, 127 tokens >= 50th percentile speed
+- **[INFO]** Disk at 84% (19G free) — approaching 85% threshold, compress logs soon
+- **[INFO]** hl-sync-guardian active. No crashes, no phantom trades.
+- **AUTO-FIX**: None needed — all issues non-critical

@@ -1,3 +1,42 @@
+## [2026-09-09 21:00 UTC] Hourly Analysis
+
+**Trades:** 6 closed (2W 4L -$0.05)
+**24h:** 44T 24W 54.5%WR +$0.22
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 9T 88.9%WR +$0.37 ⭐
+- rr_engine_support_tp: 5T 80%WR +$0.26 ⭐
+- atr_sl_hit: 26T (13 profitable trailing,13 actual stops = 29.5% real stop rate) ✅
+- rr_engine_resistance: 2T 0%WR -$0.25
+
+**24h Signal Performance (2+ trades):**
+- pump_chain: 6T 50%WR +$1.06 ⭐
+- pullback-entry-: 8T 62.5%WR +$0.33 ⭐
+- mover-: 3T 66.7%WR +$0.05 ⭐
+- accel-300-v3-short-: 2T 50%WR +$0.05
+- pump-chain-: 6T 50%WR -$0.63 ⚠️ (avg_win=$0.03 avg_loss=-$0.24, R:R 0.11:1)
+- pullback-entry+: 4T 25%WR -$0.34 ⚠️
+- open-skies+: 2T 0%WR -$0.49 ⚠️ (below kill threshold)
+
+**Structural Issue:** R:R across system is 0.77:1 (avg_win $0.12 vs avg_loss -$0.15). pump-chain- is worst at 0.11:1. Profit captured by trailing exits is small relative to stop losses.
+
+**Changes:**
+None — no kill criteria met (no signal at 0%WR with 3+ trades last hour).
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- Real stop rate 29.5% well below 40% threshold ✅
+- Trade freq 6/hr normal
+- pump-chain+ killed at 03:10 UTC — improvement confirmed (+$0.22 vs -$3.08)
+- pump-chain- 50%WR but bad R:R — structural, not a kill signal
+- open-skies+ 0%WR but only 2T — below threshold
+
+**Open Questions:**
+- pump-chain- R:R 0.11:1 is a structural drag — 50%WR but losses dwarf wins. Needs T review.
+- pullback-entry+ 4T 25%WR — monitoring for next kill cycle
+- 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$0.22 (improving)
+- Open positions: 4 SHORT (ONDO, COMP, ENA, ADA)
+
 ## [2026-09-09 03:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed (0W 1L -$0.15)
@@ -839,3 +878,27 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - open-skies+ if drops to 0%WR with 3+T next hour → kill
 - pump-chain- at -$0.63/24h but 50%WR — structural not signal
+
+## [2026-09-09 19:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L, +$0.14)
+**24h:** 39T 54%WR +$0.04
+**Open:** 5 positions all green (+$0.96 unrealized)
+
+**24h Exit Reasons:**
+- atr_sl_hit: 24T 61.5% avg -$0.006 (flat, systemic)
+- profit-monster-trail: 8T avg +$0.043 (healthy)
+- rr_engine_support_tp: 4T avg +$0.023 (healthy)
+- rr_engine_resistance: 2T avg -$0.125 (structural)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no 0%WR signal with 3+T last hour
+- atr_sl_hit 61.5% systemic but flat — not crisis
+- Trade freq 2/hr healthy
+- 3d trend recovering: Sep 8 -$2.74 → Sep 9 +$0.30 (58.3%WR)
+
+**Open Questions:**
+- pump-chain- at -$0.63/24h but 50%WR — monitor
+- open-skies+ if drops to 3+T 0%WR → kill

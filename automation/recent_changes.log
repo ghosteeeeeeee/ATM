@@ -1,3 +1,7 @@
+[2026-09-09 21:00 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (2W 4L -$0.05). 44T/24h 54.5%WR +$0.22 (improved from -$3.08). Kill criteria not met: no signal at 0%WR with 3+T last hour. Real atr_sl_stop rate 29.5% (13/44) well below 40%. profit-monster-trail 9T 88.9%WR +$0.37 star. rr_engine_support_tp 5T 80%WR +$0.26 star. pump_chain 6T 50%WR +$1.06 star. pump-chain- 6T 50%WR -$0.63 — R:R 0.11:1 structural drag (avg_win $0.03 vs avg_loss -$0.24). pullback-entry+ 4T 25%WR -$0.34 monitoring. open-skies+ 2T 0%WR -$0.49 below kill threshold. Trade freq 6/hr normal. 4 open SHORT positions. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$0.22 improving. pump-chain+ kill from 03:10 UTC confirmed working.
+  BY: auto_1hr
+  NEXT: Re-run at 22:00 UTC
 [2026-09-09 03:10 UTC] auto_1hr: KILL pump-chain+ LONG
   WHY: 1T last hour (0W 1L -$0.15 IMX pump-chain+ atr_sl). 60T/24h 41.7%WR -$3.08. pump-chain+ 13T 35.7%WR -$1.28 worst performer — ALL LONG in downtrend. KILL: PUMP_FLOW_PLUS_ENABLED=False. SHORT stays active. atr_sl_hit 21% healthy. Trade freq 1/hr. 5 open positions. ema300-dip-short 11T 36.4%WR -$0.78 protection expired, monitoring. bb-bounce-v2-long+ 37.5%WR monitoring. open-skies+ 67%WR star. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74 deteriorating.
   BY: auto_1hr
@@ -1257,3 +1261,7 @@
   WHY: 2T last hour (1W 1L -$0.18). 42T/24h 41%WR -$0.22. Kill criteria not met: no 0%WR signal with 3+T last hour. open-skies+ 2T 0%WR -$0.49 below threshold. atr_sl_hit 64.3% systemic but flat (-$0.017 avg). Trade freq 2/hr normal. 0 open positions. 3d trend recovering: Sep 8 -$2.74 → Sep 9 -$0.22.
   BY: auto_1hr
   NEXT: Re-run at 19:10 UTC
+[2026-09-09 19:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +$0.14). 39T/24h 54%WR +$0.04. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 61.5% above threshold but avg -$0.006 (flat). Trade freq 2/hr normal. 5 open positions all green (+$0.96 unrealized). 3d trend recovering: Sep 8 -$2.74 → Sep 9 +$0.30.
+  BY: auto_1hr
+  NEXT: Re-run at 20:10 UTC
