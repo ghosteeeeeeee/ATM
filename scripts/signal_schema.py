@@ -1548,28 +1548,28 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
-            # momentum_leaderboard
+            # mover (fast mover signal)
             if _comp == 'mover+':
                 try:
-                    from hermes_constants import MOMENTUM_LEADERBOARD_PLUS_ENABLED
-                    if not MOMENTUM_LEADERBOARD_PLUS_ENABLED:
-                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_LEADERBOARD_PLUS_ENABLED=False', flush=True)
+                    from hermes_constants import MOVER_PLUS_ENABLED
+                    if not MOVER_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOVER_PLUS_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
             if _comp == 'mover-':
                 try:
-                    from hermes_constants import MOMENTUM_LEADERBOARD_MINUS_ENABLED
-                    if not MOMENTUM_LEADERBOARD_MINUS_ENABLED:
-                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_LEADERBOARD_MINUS_ENABLED=False', flush=True)
+                    from hermes_constants import MOVER_MINUS_ENABLED
+                    if not MOVER_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOVER_MINUS_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
             if _comp == 'mover':
                 try:
-                    from hermes_constants import MOMENTUM_LEADERBOARD_ENABLED
-                    if not MOMENTUM_LEADERBOARD_ENABLED:
-                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_LEADERBOARD_ENABLED=False', flush=True)
+                    from hermes_constants import MOVER_ENABLED
+                    if not MOVER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOVER_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass

@@ -2005,6 +2005,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
+    'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
 )
@@ -2528,6 +2529,19 @@ MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT = 2.0   # % — confidence penalty when ab
 MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for high-conviction movers
 MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
 MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
+
+# ── Mover Signal (fast mover detection) ───────────────────────────────────
+# mover.py — detects fastest moving coins, trades momentum direction
+MOVER_ENABLED = True                    # master kill-switch
+MOVER_PLUS_ENABLED = True               # LONG direction
+MOVER_MINUS_ENABLED = True              # SHORT direction
+MOVER_TOP_N = 20                        # top N candidates to evaluate
+MOVER_VELOCITY_MIN = 0.3                # min velocity % to qualify (5m window)
+MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)
+MOVER_VOLUME_RATIO = 1.3                # volume must be 1.3x average
+MOVER_COOLDOWN_HOURS = 2                # per token+direction cooldown
+MOVER_CONF_BASE = 75                    # base confidence
+MOVER_CONF_CAP = 88                     # max confidence (system ceiling)
 
 # ── Continuation V2 (smart re-entry after profitable close) ─────────────
 # continuation.py V2 — assess trend state, fire same-dir or fade exhaustion

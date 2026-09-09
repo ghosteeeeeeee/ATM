@@ -1,0 +1,321 @@
+#!/usr/bin/env python3
+"""
+mover.py — Fast Mover Signal.
+
+Detects the fastest moving coins and trades in the direction of momentum.
+Uses velocity (rate of price change) across multiple timeframes to identify
+institutions or algos driving price.
+
+Signal types:
+  - mover_long  : LONG (fastest upward mover with volume confirmation)
+  - mover_short : SHORT (fastest downward mover with volume confirmation)
+
+Thesis: Fast movers attract more capital (momentum begets momentum).
+The key is catching the move early with volume confirmation, not chasing.
+"""
+
+import os
+import sys
+import sqlite3
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
+from paths import HERMES_DATA
+from entry_gates import volume_gate, candle_close_gate, session_timing_gate
+
+from hermes_constants import (
+    MOVER_ENABLED,
+    MOVER_PLUS_ENABLED,
+    MOVER_MINUS_ENABLED,
+    MOVER_TOP_N,
+    MOVER_VELOCITY_MIN,
+    MOVER_VELOCITY_WINDOW,
+    MOVER_VOLUME_RATIO,
+    MOVER_CONF_BASE,
+    MOVER_CONF_CAP,
+    MOVER_COOLDOWN_HOURS,
+    LONG_BLACKLIST,
+    SHORT_BLACKLIST,
+)
+
+SIGNAL_TYPE_LONG = 'mover_long'
+SIGNAL_TYPE_SHORT = 'mover_short'
+SOURCE_LONG = 'mover+'
+SOURCE_SHORT = 'mover-'
+
+_CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
+
+
+def _log(msg):
+    print(f"[mover] {msg}", flush=True)
+
+
+def _get_candles(token, table='candles_5m', limit=100):
+    """Fetch OHLCV candles. Returns list of {ts, open, high, low, close, volume} oldest-first."""
+    _VALID_TABLES = {'candles_1m', 'candles_5m', 'candles_15m', 'candles_1h'}
+    if table not in _VALID_TABLES:
+        return []
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute(f"""
+            SELECT ts, open, high, low, close, volume FROM {table}
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = cur.fetchall()
+        if not rows or len(rows) < 10:
+            return []
+        return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
+                for r in reversed(rows)]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
+def _get_closes(token, table='candles_5m', limit=100):
+    """Fetch close prices only. Returns list oldest-first."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute(f"""
+            SELECT close FROM {table}
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = cur.fetchall()
+        if not rows:
+            return []
+        return [r[0] for r in reversed(rows)]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
+def compute_velocity(closes, window=None):
+    """Compute velocity (% price change per candle) over recent window.
+
+    Returns (velocity_pct, direction) where direction is 'LONG' or 'SHORT'.
+    Returns (0, None) if insufficient data.
+    """
+    if window is None:
+        window = MOVER_VELOCITY_WINDOW
+    if len(closes) < window + 1:
+        return 0, None
+
+    start_price = closes[-(window + 1)]
+    end_price = closes[-1]
+
+    if start_price == 0:
+        return 0, None
+
+    velocity_pct = (end_price - start_price) / start_price * 100
+    direction = 'LONG' if velocity_pct > 0 else 'SHORT'
+
+    return velocity_pct, direction
+
+
+def compute_velocity_acceleration(closes, short_window=None, long_window=None):
+    """Compute velocity acceleration (short-term velocity vs long-term velocity).
+
+    Positive = accelerating upward, negative = accelerating downward.
+    Returns acceleration_pct (difference in velocities).
+    """
+    if short_window is None:
+        short_window = max(MOVER_VELOCITY_WINDOW // 3, 3)
+    if long_window is None:
+        long_window = MOVER_VELOCITY_WINDOW
+
+    if len(closes) < long_window + 1:
+        return 0
+
+    # Long-term velocity
+    long_start = closes[-(long_window + 1)]
+    long_end = closes[-1]
+    if long_start == 0:
+        return 0
+    long_vel = (long_end - long_start) / long_start * 100
+
+    # Short-term velocity (last short_window candles)
+    short_start = closes[-(short_window + 1)]
+    short_end = closes[-1]
+    if short_start == 0:
+        return 0
+    short_vel = (short_end - short_start) / short_start * 100
+
+    # Acceleration = short-term velocity normalized to long-term
+    # Positive means short-term is faster than long-term (accelerating)
+    if abs(long_vel) < 0.001:
+        return short_vel  # long-term flat, just use short-term
+    return short_vel - long_vel * (short_window / long_window)
+
+
+def detect_mover(token):
+    """Detect if token is a fast mover worth trading.
+
+    Returns {direction, confidence, value, price} or None.
+    """
+    # Get 5m candles for velocity
+    closes_5m = _get_closes(token, 'candles_5m', 100)
+    if len(closes_5m) < MOVER_VELOCITY_WINDOW + 1:
+        return None
+
+    # Get 1m candles for entry timing
+    candles_1m = _get_candles(token, 'candles_1m', 100)
+    if len(candles_1m) < 20:
+        return None
+
+    # Compute velocity
+    velocity, direction = compute_velocity(closes_5m)
+    if direction is None:
+        return None
+
+    # Filter: minimum velocity threshold
+    if abs(velocity) < MOVER_VELOCITY_MIN:
+        return None
+
+    # Compute acceleration (is the move speeding up?)
+    acceleration = compute_velocity_acceleration(closes_5m)
+
+    # Acceleration bonus: accelerating moves are stronger
+    accel_bonus = 0
+    if direction == 'LONG' and acceleration > 0:
+        accel_bonus = min(acceleration * 2, 10)  # up to +10 conf
+    elif direction == 'SHORT' and acceleration < 0:
+        accel_bonus = min(abs(acceleration) * 2, 10)
+
+    # Volume confirmation
+    if not volume_gate(candles_1m, min_ratio=MOVER_VOLUME_RATIO):
+        return None
+
+    # Candle close gate — confirmed candles only
+    confirmed_candles = candle_close_gate(candles_1m, timeframe_seconds=60)
+    if len(confirmed_candles) < 2:
+        return None
+
+    # Compute confidence based on velocity strength
+    conf = MOVER_CONF_BASE
+    # Stronger velocity = higher confidence
+    velocity_strength = abs(velocity) / MOVER_VELOCITY_MIN  # 1.0 = minimum, 2.0 = 2x min
+    if velocity_strength > 3.0:
+        conf += 10
+    elif velocity_strength > 2.0:
+        conf += 5
+    conf += accel_bonus
+    conf = min(conf, MOVER_CONF_CAP)
+
+    # Get current price
+    price = closes_5m[-1]
+
+    return {
+        'direction': direction,
+        'confidence': conf,
+        'value': round(velocity, 4),
+        'price': price,
+        'acceleration': round(acceleration, 4),
+    }
+
+
+def scan_mover_signals():
+    """Scan all tokens for fast mover signals."""
+    added = 0
+
+    # Session timing gate
+    if not session_timing_gate():
+        return 0
+
+    from signal_schema import get_all_latest_prices
+    prices = get_all_latest_prices()
+
+    # Collect all valid tokens with velocity
+    candidates = []
+    for token, data in prices.items():
+        if token.startswith('@'):
+            continue
+        price = data.get('price')
+        if not price or price <= 0:
+            continue
+
+        # Staleness check
+        if price_age_minutes(token) > 10:
+            continue
+
+        # Blacklist check
+        if token.upper() in LONG_BLACKLIST or token.upper() in SHORT_BLACKLIST:
+            continue
+
+        # Quick velocity check (no DB call yet)
+        candidates.append(token)
+
+    # Limit scan to top candidates by price (fastest to scan)
+    # We'll do the actual velocity calculation in detect_mover
+    scan_tokens = candidates[:200]  # safety cap
+
+    for token in scan_tokens:
+        # Cooldown check
+        if get_cooldown(token):
+            continue
+
+        sig = detect_mover(token)
+        if not sig:
+            continue
+
+        direction = sig['direction']
+
+        # Layer 1: per-direction kill-switch
+        if direction == 'LONG' and not MOVER_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not MOVER_MINUS_ENABLED:
+            continue
+
+        # Layer 1: blacklists (direction-specific)
+        if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
+            continue
+        if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            continue
+
+        # Direction-specific cooldown
+        if get_cooldown(token, direction=direction):
+            continue
+
+        sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
+        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+
+        sid = add_signal(
+            token=token.upper(),
+            direction=direction,
+            signal_type=sig_type,
+            source=source,
+            confidence=sig['confidence'],
+            value=sig['value'],
+            price=sig['price'],
+            exchange='hyperliquid',
+            timeframe='5m',
+            z_score=sig.get('acceleration'),
+        )
+        if sid:
+            added += 1
+            set_cooldown(token, direction, hours=MOVER_COOLDOWN_HOURS)
+            _log(f"{token} {direction} vel={sig['value']:.3f}% "
+                 f"accel={sig['acceleration']:.3f}% conf={sig['confidence']}")
+
+    return added
+
+
+def run():
+    """Entry point for signals_runner."""
+    return scan_mover_signals()
+
+
+if __name__ == '__main__':
+    n = scan_mover_signals()
+    print(f"mover: {n} signals emitted")

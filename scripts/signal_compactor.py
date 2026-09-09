@@ -410,8 +410,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
     ('hh_hl_choch', 'choch-'):  1.3,   # bearish flip (HH_HL→LH_LL)
-    # momentum_leaderboard — top movers
-    ('mover_long',  'mover+'):  1.3,  # boosted 2026-08-13 — GRASS LONG setup, z=-1.19
+    # mover — fast mover signal (velocity-based)
+    ('mover_long',  'mover+'):  1.0,  # new signal — start neutral, tune after 20+ trades
     ('mover_short', 'mover-'):  1.0,
     # hzscore+mover+ combo — star performer (80% WR, +$0.17)
     ('mtf_zscore',  'hzscore+,mover+'): 1.3,  # boosted 2026-08-14

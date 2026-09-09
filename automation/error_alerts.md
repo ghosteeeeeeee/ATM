@@ -170,3 +170,8 @@
 - **[INFO]** Disk at 83% (92G/118G) — stable, below 85% threshold.
 - **[INFO]** Live trading enabled (`hype_live_trading.json`: true).
 - **AUTO-FIX**: None applied — PnL issue requires manual review of open positions and risk parameters. No system failures to restart.
+
+## Error Alerts — 2026-09-08 23:23 UTC
+- **[WARN]** (5x): Near-zero PnL trades (<$0.01) — phantom trade candidates: ATOM/LONG, BANANA/SHORT, SAND/LONG, USUAL/LONG, ICP/LONG
+- **[WARN]** (1x): Max positions reached (5/5) — KAS SHORT signal skipped at 23:22
+- **AUTO-FIX**: None required — pipeline healthy

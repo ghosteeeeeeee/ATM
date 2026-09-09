@@ -42,6 +42,7 @@ from hermes_constants import (
     SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
     GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
     RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
+    MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
 )
 
 
@@ -262,6 +263,11 @@ try:
 except Exception:
     _resistance_break_run = None
 
+try:
+    from signals.mover import run as _mover_run
+except Exception:
+    _mover_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -312,6 +318,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
     {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
     {'name': 'resistance_break',         'enabled': 'RESISTANCE_BREAK_ENABLED',     'run': _resistance_break_run},
+    {'name': 'mover',                    'enabled': 'MOVER_ENABLED',               'run': _mover_run},
 ]
 
 
