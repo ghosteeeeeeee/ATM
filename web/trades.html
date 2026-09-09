@@ -163,13 +163,14 @@
         <th class="sortable" data-col="7" data-type="num">Size</th>
         <th class="sortable" data-col="8" data-type="num">Eff. Size</th>
         <th class="sortable" data-col="9" data-type="num">Lev</th>
+        <th>Exit</th>
         <th>SL</th>
         <th>TP</th>
         <th class="sortable" data-col="12" data-type="string">Signal</th>
         <th class="sortable" data-col="13" data-type="string">Opened</th>
       </tr>
     </thead>
-    <tbody id="open-tbody"><tr><td colspan="14" class="empty">Loading...</td></tr></tbody>
+    <tbody id="open-tbody"><tr><td colspan="15" class="empty">Loading...</td></tr></tbody>
   </table>
 
   <div class="section-title">Closed Trades</div>
@@ -189,6 +190,40 @@
   <script>
     const PAGE_SIZE = 50;
     let currentPage = 1;
+
+    // Signal → Exit Strategy mapping (from hermes_constants.py SIGNAL_EXIT_CONFIG)
+    const SIGNAL_EXIT_CONFIG = {
+      'open-skies+': 'rr_engine',
+      'open-skies-': 'rr_engine',
+      'atr-spike+': 'atr',
+      'atr-spike-': 'atr',
+      'r2l-long': 'atr',
+      'r2-trend-short': 'atr',
+      'pump-catcher+': 'atr',
+      'pump-catcher-': 'atr',
+      'pump-chain+': 'rr_engine',
+      'pump-chain-': 'rr_engine',
+    };
+    const EXIT_LABELS = {
+      'rr_engine': { label: 'RR Engine', color: '#00ff88', icon: '🎯' },
+      'atr':       { label: 'ATR SL',    color: '#4488ff', icon: '📐' },
+      'pm_trail':  { label: 'PM Trail',  color: '#ffaa00', icon: '🐉' },
+      'cut_loser': { label: 'Cut Loser', color: '#ff4444', icon: '✂️' },
+    };
+    function getExitStrategy(signal) {
+      if (!signal) return EXIT_LABELS['pm_trail'];
+      const sig = signal.trim().toLowerCase();
+      // Check exact match first
+      if (SIGNAL_EXIT_CONFIG[sig]) return EXIT_LABELS[SIGNAL_EXIT_CONFIG[sig]] || EXIT_LABELS['pm_trail'];
+      // Check base signal (strip +/- suffix)
+      const base = sig.replace(/[+-]$/, '');
+      if (SIGNAL_EXIT_CONFIG[base]) return EXIT_LABELS[SIGNAL_EXIT_CONFIG[base]] || EXIT_LABELS['pm_trail'];
+      return EXIT_LABELS['pm_trail'];
+    }
+    function getExitStrategyHtml(signal) {
+      const exit = getExitStrategy(signal);
+      return `<span style="color:${exit.color};font-size:0.75em" title="${exit.label}">${exit.icon} ${exit.label}</span>`;
+    }
     let allClosed = [];
     let totalClosed = 0;
     let hotSet = [];
@@ -546,6 +581,7 @@
           <td>$${size.toFixed(1)}</td>
           <td>$${effSize.toFixed(1)}</td>
           <td>${lev}x</td>
+          <td style="font-size:0.75em">${getExitStrategyHtml(t.signal)}</td>
           <td class="${slClass}">$${sl.toFixed(6)}<br><span class="dist">${slDistStr}</span></td>
           <td class="${tpClass}">$${tp.toFixed(4)}<br><span class="dist">${tpDistStr}</span></td>
           <td style="color:#888;font-size:0.8em">${t.signal||''}</td>
