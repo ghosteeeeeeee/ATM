@@ -1106,7 +1106,6 @@ WARN (cautious):
 - Hebbian WR 30-50% with limited data
 
 NAY (hard block):
-- Dead hours (03:00-08:00 UTC) for non-inv-accel signals
 - Historical WR < 30% with 5+ trades for this setup
 - Z-score extreme AND speed low: |z| > 1.5 AND speed < 30
 - LONG with z > 1.5 AND speed < 40 (overbought + no momentum)

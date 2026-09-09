@@ -1,42 +1,37 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-08 ~22:30 UTC (CEO)**
+**Last Updated: 2026-09-09 ~02:40 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 70T, 45.7% WR, -$2.51. 48h: 128T, 53.1% WR, -$2.22. 7d: 387T, 56.1% WR, -$4.88. Today Sep 8: 66T, 43.9% WR, -$2.51 (worst day, R:R collapse). Market 100% NEUTRAL.
+24h: 63T, 39.7% WR, -$3.57. 7d: 387T, 56.1% WR, -$4.88. Sep 8: 68T, 44.1% WR, -$2.74 (worst day). Sep 9: 2T, 50% WR, -$0.14 (just started). Market 100% NEUTRAL.
 
-- **24h:** 70T, 45.7% WR, -$2.51 (verified DB)
-- **48h:** 128T, 53.1% WR, -$2.22 (verified DB)
-- **7d:** 387T, 56.1% WR, -$4.88 (verified DB — legacy aging out)
-- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 72T/73.6% WR +$1.99 ★ | open-skies+ 18T/61.1% WR +$1.55 ★ | pump-chain+ 37T/70.3% WR -$0.08
-- **7d LEGACY (killed):** accel-300-v3-long+ 39T/43.6% WR -$1.41 | ema300-dip 55T/63.6% WR -$0.72 | slow-grind+ 15T/40% WR -$0.80 | sma20-dip+ 19T/42.1% WR -$0.73 | coil-spring+ 21T/42.9% WR -$0.65
-- **Market:** 1 LONG_BIAS / 2 SHORT_BIAS / 103 NEUTRAL
+- **24h:** 63T, 39.7% WR, -$3.57 (verified DB)
+- **7d:** 387T, 56.1% WR, -$4.88 (verified DB)
+- **7d ACTIVE SIGNALS:** bb-bounce-v2-long+ 73T/74.0% WR +$2.08 ★ | open-skies+ 19T/63.2% WR +$1.56 ★ | pump-chain+ 39T/66.7% WR -$0.55
+- **7d LEGACY (killed):** ema300-dip-short 24T/41.7% WR -$1.48 | sma20-dip+ 19T/42.1% WR -$0.73 | ema300-dip 55T/63.6% WR -$0.72
+- **Market:** 100% NEUTRAL (363/370 7d trades in NEUTRAL)
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 71T/7d 74.6% WR +$2.19. STAR. Today 9T/44.4% WR -$0.57 (variance, R:R 0.612).
-- **PUMP-CHAIN+:** Live. 34T/7d 82.1% WR +$0.60. Strongest WR. R:R 0.370 (needs 73% WR to break even).
-- **OPEN-SKIES+:** Live. 17T/7d 64.7% WR +$1.55. Only healthy R:R (1.303). Today 2T/100% WR +$1.42.
-- **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC (0%WR last hour, 42.1% all-time).
+- **BB_BOUNCE_V2_LONG:** Live. 73T/7d 74.0% WR +$2.08. STAR. Today 8T/37.5% WR -$0.65 (variance + cut-loser bug).
+- **PUMP-CHAIN+:** Live. 39T/7d 66.7% WR -$0.55. Today 15T/33.3% WR -$1.43 (degraded).
+- **OPEN-SKIES+:** Live. 19T/7d 63.2% WR +$1.56. Only healthy R:R. Today 2T/50% WR +$0.01.
+- **SMA20-DIP+:** KILLED by auto_1hr at 12:10 UTC Sep 8.
 - **CONTINUATION+:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
 - **NEUTRAL_SNIPER:** LIVE. RSI 45/55. Signals firing but BTC-CRASH filter blocks SHORTs.
-- **EMA300-DIP-SHORT:** LIVE (protected until Sep 9 05:00 UTC). EMA300_DIP_SHORT_ENABLED=True. auto_1hr kill at 16:10 overridden by T's re-enable commit. 12T/24h 41.7% WR -$0.96 — aging out.
+- **EMA300-DIP-SHORT:** LIVE (protected until Sep 9 05:00 UTC). 24T/7d 41.7% WR -$1.48 — WILL DISABLE after protection expires.
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
-- **Disk:** 82% (21G free).
+- **Disk:** 83% (92G/118G).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 
-**⚠️ ACTIVE BLEEDERS (CEO_PROTECTED):**
-1. **macd-div- SHORT** — 1T/7d 100% WR +$0.02. FLAGGED. Monitor.
-2. **confluence-,ichimoku- SHORT** — 1T/7d 0% WR -$0.09. FLAGGED FOR T.
-
-**🔴 R:R STATUS (STRUCTURAL)**
-Signal R:R (7d): open-skies+ 1.550 | bb-bounce-v2-long+ 0.617 | pump-chain+ 0.406
-24h R:R: 0.513 (avg_win 2.51%, avg_loss -4.90%). Breakeven WR = 66.6%. Actual 45.7%.
+**🔴 R:R STATUS (STRUCTURAL — IMPROVING)**
 24h exit breakdown (losses only):
-- cut-loser-CL-T1: 24T, avg -4.84%, -$3.48 — #1 loss driver
-- atr_sl_hit: 13T, avg -2.44%, -$0.72
-**Note:** ATR_SL reverted to 1.2%-1.5% (was 1.5%-1.8%). Wider SL caused avg loss -4.84%, R:R collapsed to 0.51. Expected: tighter SL catches losses earlier, R:R improves to 0.70+. PM_TRAIL protected (0.40%/0.20%). Legacy signals aging out.
+- cut-loser-CL-T1: 22T, avg -4.98%, -$3.14 — #1 loss driver (FIXED — see below)
+- atr_sl_hit: 14T, avg -4.70%, -$1.71
+
+**🔴 CRITICAL BUG FIX: cut-loser sl_distance vs leveraged pnl_pct**
+`should_cut_loser()` Priority 2 compared `sl_distance` (price-move %) against `pnl_pct` (LEVERAGED). With leverage=3 and sl_distance=0.015: a 0.5% price drop = -1.5% leveraged pnl → cut-loser fires at -0.5% instead of -1.5%. This made effective SL 3x tighter than intended. **FIX: threshold = -sl_dist * 100 * leverage (was / leverage).** Pipeline restarted. Expected: cut-loser fires at correct 1.2%-1.5% price move, avg loss drops from -4.98% to ~-2%, R:R improves.
 
 ## Today's Changes (Sep 8)
 

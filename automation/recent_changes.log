@@ -1237,3 +1237,7 @@
   WHY: 4T last hour (4W 0L +$0.14 all winners). 62T/24h 44%WR -$2.62. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 24% healthy. Trade freq 4/hr normal. pump_chain 4T all winners. mover 2T both trails. 5 open positions. 3d trend improving: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$0.14.
   BY: auto_1hr
   NEXT: Re-run at 04:10 UTC
+[2026-09-09 04:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.14 ICP pump_chain atr_sl). 59T/24h 44%WR -$2.74. Kill criteria not met: no 0%WR signal with 3+T last hour (1T). atr_sl_hit 27% healthy. Trade freq 1/hr normal. pump-chain+ 47%WR above kill threshold. cut-loser-CL-T1 -$2.65 structural drag but not signal-specific. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 -$0.14 (early).
+  BY: auto_1hr
+  NEXT: Re-run at 05:10 UTC

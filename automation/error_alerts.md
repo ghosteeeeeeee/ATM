@@ -175,3 +175,18 @@
 - **[WARN]** (5x): Near-zero PnL trades (<$0.01) — phantom trade candidates: ATOM/LONG, BANANA/SHORT, SAND/LONG, USUAL/LONG, ICP/LONG
 - **[WARN]** (1x): Max positions reached (5/5) — KAS SHORT signal skipped at 23:22
 - **AUTO-FIX**: None required — pipeline healthy
+
+## Error Alerts — 2026-09-09 01:23 UTC
+- **CRITICAL** (4x): `signal_compactor timed out` — recurring every ~10min for last hour
+- **WARN**: Disk at 83% (92G/118G) — approaching 85% threshold
+- **INFO**: Pipeline completed successfully at 01:22:35, 5 open positions, -97.56% daily PnL
+
+## Error Alerts — 2026-09-09 04:24 UTC
+- **WARN** (1x): `signal_compactor: timed out` — recovered on next run (04:22:33)
+- **WARN** (1x): Phantom trade detected — ABS(pnl_pct) < 0.01% in last 24h
+- **INFO**: Disk at 83% (118G, 20G free) — approaching 85% threshold
+
+## Error Alerts — 2026-09-09 05:23 UTC
+- **[WARN]** (Nx): `CTX-GATE blocking 100% of signals — 115 signals generated, 0 executed. LLM NAY on CRV, POL: "setup is actively harmful"`
+- **[WARN]** (1x): `hermes-hl-sync-guardian last fired ~12h ago (2026-09-08 16:37 UTC)`
+- **AUTO-FIX**: none needed — pipeline and timers healthy

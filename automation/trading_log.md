@@ -658,3 +658,53 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 **Open Questions:**
 - cut-loser-CL-T1 contributes -$2.65 of -$2.62 total 24h loss (over 100%). Other exits compensate.
 - 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$0.14 (improving)
+
+## [2026-09-09 04:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.14)
+**24h:** 59T 44%WR -$2.74
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 22T avg +$0.051 ⭐
+- cut-loser-CL-T1: 19T avg -$0.139 (97% of total loss)
+- atr_sl_hit: 16T 27% avg -$0.110
+- HL_CLOSED: 1T +$0.02
+- test_cleanup: 1T $0.00
+
+**Last Hour Trades:**
+- ICP SHORT pump_chain: -$0.14 (atr_sl_hit) — expected, pump_chain LONG-biased
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour (1T only)
+- atr_sl_hit 27% healthy ✅
+- Trade freq 1/hr normal (market quiet ~04:10 UTC)
+- pump-chain+ 47%WR above kill threshold
+- cut-loser-CL-T1 structural issue but not signal-specific
+
+**Open Questions:**
+- cut-loser-CL-T1 contributes -$2.65 of -$2.74 total 24h loss — consider adjusting CL threshold
+- 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 -$0.14 (early day)
+
+## FAVORITES Update — 2026-09-09 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE GRASS (WR=57.1%, PnL=$-0.11, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE COMP (WR=60.0%, AvgPnL=0.30%, Trades=5)
+- PROMOTE IMX (WR=60.0%, AvgPnL=0.43%, Trades=5)
+
+Final set: ['ACE', 'AIXBT', 'BLUR', 'CFX', 'COMP', 'DOGE', 'DOT', 'DYDX', 'ENA', 'FOGO', 'IMX', 'INJ', 'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'ZRO']
+
+## LOSERS Update — 2026-09-09 06:05 UTC
+- REMOVE CASHCAT (insufficient data)
+- REMOVE SYRUP (WR=50.0%, PnL=$-0.12, recovered)
+- REMOVE FIL (insufficient data)
+- REMOVE LDO (insufficient data)
+- ADD BABY (WR=40.0%, PnL=$-0.50, wr_collapse (63.2% → 40.0%))
+- ADD APT (WR=42.9%, PnL=$-0.47, low_wr (42.9%))
+- ADD HBAR (WR=40.0%, PnL=$-0.47, low_wr (40.0%))
+- ADD IO (WR=40.0%, PnL=$-0.40, low_wr (40.0%))
+- ADD ETC (WR=44.4%, PnL=$0.10, low_wr (44.4%))
+
+Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']

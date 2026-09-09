@@ -251,12 +251,13 @@ FAVORITES = {
     'AIXBT',
     'BLUR',
     'CFX',
+    'COMP',
     'DOGE',
     'DOT',
     'DYDX',
     'ENA',
     'FOGO',
-    'GRASS',
+    'IMX',
     'INJ',
     'KAS',
     'LTC',
@@ -280,15 +281,17 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
+    'APT',
+    'BABY',
     'BCH',
     'BIGTIME',
-    'CASHCAT',
-    'FIL',
-    'LDO',
+    'ETC',
+    'HBAR',
+    'IO',
     'SAND',
-    'STX',
-    'SYRUP'
+    'STX'
 }
+
 
 
 
@@ -977,8 +980,8 @@ MULTI_ALT_REFERENCE_ALTS = ['ETH', 'SOL', 'XRP', 'DOGE', 'AVAX', 'DOT', 'LINK', 
 # Would have prevented 3/6 losing SHORT entries in Aug 24 incident.
 BTC_MOMENTUM_FILTER_ENABLED = True
 BTC_MOMENTUM_WINDOW = 30                    # minutes — momentum lookback
-BTC_MOMENTUM_RISING_THRESHOLD = 0.15        # % — block SHORT if BTC 30m momentum > this
-BTC_MOMENTUM_FALLING_THRESHOLD = -0.15      # % — block LONG if BTC 30m momentum < this
+BTC_MOMENTUM_RISING_THRESHOLD = 0.12        # % — block SHORT if BTC 30m momentum > this (tightened from 0.15 per crash-protection plan)
+BTC_MOMENTUM_FALLING_THRESHOLD = -0.12      # % — block LONG if BTC 30m momentum < this (tightened from -0.15 per crash-protection plan)
 BTC_MOMENTUM_BLOCK_DURATION_MIN = 10        # minutes to block entries after trigger
 
 # ── BTC Level Filter (Layer 8) ───────────────────────────────────────────────
@@ -1255,23 +1258,25 @@ RR_EXIT_TRAIL_BUFFER = 0.002      # 0.2% below support for SL placement
 
 # ── Cut Loser v2 ──────────────────────────────────────────────────────────────
 # cut_loser.py — Two-tier loss cutting + trailing loss. Mirror of profit_monster.
+# Hard Stop: immediate cut at -3.0% (runs every wake, no fire window).
 # Tier 1 (Quick Cut): catches small losses fast. Tier 2 (Deep Cut): handles bigger bleeds.
 # Trailing Loss: tracks worst point, cuts on recovery failure.
 CUT_LOSER_ENABLED      = True   # master switch
+CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0% immediately (7d: 39 trades bled past -5%)
 
-# Tier 1: Quick Cut — -1.0% to -2.0%, fires frequently
-CL_TIER1_MIN_PCT      = -2.0    # floor (don't cut deeper than this in T1)
+# Tier 1: Quick Cut — -1.0% to -3.0%, fires frequently
+CL_TIER1_MIN_PCT      = -3.0    # floor (widened from -2.0% — 7d data shows trades bleed through)
 CL_TIER1_MAX_PCT      = -1.0    # ceiling (start cutting at -1.0%)
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
-CL_TIER1_SKIP_BOTTOM_PCT = 10   # don't touch bottom 10% worst losers
-CL_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}
+CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
+CL_TIER1_FIRE_WINDOWS = {"A": (1, 2), "B": (1, 2)}  # CEO Sep 9: tightened from (3,6)
 
-# Tier 2: Deep Cut — -1.5% to -5.0%, fires less frequently (ceiling above CUT_LOSER_PNL so Tier 2 has room)
-CL_TIER2_MIN_PCT      = -5.0    # floor
+# Tier 2: Deep Cut — -1.5% to -3.0%, fires less frequently
+CL_TIER2_MIN_PCT      = -3.0    # floor (tightened from -5.0% — hard stop catches below this)
 CL_TIER2_MAX_PCT      = -1.5    # ceiling (T1 handles above this; must be > CUT_LOSER_PNL so Tier 2 isn't dead code)
 CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
-CL_TIER2_SKIP_BOTTOM_PCT = 20   # don't touch bottom 20% — let ATR SL handle catastrophic
-CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
+CL_TIER2_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
+CL_TIER2_FIRE_WINDOWS = {"A": (2, 4), "B": (2, 4)}  # CEO Sep 9: tightened from (6,12)
 
 # Trailing Loss — mirror of PM_TRAIL (inverted logic)
 CL_TRAIL_ENABLED        = False
@@ -1763,6 +1768,36 @@ GRIND_BREAKOUT_VEL_SHORT_BARS = 6           # bars for short-term velocity (5m p
 GRIND_BREAKOUT_VEL_LONG_BARS = 16           # bars for long-term velocity (15m proxy)
 GRIND_BREAKOUT_CONSEC_LOOKBACK = 5          # bars for consecutive candle count
 GRIND_BREAKOUT_FRESHNESS_SECS = 600         # 10 min freshness window
+
+# ── squeeze_reversal — BB squeeze → mean-reversion breakout ─────────────────
+SQUEEZE_REVERSAL_ENABLED = True
+SQUEEZE_REVERSAL_PLUS_ENABLED = True       # LONG direction
+SQUEEZE_REVERSAL_MINUS_ENABLED = True      # SHORT direction
+SQUEEZE_REVERSAL_COOLDOWN_HOURS = 3
+# Sell-off detection
+SQUEEZE_REVERSAL_SELLOFF_PCT = 2.0         # min % drop in last 2h (creates squeeze)
+SQUEEZE_REVERSAL_SELLOFF_WINDOW = 120      # bars to check for sell-off (2h of 1m)
+# BB Squeeze
+SQUEEZE_REVERSAL_BB_PERIOD = 20            # BB period
+SQUEEZE_REVERSAL_BB_MULT = 2.0             # BB standard deviation multiplier
+SQUEEZE_REVERSAL_SQUEEZE_THRESH = 0.8      # max BB Width % for squeeze
+SQUEEZE_REVERSAL_SQUEEZE_MIN_BARS = 60     # min bars in squeeze (1h)
+# Entry
+SQUEEZE_REVERSAL_PROXIMITY_PCT = 0.5       # max % from BB band for entry
+SQUEEZE_REVERSAL_RSI_MIN = 35              # RSI floor (not oversold)
+SQUEEZE_REVERSAL_RSI_MAX = 65              # RSI ceiling (not overbought)
+# Confidence
+SQUEEZE_REVERSAL_CONF_BASE = 75
+SQUEEZE_REVERSAL_CONF_FLOOR = 50
+SQUEEZE_REVERSAL_CONF_CAP = 88
+SQUEEZE_REVERSAL_CONF_SQUEEZE_BONUS = 5    # extra for long squeeze duration
+SQUEEZE_REVERSAL_CONF_SELLOFF_BONUS = 3    # extra for large sell-off
+SQUEEZE_REVERSAL_CONF_PROXIMITY_BONUS = 2  # extra for very close to BB band
+# Data
+SQUEEZE_REVERSAL_LOOKBACK_1M = 300         # 1m bars to fetch (5h)
+SQUEEZE_REVERSAL_RSI_PERIOD = 14
+SQUEEZE_REVERSAL_MIN_BARS = 150            # need enough data for sell-off + squeeze
+SQUEEZE_REVERSAL_FRESHNESS_SECS = 600      # 10 min freshness
 
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
@@ -3076,14 +3111,18 @@ PULLBACK_ENTRY_PLUS_ENABLED      = True    # LONG direction
 PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
 
 # Detection parameters
-PULLBACK_IMPULSE_MIN_PCT         = 0.3     # min % move for impulse
+PULLBACK_IMPULSE_MIN_PCT         = 0.4     # min % move for impulse (tightened from 0.3 — backtest: 68.8% WR +6.00%)
 PULLBACK_IMPULSE_LOOKBACK        = 10      # candles to look back for impulse
-PULLBACK_DIP_MIN_PCT             = 0.10    # min % drop from impulse high/low
+PULLBACK_DIP_MIN_PCT             = 0.15    # min % drop from impulse high/low (tightened from 0.10)
 PULLBACK_VOLUME_RATIO            = 0.3     # volume < 30% of 20-period average
-PULLBACK_BB_WIDTH_MAX            = 0.8     # BB width < 0.8%
-PULLBACK_RSI_MIN                 = 45      # RSI > 45 (LONG) or < 55 (SHORT)
+PULLBACK_BB_WIDTH_MAX            = 0.6     # BB width < 0.6% (tightened from 0.8)
+PULLBACK_RSI_MIN                 = 48      # RSI > 48 (LONG) or < 52 (SHORT) (tightened from 45)
 PULLBACK_RSI_MAX                 = 70      # RSI < 70 (LONG) or > 30 (SHORT)
 PULLBACK_EMA_PERIOD              = 20      # EMA period for trend check
+PULLBACK_MIN_CANDLES             = 20      # min candles required for detection
+PULLBACK_VOL_LOOKBACK            = 20      # volume lookback period
+PULLBACK_CANDLE_FETCH            = 50      # candles to fetch from DB
+PULLBACK_STALENESS_MIN           = 10      # max age in minutes for price data
 
 # Risk management
 PULLBACK_ENTRY_COOLDOWN_HOURS    = 0.5     # per-token cooldown (30 min)

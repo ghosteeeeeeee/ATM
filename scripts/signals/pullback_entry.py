@@ -120,8 +120,9 @@ def detect(token):
     )
 
     # Get 5m candles
-    candles = _get_candles(token, 'candles_5m', 50)
-    if len(candles) < 20:
+    from hermes_constants import PULLBACK_MIN_CANDLES, PULLBACK_CANDLE_FETCH
+    candles = _get_candles(token, 'candles_5m', PULLBACK_CANDLE_FETCH)
+    if len(candles) < PULLBACK_MIN_CANDLES:
         return None
 
     closes = [c['close'] for c in candles]
@@ -152,9 +153,10 @@ def detect(token):
         return None
 
     # 3. Volume dry-up check
-    if len(volumes) < 20:
+    from hermes_constants import PULLBACK_VOL_LOOKBACK
+    if len(volumes) < PULLBACK_VOL_LOOKBACK:
         return None
-    avg_vol = sum(volumes[-20:]) / 20
+    avg_vol = sum(volumes[-PULLBACK_VOL_LOOKBACK:]) / PULLBACK_VOL_LOOKBACK
     if avg_vol <= 0:
         return None
     current_vol = volumes[-1]
@@ -235,7 +237,8 @@ def scan_signals() -> int:
             continue
 
         # Staleness check
-        if price_age_minutes(token) > 10:
+        from hermes_constants import PULLBACK_STALENESS_MIN
+        if price_age_minutes(token) > PULLBACK_STALENESS_MIN:
             continue
 
         sig = detect(token)

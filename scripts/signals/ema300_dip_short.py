@@ -29,12 +29,13 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
-from paths import HERMES_DATA
+from paths import HERMES_DATA, CANDLES_DB
 
 from hermes_constants import (
     EMA300_DIP_SHORT_ENABLED,
     EMA300_DIP_SHORT_EMA_PERIOD,
     EMA300_DIP_SHORT_MAX_DIST_PCT,
+    EMA300_DIP_SHORT_MIN_DIST_PCT,
     EMA300_DIP_SHORT_MIN_RSI,
     EMA300_DIP_SHORT_MAX_RSI,
     EMA300_DIP_SHORT_MIN_TREND_STRENGTH,
@@ -44,6 +45,7 @@ from hermes_constants import (
     EMA300_DIP_SHORT_TP_PCT,
     EMA300_DIP_SHORT_SL_PCT,
     EMA300_DIP_SHORT_MIN_CONSEC_BELOW,
+    EMA300_DIP_SHORT_MIN_BTC_TREND,
     CANDLES_STALENESS_SEC,
     SHORT_BLACKLIST,
 )

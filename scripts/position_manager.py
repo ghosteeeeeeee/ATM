@@ -2473,15 +2473,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 rr_action = rr_result.get('action', 'HOLD')
                 if rr_action in ('TAKE_PROFIT', 'CUT_LOSS', 'EXIT'):
                     reason = f"rr_engine_{rr_result.get('reason', rr_action).replace(' ', '_')}"
-                    hits.append({
-                        'trade_id': trade_id,
-                        'token': token,
-                        'direction': direction,
-                        'hit_reason': reason,
-                        'current_price': cur,
-                        'stop_loss': current_sl,
-                        'target': None,
-                    })
+                    close_paper_position(trade_id, reason)
+                    closed_count += 1
                     log(f"  [RR-ENGINE] {token} {direction}: {rr_action} — {rr_result.get('reason', '')}")
                     continue  # skip other exit checks
                 elif rr_action == 'TRAIL_SL':
