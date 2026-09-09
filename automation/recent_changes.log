@@ -1217,3 +1217,11 @@
   WHY: 0T last hour (market quiet). 70T/24h 45.7%WR -$2.51. Kill criteria not met: no 0%WR signal with 3+T last hour (0 trades). atr_sl_hit 18.6% healthy. Trade freq 0/hr. 4 open positions (APT SHORT, AIXBT LONG, IMX LONG, NEO LONG). Today 66T 43.9%WR -$2.51. sma20-dip+ and ema300-dip-short legacy trades settling. bb-bounce-v2-long+ 38%WR monitoring. pump-chain+ 41%WR degraded. 3d trend deteriorating.
   BY: auto_1hr
   NEXT: Re-run at 23:10 UTC
+[2026-09-08 23:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.32 AIXBT pump-chain+ atr_sl). 69T/24h 44.9%WR -$2.76. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 20.3% healthy. Trade freq 1/hr. 5 open positions. pump-chain+ 47%WR degraded but above kill threshold. bb-bounce-v2-long+ 37.5%WR monitoring. 3d trend: Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.76 deteriorating.
+  BY: auto_1hr
+  NEXT: Re-run at 00:10 UTC
+[2026-09-09 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.09 NEO bb-bounce-v2-long+ profit-trail). 67T/24h 44.8%WR -$2.74. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 19.4% healthy. Trade freq 1/hr. 4 open positions. pump-chain+ 47%WR degraded but above kill threshold. bb-bounce-v2-long+ 37.5%WR worst active monitoring. sma20-dip+ and ema300-dip-short legacy settling. 3d trend: Sep 7 +$0.01 → Sep 8 -$2.74 deteriorating.
+  BY: auto_1hr
+  NEXT: Re-run at 02:10 UTC

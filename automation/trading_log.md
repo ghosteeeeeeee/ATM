@@ -463,3 +463,60 @@ Final set: ['BCH', 'BIGTIME', 'CASHCAT', 'FIL', 'LDO', 'SAND', 'STX', 'SYRUP']
 - 3-day trend: Sep 6 +$0.40, Sep 7 +$0.01, Sep 8 -$2.51. Market regime shift?
 - bb-bounce-v2-long+ 38%WR persistent drag (killed earlier but legacy settling)
 - pump-chain+ degraded to 41%WR
+
+## [2026-09-08 23:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.32)
+**24h:** 69T 44.9%WR -$2.76
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 30T avg +$0.054 ⭐
+- cut-loser-CL-T1: 23T avg -$0.146
+- atr_sl_hit: 14T 20.3% avg -$0.074 (healthy)
+- HL_CLOSED: 1T +$0.02
+
+**Open Positions:** 5 (CC LONG, ATOM LONG, APT SHORT, IMX LONG, NEO LONG)
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour (1T total)
+- atr_sl_hit 20.3% healthy ✅
+- Trade freq 1/hr normal
+- pump-chain+ 47%WR degraded but not at kill threshold
+- bb-bounce-v2-long+ 37.5%WR worst active, monitoring
+
+**Open Questions:**
+- 3-day trend: Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.76. Deteriorating fast.
+- pump-chain+ entries weak in current regime — 5W/12L in 24h
+- bb-bounce-v2-long+ 37.5%WR approaching concern threshold
+
+## [2026-09-09 01:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.09)
+**24h:** 67T 44.8%WR -$2.74
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 29T avg +$0.056 ⭐
+- cut-loser-CL-T1: 23T avg -$0.146
+- atr_sl_hit: 13T 19.4% avg -$0.084 (healthy)
+- HL_CLOSED: 1T +$0.02
+
+**Open Positions:** 4
+
+**Changes:**
+- None needed
+
+**No Change Needed:**
+- Kill criteria: No signal at 0%WR with 3+T last hour (1T total)
+- atr_sl_hit 19.4% healthy ✅
+- Trade freq 1/hr normal
+- pump-chain+ 47%WR degraded but above kill threshold
+- bb-bounce-v2-long+ 37.5%WR worst active, monitoring
+- sma20-dip+ and ema300-dip-short legacy settling
+
+**Open Questions:**
+- 3-day trend: Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 (just started)
+- pump-chain+ degraded but not at kill threshold (0%WR required)
+- Market regime shift? Low trade volume suggests quiet market
