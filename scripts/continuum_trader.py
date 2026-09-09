@@ -335,9 +335,9 @@ class ContinuumTrader:
             # Save state to DB
             self.engine.save_state(state)
             
-            # Check for entry signal
-            if state.entry_phase == 4 and self.last_entry_phase < 4:
-                print(f"[TRADER] ENTRY SIGNAL DETECTED: Phase 4 reached")
+            # Check for entry signal (Phase 6 = all confirmations met)
+            if state.entry_phase == 6 and self.last_entry_phase < 6:
+                print(f"[TRADER] ENTRY SIGNAL DETECTED: Phase 6 reached")
                 self._handle_entry(state)
             
             # Check for exit signal (engine says no position)

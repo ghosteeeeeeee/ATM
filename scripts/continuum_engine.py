@@ -487,6 +487,7 @@ class ContinuumEngine:
         # Phase reset tracking
         self._below_count = 0  # Consecutive candles below EMA300
         self._last_side = None  # Track EMA300 position for flip detection
+        self._sustained_high_score_count = 0  # Consecutive 95+ score ticks
         
         # History for multi-TF
         self.state_history: List[ContinuumState] = []
@@ -970,7 +971,9 @@ class ContinuumEngine:
         1: EMA300 cross detected (5+ candles above/below)
         2: Confirmed above/below (60+ minutes)
         3: Z-score aligning
-        4: ENTRY SIGNAL (all states aligned)
+        4: Volume confirmed (Sep 3 style)
+        5: Sustained score (95+ for 20 ticks)
+        6: ENTRY SIGNAL (all confirmations met)
         """
         if state.ema300_position == 'ABOVE':
             side = 'LONG'
@@ -1025,7 +1028,8 @@ class ContinuumEngine:
                 self.position_side = side
                 self.position_size_pct = 100 if state.volume_regime == 'PARABOLIC' else 75
                 self.entry_ts = state.ts
-                print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime}")
+                self._sustained_high_score_count = 0  # Reset sustained score counter
+                print(f"[CONTINUUM] Phase 4: Volume confirmed ({state.volume_regime}) | Score={state.state_score:.1f}")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
                 self.entry_phase = 2  # Step back but don't reset fully
             elif (side == 'LONG' and state.zscore_tier in ('NEG', 'STRONG_NEG')) or \
@@ -1038,8 +1042,35 @@ class ContinuumEngine:
                 self.entry_phase = 0
                 print(f"[CONTINUUM] Phase reset: EMA300 flipped from {self._last_side} to {side}")
         
-        # Track side for flip detection
-        self._last_side = side
+        # Phase 4 → 5: Sustained score confirmation (filters false alarms)
+        if self.entry_phase == 4:
+            # Track consecutive 95+ score ticks
+            if state.state_score >= 95:
+                self._sustained_high_score_count += 1
+            else:
+                self._sustained_high_score_count = 0
+            
+            # Require 20+ ticks (10 minutes) of 95+ score
+            if self._sustained_high_score_count >= 20:
+                self.entry_phase = 5
+                print(f"[CONTINUUM] Phase 5: Sustained score confirmed ({self._sustained_high_score_count} ticks @ 95+)")
+            
+            # Exit conditions — step back if conditions degrade
+            elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
+                self.entry_phase = 2
+                self._sustained_high_score_count = 0
+            elif (side == 'LONG' and state.zscore_tier in ('NEG', 'STRONG_NEG')) or \
+                 (side == 'SHORT' and state.zscore_tier in ('POS', 'STRONG_POS')):
+                self.entry_phase = 2
+                self._sustained_high_score_count = 0
+                print(f"[CONTINUUM] Phase 4→2: z-score reversed ({state.zscore_tier} vs {side})")
+        
+        # Phase 5 → Entry signal (all confirmations met)
+        if self.entry_phase == 5:
+            self.entry_phase = 6  # Entry triggered
+            self.position_side = side
+            self.entry_ts = state.ts
+            print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime} | Sustained={self._sustained_high_score_count} ticks")
         
         # Exit checks (if we have a position)
         if self.position_side != 'NONE':
