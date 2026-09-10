@@ -1,168 +1,108 @@
-## CEO Report — 2026-09-10 ~02:35 UTC
+## CEO Report — 2026-09-10
 
-### Diagnosis
-R:R fix confirmed working. 24h: 45T, 60.0% WR, +$2.15 (best day in week). 7d: 364T, 58.0% WR, -$1.18. System structurally profitable after ATR_SL revert.
+### Executive Summary
 
-### Root Cause
-ATR_SL reverted from 1.5%/1.8% to 1.2%/1.5% on Sep 8. cut-loser threshold fix (leveraged pnl comparison) verified. Combined effect: atr_sl_hit avg flipped from -1.15% to +2.11%, cut-loser-CL-T1 eliminated (0 exits in 24h).
-
-### Fix Applied
-No new changes. Monitoring only. System healthy.
-
-### Verification
-- 24h exits: atr_sl_hit 28T avg +2.11%, profit-monster-trail 8T avg +1.56%, cut-loser-CL-T1 0 exits
-- Daily: Sep 5 +$0.47, Sep 6 +$0.40, Sep 7 +$0.01, Sep 9 +$2.01 (5/7 green)
-- 7d legacy (ema300 -$1.48, sma20 -$0.73, ema300_dip -$0.72) aging out, should flip 7d positive by Sep 11
-- open-skies degraded today (2T/0% WR) but 7d 63.2% — variance, monitor
-- Coin tracker healthy (fresh Sep 10 02:33, 96 coins). Disk 84%.
+**GO: Conditional.** The "wire don't build" thesis is 80% correct. Existing data covers gradient detection and directional bias. But the plan has 2 flaws: (1) gradient detection partially exists already via `get_zscore_accel_penalty()`, (2) threshold tightening is too aggressive for the trade volume. Recommend: implement Layers 1, 2, 4 as-is, defer Layer 3 threshold changes until backtested on 30d data.
 
 ---
 
-## CEO Report — 2026-09-09 ~03:00 UTC
+### Plan Assessment — Wire-Don't-Build Thesis
 
-### Data Migration Completed
+| Layer | Data Exists? | Already Used? | Verdict |
+|-------|-------------|---------------|---------|
+| 1: Gradient | `token_speeds.price_acceleration` ✅ | YES — `get_zscore_accel_penalty()` reads it at line 823 | **REDUNDANT** — the zscore_accel system already penalizes when acceleration + z-score disagree. Adding a second gradient check creates double-penalization. Skip or merge into existing zscore_accel. |
+| 2: Directional Bias | `momentum_cache.momentum_state` ✅ | NO — signal_compactor only reads `regime_4h` from PostgreSQL momentum_cache, not `momentum_state` from SQLite | **REAL GAP** — this is the biggest win. momentum_state encodes strong_long/strong_short/neutral with confidence. Currently unused. |
+| 3: Circuit Breaker | Existing thresholds ✅ | Already fires — WINDOW=5, TIME_WINDOW=15, LOSS_THRESHOLD=3 | **TOO AGGRESSIVE** — see risk analysis below. |
+| 4: Alt-BTC Divergence | `token_speeds.price_change_30m` ✅ | NO — not compared across tokens | **REAL GAP** — simple, low risk, high value. |
 
-**Issue:** Trades ↔ signals linkage was broken due to:
-1. `signal_created_at` field NULL in all 448 trades
-2. Signal naming convention mismatch (dashes vs underscores)
-
-**Fix Applied:**
-1. Created `data_migration_sync.py` — migration script
-2. Normalized all 448 trade signal names (bb-bounce-v2-long+ → bb_bounce_v2_long)
-3. Populated `signal_created_at` for all 448 trades by matching to signals table
-
-**Verification:** All 448 trades now have:
-- `signal_created_at` populated (100% coverage)
-- Normalized signal types matching signals.signal_type format
-- Proper linkage to originating signals
-
-**Note:** Previous analysis claimed 97.3% data corruption. This was WRONG — the actual issue was naming convention mismatch (32.7% unmatched). After normalization, 67.2% of trades match signals within 24h window.
+**Key finding the plan missed:** `get_zscore_accel_penalty()` at `signal_compactor.py:823-858` already queries `token_speeds.price_acceleration` and applies a penalty when z-score and acceleration diverge. The plan's Layer 1 gradient check would double-penalize the same condition. Either merge into zscore_accel (adjust its thresholds) or skip Layer 1 entirely.
 
 ---
 
-## CEO Report — 2026-09-09 ~02:50 UTC
+### Risk Analysis
 
-### Critical Bug Fix: Signal Type Data Integrity
+**Layer 3 threshold tightening — HIGH RISK:**
 
-**Issue:** The `signal` field in PostgreSQL trades table was set to `source` (merged tags like `pump-chain+,support_resistance+`) instead of actual `signal_type` (e.g., `support_resistance`, `ema300_dip`). This inflated pump-chain stats and corrupted all signal performance analysis.
+| Change | Current | Proposed | Risk |
+|--------|---------|----------|------|
+| WINDOW 5→3 | 5 trades | 3 trades | With 2-3 trades/hr, a 3-trade window = ~1 hour. A normal losing streak (3 losses in 1 hour) would trigger directional lock. False positive rate spikes. |
+| LOSS_THRESHOLD 3→2 | 3 losses | 2 losses | 2 losses in 3 trades = normal variance. This fires on noise. |
+| TIME_WINDOW 15→30 | 15 min | 30 min | Widening the catch window is reasonable, but combined with lower LOSS_THRESHOLD = fires on almost any 2 losses within 30 min. |
 
-**Root Cause:** `decider_run.py` passed `source` to `brain.py` as `--signal` parameter instead of the actual `signal_type` from the signals table.
+**The current system already has:**
+- Velocity tiers (0.6 = hard block, 0.4 = 0.5x penalty)
+- Integral window (240 min, 5 losses)
+- Direction lock (10 min, 0.6 velocity)
 
-**Impact:** All pump-chain win rate calculations were wrong — trades from other signals were being counted as pump-chain.
+These tiers already catch the AIXBT pattern (3 losses spread over hours) via the integral window. The problem wasn't that the system didn't fire — it was that the penalty (0.7x) still let signals through. **Better fix: increase DIRECTIONAL_OUTCOME_PENALTY from 0.7 to 0.5, or lower LOCK_VELOCITY from 0.6 to 0.5.**
 
-**Fix Applied:**
-1. `signal_compactor.py`: Added `signal_type` field to `hotset_output` (line 3039)
-2. `decider_run.py`: Added `signal_type` parameter to `execute_trade()` function
-3. `decider_run.py`: Passes `sig.get('signal_type', '')` to `execute_trade()`
+**Layer 1 gradient — MEDIUM RISK:**
+- Already partially handled by `get_zscore_accel_penalty()` (line 823)
+- Adding a second acceleration check creates interaction effects
+- Risk of false positives during brief pullbacks in uptrends
 
-**Verification:** Bug-hunter verified all 3 parts. Data flow confirmed end-to-end.
+**Layer 2 directional bias — LOW RISK:**
+- Reads existing data, applies multiplier
+- Momentum_state is already computed by regime scanner
+- Worst case: mild score reduction on counter-trend signals
 
-**Note:** Existing trades in database still have wrong signal_type. Historical stats are corrupted until data migration is performed.
-
----
-
-## CEO Report — 2026-09-08 ~22:30 UTC
-
-### Diagnosis
-24h: 70T, 45.7% WR, -$2.51 (WORST DAY in 7d). 48h: 128T, 53.1% WR, -$2.22. 7d: 387T, 56.1% WR, -$4.88. **R:R COLLAPSE:** cut-loser-CL-T1 exits avg -4.84%, wins avg 2.51% → R:R 0.513. Breakeven WR 66.6%, actual 45.7%. Sep 8 daily R:R 0.513 vs Sep 5-7 avg 0.682 — 25% degradation.
-
-### Root Cause
-ATR_SL_MIN widened from 1.2% to 1.5% on Sep 4. Trades bleed to -4.84% avg before exit. Losses 1.95x wins. The wider SL was supposed to "avoid premature exits" but instead lets trades deteriorate past recovery.
-
-### Fix Applied
-Reverted ATR_SL_MIN 1.5%→1.2%, ATR_SL_MAX 1.8%→1.5%. All 6 fallbacks updated (SL_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN, TP_PCT_FALLBACK 4.5%→3.6%, init values). Expected: avg loss drops from -4.84% to ~-2%, R:R from 0.51 to 0.70+.
-
-### Verification
-Pipeline restarted with new settings. Monitor next 24h for R:R improvement. Target: 24h R:R >0.65, daily PnL positive.
+**Layer 4 alt-BTC divergence — LOW RISK:**
+- Per-token, simple threshold
+- Only fires when alt diverges significantly from BTC
+- Existing data, no new failure modes
 
 ---
 
-## CEO Report — 2026-09-08 ~19:00 UTC
+### Recommended Changes
 
-### Diagnosis
-24h: 72T, 50.0% WR, -$1.21. 48h: 130T, 57.7% WR, -$1.32. 7d: 388T, 57.0% WR, -$4.24. Sep 8: 60T, 48.3% WR, -$1.86 (worst day in 7d). **Legacy signal bleed is dominant:** ema300-dip-short 16T/43.8% WR -$0.96 (killed 16:10 UTC), sma20-dip+ 19T/42.1% WR -$0.73 (killed 12:10 UTC). bb-bounce-v2-long+ variance: 9T/44.4% WR -$0.57 today, 7d 74.6% WR +$2.19. open-skies+ only healthy: 2T/24h 100% WR +$1.42, R:R 1.303.
+**Layer 1 (Gradient): SKIP.** Merge any needed adjustments into `ZSCORE_ACCEL_*` constants instead. The existing `get_zscore_accel_penalty()` already does this job. Adding a second gradient system is over-engineering.
 
-### Root Cause
-1. **Legacy signal bleed** — ema300-dip-short (-$0.96) and sma20-dip+ (-$0.73) account for 93% of today's losses. Both killed, aging out of 24h window.
-2. **bb-bounce-v2-long+ variance** — 9T/44.4% WR -$0.57 today but 7d 74.6% WR +$2.19 is strong. Normal fluctuation.
-3. **R:R structural** — 24h R:R 0.681 (breakeven WR 59.5%, actual 50%). avg_win $0.097 vs avg_loss $0.142. PM_TRAIL at 0.20% distance capping winners.
+**Layer 2 (Directional Bias): IMPLEMENT AS-IS.** This is the real gap. Read `momentum_state` from SQLite `momentum_cache`, apply boost/penalty. ~20 lines.
 
-### Fix Applied
-1. **ema300-dip-short KILLED** by auto_1hr at 16:10 UTC — 0%WR last hour, 43.8% all-time. Was CEO-protected until Sep 9 but auto-kill triggered.
-2. **sma20-dip+ KILLED** by auto_1hr at 12:10 UTC — 0%WR last hour, 42.1% all-time.
-3. **No param changes** — legacy aging out naturally, active signals profitable on 7d.
+**Layer 3 (Circuit Breaker): DO NOT change thresholds yet.** Instead:
+- Increase `DIRECTIONAL_OUTCOME_PENALTY` from 0.7 to 0.5 (stronger penalty when it fires)
+- Lower `DIRECTIONAL_OUTCOME_LOCK_VELOCITY` from 0.6 to 0.5 (lock triggers at 2.5/5 losses instead of 3/5)
+- These are single-number changes, no structural risk
 
-### Verification
-Pipeline healthy. 5 open flat ($0 unrealized). Disk 82%. Legacy signals killed, 24h losses aging out by tomorrow. System structurally sound — all 4 active signals profitable on 7d (bb-bounce +$2.19, open-skies +$1.55, pump-chain +$0.60, continuation +$0.05). Today's -$1.86 is 100% legacy bleed + variance.
+**Layer 4 (Alt-BTC Divergence): IMPLEMENT AS-IS.** ~10 lines, low risk.
 
-### Target
-48h positive by Sep 9 as legacy fully ages out. 7d turns positive within 2-3 days as legacy ages out completely.
+**Revised implementation:**
+1. Layer 3: Change 2 constants (5 min work)
+2. Layer 2: Add directional bias check (~20 lines)
+3. Layer 4: Add alt-BTC divergence check (~10 lines)
+4. Layer 1: Skip — adjust ZSCORE_ACCEL constants if needed
 
-### Signal R:R Summary (7d)
-| Signal | R:R | Breakeven WR | Actual WR | Status |
-|--------|-----|-------------|-----------|--------|
-| open-skies+ | 1.303 | 43.4% | 64.7% | HEALTHY ★ |
-| bb-bounce-v2-long+ | 0.612 | 62.0% | 74.6% | Profitable but tight |
-| pump-chain+ | 0.370 | 73.0% | 82.1% | Barely profitable |
+Total: ~30 lines of new code + 4 constant changes. Even lazier than the plan.
 
-### Verification
-DB verified at 10:35 UTC. 48h flipped negative from legacy. Today -$0.33 within normal variance for compressed R:R system. No param changes needed — watch 48h window flip back positive as legacy ages out. ema300-dip-short protection expires Sep 9 05:00.
+---
 
-## CEO Report — 2026-09-09 ~19:10 UTC
+### Implementation Priority
 
-### Diagnosis
-24h: 42T, 47.6% WR, -$0.72. 7d: 371T, 57.7% WR, -$3.31. Sep 9: 34T, 55.9% WR, +$0.16. Market SHORT_BIAS (3 SHORT / 0 LONG / 115 NEUTRAL). Orchestrator already handled all major kills (ema300-dip-short, ema300-dip-long, accel-300-v3-long, accel-300-v3-short, pullback-entry+, pump-chain-). System at 57.7% WR vs 58.0% breakeven — $0.02/trade away from profitability.
+1. **Layer 3 constants** — 2 number changes, immediate effect
+2. **Layer 4 alt-BTC divergence** — 10 lines, independent, easy to test
+3. **Layer 2 directional bias** — 20 lines, highest value but needs careful tuning
+4. **Layer 1 gradient** — SKIP (already covered by zscore_accel)
 
-### Root Cause
-R:R still compressed: avg_win 3.24%, avg_loss -4.46%, ratio 0.726. PM_TRAIL (0.40%/0.20%) and ATR_SL (1.2%-1.5%) ranges protected. 7d legacy bleeders (ema300_dip_short -$1.48, sma20_dip -$0.73, ema300_dip -$0.72) aging out of window — will drop off by Sep 10-11.
+---
 
-### Fix Applied
-**No changes needed.** Orchestrator already executed:
-- ema300-dip-short: KILLED (protection expired 05:00 UTC) — NEVER_REENABLE
-- ema300-dip-long: KILLED (protection expired 05:00 UTC) — NEVER_REENABLE
-- accel-300-v3-long: KILLED — NEVER_REENABLE
-- accel-300-v3-short: KILLED — NEVER_REENABLE
-- pullback-entry+: KILLED by auto_1hr (15:10 UTC) — 0%WR
-- pump-chain-: KILLED by signal_reporter (17:12 UTC) — losses 8.8x wins
+### Testing Strategy
 
-Active signals healthy: bb_bounce_v2_long 73T/74.0% WR +$2.08, open_skies 19T/63.2% WR +$1.56, pump_chain 43T/67.4% WR +$1.11, continuation 6T/83.3% WR +$0.05. All 7d profitable.
+**Phase 1 (Day 1-2):** Layer 3 constant changes only. Monitor directional outcome fire rate — should increase from ~5/day to ~8/day. If >12/day, LOCK_VELOCITY is too aggressive.
 
-### Verification
-3 open positions, 0 in active management. Cut-loser fix working (2 exits vs 22 in prior 48h window). 7d PnL should turn positive within 24-48h as legacy drops off. Monitor: pump_chain SHORT residual (6T 7d -$0.63) aging out.
+**Phase 2 (Day 3-5):** Add Layer 4 (alt-BTC divergence). Log what would have been blocked vs what traded. No live effect for 48h.
 
-## CEO Report — 2026-09-09 ~22:30 UTC
+**Phase 3 (Day 6-10):** Add Layer 2 (directional bias). This is the global change — monitor for signal starvation. If total signals drop >20%, reduce DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY from 0.6 to 0.7.
 
-### Diagnosis
+**Phase 4 (Day 11-14):** Evaluate all layers combined. Compare 14d transition zone PnL vs baseline.
 
-24h: 48T, 58.3% WR, +$1.66. 7d: 373T, 58.2% WR, -$1.21. **24h flipped strongly positive** — improved from -$0.72 at 19:10 to +$1.66. R:R 1.23 (healthy). 5 open positions.
+**Backtest first:** Before ANY live changes, run the tightened thresholds against last 30d of trades in the DB. Compute: how many winning trades would have been blocked? If >10% of winning trades blocked, thresholds are too tight.
 
-### Root Cause of Previous Negative
+---
 
-Legacy signal bleed (ema300_dip_short -$1.48, sma20_dip -$0.73, ema300_dip -$0.72) aging out. These were killed days ago but still in7d window. They drop off by Sep 10-11.
+### Go/No-Go Decision
 
-### What Changed
+**GO for Layers 2, 3 (conservative), 4. NO-GO for Layer 1.**
 
-- **24h PnL:** -$0.72 → +$1.66 (verified DB). Legacy exiting window.
-- **7d PnL:** -$3.31 → -$1.21 (legacy aging). Should flip positive by Sep 10.
-- **R:R:** 1.23 (avg_win 4.77% / avg_loss 3.88%). Cut-loser fix holding.
-- **Exit breakdown:** atr_sl_hit 30T +$1.28, profit-monster-trail 9T +$0.37, rr_engine_resistance 2T -$0.25.
-- **Active signals all green:** pullback_entry- 11T/72.7% +$1.35, pump_chain 4T/50% +$1.19, bb_bounce_v2_long 1T/100% +$0.09.
+The plan's thesis is correct — this is wiring, not building. But the plan over-optimizes for the Sep 9 transition zone (50 trades, -$1.45) while risking signal starvation in normal conditions. The system currently generates ~2-3 signals/hr. If directional bias + alt-BTC divergence block 30% of signals, we drop to ~1.5-2/hr — back to signal starvation territory.
 
-### Fix Applied
-
-No param changes. System healing as legacy exits.
-
-### Verification
-
-- DB verified: 48T/58.3% WR/+$1.66 (24h), 373T/58.2% WR/-$1.21 (7d)
-- 5 open positions healthy
-- Coin tracker: 112 coins, running every 30min, data fresh
-- Disk: 84% (19G free)
-- All timers running
-
-### Next Actions
-
-1. **Monitor 7d flip.** Legacy (ema300_dip_short, sma20_dip, ema300_dip) drops off by Sep 10-11. 7d PnL should go positive.
-2. **Monitor open-skies.** 2T/24h 0%WR -$0.49 (variance). 7d still 63.2% WR +$1.56. Kill if WR <45% at 10T/48h.
-3. **bb_bounce_v2_long dominance.** 68T/7d = 18% of all trades. Single point of failure. Delegate: build 2nd LONG signal.
-4. **SHORT_BIAS market.** 3 SHORT / 0 LONG / 115 NEUTRAL. pullback_entry- performing well SHORT-side.
+**Conservative approach:** Tighten 2 constants (Layer 3), add 2 small checks (Layers 2+4), skip Layer 1 (redundant). Total: 30 lines, 4 constants, 2 files. Even lazier than the plan, and safer.
