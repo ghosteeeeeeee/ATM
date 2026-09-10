@@ -2656,6 +2656,49 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             continue
                             except Exception:
                                 pass  # non-fatal — let signal through on DB error
+                        # ── CHOP FILTER for preserved entries ────────────────────────────────
+                        # FIX (2026-09-10): Preserved entries bypass CHOP filter, allowing
+                        # momentum signals to fire in choppy markets (GRASS loss #15202).
+                        if CHOP_DETECTOR_ENABLED:
+                            try:
+                                from chop_detector import get_regime as _chop_get_regime, should_trade_signal as _chop_should_trade
+                                _chop_regime_p = _chop_get_regime()
+                                _chop_allowed_p, _chop_reason_p = _chop_should_trade(pe_src, _chop_regime_p, token=pe['token'])
+                                if not _chop_allowed_p:
+                                    log(f"  🌊 [PRESERVE-CHOP-BLOCK] {pe['token']}:{pe['direction']} preserved entry blocked — {_chop_reason_p}")
+                                    continue
+                            except Exception:
+                                pass  # non-fatal
+                        # ── DIRECTION-LOCK for preserved entries ──────────────────────────────
+                        # FIX (2026-09-10): Preserved entries bypass DIRECTION-LOCK, allowing
+                        # trades in locked directions (GRASS loss #15202).
+                        if _is_direction_locked(pe.get('direction', '')):
+                            log(f"  🔒 [PRESERVE-LOCK-BLOCK] {pe['token']}:{pe['direction']} preserved entry blocked — direction locked")
+                            continue
+                        # ── PUMP-CHAIN VELOCITY FILTER for preserved entries ──────────────────
+                        # FIX (2026-09-10): Preserved entries bypass pump-chain velocity filters.
+                        pe_direction = pe.get('direction', '').upper()
+                        if 'pump-chain' in pe_src:
+                            try:
+                                _pv_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                                _pv_cur = _pv_conn.cursor()
+                                _pv_cur.execute("""
+                                    SELECT close FROM candles_5m
+                                    WHERE token = ? AND is_closed = 1
+                                    ORDER BY ts DESC LIMIT 6
+                                """, (pe['token'].upper(),))
+                                _pv_closes = [r[0] for r in _pv_cur.fetchall()]
+                                _pv_conn.close()
+                                if len(_pv_closes) >= 6 and _pv_closes[-1] > 0:
+                                    _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
+                                    if pe_direction == 'LONG' and _pv_vel_30m < 0:
+                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} LONG preserved — 30m vel={_pv_vel_30m:+.3f}% (token declining)")
+                                        continue
+                                    if pe_direction == 'SHORT' and _pv_vel_30m > 0:
+                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} SHORT preserved — 30m vel={_pv_vel_30m:+.3f}% (token rising)")
+                                        continue
+                            except Exception:
+                                pass  # non-fatal
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
                         _preserved_won = False
                         if existing is None:
