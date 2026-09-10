@@ -36,7 +36,7 @@ REGIME_SIGNALS = {
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
         'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
-        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # V2 strong trend momentum SHORT
+        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # V2/V3 strong trend momentum SHORT
         'accel-300-v3-long+',  # V3 pullback LONG — works in all regimes (trend-based, not vol-based)
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
@@ -74,7 +74,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
-        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # V2 strong trend momentum SHORT
+        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-', 'accel-300-v4-short-',  # V2/V4 strong trend momentum SHORT
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-short',  # R² downtrend SHORT detector — works in all regimes
@@ -119,7 +119,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
-        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # V2 strong trend momentum SHORT
+        'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-', 'accel-300-v4-short-',  # V2/V4 strong trend momentum SHORT
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
@@ -174,7 +174,7 @@ REGIME_SIGNALS = {
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
-        'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-',  # trend momentum
+        'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-', 'accel-300-v4-short-',  # trend momentum
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic

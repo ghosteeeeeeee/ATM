@@ -1121,6 +1121,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # accel-300-v4-short (proven momentum SHORT + regime filter)
+            if _comp in ('accel-300-v4-short+', 'accel-300-v4-short-'):
+                try:
+                    from hermes_constants import ACCEL_300_V4_SHORT_ENABLED
+                    if not ACCEL_300_V4_SHORT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V4_SHORT_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'accel-300-v4-short':
+                try:
+                    from hermes_constants import ACCEL_300_V4_SHORT_ENABLED
+                    if not ACCEL_300_V4_SHORT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V4_SHORT_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # breakout-long (volume-confirmed breakout LONG)
             if _comp == 'breakout-long+':
                 try:
@@ -2392,6 +2409,7 @@ def is_component_disabled(component: str) -> bool:
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
             ACCEL_300_V3_SHORT_ENABLED,
+            ACCEL_300_V4_SHORT_ENABLED,
             BREAKOUT_LONG_ENABLED, BREAKOUT_LONG_PLUS_ENABLED, BREAKOUT_LONG_MINUS_ENABLED,
             BB_BOUNCE_V2_SHORT_ENABLED,
             OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
@@ -2657,6 +2675,9 @@ def is_component_disabled(component: str) -> bool:
     # accel-300-v3-short (anti-bottom-catch SHORT)
     if c in ('accel-300-v3-short+', 'accel-300-v3-short-'): return not ACCEL_300_V3_SHORT_ENABLED
     if c == 'accel-300-v3-short': return not ACCEL_300_V3_SHORT_ENABLED
+    # accel-300-v4-short (proven momentum SHORT + regime filter)
+    if c in ('accel-300-v4-short+', 'accel-300-v4-short-'): return not ACCEL_300_V4_SHORT_ENABLED
+    if c == 'accel-300-v4-short': return not ACCEL_300_V4_SHORT_ENABLED
     # breakout-long (volume-confirmed breakout LONG)
     if c == 'breakout-long+': return not BREAKOUT_LONG_PLUS_ENABLED
     if c == 'breakout-long-': return not BREAKOUT_LONG_MINUS_ENABLED

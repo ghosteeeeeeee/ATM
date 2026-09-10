@@ -1164,7 +1164,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
-    'accel-300-v4-short',  # V4 earlier-entry SHORT — manage via ATR SL, not PM Trail
+    'accel-300-v4-short',  # V4 proven momentum SHORT — V2 conditions + FLAT block
     'breakout-long',  # Volume-confirmed breakout LONG — manage via ATR SL, not PM Trail
     'ema300-dip-long',     # EMA300 dip buyer — structural exit
     'ema300-dip-short',    # EMA300 rally seller — structural exit
@@ -1923,39 +1923,32 @@ ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE = 0.5  # max % price can move from signal pric
 ACCEL_300_V3_SHORT_EXEC_RSI_MAX = 50     # max RSI at execution — block SHORT if RSI > 50 (catches 30 losses, 95.7% WR verified)
 ACCEL_300_V3_SHORT_EXEC_Z_MAX = 0        # max z_score at execution — block SHORT if z > 0 in HIGH regime (95.8% WR verified)
 
-# ── accel-300-v4 SHORT params (earlier entry, pre-drop detection) ──────────────
-# v4 fires BEFORE the drop (gap starting to widen) vs v3 fires AFTER (gap already widened).
-# Key change: lower MIN_GAP_ACCEL so signal fires at onset of acceleration, not after.
-ACCEL_300_V4_SHORT_ENABLED      = False   # disabled until backtested
-ACCEL_300_V4_SHORT_MIN_GAP      = 0.8     # min gap below EMA300 (lowered from 1.0 — fire earlier)
-ACCEL_300_V4_SHORT_MAX_GAP      = 6.0     # max gap (same as v3)
-ACCEL_300_V4_SHORT_MIN_GAP_ACCEL = 0.10   # min gap acceleration (LOWERED from 0.20 — fire when gap STARTS widening)
-ACCEL_300_V4_SHORT_GAP_ACCEL_WINDOW = 10  # bars for gap acceleration (same as v3)
-ACCEL_300_V4_SHORT_VELOCITY_WINDOW = 5    # bars for price velocity (same as v3)
-ACCEL_300_V4_SHORT_MIN_VELOCITY = 0.0003  # min velocity as fraction of price (0.03%) — lower than v3 (0.05%) for earlier entry
-ACCEL_300_V4_SHORT_PERSISTENCE_BARS = 3   # min bars below EMA (same as v3)
-ACCEL_300_V4_SHORT_SLOPE_WINDOW = 20      # bars for slope (same as v3)
-ACCEL_300_V4_SHORT_MIN_SLOPE_PCT = 0.0003 # min slope magnitude (lowered from 0.0005)
-ACCEL_300_V4_SHORT_RSI_MAX      = 70      # max RSI (same as v3)
-ACCEL_300_V4_SHORT_RSI_MIN      = 25      # min RSI (same as v3)
-ACCEL_300_V4_SHORT_CHASE_DROP_MAX = 2.0   # max 30m drop % (same as v3)
-ACCEL_300_V4_SHORT_CHASE_RSI_MIN = 30     # RSI must be above this when drop exceeds max (same as v3)
-ACCEL_300_V4_SHORT_VOLUME_LOOKBACK = 30   # bars for average volume (same as v3)
-ACCEL_300_V4_SHORT_VOLUME_MULT = 1.1      # volume must be >= 1.1x average (same as v3)
-ACCEL_300_V4_SHORT_COOLDOWN_BARS = 15     # cooldown between signals (same as v3)
-ACCEL_300_V4_SHORT_LOOKBACK_1M = 700      # 1m prices to fetch (same as v3)
-ACCEL_300_V4_SHORT_FRESH_CROSS_BARS = 10  # max bars since cross (widened from 8 — earlier entry needs wider window)
-ACCEL_300_V4_SHORT_FRESH_CROSS_MIN_GAP = 0.15 # min gap for fresh cross (lowered from 0.20)
-ACCEL_300_V4_SHORT_CONF_BASE    = 60      # base confidence (lower than v3 — earlier = less certain)
-ACCEL_300_V4_SHORT_CONF_FLOOR   = 55      # min confidence (lower than v3)
-ACCEL_300_V4_SHORT_CONF_CAP     = 88      # max confidence (same as v3)
-# v4 NEW filters — earlier detection
-ACCEL_300_V4_SHORT_VOL_SPIKE_WINDOW = 5   # bars to check for volume spike (20%+ increase)
-ACCEL_300_V4_SHORT_VOL_SPIKE_MULT = 1.2   # volume must be >= 1.2x of 5-bar avg (smart money selling)
-ACCEL_300_V4_SHORT_RESISTANCE_WINDOW = 10  # bars to check for EMA300 touch+rejection
-ACCEL_300_V4_SHORT_RESISTANCE_THRESH = 0.10 # max gap % at touch point (price within 0.10% of EMA = "touch")
-ACCEL_300_V4_SHORT_DIVERGENCE_WINDOW = 20  # bars to check for RSI bearish divergence
-ACCEL_300_V4_SHORT_MOMENTUM_SHIFT_WINDOW = 10 # bars to check for momentum shift (rising→falling)
+# ── accel-300-v4 SHORT params (proven momentum + regime filter) ───────────────
+# v4 = V2 proven conditions (56% WR, +$0.60) + FLAT regime block + confidence trap block
+# V2 was the best SHORT variant. V4 keeps what works and blocks what doesn't.
+# FLAT regime: 17% WR → block. Confidence 90-94: 33% WR → block.
+ACCEL_300_V4_SHORT_ENABLED      = True    # enabled — proven V2 conditions + regime filter
+ACCEL_300_V4_SHORT_MIN_GAP      = 2.0     # min gap below EMA300 (V2 proven: no loser had gap>2.0%)
+ACCEL_300_V4_SHORT_MAX_GAP      = 6.0     # max gap (V2 proven)
+ACCEL_300_V4_SHORT_MIN_GAP_ACCEL = 0.20   # min gap acceleration (V2 proven: 0.10 was too weak)
+ACCEL_300_V4_SHORT_GAP_ACCEL_WINDOW = 10  # bars for gap acceleration (V2 proven)
+ACCEL_300_V4_SHORT_VELOCITY_WINDOW = 5    # bars for price velocity (V2 proven)
+ACCEL_300_V4_SHORT_MIN_VELOCITY = 0.0005  # min velocity as fraction of price (0.05%) — V2 proven
+ACCEL_300_V4_SHORT_PERSISTENCE_BARS = 3   # min bars below EMA (V2 proven)
+ACCEL_300_V4_SHORT_SLOPE_WINDOW = 20      # bars for linear regression slope (V2 proven)
+ACCEL_300_V4_SHORT_MIN_SLOPE_PCT = 0.0005 # min slope % per bar (V2 proven)
+ACCEL_300_V4_SHORT_FRESH_CROSS_BARS = 8   # max bars since cross (V2 proven)
+ACCEL_300_V4_SHORT_FRESH_CROSS_MIN_GAP = 0.20 # min gap for fresh cross (V2 proven)
+ACCEL_300_V4_SHORT_VOLUME_LOOKBACK = 30   # bars for average volume (V2 proven)
+ACCEL_300_V4_SHORT_VOLUME_MULT = 1.0      # volume must be >= average (V2 proven: any volume OK)
+ACCEL_300_V4_SHORT_COOLDOWN_BARS = 15     # cooldown between signals (V2 proven)
+ACCEL_300_V4_SHORT_LOOKBACK_1M = 700      # 1m prices to fetch (V2 proven)
+ACCEL_300_V4_SHORT_CONF_BASE    = 62      # base confidence (V2 proven)
+ACCEL_300_V4_SHORT_CONF_FLOOR   = 60      # min confidence
+ACCEL_300_V4_SHORT_CONF_CAP     = 88      # max confidence (system ceiling)
+# v4 NEW: confidence trap block (90-94 = 33% WR, skip these)
+ACCEL_300_V4_SHORT_CONF_BLOCK_MIN = 90    # block confidence >= this
+ACCEL_300_V4_SHORT_CONF_BLOCK_MAX = 94    # block confidence <= this
 
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
@@ -2117,7 +2110,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
-    'accel-300-v4-short',  # V4 earlier-entry SHORT — fires before drop, pre-drop detection
+    'accel-300-v4-short',  # V4 proven momentum SHORT — V2 conditions + FLAT block, works solo
     'breakout-long',  # Volume-confirmed breakout LONG — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
