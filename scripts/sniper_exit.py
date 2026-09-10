@@ -147,33 +147,33 @@ def get_btc_slope_15m():
     return row['avg_z'] if row else None
 
 
-def volatility_regime_changed():
-    """Check if BTC volatility regime changed in last 4 hours.
-    Uses state file to track previous regime.
-    Returns: True if changed
+def _get_current_volatility_regime():
+    """Read current BTC volatility regime from regime_5m.json.
+    Returns: regime string or None
     """
     try:
-        state = _load_state()
-        prev_regime = state.get('last_volatility_regime')
-
-        # Read current regime from regime_5m.json
         regime_file = '/var/www/hermes/data/regime_5m.json'
         if os.path.exists(regime_file):
             with open(regime_file) as f:
                 data = json.load(f)
-            # Find BTC in the regime data
             for token_data in data.get('tokens', []):
                 if token_data.get('token') == 'BTC':
-                    current_regime = token_data.get('regime', 'NEUTRAL')
-                    if prev_regime and current_regime != prev_regime:
-                        state['last_volatility_regime'] = current_regime
-                        _save_state(state)
-                        return True
-                    state['last_volatility_regime'] = current_regime
-                    _save_state(state)
-                    return False
-    except Exception as e:
-        log.warning(f"volatility_regime_changed error: {e}")
+                    return token_data.get('regime', 'NEUTRAL')
+    except Exception:
+        pass
+    return None
+
+
+def volatility_regime_changed(state):
+    """Check if BTC volatility regime changed. Reads from state dict (not file).
+    Returns: True if changed. Caller must update state['last_volatility_regime'].
+    """
+    prev_regime = state.get('last_volatility_regime')
+    current_regime = _get_current_volatility_regime()
+    if current_regime is None:
+        return False
+    if prev_regime and current_regime != prev_regime:
+        return True
     return False
 
 
@@ -191,10 +191,12 @@ def _load_state():
 
 
 def _save_state(state):
-    """Save sniper state to JSON file."""
+    """Save sniper state to JSON file (atomic write)."""
     try:
-        with open(STATE_FILE, 'w') as f:
+        tmp = STATE_FILE + '.tmp'
+        with open(tmp, 'w') as f:
             json.dump(state, f, indent=2, default=str)
+        os.rename(tmp, STATE_FILE)
     except Exception as e:
         log.warning(f"Failed to save state: {e}")
 
@@ -212,6 +214,28 @@ def _load_trail_state():
 #  MUTUAL EXCLUSION — Closing markers
 # ═══════════════════════════════════════════════════════════════════════════
 
+CLOSING_MARKER_EXPIRY = 300  # 5 minutes — stale markers auto-clear
+
+
+def _clean_stale_markers():
+    """Remove closing markers older than CLOSING_MARKER_EXPIRY seconds.
+    Called at start of sniper_check to clean up after crashes/timeouts.
+    """
+    try:
+        with open(CLOSING_MARKERS_FILE) as f:
+            markers = json.load(f)
+        now = time.time()
+        stale = [k for k, v in markers.items() if now - v > CLOSING_MARKER_EXPIRY]
+        for k in stale:
+            del markers[k]
+            log.info(f"  Cleaned stale closing marker: {k}")
+        if stale:
+            with open(CLOSING_MARKERS_FILE, 'w') as f:
+                json.dump(markers, f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+
 def write_closing_marker(token):
     """Write a marker indicating sniper is closing this token."""
     markers = {}
@@ -220,7 +244,7 @@ def write_closing_marker(token):
             markers = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    markers[token] = time.time()
+    markers[token.upper()] = time.time()
     try:
         with open(CLOSING_MARKERS_FILE, 'w') as f:
             json.dump(markers, f)
@@ -236,7 +260,7 @@ def clear_closing_marker(token):
             markers = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    markers.pop(token, None)
+    markers.pop(token.upper(), None)
     try:
         with open(CLOSING_MARKERS_FILE, 'w') as f:
             json.dump(markers, f)
@@ -247,11 +271,17 @@ def clear_closing_marker(token):
 def is_token_being_closed_by_sniper(token):
     """Check if sniper is currently closing this token.
     Used by profit_monster and cut_loser to avoid double-close.
+    Auto-expires markers older than CLOSING_MARKER_EXPIRY.
     """
     try:
         with open(CLOSING_MARKERS_FILE) as f:
             markers = json.load(f)
-        return token.upper() in {k.upper() for k in markers.keys()}
+        now = time.time()
+        for k, v in list(markers.items()):
+            if now - v > CLOSING_MARKER_EXPIRY:
+                del markers[k]  # auto-expire stale
+        token_upper = token.upper()
+        return token_upper in {k.upper() for k in markers.keys()}
     except (FileNotFoundError, json.JSONDecodeError):
         return False
 
@@ -260,12 +290,13 @@ def is_token_being_closed_by_sniper(token):
 #  SHIFT DETECTION
 # ═══════════════════════════════════════════════════════════════════════════
 
-def detect_shift():
+def detect_shift(state=None):
     """Detect market shift and determine direction.
     Returns: (shift_level, shift_direction) or None
 
     Uses majority voting — not strict agreement. CRITICAL crash = 2 votes.
     All helper functions read from existing SQLite tables.
+    If state is provided, volatility regime tracking uses it (avoids file race).
     """
     signals = 0
     direction_votes = {'BEARISH': 0, 'BULLISH': 0}
@@ -330,8 +361,8 @@ def detect_shift():
     else:
         log.info(f"  momentum_cache stale ({cache_age:.0f}min) — skipping momentum signal")
 
-    # Volatility regime change
-    if volatility_regime_changed():
+    # Volatility regime change (pass state to avoid file race)
+    if volatility_regime_changed(state or {}):
         signals += 1
         slope = get_btc_slope_15m()
         if slope is not None and slope < 0:
@@ -458,6 +489,12 @@ def sniper_close_position(pos, reason, dry_run=False):
         log.info(f"  Guardian closing {token} — skipping")
         return False
 
+    # Check profit_monster trail state (PM may be mid-close)
+    trail_state = _load_trail_state()
+    if str(pos['id']) in trail_state:
+        log.info(f"  {token} in PM_TRAIL state — PM may be closing, skipping")
+        return False
+
     # Check HL
     if not is_position_on_hl(token):
         log.info(f"  {token} not on HL — already closed, skipping")
@@ -524,6 +561,9 @@ def sniper_check(dry_run=False):
 
     state = _load_state()
 
+    # ── Clean stale closing markers (crash recovery) ──
+    _clean_stale_markers()
+
     # ── Cooldown check ──
     cooldown_until = state.get('cooldown_until', 0)
     if time.time() < cooldown_until:
@@ -541,7 +581,11 @@ def sniper_check(dry_run=False):
         return
 
     # ── Detect shift ──
-    result = detect_shift()
+    result = detect_shift(state)
+    # Update volatility regime in state (avoids race condition)
+    current_vol_regime = _get_current_volatility_regime()
+    if current_vol_regime:
+        state['last_volatility_regime'] = current_vol_regime
     if result is None:
         # Reset cycle count if no shift
         if cycle_count > 0:
@@ -588,7 +632,7 @@ def sniper_check(dry_run=False):
 
     tier2 = sorted(
         [p for p in wrong_side
-         if p['pnl_pct'] < -SNIPER_MIN_LOSS_THRESHOLD
+         if p['pnl_pct'] < SNIPER_MIN_LOSS_THRESHOLD  # e.g. < -0.5%
          and p.get('open_time') is not None],
         key=lambda p: p['open_time'],
         reverse=True  # LIFO — most recent first

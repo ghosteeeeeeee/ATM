@@ -3220,6 +3220,18 @@ CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per dir
 CONTINUUM_SCORE_STALENESS_MIN        = 5       # max age of continuum data in minutes
 CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme scores
 
+# ── Continuum Oscillator Signal (continuum_oscillator.py) ─────────────────
+# Thesis: Score oscillates 60-65 (troughs) → 90-100 (peaks) with 30-60 min cadence.
+# Rising score = momentum building = LONG. Falling score = momentum fading = SHORT.
+CONTINUUM_OSC_ENABLED                = True    # master kill-switch
+CONTINUUM_OSC_PLUS_ENABLED           = True    # LONG direction
+CONTINUUM_OSC_MINUS_ENABLED          = True    # SHORT direction
+CONTINUUM_OSC_SCORE_RISING_THRESHOLD = 3.0     # score must rise by this much for LONG
+CONTINUUM_OSC_SCORE_FALLING_THRESHOLD= 3.0     # score must fall by this much for SHORT
+CONTINUUM_OSC_MIN_SCORE              = 75      # minimum score for LONG entry
+CONTINUUM_OSC_MAX_SCORE              = 80      # maximum score for SHORT entry (score below this)
+CONTINUUM_OSC_COOLDOWN_HOURS         = 2       # per-token+direction cooldown
+
 # ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
 # Buy pullback to SMA20 in established uptrends.
 # Reference: INJ LONG 2026-09-07 +40.57% (5x), entry at SMA20
