@@ -1014,3 +1014,150 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - open-skies+ — kill at 3T 0%WR next run
 - pump-chain- 6T -$0.63 — structural drag but has 50% WR, not killable
+
+## [2026-09-10 02:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L, +$0.36)
+**24h:** 48T 60.4%WR +$2.51
+
+**24h Exit Reasons:**
+- atr_sl_hit: 29T avg +$0.076 (profitable systemic)
+- profit-monster-trail: 8T avg +$0.035 (healthy)
+- rr_engine_support_tp: 5T avg +$0.052 (healthy)
+- rr_engine_resistance: 4T avg -$0.060 (structural)
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 15T 73%WR +$1.83 (star)
+- pump_chain LONG: 4T 75%WR +$1.53 (strong)
+- pump-chain- SHORT: 6T 50%WR -$0.63 (worst)
+- open-skies+ LONG: 2T 0%WR -$0.49 (at kill threshold)
+- pullback-entry+ LONG: 4T 25%WR -$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: open-skies+ at 2T 0%WR (threshold 3T) — one more loss triggers kill
+- No signal has 0%WR with 3+ trades in last hour
+- Trade freq 3/hr normal
+- atr_sl_hit 60% but avg +$0.076 — profitable
+- Overall 24h positive (+$2.51)
+
+**Open Questions:**
+- open-skies+ — kill at 3T 0%WR next run
+- pump-chain- 6T -$0.63 — structural drag, has 50% WR but negative PnL
+
+## [2026-09-10 03:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 44T 56.8%WR +$2.37
+
+**24h Exit Reasons:**
+- atr_sl_hit: 27T avg +$0.078 (profitable, 61% of closes)
+- profit-monster-trail: 6T avg +$0.040
+- rr_engine_support_tp: 5T avg +$0.052
+- rr_engine_resistance: 4T avg -$0.060 (structural)
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 15T 73%WR +$1.83 (star)
+- pump_chain LONG: 1T 100%WR +$1.57 (strong)
+- open-skies+ LONG: 2T 0%WR -$0.49 (at kill threshold)
+- pump-chain- SHORT: 6T 50%WR -$0.63 (structural drag)
+- pullback-entry+ LONG: 4T 25%WR -$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: open-skies+ at 2T 0%WR (threshold 3T) — one more loss triggers kill
+- No signal has 0%WR with 3+ trades in last hour
+- Trade freq 0/hr (quiet hours ~03:00 UTC)
+- 2 open positions at breakeven
+- atr_sl_hit 61% but avg +$0.078 — profitable systemic
+- Overall 24h positive (+$2.37)
+
+**Open Questions:**
+- open-skies+ — kill at 3T 0%WR next run
+- pump-chain- 6T -$0.63 — structural drag, 50% WR but negative PnL
+
+## [2026-09-10 05:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L, net -$0.02)
+- MERL SHORT mover- → profit-monster-trail +$0.02
+- CHIP SHORT pullback-entry- → rr_engine_resistance -$0.04
+
+**24h:** 45T 57.8%WR +$2.49
+
+**24h Exit Reasons:**
+- atr_sl_hit: 26T avg +$0.087 (profitable, 58% of closes)
+- profit-monster-trail: 7T avg +$0.037
+- rr_engine_resistance: 5T avg -$0.056 (structural)
+- rr_engine_support_tp: 5T avg +$0.052
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 16T 69%WR +$1.79 (star)
+- pump_chain LONG: 1T 100%WR +$1.57 (strong)
+- mover- SHORT: 4T 75%WR +$0.07
+- ema300-dip-short SHORT: 1T 100%WR +$0.42
+- open-skies+ LONG: 2T 0%WR -$0.49 (watch)
+- pullback-entry+ LONG: 4T 25%WR -$0.34
+- pump-chain- SHORT: 6T 50%WR -$0.63 (structural drag)
+- ema300-dip-long LONG: 3T 33%WR -$0.15
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: open-skies+ at 2T 0%WR (threshold 3T) — one more loss triggers kill
+- No signal has 0%WR with 3+ trades in last hour
+- Trade freq 2/hr normal
+- 5 open positions all reasonable
+- atr_sl_hit 58% but avg +$0.087 — profitable systemic
+- Overall 24h positive (+$2.49)
+
+**Open Questions:**
+- open-skies+ — kill at 3T 0%WR next run
+- pump-chain- 6T -$0.63 — structural drag, 50% WR but negative PnL
+
+## FAVORITES Update — 2026-09-10 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE DOGE (WR=50.0%, PnL=$-0.23, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE WLD (WR=60.0%, AvgPnL=5.02%, Trades=5)
+- PROMOTE ADA (WR=60.0%, AvgPnL=2.73%, Trades=5)
+- PROMOTE CC (WR=80.0%, AvgPnL=0.95%, Trades=5)
+
+Final set: ['ACE', 'ADA', 'AIXBT', 'BLUR', 'CC', 'CFX', 'COMP', 'DOT', 'DYDX', 'ENA', 'FOGO', 'IMX', 'INJ', 'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'WLD', 'ZRO']
+
+## LOSERS Update — 2026-09-10 06:05 UTC
+- REMOVE STX (insufficient data)
+- REMOVE APT (WR=50.0%, PnL=$-0.31, recovered)
+- REMOVE BCH (insufficient data)
+- ADD GMT (WR=44.4%, PnL=$-0.77, negative_pnl ($-0.77))
+- ADD CAKE (WR=42.9%, PnL=$-0.26, low_wr (42.9%))
+
+Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
+
+## [2026-09-10 07:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+**PnL:** +$0.46 (50% WR)
+
+**Breakdown:**
+- KAS pump-chain+ LONG: +$0.59 (rr_engine_support_br)
+- ETH pullback-entry- SHORT: -$0.13 (rr_engine_resistance)
+
+**24h Context:** 47T 57.4%WR +$2.95 — healthy
+
+**Kill Criteria Check:**
+- open-skies+ LONG: 2T 0%WR -$0.49 — at threshold (3T), one more loss triggers kill
+- pump-chain- SHORT: 6T 50%WR -$0.63 — structural drag but 50%WR, doesn't meet 0%WR kill
+- No signal has 0%WR with 3+ trades in last hour
+
+**No Change Needed:**
+- Kill criteria not met (open-skies+ at 2T, needs 3T)
+- atr_sl_hit 55% but avg +$0.087 (profitable)
+- Trade freq 2/hr normal
+- 0 open positions
+- SHORTs crushing (66%WR) vs LONGs (40%WR) — NEUTRAL regime pattern
+
+**Open Questions:**
+- open-skies+ teetering at 2T 0%WR — will kill at next loss
+- pump-chain- biggest 24h loser (-$0.63) but 50%WR doesn't trigger kill — monitor
+- SHORTs outperforming LONGs significantly in NEUTRAL regime

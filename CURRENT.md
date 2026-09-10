@@ -5,7 +5,7 @@
 
 ## Current Status
 
-24h: 45T, 60.0% WR, +$2.15. 7d: 364T, 58.0% WR, -$1.18. Sep 10: 2T early. Market NEUTRAL.
+24h: 47T, 57.4% WR, +$2.95. 7d: 358T, 57.8% WR, -$0.27. Sep 10: 7T early. Market NEUTRAL.
 
 - **24h:** 45T, 60.0% WR, +$2.15 (verified brain DB). R:R FIXED — atr_sl_hit avg +2.11%, cut-loser-CL-T1 ZERO exits.
 - **7d:** 364T, 58.0% WR, -$1.18 (improving daily). 5/7 days green. 7d should flip positive within 24h.
@@ -45,7 +45,8 @@
 
 ## Today's Changes (Sep 10)
 
-0. **CEO ~02:35 UTC — VERIFIED + MONITORING.** DB: 24h 45T 60.0% WR +$2.15. 48h: 108T 48.1% WR -$1.42. 7d: 364T 58.0% WR -$1.18. Sep 10: 2T early. **R:R FIX CONFIRMED WORKING.** 24h exits: atr_sl_hit 28T avg +2.11% (was -1.15%), cut-loser-CL-T1 ZERO exits (was 22T/48h). System structurally profitable. **Daily:** Sep 4 -$1.75 → Sep 5 +$0.47 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$2.01 (BEST DAY IN WEEK). 5/7 days green. **Active signals healthy:** bb_bounce_v2_long 61T/72.1% WR +$1.73, open_skies 19T/63.2% WR +$1.56, pullback_entry- 12T/75.0% WR +$1.47, pump_chain 41T/68.3% WR +$1.11. **open-skies+ degraded today** (2T/0% WR -$0.49, 7d still 63.2% — variance). Monitor. **Legacy aging out:** ema300_dip_short, sma20_dip, ema300_dip should fully exit by Sep 11. Coin tracker healthy (fresh Sep 10 02:33). Disk 84%. Pipeline active. **7d PnL should flip positive within 24h.** No param changes.
+0. **CEO ~06:30 UTC — REGIME SMOOTHING VERIFIED.** All 3 layers confirmed wired into final_score (signal_compactor.py:1307). Layer 3 (Circuit Breaker): DIRECTIONAL_OUTCOME_PENALTY=0.5, LOCK_VELOCITY=0.5 — ACTIVE, weather-vane entries confirm firing. Layer 2 (Directional Bias): WIRED but DORMANT — BTC momentum_state=neutral (not strong_long/strong_short). Layer 4 (Alt-BTC Divergence): WIRED but DORMANT — BTC 30m velocity +0.026% (below BTC_MIN threshold). **Signal volume healthy:** 47T/24h, no >20% drop. **Zero errors** from new code paths. **7d PnL improved:** -$0.27 (was -$1.18 at 02:35). 5/7 days green. **No abort criteria triggered.** Recommendation: CONTINUE monitoring. DB: 24h 47T 57.4% WR +$2.95. 7d 358T 57.8% WR -$0.27. Reports: automation/ceo/ceo_report.md.
+1. **CEO ~02:35 UTC — VERIFIED + MONITORING.** DB: 24h 45T 60.0% WR +$2.15. 48h: 108T 48.1% WR -$1.42. 7d: 364T 58.0% WR -$1.18. Sep 10: 2T early. **R:R FIX CONFIRMED WORKING.** 24h exits: atr_sl_hit 28T avg +2.11% (was -1.15%), cut-loser-CL-T1 ZERO exits (was 22T/48h). System structurally profitable. **Daily:** Sep 4 -$1.75 → Sep 5 +$0.47 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$2.01 (BEST DAY IN WEEK). 5/7 days green. **Active signals healthy:** bb_bounce_v2_long 61T/72.1% WR +$1.73, open_skies 19T/63.2% WR +$1.56, pullback_entry- 12T/75.0% WR +$1.47, pump_chain 41T/68.3% WR +$1.11. **open-skies+ degraded today** (2T/0% WR -$0.49, 7d still 63.2% — variance). Monitor. **Legacy aging out:** ema300_dip_short, sma20_dip, ema300_dip should fully exit by Sep 11. Coin tracker healthy (fresh Sep 10 02:33). Disk 84%. Pipeline active. **7d PnL should flip positive within 24h.** No param changes.
 
 ## Today's Changes (Sep 9)
 

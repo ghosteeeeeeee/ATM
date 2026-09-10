@@ -1281,3 +1281,19 @@
   WHY: 0T last hour. 46T/24h 57%WR +$2.00. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). atr_sl_hit 63% avg +$0.059 (profitable). Trade freq 0/hr (quiet hours). 5 open shorts all reasonable. 3d trend: Sep 8 -$2.74 → Sep 9 +$2.01.
   BY: auto_1hr
   NEXT: Re-run at 02:10 UTC
+[2026-09-10 02:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.36). 48T/24h 60.4%WR +$2.51. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). atr_sl_hit 60% but avg +$0.076 (profitable). Trade freq 3/hr normal. 5 open shorts. 3d trend improving: Sep 8 -$2.74 → Sep 9 +$2.01.
+  BY: auto_1hr
+  NEXT: Re-run at 03:10 UTC
+[2026-09-10 03:10 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 44T/24h 56.8%WR +$2.37. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). atr_sl_hit 61% avg +$0.078 (profitable). Trade freq 0/hr (quiet hours). 2 open positions at breakeven. 3d trend: Sep 8 -$2.74 → Sep 9 +$2.01.
+  BY: auto_1hr
+  NEXT: Re-run at 04:10 UTC
+[2026-09-10 05:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.02). 45T/24h 57.8%WR +$2.49. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). atr_sl_hit 58% avg +$0.087 (profitable). Trade freq 2/hr normal. 5 open positions reasonable. 3d trend positive.
+  BY: auto_1hr
+  NEXT: Re-run at 06:10 UTC
+[2026-09-10 07:00 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.46). 47T/24h 57.4%WR +$2.95. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). pump-chain- 6T 50%WR -$0.63 (50%WR doesn't trigger kill). atr_sl_hit 55% avg +$0.087 (profitable). Trade freq 2/hr normal. 0 open positions. SHORTs outperforming LONGs (66% vs 40% WR). NEUTRAL regime pattern.
+  BY: auto_1hr
+  NEXT: Re-run at 08:10 UTC
