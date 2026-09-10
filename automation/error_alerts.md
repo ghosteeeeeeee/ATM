@@ -216,3 +216,15 @@
 - **[INFO]** 5m and 1m candle timers disabled — candle collection via price_collector.py (running, PID 861175) and pipeline execution. Not a bug.
 - **[INFO]** Regime: unknown (regime_5m.json missing or empty)
 - **AUTO-FIX**: None needed — no critical issues
+
+## Error Alerts — 2026-09-10 00:25 UTC
+- **WARN** (2x): `signal_compactor: timed out` at 00:19 and 00:22
+- **AUTO-FIX**: None needed — pipeline continued running, compactor recovered on retry
+- **WARN**: Signal compactor timeouts may cause brief delays in hotset updates
+- **INFO**: Disk at 84% (19G free) — approaching threshold, monitor
+- **INFO**: 5/5 positions full, 0 signals above 50% confidence — system correctly holding
+
+## Error Alerts — 2026-09-10 01:24 UTC
+- **WARN** (5x): `signal_compactor: timed out` — transient, self-recovered
+- **WARN**: Disk at 84% (93G/118G) — approaching threshold
+- **INFO**: Market fully NEUTRAL (102/103 tokens), low activity expected

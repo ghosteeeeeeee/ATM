@@ -1,3 +1,23 @@
+## CEO Report — 2026-09-10 ~02:35 UTC
+
+### Diagnosis
+R:R fix confirmed working. 24h: 45T, 60.0% WR, +$2.15 (best day in week). 7d: 364T, 58.0% WR, -$1.18. System structurally profitable after ATR_SL revert.
+
+### Root Cause
+ATR_SL reverted from 1.5%/1.8% to 1.2%/1.5% on Sep 8. cut-loser threshold fix (leveraged pnl comparison) verified. Combined effect: atr_sl_hit avg flipped from -1.15% to +2.11%, cut-loser-CL-T1 eliminated (0 exits in 24h).
+
+### Fix Applied
+No new changes. Monitoring only. System healthy.
+
+### Verification
+- 24h exits: atr_sl_hit 28T avg +2.11%, profit-monster-trail 8T avg +1.56%, cut-loser-CL-T1 0 exits
+- Daily: Sep 5 +$0.47, Sep 6 +$0.40, Sep 7 +$0.01, Sep 9 +$2.01 (5/7 green)
+- 7d legacy (ema300 -$1.48, sma20 -$0.73, ema300_dip -$0.72) aging out, should flip 7d positive by Sep 11
+- open-skies degraded today (2T/0% WR) but 7d 63.2% — variance, monitor
+- Coin tracker healthy (fresh Sep 10 02:33, 96 coins). Disk 84%.
+
+---
+
 ## CEO Report — 2026-09-09 ~03:00 UTC
 
 ### Data Migration Completed

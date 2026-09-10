@@ -958,3 +958,59 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 **Open Questions:**
 - pump-chain- -$0.63/24h but 50%WR — structural drag
 - open-skies+ if drops to 3+T 0%WR → kill
+
+## TEAM UPDATES
+- [2026-09-09 23:08] signal_reporter: No kills — no signal meets strict kill criteria. 47 trades/24h, +$1.98 PnL. Top: pullback-entry- SHORT 72.7%WR/+$1.35, pump_chain LONG 60%WR/+$1.38. Watch: pump-chain- SHORT 50%WR/-$0.63 (6 trades, marginal).
+
+## [2026-09-10 00:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L, +$0.12)
+**24h:** 47T 59.6%WR +$2.01
+
+**24h Exit Reasons:**
+- atr_sl_hit: 30T 63.8% avg +$0.057 (profitable systemic)
+- profit-monster-trail: 8T avg +$0.035 (healthy)
+- rr_engine_support_tp: 5T avg +$0.052 (healthy)
+- rr_engine_resistance: 2T avg -$0.125 (structural)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: open-skies+ LONG 2T 0%WR — one more loss triggers kill
+- atr_sl_hit 63.8% but avg +$0.057 — profitable, not crisis
+- Trade freq 1/hr normal
+- 5 open shorts at breakeven
+
+**Open Questions:**
+- open-skies+ LONG — kill at 3T 0%WR next run
+- pullback-entry+ LONG 25%WR — monitor
+
+## [2026-09-10 01:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 46T ~57%WR +$2.00
+**Today:** 0 closed trades
+
+**24h Exit Reasons:**
+- atr_sl_hit: 29T avg +$0.059 (63% of closes, profitable)
+- profit-monster-trail: 8T avg +$0.035 (healthy)
+- rr_engine_support_tp: 5T avg +$0.052 (healthy)
+- rr_engine_resistance: 2T avg -$0.125 (structural)
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 12T 75%WR +$1.47 (star)
+- pump_chain LONG: 3T 67%WR +$1.51 (strong)
+- open-skies+ LONG: 2T 0%WR -$0.49 (borderline kill)
+- pump-chain- SHORT: 6T 50%WR -$0.63 (worst)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: open-skies+ at 2T 0%WR (threshold 3T) — one more loss triggers kill
+- No other signal meets kill criteria
+- Trade freq 0/hr (quiet market hours)
+- 5 open pullback-entry- shorts, all reasonable
+
+**Open Questions:**
+- open-skies+ — kill at 3T 0%WR next run
+- pump-chain- 6T -$0.63 — structural drag but has 50% WR, not killable

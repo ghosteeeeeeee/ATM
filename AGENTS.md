@@ -19,6 +19,19 @@
 
 All file/DB paths are defined in **`scripts/paths.py`** — import with `from paths import *`.
 
+## Trade Databases
+
+Two separate stores for trade data — they are NOT the same:
+
+| Store | Type | Trades | Retention | Schema | Has `volatility_regime`? |
+|-------|------|--------|-----------|--------|--------------------------|
+| **PostgreSQL (brain)** | Primary DB | ~4,851+ | Full history (months) | 90+ columns (regime, signal_metadata, MFE/MAE, trailing, etc.) | ✅ Yes |
+| **trades.json** | Dashboard API | 200 | Rolling window (last 200 closed) | 15 columns (coin, direction, entry, exit, pnl, signal) | ❌ No |
+
+- **PostgreSQL** = source of truth. Query for analytics, backtests, regime analysis. `_signal_metadata` column has full signal context JSON.
+- **trades.json** = `/var/www/hermes/data/trades.json` — served by nginx for the web dashboard. Limited columns, rolling 200 window.
+- When the user asks about trade data, check **PostgreSQL first** — trades.json is missing fields like `volatility_regime`, `signal_metadata`, MFE/MAE.
+
 ## Key Gotchas
 
 - **`ai_decider.py` is DEFUNCT** — replaced by `signal_compactor.py` (deterministic, LLM-free). Do not call, import, or modify ai_decider.py.

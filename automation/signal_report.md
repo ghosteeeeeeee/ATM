@@ -1,40 +1,47 @@
 === Signal Performance Report ===
-Period: Last 6h | 24h
-Generated: 2026-09-09 17:11 UTC
+Period: 2026-09-09 ~23:08 UTC | Window: 6h / 24h
+Total: 14 trades (6h, +$1.55) | 47 trades (24h, +$1.98)
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 50% | -$0.63 | 6 | PUMP_FLOW_MINUS_ENABLED = False — losses 8.8x wins, KAS -$0.42 alone |
+| (none) | — | — | — | — | No candidates meet kill criteria |
 
-ALREADY DISABLED (pre-existing):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry+ | LONG | 25% | -$0.34 | 4 | Already False (auto_1hr kill 2026-09-09 15:10 UTC) |
-| pump_flow LONG | LONG | 25% | +$0.73 | 8 | Already False (auto_1hr kill 2026-09-09 03:10 UTC) |
-
-BOOSTED (executed):
-None — no clear winners above 55% WR with 5+ trades in 24h
+BOOST CANDIDATES (watch):
+| Signal | Dir | WR | PnL | Trades | Age | Notes |
+|--------|-----|-----|-----|--------|-----|-------|
+| pullback-entry- | SHORT | 72.7% | +$1.35 | 11 | 13.5h | Strong WR, consistent. Monitor — age < 24h |
+| pump_chain | LONG | 60.0% | +$1.38 | 5 | 25.9h | Good WR, positive PnL. Consider confidence boost |
 
 LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| ema300-dip-long | LONG | 33.3% | -$0.15 | 3 | Protected until 2026-09-09 05:00 UTC — cannot kill |
-| bb_bounce_v2_long | LONG | 50% | -$0.11 | 2 | Watch: only 2 trades, too early |
-| pullback-entry- | SHORT | 100% | +$0.08 | 3 | Winner — keep enabled |
+| Signal | Dir | WR | PnL | Trades | Age | Status |
+|--------|-----|-----|-----|--------|-----|--------|
+| pump-chain- | SHORT | 50.0% | -$0.63 | 6 | 17.5h | Active, marginal — not killable (50% WR) |
+| open-skies+ | LONG | 0.0% | -$0.49 | 2 | 14.1h | Active — too few trades to kill |
+| pullback-entry+ | LONG | 25.0% | -$0.34 | 4 | 17.8h | ALREADY DISABLED (auto_1hr 2026-09-09) |
+| ema300-dip-long | LONG | 33.3% | -$0.15 | 3 | 17.9h | ALREADY DISABLED (orchestrator 2026-09-09) |
+| r2v2-long3 | LONG | 0.0% | -$0.14 | 1 | 7.1h | Active — too few trades to act |
 
 WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 100% | +$0.08 | 3 | Keep |
-| accel-300-v3-short- | SHORT | 50% | +$0.05 | 2 | Protected until 2026-09-09 05:00 UTC |
-| mover | SHORT | 100% | +$0.04 | 2 | N/A — 2 trades only |
-| open_skies | LONG | 50% | +$0.01 | 2 | N/A — 2 trades only |
+| Signal | Dir | WR | PnL | Trades | Age | Status |
+|--------|-----|-----|-----|--------|-----|--------|
+| pullback-entry- | SHORT | 72.7% | +$1.35 | 11 | 13.5h | TOP PERFORMER — monitor for boost |
+| pump_chain | LONG | 60.0% | +$1.38 | 5 | 25.9h | Solid — monitor for boost |
+| ema300-dip-short | SHORT | 100.0% | +$0.42 | 1 | 5.1h | 1 trade only — too early |
+| mover+ | LONG | 100.0% | +$0.12 | 1 | 6.7h | 1 trade only — too early |
+| bb_bounce_v2_long | LONG | 100.0% | +$0.09 | 1 | 26.5h | 1 trade only — too early |
+| pullback-entry+,rs-s45 | LONG | 100.0% | +$0.15 | 1 | 11.5h | Combo variant — 1 trade only |
+| accel-300-v3-short- | SHORT | 50.0% | +$0.05 | 2 | 8.2h | Marginal — 2 trades |
+| mover | SHORT | 100.0% | +$0.04 | 2 | 21.9h | 2 trades — watch |
 
 ISSUES:
-- No signal inversions detected (24h)
-- pump-chain- SHORT killed: 6T/50%WR/-$0.63. Losses 8.8x wins (avg loss -$0.237 vs avg win +$0.027). All ATR_SL exits on losers.
-- pump_chain LONG: 8T/25%WR/+$0.73 — low WR but profitable (big winners outweigh losses). Keep watching.
-- ema300-dip-long under protection until 2026-09-09 05:00 UTC — re-evaluate after protection expires.
-- 6h volume moderate: 4 signal combos with 2+ trades.
-- 24h total: 41 closed trades.
+- No signal inversions detected (all signals match their directions)
+- Close reasons: 29/47 atr_sl_hit (avg +$0.06), 9 profit-monster-trail (avg +$0.04), 5 rr_engine_support_tp (avg +$0.05)
+- 5 open trades (all pullback-entry- SHORT) — active risk exposure
+
+KILL DECISIONS:
+- pump-chain- SHORT: 50% WR with 6 trades does NOT meet kill criteria (need WR < 30%). Keep on watch.
+- open-skies+ LONG: 0% WR but only 2 trades — too few to be statistically significant. Keep on watch.
+- No signals meet ALL kill criteria (WR < 30% + 5+ trades + active > 24h).
+
+NEXT REVIEW: ~6h (2026-09-10 ~05:08 UTC)
