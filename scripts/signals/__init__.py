@@ -353,8 +353,8 @@ SIGNAL_REGISTRY: list[dict] = [
 # ── Registry Accessors ─────────────────────────────────────────────────────────
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
-# pump_flow_signal reads from state file, runs on slow cadence
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'pump_flow_signal'}
+# pump_flow_signal removed — runs every minute to match state file update cadence
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud'}
 
 
 def _resolve_enabled(entry):
