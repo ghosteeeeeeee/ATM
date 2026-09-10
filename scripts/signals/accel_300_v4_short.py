@@ -115,7 +115,7 @@ def _get_1m_prices(token: str, lookback: int = ACCEL_300_V4_SHORT_LOOKBACK_1M) -
             SELECT timestamp, price FROM (
                 SELECT timestamp, price
                 FROM price_history
-                WHERE token = ?
+                WHERE token = ? AND price IS NOT NULL
                 ORDER BY timestamp DESC
                 LIMIT ?
             ) sub

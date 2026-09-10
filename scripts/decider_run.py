@@ -3482,13 +3482,13 @@ def run(dry_run=False):
 
                     # ── Price move check: block stale entries ─────────────────
                     try:
-                        from hermes_constants import ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE  # reuse V3 constant
+                        from hermes_constants import ACCEL_300_V4_SHORT_MAX_ENTRY_MOVE
                         _signal_price = sig.get('price', 0) or 0
                         _current_price = float(fresh_prices[-1]['price']) if fresh_prices else 0
                         if _signal_price > 0 and _current_price > 0:
                             _entry_move_pct = abs(_current_price - _signal_price) / _signal_price * 100
-                            if _entry_move_pct > ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE:
-                                log(f'  🚫 [ACCEL-V4-MOVE] {token} {direction} BLOCKED — price moved {_entry_move_pct:.2f}% from signal (max={ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE}%)')
+                            if _entry_move_pct > ACCEL_300_V4_SHORT_MAX_ENTRY_MOVE:
+                                log(f'  🚫 [ACCEL-V4-MOVE] {token} {direction} BLOCKED — price moved {_entry_move_pct:.2f}% from signal (max={ACCEL_300_V4_SHORT_MAX_ENTRY_MOVE}%)')
                                 if sig_id:
                                     mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                                 skipped += 1

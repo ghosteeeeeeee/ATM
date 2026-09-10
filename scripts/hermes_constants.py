@@ -1965,6 +1965,7 @@ ACCEL_300_V4_SHORT_LOOKBACK_1M = 700      # 1m prices to fetch (V2 proven)
 ACCEL_300_V4_SHORT_CONF_BASE    = 62      # base confidence (V2 proven)
 ACCEL_300_V4_SHORT_CONF_FLOOR   = 60      # min confidence
 ACCEL_300_V4_SHORT_CONF_CAP     = 88      # max confidence (system ceiling)
+ACCEL_300_V4_SHORT_MAX_ENTRY_MOVE = 0.5    # max % price can move from signal before entry — block stale entries
 
 INVERSE_ACCEL_300_V2_ENABLED   = False   # CEO 2026-08-29 — 0 trades in 14d, dead signal. NEVER_REENABLE.
 # ── inv-accel-300-v2 params (tuned via backtest: +73% over 7d) ─────────────
