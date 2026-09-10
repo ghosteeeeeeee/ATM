@@ -58,6 +58,8 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',
         'confluence+', 'confluence-',
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -85,6 +87,8 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',
         'confluence+', 'confluence-',
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -110,6 +114,8 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -123,6 +129,8 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
+        'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
     },
 }
 
