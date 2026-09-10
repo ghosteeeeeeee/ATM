@@ -3243,7 +3243,8 @@ def run(dry_run=False):
         _is_accel_v2_long_5m = 'accel-300-v2-long-5m' in (source or '')
         _is_accel_v3_short = 'accel-300-v3-short' in (source or '')
         _is_accel_v3_long = 'accel-300-v3-long' in (source or '')
-        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short or _is_accel_v3_long:
+        _is_accel_v4_short = 'accel-300-v4-short' in (source or '')
+        if _is_accel_v2 or _is_accel_v2_long or _is_accel_v2_long_5m or _is_accel_v3_short or _is_accel_v3_long or _is_accel_v4_short:
             # ── Maximum staleness check: block signals older than 10 minutes ──
             # Prevents compactor from executing stale combo signals
             _entry_origin = sig.get('entry_origin_ts') or 0
@@ -3438,6 +3439,79 @@ def run(dry_run=False):
                                 continue
                         except Exception as e:
                             log(f'  [WARN] pre15 check failed: {e}', 'WARN')
+                elif _is_accel_v4_short:
+                    # ── V4 SHORT execution-time filters ──────────────────────
+                    # Same as V3: re-validate conditions at execution time
+                    from signals.accel_300_v4_short import detect_accel_300_v4_short, _get_1m_prices
+                    fresh_prices = _get_1m_prices(token)
+                    if not fresh_prices:
+                        log(f'  🚫 [ACCEL-V4-SHORT-STALE] {token} {direction} blocked: no fresh price data')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+
+                    # ── Gap re-validation: must still be >= 2.0% below EMA300 ──
+                    try:
+                        from signals.accel_300_v4_short import _ema_series as _v4_ema, PERIOD as _v4_period
+                        from hermes_constants import ACCEL_300_V4_SHORT_MIN_GAP, ACCEL_300_V4_SHORT_MAX_GAP
+                        _fc = [float(p['price']) for p in fresh_prices]
+                        _ema = _v4_ema(_fc, _v4_period)
+                        if _ema and _ema[-1] and _ema[-1] > 0:
+                            _gap_now = (_fc[-1] - _ema[-1]) / _ema[-1] * 100
+                            if _gap_now >= 0:
+                                log(f'  🚫 [ACCEL-V4-GAP] {token} {direction} BLOCKED — gap_above_ema({_gap_now:+.3f}%)')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                            if abs(_gap_now) < ACCEL_300_V4_SHORT_MIN_GAP:
+                                log(f'  🚫 [ACCEL-V4-GAP] {token} {direction} BLOCKED — gap_too_small({abs(_gap_now):.3f}%<{ACCEL_300_V4_SHORT_MIN_GAP}%)')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                            if abs(_gap_now) > ACCEL_300_V4_SHORT_MAX_GAP:
+                                log(f'  🚫 [ACCEL-V4-GAP] {token} {direction} BLOCKED — gap_too_large({abs(_gap_now):.3f}%>{ACCEL_300_V4_SHORT_MAX_GAP}%)')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                    except Exception as e:
+                        log(f'  [WARN] V4 gap check failed: {e}', 'WARN')
+
+                    # ── Price move check: block stale entries ─────────────────
+                    try:
+                        from hermes_constants import ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE  # reuse V3 constant
+                        _signal_price = sig.get('price', 0) or 0
+                        _current_price = float(fresh_prices[-1]['price']) if fresh_prices else 0
+                        if _signal_price > 0 and _current_price > 0:
+                            _entry_move_pct = abs(_current_price - _signal_price) / _signal_price * 100
+                            if _entry_move_pct > ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE:
+                                log(f'  🚫 [ACCEL-V4-MOVE] {token} {direction} BLOCKED — price moved {_entry_move_pct:.2f}% from signal (max={ACCEL_300_V3_SHORT_MAX_ENTRY_MOVE}%)')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                    except Exception as e:
+                        log(f'  [WARN] V4 price move check failed: {e}', 'WARN')
+
+                    # ── Velocity check: block if price moving UP ─────────────
+                    try:
+                        from hermes_constants import ACCEL_300_V4_SHORT_VELOCITY_WINDOW
+                        _fc = [float(p['price']) for p in fresh_prices]
+                        if len(_fc) > ACCEL_300_V4_SHORT_VELOCITY_WINDOW:
+                            _vel = _fc[-1] - _fc[-1 - ACCEL_300_V4_SHORT_VELOCITY_WINDOW]
+                            if _vel >= 0:
+                                log(f'  🚫 [ACCEL-V4-VEL] {token} {direction} BLOCKED — velocity_positive({_vel:+.6f})')
+                                if sig_id:
+                                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                skipped += 1
+                                continue
+                    except Exception as e:
+                        log(f'  [WARN] V4 velocity check failed: {e}', 'WARN')
+
+                    fresh_result = detect_accel_300_v4_short(token, fresh_prices)
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
                     fresh_prices = _get_1m_prices(token)
@@ -3449,7 +3523,7 @@ def run(dry_run=False):
                         continue
                     fresh_result = detect_accel_300_v2_short(token, fresh_prices)
                 if fresh_result is None or fresh_result.get('direction') != direction:
-                    _stale_tag = 'V3-SHORT' if _is_accel_v3_short else 'V3-LONG' if _is_accel_v3_long else 'V2-SHORT' if _is_accel_v2 else 'V2-LONG' if _is_accel_v2_long else 'V2'
+                    _stale_tag = 'V4-SHORT' if _is_accel_v4_short else 'V3-SHORT' if _is_accel_v3_short else 'V3-LONG' if _is_accel_v3_long else 'V2-SHORT' if _is_accel_v2 else 'V2-LONG' if _is_accel_v2_long else 'V2'
                     log(f'  🚫 [ACCEL-{_stale_tag}-STALE] {token} {direction} blocked: conditions no longer valid at execution time')
                     if sig_id:
                         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
