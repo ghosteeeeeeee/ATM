@@ -2478,10 +2478,25 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     log(f"  [RR-ENGINE] {token} {direction}: {rr_action} — {rr_result.get('reason', '')}")
                     continue  # skip other exit checks
                 elif rr_action == 'TRAIL_SL':
-                    # Update SL in memory
+                    # Update SL in memory AND persist to DB
                     new_sl = rr_result.get('new_sl')
                     if new_sl and new_sl > 0:
                         pos['stop_loss'] = new_sl
+                        # Persist to DB so ATR SL check uses the tighter value
+                        try:
+                            import psycopg2
+                            from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+                            conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
+                                                    user='postgres', password=BRAIN_PASSWORD,
+                                                    connect_timeout=5)
+                            cur = conn.cursor()
+                            cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
+                                        (new_sl, trade_id))
+                            conn.commit()
+                            cur.close()
+                            conn.close()
+                        except Exception as e:
+                            log(f"  [RR-ENGINE] DB persist failed: {e}", "WARN")
                         adjusted_count += 1
                         log(f"  [RR-ENGINE] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
             except Exception as e:
