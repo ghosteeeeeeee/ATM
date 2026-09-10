@@ -1255,12 +1255,12 @@ def _score_signal(token, direction, conf, source, signal_type,
         DIRECTIONAL_BIAS_PRO_TREND_BOOST,
     )
     if DIRECTIONAL_BIAS_ENABLED:
+        _bias_conn = None
         try:
             _bias_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
             _bias_row = _bias_conn.execute(
                 "SELECT momentum_state FROM momentum_cache WHERE token='BTC'"
             ).fetchone()
-            _bias_conn.close()
             if _bias_row and _bias_row[0]:
                 _btc_mom = _bias_row[0]
                 if _btc_mom in ('strong_long', 'strong_short'):
@@ -1279,6 +1279,12 @@ def _score_signal(token, direction, conf, source, signal_type,
                         dir_bias_mult = DIRECTIONAL_BIAS_PRO_TREND_BOOST
         except Exception:
             pass
+        finally:
+            if _bias_conn:
+                try:
+                    _bias_conn.close()
+                except Exception:
+                    pass
 
     # ── Alt-BTC Divergence (Regime Transition Smoothing Layer 4) ────────────
     # Block LONG when alt is falling but BTC is flat/rising (divergent bearish).
@@ -1288,13 +1294,13 @@ def _score_signal(token, direction, conf, source, signal_type,
         ALT_BTC_DIVERGENCE_BTC_MIN, ALT_BTC_DIVERGENCE_LONG_PENALTY,
     )
     if ALT_BTC_DIVERGENCE_ENABLED and direction == 'LONG':
+        _div_conn = None
         try:
             _alt_chg = speed_data.get('price_change_30m', 0.0) or 0.0
             _div_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
             _div_row = _div_conn.execute(
                 "SELECT velocity FROM momentum_cache WHERE token='BTC'"
             ).fetchone()
-            _div_conn.close()
             if _div_row and _div_row[0] is not None:
                 # momentum_cache.velocity for BTC = 30m price change (same as token_speeds.price_change_30m)
                 _btc_chg = _div_row[0]
@@ -1303,6 +1309,12 @@ def _score_signal(token, direction, conf, source, signal_type,
                     log(f"  📉 [ALT-BTC-DIV] {token}: alt30m={_alt_chg:+.3f}% BTC30m={_btc_chg:+.3f}% → {alt_btc_div_mult:.2f}x")
         except Exception:
             pass
+        finally:
+            if _div_conn:
+                try:
+                    _div_conn.close()
+                except Exception:
+                    pass
 
     final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
     return final_score
