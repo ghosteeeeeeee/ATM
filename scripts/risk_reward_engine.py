@@ -1052,33 +1052,9 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         'new_sl': None,
                     }
 
-        # Rule 2: Take profit ONLY at extremely strong levels (15+ touches)
-        # This is a safety valve — most trades exit via structural break, not TP
-        tp_type = 'resistance' if direction == 'LONG' else 'support'
-        for level in sr_map:
-            if level.get('type') == tp_type:
-                level_price = level['price']
-                dist = abs(level_price - current_price) / current_price
-                level_touches = level.get('touches', level.get('strength', 0))
-                
-                touched = dist < 0.001
-                in_profit = False
-                if direction == 'LONG' and current_price > level_price:
-                    in_profit = True
-                elif direction == 'SHORT' and current_price < level_price:
-                    in_profit = True
-                
-                # Only exit at very strong CANDLE levels (15+ touches)
-                # Non-candle levels (book/liquidation) have 'strength' not 'touches'
-                # — skip them to avoid false TP exits
-                is_candle_level = level.get('source') == 'CANDLE'
-                if touched and in_profit and is_candle_level and level_touches >= 15:
-                    return {
-                        'action': 'TAKE_PROFIT',
-                        'price': current_price,
-                        'reason': f'{tp_type}_tp: {level_price:.4f} ({level.get("source", "?")}) touches={level_touches}',
-                        'new_sl': None,
-                    }
+        # Rule 2: REMOVED — TP at support/resistance touch was exiting too early
+        # Price continued in trade direction after exit on every trade tested.
+        # Structural break (Rule 1) + trailing SL (Rule 3) handle all exits.
 
         # Rule 3: Trail SL to structural level
         # LONG → trail to support below (floor rises as price rises)
