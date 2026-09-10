@@ -51,3 +51,12 @@
 ## Error Alerts — 2026-09-10 17:23 UTC
 - **[WARN]** (Nx1): `disk_84pct` — Disk at 84% (93G/118G), approaching 85% threshold
 - **AUTO-FIX**: None needed yet. Will compress logs if hits 85%.
+
+## Health Check — 2026-09-10 20:24 UTC
+- **INFO**: Pipeline running, all services active
+- **INFO**: 74 signals generated in last hour, 4 open trades, 43 closed today (+81.12% PnL)
+- **INFO**: Regime NEUTRAL, 94 coins tracked
+- **AUTO-FIX**: Fixed missing `CONTINUUM_OSC_ENABLED` import in `signal_schema.py:2421` — was causing `[RAW-SIGNALS] write failed` every minute. Restarted pipeline.
+- **MONITOR**: `signal_compactor` non-fatal crash on every cycle (line 3780) — does not block pipeline but needs investigation
+- **MONITOR**: Disk at 83% (93G/118G) — approaching 85% threshold
+- **WARN**: `hermes-5m-candle.service` and `hermes-coding-mcp.service` still broken (missing scripts, known from earlier)
