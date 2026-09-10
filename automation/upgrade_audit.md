@@ -1,6 +1,16 @@
 # Upgrade Audit Trail
 
-**Last updated:** 2026-09-10 06:05 UTC
+**Last updated:** 2026-09-10 18:15 UTC
+
+---
+
+## Plan: 2026-09-09_pump-chain-v2-spec.md
+- **Date scanned:** 2026-09-10 18:00
+- **Core request:** Add token 30m velocity filter + tighten 5m threshold to block pump-chain losers
+- **Difficulty:** Level 1
+- **Value:** HIGH — backtested 57%→80% WR, PnL 0.5→3.36
+- **Status:** IMPLEMENTED
+- **Reason:** Added 3 new filters: (1) 30m velocity > 0% for LONG, (2) 5m threshold tightened -0.2%→-0.5%, (3) SHORT blocked when token 30m vel > 0%. All in pump_flow_signal.py, constants in hermes_constants.py. Dry run verified.
 
 ---
 
