@@ -1020,12 +1020,20 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         # LONG → exit when price breaks BELOW support (structural floor broken)
         # SHORT → exit when price breaks ABOVE resistance (structural ceiling broken)
         # KEY: Hold until the level BREAKS, not just touches it.
+        # Don't exit if resistance is too close to entry (within 0.5%) — that's just noise.
         break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
         break_type = 'support' if direction == 'LONG' else 'resistance'
+        min_break_dist = 0.005  # 0.5% minimum distance from entry for resistance break to fire
         for level in sr_map:
             if level.get('type') == break_type:
                 level_price = level['price']
                 level_touches = level.get('touches', level.get('strength', 0))
+                
+                # For SHORT: don't exit if resistance is too close to entry
+                if direction == 'SHORT' and entry_price is not None:
+                    dist_from_entry = abs(level_price - entry_price) / entry_price
+                    if dist_from_entry < min_break_dist:
+                        continue  # resistance too close — skip this level
                 
                 if direction == 'LONG' and current_price < level_price * (1 - break_buffer):
                     return {
