@@ -223,6 +223,8 @@ def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
         all_levels.append(level)
 
     for level in liq_levels:
+        # Normalize type to lowercase (book levels may be UPPERCASE)
+        level['type'] = level.get('type', '').lower()
         all_levels.append(level)
 
     # Sort by proximity to current price
@@ -1066,8 +1068,11 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 elif direction == 'SHORT' and current_price < level_price:
                     in_profit = True
                 
-                # Only exit at very strong levels (15+ touches)
-                if touched and in_profit and level_touches >= 15:
+                # Only exit at very strong CANDLE levels (15+ touches)
+                # Non-candle levels (book/liquidation) have 'strength' not 'touches'
+                # — skip them to avoid false TP exits
+                is_candle_level = level.get('source') == 'CANDLE'
+                if touched and in_profit and is_candle_level and level_touches >= 15:
                     return {
                         'action': 'TAKE_PROFIT',
                         'price': current_price,
@@ -1082,18 +1087,29 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         if getattr(hc, 'RR_EXIT_TRAIL_ENABLED', True) and current_sl is not None:
             trail_buffer = getattr(hc, 'RR_EXIT_TRAIL_BUFFER', 0.002)
             
-            # For LONG: trail UP to support below price
+            # For LONG: trail UP to support below price (with ATR fallback)
             if direction == 'LONG':
+                best_trail = None
                 for level in sr_map:
                     if level.get('type') == 'support' and level['price'] < current_price:
                         new_sl = level['price'] - (current_price * trail_buffer)
-                        if new_sl > current_sl:
-                            return {
-                                'action': 'TRAIL_SL',
-                                'price': current_price,
-                                'reason': f'trail_to_support: {level["price"]:.4f}',
-                                'new_sl': new_sl,
-                            }
+                        if best_trail is None or new_sl > best_trail:
+                            best_trail = new_sl
+                
+                # ATR fallback trail
+                atr_pct = vol_width.get('atr_pct', 1.0)
+                atr_trail_pct = atr_pct / 100.0 * 0.5
+                atr_new_sl = current_price - (current_price * atr_trail_pct)
+                if atr_new_sl < current_price and (best_trail is None or atr_new_sl > best_trail):
+                    best_trail = atr_new_sl
+                
+                if best_trail and best_trail > current_sl:
+                    return {
+                        'action': 'TRAIL_SL',
+                        'price': current_price,
+                        'reason': f'trail_sl: {best_trail:.4f}',
+                        'new_sl': best_trail,
+                    }
             
             # For SHORT: trail DOWN — pick tightest SL from structural + ATR
             elif direction == 'SHORT':
