@@ -1680,7 +1680,7 @@ EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
 # ema300_dip_short.py — catches shallow rallies in strong downtrends
-EMA300_DIP_SHORT_ENABLED = True       # RE-ENABLED 2026-09-09 — wins in HIGH (57%) and NORMAL (56%). EXTREME blocked via volatility_gate_v2.
+EMA300_DIP_SHORT_ENABLED = False      # DISABLED 2026-09-09 — 24T, 41.7% WR, NO winning regime (HIGH 42%, NORMAL 42%). Kill correct.
 EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
 EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
