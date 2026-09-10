@@ -1940,7 +1940,7 @@ def _check_hard_stops(prices: dict):
         # race conditions with position_manager's own SL checks.
         cur.execute("""
             SELECT id, token, direction, entry_price, stop_loss, target,
-                   leverage, amount_usdt, paper, atr_managed
+                   leverage, amount_usdt, paper, atr_managed, signal
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
             AND stop_loss IS NOT NULL AND stop_loss > 0
@@ -1949,7 +1949,7 @@ def _check_hard_stops(prices: dict):
         cur.close()
         conn.close()
 
-        for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper, atr_managed in rows:
+        for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper, atr_managed, signal in rows:
             token = token.upper()
             cur_price = prices.get(token)
             if cur_price is None:
@@ -1970,10 +1970,10 @@ def _check_hard_stops(prices: dict):
                 if cur_price >= sl * (1 + _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals — let RR engine handle exits
-                signal = str(pos.get('signal', '') or '')
+                signal_str = str(signal or '')
                 from hermes_constants import SIGNAL_EXIT_CONFIG
                 if tp > 0 and cur_price <= tp * (1 - _margin):
-                    if not (signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine'):
+                    if not (signal_str in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal_str] == 'rr_engine'):
                         hit_reason = 'hard_tp'
             elif direction == 'LONG':
                 # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
@@ -1982,8 +1982,9 @@ def _check_hard_stops(prices: dict):
                 if cur_price <= sl * (1 - _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals
+                signal_str = str(signal or '')
                 if tp > 0 and cur_price >= tp * (1 + _margin):
-                    if not (signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine'):
+                    if not (signal_str in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal_str] == 'rr_engine'):
                         hit_reason = 'hard_tp'
 
             if hit_reason:
