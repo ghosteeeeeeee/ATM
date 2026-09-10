@@ -1969,16 +1969,22 @@ def _check_hard_stops(prices: dict):
                 _margin = 0.005 if (atr_managed) else 0.0
                 if cur_price >= sl * (1 + _margin):
                     hit_reason = 'hard_sl'
-                elif tp > 0 and cur_price <= tp * (1 - _margin):
-                    hit_reason = 'hard_tp'
+                # Skip hard_tp for RR engine-managed signals — let RR engine handle exits
+                signal = str(pos.get('signal', '') or '')
+                from hermes_constants import SIGNAL_EXIT_CONFIG
+                if tp > 0 and cur_price <= tp * (1 - _margin):
+                    if not (signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine'):
+                        hit_reason = 'hard_tp'
             elif direction == 'LONG':
                 # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
                 # TP is ABOVE entry. Price rising TO or ABOVE TP = profit target.
                 _margin = 0.005 if (atr_managed) else 0.0
                 if cur_price <= sl * (1 - _margin):
                     hit_reason = 'hard_sl'
-                elif tp > 0 and cur_price >= tp * (1 + _margin):
-                    hit_reason = 'hard_tp'
+                # Skip hard_tp for RR engine-managed signals
+                if tp > 0 and cur_price >= tp * (1 + _margin):
+                    if not (signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine'):
+                        hit_reason = 'hard_tp'
 
             if hit_reason:
                 pnl_pct = 0
