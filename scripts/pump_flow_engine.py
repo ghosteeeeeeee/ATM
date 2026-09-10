@@ -269,6 +269,26 @@ def detect_phase():
     BTC_DUMP_THRESHOLD = -0.3   # < -0.3% in 15m = significant
     BTC_CHOP_THRESHOLD = 0.1    # |v| < 0.1% = choppy
     
+    # Hysteresis: require phase to be stable for multiple cycles before switching
+    # This prevents oscillation when BTC velocity fluctuates around thresholds
+    PHASE_STABILITY_CYCLES = 3  # need 3 consecutive detections to switch phase
+    phase_state_file = os.path.join(HERMES_DATA, 'pump_flow_phase_state.json')
+    
+    # Load previous phase state
+    prev_phase = 'UNKNOWN'
+    prev_phase_count = 0
+    candidate_phase = 'UNKNOWN'
+    candidate_count = 0
+    try:
+        with open(phase_state_file) as f:
+            ps = json.load(f)
+            prev_phase = ps.get('phase', 'UNKNOWN')
+            prev_phase_count = ps.get('count', 0)
+            candidate_phase = ps.get('candidate', 'UNKNOWN')
+            candidate_count = ps.get('candidate_count', 0)
+    except Exception:
+        pass
+    
     # BTC trending up (15m and 30m aligned)
     btc_bullish = btc_v15 > BTC_CHOP_THRESHOLD and btc_v30 > 0
     btc_bearish = btc_v15 < -BTC_CHOP_THRESHOLD and btc_v30 < 0
@@ -347,6 +367,52 @@ def detect_phase():
             alt_signal = 'neutral'
             confidence = 0.3
             reason = f"BTC unclear {btc_v15:+.2f}%"
+    
+    # ── Hysteresis: require phase stability before switching ──────────────────
+    # Skip hysteresis for UNKNOWN phase (initial state)
+    if phase == 'UNKNOWN' or prev_phase == 'UNKNOWN':
+        # First run or invalid phase — use detected phase directly
+        prev_phase = phase
+        prev_phase_count = 1
+        candidate_phase = phase
+        candidate_count = 0
+    elif phase == prev_phase:
+        # Same phase — confirmed, increment counter
+        prev_phase_count += 1
+        candidate_phase = phase
+        candidate_count = 0
+    elif phase == candidate_phase:
+        # Same candidate as before — increment
+        candidate_count += 1
+        if candidate_count >= PHASE_STABILITY_CYCLES:
+            # Candidate confirmed — switch to it
+            prev_phase = phase
+            prev_phase_count = 1
+            candidate_phase = phase
+            candidate_count = 0
+        else:
+            # Not enough cycles yet — keep previous phase
+            phase = prev_phase
+            confidence *= 0.8  # reduce confidence for unstable phase
+    else:
+        # New candidate — start tracking
+        candidate_phase = phase
+        candidate_count = 1
+        # Keep previous phase until candidate confirmed
+        phase = prev_phase
+        confidence *= 0.8
+    
+    # Save phase state for next run
+    try:
+        with open(phase_state_file, 'w') as f:
+            json.dump({
+                'phase': phase,
+                'count': prev_phase_count,
+                'candidate': candidate_phase,
+                'candidate_count': candidate_count,
+            }, f)
+    except Exception:
+        pass
     
     return {
         'phase': phase,
