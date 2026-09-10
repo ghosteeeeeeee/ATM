@@ -191,6 +191,11 @@ VOL_PHASE_MULTS = {
         'Exhaustion': 0.3,      # Storms don't exhaust
         'Coiled_Spring': 0.0,   # BLOCKED — 40% WR in EXTREME, only trade NORMAL
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
+        'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
+    },
+    # NORMAL volatility: block pullback_entry LONG (0% WR in NORMAL)
+    ('NORMAL', '*'): {
+        'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
     },
     # HIGH volatility: Volatile — coiled_spring has 20% WR here
     ('HIGH', '*'): {

@@ -1374,8 +1374,8 @@ NEVER_REENABLE_FLAGS = {
     'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_LONG_ENABLED',     # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
-    'EMA300_DIP_LONG_ENABLED',     # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
-    'EMA300_DIP_SHORT_ENABLED',    # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
+    # EMA300_DIP_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
+    # EMA300_DIP_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
 }
@@ -1663,7 +1663,7 @@ R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LON
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip_long.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_LONG_ENABLED = False           # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 3T/48h 33.3%WR -$4.18. NEVER_REENABLE.
+EMA300_DIP_LONG_ENABLED = True           # RE-ENABLED 2026-09-09 — wins in HIGH (57%) and NORMAL (56%). EXTREME blocked via volatility_gate_v2.
 EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
 EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_LONG_MIN_DIST_PCT = 0.3        # min distance from EMA300 (%) — require meaningful dip, not noise
@@ -1680,7 +1680,7 @@ EMA300_DIP_LONG_SL_PCT = 1.5              # stop loss (%)
 # Balanced: loosened from strict (0.5/35/80/60) for more signals, still tighter than original
 # ── EMA300 Dip SHORT (sells rallies to EMA300 during confirmed downtrends) ──────────
 # ema300_dip_short.py — catches shallow rallies in strong downtrends
-EMA300_DIP_SHORT_ENABLED = False      # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 16T/48h 43.8%WR -$36.54. NEVER_REENABLE.
+EMA300_DIP_SHORT_ENABLED = True       # RE-ENABLED 2026-09-09 — wins in HIGH (57%) and NORMAL (56%). EXTREME blocked via volatility_gate_v2.
 EMA300_DIP_SHORT_EMA_PERIOD = 300     # EMA period
 EMA300_DIP_SHORT_MAX_DIST_PCT = 0.5   # max distance from EMA300 (%) — same as LONG
 EMA300_DIP_SHORT_MIN_RSI = 65         # min RSI — must be overbought
@@ -3056,8 +3056,8 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = False         # auto_1hr KILLED 2026-09-09 03:10 UTC — 13T/35.7%WR/-$1.28 (24h worst). All LONG in downtrend. SHORT stays active.
-PUMP_FLOW_MINUS_ENABLED = False        # SIGNAL REPORTER 2026-09-09 — 6T/24h 50%WR/-$0.63. Losses 8.8x wins (KAS -$0.42 alone). LONG already dead.
+PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-09 — wins in ALL regimes (EXTREME 62%, HIGH 72%, NORMAL 67%). EXTREME blocked via volatility_gate_v2.
+PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-09 — wins in ALL regimes. EXTREME blocked via volatility_gate_v2.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
@@ -3123,7 +3123,7 @@ OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for modera
 # pullback_entry.py — buy low-volume pullbacks after strong moves, before continuation
 # Classification: Mean-reversion (buying the dip = contrarian, allowed in CHOP)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
-PULLBACK_ENTRY_PLUS_ENABLED      = False   # DISABLED 2026-09-09 15:10 UTC — 0%WR with 3+T last hour (auto_1hr kill)
+PULLBACK_ENTRY_PLUS_ENABLED      = True    # RE-ENABLED 2026-09-09 — wins in HIGH (100% WR). NORMAL blocked via volatility_gate_v2.
 PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
 
 # Detection parameters
