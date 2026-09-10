@@ -248,11 +248,12 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
+    'ADA',
     'AIXBT',
     'BLUR',
+    'CC',
     'CFX',
     'COMP',
-    'DOGE',
     'DOT',
     'DYDX',
     'ENA',
@@ -264,6 +265,7 @@ FAVORITES = {
     'ME',
     'POL',
     'TURBO',
+    'WLD',
     'ZRO'
 }
 
@@ -281,16 +283,16 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'APT',
     'BABY',
-    'BCH',
     'BIGTIME',
+    'CAKE',
     'ETC',
+    'GMT',
     'HBAR',
     'IO',
-    'SAND',
-    'STX'
+    'SAND'
 }
+
 
 
 
@@ -830,7 +832,7 @@ DIRECTIONAL_OUTCOME_WINDOW = 5            # last N trades per direction
 DIRECTIONAL_OUTCOME_TIME_WINDOW = 15      # minutes (rolling window — tightened from 30 for faster detection)
 DIRECTIONAL_OUTCOME_LOSS_THRESHOLD = 3    # N losses in window to trigger
 DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # backup: WR below this also triggers
-DIRECTIONAL_OUTCOME_PENALTY = 0.7         # score multiplier (milder for first deploy)
+DIRECTIONAL_OUTCOME_PENALTY = 0.5         # score multiplier (tightened from 0.7 — regime-transition-smoothing plan: AIXBT-type patterns caught earlier)
 DIRECTIONAL_OUTCOME_MIN_TRADES = 3        # minimum trades before activating
 DIRECTIONAL_OUTCOME_RECOVERY_WR = 45      # hysteresis: WR% required to deactivate suppression
 # Velocity tiers: tiered penalty based on loss_velocity (losses/total).
@@ -849,7 +851,7 @@ DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
 # Prevents re-entry during clear bad streaks — no unsuppression during lock.
 DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
 DIRECTIONAL_OUTCOME_LOCK_MINUTES = 10         # lock duration after severe failure (lowered from 20 2026-09-08 — too slow to recover after a win)
-DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.6       # loss_velocity threshold for lock activation (matches 0.6 tier)
+DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.5       # loss_velocity threshold for lock activation (tightened from 0.6 — catches 2.5/5 losses instead of 3/5)
 
 # ── Position Shield (Weather Vane Component 2) ─────────────────────────────
 # Tighten trailing stops on counter-regime LOSING positions when Weather Vane fires.
@@ -858,6 +860,21 @@ WEATHER_VANE_SHIELD_ENABLED = True
 WEATHER_VANE_SHIELD_TRAILING_PCT = 0.0030   # 0.30% tightened from default 2.00%
 WEATHER_VANE_SHIELD_MAX_HOLD_MIN = 30       # force-close if still open after this
 WEATHER_VANE_SHIELD_LOSING_ONLY = True      # only shield positions with pnl < 0
+
+# ── Directional Bias (Regime Transition Smoothing Layer 2) ──────────────────
+# Use BTC momentum_state from momentum_cache to bias signal scoring.
+# Reduces counter-trend signals during regime shifts (biggest value in transition zones).
+DIRECTIONAL_BIAS_ENABLED = True
+DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY = 0.6  # multiplier — reduce counter-trend scores
+DIRECTIONAL_BIAS_PRO_TREND_BOOST = 1.15       # multiplier — boost pro-trend scores
+
+# ── Alt-BTC Divergence (Regime Transition Smoothing Layer 4) ────────────────
+# Block LONG when alt is falling but BTC is flat/rising (divergent bearish).
+# Catches alt bleed before it hits the stop.
+ALT_BTC_DIVERGENCE_ENABLED = True
+ALT_BTC_DIVERGENCE_THRESHOLD = -0.30      # % — alt must be below this
+ALT_BTC_DIVERGENCE_BTC_MIN = -0.10        # % — BTC must be above this
+ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 
 # ── HL Reconciliation Post-Mortem ──────────────────────────────────────────
 # Automated PnL reconciliation: compare DB trades against HL fills every N hours.

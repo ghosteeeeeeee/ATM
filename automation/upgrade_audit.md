@@ -1,6 +1,20 @@
 # Upgrade Audit Trail
 
-**Last updated:** 2026-09-09 18:00 UTC
+**Last updated:** 2026-09-10 06:05 UTC
+
+---
+
+## Plan: 2026-09-09_regime-transition-smoothing.md
+- **Date scanned:** 2026-09-10 06:00
+- **Core request:** Reduce transition zone bleeding by wiring existing systems + tightening constants
+- **Difficulty:** Level 1 (constants) + Level 2 (directional bias + alt-BTC divergence)
+- **Value:** HIGH — estimated +$1.05 PnL impact in transition zones
+- **Status:** IMPLEMENTED
+- **Reason:** CEO-approved plan. Implemented 3 of 4 layers (Layer 1 skipped — redundant with zscore_accel).
+  - Layer 3: DIRECTIONAL_OUTCOME_PENALTY 0.7→0.5, LOCK_VELOCITY 0.6→0.5
+  - Layer 2: Directional bias — reads BTC momentum_state from cache, boosts pro-trend (1.15x), penalizes counter-trend (0.6x)
+  - Layer 4: Alt-BTC divergence — blocks LONG when alt 30m <-0.3% and BTC 30m > -0.1% (0.5x penalty)
+  - Files: hermes_constants.py (+6 constants), signal_compactor.py (~40 lines added)
 
 ---
 

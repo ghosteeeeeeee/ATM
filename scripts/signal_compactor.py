@@ -1247,7 +1247,64 @@ def _score_signal(token, direction, conf, source, signal_type,
     except Exception as e:
         log(f"  [WARN] RR engine failed (fail-open): {e}", 'WARN')
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult
+    # ── Directional Bias (Regime Transition Smoothing Layer 2) ──────────────
+    # Use BTC momentum_state to boost pro-trend / penalize counter-trend signals.
+    dir_bias_mult = 1.0
+    from hermes_constants import (
+        DIRECTIONAL_BIAS_ENABLED, DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY,
+        DIRECTIONAL_BIAS_PRO_TREND_BOOST,
+    )
+    if DIRECTIONAL_BIAS_ENABLED:
+        try:
+            _bias_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+            _bias_row = _bias_conn.execute(
+                "SELECT momentum_state FROM momentum_cache WHERE token='BTC'"
+            ).fetchone()
+            _bias_conn.close()
+            if _bias_row and _bias_row[0]:
+                _btc_mom = _bias_row[0]
+                if _btc_mom in ('strong_long', 'strong_short'):
+                    _is_pro_trend = (
+                        (_btc_mom == 'strong_long' and direction == 'LONG') or
+                        (_btc_mom == 'strong_short' and direction == 'SHORT')
+                    )
+                    _is_counter_trend = (
+                        (_btc_mom == 'strong_long' and direction == 'SHORT') or
+                        (_btc_mom == 'strong_short' and direction == 'LONG')
+                    )
+                    if _is_counter_trend:
+                        dir_bias_mult = DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY
+                        log(f"  🧭 [DIR-BIAS] {token} {direction}: counter-trend to BTC {_btc_mom} → {dir_bias_mult:.2f}x")
+                    elif _is_pro_trend:
+                        dir_bias_mult = DIRECTIONAL_BIAS_PRO_TREND_BOOST
+        except Exception:
+            pass
+
+    # ── Alt-BTC Divergence (Regime Transition Smoothing Layer 4) ────────────
+    # Block LONG when alt is falling but BTC is flat/rising (divergent bearish).
+    alt_btc_div_mult = 1.0
+    from hermes_constants import (
+        ALT_BTC_DIVERGENCE_ENABLED, ALT_BTC_DIVERGENCE_THRESHOLD,
+        ALT_BTC_DIVERGENCE_BTC_MIN, ALT_BTC_DIVERGENCE_LONG_PENALTY,
+    )
+    if ALT_BTC_DIVERGENCE_ENABLED and direction == 'LONG':
+        try:
+            _alt_chg = speed_data.get('price_change_30m', 0.0) or 0.0
+            _div_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+            _div_row = _div_conn.execute(
+                "SELECT velocity FROM momentum_cache WHERE token='BTC'"
+            ).fetchone()
+            _div_conn.close()
+            if _div_row and _div_row[0] is not None:
+                # momentum_cache.velocity for BTC = 30m price change (same as token_speeds.price_change_30m)
+                _btc_chg = _div_row[0]
+                if _alt_chg < ALT_BTC_DIVERGENCE_THRESHOLD and _btc_chg > ALT_BTC_DIVERGENCE_BTC_MIN:
+                    alt_btc_div_mult = ALT_BTC_DIVERGENCE_LONG_PENALTY
+                    log(f"  📉 [ALT-BTC-DIV] {token}: alt30m={_alt_chg:+.3f}% BTC30m={_btc_chg:+.3f}% → {alt_btc_div_mult:.2f}x")
+        except Exception:
+            pass
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
     return final_score
 
 
