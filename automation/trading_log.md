@@ -1400,3 +1400,30 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 **Open Questions:**
 - pump-chain- on ICP: 2 losses (-$0.18, -$0.16) vs 1 win (+$0.01) — coin-specific issue?
 - rr_engine_resistance exit mechanism consistently small negative — structural, not urgent
+
+## [2026-09-10 16:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2W 1L +$0.38)
+- BLUR SHORT pump-chain- atr_sl_hit +$0.50
+- ACE LONG bb-bounce-v2-long+ profit-monster-trail +$0.02
+- SYRUP SHORT accel-300-v4-short- atr_sl_hit -$0.14
+
+**24h:** 46T ~63%WR
+- pullback-entry-: 18T 77.8%WR +$2.19 (carrying system)
+- pump-chain-: 9T 77.8%WR +$0.31 (improved from -$0.19 earlier)
+- atr_sl_hit: 21T (45.7%) avg +$0.104 — above 40% but profitable
+- rr_engine_resistance: 6T -$0.32 (structural, small)
+
+**Daily trend:** Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$2.01 (strong recovery)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ already killed
+- atr_sl_hit 45.7% above 40% but avg +$0.104 profitable — leave alone
+- Trade freq 1-4/hr normal
+- pump-chain- R:R improved to +$0.31 from earlier -$0.19
+
+**Open Questions:**
+- None — system performing well
