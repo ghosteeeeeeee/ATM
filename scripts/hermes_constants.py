@@ -1273,6 +1273,7 @@ RR_EXIT_RESISTANCE_DIST = 0.003   # within 0.3% of resistance = take profit
 RR_EXIT_SUPPORT_BREAK_BUFFER = 0.001   # 0.1% below support = structural break
 RR_EXIT_LIQUIDATION_DIST = 0.005  # within 0.5% of cluster = exit
 RR_EXIT_RR_MIN = 1.0             # R:R below 1:1 = deterioration exit
+RR_EXIT_MIN_BREAK_DIST = 0.005  # 0.5% minimum distance from entry for support/resistance break to fire
 
 # Trail logic
 RR_EXIT_TRAIL_ENABLED = True

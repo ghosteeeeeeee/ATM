@@ -1023,7 +1023,7 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         # Don't exit if resistance is too close to entry (within 0.5%) — that's just noise.
         break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
         break_type = 'support' if direction == 'LONG' else 'resistance'
-        min_break_dist = 0.005  # 0.5% minimum distance from entry for resistance break to fire
+        min_break_dist = getattr(hc, 'RR_EXIT_MIN_BREAK_DIST', 0.005)  # 0.5% minimum distance
         for level in sr_map:
             if level.get('type') == break_type:
                 level_price = level['price']
@@ -1124,15 +1124,23 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         'new_sl': best_trail,
                     }
 
-        # Rule 4: Exit before liquidation cluster
+        # Rule 4: Exit before liquidation cluster (DANGEROUS direction only)
+        # LONG → exit if cluster is BELOW price (cascading selling)
+        # SHORT → exit if cluster is ABOVE price (cascading buying)
+        # Don't exit if cluster is in the FAVORABLE direction (cascade helps us)
         liquidation_dist = getattr(hc, 'RR_EXIT_LIQUIDATION_DIST', 0.005)
-        # Try to get raw cluster data from load_clusters()
         try:
             if _HAS_LIQ_MAP:
                 raw_data = load_clusters()
                 raw_clusters = raw_data.get('liquidation_clusters', {}).get(token.upper(), [])
                 for cluster in raw_clusters:
-                    dist = abs(cluster.get('distance_pct', 999)) / 100.0  # convert % to decimal
+                    cluster_dist = cluster.get('distance_pct', 999)  # signed!
+                    # Only exit if cluster is in the DANGEROUS direction
+                    is_dangerous = (direction == 'LONG' and cluster_dist < 0) or \
+                                   (direction == 'SHORT' and cluster_dist > 0)
+                    if not is_dangerous:
+                        continue
+                    dist = abs(cluster_dist) / 100.0
                     if dist < liquidation_dist:
                         return {
                             'action': 'EXIT',
