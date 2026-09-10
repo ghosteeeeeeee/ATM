@@ -2712,6 +2712,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'continuum+': return not CONTINUUM_SCORE_LONG_ENABLED
     if c == 'continuum-': return not CONTINUUM_SCORE_SHORT_ENABLED
     if c == 'continuum': return not CONTINUUM_SCORE_ENABLED
+    # continuum-oscillator
+    if c == 'continuum-osc+': return not CONTINUUM_OSC_ENABLED
+    if c == 'continuum-osc-': return not CONTINUUM_OSC_ENABLED
+    if c == 'continuum-osc': return not CONTINUUM_OSC_ENABLED
     # btc-pump-rider
     if c == 'btc-pump-rider+': return not BTC_PUMP_RIDER_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)

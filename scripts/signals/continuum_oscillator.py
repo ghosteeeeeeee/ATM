@@ -14,7 +14,7 @@ composite score. It captures the cadence pattern observed in live trading.
 """
 import sys, os, sqlite3, time, json, math
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from signal_schema import add_signal, get_cooldown, set_cooldown
 from paths import HERMES_DATA, WWW_DATA
 

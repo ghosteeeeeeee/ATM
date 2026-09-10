@@ -534,6 +534,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuum_score — extreme score signals from continuum engine
     ('continuum_score_long', 'continuum+'): 1.5,   # contrarian LONG at extreme bearish
     ('continuum_score_short', 'continuum-'): 1.5,  # contrarian SHORT at extreme bullish
+    # continuum_oscillator — score cadence momentum signals
+    ('continuum_oscillator_long', 'continuum-osc+'): 1.2,   # momentum LONG
+    ('continuum_oscillator_short', 'continuum-osc-'): 1.2,  # momentum SHORT
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
