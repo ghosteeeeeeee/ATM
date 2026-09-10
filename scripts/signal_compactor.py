@@ -783,7 +783,7 @@ def get_tide_penalty(token: str, direction: str) -> float:
     Bullish tide: BTC 3h rising AND SHORT WR < 45% → suppress SHORT
     """
     from hermes_constants import (
-        TIDE_ENABLED, TIDE_PENALTY, TIDE_BTC_MOM_WINDOW,
+        TIDE_ENABLED, TIDE_PENALTY, TIDE_BOOST, TIDE_BTC_MOM_WINDOW,
         TIDE_BTC_MOM_FALLING, TIDE_BTC_MOM_RISING,
         TIDE_SHORT_WR_THRESHOLD_HIGH, TIDE_SHORT_WR_THRESHOLD_LOW,
     )
@@ -3778,6 +3778,12 @@ if __name__ == '__main__':
         print("Purge complete.")
         sys.exit(0)
 
-    result = run_compaction(dry=args.dry, verbose=args.verbose, purge_executed=args.purge_executed)
-    print(f"\nResult: {len(result['hotset'])} hotset entries | cycle={result['compaction_cycle']} | "
-          f"approved={result['approved']} | rejected={result['rejected']}")
+    try:
+        result = run_compaction(dry=args.dry, verbose=args.verbose, purge_executed=args.purge_executed)
+        print(f"\nResult: {len(result['hotset'])} hotset entries | cycle={result['compaction_cycle']} | "
+              f"approved={result['approved']} | rejected={result['rejected']}")
+    except Exception as e:
+        import traceback
+        print(f"\nFATAL ERROR in run_compaction:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
