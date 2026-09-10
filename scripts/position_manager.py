@@ -2483,20 +2483,29 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     if new_sl and new_sl > 0:
                         pos['stop_loss'] = new_sl
                         # Persist to DB so ATR SL check uses the tighter value
+                        db_conn = None
+                        db_cur = None
                         try:
                             import psycopg2
                             from _secrets import BRAIN_PASSWORD, BRAIN_HOST
-                            conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
+                            db_conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
                                                     user='postgres', password=BRAIN_PASSWORD,
                                                     connect_timeout=5)
-                            cur = conn.cursor()
-                            cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
+                            db_cur = db_conn.cursor()
+                            db_cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
                                         (new_sl, trade_id))
-                            conn.commit()
-                            cur.close()
-                            conn.close()
+                            db_conn.commit()
                         except Exception as e:
                             log(f"  [RR-ENGINE] DB persist failed: {e}", "WARN")
+                        finally:
+                            try:
+                                if db_cur: db_cur.close()
+                            except Exception:
+                                pass
+                            try:
+                                if db_conn: db_conn.close()
+                            except Exception:
+                                pass
                         adjusted_count += 1
                         log(f"  [RR-ENGINE] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
             except Exception as e:

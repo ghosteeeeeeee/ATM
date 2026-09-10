@@ -1030,7 +1030,7 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 level_touches = level.get('touches', level.get('strength', 0))
                 
                 # Don't exit if level is too close to entry (within 0.5%) — that's just noise
-                if entry_price is not None:
+                if entry_price is not None and entry_price > 0:
                     dist_from_entry = abs(level_price - entry_price) / entry_price
                     if dist_from_entry < min_break_dist:
                         continue  # level too close — skip
@@ -1099,14 +1099,10 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
             elif direction == 'SHORT':
                 best_trail = None
                 
-                # Structural trails (resistance above + support below)
+                # Structural trails (resistance above for SHORT)
                 for level in sr_map:
                     level_price = level['price']
                     if level.get('type') == 'resistance' and level_price > current_price:
-                        new_sl = level_price + (current_price * trail_buffer)
-                        if best_trail is None or new_sl < best_trail:
-                            best_trail = new_sl
-                    if level.get('type') == 'support' and level_price < current_price:
                         new_sl = level_price + (current_price * trail_buffer)
                         if best_trail is None or new_sl < best_trail:
                             best_trail = new_sl
