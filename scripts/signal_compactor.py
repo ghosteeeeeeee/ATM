@@ -2849,6 +2849,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _rescue_ok = False
                         except Exception:
                             pass
+                    # ── Pump-chain velocity filter for conflict rescue ────────
+                    # FIX (2026-09-10): Conflict rescue bypasses velocity filter,
+                    # allowing wrong-direction entries (same class as PRESERVE bug).
+                    if _rescue_ok and 'pump-chain' in (loser.get('source', '') or ''):
+                        try:
+                            _pv_conn_r = sqlite3.connect(CANDLES_DB, timeout=5)
+                            _pv_cur_r = _pv_conn_r.cursor()
+                            _pv_cur_r.execute("""
+                                SELECT close FROM candles_5m
+                                WHERE token = ? AND is_closed = 1
+                                ORDER BY ts DESC LIMIT 6
+                            """, (tok.upper(),))
+                            _pv_closes_r = [r[0] for r in _pv_cur_r.fetchall()]
+                            _pv_conn_r.close()
+                            if len(_pv_closes_r) >= 6 and _pv_closes_r[-1] > 0:
+                                _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100
+                                if direc.upper() == 'LONG' and _pv_vel_r < 0:
+                                    _rescue_ok = False
+                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} LONG rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token declining)")
+                                elif direc.upper() == 'SHORT' and _pv_vel_r > 0:
+                                    _rescue_ok = False
+                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} SHORT rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token rising)")
+                        except Exception:
+                            pass  # non-fatal
                     if not _rescue_ok:
                         log(f"  🔄 [CONFLICT-RESCUE-BLOCK] {tok}:{direc} — safety check failed, not rescued")
                         continue
