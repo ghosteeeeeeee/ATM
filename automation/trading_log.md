@@ -1343,3 +1343,60 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 **Open Questions:**
 - pump-chain- 6T 66.7%WR -$0.24 — wins small relative to losses, R:R drag persists
 - rr_engine_resistance exit reason losing money — consider if resistance detection is too aggressive
+
+## [2026-09-10 13:07 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W 0L +$0.51)
+- STX SHORT pullback-entry- hard_tp +$0.24
+- SEI SHORT pullback-entry- hard_tp +$0.24
+- LDO SHORT pullback-entry- rr_engine_support_tp +$0.02
+- APT SHORT pump-chain- rr_engine_support_tp +$0.01
+
+**24h:** 45T $2.76
+- atr_sl_hit: 19T (42.2%) +$1.61 avg $0.085
+- rr_engine_support_tp: 9T +$0.28
+- rr_engine_resistance: 7T -$0.34
+- profit-monster-trail: 6T +$0.23
+- hard_tp: 2T +$0.48
+- rr_engine_support_br: 2T +$0.50
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour (4W 0L)
+- pullback-entry+ already killed
+- atr_sl_hit 42.2% — above 40% but profitable +$0.085 avg
+- rr_engine_resistance 7T -$0.34 — small losses, not urgent
+- Trade freq ~1.6/hr normal
+
+**Open Questions:**
+- None — system performing well
+
+## [2026-09-10 15:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L +$0.04)
+- CC SHORT pump-chain- atr_sl_hit +$0.04
+- ICP SHORT pump-chain- atr_sl_hit -$0.18
+
+**24h:** 47T 63.8%WR +$1.63 net
+- pullback-entry-: 19T 78.9%WR +$2.21 (carrying system)
+- pump-chain-: 8T 75%WR -$0.19 (R:R drag — wins small, losses outsized)
+- rr_engine_resistance: 7T -$0.34 (exit mechanism, small)
+- rr_engine_support_tp: 9T +$0.28
+- profit-monster-trail: 6T +$0.23
+
+**Daily trend:** Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$1.63 (healthy recovery)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ already killed (5T 0%WR)
+- atr_sl_hit 44.7% — above 40% but avg +$0.070 profitable
+- pump-chain- R:R drag persists but 75%WR keeps it viable — monitor
+- Trade freq ~1.5/hr normal
+- 5 open SHORTs all near breakeven
+
+**Open Questions:**
+- pump-chain- on ICP: 2 losses (-$0.18, -$0.16) vs 1 win (+$0.01) — coin-specific issue?
+- rr_engine_resistance exit mechanism consistently small negative — structural, not urgent

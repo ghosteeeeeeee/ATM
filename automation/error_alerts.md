@@ -40,3 +40,10 @@
 - **INFO** `prices.db` and `prices_hermes.db` both 0 bytes — candles.db (1GB) is the active price store
 - **AUTO-FIX**: Restarted `hermes-coding-mcp.service` (will likely fail again — missing script)
 - **AUTO-FIX**: `hermes-5m-candle.service` not restarted — missing script needs manual fix or systemd unit update
+
+## Health Check — 2026-09-10 14:24 UTC
+- **INFO**: Pipeline running normally, 0 errors in last 30m
+- **INFO**: 20 trades today, 60% WR, $1.04 PnL, 0 open
+- **INFO**: Regime NEUTRAL, 64.6% tokens fast, candles fresh
+- **MONITOR**: Disk at 83% (93G/118G) — watch for threshold
+- **MONITOR**: prices.db / prices_hermes.db are 0 bytes — may be intentional (candles.db active)
