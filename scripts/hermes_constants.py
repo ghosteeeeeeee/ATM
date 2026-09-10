@@ -151,6 +151,8 @@ SHORT_BLACKLIST = {
     'DASH',   # 4T 25% WR, -$0.02. ext=5.4-5.8x, entered at bottom of -4.6% drop
     # 2026-08-24: extra fees — eats into margins
     'GRAM', 'ASTER',
+    # 2026-09-10: ICP — persistent SHORT losses, all entries at local peaks
+    'ICP',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
