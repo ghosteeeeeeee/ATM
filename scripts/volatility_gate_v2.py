@@ -202,14 +202,16 @@ VOL_PHASE_MULTS = {
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
     },
-    # NORMAL volatility: block pullback_entry LONG (0% WR in NORMAL)
+    # NORMAL volatility: block pullback_entry LONG, block R2 (wins in EXTREME/HIGH)
     ('NORMAL', '*'): {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
+        'R2': 0.0,                   # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
     },
-    # HIGH volatility: Volatile — coiled_spring has 20% WR here
+    # HIGH volatility: block Bollinger LONG, coiled_spring dead, penalize Trendline
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
         'Trendline': 0.3,       # BLOCKED SHORT — 33% WR in HIGH, wins in NORMAL
+        'Bollinger': 0.0,       # BLOCKED LONG — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
     },
 }
 

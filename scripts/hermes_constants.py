@@ -1406,7 +1406,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V2_ENABLED',         # CEO 2026-09-02 — replaced by v3. 7T/24h 28.6% WR -$0.06. NEVER_REENABLE.
     'ACCEL_300_V2_MINUS_ENABLED',   # CEO 2026-09-02 — replaced by v3. NEVER_REENABLE.
     'RANGE_REVERSION_ENABLED',     # CEO 2026-09-02 — 6T/24h standalone -$0.62, 16.7% WR. ALL ATR_SL in NEUTRAL. NEVER_REENABLE.
-    'R2_TREND_LONG_ENABLED',       # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% -$0.46. ALL losers. NEVER_REENABLE.
+    # R2_TREND_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with NORMAL regime block
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
     'SLOW_GRIND_LONG_ENABLED',     # ORCHESTRATOR 2026-09-07 — 10T/24h 10% WR -$1.42. NEVER_REENABLE.
     # EMA300_DIP_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
@@ -1669,7 +1669,7 @@ ACCEL_300_V3_SHORT_EXTREME_BLOCK = True  # 2026-09-07 — block v3 SHORT in EXTR
 ACCEL_300_V3_SHORT_FLAT_BLOCK = True     # 2026-09-07 — block v3 SHORT in FLAT (33% WR). No SHORT edge in flat market.
 ACCEL_300_V3_LONG_EXTREME_BLOCK = True   # 2026-09-07 — block v3 LONG in EXTREME (42% WR, -$0.96). No LONG edge in extreme volatility.
 ACCEL_300_V3_LONG_FLAT_BLOCK = True      # 2026-09-07 — block v3 LONG in FLAT (33% WR). No LONG edge in flat market.
-R2_TREND_LONG_ENABLED        = False   # SIGNAL REPORTER 2026-09-03 — 5T/24h 20% WR -$0.44, 9T/48h 33.3% WR -$0.46. ALL losers. NEVER_REENABLE.
+R2_TREND_LONG_ENABLED        = True    # RE-ENABLED 2026-09-09 — EXTREME 67% WR, HIGH 68% WR. NORMAL blocked via volatility_gate_v2.
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
@@ -2086,8 +2086,8 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
-BB_BOUNCE_PLUS_ENABLED = False  # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
-BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
+BB_BOUNCE_PLUS_ENABLED = True   # RE-ENABLED 2026-09-09 — NORMAL 77% WR, EXTREME 62% WR. HIGH blocked via volatility_gate_v2.
+BB_BOUNCE_MINUS_ENABLED = True    # RE-ENABLED 2026-09-09 — EXTREME 81% WR, NORMAL 57% WR. HIGH blocked via volatility_gate_v2.
 BB_BOUNCE_SHORT_ENABLED = False    # auto_1hr KILLED 2026-09-03 — 3T/33.3%WR/-$0.35 today. 2 consecutive losses (ME cut-loser, ALT atr_sl_hit). Below 60% KILL_WR threshold.
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
@@ -3003,7 +3003,7 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
 # Thesis: Multi-component agreement = institutional trend confirmation.
 # Timeframe: 1h (Ichimoku needs 52+ period depth)
-ICHIMOKU_ENABLED = False               # DISABLED 2026-08-31 — underperforms RS standalone (50% WR vs 70% WR)
+ICHIMOKU_ENABLED = True                # RE-ENABLED 2026-09-09 — NORMAL 60% WR. HIGH blocked via volatility_gate_v2.
 ICHIMOKU_PLUS_ENABLED = True           # LONG direction
 ICHIMOKU_MINUS_ENABLED = True          # SHORT direction
 ICHIMOKU_COOLDOWN_HOURS = 1            # per token+direction cooldown
