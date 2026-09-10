@@ -38,7 +38,9 @@ from hermes_constants import (
     PUMP_FLOW_CHAIN_BONUS,
     PUMP_FLOW_PHASE_BONUS,
     PUMP_FLOW_BTC_FILTER_THRESHOLD,
+    PUMP_FLOW_TOKEN_30M_THRESHOLD,
     PUMP_FLOW_TOKEN_VEL_THRESHOLD,
+    PUMP_FLOW_SHORT_VEL_THRESHOLD,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -294,23 +296,40 @@ def scan_signals():
         if price is None or price <= 0:
             continue
         
-        # Token velocity filter — skip if token is already declining at entry
-        # Backtest: all 7 losses had 5m velocity < -0.3% at entry
-        # -0.2% threshold: 96% WR, +10.73% PnL (vs 77% WR, +2.79% unfiltered)
-        if direction == 'LONG':
+        # Token velocity filters — skip if token is declining (LONG) or rising (SHORT)
+        # 30m filter: 57%→80% WR, +0.5→+3.36 PnL (biggest single improvement)
+        # 5m filter: tightened from -0.2% to -0.5% (was blocking 13 winners)
+        if direction in ('LONG', 'SHORT'):
             try:
                 _conn_vel = sqlite3.connect(f"file:{STATIC_DB}?mode=ro", uri=True, timeout=5)
                 try:
-                    _vel_row = _conn_vel.execute("""
+                    _now = time.time()
+                    # 30m velocity (1800s = 30 min)
+                    _vel30_row = _conn_vel.execute("""
                         SELECT price FROM price_history
-                        WHERE token = ? AND timestamp <= ? - 300
+                        WHERE token = ? AND timestamp <= ? - 1800
                         ORDER BY timestamp DESC LIMIT 1
-                    """, (token, time.time())).fetchone()
-                    if _vel_row and _vel_row[0] > 0:
-                        token_5m_vel = (price - _vel_row[0]) / _vel_row[0] * 100
-                        if token_5m_vel < PUMP_FLOW_TOKEN_VEL_THRESHOLD:
-                            _log(f"  [pump-flow] {token} 5m Δ={token_5m_vel:+.3f}% < {PUMP_FLOW_TOKEN_VEL_THRESHOLD}% — skipping (token declining)")
+                    """, (token, _now)).fetchone()
+                    if _vel30_row and _vel30_row[0] > 0:
+                        token_30m_vel = (price - _vel30_row[0]) / _vel30_row[0] * 100
+                        if direction == 'LONG' and token_30m_vel < PUMP_FLOW_TOKEN_30M_THRESHOLD:
+                            _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% < {PUMP_FLOW_TOKEN_30M_THRESHOLD}% — skipping LONG (token declining)")
                             continue
+                        if direction == 'SHORT' and token_30m_vel > PUMP_FLOW_SHORT_VEL_THRESHOLD:
+                            _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% > {PUMP_FLOW_SHORT_VEL_THRESHOLD}% — skipping SHORT (token rising)")
+                            continue
+                    # 5m velocity (300s) — LONG only
+                    if direction == 'LONG':
+                        _vel5_row = _conn_vel.execute("""
+                            SELECT price FROM price_history
+                            WHERE token = ? AND timestamp <= ? - 300
+                            ORDER BY timestamp DESC LIMIT 1
+                        """, (token, _now)).fetchone()
+                        if _vel5_row and _vel5_row[0] > 0:
+                            token_5m_vel = (price - _vel5_row[0]) / _vel5_row[0] * 100
+                            if token_5m_vel < PUMP_FLOW_TOKEN_VEL_THRESHOLD:
+                                _log(f"  [pump-flow] {token} 5m Δ={token_5m_vel:+.3f}% < {PUMP_FLOW_TOKEN_VEL_THRESHOLD}% — skipping LONG (sharp decline)")
+                                continue
                 finally:
                     _conn_vel.close()
             except Exception:

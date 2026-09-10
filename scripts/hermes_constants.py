@@ -3088,8 +3088,11 @@ PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
 PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal
 PUMP_FLOW_BTC_FILTER_THRESHOLD = -0.1  # min BTC 1h Δ% to allow LONG signals (peak-pick filter)
                                        # Backtest: 81%→89% WR, +5.28%→+7.04% PnL at -0.1%
-PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.2   # min token 5m Δ% to allow LONG signals (declining token filter)
-                                       # Backtest: 77%→96% WR, +2.79%→+10.73% PnL at -0.2%
+PUMP_FLOW_TOKEN_30M_THRESHOLD = 0      # min token 30m Δ% to allow LONG signals (declining token filter)
+                                       # Backtest: 57%→80% WR, +0.5→+3.36 PnL — 93% winners had positive 30m vel
+PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.5   # min token 5m Δ% to allow LONG signals (tightened from -0.2%)
+                                       # -0.2% was too aggressive — blocked 13 winning trades
+PUMP_FLOW_SHORT_VEL_THRESHOLD = 0      # block SHORT when token 30m vel > 0% (wrong direction)
 
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).
