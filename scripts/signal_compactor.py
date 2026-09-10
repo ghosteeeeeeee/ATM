@@ -788,16 +788,22 @@ def get_tide_penalty(token: str, direction: str) -> float:
         return 1.0
     btc_mom = _get_btc_momentum()
     short_wr = _get_short_wr()
-    # Bearish tide: BTC falling + SHORT winning → suppress LONG
+    # Bearish tide: BTC falling + SHORT winning → suppress LONG, boost SHORT
     if btc_mom < TIDE_BTC_MOM_FALLING and short_wr > TIDE_SHORT_WR_THRESHOLD_HIGH:
         if direction.upper() == 'LONG':
             log(f"  🌊 [TIDE] {token} LONG: bearish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_PENALTY}x")
             return TIDE_PENALTY
-    # Bullish tide: BTC rising + SHORT losing → suppress SHORT
+        if direction.upper() == 'SHORT':
+            log(f"  🌊 [TIDE] {token} SHORT: bearish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_BOOST}x")
+            return TIDE_BOOST
+    # Bullish tide: BTC rising + SHORT losing → suppress SHORT, boost LONG
     if btc_mom > TIDE_BTC_MOM_RISING and short_wr < TIDE_SHORT_WR_THRESHOLD_LOW:
         if direction.upper() == 'SHORT':
             log(f"  🌊 [TIDE] {token} SHORT: bullish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_PENALTY}x")
             return TIDE_PENALTY
+        if direction.upper() == 'LONG':
+            log(f"  🌊 [TIDE] {token} LONG: bullish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_BOOST}x")
+            return TIDE_BOOST
     return 1.0
 
 

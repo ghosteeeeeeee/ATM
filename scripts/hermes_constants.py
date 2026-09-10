@@ -892,6 +892,7 @@ HL_RECONCILIATION_MATCH_WINDOW_MINUTES = 5  # HL fill matching tolerance
 # Bullish tide: BTC 3h rising + SHORT WR < 45% → suppress SHORT
 TIDE_ENABLED = True
 TIDE_PENALTY = 0.7
+TIDE_BOOST = 1.2                 # boost for aligned direction in favorable tide (2026-09-10)
 TIDE_BTC_MOM_WINDOW = 3          # hours for BTC momentum
 TIDE_BTC_MOM_FALLING = -0.1      # % — below this = falling
 TIDE_BTC_MOM_RISING = 0.1        # % — above this = rising
