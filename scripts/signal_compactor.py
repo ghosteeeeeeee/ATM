@@ -2668,6 +2668,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # ── CHOP FILTER for preserved entries ────────────────────────────────
                         # FIX (2026-09-10): Preserved entries bypass CHOP filter, allowing
                         # momentum signals to fire in choppy markets (GRASS loss #15202).
+                        from hermes_constants import CHOP_DETECTOR_ENABLED
                         if CHOP_DETECTOR_ENABLED:
                             try:
                                 from chop_detector import get_regime as _chop_get_regime, should_trade_signal as _chop_should_trade

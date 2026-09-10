@@ -60,3 +60,11 @@
 - **MONITOR**: `signal_compactor` non-fatal crash on every cycle (line 3780) — does not block pipeline but needs investigation
 - **MONITOR**: Disk at 83% (93G/118G) — approaching 85% threshold
 - **WARN**: `hermes-5m-candle.service` and `hermes-coding-mcp.service` still broken (missing scripts, known from earlier)
+
+## Error Alerts — 2026-09-10 21:26 UTC
+- **[CRITICAL]** (35x): `hermes-signal-compactor.service` crash loop — `NameError: name 'CHOP_DETECTOR_ENABLED' is not defined` at signal_compactor.py:2671. Variable imported inside `_score_signal()` but referenced in `run_compaction()` (different scope). Crashed 35 times in 4 minutes (21:15–21:19), then self-recovered.
+- **[INFO]** Pipeline running, last cycle 21:23:21, 5 open, 41 closed today, +83.11% PnL
+- **[INFO]** Signals: 42 generated in last hour, 1 hotset (LDO LONG)
+- **[INFO]** Regime: NEUTRAL (0 hot, 87 warm, 7 cold)
+- **[WARN]** Disk at 83% (93G/118G) — 2% from threshold
+- **AUTO-FIX**: Added `from hermes_constants import CHOP_DETECTOR_ENABLED` before line 2671 in signal_compactor.py. Verified compactor runs clean (dry run: 1 hotset, 0 errors). Standalone service and pipeline both confirmed working post-fix.

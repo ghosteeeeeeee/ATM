@@ -1504,3 +1504,59 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - None — system performing well
+
+## [2026-09-10 20:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. Most recent: ICP SHORT atr_sl_hit -$0.13 (18:52 UTC).
+**24h:** 44T 68.2%WR +$3.99. 5 open positions. Today: 34T +$2.12.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- 24h WR 68.2% strong
+- Trade freq normal
+- 5 open positions running
+
+**Open Questions:**
+- None — system performing well
+
+## [2026-09-10 21:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.18)
+- AIXBT SHORT pump-chain- rr_engine_resistance -$0.18
+
+**24h:** 41T 65.9%WR +$3.72. Today: 36T 61.1%WR +$2.16. 5 open positions.
+
+**Signal breakdown (24h):**
+- pullback-entry-: 16T 75%WR +$2.00 (carrying system)
+- pump-chain-: 14T 71.4%WR +$1.19 (strong)
+- pump-chain+: 3T 33.3%WR +$0.30 (small sample, profitable)
+- pullback-entry+: 2T 0%WR -$0.23 (watch — not kill threshold yet)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ at 0%WR but only 2T (needs 3+). Watch next hour.
+- atr_sl_hit 56% above 40% but avg +$0.114 profitable
+- Trade freq ~1.5/hr normal
+- 24h WR 65.9% strong
+
+**Open Questions:**
+- pullback-entry+ trending negative — monitor for 3rd loss next hour
+
+## [2026-09-10 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour.
+**24h:** 41T 65.9%WR +$3.72. Today: 36T 61.1%WR +$2.16. 5 open positions.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- 24h WR 65.9% strong
+- Trade freq 0/hr (quiet evening)
+- 5 open positions running
+
+**Open Questions:**
+- None — system performing well
