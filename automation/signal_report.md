@@ -1,49 +1,52 @@
-=== Signal Performance Report ===
-Period: 2026-09-10 ~14:30 UTC | Window: 6h / 24h
-Total: 14 trades (6h, +$1.75) | 42 trades (24h, +$3.97, 64.3% WR)
+# Signal Performance Report
+**Period:** Last 6h / 24h | **Generated:** 2026-09-10 17:08 UTC
 
-KILLED (executed):
+## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No kill candidates. All signals with 3+ trades are profitable. |
+| — | — | — | — | — | No kill candidates |
 
-BOOST CANDIDATES (watch):
-| Signal | Dir | WR | PnL | Trades | Notes |
-|--------|-----|-----|-----|--------|-------|
-| pump-chain- | SHORT | 90.0% | +$1.27 | 10 | DOMINANT — 90% WR, smallest loss -$0.14. Reliable across 24h. |
-| pullback-entry- | SHORT | 76.5% | +$2.16 | 17 | TOP PnL — highest absolute profit, 17 trades. Already boosted. |
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 69.2% | +$0.98 | 13 | Hot-set priority candidate |
+| pump-chain- | SHORT | 71.4% | +$1.19 | 14 | Hot-set priority candidate |
 
-LOSERS (watch list):
+**Regime breakdown (pullback-entry- SHORT):**
+| Regime | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| EXTREME | 3 | 66.7% | +$0.32 |
+| HIGH | 8 | 87.5% | +$0.81 |
+| NORMAL | 2 | 0.0% | -$0.15 |
+
+**Regime breakdown (pump-chain- SHORT):**
+| Regime | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| EXTREME | 9 | 77.8% | +$0.98 |
+| HIGH | 5 | 60.0% | +$0.21 |
+
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry+ | LONG | 0.0% | -$0.23 | 2 | 0% WR but only 2T — in NEVER_REENABLE_FLAGS already |
-| open-skies+ | LONG | 0.0% | -$0.23 | 1 | Single trade, too early to judge |
-| pump-chain-,r2-trend-short4 | SHORT | 0.0% | -$0.18 | 1 | Combo signal, single trade |
-| accel-300-v4-short- | SHORT | 50.0% | +$0.18 | 2 | Breakeven — watch for edge decay |
+| pump-chain+ | LONG | 50.0% | -$0.12 | 2 | Below trade threshold |
+| pump-chain- | SHORT | 50.0% | -$0.07 | 4 | Within noise |
+| pullback-entry+ | LONG | 0.0% | -$0.23 | 2 | Below trade threshold |
 
-WINNERS:
+**Long-term concern:** inv_accel_ LONG — 14.3% WR, -$0.31 PnL (77 trades all-time). No regime data. Already disabled.
+
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 76.5% | +$2.16 | 17 | TOP PERFORMER — highest PnL |
-| pump-chain- | SHORT | 90.0% | +$1.27 | 10 | BEST WR — 90% with meaningful volume |
-| pump-chain+ | LONG | 50.0% | +$0.45 | 2 | Early but profitable |
-| mover- | SHORT | 75.0% | +$0.07 | 4 | Small sample, profitable |
-| accel-300-v4-short- | SHORT | 50.0% | +$0.18 | 2 | Breakeven |
+| pullback-entry- | SHORT | 69.2% | +$0.98 | 13 | STRONG — especially HIGH regime |
+| pump-chain- | SHORT | 71.4% | +$1.19 | 14 | STRONG — consistent across regimes |
+| pump-chain+ | LONG | 50.0% | +$0.33 | 4 | Holding |
 
-7d WATCH LIST (signals losing over 7d):
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| ema300_dip_short | SHORT | 24 | 41.7% | -$1.48 | DISABLED (EMA300_DIP_SHORT_ENABLED=False) |
-| ema300_dip | LONG | 35 | 60.0% | -$1.01 | ENABLED — 60% WR but still net negative (tight TP/SL) |
-| slow_grind | LONG | 15 | 40.0% | -$0.80 | DISABLED (NEVER_REENABLE) |
-| sma20_dip | LONG | 19 | 42.1% | -$0.73 | DISABLED (SMA20_DIP_PLUS_ENABLED=False) |
-| coiled_spring | LONG | 21 | 42.9% | -$0.65 | ENABLED — regime-filtered |
-| pullback-entry+ | LONG | 6 | 16.7% | -$0.57 | NEVER_REENABLE — 16.7% WR |
-| accel_300_v3_long | LONG | 9 | 44.4% | -$0.54 | ENABLED — re-enabled with EXTREME block |
+## ISSUES
+- **No signal inversion bugs detected**
+- **pullback-entry- SHORT:** 0% WR in NORMAL regime (2 trades). Consider regime gate if NORMAL regime volume increases.
+- **All active signals profitable in 24h window** — no immediate kills needed.
 
-ISSUES:
-- No signal inversions detected
-- No kill candidates in 24h window (all signals with 3+ trades are positive)
-- ema300_dip LONG has 60% WR but -$1.01 PnL over 7d — possible R:R sizing issue (wins are small, losses are larger)
-- ema300_dip_short is the worst 7d performer (-$1.48) but is already correctly disabled
-- Total 24h system PnL: +$3.97 across 42 trades — healthy positive edge
+## Recommendations
+1. **Add pullback-entry- and pump-chain- to hot-set priority** — both consistently profitable across EXTREME/HIGH regimes
+2. **Regime gate consideration:** Add 0.0x multiplier for pullback-entry- SHORT in NORMAL regime if more data confirms the 0% WR pattern
+3. **Monitor pump-chain+ LONG** — 50% WR, only 4 trades. Needs more data before action.
