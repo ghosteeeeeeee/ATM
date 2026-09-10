@@ -1,3 +1,21 @@
+## Error Alerts — 2026-09-10 08:23 UTC
+- **[INFO]** Pipeline running, last cycle 08:22:48, 1 transient error
+- **[INFO]** Signals: 49 generated in last hour, 0 above 50% confidence (NEUTRAL regime)
+- **[INFO]** Trades: 4 open (exchange), 10 closed today, +$0.81 PnL, 60.0% WR
+- **[WARN]** (1x): `signal_compactor: timed out` at 08:22 — self-recovered on next cycle
+- **[WARN]** Disk at 83% (93G/118G) — 2% from 85% threshold
+- **AUTO-FIX**: None needed — transient compactor timeout self-recovered
+
+## Error Alerts — 2026-09-10 06:25 UTC
+- **[CRITICAL]** (10+): `[RR-ENGINE] DB persist failed: schema "np" does not exist` — numpy.float64 not adapted by psycopg2, every TRAIL_SL update failing since ~05:54 UTC
+- **[WARN]** (7x): `signal_compactor: timed out` in last hour — compactor stalling, signals not being compacted
+- **[INFO]** Pipeline running, 3 open positions, +85.73% PnL today
+- **[INFO]** Signals: 78 generated in last hour
+- **[INFO]** Trades: 3 open (exchange), 7 tracked in signal_outcomes, 57.1% WR
+- **[WARN]** Disk at 84% (19G free) — 1% from threshold
+- **AUTO-FIX**: Fixed RR-ENGINE numpy bug — wrapped `new_sl` with `float()` in position_manager.py:2495 and :1332 ✅ VERIFIED — TRAIL_SL persisting successfully post-restart
+- **AUTO-FIX**: Compactor timeouts not auto-fixable — likely DB lock contention or slow query
+
 ## Error Alerts — 2026-09-10 04:25 UTC
 - **[INFO]** Pipeline running, cycle #193193, 0 errors
 - **[INFO]** Signals: 28 generated in last hour

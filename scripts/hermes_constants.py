@@ -1396,6 +1396,7 @@ NEVER_REENABLE_FLAGS = {
     # EMA300_DIP_SHORT_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
+    'PULLBACK_ENTRY_PLUS_ENABLED',  # CEO 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -3141,7 +3142,7 @@ OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for modera
 # pullback_entry.py — buy low-volume pullbacks after strong moves, before continuation
 # Classification: Mean-reversion (buying the dip = contrarian, allowed in CHOP)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
-PULLBACK_ENTRY_PLUS_ENABLED      = True    # RE-ENABLED 2026-09-09 — HIGH only. NORMAL/EXTREME blocked via volatility_gate_v2.
+PULLBACK_ENTRY_PLUS_ENABLED      = False   # CEO KILLED 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
 PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
 
 # Detection parameters

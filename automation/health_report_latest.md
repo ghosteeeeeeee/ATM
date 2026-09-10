@@ -1,29 +1,29 @@
-# Health Report — 2026-08-24 14:21 UTC
+## Health Report — 2026-09-10 08:23 UTC
 
-## PIPELINE: OK (with fixes applied)
-- **Status**: running (active)
-- **Cycles (1h)**: 58 completed
-- **Signals (1h)**: 168 generated (11 types: support_resistance, macd_divergence_short, signal_confluence lead)
-- **Trades**: 5 open, 82 closed today
-- **PnL**: -6.99% (was +15.30% at 13:56, dropped during cascade flip window)
-- **Errors**: 6 position_manager FATAL (fixed), 1 signal_compactor traceback (non-fatal)
+PIPELINE: ✅ OK
+- Status: running (last cycle 08:22:48)
+- Signals (1h): 49 generated, 0 above 50% confidence (normal for NEUTRAL regime)
+- Hotset: empty (no signals survived compaction)
+- Open positions: 4/5
+- Closed today: 10 trades, +$0.81 PnL, 60.0% WR
+- Errors: 1 transient (signal_compactor timeout at 08:22, self-recovered)
 
-## MARKET
-- **Regime**: SHORT_BIAS (7 short, 0 long, 98 neutral across 105 tokens)
-- **Speed**: 239 tokens tracked
-- **Hotset**: 9 tokens (STX active as #1 candidate)
+MARKET:
+- Regime: NEUTRAL (0 long, 2 short, 103 neutral)
+- Overall: NEUTRAL — quiet market, no trades expected
+- No phantom trades detected
 
-## SYSTEM
-- **Services**: hermes-pipeline=active, hermes-hl-sync-guardian=active
-- **Timers**: 0 hermes-* timers listed (pipeline runs via systemd service, not timer)
-- **Disk**: 84% used (93G/118G) — 1% from WARN threshold
-- **Prices**: Fresh (updated 14:21 UTC)
+SYSTEM:
+- Pipeline service: active
+- HL Sync Guardian: active
+- Timers: 55 active, all firing on schedule
+- Disk: 83% (93G/118G, 25G free) — 2% from threshold
+- Price collector: active (fired 28s ago)
+- Lock file: present (normal for running pipeline)
 
-## AUTO-FIXES APPLIED
-1. **cascade_flip.py:31** — Added `compute_pnl_usdt` to import from pnl_utils. Root cause of 6 position_manager crashes. Verified import works.
+AUTO-FIXES APPLIED:
+- None needed
 
-## ALERTS
-- **CRITICAL (fixed)**: position_manager crashing on cascade flip — missing import in cascade_flip.py
-- **WARN**: Disk at 84% — compress old logs if >85%
-- **WARN**: PURRUSDT Binance 400 errors — symbol may be delisted
-- **WARN**: signal_compactor truncated traceback (1x, non-fatal)
+ALERTS:
+- **[WARN]** Disk at 83% — 2% from 85% threshold. Monitor closely.
+- **[WARN]** signal_compactor timeout at 08:22 — self-recovered on next cycle. Persistent issue from earlier today (multiple timeouts logged in error_alerts.md).

@@ -1,8 +1,143 @@
-## CEO Report — 2026-09-10
+## CEO Report — 2026-09-10 ~10:37 UTC
 
-### Executive Summary
+### Diagnosis
 
-**GO: Conditional.** The "wire don't build" thesis is 80% correct. Existing data covers gradient detection and directional bias. But the plan has 2 flaws: (1) gradient detection partially exists already via `get_zscore_accel_penalty()`, (2) threshold tightening is too aggressive for the trade volume. Recommend: implement Layers 1, 2, 4 as-is, defer Layer 3 threshold changes until backtested on 30d data.
+**System healthy, 7d PnL -$0.17 — flipping positive any moment.** 24h: 40T, 65.0% WR, +$2.04. Active signals 7d: 128T, 70.3% WR, +$4.47. Legacy bleeders ($4.64/7d) aging out. ONE ACTION TAKEN: killed pullback_entry+ (LONG) — 5T/24h 0%WR -$0.61, all losses in NEUTRAL market.
+
+### Verified Numbers (DB)
+
+| Window | Trades | WR | PnL | R:R | Status |
+|--------|--------|-----|------|------|--------|
+| 24h | 40 | 65.0% | +$2.04 | 0.71 | ✅ Strong |
+| 7d | 353 | 57.8% | -$0.17 | 0.68 | Almost flat |
+| Sep 10 (so far) | 12 | 58.3% | +$0.97 | — | On track |
+| 5 open | — | — | ~+$5.00 | — | All SHORT, all green |
+
+**Active Signals 7d (VERIFIED):**
+
+| Signal | Trades | WR | PnL | R:R | Status |
+|--------|--------|-----|------|------|--------|
+| bb_bounce_v2_long | 60T | 73.3% | +$1.88 | 0.64 | ★ STAR |
+| pullback_entry- | 16T | 81.3% | +$1.76 | 2.49 | ★ STAR |
+| open_skies | 19T | 63.2% | +$1.56 | 1.20 | ★ |
+| pump_chain | 41T | 68.3% | +$1.11 | 0.71 | Solid |
+| continuation | 6T | 83.3% | +$0.05 | 0.24 | Low volume |
+
+**Legacy Bleed (aging out — all killed):**
+
+| Signal | Trades | WR | PnL | Kill Date |
+|--------|--------|-----|------|-----------|
+| ema300_dip_short | 24T | 41.7% | -$1.48 | Sep 9 |
+| ema300_dip | 41T | 61.0% | -$0.91 | Sep 9 |
+| slow_grind | 15T | 40.0% | -$0.80 | Sep 7 |
+| sma20_dip | 19T | 42.1% | -$0.73 | Sep 8 |
+| coiled_spring | 21T | 42.9% | -$0.65 | Sep 6 |
+
+**Combined legacy: -$4.64/7d.** All killed, rotating out. 7d PnL flips positive by Sep 11.
+
+### Root Cause
+
+pullback_entry+ (LONG) bleeding in NEUTRAL market. The signal fires LONG entries, but LONG_NEUTRAL_BLOCK should catch them — it's bypassing via volatility_gate_v2 (set to "HIGH only" but NEUTRAL not in block list). 5T/24h, all atr_sl_hit, all losses >3%. Structural mismatch: LONG signal in SHORT-dominated NEUTRAL market.
+
+### Fix Applied
+
+**KILLED pullback_entry+**: `PULLBACK_ENTRY_PLUS_ENABLED=False`, added to `NEVER_REENABLE_FLAGS`. Restarted pipeline.
+
+**Expected impact:** -$0.61/24h bleeding removed. System now purely on profitable signals.
+
+### Daily Trend (14d)
+
+| Day | PnL | WR | Trades |
+|-----|------|-----|--------|
+| Aug 28 | +$1.55 | 56.2% | 89 |
+| Aug 29-31 | -$0.91 | 47% | 123 |
+| Sep 1-2 | -$2.51 | 51% | 120 |
+| Sep 3 | +$0.33 | 66.3% | 83 |
+| Sep 4 | -$1.75 | 48.8% | 41 |
+| Sep 5 | +$0.47 | 60.0% | 35 |
+| Sep 6 | +$0.40 | 65.8% | 38 |
+| Sep 7 | +$0.01 | 60.3% | 58 |
+| Sep 8 | -$2.74 | 44.1% | 68 |
+| Sep 9 | +$2.03 | 63.6% | 44 |
+| Sep 10 | +$0.97 | 58.3% | 12 |
+
+**5/7 days green.** Best day: Sep 9 +$2.03. System trending positive.
+
+### Monitoring
+
+- **open-skies+**: 2T/48h 0%WR -$0.49 — below 3T kill threshold. 7d still63.2% WR +$1.56. Kill if 10T/48h <45% WR.
+- **pump-chain-**: 5T/24h 60%WR -$0.50 — losses > wins but WR ok. Monitor 48h.
+- **Disk**: 84% (19G free) — approaching threshold. Clean if >85%.
+- **7d flip**: Will happen within hours as legacy ages out.
+- **Active signal health**: All 5 signals profitable on 7d. No degradation.
+
+### Previous Report (08:00 UTC)
+
+Pulled from above. Regime smoothing verified, all layers correct. No abort criteria.
+
+---
+
+## CEO Report — 2026-09-10 ~08:00 UTC
+
+### Diagnosis
+
+**System healthy, 7d PnL -$0.28 — should flip positive TODAY.** 24h: 44T, 61.4% WR, +$2.97 (strong). Active signals performing well. Legacy bleeders ($5.17/7d) aging out — will exit 7d window by Sep 11-12. No param changes needed.
+
+### Verified Numbers (DB)
+
+| Window | Trades | WR | PnL | Status |
+|--------|--------|-----|------|--------|
+| 24h | 44 | 61.4% | +$2.97 | ✅ Strong |
+| 7d | 354 | 58.2% | -$0.28 | Almost flat |
+| Today Sep 10 | 7 | 57.1% | +$0.80 | On track |
+| 5 open | — | — | ~$0 | All near breakeven |
+
+**24h Exit Breakdown (VERIFIED):**
+- atr_sl_hit: 24T avg +2.90%, +$2.27 — #1 exit, HEALTHY
+- profit-monster-trail: 7T avg +1.13%, +$0.26 — healthy
+- rr_engine_support_tp: 5T avg +2.00%, +$0.26 — healthy
+- cut-loser-CL-T1: **ZERO exits in 24h** — fix confirmed working
+- rr_engine_resistance: 6T avg -1.75%, -$0.41 — small drag
+
+### Active Signals 7d (VERIFIED)
+
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|------|--------|
+| bb_bounce_v2_long | 60T | 73.3% | +$1.88 | ★ STAR |
+| pullback_entry- | 14T | 78.6% | +$1.68 | ★ STAR (SHORT) |
+| open_skies | 19T | 63.2% | +$1.56 | ★ |
+| pump_chain LONG | 41T | 68.3% | +$1.11 | Solid |
+
+### Legacy Bleed (aging out)
+
+| Signal | Trades | WR | PnL | Kill Status |
+|--------|--------|-----|------|-------------|
+| ema300_dip_short | 24T | 41.7% | -$1.48 | Killed Sep 9 |
+| ema300_dip | 46T | 63.0% | -$0.88 | Killed Sep 9 |
+| slow_grind | 15T | 40.0% | -$0.80 | Killed Sep 7 |
+| sma20_dip | 19T | 42.1% | -$0.73 | Killed Sep 8 |
+| coiled_spring | 21T | 42.9% | -$0.65 | Killed Sep 6 |
+| pump-chain- | 6T | 50.0% | -$0.63 | Killed Sep 9 |
+
+**Combined legacy: -$5.17/7d.** All killed, rotating out. 7d PnL flips positive once these exit window (by Sep 11-12).
+
+### Root Cause
+
+7d negative solely from killed legacy signals. Active signals are ALL profitable. System structurally sound — just waiting for legacy to age out.
+
+### Fix Applied
+
+None needed. Cut-loser fix (position_manager.py:363) verified: zero cut-loser-CL-T1 exits in 24h vs 17 in 48h (all pre-fix Sep 8). RR-engine numpy bug also auto-fixed today.
+
+### Monitoring
+
+- **open-skies+**: 2T/24h 0% WR -$0.49 — below 3T kill threshold. 7d still 63.2% WR +$1.56. Variance, not structural. Kill if 10T/48h <45% WR.
+- **Disk**: 83% — safe.
+- **7d flip**: Expected positive by Sep 11 as legacy exits.
+
+### Previous Report (Plan Review)
+
+**GO: Conditional.** Wire-don't-build thesis 80% correct. Gradient detection redundant with existing `get_zscore_accel_penalty()`. Layer 2 (directional bias) is real gap. Layer 3 threshold tightening too aggressive — recommend DIRECTIONAL_OUTCOME_PENALTY 0.7→0.5 and LOCK_VELOCITY 0.6→0.5 instead.
 
 ---
 

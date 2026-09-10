@@ -1330,7 +1330,7 @@ def adjust_stop_loss(trade_id: int, new_sl: float) -> bool:
         cur = get_cursor(conn)
         cur.execute("""
             UPDATE trades SET stop_loss = %s WHERE id = %s AND paper = TRUE
-        """, (new_sl, trade_id))
+        """, (float(new_sl), trade_id))
         conn.commit()
         return True
     except Exception as e:
@@ -2493,7 +2493,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                                     connect_timeout=5)
                             db_cur = db_conn.cursor()
                             db_cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
-                                        (new_sl, trade_id))
+                                        (float(new_sl), trade_id))
                             db_conn.commit()
                         except Exception as e:
                             log(f"  [RR-ENGINE] DB persist failed: {e}", "WARN")
