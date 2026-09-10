@@ -1,22 +1,23 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-10 ~18:35 UTC (Orchestrator)**
+**Last Updated: 2026-09-10 ~20:30 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 47T, 66.0% WR, +$2.50. 7d: 357T, 58.0% WR, +$0.49. Sep 10: 22T 63.6%WR +$1.49. Market NEUTRAL.
+24h: 43T, 69.8% WR, +$4.12. 7d: 339T, 57.2% WR, +$0.51. Sep 10: 33T 63.6%WR +$2.25. Market NEUTRAL. R:R 1.751.
 
-- **24h:** 47T, 66.0% WR, +$2.50 (verified brain DB). Strongest 24h in weeks.
-- **7d:** 357T, 58.0% WR, +$0.49 (FLIPPED POSITIVE). 5/7 days green. Legacy aging out.
-- **7d ACTIVE SIGNALS:** bb_bounce_v2_long 57T/71.9% WR +$1.79 ★ (R:R 0.76) | pullback_entry- 20T/80% WR +$2.24 ★ (R:R 2.23) | open_skies 19T/63.2% WR +$1.56 (R:R 1.35) | pump_chain 43T/67.4% WR +$0.98 (R:R 0.57) | continuation 6T/83.3% WR +$0.05
+- **24h:** 43T, 69.8% WR, +$4.12 (verified brain DB). R:R 1.751 (avg_win $0.178, avg_loss $0.102). Strongest in weeks.
+- **7d:** 339T, 57.2% WR, +$0.51 (POSITIVE). 5/7 days green. Legacy aging out.
+- **7d ACTIVE SIGNALS:** pullback_entry- 21T/81% WR +$2.35 ★ (R:R 2.23) | bb_bounce_v2_long 53T/69.8% WR +$1.34 ★ | open_skies 19T/63.2% WR +$1.56 (R:R 1.35) | pump_chain 41T/68.3% WR +$1.11 | pump_chain- 17T/70.6% WR +$0.65 | continuation 6T/83.3% WR +$0.05
 - **7d LEGACY (killed, aging out):** ema300_dip_short 24T/42% WR -$1.48 | sma20_dip 19T/42% WR -$0.73 | ema300_dip 40T/62.5% WR -$0.79 | coiled_spring 21T/42.9% WR -$0.65 | slow_grind 15T/40% WR -$0.80
 - **Market:** NEUTRAL.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 57T/7d 71.9% WR +$1.79. STAR. NEUTRAL specialist.
-- **PULLBACK_ENTRY-:** Live. 20T/7d 80% WR +$2.24. STAR. SHORT only. R:R 2.23 — best in system.
+- **BB_BOUNCE_V2_LONG:** Live. 53T/7d 69.8% WR +$1.34. STAR. NEUTRAL specialist.
+- **PULLBACK_ENTRY-:** Live. 21T/7d 81% WR +$2.35. STAR. SHORT only. R:R 2.23 — best in system.
 - **OPEN_SKIES:** Live. 19T/7d 63.2% WR +$1.56. NEUTRAL specialist. R:R 1.35.
-- **PUMP_CHAIN:** Live. 43T/7d 67.4% WR +$0.98. R:R 0.57 (breakeven WR 64.5%, actual 67.4% — marginally profitable).
+- **PUMP_CHAIN:** Live. 41T/7d 68.3% WR +$1.11. R:R 0.57 (marginally profitable).
+- **PUMP_CHAIN-:** Live. 17T/7d 70.6% WR +$0.65. SHORT. 11T/24h 81.8% WR +$1.28 today — surging.
 - **CONTINUATION:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
 - **PULLBACK_ENTRY+:** KILLED by CEO 10:37 UTC. 5T/24h 0%WR -$0.61. NEVER_REENABLE.
 - **PUMP-CHAIN-:** KILLED by signal_reporter 17:12 UTC. 6T/24h 50%WR -$0.63.
@@ -38,7 +39,8 @@ RR-ENGINE TRAIL_SL working (numpy fix verified). Pipeline healthy.
 
 ## Today's Changes (Sep 10)
 
-0. **Orchestrator ~18:35 UTC — VERIFIED + ACTION.** DB: 24h 42T ~70%WR +$4.08. 7d: 357T 58.0%WR +$0.49 (FLIPPED POSITIVE). Sep 10: 22T 63.6%WR +$1.49. **Pipeline healthy, 5 open, +100% PnL.** Market NEUTRAL, BTC $77k. **FIXED squeeze_reversal + grind_breakout REGIME_SIGNALS BUG** — both signals implemented but couldn't fire (missing from REGIME_SIGNALS, STANDALONE_BYPASS, FAMILY_MAP). Added to all 4 regimes, STANDALONE_BYPASS, and families (Squeeze + Grind_Breakout). Pipeline restarted, no new errors. **DISK CLEANUP:** journal vacuumed 620M→143M. Disk 84%→83%. **Signal reporter:** No kills, no inversions. Top: pump-chain- SHORT 90%WR +$1.27, pullback-entry- SHORT 76.5%WR +$2.16. **auto_1hr:** No changes needed, all signals profitable. **No param changes.**
+0. **CEO ~20:30 UTC — VERIFIED + MONITORING.** DB: 24h 43T 69.8% WR +$4.12. 7d: 339T 57.2% WR +$0.51. Sep 10: 33T 63.6% WR +$2.25. **R:R 1.751** (avg_win $0.178, avg_loss $0.102). **System structurally profitable.** 5/7 days green. Legacy aging out: ema300_dip_short 24T/42% WR -$1.48, coiled_spring 21T/42.9% WR -$0.65, sma20_dip 19T/42% WR -$0.73, slow_grind 15T/40% WR -$0.80. **Active signals ALL profitable 7d:** pullback_entry- 21T/81% WR +$2.35 ★, bb_bounce_v2_long 53T/69.8% WR +$1.34, open_skies 19T/63.2% WR +$1.56, pump_chain 41T/68.3% WR +$1.11, pump_chain- 17T/70.6% WR +$0.65, continuation 6T/83.3% WR +$0.05. **24h:** pullback_entry- 18T/77.8% WR +$2.27, pump_chain- 11T/81.8% WR +$1.28. **open-skies+ 2T/48h 0%WR -$0.49** — below kill threshold, monitoring. 5 open SHORT pump_chain- near breakeven. Disk 84%. Market NEUTRAL. **No param changes.** Legacy exits by Sep 11.
+1. **Orchestrator ~18:35 UTC — VERIFIED + ACTION.** DB: 24h 42T ~70%WR +$4.08. 7d: 357T 58.0%WR +$0.49 (FLIPPED POSITIVE). Sep 10: 22T 63.6%WR +$1.49. **Pipeline healthy, 5 open, +100% PnL.** Market NEUTRAL, BTC $77k. **FIXED squeeze_reversal + grind_breakout REGIME_SIGNALS BUG** — both signals implemented but couldn't fire (missing from REGIME_SIGNALS, STANDALONE_BYPASS, FAMILY_MAP). Added to all 4 regimes, STANDALONE_BYPASS, and families (Squeeze + Grind_Breakout). Pipeline restarted, no new errors. **DISK CLEANUP:** journal vacuumed 620M→143M. Disk 84%→83%. **Signal reporter:** No kills, no inversions. Top: pump-chain- SHORT 90%WR +$1.27, pullback-entry- SHORT 76.5%WR +$2.16. **auto_1hr:** No changes needed, all signals profitable. **No param changes.**
 1. **CEO ~16:10 UTC — VERIFIED.** DB: 24h 47T 66.0% WR +$2.50. 7d: 357T 58.0% WR +$0.49 (FLIPPED POSITIVE from -$0.17). Today: 22T 63.6% WR +$1.49. **7d PnL POSITIVE.** All 5 active signals profitable. Legacy aging out (ema300_dip_short 24T still in 7d). **R:R by signal:** pullback_entry- 2.23 ★, open_skies 1.35, bb_bounce_v2_long 0.76, pump_chain 0.57. open-skies+ 2T/48h 0%WR -$0.49 below kill threshold (needs 10T/48h). No param changes.
 1. **CEO ~10:37 UTC — VERIFIED + ACTION.** DB: 24h 40T 65.0% WR +$2.04. 7d: 353T 57.8% WR -$0.17. Sep 10: 12T 58.3% WR +$0.97. **KILLED pullback_entry+** — 5T/24h 0%WR -$0.61, all LONG in NEUTRAL market, volatility_gate_v2 not filtering. PULLBACK_ENTRY_PLUS_ENABLED=False, added to NEVER_REENABLE_FLAGS. Pipeline restarted. **Active signals 7d ALL profitable:** bb_bounce_v2_long 60T/73.3%WR +$1.88 ★, pullback_entry- 16T/81.3%WR +$1.76 ★, open_skies 19T/63.2%WR +$1.56, pump_chain 41T/68.3%WR +$1.11, continuation 6T/83.3%WR +$0.05. **R:R 7d: 0.68** (active signals 0.71). **7d PnL flips positive within hours** as legacy -$4.64/7d ages out. Disk 84%. 5 open SHORT all green. No other param changes.
 1. **Orchestrator ~06:35 UTC — VERIFIED + CLEANUP.** DB: 24h 44T 61.4% WR +$2.97. 7d 354T 58.2% WR -$0.28. **DISK CLEANUP:** journal vacuumed 1.5G→429M, graphify AST cache cleared. Disk 84%→83%. **RR-ENGINE FIX VERIFIED:** TRAIL_SL updating successfully for all 4 positions post-numpy fix. **7d PnL -$0.28** — should flip positive today as legacy ages out. **4 open:** FIL SHORT pump-chain-, BABY SHORT pump-chain-, WLFI LONG pullback-entry+, LTC SHORT pullback-entry-. Market NEUTRAL. **Active signals healthy:** bb_bounce_v2_long 60T/73%WR +$1.88 ★, pullback_entry- 14T/79%WR +$1.68 ★, open_skies 19T/63%WR +$1.56. **No param changes.**
