@@ -1029,11 +1029,11 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 level_price = level['price']
                 level_touches = level.get('touches', level.get('strength', 0))
                 
-                # For SHORT: don't exit if resistance is too close to entry
-                if direction == 'SHORT' and entry_price is not None:
+                # Don't exit if level is too close to entry (within 0.5%) — that's just noise
+                if entry_price is not None:
                     dist_from_entry = abs(level_price - entry_price) / entry_price
                     if dist_from_entry < min_break_dist:
-                        continue  # resistance too close — skip this level
+                        continue  # level too close — skip
                 
                 if direction == 'LONG' and current_price < level_price * (1 - break_buffer):
                     return {
