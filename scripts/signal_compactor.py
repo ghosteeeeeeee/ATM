@@ -1263,14 +1263,14 @@ def _score_signal(token, direction, conf, source, signal_type,
             ).fetchone()
             if _bias_row and _bias_row[0]:
                 _btc_mom = _bias_row[0]
-                if _btc_mom in ('strong_long', 'strong_short'):
+                if _btc_mom in ('strong_long', 'strong_short', 'bullish', 'bearish'):
                     _is_pro_trend = (
-                        (_btc_mom == 'strong_long' and direction == 'LONG') or
-                        (_btc_mom == 'strong_short' and direction == 'SHORT')
+                        (_btc_mom in ('strong_long', 'bullish') and direction == 'LONG') or
+                        (_btc_mom in ('strong_short', 'bearish') and direction == 'SHORT')
                     )
                     _is_counter_trend = (
-                        (_btc_mom == 'strong_long' and direction == 'SHORT') or
-                        (_btc_mom == 'strong_short' and direction == 'LONG')
+                        (_btc_mom in ('strong_long', 'bullish') and direction == 'SHORT') or
+                        (_btc_mom in ('strong_short', 'bearish') and direction == 'LONG')
                     )
                     if _is_counter_trend:
                         dir_bias_mult = DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY

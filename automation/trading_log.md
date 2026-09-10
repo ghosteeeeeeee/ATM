@@ -1453,3 +1453,29 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - None — system performing well
+
+## [2026-09-10 18:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L +$0.22)
+- INJ SHORT pump-chain- atr_sl_hit +$0.29
+- IO SHORT pump-chain- atr_sl_hit +$0.07
+- ATOM SHORT pump-chain- atr_sl_hit -$0.14
+
+**24h:** 41T 68.2%WR +$3.56
+- atr_sl_hit: 19T (46.3%) avg +$0.152 — above 40% but profitable
+- rr_engine_resistance: 6T -$0.32 (structural, small)
+- pullback-entry-: 18T 77.8%WR +$2.19 (carrying system)
+- pump-chain-: 8T+ strong
+
+**Daily trend:** Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$2.07
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 46.3% above 40% but avg +$0.152 profitable — leave alone
+- Trade freq 3/hr normal
+- 24h WR 68.2% strong
+
+**Open Questions:**
+- None — system performing well

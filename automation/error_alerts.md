@@ -47,3 +47,7 @@
 - **INFO**: Regime NEUTRAL, 64.6% tokens fast, candles fresh
 - **MONITOR**: Disk at 83% (93G/118G) — watch for threshold
 - **MONITOR**: prices.db / prices_hermes.db are 0 bytes — may be intentional (candles.db active)
+
+## Error Alerts — 2026-09-10 17:23 UTC
+- **[WARN]** (Nx1): `disk_84pct` — Disk at 84% (93G/118G), approaching 85% threshold
+- **AUTO-FIX**: None needed yet. Will compress logs if hits 85%.
