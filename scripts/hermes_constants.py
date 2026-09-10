@@ -1366,7 +1366,7 @@ NEVER_REENABLE_FLAGS = {
     'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
     'TL_BREAK_ENABLED',           # CEO 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
     'TL_BREAK_PLUS_ENABLED',      # CEO 2026-08-07 — master TL_BREAK killed
-    'TL_BREAK_MINUS_ENABLED',     # SIGNAL REPORTER 2026-08-25 — 28.6% WR, -$0.32 (24h), 7T. NEVER_REENABLE.
+    # TL_BREAK_MINUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with NORMAL regime (85.7% WR)
     'ZSCORE_RISING_ENABLED',      # CEO 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
     'ZSCORE_RISING_PLUS_ENABLED', # CEO 2026-08-07 — master ZSCORE_RISING killed
     'ZSCORE_RISING_MINUS_ENABLED',# CEO 2026-08-07 — master ZSCORE_RISING killed
@@ -2009,7 +2009,7 @@ RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES low
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
 TL_BREAK_PLUS_ENABLED         = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
-TL_BREAK_MINUS_ENABLED        = False  # KILLED 2026-08-25 — 28.6% WR, -$0.32 (24h), 7T. NEVER_REENABLE.
+TL_BREAK_MINUS_ENABLED        = True    # RE-ENABLED 2026-09-09 — 85.7% WR in NORMAL. HIGH/EXTREME blocked via volatility_gate_v2.
 
 # ── Rotator Protection ──────────────────────────────────────────────────────
 # Signals in this list are NEVER auto-rotated by signal_rotator.py

@@ -209,6 +209,7 @@ VOL_PHASE_MULTS = {
     # HIGH volatility: Volatile — coiled_spring has 20% WR here
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
+        'Trendline': 0.3,       # BLOCKED SHORT — 33% WR in HIGH, wins in NORMAL
     },
 }
 
