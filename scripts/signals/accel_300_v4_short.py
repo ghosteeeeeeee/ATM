@@ -4,10 +4,9 @@
 Branched from accel_300_v2_short (56% WR, +$0.60 PnL — best SHORT variant).
 
 THESIS:
-  V2 was the best SHORT variant but fired in FLAT regime (17% WR) and had
-  a confidence trap at 90-94 (33% WR). V4 adds:
+  V2 was the best SHORT variant but fired in FLAT regime (17% WR).
+  V4 adds:
   - FLAT regime block (FLAT kills SHORT signals)
-  - Confidence 90-94 block (overconfident signals lose money)
   - All other V2 conditions preserved (proven winners)
 
 V2 CONDITIONS (kept — these work):
@@ -22,7 +21,6 @@ V2 CONDITIONS (kept — these work):
 
 V4 ADDITIONS:
   9. FLAT regime block (FLAT = 17% WR → skip)
-  10. Confidence 90-94 block (33% WR → skip)
 
 REGIME PERFORMANCE (V2 historical):
   HIGH:    62% WR, +$1.63 ← BEST
@@ -76,8 +74,6 @@ from hermes_constants import (
     ACCEL_300_V4_SHORT_CONF_BASE,
     ACCEL_300_V4_SHORT_CONF_FLOOR,
     ACCEL_300_V4_SHORT_CONF_CAP,
-    ACCEL_300_V4_SHORT_CONF_BLOCK_MIN,
-    ACCEL_300_V4_SHORT_CONF_BLOCK_MAX,
 )
 
 PERIOD = 300  # EMA300 period
@@ -198,7 +194,6 @@ def detect_accel_300_v4_short(token: str, prices: list) -> Optional[dict]:
 
     V4 keeps all V2 conditions that produced 56% WR and adds:
       - FLAT regime block (FLAT = 17% WR)
-      - Confidence 90-94 block (33% WR trap)
     """
     min_rows = PERIOD + max(ACCEL_300_V4_SHORT_GAP_ACCEL_WINDOW, ACCEL_300_V4_SHORT_SLOPE_WINDOW, 10) + 10
     if len(prices) < min_rows:
@@ -435,10 +430,6 @@ def scan_accel_300_v4_short_signals(prices_dict: dict) -> int:
         confidence = int(min(ACCEL_300_V4_SHORT_CONF_CAP,
             ACCEL_300_V4_SHORT_CONF_BASE + gap_bonus + accel_bonus + fresh_bonus))
         confidence = max(ACCEL_300_V4_SHORT_CONF_FLOOR, confidence)
-
-        # ── V4 NEW: Block confidence 90-94 (33% WR trap) ───────────────────
-        if ACCEL_300_V4_SHORT_CONF_BLOCK_MIN <= confidence <= ACCEL_300_V4_SHORT_CONF_BLOCK_MAX:
-            continue  # overconfident signals lose money
 
         signal_price = float(sig['price'])
 
