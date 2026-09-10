@@ -1,3 +1,7 @@
+[2026-09-10 08:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L ~$0). 46T/24h 65%WR +$1.39 net (improving: Sep 7 +$1.28, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track). Kill criteria not met: no signal at 0%WR with 3+T last hour. pullback-entry- 16T 81%WR +$1.76 star. atr_sl_hit improved to 50% (was 59%) and now profitable +$0.70. pump-chain- 6T 50%WR -$0.63 R:R 0.13:1 structural (avg_win $0.03 vs avg_loss -$0.24). pullback-entry+ 5T 20%WR -$0.43 approaching kill (one more 0%WR loss at 3T triggers kill). ema300-dip-long 3T 33%WR -$0.15 new problem, all 3 SL hits, monitoring. open-skies+ 2T 0%WR -$0.49 below kill threshold (only 2T). rr_engine_resistance 7T -$0.34 worst exit reason. Trade freq 1.4/hr normal. 3 open positions. 3d trend improving: Sep 7 +$1.28, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track.
+  BY: auto_1hr
+  NEXT: Re-run at 09:15 UTC
 [2026-09-09 22:07 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour (quiet since 21:00). 44T/24h 59% atr_sl_hit +$0.38 net improving. Kill criteria not met: no signal at 0%WR with 3+T last hour. profit-monster-trail 9T +$0.37 star. rr_engine_support_tp 5T +$0.26 star. pump_chain 6T 50%WR +$1.06 star. pump-chain- 6T 50%WR -$0.63 R:R 0.11:1 structural drag. pullback-entry+ 4T 25%WR -$0.34 monitoring. open-skies+ 2T 0%WR -$0.49 below threshold. Trade freq 0/hr quiet. 5 open SHORTs (WLD, ADA, ENA, COMP, ONDO) all pullback-entry-. 3d trend: Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$0.38 improving.
   BY: auto_1hr
@@ -1297,3 +1301,11 @@
   WHY: 2T last hour (1W 1L +$0.46). 47T/24h 57.4%WR +$2.95. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). pump-chain- 6T 50%WR -$0.63 (50%WR doesn't trigger kill). atr_sl_hit 55% avg +$0.087 (profitable). Trade freq 2/hr normal. 0 open positions. SHORTs outperforming LONGs (66% vs 40% WR). NEUTRAL regime pattern.
   BY: auto_1hr
   NEXT: Re-run at 08:10 UTC
+[2026-09-10 09:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.32). 44T/24h 63.6%WR +$1.83. Kill criteria not met: open-skies+ 2T 0%WR (threshold 3T). atr_sl_hit 50% avg +$0.052 (profitable). Trade freq 1/hr normal. 5 open positions. pullback-entry- dominant (16T 81%WR +$1.76).
+  BY: auto_1hr
+  NEXT: Re-run at 10:10 UTC
+[2026-09-10 10:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.14). 41T/24h 56%WR +$1.07. Kill criteria not met: pullback-entry+ 5T 0%WR (24h) but only 1T last hour (threshold 3T). atr_sl_hit 46.3% above threshold but avg +$0.073 (profitable). Trade freq 1/hr normal. 5 open shorts. 3d trend positive: Sep 9 +$2.03, Sep 10 +$0.97.
+  BY: auto_1hr
+  NEXT: Re-run at 11:10 UTC

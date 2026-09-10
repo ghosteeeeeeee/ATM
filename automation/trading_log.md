@@ -1,3 +1,39 @@
+## [2026-09-10 08:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L ~$0.00)
+**24h:** 46T 65%WR +$1.39 net (improving: Sep 7 +$1.28, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 7T +$0.26 ⭐
+- rr_engine_support_tp: 6T +$0.27 ⭐
+- rr_engine_support_br: 2T +$0.50 ⭐
+- atr_sl_hit: 23T (50%) +$0.70 (avg +$0.03 — profitable trailing)
+- rr_engine_resistance: 7T -$0.34 (worst exit reason)
+
+**24h Signal Performance (2+ trades):**
+- pullback-entry-: 16T 81%WR +$1.76 ⭐⭐⭐ (carrying system)
+- pump-chain+: 1T 100%WR +$0.59
+- mover-: 4T 75%WR +$0.07
+- pump-chain-: 6T 50%WR -$0.63 (R:R 0.13:1 — structural, can't kill)
+- pullback-entry+: 5T 20%WR -$0.43 ⚠️ (approaching kill: 3T below)
+- ema300-dip-long: 3T 33%WR -$0.15 (NEW, all 3 SL hits)
+- open-skies+: 2T 0%WR -$0.49 (below kill threshold)
+
+**Changes:** None — no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- Trade freq 1.4/hr normal
+- Atr_sl_hit improved to 50% (was 59%), now profitable
+- pump-chain- R:R 0.13:1 structural (avg_win $0.03 vs avg_loss -$0.24)
+- ema300-dip-long 3T 33%WR — monitor next hour, below kill threshold but trending down
+- pullback-entry+ 5T 20%WR — one more loss at 0%WR hits 3T kill
+
+**Open Questions:**
+- ema300-dip-long new signal — 3T all SL hits, may need parameter tuning
+- pump-chain- structural R:R issue — TPSL review needed, not killable
+- pullback-entry+ approaching kill threshold — watch closely next hour
+
 ## [2026-09-09 22:07 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet since 21:00 UTC)
@@ -1161,3 +1197,78 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 - open-skies+ teetering at 2T 0%WR — will kill at next loss
 - pump-chain- biggest 24h loser (-$0.63) but 50%WR doesn't trigger kill — monitor
 - SHORTs outperforming LONGs significantly in NEUTRAL regime
+
+## [2026-09-10 08:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.07 (100% WR)
+
+**Breakdown:**
+- LTC pullback-entry- SHORT: +$0.07 (rr_engine_resistance)
+
+**24h Context:** 45T 57%WR +$2.95 (from daily)
+
+**Kill Criteria Check:**
+- open-skies+ 2T 0%WR -$0.49 — at threshold, needs 3T to trigger kill
+- pump-chain- 6T 50%WR -$0.63 — 50%WR doesn't trigger kill
+- No signal has 0%WR with 3+ trades in last hour
+
+**No Change Needed:**
+- Kill criteria not met (open-skies+ still at 2T)
+- atr_sl_hit 24/45T (53%) avg +$0.095 — profitable, no concern
+- Trade freq 1/hr normal (quiet hours)
+- 3d trend improving: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$0.87
+- rr_engine_resistance slightly negative (-$0.34 on 7T) but within acceptable range
+
+**Open Questions:**
+- open-skies+ teetering at 2T 0%WR — one more trade triggers kill
+- pump-chain- persistent drag but 50%WR keeps it alive
+
+## [2026-09-10 09:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.32 (100% WR)
+
+**Breakdown:**
+- PONS SHORT accel-300-v4-short-: +$0.32 (atr_sl_hit)
+
+**24h Context:** 44T 63.6%WR +$1.83 — strong
+
+**Kill Criteria Check:**
+- open-skies+ 2T 0%WR -$0.49 — at threshold, needs 3T to trigger kill
+- No signal has 0%WR with 3+ trades in last hour
+
+**No Change Needed:**
+- Kill criteria not met
+- atr_sl_hit 50% avg +$0.052 (profitable)
+- Trade freq 1/hr normal
+- 5 open positions reasonable
+- pullback-entry- dominant: 16T 81%WR +$1.76
+
+**Open Questions:**
+- open-skies+ teetering at 2T 0%WR — one more trade triggers kill
+- pullback-entry+ struggling: 5T 20%WR -$0.43 (monitor)
+
+## [2026-09-10 10:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L)
+**PnL:** -$0.14 (0% WR)
+
+**Breakdown:**
+- NXPC pullback-entry+ LONG: -$0.14 (atr_sl_hit)
+
+**24h Context:** 41T 56%WR +$1.07
+
+**Kill Criteria Check:**
+- pullback-entry+ 5T 0%WR -$0.61 (24h) — only 1T last hour, below 3T kill threshold
+- No signal has 0%WR with 3+ trades in last hour
+
+**No Change Needed:**
+- Kill criteria not met
+- atr_sl_hit 46.3% (above 40% threshold) but avg +$0.073 (profitable, not urgent)
+- Trade freq 1/hr normal
+- 3d trend positive: Sep 9 +$2.03, Sep 10 +$0.97
+
+**Open Questions:**
+- pullback-entry+ LONG is 0/5 over 24h — clear drag, will trigger kill if next 2 trades also lose (reaching 3+ in a rolling hour window)
+- pump-chain- 5T 60%WR -$0.50 — wins too small to cover losses
