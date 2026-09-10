@@ -876,6 +876,20 @@ ALT_BTC_DIVERGENCE_THRESHOLD = -0.30      # % — alt must be below this
 ALT_BTC_DIVERGENCE_BTC_MIN = -0.10        # % — BTC must be above this
 ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 
+# ── Sniper Exit Strategy ──────────────────────────────────────────────────
+# Proactive position closing on regime shifts. Closes wrong-side positions
+# when trend changes, lets right-side positions ride.
+SNIPER_ENABLED = True
+SNIPER_CHECK_INTERVAL = 180          # seconds between checks (3 min)
+SNIPER_MAX_CLOSES_PER_CYCLE = 2      # max positions closed per cycle
+SNIPER_MAX_CYCLES = 6                # max cycles before reassessment (18 min)
+SNIPER_COOLDOWN = 600                # seconds cooldown after full cycle (10 min)
+SNIPER_MIN_LOSS_THRESHOLD = -0.5     # % — minimum loss for Tier 2 LIFO close
+SNIPER_BTC_VELOCITY_THRESHOLD = 0.15 # % — BTC velocity to trigger shift signal
+SNIPER_SIGNALS_FOR_L1 = 1           # signals needed for Level 1 (Caution)
+SNIPER_SIGNALS_FOR_L2 = 2           # signals needed for Level 2 (Alert)
+SNIPER_SIGNALS_FOR_L3 = 3           # signals needed for Level 3 (Emergency)
+
 # ── HL Reconciliation Post-Mortem ──────────────────────────────────────────
 # Automated PnL reconciliation: compare DB trades against HL fills every N hours.
 # Auto-corrects divergences > threshold. Catches calc_notional bugs, fee errors,

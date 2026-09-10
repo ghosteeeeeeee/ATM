@@ -175,6 +175,14 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
     if is_token_being_closed_by_profit_monster(token):
         log(f"  [{tier}] Profit monster closing {token} — skipping", "WARN")
         return False
+    # Sniper mutual exclusion — don't close if sniper is handling it
+    try:
+        from sniper_exit import is_token_being_closed_by_sniper
+        if is_token_being_closed_by_sniper(token):
+            log(f"  [{tier}] Sniper closing {token} — skipping", "WARN")
+            return False
+    except ImportError:
+        pass
     if not is_position_on_hl(token):
         log(f"  [{tier}] {token} not on HL — already closed, skipping", "WARN")
         return False
