@@ -1427,3 +1427,29 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - None — system performing well
+
+## [2026-09-10 17:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L +$0.04)
+- BCH SHORT pump-chain- atr_sl_hit +$0.18
+- GRASS LONG pump-chain+ atr_sl_hit -$0.14
+
+**24h:** 44T 68.2%WR +$3.56
+- pullback-entry-: 18T 77.8%WR +$2.19 (carrying system)
+- pump-chain-: 8T 87.5%WR +$0.89 (strong)
+- rr_engine_resistance: 6T -$0.32 (structural, small)
+- atr_sl_hit: 19T 42.2% avg +$0.126 (profitable)
+
+**Daily trend:** Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$2.05
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- atr_sl_hit 42.2% above 40% but avg +$0.126 profitable — leave alone
+- Trade freq 2/hr normal
+- 5 open positions near breakeven
+- 24h WR 68.2% strong recovery
+
+**Open Questions:**
+- None — system performing well
