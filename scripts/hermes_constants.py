@@ -153,6 +153,8 @@ SHORT_BLACKLIST = {
     'GRAM', 'ASTER',
     # 2026-09-10: ICP — persistent SHORT losses, all entries at local peaks
     'ICP',
+    # 2026-09-10: AIXBT — persistent SHORT losses, all entries at local peaks
+    'AIXBT',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
