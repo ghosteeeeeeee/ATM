@@ -3123,7 +3123,7 @@ OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for modera
 # pullback_entry.py — buy low-volume pullbacks after strong moves, before continuation
 # Classification: Mean-reversion (buying the dip = contrarian, allowed in CHOP)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
-PULLBACK_ENTRY_PLUS_ENABLED      = False   # DISABLED 2026-09-09 — only 1T in HIGH (100%WR not significant), 2T NORMAL 0%WR, 1T EXTREME 0%WR. No winning regime.
+PULLBACK_ENTRY_PLUS_ENABLED      = True    # RE-ENABLED 2026-09-09 — HIGH only. NORMAL/EXTREME blocked via volatility_gate_v2.
 PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
 
 # Detection parameters
