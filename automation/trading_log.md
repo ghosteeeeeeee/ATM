@@ -1272,3 +1272,74 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 **Open Questions:**
 - pullback-entry+ LONG is 0/5 over 24h — clear drag, will trigger kill if next 2 trades also lose (reaching 3+ in a rolling hour window)
 - pump-chain- 5T 60%WR -$0.50 — wins too small to cover losses
+
+## [2026-09-10 09:45 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last 2h (NXPC pullback-entry+ LONG atr_sl_hit -$0.14)
+**24h:** 40T 65%WR +$2.04
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T (47.5%) +$1.38 (profitable, slightly above 40% threshold)
+- rr_engine_support_tp: 6T +$0.27 ⭐
+- rr_engine_support_br: 2T +$0.50 ⭐
+- profit-monster-trail: 6T +$0.23 ⭐
+- rr_engine_resistance: 7T -$0.34 (worst exit)
+
+**24h Signal Performance (2+ trades):**
+- pullback-entry-: 16T 81.3%WR +$1.76 ⭐⭐⭐ (carrying system)
+- mover-: 4T 75%WR +$0.07 ⭐
+- accel-300-v3-short-: 2T 50%WR +$0.05
+- pump-chain-: 5T 60%WR -$0.50 (R:R drag)
+- pullback-entry+: 5T 0%WR -$0.61 (already killed)
+
+**Changes:** None — no kill criteria met, no parameter drift.
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ already killed (PULLBACK_ENTRY_PLUS_ENABLED=False)
+- atr_sl_hit 47.5% — slightly above 40% but profitable +$1.38, not urgent
+- Trade freq ~1.7/hr normal
+- 5 open SHORT positions all in profit (BABY +$0.35, SEI +$0.08, FIL +$0.07, LINK +$0.03, CC +$0.05)
+- System 3d trend improving: Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track
+
+**Open Questions:**
+- open-skies+ and ema300-dip-long no closes in 24h — below kill threshold, monitoring
+- pump-chain- R:R drag persists but 60%WR keeps it alive
+
+## [2026-09-10 12:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed last 2h (2W 1L +$0.29)
+- FIL SHORT pump-chain- atr_sl_hit +$0.03
+- BABY SHORT pump-chain- atr_sl_hit +$0.28
+- LINK SHORT pullback-entry- rr_engine_support_tp -$0.02
+
+**24h:** 41T 63.4%WR +$2.25
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T (46.3%) +$1.61 avg $0.085 (profitable, above 40% threshold but OK)
+- rr_engine_support_tp: 7T +$0.25
+- rr_engine_resistance: 7T -$0.34 (worst exit — small losses, 1 win)
+- profit-monster-trail: 6T +$0.23
+- rr_engine_support_br: 2T +$0.50
+
+**24h Signal Performance (2+ trades):**
+- pullback-entry-: 16T 75%WR +$1.71 ⭐⭐ (carrying system)
+- mover-: 4T 75%WR +$0.07
+- accel-300-v3-short-: 2T 50%WR +$0.05
+- pump-chain-: 6T 66.7%WR -$0.24 (R:R drag)
+- pullback-entry+: 5T 0%WR -$0.61 (already killed)
+
+**Changes:** None — no kill criteria met, no parameter drift.
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades last hour
+- pullback-entry+ already killed
+- atr_sl_hit 46.3% — above 40% but profitable +$1.61 avg, not urgent
+- rr_engine_resistance 7T -$0.34 — exit mechanism not signal, losses small
+- Trade freq 1.5/hr normal
+- 5 open SHORTs all near breakeven
+- 3d trend positive: Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$1.26
+
+**Open Questions:**
+- pump-chain- 6T 66.7%WR -$0.24 — wins small relative to losses, R:R drag persists
+- rr_engine_resistance exit reason losing money — consider if resistance detection is too aggressive
