@@ -111,6 +111,7 @@ REGIME_SIGNALS = {
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in normal vol
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
+        'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
     },
     'HIGH': {
         # Breakout works in big moves
@@ -165,6 +166,7 @@ REGIME_SIGNALS = {
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in high vol
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
+        'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
     },
     'EXTREME': {
         # Continuation works in storms

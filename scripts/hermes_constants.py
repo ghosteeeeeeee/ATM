@@ -2258,6 +2258,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hh-hl',  # Structure Sniper — multi-confluence market structure breakout, works solo
     'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
     'trend_purity',  # EMA30 purity-based LONG/CRASH SHORT — directional momentum, works solo
+    'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -3079,6 +3080,24 @@ RR_ENGINE_CONF_NEUTRAL_MULT  = 1.00    # standard (R:R≥2)
 RR_ENGINE_CONF_MEDIOCRE_MULT = 0.85    # mediocre (R:R 1.5-2.0)
 RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 
+# ── RR Structural Signal ────────────────────────────────────────────────────
+# rr_structural.py — fire on structurally excellent R:R setups
+# Uses risk_reward_engine to evaluate structural quality for every token.
+# Fires ONLY when engine scores Grade A/B with R:R ≥ 3.0.
+RR_STRUCTURAL_ENABLED         = True   # master kill-switch
+RR_STRUCTURAL_PLUS_ENABLED    = True   # LONG direction
+RR_STRUCTURAL_MINUS_ENABLED   = True   # SHORT direction
+RR_STRUCTURAL_MIN_SCORE       = 70     # minimum RR engine score (Grade B+)
+RR_STRUCTURAL_MIN_RR          = 3.0    # minimum R:R ratio
+RR_STRUCTURAL_MIN_ATR_PCT     = 0.5    # minimum ATR% (skip flat coins)
+RR_STRUCTURAL_MAX_ATR_PCT     = 1.5    # maximum ATR% (skip extreme noise)
+RR_STRUCTURAL_REGIMES         = ('NORMAL', 'HIGH')  # allowed regimes
+RR_STRUCTURAL_COOLDOWN_HOURS  = 4      # per-token+direction cooldown
+RR_STRUCTURAL_CONF_BASE       = 65     # base confidence
+RR_STRUCTURAL_CONF_CAP        = 92     # max confidence
+RR_STRUCTURAL_OPEN_SKY_BONUS  = 5      # bonus for open skies (no resistance)
+RR_STRUCTURAL_LIQ_BONUS       = 5      # bonus for liquidity proximity
+
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
 # Thesis: Multi-component agreement = institutional trend confirmation.
@@ -3195,6 +3214,8 @@ PUMP_FLOW_SHORT_VEL_THRESHOLD = 0      # block SHORT when token 30m vel > 0% (wr
 PUMP_FLOW_SHORT_15M_THRESHOLD = 0      # block SHORT when token 15m vel > 0% (bounce-in-progress filter)
                                        # Backtest: catches 4/14 losses, kills 0/21 wins (BCH -$0.12,
                                        # AVAX -$0.18, INJ -$0.27, BTC -$0.04 — total $0.61 saved)
+PUMP_FLOW_SHORT_RSI_FLOOR = 15          # block SHORT when RSI < 15 (extremely oversold = bounce imminent)
+                                       # Backtest: catches 4/8 losses, kills 0/4 wins (0% WR at RSI<15)
 
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).

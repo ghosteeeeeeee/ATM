@@ -2159,3 +2159,29 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - 2 open positions
 
 **Open Questions:** None
+
+## [2026-09-11 21:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L -$0.20)
+**24h:** 55T 50.9%WR -$1.08 | 4 open
+
+- ENA pump-chain- SHORT profit-monster-trail +$0.05
+- ENA pump-chain- SHORT cut-loser-CL-T1 -$0.25
+
+**24h exit reason breakdown:**
+- atr_sl_hit: 21T (38.2%) avg -$0.039
+- rr_engine_resistance: 14T avg -$0.061 (worst by volume)
+- profit-monster-trail: 12T avg +$0.123 (best)
+- cut-loser-CL-T1: 3T avg -$0.193 (worst per-trade loss)
+
+**No Change Needed:**
+- Kill criteria: no active signal has 0%WR with 3+ trades last hour. Previous kills (accel-300-v4-short- 12:10, pump-chain+ 13:15) already done.
+- atr_sl_hit 21/55 = 38.2% — below 40% threshold
+- Trade freq 2/hr normal
+- 55T/24h 50.9%WR -$1.08. Market: 98% NEUTRAL
+- 6h trend 4/6 POS. Not 3+ consecutive negative hours.
+- pump-chain- still worst active signal (15T 60%WR -$0.29) but has wins, not killable
+- 4 open positions (ATOM, BTC, KAS, ARB)
+
+**Open Questions:**
+- rr_engine_resistance is dominant loss driver (14T, -$0.86 total) — worth investigating filter tightness in future

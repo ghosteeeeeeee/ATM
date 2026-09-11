@@ -344,6 +344,11 @@ try:
 except Exception:
     _ema300_breakthrough_run = None
 
+try:
+    from signals.rr_structural import run as _rr_structural_run
+except Exception:
+    _rr_structural_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -408,6 +413,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'hh_hl',                    'enabled': 'HH_HL_ENABLED',              'run': _hh_hl_run},
     {'name': 'trend_purity',             'enabled': 'TREND_PURITY_ENABLED',        'run': _trend_purity_run},
     {'name': 'ema300_breakthrough',       'enabled': 'EMA300_BREAKTHROUGH_ENABLED', 'run': _ema300_breakthrough_run},
+    {'name': 'rr_structural',            'enabled': 'RR_STRUCTURAL_ENABLED',     'run': _rr_structural_run},
 ]
 
 
@@ -415,7 +421,7 @@ SIGNAL_REGISTRY: list[dict] = [
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
 # pump_flow_signal removed — runs every minute to match state file update cadence
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud'}
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural'}
 
 
 def _resolve_enabled(entry):

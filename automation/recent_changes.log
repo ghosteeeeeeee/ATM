@@ -1429,3 +1429,7 @@
   WHY: 3T last hour (2W 1L -$0.02). ENA pump-chain- SHORT profit-monster-trail +$0.13, INJ pump-chain- SHORT atr_sl_hit -$0.27, KAS rs-s88/trend_purity+ LONG profit-monster-trail +$0.12. 54T/24h 50%WR -$1.06. Kill criteria not met: no signal has 0%WR with 3+ trades last hour. atr_sl_hit 21/54=38.9% below 40% threshold. Trade freq 3/hr normal. 98% tokens NEUTRAL. 2 open positions.
   BY: auto_1hr
   NEXT: Re-run at 21:10 UTC
+[2026-09-11 21:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.20). ENA pump-chain- SHORT profit-monster-trail +$0.05, ENA pump-chain- SHORT cut-loser-CL-T1 -$0.25. 55T/24h 50.9%WR -$1.08. Kill criteria not met: no signal 0%WR with 3+ trades last hour. Previous kills (accel-300-v4-short- 12:10, pump-chain+ 13:15) already done. atr_sl_hit 21/55=38.2% below 40% threshold. rr_engine_resistance 14T avg -$0.061 worst exit by volume. Trade freq 2/hr normal. 4 open positions (ATOM, BTC, KAS, ARB). pump-chain- 15T 60%WR -$0.29 worst active signal but has wins.
+  BY: auto_1hr
+  NEXT: Re-run at 22:10 UTC

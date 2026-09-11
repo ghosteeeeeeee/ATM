@@ -2152,6 +2152,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         # after 5 min must not contribute its source tag to a new signal arriving
         # 10+ min later. The compactor already expires PENDING signals at the 5-min
         # mark — this brings add_signal() in sync with that lifecycle.
+        # rr-struct (structural R:R quality signal)
+        if _comp == 'rr-struct+':
+            try:
+                from hermes_constants import RR_STRUCTURAL_PLUS_ENABLED
+                if not RR_STRUCTURAL_PLUS_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RR_STRUCTURAL_PLUS_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
+        if _comp == 'rr-struct-':
+            try:
+                from hermes_constants import RR_STRUCTURAL_MINUS_ENABLED
+                if not RR_STRUCTURAL_MINUS_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RR_STRUCTURAL_MINUS_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
+        if _comp == 'rr-struct':
+            try:
+                from hermes_constants import RR_STRUCTURAL_ENABLED
+                if not RR_STRUCTURAL_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RR_STRUCTURAL_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
         c.execute('''
             SELECT id, source, signal_types, confidence,
                    z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist
@@ -2572,6 +2597,7 @@ def is_component_disabled(component: str) -> bool:
             MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
             PATTERN_CHANNEL_ENABLED, PATTERN_FLAG_ENABLED, PATTERN_MICRO_FLAG_ENABLED, PATTERN_WOLF_ENABLED,
             OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_MTF_RSI_ENABLED, OC_PENDING_ENABLED,
+            RR_STRUCTURAL_ENABLED, RR_STRUCTURAL_PLUS_ENABLED, RR_STRUCTURAL_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2884,6 +2910,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'volume-climax+': return not VOLUME_CLIMAX_PLUS_ENABLED
     if c == 'volume-climax-': return not VOLUME_CLIMAX_MINUS_ENABLED
     if c == 'volume-climax': return not VOLUME_CLIMAX_ENABLED
+    # rr-struct (structural R:R quality signal)
+    if c == 'rr-struct+': return not RR_STRUCTURAL_PLUS_ENABLED
+    if c == 'rr-struct-': return not RR_STRUCTURAL_MINUS_ENABLED
+    if c == 'rr-struct': return not RR_STRUCTURAL_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

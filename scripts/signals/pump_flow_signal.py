@@ -42,6 +42,7 @@ from hermes_constants import (
     PUMP_FLOW_TOKEN_VEL_THRESHOLD,
     PUMP_FLOW_SHORT_VEL_THRESHOLD,
     PUMP_FLOW_SHORT_15M_THRESHOLD,
+    PUMP_FLOW_SHORT_RSI_FLOOR,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -345,6 +346,25 @@ def scan_signals():
                                 continue
                 finally:
                     _conn_vel.close()
+            except Exception:
+                pass  # fail open
+        
+        # RSI floor filter — block SHORT when RSI < 15 (extremely oversold = bounce imminent)
+        # Backtest: 0% WR at RSI<15, catches 4/8 losses, kills 0/4 wins
+        if direction == 'SHORT':
+            try:
+                from paths import RUNTIME_DB
+                _conn_rsi = sqlite3.connect(f"file:{RUNTIME_DB}?mode=ro", uri=True, timeout=3)
+                try:
+                    _rsi_row = _conn_rsi.execute(
+                        "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
+                        (token.upper(),)
+                    ).fetchone()
+                    if _rsi_row and _rsi_row[0] is not None and _rsi_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
+                        _log(f"  [pump-flow] {token} RSI={_rsi_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} — skipping SHORT (extremely oversold)")
+                        continue
+                finally:
+                    _conn_rsi.close()
             except Exception:
                 pass  # fail open
         

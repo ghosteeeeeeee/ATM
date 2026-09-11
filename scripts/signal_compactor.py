@@ -662,6 +662,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('volume_climax_short',      'volume-climax-'):      1.25,  # volume rejection reversal
     ('hh_hl_breakout_long',      'hh-hl+'):              1.5,   # Structure Sniper — multi-confluence, high conviction
     ('hh_hl_breakout_short',     'hh-hl-'):              1.5,   # Structure Sniper — multi-confluence, high conviction
+    # rr_structural — structural R:R quality signal (Grade A/B, R:R ≥ 3.0)
+    ('rr_structural_long',  'rr-struct+'):  1.3,   # structural quality LONG — high R:R setups
+    ('rr_structural_short', 'rr-struct-'):  1.3,   # structural quality SHORT — high R:R setups
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -2656,6 +2659,28 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _conn_vel_30s.close()
                     except Exception:
                         pass
+            # ── Pump-chain SHORT RSI floor: block SHORT when RSI < 15 (oversold = bounce imminent) ──
+            # Backtest: 0% WR at RSI<15, catches 4/8 losses, kills 0/4 wins
+            if direction == 'SHORT' and 'pump-chain' in (src or ''):
+                try:
+                    _conn_rsi_floor = sqlite3.connect(RUNTIME_DB, timeout=3)
+                    _cur_rsi_floor = _conn_rsi_floor.cursor()
+                    _cur_rsi_floor.execute(
+                        "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
+                        (tkn.upper(),)
+                    )
+                    _rsi_floor_row = _cur_rsi_floor.fetchone()
+                    _cur_rsi_floor.close()
+                    if _rsi_floor_row and _rsi_floor_row[0] is not None and _rsi_floor_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
+                        log(f"  🚫 [PUMP-CHAIN-RSI-FLOOR] {tkn}: SHORT blocked — RSI={_rsi_floor_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
+                        continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    try:
+                        _conn_rsi_floor.close()
+                    except Exception:
+                        pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
             vol_ok = check_volatility_floor(tkn)
             if vol_ok == 0.0:
@@ -2937,6 +2962,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         continue
                             except Exception:
                                 pass  # non-fatal
+                        # ── RSI floor filter for preserved entries ──
+                        if pe_direction == 'SHORT' and 'pump-chain' in pe_src:
+                            try:
+                                _pv_rsi_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
+                                _pv_rsi_cur = _pv_rsi_conn.cursor()
+                                _pv_rsi_cur.execute(
+                                    "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
+                                    (pe['token'].upper(),)
+                                )
+                                _pv_rsi_row = _pv_rsi_cur.fetchone()
+                                _pv_rsi_conn.close()
+                                if _pv_rsi_row and _pv_rsi_row[0] is not None and _pv_rsi_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
+                                    log(f"  🚫 [PRESERVE-PUMP-CHAIN-RSI] {pe['token']} SHORT preserved — RSI={_pv_rsi_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
+                                    continue
+                            except Exception:
+                                pass  # non-fatal
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
                         _preserved_won = False
                         if existing is None:
@@ -3117,6 +3158,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 elif direc.upper() == 'SHORT' and _pv_vel_r > 0:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} SHORT rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token rising)")
+                        except Exception:
+                            pass  # non-fatal
+                    # ── RSI floor filter for conflict rescue ──
+                    if _rescue_ok and direc.upper() == 'SHORT' and 'pump-chain' in (loser.get('source', '') or ''):
+                        try:
+                            _rescue_rsi_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
+                            _rescue_rsi_cur = _rescue_rsi_conn.cursor()
+                            _rescue_rsi_cur.execute(
+                                "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
+                                (tok.upper(),)
+                            )
+                            _rescue_rsi_row = _rescue_rsi_cur.fetchone()
+                            _rescue_rsi_conn.close()
+                            if _rescue_rsi_row and _rescue_rsi_row[0] is not None and _rescue_rsi_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
+                                _rescue_ok = False
+                                log(f"  🚫 [RESCUE-PUMP-CHAIN-RSI] {tok} SHORT rescue blocked — RSI={_rescue_rsi_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
                         except Exception:
                             pass  # non-fatal
                     if not _rescue_ok:
