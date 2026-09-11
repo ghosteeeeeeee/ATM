@@ -207,11 +207,12 @@ VOL_PHASE_MULTS = {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
         'R2': 0.0,                   # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
     },
-    # HIGH volatility: block Bollinger LONG, coiled_spring dead, penalize Trendline
+    # HIGH volatility: block Bollinger LONG, coiled_spring dead, penalize Trendline and Accelerate
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
         'Trendline': 0.3,       # BLOCKED SHORT — 33% WR in HIGH, wins in NORMAL
         'Bollinger': 0.0,       # BLOCKED LONG — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
+        'Accelerate': 0.3,      # PENALIZED SHORT — accel_300 35% WR in HIGH, wins in NORMAL/EXTREME
         # Pump_Flow removed — SHORT wins 61.5% WR in HIGH, LONG wins 64.7% WR in HIGH
     },
 }

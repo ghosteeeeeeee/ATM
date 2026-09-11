@@ -1361,7 +1361,7 @@ NEVER_REENABLE_FLAGS = {
     'INVERSE_ACCEL_300_MINUS_ENABLED',
     'ACCEL_300_ENABLED',           # 0% WR over 48h, no edge — permanently dead
     'ACCEL_300_PLUS_ENABLED',      # 0% WR over 48h — permanently dead
-    'ACCEL_300_MINUS_ENABLED',     # 15% WR, -$1.26 in 7d — permanently dead
+    # ACCEL_300_MINUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-11 — re-enabled with NORMAL/EXTREME regime (65%/57% WR)
     'ACCEL_300_BREAKOUT_ENABLED',  # 0% WR (0/3) — permanently dead
     'ACCEL_300_VELOCITY_IGNITION_ENABLED',  # 0% WR (10 trades), -$4.97 — permanently dead
     'ACCEL_300_VELOCITY_PLUS_ENABLED',  # permanently dead
@@ -1971,7 +1971,7 @@ ACCEL_300_V3_SHORT_EXEC_Z_MAX = 0        # max z_score at execution — block SH
 # v4 = V2 proven conditions (56% WR, +$0.60) + FLAT regime block + confidence trap block
 # V2 was the best SHORT variant. V4 keeps what works and blocks what doesn't.
 # FLAT regime: 17% WR → block. Confidence 90-94: 33% WR → block.
-ACCEL_300_V4_SHORT_ENABLED      = True    # RE-ENABLED 2026-09-11 — need more data (only 4T). Monitoring, no regime blocks yet.
+ACCEL_300_V4_SHORT_ENABLED      = False   # DISABLED 2026-09-11 — replacing with original accel_300_short which has better regime data.
 ACCEL_300_V4_SHORT_MIN_GAP      = 2.0     # min gap below EMA300 (V2 proven: no loser had gap>2.0%)
 ACCEL_300_V4_SHORT_MAX_GAP      = 6.0     # max gap (V2 proven)
 ACCEL_300_V4_SHORT_MIN_GAP_ACCEL = 0.20   # min gap acceleration (V2 proven: 0.10 was too weak)
