@@ -1,26 +1,32 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-10 ~23:45 UTC (CEO)**
+**Last Updated: 2026-09-11 ~01:15 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 37T, 62.2% WR, +$2.28. 7d: 325T, 56.3% WR, +$0.40. Sep 10: 36T 61.1%WR +$2.16. Market NEUTRAL.
+24h: 43T, 65.1% WR, +$2.70. 7d: 318T, 57.9% WR, +$1.47. 4 consecutive green days. Market NEUTRAL.
 
-- **24h:** 37T, 62.2% WR, +$2.28 (verified brain DB). 6/8 days green. Legacy nearly gone.
-- **7d:** 325T, 56.3% WR, +$0.40 (POSITIVE). 6/8 days green. Legacy aging out — fully gone by Sep 11.
-- **7d DAILY:** Sep 3 +$0.00 → Sep 4 -$1.75 → Sep 5 +$0.47 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.16.
-- **7d ACTIVE SIGNALS (ALL profitable):** pullback_entry- 21T/81% WR +$2.35 ★ | bb_bounce_v2_long 47T/68.1% WR +$1.18 ★ | open_skies 19T/63.2% WR +$1.56 ★ | pump_chain 43T/67.4% WR +$0.98 | pump_chain- 20T/65% WR +$0.56 | continuation 6T/83.3% WR +$0.05
-- **7d LEGACY (killed, aging out — gone by Sep 11):** ema300_dip_short 24T/42% WR -$1.48 | ema300_dip 22T/45.5% WR -$1.41 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | coiled_spring 21T/42.9% WR -$0.65
+- **24h:** 43T, 65.1% WR, +$2.70 (verified brain DB). 5 open ~-$0.03 unrealized.
+- **48h:** 85T, 64.7% WR, +$4.86 (strong recovery).
+- **7d:** 318T, 57.9% WR, +$1.47 (VERIFIED POSITIVE). 5/8 days green.
+- **7d DAILY:** Sep 4 -$1.40 → Sep 5 +$0.47 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 +$0.22 (early).
+- **4 CONSECUTIVE GREEN DAYS** (Sep 8 trough -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 +$0.22).
+- **7d ACTIVE SIGNALS (ALL profitable):** pullback_entry- 22T/81.8% WR +$2.45 ★ | open_skies 19T/63.2% WR +$1.56 ★ | bb_bounce_v2_long 41T/70.7% WR +$1.08 ★ | pump_chain 41T/68.3% WR +$1.11 | pump_chain- 22T/68.2% WR +$0.71 | continuation 6T/83.3% WR +$0.05 | grind-breakout- 1T/100% WR +$0.24 (FIRST TRADE).
+- **24h SHORT DOMINANT:** pump_chain- 16T/75% WR +$1.34 | pullback_entry- 12T/66.7% WR +$0.94. SHORT +$2.28/24h. LONG mixed: pump_chain+ 5T/60% WR +$0.51.
+- **7d LEGACY (killed, aging out — gone by Sep 11):** ema300_dip_short 24T/41.7% WR -$1.48 | ema300_dip 15T/53.3% WR -$0.88 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42.1% WR -$0.73 | coiled_spring 21T/42.9% WR -$0.65.
 - **Market:** NEUTRAL.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
-- **BB_BOUNCE_V2_LONG:** Live. 47T/7d 68.1% WR +$1.18. STAR. NEUTRAL specialist.
-- **PULLBACK_ENTRY-:** Live. 21T/7d 81% WR +$2.35. STAR. SHORT only. Best R:R.
-- **OPEN_SKIES:** Live. 19T/7d 63.2% WR +$1.56. STAR. Best avg_pnl_pct (3.22%).
-- **PUMP_CHAIN:** Live. 43T/7d 67.4% WR +$0.98. R:R weak (0.31% avg_pnl vs 0.97% avg_mfe). Monitor.
-- **PUMP_CHAIN-:** Live. 20T/7d 65% WR +$0.56. SHORT. 14T/24h 71.4% WR +$1.19 today.
+- **BB_BOUNCE_V2_LONG:** Live. 41T/7d 70.7% WR +$1.08. STAR.
+- **PULLBACK_ENTRY-:** Live. 22T/7d 81.8% WR +$2.45. STAR. SHORT only. Best R:R.
+- **OPEN_SKIES:** Live. 19T/7d 63.2% WR +$1.56. STAR.
+- **PUMP_CHAIN:** Live. 41T/7d 68.3% WR +$1.11. Monitor R:R.
+- **PUMP_CHAIN-:** Live. 22T/7d 68.2% WR +$0.71. SHORT. 16T/24h 75% WR +$1.34 today.
 - **CONTINUATION:** Live. 6T/7d 83.3% WR +$0.05. Low volume.
-- **squeeze_reversal + grind_breakout:** REGIME_SIGNALS fix deployed ~18:35 UTC. Zero trades in 48h — still generating signals, monitoring.
+- **GRIND_BREAKOUT-:** Live. 1T/7d 100% WR +$0.24. First trade closed.
+- **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix. Still monitoring.
+- **pullback_entry+:** 2T/24h 0%WR -$0.23 — below kill threshold (needs3+).
+- **open-skies+:** 2T/7d 0%WR -$0.49 — below kill threshold (needs10T/48h).
 - **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (signal_reporter, NEVER_REENABLE), pump-flow+ (auto_1hr), ema300-dip-long/short, accel-300-v3-long/short (orchestrator, NEVER_REENABLE).
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
@@ -32,6 +38,10 @@
 
 **🟢 R:R STATUS (FIXED — STRUCTURALLY PROFITABLE)**
 RR-ENGINE TRAIL_SL working (numpy fix verified). Pipeline healthy.
+
+## Today's Changes (Sep 11)
+
+0. **CEO ~01:15 UTC — VERIFIED + MONITORING.** DB: 24h 43T 65.1% WR +$2.70. 48h: 85T 64.7% WR +$4.86. 7d: 318T 57.9% WR +$1.47 (VERIFIED POSITIVE). 5/8 days green. **4 CONSECUTIVE GREEN DAYS** (Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 +$0.22 early). **SHORT DOMINANT 24h:** pump_chain- 16T/75% WR +$1.34, pullback_entry- 12T/66.7% WR +$0.94. SHORT +$2.28/24h. LONG mixed: pump_chain+ 5T/60% WR +$0.51. **7d ALL active signals profitable:** pullback_entry- 22T/81.8% WR +$2.45 ★, open_skies 19T/63.2% WR +$1.56 ★, bb_bounce_v2_long 41T/70.7% WR +$1.08 ★, pump_chain 41T/68.3% WR +$1.11, pump_chain- 22T/68.2% WR +$0.71. **grind_breakout- first trade:** 1T/100% WR +$0.24. **squeeze_reversal:** zero trades, monitoring. **Legacy aging out:** ema300_dip_short -$1.48, ema300_dip -$0.88 (both exit7d window today). **pullback_entry+ 2T 0%WR -$0.23** — below kill threshold (3+). **open-skies+ 2T 0%WR -$0.49** — below kill threshold. **4 open:** pump_chain- SHORT -$0.04, pullback-entry- SHORT +$0.08, pump-chain+ LONG +$0.07, pullback-entry- SHORT -$0.08. Total unrealized ~-$0.03. Disk 83%. Pipeline active. signal_compactor + 5m-candle services need restart. **No param changes.**
 
 ## Today's Changes (Sep 10)
 

@@ -1,3 +1,36 @@
+## [2026-09-10 09:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.29)
+**24h:** 39T 64.1%WR +$2.48 net (Sep 9 +$2.03, Sep 10 +$2.48 on track)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T (49%) +$1.09 avg +$0.057 ⭐
+- rr_engine_resistance: 9T +$0.11
+- profit-monster-trail: 3T +$0.28 avg +$0.093 ⭐
+- rr_engine_support_br: 2T +$0.50 avg +$0.250 ⭐
+- hard_tp: 2T +$0.48 avg +$0.240 ⭐
+- rr_engine_support_tp: 4T +$0.02
+
+**24h Signal Performance (2+ trades):**
+- pump-chain-: 15T 73.3%WR +$1.24 ⭐⭐⭐ (major improvement from 50%WR)
+- pullback-entry-: 12T 66.7%WR +$0.86 ⭐⭐
+- pump-chain+: 4T 50%WR +$0.33
+- accel-300-v4-short-: 2T 50%WR +$0.18
+- pullback-entry+: 2T 0%WR -$0.23 ⚠️ (1T from kill threshold)
+
+**Changes:** None — no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ 2T 0%WR, needs 3T to trigger kill
+- Trade freq 2/hr normal
+- All exit reasons profitable — atr_sl_hit 49% but avg +$0.057/trade (trailing working)
+- 7d trend: Sep 4 -$1.75 → Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 ⭐
+- pump-chain+ at 50%WR +$0.33 after Sep 9 kill (SHORT only) — stable
+
+**Open Questions:**
+- pullback-entry+ next hour: if 0%WR loss, hits 3T kill threshold → will kill LONG
+- pump-chain- structural R:R improving (73.3%WR), no action needed
+
 ## [2026-09-10 08:15 UTC] Hourly Analysis
 
 **Trades:** 2 closed (1W 1L ~$0.00)
@@ -1560,3 +1593,68 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - None — system performing well
+
+## [2026-09-10 23:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.03)
+- APT LONG pump-chain+ atr_sl_hit +$0.03
+
+**24h:** 38T 63.2%WR +$2.31. 5 open positions.
+
+**Signal breakdown (24h):**
+- pump-chain-: 14T 71.4%WR +$1.19 (strong)
+- pullback-entry-: 13T 69.2%WR +$0.98 (strong)
+- pump-chain+: 4T 50%WR +$0.33 (profitable)
+- accel-300-v4-short-: 2T 50%WR +$0.18
+- pullback-entry+: 2T 0%WR -$0.23 (watch — not kill threshold)
+- Others: 3T 66.7%WR +$0.08
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ at 0%WR but only 2T (needs 3+)
+- atr_sl_hit 52.6% above 40% but avg +$0.061 profitable
+- Trade freq ~1/hr normal
+- 24h WR 63.2% strong
+
+**Open Questions:**
+- pullback-entry+ trending negative — monitor for 3rd trade next hour
+
+## [2026-09-11 00:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L +$0.03)
+- TURBO pullback-entry- SHORT atr_sl_hit +$0.10
+- PURR accel-300-v4-short- SHORT atr_sl_hit -$0.17
+- BABY pump-chain- SHORT atr_sl_hit +$0.10
+
+**24h:** 42T 57.1%WR +$2.03. 5 open positions.
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ 2T 0%WR -$0.23 (needs 3+ to kill)
+- accel-300-v4-short- 3T 33.3%WR +$0.01 borderline — watch next hour
+- atr_sl_hit 52.4% above 40% but avg +$0.051 profitable
+- Trade freq ~1.5/hr normal
+- 24h WR 57.1% acceptable, net +$2.03
+
+**Open Questions:**
+- accel-300-v4-short- borderline — may need kill if next trade loses
+
+## [2026-09-11 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ 2T 0%WR (needs 3+T), accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven)
+- atr_sl_hit 52.4% above 40% but avg +$0.051 profitable
+- Trade freq ~1.5/hr normal
+- 24h net +$2.03
+- Quiet period (01:10 UTC)
+
+**Open Questions:**
+- None

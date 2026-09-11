@@ -1,3 +1,12 @@
+## Error Alerts — 2026-09-10 23:23 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 23:23:03, 0 open trades in DB, 4 open per pipeline
+- **[INFO]** Signals: 91 generated in last hour (19 LONG, 72 SHORT)
+- **[INFO]** Trades: 36 today, +$1.42 PnL, 63.9% WR (best: pump-chain SHORT 73.3%)
+- **[WARN]** (2x): `signal_compactor: timed out` at 23:14 and 23:16 — self-recovered on next cycle
+- **[WARN]** 69/241 tokens stale (28.6%) — expected in NEUTRAL market
+- **[WARN]** Disk at 83% (93G/118G) — 2% from 85% threshold
+- **AUTO-FIX**: None needed — transient compactor timeouts self-recovered
+
 ## Error Alerts — 2026-09-10 08:23 UTC
 - **[INFO]** Pipeline running, last cycle 08:22:48, 1 transient error
 - **[INFO]** Signals: 49 generated in last hour, 0 above 50% confidence (NEUTRAL regime)
@@ -68,3 +77,7 @@
 - **[INFO]** Regime: NEUTRAL (0 hot, 87 warm, 7 cold)
 - **[WARN]** Disk at 83% (93G/118G) — 2% from threshold
 - **AUTO-FIX**: Added `from hermes_constants import CHOP_DETECTOR_ENABLED` before line 2671 in signal_compactor.py. Verified compactor runs clean (dry run: 1 hotset, 0 errors). Standalone service and pipeline both confirmed working post-fix.
+
+## Error Alerts — 2026-09-11 00:24 UTC
+- **WARN** (2x): `signal_compactor: timed out` at 00:17 and 00:20
+- **AUTO-FIX**: None — non-fatal, pipeline continued running. Monitor for escalation.

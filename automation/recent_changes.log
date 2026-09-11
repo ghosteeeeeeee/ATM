@@ -1,3 +1,7 @@
+[2026-09-10 09:30 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.29). 39T/24h 64.1%WR +$2.48 net (Sep 9 +$2.03, Sep 10 +$2.48 on track). Kill criteria not met: pullback-entry+ 2T 0%WR -$0.23 (1T from kill). All exit reasons profitable. atr_sl_hit 49% but avg +$0.057/trade (trailing working). pump-chain- 15T 73.3%WR +$1.24 star. pullback-entry- 12T 66.7%WR +$0.86 star. Trade freq 2/hr normal. 5 open positions. 7d trend improving: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48.
+  BY: auto_1hr
+  NEXT: Re-run at 10:30 UTC
 [2026-09-10 08:15 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L ~$0). 46T/24h 65%WR +$1.39 net (improving: Sep 7 +$1.28, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track). Kill criteria not met: no signal at 0%WR with 3+T last hour. pullback-entry- 16T 81%WR +$1.76 star. atr_sl_hit improved to 50% (was 59%) and now profitable +$0.70. pump-chain- 6T 50%WR -$0.63 R:R 0.13:1 structural (avg_win $0.03 vs avg_loss -$0.24). pullback-entry+ 5T 20%WR -$0.43 approaching kill (one more 0%WR loss at 3T triggers kill). ema300-dip-long 3T 33%WR -$0.15 new problem, all 3 SL hits, monitoring. open-skies+ 2T 0%WR -$0.49 below kill threshold (only 2T). rr_engine_resistance 7T -$0.34 worst exit reason. Trade freq 1.4/hr normal. 3 open positions. 3d trend improving: Sep 7 +$1.28, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$0.79 on track.
   BY: auto_1hr
@@ -1345,3 +1349,15 @@
   WHY: 1T last hour (0W 1L -$0.18 AIXBT pump-chain- rr_engine_resistance). 41T/24h 65.9%WR +$3.72. Kill criteria not met: pullback-entry+ at 0%WR but only 2T (needs 3+). atr_sl_hit 56% above 40% but avg +$0.114 profitable. Trade freq ~1.5/hr normal. 5 open positions. Daily trend strong: Sep 9 +$2.03, Sep 10 +$2.16.
   BY: auto_1hr
   NEXT: Re-run at 22:10 UTC
+[2026-09-10 23:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.03 APT pump-chain+). 38T/24h 63.2%WR +$2.31. Kill criteria not met: pullback-entry+ at 0%WR but only 2T (needs 3+). atr_sl_hit 52.6% above 40% but avg +$0.061 profitable. pump-chain- 14T 71.4%WR +$1.19 strong. pullback-entry- 13T 69.2%WR +$0.98 strong. Trade freq ~1/hr normal. 5 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 00:10 UTC
+[2026-09-11 00:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.03). All atr_sl_hit. 42T/24h 57.1%WR +$2.03. Kill criteria not met. pullback-entry+ 2T 0%WR -$0.23 (needs 3+ to kill). accel-300-v4-short- 3T 33.3%WR +$0.01 borderline. atr_sl_hit 52.4% above 40% but avg +$0.051 profitable. pump-chain- 16T 75%WR +$1.34 strong. Trade freq ~1.5/hr normal. 5 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 01:10 UTC
+[2026-09-11 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period, 01:10 UTC). 42T/24h 57.1%WR +$2.03. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven). atr_sl_hit 52.4% above 40% but avg +$0.051 profitable. 5 open positions. Trade freq ~1.5/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 02:10 UTC
