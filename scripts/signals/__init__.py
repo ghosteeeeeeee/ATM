@@ -50,6 +50,7 @@ from hermes_constants import (
     WARRIOR_SR_CONFIRM_ENABLED, WARRIOR_SR_CONFIRM_PLUS_ENABLED, WARRIOR_SR_CONFIRM_MINUS_ENABLED,
     BREAKOUT_PULLBACK_ENABLED, BREAKOUT_PULLBACK_PLUS_ENABLED, BREAKOUT_PULLBACK_MINUS_ENABLED,
     VOLUME_CLIMAX_ENABLED, VOLUME_CLIMAX_PLUS_ENABLED, VOLUME_CLIMAX_MINUS_ENABLED,
+    HH_HL_ENABLED,
 )
 
 
@@ -320,6 +321,11 @@ try:
 except Exception:
     _volume_climax_run = None
 
+try:
+    from signals.hh_hl import run as _hh_hl_run
+except Exception:
+    _hh_hl_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -380,6 +386,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'warrior_sr_confirm',       'enabled': 'WARRIOR_SR_CONFIRM_ENABLED',  'run': _warrior_sr_confirm_run},
     {'name': 'breakout_pullback',        'enabled': 'BREAKOUT_PULLBACK_ENABLED',   'run': _breakout_pullback_run},
     {'name': 'volume_climax',            'enabled': 'VOLUME_CLIMAX_ENABLED',       'run': _volume_climax_run},
+    {'name': 'hh_hl',                    'enabled': 'HH_HL_ENABLED',              'run': _hh_hl_run},
 ]
 
 

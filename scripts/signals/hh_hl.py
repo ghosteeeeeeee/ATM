@@ -1,894 +1,623 @@
-# Migrated from ../hh_hl_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
+"""hh_hl.py — Structure Sniper: multi-confluence market structure signal (v2).
+
+Detects HH/HL (uptrend) and LH/LL (downtrend) structure on 5m OHLCV candles
+and fires breakout signals when price breaks above the last swing high (LONG)
+or below the last swing low (SHORT), with 7+ confluence gates.
+
+Architecture: signal → add_signal() → compactor → hotset → guardian
+
+Confluence gates (ALL must pass):
+  1. Structure clarity — clear 4+ swing pattern on 5m
+  2. Higher TF trend — 1H EMA20 vs EMA50 alignment
+  3. Volume confirmation — breakout candle > 1.5x 20-period average
+  4. Momentum — RSI in favorable zone
+  5. EMA alignment — price vs 5m EMA20 + EMA20 vs EMA50
+  6. Volatility — ATR% between 0.3% and 1.5%
+  7. Freshness — breakout within last 5 bars on 5m
+
+Data sources:
+  Primary: candles_5m (OHLCV, proper H/L for swing detection)
+  Higher TF: candles_1h (EMA20/50 trend confirmation)
+  Fallback: price_history (close-only, lower quality — skip if possible)
+
+Signal types: hh_hl_breakout_long, hh_hl_breakout_short
+Source strings: hh-hl+ (LONG), hh-hl- (SHORT)
 """
-hh_hl_signals.py — Higher Highs / Higher Lows Structure Signal Scanner for Hermes.
 
-Detects swing structure (HH/HL or LH/LL) on 1m close prices and fires:
-  1. BREAKOUT variant — price breaks above recent swing high (LONG) or below swing low (SHORT)
-  2. PULLBACK variant — price pulls back to prior swing level in established structure then bounces
+import sys, os, sqlite3, time
+from typing import Optional, List, Tuple, Dict
 
-Data: price_history table (signals_hermes.db) — live 1m closes, updated every minute.
-      Falls back to ohlcv_1m if price_history is insufficient.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
+from paths import HERMES_DATA, CANDLES_DB, STATIC_DB
 
-Params: see hermes_constants.py HH_HL_* constants.
-Signal types: hh_hl_breakout, hh_hl_pullback
-"""
-
-import sys
-import os
-import time
-import sqlite3
-from typing import Optional, Tuple, List, Dict
-
-# ── Params from hermes_constants ────────────────────────────────────────────────
 from hermes_constants import (
-    HH_HL_LOOKBACK, HH_HL_SWING_WINDOW, HH_HL_MIN_SEP,
-    HH_HL_BREAKOUT_THRESHOLD, HH_HL_ATR_ENTRY_MIN,
+    HH_HL_ENABLED, HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED,
+    HH_HL_LOOKBACK, HH_HL_SWING_WINDOW, HH_HL_MIN_SEP, HH_HL_MIN_SWINGS,
+    HH_HL_BREAKOUT_THRESHOLD, HH_HL_MAX_BARS_SINCE,
     HH_HL_SL_ATR_MULT, HH_HL_TP_ATR_MULT,
-    HH_HL_MAX_HOLD_BARS, HH_HL_MAX_BARS_SINCE, HH_HL_COOLDOWN_MIN,
-    HH_HL_CONFIDENCE_FLOOR, HH_HL_CONFIDENCE_CAP,
-    HH_HL_BASE_CONFIDENCE, HH_HL_STRUCT_BONUS_MAX,
-    HH_HL_BREAKOUT_BONUS_MAX, HH_HL_RECENCY_BONUS_MAX,
-    HH_HL_ENABLED,
-    HH_HL_SHORT_RANGE_TOP_ATR, HH_HL_LONG_RANGE_BOTTOM_ATR,
-    HH_HL_CHOCH_BASE_CONFIDENCE, HH_HL_CHOCH_STRUCT_BONUS_MAX,
-    HH_HL_CHOCH_RECENCY_BONUS_MAX, HH_HL_CHOCH_MAX_BARS_SINCE,
+    HH_HL_AVG_VOL_MULT, HH_HL_VOL_LOOKBACK,
+    HH_HL_RSI_PERIOD, HH_HL_RSI_LONG_MIN, HH_HL_RSI_LONG_MAX,
+    HH_HL_RSI_SHORT_MIN, HH_HL_RSI_SHORT_MAX,
+    HH_HL_EMA_FAST, HH_HL_EMA_SLOW,
+    HH_HL_HTF_EMA_FAST, HH_HL_HTF_EMA_SLOW,
+    HH_HL_VOL_FLOOR_PCT, HH_HL_VOL_CAP_PCT,
+    HH_HL_CONF_BASE, HH_HL_CONF_FLOOR, HH_HL_CONF_CAP,
+    HH_HL_CONF_STRUCT_BONUS, HH_HL_CONF_VOLUME_BONUS,
+    HH_HL_CONF_HTF_BONUS, HH_HL_CONF_MOMENTUM_BONUS,
+    HH_HL_COOLDOWN_HOURS,
+    HH_HL_STALE_5M_SEC, HH_HL_STALE_1H_SEC,
+    HH_HL_MIN_CANDLES_5M, HH_HL_MIN_CANDLES_1H,
+    HH_HL_STRUCT_MIN_SWINGS, HH_HL_MAX_EXTENSION_ATR,
+    HH_HL_HTF_STRONG_SPREAD, HH_HL_HTF_BONUS_SPREAD,
+    HH_HL_RSI_SWEET_LONG_LOW, HH_HL_RSI_SWEET_LONG_HIGH,
+    HH_HL_RSI_SWEET_SHORT_LOW, HH_HL_RSI_SWEET_SHORT_HIGH,
+    HH_HL_VOL_STRONG_MULT, HH_HL_BACKUP_ATR_PCT,
+    LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
-SIGNAL_TYPE_BREAKOUT = 'hh_hl_breakout'
-SIGNAL_TYPE_PULLBACK = 'hh_hl_pullback'
-SIGNAL_TYPE_CHOCH    = 'hh_hl_choch'
-_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
-
-# ── ATR ────────────────────────────────────────────────────────────────────────
-
-def _compute_atr(candles: list, period: int = 14) -> Optional[float]:
-    """Compute ATR from close-only candle data (price_history).
-
-    Since price_history has open=high=low=close for each row, traditional
-    TR = max(H-L, |H-PC|, |L-PC|) degenerates to 0.
-
-    Instead we use the rolling close range as a volatility proxy:
-      ATR = mean over period of (rolling_max_closes - rolling_min_closes)
-
-    This is a standard approach for close-only data and is used by practitioners
-    who don't have true H/L/O data.
-
-    Returns None if insufficient data.
-    """
-    n = len(candles)
-    if n < period + 1:
-        return None
-
-    closes = [c['close'] for c in candles]
-
-    # Rolling range: max(closes[i-period+1:i+1]) - min(closes[i-period+1:i+1])
-    # This is the "close-only ATR" — true range equivalent for close-only data
-    ranges = []
-    for i in range(period - 1, n):
-        window = closes[i - period + 1 : i + 1]
-        r = max(window) - min(window)
-        ranges.append(r)
-
-    if len(ranges) < period:
-        return None
-    return sum(ranges[-period:]) / period
-
-
-# ── Swing Detection ────────────────────────────────────────────────────────────
-
-def _find_swing_highs_lows(candles: list, window: int = HH_HL_SWING_WINDOW,
-                           min_sep: int = HH_HL_MIN_SEP) -> Tuple[List[int], List[int]]:
-    """Find indices of swing highs and swing lows using proxy high/low from closes.
-
-    Since price_history has close-only data (open=high=low=close per row), we use
-    a rolling window max/min of closes as proxy for the candle's high/low. A swing
-    high at index i is the MAX of closes in [i-window, i+window] and is strictly
-    greater than the proxy high of all neighbors. Same for swing low (MIN, strictly less).
-
-    This is a standard technique for swing detection on close-only data.
-
-    Args:
-        candles: list of {open, high, low, close} dicts, oldest first
-        window:  half-width of the swing check window
-        min_sep: minimum candle separation between consecutive swings
-
-    Returns:
-        (swing_high_indices, swing_low_indices) — sorted ascending
-    """
-    n = len(candles)
-    highs, lows = [], []
-    last_h = last_l = -999
-
-    # Pre-compute rolling proxy high/low using closes
-    closes = [c['close'] for c in candles]
-
-    for i in range(window, n - window):
-        # Proxy high/low for index i: max/min of closes in [i-window, i+window]
-        window_closes = closes[i - window : i + window + 1]
-        proxy_high = max(window_closes)
-        proxy_low  = min(window_closes)
-
-        # Swing high: proxy high at i is strictly greater than all neighbors' proxy highs
-        # (use <= here to match tested behavior — allows equal proxy highs at neighbors)
-        is_high = True
-        for j in range(i - window, i + window + 1):
-            if j == i:
-                continue
-            neighbor_closes = closes[max(0, j - window) : j + window + 1]
-            neighbor_proxy_high = max(neighbor_closes)
-            if neighbor_proxy_high > proxy_high:
-                is_high = False
-                break
-        if is_high and (i - last_h) >= min_sep:
-            highs.append(i)
-            last_h = i
-
-        # Swing low: proxy low at i is strictly less than all neighbors' proxy lows
-        is_low = True
-        for j in range(i - window, i + window + 1):
-            if j == i:
-                continue
-            neighbor_closes = closes[max(0, j - window) : j + window + 1]
-            neighbor_proxy_low = min(neighbor_closes)
-            if neighbor_proxy_low < proxy_low:
-                is_low = False
-                break
-        if is_low and (i - last_l) >= min_sep:
-            lows.append(i)
-            last_l = i
-
-    return highs, lows
-
-
-def _classify_structure(highs: List[int], lows: List[int],
-                        candles: list) -> Tuple[str, float, int]:
-    """Classify current swing structure at the most recent candle.
-
-    Args:
-        highs: sorted swing high indices
-        lows:  sorted swing low indices
-        candles: full candle list
-
-    Returns:
-        (structure, breakout_strength_pct, bars_since_last_swing)
-          structure: 'HH_HL' | 'LH_LL' | 'NEUTRAL'
-          breakout_strength: price distance from last HH (LONG) or LL (SHORT) as %
-    """
-    n = len(candles)
-    if not highs or not lows:
-        return 'NEUTRAL', 0.0, 0
-
-    price = candles[-1]['close']
-
-    # Build sorted swing list
-    all_swings = []
-    for idx in highs:
-        all_swings.append((idx, candles[idx]['high'], 'H'))
-    for idx in lows:
-        all_swings.append((idx, candles[idx]['low'], 'L'))
-    all_swings.sort(key=lambda x: x[0])
-
-    if len(all_swings) < 4:
-        return 'NEUTRAL', 0.0, 0
-
-    # Last 4 swings: s0=oldest, s3=newest
-    s0, s1, s2, s3 = all_swings[-4:]
-    _, p0, t0 = s0
-    _, p1, t1 = s1
-    _, p2, t2 = s2
-    _, p3, t3 = s3
-
-    structure = 'NEUTRAL'
-    bs = 0.0
-    last_swing_idx = max(highs[-1] if highs else 0, lows[-1] if lows else 0)
-
-    if t0 == 'H' and t1 == 'L' and t2 == 'H' and t3 == 'L':
-        # Full HH_HL pattern
-        if p2 > p0 and p3 > p1:
-            structure = 'HH_HL'
-            bs = (price - p2) / price * 100.0
-        elif p2 < p0 and p3 < p1:
-            structure = 'LH_LL'
-            bs = (p2 - price) / price * 100.0
-    elif t0 == 'L' and t1 == 'H' and t2 == 'L' and t3 == 'H':
-        # First HH then first HL
-        if p3 > p1:
-            structure = 'HH_HL'
-            bs = (price - p3) / price * 100.0
-        elif p3 < p1:
-            structure = 'LH_LL'
-            bs = (p3 - price) / price * 100.0
-    elif t0 == 'H' and t1 == 'L' and t2 == 'H':
-        # Partial HH_HL (only 3 swings — one HH, one HL so far)
-        if p2 > p0:
-            structure = 'HH_HL'
-            bs = (price - p2) / price * 100.0
-    elif t0 == 'L' and t1 == 'H' and t2 == 'L':
-        if p2 < p0:
-            structure = 'LH_LL'
-            bs = (p2 - price) / price * 100.0
-
-    bars_since = n - 1 - last_swing_idx
-    return structure, bs, bars_since
-
-
-# ── Breakout detection ─────────────────────────────────────────────────────────
-
-def _detect_breakout(token: str, candles: list, structure: str,
-                     breakout_strength: float, price: float,
-                     bars_since: int) -> Optional[dict]:
-    """Detect HH_HL breakout signals.
-
-    LONG:  in HH_HL structure + price breaks above last swing high
-    SHORT: in LH_LL structure + price breaks below last swing low
-    """
-    if structure not in ('HH_HL', 'LH_LL'):
-        return None
-
-    highs, lows = _find_swing_highs_lows(candles)
-    if not highs or not lows:
-        return None
-
-    atr = _compute_atr(candles)
-    if atr is None:
-        return None
-
-    direction = None
-    last_sw_price = None
-
-    # breakout_strength is in % units (e.g. 0.014 = 0.014%); threshold is in decimal fraction
-    # → normalize: breakout_strength / 100 to compare against threshold
-    if structure == 'HH_HL' and (breakout_strength / 100) >= HH_HL_BREAKOUT_THRESHOLD:
-        last_sw_price = candles[highs[-1]]['high']
-        if price > last_sw_price:
-            direction = 'LONG'
-            source = f'hhh-long{bars_since}'
-    elif structure == 'LH_LL' and (breakout_strength / 100) >= HH_HL_BREAKOUT_THRESHOLD:
-        last_sw_price = candles[lows[-1]]['low']
-        if price < last_sw_price:
-            direction = 'SHORT'
-            source = f'hhh-short{bars_since}'
-
-    # ── OPTION C: Range-position filter ────────────────────────────────────
-    # SHORT should only fire at the BOTTOM of the range, not at bounce territory.
-    # If price is within 1 ATR of the 20-bar high, it's a bounce-at-top SHORT
-    # — price bounces 99% of the time there. Block it.
-    # LONG should only fire when price has room to run (not too close to 20-bar low).
-    if direction == 'SHORT':
-        recent_high = max(c['high'] for c in candles[-20:])
-        if price > recent_high - (atr * HH_HL_SHORT_RANGE_TOP_ATR):
-            return None  # too close to top of range = bounce territory
-    if direction == 'LONG':
-        recent_low = min(c['low'] for c in candles[-20:])
-        if price < recent_low + (atr * HH_HL_LONG_RANGE_BOTTOM_ATR):
-            return None  # too close to recent low = not a clean HH breakout
-
-    if direction is None:
-        return None
-
-    # Reject stale breakouts — signal must be recent
-    if bars_since > HH_HL_MAX_BARS_SINCE:
-        return None
-
-    # NOTE: breakout candle size check (HH_HL_ATR_ENTRY_MIN) is skipped — price_history
-    # is close-only so candle body is always 0. The BREAKOUT_THRESHOLD (0.05%) is the
-    # primary filter for distinguishing real breakouts from noise.
-
-    # Confidence
-    struct_bonus  = min(breakout_strength * 5, HH_HL_STRUCT_BONUS_MAX)
-    break_bonus   = min(breakout_strength * 3, HH_HL_BREAKOUT_BONUS_MAX)
-    recency_bonus = max(HH_HL_RECENCY_BONUS_MAX - bars_since, 0)
-
-    confidence = int(min(
-        HH_HL_BASE_CONFIDENCE + struct_bonus + break_bonus + recency_bonus,
-        HH_HL_CONFIDENCE_CAP
-    ))
-    if confidence < HH_HL_CONFIDENCE_FLOOR:
-        return None
-
-    return {
-        'direction':   direction,
-        'confidence':  confidence,
-        'source':      source,
-        'breakout_pct': round(breakout_strength, 4),
-        'bars_since':  bars_since,
-        'structure':   structure,
-        'value':       float(confidence),
-    }
-
-
-# ── Pullback detection ─────────────────────────────────────────────────────────
-
-def _detect_pullback(token: str, candles: list, structure: str,
-                    price: float) -> Optional[dict]:
-    """Detect HH_HL pullback signals.
-
-    LONG:  in HH_HL structure + price retraces to last HL level + bounces
-    SHORT: in LH_LL structure + price retraces to last LH level + drops
-
-    Pullback zone: 23.6%–61.8% Fibonacci retracement from the prior swing.
-    Entry: confirmation candle close vs current close (bounce confirmation).
-    """
-    if structure not in ('HH_HL', 'LH_LL'):
-        return None
-
-    highs, lows = _find_swing_highs_lows(candles)
-    if not highs or not lows:
-        return None
-
-    atr = _compute_atr(candles)
-    if atr is None:
-        return None
-
-    # Get last 4 swings: HH, HL, LH, LL
-    all_swings = []
-    for idx in highs:
-        all_swings.append((idx, candles[idx]['high'], 'H'))
-    for idx in lows:
-        all_swings.append((idx, candles[idx]['low'], 'L'))
-    all_swings.sort(key=lambda x: x[0])
-
-    if len(all_swings) < 4:
-        return None
-
-    s0, s1, s2, s3 = all_swings[-4:]
-    _, hh, _ = s0 if s0[2] == 'H' else (None, None, None)
-    # Find HH, HL, LH, LL prices
-    swing_prices = {s[0]: (s[1], s[2]) for s in all_swings[-4:]}
-    sorted_prices = sorted([(s[0], s[1], s[2]) for s in all_swings[-4:]], key=lambda x: x[0])
-
-    # Identify: among last 4 swings, which are H and which are L
-    last_4 = sorted_prices  # [(idx, price, type), ...]
-    # Find the HH (higher high) and HL (higher low) — for HH_HL structure
-    h_swings = [(s[0], s[1]) for s in last_4 if s[2] == 'H']  # (idx, price)
-    l_swings = [(s[0], s[1]) for s in last_4 if s[2] == 'L']  # (idx, price)
-
-    if len(h_swings) < 2 or len(l_swings) < 2:
-        return None
-
-    # For HH_HL: last high is the HH, last low is the HL
-    direction = None
-    pullback_level = None
-    bars_since = 0
-    fib_min_price = None
-    fib_max_price = None
-
-    if structure == 'HH_HL':
-        last_hh_idx, last_hh_price = h_swings[-1]
-        last_hl_idx, last_hl_price = l_swings[-1]
-        # Price must be between HH and HL (pullback in progress)
-        if price >= last_hh_price or price <= last_hl_price:
-            return None
-        # Fib zone: 23.6%–61.8% retracement from HH toward HL
-        fib_236 = last_hh_price - (last_hh_price - last_hl_price) * 0.236
-        fib_618 = last_hh_price - (last_hh_price - last_hl_price) * 0.618
-        if not (fib_618 <= price <= fib_236):
-            return None
-        # Bounce confirmation: next candle close > current close
-        next_close = candles[-1]['close']
-        if next_close <= price:
-            return None  # hasn't bounced yet
-        pullback_level = last_hl_price
-        bars_since = len(candles) - 1 - last_hl_idx
-        direction = 'LONG'
-
-    elif structure == 'LH_LL':
-        last_lh_idx, last_lh_price = h_swings[-1]
-        last_ll_idx, last_ll_price = l_swings[-1]
-        if price <= last_ll_price or price >= last_lh_price:
-            return None
-        fib_236 = last_ll_price + (last_lh_price - last_ll_price) * 0.236
-        fib_618 = last_ll_price + (last_lh_price - last_ll_price) * 0.618
-        if not (fib_236 <= price <= fib_618):
-            return None
-        next_close = candles[-1]['close']
-        if next_close >= price:
-            return None  # hasn't dropped yet
-        pullback_level = last_lh_price
-        bars_since = len(candles) - 1 - last_lh_idx
-        direction = 'SHORT'
-
-    if direction is None:
-        return None
-
-    # Reject stale pullbacks — signal must be recent
-    if bars_since > HH_HL_MAX_BARS_SINCE:
-        return None
-
-    # Confidence
-    dist_from_level = abs(price - pullback_level) / price * 100.0
-    struct_bonus  = min(dist_from_level * 2, HH_HL_STRUCT_BONUS_MAX)
-    recency_bonus = max(HH_HL_RECENCY_BONUS_MAX - bars_since, 0) if bars_since < HH_HL_RECENCY_BONUS_MAX else 0
-
-    confidence = int(min(
-        HH_HL_BASE_CONFIDENCE + struct_bonus + recency_bonus,
-        HH_HL_CONFIDENCE_CAP
-    ))
-    if confidence < HH_HL_CONFIDENCE_FLOOR:
-        return None
-
-    source = f'hhp-long{bars_since}' if direction == 'LONG' else f'hhp-short{bars_since}'
-
-    return {
-        'direction':    direction,
-        'confidence':  confidence,
-        'source':      source,
-        'pullback_pct': round(dist_from_level, 4),
-        'bars_since':  bars_since,
-        'structure':   structure,
-        'value':       float(confidence),
-    }
-
-
-# ── CHoCH (Change of Character) detection ──────────────────────────────────────
-
-def _structure_from_swings(swings_4: list) -> str:
-    """Classify structure from swing points. Returns 'HH_HL', 'LH_LL', or 'NEUTRAL'.
-
-    Uses the same logic as _classify_structure — checks for H,L,H,L or L,H,L,H patterns
-    in the sorted swing list. Handles non-alternating sequences by checking all valid patterns.
-    Checks 4-swing patterns first (more specific) before 3-swing patterns.
-    """
-    if len(swings_4) < 3:
-        return 'NEUTRAL'
-
-    # Sort by index
-    sorted_swings = sorted(swings_4, key=lambda x: x[0])
-    # Deduplicate by index, keeping last type
-    deduped = {}
-    for s in sorted_swings:
-        deduped[s[0]] = s
-    swings = sorted(deduped.values(), key=lambda x: x[0])
-
-    if len(swings) < 3:
-        return 'NEUTRAL'
-
-    # Check 4-swing patterns FIRST (more specific, higher confidence)
-    # Pattern: H,L,H,L (full HH_HL or LH_LL)
-    for i in range(len(swings) - 3):
-        s0, s1, s2, s3 = swings[i], swings[i+1], swings[i+2], swings[i+3]
-        if s0[2] == 'H' and s1[2] == 'L' and s2[2] == 'H' and s3[2] == 'L':
-            if s2[1] > s0[1] and s3[1] > s1[1]:
-                return 'HH_HL'
-            elif s2[1] < s0[1] and s3[1] < s1[1]:
-                return 'LH_LL'
-
-    # Pattern: L,H,L,H (full)
-    for i in range(len(swings) - 3):
-        s0, s1, s2, s3 = swings[i], swings[i+1], swings[i+2], swings[i+3]
-        if s0[2] == 'L' and s1[2] == 'H' and s2[2] == 'L' and s3[2] == 'H':
-            if s3[1] > s1[1]:
-                return 'HH_HL'
-            elif s3[1] < s1[1]:
-                return 'LH_LL'
-
-    # Then check 3-swing patterns (partial, less specific)
-    # Pattern: H,L,H (partial HH_HL)
-    for i in range(len(swings) - 2):
-        s0, s1, s2 = swings[i], swings[i+1], swings[i+2]
-        if s0[2] == 'H' and s1[2] == 'L' and s2[2] == 'H':
-            if s2[1] > s0[1]:  # higher high
-                return 'HH_HL'
-            elif s2[1] < s0[1]:  # lower high
-                return 'LH_LL'
-
-    # Pattern: L,H,L (partial LH_LL)
-    for i in range(len(swings) - 2):
-        s0, s1, s2 = swings[i], swings[i+1], swings[i+2]
-        if s0[2] == 'L' and s1[2] == 'H' and s2[2] == 'L':
-            if s2[1] < s0[1]:  # lower low
-                return 'LH_LL'
-            elif s2[1] > s0[1]:  # higher low
-                return 'HH_HL'
-
-    return 'NEUTRAL'
-
-
-def _detect_choch(token: str, candles: list, price: float) -> Optional[dict]:
-    """Detect Change of Character — structure flip from HH_HL→LH_LL or LH_LL→HH_HL.
-
-    Looks at the last 8 swings: first 4 = previous structure, last 4 = current structure.
-    If both are non-NEUTRAL and differ, that's a CHoCH.
-    """
-    highs, lows = _find_swing_highs_lows(candles)
-    if not highs or not lows:
-        return None
-
-    all_swings = []
-    for idx in highs:
-        all_swings.append((idx, candles[idx]['high'], 'H'))
-    for idx in lows:
-        all_swings.append((idx, candles[idx]['low'], 'L'))
-    all_swings.sort(key=lambda x: x[0])
-
-    # Need at least 7 swings: 3 for "previous" window overlap + 4 for current
-    # Actually need 8 for two independent sets of 4
-    if len(all_swings) < 8:
-        return None
-
-    # Previous structure: swings[-8:-4], Current structure: swings[-4:]
-    prev_swings = all_swings[-8:-4]
-    curr_swings = all_swings[-4:]
-
-    prev_struct = _structure_from_swings(prev_swings)
-    curr_struct = _structure_from_swings(curr_swings)
-
-    # Must have a flip between two defined structures
-    if prev_struct == curr_struct or prev_struct == 'NEUTRAL' or curr_struct == 'NEUTRAL':
-        return None
-
-    # CHoCH confirmed: structure flipped
-    # Determine direction based on NEW structure
-    if curr_struct == 'LH_LL':
-        direction = 'SHORT'
-        source_prefix = 'choch-'
-    elif curr_struct == 'HH_HL':
-        direction = 'LONG'
-        source_prefix = 'choch+'
-    else:
-        return None
-
-    # Bars since the flip (distance from current bar to last swing point)
-    last_swing_idx = all_swings[-1][0]
-    bars_since = len(candles) - 1 - last_swing_idx
-
-    if bars_since > HH_HL_CHOCH_MAX_BARS_SINCE:
-        return None
-
-    # Structure clarity: how many of the 4 curr swings are strictly monotonic
-    strict_pairs = 0
-    for i in range(len(curr_swings) - 1):
-        _, p_a, t_a = curr_swings[i]
-        _, p_b, t_b = curr_swings[i + 1]
-        if t_a == 'H' and t_b == 'L' and p_a > p_b:
-            strict_pairs += 1
-        elif t_a == 'L' and t_b == 'H' and p_b > p_a:
-            strict_pairs += 1
-
-    atr = _compute_atr(candles) or (price * 0.01)  # fallback to 1% of price
-
-    # Confidence
-    clarity_bonus = min(strict_pairs * 3, HH_HL_CHOCH_STRUCT_BONUS_MAX)
-    recency_bonus = max(HH_HL_CHOCH_RECENCY_BONUS_MAX - bars_since, 0)
-    confidence = int(min(
-        HH_HL_CHOCH_BASE_CONFIDENCE + clarity_bonus + recency_bonus,
-        HH_HL_CONFIDENCE_CAP
-    ))
-    if confidence < HH_HL_CONFIDENCE_FLOOR:
-        return None
-
-    source = f'{source_prefix}{bars_since}'
-
-    return {
-        'direction':   direction,
-        'confidence':  confidence,
-        'source':      source,
-        'prev_struct': prev_struct,
-        'curr_struct': curr_struct,
-        'bars_since':  bars_since,
-        'structure':   curr_struct,
-        'value':       float(confidence),
-    }
-
-
-# ── Data fetch ─────────────────────────────────────────────────────────────────
-
-def _get_candles_from_price_history(token: str, lookback: int = HH_HL_LOOKBACK) -> list:
-    """Fetch 1m close prices from price_history (signals_hermes.db), oldest first.
-
-    price_history is updated every minute — the most up-to-date 1m data source.
-    Timestamps are in seconds (Unix time). Returns list of {open, high, low, close}.
-    For price_history (close-only), open=high=low=close=price.
-
-    Returns [] if stale (>2 min old) or empty.
-    """
+SIGNAL_TYPE_LONG  = 'hh_hl_breakout_long'
+SIGNAL_TYPE_SHORT = 'hh_hl_breakout_short'
+SOURCE_LONG       = 'hh-hl+'
+SOURCE_SHORT      = 'hh-hl-'
+
+_CANDLES_DB = CANDLES_DB
+_PRICE_DB   = STATIC_DB  # signals_hermes.db (price_history fallback)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Data Fetch
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_candles_5m(token: str, limit: int = 200) -> list:
+    """Fetch 5m OHLCV from candles.db, oldest first. Returns [{open, high, low, close, volume}].
+    Returns [] if stale (>10 min old) or empty."""
+    conn = None
     try:
-        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
-            SELECT timestamp, price FROM (
-                SELECT timestamp, price
-                FROM price_history
-                WHERE token = ?
-                ORDER BY timestamp DESC
+            SELECT open, high, low, close, volume, ts FROM (
+                SELECT open, high, low, close, volume, ts
+                FROM candles_5m
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC
                 LIMIT ?
             ) sub
-            ORDER BY timestamp ASC
-        """, (token.upper(), lookback))
+            ORDER BY ts ASC
+        """, (token.upper(), limit))
         rows = c.fetchall()
-        conn.close()
-
         if not rows:
             return []
-
-        most_recent_ts = rows[-1][0]
-        if (time.time() - most_recent_ts) > 120:
+        # Staleness: 5m candles update every 5 min — 10 min = 2 candles stale
+        most_recent_ts = rows[-1][5]
+        if (time.time() - most_recent_ts) > HH_HL_STALE_5M_SEC:
             return []
-
-        # price_history only has close prices — use close as H/L/O for swing detection
-        return [
-            {'open': p, 'high': p, 'low': p, 'close': p}
-            for _, p in rows
-        ]
+        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
+                for r in rows]
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
-def _get_candles_from_ohlcv_1m(token: str, lookback: int = HH_HL_LOOKBACK) -> list:
-    """Fetch 1m OHLCV from ohlcv_1m table (signals_hermes.db), oldest first.
-
-    Returns list of {open, high, low, close} dicts.
-    Returns [] if no data or stale.
-    """
+def _get_candles_1h(token: str, limit: int = 60) -> list:
+    """Fetch 1H OHLCV from candles.db, oldest first. Returns [{open, high, low, close}].
+    Returns [] if stale (>30 min old) or empty."""
+    conn = None
     try:
-        conn = sqlite3.connect(_PRICE_DB, timeout=10)
-        c = conn.cursor()
-        c.execute("""
-            SELECT open_time, open, high, low, close FROM (
-                SELECT open_time, open, high, low, close
-                FROM ohlcv_1m
-                WHERE token = ?
-                ORDER BY open_time DESC
-                LIMIT ?
-            ) sub
-            ORDER BY open_time ASC
-        """, (token.upper(), lookback))
-        rows = c.fetchall()
-        conn.close()
-
-        if not rows:
-            return []
-
-        most_recent_ts = rows[-1][0]
-        if (time.time() - most_recent_ts) > 120:
-            return []
-
-        return [
-            {'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4]}
-            for r in rows
-        ]
-    except Exception:
-        return []
-
-
-def _get_candles_from_5m(token: str, lookback: int = 200) -> list:
-    """Fetch 5m OHLCV from candles.db, oldest first.
-
-    Uses candles_5m table which has more tokens than price_history.
-    Returns list of {open, high, low, close} dicts.
-    Returns [] if no data or stale.
-    """
-    try:
-        from paths import CANDLES_DB
-        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT open, high, low, close, ts FROM (
                 SELECT open, high, low, close, ts
-                FROM candles_5m
+                FROM candles_1h
                 WHERE token = ?
                 ORDER BY ts DESC
                 LIMIT ?
             ) sub
             ORDER BY ts ASC
-        """, (token.upper(), lookback))
+        """, (token.upper(), limit))
         rows = c.fetchall()
-        conn.close()
-
         if not rows:
             return []
-
         most_recent_ts = rows[-1][4]
-        if (time.time() - most_recent_ts) > 300:  # 5 min staleness
+        if (time.time() - most_recent_ts) > HH_HL_STALE_1H_SEC:
             return []
-
-        return [
-            {'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3]}
-            for r in rows
-        ]
+        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3]}
+                for r in rows]
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
-# ── Main scanner ────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+# Technical Indicators
+# ═══════════════════════════════════════════════════════════════════════════════
 
-def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
-    """Scan tokens for HH/HL structure signals and write to DB.
+def _ema(closes: list, period: int) -> Optional[float]:
+    """Return latest EMA value. Returns None if insufficient data."""
+    if len(closes) < period:
+        return None
+    k = 2.0 / (period + 1)
+    val = sum(closes[:period]) / period
+    for price in closes[period:]:
+        val = price * k + val * (1 - k)
+    return val
 
-    Args:
-        prices_dict: token -> {'price': float, ...} (pre-filtered by caller)
-        variant:     'breakout' | 'pullback' | 'choch' | 'both'
+
+def _ema_spread(closes: list, fast_period: int, slow_period: int) -> Optional[float]:
+    """Return (ema_fast - ema_slow) / ema_slow as percentage. None if insufficient data."""
+    if len(closes) < slow_period:
+        return None
+    ema_f = _ema(closes, fast_period)
+    ema_s = _ema(closes, slow_period)
+    if ema_s is None or ema_s == 0 or ema_f is None:
+        return None
+    return (ema_f - ema_s) / ema_s * 100.0
+
+
+def _rsi(closes: list, period: int = 14) -> Optional[float]:
+    """Calculate RSI. Returns None if insufficient data."""
+    if len(closes) < period + 1:
+        return None
+    deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gains = [d if d > 0 else 0 for d in deltas[-period:]]
+    losses = [-d if d < 0 else 0 for d in deltas[-period:]]
+    avg_gain = sum(gains) / period
+    avg_loss = sum(losses) / period
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100.0 - (100.0 / (1.0 + rs))
+
+
+def _atr(closes: list, period: int = 14) -> Optional[float]:
+    """ATR from close-only data using rolling range (max - min) over period windows."""
+    if len(closes) < period + 1:
+        return None
+    ranges = []
+    for i in range(period, len(closes)):
+        window = closes[i - period:i + 1]
+        ranges.append(max(window) - min(window))
+    if not ranges:
+        return None
+    return sum(ranges[-period:]) / period
+
+
+def _volume_atr(candles: list, period: int = 14) -> Optional[float]:
+    """ATR from OHLCV data using true range."""
+    if len(candles) < period + 1:
+        return None
+    trs = []
+    for i in range(1, len(candles)):
+        h = candles[i]['high']
+        l = candles[i]['low']
+        pc = candles[i - 1]['close']
+        tr = max(h - l, abs(h - pc), abs(l - pc))
+        trs.append(tr)
+    if len(trs) < period:
+        return None
+    return sum(trs[-period:]) / period
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Swing Detection (on 5m OHLCV candles)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _find_swings(candles: list, window: int = HH_HL_SWING_WINDOW,
+                 min_sep: int = HH_HL_MIN_SEP) -> Tuple[List[Tuple[int, float, str]],
+                                                          List[Tuple[int, float, str]]]:
+    """Find swing highs and swing lows on 5m OHLCV data.
+
+    Swing high at index i: candle[i].high is the highest high in [i-window, i+window].
+    Swing low at index i: candle[i].low is the lowest low in [i-window, i+window].
 
     Returns:
-        list of dicts — [{'token': str, 'direction': str, 'variant': str}]
+        (swing_highs, swing_lows) — each is list of (index, price, type) sorted by index.
     """
-    from hermes_constants import HH_HL_ENABLED, HH_HL_CHOCH_ENABLED
-    # Allow CHoCH to run independently of HH_HL_ENABLED
-    if not HH_HL_ENABLED and not HH_HL_CHOCH_ENABLED:
-        return []
-    if not HH_HL_ENABLED and variant not in ('choch', 'both'):
-        return []
+    n = len(candles)
+    if n < 2 * window + 1:
+        return [], []
 
-    from signal_schema import add_signal
+    highs = []
+    lows = []
+    last_h_idx = -999
+    last_l_idx = -999
 
-    fired = []
+    for i in range(window, n - window):
+        # Check swing high: candle[i].high must be highest in window
+        is_high = True
+        for j in range(i - window, i + window + 1):
+            if j == i:
+                continue
+            if candles[j]['high'] >= candles[i]['high']:
+                is_high = False
+                break
+        if is_high and (i - last_h_idx) >= min_sep:
+            highs.append((i, candles[i]['high'], 'H'))
+            last_h_idx = i
 
-    for token, data in prices_dict.items():
-        price = data.get('price')
-        if not price or price <= 0:
-            continue
+        # Check swing low: candle[i].low must be lowest in window
+        is_low = True
+        for j in range(i - window, i + window + 1):
+            if j == i:
+                continue
+            if candles[j]['low'] <= candles[i]['low']:
+                is_low = False
+                break
+        if is_low and (i - last_l_idx) >= min_sep:
+            lows.append((i, candles[i]['low'], 'L'))
+            last_l_idx = i
 
-        # Primary: price_history (most up-to-date 1m closes)
-        candles = _get_candles_from_price_history(token, lookback=HH_HL_LOOKBACK)
-        if not candles or len(candles) < 30:
-            # Fallback: ohlcv_1m
-            candles = _get_candles_from_ohlcv_1m(token, lookback=HH_HL_LOOKBACK)
-        if not candles or len(candles) < 30:
-            # Fallback: 5m candles (more tokens available)
-            candles = _get_candles_from_5m(token, lookback=200)
-        if not candles or len(candles) < 30:
-            continue
-
-        # ── Find swings ─────────────────────────────────────────────────────────
-        highs, lows = _find_swing_highs_lows(candles)
-        if not highs or not lows:
-            continue
-
-        # ── CHoCH variant (independent of current structure — detects flips) ───
-        if variant in ('choch', 'both'):
-            from hermes_constants import HH_HL_CHOCH_ENABLED
-            if HH_HL_CHOCH_ENABLED:
-                sig = _detect_choch(token, candles, price)
-                if sig:
-                    from hermes_constants import HH_HL_CHOCH_PLUS_ENABLED, HH_HL_CHOCH_MINUS_ENABLED
-                    blocked = (
-                        (sig['direction'] == 'LONG' and not HH_HL_CHOCH_PLUS_ENABLED) or
-                        (sig['direction'] == 'SHORT' and not HH_HL_CHOCH_MINUS_ENABLED)
-                    )
-                    if not blocked:
-                        sid = add_signal(
-                            token=token.upper(),
-                            direction=sig['direction'],
-                            signal_type=SIGNAL_TYPE_CHOCH,
-                            source=sig['source'],
-                            confidence=sig['confidence'],
-                            value=sig['value'],
-                            price=price,
-                            exchange='hyperliquid',
-                            timeframe='1m',
-                            z_score=None,
-                            z_score_tier=None,
-                        )
-                        if sid:
-                            fired.append({
-                                'token': token.upper(),
-                                'direction': sig['direction'],
-                                'variant': 'choch',
-                            })
-                            print(f'  HH-HL CHOCH   {sig["direction"]:5s} {token:8s} '
-                                  f'conf={sig["confidence"]:.0f}% '
-                                  f'{sig["prev_struct"]}→{sig["curr_struct"]} '
-                                  f'bars={sig["bars_since"]} '
-                                  f'[{sig["source"]}]')
-
-        # ── Classify structure ───────────────────────────────────────────────────
-        structure, breakout_strength, bars_since = _classify_structure(
-            highs, lows, candles
-        )
-        if structure == 'NEUTRAL':
-            continue
-
-        # ── Breakout variant ────────────────────────────────────────────────────
-        if variant in ('breakout', 'both'):
-            sig = _detect_breakout(
-                token, candles, structure, breakout_strength, price, bars_since
-            )
-            if sig:
-                from hermes_constants import HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED
-                blocked = (
-                    (sig['direction'] == 'LONG' and not HH_HL_PLUS_ENABLED) or
-                    (sig['direction'] == 'SHORT' and not HH_HL_MINUS_ENABLED)
-                )
-                if not blocked:
-                    sid = add_signal(
-                        token=token.upper(),
-                        direction=sig['direction'],
-                        signal_type=SIGNAL_TYPE_BREAKOUT,
-                        source=sig['source'],
-                        confidence=sig['confidence'],
-                        value=sig['value'],
-                        price=price,
-                        exchange='hyperliquid',
-                        timeframe='1m',
-                        z_score=None,
-                        z_score_tier=None,
-                    )
-                    if sid:
-                        fired.append({
-                            'token': token.upper(),
-                            'direction': sig['direction'],
-                            'variant': 'breakout',
-                        })
-                        print(f'  HH-HL BREAKOUT {sig["direction"]:5s} {token:8s} '
-                              f'conf={sig["confidence"]:.0f}% struct={structure} '
-                              f'break={sig["breakout_pct"]:.3f}% bars={bars_since} '
-                              f'[{sig["source"]}]')
-
-        # ── Pullback variant ─────────────────────────────────────────────────────
-        if variant in ('pullback', 'both'):
-            sig = _detect_pullback(
-                token, candles, structure, price
-            )
-            if sig:
-                from hermes_constants import HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED
-                blocked = (
-                    (sig['direction'] == 'LONG' and not HH_HL_PLUS_ENABLED) or
-                    (sig['direction'] == 'SHORT' and not HH_HL_MINUS_ENABLED)
-                )
-                if not blocked:
-                    sid = add_signal(
-                        token=token.upper(),
-                        direction=sig['direction'],
-                        signal_type=SIGNAL_TYPE_PULLBACK,
-                        source=sig['source'],
-                        confidence=sig['confidence'],
-                        value=sig['value'],
-                        price=price,
-                        exchange='hyperliquid',
-                        timeframe='1m',
-                        z_score=None,
-                        z_score_tier=None,
-                    )
-                    if sid:
-                        fired.append({
-                            'token': token.upper(),
-                            'direction': sig['direction'],
-                            'variant': 'pullback',
-                        })
-                        print(f'  HH-HL PULLBACK {sig["direction"]:5s} {token:8s} '
-                              f'conf={sig["confidence"]:.0f}% struct={structure} '
-                              f'pb={sig["pullback_pct"]:.3f}% bars={sig["bars_since"]} '
-                              f'[{sig["source"]}]')
-
-    return fired
+    return highs, lows
 
 
-# ── CLI test ──────────────────────────────────────────────────────────────────
-if __name__ == '__main__':
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+def _classify_structure(swings: list) -> Tuple[str, int]:
+    """Classify market structure from sorted swing points.
 
-    from signal_schema import get_all_latest_prices, init_db
+    Requires minimum HH_HL_MIN_SWINGS (4) alternating H/L points.
+    Checks H-L-H-L pattern: if highs rising + lows rising = HH/HL (uptrend).
+    Checks L-H-L-H pattern: if lows rising + highs rising = HH/HL (uptrend).
+    Vice versa for LH/LL (downtrend).
 
-    init_db()
+    Returns:
+        (structure, num_swings) — 'HH_HL' | 'LH_LL' | 'NEUTRAL', swing count
+    """
+    if len(swings) < HH_HL_MIN_SWINGS:
+        return 'NEUTRAL', 0
+
+    # Build alternating swing sequence from the last swings
+    # Take the most recent swings and check for HH/HL or LH/LL patterns
+    recent = swings[-HH_HL_STRUCT_MIN_SWINGS:] if len(swings) >= HH_HL_STRUCT_MIN_SWINGS else swings
+
+    # Separate highs and lows from the recent set
+    h_swings = [(i, p) for i, p, t in recent if t == 'H']
+    l_swings = [(i, p) for i, p, t in recent if t == 'L']
+
+    if len(h_swings) < 2 or len(l_swings) < 2:
+        return 'NEUTRAL', len(swings)
+
+    # Check for HH/HL (uptrend): each high higher than previous, each low higher than previous
+    hh_count = 0
+    hl_count = 0
+    for j in range(1, len(h_swings)):
+        if h_swings[j][1] > h_swings[j - 1][1]:
+            hh_count += 1
+    for j in range(1, len(l_swings)):
+        if l_swings[j][1] > l_swings[j - 1][1]:
+            hl_count += 1
+
+    lh_count = 0
+    ll_count = 0
+    for j in range(1, len(h_swings)):
+        if h_swings[j][1] < h_swings[j - 1][1]:
+            lh_count += 1
+    for j in range(1, len(l_swings)):
+        if l_swings[j][1] < l_swings[j - 1][1]:
+            ll_count += 1
+
+    # HH/HL requires at least 1 higher high AND 1 higher low
+    if hh_count >= 1 and hl_count >= 1:
+        return 'HH_HL', len(swings)
+    # LH/LL requires at least 1 lower high AND 1 lower low
+    if lh_count >= 1 and ll_count >= 1:
+        return 'LH_LL', len(swings)
+
+    return 'NEUTRAL', len(swings)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Detection: 7 Confluence Gates
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect(token: str, candles_5m: list = None, candles_1h: list = None) -> Optional[dict]:
+    """Detect HH/HL structure breakout with 7 confluence gates.
+
+    Returns {direction, confidence, value, price, source, ...} or None.
+    """
+    if not HH_HL_ENABLED:
+        return None
+
+    # ── Fetch data if not provided ─────────────────────────────────────────────
+    if candles_5m is None:
+        candles_5m = _get_candles_5m(token, limit=HH_HL_LOOKBACK)
+    if not candles_5m or len(candles_5m) < HH_HL_MIN_CANDLES_5M:
+        return None
+
+    if candles_1h is None:
+        candles_1h = _get_candles_1h(token, limit=60)
+    # 1H data is optional — if missing, gate 2 is skipped (neutral)
+
+    price = candles_5m[-1]['close']
+    closes_5m = [c['close'] for c in candles_5m]
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 1: Structure Clarity
+    # ════════════════════════════════════════════════════════════════════════════
+    swing_highs, swing_lows = _find_swings(candles_5m)
+    if not swing_highs or not swing_lows:
+        return None
+
+    # Merge into chronological swing list
+    all_swings = sorted(swing_highs + swing_lows, key=lambda x: x[0])
+    structure, num_swings = _classify_structure(all_swings)
+    if structure == 'NEUTRAL':
+        return None
+
+    direction = 'LONG' if structure == 'HH_HL' else 'SHORT'
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # BREAKOUT DETECTION
+    # ════════════════════════════════════════════════════════════════════════════
+    # Get the most recent swing high and swing low
+    last_sh = swing_highs[-1]  # (index, price, 'H')
+    last_sl = swing_lows[-1]   # (index, price, 'L')
+    last_swing_idx = max(last_sh[0], last_sl[0])
+    bars_since = len(candles_5m) - 1 - last_swing_idx
+
+    # ── GATE 7: Freshness ──────────────────────────────────────────────────────
+    if bars_since > HH_HL_MAX_BARS_SINCE:
+        return None
+
+    # Breakout: price must exceed the relevant swing level by threshold
+    if direction == 'LONG':
+        # LONG breakout: price above last swing high
+        swing_level = last_sh[1]
+        breakout_pct = (price - swing_level) / swing_level
+        if breakout_pct < HH_HL_BREAKOUT_THRESHOLD:
+            return None
+        # ── Late entry filter: price not already extended > 3x ATR above swing ──
+        atr_val = _volume_atr(candles_5m) or (price * HH_HL_BACKUP_ATR_PCT)
+        if breakout_pct > (atr_val / price * HH_HL_MAX_EXTENSION_ATR):
+            return None  # price already extended = too late
+    else:
+        # SHORT breakout: price below last swing low
+        swing_level = last_sl[1]
+        breakout_pct = (swing_level - price) / swing_level
+        if breakout_pct < HH_HL_BREAKOUT_THRESHOLD:
+            return None
+        # ── Late entry filter: price not already extended > 3x ATR below swing ──
+        atr_val = _volume_atr(candles_5m) or (price * HH_HL_BACKUP_ATR_PCT)
+        if breakout_pct > (atr_val / price * HH_HL_MAX_EXTENSION_ATR):
+            return None  # price already extended = too late
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 2: Higher Timeframe Trend (1H)
+    # ════════════════════════════════════════════════════════════════════════════
+    htf_aligned = False
+    htf_spread = 0.0
+    if candles_1h and len(candles_1h) >= HH_HL_HTF_EMA_SLOW:
+        closes_1h = [c['close'] for c in candles_1h]
+        ema_fast_1h = _ema(closes_1h, HH_HL_HTF_EMA_FAST)
+        ema_slow_1h = _ema(closes_1h, HH_HL_HTF_EMA_SLOW)
+        if ema_fast_1h is not None and ema_slow_1h is not None and ema_slow_1h > 0:
+            htf_spread = (ema_fast_1h - ema_slow_1h) / ema_slow_1h * 100.0
+            if direction == 'LONG' and ema_fast_1h > ema_slow_1h:
+                htf_aligned = True
+            elif direction == 'SHORT' and ema_fast_1h < ema_slow_1h:
+                htf_aligned = True
+
+            # If 1H trend STRONGLY disagrees, block the signal
+            if not htf_aligned:
+                # Strong disagreement: 1H EMA spread > threshold in wrong direction
+                if abs(htf_spread) > HH_HL_HTF_STRONG_SPREAD:
+                    return None
+    # If no 1H data available, allow (neutral — don't block, don't bonus)
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 3: Volume Confirmation
+    # ════════════════════════════════════════════════════════════════════════════
+    volumes = [c['volume'] for c in candles_5m]
+    vol_ok = False
+    vol_ratio = 0.0
+    if len(volumes) >= HH_HL_VOL_LOOKBACK:
+        avg_vol = sum(volumes[-HH_HL_VOL_LOOKBACK:]) / HH_HL_VOL_LOOKBACK
+        if avg_vol > 0:
+            vol_ratio = volumes[-1] / avg_vol
+            if vol_ratio >= HH_HL_AVG_VOL_MULT:
+                vol_ok = True
+    # Volume is a strong filter — require it
+    if not vol_ok:
+        return None
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 4: Momentum (RSI)
+    # ════════════════════════════════════════════════════════════════════════════
+    rsi_val = _rsi(closes_5m, HH_HL_RSI_PERIOD)
+    if rsi_val is None:
+        return None
+    if direction == 'LONG' and (rsi_val < HH_HL_RSI_LONG_MIN or rsi_val > HH_HL_RSI_LONG_MAX):
+        return None
+    if direction == 'SHORT' and (rsi_val < HH_HL_RSI_SHORT_MIN or rsi_val > HH_HL_RSI_SHORT_MAX):
+        return None
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 5: EMA Alignment (5m)
+    # ════════════════════════════════════════════════════════════════════════════
+    if len(closes_5m) < HH_HL_EMA_SLOW:
+        return None
+    ema_fast_5m = _ema(closes_5m, HH_HL_EMA_FAST)
+    ema_slow_5m = _ema(closes_5m, HH_HL_EMA_SLOW)
+    if ema_fast_5m is None or ema_slow_5m is None:
+        return None
+    if direction == 'LONG':
+        # Price must be above fast EMA, fast EMA above slow EMA
+        if price < ema_fast_5m:
+            return None
+        if ema_fast_5m < ema_slow_5m:
+            return None
+    else:
+        # Price must be below fast EMA, fast EMA below slow EMA
+        if price > ema_fast_5m:
+            return None
+        if ema_fast_5m > ema_slow_5m:
+            return None
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # GATE 6: Volatility
+    # ════════════════════════════════════════════════════════════════════════════
+    atr_val = _volume_atr(candles_5m)
+    if atr_val is None or price <= 0:
+        return None
+    atr_pct = atr_val / price * 100.0
+    if atr_pct < HH_HL_VOL_FLOOR_PCT or atr_pct > HH_HL_VOL_CAP_PCT:
+        return None
+
+    # ════════════════════════════════════════════════════════════════════════════
+    # CONFIDENCE SCORING
+    # ════════════════════════════════════════════════════════════════════════════
+    conf = HH_HL_CONF_BASE
+
+    # Bonus: deep structure (6+ swings = stronger pattern)
+    if num_swings >= HH_HL_STRUCT_MIN_SWINGS:
+        conf += HH_HL_CONF_STRUCT_BONUS
+
+    # Bonus: strong volume (>2x average)
+    if vol_ratio >= HH_HL_VOL_STRONG_MULT:
+        conf += HH_HL_CONF_VOLUME_BONUS
+
+    # Bonus: 1H trend strongly aligned
+    if htf_aligned and abs(htf_spread) > HH_HL_HTF_BONUS_SPREAD:
+        conf += HH_HL_CONF_HTF_BONUS
+
+    # Bonus: RSI in sweet spot (momentum with the trade, not exhausted)
+    if direction == 'LONG' and HH_HL_RSI_SWEET_LONG_LOW <= rsi_val <= HH_HL_RSI_SWEET_LONG_HIGH:
+        conf += HH_HL_CONF_MOMENTUM_BONUS
+    elif direction == 'SHORT' and HH_HL_RSI_SWEET_SHORT_LOW <= rsi_val <= HH_HL_RSI_SWEET_SHORT_HIGH:
+        conf += HH_HL_CONF_MOMENTUM_BONUS
+
+    conf = min(conf, HH_HL_CONF_CAP)
+    if conf < HH_HL_CONF_FLOOR:
+        return None
+
+    source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+
+    return {
+        'direction':   direction,
+        'confidence':  conf,
+        'value':       float(conf),
+        'price':       price,
+        'source':      source,
+        'structure':   structure,
+        'num_swings':  num_swings,
+        'bars_since':  bars_since,
+        'swing_level': swing_level,
+        'breakout_pct': round(breakout_pct * 100, 4),
+        'rsi':         round(rsi_val, 1),
+        'vol_ratio':   round(vol_ratio, 2),
+        'atr_pct':     round(atr_pct, 3),
+        'htf_aligned': htf_aligned,
+        'htf_spread':  round(htf_spread, 3),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Scanner: iterate all tokens
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def scan_signals() -> int:
+    """Scan all tokens for HH/HL structure breakouts. Returns count of signals emitted."""
+    from signal_schema import get_all_latest_prices
+
+    added = 0
     prices = get_all_latest_prices()
 
+    for token, data in prices.items():
+        if token.startswith('@'):
+            continue
+
+        # Staleness
+        if price_age_minutes(token) > 10:
+            continue
+
+        sig = detect(token)
+        if not sig:
+            continue
+
+        direction = sig['direction']
+
+        # Layer 1: per-direction kill-switch
+        if direction == 'LONG' and not HH_HL_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not HH_HL_MINUS_ENABLED:
+            continue
+
+        # Layer 1: blacklists
+        if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
+            continue
+        if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            continue
+
+        # Cooldown
+        if get_cooldown(token, direction=direction):
+            continue
+
+        sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
+        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+
+        sid = add_signal(
+            token=token.upper(),
+            direction=direction,
+            signal_type=sig_type,
+            source=source,
+            confidence=sig['confidence'],
+            value=sig['value'],
+            price=sig['price'],
+            exchange='hyperliquid',
+            timeframe='5m',
+            z_score=None,
+        )
+        if sid:
+            added += 1
+            set_cooldown(token, direction, hours=HH_HL_COOLDOWN_HOURS)
+            print(f'  HH-HL v2 {direction:5s} {token:8s} '
+                  f'conf={sig["confidence"]:.0f}% '
+                  f'struct={sig["structure"]} '
+                  f'swings={sig["num_swings"]} '
+                  f'break={sig["breakout_pct"]:.3f}% '
+                  f'bars={sig["bars_since"]} '
+                  f'rsi={sig["rsi"]:.0f} '
+                  f'vol={sig["vol_ratio"]:.1f}x '
+                  f'htf={"✓" if sig["htf_aligned"] else "—"} '
+                  f'[{source}]')
+
+    return added
+
+
+def run():
+    """Entry point for signals_runner. No prices_dict — reads from DB directly."""
+    return scan_signals()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CLI test
+# ═══════════════════════════════════════════════════════════════════════════════
+if __name__ == '__main__':
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from signal_schema import get_all_latest_prices
+
+    prices = get_all_latest_prices()
     test_tokens = {k: v for k, v in prices.items()
-                   if k in ('BTC', 'ETH', 'SOL', 'AVAX', 'LINK', 'SAGA', 'SCR',
-                            'ARB', 'OP', 'ATOM', 'NEAR', 'APT', 'INJ') and v.get('price')}
+                   if k in ('BTC', 'ETH', 'SOL', 'AVAX', 'LINK', 'ARB', 'OP',
+                            'NEAR', 'APT', 'INJ', 'DOGE', 'PEPE', 'WIF') and v.get('price')}
     if not test_tokens:
-        test_tokens = dict(list(prices.items())[:10])
+        test_tokens = dict(list(prices.items())[:15])
 
-    print(f"[hh_hl] Testing on {len(test_tokens)} tokens (breakout + pullback + choch)...")
-    result = scan_hh_hl_signals(test_tokens, variant='both')
-    print(f"[hh_hl] Done. {len(result)} signals emitted.")
-    for r in result:
-        print(f"  {r}")
-
-    # Also test CHoCH specifically
-    choch_result = scan_hh_hl_signals(test_tokens, variant='choch')
-    print(f"[hh_hl] CHoCH test: {len(choch_result)} signals emitted.")
-    for r in choch_result:
-        print(f"  {r}")
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# signals_runner entry point
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def run(prices_dict=None):
-    """Entry point for signals_runner. Returns count of signals emitted."""
-    if prices_dict is None:
-        from signal_schema import get_all_latest_prices
-        prices_dict = get_all_latest_prices()
-    return scan_hh_hl_signals(prices_dict)
+    print(f"[hh_hl v2] Testing on {len(test_tokens)} tokens...")
+    for token in test_tokens:
+        sig = detect(token)
+        if sig:
+            print(f"  {token}: {sig['direction']} conf={sig['confidence']:.0f}% "
+                  f"struct={sig['structure']} swings={sig['num_swings']} "
+                  f"break={sig['breakout_pct']:.3f}% bars={sig['bars_since']} "
+                  f"rsi={sig['rsi']:.0f} vol={sig['vol_ratio']:.1f}x "
+                  f"htf={'✓' if sig['htf_aligned'] else '—'}")
+        else:
+            print(f"  {token}: no signal")
+    print("[hh_hl v2] Done.")

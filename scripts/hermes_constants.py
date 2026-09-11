@@ -1145,7 +1145,7 @@ HH_HL_MIN_SWINGS        = 4     # minimum swing points for valid structure (H-L-
 HH_HL_BREAKOUT_THRESHOLD = 0.002  # price must exceed prior swing by 0.2% (0.002 fraction)
 
 # ── Entry Filters ──────────────────────────────────────────────────────────────
-HH_HL_MAX_BARS_SINCE    = 5     # breakout must be within last N bars on 5m
+HH_HL_MAX_BARS_SINCE    = 10    # breakout must be within last N bars on 5m (50 min)
 HH_HL_SL_ATR_MULT       = 1.5   # SL = entry +/- SL_ATR_MULT * ATR
 HH_HL_TP_ATR_MULT       = 3.0   # TP = entry + TP_ATR_MULT * ATR
 HH_HL_COOLDOWN_HOURS    = 3     # per-token+direction cooldown
@@ -1172,6 +1172,24 @@ HH_HL_HTF_EMA_SLOW      = 50    # slow EMA on 1H (higher timeframe trend)
 # ── Confluence Gate: Volatility ────────────────────────────────────────────────
 HH_HL_VOL_FLOOR_PCT     = 0.3   # minimum ATR% — skip dead tokens
 HH_HL_VOL_CAP_PCT       = 1.5   # maximum ATR% — skip panic/extreme tokens
+
+# ── Data Staleness ─────────────────────────────────────────────────────────────
+HH_HL_STALE_5M_SEC      = 900   # 5m candles max age (15 min — current candle not yet closed)
+HH_HL_STALE_1H_SEC      = 5400  # 1h candles max age (90 min = 1.5 candles)
+
+# ── Structural Minimums ────────────────────────────────────────────────────────
+HH_HL_MIN_CANDLES_5M    = 60    # minimum 5m candles for valid analysis
+HH_HL_MIN_CANDLES_1H    = 50    # minimum 1H candles for EMA calculation
+HH_HL_STRUCT_MIN_SWINGS = 6     # deep structure bonus threshold (6+ swings)
+HH_HL_MAX_EXTENSION_ATR = 3.0   # max breakout extension as ATR multiple (late entry filter)
+HH_HL_HTF_STRONG_SPREAD = 0.3   # 1H EMA spread% for "strong disagreement" block
+HH_HL_HTF_BONUS_SPREAD  = 0.2   # 1H EMA spread% for bonus
+HH_HL_RSI_SWEET_LONG_LOW  = 50  # LONG RSI sweet spot lower bound
+HH_HL_RSI_SWEET_LONG_HIGH = 60  # LONG RSI sweet spot upper bound
+HH_HL_RSI_SWEET_SHORT_LOW  = 40 # SHORT RSI sweet spot lower bound
+HH_HL_RSI_SWEET_SHORT_HIGH = 50 # SHORT RSI sweet spot upper bound
+HH_HL_VOL_STRONG_MULT   = 2.0   # volume ratio for "strong volume" bonus
+HH_HL_BACKUP_ATR_PCT    = 0.01  # fallback ATR as % of price when ATR calc fails
 
 # ── Confidence Scoring ─────────────────────────────────────────────────────────
 HH_HL_CONF_BASE         = 75    # base confidence (all gates pass = minimum score)

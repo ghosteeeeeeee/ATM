@@ -106,6 +106,7 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in steady markets
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in normal vol
+        'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
     },
     'HIGH': {
         # Breakout works in big moves
@@ -158,6 +159,7 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in high vol
+        'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
     },
     'EXTREME': {
         # Continuation works in storms

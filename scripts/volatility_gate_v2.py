@@ -89,6 +89,7 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -116,6 +117,7 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -163,6 +165,7 @@ VOL_PHASE_MULTS = {
         'Momentum': 1.3,        # Building breakout
         'Squeeze': 1.3,         # Compression detected
         'Trendline': 1.2,       # Trend signals work
+        'Pattern': 1.3,         # Structure Sniper thrives in trend building
         'Bollinger': 0.6,       # Don't fade trends
         'Exhaustion': 0.5,      # Too early
     },
@@ -201,6 +204,7 @@ VOL_PHASE_MULTS = {
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
+        'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
     },
     # NORMAL volatility: block pullback_entry LONG, block R2 (wins in EXTREME/HIGH)
     ('NORMAL', '*'): {

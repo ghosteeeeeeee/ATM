@@ -651,6 +651,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('breakout_pullback_short',  'breakout-pullback-'):  1.3,   # breakout → pullback (high R:R)
     ('volume_climax_long',       'volume-climax+'):      1.25,  # volume rejection reversal
     ('volume_climax_short',      'volume-climax-'):      1.25,  # volume rejection reversal
+    ('hh_hl_breakout_long',      'hh-hl+'):              1.5,   # Structure Sniper — multi-confluence, high conviction
+    ('hh_hl_breakout_short',     'hh-hl-'):              1.5,   # Structure Sniper — multi-confluence, high conviction
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
