@@ -3511,6 +3511,31 @@ def run(dry_run=False):
                     except Exception as e:
                         log(f'  [WARN] V4 velocity check failed: {e}', 'WARN')
 
+                    # ── z_score + wave_phase filter: block oversold + falling ──
+                    # Data: z < -2.5 + falling = 0% WR (0W/3L). Price already oversold,
+                    # momentum fading — guaranteed bounce. Blocks ZEN (-5.57%), NEAR (-5.05%), SYRUP (-3.71%)
+                    try:
+                        _fc = [float(p['price']) for p in fresh_prices]
+                        if len(_fc) >= 20:
+                            _mean_20 = sum(_fc[-20:]) / 20
+                            _std_20 = (sum((p - _mean_20) ** 2 for p in _fc[-20:]) / 20) ** 0.5
+                            if _std_20 > 0:
+                                _exec_z = (_fc[-1] - _mean_20) / _std_20
+                                # Check wave phase from signal metadata
+                                _meta = sig.get('signal_metadata') or '{}'
+                                if isinstance(_meta, str):
+                                    import json as _json
+                                    _meta = _json.loads(_meta)
+                                _wave_phase = _meta.get('wave_phase', '')
+                                if _exec_z < -2.5 and _wave_phase == 'falling':
+                                    log(f'  🚫 [ACCEL-V4-ZPHASE] {token} {direction} BLOCKED — z={_exec_z:.2f} + wave=falling (oversold bounce risk)')
+                                    if sig_id:
+                                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                                    skipped += 1
+                                    continue
+                    except Exception as e:
+                        log(f'  [WARN] V4 z_score+wave_phase check failed: {e}', 'WARN')
+
                     fresh_result = detect_accel_300_v4_short(token, fresh_prices)
                 else:
                     from signals.accel_300_v2_short import detect_accel_300_v2_short, _get_1m_prices
