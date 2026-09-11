@@ -1658,3 +1658,66 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - None
+
+## [2026-09-11 02:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.18)
+- CHIP pump-chain+ LONG rr_engine_support_br +$0.18
+
+**24h:** 40T 65.0%WR +$2.33 | 5 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ 2T 0%WR -$0.23 (needs 3+ to trigger kill)
+- accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven)
+- atr_sl_hit 52.5% above 40% but avg +$0.037 profitable
+- Trade freq ~1/hr normal
+- 24h WR 65% solid
+
+**Open Questions:**
+- None
+
+## [2026-09-11 04:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0W 4L -$0.60)
+- pullback-entry- SHORT → rr_engine_resistance -$0.16
+- pump-chain- SHORT → rr_engine_resistance -$0.12
+- pump-chain+ LONG → atr_sl_hit -$0.13
+- pullback-entry- SHORT → rr_engine_resistance -$0.19
+
+**24h:** 44T 59.1%WR +$1.73 | 3 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- pullback-entry+ 2T 0%WR -$0.23 (needs 3+ to kill)
+- accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven)
+- rr_engine_resistance 10T avg -$0.037 slight negative — not dramatic, watch next hour
+- 24h net +$1.73 system profitable
+
+**Open Questions:**
+- Market may be shifting bullish — 3/4 last-hour shorts hit resistance exit
+
+## [2026-09-11 05:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.45)
+- BLUR pump-chain+ LONG → atr_sl_hit -$0.29
+- NOT pullback-entry- SHORT → rr_engine_resistance -$0.16
+
+**24h:** 44T 59.1%WR +$1.39 | 3 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01 (not 0%)
+- rr_engine_resistance 10T 22.7% of exits, -$0.49 total — last 3h all SHORT losses (price bouncing in 15m NEUTRAL against 4h SHORT_BIAS entries). Working as designed — preventing larger losses on ranging markets
+- Directional outcome system should be penalizing SHORT after 3+ rolling losses (0.5x multiplier active)
+- 3 consecutive losing hours (-$1.05) within normal variance at 2 trades/hr
+- SHORTs still profitable 24h: 34T 61.8%WR +$1.42
+- LONGs bleeding: 10T 40%WR -$0.12 — but no signal at kill threshold
+
+**Open Questions:**
+- Regime mismatch: 4h SHORT_BIAS vs 15m NEUTRAL creating whipsaw on shorts. If this persists, may need to tighten entry conditions when 15m is NEUTRAL

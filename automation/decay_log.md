@@ -1053,3 +1053,9 @@
 [2026-09-10 23:08 UTC]   🟢 OK: pump-chain-: 14 trades, 71.4% WR, PnL=6.63
 [2026-09-10 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-10 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-11 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-11 05:08 UTC]   🟢 OK: pump-chain+: 7 trades, 42.9% WR, PnL=-0.6
+[2026-09-11 05:08 UTC]   🟢 OK: pullback-entry-: 10 trades, 50.0% WR, PnL=-3.0
+[2026-09-11 05:08 UTC]   🟢 OK: pump-chain-: 17 trades, 70.6% WR, PnL=6.88
+[2026-09-11 05:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-11 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

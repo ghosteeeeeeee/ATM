@@ -81,3 +81,14 @@
 ## Error Alerts — 2026-09-11 00:24 UTC
 - **WARN** (2x): `signal_compactor: timed out` at 00:17 and 00:20
 - **AUTO-FIX**: None — non-fatal, pipeline continued running. Monitor for escalation.
+
+## Health Check — 2026-09-11 04:23 UTC
+- **[OK]** Pipeline: ACTIVE (cycle #194630), 60 cycles in last hour, no errors
+- **[INFO]** Signals: 67 generated last hour, 0 in hotset (none survived compaction)
+- **[INFO]** Trades: 2 open (3→2 after NOT SHORT closed at 04:22), 9 closed today
+- **[INFO]** PnL today: -$0.67 (3 wins / 9 trades = 33% WR)
+- **[INFO]** Regime: NEUTRAL (104/105 tokens neutral, 1 long-biased)
+- **[WARN]** signal_compactor timeout: 1 in last hour (non-fatal, recovered at 04:22:33)
+- **[WARN]** Disk at 84% (93G/118G) — 1% from threshold
+- **[WARN]** 0 tokens in hotset — all 67 signals filtered out by compaction
+- **AUTO-FIX**: None needed — pipeline self-recovered from compactor timeout

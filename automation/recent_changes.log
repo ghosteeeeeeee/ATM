@@ -1361,3 +1361,15 @@
   WHY: 0T last hour (quiet period, 01:10 UTC). 42T/24h 57.1%WR +$2.03. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven). atr_sl_hit 52.4% above 40% but avg +$0.051 profitable. 5 open positions. Trade freq ~1.5/hr normal.
   BY: auto_1hr
   NEXT: Re-run at 02:10 UTC
+[2026-09-11 02:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.18 CHIP pump-chain+). 40T/24h 65.0%WR +$2.33. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01 (breakeven). atr_sl_hit 52.5% above 40% but avg +$0.037 profitable. pump-chain- 16T 75%WR +$1.34 strong. Trade freq ~1/hr normal. 5 open positions. Quiet period 02:10 UTC.
+  BY: auto_1hr
+  NEXT: Re-run at 03:10 UTC
+[2026-09-11 04:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (0W 4L -$0.60). 3 SHORTs hit rr_engine_resistance, 1 atr_sl_hit. 44T/24h 59.1%WR +$1.73. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01. atr_sl_hit 50% but avg +$0.029 profitable. 3 open positions. Market possibly shifting bullish — shorts hitting resistance. Watch next hour.
+  BY: auto_1hr
+  NEXT: Re-run at 05:10 UTC
+[2026-09-11 05:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.45). BLUR pump-chain+ LONG atr_sl_hit -$0.29, NOT pullback-entry- SHORT rr_engine_resistance -$0.16. 3 consecutive losing hours (-$1.05) within normal variance. 44T/24h 59.1%WR +$1.39 still profitable. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR. rr_engine_resistance 10T 22.7% exits, -$0.49 total — last 3h SHORT losses from 15m NEUTRAL vs 4h SHORT_BIAS mismatch. Directional outcome system active. 3 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 06:10 UTC
