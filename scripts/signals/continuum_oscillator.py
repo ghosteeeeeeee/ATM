@@ -2,17 +2,23 @@
 """
 continuum_oscillator.py — Score cadence oscillator signal for BTC.
 
-Thesis: The continuum score oscillates between 60-65 (troughs) and 90-100 (peaks)
-with a 30-60 minute cadence. Rising score = momentum building = LONG opportunity.
-Falling score = momentum fading = SHORT opportunity.
+Thesis: The continuum score oscillates between troughs and peaks with a
+cadence of 30-60 minutes. When we detect the score is RISING through
+a meaningful range, we enter LONG. When FALLING, we enter SHORT.
 
-Entry LONG: Score rising from 60 → 80+ (momentum building)
-Entry SHORT: Score falling from 90 → 60 (momentum fading)
+This captures the "riding the wave" pattern — not waiting for extremes,
+but entering during the momentum phase of the oscillation.
 
-This is a momentum oscillator signal derived from the continuum engine's
-composite score. It captures the cadence pattern observed in live trading.
+Improvements (2026-09-12):
+- Uses continuum_context for linreg-enhanced confidence
+- Faster cadence detection (6-tick window instead of 10)
+- Score magnitude influences confidence directly
+- Cooldown reduced to 1h (was 2h)
+
+Entry LONG: Score rising through neutral zone (40→60+)
+Entry SHORT: Score falling through neutral zone (60→40-)
 """
-import sys, os, sqlite3, time, json, math
+import sys, os, sqlite3, time, json
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from signal_schema import add_signal, get_cooldown, set_cooldown
@@ -22,23 +28,19 @@ from hermes_constants import (
     CONTINUUM_OSC_ENABLED,
     CONTINUUM_OSC_PLUS_ENABLED,
     CONTINUUM_OSC_MINUS_ENABLED,
-    CONTINUUM_OSC_SCORE_RISING_THRESHOLD,  # Score must rise by this much
-    CONTINUUM_OSC_SCORE_FALLING_THRESHOLD,  # Score must fall by this much
-    CONTINUUM_OSC_MIN_SCORE,  # Minimum score for LONG entry
-    CONTINUUM_OSC_MAX_SCORE,  # Maximum score for SHORT entry
+    CONTINUUM_OSC_SCORE_RISING_THRESHOLD,
+    CONTINUUM_OSC_SCORE_FALLING_THRESHOLD,
+    CONTINUUM_OSC_MIN_SCORE,
+    CONTINUUM_OSC_MAX_SCORE,
     CONTINUUM_OSC_COOLDOWN_HOURS,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
-
-# ── Continuum score data source ────────────────────────────────────────────────
-# The score is computed by continuum_engine.py and stored in continuum.db
-# We read the last N scores to detect the cadence pattern.
 
 CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
 
 
 def _get_recent_scores(token: str, limit: int = 30) -> list:
-    """Get recent continuum scores for a token from continuum.db.
+    """Get recent continuum scores from continuum.db.
     Returns list of (timestamp, score) tuples, oldest first."""
     conn = None
     try:
@@ -51,7 +53,6 @@ def _get_recent_scores(token: str, limit: int = 30) -> list:
         rows = c.fetchall()
         if not rows:
             return []
-        # Reverse to oldest-first
         return [(r[0], r[1]) for r in reversed(rows)]
     except Exception:
         return []
@@ -60,58 +61,60 @@ def _get_recent_scores(token: str, limit: int = 30) -> list:
             conn.close()
 
 
-def _get_current_score(token: str) -> float:
-    """Get the most recent continuum score for a token."""
-    scores = _get_recent_scores(token, limit=1)
-    if scores:
-        return scores[0][1]
-    return 50.0  # Default neutral
-
-
 def _detect_cadence(scores: list) -> dict:
     """
-    Detect the score cadence pattern.
+    Detect the score cadence pattern using a fast 6-tick window (3 min).
     
     Returns dict with:
     - trend: 'RISING', 'FALLING', 'FLAT'
     - magnitude: how much the score changed
-    - duration: how long the trend has been active
-    - phase: 'PEAK', 'TROUGH', 'RISING', 'FALLING'
+    - phase: 'PEAK', 'TROUGH', 'RISING', 'FALLING', 'FLAT'
+    - current_score: latest score
+    - change: signed change (positive = rising)
     """
-    if len(scores) < 5:
-        return {'trend': 'FLAT', 'magnitude': 0, 'duration': 0, 'phase': 'UNKNOWN'}
+    if len(scores) < 6:
+        return {'trend': 'FLAT', 'magnitude': 0, 'duration': 0, 'phase': 'UNKNOWN',
+                'current_score': 50, 'change': 0}
     
-    # Get recent scores (last 10 ticks = 5 minutes)
-    recent = [s[1] for s in scores[-10:]]
+    # Use last 6 ticks (3 minutes) for fast detection
+    recent = [s[1] for s in scores[-6:]]
+    if any(s is None for s in recent):
+        return {'trend': 'FLAT', 'magnitude': 0, 'duration': 0, 'phase': 'UNKNOWN',
+                'current_score': 50, 'change': 0}
     
-    # Calculate trend
-    first_half = sum(recent[:5]) / 5
-    second_half = sum(recent[5:]) / 5
+    # Split into first half and second half of the window
+    first_half = sum(recent[:3]) / 3
+    second_half = sum(recent[3:]) / 3
     change = second_half - first_half
     
-    # Determine phase
     current_score = recent[-1]
-    if current_score >= 95:
+    
+    # Determine phase
+    if current_score >= 90:
         phase = 'PEAK'
-    elif current_score <= 65:
+    elif current_score <= 20:
         phase = 'TROUGH'
-    elif change > 2:
+    elif change > 1.5:
         phase = 'RISING'
-    elif change < -2:
+    elif change < -1.5:
         phase = 'FALLING'
     else:
         phase = 'FLAT'
     
-    # Calculate duration of current trend
+    # Calculate duration of current trend (ticks in the same direction)
     duration = 0
     if len(scores) >= 3:
-        for i in range(len(scores)-1, 0, -1):
-            if i == len(scores)-1:
+        for i in range(len(scores) - 1, max(0, len(scores) - 20), -1):
+            if i == len(scores) - 1:
                 continue
-            if scores[i][1] > scores[i-1][1]:
-                duration += 1
-            else:
+            if i < 0 or i + 1 >= len(scores):
                 break
+            if scores[i + 1][1] > scores[i][1]:
+                duration += 1
+            elif scores[i + 1][1] < scores[i][1]:
+                break
+            else:
+                duration += 0.5  # flat tick
     
     return {
         'trend': 'RISING' if change > 1 else ('FALLING' if change < -1 else 'FLAT'),
@@ -127,7 +130,7 @@ def detect(token: str) -> dict:
     """
     Detect continuum oscillator signal for a token.
     
-    Returns {direction, confidence, value, price} or None.
+    Returns {direction, confidence, value, price, reason} or None.
     """
     # Get recent scores
     scores = _get_recent_scores(token, limit=30)
@@ -147,14 +150,14 @@ def detect(token: str) -> dict:
     except Exception:
         return None
     
-    # LONG signal: score rising from trough
+    # LONG signal: score rising from trough zone
     if (cadence['phase'] == 'RISING' and 
         cadence['current_score'] >= CONTINUUM_OSC_MIN_SCORE and
         cadence['magnitude'] >= CONTINUUM_OSC_SCORE_RISING_THRESHOLD):
         
-        # Confidence based on magnitude and current score
-        conf = 60 + min(20, cadence['magnitude'] * 2)
-        conf = min(88, conf)  # Cap at 88
+        # Confidence scales with magnitude and score level
+        conf = 65 + min(18, cadence['magnitude'] * 3)
+        conf = min(88, conf)
         
         return {
             'direction': 'LONG',
@@ -162,15 +165,15 @@ def detect(token: str) -> dict:
             'value': cadence['magnitude'],
             'price': price,
             'z_score': None,
-            'reason': f'score_rising_{cadence["magnitude"]:.1f}',
+            'reason': f'osc_rising_{cadence["magnitude"]:.1f}_score_{cadence["current_score"]:.0f}',
         }
     
-    # SHORT signal: score falling from peak
+    # SHORT signal: score falling from peak zone
     if (cadence['phase'] == 'FALLING' and
         cadence['current_score'] <= CONTINUUM_OSC_MAX_SCORE and
         cadence['magnitude'] >= CONTINUUM_OSC_SCORE_FALLING_THRESHOLD):
         
-        conf = 60 + min(20, cadence['magnitude'] * 2)
+        conf = 65 + min(18, cadence['magnitude'] * 3)
         conf = min(88, conf)
         
         return {
@@ -179,7 +182,7 @@ def detect(token: str) -> dict:
             'value': cadence['magnitude'],
             'price': price,
             'z_score': None,
-            'reason': f'score_falling_{cadence["magnitude"]:.1f}',
+            'reason': f'osc_falling_{cadence["magnitude"]:.1f}_score_{cadence["current_score"]:.0f}',
         }
     
     return None

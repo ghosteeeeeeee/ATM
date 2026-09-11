@@ -1962,6 +1962,42 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # continuum-mom+ (momentum zone-transition LONG)
+            if _comp == 'continuum-mom+':
+                try:
+                    from hermes_constants import CONTINUUM_SCORE_MOMENTUM_ENABLED, CONTINUUM_SCORE_LONG_ENABLED
+                    if not CONTINUUM_SCORE_MOMENTUM_ENABLED or not CONTINUUM_SCORE_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_MOM_LONG=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # continuum-mom- (momentum zone-transition SHORT)
+            if _comp == 'continuum-mom-':
+                try:
+                    from hermes_constants import CONTINUUM_SCORE_MOMENTUM_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED
+                    if not CONTINUUM_SCORE_MOMENTUM_ENABLED or not CONTINUUM_SCORE_SHORT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_MOM_SHORT=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # continuum-trend+ (linreg trendline LONG)
+            if _comp == 'continuum-trend+':
+                try:
+                    from hermes_constants import CONTINUUM_TREND_ENABLED, CONTINUUM_TREND_ALIGN_ENABLED
+                    if not CONTINUUM_TREND_ENABLED or not CONTINUUM_TREND_ALIGN_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_TREND_LONG=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # continuum-trend- (linreg trendline SHORT)
+            if _comp == 'continuum-trend-':
+                try:
+                    from hermes_constants import CONTINUUM_TREND_ENABLED, CONTINUUM_TREND_ALIGN_ENABLED
+                    if not CONTINUUM_TREND_ENABLED or not CONTINUUM_TREND_ALIGN_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_TREND_SHORT=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # warrior-sr-confirm (Warrior Trading S/R + candlestick + volume)
             if _comp == 'warrior-sr-confirm+':
                 try:
@@ -2807,6 +2843,13 @@ def is_component_disabled(component: str) -> bool:
     if c == 'continuum-osc+': return not CONTINUUM_OSC_ENABLED
     if c == 'continuum-osc-': return not CONTINUUM_OSC_ENABLED
     if c == 'continuum-osc': return not CONTINUUM_OSC_ENABLED
+    # continuum-momentum (zone-transition signals)
+    if c == 'continuum-mom+': return not CONTINUUM_SCORE_MOMENTUM_ENABLED
+    if c == 'continuum-mom-': return not CONTINUUM_SCORE_MOMENTUM_ENABLED
+    # continuum-trend (linreg trendline alignment)
+    if c == 'continuum-trend+': return not CONTINUUM_TREND_ENABLED
+    if c == 'continuum-trend-': return not CONTINUUM_TREND_ENABLED
+    if c == 'continuum-trend': return not CONTINUUM_TREND_ENABLED
     # btc-pump-rider
     if c == 'btc-pump-rider+': return not BTC_PUMP_RIDER_ENABLED
     # warrior-sr-confirm

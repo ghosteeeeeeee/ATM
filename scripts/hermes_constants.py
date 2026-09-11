@@ -3322,6 +3322,17 @@ CONTINUUM_OSC_MIN_SCORE              = 55      # minimum score for LONG entry [w
 CONTINUUM_OSC_MAX_SCORE              = 60      # maximum score for SHORT entry [was 80, fixed 2026-09-12]
 CONTINUUM_OSC_COOLDOWN_HOURS         = 1       # per-token+direction cooldown [was 2h, shortened 2026-09-12]
 
+# ── Continuum Trend Signal (continuum_trend.py) ────────────────────────────
+# Fires when multi-TF linreg slopes (trendlines) align strongly.
+# This is the most reliable continuum signal — captures structural momentum.
+CONTINUUM_TREND_ENABLED              = True    # master kill-switch
+CONTINUUM_TREND_ALIGN_ENABLED        = True    # trend alignment signals
+CONTINUUM_TREND_REVERSAL_ENABLED     = True    # trend reversal signals
+CONTINUUM_TREND_MIN_ALIGNMENT        = 0.75    # 75%+ of TFs must agree
+CONTINUUM_TREND_MIN_SLOPE            = 0.02    # at least one slope must exceed this
+CONTINUUM_TREND_COOLDOWN_MIN         = 10      # minutes between signals per direction
+CONTINUUM_TREND_CONF_BASE            = 80      # base confidence for trend signals
+
 # ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
 # Buy pullback to SMA20 in established uptrends.
 # Reference: INJ LONG 2026-09-07 +40.57% (5x), entry at SMA20

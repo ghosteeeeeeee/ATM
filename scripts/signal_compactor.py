@@ -642,11 +642,17 @@ SIGNAL_SOURCE_WEIGHTS = {
     # sma20_dip — LONG-only SMA20 pullback in uptrend (mean reversion)
     ('sma20_dip_long', 'sma20-dip+'): 1.2,  # pullback entry at SMA20, proven INJ pattern
     # continuum_score — extreme score signals from continuum engine
-    ('continuum_score_long', 'continuum+'): 1.5,   # contrarian LONG at extreme bearish
-    ('continuum_score_short', 'continuum-'): 1.5,  # contrarian SHORT at extreme bullish
+    ('continuum_score_long', 'continuum+'): 1.5,           # contrarian LONG at extreme bearish
+    ('continuum_score_short', 'continuum-'): 1.5,          # contrarian SHORT at extreme bullish
+    # continuum_score momentum — zone-transition signals (score crosses 50)
+    ('continuum_score_long', 'continuum-mom+'): 1.3,       # momentum LONG (score crossing above 50)
+    ('continuum_score_short', 'continuum-mom-'): 1.3,      # momentum SHORT (score crossing below 50)
     # continuum_oscillator — score cadence momentum signals
-    ('continuum_oscillator_long', 'continuum-osc+'): 1.2,   # momentum LONG
-    ('continuum_oscillator_short', 'continuum-osc-'): 1.2,  # momentum SHORT
+    ('continuum_oscillator_long', 'continuum-osc+'): 1.2,  # momentum LONG
+    ('continuum_oscillator_short', 'continuum-osc-'): 1.2, # momentum SHORT
+    # continuum_trend — linreg trendline alignment (structural momentum)
+    ('continuum_trend_long', 'continuum-trend+'): 1.4,     # trendline LONG (BULL alignment)
+    ('continuum_trend_short', 'continuum-trend-'): 1.4,    # trendline SHORT (BEAR alignment)
     # Warrior Trading signals (book strategy conversion 2026-09-12)
     ('warrior_sr_confirm_long',  'warrior-sr-confirm+'): 1.2,   # S/R + candlestick + volume
     ('warrior_sr_confirm_short', 'warrior-sr-confirm-'): 1.2,   # S/R + candlestick + volume

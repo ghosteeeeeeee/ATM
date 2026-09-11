@@ -68,6 +68,7 @@ FAMILY_MAP = {
     'Volume': ['volume_hl', 'pump_catcher_long', 'volume_breakout_long', 'volume_breakout_short'],
     'ATR': ['atr_spike_long'],
     'Coiled_Spring': ['coiled_spring_long', 'coiled_spring_short'],
+    'Continuum': ['continuum_score', 'continuum_oscillator', 'continuum_trend'],
 }
 
 # Reverse lookup: signal_type → family

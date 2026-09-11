@@ -53,6 +53,9 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
+        'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in all regimes
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — mean-reversion, works in range-bound
     },
