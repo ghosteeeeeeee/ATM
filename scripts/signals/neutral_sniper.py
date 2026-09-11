@@ -232,8 +232,47 @@ def detect_neutral_sniper(token: str, candles: list) -> Optional[dict]:
     }
 
 
+def _is_neutral_regime() -> bool:
+    """Check if BTC is in NEUTRAL/FLAT regime — only fire in chop."""
+    import sqlite3
+    from paths import RUNTIME_DB
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        # Check momentum_state from momentum_cache
+        row = conn.execute(
+            "SELECT momentum_state FROM momentum_cache WHERE token='BTC'"
+        ).fetchone()
+        if row and row[0]:
+            state = row[0].lower()
+            # Only fire in neutral/quiet/chop regimes
+            if state in ('neutral', 'quiet'):
+                return True
+            # Also check if BTC velocity is flat (regime scanner may say otherwise)
+        # Fallback: check BTC 30m velocity
+        row2 = conn.execute(
+            "SELECT price_change_30m FROM token_speeds WHERE token='BTC'"
+        ).fetchone()
+        if row2 and row2[0] is not None:
+            return abs(row2[0]) < 0.25  # flat = neutral for this signal
+    except Exception:
+        pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return False  # default: don't fire if uncertain
+
+
 def run(prices_dict=None) -> int:
     """Entry point for signals_runner."""
+    # Regime gate: only fire in NEUTRAL/FLAT regime
+    if not _is_neutral_regime():
+        _log("  [neutral_sniper] Skipped — BTC not in NEUTRAL/FLAT regime")
+        return 0
+
     if prices_dict is None:
         from signal_schema import get_all_latest_prices
         prices_dict = get_all_latest_prices()
