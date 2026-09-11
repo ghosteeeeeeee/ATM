@@ -1393,3 +1393,11 @@
   WHY: 3T last hour (1W 2L +$0.02). PONS mover+ LONG atr_sl_hit +$0.01, ZRO bb-bounce-v2-long+ profit-monster-trail +$0.12, ETC pump-chain- SHORT rr_engine_resistance -$0.11. 45T/24h 53.3%WR +$0.27. Kill criteria not met: accel-300-v4-short- 2T 0%WR (needs 3+), pullback-entry+ 1T 0%WR (needs 3+). rr_engine_resistance 11T -$0.75 structural SHORT losses in NEUTRAL market (avg -$0.068) working as designed. pump-chain+ 7T 28.6%WR -$0.61 worst signal but not at kill threshold. pump-chain- 19T 63.2%WR +$1.00 strong. 98% tokens NEUTRAL on 5m. 5 open positions. Trade freq 3/hr normal.
   BY: auto_1hr
   NEXT: Re-run at 10:10 UTC
+[2026-09-11 11:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.54). ME ema300-dip-long LONG atr_sl_hit -$0.23, LTC bb-bounce-v2-long+ LONG cut-loser-CL-T1 -$0.22, FOGO pullback-entry- SHORT rr_engine_resistance -$0.09. 50T/24h 50.0%WR -$0.04. Kill criteria not met: accel-300-v4-short- 2T 0%WR (needs 3+), ema300-dip-long 1T 0%WR (needs 3+). rr_engine_resistance 13T -$0.81 structural SHORT losses in NEUTRAL market working as designed. pump-chain+ 7T 28.6%WR -$0.61 losing but not at kill threshold. 6h trend 4/5 hours negative mild drawdown within normal variance. 98% tokens NEUTRAL. 4 open positions. Trade freq 2.5/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 12:10 UTC
+[2026-09-11 12:10 UTC] auto_1hr: KILLED ACCEL_300_V4_SHORT_ENABLED = False
+  WHY: 3T/24h 0%WR -$0.44. All ATR_SL hits. SHORT momentum signal in 98% NEUTRAL market = no edge. Meets kill threshold (0% WR, 3+ trades).
+  BY: auto_1hr
+  NEXT: Re-run at 13:10 UTC

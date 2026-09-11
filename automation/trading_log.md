@@ -1887,3 +1887,60 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - Market: 98% NEUTRAL on 5m, only RUNE SHORT_BIAS, MET LONG_BIAS
 
 **Open Questions:** None — system healthy, no actionable fixes
+
+## [2026-09-11 11:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** $-0.54 (WR: 0.0%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| ME | ema300-dip-long | LONG | atr_sl_hit | -$0.23 |
+| LTC | bb-bounce-v2-long+ | LONG | cut-loser-CL-T1 | -$0.22 |
+| FOGO | pullback-entry- | SHORT | rr_engine_resistance | -$0.09 |
+
+**24h:** 50T 50.0%WR -$0.04 | 4 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 2T 0%WR (needs 3+), ema300-dip-long 1T 0%WR (needs 3+)
+- pump-chain+ 7T 28.6%WR -$0.61 — losing but not at kill threshold (not 0% WR)
+- rr_engine_resistance 13T 28.9% of exits, -$0.81 — structural SHORT losses in NEUTRAL market (avg -$0.062), working as designed
+- atr_sl_hit 24T 53.3% but avg -$0.013 slightly negative — monitor if this persists
+- ema300-dip-long: first trade (-$0.23) — too early to judge, monitor next 24h
+- cut-loser-CL-T1: 2T both losses on bb-bounce-v2-long+ — indicates SL tight for this signal
+- Trade freq 2.5/hr normal
+- Market: 98% NEUTRAL on 5m
+- 6h trend: 4/5 hours negative, mild drawdown within normal variance
+
+**Open Questions:**
+- ema300-dip-long first trade a loss — watch next 24h before deciding
+- cut-loser-CL-T1 on bb-bounce-v2-long+ — could indicate SL needs widening for this signal
+
+## [2026-09-11 12:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $+0.16 (WR: 50.0%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| BIGTIME | pullback-entry- | SHORT | atr_sl_hit | +$0.05 |
+| ARB | accel-300-v4-short- | SHORT | atr_sl_hit | -$0.13 |
+| ATOM | pullback-entry- | SHORT | atr_sl_hit | +$0.13 |
+| APT | pump-chain- | SHORT | atr_sl_hit | +$0.11 |
+
+**24h:** 48T 50.0%WR -$0.07 | 1 open position
+
+**Changes:**
+1. KILLED `ACCEL_300_V4_SHORT_ENABLED = False` — 3T/24h 0%WR -$0.44. All ATR_SL hits. SHORT momentum signal has no edge in 98% NEUTRAL market. Meets kill threshold (0% WR, 3+ trades).
+
+**No Change Needed:**
+- atr_sl_hit: 26T 54.2% of exits, avg -$0.018 — borderline but not critical
+- rr_engine_resistance: 13T 27.1% exits, -$0.81 — structural SHORT losses in NEUTRAL, working as designed
+- pump-chain-: 19T 63.2%WR +$0.83 — strong performer
+- pump-chain+: 7T 28.6%WR -$0.61 — losing but has some wins, not at kill threshold
+- Trade freq 2-3/hr normal
+- Market: 98% NEUTRAL on 5m
+
+**Open Questions:** None

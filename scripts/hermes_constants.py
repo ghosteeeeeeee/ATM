@@ -1970,7 +1970,7 @@ ACCEL_300_V3_SHORT_EXEC_Z_MAX = 0        # max z_score at execution — block SH
 # v4 = V2 proven conditions (56% WR, +$0.60) + FLAT regime block + confidence trap block
 # V2 was the best SHORT variant. V4 keeps what works and blocks what doesn't.
 # FLAT regime: 17% WR → block. Confidence 90-94: 33% WR → block.
-ACCEL_300_V4_SHORT_ENABLED      = True    # enabled — proven V2 conditions + regime filter
+ACCEL_300_V4_SHORT_ENABLED      = False   # auto_1hr KILLED 2026-09-11 12:10 — 3T/24h 0%WR -$0.44. All ATR_SL. SHORT in NEUTRAL market = no edge.
 ACCEL_300_V4_SHORT_MIN_GAP      = 2.0     # min gap below EMA300 (V2 proven: no loser had gap>2.0%)
 ACCEL_300_V4_SHORT_MAX_GAP      = 6.0     # max gap (V2 proven)
 ACCEL_300_V4_SHORT_MIN_GAP_ACCEL = 0.20   # min gap acceleration (V2 proven: 0.10 was too weak)
