@@ -1541,7 +1541,7 @@ MA_CROSS_MINUS_ENABLED    = False  # CEO 2026-08-09 — all ma100-cross SHORT co
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
-TL_BREAK_ENABLED         = False  # KILLED 2026-08-25 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
+TL_BREAK_ENABLED         = True   # RE-ENABLED 2026-09-11 — master switch for LONG/SHORT. Directional flags control per-regime.
 ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 # ── Coiled Spring (volume contraction pullback in bullish trend) ────────────────
 # coiled_spring.py — LONG only. Catches volume dead zones during pullbacks
