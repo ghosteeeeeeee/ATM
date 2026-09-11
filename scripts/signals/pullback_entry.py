@@ -192,6 +192,25 @@ def detect(token):
     else:
         momentum_state = 'flat'
 
+    # 8. Support/Resistance proximity check (CEO 2026-09-11)
+    # SHORT at support = bounce risk (SAND/NOT/BANANA loss pattern)
+    # LONG at resistance = rejection risk
+    from hermes_constants import PULLBACK_SUPPORT_PROXIMITY_PCT
+    recent_lows = [c['low'] for c in candles]
+    recent_highs = [c['high'] for c in candles]
+    if recent_lows and direction == 'SHORT':
+        min_low = min(recent_lows[-PULLBACK_VOL_LOOKBACK:])
+        if min_low > 0:
+            dist_from_low = (price - min_low) / min_low * 100
+            if dist_from_low < PULLBACK_SUPPORT_PROXIMITY_PCT:
+                return None  # price at support = bounce risk for SHORT
+    if recent_highs and direction == 'LONG':
+        max_high = max(recent_highs[-PULLBACK_VOL_LOOKBACK:])
+        if max_high > 0:
+            dist_from_high = (max_high - price) / max_high * 100
+            if dist_from_high < PULLBACK_SUPPORT_PROXIMITY_PCT:
+                return None  # price at resistance = rejection risk for LONG
+
     # RSI check
     rsi = _calc_rsi(closes)
     if rsi is None:

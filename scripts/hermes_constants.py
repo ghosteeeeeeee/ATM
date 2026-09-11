@@ -3178,7 +3178,8 @@ PULLBACK_IMPULSE_MIN_PCT         = 0.4     # min % move for impulse (tightened f
 PULLBACK_IMPULSE_LOOKBACK        = 10      # candles to look back for impulse
 PULLBACK_DIP_MIN_PCT             = 0.15    # min % drop from impulse high/low (tightened from 0.10)
 PULLBACK_VOLUME_RATIO            = 0.25    # volume < 25% of 20-period average (tightened from 0.3 — ENA loss had 0.292 vol_ratio)
-PULLBACK_BB_WIDTH_MAX            = 0.55    # BB width < 0.55% (tightened from 0.6 — ENA loss had 0.594%)
+PULLBACK_BB_WIDTH_MAX            = 0.6     # BB width < 0.6% (reverted from 0.55 — too tight, blocks most signals)
+PULLBACK_SUPPORT_PROXIMITY_PCT   = 0.05    # block SHORT when entry < 0.05% above recent 5m low (at support = bounce risk)
 PULLBACK_RSI_MIN                 = 48      # RSI > 48 (LONG) or < 52 (SHORT) (tightened from 45)
 PULLBACK_RSI_MAX                 = 70      # RSI < 70 (LONG) or > 30 (SHORT)
 PULLBACK_EMA_PERIOD              = 20      # EMA period for trend check
