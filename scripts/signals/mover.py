@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """
-mover.py — Fast Mover Signal v2.
+mover.py — Fast Mover Signal v3 (acceleration-based).
 
-Trend-following signal that catches coins in strong directional moves.
-Avoids entering at peaks (LONG) or valleys (SHORT) — waits for pullbacks
-within the trend for better R:R entries.
+Catches coins ACCELERATING into moves, not just moving.
+Uses velocity acceleration as primary signal — fires at START of move.
 
 Signal types:
-  - mover_long  : LONG (upward trend, not overextended)
-  - mover_short : SHORT (downward trend, not oversold)
+  - mover_long  : LONG (accelerating upward)
+  - mover_short : SHORT (accelerating downward)
 
-Thesis: Fast movers attract more capital (momentum begets momentum).
-Key: Catch the move early, avoid chasing at extremes.
+Thesis: Acceleration precedes price expansion.
+Key: Catch the move when it's speeding up, not after it's over.
 """
 
 import os
 import sys
 import sqlite3
-import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
@@ -160,80 +158,6 @@ def compute_velocity_acceleration(closes, short_window=None, long_window=None):
     return short_vel - long_vel * (short_window / long_window)
 
 
-def compute_rsi(closes, period=14):
-    """Compute RSI. Returns value 0-100."""
-    if len(closes) < period + 1:
-        return 50  # neutral default
-
-    deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
-    gains = [d if d > 0 else 0 for d in deltas]
-    losses = [-d if d < 0 else 0 for d in deltas]
-
-    avg_gain = sum(gains[-period:]) / period
-    avg_loss = sum(losses[-period:]) / period
-
-    if avg_loss == 0:
-        return 100
-    rs = avg_gain / avg_loss
-    return 100 - (100 / (1 + rs))
-
-
-def compute_bb_position(closes, period=20, stddev=2.0):
-    """Compute position within Bollinger Bands (0 = lower band, 1 = upper band).
-
-    Returns value 0-1 (can exceed if price outside bands).
-    """
-    if len(closes) < period:
-        return 0.5  # neutral
-
-    window = closes[-period:]
-    sma = sum(window) / period
-    variance = sum((x - sma) ** 2 for x in window) / period
-    std = variance ** 0.5
-
-    if std == 0:
-        return 0.5
-
-    upper = sma + stddev * std
-    lower = sma - stddev * std
-    price = closes[-1]
-
-    if upper == lower:
-        return 0.5
-    return (price - lower) / (upper - lower)
-
-
-def is_near_recent_extreme(closes, direction, lookback=20, proximity_pct=None):
-    """Check if price is near recent high (LONG) or low (SHORT).
-
-    For trend following: avoid entering at peaks/valleys.
-    Returns True if too close to extreme (should NOT enter).
-    """
-    if proximity_pct is None:
-        proximity_pct = MOVER_PROXIMITY_PCT
-
-    if len(closes) < lookback:
-        return False
-
-    recent = closes[-lookback:]
-    current = closes[-1]
-
-    if direction == 'LONG':
-        # Don't buy near recent high — wait for pullback
-        recent_high = max(recent)
-        if recent_high == 0:
-            return False
-        dist_to_high = (recent_high - current) / recent_high * 100
-        return dist_to_high < proximity_pct  # too close to high = bad entry
-    else:
-        # Don't short near recent low — wait for bounce
-        recent_low = min(recent)
-        if recent_low == 0:
-            return False
-        dist_to_low = (current - recent_low) / recent_low * 100
-        return dist_to_low < proximity_pct  # too close to low = bad entry
-
-
 def detect_mover(token):
     """Detect if token is a fast mover worth trading.
 
@@ -311,18 +235,12 @@ def detect_mover(token):
     # Get current price
     price = closes_5m[-1]
 
-    # Compute RSI and BB for logging only (not filtering)
-    rsi = compute_rsi(closes_5m)
-    bb_pos = compute_bb_position(closes_5m)
-
     return {
         'direction': direction,
         'confidence': conf,
         'value': round(velocity, 4),
         'price': price,
         'acceleration': round(acceleration, 4),
-        'rsi': round(rsi, 2),
-        'bb_position': round(bb_pos, 4),
     }
 
 
@@ -357,9 +275,9 @@ def scan_mover_signals():
         # Quick velocity check (no DB call yet)
         candidates.append(token)
 
-    # Limit scan to top candidates by price (fastest to scan)
+    # Limit scan to top candidates (fastest to scan)
     # We'll do the actual velocity calculation in detect_mover
-    scan_tokens = candidates[:200]  # safety cap
+    scan_tokens = candidates[:MOVER_TOP_N]
 
     for token in scan_tokens:
         # Cooldown check
@@ -407,8 +325,7 @@ def scan_mover_signals():
             added += 1
             set_cooldown(token, direction, hours=MOVER_COOLDOWN_HOURS)
             _log(f"{token} {direction} vel={sig['value']:.3f}% "
-                 f"accel={sig['acceleration']:.3f}% rsi={sig['rsi']:.1f} "
-                 f"bb={sig['bb_position']:.3f} conf={sig['confidence']}")
+                 f"accel={sig['acceleration']:.3f}% conf={sig['confidence']}")
 
     return added
 
