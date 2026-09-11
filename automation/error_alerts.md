@@ -131,3 +131,8 @@
 - **[WARN]** candles.db at 976MB — growing, may contribute to disk pressure
 - **[WARN]** metrics_collector.py missing — timer firing but script not found (repeated errors)
 - **AUTO-FIX**: None needed — compactor timeouts self-recovered, pipeline running normally
+
+## Error Alerts — 2026-09-11 14:24 UTC
+- **WARN** (3x): `signal_compactor: timed out` at 13:55, 13:59, 14:02 — recurring ~every 4 min but pipeline recovers each cycle
+- **WARN**: Today's winrate 38.9% (36 closed trades, -$1.65 PnL)
+- **INFO**: No auto-fixes needed — pipeline self-recovers from compactor timeouts

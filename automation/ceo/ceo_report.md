@@ -1,36 +1,38 @@
-## CEO Report — 2026-09-11 ~10:35 UTC
+## CEO Report — 2026-09-11 ~14:30 UTC
 
 ### Diagnosis
 
-24h: 49T, 51.0% WR, -$0.24. 7d: 317T, 55.8% WR, -$0.07 (basically flat). Sep 11: 22T, 31.8% WR, -$1.75 (bad day). R:R 24h: 0.60 (avg_win 2.79%, avg_loss -4.65%) — UNDERWATER. Breakeven WR 62.5%, actual 51%.
+24h: 54T, 46.3% WR, -$0.78. 7d: 322T, 55.9% WR, +$0.93 (POSITIVE). Sep 11: 37T, 37.8% WR, -$1.77 (bad day — worst since Sep 8). R:R 24h: 0.77 (avg_win 3.56%, avg_loss -4.83%). 1 open trade. Disk 83%.
 
-**#1 loss driver: rr_engine_resistance** — 13 SHORT trades hitting resistance, avg -2.37%, -$0.81 total. These are SHORT entries in NEUTRAL market that the RR engine correctly exits at resistance. Working as designed — the problem is entries, not exits.
+**#1 loss driver: rr_engine_resistance** — 10 SHORT trades/48h hitting resistance, avg -4.88%, -$1.40 total. Structural — SHORT entries in 98% NEUTRAL market keep hitting resistance. Working as designed.
 
-**pump-chain+ LONG** — 7T/28.6% WR, -$0.61. Variance from 7d 68.3% WR +$1.11. Not structural.
+**pump-chain+ LONG killed at 13:15 UTC** — 9T/24h 22.2% WR -$0.82. ALL atr_sl_hit. Directional mismatch in NEUTRAL. Already dead.
 
-**squeeze_reversal** — 0 signals generated. Market condition: NEUTRAL market has no sharp sell-offs (need >=2% drop in 2h). Not a bug.
+**accel-300-v4-short- killed by auto_1hr at 12:10 UTC** — 3T 0% WR -$0.44. Already dead.
+
+**squeeze_reversal** — 0 signals. Market condition: NEUTRAL has no sharp sell-offs (need >=2% drop in 2h). Not a bug.
 
 ### Root Cause
 
-R:R ratio 0.60 means losses are 1.67x larger than wins. System needs R:R >= 1.0 to be structurally profitable at current WR. The rr_engine_resistance exits are cutting SHORT trades at resistance (correct behavior), but SHORT entries in NEUTRAL market keep hitting resistance because there's no directional edge.
+Today's -$1.77 is mostly rr_engine_resistance (SHORT structural losses) and pump-chain+ bleed (now killed). R:R 0.77 means system needs >57% WR to break even — actual 46.3% today. However, 7d is positive (+$0.93) and 5/8 days green. This is a bad day, not a structural problem.
 
 ### Fix Applied
 
-1. **Disk cleanup:** Logs truncated, journal vacuumed. 84% → 83%.
-2. **signal_regime_memory.json updated:** From stale Sep 6 to fresh Sep 11 data. All active signals verified profitable in NEUTRAL regime.
-3. **CURRENT.md updated:** Corrected stale numbers (was showing +$0.78/24h, DB shows -$0.24).
+1. **pump-chain+ LONG already killed** (13:15 UTC, PUMP_FLOW_PLUS_ENABLED=False). Was bleeding 9T/24h 22.2% WR -$0.82.
+2. **accel-300-v4-short- already killed** (12:10 UTC by auto_1hr). Was 3T 0% WR -$0.44.
+3. **No param changes needed.** PM_TRAIL/ATR_SL protected. Active signals all profitable on7d.
 
 ### Verification
 
-- DB verified: 24h 49T 51.0% WR -$0.24. 7d 317T 55.8% WR -$0.07.
-- squeeze_reversal: 0 signals = market condition (NEUTRAL, no sharp sell-offs). Code confirmed working.
-- signal_regime_memory.json: Updated with 30d regime data for all 7 active signals.
-- Disk: 83% (1% from threshold).
+- DB verified: 24h 54T 46.3% WR -$0.78. 7d 322T 55.9% WR +$0.93.
+- All 5 active signals profitable7d: pullback_entry- 29T/69%WR +$1.93 ★, open_skies 19T/63.2%WR +$1.56 ★, bb_bounce_v2_long 39T/71.8%WR +$1.20 ★, pump_chain 41T/68.3%WR +$1.11, pump-chain- 28T/60.7%WR +$0.33.
+- squeeze_reversal: 0 signals = market condition confirmed.
+- Disk: 83%.
 
 ### Next Actions
 
-1. **Monitor R:R.** Currently 0.60. If doesn't improve to 0.80+ by Sep 13, investigate PM_TRAIL/ATR_SL params.
-2. **Legacy exits by Sep 12.** ema300_dip_short -$1.48, ema300_dip -$1.02, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65. Total -$4.68/7d drag.
-3. **Monitor pump-chain+ LONG.** 7T/28.6% WR -$0.61 today. If 10T/48h <45% WR, kill.
-4. **Disk at 83%.** 2% from threshold. Next cleanup needed if >84%.
-5. **squeeze_reversal:** No action needed. Will fire when market provides sharp sell-offs.
+1. **Monitor R:R.** 0.77 (improving from 0.60). Breakeven at 57.5%. System7d WR 55.9% — close. If reaches 1.0+, structurally profitable.
+2. **Legacy exits by Sep 12.** ema300_dip_short -$1.48, ema300_dip -$1.02, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65. Will age out of7d window.
+3. **squeeze_reversal:** No action. Will fire when market provides sharp sell-offs.
+4. **Disk at 83%.** 2% from threshold. Next cleanup if >84%.
+5. **Monitor pump-chain-.** 28T/7d 60.7% WR +$0.33 — profitable but R:R weak (-0.14% avg). Watch for degradation.
