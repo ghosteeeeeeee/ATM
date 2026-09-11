@@ -51,6 +51,9 @@ from hermes_constants import (
     BREAKOUT_PULLBACK_ENABLED, BREAKOUT_PULLBACK_PLUS_ENABLED, BREAKOUT_PULLBACK_MINUS_ENABLED,
     VOLUME_CLIMAX_ENABLED, VOLUME_CLIMAX_PLUS_ENABLED, VOLUME_CLIMAX_MINUS_ENABLED,
     HH_HL_ENABLED,
+    EMA300_BREAKTHROUGH_ENABLED,
+    EMA300_BREAKTHROUGH_PLUS_ENABLED,
+    EMA300_BREAKTHROUGH_MINUS_ENABLED,
 )
 
 
@@ -326,6 +329,16 @@ try:
 except Exception:
     _hh_hl_run = None
 
+try:
+    from signals.trend_purity import scan as _trend_purity_run
+except Exception:
+    _trend_purity_run = None
+
+try:
+    from signals.ema300_breakthrough import run as _ema300_breakthrough_run
+except Exception:
+    _ema300_breakthrough_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -387,6 +400,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'breakout_pullback',        'enabled': 'BREAKOUT_PULLBACK_ENABLED',   'run': _breakout_pullback_run},
     {'name': 'volume_climax',            'enabled': 'VOLUME_CLIMAX_ENABLED',       'run': _volume_climax_run},
     {'name': 'hh_hl',                    'enabled': 'HH_HL_ENABLED',              'run': _hh_hl_run},
+    {'name': 'trend_purity',             'enabled': 'TREND_PURITY_ENABLED',        'run': _trend_purity_run},
+    {'name': 'ema300_breakthrough',       'enabled': 'EMA300_BREAKTHROUGH_ENABLED', 'run': _ema300_breakthrough_run},
 ]
 
 

@@ -1270,6 +1270,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'open-skies',            # open skies breakout — ride ATR SL/TP only, no PM at all
     'resistance-break',      # resistance break + pullback — ATR SL, not PM Trail
     'hh-hl',                 # Structure Sniper — ATR-based SL/TP, not PM Trail
+    'ema300-breakthrough',   # EMA300 breakthrough — 15m breakout, manage via ATR SL
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
@@ -1316,6 +1317,9 @@ SIGNAL_EXIT_CONFIG = {
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',
+    # EMA300 breakthrough: ATR-based exit
+    'ema300-breakthrough+': 'atr',
+    'ema300-breakthrough-': 'atr',
     # Pullback entry: structural exit
     'pullback-entry+': 'rr_engine',
     'pullback-entry-': 'rr_engine',
@@ -1791,6 +1795,22 @@ EMA300_DIP_SHORT_MAX_CROSSINGS = 10   # max EMA crossings in 100 bars — block 
 EMA300_DIP_SHORT_MIN_DIST_PCT = 0.3   # min distance from EMA300 (%) — require meaningful rally, not noise
 EMA300_DIP_SHORT_MIN_BTC_TREND = 0.5  # min BTC 1h trend (%) — only SHORT when BTC supporting downtrend
 # Mirror of LONG signal: sell rallies to EMA300 in downtrends
+# ── EMA300 Breakthrough (price crashes through EMA300 with momentum) ──────
+# ema300_breakthrough.py — 15m timeframe, confirms breakout with strong candle
+EMA300_BREAKTHROUGH_ENABLED = True
+EMA300_BREAKTHROUGH_PLUS_ENABLED = True      # LONG (reversal through EMA300 upward)
+EMA300_BREAKTHROUGH_MINUS_ENABLED = True     # SHORT (trend continuation through EMA300 downward)
+EMA300_BREAKTHROUGH_EMA_PERIOD = 300         # EMA period
+EMA300_BREAKTHROUGH_MIN_BODY_RATIO = 0.70    # min body / range ratio (strong candle)
+EMA300_BREAKTHROUGH_MIN_GAP_PCT = 0.30       # min gap at close after breakout (%)
+EMA300_BREAKTHROUGH_PRE_MOVE_WINDOW = 5      # bars to measure pre-move
+EMA300_BREAKTHROUGH_PRE_MOVE_SHORT = -2.0    # max pre-move for SHORT (price was falling)
+EMA300_BREAKTHROUGH_PRE_MOVE_LONG = -2.0     # max pre-move for LONG (reversal from decline)
+EMA300_BREAKTHROUGH_MIN_ATR_PCT = 0.15       # min ATR% (avoid ultra-low-vol noise)
+EMA300_BREAKTHROUGH_COOLDOWN = 30            # minutes between signals per token
+EMA300_BREAKTHROUGH_CONF_BASE = 75
+EMA300_BREAKTHROUGH_CONF_CAP = 88
+# Backtest: SHORT 80% WR (15T), LONG 61% WR (54T) with pre_move < -2% + body>70% + gap>0.3%
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
 SLOW_GRIND_SHORT_ENABLED = False   # CEO 2026-09-04 — 15T/30d 33.3% WR -$0.81. ALL losers. NEVER_REENABLE.
@@ -1902,9 +1922,9 @@ SQUEEZE_REVERSAL_RSI_PERIOD = 14
 SQUEEZE_REVERSAL_MIN_BARS = 150            # need enough data for sell-off + squeeze
 SQUEEZE_REVERSAL_FRESHNESS_SECS = 600      # 10 min freshness
 
-TREND_PURITY_ENABLED     = False
-TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
-TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
+TREND_PURITY_ENABLED     = True    # RE-ENABLED 2026-09-11 — wired into pipeline, shadow mode first
+TREND_PURITY_PLUS_ENABLED    = True    # trend_purity+ LONG — enabled for shadow testing
+TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT — enabled for shadow testing
 VOLUME_HL_ENABLED        = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 VOLUME_HL_PLUS_ENABLED        = False    # volume_hl+ LONG
 VOLUME_HL_MINUS_ENABLED       = True    # volume_hl- SHORT
@@ -2238,6 +2258,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'squeeze-reversal', 'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout', 'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
     'hh-hl',  # Structure Sniper — multi-confluence market structure breakout, works solo
+    'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
