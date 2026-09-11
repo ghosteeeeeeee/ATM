@@ -677,7 +677,7 @@ WIN_COOLDOWN_MINUTES   = 3         # block same direction for 3 min after a win 
 ATR_K_INITIAL      = 1.2   # initial SL only (reverted to original)
 ATR_K_LOW_VOL      = 0.8   # trailing/accel SL — atr_pct < 1% (was 0.5 — effective SL=0.4%, noise-level. 0.8 gives min 0.96% SL)
 ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.0% <= atr_pct <= 1.5%
-ATR_K_HIGH_VOL     = 0.25  # trailing/accel SL — atr_pct > 1.5% (EXTREME regime)
+ATR_K_HIGH_VOL     = 1.5   # trailing/accel SL — atr_pct > 1.5% (HIGH VOL — wider SL to survive spikes)
 ATR_PCT_LOW_THRESH = 0.01  # 1%
 ATR_PCT_HIGH_THRESH= 0.015  # 1.5% — matches EXTREME regime threshold
 
@@ -688,11 +688,11 @@ ATR_PCT_FALLBACK    = 0.03  # 2% assumed ATR — fallback when atr_cache returns
 
 # ── Trend Purity Signal ───────────────────────────────────────────────────────
 # trend_purity_signals.py — tighter params = fires sooner
-TP_MIN_GAP_PCT           = 0.15  # was 0.30 — price must be this far above EMA to fire LONG
-TP_PURITY_THRESH         = 0.45  # was 0.55 — fraction of lookback bars above EMA
-TP_LOOKBACK              = 15    # was 20   — shorter window = faster reaction
-TP_SHORT_CRASH_THRESH     = -0.75 # was -1.0 — gap_pct must be >= this below EMA to fire SHORT
-TP_SHORT_UPTREND_PURITY   = 0.60  # was 0.65 — uptrend purity needed before crash SHORT fires
+TP_MIN_GAP_PCT           = 0.30  # was 0.15 — price must be clearly above EMA (0.30%+)
+TP_PURITY_THRESH         = 0.65  # was 0.45 — 65% of bars above EMA = clean trend
+TP_LOOKBACK              = 20    # was 15   — full 20-bar window for trend quality
+TP_SHORT_CRASH_THRESH     = -1.50 # was -0.75 — only genuine crashes, not small dips
+TP_SHORT_UPTREND_PURITY   = 0.80  # was 0.60 — prior uptrend must be very strong before crash SHORT
 
 # Candle staleness threshold for signal generators (seconds)
 # Both volume_1m and volume_hl must use the same value to ensure consistent
@@ -1251,8 +1251,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
-    'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — own TP/SL/trailing
-    'pump_chain', 'pump_chain+', 'pump_chain-',  # underscore variant (actual DB values)
     'accel-300-v2-long',   # LONG momentum — new signal, manage via ATR SL not PM Trail
     'accel-300-v2-short',  # SHORT momentum — proven winner, manage via ATR SL not PM Trail
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
@@ -2259,6 +2257,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'grind-breakout', 'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
     'hh-hl',  # Structure Sniper — multi-confluence market structure breakout, works solo
     'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
+    'trend_purity',  # EMA30 purity-based LONG/CRASH SHORT — directional momentum, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
