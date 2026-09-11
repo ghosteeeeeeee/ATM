@@ -197,3 +197,7 @@
 - **WARN** (14x): `hermes-* services in failed state` — all auxiliary (better-coder, bug-hunter, ceo-dashboard, etc.), not blocking trading
 - **WARN** (2x): `hermes-coding-mcp, hermes-metrics auto-restart loops` — not blocking pipeline
 - **INFO**: 120/120 tokens NEUTRAL regime — flat market, low signal volume expected
+
+## Error Alerts — 2026-09-11 21:55 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

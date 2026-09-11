@@ -70,6 +70,8 @@ FAMILY_MAP = {
     'Open_Skies': ['open_skies', 'open_skies_long', 'open-skies', 'open-skies+'],
     'Coiled_Spring': ['coiled_spring_long', 'coiled_spring_short'],
     'Continuum': ['continuum_score', 'continuum_osc', 'continuum_trend'],
+    'Trend_Purity': ['trend_purity', 'trend_purity_long', 'trend_purity_short',
+                      'trend_purity+', 'trend_purity-'],
 }
 
 # Reverse lookup: signal_type → family

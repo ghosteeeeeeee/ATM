@@ -38,6 +38,7 @@ DRY_RUN       = False
 
 # ── DB paths ─────────────────────────────────────────────────────────────────
 STATIC_DB = '/root/.hermes/data/signals_hermes.db'
+RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 
 
 def _ema(prices: list) -> float:
@@ -89,6 +90,28 @@ def detect_trend_purity(token: str, direction: str = None):
     current_price = lookback_prices[-1]
     gap_pct = (current_price - ema) / ema * 100
 
+    # ── Momentum/speed guard — block stale, falling, or slow entries ────────
+    # Root cause: KAS loss on 2026-09-11 — is_stale=true, wave_phase=falling,
+    # speed_percentile=13.7. All three were red flags that should have blocked.
+    _speed_data = None
+    try:
+        _spd_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+        _spd_row = _spd_conn.execute(
+            'SELECT speed_percentile, is_stale, momentum_score, price_acceleration, wave_phase '
+            'FROM token_speeds WHERE token = ?', (token.upper(),)
+        ).fetchone()
+        _spd_conn.close()
+        if _spd_row:
+            _speed_data = {
+                'speed_percentile': _spd_row[0],
+                'is_stale': bool(_spd_row[1]),
+                'momentum_score': _spd_row[2],
+                'price_acceleration': _spd_row[3],
+                'wave_phase': _spd_row[4],
+            }
+    except Exception:
+        pass  # no speed data — don't block, just skip guard
+
     if direction is None:
         directions = ['LONG', 'SHORT']
     else:
@@ -96,6 +119,18 @@ def detect_trend_purity(token: str, direction: str = None):
 
     signals = []
     for d in directions:
+        # ── Momentum/speed guards (LONG-specific) ──────────────────────────
+        if d == 'LONG' and _speed_data:
+            # Block if signal is stale (price flat, no directional movement)
+            if _speed_data['is_stale']:
+                continue
+            # Block if speed is too low (price crawling — trend has no energy)
+            if _speed_data['speed_percentile'] is not None and _speed_data['speed_percentile'] < 20:
+                continue
+            # Block if wave_phase is falling (price decelerating into entry)
+            if _speed_data['wave_phase'] == 'falling':
+                continue
+
         if d == 'LONG':
             if gap_pct < MIN_GAP_PCT:
                 continue
