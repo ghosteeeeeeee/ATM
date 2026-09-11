@@ -1970,7 +1970,7 @@ ACCEL_300_V3_SHORT_EXEC_Z_MAX = 0        # max z_score at execution — block SH
 # v4 = V2 proven conditions (56% WR, +$0.60) + FLAT regime block + confidence trap block
 # V2 was the best SHORT variant. V4 keeps what works and blocks what doesn't.
 # FLAT regime: 17% WR → block. Confidence 90-94: 33% WR → block.
-ACCEL_300_V4_SHORT_ENABLED      = False   # auto_1hr KILLED 2026-09-11 12:10 — 3T/24h 0%WR -$0.44. All ATR_SL. SHORT in NEUTRAL market = no edge.
+ACCEL_300_V4_SHORT_ENABLED      = True    # RE-ENABLED 2026-09-11 — need more data (only 4T). Monitoring, no regime blocks yet.
 ACCEL_300_V4_SHORT_MIN_GAP      = 2.0     # min gap below EMA300 (V2 proven: no loser had gap>2.0%)
 ACCEL_300_V4_SHORT_MAX_GAP      = 6.0     # max gap (V2 proven)
 ACCEL_300_V4_SHORT_MIN_GAP_ACCEL = 0.20   # min gap acceleration (V2 proven: 0.10 was too weak)
@@ -3100,7 +3100,7 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = False        # KILLED 2026-09-11 13:15 — 9T/24h 22.2%WR -$0.82. ALL atr_sl_hit. Directional mismatch in NEUTRAL. SHORT stays active.
+PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-11 — 7-day: EXTREME 58%WR +$1.43, HIGH 65%WR, NORMAL 57%WR. All regimes winning.
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-09 — wins in ALL regimes. EXTREME blocked via volatility_gate_v2.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
