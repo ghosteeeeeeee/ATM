@@ -42,6 +42,7 @@ REGIME_SIGNALS = {
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'doji-top-short',  # doji exhaustion at top — mean-reversion (exit LONG / enter SHORT)
+        'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
@@ -99,6 +100,7 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
+        'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
     },
     'HIGH': {
         # Breakout works in big moves
@@ -147,6 +149,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
+        'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
     },
     'EXTREME': {
         # Continuation works in storms

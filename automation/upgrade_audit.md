@@ -1,6 +1,16 @@
 # Upgrade Audit Trail
 
-**Last updated:** 2026-09-10 18:15 UTC
+**Last updated:** 2026-09-11 05:00 UTC
+
+---
+
+## Plan: doji_bottom_signal (NEW — not in plans/)
+- **Date scanned:** 2026-09-11 04:50
+- **Core request:** Create doji-bottom-long signal — mirror of doji_top for bottoms (LONG entry on doji exhaustion after decline)
+- **Difficulty:** Level 1
+- **Value:** MEDIUM — completes the doji exhaustion system (top was SHORT-only)
+- **Status:** IMPLEMENTED
+- **Reason:** Constants already existed (DOJI_DECLINE_MIN_PCT, DOJI_RSI_OVERSOLD, DOJI_VOLUME_DRY_RATIO). Created doji_bottom.py (216 lines), registered in __init__.py, added source weights in signal_compactor.py, added to REGIME_SIGNALS (FLAT/NORMAL/HIGH), STANDALONE_BYPASS, chop_detector classification, market_phase_gate. Uses inverse logic: volume drying up (not spike), RSI oversold (not overbought), prior decline (not advance). Runs clean, 0 signals in test (expected — needs specific conditions).
 
 ---
 
@@ -73,8 +83,8 @@
 - **Core request:** Doji-based entry/exit signals
 - **Difficulty:** Level 2
 - **Value:** MEDIUM
-- **Status:** PARTIAL (doji_top exists, doji_bottom missing)
-- **Reason:** `scripts/signals/doji_top.py` exists (6760 bytes). `doji_bottom.py` NOT created. Constants partially added (DOJI_TOP, DOJI_BODY_MAX_PCT, etc.). Need to create doji_bottom.py.
+- **Status:** IMPLEMENTED (both top and bottom)
+- **Reason:** `scripts/signals/doji_top.py` exists (SHORT-only). `scripts/signals/doji_bottom.py` created 2026-09-11 (LONG entry). Constants fully defined. Registered, source weights added, in REGIME_SIGNALS + STANDALONE_BYPASS.
 
 ## Plan: 2026-09-08_trend-ignition-signal-spec.md
 - **Date scanned:** 2026-09-09
@@ -155,16 +165,20 @@
 | Status | Count |
 |--------|-------|
 | IMPLEMENTED (with bugs found) | 2 |
-| IMPLEMENTED (complete) | 7 |
+| IMPLEMENTED (complete) | 8 |
 | PARTIAL | 2 |
 | NOT IMPLEMENTED | 4 |
 
-### Critical Bugs Found During Scan
-1. **squeeze_reversal NOT in REGIME_SIGNALS** — signal exists but won't fire
-2. **squeeze_reversal NOT in signal_compactor source weights** — no compaction scoring
-3. **squeeze_reversal NOT in STANDALONE_BYPASS** — needs confluence to fire
-4. **grind_breakout NOT in REGIME_SIGNALS** — signal exists but won't fire
+### Critical Bugs Found During Scan (All Fixed)
+1. ~~squeeze_reversal NOT in REGIME_SIGNALS~~ — FIXED
+2. ~~squeeze_reversal NOT in signal_compactor source weights~~ — FIXED
+3. ~~squeeze_reversal NOT in STANDALONE_BYPASS~~ — FIXED
+4. ~~grind_breakout NOT in REGIME_SIGNALS~~ — FIXED
 
 ### Next Level 2 Candidates
-1. `trend_ignition.py` — New signal, HIGH value, 100% WR in backtest
-2. `doji_bottom.py` — New signal, MEDIUM value, complements existing doji_top
+1. `trend_ignition.py` — New signal, HIGH value, 100% WR in 7-day backtest (9 signals)
+2. Partial close trailing runner — Level 3, MEDIUM value (exit system improvement)
+
+### Pending Level 1 Tasks
+1. Short filter VEL threshold 0.3→0.5 — needs simulation script first per audit
+2. EMA300 slope threshold 0→0.1 — needs simulation script first

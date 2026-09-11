@@ -1,3 +1,15 @@
+## Error Alerts — 2026-09-11 06:23 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 06:23:11, 5 open trades
+- **[INFO]** Signals: 119 generated in last hour
+- **[INFO]** Trades: 11 today, -$1.25 PnL, 27.3% WR (pump-chain SHORT best at 70.6%)
+- **[INFO]** Speed: 127/241 tokens >= 50% (52.7%)
+- **[INFO]** Regime: NEUTRAL (105 neutral, 1 short, 0 long)
+- **[WARN]** (2x): `signal_compactor: timed out` at 06:19 and 06:22 — self-recovered
+- **[WARN]** Hotset empty — 0 tokens survived compaction (NEUTRAL regime, low signal quality)
+- **[WARN]** Disk at 84% (93G/118G) — 1% from 85% threshold
+- **[WARN]** 10 phantom trades (exactly 0.0 PnL) — mostly historical, not recent
+- **AUTO-FIX**: Compressed 18 old .gz logs, vacuumed journal (freed 0B — journals already clean)
+
 ## Error Alerts — 2026-09-10 23:23 UTC
 - **[INFO]** Pipeline: OK — running, last cycle 23:23:03, 0 open trades in DB, 4 open per pipeline
 - **[INFO]** Signals: 91 generated in last hour (19 LONG, 72 SHORT)
@@ -92,3 +104,13 @@
 - **[WARN]** Disk at 84% (93G/118G) — 1% from threshold
 - **[WARN]** 0 tokens in hotset — all 67 signals filtered out by compaction
 - **AUTO-FIX**: None needed — pipeline self-recovered from compactor timeout
+
+## Health Check — 2026-09-11 07:23 UTC
+- **[OK]** Pipeline: ACTIVE, 5 open positions, no Tracebacks in last 30min
+- **[INFO]** Signals: 158 generated last hour, 0 in hotset (none survived compaction)
+- **[INFO]** Regime: NEUTRAL (104 neutral, 1 long-biased)
+- **[INFO]** Speed: 53% tokens >= 50th percentile (127/241)
+- **[WARN]** signal_compactor timeout: 3x in last 10min (07:18, 07:20, 07:22) — non-fatal, pipeline self-recovered
+- **[WARN]** Disk at 83% (93G/118G) — 2% from threshold
+- **[INFO]** All 44 hermes timers active and firing on schedule
+- **AUTO-FIX**: None needed

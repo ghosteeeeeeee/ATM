@@ -1815,3 +1815,29 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 **Open Questions:**
 - pump-chain+ at -$0.50 (6T 33.3%WR) — monitoring, not at kill threshold yet
 - 15m NEUTRAL vs 4h SHORT_BIAS mismatch continuing to cause SHORT resistance losses
+
+## [2026-09-11 09:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** $0.02 (WR: 33.3%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| PONS | mover+ | LONG | atr_sl_hit | +$0.01 |
+| ZRO | bb-bounce-v2-long+ | LONG | profit-monster-trail | +$0.12 |
+| ETC | pump-chain- | SHORT | rr_engine_resistance | -$0.11 |
+
+**24h:** 45T 53.3%WR +$0.27 | 5 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 2T 0%WR (needs 3+), pullback-entry+ 1T 0%WR (needs 3+)
+- rr_engine_resistance 11T 24.4% of exits, -$0.75 — structural SHORT losses in NEUTRAL market (avg -$0.068), working as designed
+- atr_sl_hit 23T 51.1% but avg +$0.002 profitable
+- pump-chain+ 7T 28.6%WR -$0.61 — worst signal but not at kill threshold (not 0% WR)
+- pump-chain- 19T 63.2%WR +$1.00 — strongest performer
+- Trade freq 3/hr normal
+- Market: 98% NEUTRAL on 5m, only RUNE SHORT_BIAS, MET LONG_BIAS
+
+**Open Questions:** None — system healthy, no actionable fixes

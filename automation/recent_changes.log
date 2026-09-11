@@ -1385,3 +1385,7 @@
   WHY: 2T last hour (1W 1L +$0.04). USUAL mover+ LONG profit-monster-trail +$0.04, BANANA pullback-entry- SHORT rr_engine_resistance -$0.10. 43T/24h 55.8%WR +$0.71. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01. atr_sl_hit 53.5% but avg +$0.015 profitable. pump-chain+ 6T 33.3%WR -$0.50 losing but not at kill threshold. Trade freq ~2/hr normal. 5 open positions.
   BY: auto_1hr
   NEXT: Re-run at 09:10 UTC
+[2026-09-11 09:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L +$0.02). PONS mover+ LONG atr_sl_hit +$0.01, ZRO bb-bounce-v2-long+ profit-monster-trail +$0.12, ETC pump-chain- SHORT rr_engine_resistance -$0.11. 45T/24h 53.3%WR +$0.27. Kill criteria not met: accel-300-v4-short- 2T 0%WR (needs 3+), pullback-entry+ 1T 0%WR (needs 3+). rr_engine_resistance 11T -$0.75 structural SHORT losses in NEUTRAL market (avg -$0.068) working as designed. pump-chain+ 7T 28.6%WR -$0.61 worst signal but not at kill threshold. pump-chain- 19T 63.2%WR +$1.00 strong. 98% tokens NEUTRAL on 5m. 5 open positions. Trade freq 3/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 10:10 UTC

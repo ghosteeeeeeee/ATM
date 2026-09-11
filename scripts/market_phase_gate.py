@@ -41,7 +41,7 @@ FAMILY_MAP = {
                'range_reversion_long', 'range_reversion_short'],
     'ZScore': ['zscore_rising', 'zscore_rising_long', 'zscore_rising_short', 'hzscore', 'mtp_zscore'],
     'Exhaustion': ['exhaustion', 'return_exhaustion', 'return_exhaustion_short', 'return_exhaustion_long',
-                    'spike_exhaustion_short'],
+                    'spike_exhaustion_short', 'doji_bottom_long'],
     'R2': ['r2_rev', 'r2_trend', 'r2_trend_long', 'r2_trend_short'],
     'Accelerate': ['accel_300', 'accel_300_long', 'accel_300_short', 'inverse_accel_300_long', 'inverse_accel_300_short',
                     'accel_300_v3_long', 'accel_300_v3_short'],

@@ -250,12 +250,9 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
-    'ADA',
-    'AIXBT',
     'BLUR',
     'CC',
     'CFX',
-    'COMP',
     'DOT',
     'DYDX',
     'ENA',
@@ -285,15 +282,17 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'BABY',
     'BIGTIME',
-    'CAKE',
     'ETC',
     'GMT',
     'HBAR',
     'IO',
-    'SAND'
+    'NOT',
+    'SAND',
+    'SUSHI',
+    'WLFI'
 }
+
 
 
 
@@ -2178,6 +2177,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
+    'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
     'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
     'mover', 'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets

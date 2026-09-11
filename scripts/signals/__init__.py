@@ -256,6 +256,11 @@ except Exception:
     _doji_top_run = None
 
 try:
+    from signals.doji_bottom import run as _doji_bottom_run
+except Exception:
+    _doji_bottom_run = None
+
+try:
     from signals.continuum_score import run as _continuum_score_run
 except Exception:
     _continuum_score_run = None
@@ -365,6 +370,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
     {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
+    {'name': 'doji_bottom',               'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_bottom_run},
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
     {'name': 'continuum_oscillator',      'enabled': 'CONTINUUM_OSC_ENABLED',         'run': _continuum_oscillator_run},
     {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
