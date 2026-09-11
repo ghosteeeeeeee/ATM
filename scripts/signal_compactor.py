@@ -2704,6 +2704,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # CRITICAL DEBUG: log every entry entering hotset_final — catch single-source bypass
             src_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
+            # ── EMA300-DIP-LONG RE-VALIDATION (2026-09-09) ──────────────────
+            # FIX: Signals bypass detection function when emitted directly (not preserved)
+            # Re-run detection to verify signal still passes new filters
+            if src == 'ema300-dip-long' and direction.upper() == 'LONG':
+                try:
+                    from signals.ema300_dip_long import detect_ema300_dip_long, _get_candles_1m
+                    _re_candles = _get_candles_1m(tkn)
+                    if _re_candles and len(_re_candles) >= 500:
+                        _re_price = entry.get('price', 0)
+                        _re_result = detect_ema300_dip_long(tkn, _re_candles, _re_price)
+                        if _re_result is None:
+                            log(f"  🚫 [HOTSET-FINAL-REVALIDATE-BLOCK] {tkn}:{direction} ema300-dip-long — detection function returned None (filters not passed)")
+                            continue
+                except Exception as _re_e:
+                    log(f"  ⚠️ [HOTSET-FINAL-REVALIDATE-ERROR] {tkn}:{direction} re-validation failed: {_re_e}")
             # ── FINAL CONFLUENCE GUARD (2026-05-12) ─────────────────────────────────
             # This is the last line of defense: even if a single-source entry somehow
             # passed _filter_safe_prev_hotset (preservation path) or the DB query path,
