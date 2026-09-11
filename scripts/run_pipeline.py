@@ -4,7 +4,7 @@ run_pipeline.py — Hermes Trading Pipeline
 Runs every 1 minute via cron. A/B optimizer every 10 minutes.
 """
 from paths import *
-import sys, subprocess, time, os, argparse, os, fcntl, json
+import sys, subprocess, time, os, signal, argparse, fcntl, json
 from _secrets import BRAIN_DB_DICT
 
 from hermes_log import log
@@ -67,10 +67,31 @@ def run(name, args=None):
     cmd = [sys.executable, script] + (args or [])
     timeout = STEP_TIMEOUTS.get(name, DEFAULT_TIMEOUT)
     log(f'Running {name}...')
+    proc = None
     try:
-        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, timeout=timeout)
-        out = (r.stdout or b'').decode(errors='replace').strip()
-        err = (r.stderr or b'').decode(errors='replace').strip()
+        proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            # FIX: Kill the child process tree on timeout (subprocess.run didn't do this,
+            # leaving zombie processes holding FileLocks and blocking the next cycle)
+            import signal as _sig
+            try:
+                os.killpg(os.getpgid(proc.pid), _sig.SIGTERM)
+            except OSError:
+                pass
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(os.getpgid(proc.pid), _sig.SIGKILL)
+                except OSError:
+                    pass
+            log(f'ERROR {name}: timed out (killed)')
+            return False
+
+        out = (stdout or b'').decode(errors='replace').strip()
+        err = (stderr or b'').decode(errors='replace').strip()
 
         # Always log last 5 lines of output for position_manager, decider-run, signal_gen
         # This is critical for monitoring trade decisions in real-time
@@ -91,17 +112,21 @@ def run(name, args=None):
                 for l in tail:
                     log(f'  {l}')
 
-        if r.returncode != 0 and err:
+        if proc.returncode != 0 and err:
             for line in err.strip().split('\n')[:2]:
                 if line.strip():
                     log(f'  ERR {name}: {line.strip()}')
-        return r.returncode == 0
-    except subprocess.TimeoutExpired:
-        log(f'ERROR {name}: timed out')
-        return False
+        return proc.returncode == 0
     except Exception as e:
         log(f'ERROR {name}: {e}')
         return False
+    finally:
+        # Ensure child process is always cleaned up
+        if proc and proc.poll() is None:
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            except OSError:
+                pass
 
 
 def run_bg(name, args=None):
