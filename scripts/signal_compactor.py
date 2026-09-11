@@ -2622,8 +2622,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel_30.close()
                         except Exception:
                             pass
-            # ── Pump-chain SHORT velocity filter: block SHORT when token 30m velocity positive ──
-            # Mirror of LONG filter — SHORT needs price declining, block if rising
+            # ── Pump-chain SHORT velocity filters: block SHORT when token is bouncing ──
+            # 15m filter: catches bounce-in-progress (3x 5m candles = 15m)
+            # 30m filter: catches sustained rise (6x 5m candles = 30m)
+            # Backtest 15m: catches 4/14 losses, kills 0/21 wins
             if direction == 'SHORT' and 'pump-chain' in (src or ''):
                 try:
                     _conn_vel_30s = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -2635,6 +2637,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     """, (tkn.upper(),))
                     _vel_30_closes_s = [r[0] for r in _cur_vel_30s.fetchall()]
                     _cur_vel_30s.close()
+                    # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
+                    if len(_vel_30_closes_s) >= 3 and _vel_30_closes_s[0] > 0:
+                        _vel_15m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[2]) / _vel_30_closes_s[2] * 100
+                        if _vel_15m_s > 0:
+                            log(f"  🚫 [PUMP-CHAIN-VEL15-SHORT] {tkn}: SHORT blocked — 15m vel={_vel_15m_s:+.3f}% (bounce in progress)")
+                            continue
+                    # 30m velocity check (6 x 5m candles) — sustained rise filter
                     if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[-1] > 0:
                         _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
                         if _vel_30m_s > 0:
@@ -2898,6 +2907,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                         # ── PUMP-CHAIN VELOCITY FILTER for preserved entries ──────────────────
                         # FIX (2026-09-10): Preserved entries bypass pump-chain velocity filters.
+                        # FIX (2026-09-11): Added 15m velocity check — catches bounce-in-progress.
                         pe_direction = pe.get('direction', '').upper()
                         if 'pump-chain' in pe_src:
                             try:
@@ -2910,6 +2920,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 """, (pe['token'].upper(),))
                                 _pv_closes = [r[0] for r in _pv_cur.fetchall()]
                                 _pv_conn.close()
+                                # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
+                                if len(_pv_closes) >= 3 and _pv_closes[0] > 0:
+                                    _pv_vel_15m = (_pv_closes[0] - _pv_closes[2]) / _pv_closes[2] * 100
+                                    if pe_direction == 'SHORT' and _pv_vel_15m > 0:
+                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-15M] {pe['token']} SHORT preserved — 15m vel={_pv_vel_15m:+.3f}% (bounce in progress)")
+                                        continue
+                                # 30m velocity check (6 x 5m candles) — sustained rise filter
                                 if len(_pv_closes) >= 6 and _pv_closes[-1] > 0:
                                     _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
                                     if pe_direction == 'LONG' and _pv_vel_30m < 0:
@@ -3073,6 +3090,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # ── Pump-chain velocity filter for conflict rescue ────────
                     # FIX (2026-09-10): Conflict rescue bypasses velocity filter,
                     # allowing wrong-direction entries (same class as PRESERVE bug).
+                    # FIX (2026-09-11): Added 15m velocity check — catches bounce-in-progress.
                     if _rescue_ok and 'pump-chain' in (loser.get('source', '') or ''):
                         try:
                             _pv_conn_r = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3084,7 +3102,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             """, (tok.upper(),))
                             _pv_closes_r = [r[0] for r in _pv_cur_r.fetchall()]
                             _pv_conn_r.close()
-                            if len(_pv_closes_r) >= 6 and _pv_closes_r[-1] > 0:
+                            # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
+                            if _rescue_ok and len(_pv_closes_r) >= 3 and _pv_closes_r[0] > 0:
+                                _pv_vel_15m_r = (_pv_closes_r[0] - _pv_closes_r[2]) / _pv_closes_r[2] * 100
+                                if direc.upper() == 'SHORT' and _pv_vel_15m_r > 0:
+                                    _rescue_ok = False
+                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-15M] {tok} SHORT rescue blocked — 15m vel={_pv_vel_15m_r:+.3f}% (bounce in progress)")
+                            # 30m velocity check (6 x 5m candles) — sustained rise filter
+                            if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[-1] > 0:
                                 _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100
                                 if direc.upper() == 'LONG' and _pv_vel_r < 0:
                                     _rescue_ok = False

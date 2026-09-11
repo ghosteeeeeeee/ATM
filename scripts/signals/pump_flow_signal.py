@@ -41,6 +41,7 @@ from hermes_constants import (
     PUMP_FLOW_TOKEN_30M_THRESHOLD,
     PUMP_FLOW_TOKEN_VEL_THRESHOLD,
     PUMP_FLOW_SHORT_VEL_THRESHOLD,
+    PUMP_FLOW_SHORT_15M_THRESHOLD,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -318,6 +319,18 @@ def scan_signals():
                         if direction == 'SHORT' and token_30m_vel > PUMP_FLOW_SHORT_VEL_THRESHOLD:
                             _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% > {PUMP_FLOW_SHORT_VEL_THRESHOLD}% — skipping SHORT (token rising)")
                             continue
+                    # 15m velocity (900s) — SHORT only (bounce-in-progress filter)
+                    if direction == 'SHORT':
+                        _vel15_row = _conn_vel.execute("""
+                            SELECT price FROM price_history
+                            WHERE token = ? AND timestamp <= ? - 900
+                            ORDER BY timestamp DESC LIMIT 1
+                        """, (token, _now)).fetchone()
+                        if _vel15_row and _vel15_row[0] > 0:
+                            token_15m_vel = (price - _vel15_row[0]) / _vel15_row[0] * 100
+                            if token_15m_vel > PUMP_FLOW_SHORT_15M_THRESHOLD:
+                                _log(f"  [pump-flow] {token} 15m Δ={token_15m_vel:+.3f}% > {PUMP_FLOW_SHORT_15M_THRESHOLD}% — skipping SHORT (bounce in progress)")
+                                continue
                     # 5m velocity (300s) — LONG only
                     if direction == 'LONG':
                         _vel5_row = _conn_vel.execute("""
