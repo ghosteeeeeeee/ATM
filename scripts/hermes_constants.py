@@ -2015,7 +2015,7 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES lowered to 30, RS_PROXIMITY_K raised to 4.0
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
-TL_BREAK_PLUS_ENABLED         = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
+TL_BREAK_PLUS_ENABLED         = True    # RE-ENABLED 2026-09-11 — NORMAL only (50% WR, 2T). HIGH/EXTREME blocked via volatility_gate_v2. Need more data.
 TL_BREAK_MINUS_ENABLED        = True    # RE-ENABLED 2026-09-09 — 85.7% WR in NORMAL. HIGH/EXTREME blocked via volatility_gate_v2.
 
 # ── Rotator Protection ──────────────────────────────────────────────────────
