@@ -637,7 +637,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # btc_wave_detector — BTC EMA300 crossover + volume surge (high-conviction wave pattern)
     ('btc_wave_long', 'btc-wave+'):  1.5,  # boosted for hotset competitiveness (tsunami, not ripple)
     # open_skies — LONG-only open skies breakout (no resistance overhead)
-    ('open_skies_long', 'open-skies+'): 1.2,  # structural breakout signal, room to run
+    ('open_skies_long', 'open-skies+'): 1.4,  # BOOSTED 2026-09-11 — 77.8% WR in EXTREME, solid structural breakout
     ('resistance_break_long', 'resistance-break+'): 1.1,  # resistance break + pullback, early entry
     # sma20_dip — LONG-only SMA20 pullback in uptrend (mean reversion)
     ('sma20_dip_long', 'sma20-dip+'): 1.2,  # pullback entry at SMA20, proven INJ pattern
