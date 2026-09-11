@@ -179,10 +179,10 @@ def detect(token):
         return None  # price above EMA = trend broken
 
     # 7. Momentum alignment check (CEO 2026-09-11)
-    # SHORT with rising momentum = 71% LOSS RATE (5/7 losses in backtest)
+    # SHORT with rising momentum = 62.5% LOSS RATE (5/8 trades lost)
     # LONG with falling momentum = similar anti-trend risk
     # Check 5-bar velocity (same calc as signal_schema.py enrichment)
-    if len(closes) >= 6:
+    if len(closes) >= 6 and closes[-6]:
         vel_5bar = (closes[-1] - closes[-6]) / closes[-6] * 100
         momentum_state = 'rising' if vel_5bar > 0.1 else 'falling' if vel_5bar < -0.1 else 'flat'
         if direction == 'SHORT' and momentum_state == 'rising':
@@ -292,6 +292,7 @@ def scan_signals() -> int:
             exchange='hyperliquid',
             timeframe='5m',
             z_score=None,
+            momentum_state=sig.get('momentum_state'),
         )
         if sid:
             added += 1
