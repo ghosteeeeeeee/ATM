@@ -1,3 +1,37 @@
+## [2026-09-11 08:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.22)
+**24h:** ~43T ~58%WR ~$0 net (Sep 10 +$2.48, Sep 11 -$1.12 so far)
+**Open:** 4 positions (ETC SHORT, ZRO LONG, DYDX LONG, ME LONG)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 23T (53%) +$0.35 avg +$0.015 ⭐ (trailing working, slightly profitable)
+- rr_engine_resistance: 10T -$0.64 avg -$0.064 ⚠️ (worst exit, 6/10 losses)
+- profit-monster-trail: 3T +$0.30 avg +$0.100 ⭐
+- hard_tp: 2T +$0.48 avg +$0.240 ⭐
+- rr_engine_support_br: 2T +$0.07
+- rr_engine_support_tp: 3T +$0.01
+
+**24h Signal+Direction (worst first):**
+- pump-chain+ LONG: 7T 28.6%WR -$0.61 ⚠️ (biggest drag, re-enabled Sep 9)
+- accel-300-v4-short- SHORT: 3T 33.3%WR +$0.01
+- pullback-entry- SHORT: 10T 50%WR +$0.08
+- pump-chain- SHORT: 18T 66.7%WR +$1.11 ⭐⭐
+
+**Changes:** None — no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: pump-chain+ LONG 1T last hour 0%WR — needs 3T to trigger kill
+- Trade freq 2/hr normal
+- 4 open positions healthy
+- 7d trend: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 (still positive trend)
+- pump-chain+ LONG 8T 37.5%WR -$0.02 all-time since re-enable — borderline, not auto-kill
+
+**Open Questions:**
+- pump-chain+ LONG approaching kill threshold — if 2 more 0%WR losses in next 2 hours, triggers kill
+- rr_engine_resistance -$0.64 worst exit — may need SL widening for SHORT signals hitting resistance
+- Today's 28.6%WR early, monitoring hourly
+
 ## [2026-09-10 09:30 UTC] Hourly Analysis
 
 **Trades:** 2 closed (2W 0L +$0.29)
@@ -1721,3 +1755,63 @@ Final set: ['BABY', 'BIGTIME', 'CAKE', 'ETC', 'GMT', 'HBAR', 'IO', 'SAND']
 
 **Open Questions:**
 - Regime mismatch: 4h SHORT_BIAS vs 15m NEUTRAL creating whipsaw on shorts. If this persists, may need to tighten entry conditions when 15m is NEUTRAL
+
+## FAVORITES Update — 2026-09-11 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ADA (WR=50.0%, PnL=$0.23, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE AIXBT (WR=50.0%, PnL=$-0.53, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE COMP (WR=50.0%, PnL=$0.10, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['ACE', 'BLUR', 'CC', 'CFX', 'DOT', 'DYDX', 'ENA', 'FOGO', 'IMX', 'INJ', 'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'WLD', 'ZRO']
+
+## LOSERS Update — 2026-09-11 06:05 UTC
+- REMOVE BABY (WR=50.0%, PnL=$-0.01, recovered)
+- REMOVE CAKE (WR=50.0%, PnL=$-0.26, recovered)
+- ADD NOT (WR=20.0%, PnL=$-0.44, low_wr (20.0%))
+- ADD WLFI (WR=40.0%, PnL=$-0.27, low_wr (40.0%))
+- ADD SUSHI (WR=40.0%, PnL=$-0.11, low_wr (40.0%))
+
+Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI']
+
+## [2026-09-11 07:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet period)
+**PnL:** $0.00
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ 2T 0%WR (needs 3+ to kill), accel-300-v4-short- 3T 33.3%WR +$0.01 (not 0%)
+- atr_sl_hit 54.8% of exits (23/42) but avg +$0.015 profitable — no action needed
+- pump-chain- 17T 70.6%WR +$1.22 — strong performer
+- Trade freq 1.75/hr normal
+- 3 open positions
+
+**Open Questions:** None — system healthy
+
+## [2026-09-11 08:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $0.04 (WR: 50.0%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| USUAL | mover+ | LONG | profit-monster-trail | +$0.04 |
+| BANANA | pullback-entry- | SHORT | rr_engine_resistance | -$0.10 |
+
+**24h:** 43T 55.8%WR +$0.71 | 5 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01
+- pump-chain- 17T 70.6%WR +$1.22 — strong performer
+- pump-chain+ 6T 33.3%WR -$0.50 — losing but not at kill threshold (not 0% WR)
+- rr_engine_resistance 9T 20.9% of exits, -$0.53 — losses from SHORTs in NEUTRAL market, working as designed
+- atr_sl_hit 23T 53.5% but avg +$0.015 profitable
+- Trade freq ~2/hr normal
+- 3 consecutive losing hours at 04-07 UTC within normal variance
+
+**Open Questions:**
+- pump-chain+ at -$0.50 (6T 33.3%WR) — monitoring, not at kill threshold yet
+- 15m NEUTRAL vs 4h SHORT_BIAS mismatch continuing to cause SHORT resistance losses

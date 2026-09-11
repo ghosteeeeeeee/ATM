@@ -1,3 +1,7 @@
+[2026-09-11 08:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.22). 43T/24h ~58%WR ~$0 net (Sep 10 +$2.48, Sep 11 -$1.12 early). Kill criteria not met: pump-chain+ LONG 1T last hour 0%WR (needs 3T). pump-chain+ LONG 7T 28.6%WR -$0.61 worst signal but below auto-kill. rr_engine_resistance 10T -$0.64 worst exit reason. Trade freq 2/hr normal. 4 open positions. 7d trend still positive: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48.
+  BY: auto_1hr
+  NEXT: Re-run at 09:15 UTC
 [2026-09-10 09:30 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (2W 0L +$0.29). 39T/24h 64.1%WR +$2.48 net (Sep 9 +$2.03, Sep 10 +$2.48 on track). Kill criteria not met: pullback-entry+ 2T 0%WR -$0.23 (1T from kill). All exit reasons profitable. atr_sl_hit 49% but avg +$0.057/trade (trailing working). pump-chain- 15T 73.3%WR +$1.24 star. pullback-entry- 12T 66.7%WR +$0.86 star. Trade freq 2/hr normal. 5 open positions. 7d trend improving: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48.
   BY: auto_1hr
@@ -1373,3 +1377,11 @@
   WHY: 2T last hour (0W 2L -$0.45). BLUR pump-chain+ LONG atr_sl_hit -$0.29, NOT pullback-entry- SHORT rr_engine_resistance -$0.16. 3 consecutive losing hours (-$1.05) within normal variance. 44T/24h 59.1%WR +$1.39 still profitable. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR. rr_engine_resistance 10T 22.7% exits, -$0.49 total — last 3h SHORT losses from 15m NEUTRAL vs 4h SHORT_BIAS mismatch. Directional outcome system active. 3 open positions.
   BY: auto_1hr
   NEXT: Re-run at 06:10 UTC
+[2026-09-11 07:10 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet period). 42T/24h 59.1%WR +$1.73. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR. atr_sl_hit 54.8% but avg +$0.015 profitable. pump-chain- 17T 70.6%WR +$1.22 strong. Trade freq 1.75/hr normal. 3 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 08:10 UTC
+[2026-09-11 08:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.04). USUAL mover+ LONG profit-monster-trail +$0.04, BANANA pullback-entry- SHORT rr_engine_resistance -$0.10. 43T/24h 55.8%WR +$0.71. Kill criteria not met: pullback-entry+ 2T 0%WR (needs 3+), accel-300-v4-short- 3T 33.3%WR +$0.01. atr_sl_hit 53.5% but avg +$0.015 profitable. pump-chain+ 6T 33.3%WR -$0.50 losing but not at kill threshold. Trade freq ~2/hr normal. 5 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 09:10 UTC
