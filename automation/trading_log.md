@@ -1944,3 +1944,29 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - Market: 98% NEUTRAL on 5m
 
 **Open Questions:** None
+
+## [2026-09-11 13:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $+0.19 (WR: 50.0%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| BABY | pump-chain+ | LONG | atr_sl_hit | -$0.14 |
+| IMX | doji-bottom-long | LONG | profit-monster-trail | +$0.31 |
+| ETH | liq-hunt+ | LONG | profit-monster-trail | -$0.01 |
+| PONS | mover+ | LONG | atr_sl_hit | +$0.03 |
+
+**24h:** 51T 47.1%WR -$0.94 | 0 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 3T 0%WR (already killed 12:10), ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+)
+- pump-chain+ 8T 25%WR -$0.75 — losing but has wins, doesn't meet kill threshold (0% WR required)
+- atr_sl_hit 28T 54.9% exits, avg -$0.021 — borderline but not critical
+- Trade freq 2-5/hr normal
+- Market: 98% NEUTRAL on 5m
+
+**Open Questions:**
+- pump-chain+ at 25%WR is poor — monitor, may need manual intervention if it continues losing

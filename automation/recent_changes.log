@@ -1401,3 +1401,7 @@
   WHY: 3T/24h 0%WR -$0.44. All ATR_SL hits. SHORT momentum signal in 98% NEUTRAL market = no edge. Meets kill threshold (0% WR, 3+ trades).
   BY: auto_1hr
   NEXT: Re-run at 13:10 UTC
+[2026-09-11 13:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L +$0.19). BABY pump-chain+ LONG atr_sl_hit -$0.14, IMX doji-bottom-long LONG profit-monster-trail +$0.31, ETH liq-hunt+ LONG profit-monster-trail -$0.01, PONS mover+ LONG atr_sl_hit +$0.03. 51T/24h 47.1%WR -$0.94. Kill criteria not met: accel-300-v4-short- 3T 0%WR (already killed 12:10), ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+). pump-chain+ 8T 25%WR -$0.75 losing but has wins, doesn't meet kill threshold. atr_sl_hit 54.9% but avg -$0.021 borderline not critical. Trade freq 2-5/hr normal. 98% tokens NEUTRAL.
+  BY: auto_1hr
+  NEXT: Re-run at 14:10 UTC
