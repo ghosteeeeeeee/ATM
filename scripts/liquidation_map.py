@@ -34,7 +34,14 @@ BASE_URL = "https://api.hyperliquid.xyz/info"
 
 
 def _hl_info(payload: dict, timeout: int = 10):
-    """POST to HL /info endpoint. Rate limiting is enforced in the scan loops (1s gap)."""
+    """POST to HL /info endpoint with rate limiting (1s gap)."""
+    # Rate limit: enforce 1s gap between calls
+    now = time.time()
+    elapsed = now - _hl_info._last_call
+    if elapsed < 1.0:
+        time.sleep(1.0 - elapsed)
+    _hl_info._last_call = time.time()
+
     data = json.dumps(payload).encode()
     req = urllib.request.Request(
         BASE_URL,
@@ -47,6 +54,8 @@ def _hl_info(payload: dict, timeout: int = 10):
     except Exception as e:
         print(f"[hl_info] Error: {e}")
         return None
+
+_hl_info._last_call = 0  # Track last call time for rate limiting
 
 # Tokens to scan (top volume + our traded tokens)
 SCAN_TOKENS = [
