@@ -53,6 +53,8 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in all regimes
+        'volume-climax+', 'volume-climax-',  # volume rejection reversal — mean-reversion, works in range-bound
     },
     'NORMAL': {
         # pump_catcher — momentum breakout (velocity + acceleration)
@@ -101,6 +103,9 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in steady markets
+        'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol
+        'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in normal vol
     },
     'HIGH': {
         # Breakout works in big moves
@@ -150,6 +155,9 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
+        'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol
+        'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in high vol
     },
     'EXTREME': {
         # Continuation works in storms
@@ -184,6 +192,8 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol
+        'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in extreme vol
     },
 }
 
