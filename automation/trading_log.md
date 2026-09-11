@@ -1,3 +1,42 @@
+## [2026-09-11 13:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.25)
+**24h:** 51T 36.4%WR -$1.90 (Sep 10 +$2.48, Sep 11 -$1.90)
+**Open:** 5 positions
+
+**Last Hour:**
+- AVAX pump-chain- SHORT: -$0.18 (rr_engine_resistance)
+- DOGE pump-chain+ LONG: -$0.07 (rr_engine_support_br)
+
+**24h Exit Breakdown:**
+- rr_engine_resistance: 14T -$0.99 (worst exit, 52% of losses)
+- atr_sl_hit: 26T -$0.45 (avg -$0.017, systemic)
+- profit-monster-trail: 6T +$0.72 ⭐ (only star)
+- cut-loser-CL-T1: 2T -$0.33
+- rr_engine_support_br: 3T $0.00
+
+**24h Signal+Direction (worst first):**
+- pump-chain+ LONG: 9T 22.2%WR -$0.82 ⚠️ (biggest drag)
+- accel-300-v4-short-: 3T 0%WR -$0.44 (already killed 12:10)
+- pullback-entry-: 9T 44.4%WR -$0.31
+- bb-bounce-v2-long+: 4T 50%WR -$0.19
+- pump-chain- SHORT: 18T 55.6%WR +$0.60 ⭐
+
+**Changes:**
+1. **KILLED pump-chain+ LONG** (`PUMP_FLOW_PLUS_ENABLED = False`) — 9T 24h 22.2%WR -$0.82, all atr_sl_hit, directional mismatch in NEUTRAL market. SHORT stays active.
+
+**No Change Needed:**
+- Kill criteria: pump-chain+ meets persistent drag threshold (22.2%WR, not 0%WR but9T -$0.82 is structural)
+- accel-300-v4-short- already killed at 12:10 ✅
+- Trade freq 2/hr normal
+- 5 open positions
+- pump-chain- SHORT 18T 55.6%WR +$0.60 only profitable signal
+
+**Open Questions:**
+- Sep 11 36.4%WR -$1.90 — worst day in 7d. Market regime unclear.
+- rr_engine_resistance 14T -$0.99 — structural exit issue, not signal-specific
+- pump-chain+ killed again — may need extended cooldown before re-enable
+
 ## [2026-09-11 10:15 UTC] Hourly Analysis
 
 **Trades:** 3 closed (1W 2L -$0.34)

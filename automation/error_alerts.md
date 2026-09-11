@@ -120,3 +120,14 @@
 - **[WARN]**: Disk at 84% (19G free) — 1% from 85% threshold. Monitor.
 - **[WARN]**: Today PnL -23.65% across 45 closed trades. Worst: pullback-entry- (37.5% WR), pump-chain+ (28.6% WR).
 - **[INFO]**: Market regime all NEUTRAL across 105 tokens — low conviction environment.
+
+## Error Alerts — 2026-09-11 12:23 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 12:23:09, 2 open positions (eth, imx), 0 approved signals
+- **[INFO]** Signals: 0 passed compaction (all blocked by confluence gate / R:R filter / neutral regime)
+- **[INFO]** Trades: 27 today, -$2.12 PnL, 37.0% WR (LONG 36.4%, SHORT 37.5%)
+- **[INFO]** Regime: 100% NEUTRAL (105 tokens neutral, 0 long, 0 short)
+- **[WARN]** (2x): `signal_compactor: timed out` at 12:19 and 12:22 — self-recovered on next cycle
+- **[WARN]** Disk at 83% (93G/118G) — 2% from 85% threshold
+- **[WARN]** candles.db at 976MB — growing, may contribute to disk pressure
+- **[WARN]** metrics_collector.py missing — timer firing but script not found (repeated errors)
+- **AUTO-FIX**: None needed — compactor timeouts self-recovered, pipeline running normally
