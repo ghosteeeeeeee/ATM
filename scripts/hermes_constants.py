@@ -3337,7 +3337,7 @@ WARRIOR_SR_CONFIRM_VOLUME_RATIO = 1.5      # volume must be 1.5× average
 # Confidence
 WARRIOR_SR_CONFIRM_CONF_BASE = 75          # base confidence
 WARRIOR_SR_CONFIRM_CONF_CAP = 88           # max confidence
-WARRIOR_SR_CONFIRM_COOLDOWN_HOURS = 1      # per token cooldown
+WARRIOR_SR_CONFIRM_COOLDOWN_HOURS = 0.25    # 15 min per token cooldown
 
 # ── Breakout Pullback Signal (breakout_pullback.py) ─────────────────────────
 # Warrior Trading: "Wait for breakout, then enter on the first pullback."
