@@ -1,3 +1,35 @@
+## [2026-09-11 15:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L +$0.12)
+**24h:** 52T 48.1%WR -$0.35 | 3 open positions
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| AVAX | pump-chain+ | LONG | rr_engine_support_br | -$0.10 |
+| YGG | open-skies+ | LONG | atr_sl_hit | +$0.18 |
+| AIXBT | pump-chain+ | LONG | atr_sl_hit | +$0.17 |
+| ARB | pump-chain+ | LONG | atr_sl_hit | -$0.13 |
+
+**24h by Signal:**
+- pump-chain- SHORT: 17T 52.9%WR +$0.10 (strong)
+- pump-chain+ LONG: 12T 25%WR -$0.88 (BLEEDING — all NEUTRAL)
+- pullback-entry- SHORT: 9T 44.4%WR -$0.31
+- rr_engine_resistance: 14T -$0.99 (structural SHORT losses in NEUTRAL)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 2T 0%WR (needs 3+, was re-enabled after 12:10 kill — deliberate)
+- pump-chain+ 12T 25%WR -$0.88 — has wins, doesn't meet 0% WR kill threshold
+- ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+)
+- atr_sl_hit 27T 51.9% exits, avg -$0.022 — borderline but not critical
+- Trade freq 4/hr normal
+- Market: 98% NEUTRAL on 5m — structural, not fixable by signal tuning
+
+**Open Questions:**
+- pump-chain+ is the biggest ongoing bleed (12T/24h -$0.88) — may need manual kill if pattern continues
+- accel-300-v4-short- was re-enabled after 12:10 kill — CEO decision to "need more data", respecting it
+
 ## [2026-09-11 13:15 UTC] Hourly Analysis
 
 **Trades:** 2 closed (0W 2L -$0.25)

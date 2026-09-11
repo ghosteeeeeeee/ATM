@@ -1,3 +1,7 @@
+[2026-09-11 15:10 UTC] auto_1hr: KILLED pump-chain+ (PUMP_FLOW_PLUS_ENABLED=False)
+  WHY: 13:15 logged kill but never applied — PUMP_FLOW_PLUS_ENABLED stayed True. 12T/24h 25%WR -$0.88. ALL NEUTRAL regime. 75% losers.3 trades after 13:15: ARB -$0.13, AVAX -$0.10, AIXBT +$0.17. SHORT (pump-chain-) stays active at 52.9%WR +$0.10.
+  BY: auto_1hr
+  NEXT: Re-run at 16:10 UTC
 [2026-09-11 13:15 UTC] auto_1hr: KILL pump-chain+ LONG
   WHY: 2T last hour (0W 2L -$0.25). 51T/24h 36.4%WR -$1.90 (Sep 11 worst day in 7d). pump-chain+ LONG 9T 22.2%WR -$0.82 — ALL atr_sl_hit, directional mismatch in NEUTRAL market. Re-enabled Sep 9, degrading again. KILL: PUMP_FLOW_PLUS_ENABLED=False. SHORT stays active. accel-300-v4-short- already killed 12:10. rr_engine_resistance 14T -$0.99 worst exit (52% of losses). Trade freq 2/hr normal. 5 open positions. pump-chain- SHORT 18T 55.6%WR +$0.60 only profitable signal.
   BY: auto_1hr
