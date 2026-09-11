@@ -114,3 +114,9 @@
 - **[WARN]** Disk at 83% (93G/118G) — 2% from threshold
 - **[INFO]** All 44 hermes timers active and firing on schedule
 - **AUTO-FIX**: None needed
+
+## Error Alerts — 2026-09-11 09:23 UTC
+- **[WARN]** (7x): `signal_compactor: timed out` — non-fatal, pipeline continues. May indicate high load.
+- **[WARN]**: Disk at 84% (19G free) — 1% from 85% threshold. Monitor.
+- **[WARN]**: Today PnL -23.65% across 45 closed trades. Worst: pullback-entry- (37.5% WR), pump-chain+ (28.6% WR).
+- **[INFO]**: Market regime all NEUTRAL across 105 tokens — low conviction environment.

@@ -1,3 +1,49 @@
+## [2026-09-11 10:15 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.34)
+**24h:** 47T 53.2%WR +$0.07 (Sep 10 +$2.48, Sep 11 -$1.44 so far)
+**Open:** 4 positions
+
+**Last Hour:**
+- ATOM pump-chain- SHORT: +$0.03 (rr_engine_resistance)
+- BLUR mover+ LONG: -$0.26 (atr_sl_hit)
+- DYDX bb-bounce-v2-long+ LONG: -$0.11 (cut-loser-CL-T1)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 23T (49%) -$0.08 (turned slightly negative)
+- rr_engine_resistance: 12T -$0.72 (worst exit, 63% of losses today)
+- profit-monster-trail: 4T +$0.42 ⭐
+- hard_tp: 2T +$0.48 ⭐
+- cut-loser-CL-T1: 1T -$0.11
+
+**24h Signal+Direction (worst first):**
+- pump-chain+ LONG: 7T 28.6%WR -$0.61 ⚠️ (persistent drag)
+- accel-300-v4-short-: 2T 0%WR -$0.31 (1T from kill)
+- mover+: 3T 66.7%WR -$0.21 (bad R:R)
+- pullback-entry-: 10T 50%WR +$0.08
+- pump-chain- SHORT: 20T 65%WR +$1.03 ⭐⭐
+
+**Sep 11 Breakdown (20T 35%WR -$1.44):**
+- rr_engine_resistance: 8T -$0.92 (dominant loss driver)
+- atr_sl_hit: 7T -$0.64
+- pullback-entry- SHORT: 5T 20%WR -$0.51 (4/5 losses rr_engine_resistance)
+- pump-chain+ LONG: 4T 25%WR -$0.35
+
+**Changes:** None — no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+T last hour
+- Trade freq 3/hr normal
+- 4 open positions
+- 7d trend: Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 (still positive trend despite Sep 11 -$1.44)
+- rr_engine_resistance structural issue (not signal-specific, affects pullback-entry- and pump-chain-)
+- pump-chain+ LONG 7T 28.6%WR -$0.61 — below auto-kill (not 0%WR, needs 3+T last hour at 0%WR)
+
+**Open Questions:**
+- Sep 11 early but 35%WR -$1.44 — watching if trend continues
+- rr_engine_resistance 8T -$0.92 today — may need exit logic review if persists
+- accel-300-v4-short- 2T 0%WR — 1T from kill threshold
+
 ## [2026-09-11 08:15 UTC] Hourly Analysis
 
 **Trades:** 2 closed (0W 2L -$0.22)
