@@ -225,9 +225,10 @@ VOL_PHASE_MULTS = {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
     },
-    # NORMAL volatility: block pullback_entry LONG, block R2 (wins in EXTREME/HIGH)
+    # NORMAL volatility: block pullback_entry LONG+SHORT, block R2 (wins in EXTREME/HIGH)
     ('NORMAL', '*'): {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
+        'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 42.9% WR in NORMAL, wins in EXTREME/HIGH
         'R2': 0.0,                   # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
         'Open_Skies': 0.0,           # BLOCKED — open-skies 50% WR in NORMAL, wins in EXTREME
     },

@@ -2174,7 +2174,7 @@ BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → a
 BB_BOUNCE_V2_SHORT_ENABLED = True   # V2 short signal — improved velocity, momentum, volatility filters
 BB_BOUNCE_V2_SHORT_KILL_WR = 60.0   # Kill trigger: WR < 60% over 30+ trades
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
-BB_BOUNCE_V2_LONG_ENABLED = True  # TESTING 2026-09-02 — new signal calibrated from SHORT winners. 7 filters: BB width, RSI, bounce, velocity, momentum, volatility, min_age.
+BB_BOUNCE_V2_LONG_ENABLED = False  # signal_reporter KILLED 2026-09-11 — 4T/24h 25%WR/-$0.47. No edge.
 
 # bb_bounce_v2_long parameters (calibrated from SHORT winner patterns)
 BB_BOUNCE_V2_BB_PERIOD = 20
