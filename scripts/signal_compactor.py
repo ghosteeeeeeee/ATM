@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -2637,14 +2637,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     """, (tkn.upper(),))
                     _vel_30_closes_s = [r[0] for r in _cur_vel_30s.fetchall()]
                     _cur_vel_30s.close()
-                    # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
-                    if len(_vel_30_closes_s) >= 3 and _vel_30_closes_s[0] > 0:
-                        _vel_15m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[2]) / _vel_30_closes_s[2] * 100
-                        if _vel_15m_s > 0:
+                    # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
+                    if len(_vel_30_closes_s) >= 4 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[3] > 0:
+                        _vel_15m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[3]) / _vel_30_closes_s[3] * 100
+                        if _vel_15m_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
                             log(f"  🚫 [PUMP-CHAIN-VEL15-SHORT] {tkn}: SHORT blocked — 15m vel={_vel_15m_s:+.3f}% (bounce in progress)")
                             continue
                     # 30m velocity check (6 x 5m candles) — sustained rise filter
-                    if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[-1] > 0:
+                    if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[-1] > 0:
                         _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
                         if _vel_30m_s > 0:
                             log(f"  🚫 [PUMP-CHAIN-VEL-SHORT] {tkn}: SHORT blocked — 30m vel={_vel_30m_s:+.3f}% (token rising)")
@@ -2920,14 +2920,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 """, (pe['token'].upper(),))
                                 _pv_closes = [r[0] for r in _pv_cur.fetchall()]
                                 _pv_conn.close()
-                                # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
-                                if len(_pv_closes) >= 3 and _pv_closes[0] > 0:
-                                    _pv_vel_15m = (_pv_closes[0] - _pv_closes[2]) / _pv_closes[2] * 100
-                                    if pe_direction == 'SHORT' and _pv_vel_15m > 0:
+                                # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
+                                if len(_pv_closes) >= 4 and _pv_closes[0] > 0 and _pv_closes[3] > 0:
+                                    _pv_vel_15m = (_pv_closes[0] - _pv_closes[3]) / _pv_closes[3] * 100
+                                    if pe_direction == 'SHORT' and _pv_vel_15m > PUMP_FLOW_SHORT_15M_THRESHOLD:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-15M] {pe['token']} SHORT preserved — 15m vel={_pv_vel_15m:+.3f}% (bounce in progress)")
                                         continue
                                 # 30m velocity check (6 x 5m candles) — sustained rise filter
-                                if len(_pv_closes) >= 6 and _pv_closes[-1] > 0:
+                                if len(_pv_closes) >= 6 and _pv_closes[0] > 0 and _pv_closes[-1] > 0:
                                     _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
                                     if pe_direction == 'LONG' and _pv_vel_30m < 0:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} LONG preserved — 30m vel={_pv_vel_30m:+.3f}% (token declining)")
@@ -3102,14 +3102,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             """, (tok.upper(),))
                             _pv_closes_r = [r[0] for r in _pv_cur_r.fetchall()]
                             _pv_conn_r.close()
-                            # 15m velocity check (3 x 5m candles) — bounce-in-progress filter
-                            if _rescue_ok and len(_pv_closes_r) >= 3 and _pv_closes_r[0] > 0:
-                                _pv_vel_15m_r = (_pv_closes_r[0] - _pv_closes_r[2]) / _pv_closes_r[2] * 100
-                                if direc.upper() == 'SHORT' and _pv_vel_15m_r > 0:
+                            # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
+                            if _rescue_ok and len(_pv_closes_r) >= 4 and _pv_closes_r[0] > 0 and _pv_closes_r[3] > 0:
+                                _pv_vel_15m_r = (_pv_closes_r[0] - _pv_closes_r[3]) / _pv_closes_r[3] * 100
+                                if direc.upper() == 'SHORT' and _pv_vel_15m_r > PUMP_FLOW_SHORT_15M_THRESHOLD:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-15M] {tok} SHORT rescue blocked — 15m vel={_pv_vel_15m_r:+.3f}% (bounce in progress)")
                             # 30m velocity check (6 x 5m candles) — sustained rise filter
-                            if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[-1] > 0:
+                            if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[0] > 0 and _pv_closes_r[-1] > 0:
                                 _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100
                                 if direc.upper() == 'LONG' and _pv_vel_r < 0:
                                     _rescue_ok = False
