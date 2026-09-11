@@ -16,7 +16,8 @@
 - pullback-entry- SHORT: 9T 44.4%WR -$0.31
 - rr_engine_resistance: 14T -$0.99 (structural SHORT losses in NEUTRAL)
 
-**Changes:** None
+**Changes:**
+1. KILLED `PUMP_FLOW_PLUS_ENABLED = False` — pump-chain+ 12T/24h 25%WR -$0.88. ALL NEUTRAL regime, 75% losers. Kill was logged at 13:15 but never applied (flag stayed True). Now enforced. SHORT (pump-chain-) stays active.
 
 **No Change Needed:**
 - Kill criteria: accel-300-v4-short- 2T 0%WR (needs 3+, was re-enabled after 12:10 kill — deliberate)
