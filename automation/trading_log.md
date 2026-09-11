@@ -2140,3 +2140,22 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - 4 open positions
 
 **Open Questions:** None
+
+## [2026-09-11 20:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** -$0.02 (WR: 66.7%)
+
+- ENA pump-chain- SHORT profit-monster-trail +$0.13
+- INJ pump-chain- SHORT atr_sl_hit -$0.27
+- KAS rs-s88/trend_purity+ LONG profit-monster-trail +$0.12
+
+**No Change Needed:**
+- Kill criteria: no signal has 0%WR with 3+ trades last hour. Previous kills (accel-300-v4-short- at 12:10, pump-chain+ at 13:15) already done.
+- atr_sl_hit 21/54 = 38.9% — below 40% threshold
+- Trade freq 3/hr normal
+- 54T/24h 50%WR -$1.06. R:R 0.77 (avg_win $0.130, avg_loss -$0.048). 6h trend 5/7 positive.
+- Market: 98% NEUTRAL on 5m
+- 2 open positions
+
+**Open Questions:** None
