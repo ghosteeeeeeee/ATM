@@ -3100,7 +3100,7 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-09 — wins in ALL regimes (EXTREME 62%, HIGH 72%, NORMAL 67%). EXTREME blocked via volatility_gate_v2.
+PUMP_FLOW_PLUS_ENABLED = False        # KILLED 2026-09-11 13:15 — 9T/24h 22.2%WR -$0.82. ALL atr_sl_hit. Directional mismatch in NEUTRAL. SHORT stays active.
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-09 — wins in ALL regimes. EXTREME blocked via volatility_gate_v2.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
