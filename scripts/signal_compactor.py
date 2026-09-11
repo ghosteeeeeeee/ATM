@@ -1651,7 +1651,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 elif any(is_component_disabled(p) for p in source_parts_raw):
                     block_reason = 'DISABLED_COMPONENT'
                 elif len(source_parts_raw) < 2 and not any(
-                    sp in STANDALONE_BYPASS_SIGNALS for sp in source_parts_raw
+                    sp in STANDALONE_BYPASS_SIGNALS or sp.rstrip('+-') in STANDALONE_BYPASS_SIGNALS
+                    for sp in source_parts_raw
                 ):
                     block_reason = 'CONFLUENCE_GATE'
                 raw_signals.append({
