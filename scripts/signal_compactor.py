@@ -642,6 +642,13 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuum_oscillator — score cadence momentum signals
     ('continuum_oscillator_long', 'continuum-osc+'): 1.2,   # momentum LONG
     ('continuum_oscillator_short', 'continuum-osc-'): 1.2,  # momentum SHORT
+    # Warrior Trading signals (book strategy conversion 2026-09-12)
+    ('warrior_sr_confirm_long',  'warrior-sr-confirm+'): 1.2,   # S/R + candlestick + volume
+    ('warrior_sr_confirm_short', 'warrior-sr-confirm-'): 1.2,   # S/R + candlestick + volume
+    ('breakout_pullback_long',   'breakout-pullback+'):  1.3,   # breakout → pullback (high R:R)
+    ('breakout_pullback_short',  'breakout-pullback-'):  1.3,   # breakout → pullback (high R:R)
+    ('volume_climax_long',       'volume-climax+'):      1.25,  # volume rejection reversal
+    ('volume_climax_short',      'volume-climax-'):      1.25,  # volume rejection reversal
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

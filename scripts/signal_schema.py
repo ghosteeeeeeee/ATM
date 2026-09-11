@@ -1958,6 +1958,57 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # warrior-sr-confirm (Warrior Trading S/R + candlestick + volume)
+            if _comp == 'warrior-sr-confirm+':
+                try:
+                    from hermes_constants import WARRIOR_SR_CONFIRM_PLUS_ENABLED
+                    if not WARRIOR_SR_CONFIRM_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WARRIOR_SR_CONFIRM_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'warrior-sr-confirm-':
+                try:
+                    from hermes_constants import WARRIOR_SR_CONFIRM_MINUS_ENABLED
+                    if not WARRIOR_SR_CONFIRM_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WARRIOR_SR_CONFIRM_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # breakout-pullback (breakout → pullback → entry)
+            if _comp == 'breakout-pullback+':
+                try:
+                    from hermes_constants import BREAKOUT_PULLBACK_PLUS_ENABLED
+                    if not BREAKOUT_PULLBACK_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BREAKOUT_PULLBACK_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'breakout-pullback-':
+                try:
+                    from hermes_constants import BREAKOUT_PULLBACK_MINUS_ENABLED
+                    if not BREAKOUT_PULLBACK_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BREAKOUT_PULLBACK_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # volume-climax (extreme volume + rejection candle)
+            if _comp == 'volume-climax+':
+                try:
+                    from hermes_constants import VOLUME_CLIMAX_PLUS_ENABLED
+                    if not VOLUME_CLIMAX_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLUME_CLIMAX_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'volume-climax-':
+                try:
+                    from hermes_constants import VOLUME_CLIMAX_MINUS_ENABLED
+                    if not VOLUME_CLIMAX_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLUME_CLIMAX_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2422,6 +2473,9 @@ def is_component_disabled(component: str) -> bool:
             BTC_PUMP_RIDER_ENABLED,
             MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
             CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
+            WARRIOR_SR_CONFIRM_ENABLED, WARRIOR_SR_CONFIRM_PLUS_ENABLED, WARRIOR_SR_CONFIRM_MINUS_ENABLED,
+            BREAKOUT_PULLBACK_ENABLED, BREAKOUT_PULLBACK_PLUS_ENABLED, BREAKOUT_PULLBACK_MINUS_ENABLED,
+            VOLUME_CLIMAX_ENABLED, VOLUME_CLIMAX_PLUS_ENABLED, VOLUME_CLIMAX_MINUS_ENABLED,
             ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
             LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
             SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED,
@@ -2719,6 +2773,18 @@ def is_component_disabled(component: str) -> bool:
     if c == 'continuum-osc': return not CONTINUUM_OSC_ENABLED
     # btc-pump-rider
     if c == 'btc-pump-rider+': return not BTC_PUMP_RIDER_ENABLED
+    # warrior-sr-confirm
+    if c == 'warrior-sr-confirm+': return not WARRIOR_SR_CONFIRM_PLUS_ENABLED
+    if c == 'warrior-sr-confirm-': return not WARRIOR_SR_CONFIRM_MINUS_ENABLED
+    if c == 'warrior-sr-confirm': return not WARRIOR_SR_CONFIRM_ENABLED
+    # breakout-pullback
+    if c == 'breakout-pullback+': return not BREAKOUT_PULLBACK_PLUS_ENABLED
+    if c == 'breakout-pullback-': return not BREAKOUT_PULLBACK_MINUS_ENABLED
+    if c == 'breakout-pullback': return not BREAKOUT_PULLBACK_ENABLED
+    # volume-climax
+    if c == 'volume-climax+': return not VOLUME_CLIMAX_PLUS_ENABLED
+    if c == 'volume-climax-': return not VOLUME_CLIMAX_MINUS_ENABLED
+    if c == 'volume-climax': return not VOLUME_CLIMAX_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

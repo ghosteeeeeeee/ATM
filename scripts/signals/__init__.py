@@ -47,6 +47,9 @@ from hermes_constants import (
     MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
     BTC_PUMP_RIDER_ENABLED,
     BREAKOUT_LONG_ENABLED, BREAKOUT_LONG_PLUS_ENABLED, BREAKOUT_LONG_MINUS_ENABLED,
+    WARRIOR_SR_CONFIRM_ENABLED, WARRIOR_SR_CONFIRM_PLUS_ENABLED, WARRIOR_SR_CONFIRM_MINUS_ENABLED,
+    BREAKOUT_PULLBACK_ENABLED, BREAKOUT_PULLBACK_PLUS_ENABLED, BREAKOUT_PULLBACK_MINUS_ENABLED,
+    VOLUME_CLIMAX_ENABLED, VOLUME_CLIMAX_PLUS_ENABLED, VOLUME_CLIMAX_MINUS_ENABLED,
 )
 
 
@@ -297,6 +300,21 @@ try:
 except Exception:
     _breakout_long_run = None
 
+try:
+    from signals.warrior_sr_confirm import run as _warrior_sr_confirm_run
+except Exception:
+    _warrior_sr_confirm_run = None
+
+try:
+    from signals.breakout_pullback import run as _breakout_pullback_run
+except Exception:
+    _breakout_pullback_run = None
+
+try:
+    from signals.volume_climax import run as _volume_climax_run
+except Exception:
+    _volume_climax_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -353,6 +371,9 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'resistance_break',         'enabled': 'RESISTANCE_BREAK_ENABLED',     'run': _resistance_break_run},
     {'name': 'mover',                    'enabled': 'MOVER_ENABLED',               'run': _mover_run},
     {'name': 'breakout_long',            'enabled': 'BREAKOUT_LONG_ENABLED',       'run': _breakout_long_run},
+    {'name': 'warrior_sr_confirm',       'enabled': 'WARRIOR_SR_CONFIRM_ENABLED',  'run': _warrior_sr_confirm_run},
+    {'name': 'breakout_pullback',        'enabled': 'BREAKOUT_PULLBACK_ENABLED',   'run': _breakout_pullback_run},
+    {'name': 'volume_climax',            'enabled': 'VOLUME_CLIMAX_ENABLED',       'run': _volume_climax_run},
 ]
 
 

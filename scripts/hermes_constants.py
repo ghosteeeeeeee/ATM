@@ -3315,3 +3315,68 @@ RESISTANCE_BREAK_COOLDOWN_HOURS = 0.25   # per token cooldown (15 min)
 # Confidence
 RESISTANCE_BREAK_CONF_BASE      = 70    # base confidence
 RESISTANCE_BREAK_CONF_CAP       = 90    # max confidence
+
+# ── Warrior S/R Confirm Signal (warrior_sr_confirm.py) ──────────────────────
+# Warrior Trading: "Enter on confirmed pattern at support/resistance."
+# S/R level touch + candlestick pattern (engulfing/hammer) + volume confirmation
+# Family: PriceAction (pairs with ANY other family for 2-type confluence)
+# NEW 2026-09-12 — Warrior Trading book strategy conversion
+WARRIOR_SR_CONFIRM_ENABLED = True
+WARRIOR_SR_CONFIRM_PLUS_ENABLED = True     # LONG (bullish pattern at support)
+WARRIOR_SR_CONFIRM_MINUS_ENABLED = True    # SHORT (bearish pattern at resistance)
+
+# Detection
+WARRIOR_SR_CONFIRM_LOOKBACK = 200          # 5m candles for S/R detection
+WARRIOR_SR_CONFIRM_TOUCHES_MIN = 2         # minimum touches to confirm S/R level
+WARRIOR_SR_CONFIRM_ATR_PROXIMITY = 4.0     # price within 4×ATR of level = "near"
+WARRIOR_SR_CONFIRM_SWING_WINDOW = 5        # swing high/low detection window
+WARRIOR_SR_CONFIRM_VOLUME_RATIO = 1.5      # volume must be 1.5× average
+
+# Confidence
+WARRIOR_SR_CONFIRM_CONF_BASE = 75          # base confidence
+WARRIOR_SR_CONFIRM_CONF_CAP = 88           # max confidence
+WARRIOR_SR_CONFIRM_COOLDOWN_HOURS = 1      # per token cooldown
+
+# ── Breakout Pullback Signal (breakout_pullback.py) ─────────────────────────
+# Warrior Trading: "Wait for breakout, then enter on the first pullback."
+# Breakout → pullback to breakout level → candlestick confirmation
+# Family: Momentum (pairs with Trend/Volume for 2-type confluence)
+# NEW 2026-09-12 — Warrior Trading book strategy conversion
+BREAKOUT_PULLBACK_ENABLED = True
+BREAKOUT_PULLBACK_PLUS_ENABLED = True      # LONG (breakout above resistance + pullback)
+BREAKOUT_PULLBACK_MINUS_ENABLED = True     # SHORT (breakdown below support + pullback)
+
+# Detection
+BREAKOUT_PULLBACK_LOOKBACK = 200           # 5m candles for breakout detection
+BREAKOUT_PULLBACK_BREAKOUT_PCT = 0.3       # min breakout magnitude %
+BREAKOUT_PULLBACK_PULLBACK_PCT = 0.5       # pullback must be within 0.5% of level
+BREAKOUT_PULLBACK_VOLUME_SPIKE = 1.5       # breakout candle volume must be 1.5× avg
+BREAKOUT_PULLBACK_VOLUME_RATIO = 1.2       # pullback volume gate (entry_gates)
+BREAKOUT_PULLBACK_PULLBACK_WINDOW = 30     # max bars to wait for pullback
+BREAKOUT_PULLBACK_SWING_WINDOW = 5         # swing high/low detection window
+
+# Confidence
+BREAKOUT_PULLBACK_CONF_BASE = 75           # base confidence
+BREAKOUT_PULLBACK_CONF_CAP = 88            # max confidence
+BREAKOUT_PULLBACK_COOLDOWN_HOURS = 1       # per token cooldown
+
+# ── Volume Climax Signal (volume_climax.py) ─────────────────────────────────
+# Warrior Trading: "Massive volume + rejection candle = institutional exhaustion."
+# Extreme volume spike + long wick rejection at price extreme
+# Family: Volume (pairs with MeanReversion/Trend for 2-type confluence)
+# NEW 2026-09-12 — Warrior Trading book strategy conversion
+VOLUME_CLIMAX_ENABLED = True
+VOLUME_CLIMAX_PLUS_ENABLED = True          # LONG (bullish rejection at lows)
+VOLUME_CLIMAX_MINUS_ENABLED = True         # SHORT (bearish rejection at highs)
+
+# Detection
+VOLUME_CLIMAX_LOOKBACK = 100               # 5m candles for analysis
+VOLUME_CLIMAX_SPIKE_MULT = 2.5             # volume must be 2.5× average (extreme)
+VOLUME_CLIMAX_AVG_PERIOD = 20              # bars for average volume
+VOLUME_CLIMAX_WICK_RATIO = 1.5             # wick must be 1.5× body (rejection)
+VOLUME_CLIMAX_EXTREME_WINDOW = 30          # bars to define price extreme range
+
+# Confidence
+VOLUME_CLIMAX_CONF_BASE = 75               # base confidence
+VOLUME_CLIMAX_CONF_CAP = 88                # max confidence
+VOLUME_CLIMAX_COOLDOWN_HOURS = 1           # per token cooldown
