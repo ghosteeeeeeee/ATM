@@ -959,15 +959,14 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Hard gate — no voting, no overrides. When BTC 30m momentum is flat,
     # momentum signals have no tailwind and fail in chop.
     # Layer A of chop regime signal gating plan.
-    _btc_chop_blocked = False
     from hermes_constants import BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, CHOP_GATE_LOG_ONLY
     if BTC_CHOP_GATE_ENABLED:
+        _gate_conn = None
         try:
             _gate_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
             _gate_row = _gate_conn.execute(
                 "SELECT velocity FROM momentum_cache WHERE token='BTC'"
             ).fetchone()
-            _gate_conn.close()
             if _gate_row and _gate_row[0] is not None:
                 _btc_30m = _gate_row[0]
                 if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
@@ -975,7 +974,6 @@ def _score_signal(token, direction, conf, source, signal_type,
                     from chop_detector import _classify_signal
                     _sig_family = _classify_signal(signal_type)
                     if _sig_family == 'MOMENTUM':
-                        _btc_chop_blocked = True
                         if CHOP_GATE_LOG_ONLY:
                             log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
                         else:
@@ -983,6 +981,12 @@ def _score_signal(token, direction, conf, source, signal_type,
                             return 0.0
         except Exception as e:
             log(f"  [WARN] BTC chop gate check failed: {e}", 'WARN')
+        finally:
+            if _gate_conn:
+                try:
+                    _gate_conn.close()
+                except Exception:
+                    pass
 
     # ── Chop Detector: preserve winrates during transitions (2026-09-05) ──
     # Detects chop via WR degradation + BTC flatness + FLAT vol regime.
@@ -1370,6 +1374,7 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
     Returns multiplier (1.0 = no penalty).
     """
     opp_direction = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+    conn = None
     try:
         conn = sqlite3.connect(db_path, timeout=10)
         c = conn.cursor()
@@ -1382,7 +1387,6 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
               AND confidence >= 60
         """, (token.upper(), opp_direction))
         opp_sources = [row[0] for row in c.fetchall() if row[0]]
-        conn.close()
         if not opp_sources:
             return 1.0
 
@@ -1405,6 +1409,12 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
     except Exception as e:
         log(f"  [WARN] Opposing penalty query failed: {e}", 'WARN')
         return 1.0
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 # ── Main compaction ────────────────────────────────────────────────────────────
 def run_compaction(dry=False, verbose=False, purge_executed=False):
@@ -1834,16 +1844,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Prevents single-source signals from bypassing neutral block when BTC is flat.
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
             if BTC_CHOP_GATE_ENABLED:
+                _bypass_conn = None
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
                     _bypass_row = _bypass_conn.execute(
                         "SELECT velocity FROM momentum_cache WHERE token='BTC'"
                     ).fetchone()
-                    _bypass_conn.close()
                     if _bypass_row and _bypass_row[0] is not None:
                         _btc_mom_ok_for_bypass = abs(_bypass_row[0]) >= BTC_CHOP_GATE_THRESHOLD
-                except Exception:
-                    pass
+                except Exception as e:
+                    log(f"  [WARN] BTC chop bypass check failed: {e}", 'WARN')
+                finally:
+                    if _bypass_conn:
+                        try:
+                            _bypass_conn.close()
+                        except Exception:
+                            pass
 
             if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
                 if _regime == 'SHORT_BIAS':
