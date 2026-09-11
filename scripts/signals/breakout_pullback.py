@@ -375,6 +375,10 @@ def scan_breakout_pullback_signals():
         if len(candles) < 30:
             continue
 
+        # GATE: Reject synthesized candles (V=0 = price_history, not real exchange data)
+        if candles[-1].get('volume', 0) <= 0:
+            continue
+
         sig = detect_breakout_pullback(candles)
         if not sig:
             continue

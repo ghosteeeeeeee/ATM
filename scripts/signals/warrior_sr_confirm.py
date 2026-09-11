@@ -356,6 +356,10 @@ def scan_warrior_sr_signals():
         if len(candles) < 20:
             continue
 
+        # GATE: Reject synthesized candles (V=0 = price_history, not real exchange data)
+        if candles[-1].get('volume', 0) <= 0:
+            continue
+
         # Get ATR for this token
         atr_pct = _get_cached_atr(token)
 

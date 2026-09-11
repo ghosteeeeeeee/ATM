@@ -213,7 +213,7 @@ def volume_gate(candles, min_ratio=None, lookback=None):
         # Current candle volume (last)
         current_vol = volumes[-1]
         if current_vol <= 0:
-            return True  # no volume data, fail-open
+            return False  # V=0 = synthesized candle (from price_history), reject
 
         # Average of prior candles (exclude current)
         prior = volumes[-(lookback + 1):-1] if len(volumes) > lookback else volumes[:-1]

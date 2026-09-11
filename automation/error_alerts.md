@@ -136,3 +136,7 @@
 - **WARN** (3x): `signal_compactor: timed out` at 13:55, 13:59, 14:02 — recurring ~every 4 min but pipeline recovers each cycle
 - **WARN**: Today's winrate 38.9% (36 closed trades, -$1.65 PnL)
 - **INFO**: No auto-fixes needed — pipeline self-recovers from compactor timeouts
+
+## Error Alerts — 2026-09-11 15:55 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
