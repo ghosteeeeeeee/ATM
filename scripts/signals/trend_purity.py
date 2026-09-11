@@ -32,7 +32,7 @@ EMA_PERIOD    = 30      # EMA period in bars
 PURITY_THRESH = TP_PURITY_THRESH       # fraction of lookback bars must be above EMA
 LOOKBACK      = TP_LOOKBACK            # bars to check for purity
 MIN_GAP_PCT   = TP_MIN_GAP_PCT         # price must be at least this far from EMA to fire
-CONF_BASE     = 60      # base confidence for a clean trend signal
+CONF_BASE     = 65      # base confidence for a clean trend signal
 CONF_GAP_BONUS = 20     # extra confidence when gap is large (> 1.0%)
 DRY_RUN       = False
 
@@ -103,8 +103,8 @@ def detect_trend_purity(token: str, direction: str = None):
             purity = above / LOOKBACK
             if purity < PURITY_THRESH:
                 continue
-            # Confidence: base + gap bonus
-            conf = min(CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * 10) + (purity - PURITY_THRESH) * 40, 99)
+            # Confidence: base + gap bonus + purity bonus
+            conf = min(CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * 25) + (purity - PURITY_THRESH) * 50, 99)
             signals.append({
                 'token': token,
                 'signal_type': 'trend_purity_long',
