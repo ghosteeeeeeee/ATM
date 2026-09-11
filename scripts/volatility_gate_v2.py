@@ -225,19 +225,22 @@ VOL_PHASE_MULTS = {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
     },
-    # NORMAL volatility: block pullback_entry LONG+SHORT, block R2 (wins in EXTREME/HIGH)
+    # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
-        'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
-        'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 42.9% WR in NORMAL, wins in EXTREME/HIGH
-        'R2': 0.0,                   # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
-        'Open_Skies': 0.0,           # BLOCKED — open-skies 50% WR in NORMAL, wins in EXTREME
+        'Pullback_Entry_Long': 0.0,   # BLOCKED — pullback_entry+ 30% WR in NORMAL, wins in HIGH/EXTREME
+        'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 30% WR in NORMAL, wins in EXTREME/HIGH
+        'R2': 0.0,                    # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
+        'Open_Skies': 0.0,            # BLOCKED — open-skies 50% WR in NORMAL, wins in EXTREME
+        'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
     },
-    # HIGH volatility: block Bollinger LONG, coiled_spring dead, penalize Trendline and Accelerate
+    # HIGH volatility: block signals that lose here but win in EXTREME/NORMAL
     ('HIGH', '*'): {
-        'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
-        'Trendline': 0.3,       # BLOCKED SHORT — 33% WR in HIGH, wins in NORMAL
-        'Bollinger': 0.0,       # BLOCKED LONG — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
-        'Accelerate': 0.3,      # PENALIZED SHORT — accel_300 35% WR in HIGH, wins in NORMAL/EXTREME
+        'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
+        'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
+        'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
+        'Accelerate': 0.3,       # PENALIZED — accel_300 35% WR in HIGH, wins in NORMAL/EXTREME
+        'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
+        'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
         # Pump_Flow removed — SHORT wins 61.5% WR in HIGH, LONG wins 64.7% WR in HIGH
     },
 }
