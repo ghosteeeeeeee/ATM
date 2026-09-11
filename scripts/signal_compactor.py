@@ -133,9 +133,10 @@ def _load_leaderboard():
 
 def _get_leaderboard_mult(token):
     """Get score multiplier based on 30d performance.
-    - Hall of Fame (30d WR >=70%, 15+ trades): 1.3x bonus
-    - Strong (30d WR >=60%): 1.15x bonus
-    - Weak (30d WR <45%, 15+ trades): 0.7x penalty
+    - Hall of Fame (30d WR >=60%, 15+ trades): 1.3x bonus
+    - Strong (30d WR >=50%): 1.15x bonus
+    - Hall of Shame (30d WR <45%, 15+ trades): 0.7x penalty
+    - Below average (30d WR <50%): 0.85x penalty
     - No data: 1.0x (neutral)
     """
     lb = _load_leaderboard()
@@ -154,6 +155,98 @@ def _get_leaderboard_mult(token):
         return 0.7   # Hall of Shame
     elif wr < 50:
         return 0.85  # Below average
+    return 1.0
+
+
+# ── Token+Signal Combo Cache ──────────────────────────────────────────────────
+_combo_cache = {}  # (token, signal) -> {'wr': float, 'trades': int, 'pnl': float}
+_combo_cache_ts = 0
+_COMBO_CACHE_TTL = 600  # 10 min
+
+
+def _load_signal_combos():
+    """Load30d token+signal combo performance from PostgreSQL."""
+    global _combo_cache, _combo_cache_ts
+    import time
+    now = time.time()
+    if _combo_cache and (now - _combo_cache_ts) < _COMBO_CACHE_TTL:
+        return _combo_cache
+
+    conn = None
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                 user='postgres', connect_timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                token,
+                signal,
+                COUNT(*) as trades,
+                ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
+                ROUND(SUM(pnl_usdt), 2) as total_pnl
+            FROM trades
+            WHERE server = 'Hermes'
+              AND status = 'closed'
+              AND pnl_pct IS NOT NULL
+              AND close_time > NOW() - INTERVAL '30 days'
+              AND signal IS NOT NULL
+            GROUP BY token, signal
+            HAVING COUNT(*) >= 5
+        """)
+        cache = {}
+        for token, signal, trades, wr, pnl in cur.fetchall():
+            # Normalize signal - extract primary signal before comma
+            primary_sig = signal.split(',')[0].strip() if signal else signal
+            key = (token.upper(), primary_sig.upper())
+            cache[key] = {
+                'wr': float(wr) if wr else 50,
+                'trades': int(trades),
+                'pnl': float(pnl) if pnl else 0,
+            }
+        _combo_cache = cache
+        _combo_cache_ts = now
+        return cache
+    except Exception as e:
+        log(f"Error loading signal combos: {e}")
+        return _combo_cache
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+
+def _get_combo_mult(token, signal):
+    """Get score multiplier for winning token+signal combos.
+    - Legendary (75%+ WR, 10+ trades): 2.5x — always wins
+    - Elite (70%+ WR, 8+ trades): 2.0x
+    - Strong (65%+ WR, 6+ trades): 1.5x
+    - Good (60%+ WR, 5+ trades): 1.25x
+    - No data or low sample: 1.0x (neutral)
+    """
+    combos = _load_signal_combos()
+    if not signal:
+        return 1.0
+
+    # Normalize signal
+    primary_sig = signal.split(',')[0].strip() if signal else signal
+    key = (token.upper(), primary_sig.upper())
+    data = combos.get(key)
+
+    if not data or data['trades'] < 5:
+        return 1.0
+
+    wr = data['wr']
+    trades = data['trades']
+
+    if wr >= 75 and trades >= 10:
+        return 2.5   # Legendary — always wins
+    elif wr >= 70 and trades >= 8:
+        return 2.0   # Elite
+    elif wr >= 65 and trades >= 6:
+        return 1.5   # Strong
+    elif wr >= 60 and trades >= 5:
+        return 1.25  # Good
     return 1.0
 
 
@@ -1120,6 +1213,11 @@ def _score_signal(token, direction, conf, source, signal_type,
     # 30d leaderboard bonus/penalty — long-term performers get extra boost
     leaderboard_mult = _get_leaderboard_mult(token)
 
+    # Token+Signal combo bonus — winning combos get huge boost
+    combo_mult = _get_combo_mult(token, source)
+    if combo_mult >= 2.0:
+        log(f"  🏆 [COMBO] {token}+{source}: {combo_mult:.1f}x bonus (proven winner)")
+
     # Hall of Shame BLOCK — never trade consistent losers (30d WR <45%, 15+ trades)
     if leaderboard_mult <= 0.7:
         log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR <45%, consistent loser")
@@ -1358,7 +1456,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                 except Exception:
                     pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
     return final_score
 
 
