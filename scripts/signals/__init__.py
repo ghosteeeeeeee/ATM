@@ -330,7 +330,7 @@ except Exception:
     _hh_hl_run = None
 
 try:
-    from signals.trend_purity import scan as _trend_purity_run
+    from signals.trend_purity import run as _trend_purity_run
 except Exception:
     _trend_purity_run = None
 

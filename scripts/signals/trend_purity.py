@@ -60,18 +60,21 @@ def detect_trend_purity(token: str, direction: str = None):
 
     Returns signal dict or None.
     """
-    conn = sqlite3.connect(STATIC_DB, timeout=10)
-    conn.execute("PRAGMA journal_mode=WAL")
+    conn = None
+    try:
+        conn = sqlite3.connect(STATIC_DB, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL")
 
-    # Fetch last LOOKBACK + EMA_PERIOD bars for warmup
-    rows = conn.execute("""
-        SELECT price FROM price_history
-        WHERE token = ?
-        ORDER BY timestamp DESC
-        LIMIT ?
-    """, (token, LOOKBACK + EMA_PERIOD)).fetchall()
-
-    conn.close()
+        # Fetch last LOOKBACK + EMA_PERIOD bars for warmup
+        rows = conn.execute("""
+            SELECT price FROM price_history
+            WHERE token = ?
+            ORDER BY timestamp DESC
+            LIMIT ?
+        """, (token, LOOKBACK + EMA_PERIOD)).fetchall()
+    finally:
+        if conn:
+            conn.close()
 
     if len(rows) < LOOKBACK + EMA_PERIOD:
         return None
@@ -178,16 +181,19 @@ def scan(conf_min: int = 60, token: str = None):
         conf_min: minimum confidence to emit
         token: if set, only scan this token
     """
-    conn = sqlite3.connect(STATIC_DB, timeout=10)
-    conn.execute("PRAGMA journal_mode=WAL")
+    conn = None
+    try:
+        conn = sqlite3.connect(STATIC_DB, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL")
 
-    if token:
-        tokens = [token]
-    else:
-        rows = conn.execute("SELECT DISTINCT token FROM latest_prices").fetchall()
-        tokens = [r[0] for r in rows]
-
-    conn.close()
+        if token:
+            tokens = [token]
+        else:
+            rows = conn.execute("SELECT DISTINCT token FROM latest_prices").fetchall()
+            tokens = [r[0] for r in rows]
+    finally:
+        if conn:
+            conn.close()
 
     emitted = 0
     for tok in tokens:
