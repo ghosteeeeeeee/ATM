@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -955,6 +955,35 @@ def _score_signal(token, direction, conf, source, signal_type,
         except Exception as e:
             log(f"  [WARN] Directional cap check failed: {e}", 'WARN')
 
+    # ── BTC Chop Gate: block momentum signals when BTC flat (2026-09-11) ─
+    # Hard gate — no voting, no overrides. When BTC 30m momentum is flat,
+    # momentum signals have no tailwind and fail in chop.
+    # Layer A of chop regime signal gating plan.
+    _btc_chop_blocked = False
+    from hermes_constants import BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, CHOP_GATE_LOG_ONLY
+    if BTC_CHOP_GATE_ENABLED:
+        try:
+            _gate_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+            _gate_row = _gate_conn.execute(
+                "SELECT velocity FROM momentum_cache WHERE token='BTC'"
+            ).fetchone()
+            _gate_conn.close()
+            if _gate_row and _gate_row[0] is not None:
+                _btc_30m = _gate_row[0]
+                if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
+                    # BTC is flat — check if signal is momentum family
+                    from chop_detector import _classify_signal
+                    _sig_family = _classify_signal(signal_type)
+                    if _sig_family == 'MOMENTUM':
+                        _btc_chop_blocked = True
+                        if CHOP_GATE_LOG_ONLY:
+                            log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
+                        else:
+                            log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: BLOCKED — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
+                            return 0.0
+        except Exception as e:
+            log(f"  [WARN] BTC chop gate check failed: {e}", 'WARN')
+
     # ── Chop Detector: preserve winrates during transitions (2026-09-05) ──
     # Detects chop via WR degradation + BTC flatness + FLAT vol regime.
     # Blocks momentum signals in chop (preserves their WR for next trend).
@@ -1801,21 +1830,42 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # FIX (2026-08-23): Allow SHORT when 1m shows SHORT_BIAS
             # FIX (2026-08-24): Also allow SHORT when confluence is strong (2+ types)
             # or source is standalone bypass — NEUTRAL market doesn't mean no SHORT edge
+            # Layer B: Gate STANDALONE_BYPASS with BTC momentum check (2026-09-11)
+            # Prevents single-source signals from bypassing neutral block when BTC is flat.
+            _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
+            if BTC_CHOP_GATE_ENABLED:
+                try:
+                    _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+                    _bypass_row = _bypass_conn.execute(
+                        "SELECT velocity FROM momentum_cache WHERE token='BTC'"
+                    ).fetchone()
+                    _bypass_conn.close()
+                    if _bypass_row and _bypass_row[0] is not None:
+                        _btc_mom_ok_for_bypass = abs(_bypass_row[0]) >= BTC_CHOP_GATE_THRESHOLD
+                except Exception:
+                    pass
+
             if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
                 if _regime == 'SHORT_BIAS':
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but 1m SHORT_BIAS, allowed")
-                elif unique_signal_types >= 2 or bare_source in STANDALONE_BYPASS_SIGNALS:
+                elif unique_signal_types >= 2 or (bare_source in STANDALONE_BYPASS_SIGNALS and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
-                    log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
+                    if not _btc_mom_ok_for_bypass:
+                        log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                    else:
+                        log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
                     continue
             if LONG_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL':
                 if _regime == 'LONG_BIAS':
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but 1m LONG_BIAS, allowed")
-                elif unique_signal_types >= 2 or bare_source in STANDALONE_BYPASS_SIGNALS:
+                elif unique_signal_types >= 2 or (bare_source in STANDALONE_BYPASS_SIGNALS and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
-                    log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
+                    if not _btc_mom_ok_for_bypass:
+                        log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                    else:
+                        log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
                     continue
             # ── EXTREME/FLAT regime blocks for v3 signals ──────────────────────
             # v3 SHORT: EXTREME 42% WR, FLAT 33% WR — no edge

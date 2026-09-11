@@ -878,6 +878,14 @@ ALT_BTC_DIVERGENCE_THRESHOLD = -0.30      # % — alt must be below this
 ALT_BTC_DIVERGENCE_BTC_MIN = -0.10        # % — BTC must be above this
 ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 
+# ── Chop Regime Signal Gating (2026-09-11) ────────────────────────────────
+# Prevents trend signals from firing in flat/chop markets.
+# Layer A: Hard BTC momentum gate — block MOMENTUM signals when BTC flat.
+# Layer B: Gate STANDALONE_BYPASS — prevent bypass when BTC flat.
+BTC_CHOP_GATE_ENABLED = True
+BTC_CHOP_GATE_THRESHOLD = 0.15            # % — |BTC 30m| below this = CHOP (matches CHOP_DETECTOR_BTC_MOM_THRESHOLD)
+CHOP_GATE_LOG_ONLY = True                 # True = log only, don't block. Set False after 48h clean logs.
+
 # ── Sniper Exit Strategy ──────────────────────────────────────────────────
 # Proactive position closing on regime shifts. Closes wrong-side positions
 # when trend changes, lets right-side positions ride.
