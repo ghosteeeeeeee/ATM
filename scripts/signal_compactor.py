@@ -578,6 +578,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ema300_dip_long', 'ema300-dip-long'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # ema300_dip_short — sell rallies to EMA300 during strong downtrends
     ('ema300_dip_short', 'ema300-dip-short'):  1.2,  # Mirror of LONG signal
+    # ema300_breakthrough — price crashes through EMA300 (15m timeframe)
+    ('ema300_breakthrough_long', 'ema300-breakthrough+'):  1.1,  # NEW — 61% WR backtest, reversal LONG
+    ('ema300_breakthrough_short', 'ema300-breakthrough-'):  1.2,  # NEW — 80% WR backtest, trend continuation SHORT
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 85%WR +$0.74, 13 tokens
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────

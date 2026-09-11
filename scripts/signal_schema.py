@@ -2485,6 +2485,7 @@ def is_component_disabled(component: str) -> bool:
             GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
             EMA300_DIP_LONG_ENABLED,
             EMA300_DIP_SHORT_ENABLED,
+            EMA300_BREAKTHROUGH_ENABLED, EMA300_BREAKTHROUGH_PLUS_ENABLED, EMA300_BREAKTHROUGH_MINUS_ENABLED,
             ACCEL_300_V2_ENABLED, ACCEL_300_V2_LONG_ENABLED, ACCEL_300_V2_LONG_5M_ENABLED,
             INVERSE_ACCEL_300_V2_ENABLED,
             ACCEL_300_V3_LONG_ENABLED,
@@ -2634,6 +2635,10 @@ def is_component_disabled(component: str) -> bool:
     # ema300-dip-long
     if c == 'ema300-dip-long': return not EMA300_DIP_LONG_ENABLED
     if c == 'ema300-dip-short': return not EMA300_DIP_SHORT_ENABLED
+    # ema300-breakthrough
+    if c == 'ema300-breakthrough+': return not EMA300_BREAKTHROUGH_PLUS_ENABLED
+    if c == 'ema300-breakthrough-': return not EMA300_BREAKTHROUGH_MINUS_ENABLED
+    if c == 'ema300-breakthrough': return not EMA300_BREAKTHROUGH_ENABLED
     # slow-grind-short
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # slow-grind-long

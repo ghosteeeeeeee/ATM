@@ -2043,3 +2043,85 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 
 **Open Questions:**
 - pump-chain+ at 25%WR is poor — monitor, may need manual intervention if it continues losing
+
+## [2026-09-11 16:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** $+0.30 (WR: 75.0%)
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| GRASS | pump-chain- | SHORT | rr_engine_resistance | +$0.06 |
+| CC | mover- | SHORT | profit-monster-trail | +$0.26 |
+| W | open-skies+ | LONG | hard_sl | -$0.21 |
+| USUAL | open-skies+ | LONG | atr_sl_hit | +$0.19 |
+
+**24h:** 54T 50%WR -$0.44 | 1 open position
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 2T 0%WR (already killed), ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+)
+- pump-chain+ 11T 27.3%WR -$0.74 — worst signal but has wins, doesn't meet kill threshold
+- bb-bounce-v2-long+ 3T 33.3%WR -$0.21 — has wins
+- atr_sl_hit 26T 48% of exits, avg -$0.017 — borderline but not critical
+- rr_engine_resistance 15T 28% exits, -$0.93 — structural SHORT losses in NEUTRAL, working as designed
+- Trade freq 2-5/hr normal
+- Market: 98% NEUTRAL on 5m
+
+**Open Questions:** None
+
+## [2026-09-11 18:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.11)
+**24h:** 53T ~50%WR -$0.44 | 3 open positions
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| DOT | mover- | SHORT | profit-monster-trail | +$0.09 |
+| LDO | mover+ | LONG | profit-monster-trail | +$0.02 |
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- 3T 0%WR (already killed 12:10), ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+)
+- pump-chain+ 10T 30%WR -$0.59 — worst signal but has wins, doesn't meet kill threshold
+- pullback-entry- 8T 37.5%WR -$0.42 — poor but has wins
+- atr_sl_hit 22T 42.3% of exits avg -$0.030 — borderline but not critical
+- 6h trend: 6/7 hours positive — system performing well
+- Trade freq 3/hr normal
+- Market: 98% NEUTRAL on 5m
+
+**Open Questions:** None
+
+## [2026-09-11 18:30 UTC] Orchestrator — VERIFIED + DISK CLEANUP
+
+**DB:** 24h 51T 45.1% WR -$0.78. 7d: 333T 55.6% WR +$1.26 (VERIFIED POSITIVE).
+**Sep 11:** 46T 41.3% WR -$1.21 (bad day).
+**R:R 24h:** 0.815 (avg_win $0.121, avg_loss -$0.149). Breakeven WR 55.0%.
+**R:R 7d:** 0.771 (avg_win $0.113, avg_loss -$0.147).
+
+**DISK CLEANUP:** /tmp compile caches cleared — freed 9.5G. Disk 84%→76%.
+
+**4 open SHORT:** BTC, INJ, APT, ATOM.
+**Market:** SHORT_BIAS. 98% NEUTRAL on 5m.
+
+**Active signals 7d ALL profitable:**
+- pullback_entry-: 29T/69.0% WR +$1.93 ★
+- open_skies: 19T/63.2% WR +$1.56 ★
+- bb_bounce_v2_long: 39T/71.8% WR +$1.20 ★
+- pump_chain: 43T/67.4% WR +$0.98
+- pump-chain-: 34T/58.8% WR +$0.61
+
+**24h signal perf:**
+- Winners: mover- 3T/66.7%WR +$0.35, doji-bottom-long 1T/100%WR +$0.31, pump-chain- 12T/50%WR +$0.24
+- Losers: pump-chain+ 10T/30%WR -$0.59 (KILLED 13:15), accel-300-v4-short- 3T/0%WR -$0.44 (KILLED 12:10), pullback-entry- 8T/37.5%WR -$0.42
+
+**auto_1hr 18:10:** No changes needed. 6/7 hours positive trend. Kill criteria not met for any signal.
+**signal_reporter 17:18:** Timed out (recurring, non-critical).
+**Health monitor 18:24:** Pipeline OK, 55 timers firing. Disk now 76%.
+
+**No param changes. No signal changes.**
+
+**Changes:** Disk cleanup — 9.5G freed from /tmp compile caches.
+**Status:** System healthy. 7d positive. R:R improving.

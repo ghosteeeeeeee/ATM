@@ -1,51 +1,74 @@
-=== Signal Performance Report ===
-Period: 2026-09-11 | Last 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-09-11 17:03 UTC | **Period:** Last 6h + 24h
 
-## 6h Performance
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-bounce-v2-long+ | LONG | 3 | 33.3% | -$0.21 |
-| mover+ | LONG | 3 | 66.7% | -$0.21 |
-| pullback-entry- | SHORT | 2 | 0.0% | -$0.19 |
-| pump-chain- | SHORT | 3 | 33.3% | -$0.19 |
+## Overall Stats
+- **Total trades (all time):** 2,321 | **WR:** 51.8% | **PnL:** -98.75%
+- **Date range:** 2026-07-29 → 2026-09-11
 
-## 24h Performance
-| Signal | Dir | Trades | WR | PnL | Avg PnL |
-|--------|-----|--------|-----|-----|---------|
-| pump-chain+ | LONG | 7 | 28.6% | -$0.61 | -$0.087 |
-| accel-300-v4-short- | SHORT | 2 | 0.0% | -$0.31 | -$0.155 |
-| mover+ | LONG | 3 | 66.7% | -$0.21 | -$0.070 |
-| bb-bounce-v2-long+ | LONG | 4 | 50.0% | -$0.19 | -$0.048 |
-| pullback-entry- | SHORT | 11 | 45.5% | -$0.01 | -$0.001 |
-| pump-chain- | SHORT | 20 | 65.0% | +$1.03 | +$0.052 |
+---
 
-**Total 24h:** 50 trades, 50.0% WR, -$0.49 PnL
+## WINNERS (WR > 55%, PnL > 0)
 
-## KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 28.6% | -$0.61 | 7 | Regime block: 0.0x in HIGH volatility |
+None found.
 
-**Details:** pump-chain+ LONG wins in EXTREME regime (42.9% WR, +$0.09) but loses badly in HIGH regime (0% WR, -$0.11). Added `Pump_Flow: 0.0` multiplier to `('HIGH', '*')` in `volatility_gate_v2.py` VOL_PHASE_MULTS. SHORT side unaffected (65% WR, +$1.03).
+---
 
-## BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No boost candidates — no signal has WR>55% with 5+ trades AND positive PnL |
+## LOSERS (WR < 30%, PnL < -2%)
 
-## LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| accel-300-v4-short- | SHORT | 0.0% | -$0.31 | 2 | Watch — insufficient data (2 trades) |
-| bb-bounce-v2-long+ | LONG | 50.0% | -$0.19 | 4 | Watch — borderline WR, small losses |
-| mover+ | LONG | 66.7% | -$0.21 | 3 | Watch — good WR but negative PnL |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
+| pump-chain+ | LONG | 5 | 20.0% | -2.54 | 11 | 27.3% | -5.56 | ❓ | **DISABLE** |
 
-## WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 65.0% | +$1.03 | 20 | Strong performer — keep |
+---
 
-## ISSUES:
-- No direction inversions detected (LONG signals not firing SHORT, vice versa)
-- Total 24h PnL slightly negative (-$0.49) — 50 trades is a moderate sample
-- mover+ has 66.7% WR but negative PnL — winning trades smaller than losing trades (R:R issue)
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| pump-chain- | SHORT | 16 | 50.0% | -2.91 | ❓ | Borderline |
+| pullback-entry- | SHORT | 9 | 44.4% | -2.45 | ENABLED | Borderline |
+| bb-bounce-v2-long+ | LONG | 3 | 33.3% | -1.38 | ❓ | Needs more data |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[DISABLE] pump-chain+ LONG** — WR=27.3%, PnL=-5.56% over 11 trades (24h).
+2. **[WATCH] pump-chain- SHORT** — WR=50.0%, PnL=-2.91% over 16 trades. Monitor next cycle.
+3. **[WATCH] pullback-entry- SHORT** — WR=44.4%, PnL=-2.45% over 9 trades. Monitor next cycle.
+4. **[WATCH] bb-bounce-v2-long+ LONG** — WR=33.3%, PnL=-1.38% over 3 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-09-11 | f346602 | config: disable accel_300_v4_short, re-enable accel_300_shor... |
+| 2026-09-11 | ef6f5ec | fix: bug hunter findings — NEVER_REENABLE cleanup, Pump_Flow... |
+| 2026-09-11 | f21407f | config: enable TL_BREAK_ENABLED master switch (2026-09-11) |
+| 2026-09-11 | 2bf0228 | config: enable tl_break_long in NORMAL regime (2026-09-11) |
+| 2026-09-11 | 2cfd770 | auto_1hr: KILL pump-chain+ (PUMP_FLOW_PLUS_ENABLED=False) — ... |
+| 2026-09-11 | 62026ef | config: re-enable pump_chain LONG and accel_300_v4_short (20... |
+| 2026-09-11 | fa17d3e | Signals: Add support proximity filter to pullback_entry |
+| 2026-09-11 | b15d4a9 | auto_1hr: KILL pump-chain+ LONG (PUMP_FLOW_PLUS_ENABLED=Fals... |
+| 2026-09-11 | 5873e7f | auto_1hr: Kill accel-300-v4-short- (0% WR, 3T, -/usr/bin/bas... |
+| 2026-09-11 | d287cf7 | Auto 1hr: no changes - system healthy (2026-09-11 09:10 UTC) |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -90,6 +90,7 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -118,6 +119,7 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -133,6 +135,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
     },
 }
 

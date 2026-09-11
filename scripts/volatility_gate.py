@@ -107,6 +107,7 @@ REGIME_SIGNALS = {
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in normal vol
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
     },
     'HIGH': {
         # Breakout works in big moves
@@ -160,6 +161,7 @@ REGIME_SIGNALS = {
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in high vol
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
     },
     'EXTREME': {
         # Continuation works in storms
@@ -196,6 +198,7 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in extreme vol
+        'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
     },
 }
 
