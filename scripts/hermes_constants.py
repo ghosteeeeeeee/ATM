@@ -1117,43 +1117,76 @@ WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 MACD_EXIT_PAUSED = True   # Disable macd_rules.py exit signals (ATR TP/SL handles closes)
 REGIME_BULL_FLIP_ENABLED = False  # Disable regime_bull_flip exit (fires too often on short timeframe)
 
-# ── HH_HL Signal (Higher Highs / Higher Lows structure) ────────────────────────
-# hh_hl_signals.py — swing structure detection on 1m close prices
-# NOTE: price_history is close-only (open=high=low=close per row), so swing
-# detection uses rolling proxy high/low of closes. window=4 is the minimum
-# viable half-width for close-only data — produces ~50-80 swings per 300 candles.
-HH_HL_LOOKBACK          = 200   # candles for swing detection (200 = ~3h20m at 1m)
-HH_HL_SWING_WINDOW      = 4     # half-width for proxy high/low (min viable for close-only)
-HH_HL_MIN_SEP           = 3     # minimum candle separation between consecutive swings
-HH_HL_BREAKOUT_THRESHOLD = 0.0015   # price must exceed prior swing by this fraction (0.15%)
-                                          # FIX (2026-05-12): raised from 0.0005 (0.05%) to 0.0015 (0.15%)
-                                          # 0.05% was too loose — BERA @ $0.40 only needs $0.0002 to trigger,
-                                          # catching micro-noise at tops/bottoms of bounces. 0.15% = $0.0006
-                                          # for BERA, $0.0368 for COMP — requires genuine structural breakout.
-HH_HL_ATR_ENTRY_MIN     = 0.5   # breakout candle must be >= 0.5x ATR
+# ── HH_HL Signal v2 (Structure Sniper) ─────────────────────────────────────────
+# hh_hl.py — Multi-confluence market structure signal (5m OHLCV + 1H trend)
+# Fires ONLY when 7+ confluence factors align. Quality over quantity.
+# Uses 5m OHLCV candles for proper swing detection (real H/L data, not close-only).
+# Structure: HH/HL = uptrend (LONG), LH/LL = downtrend (SHORT).
+#
+# Confluence gates:
+#   1. Structure clarity — clear 4+ swing pattern (H-L-H-L or L-H-L-H)
+#   2. Higher TF trend — 1H EMA20 vs EMA50 alignment
+#   3. Volume confirmation — breakout candle > avg_vol_mult × 20-period average
+#   4. Momentum — RSI in favorable zone (not overbought for LONG, not oversold for SHORT)
+#   5. EMA alignment — price vs 5m EMA20 + EMA20 vs EMA50
+#   6. Volatility — ATR% between vol_floor_pct and vol_cap_pct (not dead, not extreme)
+#   7. Freshness — breakout within max_bars_since bars on 5m
+#
+# Data sources:
+#   Primary: candles_5m (OHLCV, proper H/L for swing detection)
+#   Higher TF: candles_1h (EMA20/50 trend confirmation)
+#   Fallback: price_history (close-only, lower quality)
+
+# ── Structure Detection ────────────────────────────────────────────────────────
+HH_HL_LOOKBACK          = 200   # 5m candles for swing detection (~16.7 hours)
+HH_HL_SWING_WINDOW      = 5     # half-width for swing high/low detection on 5m
+HH_HL_MIN_SEP           = 4     # minimum candle separation between consecutive swings
+HH_HL_MIN_SWINGS        = 4     # minimum swing points for valid structure (H-L-H-L)
+HH_HL_BREAKOUT_THRESHOLD = 0.002  # price must exceed prior swing by 0.2% (0.002 fraction)
+
+# ── Entry Filters ──────────────────────────────────────────────────────────────
+HH_HL_MAX_BARS_SINCE    = 5     # breakout must be within last N bars on 5m
 HH_HL_SL_ATR_MULT       = 1.5   # SL = entry +/- SL_ATR_MULT * ATR
 HH_HL_TP_ATR_MULT       = 3.0   # TP = entry + TP_ATR_MULT * ATR
-HH_HL_MAX_HOLD_BARS     = 20    # auto-close if neither SL nor TP hit in this many bars
-HH_HL_MAX_BARS_SINCE    = 10    # reject signal if breakout is older than this many bars
-HH_HL_SHORT_RANGE_TOP_ATR = 0.5  # SHORT blocked if price > 20-bar high minus this many ATRs
-                                        # FIX (2026-05-12): raised from 1.0 to 0.5 ATR. 1 ATR was too permissive —
-                                        # BERA at 37% up in range cleared it. 0.5 ATR is tighter, shorts only fire
-                                        # when truly near the bottom of the range.
-HH_HL_LONG_RANGE_BOTTOM_ATR = 0.5 # LONG blocked if price < 20-bar low plus this many ATRs
-                                        # Same rationale as SHORT — only enter LONGs with room to run.
-HH_HL_COOLDOWN_MIN      = 15    # minutes between signals per token
-HH_HL_CONFIDENCE_FLOOR  = 50
-HH_HL_CONFIDENCE_CAP    = 88
-HH_HL_BASE_CONFIDENCE    = 62
-HH_HL_STRUCT_BONUS_MAX  = 15    # per consecutive HH/HL pair
-HH_HL_BREAKOUT_BONUS_MAX = 12   # bonus for strong breakout
-HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
+HH_HL_COOLDOWN_HOURS    = 3     # per-token+direction cooldown
+HH_HL_SHORT_RANGE_TOP_ATR = 0.5 # SHORT blocked if price > 20-bar high - ATR * this
+HH_HL_LONG_RANGE_BOTTOM_ATR = 0.5  # LONG blocked if price < 20-bar low + ATR * this
 
-# ── CHoCH (Change of Character) ────────────────────────────────────────────────
-HH_HL_CHOCH_BASE_CONFIDENCE = 70   # higher base — CHoCH is a stronger reversal signal
-HH_HL_CHOCH_STRUCT_BONUS_MAX = 10  # bonus for clean 4-swing structure
-HH_HL_CHOCH_RECENCY_BONUS_MAX = 6  # bonus for fresh flip
-HH_HL_CHOCH_MAX_BARS_SINCE   = 15  # reject if flip is older than this many bars
+# ── Confluence Gate: Volume ────────────────────────────────────────────────────
+HH_HL_AVG_VOL_MULT      = 1.5   # breakout candle volume must be > avg * this
+HH_HL_VOL_LOOKBACK      = 20    # period for average volume calculation
+
+# ── Confluence Gate: RSI ───────────────────────────────────────────────────────
+HH_HL_RSI_PERIOD        = 14
+HH_HL_RSI_LONG_MIN      = 40    # LONG RSI must be >= this (not oversold against trend)
+HH_HL_RSI_LONG_MAX      = 68    # LONG RSI must be <= this (not overbought at top)
+HH_HL_RSI_SHORT_MIN     = 32    # SHORT RSI must be >= this (not oversold at bottom)
+HH_HL_RSI_SHORT_MAX     = 60    # SHORT RSI must be <= this (not overbought against trend)
+
+# ── Confluence Gate: EMA ───────────────────────────────────────────────────────
+HH_HL_EMA_FAST          = 20    # fast EMA on 5m
+HH_HL_EMA_SLOW          = 50    # slow EMA on 5m (trend direction)
+HH_HL_HTF_EMA_FAST      = 20    # fast EMA on 1H (higher timeframe)
+HH_HL_HTF_EMA_SLOW      = 50    # slow EMA on 1H (higher timeframe trend)
+
+# ── Confluence Gate: Volatility ────────────────────────────────────────────────
+HH_HL_VOL_FLOOR_PCT     = 0.3   # minimum ATR% — skip dead tokens
+HH_HL_VOL_CAP_PCT       = 1.5   # maximum ATR% — skip panic/extreme tokens
+
+# ── Confidence Scoring ─────────────────────────────────────────────────────────
+HH_HL_CONF_BASE         = 75    # base confidence (all gates pass = minimum score)
+HH_HL_CONF_FLOOR        = 50    # min confidence to emit signal
+HH_HL_CONF_CAP          = 88    # system ceiling
+HH_HL_CONF_STRUCT_BONUS = 5     # bonus: deep structure (6+ swings vs minimum 4)
+HH_HL_CONF_VOLUME_BONUS = 4     # bonus: strong volume confirmation (>2x avg)
+HH_HL_CONF_HTF_BONUS    = 3     # bonus: 1H trend strongly aligned (EMA spread > 0.2%)
+HH_HL_CONF_MOMENTUM_BONUS = 3   # bonus: RSI in sweet spot (50-60 for LONG, 40-50 for SHORT)
+
+# ── CHoCH (Change of Character) — kept from v1, separate variant ───────────────
+HH_HL_CHOCH_BASE_CONFIDENCE = 70
+HH_HL_CHOCH_STRUCT_BONUS_MAX = 10
+HH_HL_CHOCH_RECENCY_BONUS_MAX = 6
+HH_HL_CHOCH_MAX_BARS_SINCE   = 15
 
 # ── Profit Monster ─────────────────────────────────────────────────────────────
 # profit_monster.py — closes medium-profit positions (2-5%) at random intervals.
@@ -1218,6 +1251,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'coil-trigger',          # volume-confirmed breakout — own ATR SL/TP, no PM Trail benefit
     'open-skies',            # open skies breakout — ride ATR SL/TP only, no PM at all
     'resistance-break',      # resistance break + pullback — ATR SL, not PM Trail
+    'hh-hl',                 # Structure Sniper — ATR-based SL/TP, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
@@ -1623,9 +1657,9 @@ EXHAUSTION_MINUS_ENABLED       = True    # exhaustion- SHORT
 GUPPY_ENABLED            = False
 GUPPY_PLUS_ENABLED             = False   # guppy+ LONG
 GUPPY_MINUS_ENABLED            = False   # guppy- SHORT
-HH_HL_ENABLED            = False   # HH/HL breakout + pullback structure
-HH_HL_PLUS_ENABLED            = True    # hh_hl+ LONG (breakout/pullback)
-HH_HL_MINUS_ENABLED           = True    # hh_hl- SHORT (breakout/pullback)
+HH_HL_ENABLED            = True    # HH/HL v2 Structure Sniper — multi-confluence market structure
+HH_HL_PLUS_ENABLED            = True    # hh-hl+ LONG (breakout in HH/HL uptrend)
+HH_HL_MINUS_ENABLED           = True    # hh-hl- SHORT (breakout in LH/LL downtrend)
 HH_HL_CHOCH_ENABLED           = True    # CHoCH reversal signals (separate from breakout/pullback)
 HH_HL_CHOCH_PLUS_ENABLED      = True    # choch+ bullish flip (LH_LL→HH_HL)
 HH_HL_CHOCH_MINUS_ENABLED     = True    # choch- bearish flip (HH_HL→LH_LL)
@@ -2185,6 +2219,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
     'squeeze-reversal', 'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout', 'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
+    'hh-hl',  # Structure Sniper — multi-confluence market structure breakout, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -2707,22 +2742,20 @@ MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for h
 MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
 MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
 
-# ── Mover Signal v2 (trend-following fast mover detection) ────────────────
-# mover.py — catches coins in strong directional moves, avoids peaks/valleys
+# ── Mover Signal v3 (acceleration-based fast mover detection) ─────────────
+# mover.py — catches coins ACCELERATING into moves, not just moving
+# Uses velocity acceleration as primary signal (fires at START of move)
 MOVER_ENABLED = True                    # master kill-switch
 MOVER_PLUS_ENABLED = True               # LONG direction
 MOVER_MINUS_ENABLED = True              # SHORT direction
 MOVER_TOP_N = 20                        # top N candidates to evaluate
-MOVER_VELOCITY_MIN = 1.0                # min velocity % to qualify (real moves only)
+MOVER_VELOCITY_MIN = 0.3                # min velocity % (lowered — acceleration is primary)
 MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)
 MOVER_VOLUME_RATIO = 1.3                # volume must be 1.3x average
 MOVER_COOLDOWN_HOURS = 2                # per token+direction cooldown
 MOVER_CONF_BASE = 75                    # base confidence
 MOVER_CONF_CAP = 88                     # max confidence (system ceiling)
-MOVER_RSI_MIN = 30                      # don't short below this RSI (oversold)
-MOVER_RSI_MAX = 70                      # don't buy above this RSI (overbought)
-MOVER_BB_POSITION_MAX = 0.85            # don't enter above this BB position (0=lower, 1=upper)
-MOVER_PROXIMITY_PCT = 0.5               # % — don't enter within this % of recent high/low
+MOVER_ACCEL_MIN = 0.3                   # min acceleration % to qualify (moves must be speeding up)
 
 # ── Continuation V2 (smart re-entry after profitable close) ─────────────
 # continuation.py V2 — assess trend state, fire same-dir or fade exhaustion

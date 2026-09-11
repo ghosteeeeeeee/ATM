@@ -35,10 +35,7 @@ from hermes_constants import (
     MOVER_CONF_BASE,
     MOVER_CONF_CAP,
     MOVER_COOLDOWN_HOURS,
-    MOVER_RSI_MIN,
-    MOVER_RSI_MAX,
-    MOVER_BB_POSITION_MAX,
-    MOVER_PROXIMITY_PCT,
+    MOVER_ACCEL_MIN,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -240,7 +237,8 @@ def is_near_recent_extreme(closes, direction, lookback=20, proximity_pct=None):
 def detect_mover(token):
     """Detect if token is a fast mover worth trading.
 
-    Trend-following: catches moves in progress, avoids extremes.
+    ACCELERATION-BASED: Catches moves that are SPEEDING UP, not just moving.
+    This fires at the START of a move, not the end.
 
     Returns {direction, confidence, value, price} or None.
     """
@@ -254,49 +252,33 @@ def detect_mover(token):
     if len(candles_1m) < 20:
         return None
 
-    # Compute velocity
+    # Compute velocity and acceleration
     velocity, direction = compute_velocity(closes_5m)
     if direction is None:
         return None
 
-    # Filter: minimum velocity threshold (1.0% = real move)
-    if abs(velocity) < MOVER_VELOCITY_MIN:
-        return None
-
-    # ── PEAK/VALLEY FILTER (trend following) ──────────────────────────────
-    # Don't enter at extremes — wait for pullback within trend
-
-    # RSI filter: avoid overbought (LONG) or oversold (SHORT)
-    rsi = compute_rsi(closes_5m)
-    if direction == 'LONG' and rsi > MOVER_RSI_MAX:
-        return None  # too overextended, wait for pullback
-    if direction == 'SHORT' and rsi < MOVER_RSI_MIN:
-        return None  # too oversold, wait for bounce
-
-    # BB position filter: don't buy at top of bands, don't short at bottom
-    bb_pos = compute_bb_position(closes_5m)
-    if direction == 'LONG' and bb_pos > MOVER_BB_POSITION_MAX:
-        return None  # price at top of range
-    if direction == 'SHORT' and bb_pos < (1 - MOVER_BB_POSITION_MAX):
-        return None  # price at bottom of range
-
-    # Recent extreme proximity: don't chase new highs/lows
-    if is_near_recent_extreme(closes_5m, direction):
-        return None
-
-    # ── END PEAK/VALLEY FILTER ────────────────────────────────────────────
-
-    # Compute acceleration (is the move speeding up?)
     acceleration = compute_velocity_acceleration(closes_5m)
 
-    # Acceleration bonus: accelerating moves are stronger
-    accel_bonus = 0
-    if direction == 'LONG' and acceleration > 0:
-        accel_bonus = min(acceleration * 2, 10)  # up to +10 conf
-    elif direction == 'SHORT' and acceleration < 0:
-        accel_bonus = min(abs(acceleration) * 2, 10)
+    # ── PRIMARY FILTER: ACCELERATION ──────────────────────────────────────
+    # The move must be SPEEDING UP, not just existing
+    # For LONG: acceleration > 0 (velocity increasing)
+    # For SHORT: acceleration < 0 (velocity decreasing/negative accelerating)
+    if direction == 'LONG' and acceleration <= 0:
+        return None  # not accelerating upward
+    if direction == 'SHORT' and acceleration >= 0:
+        return None  # not accelerating downward
 
-    # Volume confirmation
+    # Minimum acceleration threshold (must be meaningful)
+    if abs(acceleration) < MOVER_ACCEL_MIN:  # at least 0.3% acceleration
+        return None
+
+    # ── SECONDARY: MINIMUM VELOCITY ───────────────────────────────────────
+    # Must have some velocity, but lower threshold since acceleration is primary
+    if abs(velocity) < MOVER_VELOCITY_MIN:  # at least 0.3% velocity (lower than before)
+        return None
+
+    # ── VOLUME CONFIRMATION ───────────────────────────────────────────────
+    # Volume must confirm the move is real
     if not volume_gate(candles_1m, min_ratio=MOVER_VOLUME_RATIO):
         return None
 
@@ -305,19 +287,33 @@ def detect_mover(token):
     if len(confirmed_candles) < 2:
         return None
 
-    # Compute confidence based on velocity strength
+    # ── COMPUTE CONFIDENCE ────────────────────────────────────────────────
     conf = MOVER_CONF_BASE
-    # Stronger velocity = higher confidence
-    velocity_strength = abs(velocity) / MOVER_VELOCITY_MIN  # 1.0 = minimum, 2.0 = 2x min
-    if velocity_strength > 3.0:
+
+    # Acceleration bonus: stronger acceleration = higher confidence
+    accel_strength = abs(acceleration) / MOVER_ACCEL_MIN  # 1.0 = minimum, 2.0 = 2x min
+    if accel_strength > 3.0:
+        conf += 15
+    elif accel_strength > 2.0:
         conf += 10
-    elif velocity_strength > 2.0:
+    elif accel_strength > 1.5:
         conf += 5
-    conf += accel_bonus
+
+    # Velocity bonus: stronger velocity = higher confidence
+    velocity_strength = abs(velocity) / MOVER_VELOCITY_MIN
+    if velocity_strength > 5.0:
+        conf += 10
+    elif velocity_strength > 3.0:
+        conf += 5
+
     conf = min(conf, MOVER_CONF_CAP)
 
     # Get current price
     price = closes_5m[-1]
+
+    # Compute RSI and BB for logging only (not filtering)
+    rsi = compute_rsi(closes_5m)
+    bb_pos = compute_bb_position(closes_5m)
 
     return {
         'direction': direction,
