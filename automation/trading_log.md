@@ -2125,3 +2125,18 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 
 **Changes:** Disk cleanup — 9.5G freed from /tmp compile caches.
 **Status:** System healthy. 7d positive. R:R improving.
+
+## [2026-09-11 19:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.20 (WR: 100%)
+
+**No Change Needed:**
+- Kill criteria: accel-300-v4-short- already killed 12:10, pump-chain+ 10T/30%WR has wins (needs 0%WR 3+), pullback-entry- 8T/37.5%WR has wins (needs 0%WR 3+), ema300-dip-long 1T (needs 3+), liq-hunt+ 1T (needs 3+)
+- atr_sl_hit 20T/52T = 38.5% of exits — below 40% threshold
+- Trade freq 2.6/hr normal
+- 6h trend 5/7 hours positive
+- Market: 98% NEUTRAL on 5m
+- 4 open positions
+
+**Open Questions:** None

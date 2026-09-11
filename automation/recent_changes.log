@@ -1421,3 +1421,7 @@
   WHY: 2T last hour (2W 0L +$0.11). DOT mover- SHORT profit-monster-trail +$0.09, LDO mover+ LONG profit-monster-trail +$0.02. 53T/24h ~50%WR -$0.44. Kill criteria not met: accel-300-v4-short- 3T 0%WR (already killed 12:10), ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+). pump-chain+ 10T 30%WR -$0.59 worst signal but has wins, doesn't meet kill threshold. pullback-entry- 8T 37.5%WR -$0.42 poor but has wins. atr_sl_hit 22T 42.3% borderline not critical. 6h trend 6/7 hours positive. Trade freq 3/hr normal. 98% tokens NEUTRAL. 3 open positions.
   BY: auto_1hr
   NEXT: Re-run at 19:10 UTC
+[2026-09-11 19:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.20). APT mover- SHORT profit-monster-trail +$0.11, BTC pump-chain- SHORT rr_engine_resistance +$0.09. 52T/24h ~50%WR -$0.84. Kill criteria not met: accel-300-v4-short- 3T 0%WR (already killed 12:10), pump-chain+ 10T 30%WR -$0.59 has wins, pullback-entry- 8T 37.5%WR -$0.42 has wins, ema300-dip-long 1T 0%WR (needs 3+), liq-hunt+ 1T 0%WR (needs 3+). atr_sl_hit 38.5% below 40% threshold. 6h trend 5/7 positive. Trade freq 2.6/hr normal. 98% tokens NEUTRAL. 4 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 20:10 UTC
