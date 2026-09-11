@@ -423,11 +423,11 @@ def _get_closes_from_candles_1m(token, lookback=50):
     conn = None
     try:
         from paths import CANDLES_DB
-        conn = _sqlite3.connect(CANDLES_DB, timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT close FROM (
-                SELECT close FROM candles_1m
+                SELECT ts, close FROM candles_1m
                 WHERE token = ? ORDER BY ts DESC LIMIT ?
             ) sub ORDER BY ts ASC
         """, (token.upper(), lookback))
@@ -2010,6 +2010,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import VOLUME_CLIMAX_MINUS_ENABLED
                     if not VOLUME_CLIMAX_MINUS_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLUME_CLIMAX_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # hh-hl (Structure Sniper — multi-confluence market structure)
+            if _comp == 'hh-hl+':
+                try:
+                    from hermes_constants import HH_HL_PLUS_ENABLED
+                    if not HH_HL_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HH_HL_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'hh-hl-':
+                try:
+                    from hermes_constants import HH_HL_MINUS_ENABLED
+                    if not HH_HL_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HH_HL_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'hh-hl':
+                try:
+                    from hermes_constants import HH_HL_ENABLED
+                    if not HH_HL_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HH_HL_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
