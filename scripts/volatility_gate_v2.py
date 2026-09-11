@@ -60,6 +60,10 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
+        'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -91,6 +95,10 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -120,6 +128,10 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -136,6 +148,10 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
+        'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
     },
 }
 

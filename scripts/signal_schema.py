@@ -1998,6 +1998,24 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # continuum-osc+ (score cadence oscillator LONG)
+            if _comp == 'continuum-osc+':
+                try:
+                    from hermes_constants import CONTINUUM_OSC_ENABLED, CONTINUUM_OSC_PLUS_ENABLED
+                    if not CONTINUUM_OSC_ENABLED or not CONTINUUM_OSC_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_OSC_LONG=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # continuum-osc- (score cadence oscillator SHORT)
+            if _comp == 'continuum-osc-':
+                try:
+                    from hermes_constants import CONTINUUM_OSC_ENABLED, CONTINUUM_OSC_MINUS_ENABLED
+                    if not CONTINUUM_OSC_ENABLED or not CONTINUUM_OSC_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUUM_OSC_SHORT=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # warrior-sr-confirm (Warrior Trading S/R + candlestick + volume)
             if _comp == 'warrior-sr-confirm+':
                 try:
