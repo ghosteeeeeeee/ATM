@@ -1239,6 +1239,56 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Tide detection: BTC 3h momentum + SHORT WR confirmation
     tide_mult = get_tide_penalty(token, direction)
 
+    # Continuum context boost: BTC trend alignment from continuum engine
+    # Signals aligned with BTC macro trend get boosted, counter-trend penalized
+    try:
+        from continuum_context import get_trend_boost
+        continuum_boost = get_trend_boost(direction)
+        # Convert -0.10..+0.15 boost to a multiplier: boost=0→1.0, +0.15→1.15, -0.10→0.90
+        continuum_mult = 1.0 + continuum_boost
+        if abs(continuum_boost) >= 0.05:
+            log(f"  🌊 [CONTINUUM] {token} {direction}: BTC trend boost {continuum_boost:+.1%} → {continuum_mult:.2f}x")
+    except Exception:
+        continuum_mult = 1.0
+
+    # Universal trend filter: block counter-trend trades when EMA20/50 disagree
+    trend_filter_mult = 1.0
+    try:
+        from hermes_constants import TREND_FILTER_ENABLED, TREND_FILTER_TIMEFRAME, TREND_FILTER_EMA_FAST, TREND_FILTER_EMA_SLOW, TREND_FILTER_NEUTRAL_PCT
+        if TREND_FILTER_ENABLED:
+            import sqlite3 as _tf_sqlite
+            from paths import CANDLES_DB
+            _tf_conn = _tf_sqlite.connect(CANDLES_DB, timeout=5)
+            try:
+                _tf_cur = _tf_conn.cursor()
+                _tf_table = f'candles_{TREND_FILTER_TIMEFRAME}'
+                _tf_cur.execute(f"SELECT close FROM {_tf_table} WHERE token=? ORDER BY ts DESC LIMIT ?", (token, max(TREND_FILTER_EMA_FAST, TREND_FILTER_EMA_SLOW) + 10))
+                _tf_closes = [r[0] for r in _tf_cur.fetchall()]
+                _tf_cur.close()
+                if len(_tf_closes) >= TREND_FILTER_EMA_SLOW:
+                    # Compute EMAs
+                    _k_fast = 2 / (TREND_FILTER_EMA_FAST + 1)
+                    _k_slow = 2 / (TREND_FILTER_EMA_SLOW + 1)
+                    _ema_fast = sum(_tf_closes[:TREND_FILTER_EMA_FAST]) / TREND_FILTER_EMA_FAST
+                    _ema_slow = sum(_tf_closes[:TREND_FILTER_EMA_SLOW]) / TREND_FILTER_EMA_SLOW
+                    for _p in _tf_closes[TREND_FILTER_EMA_FAST:]:
+                        _ema_fast = _p * _k_fast + _ema_fast * (1 - _k_fast)
+                    for _p in _tf_closes[TREND_FILTER_EMA_SLOW:]:
+                        _ema_slow = _p * _k_slow + _ema_slow * (1 - _k_slow)
+                    _ema_spread = abs(_ema_fast - _ema_slow) / _ema_slow * 100 if _ema_slow > 0 else 0
+                    _trend_bull = _ema_fast > _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
+                    _trend_bear = _ema_fast < _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
+                    if direction == 'LONG' and _trend_bear:
+                        trend_filter_mult = 0.7  # counter-trend penalty
+                        log(f"  📉 [TREND-FILTER] {token} LONG: EMA{_tf_closes[0]:.2f}<{TREND_FILTER_EMA_SLOW} bearish → {trend_filter_mult:.2f}x")
+                    elif direction == 'SHORT' and _trend_bull:
+                        trend_filter_mult = 0.7
+                        log(f"  📈 [TREND-FILTER] {token} SHORT: EMA{_tf_closes[0]:.2f}>{TREND_FILTER_EMA_SLOW} bullish → {trend_filter_mult:.2f}x")
+            finally:
+                _tf_conn.close()
+    except Exception:
+        pass
+
     # Surfing.md quadrant filter: z-score + acceleration alignment
     zscore_accel_mult = get_zscore_accel_penalty(token, direction)
 
@@ -1491,7 +1541,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                 except Exception:
                     pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
     return final_score
 
 

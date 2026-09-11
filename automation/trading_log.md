@@ -2185,3 +2185,29 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 
 **Open Questions:**
 - rr_engine_resistance is dominant loss driver (14T, -$0.86 total) — worth investigating filter tightness in future
+
+## [2026-09-11 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 60T 50%WR -$1.16 | 5 open (BTC, BCH, MNT, LTC, BANANA)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 21T 35% avg -$0.052
+- profit-monster-trail: 15T avg +$0.117
+- rr_engine_resistance: 14T avg -$0.061
+- cut-loser-CL-T1: 5T avg -$0.188
+
+**24h Worst Signals:**
+- pump-chain+: 9T 22.2%WR -$0.62 (already killed 13:15)
+- pullback-entry-: 8T 37.5%WR -$0.42
+- bb-bounce-v2-long+: 4T 25%WR -$0.47
+
+**Changes:** None — 0 trades last hour, no kill criteria met.
+
+**No Change Needed:**
+- Kill criteria: no signal has 0%WR with 3+ trades last hour (0 trades total)
+- atr_sl_hit 21/60 = 35% — below 40% threshold
+- 6h trend: 22:00 bucket 66.7% WR -$0.04 (neutral)
+- 5 open positions, all recently entered
+
+**Open Questions:** None

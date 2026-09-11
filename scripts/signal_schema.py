@@ -2139,6 +2139,18 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             metadata.update({k: v for k, v in enriched.items() if v is not None})
             metadata['price_at_signal'] = price
 
+        # Add BTC continuum context to metadata (prerequisite for correlation analysis)
+        try:
+            from continuum_context import get_btc_trend_context
+            _btc_ctx = get_btc_trend_context()
+            if _btc_ctx.get('available'):
+                metadata['btc_score'] = round(_btc_ctx['score'], 1)
+                metadata['btc_trend_bias'] = round(_btc_ctx['trend_bias'], 3)
+                metadata['btc_linreg_bias'] = round(_btc_ctx['linreg_bias'], 3)
+                metadata['btc_regime'] = _btc_ctx['regime']
+        except Exception:
+            pass  # Don't block signal creation on context failure
+
         # ── CONFLICT GUARD — REMOVED 2026-04-27 ───────────────────────────────────
         # Removed: relying on signal_compactor's opp_penalty instead (-15% per
         # opposing source, 5-min window). The conflict guard was causing counter_flip
