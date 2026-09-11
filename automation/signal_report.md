@@ -1,66 +1,51 @@
-# Signal Performance Report
-**Period:** Last 6h / 24h | **Generated:** 2026-09-10 23:08 UTC
+=== Signal Performance Report ===
+Period: 2026-09-11 | Last 6h + 24h
 
-## KILLED (executed)
+## 6h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-bounce-v2-long+ | LONG | 3 | 33.3% | -$0.21 |
+| mover+ | LONG | 3 | 66.7% | -$0.21 |
+| pullback-entry- | SHORT | 2 | 0.0% | -$0.19 |
+| pump-chain- | SHORT | 3 | 33.3% | -$0.19 |
+
+## 24h Performance
+| Signal | Dir | Trades | WR | PnL | Avg PnL |
+|--------|-----|--------|-----|-----|---------|
+| pump-chain+ | LONG | 7 | 28.6% | -$0.61 | -$0.087 |
+| accel-300-v4-short- | SHORT | 2 | 0.0% | -$0.31 | -$0.155 |
+| mover+ | LONG | 3 | 66.7% | -$0.21 | -$0.070 |
+| bb-bounce-v2-long+ | LONG | 4 | 50.0% | -$0.19 | -$0.048 |
+| pullback-entry- | SHORT | 11 | 45.5% | -$0.01 | -$0.001 |
+| pump-chain- | SHORT | 20 | 65.0% | +$1.03 | +$0.052 |
+
+**Total 24h:** 50 trades, 50.0% WR, -$0.49 PnL
+
+## KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No kill candidates |
+| pump-chain+ | LONG | 28.6% | -$0.61 | 7 | Regime block: 0.0x in HIGH volatility |
 
-## BOOSTED (executed)
+**Details:** pump-chain+ LONG wins in EXTREME regime (42.9% WR, +$0.09) but loses badly in HIGH regime (0% WR, -$0.11). Added `Pump_Flow: 0.0` multiplier to `('HIGH', '*')` in `volatility_gate_v2.py` VOL_PHASE_MULTS. SHORT side unaffected (65% WR, +$1.03).
+
+## BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No boost candidates |
+| (none) | | | | | No boost candidates — no signal has WR>55% with 5+ trades AND positive PnL |
 
-## LOSERS (watch list)
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v4-short- | SHORT | 33.3% | +$0.01 | 3 | Too few trades (first: 2026-09-10) |
-| pump-chain+ | LONG | 42.9% | +$0.09 | 7 | Marginal — positive PnL despite sub-50% WR |
-| pullback-entry+ | LONG | 16.7% | -$0.57 | 6 | KILLED by CEO 2026-09-10 — NEVER_REENABLE |
+| accel-300-v4-short- | SHORT | 0.0% | -$0.31 | 2 | Watch — insufficient data (2 trades) |
+| bb-bounce-v2-long+ | LONG | 50.0% | -$0.19 | 4 | Watch — borderline WR, small losses |
+| mover+ | LONG | 66.7% | -$0.21 | 3 | Watch — good WR but negative PnL |
 
-## WINNERS
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 70.6% | +$1.22 | 17 | STRONG — consistent across EXTREME/HIGH |
-| pullback-entry- | SHORT | 58.3% | +$0.13 | 12 | SOLID — 75% WR in HIGH regime |
+| pump-chain- | SHORT | 65.0% | +$1.03 | 20 | Strong performer — keep |
 
-## 6h Snapshot (variance check)
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| pullback-entry- | SHORT | 25.0% | -$0.41 | 4 |
-| pump-chain+ | LONG | 33.3% | -$0.24 | 3 |
-| pump-chain- | SHORT | 66.7% | +$0.03 | 3 |
-
-## Regime Breakdown (24h)
-**pullback-entry- SHORT:**
-| Regime | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| HIGH | 8 | 75.0% | +$0.46 |
-| EXTREME | 2 | 50.0% | -$0.18 |
-| NORMAL | 2 | 0.0% | -$0.15 |
-
-**pump-chain- SHORT:**
-| Regime | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| EXTREME | 10 | 70.0% | +$0.86 |
-| HIGH | 6 | 66.7% | +$0.31 |
-
-**pump-chain+ LONG:**
-| Regime | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| EXTREME | 7 | 42.9% | +$0.09 |
-
-## All-Time Regime (pullback-entry- SHORT)
-| Regime | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| HIGH | 13 | 76.9% | +$1.01 |
-| EXTREME | 8 | 75.0% | +$1.03 |
-| NORMAL | 4 | 50.0% | -$0.10 |
-
-## ISSUES
-- **No signal inversions detected**
-- **pullback-entry- SHORT:** 0% WR in NORMAL (2 trades) and EXTREME (2 trades) in 24h, but all-time EXTREME is 75% — likely variance. NORMAL all-time is 50%/$-0.10 — marginal. No action yet.
-- **accel-300-v4-short-:** Only 3 trades total, first trade 2026-09-10. Needs 5+ trades before any action.
-
-## Summary
-No kills or boosts executed. System is healthy — 44 trades in 24h, all active signals profitable overall. The 6h losers (pullback-entry- SHORT, pump-chain+ LONG) are variance within winning 24h trends. pullback-entry+ LONG remains killed per CEO directive (NEVER_REENABLE).
+## ISSUES:
+- No direction inversions detected (LONG signals not firing SHORT, vice versa)
+- Total 24h PnL slightly negative (-$0.49) — 50 trades is a moderate sample
+- mover+ has 66.7% WR but negative PnL — winning trades smaller than losing trades (R:R issue)

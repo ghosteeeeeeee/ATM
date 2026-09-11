@@ -212,6 +212,7 @@ VOL_PHASE_MULTS = {
         'Coiled_Spring': 0.0,   # BLOCKED — 20% WR in HIGH, only trade NORMAL
         'Trendline': 0.3,       # BLOCKED SHORT — 33% WR in HIGH, wins in NORMAL
         'Bollinger': 0.0,       # BLOCKED LONG — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
+        'Pump_Flow': 0.0,       # BLOCKED pump-chain+ LONG — 28.6% WR, -$0.61 (24h), wins only in EXTREME
     },
 }
 
