@@ -271,12 +271,6 @@ def scan_signals() -> int:
     
     direction = sig['direction']
     
-    # Per-direction kill-switch
-    if direction == 'LONG' and not CONTINUUM_TREND_ALIGN_ENABLED:
-        return 0
-    if direction == 'SHORT' and not CONTINUUM_TREND_REVERSAL_ENABLED:
-        return 0
-    
     # Cooldown
     if get_cooldown(token, direction=direction):
         return 0
