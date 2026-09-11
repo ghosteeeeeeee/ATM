@@ -3097,6 +3097,12 @@ RR_STRUCTURAL_CONF_BASE       = 65     # base confidence
 RR_STRUCTURAL_CONF_CAP        = 92     # max confidence
 RR_STRUCTURAL_OPEN_SKY_BONUS  = 5      # bonus for open skies (no resistance)
 RR_STRUCTURAL_LIQ_BONUS       = 5      # bonus for liquidity proximity
+RR_STRUCTURAL_RR_CONF_MULT    = 5      # R:R-to-confidence multiplier
+RR_STRUCTURAL_RR_CONF_CAP     = 20     # max R:R bonus points
+RR_STRUCTURAL_GRADE_A_BONUS   = 10     # Grade A confidence bonus
+RR_STRUCTURAL_GRADE_B_BONUS   = 5      # Grade B confidence bonus
+RR_STRUCTURAL_MAGNET_THRESH   = 0.5    # magnet score threshold for liquidity bonus
+RR_STRUCTURAL_MAX_PRICE_AGE   = 10     # max price age in minutes
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias

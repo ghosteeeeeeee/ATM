@@ -15,7 +15,6 @@ from tokens import get_all_tradeable_tokens
 from risk_reward_engine import evaluate_rr
 
 from hermes_constants import (
-    RR_STRUCTURAL_ENABLED,
     RR_STRUCTURAL_PLUS_ENABLED,
     RR_STRUCTURAL_MINUS_ENABLED,
     RR_STRUCTURAL_MIN_SCORE,
@@ -28,6 +27,12 @@ from hermes_constants import (
     RR_STRUCTURAL_CONF_CAP,
     RR_STRUCTURAL_OPEN_SKY_BONUS,
     RR_STRUCTURAL_LIQ_BONUS,
+    RR_STRUCTURAL_RR_CONF_MULT,
+    RR_STRUCTURAL_RR_CONF_CAP,
+    RR_STRUCTURAL_GRADE_A_BONUS,
+    RR_STRUCTURAL_GRADE_B_BONUS,
+    RR_STRUCTURAL_MAGNET_THRESH,
+    RR_STRUCTURAL_MAX_PRICE_AGE,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -83,8 +88,8 @@ def detect(token, price):
 
     # Compute confidence
     conf = RR_STRUCTURAL_CONF_BASE
-    conf += min(20, int((result['rr_ratio'] - 3.0) * 5))
-    conf += 10 if result['grade'] == 'A' else 5
+    conf += min(RR_STRUCTURAL_RR_CONF_CAP, int((result['rr_ratio'] - RR_STRUCTURAL_MIN_RR) * RR_STRUCTURAL_RR_CONF_MULT))
+    conf += RR_STRUCTURAL_GRADE_A_BONUS if result['grade'] == 'A' else RR_STRUCTURAL_GRADE_B_BONUS
 
     # Open skies bonus
     if direction == 'LONG':
@@ -95,7 +100,7 @@ def detect(token, price):
         conf += RR_STRUCTURAL_OPEN_SKY_BONUS
 
     # Liquidity proximity bonus
-    if result['liquidity'].get('magnet_score', 0) > 0.5:
+    if result['liquidity'].get('magnet_score', 0) > RR_STRUCTURAL_MAGNET_THRESH:
         conf += RR_STRUCTURAL_LIQ_BONUS
 
     conf = min(RR_STRUCTURAL_CONF_CAP, conf)
@@ -120,7 +125,7 @@ def scan_signals():
         token_upper = token.upper()
 
         # Price age check
-        if price_age_minutes(token) > 10:
+        if price_age_minutes(token) > RR_STRUCTURAL_MAX_PRICE_AGE:
             continue
 
         # Get latest price

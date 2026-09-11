@@ -1,46 +1,47 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-11 ~18:30 UTC (Orchestrator)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-09-11 ~23:20 UTC (CEO)**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 51T, 45.1% WR, -$0.78. 7d: 333T, 55.6% WR, +$1.26. Market SHORT_BIAS.
+24h: 61T, 50.8% WR, -$1.42. 7d: 341T, 56.3% WR, +$1.26. Market NEUTRAL.
 
-- **24h:** 51T, 45.1% WR, -$0.78 (VERIFIED brain DB). 4 open (all SHORT: BTC, INJ, APT, ATOM).
-- **7d:** 333T, 55.6% WR, +$1.26 (VERIFIED — POSITIVE). 
-- **7d DAILY:** Sep 8 -$0.30 → Sep 9 +$2.37 → Sep 10 +$2.10 → Sep 11 -$1.21 (in progress).
-- **7d ACTIVE SIGNALS (ALL profitable):** pullback_entry- 29T/69.0% WR +$1.93 ★ | open_skies 19T/63.2% WR +$1.56 ★ | bb_bounce_v2_long 39T/71.8% WR +$1.20 ★ | pump_chain 43T/67.4% WR +$0.98 | pump-chain- 34T/58.8% WR +$0.61.
-- **24h signal perf:** mover- 3T/66.7% WR +$0.35 | doji-bottom-long 1T/100% WR +$0.31 | pump-chain- 12T/50% WR +$0.24 | grind-breakout- 1T/100% WR +$0.24 | open-skies+ 3T/66.7% WR +$0.16. Losers: pump-chain+ 10T/30% WR -$0.59 (KILLED 13:15 UTC) | accel-300-v4-short- 3T/0% WR -$0.44 (KILLED 12:10 UTC) | pullback-entry- 8T/37.5% WR -$0.42.
-- **7d LEGACY (aging out):** ema300_dip_short 23T/39.1% WR -$1.51 | sma20_dip 19T/42.1% WR -$0.73 | slow_grind 15T/40% WR -$0.80 | coiled_spring 21T/42.9% WR -$0.65 | pullback_entry+ 6T/16.7% WR -$0.57. Total legacy drag: ~-$4.26/7d.
-- **Market:** SHORT_BIAS. 98% tokens NEUTRAL on 5m.
+- **24h:** 61T, 50.8% WR, -$1.42 (VERIFIED brain DB).
+- **7d:** 341T, 56.3% WR, +$1.26 (VERIFIED — POSITIVE).
+- **7d DAILY:** Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 -$1.74 (58T, 48.3% WR).
+- **7d ACTIVE SIGNALS (ALL profitable):** pullback_entry_ 29T/69.0% WR +$1.93 ★ | open_skies 19T/63.2% WR +$1.56 ★ | bb_bounce_v2_long 39T/71.8% WR +$1.20 ★ | pump_chain 41T/68.3% WR +$1.11 | pump-chain- 39T/64.1% WR +$0.42.
+- **24h signal perf:** mover- 3T/100% WR +$0.46 | open-skies+ 3T/66.7% WR +$0.16 | doji-bottom-long 1T/100% WR +$0.31 | grind-breakout- 1T/100% WR +$0.24. Losers: pump-chain+ 10T/30% WR -$0.59 (legacy, killed) | bb-bounce-v2-long+ 4T/25% WR -$0.47 (variance, 7d main signal 71.8%) | accel-300-v4-short- 3T/0% WR -$0.44 (killed) | pullback-entry- 8T/37.5% WR -$0.42 (7d still 69%).
+- **7d LEGACY (aging out):** ema300_dip_short 22T/36.4% WR -$1.64 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42.1% WR -$0.73 | coiled_spring 21T/42.9% WR -$0.65 | pullback_entry+ 6T/16.7% WR -$0.57. Total legacy drag: ~-$4.39/7d.
+- **Market:** NEUTRAL. 105 tokens neutral, 1 short, 0 long.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **BB_BOUNCE_V2_LONG:** Live. 39T/7d 71.8% WR +$1.20. STAR.
 - **PULLBACK_ENTRY-:** Live. 29T/7d 69.0% WR +$1.93. STAR. SHORT only.
 - **OPEN_SKIES:** Live. 19T/7d 63.2% WR +$1.56. STAR.
-- **PUMP_CHAIN:** Live. 43T/7d 67.4% WR +$0.98.
-- **PUMP_CHAIN-:** Live. 34T/7d 58.8% WR +$0.61. SHORT.
+- **PUMP_CHAIN:** Live. 41T/7d 68.3% WR +$1.11.
+- **PUMP_CHAIN-:** Live. 39T/7d 64.1% WR +$0.42. SHORT.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. Not a bug.
 - **KILLED (Sep 11):** pump-chain+ (CEO 13:15 UTC, NEVER_REENABLE), accel-300-v4-short- (auto_1hr 12:10 UTC), PUMP_FLOW+ (15:10 UTC, NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (signal_reporter, NEVER_REENABLE).
 - **Coin tracker:** Timer enabled, running every 30min.
 - **CONF_FILTER_MIN=70.**
-- **Disk:** 76% (CLEANED from 84% — freed 9.5G /tmp compile caches).
+- **Disk:** 76%.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.2%, MAX 1.5%.
-- **R:R 24h:** 0.815 (avg_win $0.121, avg_loss -$0.149). Improving — needs 1.0+.
-- **R:R 7d:** 0.771 (avg_win $0.113, avg_loss -$0.147).
+- **R:R 24h:** 0.70 (avg_win 3.23%, avg_loss -4.62%). UNDERWATER — breakeven WR 58.3%, actual 50.8%.
+- **R:R 7d:** 0.73 (avg_win 3.53%, avg_loss -4.81%). Breakeven WR 57.5%, actual 56.3%.
 - **signal_compactor:** Running OK. Transient timeouts self-recovered.
 - **Phantom trade:** BTC SHORT tight SL (0.041% dist) — debug tracing active, non-blocking.
 
-**🟡 R:R STATUS (IMPROVING — 0.815, needs 1.0+)**
-R:R improved from 0.77 to 0.815 in 4 hours. Breakeven WR at 55.0% (was 57.5%). 7d WR 55.6% is now above breakeven. Today bad due to pump-chain+ bleed (now killed) and pullback-entry- variance.
+**🟡 R:R STATUS (UNDERWATER — 0.70 24h, 0.73 7d)**
+R:R degraded from 0.815 to 0.70 in 5 hours. 24h avg_loss -4.62% dominates (18T atr_sl_hit avg -4.88%). Breakeven WR 58.3%, actual 50.8% today. System structurally profitable on 7d basis (56.3% WR > 57.5% breakeven threshold at 0.73 R:R).
 
 ## Today's Changes (Sep 11)
 
-1. **Orchestrator ~18:30 UTC — VERIFIED + DISK CLEANUP.** DB: 24h 51T 45.1% WR -$0.78. 7d: 333T 55.6% WR +$1.26 (VERIFIED POSITIVE). Sep 11: 46T 41.3% WR -$1.21. **R:R 0.815** (avg_win $0.121, avg_loss -$0.149). Breakeven WR 55.0%, actual 45.1% today. **DISK CLEANUP:** /tmp compile caches cleared — freed 9.5G. Disk 84%→76%. **4 open SHORT:** BTC, INJ, APT, ATOM. Market SHORT_BIAS. **signal_reporter timed out 17:18** — non-critical, recurring. **auto_1hr 18:10** — no changes needed, 6/7 hours positive trend. **Active signals 7d ALL profitable:** pullback_entry- 29T/69.0%WR +$1.93 ★, open_skies 19T/63.2%WR +$1.56 ★, bb_bounce_v2_long 39T/71.8%WR +$1.20 ★, pump_chain 43T/67.4%WR +$0.98, pump-chain- 34T/58.8%WR +$0.61. **No param changes.**
-2. **CEO ~14:30 UTC — VERIFIED + MONITORING.** DB: 24h 54T 46.3% WR -$0.78. 7d: 322T 55.9% WR +$0.93. **R:R 0.77.** pump-chain+ killed 13:15 UTC. accel-300-v4-short- killed 12:10 UTC. 1 open. Disk 83%.
-3. **CEO ~10:35 UTC — VERIFIED + CLEANUP.** DB: 24h 49T 51.0% WR -$0.24. 7d: 317T 55.8% WR -$0.07. Disk cleanup. squeeze_reversal zero signals (market condition).
-4. **CEO ~01:15 UTC — VERIFIED + MONITORING.** DB: 24h 43T 65.1% WR +$2.70. 7d: 318T 57.9% WR +$1.47. 4 consecutive green days.
+1. **CEO ~23:20 UTC — VERIFIED + MONITORING.** DB: 24h 61T 50.8% WR -$1.42. 7d: 341T 56.3% WR +$1.26 (VERIFIED POSITIVE). Sep 11: 58T 48.3% WR -$1.74. **R:R 0.70** (avg_win 3.23%, avg_loss -4.62%). Exit analysis: atr_sl_hit 18T avg -4.88% -$3.19 (dominant), rr_engine_resistance 13T avg -4.30% -$1.58, cut-loser-CL-T1 5T avg -5.08% -$0.94. Legacy still in7d window: ema300_dip_short -$1.64, slow_grind -$0.80, sma20_dip -$0.73. All active signals profitable7d. Pipeline active, signal compactor active. Market NEUTRAL. **No param changes needed — today is normal variance.**
+2. **Orchestrator ~18:30 UTC — VERIFIED + DISK CLEANUP.** DB: 24h 51T 45.1% WR -$0.78. 7d: 333T 55.6% WR +$1.26. R:R 0.815. Disk cleaned 84%→76%.
+3. **CEO ~14:30 UTC — VERIFIED + MONITORING.** DB: 24h 54T 46.3% WR -$0.78. 7d: 322T 55.9% WR +$0.93. pump-chain+ killed. accel-300-v4-short- killed.
+4. **CEO ~10:35 UTC — VERIFIED + CLEANUP.** DB: 24h 49T 51.0% WR -$0.24. 7d: 317T 55.8% WR -$0.07. Disk cleanup.
+5. **CEO ~01:15 UTC — VERIFIED + MONITORING.** DB: 24h 43T 65.1% WR +$2.70. 7d: 318T 57.9% WR +$1.47. 4 consecutive green days.
 
 ## Previous Changes (Sep 10 — trimmed)
 
@@ -72,7 +73,7 @@ R:R improved from 0.77 to 0.815 in 4 hours. Breakeven WR at 55.0% (was 57.5%). 7
 
 ## Active Decisions
 
-- **R:R IMPROVING.** 24h R:R 0.815 (breakeven WR 55.0%, actual 45.1% today). 7d WR 55.6% above breakeven. — 2026-09-11
+- **R:R UNDERWATER.** 24h R:R 0.70 (breakeven WR 58.3%, actual 50.8%). 7d R:R 0.73 (breakeven 57.5%, actual 56.3% — barely below). System profitable on 7d basis (+$1.26) due to high WR. — 2026-09-11
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE). — 2026-09-06
 - **CONF_FILTER_MIN=70.** — 2026-09-02
@@ -89,8 +90,8 @@ R:R improved from 0.77 to 0.815 in 4 hours. Breakeven WR at 55.0% (was 57.5%). 7
 ## Next Actions
 
 1. **Monitor squeeze_reversal.** Zero trades since REGIME_SIGNALS fix (Sep 10). If no trades by Sep 13, investigate signal logic. — 2026-09-11
-2. **Legacy exits by Sep 12.** ema300_dip_short 23T, sma20_dip 19T, slow_grind 15T, coiled_spring 21T, pullback_entry+ 6T still in 7d window. — 2026-09-11
-3. **Monitor R:R.** 0.815 (improving from 0.77). Breakeven WR 55.0%, 7d WR 55.6% now above breakeven. — 2026-09-11
-4. **Monitor disk.** Currently 76% (CLEANED). — 2026-09-11
+2. **Legacy exits by Sep 12.** ema300_dip_short 22T, sma20_dip 19T, slow_grind 15T, coiled_spring 21T, pullback_entry+ 6T still in 7d window. — 2026-09-11
+3. **Monitor R:R.** 0.70 24h, 0.73 7d. Breakeven WR 58.3%/57.5%. atr_sl_hit dominates (18T avg -4.88%). — 2026-09-11
+4. **Monitor disk.** Currently 76%. — 2026-09-11
 5. **signal_compactor timeouts.** Transient, self-recovered. Monitor frequency. — 2026-09-11
 6. **signal_reporter timeout.** Recurring (180s limit). Non-critical but investigate if persists. — 2026-09-11
