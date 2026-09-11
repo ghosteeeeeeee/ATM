@@ -165,7 +165,7 @@ _COMBO_CACHE_TTL = 600  # 10 min
 
 
 def _load_signal_combos():
-    """Load30d token+signal combo performance from PostgreSQL."""
+    """Load30d token+signal+direction combo performance from PostgreSQL."""
     global _combo_cache, _combo_cache_ts
     import time
     now = time.time()
@@ -182,6 +182,7 @@ def _load_signal_combos():
             SELECT
                 token,
                 signal,
+                direction,
                 COUNT(*) as trades,
                 ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
                 ROUND(SUM(pnl_usdt), 2) as total_pnl
@@ -191,19 +192,24 @@ def _load_signal_combos():
               AND pnl_pct IS NOT NULL
               AND close_time > NOW() - INTERVAL '30 days'
               AND signal IS NOT NULL
-            GROUP BY token, signal
-            HAVING COUNT(*) >= 5
+            GROUP BY token, signal, direction
+            HAVING COUNT(*) >= 3
         """)
         cache = {}
-        for token, signal, trades, wr, pnl in cur.fetchall():
+        for token, signal, direction, trades, wr, pnl in cur.fetchall():
             # Normalize signal - extract primary signal before comma
             primary_sig = signal.split(',')[0].strip() if signal else signal
-            key = (token.upper(), primary_sig.upper())
+            # Key: (token, signal, direction)
+            key = (token.upper(), primary_sig.upper(), direction.upper() if direction else None)
             cache[key] = {
                 'wr': float(wr) if wr else 50,
                 'trades': int(trades),
                 'pnl': float(pnl) if pnl else 0,
             }
+            # Also store in non-directional cache for fallback
+            nd_key = (token.upper(), primary_sig.upper(), None)
+            if nd_key not in cache or cache[nd_key]['trades'] < trades:
+                cache[nd_key] = cache[key]
         _combo_cache = cache
         _combo_cache_ts = now
         return cache
@@ -216,13 +222,15 @@ def _load_signal_combos():
             except Exception: pass
 
 
-def _get_combo_mult(token, signal):
-    """Get score multiplier for winning token+signal combos.
-    - Legendary (75%+ WR, 10+ trades): 2.5x — always wins
-    - Elite (70%+ WR, 8+ trades): 2.0x
-    - Strong (65%+ WR, 6+ trades): 1.5x
-    - Good (60%+ WR, 5+ trades): 1.25x
+def _get_combo_mult(token, signal, direction=None):
+    """Get score multiplier for winning token+signal+direction combos.
+    - Legendary (75%+ WR, 5+ trades): 2.5x — always wins
+    - Elite (70%+ WR, 4+ trades): 2.0x
+    - Strong (65%+ WR, 4+ trades): 1.5x
+    - Good (60%+ WR, 3+ trades): 1.25x
     - No data or low sample: 1.0x (neutral)
+
+    Direction-specific combos get priority over non-directional.
     """
     combos = _load_signal_combos()
     if not signal:
@@ -230,22 +238,26 @@ def _get_combo_mult(token, signal):
 
     # Normalize signal
     primary_sig = signal.split(',')[0].strip() if signal else signal
-    key = (token.upper(), primary_sig.upper())
-    data = combos.get(key)
 
-    if not data or data['trades'] < 5:
+    # Try direction-specific first, then fallback to non-directional
+    dir_key = (token.upper(), primary_sig.upper(), direction.upper() if direction else None)
+    nd_key = (token.upper(), primary_sig.upper(), None)
+
+    data = combos.get(dir_key) or combos.get(nd_key)
+
+    if not data or data['trades'] < 3:
         return 1.0
 
     wr = data['wr']
     trades = data['trades']
 
-    if wr >= 75 and trades >= 10:
+    if wr >= 75 and trades >= 5:
         return 2.5   # Legendary — always wins
-    elif wr >= 70 and trades >= 8:
+    elif wr >= 70 and trades >= 4:
         return 2.0   # Elite
-    elif wr >= 65 and trades >= 6:
+    elif wr >= 65 and trades >= 4:
         return 1.5   # Strong
-    elif wr >= 60 and trades >= 5:
+    elif wr >= 60 and trades >= 3:
         return 1.25  # Good
     return 1.0
 
@@ -1213,10 +1225,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     # 30d leaderboard bonus/penalty — long-term performers get extra boost
     leaderboard_mult = _get_leaderboard_mult(token)
 
-    # Token+Signal combo bonus — winning combos get huge boost
-    combo_mult = _get_combo_mult(token, source)
+    # Token+Signal+Direction combo bonus — winning combos get huge boost
+    combo_mult = _get_combo_mult(token, source, direction)
     if combo_mult >= 2.0:
-        log(f"  🏆 [COMBO] {token}+{source}: {combo_mult:.1f}x bonus (proven winner)")
+        log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
 
     # Hall of Shame BLOCK — never trade consistent losers (30d WR <45%, 15+ trades)
     if leaderboard_mult <= 0.7:
