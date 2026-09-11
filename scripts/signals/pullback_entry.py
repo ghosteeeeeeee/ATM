@@ -178,6 +178,20 @@ def detect(token):
     if direction == 'SHORT' and price > ema:
         return None  # price above EMA = trend broken
 
+    # 7. Momentum alignment check (CEO 2026-09-11)
+    # SHORT with rising momentum = 71% LOSS RATE (5/7 losses in backtest)
+    # LONG with falling momentum = similar anti-trend risk
+    # Check 5-bar velocity (same calc as signal_schema.py enrichment)
+    if len(closes) >= 6:
+        vel_5bar = (closes[-1] - closes[-6]) / closes[-6] * 100
+        momentum_state = 'rising' if vel_5bar > 0.1 else 'falling' if vel_5bar < -0.1 else 'flat'
+        if direction == 'SHORT' and momentum_state == 'rising':
+            return None  # price rising = wrong direction for SHORT
+        if direction == 'LONG' and momentum_state == 'falling':
+            return None  # price falling = wrong direction for LONG
+    else:
+        momentum_state = 'flat'
+
     # RSI check
     rsi = _calc_rsi(closes)
     if rsi is None:
@@ -222,6 +236,7 @@ def detect(token):
         'vol_ratio': vol_ratio,
         'bb_width': bb_width,
         'rsi': rsi,
+        'momentum_state': momentum_state,
     }
 
 
