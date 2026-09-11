@@ -229,6 +229,7 @@ VOL_PHASE_MULTS = {
     ('NORMAL', '*'): {
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in NORMAL, wins in HIGH
         'R2': 0.0,                   # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
+        'Open_Skies': 0.0,           # BLOCKED — open-skies 50% WR in NORMAL, wins in EXTREME
     },
     # HIGH volatility: block Bollinger LONG, coiled_spring dead, penalize Trendline and Accelerate
     ('HIGH', '*'): {
