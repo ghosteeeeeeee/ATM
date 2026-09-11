@@ -671,9 +671,9 @@ WIN_COOLDOWN_MINUTES   = 3         # block same direction for 3 min after a win 
 # ── ATR k Multiplier Constants ────────────────────────────────────────────────
 # Base k: _atr_multiplier(atr_pct) — volatility-driven SL/TP scaling
 # atr_pct = ATR / entry_price
-#   < 1%  → k=1.0  (low volatility — tight stops)
-#   > 3%  → k=2.5  (high volatility — wide stops)
-#   1–3%  → k=2.0  (normal — balanced stops)
+#   < 1%  → k=0.8  (low volatility — tight stops)
+#   > 1.5% → k=1.5  (high volatility — wide stops to survive spikes)
+#   1–1.5% → k=1.0  (normal — balanced stops)
 ATR_K_INITIAL      = 1.2   # initial SL only (reverted to original)
 ATR_K_LOW_VOL      = 0.8   # trailing/accel SL — atr_pct < 1% (was 0.5 — effective SL=0.4%, noise-level. 0.8 gives min 0.96% SL)
 ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.0% <= atr_pct <= 1.5%
@@ -3295,27 +3295,32 @@ DOJI_CONF_BASE                = 75      # base confidence
 DOJI_CONF_CAP                 = 88      # max confidence (system ceiling)
 
 # ── Continuum Score Signal ───────────────────────────────────────────────────
-# continuum_score.py — fires signals when continuum engine reaches extreme scores
+# continuum_score.py — contrarian + momentum signals from continuum engine
 CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
-CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction (score hits 100)
-CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction (score hits 0)
-CONTINUUM_SCORE_LONG_THRESHOLD       = 95      # score >= this → SHORT signal
-CONTINUUM_SCORE_SHORT_THRESHOLD      = 5       # score <= this → LONG signal
+CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction
+CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction
+CONTINUUM_SCORE_LONG_THRESHOLD       = 85      # score >= this → SHORT (contrarian sell greed)  [was 95, widened 2026-09-12]
+CONTINUUM_SCORE_SHORT_THRESHOLD      = 15      # score <= this → LONG (contrarian buy fear)    [was 5, widened 2026-09-12]
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
 CONTINUUM_SCORE_STALENESS_MIN        = 5       # max age of continuum data in minutes
-CONTINUUM_SCORE_CONF_BASE            = 85      # base confidence for extreme scores
+CONTINUUM_SCORE_CONF_BASE            = 82      # base confidence for contrarian scores
+# ── Continuum Score Momentum (zone transitions) ─────────────────────────────
+# When score crosses above/below 50 → alt-wave momentum signal
+CONTINUUM_SCORE_MOMENTUM_ENABLED     = True    # enable zone-transition signals
+CONTINUUM_SCORE_MOMENTUM_THRESHOLD   = 5       # score must be past 50 by this much to trigger
+CONTINUUM_SCORE_MOMENTUM_CONF        = 75      # base confidence for momentum signals
 
 # ── Continuum Oscillator Signal (continuum_oscillator.py) ─────────────────
-# Thesis: Score oscillates 60-65 (troughs) → 90-100 (peaks) with 30-60 min cadence.
-# Rising score = momentum building = LONG. Falling score = momentum fading = SHORT.
+# Thesis: Score oscillates with cadence. Rising score = momentum = LONG.
+# Falling score = fading momentum = SHORT.
 CONTINUUM_OSC_ENABLED                = True    # master kill-switch
 CONTINUUM_OSC_PLUS_ENABLED           = True    # LONG direction
 CONTINUUM_OSC_MINUS_ENABLED          = True    # SHORT direction
-CONTINUUM_OSC_SCORE_RISING_THRESHOLD = 3.0     # score must rise by this much for LONG
-CONTINUUM_OSC_SCORE_FALLING_THRESHOLD= 3.0     # score must fall by this much for SHORT
-CONTINUUM_OSC_MIN_SCORE              = 75      # minimum score for LONG entry
-CONTINUUM_OSC_MAX_SCORE              = 80      # maximum score for SHORT entry (score below this)
-CONTINUUM_OSC_COOLDOWN_HOURS         = 2       # per-token+direction cooldown
+CONTINUUM_OSC_SCORE_RISING_THRESHOLD = 2.0     # score must rise by this much for LONG [was 3.0, lowered 2026-09-12]
+CONTINUUM_OSC_SCORE_FALLING_THRESHOLD= 2.0     # score must fall by this much for SHORT [was 3.0, lowered 2026-09-12]
+CONTINUUM_OSC_MIN_SCORE              = 55      # minimum score for LONG entry [was 75, lowered 2026-09-12]
+CONTINUUM_OSC_MAX_SCORE              = 60      # maximum score for SHORT entry [was 80, fixed 2026-09-12]
+CONTINUUM_OSC_COOLDOWN_HOURS         = 1       # per-token+direction cooldown [was 2h, shortened 2026-09-12]
 
 # ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
 # Buy pullback to SMA20 in established uptrends.
