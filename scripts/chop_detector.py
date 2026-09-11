@@ -85,6 +85,9 @@ SIGNAL_OVERRIDES = {
     'pullback_entry_long': 'MEAN_REVERSION',
     'pullback_entry_short': 'MEAN_REVERSION',
     'doji_top': 'MEAN_REVERSION',            # doji exhaustion at top — mean-reversion
+    'trend_purity': 'MEAN_REVERSION',       # structural trend confirmation — allowed in chop
+    'trend_purity_long': 'MEAN_REVERSION',
+    'trend_purity_short': 'MEAN_REVERSION',
     'doji_top_short': 'MEAN_REVERSION',
     'doji_top_exit': 'MEAN_REVERSION',
     'doji_bottom_long': 'MEAN_REVERSION',    # doji exhaustion at bottom — mean-reversion
