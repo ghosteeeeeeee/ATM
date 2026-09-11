@@ -16,6 +16,17 @@
 
 **Dissent:** Signal Analyst says pullback-entry thresholds are "sound logic" — would keep if implemented alone.
 
+### Statistician Verification (CRITICAL)
+
+| Claim | Plan Said | Data Shows | Verdict |
+|-------|-----------|------------|---------|
+| pump-chain+ loses 70% when BTC > +0.3% | 70% | **100% (4/4)** | Directionally correct, but n=4 (inconclusive) |
+| pump-chain- loses 60% when BTC < -0.3% | 60% | **62.5% WIN RATE (5/8)** | **REFUTED — blocks mostly WINNERS** |
+| Net savings $28.90 | $28.90 | **$1.25** | **FABRICATED — off by 23x** |
+| Sample sizes | Implied large | n=4 and n=8 | **Too small for any conclusion** |
+
+**The pump-chain- filter is INVERTED.** Blocking SHORTs when BTC drops would actually block winning trades (SHORTs benefit from drops).
+
 ---
 
 ## Key Findings
