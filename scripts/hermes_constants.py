@@ -1371,8 +1371,9 @@ NEVER_REENABLE_FLAGS = {
     'VEL_HERMES_ENABLED',         # CEO 2026-08-04 — 0% WR (12 trades 7d), permanently dead
     'VEL_HERMES_PLUS_ENABLED',    # 31% WR, negative PnL, permanently dead
     'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
-    'TL_BREAK_ENABLED',           # CEO 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
-    'TL_BREAK_PLUS_ENABLED',      # CEO 2026-08-07 — master TL_BREAK killed
+    # TL_BREAK_ENABLED — REMOVED from NEVER_REENABLE 2026-09-11 — re-enabled with NORMAL regime
+    # TL_BREAK_PLUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-11 — re-enabled with NORMAL regime
+    # TL_BREAK_MINUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with NORMAL regime (85.7% WR)
     # TL_BREAK_MINUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with NORMAL regime (85.7% WR)
     'ZSCORE_RISING_ENABLED',      # CEO 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
     'ZSCORE_RISING_PLUS_ENABLED', # CEO 2026-08-07 — master ZSCORE_RISING killed
@@ -1398,7 +1399,7 @@ NEVER_REENABLE_FLAGS = {
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
     'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
     # BB_BOUNCE KILLED 2026-08-27 (CEO) — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
-    'BB_BOUNCE_PLUS_ENABLED',  # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
+    # BB_BOUNCE_PLUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'BB_BOUNCE_ENABLED',       # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
     'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
     'ATR_SPIKE_PLUS_ENABLED',     # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
@@ -1676,7 +1677,7 @@ ACCEL_300_V3_SHORT_EXTREME_BLOCK = True  # 2026-09-07 — block v3 SHORT in EXTR
 ACCEL_300_V3_SHORT_FLAT_BLOCK = True     # 2026-09-07 — block v3 SHORT in FLAT (33% WR). No SHORT edge in flat market.
 ACCEL_300_V3_LONG_EXTREME_BLOCK = True   # 2026-09-07 — block v3 LONG in EXTREME (42% WR, -$0.96). No LONG edge in extreme volatility.
 ACCEL_300_V3_LONG_FLAT_BLOCK = True      # 2026-09-07 — block v3 LONG in FLAT (33% WR). No LONG edge in flat market.
-R2_TREND_LONG_ENABLED        = True    # RE-ENABLED 2026-09-09 — EXTREME 67% WR, HIGH 68% WR. NORMAL blocked via volatility_gate_v2.
+R2_TREND_LONG_ENABLED        = True    # RE-ENABLED 2026-09-09 — HIGH only (68% WR). EXTREME blocked (trend-following too risky in storms). NORMAL blocked via volatility_gate_v2.
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
