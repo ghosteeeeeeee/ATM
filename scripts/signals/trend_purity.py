@@ -91,6 +91,12 @@ def detect_trend_purity(token: str, direction: str = None):
     if ema is None:
         return None
 
+    # Compute EMA series for slope analysis (needed by EMA slope guard)
+    _ema_k = 2 / (EMA_PERIOD + 1)
+    emas = [prices[0]]
+    for p in prices[1:]:
+        emas.append(p * _ema_k + emas[-1] * (1 - _ema_k))
+
     current_price = lookback_prices[-1]
     gap_pct = (current_price - ema) / ema * 100
 
@@ -159,6 +165,16 @@ def detect_trend_purity(token: str, direction: str = None):
         # Allow bb > 1.0 (breakout) and bb < 0.90 (room to run).
         if d == 'LONG' and _bb_position is not None:
             if 0.90 < _bb_position < 1.0:
+                continue
+
+        # ── EMA slope guard (LONG-specific) ────────────────────────────────
+        # Root cause: BIGTIME LONG loss on 2026-09-12 — EMA30 was FALLING at
+        # entry (slope -0.00000159). Price bounced in a downtrend, signal fired
+        # on the bounce, but EMA was already turning down. All winners have
+        # rising EMA. Block when EMA is declining (trend reversing).
+        if d == 'LONG' and len(emas) >= 5:
+            _ema5_slope = emas[-1] - emas[-5]
+            if _ema5_slope < 0:
                 continue
 
         if d == 'LONG':

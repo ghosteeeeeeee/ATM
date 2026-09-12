@@ -1453,3 +1453,7 @@
   WHY: 2T last hour (2W 0L +$0.30). ACE trend_purity+ atr_sl_hit +$0.01, KAS trend_purity+ rr_engine_support_br +$0.29. 59T/24h 50%WR -$1.31. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 32% well below 40% threshold. Trade freq 2/hr normal. 6h trend 7W 2L strong. pump-chain+ 7T 14.3%WR -$0.67 (24h) bad but 0 trades last hour. bb-bounce-v2-long+ 4T 25%WR -$0.47 has wins. Previous kills already done.
   BY: auto_1hr
   NEXT: Re-run at 05:10 UTC
+[2026-09-12 05:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.28). IMX rr-struct+ profit-monster-trail +$0.02, INJ trend_purity+ rr_engine_support_br -$0.30. 59T/24h 57.6%WR -$0.24 (improved from -$1.31). Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 30.5% well below 40% threshold. Trade freq 2/hr normal. 6h trend 9W 2L strong. 5 open positions. Regime EXTREME 7W 1L, HIGH 2W 1L.
+  BY: auto_1hr
+  NEXT: Re-run at 06:10 UTC

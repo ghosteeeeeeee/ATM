@@ -1,36 +1,47 @@
 === Signal Performance Report ===
-Period: 2026-09-11 | Last 6h + 24h
+Period: 2026-09-12 05:00 UTC | 6h + 24h
 
-KILLED (executed):
+## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 25.0% | -$0.47 | 4 | BB_BOUNCE_V2_LONG_ENABLED = False |
-| pump-chain+ | LONG | 22.2% | -$0.62 | 9 | Already killed (PUMP_FLOW_PLUS_ENABLED = False) |
+| pump-chain+ | LONG | 16.7% | -$0.38 | 6 | Already killed 2026-09-11 15:10 |
 
-REGIME BLOCKS (executed):
-| Signal | Dir | Regime | WR | Action |
-|--------|-----|--------|-----|--------|
-| pullback-entry- | SHORT | NORMAL | 42.9% | Added Pullback_Entry_Short: 0.0 to NORMAL in volatility_gate_v2.py |
+No new kills this cycle. bb-bounce-v2-long+ (25% WR, -$0.47) has only 4 trades — below 5+ threshold for blanket kill. Will monitor next cycle.
 
-LOSERS (watch list):
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+
+No boosts this cycle. mover+ (83.3% WR) and mover- (100% WR) already performing well — no tuning needed.
+
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-v4-short- | SHORT | 0.0% | -$0.44 | 3 | Blacklisted (accel-300 in blacklist) |
-| pullback-entry- | SHORT | 37.5% | -$0.42 | 8 | NORMAL regime blocked, EXTREME/HIGH winners |
-| mover+ | LONG | 80.0% | -$0.16 | 5 | High WR but negative PnL — watch |
+| bb-bounce-v2-long+ | LONG | 25.0% | -$0.47 | 4 | WATCH — below kill threshold, 2+ days active |
+| accel-300-v4-short- | SHORT | 0.0% | -$0.27 | 2 | LOW VOLUME — too few trades to act |
+| ema300-dip-long | LONG | 0.0% | -$0.25 | 1 | LOW VOLUME |
+| pump-chain- | SHORT | 62.5% | -$0.17 | 16 | R:R ISSUE — good WR, bad risk/reward |
 
-WINNERS:
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| mover- | SHORT | 100.0% | $0.46 | 3 | Healthy |
-| open-skies+ | LONG | 66.7% | $0.16 | 3 | Healthy |
-| pump-chain- | SHORT | 63.2% | -$0.14 | 19 | High WR, slight negative — monitor |
+| mover- | SHORT | 100.0% | +$0.46 | 3 | EXCELLENT |
+| mover+ | LONG | 83.3% | +$0.15 | 6 | STRONG |
+| open-skies+ | LONG | 66.7% | +$0.16 | 3 | GOOD |
+| pullback-entry- | SHORT | 60.0% | +$0.07 | 5 | GOOD |
+| trend_purity+ | LONG | 75.0% | +$0.02 | 4 | GOOD |
+| rr-struct+ | LONG | 100.0% | +$0.09 | 2 | EXCELLENT (low vol) |
 
-ISSUES:
+## ISSUES
 - No signal inversions detected
-- pump-chain+ LONG killed but trades still closing (pre-kill entries)
-- accel-300-v4-short- at 0% WR but only 3 trades — too few to blanket kill
+- pump-chain- SHORT: 62.5% WR but -$0.17 PnL — winning trades are small, losing trades are large. Needs R:R tuning or SL adjustment. Historical regime data shows all regimes profitable — recent 24h underperformance may be temporary.
+- bb-bounce-v2-long+ has been active 2+ days with 25% WR. If next cycle shows 5+ trades, will kill.
 
-ACTIONS TAKED:
-1. Set BB_BOUNCE_V2_LONG_ENABLED = False (hermes_constants.py:2177)
-2. Added Pullback_Entry_Short: 0.0 to NORMAL regime (volatility_gate_v2.py:231)
+## 6h Performance (for reference)
+| Signal | Dir | WR | PnL | Trades |
+|--------|-----|-----|-----|--------|
+| trend_purity+ | LONG | 75.0% | +$0.02 | 4 |
+| rr-struct+ | LONG | 100.0% | +$0.09 | 2 |
+
+## Summary
+No actions taken. All kill candidates either already killed (pump-chain+) or below threshold (bb-bounce-v2-long+ at 4 trades). System performing well — 59 closed trades in 24h, 5 signals with >55% WR and positive PnL.
