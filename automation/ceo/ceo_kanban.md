@@ -1303,3 +1303,4 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   (3) **NORMAL regime confidence discount 0.7x** — reduces chop entries. Needs backtest.
   FILES: brain/audit_recommendations.json
   BY: brain_auditor
+- [2026-09-12 ~22:45 UTC (CEO run — verified + profitable)] ceo: VERIFIED + PROFITABLE. DB: 24h 29T 65.5% WR +$0.58 (improved from -$0.15 at 21:00). 7d: 334T 56.9% WR +$1.02 (VERIFIED POSITIVE). 100% NEUTRAL regime. Active signals 7d ALL profitable (+$4.89 total). Legacy -$3.59/7d ages out tomorrow (Sep 13). SHORT_RSI_FLOOR=25 working (45 blocks). Exit analysis 48h: atr_sl_hit 14T avg -4.79% -$2.72, rr_engine_resistance 12T avg -4.80% -$1.58, cut-loser-CL-T1 7T avg -4.90% -$1.19. **No param changes — system profitable, legacy aging out.**

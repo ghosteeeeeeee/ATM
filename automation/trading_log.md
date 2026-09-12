@@ -2919,3 +2919,31 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - cut-loser-CL-T1: worst avg exit, -$0.153/trade
 
 **Open Questions:** None — system operating normally
+
+## [2026-09-12 23:55 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**Open positions:** 6 (3 SHORTs profitable, 2 LONGs slightly underwater, 1 BTC SHORT flat)
+**PnL:** System at +$0.58/24h (65.5%WR)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 10T +$0.77 — star performer
+- atr_sl_hit: 9T +$0.41 (28.5% — healthy)
+- rr_engine_resistance: 5T -$0.23
+- rr_engine_support_br: 3T -$0.12
+- cut-loser-CL-T1: 2T -$0.25
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 28.5% — well below 40%
+- Trade freq ~1.2/hr — normal
+- NORMAL regime 100%WR +$0.43 — fixed regime working
+
+**Watch List:**
+- rr-struct- SHORT: 4T 50%WR -$0.20 — structural but not at kill threshold
+- trend_purity+ LONG: 8T 50%WR -$0.15 — watching
+- MIN_HOLD_MINUTES=10 implementation still pending (from audit)
+
+**Open Questions:** None — system operating normally
