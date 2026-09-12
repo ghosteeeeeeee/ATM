@@ -1181,6 +1181,7 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 - open-skies+ if drops to 3+T 0%WR → kill
 
 ## TEAM UPDATES
+- [2026-09-12 09:07] auto_1hr: No change — system healthy. 58T/24h 58.6%WR +$0.13. Cut-loser-CL-T1 still #1 loss driver (-$1.06/24h), activation delay (MIN_HOLD_MINUTES=10) from Sep 12 audit still pending.
 - [2026-09-11 13:15] auto_1hr: KILLED pump-chain+ LONG (PUMP_FLOW_PLUS_ENABLED=False) — 9T/24h 22.2%WR -$0.82. All atr_sl_hit. Directional mismatch NEUTRAL. SHORT active. Sep 11 worst day 7d (36.4%WR -$1.90). rr_engine_resistance 14T -$0.99 structural. Pushed.
 - [2026-09-09 23:08] signal_reporter: No kills — no signal meets strict kill criteria. 47 trades/24h, +$1.98 PnL. Top: pullback-entry- SHORT 72.7%WR/+$1.35, pump_chain LONG 60%WR/+$1.38. Watch: pump-chain- SHORT 50%WR/-$0.63 (6 trades, marginal).
 
@@ -2467,3 +2468,114 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 
 **Open Questions:**
 - PONS trade showed +626% pnl_pct but only +$0.24 — pnl_pct data quality issue persists
+
+## [2026-09-12 08:08 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.04)
+- ONDO pullback-entry- SHORT: rr_engine_resistance -$0.08
+- LINK pullback-entry- SHORT: rr_engine_resistance -$0.08
+- MNT rr-struct- SHORT: profit-monster-trail +$0.12
+
+**24h:** 61T 36W 25L 59%WR -$0.07 (stable)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 20T avg +$0.107
+- atr_sl_hit: 20T avg -$0.020 (32.8% of closes)
+- rr_engine_resistance: 10T avg -$0.015
+- cut-loser-CL-T1: 6T avg -$0.177 (-$1.06 total)
+- rr_engine_support_br: 4T avg -$0.045
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour (3T last hour, spread across 3 signals)
+- atr_sl_hit 32.8% — below 40% threshold
+- Trade freq 3/hr — normal
+- 24h WR stable at 59% (improving from 50.8% earlier)
+- 24h PnL stable at -$0.07 (improving from -$1.31 earlier)
+- 7d PnL: +$1.30 (positive)
+- All previous losers already killed (slow_grind, ema300_dip_short, sma20_dip, coiled_spring variants)
+- pullback-entry- still #1 signal 7d: 32T +$1.85 (+$0.058/trade) — today's 2 rr_engine_resistance losses are noise
+- bb-bounce-v2-long+ (5T/7d -$0.45) has 2 wins, not killable by 0%WR rule
+
+**Open Questions:**
+- cut-loser-CL-T1 still #1 loss driver at -$1.06/24h — activation delay recommendation from Sep 12 audit still pending
+
+## [2026-09-12 09:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.08) — ARB trend_purity+ LONG: rr_engine_resistance
+**6h:** 10T 6W 4L +$0.13
+**24h:** 58T 34W 24L 58.6%WR +$0.13
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T 18W +$2.02 (+$0.106 avg)
+- atr_sl_hit: 19T 10W -$0.40 (32.8% of closes)
+- rr_engine_resistance: 9T 5W -$0.04
+- cut-loser-CL-T1: 6T 0W -$1.06 (-$0.177 avg)
+- rr_engine_support_br: 4T 1W -$0.18
+- hard_sl: 1T 0W -$0.21
+
+**24h Top Signals:**
+- mover-: 3T 3W +$0.46 (best avg, starved)
+- trend_purity+: 6T 4W +$0.12
+- pump-chain-: 14T 10W +$0.05 (volume king)
+- pullback-entry-: 6T 3W +$0.01
+- bb-bounce-v2-long+: 3T 0W -$0.59 (worst)
+- accel-300-v4-short-: 2T 0W -$0.27
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades in LAST HOUR (1T last hour only)
+- atr_sl_hit 32.8% — below 40% threshold
+- Trade freq 1/hr — normal
+- 24h WR 58.6% — stable
+- 24h PnL +$0.13 — positive
+- 7d PnL: +$1.30 (positive)
+- 5 open positions all managed by SL/TP (BTC SHORT oldest at 14.8h)
+
+**Open Questions:**
+- cut-loser-CL-T1 still #1 loss driver at -$1.06/24h — activation delay (MIN_HOLD_MINUTES=10) from Sep 12 audit still pending
+- pump-chain+ bleeding 5T/24h -$0.27 — below intervention threshold but watch
+
+## [2026-09-12 10:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last 30min (ARB trend_purity+ LONG: rr_engine_support_br -$0.11)
+**6h:** 9 closed (5W 4L +$0.08)
+**24h:** 56T 33W 23L 58.9%WR +$0.36
+**7d:** 344T 194W 56.4%WR +$1.10
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T 18W +$2.02 (+$0.106 avg)
+- atr_sl_hit: 18T 10W -$0.14 (32.1% of closes)
+- rr_engine_resistance: 8T -$0.07
+- cut-loser-CL-T1: 5T 0W -$0.95 (-$0.190 avg)
+- rr_engine_support_br: 5T 1W -$0.29
+- hard_sl: 1T 0W -$0.21
+
+**24h Top Signals:**
+- mover+: 3T 3W +$0.12 avg (starved)
+- mover-: 3T 3W +$0.15 avg (starved)
+- rr-struct+: 3T 3W +$0.047 avg
+- pump-chain-: 13T 9W +$0.002 avg
+- trend_purity+: 7T 4W +$0.001 avg
+- bb-bounce-v2-long+: 2T 0W -$0.24 avg (below kill threshold)
+- accel-300-v4-short-: 2T 0W -$0.135 avg (below kill threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades in last hour
+- atr_sl_hit 32.1% — below 40% threshold
+- Trade freq ~2.3/hr — normal
+- 24h WR 58.9% — stable/improving
+- 24h PnL +$0.36 — positive
+- 7d PnL +$1.10 — positive
+- Regime healthy: EXTREME +$0.14, HIGH +$0.47 (NORMAL -0.16 on 5T only)
+- All previous losers already killed (slow_grind, ema300_dip_short, sma20_dip, coiled_spring variants)
+- bb-bounce-v2-long+ and accel-300-v4-short- both 0%WR but only 2T/24h each — below 3T kill threshold
+
+**Open Questions:**
+- cut-loser-CL-T1 still #1 loss driver at -$0.95/24h — STALE_LOSER_TIMEOUT_MINUTES was reduced from 10→8 but still bleeding. Pending: review whether cut-loser should also check regime before cutting
+- mover+ and mover- are best signals by avg PnL but starved at 3T/24h each — expansion opportunity
