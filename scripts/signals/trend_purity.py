@@ -112,6 +112,22 @@ def detect_trend_purity(token: str, direction: str = None):
     except Exception:
         pass  # no speed data — don't block, just skip guard
 
+    # ── BB position guard — block entries at resistance ceiling ────────────
+    # Root cause: INJ LONG loss on 2026-09-12 — entered at bb_position=0.967
+    # (stalling just below upper BB). Price had run up 1hr then crashed -6.75%.
+    # Winners enter at bb<0.90 (room to run) or bb>1.0 (breakout above BB).
+    _bb_position = None
+    try:
+        if len(prices) >= 20:
+            _w = prices[-20:]
+            _mean = sum(_w) / len(_w)
+            _var = sum((p - _mean) ** 2 for p in _w) / len(_w)
+            _std = _var ** 0.5
+            if _std > 0:
+                _bb_position = round((current_price - (_mean - 2 * _std)) / (4 * _std), 4)
+    except Exception:
+        pass
+
     if direction is None:
         directions = ['LONG', 'SHORT']
     else:
@@ -129,6 +145,13 @@ def detect_trend_purity(token: str, direction: str = None):
                 continue
             # Block if wave_phase is falling (price decelerating into entry)
             if _speed_data['wave_phase'] == 'falling':
+                continue
+
+        # ── BB position guard (LONG-specific) ──────────────────────────────
+        # Block when price is stalling at resistance ceiling (0.90 < bb < 1.0).
+        # Allow bb > 1.0 (breakout) and bb < 0.90 (room to run).
+        if d == 'LONG' and _bb_position is not None:
+            if 0.90 < _bb_position < 1.0:
                 continue
 
         if d == 'LONG':
@@ -152,6 +175,7 @@ def detect_trend_purity(token: str, direction: str = None):
                 'price': round(current_price, 6),
                 'bars_above': above,
                 'lookback': LOOKBACK,
+                'bb_position': round(_bb_position, 4) if _bb_position is not None else None,
             })
 
         elif d == 'SHORT':

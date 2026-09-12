@@ -2330,3 +2330,31 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - Previous kills (accel-300-v4-short-, pump-chain+) already done
 
 **Open Questions:** None
+
+## [2026-09-12 04:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.30)
+**PnL:** +$0.30 (100% WR) — ACE trend_purity+ atr_sl_hit +$0.01, KAS trend_purity+ rr_engine_support_br +$0.29
+
+**24h:** 59T 50%WR -$1.31 | 5 open positions
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T 32% avg -$0.041
+- profit-monster-trail: 18T avg +$0.111
+- rr_engine_resistance: 11T avg -$0.033
+- cut-loser-CL-T1: 6T avg -$0.177
+- rr_engine_support_br: 4T avg +$0.003
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour (0 trades last hour)
+- atr_sl_hit 32% — well below 40% threshold
+- Trade freq 2/hr — normal
+- 6h trend 7W 2L — strong
+- pump-chain+ 7T 14.3%WR -$0.67 (24h) — bad but only 0 trades last hour, doesn't meet kill criteria
+- bb-bounce-v2-long+ 4T 25%WR -$0.47 — has wins, not killable
+- Previous kills (accel-300-v4-short-, pump-chain+) already done
+
+**Open Questions:** None

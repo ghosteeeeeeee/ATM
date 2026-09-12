@@ -1449,3 +1449,7 @@
   WHY: 1T last hour (1W 0L +$0.21). BIGTIME open-skies+ LONG atr_sl_hit +$0.21 (positive PnL despite exit reason). 61T/24h 50.8%WR -$1.31. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 19/61=31% well below 40% threshold. Trade freq 1/hr normal. pump-chain+ 8T 12.5%WR -$0.80 has 1 win, not killable. bb-bounce-v2-long+ 4T 25%WR -$0.47 has 1 win. 5 open positions (BTC, MNT, KAS, ACE, IMX). Previous kills already done.
   BY: auto_1hr
   NEXT: Re-run at 04:10 UTC
+[2026-09-12 04:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.30). ACE trend_purity+ atr_sl_hit +$0.01, KAS trend_purity+ rr_engine_support_br +$0.29. 59T/24h 50%WR -$1.31. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 32% well below 40% threshold. Trade freq 2/hr normal. 6h trend 7W 2L strong. pump-chain+ 7T 14.3%WR -$0.67 (24h) bad but 0 trades last hour. bb-bounce-v2-long+ 4T 25%WR -$0.47 has wins. Previous kills already done.
+  BY: auto_1hr
+  NEXT: Re-run at 05:10 UTC
