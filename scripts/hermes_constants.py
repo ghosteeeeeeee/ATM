@@ -2248,6 +2248,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'btc-pump-rider',  # BTC breakout → alt lagging LONG — works solo
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
     'pump-chain', 'pump-chain+', 'pump-chain-',  # renamed from pump-catcher — chain correlation momentum
+    'pump_chain', 'pump_chain+', 'pump_chain-',  # underscore variant (actual DB values)
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
