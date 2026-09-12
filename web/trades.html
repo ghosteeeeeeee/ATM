@@ -180,7 +180,7 @@
     <thead>
       <tr>
         <th>#</th><th>Coins</th><th>Dir</th><th>Entry</th><th>Exit</th>
-        <th>P&amp;L %</th><th>P&amp;L $</th><th>Lev</th><th>Size</th>
+        <th>P&amp;L %</th><th>P&amp;L $</th><th>Size</th><th>Lev</th>
         <th>Reason</th><th>Signal</th><th>Closed</th>
       </tr>
     </thead>
@@ -467,8 +467,8 @@
           <td>$${(t.exit||0).toFixed(4)}</td>
           <td class="${cls}">${leveragedPct>=0?'+':''}${leveragedPct.toFixed(2)}%</td>
           <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
-          <td>${lev}x</td>
           <td>$${size.toFixed(1)}</td>
+          <td>${lev}x</td>
           <td style="color:#888;font-size:0.75em">${t.close_reason||''}</td>
           <td style="color:#555;font-size:0.75em">${t.signal||''}</td>
           <td style="color:#666;font-size:0.75em">${closedTime}</td>
