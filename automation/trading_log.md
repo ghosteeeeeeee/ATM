@@ -2726,3 +2726,99 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - AIXBT SHORT: 0.4h
 
 **Open Questions:** None — system operating normally
+
+## [2026-09-12 15:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.36 (MET -$0.16 atr_sl_hit, ENA -$0.20 rr_engine_resistance)
+
+**24h:** 44T 63.6%WR +$0.43
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T +$1.72 — star
+- atr_sl_hit: 11T -$0.10 (25% of closes) — healthy
+- rr_engine_resistance: 7T +$0.00 — breakeven
+- cut-loser-CL-T1: 5T -$0.86 (-$0.172 avg) — worst, losses small
+- rr_engine_support_br: 3T -$0.12
+- hard_sl: 1T -$0.21
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades in last hour
+- atr_sl_hit 25% — well below 40%
+- Trade freq ~2/hr — normal
+- 24h WR 63.6% — healthy
+- No negative avg_pnl signal with 3+ trades in last hour
+
+**Open Positions:** 5 managed
+- BTC SHORT: 20.8h old (stale, system will handle)
+- NOT SHORT: 6.8h
+- ENA SHORT: 3.8h
+- INJ SHORT: 1.6h
+- AIXBT SHORT: 1.4h
+
+**Open Questions:** None — system operating normally
+
+## [2026-09-12 16:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.01 (NEAR LONG rr-struct+ profit-monster-trail)
+
+**24h:** 41T 63.4%WR +$0.14
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T +$1.47 — star
+- atr_sl_hit: 10T -$0.29 (24% of closes) — healthy
+- rr_engine_resistance: 6T -$0.06 — breakeven
+- cut-loser-CL-T1: 5T -$0.86 (-$0.172 avg) — worst, losses small
+- rr_engine_support_br: 3T -$0.12
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades in last hour
+- atr_sl_hit 24% — well below 40%
+- Trade freq ~1/hr — normal
+- 24h WR 63.4% — healthy
+- No negative avg_pnl signal with 3+ trades in last hour
+
+**Watch List:**
+- pullback-entry- 25%WR 4T -$0.28 — worst signal 24h but no trades last hour, borderline
+- trend_purity+ 50%WR 8T -$0.15 — underperforming but not at kill threshold
+
+**Open Questions:** None — system operating normally
+
+## [2026-09-12 17:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.25 (INJ SHORT rr-struct- atr_sl_hit)
+
+**24h:** 40T 62.5%WR -$0.10
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T +$1.47 — star
+- atr_sl_hit: 10T -$0.40 (24% of closes) — healthy
+- cut-loser-CL-T1: 5T -$0.86
+- rr_engine_resistance: 5T -$0.19
+- rr_engine_support_br: 3T -$0.12
+
+**Key Finding — Stale vs Fresh gap:**
+- Fresh: 24T 71%WR +$0.60
+- Stale: 15T 47%WR -$0.72
+- Stale trades (38.5% of volume) account for nearly all losses
+- 5/8 SHORT losers were stale
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades in last hour
+- atr_sl_hit 24% — well below 40%
+- Trade freq ~1.7/hr — normal
+- No negative avg_pnl signal with 3+ trades in last hour
+
+**Watch List:**
+- pullback-entry-: 4T 25%WR -$0.28 — worst signal 24h, not at kill threshold (needs 0%WR)
+- Stale+oversold SHORT block still top opportunity (~$0.30-0.50/24h savings)
+
+**Open Questions:** None — system operating normally
