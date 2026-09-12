@@ -240,6 +240,16 @@ def detect_trend_purity(token: str, direction: str = None):
                 elif _rsi > 72:
                     conf -= 3  # overbought — reversal risk
 
+            # ── Pullback-to-EMA bonus (+5) ─────────────────────────────────
+            # The "buy the dip in uptrend" pattern that produced PONS +6.27%.
+            # Price dipped to EMA (pullback) then bounced with momentum.
+            # This is the highest-quality entry pattern for trend_purity.
+            if len(emas) >= 10 and gap_pct > 0.30:
+                _dips = sum(1 for i in range(-10, -1) if prices[i] <= emas[i] * 1.002)
+                _ema_rising = emas[-1] > emas[-10]
+                if _dips >= 2 and _ema_rising:
+                    conf += 5  # clean pullback + bounce in uptrend
+
             conf = min(max(round(conf), 50), 99)  # floor at 50 (min to reach decider)
             signals.append({
                 'token': token,
