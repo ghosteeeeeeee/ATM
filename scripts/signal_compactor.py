@@ -665,6 +665,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # rr_structural — structural R:R quality signal (Grade A/B, R:R ≥ 3.0)
     ('rr_structural_long',  'rr-struct+'):  1.3,   # structural quality LONG — high R:R setups
     ('rr_structural_short', 'rr-struct-'):  1.3,   # structural quality SHORT — high R:R setups
+    # wall_street_cycle — euphoria/capitulation reversal (Wall Street Psychology Cycle)
+    ('wall_street_cycle_long',  'wall-st-cycle+'):  1.25,  # capitulation LONG — buy the fear
+    ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

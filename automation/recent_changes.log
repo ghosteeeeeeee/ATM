@@ -1437,3 +1437,7 @@
   WHY: 0T last hour. 60T/24h 50%WR -$1.16. Kill criteria not met: no trades last hour. atr_sl_hit 35% below threshold. 5 open positions (BTC, BCH, MNT, LTC, BANANA). 6h trend mixed. Market: 98% NEUTRAL.
   BY: auto_1hr
   NEXT: Re-run at 23:10 UTC
+[2026-09-12 01:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.05). BANANA rr-struct- SHORT cut-loser-CL-T1 -$0.12, BABY rs-s54,trend_purity+ LONG profit-monster-trail +$0.07. 58T/24h 31%WR -$1.62. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 31% well below 40% threshold. Trade freq 2/hr normal. 6h trend 4/6 positive. 4 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 02:10 UTC

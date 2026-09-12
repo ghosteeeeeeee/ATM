@@ -3104,6 +3104,8 @@ RR_STRUCTURAL_GRADE_A_BONUS   = 10     # Grade A confidence bonus
 RR_STRUCTURAL_GRADE_B_BONUS   = 5      # Grade B confidence bonus
 RR_STRUCTURAL_MAGNET_THRESH   = 0.5    # magnet score threshold for liquidity bonus
 RR_STRUCTURAL_MAX_PRICE_AGE   = 10     # max price age in minutes
+RR_STRUCTURAL_RSI_MIN         = 30     # block SHORT when RSI < this (oversold = bounce risk)
+RR_STRUCTURAL_RSI_MAX         = 80     # block LONG when RSI > this (overbought = pullback risk)
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
@@ -3500,3 +3502,36 @@ VOLUME_CLIMAX_EXTREME_WINDOW = 30          # bars to define price extreme range
 VOLUME_CLIMAX_CONF_BASE = 75               # base confidence
 VOLUME_CLIMAX_CONF_CAP = 88                # max confidence
 VOLUME_CLIMAX_COOLDOWN_HOURS = 1           # per token cooldown
+
+# ── Wall Street Psychology Cycle Signal (wall_street_cycle.py) ────────────────
+# Based on the Wall Street Cheat Sheet (Liberated Stock Trader, 2000 Dotcom Bubble).
+# Detects EUPHORIA (top) and CAPITULATION (bottom) phases via multi-indicator
+# extremes. Reversal signal — fades emotional extremes.
+# Family: MeanReversion (pairs with Trend/Volume for 2-type confluence)
+# NEW 2026-09-13
+WALL_ST_CYCLE_ENABLED = True
+WALL_ST_CYCLE_PLUS_ENABLED = True          # LONG (capitulation — buy the fear)
+WALL_ST_CYCLE_MINUS_ENABLED = True         # SHORT (euphoria — sell the greed)
+
+# Euphoria (SHORT) detection — "I am a genius!"
+WALL_ST_CYCLE_EUPHORIA_RSI = 80            # 1h RSI > 80 = extreme overbought
+WALL_ST_CYCLE_EUPHORIA_EMA_GAP_PCT = 5.0   # price >5% above EMA50 = parabolic
+WALL_ST_CYCLE_EUPHORIA_BB_EXPANSION = 5.0  # BB width >5% = volatility expansion
+WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT = 1.5   # 5m volume >1.5× avg = last buyers
+
+# Capitulation (LONG) detection — "My retirement is lost!"
+WALL_ST_CYCLE_CAPITULATION_RSI = 20        # 1h RSI < 20 = extreme oversold
+WALL_ST_CYCLE_CAPITULATION_EMA_GAP_PCT = 5.0  # price >5% below EMA50 = crashed
+WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT = 1.5  # 5m volume >1.5× avg = panic sell
+WALL_ST_CYCLE_CAPITULATION_WICK_RATIO = 1.5   # lower wick >1.5× body = buyer rejection
+
+# Common parameters
+WALL_ST_CYCLE_LOOKBACK = 100               # 5m candles to fetch
+WALL_ST_CYCLE_AVG_PERIOD = 20              # bars for average volume
+WALL_ST_CYCLE_EXTREME_WINDOW = 30          # bars to define price extreme range
+
+# Confidence
+WALL_ST_CYCLE_CONF_BASE = 75               # base confidence
+WALL_ST_CYCLE_CONF_FLOOR = 50              # min confidence
+WALL_ST_CYCLE_CONF_CAP = 88                # max confidence
+WALL_ST_CYCLE_COOLDOWN_HOURS = 1           # per token cooldown

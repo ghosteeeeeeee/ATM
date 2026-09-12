@@ -2189,6 +2189,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     return None
             except ImportError:
                 pass
+        # wall-st-cycle (Wall Street Psychology Cycle — euphoria/capitulation reversal)
+        if _comp == 'wall-st-cycle+':
+            try:
+                from hermes_constants import WALL_ST_CYCLE_PLUS_ENABLED
+                if not WALL_ST_CYCLE_PLUS_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WALL_ST_CYCLE_PLUS_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
+        if _comp == 'wall-st-cycle-':
+            try:
+                from hermes_constants import WALL_ST_CYCLE_MINUS_ENABLED
+                if not WALL_ST_CYCLE_MINUS_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WALL_ST_CYCLE_MINUS_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
+        if _comp == 'wall-st-cycle':
+            try:
+                from hermes_constants import WALL_ST_CYCLE_ENABLED
+                if not WALL_ST_CYCLE_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WALL_ST_CYCLE_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
         c.execute('''
             SELECT id, source, signal_types, confidence,
                    z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist

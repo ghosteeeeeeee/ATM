@@ -2245,3 +2245,31 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 
 **Open Questions:**
 - rr_engine_resistance (14T, -$0.83) is the biggest loss driver by volume but it's an exit mechanism, not a signal — investigation deferred
+
+## [2026-09-12 01:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L -$0.05)
+**PnL:** -$0.05 (50% WR)
+
+**24h:** 58T 31%WR -$1.62 | 4 open
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T 31% avg -$0.063
+- profit-monster-trail: 15T avg +$0.106
+- rr_engine_resistance: 14T avg -$0.059
+- cut-loser-CL-T1: 6T avg -$0.177
+- rr_engine_support_br: 4T avg -$0.025
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour
+- atr_sl_hit 31% — well below 40% threshold
+- Trade freq 2/hr normal
+- Previous kills (accel-300-v4-short- 12:10, pump-chain+ 13:15) already done
+- rr-struct- and rs-s54,trend_purity+ both traded last hour with mixed results (1W 1L)
+- 6h trend 4/6 positive
+- 4 open positions (ATOM, BTC, KAS, ARB)
+
+**Open Questions:** None
