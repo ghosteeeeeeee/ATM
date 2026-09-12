@@ -88,7 +88,7 @@ def get_recommendations() -> list:
             if isinstance(data, list):
                 return data
             return [data]
-        except:
+        except Exception:
             return []
     return []
 
@@ -121,7 +121,7 @@ def get_creative() -> list:
         try:
             with open(CREATIVE_FILE) as f:
                 return json.load(f)
-        except:
+        except Exception:
             return []
     return []
 
@@ -153,11 +153,21 @@ def get_session_detail(session_id: str) -> dict:
     return session
 
 
+_brain_singleton = None
+
+def get_brain():
+    """BUG 3 fix: Singleton — load SessionBrain once, reuse across requests."""
+    global _brain_singleton
+    if _brain_singleton is None:
+        from session_brain import SessionBrain
+        _brain_singleton = SessionBrain()
+    return _brain_singleton
+
+
 def search_sessions(query_text: str, top_k: int = 10) -> list:
     """Semantic search across sessions using session_brain."""
     try:
-        from session_brain import SessionBrain
-        brain = SessionBrain()
+        brain = get_brain()
         return brain.query(query_text, top_k=top_k)
     except Exception as e:
         return [{"error": str(e)}]
@@ -178,7 +188,7 @@ def get_audit_log() -> list:
         try:
             with open(AUDIT_LOG) as f:
                 return json.load(f)
-        except:
+        except Exception:
             return []
     return []
 

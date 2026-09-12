@@ -299,7 +299,7 @@
         for (const r of results) {
             if (r.error) continue;
             html += `<div class="rec-item">
-                <div class="timestamp">score: ${r.score?.toFixed(3)} · ${esc(r.type)} · ${esc(r.session_id?.substring(0, 12))}</div>
+                <div class="timestamp">score: ${r.score != null ? r.score.toFixed(3) : 'N/A'} · ${esc(r.type)} · ${esc(r.session_id?.substring(0, 12))}</div>
                 <div class="title">${esc(r.title?.substring(0, 80))}</div>
                 <div class="detail">${esc(r.text?.substring(0, 300))}</div>
             </div>`;

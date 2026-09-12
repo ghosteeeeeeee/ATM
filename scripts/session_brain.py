@@ -24,9 +24,13 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
 
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import *  # noqa: F401,F403
+
 # ── Paths ───────────────────────────────────────────────────────────────
-SESSIONS_DIR = Path("/root/.dsh/sessions/--root-.hermes--")
-DATA_DIR = Path("/root/.hermes/data")
+SESSIONS_DIR = Path(os.environ.get("DSH_SESSIONS_DIR",
+    "/root/.dsh/sessions/--root-.hermes--"))
+DATA_DIR = Path(HERMES_DATA) if 'HERMES_DATA' in dir() else Path("/root/.hermes/data")
 BRAIN_DB = DATA_DIR / "session_brain.db"
 FAISS_INDEX = DATA_DIR / "session_brain.index"
 FAISS_IDS = DATA_DIR / "session_brain_ids.json"
@@ -135,17 +139,34 @@ def clean_text(text: str) -> str:
     return text
 
 
-def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict]]:
+def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float]:
     """
     Parse a .jsonl.zstd session file and extract all text content.
     
     Returns:
-        (title, chunks) where chunks is a list of {text, type, timestamp}
+        (title, chunks, created_at_ms) where chunks is a list of {text, type, timestamp}
     """
     import zstandard as zstd
     
     title = ""
     raw_chunks = []
+    created_at_ms = 0.0
+    
+    # BUG 1 fix: Accumulate streaming fragments before checking length
+    # Key: (msg_type, turn, step) → accumulated text
+    fragment_accumulator = {}  # {(type, turn, step): {"text": str, "timestamp": int}}
+    
+    def _flush_fragments():
+        """Flush accumulated fragments into raw_chunks."""
+        for key, frag in fragment_accumulator.items():
+            text = clean_text(frag["text"])
+            if text and len(text) > 20:
+                raw_chunks.append({
+                    "text": text,
+                    "type": frag["chunk_type"],
+                    "timestamp": frag["timestamp"]
+                })
+        fragment_accumulator.clear()
     
     try:
         dctx = zstd.ZstdDecompressor()
@@ -178,7 +199,7 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict]]:
                     
                     # ── Session metadata (first line) ──
                     if msg_type == "session":
-                        created_ms = obj.get("createdAt", 0)
+                        created_at_ms = obj.get("createdAt", 0)
                         continue
                     
                     # ── User messages ──
@@ -197,80 +218,95 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict]]:
                         continue
                     
                     # ── Assistant chunks (streaming) ──
+                    # BUG 2 fix: Only use assistant/chunk block-end for assistant text
+                    # (skip assistant/message to avoid duplication)
                     if msg_type == "assistant/chunk":
                         chunk = data_obj.get("chunk", {})
                         if isinstance(chunk, dict):
-                            # block-end chunks have the full text
                             if chunk.get("type") == "block-end":
                                 block = chunk.get("block", {})
-                                text = clean_text(block.get("text", ""))
-                                if text and len(text) > 20:
-                                    raw_chunks.append({
-                                        "text": text,
-                                        "type": "assistant",
-                                        "timestamp": obj.get("time", 0)
-                                    })
+                                block_type = block.get("type", "")
+                                text = block.get("text", "")
+                                
+                                # Reasoning blocks: accumulate fragments
+                                if block_type == "reasoning":
+                                    turn = data_obj.get("turn", 0)
+                                    step = data_obj.get("step", 0)
+                                    key = ("reasoning", turn, step)
+                                    if key in fragment_accumulator:
+                                        fragment_accumulator[key]["text"] += " " + text
+                                    else:
+                                        fragment_accumulator[key] = {
+                                            "text": text,
+                                            "chunk_type": "reasoning",
+                                            "timestamp": obj.get("time", 0)
+                                        }
+                                else:
+                                    # Text blocks: emit directly (block-end has full text)
+                                    text = clean_text(text)
+                                    if text and len(text) > 20:
+                                        raw_chunks.append({
+                                            "text": text,
+                                            "type": "assistant",
+                                            "timestamp": obj.get("time", 0)
+                                        })
                         continue
                     
                     # ── Assistant messages (assembled) ──
+                    # BUG 2 fix: SKIP — duplicated by assistant/chunk block-end
                     if msg_type == "assistant/message":
-                        content = data_obj.get("message", {}).get("content", [])
-                        if isinstance(content, list):
-                            for block in content:
-                                if isinstance(block, dict) and block.get("type") == "text":
-                                    text = clean_text(block.get("text", ""))
-                                    if text and len(text) > 20:
-                                        raw_chunks.append({
-                                            "text": text,
-                                            "type": "assistant",
-                                            "timestamp": obj.get("time", 0)
-                                        })
                         continue
                     
-                    # ── Text chunks (batched) ──
+                    # ── Text chunks (batched streaming fragments) ──
+                    # BUG 1 fix: Accumulate fragments by (turn, step, index)
                     if msg_type == "text-chunks":
                         texts = data_obj.get("texts", [])
+                        turn = data_obj.get("turn", 0)
+                        step = data_obj.get("step", 0)
                         if isinstance(texts, list):
-                            for t in texts:
+                            for idx, t in enumerate(texts):
+                                fragment_text = ""
                                 if isinstance(t, str):
-                                    text = clean_text(t)
-                                    if text and len(text) > 20:
-                                        raw_chunks.append({
-                                            "text": text,
-                                            "type": "assistant",
-                                            "timestamp": obj.get("time", 0)
-                                        })
+                                    fragment_text = t
                                 elif isinstance(t, dict):
-                                    text = clean_text(t.get("text", ""))
-                                    if text and len(text) > 20:
-                                        raw_chunks.append({
-                                            "text": text,
-                                            "type": "assistant",
+                                    fragment_text = t.get("text", "")
+                                
+                                if fragment_text:
+                                    key = ("text", turn, step, idx)
+                                    if key in fragment_accumulator:
+                                        fragment_accumulator[key]["text"] += fragment_text
+                                    else:
+                                        fragment_accumulator[key] = {
+                                            "text": fragment_text,
+                                            "chunk_type": "assistant",
                                             "timestamp": obj.get("time", 0)
-                                        })
+                                        }
                         continue
                     
-                    # ── Reasoning chunks ──
+                    # ── Reasoning chunks (batched streaming fragments) ──
+                    # BUG 1 fix: Accumulate fragments by (turn, step, index)
                     if msg_type == "reasoning-chunks":
                         texts = data_obj.get("texts", [])
+                        turn = data_obj.get("turn", 0)
+                        step = data_obj.get("step", 0)
                         if isinstance(texts, list):
-                            for t in texts:
+                            for idx, t in enumerate(texts):
+                                fragment_text = ""
                                 if isinstance(t, str):
-                                    text = clean_text(t)
-                                    if text and len(text) > 20:
-                                        raw_chunks.append({
-                                            "text": text,
-                                            "type": "reasoning",
-                                            "timestamp": obj.get("time", 0)
-                                        })
+                                    fragment_text = t
                                 elif isinstance(t, dict):
-                                    text = clean_text(t.get("text", ""))
-                                    if text and len(text) > 20:
-                                        raw_chunks.append({
-                                            "text": text,
-                                            "type": "reasoning",
+                                    fragment_text = t.get("text", "")
+                                
+                                if fragment_text:
+                                    key = ("reasoning", turn, step, idx)
+                                    if key in fragment_accumulator:
+                                        fragment_accumulator[key]["text"] += fragment_text
+                                    else:
+                                        fragment_accumulator[key] = {
+                                            "text": fragment_text,
+                                            "chunk_type": "reasoning",
                                             "timestamp": obj.get("time", 0)
-                                        })
+                                        }
                         continue
                     
                     # ── Tool results ──
@@ -286,7 +322,6 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict]]:
                                             if isinstance(ic, dict) and ic.get("type") == "text":
                                                 text = clean_text(ic.get("text", ""))
                                                 if text and len(text) > 50:
-                                                    # Truncate long tool output
                                                     if len(text) > MAX_CHUNK_CHARS:
                                                         text = text[:MAX_CHUNK_CHARS] + "..."
                                                     raw_chunks.append({
@@ -305,12 +340,15 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict]]:
                                                 "timestamp": obj.get("time", 0)
                                             })
                         continue
+        
+        # Flush any remaining accumulated fragments
+        _flush_fragments()
     
     except Exception as e:
         print(f"  ERROR parsing {filepath.name}: {e}")
-        return title, []
+        return title, [], created_at_ms
     
-    return title, raw_chunks
+    return title, raw_chunks, created_at_ms
 
 
 def merge_and_chunk(raw_chunks: List[Dict], chunk_size: int = CHUNK_SIZE,
@@ -538,6 +576,15 @@ class SessionBrain:
         print(f"Session Brain — {mode.upper()} INGEST")
         print(f"{'='*60}")
         
+        # BUG 4 fix: On full ingest, rebuild FAISS from scratch
+        if not incremental:
+            print("Full ingest: rebuilding FAISS index from scratch...")
+            if FAISS_INDEX.exists():
+                FAISS_INDEX.unlink()
+            if FAISS_IDS.exists():
+                FAISS_IDS.unlink()
+            self.vector_store = None  # Force recreation
+        
         sessions = self._get_sessions() if incremental else {}
         files = self._get_session_files()
         print(f"Found {len(files)} session files")
@@ -562,7 +609,7 @@ class SessionBrain:
             print(f"\n[{i+1}/{len(files)}] {session_id[:12]}...", end=" ", flush=True)
             
             # Parse
-            title, raw_chunks = extract_text_from_session(filepath)
+            title, raw_chunks, created_at_ms = extract_text_from_session(filepath)
             if not raw_chunks:
                 print("(no content)")
                 continue
@@ -588,11 +635,21 @@ class SessionBrain:
             ))
             self.vector_store.add(embeddings, chunk_ids)
             
+            # BUG 5 fix: Store created_at
+            created_at_iso = None
+            if created_at_ms:
+                try:
+                    created_at_iso = datetime.fromtimestamp(
+                        created_at_ms / 1000, tz=timezone.utc
+                    ).isoformat()
+                except (ValueError, OSError):
+                    pass
+            
             # Store metadata in SQLite
             self.db.execute(
-                "INSERT OR REPLACE INTO sessions (id, title, file_size, last_modified, last_ingested, chunk_count, status) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (session_id, title, filepath.stat().st_size,
+                "INSERT OR REPLACE INTO sessions (id, title, created_at, file_size, last_modified, last_ingested, chunk_count, status) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (session_id, title, created_at_iso, filepath.stat().st_size,
                  filepath.stat().st_mtime, time.time(), len(chunks), "indexed")
             )
             

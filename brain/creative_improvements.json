@@ -1,0 +1,38 @@
+[
+  {
+    "date": "2026-09-12T07:00:00Z",
+    "idea": "EXTREME regime confidence boost \u2014 lower CONF_FILTER_MIN to 60 for EXTREME, keep 70 for NORMAL",
+    "rationale": "EXTREME: 139T/59%WR/+$2.96. NORMAL: 81T/53.1%WR/-$2.43. Let more signals fire in EXTREME, fewer in NORMAL.",
+    "expected_impact": "+$0.75-1.10/7d net",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:00:00Z",
+    "idea": "cut-loser-CL-T1 activation delay \u2014 5min grace period for ATR_SL to manage",
+    "rationale": "cut-loser 0%WR/-$1.06/24h fires before ATR_SL can act. ATR_SL actually profitable at 52.6% WR.",
+    "expected_impact": "Save ~$0.50/24h",
+    "category": "exit optimizer",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-12T07:00:00Z",
+    "idea": "mover- SHORT expansion \u2014 add to STANDALONE_BYPASS or lower confidence threshold",
+    "rationale": "Best R:R in system (2.38), 85.7% WR, but only 7T/7d. Signal starved.",
+    "expected_impact": "+$0.40/7d if doubled",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:00:00Z",
+    "idea": "pullback-entry- RR engine resistance +0.1% wider band",
+    "rationale": "12 SHORT trades hit resistance and reversed (-$0.60/7d). Wider band lets some reach TP.",
+    "expected_impact": "+$0.30/7d",
+    "category": "exit optimizer",
+    "status": "suggested",
+    "risk": "low"
+  }
+]

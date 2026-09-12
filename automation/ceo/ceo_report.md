@@ -1,3 +1,25 @@
+## CEO Report — 2026-09-12 ~07:15 UTC
+
+### Diagnosis
+
+**DB VERIFIED:** 24h 59T 57.6% WR -$0.27. 7d 344T 57.0% WR +$1.20. Sep 12: 13T 76.9% WR +$0.57 (strong start). System nearly at breakeven — 24h WR 57.6% vs ~58% breakeven threshold.
+
+### Root Cause
+
+**Legacy signals aging out.** ema300_dip_short -$1.19, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65, pullback_entry+ -$0.57. Total -$3.94/7d drag. These will drop off by Sep 13. **SHORT structural drag:** rr_engine_resistance exits pulling -$0.56/48h on pullback-entry- and pump-chain- (SHORT entries hitting support in NEUTRAL). This is expected behavior, not a bug.
+
+### Fix Applied
+
+**No param changes.** 24h WR improved from 50.0% to 57.6% in 5 hours. PnL improved from -$1.52 to -$0.27. All 5 active signals profitable 7d. System self-correcting as legacy ages out.
+
+### Next Actions
+
+1. Legacy drops off by Sep 13 — 7d PnL should improve further.
+2. squeeze_reversal: zero trades, NEUTRAL market. If no trades by Sep 14, investigate.
+3. Monitor rr_engine_resistance SHORT exits — structural but worth tracking.
+
+---
+
 ## CEO Report — 2026-09-12 ~02:35 UTC
 
 ### Diagnosis

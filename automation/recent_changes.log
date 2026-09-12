@@ -1461,3 +1461,20 @@
   WHY: 1T last hour (0W 1L -$0.14). BIGTIME trend_purity+ LONG atr_sl_hit -$0.14. 60T/24h 56.7%WR -$0.38. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 19/60=31.7% well below 40% threshold. Trade freq 1/hr normal. 6h trend 8W 3L strong. 5 open positions. Worst signals: bb-bounce-v2-long+ 4T 25%WR -$0.47 has 1 win not killable, accel-300-v4-short- 2T 0%WR -$0.27 below kill threshold. Previous kills already done.
   BY: auto_1hr
   NEXT: Re-run at 07:10 UTC
+[2026-09-12 07:00 UTC] brain_auditor: AUDIT COMPLETE — VERIFIED + RECOMMENDATIONS
+  WHY: Full audit of 24h/7d trade data, regime performance, exit analysis, config drift.
+  FINDINGS:
+    1. Session brain EMPTY — needs ingestion (cross-session learning blind)
+    2. EXTREME regime is the money printer: 139T/59%WR/+$2.96 vs NORMAL 81T/53.1%WR/-$2.43
+    3. cut-loser-CL-T1 still #1 loss driver (6T/24h 0%WR -$1.06) despite Sep 8 fix
+    4. profit-monster-trail is the ONLY profitable exit (20T/24h 95%WR +$2.06)
+    5. SHORT R:R drag from rr_engine_resistance on pullback-entry- (12T -$0.60)
+    6. pump-chain+ legacy still bleeding (killed Sep 11, 6T/24h -$0.38 — pre-kill positions)
+    7. mover- has best R:R (2.38) but only 7T/7d — signal starved
+  RECOMMENDATIONS:
+    - EXTREME regime confidence boost (creative improvement #1)
+    - cut-loser-CL-T1 activation delay (creative improvement #2)
+    - mover- expansion (creative improvement #3)
+    - pullback-entry- RR engine resistance widening (creative improvement #4)
+  CONFIG: No changes applied (session lock check: no lock, but system profitable — monitor first)
+  BY: brain_auditor

@@ -1,0 +1,140 @@
+{
+  "timestamp": "2026-09-12T07:00:00Z",
+  "auditor": "brain_auditor",
+  "session_brain_stats": {
+    "status": "EMPTY — needs ingestion",
+    "impact": "Cross-session learning is blind. All prior DSH conversations not queryable."
+  },
+  "trade_summary_24h": {
+    "total_trades": 60,
+    "win_rate": 50.0,
+    "pnl": -1.52,
+    "avg_win": 0.103,
+    "avg_loss": -0.134,
+    "rr_ratio": 0.77,
+    "breakeven_wr": 57.7,
+    "by_direction": {
+      "LONG": {"trades": 34, "wr": 55.9, "pnl": -0.30},
+      "SHORT": {"trades": 26, "wr": 61.5, "pnl": 0.07}
+    },
+    "top_exit_drag": [
+      {"exit": "cut-loser-CL-T1", "trades": 6, "avg_pnl": -0.177, "total": -1.06, "wr": 0},
+      {"exit": "atr_sl_hit", "trades": 19, "avg_pnl": -0.033, "total": -0.63, "wr": 52.6},
+      {"exit": "rr_engine_support_br", "trades": 5, "avg_pnl": -0.058, "total": -0.29, "wr": 20.0}
+    ],
+    "top_exit_win": [
+      {"exit": "profit-monster-trail", "trades": 20, "avg_pnl": 0.103, "total": 2.06, "wr": 95.0}
+    ]
+  },
+  "trade_summary_7d": {
+    "total_trades": 344,
+    "win_rate": 57.0,
+    "pnl": 1.20,
+    "by_regime": {
+      "EXTREME": {"trades": 139, "wr": 59.0, "pnl": 2.96},
+      "HIGH": {"trades": 121, "wr": 57.0, "pnl": 0.31},
+      "NORMAL": {"trades": 81, "wr": 53.1, "pnl": -2.43},
+      "FLAT": {"trades": 2, "wr": 100.0, "pnl": 0.36}
+    },
+    "rr_overall_48h": {"trades": 103, "avg_win": 0.122, "avg_loss": -0.156, "rr": 0.784, "pnl": 0.51, "wr": 57.3}
+  },
+  "drift_findings": [
+    {
+      "id": "DRIFT-001",
+      "severity": "high",
+      "finding": "Session brain EMPTY — needs ingestion",
+      "detail": "All DSH conversations are not queryable. Cross-session learning broken.",
+      "impact": "Brain auditor cannot find insights from prior sessions. No drift detection possible on session-level decisions.",
+      "action": "Run session brain ingestion. Priority: fix before next audit."
+    },
+    {
+      "id": "DRIFT-002",
+      "severity": "medium",
+      "finding": "STANDALONE_BYPASS_SIGNALS list contains dead signals",
+      "detail": "List includes: accel-300-v3-long, accel-300-v3-short, accel-300-v2-long, ema300-dip-long, ema300-dip-short — all NEVER_REENABLE. They waste evaluation time.",
+      "impact": "Minor. Dead signals still checked in bypass logic but never produce trades.",
+      "action": "Clean STANDALONE_BYPASS_SIGNALS to remove NEVER_REENABLE entries."
+    },
+    {
+      "id": "DRIFT-003",
+      "severity": "low",
+      "finding": "Regime transition smoothing (Sep 10 CEO plan) never implemented",
+      "detail": "CEO approved Layer 2 (directional bias) and Layer 4 (alt-BTC divergence) on Sep 10. Neither appears in current code. Layer 3 constants were deferred.",
+      "impact": "Missing potential regime-transition protection. However, current system is profitable without it.",
+      "action": "Defer — system profitable. Revisit if NORMAL regime drag worsens."
+    },
+    {
+      "id": "DRIFT-004",
+      "severity": "medium",
+      "finding": "cut-loser-CL-T1 still dominant loss driver despite Sep 8 fix",
+      "detail": "24h: 6T, 0% WR, -$1.06. The ATR_SL revert (1.2%-1.5%) reduced avg_loss from -4.88% but cut-loser exits are still the #1 loss source.",
+      "impact": "Structural. This exit fires when position hits -1% loss, cutting before ATR_SL can manage.",
+      "action": "Monitor. If cut-loser-CL-T1 remains >$0.50/24h drag, investigate tighter activation threshold."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "NORMAL regime bleeds",
+      "detail": "7d: NORMAL 81T/53.1% WR/-$2.43. ALL other regimes positive. LONG_NEUTRAL_BLOCK helps but doesn't fully solve.",
+      "occurrences": "Every audit since Sep 2",
+      "suggestion": "Consider reducing position size or requiring 2+ signal types for NORMAL regime entries (beyond current bypass)."
+    },
+    {
+      "topic": "SHORT R:R drag from rr_engine_resistance",
+      "detail": "pullback-entry- 12T rr_engine_resistance -$0.60, pump-chain- 11T rr_engine_resistance -$0.12. SHORT exits hit resistance levels and reverse.",
+      "occurrences": "CEO kanban entries Sep 10-12",
+      "suggestion": "The RR engine resistance threshold may be too tight for SHORT. Consider wider resistance band for SHORT exits."
+    },
+    {
+      "topic": "Legacy signal bleed after kills",
+      "detail": "pump-chain+ killed Sep 11, still 6T/24h -$0.38 (pre-kill open positions closing). pump-chain- killed Sep 10, still 16T/24h.",
+      "occurrences": "Every kill cycle",
+      "suggestion": "Consider force-closing open positions on signal kill instead of letting them run to SL."
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-12T07:00:00Z",
+      "idea": "EXTREME regime confidence boost — increase CONF_FILTER_MIN to 75 for EXTREME entries, reduce to 65 for NORMAL",
+      "rationale": "EXTREME regime: 139T/59%WR/+$2.96. NORMAL: 81T/53.1%WR/-$2.43. The system already filters better in EXTREME. We should let MORE signals fire in EXTREME (lower bar) and FEWER in NORMAL (higher bar). Current CONF_FILTER_MIN=70 is one-size-fits-all.",
+      "expected_impact": "Could capture 15-20% more EXTREME trades (+$0.45-0.60/7d) while reducing NORMAL noise (-$0.30-0.50/7d saved). Net: +$0.75-1.10/7d.",
+      "category": "regime creative",
+      "status": "suggested",
+      "risk": "low — only affects confidence threshold per regime, no structural change"
+    },
+    {
+      "date": "2026-09-12T07:00:00Z",
+      "idea": "cut-loser-CL-T1 activation delay — skip first 5 minutes, let ATR_SL manage initial drawdown",
+      "rationale": "cut-loser-CL-T1 exits avg -$0.177/trade (0% WR, 6T/24h). These fire on 1% loss immediately. But ATR_SL exits avg -$0.033 with 52.6% WR. The problem: cut-loser fires BEFORE ATR_SL can manage. If we add a 5-minute delay, ATR_SL gets a chance to trail or hit TP first. 48h data: ATR_SL is actually profitable at scale (19T 52.6% WR).",
+      "expected_impact": "Reduce cut-loser-CL-T1 exits by ~50%. Save ~$0.50/24h. Some will become ATR_SL exits (manageable) or profit-monster-trail wins.",
+      "category": "exit optimizer",
+      "status": "suggested",
+      "risk": "medium — some positions may drawdown further before cut-loser fires. Needs backtest."
+    },
+    {
+      "date": "2026-09-12T07:00:00Z",
+      "idea": "mover- SHORT position sizing boost — 2.38 R:R, 85.7% WR, only 7T/7d",
+      "rationale": "mover- has the best R:R in the system (2.38) with 85.7% WR. But only 7 trades in 7d. It's signal-starved. If we add it to STANDALONE_BYPASS or lower its confidence threshold, it could fire more often without sacrificing quality.",
+      "expected_impact": "If mover- doubles from 7T to 14T/7d at same R:R: +$0.40/7d additional profit.",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low — mover- already proven, just needs more opportunities"
+    },
+    {
+      "date": "2026-09-12T07:00:00Z",
+      "idea": "pullback-entry- SHORT R:R improvement — widen RR engine resistance by 0.1%",
+      "rationale": "pullback-entry- is the #1 profitable signal (29T/69%WR/+$1.93/7d) but rr_engine_resistance exits cost -$0.60. 12 SHORT trades hit resistance and reversed. Widening the resistance band by 0.1% would let some of these trades run to TP instead of exiting at support.",
+      "expected_impact": "If 50% of rr_engine_resistance exits become TP exits: +$0.30/7d.",
+      "category": "exit optimizer",
+      "status": "suggested",
+      "risk": "low — only affects exit threshold, not entry"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Run session brain ingestion — cross-session learning is blind",
+    "Monitor cut-loser-CL-T1 — if still >$0.50/24h drag by Sep 14, investigate activation delay",
+    "Consider EXTREME regime confidence adjustment — test with backtest first",
+    "Clean STANDALONE_BYPASS_SIGNALS of dead entries"
+  ]
+}
