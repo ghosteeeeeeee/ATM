@@ -195,7 +195,7 @@ def detect_neutral_sniper(token: str, candles: list) -> Optional[dict]:
 
     price = closes[-1]
     direction = None
-    confidence = 65
+    confidence = 75  # BOOSTED from 65 — mean-reversion in chop has edge, more competitive
 
     # LONG: RSI oversold + CMF accumulation (volume confirms bounce)
     if rsi_val < NS_RSI_OVERSOLD and cmf_val > NS_CMF_LONG_MIN:
@@ -220,7 +220,7 @@ def detect_neutral_sniper(token: str, candles: list) -> Optional[dict]:
     if direction is None:
         return None
 
-    confidence = max(60, min(confidence, 88))
+    confidence = max(70, min(confidence, 92))  # BOOSTED range from 60-88 to 70-92
 
     return {
         'direction': direction,
