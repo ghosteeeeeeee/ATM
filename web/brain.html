@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hermes Brain — Session Intelligence Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0f; color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -128,6 +129,17 @@
                 <span class="badge" id="drift-count">0</span>
             </div>
             <div class="card-body" id="drift-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+        
+        <!-- Changes Made -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🔧 Changes Made</h2>
+                <span class="badge" id="changes-count">0</span>
+            </div>
+            <div class="card-body" id="changes-list">
                 <div class="loading">Loading...</div>
             </div>
         </div>
@@ -308,6 +320,28 @@
         el.innerHTML = html;
     }
     
+    // ── Changes ──
+    async function loadChanges() {
+        const changes = await fetchJSON(`${API}/changes`);
+        const el = document.getElementById('changes-list');
+        document.getElementById('changes-count').textContent = changes?.length || 0;
+        if (!changes || !changes.length) { el.innerHTML = '<div class="empty">No changes logged yet.</div>'; return; }
+        
+        let html = '';
+        for (const c of changes.slice(0, 15)) {
+            const typeClass = c.type === 'kill' ? 'critical' : c.type === 'creative' ? 'creative' : 'success';
+            const icon = c.type === 'kill' ? '💀' : c.type === 'creative' ? '💡' : c.type === 'config' ? '⚙️' : '🔧';
+            html += `<div class="rec-item ${typeClass}">
+                <div class="timestamp">${esc(c.timestamp || '')} · ${esc(c.agent || '')}</div>
+                <div class="title">${icon} ${esc(c.change || '')}</div>
+                ${c.before && c.after ? `<div class="detail"><span style="color:#ff6b6b">${esc(c.before)}</span> → <span style="color:#00ff88">${esc(c.after)}</span></div>` : ''}
+                ${c.rationale ? `<div class="detail">💡 ${esc(c.rationale)}</div>` : ''}
+                ${c.impact ? `<div class="detail">📈 ${esc(c.impact)}</div>` : ''}
+            </div>`;
+        }
+        el.innerHTML = html;
+    }
+    
     // ── Init ──
     async function refresh() {
         await Promise.all([
@@ -315,6 +349,7 @@
             loadRecommendations(),
             loadCreative(),
             loadDrift(),
+            loadChanges(),
             loadTopics(),
             loadSessions()
         ]);

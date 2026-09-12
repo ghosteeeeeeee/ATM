@@ -285,3 +285,7 @@
 - Pipeline last run: 18:23:28 UTC (clean)
 - 154 signals, 5 open trades, 40 closed today
 - Disk: 78%, all timers firing, no phantoms
+
+## Error Alerts — 2026-09-12 20:55 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

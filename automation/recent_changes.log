@@ -1572,3 +1572,7 @@
   BY: brain_auditor
 [2026-09-12 14:00 UTC] auto_1hr: NO CHANGES — system healthy. 2 trades, +/usr/bin/bash.07. 24h 65.2%WR +/usr/bin/bash.91. All kill/fix criteria below threshold.
 [2026-09-12 14:30 UTC] brain_auditor: FULL AUDIT COMPLETE. Key findings: (1) Stale signals = #1 drag: 35% of 24h trades stale, 40% WR vs 78.6% fresh. Stale SHORTs lose $0.87/24h. (2) NORMAL regime worst: 51.4% WR -$2.36/7d across all signals. (3) rr_engine_resistance structural SHORT: 14 exits/7d, 28.6% WR -$0.76. (4) Creative: stale+oversold SHORT block would save $0.30-0.50/24h. Files: brain/audit_recommendations.json
+
+[2026-09-12 22:00 UTC] brain_auditor: AUDIT RUN — no config change
+  WHY: System at breakeven (61.1% WR, -$0.24/24h). Two fixes applied today (SHORT_RSI_FLOOR, trend_purity EXTREME penalty) need verification time. Legacy -$3.79/7d ages out Sep 13 (tomorrow). Key findings: (1) MIN_HOLD_MINUTES=10 still not implemented (cut-loser activation delay). (2) rr_engine_resistance SHORT structural 29T/7d -$1.28. (3) Time-of-day pattern discovered: 19:00 UTC +$1.62, 03:00-05:00 UTC -$1.80. Creative ideas logged: time-of-day weighting, SHORT NORMAL gate, bb_bounce NORMAL block.
+  BY: brain_auditor

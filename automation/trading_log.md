@@ -2881,3 +2881,41 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - Stale+oversold SHORT block still top opportunity (~$0.30-0.50/24h savings)
 
 **Open Questions:** None — system operating normally
+
+## [2026-09-12 23:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 loss)
+**PnL:** +$0.28 (XPL SHORT pullback-entry- atr_sl_hit — profitable despite SL name, small position)
+
+**24h:** 35T 62.9%WR +$0.24 — system positive
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 13T +$1.05 — star
+- atr_sl_hit: 10T +$0.15 (28.5% of closes) — healthy
+- rr_engine_resistance: 5T -$0.23
+- cut-loser-CL-T1: 4T -$0.61 (worst avg loss -$0.153/T)
+- rr_engine_support_br: 3T -$0.12
+
+**24h Regime:**
+- NORMAL: 4T 100%WR +$0.43 — dramatically improved post-fixes
+- EXTREME: 19T 63.2%WR +$0.33
+- HIGH: 12T 50%WR -$0.52 — new weak spot, watching
+
+**24h Worst Signals (3+ trades):**
+- trend_purity+ LONG: 8T 50%WR -$0.15 — underperforming but not at kill threshold
+- rr-struct- SHORT: 4T 50%WR -$0.20
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 28.5% — well below 40%
+- Trade freq 1.5/hr — normal
+- No negative avg_pnl signal with 3+ trades last hour
+
+**Watch List:**
+- HIGH regime: 12T 50%WR -$0.52 — monitoring
+- trend_purity+ LONG: 8T 50%WR -$0.15 — worst volume signal, not killable
+- cut-loser-CL-T1: worst avg exit, -$0.153/trade
+
+**Open Questions:** None — system operating normally

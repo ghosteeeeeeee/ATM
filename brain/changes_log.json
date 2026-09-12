@@ -1,0 +1,47 @@
+[
+  {
+    "timestamp": "2026-09-12 07:45 UTC",
+    "agent": "brain_auditor",
+    "change": "Added Trend_Purity to VOL_PHASE_MULTS with EXTREME multiplier 0.3",
+    "type": "config",
+    "file": "volatility_gate_v2.py",
+    "before": "No EXTREME filter",
+    "after": "EXTREME confidence reduced 70%"
+  },
+  {
+    "timestamp": "2026-09-12 11:00 UTC",
+    "agent": "brain_auditor",
+    "change": "TIME_BLOCK_START 5 → 3 — extends 0.7x penalty to hour 03",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "TIME_BLOCK_START=5",
+    "after": "TIME_BLOCK_START=3"
+  },
+  {
+    "timestamp": "2026-09-12 12:00 UTC",
+    "agent": "brain_auditor",
+    "change": "Killed pump_chain+ signal — only net-negative active signal (13T/30.8%WR/‑bash.29/7d)",
+    "type": "kill",
+    "file": "hermes_constants.py",
+    "before": "PUMP_CHAIN_PLUS_ENABLED=True",
+    "after": "PUMP_CHAIN_PLUS_ENABLED=False"
+  },
+  {
+    "timestamp": "2026-09-12 15:30 UTC",
+    "agent": "brain_auditor",
+    "change": "Added trend_purity EXTREME penalty to volatility_gate_v2.py — 50% WR in EXTREME, ‑bash.15/7d",
+    "type": "config",
+    "file": "volatility_gate_v2.py",
+    "before": "No EXTREME penalty",
+    "after": "EXTREME multiplier 0.3"
+  },
+  {
+    "timestamp": "2026-09-12 11:00 UTC",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_FLOOR=30 added — prevent shorting oversold (was catching falling knives)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "No RSI floor for SHORT",
+    "after": "RSI_MIN=35, RSI_FLOOR=30 for SHORT"
+  }
+]

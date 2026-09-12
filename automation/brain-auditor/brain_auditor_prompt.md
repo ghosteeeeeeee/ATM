@@ -257,6 +257,29 @@ EOF
 # Append to brain/creative_improvements.json
 ```
 
+### Log config changes to (EVERY change you make):
+```bash
+# Append to brain/changes_log.json
+# Format each change as:
+python3 -c "
+import json
+changes = json.load(open('brain/changes_log.json')) if __import__('os').path.exists('brain/changes_log.json') else []
+changes.append({
+    'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+    'agent': 'brain_auditor',
+    'change': 'What was changed',
+    'type': 'config|kill|tweak|creative',
+    'file': 'hermes_constants.py',
+    'before': 'What it was before',
+    'after': 'What it is now',
+    'rationale': 'Why we changed it',
+    'impact': 'Expected impact'
+})
+json.dump(changes, open('brain/changes_log.json', 'w'), indent=2, ensure_ascii=False)
+print('Changes logged.')
+"
+```
+
 ## RULES
 
 1. **Verify numbers yourself** — query DB, don't trust old reports

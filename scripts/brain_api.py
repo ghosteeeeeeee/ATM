@@ -33,6 +33,8 @@ BRAIN_DB = Path("/root/.hermes/data/session_brain.db")
 RECOMMENDATIONS_FILE = Path("/root/.hermes/brain/audit_recommendations.json")
 CREATIVE_FILE = Path("/root/.hermes/brain/creative_improvements.json")
 AUDIT_LOG = Path("/root/.hermes/brain/audit_log.json")
+CHANGES_LOG = Path("/root/.hermes/brain/changes_log.json")
+AUDIT_LOG = Path("/root/.hermes/brain/audit_log.json")
 
 PORT = int(os.environ.get("BRAIN_API_PORT", 54322))
 
@@ -194,6 +196,20 @@ def get_audit_log() -> list:
     return []
 
 
+def get_changes() -> list:
+    """All config changes made by brain auditor and CEO."""
+    if CHANGES_LOG.exists():
+        try:
+            with open(CHANGES_LOG) as f:
+                data = json.load(f)
+            if isinstance(data, list):
+                return data
+            return [data]
+        except Exception:
+            return []
+    return []
+
+
 # ── HTTP Handler ────────────────────────────────────────────────────────
 
 class BrainAPIHandler(BaseHTTPRequestHandler):
@@ -227,6 +243,8 @@ class BrainAPIHandler(BaseHTTPRequestHandler):
             self._json_response(get_timeline())
         elif path == "/api/brain/audit-log":
             self._json_response(get_audit_log())
+        elif path == "/api/brain/changes":
+            self._json_response(get_changes())
         else:
             self._json_response({"error": "Not found"}, 404)
     

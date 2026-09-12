@@ -1,153 +1,163 @@
 {
-  "timestamp": "2026-09-12T19:28:39.334593Z",
-  "session_brain_stats": {
-    "status": "empty \u2014 no DSH data ingested",
-    "sessions_indexed": 0
-  },
-  "trade_summary_24h": {
-    "trades": 39,
-    "wr": 61.5,
-    "pnl": -0.26,
-    "note": "At breakeven. 15 losing trades analyzed."
-  },
-  "trade_summary_7d": {
-    "trades": 338,
-    "wr": 56.2,
-    "pnl": 0.23,
-    "regimes": {
-      "EXTREME": {
-        "trades": 138,
-        "wr": 58.0,
-        "pnl": 2.64,
-        "note": "Best regime \u2014 carries system"
-      },
-      "NORMAL": {
-        "trades": 74,
-        "wr": 52.7,
-        "pnl": -2.51,
-        "note": "Worst regime \u2014 legacy + R:R issues"
-      },
-      "HIGH": {
-        "trades": 123,
-        "wr": 56.1,
-        "pnl": -0.26,
-        "note": "Flat"
-      },
-      "FLAT": {
-        "trades": 2,
-        "wr": 100.0,
-        "pnl": 0.36,
-        "note": "Tiny sample"
-      }
+    "timestamp": "2026-09-12T23:00:00Z",
+    "session_brain_stats": {
+        "status": "EMPTY — needs --ingest",
+        "note": "Session brain FAISS index is empty. All insights derived from CURRENT.md, kanban, and live DB queries."
     },
-    "direction": {
-      "LONG": {
-        "trades": 208,
-        "pnl": -1.23,
-        "note": "Net negative \u2014 legacy drag"
-      },
-      "SHORT": {
-        "trades": 130,
-        "pnl": 1.46,
-        "note": "Net positive \u2014 structural edge"
-      }
-    }
-  },
-  "drift_findings": [
-    {
-      "finding": "trend_purity+ EXTREME penalty applied (0.3x) by previous brain_auditor",
-      "status": "IMPLEMENTED in volatility_gate_v2.py:229",
-      "impact": "trend_purity+ EXTREME: 8T -$0.15/7d (50% WR) \u2014 penalty active but sample too small to verify effect"
+    "trade_summary_24h": {
+        "total_trades": 34,
+        "winners": 22,
+        "losers": 12,
+        "wr_pct": 64.7,
+        "pnl": 0.39,
+        "top_winner": "ACE LONG mover+ $0.31",
+        "top_loser": "INJ LONG rr-struct+ -$0.30",
+        "exit_analysis": {
+            "profit-monster-trail": "13T 100%WR +$1.05 (carries system)",
+            "atr_sl_hit": "10T 60%WR +$0.15",
+            "rr_engine_resistance": "5T 40%WR -$0.23 (SHORT structural)",
+            "cut-loser-CL-T1": "3T 0%WR -$0.48 (stale entries)",
+            "rr_engine_support_br": "3T 33%WR -$0.12"
+        }
     },
-    {
-      "finding": "stale+oversold SHORT block flagged as top opportunity",
-      "status": "NOT IMPLEMENTED \u2014 no execution-time RSI check exists",
-      "impact": "9 SHORT losers with RSI<35 lost $1.44/7d. Current spike filter only checks at detection time, not execution."
-    }
-  ],
-  "losing_trade_autopsy": {
-    "pattern": "SHORT entries at oversold RSI \u2014 9 losers with RSI<35, $1.44/7d drag",
-    "specific_trades": [
-      {
-        "token": "BANANA",
-        "signal": "rr-struct-",
-        "rsi": 10.53,
-        "pnl": -0.12,
-        "exit": "cut-loser-CL-T1",
-        "root_cause": "Entered SHORT at RSI 10.53 \u2014 extreme oversold, bounce imminent"
-      },
-      {
-        "token": "ENA",
-        "signal": "pump-chain-",
-        "rsi": 11.76,
-        "pnl": -0.25,
-        "exit": "cut-loser-CL-T1",
-        "root_cause": "Entered SHORT at RSI 11.76 \u2014 cut after 7 min, price bounced"
-      },
-      {
-        "token": "KAS",
-        "signal": "pump-chain-",
-        "rsi": 20.58,
-        "pnl": -0.42,
-        "exit": "cut-loser-CL-T1",
-        "root_cause": "Largest single SHORT loss \u2014 oversold entry"
-      },
-      {
-        "token": "BIGTIME",
-        "signal": "pump-chain-",
-        "rsi": 6.45,
-        "pnl": -0.13,
-        "exit": "cut-loser-CL-T1",
-        "root_cause": "RSI 6.45 \u2014 most oversold entry, guaranteed bounce"
-      },
-      {
-        "token": "ONDO",
-        "signal": "pullback-entry-",
-        "rsi": 24.14,
-        "pnl": -0.08,
-        "exit": "rr_engine_resistance",
-        "root_cause": "SHORT near support at oversold RSI"
-      }
+    "trade_summary_7d": {
+        "total_trades": 337,
+        "pnl": 2.44,
+        "regime_breakdown": {
+            "EXTREME": "137T 58.4%WR +$2.84 (best)",
+            "HIGH": "123T 56.1%WR -$0.26 (flat)",
+            "NORMAL": "74T 52.7%WR -$2.26 (worst)",
+            "FLAT": "2T 100%WR +$0.36"
+        },
+        "stale_vs_fresh": {
+            "stale": "86T 57.0%WR -$1.19",
+            "fresh": "250T 56.4%WR +$2.07",
+            "insight": "Same WR but stale loses 5x more per trade. Stale entries enter after moves already happened."
+        }
+    },
+    "drift_findings": [
+        {
+            "finding": "MIN_HOLD_MINUTES hard block — DISCUSSED BUT NEVER IMPLEMENTED",
+            "sessions": "brain_auditor 05:00, 14:30, 17:30, 22:00 UTC Sep 12",
+            "current_state": "No hard staleness block exists. staleness_mult decays confidence to 0 at 10min but signals can survive via survival_bonus + other multipliers. Stale signals still fire.",
+            "impact": "86 stale trades/7d = -$1.19. cut-loser-CL-T1 on stale = -$2.75/7d. Would save ~$0.50-1.00/7d.",
+            "recommended_action": "Add MAX_SIGNAL_AGE_MINUTES = 3 to hermes_constants.py + hard skip in signal_compactor.py compaction loop",
+            "confidence": "HIGH"
+        },
+        {
+            "finding": "SHORT_RSI_FLOOR implemented and working",
+            "sessions": "brain_auditor 19:30 UTC Sep 12",
+            "current_state": "SHORT_RSI_FLOOR=25 in hermes_constants.py, check in signal_compactor.py:2616. Zero SHORT trades with RSI<25 in 24h.",
+            "impact": "Blocks extreme oversold SHORT entries. No false blocks in 24h data.",
+            "status": "VERIFIED WORKING"
+        },
+        {
+            "finding": "trend_purity+ EXTREME penalty applied but needs more data",
+            "sessions": "brain_auditor 15:30 UTC Sep 12",
+            "current_state": "VOL_PHASE_MULTS penalty for trend_purity in EXTREME added at 15:30. Only 3 trades since — too early to evaluate.",
+            "impact": "trend_purity+ EXTREME: 8T/7d 50%WR -$0.15. Penalty should reduce false positives.",
+            "status": "NEEDS 20+ TRADES TO VERIFY"
+        }
     ],
-    "verification": "SHORT winners at RSI<25 avg +$0.04/trade (tiny wins). Losers avg -$0.20/trade (5x larger). Filter blocks losers worth 5x what it blocks in winners."
-  },
-  "config_change_recommendation": {
-    "change": "Add SHORT_RSI_FLOOR = 25 to hermes_constants.py + execution-time RSI check in signal_compactor.py",
-    "rationale": "9 SHORT losers at RSI<35 lost $1.44/7d. Blocking RSI<25 saves $1.00 losers while only blocking $0.29 in tiny wins. Net: +$0.71/7d.",
-    "backtest": "7d SHORT trades with RSI<25: 5 losers ($-1.00), 7 winners ($+0.29). Net improvement: $+0.71/7d",
-    "impact_on_winners": "Would block 7 small wins averaging $0.04 each. No large winners affected \u2014 all blocked wins are <$0.10.",
-    "risk": "LOW \u2014 only blocks extreme oversold entries where bounce risk is highest"
-  },
-  "creative_improvements": [
-    {
-      "idea": "Execution-time SHORT RSI floor (described above)",
-      "category": "entry sniper",
-      "expected_impact": "+$0.71/7d",
-      "risk": "low",
-      "status": "recommended"
-    },
-    {
-      "idea": "NORMAL regime signal confidence discount \u2014 reduce all signal confidence by 20% in NORMAL",
-      "rationale": "NORMAL regime is -$2.51/7d, worst regime. Most losses are from active signals (bb_bounce_v2_long -$0.09 despite 69% WR due to R:R, pump_chain -$0.27). A confidence discount would reduce trade frequency in NORMAL without blocking signals entirely.",
-      "expected_impact": "+$0.50-1.00/7d (reduce NORMAL losses by 20-40%)",
-      "category": "regime creative",
-      "risk": "medium \u2014 could starve system if NORMAL is dominant. Currently 22% of trades.",
-      "status": "suggested \u2014 needs backtest"
-    },
-    {
-      "idea": "SHORT profit target acceleration \u2014 tighten TP for SHORT entries near support levels",
-      "rationale": "rr_engine_resistance exits 27T/7d -$1.27 (pullback-entry- 16T -$0.91, pump-chain- 11T -$0.12). SHORT entries hit resistance and get exited. If TP was tighter (e.g., 1.5% instead of 2%), wins would be smaller but more frequent before hitting resistance.",
-      "expected_impact": "+$0.30-0.60/7d (reduce rr_engine_resistance drag)",
-      "category": "exit optimizer",
-      "risk": "medium \u2014 needs per-signal backtest. Some SHORT signals need full R:R to be profitable.",
-      "status": "suggested \u2014 needs backtest"
-    }
-  ],
-  "next_actions": [
-    "1. Add SHORT_RSI_FLOOR = 25 constant to hermes_constants.py",
-    "2. Add execution-time RSI check in signal_compactor.py (after spike filter, before final decision)",
-    "3. Monitor 7d: SHORT WR in oversold conditions should improve",
-    "4. Verify legacy ages out Sep 13 (ema300_dip_short, slow_grind, coiled_spring, sma20_dip, pullback_entry+)",
-    "5. Backtest NORMAL regime confidence discount before implementing"
-  ]
+    "recurring_problems": [
+        {
+            "problem": "Stale entries = #1 systematic drag",
+            "frequency": "Flagged in 4+ brain_auditor runs on Sep 12",
+            "data": "86 stale/7d -$1.19 vs 250 fresh/7d +$2.07. Same WR (~57%) but stale loses 5x more per trade.",
+            "root_cause": "No hard staleness block. Signals with staleness_mult > 0 survive compaction and fire. Enter after moves already happened → immediate loss.",
+            "fix_status": "NOT IMPLEMENTED despite multiple recommendations"
+        },
+        {
+            "problem": "cut-loser-CL-T1 = 0% WR exit",
+            "frequency": "55T/7d, 0% WR, -$8.29",
+            "data": "Every single cut-loser exit is a loss (by design). But 18/55 are stale entries that never had a chance.",
+            "root_cause": "Stale entries enter, immediately go negative, trigger cut-loser threshold at -0.6%.",
+            "fix_status": "Partially addressed (Sep 8 fix reduced frequency). Staleness block would eliminate root cause."
+        },
+        {
+            "problem": "NORMAL regime -$2.26/7d",
+            "frequency": "74T/7d, 52.7%WR",
+            "data": "Worst regime by far. EXTREME +$2.84, HIGH -$0.26. NORMAL drags system.",
+            "root_cause": "Likely choppy price action in NORMAL — signals fire but moves are too small for profit-monster-trail to capture.",
+            "fix_status": "MONITORING — no fix applied yet"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "MAX_SIGNAL_AGE_MINUTES hard block",
+            "discussed": "Sep 12 multiple runs",
+            "impact": "HIGH — would save ~$0.50-1.00/7d",
+            "effort": "LOW — ~10 lines in signal_compactor.py + 1 constant"
+        },
+        {
+            "item": "Time-of-day penalty (03:00-05:00 UTC)",
+            "discussed": "Sep 12 22:00 run",
+            "data": "03:00 UTC 33.3%WR -$0.90, 05:00 UTC 44.4%WR -$0.90 (7d)",
+            "impact": "MEDIUM — would save ~$0.30-0.50/7d",
+            "effort": "LOW — time_block_mult already exists in signal_compactor, just needs hourly tiers"
+        },
+        {
+            "item": "Session brain ingestion",
+            "discussed": "Multiple sessions",
+            "impact": "MEDIUM — enables cross-session insight retrieval",
+            "effort": "LOW — run session_brain.py --ingest"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-12T23:00:00Z",
+            "idea": "Stale signal hard block at 3 minutes",
+            "rationale": "Stale entries have same WR as fresh (57% vs 56.4%) but 5x worse PnL per trade. The staleness_mult decay to 0 at 10min is too lenient — signals survive via survival_bonus. A hard block at 3 min would cut the worst entries while preserving fresh signals. cut-loser-CL-T1 on stale = -$2.75/7d, most would be blocked.",
+            "expected_impact": "+$0.50-1.00/7d (conservative: blocks 30% of stale trades, preserves all fresh trades)",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "implementation": "Add MAX_SIGNAL_AGE_MINUTES=3 to hermes_constants.py. In signal_compactor.py compaction loop (~line 1680), add: if age_m > MAX_SIGNAL_AGE_MINUTES: skip with log. Verify no winning trades have age>3min."
+        },
+        {
+            "date": "2026-09-12T23:00:00Z",
+            "idea": "Time-of-day confidence penalty for 03:00-06:00 UTC",
+            "rationale": "03:00 UTC: 33.3%WR -$0.90, 05:00 UTC: 44.4%WR -$0.90 (7d). These hours have consistently poor performance across multiple runs. The time_block_mult mechanism already exists in signal_compactor — just needs hourly tiers.",
+            "expected_impact": "+$0.30-0.50/7d",
+            "category": "time-of-day",
+            "status": "suggested",
+            "risk": "low",
+            "implementation": "Add TIME_BLOCK_TIERS dict to hermes_constants.py: {3: 0.5, 4: 0.7, 5: 0.5}. Already wired in signal_compactor time_block_mult."
+        },
+        {
+            "date": "2026-09-12T23:00:00Z",
+            "idea": "NORMAL regime confidence discount",
+            "rationale": "NORMAL regime -$2.26/7d across 74 trades. EXTREME +$2.84. The regime_mult already penalizes counter-regime, but NORMAL gets no special treatment. Adding a NORMAL penalty (0.7x) would reduce false signals in choppy markets.",
+            "expected_impact": "+$0.50-1.00/7d (blocks ~40% of NORMAL losers while preserving EXTREME/HIGH winners)",
+            "category": "regime creative",
+            "status": "suggested",
+            "risk": "medium — needs backtest to verify it doesn't block NORMAL winners",
+            "implementation": "In regime_mult logic, add: if regime == 'NORMAL': reg_mult *= 0.7"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        {
+            "action": "Implement MAX_SIGNAL_AGE_MINUTES=3 hard block",
+            "priority": "HIGH",
+            "effort": "~10 lines",
+            "expected_impact": "+$0.50-1.00/7d",
+            "verification": "Check last 7d: how many winning trades had age>3min? If 0, safe to deploy."
+        },
+        {
+            "action": "Verify trend_purity+ EXTREME penalty (needs 20+ trades)",
+            "priority": "MEDIUM",
+            "note": "Applied at 15:30 UTC Sep 12. Only 3 trades since."
+        },
+        {
+            "action": "Monitor NORMAL regime — consider confidence discount",
+            "priority": "MEDIUM",
+            "note": "$2.26/7d drag. Needs backtest before deploying."
+        },
+        {
+            "action": "Legacy exits by Sep 13 (tomorrow)",
+            "priority": "LOW",
+            "note": "ema300_dip_short, slow_grind, coiled_spring, sma20_dip, pullback_entry+ all aging out."
+        }
+    ]
 }

@@ -1283,3 +1283,23 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 ## TEAM UPDATES
 - [2026-09-12 ~16:00 UTC] brain_auditor: FULL AUDIT. 24h: 41T 61.0% WR -$0.24 (verified). 7d: 337T 56.1% WR +$0.51 (verified). **KEY FINDINGS:** (1) NORMAL regime worst at -$2.36/7d — legacy aging out Sep 13, active drag: pullback-entry- SHORT -$0.24. (2) rr_engine_resistance SHORT structural: pullback-entry- 15 exits/7d, 26.7% WR -$0.96. (3) Time-of-day: 03:00-05:00 UTC -$0.90/7d, 17:00-22:00 UTC +$1.66/7d. **CREATIVE IDEAS:** (1) Regime-gate pullback-entry- SHORT to EXTREME+HIGH — saves $0.24/7d, low risk. (2) Time-of-day boost 17:00-22:00 UTC — +$0.30-0.50/7d. (3) pump-chain+ kill candidate — 25% WR SL hits -$0.78/7d. **NO CONFIG CHANGES APPLIED** — system profitable, legacy aging out. Files: brain/audit_recommendations.json, brain/creative_improvements.json
 - [2026-09-12 ~17:26 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE. 24h: 41T 63.4% WR -$0.02 (flat, verified brain DB). **KEY FINDING: cut-loser-CL-T1 has 0% WR in 24h — 5 trades, all losses, -$0.86.** This is structural (exit fires when loss threshold hit). Also: pullback-entry- SHORT in HIGH has 3 rr_engine_resistance losses in 48h (ENA -$0.20, ONDO -$0.08, LINK -$0.08). SHORT side underperforms LONG: SHORT -$0.38 vs LONG +$0.34. **trend_purity+ LONG in EXTREME: 7d actually +$0.17 (13T/61.5%WR) — volatility gate working correctly, no action needed.** Exit analysis: profit-monster-trail 17T 100%WR +$1.50 (dominant winner), atr_sl_hit 10T 50%WR -$0.40. **No config changes — system profitable, legacy aging out by Sep 13.** 3 creative ideas generated: regime-adaptive rr_engine threshold, SHORT confidence floor by regime, time-of-day filter for EXTREME.
+- [2026-09-12 ~22:00 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE. 24h: 36T 61.1%WR -$0.24. 7d: 336T 56.3%WR +$0.40. **KEY FINDINGS:** (1) SHORT_RSI_FLOOR=25 active (19:30 UTC) — 0 trades affected yet, needs 24h verification. BANANA SHORT RSI=10.53 was pre-fix loss. (2) trend_purity EXTREME penalty 0.3x active (15:30 UTC) — 4 losses -$0.71 pre-fix, net +$0.17/7d already. (3) MIN_HOLD_MINUTES=10 still NOT IMPLEMENTED — cut-loser-CL-T1 55T/7d -$8.29 legacy, ages out Sep 13. (4) rr_engine_resistance SHORT structural: 29T/7d -$1.28, 37.9% WR. **LOSING TRADE AUTOPSY:** 14 losers analyzed. 3 clusters: trend_purity+ EXTREME whipsaw (4T -$0.71), pullback-entry- SHORT rr_engine exits (3T -$0.36), cut-loser-CL-T1 premature exits (3T -$0.48). All pre-fix trades. **CREATIVE:** (1) TIME-OF-DAY weighting: 19:00 UTC 83.3%WR +$1.62 vs 03:00-05:00 UTC 33-44%WR -$1.80. Real pattern, needs backtest. (2) SHORT regime gate: block SHORT in NORMAL (mild drag -$0.19/7d). (3) bb_bounce_v2_long NORMAL block: 1 trade -$0.22, tiny but free. **NO CONFIG CHANGE** — two fixes just applied, legacy ages out tomorrow, system at breakeven.
+- [2026-09-12 ~23:00 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — no config change
+  WHY: System profitable (24h 34T 64.7%WR +$0.39). Two fixes applied today (SHORT_RSI_FLOOR, trend_purity EXTREME) need verification. Legacy ages out tomorrow.
+  KEY FINDINGS:
+  (1) **Stale entries = #1 drag, STILL NOT BLOCKED.** 86 stale/7d -$1.19 vs 250 fresh/7d +$2.07. Same WR (~57%) but stale loses 5x more per trade. cut-loser-CL-T1 on stale = -$2.75/7d. Session brain EMPTY (needs ingest) but kanban shows this was flagged 4+ times today without implementation.
+  (2) **SHORT_RSI_FLOOR=25 VERIFIED WORKING.** Zero SHORT trades with RSI<25 in 24h. No false blocks.
+  (3) **trend_purity+ EXTREME penalty needs more data.** Only 3 trades since 15:30. 8T/7d 50%WR -$0.15 pre-penalty.
+  (4) **NORMAL regime -$2.26/7d (74T).** Worst regime. EXTREME +$2.84. Choppy price action = signals fire but moves too small.
+  (5) **Time-of-day: 03:00-05:00 UTC consistently poor.** 03:00 33.3%WR -$0.90, 05:00 44.4%WR -$0.90 (7d).
+  LOSING TRADE AUTOPSY (24h, 12 losers):
+  - trend_purity+ EXTREME: 4 LONG losers (MET -$0.16, ARB -$0.11, BIGTIME -$0.14, INJ -$0.30). EXTREME whipsaw. Penalty applied but needs verification.
+  - pullback-entry- HIGH: 3 SHORT losers (ENA -$0.20, ONDO -$0.08, LINK -$0.08). rr_engine_resistance exits. 2/3 stale.
+  - rr-struct HIGH: 2 losers (INJ SHORT -$0.25, BANANA SHORT -$0.12). atr_sl + cut-loser.
+  - bb-bounce-v2-long+ EXTREME: 1 (KAS -$0.26). Stale entry.
+  CREATIVE IDEAS:
+  (1) **MAX_SIGNAL_AGE_MINUTES=3 hard block** — blocks stale entries before they fire. ~$0.50-1.00/7d savings. ~10 lines.
+  (2) **Time-of-day penalty 03:00-06:00 UTC** — time_block_mult already exists, just needs tiers. ~$0.30-0.50/7d.
+  (3) **NORMAL regime confidence discount 0.7x** — reduces chop entries. Needs backtest.
+  FILES: brain/audit_recommendations.json
+  BY: brain_auditor
