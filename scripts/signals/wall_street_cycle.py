@@ -47,11 +47,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
 from paths import HERMES_DATA
 from entry_gates import (
-    rr_gate, volume_gate, candle_close_gate, session_timing_gate,
+    rr_gate, candle_close_gate, session_timing_gate,
 )
 
 from hermes_constants import (
-    WALL_ST_CYCLE_ENABLED,
     WALL_ST_CYCLE_PLUS_ENABLED,
     WALL_ST_CYCLE_MINUS_ENABLED,
     # Euphoria (SHORT) params
@@ -59,15 +58,36 @@ from hermes_constants import (
     WALL_ST_CYCLE_EUPHORIA_EMA_GAP_PCT,
     WALL_ST_CYCLE_EUPHORIA_BB_EXPANSION,
     WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT,
+    # Euphoria confidence tiers
+    WALL_ST_CYCLE_EUPH_RSI_TIER1, WALL_ST_CYCLE_EUPH_RSI_TIER2, WALL_ST_CYCLE_EUPH_RSI_TIER3,
+    WALL_ST_CYCLE_EUPH_RSI_BONUS1, WALL_ST_CYCLE_EUPH_RSI_BONUS2, WALL_ST_CYCLE_EUPH_RSI_BONUS3,
+    WALL_ST_CYCLE_EUPH_EMA_TIER1, WALL_ST_CYCLE_EUPH_EMA_TIER2, WALL_ST_CYCLE_EUPH_EMA_TIER3,
+    WALL_ST_CYCLE_EUPH_EMA_BONUS1, WALL_ST_CYCLE_EUPH_EMA_BONUS2, WALL_ST_CYCLE_EUPH_EMA_BONUS3,
+    WALL_ST_CYCLE_EUPH_VOL_MULT2, WALL_ST_CYCLE_EUPH_VOL_MULT3,
+    WALL_ST_CYCLE_EUPH_VOL_BONUS2, WALL_ST_CYCLE_EUPH_VOL_BONUS3,
+    WALL_ST_CYCLE_EUPH_BB_TIER1, WALL_ST_CYCLE_EUPH_BB_TIER2,
+    WALL_ST_CYCLE_EUPH_BB_BONUS1, WALL_ST_CYCLE_EUPH_BB_BONUS2,
     # Capitulation (LONG) params
     WALL_ST_CYCLE_CAPITULATION_RSI,
     WALL_ST_CYCLE_CAPITULATION_EMA_GAP_PCT,
     WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT,
     WALL_ST_CYCLE_CAPITULATION_WICK_RATIO,
+    # Capitulation confidence tiers
+    WALL_ST_CYCLE_CAP_RSI_TIER1, WALL_ST_CYCLE_CAP_RSI_TIER2, WALL_ST_CYCLE_CAP_RSI_TIER3,
+    WALL_ST_CYCLE_CAP_RSI_BONUS1, WALL_ST_CYCLE_CAP_RSI_BONUS2, WALL_ST_CYCLE_CAP_RSI_BONUS3,
+    WALL_ST_CYCLE_CAP_EMA_TIER1, WALL_ST_CYCLE_CAP_EMA_TIER2, WALL_ST_CYCLE_CAP_EMA_TIER3,
+    WALL_ST_CYCLE_CAP_EMA_BONUS1, WALL_ST_CYCLE_CAP_EMA_BONUS2, WALL_ST_CYCLE_CAP_EMA_BONUS3,
+    WALL_ST_CYCLE_CAP_VOL_MULT2, WALL_ST_CYCLE_CAP_VOL_MULT3,
+    WALL_ST_CYCLE_CAP_VOL_BONUS2, WALL_ST_CYCLE_CAP_VOL_BONUS3,
+    WALL_ST_CYCLE_CAP_WICK_TIER1, WALL_ST_CYCLE_CAP_WICK_TIER2,
+    WALL_ST_CYCLE_CAP_WICK_BONUS1, WALL_ST_CYCLE_CAP_WICK_BONUS2,
     # Common
     WALL_ST_CYCLE_LOOKBACK,
     WALL_ST_CYCLE_AVG_PERIOD,
     WALL_ST_CYCLE_EXTREME_WINDOW,
+    WALL_ST_CYCLE_EXTREME_PCT_TOP,
+    WALL_ST_CYCLE_EXTREME_PCT_BOT,
+    WALL_ST_CYCLE_TREND_SPREAD_MIN,
     WALL_ST_CYCLE_CONF_BASE,
     WALL_ST_CYCLE_CONF_FLOOR,
     WALL_ST_CYCLE_CONF_CAP,
@@ -191,9 +211,9 @@ def _is_at_extreme(candles, direction, window=None):
     position = (price - range_low) / range_size
 
     if direction == 'SHORT':
-        return position > 0.90  # top 10%
+        return position > WALL_ST_CYCLE_EXTREME_PCT_TOP
     else:
-        return position < 0.10  # bottom 10%
+        return position < WALL_ST_CYCLE_EXTREME_PCT_BOT
 
 
 def _detect_euphoria(candles_5m, candles_1h, candles_4h):
@@ -251,32 +271,32 @@ def _detect_euphoria(candles_5m, candles_1h, candles_4h):
     conf = WALL_ST_CYCLE_CONF_BASE
 
     # RSI strength bonus
-    if rsi_1h > 90:
-        conf += 8  # extreme euphoria
-    elif rsi_1h > 85:
-        conf += 5
-    elif rsi_1h > 80:
-        conf += 3
+    if rsi_1h > WALL_ST_CYCLE_EUPH_RSI_TIER1:
+        conf += WALL_ST_CYCLE_EUPH_RSI_BONUS1
+    elif rsi_1h > WALL_ST_CYCLE_EUPH_RSI_TIER2:
+        conf += WALL_ST_CYCLE_EUPH_RSI_BONUS2
+    elif rsi_1h > WALL_ST_CYCLE_EUPH_RSI_TIER3:
+        conf += WALL_ST_CYCLE_EUPH_RSI_BONUS3
 
     # EMA gap bonus (bigger extension = more euphoric)
-    if ema_gap_pct > 10:
-        conf += 8
-    elif ema_gap_pct > 7:
-        conf += 5
-    elif ema_gap_pct > 5:
-        conf += 3
+    if ema_gap_pct > WALL_ST_CYCLE_EUPH_EMA_TIER1:
+        conf += WALL_ST_CYCLE_EUPH_EMA_BONUS1
+    elif ema_gap_pct > WALL_ST_CYCLE_EUPH_EMA_TIER2:
+        conf += WALL_ST_CYCLE_EUPH_EMA_BONUS2
+    elif ema_gap_pct > WALL_ST_CYCLE_EUPH_EMA_TIER3:
+        conf += WALL_ST_CYCLE_EUPH_EMA_BONUS3
 
     # Volume climax bonus
-    if vol_ratio > WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT * 3:
-        conf += 8
-    elif vol_ratio > WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT * 2:
-        conf += 5
+    if vol_ratio > WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT * WALL_ST_CYCLE_EUPH_VOL_MULT3:
+        conf += WALL_ST_CYCLE_EUPH_VOL_BONUS3
+    elif vol_ratio > WALL_ST_CYCLE_EUPHORIA_VOLUME_MULT * WALL_ST_CYCLE_EUPH_VOL_MULT2:
+        conf += WALL_ST_CYCLE_EUPH_VOL_BONUS2
 
     # BB width bonus (wider = more volatile = more euphoric)
-    if bb_width > 8:
-        conf += 5
-    elif bb_width > 6:
-        conf += 3
+    if bb_width > WALL_ST_CYCLE_EUPH_BB_TIER1:
+        conf += WALL_ST_CYCLE_EUPH_BB_BONUS1
+    elif bb_width > WALL_ST_CYCLE_EUPH_BB_TIER2:
+        conf += WALL_ST_CYCLE_EUPH_BB_BONUS2
 
     conf = min(conf, WALL_ST_CYCLE_CONF_CAP)
     conf = max(conf, WALL_ST_CYCLE_CONF_FLOOR)
@@ -350,32 +370,32 @@ def _detect_capitulation(candles_5m, candles_1h, candles_4h):
     conf = WALL_ST_CYCLE_CONF_BASE
 
     # RSI depth bonus (lower = more capitulation)
-    if rsi_1h < 10:
-        conf += 8  # extreme capitulation
-    elif rsi_1h < 15:
-        conf += 5
-    elif rsi_1h < 20:
-        conf += 3
+    if rsi_1h < WALL_ST_CYCLE_CAP_RSI_TIER1:
+        conf += WALL_ST_CYCLE_CAP_RSI_BONUS1
+    elif rsi_1h < WALL_ST_CYCLE_CAP_RSI_TIER2:
+        conf += WALL_ST_CYCLE_CAP_RSI_BONUS2
+    elif rsi_1h < WALL_ST_CYCLE_CAP_RSI_TIER3:
+        conf += WALL_ST_CYCLE_CAP_RSI_BONUS3
 
     # EMA gap bonus (bigger crash = more capitulation)
-    if ema_gap_pct > 10:
-        conf += 8
-    elif ema_gap_pct > 7:
-        conf += 5
-    elif ema_gap_pct > 5:
-        conf += 3
+    if ema_gap_pct > WALL_ST_CYCLE_CAP_EMA_TIER1:
+        conf += WALL_ST_CYCLE_CAP_EMA_BONUS1
+    elif ema_gap_pct > WALL_ST_CYCLE_CAP_EMA_TIER2:
+        conf += WALL_ST_CYCLE_CAP_EMA_BONUS2
+    elif ema_gap_pct > WALL_ST_CYCLE_CAP_EMA_TIER3:
+        conf += WALL_ST_CYCLE_CAP_EMA_BONUS3
 
     # Volume panic bonus
-    if vol_ratio > WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT * 3:
-        conf += 8
-    elif vol_ratio > WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT * 2:
-        conf += 5
+    if vol_ratio > WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT * WALL_ST_CYCLE_CAP_VOL_MULT3:
+        conf += WALL_ST_CYCLE_CAP_VOL_BONUS3
+    elif vol_ratio > WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT * WALL_ST_CYCLE_CAP_VOL_MULT2:
+        conf += WALL_ST_CYCLE_CAP_VOL_BONUS2
 
     # Wick rejection bonus (longer wick = stronger buyer rejection)
-    if wick_ratio > 3.0:
-        conf += 5
-    elif wick_ratio > 2.0:
-        conf += 3
+    if wick_ratio > WALL_ST_CYCLE_CAP_WICK_TIER1:
+        conf += WALL_ST_CYCLE_CAP_WICK_BONUS1
+    elif wick_ratio > WALL_ST_CYCLE_CAP_WICK_TIER2:
+        conf += WALL_ST_CYCLE_CAP_WICK_BONUS2
 
     conf = min(conf, WALL_ST_CYCLE_CONF_CAP)
     conf = max(conf, WALL_ST_CYCLE_CONF_FLOOR)
@@ -420,7 +440,7 @@ def _get_1h_trend(token):
         if ema50 == 0:
             return 'NEUTRAL'
         spread = abs(ema20 - ema50) / ema50 * 100
-        if spread < 0.1:
+        if spread < WALL_ST_CYCLE_TREND_SPREAD_MIN:
             return 'NEUTRAL'
         return 'BULLISH' if ema20 > ema50 else 'BEARISH'
     except Exception:

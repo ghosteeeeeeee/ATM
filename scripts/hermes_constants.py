@@ -3525,10 +3525,69 @@ WALL_ST_CYCLE_CAPITULATION_EMA_GAP_PCT = 5.0  # price >5% below EMA50 = crashed
 WALL_ST_CYCLE_CAPITULATION_VOLUME_MULT = 1.5  # 5m volume >1.5× avg = panic sell
 WALL_ST_CYCLE_CAPITULATION_WICK_RATIO = 1.5   # lower wick >1.5× body = buyer rejection
 
+# Euphoria confidence tier thresholds (RSI)
+WALL_ST_CYCLE_EUPH_RSI_TIER1 = 90         # RSI > 90 → +conf bonus tier 1
+WALL_ST_CYCLE_EUPH_RSI_TIER2 = 85         # RSI > 85 → +conf bonus tier 2
+WALL_ST_CYCLE_EUPH_RSI_TIER3 = 80         # RSI > 80 → +conf bonus tier 3
+WALL_ST_CYCLE_EUPH_RSI_BONUS1 = 8         # bonus for tier 1
+WALL_ST_CYCLE_EUPH_RSI_BONUS2 = 5         # bonus for tier 2
+WALL_ST_CYCLE_EUPH_RSI_BONUS3 = 3         # bonus for tier 3
+
+# Euphoria confidence tier thresholds (EMA gap)
+WALL_ST_CYCLE_EUPH_EMA_TIER1 = 10.0       # EMA gap > 10% → +conf tier 1
+WALL_ST_CYCLE_EUPH_EMA_TIER2 = 7.0        # EMA gap > 7% → +conf tier 2
+WALL_ST_CYCLE_EUPH_EMA_TIER3 = 5.0        # EMA gap > 5% → +conf tier 3
+WALL_ST_CYCLE_EUPH_EMA_BONUS1 = 8
+WALL_ST_CYCLE_EUPH_EMA_BONUS2 = 5
+WALL_ST_CYCLE_EUPH_EMA_BONUS3 = 3
+
+# Euphoria confidence tier thresholds (volume)
+WALL_ST_CYCLE_EUPH_VOL_MULT2 = 2.0        # vol > 2× threshold → bonus
+WALL_ST_CYCLE_EUPH_VOL_MULT3 = 3.0        # vol > 3× threshold → bonus
+WALL_ST_CYCLE_EUPH_VOL_BONUS2 = 5
+WALL_ST_CYCLE_EUPH_VOL_BONUS3 = 8
+
+# Euphoria confidence tier thresholds (BB width)
+WALL_ST_CYCLE_EUPH_BB_TIER1 = 8.0         # BB width > 8% → +conf
+WALL_ST_CYCLE_EUPH_BB_TIER2 = 6.0         # BB width > 6% → +conf
+WALL_ST_CYCLE_EUPH_BB_BONUS1 = 5
+WALL_ST_CYCLE_EUPH_BB_BONUS2 = 3
+
+# Capitulation confidence tier thresholds (RSI)
+WALL_ST_CYCLE_CAP_RSI_TIER1 = 10          # RSI < 10 → +conf tier 1
+WALL_ST_CYCLE_CAP_RSI_TIER2 = 15          # RSI < 15 → +conf tier 2
+WALL_ST_CYCLE_CAP_RSI_TIER3 = 20          # RSI < 20 → +conf tier 3
+WALL_ST_CYCLE_CAP_RSI_BONUS1 = 8
+WALL_ST_CYCLE_CAP_RSI_BONUS2 = 5
+WALL_ST_CYCLE_CAP_RSI_BONUS3 = 3
+
+# Capitulation confidence tier thresholds (EMA gap — crash depth)
+WALL_ST_CYCLE_CAP_EMA_TIER1 = 10.0        # crash > 10% below EMA → tier 1
+WALL_ST_CYCLE_CAP_EMA_TIER2 = 7.0         # crash > 7% below EMA → tier 2
+WALL_ST_CYCLE_CAP_EMA_TIER3 = 5.0         # crash > 5% below EMA → tier 3
+WALL_ST_CYCLE_CAP_EMA_BONUS1 = 8
+WALL_ST_CYCLE_CAP_EMA_BONUS2 = 5
+WALL_ST_CYCLE_CAP_EMA_BONUS3 = 3
+
+# Capitulation confidence tier thresholds (volume)
+WALL_ST_CYCLE_CAP_VOL_MULT2 = 2.0         # vol > 2× threshold → bonus
+WALL_ST_CYCLE_CAP_VOL_MULT3 = 3.0         # vol > 3× threshold → bonus
+WALL_ST_CYCLE_CAP_VOL_BONUS2 = 5
+WALL_ST_CYCLE_CAP_VOL_BONUS3 = 8
+
+# Capitulation confidence tier thresholds (wick ratio)
+WALL_ST_CYCLE_CAP_WICK_TIER1 = 3.0        # wick > 3× body → strong rejection
+WALL_ST_CYCLE_CAP_WICK_TIER2 = 2.0        # wick > 2× body → moderate rejection
+WALL_ST_CYCLE_CAP_WICK_BONUS1 = 5
+WALL_ST_CYCLE_CAP_WICK_BONUS2 = 3
+
 # Common parameters
 WALL_ST_CYCLE_LOOKBACK = 100               # 5m candles to fetch
 WALL_ST_CYCLE_AVG_PERIOD = 20              # bars for average volume
 WALL_ST_CYCLE_EXTREME_WINDOW = 30          # bars to define price extreme range
+WALL_ST_CYCLE_EXTREME_PCT_TOP = 0.90       # price in top 10% = at extreme high
+WALL_ST_CYCLE_EXTREME_PCT_BOT = 0.10       # price in bottom 10% = at extreme low
+WALL_ST_CYCLE_TREND_SPREAD_MIN = 0.1       # EMA20/50 spread < 0.1% = NEUTRAL
 
 # Confidence
 WALL_ST_CYCLE_CONF_BASE = 75               # base confidence
