@@ -3851,9 +3851,9 @@ def _filter_safe_prev_hotset(prev_hotset):
         # These apply only to PRESERVED (prev_hotset) entries, not fresh signals.
         HARD_REQUIREMENTS = []  # e.g. ['rs'] to require RS component
         # ── Trend purity: bonus multiplier (not hard requirement) ─────────────
-        # Signals with trend_purity get +50% final score.
+        # Signals with trend_purity get +75% final score (boosted from +50% 2026-09-11).
         has_trend_purity = ('trend_purity+' in sp or 'trend_purity-' in sp)
-        tp_bonus = 1.50 if has_trend_purity else 1.0
+        tp_bonus = 1.75 if has_trend_purity else 1.0
         entry['tp_bonus_mult'] = tp_bonus
         # breakout is single-source but exempt from confluence requirement
         # (it writes to DB directly and bypasses the normal pipeline)

@@ -2253,6 +2253,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
+    'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
     'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)

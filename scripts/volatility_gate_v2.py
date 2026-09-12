@@ -152,6 +152,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
     },
 }
 
