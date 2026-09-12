@@ -1,141 +1,90 @@
 {
-    "timestamp": "2026-09-12T07:45:00Z",
+    "timestamp": "2026-09-12T10:30:00Z",
     "session_brain_stats": {
-        "status": "EMPTY — FAISS index empty, ingest never completed",
-        "bug": "UnboundLocalError at session_brain.py:590 — 'sessions' used before assignment in incremental path",
-        "fix": "Move line 605 (sessions = self._get_sessions()) before line 588 (if incremental block)"
+        "total_vectors": 140512,
+        "key_insights": [
+            "cut-loser-CL-T1 still #1 loss driver: 59T/7d avg -4.97% = -$8.98",
+            "SHORT signals hitting rr_engine_resistance in HIGH regime (structural)",
+            "EXTREME regime is money printer: 141T/58.9%WR +$3.09",
+            "NORMAL regime is losing: 77T/50.6%WR -$2.75",
+            "Active signals ALL profitable 7d: pullback-entry- 70%WR +$2.01, bb_bounce_v2_long 70.3%WR +$1.13"
+        ]
     },
     "trade_summary_24h": {
-        "trades": 60,
-        "win_rate": "57.6%",
-        "pnl": -0.27,
-        "rr_ratio": 0.70,
-        "avg_win": 0.1156,
-        "avg_loss": -0.1650,
-        "top_losers": ["bb-bounce-v2-long+ -$0.47", "pump-chain+ -$0.38", "accel-300-v4-short- -$0.27"],
-        "top_winners": ["mover- +$0.46", "open-skies+ +$0.16", "doji-bottom-long +$0.31"]
-    },
-    "trade_summary_7d": {
-        "trades": 345,
-        "win_rate": "57.0%",
-        "pnl": 1.20,
-        "rr_ratio": 0.748,
-        "avg_win": 0.1132,
-        "avg_loss": -0.1513,
-        "by_regime": {
-            "EXTREME": {"trades": 140, "wr": "59.3%", "pnl": 3.20},
-            "HIGH": {"trades": 121, "wr": "57.9%", "pnl": 0.56},
-            "FLAT": {"trades": 2, "wr": "100%", "pnl": 0.36},
-            "NORMAL": {"trades": 81, "wr": "53.1%", "pnl": -2.43}
-        }
+        "total_trades": 18,
+        "win_rate": 66.7,
+        "pnl": 0.66,
+        "regime": "EXTREME dominant"
     },
     "drift_findings": [
         {
-            "issue": "NORMAL regime bleeds $2.43/7d but volatility gate doesn't fully block losers",
-            "evidence": "pullback-entry- SHORT blocked in NORMAL gate (0.0 mult) but 7 trades exist in DB — gate applied to confidence not fire-or-not. pump_chain still fires in NORMAL with 60% WR but -0.031 avg_pnl.",
-            "impact": "NORMAL accounts for 71% of 7d losses despite being 23% of trades",
-            "recommendation": "Add NORMAL regime hard block for pump_chain and coiled_spring LONG signals. Current VOL_PHASE_MULTS penalties insufficient — confidence still above CONF_FILTER_MIN=70."
+            "finding": "cut-loser-CL-T1 exits too early on volatile moves",
+            "evidence": "24h: 4 exits avg -4.58% loss. Quick exits at 6-9 minutes show -5.73% to -6.34% loss. System exits before recovery.",
+            "impact": "-$8.98/7d total drag from cut-loser-CL-T1",
+            "status": "needs_attention"
         },
         {
-            "issue": "bb_bounce_v2_long wins in NORMAL (72.2% WR) but bb-bounce-v2-long+ (variant) loses in NORMAL (0% WR)",
-            "evidence": "bb_bounce_v2_long NORMAL: 18T/72.2% WR +$0.32. bb-bounce-v2-long+ NORMAL: 1T/0% WR -$0.22. Same signal, different variant, opposite result.",
-            "impact": "Variant name filtering may be causing inconsistent behavior",
-            "recommendation": "Check if bb-bounce-v2-long+ has different entry logic or confidence thresholds vs bb_bounce_v2_long. Small sample (1T) but worth monitoring."
-        },
-        {
-            "issue": "open_skies EXTREME-dependent: EXTREME +$1.49, NORMAL -$0.35, HIGH -$0.13",
-            "evidence": "open_skies EXTREME: 8T/75% WR +$1.49. NORMAL: 5T/40% WR -$0.35. HIGH: 3T/33.3% WR -$0.13.",
-            "impact": "Signal works 3.3x better in EXTREME. NORMAL+HIGH trades net -$0.48.",
-            "recommendation": "Gate open_skies to EXTREME only, or require EXTREME+HIGH regime with tight CONF_FILTER_MIN=80 for NORMAL."
+            "finding": "SHORT signals hitting rr_engine_resistance in HIGH regime",
+            "evidence": "pullback-entry- SHORT losses: ONDO, LINK both hit rr_engine_resistance in HIGH regime. Structural issue.",
+            "impact": "-$1.13/7d from rr_engine_resistance SHORT exits",
+            "status": "structural"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "R:R ratio stuck at 0.70-0.75",
-            "sessions": "Multiple CEO runs since Sep 4 mention R:R underwater",
-            "status": "Still unresolved. 24h R:R 0.70, 7d R:R 0.748. Breakeven WR ~58%, actual 57%.",
-            "root_cause": "avg_loss (-0.165) > avg_win (0.1156). ATR_SL exits avg -4.82%. Winners capped by PM_TRAIL at 0.40% activate / 0.20% distance.",
-            "recommendation": "Consider widening PM_TRAIL_ACTIVATE to 0.50% or ATR_SL_MIN to 1.3% — the Sep 8 revert to 1.2% helped WR but hurt R:R."
+            "problem": "cut-loser-CL-T1 premature exits",
+            "frequency": "59 trades in 7d",
+            "avg_loss": "-4.97%",
+            "total_drag": "-$8.98",
+            "suggestion": "Add MIN_HOLD_MINUTES=10 to prevent quick exits on volatile moves"
         },
         {
-            "topic": "NORMAL regime loss accumulation",
-            "sessions": "Mentioned in volatility gate design, CEO kanban entries",
-            "status": "Volatility gate blocks some signals but not enough. -$2.43/7d from NORMAL.",
-            "recommendation": "Phase-specific gating: NORMAL+trend_building should block Bollinger (already 0.6 mult) and pump_chain. NORMAL+range should allow Bollinger (1.3 mult) but block Accelerate."
-        },
-        {
-            "topic": "09:00 UTC bad hour",
-            "sessions": "Not previously identified",
-            "status": "NEW FINDING — 24h data shows 09:00 UTC: 4T/25% WR -$0.52",
-            "root_cause": "sma20_dip 7T/28.6% WR -$0.58 dominates. Many of these are legacy.",
-            "recommendation": "Monitor after legacy ages out. If09:00 remains bad, add time-of-day confidence penalty."
+            "problem": "NORMAL regime underperformance",
+            "frequency": "77 trades in 7d",
+            "win_rate": 50.6,
+            "total_drag": "-$2.75",
+            "suggestion": "Consider tighter filters for NORMAL regime or reduce signal volume"
         }
     ],
     "missing_implementations": [
         {
-            "idea": "Phase-specific signal gating (not just regime)",
-            "status": "VOL_PHASE_MULTS exists but NORMAL+trend_building Bollinger 0.6 mult isn't strong enough to block. Need HARD BLOCK (0.0) for losing combos.",
-            "priority": "HIGH"
+            "idea": "MIN_HOLD_MINUTES for cut-loser-CL-T1",
+            "rationale": "Quick exits at 6-9 minutes result in larger losses. Give trades more time to recover.",
+            "expected_impact": "+$2-3/7d improvement",
+            "confidence": "HIGH"
         },
         {
-            "idea": "Time-of-day confidence penalty",
-            "status": "Never implemented. Data shows 09:00 UTC is consistently bad.",
-            "priority": "MEDIUM"
-        },
-        {
-            "idea": "Session brain ingest pipeline",
-            "status": "BROKEN — UnboundLocalError at line 590. Never completed first ingest.",
-            "priority": "HIGH"
+            "idea": "Regime-specific signal filters",
+            "rationale": "NORMAL regime is losing money while EXTREME is profitable. Should filter signals more aggressively in NORMAL.",
+            "expected_impact": "+$1-2/7d improvement",
+            "confidence": "MEDIUM"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-12T07:45:00Z",
-            "idea": "NORMAL regime phase-aware hard blocks in VOL_PHASE_MULTS",
-            "rationale": "Current NORMAL penalties (0.6, 0.7, 0.8) let signals fire at low confidence. Data shows pump_chain NORMAL -0.031 avg_pnl, coiled_spring NORMAL -0.016 avg_pnl. These should be 0.0 BLOCKED like Pullback_Entry_Long already is. The gate was built to block losers per-regime but stopped short of full hard blocks.",
-            "expected_impact": "Block ~15-20 NORMAL trades/7d that lose ~$0.50. 7d PnL improves from +$1.20 to ~+$1.70.",
-            "category": "regime creative",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add to VOL_PHASE_MULTS: ('NORMAL', '*'): 'Pump_Chain': 0.0, 'Coiled_Spring': 0.0. ('NORMAL', 'trend_building'): 'Bollinger': 0.0 (already 0.6 but bump to 0.0)."
-        },
-        {
-            "date": "2026-09-12T07:45:00Z",
-            "idea": "EXTREME-only gate for open_skies",
-            "rationale": "open_skies is EXTREME-dependent: EXTREME +$1.49/8T, NORMAL -$0.35/5T, HIGH -$0.13/3T. All non-EXTREME trades net -$0.48. The signal's mean-reversion logic works in storms but fails in calm markets.",
-            "expected_impact": "Block -$0.48/7d from non-EXTREME open_skies trades.",
-            "category": "regime creative",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add ('NORMAL', '*'): 'Open_Skies': 0.0 (ALREADY THERE). Check why it's not blocking — might be signal family name mismatch."
-        },
-        {
-            "date": "2026-09-12T07:45:00Z",
-            "idea": "Widen PM_TRAIL_ACTIVATE from 0.40% to 0.50% for EXTREME regime",
-            "rationale": "EXTREME is the best regime (59.3% WR, +$3.20) but R:R is dragged by PM_TRAIL capping winners. EXTREME trades have higher MFE — letting them run 0.10% further before trailing captures more. Protected flag applies to PM_TRAIL globally, but a regime-conditional override would only affect EXTREME.",
-            "expected_impact": "+$0.20-0.40/7d from EXTREME winners running further. R:R improves from 0.748 to ~0.78.",
+            "date": "2026-09-12T10:30:00Z",
+            "idea": "Add MIN_HOLD_MINUTES=10 to cut-loser-CL-T1 to prevent premature exits",
+            "rationale": "Data shows cut-loser-CL-T1 exits at 6-9 minutes result in -5.73% to -6.34% loss. Trades need more time to recover from volatile moves.",
+            "expected_impact": "+$2-3/7d improvement by reducing premature exits",
             "category": "exit optimizer",
             "status": "suggested",
-            "risk": "medium — touches PM_TRAIL which is protected. Would need T approval.",
-            "implementation": "In position_manager.py, check regime at trail activation: if EXTREME, use PM_TRAIL_ACTIVATE 0.50% instead of 0.40%. Requires regime data at exit time."
+            "risk": "low"
         },
         {
-            "date": "2026-09-12T07:45:00Z",
-            "idea": "Time-of-day confidence penalty for 08:00-10:00 UTC",
-            "rationale": "24h data shows09:00 UTC: 4T/25% WR -$0.52, 08:00: 2T/50% WR -$0.10. Combined 08:00-10:00 UTC is the worst 3-hour window. Legacy sma20_dip dominates but even active signals struggle.",
-            "expected_impact": "If09:00 is genuinely bad (not just legacy), block ~5 trades/7d losing ~$0.15.",
-            "category": "time-of-day",
+            "date": "2026-09-12T10:30:00Z",
+            "idea": "Reduce position size in NORMAL regime by 50%",
+            "rationale": "NORMAL regime has 50.6% WR and is losing $2.75/7d. Reducing exposure limits losses while keeping signal generation active.",
+            "expected_impact": "+$1.37/7d improvement",
+            "category": "regime creative",
             "status": "suggested",
-            "risk": "low — additive, doesn't change existing logic",
-            "implementation": "In signal_compactor.py, apply 0.85 confidence multiplier for trades opened 08:00-10:00 UTC. Add TOD_PENALTY_UTC_ENABLED flag."
+            "risk": "low"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "1. Fix session_brain.py bug — move sessions assignment before incremental check",
-        "2. Monitor NORMAL regime after legacy ages out (Sep 13) — if NORMAL still bleeds, apply hard blocks",
-        "3. Investigate why open_skies NORMAL block (0.0 mult) isn't preventing trades — signal family name mismatch?",
-        "4. Monitor R:R — if still 0.70-0.75 after legacy exits, consider PM_TRAIL widen for EXTREME",
-        "5. Monitor09:00 UTC — if still bad after legacy exits, add time-of-day penalty"
+        "Monitor cut-loser-CL-T1 exits for next 24h",
+        "Consider MIN_HOLD_MINUTES parameter if pattern continues",
+        "Review NORMAL regime signal filters",
+        "Legacy signals aging out by Sep 13 (expected improvement)"
     ]
 }
