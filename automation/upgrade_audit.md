@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Last updated:** 2026-09-11 05:00 UTC
+**Last updated:** 2026-09-12 06:00 UTC
 
 ---
 
@@ -182,3 +182,98 @@
 ### Pending Level 1 Tasks
 1. Short filter VEL threshold 0.3→0.5 — needs simulation script first per audit
 2. EMA300 slope threshold 0→0.1 — needs simulation script first
+
+---
+
+## Plan: 2026-09-11_btc-timing-guard.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Per-signal-type BTC momentum filter — block pump-chain/pullback-entry when BTC already moved in trade direction (prevents chasing)
+- **Difficulty:** Level 1 (~35 lines + 8 constants)
+- **Value:** HIGH — estimated +$28.90 per 50 trades (12 bad entries blocked)
+- **Status:** IMPLEMENTED
+- **Reason:** Added 8 constants to hermes_constants.py (BTC_TIMING_GUARD_*) and ~50 lines to signal_compactor.py after BTC chop gate. LOG_ONLY mode for 48h testing. Blocks pump-chain+ when BTC>+0.3%, pump-chain- when BTC<-0.3%, pullback-entry± at tighter thresholds, accel-300-v4-short- at -0.15%. Syntax verified.
+
+## Plan: 2026-09-11_chop-regime-signal-gating.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Block trend signals in chop + gate STANDALONE_BYPASS when BTC flat
+- **Difficulty:** Level 1 (~20 lines + 3 constants)
+- **Value:** HIGH — estimated +$0.60 per 4 losses
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** Layer A (BTC_CHOP_GATE) and Layer B (bypass gate with _btc_mom_ok_for_bypass) both already in signal_compactor.py. Constants present in hermes_constants.py. CHOP_GATE_LOG_ONLY=True still active.
+
+## Plan: 2026-09-11_btc-pump-rider-gradual-rally.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Detect gradual BTC rallies (vs explosive breakouts) and buy lagging alts
+- **Difficulty:** Level 2 (~80 lines + 8 constants)
+- **Value:** MEDIUM — estimated +$0.20 per rally, catches 5-10 missed trades per day
+- **Status:** IMPLEMENTED
+- **Reason:** Added detect_btc_gradual_rally() + find_lagging_alts_gradual() to btc_pump_rider.py. 8 constants in hermes_constants.py. Modified run() to try gradual rally when no explosive breakout found. Syntax verified.
+
+## Plan: 2026-09-12_btc-momentum-sync-plan.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** 5-layer defense: BTC momentum gate, transition detection, stale signal filter, RSI/z-score guard, continuum context boost
+- **Difficulty:** Level 3-4 (multiple systems)
+- **Value:** HIGH — projected +$4-6/week
+- **Status:** PARTIAL
+- **Reason:** Layer 1 (BTC Momentum Gate) is a superset of the timing guard — partially overlaps. Layer 2 (Transition Detection) not implemented. Layer 3 (Stale Signal Filter tightening) not implemented. Layer 4 (RSI/Z-Score Guard) partially exists. Layer 5 (Continuum Context Boost) already built but not wired. Defer to separate sessions.
+
+## Plan: brain-rag-system.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Feed 602 DSH sessions into FAISS vector index + hourly brain auditor
+- **Difficulty:** Level 4 (new system, 3-4 hours)
+- **Value:** HIGH — cross-session intelligence, config drift detection
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Requires faiss-cpu install, new session_brain.py script, systemd timers, brain auditor agent. Defer.
+
+## Plan: regime-tuner-spec.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Weekly automated regime analysis — re-enable/disable signals based on per-regime WR
+- **Difficulty:** Level 3 (new system with DB writes, file safety, locking)
+- **Value:** HIGH — prevents stale signal states
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Complex: AST-based writes to volatility_gate_v2.py, NEVER_REENABLE protection, file locking. Defer.
+
+## Plan: sniper-exit-strategy.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Proactive position closing on regime shifts — close wrong-side positions
+- **Difficulty:** Level 3 (~350 lines, new systemd service)
+- **Value:** HIGH — estimated +$0.30-$0.75 per transition zone
+- **Status:** CONSTANTS EXIST, LOGIC NOT IMPLEMENTED
+- **Reason:** SNIPER_* constants already in hermes_constants.py (lines 886-898). No sniper_exit.py script exists. Defer.
+
+## Plan: spider-profit.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** Regime-aware profit taking — smaller exits in flat markets, let winners run in trends
+- **Difficulty:** Level 2-3 (modifies profit_monster.py or new script)
+- **Value:** MEDIUM — capital turnover improvement in flat markets
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No SPIDER_* constants exist. Requires profit_monster.py changes. Defer.
+
+## Plan: ema300-rejection-signal-spec.md
+- **Date scanned:** 2026-09-12 05:50
+- **Core request:** EMA300 breakthrough signal — price crashes through EMA300 with momentum
+- **Difficulty:** Level 2 (new signal)
+- **Value:** HIGH — 69-80% WR backtested
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** scripts/signals/ema300_breakthrough.py exists with full constants (EMA300_BREAKTHROUGH_*).
+
+---
+
+## Updated Summary
+
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED (this session) | 2 |
+| ALREADY IMPLEMENTED | 2 |
+| PARTIAL | 2 |
+| NOT IMPLEMENTED | 5 |
+
+### Implemented This Session
+1. **BTC Timing Guard** — per-signal-type momentum filter, LOG_ONLY mode
+2. **BTC Pump Rider Gradual Rally** — gradual rally detection + lagging alt finder
+
+### Next Candidates
+1. `trend_ignition.py` — Level 2, HIGH value, 100% WR in 7-day backtest
+2. Sniper Exit Strategy — Level 3, HIGH value, constants already exist
+3. Regime Tuner — Level 3, HIGH value, prevents stale signal states
+4. Brain RAG System — Level 4, HIGH value, cross-session intelligence

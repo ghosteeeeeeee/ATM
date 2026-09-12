@@ -1119,6 +1119,61 @@ def _score_signal(token, direction, conf, source, signal_type,
                 except Exception:
                     pass
 
+    # ── BTC Timing Guard: block signals when BTC already moved (2026-09-11) ─
+    # Per-signal-type thresholds. Prevents chasing rallies/drops.
+    from hermes_constants import (
+        BTC_TIMING_GUARD_ENABLED, BTC_TIMING_GUARD_LOG_ONLY,
+        BTC_TIMING_GUARD_PUMP_CHAIN_LONG, BTC_TIMING_GUARD_PUMP_CHAIN_SHORT,
+        BTC_TIMING_GUARD_PULLBACK_LONG, BTC_TIMING_GUARD_PULLBACK_SHORT,
+        BTC_TIMING_GUARD_OPEN_SKIES_LONG, BTC_TIMING_GUARD_ACCEL_SHORT,
+    )
+    if BTC_TIMING_GUARD_ENABLED:
+        _tg_conn = None
+        try:
+            _tg_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+            _tg_row = _tg_conn.execute(
+                "SELECT velocity FROM momentum_cache WHERE token='BTC'"
+            ).fetchone()
+            if _tg_row and _tg_row[0] is not None:
+                _btc_30m = _tg_row[0]
+                _bare_st = signal_type.rstrip('+-') if signal_type else ''
+                _block = False
+                _threshold = 0
+                if direction == 'LONG':
+                    if _bare_st == 'pump-chain':
+                        _block = _btc_30m > BTC_TIMING_GUARD_PUMP_CHAIN_LONG
+                        _threshold = BTC_TIMING_GUARD_PUMP_CHAIN_LONG
+                    elif _bare_st == 'pullback-entry':
+                        _block = _btc_30m > BTC_TIMING_GUARD_PULLBACK_LONG
+                        _threshold = BTC_TIMING_GUARD_PULLBACK_LONG
+                    elif _bare_st == 'open-skies':
+                        _block = _btc_30m > BTC_TIMING_GUARD_OPEN_SKIES_LONG
+                        _threshold = BTC_TIMING_GUARD_OPEN_SKIES_LONG
+                elif direction == 'SHORT':
+                    if _bare_st == 'pump-chain':
+                        _block = _btc_30m < BTC_TIMING_GUARD_PUMP_CHAIN_SHORT
+                        _threshold = BTC_TIMING_GUARD_PUMP_CHAIN_SHORT
+                    elif _bare_st == 'pullback-entry':
+                        _block = _btc_30m < BTC_TIMING_GUARD_PULLBACK_SHORT
+                        _threshold = BTC_TIMING_GUARD_PULLBACK_SHORT
+                    elif _bare_st == 'accel-300-v4-short':
+                        _block = _btc_30m < BTC_TIMING_GUARD_ACCEL_SHORT
+                        _threshold = BTC_TIMING_GUARD_ACCEL_SHORT
+                if _block:
+                    if BTC_TIMING_GUARD_LOG_ONLY:
+                        log(f"  ⏱️ [TIMING-GUARD] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (>{_threshold:+.2f}%), chasing")
+                    else:
+                        log(f"  ⏱️ [TIMING-GUARD] {token} {direction} {signal_type}: BLOCKED — BTC 30m={_btc_30m:+.3f}% (>{_threshold:+.2f}%), chasing")
+                        return 0.0
+        except Exception as e:
+            log(f"  [WARN] BTC timing guard check failed: {e}", 'WARN')
+        finally:
+            if _tg_conn:
+                try:
+                    _tg_conn.close()
+                except Exception:
+                    pass
+
     # ── Chop Detector: preserve winrates during transitions (2026-09-05) ──
     # Detects chop via WR degradation + BTC flatness + FLAT vol regime.
     # Blocks momentum signals in chop (preserves their WR for next trend).

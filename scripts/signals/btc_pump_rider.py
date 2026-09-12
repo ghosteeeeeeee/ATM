@@ -55,6 +55,14 @@ from hermes_constants import (
     BTC_PUMP_RIDER_CONF_CAP,
     BTC_PUMP_RIDER_CONF_BETA_BOOST,
     BTC_PUMP_RIDER_COOLDOWN_MINUTES,
+    BTC_PUMP_RIDER_GRADUAL_ENABLED,
+    BTC_PUMP_RIDER_GRADUAL_MIN_CHANGE_30M,
+    BTC_PUMP_RIDER_GRADUAL_MIN_UP_CANDLES,
+    BTC_PUMP_RIDER_GRADUAL_VOL_MIN_RATIO,
+    BTC_PUMP_RIDER_GRADUAL_ALT_MAX_CHANGE,
+    BTC_PUMP_RIDER_GRADUAL_ALT_MIN_BETA,
+    BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX,
+    BTC_PUMP_RIDER_GRADUAL_MAX_ALTS,
 )
 
 SIGNAL_TYPE_LONG = 'btc_pump_rider_long'
@@ -169,6 +177,124 @@ def detect_btc_breakout() -> dict | None:
         'btc_break_pct': (curr_close - prev_high) / prev_high * 100,
         'btc_vel_5m': btc_vel_5m,
     }
+
+
+def detect_btc_gradual_rally() -> dict | None:
+    """
+    Detect gradual BTC rally — sustained buying over 30+ minutes.
+    Returns rally info dict or None.
+    """
+    if not BTC_PUMP_RIDER_GRADUAL_ENABLED:
+        return None
+
+    btc_candles = _get_candles('BTC', 'candles_1m', 60)
+    if len(btc_candles) < 30:
+        return None
+
+    # BTC 30m price change
+    price_30m_ago = btc_candles[-30][4]
+    price_now = btc_candles[-1][4]
+    if price_30m_ago <= 0:
+        return None
+    change_30m = (price_now - price_30m_ago) / price_30m_ago * 100
+
+    if change_30m < BTC_PUMP_RIDER_GRADUAL_MIN_CHANGE_30M:
+        return None
+
+    # Count consecutive up candles in last 15 minutes
+    recent = btc_candles[-15:]
+    up_candles = sum(1 for c in recent if c[4] > c[1])
+    if up_candles < BTC_PUMP_RIDER_GRADUAL_MIN_UP_CANDLES:
+        return None
+
+    # Volume consistency — avg of last 15 candles vs 60 candle avg
+    avg_vol_60 = sum(c[5] for c in btc_candles) / len(btc_candles)
+    avg_vol_15 = sum(c[5] for c in recent) / len(recent)
+    vol_ratio = avg_vol_15 / avg_vol_60 if avg_vol_60 > 0 else 0
+
+    if vol_ratio < BTC_PUMP_RIDER_GRADUAL_VOL_MIN_RATIO:
+        return None
+
+    return {
+        'btc_price': price_now,
+        'btc_change_30m': change_30m,
+        'btc_up_candles': up_candles,
+        'btc_vol_ratio': vol_ratio,
+        'mode': 'gradual_rally',
+    }
+
+
+def find_lagging_alts_gradual(rally_info: dict) -> list:
+    """Find alts that haven't followed BTC yet during a gradual rally."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT DISTINCT token FROM candles_1m
+            WHERE token != 'BTC' AND token != 'USDT'
+            ORDER BY token
+        """)
+        tokens = [r[0] for r in cur.fetchall()]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+    btc_candles = _get_candles('BTC', 'candles_1m', 200)
+    btc_closes = [c[4] for c in btc_candles]
+
+    lagging = []
+    for token in tokens:
+        if token in LONG_BLACKLIST:
+            continue
+
+        cd = get_cooldown(token, 'btc_pump_rider')
+        if cd and time.time() - cd < BTC_PUMP_RIDER_COOLDOWN_MINUTES * 60:
+            continue
+
+        alt_candles = _get_candles(token, 'candles_1m', 30)
+        if len(alt_candles) < 15:
+            continue
+
+        if alt_candles[-1][5] < BTC_PUMP_RIDER_ALT_VOLUME_MIN:
+            continue
+
+        # Alt 30m change — must not have moved yet
+        alt_30m_ago = alt_candles[-15][4]
+        alt_now = alt_candles[-1][4]
+        if alt_30m_ago <= 0:
+            continue
+        alt_change = (alt_now - alt_30m_ago) / alt_30m_ago * 100
+
+        if alt_change > BTC_PUMP_RIDER_GRADUAL_ALT_MAX_CHANGE:
+            continue
+
+        alt_closes = [c[4] for c in alt_candles]
+        beta = compute_alt_beta(token, btc_closes, alt_closes)
+        if beta < BTC_PUMP_RIDER_GRADUAL_ALT_MIN_BETA:
+            continue
+
+        rsi = _compute_rsi(alt_closes)
+        if rsi > BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX:
+            continue
+
+        age = price_age_minutes(token)
+        if age is not None and age > 5:
+            continue
+
+        lagging.append({
+            'token': token,
+            'price': alt_now,
+            'beta': beta,
+            'rsi': rsi,
+            'volume': alt_candles[-1][5],
+            'lag_score': beta * (1 - alt_change / BTC_PUMP_RIDER_GRADUAL_ALT_MAX_CHANGE),
+        })
+
+    lagging.sort(key=lambda x: -x['lag_score'])
+    return lagging[:BTC_PUMP_RIDER_GRADUAL_MAX_ALTS]
 
 
 def compute_alt_beta(token: str, btc_closes: list, alt_closes: list) -> float:
@@ -330,17 +456,24 @@ def run() -> int:
     if not BTC_PUMP_RIDER_ENABLED:
         return 0
 
-    # Step 1: Detect BTC breakout
+    # Step 1: Detect BTC breakout (explosive)
     btc_info = detect_btc_breakout()
+
+    # Step 1b: If no breakout, try gradual rally
     if btc_info is None:
-        return 0
+        btc_info = detect_btc_gradual_rally()
+        if btc_info is None:
+            return 0
+        _log(f"  📈 [BTC-PUMP-RIDER] Gradual rally detected: ${btc_info['btc_price']:,.1f} "
+             f"(+{btc_info['btc_change_30m']:.2f}% in 30min) "
+             f"up_candles={btc_info['btc_up_candles']} vol={btc_info['btc_vol_ratio']:.1f}x")
+        alts = find_lagging_alts_gradual(btc_info)
+    else:
+        _log(f"  ⚡ [BTC-PUMP-RIDER] BTC breakout detected: ${btc_info['btc_price']:,.1f} "
+             f"(+{btc_info['btc_break_pct']:.3f}% above 1h high) "
+             f"vel={btc_info['btc_velocity']:+.3f}% vol={btc_info['btc_vol_ratio']:.1f}x")
+        alts = find_lagging_alts(btc_info)
 
-    _log(f"  ⚡ [BTC-PUMP-RIDER] BTC breakout detected: ${btc_info['btc_price']:,.1f} "
-         f"(+{btc_info['btc_break_pct']:.3f}% above 1h high) "
-         f"vel={btc_info['btc_velocity']:+.3f}% vol={btc_info['btc_vol_ratio']:.1f}x")
-
-    # Step 2: Find lagging alts
-    alts = find_lagging_alts(btc_info)
     if not alts:
         _log(f"  ⚠️ [BTC-PUMP-RIDER] No lagging alts found")
         return 0

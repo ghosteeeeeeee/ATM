@@ -2388,3 +2388,51 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - accel-300-v4-short- 2T 0%WR -$0.27 — only 2 trades, below kill threshold
 
 **Open Questions:** None
+
+## FAVORITES Update — 2026-09-12 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE FOGO (WR=50.0%, PnL=$-0.14, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ME (WR=40.0%, PnL=$-0.38, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['ACE', 'BLUR', 'CC', 'CFX', 'DOT', 'DYDX', 'ENA', 'IMX', 'INJ', 'KAS', 'LTC', 'POL', 'TURBO', 'WLD', 'ZRO']
+
+## LOSERS Update — 2026-09-12 06:05 UTC
+- REMOVE BIGTIME (WR=50.0%, PnL=$-0.10, recovered)
+- REMOVE NOT (insufficient data)
+- REMOVE GMT (insufficient data)
+- REMOVE HBAR (insufficient data)
+- ADD ME (WR=40.0%, PnL=$-0.38, wr_collapse (74.1% → 40.0%))
+- ADD AVAX (WR=33.3%, PnL=$-0.34, wr_collapse (61.1% → 33.3%))
+- ADD NEAR (WR=40.0%, PnL=$-0.19, low_wr (40.0%))
+- ADD GRASS (WR=40.0%, PnL=$1.21, low_wr (40.0%))
+
+Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
+
+## [2026-09-12 06:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.14)
+**PnL:** -$0.14 (0% WR) — BIGTIME trend_purity+ LONG atr_sl_hit -$0.14
+
+**24h:** 60T 34W 56.7%WR -$0.38
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T avg +$0.106
+- atr_sl_hit: 19T avg -$0.033 (31.7% of closes)
+- rr_engine_resistance: 10T avg -$0.020
+- cut-loser-CL-T1: 6T avg -$0.177
+- rr_engine_support_br: 5T avg -$0.058
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour
+- atr_sl_hit 31.7% — below 40% threshold
+- Trade freq 1/hr — normal
+- 6h trend 8W 3L — strong
+- 5 open positions
+- Worst signals: bb-bounce-v2-long+ (4T 25%WR -$0.47) has 1 win, accel-300-v4-short- (2T 0%WR -$0.27) below kill threshold
+- 24h WR improved from 56.7% → 56.7% (stable)
+
+**Open Questions:**
+- BIGTIME trade showed -366% pnl_pct but only -$0.14 loss on $11.10 — possible data quality issue in pnl_pct calculation

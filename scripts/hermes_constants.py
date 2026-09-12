@@ -256,12 +256,10 @@ FAVORITES = {
     'DOT',
     'DYDX',
     'ENA',
-    'FOGO',
     'IMX',
     'INJ',
     'KAS',
     'LTC',
-    'ME',
     'POL',
     'TURBO',
     'WLD',
@@ -282,16 +280,17 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'BIGTIME',
+    'AVAX',
     'ETC',
-    'GMT',
-    'HBAR',
+    'GRASS',
     'IO',
-    'NOT',
+    'ME',
+    'NEAR',
     'SAND',
     'SUSHI',
     'WLFI'
 }
+
 
 
 
@@ -885,6 +884,19 @@ BTC_CHOP_GATE_ENABLED = True
 BTC_CHOP_GATE_THRESHOLD = 0.20            # % — |BTC 30m| below this = CHOP (raised from 0.15 2026-09-11 — too many false entries in tight range)
 CHOP_GATE_LOG_ONLY = True                 # True = log only, don't block. Set False after 48h clean logs.
 
+# ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
+# Blocks signals when BTC has already moved significantly in the trade direction.
+# Prevents chasing: pump-chain+ loses 70% when BTC > +0.3%, pump-chain- loses 60% when BTC < -0.3%.
+BTC_TIMING_GUARD_ENABLED = True
+BTC_TIMING_GUARD_LOG_ONLY = True          # True = log only, don't block. Set False after 48h clean logs.
+# Per-signal-type BTC 30m momentum thresholds (%)
+BTC_TIMING_GUARD_PUMP_CHAIN_LONG = 0.30   # block pump-chain+ if BTC > this
+BTC_TIMING_GUARD_PUMP_CHAIN_SHORT = -0.30 # block pump-chain- if BTC < this
+BTC_TIMING_GUARD_PULLBACK_LONG = 0.20     # block pullback-entry+ if BTC > this
+BTC_TIMING_GUARD_PULLBACK_SHORT = -0.20   # block pullback-entry- if BTC < this
+BTC_TIMING_GUARD_OPEN_SKIES_LONG = 1.00   # open-skies+ is aggressive, allow higher
+BTC_TIMING_GUARD_ACCEL_SHORT = -0.15      # accel-300-v4-short- is very sensitive
+
 # ── Sniper Exit Strategy ──────────────────────────────────────────────────
 # Proactive position closing on regime shifts. Closes wrong-side positions
 # when trend changes, lets right-side positions ride.
@@ -963,6 +975,18 @@ BTC_PUMP_RIDER_CONF_VOLUME_BOOST = 5      # extra conf per 1x above volume thres
 BTC_PUMP_RIDER_CONF_CAP = 92              # max confidence (system ceiling)
 BTC_PUMP_RIDER_CONF_BETA_BOOST = 3        # extra conf per 0.1 beta above minimum
 BTC_PUMP_RIDER_COOLDOWN_MINUTES = 15      # cooldown between signals per token
+
+# ── BTC Pump Rider — Gradual Rally Mode (2026-09-11) ────────────────────────
+# Detects slow, steady BTC rallies (vs explosive breakouts).
+# Catches alts that lag BTC by 5-10 minutes during gradual moves.
+BTC_PUMP_RIDER_GRADUAL_ENABLED = True
+BTC_PUMP_RIDER_GRADUAL_MIN_CHANGE_30M = 0.5   # % — min BTC rise in 30min
+BTC_PUMP_RIDER_GRADUAL_MIN_UP_CANDLES = 3     # consecutive up candles in 15min
+BTC_PUMP_RIDER_GRADUAL_VOL_MIN_RATIO = 1.0    # volume must be above average
+BTC_PUMP_RIDER_GRADUAL_ALT_MAX_CHANGE = 0.3   # % — alt must not have moved yet
+BTC_PUMP_RIDER_GRADUAL_ALT_MIN_BETA = 0.5     # min correlation with BTC
+BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX = 70       # don't buy overbought alts
+BTC_PUMP_RIDER_GRADUAL_MAX_ALTS = 5           # max alt signals per rally
 
 # ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
 # Multi-layer crash detection using leading indicators:
