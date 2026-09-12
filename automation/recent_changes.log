@@ -1,3 +1,11 @@
+[2026-09-12 19:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 36T 61%WR +$0.24 | 0T/1h, 5 open
+  Exit: profit-monster-trail 14T +$1.10, atr_sl_hit 9T -$0.13 (22.5%), cut-loser 5T -$0.86
+  Signal: rr-struct+ best (+$0.07), trend_purity+ worst (-$0.15)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: cut-loser-CL-T1 activation delay fix still pending, trend_purity+ EXTREME penalty applied 15:30 needs more data
+  BY: auto_1hr
+
 [2026-09-12 18:10 UTC] auto_1hr: NO CHANGE — system break-even
   24h: 39T 61.5%WR -$0.26 | All NEUTRAL | 0T/1h, 5 open
   Exit: profit-monster-trail 16T +$1.35, atr_sl_hit 10T -$0.40 (25.6%), cut-loser 5T -$0.86

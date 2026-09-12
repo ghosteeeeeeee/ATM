@@ -1,3 +1,30 @@
+## [2026-09-12 19:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**24h:** 36T 61%WR +$0.24
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 14T +$1.10 (carries system)
+- atr_sl_hit: 9T -$0.13 (22.5%, avg -$0.014)
+- cut-loser-CL-T1: 5T -$0.86 (12.5%, avg -$0.172 — worst per-trade)
+- rr_engine_resistance: 5T -$0.23
+- rr_engine_support_br: 3T -$0.12
+
+**24h by Signal:**
+- trend_purity+ LONG: 8T 50%WR -$0.15 (worst)
+- pump-chain- SHORT: 6T 83%WR -$0.05
+- rr-struct+ LONG: 6T 83%WR +$0.07 (best)
+- pullback-entry- SHORT: 5T 40%WR -$0.23
+- rr-struct- SHORT: 4T 50%WR -$0.20
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour (0 trades closed)
+- Trade freq: 1-3/hr, healthy
+- cut-loser-CL-T1 activation delay: still pending (brain_auditor Sep 12)
+- trend_purity+ EXTREME penalty: applied 15:30 Sep 12, needs more data
+
 ## [2026-09-12 18:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed | 5 open positions

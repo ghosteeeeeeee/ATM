@@ -67,7 +67,8 @@ REGIME_SIGNALS = {
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
+        'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',
@@ -102,7 +103,8 @@ REGIME_SIGNALS = {
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
+        'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',
@@ -144,7 +146,8 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
+        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms (hyphen variant)
+        'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum — works in storms (underscore variant)
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
@@ -233,7 +236,7 @@ VOL_PHASE_MULTS = {
         'Pullback_Entry_Long': 0.0,   # BLOCKED — pullback_entry+ 30% WR in NORMAL, wins in HIGH/EXTREME
         'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 30% WR in NORMAL, wins in EXTREME/HIGH
         'R2': 0.0,                    # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
-        'Open_Skies': 0.0,            # BLOCKED — open-skies 50% WR in NORMAL, wins in EXTREME
+        # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
     },
     # HIGH volatility: block signals that lose here but win in EXTREME/NORMAL
