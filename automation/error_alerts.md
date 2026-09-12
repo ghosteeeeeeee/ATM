@@ -1,3 +1,23 @@
+## Error Alerts — 2026-09-12 14:24 UTC
+- **[INFO]** Pipeline: OK — last run 14:23:20, exit 0, next cycle ~20s
+- **[INFO]** Signals: 109 generated last hour, 67,583 total (healthy flow)
+- **[INFO]** Trades: 0 open (DB), 21 closed today ($0.29 PnL, 66.7% WR)
+- **[INFO]** Regime: 105/105 tokens NEUTRAL, 0 LONG, 0 SHORT
+- **[INFO]** Timers: 30+ hermes timers active, all firing on schedule
+- **[INFO]** Disk: 78% (87G/118G) — 7% from 85% threshold
+- **[INFO]** Services: hermes-pipeline oneshot (inactive=normal), hl-sync-guardian active
+- **[INFO]** No errors, no tracebacks, no crashes in last 30 min
+- **[WARN]** Stale signals persist: SEI SHORT (10min), BLUR SHORT (10min), ALT LONG (10min) — all blocked by max-positions (5/5), system verifying conditions before entry
+- **AUTO-FIX**: None needed — all systems nominal
+
+## Error Alerts — 2026-09-12 09:24 UTC
+- **[INFO]** Pipeline: OK — running, cycle #196381, 0 errors, 0 tracebacks
+- **[INFO]** Signals: 71 generated last hour, 0 survived compaction (market NEUTRAL)
+- **[INFO]** Trades: 0 open, 18 closed today ($0.19 PnL, 66.7% WR)
+- **[INFO]** Regime: 111/112 NEUTRAL, 0% tokens >= 50th percentile
+- **[WARN]** 10 services in "failed" state — all non-critical (auxiliary services)
+- **INFO** Disk at 78% (26G free), all timers active, no auto-fixes needed
+
 ## Error Alerts — 2026-09-11 06:23 UTC
 - **[INFO]** Pipeline: OK — running, last cycle 06:23:11, 5 open trades
 - **[INFO]** Signals: 119 generated in last hour
@@ -227,3 +247,6 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-12 10:55 UTC
+- **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

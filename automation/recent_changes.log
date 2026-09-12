@@ -1,3 +1,11 @@
+[2026-09-12 09:07 UTC] auto_1hr: NO CHANGE — system healthy
+  24h: 58T 58.6%WR +$0.13 | 10T/6h +$0.13 | 1T/1h -$0.08
+  Exit: profit-monster-trail 19T +$2.02, atr_sl_hit 19T -$0.40 (32.8%), cut-loser 6T -$1.06
+  Signal: mover- best (+$0.46), bb-bounce-v2-long+ worst (-$0.59/24h but 2W/7d not killable)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: cut-loser-CL-T1 activation delay (MIN_HOLD_MINUTES=10) from Sep 12 audit still pending
+  BY: auto_1hr
+
 [2026-09-11 15:10 UTC] auto_1hr: KILLED pump-chain+ (PUMP_FLOW_PLUS_ENABLED=False)
   WHY: 13:15 logged kill but never applied — PUMP_FLOW_PLUS_ENABLED stayed True. 12T/24h 25%WR -$0.88. ALL NEUTRAL regime. 75% losers.3 trades after 13:15: ARB -$0.13, AVAX -$0.10, AIXBT +$0.17. SHORT (pump-chain-) stays active at 52.9%WR +$0.10.
   BY: auto_1hr
@@ -1482,3 +1490,60 @@
   WHY: 2T last hour (2W 0L +$0.29). PONS trend_purity+ atr_sl_hit +$0.24, STX rr-struct+ profit-monster-trail +$0.05. 60T/24h 58.3%WR -$0.03 (improved from -$0.38). Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 20/60=33.3% well below 40% threshold. Trade freq 2/hr normal. 24h WR improving: 50.8% → 58.3%. 5 open positions (2 stale: BTC 12.8h, MNT 9h — managed by SL/TP). cut-loser-CL-T1 still biggest loss driver (6T/24h -$1.06) but exit reason not signal. Previous kills already done.
   BY: auto_1hr
   NEXT: Re-run at 08:08 UTC
+[2026-09-12 08:08 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.04). ONDO pullback-entry- rr_engine_resistance -$0.08, LINK pullback-entry- rr_engine_resistance -$0.08, MNT rr-struct- profit-monster-trail +$0.12. 61T/24h 59%WR -$0.07 (stable). Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 20/61=32.8% below 40% threshold. Trade freq 3/hr normal. 24h WR stable at 59% (from 50.8%). 24h PnL stable at -$0.07 (from -$1.31). 7d PnL +$1.30 positive. pullback-entry- still #1 signal 7d: 32T +$1.85. All previous losers already killed. 3 open positions (BTC 13.8h, STX 1.3h, ARB 0.7h). cut-loser-CL-T1 still #1 loss driver -$1.06/24h.
+  BY: auto_1hr
+  NEXT: Re-run at 09:08 UTC
+[2026-09-12 ~08:30 UTC] brain_auditor: FULL AUDIT — VERIFIED + RECOMMENDATIONS
+  WHY: Comprehensive audit of 24h/7d trade data, regime performance, exit analysis, losing trade autopsy, creative improvements.
+  FINDINGS:
+    1. Session brain EMPTY — needs ingestion (cross-session learning blind)
+    2. EXTREME regime is the money printer: 140T/59.3%WR/+3.20 vs NORMAL 79T/51.9%WR/-2.66
+    3. cut-loser-CL-T1 still #1 loss driver: 59T/7d avg -$0.1522 = -$8.98 total
+    4. profit-monster-trail is the ONLY profitable exit: 123T/7d avg +$0.0761 = +$9.36
+    5. rr_engine_resistance SHORT structural drag: 27T/7d -$1.13 (pullback-entry- 14T -$0.76)
+    6. pump-chain+ legacy bleeding 5T/24h -$0.27 (pre-kill, will clear)
+    7. mover- has best R:R (2.38) but only 7T/7d — signal starved
+    8. 24h nearly breakeven: 61T 58.3%WR -$0.03 (from -$1.52 yesterday)
+    9. 7d PnL positive: 345T 57.0%WR +$1.17
+  LOSING TRADE AUTOPSY (24h):
+    - pullback-entry- SHORT (ONDO, LINK): rr_engine_resistance exits in HIGH regime — structural
+    - bb-bounce-v2-long+ LONG (KAS, LTC): atr_sl_hit/cut-loser in EXTREME/NORMAL — variance
+    - pump-chain+ LONG (AVAX, ARB, BABY): pre-kill legacy positions clearing
+    - cut-loser-CL-T1 premature exits: ENA 7min, ARB 9min — no recovery time
+  CREATIVE IMPROVEMENTS (4):
+    1. EXTREME regime confidence boost: CONF_FILTER_MIN=60 when regime=EXTREME
+    2. cut-loser-CL-T1 activation delay: MIN_HOLD_MINUTES=10
+    3. mover- expansion: widen entry criteria for best R:R signal
+    4. pullback-entry- rr_engine resistance widening for SHORT
+  CONFIG: No changes applied (system improving, monitor first)
+  BY: brain_auditor
+
+[2026-09-12 11:00 UTC] brain_auditor: TIME_BLOCK_START 5→3 (extend penalty to hour 03)
+  WHY: 30d data shows hour 03 is 3rd worst (-$1.77, 48.6% WR). Current TIME_BLOCK only covers 05:00-06:59.
+  IMPACT: 0.7x confidence penalty for trades during 03:00-06:59 UTC. No entry condition impact.
+  VERIFICATION: No winning trades would be blocked — penalty reduces confidence score.
+  BY: brain_auditor
+
+[2026-09-12 13:30 UTC] brain_auditor: AUDIT COMPLETE
+  24h: 46T 63.0%WR +$0.72 | 7d: 336T 56.5%WR +$1.26
+  SYSTEM PROFITABLE — no config changes recommended.
+  
+  LOSING TRADE AUTOPSY (24h, 16 losers):
+  - rr_engine_resistance: 2 SHORT losers (ONDO -$0.08, LINK -$0.08) — SHORT entries hitting support bounce
+  - cut-loser-CL-T1: 3 SHORT losers (BANANA -$0.12, ARB -$0.13, ENA -$0.25) — stale + oversold RSI
+  - atr_sl_hit: 3 losers (BIGTIME -$0.14, KAS -$0.26, INJ -$0.30) — normal SL hits
+  - rr_engine_support_br: 2 LONG losers (ARB -$0.11, INJ -$0.30) — support break fails
+  - hard_sl: 1 (W -$0.21) — wide SL, quick exit
+  
+  ROOT CAUSE: 3 worst SHORT losses (BANANA RSI=10.53, ENA RSI=11.76, ONDO RSI=24.14) all had is_stale=True. Shorting into oversold with stale signals = catching falling knife in reverse.
+  
+  CREATIVE IDEAS:
+  1. NORMAL regime SHORT filter — SHORTs lose -$1.13/7d in NORMAL, win in EXTREME/HIGH. Filter could save ~$1/7d.
+  2. stale+oversold SHORT block — block SHORT when is_stale=True AND RSI<30. Would have caught 3 worst losers ($-0.45) without affecting winners.
+  3. Trend following signal — discussed in sessions, never built. Could add backbone for trending markets.
+  
+  FILES: brain/audit_recommendations.json, brain/creative_improvements.json
+  BY: brain_auditor
+[2026-09-12 14:00 UTC] auto_1hr: NO CHANGES — system healthy. 2 trades, +/usr/bin/bash.07. 24h 65.2%WR +/usr/bin/bash.91. All kill/fix criteria below threshold.
+[2026-09-12 14:30 UTC] brain_auditor: FULL AUDIT COMPLETE. Key findings: (1) Stale signals = #1 drag: 35% of 24h trades stale, 40% WR vs 78.6% fresh. Stale SHORTs lose $0.87/24h. (2) NORMAL regime worst: 51.4% WR -$2.36/7d across all signals. (3) rr_engine_resistance structural SHORT: 14 exits/7d, 28.6% WR -$0.76. (4) Creative: stale+oversold SHORT block would save $0.30-0.50/24h. Files: brain/audit_recommendations.json

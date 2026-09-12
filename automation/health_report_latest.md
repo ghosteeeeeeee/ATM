@@ -1,29 +1,23 @@
-## Health Report — 2026-09-10 08:23 UTC
+## Health Report — 2026-09-12 14:24 UTC
 
 PIPELINE: ✅ OK
-- Status: running (last cycle 08:22:48)
-- Signals (1h): 49 generated, 0 above 50% confidence (normal for NEUTRAL regime)
-- Hotset: empty (no signals survived compaction)
-- Open positions: 4/5
-- Closed today: 10 trades, +$0.81 PnL, 60.0% WR
-- Errors: 1 transient (signal_compactor timeout at 08:22, self-recovered)
+- Status: completed (last run 14:23:20, exit 0, duration 17s)
+- Signals (1h): 109 generated, 67,583 total
+- Trades: 0 open (DB), 21 closed today ($0.29 PnL, 66.7% WR)
+- Errors: 0
 
 MARKET:
-- Regime: NEUTRAL (0 long, 2 short, 103 neutral)
-- Overall: NEUTRAL — quiet market, no trades expected
-- No phantom trades detected
+- Regime: 105/105 NEUTRAL, 0 LONG, 0 SHORT
+- Speed: N/A (not queried)
 
 SYSTEM:
-- Pipeline service: active
-- HL Sync Guardian: active
-- Timers: 55 active, all firing on schedule
-- Disk: 83% (93G/118G, 25G free) — 2% from threshold
-- Price collector: active (fired 28s ago)
-- Lock file: present (normal for running pipeline)
+- Timers: 30+ active, all firing on schedule
+- Disk: 78% used (87G/118G)
+- Prices: N/A (prices_hermes.db empty — not in use)
 
 AUTO-FIXES APPLIED:
 - None needed
 
 ALERTS:
-- **[WARN]** Disk at 83% — 2% from 85% threshold. Monitor closely.
-- **[WARN]** signal_compactor timeout at 08:22 — self-recovered on next cycle. Persistent issue from earlier today (multiple timeouts logged in error_alerts.md).
+- [WARN] Stale signals: SEI SHORT, BLUR SHORT, ALT LONG persisting past 5min threshold — all blocked by max-positions (5/5), system verifying conditions before entry
+- [INFO] trades.json shows 5 open positions, 4952 closed total (API dashboard view)

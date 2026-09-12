@@ -2619,3 +2619,110 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 **Open Questions:**
 - BTC SHORT open 16.6h — longest position, near break-even. SL at 77349 (tight)
 - cut-loser-CL-T1 still #1 loss driver but improving (4T vs 5T earlier)
+
+## [2026-09-12 12:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BIGTIME LONG, atr_sl_hit, +$0.15)
+**24h:** 50T 31W 62.0%WR +$0.91
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T +$2.02 (+$0.106 avg) — star performer
+- atr_sl_hit: 14T +$0.10 (28% of closes) — healthy
+- rr_engine_resistance: 7T +$0.02
+- rr_engine_support_br: 5T -$0.29 (-$0.058 avg)
+- cut-loser-CL-T1: 4T -$0.73 (-$0.183 avg)
+- hard_sl: 1T -$0.21
+
+**24h Top Signals:**
+- mover-: 3T 3W +$0.46 (+$0.153 avg)
+- mover+: 3T 3W +$0.36 (+$0.120 avg)
+- rr-struct+: 3T 3W +$0.14
+- pump-chain-: 12T 8W -$0.09 (67%WR, slightly negative)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 28% — well below 40% threshold
+- Trade freq normal (~2/hr)
+- 24h WR 62.0% — healthy
+- 24h PnL +$0.91 — positive
+- pump-chain+ 5T/20%WR — already killed (PUMP_FLOW_PLUS_ENABLED=False), legacy trades clearing
+
+**Open Positions:** 5 managed
+- BTC SHORT (pump-chain-): 17.8h old, SL at 77367 (0.29% from entry)
+- STX LONG (trend_purity+): 5.3h old
+- WLD LONG (rr-struct+): 3.9h old
+- NOT SHORT (pullback-entry-): 3.9h old
+- ENA SHORT (pullback-entry-): 0.8h old, $19.90 size (larger position)
+
+**Open Questions:**
+- BTC SHORT 17.8h — very stale, tight SL. System will handle via cut-loser/SL
+- pump-chain- 12T/67%WR but -$0.09 — wins not big enough. Monitor but not kill threshold
+
+## [2026-09-12 13:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet window)
+**24h:** 46T 62%WR +$0.82
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T +$1.72 (+$0.101 avg) — star
+- atr_sl_hit: 12T +$0.21 (24% of closes) — healthy
+- rr_engine_resistance: 7T +$0.02
+- rr_engine_support_br: 5T -$0.29
+- cut-loser-CL-T1: 4T -$0.73 (-$0.183 avg) — worst, but small losses
+- hard_sl: 1T -$0.21
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 24% — well below 40%
+- Trade freq ~1/hr — normal
+- 24h WR 62% — healthy
+- pump-chain- 12T/66.7%WR but -$0.09 — wins too small, monitor
+- cut-loser-CL-T1 4T but max loss -$0.25 per trade — acceptable noise
+
+**Open Positions:** 5 managed
+- BTC SHORT: 18.75h old, near break-even, system will handle
+- STX LONG: 6.3h
+- WLD LONG: 4.8h
+- NOT SHORT: 4.8h
+- ENA SHORT: 1.8h, $19.90 size (double usual)
+
+**Open Questions:**
+- ENA SHORT $19.90 size — 2x normal. Check if position sizing logic changed or intentional.
+- cut-loser-CL-T1: ARB/ENA cut at 6-9min. Previous analysis proposed MIN_HOLD=10 but not applied. Losses small enough to let it run.
+
+## [2026-09-12 14:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.07 (STX +$0.07 atr_sl_hit, WLD -$0.13 cut-loser)
+
+**24h:** 46T 65.2%WR +$0.91 — system healthy
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 17T +$1.72 (+$0.101 avg) — star
+- atr_sl_hit: 13T +$0.28 (28% of closes) — healthy
+- rr_engine_resistance: 6T +$0.20
+- cut-loser-CL-T1: 5T -$0.86 (-$0.172 avg) — worst, but losses small
+- rr_engine_support_br: 4T -$0.22
+- hard_sl: 1T -$0.21
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades (pullback-entry- at 33.3%WR borderline but losses tiny)
+- atr_sl_hit 28% — well below 40%
+- Trade freq ~1-2/hr — normal
+- cut-loser-CL-T1: ARB/ENA cut at 7-9min, losses small enough
+- 24h WR 65.2% — healthy
+
+**Open Positions:** 5 managed
+- BTC SHORT: 19.8h old (stale, system will handle)
+- NOT SHORT: 5.8h
+- ENA SHORT: 2.8h
+- INJ SHORT: 0.6h
+- AIXBT SHORT: 0.4h
+
+**Open Questions:** None — system operating normally

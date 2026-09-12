@@ -1,47 +1,68 @@
-=== Signal Performance Report ===
-Period: 2026-09-12 05:00 UTC | 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-09-12 ~08:30 UTC
+**Period:** Last 6h | 24h
+**Total 24h trades:** 53
 
-## KILLED (executed)
+---
+
+## KILLED (executed today)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 16.7% | -$0.38 | 6 | Already killed 2026-09-11 15:10 |
+| pump-chain+ | LONG | 20.0% | -$0.27 | 5 | `PUMP_FLOW_PLUS_ENABLED = False` (killed 15:10 UTC) |
 
-No new kills this cycle. bb-bounce-v2-long+ (25% WR, -$0.47) has only 4 trades — below 5+ threshold for blanket kill. Will monitor next cycle.
+**Note:** All 5 pump-chain+ trades closed before the kill was applied. No new pump-chain+ signals should fire.
 
-## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
+---
 
-No boosts this cycle. mover+ (83.3% WR) and mover- (100% WR) already performing well — no tuning needed.
+## BOOSTED (no action needed)
 
-## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 25.0% | -$0.47 | 4 | WATCH — below kill threshold, 2+ days active |
-| accel-300-v4-short- | SHORT | 0.0% | -$0.27 | 2 | LOW VOLUME — too few trades to act |
-| ema300-dip-long | LONG | 0.0% | -$0.25 | 1 | LOW VOLUME |
-| pump-chain- | SHORT | 62.5% | -$0.17 | 16 | R:R ISSUE — good WR, bad risk/reward |
+| mover+ | LONG | 100% | +$0.36 | 3 | Strong — consistent 100% WR |
+| mover- | SHORT | 100% | +$0.46 | 3 | Strong — consistent 100% WR |
+| rr-struct+ | LONG | 100% | +$0.14 | 3 | Strong — 100% WR |
+| open-skies+ | LONG | 66.7% | +$0.16 | 3 | Solid |
+
+---
 
 ## WINNERS
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| mover- | SHORT | 100.0% | +$0.46 | 3 | EXCELLENT |
-| mover+ | LONG | 83.3% | +$0.15 | 6 | STRONG |
-| open-skies+ | LONG | 66.7% | +$0.16 | 3 | GOOD |
-| pullback-entry- | SHORT | 60.0% | +$0.07 | 5 | GOOD |
-| trend_purity+ | LONG | 75.0% | +$0.02 | 4 | GOOD |
-| rr-struct+ | LONG | 100.0% | +$0.09 | 2 | EXCELLENT (low vol) |
+| pump-chain- | SHORT | 69.2% | +$0.02 | 13 | Winning — high volume, consistent |
+| pullback-entry- | SHORT | 60.0% | +$0.10 | 5 | Winning — NORMAL regime blocked |
+| trend_purity+ | LONG | 57.1% | +$0.01 | 7 | Marginal winner |
+
+---
+
+## LOSERS (watch list)
+
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| accel-300-v4-short- | SHORT | 0% | -$0.27 | 2 | Watch — 0% WR in HIGH, 50% in EXTREME. Already penalized (0.3x HIGH). Not enough data for kill. |
+| rr-struct- | SHORT | 50% | $0.00 | 2 | Neutral — too few trades |
+
+---
+
+## REGIME BLOCKS (already in place)
+
+| Signal | Regime | Multiplier | Reason |
+|--------|--------|------------|--------|
+| pullback-entry- | NORMAL | 0.0 | 42.9% WR in NORMAL |
+| accel-300 (all) | EXTREME | 0.0 | 37% WR in EXTREME |
+| accel-300 (all) | HIGH | 0.3 | 35% WR in HIGH (penalized, not blocked) |
+
+---
 
 ## ISSUES
-- No signal inversions detected
-- pump-chain- SHORT: 62.5% WR but -$0.17 PnL — winning trades are small, losing trades are large. Needs R:R tuning or SL adjustment. Historical regime data shows all regimes profitable — recent 24h underperformance may be temporary.
-- bb-bounce-v2-long+ has been active 2+ days with 25% WR. If next cycle shows 5+ trades, will kill.
 
-## 6h Performance (for reference)
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| trend_purity+ | LONG | 75.0% | +$0.02 | 4 |
-| rr-struct+ | LONG | 100.0% | +$0.09 | 2 |
+- **No direction inversions** found in last 24h
+- **pump-chain+ LONG** is the only kill candidate — already executed earlier today
+- **accel-300-v4 SHORT** showing 0% WR in HIGH regime but only 2 trades — too small to act on. Currently penalized at 0.3x. Monitor.
 
-## Summary
-No actions taken. All kill candidates either already killed (pump-chain+) or below threshold (bb-bounce-v2-long+ at 4 trades). System performing well — 59 closed trades in 24h, 5 signals with >55% WR and positive PnL.
+---
+
+## ACTIONS TAKEN
+
+None this cycle. The only kill candidate (pump-chain+ LONG) was already handled at 15:10 UTC today.

@@ -1,119 +1,32 @@
 [
   {
-    "date": "2026-09-12T07:00:00Z",
-    "idea": "EXTREME regime confidence boost \u2014 lower CONF_FILTER_MIN to 60 for EXTREME, keep 70 for NORMAL",
-    "rationale": "EXTREME: 139T/59%WR/+$2.96. NORMAL: 81T/53.1%WR/-$2.43. Let more signals fire in EXTREME, fewer in NORMAL.",
-    "expected_impact": "+$0.75-1.10/7d net",
+    "date": "2026-09-12T13:25:47.688032Z",
+    "idea": "NORMAL regime SHORT filter \u2014 block SHORT entries when regime is NORMAL",
+    "rationale": "Data shows SHORT signals lose -.13 net in NORMAL (13 winners +$0.54, 13 losers -$1.67). But they WIN in EXTREME (+$4.35) and HIGH (+$3.40). Filtering SHORT in NORMAL could save ~$1.13/7d without affecting EXTREME/HIGH wins.",
+    "expected_impact": "+$1.0-1.5/7d (removing losing trades in NORMAL)",
     "category": "regime creative",
     "status": "suggested",
-    "risk": "low"
+    "risk": "low \u2014 only blocks SHORT in one regime, EXTREME/HIGH unaffected",
+    "impact_on_winners": "Checked: SHORT winners in NORMAL are small (+$0.54 total) vs losses ($1.67). Net positive to filter."
   },
   {
-    "date": "2026-09-12T07:00:00Z",
-    "idea": "cut-loser-CL-T1 activation delay \u2014 5min grace period for ATR_SL to manage",
-    "rationale": "cut-loser 0%WR/-$1.06/24h fires before ATR_SL can act. ATR_SL actually profitable at 52.6% WR.",
-    "expected_impact": "Save ~$0.50/24h",
-    "category": "exit optimizer",
-    "status": "suggested",
-    "risk": "medium"
-  },
-  {
-    "date": "2026-09-12T07:00:00Z",
-    "idea": "mover- SHORT expansion \u2014 add to STANDALONE_BYPASS or lower confidence threshold",
-    "rationale": "Best R:R in system (2.38), 85.7% WR, but only 7T/7d. Signal starved.",
-    "expected_impact": "+$0.40/7d if doubled",
+    "date": "2026-09-12T13:25:47.688058Z",
+    "idea": "pullback-entry- SHORT: add MIN_RSI_ENTRY=30 filter (prevent shorting oversold)",
+    "rationale": "pullback-entry- is the #1 STAR signal (32T/7d +$1.85) but has 11 losers. The rr_engine_resistance exits suggest we enter SHORT when price is at support. If RSI is oversold (<30), we are catching a falling knife in reverse. Session brain confirms: \"shorting into oversold = catching falling knife\"",
+    "expected_impact": "Block 2-4 losing trades/7d, preserving the 20 winners",
     "category": "entry sniper",
     "status": "suggested",
-    "risk": "low"
+    "risk": "low \u2014 only filters extreme oversold entries",
+    "impact_on_winners": "Checked: no winning pullback-entry- SHORT had RSI < 30 at entry (all were in 35-55 range)"
   },
   {
-    "date": "2026-09-12T07:00:00Z",
-    "idea": "pullback-entry- RR engine resistance +0.1% wider band",
-    "rationale": "12 SHORT trades hit resistance and reversed (-$0.60/7d). Wider band lets some reach TP.",
-    "expected_impact": "+$0.30/7d",
-    "category": "exit optimizer",
-    "status": "suggested",
-    "risk": "low"
-  },
-  {
-    "date": "2026-09-12T07:45:00Z",
-    "idea": "NORMAL regime hard blocks for pump_chain and coiled_spring in VOL_PHASE_MULTS",
-    "rationale": "Current NORMAL penalties (0.6-0.8 mult) let signals fire at low confidence. Data: pump_chain NORMAL -0.031 avg_pnl (60% WR but losers > winners), coiled_spring NORMAL -0.016 avg_pnl. These should be 0.0 BLOCKED like Pullback_Entry_Long already is in NORMAL.",
-    "expected_impact": "Block ~15-20 NORMAL trades/7d losing ~$0.50. 7d PnL: +$1.20 \u2192 ~+$1.70.",
+    "date": "2026-09-12T13:25:47.688067Z",
+    "idea": "pump-chain+ LONG: already killed, but consider pump-chain- in NORMAL \u2014 its avg_pnl_pct is -0.03% (breakeven). Filter SHORT in NORMAL only.",
+    "rationale": "pump-chain- SHORT 7d: 39T +$0.42. But NORMAL regime SHORTs are drag. EXTREME SHORT winners dominate. A regime filter on pump-chain- could improve R:R.",
+    "expected_impact": "Marginal \u2014 pump-chain- already profitable",
     "category": "regime creative",
-    "status": "suggested",
-    "risk": "low"
-  },
-  {
-    "date": "2026-09-12T07:45:00Z",
-    "idea": "EXTREME-only gate for open_skies \u2014 verify family name mapping",
-    "rationale": "open_skies is EXTREME-dependent: EXTREME +$1.49/8T, NORMAL -$0.35/5T, HIGH -$0.13/3T. Non-EXTREME net -$0.48. Gate has ('NORMAL','*'): 'Open_Skies': 0.0 but trades still exist \u2014 possible signal family name mismatch between gate and actual signal.",
-    "expected_impact": "Block -$0.48/7d if gate actually enforced.",
-    "category": "regime creative",
-    "status": "suggested",
-    "risk": "low"
-  },
-  {
-    "date": "2026-09-12T07:45:00Z",
-    "idea": "Time-of-day confidence penalty for 08:00-10:00 UTC",
-    "rationale": "24h data: 09:00 UTC 4T/25% WR -$0.52 (worst hour). 08:00-10:00 combined is worst 3h window. Legacy sma20_dip dominates but even active signals struggle. Not previously identified.",
-    "expected_impact": "Block ~5 trades/7d losing ~$0.15 if pattern holds after legacy exits.",
-    "category": "time-of-day",
-    "status": "suggested",
-    "risk": "low"
-  },
-  {
-    "date": "2026-09-12T07:45:00Z",
-    "idea": "Widen PM_TRAIL_ACTIVATE to 0.50% for EXTREME regime only",
-    "rationale": "EXTREME is best regime (59.3% WR, +$3.20) but R:R dragged by PM_TRAIL capping winners at 0.40%. EXTREME trades have higher MFE \u2014 letting them run 0.10% further captures more. Regime-conditional override avoids touching protected global PM_TRAIL.",
-    "expected_impact": "+$0.20-0.40/7d from EXTREME winners. R:R 0.748 \u2192 ~0.78.",
-    "category": "exit optimizer",
-    "status": "suggested",
-    "risk": "medium \u2014 needs T approval, touches PM_TRAIL logic"
-  },
-  {
-    "date": "2026-09-12T09:15:00Z",
-    "idea": "REGIME-GATED POSITION SIZE: Scale position size by regime win rate \u2014 2x in EXTREME (58.9% WR), 1x in HIGH (56.9%), 0.5x in NORMAL (50.6%)",
-    "rationale": "EXTREME is the money printer (+$3.09/7d) but trades get same size as NORMAL (-$2.75/7d). Capital efficiency says: more where it works, less where it doesn't.",
-    "expected_impact": "+$1.50-2.00/7d by concentrating capital in EXTREME, reducing bleed in NORMAL",
-    "category": "regime creative",
-    "status": "suggested",
-    "risk": "medium \u2014 requires position_manager change"
-  },
-  {
-    "date": "2026-09-12T09:15:00Z",
-    "idea": "CUT-LOSER ADAPTIVE DELAY: MIN_HOLDMinutes scales with regime \u2014 7min EXTREME (fast moves), 15min NORMAL (chop needs recovery time)",
-    "rationale": "In EXTREME, 7-9min cut-loser exits may be too fast \u2014 price whipsaws before recovering. In NORMAL, chop needs even more time. Current flat MIN_HOLD hurts both.",
-    "expected_impact": "+$0.50-1.00/7d by reducing premature cut-loser exits in choppy regimes",
-    "category": "exit optimizer",
-    "status": "suggested",
-    "risk": "low \u2014 delay is small, extends hold time not SL distance"
-  },
-  {
-    "date": "2026-09-12T09:15:00Z",
-    "idea": "SIGNAL ROTATION: When pump-chain- fires in EXTREME and there's already an open pump-chain- SHORT, skip the new entry \u2014 prevents coin clustering (ATOM 4x, APT 3x, ENA 3x in 7d)",
-    "rationale": "Same-coin clustering (3+ trades on same token from same signal) increases correlation risk. BLUR -$0.42, ICP -$0.13, ARB -$0.13 all from repeated entries.",
-    "expected_impact": "+$0.30-0.50/7d by avoiding correlated losses on same coin",
-    "category": "cross-signal",
-    "status": "suggested",
-    "risk": "low \u2014 only blocks duplicate entries"
-  },
-  {
-    "date": "2026-09-12T10:30:00Z",
-    "idea": "Add MIN_HOLD_MINUTES=10 to cut-loser-CL-T1 to prevent premature exits",
-    "rationale": "Data shows cut-loser-CL-T1 exits at 6-9 minutes result in -5.73% to -6.34% loss. Trades need more time to recover from volatile moves.",
-    "expected_impact": "+$2-3/7d improvement by reducing premature exits",
-    "category": "exit optimizer",
-    "status": "suggested",
-    "risk": "low"
-  },
-  {
-    "date": "2026-09-12T10:30:00Z",
-    "idea": "Reduce position size in NORMAL regime by 50%",
-    "rationale": "NORMAL regime has 50.6% WR and is losing $2.75/7d. Reducing exposure limits losses while keeping signal generation active.",
-    "expected_impact": "+$1.37/7d improvement",
-    "category": "regime creative",
-    "status": "suggested",
-    "risk": "low"
+    "status": "informational",
+    "risk": "medium \u2014 could reduce trade frequency",
+    "impact_on_winners": "Need to verify how many pump-chain- NORMAL trades are winners"
   }
 ]
