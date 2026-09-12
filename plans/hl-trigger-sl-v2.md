@@ -1,8 +1,9 @@
 # HL Trigger SL/TP — V2 Implementation Spec
 
-**Status:** Draft
+**Status:** Draft (bug-hunter audited)
 **Date:** 2026-09-12
 **Author:** Hermes Agent (researched code, SDK, HL API docs, git history)
+**Audit:** bug-hunter subagent — 2 CRITICAL, 4 HIGH, 3 MEDIUM, 4 LOW findings
 
 ---
 
@@ -170,6 +171,43 @@ cancel_all_open_orders(coin) # cancels EVERYTHING for a coin
 
 ---
 
+## 4.5 Bug Hunter Audit Findings (2026-09-12)
+
+### CRITICAL
+
+| # | Finding | Fix Required |
+|---|---------|-------------|
+| C1 | `_execute_atr_bulk_updates` deleted but still called at `position_manager.py:2432` | Replace call with new `_sync_hl_triggers()` |
+| C2 | Guardian `_check_hard_stops` (line 1921) fires `close_position()` WITHOUT checking if HL trigger already handled the close — double-close race | Add `_find_open_trigger_order(coin, "sl")` check before market_close |
+
+### HIGH
+
+| # | Finding | Fix Required |
+|---|---------|-------------|
+| H1 | `place_sl()` has NO retry (place_tp has 3-attempt retry) | Add same retry loop to `place_sl()` |
+| H2 | `_find_open_trigger_order` returns FIRST match — could be stale order | Return most recent (highest oid) when multiple triggers exist |
+| H3 | `replace_sl` cancel-and-recreate: if cancel fails, doesn't attempt fresh placement | After cancel fails, still attempt `place_sl()` |
+| H4 | `place_sl`/`place_tp` return `{"success": True}` on empty status list | Return failure when statuses is empty |
+
+### MEDIUM
+
+| # | Finding | Fix Required |
+|---|---------|-------------|
+| M1 | No price-side pre-validation (LONG SL above current = HL rejection) | Add mid-price check before placement |
+| M2 | `place_tp_sl_batch` can't distinguish SL-fail/TP-ok | Parse per-order status from bulk result |
+| M3 | `replace_tp` missing cancel-and-recreate fallback that `replace_sl` has | Add same fallback to `replace_tp` |
+
+### LOW
+
+| # | Finding |
+|---|---------|
+| L1 | `UNPROTECTABLE_COINS` list may be stale (some coins now blacklisted) |
+| L2 | Rate limit budget in spec is optimistic (~41 actual vs ~11 claimed) |
+| L3 | Guardian uses two different close functions (`close_position_hl` vs `close_position`) — spec conflates them |
+| L4 | `_find_open_trigger_order` bypasses `_info_rate_limit()` via SDK |
+
+---
+
 ## 5. Implementation Details
 
 ### 5.1 New Kill Switches (hermes_constants.py)
@@ -224,15 +262,53 @@ Key differences from V1:
 ### 5.4 Guardian Changes (hl-sync-guardian.py)
 
 ```python
-# In breach detector (Step 11):
-# Before firing market_close, check if HL has an active trigger order
-hl_trigger_exists = _check_hl_trigger_exists(token, direction)
-if hl_trigger_exists:
-    log(f'  [GUARDIAN] {token} — HL trigger active, skipping market_close')
-    continue  # HL will handle the close
-else:
-    log(f'  [GUARDIAN] {token} — NO HL trigger, firing market_close')
-    close_position(token, slippage=CLOSE_SLIPPAGE)
+# FIX C2: Before firing market_close in BOTH hard_sl AND breach detector:
+# Check if HL has an active trigger order for this coin.
+
+# In _check_hard_stops (line ~2035) AND _check_and_close_breached_trades:
+from hyperliquid_exchange import _find_open_trigger_order
+oid, cloid, _, _ = _find_open_trigger_order(token, "sl")
+if oid is not None:
+    log(f'  [GUARDIAN] {token} — HL trigger order active (oid={oid}), '
+        f'skipping market_close — HL will handle')
+    continue  # HL trigger will fire, no need for market close
+
+# Only fire market_close if no HL trigger exists
+result = close_position(token, slippage=CLOSE_SLIPPAGE)
+```
+
+**Critical:** This check must happen in BOTH:
+1. `_check_hard_stops` (line ~2035) — the hard_sl path
+2. `_check_and_close_breached_trades` (line ~3744) — the breach detector
+
+Without this, both HL trigger AND guardian fire on the same breach.
+
+**FIX H1:** Add retry logic to `place_sl()`:
+```python
+def place_sl(coin, direction, sl_price, size):
+    # ... same as place_tp retry logic ...
+    import time
+    last_error = None
+    for attempt in range(3):
+        try:
+            result = exchange.order(...)
+            # ... same error handling as place_tp ...
+        except Exception as e:
+            last_error = str(e)
+            if attempt < 2 and ('429' in str(e) or 'rate limit' in str(e).lower()):
+                time.sleep(2 ** attempt)
+                continue
+            return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
+    return {"success": False, "error": last_error, "coin": coin, "type": "SL"}
+```
+
+**FIX H4:** Return failure on empty status:
+```python
+# In place_sl() and place_tp():
+statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+if not statuses:
+    return {"success": False, "error": "Empty status list — order may not have been placed",
+            "coin": coin, "type": "SL"}
 ```
 
 ### 5.5 Brain.py Trade Open
