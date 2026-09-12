@@ -192,6 +192,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'atr-spike+', 'atr-spike-',  # ATR compression spike
+        'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-11)
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-', 'accel-300-v4-short-',  # trend momentum
         'open-skies+',  # open skies breakout — structural, regime-agnostic
