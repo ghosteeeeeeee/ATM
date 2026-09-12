@@ -1325,6 +1325,10 @@ SIGNAL_EXIT_CONFIG = {
     'accel-300-v3-short+': 'rr_engine',
     'accel-300-v3-short-': 'rr_engine',
     'accel-300-v3-short': 'rr_engine',
+    # Trend purity: PM trail (proven exit for trend signals)
+    'trend_purity+': 'pm_trail',
+    'trend_purity-': 'pm_trail',
+    'trend_purity': 'pm_trail',
     # Default: PM trail (current behavior for all signals not listed)
 }
 
