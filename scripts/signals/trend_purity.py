@@ -25,6 +25,12 @@ from hermes_constants import (
     TP_LOOKBACK,
     TP_SHORT_CRASH_THRESH,
     TP_SHORT_UPTREND_PURITY,
+    TP_CONF_BASE,
+    TP_CONF_GAP_BONUS,
+    TP_CONF_PURITY_BONUS,
+    TP_CONF_SHORT_PUR_BASE,
+    TP_CONF_SHORT_PUR_MULT,
+    TP_CONF_SHORT_CRASH_MULT,
 )
 
 # ── Tunable params (sourced from hermes_constants.py) ─────────────────────────
@@ -32,12 +38,12 @@ EMA_PERIOD    = 30      # EMA period in bars
 PURITY_THRESH = TP_PURITY_THRESH       # fraction of lookback bars must be above EMA
 LOOKBACK      = TP_LOOKBACK            # bars to check for purity
 MIN_GAP_PCT   = TP_MIN_GAP_PCT         # price must be at least this far from EMA to fire
-CONF_BASE     = 65      # base confidence for a clean trend signal
-CONF_GAP_BONUS = 25     # gap multiplier: extra confidence per 0.1% above MIN_GAP_PCT
-CONF_PURITY_BONUS = 50  # purity multiplier for LONG confidence
-CONF_SHORT_PUR_BASE = 0.65  # baseline purity for SHORT confidence bonus
-CONF_SHORT_PUR_MULT = 60    # purity multiplier for SHORT confidence
-CONF_SHORT_CRASH_MULT = 15  # crash severity multiplier for SHORT confidence
+CONF_BASE     = TP_CONF_BASE
+CONF_GAP_BONUS = TP_CONF_GAP_BONUS
+CONF_PURITY_BONUS = TP_CONF_PURITY_BONUS
+CONF_SHORT_PUR_BASE = TP_CONF_SHORT_PUR_BASE
+CONF_SHORT_PUR_MULT = TP_CONF_SHORT_PUR_MULT
+CONF_SHORT_CRASH_MULT = TP_CONF_SHORT_CRASH_MULT
 DRY_RUN       = False
 
 # ── DB paths ─────────────────────────────────────────────────────────────────
@@ -207,13 +213,7 @@ def detect_trend_purity(token: str, direction: str = None):
             # Price was persistently above EMA30 — then crashed below it.
             # This catches the breakdown SHORT, not the bounce.
             #
-            # Logic:
-            #   1. Prerequisite: price must be at least 1% below EMA (genuine crash)
-            #   2. Uptrend was in place: most of the lookback window was ABOVE EMA
-            #      (high LONG-side purity confirms the trend was established)
-            #   3. Current bar is the one that cracked below EMA or widened the gap fast
-            #
-            #   1. Prerequisite: price must be at least TP_SHORT_CRASH_THRESH below EMA (genuine crash)
+            # Prerequisite: price must be at least TP_SHORT_CRASH_THRESH below EMA (genuine crash)
             if gap_pct >= TP_SHORT_CRASH_THRESH:
                 continue
             # Confirm uptrend was in place: most of the lookback bars were ABOVE EMA
@@ -278,10 +278,10 @@ def scan(conf_min: int = 60, token: str = None):
             conn.close()
 
     emitted = 0
+    from hermes_constants import TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED
     for tok in tokens:
         for direction in ['LONG', 'SHORT']:
             # ── Per-direction kill-switch ─────────────────────────────────────────
-            from hermes_constants import TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED
             if direction == 'LONG' and not TREND_PURITY_PLUS_ENABLED:
                 continue
             if direction == 'SHORT' and not TREND_PURITY_MINUS_ENABLED:
@@ -302,10 +302,7 @@ def scan(conf_min: int = 60, token: str = None):
 
 def run(prices_dict=None):
     """Entry point for signals_runner. Returns count of signals emitted."""
-    result = scan(conf_min=60)
-    if result is None:
-        return 0
-    return result if isinstance(result, int) else len(result)
+    return scan(conf_min=60)
 
 
 # ── CLI entry point ───────────────────────────────────────────────────────────

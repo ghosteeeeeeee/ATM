@@ -693,6 +693,14 @@ TP_LOOKBACK              = 20    # was 15   — full 20-bar window for trend qua
 TP_SHORT_CRASH_THRESH     = -1.50 # was -0.75 — only genuine crashes, not small dips
 TP_SHORT_UPTREND_PURITY   = 0.80  # was 0.60 — prior uptrend must be very strong before crash SHORT
 
+# trend_purity confidence formula parameters
+TP_CONF_BASE              = 65    # base confidence for a clean trend signal
+TP_CONF_GAP_BONUS         = 25    # gap multiplier: extra confidence per 0.1% above MIN_GAP_PCT
+TP_CONF_PURITY_BONUS      = 50    # purity multiplier for LONG confidence
+TP_CONF_SHORT_PUR_BASE    = 0.65  # baseline purity for SHORT confidence bonus
+TP_CONF_SHORT_PUR_MULT    = 60    # purity multiplier for SHORT confidence
+TP_CONF_SHORT_CRASH_MULT  = 15    # crash severity multiplier for SHORT confidence
+
 # Candle staleness threshold for signal generators (seconds)
 # Both volume_1m and volume_hl must use the same value to ensure consistent
 # signal quality filtering across all volume-based signals.
