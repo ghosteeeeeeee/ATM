@@ -1385,7 +1385,7 @@ RR_EXIT_FREQ_EXTREME = 60       # 1 min — cascade risk
 
 # Exit thresholds
 RR_EXIT_RESISTANCE_DIST = 0.003   # within 0.3% of resistance = take profit
-RR_EXIT_SUPPORT_BREAK_BUFFER = 0.001   # 0.1% below support = structural break
+RR_EXIT_SUPPORT_BREAK_BUFFER = 0.002   # 0.2% buffer for structural break detection
 RR_EXIT_LIQUIDATION_DIST = 0.005  # within 0.5% of cluster = exit
 RR_EXIT_RR_MIN = 1.0             # R:R below 1:1 = deterioration exit
 RR_EXIT_MIN_BREAK_DIST = 0.005  # 0.5% minimum distance from entry for support/resistance break to fire
