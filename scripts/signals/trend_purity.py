@@ -33,7 +33,11 @@ PURITY_THRESH = TP_PURITY_THRESH       # fraction of lookback bars must be above
 LOOKBACK      = TP_LOOKBACK            # bars to check for purity
 MIN_GAP_PCT   = TP_MIN_GAP_PCT         # price must be at least this far from EMA to fire
 CONF_BASE     = 65      # base confidence for a clean trend signal
-CONF_GAP_BONUS = 20     # extra confidence when gap is large (> 1.0%)
+CONF_GAP_BONUS = 25     # gap multiplier: extra confidence per 0.1% above MIN_GAP_PCT
+CONF_PURITY_BONUS = 50  # purity multiplier for LONG confidence
+CONF_SHORT_PUR_BASE = 0.65  # baseline purity for SHORT confidence bonus
+CONF_SHORT_PUR_MULT = 60    # purity multiplier for SHORT confidence
+CONF_SHORT_CRASH_MULT = 15  # crash severity multiplier for SHORT confidence
 DRY_RUN       = False
 
 # ── DB paths ─────────────────────────────────────────────────────────────────
@@ -94,13 +98,13 @@ def detect_trend_purity(token: str, direction: str = None):
     # Root cause: KAS loss on 2026-09-11 — is_stale=true, wave_phase=falling,
     # speed_percentile=13.7. All three were red flags that should have blocked.
     _speed_data = None
+    _spd_conn = None
     try:
         _spd_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         _spd_row = _spd_conn.execute(
             'SELECT speed_percentile, is_stale, momentum_score, price_acceleration, wave_phase '
             'FROM token_speeds WHERE token = ?', (token.upper(),)
         ).fetchone()
-        _spd_conn.close()
         if _spd_row:
             _speed_data = {
                 'speed_percentile': _spd_row[0],
@@ -111,6 +115,9 @@ def detect_trend_purity(token: str, direction: str = None):
             }
     except Exception:
         pass  # no speed data — don't block, just skip guard
+    finally:
+        if _spd_conn:
+            _spd_conn.close()
 
     # ── BB position guard — block entries at resistance ceiling ────────────
     # Root cause: INJ LONG loss on 2026-09-12 — entered at bb_position=0.967
@@ -162,7 +169,7 @@ def detect_trend_purity(token: str, direction: str = None):
             if purity < PURITY_THRESH:
                 continue
             # Confidence: base + gap bonus + purity bonus
-            conf = min(CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * 25) + (purity - PURITY_THRESH) * 50, 99)
+            conf = min(CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * CONF_GAP_BONUS) + (purity - PURITY_THRESH) * CONF_PURITY_BONUS, 99)
             signals.append({
                 'token': token,
                 'signal_type': 'trend_purity_long',
@@ -208,7 +215,7 @@ def detect_trend_purity(token: str, direction: str = None):
             if not (path_a or path_b):
                 continue
             # Confidence: boost when uptrend was strong (high above_purity) + crash is sharp
-            conf = min(65 + (above_purity - 0.65) * 60 + max(0, (-gap_pct - 1.0) * 15), 99)
+            conf = min(CONF_BASE + (above_purity - CONF_SHORT_PUR_BASE) * CONF_SHORT_PUR_MULT + max(0, (-gap_pct - 1.0) * CONF_SHORT_CRASH_MULT), 99)
             signals.append({
                 'token': token,
                 'signal_type': 'trend_purity_short',
@@ -230,9 +237,6 @@ def detect_trend_purity(token: str, direction: str = None):
 
 
 def scan(conf_min: int = 60, token: str = None):
-    from hermes_constants import TREND_PURITY_ENABLED
-    if not TREND_PURITY_ENABLED:
-        return 0
     """
     Scan all tokens (or single token) and emit trend_purity signals.
 
@@ -240,6 +244,9 @@ def scan(conf_min: int = 60, token: str = None):
         conf_min: minimum confidence to emit
         token: if set, only scan this token
     """
+    from hermes_constants import TREND_PURITY_ENABLED
+    if not TREND_PURITY_ENABLED:
+        return 0
     conn = None
     try:
         conn = sqlite3.connect(STATIC_DB, timeout=10)
