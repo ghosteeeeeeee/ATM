@@ -161,8 +161,8 @@
         <th class="sortable" data-col="5" data-type="num">P&amp;L %</th>
         <th class="sortable" data-col="6" data-type="num">P&amp;L $</th>
         <th class="sortable" data-col="7" data-type="num">Size</th>
-        <th>Margin</th>
         <th class="sortable" data-col="9" data-type="num">Lev</th>
+        <th>Margin</th>
         <th>Exit</th>
         <th>SL</th>
         <th>TP</th>
@@ -583,8 +583,8 @@
           <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
           <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
           <td>$${size.toFixed(1)}</td>
-          <td>$${effSize.toFixed(2)}</td>
           <td>${lev}x</td>
+          <td>$${effSize.toFixed(2)}</td>
           <td style="font-size:0.75em">${getExitStrategyHtml(t.signal)}</td>
           <td class="${slClass}">$${sl.toFixed(6)}<br><span class="dist">${slDistStr}</span></td>
           <td class="${tpClass}">$${tp.toFixed(4)}<br><span class="dist">${tpDistStr}</span></td>
