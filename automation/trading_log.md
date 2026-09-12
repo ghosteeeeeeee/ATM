@@ -2579,3 +2579,43 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 **Open Questions:**
 - cut-loser-CL-T1 still #1 loss driver at -$0.95/24h — STALE_LOSER_TIMEOUT_MINUTES was reduced from 10→8 but still bleeding. Pending: review whether cut-loser should also check regime before cutting
 - mover+ and mover- are best signals by avg PnL but starved at 3T/24h each — expansion opportunity
+
+## [2026-09-12 11:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour
+**24h:** 53T 33W 62.3%WR +$0.92
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T +$2.02 (+$0.106 avg) — star performer
+- atr_sl_hit: 17T +$0.11 (32.1% of closes) — healthy
+- rr_engine_resistance: 7T +$0.02
+- cut-loser-CL-T1: 4T -$0.73 (-$0.183 avg) — improving (was -$0.19)
+- rr_engine_support_br: 5T -$0.29
+- hard_sl: 1T -$0.21
+
+**24h Top Signals:**
+- mover-: 3T 3W +$0.46 (+$0.153 avg)
+- mover+: 3T 3W +$0.36 (+$0.120 avg)
+- rr-struct+: 3T 3W +$0.14
+- pump-chain-: 13T 9W +$0.02 (stable)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades (0 trades this hour)
+- atr_sl_hit 32.1% — below 40% threshold
+- Trade freq normal (quiet hour)
+- 24h WR 62.3% — healthy
+- 24h PnL +$0.92 — positive and improving
+- 5 open positions all managed by SL/TP
+
+**Open Positions:**
+- BTC SHORT (pump-chain-): 16.6h old, $11.10, SL at 77349
+- STX LONG (trend_purity+): 4.2h old, $11.10
+- WLD LONG (rr-struct+): 2.7h old, $11.10
+- NOT SHORT (pullback-entry-): 2.7h old, $11.10
+- BIGTIME LONG (trend_purity+): 1.4h old, $11.10
+
+**Open Questions:**
+- BTC SHORT open 16.6h — longest position, near break-even. SL at 77349 (tight)
+- cut-loser-CL-T1 still #1 loss driver but improving (4T vs 5T earlier)
