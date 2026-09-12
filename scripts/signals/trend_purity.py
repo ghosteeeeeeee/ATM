@@ -106,6 +106,17 @@ def detect_trend_purity(token: str, direction: str = None):
     current_price = lookback_prices[-1]
     gap_pct = (current_price - ema) / ema * 100
 
+    # Compute RSI(14) for trend quality — healthy trends have RSI 50-70
+    _rsi = None
+    if len(prices) >= 15:
+        _changes = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+        _gains = [c for c in _changes[-14:] if c > 0]
+        _losses = [-c for c in _changes[-14:] if c < 0]
+        _avg_gain = sum(_gains) / 14 if _gains else 0
+        _avg_loss = sum(_losses) / 14 if _losses else 0.0001
+        _rs = _avg_gain / _avg_loss
+        _rsi = 100 - (100 / (1 + _rs))
+
     # ── Momentum/speed guard — block stale, falling, or slow entries ────────
     # Root cause: KAS loss on 2026-09-11 — is_stale=true, wave_phase=falling,
     # speed_percentile=13.7. All three were red flags that should have blocked.
@@ -191,7 +202,10 @@ def detect_trend_purity(token: str, direction: str = None):
             if purity < PURITY_THRESH:
                 continue
             # Confidence: base + gap bonus + purity bonus + trend quality modifiers
-            conf = CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * CONF_GAP_BONUS) + (purity - PURITY_THRESH) * CONF_PURITY_BONUS
+            # Purity bonus is scaled by gap quality — 100% purity with tiny gap
+            # means price is hugging EMA, not trending. Real trends have gap.
+            _gap_quality = min(1.0, max(0, gap_pct) / max(MIN_GAP_PCT, 0.01))
+            conf = CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * CONF_GAP_BONUS) + max(0, (purity - PURITY_THRESH) * CONF_PURITY_BONUS * _gap_quality)
 
             # ── Trend quality modifiers ────────────────────────────────────
             # Strong trends get confidence boost, weak trends get penalty.
@@ -213,6 +227,18 @@ def detect_trend_purity(token: str, direction: str = None):
                 # Near bottom of BB (bb < 0.2) → weak position penalty (-3)
                 elif _bb_position < 0.2:
                     conf -= 3
+
+            # RSI quality modifier — healthy trends have RSI 50-70
+            # RSI 60 (WLFI) → neutral/slight bonus
+            # RSI 40 (IOTA) → weak trend penalty
+            # RSI 74 (SAGA) → overbought penalty
+            if _rsi is not None:
+                if 50 <= _rsi <= 70:
+                    conf += 2  # sweet spot
+                elif _rsi < 45:
+                    conf -= 5  # weak/oversold — trend has no momentum
+                elif _rsi > 72:
+                    conf -= 3  # overbought — reversal risk
 
             conf = min(max(round(conf), 50), 99)  # floor at 50 (min to reach decider)
             signals.append({
