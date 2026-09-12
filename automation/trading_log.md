@@ -2436,3 +2436,34 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 
 **Open Questions:**
 - BIGTIME trade showed -366% pnl_pct but only -$0.14 loss on $11.10 — possible data quality issue in pnl_pct calculation
+
+## [2026-09-12 07:08 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.29)
+**PnL:** +$0.29 (100% WR) — PONS trend_purity+ atr_sl_hit +$0.24, STX rr-struct+ profit-monster-trail +$0.05
+
+**24h:** 60T 35W 25L 58.3%WR -$0.03 (almost breakeven, improved from -$0.38)
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 19T avg +$0.106
+- atr_sl_hit: 20T avg -$0.020 (33.3% of closes)
+- rr_engine_resistance: 9T avg -$0.011
+- cut-loser-CL-T1: 6T avg -$0.177 (biggest loss driver -$1.06)
+- rr_engine_support_br: 5T avg -$0.058
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour (2T last hour, both wins)
+- atr_sl_hit 33.3% — below 40% threshold
+- Trade freq 2/hr — normal
+- 24h WR improving: 50.8% → 57.6% → 58.3%
+- 24h PnL improving: -$1.31 → -$0.38 → -$0.03
+- 5 open positions (2 stale: BTC 12.8h, MNT 9h — managed by SL/TP)
+- bb-bounce-v2-long+ (4T 25%WR -$0.47) has 1 win, not killable
+- accel-300-v4-short- (2T 0%WR -$0.27) below kill threshold of 3
+- cut-loser-CL-T1 is exit reason (not signal), all 6 trades losses at -$1.06 total — monitored
+
+**Open Questions:**
+- PONS trade showed +626% pnl_pct but only +$0.24 — pnl_pct data quality issue persists

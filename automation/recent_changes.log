@@ -1478,3 +1478,7 @@
     - pullback-entry- RR engine resistance widening (creative improvement #4)
   CONFIG: No changes applied (session lock check: no lock, but system profitable — monitor first)
   BY: brain_auditor
+[2026-09-12 07:08 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.29). PONS trend_purity+ atr_sl_hit +$0.24, STX rr-struct+ profit-monster-trail +$0.05. 60T/24h 58.3%WR -$0.03 (improved from -$0.38). Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 20/60=33.3% well below 40% threshold. Trade freq 2/hr normal. 24h WR improving: 50.8% → 58.3%. 5 open positions (2 stale: BTC 12.8h, MNT 9h — managed by SL/TP). cut-loser-CL-T1 still biggest loss driver (6T/24h -$1.06) but exit reason not signal. Previous kills already done.
+  BY: auto_1hr
+  NEXT: Re-run at 08:08 UTC

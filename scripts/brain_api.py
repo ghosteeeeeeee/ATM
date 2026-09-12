@@ -74,6 +74,7 @@ def get_stats() -> dict:
         "chunks_total": chunks[0]["cnt"] if chunks else 0,
         "chunk_types": {t["chunk_type"]: t["cnt"] for t in types},
         "faiss_index_mb": round(faiss_size / 1024 / 1024, 1),
+        "faiss_status": "ready" if faiss_path.exists() else "ingesting",
         "db_size_mb": round(db_size / 1024 / 1024, 1),
         "last_ingest": last_ingest[0] if last_ingest else None,
     }

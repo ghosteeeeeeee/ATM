@@ -139,18 +139,19 @@ def clean_text(text: str) -> str:
     return text
 
 
-def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float]:
+def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float, str]:
     """
     Parse a .jsonl.zstd session file and extract all text content.
     
     Returns:
-        (title, chunks, created_at_ms) where chunks is a list of {text, type, timestamp}
+        (title, chunks, created_at_ms, origin) where chunks is a list of {text, type, timestamp}
     """
     import zstandard as zstd
     
     title = ""
     raw_chunks = []
     created_at_ms = 0.0
+    origin = "unknown"
     
     # BUG 1 fix: Accumulate streaming fragments before checking length
     # Key: (msg_type, turn, step) → accumulated text
@@ -200,6 +201,7 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float]:
                     # ── Session metadata (first line) ──
                     if msg_type == "session":
                         created_at_ms = obj.get("createdAt", 0)
+                        origin = obj.get("origin", "unknown")
                         continue
                     
                     # ── User messages ──
@@ -346,9 +348,9 @@ def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float]:
     
     except Exception as e:
         print(f"  ERROR parsing {filepath.name}: {e}")
-        return title, [], created_at_ms
+        return title, [], created_at_ms, origin
     
-    return title, raw_chunks, created_at_ms
+    return title, raw_chunks, created_at_ms, origin
 
 
 def merge_and_chunk(raw_chunks: List[Dict], chunk_size: int = CHUNK_SIZE,
@@ -563,17 +565,19 @@ class SessionBrain:
         files.sort(key=lambda f: f.stat().st_mtime)
         return files
     
-    def ingest(self, incremental: bool = False):
+    def ingest(self, incremental: bool = False, main_only: bool = False):
         """
         Ingest sessions into the brain.
         
         Args:
             incremental: if True, only process new/changed sessions
+            main_only: if True, only ingest main (human) sessions, skip subagents
         """
         start_time = time.time()
         mode = "incremental" if incremental else "full"
+        filter_label = " (main sessions only)" if main_only else ""
         print(f"\n{'='*60}")
-        print(f"Session Brain — {mode.upper()} INGEST")
+        print(f"Session Brain — {mode.upper()} INGEST{filter_label}")
         print(f"{'='*60}")
         
         # BUG 4 fix: On full ingest, rebuild FAISS from scratch
@@ -609,7 +613,13 @@ class SessionBrain:
             print(f"\n[{i+1}/{len(files)}] {session_id[:12]}...", end=" ", flush=True)
             
             # Parse
-            title, raw_chunks, created_at_ms = extract_text_from_session(filepath)
+            title, raw_chunks, created_at_ms, origin = extract_text_from_session(filepath)
+            
+            # Filter: skip subagent sessions if main_only
+            if main_only and origin == "subagent":
+                print("(subagent, skipped)")
+                continue
+            
             if not raw_chunks:
                 print("(no content)")
                 continue
@@ -786,6 +796,8 @@ def main():
     group.add_argument("--update", action="store_true", help="Incremental update (new/changed only)")
     group.add_argument("--query", type=str, help="Semantic search query")
     group.add_argument("--stats", action="store_true", help="Show brain statistics")
+    parser.add_argument("--main-only", action="store_true",
+                        help="Only ingest main (human) sessions, skip subagents")
     parser.add_argument("--top-k", type=int, default=10, help="Number of results for query")
     parser.add_argument("--min-score", type=float, default=0.0, help="Minimum similarity score")
     
@@ -793,9 +805,9 @@ def main():
     brain = SessionBrain()
     
     if args.ingest:
-        brain.ingest(incremental=False)
+        brain.ingest(incremental=False, main_only=args.main_only)
     elif args.update:
-        brain.ingest(incremental=True)
+        brain.ingest(incremental=True, main_only=args.main_only)
     elif args.query:
         results = brain.query(args.query, top_k=args.top_k, min_score=args.min_score)
         if not results:
