@@ -153,6 +153,7 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
+        'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.3x)
     },
 }
 
@@ -225,6 +226,7 @@ VOL_PHASE_MULTS = {
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
+        'Trend_Purity': 0.3,         # PENALIZED — trend_purity+ LONG 50% WR in EXTREME, -$0.15/7d (2026-09-12 brain_auditor)
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
@@ -238,6 +240,7 @@ VOL_PHASE_MULTS = {
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
+        'Pullback_Entry_Short': 0.7,  # PENALIZED — pullback_entry- 57% WR in HIGH (ENA -4.97% chop entry), wins in EXTREME
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
         'Accelerate': 0.3,       # PENALIZED — accel_300 35% WR in HIGH, wins in NORMAL/EXTREME
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME

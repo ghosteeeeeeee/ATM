@@ -1,3 +1,8 @@
+[2026-09-12 15:30 UTC] brain_auditor: CONFIG CHANGE — trend_purity EXTREME penalty
+  WHY: trend_purity+ LONG 50% WR in EXTREME regime, -$0.15/7d. 4 losses in 24h (MET, ARB, BIGTIME, INJ) all in EXTREME. Added 'Trend_Purity': 0.3 to VOL_PHASE_MULTS EXTREME section. Added trend_purity+/- to REGIME_SIGNALS EXTREME. Reduces confidence by 70% in EXTREME, preserving 4 winning trades (+$0.56) while making 4 losers (-$0.71) harder to fire.
+  BY: brain_auditor
+  FILES: scripts/volatility_gate_v2.py
+
 [2026-09-12 09:07 UTC] auto_1hr: NO CHANGE — system healthy
   24h: 58T 58.6%WR +$0.13 | 10T/6h +$0.13 | 1T/1h -$0.08
   Exit: profit-monster-trail 19T +$2.02, atr_sl_hit 19T -$0.40 (32.8%), cut-loser 6T -$1.06

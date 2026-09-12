@@ -1,3 +1,15 @@
+## Error Alerts — 2026-09-12 16:25 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 16:23:19, 0 errors
+- **[INFO]** Signals: 106 generated last hour (healthy flow)
+- **[INFO]** Trades: 25 today, 60% WR, PnL=-$0.31 (flat market)
+- **[INFO]** Open positions: 5/5 (HL copy trades — new entries skipped by design)
+- **[INFO]** Regime: 1 LONG (MET), 0 SHORT, 104 NEUTRAL — flat market
+- **[INFO]** Speed: 0 tokens >= 50% — no momentum
+- **[INFO]** Timers: 60+ active, all critical timers firing
+- **[INFO]** Disk: 78% (87G/118G)
+- **[WARN]** 1 phantom trade — NEAR LONG rr-struct+ PnL=$0.006 (negligible)
+- **AUTO-FIX**: None needed
+
 ## Error Alerts — 2026-09-12 14:24 UTC
 - **[INFO]** Pipeline: OK — last run 14:23:20, exit 0, next cycle ~20s
 - **[INFO]** Signals: 109 generated last hour, 67,583 total (healthy flow)
@@ -250,3 +262,14 @@
 
 ## Error Alerts — 2026-09-12 10:55 UTC
 - **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-12 15:23 UTC
+- **INFO** (2x): `Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument` — benign systemd warning, no operational impact. Pipeline restarted cleanly.
+
+## Error Alerts — 2026-09-12 15:55 UTC
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-12 17:24 UTC
+- **WARN** (1x): `hermes-hl-sync-guardian.timer` last fired 35h ago (Sep 11 06:30). Service active but timer stale.
+- **INFO**: hermes-pipeline.timer, hermes-price-collector.timer disabled — likely running via other triggers.
+- **INFO**: Hotset empty — 104/106 tokens NEUTRAL. Normal in low-volatility regime.

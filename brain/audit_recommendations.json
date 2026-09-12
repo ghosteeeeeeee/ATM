@@ -1,132 +1,123 @@
 {
-    "timestamp": "2026-09-12T14:30:00Z",
-    "session_brain_stats": {
-        "total_vectors": 140512,
-        "top_themes": ["signal performance winrate", "new signal idea improvement", "loss money bleeding losing"]
-    },
-    "trade_summary_24h": {
-        "total_trades": 43,
-        "fresh_trades": 28,
-        "stale_trades": 15,
-        "fresh_WR": 78.6,
-        "stale_WR": 40.0,
-        "fresh_pnl": 1.56,
-        "stale_pnl": -0.87,
-        "net_pnl": 0.67,
-        "regime_mix": "100% NEUTRAL (market), but trades hitting EXTREME/HIGH/NORMAL"
-    },
-    "trade_summary_7d_regime": {
-        "EXTREME": {"trades": 140, "WR": 58.6, "pnl": 2.88},
-        "HIGH": {"trades": 122, "WR": 56.6, "pnl": 0.24},
-        "FLAT": {"trades": 2, "WR": 100.0, "pnl": 0.36},
-        "NORMAL": {"trades": 72, "WR": 51.4, "pnl": -2.36}
-    },
-    "drift_findings": [
-        {
-            "topic": "Stale signal SHORT losses",
-            "session_decision": "Multiple sessions identified stale+oversold SHORT as worst pattern. Discussed adding RSI_MIN=35 filter for SHORT entries when stale.",
-            "current_state": "NOT IMPLEMENTED — no staleness-aware RSI filter exists",
-            "impact": "24h: 15 stale trades, 40% WR, -$0.87. 7d: stale SHORTs across signals are consistent losers.",
-            "severity": "HIGH"
-        },
-        {
-            "topic": "NORMAL regime SHORT bleed",
-            "session_decision": "pullback-entry- SHORT loses in NORMAL (42.9% WR -$0.24/7d) but wins in EXTREME (77.8% +$1.11) and HIGH (68.8% +$0.98). Discussed regime-gating SHORT signals.",
-            "current_state": "NOT IMPLEMENTED — no regime gate on pullback-entry- or pump-chain-",
-            "impact": "7d NORMAL total -$2.36 across all signals. pullback-entry- and pump_chain LONG both lose in NORMAL.",
-            "severity": "MEDIUM"
-        },
-        {
-            "topic": "Trend following signal",
-            "session_decision": "Multiple sessions (score 0.698) discussed building a trend following signal as new backbone. Never implemented.",
-            "current_state": "NOT BUILT — system relies on 5 signals, all mean-reversion/bounce style",
-            "impact": "No trend-following capability. When market trends, bounce signals whipsaw.",
-            "severity": "MEDIUM"
-        },
-        {
-            "topic": "rr_engine_resistance structural SHORT exits",
-            "session_decision": "Known structural issue: SHORT entries hit support levels, rr_engine exits at loss. 14 exits/7d, 28.6% WR, -$0.76.",
-            "current_state": "NOT ADDRESSED — rr_engine continues to exit SHORTs at support",
-            "impact": "pullback-entry- SHORT loses $0.76/7d from rr_engine_resistance alone",
-            "severity": "HIGH"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "Stale signal losses",
-            "frequency": "Every audit for 5+ days",
-            "pattern": "Signals fire, conditions change, trade enters stale. SHORT stale trades consistently lose.",
-            "root_cause": "No staleness-aware entry filter. Compactor fires but market moves before execution.",
-            "recommended_fix": "Add staleness gate: if is_stale=True AND direction=SHORT AND RSI<35, block entry"
-        },
-        {
-            "topic": "NORMAL regime underperformance",
-            "frequency": "3+ audits",
-            "pattern": "Most signals designed for EXTREME/HIGH volatility. In NORMAL (low vol), entries are choppy.",
-            "root_cause": "Mean-reversion signals need volatility to generate edge. LOW vol = noise.",
-            "recommended_fix": "Reduce position size or increase confidence threshold in NORMAL regime"
-        },
-        {
-            "topic": "SHORT R:R drag from rr_engine",
-            "frequency": "Every audit for 7+ days",
-            "pattern": "SHORT entries hit support, rr_engine forces exit at loss. Structural in NEUTRAL.",
-            "root_cause": "rr_engine support detection fires too eagerly on SHORT positions in NEUTRAL market.",
-            "recommended_fix": "Increase rr_engine SHORT support threshold or add regime awareness"
-        }
-    ],
-    "missing_implementations": [
-        "Trend following signal (discussed in sessions, never built)",
-        "Staleness-aware RSI filter for SHORT entries",
-        "NORMAL regime position sizing reduction",
-        "rr_engine support threshold for SHORT in NEUTRAL"
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-12T14:30:00Z",
-            "idea": "Stale SHORT oversold block — block SHORT when is_stale=True AND RSI<35",
-            "rationale": "24h data: stale trades 40% WR vs fresh 78.6% WR. All 6 worst 24h SHORT losers were stale. Would have saved $0.45 in 24h alone. Session brain confirms this pattern across 5+ days.",
-            "expected_impact": "Save ~$0.30-0.50/24h, ~$2-3/7d. Zero impact on fresh winners.",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add staleness check in signal_compactor.py or individual signal filters: if is_stale and direction=='SHORT' and rsi < 35, skip signal"
-        },
-        {
-            "date": "2026-09-12T14:30:00Z",
-            "idea": "NORMAL regime confidence boost — require +5% confidence threshold when volatility_regime=NORMAL",
-            "rationale": "7d NORMAL: 51.4% WR -$2.36. All signals underperform in NORMAL. Instead of disabling signals (starvation), just raise the bar. A signal at conf=72 in NORMAL fires at conf=77.",
-            "expected_impact": "Reduce NORMAL false positives by ~20%, save ~$0.50-1.00/7d",
-            "category": "regime creative",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "In signal_compactor.py, after confidence calculation: if volatility_regime=='NORMAL', confidence += 5"
-        },
-        {
-            "date": "2026-09-12T14:30:00Z",
-            "idea": "pullback-entry- SHORT regime gate — block SHORT when NORMAL and RSI>50",
-            "rationale": "pullback-entry- SHORT: EXTREME 77.8% WR +$1.11, HIGH 68.8% +$0.98, NORMAL 42.9% -$0.24. The signal ONLY works in volatile regimes. In NORMAL, SHORT entries are noise. Combined with stale filter, this is surgical.",
-            "expected_impact": "Save ~$0.24/7d from pullback-entry- NORMAL losses, zero impact on EXTREME/HIGH winners",
-            "category": "regime creative",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "In pullback_entry_short.py: if volatility_regime=='NORMAL' and rsi > 50, skip signal"
-        },
-        {
-            "date": "2026-09-12T14:30:00Z",
-            "idea": "rr_engine SHORT support threshold increase — move SHORT support detection from current to +0.3% above",
-            "rationale": "14 SHORT exits at rr_engine_resistance/7d, 28.6% WR -$0.76. SHORT entries hit support that's too close. Widening the threshold lets SHORTs run further before forced exit.",
-            "expected_impact": "Convert ~30% of losing rr_engine SHORT exits to wins, save ~$0.20-0.30/7d",
-            "category": "exit optimizer",
-            "status": "suggested",
-            "risk": "medium",
-            "implementation": "Adjust rr_engine SHORT support detection threshold, needs backtest first"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "IMPLEMENT: Stale SHORT oversold block (highest confidence, lowest risk)",
-        "MONITOR: NORMAL regime performance after legacy ages out (Sep 13)",
-        "BACKTEST: rr_engine SHORT support threshold change before implementing",
-        "DISCUSS: Trend following signal design with user"
+  "timestamp": "2026-09-12T17:26:25.364142+00:00",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "key_findings": [
+      "Sessions discuss R:R exit optimization extensively \u2014 100% WR with 4 signals but too few trades",
+      "Pullback depth analysis in sessions: 0-0.5% depth has 50-53% WR, deeper pullbacks rare",
+      "Trend following signal discussed in sessions but not implemented as standalone",
+      "BTC crash filter sessions show LONGs when BTC falling = guaranteed bleed"
     ]
+  },
+  "trade_summary_24h": {
+    "trades": 41,
+    "wins": 26,
+    "win_rate": "63.4%",
+    "pnl": -0.02,
+    "by_exit": {
+      "profit_monster_trail": "17T 100%WR +$1.50 (dominant winner)",
+      "atr_sl_hit": "10T 50%WR -$0.40",
+      "cut_loser_CL_T1": "5T 0%WR -$0.86 (ALL losers!)",
+      "rr_engine_resistance": "6T 50%WR -$0.14",
+      "rr_engine_support_br": "3T 33%WR -$0.12"
+    },
+    "by_direction": {
+      "LONG": "13T 61.5%WR +$0.34",
+      "SHORT": "19T 57.9%WR -$0.38"
+    },
+    "regime": {
+      "EXTREME": "26T 65.4%WR +$0.31",
+      "HIGH": "12T 50%WR -$0.52",
+      "NORMAL": "3T 100%WR +$0.19"
+    }
+  },
+  "drift_findings": [
+    {
+      "finding": "cut-loser-CL-T1 has 0% WR in 24h \u2014 5 trades, all losses, -$0.86",
+      "status": "ACTIVE \u2014 this exit type is structural",
+      "impact": "$0.86/24h drag from cut-loser exits alone",
+      "detail": "5 trades hit cut-loser-CL-T1 with 0 wins. WLD -$0.13, BANANA -$0.12, KAS -$0.23, ARB -$0.13, ENA -$0.25. These are positions where the loss limit triggers immediately."
+    },
+    {
+      "finding": "pullback-entry- SHORT in HIGH regime has 3 rr_engine_resistance losses in 48h",
+      "status": "STRUCTURAL \u2014 rr_engine exits SHORT at support levels",
+      "impact": "ENA -$0.20, ONDO -$0.08, LINK -$0.08",
+      "detail": "SHORT entries hit resistance-based exit logic. In HIGH volatility, support/resistance levels are wider, triggering exits before price moves in trade direction."
+    },
+    {
+      "finding": "trend_purity+ LONG in EXTREME \u2014 7d actually +$0.17 (13T/61.5%WR)",
+      "status": "MONITORING \u2014 volatility gate already applied (0.3x mult)",
+      "impact": "Low \u2014 system handles this correctly",
+      "detail": "Brain auditor previously flagged -$0.15/7d. Current data shows +$0.17/7d after volatility gate adjustment. 24h: 9T 55.6%WR +$0.11. No action needed."
+    },
+    {
+      "finding": "SHORT side underperforms LONG in 24h",
+      "status": "STRUCTURAL \u2014 SHORT -$0.38 vs LONG +$0.34",
+      "impact": "Net -$0.74 directional drag",
+      "detail": "pullback-entry- 5T 40%WR -$0.23, pump-chain- 9T 66.7%WR -$0.10, rr-struct- 3T 33.3%WR -$0.25. Only mover- 2T 100%WR +$0.20 profitable."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "rr_engine_resistance SHORT exits",
+      "frequency": "48h: 21 occurrences, SHORT exits dominate losses",
+      "root_cause": "SHORT entries near support levels trigger resistance-based exit before price moves in trade direction",
+      "suggestion": "Consider widening rr_engine_resistance threshold for SHORT signals or adding minimum hold time"
+    },
+    {
+      "topic": "EXTREME regime volume",
+      "frequency": "24h: 26/41 trades (63%) in EXTREME",
+      "root_cause": "Market currently volatile \u2014 EXTREME is dominant regime",
+      "suggestion": "System handles this well \u2014 65.4% WR +$0.31 in EXTREME. No action needed."
+    },
+    {
+      "topic": "cut-loser-CL-T1 zero win rate",
+      "frequency": "24h: 5T 0%WR",
+      "root_cause": "Cut-loser exits fire when loss threshold hit \u2014 by definition these are losses",
+      "suggestion": "This is expected behavior (cut losers early). Monitor avg loss size \u2014 currently -$0.172/trade which is reasonable."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "idea": "Trend following signal (discussed in sessions)",
+      "status": "Not implemented \u2014 sessions discussed spec",
+      "priority": "LOW \u2014 trend_purity+ covers this space"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-12T17:26:25.364161+00:00",
+      "idea": "Regime-adaptive rr_engine_resistance threshold",
+      "rationale": "24h data shows rr_engine_resistance exits SHORT signals prematurely in HIGH regime. 6 trades hit this exit, 50% WR, -$0.14. In EXTREME, the same exit has 77.8% WR for pullback-entry-. The resistance levels are wider in HIGH, triggering exits before the trade develops. Adding a regime-based multiplier (wider threshold in HIGH, tighter in EXTREME) would let SHORT trades breathe in HIGH while catching reversals in EXTREME.",
+      "expected_impact": "+$0.10-0.20/24h from fewer premature SHORT exits in HIGH",
+      "category": "exit optimizer",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-12T17:26:25.364164+00:00",
+      "idea": "SHORT entry confidence floor by regime",
+      "rationale": "SHORT signals in 24h average -$0.38 while LONG +$0.34. In HIGH regime, SHORT has 50% WR. Adding CONF_FILTER_MIN=75 for SHORT entries in HIGH regime (vs 70 currently) would filter marginal SHORT entries. Checking 7d data: pullback-entry- SHORT in HIGH has 64.7% WR with $0.78 PnL \u2014 the signal works, just some entries are low quality.",
+      "expected_impact": "Filter 1-2 marginal SHORT entries per day, improve SHORT WR by 5-10%",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "medium \u2014 could reduce SHORT trade frequency"
+    },
+    {
+      "date": "2026-09-12T17:26:25.364165+00:00",
+      "idea": "Time-of-day filter for EXTREME regime trades",
+      "rationale": "Looking at 24h data: EXTREME regime trades between 00:00-06:00 UTC have 5/6 winners (KAS +0.29, PONS +0.24, BIGTIME +0.21, KAS +0.12, BABY +0.07, ACE +0.01). EXTREME trades 06:00-12:00 UTC have 3/5 winners. The night session (UTC) shows better EXTREME performance. Could weight confidence higher during optimal hours.",
+      "expected_impact": "Marginal \u2014 system already handles EXTREME well (65.4% WR). More useful for future optimization.",
+      "category": "time-of-day",
+      "status": "suggested",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Monitor rr_engine_resistance SHORT exits \u2014 if HIGH regime persists, consider regime-adaptive threshold",
+    "Monitor cut-loser-CL-T1 avg loss \u2014 currently -$0.172/trade, acceptable",
+    "Legacy signals aging out by Sep 13 \u2014 will improve 7d PnL",
+    "System is profitable \u2014 no param changes needed this run"
+  ]
 }

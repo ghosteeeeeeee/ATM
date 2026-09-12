@@ -28,5 +28,69 @@
     "status": "informational",
     "risk": "medium \u2014 could reduce trade frequency",
     "impact_on_winners": "Need to verify how many pump-chain- NORMAL trades are winners"
+  },
+  {
+    "date": "2026-09-12T15:30:00Z",
+    "idea": "Add trend_purity to VOL_PHASE_MULTS with EXTREME multiplier 0.3 (penalized, not blocked)",
+    "rationale": "trend_purity+ LONG has 50% WR in EXTREME regime (8 trades, -$0.15). Small sample but consistent losses. Adding penalty (0.3x) reduces confidence by 70%, making it harder to fire in EXTREME. Safer than hard block (0.0) since there are 4 winning trades (+$0.56).",
+    "expected_impact": "-$0.15/7d drag reduced, +2-3% WR for trend_purity+ in EXTREME",
+    "category": "regime creative",
+    "status": "applied",
+    "risk": "low",
+    "impact_on_winners": "Checked: 4 winning trades in EXTREME (+$0.56) will still fire but with lower confidence. 4 losing trades (-$0.71) will be harder to fire."
+  },
+  {
+    "date": "2026-09-12T16:00:00Z",
+    "idea": "Regime-gate pullback-entry- SHORT to EXTREME+HIGH only",
+    "rationale": "pullback-entry- SHORT: EXTREME 9T 77.8% WR +$1.11, HIGH 17T 64.7% WR +$0.78, NORMAL 7T 42.9% WR -$0.24. NORMAL is dead weight.",
+    "expected_impact": "+$0.24/7d",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T16:00:00Z",
+    "idea": "Time-of-day boost 17:00-22:00 UTC",
+    "rationale": "17:00-22:00 UTC: 82T 60.8% WR +$1.66/7d. 19:00 alone 83.3% WR +$1.62. US session = best performance. Boost confidence 10-15%.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "time-of-day",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T16:00:00Z",
+    "idea": "pump-chain+ kill candidate \u2014 25% WR SL hits -$0.78/7d",
+    "rationale": "pump-chain+ LONG atr_sl_hit: 8T 25% WR -$0.78/7d. Worst active LONG signal by SL hit loss.",
+    "expected_impact": "monitoring",
+    "category": "exit optimizer",
+    "status": "monitoring",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-12T17:26:47.305267+00:00",
+    "idea": "Regime-adaptive rr_engine_resistance threshold",
+    "rationale": "24h data shows rr_engine_resistance exits SHORT signals prematurely in HIGH regime. 6 trades hit this exit, 50% WR, -$0.14. In EXTREME, the same exit has 77.8% WR for pullback-entry-. The resistance levels are wider in HIGH, triggering exits before the trade develops.",
+    "expected_impact": "+$0.10-0.20/24h from fewer premature SHORT exits in HIGH",
+    "category": "exit optimizer",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T17:26:47.305281+00:00",
+    "idea": "SHORT entry confidence floor by regime",
+    "rationale": "SHORT signals in 24h average -$0.38 while LONG +$0.34. In HIGH regime, SHORT has 50% WR. Adding CONF_FILTER_MIN=75 for SHORT entries in HIGH regime would filter marginal SHORT entries. 7d pullback-entry- SHORT in HIGH has 64.7% WR +$0.78 \u2014 signal works, just some entries are low quality.",
+    "expected_impact": "Filter 1-2 marginal SHORT entries per day, improve SHORT WR by 5-10%",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-12T17:26:47.305283+00:00",
+    "idea": "Time-of-day filter for EXTREME regime trades",
+    "rationale": "EXTREME regime trades 00:00-06:00 UTC have 5/6 winners (KAS +0.29, PONS +0.24, BIGTIME +0.21). 06:00-12:00 UTC have 3/5 winners. Night session shows better EXTREME performance.",
+    "expected_impact": "Marginal \u2014 system already handles EXTREME well (65.4% WR)",
+    "category": "time-of-day",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
