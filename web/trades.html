@@ -161,7 +161,7 @@
         <th class="sortable" data-col="5" data-type="num">P&amp;L %</th>
         <th class="sortable" data-col="6" data-type="num">P&amp;L $</th>
         <th class="sortable" data-col="7" data-type="num">Size</th>
-        <th class="sortable" data-col="8" data-type="num">Eff. Size</th>
+        <th>Margin</th>
         <th class="sortable" data-col="9" data-type="num">Lev</th>
         <th>Exit</th>
         <th>SL</th>
@@ -536,7 +536,7 @@
         const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
         const pnlPct  = parseFloat(t.pnl_pct)  || 0;
         const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
-        const effSize = size * lev;
+        const effSize = size / lev;
         const sl = t.sl || 0;
         const tp = t.tp || 0;
         const dirLower = dir === 'LONG';
@@ -579,7 +579,7 @@
           <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
           <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
           <td>$${size.toFixed(1)}</td>
-          <td>$${effSize.toFixed(1)}</td>
+          <td>$${effSize.toFixed(2)}</td>
           <td>${lev}x</td>
           <td style="font-size:0.75em">${getExitStrategyHtml(t.signal)}</td>
           <td class="${slClass}">$${sl.toFixed(6)}<br><span class="dist">${slDistStr}</span></td>
