@@ -585,6 +585,7 @@ class SessionBrain:
         # BUG 4 fix: On full ingest OR when re-ingesting changed sessions,
         # rebuild FAISS from scratch to prevent orphaned vectors
         rebuild_faiss = not incremental  # always rebuild on full ingest
+        sessions = self._get_sessions() if incremental else {}
         if incremental:
             # Check if any existing sessions have changed mtime (will be re-ingested)
             for sid, existing in sessions.items():
@@ -601,8 +602,6 @@ class SessionBrain:
             if FAISS_IDS.exists():
                 FAISS_IDS.unlink()
             self.vector_store = None  # Force recreation
-        
-        sessions = self._get_sessions() if incremental else {}
         files = self._get_session_files()
         print(f"Found {len(files)} session files")
         

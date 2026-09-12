@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-09-12T07:00:00Z",
-    "idea": "EXTREME regime confidence boost \u2014 lower CONF_FILTER_MIN to 60 for EXTREME, keep 70 for NORMAL",
+    "idea": "EXTREME regime confidence boost — lower CONF_FILTER_MIN to 60 for EXTREME, keep 70 for NORMAL",
     "rationale": "EXTREME: 139T/59%WR/+$2.96. NORMAL: 81T/53.1%WR/-$2.43. Let more signals fire in EXTREME, fewer in NORMAL.",
     "expected_impact": "+$0.75-1.10/7d net",
     "category": "regime creative",
@@ -10,7 +10,7 @@
   },
   {
     "date": "2026-09-12T07:00:00Z",
-    "idea": "cut-loser-CL-T1 activation delay \u2014 5min grace period for ATR_SL to manage",
+    "idea": "cut-loser-CL-T1 activation delay — 5min grace period for ATR_SL to manage",
     "rationale": "cut-loser 0%WR/-$1.06/24h fires before ATR_SL can act. ATR_SL actually profitable at 52.6% WR.",
     "expected_impact": "Save ~$0.50/24h",
     "category": "exit optimizer",
@@ -19,7 +19,7 @@
   },
   {
     "date": "2026-09-12T07:00:00Z",
-    "idea": "mover- SHORT expansion \u2014 add to STANDALONE_BYPASS or lower confidence threshold",
+    "idea": "mover- SHORT expansion — add to STANDALONE_BYPASS or lower confidence threshold",
     "rationale": "Best R:R in system (2.38), 85.7% WR, but only 7T/7d. Signal starved.",
     "expected_impact": "+$0.40/7d if doubled",
     "category": "entry sniper",
@@ -34,5 +34,41 @@
     "category": "exit optimizer",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:45:00Z",
+    "idea": "NORMAL regime hard blocks for pump_chain and coiled_spring in VOL_PHASE_MULTS",
+    "rationale": "Current NORMAL penalties (0.6-0.8 mult) let signals fire at low confidence. Data: pump_chain NORMAL -0.031 avg_pnl (60% WR but losers > winners), coiled_spring NORMAL -0.016 avg_pnl. These should be 0.0 BLOCKED like Pullback_Entry_Long already is in NORMAL.",
+    "expected_impact": "Block ~15-20 NORMAL trades/7d losing ~$0.50. 7d PnL: +$1.20 → ~+$1.70.",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:45:00Z",
+    "idea": "EXTREME-only gate for open_skies — verify family name mapping",
+    "rationale": "open_skies is EXTREME-dependent: EXTREME +$1.49/8T, NORMAL -$0.35/5T, HIGH -$0.13/3T. Non-EXTREME net -$0.48. Gate has ('NORMAL','*'): 'Open_Skies': 0.0 but trades still exist — possible signal family name mismatch between gate and actual signal.",
+    "expected_impact": "Block -$0.48/7d if gate actually enforced.",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:45:00Z",
+    "idea": "Time-of-day confidence penalty for 08:00-10:00 UTC",
+    "rationale": "24h data: 09:00 UTC 4T/25% WR -$0.52 (worst hour). 08:00-10:00 combined is worst 3h window. Legacy sma20_dip dominates but even active signals struggle. Not previously identified.",
+    "expected_impact": "Block ~5 trades/7d losing ~$0.15 if pattern holds after legacy exits.",
+    "category": "time-of-day",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T07:45:00Z",
+    "idea": "Widen PM_TRAIL_ACTIVATE to 0.50% for EXTREME regime only",
+    "rationale": "EXTREME is best regime (59.3% WR, +$3.20) but R:R dragged by PM_TRAIL capping winners at 0.40%. EXTREME trades have higher MFE — letting them run 0.10% further captures more. Regime-conditional override avoids touching protected global PM_TRAIL.",
+    "expected_impact": "+$0.20-0.40/7d from EXTREME winners. R:R 0.748 → ~0.78.",
+    "category": "exit optimizer",
+    "status": "suggested",
+    "risk": "medium — needs T approval, touches PM_TRAIL logic"
   }
 ]
