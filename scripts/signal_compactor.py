@@ -662,9 +662,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('volume_climax_short',      'volume-climax-'):      1.25,  # volume rejection reversal
     ('hh_hl_breakout_long',      'hh-hl+'):              1.5,   # Structure Sniper — multi-confluence, high conviction
     ('hh_hl_breakout_short',     'hh-hl-'):              1.5,   # Structure Sniper — multi-confluence, high conviction
-    # rr_structural — structural R:R quality signal (Grade A/B, R:R ≥ 3.0)
-    ('rr_structural_long',  'rr-struct+'):  1.3,   # structural quality LONG — high R:R setups
-    ('rr_structural_short', 'rr-struct-'):  1.3,   # structural quality SHORT — high R:R setups
+    # rr_structural — structural R:R quality signal
+    ('rr_structural_long',  'rr-struct+'):  1.1,   # REDUCED 2026-09-11 — was 1.3x, structural quality LONG
+    ('rr_structural_short', 'rr-struct-'):  1.1,   # REDUCED 2026-09-11 — was 1.3x, structural quality SHORT
     # wall_street_cycle — euphoria/capitulation reversal (Wall Street Psychology Cycle)
     ('wall_street_cycle_long',  'wall-st-cycle+'):  1.25,  # capitulation LONG — buy the fear
     ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
