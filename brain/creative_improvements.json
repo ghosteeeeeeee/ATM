@@ -92,5 +92,35 @@
     "category": "time-of-day",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-12T17:30:00Z",
+    "idea": "SHORT entry minimum support distance filter — block SHORT within 2% of nearest support",
+    "rationale": "pullback-entry- SHORT has 16T/7d rr_engine_resistance exits avg -1.83%. Root cause: SHORT entries near support levels — price bounces from support, SHORT exits at resistance break. If we add MIN_SUPPORT_DISTANCE_PCT=2.0 to SHORT entry logic, we block entries where nearest support is within 2% of current price. This prevents the most common losing pattern.",
+    "expected_impact": "Block 4-6 losing SHORT entries per 7d, preserving ~$0.70-1.00/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — could reduce SHORT trade frequency",
+    "impact_on_winners": "Need to verify: check if any winning SHORT entries had support within 2%"
+  },
+  {
+    "date": "2026-09-12T17:30:00Z",
+    "idea": "NORMAL regime confidence penalty — 0.5x multiplier for all signals in NORMAL",
+    "rationale": "NORMAL regime has 75T/7d -$2.21 drag. Most signals designed for trending markets. Adding ('NORMAL','*'): 0.5 to VOL_PHASE_MULTS would reduce confidence by 50% in NORMAL, filtering marginal entries while preserving high-confidence trades.",
+    "expected_impact": "Reduce NORMAL drag from -$2.21 to ~-$1.00/7d",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "medium — could reduce trade frequency in NORMAL",
+    "impact_on_winners": "Need to check: NORMAL winners that would be blocked by 50% confidence reduction"
+  },
+  {
+    "date": "2026-09-12T17:30:00Z",
+    "idea": "trend_purity+ volume confirmation in EXTREME — require volume_breakout+ confluence",
+    "rationale": "48h data: trend_purity+,volume-breakout-long+ (BIGTIME +3.95%) won. trend_purity+ alone in EXTREME has 50% WR. If we require volume confirmation for trend_purity+ LONG entries in EXTREME, we keep the winners (volume-confirmed) and filter the losers (no volume).",
+    "expected_impact": "Improve trend_purity+ EXTREME WR from 50% to ~70%",
+    "category": "cross-signal",
+    "status": "suggested",
+    "risk": "low — only adds filter to one signal in one regime",
+    "impact_on_winners": "BIGTIME +3.95% (volume-breakout-long+) would still win. PONS +6.27%, KAS +4.60% — need to check if volume confirmed."
   }
 ]
