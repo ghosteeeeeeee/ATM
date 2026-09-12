@@ -580,9 +580,20 @@ class SessionBrain:
         print(f"Session Brain — {mode.upper()} INGEST{filter_label}")
         print(f"{'='*60}")
         
-        # BUG 4 fix: On full ingest, rebuild FAISS from scratch
-        if not incremental:
-            print("Full ingest: rebuilding FAISS index from scratch...")
+        # BUG 4 fix: On full ingest OR when re-ingesting changed sessions,
+        # rebuild FAISS from scratch to prevent orphaned vectors
+        rebuild_faiss = not incremental  # always rebuild on full ingest
+        if incremental:
+            # Check if any existing sessions have changed mtime (will be re-ingested)
+            for sid, existing in sessions.items():
+                fp = SESSIONS_DIR / sid / "session.jsonl.zstd"
+                if fp.exists() and fp.stat().st_mtime > (existing.get("last_modified") or 0):
+                    rebuild_faiss = True
+                    print(f"Session {sid[:12]} changed — will rebuild FAISS index")
+                    break
+        
+        if rebuild_faiss:
+            print("Rebuilding FAISS index from scratch...")
             if FAISS_INDEX.exists():
                 FAISS_INDEX.unlink()
             if FAISS_IDS.exists():

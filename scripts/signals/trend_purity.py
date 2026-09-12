@@ -190,8 +190,31 @@ def detect_trend_purity(token: str, direction: str = None):
             purity = above / LOOKBACK
             if purity < PURITY_THRESH:
                 continue
-            # Confidence: base + gap bonus + purity bonus
-            conf = min(CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * CONF_GAP_BONUS) + (purity - PURITY_THRESH) * CONF_PURITY_BONUS, 99)
+            # Confidence: base + gap bonus + purity bonus + trend quality modifiers
+            conf = CONF_BASE + max(0, (gap_pct - MIN_GAP_PCT) * CONF_GAP_BONUS) + (purity - PURITY_THRESH) * CONF_PURITY_BONUS
+
+            # ── Trend quality modifiers ────────────────────────────────────
+            # Strong trends get confidence boost, weak trends get penalty.
+            # ARB (gap=+0.61%, rising EMA, bb=1.12 breakout) → boost
+            # BABY (gap=-0.25%, falling EMA, bb=0.03 bottom) → penalty
+            if len(emas) >= 10:
+                _ema10_slope = emas[-1] - emas[-10]
+                # Rising EMA = healthy trend → bonus (max +5)
+                if _ema10_slope > 0:
+                    conf += min(5, _ema10_slope / ema * 10000)
+                # Falling EMA = dying trend → penalty (max -8)
+                else:
+                    conf -= min(8, abs(_ema10_slope) / ema * 10000)
+
+            if _bb_position is not None:
+                # Breakout above BB (bb > 1.0) → momentum bonus (+3)
+                if _bb_position > 1.0:
+                    conf += 3
+                # Near bottom of BB (bb < 0.2) → weak position penalty (-3)
+                elif _bb_position < 0.2:
+                    conf -= 3
+
+            conf = min(max(round(conf), 50), 99)  # floor at 50 (min to reach decider)
             signals.append({
                 'token': token,
                 'signal_type': 'trend_purity_long',
