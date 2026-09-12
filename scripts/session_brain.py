@@ -570,7 +570,9 @@ class SessionBrain:
         Ingest sessions into the brain.
         
         Args:
-            incremental: if True, only process new/changed sessions
+            incremental: if True, only process new/changed sessions.
+                        FAISS index is rebuilt from scratch if any session was updated
+                        (prevents orphaned vectors from old versions).
             main_only: if True, only ingest main (human) sessions, skip subagents
         """
         start_time = time.time()
