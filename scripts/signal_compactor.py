@@ -1266,24 +1266,26 @@ def _score_signal(token, direction, conf, source, signal_type,
                 _tf_closes = [r[0] for r in _tf_cur.fetchall()]
                 _tf_cur.close()
                 if len(_tf_closes) >= TREND_FILTER_EMA_SLOW:
-                    # Compute EMAs
+                    # Reverse to oldest-first for correct EMA calculation
+                    _tf_closes_asc = list(reversed(_tf_closes))
+                    # Compute SMA-seeded EMAs (oldest → newest)
                     _k_fast = 2 / (TREND_FILTER_EMA_FAST + 1)
                     _k_slow = 2 / (TREND_FILTER_EMA_SLOW + 1)
-                    _ema_fast = sum(_tf_closes[:TREND_FILTER_EMA_FAST]) / TREND_FILTER_EMA_FAST
-                    _ema_slow = sum(_tf_closes[:TREND_FILTER_EMA_SLOW]) / TREND_FILTER_EMA_SLOW
-                    for _p in _tf_closes[TREND_FILTER_EMA_FAST:]:
+                    _ema_fast = sum(_tf_closes_asc[:TREND_FILTER_EMA_FAST]) / TREND_FILTER_EMA_FAST
+                    _ema_slow = sum(_tf_closes_asc[:TREND_FILTER_EMA_SLOW]) / TREND_FILTER_EMA_SLOW
+                    for _p in _tf_closes_asc[TREND_FILTER_EMA_FAST:]:
                         _ema_fast = _p * _k_fast + _ema_fast * (1 - _k_fast)
-                    for _p in _tf_closes[TREND_FILTER_EMA_SLOW:]:
+                    for _p in _tf_closes_asc[TREND_FILTER_EMA_SLOW:]:
                         _ema_slow = _p * _k_slow + _ema_slow * (1 - _k_slow)
                     _ema_spread = abs(_ema_fast - _ema_slow) / _ema_slow * 100 if _ema_slow > 0 else 0
                     _trend_bull = _ema_fast > _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
                     _trend_bear = _ema_fast < _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
                     if direction == 'LONG' and _trend_bear:
                         trend_filter_mult = 0.7  # counter-trend penalty
-                        log(f"  📉 [TREND-FILTER] {token} LONG: EMA{_tf_closes[0]:.2f}<{TREND_FILTER_EMA_SLOW} bearish → {trend_filter_mult:.2f}x")
+                        log(f"  📉 [TREND-FILTER] {token} LONG: EMA20={_ema_fast:.2f} < EMA50={_ema_slow:.2f} bearish → {trend_filter_mult:.2f}x")
                     elif direction == 'SHORT' and _trend_bull:
                         trend_filter_mult = 0.7
-                        log(f"  📈 [TREND-FILTER] {token} SHORT: EMA{_tf_closes[0]:.2f}>{TREND_FILTER_EMA_SLOW} bullish → {trend_filter_mult:.2f}x")
+                        log(f"  📈 [TREND-FILTER] {token} SHORT: EMA20={_ema_fast:.2f} > EMA50={_ema_slow:.2f} bullish → {trend_filter_mult:.2f}x")
             finally:
                 _tf_conn.close()
     except Exception:
