@@ -243,8 +243,9 @@
         let html = '';
         for (const d of drift.slice(0, 15)) {
             html += `<div class="drift-item">
-                <div class="finding">${esc(d.finding || d)}</div>
-                ${d.context ? `<div class="context">${esc(d.context)}</div>` : ''}
+                <div class="finding">${esc(d.issue || d.finding || d)}</div>
+                ${d.recommendation ? `<div class="context">💡 ${esc(d.recommendation)}</div>` : ''}
+                ${d.timestamp ? `<div class="timestamp">${esc(d.timestamp)}</div>` : ''}
             </div>`;
         }
         el.innerHTML = html;

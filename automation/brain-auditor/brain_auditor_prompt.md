@@ -118,6 +118,78 @@ results = brain.query("we should build new signal idea plan", top_k=10)
 # Cross-reference with what actually exists in scripts/signals/
 ```
 
+## Step 5b: Losing Trade Autopsy (EVERY RUN — MANDATE)
+
+**"How can we avoid entries like this?"** — Ask this for every losing trade, every run.
+
+### The Process:
+
+1. **Find the losers**: Query last 24h trades where `pnl_usdt < 0`:
+```python
+import psycopg2
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres')
+cur = conn.cursor()
+cur.execute("""
+    SELECT token, signal, direction, entry_price, exit_price, 
+           stop_loss, target, pnl_usdt, pnl_pct, exit_reason,
+           open_time, close_time, volatility_regime
+    FROM trades 
+    WHERE status = 'closed' AND pnl_usdt < 0 
+      AND close_time > NOW() - INTERVAL '24 hours'
+    ORDER BY close_time DESC
+""")
+losing_trades = cur.fetchall()
+conn.close()
+```
+
+2. **For each loser (or cluster of losers from same signal), ask:**
+   - Were entry conditions valid? (RSI not overbought/oversold, not entering against trend)
+   - Were we too early or too late? (check 1m price action before entry)
+   - Is it in the right volatility regime? (check `volatility_regime` column)
+   - What params in `hermes_constants.py` could be tweaked for THIS signal?
+   - Did the same signal lose multiple times? (cluster analysis)
+
+3. **Check 1m price data before the trade**:
+```python
+# Look at price action 5-15 minutes before entry
+import sqlite3
+price_db = sqlite3.connect('/root/.hermes/data/prices.db')
+# Check: was price trending against us? Was there a sudden spike?
+# Were we chasing? (entered after a big move already happened)
+```
+
+4. **Cross-reference with winners**: 
+   - Do our WINNING trades from the same signal have different entry conditions?
+   - What's different about the winners vs losers? (RSI range, regime, time of day, etc.)
+
+5. **Recommend safe changes**:
+   - "We were shorting into oversold RSI — add RSI_MIN=35 filter for SHORT entries"
+   - "All losers had volatility_regime=EXTREME — gate this signal to LOW/NORMAL only"
+   - "Entry was 0.3% above EMA — we were chasing. Add MAX_ENTRY_GAP=0.2%"
+   - **CRITICAL**: Any change must NOT affect winning trades. Verify by checking:
+     - Would this filter have blocked any of our recent winners?
+     - Run the proposed filter against the last 7 days of winning trades
+
+6. **Never recommend blind changes**. Every recommendation must be backed by:
+   - Specific trade data (entry time, price, conditions)
+   - Evidence of what went wrong
+   - Proof it won't hurt winners
+
+### Output Format:
+```json
+{
+    "losing_trade": "SOL SHORT pnl=-$0.85",
+    "signal": "pullback-entry-short",
+    "regime": "EXTREME",
+    "root_cause": "Entered at RSI=28 (oversold) — shorting into oversold = catching falling knife",
+    "entry_check": "RSI 28 at entry, price already dropped 1.2% in 5min before entry",
+    "regime_check": "EXTREME regime — high volatility, whipsaw-prone",
+    "recommended_change": "Add RSI_MIN=35 to pullback-entry SHORT filter",
+    "impact_on_winners": "Checked last 7d: 0 winning shorts had RSI < 35 — no impact",
+    "confidence": "HIGH"
+}
+```
+
 ## Step 6: Creative Improvements (MANDATE)
 
 **You MUST generate at least one creative improvement idea per run.**
