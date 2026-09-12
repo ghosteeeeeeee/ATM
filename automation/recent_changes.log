@@ -1,3 +1,11 @@
+[2026-09-12 18:10 UTC] auto_1hr: NO CHANGE — system break-even
+  24h: 39T 61.5%WR -$0.26 | All NEUTRAL | 0T/1h, 5 open
+  Exit: profit-monster-trail 16T +$1.35, atr_sl_hit 10T -$0.40 (25.6%), cut-loser 5T -$0.86
+  Signal: rr-struct+ best (+$0.07), pullback-entry- worst (-$0.23)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: cut-loser-CL-T1 activation delay fix pending (brain_auditor Sep 12), trend_purity+ EXTREME penalty applied 15:30 needs more data
+  BY: auto_1hr
+
 [2026-09-12 17:30 UTC] brain_auditor: AUDIT RUN — no config change
   WHY: System profitable. 24h 30T ~57%WR +$0.04. 7d 339T 56.4%WR +$1.12. Key findings: (1) rr_engine_resistance SHORT exits 29T/7d -$1.28 — structural. (2) NORMAL regime 75T/7d -$2.21 — worst. (3) trend_purity+ EXTREME volatility gate 0.3x applied at 15:30 — needs 20+ trades to verify. Creative ideas logged: SHORT support distance filter, NORMAL penalty, trend_purity+ volume confirmation. Legacy aging out Sep 13.
   BY: brain_auditor

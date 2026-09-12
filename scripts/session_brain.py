@@ -610,17 +610,16 @@ class SessionBrain:
         print(f"Session Brain — {mode.upper()} INGEST{filter_label}")
         print(f"{'='*60}")
         
-        # BUG 4 fix: On full ingest OR when re-ingesting changed sessions,
-        # rebuild FAISS from scratch to prevent orphaned vectors
-        # DON'T delete FAISS upfront — only rebuild if we actually process sessions
-        sessions = self._get_sessions() if incremental else {}
+        # BUG 4 fix: FAISS doesn't support deletion, so orphaned vectors
+        # accumulate on re-ingest. Solution: only do a FULL rebuild once daily.
+        # Incremental updates just append new vectors (some orphans are OK short-term).
+        # The daily rebuild cleans everything up.
         needs_rebuild = not incremental  # always rebuild on full ingest
         if incremental:
             for sid, existing in sessions.items():
                 fp = SESSIONS_DIR / sid / "session.jsonl.zstd"
                 if fp.exists() and fp.stat().st_mtime > (existing.get("last_modified") or 0):
-                    needs_rebuild = True
-                    print(f"Session {sid[:12]} changed — will rebuild FAISS after ingest")
+                    print(f"Session {sid[:12]} changed — will re-ingest (append to FAISS)")
                     break
         
         files = self._get_session_files()
@@ -718,10 +717,9 @@ class SessionBrain:
         if self.vector_store and self.vector_store.size > 0:
             self.vector_store.save()
         
-        # If we need to rebuild (full ingest or changed sessions), rebuild from DB
-        # This ensures no orphaned vectors even if some sessions were skipped
+        # Only rebuild on full ingest (daily). Incremental appends new vectors.
         if needs_rebuild and sessions_processed > 0:
-            print("\nRebuilding FAISS index from all DB chunks...")
+            print("\nFull ingest complete — rebuilding FAISS from all DB chunks...")
             self.rebuild_index()
         
         # Log ingest

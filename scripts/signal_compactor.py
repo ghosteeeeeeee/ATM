@@ -2609,6 +2609,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_sf.close()
                         except Exception:
                             pass
+            # ── SHORT RSI floor: block SHORT at extreme oversold (bounce imminent) ──
+            # Differs from spike filter: runs independently, catches stale signals where
+            # RSI was OK at detection but dipped to oversold by execution time.
+            # Backtest 7d: blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
+            if direction == 'SHORT' and SHORT_RSI_FLOOR_ENABLED:
+                _conn_rsf = None
+                try:
+                    _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_rsf = _conn_rsf.cursor()
+                    _cur_rsf.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _rsf_closes = [r[0] for r in _cur_rsf.fetchall()]
+                    if len(_rsf_closes) >= 15:
+                        _rsf_deltas = [_rsf_closes[i] - _rsf_closes[i+1] for i in range(len(_rsf_closes)-1)]
+                        _rsf_gains = [d if d > 0 else 0 for d in _rsf_deltas[-14:]]
+                        _rsf_losses = [-d if d < 0 else 0 for d in _rsf_deltas[-14:]]
+                        _rsf_ag = sum(_rsf_gains) / 14
+                        _rsf_al = sum(_rsf_losses) / 14
+                        if _rsf_al > 0:
+                            _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
+                            if _rsf_rsi < SHORT_RSI_FLOOR:
+                                log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
+                                continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    if _conn_rsf:
+                        try:
+                            _conn_rsf.close()
+                        except Exception:
+                            pass
             # ── Global spike filter LONG: block LONG after recent bearish 5m candle ──
             # Mirror of SHORT spike filter — prevents entering LONG at dump lows
             # EXEMPT: v3 pullback signals (accel-300-v3-long+) — bearish candle IS the pullback

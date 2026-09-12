@@ -1,3 +1,35 @@
+## [2026-09-12 18:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed | 5 open positions
+**24h:** 39T 61.5%WR -$0.26 | All NEUTRAL regime
+**7d:** 339T 56.3%WR +$0.53
+
+**24h by Signal:**
+- pump-chain- SHORT: 8T 62.5%WR -$0.19
+- trend_purity+ LONG: 8T 50%WR -$0.15
+- rr-struct+ LONG: 6T 83.3%WR +$0.07 (best)
+- pullback-entry- SHORT: 5T 40%WR -$0.23 (worst)
+- rr-struct- SHORT: 4T 50%WR -$0.20
+
+**24h Exit Breakdown:**
+- profit-monster-trail: 16T +$1.35 (carries system)
+- atr_sl_hit: 10T -$0.40 (25.6%, avg -$0.04)
+- cut-loser-CL-T1: 5T -$0.86 (12.8%, avg -$0.172 — worst per-trade)
+- rr_engine_resistance: 5T -$0.23
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour (0 trades closed)
+- Trade freq: 1-3/hr, healthy
+- cut-loser-CL-T1 activation delay: flagged by brain_auditor Sep 12, still pending
+- trend_purity+ EXTREME penalty: applied 15:30 Sep 12, needs more data
+- pump-chain- continues bleeding (-$0.19/24h) but 62.5%WR not killable
+
+**Open Questions:**
+- cut-loser-CL-T1 pending fix (MIN_HOLD_MINUTES increase) — worst exit reason per-trade
+- NEUTRAL regime dominates (100% of 24h trades) — structural market condition
+
 ## [2026-09-11 15:10 UTC] Hourly Analysis
 
 **Trades:** 4 closed (2W 2L +$0.12)

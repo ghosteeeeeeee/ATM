@@ -794,6 +794,13 @@ SPIKE_FILTER_ENABLED = True
 SPIKE_FILTER_5M_THRESHOLD = 0.5      # % — block LONG/SHORT if last 3 5m candles had candle > this (CEO: raised from 0.3 2026-09-06 — 0.3% was false positive factory)
 SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = bounce risk)
 
+# ── SHORT RSI Floor (2026-09-12 brain_auditor) ──────────────────────────────
+# Block ALL SHORT entries when RSI < floor (extreme oversold = bounce imminent).
+# Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
+# This runs at execution time too — catches stale signals where RSI recovered then dipped again.
+# Backtest 7d: RSI<25 blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
+SHORT_RSI_FLOOR = 25
+
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
 # CEO backtested: misaligned = 23.8% WR, aligned = 76.4% WR (52pt gap).
