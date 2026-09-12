@@ -43,6 +43,21 @@ MAX_CHUNK_CHARS = 2500 # max chars per chunk (~500 tokens * 5 chars avg)
 STALE_SESSION_MIN = 5  # skip sessions modified in last N minutes
 EMBED_MODEL = "all-MiniLM-L6-v2"
 
+# Topic keywords for auto-classification
+TOPIC_KEYWORDS = {
+    "signal": ["signal", "enable", "disable", "kill", "boost", "penalty", "multiplier"],
+    "regime": ["regime", "extreme", "normal", "high", "flat", "volatility", "vol"],
+    "trade": ["trade", "pnl", "win", "loss", "entry", "exit", "sl", "tp", "trailing"],
+    "risk": ["risk", "stop", "loss", "size", "position", "notional", "cooldown"],
+    "config": ["config", "constant", "flag", "param", "threshold", "filter"],
+    "signal_dev": ["new signal", "build signal", "signal idea", "backtest", "shadow mode"],
+    "analysis": ["analysis", "stats", "performance", "winrate", "wr", "mfe", "mae"],
+    "debug": ["bug", "fix", "error", "broken", "issue", "crash", "leak"],
+    "dashboard": ["dashboard", "html", "display", "chart", "visual"],
+    "coin": ["coin", "token", "blacklist", "favorite", "watchlist"],
+    "brain": ["brain", "memory", "hebbian", "session", "rag", "embed"],
+}
+
 # System noise to filter out
 SYSTEM_NOISE_PATTERNS = [
     "<system-reminder>",
@@ -137,6 +152,19 @@ def clean_text(text: str) -> str:
     while "  " in text:
         text = text.replace("  ", " ")
     return text
+
+
+def extract_topic(text: str, session_title: str = "") -> str:
+    """Extract topic from text content using keyword matching."""
+    text_lower = (text[:500] + " " + session_title).lower()
+    scores = {}
+    for topic, keywords in TOPIC_KEYWORDS.items():
+        score = sum(1 for kw in keywords if kw in text_lower)
+        if score > 0:
+            scores[topic] = score
+    if scores:
+        return max(scores, key=scores.get)
+    return "general"
 
 
 def extract_text_from_session(filepath: Path) -> Tuple[str, List[Dict], float, str]:
@@ -672,10 +700,11 @@ class SessionBrain:
             self.db.execute("DELETE FROM chunks WHERE session_id = ?", (session_id,))
             
             for j, chunk in enumerate(chunks):
+                topic = extract_topic(chunk["text"], title)
                 self.db.execute(
-                    "INSERT INTO chunks (session_id, chunk_index, text, chunk_type, char_count, token_estimate, embedding_offset) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (session_id, j, chunk["text"], chunk["type"],
+                    "INSERT INTO chunks (session_id, chunk_index, text, topic, chunk_type, char_count, token_estimate, embedding_offset) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (session_id, j, chunk["text"], topic, chunk["type"],
                      len(chunk["text"]), len(chunk["text"]) // 4,
                      chunk_ids[j])
                 )
@@ -796,7 +825,7 @@ class SessionBrain:
         }
 
     def rebuild_index(self):
-        """Rebuild FAISS index from all chunks in SQLite."""
+        """Rebuild FAISS index from all chunks in SQLite. Also backfills topics."""
         self._ensure_embedder()
         
         print("Rebuilding FAISS index from DB chunks...")
@@ -806,6 +835,19 @@ class SessionBrain:
             FAISS_INDEX.unlink()
         if FAISS_IDS.exists():
             FAISS_IDS.unlink()
+        
+        # Backfill topics for chunks that don't have them
+        no_topic = self.db.execute(
+            "SELECT c.id, c.text, s.title FROM chunks c "
+            "JOIN sessions s ON c.session_id = s.id "
+            "WHERE c.topic IS NULL"
+        ).fetchall()
+        if no_topic:
+            print(f"Backfilling topics for {len(no_topic)} chunks...")
+            for chunk_id, text, title in no_topic:
+                topic = extract_topic(text, title or "")
+                self.db.execute("UPDATE chunks SET topic = ? WHERE id = ?", (topic, chunk_id))
+            self.db.commit()
         
         # Get all chunks
         chunks = self.db.execute(
