@@ -245,7 +245,7 @@ VOL_PHASE_MULTS = {
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
         'Pullback_Entry_Short': 0.7,  # PENALIZED — pullback_entry- 57% WR in HIGH (ENA -4.97% chop entry), wins in EXTREME
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
-        'Accelerate': 0.3,       # PENALIZED — accel_300 35% WR in HIGH, wins in NORMAL/EXTREME
+        # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
         # Pump_Flow removed — SHORT wins 61.5% WR in HIGH, LONG wins 64.7% WR in HIGH
