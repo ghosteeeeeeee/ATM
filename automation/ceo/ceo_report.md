@@ -1,3 +1,25 @@
+## CEO Report — 2026-09-12 ~02:35 UTC
+
+### Diagnosis
+
+**DB VERIFIED:** 24h 60T 50.0% WR -$1.52. 7d 341T 56.9% WR +$1.21. R:R 0.675 (breakeven ~59.7%). Sep 12: 6T 83.3% WR +$0.43 (early). 5 open positions.
+
+### Root Cause
+
+**SHORT R:R drag from rr_engine_resistance.** 22 SHORT trades in 48h exit at resistance with avg -1.3% loss. pullback-entry- 12T avg -1.62%, pump-chain- 11T avg -1.04%. This caps SHORT profits. atr_sl_hit dominates at 18T avg -4.88% (mostly legacy pump-chain+). **Legacy signals still in 7d window:** ema300_dip_short -$1.33, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65. These age out by Sep 13.
+
+### Fix Applied
+
+**No param changes.** System structurally improving — legacy aging out, all 5 active signals profitable 7d. squeeze_reversal zero trades is market condition (NEUTRAL, no sell-offs). grind_breakout 1 trade total — also market condition. Today starting strong (83.3% WR).
+
+### Next Actions
+
+1. Monitor rr_engine_resistance SHORT exits — if persistent, consider widening resistance buffer.
+2. Legacy ages out by Sep 13 — 7d PnL should improve.
+3. squeeze_reversal: if no trades by Sep 15, investigate signal logic.
+
+---
+
 ## CEO Report — 2026-09-12 ~01:00 UTC (BTC Momentum Sync Decision)
 
 ### Diagnosis

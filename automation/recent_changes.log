@@ -1441,3 +1441,11 @@
   WHY: 2T last hour (1W 1L -$0.05). BANANA rr-struct- SHORT cut-loser-CL-T1 -$0.12, BABY rs-s54,trend_purity+ LONG profit-monster-trail +$0.07. 58T/24h 31%WR -$1.62. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 31% well below 40% threshold. Trade freq 2/hr normal. 6h trend 4/6 positive. 4 open positions.
   BY: auto_1hr
   NEXT: Re-run at 02:10 UTC
+[2026-09-12 02:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (3W 0L +$0.40). ACE mover+ LONG profit-monster-trail +$0.31, LTC rr-struct+ LONG profit-monster-trail +$0.07, W trend_purity+ LONG profit-monster-trail +$0.02. 61T/24h 50.8%WR -$0.00. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 18/61=29.5% well below 40% threshold. Trade freq 3/hr normal. 6h trend 4/6 positive. 4 open positions. Previous kills already done. pump-chain- 17T 58.8%WR -$0.29 has wins. bb-bounce-v2-long+ 4T 25%WR -$0.47 has wins.
+  BY: auto_1hr
+  NEXT: Re-run at 03:10 UTC
+[2026-09-12 03:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W 0L +$0.21). BIGTIME open-skies+ LONG atr_sl_hit +$0.21 (positive PnL despite exit reason). 61T/24h 50.8%WR -$1.31. Kill criteria not met: no signal 0%WR with 3+ trades last hour. atr_sl_hit 19/61=31% well below 40% threshold. Trade freq 1/hr normal. pump-chain+ 8T 12.5%WR -$0.80 has 1 win, not killable. bb-bounce-v2-long+ 4T 25%WR -$0.47 has 1 win. 5 open positions (BTC, MNT, KAS, ACE, IMX). Previous kills already done.
+  BY: auto_1hr
+  NEXT: Re-run at 04:10 UTC

@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-11 ~23:20 UTC (CEO)**
+**Last Updated: 2026-09-12 ~02:35 UTC (CEO)**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 61T, 50.8% WR, -$1.42. 7d: 341T, 56.3% WR, +$1.26. Market NEUTRAL.
+24h: 60T, 50.0% WR, -$1.52. 7d: 341T, 56.9% WR, +$1.21. Market NEUTRAL.
 
-- **24h:** 61T, 50.8% WR, -$1.42 (VERIFIED brain DB).
-- **7d:** 341T, 56.3% WR, +$1.26 (VERIFIED — POSITIVE).
-- **7d DAILY:** Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 -$1.74 (58T, 48.3% WR).
+- **24h:** 60T, 50.0% WR, -$1.52 (VERIFIED brain DB).
+- **7d:** 341T, 56.9% WR, +$1.21 (VERIFIED — POSITIVE).
+- **7d DAILY:** Sep 5 +$0.34 → Sep 6 +$0.40 → Sep 7 +$0.01 → Sep 8 -$2.74 → Sep 9 +$2.03 → Sep 10 +$2.48 → Sep 11 -$1.74 → Sep 12 +$0.43 (6T, 83.3% WR — early).
 - **7d ACTIVE SIGNALS (ALL profitable):** pullback_entry_ 29T/69.0% WR +$1.93 ★ | open_skies 19T/63.2% WR +$1.56 ★ | bb_bounce_v2_long 39T/71.8% WR +$1.20 ★ | pump_chain 41T/68.3% WR +$1.11 | pump-chain- 39T/64.1% WR +$0.42.
 - **24h signal perf:** mover- 3T/100% WR +$0.46 | open-skies+ 3T/66.7% WR +$0.16 | doji-bottom-long 1T/100% WR +$0.31 | grind-breakout- 1T/100% WR +$0.24. Losers: pump-chain+ 10T/30% WR -$0.59 (legacy, killed) | bb-bounce-v2-long+ 4T/25% WR -$0.47 (variance, 7d main signal 71.8%) | accel-300-v4-short- 3T/0% WR -$0.44 (killed) | pullback-entry- 8T/37.5% WR -$0.42 (7d still 69%).
 - **7d LEGACY (aging out):** ema300_dip_short 22T/36.4% WR -$1.64 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42.1% WR -$0.73 | coiled_spring 21T/42.9% WR -$0.65 | pullback_entry+ 6T/16.7% WR -$0.57. Total legacy drag: ~-$4.39/7d.

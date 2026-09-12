@@ -2273,3 +2273,60 @@ Final set: ['BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI
 - 4 open positions (ATOM, BTC, KAS, ARB)
 
 **Open Questions:** None
+
+## [2026-09-12 02:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W 0L +$0.40)
+**PnL:** +$0.40 (100% WR)
+
+**24h:** 61T -$0.00 (50.8% WR) | 4 open (ATOM, BTC, KAS, ARB)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T 29.5% avg -$0.063
+- profit-monster-trail: 18T avg +$0.111
+- rr_engine_resistance: 14T avg -$0.059
+- cut-loser-CL-T1: 6T avg -$0.177
+- rr_engine_support_br: 4T avg -$0.025
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour (0 trades last hour, 3 this hour all winners)
+- atr_sl_hit 29.5% — well below 40% threshold
+- Trade freq 3/hr normal
+- 6h trend 4/6 positive
+- 4 open positions (ATOM, BTC, KAS, ARB)
+- Previous kills (accel-300-v4-short-, pump-chain+) already done
+- pump-chain- 17T 58.8%WR -$0.29 — has wins, not killable
+- bb-bounce-v2-long+ 4T 25%WR -$0.47 — has wins, not killable
+
+**Open Questions:** None
+
+## [2026-09-12 03:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.21)
+**PnL:** +$0.21 (100% WR) — BIGTIME open-skies+ LONG atr_sl_hit (data: positive PnL despite atr_sl_hit exit)
+
+**24h:** 61T -$1.31 (50.8% WR) | 5 open (BTC, MNT, KAS, ACE, IMX)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T 31% avg -$0.048
+- profit-monster-trail: 18T avg +$0.111
+- rr_engine_resistance: 14T avg -$0.059
+- cut-loser-CL-T1: 6T avg -$0.177
+- rr_engine_support_br: 3T avg -$0.093
+- hard_sl: 1T avg -$0.210
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal 0%WR with 3+ trades last hour
+- atr_sl_hit 31% — well below 40% threshold
+- Trade freq 1/hr — low, no overtrading
+- pump-chain+ 8T 12.5%WR -$0.80 has 1 win, not killable
+- bb-bounce-v2-long+ 4T 25%WR -$0.47 has 1 win, not killable
+- 6h trend positive (ACE, KAS, IMX trending)
+- Previous kills (accel-300-v4-short-, pump-chain+) already done
+
+**Open Questions:** None
