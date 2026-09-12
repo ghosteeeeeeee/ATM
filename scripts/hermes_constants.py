@@ -2236,6 +2236,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'atr-spike',
     'ct-hot',
     'liq-hunt',  # liquidation cluster contrarian — structural, regime-agnostic
+    'neutral-sniper-short',  # StochRSI+CMF oversold SHORT — mean-reversion, works solo (2026-09-11)
     'macd-div',  # MACD divergence — counter-trend, works solo
     'slow-grind',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
