@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Last updated:** 2026-09-12 06:00 UTC
+**Last updated:** 2026-09-12 18:10 UTC
 
 ---
 
@@ -259,21 +259,144 @@
 
 ---
 
+## Plan: trend_momentum_v4_spec.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Data-driven signal improvements — hour filter (+7% WR), after-win filter (+0.9% WR), token blacklist
+- **Difficulty:** Level 2 (new signal file, ~250 lines)
+- **Value:** HIGH — projected 46%→54% WR, +30% PnL
+- **Status:** NOT IMPLEMENTED
+- **Reason:** trend_momentum signal doesn't exist yet (only trend_momentum_near_sma which is killed). Requires full signal build. Hour filter overlaps with existing TIME_BLOCK system.
+
+## Plan: trend_momentum_spec.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** New trend + acceleration signal — catches staged moves from compression
+- **Difficulty:** Level 2 (new signal, ~250 lines, 6 file changes)
+- **Value:** HIGH — 35% WR but 3.0:1 R:R, +67.89% net PnL in 14d backtest
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No trend_momentum.py exists. Spec is thorough with backtest data. Conditional GO — needs blacklist, cooldown increase, out-of-sample test.
+
+## Plan: retroactive-scan-delayed-entry.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Secondary scan after breakout engine — catches missed moves with lower confidence
+- **Difficulty:** Level 3 (~350 lines in breakout_engine.py, new functions)
+- **Value:** HIGH — safety net for missed breakouts (IMX +2.72% case)
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Complex integration into breakout_engine.py. Plan is well-designed (v3, audited). Deferred to separate session.
+
+## Plan: pullback_entry_v2_long.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Improve pullback_entry LONG from 40% to 60%+ WR
+- **Difficulty:** Level 1 (config changes)
+- **Value:** MEDIUM — but plan concludes signal is fundamentally unprofitable standalone
+- **Status:** ALREADY IMPLEMENTED (disabled)
+- **Reason:** Plan recommends disabling pullback_entry_long. Signal is currently disabled (PULLBACK_ENTRY_LONG not in active signals). All backtest configs showed negative PnL.
+
+## Plan: spec-signal-regime-memory.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Per-signal regime memory — "Species of Fish" system. Signals dormant in bad regimes, resurrect when conditions return.
+- **Difficulty:** Level 4 (multi-system, 3-4 days)
+- **Value:** HIGH — prevents premature signal death, enables regime-aware lifecycle
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Requires: (1) persist regime at entry, (2) regime tracker SQLite DB, (3) rotator integration, (4) kill system updates, (5) lifecycle dormant state. Complex but well-designed. Defer.
+
+## Plan: accel300-short-variants-study.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Study all accel_300 SHORT variants to find what worked
+- **Difficulty:** Level 1 (constant additions based on findings)
+- **Value:** HIGH — FLAT regime kills SHORT signals (17% WR original, 0% breakout)
+- **Status:** IMPLEMENTED (partial)
+- **Reason:** Added ACCEL_300_MINUS_FLAT_BLOCK=True for original SHORT (17% WR in FLAT). V3 already has FLAT+EXTREME blocks. V4 disabled. Breakout and velocity-ignition already disabled. V2 replaced by V3 (also disabled).
+
+## Plan: 2026-09-08_short-filter-overhaul.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Stop blocking profitable SHORT signals — relax VEL filter, SHORT-NEUTRAL block, EMA300 slope
+- **Difficulty:** Level 1 (constant changes)
+- **Value:** HIGH — 1,101 SHORTs blocked on Sep 8
+- **Status:** PARTIAL (dead code fixed, thresholds pending)
+- **Reason:** Dead code bug (range(3) vs threshold=5) already fixed. VEL threshold 0.3→0.5 needs simulation script per audit. SHORT-NEUTRAL block has bypasses. SHORT R:R is poor (0.28:1) — relaxing filters adds volume without fixing R:R. Audit found confluence gate is the BIGGEST blocker (3,058 SHORTs), not the filters this plan targets.
+
+## Plan: conf-filter-plan.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Block high-confidence (90+) trades and dead hours (01-06 UTC)
+- **Difficulty:** Level 1 (constant changes)
+- **Value:** HIGH — conf<90 turns -$1.37 into +$0.08
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** CONF_FILTER_ENABLED=True with CONF_FILTER_MAX=89. TIME_BLOCK_ENABLED=True with hours 03-07 UTC. Both filters active.
+
+## Plan: confidence-calibration-plan.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Fix non-monotonic confidence curve (90+ trades lose)
+- **Difficulty:** Level 2-3 (scoring system changes)
+- **Value:** LOW — investigation concluded existing CONF_FILTER already handles this
+- **Status:** ALREADY IMPLEMENTED (via conf-filter-plan)
+- **Reason:** Investigation complete — proposed fix rejected, existing CONF_FILTER confirmed working.
+
+## Plan: btc-crash-filter-plan.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** BTC acceleration detection — catch crashes 2-3 minutes earlier
+- **Difficulty:** Level 2 (new detection logic)
+- **Value:** HIGH — catches WLFI/BIGTIME trades during Aug 22 crash
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** BTC_ACCEL_ENABLED=True, _check_acceleration() in btc_crash_filter.py, BTC_ACCEL_VEL_THRESHOLD=-0.15%. Full implementation active.
+
+## Plan: exit-mechanics-v2.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Fix backwards PROFIT_MONSTER_BYPASS_SIGNALS — proven signals not bypassed, losing signals bypassed
+- **Difficulty:** Level 1 (constant list changes)
+- **Value:** MEDIUM — exit system ownership clarity
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** PROFIT_MONSTER_BYPASS_SIGNALS corrected — ct-hot+/- REMOVED from bypass (plan recommended), proven signals (r2-trend, bb_bounce, etc.) IN bypass. Exit ownership model in place.
+
+## Plan: 2026-09-08_grind-breakout-backtest-data.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Raw backtest data for grind_breakout signal
+- **Difficulty:** N/A (data only)
+- **Value:** LOW — reference data, no implementation needed
+- **Status:** ALREADY IMPLEMENTED (signal exists)
+- **Reason:** grind_breakout.py exists with constants. This is just backtest reference data.
+
+## Plan: sniper-exit-strategy-brainstorm.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Proactive position closing on regime shifts
+- **Difficulty:** Level 3 (~350 lines, new systemd service)
+- **Value:** HIGH — estimated +$0.30-$0.75 per transition zone
+- **Status:** PARTIAL (constants exist, script exists but not verified)
+- **Reason:** SNIPER_* constants in hermes_constants.py, sniper_exit.py exists and imports clean. Needs integration testing. Defer.
+
+## Plan: 2026-08-19_short-bias-fix.md
+- **Date scanned:** 2026-09-12 18:00
+- **Core request:** Investigate SHORT starvation — system heavily long biased
+- **Difficulty:** N/A (investigation only)
+- **Value:** LOW — root cause identified (market condition, not filter bug)
+- **Status:** ALREADY IMPLEMENTED (investigation complete)
+- **Reason:** SHORT starvation is expected in bull market — trend alignment correctly blocks counter-trend SHORTs (26% WR). No filter changes needed.
+
+---
+
 ## Updated Summary
 
 | Status | Count |
 |--------|-------|
-| IMPLEMENTED (this session) | 2 |
-| ALREADY IMPLEMENTED | 2 |
+| IMPLEMENTED (this session) | 1 |
+| ALREADY IMPLEMENTED | 7 |
 | PARTIAL | 2 |
-| NOT IMPLEMENTED | 5 |
+| NOT IMPLEMENTED | 4 |
+| N/A (investigation/data) | 3 |
 
 ### Implemented This Session
+1. **ACCEL_300_MINUS_FLAT_BLOCK** — blocks original SHORT in FLAT regime (17% WR → 0 trades)
+
+### Previously Implemented (from earlier sessions)
 1. **BTC Timing Guard** — per-signal-type momentum filter, LOG_ONLY mode
 2. **BTC Pump Rider Gradual Rally** — gradual rally detection + lagging alt finder
+3. **CONF_FILTER + TIME_BLOCK** — blocks 90+ confidence and dead hours
+4. **BTC Acceleration Detection** — catches crashes 2-3 min earlier
+5. **PROFIT_MONSTER_BYPASS corrected** — exit ownership model
+6. **Dead code fix in VEL-FILTER** — range(3) → range(5)
 
 ### Next Candidates
 1. `trend_ignition.py` — Level 2, HIGH value, 100% WR in 7-day backtest
-2. Sniper Exit Strategy — Level 3, HIGH value, constants already exist
-3. Regime Tuner — Level 3, HIGH value, prevents stale signal states
-4. Brain RAG System — Level 4, HIGH value, cross-session intelligence
+2. `trend_momentum.py` — Level 2, HIGH value, 3.0:1 R:R
+3. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
+4. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
+5. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist

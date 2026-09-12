@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -663,8 +663,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('hh_hl_breakout_long',      'hh-hl+'):              1.5,   # Structure Sniper — multi-confluence, high conviction
     ('hh_hl_breakout_short',     'hh-hl-'):              1.5,   # Structure Sniper — multi-confluence, high conviction
     # rr_structural — structural R:R quality signal
-    ('rr_structural_long',  'rr-struct+'):  1.1,   # REDUCED 2026-09-11 — was 1.3x, structural quality LONG
-    ('rr_structural_short', 'rr-struct-'):  1.1,   # REDUCED 2026-09-11 — was 1.3x, structural quality SHORT
+    ('rr_structural_long',  'rr-struct+'):  0.85,  # REDUCED 2026-09-11 — was 1.3x→1.1x→0.85x, over-weighted
+    ('rr_structural_short', 'rr-struct-'):  0.85,  # REDUCED 2026-09-11 — was 1.3x→1.1x→0.85x, over-weighted
     # wall_street_cycle — euphoria/capitulation reversal (Wall Street Psychology Cycle)
     ('wall_street_cycle_long',  'wall-st-cycle+'):  1.25,  # capitulation LONG — buy the fear
     ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
@@ -2143,6 +2143,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     continue
                 if ACCEL_300_V3_LONG_FLAT_BLOCK and _regime_4h == 'FLAT':
                     log(f"  🚫 [V3-LONG-FLAT] {token} LONG blocked — FLAT regime, no LONG edge (33% WR)")
+                    continue
+            # ── Original accel-300 SHORT FLAT block ─────────────────────────
+            # Original SHORT: 17% WR in FLAT (1W/5L) — no edge in flat market
+            if 'accel-300-' in bare_source and 'v2' not in bare_source and 'v3' not in bare_source and 'v4' not in bare_source:
+                if ACCEL_300_MINUS_FLAT_BLOCK and _regime_4h == 'FLAT':
+                    log(f"  🚫 [ACCEL300-SHORT-FLAT] {token} SHORT blocked — FLAT regime, no SHORT edge (17% WR)")
                     continue
             # ── Coiled Spring regime filter ──────────────────────────────────
             # 71% WR in NORMAL, 20-40% in others — only trade NORMAL

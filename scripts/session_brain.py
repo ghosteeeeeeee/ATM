@@ -584,24 +584,17 @@ class SessionBrain:
         
         # BUG 4 fix: On full ingest OR when re-ingesting changed sessions,
         # rebuild FAISS from scratch to prevent orphaned vectors
-        rebuild_faiss = not incremental  # always rebuild on full ingest
+        # DON'T delete FAISS upfront — only rebuild if we actually process sessions
         sessions = self._get_sessions() if incremental else {}
+        needs_rebuild = not incremental  # always rebuild on full ingest
         if incremental:
-            # Check if any existing sessions have changed mtime (will be re-ingested)
             for sid, existing in sessions.items():
                 fp = SESSIONS_DIR / sid / "session.jsonl.zstd"
                 if fp.exists() and fp.stat().st_mtime > (existing.get("last_modified") or 0):
-                    rebuild_faiss = True
-                    print(f"Session {sid[:12]} changed — will rebuild FAISS index")
+                    needs_rebuild = True
+                    print(f"Session {sid[:12]} changed — will rebuild FAISS after ingest")
                     break
         
-        if rebuild_faiss:
-            print("Rebuilding FAISS index from scratch...")
-            if FAISS_INDEX.exists():
-                FAISS_INDEX.unlink()
-            if FAISS_IDS.exists():
-                FAISS_IDS.unlink()
-            self.vector_store = None  # Force recreation
         files = self._get_session_files()
         print(f"Found {len(files)} session files")
         
@@ -695,6 +688,12 @@ class SessionBrain:
         # Save FAISS index
         if self.vector_store and self.vector_store.size > 0:
             self.vector_store.save()
+        
+        # If we need to rebuild (full ingest or changed sessions), rebuild from DB
+        # This ensures no orphaned vectors even if some sessions were skipped
+        if needs_rebuild and sessions_processed > 0:
+            print("\nRebuilding FAISS index from all DB chunks...")
+            self.rebuild_index()
         
         # Log ingest
         duration = time.time() - start_time
@@ -796,6 +795,47 @@ class SessionBrain:
             "db_size_mb": round(BRAIN_DB.stat().st_size / 1024 / 1024, 1) if BRAIN_DB.exists() else 0,
         }
 
+    def rebuild_index(self):
+        """Rebuild FAISS index from all chunks in SQLite."""
+        self._ensure_embedder()
+        
+        print("Rebuilding FAISS index from DB chunks...")
+        
+        # Remove old index
+        if FAISS_INDEX.exists():
+            FAISS_INDEX.unlink()
+        if FAISS_IDS.exists():
+            FAISS_IDS.unlink()
+        
+        # Get all chunks
+        chunks = self.db.execute(
+            "SELECT id, text FROM chunks ORDER BY id"
+        ).fetchall()
+        print(f"Found {len(chunks)} chunks in DB")
+        
+        if not chunks:
+            print("No chunks to index.")
+            return
+        
+        # Embed in batches
+        batch_size = 256
+        self.vector_store = None  # Force fresh creation
+        self._ensure_vector_store()
+        
+        for i in range(0, len(chunks), batch_size):
+            batch = chunks[i:i+batch_size]
+            texts = [c[1] for c in batch]
+            chunk_ids = [c[0] for c in batch]
+            
+            embeddings = self.embedder.embed(texts, batch_size=batch_size)
+            self.vector_store.add(embeddings, chunk_ids)
+            
+            if (i // batch_size) % 10 == 0:
+                print(f"  Embedded {min(i+batch_size, len(chunks))}/{len(chunks)}...")
+        
+        self.vector_store.save()
+        print(f"FAISS index rebuilt: {self.vector_store.size} vectors")
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # CLI
@@ -806,6 +846,7 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--ingest", action="store_true", help="Full ingest of all sessions")
     group.add_argument("--update", action="store_true", help="Incremental update (new/changed only)")
+    group.add_argument("--rebuild-index", action="store_true", help="Rebuild FAISS index from existing DB chunks")
     group.add_argument("--query", type=str, help="Semantic search query")
     group.add_argument("--stats", action="store_true", help="Show brain statistics")
     parser.add_argument("--main-only", action="store_true",
@@ -820,6 +861,8 @@ def main():
         brain.ingest(incremental=False, main_only=args.main_only)
     elif args.update:
         brain.ingest(incremental=True, main_only=args.main_only)
+    elif args.rebuild_index:
+        brain.rebuild_index()
     elif args.query:
         results = brain.query(args.query, top_k=args.top_k, min_score=args.min_score)
         if not results:

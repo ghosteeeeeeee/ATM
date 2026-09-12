@@ -1768,6 +1768,7 @@ ACCEL_300_V3_SHORT_EXTREME_BLOCK = True  # 2026-09-07 — block v3 SHORT in EXTR
 ACCEL_300_V3_SHORT_FLAT_BLOCK = True     # 2026-09-07 — block v3 SHORT in FLAT (33% WR). No SHORT edge in flat market.
 ACCEL_300_V3_LONG_EXTREME_BLOCK = True   # 2026-09-07 — block v3 LONG in EXTREME (42% WR, -$0.96). No LONG edge in extreme volatility.
 ACCEL_300_V3_LONG_FLAT_BLOCK = True      # 2026-09-07 — block v3 LONG in FLAT (33% WR). No LONG edge in flat market.
+ACCEL_300_MINUS_FLAT_BLOCK = True        # 2026-09-12 — block original SHORT in FLAT (17% WR, 1W/5L). No SHORT edge in flat market.
 R2_TREND_LONG_ENABLED        = True    # RE-ENABLED 2026-09-09 — HIGH only (68% WR). EXTREME blocked (trend-following too risky in storms). NORMAL blocked via volatility_gate_v2.
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels

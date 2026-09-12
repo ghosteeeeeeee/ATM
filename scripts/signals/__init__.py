@@ -241,6 +241,11 @@ except Exception:
     _pump_flow_signal_run = None
 
 try:
+    from signals.pump_chain_long import run as _pump_chain_long_run
+except Exception:
+    _pump_chain_long_run = None
+
+try:
     from signals.btc_pump_rider import run as _btc_pump_rider_run
 except Exception:
     _btc_pump_rider_run = None
