@@ -2090,9 +2090,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Layer B: Gate STANDALONE_BYPASS with BTC momentum check (2026-09-11)
             # Prevents single-source signals from bypassing neutral block when BTC is flat.
             # EXEMPTION: pump-chain fires when COIN is pumping — BTC flatness irrelevant (2026-09-12)
+            # EXEMPTION: mover fires on strong momentum — BTC flatness irrelevant (2026-09-12)
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
             _is_pump_chain = bare_source in ('pump-chain', 'pump_chain', 'pump-chain+', 'pump-chain-', 'pump_chain+', 'pump_chain-')
-            if BTC_CHOP_GATE_ENABLED and not _is_pump_chain:
+            _is_mover = bare_source in ('mover_long', 'mover+', 'mover-', 'mover_long+', 'mover_long-')
+            _btc_exempt = _is_pump_chain or _is_mover
+            if BTC_CHOP_GATE_ENABLED and not _btc_exempt:
                 _bypass_conn = None
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
