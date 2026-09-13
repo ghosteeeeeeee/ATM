@@ -1,3 +1,10 @@
+[2026-09-13 13:08 UTC] auto_1hr: NO CHANGE — system slightly positive, quiet hour
+  24h: 23T ~57%WR +$0.30 | 1T/1h, 5 open | All NEUTRAL
+  Exit: atr_sl_hit 12T +$0.30 (profitable, 34.5% 7d), profit-monster-trail 5T +$0.23
+  Signal: rr-struct+ best (+$0.67, 71.4%WR), trend_purity+ worst (-$0.91, 0%WR legacy aging)
+  Kill check: 0 trades closed last hour — no trigger
+  BY: auto_1hr
+
 [2026-09-13 12:09 UTC] auto_1hr: NO CHANGE — system slightly positive, quiet hour
   24h: 22T ~59%WR +$0.04 | 1T/1h, 4 open | All NEUTRAL
   Exit: atr_sl_hit 11T +$0.25 (profitable, trail-adjusted), profit-monster-trail 5T +$0.23

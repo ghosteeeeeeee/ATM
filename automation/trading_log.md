@@ -1,3 +1,33 @@
+## [2026-09-13 13:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed (POL pullback-entry- SHORT atr_sl_hit +$0.05 — 8.7h hold, trail exit in profit)
+**24h:** 23T ~57%WR +$0.30 | 5 open | All NEUTRAL
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 12T +$0.30 (52%, avg +$0.025 — profitable, trail-adjusted)
+- profit-monster-trail: 5T +$0.23 (22%, avg +$0.046)
+- rr_engine_resistance: 4T $0.00 (breakeven)
+- cut-loser-CL-T1: 1T -$0.13
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal (2+ trades):**
+- rr-struct+ LONG: 7T 71.4%WR +$0.67 (best)
+- pullback-entry- SHORT: 6T 83.3%WR +$0.30
+- trend_purity+ LONG: 4T 0%WR -$0.91 (worst — all losses, last close 04:00 UTC)
+- rr-struct- SHORT: 3T 66.7%WR -$0.14
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: 0 trades closed last hour for any signal — no 3+ trades/hour threshold met
+- Trade freq: 1T/hr, 5 open — healthy
+- atr_sl_hit 34.5% of 7d closes (below 40% threshold), profitable (+$1.21/7d)
+- trend_purity+ legacy losses aging out — 0 trades last hour, EXTREME penalty applied Sep 12
+- System slightly positive (+$0.30/24h), no urgency
+
+**Open Questions:**
+- trend_purity+ at -$0.91/24h but 0 recent trades — kill trigger requires 3+ in last hour specifically. Aging out naturally.
+
 ## [2026-09-13 12:09 UTC] Hourly Analysis
 
 **Trades:** 1 closed (BABY rr-struct+ LONG atr_sl_hit +$0.17)
