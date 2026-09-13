@@ -2297,8 +2297,10 @@ STANDALONE_BYPASS_SIGNALS = (
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
+    'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
     'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
+    'continuum-osc', 'continuum-osc+', 'continuum-osc-',  # continuum oscillator — structural momentum, works solo (2026-09-13)
     'mover', 'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo
@@ -2308,13 +2310,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
     'trend_purity',  # EMA30 purity-based LONG/CRASH SHORT — directional momentum, works solo
     'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
-)
-
-# PM Trail bypass signals — signals with pm_trail exit bypass confluence gate
-PM_TRAIL_BYPASS_SIGNALS = (
-    'pump-chain',  # chain correlation momentum — pm_trail exit
-    'pump-catcher',  # momentum breakout — pm_trail exit
-    'mover',  # fast mover momentum — pm_trail exit
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
