@@ -2959,6 +2959,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # FIX: Signals bypass detection function when emitted directly (not preserved)
             # Re-run detection to verify signal still passes new filters
             if src == 'ema300-dip-long' and direction.upper() == 'LONG':
+                log(f"  🔍 [REVALIDATE-CHECK] {tkn}:{direction} ema300-dip-long — checking...")
                 try:
                     from signals.ema300_dip_long import detect_ema300_dip_long, _get_candles_1m
                     _re_candles = _get_candles_1m(tkn)
@@ -2968,6 +2969,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _re_result is None:
                             log(f"  🚫 [HOTSET-FINAL-REVALIDATE-BLOCK] {tkn}:{direction} ema300-dip-long — detection function returned None (filters not passed)")
                             continue
+                        else:
+                            log(f"  ✅ [REVALIDATE-PASS] {tkn}:{direction} ema300-dip-long — detection function passed")
+                    else:
+                        log(f"  ⚠️ [REVALIDATE-SKIP] {tkn}:{direction} insufficient candles ({len(_re_candles) if _re_candles else 0})")
                 except Exception as _re_e:
                     log(f"  ⚠️ [HOTSET-FINAL-REVALIDATE-ERROR] {tkn}:{direction} re-validation failed: {_re_e}")
             # ── FINAL CONFLUENCE GUARD (2026-05-12) ─────────────────────────────────
