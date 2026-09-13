@@ -99,6 +99,7 @@ if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signa
         
         entry_price = float(pos.get("entry_price") or 0)
         current_sl = float(pos.get("stop_loss") or 0)
+        highest_price = float(pos.get("highest_price") or entry_price)  # use persisted peak
         
         # Get ATR
         _conn_atr = _sqlite3.connect(CANDLES_DB, timeout=5)
@@ -120,40 +121,34 @@ if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signa
                 trs.append(max(h - l, abs(h - pc), abs(l - pc)))
             atr = sum(trs[-14:]) / 14
         
-        # Calculate trailing stop
+        # Calculate trailing stop (DIRECTION-AWARE)
         trail_mult = getattr(hc, 'PUMP_EXIT_TRAIL_MULT', 3.0)
         trail_distance = atr * trail_mult
-        peak_price = max(cur, entry_price)  # track peak
-        trailing_sl = peak_price - trail_distance
         
-        # Use tighter of current SL and trailing SL
-        new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+        if direction == 'LONG':
+            # LONG: trail below peak
+            peak_price = max(cur, highest_price)
+            trailing_sl = peak_price - trail_distance
+            new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+        else:
+            # SHORT: trail above trough
+            trough_price = min(cur, pos.get("lowest_price", cur))
+            trailing_sl = trough_price + trail_distance
+            new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
         
         # Update SL if tighter
-        if new_sl > current_sl:
+        if direction == 'LONG' and new_sl > current_sl:
             pos['stop_loss'] = new_sl
             # Persist to DB
-            db_conn = None
-            try:
-                import psycopg2
-                from _secrets import BRAIN_PASSWORD, BRAIN_HOST
-                db_conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
-                                        user='postgres', password=BRAIN_PASSWORD,
-                                        connect_timeout=5)
-                db_cur = db_conn.cursor()
-                db_cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
-                            (float(new_sl), trade_id))
-                db_conn.commit()
-            except Exception as e:
-                log(f"  [PUMP-EXIT] DB persist failed: {e}", "WARN")
-            finally:
-                if db_conn:
-                    db_conn.close()
-            
+            _persist_sl(db_conn, trade_id, new_sl)
+            log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+        elif direction == 'SHORT' and new_sl < current_sl:
+            pos['stop_loss'] = new_sl
+            _persist_sl(db_conn, trade_id, new_sl)
             log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
         
-        # Check momentum exit
-        momentum_vel = getattr(hc, 'PUMP_EXIT_MOMENTUM_VEL', -0.5)
+        # Check momentum exit (VELOCITY-BASED, not just declining closes)
+        momentum_vel = getattr(hc, 'PUMP_EXIT_MOMENTUM_VEL', -0.5)  # -0.5% threshold
         momentum_candles = getattr(hc, 'PUMP_EXIT_MOMENTUM_CANDLES', 2)
         
         _conn_vel = _sqlite3.connect(CANDLES_DB, timeout=5)
@@ -168,23 +163,27 @@ if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signa
         _conn_vel.close()
         
         if len(_vel_closes) >= momentum_candles + 1:
-            # Check if velocity is negative for consecutive candles
+            # Calculate actual velocity (not just declining closes)
+            vel_5m = (_vel_closes[0] - _vel_closes[-1]) / _vel_closes[-1] * 100 if _vel_closes[-1] > 0 else 0
+            
+            # Check if velocity is below threshold for consecutive periods
             neg_count = 0
             for i in range(1, len(_vel_closes)):
-                if _vel_closes[i-1] > _vel_closes[i]:
+                period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
+                if period_vel < momentum_vel:  # USE THE THRESHOLD
                     neg_count += 1
                 else:
                     neg_count = 0
             
             if neg_count >= momentum_candles:
                 profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
-                reason = f"momentum_fade: {neg_count} consecutive negative candles, vel={(_vel_closes[0] - _vel_closes[-1]) / _vel_closes[-1] * 100 if _vel_closes[-1] > 0 else 0:.2f}%"
+                reason = f"momentum_fade: vel={vel_5m:.2f}% < {momentum_vel}% for {neg_count} candles"
                 close_paper_position(trade_id, reason)
                 closed_count += 1
                 log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
                 continue
         
-        # Check time exit
+        # Check time exit (with momentum check to avoid cutting consolidating winners)
         time_threshold = getattr(hc, 'PUMP_EXIT_TIME_THRESHOLD', 2.0)
         time_hours = getattr(hc, 'PUMP_EXIT_TIME_HOURS', 2.0)
         
@@ -195,12 +194,17 @@ if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signa
                 hold_hours = (datetime.now(timezone.utc) - entry_dt).total_seconds() / 3600
                 profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
                 
+                # Only exit if profit is low AND momentum is fading
                 if profit_pct < time_threshold and hold_hours > time_hours:
-                    reason = f"dead_money: {hold_hours:.1f}h hold, {profit_pct:+.2f}% profit"
-                    close_paper_position(trade_id, reason)
-                    closed_count += 1
-                    log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
-                    continue
+                    # Double-check: is momentum still positive?
+                    if len(_vel_closes) >= 2:
+                        vel_check = (_vel_closes[0] - _vel_closes[1]) / _vel_closes[1] * 100 if _vel_closes[1] > 0 else 0
+                        if vel_check < 0:  # momentum actually fading
+                            reason = f"dead_money: {hold_hours:.1f}h hold, {profit_pct:+.2f}%, vel={vel_check:.2f}%"
+                            close_paper_position(trade_id, reason)
+                            closed_count += 1
+                            log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
+                            continue
             except Exception:
                 pass
         
@@ -224,6 +228,8 @@ if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signa
 - Momentum exit may exit too early on news-driven pullbacks
 - Time exit may cut winners that need more time
 - Need to verify pump-chain is in PROFIT_MONSTER_BYPASS_SIGNALS
+- **NOTE:** 3.0x multiplier based on single FIL case study — validate on more tokens before full deployment
+- **NOTE:** Actual margin is 0.30% (not 6%) — ATR 3.0x = 2.82%, max DD = 2.52%
 
 ## 9. Recommendation
 
