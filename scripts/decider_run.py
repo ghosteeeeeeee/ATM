@@ -918,10 +918,12 @@ def rule_based_context_gate(token, direction, source, sig):
         # Hard block: pullback-entry SHORT with z > 1.0 at execution time
         # (XPL DNA: winning SHORTs have z < 0 — price below mean = downtrend intact)
         # The detect() filter uses 5m data; z can change between detection and execution
-        # Threshold 1.0: 46% of winning trades have z > 0, but only 25% have z > 1.0
+        # Use LIVE z-score (not stale detection-time z) to catch reversals
         _is_pullback = source and 'pullback-entry' in source
-        if _is_pullback and direction == 'SHORT' and z_score is not None and z_score > 1.0:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: z={z_score:.2f} > 1.0 (price well above mean — downtrend reversed)', 20)
+        if _is_pullback and direction == 'SHORT':
+            _live_z = _ctx_gate_get_zscore(token)
+            if _live_z is not None and _live_z > 1.0:
+                return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 1.0 (price well above mean — downtrend reversed)', 20)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
