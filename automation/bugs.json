@@ -379,6 +379,46 @@
       "related_bugs": [
         "BUG-014"
       ]
+    },
+    {
+      "id": "BUG-021",
+      "title": "Chain-data parsing in _classify_signal doesn't normalize hyphens to underscores — 11 MEAN_REVERSION signals misclassified as MOMENTUM",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "scripts/chop_detector.py"
+      ],
+      "symptom": "When _classify_signal receives hyphen-based source strings (from preserved entries), MEAN_REVERSION signals like bb-bounce-v2-long+, open-skies+, coil-spring+, neutral-sniper-long+, pullback-entry+, doji-top-short, doji-bottom-long, liq-hunt+, return-exhaustion-long+, range-reversion-long+ are classified as MOMENTUM and BLOCKED in CHOP. Verified: 11 of 16 source strings with hyphens return wrong classification.",
+      "root_cause": "SIGNAL_OVERRIDES keys use underscores (bb_bounce_v2_long, open_skies, etc.) but source strings use hyphens (bb-bounce-v2-long+, open-skies+, etc.). The chain-data parsing strips ALL hyphens via .replace('-', '') producing unreadable strings (bbbouncev2long) that never match override keys. Missing normalization step: convert hyphens to underscores before checking.",
+      "fix": "In _classify_signal chain-data parsing (line 139-146): add p_normalized = p.replace('-', '_').replace('+', '') before checking against SIGNAL_OVERRIDES. Also add missing abbreviated entries: 'coil_spring': 'MEAN_REVERSION', 'liq_hunt': 'MEAN_REVERSION', 'liq_hunt_long': 'MEAN_REVERSION', 'liq_hunt_short': 'MEAN_REVERSION'.",
+      "verified_by": "Bug hunter classification test: 16 source strings tested, 11 returned wrong classification. DB signal_types (underscore-based) all pass correctly.",
+      "date_found": "2026-09-13",
+      "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-020"
+      ]
+    },
+    {
+      "id": "BUG-022",
+      "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES — defaults correctly by accident",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/chop_detector.py"
+      ],
+      "symptom": "ema300_dip and ema300_dip_short are in SIGNAL_OVERRIDES but ema300_dip_long is not. Classification defaults to MOMENTUM (correct) via the catch-all default, but this is accidental and inconsistent.",
+      "root_cause": "Omission during SIGNAL_OVERRIDES authoring — ema300_dip_long was never added despite ema300_dip_short being present.",
+      "fix": "Add 'ema300_dip_long': 'MOMENTUM' to SIGNAL_OVERRIDES.",
+      "verified_by": "Bug hunter: confirmed ema300_dip_long not in dict, defaults correctly only because of line 160 default.",
+      "date_found": "2026-09-13",
+      "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-021"
+      ]
     }
   ],
   "schema": {

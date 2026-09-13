@@ -1,89 +1,110 @@
 {
-    "timestamp": "2026-09-13T19:30:00Z",
+    "timestamp": "2026-09-13T20:30:00Z",
     "session_brain_stats": {
-        "total_vectors": 157487,
-        "top_topics": ["pullback entry", "bb_bounce", "signal performance", "stale gap"]
+        "total_sessions": 157487,
+        "top_topics": ["signal performance", "pullback entry", "bb bounce", "losses", "databases"],
+        "recurring_themes": ["rr_engine_resistance SHORT exit delay", "signal metadata NULL", "stale trade drag", "legacy signal aging out"]
     },
     "trade_summary_24h": {
         "trades": 32,
-        "wr": 56.3,
-        "pnl": 0.44,
-        "regime": "NEUTRAL",
-        "top_performers": "rr-struct+ 7T/57.1%WR +$0.47, pullback-entry- 10T/60%WR +$0.41",
-        "worst_performers": "trend_purity+ 3T/0%WR -$0.75 (dead signal)"
+        "win_rate": 56.3,
+        "pnl": 0.17,
+        "status": "ABOVE_BREAKEVEN",
+        "r_r_ratio": 0.938,
+        "breakeven_wr": 51.6
     },
     "trade_summary_7d": {
-        "trades": 338,
-        "wr": 56.8,
-        "pnl": 1.28,
-        "active_signals_pnl": 5.39,
-        "legacy_drag": -3.46,
-        "top_performers": "pullback-entry- 44T/63.6%WR +$2.11, open_skies 8T/62.5%WR +$1.20",
-        "worst_performers": "ema300_dip_short -$0.91, trend_purity+ -$0.90 (dead)"
+        "trades": 339,
+        "win_rate": 56.9,
+        "pnl": 1.29,
+        "status": "PROFITABLE",
+        "r_r_ratio": 0.800,
+        "breakeven_wr": 55.6
+    },
+    "losing_trade_autopsy": {
+        "total_24h_losers": 13,
+        "dead_signal_losers": 3,
+        "active_signal_losers": 10,
+        "total_loss": -1.10,
+        "key_findings": [
+            "trend_purity+ 3 LONG (MET -$0.18 EXTREME, ZRO -$0.29 HIGH, INJ -$0.28 HIGH) — ALL dead signal, 11T/7d 36.4%WR -$0.90. Ages out Sep 14.",
+            "pullback-entry- 4 SHORT (ZRO -$0.21, DYDX -$0.14, NXPC -$0.13, CAKE -$0.10) — mixed regimes. CAKE RSI=23.53 near oversold, DYDX RSI=75.0 overbought.",
+            "rr-struct- 3 SHORT (ZEN -$0.16 HIGH, LINK -$0.12 NORMAL, INJ -$0.25 legacy) — 7T/7d 42.9%WR -$0.42. Monitoring at 15T kill threshold.",
+            "rr-struct+ 2 LONG (KAS -$0.26 NORMAL rr_engine_support_br, TURBO -$0.14 NORMAL atr_sl) — STAR signal 71.4%WR, normal variance.",
+            "pump-chain+ 1 LONG (FIL -$0.02 tiny EXTREME) — negligible."
+        ],
+        "entry_condition_analysis": {
+            "oversold_short_entries": "CAKE RSI=23.53, NXPC RSI=18.18 — both lost. SHORT_RSI_FLOOR=25 now blocks these.",
+            "overbought_long_entries": "DYDX RSI=75.0 for SHORT (entered overbought) — lost. Not a LONG entry issue.",
+            "metadata_quality": "ALL 13 losers have entry_rsi_14=NULL — data in _signal_metadata JSON but not individual columns. Blocks entry condition analysis."
+        }
     },
     "drift_findings": [
         {
-            "item": "pullback-entry- SHORT blocked in HIGH regime",
-            "detail": "volatility_gate_v2.py has Pullback_Entry_Short=0.0 in HIGH based on stale 3T data. Current 7d data: 20T/65%WR +$1.01.",
-            "status": "FIXED — changed multiplier to 0.7",
-            "impact": "+$0.50-1.00/7d expected from more HIGH-regime SHORT entries"
+            "issue": "VOL_PHASE_MULTS key mismatch bug",
+            "description": "Pullback_Entry_Short and R2 keys in VOL_PHASE_MULTS never matched signal_family() output (Pullback_Entry, R2_Structural). Multipliers were NEVER applied.",
+            "impact": "Pullback-entry SHORT fired in NORMAL regime without penalty (15T, 53.3%WR, -$0.01). rr-struct- SHORT fired in HIGH without block (4T, 25%WR, -$0.41).",
+            "status": "FIXED — keys corrected to match signal_family output"
         },
         {
-            "item": "rr_engine_resistance SHORT exits structural drag",
-            "detail": "33 exits/7d -$1.35. pullback-entry- 18T -$0.92, pump-chain- 11T -$0.12. Engine exits when price touches resistance — SHORT entries near support get stopped out on bounce.",
-            "status": "NEEDS CODE FIX — grace period or entry distance filter",
-            "impact": "-$0.92/7d from pullback-entry- alone"
-        },
-        {
-            "item": "trend_purity+ dead signal still trading",
-            "detail": "11T/7d 36.4%WR -$0.90. Auto-killed at 04:15 UTC but trades still in 7d window.",
-            "status": "Ages out by Sep 14. Kill threshold 15T approaching.",
-            "impact": "-$0.90/7d drag, self-resolving"
+            "issue": "Signal metadata NULL for ALL recent trades",
+            "description": "entry_rsi_14, signal_z_score not recorded in individual columns. Data exists in _signal_metadata JSON.",
+            "impact": "Cannot verify entry conditions at execution time. Blocks entry analysis.",
+            "status": "MONITORING — needs code fix to write individual columns"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "rr-struct- SHORT in HIGH regime weak",
-            "detail": "4T/7d 25%WR -$0.41. Small sample, keep monitoring. Kill at 15T if WR <50%.",
-            "severity": "low"
+            "problem": "rr_engine_resistance SHORT exit structural drag",
+            "detail": "33 SHORT trades/7d exited by rr_engine_resistance, -$1.35 net. Exits when price breaks above resistance — many breakouts are temporary.",
+            "recommendation": "CODE CHANGE: Add minimum hold time or require close above resistance instead of wick. Backtest needed.",
+            "status": "OPEN — needs code change"
         },
         {
-            "problem": "Signal metadata NULL for ALL recent trades",
-            "detail": "entry_rsi_14, signal_z_score not recorded as individual columns. Data exists in _signal_metadata JSON.",
-            "severity": "medium"
+            "problem": "Legacy signal drag aging out",
+            "detail": "ema300_dip_short -$0.91, trend_purity+ -$0.90, slow_grind -$0.80, sma20_dip -$0.73, pullback_entry+ -$0.57. Total -$3.46/7d.",
+            "recommendation": "Monitor — ages out Sep 14 naturally.",
+            "status": "MONITORING"
+        },
+        {
+            "problem": "rr-struct- degrading",
+            "detail": "7T/7d 42.9%WR -$0.42. R:R 0.42 (avg_loss 2.4x avg_win).",
+            "recommendation": "Kill at 15T if WR <50% or PnL negative.",
+            "status": "MONITORING"
         }
     ],
     "missing_implementations": [
-        "rr_engine grace period for SHORT exits (code change needed)",
-        "Signal metadata column recording (5-10 lines)",
-        "bb_position < 0.15 filter for SHORT near support"
+        "rr_engine_resistance SHORT exit delay (needs code change + backtest)",
+        "Signal metadata individual column recording (needs code fix)",
+        "bb_position SHORT entry filter (needs backtest)"
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-13T19:30:00Z",
-            "idea": "Relax pullback-entry- SHORT volatility gate in HIGH from 0.0 to 0.7",
-            "rationale": "Stale comment said 0%WR (3T). Actual 7d data: 20T/65%WR +$1.01. Multiplier clamped to 0.3 still allowed trades — raising to 0.7 captures more of the edge.",
-            "expected_impact": "+$0.50-1.00/7d",
-            "category": "entry sniper",
-            "status": "APPLIED",
-            "risk": "low — single multiplier, high WR base, already profitable at 0.3x",
-            "impact_on_winners": "Would not have blocked any of the 13 HIGH winners in last 7d"
+            "date": "2026-09-13T20:30:00Z",
+            "idea": "Fix VOL_PHASE_MULTS key mismatch — multipliers for Pullback_Entry and R2_Structural were never applied",
+            "rationale": "signal_family() returns 'Pullback_Entry' but VOL_PHASE_MULTS had 'Pullback_Entry_Short'. Keys never matched. Multipliers silently ignored.",
+            "expected_impact": "Pullback_Entry SHORT blocked in NORMAL (saves ~$0.18/7d), penalized in HIGH (reduces false positives). rr-struct penalized in NORMAL (0.5x).",
+            "category": "bug fix",
+            "status": "IMPLEMENTED",
+            "risk": "low — conservative values (0.5 for rr-struct, not 0.0)",
+            "files_changed": ["scripts/volatility_gate_v2.py"],
+            "impact_on_winners": "pullback-entry SHORT in NORMAL: 15T 53.3%WR -$0.01 — blocking saves ~$0.18. No winning trades blocked (all flat/negative). rr-struct in NORMAL: 6T LONG 50%WR +$0.21 — 0.5x multiplier reduces confidence but doesn't block."
         }
     ],
     "config_changes_applied": [
         {
             "file": "scripts/volatility_gate_v2.py",
-            "change": "Pullback_Entry_Short HIGH multiplier 0.0 → 0.7",
-            "rationale": "Stale block based on 3T data. Current 20T/65%WR +$1.01 in HIGH.",
-            "expected_impact": "+$0.50-1.00/7d"
+            "change": "Fixed VOL_PHASE_MULTS keys: Pullback_Entry_Short→Pullback_Entry (NORMAL 0.0, HIGH 0.7), R2→R2_Structural (NORMAL 0.5)",
+            "rationale": "Key mismatch bug — multipliers were never applied. NORMAL pullback-entry SHORT 15T -$0.01, rr-struct NORMAL 6T +$0.21. Conservative values.",
+            "expected_impact": "~$0.18/7d from blocked NORMAL pullback-entry trades + reduced HIGH false positives"
         }
     ],
     "next_actions": [
-        "Monitor pullback-entry- SHORT in HIGH after multiplier change — 48h check",
-        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d)",
-        "Monitor trend_purity+ at 15T kill threshold (currently 11T/7d)",
-        "Fix rr_engine SHORT exit grace period (code change needed)",
-        "Fix signal metadata column recording (5-10 lines)",
-        "Legacy ages out by Sep 14 — expect +$3.46/7d improvement"
+        "Monitor volatility gate fix impact over 48h. Check pipeline.log for multiplier application.",
+        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d 42.9%WR -$0.42).",
+        "Monitor legacy aging out by Sep 14. Expect 7d PnL improvement ~$3.46.",
+        "Verify signal metadata recording — entry_rsi_14 NULL for ALL recent trades.",
+        "CODE CHANGE NEEDED: rr_engine_resistance SHORT exit delay — add hold time or close-above-resistance requirement.",
+        "Monitor squeeze_reversal — zero trades since Sep 10. If no trades by Sep 14, investigate."
     ]
 }

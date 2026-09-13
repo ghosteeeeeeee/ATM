@@ -76,5 +76,16 @@
     "after": "Pullback_Entry_Short = 0.7 in HIGH (20T/65%WR +$1.01/7d)",
     "rationale": "Stale block based on 3 trades with 0%WR. Current 7d data: 20 trades, 65%WR, +$1.01 in HIGH. Multiplier clamped to 0.3 still allowed trades — raising to 0.7 captures more of the edge.",
     "impact": "+$0.50-1.00/7d expected"
+  },
+  {
+    "timestamp": "2026-09-13T20:38:42Z",
+    "agent": "brain_auditor",
+    "change": "Fixed VOL_PHASE_MULTS key mismatch — Pullback_Entry_Short→Pullback_Entry (NORMAL 0.0, HIGH 0.7), R2→R2_Structural (NORMAL 0.5)",
+    "type": "config",
+    "file": "volatility_gate_v2.py",
+    "before": "Keys Pullback_Entry_Short and R2 never matched signal_family() output. Multipliers silently ignored (always 1.0).",
+    "after": "Keys corrected to Pullback_Entry and R2_Structural. NORMAL blocks pullback-entry (0.0), penalizes rr-struct (0.5). HIGH relaxes pullback-entry (0.7), blocks rr-struct (0.0).",
+    "rationale": "Bug fix — multipliers were never applied. Pullback-entry SHORT in NORMAL: 15T 53.3%WR -$0.01. rr-struct SHORT in HIGH: 4T 25%WR -$0.41. Key mismatch prevented regime-specific filtering.",
+    "impact": "~$0.18/7d from blocked NORMAL pullback-entry trades + reduced HIGH false positives. Net slightly positive."
   }
 ]

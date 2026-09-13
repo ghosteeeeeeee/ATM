@@ -236,9 +236,8 @@ VOL_PHASE_MULTS = {
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
-        'Pullback_Entry_Long': 0.0,   # BLOCKED — pullback_entry+ 30% WR in NORMAL, wins in HIGH/EXTREME
-        'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 30% WR in NORMAL, wins in EXTREME/HIGH
-        'R2': 0.0,                    # BLOCKED — r2_trend_long 53% WR in NORMAL, wins in EXTREME/HIGH
+        'Pullback_Entry': 0.0,        # BLOCKED — pullback-entry 2T LONG 0%WR -$0.17 + 15T SHORT 53%WR -$0.01 in NORMAL. Wins in EXTREME/HIGH. Key fixed 2026-09-13 (was Pullback_Entry_Short, never matched signal_family output)
+        'R2_Structural': 0.5,         # PENALIZED — rr-struct 6T LONG 50%WR +$0.21 + 3T SHORT 67%WR -$0.01 in NORMAL. Mixed. Key fixed 2026-09-13 (was R2, never matched)
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
     },
@@ -246,8 +245,8 @@ VOL_PHASE_MULTS = {
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
-        'Pullback_Entry_Short': 0.7,  # RELAXED — pullback_entry- 65%WR +$1.01/7d in HIGH (20T). Was 0.0 based on stale 3T data.
-        'R2_Structural': 0.0,    # BLOCKED — rr-struct- 33% WR in HIGH (3 trades, -$0.25), wins in NORMAL
+        'Pullback_Entry': 0.7,   # RELAXED — pullback_entry- 20T 65%WR +$1.01/7d in HIGH. Key fixed 2026-09-13 (was Pullback_Entry_Short, never matched)
+        'R2_Structural': 0.0,    # BLOCKED — rr-struct- 4T 25%WR -$0.41 in HIGH, wins in NORMAL. Key fixed 2026-09-13 (was R2_Structural, already matched but value stands)
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME

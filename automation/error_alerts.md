@@ -371,3 +371,8 @@
 - **INFO** Disk: 79% used (24G free)
 - **INFO** Timers: hermes-pipeline.timer active, firing every 1m
 - **INFO** Auto-fix: Applied `sqlite3` import fix to position_manager.py line 2510
+
+## Error Alerts — 2026-09-13 20:55 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.0s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.4s):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
