@@ -3349,3 +3349,33 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 **Open Questions:**
 - POL SHORT open 6+ hours, ETC SHORT open 17+ hours
 - trend_purity+ -$0.91 aging out of 24h window
+
+## [2026-09-13 11:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour | 22 closed in 24h (14W/8L)
+**PnL:** 24h: +$0.04 (63.6% WR) — break-even but stable
+**Open:** 5 positions (ETC SHORT 17.7h, POL SHORT 6.9h, BABY LONG 1.5h, NXPC SHORT 0.8h, CAKE SHORT 0.8h)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.23 (50%) — profitable
+- profit-monster-trail: 5T +$0.23 (23%)
+- rr_engine_resistance: 4T $0.00 (18%)
+- cut-loser-CL-T1: 1T -$0.13
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal (active only):**
+- rr-struct+ LONG: 6T 67%WR +$0.50 (top)
+- pullback-entry- SHORT: 5T 80%WR +$0.25
+- rr-struct- SHORT: 3T 67%WR -$0.14
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades
+- atr_sl_hit 50% but profitable — doing its job
+- Trade freq: ~1/hr, healthy
+- All active signals positive
+
+**Open Questions:**
+- ETC SHORT open 17.7h — very old position, may be stuck
+- POL SHORT open 6.9h — monitoring
