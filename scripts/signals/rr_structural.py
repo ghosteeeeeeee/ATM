@@ -2,7 +2,11 @@
 """rr_structural — Fire on structurally excellent R:R setups.
 
 Uses the risk_reward_engine to evaluate structural quality for every token.
-Fires signals ONLY when the engine scores Grade A/B with R:R ≥ 3.0.
+Fires signals when the engine scores Grade A/B with R:R ≥ 2.0.
+
+Filters:
+  - RSI extremes (SHORT blocked when RSI < 30, LONG when RSI > 80)
+  - Price acceleration direction (SHORT blocked when accel > 0, LONG when accel < 0)
 
 Market mechanic: Structural breakout — clear air + strong R:R + right regime = favorable setup.
 Edge: RR engine evaluates ~200 tokens per cycle. Most get Grade D/F. Grade A/B have excellent structure.
@@ -36,6 +40,8 @@ from hermes_constants import (
     RR_STRUCTURAL_MAX_PRICE_AGE,
     RR_STRUCTURAL_RSI_MIN,
     RR_STRUCTURAL_RSI_MAX,
+    RR_STRUCTURAL_ACCEL_LOOKBACK,
+    RR_STRUCTURAL_BLOCK_ACCEL,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -92,15 +98,54 @@ def _get_rsi(token):
             conn.close()
 
 
+def _compute_price_acceleration(token, lookback=None):
+    """Compute short-term price acceleration from recent 1m candle closes.
+
+    Returns float: positive = price moving UP, negative = moving DOWN.
+    Returns None if insufficient data.
+    """
+    if lookback is None:
+        lookback = RR_STRUCTURAL_ACCEL_LOOKBACK
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1m
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC LIMIT ?
+        """, (token.upper(), lookback + 1))
+        rows = cur.fetchall()
+        if len(rows) < lookback:
+            return None
+        closes = [r[0] for r in reversed(rows)]
+        # Acceleration = rate of change of rate of change
+        # Simple: (current - N/2 ago) - (N/2 ago - oldest) all normalized
+        mid = len(closes) // 2
+        first_half_roc = (closes[mid] - closes[0]) / closes[0] if closes[0] else 0
+        second_half_roc = (closes[-1] - closes[mid]) / closes[mid] if closes[mid] else 0
+        return second_half_roc - first_half_roc
+    except Exception:
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+
 def detect(token, price):
     """Evaluate structural R:R for a token. Returns signal dict or None.
 
     Checks both LONG and SHORT. Returns the direction with better structure.
     Hard blocks: SHORT when RSI < RR_STRUCTURAL_RSI_MIN (oversold),
-                 LONG when RSI > RR_STRUCTURAL_RSI_MAX (overbought).
+                 LONG when RSI > RR_STRUCTURAL_RSI_MAX (overbought),
+                 SHORT when price accel > 0 (price going UP against SHORT),
+                 LONG when price accel < 0 (price going DOWN against LONG).
     """
     # Get RSI for extreme filtering
     rsi = _get_rsi(token)
+
+    # Get price acceleration for direction filter
+    price_accel = _compute_price_acceleration(token)
 
     # LONG evaluation
     long_ok = False
@@ -113,6 +158,9 @@ def detect(token, price):
         # RSI check: don't LONG when overbought
         if rsi is not None and rsi > RR_STRUCTURAL_RSI_MAX:
             _log(f'{token} LONG blocked: RSI {rsi:.1f} > {RR_STRUCTURAL_RSI_MAX} (overbought)')
+        # Acceleration check: don't LONG when price accelerating DOWN
+        elif RR_STRUCTURAL_BLOCK_ACCEL and price_accel is not None and price_accel < 0:
+            _log(f'{token} LONG blocked: accel {price_accel:+.6f} < 0 (price going DOWN)')
         else:
             long_ok = True
 
@@ -127,6 +175,9 @@ def detect(token, price):
         # RSI check: don't SHORT when oversold
         if rsi is not None and rsi < RR_STRUCTURAL_RSI_MIN:
             _log(f'{token} SHORT blocked: RSI {rsi:.1f} < {RR_STRUCTURAL_RSI_MIN} (oversold)')
+        # Acceleration check: don't SHORT when price accelerating UP
+        elif RR_STRUCTURAL_BLOCK_ACCEL and price_accel is not None and price_accel > 0:
+            _log(f'{token} SHORT blocked: accel {price_accel:+.6f} > 0 (price going UP)')
         else:
             short_ok = True
 

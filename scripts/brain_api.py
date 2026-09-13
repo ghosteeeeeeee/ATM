@@ -259,6 +259,31 @@ def get_changes() -> list:
     return []
 
 
+def reject_creative(index: int, reason: str = "") -> dict:
+    """Reject a creative improvement by setting its status to rejected."""
+    if not CREATIVE_FILE.exists():
+        return {"error": "No creative improvements file"}
+    
+    try:
+        with open(CREATIVE_FILE) as f:
+            data = json.load(f)
+        
+        if not isinstance(data, list) or index is None or index < 0 or index >= len(data):
+            return {"error": f"Invalid index {index}"}
+        
+        data[index]["status"] = "rejected"
+        data[index]["rejected_at"] = datetime.now(timezone.utc).isoformat()
+        if reason:
+            data[index]["reject_reason"] = reason
+        
+        with open(CREATIVE_FILE, 'w') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        return {"ok": True, "idea": data[index].get("idea", "")}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # ── HTTP Handler ────────────────────────────────────────────────────────
 
 class BrainAPIHandler(BaseHTTPRequestHandler):
@@ -296,6 +321,23 @@ class BrainAPIHandler(BaseHTTPRequestHandler):
             self._json_response(get_changes())
         elif path == "/api/brain/topic-graph":
             self._json_response(get_topic_relationships())
+        else:
+            self._json_response({"error": "Not found"}, 404)
+    
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        path = parsed.path
+        
+        if path == "/api/brain/creative/reject":
+            # Reject a creative improvement by index
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))
+                body = json.loads(self.rfile.read(content_length)) if content_length > 0 else {}
+                index = body.get("index")
+                reason = body.get("reason", "")
+                self._json_response(reject_creative(index, reason))
+            except Exception as e:
+                self._json_response({"error": str(e)}, 400)
         else:
             self._json_response({"error": "Not found"}, 404)
     

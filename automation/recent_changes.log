@@ -1590,3 +1590,8 @@
   WHY: trend_purity+ 10T/40%WR -$0.72/7d in EXTREME. 5 losers (INJ, KAS, MET, BIGTIME, ARB). 0.3x multiplier insufficient. Changed to 0.15x to further suppress confidence in EXTREME regime.
   BY: brain_auditor
   FILES: scripts/volatility_gate_v2.py
+
+[2026-09-13 04:15 UTC] auto_1hr: SIGNAL KILLED — TREND_PURITY_PLUS_ENABLED = False
+  WHY: trend_purity+ LONG 8T/24h 12.5% WR -$1.22, all NEUTRAL regime. Brain_auditor 0.15x EXTREME multiplier didn't help — trades are NEUTRAL, not EXTREME. Combo signals unaffected.
+  BY: auto_1hr
+  FILES: scripts/hermes_constants.py

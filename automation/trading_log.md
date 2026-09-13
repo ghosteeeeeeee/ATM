@@ -3089,3 +3089,33 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - BTC SHORT: 32.8h open, -14.58% — stale and underwater
 
 **Open Questions:** None
+
+## [2026-09-13 04:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.47 (0% WR)
+
+**Last Hour Trades:**
+- MET trend_purity+ LONG → atr_sl_hit → -$0.18
+- ZRO trend_purity+ LONG → rr_engine_support_br → -$0.29
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T -$0.24 (40% — at threshold)
+- profit-monster-trail: 6T +$0.30
+- rr_engine_resistance: 5T -$0.25
+- rr_engine_support_br: 3T -$0.70
+- cut-loser-CL-T1: 1T -$0.13
+
+**Changes:**
+1. KILLED TREND_PURITY_PLUS_ENABLED = False — 8T/24h 12.5% WR -$1.22, all NEUTRAL regime losses. Brain_auditor's 0.15x EXTREME multiplier didn't help because trades are NEUTRAL, not EXTREME. Combo signals (rs-s66,rs-s70,trend_purity+ and volume-breakout-long+) unaffected.
+
+**No Change Needed:**
+- atr_sl_hit 40% — at threshold, not over
+- Trade freq ~1-2/hr — normal weekend
+- Other signals stable
+
+**Watch List:**
+- BTC SHORT pump-chain-: 33.8h, -6.68% — stale
+- rr_engine_support_br: 3T -$0.70 — worst avg PnL exit reason
+
+**Open Questions:** None

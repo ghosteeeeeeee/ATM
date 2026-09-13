@@ -201,20 +201,37 @@ Think like a trader who:
 - Questions assumptions ("why do we always do X? what if we did Y?")
 - Looks for patterns humans miss
 
-### Creative Thinking Modes:
+### ⚠️ SUGGESTION QUALITY RULES (MANDATE)
 
-| Mode | What To Look For | Example |
-|------|-----------------|---------|
-| **Pattern hunter** | Winning patterns in sessions we haven't implemented | "3 sessions ago we discussed RSI divergence — never built it" |
-| **Cross-signal** | Combine learnings from different signals | "bb_bounce wins in FLAT, atr_spike in HIGH — combine in NORMAL?" |
-| **Regime creative** | New regime behaviors beyond enable/disable | "EXTREME kills most — what if halved position size instead?" |
-| **Entry sniper** | Perfect entry conditions from winners | "All top 20 wins had RSI 45-55 — tighten entry band" |
-| **Exit optimizer** | Better TP/SL logic | "60% hit +2% before reversing — activate trailing earlier" |
-| **Gap finder** | Missing capabilities entirely | "No signal fires on weekends — Sunday BTC moves are predictable" |
-| **Contrarian** | Challenge existing assumptions | "We block SHORT in uptrends — but trend exhaustion signals?" |
-| **Time-of-day** | Temporal patterns | "All big wins 14:00-18:00 UTC — weight signals higher then" |
+**Before suggesting ANY change, you MUST verify:**
 
-### Idea Format:
+1. **Minimum sample size**: At least 20 trades for signal-level suggestions, 50+ for regime-level
+   - If sample < 20: say "insufficient data — monitor" NOT "we should change X"
+   - Small samples (5-15 trades) have high variance and can mislead
+
+2. **Statistical significance**: The pattern must be clear, not marginal
+   - 55% WR vs 45% WR in 10 trades = noise, not signal
+   - 70% WR vs 30% WR in 30 trades = worth investigating
+   - When in doubt, say "needs more data"
+
+3. **Impact on winners**: Check how many winning trades your suggestion would have blocked
+   - If your filter would have killed >20% of recent winners: BAD IDEA
+   - If your filter would have killed 0 winners: GOOD IDEA
+   - Always quantify: "Would have blocked X of Y winners in last 7d"
+
+4. **One variable at a time**: Don't suggest compound changes
+   - Bad: "Block SHORT in NORMAL AND increase confidence to 75%"
+   - Good: "Block SHORT in NORMAL" (then monitor, then adjust confidence later)
+
+5. **Conservative defaults**: When uncertain, suggest monitoring, not changing
+   - "Monitor for 48h" is better than "change now"
+   - "Add to watchlist" is better than "disable immediately"
+
+6. **Never suggest blanket changes** that affect all signals/coins equally
+   - Bad: "Increase all confidence thresholds by 10%"
+   - Good: "Increase bb_bounce confidence from 50% to 65% in FLAT"
+
+### Idea Format (with required fields):
 ```json
 {
     "date": "2026-09-12T05:00:00Z",

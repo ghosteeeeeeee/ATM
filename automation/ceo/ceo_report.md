@@ -1,192 +1,43 @@
-## CEO Report — 2026-09-13 ~04:00 UTC (BTC SHORT Regime Classification)
+## CEO Report — 2026-09-13 ~03:15 UTC
 
 ### Diagnosis
-
-**DB QUERIED:** Spike-inflated regime classification reviewed. Only 3 out of 1,472 trades (0.2%) in 30d had regime shifts within 3h of entry. All 3 were winners/near-breakeven (GMT +0.45%, AIXBT +0.87%, ME -3.28%). BTC SHORT ID 15262 was correctly classified: ATR=0.86% at entry = NORMAL. pump-chain- is allowed in NORMAL. Trade is -0.07% (near breakeven, not a regime classification issue).
-
-### Root Cause
-
-**Non-issue.** The +3.3% BTC spike at 12:00-14:00 Sep 11 was a genuine market move, not noise. ATR correctly reflected recent volatility. ATR period change (14→20) would yield 0.74% — still NORMAL regime. No evidence that spike-inflated classification causes losses. The 3 regime-shift trades were all fine.
-
-### Recommendation: NO CHANGE
-
-| Option | Verdict | Why |
-|--------|---------|-----|
-| 1. No change | **ADOPT** | Classification correct at trade time, 0.2% occurrence rate, no losses |
-| 2. Longer ATR period (20) | Skip | Marginal smoothing, still NORMAL, adds complexity |
-| 3. Cooling period after >2% candle | Skip | Would block legitimate post-spike entries (momentum continuation) |
-| 4. Median-based ATR | Skip | Overkill for 0.2% occurrence, changes ATR behavior globally |
-
-**Real issues to focus on:** NORMAL regime -$1.70/7d SHORT (structural), stale entries -$1.19/7d, trend_purity+ EXTREME whipsaw. Not regime classification.
-
----
-
-## CEO Report — 2026-09-12 ~14:35 UTC
-
-### Diagnosis
-
-**DB VERIFIED:** 24h 42T 66.7% WR +$0.79. 7d 337T 56.4% WR +$1.12. Sep 12: 21T 66.7% WR +$0.75 (strong). R:R 0.69 — system PROFITABLE (breakeven 59.0%, actual 66.7%).
-
-### Root Cause
-
-**No root cause needed — system is profitable.** Legacy signals still in 7d window: ema300_dip_short -$0.91, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65, pullback_entry+ -$0.57. Total -$3.66/7d drag. All 5 active signals profitable 7d. R:R 0.69 (above breakeven). Today strong: 21T 66.7% WR +$0.75.
-
-### Fix Applied
-
-**No param changes needed.** System is healthy and profitable. Legacy aging out by Sep 13. 24h WR improved to 66.7% (from 61.1% earlier). PnL improved to +$0.79 (from +$0.67). All active signals profitable. Pipeline running, disk 78%.
-
-### Next Actions
-
-1. **Legacy exits by Sep 13.** Total -$3.66 drag drops off — 7d PnL expected ~+$4.78.
-2. **squeeze_reversal:** zero trades, NEUTRAL market. If no trades by Sep 14, investigate.
-3. **Monitor R:R.** Currently 0.69 — healthy. Keep above 0.70.
-4. **Discipline:** No param changes while system is profitable. Don't fix what isn't broken.
-
----
-
-## CEO Report — 2026-09-12 ~10:35 UTC
-
-### Diagnosis
-
-**DB VERIFIED:** 24h 54T 61.1% WR +$0.67. 7d 344T 56.4% WR +$1.10. Sep 12: 18T 66.7% WR +$0.66 (strong). R:R 0.76 — system PROFITABLE (breakeven 56.6%, actual 61.1%).
-
-### Root Cause
-
-**No root cause needed — system is profitable.** Legacy signals still in 7d window: ema300_dip_short -$1.06, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65, pullback_entry+ -$0.57. Total -$3.94/7d drag. All 5 active signals profitable 7d. R:R 0.76 (above breakeven). Today strong: 18T 66.7% WR +$0.66.
-
-### Fix Applied
-
-**No param changes needed.** System is healthy and profitable. Legacy aging out by Sep 13. 24h WR jumped to 61.1% (from 57.6% earlier). PnL improved to +$0.67 (from -$0.27). All active signals profitable. Pipeline running, disk 78%.
-
-### Next Actions
-
-1. **Legacy exits by Sep 13.** Total -$3.94 drag drops off — 7d PnL expected ~+$5.
-2. **squeeze_reversal:** zero trades, NEUTRAL market. If no trades by Sep 14, investigate.
-3. **Monitor R:R.** Currently 0.76 — healthy. Keep above 0.70.
-4. **Discipline:** No param changes while system is profitable. Don't fix what isn't broken.
-
----
-
-## CEO Report — 2026-09-12 ~02:35 UTC
-
-### Diagnosis
-
-**DB VERIFIED:** 24h 60T 50.0% WR -$1.52. 7d 341T 56.9% WR +$1.21. R:R 0.675 (breakeven ~59.7%). Sep 12: 6T 83.3% WR +$0.43 (early). 5 open positions.
-
-### Root Cause
-
-**SHORT R:R drag from rr_engine_resistance.** 22 SHORT trades in 48h exit at resistance with avg -1.3% loss. pullback-entry- 12T avg -1.62%, pump-chain- 11T avg -1.04%. This caps SHORT profits. atr_sl_hit dominates at 18T avg -4.88% (mostly legacy pump-chain+). **Legacy signals still in 7d window:** ema300_dip_short -$1.33, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65. These age out by Sep 13.
-
-### Fix Applied
-
-**No param changes.** System structurally improving — legacy aging out, all 5 active signals profitable 7d. squeeze_reversal zero trades is market condition (NEUTRAL, no sell-offs). grind_breakout 1 trade total — also market condition. Today starting strong (83.3% WR).
-
-### Next Actions
-
-1. Monitor rr_engine_resistance SHORT exits — if persistent, consider widening resistance buffer.
-2. Legacy ages out by Sep 13 — 7d PnL should improve.
-3. squeeze_reversal: if no trades by Sep 15, investigate signal logic.
-
----
-
-## CEO Report — 2026-09-12 ~01:00 UTC (BTC Momentum Sync Decision)
-
-### Diagnosis
-
-**DB VERIFIED (my own queries):** 24h: 60T, 50.0% WR, -$1.45. 7d: 341T, 56.3% WR, +$0.80. cut-loser-CL-T1: 63T, 0% WR, -$9.56 (BIGGEST SINGLE DRAG). atr_sl_hit: 53T, avg -5.22%, -$8.76. BTC score NOT in trade metadata (0/341). RSI/z-score NOT populated (0/341). TREND_FILTER defined but NOT enforced in compactor. Regime almost all NEUTRAL (331/341).
-
-**Independent verdict found:** Plan's numbers wrong (bleed is -$1.94 not -$1.42, BTC bearish 63% not 56%, transitions 806 not 514). Staleness diagnosis wrong — hard block removal is the issue, not the decay formula. BUT concept is sound: LONGs bleed when BTC is bearish.
-
-### Decision: GO (MODIFIED)
-
-**Rationale:** The tide mechanism (BTC 3h momentum + SHORT WR) already exists and is wired into scoring (signal_compactor.py:1240). It provides a 0.7x penalty / 1.2x boost — soft filter, not hard block. The plan's Layer 1 wants a harder gate. Layer 5 (continuum context boost) is already built, just needs wiring. The plan's Layer 2 (hard staleness) was removed intentionally on Sep 4 — respect that decision.
-
-### Priority Order (REVISED)
-
-| # | Change | Why | Effort |
-|---|--------|-----|--------|
-| 1 | **Wire Continuum Context Boost** (Layer 5) | Already built in continuum_context.py:276. Just call `get_trend_boost()` in signal_compactor scoring. Zero new code, just wiring. | 15 min |
-| 2 | **Add BTC score/trend_bias to _signal_metadata** | PREREQUISITE for verifying Layer 1. Without this, we can't correlate BTC state with trade PnL. Store in signal_compactor when creating trades. | 30 min |
-| 3 | **Investigate cut-loser-CL-T1** | 0% WR, -$9.56 across 63 trades. The plan doesn't address this but it's the BIGGEST drag. Need to understand WHY it fires at -5% avg. | 1 hour |
-| 4 | **Enforce TREND_FILTER in compactor** | Already defined (TREND_FILTER_ENABLED=True) but only used in 4 signal detectors. Add as universal gate in _score_signal(). | 30 min |
-| 5 | **Strengthen tide mechanism** | Current: 0.7x penalty (soft). Consider: hard block when BTC score <30 (STRONG_BEAR). Only after verifying Layer 5 impact. | 1 hour |
-| 6 | **RSI/z-score recording** | Populate entry_rsi_14, signal_z_score at trade creation for future validation. | 30 min |
-| 7 | **Transition Detection** (Layer 2) | Defer — 12.6min transitions need faster detection than plan's 30min window. Build after Layers 1-5 proven. | Future |
-
-### What I'm NOT Doing
-
-- **NOT restoring hard staleness block.** Removed Sep 4 intentionally. The verdict correctly identifies this as the root cause of stale trades, but the removal was deliberate — signals that survive hotset rounds should execute. The staleness_mult (0.1/min decay) already penalizes old signals in scoring. Adding BTC momentum staleness (score shift >15 → kill) is better than a hard time block.
-- **NOT implementing Layer 4 (Transition Detection) now.** The plan's frequency data was wrong (806 transitions, not 514). Needs different approach — faster detection window, smaller delta threshold.
-- **NOT touching protected flags.** PM_TRAIL, ATR_SL, LIVE_TRADING_ENABLED, CONFLUENCE_REQUIRED — all untouched.
-
-### Concerns
-
-1. **cut-loser-CL-T1 0% WR is the real emergency.** 63 trades, every single one a loss, -$9.56. This dwarfs the LONG bleed. Need to investigate whether the threshold is too tight or the mechanism is counterproductive.
-2. **TREND_FILTER gap** is a free fix — defined but not enforced. Should have been caught earlier.
-3. **No BTC score in metadata** means we're flying blind on correlation. This must be fixed before Layer 1 can be validated.
-
-### Delegation
-
-- [ ] DELEGATE to bug_hunter: Investigate cut-loser-CL-T1 — why does it fire at -5% avg? Is the threshold wrong? Query trades WHERE exit_reason='cut-loser-CL-T1' and analyze the pattern.
-- [ ] DELEGATE to signal_analyst: Wire get_trend_boost() into signal_compactor.py scoring pipeline. Add BTC score/trend_bias to _signal_metadata INSERT. Add TREND_FILTER enforcement in _score_signal().
-
----
-
-## CEO Report — 2026-09-11 ~18:24 UTC
-
-### Diagnosis
-
-24h: 52T, 48.1% WR, -$1.06. 7d: 330T, 56.4% WR, +$1.38 (VERIFIED POSITIVE). 48h: 95T, 57.9% WR, +$3.06 (STRONG). Sep 11: 46T, 45.7% WR, -$1.29. R:R 24h: 0.74 (avg_win 3.37%, avg_loss -4.53%). 4 open (all SHORT). Disk 83%.
-
-**#1 loss driver: rr_engine_resistance** — 16 SHORT trades/24h, avg -2.09%, -$0.82 total. Structural — SHORT entries in 98% NEUTRAL market hitting resistance levels. Working as designed but biggest single drag.
-
-**#2 loss driver: pump-chain+ LONG** — 10T/24h 30% WR, -$0.59. Still firing despite 30.8% WR over 7d (13T/7d -$0.29). Auto_1hr didn't kill (has wins, below threshold). **Should be killed.**
-
-**#3 loss driver: pullback-entry- SHORT** — 8T/24h 37.5% WR, -$0.42. Bad day (7d is 69% WR +$1.93). Variance.
-
-**#4 loss driver: atr_sl_hit** — 21T/24h, avg -0.64%, -$0.67. Normal SL exits.
-
-**Profit source: profit-monster-trail** — 8T/24h, avg +3.58%, +$1.07. Only green exit type.
-
-### Root Cause
-
-Today's -$1.29 is structural rr_engine_resistance (-$0.82) + pump-chain+ bleed (-$0.59) + variance on pullback-entry- (-$0.42). However, 48h is +$3.06 and 7d is +$1.38 — system is structurally profitable. Today is a bad day, not a structural failure. R:R 0.74 means breakeven WR ~57%, actual 48.1% today.
-
-### Fix Applied
-
-**pump-chain+ LONG should be killed.** 13T/7d 30.8% WR -$0.29, 10T/24h 30% WR -$0.59. Not auto-killed because "has wins." This is the only actionable fix today. All other losses are structural (rr_engine) or variance (pullback-entry- bad day).
-
-**No param changes.** PM_TRAIL/ATR_SL protected. Active signals all profitable on 7d.
-
-### Verification
-
-- DB verified: 24h 52T 48.1% WR -$1.06. 7d 330T 56.4% WR +$1.38. 48h 95T 57.9% WR +$3.06.
-- All 5 active signals profitable 7d: pullback_entry- 29T/69%WR +$1.93 ★, open_skies 19T/63.2%WR +$1.56 ★, bb_bounce_v2_long 39T/71.8%WR +$1.20 ★, pump_chain 41T/68.3%WR +$1.11, pump-chain- 31T/64.5%WR +$0.61.
-- pump-chain+ 13T/7d 30.8%WR -$0.29 — only non-legacy signal bleeding.
-- 4 open: 3x pump-chain- SHORT, 1x mover- SHORT. Near breakeven.
-- Disk: 83%.
-
-### Next Actions
-
-1. **Kill pump-chain+ LONG.** Set PUMP_FLOW_PLUS_ENABLED=False, add to NEVER_REENABLE_FLAGS. -$.59/24h bleeding removed.
-2. **Monitor R:R.** 0.74 (breakeven 57%). System 7d WR 56.4% — nearly there.
-3. **Legacy exits by Sep 12.** ema300_dip_short -$1.51, ema300_dip -$0.40, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.65. Will age out.
-4. **Monitor rr_engine_resistance.** Structural, but -$0.82/24h. If persistent, consider widening resistance threshold.
-5. **Disk at 83%.** 2% from threshold.
-
-## CEO Report — 2026-09-12 ~22:45 UTC
-
-### Diagnosis
-24h improved: 29T 65.5% WR +$0.58 (was -$0.15 at 21:00). 7d: 334T 56.9% WR +$1.02 (VERIFIED POSITIVE). System structurally profitable. R:R 0.73 (breakeven 60%, actual 65.5%).
-
-### Root Cause
-Legacy signals still dragging: ema300_dip_short -$0.91, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.58, pullback_entry+ -$0.57. Total -$3.59/7d. All aging out by Sep 13 (tomorrow). Active signals ALL profitable (+$4.89/7d). SHORT_RSI_FLOOR=25 working — 45 blocks in pipeline.log preventing oversold SHORT entries.
-
-### Fix Applied
-No param changes needed. System profitable, legacy aging out naturally. SHORT_RSI_FLOOR (brain_auditor implementation) verified working.
-
-### Verification
-- DB: 24h 29T 65.5% WR +$0.58. 7d 334T 56.9% WR +$1.02.
-- All 5 active signals profitable 7d: pullback_entry_ 35T/65.7%WR +$1.98, pump_chain 41T/68.3%WR +$1.11, open_skies 8T/62.5%WR +$1.20, bb_bounce_v2_long 28T/64.3%WR +$0.18, pump-chain_ 39T/64.1%WR +$0.42.
-- Exit analysis 48h: atr_sl_hit 14T -$2.72, rr_engine_resistance 12T -$1.58, cut-loser-CL-T1 7T -$1.19.
-- Disk 78%. Pipeline active. Market NEUTRAL.
+rr_structural signal has 12 trades/7d. Only 1 (INJ SHORT) actually fired through detect() — all others assigned by signal_compactor. Current thresholds (R:R≥3.0, Score≥70) are too restrictive. INJ passed detect() with R:R 6.96/Score 87 but the context was terrible (SHORTING at support, price acceleration against trade). NEO (+30.98% winner) had R:R 2.26/Score 65.25 — below thresholds, never had a chance to fire.
+
+### Verified Numbers
+- 24h: 25T, 56% WR, -$0.03 (flat)
+- 7d: 334T, 56.6% WR, +$0.53 (profitable)
+- rr-struct 7d: 12T, 75% WR, +$1.04 (strong — mostly signal_compactor assigned)
+- NEO LONG: +30.98%, price_accel=+0.0062 (aligned), RSI=50.0, regime NEUTRAL
+- INJ SHORT: -6.52%, price_accel=+0.0044 (against trade), RSI=40.43, regime NEUTRAL, bb_position=0.38 (mid-range, not at support)
+
+### Decision: APPROVED (2 of 3 changes)
+
+**Change 1 — APPROVED: Lower Detection Thresholds**
+```
+RR_STRUCTURAL_MIN_RR     = 2.0   (was 3.0)
+RR_STRUCTURAL_MIN_SCORE  = 60    (was 70)
+```
+Rationale: Catches trades like NEO that have good structure but moderate R:R. System is at breakeven (56% WR, R:R 0.67) — need to increase signal volume from detect() without sacrificing quality. The existing RSI and regime filters already block bad entries.
+
+**Change 2 — APPROVED: Price Acceleration Direction Filter**
+- Block SHORT when price_acceleration > 0 (price going UP against SHORT)
+- Block LONG when price_acceleration < 0 (price going DOWN against LONG)
+- Computed from last 10 1m candle closes (roc check)
+Rationale: Clean momentum filter. NEO had accel=+0.0062 aligned with LONG ✅. INJ had accel=+0.0044 against SHORT ❌. No counter-examples in the 12-trade sample. Simple, low-risk addition.
+
+**Change 3 — REJECTED: Range Position Filter**
+Rationale: Too brittle. "Bottom 20% of 1h range" is context-dependent — NEO was at 12% of range and WON (+30.98%). INJ was at 6.3% and LOST, but it lost because of price acceleration against the trade, not because of range position. The range filter would have blocked NEO too if we'd set it wrong. The price acceleration filter (Change 2) already covers the INJ case more reliably. Adding range position is redundant complexity.
+
+### Implementation Directive
+1. Apply Changes 1 and 2 to hermes_constants.py and rr_structural.py
+2. Add `price_acceleration` filter in detect() — compute from candles_1m, block misaligned trades
+3. Run in shadow mode (log signals without trading) for 48h before enabling live
+4. Monitor: signal volume increase, false positive rate, WR of detect()-fired trades
+
+### What Was Skipped
+- Range position filter (Change 3) — redundant with accel filter, too many edge cases
+- Regime-specific param tuning — not enough rr-struct trades per regime yet (12 total, all NEUTRAL)
+- New signal development — system flat, legacy aging out, focus on structural fixes first
+
+### Next Review
+48h after shadow mode activation — check signal volume, WR, and whether accel filter blocked any good trades.

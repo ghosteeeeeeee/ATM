@@ -304,3 +304,9 @@
 
 ## Error Alerts — 2026-09-13 03:55 UTC
 - **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-13 04:25 UTC
+- **[WARN]** (1x): `hermes-5m-candle.service` failed — `_aggregate_5m.py` not found (dead since Sep 11)
+- **AUTO-FIX**: Disabled `hermes-5m-candle.timer`. Candles still populated by price_collector/fetch_binance_candles paths.
+- **[WARN]** (1x): Phantom trade — NOT SHORT pullback-entry- with 0.0% PnL at 00:31 UTC
+- **[INFO]** Hotset empty — market NEUTRAL regime, no signals survived compaction

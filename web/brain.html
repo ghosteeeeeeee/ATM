@@ -57,6 +57,8 @@
         .status-suggested { background: rgba(170,102,255,0.2); color: #aa66ff; }
         .status-implemented { background: rgba(0,255,136,0.2); color: #00ff88; }
         .status-rejected { background: rgba(255,68,68,0.2); color: #ff4444; }
+        .reject-btn { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); color: #ff4444; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75em; }
+        .reject-btn:hover { background: rgba(255,68,68,0.3); }
         
         .drift-item { padding: 10px 12px; border-bottom: 1px solid #1a1a25; }
         .drift-item .finding { color: #ffaa00; font-size: 0.9em; }
@@ -232,17 +234,36 @@
         if (!items || !items.length) { el.innerHTML = '<div class="empty">No creative ideas yet. The brain generates at least 1 per hourly run.</div>'; return; }
         
         let html = '';
-        for (const item of items.slice(0, 15)) {
+        items.slice(0, 15).forEach((item, idx) => {
             const statusClass = `status-${item.status || 'suggested'}`;
-            html += `<div class="creative-item">
+            const isRejected = item.status === 'rejected';
+            const isImplemented = item.status === 'implemented';
+            const rejectBtn = (!isRejected && !isImplemented) ? 
+                `<button class="reject-btn" onclick="rejectIdea(${idx})" title="Reject this idea">✕</button>` : '';
+            html += `<div class="creative-item" style="${isRejected ? 'opacity:0.4;' : ''}">
                 <div class="idea">${esc(item.idea)}</div>
                 <div class="rationale">${esc(item.rationale)}</div>
                 <div class="impact">Expected: ${esc(item.expected_impact)}</div>
-                <span class="status-badge ${statusClass}">${esc(item.status || 'suggested')}</span>
-                <span class="tag">${esc(item.category || 'general')}</span>
+                ${item.impact_on_winners ? `<div class="detail" style="color:#00ff88">🏆 ${esc(item.impact_on_winners)}</div>` : ''}
+                <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
+                    <span class="status-badge ${statusClass}">${esc(item.status || 'suggested')}</span>
+                    <span class="tag">${esc(item.category || 'general')}</span>
+                    ${rejectBtn}
+                </div>
             </div>`;
-        }
+        });
         el.innerHTML = html;
+    }
+    
+    async function rejectIdea(index) {
+        const reason = prompt('Why reject this idea? (optional)');
+        if (reason === null) return; // cancelled
+        await fetch(`${API}/creative/reject`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({index, reason})
+        });
+        loadCreative(); // refresh
     }
     
     // ── Drift ──

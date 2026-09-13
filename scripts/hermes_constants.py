@@ -3139,8 +3139,8 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 RR_STRUCTURAL_ENABLED         = True   # master kill-switch
 RR_STRUCTURAL_PLUS_ENABLED    = True   # LONG direction
 RR_STRUCTURAL_MINUS_ENABLED   = True   # SHORT direction
-RR_STRUCTURAL_MIN_SCORE       = 70     # minimum RR engine score (Grade B+)
-RR_STRUCTURAL_MIN_RR          = 3.0    # minimum R:R ratio
+RR_STRUCTURAL_MIN_SCORE       = 60     # minimum RR engine score (Grade B)
+RR_STRUCTURAL_MIN_RR          = 2.0    # minimum R:R ratio
 RR_STRUCTURAL_MIN_ATR_PCT     = 0.5    # minimum ATR% (skip flat coins)
 RR_STRUCTURAL_MAX_ATR_PCT     = 1.5    # maximum ATR% (skip extreme noise)
 RR_STRUCTURAL_REGIMES         = ('NORMAL', 'HIGH')  # allowed regimes
@@ -3157,6 +3157,8 @@ RR_STRUCTURAL_MAGNET_THRESH   = 0.5    # magnet score threshold for liquidity bo
 RR_STRUCTURAL_MAX_PRICE_AGE   = 10     # max price age in minutes
 RR_STRUCTURAL_RSI_MIN         = 30     # block SHORT when RSI < this (oversold = bounce risk)
 RR_STRUCTURAL_RSI_MAX         = 80     # block LONG when RSI > this (overbought = pullback risk)
+RR_STRUCTURAL_ACCEL_LOOKBACK  = 10     # number of 1m candles to check for price acceleration
+RR_STRUCTURAL_BLOCK_ACCEL     = True   # block trades when price accel is against direction
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
