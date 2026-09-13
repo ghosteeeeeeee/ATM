@@ -145,12 +145,12 @@
         </div>
         
         <!-- Topic Frequency -->
-        <div class="card">
+        <div class="card full-width">
             <div class="card-header">
                 <h2>📊 Knowledge Map — Topics</h2>
             </div>
-            <div class="card-body" id="topics-list">
-                <div class="loading">Loading...</div>
+            <div class="card-body" id="topics-graph" style="position: relative; height: 420px; overflow: hidden;">
+                <div class="loading" id="topics-loading">Loading...</div>
             </div>
         </div>
         
@@ -266,23 +266,104 @@
         el.innerHTML = html;
     }
     
-    // ── Topics ──
+    // ── Topics (CSS relationship graph) ──
+    const TOPIC_COLORS = {
+        signal: '#00d4ff', trade: '#00ff88', regime: '#ffaa00', debug: '#ff6b6b',
+        config: '#aa66ff', analysis: '#ff69b4', risk: '#ff8c00', coin: '#00bfff',
+        brain: '#9370db', dashboard: '#20b2aa', general: '#888', signal_dev: '#7cfc00'
+    };
+    
     async function loadTopics() {
-        const topics = await fetchJSON(`${API}/topics`);
-        const el = document.getElementById('topics-list');
-        if (!topics || !topics.length) { el.innerHTML = '<div class="empty">No topics indexed yet.</div>'; return; }
+        const data = await fetchJSON(`${API}/topic-graph`);
+        if (!data || !data.nodes || !data.nodes.length) return;
         
-        const maxCount = Math.max(...topics.map(t => t.cnt));
-        let html = '';
-        for (const t of topics.slice(0, 15)) {
-            const pct = (t.cnt / maxCount * 100).toFixed(0);
-            html += `<div class="topic-bar">
-                <div class="name">${esc(t.topic)}</div>
-                <div class="bar" style="width: ${pct}%"></div>
-                <div class="count">${t.cnt}</div>
-            </div>`;
+        const container = document.getElementById('topics-graph');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const W = container.offsetWidth || 1000;
+        const H = 420;
+        const cx = W / 2, cy = H / 2;
+        
+        // Place nodes in a circle
+        const maxCount = Math.max(...data.nodes.map(n => n.count));
+        const nodes = data.nodes.map((n, i) => {
+            const angle = (i / data.nodes.length) * Math.PI * 2 - Math.PI / 2;
+            const baseR = Math.min(W, H) * 0.32;
+            const sizeBonus = (n.count / maxCount) * 30;
+            const r = baseR - sizeBonus;
+            return {
+                ...n,
+                x: cx + Math.cos(angle) * r,
+                y: cy + Math.sin(angle) * r,
+                color: TOPIC_COLORS[n.id] || '#888'
+            };
+        });
+        
+        const nodeMap = {};
+        nodes.forEach(n => nodeMap[n.id] = n);
+        
+        // Draw SVG edges
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', H);
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.pointerEvents = 'none';
+        
+        for (const e of data.edges) {
+            const a = nodeMap[e.source], b = nodeMap[e.target];
+            if (!a || !b) continue;
+            const alpha = Math.min(0.5, e.weight / 200);
+            const width = 0.5 + (e.weight / 160) * 2;
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+            line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+            line.setAttribute('stroke', `rgba(100,100,140,${alpha})`);
+            line.setAttribute('stroke-width', width);
+            svg.appendChild(line);
         }
-        el.innerHTML = html;
+        container.appendChild(svg);
+        
+        // Draw nodes as HTML divs
+        for (const n of nodes) {
+            const r = 16 + (n.count / maxCount) * 20;
+            const div = document.createElement('div');
+            div.style.cssText = `
+                position: absolute;
+                left: ${n.x - r}px; top: ${n.y - r}px;
+                width: ${r * 2}px; height: ${r * 2}px;
+                border-radius: 50%;
+                background: ${n.color}18;
+                border: 2px solid ${n.color};
+                box-shadow: 0 0 ${r}px ${n.color}30;
+                display: flex; flex-direction: column;
+                align-items: center; justify-content: center;
+                text-align: center;
+                transition: transform 0.2s;
+            `;
+            div.onmouseenter = () => div.style.transform = 'scale(1.1)';
+            div.onmouseleave = () => div.style.transform = 'scale(1)';
+            
+            const label = document.createElement('div');
+            label.style.cssText = `color: #e0e0e0; font-size: ${Math.max(10, 10 + (n.count/maxCount)*4)}px; font-weight: bold;`;
+            label.textContent = n.id;
+            
+            const count = document.createElement('div');
+            count.style.cssText = `color: ${n.color}; font-size: ${Math.max(9, 9 + (n.count/maxCount)*3)}px;`;
+            count.textContent = n.count.toLocaleString();
+            
+            div.appendChild(label);
+            div.appendChild(count);
+            container.appendChild(div);
+        }
+        
+        // Legend
+        const legend = document.createElement('div');
+        legend.style.cssText = 'position: absolute; bottom: 5px; left: 10px; color: #666; font-size: 10px;';
+        legend.textContent = 'Node size = sessions with topic | Lines = co-occurrence';
+        container.appendChild(legend);
     }
     
     // ── Sessions ──

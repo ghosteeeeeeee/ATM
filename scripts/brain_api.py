@@ -118,6 +118,55 @@ def get_topics() -> list:
     )
 
 
+def get_topic_relationships() -> dict:
+    """Topic co-occurrence relationships for force-directed graph."""
+    if not BRAIN_DB.exists():
+        return {"nodes": [], "edges": []}
+    
+    conn = sqlite3.connect(str(BRAIN_DB))
+    conn.row_factory = sqlite3.Row
+    
+    # Get dominant topic per session
+    rows = conn.execute(
+        "SELECT session_id, topic, COUNT(*) as cnt FROM chunks "
+        "WHERE topic IS NOT NULL GROUP BY session_id, topic"
+    ).fetchall()
+    conn.close()
+    
+    # Build co-occurrence
+    from collections import Counter
+    session_topics = {}
+    for r in rows:
+        sid, topic = r["session_id"], r["topic"]
+        if sid not in session_topics:
+            session_topics[sid] = set()
+        session_topics[sid].add(topic)
+    
+    pair_counts = Counter()
+    topic_session_counts = Counter()
+    for sid, topics in session_topics.items():
+        topics = sorted(topics)
+        for t in topics:
+            topic_session_counts[t] += 1
+        for i in range(len(topics)):
+            for j in range(i + 1, len(topics)):
+                pair_counts[(topics[i], topics[j])] += 1
+    
+    # Build nodes
+    max_count = max(topic_session_counts.values()) if topic_session_counts else 1
+    nodes = []
+    for topic, cnt in topic_session_counts.most_common():
+        nodes.append({"id": topic, "count": cnt, "size": cnt / max_count})
+    
+    # Build edges (top pairs only)
+    edges = []
+    for (a, b), cnt in pair_counts.most_common(30):
+        if cnt >= 5:
+            edges.append({"source": a, "target": b, "weight": cnt})
+    
+    return {"nodes": nodes, "edges": edges}
+
+
 def get_creative() -> list:
     """Creative improvement ideas."""
     if CREATIVE_FILE.exists():
@@ -245,6 +294,8 @@ class BrainAPIHandler(BaseHTTPRequestHandler):
             self._json_response(get_audit_log())
         elif path == "/api/brain/changes":
             self._json_response(get_changes())
+        elif path == "/api/brain/topic-graph":
+            self._json_response(get_topic_relationships())
         else:
             self._json_response({"error": "Not found"}, 404)
     
