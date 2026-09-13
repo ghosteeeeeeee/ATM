@@ -1399,6 +1399,7 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 - open-skies+ if drops to 3+T 0%WR → kill
 
 ## TEAM UPDATES
+- [2026-09-13 14:10] auto_1hr: No change — system slightly positive. 28T/24h ~60%WR +$0.83. Kill check: 0 trades closed last hour for any signal. trend_purity+ 0%WR/-$0.75 legacy aging out (all trades from hours 01-04 UTC). atr_sl_hit 60.7% but profitable (+$0.039 avg). 6 open positions.
 - [2026-09-12 09:07] auto_1hr: No change — system healthy. 58T/24h 58.6%WR +$0.13. Cut-loser-CL-T1 still #1 loss driver (-$1.06/24h), activation delay (MIN_HOLD_MINUTES=10) from Sep 12 audit still pending.
 - [2026-09-11 13:15] auto_1hr: KILLED pump-chain+ LONG (PUMP_FLOW_PLUS_ENABLED=False) — 9T/24h 22.2%WR -$0.82. All atr_sl_hit. Directional mismatch NEUTRAL. SHORT active. Sep 11 worst day 7d (36.4%WR -$1.90). rr_engine_resistance 14T -$0.99 structural. Pushed.
 - [2026-09-09 23:08] signal_reporter: No kills — no signal meets strict kill criteria. 47 trades/24h, +$1.98 PnL. Top: pullback-entry- SHORT 72.7%WR/+$1.35, pump_chain LONG 60%WR/+$1.38. Watch: pump-chain- SHORT 50%WR/-$0.63 (6 trades, marginal).
