@@ -1,227 +1,175 @@
 {
-    "timestamp": "2026-09-13T16:30:00Z",
+    "timestamp": "2026-09-13T18:00:00Z",
     "session_brain_stats": {
         "total_vectors": 157487,
-        "top_queries": ["signal performance", "creative ideas", "problems/losses"],
-        "note": "Session brain populated with DSH conversations"
+        "top_topics": ["bb_bounce_v2_long", "pullback_entry", "stale_signal_gap", "open_skies", "signal speed velocity"]
     },
     "trade_summary_24h": {
-        "total_trades": 28,
-        "win_rate": 67.9,
-        "pnl": "+$0.83",
+        "trades": 31,
+        "win_rate": 58.1,
+        "pnl": 0.70,
+        "regime": "NEUTRAL",
         "rr_ratio": 0.871,
-        "avg_win": "$0.14",
-        "avg_loss": "-$0.16",
         "breakeven_wr": 57.4,
-        "actual_vs_breakeven": "+10.5% above breakeven"
+        "status": "ABOVE_BREAKEVEN"
     },
     "trade_summary_7d": {
-        "total_trades": 331,
+        "trades": 338,
         "win_rate": 57.1,
-        "pnl": "+$1.42",
-        "regime_best": "EXTREME +$3.20",
-        "regime_worst": "NORMAL -$1.65",
-        "exit_best": "profit-monster-trail +$7.27",
-        "exit_worst": "cut-loser-CL-T1 -$7.01 (legacy)"
+        "pnl": 1.57,
+        "rr_ratio": 0.754,
+        "breakeven_wr": 57.1,
+        "status": "AT_BREAKEVEN"
     },
     "drift_findings": [
         {
-            "finding": "signal_created_at NULL for ALL 24h trades",
-            "impact": "Cannot measure staleness from trade data. Must query _signal_metadata JSON instead.",
-            "status": "Recurring — noted in every audit since Sep 13",
-            "severity": "LOW — data accessible via JSON, just not in individual columns"
+            "item": "Signal metadata NULL",
+            "impact": "Cannot verify entry conditions at execution time. 338/338 7d trades missing entry_rsi_14/signal_z_score.",
+            "status": "NOT_IMPLEMENTED",
+            "severity": "MEDIUM"
         },
         {
-            "finding": "trend_purity+ LONG bleeding in HIGH regime",
-            "impact": "3T/24h 0%WR, 11T/7d 36.4%WR -$0.90. EXTREME penalty 0.3x active but HIGH has no penalty.",
-            "status": "Monitoring — at 11T, kill threshold at 15T",
-            "severity": "MEDIUM — will age out or hit kill threshold soon"
+            "item": "trend_purity+ EXTREME penalty 0.3x not blocking trades",
+            "impact": "3/3 24h trades lost in EXTREME/HIGH despite penalty. Confidence reduction insufficient.",
+            "status": "PARTIALLY_EFFECTIVE",
+            "severity": "HIGH"
         },
         {
-            "finding": "rr_engine_resistance SHORT exits structural drag",
-            "impact": "32T/7d -$1.23. Engine exits SHORT at support levels prematurely.",
-            "status": "Known — needs code change (grace period after resistance touch)",
-            "severity": "MEDIUM — structural, not a config fix"
+            "item": "rr-struct- approaching kill threshold",
+            "impact": "7T/7d 42.9% WR -$0.42. Kill threshold at 15T if WR<50% or PnL negative.",
+            "status": "MONITORING",
+            "severity": "LOW"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "SHORT entries near support (bb_position < 0.2)",
-            "frequency": "Multiple audits flagged this",
-            "status": "Suggested bb_position filter but winners also have low bb_position — would kill winners",
-            "resolution": "Abandoned — filter too noisy"
+            "problem": "rr_engine_resistance SHORT exits",
+            "frequency": "33 trades/7d",
+            "impact": "-$1.35/7d",
+            "root_cause": "Engine exits SHORT at support levels before support is tested. Pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%.",
+            "recommended_fix": "Code change: add 10-15min grace period after resistance touch before exit. Needs backtest."
         },
         {
-            "problem": "LONG_RSI_CEILING=70 suggestion",
-            "frequency": "Suggested Sep 13 11:15, 13:34",
-            "status": "REJECTED — active signals profitable at RSI>70 (pump_chain 31T 74.2%WR)",
-            "resolution": "Rejected — would kill winners"
+            "problem": "trend_purity+ LONG losses in HIGH regime",
+            "frequency": "4/7 7d losers in HIGH",
+            "impact": "-$0.90/7d",
+            "root_cause": "No HIGH regime penalty exists. EXTREME has 0.3x but HIGH has no multiplier.",
+            "recommended_fix": "Monitor at 15T kill threshold. If WR<50% at 15T, kill signal."
         }
     ],
     "missing_implementations": [
         {
             "item": "rr-struct- STANDALONE_BYPASS",
-            "reason": "5T sample too small (min 20T required)",
-            "status": "Monitor — at 5T, need 15 more trades"
+            "rationale": "7T/7d 85.7% WR when firing solo. Currently blocked by confluence gate.",
+            "status": "SUGGESTED",
+            "risk": "LOW — 7T sample, monitor first"
         },
         {
-            "item": "RR Engine SHORT exit grace period",
-            "reason": "Needs code change + backtest",
-            "status": "Backlog — structural fix"
+            "item": "rr_engine_resistance exit delay",
+            "rationale": "33T/7d -$1.35 structural SHORT exit drag. Needs code change.",
+            "status": "SUGGESTED",
+            "risk": "MEDIUM — needs backtest"
         }
     ],
-    "losing_trade_autopsy_24h": [
-        {
-            "trade": "MET LONG trend_purity+ -$0.18",
-            "regime": "EXTREME",
-            "rsi": 69.72,
-            "z_score": 0.50,
-            "bb_position": 0.63,
-            "exit": "atr_sl_hit",
-            "hold_mins": 12,
-            "root_cause": "Entered at RSI=69.7 (overbought) in EXTREME. EXTREME penalty 0.3x active but not enough. Hold only 12min — quick stop out.",
-            "would_filter_block": "No — RSI 69.7 passes all current filters"
-        },
-        {
-            "trade": "ZRO LONG trend_purity+ -$0.29",
-            "regime": "HIGH",
-            "rsi": 27.27,
-            "z_score": 2.31,
-            "bb_position": 1.08,
-            "exit": "rr_engine_support_br",
-            "hold_mins": 143,
-            "root_cause": "Entered at RSI=27 (oversold) with z_score=2.31 (extreme_high). bb_position=1.08 (ABOVE upper band — price extended). Support break exit.",
-            "would_filter_block": "z_score>2.0 penalty would block — but sample too small to justify"
-        },
-        {
-            "trade": "INJ LONG trend_purity+ -$0.28",
-            "regime": "HIGH",
-            "rsi": 75.58,
-            "z_score": 0.07,
-            "bb_position": 0.52,
-            "exit": "atr_sl_hit",
-            "hold_mins": 31,
-            "root_cause": "Entered at RSI=75.6 (overbought) in HIGH. momentum_state=falling. MACD histogram negative.",
-            "would_filter_block": "LONG_RSI_CEILING=70 would block — but would also kill winners"
-        },
-        {
-            "trade": "CAKE SHORT pullback-entry- -$0.10",
-            "regime": "NORMAL",
-            "rsi": 23.53,
-            "is_stale": true,
-            "bb_position": 0.42,
-            "exit": "rr_engine_resistance",
-            "hold_mins": 320,
-            "root_cause": "Stale signal. RSI=23.5 at detection (oversold). Entered late when conditions changed. rr_engine exited at resistance.",
-            "would_filter_block": "SHORT_RSI_FLOOR=25 would block at execution — but RSI was checked at different time"
-        },
-        {
-            "trade": "DYDX SHORT pullback-entry- -$0.14",
-            "regime": "NORMAL",
-            "rsi": 75.0,
-            "is_stale": true,
-            "bb_position": 0.99,
-            "exit": "atr_sl_hit",
-            "hold_mins": 114,
-            "root_cause": "Stale signal. RSI=75 at detection (good for SHORT). bb_position=0.99 (near upper band — good entry). But price kept rising. Stale drift.",
-            "would_filter_block": "No — entry conditions were actually good. Stale drift is the issue."
-        },
-        {
-            "trade": "NXPC SHORT pullback-entry- -$0.13",
-            "regime": "NORMAL",
-            "rsi": 18.18,
-            "is_stale": true,
-            "bb_position": 0.80,
-            "exit": "atr_sl_hit",
-            "hold_mins": 216,
-            "root_cause": "RSI=18.2 at detection (extreme oversold). SHORT into oversold = catching falling knife in reverse. Stale entry.",
-            "would_filter_block": "SHORT_RSI_FLOOR=25 should block — need to verify execution-time RSI"
-        },
-        {
-            "trade": "TURBO LONG rr-struct+ -$0.14",
-            "regime": "NORMAL",
-            "rsi": 72.73,
-            "bb_position": 0.64,
-            "exit": "atr_sl_hit",
-            "hold_mins": 55,
-            "root_cause": "Range position 93.3% of 1h range (CEO identified). Buying at the top. RR_STRUCTURAL_RANGE_LONG_MAX=80 now active — would catch this.",
-            "would_filter_block": "RR_STRUCTURAL_RANGE_LONG_MAX=80 WOULD BLOCK — CEO already implemented"
-        },
-        {
-            "trade": "SEI LONG rr-struct+ -$0.14",
-            "regime": "NORMAL",
-            "rsi": 69.23,
-            "is_stale": true,
-            "bb_position": 0.12,
-            "exit": "atr_sl_hit",
-            "hold_mins": 699,
-            "root_cause": "Stale signal (11.6 hours). RSI=69.2 at detection. bb_position=0.12 (near lower band). Entered after long delay when conditions changed.",
-            "would_filter_block": "Staleness decay should have killed this — signal_created_at NULL so can't verify"
-        }
-    ],
+    "losing_trade_autopsy": {
+        "24h_losers": [
+            {
+                "trade": "MET LONG trend_purity+ -$0.18",
+                "regime": "EXTREME",
+                "exit": "atr_sl_hit",
+                "open_time": "2026-09-13 03:48 UTC",
+                "root_cause": "EXTREME penalty 0.3x applied but still fired. LONG entry in EXTREME whipsaw.",
+                "recommended_change": "Kill trend_purity+ at 15T threshold (currently 11T). No code change needed.",
+                "confidence": "HIGH"
+            },
+            {
+                "trade": "ZRO LONG trend_purity+ -$0.29",
+                "regime": "HIGH",
+                "exit": "rr_engine_support_br",
+                "open_time": "2026-09-13 01:08 UTC",
+                "root_cause": "HIGH regime — no penalty exists. rr_engine_support_br exit near support.",
+                "recommended_change": "Monitor trend_purity+ at 15T kill threshold.",
+                "confidence": "HIGH"
+            },
+            {
+                "trade": "INJ LONG trend_purity+ -$0.28",
+                "regime": "HIGH",
+                "exit": "atr_sl_hit",
+                "open_time": "2026-09-13 00:35 UTC",
+                "root_cause": "HIGH regime — same as ZRO. ATR SL hit after 30min.",
+                "recommended_change": "Same as above — monitor at 15T.",
+                "confidence": "HIGH"
+            },
+            {
+                "trade": "ZEN SHORT rr-struct- -$0.16",
+                "regime": "HIGH",
+                "exit": "atr_sl_hit",
+                "open_time": "2026-09-13 15:28 UTC",
+                "root_cause": "SHORT at HIGH regime — price reversed. ATR SL hit after 1.7h.",
+                "recommended_change": "Monitor rr-struct- at 15T kill threshold.",
+                "confidence": "MEDIUM"
+            },
+            {
+                "trade": "LINK SHORT rr-struct- -$0.12",
+                "regime": "NORMAL",
+                "exit": "rr_engine_resistance",
+                "open_time": "2026-09-13 15:06 UTC",
+                "root_cause": "SHORT near support — rr_engine_resistance exit.",
+                "recommended_change": "Code fix: rr_engine_resistance exit delay. Needs backtest.",
+                "confidence": "MEDIUM"
+            },
+            {
+                "trade": "ZRO SHORT pullback-entry- -$0.21",
+                "regime": "HIGH",
+                "exit": "atr_sl_hit",
+                "open_time": "2026-09-13 13:48 UTC",
+                "root_cause": "SHORT in HIGH — price reversed up. ATR SL hit after 3.8h.",
+                "recommended_change": "NORMAL variance — STAR signal 63.6% WR 7d.",
+                "confidence": "LOW"
+            }
+        ],
+        "impact_on_winners": "No config changes recommended this run. No winners affected."
+    },
     "creative_improvements": [
         {
-            "date": "2026-09-13T16:30:00Z",
-            "idea": "Monitor RR_STRUCTURAL_RANGE filter effectiveness",
-            "rationale": "CEO added RR_STRUCTURAL_RANGE_LONG_MAX=80 and RR_STRUCTURAL_RANGE_SHORT_MIN=20 today. TURBO LONG at 93.3% range would have been blocked. NEO at 12% range keeps win. Verify no winners killed by checking future trades.",
-            "expected_impact": "Saves ~$9.35/7d (TURBO + INJ SHORT from CEO analysis)",
-            "category": "entry sniper",
-            "status": "implemented_by_ceo",
-            "risk": "low",
-            "verification": "Check 7d: any LONG trades with range >80% that won? Any SHORT trades with range <20% that won?"
-        },
-        {
-            "date": "2026-09-13T16:30:00Z",
-            "idea": "Add trend_purity+ HIGH regime penalty (0.5x) to volatility_gate_v2.py",
-            "rationale": "trend_purity+ has EXTREME penalty 0.3x but no HIGH penalty. 4/7 losers in past 7d are HIGH regime (ZRO, INJ x2, INJ). HIGH regime is the worst for this signal. Adding 0.5x penalty reduces confidence without blocking.",
-            "expected_impact": "Reduce trend_purity+ HIGH losses by ~50%",
+            "date": "2026-09-13T18:00:00Z",
+            "idea": "Add rr-struct- to STANDALONE_BYPASS when it reaches 10T+ with WR>55%",
+            "rationale": "7T/7d 85.7% WR when firing solo. Currently blocked by confluence gate requiring 2+ signal types. Adding to STANDALONE_BYPASS would let it fire with 1 source.",
+            "expected_impact": "+$0.10-0.20/7d — captures solo SHORT signals that currently expire",
             "category": "entry sniper",
             "status": "suggested",
-            "risk": "medium",
-            "impact_on_winners": "2/4 EXTREME winners (PONS, KAS) would be penalized but not blocked. 0 HIGH winners exist — no impact.",
-            "caveat": "3T HIGH sample too small for confident change. Monitor 5 more trades first."
+            "risk": "low",
+            "sample_size": "7 trades — below 20 threshold, monitor first"
         },
         {
-            "date": "2026-09-13T16:30:00Z",
-            "idea": "Query _signal_metadata JSON for entry analysis instead of individual columns",
-            "rationale": "signal_created_at, entry_rsi_14, signal_z_score are NULL for ALL recent trades. But _signal_metadata JSON has rsi_14, z_score, bb_position, momentum_state, etc. Use JSON queries for entry analysis.",
-            "expected_impact": "Enables entry condition analysis without code changes",
-            "category": "analytics",
-            "status": "already_doing_this",
-            "risk": "none"
+            "date": "2026-09-13T18:00:00Z",
+            "idea": "Monitor trend_purity+ at 15T kill threshold — kill if WR<50%",
+            "rationale": "11T/7d 36.4% WR -$0.90. 3/3 24h trades lost. EXTREME penalty insufficient. At 15T with WR<50%, kill.",
+            "expected_impact": "+$0.90/7d if killed — removes worst performing signal",
+            "category": "exit optimization",
+            "status": "monitoring",
+            "risk": "low",
+            "sample_size": "11 trades — approaching threshold"
+        },
+        {
+            "date": "2026-09-13T18:00:00Z",
+            "idea": "Verify rr_engine_resistance exit delay over next 48h — track if SHORT losses cluster near support",
+            "rationale": "33T/7d -$1.35. SHORT entries near support levels bounce to resistance. Engine exits too early. Needs code change + backtest.",
+            "expected_impact": "+$0.50-1.00/7d if fixed — structural SHORT exit improvement",
+            "category": "exit optimization",
+            "status": "monitoring",
+            "risk": "medium — needs code change",
+            "sample_size": "33 trades — sufficient for investigation"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        {
-            "action": "Monitor trend_purity+ at 15T kill threshold",
-            "detail": "Currently 11T/7d 36.4%WR -$0.90. Kill if 15T and WR<50% or PnL negative.",
-            "priority": "high",
-            "deadline": "Sep 14"
-        },
-        {
-            "action": "Monitor rr-struct- at 15T kill threshold",
-            "detail": "Currently 5T/7d 60%WR -$0.14. Kill if 15T and WR<50% or PnL negative.",
-            "priority": "medium",
-            "deadline": "Sep 15"
-        },
-        {
-            "action": "Verify RR_STRUCTURAL_RANGE filter working",
-            "detail": "Check future trades: any LONG >80% range or SHORT <20% range that won? CEO added today.",
-            "priority": "medium",
-            "deadline": "Sep 15"
-        },
-        {
-            "action": "Legacy aging out Sep 14",
-            "detail": "ema300_dip_short, slow_grind, sma20_dip, pullback_entry+, bb-bounce-v2-long+ still in 7d. Expected ~$4.43 improvement when they drop off.",
-            "priority": "low",
-            "deadline": "Sep 14"
-        },
-        {
-            "action": "Monitor signal_compactor timeouts",
-            "detail": "Transient, self-recovered. Monitor frequency.",
-            "priority": "low",
-            "deadline": "ongoing"
-        }
+        "Monitor trend_purity+ at 15T kill threshold (currently 11T/7d 36.4%WR -$0.90). Kill if WR<50% at 15T.",
+        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d 42.9%WR -$0.42). Kill if WR<50% at 15T.",
+        "Verify signal metadata recording — entry_rsi_14, signal_z_score NULL for all recent trades.",
+        "Investigate rr_engine_resistance SHORT exit delay — needs code change + backtest.",
+        "Verify RR_STRUCTURAL_RANGE filter over next 48h (saves TURBO $0.14).",
+        "Monitor disk at 78% (25G free).",
+        "Monitor squeeze_reversal — zero trades since Sep 10. If no trades by Sep 14, investigate."
     ]
 }

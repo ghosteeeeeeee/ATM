@@ -1,3 +1,13 @@
+[2026-09-13 18:00 UTC] brain_auditor: NO CONFIG CHANGE — system above breakeven
+  24h: 31T 58.1%WR +$0.70 | 7d: 338T 57.1%WR +$1.57
+  R:R 24h: 0.871 (breakeven 57.4%, actual 58.1% — ABOVE)
+  Exit 7d: profit-monster-trail 106T +$7.42, cut-loser-CL-T1 46T -$7.01 (legacy), rr_engine_resistance 33T -$1.35
+  Losers 24h: 12 total, 7 dead/stale signal, 5 active (-$0.68)
+  trend_purity+ 11T/7d 36.4%WR -$0.90 — monitoring at 15T kill threshold
+  rr-struct- 7T/7d 42.9%WR -$0.42 — monitoring at 15T kill threshold
+  Creative: (1) Monitor trend_purity+ at 15T (2) Monitor rr-struct- at 15T (3) rr_engine_resistance exit delay needs code change
+  BY: brain_auditor
+
 [2026-09-13 16:30 UTC] brain_auditor: NO CONFIG CHANGE — system above breakeven
   24h: 28T 67.9%WR +$0.83 | 7d: 331T 57.1%WR +$1.42
   R:R 24h: 0.871 (breakeven 57.4%, actual 67.9% — +10.5% above)
