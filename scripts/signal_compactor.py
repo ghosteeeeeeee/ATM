@@ -3416,6 +3416,19 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     }
                     hotset_final.append(rescue_entry)
                     log(f"  🔄 [CONFLICT-RESCUE] {tok}:{direc} — winner killed, promoting conflict loser (src={l_source})")
+                    # ── EMA300-DIP-LONG RE-VALIDATE RESCUE ENTRIES ──────────────────
+                    if l_source == 'ema300-dip-long' and direc.upper() == 'LONG':
+                        try:
+                            from signals.ema300_dip_long import detect_ema300_dip_long, _get_candles_1m
+                            _re_candles = _get_candles_1m(tok)
+                            if _re_candles and len(_re_candles) >= 500:
+                                _re_price = rescue_entry.get('price', 0)
+                                _re_result = detect_ema300_dip_long(tok, _re_candles, _re_price)
+                                if _re_result is None:
+                                    hotset_final.remove(rescue_entry)
+                                    log(f"  🚫 [RESCUE-REVALIDATE-BLOCK] {tok}:{direc} ema300-dip-long — detection function returned None")
+                        except Exception:
+                            pass
 
         # Cap at 10
         hotset_final = hotset_final[:10]
