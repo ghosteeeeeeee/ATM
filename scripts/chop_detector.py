@@ -55,6 +55,7 @@ MEAN_REVERSION_FAMILIES = {
 SIGNAL_OVERRIDES = {
     # Momentum signals — block in chop
     'ema300_dip': 'MOMENTUM',
+    'ema300_dip_long': 'MOMENTUM',
     'ema300_dip_short': 'MOMENTUM',
     'accel_300': 'MOMENTUM',
     'accel_300_long': 'MOMENTUM',
@@ -75,9 +76,13 @@ SIGNAL_OVERRIDES = {
     'return_exhaustion_long': 'MEAN_REVERSION',
     'return_exhaustion_short': 'MEAN_REVERSION',
     'coiled_spring': 'MEAN_REVERSION',
+    'coil_spring': 'MEAN_REVERSION',           # source string variant (hyphenated)
     'coiled_spring_long': 'MEAN_REVERSION',
     'liquidation_hunt_long': 'MEAN_REVERSION',
     'liquidation_hunt_short': 'MEAN_REVERSION',
+    'liq_hunt': 'MEAN_REVERSION',              # source string variant (abbreviated)
+    'liq_hunt_long': 'MEAN_REVERSION',
+    'liq_hunt_short': 'MEAN_REVERSION',
     'neutral_sniper': 'MEAN_REVERSION',       # StochRSI+CMF mean-reversion — fires in chop, not momentum
     'neutral_sniper_long': 'MEAN_REVERSION',
     'neutral_sniper_short': 'MEAN_REVERSION',
@@ -138,9 +143,16 @@ def _classify_signal(signal_type: str) -> str:
     # Chain data looks like "TOKEN(N.NNx)" — split on comma, find parts without parentheses
     parts = [p.strip() for p in signal_type.split(',')]
     for p in parts:
-        if '(' not in p and p in SIGNAL_OVERRIDES:
+        if '(' in p:
+            continue
+        # Exact match
+        if p in SIGNAL_OVERRIDES:
             return SIGNAL_OVERRIDES[p]
-        # Also try stripped version
+        # Normalize hyphens to underscores + strip suffixes (e.g. "bb-bounce-v2-long+" -> "bb_bounce_v2_long")
+        p_normalized = p.replace('-', '_').replace('+', '').rstrip('_')
+        if p_normalized in SIGNAL_OVERRIDES:
+            return SIGNAL_OVERRIDES[p_normalized]
+        # Also try stripped version (original behavior)
         p_stripped = p.replace('+', '').replace('-', '').replace('_long', '').replace('_short', '')
         if p_stripped in SIGNAL_OVERRIDES:
             return SIGNAL_OVERRIDES[p_stripped]
