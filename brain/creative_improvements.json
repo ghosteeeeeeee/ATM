@@ -332,5 +332,32 @@
     "category": "regime weighting",
     "status": "needs backtest",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-13T13:34:56Z",
+    "idea": "Add bb_position < 0.15 filter for SHORT entries",
+    "rationale": "ENA SHORT loss had bb_position=0.081 (near support). SHORT entries near support bounce to resistance. Winners have bb_position > 0.15.",
+    "expected_impact": "Prevent ~$0.20-0.30/7d losses from SHORT entries near support",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T13:34:56Z",
+    "idea": "Monitor rr-struct- at 15T kill threshold",
+    "rationale": "5T/7d 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). If WR drops below 50% or PnL negative at 15T, kill.",
+    "expected_impact": "Prevent potential -$0.50-1.00/7d drag if signal degrades",
+    "category": "risk management",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T13:34:56Z",
+    "idea": "Verify signal metadata recording",
+    "rationale": "entry_rsi_14, signal_z_score NULL for 330/330 7d trades. Cannot verify entry conditions at execution time.",
+    "expected_impact": "Enable entry condition analysis for losing trades",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

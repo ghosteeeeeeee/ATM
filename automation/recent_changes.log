@@ -1,3 +1,12 @@
+[2026-09-13 13:34 UTC] brain_auditor: NO CONFIG CHANGE — system flat, legacy aging out
+  24h: 21T 61.9%WR +$0.04 | 7d: 330T 56.4%WR +$0.63
+  R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater)
+  Exit 7d: cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural), profit-monster-trail 105T +$7.19
+  Losers 24h: 8 total, 5 dead signal, 3 active (-$0.52)
+  Drift: (1) Signal metadata NULL 330/330 (2) bb_bounce_v2_long degraded 73.3%→60% WR
+  Creative: (1) bb_position < 0.15 filter for SHORT (2) Monitor rr-struct- at 15T kill threshold
+  BY: brain_auditor
+
 [2026-09-13 13:08 UTC] auto_1hr: NO CHANGE — system slightly positive, quiet hour
   24h: 23T ~57%WR +$0.30 | 1T/1h, 5 open | All NEUTRAL
   Exit: atr_sl_hit 12T +$0.30 (profitable, 34.5% 7d), profit-monster-trail 5T +$0.23

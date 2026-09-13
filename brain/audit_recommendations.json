@@ -1,114 +1,123 @@
 {
-  "timestamp": "2026-09-13T12:34:03.686970+00:00",
+  "timestamp": "2026-09-13T13:34:25Z",
   "session_brain_stats": {
     "total_vectors": 147880,
-    "queries_run": 4,
-    "key_insights": [
-      "pullback-entry long v2: solo 40% WR vs combo 75% WR — confluence matters",
-      "trend_purity+ confirmed dead — auto_1hr killed at 04:15 UTC",
-      "rr_engine_resistance SHORT exits structural — 17T/7d pullback-entry- -/usr/bin/bash.82"
-    ]
+    "embedding_model": "all-MiniLM-L6-v2"
   },
   "trade_summary_24h": {
     "total_trades": 21,
     "win_rate": 61.9,
     "pnl": 0.04,
-    "rr_ratio": 0.574,
-    "breakeven_wr": 63.5,
     "regime": "NEUTRAL",
-    "losers": 8,
-    "dead_signal_losers": 5,
-    "active_signal_losers": 3,
-    "active_loss_total": -0.52
+    "breakeven_wr": 63.5,
+    "actual_wr": 61.9,
+    "rr_ratio": 0.574
   },
   "trade_summary_7d": {
-    "total_trades": 331,
+    "total_trades": 330,
     "win_rate": 56.4,
     "pnl": 0.63,
-    "rr_ratio": 0.754,
+    "regime": "NEUTRAL",
     "breakeven_wr": 57.1,
-    "short_pnl": 2.18,
-    "long_pnl": -1.38,
-    "extreme_pnl": 2.73,
-    "normal_pnl": -1.5,
-    "high_pnl": -0.47
+    "actual_wr": 56.4,
+    "rr_ratio": 0.754
   },
   "drift_findings": [
     {
-      "finding": "Signal metadata columns NULL",
-      "detail": "entry_rsi_14, signal_z_score columns empty for 331/331 7d trades. Data exists in _signal_metadata JSON (rsi_14, z_score fields).",
-      "impact": "Cannot query entry conditions via SQL. Must parse JSON. Blocks quick entry condition analysis.",
-      "status": "KNOWN — data available in JSON, just not in dedicated columns"
+      "topic": "Signal metadata NULL",
+      "description": "entry_rsi_14, signal_z_score NULL for 330/330 7d trades. Data exists in _signal_metadata JSON but not individual columns.",
+      "impact": "Cannot verify entry conditions at execution time. Blocks entry condition analysis.",
+      "status": "KNOWN, NOT FIXED"
     },
     {
-      "finding": "bb_bounce_v2_long degraded Sep 8",
-      "detail": "Sep 6: 75%WR, Sep 7: 66.7%WR, Sep 8: 37.5%WR. 7d total: 25T 60%WR -/usr/bin/bash.22.",
-      "impact": "Single bad day dragged 7d WR down. Variance, not structural.",
-      "status": "MONITORING — no action needed"
+      "topic": "bb_bounce_v2_long degraded",
+      "description": "Win rate dropped from 73.3% to 60.9% over 7d. Still profitable but declining.",
+      "impact": "Reduced signal quality, more false positives.",
+      "status": "MONITORING"
     }
   ],
   "recurring_problems": [
     {
       "problem": "rr_engine_resistance SHORT exits",
-      "detail": "pullback-entry- 17T/7d -/usr/bin/bash.82, avg hold 3.6h, avg -1.48%. pump-chain- 11T/7d -/usr/bin/bash.12.",
-      "pattern": "SHORT entries near support bounce to resistance. Engine exits at resistance before support is tested.",
-      "root_cause": "Structural — rr_engine exits at resistance levels. SHORT entries near support (bb_position < 0.15) hit resistance on bounce.",
-      "recommended_fix": "Add SHORT entry minimum support distance filter (bb_position > 0.20). But data shows bb_position<0.15 SHORTs are actually profitable (46T 60.9%WR +/usr/bin/bash.86). The drag is from rr_engine_resistance exits specifically, not the entries themselves.",
-      "status": "NEEDS CODE FIX — entry filter would kill winners"
+      "frequency": "DAILY in sessions",
+      "impact": "31T/7d -.13 structural drag",
+      "root_cause": "Engine exits at resistance levels before support is tested. SHORT entries near support levels bounce to resistance.",
+      "sessions_mentioned": "10+ sessions",
+      "status": "NEEDS CODE FIX"
     },
     {
-      "problem": "Legacy signal drag",
-      "detail": "ema300_dip_short -/usr/bin/bash.91, slow_grind -/usr/bin/bash.80, sma20_dip -/usr/bin/bash.73, coiled_spring -/usr/bin/bash.69, pullback_entry+ -/usr/bin/bash.57. Total ~-.49/7d.",
-      "pattern": "All killed signals still in 7d window.",
-      "root_cause": "Time-based aging. Trades from before kill date still in window.",
-      "status": "AGING OUT — expected off by Sep 14"
+      "problem": "trend_purity+ LONG in EXTREME",
+      "frequency": "DAILY in sessions",
+      "impact": "11T/7d -/usr/bin/bash.90, 36.4% WR",
+      "root_cause": "Entered at overbought RSI (69-75) in EXTREME regime. Volatility gate 0.15x multiplier insufficient.",
+      "sessions_mentioned": "8+ sessions",
+      "status": "MONITORING (0.3x penalty active)"
+    },
+    {
+      "problem": "BAD_TRADE_HOURS",
+      "frequency": "DAILY in sessions",
+      "impact": "97T/7d -.26 combined (45.4% WR)",
+      "root_cause": "Hours 3,5,13,14,15,21 have legacy-heavy data with poor performance.",
+      "sessions_mentioned": "5+ sessions",
+      "status": "IMPLEMENTED (BAD_TRADE_HOURS set)"
     }
   ],
   "missing_implementations": [
     {
-      "item": "Signal metadata dedicated columns",
-      "detail": "entry_rsi_14, signal_z_score columns exist but are always NULL. Data is in _signal_metadata JSON.",
-      "impact": "Cannot efficiently query entry conditions. Must use JSON parsing.",
-      "priority": "LOW — data available, just not optimized"
+      "idea": "SHORT support distance filter",
+      "description": "Block SHORT entries when bb_position < 0.15 (near support). Would have prevented ENA SHORT loss.",
+      "impact": "Prevent ~/usr/bin/bash.20-0.30/7d losses from SHORT entries near support",
+      "status": "SUGGESTED, NOT IMPLEMENTED"
+    },
+    {
+      "idea": "rr_engine_resistance SHORT exit delay",
+      "description": "Add 10-15min grace period after resistance touch to allow price to test support.",
+      "impact": "Could reduce rr_engine_resistance SHORT exits by 30-50%",
+      "status": "SUGGESTED, NEEDS CODE CHANGE + BACKTEST"
+    },
+    {
+      "idea": "LONG_RSI_CEILING=70",
+      "description": "Block LONG entries when RSI > 70 to avoid overbought entries.",
+      "impact": "Would have blocked MET and INJ trend_purity+ losses but also W winner (RSI=71.43)",
+      "status": "REJECTED - would block winners"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-13T12:34:03.686991+00:00",
-      "idea": "Monitor — no config change needed",
-      "rationale": "System is structurally healthy. Legacy ages out Sep 14. Active signals all profitable 7d. SHORT direction +.18/7d. R:R 0.754 carries system. 5/8 24h losers are dead signals. 3/8 active losses total -/usr/bin/bash.52 — normal variance.",
-      "expected_impact": "Legacy aging out will improve 7d PnL by ~.49",
-      "category": "monitoring",
+      "date": "2026-09-13T13:33:00Z",
+      "idea": "Add bb_position < 0.15 filter for SHORT entries",
+      "rationale": "ENA SHORT loss had bb_position=0.081 (near support). SHORT entries near support bounce to resistance. Winners have bb_position > 0.15.",
+      "expected_impact": "Prevent ~/usr/bin/bash.20-0.30/7d losses from SHORT entries near support",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "none"
+      "risk": "low"
     },
     {
-      "date": "2026-09-13T12:34:03.686997+00:00",
-      "idea": "rr_engine_resistance SHORT exit delay — add 10-15min grace period after resistance touch",
-      "rationale": "pullback-entry- SHORT exits at resistance avg 3.6h after entry. Some exits happen before support is tested. A grace period could let trades recover.",
-      "expected_impact": "+/usr/bin/bash.30-0.50/7d if it saves 3-5 trades from premature exit",
-      "category": "exit optimization",
-      "status": "needs code change + backtest",
-      "risk": "medium — could increase losses if support breaks during grace period"
+      "date": "2026-09-13T13:33:00Z",
+      "idea": "Monitor rr-struct- at 15T kill threshold",
+      "rationale": "5T/7d 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). If WR drops below 50% or PnL negative at 15T, kill.",
+      "expected_impact": "Prevent potential -/usr/bin/bash.50-1.00/7d drag if signal degrades",
+      "category": "risk management",
+      "status": "monitoring",
+      "risk": "low"
     },
     {
-      "date": "2026-09-13T12:34:03.686999+00:00",
-      "idea": "LONG_RSI_CEILING=70 rejected — active signals profitable at RSI>70",
-      "rationale": "Tested: 54 LONG trades at RSI>70, 33 winners (61.1% WR), -.62 total. But active signals at RSI>70 are profitable: pump_chain 31T 74.2%WR +/usr/bin/bash.09, bb_bounce_v2_long 3T 100%WR +/usr/bin/bash.18. The drag is from legacy (sma20_dip, trend_purity+, slow_grind).",
-      "expected_impact": "WOULD KILL WINNERS — rejected",
-      "category": "entry filter",
-      "status": "rejected",
-      "risk": "high — would block profitable active signal entries"
+      "date": "2026-09-13T13:33:00Z",
+      "idea": "Verify signal metadata recording",
+      "rationale": "entry_rsi_14, signal_z_score NULL for 330/330 7d trades. Cannot verify entry conditions at execution time.",
+      "expected_impact": "Enable entry condition analysis for losing trades",
+      "category": "data quality",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Monitor legacy aging out — expect 7d PnL improvement by ~.49 when off (Sep 14)",
-    "Monitor trend_purity+ — KILLED by auto_1hr 04:15 UTC. Ages out by Sep 14.",
-    "Monitor rr-struct- — 5T/7d 60%WR -/usr/bin/bash.14. Kill at 15T if WR<50% or PnL negative.",
-    "Monitor bb_bounce_v2_long — Sep 8 was 37.5%WR (variance). 7d still 60%WR.",
-    "Monitor squeeze_reversal — zero trades since Sep 10. Market condition.",
-    "Monitor R:R — 24h ratio 0.574 (breakeven 63.5%, actual 61.9%). 7d ratio 0.754 (breakeven 57.1%, actual 56.4%).",
-    "Monitor disk — 78% (25G free)."
+    "Monitor legacy aging out - ema300_dip_short, coiled_spring, slow_grind, sma20_dip, pullback_entry+ still in 7d window",
+    "Monitor trend_purity+ EXTREME penalty - needs 20+ trades to verify improvement",
+    "Monitor rr-struct- - kill at 15T if WR <50% or PnL negative",
+    "Verify signal metadata recording - entry_rsi_14, signal_z_score NULL",
+    "Monitor R:R - 24h ratio 0.574 (breakeven 63.5%, actual 61.9%)",
+    "Monitor squeeze_reversal - zero trades since Sep 10, market condition"
   ]
 }
