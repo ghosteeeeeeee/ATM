@@ -1932,6 +1932,25 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     return updates
 
 
+def _persist_sl(trade_id, new_sl):
+    """Persist trailing SL to brain DB for pump-exit."""
+    if not trade_id or new_sl is None or new_sl <= 0:
+        return
+    conn = get_db_connection()
+    if conn is None:
+        return
+    try:
+        cur = get_cursor(conn)
+        cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s AND status = 'open'",
+                    (round(new_sl, 8), trade_id))
+        conn.commit()
+    except Exception as e:
+        log(f"  [PUMP-EXIT] DB persist failed: {e}", "WARN")
+    finally:
+        close_cursor(cur)
+        close_connection(conn)
+
+
 def _persist_atr_levels(updates: List[Dict]) -> None:
     """
     Write ATR-computed SL/TP levels to brain DB.
@@ -2492,6 +2511,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             try:
                 import sqlite3 as _sqlite3
                 from paths import CANDLES_DB
+                from hermes_constants import (
+                    PUMP_EXIT_TRAIL_MULT, PUMP_EXIT_MOMENTUM_VEL,
+                    PUMP_EXIT_MOMENTUM_CANDLES, PUMP_EXIT_TIME_THRESHOLD,
+                    PUMP_EXIT_TIME_HOURS
+                )
                 
                 entry_price = float(pos.get("entry_price") or 0)
                 current_sl = float(pos.get("stop_loss") or 0)
@@ -2518,8 +2542,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     atr = sum(trs[-14:]) / 14
                 
                 # Calculate trailing stop (DIRECTION-AWARE)
-                trail_mult = getattr(hc, 'PUMP_EXIT_TRAIL_MULT', 3.0)
-                trail_distance = atr * trail_mult
+                trail_distance = atr * PUMP_EXIT_TRAIL_MULT
                 
                 if direction == 'LONG':
                     peak_price = max(cur, highest_price)
@@ -2527,6 +2550,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
                     if new_sl > current_sl:
                         pos['stop_loss'] = new_sl
+                        # Persist to DB
+                        _persist_sl(db_conn, trade_id, new_sl)
                         log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
                 else:
                     lowest_price = float(pos.get("lowest_price", cur))
@@ -2535,11 +2560,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
                     if new_sl < current_sl:
                         pos['stop_loss'] = new_sl
+                        _persist_sl(db_conn, trade_id, new_sl)
                         log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
                 
-                # Check momentum exit
-                momentum_vel = getattr(hc, 'PUMP_EXIT_MOMENTUM_VEL', -0.5)
-                momentum_candles = getattr(hc, 'PUMP_EXIT_MOMENTUM_CANDLES', 2)
+                # Check momentum exit (DIRECTION-AWARE)
+                momentum_candles = PUMP_EXIT_MOMENTUM_CANDLES
                 
                 _conn_vel = _sqlite3.connect(CANDLES_DB, timeout=5)
                 _cur_vel = _conn_vel.cursor()
@@ -2553,37 +2578,56 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _conn_vel.close()
                 
                 if len(_vel_closes) >= momentum_candles + 1:
-                    neg_count = 0
-                    for i in range(1, len(_vel_closes)):
-                        period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
-                        if period_vel < momentum_vel:
-                            neg_count += 1
-                        else:
-                            neg_count = 0
+                    # Direction-aware: LONG exits on negative velocity, SHORT exits on positive velocity
+                    if direction == 'LONG':
+                        # LONG: exit when price dropping (negative velocity)
+                        neg_count = 0
+                        for i in range(1, len(_vel_closes)):
+                            period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
+                            if period_vel < PUMP_EXIT_MOMENTUM_VEL:
+                                neg_count += 1
+                            else:
+                                neg_count = 0
+                        exit_momentum = neg_count >= momentum_candles
+                    else:
+                        # SHORT: exit when price rising (positive velocity)
+                        pos_count = 0
+                        for i in range(1, len(_vel_closes)):
+                            period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
+                            if period_vel > abs(PUMP_EXIT_MOMENTUM_VEL):
+                                pos_count += 1
+                            else:
+                                pos_count = 0
+                        exit_momentum = pos_count >= momentum_candles
                     
-                    if neg_count >= momentum_candles:
-                        profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
-                        reason = f"pump_exit_momentum: vel={(_vel_closes[0] - _vel_closes[-1]) / _vel_closes[-1] * 100 if _vel_closes[-1] > 0 else 0:.2f}% for {neg_count} candles"
+                    if exit_momentum:
+                        reason = f"pump_exit_momentum: dir={direction}, candles={momentum_candles}"
                         close_paper_position(trade_id, reason)
                         closed_count += 1
                         log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
                         continue
                 
-                # Check time exit
-                time_threshold = getattr(hc, 'PUMP_EXIT_TIME_THRESHOLD', 2.0)
-                time_hours = getattr(hc, 'PUMP_EXIT_TIME_HOURS', 2.0)
+                # Check time exit (DIRECTION-AWARE profit calculation)
+                time_threshold = PUMP_EXIT_TIME_THRESHOLD
+                time_hours = PUMP_EXIT_TIME_HOURS
                 
-                entry_time_str = pos.get('entry_time')
-                if entry_time_str:
+                open_time_str = pos.get('open_time')
+                if open_time_str:
                     try:
-                        entry_dt = datetime.fromisoformat(entry_time_str.replace('+00:00', ''))
+                        entry_dt = datetime.fromisoformat(open_time_str.replace('+00:00', ''))
                         hold_hours = (datetime.now(timezone.utc) - entry_dt).total_seconds() / 3600
-                        profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
+                        # Direction-aware profit calculation
+                        if direction == 'LONG':
+                            profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
+                        else:
+                            profit_pct = (entry_price - cur) / entry_price * 100 if entry_price > 0 else 0
                         
                         if profit_pct < time_threshold and hold_hours > time_hours:
                             if len(_vel_closes) >= 2:
                                 vel_check = (_vel_closes[0] - _vel_closes[1]) / _vel_closes[1] * 100 if _vel_closes[1] > 0 else 0
-                                if vel_check < 0:
+                                # Direction-aware: LONG exits on negative vel, SHORT on positive vel
+                                vel_fading = (direction == 'LONG' and vel_check < 0) or (direction == 'SHORT' and vel_check > 0)
+                                if vel_fading:
                                     reason = f"pump_exit_dead_money: {hold_hours:.1f}h, {profit_pct:+.2f}%, vel={vel_check:.2f}%"
                                     close_paper_position(trade_id, reason)
                                     closed_count += 1
