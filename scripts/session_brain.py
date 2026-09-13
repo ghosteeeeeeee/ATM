@@ -615,6 +615,7 @@ class SessionBrain:
         # Incremental updates just append new vectors (some orphans are OK short-term).
         # The daily rebuild cleans everything up.
         needs_rebuild = not incremental  # always rebuild on full ingest
+        sessions = self._get_sessions() if incremental else {}
         if incremental:
             for sid, existing in sessions.items():
                 fp = SESSIONS_DIR / sid / "session.jsonl.zstd"
