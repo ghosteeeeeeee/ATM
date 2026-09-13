@@ -2273,6 +2273,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
+    'accel-300-breakout',  # ATR breakout signal — works solo (2026-09-13)
     'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
     'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant

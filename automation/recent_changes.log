@@ -1749,3 +1749,14 @@
   Signal: rr-struct+ best (+$0.73, 66.7%WR), trend_purity+ worst (-$0.75, 0%WR legacy aging)
   Kill check: 0 trades closed last hour for any signal — no trigger
   BY: auto_1hr
+
+[2026-09-13 22:30 UTC] brain_auditor: NO CONFIG CHANGE — system above breakeven, legacy ages out tomorrow
+  24h: 34T 55.9%WR +$0.17 | 7d: 267T 57.3%WR -$0.44
+  R:R 24h: 0.938 (breakeven 51.6%, actual 55.9% — ABOVE)
+  Exit 7d: profit-monster-trail 102T 94.1%WR +$7.31, cut-loser-CL-T1 46T -$7.01 (legacy), rr_engine_resistance 31T 39.4%WR -$1.34
+  Losers 24h: 15 total, 3 dead signal (trend_purity+), 12 active (-$1.10)
+  7d SHORT dominant: 143T 60.1%WR +$1.91 vs LONG 193T 53.9%WR -$0.70
+  rr_engine_resistance SHORT structural: 31T/7d 41.9%WR -$1.34 — losses cluster 03-08 UTC
+  pullback-entry- rr_engine_resistance: 18T/7d 33.3%WR -$1.54 — biggest signal drag
+  Creative: (1) rr_engine_resistance SHORT exit CLOSE-above-resistance (needs code + backtest) (2) Monitor rr-struct- at 15T (3) bb_bounce_v2_long degradation tracking
+  BY: brain_auditor

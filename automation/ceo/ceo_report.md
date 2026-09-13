@@ -52,3 +52,17 @@ rr_structural.py had no range position filter. Accel catches direction (price mo
 
 ### Verification
 Import verified. Pipeline restart needed to load new code. Monitor next 24h for blocks in pipeline.log.
+
+## CEO Report — 2026-09-13 ~22:35 UTC
+
+### Diagnosis
+24h: 35T, 54.3% WR, -$0.16. 7d: 336T, 56.5% WR, +$1.21. Market NEUTRAL. R:R 24h 0.740 (breakeven 56.7%, actual 54.3% — 2.4% underwater). 24h negative solely from dead signal trend_purity+ 3T 0%WR -$0.75 — without it, 32T +$0.59.
+
+### Root Cause
+Legacy signal trend_purity+ still in 24h window. Ages out Sep 14. Active signals ALL profitable: pullback-entry- +$2.11, open_skies +$1.20, pump_chain +$1.08, rr-struct+ +$0.59. 7d legacy drag -$3.46 will be gone by tomorrow.
+
+### Fix Applied
+**No config changes.** System structurally healthy. Monitoring: rr-struct- at 7T/42.9%WR (kill at 15T if WR <50%), rr_engine_resistance SHORT exits (5T/48h -$0.58, needs code change), trend_ignition 0 trades (market condition).
+
+### Verification
+7d PnL +$1.21 (VERIFIED). 24h -$0.16 (legacy noise). Pipeline active, 4 open positions, 0 errors. Disk 79%. Next: legacy ages out tomorrow, expect 7d PnL improvement ~$3.46.

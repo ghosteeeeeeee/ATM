@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~21:30 UTC (brain_auditor run)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-13 ~22:35 UTC (CEO run)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 32T, 56.3% WR, +$0.17. 7d: 336T, 56.5% WR, +$1.21. Market NEUTRAL.
+24h: 35T, 54.3% WR, -$0.16. 7d: 336T, 56.5% WR, +$1.21. Market NEUTRAL.
 
-- **24h:** 32T, 56.3% WR, +$0.17 (VERIFIED brain DB). ABOVE breakeven (51.6%). R:R 0.938. LONG 19T/57.9%WR +$0.20, SHORT 13T/53.8%WR -$0.03.
+- **24h:** 35T, 54.3% WR, -$0.16 (VERIFIED brain DB). Below breakeven (56.7%). R:R 0.740. 24h dip from dead signal trend_purity+ 3T 0%WR -$0.75. Without dead signal: 32T +$0.59.
 - **7d:** 336T, 56.5% WR, +$1.21 (VERIFIED — POSITIVE). SHORT 143T/60.1%WR +$1.91 ★ dominates LONG 193T/53.9%WR -$0.70.
 - **7d REGIME:** EXTREME 136T/59.6%WR +$3.21 ★ | HIGH 125T/57.6%WR +$0.02 | NORMAL 72T/50.0%WR -$2.06 | FLAT 1T +$0.04.
 - **7d TOP PERFORMERS:** pullback-entry- 44T/63.6% WR +$2.11 ★ | open_skies 8T/62.5% WR +$1.20 ★ | pump_chain 41T/65.9% WR +$0.95 ★ | rr-struct+ 14T/71.4% WR +$0.55.
