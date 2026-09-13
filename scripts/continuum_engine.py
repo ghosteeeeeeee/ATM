@@ -985,6 +985,8 @@ class ContinuumEngine:
         else:
             side = self._last_side or 'LONG'  # AT zone: hold previous or default LONG
         
+        self._last_side = side  # Track for AT zone fallback and flip detection
+        
         # Debug: log entry to update method
         print(f"[CONTINUUM] _update: phase={self.entry_phase}, side={side}, dur={state.ema300_duration}, z={state.zscore_tier}")
         
