@@ -1,3 +1,12 @@
+[2026-09-13 16:30 UTC] brain_auditor: NO CONFIG CHANGE — system above breakeven
+  24h: 28T 67.9%WR +$0.83 | 7d: 331T 57.1%WR +$1.42
+  R:R 24h: 0.871 (breakeven 57.4%, actual 67.9% — +10.5% above)
+  Exit 7d: profit-monster-trail 104T +$7.27, cut-loser-CL-T1 46T -$7.01 (legacy), rr_engine_resistance 32T -$1.23
+  Losers 24h: 9 total, 5 dead/stale signal, 4 active (-$0.55)
+  trend_purity+ 11T/7d 36.4%WR -$0.90 — monitoring at 15T kill threshold
+  Creative: (1) trend_purity+ HIGH penalty 0.5x suggested (2) Monitor RR_STRUCTURAL_RANGE filter
+  BY: brain_auditor
+
 [2026-09-13 14:10 UTC] auto_1hr: NO CHANGE — system slightly positive, quiet hour
   24h: 28T ~60%WR +$0.83 | 4T/1h, 6 open | All NEUTRAL
   Exit: atr_sl_hit 17T +$0.67 (profitable, trail-adjusted), profit-monster-trail 6T +$0.35
@@ -1696,3 +1705,9 @@
   KEY FINDINGS: (1) Signal metadata NULL 329/329 — blocks entry condition analysis. (2) rr_engine_resistance SHORT 31 exits/7d -$1.13 — structural, needs code fix. (3) bb_bounce_v2_long 10 cut-loser exits -$1.51/7d. (4) NORMAL regime weakest -$1.55/7d but mostly legacy. (5) pullback-entry- EXTREME strongest: 9T 77.8%WR +$1.11.
   CREATIVE: (1) rr_engine grace period code fix + backtest. (2) rr-struct- STANDALONE_BYPASS (needs 15T sample first). (3) Fix signal metadata recording (5-10 lines).
   BY: brain_auditor
+[2026-09-13 18:00 UTC] auto_1hr: NO CHANGE — system healthy
+  24h: 31T 67.7%WR +$1.22 | 1.3T/1h, 4 open | All NORMAL
+  Exit: atr_sl_hit 16T +$0.92 (profitable), profit-monster-trail 9T +$0.61
+  Signal: rr-struct+ best (+$0.78), pullback-entry- second (+$0.67), pump-chain+ third (+$0.39)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  BY: auto_1hr

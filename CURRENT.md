@@ -1,17 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~15:30 UTC (CEO run)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-13 ~16:30 UTC (brain_auditor run)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 25T, 64.0% WR, +$0.44. 7d: 329T, 57.1% WR, +$1.42. Market NEUTRAL.
+24h: 28T, 67.9% WR, +$0.83. 7d: 331T, 57.1% WR, +$1.42. Market NEUTRAL.
 
-- **24h:** 25T, 64.0% WR, +$0.44 (VERIFIED brain DB). Improving — above breakeven WR.
-- **7d:** 329T, 57.1% WR, +$1.42 (VERIFIED — POSITIVE, improved from +$0.63 earlier).
-- **7d TOP PERFORMERS:** pullback-entry- 42T/66.7% WR +$2.42 ★ | open_skies 8T/62.5% WR +$1.20 ★ | pump_chain 41T/68.3% WR +$1.11 ★ | rr-struct+ 10T/80% WR +$0.81.
-- **7d LEGACY (aging out):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | pullback_entry+ 6T/17% WR -$0.57 | bb-bounce-v2-long+ 5T/40% WR -$0.45 | ema300-dip-long 4T/25% WR -$0.40 | coiled_spring 2T/0% WR -$0.23 | pump-chain+ 13T/31% WR -$0.29. Legacy drag: ~-$4.43/7d (aging out by Sep 14).
-- **24h BIGGEST LOSER:** trend_purity+ LONG — KILLED by auto_1hr 04:15 UTC (4T/24h 0%WR -$0.91, all NEUTRAL). Already disabled.
+- **24h:** 28T, 67.9% WR, +$0.83 (VERIFIED brain DB). ABOVE breakeven (57.4%). R:R 0.871.
+- **7d:** 331T, 57.1% WR, +$1.42 (VERIFIED — POSITIVE).
+- **7d TOP PERFORMERS:** pullback-entry- 43T/65.1% WR +$2.32 ★ | pump_chain 41T/68.3% WR +$1.11 ★ | open_skies 8T/62.5% WR +$1.20 ★ | rr-struct+ 12T/75% WR +$0.80.
+- **7d LEGACY (aging out Sep 14):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | pullback_entry+ 6T/17% WR -$0.57 | bb-bounce-v2-long+ 5T/40% WR -$0.45 | ema300-dip-long 4T/25% WR -$0.40 | coiled_spring 2T/0% WR -$0.23 | pump-chain+ 13T/31% WR -$0.29. Legacy drag: ~-$4.43/7d (aging out by Sep 14).
+- **24h BIGGEST LOSER:** trend_purity+ LONG — 3T/24h 0%WR -$0.75. Dead signal, aging out. KILLED by auto_1hr 04:15 UTC.
 - **Market:** NEUTRAL (100%).
 - **SHORT in NEUTRAL:** Strongest combination (63.5% WR 7d).
 - **LONG in NEUTRAL:** Weakest (mostly legacy).

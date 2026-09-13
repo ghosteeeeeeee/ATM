@@ -3532,3 +3532,35 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 - All active signals positive or correctly disabled
 
 **Open Questions:** None
+
+## [2026-09-13 18:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W/1L, 75% WR, net +$0.14)
+- LINK SHORT rr-struct- -$0.12 (rr_engine_resistance)
+- APT LONG pump-chain+ +$0.12 (profit-monster-trail)
+- FIL LONG pump-chain+ +$0.03 (profit-monster-trail)
+- FIL LONG pump-chain+ +$0.11 (profit-monster-trail)
+
+**24h:** 31T 67.7%WR +$1.22 | 4 open | 1.3T/hr
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 16T +$0.92 (51.6%) — profitable
+- profit-monster-trail: 9T +$0.61 (29%)
+- rr_engine_resistance: 5T -$0.02 (16.1%)
+- rr_engine_support_br: 1T -$0.29 (3.2%)
+
+**24h by Signal:**
+- rr-struct+: 7T 71.4%WR +$0.78 (best)
+- pullback-entry-: 10T 70%WR +$0.67
+- pump-chain+: 5T 80%WR +$0.39
+- trend_purity+: 3T 0%WR -$0.75 (disabled, correct)
+
+**Changes:** None — system healthy
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour
+- atr_sl_hit 51.6% but avg +$0.058/trade — profitable, SL working correctly
+- Trade freq: 1.3/hr, normal
+- All active signals profitable
+
+**Open Questions:** None

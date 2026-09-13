@@ -63,14 +63,15 @@ DRY_RUN = '--dry' in sys.argv
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _get_5m_candles(token: str, limit: int = 500) -> list:
-    """Fetch 5m candles from DB. Returns oldest-first list of dicts."""
+    """Fetch 5m candles from DB. Returns oldest-first list of dicts.
+    Only returns CLOSED candles (is_closed=1) to avoid 0-volume unclosed candles."""
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT ts, open, high, low, close, volume FROM candles_5m
-            WHERE token = ? ORDER BY ts DESC LIMIT ?
+            WHERE token = ? AND is_closed = 1 ORDER BY ts DESC LIMIT ?
         """, (token.upper(), limit))
         rows = c.fetchall()
         if not rows:

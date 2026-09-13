@@ -65,8 +65,10 @@
     "rationale": "pump-chain+ LONG atr_sl_hit: 8T 25% WR -$0.78/7d. Worst active LONG signal by SL hit loss.",
     "expected_impact": "monitoring",
     "category": "exit optimizer",
-    "status": "monitoring",
-    "risk": "medium"
+    "status": "rejected",
+    "risk": "medium",
+    "rejected_at": "2026-09-13T16:59:17.312190+00:00",
+    "reject_reason": "it is one of our best signal, we cannot kill it, we can only improve it"
   },
   {
     "date": "2026-09-12T17:26:47.305267+00:00",
@@ -92,8 +94,10 @@
     "rationale": "EXTREME regime trades 00:00-06:00 UTC have 5/6 winners (KAS +0.29, PONS +0.24, BIGTIME +0.21). 06:00-12:00 UTC have 3/5 winners. Night session shows better EXTREME performance.",
     "expected_impact": "Marginal — system already handles EXTREME well (65.4% WR)",
     "category": "time-of-day",
-    "status": "suggested",
-    "risk": "low"
+    "status": "rejected",
+    "risk": "low",
+    "rejected_at": "2026-09-13T16:59:56.788474+00:00",
+    "reject_reason": "not a big fan of time-of-day anything, the crypto market is constantly evolving"
   },
   {
     "date": "2026-09-12T17:30:00Z",
@@ -111,9 +115,11 @@
     "rationale": "NORMAL regime has 75T/7d -$2.21 drag. Most signals designed for trending markets. Adding ('NORMAL','*'): 0.5 to VOL_PHASE_MULTS would reduce confidence by 50% in NORMAL, filtering marginal entries while preserving high-confidence trades.",
     "expected_impact": "Reduce NORMAL drag from -$2.21 to ~-$1.00/7d",
     "category": "regime creative",
-    "status": "suggested",
+    "status": "rejected",
     "risk": "medium — could reduce trade frequency in NORMAL",
-    "impact_on_winners": "Need to check: NORMAL winners that would be blocked by 50% confidence reduction"
+    "impact_on_winners": "Need to check: NORMAL winners that would be blocked by 50% confidence reduction",
+    "rejected_at": "2026-09-13T17:00:43.338518+00:00",
+    "reject_reason": "not a fan of blocking entire regimes at all"
   },
   {
     "date": "2026-09-12T17:30:00Z",
