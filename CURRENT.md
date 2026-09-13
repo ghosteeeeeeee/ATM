@@ -1,16 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~20:30 UTC (brain_auditor run)**
+**Last Updated: 2026-09-13 ~21:30 UTC (brain_auditor run)**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 32T, 56.3% WR, +$0.17. 7d: 339T, 56.9% WR, +$1.29. Market NEUTRAL.
+24h: 32T, 56.3% WR, +$0.17. 7d: 336T, 56.5% WR, +$1.21. Market NEUTRAL.
 
-- **24h:** 32T, 56.3% WR, +$0.17 (VERIFIED brain DB). ABOVE breakeven (51.6%). R:R 0.938.
-- **7d:** 339T, 56.9% WR, +$1.29 (VERIFIED — POSITIVE).
-- **7d TOP PERFORMERS:** pullback-entry- 44T/63.6% WR +$2.11 ★ | open_skies 8T/62.5% WR +$1.20 ★ | pump_chain 43T/67.4% WR +$0.98 ★ | rr-struct+ 12T/75% WR +$0.80.
-- **7d LEGACY (aging out Sep 14):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | pullback_entry+ 6T/17% WR -$0.57 | bb-bounce-v2-long+ 5T/40% WR -$0.45 | ema300-dip-long 4T/25% WR -$0.40. Legacy drag: ~-$3.46/7d (aging out by Sep 14).
+- **24h:** 32T, 56.3% WR, +$0.17 (VERIFIED brain DB). ABOVE breakeven (51.6%). R:R 0.938. LONG 19T/57.9%WR +$0.20, SHORT 13T/53.8%WR -$0.03.
+- **7d:** 336T, 56.5% WR, +$1.21 (VERIFIED — POSITIVE). SHORT 143T/60.1%WR +$1.91 ★ dominates LONG 193T/53.9%WR -$0.70.
+- **7d REGIME:** EXTREME 136T/59.6%WR +$3.21 ★ | HIGH 125T/57.6%WR +$0.02 | NORMAL 72T/50.0%WR -$2.06 | FLAT 1T +$0.04.
+- **7d TOP PERFORMERS:** pullback-entry- 44T/63.6% WR +$2.11 ★ | open_skies 8T/62.5% WR +$1.20 ★ | pump_chain 41T/65.9% WR +$0.95 ★ | rr-struct+ 14T/71.4% WR +$0.55.
+- **7d LEGACY (aging out Sep 14):** ema300_dip_short 17T/47% WR -$0.91 | trend_purity+ 11T/36.4% WR -$0.90 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | pullback_entry+ 6T/17% WR -$0.57 | bb-bounce-v2-long+ 5T/40% WR -$0.45 | ema300-dip-long 4T/25% WR -$0.40. Legacy drag: ~-$3.46/7d (aging out by Sep 14).
+- **7d EXIT:** profit-monster-trail 102T/94.1%WR +$7.31 ★ | cut-loser-CL-T1 46T/0%WR -$7.01 (legacy) | rr_engine_resistance 33T/39.4%WR -$1.35 (STRUCTURAL).
 - **24h BIGGEST LOSER:** trend_purity+ LONG — 3T/24h 0%WR -$0.75. Dead signal, aging out. KILLED by auto_1hr 04:15 UTC.
 - **Market:** NEUTRAL (100%).
 - **SHORT in NEUTRAL:** Strongest combination.
@@ -23,8 +25,8 @@
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.2%, MAX 1.5%.
 - **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active (brain_auditor 06:49 UTC). 7d these hours -$4.26 combined.
-- **R:R 24h:** avg_win $0.15, avg_loss $-0.16. ratio 0.938. Breakeven WR 51.6%, actual 58.1% (ABOVE breakeven).
-- **R:R 7d:** avg_win $0.12, avg_loss $-0.15. ratio 0.800. Breakeven WR 55.6%, actual 57.1% (ABOVE breakeven). R:R carries system.
+- **R:R 24h:** avg_win $0.15, avg_loss $-0.16. ratio 0.938. Breakeven WR 51.6%, actual 56.3% (ABOVE breakeven).
+- **R:R 7d:** avg_win $0.12, avg_loss $-0.15. ratio 0.800. Breakeven WR 55.6%, actual 56.5% (ABOVE breakeven). R:R carries system.
 - **signal_compactor:** Running OK. Transient timeouts self-recovered.
 - **SHORT_RSI_FLOOR=25:** Working. Zero SHORT trades with RSI<25 in 7d.
 - **rr-struct- MONITORING:** 7T/7d 42.9% WR, R:R 0.42 (avg_loss 2.4x avg_win). Degrading — kill at 15T if WR <50% or PnL negative.
@@ -130,4 +132,5 @@
 5. **Monitor R:R.** 24h ratio 0.938 (breakeven 51.6%, actual 56.3% — ABOVE breakeven). 7d PnL +$1.29. — 2026-09-13 ~20:30 UTC
 6. **Monitor squeeze_reversal.** Zero trades since Sep 10. Market condition. If no trades by Sep 14, investigate. — 2026-09-12
 7. **Monitor disk.** Currently 79% (25G free). — 2026-09-13
-8. **CODE CHANGE NEEDED: rr_engine_resistance SHORT exit delay.** 33T/7d -$1.35. Add hold time or close-above-resistance requirement. Backtest needed. — 2026-09-13 ~20:30 UTC
+8. **CODE CHANGE NEEDED: rr_engine_resistance SHORT exit delay.** 33T/7d 39.4%WR -$1.35. Require CLOSE above resistance (not wick) to avoid false breakout exits. Backtest needed. — 2026-09-13 ~21:30 UTC
+9. **Monitor bb_bounce_v2_long.** 18T/7d 55.6%WR -$0.35. Was 73.3%WR earlier. May be variance or regime-dependent. Monitor 48h. — 2026-09-13 ~21:30 UTC

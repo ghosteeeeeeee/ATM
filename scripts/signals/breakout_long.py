@@ -183,10 +183,14 @@ def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
     # ── PATH B: Pre-breakout (earlier entry) ───────────────────────────
     # Detect FIRST volume spike during consolidation
     # Enters BEFORE the breakout, catching the move earlier
-    if vol_ratio >= 3.0:  # strong volume spike (3x average)
-        # Price must be near range high (within 0.5%)
+    # Check for RECENT volume spike (last 3 candles) — not just latest
+    recent_vol_max = max(volumes[max(0, latest_idx-2):latest_idx+1])
+    recent_vol_ratio = recent_vol_max / vol_avg if vol_avg > 0 else 0
+    
+    if recent_vol_ratio >= 3.0:  # strong volume spike in last 3 candles
+        # Price must be near range high (within 1.0% — wider than Path A)
         proximity = (range_high - price) / range_high * 100
-        if proximity <= 0.5 and proximity >= -0.2:  # near or just above
+        if proximity <= 1.0 and proximity >= -0.5:  # near or just above
             # Check for EMA300 confirmation (price above EMA300)
             if len(closes) >= 300:
                 k = 2.0 / 301
@@ -196,7 +200,7 @@ def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
                 if price > ema_val:
                     # Pre-breakout entry — lower confidence but earlier
                     confidence = int(min(BREAKOUT_LONG_CONF_CAP,
-                        BREAKOUT_LONG_CONF_BASE - 5 + min(10, (vol_ratio - 3.0) * 3)))
+                        BREAKOUT_LONG_CONF_BASE - 5 + min(10, (recent_vol_ratio - 3.0) * 3)))
                     confidence = max(BREAKOUT_LONG_CONF_FLOOR, confidence)
                     
                     return {

@@ -2267,6 +2267,7 @@ BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought ca
 STANDALONE_BYPASS_SIGNALS = (
     'pump-chain', 'pump_chain',  # chain correlation — fires when coin is pumping, BTC flat irrelevant (2026-09-12)
     'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
+    'open-skies+', 'open-skies', 'open_skies',  # breakout LONG — 63% WR, works solo (2026-09-12)
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-v2-short',
     'range_breakout', 'range_breakout_short',
@@ -3423,6 +3424,22 @@ PULLBACK_CONF_BB_SQUEEZE_THRESHOLD = 0.2   # BB width threshold for squeeze bonu
 PULLBACK_CONF_BONUS_STRONG       = 5       # confidence bonus for strong impulse
 PULLBACK_CONF_BONUS_DRY          = 5       # confidence bonus for very low volume
 PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
+
+# ── oversold_bounce (mean reversion at extreme oversold) ──────────────────────
+# oversold_bounce.py — LONG when RSI < 25 + z-score < -1 + BB < 0.3
+# Backtest: 70% WR, +$0.97 total at RSI < 25 + z < -1 (40 trades)
+# Thesis: Oversold cascades are overreactions, price reverts to mean
+OVERSOLD_BOUNCE_ENABLED             = True    # master kill-switch (LONG only)
+OVERSOLD_BOUNCE_RSI_MAX             = 25      # RSI must be below this (oversold threshold)
+OVERSOLD_BOUNCE_Z_MAX               = -1.0    # z-score must be below this (price below mean)
+OVERSOLD_BOUNCE_BB_MAX              = 0.3     # BB position must be below this (lower band)
+OVERSOLD_BOUNCE_MOM_LOOKBACK        = 5       # bars for momentum check
+OVERSOLD_BOUNCE_MIN_CANDLES         = 20      # minimum candles needed
+OVERSOLD_BOUNCE_CANDLE_FETCH        = 50      # candles to fetch from DB
+OVERSOLD_BOUNCE_STALENESS_MIN       = 10      # max age in minutes for price data
+OVERSOLD_BOUNCE_COOLDOWN_HOURS      = 2       # per-token cooldown (2 hours)
+OVERSOLD_BOUNCE_CONF_BASE           = 75      # base confidence
+OVERSOLD_BOUNCE_CONF_CAP            = 88      # max confidence (system ceiling)
 
 # ── doji_top (doji exhaustion at tops) ──────────────────────────────────────
 # doji_top.py — exit LONG / enter SHORT when doji appears after strong advance

@@ -1956,7 +1956,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Block LONG when RSI < 20 — price in freefall, no bounce coming.
             # Backtest: blocks 3 losers (LINEA RSI=0, SAND RSI=12.7, ICP RSI=11.9),
             # 0 winners. WR: 50% → 61.5% on ct-hot+.
-            if direction.upper() == 'LONG':
+            # EXCLUDE volume_breakout — structural volume signal, RSI lags on 1m candles.
+            _is_vol_breakout = any('volume-breakout' in p for p in source_parts)
+            if direction.upper() == 'LONG' and not _is_vol_breakout:
                 try:
                     _rsi_conn = sqlite3.connect(CANDLES_DB, timeout=5)
                     _rsi_cur = _rsi_conn.cursor()
@@ -2091,10 +2093,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Prevents single-source signals from bypassing neutral block when BTC is flat.
             # EXEMPTION: pump-chain fires when COIN is pumping — BTC flatness irrelevant (2026-09-12)
             # EXEMPTION: mover fires on strong momentum — BTC flatness irrelevant (2026-09-12)
+            # EXEMPTION: open-skies breakout — BTC flatness irrelevant (2026-09-12)
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
             _is_pump_chain = bare_source in ('pump-chain', 'pump_chain', 'pump-chain+', 'pump-chain-', 'pump_chain+', 'pump_chain-')
             _is_mover = bare_source in ('mover_long', 'mover+', 'mover-', 'mover_long+', 'mover_long-')
-            _btc_exempt = _is_pump_chain or _is_mover
+            _is_open_skies = bare_source in ('open-skies+', 'open-skies', 'open_skies')
+            _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies
             if BTC_CHOP_GATE_ENABLED and not _btc_exempt:
                 _bypass_conn = None
                 try:

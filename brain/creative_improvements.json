@@ -395,5 +395,23 @@
         "risk": "very low"
       }
     ]
+  },
+  {
+    "date": "2026-09-13T21:34:02Z",
+    "idea": "SHORT exit: require CLOSE above resistance, not wick",
+    "rationale": "33 SHORT trades/7d rr_engine_resistance -.35. Many exits are temporary wicks above resistance that reverse. Requiring 1m CLOSE above resistance filters false breakouts.",
+    "expected_impact": "+$0.50-1.00/7d from avoiding false breakout exits",
+    "category": "exit improvement",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-13T21:34:02Z",
+    "idea": "Monitor rr-struct- at 15T kill threshold",
+    "rationale": "7T/7d 42.9%WR -$0.42. R:R 0.42. Kill at 15T if WR<50% or PnL negative.",
+    "expected_impact": "Prevents additional drag if degrading continues",
+    "category": "kill threshold",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]
