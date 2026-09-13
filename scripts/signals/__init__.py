@@ -363,6 +363,11 @@ except Exception:
     _rr_structural_run = None
 
 try:
+    from signals.rr_structural_v2_long import run as _rr_structural_v2_long_run
+except Exception:
+    _rr_structural_v2_long_run = None
+
+try:
     from signals.wall_street_cycle import run as _wall_street_cycle_run
 except Exception:
     _wall_street_cycle_run = None
@@ -439,6 +444,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'trend_purity',             'enabled': 'TREND_PURITY_ENABLED',        'run': _trend_purity_run},
     {'name': 'ema300_breakthrough',       'enabled': 'EMA300_BREAKTHROUGH_ENABLED', 'run': _ema300_breakthrough_run},
     {'name': 'rr_structural',            'enabled': 'RR_STRUCTURAL_ENABLED',     'run': _rr_structural_run},
+    {'name': 'rr_structural_v2_long',    'enabled': 'RR_STRUCTURAL_V2_LONG_ENABLED', 'run': _rr_structural_v2_long_run},
     {'name': 'wall_street_cycle',        'enabled': 'WALL_ST_CYCLE_ENABLED',     'run': _wall_street_cycle_run},
     {'name': 'trend_ignition',            'enabled': 'TREND_IGNITION_ENABLED',    'run': _trend_ignition_run},
 ]
@@ -448,7 +454,7 @@ SIGNAL_REGISTRY: list[dict] = [
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
 # pump_flow_signal removed — runs every minute to match state file update cadence
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural'}
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural', 'rr_structural_v2_long'}
 
 
 def _resolve_enabled(entry):

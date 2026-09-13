@@ -665,6 +665,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # rr_structural — structural R:R quality signal
     ('rr_structural_long',  'rr-struct+'):  0.85,  # REDUCED 2026-09-11 — was 1.3x→1.1x→0.85x, over-weighted
     ('rr_structural_short', 'rr-struct-'):  0.85,  # REDUCED 2026-09-11 — was 1.3x→1.1x→0.85x, over-weighted
+    ('rr_structural_v2_long', 'rr-struct-v2+'): 1.0,  # v2 LONG with falling-knife filter
     # wall_street_cycle — euphoria/capitulation reversal (Wall Street Psychology Cycle)
     ('wall_street_cycle_long',  'wall-st-cycle+'):  1.25,  # capitulation LONG — buy the fear
     ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
@@ -2088,8 +2089,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # or source is standalone bypass — NEUTRAL market doesn't mean no SHORT edge
             # Layer B: Gate STANDALONE_BYPASS with BTC momentum check (2026-09-11)
             # Prevents single-source signals from bypassing neutral block when BTC is flat.
+            # EXEMPTION: pump-chain fires when COIN is pumping — BTC flatness irrelevant (2026-09-12)
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
-            if BTC_CHOP_GATE_ENABLED:
+            _is_pump_chain = bare_source in ('pump-chain', 'pump_chain', 'pump-chain+', 'pump-chain-', 'pump_chain+', 'pump_chain-')
+            if BTC_CHOP_GATE_ENABLED and not _is_pump_chain:
                 _bypass_conn = None
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)

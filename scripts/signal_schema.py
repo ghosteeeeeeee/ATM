@@ -2193,6 +2193,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     return None
             except ImportError:
                 pass
+        # rr-struct-v2+ (enhanced LONG with falling-knife filter)
+        if _comp == 'rr-struct-v2+':
+            try:
+                from hermes_constants import RR_STRUCTURAL_V2_LONG_ENABLED
+                if not RR_STRUCTURAL_V2_LONG_ENABLED:
+                    print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RR_STRUCTURAL_V2_LONG_ENABLED=False', flush=True)
+                    return None
+            except ImportError:
+                pass
         # wall-st-cycle (Wall Street Psychology Cycle — euphoria/capitulation reversal)
         if _comp == 'wall-st-cycle+':
             try:
@@ -2639,6 +2648,7 @@ def is_component_disabled(component: str) -> bool:
             PATTERN_CHANNEL_ENABLED, PATTERN_FLAG_ENABLED, PATTERN_MICRO_FLAG_ENABLED, PATTERN_WOLF_ENABLED,
             OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_MTF_RSI_ENABLED, OC_PENDING_ENABLED,
             RR_STRUCTURAL_ENABLED, RR_STRUCTURAL_PLUS_ENABLED, RR_STRUCTURAL_MINUS_ENABLED,
+            RR_STRUCTURAL_V2_LONG_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2955,6 +2965,7 @@ def is_component_disabled(component: str) -> bool:
     if c == 'rr-struct+': return not RR_STRUCTURAL_PLUS_ENABLED
     if c == 'rr-struct-': return not RR_STRUCTURAL_MINUS_ENABLED
     if c == 'rr-struct': return not RR_STRUCTURAL_ENABLED
+    if c == 'rr-struct-v2+': return not RR_STRUCTURAL_V2_LONG_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

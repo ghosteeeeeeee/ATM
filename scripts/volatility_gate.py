@@ -112,6 +112,7 @@ REGIME_SIGNALS = {
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
         'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
+        'rr-struct-v2+',  # v2 LONG with falling-knife filter
         'trend-ignition+',  # early-stage breakout — volume spike + compression, catches start of move
     },
     'HIGH': {
@@ -169,6 +170,7 @@ REGIME_SIGNALS = {
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
         'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
+        'rr-struct-v2+',  # v2 LONG with falling-knife filter
         'trend-ignition+',  # early-stage breakout — volume spike + compression, catches start of move
     },
     'EXTREME': {

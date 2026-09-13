@@ -2261,6 +2261,7 @@ BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought ca
 # CEO 2026-08-17 — removed 'accel-300' (40T/7d 55% WR -$0.30, net negative), 'wave_catcher' (killed), 'range_breakout_short' (killed)
 # CEO 2026-08-25 — removed 'hl_copy_trader' (5T/8h 0% WR -$2.41. Copy delay = enters after move over. Requires confluence to fire.)
 STANDALONE_BYPASS_SIGNALS = (
+    'pump-chain', 'pump_chain',  # chain correlation — fires when coin is pumping, BTC flat irrelevant (2026-09-12)
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-v2-short',
     'range_breakout', 'range_breakout_short',
@@ -2312,6 +2313,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
     'trend_purity',  # EMA30 purity-based LONG/CRASH SHORT — directional momentum, works solo
     'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
+    'rr-struct-v2+',  # v2 LONG with falling-knife filter — works solo
     'trend-ignition',  # early-stage breakout — volume spike + compression, works solo
 )
 
@@ -3164,6 +3166,12 @@ RR_STRUCTURAL_BLOCK_ACCEL     = True   # block trades when price accel is agains
 RR_STRUCTURAL_RANGE_LONG_MAX  = 80     # block LONG when price > this % of 1h range (buying at top)
 RR_STRUCTURAL_RANGE_SHORT_MIN = 20     # block SHORT when price < this % of 1h range (selling at bottom)
 RR_STRUCTURAL_BB_SHORT_MIN    = 0.1    # block SHORT when bb_position < this (oversold = bounce risk)
+
+# ── RR Structural V2 LONG ───────────────────────────────────────────────────
+# rr_structural_v2_long.py — enhanced LONG signal with falling-knife filter
+RR_STRUCTURAL_V2_LONG_ENABLED       = True   # master kill-switch
+RR_STRUCTURAL_V2_MOM_FALLING_Z_MIN  = -2.0   # block LONG when momentum=falling AND z_score < this
+RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN = 0.0    # block LONG when momentum=falling AND bb_position < this
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
