@@ -61,3 +61,30 @@ Legacy signals (ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback
 
 ### Verification
 Pipeline active since 14:35 UTC. All 5 active signals profitable. 7d PnL +$1.42. No errors.
+
+## CEO Report — 2026-09-13 ~15:30 UTC
+
+### Diagnosis
+TURBO LONG loss (-3.83%, $0.14) at 93.3% of 1h range — buying the top. Current accel filter (+0.0028 > 0) passed because price was still rising. RSI 72.73 < 80 also passed. The only filter that catches "buying at resistance" is range position.
+
+### Root Cause
+rr_structural.py had no range position filter. Accel catches direction (price moving against trade) but not position (price at wrong end of range). TURBO: price rising but at 93.3% of 1h range — classic buy-the-top. INJ SHORT: at 6.3% of range — classic sell-the-bottom. Both passed all existing filters.
+
+### Fix Applied
+**CONFIG CHANGE: RR_STRUCTURAL_RANGE_LONG_MAX=80, RR_STRUCTURAL_RANGE_SHORT_MIN=20 added to hermes_constants.py.**
+
+**Code change: `_get_range_position()` added to rr_structural.py** — queries 1h high/low from candles_1h, returns position as 0-100%. Range filter added to detect() for both LONG and SHORT directions.
+
+**Impact analysis (17 rr-struct trades, 30d):**
+- Saves: TURBO LONG -3.83% (93.3% range → blocked), INJ SHORT -6.52% (6.3% range → blocked) = **$9.35 saved**
+- Costs: NEO LONG +30.98% (12% range → NOT blocked) = **$0 cost**
+- Net: +$9.35 if filter was active
+
+**Why NOT redundant with accel filter:**
+- TURBO: accel=+0.0028 (UP, aligned with LONG) → accel PASSES → but 93.3% range → range BLOCKS
+- Accel catches: price moving AGAINST direction
+- Range catches: price at WRONG END of range (even if moving in direction)
+- Complementary, not redundant.
+
+### Verification
+Import verified. Pipeline restart needed to load new code. Monitor next 24h for blocks in pipeline.log.
