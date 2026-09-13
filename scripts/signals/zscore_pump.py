@@ -429,7 +429,7 @@ def scan_zscore_pump_signals(prices_dict: dict) -> int:
             if sid:
                 added += 1
                 # Set cooldown: don't re-fire for COOLDOWN_BARS bars (~10 minutes)
-                from signal_gen import set_cooldown
+                from signal_schema import set_cooldown
                 set_cooldown(token, direction, hours=ZSCORE_PUMP_COOLDOWN_BARS / 60.0)
                 _log(f"  {direction:5s}-zscore-pump {token:8s} z={sig['z_score']:+.3f} "
                      f"conf={confidence:.0f}% lookback={lookback} [{source}]")

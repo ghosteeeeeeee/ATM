@@ -360,7 +360,7 @@ def scan_mtp_zscore_signals(prices_dict: dict) -> int:
             if sid:
                 added += 1
                 # Set cooldown: don't re-fire for MTP_ZSCORE_COOLDOWN_BARS bars (~20 min)
-                from signal_gen import set_cooldown
+                from signal_schema import set_cooldown
                 set_cooldown(token, direction, hours=int(MTP_ZSCORE_COOLDOWN_BARS / 60.0))
                 _log(f"  {direction:5s}-mtp-zscore {token:8s} "
                      f"z={sig['z_score']:+.3f} (S:{sig['z_short']:+.2f} M:{sig['z_mid']:+.2f} L:{sig['z_long']:+.2f}) "

@@ -530,7 +530,7 @@ def run(prices_dict: Dict = None) -> int:
             if result:
                 added += 1
                 # Set cooldown to prevent duplicate signals
-                from signal_gen import set_cooldown
+                from signal_schema import set_cooldown
                 set_cooldown(token, sig['direction'], hours=COOLDOWN_BARS / 60.0)
 
     return added
