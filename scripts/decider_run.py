@@ -1643,6 +1643,40 @@ def execute_trade(token, direction, price, confidence, source,
     # FIX 2026-09-06: Cap at HL_MIN after multipliers — amplitude/fav mults can reduce below minimum
     _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
+    # ── SL Zone position sizing: reduce size when death zone ahead ────────────
+    try:
+        from sl_zones import zone_adjusted_size
+        _zone_atr = 0
+        try:
+            import sqlite3 as _sqlite3_zone
+            from paths import CANDLES_DB as _CANDLES_DB_ZONE
+            _conn_zone_sz = _sqlite3_zone.connect(_CANDLES_DB_ZONE, timeout=5)
+            _cur_zone_sz = _conn_zone_sz.cursor()
+            _cur_zone_sz.execute("""
+                SELECT open, high, low, close FROM candles_1h
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT 20
+            """, (token.upper(),))
+            _atr_rows_zone = _cur_zone_sz.fetchall()
+            _cur_zone_sz.close()
+            _conn_zone_sz.close()
+            if len(_atr_rows_zone) >= 15:
+                _trs_zone = []
+                for i in range(1, len(_atr_rows_zone)):
+                    _h, _l, _pc = _atr_rows_zone[i][1], _atr_rows_zone[i][2], _atr_rows_zone[i-1][3]
+                    _trs_zone.append(max(_h - _l, abs(_h - _pc), abs(_l - _pc)))
+                _zone_atr = sum(_trs_zone[-14:]) / 14
+        except Exception:
+            pass
+        _zone_adjusted = zone_adjusted_size(_trade_size, token, direction, price, _zone_atr)
+        if _zone_adjusted < _trade_size:
+            log(f"  [SL-ZONE-SIZE] {token} {direction}: size reduced from {_trade_size:.2f} to {_zone_adjusted:.2f} (death zone ahead)")
+            _trade_size = _zone_adjusted
+    except ImportError:
+        pass  # sl_zones not available
+    except Exception:
+        pass  # non-fatal
+
     # DEBUG: Trace open-skies trade opening
     if 'open-skies' in (source or ''):
         log(f"  [DEBUG-TRADE] open-skies: token={token} dir={cmd_side} price={price} "
