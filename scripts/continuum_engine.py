@@ -1054,8 +1054,8 @@ class ContinuumEngine:
             else:
                 self._sustained_high_score_count = 0
             
-            # Require 20+ ticks (10 minutes) of 95+ score
-            if self._sustained_high_score_count >= 20:
+            # Require 30+ ticks (15 minutes) of 95+ score
+            if self._sustained_high_score_count >= 30:
                 # Verify volume is still valid at Phase 5
                 if state.volume_regime in ('HIGH', 'PARABOLIC'):
                     self.entry_phase = 5

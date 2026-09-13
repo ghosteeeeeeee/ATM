@@ -142,7 +142,7 @@ function render() {
          c.entry_phase === 6 ? '🟢 ENTRY' : 
          c.entry_phase === 5 ? '⏳ SUSTAINED' : 
          c.entry_phase === 4 ? '📊 VOL CONFIRMED' : ''),
-    stat('Sustained', (c._sustained_high_score_count || 0) + '/20', 'ticks @ 95+'),
+    stat('Sustained', (c._sustained_high_score_count || 0) + '/30', 'ticks @ 95+'),
     stat('Ticks', data.stats.total_ticks || 0),
   ];
   document.getElementById('stats-bar').innerHTML = statsHtml.join('');
