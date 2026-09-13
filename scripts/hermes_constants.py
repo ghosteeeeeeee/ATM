@@ -2054,7 +2054,7 @@ BREAKOUT_LONG_VOL_MULT = 2.0            # volume must be > 2x average
 BREAKOUT_LONG_CONF_BASE = 75            # base confidence
 BREAKOUT_LONG_CONF_FLOOR = 60           # min confidence
 BREAKOUT_LONG_CONF_CAP = 88             # max confidence
-BREAKOUT_LONG_COOLDOWN_HOURS = 3        # per token cooldown
+BREAKOUT_LONG_COOLDOWN_HOURS = 0.25     # 15 min cooldown between signals per token
 
 # ── accel-300-v3 SHORT params (anti-bottom-catch) ────────────────────────────
 ACCEL_300_V3_SHORT_ENABLED     = False   # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR +$1.52 but 7d 4T -4.21%. NEVER_REENABLE.
