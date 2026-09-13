@@ -1595,3 +1595,11 @@
   WHY: trend_purity+ LONG 8T/24h 12.5% WR -$1.22, all NEUTRAL regime. Brain_auditor 0.15x EXTREME multiplier didn't help — trades are NEUTRAL, not EXTREME. Combo signals unaffected.
   BY: auto_1hr
   FILES: scripts/hermes_constants.py
+
+[2026-09-13 03:00 UTC] auto_1hr: NO CHANGE — system borderline
+  24h: 24T 54.2%WR -$0.05 | 1T/1h, 6 open
+  Exit: atr_sl_hit 11T +$0.45 (46%), profit-monster-trail 5T +$0.28
+  Signal: rr-struct+ best (+$0.67), trend_purity+ worst (-$0.92, 14.3%WR)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: trend_purity+ EXTREME penalty active since Sep 12, needs 20+ trades to evaluate. cut-loser-CL-T1 fix pending.
+  BY: auto_1hr

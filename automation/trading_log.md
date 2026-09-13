@@ -3119,3 +3119,38 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - rr_engine_support_br: 3T -$0.70 — worst avg PnL exit reason
 
 **Open Questions:** None
+
+## [2026-09-13 03:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.69)
+**24h:** 24T 54.2%WR -$0.05 | 6 open positions
+
+| Trade | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| NEO | rr-struct+ | LONG | atr_sl_hit | +$0.69 |
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.45 (46%, avg +$0.041)
+- profit-monster-trail: 5T +$0.28
+- rr_engine_resistance: 5T -$0.25
+- rr_engine_support_br: 2T -$0.40
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h by Signal:**
+- trend_purity+: 7T 14.3%WR -$0.92 (worst — EXTREME penalty active, needs more data)
+- pullback-entry-: 6T 50%WR $0.00
+- rr-struct+: 5T 80%WR +$0.67 (best)
+- rr-struct-: 4T 75%WR -$0.02
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour
+- Trade freq: 1/hr, healthy
+- atr_sl_hit at 46% but avg +$0.04 — winners outpace SL losses, not too tight
+- trend_purity+ 14.3%WR already has EXTREME penalty from Sep 12, needs 20+ trades to evaluate
+- System borderline (-$0.05/24h) but within normal range
+
+**Open Questions:**
+- trend_purity+ still bleeding despite EXTREME penalty — monitor next hour
+- cut-loser-CL-T1 activation delay fix still pending (brain_auditor Sep 12)

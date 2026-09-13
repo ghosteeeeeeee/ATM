@@ -219,11 +219,21 @@
         for (const rec of recs.slice(0, 20)) {
             const drift = rec.drift_findings || [];
             const creative = rec.creative_improvements || [];
+            const ts = rec.trade_summary_24h || {};
             const category = creative.length ? 'creative' : (drift.length ? 'critical' : 'success');
+            
+            let tradeInfo = '';
+            if (ts.trades || ts.win_rate || ts.pnl !== undefined) {
+                const pnlColor = (ts.pnl || 0) >= 0 ? '#00ff88' : '#ff4444';
+                tradeInfo = `<div class="detail">
+                    📊 ${ts.trades || 0} trades · <span style="color:${pnlColor}">${ts.win_rate || '?'}% WR · $${typeof ts.pnl === 'number' ? ts.pnl.toFixed(2) : ts.pnl || '0'}</span>
+                </div>`;
+            }
+            
             html += `<div class="rec-item ${category}">
-                <div class="timestamp">${esc(rec.timestamp)}</div>
-                <div class="title">${creative.length ? '💡 ' + creative.length + ' creative ideas' : drift.length ? '⚠️ ' + drift.length + ' drift findings' : '✅ System looks healthy'}</div>
-                <div class="detail">${esc(JSON.stringify(rec.trade_summary_24h || {}).slice(0, 200))}</div>
+                <div class="timestamp">${esc(rec.timestamp?.slice(0, 16) || '')}</div>
+                <div class="title">${creative.length ? '💡 ' + creative.length + ' creative ideas' : drift.length ? '⚠️ ' + drift.length + ' drift findings' : '✅ System healthy'}</div>
+                ${tradeInfo}
             </div>`;
         }
         el.innerHTML = html;
@@ -243,7 +253,7 @@
             const isImplemented = item.status === 'implemented';
             const isBoosted = item.status === 'boosted';
             const rejectBtn = (!isRejected && !isImplemented && !isBoosted) ? 
-                `<button class="reject-btn" onclick="rejectIdea(${idx})" title="Reject this idea">✕</button>` : '';
+                `<button class="reject-btn" onclick="rejectIdea(${idx})" title="Reject this idea">👎</button>` : '';
             const boostBtn = (!isRejected && !isImplemented && !isBoosted) ?
                 `<button class="boost-btn" onclick="boostIdea(${idx})" title="Boost — CEO should implement this">👍</button>` : '';
             html += `<div class="creative-item" style="${isRejected ? 'opacity:0.4;' : ''}${isBoosted ? 'border-color:#00ff88;' : ''}">
@@ -450,6 +460,10 @@
         
         let html = '';
         for (const c of changes.slice(0, 15)) {
+            // Skip "no change" entries
+            if (c.before === 'N/A' && c.after === 'N/A') continue;
+            if (c.change && c.change.toLowerCase().includes('no config change')) continue;
+            
             const typeClass = c.type === 'kill' ? 'critical' : c.type === 'creative' ? 'creative' : 'success';
             const icon = c.type === 'kill' ? '💀' : c.type === 'creative' ? '💡' : c.type === 'config' ? '⚙️' : '🔧';
             html += `<div class="rec-item ${typeClass}">

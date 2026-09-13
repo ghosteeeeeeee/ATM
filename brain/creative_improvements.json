@@ -5,9 +5,11 @@
     "rationale": "Data shows SHORT signals lose -.13 net in NORMAL (13 winners +$0.54, 13 losers -$1.67). But they WIN in EXTREME (+$4.35) and HIGH (+$3.40). Filtering SHORT in NORMAL could save ~$1.13/7d without affecting EXTREME/HIGH wins.",
     "expected_impact": "+$1.0-1.5/7d (removing losing trades in NORMAL)",
     "category": "regime creative",
-    "status": "suggested",
+    "status": "rejected",
     "risk": "low — only blocks SHORT in one regime, EXTREME/HIGH unaffected",
-    "impact_on_winners": "Checked: SHORT winners in NORMAL are small (+$0.54 total) vs losses ($1.67). Net positive to filter."
+    "impact_on_winners": "Checked: SHORT winners in NORMAL are small (+$0.54 total) vs losses ($1.67). Net positive to filter.",
+    "rejected_at": "2026-09-13T05:11:46.263553+00:00",
+    "reject_reason": "I don't think this is a good idea, we'd be cutting tooo many trades out"
   },
   {
     "date": "2026-09-12T13:25:47.688058Z",

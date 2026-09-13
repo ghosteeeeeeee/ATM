@@ -274,8 +274,10 @@ EOF
 # Append to brain/creative_improvements.json
 ```
 
-### Log config changes to (EVERY change you make):
+### Log config changes to (ONLY when you actually change something):
 ```bash
+# ⚠️ DO NOT log "no change" or "no config change" entries!
+# ONLY log when you actually modify a file.
 # Append to brain/changes_log.json
 # Format each change as:
 python3 -c "

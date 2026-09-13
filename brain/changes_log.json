@@ -45,17 +45,6 @@
     "after": "RSI_MIN=35, RSI_FLOOR=30 for SHORT"
   },
   {
-    "timestamp": "2026-09-13T00:32:28.842742+00:00",
-    "agent": "brain_auditor",
-    "change": "No config change — system profitable, legacy ages out tomorrow",
-    "type": "audit",
-    "file": "none",
-    "before": "N/A",
-    "after": "N/A",
-    "rationale": "24h 65.5% WR +$0.58, 7d 56.9% WR +$1.02. Legacy -$3.59/7d ages out Sep 13. Don't fix what isn't broken.",
-    "impact": "Monitoring only"
-  },
-  {
     "timestamp": "2026-09-13T03:30:00Z",
     "agent": "brain_auditor",
     "change": "Increase Trend_Purity EXTREME multiplier from 0.3x to 0.15x",

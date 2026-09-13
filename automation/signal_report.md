@@ -1,78 +1,83 @@
 # Signal Performance Report
-**Generated:** 2026-09-12 ~23:30 UTC | **Period:** Last 6h + 24h
-
-## Overall Stats (24h)
-- **Total closed trades:** 29
-- **Overall WR:** 62.1% | **PnL:** +$0.63
+**Generated:** 2026-09-13 12:00 UTC | **Period:** Last 6h + 24h
 
 ---
 
-## REGIME BREAKDOWN (24h)
+## 6h Performance
 
-| Regime | Trades | WR | PnL |
-|--------|--------|-----|------|
-| EXTREME | 13 | 69.2% | +$0.67 |
-| HIGH | 12 | 50.0% | -$0.52 |
-| NORMAL | 4 | 100% | +$0.43 |
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| trend_purity+ | LONG | 3 | 0.0% | -0.75 |
 
-**Key finding:** HIGH regime is the only losing regime. EXTREME and NORMAL are profitable.
+No other signals had 2+ trades in 6h.
 
 ---
 
-## EXECUTED KILLS (regime-based)
+## 24h Performance
 
-No blanket kills — all signals have mixed performance across regimes. Applied **HIGH regime blocks** instead:
-
-| Signal | Dir | WR | PnL | Regime | Action |
-|--------|-----|-----|-----|--------|--------|
-| rr-struct- | SHORT | 33% (HIGH) | -$0.25 | HIGH | BLOCKED 0.0x in HIGH |
-| pullback-entry- | SHORT | 0% (HIGH) | -$0.36 | HIGH | BLOCKED 0.0x in HIGH (was 0.7x, upgraded to 0.0x) |
-
-Both signals still trade in EXTREME/NORMAL where they're profitable.
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| rr-struct+ | LONG | 5 | 80.0% | +0.67 |
+| pullback-entry- | SHORT | 6 | 50.0% | 0.00 |
+| rr-struct- | SHORT | 4 | 75.0% | -0.02 |
+| trend_purity+ | LONG | 7 | 14.3% | -0.92 |
 
 ---
 
-## BOOST CANDIDATES
+## ACTIONS TAKEN
 
-| Signal | Dir | 24h WR | 24h PnL | Trades | Action |
-|--------|-----|--------|---------|--------|--------|
-| rr-struct+ | LONG | 83.3% | +$0.07 | 6 | Monitor — strong but low volume |
-
----
-
-## WINNERS (24h)
-
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| rr-struct+ | LONG | 83.3% | +$0.07 | 6 | ✅ Keep |
-| mover+ | LONG | 100% | +$0.31 | 1 | ✅ Keep (low count) |
-| open-skies+,trend_purity+ | LONG | 100% | +$0.21 | 1 | ✅ Keep (low count) |
-| trend_purity+,volume-breakout-long+ | LONG | 100% | +$0.15 | 1 | ✅ Keep (low count) |
+**REGIME BLOCK EXECUTED:**
+- `trend_purity+` removed from HIGH regime whitelist in `volatility_gate_v2.py`
+- Added `Trend_Purity: 0.0` to (`HIGH`, `*`) VOL_PHASE_MULTS
+- Rationale: 33.3% WR, -$0.50 PnL in HIGH (3 trades). Wins in EXTREME (57.1%, -$0.01 breakeven).
+- **Not a blanket kill** — signal remains active in NORMAL (primary) and EXTREME (penalized 0.15x)
 
 ---
 
-## LOSERS / WATCH LIST (24h)
+## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | WR | PnL | Trades | Status | Note |
-|--------|-----|-----|-----|--------|--------|------|
-| rr-struct- | SHORT | 50% | -$0.20 | 4 | HIGH blocked | 33% WR in HIGH, 100% in NORMAL |
-| trend_purity+ | LONG | 50% | -$0.15 | 8 | Watch | 63.6% in EXTREME, dragged by other regimes |
-| pullback-entry- | SHORT | 50% | +$0.05 | 6 | HIGH blocked | 0% in HIGH, 100% in NORMAL/EXTREME |
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| rr-struct+ | LONG | 5 | 80.0% | +0.67 | ACTIVE |
 
 ---
 
-## SIGNAL INVERSIONS (24h)
+## LOSERS (WR < 30%, PnL < -$0.10)
+
+| Signal | Dir | Trades | WR | PnL | Action |
+|--------|-----|--------|-----|-----|--------|
+| trend_purity+ | LONG | 7 | 14.3% | -0.92 | Regime block (HIGH) — wins in EXTREME |
+
+---
+
+## WATCH LIST (marginal)
+
+| Signal | Dir | Trades | WR | PnL | Note |
+|--------|-----|--------|-----|-----|------|
+| rr-struct- | SHORT | 4 | 75.0% | -0.02 | High WR but INJ loss (-$0.25) in HIGH. Already blocked in HIGH via VOL_PHASE_MULTS. |
+| pullback-entry- | SHORT | 6 | 50.0% | 0.00 | Breakeven. Regime blocks already in place for losing regimes. |
+
+---
+
+## SIGNAL INVERSIONS
 
 **No inversions found.** All signals respect their direction labels.
 
 ---
 
-## CHANGES MADE
+## REGIME PERFORMANCE (trend_purity+ LONG)
 
-1. **market_phase_gate.py** — Added `R2_Structural` family to FAMILY_MAP (maps rr-struct variants)
-2. **volatility_gate_v2.py** — BLOCKED `R2_Structural` 0.0x in HIGH regime (rr-struct- SHORT: 33% WR, 3 trades, -$0.25)
-3. **volatility_gate_v2.py** — Upgraded `Pullback_Entry_Short` from 0.7x to 0.0x in HIGH regime (0% WR, 3 trades, -$0.36)
+| Regime | Trades | Wins | WR | PnL |
+|--------|--------|------|-----|-----|
+| EXTREME | 14 | 8 | 57.1% | -0.01 |
+| HIGH | 3 | 1 | 33.3% | -0.50 |
+
+**Decision:** Block HIGH only. EXTREME is breakeven, NORMAL is primary.
 
 ---
 
-*Report auto-generated. Next report: ~6h from now.*
+## NOTES
+
+- Pullback-entry- SHORT is exactly breakeven — regime blocks already active for losing regimes (NORMAL blocked at 0.0x per line 239).
+- rr-struct- SHORT has 75% WR but -$0.25 INJ loss in HIGH wiped gains. Already blocked in HIGH (line 249).
+- No signals hit kill threshold (WR < 30% with 5+ trades AND net PnL < -$0.10 AND active > 24h).

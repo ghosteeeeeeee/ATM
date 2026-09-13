@@ -131,7 +131,8 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
-        'trend_purity+', 'trend_purity-',  # trend following — 100% WR in HIGH (1T), needs data
+        # trend_purity+ REMOVED from HIGH — 33.3% WR, -$0.50 (3 trades). Wins in EXTREME (57.1%).
+
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -252,6 +253,7 @@ VOL_PHASE_MULTS = {
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
         # Pump_Flow removed — SHORT wins 61.5% WR in HIGH, LONG wins 64.7% WR in HIGH
+        'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
     },
 }
 
