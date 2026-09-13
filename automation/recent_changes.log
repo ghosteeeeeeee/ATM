@@ -1,3 +1,11 @@
+[2026-09-13 09:09 UTC] auto_1hr: NO CHANGE — system break-even
+  24h: 21T 61.9%WR -$0.02 | 2T/1h, 3 open | All NORMAL
+  Exit: atr_sl_hit 11T +$0.23 (profitable), profit-monster-trail 4T +$0.17
+  Signal: rr-struct+ best (+$0.50, 83%WR), trend_purity+ worst (-$0.91, legacy disabled)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: trend_purity+ -$0.91 legacy aging out, active signals profitable
+  BY: auto_1hr
+
 [2026-09-13 07:15 UTC] auto_1hr: NO CHANGE — quiet hour, no kill triggers
   24h: 20T 60%WR -$0.08 | 0T/1h, 5 open | HIGH/NORMAL/EXTREME
   Exit: atr_sl_hit 10T +$0.37 (profitable), rr_engine_support_br 2T -$0.40 (worst)
