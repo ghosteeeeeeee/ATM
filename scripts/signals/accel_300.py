@@ -655,11 +655,11 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
     from hermes_constants import ACCEL_300_ENABLED, ACCEL_300_TOKEN_ALLOWLIST
     if not ACCEL_300_ENABLED:
         return 0
-    from signal_schema import add_signal, get_cooldown, price_age_minutes
+    from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
     from position_manager import get_open_positions as _get_open_pos
     from signals.fast_momentum import (
         recent_trade_exists, is_delisted, SHORT_BLACKLIST,
-        MIN_TRADE_INTERVAL_MINUTES, set_cooldown
+        MIN_TRADE_INTERVAL_MINUTES
     )
 
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
