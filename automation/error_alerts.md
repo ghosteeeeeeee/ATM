@@ -385,3 +385,15 @@
 - **[WARN]** 45% tokens stale (109/241) — price collector may need tuning
 - **[WARN]** 11 failed services — mostly non-critical (5m-candle, away-detector, better-coder, etc.)
 - **AUTO-FIX**: Disabled hermes-metrics.service — missing script metrics_collector.py, 4.8MB error log spam cleared
+
+## Error Alerts — 2026-09-13 22:55 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-13 23:55 UTC
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

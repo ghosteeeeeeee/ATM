@@ -3730,3 +3730,37 @@ BY: auto_1hr
 
 **Open Questions:**
 - pnl_pct values are wildly incorrect (showing -781%, +3098% etc) — display bug, pnl_usdt is accurate. Worth investigating pnl_pct calculation.
+
+## [2026-09-13 23:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W, 1L) | 34T/24h ~56%WR +$0.07 | 7 open
+
+**Last Hour:**
+- ONDO ema300-dip-long LONG: -$0.15 (atr_sl_hit)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 20T +$0.06 (56%, avg +$0.003 — breakeven)
+- profit-monster-trail: 7T +$0.51 (19%, avg +$0.073 — best)
+- rr_engine_resistance: 4T -$0.07 (11%)
+- rr_engine_support_br: 3T -$0.51 (8%, avg -$0.170 — worst)
+
+**24h by Signal:**
+- rr-struct+ LONG: 9T 67%WR +$0.52 (best)
+- pump-chain+ LONG: 5T 80%WR +$0.39
+- pullback-entry- SHORT: 9T 56%WR +$0.13
+- rr-struct- SHORT: 3T 33%WR -$0.22
+- trend_purity+ LONG: 3T 0%WR -$0.75 (legacy, already disabled)
+
+**Open Trades (7):** ETH rr-struct+ 6h (+$0.11), FOGO pullback- 3.8h, BIGTIME pullback- 3.6h, GMT pump-chain- 3.2h, ONDO ema300-dip 1.4h, ACE pullback- 0.8h, ENA pump-chain+ 0.6h
+
+**Changes:** None — no kill triggers, system stable, quiet hour
+
+**No Change Needed:**
+- Kill check: 0 signals with 3+ trades and 0% WR last hour
+- trend_purity+ 0%WR legacy aging, 0 recent trades — natural attrition
+- Trade freq: 0T/hr — below threshold
+- All active signals net positive
+
+**Open Questions:** None
+
+BY: auto_1hr

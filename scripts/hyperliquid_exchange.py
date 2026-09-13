@@ -122,10 +122,6 @@ _HL_BLOCKLIST = {
     # K-tokens: meme coin forks. In HL universe but regime blindspots — pollute
     # the signals queue and block legitimate tokens. Added 2026-04-06.
     'KPEPE', 'KSHIB', 'KLUNC', 'KSHIBA', 'KLOKI', 'KNEIRO', 'KFLOKI', 'KBONK',
-    # Other confirmed non-tradable
-    'WCT', 'SAGA', 'GOAT', 'IOTA', 'AZTEC',
-    'TRX', 'RESOLV', 'HEMI', 'GMX', 'ALGO', 'HYPER',
-    'SUPER',  # regime blindspot + HL blindspot
 }
 
 def is_delisted(token: str) -> bool:

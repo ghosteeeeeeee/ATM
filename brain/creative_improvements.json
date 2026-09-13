@@ -413,5 +413,23 @@
     "category": "kill threshold",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-13T23:33:38.396777+00:00",
+    "idea": "pullback-entry- SHORT exit improvement: CLOSE-above-resistance filter",
+    "rationale": "pullback-entry- SHORT 46T/7d 65.2%WR +$2.87 STAR signal. 18/46 exits at rr_engine_resistance 33.3%WR -$0.92. False breakout exits where wick touches resistance but price closes below. Signal entry excellent — EXIT is the problem.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "exit improvement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T23:33:38.396792+00:00",
+    "idea": "SHORT regime confidence boost in EXTREME",
+    "rationale": "7d SHORT EXTREME 136T 59.6%WR +$3.64 dominant. SHORT NORMAL 75T 50.7%WR -$1.97 drag. Add SHORT confidence +10% EXTREME, -5% NORMAL. Single variable.",
+    "expected_impact": "+$0.30-0.80/7d",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest",
+    "risk": "medium"
   }
 ]

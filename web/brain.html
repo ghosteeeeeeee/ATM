@@ -255,16 +255,25 @@
         document.getElementById('creative-count').textContent = items?.length || 0;
         if (!items || !items.length) { el.innerHTML = '<div class="empty">No creative ideas yet. The brain generates at least 1 per hourly run.</div>'; return; }
         
+        // Sort: newest first, rejected to bottom
+        const sorted = [...items].sort((a, b) => {
+            const aReject = a.status === 'rejected' ? 1 : 0;
+            const bReject = b.status === 'rejected' ? 1 : 0;
+            if (aReject !== bReject) return aReject - bReject; // rejected goes bottom
+            return (b.date || '').localeCompare(a.date || ''); // newest first
+        });
+        
         let html = '';
-        items.slice(0, 15).forEach((item, idx) => {
+        sorted.slice(0, 15).forEach((item) => {
+            const origIdx = items.indexOf(item);
             const statusClass = `status-${item.status || 'suggested'}`;
             const isRejected = item.status === 'rejected';
             const isImplemented = item.status === 'implemented';
             const isBoosted = item.status === 'boosted';
             const rejectBtn = (!isRejected && !isImplemented && !isBoosted) ? 
-                `<button class="reject-btn" onclick="rejectIdea(${idx})" title="Reject this idea">👎</button>` : '';
+                `<button class="reject-btn" onclick="rejectIdea(${origIdx})" title="Reject this idea">👎</button>` : '';
             const boostBtn = (!isRejected && !isImplemented && !isBoosted) ?
-                `<button class="boost-btn" onclick="boostIdea(${idx})" title="Boost — CEO should implement this">👍</button>` : '';
+                `<button class="boost-btn" onclick="boostIdea(${origIdx})" title="Boost — CEO should implement this">👍</button>` : '';
             html += `<div class="creative-item" style="${isRejected ? 'opacity:0.4;' : ''}${isBoosted ? 'border-color:#00ff88;' : ''}">
                 <div class="idea">${esc(item.idea)}</div>
                 <div class="rationale">${esc(item.rationale)}</div>
@@ -464,21 +473,27 @@
     async function loadChanges() {
         const changes = await fetchJSON(`${API}/changes`);
         const el = document.getElementById('changes-list');
-        document.getElementById('changes-count').textContent = changes?.length || 0;
-        if (!changes || !changes.length) { el.innerHTML = '<div class="empty">No changes logged yet.</div>'; return; }
+        if (!changes || !changes.length) { el.innerHTML = '<div class="empty">No changes logged yet.</div>'; document.getElementById('changes-count').textContent = '0'; return; }
+        
+        // Filter out "no change" entries
+        const filtered = changes.filter(c => {
+            if (c.before === 'N/A' && c.after === 'N/A') return false;
+            if (c.change && c.change.toLowerCase().includes('no config change')) return false;
+            return true;
+        });
+        document.getElementById('changes-count').textContent = filtered.length;
+        
+        // Sort: newest first
+        const sorted = [...filtered].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
         
         let html = '';
-        for (const c of changes.slice(0, 15)) {
-            // Skip "no change" entries
-            if (c.before === 'N/A' && c.after === 'N/A') continue;
-            if (c.change && c.change.toLowerCase().includes('no config change')) continue;
-            
+        for (const c of sorted.slice(0, 15)) {
             const typeClass = c.type === 'kill' ? 'critical' : c.type === 'creative' ? 'creative' : 'success';
             const icon = c.type === 'kill' ? '💀' : c.type === 'creative' ? '💡' : c.type === 'config' ? '⚙️' : '🔧';
             html += `<div class="rec-item ${typeClass}">
-                <div class="timestamp">${esc(c.timestamp || '')} · ${esc(c.agent || '')}</div>
+                <div class="timestamp">${esc((c.timestamp || '').slice(0, 16))} · ${esc(c.agent || '')}</div>
                 <div class="title">${icon} ${esc(c.change || '')}</div>
-                ${c.before && c.after ? `<div class="detail"><span style="color:#ff6b6b">${esc(c.before)}</span> → <span style="color:#00ff88">${esc(c.after)}</span></div>` : ''}
+                ${c.before && c.after && c.before !== 'N/A' ? `<div class="detail"><span style="color:#ff6b6b">${esc(c.before)}</span> → <span style="color:#00ff88">${esc(c.after)}</span></div>` : ''}
                 ${c.rationale ? `<div class="detail">💡 ${esc(c.rationale)}</div>` : ''}
                 ${c.impact ? `<div class="detail">📈 ${esc(c.impact)}</div>` : ''}
             </div>`;
