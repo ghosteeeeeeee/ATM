@@ -160,6 +160,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
+        'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol

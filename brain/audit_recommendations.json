@@ -1,163 +1,94 @@
 {
-    "timestamp": "2026-09-12T23:00:00Z",
-    "session_brain_stats": {
-        "status": "EMPTY — needs --ingest",
-        "note": "Session brain FAISS index is empty. All insights derived from CURRENT.md, kanban, and live DB queries."
-    },
-    "trade_summary_24h": {
-        "total_trades": 34,
-        "winners": 22,
-        "losers": 12,
-        "wr_pct": 64.7,
-        "pnl": 0.39,
-        "top_winner": "ACE LONG mover+ $0.31",
-        "top_loser": "INJ LONG rr-struct+ -$0.30",
-        "exit_analysis": {
-            "profit-monster-trail": "13T 100%WR +$1.05 (carries system)",
-            "atr_sl_hit": "10T 60%WR +$0.15",
-            "rr_engine_resistance": "5T 40%WR -$0.23 (SHORT structural)",
-            "cut-loser-CL-T1": "3T 0%WR -$0.48 (stale entries)",
-            "rr_engine_support_br": "3T 33%WR -$0.12"
-        }
-    },
-    "trade_summary_7d": {
-        "total_trades": 337,
-        "pnl": 2.44,
-        "regime_breakdown": {
-            "EXTREME": "137T 58.4%WR +$2.84 (best)",
-            "HIGH": "123T 56.1%WR -$0.26 (flat)",
-            "NORMAL": "74T 52.7%WR -$2.26 (worst)",
-            "FLAT": "2T 100%WR +$0.36"
-        },
-        "stale_vs_fresh": {
-            "stale": "86T 57.0%WR -$1.19",
-            "fresh": "250T 56.4%WR +$2.07",
-            "insight": "Same WR but stale loses 5x more per trade. Stale entries enter after moves already happened."
-        }
-    },
-    "drift_findings": [
-        {
-            "finding": "MIN_HOLD_MINUTES hard block — DISCUSSED BUT NEVER IMPLEMENTED",
-            "sessions": "brain_auditor 05:00, 14:30, 17:30, 22:00 UTC Sep 12",
-            "current_state": "No hard staleness block exists. staleness_mult decays confidence to 0 at 10min but signals can survive via survival_bonus + other multipliers. Stale signals still fire.",
-            "impact": "86 stale trades/7d = -$1.19. cut-loser-CL-T1 on stale = -$2.75/7d. Would save ~$0.50-1.00/7d.",
-            "recommended_action": "Add MAX_SIGNAL_AGE_MINUTES = 3 to hermes_constants.py + hard skip in signal_compactor.py compaction loop",
-            "confidence": "HIGH"
-        },
-        {
-            "finding": "SHORT_RSI_FLOOR implemented and working",
-            "sessions": "brain_auditor 19:30 UTC Sep 12",
-            "current_state": "SHORT_RSI_FLOOR=25 in hermes_constants.py, check in signal_compactor.py:2616. Zero SHORT trades with RSI<25 in 24h.",
-            "impact": "Blocks extreme oversold SHORT entries. No false blocks in 24h data.",
-            "status": "VERIFIED WORKING"
-        },
-        {
-            "finding": "trend_purity+ EXTREME penalty applied but needs more data",
-            "sessions": "brain_auditor 15:30 UTC Sep 12",
-            "current_state": "VOL_PHASE_MULTS penalty for trend_purity in EXTREME added at 15:30. Only 3 trades since — too early to evaluate.",
-            "impact": "trend_purity+ EXTREME: 8T/7d 50%WR -$0.15. Penalty should reduce false positives.",
-            "status": "NEEDS 20+ TRADES TO VERIFY"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "Stale entries = #1 systematic drag",
-            "frequency": "Flagged in 4+ brain_auditor runs on Sep 12",
-            "data": "86 stale/7d -$1.19 vs 250 fresh/7d +$2.07. Same WR (~57%) but stale loses 5x more per trade.",
-            "root_cause": "No hard staleness block. Signals with staleness_mult > 0 survive compaction and fire. Enter after moves already happened → immediate loss.",
-            "fix_status": "NOT IMPLEMENTED despite multiple recommendations"
-        },
-        {
-            "problem": "cut-loser-CL-T1 = 0% WR exit",
-            "frequency": "55T/7d, 0% WR, -$8.29",
-            "data": "Every single cut-loser exit is a loss (by design). But 18/55 are stale entries that never had a chance.",
-            "root_cause": "Stale entries enter, immediately go negative, trigger cut-loser threshold at -0.6%.",
-            "fix_status": "Partially addressed (Sep 8 fix reduced frequency). Staleness block would eliminate root cause."
-        },
-        {
-            "problem": "NORMAL regime -$2.26/7d",
-            "frequency": "74T/7d, 52.7%WR",
-            "data": "Worst regime by far. EXTREME +$2.84, HIGH -$0.26. NORMAL drags system.",
-            "root_cause": "Likely choppy price action in NORMAL — signals fire but moves are too small for profit-monster-trail to capture.",
-            "fix_status": "MONITORING — no fix applied yet"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "MAX_SIGNAL_AGE_MINUTES hard block",
-            "discussed": "Sep 12 multiple runs",
-            "impact": "HIGH — would save ~$0.50-1.00/7d",
-            "effort": "LOW — ~10 lines in signal_compactor.py + 1 constant"
-        },
-        {
-            "item": "Time-of-day penalty (03:00-05:00 UTC)",
-            "discussed": "Sep 12 22:00 run",
-            "data": "03:00 UTC 33.3%WR -$0.90, 05:00 UTC 44.4%WR -$0.90 (7d)",
-            "impact": "MEDIUM — would save ~$0.30-0.50/7d",
-            "effort": "LOW — time_block_mult already exists in signal_compactor, just needs hourly tiers"
-        },
-        {
-            "item": "Session brain ingestion",
-            "discussed": "Multiple sessions",
-            "impact": "MEDIUM — enables cross-session insight retrieval",
-            "effort": "LOW — run session_brain.py --ingest"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-12T23:00:00Z",
-            "idea": "Stale signal hard block at 3 minutes",
-            "rationale": "Stale entries have same WR as fresh (57% vs 56.4%) but 5x worse PnL per trade. The staleness_mult decay to 0 at 10min is too lenient — signals survive via survival_bonus. A hard block at 3 min would cut the worst entries while preserving fresh signals. cut-loser-CL-T1 on stale = -$2.75/7d, most would be blocked.",
-            "expected_impact": "+$0.50-1.00/7d (conservative: blocks 30% of stale trades, preserves all fresh trades)",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add MAX_SIGNAL_AGE_MINUTES=3 to hermes_constants.py. In signal_compactor.py compaction loop (~line 1680), add: if age_m > MAX_SIGNAL_AGE_MINUTES: skip with log. Verify no winning trades have age>3min."
-        },
-        {
-            "date": "2026-09-12T23:00:00Z",
-            "idea": "Time-of-day confidence penalty for 03:00-06:00 UTC",
-            "rationale": "03:00 UTC: 33.3%WR -$0.90, 05:00 UTC: 44.4%WR -$0.90 (7d). These hours have consistently poor performance across multiple runs. The time_block_mult mechanism already exists in signal_compactor — just needs hourly tiers.",
-            "expected_impact": "+$0.30-0.50/7d",
-            "category": "time-of-day",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add TIME_BLOCK_TIERS dict to hermes_constants.py: {3: 0.5, 4: 0.7, 5: 0.5}. Already wired in signal_compactor time_block_mult."
-        },
-        {
-            "date": "2026-09-12T23:00:00Z",
-            "idea": "NORMAL regime confidence discount",
-            "rationale": "NORMAL regime -$2.26/7d across 74 trades. EXTREME +$2.84. The regime_mult already penalizes counter-regime, but NORMAL gets no special treatment. Adding a NORMAL penalty (0.7x) would reduce false signals in choppy markets.",
-            "expected_impact": "+$0.50-1.00/7d (blocks ~40% of NORMAL losers while preserving EXTREME/HIGH winners)",
-            "category": "regime creative",
-            "status": "suggested",
-            "risk": "medium — needs backtest to verify it doesn't block NORMAL winners",
-            "implementation": "In regime_mult logic, add: if regime == 'NORMAL': reg_mult *= 0.7"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        {
-            "action": "Implement MAX_SIGNAL_AGE_MINUTES=3 hard block",
-            "priority": "HIGH",
-            "effort": "~10 lines",
-            "expected_impact": "+$0.50-1.00/7d",
-            "verification": "Check last 7d: how many winning trades had age>3min? If 0, safe to deploy."
-        },
-        {
-            "action": "Verify trend_purity+ EXTREME penalty (needs 20+ trades)",
-            "priority": "MEDIUM",
-            "note": "Applied at 15:30 UTC Sep 12. Only 3 trades since."
-        },
-        {
-            "action": "Monitor NORMAL regime — consider confidence discount",
-            "priority": "MEDIUM",
-            "note": "$2.26/7d drag. Needs backtest before deploying."
-        },
-        {
-            "action": "Legacy exits by Sep 13 (tomorrow)",
-            "priority": "LOW",
-            "note": "ema300_dip_short, slow_grind, coiled_spring, sma20_dip, pullback_entry+ all aging out."
-        }
+  "timestamp": "2026-09-13T00:32:16.686006+00:00",
+  "session_brain_stats": {
+    "total_vectors": 169957,
+    "queries_run": 3,
+    "key_insights": [
+      "signal_decay_guitar_tuning: Signal decay is a blunt hammer — kills low WR signals without remembering why they were good",
+      "MIN_HOLD_MINUTES: Still not implemented (noted in previous audit, still missing)",
+      "time_of_day_pattern: 19:00 UTC +$1.62/7d, 03:00-05:00 UTC -$1.80/7d"
     ]
+  },
+  "trade_summary_24h": {
+    "total_trades": 29,
+    "win_rate": 65.5,
+    "pnl": 0.58,
+    "regime": "100% NEUTRAL",
+    "losers": 10,
+    "stale_losers": 4,
+    "key_patterns": [
+      "trend_purity+ LONG EXTREME: 4 losers, 7 winners — 0.3x penalty applied, can't block",
+      "pullback-entry- SHORT HIGH: 3 losers, all rr_engine_resistance — structural",
+      "rr-struct- SHORT HIGH: 2 losers — structural"
+    ]
+  },
+  "drift_findings": [
+    {
+      "item": "MIN_HOLD_MINUTES",
+      "status": "NOT IMPLEMENTED",
+      "impact": "Trades can exit immediately after opening — cut-loser/PM_TRAIL can fire too early",
+      "recommendation": "Add MIN_HOLD_MINUTES=10 to hermes_constants.py, enforce in position_manager.py",
+      "priority": "MEDIUM"
+    },
+    {
+      "item": "Time-of-day signal weighting",
+      "status": "DISCOVERED BUT NOT IMPLEMENTED",
+      "impact": "System fires equally at 03:00 UTC (-$0.90/7d) and 19:00 UTC (+$1.62/7d)",
+      "recommendation": "Add time-of-day confidence boost/penalty in signal_compactor.py",
+      "priority": "LOW"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "rr_engine_resistance SHORT exits",
+      "frequency": "27T/7d",
+      "pnl_impact": "-$1.03/7d",
+      "root_cause": "SHORT entries near support levels, engine exits at support before support is tested",
+      "status": "Structural — needs code fix (minimum support distance filter)",
+      "recommendation": "Add MIN_SUPPORT_DISTANCE_PCT=2.0 to block SHORT within 2% of support"
+    }
+  ],
+  "missing_implementations": [
+    "MIN_HOLD_MINUTES (cut-loser activation delay)",
+    "Time-of-day confidence weighting",
+    "MIN_SUPPORT_DISTANCE_PCT for SHORT entries"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-13T00:32:16.686024+00:00",
+      "idea": "Time-of-day signal confidence weighting",
+      "rationale": "7d data shows 19:00 UTC +$1.62 (83.3% WR) vs 03:00-05:00 UTC -$1.80 (33-44% WR). Weighting signals by time-of-day could capture this edge.",
+      "expected_impact": "+$0.50-1.00/7d by boosting high-performance hours and penalizing low-performance hours",
+      "category": "time-of-day",
+      "status": "suggested",
+      "risk": "low",
+      "implementation": "Add TIME_WEIGHTS dict to hermes_constants.py, apply in signal_compactor.py confidence calculation"
+    },
+    {
+      "date": "2026-09-13T00:32:16.686026+00:00",
+      "idea": "SHORT NORMAL regime confidence discount",
+      "rationale": "NORMAL regime: 73T/7d -$2.12 (worst regime). EXTREME: 137T +$2.84 (best). SHORT signals in NORMAL lose money.",
+      "expected_impact": "+$0.50-1.00/7d by reducing SHORT confidence in NORMAL",
+      "category": "regime creative",
+      "status": "needs backtest",
+      "risk": "medium"
+    },
+    {
+      "date": "2026-09-13T00:32:16.686028+00:00",
+      "idea": "Add rr-struct- to STANDALONE_BYPASS",
+      "rationale": "rr-struct- SHORT has 50% WR in 24h but 7d data shows it can work. Standalone bypass would let it fire with 1 source instead of requiring 2+.",
+      "expected_impact": "More SHORT signals in NEUTRAL market",
+      "category": "gap finder",
+      "status": "needs backtest",
+      "risk": "medium"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Legacy exits by Sep 13 (TOMORROW) — -$3.59/7d drag removed",
+    "Monitor trend_purity+ EXTREME penalty — 0.3x active, needs 20+ trades to verify",
+    "Monitor rr_engine_resistance SHORT — structural, needs code fix",
+    "Consider MIN_HOLD_MINUTES implementation — prevents early cut-loser exits",
+    "Consider time-of-day weighting — discovered edge, needs backtest"
+  ]
 }

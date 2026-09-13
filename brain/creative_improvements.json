@@ -1,12 +1,12 @@
 [
   {
     "date": "2026-09-12T13:25:47.688032Z",
-    "idea": "NORMAL regime SHORT filter \u2014 block SHORT entries when regime is NORMAL",
+    "idea": "NORMAL regime SHORT filter — block SHORT entries when regime is NORMAL",
     "rationale": "Data shows SHORT signals lose -.13 net in NORMAL (13 winners +$0.54, 13 losers -$1.67). But they WIN in EXTREME (+$4.35) and HIGH (+$3.40). Filtering SHORT in NORMAL could save ~$1.13/7d without affecting EXTREME/HIGH wins.",
     "expected_impact": "+$1.0-1.5/7d (removing losing trades in NORMAL)",
     "category": "regime creative",
     "status": "suggested",
-    "risk": "low \u2014 only blocks SHORT in one regime, EXTREME/HIGH unaffected",
+    "risk": "low — only blocks SHORT in one regime, EXTREME/HIGH unaffected",
     "impact_on_winners": "Checked: SHORT winners in NORMAL are small (+$0.54 total) vs losses ($1.67). Net positive to filter."
   },
   {
@@ -16,17 +16,17 @@
     "expected_impact": "Block 2-4 losing trades/7d, preserving the 20 winners",
     "category": "entry sniper",
     "status": "suggested",
-    "risk": "low \u2014 only filters extreme oversold entries",
+    "risk": "low — only filters extreme oversold entries",
     "impact_on_winners": "Checked: no winning pullback-entry- SHORT had RSI < 30 at entry (all were in 35-55 range)"
   },
   {
     "date": "2026-09-12T13:25:47.688067Z",
-    "idea": "pump-chain+ LONG: already killed, but consider pump-chain- in NORMAL \u2014 its avg_pnl_pct is -0.03% (breakeven). Filter SHORT in NORMAL only.",
+    "idea": "pump-chain+ LONG: already killed, but consider pump-chain- in NORMAL — its avg_pnl_pct is -0.03% (breakeven). Filter SHORT in NORMAL only.",
     "rationale": "pump-chain- SHORT 7d: 39T +$0.42. But NORMAL regime SHORTs are drag. EXTREME SHORT winners dominate. A regime filter on pump-chain- could improve R:R.",
-    "expected_impact": "Marginal \u2014 pump-chain- already profitable",
+    "expected_impact": "Marginal — pump-chain- already profitable",
     "category": "regime creative",
     "status": "informational",
-    "risk": "medium \u2014 could reduce trade frequency",
+    "risk": "medium — could reduce trade frequency",
     "impact_on_winners": "Need to verify how many pump-chain- NORMAL trades are winners"
   },
   {
@@ -59,7 +59,7 @@
   },
   {
     "date": "2026-09-12T16:00:00Z",
-    "idea": "pump-chain+ kill candidate \u2014 25% WR SL hits -$0.78/7d",
+    "idea": "pump-chain+ kill candidate — 25% WR SL hits -$0.78/7d",
     "rationale": "pump-chain+ LONG atr_sl_hit: 8T 25% WR -$0.78/7d. Worst active LONG signal by SL hit loss.",
     "expected_impact": "monitoring",
     "category": "exit optimizer",
@@ -78,7 +78,7 @@
   {
     "date": "2026-09-12T17:26:47.305281+00:00",
     "idea": "SHORT entry confidence floor by regime",
-    "rationale": "SHORT signals in 24h average -$0.38 while LONG +$0.34. In HIGH regime, SHORT has 50% WR. Adding CONF_FILTER_MIN=75 for SHORT entries in HIGH regime would filter marginal SHORT entries. 7d pullback-entry- SHORT in HIGH has 64.7% WR +$0.78 \u2014 signal works, just some entries are low quality.",
+    "rationale": "SHORT signals in 24h average -$0.38 while LONG +$0.34. In HIGH regime, SHORT has 50% WR. Adding CONF_FILTER_MIN=75 for SHORT entries in HIGH regime would filter marginal SHORT entries. 7d pullback-entry- SHORT in HIGH has 64.7% WR +$0.78 — signal works, just some entries are low quality.",
     "expected_impact": "Filter 1-2 marginal SHORT entries per day, improve SHORT WR by 5-10%",
     "category": "entry sniper",
     "status": "suggested",
@@ -88,40 +88,40 @@
     "date": "2026-09-12T17:26:47.305283+00:00",
     "idea": "Time-of-day filter for EXTREME regime trades",
     "rationale": "EXTREME regime trades 00:00-06:00 UTC have 5/6 winners (KAS +0.29, PONS +0.24, BIGTIME +0.21). 06:00-12:00 UTC have 3/5 winners. Night session shows better EXTREME performance.",
-    "expected_impact": "Marginal \u2014 system already handles EXTREME well (65.4% WR)",
+    "expected_impact": "Marginal — system already handles EXTREME well (65.4% WR)",
     "category": "time-of-day",
     "status": "suggested",
     "risk": "low"
   },
   {
     "date": "2026-09-12T17:30:00Z",
-    "idea": "SHORT entry minimum support distance filter \u2014 block SHORT within 2% of nearest support",
-    "rationale": "pullback-entry- SHORT has 16T/7d rr_engine_resistance exits avg -1.83%. Root cause: SHORT entries near support levels \u2014 price bounces from support, SHORT exits at resistance break. If we add MIN_SUPPORT_DISTANCE_PCT=2.0 to SHORT entry logic, we block entries where nearest support is within 2% of current price. This prevents the most common losing pattern.",
+    "idea": "SHORT entry minimum support distance filter — block SHORT within 2% of nearest support",
+    "rationale": "pullback-entry- SHORT has 16T/7d rr_engine_resistance exits avg -1.83%. Root cause: SHORT entries near support levels — price bounces from support, SHORT exits at resistance break. If we add MIN_SUPPORT_DISTANCE_PCT=2.0 to SHORT entry logic, we block entries where nearest support is within 2% of current price. This prevents the most common losing pattern.",
     "expected_impact": "Block 4-6 losing SHORT entries per 7d, preserving ~$0.70-1.00/7d",
     "category": "entry sniper",
     "status": "suggested",
-    "risk": "medium \u2014 could reduce SHORT trade frequency",
+    "risk": "medium — could reduce SHORT trade frequency",
     "impact_on_winners": "Need to verify: check if any winning SHORT entries had support within 2%"
   },
   {
     "date": "2026-09-12T17:30:00Z",
-    "idea": "NORMAL regime confidence penalty \u2014 0.5x multiplier for all signals in NORMAL",
+    "idea": "NORMAL regime confidence penalty — 0.5x multiplier for all signals in NORMAL",
     "rationale": "NORMAL regime has 75T/7d -$2.21 drag. Most signals designed for trending markets. Adding ('NORMAL','*'): 0.5 to VOL_PHASE_MULTS would reduce confidence by 50% in NORMAL, filtering marginal entries while preserving high-confidence trades.",
     "expected_impact": "Reduce NORMAL drag from -$2.21 to ~-$1.00/7d",
     "category": "regime creative",
     "status": "suggested",
-    "risk": "medium \u2014 could reduce trade frequency in NORMAL",
+    "risk": "medium — could reduce trade frequency in NORMAL",
     "impact_on_winners": "Need to check: NORMAL winners that would be blocked by 50% confidence reduction"
   },
   {
     "date": "2026-09-12T17:30:00Z",
-    "idea": "trend_purity+ volume confirmation in EXTREME \u2014 require volume_breakout+ confluence",
+    "idea": "trend_purity+ volume confirmation in EXTREME — require volume_breakout+ confluence",
     "rationale": "48h data: trend_purity+,volume-breakout-long+ (BIGTIME +3.95%) won. trend_purity+ alone in EXTREME has 50% WR. If we require volume confirmation for trend_purity+ LONG entries in EXTREME, we keep the winners (volume-confirmed) and filter the losers (no volume).",
     "expected_impact": "Improve trend_purity+ EXTREME WR from 50% to ~70%",
     "category": "cross-signal",
     "status": "suggested",
-    "risk": "low \u2014 only adds filter to one signal in one regime",
-    "impact_on_winners": "BIGTIME +3.95% (volume-breakout-long+) would still win. PONS +6.27%, KAS +4.60% \u2014 need to check if volume confirmed."
+    "risk": "low — only adds filter to one signal in one regime",
+    "impact_on_winners": "BIGTIME +3.95% (volume-breakout-long+) would still win. PONS +6.27%, KAS +4.60% — need to check if volume confirmed."
   },
   {
     "date": "2026-09-12T23:00:00Z",
@@ -148,6 +148,60 @@
     "expected_impact": "+$0.50-1.00/7d",
     "category": "regime creative",
     "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-12T23:00:00Z",
+    "idea": "SHORT regime confidence weighting: boost SHORT signals in EXTREME regime (+0.15 conf), penalize in NORMAL (-0.10 conf)",
+    "rationale": "EXTREME regime has SHORT directional edge: +.46/7d SHORT vs -$1.23/7d LONG. SHORT in EXTREME fires with 0.3x trend multiplier but other SHORT signals dont get a boost. NORMAL is choppy and SHORT entries bleed.",
+    "expected_impact": "+$0.30-0.50/7d by concentrating SHORT in EXTREME where it has edge",
+    "category": "regime creative",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T23:00:00Z",
+    "idea": "Time-of-day signal weighting: +10% confidence for signals firing 14:00-18:00 UTC (peak volume), -5% for 02:00-06:00 UTC (low volume)",
+    "rationale": "Session brain shows volume patterns. Peak hours have tighter spreads and better follow-through. Low-volume hours have more false signals and whipsaws.",
+    "expected_impact": "+$0.20-0.40/7d by filtering low-quality entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-12T23:00:00Z",
+    "idea": "Add rr-struct- to STANDALONE_BYPASS list",
+    "rationale": "rr-struct- SHORT has 4T/7d 50% WR -$0.20. Small sample but structurally sound. If it fires solo, adds SHORT diversity.",
+    "expected_impact": "Neutral to slightly positive — adds SHORT signal diversity",
+    "category": "gap finder",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T00:32:28.842169+00:00",
+    "idea": "Time-of-day signal confidence weighting",
+    "rationale": "7d data shows 19:00 UTC +$1.62 (83.3% WR) vs 03:00-05:00 UTC -$1.80 (33-44% WR). Weighting signals by time-of-day could capture this edge.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "time-of-day",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T00:32:28.842176+00:00",
+    "idea": "SHORT NORMAL regime confidence discount",
+    "rationale": "NORMAL regime: 73T/7d -$2.12 (worst). SHORT signals in NORMAL lose money. Reduce confidence.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "regime creative",
+    "status": "needs backtest",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-13T00:32:28.842178+00:00",
+    "idea": "Add rr-struct- to STANDALONE_BYPASS",
+    "rationale": "rr-struct- SHORT has 50% WR in 24h but can work. Standalone bypass lets it fire with 1 source.",
+    "expected_impact": "More SHORT signals in NEUTRAL",
+    "category": "gap finder",
+    "status": "needs backtest",
     "risk": "medium"
   }
 ]

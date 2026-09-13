@@ -93,9 +93,9 @@
 ## Next Actions
 
 1. **Legacy exits by Sep 13 (TOMORROW).** sma20_dip 19T, coiled_spring 18T, ema300_dip_short 17T, slow_grind 15T, pullback_entry+ 6T still in 7d window — expected to age out by Sep 13. Total -$3.59 drag. — 2026-09-12
-2. **Monitor stale+oversold SHORT block.** Top opportunity flagged (~$0.30-0.50/24h savings). 5/8 SHORT losers were stale. Requires code change — not implemented yet. — 2026-09-12
+2. **Monitor rr_engine_resistance SHORT exits.** 27T/7d -$1.03. pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%. Needs code fix (minimum support distance filter). — 2026-09-12 (brain_auditor)
 3. **Monitor R:R.** 24h R:R 0.73 (breakeven 60%, actual 65.5% — PROFITABLE). 7d PnL +$1.02. profit-monster-trail carries system. — 2026-09-12
-4. **Monitor squeeze_reversal.** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. If no trades by Sep 14, investigate. — 2026-09-12
-5. **Monitor disk.** Currently 78% (26G free). — 2026-09-12
-6. **signal_compactor timeouts.** Transient, self-recovered. Monitor frequency. — 2026-09-12
-7. **MIN_HOLD_MINUTES not implemented.** brain_auditor flagged cut-loser activation delay. Needs code change. — 2026-09-12
+4. **Monitor trend_purity+ EXTREME penalty.** 0.3x multiplier active (Sep 12 15:30). Needs 20+ trades to verify. 4 losers24h already identified. — 2026-09-12 (brain_auditor)
+5. **Monitor squeeze_reversal.** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. If no trades by Sep 14, investigate. — 2026-09-12
+6. **Monitor disk.** Currently 78% (26G free). — 2026-09-12
+7. **signal_compactor timeouts.** Transient, self-recovered. Monitor frequency. — 2026-09-12
