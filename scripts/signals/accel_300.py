@@ -657,7 +657,7 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
         return 0
     from signal_schema import add_signal, get_cooldown, price_age_minutes
     from position_manager import get_open_positions as _get_open_pos
-    from signal_gen import (
+    from signals.fast_momentum import (
         recent_trade_exists, is_delisted, SHORT_BLACKLIST,
         MIN_TRADE_INTERVAL_MINUTES, set_cooldown
     )
