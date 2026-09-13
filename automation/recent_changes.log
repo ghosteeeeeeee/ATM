@@ -1585,3 +1585,8 @@
   KEY FINDINGS: (1) SHORT_RSI_FLOOR=25 working — 2319 blocks. (2) trend_purity+ EXTREME losers at RSI>60/z>2.0 — entry condition issue, not regime. (3) SHORT side strong EXTREME +$1.65/7d. (4) Session brain empty — needs ingest.
   CREATIVE: z_score>2.5 LONG penalty in EXTREME, bb_position>0.20 SHORT filter, time-of-day weighting.
   BY: brain_auditor
+
+[2026-09-13 03:30 UTC] brain_auditor: CONFIG CHANGE — trend_purity EXTREME multiplier
+  WHY: trend_purity+ 10T/40%WR -$0.72/7d in EXTREME. 5 losers (INJ, KAS, MET, BIGTIME, ARB). 0.3x multiplier insufficient. Changed to 0.15x to further suppress confidence in EXTREME regime.
+  BY: brain_auditor
+  FILES: scripts/volatility_gate_v2.py

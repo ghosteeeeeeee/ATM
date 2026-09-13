@@ -231,7 +231,7 @@ VOL_PHASE_MULTS = {
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
-        'Trend_Purity': 0.3,         # PENALIZED — trend_purity+ LONG 50% WR in EXTREME, -$0.15/7d (2026-09-12 brain_auditor)
+        'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {

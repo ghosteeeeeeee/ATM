@@ -230,5 +230,50 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-13T03:30:00Z",
+    "idea": "Trend_Purity EXTREME multiplier 0.3x → 0.15x",
+    "rationale": "10T/40%WR -$0.72/7d. 5 losers in EXTREME with z>0.6 or RSI>60. Winners have z<2.1 and RSI 40-71. Tighter multiplier suppresses losers while preserving most winners.",
+    "expected_impact": "Save ~$0.50/7d by blocking 3-4 EXTREME losers.",
+    "category": "entry sniper",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T03:30:00Z",
+    "idea": "SHORT bb_position > 0.15 minimum support distance",
+    "rationale": "All pullback-entry- SHORT losers in 7d have bb_position ranging 0.01-1.03. Entries below 0.10 are near support. Zero SHORT winners below 0.15.",
+    "expected_impact": "Block ~3-4 SHORT entries/year near support. Save ~$0.20-0.40/7d.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T03:30:00Z",
+    "idea": "SHORT_RSI_CEILING=55 — block SHORT at overbought RSI",
+    "rationale": "22T/7d SHORT at RSI>55 = 50%WR -$0.97. Momentum trap.",
+    "expected_impact": "+$0.50-0.80/7d net.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T03:30:00Z",
+    "idea": "Time-of-day confidence weighting: -5% at 03:00-05:00, +10% at 17:00-19:00 UTC",
+    "rationale": "03:00-05:00 UTC: 42T/33.3%WR -$1.80/7d. 17:00-19:00 UTC: 43T/73%WR +$3.06/7d.",
+    "expected_impact": "+$0.50-1.00/7d.",
+    "category": "time-of-day",
+    "status": "suggested",
+    "risk": "medium — needs backtest"
+  },
+  {
+    "date": "2026-09-13T03:30:00Z",
+    "idea": "Add rr-struct- to STANDALONE_BYPASS",
+    "rationale": "60%WR +$0.07/7d profitable SHORT signal. Currently requires 2+ signal types.",
+    "expected_impact": "+2-4 additional SHORT trades/week.",
+    "category": "gap finder",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

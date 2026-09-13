@@ -3048,3 +3048,44 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - MIN_HOLD_MINUTES=10 still pending from earlier audit
 
 **Open Questions:** None — system healthy
+
+## [2026-09-13 03:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet weekend)
+**PnL:** $0.00
+**24h:** 25T 60%WR -$0.25
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T -$0.05 (40.0% — exactly at threshold)
+- profit-monster-trail: 6T +$0.30
+- rr_engine_resistance: 5T -$0.25
+- rr_engine_support_br: 3T -$0.12
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h Signal Performance:**
+- trend_purity+ LONG: 8T 37.5%WR -$0.45 (persistent, not killable)
+- rr-struct+ LONG: 5T 80%WR $0.00
+- rr-struct- SHORT: 4T 75%WR -$0.02
+- pullback-entry- SHORT: 6T 50%WR $0.00
+
+**Open Trades (6):**
+- BTC SHORT pump-chain-: 32.8h, -14.58% — stale underwater (flagged before)
+- ETC SHORT pullback-entry-: 9.7h, +138.98%
+- NEO LONG rr-struct+: 6.5h, +294.93%
+- SEI LONG rr-struct+: 6.1h, -9.19%
+- ZRO LONG trend_purity+: 2h, -53.33%
+- XPL SHORT pullback-entry-: 1.7h, +12.85%
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 40.0% — exactly at threshold, not over
+- Trade freq ~1/hr — normal weekend
+- No consecutive negative hourly avg_pnl
+
+**Watch List:**
+- trend_purity+ LONG: 8T 37.5%WR -$0.45 — persistent underperformer
+- BTC SHORT: 32.8h open, -14.58% — stale and underwater
+
+**Open Questions:** None
