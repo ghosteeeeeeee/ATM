@@ -23,10 +23,11 @@ LOG_FILE = "/root/.hermes/logs/15m_regime.log"
 BRAIN_DB = BRAIN_DB_DICT
 CANDLE_TF = "5m"
 CANDLE_TABLE = "candles_5m"
-STALE_THRESHOLD_SECS = 900  # 15 min — if latest closed candle is older, use Binance
-                            # 5m candles close every 5min; scanner runs every 15min
-                            # so candles can be up to 15min old at scan time
-                            # 900s = 15min matches the scanner interval
+STALE_THRESHOLD_SECS = 1020  # 17 min — if latest closed candle is older, use Binance
+                              # Scanner runs at :00/:15/:30/:45, price_collector closes
+                              # 5m window at :07/:37. At scan time, the last closed candle
+                              # is from the PREVIOUS 5m window (~15min old). Add 2min buffer
+                              # for processing delays. 1020s = 17min.
 
 def fetch_candles_from_db(token, limit=16):
     """Read closed 15m candles from candles.db. Returns list of dicts or None if stale/missing."""
