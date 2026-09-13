@@ -3097,7 +3097,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 close_time = NOW(), close_reason = %s, exit_reason = %s,
                 is_guardian_close = TRUE, guardian_closed = TRUE, guardian_reason = %s,
                 hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s,
-                mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s
+                mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s,
+                trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id = %s AND status = 'open'
         """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, _exit_reason_short, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
@@ -3223,7 +3224,8 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 close_time=NOW(), close_reason=%s, exit_reason=%s,
                 last_updated=NOW(), updated_at=NOW(),
                 is_guardian_close=TRUE, guardian_closed=TRUE, guardian_reason=%s,
-                hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s
+                hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s,
+                trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
               reason, _exit_reason_short, reason,

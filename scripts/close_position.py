@@ -91,7 +91,8 @@ def close_brain(coin, exit_price):
             UPDATE trades SET
                 status='closed', close_time=NOW(), exit_price=%s,
                 pnl_usdt=%s, pnl_pct=%s, exit_reason='manual_close',
-                close_reason='manual_close', updated_at=NOW()
+                close_reason='manual_close', updated_at=NOW(),
+                trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s
         """, (exit_price or 0.0, pnl_usdt_calc, pnl_pct, trade_id))
         conn.commit()

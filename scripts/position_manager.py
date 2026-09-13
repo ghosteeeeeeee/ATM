@@ -1075,13 +1075,14 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 fees = %s,
                 is_guardian_close = FALSE,
                 hype_realized_pnl_usdt = %s,
-                hype_realized_pnl_pct = %s
+                hype_realized_pnl_pct = %s,
+                trade_duration = EXTRACT(EPOCH FROM (%s::timestamp - open_time))
             WHERE id = %s AND status = 'open'
         """, (now, reason, reason[:20] if reason else reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
-              trade_id))
+              now, trade_id))
         if cur.rowcount == 0:
             log(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
             conn.rollback()
