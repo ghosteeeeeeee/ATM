@@ -4242,6 +4242,8 @@ def _enrich_and_write_signals(hotset_entries):
 
 
 if __name__ == '__main__':
+    import time as _t
+    _main_start = _t.time()
     parser = argparse.ArgumentParser(description='Deterministic signal compactor')
     parser.add_argument('--dry', action='store_true', help='Dry run (log only, no write)')
     parser.add_argument('--verbose', action='store_true', help='Log per-signal scoring details')
@@ -4256,10 +4258,12 @@ if __name__ == '__main__':
 
     try:
         result = run_compaction(dry=args.dry, verbose=args.verbose, purge_executed=args.purge_executed)
+        _elapsed = _t.time() - _main_start
         print(f"\nResult: {len(result['hotset'])} hotset entries | cycle={result['compaction_cycle']} | "
-              f"approved={result['approved']} | rejected={result['rejected']}")
+              f"approved={result['approved']} | rejected={result['rejected']} | {_elapsed:.1f}s total")
     except Exception as e:
         import traceback
-        print(f"\nFATAL ERROR in run_compaction:", file=sys.stderr)
+        _elapsed = _t.time() - _main_start
+        print(f"\nFATAL ERROR in run_compaction ({_elapsed:.1f}s):", file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)

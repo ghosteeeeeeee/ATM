@@ -68,6 +68,7 @@ def run(name, args=None):
     timeout = STEP_TIMEOUTS.get(name, DEFAULT_TIMEOUT)
     log(f'Running {name}...')
     proc = None
+    _start = time.time()
     try:
         proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
@@ -87,11 +88,18 @@ def run(name, args=None):
                     os.killpg(os.getpgid(proc.pid), _sig.SIGKILL)
                 except OSError:
                     pass
-            log(f'ERROR {name}: timed out (killed)')
+            log(f'ERROR {name}: timed out (killed after {time.time()-_start:.1f}s)')
             return False
 
         out = (stdout or b'').decode(errors='replace').strip()
         err = (stderr or b'').decode(errors='replace').strip()
+        elapsed = time.time() - _start
+
+        # Log step completion with timing
+        if proc.returncode == 0:
+            log(f'  {name}: done in {elapsed:.1f}s (rc=0)')
+        else:
+            log(f'  {name}: FAILED in {elapsed:.1f}s (rc={proc.returncode})')
 
         # Always log last 5 lines of output for position_manager, decider-run, signal_gen
         # This is critical for monitoring trade decisions in real-time
@@ -118,7 +126,7 @@ def run(name, args=None):
                     log(f'  ERR {name}: {line.strip()}')
         return proc.returncode == 0
     except Exception as e:
-        log(f'ERROR {name}: {e}')
+        log(f'ERROR {name}: {e} (after {time.time()-_start:.1f}s)')
         return False
     finally:
         # Ensure child process is always cleaned up
@@ -220,25 +228,32 @@ def main():
 
     import time as _t
     start = _t.time()
+    step_results = {}  # Track step success/failure for summary
+
     # Every minute
     for step in STEPS_EVERY_MIN:
         # NOTE: --live is NOT passed to step scripts.
         # All scripts check LIVESWITCH_FILE (hype_live_trading.json) for live mode.
         # Some scripts (breakout_engine, price_collector, etc.) do not accept --live.
         if step == 'signals_runner':
-            run(step)  # signals_runner ~3s — run synchronously so decider_run sees fresh signals
+            step_results[step] = run(step)  # signals_runner ~3s — run synchronously so decider_run sees fresh signals
         else:
-            run(step)
+            step_results[step] = run(step)
 
     # Every 5 minutes: slow signals (momentum, mtf_momentum)
     if every_5:
         for step in STEPS_EVERY_5M:
-            run(step)
+            step_results[step] = run(step)
 
     # Every 10 minutes: strategy_optimizer, ab_optimizer
     if every_10:
         for step in STEPS_EVERY_10M:
-            run(step)
+            step_results[step] = run(step)
+
+    # Log step summary for debugging
+    failed_steps = [s for s, ok in step_results.items() if not ok]
+    if failed_steps:
+        log(f'WARNING: {len(failed_steps)} steps failed: {", ".join(failed_steps)}')
 
     elapsed = _t.time() - start
     log(f'=== Pipeline done ({mode}) ===')

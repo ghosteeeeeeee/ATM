@@ -484,7 +484,9 @@ def register_signal(name: str, run_fn, enabled=True):
 
 def _run_signal(args):
     """Run a single signal."""
+    import time as _t
     sig_name, fn_name = args
+    _start = _t.time()
     try:
         import sys
         sys.path.insert(0, '/root/.hermes/scripts')
@@ -496,11 +498,21 @@ def _run_signal(args):
         if fn is None:
             return sig_name, None
         if fn.__code__.co_argcount == 0:
-            return sig_name, fn()
-        from signal_schema import get_all_latest_prices
-        prices = get_all_latest_prices()
-        return sig_name, fn(prices)
+            result = fn()
+        else:
+            from signal_schema import get_all_latest_prices
+            prices = get_all_latest_prices()
+            result = fn(prices)
+        elapsed = _t.time() - _start
+        # Log slow signals (>5s) for debugging
+        if elapsed > 5:
+            import sys as _sys
+            print(f'  [SLOW-SIGNAL] {sig_name}: {elapsed:.1f}s', file=_sys.stderr, flush=True)
+        return sig_name, result
     except Exception as e:
+        elapsed = _t.time() - _start
+        import sys as _sys
+        print(f'  [SIGNAL-ERROR] {sig_name}: {e} ({elapsed:.1f}s)', file=_sys.stderr, flush=True)
         return sig_name, f'ERROR: {e}'
 
 
