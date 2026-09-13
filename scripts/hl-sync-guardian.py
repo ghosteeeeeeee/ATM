@@ -1961,6 +1961,12 @@ def _check_hard_stops(prices: dict):
             entry_px = float(entry_px)
             hit_reason = None
 
+            # Import SIGNAL_EXIT_CONFIG once for both branches
+            from hermes_constants import SIGNAL_EXIT_CONFIG
+            signal_str = str(signal or '')
+            signal_parts = [s.strip() for s in signal_str.split(',')]
+            is_rr_engine = any(p in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[p] == 'rr_engine' for p in signal_parts)
+
             if direction == 'SHORT':
                 # SHORT: SL is ABOVE entry. Price rising TO or ABOVE SL = loss.
                 # TP is BELOW entry. Price falling TO or BELOW TP = profit target.
@@ -1970,10 +1976,6 @@ def _check_hard_stops(prices: dict):
                 if cur_price >= sl * (1 + _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals — let RR engine handle exits
-                signal_str = str(signal or '')
-                from hermes_constants import SIGNAL_EXIT_CONFIG
-                signal_parts = [s.strip() for s in signal_str.split(',')]
-                is_rr_engine = any(p in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[p] == 'rr_engine' for p in signal_parts)
                 if tp > 0 and cur_price <= tp * (1 - _margin):
                     if not is_rr_engine:
                         hit_reason = 'hard_tp'
@@ -1984,9 +1986,6 @@ def _check_hard_stops(prices: dict):
                 if cur_price <= sl * (1 - _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals
-                signal_str = str(signal or '')
-                signal_parts = [s.strip() for s in signal_str.split(',')]
-                is_rr_engine = any(p in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[p] == 'rr_engine' for p in signal_parts)
                 if tp > 0 and cur_price >= tp * (1 + _margin):
                     if not is_rr_engine:
                         hit_reason = 'hard_tp'
