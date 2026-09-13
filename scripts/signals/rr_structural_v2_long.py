@@ -38,7 +38,6 @@ from hermes_constants import (
     RR_STRUCTURAL_ACCEL_LOOKBACK,
     RR_STRUCTURAL_BLOCK_ACCEL,
     RR_STRUCTURAL_RANGE_LONG_MAX,
-    RR_STRUCTURAL_V2_MOM_FALLING_Z_MIN,
     RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN,
     LONG_BLACKLIST,
 )
@@ -238,10 +237,6 @@ def detect(token, price):
               long_result['vol_width'].get('bb_position') is not None and
               long_result['vol_width']['bb_position'] < RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN):
             _log(f'{token} LONG blocked: momentum=falling + bb={long_result["vol_width"]["bb_position"]:.3f} < {RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN} (falling knife)')
-        elif (momentum == 'falling' and
-              long_result.get('z_score') is not None and
-              long_result['z_score'] < RR_STRUCTURAL_V2_MOM_FALLING_Z_MIN):
-            _log(f'{token} LONG blocked: momentum=falling + z={long_result["z_score"]:.3f} < {RR_STRUCTURAL_V2_MOM_FALLING_Z_MIN} (falling knife)')
         else:
             long_ok = True
 
