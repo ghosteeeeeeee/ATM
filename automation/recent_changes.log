@@ -1711,3 +1711,9 @@
   Signal: rr-struct+ best (+$0.78), pullback-entry- second (+$0.67), pump-chain+ third (+$0.39)
   Kill check: no signal 0%WR with 3+ trades in last hour
   BY: auto_1hr
+[2026-09-13 17:35 UTC] auto_1hr: NO CHANGE — system positive, quiet hour
+  24h: 31T ~64%WR +$0.70 | 3T/1h, 6 open | All NEUTRAL
+  Exit: atr_sl_hit 18T +$0.55 (profitable), profit-monster-trail 7T +$0.51
+  Signal: rr-struct+ best (+$0.73, 66.7%WR), trend_purity+ worst (-$0.75, 0%WR legacy aging)
+  Kill check: 0 trades closed last hour for any signal — no trigger
+  BY: auto_1hr

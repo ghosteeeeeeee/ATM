@@ -1399,6 +1399,7 @@ Final set: ['APT', 'BABY', 'BCH', 'BIGTIME', 'ETC', 'HBAR', 'IO', 'SAND', 'STX']
 - open-skies+ if drops to 3+T 0%WR → kill
 
 ## TEAM UPDATES
+- [2026-09-13 17:35] auto_1hr: No change — system positive. 31T/24h ~64%WR +$0.70. Kill check: 0 trades closed last hour for any signal (3 trades total). trend_purity+ 0%WR/-$0.75 legacy all from hours 01-04 UTC aging out. atr_sl_hit 58% but profitable (+$0.031 avg). 6 open positions.
 - [2026-09-13 14:10] auto_1hr: No change — system slightly positive. 28T/24h ~60%WR +$0.83. Kill check: 0 trades closed last hour for any signal. trend_purity+ 0%WR/-$0.75 legacy aging out (all trades from hours 01-04 UTC). atr_sl_hit 60.7% but profitable (+$0.039 avg). 6 open positions.
 - [2026-09-12 09:07] auto_1hr: No change — system healthy. 58T/24h 58.6%WR +$0.13. Cut-loser-CL-T1 still #1 loss driver (-$1.06/24h), activation delay (MIN_HOLD_MINUTES=10) from Sep 12 audit still pending.
 - [2026-09-11 13:15] auto_1hr: KILLED pump-chain+ LONG (PUMP_FLOW_PLUS_ENABLED=False) — 9T/24h 22.2%WR -$0.82. All atr_sl_hit. Directional mismatch NEUTRAL. SHORT active. Sep 11 worst day 7d (36.4%WR -$1.90). rr_engine_resistance 14T -$0.99 structural. Pushed.
@@ -3564,3 +3565,38 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 - All active signals profitable
 
 **Open Questions:** None
+
+## [2026-09-13 17:35 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 2L + 1 ORPHAN_PAPER, -$0.37 real)
+**24h:** 31T ~64%WR +$0.70 | 6 open | All NEUTRAL
+
+**Last Hour:**
+- ZRO pullback-entry- SHORT: -$0.21 (atr_sl_hit)
+- ZEN rr-struct- SHORT: -$0.16 (atr_sl_hit)
+- BTC continuum_engine LONG: $0.00 (ORPHAN_PAPER)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T +$0.55 (58%, avg +$0.031 — trail-adjusted, profitable)
+- profit-monster-trail: 7T +$0.51 (23%, avg +$0.073)
+- rr_engine_resistance: 4T -$0.07 (13%)
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal (2+ trades):**
+- rr-struct+ LONG: 6T 66.7%WR +$0.73 (best)
+- pullback-entry- SHORT: 10T 60%WR +$0.41
+- pump-chain+ LONG: 5T 80%WR +$0.39
+- rr-struct- SHORT: 3T 33.3%WR -$0.22
+- trend_purity+ LONG: 3T 0%WR -$0.75 (worst — all legacy, 0 trades last hour)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: 0 trades last hour for any single signal — no 3+ trades/hour threshold met
+- Trade freq: 3T/hr, 6 open — healthy
+- atr_sl_hit 58% of 24h but profitable (+$0.55 total, avg +$0.031) — trail-adjusted working
+- trend_purity+ 0%WR/3T/-$0.75 legacy all from hours 01-04 UTC, 0 trades last hour, aging out
+- System positive (+$0.70/24h), no urgency
+
+**Open Questions:**
+- trend_purity+ at -$0.75/24h but 0 trades last hour — kill trigger requires 3+ in last hour specifically. Aging out naturally.
