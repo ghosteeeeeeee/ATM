@@ -1309,6 +1309,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'resistance-break',      # resistance break + pullback — ATR SL, not PM Trail
     'hh-hl',                 # Structure Sniper — ATR-based SL/TP, not PM Trail
     'ema300-breakthrough',   # EMA300 breakthrough — 15m breakout, manage via ATR SL
+    'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
