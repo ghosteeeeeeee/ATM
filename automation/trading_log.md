@@ -3627,3 +3627,39 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 - All active signals net positive
 
 **Open Questions:** None
+
+## [2026-09-13 20:07 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L -$0.25) | 33T/24h 57.6%WR +$0.45 | 5 open
+
+**Last Hour:**
+- ETC rr-struct+ LONG atr_sl_hit: +$0.01 (breakeven)
+- KAS rr-struct+ LONG rr_engine_support_br: -$0.26
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T +$0.56 (58%, avg +$0.029 — profitable)
+- profit-monster-trail: 7T +$0.51 (21%, avg +$0.073 — best)
+- rr_engine_resistance: 4T -$0.07 (12%)
+- rr_engine_support_br: 2T -$0.55 (6%, avg -$0.275 — worst)
+
+**24h by Signal:**
+- rr-struct+ LONG: 8T 62.5%WR +$0.48
+- pullback-entry- SHORT: 10T 60%WR +$0.41
+- pump-chain+ LONG: 5T 80%WR +$0.39
+- rr-struct- SHORT: 3T 33.3%WR -$0.22
+- trend_purity+ LONG: 3T 0%WR -$0.75 (legacy, 0 trades last 16h)
+
+**Open Trades:** 5 (ETH rr-struct+ 5h, FOGO pullback- 2.8h, BIGTIME pullback- 2.6h, GMT pump-chain- 2.2h, ONDO ema300-dip 0.4h)
+
+**Changes:** None — no kill triggers, system stable
+
+**No Change Needed:**
+- Kill check: 0 signals with 3+ trades and 0% WR in last hour
+- trend_purity+ 0%WR but 0 trades last 16h — aging out naturally
+- rr_engine_support_br -$0.55 but only 2 trades — too small a sample
+- Trade freq: 2T/hr — healthy, no overtrading
+- All active signals net positive (rr-struct+, pullback-entry-, pump-chain+)
+
+**Open Questions:** None
+
+BY: auto_1hr
