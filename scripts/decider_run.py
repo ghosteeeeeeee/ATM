@@ -915,6 +915,13 @@ def rule_based_context_gate(token, direction, source, sig):
             if direction == 'SHORT' and z_score > SIGNAL_FILTER_Z_MAX and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
                 return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={_spd_str}% (chasing uptrend)', 15)
 
+        # Hard block: pullback-entry SHORT with z > 0 at execution time
+        # (XPL DNA: winning SHORTs have z < 0 — price below mean = downtrend intact)
+        # The detect() filter uses 5m data; z can change between detection and execution
+        _is_pullback = source and 'pullback-entry' in source
+        if _is_pullback and direction == 'SHORT' and z_score is not None and z_score > 0:
+            return ('SKIP', f'pullback-entry SHORT: z={z_score:.2f} > 0 (price above mean — downtrend reversed)', 0)
+
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
     # Aligned: LONG z>0 + accel>0 (76.4%), SHORT z<0 + accel<0 (63.3%)
