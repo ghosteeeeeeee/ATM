@@ -359,3 +359,15 @@
 - **REPEATED** (8x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (25x): `Sep N N:N:N python3[TOK]: TS   TS [TOK]   ⚠️ [SL-TOK-TOK] TOK for TOK: name 'sqlite3' is not defined`
+
+## Error Alerts — 2026-09-13 20:25 UTC
+- **CRITICAL** (FIXED): `⚠️ [SL-ZONE-EXIT] Error for FOGO/ETH: name 'sqlite3' is not defined` — Missing `import sqlite3` in position_manager.py SL-ZONE-EXIT handler. Added `import sqlite3 as _sqlite3_slz` + local alias. Verified fixed — zero errors on next pipeline run.
+- **INFO** Pipeline: OK — running every 1m, last cycle 20:25:24, 0 errors post-fix
+- **INFO** Trades: 31 closed today, PnL=+$0.17 (flat market, low volume)
+- **INFO** Signals: 10 generated last hour (normal flow)
+- **INFO** Open: 0 (all positions closed)
+- **INFO** Regime: NEUTRAL (122 tokens scanned)
+- **INFO** Token speeds: 127/241 >= 50th percentile (53% high-speed)
+- **INFO** Disk: 79% used (24G free)
+- **INFO** Timers: hermes-pipeline.timer active, firing every 1m
+- **INFO** Auto-fix: Applied `sqlite3` import fix to position_manager.py line 2510
