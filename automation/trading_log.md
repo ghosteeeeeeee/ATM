@@ -1,3 +1,35 @@
+## [2026-09-13 07:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 20T 60%WR -$0.08 | 5 open | HIGH/NORMAL/EXTREME
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T +$0.37 (50%, avg +$0.037 — trail-adjusted, profitable)
+- profit-monster-trail: 4T +$0.17 (20%, avg +$0.043)
+- rr_engine_resistance: 3T -$0.09 (15%, avg -$0.030)
+- rr_engine_support_br: 2T -$0.40 (10%, avg -$0.200 — worst per-trade)
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h by Signal:**
+- trend_purity+ LONG: 5T 0%WR -$1.02 (worst — ALL losses, 3 EXTREME + 2 HIGH)
+- rr-struct- SHORT: 3T 66.7%WR -$0.14
+- pullback-entry- SHORT: 4T 75%WR +$0.16
+- rr-struct+ LONG: 5T 80%WR +$0.64 (best)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: 0 trades closed in last hour — no signal qualifies
+- Trade freq: 0T/hr, healthy
+- BAD_TRADE_HOURS deployed by brain_auditor at 06:49 (hours 3,5,13,14,15,21 — $4.26/7d impact). Let it work.
+- trend_purity+ EXTREME 0.15x + HIGH 0.0x already applied, needs more data
+- System slightly negative (-$0.08/24h), not alarming
+
+**Open Questions:**
+- trend_purity+ 0%WR in 24h but no trades in last hour — kill trigger requires 3+ trades in last hour
+- **BUG: trend_purity+ fired 2 trades in HIGH regime (ZRO, INJ) despite Trend_Purity=0.0x multiplier.** Either volatility gate multiplier doesn't prevent execution, or signal fires before gate check. Needs investigation.
+- rr_engine_support_br avg -$0.200/trade — both losses were trend_purity+ trades (downstream of above)
+
 ## [2026-09-13 06:09 UTC] Hourly Analysis
 
 **Trades:** 1 closed (BLUR LONG pump-chain+ profit-monster-trail +$0.06)
