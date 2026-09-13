@@ -3428,9 +3428,9 @@ PULLBACK_CONF_BONUS_DRY          = 5       # confidence bonus for very low volum
 PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
 
 # ── oversold_bounce (mean reversion at extreme oversold) ──────────────────────
-# oversold_bounce.py — LONG when RSI 15-20 + z-score < -1.5 + BB < 0 + vol drying
+# oversold_bounce.py — LONG when RSI 15-20 + z-score < -2.0 + BB < -0.5 + vol drying
 # Backtest: RSI 15-25 + z < -1.5 + BB < 0 = 85.7% WR, +$0.74 (7 trades)
-# Tight: RSI 15-20 + z < -1.5 + BB < 0 = 100% WR, +$0.35 (3 trades)
+# Tight golden zone: RSI 15-20 + z < -1.5 + BB < 0 = 100% WR, +$0.35 (3 trades)
 # Thesis: Oversold cascades are overreactions, price reverts to mean
 OVERSOLD_BOUNCE_ENABLED             = True    # master kill-switch (LONG only)
 OVERSOLD_BOUNCE_RSI_MIN             = 15      # RSI must be above this (not cliff-edge)
