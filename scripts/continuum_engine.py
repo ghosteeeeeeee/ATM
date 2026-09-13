@@ -489,6 +489,7 @@ class ContinuumEngine:
         self._below_count = 0  # Consecutive candles below EMA300
         self._last_side = None  # Track EMA300 position for flip detection
         self._sustained_high_score_count = 0  # Consecutive 95+ score ticks
+        self._entry_volume = None  # Volume regime at Phase 4 entry
         
         # History for multi-TF
         self.state_history: List[ContinuumState] = []
@@ -1030,6 +1031,7 @@ class ContinuumEngine:
                 self.position_side = side
                 self.position_size_pct = 100 if state.volume_regime == 'PARABOLIC' else 75
                 self.entry_ts = state.ts
+                self._entry_volume = state.volume_regime  # Save volume at Phase 4 entry
                 self._sustained_high_score_count = 0  # Reset sustained score counter
                 print(f"[CONTINUUM] Phase 4: Volume confirmed ({state.volume_regime}) | Score={state.state_score:.1f}")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
@@ -1054,8 +1056,15 @@ class ContinuumEngine:
             
             # Require 20+ ticks (10 minutes) of 95+ score
             if self._sustained_high_score_count >= 20:
-                self.entry_phase = 5
-                print(f"[CONTINUUM] Phase 5: Sustained score confirmed ({self._sustained_high_score_count} ticks @ 95+)")
+                # Verify volume is still valid at Phase 5
+                if state.volume_regime in ('HIGH', 'PARABOLIC'):
+                    self.entry_phase = 5
+                    print(f"[CONTINUUM] Phase 5: Sustained score confirmed ({self._sustained_high_score_count} ticks @ 95+) | Volume={state.volume_regime}")
+                else:
+                    # Volume dropped — step back
+                    self.entry_phase = 2
+                    self._sustained_high_score_count = 0
+                    print(f"[CONTINUUM] Phase 5 BLOCKED: Volume dropped to {state.volume_regime} (was {self._entry_volume})")
             
             # Exit conditions — step back if conditions degrade
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
@@ -1072,7 +1081,7 @@ class ContinuumEngine:
             self.entry_phase = 6  # Entry triggered
             self.position_side = side
             self.entry_ts = state.ts
-            print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={state.volume_regime} | Sustained={self._sustained_high_score_count} ticks")
+            print(f"[CONTINUUM] *** ENTRY SIGNAL *** {side} | Score={state.state_score:.1f} | Volume={self._entry_volume} (saved at Phase 4) | Sustained={self._sustained_high_score_count} ticks")
         
         # Exit checks (if we have a position)
         if self.position_side != 'NONE':
