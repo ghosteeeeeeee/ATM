@@ -1357,6 +1357,7 @@ SIGNAL_EXIT_CONFIG = {
     # Mover: acceleration-based momentum, use pump-exit for trailing
     'mover+': 'pump_exit',
     'mover-': 'pump_exit',
+    'mover': 'pump_exit',    # bare variant
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',

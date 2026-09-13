@@ -2506,8 +2506,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 0b. SL Zone Exit Check — tighten trail near death zones ────────────
         # If price is approaching a known SL zone, tighten trailing to protect profit.
         try:
+            import sqlite3 as _sqlite3_slz
             from sl_zones import zone_aware_exit_check
-            _conn_slz_exit = sqlite3.connect(CANDLES_DB, timeout=5)
+            _conn_slz_exit = _sqlite3_slz.connect(CANDLES_DB, timeout=5)
             try:
                 _cur_slz_exit = _conn_slz_exit.cursor()
                 _cur_slz_exit.execute("""
@@ -2694,9 +2695,17 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         
         # ── 0. RR Engine structural exit (for configured signals) ──────────────
         # Check if this trade's signal uses RR engine exits
+        # Support both exact match and partial match (comma-separated sources)
         signal = str(pos.get("signal", "") or "")
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
-        if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'rr_engine':
+        signal_parts = [s.strip() for s in signal.split(',')]
+        use_rr_engine = False
+        if RR_EXIT_ENABLED:
+            for part in signal_parts:
+                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'rr_engine':
+                    use_rr_engine = True
+                    break
+        if use_rr_engine:
             try:
                 from risk_reward_engine import manage_exit
                 current_sl = float(pos.get("stop_loss") or 0)
