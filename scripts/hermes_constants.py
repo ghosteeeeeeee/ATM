@@ -3090,7 +3090,7 @@ RR_ENGINE_FAIL_OPEN          = True    # missing data = pass (never kill pipelin
 # R:R minimums (regime-adjusted)
 RR_ENGINE_MIN_RATIO_FLAT     = 2.5     # FLAT regime (<0.48% ATR) — low energy, need bigger reward
 RR_ENGINE_MIN_RATIO_NORMAL   = 2.0     # NORMAL regime (0.48-1.0% ATR) — standard
-RR_ENGINE_MIN_RATIO_HIGH     = 1.5     # HIGH regime (1.0-1.5% ATR) — volatile, wider SL OK
+RR_ENGINE_MIN_RATIO_HIGH     = 1.3     # HIGH regime (1.0-1.5% ATR) — volatile, wider SL OK
 RR_ENGINE_MIN_RATIO_EXTREME  = 2.0     # EXTREME regime (>1.5% ATR) — only specific signals trade here
 
 # SL placement
