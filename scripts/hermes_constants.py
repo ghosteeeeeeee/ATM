@@ -1971,7 +1971,7 @@ SQUEEZE_REVERSAL_MIN_BARS = 150            # need enough data for sell-off + squ
 SQUEEZE_REVERSAL_FRESHNESS_SECS = 600      # 10 min freshness
 
 TREND_PURITY_ENABLED     = True    # RE-ENABLED 2026-09-11 — wired into pipeline, shadow mode first
-TREND_PURITY_PLUS_ENABLED    = True    # trend_purity+ LONG — enabled for shadow testing
+TREND_PURITY_PLUS_ENABLED    = False   # DISABLED auto_1hr 2026-09-13 — 8T/24h 12.5%WR -$1.22, all NEUTRAL regime
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT — enabled for shadow testing
 VOLUME_HL_ENABLED        = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 VOLUME_HL_PLUS_ENABLED        = False    # volume_hl+ LONG
