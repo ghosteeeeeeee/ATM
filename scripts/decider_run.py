@@ -906,13 +906,6 @@ def rule_based_context_gate(token, direction, source, sig):
             if direction == 'SHORT' and rsi < SIGNAL_FILTER_RSI_MIN:
                 return ('AMBIGUOUS', f'RSI {rsi:.1f} < {SIGNAL_FILTER_RSI_MIN} (oversold)', 10)
 
-        # Hard block: pullback-entry SHORT when RSI < 25 (extremely oversold)
-        # (CAKE DNA: SHORTing into oversold = bounce risk, SL hit)
-        # RSI < 25 means price already dropped significantly — bounce likely
-        _is_pullback = source and 'pullback-entry' in source
-        if _is_pullback and direction == 'SHORT' and rsi is not None and rsi < 25:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: RSI {rsi:.1f} < 25 (extremely oversold — bounce risk)', 20)
-
         # Z-score filter: penalize chasing entries (only when speed is low)
         # KEY INSIGHT: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
         if z_score is not None:
@@ -922,15 +915,19 @@ def rule_based_context_gate(token, direction, source, sig):
             if direction == 'SHORT' and z_score > SIGNAL_FILTER_Z_MAX and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
                 return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={_spd_str}% (chasing uptrend)', 15)
 
-        # Hard block: pullback-entry SHORT with z > 1.0 at execution time
-        # (XPL DNA: winning SHORTs have z < 0 — price below mean = downtrend intact)
-        # The detect() filter uses 5m data; z can change between detection and execution
-        # Use LIVE z-score (not stale detection-time z) to catch reversals
-        _is_pullback = source and 'pullback-entry' in source
-        if _is_pullback and direction == 'SHORT':
-            _live_z = _ctx_gate_get_zscore(token)
-            if _live_z is not None and _live_z > 1.0:
-                return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 1.0 (price well above mean — downtrend reversed)', 20)
+    # 1b-ext. Pullback-entry safety checks (always active — NOT gated on SIGNAL_FILTER_ENABLED)
+    # These are loss-prevention guardrails, not tunable signal quality filters
+    from hermes_constants import SHORT_RSI_FLOOR
+    rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
+    _is_pullback = source and 'pullback-entry' in source
+    if _is_pullback and direction == 'SHORT':
+        # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
+        if rsi is not None and rsi < SHORT_RSI_FLOOR:
+            return ('AMBIGUOUS', f'pullback-entry SHORT: RSI {rsi:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
+        # XPL DNA: LIVE z > 1.0 means price well above mean — downtrend reversed
+        _live_z = _ctx_gate_get_zscore(token)
+        if _live_z is not None and _live_z > 1.0:
+            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 1.0 (price well above mean — downtrend reversed)', 20)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
