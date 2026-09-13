@@ -202,18 +202,19 @@
       'r2-trend-short': 'atr',
       'pump-catcher+': 'atr',
       'pump-catcher-': 'atr',
-      'pump-chain+': 'rr_engine',
-      'pump-chain-': 'rr_engine',
+      'pump-chain+': 'pump_exit',
+      'pump-chain-': 'pump_exit',
       'pullback-entry+': 'rr_engine',
       'pullback-entry-': 'rr_engine',
       'rr-struct+': 'rr_engine',
       'rr-struct-': 'rr_engine',
     };
     const EXIT_LABELS = {
-      'rr_engine': { label: 'RR Engine', color: '#00ff88', icon: '🎯' },
-      'atr':       { label: 'ATR SL',    color: '#4488ff', icon: '📐' },
-      'pm_trail':  { label: 'PM Trail',  color: '#ffaa00', icon: '🐉' },
-      'cut_loser': { label: 'Cut Loser', color: '#ff4444', icon: '✂️' },
+      'rr_engine':  { label: 'RR Engine', color: '#00ff88', icon: '🎯' },
+      'atr':        { label: 'ATR SL',    color: '#4488ff', icon: '📐' },
+      'pm_trail':   { label: 'PM Trail',  color: '#ffaa00', icon: '🐉' },
+      'cut_loser':  { label: 'Cut Loser', color: '#ff4444', icon: '✂️' },
+      'pump_exit':  { label: 'Pump Exit', color: '#ff6600', icon: '🚀' },
     };
     function getExitStrategy(signal) {
       if (!signal) return EXIT_LABELS['pm_trail'];
