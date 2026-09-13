@@ -2484,6 +2484,116 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         else:
             live_pnl = pnl_pct
 
+        # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
+        # Check if this trade's signal uses pump-exit
+        signal = str(pos.get("signal", "") or "")
+        from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
+        if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'pump_exit':
+            try:
+                import sqlite3 as _sqlite3
+                from paths import CANDLES_DB
+                
+                entry_price = float(pos.get("entry_price") or 0)
+                current_sl = float(pos.get("stop_loss") or 0)
+                highest_price = float(pos.get("highest_price") or entry_price)
+                
+                # Get ATR
+                _conn_atr = _sqlite3.connect(CANDLES_DB, timeout=5)
+                _cur_atr = _conn_atr.cursor()
+                _cur_atr.execute("""
+                    SELECT open, high, low, close FROM candles_1h
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 20
+                """, (token.upper(),))
+                _atr_rows = _cur_atr.fetchall()
+                _cur_atr.close()
+                _conn_atr.close()
+                
+                atr = 0
+                if len(_atr_rows) >= 15:
+                    trs = []
+                    for i in range(1, len(_atr_rows)):
+                        h, l, pc = _atr_rows[i][1], _atr_rows[i][2], _atr_rows[i-1][3]
+                        trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+                    atr = sum(trs[-14:]) / 14
+                
+                # Calculate trailing stop (DIRECTION-AWARE)
+                trail_mult = getattr(hc, 'PUMP_EXIT_TRAIL_MULT', 3.0)
+                trail_distance = atr * trail_mult
+                
+                if direction == 'LONG':
+                    peak_price = max(cur, highest_price)
+                    trailing_sl = peak_price - trail_distance
+                    new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                    if new_sl > current_sl:
+                        pos['stop_loss'] = new_sl
+                        log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                else:
+                    lowest_price = float(pos.get("lowest_price", cur))
+                    trough_price = min(cur, lowest_price)
+                    trailing_sl = trough_price + trail_distance
+                    new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                    if new_sl < current_sl:
+                        pos['stop_loss'] = new_sl
+                        log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                
+                # Check momentum exit
+                momentum_vel = getattr(hc, 'PUMP_EXIT_MOMENTUM_VEL', -0.5)
+                momentum_candles = getattr(hc, 'PUMP_EXIT_MOMENTUM_CANDLES', 2)
+                
+                _conn_vel = _sqlite3.connect(CANDLES_DB, timeout=5)
+                _cur_vel = _conn_vel.cursor()
+                _cur_vel.execute("""
+                    SELECT close FROM candles_5m
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT ?
+                """, (token.upper(), momentum_candles + 1))
+                _vel_closes = [r[0] for r in _cur_vel.fetchall()]
+                _cur_vel.close()
+                _conn_vel.close()
+                
+                if len(_vel_closes) >= momentum_candles + 1:
+                    neg_count = 0
+                    for i in range(1, len(_vel_closes)):
+                        period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
+                        if period_vel < momentum_vel:
+                            neg_count += 1
+                        else:
+                            neg_count = 0
+                    
+                    if neg_count >= momentum_candles:
+                        profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
+                        reason = f"pump_exit_momentum: vel={(_vel_closes[0] - _vel_closes[-1]) / _vel_closes[-1] * 100 if _vel_closes[-1] > 0 else 0:.2f}% for {neg_count} candles"
+                        close_paper_position(trade_id, reason)
+                        closed_count += 1
+                        log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
+                        continue
+                
+                # Check time exit
+                time_threshold = getattr(hc, 'PUMP_EXIT_TIME_THRESHOLD', 2.0)
+                time_hours = getattr(hc, 'PUMP_EXIT_TIME_HOURS', 2.0)
+                
+                entry_time_str = pos.get('entry_time')
+                if entry_time_str:
+                    try:
+                        entry_dt = datetime.fromisoformat(entry_time_str.replace('+00:00', ''))
+                        hold_hours = (datetime.now(timezone.utc) - entry_dt).total_seconds() / 3600
+                        profit_pct = (cur - entry_price) / entry_price * 100 if entry_price > 0 else 0
+                        
+                        if profit_pct < time_threshold and hold_hours > time_hours:
+                            if len(_vel_closes) >= 2:
+                                vel_check = (_vel_closes[0] - _vel_closes[1]) / _vel_closes[1] * 100 if _vel_closes[1] > 0 else 0
+                                if vel_check < 0:
+                                    reason = f"pump_exit_dead_money: {hold_hours:.1f}h, {profit_pct:+.2f}%, vel={vel_check:.2f}%"
+                                    close_paper_position(trade_id, reason)
+                                    closed_count += 1
+                                    log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
+                                    continue
+                    except Exception:
+                        pass
+            except Exception as e:
+                log(f"  [PUMP-EXIT] Error: {e}", "WARN")
+        
         # ── 0. RR Engine structural exit (for configured signals) ──────────────
         # Check if this trade's signal uses RR engine exits
         signal = str(pos.get("signal", "") or "")

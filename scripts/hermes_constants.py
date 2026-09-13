@@ -1346,12 +1346,12 @@ SIGNAL_EXIT_CONFIG = {
     # Pump catcher: ATR SL (proven)
     'pump-catcher+': 'atr',
     'pump-catcher-': 'atr',
-    # Pump chain: structural exit (resistance/support)
-    'pump-chain+': 'rr_engine',
-    'pump-chain-': 'rr_engine',
-    'pump_chain+': 'rr_engine',  # underscore variant
-    'pump_chain-': 'rr_engine',  # underscore variant
-    'pump_chain': 'rr_engine',    # bare variant
+    # Pump chain: ATR trailing exit (momentum breakout)
+    'pump-chain+': 'pump_exit',
+    'pump-chain-': 'pump_exit',
+    'pump_chain+': 'pump_exit',  # underscore variant
+    'pump_chain-': 'pump_exit',  # underscore variant
+    'pump_chain': 'pump_exit',    # bare variant
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',
@@ -3272,6 +3272,13 @@ PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned sign
 PUMP_FLOW_BTC_FILTER_THRESHOLD = -0.1  # min BTC 1h Δ% to allow LONG signals (peak-pick filter)
                                        # Backtest: 81%→89% WR, +5.28%→+7.04% PnL at -0.1%
 PUMP_FLOW_TOKEN_30M_THRESHOLD = 0      # min token 30m Δ% to allow LONG signals (declining token filter)
+
+# ── Pump-Exit Parameters (ATR trailing exit for pump-chain signals) ─────────
+PUMP_EXIT_TRAIL_MULT = 3.0           # ATR multiplier for trailing stop
+PUMP_EXIT_MOMENTUM_VEL = -0.5        # 5m velocity threshold for momentum exit
+PUMP_EXIT_MOMENTUM_CANDLES = 2       # consecutive negative candles required
+PUMP_EXIT_TIME_THRESHOLD = 2.0       # min profit % for time exit
+PUMP_EXIT_TIME_HOURS = 2.0           # max hold time in hours
                                        # Backtest: 57%→80% WR, +0.5→+3.36 PnL — 93% winners had positive 30m vel
 PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.5   # min token 5m Δ% to allow LONG signals (tightened from -0.2%)
                                        # -0.2% was too aggressive — blocked 13 winning trades
