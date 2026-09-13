@@ -112,10 +112,17 @@ def detect_trend_purity(token: str, direction: str = None):
         _changes = [prices[i] - prices[i-1] for i in range(1, len(prices))]
         _gains = [c for c in _changes[-14:] if c > 0]
         _losses = [-c for c in _changes[-14:] if c < 0]
-        _avg_gain = sum(_gains) / 14 if _gains else 0
-        _avg_loss = sum(_losses) / 14 if _losses else 0.0001
-        _rs = _avg_gain / _avg_loss
-        _rsi = 100 - (100 / (1 + _rs))
+        if not _gains and not _losses:
+            _rsi = 50  # flat market = neutral
+        elif not _gains:
+            _rsi = 0
+        elif not _losses:
+            _rsi = 100
+        else:
+            _avg_gain = sum(_gains) / 14
+            _avg_loss = sum(_losses) / 14
+            _rs = _avg_gain / _avg_loss
+            _rsi = 100 - (100 / (1 + _rs))
 
     # ── Momentum/speed guard — block stale, falling, or slow entries ────────
     # Root cause: KAS loss on 2026-09-11 — is_stale=true, wave_phase=falling,
@@ -255,8 +262,8 @@ def detect_trend_purity(token: str, direction: str = None):
             # The "buy the dip in uptrend" pattern that produced PONS +6.27%.
             # Price dipped to EMA (pullback) then bounced with momentum.
             # This is the highest-quality entry pattern for trend_purity.
-            if len(emas) >= 10 and gap_pct > 0.30:
-                _dips = sum(1 for i in range(-10, -1) if prices[i] <= emas[i] * 1.002)
+            if len(emas) >= 10 and gap_pct > MIN_GAP_PCT:
+                _dips = sum(1 for i in range(-10, 0) if prices[i] <= emas[i] * 1.002)
                 _ema_rising = emas[-1] > emas[-10]
                 if _dips >= 2 and _ema_rising:
                     conf += 5  # clean pullback + bounce in uptrend
@@ -398,7 +405,6 @@ def run(prices_dict=None):
 
 # ── CLI entry point ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
-    import argparse, sys
     parser = argparse.ArgumentParser(description='trend_purity signals')
     parser.add_argument('--dry', action='store_true', help='dry run')
     parser.add_argument('--token', type=str, default=None)
