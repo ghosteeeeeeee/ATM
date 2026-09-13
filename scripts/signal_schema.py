@@ -2317,7 +2317,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
 
         # Compute combo_key for identity matching across cycles.
         # Sorted alphabetically so 'pct-hermes+,hzscore+' and 'hzscore+,pct-hermes+' → same identity.
-        source_parts = sorted(p.strip() for p in (source or '').split(',') if p.strip())
+        # Strip chain correlation data (e.g., "STBL(1.47x)),chain(ADA(1.47x)") from source
+        # to keep combo_key consistent regardless of chain correlation presence.
+        import re as _re_combo
+        _source_clean = _re_combo.sub(r'[^,]*chain\([^)]*\),?', '', source or '').strip(',').strip()
+        if not _source_clean:
+            _source_clean = source or ''
+        source_parts = sorted(p.strip() for p in _source_clean.split(',') if p.strip())
         combo_key = f"{token.upper()}:{direction.upper()}:{','.join(source_parts)}"
 
         c.execute('''
