@@ -1110,3 +1110,8 @@
 [2026-09-13 05:08 UTC]   🟢 OK: rr-struct+: 5 trades, 80.0% WR, PnL=6.08
 [2026-09-13 05:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-13 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-13 11:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-13 11:08 UTC]   🟢 OK: pullback-entry-: 5 trades, 60.0% WR, PnL=2.8
+[2026-09-13 11:08 UTC]   🟢 OK: rr-struct+: 6 trades, 66.7% WR, PnL=4.57
+[2026-09-13 11:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-13 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

@@ -305,5 +305,32 @@
     "category": "entry filter",
     "status": "needs backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-13T11:15:00Z",
+    "idea": "LONG_RSI_CEILING=70 for trend_purity+ in EXTREME/HIGH",
+    "rationale": "trend_purity+ LONG losers cluster at RSI >55 in EXTREME. 3 of 4 24h losers likely entered at overbought RSI.",
+    "expected_impact": "-$0.30-0.50/7d drag reduction",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T11:15:00Z",
+    "idea": "SHORT entry minimum support distance (MIN_SUPPORT_DISTANCE_PCT=1.5)",
+    "rationale": "ENA SHORT entered at bb_position=0.08 near support, bounced to rr_engine_resistance exit. 16T/7d rr_engine_resistance SHORT losses.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "entry sniper",
+    "status": "needs code",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-13T11:15:00Z",
+    "idea": "bb_bounce_v2_long regime-specific confidence",
+    "rationale": "bb_bounce_v2_long degraded from 73.3% to 60% WR. NORMAL regime 52.1% WR system-wide. Could boost confidence in EXTREME, discount in NORMAL.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "regime weighting",
+    "status": "needs backtest",
+    "risk": "low"
   }
 ]
