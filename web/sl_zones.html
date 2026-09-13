@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SL Zones — Death Zone Dashboard</title>
+    <meta http-equiv="refresh" content="60">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: #ff4444;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: #12121a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .stat-card .value.red { color: #ff4444; }
+        .stat-card .value.yellow { color: #ffaa00; }
+        .stat-card .value.green { color: #44ff88; }
+        .stat-card .value.blue { color: #4488ff; }
+        .section {
+            margin-bottom: 32px;
+        }
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: #ccc;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #12121a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th {
+            background: #1a1a25;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            border-bottom: 1px solid #333;
+        }
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #1a1a25;
+            font-size: 0.9rem;
+        }
+        tr:hover { background: #1a1a2a; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-long { background: #1a3a1a; color: #44ff88; }
+        .badge-short { background: #3a1a1a; color: #ff4444; }
+        .badge-hold { background: #1a1a3a; color: #4488ff; }
+        .badge-watch { background: #3a3a1a; color: #ffaa00; }
+        .badge-tighten { background: #3a1a1a; color: #ff4444; }
+        .badge-unknown { background: #2a2a2a; color: #888; }
+        .strength-bar {
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+        .strength-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        .pnl-positive { color: #44ff88; }
+        .pnl-negative { color: #ff4444; }
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        .timestamp {
+            color: #555;
+            font-size: 0.8rem;
+            margin-top: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>💀 SL Zones — Death Zone Dashboard</h1>
+    <p class="subtitle">Previous stop-losses as support/resistance. Avoid getting stopped out at the same levels.</p>
+
+    <div class="summary-grid" id="summary-grid">
+        <div class="stat-card"><div class="label">Total SL Hits</div><div class="value red" id="total-hits">—</div></div>
+        <div class="stat-card"><div class="label">Hits (24h)</div><div class="value yellow" id="hits-24h">—</div></div>
+        <div class="stat-card"><div class="label">Tokens Tracked</div><div class="value blue" id="tokens-tracked">—</div></div>
+        <div class="stat-card"><div class="label">Strong Zones</div><div class="value green" id="strong-zones">—</div></div>
+    </div>
+
+    <div class="section">
+        <h2>🔴 Active Positions Near Death Zones</h2>
+        <table id="positions-table">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Direction</th>
+                    <th>Entry</th>
+                    <th>Current</th>
+                    <th>PnL</th>
+                    <th>Zone Status</th>
+                    <th>Zone Reason</th>
+                </tr>
+            </thead>
+            <tbody id="positions-body"></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>⚠️ Strongest Death Zones (3+ hits)</h2>
+        <table id="zones-table">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Direction</th>
+                    <th>SL Level</th>
+                    <th>Hits</th>
+                    <th>Strength</th>
+                    <th>Last Hit</th>
+                </tr>
+            </thead>
+            <tbody id="zones-body"></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📊 All Zones by Token</h2>
+        <table id="all-zones-table">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Direction</th>
+                    <th>Zone SL</th>
+                    <th>Hits</th>
+                    <th>Strength</th>
+                    <th>Regime</th>
+                    <th>Days Ago</th>
+                </tr>
+            </thead>
+            <tbody id="all-zones-body"></tbody>
+        </table>
+    </div>
+
+    <div class="timestamp" id="timestamp"></div>
+
+    <script>
+        function strengthColor(s) {
+            if (s >= 0.7) return '#ff4444';
+            if (s >= 0.5) return '#ffaa00';
+            if (s >= 0.3) return '#ffdd44';
+            return '#44ff88';
+        }
+        function strengthWidth(s) { return Math.min(100, s * 100) + '%'; }
+        function pnlClass(v) { return v >= 0 ? 'pnl-positive' : 'pnl-negative'; }
+        function dirBadge(d) {
+            return d === 'LONG' ? '<span class="badge badge-long">LONG</span>' : '<span class="badge badge-short">SHORT</span>';
+        }
+        function statusBadge(s) {
+            const cls = { hold: 'badge-hold', watch: 'badge-watch', tighten_trail: 'badge-tighten', unknown: 'badge-unknown' };
+            const label = { hold: 'HOLD', watch: 'WATCH', tighten_trail: 'TIGHTEN', unknown: '?' };
+            return `<span class="badge ${cls[s] || 'badge-unknown'}">${label[s] || s}</span>`;
+        }
+
+        async function load() {
+            try {
+                const r = await fetch('http://127.0.0.1:54321/data/sl_zones.json');
+                const d = await r.json();
+
+                // Summary
+                document.getElementById('total-hits').textContent = d.summary.total_hits;
+                document.getElementById('hits-24h').textContent = d.summary.hits_24h;
+                document.getElementById('tokens-tracked').textContent = d.summary.tokens_tracked;
+                document.getElementById('strong-zones').textContent = d.summary.strong_zones.length;
+
+                // Strong zones
+                const zb = document.getElementById('zones-body');
+                zb.innerHTML = d.summary.strong_zones.map(z => `
+                    <tr>
+                        <td><strong>${z.token}</strong></td>
+                        <td>${dirBadge(z.direction)}</td>
+                        <td>${z.sl_level}</td>
+                        <td><strong>${z.hits}</strong></td>
+                        <td><div class="strength-bar"><div class="strength-fill" style="width:${strengthWidth(z.hits/10)};background:${strengthColor(z.hits/10)}"></div></div></td>
+                        <td>${z.last_hit ? new Date(z.last_hit).toLocaleDateString() : '—'}</td>
+                    </tr>
+                `).join('');
+
+                // Active positions
+                const pb = document.getElementById('positions-body');
+                if (d.positions.length === 0) {
+                    pb.innerHTML = '<tr><td colspan="7" class="no-data">No open positions</td></tr>';
+                } else {
+                    pb.innerHTML = d.positions.map(p => `
+                        <tr>
+                            <td><strong>${p.token}</strong></td>
+                            <td>${dirBadge(p.direction)}</td>
+                            <td>${p.entry_price.toFixed(4)}</td>
+                            <td>${p.current_price.toFixed(4)}</td>
+                            <td class="${pnlClass(p.pnl_pct)}">${p.pnl_pct >= 0 ? '+' : ''}${p.pnl_pct.toFixed(2)}%</td>
+                            <td>${statusBadge(p.zone_status)}</td>
+                            <td style="font-size:0.8rem;color:#999">${p.zone_reason}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                // All zones
+                const azb = document.getElementById('all-zones-body');
+                const allZones = [];
+                for (const [key, data] of Object.entries(d.zones)) {
+                    for (const z of data.zones) {
+                        allZones.push({ ...z, token: data.token, direction: data.direction });
+                    }
+                }
+                allZones.sort((a, b) => b.strength - a.strength);
+                azb.innerHTML = allZones.slice(0, 50).map(z => `
+                    <tr>
+                        <td><strong>${z.token}</strong></td>
+                        <td>${dirBadge(z.direction)}</td>
+                        <td>${z.center.toFixed(4)}</td>
+                        <td>${z.hit_count}</td>
+                        <td><div class="strength-bar"><div class="strength-fill" style="width:${strengthWidth(z.strength)};background:${strengthColor(z.strength)}"></div></div> ${z.strength.toFixed(3)}</td>
+                        <td>${z.dominant_regime}</td>
+                        <td>${z.recency_days.toFixed(1)}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('timestamp').textContent = `Last updated: ${new Date(d.generated_at).toLocaleString()}`;
+            } catch(e) {
+                console.error('Failed to load SL zones:', e);
+            }
+        }
+        load();
+    </script>
+</body>
+</html>
