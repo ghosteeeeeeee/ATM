@@ -2566,7 +2566,6 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if use_pump_exit:
             try:
                 import sqlite3 as _sqlite3
-                from paths import CANDLES_DB
                 from hermes_constants import (
                     PUMP_EXIT_TRAIL_MULT, PUMP_EXIT_MOMENTUM_VEL,
                     PUMP_EXIT_MOMENTUM_CANDLES, PUMP_EXIT_TIME_THRESHOLD,
