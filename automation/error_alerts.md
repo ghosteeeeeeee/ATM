@@ -301,3 +301,6 @@
 - **[INFO]** Prices: 94 tokens tracked, 0 errors
 - **[WARN]** hotset fallback DB query returning 0 tokens each cycle (non-critical, hotset.json works)
 - **AUTO-FIX**: None needed — all systems nominal
+
+## Error Alerts — 2026-09-13 03:55 UTC
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
