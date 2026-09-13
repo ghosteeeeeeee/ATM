@@ -116,15 +116,15 @@ def _compute_price_acceleration(token, lookback=None):
             ORDER BY ts DESC LIMIT ?
         """, (token.upper(), lookback + 1))
         rows = cur.fetchall()
-        if len(rows) < lookback:
+        if len(rows) < lookback + 1:
             return None
         closes = [r[0] for r in reversed(rows)]
         # Acceleration = rate of change of rate of change
-        # Simple: (current - N/2 ago) - (N/2 ago - oldest) all normalized
+        # Use absolute price changes (not percentage) to avoid uptrend bias
         mid = len(closes) // 2
-        first_half_roc = (closes[mid] - closes[0]) / closes[0] if closes[0] else 0
-        second_half_roc = (closes[-1] - closes[mid]) / closes[mid] if closes[mid] else 0
-        return second_half_roc - first_half_roc
+        first_half_delta = closes[mid] - closes[0]
+        second_half_delta = closes[-1] - closes[mid]
+        return second_half_delta - first_half_delta
     except Exception:
         return None
     finally:

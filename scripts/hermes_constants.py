@@ -3135,7 +3135,7 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 # ── RR Structural Signal ────────────────────────────────────────────────────
 # rr_structural.py — fire on structurally excellent R:R setups
 # Uses risk_reward_engine to evaluate structural quality for every token.
-# Fires ONLY when engine scores Grade A/B with R:R ≥ 3.0.
+# Fires ONLY when engine scores Grade A/B with R:R ≥ 2.0.
 RR_STRUCTURAL_ENABLED         = True   # master kill-switch
 RR_STRUCTURAL_PLUS_ENABLED    = True   # LONG direction
 RR_STRUCTURAL_MINUS_ENABLED   = True   # SHORT direction
