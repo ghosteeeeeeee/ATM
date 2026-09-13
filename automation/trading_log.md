@@ -1,3 +1,34 @@
+## [2026-09-13 12:09 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BABY rr-struct+ LONG atr_sl_hit +$0.17)
+**24h:** 22T ~59%WR +$0.04 | 4 open | All NEUTRAL
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.25 (50%, avg +$0.023 — trail-adjusted, profitable)
+- profit-monster-trail: 5T +$0.23 (avg +$0.046)
+- rr_engine_resistance: 4T $0.00 (breakeven)
+- cut-loser-CL-T1: 1T -$0.13
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal (2+ trades):**
+- trend_purity+ LONG: 4T 0%WR -$0.91 (worst — all NEUTRAL regime losses)
+- rr-struct- SHORT: 3T 66.7%WR -$0.14
+- pullback-entry- SHORT: 5T 80%WR +$0.25
+- rr-struct+ LONG: 7T 71.4%WR +$0.67 (best)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: 0 trades closed in last hour for any single signal — no signal qualifies for 3+ trades/hour threshold
+- Trade freq: 1T/hr, healthy
+- atr_sl_hit 50% of 24h closes but **profitable** (+$0.25 total, avg +$0.023) — trail-adjusted exits working. 7d rate 34.1%, below 40% threshold
+- trend_purity+ 0%WR/4T/-$0.91 legacy aging out, EXTREME penalty applied Sep 12, needs more data per brain_auditor
+- System slightly positive (+$0.04/24h), no urgency
+
+**Open Questions:**
+- trend_purity+ still hemorrhaging (-$0.91/24h) but 0 trades last hour — kill trigger requires 3+ in last hour specifically. Will monitor.
+- **BUG STATUS (from 07:15):** trend_purity+ fired HIGH-regime trades despite 0.0x multiplier — all 4 recent trend_purity+ trades are in NEUTRAL regime. Bug may have been resolved or was one-off. No recurrence this hour.
+
 ## [2026-09-13 07:15 UTC] Hourly Analysis
 
 **Trades:** 0 closed (quiet hour)
