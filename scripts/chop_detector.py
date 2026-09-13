@@ -94,6 +94,13 @@ SIGNAL_OVERRIDES = {
     'ema300_breakthrough': 'MOMENTUM',        # EMA300 breakout — trend continuation, block in chop
     'ema300_breakthrough_long': 'MOMENTUM',
     'ema300_breakthrough_short': 'MOMENTUM',
+    # pump-chain: chain-correlation signal, fires when coin is pumping — NOT BTC-dependent (2026-09-13)
+    'pump_chain': 'MEAN_REVERSION',
+    'pump_chain_long': 'MEAN_REVERSION',
+    'pump_chain_short': 'MEAN_REVERSION',
+    'pump-chain': 'MEAN_REVERSION',
+    'pump-chain+': 'MEAN_REVERSION',
+    'pump-chain-': 'MEAN_REVERSION',
 }
 
 
@@ -126,6 +133,17 @@ def _classify_signal(signal_type: str) -> str:
 
     # Strip direction/confluence suffixes for family lookup
     base = signal_type.replace('+', '').replace('-', '').replace('_long', '').replace('_short', '')
+
+    # Also try to extract bare signal type from chain data (e.g. "ADA(1.73x),pump-chain+" -> "pump-chain")
+    # Chain data looks like "TOKEN(N.NNx)" — split on comma, find parts without parentheses
+    parts = [p.strip() for p in signal_type.split(',')]
+    for p in parts:
+        if '(' not in p and p in SIGNAL_OVERRIDES:
+            return SIGNAL_OVERRIDES[p]
+        # Also try stripped version
+        p_stripped = p.replace('+', '').replace('-', '').replace('_long', '').replace('_short', '')
+        if p_stripped in SIGNAL_OVERRIDES:
+            return SIGNAL_OVERRIDES[p_stripped]
 
     # Try market_phase_gate family lookup
     try:
