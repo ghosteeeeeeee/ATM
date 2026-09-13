@@ -2977,3 +2977,35 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - MIN_HOLD_MINUTES=10 still pending from earlier audit
 
 **Open Questions:** None — system healthy, quiet weekend hours
+
+## [2026-09-13 01:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.20 (INJ LONG -$0.23 atr_sl_hit, NOT SHORT +$0.03 atr_sl_hit)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.21 (39.3% — just under 40% threshold)
+- profit-monster-trail: 9T +$0.70 — star performer
+- rr_engine_resistance: 4T -$0.31
+- rr_engine_support_br: 3T -$0.12
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h Signal Performance:**
+- trend_purity+ LONG: 9T 44%WR -$0.38 — persistent underperformer
+- rr-struct- SHORT: 3T 67%WR -$0.08
+- pullback-entry- SHORT: 6T 50%WR $0.00
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 39.3% — just under 40%
+- Trade freq ~1.2/hr — normal
+- No consecutive negative hourly avg_pnl
+
+**Watch List:**
+- trend_purity+ LONG: 9T 44%WR -$0.38 — persistent underperformer, not at kill threshold
+- BTC SHORT: 30.8h open, -12.25% — stale and underwater
+- MIN_HOLD_MINUTES=10 still pending from audit
+
+**Open Questions:** None — system healthy

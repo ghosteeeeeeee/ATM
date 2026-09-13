@@ -194,6 +194,17 @@ def detect_trend_purity(token: str, direction: str = None):
             if _ema5_slope < 0:
                 continue
 
+        # ── Price decline guard (LONG-specific) ────────────────────────────
+        # Root cause: INJ LONG losses — entered AFTER price peaked and was
+        # already declining. EMA lags so it still shows rising, but price
+        # is falling from a local top. Block if price dropped >0.5% from
+        # the recent 15-bar high (entering at a local top).
+        if d == 'LONG' and len(prices) >= 15:
+            _recent_high = max(prices[-15:])
+            _decline_pct = (_recent_high - current_price) / _recent_high * 100
+            if _decline_pct > 0.5:
+                continue
+
         if d == 'LONG':
             if gap_pct < MIN_GAP_PCT:
                 continue
