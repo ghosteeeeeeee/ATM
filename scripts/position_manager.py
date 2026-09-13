@@ -2552,9 +2552,17 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
         # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
         # Check if this trade's signal uses pump-exit
+        # Support both exact match and partial match (comma-separated sources)
         signal = str(pos.get("signal", "") or "")
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
-        if RR_EXIT_ENABLED and signal in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[signal] == 'pump_exit':
+        signal_parts = [s.strip() for s in signal.split(',')]
+        use_pump_exit = False
+        if RR_EXIT_ENABLED:
+            for part in signal_parts:
+                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'pump_exit':
+                    use_pump_exit = True
+                    break
+        if use_pump_exit:
             try:
                 import sqlite3 as _sqlite3
                 from paths import CANDLES_DB
