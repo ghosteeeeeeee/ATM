@@ -3694,3 +3694,39 @@ BY: auto_1hr
 **Open Questions:** None
 
 BY: auto_1hr
+
+## [2026-09-13 22:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W, 1L) | 34T/24h ~60%WR +$0.57 | 5 open
+
+**Last Hour:**
+- ENA pump-chain+ LONG: -$0.22 (atr_sl_hit, -1.56% adverse)
+- ETH rr-struct+ LONG: +$0.04 (rr_engine_support_br)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T +$0.06 (56%, avg +$0.003 — breakeven)
+- profit-monster-trail: 7T +$0.51 (21%, avg +$0.073 — best)
+- rr_engine_resistance: 4T -$0.07 (12%)
+- rr_engine_support_br: 3T -$0.51 (9%, avg -$0.170 — worst)
+
+**24h by Signal:**
+- rr-struct+ LONG: 9T 67%WR +$0.52
+- pump-chain+ LONG: 5T 80%WR +$0.39
+- pullback-entry- SHORT: 9T 56%WR +$0.13
+- rr-struct- SHORT: 3T 33%WR -$0.22
+- trend_purity+ LONG: 3T 0%WR -$0.75 (legacy, already disabled)
+
+**Open Trades (5):** FOGO pullback- 4.8h (+$0.24), BIGTIME pullback- 4.6h (+$0.40), GMT pump-chain- 4.2h (+$0.18), ONDO ema300-dip 2.4h (-$0.12), ACE pullback- 1.9h (+$0.13)
+
+**Changes:** None — no kill triggers, system stable
+
+**No Change Needed:**
+- Kill check: 0 signals with 3+ trades and 0% WR last hour
+- trend_purity+ 0%WR legacy aging, 0 recent trades — natural attrition
+- rr-struct- 33%WR but only 3 trades — within normal variance
+- Trade freq: 2T/hr — healthy
+- All active signals net positive
+- MFE/MAE still NULL — known issue, can't assess entry quality
+
+**Open Questions:**
+- pnl_pct values are wildly incorrect (showing -781%, +3098% etc) — display bug, pnl_usdt is accurate. Worth investigating pnl_pct calculation.
