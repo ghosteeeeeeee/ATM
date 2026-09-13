@@ -297,6 +297,29 @@ def get_position_count(server: str = SERVER_NAME) -> int:
         conn.close()
 
 
+def get_pump_chain_position_count(server: str = SERVER_NAME) -> int:
+    """Count open pump-chain positions for reserved slot management."""
+    conn = get_db_connection()
+    if conn is None:
+        return 0
+
+    try:
+        cur = get_cursor(conn)
+        cur.execute("""
+            SELECT COUNT(*) as cnt FROM trades
+            WHERE status = 'open'
+              AND server = %s
+              AND signal LIKE '%%pump-chain%%'
+        """, (server,))
+        row = cur.fetchone()
+        return int(row["cnt"]) if row else 0
+    except Exception as e:
+        log(f"[Position Manager] get_pump_chain_position_count error: {e}")
+        return 0
+    finally:
+        conn.close()
+
+
 def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
     """Check if token already has an open position (excludes pump_hunter signal only)."""
     conn = get_db_connection()

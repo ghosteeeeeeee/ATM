@@ -3173,9 +3173,24 @@ def run(dry_run=False):
         # No aggregate market-wide block here.
 
         # Check position limit
-        if open_count >= MAX_POS:
-            log(f'SKIP: Max positions reached ({MAX_POS})')
-            break
+        # Reserved slot logic: pump-chain gets its own slot, other signals share the rest
+        from position_manager import get_pump_chain_position_count
+        pump_chain_count = get_pump_chain_position_count()
+        is_pump_chain = 'pump-chain' in (source or '')
+        
+        if is_pump_chain:
+            # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS
+            from hermes_constants import PUMP_FLOW_MAX_POSITIONS
+            if pump_chain_count >= PUMP_FLOW_MAX_POSITIONS:
+                log(f'SKIP: Max pump-chain positions reached ({pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS})')
+                break
+        else:
+            # Other signals: block if open_count >= MAX_POS - PUMP_FLOW_RESERVED_SLOTS
+            from hermes_constants import PUMP_FLOW_RESERVED_SLOTS
+            available_slots = MAX_POS - PUMP_FLOW_RESERVED_SLOTS
+            if open_count >= available_slots:
+                log(f'SKIP: Max positions reached ({open_count}/{available_slots} non-pump-chain slots)')
+                break
 
         # BUG-12 fix: validate source against whitelist before routing to A/B params
         # FIX: Use actual source from DB if available (e.g. 'hmacd-,hzscore' from merged signals)
