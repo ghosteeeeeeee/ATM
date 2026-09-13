@@ -310,3 +310,9 @@
 - **AUTO-FIX**: Disabled `hermes-5m-candle.timer`. Candles still populated by price_collector/fetch_binance_candles paths.
 - **[WARN]** (1x): Phantom trade — NOT SHORT pullback-entry- with 0.0% PnL at 00:31 UTC
 - **[INFO]** Hotset empty — market NEUTRAL regime, no signals survived compaction
+
+## Health Check — 2026-09-13 05:25 UTC
+- **WARN**: trend_purity+ LONG: 0% WR on 3 trades today (-0.74 USDT) — signal performance degraded
+- **INFO**: 31 phantom trades historically (spread over 7 weeks, no recent spike)
+- **INFO**: systemd "Failed to kill control group" — benign cleanup artifact
+- **AUTO-FIX**: None required
