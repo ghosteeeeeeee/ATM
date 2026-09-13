@@ -3183,14 +3183,15 @@ def run(dry_run=False):
             from hermes_constants import PUMP_FLOW_MAX_POSITIONS
             if pump_chain_count >= PUMP_FLOW_MAX_POSITIONS:
                 log(f'SKIP: Max pump-chain positions reached ({pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS})')
-                break
+                continue
         else:
-            # Other signals: block if open_count >= MAX_POS - PUMP_FLOW_RESERVED_SLOTS
+            # Other signals: block if non-pump-chain count >= available slots
             from hermes_constants import PUMP_FLOW_RESERVED_SLOTS
-            available_slots = MAX_POS - PUMP_FLOW_RESERVED_SLOTS
-            if open_count >= available_slots:
-                log(f'SKIP: Max positions reached ({open_count}/{available_slots} non-pump-chain slots)')
-                break
+            available_slots = max(0, MAX_POS - PUMP_FLOW_RESERVED_SLOTS)
+            non_pump_chain_count = open_count - pump_chain_count
+            if non_pump_chain_count >= available_slots:
+                log(f'SKIP: Max non-pump-chain positions reached ({non_pump_chain_count}/{available_slots})')
+                continue
 
         # BUG-12 fix: validate source against whitelist before routing to A/B params
         # FIX: Use actual source from DB if available (e.g. 'hmacd-,hzscore' from merged signals)
