@@ -924,10 +924,11 @@ def rule_based_context_gate(token, direction, source, sig):
         # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
         if rsi is not None and rsi < SHORT_RSI_FLOOR:
             return ('AMBIGUOUS', f'pullback-entry SHORT: RSI {rsi:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
-        # XPL DNA: LIVE z > 1.0 means price well above mean — downtrend reversed
+        # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened
+        # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _live_z = _ctx_gate_get_zscore(token)
-        if _live_z is not None and _live_z > 1.0:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 1.0 (price well above mean — downtrend reversed)', 20)
+        if _live_z is not None and _live_z > 0.5:
+            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 0.5 (price above mean — downtrend weakened)', 20)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
