@@ -906,6 +906,13 @@ def rule_based_context_gate(token, direction, source, sig):
             if direction == 'SHORT' and rsi < SIGNAL_FILTER_RSI_MIN:
                 return ('AMBIGUOUS', f'RSI {rsi:.1f} < {SIGNAL_FILTER_RSI_MIN} (oversold)', 10)
 
+        # Hard block: pullback-entry SHORT when RSI < 25 (extremely oversold)
+        # (CAKE DNA: SHORTing into oversold = bounce risk, SL hit)
+        # RSI < 25 means price already dropped significantly — bounce likely
+        _is_pullback = source and 'pullback-entry' in source
+        if _is_pullback and direction == 'SHORT' and rsi is not None and rsi < 25:
+            return ('AMBIGUOUS', f'pullback-entry SHORT: RSI {rsi:.1f} < 25 (extremely oversold — bounce risk)', 20)
+
         # Z-score filter: penalize chasing entries (only when speed is low)
         # KEY INSIGHT: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
         if z_score is not None:
