@@ -113,11 +113,18 @@ def _atr(highs: list, lows: list, closes: list, period: int = 14) -> list:
 def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
     """Detect volume-confirmed breakout LONG.
     
-    Entry conditions:
-      1. ATR(14) < 0.5% — consolidation
-      2. Price breaks 1h high by 0.3% — breakout
-      3. Volume > 2x average — confirmation
-      4. Close near high (close > high * 0.997) — candle strength
+    Entry conditions (2 paths):
+      PATH A — Breakout confirmed:
+        1. ATR(14) < 0.5% — consolidation
+        2. Price breaks 1h high by 0.3% — breakout
+        3. Volume > 2x average — confirmation
+        4. Close near high (close > high * 0.997) — candle strength
+      
+      PATH B — Pre-breakout (earlier entry):
+        1. ATR(14) < 0.5% — consolidation
+        2. Volume spike > 3x average — first sign of buying
+        3. Price within 0.5% of range high — about to break out
+        4. Price above EMA300 — trend confirmation
     """
     if len(candles) < BREAKOUT_LONG_RANGE_PERIOD + 20:
         return None
@@ -138,41 +145,68 @@ def detect_breakout_long(token: str, candles: list) -> Optional[dict]:
     if atr_pct > BREAKOUT_LONG_ATR_MAX_PCT:
         return None  # not compressed enough
 
-    # ── FILTER 2: Range breakout ───────────────────────────────────────
+    # ── Range high (shared between both paths) ─────────────────────────
     range_high = max(highs[latest_idx - BREAKOUT_LONG_RANGE_PERIOD:latest_idx])
     if range_high <= 0:
         return None  # degenerate data
-    breakout_threshold = range_high * (1 + BREAKOUT_LONG_BREAKOUT_PCT / 100)
-    if price <= breakout_threshold:
-        return None  # no breakout
 
-    # ── FILTER 3: Volume confirmation ──────────────────────────────────
+    # ── Volume analysis (shared) ───────────────────────────────────────
     vol_avg = sum(volumes[latest_idx - BREAKOUT_LONG_VOL_LOOKBACK:latest_idx]) / BREAKOUT_LONG_VOL_LOOKBACK
     if vol_avg <= 0:
         return None
     vol_ratio = volumes[latest_idx] / vol_avg
-    if vol_ratio < BREAKOUT_LONG_VOL_MULT:
-        return None  # volume too low
 
-    # ── FILTER 4: Candle strength ──────────────────────────────────────
-    if price < highs[latest_idx] * BREAKOUT_LONG_CLOSE_STRENGTH:
-        return None  # weak close
+    # ── PATH A: Breakout confirmed ─────────────────────────────────────
+    breakout_threshold = range_high * (1 + BREAKOUT_LONG_BREAKOUT_PCT / 100)
+    if price > breakout_threshold and vol_ratio >= BREAKOUT_LONG_VOL_MULT:
+        # Candle strength
+        if price < highs[latest_idx] * BREAKOUT_LONG_CLOSE_STRENGTH:
+            return None  # weak close
+        
+        # Confidence
+        vol_bonus = min(15, (vol_ratio - 2.0) * 5)
+        breakout_mag = (price - range_high) / range_high * 100
+        breakout_bonus = min(10, breakout_mag * 5)
+        confidence = int(min(BREAKOUT_LONG_CONF_CAP,
+            BREAKOUT_LONG_CONF_BASE + vol_bonus + breakout_bonus))
+        confidence = max(BREAKOUT_LONG_CONF_FLOOR, confidence)
+        
+        return {
+            'direction': 'LONG',
+            'confidence': confidence,
+            'value': round(atr_pct, 4),
+            'price': price,
+            'z_score': None,
+        }
 
-    # ── Confidence ─────────────────────────────────────────────────────
-    vol_bonus = min(15, (vol_ratio - 2.0) * 5)
-    breakout_mag = (price - range_high) / range_high * 100
-    breakout_bonus = min(10, breakout_mag * 5)
-    confidence = int(min(BREAKOUT_LONG_CONF_CAP,
-        BREAKOUT_LONG_CONF_BASE + vol_bonus + breakout_bonus))
-    confidence = max(BREAKOUT_LONG_CONF_FLOOR, confidence)
+    # ── PATH B: Pre-breakout (earlier entry) ───────────────────────────
+    # Detect FIRST volume spike during consolidation
+    # Enters BEFORE the breakout, catching the move earlier
+    if vol_ratio >= 3.0:  # strong volume spike (3x average)
+        # Price must be near range high (within 0.5%)
+        proximity = (range_high - price) / range_high * 100
+        if proximity <= 0.5 and proximity >= -0.2:  # near or just above
+            # Check for EMA300 confirmation (price above EMA300)
+            if len(closes) >= 300:
+                k = 2.0 / 301
+                ema_val = sum(closes[:300]) / 300
+                for p in closes[300:]:
+                    ema_val = p * k + ema_val * (1 - k)
+                if price > ema_val:
+                    # Pre-breakout entry — lower confidence but earlier
+                    confidence = int(min(BREAKOUT_LONG_CONF_CAP,
+                        BREAKOUT_LONG_CONF_BASE - 5 + min(10, (vol_ratio - 3.0) * 3)))
+                    confidence = max(BREAKOUT_LONG_CONF_FLOOR, confidence)
+                    
+                    return {
+                        'direction': 'LONG',
+                        'confidence': confidence,
+                        'value': round(atr_pct, 4),
+                        'price': price,
+                        'z_score': None,
+                    }
 
-    return {
-        'direction': 'LONG',
-        'confidence': confidence,
-        'value': round(atr_pct, 4),
-        'price': price,
-        'z_score': None,
-    }
+    return None
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

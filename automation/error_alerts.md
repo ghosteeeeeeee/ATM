@@ -347,3 +347,10 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-13 15:55 UTC
+- **REPEATED** (11x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction:`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
