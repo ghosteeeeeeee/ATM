@@ -246,7 +246,7 @@ VOL_PHASE_MULTS = {
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
-        'Pullback_Entry_Short': 0.0,  # BLOCKED — pullback_entry- 0% WR in HIGH (3 trades, -$0.36), wins in EXTREME/NORMAL
+        'Pullback_Entry_Short': 0.7,  # RELAXED — pullback_entry- 65%WR +$1.01/7d in HIGH (20T). Was 0.0 based on stale 3T data.
         'R2_Structural': 0.0,    # BLOCKED — rr-struct- 33% WR in HIGH (3 trades, -$0.25), wins in NORMAL
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked

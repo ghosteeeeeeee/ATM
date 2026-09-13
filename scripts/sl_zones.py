@@ -306,8 +306,8 @@ def zone_aware_exit_check(token, direction, current_price, atr):
     if atr and atr > 0:
         distance_atr = abs(closest.center - current_price) / atr
     else:
-        distance_pct = abs(closest.center - current_price) / current_price * 100
-        distance_atr = distance_pct / 1.0  # rough estimate: 1% ≈ 1 ATR
+        # Unknown ATR — cannot compute distance in ATR terms, default to hold
+        return {'action': 'hold', 'reason': 'ATR unknown, cannot assess zone distance', 'new_trail_pct': None, 'zone': None}
     
     if distance_atr < EXIT_TIGHTEN_ATR:
         return {

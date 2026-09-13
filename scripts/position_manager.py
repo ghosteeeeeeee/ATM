@@ -2508,15 +2508,17 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         try:
             from sl_zones import zone_aware_exit_check
             _conn_slz_exit = sqlite3.connect(CANDLES_DB, timeout=5)
-            _cur_slz_exit = _conn_slz_exit.cursor()
-            _cur_slz_exit.execute("""
-                SELECT open, high, low, close FROM candles_1h
-                WHERE token = ? AND is_closed = 1
-                ORDER BY ts DESC LIMIT 20
-            """, (token.upper(),))
-            _atr_rows_slz = _cur_slz_exit.fetchall()
-            _cur_slz_exit.close()
-            _conn_slz_exit.close()
+            try:
+                _cur_slz_exit = _conn_slz_exit.cursor()
+                _cur_slz_exit.execute("""
+                    SELECT open, high, low, close FROM candles_1h
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 20
+                """, (token.upper(),))
+                _atr_rows_slz = _cur_slz_exit.fetchall()
+                _cur_slz_exit.close()
+            finally:
+                _conn_slz_exit.close()
             _atr_slz = 0
             if len(_atr_rows_slz) >= 15:
                 _trs_slz = []
@@ -2545,8 +2547,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 log(f"  [SL-ZONE-WATCH] {token} {direction}: {_exit_check['reason']}")
         except ImportError:
             pass  # sl_zones not available
-        except Exception:
-            pass  # non-fatal
+        except Exception as e:
+            log(f"  ⚠️ [SL-ZONE-EXIT] Error for {token}: {e}", 'WARN')
 
         # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
         # Check if this trade's signal uses pump-exit

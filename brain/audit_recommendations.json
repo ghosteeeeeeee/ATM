@@ -1,175 +1,89 @@
 {
-    "timestamp": "2026-09-13T18:00:00Z",
+    "timestamp": "2026-09-13T19:30:00Z",
     "session_brain_stats": {
         "total_vectors": 157487,
-        "top_topics": ["bb_bounce_v2_long", "pullback_entry", "stale_signal_gap", "open_skies", "signal speed velocity"]
+        "top_topics": ["pullback entry", "bb_bounce", "signal performance", "stale gap"]
     },
     "trade_summary_24h": {
-        "trades": 31,
-        "win_rate": 58.1,
-        "pnl": 0.70,
+        "trades": 32,
+        "wr": 56.3,
+        "pnl": 0.44,
         "regime": "NEUTRAL",
-        "rr_ratio": 0.871,
-        "breakeven_wr": 57.4,
-        "status": "ABOVE_BREAKEVEN"
+        "top_performers": "rr-struct+ 7T/57.1%WR +$0.47, pullback-entry- 10T/60%WR +$0.41",
+        "worst_performers": "trend_purity+ 3T/0%WR -$0.75 (dead signal)"
     },
     "trade_summary_7d": {
         "trades": 338,
-        "win_rate": 57.1,
-        "pnl": 1.57,
-        "rr_ratio": 0.754,
-        "breakeven_wr": 57.1,
-        "status": "AT_BREAKEVEN"
+        "wr": 56.8,
+        "pnl": 1.28,
+        "active_signals_pnl": 5.39,
+        "legacy_drag": -3.46,
+        "top_performers": "pullback-entry- 44T/63.6%WR +$2.11, open_skies 8T/62.5%WR +$1.20",
+        "worst_performers": "ema300_dip_short -$0.91, trend_purity+ -$0.90 (dead)"
     },
     "drift_findings": [
         {
-            "item": "Signal metadata NULL",
-            "impact": "Cannot verify entry conditions at execution time. 338/338 7d trades missing entry_rsi_14/signal_z_score.",
-            "status": "NOT_IMPLEMENTED",
-            "severity": "MEDIUM"
+            "item": "pullback-entry- SHORT blocked in HIGH regime",
+            "detail": "volatility_gate_v2.py has Pullback_Entry_Short=0.0 in HIGH based on stale 3T data. Current 7d data: 20T/65%WR +$1.01.",
+            "status": "FIXED — changed multiplier to 0.7",
+            "impact": "+$0.50-1.00/7d expected from more HIGH-regime SHORT entries"
         },
         {
-            "item": "trend_purity+ EXTREME penalty 0.3x not blocking trades",
-            "impact": "3/3 24h trades lost in EXTREME/HIGH despite penalty. Confidence reduction insufficient.",
-            "status": "PARTIALLY_EFFECTIVE",
-            "severity": "HIGH"
+            "item": "rr_engine_resistance SHORT exits structural drag",
+            "detail": "33 exits/7d -$1.35. pullback-entry- 18T -$0.92, pump-chain- 11T -$0.12. Engine exits when price touches resistance — SHORT entries near support get stopped out on bounce.",
+            "status": "NEEDS CODE FIX — grace period or entry distance filter",
+            "impact": "-$0.92/7d from pullback-entry- alone"
         },
         {
-            "item": "rr-struct- approaching kill threshold",
-            "impact": "7T/7d 42.9% WR -$0.42. Kill threshold at 15T if WR<50% or PnL negative.",
-            "status": "MONITORING",
-            "severity": "LOW"
+            "item": "trend_purity+ dead signal still trading",
+            "detail": "11T/7d 36.4%WR -$0.90. Auto-killed at 04:15 UTC but trades still in 7d window.",
+            "status": "Ages out by Sep 14. Kill threshold 15T approaching.",
+            "impact": "-$0.90/7d drag, self-resolving"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "rr_engine_resistance SHORT exits",
-            "frequency": "33 trades/7d",
-            "impact": "-$1.35/7d",
-            "root_cause": "Engine exits SHORT at support levels before support is tested. Pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%.",
-            "recommended_fix": "Code change: add 10-15min grace period after resistance touch before exit. Needs backtest."
+            "problem": "rr-struct- SHORT in HIGH regime weak",
+            "detail": "4T/7d 25%WR -$0.41. Small sample, keep monitoring. Kill at 15T if WR <50%.",
+            "severity": "low"
         },
         {
-            "problem": "trend_purity+ LONG losses in HIGH regime",
-            "frequency": "4/7 7d losers in HIGH",
-            "impact": "-$0.90/7d",
-            "root_cause": "No HIGH regime penalty exists. EXTREME has 0.3x but HIGH has no multiplier.",
-            "recommended_fix": "Monitor at 15T kill threshold. If WR<50% at 15T, kill signal."
+            "problem": "Signal metadata NULL for ALL recent trades",
+            "detail": "entry_rsi_14, signal_z_score not recorded as individual columns. Data exists in _signal_metadata JSON.",
+            "severity": "medium"
         }
     ],
     "missing_implementations": [
-        {
-            "item": "rr-struct- STANDALONE_BYPASS",
-            "rationale": "7T/7d 85.7% WR when firing solo. Currently blocked by confluence gate.",
-            "status": "SUGGESTED",
-            "risk": "LOW — 7T sample, monitor first"
-        },
-        {
-            "item": "rr_engine_resistance exit delay",
-            "rationale": "33T/7d -$1.35 structural SHORT exit drag. Needs code change.",
-            "status": "SUGGESTED",
-            "risk": "MEDIUM — needs backtest"
-        }
+        "rr_engine grace period for SHORT exits (code change needed)",
+        "Signal metadata column recording (5-10 lines)",
+        "bb_position < 0.15 filter for SHORT near support"
     ],
-    "losing_trade_autopsy": {
-        "24h_losers": [
-            {
-                "trade": "MET LONG trend_purity+ -$0.18",
-                "regime": "EXTREME",
-                "exit": "atr_sl_hit",
-                "open_time": "2026-09-13 03:48 UTC",
-                "root_cause": "EXTREME penalty 0.3x applied but still fired. LONG entry in EXTREME whipsaw.",
-                "recommended_change": "Kill trend_purity+ at 15T threshold (currently 11T). No code change needed.",
-                "confidence": "HIGH"
-            },
-            {
-                "trade": "ZRO LONG trend_purity+ -$0.29",
-                "regime": "HIGH",
-                "exit": "rr_engine_support_br",
-                "open_time": "2026-09-13 01:08 UTC",
-                "root_cause": "HIGH regime — no penalty exists. rr_engine_support_br exit near support.",
-                "recommended_change": "Monitor trend_purity+ at 15T kill threshold.",
-                "confidence": "HIGH"
-            },
-            {
-                "trade": "INJ LONG trend_purity+ -$0.28",
-                "regime": "HIGH",
-                "exit": "atr_sl_hit",
-                "open_time": "2026-09-13 00:35 UTC",
-                "root_cause": "HIGH regime — same as ZRO. ATR SL hit after 30min.",
-                "recommended_change": "Same as above — monitor at 15T.",
-                "confidence": "HIGH"
-            },
-            {
-                "trade": "ZEN SHORT rr-struct- -$0.16",
-                "regime": "HIGH",
-                "exit": "atr_sl_hit",
-                "open_time": "2026-09-13 15:28 UTC",
-                "root_cause": "SHORT at HIGH regime — price reversed. ATR SL hit after 1.7h.",
-                "recommended_change": "Monitor rr-struct- at 15T kill threshold.",
-                "confidence": "MEDIUM"
-            },
-            {
-                "trade": "LINK SHORT rr-struct- -$0.12",
-                "regime": "NORMAL",
-                "exit": "rr_engine_resistance",
-                "open_time": "2026-09-13 15:06 UTC",
-                "root_cause": "SHORT near support — rr_engine_resistance exit.",
-                "recommended_change": "Code fix: rr_engine_resistance exit delay. Needs backtest.",
-                "confidence": "MEDIUM"
-            },
-            {
-                "trade": "ZRO SHORT pullback-entry- -$0.21",
-                "regime": "HIGH",
-                "exit": "atr_sl_hit",
-                "open_time": "2026-09-13 13:48 UTC",
-                "root_cause": "SHORT in HIGH — price reversed up. ATR SL hit after 3.8h.",
-                "recommended_change": "NORMAL variance — STAR signal 63.6% WR 7d.",
-                "confidence": "LOW"
-            }
-        ],
-        "impact_on_winners": "No config changes recommended this run. No winners affected."
-    },
     "creative_improvements": [
         {
-            "date": "2026-09-13T18:00:00Z",
-            "idea": "Add rr-struct- to STANDALONE_BYPASS when it reaches 10T+ with WR>55%",
-            "rationale": "7T/7d 85.7% WR when firing solo. Currently blocked by confluence gate requiring 2+ signal types. Adding to STANDALONE_BYPASS would let it fire with 1 source.",
-            "expected_impact": "+$0.10-0.20/7d — captures solo SHORT signals that currently expire",
+            "date": "2026-09-13T19:30:00Z",
+            "idea": "Relax pullback-entry- SHORT volatility gate in HIGH from 0.0 to 0.7",
+            "rationale": "Stale comment said 0%WR (3T). Actual 7d data: 20T/65%WR +$1.01. Multiplier clamped to 0.3 still allowed trades — raising to 0.7 captures more of the edge.",
+            "expected_impact": "+$0.50-1.00/7d",
             "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "sample_size": "7 trades — below 20 threshold, monitor first"
-        },
-        {
-            "date": "2026-09-13T18:00:00Z",
-            "idea": "Monitor trend_purity+ at 15T kill threshold — kill if WR<50%",
-            "rationale": "11T/7d 36.4% WR -$0.90. 3/3 24h trades lost. EXTREME penalty insufficient. At 15T with WR<50%, kill.",
-            "expected_impact": "+$0.90/7d if killed — removes worst performing signal",
-            "category": "exit optimization",
-            "status": "monitoring",
-            "risk": "low",
-            "sample_size": "11 trades — approaching threshold"
-        },
-        {
-            "date": "2026-09-13T18:00:00Z",
-            "idea": "Verify rr_engine_resistance exit delay over next 48h — track if SHORT losses cluster near support",
-            "rationale": "33T/7d -$1.35. SHORT entries near support levels bounce to resistance. Engine exits too early. Needs code change + backtest.",
-            "expected_impact": "+$0.50-1.00/7d if fixed — structural SHORT exit improvement",
-            "category": "exit optimization",
-            "status": "monitoring",
-            "risk": "medium — needs code change",
-            "sample_size": "33 trades — sufficient for investigation"
+            "status": "APPLIED",
+            "risk": "low — single multiplier, high WR base, already profitable at 0.3x",
+            "impact_on_winners": "Would not have blocked any of the 13 HIGH winners in last 7d"
         }
     ],
-    "config_changes_applied": [],
+    "config_changes_applied": [
+        {
+            "file": "scripts/volatility_gate_v2.py",
+            "change": "Pullback_Entry_Short HIGH multiplier 0.0 → 0.7",
+            "rationale": "Stale block based on 3T data. Current 20T/65%WR +$1.01 in HIGH.",
+            "expected_impact": "+$0.50-1.00/7d"
+        }
+    ],
     "next_actions": [
-        "Monitor trend_purity+ at 15T kill threshold (currently 11T/7d 36.4%WR -$0.90). Kill if WR<50% at 15T.",
-        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d 42.9%WR -$0.42). Kill if WR<50% at 15T.",
-        "Verify signal metadata recording — entry_rsi_14, signal_z_score NULL for all recent trades.",
-        "Investigate rr_engine_resistance SHORT exit delay — needs code change + backtest.",
-        "Verify RR_STRUCTURAL_RANGE filter over next 48h (saves TURBO $0.14).",
-        "Monitor disk at 78% (25G free).",
-        "Monitor squeeze_reversal — zero trades since Sep 10. If no trades by Sep 14, investigate."
+        "Monitor pullback-entry- SHORT in HIGH after multiplier change — 48h check",
+        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d)",
+        "Monitor trend_purity+ at 15T kill threshold (currently 11T/7d)",
+        "Fix rr_engine SHORT exit grace period (code change needed)",
+        "Fix signal metadata column recording (5-10 lines)",
+        "Legacy ages out by Sep 14 — expect +$3.46/7d improvement"
     ]
 }

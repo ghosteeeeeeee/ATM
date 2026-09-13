@@ -65,5 +65,16 @@
     "after": "BAD_TRADE_HOURS = {3, 5, 13, 14, 15, 21} — covers 4 additional bad hours",
     "rationale": "7d data: hours 13,14,15,21 are -$2.82 combined. Time-of-day is independent of signal type. Existing time_block missed these.",
     "impact": "Expected +$1.50-2.50/7d from blocking marginal entries at bad hours"
+  },
+  {
+    "timestamp": "2026-09-13T19:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Relaxed pullback-entry- SHORT volatility gate multiplier in HIGH regime from 0.0 to 0.7",
+    "type": "config",
+    "file": "scripts/volatility_gate_v2.py",
+    "before": "Pullback_Entry_Short = 0.0 in HIGH (BLOCKED — stale 3T data)",
+    "after": "Pullback_Entry_Short = 0.7 in HIGH (20T/65%WR +$1.01/7d)",
+    "rationale": "Stale block based on 3 trades with 0%WR. Current 7d data: 20 trades, 65%WR, +$1.01 in HIGH. Multiplier clamped to 0.3 still allowed trades — raising to 0.7 captures more of the edge.",
+    "impact": "+$0.50-1.00/7d expected"
   }
 ]

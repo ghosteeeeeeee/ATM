@@ -2846,15 +2846,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             try:
                 from sl_zones import entry_distance_filter
                 _conn_slz = sqlite3.connect(CANDLES_DB, timeout=5)
-                _cur_slz = _conn_slz.cursor()
-                _cur_slz.execute("""
-                    SELECT close FROM candles_5m
-                    WHERE token = ? AND is_closed = 1
-                    ORDER BY ts DESC LIMIT 1
-                """, (tkn.upper(),))
-                _slz_row = _cur_slz.fetchone()
-                _cur_slz.close()
-                _conn_slz.close()
+                try:
+                    _cur_slz = _conn_slz.cursor()
+                    _cur_slz.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 1
+                    """, (tkn.upper(),))
+                    _slz_row = _cur_slz.fetchone()
+                    _cur_slz.close()
+                finally:
+                    _conn_slz.close()
                 if _slz_row and _slz_row[0] and _slz_row[0] > 0:
                     _slz_price = _slz_row[0]
                     _slz_atr_pct = _atr_cache.get(tkn.upper(), (None,))[0]
@@ -2867,8 +2869,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
             except ImportError:
                 pass  # sl_zones not available
-            except Exception:
-                pass  # non-fatal — let signal through on error
+            except Exception as e:
+                log(f"  ⚠️ [SL-ZONE] Filter error: {e}", 'WARN')  # log instead of silent swallow
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block
