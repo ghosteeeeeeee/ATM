@@ -102,9 +102,11 @@ def _calc_bb_position(closes, period=20):
 def detect(token):
     """Detect oversold bounce setup. Returns {direction, confidence, value, price} or None."""
     from hermes_constants import (
+        OVERSOLD_BOUNCE_RSI_MIN,
         OVERSOLD_BOUNCE_RSI_MAX,
         OVERSOLD_BOUNCE_Z_MAX,
         OVERSOLD_BOUNCE_BB_MAX,
+        OVERSOLD_BOUNCE_VOL_RATIO_MAX,
         OVERSOLD_BOUNCE_MIN_CANDLES,
         OVERSOLD_BOUNCE_CANDLE_FETCH,
         OVERSOLD_BOUNCE_STALENESS_MIN,
@@ -129,16 +131,19 @@ def detect(token):
         return None
 
     closes = [c['close'] for c in candles]
+    volumes = [c['volume'] for c in candles]
     price = closes[-1]
 
-    # 1. RSI check — must be deeply oversold
+    # 1. RSI check — must be oversold but not cliff-edge
     rsi = _calc_rsi(closes, period=OVERSOLD_BOUNCE_RSI_PERIOD)
     if rsi is None:
         return None
+    if rsi < OVERSOLD_BOUNCE_RSI_MIN:
+        return None  # too extreme, likely falling knife
     if rsi > OVERSOLD_BOUNCE_RSI_MAX:
         return None  # not oversold enough
 
-    # 2. Z-score check — price must be well below mean
+    # 2. Z-score check — price must be deeply below mean
     lookback = min(OVERSOLD_BOUNCE_Z_LOOKBACK, len(closes))
     mean = statistics.mean(closes[-lookback:])
     std = statistics.stdev(closes[-lookback:])
@@ -146,14 +151,24 @@ def detect(token):
     if z_score > OVERSOLD_BOUNCE_Z_MAX:
         return None  # not extended enough below mean
 
-    # 3. BB position check — price in lower band
+    # 3. BB position check — price must be below middle band
     bb_position = _calc_bb_position(closes, period=OVERSOLD_BOUNCE_BB_PERIOD)
     if bb_position is None:
         return None
     if bb_position > OVERSOLD_BOUNCE_BB_MAX:
         return None  # not in lower band
 
-    # 4. Momentum check — must be falling or flat (sellers active/exhausted)
+    # 4. Volume exhaustion check — sellers must be exhausting
+    # Volume drying up = selling pressure fading = bounce imminent
+    if len(volumes) >= 20:
+        avg_vol = sum(volumes[-20:]) / 20
+        vol_ratio = volumes[-1] / avg_vol if avg_vol > 0 else 1
+        if vol_ratio > OVERSOLD_BOUNCE_VOL_RATIO_MAX:
+            return None  # volume too high, selling still active
+    else:
+        vol_ratio = 1
+
+    # 5. Momentum check — must be falling or flat (sellers active/exhausted)
     # Rising momentum = already bouncing, don't chase
     if len(closes) >= OVERSOLD_BOUNCE_MOM_LOOKBACK + 1:
         vel = (closes[-1] - closes[-OVERSOLD_BOUNCE_MOM_LOOKBACK - 1]) / closes[-OVERSOLD_BOUNCE_MOM_LOOKBACK - 1] * 100
@@ -194,6 +209,7 @@ def detect(token):
         'z_score': z_score,
         'bb_position': bb_position,
         'momentum_state': momentum_state,
+        'vol_ratio': vol_ratio,
     }
 
 

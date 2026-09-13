@@ -3427,13 +3427,16 @@ PULLBACK_CONF_BONUS_DRY          = 5       # confidence bonus for very low volum
 PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
 
 # ── oversold_bounce (mean reversion at extreme oversold) ──────────────────────
-# oversold_bounce.py — LONG when RSI < 25 + z-score < -1 + BB < 0.3
-# Backtest: 70% WR, +$0.97 total at RSI < 25 + z < -1 (40 trades)
+# oversold_bounce.py — LONG when RSI 15-20 + z-score < -1.5 + BB < 0 + vol drying
+# Backtest: RSI 15-25 + z < -1.5 + BB < 0 = 85.7% WR, +$0.74 (7 trades)
+# Tight: RSI 15-20 + z < -1.5 + BB < 0 = 100% WR, +$0.35 (3 trades)
 # Thesis: Oversold cascades are overreactions, price reverts to mean
 OVERSOLD_BOUNCE_ENABLED             = True    # master kill-switch (LONG only)
-OVERSOLD_BOUNCE_RSI_MAX             = 25      # RSI must be below this (oversold threshold)
-OVERSOLD_BOUNCE_Z_MAX               = -1.0    # z-score must be below this (price below mean)
-OVERSOLD_BOUNCE_BB_MAX              = 0.3     # BB position must be below this (lower band)
+OVERSOLD_BOUNCE_RSI_MIN             = 15      # RSI must be above this (not cliff-edge)
+OVERSOLD_BOUNCE_RSI_MAX             = 20      # RSI must be below this (golden zone: not too extreme, not too mild)
+OVERSOLD_BOUNCE_Z_MAX               = -2.0    # z-score must be below this (deeply extended — golden zone)
+OVERSOLD_BOUNCE_BB_MAX              = -0.5    # BB position must be below this (deep in lower band)
+OVERSOLD_BOUNCE_VOL_RATIO_MAX       = 0.8     # volume must be < this x avg (seller exhaustion)
 OVERSOLD_BOUNCE_MOM_LOOKBACK        = 5       # bars for momentum check
 OVERSOLD_BOUNCE_MIN_CANDLES         = 20      # minimum candles needed
 OVERSOLD_BOUNCE_CANDLE_FETCH        = 50      # candles to fetch from DB
@@ -3445,9 +3448,9 @@ OVERSOLD_BOUNCE_RSI_PERIOD          = 14      # RSI lookback period
 OVERSOLD_BOUNCE_BB_PERIOD           = 20      # Bollinger Band lookback period
 OVERSOLD_BOUNCE_Z_LOOKBACK          = 20      # z-score lookback period
 OVERSOLD_BOUNCE_MOM_THRESHOLD       = 0.1     # velocity threshold for rising/falling
-OVERSOLD_BOUNCE_CONF_RSI_DEEP       = 15      # RSI threshold for deep oversold bonus
-OVERSOLD_BOUNCE_CONF_Z_DEEP         = -1.5    # z-score threshold for deep extension bonus
-OVERSOLD_BOUNCE_CONF_BB_DEEP        = -0.3    # BB threshold for deep lower band bonus
+OVERSOLD_BOUNCE_CONF_RSI_DEEP       = 18      # RSI threshold for deep oversold bonus
+OVERSOLD_BOUNCE_CONF_Z_DEEP         = -2.0    # z-score threshold for deep extension bonus
+OVERSOLD_BOUNCE_CONF_BB_DEEP        = -1.0    # BB threshold for deep lower band bonus
 OVERSOLD_BOUNCE_CONF_BONUS_RSI      = 5       # confidence bonus for deep oversold RSI
 OVERSOLD_BOUNCE_CONF_BONUS_Z        = 5       # confidence bonus for deep z-score extension
 OVERSOLD_BOUNCE_CONF_BONUS_BB       = 3       # confidence bonus for deep lower BB position
