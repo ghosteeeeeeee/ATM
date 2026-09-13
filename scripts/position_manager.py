@@ -2550,8 +2550,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
                     if new_sl > current_sl:
                         pos['stop_loss'] = new_sl
-                        # Persist to DB
-                        _persist_sl(db_conn, trade_id, new_sl)
+                        _persist_sl(trade_id, new_sl)
                         log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
                 else:
                     lowest_price = float(pos.get("lowest_price", cur))
@@ -2560,7 +2559,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
                     if new_sl < current_sl:
                         pos['stop_loss'] = new_sl
-                        _persist_sl(db_conn, trade_id, new_sl)
+                        _persist_sl(trade_id, new_sl)
                         log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
                 
                 # Check momentum exit (DIRECTION-AWARE)

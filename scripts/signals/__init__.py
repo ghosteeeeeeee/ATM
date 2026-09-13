@@ -56,6 +56,7 @@ from hermes_constants import (
     EMA300_BREAKTHROUGH_PLUS_ENABLED,
     EMA300_BREAKTHROUGH_MINUS_ENABLED,
     WALL_ST_CYCLE_ENABLED, WALL_ST_CYCLE_PLUS_ENABLED, WALL_ST_CYCLE_MINUS_ENABLED,
+    TREND_IGNITION_ENABLED, TREND_IGNITION_PLUS_ENABLED, TREND_IGNITION_MINUS_ENABLED,
 )
 
 
@@ -366,6 +367,11 @@ try:
 except Exception:
     _wall_street_cycle_run = None
 
+try:
+    from signals.trend_ignition import run as _trend_ignition_run
+except Exception:
+    _trend_ignition_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -434,6 +440,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'ema300_breakthrough',       'enabled': 'EMA300_BREAKTHROUGH_ENABLED', 'run': _ema300_breakthrough_run},
     {'name': 'rr_structural',            'enabled': 'RR_STRUCTURAL_ENABLED',     'run': _rr_structural_run},
     {'name': 'wall_street_cycle',        'enabled': 'WALL_ST_CYCLE_ENABLED',     'run': _wall_street_cycle_run},
+    {'name': 'trend_ignition',            'enabled': 'TREND_IGNITION_ENABLED',    'run': _trend_ignition_run},
 ]
 
 

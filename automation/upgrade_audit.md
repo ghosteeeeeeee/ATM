@@ -395,8 +395,60 @@
 6. **Dead code fix in VEL-FILTER** — range(3) → range(5)
 
 ### Next Candidates
-1. `trend_ignition.py` — Level 2, HIGH value, 100% WR in 7-day backtest
-2. `trend_momentum.py` — Level 2, HIGH value, 3.0:1 R:R
+1. `trend_momentum.py` — Level 2, HIGH value, 3.0:1 R:R
+2. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
+3. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
+4. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist (timer disabled)
+5. Pump-Chain Exit — Level 2, HIGH value, ATR trail for pump-chain momentum
+
+---
+
+## Plan: 2026-09-08_trend-ignition-signal-spec.md
+- **Date scanned:** 2026-09-13 18:00
+- **Core request:** Early-stage breakout signal at trend START — volume spike + compression + breakout
+- **Difficulty:** Level 2 (new signal, ~200 lines)
+- **Value:** HIGH — 100% WR in 7-day backtest (9 signals), avg +1.92% return
+- **Status:** IMPLEMENTED
+- **Reason:** Created `scripts/signals/trend_ignition.py` (215 lines). 15 constants added to hermes_constants.py. Registered in __init__.py, source weight 1.3 in signal_compactor.py. Added to REGIME_SIGNALS (NORMAL+HIGH), STANDALONE_BYPASS, PROFIT_MONSTER_BYPASS. Syntax verified, imports clean, detection logic tested (0 signals on test tokens — expected, needs specific conditions).
+
+## Plan: sl-memory-sr-system.md
+- **Date scanned:** 2026-09-13 18:00
+- **Core request:** SL Memory as S/R — use previous stop-losses as support/resistance levels
+- **Difficulty:** Level 4 (new DB table, multi-system integration)
+- **Value:** HIGH — prevents repeated stop-outs at same levels
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Requires new sl_memory table in PostgreSQL, zone aggregation logic, RR engine integration, position_manager changes. Complex multi-day project. Defer.
+
+## Plan: pump-chain-exit-spec.md
+- **Date scanned:** 2026-09-13 18:00
+- **Core request:** ATR trailing exit for pump-chain — replaces RR engine exits that kill momentum
+- **Difficulty:** Level 2 (modifies position_manager.py, adds constants)
+- **Value:** HIGH — FIL case: +12.7% vs +6.5% current exit
+- **Status:** ALREADY IMPLEMENTED (with bug fix)
+- **Reason:** Full pump-exit logic in position_manager.py (lines 2506-2639). Constants exist (PUMP_EXIT_*). SIGNAL_EXIT_CONFIG has pump-chain+/- → pump_exit. **BUG FIXED:** `_persist_sl` called with extra `db_conn` arg (lines 2554, 2563) — removed extra arg.
+
+## Plan: hl-trigger-sl-v2.md
+- **Date scanned:** 2026-09-13 18:00
+- **Core request:** HL trigger orders V2 — server-side SL/TP to eliminate slippage
+- **Difficulty:** Level 3 (HL SDK integration, guardian changes)
+- **Value:** HIGH — estimated 139% PnL savings over 7 days
+- **Status:** NOT IMPLEMENTED
+- **Reason:** V1 was disabled due to bugs (incomplete placement, stale matching, rate limiting). V2 spec uses SDK atomic functions. 2 CRITICAL + 4 HIGH audit findings. Requires careful testing. Defer.
+
+---
+
+## Updated Summary (2026-09-13)
+
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED (this session) | 1 |
+| ALREADY IMPLEMENTED | 7 |
+| PARTIAL | 2 |
+| NOT IMPLEMENTED | 7 |
+| N/A (investigation/data) | 3 |
+
+### Implemented This Session
+1. **trend_ignition.py** — early-stage breakout signal (100% WR backtest, 215 lines, full integration)
 3. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
 4. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
 5. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist

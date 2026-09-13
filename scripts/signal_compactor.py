@@ -668,6 +668,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # wall_street_cycle — euphoria/capitulation reversal (Wall Street Psychology Cycle)
     ('wall_street_cycle_long',  'wall-st-cycle+'):  1.25,  # capitulation LONG — buy the fear
     ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
+    # trend_ignition — early-stage breakout at trend START (100% WR backtest)
+    ('trend_ignition_long', 'trend-ignition+'):  1.3,  # NEW — 100% WR 7-day backtest, volume+compression breakout
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

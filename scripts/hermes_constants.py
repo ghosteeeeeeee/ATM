@@ -1309,6 +1309,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'resistance-break',      # resistance break + pullback — ATR SL, not PM Trail
     'hh-hl',                 # Structure Sniper — ATR-based SL/TP, not PM Trail
     'ema300-breakthrough',   # EMA300 breakthrough — 15m breakout, manage via ATR SL
+    'trend-ignition',        # early-stage breakout — manage via ATR SL, not PM Trail
     'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
@@ -2311,6 +2312,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'ema300-breakthrough',  # EMA300 breakthrough — 15m breakout confirmation, works solo
     'trend_purity',  # EMA30 purity-based LONG/CRASH SHORT — directional momentum, works solo
     'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
+    'trend-ignition',  # early-stage breakout — volume spike + compression, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -3334,6 +3336,40 @@ OPEN_SKIES_SUPPORT_STRONG       = 5       # support levels for strong floor bonu
 OPEN_SKIES_SUPPORT_MODERATE     = 3       # support levels for moderate floor bonus
 OPEN_SKIES_SMA50_STRONG         = 3.0     # % — distance from SMA50 for strong trend bonus
 OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for moderate trend bonus
+
+# ── trend_ignition (early-stage breakout at trend START) ────────────────────
+# trend_ignition.py — volume spike + compression breakout + trend alignment
+# Backtested: 100% WR (9 signals, 7-day), avg +1.92% return
+# Classification: Trend-following (LONG only — catches start of move)
+TREND_IGNITION_ENABLED          = True    # master kill-switch
+TREND_IGNITION_PLUS_ENABLED     = True    # LONG direction
+TREND_IGNITION_MINUS_ENABLED    = False   # SHORT not applicable
+
+# Volume
+TREND_IGNITION_VOL_SPIKE_MIN    = 2.5     # minimum volume spike ratio
+TREND_IGNITION_VOL_ELEVATED_RATIO = 2.0   # "elevated" = 2x average
+TREND_IGNITION_VOL_SUSTAINED_MIN = 2      # minimum bars with elevated volume (out of last 3)
+
+# Compression
+TREND_IGNITION_BB_MIN           = 1.0     # minimum BB width % (compressed but not dead)
+TREND_IGNITION_BB_MAX           = 2.0     # maximum BB width % (not already expanded)
+
+# Breakout
+TREND_IGNITION_BREAKOUT_PERIOD  = 20      # bars for consolidation high
+
+# Trend
+TREND_IGNITION_EMA_PERIOD       = 50      # trend filter EMA
+TREND_IGNITION_EMA_MIN_DIST     = 0.5     # minimum % distance from EMA50
+
+# RSI
+TREND_IGNITION_RSI_MAX          = 65      # not overbought
+
+# Cooldown
+TREND_IGNITION_COOLDOWN_HOURS   = 1       # per-token cooldown
+
+# Confidence
+TREND_IGNITION_CONF_BASE        = 75      # base confidence
+TREND_IGNITION_CONF_CAP         = 92      # max confidence (system ceiling)
 
 # ── pullback_entry (post-impulse consolidation) ─────────────────────────────
 # pullback_entry.py — buy low-volume pullbacks after strong moves, before continuation
