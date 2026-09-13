@@ -195,31 +195,32 @@ def detect(token):
     # 8. Z-score filter (CEO 2026-09-12 — XPL DNA analysis)
     # SHORT needs price BELOW mean (negative z) — downtrend intact
     # LONG needs price ABOVE mean (positive z) — uptrend intact
-    # Losing trades (ONDO/LINK/SAND) had z > 0 — price already reversed
+    # z=0 to 0.5 is danger zone (20% WR); z=0.5-1.0 is profitable (67% WR)
+    # Threshold 0.5: blocks worst zone while keeping profitable zone
     # Note: len(closes) >= PULLBACK_MIN_CANDLES (20) guaranteed by step 1
     import statistics
     _mean = statistics.mean(closes[-20:])
     _std = statistics.stdev(closes[-20:])
     z_score = (price - _mean) / _std if _std > 0 else 0
-    if direction == 'SHORT' and z_score > 0:
-        return None  # price above mean = downtrend reversed
-    if direction == 'LONG' and z_score < 0:
-        return None  # price below mean = uptrend reversed
+    if direction == 'SHORT' and z_score > 0.5:
+        return None  # price above mean = downtrend reversed (danger zone)
+    if direction == 'LONG' and z_score < -0.5:
+        return None  # price below mean = uptrend reversed (danger zone)
 
     # 9. Support/Resistance proximity check (CEO 2026-09-11)
     # SHORT at support = bounce risk (SAND/NOT/BANANA loss pattern)
     # LONG at resistance = rejection risk
-    from hermes_constants import PULLBACK_SUPPORT_PROXIMITY_PCT
+    from hermes_constants import PULLBACK_SUPPORT_PROXIMITY_PCT, PULLBACK_SUPPORT_LOOKBACK
     recent_lows = [c['low'] for c in candles]
     recent_highs = [c['high'] for c in candles]
     if recent_lows and direction == 'SHORT':
-        min_low = min(recent_lows[-PULLBACK_VOL_LOOKBACK:])
+        min_low = min(recent_lows[-PULLBACK_SUPPORT_LOOKBACK:])
         if min_low > 0:
             dist_from_low = (price - min_low) / min_low * 100
             if dist_from_low < PULLBACK_SUPPORT_PROXIMITY_PCT:
                 return None  # price at support = bounce risk for SHORT
     if recent_highs and direction == 'LONG':
-        max_high = max(recent_highs[-PULLBACK_VOL_LOOKBACK:])
+        max_high = max(recent_highs[-PULLBACK_SUPPORT_LOOKBACK:])
         if max_high > 0:
             dist_from_high = (max_high - price) / max_high * 100
             if dist_from_high < PULLBACK_SUPPORT_PROXIMITY_PCT:
