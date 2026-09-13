@@ -135,8 +135,9 @@ def _compute_price_acceleration(token, lookback=None):
 
 
 def _get_range_position(token):
-    """Get price position within the 1h range (0=at low, 100=at high).
+    """Get price position within the rolling 6h range (0=at low, 100=at high).
 
+    Uses MAX(high)/MIN(low) over last 6 1h candles for a dynamic range.
     Returns float 0-100 or None if insufficient data.
     Used to block LONG at top of range (buying resistance) and SHORT at bottom (selling support).
     """
@@ -144,25 +145,26 @@ def _get_range_position(token):
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         cur = conn.cursor()
+        # Rolling 6h range: MAX(high) and MIN(low) over last 6 closed 1h candles
         cur.execute("""
-            SELECT high, low FROM candles_1h
+            SELECT MAX(high), MIN(low) FROM candles_1h
             WHERE token = ? AND is_closed = 1
-            ORDER BY ts DESC LIMIT 1
-        """, (token.upper(),))
+            ORDER BY ts DESC LIMIT 6
+        """, (token,))
         row = cur.fetchone()
-        if not row or row[0] == row[1]:
+        if not row or row[0] is None or row[1] is None or row[0] == row[1]:
             return None
+        high, low = row[0], row[1]
         # Get current price from 1m candles
         cur.execute("""
             SELECT close FROM candles_1m
             WHERE token = ? AND is_closed = 1
             ORDER BY ts DESC LIMIT 1
-        """, (token.upper(),))
+        """, (token,))
         price_row = cur.fetchone()
         if not price_row:
             return None
         price = price_row[0]
-        high, low = row[0], row[1]
         return round((price - low) / (high - low) * 100, 1)
     except Exception:
         return None
@@ -190,6 +192,8 @@ def detect(token, price):
 
     # Get range position for top/bottom filter
     range_pos = _get_range_position(token)
+    if range_pos is None:
+        _log(f'{token} range_pos=None (no data — range filter disabled)')
 
     # LONG evaluation
     long_ok = False
@@ -206,8 +210,8 @@ def detect(token, price):
         elif RR_STRUCTURAL_BLOCK_ACCEL and price_accel is not None and price_accel < 0:
             _log(f'{token} LONG blocked: accel {price_accel:+.6f} < 0 (price going DOWN)')
         # Range position check: don't LONG when price at top of 1h range
-        elif range_pos is not None and range_pos > RR_STRUCTURAL_RANGE_LONG_MAX:
-            _log(f'{token} LONG blocked: range {range_pos:.1f}% > {RR_STRUCTURAL_RANGE_LONG_MAX}% (buying at top)')
+        elif range_pos is not None and range_pos >= RR_STRUCTURAL_RANGE_LONG_MAX:
+            _log(f'{token} LONG blocked: range {range_pos:.1f}% >= {RR_STRUCTURAL_RANGE_LONG_MAX}% (buying at top)')
         else:
             long_ok = True
 
@@ -226,8 +230,8 @@ def detect(token, price):
         elif RR_STRUCTURAL_BLOCK_ACCEL and price_accel is not None and price_accel > 0:
             _log(f'{token} SHORT blocked: accel {price_accel:+.6f} > 0 (price going UP)')
         # Range position check: don't SHORT when price at bottom of 1h range
-        elif range_pos is not None and range_pos < RR_STRUCTURAL_RANGE_SHORT_MIN:
-            _log(f'{token} SHORT blocked: range {range_pos:.1f}% < {RR_STRUCTURAL_RANGE_SHORT_MIN}% (selling at bottom)')
+        elif range_pos is not None and range_pos <= RR_STRUCTURAL_RANGE_SHORT_MIN:
+            _log(f'{token} SHORT blocked: range {range_pos:.1f}% <= {RR_STRUCTURAL_RANGE_SHORT_MIN}% (selling at bottom)')
         else:
             short_ok = True
 
