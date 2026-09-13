@@ -192,7 +192,26 @@ def detect(token):
     else:
         momentum_state = 'flat'
 
-    # 8. Support/Resistance proximity check (CEO 2026-09-11)
+    # 8. Z-score filter (CEO 2026-09-12 — XPL DNA analysis)
+    # SHORT needs price BELOW mean (negative z) — downtrend intact
+    # LONG needs price ABOVE mean (positive z) — uptrend intact
+    # Losing trades (ONDO/LINK/SAND) had z > 0 — price already reversed
+    if len(closes) >= 20:
+        import statistics as _stats
+        _mean = _stats.mean(closes[-20:])
+        _std = _stats.stdev(closes[-20:])
+        if _std > 0:
+            z_score = (price - _mean) / _std
+            if direction == 'SHORT' and z_score > 0:
+                return None  # price above mean = downtrend reversed
+            if direction == 'LONG' and z_score < 0:
+                return None  # price below mean = uptrend reversed
+        else:
+            z_score = 0
+    else:
+        z_score = 0
+
+    # 9. Support/Resistance proximity check (CEO 2026-09-11)
     # SHORT at support = bounce risk (SAND/NOT/BANANA loss pattern)
     # LONG at resistance = rejection risk
     from hermes_constants import PULLBACK_SUPPORT_PROXIMITY_PCT
@@ -256,6 +275,7 @@ def detect(token):
         'bb_width': bb_width,
         'rsi': rsi,
         'momentum_state': momentum_state,
+        'z_score': z_score,
     }
 
 
