@@ -260,6 +260,10 @@ def scan_signals():
         if direction not in ('LONG', 'SHORT'):
             continue
         
+        # pump_flow_signal now only handles SHORT — LONG is handled by pump_chain_long
+        if direction == 'LONG':
+            continue
+        
         # BTC trend filter — skip LONG when BTC 1h is negative
         if direction == 'LONG' and not btc_1h_ok:
             continue
