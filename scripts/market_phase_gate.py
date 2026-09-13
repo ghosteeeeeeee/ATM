@@ -47,6 +47,7 @@ FAMILY_MAP = {
                     'accel_300_v3_long', 'accel_300_v3_short'],
     'Pump_Flow': ['pump_chain', 'pump_chain+', 'pump_chain-', 'pump-catcher', 'pump-catcher+', 'pump-catcher-'],
     'Pullback_Entry': ['pullback_entry', 'pullback_entry+', 'pullback_entry-', 'pullback-entry', 'pullback-entry+', 'pullback-entry-'],
+    'Oversold_Bounce': ['oversold_bounce', 'oversold_bounce_long', 'oversold-bounce', 'oversold-bounce+'],
     'EMA300_Dip': ['ema300_dip', 'ema300_dip_long', 'ema300_dip_short', 'ema300-dip-long', 'ema300-dip-short',
                     'ema300_breakthrough', 'ema300_breakthrough_long', 'ema300_breakthrough_short',
                     'ema300-breakthrough+', 'ema300-breakthrough-'],

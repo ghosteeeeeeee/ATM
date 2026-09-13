@@ -760,6 +760,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             PUMP_FLOW_ENABLED, PUMP_FLOW_PLUS_ENABLED, PUMP_FLOW_MINUS_ENABLED,
             PUMP_CATCHER_ENABLED, PUMP_CATCHER_PLUS_ENABLED, PUMP_CATCHER_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+            OVERSOLD_BOUNCE_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
             CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
@@ -951,6 +952,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 return None
             if _comp == 'pullback-entry-' and not PULLBACK_ENTRY_MINUS_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PULLBACK_ENTRY_MINUS_ENABLED=False', flush=True)
+                return None
+            # oversold_bounce — mean reversion at extreme oversold
+            if _comp == 'oversold-bounce' and not OVERSOLD_BOUNCE_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OVERSOLD_BOUNCE_ENABLED=False', flush=True)
+                return None
+            if _comp == 'oversold-bounce+' and not OVERSOLD_BOUNCE_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OVERSOLD_BOUNCE_ENABLED=False', flush=True)
                 return None
             # doji_top — doji exhaustion at top
             if _comp == 'doji-top' and not DOJI_TOP_ENABLED:
@@ -2624,6 +2632,7 @@ def is_component_disabled(component: str) -> bool:
             RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
             SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+            OVERSOLD_BOUNCE_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
             CONTINUUM_OSC_ENABLED, CONTINUUM_OSC_PLUS_ENABLED, CONTINUUM_OSC_MINUS_ENABLED,
@@ -2784,6 +2793,9 @@ def is_component_disabled(component: str) -> bool:
     if c == 'pullback-entry': return not PULLBACK_ENTRY_ENABLED
     if c == 'pullback-entry+': return not PULLBACK_ENTRY_PLUS_ENABLED
     if c == 'pullback-entry-': return not PULLBACK_ENTRY_MINUS_ENABLED
+    # oversold-bounce
+    if c == 'oversold-bounce': return not OVERSOLD_BOUNCE_ENABLED
+    if c == 'oversold-bounce+': return not OVERSOLD_BOUNCE_ENABLED
     # doji-top
     if c == 'doji-top': return not DOJI_TOP_ENABLED
     if c == 'doji-top+': return not DOJI_TOP_PLUS_ENABLED

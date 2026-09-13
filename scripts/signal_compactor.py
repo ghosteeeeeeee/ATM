@@ -570,6 +570,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # pullback_entry — post-impulse consolidation (mean-reversion)
     ('pullback_entry_long', 'pullback-entry+'):  1.0,  # mean-reversion, standard weight
     ('pullback_entry_short', 'pullback-entry-'): 1.0,  # mean-reversion, standard weight
+    # oversold_bounce — mean reversion at extreme oversold (LONG only)
+    ('oversold_bounce_long', 'oversold-bounce+'): 1.0,  # oversold bounce, standard weight
     # doji_top — doji exhaustion at top (mean-reversion)
     ('doji_top_short', 'doji-top-short'):  1.0,  # exit LONG / enter SHORT, standard weight
     # doji_bottom — doji exhaustion at bottom (mean-reversion)

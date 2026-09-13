@@ -64,6 +64,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -101,6 +102,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -137,6 +139,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -160,6 +163,7 @@ REGIME_SIGNALS = {
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.3x)
+        'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
 }
 
@@ -231,12 +235,14 @@ VOL_PHASE_MULTS = {
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
+        'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in EXTREME (oversold = extreme)
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
         'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
         'Pullback_Entry': 0.0,        # BLOCKED — pullback-entry 2T LONG 0%WR -$0.17 + 15T SHORT 53%WR -$0.01 in NORMAL. Wins in EXTREME/HIGH. Key fixed 2026-09-13 (was Pullback_Entry_Short, never matched signal_family output)
+        'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in NORMAL
         'R2_Structural': 0.5,         # PENALIZED — rr-struct 6T LONG 50%WR +$0.21 + 3T SHORT 67%WR -$0.01 in NORMAL. Mixed. Key fixed 2026-09-13 (was R2, never matched)
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
@@ -246,6 +252,7 @@ VOL_PHASE_MULTS = {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
         'Pullback_Entry': 0.7,   # RELAXED — pullback_entry- 20T 65%WR +$1.01/7d in HIGH. Key fixed 2026-09-13 (was Pullback_Entry_Short, never matched)
+        'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in HIGH
         'R2_Structural': 0.0,    # BLOCKED — rr-struct- 4T 25%WR -$0.41 in HIGH, wins in NORMAL. Key fixed 2026-09-13 (was R2_Structural, already matched but value stands)
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked

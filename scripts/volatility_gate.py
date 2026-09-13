@@ -41,6 +41,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
+        'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'doji-top-short',  # doji exhaustion at top — mean-reversion (exit LONG / enter SHORT)
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
         'hl_copy_trader',  # pro trader copy — works in all regimes
@@ -88,6 +89,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
+        'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
@@ -144,6 +146,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
+        'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
         'hl_copy_trader',  # pro trader copy — works in all regimes
@@ -196,6 +199,7 @@ REGIME_SIGNALS = {
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
+        'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-11)
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural

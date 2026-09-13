@@ -2279,6 +2279,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
     'accel-300-v4-short',  # V4 proven momentum SHORT — V2 conditions + FLAT block, works solo
+    'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
     'breakout-long',  # Volume-confirmed breakout LONG — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
@@ -3440,6 +3441,16 @@ OVERSOLD_BOUNCE_STALENESS_MIN       = 10      # max age in minutes for price dat
 OVERSOLD_BOUNCE_COOLDOWN_HOURS      = 2       # per-token cooldown (2 hours)
 OVERSOLD_BOUNCE_CONF_BASE           = 75      # base confidence
 OVERSOLD_BOUNCE_CONF_CAP            = 88      # max confidence (system ceiling)
+OVERSOLD_BOUNCE_RSI_PERIOD          = 14      # RSI lookback period
+OVERSOLD_BOUNCE_BB_PERIOD           = 20      # Bollinger Band lookback period
+OVERSOLD_BOUNCE_Z_LOOKBACK          = 20      # z-score lookback period
+OVERSOLD_BOUNCE_MOM_THRESHOLD       = 0.1     # velocity threshold for rising/falling
+OVERSOLD_BOUNCE_CONF_RSI_DEEP       = 15      # RSI threshold for deep oversold bonus
+OVERSOLD_BOUNCE_CONF_Z_DEEP         = -1.5    # z-score threshold for deep extension bonus
+OVERSOLD_BOUNCE_CONF_BB_DEEP        = -0.3    # BB threshold for deep lower band bonus
+OVERSOLD_BOUNCE_CONF_BONUS_RSI      = 5       # confidence bonus for deep oversold RSI
+OVERSOLD_BOUNCE_CONF_BONUS_Z        = 5       # confidence bonus for deep z-score extension
+OVERSOLD_BOUNCE_CONF_BONUS_BB       = 3       # confidence bonus for deep lower BB position
 
 # ── doji_top (doji exhaustion at tops) ──────────────────────────────────────
 # doji_top.py — exit LONG / enter SHORT when doji appears after strong advance

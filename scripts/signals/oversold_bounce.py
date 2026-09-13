@@ -110,6 +110,17 @@ def detect(token):
         OVERSOLD_BOUNCE_STALENESS_MIN,
         OVERSOLD_BOUNCE_CONF_BASE,
         OVERSOLD_BOUNCE_CONF_CAP,
+        OVERSOLD_BOUNCE_RSI_PERIOD,
+        OVERSOLD_BOUNCE_BB_PERIOD,
+        OVERSOLD_BOUNCE_Z_LOOKBACK,
+        OVERSOLD_BOUNCE_MOM_LOOKBACK,
+        OVERSOLD_BOUNCE_MOM_THRESHOLD,
+        OVERSOLD_BOUNCE_CONF_RSI_DEEP,
+        OVERSOLD_BOUNCE_CONF_Z_DEEP,
+        OVERSOLD_BOUNCE_CONF_BB_DEEP,
+        OVERSOLD_BOUNCE_CONF_BONUS_RSI,
+        OVERSOLD_BOUNCE_CONF_BONUS_Z,
+        OVERSOLD_BOUNCE_CONF_BONUS_BB,
     )
 
     # Get 5m candles
@@ -121,50 +132,54 @@ def detect(token):
     price = closes[-1]
 
     # 1. RSI check — must be deeply oversold
-    rsi = _calc_rsi(closes)
+    rsi = _calc_rsi(closes, period=OVERSOLD_BOUNCE_RSI_PERIOD)
     if rsi is None:
         return None
     if rsi > OVERSOLD_BOUNCE_RSI_MAX:
         return None  # not oversold enough
 
     # 2. Z-score check — price must be well below mean
-    mean = statistics.mean(closes[-20:])
-    std = statistics.stdev(closes[-20:])
+    lookback = min(OVERSOLD_BOUNCE_Z_LOOKBACK, len(closes))
+    mean = statistics.mean(closes[-lookback:])
+    std = statistics.stdev(closes[-lookback:])
     z_score = (price - mean) / std if std > 0 else 0
     if z_score > OVERSOLD_BOUNCE_Z_MAX:
         return None  # not extended enough below mean
 
     # 3. BB position check — price in lower band
-    bb_position = _calc_bb_position(closes)
+    bb_position = _calc_bb_position(closes, period=OVERSOLD_BOUNCE_BB_PERIOD)
     if bb_position is None:
         return None
     if bb_position > OVERSOLD_BOUNCE_BB_MAX:
         return None  # not in lower band
 
     # 4. Momentum check — must be falling or flat (sellers active/exhausted)
-    from hermes_constants import OVERSOLD_BOUNCE_MOM_LOOKBACK
+    # Rising momentum = already bouncing, don't chase
     if len(closes) >= OVERSOLD_BOUNCE_MOM_LOOKBACK + 1:
         vel = (closes[-1] - closes[-OVERSOLD_BOUNCE_MOM_LOOKBACK - 1]) / closes[-OVERSOLD_BOUNCE_MOM_LOOKBACK - 1] * 100
-        momentum_state = 'rising' if vel > 0.1 else 'falling' if vel < -0.1 else 'flat'
+        momentum_state = 'rising' if vel > OVERSOLD_BOUNCE_MOM_THRESHOLD else 'falling' if vel < -OVERSOLD_BOUNCE_MOM_THRESHOLD else 'flat'
     else:
         momentum_state = 'flat'
 
+    # Rising momentum = already bouncing, skip (don't chase)
+    if momentum_state == 'rising':
+        return None
+
     # 5. Staleness check — oversold conditions change quickly
-    from hermes_constants import PULLBACK_STALENESS_MIN
-    if price_age_minutes(token) > PULLBACK_STALENESS_MIN:
+    if price_age_minutes(token) > OVERSOLD_BOUNCE_STALENESS_MIN:
         return None
 
     # Calculate confidence
     conf = OVERSOLD_BOUNCE_CONF_BASE
     # Bonus for deeper oversold
-    if rsi < 15:
-        conf += 5
+    if rsi < OVERSOLD_BOUNCE_CONF_RSI_DEEP:
+        conf += OVERSOLD_BOUNCE_CONF_BONUS_RSI
     # Bonus for deeper z-score
-    if z_score < -1.5:
-        conf += 5
+    if z_score < OVERSOLD_BOUNCE_CONF_Z_DEEP:
+        conf += OVERSOLD_BOUNCE_CONF_BONUS_Z
     # Bonus for very low BB position
-    if bb_position < -0.3:
-        conf += 3
+    if bb_position < OVERSOLD_BOUNCE_CONF_BB_DEEP:
+        conf += OVERSOLD_BOUNCE_CONF_BONUS_BB
     conf = min(conf, OVERSOLD_BOUNCE_CONF_CAP)
 
     # Value = z-score magnitude for sizing (deeper = more extreme = larger position)

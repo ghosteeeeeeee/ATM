@@ -40,6 +40,7 @@ from hermes_constants import (
     NEUTRAL_SNIPER_ENABLED, NEUTRAL_SNIPER_PLUS_ENABLED, NEUTRAL_SNIPER_MINUS_ENABLED,
     SLOW_GRIND_LONG_ENABLED,
     PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
+    OVERSOLD_BOUNCE_ENABLED,
     CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
     SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
     GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
@@ -268,6 +269,11 @@ except Exception:
     _pullback_entry_run = None
 
 try:
+    from signals.oversold_bounce import run as _oversold_bounce_run
+except Exception:
+    _oversold_bounce_run = None
+
+try:
     from signals.doji_top import run as _doji_top_run
 except Exception:
     _doji_top_run = None
@@ -426,6 +432,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'open_skies',                'enabled': 'OPEN_SKIES_ENABLED',            'run': _open_skies_run},
     {'name': 'neutral_sniper',            'enabled': 'NEUTRAL_SNIPER_ENABLED',        'run': _neutral_sniper_run},
     {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
+    {'name': 'oversold_bounce',           'enabled': 'OVERSOLD_BOUNCE_ENABLED',       'run': _oversold_bounce_run},
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
     {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
