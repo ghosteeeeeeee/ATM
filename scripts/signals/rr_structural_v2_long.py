@@ -199,7 +199,7 @@ def detect(token, price):
     """Evaluate structural R:R for a LONG-only signal. Returns signal dict or None.
 
     V2 filters (in addition to base rr-struct filters):
-      - Block LONG when momentum = falling AND (z_score < -2.0 OR bb_position < 0)
+      - Block LONG when momentum = falling AND bb_position < 0 (below lower BB)
         This catches "buying into a falling knife" setups.
     """
     # Get RSI for overbought filtering
