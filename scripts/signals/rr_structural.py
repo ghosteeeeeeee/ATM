@@ -44,6 +44,7 @@ from hermes_constants import (
     RR_STRUCTURAL_BLOCK_ACCEL,
     RR_STRUCTURAL_RANGE_LONG_MAX,
     RR_STRUCTURAL_RANGE_SHORT_MIN,
+    RR_STRUCTURAL_BB_SHORT_MIN,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -182,7 +183,8 @@ def detect(token, price):
                  SHORT when price accel > 0 (price going UP against SHORT),
                  LONG when price accel < 0 (price going DOWN against LONG),
                  LONG when range position > RR_STRUCTURAL_RANGE_LONG_MAX (buying at top),
-                 SHORT when range position < RR_STRUCTURAL_RANGE_SHORT_MIN (selling at bottom).
+                 SHORT when range position < RR_STRUCTURAL_RANGE_SHORT_MIN (selling at bottom),
+                 SHORT when bb_position < RR_STRUCTURAL_BB_SHORT_MIN (oversold = bounce risk).
     """
     # Get RSI for extreme filtering
     rsi = _get_rsi(token)
@@ -232,6 +234,9 @@ def detect(token, price):
         # Range position check: don't SHORT when price at bottom of 1h range
         elif range_pos is not None and range_pos <= RR_STRUCTURAL_RANGE_SHORT_MIN:
             _log(f'{token} SHORT blocked: range {range_pos:.1f}% <= {RR_STRUCTURAL_RANGE_SHORT_MIN}% (selling at bottom)')
+        # BB position check: don't SHORT when oversold (below lower BB = bounce risk)
+        elif short_result['vol_width'].get('bb_position') is not None and short_result['vol_width']['bb_position'] < RR_STRUCTURAL_BB_SHORT_MIN:
+            _log(f'{token} SHORT blocked: bb_position {short_result["vol_width"]["bb_position"]:.3f} < {RR_STRUCTURAL_BB_SHORT_MIN} (oversold = bounce risk)')
         else:
             short_ok = True
 

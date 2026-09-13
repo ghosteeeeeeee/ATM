@@ -3163,6 +3163,7 @@ RR_STRUCTURAL_ACCEL_LOOKBACK  = 10     # number of 1m candles to check for price
 RR_STRUCTURAL_BLOCK_ACCEL     = True   # block trades when price accel is against direction
 RR_STRUCTURAL_RANGE_LONG_MAX  = 80     # block LONG when price > this % of 1h range (buying at top)
 RR_STRUCTURAL_RANGE_SHORT_MIN = 20     # block SHORT when price < this % of 1h range (selling at bottom)
+RR_STRUCTURAL_BB_SHORT_MIN    = 0.1    # block SHORT when bb_position < this (oversold = bounce risk)
 
 # ── Ichimoku Cloud Signal ──────────────────────────────────────────────────────
 # ichimoku_cloud.py — Tenkan/Kijun cross + cloud breakout + future cloud bias
