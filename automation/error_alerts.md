@@ -376,3 +376,12 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.0s (rc=N)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.4s):`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-13 21:25 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 21:23:19, 0 errors
+- **[INFO]** Signals: 108 generated last hour (healthy flow)
+- **[INFO]** Trades: 31 closed today, 54.8% WR, PnL=+$0.17 (+31.53%)
+- **[INFO]** Open positions: 7 (HL) — signals skipped by max-position limits
+- **[WARN]** 45% tokens stale (109/241) — price collector may need tuning
+- **[WARN]** 11 failed services — mostly non-critical (5m-candle, away-detector, better-coder, etc.)
+- **AUTO-FIX**: Disabled hermes-metrics.service — missing script metrics_collector.py, 4.8MB error log spam cleared
