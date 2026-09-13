@@ -277,5 +277,15 @@
     "category": "gap finder",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-13T05:30:00Z",
+    "idea": "SHORT_REGIME_BOOST_EXTREME — increase SHORT confidence by 15% when volatility_regime=EXTREME",
+    "rationale": "EXTREME is best regime (+$2.93/7d, 58.8%WR). SHORT in NEUTRAL strongest combo (126T/7d 63.5%WR +$2.62). System treats EXTREME same as others for SHORT. Targeted boost increases sizing on highest-edge trades.",
+    "expected_impact": "+$0.30-0.50/7d by increasing avg_win on EXTREME SHORT trades",
+    "category": "regime optimization",
+    "status": "suggested — needs 50+ SHORT/EXTREME trade sample",
+    "risk": "low",
+    "validation": "Query SHORT trades in EXTREME with exit_reason=profit-monster-trail vs atr_sl_hit"
   }
 ]
