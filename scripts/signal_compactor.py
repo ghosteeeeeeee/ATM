@@ -1190,13 +1190,13 @@ def _score_signal(token, direction, conf, source, signal_type,
         except Exception as e:
             log(f"  [WARN] Chop detector check failed: {e}", 'WARN')
 
-    # ── Time block: penalty during bad hours (7d data-driven: hours 03,05,13,14,15,21) ───
-    from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_PENALTY, BAD_TRADE_HOURS
+    # ── Time block: penalty during dead zone (03-07 UTC) ───
+    from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_PENALTY, TIME_BLOCK_START, TIME_BLOCK_END
     time_block_mult = 1.0
     if TIME_BLOCK_ENABLED:
         utc_hour = datetime.now(timezone.utc).hour
-        if utc_hour in BAD_TRADE_HOURS:
-            time_block_mult = TIME_BLOCK_PENALTY  # soft penalty (was hard block, re-enabled 2026-08-22)
+        if TIME_BLOCK_START <= utc_hour < TIME_BLOCK_END:
+            time_block_mult = TIME_BLOCK_PENALTY  # soft penalty
 
     score = float(conf)
 

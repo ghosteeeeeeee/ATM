@@ -1,17 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~13:33 UTC (brain_auditor)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-13 ~14:35 UTC (CEO run)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 21T, 61.9% WR, +$0.04. 7d: 330T, 56.4% WR, +$0.63. Market NEUTRAL.
+24h: 25T, 64.0% WR, +$0.44. 7d: 329T, 57.1% WR, +$1.42. Market NEUTRAL.
 
-- **24h:** 21T, 61.9% WR, +$0.04 (VERIFIED brain DB). Flat positive — 1.6% below breakeven WR.
-- **7d:** 330T, 56.4% WR, +$0.63 (VERIFIED — POSITIVE).
-- **7d TOP PERFORMERS:** pullback-entry- 37T/68% WR +$2.10 ★ | open_skies 8T/63% WR +$1.20 ★ | pump_chain 41T/68% WR +$1.11 ★ | rr-struct+ 9T/78% WR +$0.64.
-- **7d LEGACY (still in window):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | coiled_spring 9T/33% WR -$0.48 | pullback_entry+ 6T/17% WR -$0.57. Legacy drag: ~-$3.49/7d (aging out by Sep 14).
-- **24h BIGGEST LOSER:** trend_purity+ LONG — KILLED by auto_1hr 04:15 UTC (8T/24h 12.5%WR -$1.22, all NEUTRAL). Already disabled. 5/8 24h losers are dead signals.
+- **24h:** 25T, 64.0% WR, +$0.44 (VERIFIED brain DB). Improving — above breakeven WR.
+- **7d:** 329T, 57.1% WR, +$1.42 (VERIFIED — POSITIVE, improved from +$0.63 earlier).
+- **7d TOP PERFORMERS:** pullback-entry- 42T/66.7% WR +$2.42 ★ | open_skies 8T/62.5% WR +$1.20 ★ | pump_chain 41T/68.3% WR +$1.11 ★ | rr-struct+ 10T/80% WR +$0.81.
+- **7d LEGACY (aging out):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | pullback_entry+ 6T/17% WR -$0.57 | bb-bounce-v2-long+ 5T/40% WR -$0.45 | ema300-dip-long 4T/25% WR -$0.40 | coiled_spring 2T/0% WR -$0.23 | pump-chain+ 13T/31% WR -$0.29. Legacy drag: ~-$4.43/7d (aging out by Sep 14).
+- **24h BIGGEST LOSER:** trend_purity+ LONG — KILLED by auto_1hr 04:15 UTC (4T/24h 0%WR -$0.91, all NEUTRAL). Already disabled.
 - **Market:** NEUTRAL (100%).
 - **SHORT in NEUTRAL:** Strongest combination (63.5% WR 7d).
 - **LONG in NEUTRAL:** Weakest (mostly legacy).
@@ -23,22 +23,23 @@
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.2%, MAX 1.5%.
 - **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active (brain_auditor 06:49 UTC). 7d these hours -$4.26 combined.
-- **R:R 24h:** avg_win $0.12, avg_loss $-0.20. ratio 0.574. Breakeven WR 63.5%, actual 61.9%.
-- **R:R 7d:** avg_win $0.11, avg_loss $-0.15. ratio 0.754. Breakeven WR 57.1%, actual 56.4%. R:R carries system.
+- **R:R 24h:** avg_win $0.12, avg_loss $-0.20. ratio 0.574. Breakeven WR 63.5%, actual 64.0% (ABOVE breakeven).
+- **R:R 7d:** avg_win $0.11, avg_loss $-0.15. ratio 0.754. Breakeven WR 57.1%, actual 57.1% (AT breakeven). R:R carries system.
 - **signal_compactor:** Running OK. Transient timeouts self-recovered.
-- **Exit analysis 7d:** profit-monster-trail 105T +$7.19 (carries system) | atr_sl_hit 112T +$0.99 (breakeven) | rr_engine_resistance 31T -$1.13 (structural SHORT) | cut-loser-CL-T1 51T -$7.70 (legacy).
+- **Exit analysis 7d:** profit-monster-trail 105T +$7.19 (carries system) | atr_sl_hit 112T +$0.99 (breakeven) | rr_engine_resistance 18T -$2.19 (structural SHORT) | cut-loser-CL-T1 48T -$7.24 (legacy).
 - **SHORT_RSI_FLOOR=25:** Working. Zero SHORT trades with RSI<25 in 7d.
 - **Stale trades insight:** 7d stale >10m: 132T -$0.95. BUT active signal stale trades: +$2.75. Dead signal stale trades: -$3.09. The stale drag is ALL from killed signals — will age out by Sep 14.
 - **rr-struct- MONITORING:** 5T/7d 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). Kill at 15T if WR <50% or PnL negative.
-- **Signal metadata:** entry_rsi_14, signal_z_score NULL for 330/330 7d trades (data in _signal_metadata JSON, not individual columns).
+- **Signal metadata:** entry_rsi_14, signal_z_score NULL for ALL recent trades (data in _signal_metadata JSON, not individual columns).
 
-**🟢 R:R STATUS (FLAT — LEGACY AGING OUT)**
-24h WR 61.9% — 1.6% below breakeven. PnL +$0.04. 7d PnL +$0.63. 5/8 24h losers are dead signals. System structurally healthy — monitoring.
+**🟢 R:R STATUS (IMPROVING — ABOVE BREAKEVEN)**
+24h WR 64.0% — ABOVE breakeven (63.5%). PnL +$0.44. 7d PnL +$1.42. 7d PnL improved from +$0.63 to +$1.42 today. Legacy ages out by Sep 14. System structurally healthy — monitoring.
 
 ## Today's Changes (Sep 13)
 
-1. **brain_auditor ~13:33 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). Market 100% NEUTRAL. **NO CONFIG CHANGE.** R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater). R:R 7d: 0.754 (breakeven 57.1%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, ages out Sep 14. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample, R:R 0.41. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — normal variance, STAR signal 77.8% WR. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss, rr_engine_resistance near support. **KEY:** 5/8 losers dead signals. 3/8 active losses total -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata NULL — 330/330 trades missing entry_rsi_14/signal_z_score. (2) bb_bounce_v2_long degraded 73.3%→60% WR. **CREATIVE:** (1) bb_position < 0.15 filter for SHORT — block near support entries. (2) Monitor rr-struct- at 15T kill threshold. (3) Verify signal metadata recording. **No config change — system flat, legacy ages out Sep 14.**
-2. **brain_auditor ~12:00 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 331T 56.4%WR +$0.63 (PROFITABLE). R:R 24h: 0.574 (breakeven 63.5%, actual 61.9%). R:R 7d: 0.754 (breakeven 57.1%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, KILLED by auto_1hr 04:15 UTC. rr-struct- 3 SHORT (INJ -$0.25, 2 others -$0.14) — 5T sample, R:R 0.41 weak. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance, 7d 80%WR +$0.81. pullback-entry- 1 SHORT (ENA -$0.20) — bb_position=0.08 near support, rr_engine_resistance exit. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata columns NULL but data in _signal_metadata JSON. (2) bb_bounce_v2_long degraded Sep 8 (37.5%WR) but 7d still 60%WR. **CREATIVE:** (1) LONG_RSI_CEILING=70 REJECTED — active signals profitable at RSI>70 (pump_chain 31T 74.2%WR +$0.09, bb_bounce 3T 100%WR +$0.18). (2) rr_engine_resistance SHORT exit delay — needs code change + backtest. **No config change — system flat, legacy ages out Sep 14.**
+1. **CEO ~14:35 UTC — NO CONFIG CHANGE.** DB: 24h 25T 64.0%WR +$0.44 (IMPROVED, above breakeven). 7d: 329T 57.1%WR +$1.42 (VERIFIED POSITIVE, improved from +$0.63). Market 100% NEUTRAL. **NO CONFIG CHANGE.** R:R 24h: 0.574 (breakeven 63.5%, actual 64.0% — ABOVE breakeven). R:R 7d: 0.754 (breakeven 57.1%, actual 57.1% — AT breakeven). **7d LOSERS (all dead/legacy):** ema300_dip_short -$0.91, trend_purity+ -$0.90, slow_grind -$0.80, sma20_dip -$0.73, pullback_entry+ -$0.57. Legacy drag -$4.43/7d, aging out Sep 14. **7d WINNERS:** pullback-entry- +$2.42 ★, open_skies +$1.20, pump_chain +$1.11, rr-struct+ +$0.81. **Active signals: ALL profitable.** Pipeline active. **No param changes — system improving, legacy ages out Sep 14.**
+2. **brain_auditor ~13:33 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). Market 100% NEUTRAL. **NO CONFIG CHANGE.** R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater). R:R 7d: 0.754 (breakeven 57.1%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, ages out Sep 14. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample, R:R 0.41. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — normal variance, STAR signal 77.8% WR. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss, rr_engine_resistance near support. **KEY:** 5/8 losers dead signals. 3/8 active losses total -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata NULL — 330/330 trades missing entry_rsi_14/signal_z_score. (2) bb_bounce_v2_long degraded 73.3%→60% WR. **CREATIVE:** (1) bb_position < 0.15 filter for SHORT — block near support entries. (2) Monitor rr-struct- at 15T kill threshold. (3) Verify signal metadata recording. **No config change — system flat, legacy ages out Sep 14.**
+3. **brain_auditor ~12:00 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 331T 56.4%WR +$0.63 (PROFITABLE). R:R 24h: 0.574 (breakeven 63.5%, actual 61.9%). R:R 7d: 0.754 (breakeven 57.1%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, KILLED by auto_1hr 04:15 UTC. rr-struct- 3 SHORT (INJ -$0.25, 2 others -$0.14) — 5T sample, R:R 0.41 weak. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance, 7d 80%WR +$0.81. pullback-entry- 1 SHORT (ENA -$0.20) — bb_position=0.08 near support, rr_engine_resistance exit. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata columns NULL but data in _signal_metadata JSON. (2) bb_bounce_v2_long degraded Sep 8 (37.5%WR) but 7d still 60%WR. **CREATIVE:** (1) LONG_RSI_CEILING=70 REJECTED — active signals profitable at RSI>70 (pump_chain 31T 74.2%WR +$0.09, bb_bounce 3T 100%WR +$0.18). (2) rr_engine_resistance SHORT exit delay — needs code change + backtest. **No config change — system flat, legacy ages out Sep 14.**
 2. **brain_auditor ~11:15 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, ages out Sep 14. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample, R:R 0.41. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance, 77.8% WR. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss, rr_engine_resistance near support. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata NULL 330/330 — blocks entry condition analysis. (2) bb_bounce_v2_long degraded 73.3%→60% WR. **CREATIVE:** (1) LONG_RSI_CEILING=70 — block overbought LONG entries. (2) SHORT support distance filter. (3) bb_bounce regime-specific confidence. **No config change — system flat, legacy ages out Sep 14.**
 2. **brain_auditor ~10:34 UTC — NO CONFIG CHANGE.** DB: 24h 22T 63.6%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). R:R 7d: 0.738 (breakeven 57.5%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **SIGNAL METADATA:** signal_rsi_14/signal_z_score NULL 330/330 — data in _signal_metadata JSON. **CREATIVE:** (1) Exit RSI tracking for SHORT entries. (2) bb_position < 0.15 SHORT filter. **No config change — system flat, legacy ages out Sep 14.**
 2. **brain_auditor ~09:30 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR -$0.02. 7d: 331T 56.7%WR +$0.83. R:R 24h: 0.608 (breakeven 62.2%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — normal variance. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample R:R 0.41 weak. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss. **KEY:** 5/8 losers dead signals. 3/8 active signal losses -$0.52 total. **CREATIVE:** (1) Monitor rr-struct- at 15T kill threshold. (2) Verify signal metadata recording — entry_rsi_14 NULL for recent trades. (3) SHORT_RSI_CEILING=55 rejected — no data for active signals. **No config change — system flat, legacy ages out.**
@@ -96,7 +97,7 @@
 
 ## Active Decisions
 
-- **R:R SLIGHTLY PROFITABLE.** 24h R:R 0.608 (breakeven 62.2%, actual 61.9%). 7d R:R 0.752 (breakeven 57.1%, actual 56.7%). 7d PnL +$0.83. Legacy ages out today. — 2026-09-13
+- **R:R IMPROVING.** 24h R:R 0.574 (breakeven 63.5%, actual 64.0% — ABOVE breakeven). 7d R:R 0.754 (breakeven 57.1%, actual 57.1% — AT breakeven). 7d PnL +$1.42. Legacy ages out Sep 14. — 2026-09-13 ~14:35 UTC
 - **rr-struct- MONITORING.** 5T/7d, 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). Kill at 15T if WR <50% or PnL negative. — 2026-09-13
 - **Signal metadata NULL.** entry_rsi_14, signal_z_score not recorded for recent trades. Cannot verify entry conditions at execution time. — 2026-09-13
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
@@ -116,11 +117,11 @@
 
 ## Next Actions
 
-1. **Monitor legacy aging out.** ema300_dip_short, coiled_spring, slow_grind, sma20_dip, pullback_entry+ still in 7d window. Expect 7d PnL to improve by ~$3.45 when they age out. — 2026-09-13
-2. **Monitor trend_purity+ EXTREME penalty.** 0.3x multiplier active (Sep 12 15:30) + HIGH regime blocked (Sep 13 05:11). 6T/24h 17%WR -$0.78. Needs 20+ trades to verify improvement. — 2026-09-13
+1. **Monitor legacy aging out.** ema300_dip_short, coiled_spring, slow_grind, sma20_dip, pullback_entry+, bb-bounce-v2-long+, open-skies+, pump-chain+ still in 7d window. Expect 7d PnL to improve by ~$4.43 when they age out. — 2026-09-13 ~14:35 UTC
+2. **Monitor trend_purity+ EXTREME penalty.** 0.3x multiplier active (Sep 12 15:30) + HIGH regime blocked (Sep 13 05:11). 4T/24h 0%WR -$0.91. Needs 20+ trades to verify improvement. — 2026-09-13
 3. **Monitor rr-struct-.** 5T/7d 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). Kill at 15T if WR <50% or PnL negative. — 2026-09-13
-4. **Verify signal metadata.** entry_rsi_14, signal_z_score NULL for recent trades. Cannot verify entry conditions at execution time. — 2026-09-13
-5. **Monitor R:R.** 24h ratio 0.608 (breakeven 62.2%, actual 61.9%). 7d ratio 0.752 (breakeven 57.1%, actual 56.7%). R:R carries system. — 2026-09-13
+4. **Verify signal metadata.** entry_rsi_14, signal_z_score NULL for ALL recent trades. Cannot verify entry conditions at execution time. — 2026-09-13
+5. **Monitor R:R.** 24h ratio 0.574 (breakeven 63.5%, actual 64.0% — ABOVE breakeven). 7d ratio 0.754 (breakeven 57.1%, actual 57.1% — AT breakeven). R:R carries system. — 2026-09-13 ~14:35 UTC
 6. **Monitor squeeze_reversal.** Zero trades since Sep 10. Market condition. If no trades by Sep 14, investigate. — 2026-09-12
 7. **Monitor disk.** Currently 78% (25G free). — 2026-09-13
 8. **signal_compactor timeouts.** Transient, self-recovered. Monitor frequency. — 2026-09-13

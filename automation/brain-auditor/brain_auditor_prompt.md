@@ -212,6 +212,14 @@ Think like a trader who:
 2. **Statistical significance**: The pattern must be clear, not marginal
    - 55% WR vs 45% WR in 10 trades = noise, not signal
    - 70% WR vs 30% WR in 30 trades = worth investigating
+
+3. **⚠️ TIME-BASED CHANGES ARE HIGH RISK** — be extremely conservative
+   - Hourly PnL data has tiny samples (9-22 trades/hour over 7d)
+   - Market conditions change — what's bad today may be good tomorrow
+   - DO NOT create new BAD_TRADE_HOURS sets or expand time blocks
+   - If you must suggest time filtering: only block the 3-5 UTC dead zone (well-established)
+   - Prefer: "monitor for 2 weeks" over "block these hours now"
+   - Time-of-day edges are the FIRST to decay as market microstructure changes
    - When in doubt, say "needs more data"
 
 3. **Impact on winners**: Check how many winning trades your suggestion would have blocked

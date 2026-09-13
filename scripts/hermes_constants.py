@@ -1094,7 +1094,6 @@ TIME_BLOCK_ENABLED = True               # Penalty during bad hours (extended fro
 TIME_BLOCK_START = 3                    # UTC hour (inclusive) — legacy range start (kept for compat)
 TIME_BLOCK_END = 7                      # UTC hour (exclusive: legacy range end)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
-BAD_TRADE_HOURS = {3, 5, 13, 14, 15, 21}  # 7d: these hours are -$3.76 combined (brain_auditor 2026-09-13). Replaces range check.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.

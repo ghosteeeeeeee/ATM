@@ -3440,3 +3440,58 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 **Open Questions:**
 - ETC SHORT open 17.7h — very old position, may be stuck
 - POL SHORT open 6.9h — monitoring
+
+## [2026-09-13 14:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed in last hour (2W/1L, 67% WR, net +$0.41)
+- ETC SHORT pullback-entry- atr_sl_hit +$0.19
+- NXPC SHORT pullback-entry- atr_sl_hit -$0.13
+- CHIP SHORT pullback-entry- atr_sl_hit +$0.35
+**24h:** 24T 16W/8L 66.7%WR +$0.58 | 4 open | All NORMAL
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 14T +$0.64 (58%) — profitable
+- profit-monster-trail: 5T +$0.23
+- rr_engine_resistance: 4T $0.00
+- rr_engine_support_br: 1T -$0.29
+
+**Changes:** None — system healthy, all signals positive
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour
+- atr_sl_hit 58% but avg +$0.046/trade — doing its job
+- Trade freq: 3/hr, normal
+- All 4 open positions fresh (<4h)
+
+**Open Questions:** None
+
+## [2026-09-13 16:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W/1L, 67% WR, net +$0.01)
+- INJ LONG rr-struct+ atr_sl_hit +$0.13
+- BABY LONG open-skies+ atr_sl_hit +$0.02
+- DYDX SHORT pullback-entry- atr_sl_hit -$0.14
+
+**24h:** 25T 68%WR +$0.75 | 4 open | 2T/hr
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 16T +$0.81 (64%) — profitable
+- profit-monster-trail: 5T +$0.23
+- rr_engine_resistance: 3T +$0.20
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal:**
+- rr-struct+: 7T 85.7%WR +$0.93 (top performer)
+- pullback-entry-: 9T 77.8%WR +$0.77
+- rr-struct-: 3T 66.7%WR -$0.14
+- trend_purity+: 3T 0%WR -$0.75 (disabled, correct)
+
+**Changes:** None — system healthy
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour
+- atr_sl_hit 64% but avg +$0.051/trade — profitable, not a problem
+- Trade freq: 2/hr, normal
+- All active signals positive or correctly disabled
+
+**Open Questions:** None
