@@ -2262,6 +2262,7 @@ BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought ca
 # CEO 2026-08-25 — removed 'hl_copy_trader' (5T/8h 0% WR -$2.41. Copy delay = enters after move over. Requires confluence to fire.)
 STANDALONE_BYPASS_SIGNALS = (
     'pump-chain', 'pump_chain',  # chain correlation — fires when coin is pumping, BTC flat irrelevant (2026-09-12)
+    'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-v2-short',
     'range_breakout', 'range_breakout_short',

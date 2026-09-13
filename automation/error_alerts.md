@@ -354,3 +354,8 @@
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction:`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-13 19:55 UTC
+- **REPEATED** (8x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (25x): `Sep N N:N:N python3[TOK]: TS   TS [TOK]   ⚠️ [SL-TOK-TOK] TOK for TOK: name 'sqlite3' is not defined`
