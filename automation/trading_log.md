@@ -1,3 +1,33 @@
+## [2026-09-13 06:09 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BLUR LONG pump-chain+ profit-monster-trail +$0.06)
+**24h:** 24T 58.3%WR +$0.15 | 6 open | All NEUTRAL
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T +$0.59 (41.7%, avg +$0.059 — includes trail-adjusted exits)
+- profit-monster-trail: 6T +$0.34 (25%, avg +$0.057)
+- rr_engine_resistance: 5T -$0.25 (20.8%, avg -$0.050)
+- rr_engine_support_br: 2T -$0.40 (8.3%, avg -$0.200 — worst per-trade)
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h by Signal:**
+- trend_purity+ LONG: 6T 16.7%WR -$0.78 (worst — 5 losses, 1 win)
+- rr-struct- SHORT: 4T 75%WR -$0.02
+- pullback-entry- SHORT: 6T 50%WR $0.00
+- rr-struct+ LONG: 5T 80%WR +$0.67 (best)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour (1 trade closed)
+- Trade freq: 1-2/hr, healthy
+- trend_purity+ EXTREME penalty applied Sep 12 15:30 — only 6 trades since, needs 20+ per brain_auditor
+- System slightly profitable (+$0.15), no urgency to intervene
+
+**Open Questions:**
+- trend_purity+ LONG still hemorrhaging at 16.7%WR — will EXTREME penalty show effect with more data?
+- rr_engine_support_br avg -$0.200/trade — structural, both losses were trend_purity+ trades
+
 ## [2026-09-12 19:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed
@@ -3154,3 +3184,22 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 **Open Questions:**
 - trend_purity+ still bleeding despite EXTREME penalty — monitor next hour
 - cut-loser-CL-T1 activation delay fix still pending (brain_auditor Sep 12)
+
+## FAVORITES Update — 2026-09-13 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE INJ (WR=55.6%, PnL=$0.27, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE LTC (WR=57.1%, PnL=$-0.30, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE NEO (WR=75.0%, AvgPnL=3.62%, Trades=8)
+- PROMOTE BIGTIME (WR=62.5%, AvgPnL=0.61%, Trades=8)
+
+Final set: ['ACE', 'BIGTIME', 'BLUR', 'CC', 'CFX', 'DOT', 'DYDX', 'ENA', 'IMX', 'KAS', 'NEO', 'POL', 'TURBO', 'WLD', 'ZRO']
+
+## LOSERS Update — 2026-09-13 06:05 UTC
+- REMOVE NEAR (insufficient data)
+- REMOVE ETC (WR=50.0%, PnL=$0.14, recovered)
+- REMOVE SUSHI (insufficient data)
+- REMOVE ME (insufficient data)
+- REMOVE WLFI (insufficient data)
+- ADD NOT (WR=20.0%, PnL=$-0.54, wr_collapse (40.0% → 20.0%))
+
+Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
