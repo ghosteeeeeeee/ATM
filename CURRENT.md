@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~10:34 UTC (brain_auditor)**
+**Last Updated: 2026-09-13 ~11:15 UTC (brain_auditor)**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 22T, 63.6% WR, +$0.04. 7d: 330T, 56.4% WR, +$0.63. Market NEUTRAL.
+24h: 21T, 61.9% WR, +$0.04. 7d: 330T, 56.4% WR, +$0.63. Market NEUTRAL.
 
-- **24h:** 22T, 63.6% WR, +$0.04 (VERIFIED brain DB). Flat positive — 1.4% above breakeven WR.
+- **24h:** 21T, 61.9% WR, +$0.04 (VERIFIED brain DB). Flat positive — 1.6% below breakeven WR.
 - **7d:** 330T, 56.4% WR, +$0.63 (VERIFIED — POSITIVE).
 - **7d TOP PERFORMERS:** pullback-entry- 37T/68% WR +$2.10 ★ | open_skies 8T/63% WR +$1.20 ★ | pump_chain 41T/68% WR +$1.11 ★ | rr-struct+ 9T/78% WR +$0.64.
 - **7d LEGACY (still in window):** ema300_dip_short 17T/47% WR -$0.91 | slow_grind 15T/40% WR -$0.80 | sma20_dip 19T/42% WR -$0.73 | coiled_spring 9T/33% WR -$0.48 | pullback_entry+ 6T/17% WR -$0.57. Legacy drag: ~-$3.49/7d (aging out by Sep 14).
@@ -23,20 +23,22 @@
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.2%, MAX 1.5%.
 - **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active (brain_auditor 06:49 UTC). 7d these hours -$4.26 combined.
-- **R:R 24h:** avg_win $0.12, avg_loss $-0.20. ratio 0.608. Breakeven WR 62.2%, actual 61.9%.
-- **R:R 7d:** avg_win $0.11, avg_loss $-0.15. ratio 0.752. Breakeven WR 57.1%, actual 56.7%. R:R carries system.
+- **R:R 24h:** avg_win $0.12, avg_loss $-0.20. ratio 0.574. Breakeven WR 63.5%, actual 61.9%.
+- **R:R 7d:** avg_win $0.11, avg_loss $-0.15. ratio 0.754. Breakeven WR 57.1%, actual 56.4%. R:R carries system.
 - **signal_compactor:** Running OK. Transient timeouts self-recovered.
-- **Exit analysis 48h (losses):** cut-loser-CL-T1 6T avg -$0.18 -$1.08 (legacy) | rr_engine_support_br 6T avg -$0.10 -$0.58 (trend_purity+ dead signal) | rr_engine_resistance 13T avg -$0.00 -$0.04 (breakeven) | atr_sl_hit 30T avg -$0.01 -$0.17 (breakeven).
+- **Exit analysis 7d:** profit-monster-trail 105T +$7.19 (carries system) | atr_sl_hit 112T +$0.99 (breakeven) | rr_engine_resistance 31T -$1.13 (structural SHORT) | cut-loser-CL-T1 51T -$7.70 (legacy).
 - **SHORT_RSI_FLOOR=25:** Working. Zero SHORT trades with RSI<25 in 7d.
 - **Stale trades insight:** 7d stale >10m: 132T -$0.95. BUT active signal stale trades: +$2.75. Dead signal stale trades: -$3.09. The stale drag is ALL from killed signals — will age out by Sep 14.
 - **rr-struct- MONITORING:** 5T/7d 60% WR, R:R 0.41 (avg_loss 2.4x avg_win). Kill at 15T if WR <50% or PnL negative.
+- **Signal metadata:** entry_rsi_14, signal_z_score NULL for 330/330 7d trades (data in _signal_metadata JSON, not individual columns).
 
 **🟢 R:R STATUS (FLAT — LEGACY AGING OUT)**
-24h WR 61.9% — just below breakeven 62.2%. PnL -$0.02. 7d PnL +$0.83. 5/8 24h losers are dead signals. System structurally healthy — monitoring.
+24h WR 61.9% — 1.6% below breakeven. PnL +$0.04. 7d PnL +$0.63. 5/8 24h losers are dead signals. System structurally healthy — monitoring.
 
 ## Today's Changes (Sep 13)
 
-1. **brain_auditor ~10:34 UTC — NO CONFIG CHANGE.** DB: 24h 22T 63.6%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). R:R 7d: 0.738 (breakeven 57.5%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **SIGNAL METADATA:** signal_rsi_14/signal_z_score NULL 330/330 — data in _signal_metadata JSON. **CREATIVE:** (1) Exit RSI tracking for SHORT entries. (2) bb_position < 0.15 SHORT filter. **No config change — system flat, legacy ages out Sep 14.**
+1. **brain_auditor ~11:15 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, ages out Sep 14. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample, R:R 0.41. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance, 77.8% WR. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss, rr_engine_resistance near support. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **DRIFT:** (1) Signal metadata NULL 330/330 — blocks entry condition analysis. (2) bb_bounce_v2_long degraded 73.3%→60% WR. **CREATIVE:** (1) LONG_RSI_CEILING=70 — block overbought LONG entries. (2) SHORT support distance filter. (3) bb_bounce regime-specific confidence. **No config change — system flat, legacy ages out Sep 14.**
+2. **brain_auditor ~10:34 UTC — NO CONFIG CHANGE.** DB: 24h 22T 63.6%WR +$0.04 (FLAT_POSITIVE). 7d: 330T 56.4%WR +$0.63 (PROFITABLE). R:R 7d: 0.738 (breakeven 57.5%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss. **KEY:** 5/8 dead signal. 3/8 active losses -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19. **SIGNAL METADATA:** signal_rsi_14/signal_z_score NULL 330/330 — data in _signal_metadata JSON. **CREATIVE:** (1) Exit RSI tracking for SHORT entries. (2) bb_position < 0.15 SHORT filter. **No config change — system flat, legacy ages out Sep 14.**
 2. **brain_auditor ~09:30 UTC — NO CONFIG CHANGE.** DB: 24h 21T 61.9%WR -$0.02. 7d: 331T 56.7%WR +$0.83. R:R 24h: 0.608 (breakeven 62.2%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — normal variance. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample R:R 0.41 weak. pullback-entry- 1 SHORT (ENA -$0.20) — STAR signal single loss. **KEY:** 5/8 losers dead signals. 3/8 active signal losses -$0.52 total. **CREATIVE:** (1) Monitor rr-struct- at 15T kill threshold. (2) Verify signal metadata recording — entry_rsi_14 NULL for recent trades. (3) SHORT_RSI_CEILING=55 rejected — no data for active signals. **No config change — system flat, legacy ages out.**
 2. **brain_auditor ~07:30 UTC — NO CONFIG CHANGE.** DB: 24h 22T 54.5%WR -$0.24. 7d: 330T 56.7%WR +$0.83. trend_purity+ KILLED by auto_1hr at 04:15 UTC (already disabled). **KEY FINDINGS:** (1) Stale trade drag is ALL from dead signals — active signal stale trades are +$2.75/7d. Dead signal stale trades -$.3.09/7d. Will age out by Sep 14. (2) rr_engine_resistance SHORT exits: 30T/7d -$1.22. pullback-entry- 16T avg -1.83% -$0.91 structural. (3) BAD_TRADE_HOURS verified: 97T/7d in hours {3,5,13,14,15,21} = -$4.26 combined (45.4% WR). (4) 48h exit: cut-loser-CL-T1 7T -$1.19 (legacy heavy), rr_engine_support_br 7T -$0.69 (trend_purity+ legacy). **CREATIVE:** (1) RR Engine SHORT exit delay — add 10-15min grace period after resistance touch. (2) SHORT_RSI_CEILING=55 — block SHORT at overbought RSI. Both need code changes. **No config change — system slightly negative, legacy ages out tomorrow.**
 2. **brain_auditor ~06:49 UTC — CONFIG CHANGE.** DB: 24h 23T 56.5%WR +$0.10. 7d: 333T 56.8%WR +$0.91. **BAD_TRADE_HOURS = {3,5,13,14,15,21} added.** 7d: hours 03,05,13,14,15,21 combined -$3.76/7d (77 trades, 44% WR). Existing time_block only covered 03-07. Added 13,14,15,21 via set membership in signal_compactor.py. Expected +$1.50-2.50/7d. Also: trend_purity+ 17T/7d 52.9%WR -$0.51 (EXTREME flat, HIGH blocked). Stale trades 86T/7d 26% of total -$1.29. pullback-entry- SHORT EXTREME strongest 9T 77.8%WR +$1.11. rr-struct- STANDALONE_BYPASS suggested (85.7% WR 7T). Files: hermes_constants.py, signal_compactor.py.
