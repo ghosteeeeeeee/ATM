@@ -2839,6 +2839,36 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if vol_ok == 0.0:
                 log(f"  🚫 [VOL-FLOOR] {tkn}: blocked — price volatility too low (<0.30%)")
                 continue
+            # ── SL Zone filter: block entries near death zones ────────────────────────
+            # Checks if entry price is too close to a known SL zone (previous stops).
+            # LONG blocked near RESISTANCE zones (previous LONG stops above).
+            # SHORT blocked near SUPPORT zones (previous SHORT stops below).
+            try:
+                from sl_zones import entry_distance_filter
+                _conn_slz = sqlite3.connect(CANDLES_DB, timeout=5)
+                _cur_slz = _conn_slz.cursor()
+                _cur_slz.execute("""
+                    SELECT close FROM candles_5m
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 1
+                """, (tkn.upper(),))
+                _slz_row = _cur_slz.fetchone()
+                _cur_slz.close()
+                _conn_slz.close()
+                if _slz_row and _slz_row[0] and _slz_row[0] > 0:
+                    _slz_price = _slz_row[0]
+                    _slz_atr_pct = _atr_cache.get(tkn.upper(), (None,))[0]
+                    _slz_atr = _slz_price * (_slz_atr_pct / 100) if _slz_atr_pct else _slz_price * 0.01
+                    _slz_pass, _slz_score, _slz_reason, _slz_zone = entry_distance_filter(
+                        tkn.upper(), direction, _slz_price, _slz_atr
+                    )
+                    if not _slz_pass:
+                        log(f"  🚫 [SL-ZONE] {tkn} {direction}: BLOCKED — {_slz_reason}")
+                        continue
+            except ImportError:
+                pass  # sl_zones not available
+            except Exception:
+                pass  # non-fatal — let signal through on error
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block
