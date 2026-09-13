@@ -316,3 +316,6 @@
 - **INFO**: 31 phantom trades historically (spread over 7 weeks, no recent spike)
 - **INFO**: systemd "Failed to kill control group" — benign cleanup artifact
 - **AUTO-FIX**: None required
+
+## Error Alerts — 2026-09-13 06:55 UTC
+- **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

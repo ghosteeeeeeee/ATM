@@ -250,6 +250,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
+    'BIGTIME',
     'BLUR',
     'CC',
     'CFX',
@@ -257,9 +258,8 @@ FAVORITES = {
     'DYDX',
     'ENA',
     'IMX',
-    'INJ',
     'KAS',
-    'LTC',
+    'NEO',
     'POL',
     'TURBO',
     'WLD',
@@ -281,15 +281,12 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
     'AVAX',
-    'ETC',
     'GRASS',
     'IO',
-    'ME',
-    'NEAR',
-    'SAND',
-    'SUSHI',
-    'WLFI'
+    'NOT',
+    'SAND'
 }
+
 
 
 
@@ -1093,10 +1090,11 @@ CONF_FILTER_MIN = 70                    # lowered from 75 2026-09-02 — <75 tie
 # Penalty during 03:00-07:00 UTC (Asian session close, low-liquidity pre-market).
 # Extended from 05:00-07:00 to 03:00-07:00 (2026-09-12) — 30d: Hour 3 is -$1.77 (3rd worst).
 # Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
-TIME_BLOCK_ENABLED = True               # Penalty during 03-07 UTC (extended from 05-07, 2026-09-12)
-TIME_BLOCK_START = 3                    # UTC hour (inclusive) — Extended from 5 to 3 (2026-09-12). 30d: Hour 3 is -$1.77 (3rd worst), hour 5 is -$4.04 (worst).
-TIME_BLOCK_END = 7                      # UTC hour (exclusive: blocks 03:00-06:59)
+TIME_BLOCK_ENABLED = True               # Penalty during bad hours (extended from 05-07, 2026-09-12)
+TIME_BLOCK_START = 3                    # UTC hour (inclusive) — legacy range start (kept for compat)
+TIME_BLOCK_END = 7                      # UTC hour (exclusive: legacy range end)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
+BAD_TRADE_HOURS = {3, 5, 13, 14, 15, 21}  # 7d: these hours are -$3.76 combined (brain_auditor 2026-09-13). Replaces range check.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.

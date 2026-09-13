@@ -3224,3 +3224,34 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 - Losers updated: NOT added (20%WR, -$0.54)
 
 **No param changes — system slightly profitable, legacy aging out.**
+
+## [2026-09-13 07:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (ZEN LONG rr-struct+ atr_sl_hit +$0.02)
+**24h:** 23T 56%WR -$0.12 | 5 open | All NORMAL regime
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T +$0.37 (43.5%, avg +$0.037 — profitable)
+- profit-monster-trail: 5T +$0.29 (21.7%, avg +$0.058)
+- rr_engine_resistance: 5T -$0.25 (21.7%, avg -$0.050)
+- rr_engine_support_br: 2T -$0.40 (8.7%, avg -$0.200)
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h by Signal:**
+- rr-struct+ LONG: 5T 80%WR +$0.64 (best)
+- pullback-entry- SHORT: 6T 50%WR $0.00
+- rr-struct- SHORT: 4T 75%WR -$0.02
+- trend_purity+ LONG: 5T 0%WR -$1.02 (already disabled ✓)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour (only 1 trade closed)
+- atr_sl_hit 43.5% but profitable (+$0.37) — not a problem
+- trend_purity+ LONG already disabled earlier today
+- BAD_TRADE_HOURS from brain_auditor already deployed
+- Trade freq: ~1/hr, healthy
+
+**Open Questions:**
+- System slightly negative (-$0.12/24h) — will brain_auditor's BAD_TRADE_HOURS show effect?
+- trend_purity+ LONG 0%WR legacy losses still in 24h window — will age out

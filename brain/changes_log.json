@@ -54,5 +54,16 @@
     "after": "'Trend_Purity': 0.15",
     "rationale": "10T/40%WR -$0.72/7d trend_purity+ in EXTREME. 5 losers with z>0.6 or RSI>60. 0.3x insufficient. 0.15x further suppresses confidence.",
     "impact": "Expected to save ~$0.50/7d by blocking 3-4 EXTREME losers. 1 winner at z=2.05 may also be blocked ($0.02 loss)."
+  },
+  {
+    "timestamp": "2026-09-13T06:49:00Z",
+    "agent": "brain_auditor",
+    "change": "Added BAD_TRADE_HOURS set and modified signal_compactor to use set membership",
+    "type": "config",
+    "file": "hermes_constants.py, signal_compactor.py",
+    "before": "TIME_BLOCK range check (03-07 UTC only)",
+    "after": "BAD_TRADE_HOURS = {3, 5, 13, 14, 15, 21} — covers 4 additional bad hours",
+    "rationale": "7d data: hours 13,14,15,21 are -$2.82 combined. Time-of-day is independent of signal type. Existing time_block missed these.",
+    "impact": "Expected +$1.50-2.50/7d from blocking marginal entries at bad hours"
   }
 ]

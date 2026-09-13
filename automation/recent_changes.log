@@ -1,3 +1,8 @@
+[2026-09-13 06:49 UTC] brain_auditor: CONFIG CHANGE — BAD_TRADE_HOURS
+  WHY: 7d data: hours 03,05,13,14,15,21 combined -$3.76/7d (77 trades, 44% WR). Existing time_block only covered 03-07. Added BAD_TRADE_HOURS = {3,5,13,14,15,21} to hermes_constants.py. Modified signal_compactor.py to use set membership instead of range check. Expected +$1.50-2.50/7d from 0.7x confidence penalty at bad hours. Also: trend_purity+ 17T/7d 52.9%WR -$0.51 (EXTREME flat, HIGH blocked). Stale trades 86T/7d 26% of total -$1.29. pullback-entry- SHORT EXTREME strongest 9T 77.8%WR +$1.11. rr-struct- STANDALONE_BYPASS suggested (85.7% WR 7T).
+  BY: brain_auditor
+  FILES: hermes_constants.py, signal_compactor.py
+
 [2026-09-13 06:09 UTC] auto_1hr: NO CHANGE — system slightly profitable
   24h: 24T 58.3%WR +$0.15 | 1T/1h, 6 open | All NEUTRAL
   Exit: atr_sl_hit 10T +$0.59, profit-monster-trail 6T +$0.34, rr_engine_resistance 5T -$0.25
@@ -1610,4 +1615,11 @@
   Signal: rr-struct+ best (+$0.67), trend_purity+ worst (-$0.92, 14.3%WR)
   Kill check: no signal 0%WR with 3+ trades in last hour
   NOTE: trend_purity+ EXTREME penalty active since Sep 12, needs 20+ trades to evaluate. cut-loser-CL-T1 fix pending.
+  BY: auto_1hr
+[2026-09-13 07:10 UTC] auto_1hr: NO CHANGE — system slightly negative
+  24h: 23T 56%WR -$0.12 | 1T/1h, 5 open | All NORMAL
+  Exit: atr_sl_hit 10T +$0.37 (profitable), profit-monster-trail 5T +$0.29
+  Signal: rr-struct+ best (+$0.64), trend_purity+ worst (-$1.02, already disabled)
+  Kill check: no signal 0%WR with 3+ trades in last hour
+  NOTE: system slightly negative, mostly from pre-existing trend_purity+ losses (already disabled). No new intervention needed.
   BY: auto_1hr

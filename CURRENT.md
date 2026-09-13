@@ -1,7 +1,7 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-13 ~06:30 UTC (Orchestrator)**
-**Updated by: Orchestrator (DB-verified)**
+**Last Updated: 2026-09-13 ~06:49 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
@@ -33,7 +33,9 @@
 
 ## Today's Changes (Sep 13)
 
-1. **Orchestrator ~06:30 UTC — VERIFIED + MONITORING.** DB: 24h 23T 56.5% WR +$0.10. 7d: 333T 56.8% WR +$0.91 (VERIFIED POSITIVE, improved from +$0.53 at 02:45). 100% NEUTRAL. 6 open positions. **trend_purity+ LONG** 6T/17%WR -$0.78 — worst signal. EXTREME penalty 0.3x active + HIGH regime blocked by signal_reporter (05:11 UTC). Needs 20+ trades to evaluate. **rr-struct+** best performer 7T/86%WR +$0.76. Legacy still in 7d window (~-$3.45 drag, down from -$3.87). Exit analysis 48h: atr_sl_hit 13T -$2.59 (dominant), cut-loser-CL-T1 7T -$1.19. Pipeline healthy, no errors. **No param changes — system slightly profitable, legacy aging out.**
+1. **brain_auditor ~06:49 UTC — CONFIG CHANGE.** DB: 24h 23T 56.5%WR +$0.10. 7d: 333T 56.8%WR +$0.91. **BAD_TRADE_HOURS = {3,5,13,14,15,21} added.** 7d: hours 03,05,13,14,15,21 combined -$3.76/7d (77 trades, 44% WR). Existing time_block only covered 03-07. Added 13,14,15,21 via set membership in signal_compactor.py. Expected +$1.50-2.50/7d. Also: trend_purity+ 17T/7d 52.9%WR -$0.51 (EXTREME flat, HIGH blocked). Stale trades 86T/7d 26% of total -$1.29. pullback-entry- SHORT EXTREME strongest 9T 77.8%WR +$1.11. rr-struct- STANDALONE_BYPASS suggested (85.7% WR 7T). Files: hermes_constants.py, signal_compactor.py.
+2. **CEO ~06:35 UTC — VERIFIED + MONITORING.** DB: 24h 23T 56.5% WR +$0.10 (VERIFIED). 7d: 333T 56.8% WR +$0.91 (VERIFIED POSITIVE). Sep 13: 7T +$0.09 (early). **NO PARAM CHANGES.** trend_purity+ LONG 6T/24h 16.7%WR -$0.78 — ONLY active losing signal. 11T/7d 36.4%WR -$0.90, needs 20+ trades to evaluate EXTREME penalty. Losses in NEUTRAL regime. Legacy still in 7d: ema300_dip_short -$0.91, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.44, pullback_entry+ -$0.57 (aging out). Active signals profitable: pullback_entry- +$2.01, open_skies +$1.20, pump_chain +$1.11, rr-struct+ +$0.76. Pipeline active, disk 78%, no errors. System slightly profitable — monitoring.
+2. **Orchestrator ~06:30 UTC — VERIFIED + MONITORING.** DB: 24h 23T 56.5% WR +$0.10. 7d: 333T 56.8% WR +$0.91 (VERIFIED POSITIVE, improved from +$0.53 at 02:45). 100% NEUTRAL. 6 open positions. **trend_purity+ LONG** 6T/17%WR -$0.78 — worst signal. EXTREME penalty 0.3x active + HIGH regime blocked by signal_reporter (05:11 UTC). Needs 20+ trades to evaluate. **rr-struct+** best performer 7T/86%WR +$0.76. Legacy still in 7d window (~-$3.45 drag, down from -$3.87). Exit analysis 48h: atr_sl_hit 13T -$2.59 (dominant), cut-loser-CL-T1 7T -$1.19. Pipeline healthy, no errors. **No param changes — system slightly profitable, legacy aging out.**
 2. **CEO ~02:45 UTC — VERIFIED + MONITORING.** DB: 24h 26T 61.5% WR -$0.04 (flat). 7d: 334T 56.6% WR +$0.53 (VERIFIED POSITIVE). 100% NEUTRAL regime. **SHORT in NEUTRAL strongest:** 126T/7d 63.5%WR +$2.62. **LONG in NEUTRAL weakest:** 198T/7d 53.0%WR -$1.73 (mostly legacy). Legacy -$3.87/7d ages out TODAY. trend_purity+ LONG 8T/24h 37.5%WR -$0.45 — EXTREME penalty (0.3x) applied Sep 12, needs 20+ trades to verify. Exit analysis 48h: atr_sl_hit 14T avg -4.99% -$2.83 (dominant), rr_engine_resistance 12T avg -4.80% -$1.58 (SHORT structural). Pipeline active, disk 78%. **No param changes — system flat, legacy ages out today, EXTREME penalty too early to evaluate.**
 
 ## Today's Changes (Sep 12)

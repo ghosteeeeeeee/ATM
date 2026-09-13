@@ -1,43 +1,25 @@
-## CEO Report — 2026-09-13 ~03:15 UTC
+## CEO Report — 2026-09-13 ~06:35 UTC
 
 ### Diagnosis
-rr_structural signal has 12 trades/7d. Only 1 (INJ SHORT) actually fired through detect() — all others assigned by signal_compactor. Current thresholds (R:R≥3.0, Score≥70) are too restrictive. INJ passed detect() with R:R 6.96/Score 87 but the context was terrible (SHORTING at support, price acceleration against trade). NEO (+30.98% winner) had R:R 2.26/Score 65.25 — below thresholds, never had a chance to fire.
+System slightly profitable. 24h: 23T 56.5% WR +$0.10. 7d: 333T 56.8% WR +$0.91 (VERIFIED). Sep 13: 7T +$0.09 (early). **trend_purity+ LONG** is the ONLY active losing signal: 6T/24h 16.7% WR -$0.78. 7d: 11T 36.4% WR -$0.90. All losses in NEUTRAL regime. EXTREME penalty (0.3x) active since Sep 12 but doesn't affect NEUTRAL losses. Legacy signals still in 7d window: ema300_dip_short -$0.91, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.44, pullback_entry+ -$0.57 (all NEVER_REENABLE, aging out).
 
-### Verified Numbers
-- 24h: 25T, 56% WR, -$0.03 (flat)
-- 7d: 334T, 56.6% WR, +$0.53 (profitable)
-- rr-struct 7d: 12T, 75% WR, +$1.04 (strong — mostly signal_compactor assigned)
-- NEO LONG: +30.98%, price_accel=+0.0062 (aligned), RSI=50.0, regime NEUTRAL
-- INJ SHORT: -6.52%, price_accel=+0.0044 (against trade), RSI=40.43, regime NEUTRAL, bb_position=0.38 (mid-range, not at support)
+### Verified Numbers (DB-queried this run)
+- 24h: 23T, 56.5% WR, +$0.10
+- 7d: 333T, 56.8% WR, +$0.91
+- Daily: Sep 6 +$0.20, Sep 7 +$0.01, Sep 8 -$2.74, Sep 9 +$2.03, Sep 10 +$2.48, Sep 11 -$1.74, Sep 12 +$0.58, Sep 13 +$0.09 (7T so far)
+- Best 7d: pullback_entry- 36T/66.7%WR +$2.01 ★, open_skies 8T/62.5%WR +$1.20, pump_chain 41T/68.3%WR +$1.11
+- Worst 7d: ema300_dip_short 17T/47.1%WR -$0.91 (legacy), trend_purity+ 11T/36.4%WR -$0.90 (active)
+- Exit analysis 48h: profit-monster-trail 110T/7d +$7.61 (carries system), cut-loser-CL-T1 51T/7d -$7.70 (dominant drag)
 
-### Decision: APPROVED (2 of 3 changes)
+### Root Cause
+trend_purity+ LONG fires in NEUTRAL without regime-specific entry filters. EXTREME penalty doesn't help NEUTRAL losses. 11 trades is below the 20-trade evaluation threshold — too early to act. Legacy signals (ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback_entry+) continue aging out of 7d window.
 
-**Change 1 — APPROVED: Lower Detection Thresholds**
-```
-RR_STRUCTURAL_MIN_RR     = 2.0   (was 3.0)
-RR_STRUCTURAL_MIN_SCORE  = 60    (was 70)
-```
-Rationale: Catches trades like NEO that have good structure but moderate R:R. System is at breakeven (56% WR, R:R 0.67) — need to increase signal volume from detect() without sacrificing quality. The existing RSI and regime filters already block bad entries.
+### Decision: NO PARAM CHANGES
+- trend_purity+ has11 trades — needs 20+ to evaluate EXTREME penalty effect
+- System slightly profitable — don't fix what isn't broken
+- Legacy aging out naturally — expected improvement
 
-**Change 2 — APPROVED: Price Acceleration Direction Filter**
-- Block SHORT when price_acceleration > 0 (price going UP against SHORT)
-- Block LONG when price_acceleration < 0 (price going DOWN against LONG)
-- Computed from last 10 1m candle closes (roc check)
-Rationale: Clean momentum filter. NEO had accel=+0.0062 aligned with LONG ✅. INJ had accel=+0.0044 against SHORT ❌. No counter-examples in the 12-trade sample. Simple, low-risk addition.
-
-**Change 3 — REJECTED: Range Position Filter**
-Rationale: Too brittle. "Bottom 20% of 1h range" is context-dependent — NEO was at 12% of range and WON (+30.98%). INJ was at 6.3% and LOST, but it lost because of price acceleration against the trade, not because of range position. The range filter would have blocked NEO too if we'd set it wrong. The price acceleration filter (Change 2) already covers the INJ case more reliably. Adding range position is redundant complexity.
-
-### Implementation Directive
-1. Apply Changes 1 and 2 to hermes_constants.py and rr_structural.py
-2. Add `price_acceleration` filter in detect() — compute from candles_1m, block misaligned trades
-3. Run in shadow mode (log signals without trading) for 48h before enabling live
-4. Monitor: signal volume increase, false positive rate, WR of detect()-fired trades
-
-### What Was Skipped
-- Range position filter (Change 3) — redundant with accel filter, too many edge cases
-- Regime-specific param tuning — not enough rr-struct trades per regime yet (12 total, all NEUTRAL)
-- New signal development — system flat, legacy aging out, focus on structural fixes first
-
-### Next Review
-48h after shadow mode activation — check signal volume, WR, and whether accel filter blocked any good trades.
+### Next Checkpoint
+- Verify trend_purity+ at 20+ trades: if WR <40%, disable
+- Monitor cut-loser-CL-T1 as legacy exits (51T/7d -$7.70 should shrink)
+- Pipeline healthy, timers firing, disk 78%
