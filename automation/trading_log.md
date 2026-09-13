@@ -3203,3 +3203,24 @@ Final set: ['ACE', 'BIGTIME', 'BLUR', 'CC', 'CFX', 'DOT', 'DYDX', 'ENA', 'IMX', 
 - ADD NOT (WR=20.0%, PnL=$-0.54, wr_collapse (40.0% → 20.0%))
 
 Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
+
+## Daily Orchestrator Run — 2026-09-13 ~06:30 UTC
+
+**Status:** System slightly profitable, no changes needed.
+
+**DB Verified:**
+- 24h: 23T, 56.5% WR, +$0.10
+- 7d: 333T, 56.8% WR, +$0.91 (improved from +$0.53)
+- Open: 6 positions
+- Market: 100% NEUTRAL
+
+**Key Findings:**
+- trend_purity+ LONG worst signal: 6T/17%WR -$0.78. EXTREME penalty 0.3x + HIGH regime blocked (signal_reporter 05:11 UTC). Needs 20+ trades to evaluate.
+- rr-struct+ best performer: 7T/86%WR +$0.76
+- Legacy still in 7d window: ~-$3.45 drag (ema300_dip_short -$0.91, slow_grind -$0.80, sma20_dip -$0.73, coiled_spring -$0.44, pullback_entry+ -$0.57)
+- Exit analysis 48h: atr_sl_hit 13T -$2.59 (dominant), cut-loser-CL-T1 7T -$1.19
+- Pipeline healthy, 0 errors, 65 active timers
+- Favorites updated: INJ/LTC demoted, NEO/BIGTIME promoted
+- Losers updated: NOT added (20%WR, -$0.54)
+
+**No param changes — system slightly profitable, legacy aging out.**
