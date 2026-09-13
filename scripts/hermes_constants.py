@@ -2760,7 +2760,7 @@ RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
 # Uses Stochastic RSI + CMF + ATR range filter (different from BB/RSI signals)
 NEUTRAL_SNIPER_ENABLED = True            # RE-ENABLED 2026-09-11 — mean-reversion for chop regime, only fires in NEUTRAL/FLAT
 NEUTRAL_SNIPER_PLUS_ENABLED = True       # LONG signal
-NEUTRAL_SNIPER_MINUS_ENABLED = True      # SHORT signal
+NEUTRAL_SNIPER_MINUS_ENABLED = False     # DISABLED 2026-09-12 — SHORT has 68% confidence, lowest in queue
 NEUTRAL_SNIPER_STOCH_RSI_PERIOD = 14     # RSI period for StochRSI
 NEUTRAL_SNIPER_STOCH_RSI_K = 3           # %K smoothing
 NEUTRAL_SNIPER_STOCH_RSI_D = 3           # %D smoothing
