@@ -1,143 +1,191 @@
 {
-  "timestamp": "2026-09-13T01:32:40.007659+00:00",
+  "timestamp": "2026-09-13T02:35:07Z",
   "session_brain_stats": {
-    "total_vectors": 169957,
-    "top_topics": [
-      "signal performance",
-      "ema300_dip_short",
-      "accel_300_v4_short",
-      "wave periods",
-      "signal decay"
-    ]
+    "status": "EMPTY — needs ingest (--ingest)"
   },
   "trade_summary_24h": {
-    "trades": 28,
-    "win_rate": 64.3,
-    "pnl": 0.34,
-    "rr_ratio": 0.73,
+    "total_trades": 26,
+    "wins": 16,
+    "losses": 10,
+    "win_rate": 61.5,
+    "pnl": -0.04,
     "regime_breakdown": {
-      "EXTREME": "10T 60%WR +$0.50",
-      "NORMAL": "6T 100%WR +$0.52",
-      "HIGH": "12T 50%WR -$0.68"
+      "EXTREME": {
+        "trades": 9,
+        "wr": 55.6,
+        "pnl": 0.19
+      },
+      "NORMAL": {
+        "trades": 6,
+        "wr": 100.0,
+        "pnl": 0.52
+      },
+      "HIGH": {
+        "trades": 11,
+        "wr": 45.5,
+        "pnl": -0.75
+      }
     }
   },
   "trade_summary_7d": {
-    "trades": 337,
-    "win_rate": 57.0,
+    "total_trades": 334,
+    "win_rate": 56.9,
     "pnl": 0.83,
     "regime_breakdown": {
-      "EXTREME": "137T 58.4%WR +$2.84",
-      "HIGH": "122T 56.6%WR -$0.34",
-      "NORMAL": "75T 54.7%WR -$2.03"
+      "EXTREME": {
+        "trades": 137,
+        "wr": 58.4,
+        "pnl": 2.84
+      },
+      "HIGH": {
+        "trades": 121,
+        "wr": 56.2,
+        "pnl": -0.61
+      },
+      "NORMAL": {
+        "trades": 73,
+        "wr": 53.4,
+        "pnl": -2.06
+      }
     },
-    "legacy_drag": "-$3.59/7d (ages out Sep 13)",
-    "active_signals_7d": "pullback_entry_ +$2.01, pump_chain +$1.11, open_skies +$1.20, bb_bounce_v2_long +$0.18, pump-chain_ +$0.42"
+    "direction_breakdown": {
+      "SHORT": {
+        "EXTREME": 1.65,
+        "HIGH": 1.04,
+        "NORMAL": -0.66
+      },
+      "LONG": {
+        "EXTREME": 1.19,
+        "HIGH": -1.65,
+        "NORMAL": -1.4
+      }
+    }
   },
   "drift_findings": [
     {
       "topic": "SHORT_RSI_FLOOR=25",
-      "status": "IMPLEMENTED and WORKING",
-      "evidence": "ONDO SHORT RSI=24.14 blocked (would have been a loser). No oversold SHORT entries in 24h. All 24h SHORT losers had RSI > 37.",
-      "impact": "Neutral positive — catches edge cases"
+      "status": "IMPLEMENTED AND WORKING",
+      "evidence": "2319 blocks in pipeline.log. Zero SHORT trades with RSI < 35 in 7d. ONDO SHORT (RSI=24.14) would have been caught.",
+      "impact": "Prevents oversold SHORT entries. Net +/usr/bin/bash.71/7d estimated."
     },
     {
       "topic": "trend_purity+ EXTREME penalty (0.3x)",
       "status": "IMPLEMENTED (Sep 12 15:30)",
-      "evidence": "24h: 8 trend_purity+ trades, 37.5%WR, -$0.45. 4 EXTREME losers (MET -$0.16, ARB -$0.11, BIGTIME -$0.14, INJ -$0.30). 0.3x multiplier reduces confidence but doesnt block. Need 20+ trades to verify.",
-      "impact": "Monitoring — too early to conclude"
+      "evidence": "9T/7d EXTREME, 50% WR, -/usr/bin/bash.15. Sample too small to verify impact.",
+      "impact": "Needs 20+ trades to confirm. Currently marginal."
     },
     {
-      "topic": "rr_engine_resistance SHORT exits",
-      "status": "UNRESOLVED — structural, needs code fix",
-      "evidence": "7d: 28 SHORT exits rr_engine_resistance, pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%. Engine exits at support levels before support is tested.",
-      "impact": "-$0.97/7d drag from SHORT signals"
+      "topic": "MIN_HOLD_MINUTES=10",
+      "status": "DISCUSSED BUT NOT IMPLEMENTED",
+      "evidence": "Multiple audit runs flagged this. Cut-loser activation delay would prevent rapid exits.",
+      "impact": "Unknown — would need backtest."
     },
     {
-      "topic": "SHORT entries at high RSI (55+)",
-      "status": "IDENTIFIED — not yet blocked",
-      "evidence": "7d: 22 SHORT trades at RSI>55, 50%WR, -$0.97. 11 winners +$0.76, 11 losers -$1.63. Most from ema300_dip_short (legacy, killed). Active SHORT signals (pullback-entry-, rr-struct-) all fire at RSI<55.",
-      "impact": "Protective filter for future signals, no immediate24h impact"
+      "topic": "rr_engine_resistance SHORT structural fix",
+      "status": "DISCUSSED BUT NOT IMPLEMENTED (needs code)",
+      "evidence": "28T/7d -/usr/bin/bash.97. pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%. Engine exits at resistance before support tested.",
+      "impact": "Code-level fix needed: minimum support distance filter."
     }
   ],
   "recurring_problems": [
     {
-      "problem": "NORMAL regime worst performer",
-      "evidence": "7d: 75T 54.7%WR -$2.03 (vs EXTREME 137T +$2.84)",
-      "status": "Not addressed — all signals fire in NORMAL",
-      "recommendation": "Consider NORMAL regime confidence discount"
+      "problem": "rr_engine_resistance SHORT exits",
+      "frequency": "Every audit run since Sep 10",
+      "impact": "-/usr/bin/bash.97/7d structural",
+      "root_cause": "Engine exits SHORT at resistance levels before price tests support. SHORT entries near support levels get squeezed.",
+      "fix_type": "CODE (minimum support distance filter)",
+      "status": "Unresolved — needs code change in rr_engine.py"
     },
     {
-      "problem": "HIGH regime drag",
-      "evidence": "24h: 12T 50%WR -$0.68. 7d: 122T -$0.34.",
-      "status": "Marginal — monitoring"
+      "problem": "LONG side bleeds in HIGH/NORMAL",
+      "frequency": "Consistent across7d",
+      "impact": "HIGH -.65/7d, NORMAL -.40/7d",
+      "root_cause": "LONG_NEUTRAL_BLOCK only gates NEUTRAL. HIGH/NORMAL LONG entries still bleed.",
+      "fix_type": "CONFIG (regime-specific LONG confidence discount)",
+      "status": "Discussed, not implemented"
     }
   ],
-  "missing_implementations": [
+  "losing_trade_autopsy": [
     {
-      "item": "SHORT regime confidence weighting (EXTREME boost, NORMAL penalty)",
-      "discussed": "Sep 12 23:00 brain_auditor",
-      "status": "Creative idea, no implementation",
-      "expected_impact": "Medium"
+      "losing_trade": "INJ LONG pnl=-/usr/bin/bash.28",
+      "signal": "trend_purity+",
+      "regime": "HIGH",
+      "root_cause": "Entered at RSI=71.4 (overbought), z_score=2.05 (extreme high), bb_position=1.01 (above upper band). Chasing overbought momentum.",
+      "entry_check": "RSI 71.4 at entry, z_score 2.05 — extreme overbought conditions",
+      "regime_check": "HIGH regime — elevated volatility, whipsaw-prone",
+      "recommended_change": "LONG_RSI_CEILING=65 for trend_purity+ entries",
+      "impact_on_winners": "Checked 7d: W LONG RSI=71.4 was a winner (+/usr/bin/bash.02). Would block marginal winners. Sample too small to confirm.",
+      "confidence": "MEDIUM — needs more data"
     },
     {
-      "item": "Time-of-day signal weighting",
-      "discussed": "Sep 12 23:00 brain_auditor",
-      "status": "Creative idea, no implementation",
-      "expected_impact": "Low-Medium"
+      "losing_trade": "INJ SHORT pnl=-/usr/bin/bash.25",
+      "signal": "rr-struct-",
+      "regime": "HIGH",
+      "root_cause": "SHORT entry near support, rr_engine exited at resistance before support tested.",
+      "entry_check": "Standard SHORT entry conditions",
+      "regime_check": "HIGH regime — wider bands, more noise",
+      "recommended_change": "CODE FIX: minimum support distance filter in rr_engine.py",
+      "impact_on_winners": "Structural fix, no impact on winners",
+      "confidence": "HIGH — root cause is code, not config"
+    },
+    {
+      "losing_trade": "ENA SHORT pnl=-/usr/bin/bash.20",
+      "signal": "pullback-entry-",
+      "regime": "HIGH",
+      "root_cause": "SHORT entry at bb_position=0.08 (near lower band), RSI=41.18. Price bounced from support to resistance.",
+      "entry_check": "bb_position 0.08 = near support, SHORT into bounce zone",
+      "regime_check": "HIGH regime",
+      "recommended_change": "Add bb_position > 0.20 filter for SHORT entries (don't SHORT near support)",
+      "impact_on_winners": "Would need backtest — could block some winning SHORTs that catch breakdowns",
+      "confidence": "MEDIUM — needs backtest"
+    },
+    {
+      "losing_trade": "MET LONG pnl=-/usr/bin/bash.16",
+      "signal": "trend_purity+",
+      "regime": "EXTREME",
+      "root_cause": "Entered at z_score=3.54 (extreme high), bb_position=1.38 (far above upper band). Extreme overextension.",
+      "entry_check": "z_score 3.54 — price 3.5 std devs above mean. Chasing parabolic.",
+      "regime_check": "EXTREME regime — high volatility, mean reversion likely",
+      "recommended_change": "z_score > 2.5 penalty for LONG entries in EXTREME",
+      "impact_on_winners": "PONS z_score=1.05 winner, KAS z_score=1.59 winner — would NOT block them",
+      "confidence": "HIGH — z_score>2.5 is clear overextension"
     }
   ],
-  "losing_trade_autopsy": {
-    "summary": "10 losers24h analyzed",
-    "clusters": [
-      {
-        "cluster": "trend_purity+ LONG in EXTREME/HIGH",
-        "trades": "5 trades (MET -$0.16, ARB -$0.11, BIGTIME -$0.14, INJ -$0.28, INJ -$0.30)",
-        "root_cause": "trend_purity+ fires in EXTREME regime where whipsaw is high. 0.3x penalty active but too early to verify. MET: z_score=3.54 (extreme_high), RSI=50, speed_percentile=99.4 — overextended. ARB: RSI=72.7 overbought LONG.",
-        "recommended_change": "Add LONG_RSI_CEILING=70 to block trend_purity+ LONG at overbought RSI (would block ARB -$0.11, preserve 24h winners at RSI 63.6, 61.6, 55.4)",
-        "confidence": "MEDIUM"
-      },
-      {
-        "cluster": "pullback-entry- SHORT at support (rr_engine_resistance)",
-        "trades": "3 trades (ENA -$0.20, ONDO -$0.08, LINK -$0.08)",
-        "root_cause": "SHORT entries near support levels. ENA bb_position=0.08 (near lower band), ONDO RSI=24.1 (oversold), LINK stale. rr_engine exits at support before bounce.",
-        "recommended_change": "Code fix: minimum support distance filter in rr_engine. Not a config change.",
-        "confidence": "HIGH"
-      }
-    ],
-    "cross_reference_winners": "Winning SHORTs 24h: LDO RSI=38.1 (rr_engine_resistance), NOT RSI=50, XPL RSI=51.1, AIXBT RSI=38.5 (profit-monster-trail), ETC RSI=0.0 (data issue). Pattern: winners enter at neutral/oversold RSI, losers enter at oversold extreme (ONDO 24.1) or near support (ENA 0.08 bb_position)."
-  },
   "creative_improvements": [
     {
-      "idea": "SHORT_RSI_CEILING=55 — block SHORT at overbought RSI",
-      "rationale": "7d: 22 SHORT trades at RSI>55, 50%WR, -$0.97. 45-55 RSI range is 100%WR +$0.52. Above 55 = momentum trap risk.",
-      "expected_impact": "+$0.87/7d net (blocks -$1.63 losers, sacrifices +$0.76 winners — mostly ema300_dip_short legacy)",
+      "date": "2026-09-13T02:35:07Z",
+      "idea": "Entry condition confidence discount for trend_purity+ in EXTREME",
+      "rationale": "Current 0.3x EXTREME penalty is blunt — penalizes all entries equally. Losers have RSI>60 OR z_score>2.0 (overbought/chasing). Winners have RSI 41-62, z_score<1.6. Target the actual losing condition, not the regime.",
+      "expected_impact": "Block ~4/8 EXTREME losers (MET z=3.54, ARB RSI=72.7, INJ RSI=55.4+z=1.87, BIGTIME z=0.61 borderline). Preserve winners.",
       "category": "entry sniper",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low — sample too small for config change, monitor first"
     },
     {
-      "idea": "Add rr-struct- to STANDALONE_BYPASS",
-      "rationale": "rr-struct- is the only profitable SHORT signal 7d (+$0.06, 100%WR at rr_engine_resistance). Currently requires confluence to fire.",
-      "expected_impact": "+2-4 SHORT trades/week, small positive",
-      "category": "gap finder",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "idea": "LONG_RSI_CEILING=70 for trend_purity+ in EXTREME",
-      "rationale": "ARB LONG entered at RSI=72.7 in EXTREME — overbought LONG is buying the top. Would block this specific pattern.",
-      "expected_impact": "Small — blocks 1-2 trades/week at most",
+      "date": "2026-09-13T02:35:07Z",
+      "idea": "SHORT bb_position > 0.20 filter (don't SHORT near support)",
+      "rationale": "ENA SHORT at bb_position=0.08 (near support) lost -/usr/bin/bash.20. SHORT entries near lower BB are entering bounce zones. Filter would block SHORT when bb_position < 0.20.",
+      "expected_impact": "Could save ~/usr/bin/bash.20-0.30/7d from support-bounce SHORT losses",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low"
+      "status": "suggested — needs backtest",
+      "risk": "medium — could block some winning SHORTs that catch breakdowns"
+    },
+    {
+      "date": "2026-09-13T02:35:07Z",
+      "idea": "Time-of-day signal weighting (recurring from previous audits)",
+      "rationale": "Previous audits found 19:00 UTC +.62, 03:00-05:00 UTC -.80. No implementation yet.",
+      "expected_impact": "+/usr/bin/bash.50-1.00/7d if entries during dead hours are penalized",
+      "category": "time-of-day",
+      "status": "suggested — needs backtest",
+      "risk": "low — confidence discount only, no hard blocks"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Monitor trend_purity+ EXTREME penalty — needs 20+ trades (currently 8 in 24h)",
-    "Legacy ages out Sep 13 — ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback_entry+ expected to exit 7d window",
-    "rr_engine_resistance SHORT structural — code fix needed (minimum support distance filter)",
-    "SHORT_RSI_CEILING=55 — backtest before implementing (creative idea)",
-    "Monitor HIGH regime — 24h -$0.68, needs attention if persists"
+    "1. Legacy ages out TODAY (Sep 13): ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback_entry+. Expected -.59 drag removed.",
+    "2. Monitor trend_purity+ EXTREME — 0.3x penalty active, needs 20+ trades to verify. Currently 9T/7d.",
+    "3. rr_engine_resistance SHORT structural: needs CODE fix (minimum support distance filter). Config cannot fix.",
+    "4. Session brain needs ingest (--ingest) — currently empty, no cross-session insights available.",
+    "5. Monitor LONG side in HIGH/NORMAL — -1.65 and -1.40/7d respectively. LONG_NEUTRAL_BLOCK only gates NEUTRAL."
   ]
 }

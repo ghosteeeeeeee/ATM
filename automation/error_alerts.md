@@ -289,3 +289,15 @@
 ## Error Alerts — 2026-09-12 20:55 UTC
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
 - **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-13 02:24 UTC
+- **[INFO]** Pipeline: OK — running, last cycle 02:23:43, 0 errors, 25.7s CPU
+- **[INFO]** Signals: 118 generated last hour (healthy flow)
+- **[INFO]** Trades: 0 open, 3 closed today (-$0.21 PnL, 33.3% WR)
+- **[INFO]** Regime: LONG_BIAS (3 long / 0 short / 104 neutral)
+- **[INFO]** Speed: 52.7% tokens >= 50th percentile (127/241)
+- **[INFO]** Timers: 0 active (pipeline runs via service, not timer)
+- **[INFO]** Disk: 78% used (87G/118G)
+- **[INFO]** Prices: 94 tokens tracked, 0 errors
+- **[WARN]** hotset fallback DB query returning 0 tokens each cycle (non-critical, hotset.json works)
+- **AUTO-FIX**: None needed — all systems nominal

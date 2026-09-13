@@ -3009,3 +3009,42 @@ Final set: ['AVAX', 'ETC', 'GRASS', 'IO', 'ME', 'NEAR', 'SAND', 'SUSHI', 'WLFI']
 - MIN_HOLD_MINUTES=10 still pending from audit
 
 **Open Questions:** None — system healthy
+
+## [2026-09-13 02:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.06 (LDO SHORT rr_engine_resistance)
+**24h:** 26T ~58%WR +$0.61
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.16 (39.3% — just under 40%)
+- profit-monster-trail: 6T +$0.30
+- rr_engine_resistance: 5T -$0.25
+- rr_engine_support_br: 3T -$0.12
+- cut-loser-CL-T1: 1T -$0.13
+
+**24h Signal Performance:**
+- trend_purity+ LONG: 8T 38%WR -$0.45 (persistent, not killable)
+- rr-struct- SHORT: 4T 75%WR -$0.02
+- rr-struct+ LONG: 5T 80%WR $0.00
+- pullback-entry- SHORT: 6T 50%WR $0.00
+
+**24h Regime:**
+- EXTREME LONG: 9T 56%WR +$0.19
+- HIGH SHORT: 5T 20%WR -$0.49 (small sample)
+- NORMAL SHORT: 5T 100%WR +$0.47
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: no signal at 0%WR with 3+ trades
+- atr_sl_hit 39.3% — just under 40%
+- Trade freq ~1/hr — normal weekend hours
+- 7d HIGH SHORT actually profitable (49T 61%WR +$1.04)
+
+**Watch List:**
+- trend_purity+ LONG: 8T 38%WR -$0.45 — persistent, monitor
+- BTC SHORT: 31.9h open — stale, no SL hit
+- MIN_HOLD_MINUTES=10 still pending from earlier audit
+
+**Open Questions:** None — system healthy
