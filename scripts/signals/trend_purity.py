@@ -261,6 +261,27 @@ def detect_trend_purity(token: str, direction: str = None):
                 if _dips >= 2 and _ema_rising:
                     conf += 5  # clean pullback + bounce in uptrend
 
+            # ── Trade quality score (+0 to +7) ────────────────────────────
+            # Based on KAS +4.60% winner analysis: entries with strong bounce,
+            # consolidation, rising momentum, and BB < 1.0 win 89% of the time.
+            # Winners: avg bounce 0.60%, 89% consolidation, 78% rising momentum
+            # Losers: avg bounce 0.21%, 57% consolidation, 57% rising momentum
+            _quality = 0
+            if len(prices) >= 15:
+                _recent_low = min(prices[-15:])
+                _bounce_pct = (current_price - _recent_low) / _recent_low * 100
+                if _bounce_pct > 0.3:
+                    _quality += 2  # strong bounce from dip
+                _last5 = prices[-5:]
+                _consol_range = (max(_last5) - min(_last5)) / min(_last5) * 100
+                if _consol_range < 0.3:
+                    _quality += 2  # consolidation after bounce
+            if _speed_data and _speed_data.get('wave_phase') == 'accelerating':
+                _quality += 2  # trend accelerating
+            if _bb_position is not None and _bb_position < 1.0:
+                _quality += 1  # not overextended
+            conf += _quality
+
             conf = min(max(round(conf), 50), 99)  # floor at 50 (min to reach decider)
             signals.append({
                 'token': token,

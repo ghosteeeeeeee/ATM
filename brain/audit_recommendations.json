@@ -1,94 +1,143 @@
 {
-  "timestamp": "2026-09-13T00:32:16.686006+00:00",
+  "timestamp": "2026-09-13T01:32:40.007659+00:00",
   "session_brain_stats": {
     "total_vectors": 169957,
-    "queries_run": 3,
-    "key_insights": [
-      "signal_decay_guitar_tuning: Signal decay is a blunt hammer — kills low WR signals without remembering why they were good",
-      "MIN_HOLD_MINUTES: Still not implemented (noted in previous audit, still missing)",
-      "time_of_day_pattern: 19:00 UTC +$1.62/7d, 03:00-05:00 UTC -$1.80/7d"
+    "top_topics": [
+      "signal performance",
+      "ema300_dip_short",
+      "accel_300_v4_short",
+      "wave periods",
+      "signal decay"
     ]
   },
   "trade_summary_24h": {
-    "total_trades": 29,
-    "win_rate": 65.5,
-    "pnl": 0.58,
-    "regime": "100% NEUTRAL",
-    "losers": 10,
-    "stale_losers": 4,
-    "key_patterns": [
-      "trend_purity+ LONG EXTREME: 4 losers, 7 winners — 0.3x penalty applied, can't block",
-      "pullback-entry- SHORT HIGH: 3 losers, all rr_engine_resistance — structural",
-      "rr-struct- SHORT HIGH: 2 losers — structural"
-    ]
+    "trades": 28,
+    "win_rate": 64.3,
+    "pnl": 0.34,
+    "rr_ratio": 0.73,
+    "regime_breakdown": {
+      "EXTREME": "10T 60%WR +$0.50",
+      "NORMAL": "6T 100%WR +$0.52",
+      "HIGH": "12T 50%WR -$0.68"
+    }
+  },
+  "trade_summary_7d": {
+    "trades": 337,
+    "win_rate": 57.0,
+    "pnl": 0.83,
+    "regime_breakdown": {
+      "EXTREME": "137T 58.4%WR +$2.84",
+      "HIGH": "122T 56.6%WR -$0.34",
+      "NORMAL": "75T 54.7%WR -$2.03"
+    },
+    "legacy_drag": "-$3.59/7d (ages out Sep 13)",
+    "active_signals_7d": "pullback_entry_ +$2.01, pump_chain +$1.11, open_skies +$1.20, bb_bounce_v2_long +$0.18, pump-chain_ +$0.42"
   },
   "drift_findings": [
     {
-      "item": "MIN_HOLD_MINUTES",
-      "status": "NOT IMPLEMENTED",
-      "impact": "Trades can exit immediately after opening — cut-loser/PM_TRAIL can fire too early",
-      "recommendation": "Add MIN_HOLD_MINUTES=10 to hermes_constants.py, enforce in position_manager.py",
-      "priority": "MEDIUM"
+      "topic": "SHORT_RSI_FLOOR=25",
+      "status": "IMPLEMENTED and WORKING",
+      "evidence": "ONDO SHORT RSI=24.14 blocked (would have been a loser). No oversold SHORT entries in 24h. All 24h SHORT losers had RSI > 37.",
+      "impact": "Neutral positive — catches edge cases"
     },
     {
-      "item": "Time-of-day signal weighting",
-      "status": "DISCOVERED BUT NOT IMPLEMENTED",
-      "impact": "System fires equally at 03:00 UTC (-$0.90/7d) and 19:00 UTC (+$1.62/7d)",
-      "recommendation": "Add time-of-day confidence boost/penalty in signal_compactor.py",
-      "priority": "LOW"
+      "topic": "trend_purity+ EXTREME penalty (0.3x)",
+      "status": "IMPLEMENTED (Sep 12 15:30)",
+      "evidence": "24h: 8 trend_purity+ trades, 37.5%WR, -$0.45. 4 EXTREME losers (MET -$0.16, ARB -$0.11, BIGTIME -$0.14, INJ -$0.30). 0.3x multiplier reduces confidence but doesnt block. Need 20+ trades to verify.",
+      "impact": "Monitoring — too early to conclude"
+    },
+    {
+      "topic": "rr_engine_resistance SHORT exits",
+      "status": "UNRESOLVED — structural, needs code fix",
+      "evidence": "7d: 28 SHORT exits rr_engine_resistance, pullback-entry- 16T avg -1.83%, pump-chain- 11T avg -1.04%. Engine exits at support levels before support is tested.",
+      "impact": "-$0.97/7d drag from SHORT signals"
+    },
+    {
+      "topic": "SHORT entries at high RSI (55+)",
+      "status": "IDENTIFIED — not yet blocked",
+      "evidence": "7d: 22 SHORT trades at RSI>55, 50%WR, -$0.97. 11 winners +$0.76, 11 losers -$1.63. Most from ema300_dip_short (legacy, killed). Active SHORT signals (pullback-entry-, rr-struct-) all fire at RSI<55.",
+      "impact": "Protective filter for future signals, no immediate24h impact"
     }
   ],
   "recurring_problems": [
     {
-      "problem": "rr_engine_resistance SHORT exits",
-      "frequency": "27T/7d",
-      "pnl_impact": "-$1.03/7d",
-      "root_cause": "SHORT entries near support levels, engine exits at support before support is tested",
-      "status": "Structural — needs code fix (minimum support distance filter)",
-      "recommendation": "Add MIN_SUPPORT_DISTANCE_PCT=2.0 to block SHORT within 2% of support"
+      "problem": "NORMAL regime worst performer",
+      "evidence": "7d: 75T 54.7%WR -$2.03 (vs EXTREME 137T +$2.84)",
+      "status": "Not addressed — all signals fire in NORMAL",
+      "recommendation": "Consider NORMAL regime confidence discount"
+    },
+    {
+      "problem": "HIGH regime drag",
+      "evidence": "24h: 12T 50%WR -$0.68. 7d: 122T -$0.34.",
+      "status": "Marginal — monitoring"
     }
   ],
   "missing_implementations": [
-    "MIN_HOLD_MINUTES (cut-loser activation delay)",
-    "Time-of-day confidence weighting",
-    "MIN_SUPPORT_DISTANCE_PCT for SHORT entries"
+    {
+      "item": "SHORT regime confidence weighting (EXTREME boost, NORMAL penalty)",
+      "discussed": "Sep 12 23:00 brain_auditor",
+      "status": "Creative idea, no implementation",
+      "expected_impact": "Medium"
+    },
+    {
+      "item": "Time-of-day signal weighting",
+      "discussed": "Sep 12 23:00 brain_auditor",
+      "status": "Creative idea, no implementation",
+      "expected_impact": "Low-Medium"
+    }
   ],
+  "losing_trade_autopsy": {
+    "summary": "10 losers24h analyzed",
+    "clusters": [
+      {
+        "cluster": "trend_purity+ LONG in EXTREME/HIGH",
+        "trades": "5 trades (MET -$0.16, ARB -$0.11, BIGTIME -$0.14, INJ -$0.28, INJ -$0.30)",
+        "root_cause": "trend_purity+ fires in EXTREME regime where whipsaw is high. 0.3x penalty active but too early to verify. MET: z_score=3.54 (extreme_high), RSI=50, speed_percentile=99.4 — overextended. ARB: RSI=72.7 overbought LONG.",
+        "recommended_change": "Add LONG_RSI_CEILING=70 to block trend_purity+ LONG at overbought RSI (would block ARB -$0.11, preserve 24h winners at RSI 63.6, 61.6, 55.4)",
+        "confidence": "MEDIUM"
+      },
+      {
+        "cluster": "pullback-entry- SHORT at support (rr_engine_resistance)",
+        "trades": "3 trades (ENA -$0.20, ONDO -$0.08, LINK -$0.08)",
+        "root_cause": "SHORT entries near support levels. ENA bb_position=0.08 (near lower band), ONDO RSI=24.1 (oversold), LINK stale. rr_engine exits at support before bounce.",
+        "recommended_change": "Code fix: minimum support distance filter in rr_engine. Not a config change.",
+        "confidence": "HIGH"
+      }
+    ],
+    "cross_reference_winners": "Winning SHORTs 24h: LDO RSI=38.1 (rr_engine_resistance), NOT RSI=50, XPL RSI=51.1, AIXBT RSI=38.5 (profit-monster-trail), ETC RSI=0.0 (data issue). Pattern: winners enter at neutral/oversold RSI, losers enter at oversold extreme (ONDO 24.1) or near support (ENA 0.08 bb_position)."
+  },
   "creative_improvements": [
     {
-      "date": "2026-09-13T00:32:16.686024+00:00",
-      "idea": "Time-of-day signal confidence weighting",
-      "rationale": "7d data shows 19:00 UTC +$1.62 (83.3% WR) vs 03:00-05:00 UTC -$1.80 (33-44% WR). Weighting signals by time-of-day could capture this edge.",
-      "expected_impact": "+$0.50-1.00/7d by boosting high-performance hours and penalizing low-performance hours",
-      "category": "time-of-day",
+      "idea": "SHORT_RSI_CEILING=55 — block SHORT at overbought RSI",
+      "rationale": "7d: 22 SHORT trades at RSI>55, 50%WR, -$0.97. 45-55 RSI range is 100%WR +$0.52. Above 55 = momentum trap risk.",
+      "expected_impact": "+$0.87/7d net (blocks -$1.63 losers, sacrifices +$0.76 winners — mostly ema300_dip_short legacy)",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low",
-      "implementation": "Add TIME_WEIGHTS dict to hermes_constants.py, apply in signal_compactor.py confidence calculation"
+      "risk": "low"
     },
     {
-      "date": "2026-09-13T00:32:16.686026+00:00",
-      "idea": "SHORT NORMAL regime confidence discount",
-      "rationale": "NORMAL regime: 73T/7d -$2.12 (worst regime). EXTREME: 137T +$2.84 (best). SHORT signals in NORMAL lose money.",
-      "expected_impact": "+$0.50-1.00/7d by reducing SHORT confidence in NORMAL",
-      "category": "regime creative",
-      "status": "needs backtest",
-      "risk": "medium"
-    },
-    {
-      "date": "2026-09-13T00:32:16.686028+00:00",
       "idea": "Add rr-struct- to STANDALONE_BYPASS",
-      "rationale": "rr-struct- SHORT has 50% WR in 24h but 7d data shows it can work. Standalone bypass would let it fire with 1 source instead of requiring 2+.",
-      "expected_impact": "More SHORT signals in NEUTRAL market",
+      "rationale": "rr-struct- is the only profitable SHORT signal 7d (+$0.06, 100%WR at rr_engine_resistance). Currently requires confluence to fire.",
+      "expected_impact": "+2-4 SHORT trades/week, small positive",
       "category": "gap finder",
-      "status": "needs backtest",
-      "risk": "medium"
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "idea": "LONG_RSI_CEILING=70 for trend_purity+ in EXTREME",
+      "rationale": "ARB LONG entered at RSI=72.7 in EXTREME — overbought LONG is buying the top. Would block this specific pattern.",
+      "expected_impact": "Small — blocks 1-2 trades/week at most",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Legacy exits by Sep 13 (TOMORROW) — -$3.59/7d drag removed",
-    "Monitor trend_purity+ EXTREME penalty — 0.3x active, needs 20+ trades to verify",
-    "Monitor rr_engine_resistance SHORT — structural, needs code fix",
-    "Consider MIN_HOLD_MINUTES implementation — prevents early cut-loser exits",
-    "Consider time-of-day weighting — discovered edge, needs backtest"
+    "Monitor trend_purity+ EXTREME penalty — needs 20+ trades (currently 8 in 24h)",
+    "Legacy ages out Sep 13 — ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback_entry+ expected to exit 7d window",
+    "rr_engine_resistance SHORT structural — code fix needed (minimum support distance filter)",
+    "SHORT_RSI_CEILING=55 — backtest before implementing (creative idea)",
+    "Monitor HIGH regime — 24h -$0.68, needs attention if persists"
   ]
 }

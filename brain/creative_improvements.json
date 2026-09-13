@@ -203,5 +203,32 @@
     "category": "gap finder",
     "status": "needs backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-13T01:32:49.532154+00:00",
+    "idea": "SHORT_RSI_CEILING=55 — block SHORT at overbought RSI",
+    "rationale": "7d: 22 SHORT trades at RSI>55, 50%WR, -$0.97. 45-55 RSI range is 100%WR +$0.52. Above 55 = momentum trap risk.",
+    "expected_impact": "+$0.87/7d net",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T01:32:49.532170+00:00",
+    "idea": "Add rr-struct- to STANDALONE_BYPASS",
+    "rationale": "rr-struct- is the only profitable SHORT signal 7d (+$0.06, 100%WR at rr_engine_resistance). Currently requires confluence.",
+    "expected_impact": "+2-4 SHORT trades/week",
+    "category": "gap finder",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-13T01:32:49.532172+00:00",
+    "idea": "LONG_RSI_CEILING=70 for trend_purity+ in EXTREME",
+    "rationale": "ARB LONG entered at RSI=72.7 in EXTREME — overbought LONG is buying the top.",
+    "expected_impact": "Small — blocks 1-2 trades/week",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

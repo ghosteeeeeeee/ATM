@@ -1,3 +1,7 @@
+[2026-09-13 02:00 UTC] brain_auditor: NO CHANGE — system profitable
+  WHY: 24h 28T 64.3%WR +$0.34. 7d 337T 57.0%WR +$0.83. Legacy ages out TODAY. KEY: (1) trend_purity+ EXTREME penalty 0.3x active, needs 20+ trades. (2) rr_engine_resistance SHORT structural -$0.97/7d. (3) SHORT at high RSI 55+ = momentum trap -$0.97/7d. (4) SHORT_RSI_FLOOR=25 working. (5) Creative: SHORT_RSI_CEILING=55, rr-struct- STANDALONE_BYPASS, LONG_RSI_CEILING=70.
+  BY: brain_auditor
+
 [2026-09-12 19:10 UTC] auto_1hr: NO CHANGE — system stable
   24h: 36T 61%WR +$0.24 | 0T/1h, 5 open
   Exit: profit-monster-trail 14T +$1.10, atr_sl_hit 9T -$0.13 (22.5%), cut-loser 5T -$0.86

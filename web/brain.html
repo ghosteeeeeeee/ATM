@@ -100,6 +100,17 @@
             </div>
         </div>
         
+        <!-- Changes Made -->
+        <div class="card full-width">
+            <div class="card-header">
+                <h2>🔧 Changes Made</h2>
+                <span class="badge" id="changes-count">0</span>
+            </div>
+            <div class="card-body" id="changes-list" style="max-height: 300px;">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+        
         <!-- Audit Recommendations -->
         <div class="card">
             <div class="card-header">
@@ -129,17 +140,6 @@
                 <span class="badge" id="drift-count">0</span>
             </div>
             <div class="card-body" id="drift-list">
-                <div class="loading">Loading...</div>
-            </div>
-        </div>
-        
-        <!-- Changes Made -->
-        <div class="card">
-            <div class="card-header">
-                <h2>🔧 Changes Made</h2>
-                <span class="badge" id="changes-count">0</span>
-            </div>
-            <div class="card-body" id="changes-list">
                 <div class="loading">Loading...</div>
             </div>
         </div>
@@ -254,10 +254,13 @@
         
         let html = '';
         for (const d of drift.slice(0, 15)) {
+            const title = d.issue || d.finding || d.topic || d.title || d;
+            const detail = d.recommendation || d.evidence || d.context || '';
+            const status = d.status ? `<span class="tag">${esc(d.status)}</span>` : '';
             html += `<div class="drift-item">
-                <div class="finding">${esc(d.issue || d.finding || d)}</div>
-                ${d.recommendation ? `<div class="context">💡 ${esc(d.recommendation)}</div>` : ''}
-                ${d.timestamp ? `<div class="timestamp">${esc(d.timestamp)}</div>` : ''}
+                <div class="finding">${esc(typeof title === 'string' ? title : JSON.stringify(title))}</div>
+                ${detail ? `<div class="context">${esc(typeof detail === 'string' ? detail : JSON.stringify(detail))}</div>` : ''}
+                ${status}
             </div>`;
         }
         el.innerHTML = html;
