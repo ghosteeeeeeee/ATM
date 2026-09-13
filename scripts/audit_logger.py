@@ -152,18 +152,17 @@ def atr_sl_hit(trade_id: int, token: str, direction: str,
               hold_time_secs=hold_time_secs,
               sl_price_before_hit=sl_price_before_hit)
     # Record to sl_memory for zone detection (SL Memory S/R System)
-    _record_sl_memory(token, direction, sl_price_before_hit, exit_price, entry_price, pnl_usdt)
+    _record_sl_memory(trade_id, token, direction, sl_price_before_hit, exit_price, entry_price, pnl_usdt)
 
 
-def _record_sl_memory(token: str, direction: str, sl_price: float,
+def _record_sl_memory(trade_id: int, token: str, direction: str, sl_price: float,
                       exit_price: float, entry_price: float, pnl_usdt: float):
     """Record SL hit to sl_memory table for zone aggregation."""
     if not sl_price or sl_price <= 0:
         return
     try:
         import psycopg2
-        from paths import BRAIN_DB
-        conn = psycopg2.connect(**BRAIN_DB)
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
         try:
             cur = conn.cursor()
             # Get ATR and regime from the trade
@@ -185,7 +184,7 @@ def _record_sl_memory(token: str, direction: str, sl_price: float,
             conn.close()
     except Exception as e:
         # Non-fatal — don't break trade closing for sl_memory logging
-        pass
+        log(f"[SL_MEMORY] Write failed: {e}", 'WARN')
 
 def atr_tp_hit(trade_id: int, token: str, direction: str,
                entry_price: float, exit_price: float,

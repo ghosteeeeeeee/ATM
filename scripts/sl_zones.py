@@ -232,11 +232,14 @@ def entry_distance_filter(token, direction, entry_price, atr):
     """
     Check if entry is too close to a death zone.
     Returns: (pass: bool, score: float, reason: str, closest_zone: SLZone or None)
-    
+
     Logic:
     - LONG entry: check RESISTANCE zones above entry (previous LONG stops)
     - SHORT entry: check SUPPORT zones below entry (previous SHORT stops)
     """
+    if not entry_price or entry_price <= 0:
+        return (True, 1.0, "Invalid entry price", None)
+
     zones = get_sl_zones(token, direction, lookback_days=30)
     
     if not zones:
@@ -281,6 +284,9 @@ def zone_aware_exit_check(token, direction, current_price, atr):
     Check if price is approaching a death zone during an active trade.
     Returns: {'action': str, 'reason': str, 'new_trail_pct': float or None, 'zone': SLZone or None}
     """
+    if not current_price or current_price <= 0:
+        return {'action': 'hold', 'reason': 'Invalid price', 'new_trail_pct': None, 'zone': None}
+
     zones = get_sl_zones(token, direction, lookback_days=30)
     
     if not zones:
@@ -328,9 +334,12 @@ def zone_adjusted_size(base_size, token, direction, entry_price, atr):
     Reduce position size when a death zone is ahead.
     Returns: adjusted size (same or smaller than base_size).
     """
+    if base_size <= 0:
+        return base_size
+
     zones = get_sl_zones(token, direction, lookback_days=30)
-    
-    if not zones or not atr or atr <= 0:
+
+    if not zones or not atr or atr <= 0 or entry_price <= 0:
         return base_size
     
     # Find zones in path
@@ -363,12 +372,18 @@ def get_sl_zones_cached(token, direction, lookback_days=30):
     """Cached version of get_sl_zones — refreshes every 5 minutes."""
     key = f"{token}_{direction}"
     now = time.time()
-    
+
+    # Evict expired entries periodically
+    if len(_zone_cache) > 100:
+        expired = [k for k, (t, _) in _zone_cache.items() if now - t >= _CACHE_TTL]
+        for k in expired:
+            del _zone_cache[k]
+
     if key in _zone_cache:
         cached_time, cached_zones = _zone_cache[key]
         if now - cached_time < _CACHE_TTL:
             return cached_zones
-    
+
     zones = get_sl_zones(token, direction, lookback_days)
     _zone_cache[key] = (now, zones)
     return zones
