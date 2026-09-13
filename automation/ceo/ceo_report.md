@@ -1,3 +1,26 @@
+## CEO Report — 2026-09-13 ~04:00 UTC (BTC SHORT Regime Classification)
+
+### Diagnosis
+
+**DB QUERIED:** Spike-inflated regime classification reviewed. Only 3 out of 1,472 trades (0.2%) in 30d had regime shifts within 3h of entry. All 3 were winners/near-breakeven (GMT +0.45%, AIXBT +0.87%, ME -3.28%). BTC SHORT ID 15262 was correctly classified: ATR=0.86% at entry = NORMAL. pump-chain- is allowed in NORMAL. Trade is -0.07% (near breakeven, not a regime classification issue).
+
+### Root Cause
+
+**Non-issue.** The +3.3% BTC spike at 12:00-14:00 Sep 11 was a genuine market move, not noise. ATR correctly reflected recent volatility. ATR period change (14→20) would yield 0.74% — still NORMAL regime. No evidence that spike-inflated classification causes losses. The 3 regime-shift trades were all fine.
+
+### Recommendation: NO CHANGE
+
+| Option | Verdict | Why |
+|--------|---------|-----|
+| 1. No change | **ADOPT** | Classification correct at trade time, 0.2% occurrence rate, no losses |
+| 2. Longer ATR period (20) | Skip | Marginal smoothing, still NORMAL, adds complexity |
+| 3. Cooling period after >2% candle | Skip | Would block legitimate post-spike entries (momentum continuation) |
+| 4. Median-based ATR | Skip | Overkill for 0.2% occurrence, changes ATR behavior globally |
+
+**Real issues to focus on:** NORMAL regime -$1.70/7d SHORT (structural), stale entries -$1.19/7d, trend_purity+ EXTREME whipsaw. Not regime classification.
+
+---
+
 ## CEO Report — 2026-09-12 ~14:35 UTC
 
 ### Diagnosis
