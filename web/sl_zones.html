@@ -210,7 +210,7 @@
 
         async function load() {
             try {
-                const r = await fetch('http://127.0.0.1:54321/data/sl_zones.json');
+                const r = await fetch('/data/sl_zones.json');
                 const d = await r.json();
 
                 // Summary
