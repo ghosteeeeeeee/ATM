@@ -359,5 +359,34 @@
     "category": "data quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-13T16:30:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "rr_engine_resistance SHORT code fix — grace period or close-above requirement",
+        "rationale": "31 exits/7d -$1.13. Engine exits SHORT on first resistance wick, but price continues down 65% of the time.",
+        "expected_impact": "+$0.80-1.20/7d",
+        "status": "monitoring — needs code change + backtest",
+        "risk": "medium",
+        "sample_size": "31 exits/7d — SIGNIFICANT"
+      },
+      {
+        "idea": "rr-struct- to STANDALONE_BYPASS",
+        "rationale": "5T/7d 60%WR near breakeven. Fires solo but blocked by confluence gate.",
+        "expected_impact": "+$0.05-0.15/7d",
+        "status": "suggested — needs 15T sample first",
+        "risk": "low",
+        "sample_size": "5T — INSUFFICIENT"
+      },
+      {
+        "idea": "Fix signal metadata recording (entry_rsi_14, signal_z_score)",
+        "rationale": "329/329 trades NULL. Data in _signal_metadata JSON. Blocks entry condition analysis.",
+        "expected_impact": "Enables all entry condition analysis",
+        "status": "suggested — 5-10 lines fix",
+        "risk": "very low"
+      }
+    ]
   }
 ]

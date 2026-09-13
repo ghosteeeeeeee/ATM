@@ -2310,6 +2310,13 @@ STANDALONE_BYPASS_SIGNALS = (
     'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
 )
 
+# PM Trail bypass signals — signals with pm_trail exit bypass confluence gate
+PM_TRAIL_BYPASS_SIGNALS = (
+    'pump-chain',  # chain correlation momentum — pm_trail exit
+    'pump-catcher',  # momentum breakout — pm_trail exit
+    'mover',  # fast mover momentum — pm_trail exit
+)
+
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = False  # CEO 2026-08-16: DISABLED. 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos (hzscore+,range_finder+ and bb_bounce+,range_finder+ both bleeding). Re-enable when R:R >1:1.
 RANGE_FINDER_PLUS_ENABLED = False # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-10 (20T -$0.44). Monitor winrate.
