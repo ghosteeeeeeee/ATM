@@ -1,3 +1,39 @@
+## [2026-09-13 14:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L -$0.11)
+- FIL pump-chain+ LONG profit-monster-trail: -$0.02
+- FIL pump-chain+ LONG profit-monster-trail: +$0.15
+- CAKE pullback-entry- SHORT rr_engine_resistance: -$0.10
+- TURBO rr-struct+ LONG atr_sl_hit: -$0.14
+
+**24h:** 28T ~60%WR +$0.83 | 6 open | All NEUTRAL
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 17T +$0.67 (60.7%, avg +$0.039 — profitable, trail-adjusted)
+- profit-monster-trail: 6T +$0.35 (21.4%, avg +$0.058)
+- rr_engine_resistance: 4T +$0.10 (14.3%, avg +$0.025 — breakeven)
+- rr_engine_support_br: 1T -$0.29 (3.6%)
+
+**24h by Signal (1+ trades):**
+- rr-struct+ LONG: 7T 71.4%WR +$0.78 (best)
+- pullback-entry- SHORT: 10T 70%WR +$0.67 (strong)
+- pump-chain+ LONG: 2T 50%WR +$0.13
+- rr-struct- SHORT: 3T 66.7%WR -$0.14 (marginal)
+- trend_purity+ LONG: 3T 0%WR -$0.75 (worst — all losses from hours 01-04 UTC)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: trend_purity+ 0%WR but 0 trades in last hour (3 in 24h, all from hours 01-04) — doesn't meet 3+/hour threshold
+- Trade freq: 4T/hr, 6 open — healthy
+- atr_sl_hit 60.7% of 24h but avg +$0.039 (profitable, trail-adjusted) — same pattern as before
+- trend_purity+ legacy losses aging out, EXTREME penalty applied Sep 12
+- System slightly positive (+$0.83/24h), no urgency
+
+**Open Questions:**
+- trend_purity+ at 0%WR/-$0.75 but aging out naturally — no action needed
+- rr-struct- SHORT at -$0.14 — marginal but has wins, not killable
+
 ## [2026-09-13 13:08 UTC] Hourly Analysis
 
 **Trades:** 1 closed (POL pullback-entry- SHORT atr_sl_hit +$0.05 — 8.7h hold, trail exit in profit)

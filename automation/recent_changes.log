@@ -1,3 +1,11 @@
+[2026-09-13 14:10 UTC] auto_1hr: NO CHANGE — system slightly positive, quiet hour
+  24h: 28T ~60%WR +$0.83 | 4T/1h, 6 open | All NEUTRAL
+  Exit: atr_sl_hit 17T +$0.67 (profitable, trail-adjusted), profit-monster-trail 6T +$0.35
+  Signal: rr-struct+ best (+$0.78, 71.4%WR), trend_purity+ worst (-$0.75, 0%WR legacy aging)
+  Kill check: 0 trades closed last hour for any signal — no trigger
+  NOTE: trend_purity+ 3T/24h 0%WR all from hours 01-04 UTC, aging out naturally
+  BY: auto_1hr
+
 [2026-09-13 13:34 UTC] brain_auditor: NO CONFIG CHANGE — system flat, legacy aging out
   24h: 21T 61.9%WR +$0.04 | 7d: 330T 56.4%WR +$0.63
   R:R 24h: 0.574 (breakeven 63.5%, actual 61.9% — 1.6% underwater)
