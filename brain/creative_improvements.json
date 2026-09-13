@@ -127,9 +127,10 @@
     "rationale": "48h data: trend_purity+,volume-breakout-long+ (BIGTIME +3.95%) won. trend_purity+ alone in EXTREME has 50% WR. If we require volume confirmation for trend_purity+ LONG entries in EXTREME, we keep the winners (volume-confirmed) and filter the losers (no volume).",
     "expected_impact": "Improve trend_purity+ EXTREME WR from 50% to ~70%",
     "category": "cross-signal",
-    "status": "suggested",
+    "status": "boosted",
     "risk": "low — only adds filter to one signal in one regime",
-    "impact_on_winners": "BIGTIME +3.95% (volume-breakout-long+) would still win. PONS +6.27%, KAS +4.60% — need to check if volume confirmed."
+    "impact_on_winners": "BIGTIME +3.95% (volume-breakout-long+) would still win. PONS +6.27%, KAS +4.60% — need to check if volume confirmed.",
+    "boosted_at": "2026-09-13T19:03:59.358708+00:00"
   },
   {
     "date": "2026-09-12T23:00:00Z",

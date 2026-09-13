@@ -2503,6 +2503,51 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         else:
             live_pnl = pnl_pct
 
+        # ── 0b. SL Zone Exit Check — tighten trail near death zones ────────────
+        # If price is approaching a known SL zone, tighten trailing to protect profit.
+        try:
+            from sl_zones import zone_aware_exit_check
+            _conn_slz_exit = sqlite3.connect(CANDLES_DB, timeout=5)
+            _cur_slz_exit = _conn_slz_exit.cursor()
+            _cur_slz_exit.execute("""
+                SELECT open, high, low, close FROM candles_1h
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT 20
+            """, (token.upper(),))
+            _atr_rows_slz = _cur_slz_exit.fetchall()
+            _cur_slz_exit.close()
+            _conn_slz_exit.close()
+            _atr_slz = 0
+            if len(_atr_rows_slz) >= 15:
+                _trs_slz = []
+                for i in range(1, len(_atr_rows_slz)):
+                    _h, _l, _pc = _atr_rows_slz[i][1], _atr_rows_slz[i][2], _atr_rows_slz[i-1][3]
+                    _trs_slz.append(max(_h - _l, abs(_h - _pc), abs(_l - _pc)))
+                _atr_slz = sum(_trs_slz[-14:]) / 14
+            _exit_check = zone_aware_exit_check(token, direction, cur, _atr_slz)
+            if _exit_check['action'] == 'tighten_trail' and _exit_check.get('new_trail_pct'):
+                _new_trail_pct = _exit_check['new_trail_pct']
+                if direction == 'LONG':
+                    _zone_sl = round(cur * (1 - _new_trail_pct), 8)
+                    _cur_sl_zone = float(pos.get('stop_loss') or 0)
+                    if _zone_sl > _cur_sl_zone:
+                        pos['stop_loss'] = _zone_sl
+                        _persist_sl(trade_id, _zone_sl)
+                        log(f"  [SL-ZONE-EXIT] {token} {direction}: trail tightened → {_zone_sl:.6f} ({_exit_check['reason']})")
+                else:
+                    _zone_sl = round(cur * (1 + _new_trail_pct), 8)
+                    _cur_sl_zone = float(pos.get('stop_loss') or 0)
+                    if _zone_sl < _cur_sl_zone:
+                        pos['stop_loss'] = _zone_sl
+                        _persist_sl(trade_id, _zone_sl)
+                        log(f"  [SL-ZONE-EXIT] {token} {direction}: trail tightened → {_zone_sl:.6f} ({_exit_check['reason']})")
+            elif _exit_check['action'] == 'watch':
+                log(f"  [SL-ZONE-WATCH] {token} {direction}: {_exit_check['reason']}")
+        except ImportError:
+            pass  # sl_zones not available
+        except Exception:
+            pass  # non-fatal
+
         # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
         # Check if this trade's signal uses pump-exit
         signal = str(pos.get("signal", "") or "")

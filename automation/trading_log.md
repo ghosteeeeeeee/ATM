@@ -3600,3 +3600,30 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 
 **Open Questions:**
 - trend_purity+ at -$0.75/24h but 0 trades last hour — kill trigger requires 3+ in last hour specifically. Aging out naturally.
+
+## [2026-09-13 18:35 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 31T/24h ~67%WR +$0.70 | 6 open
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T +$0.55 (58%, avg +$0.031 — profitable)
+- profit-monster-trail: 7T +$0.51 (23%, avg +$0.073)
+- rr_engine_resistance: 4T -$0.07 (13%)
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal:**
+- rr-struct+ LONG: 6T +$0.73 (best, avg +$0.122)
+- pullback-entry- SHORT: 10T +$0.41 (most active)
+- pump-chain+ LONG: 5T +$0.39
+- rr-struct- SHORT: 3T -$0.22
+- trend_purity+ LONG: 3T -$0.75 (legacy, 0 trades last hour)
+
+**Changes:** None — quiet hour, no kill triggers
+
+**No Change Needed:**
+- Kill check: 0 trades last hour for any signal — no threshold met
+- Trade freq: 0T/hr, 6 open — healthy/idle
+- atr_sl_hit 58% but profitable — trail working
+- All active signals net positive
+
+**Open Questions:** None
