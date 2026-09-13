@@ -27,6 +27,7 @@ from hermes_constants import (
     ACCEL_300_V3_LONG_ENABLED,
     ACCEL_300_V3_SHORT_ENABLED,
     ACCEL_300_V4_SHORT_ENABLED,
+    ACCEL_300_MINUS_ENABLED,
     ICHIMOKU_ENABLED,
     VOLUME_BREAKOUT_ENABLED,
     RANGE_REVERSION_ENABLED,
@@ -199,6 +200,11 @@ try:
     from signals.inverse_accel_300_v2 import scan_inverse_accel_300_v2_signals as _inverse_accel_300_v2_run
 except Exception:
     _inverse_accel_300_v2_run = None
+
+try:
+    from signals.accel_300 import run as _accel_300_run
+except Exception:
+    _accel_300_run = None
 
 try:
     from signals.ichimoku_cloud import run as _ichimoku_run
@@ -394,6 +400,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'accel_300_v3_long',        'enabled': ACCEL_300_V3_LONG_ENABLED,      'run': _accel_300_v3_long_run},
     {'name': 'accel_300_v3_short',       'enabled': ACCEL_300_V3_SHORT_ENABLED,     'run': _accel_300_v3_short_run},
     {'name': 'accel_300_v4_short',       'enabled': ACCEL_300_V4_SHORT_ENABLED,     'run': _accel_300_v4_short_run},
+    {'name': 'accel_300_short',          'enabled': ACCEL_300_MINUS_ENABLED,       'run': _accel_300_run},
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
     {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
     {'name': 'volume_breakout',           'enabled': 'VOLUME_BREAKOUT_ENABLED',     'run': _volume_breakout_run},
