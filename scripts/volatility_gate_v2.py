@@ -96,6 +96,7 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
+        'trend_purity+', 'trend_purity-',  # trend following — fires in NORMAL (primary regime)
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -130,6 +131,7 @@ REGIME_SIGNALS = {
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
+        'trend_purity+', 'trend_purity-',  # trend following — 100% WR in HIGH (1T), needs data
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
