@@ -793,8 +793,12 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 _p_stripped = f'{_p_stripped}{"+" if direction.upper() == "LONG" else "-"}'
             _parts_norm.append(_p_stripped)
         _src = ','.join(_parts_norm)
-        source = _src  # use normalized source for DB write + combo_key
-        _components = _src.split(',')
+        # Strip chain correlation data from source for clean display
+        # e.g., "pump-chain+,chain(CC(1.89x))" → "pump-chain+"
+        import re as _re_src
+        _src_clean = _re_src.sub(r',?chain\([^)]*\)', '', _src).strip(',').strip()
+        source = _src_clean if _src_clean else _src  # use cleaned source for DB write
+        _components = _src.split(',')  # keep original for signal type checks
         for _comp in _components:
             # pct-hermes
             if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
