@@ -3318,3 +3318,34 @@ Final set: ['AVAX', 'GRASS', 'IO', 'NOT', 'SAND']
 **Open Questions:**
 - trend_purity+ legacy losses aging out — next check should see improvement
 - rr-struct- SHORT only 33%WR but only 3 trades — needs more data
+
+## [2026-09-13 10:08 UTC] Hourly Analysis
+
+**Trades:** 22 closed in 24h (14 wins, 8 losses)
+**PnL:** $0.04 (63.6% WR) — break-even but stable
+**Open:** 3 positions (BABY LONG, POL SHORT, ETC SHORT)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T +$0.23 (50%, profitable)
+- profit-monster-trail: 5T +$0.23 (23%)
+- rr_engine_resistance: 4T $0.00 (18%)
+- cut-loser-CL-T1: 1T -$0.13
+- rr_engine_support_br: 1T -$0.29
+
+**24h by Signal (active only):**
+- rr-struct+: 6T 66.7%WR +$0.50 (top performer)
+- pullback-entry-: 5T 80%WR +$0.25
+- rr-struct-: 3T 66.7%WR -$0.14
+- trend_purity+: 4T 0%WR -$0.91 (already disabled ✓)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: no signal 0%WR with 3+ trades in last hour
+- atr_sl_hit 50% but profitable (+$0.23) — doing its job
+- trend_purity+ legacy losses aging out — will improve
+- Trade freq: ~1/hr, healthy
+
+**Open Questions:**
+- POL SHORT open 6+ hours, ETC SHORT open 17+ hours
+- trend_purity+ -$0.91 aging out of 24h window

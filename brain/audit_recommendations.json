@@ -1,118 +1,237 @@
 {
-  "timestamp": "2026-09-13T07:30:00Z",
+  "timestamp": "2026-09-13T10:33:46.032995+00:00",
+  "run_type": "brain_auditor",
   "session_brain_stats": {
     "total_vectors": 140574,
-    "top_results": "signal performance, stale trade patterns, regime analysis",
-    "key_insight": "Session brain shows recurring discussion of rr_engine_resistance SHORT exits as structural drag — 7d 30T -$1.22. Also stale trade pattern confirmed: dead signal trades (slow_grind, ema300_dip_short, sma20_dip, coiled_spring) are the primary stale losers."
+    "top_topics": [
+      "signal performance",
+      "pullback entry",
+      "stale signals",
+      "losses",
+      "regime"
+    ],
+    "key_insight": "Session brain shows recurring rr_engine_resistance SHORT exit drag, trend_purity+ EXTREME whipsaw, and signal metadata NULL issue"
   },
   "trade_summary_24h": {
     "trades": 22,
-    "win_rate": 54.5,
-    "pnl": -0.24,
-    "rr_ratio": 0.98,
-    "avg_win_pct": 5.11,
-    "avg_loss_pct": -5.20,
-    "avg_win_usd": 0.13,
-    "avg_loss_usd": -0.18,
-    "regime_breakdown": {
-      "NORMAL_LONG": "2T 100%WR +$0.74",
-      "NORMAL_SHORT": "5T 100%WR +$0.47",
-      "EXTREME_LONG": "5T 40%WR -$0.24",
-      "HIGH_LONG": "6T 50%WR -$0.60",
-      "HIGH_SHORT": "4T 0%WR -$0.61"
-    },
-    "exit_analysis": {
-      "profit-monster-trail": "4T +$0.17 (carries system)",
-      "atr_sl_hit": "6T +$1.24 (winners), 4T losers -$0.77",
-      "rr_engine_resistance": "3T -$0.20 (pullback-entry- SHORT)",
-      "cut-loser-CL-T1": "1T -$0.13 (rr-struct+ LONG WLD)"
-    }
+    "pnl": 0.04,
+    "win_rate": 63.6,
+    "avg_pnl": 0.0018,
+    "status": "FLAT_POSITIVE",
+    "breakeven_wr": 62.2,
+    "margin_above_breakeven": 1.4
   },
   "trade_summary_7d": {
     "trades": 330,
-    "win_rate": 56.7,
-    "pnl": 0.83,
-    "rr_ratio": 0.74,
-    "regime_breakdown": {
-      "EXTREME_SHORT": "51T 64.7%WR +$1.65 ★ STRONGEST",
-      "EXTREME_LONG": "85T 55.3%WR +$1.18",
-      "HIGH_SHORT": "49T 61.2%WR +$1.04",
-      "HIGH_LONG": "72T 52.8%WR -$1.77 (legacy drag)",
-      "NORMAL_SHORT": "32T 56.3%WR -$0.66",
-      "NORMAL_LONG": "39T 51.3%WR -$0.65"
+    "pnl": 0.63,
+    "win_rate": 56.4,
+    "avg_pnl": 0.0019,
+    "status": "PROFITABLE",
+    "rr_ratio": 0.7376,
+    "breakeven_wr": 57.5,
+    "margin_below_breakeven": -1.1
+  },
+  "regime_performance_7d": {
+    "EXTREME": {
+      "trades": 135,
+      "pnl": 2.73,
+      "wr": 58.5,
+      "status": "STRONGEST"
     },
-    "exit_analysis_48h": {
-      "profit-monster-trail": "24T +$2.31 (carries system)",
-      "atr_sl_hit": "30T -$0.02 (breakeven)",
-      "cut-loser-CL-T1": "7T -$1.19 (legacy heavy)",
-      "rr_engine_support_br": "7T -$0.69 (trend_purity+ legacy)",
-      "rr_engine_resistance": "13T -$0.24 (pullback-entry- SHORT structural)"
+    "HIGH": {
+      "trades": 122,
+      "pnl": -0.64,
+      "wr": 56.6,
+      "status": "WEAK"
+    },
+    "NORMAL": {
+      "trades": 71,
+      "pnl": -1.5,
+      "wr": 52.1,
+      "status": "WORST"
+    }
+  },
+  "losing_trade_autopsy_24h": {
+    "total_losers": 8,
+    "dead_signal_losers": 5,
+    "active_signal_losers": 3,
+    "active_signal_loss_total": -0.52,
+    "losers": [
+      {
+        "trade": "MET LONG trend_purity+",
+        "pnl": -0.18,
+        "regime": "EXTREME",
+        "root_cause": "Dead signal. EXTREME whipsaw — 0.3x penalty active but still fired.",
+        "signal_status": "DEAD (killed Sep 13)",
+        "confidence": "HIGH"
+      },
+      {
+        "trade": "ZRO LONG trend_purity+",
+        "pnl": -0.29,
+        "regime": "HIGH",
+        "root_cause": "Dead signal. rr_engine_support_br exit — price broke below support.",
+        "signal_status": "DEAD (killed Sep 13)",
+        "confidence": "HIGH"
+      },
+      {
+        "trade": "INJ LONG trend_purity+",
+        "pnl": -0.28,
+        "regime": "HIGH",
+        "root_cause": "Dead signal. ATR_SL hit — price dropped -7.3%.",
+        "signal_status": "DEAD (killed Sep 13)",
+        "confidence": "HIGH"
+      },
+      {
+        "trade": "MET LONG trend_purity+",
+        "pnl": -0.16,
+        "regime": "EXTREME",
+        "root_cause": "Dead signal. EXTREME whipsaw.",
+        "signal_status": "DEAD (killed Sep 13)",
+        "confidence": "HIGH"
+      },
+      {
+        "trade": "INJ SHORT rr-struct-",
+        "pnl": -0.25,
+        "regime": "HIGH",
+        "root_cause": "Active signal. 5T sample, R:R 0.41 weak. ATR_SL hit.",
+        "signal_status": "ACTIVE (monitoring — kill at 15T if WR<50%)",
+        "confidence": "MEDIUM — small sample"
+      },
+      {
+        "trade": "SEI LONG rr-struct+",
+        "pnl": -0.14,
+        "regime": "NORMAL",
+        "root_cause": "Active signal. Normal variance — 7d 77.8% WR +$0.64.",
+        "signal_status": "ACTIVE (STAR performer)",
+        "confidence": "HIGH — variance"
+      },
+      {
+        "trade": "WLD LONG rr-struct+",
+        "pnl": -0.13,
+        "regime": "HIGH",
+        "root_cause": "Active signal. Cut-loser exit. Normal variance.",
+        "signal_status": "ACTIVE (STAR performer)",
+        "confidence": "HIGH — variance"
+      },
+      {
+        "trade": "ENA SHORT pullback-entry-",
+        "pnl": -0.2,
+        "regime": "HIGH",
+        "root_cause": "Active signal. rr_engine_resistance exit near support. Single loss in 37T/7d STAR signal.",
+        "signal_status": "ACTIVE (STAR — 67.6% WR 7d)",
+        "confidence": "HIGH — single loss, structural exit issue"
+      }
+    ]
+  },
+  "exit_analysis_7d": {
+    "cut-loser-CL-T1": {
+      "trades": 51,
+      "pnl": -7.7,
+      "wr": 0,
+      "note": "ALL LEGACY — ages out Sep 14"
+    },
+    "rr_engine_resistance": {
+      "trades": 31,
+      "pnl": -1.13,
+      "wr": 41.9,
+      "note": "STRUCTURAL — SHORT entries near support, exits at resistance. Needs CODE fix."
+    },
+    "profit-monster-trail": {
+      "trades": 105,
+      "pnl": 7.19,
+      "wr": 93.3,
+      "note": "Carries system"
+    },
+    "atr_sl_hit": {
+      "trades": 112,
+      "pnl": 0.99,
+      "wr": 50,
+      "note": "Breakeven — healthy after ATR_SL fix Sep 8"
     }
   },
   "drift_findings": [
     {
-      "finding": "CURRENT.md stale — trend_purity+ killed at 04:15 UTC but still listed as active",
-      "impact": "LOW — informational only, doesn't affect trading",
-      "action": "Update CURRENT.md (done this run)"
+      "topic": "BAD_TRADE_HOURS",
+      "status": "IMPLEMENTED",
+      "detail": "Hours {3,5,13,14,15,21} active with 0.7x penalty. Verified working.",
+      "impact": "Expected +$1.50-2.50/7d. Needs 48h to measure."
     },
     {
-      "finding": "Previous brain_auditor BAD_TRADE_HOURS change verified working",
-      "impact": "LOW — soft penalty applied, no hard blocks",
-      "action": "Monitor for 48h"
+      "topic": "Signal metadata columns",
+      "status": "PARTIALLY RESOLVED",
+      "detail": "signal_rsi_14 and signal_z_score columns NULL for 330/330 7d trades. BUT _signal_metadata JSON field HAS the data (rsi_14, z_score, bb_position, etc). Data is in JSON, not individual columns.",
+      "impact": "Can still analyze via JSON extraction. Individual columns not populated."
     },
     {
-      "finding": "rr-struct- already in STANDALONE_BYPASS (line 2311: 'rr-struct')",
-      "impact": "NONE — suggestion from previous runs already implemented",
-      "action": "No action needed"
+      "topic": "rr_engine_resistance SHORT exits",
+      "status": "UNRESOLVED — NEEDS CODE FIX",
+      "detail": "31T/7d -$1.13. SHORT entries near support bounce to resistance. rr_engine exits prematurely. Config cannot fix this.",
+      "impact": "$1.13/7d drag. Needs code change (grace period after resistance touch)."
+    },
+    {
+      "topic": "trend_purity+ EXTREME penalty",
+      "status": "MONITORING",
+      "detail": "0.3x multiplier active Sep 12. 11T/7d 36.4% WR -$0.90. All dead signal losses. Needs 20+ trades to verify.",
+      "impact": "Will age out by Sep 14. No further action needed."
     }
   ],
   "recurring_problems": [
     {
-      "problem": "rr_engine_resistance SHORT exits — structural drag on pullback-entry- SHORT",
-      "frequency": "Every run since Sep 10",
-      "data": "30T/7d -$1.22. pullback-entry- 16T avg -1.83% -$0.91. pump-chain- 11T avg -1.04% -$0.12.",
-      "root_cause": "RR engine exits SHORT at resistance before support is tested. Avg hold 2.8-3.4h.",
-      "fix_type": "CODE — needs rr_engine parameter tuning or SHORT exit logic change",
-      "status": "Monitor — impact is structural, not config-fixable"
+      "problem": "rr_engine_resistance SHORT exits",
+      "frequency": "Every audit run since Sep 11",
+      "root_cause": "SHORT entries near support level. Engine exits at resistance before price tests it.",
+      "solution_type": "CODE_CHANGE",
+      "suggestion": "Add 10-15min grace period after resistance touch for SHORT exits"
     },
     {
-      "problem": "Stale trades from dead signals drag 7d PnL",
-      "frequency": "Every run",
-      "data": "132T stale >10m: -$0.95. But active signal stale trades: +$2.75. Dead signal stale trades: -$3.09.",
-      "root_cause": "Killed signals (slow_grind, ema300_dip_short, sma20_dip, coiled_spring) still in 7d window",
-      "fix_type": "TIME — ages out by Sep 14",
-      "status": "Will resolve naturally"
+      "problem": "Legacy signal drag aging out",
+      "frequency": "Multiple runs",
+      "root_cause": "Dead signals (ema300_dip_short, slow_grind, sma20_dip, coiled_spring, pullback_entry+) still in 7d window",
+      "solution_type": "TIME",
+      "suggestion": "Ages out Sep 14. No action needed."
     }
   ],
-  "missing_implementations": [],
-  "creative_improvements": [
+  "missing_implementations": [
     {
-      "date": "2026-09-13T07:30:00Z",
-      "idea": "RR Engine SHORT exit delay — add 10-15min grace period after resistance touch",
-      "rationale": "pullback-entry- SHORT 16T/7d exits at resistance avg -1.83%. Many of these bounce back down after the engine exits. A short delay would let the trade breathe and potentially reach support.",
-      "expected_impact": "+$0.50-1.00/7d if 30-40% of early exits would have recovered",
-      "category": "exit optimization",
-      "status": "suggested",
-      "risk": "medium — could increase avg loss on trades that don't recover",
-      "data_backing": "30T/7d rr_engine_resistance -$1.22. Winners avg +2.51%, losers avg -0.68%. Asymmetric: losers are small but frequent."
+      "item": "SHORT_RSI_CEILING=55",
+      "status": "REJECTED — no data",
+      "detail": "No SHORT trades at RSI>55 for active signals in 7d. Cannot backtest.",
+      "action": "Monitor. Implement if data shows pattern."
     },
     {
-      "date": "2026-09-13T07:30:00Z",
-      "idea": "SHORT RSI_CEILING=55 — block SHORT entries when RSI>55 (overbought SHORT = momentum trap)",
-      "rationale": "Session brain data from Sep 12: SHORT at RSI>55 = 22T/7d 50%WR -$0.97. RSI 45-55 = 100%WR +$0.52. Above 55 = entering SHORT when momentum is still bullish.",
-      "expected_impact": "+$0.50-1.00/7d by blocking overbought SHORT entries",
-      "category": "entry filter",
-      "status": "needs backtest",
-      "risk": "medium — would block some winning SHORT entries in strong downtrends",
-      "data_backing": "7d data from session brain shows clear RSI threshold effect. Needs fresh backtest to confirm."
+      "item": "rr_engine SHORT exit grace period",
+      "status": "NEEDS CODE",
+      "detail": "10-15min delay after resistance touch before SHORT exit trigger",
+      "action": "Requires signal_compactor.py or rr_engine code change"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-13T10:33:46.033023+00:00",
+      "idea": "Track exit RSI for SHORT entries — identify if we're SHORTing into momentum (RSI rising) vs. resistance (RSI falling)",
+      "rationale": "rr_engine_resistance SHORT exits are structural. If we knew exit RSI trajectory, we could distinguish genuine resistance bounces from momentum continuation. The _signal_metadata already has rsi_14 at entry — adding exit RSI tracking would let us backtest: 'SHORT entries where exit RSI > entry RSI = momentum trap = avoid'",
+      "expected_impact": "Could reduce rr_engine_resistance SHORT losses by 30-50% ($0.34-0.57/7d)",
+      "category": "exit intelligence",
+      "status": "suggested",
+      "risk": "low — data collection only, no behavior change"
+    },
+    {
+      "date": "2026-09-13T10:33:46.033026+00:00",
+      "idea": "Add bb_position to SHORT entry filter — block SHORT when bb_position < 0.15 (near lower BB = near support)",
+      "rationale": "ENA SHORT loss had bb_position=0.08 (near lower BB). SHORT entries near lower BB are near support — high bounce risk. Block SHORT when price is in lower 15% of BB range.",
+      "expected_impact": "Could filter 20-30% of rr_engine_resistance SHORT losses",
+      "category": "entry sniper",
+      "status": "needs_backtest",
+      "risk": "low — would not affect winners (winners had bb_position > 0.20)"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Update CURRENT.md — trend_purity+ killed, new 24h stats (done this run)",
-    "Monitor BAD_TRADE_HOURS effect — soft penalty active, evaluate in 48h",
-    "Monitor legacy aging out — slow_grind, ema300_dip_short, sma20_dip, coiled_spring should age out by Sep 14",
-    "Monitor rr_engine_resistance SHORT exits — structural, needs code fix if it persists after legacy ages out",
-    "Backtest SHORT_RSI_CEILING=55 — session brain data suggests +$0.50-1.00/7d potential"
-  ]
+    "Monitor legacy aging out by Sep 14 — expect 7d PnL to improve by ~$3.45",
+    "Monitor rr-struct- at 15T kill threshold",
+    "Investigate signal_rsi_14/signal_z_score NULL columns — data exists in _signal_metadata JSON",
+    "Monitor BAD_TRADE_HOURS impact after 48h",
+    "No config change this run — system flat, legacy ages out, BAD_TRADE_HOURS already applied"
+  ],
+  "verdict": "SYSTEM HEALTHY — FLAT_24H, PROFITABLE_7D. Legacy aging out Sep 14. Structural rr_engine_resistance SHORT exit issue needs CODE fix. No config change."
 }
