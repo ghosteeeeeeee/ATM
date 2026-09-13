@@ -57,8 +57,11 @@
         .status-suggested { background: rgba(170,102,255,0.2); color: #aa66ff; }
         .status-implemented { background: rgba(0,255,136,0.2); color: #00ff88; }
         .status-rejected { background: rgba(255,68,68,0.2); color: #ff4444; }
+        .status-boosted { background: rgba(0,255,136,0.3); color: #00ff88; }
         .reject-btn { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); color: #ff4444; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75em; }
         .reject-btn:hover { background: rgba(255,68,68,0.3); }
+        .boost-btn { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); color: #00ff88; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75em; }
+        .boost-btn:hover { background: rgba(0,255,136,0.3); }
         
         .drift-item { padding: 10px 12px; border-bottom: 1px solid #1a1a25; }
         .drift-item .finding { color: #ffaa00; font-size: 0.9em; }
@@ -238,9 +241,12 @@
             const statusClass = `status-${item.status || 'suggested'}`;
             const isRejected = item.status === 'rejected';
             const isImplemented = item.status === 'implemented';
-            const rejectBtn = (!isRejected && !isImplemented) ? 
+            const isBoosted = item.status === 'boosted';
+            const rejectBtn = (!isRejected && !isImplemented && !isBoosted) ? 
                 `<button class="reject-btn" onclick="rejectIdea(${idx})" title="Reject this idea">✕</button>` : '';
-            html += `<div class="creative-item" style="${isRejected ? 'opacity:0.4;' : ''}">
+            const boostBtn = (!isRejected && !isImplemented && !isBoosted) ?
+                `<button class="boost-btn" onclick="boostIdea(${idx})" title="Boost — CEO should implement this">👍</button>` : '';
+            html += `<div class="creative-item" style="${isRejected ? 'opacity:0.4;' : ''}${isBoosted ? 'border-color:#00ff88;' : ''}">
                 <div class="idea">${esc(item.idea)}</div>
                 <div class="rationale">${esc(item.rationale)}</div>
                 <div class="impact">Expected: ${esc(item.expected_impact)}</div>
@@ -248,6 +254,7 @@
                 <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
                     <span class="status-badge ${statusClass}">${esc(item.status || 'suggested')}</span>
                     <span class="tag">${esc(item.category || 'general')}</span>
+                    ${boostBtn}
                     ${rejectBtn}
                 </div>
             </div>`;
@@ -262,6 +269,15 @@
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({index, reason})
+        });
+        loadCreative(); // refresh
+    }
+    
+    async function boostIdea(index) {
+        await fetch(`${API}/creative/boost`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({index})
         });
         loadCreative(); // refresh
     }

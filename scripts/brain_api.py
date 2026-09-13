@@ -284,6 +284,29 @@ def reject_creative(index: int, reason: str = "") -> dict:
         return {"error": str(e)}
 
 
+def boost_creative(index: int) -> dict:
+    """Boost/approve a creative improvement so CEO prioritizes it."""
+    if not CREATIVE_FILE.exists():
+        return {"error": "No creative improvements file"}
+    
+    try:
+        with open(CREATIVE_FILE) as f:
+            data = json.load(f)
+        
+        if not isinstance(data, list) or index is None or index < 0 or index >= len(data):
+            return {"error": f"Invalid index {index}"}
+        
+        data[index]["status"] = "boosted"
+        data[index]["boosted_at"] = datetime.now(timezone.utc).isoformat()
+        
+        with open(CREATIVE_FILE, 'w') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        return {"ok": True, "idea": data[index].get("idea", "")}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 # ── HTTP Handler ────────────────────────────────────────────────────────
 
 class BrainAPIHandler(BaseHTTPRequestHandler):
@@ -336,6 +359,15 @@ class BrainAPIHandler(BaseHTTPRequestHandler):
                 index = body.get("index")
                 reason = body.get("reason", "")
                 self._json_response(reject_creative(index, reason))
+            except Exception as e:
+                self._json_response({"error": str(e)}, 400)
+        elif path == "/api/brain/creative/boost":
+            # Boost/approve a creative improvement
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))
+                body = json.loads(self.rfile.read(content_length)) if content_length > 0 else {}
+                index = body.get("index")
+                self._json_response(boost_creative(index))
             except Exception as e:
                 self._json_response({"error": str(e)}, 400)
         else:
