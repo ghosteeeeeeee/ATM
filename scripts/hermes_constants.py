@@ -2307,6 +2307,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
+    'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
     'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
