@@ -3298,7 +3298,7 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-11 — new pump_chain_long.py uses original logic (no filters)
+PUMP_FLOW_PLUS_ENABLED = False        # KILLED 2026-09-14 auto_1hr — 24T/7d 37%WR -$0.56, 24h 9T 44%WR -$0.40. Consistent loser.
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-09 — wins in ALL regimes. EXTREME blocked via volatility_gate_v2.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence

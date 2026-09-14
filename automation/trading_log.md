@@ -1,3 +1,42 @@
+## [2026-09-14 15:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L -$0.07)
+- FIL LONG pump-chain+ atr_sl_hit: -$0.13
+- BANANA SHORT pump-chain- atr_sl_hit: +$0.06
+
+**24h:** 47T 40.4%WR -$1.21 | 9 open
+**7d:** 329T 54.4%WR +$1.04
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 33T -$1.08 (70% of closes — tight in NORMAL chop)
+- rr_engine_resistance: 6T -$0.20
+- profit-monster-trail: 5T +$0.39 (only profitable exit)
+- rr_engine_support_br: 2T -$0.22
+
+**24h Regime:**
+- NORMAL: 13T 30.8%WR -$1.16 (worst)
+- HIGH: 21T 42.9%WR -$0.73
+- EXTREME: 12T 58.3%WR +$0.78 (best)
+
+**7d Kill Threshold Check (15T+, negative PnL):**
+- ema300_dip_short: 17T -$0.91 → ALREADY DISABLED
+- sma20_dip: 19T -$0.73 → ALREADY KILLED (both directions)
+- trend_purity+: 11T -$0.90 → ALREADY DISABLED (auto_1hr 2026-09-13)
+- pullback-entry+: 6T -$0.57, 16.7%WR → ALREADY KILLED (CEO 2026-09-10)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: All signals at/above 15T kill threshold already disabled — no trigger
+- SHORT_NORMAL_PENALTY + rr_engine_resistance fix deployed today (14:30 UTC) — 48h eval window active, only ~1h in
+- Trade freq: 2T last hour, 9 open — normal, no overtrading
+- bb_bounce_v2_long 14T/7d -$0.86 — approaching 25T threshold, no trades last hour
+- 7d net positive (+$1.04) despite 24h dip — market condition (NORMAL chop), not signal failure
+
+**Open Questions:**
+- SHORT_NORMAL_PENALTY + rr_engine_resistance need 48h to evaluate — next review ~2026-09-16 14:30 UTC
+- NORMAL regime LONG continues to be worst performer — no specific LONG_NORMAL_PENALTY exists
+
 ## [2026-09-14 14:30 UTC] Hourly Analysis
 
 **Trades:** 0 closed in last hour (4 in last 2h: 3W 1L +$0.28)

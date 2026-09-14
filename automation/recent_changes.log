@@ -1,3 +1,10 @@
+[2026-09-14 15:30 UTC] auto_1hr: NO CHANGE — all kill-threshold signals already disabled, eval window active
+  24h: 47T 40.4%WR -$1.21 | 7d: 329T 54.4%WR +$1.04
+  Kill check: ema300_dip_short (17T), sma20_dip (19T), trend_purity+ (11T) all pre-killed
+  SHORT_NORMAL_PENALTY + rr_engine_resistance fix ~1h into 48h eval — don't stack changes
+  2T last hour, 9 open — normal frequency
+  BY: auto_1hr
+
 [2026-09-14 14:30 UTC] auto_1hr: NO CHANGE — monitoring phase after today's fixes
   24h: 48T 43.8%WR -$1.03 | 7d: 327T 54.4%WR +$1.11
   atr_sl_hit 71% of 24h closes (34T -$1.00), 42.5% of 7d (+$1.42) — tight in NORMAL chop
