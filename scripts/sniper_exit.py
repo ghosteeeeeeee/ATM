@@ -100,6 +100,35 @@ def _db_query(db_path, query, params=(), one=True):
                 pass
 
 
+def _pg_query(query, params=(), one=True):
+    """Run a query against PostgreSQL brain DB."""
+    import psycopg2
+    try:
+        conn = psycopg2.connect("host=/var/run/postgresql dbname=brain user=postgres")
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute(query, params)
+        if one:
+            row = cur.fetchone()
+            if row is None:
+                return None
+            # Return as dict-like object
+            cols = [desc[0] for desc in cur.description]
+            return dict(zip(cols, row))
+        else:
+            rows = cur.fetchall()
+            cols = [desc[0] for desc in cur.description]
+            return [dict(zip(cols, r)) for r in rows]
+    except Exception as e:
+        log.warning(f"PG query error: {e}")
+        return None
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+
 def get_btc_wave_phase():
     """Read BTC wave_phase from token_speeds table.
     Returns: 'accelerating', 'decelerating', 'bottoming', 'falling', or 'neutral'
@@ -117,34 +146,49 @@ def get_btc_velocity():
 
 
 def get_btc_momentum_state():
-    """Read BTC momentum_state from momentum_cache.
+    """Read BTC momentum state from PostgreSQL brain DB.
+    Derives momentum_state from regime_4h + trend + slope_4h.
     Returns: 'bullish', 'bearish', 'neutral', or None
-    NOTE: momentum_cache may be stale — caller should check age.
     """
-    row = _db_query(RUNTIME_DB, "SELECT momentum_state FROM momentum_cache WHERE token='BTC'")
-    return row['momentum_state'] if row else None
+    row = _pg_query("SELECT regime_4h, trend, slope_4h, updated_at FROM momentum_cache WHERE token='BTC'")
+    if not row:
+        return None
+    regime = row.get('regime_4h', '')
+    trend = row.get('trend', '')
+    slope = row.get('slope_4h', 0) or 0
+    # Derive momentum state from available data
+    if regime == 'LONG_BIAS' or (trend == 'rising' and slope > 0.01):
+        return 'bullish'
+    elif regime == 'SHORT_BIAS' or (trend == 'falling' and slope < -0.01):
+        return 'bearish'
+    return 'neutral'
 
 
 def get_momentum_cache_age_minutes():
-    """Check how old the BTC momentum_cache entry is.
+    """Check how old the BTC momentum_cache entry is in PostgreSQL.
     Returns: age in minutes, or 9999 if unknown/stale
     """
-    row = _db_query(RUNTIME_DB, "SELECT updated_at FROM momentum_cache WHERE token='BTC'")
-    if row and row['updated_at']:
+    row = _pg_query("SELECT updated_at FROM momentum_cache WHERE token='BTC'")
+    if row and row.get('updated_at'):
         try:
-            age = (time.time() - float(row['updated_at'])) / 60
+            import datetime
+            updated = row['updated_at']
+            if isinstance(updated, str):
+                updated = datetime.datetime.fromisoformat(updated.replace('+00:00', '+00:00'))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            age = (now - updated).total_seconds() / 60
             return max(0, age)
-        except (ValueError, TypeError):
+        except Exception:
             return 9999
     return 9999
 
 
 def get_btc_slope_15m():
-    """Read BTC 15m avg_z (slope proxy) from momentum_cache.
+    """Read BTC 15m slope from PostgreSQL brain DB.
     Returns: float or None
     """
-    row = _db_query(RUNTIME_DB, "SELECT avg_z FROM momentum_cache WHERE token='BTC'")
-    return row['avg_z'] if row else None
+    row = _pg_query("SELECT slope_15m FROM momentum_cache WHERE token='BTC'")
+    return row.get('slope_15m') if row else None
 
 
 def _get_current_volatility_regime():
@@ -340,6 +384,43 @@ def detect_shift(state=None):
         log.warning("btc_crash_filter not available — skipping crash signals")
     except Exception as e:
         log.warning(f"Crash filter error: {e}")
+
+    # ── Fast signals (1-3 min) — continuum oscillator pre-warning ──
+    try:
+        CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
+        import sqlite3 as _sc
+        _conn = _sc.connect(CONTINUUM_DB, timeout=5)
+        _conn.row_factory = _sc.Row
+        _cur = _conn.execute("""
+            SELECT state_score, velocity_val, acceleration_val, zscore_val
+            FROM continuum_states
+            WHERE token = 'BTC'
+            ORDER BY ts DESC LIMIT 6
+        """)
+        _osc_rows = _cur.fetchall()
+        _conn.close()
+        if _osc_rows and len(_osc_rows) >= 4:
+            _scores = [r['state_score'] for r in reversed(_osc_rows)]
+            _vels = [r['velocity_val'] for r in reversed(_osc_rows)]
+            _accels = [r['acceleration_val'] for r in reversed(_osc_rows)]
+            _zscores = [r['zscore_val'] for r in reversed(_osc_rows)]
+            _latest_score = _scores[-1] if _scores[-1] is not None else 0
+            _latest_vel = _vels[-1] if _vels[-1] is not None else 0
+            _latest_accel = _accels[-1] if _accels[-1] is not None else 0
+            _latest_z = _zscores[-1] if _zscores[-1] is not None else 0
+            # Score rising from low (<10) through mid (>20) = bullish momentum building
+            _prev_score = _scores[-4] if len(_scores) >= 4 and _scores[-4] is not None else 0
+            _score_delta = _latest_score - _prev_score
+            if _latest_vel > 0.1 and _score_delta > 10:
+                signals += 1
+                direction_votes['BULLISH'] += 1
+                log.info(f"  [OSC] BULLISH: score={_latest_score:.1f} delta={_score_delta:+.1f} vel={_latest_vel:+.3f}")
+            elif _latest_vel < -0.1 and _score_delta < -10:
+                signals += 1
+                direction_votes['BEARISH'] += 1
+                log.info(f"  [OSC] BEARISH: score={_latest_score:.1f} delta={_score_delta:+.1f} vel={_latest_vel:+.3f}")
+    except Exception as e:
+        log.warning(f"Continuum oscillator error: {e}")
 
     # ── Medium signals (5 min) — velocity + wave phase ──
     btc_wave = get_btc_wave_phase()

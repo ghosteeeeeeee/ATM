@@ -1364,9 +1364,11 @@ def context_gate(token, direction, source, sig):
         # volatility gate needs just the signal name part
         _vol_source = source
         if source and ('chain(' in source or 'APEX(' in source or 'TAO(' in source):
-            # Extract last comma-separated part as the actual signal
-            _parts = [p.strip() for p in source.split(',')]
-            _vol_source = _parts[-1] if _parts else source
+            # Strip chain evidence first (handles nested parens like chain(ADA(1.73x)))
+            import re as _re_vol
+            _vol_source = _re_vol.sub(r',?chain\(.*\)$', '', source).strip(',').strip()
+            if not _vol_source:
+                _vol_source = source
         vol_result, vol_regime = should_trade(token, signal=_vol_source)
         atr_pct = get_atr_pct(token)
         atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'

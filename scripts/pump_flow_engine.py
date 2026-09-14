@@ -630,7 +630,7 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
     
     elif phase_data['phase'] == 'MARKUP':
         # BTC pumping — watch for early spillovers into HYPE then alts
-        # Recommend tokens with strong BTC chain links
+        # 1. Recommend tokens with strong BTC chain links
         btc_followers = []
         for edge in flow_graph.get('edges', []):
             if edge['from'] == 'BTC' and edge['lift'] >= 1.2 and edge['wr'] > 0.5:
@@ -648,6 +648,42 @@ def generate_recommendations(phase_data, active_flows, flow_graph):
                 'suggested_direction': 'LONG',
                 'chain_evidence': [{'leader': 'BTC', 'lift': edge['lift'], 'wr': edge['wr']}],
                 'flow_score': edge['strength'] * 0.5,
+            })
+        
+        # 2. Also recommend tokens with positive velocity (active capital inflow)
+        # BTC chain may have no edges — fall back to momentum-based recommendations
+        inflow_tokens = [f for f in active_flows if f['direction'] == 'IN' and f['velocity_15m'] > 0.3]
+        for flow in inflow_tokens[:10]:
+            # Skip if already recommended via chain link
+            if any(r['token'] == flow['token'] for r in recommendations):
+                continue
+            
+            # Find chain evidence for this token
+            chain_evidence = []
+            for edge in flow_graph.get('edges', []):
+                if edge['from'] == flow['token'] and edge['lift'] >= 1.3:
+                    chain_evidence.append({
+                        'follower': edge['to'],
+                        'lift': edge['lift'],
+                        'wr': edge['wr'],
+                    })
+                if edge['to'] == flow['token'] and edge['lift'] >= 1.3:
+                    chain_evidence.append({
+                        'leader': edge['from'],
+                        'lift': edge['lift'],
+                        'wr': edge['wr'],
+                    })
+            
+            conf = min(0.7, 0.3 + flow['velocity_15m'] * 0.15 + flow['signal_count_2h'] * 0.03)
+            recommendations.append({
+                'token': flow['token'],
+                'tier': flow['tier'],
+                'tier_name': flow['tier_name'],
+                'reason': f"Markup momentum: +{flow['velocity_15m']:.2f}% velocity, {flow['signal_count_2h']} recent signals",
+                'confidence': round(conf, 3),
+                'suggested_direction': 'LONG',
+                'chain_evidence': chain_evidence[:3],
+                'flow_score': flow['flow_score'],
             })
     
     elif phase_data['phase'] == 'ACCUMULATION':
