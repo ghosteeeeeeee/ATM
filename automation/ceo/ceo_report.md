@@ -1,33 +1,39 @@
-## CEO Report — 2026-09-14 ~10:15 UTC
+## CEO Report — 2026-09-14 ~14:30 UTC
 
 ### Diagnosis
-24h negative: 46T 43.5% WR -$0.87 (VERIFIED). 7d positive: 320T 55.5% WR +$1.76. Today (Sep 14) 20T 30% WR -$1.36 — bad day. 8 open positions. Market NEUTRAL.
+24h negative: 48T 45.8% WR -$0.83 (VERIFIED). 7d positive: 328T 54.6% WR +$1.17 (VERIFIED — dropped from +$1.76 at 10:15). 8 open positions. Market NEUTRAL 100%.
 
 ### Verified Numbers (DB-queried this run)
-- 24h: 46T, 43.5% WR, -$0.87 (below breakeven ~58%)
-- 7d: 320T, 55.5% WR, +$1.76
-- 7d regime: NEUTRAL 317T 55.5%WR +$1.76
-- 24h signals: pullback-entry- SHORT 18T 50%WR +$0.38 (ONLY profitable), pump-chain+ LONG 9T 44.4%WR -$0.26, rr-struct- SHORT 2T 0%WR -$0.28
-- 24h exit: atr_sl_hit 19T -$2.83 (dominant), rr_engine_resistance 4T -$0.58
+- 24h: 48T, 45.8% WR, -$0.83 (below breakeven ~58%)
+- 7d: 328T, 54.6% WR, +$1.17
+- 7d regime: NEUTRAL 320T 55.3%WR +$1.68
+- 7d exit: profit-monster-trail 86T +$6.12 ★ | atr_sl_hit 140T +$1.48 | rr_engine_resistance 37T -$1.33 (fix deployed) | cut-loser-CL-T1 37T -$5.44 (legacy)
+- 7d ACTIVE SIGNALS: pullback-entry- 57T/63.2%WR +$2.63 ★ | rr-struct+ 15T/73.3%WR +$0.59 | pump_chain 27T/59.3%WR +$0.88 | pump-chain- 48T/62.5%WR +$0.57 | open_skies 5T/60%WR +$1.24
+- 7d DRAGGERS: pump-chain+ 23T/39.1%WR -$0.43 (WORST active) | rr-struct- 7T/42.9%WR -$0.42 | open-skies+ 6T/50%WR -$0.31
+- 24h losers: 24 total, 0 dead signal, all active (variance day)
 - 8 open positions
 
 ### Root Cause
-Today is a variance day — 30% WR on 20 trades. pullback-entry- SHORT had 9 losses but still positive PnL (+$0.38) due to good R:R. The rr_engine_resistance fix deployed ~06:45 UTC needs 48h to evaluate. SHORT_NORMAL_PENALTY=0.85 applied ~05:30 UTC also needs 48h.
+7d PnL dropped -$0.59 in 4h (10:15→14:30). Main active dragger: pump-chain+ LONG at 39.1% WR — all 23 trades in NEUTRAL, losses dominated by atr_sl_hit (10T, avg -4.61%). Signal enters LONG before pump confirms, gets stopped out. Not disabling yet — needs entry timing analysis. Legacy signals (ema300_dip_short, trend_purity+, sma20_dip) still in 7d window at -$5.00 combined — aging out by Sep 15-20.
 
 ### Fix Applied
-**NO CONFIG CHANGES.** System in monitoring mode — two fixes deployed today need time to show effect. Continuing to monitor:
-- rr_engine_resistance fix (candle CLOSE check) — deployed ~06:45 UTC
-- SHORT_NORMAL_PENALTY=0.85 — applied ~05:30 UTC
-- rr-struct- at 7T/7d 42.9%WR — kill at 15T if WR <50%
-- bb_bounce_v2_long at 16T/7d 50%WR — kill at 25T if WR <50%
-- trend_ignition 0 trades since Sep 13 — monitor 72h
+**NO CONFIG CHANGES.** Two fixes deployed today still need 48h evaluation:
+- rr_engine_resistance candle CLOSE check (~06:45 UTC) — no SHORT resistance exits since deployment (expected, not every period has them)
+- SHORT_NORMAL_PENALTY=0.85 (~05:30 UTC) — monitoring
+
+### Monitoring Items
+- rr-struct- 7T/7d 42.9%WR — kill at 15T if WR <50%
+- bb_bounce_v2_long 14T/7d 0 trades last 48h — effectively dead, will age out
+- trend_ignition 0 trades since Sep 13 — NEUTRAL market, monitor 72h
+- pump-chain+ LONG — investigate entry timing, consider confidence adjustment
 
 ### Verification
-- 24h PnL: -$0.87 (negative, below breakeven)
-- 7d PnL: +$1.76 (positive)
+- 24h PnL: -$0.83 (negative, below breakeven)
+- 7d PnL: +$1.17 (positive, degraded from +$1.76)
 - Pipeline active, 8 open positions
-- Disk 80% (24G free)
-- No errors in logs
+- hermes-coding-mcp disabled (was crash-looping 465k restarts)
+- coin_tracker timer OK (next run 15:00 UTC)
+- Disk ~80%
 
 ---
 

@@ -463,3 +463,32 @@
 
 ## Error Alerts — 2026-09-14 09:56 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-14 10:44 UTC
+- **REPEATED** (2x): `[BTC-CRASH] ALT SHORT BLOCKED — WARNING: BTC level: -0.51% from high, +0.05% from low — blocking SHORT entries` (expected, safety filter)
+- **CRITICAL** (1x): `hermes-coding-mcp.service` crash-looping — 465,434 restarts, script `run_mcp_server.py` missing. **AUTO-FIX**: stopped + disabled service.
+- **WARN** (1x): `hermes-5m-candle.service` failed — script `_aggregate_5m.py` missing (2 days dead). Can't disable (static unit). Needs manual cleanup.
+- **WARN** (1x): `hermes-away-detector.service` failed — 1 week dead. Needs manual cleanup.
+- **WARN** (1x): `momentum_cache` stale — 426h old (17.75 days), 193 tokens.
+- **INFO**: Pipeline completed OK — 8 open, 45 closed today, -33.84% PnL. Regime: NEUTRAL.
+
+## Error Alerts — 2026-09-14 10:56 UTC
+- **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-09-14 12:56 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-14 13:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`

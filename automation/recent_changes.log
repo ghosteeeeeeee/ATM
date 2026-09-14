@@ -1805,3 +1805,11 @@
   Drift: bb_bounce_v2_long degraded 52.9%WR (was 66.7%), NORMAL worst regime
   Creative: (1) SHORT_RSI_CEILING=65 — 20T/7d SHORT RSI>65 50%WR -$1.02 (needs backtest) (2) rr_engine_resistance SHORT exit needs CLOSE-above-resistance code change
   BY: brain_auditor
+[2026-09-14 14:30 UTC] brain_auditor: NO CONFIG CHANGE — system in monitoring mode
+  24h: 48T 45.8%WR -$0.83 | 7d: 328T 54.6%WR +$1.17
+  Exit 7d: profit-monster-trail 86T +$6.12, rr_engine_resistance 37T -$1.33 (fix deployed)
+  24h losers: 24 total, 0 dead signal, 24 active (variance day)
+  7d regime: EXTREME +$4.16 | HIGH -$0.34 | NORMAL -$2.65
+  Drift: Signal metadata NULL (recurring 10+ runs), LONG NORMAL -$1.85 worst combo
+  Creative: LONG_NORMAL_PENALTY=0.85 suggested (needs backtest)
+  BY: brain_auditor
