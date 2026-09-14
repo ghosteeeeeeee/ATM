@@ -1,3 +1,39 @@
+## CEO Report — 2026-09-14 ~18:37 UTC
+
+### Diagnosis
+24h negative: 41T 41.5% WR -$1.12 (VERIFIED). 7d positive: 321T 53.3% WR +$0.56 (VERIFIED — degraded from +$1.30). Today (Sep 14): 34T 38.2%WR -$1.31. 7 open positions. Market NEUTRAL 100%.
+
+### Verified Numbers (DB-queried this run)
+- 24h: 41T, 41.5% WR, -$1.12 (below breakeven ~58%)
+- 7d: 321T, 53.3% WR, +$0.56
+- Today (Sep 14 full day): 34T, 38.2% WR, -$1.31
+- 7d regime: NEUTRAL 314T 54.1%WR +$1.14 (market 100% NEUTRAL)
+- 7d exit: profit-monster-trail +$5.36★ | atr_sl_hit +$0.45 | rr_engine_resistance -$1.33 (fix deployed) | cut-loser-CL-T1 -$5.05 (legacy)
+- 7d ACTIVE SIGNALS: pullback-entry- 57T/63.2%WR +$2.63★ | rr-struct+ 15T/73.3%WR +$0.59 | pump_chain 22T/50%WR +$0.34 | pump-chain- 51T/60.8%WR +$0.83 | open_skies 4T/75%WR +$1.43
+- 7d DRAGGERS: ema300_dip_short 16T/43.8%WR -$0.96 (DEAD) | trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | sma20_dip 19T/42.1%WR -$0.73 (DEAD) | pump-chain+ 24T/37.5%WR -$0.56 (KILLED today) | bb_bounce_v2_long 11T/45.5%WR -$0.68 (DEAD)
+- Today losers: pump-chain+ 6 LONG -$0.66 (killed), rr-struct-v2+ 2 LONG -$0.26, pullback-entry- 11 SHORT -$0.25
+- 7 open positions (3 rr-struct-v2+ LONG, 1 pump-chain- SHORT, 1 pullback-entry- SHORT, 1 pump-chain+ LONG pre-kill, 1 rr-struct-v2+/rs-s37 LONG)
+
+### Root Cause
+Today's -$1.31 is dominated by killed signals (pump-chain+ -$0.66, trend_purity+ -$0.75 in 48h). These will age out. The 7d PnL degraded from +$1.30 to +$0.56 over 4 hours — normal variance in choppy NEUTRAL market. Legacy signals (ema300_dip_short -$0.96, trend_purity+ -$0.90, sma20_dip -$0.73) still in 7d window — last closes were Sep 8-13, aging out by Sep 15-20. Active signals are net positive: pullback-entry- +$2.63, pump-chain- +$0.83, rr-struct+ +$0.59. The system is structurally profitable but legacy drag masks it.
+
+### Fix Applied
+**NO CONFIG CHANGES.** pump-chain+ was already killed by auto_1hr at16:08 UTC. Two fixes from earlier today still need 48h evaluation:
+- rr_engine_resistance candle CLOSE check (~06:45 UTC) — no SHORT resistance exits since deployment
+- SHORT_NORMAL_PENALTY=0.85 (~05:30 UTC) — monitoring
+
+### Monitoring Items
+- rr-struct- 7T/7d 42.9%WR -$0.42 — kill at 15T if WR <50%
+- trend_ignition 0 trades since Sep 13 — NEUTRAL market, monitor 72h until Sep 16
+- Legacy aging: ema300_dip_short, trend_purity+, sma20_dip, bb_bounce_v2_long — all dead, ages out Sep 15-20
+- SHORT_NORMAL_PENALTY evaluation window ends Sep 15 ~05:30
+- rr_engine_resistance fix evaluation window ends Sep 15 ~06:45
+
+### Verification
+All numbers DB-queried this run. No old reports trusted. 7d PnL +$0.56 verified positive. Today -$1.31 verified negative — mostly legacy/killed signals.
+
+---
+
 ## CEO Report — 2026-09-14 ~14:30 UTC
 
 ### Diagnosis

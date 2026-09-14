@@ -4338,3 +4338,47 @@ BY: auto_1hr
 - trend_purity+ LONG 7d: 11T/36.4%WR -$0.90 — monitor for kill threshold
 
 BY: auto_1hr
+
+## [2026-09-14 19:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.20)
+- BLUR SHORT pump-chain- atr_sl_hit: -$0.20
+
+**Open positions:** 8 (SOL, SEI, DOT, HYPER, TURBO, INJ, JUP, ACE)
+
+**24h exit breakdown:**
+- atr_sl_hit: 35T (85%) — structural, avg -$0.026/trade
+- rr_engine_resistance: 4T +$0.005/trade
+- rr_engine_support_br: 2T -$0.110/trade
+
+**24h signal performance (bottom):**
+- pump-chain+ LONG: 6T/17%WR -$0.66
+- rr-struct-v2+ LONG: 2T/0%WR -$0.26
+- pullback-entry- SHORT: 13T/62%WR +$0.52 (best)
+
+**24h regime:** EXTREME +$0.15 | HIGH -$0.28 | NORMAL -$0.99
+
+**7d signal losers (5+ trades):**
+- trend_purity+ LONG: 11T/36%WR -$0.90
+- ema300_dip_short SHORT: 15T/47%WR -$0.76
+- sma20_dip LONG: 19T/42%WR -$0.73
+- bb_bounce_v2_long LONG: 11T/45%WR -$0.68
+- pullback-entry+ LONG: 6T/17%WR -$0.57
+- pump-chain+ LONG: 24T/38%WR -$0.56
+
+**Kill check:** No signal at 0%WR with 3+ trades in last hour ✓
+
+**No Change Needed:**
+- Trade frequency ~1.3/hr — healthy
+- No kill triggers active
+- Pipeline running normally
+- atr_sl_hit 85% is structural (trailing catches profits on wins)
+
+**Key Finding:** NORMAL LONG is the main bleed: 7d 29T 31%WR -$1.93. No LONG_NORMAL_PENALTY exists yet. SHORT_NORMAL_PENALTY=0.85 deployed. Adding LONG_NORMAL would require backtest.
+
+**Open Questions:**
+- pump-chain+ LONG 7d: 24T/38%WR -$0.56 — approaching kill threshold
+- trend_purity+ LONG 7d: 11T/36%WR -$0.90 — monitor for kill threshold
+- LONG_NORMAL_PENALTY=0.85 suggestion from brain_auditor — needs backtest before deploy
+
+BY: auto_1hr
