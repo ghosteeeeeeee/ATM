@@ -43,7 +43,9 @@
 
 ## Today's Changes (Sep 14)
 
-1. **brain_auditor ~18:25 UTC — NO CONFIG CHANGE.** DB: 24h 41T 41.5%WR -$1.12 (NEGATIVE). 7d: 321T 53.3%WR +$0.56 (POSITIVE, barely). Market NEUTRAL. **24h DIRECTIONAL SPLIT:** SHORT 26T 50%WR +$0.31 vs LONG 15T 26.7%WR -$1.43. LONG bleeding in ALL regimes. **LOSING TRADE AUTOPSY (22 losers):** pump-chain+ KILLED 6 LONG (FIL 3x, HYPER, KAS, BCH — all atr_sl_hit). pullback-entry- 5 SHORT (NEO rr_engine_resistance -$0.22, LDO/ONDO/ENS/ENA atr_sl). rr-struct-v2+ 2 LONG. Others 9. **KEY:** 0/22 dead signal. 22/22 active. **FIXES WORKING:** rr_engine_resistance 0 exits since fix (needs data). SHORT_NORMAL_PENALTY SHORT NORMAL 4T/24h -$0.07. SHORT_RSI_CEILING=65 blocking ADA. **CREATIVE:** (1) pump-chain+ LONG NEUTRAL regime gate suggested (needs backtest). (2) SHORT_NORMAL_PENALTY 0.85→0.80 suggested. (3) rr-struct- STANDALONE_BYPASS suggested. **No config change — 3 fixes need monitoring.**
+1. **daily_orchestrator ~18:30 UTC — BUG FIX.** Fixed health_monitor_prompt.md: speed_pct→speed_percentile column name (token_speeds table has speed_percentile, not speed_pct). Was causing OperationalError on every health monitor run. No config change.
+2. **auto_1hr ~16:08 UTC — SIGNAL KILLED.** pump-chain+ LONG 24T/7d 37.5%WR -$0.56. PUMP_FLOW_PLUS_ENABLED=False. pump-chain- (63%WR +$0.30/7d) stays.
+3. **brain_auditor ~18:25 UTC — NO CONFIG CHANGE.** DB: 24h 41T 41.5%WR -$1.12 (NEGATIVE). 7d: 321T 53.3%WR +$0.56 (POSITIVE, barely). Market NEUTRAL. **24h DIRECTIONAL SPLIT:** SHORT 26T 50%WR +$0.31 vs LONG 15T 26.7%WR -$1.43. LONG bleeding in ALL regimes. **LOSING TRADE AUTOPSY (22 losers):** pump-chain+ KILLED 6 LONG (FIL 3x, HYPER, KAS, BCH — all atr_sl_hit). pullback-entry- 5 SHORT (NEO rr_engine_resistance -$0.22, LDO/ONDO/ENS/ENA atr_sl). rr-struct-v2+ 2 LONG. Others 9. **KEY:** 0/22 dead signal. 22/22 active. **FIXES WORKING:** rr_engine_resistance 0 exits since fix (needs data). SHORT_NORMAL_PENALTY SHORT NORMAL 4T/24h -$0.07. SHORT_RSI_CEILING=65 blocking ADA. **CREATIVE:** (1) pump-chain+ LONG NEUTRAL regime gate suggested (needs backtest). (2) SHORT_NORMAL_PENALTY 0.85→0.80 suggested. (3) rr-struct- STANDALONE_BYPASS suggested. **No config change — 3 fixes need monitoring.**
 1. **brain_auditor ~16:50 UTC — NO CONFIG CHANGE.** DB: 24h 22T 50.0%WR +$0.30 (VERIFIED POSITIVE). 7d: 320T 54.3%WR +$1.30 (VERIFIED POSITIVE). Market NEUTRAL. **LOSING TRADE AUTOPSY (21 losers):** pump-chain+ 6 LONG (FIL/HYPER/KAS/BCH — all atr_sl_hit, 16.7%WR). pullback-entry- 5 SHORT (NEO rr_engine_resistance, LDO/ONDO/ENS/ENA atr_sl). rr-struct-v2+ 2 LONG (SYRUP/GMT). Others 8. **KEY:** 0/21 dead signal. 21/21 active. pump-chain+ LONG worst active. **FIXES WORKING:** rr_engine_resistance SHORT 4T/24h +$0.02 (was -$1.33/7d). SHORT_NORMAL_PENALTY SHORT NORMAL 4T/24h -$0.07 (was -$2.73/7d). SHORT_RSI_CEILING=65 blocking ADA SHORT at RSI 68. **MONITORING:** rr_engine_resistance fix (48h), SHORT_NORMAL_PENALTY (48h), pump-chain+ stale filter (needs 24h), rr-struct- 7T/7d 42.9%WR (kill at 15T), trend_ignition 0 trades (72h). **No config change — system positive, 3 fixes need monitoring time.**
 2. **CEO ~14:32 UTC — NO CONFIG CHANGE.** DB: 24h 48T 45.8%WR -$0.83 (VERIFIED NEGATIVE). 7d: 328T 54.6%WR +$1.17 (VERIFIED POSITIVE, dropped from +$1.76 at 10:15). Market NEUTRAL. **NO PARAM CHANGES.** 7d PnL degraded -$0.59 in 4h. **WORST ACTIVE SIGNAL:** pump-chain+ LONG 23T/39.1%WR -$0.43 — all NEUTRAL, losses = atr_sl_hit (10T avg -4.61%). Not disabling — needs entry timing analysis. **FIXES DEPLOYED TODAY:** rr_engine_resistance candle CLOSE check (~06:45 UTC), SHORT_NORMAL_PENALTY=0.85 (~05:30 UTC) — both need 48h. **MONITORING:** rr-struct- 7T/7d 42.9%WR (kill at 15T), bb_bounce_v2_long 14T/7d 0 trades last 48h (dead, aging out), trend_ignition 0 trades (monitor 72h). **8 open positions.** Pipeline active. hermes-coding-mcp disabled (crash-looping). **No config change — system in monitoring mode, fixes need time.**
 2. **CEO ~10:15 UTC — NO CONFIG CHANGE.** DB: 24h 46T 43.5%WR -$0.87 (VERIFIED NEGATIVE). 7d: 320T 55.5%WR +$1.76 (VERIFIED POSITIVE). Market NEUTRAL. Today (Sep 14) 20T 30%WR -$1.36 — variance day. **24h losers:** pullback-entry- SHORT 9 losers but +$0.38 total (good R:R). pump-chain+ LONG 9T 44.4%WR -$0.26. rr-struct- SHORT 2T 0%WR -$0.28. **24h exit:** atr_sl_hit 19T -$2.83 (dominant). **FIXES DEPLOYED TODAY:** rr_engine_resistance candle CLOSE check (~06:45 UTC), SHORT_NORMAL_PENALTY=0.85 (~05:30 UTC) — both need 48h to evaluate. **MONITORING:** rr-struct- 7T/7d 42.9%WR (kill at 15T), bb_bounce_v2_long 16T/7d 50%WR (kill at 25T), trend_ignition 0 trades (monitor 72h). **8 open positions.** Pipeline active, disk 80%. **No config change — system in monitoring mode, fixes need time.**
@@ -122,15 +124,14 @@
 
 ## Active Decisions
 
-- **R:R POSITIVE (7d).** 7d PnL +$0.56 (positive but barely). 24h -$1.12 (negative day). — 2026-09-14 ~18:25 UTC
+- **R:R POSITIVE (7d).** 7d PnL +$0.60 (positive but degraded from +$1.30). 24h -$1.16 (negative day). — 2026-09-14 ~18:30 UTC
 - **pump-chain+ KILLED.** auto_1hr 16:08 UTC Sep 14. 24T/7d 37.5%WR -$0.56. Consistent loser. — 2026-09-14
 - **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** SHORT NORMAL 4T/24h -$0.07 (was -$2.73/7d). Monitor 48h until Sep 15 ~05:30. — 2026-09-14 ~16:50 UTC
 - **rr_engine_resistance FIX DEPLOYED.** SHORT exits 4T/24h +$0.02 (was -$1.33/7d). Working. Monitor 48h until Sep 15 ~06:45. — 2026-09-14 ~16:50 UTC
 - **SHORT_RSI_CEILING=65 ACTIVE.** Blocking ADA SHORT at RSI 68. Working. — 2026-09-14 ~16:50 UTC
-- **pump-chain+ STALE FILTER DEPLOYED.** 5T stale 7d = 0%WR blocked. Fresh 24T = 37.5%WR -$0.56. Monitor 24h. — 2026-09-14 ~16:50 UTC
-- **pump-chain+ DRAGGING.** 24T/7d 37.5%WR -$0.56. Worst active signal. Stale filter deployed, needs data. — 2026-09-14 ~16:50 UTC
 - **rr-struct- MONITORING.** 7T/7d, 42.9% WR, -$0.42. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~16:50 UTC
 - **trend_ignition: 0 trades since Sep 13.** NEUTRAL market may not trigger. Monitor 72h until Sep 16. — 2026-09-14 ~16:50 UTC
+- **ATR SL TIGHTNESS:** 55% of 24h SL hits below entry. ATR SL may be too tight for current chop. Monitor. — 2026-09-14 ~18:30 UTC
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE). — 2026-09-06
 - **CONF_FILTER_MIN=70.** — 2026-09-02
@@ -145,8 +146,9 @@
 
 ## Next Actions
 
-1. **Monitor rr_engine_resistance fix.** 0 exits since deployment. Monitor 48h until Sep 15 ~06:45. — 2026-09-14 ~18:25 UTC
-2. **Monitor SHORT_NORMAL_PENALTY=0.85.** SHORT NORMAL 4T/24h -$0.07. Monitor 48h until Sep 15 ~05:30. — 2026-09-14 ~18:25 UTC
-3. **Monitor rr-struct-.** 7T/7d 42.9% WR, -$0.42. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~18:25 UTC
-4. **Monitor trend_ignition.** 0 trades since Sep 13. Monitor 72h until Sep 16. — 2026-09-14 ~18:25 UTC
-5. **Evaluate LONG regime gate** if 7d LONG bleed continues after legacy ages out. — 2026-09-14 ~18:25 UTC
+1. **Monitor rr_engine_resistance fix.** 0 exits since deployment. Monitor 48h until Sep 15 ~06:45. — 2026-09-14 ~18:30 UTC
+2. **Monitor SHORT_NORMAL_PENALTY=0.85.** SHORT NORMAL 4T/24h -$0.07. Monitor 48h until Sep 15 ~05:30. — 2026-09-14 ~18:30 UTC
+3. **Monitor rr-struct-.** 7T/7d 42.9% WR, -$0.42. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~18:30 UTC
+4. **Monitor trend_ignition.** 0 trades since Sep 13. Monitor 72h until Sep 16. — 2026-09-14 ~18:30 UTC
+5. **Monitor ATR SL tightness.** 55% SL-below-entry rate. If continues, consider widening ATR_SL_MIN. — 2026-09-14 ~18:30 UTC
+6. **Evaluate LONG regime gate** if 7d LONG bleed continues after legacy ages out. — 2026-09-14 ~18:30 UTC
