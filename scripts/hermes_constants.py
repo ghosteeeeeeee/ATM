@@ -2758,7 +2758,7 @@ RANGE_REVERSION_MIN_ATR_PCT = 0.08      # min ATR% to avoid noise
 # Family: MeanReversion (pairs with ANY other family for 2-type confluence)
 # NEW 2026-09-05 — addresses signal starvation in NEUTRAL regime
 # Uses Stochastic RSI + CMF + ATR range filter (different from BB/RSI signals)
-NEUTRAL_SNIPER_ENABLED = True            # RE-ENABLED 2026-09-11 — mean-reversion for chop regime, only fires in NEUTRAL/FLAT
+NEUTRAL_SNIPER_ENABLED = False           # DISABLED 2026-09-12 — both directions disabled per T
 NEUTRAL_SNIPER_PLUS_ENABLED = False      # DISABLED 2026-09-12 — both directions disabled per T
 NEUTRAL_SNIPER_MINUS_ENABLED = False     # DISABLED 2026-09-12 — SHORT has 68% confidence, lowest in queue
 NEUTRAL_SNIPER_STOCH_RSI_PERIOD = 14     # RSI period for StochRSI
