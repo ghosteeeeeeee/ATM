@@ -514,6 +514,8 @@ def detect_shift(state=None):
         else:
             direction_votes['BULLISH'] += 1
             _dbg('REGIME', 'BULLISH+1', f"regime changed, slope={slope}")
+    else:
+        _dbg('REGIME', None, "no regime change")
 
     # ── Decision ──
     if signals < SNIPER_SIGNALS_FOR_L1:
