@@ -1,3 +1,11 @@
+[2026-09-14 14:30 UTC] auto_1hr: NO CHANGE — monitoring phase after today's fixes
+  24h: 48T 43.8%WR -$1.03 | 7d: 327T 54.4%WR +$1.11
+  atr_sl_hit 71% of 24h closes (34T -$1.00), 42.5% of 7d (+$1.42) — tight in NORMAL chop
+  NORMAL regime worst: 14T 28.6%WR -$1.30 (24h). LONG in NORMAL 33%WR -$1.85/7d
+  SHORT_NORMAL_PENALTY + rr_engine_resistance fix need 48h eval — don't stack changes
+  Kill check: no trigger. 7 open trades, all flat.
+  BY: auto_1hr
+
 [2026-09-14 ~09:30 UTC] brain_auditor: NO CONFIG CHANGE — two fixes deployed today need evaluation
   24h: 35T 45.7%WR -$0.12 | 7d: 320T 55.6%WR +$2.03
   Losers 24h: 21 total, 1 dead signal, 20 active

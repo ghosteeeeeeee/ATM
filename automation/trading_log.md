@@ -1,3 +1,43 @@
+## [2026-09-14 14:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (4 in last 2h: 3W 1L +$0.28)
+- ENA SHORT pump-chain- atr_sl_hit: +$0.13
+- XPL LONG breakout-long+ atr_sl_hit: +$0.25
+- USUAL SHORT pullback-entry- atr_sl_hit: +$0.08
+- ACE LONG breakout-long+,rs-s42 atr_sl_hit: -$0.18
+
+**24h:** 48T 43.8%WR -$1.03 | 7 open
+**7d:** 327T 54.4%WR +$1.11
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 34T -$1.00 (71% of closes — SLs tight in current conditions)
+- rr_engine_resistance: 6T -$0.20
+- profit-monster-trail: 5T +$0.39 (only profitable exit type)
+- rr_engine_support_br: 2T -$0.22
+
+**24h Regime:**
+- EXTREME: 11T 63.6%WR +$0.91 (strong)
+- HIGH: 22T 45.5%WR -$0.64
+- NORMAL: 14T 28.6%WR -$1.30 (worst — LONG in NORMAL is 33%WR -$1.85/7d)
+
+**24h Signal x Exit (worst):**
+- pump-chain+ -> atr_sl_hit: 5T -$0.53 (biggest loser)
+- rr-struct- -> atr_sl_hit: 1T -$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: No signal has 0%WR with 3+ trades in last hour — no trigger
+- SHORT_NORMAL_PENALTY (0.85) and rr_engine_resistance fix deployed today — need 48h evaluation window
+- atr_sl_hit 42.5% of 7d (profitable +$1.42/7d), 71% spike in 24h likely market condition (NORMAL regime chop)
+- Trade freq: 0T last hour, 7 open — healthy, no overtrading
+- trend_purity+ 11T/7d 36%WR -$0.90 — approaching 15T kill threshold, no trades last hour
+- bb_bounce_v2_long 14T/7d 42.9%WR -$0.86 — approaching 25T kill threshold
+
+**Open Questions:**
+- NORMAL regime LONG is the biggest drag (33%WR -$1.85/7d) — no specific LONG_NORMAL_PENALTY exists, consider adding if trend continues
+- 7 open trades all flat ($0.00) — normal mid-trade state
+
 ## [2026-09-14 03:45 UTC] Hourly Analysis
 
 **Trades:** 3 closed (0W 3L -$0.21)
@@ -4078,3 +4118,86 @@ BY: auto_1hr
 - pump-chain- SHORT degrading: 4T/24h 25%WR -$0.11, 2 losses last hour — approaching kill threshold
 - NORMAL regime destroying system (31.3% WR) vs EXTREME (66.7%) — entries in chop markets getting stopped out
 - ATR SL hit structural: 76.5% today, up from 31% Sep 12 — needs regime-aware entry filtering, not SL widening
+
+## [2026-09-14 11:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.27)
+- FIL pump-chain+ LONG: -$0.16 (atr_sl_hit, 13min hold)
+- HYPER pump-chain+ LONG: -$0.12 (atr_sl_hit, 27min hold)
+- ACE pump-chain- SHORT: +$0.01 (atr_sl_hit, breakeven)
+
+**24h:** 46T 43.5%WR -$0.87 | Exit: atr_sl_hit 32T 69.6% -$0.84, profit-monster-trail 5T +$0.39, rr_engine_resistance 6T -$0.20
+
+**Regime context:** Last 2 losses were LONG entries into pump chain — entries during downtrend continuation
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 3T/0%WR threshold
+- pump-chain+ LONG: 9T/24h 44.4%WR -$0.26 — losses are small avg -$0.029, not destructive
+- Trade freq 2T/hr avg — healthy
+- ATR SL hit 69.6% — structural issue from Sep 12, already documented
+
+**Open Questions:**
+- pump-chain+ LONG appears to enter during continued selling (FIL: 3 losses in a row at different prices) — may need tighter trend filter but not kill-worthy yet
+- 24h system negative -$0.87 — within noise, monitor
+
+BY: auto_1hr
+
+## [2026-09-14 12:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W +$0.19)
+- CAKE LONG pump-chain+ | atr_sl_hit | +$0.12 | 109min | HIGH
+- BIGTIME SHORT pullback-entry- | atr_sl_hit | +$0.07 | 99min | HIGH
+- JUP SHORT pump-chain- | atr_sl_hit | $0.00 | 364min | HIGH
+
+**24h:** 48T 43.8%WR -$0.85 (avg -$0.018/trade)
+- Exit: atr_sl_hit 34T (71%) -$0.82, profit-monster-trail 5T +$0.39, rr_engine_resistance 6T -$0.20
+- Regime: NORMAL 17T 35.3%WR -$1.19 (worst), HIGH 20T 45.0%WR -$0.44, EXTREME 10T 60.0%WR +$0.78 (best)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: rr-struct- SHORT 2T/0%WR — below 3T threshold
+- pump-chain- SHORT 6T/33.3%WR — losses small avg -$0.017
+- Trade freq 3T/hr — healthy
+- System slightly negative but within noise (-$0.85/24h)
+
+**Key Pattern:** pump-chain+ LONG in NORMAL regime = losers (KAS -$0.23, BCH -$0.14). In EXTREME/HIGH = mostly wins. Regime-aware entry filter would help but requires signal code change, not constant tweak.
+
+**Open Questions:**
+- rr-struct- SHORT approaching kill threshold (2T/0%WR) — monitor next hour
+- NORMAL regime 35.3%WR — structural issue, needs regime-aware entry filtering in signal code
+
+BY: auto_1hr
+
+## [2026-09-14 13:09 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (50 in 24h, 44% WR, -$0.75)
+- Last close: ACE LONG breaklong+rs-s42 at 12:56 UTC (-$0.18, atr_sl_hit)
+- 7 open positions: SOL, SEI, DOT, BANANA, ENA, GOAT, HYPER
+
+**24h breakdown:**
+- atr_sl_hit: 36T (72%) — 21 losses (-$3.01), 15 wins (+$2.29). Avg loss hold 104min
+- rr_engine_resistance: 6T -$0.20
+- profit-monster-trail: 5T +$0.39
+- All 49/50 trades in NEUTRAL regime (EXTREME/HIGH quiet)
+
+**7d signal trends (5+ trades):**
+- Winners: pullback-entry- SHORT 57T/63.2%WR +$2.63, open_skies LONG 5T/60%WR +$1.24, pump_chain LONG 28T/60.7%WR +$1.00
+- Losers: ema300_dip_short 17T/47.1%WR -$0.91, trend_purity+ LONG 11T/36.4%WR -$0.90, bb_bounce_v2_long 14T/42.9%WR -$0.86
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: No signal at 0%WR with 3+ trades in 24h ✓
+- Trade frequency: ~2/hr — healthy
+- System -$0.75/24h — within noise, not actionable
+- Pipeline running normally (cycle #199505, 3 tokens in hotset)
+- ATR SL dominant at 72% but trailing catches profits (15 wins). Structural, not fixable via constants
+
+**Open Questions:**
+- pump-chain+ LONG: 10T/24h 50%WR -$0.14 — losses small but 23T/7d 39.1%WR -$0.43 cumulative. Monitor but not kill-worthy
+- 7d trend shows pullback-entry- SHORT is best performer; consider increasing its weight if system drifts further negative
+
+BY: auto_1hr
