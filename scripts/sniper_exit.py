@@ -344,6 +344,14 @@ def detect_shift(state=None):
     """
     signals = 0
     direction_votes = {'BEARISH': 0, 'BULLISH': 0}
+    debug_log = []  # Collect debug entries for final summary
+
+    def _dbg(source, vote, detail=''):
+        """Log and collect a debug entry."""
+        if vote:
+            debug_log.append(f"    {source}: {vote} ({detail})")
+        else:
+            debug_log.append(f"    {source}: PASS ({detail})")
 
     # ── Fast signals (1-5 min) — crash filter ──
     try:
@@ -353,11 +361,15 @@ def detect_shift(state=None):
         if crash_result.blocked:
             severity = crash_result.severity
             blocked_dir = getattr(crash_result, 'blocked_direction', '') or ''
+            layer = getattr(crash_result, 'layer', '') or ''
+            reason = getattr(crash_result, 'reason', '') or ''
             if severity == 'EMERGENCY':
+                log.info(f"  [CRASH] EMERGENCY — forcing BEARISH | {reason}")
                 return (3, 'BEARISH')  # Crashes are always bearish
             elif severity == 'CRITICAL':
                 signals += 2
                 direction_votes['BEARISH'] += 2
+                _dbg('CRASH', 'BEARISH+2', f"CRITICAL layer={layer} blocked_dir={blocked_dir} | {reason}")
             elif severity == 'WARNING':
                 signals += 1
                 # blocked_direction tells us which SIDE is blocked:
@@ -366,11 +378,16 @@ def detect_shift(state=None):
                 # '' (all entries blocked) = ambiguous, use crash layer context
                 if blocked_dir == 'SHORT':
                     direction_votes['BULLISH'] += 1
+                    _dbg('CRASH', 'BULLISH+1', f"WARNING SHORT blocked (BTC rising) | {reason}")
                 elif blocked_dir == 'LONG':
                     direction_votes['BEARISH'] += 1
+                    _dbg('CRASH', 'BEARISH+1', f"WARNING LONG blocked (BTC falling) | {reason}")
                 else:
                     # All entries blocked (price crash, volume spike, etc.) — bearish
                     direction_votes['BEARISH'] += 1
+                    _dbg('CRASH', 'BEARISH+1', f"WARNING all blocked (ambiguous) | {reason}")
+        else:
+            _dbg('CRASH', None, f"clear — no block")
 
         # Multi-alt divergence — check raw dict (only populated when Layer 6 fires)
         weak_alt_count = 0
@@ -379,6 +396,7 @@ def detect_shift(state=None):
         if weak_alt_count >= 3:
             signals += 1
             direction_votes['BEARISH'] += 1
+            _dbg('ALT-DIV', 'BEARISH+1', f"{weak_alt_count} weak alts")
 
     except ImportError:
         log.warning("btc_crash_filter not available — skipping crash signals")
@@ -394,7 +412,7 @@ def detect_shift(state=None):
             _conn = _sc.connect(CONTINUUM_DB, timeout=5)
             _conn.row_factory = _sc.Row
             _cur = _conn.execute("""
-                SELECT state_score, velocity_val, acceleration_val, zscore_val
+                SELECT state_score, velocity_val, acceleration_val, zscore_val, ts
                 FROM continuum_states
                 WHERE token = 'BTC'
                 ORDER BY ts DESC LIMIT 6
@@ -411,21 +429,33 @@ def detect_shift(state=None):
             _vels = [r['velocity_val'] for r in reversed(_osc_rows)]
             _accels = [r['acceleration_val'] for r in reversed(_osc_rows)]
             _zscores = [r['zscore_val'] for r in reversed(_osc_rows)]
+            _timestamps = [r['ts'] for r in reversed(_osc_rows)]
             _latest_score = _scores[-1] if _scores[-1] is not None else 0
             _latest_vel = _vels[-1] if _vels[-1] is not None else 0
             _latest_accel = _accels[-1] if _accels[-1] is not None else 0
             _latest_z = _zscores[-1] if _zscores[-1] is not None else 0
+            _latest_ts = _timestamps[-1] if _timestamps[-1] else 0
+            _osc_age = (time.time() - _latest_ts) / 60 if _latest_ts else 999
             # Score rising from low (<10) through mid (>20) = bullish momentum building
             _prev_score = _scores[-4] if len(_scores) >= 4 and _scores[-4] is not None else 0
             _score_delta = _latest_score - _prev_score
-            if _latest_vel > 0.1 and _score_delta > 10:
+            _osc_detail = (f"score={_latest_score:.1f} delta={_score_delta:+.1f} "
+                          f"vel={_latest_vel:+.3f} accel={_latest_accel:+.3f} "
+                          f"z={_latest_z:+.2f} age={_osc_age:.1f}min")
+            if _osc_age > 10:
+                _dbg('OSC', None, f"STALE ({_osc_age:.0f}min old) — {_osc_detail}")
+            elif _latest_vel > 0.1 and _score_delta > 10:
                 signals += 1
                 direction_votes['BULLISH'] += 1
-                log.info(f"  [OSC] BULLISH: score={_latest_score:.1f} delta={_score_delta:+.1f} vel={_latest_vel:+.3f}")
+                _dbg('OSC', 'BULLISH+1', _osc_detail)
             elif _latest_vel < -0.1 and _score_delta < -10:
                 signals += 1
                 direction_votes['BEARISH'] += 1
-                log.info(f"  [OSC] BEARISH: score={_latest_score:.1f} delta={_score_delta:+.1f} vel={_latest_vel:+.3f}")
+                _dbg('OSC', 'BEARISH+1', _osc_detail)
+            else:
+                _dbg('OSC', None, _osc_detail)
+        else:
+            _dbg('OSC', None, f"insufficient data ({len(_osc_rows) if _osc_rows else 0} rows)")
     except Exception as e:
         log.warning(f"Continuum oscillator error: {e}")
 
@@ -434,18 +464,28 @@ def detect_shift(state=None):
     if btc_wave == 'falling':
         signals += 1
         direction_votes['BEARISH'] += 1
+        _dbg('WAVE', 'BEARISH+1', f"wave={btc_wave}")
     elif btc_wave in ('accelerating', 'bottoming'):
         signals += 1
         direction_votes['BULLISH'] += 1
+        _dbg('WAVE', 'BULLISH+1', f"wave={btc_wave}")
+    else:
+        _dbg('WAVE', None, f"wave={btc_wave}")
 
     btc_vel = get_btc_velocity()
     if btc_vel is not None:
         if btc_vel < -SNIPER_BTC_VELOCITY_THRESHOLD:
             signals += 1
             direction_votes['BEARISH'] += 1
+            _dbg('VELOCITY', 'BEARISH+1', f"vel={btc_vel:+.3f} threshold={SNIPER_BTC_VELOCITY_THRESHOLD}")
         elif btc_vel > SNIPER_BTC_VELOCITY_THRESHOLD:
             signals += 1
             direction_votes['BULLISH'] += 1
+            _dbg('VELOCITY', 'BULLISH+1', f"vel={btc_vel:+.3f} threshold={SNIPER_BTC_VELOCITY_THRESHOLD}")
+        else:
+            _dbg('VELOCITY', None, f"vel={btc_vel:+.3f} within threshold")
+    else:
+        _dbg('VELOCITY', None, "no data")
 
     # ── Slow signals (15 min - 4 hours) — momentum state ──
     cache_age = get_momentum_cache_age_minutes()
@@ -454,11 +494,15 @@ def detect_shift(state=None):
         if mom_state == 'bearish':
             signals += 1
             direction_votes['BEARISH'] += 1
+            _dbg('MOMENTUM', 'BEARISH+1', f"state={mom_state} age={cache_age:.0f}min")
         elif mom_state == 'bullish':
             signals += 1
             direction_votes['BULLISH'] += 1
+            _dbg('MOMENTUM', 'BULLISH+1', f"state={mom_state} age={cache_age:.0f}min")
+        else:
+            _dbg('MOMENTUM', None, f"state={mom_state} age={cache_age:.0f}min")
     else:
-        log.info(f"  momentum_cache stale ({cache_age:.0f}min) — skipping momentum signal")
+        _dbg('MOMENTUM', None, f"STALE ({cache_age:.0f}min) — skipping")
 
     # Volatility regime change (pass state to avoid file race)
     if volatility_regime_changed(state or {}):
@@ -466,11 +510,16 @@ def detect_shift(state=None):
         slope = get_btc_slope_15m()
         if slope is not None and slope < 0:
             direction_votes['BEARISH'] += 1
+            _dbg('REGIME', 'BEARISH+1', f"regime changed, slope={slope}")
         else:
             direction_votes['BULLISH'] += 1
+            _dbg('REGIME', 'BULLISH+1', f"regime changed, slope={slope}")
 
     # ── Decision ──
     if signals < SNIPER_SIGNALS_FOR_L1:
+        log.info(f"  [SNIPER-DEBUG] {signals} signals < {SNIPER_SIGNALS_FOR_L1} threshold — no shift")
+        for entry in debug_log:
+            log.info(entry)
         return None
 
     bearish = direction_votes['BEARISH']
@@ -484,6 +533,9 @@ def detect_shift(state=None):
     elif bullish > bearish:
         direction = 'BULLISH'
     else:
+        log.info(f"  [SNIPER-DEBUG] TIED — bearish={bearish} bullish={bullish} — uncertain")
+        for entry in debug_log:
+            log.info(entry)
         return None  # Tied — uncertain
 
     if signals >= SNIPER_SIGNALS_FOR_L3:
@@ -492,6 +544,10 @@ def detect_shift(state=None):
         level = 2
     else:
         level = 1
+
+    log.info(f"  [SNIPER-DEBUG] SHIFT DETECTED: L{level} {direction} (signals={signals} bearish={bearish} bullish={bullish})")
+    for entry in debug_log:
+        log.info(entry)
 
     return (level, direction)
 
