@@ -4050,3 +4050,31 @@ BY: auto_1hr
 **Open Questions:**
 - rr-struct- approaching kill threshold (2T/0%WR) — one more loss triggers action
 - pullback-entry- SHORT: 17T/24h, 13 SL hits (76.5%) — structural issue with SL tightness for this signal type
+
+BY: auto_1hr
+
+## [2026-09-14 10:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L -$0.35)
+- DOT pullback-entry- SHORT: +$0.01
+- ENA pump-chain- SHORT: -$0.13
+- HYPER pump-chain- SHORT: -$0.16
+- GMT rr-struct-v2+ LONG: -$0.07
+
+**24h:** 43T 50%WR +$0.37 | Exit: atr_sl_hit 29T 67.4% -$0.57, profit-monster-trail 5T +$0.39, rr_engine_resistance 6T -$0.20
+**Regime:** NORMAL 16T 31.3%WR -$1.20 (worst), EXTREME 9T 66.7%WR +$0.94 (best)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: pump-chain- SHORT 2T/0%WR last hour — below 3T threshold
+- rr-struct- SHORT 2T/0%WR 24h — no trades this hour, still below 3T
+- ATR SL hit 76.5% today (was 31% Sep 12) — structural, widening SL already failed (CEO reverted Sep 8, R:R collapsed)
+- Trade freq 4T/1hr — healthy
+- System net positive 24h, avg loss -$0.02/trade (breakeven, not destructive)
+- 6 consecutive negative hours (01:00–09:00 UTC) — regime-driven drawdown, not signal failure
+
+**Open Questions:**
+- pump-chain- SHORT degrading: 4T/24h 25%WR -$0.11, 2 losses last hour — approaching kill threshold
+- NORMAL regime destroying system (31.3% WR) vs EXTREME (66.7%) — entries in chop markets getting stopped out
+- ATR SL hit structural: 76.5% today, up from 31% Sep 12 — needs regime-aware entry filtering, not SL widening
