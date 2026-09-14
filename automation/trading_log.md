@@ -4486,3 +4486,38 @@ BY: auto_1hr
 - NORMAL LONG 7d: 33T -$1.66 — structural bleeding, no LONG_NORMAL_PENALTY deployed
 
 BY: auto_1hr
+
+## [2026-09-14 23:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (6 open positions: 4 SHORT pullback-entry-, 2 SHORT pump-chain-)
+**24h:** 44T 47.7%WR -$0.10 | 7d: 319T 53.9%WR +$0.42
+
+**24h exit breakdown:**
+- atr_sl_hit: 40T (91%) avg -$0.003 — structural, near break-even
+- rr_engine_resistance: 4T avg +$0.005
+
+**7d regime:** EXTREME +$2.72 | HIGH +$0.22 | NORMAL -$2.52
+
+**7d worst signals:**
+- ema300_dip_short 13T 38.5%WR -$0.96 — monitor
+- trend_purity+ 11T 36.4%WR -$0.90 — monitor
+- sma20_dip 19T 42.1%WR -$0.73 — monitor
+- bb_bounce_v2_long 9T 44.4%WR -$0.63 — monitor
+
+**Kill check:** No signal at 0%WR with 3+ trades in last hour ✓
+
+**No Change Needed:**
+- 0 trades closed — quiet period, normal
+- 24h near break-even (-$0.10)
+- 7d system positive (+$0.42)
+- All previously problematic signals already killed or monitored
+- Trade frequency 44/24h = ~2/hr — healthy
+- 6 open SHORTs slightly underwater — normal variance
+
+**Monitoring:**
+- NORMAL LONG bleeding structural -$2.52/7d — SHORT_NORMAL_PENALTY active, no new action
+- ema300_dip_short SHORT 7d: 13T 38.5%WR -$0.96 — approaching kill threshold
+- trend_purity+ LONG 7d: 11T 36.4%WR -$0.90 — approaching kill threshold
+- rr-struct- SHORT 7d: 7T 42.9%WR -$0.42 — below threshold
+
+BY: auto_1hr
