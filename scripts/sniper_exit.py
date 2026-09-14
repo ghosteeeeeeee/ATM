@@ -308,6 +308,7 @@ def detect_shift(state=None):
 
         if crash_result.blocked:
             severity = crash_result.severity
+            blocked_dir = getattr(crash_result, 'blocked_direction', '') or ''
             if severity == 'EMERGENCY':
                 return (3, 'BEARISH')  # Crashes are always bearish
             elif severity == 'CRITICAL':
@@ -315,7 +316,17 @@ def detect_shift(state=None):
                 direction_votes['BEARISH'] += 2
             elif severity == 'WARNING':
                 signals += 1
-                direction_votes['BEARISH'] += 1
+                # blocked_direction tells us which SIDE is blocked:
+                # 'SHORT' blocked = BTC rising = BULLISH
+                # 'LONG' blocked = BTC falling = BEARISH
+                # '' (all entries blocked) = ambiguous, use crash layer context
+                if blocked_dir == 'SHORT':
+                    direction_votes['BULLISH'] += 1
+                elif blocked_dir == 'LONG':
+                    direction_votes['BEARISH'] += 1
+                else:
+                    # All entries blocked (price crash, volume spike, etc.) — bearish
+                    direction_votes['BEARISH'] += 1
 
         # Multi-alt divergence — check raw dict (only populated when Layer 6 fires)
         weak_alt_count = 0

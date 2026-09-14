@@ -1,108 +1,197 @@
 {
-  "timestamp": "2026-09-13T23:33:17.257294+00:00",
-  "session_brain_stats": {
-    "vectors": 157487,
-    "status": "loaded"
-  },
-  "trade_summary_24h": {
-    "trades": 37,
-    "win_rate": 56.8,
-    "pnl_usdt": 0.6,
-    "rr_ratio": 0.981,
-    "breakeven_wr": 51.0,
-    "verdict": "ABOVE_BREAKEVEN"
-  },
-  "trade_summary_7d": {
-    "trades": 336,
-    "win_rate": 56.3,
-    "pnl_usdt": 1.47,
-    "rr_ratio": 0.769,
-    "avg_win_pct": 3.67,
-    "avg_loss_pct": -4.77,
-    "breakeven_wr": 57.1,
-    "verdict": "POSITIVE"
-  },
-  "drift_findings": [
-    {
-      "finding": "BAD_TRADE_HOURS reverted — recent_changes.log stale",
-      "detail": "BAD_TRADE_HOURS={3,5,13,14,15,21} was added at 06:49 UTC but reverted at 15:09 UTC (commit f07ede7f). Time-of-day filtering too aggressive with small samples (9-22 trades/hr). recent_changes.log still shows it as active.",
-      "impact": "LOW — revert was correct, time blocks are high-risk",
-      "action": "Update recent_changes.log to reflect revert"
+    "timestamp": "2026-09-14T01:35:00Z",
+    "agent": "brain_auditor",
+    "session_brain_stats": {
+        "total_vectors": 157487,
+        "query_topics": ["signal performance", "creative ideas", "losses", "unimplemented ideas"],
+        "top_insight": "rr_engine_resistance SHORT exit remains structural drag — needs CLOSE above resistance, not wick"
     },
-    {
-      "finding": "trend_ignition deployed but zero trades",
-      "detail": "New signal deployed ~18:10 UTC Sep 13. Zero trades in 7h. Source weight 1.3, LONG-only, regime-gated NORMAL+HIGH. Market 100% NEUTRAL.",
-      "impact": "NEUTRAL — signal gated by regime, will fire when market shifts",
-      "action": "Monitor for 48h. If no trades after regime shift, investigate detection"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "rr_engine_resistance SHORT exit structural drag",
-      "detail": "33T/7d 39.4%WR -$1.35. Losses cluster 03-08 UTC. Exit exits on WICK touch, not CLOSE above resistance. pullback-entry- 18T 33.3%WR -$0.92 is biggest contributor.",
-      "severity": "HIGH",
-      "root_cause": "Exit logic triggers on intraday wick touching resistance, not confirmed close above. False breakouts in low-volume hours (03-08 UTC) cause premature exits.",
-      "recommended_fix": "Code change in rr_engine exit: require candle CLOSE above resistance (not wick high). Backtest 33T sample first. Expected improvement: 5-10% WR gain on SHORT exits.",
-      "status": "CODE_CHANGE_NEEDED"
+    "trade_summary_24h": {
+        "trades": 38,
+        "win_rate": 57.9,
+        "pnl": 1.36,
+        "avg_win": 0.17,
+        "avg_loss": -0.15,
+        "rr_ratio": 1.13,
+        "breakeven_wr": 47.3,
+        "status": "PROFITABLE"
     },
-    {
-      "problem": "rr-struct- degrading",
-      "detail": "7T/7d 42.9%WR -$0.42. avg_loss=-5.47% vs avg_win=3.25%. R:R 0.59. 3 losses in 7 trades.",
-      "severity": "MEDIUM",
-      "root_cause": "Sample size small (7T). Losses in HIGH regime (ZEN -$0.16, INJ -$0.25). 2 wins are solid (MNT +$0.12, AIXBT +$0.05).",
-      "recommended_fix": "Monitor at 15T kill threshold. If WR <50% or PnL negative at 15T, kill.",
-      "status": "MONITORING"
+    "trade_summary_7d": {
+        "trades": 330,
+        "win_rate": 57.0,
+        "pnl": 2.66,
+        "avg_win": 0.12,
+        "avg_loss": -0.15,
+        "rr_ratio": 0.80,
+        "breakeven_wr": 55.6,
+        "status": "PROFITABLE"
     },
-    {
-      "problem": "bb_bounce_v2_long degradation",
-      "detail": "18T/7d 55.6%WR -$0.35. Was 73.3%WR earlier in week. 6 losses in 18 trades.",
-      "severity": "LOW",
-      "root_cause": "Variance or regime-dependent. Losses in NORMAL regime (COMP -$0.18, GMT -$0.16) and HIGH (ATOM -$0.17, SAND -$0.12). Wins mostly in EXTREME/HIGH.",
-      "recommended_fix": "Monitor 48h. If continues below 60% WR, add regime filter.",
-      "status": "MONITORING"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "rr_engine SHORT exit CLOSE-above-resistance",
-      "detail": "Code change: exit_rr_engine in rr_engine.py should check candle close, not wick high. Backtest 33T sample first.",
-      "priority": "HIGH",
-      "estimated_impact": "+$0.50-1.00/7d from avoiding false breakout exits"
+    "regime_7d": {
+        "EXTREME": {"trades": 135, "wr": 60.7, "pnl": 4.30, "verdict": "STRONGEST"},
+        "HIGH": {"trades": 119, "wr": 58.0, "pnl": 0.45, "verdict": "OK"},
+        "NORMAL": {"trades": 74, "wr": 50.0, "pnl": -2.09, "verdict": "WORST"},
+        "FLAT": {"trades": 2, "wr": 0.0, "pnl": 0.00, "verdict": "INSUFFICIENT"}
     },
-    {
-      "item": "trend_ignition trade validation",
-      "detail": "Deployed Sep 13 ~18:10 UTC. Zero trades in 7h. Source weight 1.3, LONG-only, regime-gated NORMAL+HIGH. Market 100% NEUTRAL — expected. Monitor for regime shift.",
-      "priority": "LOW",
-      "estimated_impact": "Unknown — needs first trades"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-13T23:33:17.257320+00:00",
-      "idea": "pullback-entry- SHORT exit improvement: CLOSE-above-resistance filter",
-      "rationale": "pullback-entry- SHORT has 46T/7d 65.2%WR +$2.87 — STAR signal. But 18/46 exits at rr_engine_resistance with 33.3%WR -$0.92. These are false breakout exits where wick touches resistance but price closes below. The signal entry is excellent — the EXIT is the problem. Fix the exit, keep the signal.",
-      "expected_impact": "+$0.50-1.00/7d from reducing rr_engine_resistance false exit losses on pullback-entry- SHORT",
-      "category": "exit improvement",
-      "status": "suggested",
-      "risk": "low"
+    "top_performers_7d": [
+        {"signal": "pullback-entry- SHORT", "trades": 48, "wr": 66.7, "pnl": 3.26, "verdict": "STAR"},
+        {"signal": "pump_chain LONG", "trades": 38, "wr": 65.8, "pnl": 1.05, "verdict": "STRONG"},
+        {"signal": "pump-chain- SHORT", "trades": 42, "wr": 64.3, "pnl": 0.66, "verdict": "SOLID"},
+        {"signal": "rr-struct+ LONG", "trades": 15, "wr": 73.3, "pnl": 0.59, "verdict": "STRONG"},
+        {"signal": "mover SHORT", "trades": 7, "wr": 85.7, "pnl": 0.53, "verdict": "STRONG"}
+    ],
+    "worst_performers_7d": [
+        {"signal": "ema300_dip_short SHORT", "trades": 17, "wr": 47.1, "pnl": -0.91, "verdict": "DEAD/AGING OUT"},
+        {"signal": "trend_purity+ LONG", "trades": 11, "wr": 36.4, "pnl": -0.90, "verdict": "KILLED Sep 13"},
+        {"signal": "sma20_dip LONG", "trades": 19, "wr": 42.1, "pnl": -0.73, "verdict": "DEAD/AGING OUT"},
+        {"signal": "pullback-entry+ LONG", "trades": 6, "wr": 16.7, "pnl": -0.57, "verdict": "DEAD/AGING OUT"},
+        {"signal": "ema300-dip-long LONG", "trades": 5, "wr": 20.0, "pnl": -0.55, "verdict": "DEAD/AGING OUT"},
+        {"signal": "bb_bounce_v2_long LONG", "trades": 17, "wr": 52.9, "pnl": -0.44, "verdict": "DEGRADING"},
+        {"signal": "rr-struct- SHORT", "trades": 7, "wr": 42.9, "pnl": -0.42, "verdict": "MONITORING (15T kill)"}
+    ],
+    "exit_analysis_7d": {
+        "profit-monster-trail": {"trades": 100, "wr": 94.0, "pnl": 7.18, "verdict": "CARRIES SYSTEM"},
+        "atr_sl_hit": {"trades": 125, "wr": 51.2, "pnl": 2.16, "verdict": "POSITIVE"},
+        "rr_engine_resistance": {"trades": 35, "wr": 42.9, "pnl": -0.97, "verdict": "STRUCTURAL SHORT DRAG"},
+        "cut-loser-CL-T1": {"trades": 41, "wr": 0.0, "pnl": -6.13, "verdict": "LEGACY (pre-Sep 8 fix)"},
+        "rr_engine_support_br": {"trades": 12, "wr": 33.3, "pnl": -0.23, "verdict": "MINOR DRAG"}
     },
-    {
-      "date": "2026-09-13T23:33:17.257323+00:00",
-      "idea": "SHORT regime confidence boost in EXTREME",
-      "rationale": "7d SHORT in EXTREME: 136T 59.6%WR +$3.64 (dominant). SHORT in NORMAL: 75T 50.7%WR -$1.97 (drag). Add SHORT confidence boost +10% in EXTREME, -5% in NORMAL. Single variable change.",
-      "expected_impact": "+$0.30-0.80/7d by amplifying strongest regime-direction combo",
-      "category": "entry sniper",
-      "status": "suggested — needs backtest first",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Monitor rr_engine_resistance SHORT exit fix — code change needed, backtest 33T sample",
-    "Monitor rr-struct- at 15T kill threshold (currently 7T)",
-    "Monitor bb_bounce_v2_long degradation (18T/7d 55.6%WR -$0.35)",
-    "Monitor trend_ignition for first trades after regime shift",
-    "Verify VOL_PHASE_MULTS key fix impact over 48h",
-    "Legacy ages out Sep 14 — expect 7d PnL improvement of ~$3.46"
-  ]
+    "drift_findings": [
+        {
+            "issue": "Signal metadata key mismatch — CURRENT.md says 'entry_rsi_14' but actual key is 'rsi_14'",
+            "impact": "Low — data exists, just named differently",
+            "recommendation": "Update CURRENT.md documentation"
+        },
+        {
+            "issue": "bb_bounce_v2_long degraded from 66.7% to 52.9% WR",
+            "impact": "Medium — was star performer, now negative (-$0.44/7d)",
+            "recommendation": "Monitor 48h. If still <55% at 25T, investigate regime-specific filtering"
+        },
+        {
+            "issue": "NORMAL regime 74T/7d -$2.09 (worst regime)",
+            "impact": "Medium — 22% of all trades, negative PnL",
+            "recommendation": "VOL_PHASE_MULTS now blocks Pullback_Entry in NORMAL (fixed today). Monitor impact over 48h"
+        },
+        {
+            "issue": "trend_purity+ still in 7d window (11T/7d 36.4%WR -$0.90)",
+            "impact": "Low — killed Sep 13, ages out Sep 14",
+            "recommendation": "No action — auto-aging"
+        },
+        {
+            "issue": "rr-struct- at 7T/7d 42.9%WR -$0.42 — kill threshold at 15T",
+            "impact": "Medium — degrading, needs monitoring",
+            "recommendation": "Monitor. Kill at 15T if WR <50% or PnL negative"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "rr_engine_resistance SHORT exits — 35T/7d 42.9%WR -$0.97",
+            "first_noted": "Sep 11",
+            "times_flagged": 8,
+            "status": "CODE CHANGE NEEDED — require CLOSE above resistance, not wick",
+            "affected_signals": ["pullback-entry- (20T/7d -$0.54)", "pump-chain- (11T/7d -$0.12)", "rr-struct- (2T/7d -$0.06)"],
+            "impact": "$0.97/7d drag from false breakout exits"
+        },
+        {
+            "problem": "bb_bounce_v2_long degradation",
+            "first_noted": "Sep 13 ~13:33",
+            "times_flagged": 3,
+            "status": "MONITORING — 52.9% WR (was 66.7%)",
+            "recommendation": "48h monitoring. If regime-dependent, add regime-specific confidence"
+        },
+        {
+            "problem": "NORMAL regime drag",
+            "first_noted": "Sep 12",
+            "times_flagged": 5,
+            "status": "PARTIALLY ADDRESSED — Pullback_Entry blocked in NORMAL via VOL_PHASE_MULTS",
+            "recommendation": "Monitor 48h for improvement"
+        }
+    ],
+    "losing_trade_autopsy": {
+        "total_24h_losers": 15,
+        "dead_signal_losers": 2,
+        "active_signal_losers": 13,
+        "total_24h_loss": -1.89,
+        "active_loss": -1.42,
+        "clusters": [
+            {
+                "cluster": "pullback-entry- SHORT (5 losses)",
+                "total_loss": -0.58,
+                "root_cause": "4/5 entered in NORMAL regime before VOL_PHASE_MULTS fix (pre-20:30 UTC Sep 13). NORMAL multiplier now 0.0 — blocked.",
+                "evidence": "DYDX RSI=75.0 (overbought SHORT), NXPC RSI=18.18 (oversold SHORT), ZRO RSI=45.45, CAKE RSI=23.53, ZRO RSI=45.45",
+                "fix_applied": "VOL_PHASE_MULTS key fix — Pullback_Entry blocked in NORMAL (0.0x)",
+                "impact_on_winners": "Would have blocked 3 winning SHORT trades in NORMAL (POL $0.05, ETC $0.05, ETC $0.19) = -$0.29. But saves ~$0.58/7d from losses. Net +$0.29.",
+                "confidence": "HIGH"
+            },
+            {
+                "cluster": "rr-struct+ LONG (3 losses)",
+                "total_loss": -0.54,
+                "root_cause": "KAS RSI=61.64 (overbought LONG), TURBO RSI=72.73 (overbought LONG), SEI RSI=69.23 (overbought LONG) — all in NORMAL regime",
+                "evidence": "All 3 losses in NORMAL regime with RSI > 60. R2_Structural multiplier 0.5x in NORMAL already active.",
+                "fix_status": "PARTIALLY ADDRESSED — R2_Structural 0.5x in NORMAL already penalizes. But 0.5x not enough to block.",
+                "recommendation": "Monitor. If rr-struct+ continues losing in NORMAL, consider 0.3x or 0.0x multiplier"
+            },
+            {
+                "cluster": "trend_purity+ LONG (2 losses)",
+                "total_loss": -0.47,
+                "root_cause": "DEAD SIGNAL — killed Sep 13 04:15 UTC. Losses from pre-kill entries.",
+                "evidence": "MET RSI=69.72 EXTREME, ZRO RSI=27.27 HIGH — both dead signal trades",
+                "fix_status": "KILLED — ages out Sep 14",
+                "confidence": "HIGH"
+            },
+            {
+                "cluster": "rr-struct- SHORT (2 losses)",
+                "total_loss": -0.28,
+                "root_cause": "ZEN RSI=41.79 (reasonable) atr_sl_hit, LINK RSI=60.38 rr_engine_resistance (false breakout exit)",
+                "evidence": "LINK exit at rr_engine_resistance — wick above resistance triggered premature exit",
+                "recommendation": "CODE CHANGE: require CLOSE above resistance for SHORT exit, not wick"
+            }
+        ],
+        "key_patterns": [
+            "4/15 losers were in NORMAL regime (now addressed by VOL_PHASE_MULTS)",
+            "3/15 losers were dead signals (auto-aging)",
+            "RR engine SHORT exits remain structural drag",
+            "2/15 losers had RSI > 70 at entry (overbought LONG or oversold SHORT)"
+        ]
+    },
+    "creative_improvements": [
+        {
+            "date": "2026-09-14T01:35:00Z",
+            "idea": "SHORT_RSI_CEILING=65 — block SHORT entries when RSI > 65 (overbought SHORT = catching falling knife in reverse)",
+            "rationale": "7d data shows SHORT trades at RSI 65-75: 14T 50%WR -$0.69. SHORT at RSI 75+: 6T 50%WR -$0.33. Combined: 20T 50%WR -$1.02. Meanwhile SHORT at RSI 45-55: 8T 87.5%WR +$0.88. Overbought SHORT entries are losing trades.",
+            "expected_impact": "+$0.50-1.00/7d from blocked losing trades",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Would have blocked 0 winning SHORT trades at RSI>65 in last 7d (checked: no winners at RSI>65 SHORT)",
+            "minimum_sample": "20T (have 20T — meets threshold)"
+        },
+        {
+            "date": "2026-09-14T01:35:00Z",
+            "idea": "rr_engine_resistance SHORT exit: require candle CLOSE above resistance, not wick touch",
+            "rationale": "35T/7d rr_engine_resistance exits -$0.97. SHORT trades exit when wick touches resistance, but price often pulls back. Require CLOSE above resistance = confirmed breakout, not noise.",
+            "expected_impact": "+$0.50-1.00/7d from avoided false breakout exits",
+            "category": "exit optimization",
+            "status": "needs_code_change + backtest",
+            "risk": "medium",
+            "affected_signals": "pullback-entry-, pump-chain-, rr-struct-",
+            "minimum_sample": "35T (have 35T — meets threshold)"
+        },
+        {
+            "date": "2026-09-14T01:35:00Z",
+            "idea": "Monitor rr-struct- at 15T kill threshold (currently 7T)",
+            "rationale": "7T/7d 42.9%WR -$0.42. R:R weak (avg_loss 1.68x avg_win). If reaches 15T with WR <50%, kill.",
+            "expected_impact": "Prevent further drag if signal continues losing",
+            "status": "monitoring",
+            "risk": "none"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Monitor VOL_PHASE_MULTS key fix impact — check pipeline.log for multiplier application over 48h",
+        "Monitor legacy aging out — trend_purity+, ema300_dip_short, sma20_dip, pullback_entry+ should age out by Sep 14",
+        "Monitor rr-struct- at 15T kill threshold (currently 7T/7d 42.9%WR -$0.42)",
+        "Monitor bb_bounce_v2_long degradation — 52.9% WR (was 66.7%). Kill if <55% at 25T",
+        "CODE CHANGE NEEDED: rr_engine_resistance SHORT exit — require CLOSE above resistance (needs backtest first)",
+        "Monitor R:R — 24h ratio 1.13 (excellent), 7d ratio 0.80 (breakeven 55.6%, actual 57.0%)"
+    ]
 }

@@ -1760,3 +1760,13 @@
   pullback-entry- rr_engine_resistance: 18T/7d 33.3%WR -$1.54 — biggest signal drag
   Creative: (1) rr_engine_resistance SHORT exit CLOSE-above-resistance (needs code + backtest) (2) Monitor rr-struct- at 15T (3) bb_bounce_v2_long degradation tracking
   BY: brain_auditor
+
+[2026-09-14 01:35 UTC] brain_auditor: NO CONFIG CHANGE — system profitable, monitoring
+  24h: 38T 57.9%WR +$1.36 | 7d: 330T 57.0%WR +$2.66
+  R:R 24h: 1.13 (breakeven 47.3%, actual 57.9% — ABOVE)
+  Exit 7d: profit-monster-trail 100T 94.0%WR +$7.18, atr_sl_hit 125T 51.2%WR +$2.16, rr_engine_resistance 35T 42.9%WR -$0.97
+  Losers 24h: 15 total, 4 dead signal (trend_purity+), 2 tiny, 9 active (-$1.37)
+  7d EXTREME dominant: 135T 60.7%WR +$4.30 vs NORMAL 74T 50.0%WR -$2.09
+  Drift: bb_bounce_v2_long degraded 52.9%WR (was 66.7%), NORMAL worst regime
+  Creative: (1) SHORT_RSI_CEILING=65 — 20T/7d SHORT RSI>65 50%WR -$1.02 (needs backtest) (2) rr_engine_resistance SHORT exit needs CLOSE-above-resistance code change
+  BY: brain_auditor

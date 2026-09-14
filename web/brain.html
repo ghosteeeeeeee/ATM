@@ -265,6 +265,8 @@
         
         let html = '';
         sorted.slice(0, 15).forEach((item) => {
+            // Skip malformed entries (no idea field)
+            if (!item.idea && !item.change) return;
             const origIdx = items.indexOf(item);
             const statusClass = `status-${item.status || 'suggested'}`;
             const isRejected = item.status === 'rejected';

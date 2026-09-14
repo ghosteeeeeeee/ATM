@@ -797,7 +797,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         # Strip chain correlation data from source for clean display
         # e.g., "pump-chain+,chain(CC(1.89x))" → "pump-chain+"
         import re as _re_src
-        _src_clean = _re_src.sub(r',?chain\([^)]*\)', '', _src).strip(',').strip()
+        _src_clean = _re_src.sub(r',?chain\(.*\)$', '', _src).strip(',').strip()
         source = _src_clean if _src_clean else _src  # use cleaned source for DB write
         _components = _src.split(',')  # keep original for signal type checks
         for _comp in _components:
@@ -2341,7 +2341,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         # Strip chain correlation data (e.g., "STBL(1.47x)),chain(ADA(1.47x)") from source
         # to keep combo_key consistent regardless of chain correlation presence.
         import re as _re_combo
-        _source_clean = _re_combo.sub(r'[^,]*chain\([^)]*\),?', '', source or '').strip(',').strip()
+        _source_clean = _re_combo.sub(r'[^,]*chain\(.*\),?', '', source or '').strip(',').strip()
         if not _source_clean:
             _source_clean = source or ''
         source_parts = sorted(p.strip() for p in _source_clean.split(',') if p.strip())
