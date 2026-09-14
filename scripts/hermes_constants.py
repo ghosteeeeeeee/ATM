@@ -3174,7 +3174,7 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 # Fires ONLY when engine scores Grade A/B with R:R ≥ 2.0.
 RR_STRUCTURAL_ENABLED         = True   # master kill-switch
 RR_STRUCTURAL_PLUS_ENABLED    = False  # LONG direction — DISABLED, replaced by rr-struct-v2+
-RR_STRUCTURAL_MINUS_ENABLED   = True   # SHORT direction
+RR_STRUCTURAL_MINUS_ENABLED   = False  # KILLED 2026-09-14 CEO: 7T/7d 42.9%WR -$0.42, all NEUTRAL, below 50% WR threshold
 RR_STRUCTURAL_MIN_SCORE       = 60     # minimum RR engine score (Grade B)
 RR_STRUCTURAL_MIN_RR          = 2.0    # minimum R:R ratio
 RR_STRUCTURAL_MIN_ATR_PCT     = 0.5    # minimum ATR% (skip flat coins)

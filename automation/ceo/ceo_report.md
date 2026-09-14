@@ -170,3 +170,36 @@ Legacy signal trend_purity+ still in 24h window. Ages out Sep 14. Active signals
 
 ### Verification
 7d PnL +$1.21 (VERIFIED). 24h -$0.16 (legacy noise). Pipeline active, 4 open positions, 0 errors. Disk 79%. Next: legacy ages out tomorrow, expect 7d PnL improvement ~$3.46.
+
+## CEO Report — 2026-09-14 ~22:45 UTC
+
+### Diagnosis
+7d PnL +$0.35 (barely positive, degraded from +$0.87). 24h -$0.10 (slightly negative). 44T/24h 47.7% WR. Market 100% NEUTRAL. Legacy signals aging out (last trades Sep 8-13). Active signals all profitable.
+
+### Root Cause
+1. **rr-struct- losing:** 7T/7d 42.9% WR -$0.42, all NEUTRAL regime. Below 50% WR threshold.
+2. **Legacy drag:** ema300_dip_short -$0.90, sma20_dip -$0.73, bb_bounce_v2_long -$0.63. Aging out by Sep 15-20.
+3. **ATR SL tightness:** 30% of SHORT atr_sl_hit exits above entry (never profitable). brain_auditor fixed at 22:34 UTC.
+
+### Fix Applied
+1. **KILLED rr-struct-** (RR_STRUCTURAL_MINUS_ENABLED=False). 7T/7d 42.9%WR -$0.42, all NEUTRAL, below 50% WR threshold.
+2. **ATR_SL_MIN 1.3%** already applied by brain_auditor at 22:34 UTC. Expected +$1.33/7d.
+
+### Verification
+- DB verified: 24h 44T 47.7%WR -$0.10, 7d 321T 53.9%WR +$0.35
+- rr-struct- kill: RR_STRUCTURAL_MINUS_ENABLED=False
+- ATR_SL_MIN: 1.3% (changed from 1.2%)
+- Pipeline active, 3 open positions (ACE SHORT, BABY SHORT, HYPER SHORT)
+- Disk 80%
+
+### Monitoring
+- ATR_SL_MIN 1.3%: Monitor 48h until Sep 16 ~06:00
+- rr_engine_resistance fix: 7 trades post-fix, -$0.11, monitor 48h
+- SHORT_NORMAL_PENALTY: 0 SHORT NORMAL trades in 48h, monitor 48h
+- trend_ignition: 0 trades since Sep 13, monitor 72h
+
+### Next Steps
+1. Monitor ATR_SL_MIN impact (expected +$1.33/7d)
+2. Monitor rr_engine_resistance fix (was -$1.33/7d)
+3. Monitor legacy signal aging out (should improve 7d PnL)
+4. Evaluate LONG regime gate if bleed continues
