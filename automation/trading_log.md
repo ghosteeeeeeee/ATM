@@ -4302,3 +4302,39 @@ BY: auto_1hr
 - trend_purity+ similarly poor (36.4% WR, 7d) — monitor for kill threshold
 
 BY: auto_1hr
+
+## [2026-09-14 17:50 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.16 (WR: 0%)
+**Open positions:** 8 (SOL, SEI, DOT, HYPER, BLUR, TURBO, INJ, JUP)
+
+**24h exit breakdown:**
+- atr_sl_hit: 34T (85%) — structural, avg -$0.021/trade
+- rr_engine_resistance: 4T +$0.005/trade
+- rr_engine_support_br: 2T -$0.110/trade
+
+**24h signal performance (bottom):**
+- pump-chain+ LONG: 6T/16.7%WR -$0.66
+- rr-struct-v2+ LONG: 2T/0%WR -$0.26
+- pullback-entry- SHORT: 13T/61.5%WR +$0.52 (best)
+
+**7d signal losers (5+ trades):**
+- ema300_dip_short SHORT: 16T/43.8%WR -$0.96
+- trend_purity+ LONG: 11T/36.4%WR -$0.90
+- sma20_dip LONG: 19T/42.1%WR -$0.73
+- pump-chain+ LONG: 24T/37.5%WR -$0.56
+
+**Kill check:** No signal at 0%WR with 3+ trades in last hour ✓
+
+**No Change Needed:**
+- Trade frequency ~1.7/hr — healthy
+- System -$0.92/24h — within noise
+- No kill triggers active
+- Pipeline running normally
+
+**Open Questions:**
+- pump-chain+ LONG 7d: 24T/37.5%WR -$0.56 — approaching kill threshold (monitor)
+- trend_purity+ LONG 7d: 11T/36.4%WR -$0.90 — monitor for kill threshold
+
+BY: auto_1hr
