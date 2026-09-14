@@ -1,3 +1,14 @@
+[2026-09-14 05:00 UTC] brain_auditor: NO CONFIG CHANGE — system above breakeven
+  24h: 44T 54.5%WR +$0.90 | 7d: 334T 56.9%WR +$2.62
+  R:R 24h: 1.035 (breakeven 50.3%, actual 54.5% — ABOVE)
+  Exit 7d: profit-monster-trail 100T 94.0%WR +$7.18, cut-loser-CL-T1 40T -$5.89 (legacy), rr_engine_resistance 35T 42.9%WR -$0.97
+  Losers 24h: 19 total, 2 dead signal (trend_purity+), 17 active
+  rr-struct- 7T/7d 42.9%WR -$0.42 — at 15T kill threshold
+  7d regime: EXTREME 136T/61.8%WR +$4.71, HIGH 121T/57.0%WR +$0.10, NORMAL 75T/49.3%WR -$2.19
+  Creative: (1) rr_engine_resistance SHORT exit — use CLOSE above resistance, not wick (12+ sessions discussed)
+  Creative: (2) Monitor trend_ignition — 0 trades since Sep 13 deployment
+  BY: brain_auditor
+
 [2026-09-13 20:38 UTC] brain_auditor: CONFIG CHANGE — VOL_PHASE_MULTS key fix
   24h: 32T 56.3%WR +$0.17 | 7d: 339T 56.9%WR +$1.29
   R:R 24h: 0.938 (breakeven 51.6%, actual 56.3% — ABOVE)
