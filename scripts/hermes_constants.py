@@ -2309,6 +2309,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
+    'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
     'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
     'continuum-osc', 'continuum-osc+', 'continuum-osc-',  # continuum oscillator — structural momentum, works solo (2026-09-13)
