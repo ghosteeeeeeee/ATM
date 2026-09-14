@@ -922,6 +922,7 @@ SNIPER_BTC_VELOCITY_THRESHOLD = 0.15 # % — BTC velocity to trigger shift signa
 SNIPER_SIGNALS_FOR_L1 = 1           # signals needed for Level 1 (Caution)
 SNIPER_SIGNALS_FOR_L2 = 2           # signals needed for Level 2 (Alert)
 SNIPER_SIGNALS_FOR_L3 = 3           # signals needed for Level 3 (Emergency)
+SNIPER_HYSTERESIS_SCORE = 90        # continuum score above this = trend intact, suppress BEARISH exits
 
 # ── HL Reconciliation Post-Mortem ──────────────────────────────────────────
 # Automated PnL reconciliation: compare DB trades against HL fills every N hours.
