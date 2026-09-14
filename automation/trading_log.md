@@ -4010,3 +4010,24 @@ BY: auto_1hr
 - atr_sl_hit at 60% persisting from 01:35 UTC audit — if still 60%+ at next 24h check, widen ATR multiplier
 
 BY: auto_1hr
+
+## [2026-09-14 08:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.14 (BCH pump-chain+ LONG → atr_sl_hit, tiny $11 position)
+**24h:** 41T ~50%WR +$0.37
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: rr-struct- at 2T/0%WR — below 3T threshold, monitor next hour
+- atr_sl_hit 60.7% (24h) but avg PnL -$0.005 — breakeven, not destructive
+- Trade freq 3T/4h — healthy
+- NEUTRAL regime 97.6% — chop market, system surviving
+- profit-monster-trail 6T +$0.45 carrying system
+
+**Open Questions:**
+- rr-struct- at 2T/0%WR — one more loss triggers kill
+- 7d atr_sl_hit trending up (66.7% today vs 31% on Sep 12) — structural
+
+BY: auto_1hr
