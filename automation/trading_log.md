@@ -1,3 +1,41 @@
+## [2026-09-14 02:08 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.83)
+- ENS pullback-entry- SHORT atr_sl_hit: -$0.69
+- BLUR pullback-entry- SHORT atr_sl_hit: +$0.06
+- ENA pullback-entry- SHORT atr_sl_hit: -$0.20
+
+**24h:** 41T 61%WR +$0.53 | 3 open
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 25T +$0.28 (61%, avg +$0.011 — slightly profitable)
+- profit-monster-trail: 7T +$0.51 (17%, avg +$0.073)
+- rr_engine_resistance: 5T +$0.25 (12%, avg +$0.050)
+- rr_engine_support_br: 3T -$0.51 (7%, avg -$0.170)
+- ORPHAN_PAPER: 1T $0.00
+
+**24h by Signal:**
+- rr-struct+ LONG: 9T 67%WR +$0.52 (best)
+- pullback-entry- SHORT: 15T 60%WR +$0.42 (most active)
+- pump-chain+ LONG: 5T 80%WR +$0.39 (strong)
+- pump-chain- SHORT: 3T 67%WR +$0.24
+- trend_purity+ LONG: 2T 0%WR -$0.47
+- rr-struct- SHORT: 2T 0%WR -$0.28
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: No signal has 0%WR with 3+ trades last hour — no trigger
+- Trade freq: 3T/hr, 3 open — healthy
+- atr_sl_hit 61% of exits but avg +$0.011 — SL not too tight, trail working
+- pullback-entry- SHORT 3-consecutive-loss streak in 24h but still net +$0.42 (60%WR/15T) — not killable
+- 6h hourly: -$0.33, +$0.77, +$0.56, -$0.20, -$0.63 — slight dip but system positive 24h
+- VOL_PHASE_MULTS fix from Sep 13 confirmed deployed
+
+**Open Questions:**
+- pullback-entry- SHORT has 3 consecutive losses (ENS, ENA, ZRO) — monitoring but still net profitable
+- rr_engine_support_br worst exit type at -$0.51 — 3T only, not actionable yet
+
 ## [2026-09-13 14:10 UTC] Hourly Analysis
 
 **Trades:** 4 closed (2W 2L -$0.11)
@@ -3764,3 +3802,34 @@ BY: auto_1hr
 **Open Questions:** None
 
 BY: auto_1hr
+
+## [2026-09-14 02:00 UTC] Hourly Analysis
+
+**Trades:** 39 closed 24h (23W 16L +$1.42, 59% WR) | 0 closed last hour | 4 open
+**Open:** LDO SHORT, ENS SHORT, ENA SHORT, BLUR SHORT (all pullback-entry-)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 22T +$1.11 (56%, avg +$0.050 — profitable, trail-adjusted)
+- profit-monster-trail: 7T +$0.51 (18%, avg +$0.073)
+- rr_engine_resistance: 6T +$0.31 (15%, avg +$0.052)
+- rr_engine_support_br: 3T -$0.51 (8%, avg -$0.170 — only bad exit)
+
+**24h by Signal:**
+- pullback-entry- SHORT: 12T 67%WR +$1.25 (best)
+- rr-struct+ LONG: 9T 67%WR +$0.52
+- pump-chain+ LONG: 5T 80%WR +$0.39
+- rr-struct- SHORT: 3T 33%WR -$0.22 (marginal)
+- trend_purity+ LONG: 2T 0%WR -$0.47 (worst)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: trend_purity+ 0%WR but only 2T/24h (0 last hour) — doesn't meet 3+/hour
+- rr-struct- at 33%WR — has wins, marginal
+- Trade freq: 0T last hour, 4 open — healthy
+- System +$1.42/24h, no urgency
+
+**Open Questions:**
+- trend_purity+ at 0%WR/-$0.47 — aging out naturally, EXTREME penalty already applied Sep 12
+- rr_engine_support_br only bad exit reason at -$0.51/7d — worth monitoring
+- All 4 opens are SHORT pullback-entry- — concentration risk but signal performing well
