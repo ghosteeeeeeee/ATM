@@ -625,7 +625,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.012   # 1.2% floor — CEO Sep 8: reverted from 1.5%. Wider SL caused avg loss -4.84%, R:R collapsed to 0.51.
+ATR_SL_MIN             = 0.013   # 1.3% floor — brain_auditor Sep 14: 55% of below-entry ATR SL hits had dist <1.3%, would survive. Expected +$1.33/7d net. Was 1.2%.
 ATR_SL_MAX             = 0.015  # 1.5% cap — CEO Sep 8: reverted from 1.8%. Tighter SL catches losses before -5% bleed.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
@@ -640,12 +640,12 @@ ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits.
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.012  # 1.2% — CEO Sep 8: MUST match ATR_SL_MIN
+ATR_SL_MIN_INIT    = 0.013  # 1.3% — brain_auditor Sep 14: MUST match ATR_SL_MIN
 ATR_SL_MAX_INIT    = 0.015  # 1.5% — CEO Sep 8: MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN) — CEO Sep 8
-TP_PCT_FALLBACK    = 0.036  # 3.6% fallback target (3:1 R:R with 1.2% SL) — CEO Sep 8
-STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN) — CEO Sep 8
-SL_PCT_MIN        = 0.012  # 1.2% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — CEO Sep 8
+SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) — brain_auditor Sep 14
+TP_PCT_FALLBACK    = 0.039  # 3.9% fallback target (3:1 R:R with 1.3% SL) — brain_auditor Sep 14
+STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
+SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
 CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py

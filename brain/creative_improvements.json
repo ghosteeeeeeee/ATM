@@ -554,5 +554,23 @@
     "status": "needs verification",
     "category": "signal unlock",
     "impact_on_winners": "Currently 7T/7d. More entries = more opportunities. Low risk at small sample."
+  },
+  {
+    "date": "2026-09-14T20:45:00Z",
+    "idea": "ATR_SL_MIN 1.2% -> 1.3% after Sep 15 monitoring window",
+    "rationale": "59.5% of 24h ATR_SL hits exit below entry (never profitable). Structural — ATR too tight for current volatility.",
+    "expected_impact": "+$0.30-0.50/7d from reduced below-entry stops",
+    "category": "exit improvement",
+    "status": "suggested — monitor until Sep 15",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-14T20:45:00Z",
+    "idea": "pump-chain- SHORT RSI ceiling filter",
+    "rationale": "2 pump-chain- SHORT trades at RSI=75 lost $0.30 combined. SHORTing into strength = momentum trap. Sample tiny (2 trades).",
+    "expected_impact": "+$0.15-0.30/7d if pattern holds",
+    "category": "entry sniper",
+    "status": "monitoring — insufficient data",
+    "risk": "low"
   }
 ]

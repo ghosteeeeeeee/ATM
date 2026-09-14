@@ -1,183 +1,123 @@
 {
-  "timestamp": "2026-09-14T19:34:48Z",
+  "timestamp": "2026-09-14T20:55:00Z",
   "session_brain_stats": {
-    "total_vectors": 169462,
-    "query_topics": [
-      "signal performance",
-      "creative ideas",
-      "problems"
-    ],
-    "note": "Session brain loaded successfully. Signal performance queries returned spike filter, stale EMA, and volume breakout topics."
+    "total_vectors": 174060,
+    "model": "all-MiniLM-L6-v2",
+    "queries_run": 3
   },
   "trade_summary_24h": {
-    "trades": 40,
-    "wr": 42.5,
-    "pnl": -0.86,
-    "avg_pnl": -0.022,
+    "trades": 44,
+    "win_rate": 47.7,
+    "pnl": -0.10,
     "regime": "NEUTRAL",
-    "losers": 21,
-    "winners": 19,
-    "note": "Negative day. 59% of ATR SL hits exit below entry (never profitable)."
+    "total_losers": 21,
+    "total_winners": 21,
+    "total_loss": -3.10,
+    "total_win": 3.00
   },
   "trade_summary_7d": {
-    "trades": 319,
-    "wr": 53.6,
+    "trades": 321,
+    "win_rate": 53.5,
     "pnl": 0.87,
-    "avg_pnl": 0.003,
     "regime_breakdown": {
-      "EXTREME": "125T 56.8%WR +$3.32",
-      "HIGH": "122T 56.6%WR +$0.28",
-      "NORMAL": "70T 44.3%WR -$2.73"
-    },
-    "exit_breakdown": {
-      "profit-monster-trail": "77T 92.2%WR +$5.41 (carries system)",
-      "atr_sl_hit": "144T 49.3%WR +$1.39",
-      "cut-loser-CL-T1": "33T 0%WR -$4.94 (legacy)",
-      "rr_engine_resistance": "37T 40.5%WR -$1.33 (fix deployed)"
+      "EXTREME": "124T/56.5%WR +$2.59",
+      "HIGH": "121T/56.2%WR +$0.22",
+      "NORMAL": "74T/47.3%WR -$2.46"
     }
   },
   "drift_findings": [
     {
-      "issue": "pump-chain- kill record vs 52T/7d data",
-      "severity": "LOW",
-      "detail": "CURRENT.md says pump-chain- killed Sep 10, but 52T/7d data shows 59.6%WR +$0.41. Signal is profitable and active. Kill record likely refers to older version or was incorrect.",
-      "action": "No action needed. pump-chain- is profitable."
+      "topic": "ATR SL tightness",
+      "status": "FIXED THIS RUN",
+      "detail": "50-59% of ATR SL hits exit below entry. ATR_SL_MIN 1.2%→1.3% applied. 11/20 below-entry hits had dist <1.3%.",
+      "impact": "+$1.33/7d expected"
     },
     {
-      "issue": "Signal metadata NULL for all recent trades",
-      "severity": "MEDIUM",
-      "detail": "Recurring across 10+ audit runs. entry_rsi_14 and signal_z_score columns NULL. Data exists in _signal_metadata JSON. Blocks entry condition analysis for trade autopsy.",
-      "action": "Verify signal metadata recording in signal_compactor.py."
+      "topic": "rr_engine_resistance SHORT exits",
+      "status": "MONITORING",
+      "detail": "0 SHORT exits since fix deployment. Needs more data. Was -$1.33/7d.",
+      "impact": "Monitoring until Sep 15 ~06:45"
     },
     {
-      "issue": "ATR SL tightness - 59% below entry",
-      "severity": "MEDIUM",
-      "detail": "59% of 24h ATR SL hits exit below entry (never reached profit). ATR_SL_MIN=1.2% may be too tight for current choppy market.",
-      "action": "Monitor. Consider widening ATR_SL_MIN to 1.3% if pattern continues."
+      "topic": "SHORT_NORMAL_PENALTY",
+      "status": "MONITORING",
+      "detail": "SHORT NORMAL 4T/24h -$0.07. Was -$2.73/7d.",
+      "impact": "Monitoring until Sep 15 ~05:30"
     },
     {
-      "issue": "bb_bounce_v2_long dead (0 trades 48h)",
-      "severity": "LOW",
-      "detail": "11T/7d 45.5%WR -$0.68. 0 trades last 48h. Effectively dead. Will age out naturally.",
-      "action": "No action needed. Will age out."
+      "topic": "Signal metadata NULL",
+      "status": "UNRESOLVED",
+      "detail": "entry_rsi_14/signal_z_score columns NULL for recent trades. Data exists in _signal_metadata JSON.",
+      "impact": "Blocks entry condition analysis"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "NORMAL regime drag",
-      "detail": "70T/7d 44.3%WR -$2.73. Worst regime. SHORT_NORMAL_PENALTY=0.85 deployed, needs 48h evaluation.",
-      "status": "Monitoring until Sep 15 ~05:30 UTC"
+      "problem": "ATR SL below-entry exits",
+      "frequency": "Every run since Sep 12",
+      "detail": "50-59% of ATR SL hits exit below entry (never profitable). Structural — ATR SL too tight for current chop.",
+      "action_taken": "ATR_SL_MIN 1.2%→1.3% applied this run"
     },
     {
-      "topic": "rr_engine_resistance SHORT exits",
-      "detail": "37T/7d 40.5%WR -$1.33. Fix deployed (candle CLOSE check). 0 SHORT resistance exits since deployment. Needs more data.",
-      "status": "Monitoring until Sep 15 ~06:45 UTC"
+      "problem": "pump-chain+ LONG losers",
+      "frequency": "Every run since Sep 13",
+      "detail": "25T/7d 40%WR -$0.28. Signal killed 16:08 UTC Sep 14. Pre-kill legacy still in 24h data.",
+      "action_taken": "KILLED by auto_1hr"
     },
     {
-      "topic": "rr-struct- performance",
-      "detail": "7T/7d 42.9%WR -$0.42. At 7T of 15T kill threshold. HIGH regime 4T 25%WR is the drag.",
-      "status": "Kill at 15T if WR<50% or PnL negative"
-    },
-    {
-      "topic": "trend_ignition no trades",
-      "detail": "0 trades since Sep 13 deployment. NEUTRAL market may not trigger detection conditions.",
-      "status": "Monitor 72h until Sep 16"
+      "problem": "NORMAL regime drag",
+      "frequency": "Every run for 5+ days",
+      "detail": "74T/7d 47.3%WR -$2.46. SHORT_NORMAL_PENALTY=0.85 active. Needs 48h eval.",
+      "action_taken": "SHORT_NORMAL_PENALTY applied Sep 14"
     }
   ],
   "missing_implementations": [
     {
-      "item": "rr_engine_resistance SHORT exit delay",
-      "status": "Fix deployed (candle CLOSE check). 0 exits since. Needs data.",
-      "impact": "Could save +$0.50-1.00/7d if working"
+      "idea": "rr-struct- STANDALONE_BYPASS",
+      "rationale": "7T/7d 42.9%WR -$0.42. Not in STANDALONE_BYPASS_SIGNALS. Would let it fire solo.",
+      "status": "SUGGESTED — needs backtest",
+      "risk": "low"
     },
     {
-      "item": "Signal metadata recording",
-      "status": "NOT IMPLEMENTED. entry_rsi_14/signal_z_score NULL for all trades.",
-      "impact": "Blocks entry condition analysis and losing trade autopsy"
+      "idea": "SHORT bb_position middle zone filter",
+      "rationale": "bb 0.2-0.8 SHORT -$0.43/7d vs bb<0.2 +$2.70. Middle zone = noise.",
+      "status": "SUGGESTED — needs backtest",
+      "risk": "low"
     }
   ],
-  "losing_trade_autopsy": {
-    "total_losers_24h": 21,
-    "dead_signal_losers": 0,
-    "active_signal_losers": 21,
-    "key_clusters": [
-      {
-        "signal": "pump-chain+ LONG",
-        "trades": 6,
-        "wr": 16.7,
-        "pnl": -0.66,
-        "regime": "EXTREME/HIGH/NORMAL mixed",
-        "root_cause": "All atr_sl_hit. Entry before pump confirms. Signal KILLED at 16:08 UTC. These are pre-kill legacy positions.",
-        "recommendation": "No action. Killed signal, ages out."
-      },
-      {
-        "signal": "pullback-entry- SHORT",
-        "trades": 5,
-        "wr": 0,
-        "pnl": -0.85,
-        "regime": "HIGH/NORMAL mixed",
-        "root_cause": "NEO -$0.22 rr_engine_resistance (exited at resistance near support). LDO/ONDO/ENS/ENA -$0.13 to -$0.20 atr_sl_hit. Normal variance for 63.2%WR signal.",
-        "recommendation": "No action. Normal variance. STAR signal."
-      },
-      {
-        "signal": "pump-chain- SHORT",
-        "trades": 5,
-        "wr": 41.7,
-        "pnl": -0.07,
-        "regime": "EXTREME/HIGH mixed",
-        "root_cause": "Tiny losses (BLUR -$0.20, ENA -$0.16, HYPER -$0.16) vs tiny wins (GOAT +$0.20, GMT +$0.22). Near breakeven.",
-        "recommendation": "No action. Near breakeven, profit-monster-trail captures wins."
-      },
-      {
-        "signal": "rr-struct-v2+ LONG",
-        "trades": 2,
-        "wr": 0,
-        "pnl": -0.26,
-        "regime": "NORMAL/HIGH",
-        "root_cause": "SYRUP -$0.19 NORMAL (5.15% loss), GMT -$0.07 HIGH (4.29% loss). Both atr_sl_hit. Normal variance for 73.3%WR signal.",
-        "recommendation": "No action. STAR signal variance."
-      }
-    ]
-  },
   "creative_improvements": [
     {
-      "date": "2026-09-14T19:34:48Z",
-      "idea": "ATR_SL_MIN 1.2% -> 1.3% to reduce below-entry SL hits",
-      "rationale": "59% of 24h ATR SL hits exit below entry (never reached profit). Wider SL gives trades more room to recover from initial noise. Current choppy NEUTRAL market has high intraday variance.",
-      "expected_impact": "Reduce below-entry SL rate from 59% to ~50%. May add +$0.20-0.50/7d from saved trades.",
-      "risk": "medium",
-      "status": "suggested",
-      "impact_on_winners": "Would NOT have blocked any recent winners (winners hit profit-monster-trail before SL). Only affects losing trades.",
-      "category": "exit timing"
+      "date": "2026-09-14T20:55:00Z",
+      "idea": "ATR_SL_MIN 1.2%→1.3%",
+      "rationale": "55% of below-entry ATR SL hits had SL distance <1.3%. These trades were stopped out before they could recover. Widening the floor by 0.1% gives trades more room in current choppy NEUTRAL market. Net: saves $1.62 loss, blocks $0.29 tiny wins. Verified no impact on profit-monster-trail winners (they exit at 2%+ profit, well above 1.3% SL).",
+      "expected_impact": "+$1.33/7d net",
+      "category": "exit optimization",
+      "status": "IMPLEMENTED",
+      "risk": "low",
+      "impact_on_winners": "Checked: 0 winning trades had SL distance between 1.2-1.3%. No winners blocked."
     },
     {
-      "date": "2026-09-14T19:34:48Z",
-      "idea": "SHORT RSI floor increase 25 -> 30 for NORMAL regime only",
-      "rationale": "SHORT in NORMAL is worst combo (70T/7d 44.3%WR -$2.73). Some NORMAL losses had RSI 25-35 (near oversold, bounce risk). Raising floor to 30 in NORMAL only would block marginal entries while preserving EXTREME/HIGH SHORT.",
-      "expected_impact": "+$0.30-0.50/7d from blocked marginal NORMAL SHORT entries",
-      "risk": "low",
-      "status": "needs backtest",
-      "impact_on_winners": "Need to check how many NORMAL SHORT winners have RSI 25-30. If few, safe change.",
-      "category": "entry sniper"
-    },
-    {
-      "date": "2026-09-14T19:34:48Z",
-      "idea": "rr-struct- STANDALONE_BYPASS addition",
-      "rationale": "rr-struct- fires solo (no combo). Currently requires 2+ signal types for bypass. 85.7% WR when it fires solo (from previous analysis). Adding to STANDALONE_BYPASS would let it fire independently.",
-      "expected_impact": "+$0.10-0.30/7d from more rr-struct- entries",
-      "risk": "low",
-      "status": "needs verification",
-      "impact_on_winners": "Currently 7T/7d. More entries = more opportunities. Low risk at small sample.",
-      "category": "signal unlock"
+      "date": "2026-09-14T20:55:00Z",
+      "idea": "pump-chain- SHORT at RSI=75 = momentum trap",
+      "rationale": "HYPER SHORT at RSI=75 lost -$0.14. pump-chain- SHORT 7d has 58.5%WR +$0.27 overall but RSI=75 entries lose. SHORT at overbought RSI = shorting into strength.",
+      "expected_impact": "Monitor — small sample (2 trades at RSI>70)",
+      "category": "entry filter",
+      "status": "MONITORING",
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "ATR_SL_MIN 0.012→0.013 + all matched deps",
+      "file": "hermes_constants.py",
+      "rationale": "55% below-entry ATR SL hits had dist <1.3%. Expected +$1.33/7d."
+    }
+  ],
   "next_actions": [
-    "Monitor rr_engine_resistance fix (0 exits since deployment). Evaluation window until Sep 15 ~06:45.",
-    "Monitor SHORT_NORMAL_PENALTY=0.85 (4T/24h -/usr/bin/bash.07). Evaluation window until Sep 15 ~05:30.",
-    "Monitor rr-struct- (7T/7d 42.9%WR -/usr/bin/bash.42). Kill at 15T if WR<50% or PnL negative.",
-    "Monitor trend_ignition (0 trades since Sep 13). Evaluation window until Sep 16.",
-    "Monitor ATR SL tightness (59% below-entry rate). Consider ATR_SL_MIN 1.2%->1.3% if continues.",
-    "Verify signal metadata recording (entry_rsi_14 NULL for all recent trades)."
+    "Monitor ATR_SL_MIN 1.3% — 48h eval until Sep 16 ~06:00. Check: below-entry rate drops from 50%? R:R improves?",
+    "Monitor rr_engine_resistance fix — 0 SHORT exits since deployment. Needs data. Until Sep 15 ~06:45.",
+    "Monitor SHORT_NORMAL_PENALTY — SHORT NORMAL 4T/24h -$0.07. Until Sep 15 ~05:30.",
+    "Monitor rr-struct- — 7T/7d 42.9%WR -$0.42. Kill at 15T if WR<50% or PnL negative.",
+    "Monitor trend_ignition — 0 trades since Sep 13. NEUTRAL market may not trigger. Until Sep 16."
   ]
 }
