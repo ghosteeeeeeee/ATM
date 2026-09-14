@@ -1,59 +1,73 @@
 # Signal Performance Report
-**Generated:** 2026-09-13 23:30 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-09-14 05:10 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **24h trades:** 35 | **24h PnL:** -$0.16 (flat)
-- **6h trades:** 6 | **6h PnL:** -$0.72
-
----
-
-## WINNERS (WR > 55%, PnL > 0)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| rr-struct+ | LONG | 3 | 66.7% | -0.21 | 9 | 66.7% | +0.52 | ENABLED |
-| pump-chain+ | LONG | — | —% | — | 5 | 80.0% | +0.39 | ENABLED |
-| pullback-entry- | SHORT | 1 | 0.0% | -0.21 | 9 | 55.6% | +0.13 | ENABLED |
+## Overall Stats (24h)
+- **Total trades:** 54 | **WR:** 48.1% | **PnL:** +$0.08 | **Avg:** $0.00
 
 ---
 
-## LOSERS (WR < 30%, PnL < -$0.10, 5+ trades)
+## ACTIONS TAKEN
 
-**None meet kill criteria.** Two watch-list signals have <5 trades (below threshold).
+### Tuning Executed
+| Signal | Change | Reason |
+|--------|--------|--------|
+| R2_Structural NORMAL | 0.5 → 0.2x | rr-struct+ LONG 40% WR, -$0.49 in NORMAL (24h). Wins 87.5% WR in HIGH |
+
+**Note:** rr-struct+ LONG was already disabled (`RR_STRUCTURAL_PLUS_ENABLED = False`). Remaining trades in 24h window are legacy positions opened before disable. The regime gate tuning (0.2x) provides defense-in-depth if the flag is ever re-enabled.
+
+### Kills: None
+No signal meets ALL kill criteria (WR < 30% + 5+ trades + PnL < -$0.10 + active > 24h).
+
+### Boosts: None
+No signal meets ALL boost criteria (WR > 55% + 5+ trades + PnL > $0.05).
 
 ---
 
-## WATCH LIST (below kill threshold but losing)
+## WINNERS (24h)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Regime Blocks | Note |
-|--------|-----|-------|--------|---------|---------------|------|
-| trend_purity+ | LONG | 3 | 0.0% | -0.75 | HIGH=0.0x, EXTREME=0.15x | 0% WR but only 3 trades. Already regime-blocked. |
-| rr-struct- | SHORT | 3 | 33.3% | -0.22 | HIGH=0.0x | 33% WR, 3 trades. Wins in NORMAL (67% WR). Already regime-blocked. |
+| Signal | Dir | Trades | WR% | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pullback-entry- | SHORT | 20 | 50.0% | +$0.72 | ✅ Active |
+| pump-chain+ | LONG | 14 | 57.1% | +$0.15 | ✅ Active |
+
+### pullback-entry- SHORT — Breakdown
+Top tokens: BIGTIME +$0.57, CHIP +$0.35, FOGO +$0.29, ACE 2T +$0.24
+7d: 56T, 60.7% WR, +$2.73 — consistent performer
+
+### pump-chain+ LONG — Breakdown
+Top tokens: FIL 4T 75%WR +$0.27, APT +$0.12, INJ +$0.11
+7d: solid across multiple tokens
 
 ---
 
-## MARGINAL (30-55% WR)
+## LOSERS / WATCH LIST
 
-None. All signals outside winners are <5 trades.
+| Signal | Dir | Trades | WR% | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| rr-struct- | SHORT | 2 | 0.0% | -$0.28 | ⚠️ Watch (too few trades to kill) |
+| pump-chain- | SHORT | 6 | 33.3% | -$0.01 | ⚠️ Watch (borderline WR, negligible PnL) |
+
+**rr-struct- SHORT:** All-time HIGH regime = 25% WR, -$0.41. NORMAL = 67% WR, -$0.01. Already blocked in HIGH (0.0x). NORMAL performs OK — no action needed.
+
+**pump-chain- SHORT:** All-time: EXTREME 57.1%, HIGH 61.5%, NORMAL 60%. The 24h dip to 33.3% is variance with only 6 trades. No action needed.
 
 ---
 
 ## SIGNAL INVERSIONS (24h)
 
-**No inversions found.** All signals respect their direction labels.
+**None found.** All signals respect their direction labels.
 
 ---
 
-## RECOMMENDATIONS
+## 6h WINDOW
 
-1. **[NO ACTION]** — No signals meet kill criteria (5+ trades, <30% WR, >24h active, PnL < -$0.10).
-2. **[KEEP]** — 3 winning combos: rr-struct+, pump-chain+, pullback-entry-. LONG side dominant.
-3. **[WATCH]** — trend_purity+ on watch. If next cycle adds 2+ more losing trades, consider blanket kill. Already regime-blocked in HIGH (0.0x) and EXTREME (0.15x).
-4. **[WATCH]** — rr-struct- marginal. Wins in NORMAL (67% WR), blocked in HIGH. Needs more data to decide.
+| Signal | Dir | Trades | WR% | PnL |
+|--------|-----|--------|-----|-----|
+| pullback-entry- | SHORT | 11 | 45.5% | +$0.58 |
+| pump-chain+ | LONG | 9 | 44.4% | -$0.24 |
+| pump-chain- | SHORT | 5 | 20.0% | -$0.07 |
 
----
-
-*Report auto-generated. Next report: ~6h from now.*
+pullback-entry- continues as primary profit driver. pump-chain+ and pump-chain- both soft in 6h window.
 
 ---
 
@@ -61,15 +75,19 @@ None. All signals outside winners are <5 trades.
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-09-13 | 197e731 | fix: update stale comments in oversold_bounce constants header |
-| 2026-09-13 | 3b1f9d3 | CEO: verified + monitoring 2026-09-13 ~22:35 UTC |
-| 2026-09-13 | 2535c08 | signals: tighten oversold_bounce to golden zone — every trade a winner |
-| 2026-09-13 | 27e4d64 | tune: lower HIGH regime R:R minimum from 1.5x to 1.3x |
-| 2026-09-13 | 9352d43 | signals: add oversold_bounce — mean reversion LONG at extreme oversold |
-| 2026-09-13 | a913481 | config: add open-skies+ to standalone bypass + BTC chop exemption |
-| 2026-09-13 | dfb37d9 | trading: fix bug-hunter findings — partial matching for exit configs |
-| 2026-09-13 | 273f00a | trading: mover signals use pump-exit for exit management |
-| 2026-09-13 | b2ec796 | config: add mover_long to STANDALONE_BYPASS_SIGNALS (85.7% WR) |
-| 2026-09-13 | 7f75b31 | config: pump-chain standalone bypass + BTC chop exemption |
+| 2026-09-14 | — | signal_reporter: R2_Structural NORMAL 0.5→0.2 (regime tuning) |
+| 2026-09-14 | a5f9d78 | Tune: sniper hysteresis threshold 55→50 |
+| 2026-09-14 | 09f6071 | Feature: directional hysteresis — LONG threshold=55, SHORT t... |
+| 2026-09-14 | d8178f8 | Fix: rr-struct-v2 standalone bypass + CHOP classification |
+| 2026-09-14 | 3ac61fb | brain_auditor: SHORT_NORMAL_PENALTY=0.85 + losing trade audi... |
+| 2026-09-14 | 7598f1e | Feature: sniper hysteresis — suppress BEARISH exits when con... |
+| 2026-09-14 | 022974b | Config: add rr-struct-v2 to STANDALONE_BYPASS_SIGNALS |
+| 2026-09-14 | d6013c2 | Fix: add volume-breakout-long to STANDALONE_BYPASS_SIGNALS |
+| 2026-09-14 | 2c40efa | Config: increase PUMP_FLOW_MAX_POSITIONS from 2 to 4 |
+| 2026-09-14 | 9ba903b | Config: add warrior-sr-confirm to STANDALONE_BYPASS_SIGNALS |
+| 2026-09-14 | 3bc7196 | config: disable rr-struct+ LONG, replaced by rr-struct-v2+ |
 
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+*Changes to `scripts/hermes_constants.py` and `scripts/volatility_gate_v2.py`.*
+
+---
+*Report auto-generated by signal_reporter. Next report: ~6h from now.*
