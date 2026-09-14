@@ -409,3 +409,16 @@
 
 ## Error Alerts — 2026-09-14 02:55 UTC
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-14 03:25 UTC
+- **[WARN]** (1x): `signals table bloat: 68,701 active signals, 51,932 older than 7 days — no cleanup mechanism`
+- **[WARN]** (1x): `signal_history table empty (0 rows) — archive mechanism not functioning`
+- **[INFO]** Pipeline: OK — running, last cycle 03:24:25, 0 errors, 0 tracebacks
+- **[INFO]** Signals: 105 generated last hour (healthy flow)
+- **[INFO]** Trades: 1 open (CAKE LONG), 46 closed today, +27.86% PnL
+- **[INFO]** Timers: 10 active, all firing on schedule
+- **[INFO]** Disk: 79% used (24G free)
+- **[INFO]** Kill switch: LIVE TRADING ENABLED
+
+## Error Alerts — 2026-09-14 03:55 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

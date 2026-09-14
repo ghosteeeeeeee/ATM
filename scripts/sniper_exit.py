@@ -61,7 +61,8 @@ try:
         SNIPER_SIGNALS_FOR_L1,
         SNIPER_SIGNALS_FOR_L2,
         SNIPER_SIGNALS_FOR_L3,
-        SNIPER_HYSTERESIS_SCORE,
+        SNIPER_HYSTERESIS_LONG,
+        SNIPER_HYSTERESIS_SHORT,
     )
 except ImportError:
     # Defaults if constants not yet added
@@ -75,7 +76,8 @@ except ImportError:
     SNIPER_SIGNALS_FOR_L1 = 1
     SNIPER_SIGNALS_FOR_L2 = 2
     SNIPER_SIGNALS_FOR_L3 = 3
-    SNIPER_HYSTERESIS_SCORE = 90
+    SNIPER_HYSTERESIS_LONG = 55
+    SNIPER_HYSTERESIS_SHORT = 45
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -542,9 +544,10 @@ def detect_shift(state=None):
             log.info(entry)
         return None  # Tied — uncertain
 
-    # ── HYSTERESIS: continuum score overrides BEARISH when trend is strong ──
-    # If score > threshold, BTC trend is still intact — small pullbacks are not reversals.
-    # Prevents trigger-happy LONG exits on minor dips.
+    # ── HYSTERESIS: continuum score suppresses premature exits ──
+    # LONG side: if score > SNIPER_HYSTERESIS_LONG, BTC trend is still bullish — don't close LONGs
+    # SHORT side: if score < SNIPER_HYSTERESIS_SHORT, BTC trend is still bearish — don't close SHORTs
+    # The "dead zone" (45-55) is where both sides can act.
     if direction == 'BEARISH':
         try:
             CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
@@ -562,11 +565,35 @@ def detect_shift(state=None):
                         _conn2.close()
                     except Exception:
                         pass
-            if _current_score > SNIPER_HYSTERESIS_SCORE:
-                log.info(f"  [SNIPER-DEBUG] HYSTERESIS: BEARISH overridden — score={_current_score:.1f} > {SNIPER_HYSTERESIS_SCORE} (trend intact)")
+            if _current_score > SNIPER_HYSTERESIS_LONG:
+                log.info(f"  [SNIPER-DEBUG] HYSTERESIS-LONG: BEARISH overridden — score={_current_score:.1f} > {SNIPER_HYSTERESIS_LONG} (trend intact)")
                 for entry in debug_log:
                     log.info(entry)
                 return None  # Score too high — trend still bullish
+        except Exception as e:
+            log.warning(f"Hysteresis check error: {e}")
+    elif direction == 'BULLISH':
+        try:
+            CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
+            import sqlite3 as _sc3
+            _conn3 = None
+            try:
+                _conn3 = _sc3.connect(CONTINUUM_DB, timeout=5)
+                _row = _conn3.execute(
+                    "SELECT state_score FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                ).fetchone()
+                _current_score = _row[0] if _row and _row[0] is not None else 0
+            finally:
+                if _conn3:
+                    try:
+                        _conn3.close()
+                    except Exception:
+                        pass
+            if _current_score < SNIPER_HYSTERESIS_SHORT:
+                log.info(f"  [SNIPER-DEBUG] HYSTERESIS-SHORT: BULLISH overridden — score={_current_score:.1f} < {SNIPER_HYSTERESIS_SHORT} (trend intact)")
+                for entry in debug_log:
+                    log.info(entry)
+                return None  # Score too low — trend still bearish
         except Exception as e:
             log.warning(f"Hysteresis check error: {e}")
 
