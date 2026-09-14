@@ -109,5 +109,16 @@
     "after": "SHORT_RSI_CEILING=65 in hermes_constants.py:801, check in signal_compactor.py:2719-2747",
     "rationale": "20T/7d SHORT RSI>=65 50%WR -$1.02. Overbought SHORT = momentum continuation risk. Only 1 active-signal winner killed (LTC +$0.02 tiny).",
     "impact": "+$0.50-1.00/7d expected from blocked overbought SHORT losers"
+  },
+  {
+    "timestamp": "2026-09-14T16:35:00Z",
+    "agent": "brain_auditor",
+    "change": "Block stale pump-chain+ entries in pump_chain_long.py",
+    "type": "signal_filter",
+    "file": "scripts/signals/pump_chain_long.py",
+    "before": "No is_stale check — stale entries fire freely",
+    "after": "Skip signal if is_stale=True from token_speeds DB",
+    "rationale": "5T stale 7d = 0%WR -$0.73. 0 winners blocked. Other signals (r2_trend, trend_purity) already do this.",
+    "impact": "+$0.73/7d expected"
   }
 ]
