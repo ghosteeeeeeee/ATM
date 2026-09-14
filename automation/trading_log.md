@@ -1,3 +1,31 @@
+## [2026-09-14 16:08 UTC] Hourly Analysis
+
+**Trades:** 4 closed in last 2h (2W 2L +$0.06)
+- GOAT SHORT pump-chain- atr_sl_hit: +$0.20
+- BANANA SHORT pump-chain- atr_sl_hit: +$0.06
+- SYRUP LONG rr-struct-v2+ atr_sl_hit: -$0.19
+- FIL LONG pump-chain+ atr_sl_hit: -$0.13
+
+**24h:** 45T 44%WR -$0.99
+- Exit: atr_sl_hit 34T (76%) -$0.93, rr_engine_resistance 5T -$0.10, profit-monster-trail 3T +$0.26
+- Regime: EXTREME 10T 60%WR +$0.65 (best), HIGH 22T 45%WR -$0.53, NORMAL 12T 33%WR -$1.11 (worst)
+- 55% of SL hits were below entry (never reached profit) — SL tight in chop
+
+**Changes:**
+1. Killed `PUMP_FLOW_PLUS_ENABLED = False` — 24T/7d 37%WR -$0.56, 24h 9T 44%WR -$0.40. Consistent loser. pump-chain- (63%WR) stays.
+
+**No Change Needed:**
+- Kill check: No other signal at 0%WR with 3+ trades in 24h
+- Trade freq: ~2/hr — healthy
+- Open positions: 8 open (SOL, SEI, HYPER, DOT, TURBO, BLUR, APT, INJ) — mostly flat
+
+**Open Questions:**
+- rr-struct-v2+ 0W/2T 24h — monitor, below kill threshold
+- NORMAL regime 33%WR — structural, needs regime-aware entry filtering in signal code
+- 55% SL-below-entry rate — ATR SL may be too tight for current volatility
+
+BY: auto_1hr
+
 ## [2026-09-14 15:30 UTC] Hourly Analysis
 
 **Trades:** 2 closed (1W 1L -$0.07)
@@ -4238,5 +4266,39 @@ BY: auto_1hr
 **Open Questions:**
 - pump-chain+ LONG: 10T/24h 50%WR -$0.14 — losses small but 23T/7d 39.1%WR -$0.43 cumulative. Monitor but not kill-worthy
 - 7d trend shows pullback-entry- SHORT is best performer; consider increasing its weight if system drifts further negative
+
+BY: auto_1hr
+
+## [2026-09-14 15:50 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (41 in 24h, 44% WR, -$0.93)
+**Open positions:** 9 (SOL, SEI, DOT, HYPER, BLUR, APT, TURBO, INJ, JUP)
+
+**24h exit breakdown:**
+- atr_sl_hit: 34T (83%) — structural dominance, avg -$0.027/trade
+- rr_engine_resistance: 4T +$0.02
+- rr_engine_support_br: 2T -$0.22
+
+**24h signal performance:**
+- Best: pullback-entry- 14T/57.1%WR, pump-chain- 9T/55.6%WR
+- Worst: pump-chain+ 6T/16.7%WR -$0.11, rr-struct-v2+ 2T/0%WR -$0.13
+
+**7d signal trends (losers, 5+ trades):**
+- trend_purity+ 11T/36.4%WR -$0.90
+- ema300_dip_short 17T/47.1%WR -$0.91
+- sma20_dip 19T/42.1%WR -$0.73
+- pump-chain+ 24T/37.5%WR -$0.56
+
+**Kill check:** No signal at 0%WR with 3+ trades in last hour ✓
+
+**No Change Needed:**
+- Trade frequency ~1.7/hr — healthy
+- System -$0.93/24h — within noise
+- Pipeline active (cycle running)
+- atr_sl_hit dominance is structural (trailing catches profits on wins)
+
+**Open Questions:**
+- pump-chain+ LONG has 37.5% WR over 7d (24T, -$0.56) — consistently bad but not at kill threshold yet
+- trend_purity+ similarly poor (36.4% WR, 7d) — monitor for kill threshold
 
 BY: auto_1hr

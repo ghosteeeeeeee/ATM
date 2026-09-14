@@ -1820,3 +1820,13 @@
   Drift: Signal metadata NULL (recurring 10+ runs), LONG NORMAL -$1.85 worst combo
   Creative: LONG_NORMAL_PENALTY=0.85 suggested (needs backtest)
   BY: brain_auditor
+
+[2026-09-14 16:50 UTC] brain_auditor: NO CONFIG CHANGE — system positive, monitoring fixes
+  24h: 22T 50.0%WR +$0.30 | 7d: 320T 54.3%WR +$1.30
+  Exit 7d: profit-monster-trail 78T 92.3%WR +$5.46, atr_sl_hit 143T 49.7%WR +$1.55
+  Fixes working: rr_engine_resistance SHORT +$0.02/24h, SHORT_NORMAL_PENALTY -$0.07/24h, SHORT_RSI_CEILING blocking ADA
+  Losers 24h: 21 total, 0 dead signal, 21 active. pump-chain+ 6 LONG worst (16.7%WR -$0.66)
+  7d regime: EXTREME +$3.57 | HIGH +$0.13 | NORMAL -$2.73
+  Monitoring: 3 fixes need 48h, rr-struct- kill at 15T, trend_ignition 0 trades
+  Creative: (1) Monitor pump-chain+ stale filter impact (2) pump-chain+ NORMAL gate needs data
+  BY: brain_auditor

@@ -479,5 +479,23 @@
     "category": "entry sniper",
     "status": "needs_data — sample near kill threshold",
     "risk": "medium — sample may be too small"
+  },
+  {
+    "date": "2026-09-14T16:50:00Z",
+    "idea": "Monitor pump-chain+ stale filter impact",
+    "rationale": "Stale filter deployed 16:34 UTC blocks stale price data entries. 5T stale 7d = 0%WR. If fresh entries still lose at 37.5% WR after 24h, next step is confidence adjustment.",
+    "expected_impact": "+$0.50-0.73/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-14T16:50:00Z",
+    "idea": "pump-chain+ LONG NORMAL regime volatility gate",
+    "rationale": "3T/7d 0%WR -$0.44 in NORMAL. Sample too small (3T) for config change. Monitor 48h.",
+    "expected_impact": "+$0.44/7d if blocked in NORMAL",
+    "category": "volatility gate",
+    "status": "needs_more_data",
+    "risk": "medium"
   }
 ]
