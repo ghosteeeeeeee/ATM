@@ -1830,3 +1830,14 @@
   Monitoring: 3 fixes need 48h, rr-struct- kill at 15T, trend_ignition 0 trades
   Creative: (1) Monitor pump-chain+ stale filter impact (2) pump-chain+ NORMAL gate needs data
   BY: brain_auditor
+
+[2026-09-14 19:15 UTC] brain_auditor: NO CONFIG CHANGE — system in monitoring mode
+  24h: 40T 42.5%WR -$0.86 | 7d: 319T 53.6%WR +$0.87
+  Exit 7d: profit-monster-trail 77T 92.2%WR +$5.41, atr_sl_hit 144T 49.3%WR +$1.39
+  ATR SL tightness: 59% below entry (up from 55%)
+  Fixes working: rr_engine_resistance 0 SHORT exits since fix, SHORT_NORMAL_PENALTY -$0.07/24h, SHORT_RSI_CEILING blocking ADA
+  Losers 24h: 21 total, 0 dead signal, 21 active. pump-chain+ KILLED 6 LONG legacy. pullback-entry- 5 SHORT normal variance.
+  7d regime: EXTREME +$3.32 | HIGH +$0.28 | NORMAL -$2.73
+  Monitoring: 4 items (rr_engine_resistance, SHORT_NORMAL_PENALTY, rr-struct-, trend_ignition)
+  Creative: (1) ATR_SL_MIN 1.2%->1.3% suggested (2) rr-struct- STANDALONE_BYPASS suggested (3) SHORT NORMAL RSI floor 30 suggested
+  BY: brain_auditor

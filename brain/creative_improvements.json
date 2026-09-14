@@ -524,5 +524,35 @@
         "status": "needs_backtest"
       }
     ]
+  },
+  {
+    "date": "2026-09-14T19:35:15Z",
+    "idea": "ATR_SL_MIN 1.2% -> 1.3% to reduce below-entry SL hits",
+    "rationale": "59% of 24h ATR SL hits exit below entry (never reached profit). Wider SL gives trades more room to recover from initial noise. Current choppy NEUTRAL market has high intraday variance.",
+    "expected_impact": "Reduce below-entry SL rate from 59% to ~50%. May add +$0.20-0.50/7d from saved trades.",
+    "risk": "medium",
+    "status": "suggested",
+    "category": "exit timing",
+    "impact_on_winners": "Would NOT have blocked any recent winners (winners hit profit-monster-trail before SL). Only affects losing trades."
+  },
+  {
+    "date": "2026-09-14T19:35:15Z",
+    "idea": "SHORT RSI floor increase 25 -> 30 for NORMAL regime only",
+    "rationale": "SHORT in NORMAL is worst combo (70T/7d 44.3%WR -$2.73). Some NORMAL losses had RSI 25-35 (near oversold, bounce risk). Raising floor to 30 in NORMAL only would block marginal entries while preserving EXTREME/HIGH SHORT.",
+    "expected_impact": "+$0.30-0.50/7d from blocked marginal NORMAL SHORT entries",
+    "risk": "low",
+    "status": "needs backtest",
+    "category": "entry sniper",
+    "impact_on_winners": "Need to check how many NORMAL SHORT winners have RSI 25-30. If few, safe change."
+  },
+  {
+    "date": "2026-09-14T19:35:15Z",
+    "idea": "rr-struct- STANDALONE_BYPASS addition",
+    "rationale": "rr-struct- fires solo (no combo). Currently requires 2+ signal types for bypass. Previous analysis showed 85.7% WR when it fires solo. Adding to STANDALONE_BYPASS would let it fire independently.",
+    "expected_impact": "+$0.10-0.30/7d from more rr-struct- entries",
+    "risk": "low",
+    "status": "needs verification",
+    "category": "signal unlock",
+    "impact_on_winners": "Currently 7T/7d. More entries = more opportunities. Low risk at small sample."
   }
 ]
