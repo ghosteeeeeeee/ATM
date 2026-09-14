@@ -320,6 +320,79 @@ def classify_volatility(atr_pct):
         return 'EXTREME'
 
 
+def get_atr_ratio(token='BTC'):
+    """Compute current ATR(14) / average ATR ratio for BTC.
+    
+    Returns float > 1.0 when expanding, < 1.0 when compressing.
+    Uses candles_1h for both current and average.
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(f'{HERMES_DATA}/candles.db', timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT open, high, low, close
+            FROM candles_1h
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), 520))  # 500 avg + 20 current
+        rows = cur.fetchall()
+        if len(rows) < 100:
+            return None
+    except Exception:
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+    candles = list(reversed(rows))
+
+    # Compute TR for all candles
+    trs = []
+    for i in range(1, len(candles)):
+        h, l, pc = candles[i][1], candles[i][2], candles[i-1][3]
+        tr = max(h - l, abs(h - pc), abs(l - pc))
+        trs.append(tr)
+
+    if len(trs) < 500:
+        return None
+
+    # Current ATR = last 14 bars
+    current_atr = sum(trs[-14:]) / 14
+    # Average ATR = previous 500 bars (excluding current 14)
+    avg_atr = sum(trs[-514:-14]) / 500
+
+    if avg_atr <= 0:
+        return None
+
+    return current_atr / avg_atr
+
+
+def get_btc_trend():
+    """Get BTC 30m trend direction from momentum_cache.
+    
+    Returns: 'RISING', 'FALLING', or 'FLAT'
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(f'{HERMES_DATA}/signals_hermes_runtime.db', timeout=5)
+        cur = conn.cursor()
+        cur.execute("SELECT velocity FROM momentum_cache WHERE token='BTC'")
+        row = cur.fetchone()
+        conn.close()
+        if row and row[0] is not None:
+            vel = float(row[0])
+            if vel > 0.15:
+                return 'RISING'
+            elif vel < -0.15:
+                return 'FALLING'
+            return 'FLAT'
+    except Exception:
+        pass
+    return 'FLAT'
+
+
 def get_current_phase():
     """Get current market phase from signal clustering."""
     if not _CLUSTERING_ENABLED:
@@ -405,6 +478,28 @@ def get_combined_multiplier(signal_type, regime, phase):
             mult *= inv_mult
         except Exception:
             pass
+    
+    # 4. ATR ratio + BTC trend boost (2026-09-11)
+    # Boosts direction-aligned expansion trades (83% WR for SHORT in falling expansion)
+    from hermes_constants import (
+        VOL_GATE_ATR_RATIO_EXPANSION,
+        VOL_GATE_EXPANSION_SHORT_FALLING_BOOST,
+        VOL_GATE_EXPANSION_LONG_RISING_BOOST,
+    )
+    try:
+        atr_ratio = get_atr_ratio('BTC')
+        if atr_ratio is not None and atr_ratio > VOL_GATE_ATR_RATIO_EXPANSION:
+            btc_trend = get_btc_trend()
+            # Determine signal direction from signal_type suffix
+            _is_short = signal_type.endswith('-') or '_short' in signal_type.lower()
+            _is_long = signal_type.endswith('+') or '_long' in signal_type.lower()
+            
+            if btc_trend == 'FALLING' and _is_short:
+                mult *= VOL_GATE_EXPANSION_SHORT_FALLING_BOOST  # 1.2x for SHORT in falling expansion
+            elif btc_trend == 'RISING' and _is_long:
+                mult *= VOL_GATE_EXPANSION_LONG_RISING_BOOST    # 1.1x for LONG in rising expansion
+    except Exception:
+        pass
     
     # Clamp to reasonable range (prevent extreme multipliers from crushing scores)
     return max(0.3, min(2.0, mult))

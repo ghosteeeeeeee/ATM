@@ -3942,3 +3942,71 @@ BY: auto_1hr
 - NORMAL regime consistently underperforming — may need regime-specific filter
 
 BY: auto_1hr
+
+## FAVORITES Update — 2026-09-14 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ZRO (WR=50.0%, PnL=$-0.32, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BIGTIME (WR=57.1%, PnL=$0.59, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ENA (WR=44.4%, PnL=$-0.31, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE CHIP (WR=80.0%, AvgPnL=4.61%, Trades=5)
+- PROMOTE BABY (WR=75.0%, AvgPnL=1.70%, Trades=8)
+- PROMOTE ETC (WR=66.7%, AvgPnL=2.37%, Trades=9)
+- PROMOTE FIL (WR=62.5%, AvgPnL=0.31%, Trades=8)
+- PROMOTE AIXBT (WR=58.3%, AvgPnL=0.17%, Trades=12)
+
+Final set: ['ACE', 'AIXBT', 'BABY', 'BLUR', 'CC', 'CFX', 'CHIP', 'DOT', 'DYDX', 'ETC', 'FIL', 'IMX', 'KAS', 'NEO', 'POL', 'TURBO', 'WLD']
+
+## LOSERS Update — 2026-09-14 06:05 UTC
+- REMOVE NOT (insufficient data)
+- REMOVE IO (insufficient data)
+- REMOVE AVAX (insufficient data)
+- REMOVE SAND (insufficient data)
+- ADD NXPC (WR=40.0%, PnL=$-0.40, wr_collapse (66.7% → 40.0%))
+- ADD ENA (WR=44.4%, PnL=$-0.31, low_wr (44.4%))
+
+Final set: ['ENA', 'GRASS', 'NXPC']
+
+## [2026-09-14 07:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (6 open)
+**24h:** 40T 52.5%WR +$0.37 (avg $0.009/trade)
+**Exit:** atr_sl_hit 25T (62.5%) +$0.03, profit-monster-trail 6T +$0.45, rr_engine_resistance 6T +$0.11
+**Direction:** SHORT 23T +$0.50, LONG 17T -$0.13
+
+**Changes:** None — no kill triggers met (0 trades last hour = no signal evaluable)
+
+**No Change Needed:**
+- Kill check: 0 trades last hour, no signal with 3+ trades at 0% WR
+- atr_sl_hit 62.5% in 24h but 7d at 39.2% — borderline, likely NEUTRAL regime chop
+- System still net positive (+$0.37/24h), SL trades averaging $0.021 on SHORT
+- pullback-entry- 17T/24h 52.9%WR +$0.04 — marginal but positive
+- Trade freq: 0T last hour, 6 open — healthy
+
+**Open Questions:**
+- 24h atr_sl_hit spike (62.5%) — monitor; if persists >48h at >40%, consider widening ATR multiplier
+- SHORT dominant: +$0.50 vs LONG -$0.13 — NEUTRAL regime favoring shorts
+- pullback-entry- high volume but low avg PnL — may need signal quality filter
+
+BY: auto_1hr
+
+## [2026-09-14 07:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**24h:** 40T 52.5%WR +$0.37 (avg $0.009/trade)
+**Exit:** atr_sl_hit 24T (60%) $0.00 avg, profit-monster-trail 6T +$0.45, rr_engine_resistance 7T -$0.11
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 1 trade last hour, no signal evaluable at 3+T with 0%WR
+- atr_sl_hit 60% of 24h closes — above 40% threshold BUT avg PnL = $0.000 (breakeven, not destructive)
+- System net positive (+$0.37/24h), all profit from profit-monster-trail
+- rr-struct+ (7T -$0.19) and rr-struct- (2T -$0.28) are structural drag — known from brain_auditor
+- Trade freq: 7T in 6h = ~1.2/hr — healthy, not overtrading
+- Regime: NEUTRAL (39/40 trades) — consistent with recent pattern
+
+**Open Questions:**
+- rr-struct- (SHORT) has 0%WR (2T/24h) — below 3-trade kill threshold but trending badly
+- atr_sl_hit at 60% persisting from 01:35 UTC audit — if still 60%+ at next 24h check, widen ATR multiplier
+
+BY: auto_1hr

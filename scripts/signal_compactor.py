@@ -1606,6 +1606,56 @@ def _score_signal(token, direction, conf, source, signal_type,
                 except Exception:
                     pass
 
+    # ── Volatility Regime Adaptive: boost momentum in expansion, mean-rev in compression ──
+    # Different vol regimes favor different signal families.
+    vol_regime_mult = 1.0
+    from hermes_constants import (
+        VOL_GATE_ATR_RATIO_EXPANSION, VOL_GATE_ATR_RATIO_COMPRESSION,
+        VOL_GATE_EXPANSION_SHORT_FALLING_BOOST, VOL_GATE_EXPANSION_LONG_RISING_BOOST,
+        VOL_GATE_COMPRESSION_MOMENTUM_PENALTY, VOL_GATE_COMPRESSION_MEANREV_BOOST,
+    )
+    try:
+        _vr_atr_ratio = None
+        _vr_conn = sqlite3.connect(f'{HERMES_DATA}/candles.db', timeout=5)
+        _vr_cur = _vr_conn.cursor()
+        _vr_cur.execute("""
+            SELECT open, high, low, close FROM candles_1h
+            WHERE token='BTC' AND is_closed=1 ORDER BY ts DESC LIMIT 520
+        """)
+        _vr_rows = _vr_cur.fetchall()
+        _vr_conn.close()
+        if len(_vr_rows) >= 500:
+            _vr_candles = list(reversed(_vr_rows))
+            _vr_trs = []
+            for _i in range(1, len(_vr_candles)):
+                _h, _l, _pc = _vr_candles[_i][1], _vr_candles[_i][2], _vr_candles[_i-1][3]
+                _vr_trs.append(max(_h - _l, abs(_h - _pc), abs(_l - _pc)))
+            if len(_vr_trs) >= 514:
+                _cur_atr = sum(_vr_trs[-14:]) / 14
+                _avg_atr = sum(_vr_trs[-514:-14]) / 500
+                if _avg_atr > 0:
+                    _vr_atr_ratio = _cur_atr / _avg_atr
+
+        if _vr_atr_ratio is not None:
+            _is_momentum = signal_type and ('mover' in signal_type or 'pump' in signal_type or 'accel' in signal_type or 'continuation' in signal_type)
+            _is_mean_rev = signal_type and ('bb_bounce' in signal_type or 'range-reversion' in signal_type or 'squeeze' in signal_type or 'oversold' in signal_type)
+
+            if _vr_atr_ratio > VOL_GATE_ATR_RATIO_EXPANSION:
+                if _is_momentum:
+                    vol_regime_mult = 1.2  # boost momentum in expansion
+                elif _is_mean_rev:
+                    vol_regime_mult = 0.8  # mild penalty for mean-rev in expansion
+            elif _vr_atr_ratio < VOL_GATE_ATR_RATIO_COMPRESSION:
+                if _is_momentum:
+                    vol_regime_mult = VOL_GATE_COMPRESSION_MOMENTUM_PENALTY
+                elif _is_mean_rev:
+                    vol_regime_mult = VOL_GATE_COMPRESSION_MEANREV_BOOST
+
+            if vol_regime_mult != 1.0:
+                log(f"  📊 [VOL-REGIME] {token} {signal_type}: ATR ratio={_vr_atr_ratio:.2f} → {vol_regime_mult:.2f}x")
+    except Exception:
+        pass
+
     # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
     # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
     short_normal_mult = 1.0
@@ -1614,7 +1664,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         short_normal_mult = SHORT_NORMAL_PENALTY
         log(f"  📉 [SHORT-NORMAL] {token}: SHORT penalty {SHORT_NORMAL_PENALTY:.2f}x in NORMAL regime")
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * short_normal_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult
     return final_score
 
 

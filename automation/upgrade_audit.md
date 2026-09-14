@@ -435,20 +435,50 @@
 - **Status:** NOT IMPLEMENTED
 - **Reason:** V1 was disabled due to bugs (incomplete placement, stale matching, rate limiting). V2 spec uses SDK atomic functions. 2 CRITICAL + 4 HIGH audit findings. Requires careful testing. Defer.
 
+## Plan: 2026-09-11_volatility-gate-tuning.md
+- **Date scanned:** 2026-09-14 06:00
+- **Core request:** ATR ratio + BTC trend boost in volatility_gate_v2.py — boost SHORT in falling expansion (83% WR setup)
+- **Difficulty:** Level 1 (~30 lines + 7 constants)
+- **Value:** HIGH — data-backed 83% WR for SHORT in falling expansion regime
+- **Status:** IMPLEMENTED
+- **Reason:** Added `get_atr_ratio()` (current_ATR/average_ATR), `get_btc_trend()` (reads momentum_cache), and direction-aligned boost in `get_combined_multiplier()`. 7 constants in hermes_constants.py. BTC ATR ratio=0.76 currently (normal, no boost applied — correct). Syntax verified.
+
+## Plan: 2026-09-11_volatility-regime-adaptive-signals.md
+- **Date scanned:** 2026-09-14 06:00
+- **Core request:** Signal weighting by volatility regime — boost momentum in expansion, mean-reversion in compression
+- **Difficulty:** Level 2 (~35 lines in signal_compactor.py)
+- **Value:** MEDIUM — estimated +$0.33-0.66 per day from regime-adaptive signal weighting
+- **Status:** IMPLEMENTED
+- **Reason:** Added `vol_regime_mult` in `_score_signal()` after alt-BTC divergence check. Computes BTC ATR ratio from candles_1h (520 bars), classifies EXPANSION/NORMAL/COMPRESSION. Momentum signals (mover, pump, accel, continuation) boosted 1.2x in expansion, penalized 0.7x in compression. Mean-reversion signals (bb_bounce, range-reversion, squeeze, oversold) penalized 0.8x in expansion, boosted 1.2x in compression. Added to final_score chain. Syntax verified.
+
 ---
 
-## Updated Summary (2026-09-13)
+## Updated Summary (2026-09-14)
 
 | Status | Count |
 |--------|-------|
-| IMPLEMENTED (this session) | 1 |
+| IMPLEMENTED (this session) | 2 |
 | ALREADY IMPLEMENTED | 7 |
 | PARTIAL | 2 |
 | NOT IMPLEMENTED | 7 |
 | N/A (investigation/data) | 3 |
 
 ### Implemented This Session
+1. **Volatility Gate Tuning** — ATR ratio + BTC trend boost in volatility_gate_v2.py (30 lines, 7 constants)
+2. **Volatility Regime Adaptive Signals** — momentum/mean-reversion weighting by regime in signal_compactor.py (35 lines)
+
+### Previously Implemented
 1. **trend_ignition.py** — early-stage breakout signal (100% WR backtest, 215 lines, full integration)
-3. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
-4. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
-5. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist
+2. **BTC Timing Guard** — per-signal-type momentum filter, LOG_ONLY mode
+3. **BTC Pump Rider Gradual Rally** — gradual rally detection + lagging alt finder
+4. **CONF_FILTER + TIME_BLOCK** — blocks 90+ confidence and dead hours
+5. **BTC Acceleration Detection** — catches crashes 2-3 min earlier
+6. **PROFIT_MONSTER_BYPASS corrected** — exit ownership model
+7. **Dead code fix in VEL-FILTER** — range(3) → range(5)
+
+### Next Candidates
+1. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
+2. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
+3. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist
+4. Pump-Chain Exit — Level 2, HIGH value, ATR trail for pump-chain momentum
+5. Ponytail Full Audit — Level 1-3, MEDIUM value, 33K lines dead code cleanup

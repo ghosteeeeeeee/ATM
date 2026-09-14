@@ -250,20 +250,22 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
-    'BIGTIME',
+    'AIXBT',
+    'BABY',
     'BLUR',
     'CC',
     'CFX',
+    'CHIP',
     'DOT',
     'DYDX',
-    'ENA',
+    'ETC',
+    'FIL',
     'IMX',
     'KAS',
     'NEO',
     'POL',
     'TURBO',
-    'WLD',
-    'ZRO'
+    'WLD'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -280,12 +282,11 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'AVAX',
+    'ENA',
     'GRASS',
-    'IO',
-    'NOT',
-    'SAND'
+    'NXPC'
 }
+
 
 
 
@@ -914,6 +915,16 @@ BTC_TIMING_GUARD_PULLBACK_LONG = 0.20     # block pullback-entry+ if BTC > this
 BTC_TIMING_GUARD_PULLBACK_SHORT = -0.20   # block pullback-entry- if BTC < this
 BTC_TIMING_GUARD_OPEN_SKIES_LONG = 1.00   # open-skies+ is aggressive, allow higher
 BTC_TIMING_GUARD_ACCEL_SHORT = -0.15      # accel-300-v4-short- is very sensitive
+
+# ── Volatility Gate: ATR Ratio + BTC Trend Boost (2026-09-11) ────────────
+# Boosts direction-aligned trades in expansion regime (83% WR for SHORT in falling expansion).
+VOL_GATE_ATR_RATIO_EXPANSION = 1.5        # ATR ratio threshold for expansion
+VOL_GATE_ATR_RATIO_COMPRESSION = 0.7      # ATR ratio threshold for compression
+VOL_GATE_ATR_AVG_WINDOW = 500             # bars for average ATR (~8h on 1m candles)
+VOL_GATE_EXPANSION_SHORT_FALLING_BOOST = 1.2   # boost SHORT in falling expansion (83% WR setup)
+VOL_GATE_EXPANSION_LONG_RISING_BOOST = 1.1     # mild boost LONG in rising expansion
+VOL_GATE_COMPRESSION_MOMENTUM_PENALTY = 0.7    # penalize momentum signals in compression
+VOL_GATE_COMPRESSION_MEANREV_BOOST = 1.2       # boost mean-reversion in compression
 
 # ── Sniper Exit Strategy ──────────────────────────────────────────────────
 # Proactive position closing on regime shifts. Closes wrong-side positions

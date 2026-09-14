@@ -442,3 +442,11 @@
 - **[INFO]** Prices: 94 tokens, fresh (05:23)
 - **[INFO]** 8 failed services — all auxiliary/known (5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, session-brain-ingest)
 - **AUTO-FIX**: None needed — pipeline healthy
+
+## Error Alerts — 2026-09-14 05:55 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Error Alerts — 2026-09-14 06:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
