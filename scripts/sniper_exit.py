@@ -389,16 +389,23 @@ def detect_shift(state=None):
     try:
         CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
         import sqlite3 as _sc
-        _conn = _sc.connect(CONTINUUM_DB, timeout=5)
-        _conn.row_factory = _sc.Row
-        _cur = _conn.execute("""
-            SELECT state_score, velocity_val, acceleration_val, zscore_val
-            FROM continuum_states
-            WHERE token = 'BTC'
-            ORDER BY ts DESC LIMIT 6
-        """)
-        _osc_rows = _cur.fetchall()
-        _conn.close()
+        _conn = None
+        try:
+            _conn = _sc.connect(CONTINUUM_DB, timeout=5)
+            _conn.row_factory = _sc.Row
+            _cur = _conn.execute("""
+                SELECT state_score, velocity_val, acceleration_val, zscore_val
+                FROM continuum_states
+                WHERE token = 'BTC'
+                ORDER BY ts DESC LIMIT 6
+            """)
+            _osc_rows = _cur.fetchall()
+        finally:
+            if _conn:
+                try:
+                    _conn.close()
+                except Exception:
+                    pass
         if _osc_rows and len(_osc_rows) >= 4:
             _scores = [r['state_score'] for r in reversed(_osc_rows)]
             _vels = [r['velocity_val'] for r in reversed(_osc_rows)]
