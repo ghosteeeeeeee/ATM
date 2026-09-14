@@ -497,5 +497,32 @@
     "category": "volatility gate",
     "status": "needs_more_data",
     "risk": "medium"
+  },
+  {
+    "timestamp": "2026-09-14T18:25:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "pump-chain+ LONG regime gate: reduce confidence 30% in NEUTRAL",
+        "rationale": "24T/7d 37.5%WR all losses in NEUTRAL. Signal enters on volume pump but NEUTRAL = no follow-through.",
+        "expected_impact": "+$0.30-0.50/7d",
+        "risk": "medium",
+        "status": "needs_backtest"
+      },
+      {
+        "idea": "SHORT_NORMAL_PENALTY 0.85→0.80",
+        "rationale": "SHORT NORMAL 4T/24h -$0.07. Penalty working but still slightly negative. Conservative step.",
+        "expected_impact": "+$0.10-0.20/7d",
+        "risk": "low",
+        "status": "suggested"
+      },
+      {
+        "idea": "rr-struct- STANDALONE_BYPASS",
+        "rationale": "7T/7d, 3/7 winners, losses cluster HIGH regime. Let it fire solo when conditions align.",
+        "expected_impact": "+$0.10-0.20/7d",
+        "risk": "medium",
+        "status": "needs_backtest"
+      }
+    ]
   }
 ]

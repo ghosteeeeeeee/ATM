@@ -85,7 +85,7 @@ PIPELINE: [OK/WARN/ERROR]
 
 MARKET:
 - Regime: X LONG / X SHORT / X NEUTRAL
-- Speed: X% tokens >= 50%
+- Speed: X% tokens >= 50th percentile
 
 SYSTEM:
 - Timers: X active
@@ -126,7 +126,7 @@ If any WARN or CRITICAL issue found, append to `automation/error_alerts.md`:
 | `signal_outcomes` | ALL trade outcomes (open + closed) | token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, created_at, trade_id |
 | `signals` | Current active signals | token, direction, signal_type, confidence, created_at |
 | `signal_history` | Historical signals | same as signals |
-| `token_speeds` | Token momentum speeds | token, speed_pct |
+| `token_speeds` | Token momentum speeds | token, speed_percentile |
 | `decisions` | Signal compactor decisions | token, direction, decision, created_at |
 
 **DO NOT query a table called `trades` — it does not exist.** Use `signal_outcomes` for trade data.

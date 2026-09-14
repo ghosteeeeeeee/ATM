@@ -1,96 +1,177 @@
 {
-    "timestamp": "2026-09-14T16:50:00Z",
+    "timestamp": "2026-09-14T18:25:00Z",
     "session_brain_stats": {
         "total_vectors": 168462,
-        "topics_queried": ["signal performance winrate regime", "creative ideas improvement strategy", "losing trades problems"]
+        "topics_queried": [
+            "signal performance winrate regime",
+            "creative ideas improvement strategy",
+            "loss money bleeding losing rr_engine resistance exit short"
+        ]
     },
     "trade_summary_24h": {
-        "trades": 22,
-        "win_rate": 50.0,
-        "pnl": 0.30,
-        "status": "POSITIVE",
-        "top_winner": "pullback-entry- SHORT +$0.31 (14T 57.1%WR)",
-        "top_loser": "pump-chain+ LONG -$0.66 (6T 16.7%WR)",
-        "exit_dominant": "atr_sl_hit"
+        "trades": 41,
+        "win_rate": 41.5,
+        "pnl": -1.12,
+        "status": "NEGATIVE",
+        "by_direction": {
+            "LONG": "15T 26.7%WR -$1.43",
+            "SHORT": "26T 50.0%WR +$0.31"
+        },
+        "top_winner": "pullback-entry- SHORT 13T 61.5%WR +$0.52",
+        "top_loser": "pump-chain+ LONG 6T 16.7%WR -$0.66",
+        "exit_dominant": "atr_sl_hit (most losses)"
     },
     "trade_summary_7d": {
-        "trades": 320,
-        "win_rate": 54.3,
-        "pnl": 1.30,
-        "status": "POSITIVE",
-        "regime_best": "EXTREME 124T 57.3%WR +$3.57",
+        "trades": 321,
+        "win_rate": 53.3,
+        "pnl": 0.56,
+        "status": "POSITIVE (barely)",
+        "by_direction": {
+            "LONG": "157T 47.8%WR -$1.63",
+            "SHORT": "164T 58.5%WR +$2.19"
+        },
+        "regime_best": "EXTREME 126T 56.3%WR +$3.21",
+        "regime_mid": "HIGH 123T 56.1%WR +$0.08",
         "regime_worst": "NORMAL 70T 44.3%WR -$2.73",
         "signal_best": "pullback-entry- SHORT 57T 63.2%WR +$2.63",
         "signal_worst_active": "pump-chain+ LONG 24T 37.5%WR -$0.56",
-        "exit_best": "profit-monster-trail 78T 92.3%WR +$5.46",
-        "exit_worst": "cut-loser-CL-T1 34T 0%WR -$5.05 (legacy)"
+        "exit_best": "profit-monster-trail 77T 92.2%WR +$5.41",
+        "exit结构性问题": "atr_sl_hit 145T 49.0%WR +$1.19 (barely break-even)"
     },
+    "losing_trade_autopsy": [
+        {
+            "cluster": "pump-chain+ LONG — 6T/24h -$0.66",
+            "trades": "FIL 3x (2L 1W), HYPER, KAS, BCH — all atr_sl_hit",
+            "regime": "EXTREME 3x, HIGH 2x, NORMAL 1x",
+            "root_cause": "pump-chain+ fires on volume pumps but in NEUTRAL market, pump momentum fizzles. Entry after volume spike → price retraces → SL hit. FIL dominated with 5 appearances in 24h (3L 1W).",
+            "entry_check": "All entered after volume pump detected. ATR_SL hit 100% of losers (avg -4.3%). Average hold 1-4h — entries were correct timing but market didn't follow through.",
+            "recommended_change": "Monitor stale filter deployed at 16:34 UTC. If 48h data shows no improvement, reduce pump-chain+ confidence in NORMAL from 1.0x to 0.7x (volatility gate).",
+            "confidence": "MEDIUM"
+        },
+        {
+            "cluster": "pullback-entry- SHORT — 5T/24h losses",
+            "trades": "NEO -$0.22 (rr_engine_resistance), LDO -$0.15 (atr_sl), ONDO -$0.13 (atr_sl), ENS -$0.15 (atr_sl), ENA -$0.20 (atr_sl)",
+            "regime": "HIGH 3x, NORMAL 2x",
+            "root_cause": "NORMAL regime SHORT entering during bounces. SHORT_NORMAL_PENALTY=0.85 working (was -$2.73/7d, now -$0.07/24h). HIGH regime entries hitting SL on bounces.",
+            "recommended_change": "No change — SHORT_NORMAL_PENALTY fix working. Monitor 48h.",
+            "confidence": "HIGH"
+        },
+        {
+            "cluster": "rr-struct-v2+ LONG — 2T/24h -$0.26",
+            "trades": "SYRUP -$0.19 NORMAL atr_sl, GMT -$0.07 HIGH atr_sl",
+            "regime": "NORMAL, HIGH",
+            "root_cause": "Small sample (2T). Both atr_sl_hit. STAR signal at 73.3% WR 7d — normal variance.",
+            "recommended_change": "No change — monitor at 15T kill threshold.",
+            "confidence": "HIGH"
+        }
+    ],
     "drift_findings": [
         {
-            "topic": "pump-chain+ LONG NORMAL regime",
-            "finding": "3T/7d 0%WR -$0.44 in NORMAL. Small sample but consistent drag. All losses = atr_sl_hit.",
-            "in_code": "Yes — volatility gate mult=1.0 for NORMAL (no penalty)",
-            "impact": "$0.44/7d drag",
-            "recommendation": "Monitor — sample too small (3T) for config change"
+            "topic": "LONG bleeding in ALL regimes",
+            "finding": "LONG 157T/7d 47.8%WR -$1.63. SHORT 164T/7d 58.5%WR +$2.19. The LONG/SHORT split is dramatic — LONG is structural drag.",
+            "in_code": "LONG_NEUTRAL_BLOCK exists but NORMAL LONG still bleeds",
+            "impact": "$1.63/7d drag from LONG side",
+            "recommendation": "LONG_NEUTRAL_BLOCK is correct. Consider extending to NORMAL if data supports — but need 50+ trades for regime-level change."
         },
         {
-            "topic": "rr-struct- HIGH regime",
-            "finding": "4T/7d 25%WR -$0.41 in HIGH. Already has 0.3x volatility penalty.",
-            "in_code": "Yes — VOL_PHASE_MULTS High 0.3x active",
-            "impact": "$0.41/7d drag",
-            "recommendation": "Already penalized. Kill at 15T if WR <50%"
+            "topic": "rr_engine_resistance SHORT fix — zero data",
+            "finding": "Fix deployed ~06:45 UTC. Zero rr_engine_resistance exits since deployment. Need more data.",
+            "in_code": "Yes — candle CLOSE check deployed",
+            "impact": "Cannot evaluate yet",
+            "recommendation": "Monitor 48h until Sep 15 ~06:45"
         },
         {
-            "topic": "Signal metadata NULL",
-            "finding": "330+ trades missing entry_rsi_14/signal_z_score in individual columns. Data exists in _signal_metadata JSON.",
-            "in_code": "Partial — _signal_metadata populated but individual columns not",
-            "impact": "Blocks entry condition analysis",
-            "recommendation": "Low priority — JSON column has the data"
+            "topic": "SHORT_RSI_CEILING=65 blocking trades",
+            "finding": "Working — blocked ADA SHORT at RSI 68. No false positives yet.",
+            "in_code": "Yes — active in signal_compactor.py",
+            "impact": "Prevents momentum trap SHORT entries",
+            "recommendation": "Monitor for false positives"
         }
     ],
     "recurring_problems": [
         {
             "topic": "pump-chain+ LONG performance",
-            "frequency": "10+ runs",
-            "status": "Stale filter deployed 16:34 UTC — needs 24h data",
-            "recommendation": "Monitor stale filter impact"
+            "frequency": "10+ runs across Sep 10-14",
+            "status": "Stale filter deployed 16:34 UTC — needs 24h data. 7d: 24T 37.5%WR -$0.56.",
+            "root_cause": "Signal enters LONG before pump confirms. In NEUTRAL market, pumps fizzle. All losses = atr_sl_hit.",
+            "recommendation": "Monitor stale filter 48h. If no improvement, reduce confidence in NORMAL regime."
         },
         {
-            "topic": "rr_engine_resistance SHORT exits",
-            "frequency": "15+ runs",
-            "status": "Candle CLOSE fix deployed 06:45 UTC — 4T/24h +$0.02",
-            "recommendation": "Monitor 48h — fix working"
+            "topic": "NORMAL regime worst performer",
+            "frequency": "Consistent across 7d data",
+            "status": "70T/7d 44.3%WR -$2.73. SHORT in NORMAL 4T/24h -$0.07 (improving with penalty). LONG in NORMAL still bleeds.",
+            "recommendation": "SHORT_NORMAL_PENALTY=0.85 working. LONG_NORMAL_PENALTY suggested but needs backtest with 50+ trades."
+        },
+        {
+            "topic": "Signal metadata NULL",
+            "frequency": "10+ runs",
+            "status": "330+ trades missing entry_rsi_14/signal_z_score in columns. Data in _signal_metadata JSON.",
+            "recommendation": "Low priority — JSON has the data."
         }
     ],
-    "missing_implementations": [],
     "creative_improvements": [
         {
-            "date": "2026-09-14T16:50:00Z",
-            "idea": "Monitor pump-chain+ stale filter impact — 5T stale 7d = 0%WR -$0.73 blocked, 0 winners blocked",
-            "rationale": "Stale filter deployed 16:34 UTC. If fresh entries still lose at 37.5% WR, next step is confidence adjustment in EXTREME (14T 42.9%WR -$0.06). But current data too early.",
-            "expected_impact": "+$0.50-0.73/7d if stale entries were the drag",
+            "date": "2026-09-14T18:25:00Z",
+            "idea": "pump-chain+ LONG regime gate: reduce confidence 30% in NEUTRAL market",
+            "rationale": "pump-chain+ LONG 24T/7d 37.5%WR -$0.56. ALL losses in NEUTRAL (100% of 7d trades). Signal enters on volume pump but NEUTRAL market = no follow-through. Reducing confidence in NEUTRAL would block marginal entries while preserving EXTREME/HIGH wins.",
+            "expected_impact": "+$0.30-0.50/7d if it blocks 5-8 of the 24 NEUTRAL LONG entries",
             "category": "entry sniper",
-            "status": "monitoring",
-            "risk": "low"
+            "status": "suggested",
+            "risk": "medium",
+            "impact_on_winners": "Need backtest — EXTREME/HIGH pump-chain+ wins should be preserved"
         },
         {
-            "date": "2026-09-14T16:50:00Z",
-            "idea": "pump-chain+ LONG NORMAL regime volatility gate — 3T/7d 0%WR -$0.44",
-            "rationale": "pump-chain+ fires in NORMAL with mult=1.0 but has 0% WR there. EXTREME 42.9% and HIGH 42.9% are slightly better. However, 3T sample is too small.",
-            "expected_impact": "+$0.44/7d if blocked in NORMAL (3T only)",
-            "category": "volatility gate",
-            "status": "needs_more_data",
+            "date": "2026-09-14T18:25:00Z",
+            "idea": "SHORT in NORMAL regime: increase SHORT_NORMAL_PENALTY from 0.85 to 0.80",
+            "rationale": "SHORT in NORMAL 4T/24h -$0.07 (was -$2.73/7d). Penalty working but still slightly negative. 0.80 = 20% confidence penalty vs current 15%. Conservative step.",
+            "expected_impact": "+$0.10-0.20/7d",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Monitor — may block 1-2 marginal SHORT winners in NORMAL"
+        },
+        {
+            "date": "2026-09-14T18:25:00Z",
+            "idea": "rr-struct- STANDALONE_BYPASS: add to bypass list",
+            "rationale": "rr-struct- 7T/7d 42.9%WR -$0.42 but 3/7 trades are winners (LDO +$0.06, AIXBT +$0.05, MNT +$0.12). Losses cluster in HIGH regime (3/4 losers in HIGH). Adding to STANDALONE_BYPASS would let it fire more confidently when conditions align.",
+            "expected_impact": "+$0.10-0.20/7d (marginal)",
+            "category": "entry sniper",
+            "status": "needs backtest",
             "risk": "medium",
-            "blocking_reason": "Sample 3T — insufficient for config change. Monitor 48h."
+            "impact_on_winners": "Need backtest — sample too small (7T)"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "Monitor rr_engine_resistance fix (48h until Sep 15 06:45 UTC)",
-        "Monitor SHORT_NORMAL_PENALTY=0.85 (48h until Sep 15 05:30 UTC)",
-        "Monitor pump-chain+ stale filter (24h until Sep 15 16:34 UTC)",
-        "Monitor rr-struct- at kill threshold (7T/15T, WR 42.9%)",
-        "Monitor trend_ignition (0 trades since Sep 13, 72h until Sep 16)",
-        "Monitor SHORT_RSI_CEILING=65 (blocking ADA SHORT at RSI 68 — working)"
+        {
+            "action": "Monitor pump-chain+ stale filter impact",
+            "deadline": "2026-09-15 16:34 UTC",
+            "priority": "HIGH"
+        },
+        {
+            "action": "Monitor rr_engine_resistance fix (candle CLOSE check)",
+            "deadline": "2026-09-15 06:45 UTC",
+            "priority": "HIGH"
+        },
+        {
+            "action": "Monitor SHORT_NORMAL_PENALTY=0.85",
+            "deadline": "2026-09-15 05:30 UTC",
+            "priority": "MEDIUM"
+        },
+        {
+            "action": "Monitor rr-struct- at 15T kill threshold (currently 7T)",
+            "deadline": "2026-09-16",
+            "priority": "MEDIUM"
+        },
+        {
+            "action": "Monitor trend_ignition — 0 trades since Sep 13",
+            "deadline": "2026-09-16",
+            "priority": "LOW"
+        },
+        {
+            "action": "Evaluate pump-chain+ LONG regime gate if stale filter doesn't help",
+            "deadline": "2026-09-16",
+            "priority": "MEDIUM"
+        }
     ]
 }
