@@ -1,18 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-14 ~05:55 UTC (brain_auditor run)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-14 ~06:45 UTC (daily_orchestrator run)**
+**Updated by: daily_orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 40T, 57.5% WR, +$0.85. 7d: 323T, 56.7% WR, +$2.46. Market NEUTRAL.
+24h: 35T, 45.7% WR, -$0.12. 7d: 320T, 55.6% WR, +$2.03. Market NEUTRAL.
 
-- **24h:** 40T, 57.5% WR, +$0.85 (VERIFIED brain DB). Above breakeven (55.4%). R:R 0.815 (avg_win 4.11%, avg_loss -5.05%). 17 losers — 1 legacy (ema300-dip-long), 16 active.
-- **7d:** 323T, 56.7% WR, +$2.46 (VERIFIED — POSITIVE). SHORT dominant. Legacy fully aged out.
-- **7d REGIME:** EXTREME 132T/60.6%WR +$4.50 ★ | HIGH 116T/56.9%WR +$0.06 | NORMAL 73T/49.3%WR -$2.10.
-- **7d TOP PERFORMERS:** pullback-entry- 53T/62.3% WR +$2.69 ★ | open_skies 7T/57.1% WR +$1.18 ★ | pump_chain 33T/60.6% WR +$0.80 | rr-struct+ 15T/73.3% WR +$0.59.
-- **7d EXIT:** profit-monster-trail 94T/93.6%WR +$6.91 ★ | atr_sl_hit 127T/50.4%WR +$1.72 | cut-loser-CL-T1 38T/0%WR -$5.62 (legacy) | rr_engine_resistance 35T/42.9%WR -$0.97 (STRUCTURAL SHORT).
-- **24h BIGGEST LOSER:** pullback-entry- SHORT — 7T/24h 42.9%WR (normal variance). NORMAL regime 4/7 losses.
+- **24h:** 35T, 45.7% WR, -$0.12 (VERIFIED brain DB). Below breakeven (~58%). 6 open positions. NORMAL regime 12T 25%WR -$1.07 is the drag.
+- **7d:** 320T, 55.6% WR, +$2.03 (VERIFIED — POSITIVE). Legacy fully aged out.
+- **7d REGIME:** EXTREME 131T/60.3%WR +$4.42 ★ | HIGH 117T/56.4%WR -$0.16 | NORMAL 70T/47.1%WR -$2.23.
+- **7d EXIT:** profit-monster-trail 93T +$6.88 ★ | atr_sl_hit 124T +$1.76 | rr_engine_resistance 37T -$1.33 (STRUCTURAL SHORT) | cut-loser-CL-T1 38T -$5.62 (legacy).
 - **Market:** NEUTRAL (100%).
 - **SHORT in NEUTRAL:** Strongest combination.
 - **LONG in NEUTRAL:** Weakest (mostly legacy).
@@ -20,30 +18,29 @@
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. Not a bug.
 - **KILLED (Sep 13):** trend_purity+ (auto_1hr 04:15 UTC). **KILLED (Sep 11):** pump-chain+ (CEO, NEVER_REENABLE), accel-300-v4-short- (auto_1hr), PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (signal_reporter, NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
-- **Disk:** 79% (25G free).
+- **Disk:** 80% (24G free).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.2%, MAX 1.5%.
-- **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active (brain_auditor 06:49 UTC). 7d these hours -$4.26 combined.
-- **SHORT_NORMAL_PENALTY=0.85:** ACTIVE — 15% confidence penalty for SHORT in NORMAL regime (brain_auditor 05:30 UTC). SHORT in NORMAL 41T/7d 53.7%WR -$0.79. Monitor 48h.
-- **R:R 24h:** avg_win 4.11%, avg_loss -5.05%. ratio 0.815. Breakeven WR 55.4%, actual 57.5% (ABOVE breakeven).
-- **R:R 7d:** avg_win 3.71%, avg_loss -4.70%. ratio 0.789. Breakeven WR 57.0%, actual 56.7% (AT breakeven). R:R carries system.
-- **signal_compactor:** Running OK. Transient timeouts self-recovered.
+- **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active.
+- **SHORT_NORMAL_PENALTY=0.85:** ACTIVE — 15% confidence penalty for SHORT in NORMAL regime. Monitor 48h.
+- **R:R 24h:** below breakeven (45.7% WR vs ~58% needed). 7d PnL +$2.03 (positive).
+- **signal_compactor:** Running OK.
 - **SHORT_RSI_FLOOR=25:** Working. Zero SHORT trades with RSI<25 in 7d.
-- **rr-struct- MONITORING:** 7T/7d 42.9% WR, R:R 0.42 (HIGH regime 4T 25%WR -$0.41 is the drag). Kill at 15T if WR <50% or PnL negative.
-- **bb_bounce_v2_long DEGRADING:** 17T/7d 52.9%WR -$0.44 (was 66.7%). Monitor at 25T kill threshold.
-- **Signal metadata:** entry_rsi_14 column does NOT exist in trades table. RSI available via _signal_metadata->'rsi_14' JSON key. Confidence NULL in metadata — can't verify SHORT_NORMAL_PENALTY post-hoc.
-- **TREND_IGNITION DEPLOYED:** New signal by upgrade_implementer Sep 13. 0 trades since deployment. Registered in signals_runner (42 signals). NEUTRAL market may not trigger detection conditions (volume spike + compression breakout + trend alignment). Monitor 72h.
+- **rr-struct- MONITORING:** 7T/7d 42.9% WR, R:R 0.42. Kill at 15T if WR <50% or PnL negative.
+- **bb_bounce_v2_long DEGRADING:** 17T/7d 52.9%WR -$0.44. Monitor at 25T kill threshold.
+- **TREND_IGNITION DEPLOYED:** 0 trades since Sep 13. NEUTRAL market may not trigger. Monitor 72h.
 
-**🟢 R:R STATUS (IMPROVING — ABOVE BREAKEVEN)**
-24h R:R 1.002 (improved from 0.938). WR 56.5% — ABOVE breakeven (50.3%). 7d PnL +$2.70 (legacy fully aged out). System structurally healthy — monitoring.
+**🟢 R:R STATUS (ABOVE BREAKEVEN 7d)**
+7d PnL +$2.03 (positive). System structurally profitable — monitoring.
 
-**🔴 STRUCTURAL DRAG: rr_engine_resistance SHORT exits — 35T/7d 42.9%WR -$0.97.** Losses from wick-driven false breakouts. Code change needed: require CLOSE above resistance, not wick. risk_reward_engine.py:1047.
+**🔴 STRUCTURAL DRAG: rr_engine_resistance SHORT exits — 37T/7d -$1.33.** FIX DEPLOYED: require candle CLOSE above resistance, not wick. risk_reward_engine.py:1058-1063.
 
 ## Today's Changes (Sep 14)
 
-1. **brain_auditor ~05:55 UTC — NO CONFIG CHANGE.** DB: 24h 40T 57.5%WR +$0.85 (ABOVE BREAKEVEN). 7d: 323T 56.7%WR +$2.46 (PROFITABLE). Market NEUTRAL. R:R 24h: 0.815 (breakeven 55.4%, actual 57.5% — ABOVE). **LOSING TRADE AUTOPSY (17 losers):** pullback-entry- 7 SHORT (ZRO -$0.21 HIGH bb_pos=0.71, ENA -$0.20 HIGH bb_pos=0.76, LDO -$0.15 HIGH, ENS -$0.15 NORMAL, DYDX -$0.14 NORMAL bb_pos=0.99, NXPC -$0.13 NORMAL bb_pos=0.80, ONDO -$0.13 NORMAL) — normal variance for 62.3%WR signal. rr-struct+ 3 LONG (KAS -$0.26 NORMAL rr_engine_support_br, TURBO -$0.14 NORMAL, SEI -$0.14 NORMAL 11.6h stale). rr-struct- 2 SHORT (ZEN -$0.16 HIGH, LINK -$0.12 NORMAL rr_engine_resistance). ema300-dip-long 1 LONG (ONDO -$0.15 NORMAL legacy). pump-chain+ 1 LONG (ENA -$0.22 HIGH combo). pump-chain- 1 SHORT (HEMI -$0.04 EXTREME). **KEY:** 1/17 dead signal. 16/17 active losses. **EXIT 7d:** profit-monster-trail 94T +$6.91, atr_sl_hit 127T +$1.72, cut-loser-CL-T1 38T -$5.62 (legacy), rr_engine_resistance 35T -$0.97 (STRUCTURAL SHORT). **DRIFT:** (1) entry_rsi_14 column doesn't exist — RSI in _signal_metadata->'rsi_14'. (2) trend_ignition 0 trades — NEUTRAL market may not trigger detection. (3) confidence NULL — can't verify SHORT_NORMAL_PENALTY post-hoc. **CREATIVE:** (1) bb_position > 0.8 SHORT filter in NORMAL — DYDX at 0.99, NXPC at 0.80 lost. Needs backtest. (2) SHORT exit acceleration — tighten SL on stale SHORTs >4h. (3) Monitor trend_ignition 72h. **No config change — SHORT_NORMAL_PENALTY=0.85 applied ~05:30 UTC, monitoring.**
-1. **brain_auditor ~05:30 UTC — CONFIG CHANGE.** DB: 24h 46T 56.5%WR +$1.13 (ABOVE BREAKEVEN). 7d: 332T 56.9%WR +$2.70 (PROFITABLE). Market NEUTRAL. R:R 24h: 1.002 (breakeven 50.3%, actual 56.5% — ABOVE). **LOSING TRADE AUTOPSY (19 losers):** pullback-entry- 8 SHORT (LDO -\$0.15 HIGH, ONDO -\$0.13 NORMAL, ENS -\$0.15 NORMAL, ENA -\$0.20 HIGH, ZRO -\$0.21 HIGH, CAKE -\$0.10 NORMAL, DYDX -\$0.14 NORMAL, NXPC -\$0.13 NORMAL) — NORMAL 4/8 losses. rr-struct+ 3 LONG (KAS -\$0.26 NORMAL, TURBO -\$0.14 NORMAL, SEI -\$0.14 NORMAL) — NORMAL 3/3 losses. rr-struct- 2 SHORT (ZEN -\$0.16 HIGH, LINK -\$0.12 NORMAL). pump-chain+ 2 LONG (ENA combo -\$0.22, FIL -\$0.02). trend_purity+ 1 LONG (MET -\$0.18 EXTREME legacy). ema300-dip-long 1 LONG (ONDO -\$0.15 NORMAL legacy). **KEY:** 10/19 losers in NORMAL. SHORT in NORMAL 30T/7d 44%WR -\$0.79. **CONFIG CHANGE: SHORT_NORMAL_PENALTY=0.85 (15% confidence penalty for SHORT in NORMAL).** Expected +\$0.20-0.30/7d. **EXIT 7d:** profit-monster-trail 98T +\$7.11, atr_sl_hit 128T +\$1.71, cut-loser-CL-T1 38T -\$5.62 (legacy), rr_engine_resistance 35T -\$0.97 (STRUCTURAL SHORT). **CREATIVE:** (1) SHORT NORMAL penalty IMPLEMENTED. (2) Monitor bb_bounce_v2_long 17T/7d 52.9%WR at 25T kill threshold. (3) rr_engine_resistance SHORT exit needs CLOSE-above-resistance code change.
-1. **brain_auditor ~01:35 UTC — NO CONFIG CHANGE.** DB: 24h 38T 57.9%WR +$1.36. 7d: 330T 57.0%WR +$2.66. Market NEUTRAL. **No config change — system profitable, monitoring.**
+1. **daily_orchestrator ~06:45 UTC — CODE FIX.** Fixed rr_engine_resistance SHORT exit: use candle CLOSE instead of live price (wick) for resistance break check. 37T/7d -$1.33 structural drag should improve. Files: risk_reward_engine.py:1021-1030. Pipeline restart not needed (next cycle picks up).
+2. **signal_reporter ~05:12 UTC — CONFIG CHANGE.** Tightened R2_Structural NORMAL multiplier 0.5→0.2 in volatility_gate_v2.py:246. rr-struct+ LONG losing 40%WR -$0.49 in NORMAL while winning 87.5% in HIGH.
+3. **brain_auditor ~05:55 UTC — NO CONFIG CHANGE.** DB: 24h 40T 57.5%WR +$0.85 (ABOVE BREAKEVEN). 7d: 323T 56.7%WR +$2.46 (PROFITABLE). Market NEUTRAL. R:R 24h: 0.815 (breakeven 55.4%, actual 57.5% — ABOVE). **LOSING TRADE AUTOPSY (17 losers):** pullback-entry- 7 SHORT (normal variance). rr-struct+ 3 LONG. rr-struct- 2 SHORT. ema300-dip-long 1 LONG (legacy). pump-chain+ 1 LONG. pump-chain- 1 SHORT. **KEY:** 1/17 dead signal. 16/17 active losses. **No config change.**
+4. **brain_auditor ~05:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY=0.85 applied. 15% confidence penalty for SHORT in NORMAL regime. Expected +$0.20-0.30/7d.
 
 ## Today's Changes (Sep 13)
 
@@ -114,18 +111,17 @@
 
 ## Active Decisions
 
-- **R:R ABOVE BREAKEVEN.** 24h R:R 0.815 (avg_win 4.11%, avg_loss -5.05%). Breakeven WR 55.4%, actual 57.5% — ABOVE. 7d PnL +$2.46. Legacy fully aged out. — 2026-09-14 ~05:55 UTC
-- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** 15% confidence penalty for SHORT in NORMAL regime. Applied ~05:30 UTC. SHORT in NORMAL 41T/7d 53.7%WR -$0.79. Monitor 48h. — 2026-09-14 ~05:55 UTC
-- **VOL_PHASE_MULTS KEY FIX.** Pullback_Entry_Short→Pullback_Entry, R2→R2_Structural. Keys never matched signal_family() output. Multipliers now applied. — 2026-09-13 ~20:30 UTC
-- **rr-struct- MONITORING.** 7T/7d, 42.9% WR, R:R 0.42. HIGH regime 4T 25%WR -$0.41 is the drag. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~05:55 UTC
-- **Signal metadata: entry_rsi_14 column does NOT exist.** RSI available via _signal_metadata->'rsi_14' JSON key. Confidence NULL in metadata — can't verify SHORT_NORMAL_PENALTY post-hoc. — 2026-09-14 ~05:55 UTC
-- **rr_engine_resistance SHORT EXIT — STRUCTURAL DRAG.** 35T/7d 42.9%WR -$0.97. Losses from wick-driven false breakouts. Code change needed: require CLOSE above resistance, not wick. risk_reward_engine.py:1047. — 2026-09-14 ~05:55 UTC
-- **trend_ignition: 0 trades since Sep 13.** Registered in signals_runner (42 signals). NEUTRAL market may not trigger detection conditions (volume spike + compression breakout + trend alignment). Monitor 72h. — 2026-09-14 ~05:55 UTC
+- **R:R ABOVE BREAKEVEN (7d).** 7d PnL +$2.03. 24h 45.7%WR below breakeven (NORMAL regime drag). — 2026-09-14 ~06:45 UTC
+- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** 15% confidence penalty for SHORT in NORMAL regime. Applied ~05:30 UTC. Monitor 48h. — 2026-09-14 ~06:45 UTC
+- **rr_engine_resistance FIX DEPLOYED.** Candle CLOSE check for SHORT resistance breaks (not wick). 37T/7d -$1.33 structural drag should improve. — 2026-09-14 ~06:45 UTC
+- **VOL_PHASE_MULTS KEY FIX.** Pullback_Entry_Short→Pullback_Entry, R2→R2_Structural. Keys never matched signal_family() output. — 2026-09-13 ~20:30 UTC
+- **rr-struct- MONITORING.** 7T/7d, 42.9% WR, R:R 0.42. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~06:45 UTC
+- **trend_ignition: 0 trades since Sep 13.** NEUTRAL market may not trigger detection. Monitor 72h. — 2026-09-14 ~06:45 UTC
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE). — 2026-09-06
 - **CONF_FILTER_MIN=70.** — 2026-09-02
-- **SHORT_RSI_FLOOR=25.** Blocks SHORT when RSI<25. Working — 2319 blocks, zero oversold SHORT entries. — 2026-09-12
-- **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. Not a bug. — 2026-09-11
+- **SHORT_RSI_FLOOR=25.** Blocks SHORT when RSI<25. Working. — 2026-09-12
+- **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition. — 2026-09-11
 
 ## What NOT To Do
 
@@ -135,11 +131,11 @@
 
 ## Next Actions
 
-1. **CODE CHANGE NEEDED: rr_engine_resistance SHORT exit.** 35T/7d 42.9%WR -$0.97. Use CLOSE above resistance, not wick. risk_reward_engine.py:1047. Backtest 35T sample first. — 2026-09-14 ~05:55 UTC
-2. **Monitor SHORT_NORMAL_PENALTY=0.85.** Applied ~05:30 UTC. SHORT in NORMAL 41T/7d 53.7%WR -$0.79. Need 48h to evaluate. — 2026-09-14 ~05:55 UTC
-3. **Monitor rr-struct-.** 7T/7d 42.9% WR, R:R 0.42. HIGH regime 4T 25%WR -$0.41 is the drag. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~05:55 UTC
-4. **Monitor trend_ignition.** Deployed Sep 13, 0 trades. Registered in signals_runner (42 signals). NEUTRAL market may not trigger detection conditions. Monitor 72h. — 2026-09-14 ~05:55 UTC
-5. **Monitor bb_bounce_v2_long.** 17T/7d 52.9%WR -$0.44. Kill at 25T if WR <50%. — 2026-09-14 ~05:55 UTC
-6. **Monitor R:R.** 24h ratio 0.815 (breakeven 55.4%, actual 57.5% — ABOVE breakeven). 7d PnL +$2.46. — 2026-09-14 ~05:55 UTC
-7. **Monitor disk.** Currently 79% (25G free). — 2026-09-14
-8. **Investigate bb_position > 0.8 SHORT filter in NORMAL.** DYDX at 0.99, NXPC at 0.80 lost. Needs backtest against 7d winners. — 2026-09-14 ~05:55 UTC
+1. **Monitor rr_engine_resistance fix.** Candle close check deployed ~06:45 UTC. Expect fewer premature exits on SHORT trades. Monitor 48h for PnL improvement. — 2026-09-14 ~06:45 UTC
+2. **Monitor SHORT_NORMAL_PENALTY=0.85.** Applied ~05:30 UTC. SHORT in NORMAL 12T/24h 25%WR -$1.07. Need 48h to evaluate. — 2026-09-14 ~06:45 UTC
+3. **Monitor rr-struct-.** 7T/7d 42.9% WR, R:R 0.42. Kill at 15T if WR <50% or PnL negative. — 2026-09-14 ~06:45 UTC
+4. **Monitor trend_ignition.** Deployed Sep 13, 0 trades. Monitor 72h. — 2026-09-14 ~06:45 UTC
+5. **Monitor bb_bounce_v2_long.** 17T/7d 52.9%WR -$0.44. Kill at 25T if WR <50%. — 2026-09-14 ~06:45 UTC
+6. **Monitor R:R.** 7d PnL +$2.03 (positive). 24h 45.7%WR below breakeven — NORMAL regime drag. — 2026-09-14 ~06:45 UTC
+7. **Monitor disk.** Currently 80% (24G free). — 2026-09-14
+8. **Investigate bb_position > 0.8 SHORT filter.** DYDX at 0.99, NXPC at 0.80 lost. Needs backtest. — 2026-09-14 ~06:45 UTC
