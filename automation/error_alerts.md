@@ -460,3 +460,6 @@
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-14 09:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`

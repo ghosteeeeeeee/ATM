@@ -2636,7 +2636,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 _conn_sf = None
                 try:
@@ -2714,6 +2714,39 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _conn_rsf:
                         try:
                             _conn_rsf.close()
+                        except Exception:
+                            pass
+            # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──
+            # Opposite of RSI floor — prevents SHORTing into strength where bounce risk is low
+            # but momentum continuation risk is high. 7d: 20T RSI>=65 50%WR -$1.02.
+            if direction == 'SHORT' and SHORT_RSI_CEILING > 0:
+                _conn_rsc = None
+                try:
+                    _conn_rsc = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_rsc = _conn_rsc.cursor()
+                    _cur_rsc.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _rsc_closes = [r[0] for r in _cur_rsc.fetchall()]
+                    if len(_rsc_closes) >= 15:
+                        _rsc_deltas = [_rsc_closes[i] - _rsc_closes[i+1] for i in range(len(_rsc_closes)-1)]
+                        _rsc_gains = [d if d > 0 else 0 for d in _rsc_deltas[-14:]]
+                        _rsc_losses = [-d if d < 0 else 0 for d in _rsc_deltas[-14:]]
+                        _rsc_ag = sum(_rsc_gains) / 14
+                        _rsc_al = sum(_rsc_losses) / 14
+                        if _rsc_al > 0:
+                            _rsc_rsi = 100 - (100 / (1 + _rsc_ag / _rsc_al))
+                            if _rsc_rsi > SHORT_RSI_CEILING:
+                                log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_CEILING} (overbought)")
+                                continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    if _conn_rsc:
+                        try:
+                            _conn_rsc.close()
                         except Exception:
                             pass
             # ── Global spike filter LONG: block LONG after recent bearish 5m candle ──

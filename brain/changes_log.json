@@ -98,5 +98,16 @@
     "after": "SHORT_NORMAL_PENALTY=0.85 (15% confidence penalty for SHORT in NORMAL)",
     "rationale": "SHORT in NORMAL 30T/7d 44%WR -$0.79 — worst regime+direction combo. EXTREME 81.8%WR +$1.74, HIGH 62.5%WR +$1.04.",
     "impact": "+$0.20-0.30/7d expected from reduced false SHORT entries in flat markets"
+  },
+  {
+    "timestamp": "2026-09-14T10:34:31Z",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_CEILING=65 added — block SHORT entries when RSI > 65 (overbought)",
+    "type": "config",
+    "file": "hermes_constants.py, signal_compactor.py",
+    "before": "No SHORT RSI ceiling check",
+    "after": "SHORT_RSI_CEILING=65 in hermes_constants.py:801, check in signal_compactor.py:2719-2747",
+    "rationale": "20T/7d SHORT RSI>=65 50%WR -$1.02. Overbought SHORT = momentum continuation risk. Only 1 active-signal winner killed (LTC +$0.02 tiny).",
+    "impact": "+$0.50-1.00/7d expected from blocked overbought SHORT losers"
   }
 ]

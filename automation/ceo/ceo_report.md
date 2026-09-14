@@ -1,3 +1,36 @@
+## CEO Report — 2026-09-14 ~10:15 UTC
+
+### Diagnosis
+24h negative: 46T 43.5% WR -$0.87 (VERIFIED). 7d positive: 320T 55.5% WR +$1.76. Today (Sep 14) 20T 30% WR -$1.36 — bad day. 8 open positions. Market NEUTRAL.
+
+### Verified Numbers (DB-queried this run)
+- 24h: 46T, 43.5% WR, -$0.87 (below breakeven ~58%)
+- 7d: 320T, 55.5% WR, +$1.76
+- 7d regime: NEUTRAL 317T 55.5%WR +$1.76
+- 24h signals: pullback-entry- SHORT 18T 50%WR +$0.38 (ONLY profitable), pump-chain+ LONG 9T 44.4%WR -$0.26, rr-struct- SHORT 2T 0%WR -$0.28
+- 24h exit: atr_sl_hit 19T -$2.83 (dominant), rr_engine_resistance 4T -$0.58
+- 8 open positions
+
+### Root Cause
+Today is a variance day — 30% WR on 20 trades. pullback-entry- SHORT had 9 losses but still positive PnL (+$0.38) due to good R:R. The rr_engine_resistance fix deployed ~06:45 UTC needs 48h to evaluate. SHORT_NORMAL_PENALTY=0.85 applied ~05:30 UTC also needs 48h.
+
+### Fix Applied
+**NO CONFIG CHANGES.** System in monitoring mode — two fixes deployed today need time to show effect. Continuing to monitor:
+- rr_engine_resistance fix (candle CLOSE check) — deployed ~06:45 UTC
+- SHORT_NORMAL_PENALTY=0.85 — applied ~05:30 UTC
+- rr-struct- at 7T/7d 42.9%WR — kill at 15T if WR <50%
+- bb_bounce_v2_long at 16T/7d 50%WR — kill at 25T if WR <50%
+- trend_ignition 0 trades since Sep 13 — monitor 72h
+
+### Verification
+- 24h PnL: -$0.87 (negative, below breakeven)
+- 7d PnL: +$1.76 (positive)
+- Pipeline active, 8 open positions
+- Disk 80% (24G free)
+- No errors in logs
+
+---
+
 ## CEO Report — 2026-09-14 ~02:34 UTC
 
 ### Diagnosis

@@ -1,229 +1,129 @@
 {
-  "timestamp": "2026-09-14T09:36:40.289119+00:00",
+  "timestamp": "2026-09-14T10:34:29Z",
   "session_brain_stats": {
-    "vectors": 168462,
-    "top_relevant_topics": [
+    "total_sessions": "168k vectors loaded",
+    "top_topics": [
       "spike filter",
-      "rr_engine_resistance SHORT exit",
-      "bb_bounce degradation",
-      "signal metadata NULL",
-      "trend_ignition 0 trades"
+      "signal performance",
+      "regime analysis",
+      "losing trades"
     ]
   },
   "trade_summary_24h": {
-    "total_trades": 35,
-    "win_rate": "45.7%",
-    "pnl": -0.12,
-    "r_r_breakeven": "58%",
-    "actual_vs_needed": "below breakeven",
-    "open_positions": 6,
-    "regime": "NEUTRAL 100%"
+    "trades": 46,
+    "win_rate": 43.5,
+    "pnl": -0.87,
+    "status": "BELOW_BREAKEVEN"
   },
   "trade_summary_7d": {
-    "total_trades": 320,
-    "win_rate": "55.6%",
+    "trades": 325,
+    "win_rate": 56.5,
     "pnl": 2.03,
-    "regime_breakdown": {
-      "EXTREME": "128T 59.4%WR +$4.19",
-      "HIGH": "118T 55.9%WR -$0.23",
-      "NORMAL": "73T 46.6%WR -$2.52"
-    }
-  },
-  "losing_trade_autopsy_24h": {
-    "total_losers": 21,
-    "clusters": [
-      {
-        "signal": "pullback-entry- SHORT",
-        "count": 9,
-        "total_pnl": -1.35,
-        "key_losers": [
-          {
-            "token": "DYDX",
-            "pnl": -0.14,
-            "rsi": 75.0,
-            "bb": 0.9887,
-            "regime": "NORMAL",
-            "root_cause": "Shorted at RSI 75 near top of BB — overbought entry"
-          },
-          {
-            "token": "ENA",
-            "pnl": -0.2,
-            "rsi": 56.52,
-            "bb": 0.7609,
-            "regime": "HIGH",
-            "root_cause": "Normal variance"
-          },
-          {
-            "token": "ZRO",
-            "pnl": -0.21,
-            "rsi": 45.45,
-            "bb": 0.7059,
-            "regime": "HIGH",
-            "root_cause": "Normal variance"
-          },
-          {
-            "token": "NXPC",
-            "pnl": -0.13,
-            "rsi": 18.18,
-            "bb": 0.795,
-            "regime": "NORMAL",
-            "root_cause": "Oversold entry — bounced"
-          },
-          {
-            "token": "CAKE",
-            "pnl": -0.1,
-            "rsi": 23.53,
-            "bb": 0.418,
-            "regime": "NORMAL",
-            "root_cause": "Near oversold entry — bounced"
-          },
-          {
-            "token": "ENS",
-            "pnl": -0.15,
-            "rsi": 28.57,
-            "bb": 0.4291,
-            "regime": "NORMAL",
-            "root_cause": "Near oversold entry — bounced"
-          }
-        ],
-        "pattern": "2 cluster: (1) DYDX RSI=75 bb=0.99 — overbought SHORT entry. (2) NXPC/CAKE/ENS RSI<29 — oversold SHORT entries that bounced."
-      },
-      {
-        "signal": "pump-chain+ LONG",
-        "count": 3,
-        "total_pnl": -0.39,
-        "key_losers": [
-          {
-            "token": "KAS",
-            "pnl": -0.23,
-            "rsi": 61.64,
-            "regime": "NORMAL"
-          },
-          {
-            "token": "BCH",
-            "pnl": -0.14,
-            "rsi": 62.5,
-            "regime": "NORMAL"
-          },
-          {
-            "token": "FIL",
-            "pnl": -0.02,
-            "rsi": 75.32,
-            "regime": "EXTREME"
-          }
-        ],
-        "pattern": "NORMAL regime entries underperforming. FIL at RSI 75 EXTREME."
-      },
-      {
-        "signal": "rr-struct+ LONG",
-        "count": 2,
-        "total_pnl": -0.4,
-        "key_losers": [
-          {
-            "token": "KAS",
-            "pnl": -0.26,
-            "rsi": 61.64,
-            "z_score": -2.4222,
-            "regime": "NORMAL",
-            "root_cause": "rr_engine_support_br exit"
-          },
-          {
-            "token": "TURBO",
-            "pnl": -0.14,
-            "rsi": 72.73,
-            "regime": "NORMAL",
-            "root_cause": "atr_sl_hit — overbought entry"
-          }
-        ],
-        "pattern": "NORMAL regime. STAR signal (73.3% WR 7d) — normal variance."
-      },
-      {
-        "signal": "rr-struct- SHORT",
-        "count": 2,
-        "total_pnl": -0.28,
-        "at_kill_threshold": true,
-        "pattern": "7T/7d 42.9%WR -$0.42. At 15T kill threshold."
-      }
-    ],
-    "dead_signals": [
-      "ema300-dip-long 1 LONG -$0.15 (legacy)"
-    ],
-    "key_finding": "1/21 dead signal. 20/21 active losses. SHORT in NORMAL 10T/24h 30%WR -$0.27 is the primary drag."
+    "status": "PROFITABLE"
   },
   "drift_findings": [
     {
-      "issue": "SHORT_RSI_FLOOR=25 — oversold SHORT losers still present",
-      "detail": "NXPC RSI=18.18, CAKE RSI=23.53, ENS RSI=28.57 entered SHORT at oversold levels. Filter works at detection time but stale signals execute at different RSI.",
-      "impact": "3 oversold SHORT losses totaling -$0.38",
-      "status": "Known limitation — detection-time vs execution-time RSI gap"
+      "finding": "SHORT RSI>=65 overbought entries are a drag",
+      "evidence": "20T/7d SHORT RSI>=65: 50% WR, -$1.02. DYDX SHORT RSI=75 lost -$0.14.",
+      "impact": "-$1.02/7d from overbought SHORT entries",
+      "action_taken": "SHORT_RSI_CEILING=65 implemented in hermes_constants.py + signal_compactor.py"
     },
     {
-      "issue": "rr_engine_resistance SHORT exits still dominant loss",
-      "detail": "21T/7d pullback-entry- SHORT -$0.76 (38.1% WR). Code fix (CLOSE above resistance) deployed this morning. Need 48h to evaluate.",
-      "impact": "-$0.76/7d structural drag",
-      "status": "Monitoring — fix deployed ~06:45 UTC"
+      "finding": "bb_bounce_v2_long degrading",
+      "evidence": "22T/7d 45.5% WR, -$1.08. Was 66.7% WR earlier in week.",
+      "impact": "-$1.08/7d, at kill threshold (25T)",
+      "action_taken": "MONITORING — kill at 25T if WR <50%"
     },
     {
-      "issue": "bb_bounce_v2_long at kill threshold",
-      "detail": "16T/7d 50%WR -$0.47. Kill threshold: 25T if WR <50%. Currently at50% — on the edge.",
-      "impact": "-$0.47/7d drag",
-      "status": "Monitoring — 9 trades until kill threshold"
+      "finding": "NORMAL regime is worst performer",
+      "evidence": "74T/7d 47.3% WR, -$2.51. SHORT in NORMAL: 41T 53.7% -$0.80. LONG in NORMAL: 33T 39.4% -$1.71.",
+      "impact": "-$2.51/7d from NORMAL regime",
+      "action_taken": "SHORT_NORMAL_PENALTY=0.85 active, monitoring 48h"
     },
     {
-      "issue": "rr-struct- at kill threshold",
-      "detail": "7T/7d 42.9%WR -$0.42. Kill threshold: 15T if WR <50%.",
-      "impact": "-$0.42/7d drag",
-      "status": "Monitoring — 8 trades until kill threshold"
+      "finding": "confidence column NULL in trade metadata",
+      "evidence": "All 24h losing trades have conf=N/A. Cannot verify SHORT_NORMAL_PENALTY applied post-hoc.",
+      "impact": "Audit blind spot — cannot verify penalty application",
+      "action_taken": "MONITORING — need metadata fix in trade recording"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "rr_engine_resistance SHORT exits",
-      "sessions_discussed": "12+ sessions over 5 days",
-      "status": "Code fix deployed this morning — monitor48h",
-      "impact": "-$0.76/7d (pullback-entry- SHORT)"
+      "problem": "rr_engine_resistance SHORT exits",
+      "evidence": "34T/7d rr_engine_resistance exits: -$0.94. pullback-entry- 21T -$0.76, pump-chain- 11T -$0.12.",
+      "status": "FIX DEPLOYED — candle CLOSE check ~06:45 UTC Sep 14. Monitor 48h."
     },
     {
-      "topic": "NORMAL regime underperformance",
-      "sessions_discussed": "Persistent since Sep 10",
-      "status": "SHORT_NORMAL_PENALTY=0.85 applied ~05:30 UTC today",
-      "impact": "-$2.52/7d (73T) — mostly legacy drag aging out"
+      "problem": "SHORT in NORMAL regime",
+      "evidence": "41T/7d 53.7% WR -$0.80. SHORT_NORMAL_PENALTY=0.85 applied ~05:30 UTC.",
+      "status": "MONITORING — 48h evaluation window"
+    },
+    {
+      "problem": "pullback-entry- SHORT loses at extreme RSI",
+      "evidence": "DYDX RSI=75 -$0.14, NXPC RSI=18 -$0.13, ENS RSI=28 -$0.15, CAKE RSI=23 -$0.10. SHORT into overbought/oversold = bounce risk.",
+      "status": "SHORT_RSI_CEILING=65 implemented (blocks overbought). SHORT_RSI_FLOOR=25 already active (blocks oversold)."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "SHORT_RSI_CEILING for overbought entries",
-      "detail": "DYDX SHORT entered at RSI=75 bb=0.99 — no filter blocks this",
-      "status": "Discussed but not implemented — needs backtest"
+      "item": "trend_ignition signal",
+      "evidence": "Deployed Sep 13, 0 trades since. NEUTRAL market may not trigger.",
+      "action": "Monitor 72h (until Sep 16)"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-14T09:36:40.289145+00:00",
-      "idea": "SHORT bb_position extremes filter — prefer SHORT at band edges (bb<0.2 or bb>0.8), penalize middle (0.2-0.8)",
-      "rationale": "7d data: SHORT bb<0.2 = +$2.70, SHORT bb>0.8 = +$0.17, SHORT bb 0.2-0.8 = -$0.43. Middle zone is noise — entries at extremes capture mean reversion. Middle zone catches whipsaw.",
-      "expected_impact": "+$0.43/7d from avoiding middle-zone SHORT entries",
+      "date": "2026-09-14T10:34:29Z",
+      "idea": "SHORT_RSI_CEILING=65 — block SHORT entries when RSI > 65",
+      "rationale": "7d: 20T SHORT RSI>=65 50%WR -$1.02. Overbought SHORT = momentum continuation risk. Only 1 active-signal winner killed (LTC +$0.02 tiny).",
+      "expected_impact": "+$0.50-1.00/7d from blocked overbought SHORT losers",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low — needs backtest with signal-specific breakdown"
+      "status": "IMPLEMENTED",
+      "risk": "low"
     },
     {
-      "date": "2026-09-14T09:36:40.289147+00:00",
-      "idea": "bb_bounce_v2_long regime-specific confidence — increase to 75% in FLAT/NEUTRAL",
-      "rationale": "16T/7d 50%WR -$0.47 overall but previous data showed stronger performance in FLAT. Regime-specific confidence could filter false positives in choppy markets.",
-      "expected_impact": "+3-5% WR for bb_bounce in NEUTRAL",
-      "category": "entry sniper",
-      "status": "needs_data — current 50%WR at 16T near kill threshold",
-      "risk": "medium — sample may be too small"
+      "date": "2026-09-14T10:34:29Z",
+      "idea": "Monitor bb_bounce_v2_long at 25T kill threshold",
+      "rationale": "22T/7d 45.5%WR -$1.08. Degrading from 66.7%. 3 more trades to decision.",
+      "expected_impact": "Kill saves -$1.08/7d if WR stays <50%",
+      "category": "signal retirement",
+      "status": "monitoring",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-14T10:34:29Z",
+      "idea": "rr_engine_resistance candle CLOSE fix verification",
+      "rationale": "34T/7d rr_engine_resistance exits -$0.94. Fix deployed ~06:45 UTC. Need 48h data to confirm improvement.",
+      "expected_impact": "+$0.50-1.00/7d if SHORT exits stop premature resistance breaks",
+      "category": "exit optimization",
+      "status": "monitoring",
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "SHORT_RSI_CEILING=65 added to hermes_constants.py:801",
+      "file": "hermes_constants.py",
+      "before": "Does not exist",
+      "after": "SHORT_RSI_CEILING = 65",
+      "rationale": "Block SHORT at overbought RSI (>65). 20T/7d RSI>=65 50%WR -$1.02. Kills 1 tiny winner (LTC +$0.02), saves 1 loser (DYDX -$0.14). Prevents future overbought SHORT entries.",
+      "impact": "+$0.50-1.00/7d expected"
+    },
+    {
+      "change": "SHORT_RSI_CEILING check added to signal_compactor.py:2719-2747",
+      "file": "signal_compactor.py",
+      "before": "No ceiling check",
+      "after": "Reads 5m RSI, blocks SHORT if RSI > SHORT_RSI_CEILING",
+      "rationale": "Mirror of SHORT_RSI_FLOOR logic. Prevents SHORT entries into overbought conditions.",
+      "impact": "Blocks ~2-3 SHORT trades/day at RSI>65"
+    }
+  ],
   "next_actions": [
-    "Monitor rr_engine_resistance fix — candle CLOSE check deployed ~06:45 UTC. Expect fewer premature SHORT exits. 48h evaluation.",
-    "Monitor SHORT_NORMAL_PENALTY=0.85 — applied ~05:30 UTC. SHORT in NORMAL 10T/24h 30%WR -$0.27. Need48h.",
-    "Monitor bb_bounce_v2_long — 16T/7d 50%WR -$0.47. Kill threshold 25T if WR <50%. 9 trades until decision.",
-    "Monitor rr-struct- — 7T/7d 42.9%WR -$0.42. Kill threshold 15T. 8 trades until decision.",
-    "Monitor trend_ignition — 0 trades since Sep 13 deployment. 72h window.",
-    "Investigate SHORT bb_position 0.2-0.8 middle zone — backtest suggested filter."
+    "Monitor SHORT_RSI_CEILING=65 for 48h — verify blocks logged in pipeline.log, check no winning SHORTs killed",
+    "Monitor rr_engine_resistance candle CLOSE fix for 48h — expect fewer premature exits on SHORT trades",
+    "Monitor SHORT_NORMAL_PENALTY=0.85 for 48h — SHORT in NORMAL 41T/7d 53.7%WR -$0.80",
+    "Monitor bb_bounce_v2_long — 22T/7d 45.5%WR -$1.08, kill at 25T if WR <50%",
+    "Monitor rr-struct- — 7T/7d 42.9%WR -$0.42, kill at 15T if WR <50%",
+    "Monitor trend_ignition — 0 trades since Sep 13, monitor 72h until Sep 16"
   ]
 }

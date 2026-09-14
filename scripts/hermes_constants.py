@@ -798,6 +798,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 7d: RSI<25 blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
 SHORT_RSI_FLOOR = 25
+SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
