@@ -1,3 +1,32 @@
+## CEO Report — 2026-09-14 ~02:34 UTC
+
+### Diagnosis
+System healthy and improving. 24h: 44T 54.5% WR +$0.90 (VERIFIED). 7d: 334T 56.9% WR +$2.62 (VERIFIED POSITIVE, doubled from +$1.21). R:R 1.035 (breakeven 50.3%, actual 54.5% — 4.2% above). Legacy signals aging out — ema300_dip_short and sma20_dip last closed Sep 8, will drop off 7d window by Sep 15. Active signals ALL profitable. No config changes needed.
+
+### Verified Numbers (DB-queried this run)
+- 24h: 44T, 54.5% WR, +$0.90 (R:R 1.035, breakeven WR 50.3%)
+- 7d: 334T, 56.9% WR, +$2.62
+- 7d regime: NEUTRAL 324T 57.7%WR +$3.00 (100% market)
+- 7d exit: profit-monster-trail 100T +$7.18, cut-loser-CL-T1 40T -$5.89 (legacy), rr_engine_resistance 35T -$0.97
+- 7d top: pullback-entry- 53T +$2.69, open_skies 8T +$1.20, pump_chain 38T +$1.05
+- 2 open: ENA LONG pump-chain+, DOT LONG pump-chain+ (just opened)
+
+### Root Cause
+No active root cause — system is profitable. Legacy drag (-$4.11/7d combined from 6 dead signals) is aging out naturally. Structural drag from rr_engine_resistance SHORT exits (-$0.97/7d) persists but improved from -$1.34.
+
+### Fix Applied
+No config changes. Updated CURRENT.md Active Decisions and Next Actions with verified numbers. Legacy signals will age out of 7d window by Sep 15-20.
+
+### Verification
+- 24h PnL: +$0.90 (positive, above breakeven)
+- 7d PnL: +$2.62 (positive, doubled from last report)
+- R:R: 1.035 (above breakeven)
+- All 5 active signals profitable 7d
+- Pipeline active, compactor running, disk 79%
+- rr-struct- at 7T/7d (monitoring at 15T kill threshold)
+
+---
+
 ## CEO Report — 2026-09-13 ~18:35 UTC
 
 ### Diagnosis
