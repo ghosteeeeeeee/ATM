@@ -1018,9 +1018,20 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
         vol_width = result.get('vol_width', {})
         regime = vol_width.get('atr_regime', 'NORMAL')
 
+        # Fetch latest candle close for SHORT resistance break check
+        # ponytail: one extra query per evaluation, avoids wick-driven false breakouts
+        candle_close = current_price
+        if direction == 'SHORT':
+            try:
+                _candles = _get_candles_5m(token, limit=1)
+                if _candles:
+                    candle_close = _candles[-1]['close']
+            except Exception:
+                pass
+
         # Rule 1: SL at structural break (PRIMARY EXIT)
         # LONG → exit when price breaks BELOW support (structural floor broken)
-        # SHORT → exit when price breaks ABOVE resistance (structural ceiling broken)
+        # SHORT → exit when candle CLOSE breaks ABOVE resistance (wick-only = hold)
         # KEY: Hold until the level BREAKS, not just touches it.
         # Don't exit if resistance is too close to entry (within 0.5%) — that's just noise.
         break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
@@ -1044,11 +1055,12 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches})',
                         'new_sl': None,
                     }
-                if direction == 'SHORT' and current_price > level_price * (1 + break_buffer):
+                # SHORT: use candle_close (not wick) to avoid false breakouts
+                if direction == 'SHORT' and candle_close > level_price * (1 + break_buffer):
                     return {
                         'action': 'CUT_LOSS',
                         'price': current_price,
-                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches})',
+                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches}, close={candle_close:.4f})',
                         'new_sl': None,
                     }
 
