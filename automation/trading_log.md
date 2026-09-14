@@ -1,3 +1,43 @@
+## [2026-09-14 03:45 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L -$0.21)
+- ACE pump-chain+ LONG SNIPER-L3-BEARISH: -$0.12
+- CAKE pump-chain+ LONG SNIPER-L3-BEARISH: -$0.09
+- HYPER pump-chain+ LONG SNIPER-L3-BEARISH: $0.00
+
+**24h:** 48T 54.2%WR +$1.10 | 5 open
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 26T +$0.72 (54%, avg +$0.028 — profitable)
+- profit-monster-trail: 7T +$0.51 (15%, avg +$0.073)
+- SNIPER-L3-BEARISH: 6T -$0.27 (13%, avg -$0.045 — protective exit)
+- rr_engine_resistance: 5T +$0.25 (10%, avg +$0.050)
+- rr_engine_support_br: 2T -$0.22 (4%, avg -$0.110)
+- SNIPER-L1-BEARISH: 1T +$0.11
+
+**24h by Signal:**
+- pullback-entry-: 17T 53%WR +$0.68 (best)
+- rr-struct+: 9T 67%WR +$0.52
+- pump-chain+: 12T 58%WR +$0.23
+- pump-chain-: 3T 67%WR +$0.24
+- rr-struct-: 2T 0%WR -$0.28
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: No signal has 0%WR with 3+ trades in last hour — no trigger
+- pump-chain+ LONG had 3 SNIPER exits but sniper is working as designed (protective closes during bearish shift). Tiny losses ($0.00-$0.12), system still +$1.10/24h
+- Trade freq: 3T/hr, 5 open — healthy
+- atr_sl_hit 38.2% of 7d (below 40% threshold), profitable (+$1.71/7d)
+- trend_purity+ 11T/7d 36%WR -$0.90 — at 15T kill threshold, monitoring
+- rr-struct- 7T/7d 43%WR -$0.42 — well below 15T kill threshold
+- 7d regime: EXTREME 135T 61%WR +$4.69 (strongest), NORMAL 74T 49%WR -$2.22 (weakest)
+- 5 open trades: 3 EXTREME, 2 NORMAL
+
+**Open Questions:**
+- SNIPER-L3-BEARISH exits are new (first seen today 02:57 UTC) —6 total, all pump-chain+ LONG, -$0.27. Working as designed but monitoring if it becomes a pattern
+- trend_purity+ at 11T/7d approaching 15T kill threshold — no trades in last hour
+
 ## [2026-09-14 02:08 UTC] Hourly Analysis
 
 **Trades:** 3 closed (1W 2L -$0.83)
