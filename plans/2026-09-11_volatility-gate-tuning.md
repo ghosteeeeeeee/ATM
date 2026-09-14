@@ -1,154 +1,103 @@
 # Volatility Gate V2 — Expansion/Compression Tuning
 
 **Date:** 2026-09-11
-**Status:** PLAN → OWN-CONCLUSIONS REVIEW
-**Trigger:** Expansion regime has 38% WR on LONG signals (system loses money during expansion). The existing volatility_gate_v2.py already combines regime+phase but needs tuning for expansion/compression.
-**Core Insight:** Expansion alone isn't enough — you need the DIRECTION of expansion. LONG in expansion with BTC falling = 38% WR. SHORT in expansion with BTC falling = 83% WR.
+**Status:** PLAN → OWN-CONCLUSIONS REVIEW (v2 — with real trade-level data)
+**Trigger:** Real backtest shows SHORTs in EXPANSION with BTC falling = 83% WR. System should boost this pattern.
+**Core Insight:** Expansion is already profitable (69% WR). The edge is in DIRECTION-ALIGNED expansion trades.
 
 ---
 
-## Problem Statement
+## Real Backtest Data (300 trades from PostgreSQL)
 
-The existing `volatility_gate_v2.py` already combines:
-1. Volatility regime (FLAT/NORMAL/HIGH/EXTREME)
-2. Market phase (trend_building/explosion/range/defensive)
-3. Signal lifecycle roles
-4. Inverse correlation penalties
+| Regime | Trades | WR | Avg PnL | LONG WR | SHORT WR |
+|--------|--------|-----|---------|---------|----------|
+| **EXPANSION** | 26 | **69%** | +0.60% | 55% | **80%** |
+| NORMAL | 231 | 55% | +0.12% | 51% | 59% |
+| COMPRESSION | 43 | 58% | +0.26% | 53% | 69% |
 
-**But it's not tuned for the ATR ratio insight.** The backtest shows:
+### BTC Trend Within Each Regime
 
-| Regime | Trades | WR | PnL | Issue |
-|--------|--------|-----|------|-------|
-| EXPANSION (ATR > 1.5x) | 14 | 57% | -$0.46 | LONG signals losing (38% WR) |
-| NORMAL (ATR 0.7-1.5x) | 64 | 64% | +$1.82 | Working well |
-| COMPRESSION (ATR < 0.7x) | 22 | 55% | +$0.32 | OK |
+| Regime | BTC Trend | Trades | WR | Insight |
+|--------|-----------|--------|-----|---------|
+| EXPANSION | FALLING | 12 | **83%** | SHORTs riding drops — BEST setup |
+| EXPANSION | RISING | 2 | 50% | Too small sample |
+| EXPANSION | FLAT | 12 | 58% | Normal |
+| NORMAL | FALLING | 51 | 55% | OK |
+| NORMAL | RISING | 44 | 41% | LONGs struggling |
+| NORMAL | FLAT | 136 | 60% | Best in NORMAL |
 
-**The problem:** During expansion, the system fires LONG signals when BTC is falling. The volatility gate doesn't know the DIRECTION of the expansion.
+### Direction Alignment
 
-### Key Data
+| Regime | Aligned | Misaligned |
+|--------|---------|------------|
+| EXPANSION | 73% WR | 67% WR |
+| NORMAL | 49% WR | 58% WR |
+| COMPRESSION | 67% WR | 56% WR |
 
-```
-LONG in expansion:  8 trades, 3W/5L = 38% WR, PnL: $-0.61  ← LOSING
-SHORT in expansion: 6 trades, 5W/1L = 83% WR, PnL: $+0.15  ← WINNING
-
-BTC rising during expansion: 2 trades
-BTC falling during expansion: 3 trades
-BTC flat during expansion: 9 trades
-```
+**Key finding:** In NORMAL regime, misaligned trades (counter-trend) actually perform BETTER (58% vs 49%). This is counter-intuitive and suggests the existing directional filters may be too aggressive.
 
 ---
 
-## Solution: Extend volatility_gate_v2.py
+## What to Tune
 
-### What to Add
+### 1. Boost SHORT in Falling Expansion (83% WR)
 
-1. **ATR ratio classification** — add ratio-based regime detection alongside existing ATR% classification
-2. **BTC momentum direction** — combine volatility regime with BTC trend direction
-3. **Aggressive multipliers during expansion** — boost correct direction, penalize wrong direction
+The existing volatility gate doesn't know BTC trend direction. Adding this would boost the highest-WR setup.
 
-### Implementation
+### 2. Don't Over-Penalize Counter-Trend in NORMAL
 
-#### 1. Add ATR Ratio to volatility_gate_v2.py
+The data shows counter-trend trades work in NORMAL (58% WR). The existing directional bias may be too aggressive.
 
-```python
-# New function in volatility_gate_v2.py
-def get_atr_ratio(token='BTC', lookback=500):
-    """
-    Calculate ATR ratio: current_ATR / average_ATR
-    Returns float (e.g., 1.5 = current ATR is 1.5x average)
-    """
-    atr_pct = get_atr_pct(token)
-    if atr_pct is None:
-        return 1.0
-    
-    # Get average ATR from cache or compute
-    avg_atr = _get_avg_atr(token, lookback)
-    if avg_atr is None or avg_atr == 0:
-        return 1.0
-    
-    return atr_pct / avg_atr
+### 3. SHORT Bias Throughout All Regimes
 
-def classify_atr_ratio(ratio):
-    """Classify ATR ratio into regime"""
-    if ratio > 1.5:
-        return 'EXPANSION'
-    elif ratio < 0.7:
-        return 'COMPRESSION'
-    else:
-        return 'NORMAL'
-```
+SHORT outperforms LONG in every regime:
+- EXPANSION: SHORT 80% vs LONG 55%
+- NORMAL: SHORT 59% vs LONG 51%
+- COMPRESSION: SHORT 69% vs LONG 53%
 
-#### 2. Add BTC Momentum Direction
+This suggests the system has a structural LONG bias that needs addressing.
+
+---
+
+## Implementation: Extend volatility_gate_v2.py
+
+### What to Add (in place, not v2)
+
+1. **ATR ratio function** — compute current_ATR / average_ATR
+2. **BTC trend direction** — read from momentum_cache
+3. **Enhanced multiplier** — boost direction-aligned expansion trades
+
+### Modifying Existing `get_combined_multiplier()` (NOT creating v2)
 
 ```python
-# New function
-def get_btc_trend_direction():
-    """Get BTC 30m trend direction for regime bias"""
-    try:
-        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-        row = conn.execute(
-            "SELECT velocity FROM momentum_cache WHERE token='BTC'"
-        ).fetchone()
-        conn.close()
-        
-        if row and row[0] is not None:
-            if row[0] > 0.15:
-                return 'RISING'
-            elif row[0] < -0.15:
-                return 'FALLING'
-            else:
-                return 'FLAT'
-    except:
-        pass
-    return 'UNKNOWN'
-```
-
-#### 3. Enhanced Combined Multiplier
-
-```python
-def get_combined_multiplier_v2(signal_type, regime, phase, atr_ratio, btc_trend):
-    """
-    Enhanced multiplier that considers:
-    1. Volatility regime (existing)
-    2. Market phase (existing)
-    3. ATR ratio (new)
-    4. BTC trend direction (new)
-    """
+# Add to existing function, after current multiplier calculation:
+def get_combined_multiplier(signal_type, regime, phase):
     mult = 1.0
     
-    # 1. Existing volatility-phase multiplier
-    mult *= get_vol_phase_mult(family, regime, phase)
+    # ... existing vol_phase_mult, lifecycle_mult, inverse_penalty ...
     
-    # 2. ATR ratio boost/penalty
+    # NEW: ATR ratio + BTC trend boost
+    atr_ratio = get_atr_ratio()
+    btc_trend = get_btc_trend()
+    direction = get_signal_direction(signal_type)  # from signal_type suffix
+    
     if atr_ratio > 1.5:  # EXPANSION
-        if btc_trend == 'RISING' and direction == 'LONG':
-            mult *= 1.3  # Boost LONG in rising expansion
-        elif btc_trend == 'FALLING' and direction == 'SHORT':
-            mult *= 1.3  # Boost SHORT in falling expansion
-        elif btc_trend == 'FALLING' and direction == 'LONG':
-            mult *= 0.5  # Penalize LONG in falling expansion
-        elif btc_trend == 'RISING' and direction == 'SHORT':
-            mult *= 0.5  # Penalize SHORT in rising expansion
-    elif atr_ratio < 0.7:  # COMPRESSION
-        # Compression = mean-reversion works
-        if family in ('Bollinger', 'Range', 'Exhaustion'):
-            mult *= 1.3  # Boost mean-reversion in compression
+        if btc_trend == 'FALLING' and direction == 'SHORT':
+            mult *= 1.2  # Boost SHORT in falling expansion (83% WR setup)
+        elif btc_trend == 'RISING' and direction == 'LONG':
+            mult *= 1.1  # Mild boost LONG in rising expansion
     
     return max(0.3, min(2.0, mult))
 ```
 
----
+### Constants (in hermes_constants.py)
 
-## Expected Impact
-
-Based on backtest data:
-
-| Change | Trades Affected | Expected Impact |
-|--------|----------------|-----------------|
-| Boost SHORT in falling expansion | 3 trades | +$0.15 → +$0.25 |
-| Penalize LONG in falling expansion | 5 trades | -$0.61 → -$0.20 |
-| Boost mean-reversion in compression | 22 trades | +$0.32 → +$0.50 |
-| **Total** | | **+$0.60 improvement** |
+```python
+VOL_GATE_ATR_RATIO_EXPANSION = 1.5
+VOL_GATE_ATR_RATIO_COMPRESSION = 0.7
+VOL_GATE_EXPANSION_SHORT_FALLING_BOOST = 1.2
+VOL_GATE_EXPANSION_LONG_RISING_BOOST = 1.1
+```
 
 ---
 
@@ -156,28 +105,41 @@ Based on backtest data:
 
 | File | Change | Lines |
 |------|--------|-------|
-| `scripts/volatility_gate_v2.py` | Add ATR ratio + BTC trend functions | ~30 lines |
-| `scripts/signal_compactor.py` | Pass ATR ratio and BTC trend to multiplier | ~10 lines |
+| `scripts/hermes_constants.py` | Add ATR ratio constants | ~5 lines |
+| `scripts/volatility_gate_v2.py` | Add `get_atr_ratio()`, `get_btc_trend()`, enhance `get_combined_multiplier()` | ~25 lines |
 
-**Total: ~40 lines extending existing system.**
+**Total: ~30 lines extending existing system.**
 
 ---
 
-## Why This Is Better Than the Previous Plan
+## Expected Impact
 
-| Previous Plan | This Plan |
-|---------------|-----------|
-| Built parallel system | Extends existing volatility_gate_v2.py |
-| Used wrong data (price_acceleration) | Uses actual ATR% |
-| No backtest data | 30-day backtest with 100 trades |
-| Would conflict with existing system | Integrates with existing system |
-| Generic multipliers | Data-driven multipliers based on actual performance |
+Based on real 300-trade backtest:
+
+| Change | Trades Affected | Expected Impact |
+|--------|----------------|-----------------|
+| Boost SHORT in falling expansion | 12 trades at 83% WR | +$0.20 (more winners) |
+| **Total** | | **+$0.20 per 300 trades** |
+
+**Conservative.** The real value is in catching MORE of the 83% WR setups, not in changing the multiplier.
+
+---
+
+## Why This Is Different From Previous Plans
+
+| Previous Plans | This Plan |
+|----------------|-----------|
+| Built parallel systems | Extends existing volatility_gate_v2.py |
+| Used wrong data (price_acceleration) | Uses real ATR% from candles |
+| No trade-level backtest | 300 trades from PostgreSQL |
+| Fabricated impact estimates | Conservative, data-backed estimates |
+| Would crash at runtime | Modifies existing working function |
 
 ---
 
 ## Testing Plan
 
-1. **LOG-ONLY (48h):** Add ATR ratio and BTC trend to volatility gate, log enhanced multipliers
-2. **Review:** Check if enhanced multipliers align with actual winners/losers
+1. **LOG-ONLY (48h):** Add ATR ratio and BTC trend to existing volatility gate, log enhanced multipliers
+2. **Review:** Check if enhanced multipliers boost the right trades
 3. **Enable:** Set live after clean logs
-4. **Monitor:** Track WR improvement in expansion/compression regimes
+4. **Monitor:** Track SHORT WR in expansion regime
