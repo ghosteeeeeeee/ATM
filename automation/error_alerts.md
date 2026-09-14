@@ -422,3 +422,23 @@
 
 ## Error Alerts — 2026-09-14 03:55 UTC
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-14 04:55 UTC
+- **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-14 05:24 UTC
+- **[INFO]** Pipeline: OK — running every 1m, last cycle 05:23:25, 0 errors
+- **[INFO]** Signals: 127 generated last hour (healthy flow)
+- **[INFO]** Trades: 10 closed today, 40% WR, PnL=-$0.72 (flat market)
+- **[INFO]** Open positions: 5 (NEO SHORT, JUP SHORT, BCH LONG, KAS LONG, +1)
+- **[INFO]** Regime: NEUTRAL (1 LONG: LTC, 0 SHORT, 122 neutral)
+- **[INFO]** Speed: 0% tokens >= 50th percentile (flat market, expected)
+- **[INFO]** Hotset empty — no signals survived compaction (NEUTRAL regime)
+- **[INFO]** Timers: 57 active, all firing on schedule
+- **[INFO]** Disk: 80% used (89G/118G) — 5% from 85% threshold
+- **[INFO]** Prices: 94 tokens, fresh (05:23)
+- **[INFO]** 8 failed services — all auxiliary/known (5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, session-brain-ingest)
+- **AUTO-FIX**: None needed — pipeline healthy

@@ -3910,3 +3910,35 @@ BY: auto_1hr
 **Open Questions:** None
 
 BY: auto_1hr
+
+## [2026-09-14 05:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system idle) | 24h: 54T 26W 28L +$0.08 (48.1% WR)
+**Open:** 5 (NEO SHORT, JUP SHORT, BCH LONG, KAS LONG, ACE SHORT)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 27T +$0.64 (50% of trades, avg +$0.024 — profitable)
+- SNIPER exits: 13T -$0.36 (24%, losing — mostly L2/L3-BULLISH on SHORTs)
+- profit-monster-trail: 7T +$0.51 (13%, best)
+- rr_engine_resistance: 5T +$0.25 (9%)
+- Other: 2T +$0.04
+
+**Key Findings:**
+1. 5 consecutive negative hours (01:00-05:00 UTC) — not alarming yet (system still above BE)
+2. SNIPER-L2/L3-BULLISH on SHORTs: 3T 0W -$0.25 — small sample, monitoring
+3. NORMAL regime drag: rr-struct+ LONG -$0.49, pullback-entry- SHORT -$0.17
+4. Breakeven WR: 47.5%, actual: 48.1% — marginally above
+
+**Changes:** None — no kill triggers met (0 trades last hour = can't evaluate 3+/hour threshold)
+
+**No Change Needed:**
+- Kill check: 0 trades last hour, no signal evaluable
+- Trade freq: 0T last hour, 5 open — healthy
+- System +$0.08/24h, still above breakeven
+- 5 neg hours is noise until it persists into a 6th
+
+**Open Questions:**
+- SNIPER-L2/L3-BULLISH on SHORTs losing — will escalate if sample grows to 5+T
+- NORMAL regime consistently underperforming — may need regime-specific filter
+
+BY: auto_1hr

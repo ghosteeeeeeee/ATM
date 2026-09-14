@@ -1,148 +1,135 @@
 {
-  "timestamp": "2026-09-14T03:38:12.018949+00:00",
-  "session_brain_stats": {
-    "total_vectors": 164943,
-    "queries_run": 3,
-    "top_topics": [
-      "signal performance winrate regime",
-      "new signal idea improvement",
-      "loss money bleeding losing"
+    "timestamp": "2026-09-14T05:55:00Z",
+    "agent": "brain_auditor",
+    "session_brain_stats": {
+        "total_vectors": 164943,
+        "top_topics": ["signal performance", "bb_bounce_v2_long", "spike filter", "pullback entry", "pump-chain exits"]
+    },
+    "trade_summary_24h": {
+        "trades": 40,
+        "win_rate": 57.5,
+        "pnl": 0.85,
+        "r_r_ratio": 0.815,
+        "breakeven_wr": 55.4,
+        "losers": 17,
+        "biggest_loser": "KAS rr-struct+ LONG -$0.26"
+    },
+    "trade_summary_7d": {
+        "trades": 323,
+        "win_rate": 56.7,
+        "pnl": 2.46,
+        "regime": {"EXTREME": "132T/60.6%WR/+$4.50", "HIGH": "116T/56.9%WR/+$0.06", "NORMAL": "73T/49.3%WR/-$2.10"}
+    },
+    "losing_trade_autopsy": [
+        {
+            "cluster": "pullback-entry- SHORT (7 losers, 24h)",
+            "regime_breakdown": "HIGH 3, NORMAL 4",
+            "root_cause": "Normal variance for 62.3%WR signal. HIGH regime 3/7 losers with bb_position>0.7 (entering near top of range). NORMAL 4/7 losers are regime drag.",
+            "entry_check": "bb_position range 0.22-0.99 across losers. No clean entry filter — this is normal variance.",
+            "recommended_change": "SHORT_NORMAL_PENALTY=0.85 already applied. Monitor 48h.",
+            "confidence": "MEDIUM"
+        },
+        {
+            "cluster": "rr-struct+ LONG (3 losers, 24h)",
+            "regime_breakdown": "NORMAL 3/3",
+            "root_cause": "STAR signal (73.3%WR 7d) variance. KAS -$0.26 at rr_engine_support_br (support broken), TURBO -$0.14 at atr_sl_hit (range 93.3% caught by new filter), SEI -$0.14 stale 11.6h.",
+            "entry_check": "SEI was held 11.6h — stale trade. TURBO range filter already caught similar cases. KAS support break is normal risk.",
+            "recommended_change": "No change — STAR signal, normal variance. SEI staleness is exit timing, not entry.",
+            "confidence": "HIGH"
+        },
+        {
+            "cluster": "rr-struct- SHORT (2 losers, 24h)",
+            "regime_breakdown": "HIGH 1, NORMAL 1",
+            "root_cause": "7T/7d 42.9%WR -$0.42. HIGH regime 4T/7d 25%WR -$0.41 is the drag. At 15T kill threshold.",
+            "entry_check": "ZEN SHORT -$0.16 HIGH atr_sl (1.7h hold), LINK SHORT -$0.12 NORMAL rr_engine_resistance (1.9h).",
+            "recommended_change": "Monitor. Kill at 15T if WR <50% or PnL negative.",
+            "confidence": "HIGH"
+        },
+        {
+            "cluster": "SEI LONG staleness (11.6h hold)",
+            "root_cause": "Opened Sep 12 21:01, closed Sep 13 08:40. Held through overnight, hit ATR SL. bb_position=0.1171 at entry (near support — good entry). Price moved against overnight.",
+            "recommended_change": "No actionable fix — this is normal overnight risk. PM_TRAIL captured the loss at -6.47%.",
+            "confidence": "HIGH"
+        }
+    ],
+    "drift_findings": [
+        {
+            "finding": "entry_rsi_14 column does not exist in trades table",
+            "impact": "CURRENT.md says 'entry_rsi_14 NULL for ALL recent trades' — misleading. Column doesn't exist. RSI data is in _signal_metadata JSON under key 'rsi_14'.",
+            "recommendation": "Update CURRENT.md to clarify: RSI available via _signal_metadata->'rsi_14', not a separate column."
+        },
+        {
+            "finding": "confidence is NULL in _signal_metadata for all trades",
+            "impact": "SHORT_NORMAL_PENALTY=0.85 applies at execution time but confidence not stored in trade metadata. Can't verify penalty was applied post-hoc.",
+            "recommendation": "Verify penalty works by checking pipeline.log for 'SHORT_NORMAL_PENALTY' blocks."
+        },
+        {
+            "finding": "trend_ignition registered but generates 0 signals",
+            "impact": "Deployed Sep 13, 0 trades. Pipeline.log shows 'Signal trend_ignition: 0'. Detection logic requires volume spike + compression breakout + trend alignment — NEUTRAL market may not provide these conditions.",
+            "recommendation": "Monitor 72h. If still 0 signals, investigate detection thresholds (TREND_IGNITION_EMA_PERIOD, TREND_IGNITION_BREAKOUT_PERIOD)."
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "rr_engine_resistance SHORT exits",
+            "frequency": "Mentioned in 15+ audit runs since Sep 11",
+            "impact": "35T/7d 42.9%WR -$0.97. pullback-entry- 20T/7d -$0.54 biggest contributor.",
+            "status": "CODE CHANGE NEEDED — use CLOSE above resistance, not wick. risk_reward_engine.py:1047."
+        },
+        {
+            "problem": "NORMAL regime drag",
+            "frequency": "Every audit run since Sep 10",
+            "impact": "73T/7d 49.3%WR -$2.10. SHORT_NORMAL_PENALTY=0.85 just applied.",
+            "status": "MONITORING — SHORT_NORMAL_PENALTY applied ~05:30 UTC. Need 48h to evaluate."
+        },
+        {
+            "problem": "bb_bounce_v2_long degradation",
+            "frequency": "Mentioned in 5+ runs since Sep 12",
+            "impact": "17T/7d 52.9%WR -$0.44 (was 66.7%).",
+            "status": "MONITORING — at 25T kill threshold."
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "rr_engine_resistance SHORT exit code change",
+            "impact": "Would save +$0.50-1.00/7d",
+            "status": "NEEDS CODE + BACKTEST — risk_reward_engine.py:1047"
+        },
+        {
+            "item": "trend_ignition investigation",
+            "impact": "0 trades since deployment — either market condition or detection threshold issue",
+            "status": "MONITOR 72h"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-14T05:55:00Z",
+            "idea": "bb_position > 0.8 SHORT filter in NORMAL regime",
+            "rationale": "24h SHORT losers in NORMAL have bb_position 0.42-0.99. DYDX at 0.9887 (near top of range) lost -6.29%. SHORTing near top of BB range in NORMAL (ranging market) fights the range. Would block SHORT entries when price is already extended upward.",
+            "expected_impact": "+$0.20-0.40/7d from blocked bad entries",
+            "category": "entry sniper",
+            "status": "needs backtest",
+            "risk": "low — only affects NORMAL regime SHORT entries near top of range",
+            "impact_on_winners": "Need to verify: how many winning SHORT entries in NORMAL had bb_position > 0.8?"
+        },
+        {
+            "date": "2026-09-14T05:55:00Z",
+            "idea": "SHORT exit acceleration: if SHORT held >4h and price within 0.5% of entry, tighten SL to 0.8%",
+            "rationale": "CAKE SHORT held 5.3h before rr_engine_resistance exit at -2.64%. If SHORT doesn't move in 4h, the setup failed. Tighter SL on stale SHORTs reduces avg loss from -4.94% to ~-2%.",
+            "expected_impact": "+$0.30-0.50/7d from reduced avg loss on stale SHORTs",
+            "category": "exit optimization",
+            "status": "needs backtest + code change",
+            "risk": "medium — could cut winning SHORTs that take time to play out",
+            "impact_on_winners": "Need to check: how many winning SHORTs in7d were held >4h?"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "MONITOR SHORT_NORMAL_PENALTY=0.85 — applied ~05:30 UTC, need 48h to evaluate impact on SHORT in NORMAL (41T/7d 44%WR -$0.79)",
+        "CODE CHANGE: rr_engine_resistance SHORT exit — use CLOSE above resistance, not wick. risk_reward_engine.py:1047. Backtest 35T sample first.",
+        "MONITOR rr-struct- — 7T/7d 42.9%WR -$0.42. Kill at 15T if WR <50% or PnL negative.",
+        "MONITOR trend_ignition — 0 trades since Sep 13 deployment. Check detection thresholds if still 0 at 72h.",
+        "MONITOR bb_bounce_v2_long — 17T/7d 52.9%WR -$0.44. Kill at 25T if WR <50%.",
+        "Investigate bb_position > 0.8 SHORT filter in NORMAL — needs backtest against7d winners."
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 46,
-    "wr": 56.5,
-    "pnl": 1.13,
-    "avg_win_pct": 4.94,
-    "avg_loss_pct": -4.93,
-    "rr_ratio": 1.002,
-    "breakeven_wr": 50.3,
-    "regime": "NEUTRAL"
-  },
-  "trade_summary_7d": {
-    "trades": 332,
-    "wr": 56.9,
-    "pnl": 2.7,
-    "avg_win_pct": 3.71,
-    "avg_loss_pct": -4.7,
-    "rr_ratio": 0.789,
-    "breakeven_wr": 57.0,
-    "regime_breakdown": {
-      "EXTREME": {
-        "trades": 135,
-        "wr": 61.5,
-        "pnl": 4.69
-      },
-      "HIGH": {
-        "trades": 122,
-        "wr": 57.4,
-        "pnl": 0.11
-      },
-      "NORMAL": {
-        "trades": 73,
-        "wr": 49.3,
-        "pnl": -2.1
-      }
-    }
-  },
-  "drift_findings": [
-    {
-      "topic": "Signal metadata RSI/z_score NULL",
-      "status": "DRIFT — still not recorded",
-      "impact": "Cannot analyze entry conditions for losers (RSI, z_score all N/A)",
-      "suggested_fix": "Verify _signal_metadata JSON recording in signal detectors"
-    },
-    {
-      "topic": "bb_bounce_v2_long degradation",
-      "status": "MONITORING — 17T/7d 52.9%WR (was 66.7%)",
-      "impact": "-/usr/bin/bash.44/7d drag from previously star signal",
-      "suggested_fix": "Monitor at 25T kill threshold if WR stays <55%"
-    },
-    {
-      "topic": "rr_engine_resistance SHORT exit",
-      "status": "OPEN — needs code change (require CLOSE above resistance)",
-      "impact": "-/usr/bin/bash.97/7d structural drag (35T 42.9%WR)",
-      "suggested_fix": "Code change + backtest: require candle CLOSE above resistance, not wick"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "SHORT in NORMAL regime",
-      "frequency": "Every audit for 7+ days",
-      "data": "30T/7d 44%WR -$0.79 (pullback-entry- 18T -$0.09, rr-struct- 3T -$0.01, pump-chain- 6T +$0.06, others)",
-      "action_taken": "SHORT_NORMAL_PENALTY=0.85 applied (15% confidence penalty)",
-      "expected_impact": "+$0.20-0.30/7d"
-    },
-    {
-      "topic": "Legacy signal drag aging out",
-      "frequency": "Resolved Sep 14",
-      "data": "Legacy fully aged out of 7d window. ema300_dip_short, trend_purity+, slow_grind, sma20_dip, pullback_entry+ all gone.",
-      "action_taken": "Monitor — legacy drag eliminated"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "idea": "rr_engine_resistance SHORT exit requires CLOSE above resistance",
-      "status": "NEEDS CODE CHANGE",
-      "impact": "-$0.97/7d structural drag",
-      "effort": "20 lines + backtest"
-    },
-    {
-      "idea": "bb_bounce_v2_long signal refresh/investigation",
-      "status": "NEEDS INVESTIGATION",
-      "impact": "-$0.44/7d degradation",
-      "effort": "Analysis of entry conditions vs historical"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-14T03:38:12.018949+00:00",
-      "idea": "SHORT in NORMAL regime confidence penalty (0.85x)",
-      "rationale": "SHORT signals lose in NORMAL across all signals: pullback-entry- 18T 50%WR -$0.09, rr-struct- 3T 66.7%WR -$0.01, pump-chain- 6T 50%WR +$0.06. NORMAL is flat/choppy — SHORT entries get whipsawed. EXTREME (81.8%WR +$1.74) and HIGH (62.5%WR +$1.04) are where SHORT thrives.",
-      "expected_impact": "+$0.20-0.30/7d from reduced false SHORT entries in NORMAL",
-      "category": "entry sniper",
-      "status": "IMPLEMENTED",
-      "risk": "low",
-      "impact_on_winners": "Verified: EXTREME SHORT winners unaffected (regime != NORMAL). HIGH SHORT winners unaffected. Only NORMAL SHORT entries get 15% penalty — not blocked, just harder to fire."
-    },
-    {
-      "date": "2026-09-14T03:38:12.018949+00:00",
-      "idea": "Monitor bb_bounce_v2_long at 25T kill threshold",
-      "rationale": "Was star signal (66.7%WR 7d), now 52.9%WR across all regimes. 17T sample — needs 8 more trades to evaluate. If WR stays <55% at 25T, investigate or kill.",
-      "expected_impact": "Prevent further drag if degradation continues",
-      "category": "monitoring",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-14T03:38:12.018949+00:00",
-      "idea": "rr_engine_resistance SHORT exit: require CLOSE above resistance (not wick)",
-      "rationale": "35T/7d 42.9%WR -$0.97. SHORT entries get stopped out by wick-driven false breakouts that dont hold. If we require candle CLOSE above resistance before exiting, we filter out noise.",
-      "expected_impact": "+$0.50-0.80/7d from fewer false breakouts",
-      "category": "exit optimization",
-      "status": "needs code change",
-      "risk": "medium",
-      "impact_on_winners": "Needs backtest — could delay exits on real breakouts"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "file": "hermes_constants.py",
-      "change": "Added SHORT_NORMAL_PENALTY = 0.85",
-      "rationale": "SHORT in NORMAL 30T/7d 44%WR -$0.79 — worst regime+direction combo",
-      "expected_impact": "+$0.20-0.30/7d"
-    },
-    {
-      "file": "signal_compactor.py",
-      "change": "Added short_normal_mult to _score_signal final_score calculation",
-      "rationale": "Applies 15% confidence penalty to SHORT entries when regime is NORMAL",
-      "expected_impact": "Reduces false SHORT entries in flat markets"
-    }
-  ],
-  "next_actions": [
-    "Restart pipeline to load SHORT_NORMAL_PENALTY",
-    "Monitor bb_bounce_v2_long at 25T kill threshold",
-    "Code change needed: rr_engine_resistance SHORT exit CLOSE-above-resistance",
-    "Verify signal metadata RSI/z_score recording"
-  ]
 }
