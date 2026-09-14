@@ -622,15 +622,17 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # CHoCH exemption: reversal signals are SUPPOSED to fire counter-trend
             # coin_tracker_hot exemption: uses its own momentum filters
             # mtf_zscore exemption: z-score extremes are LEADING indicators, fire at extremes
+            # pump-chain exemption: momentum signal from pump flow engine, fires on capital rotation
             _choch_exempt = signal_type and 'choch' in signal_type.lower()
             _ct_hot_exempt = signal_type and 'coin_tracker_hot' in signal_type.lower()
             _hzscore_exempt = signal_type and signal_type.lower() == 'mtf_zscore'
             _reversion_exempt = signal_type and ('inverse_accel_300' in signal_type.lower() or 'oversold_bounce' in signal_type.lower())  # mean reversion fires INTO trend
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt:
+            _pump_chain_exempt = signal_type and 'pump-chain' in signal_type.lower()  # momentum from pump flow engine
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt:
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
