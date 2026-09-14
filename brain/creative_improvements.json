@@ -461,5 +461,23 @@
     "category": "exit optimization",
     "status": "needs code change",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-14T09:39:01.491617+00:00",
+    "idea": "SHORT bb_position 0.2-0.8 middle zone filter",
+    "rationale": "7d data: SHORT bb<0.2 = +$2.70, bb>0.8 = +$0.17, bb 0.2-0.8 = -$0.43. Middle zone = noise. Entries at band edges capture mean reversion. Middle zone catches whipsaw in trending markets.",
+    "expected_impact": "+$0.43/7d from avoiding middle-zone SHORT entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — needs signal-specific backtest"
+  },
+  {
+    "date": "2026-09-14T09:39:01.491631+00:00",
+    "idea": "bb_bounce_v2_long regime-specific confidence",
+    "rationale": "16T/7d 50%WR -$0.47 overall. Previous data showed stronger performance in FLAT. Regime-specific confidence could filter false positives in choppy markets.",
+    "expected_impact": "+3-5% WR for bb_bounce in NEUTRAL",
+    "category": "entry sniper",
+    "status": "needs_data — sample near kill threshold",
+    "risk": "medium — sample may be too small"
   }
 ]

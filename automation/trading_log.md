@@ -4031,3 +4031,22 @@ BY: auto_1hr
 - 7d atr_sl_hit trending up (66.7% today vs 31% on Sep 12) — structural
 
 BY: auto_1hr
+
+## [2026-09-14 09:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.23 (KAS pump-chain+ LONG → atr_sl_hit)
+**24h:** 40T 50%WR +$0.37 | Exit: atr_sl_hit 25T 62.5% -$0.22, profit-monster-trail 6T +$0.45, rr_engine_resistance 6T -$0.20
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: rr-struct- 2T/0%WR — below 3T threshold, monitor next hour
+- pullback-entry- SHORT 17T but 13 SL hits — heavy SL concentration but net +$0.37
+- atr_sl_hit 62.5% — above 40% threshold but avg PnL -$0.009 (breakeven)
+- Trade freq 1T/hr — healthy
+- System net positive, no consecutive negative hours
+
+**Open Questions:**
+- rr-struct- approaching kill threshold (2T/0%WR) — one more loss triggers action
+- pullback-entry- SHORT: 17T/24h, 13 SL hits (76.5%) — structural issue with SL tightness for this signal type

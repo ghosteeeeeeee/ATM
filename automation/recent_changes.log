@@ -1,3 +1,11 @@
+[2026-09-14 ~09:30 UTC] brain_auditor: NO CONFIG CHANGE — two fixes deployed today need evaluation
+  24h: 35T 45.7%WR -$0.12 | 7d: 320T 55.6%WR +$2.03
+  Losers 24h: 21 total, 1 dead signal, 20 active
+  SHORT in NORMAL 10T/24h 30%WR -$0.27 — primary drag
+  Monitor: rr_engine_resistance fix (48h), SHORT_NORMAL_PENALTY (48h), bb_bounce_v2_long (kill threshold 25T), rr-struct- (kill threshold 15T)
+  Creative: SHORT bb_position 0.2-0.8 middle zone filter suggested
+  BY: brain_auditor
+
 [2026-09-14 03:45 UTC] auto_1hr: NO CHANGE — system positive, SNIPER exits working
   24h: 48T 54.2%WR +$1.10 | 5 open
   Exit: SNIPER-L3-BEARISH 6T -$0.27 (protective, all pump-chain+ LONG), atr_sl_hit 26T +$0.72
