@@ -87,5 +87,16 @@
     "after": "Keys corrected to Pullback_Entry and R2_Structural. NORMAL blocks pullback-entry (0.0), penalizes rr-struct (0.5). HIGH relaxes pullback-entry (0.7), blocks rr-struct (0.0).",
     "rationale": "Bug fix — multipliers were never applied. Pullback-entry SHORT in NORMAL: 15T 53.3%WR -$0.01. rr-struct SHORT in HIGH: 4T 25%WR -$0.41. Key mismatch prevented regime-specific filtering.",
     "impact": "~$0.18/7d from blocked NORMAL pullback-entry trades + reduced HIGH false positives. Net slightly positive."
+  },
+  {
+    "timestamp": "2026-09-14T03:38:16.560841+00:00",
+    "agent": "brain_auditor",
+    "change": "Added SHORT_NORMAL_PENALTY=0.85 + short_normal_mult in _score_signal",
+    "type": "config",
+    "file": "hermes_constants.py, signal_compactor.py",
+    "before": "No SHORT-in-NORMAL regime penalty",
+    "after": "SHORT_NORMAL_PENALTY=0.85 (15% confidence penalty for SHORT in NORMAL)",
+    "rationale": "SHORT in NORMAL 30T/7d 44%WR -$0.79 — worst regime+direction combo. EXTREME 81.8%WR +$1.74, HIGH 62.5%WR +$1.04.",
+    "impact": "+$0.20-0.30/7d expected from reduced false SHORT entries in flat markets"
   }
 ]

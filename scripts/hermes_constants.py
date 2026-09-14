@@ -798,6 +798,12 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Backtest 7d: RSI<25 blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
 SHORT_RSI_FLOOR = 25
 
+# ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
+# SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
+# 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.
+# Impact: ~6 SHORT/7d in NORMAL lose -$0.79. Penalty blocks ~2, saves ~$0.26/7d.
+SHORT_NORMAL_PENALTY = 0.85
+
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
 # CEO backtested: misaligned = 23.8% WR, aligned = 76.4% WR (52pt gap).

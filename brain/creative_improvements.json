@@ -434,5 +434,32 @@
     "category": "entry sniper",
     "status": "suggested — needs backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-14T03:38:14.654458+00:00",
+    "idea": "SHORT in NORMAL regime confidence penalty (0.85x)",
+    "rationale": "SHORT signals lose in NORMAL across all signals. NORMAL is flat/choppy — SHORT entries get whipsawed. EXTREME (81.8%WR) and HIGH (62.5%WR) are where SHORT thrives.",
+    "expected_impact": "+$0.20-0.30/7d",
+    "category": "entry sniper",
+    "status": "IMPLEMENTED",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-14T03:38:14.654458+00:00",
+    "idea": "Monitor bb_bounce_v2_long at 25T kill threshold",
+    "rationale": "Was star signal (66.7%WR), now 52.9%WR. 17T sample — needs 8 more trades to evaluate.",
+    "expected_impact": "Prevent further drag",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-14T03:38:14.654458+00:00",
+    "idea": "rr_engine_resistance SHORT exit: require CLOSE above resistance",
+    "rationale": "35T/7d 42.9%WR -$0.97. Wick-driven false breakouts. CLOSE filter would reduce noise.",
+    "expected_impact": "+$0.50-0.80/7d",
+    "category": "exit optimization",
+    "status": "needs code change",
+    "risk": "medium"
   }
 ]

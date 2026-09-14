@@ -1606,7 +1606,15 @@ def _score_signal(token, direction, conf, source, signal_type,
                 except Exception:
                     pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult
+    # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
+    # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
+    short_normal_mult = 1.0
+    from hermes_constants import SHORT_NORMAL_PENALTY
+    if direction.upper() == 'SHORT' and regime == 'NORMAL':
+        short_normal_mult = SHORT_NORMAL_PENALTY
+        log(f"  📉 [SHORT-NORMAL] {token}: SHORT penalty {SHORT_NORMAL_PENALTY:.2f}x in NORMAL regime")
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * short_normal_mult
     return final_score
 
 
