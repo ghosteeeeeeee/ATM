@@ -47,8 +47,7 @@ CONF_SHORT_CRASH_MULT = TP_CONF_SHORT_CRASH_MULT
 DRY_RUN       = False
 
 # ── DB paths ─────────────────────────────────────────────────────────────────
-STATIC_DB = '/root/.hermes/data/signals_hermes.db'
-RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+from paths import STATIC_DB, RUNTIME_DB
 
 
 def _ema(prices: list) -> float:

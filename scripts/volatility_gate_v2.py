@@ -162,7 +162,7 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
-        'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.3x)
+        'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
 }
@@ -332,14 +332,24 @@ def get_current_phase():
 
 
 def get_vol_phase_mult(family, regime, phase):
-    """Get combined multiplier from volatility regime + market phase."""
-    # Check specific (regime, phase) combination
+    """Get combined multiplier from volatility regime + market phase.
+    
+    FIX: Check wildcard FIRST for 0.0 blocks, then specific keys for overrides.
+    This prevents blocked signals from leaking through specific (regime, phase) combos.
+    """
+    # Step 1: Check wildcard (regime, '*') for hard blocks (0.0 multipliers)
+    wildcard_key = (regime, '*')
+    if wildcard_key in VOL_PHASE_MULTS:
+        wildcard_mult = VOL_PHASE_MULTS[wildcard_key].get(family, None)
+        if wildcard_mult is not None and wildcard_mult == 0.0:
+            return 0.0  # Hard block — never overridden by specific keys
+    
+    # Step 2: Check specific (regime, phase) combination
     key = (regime, phase)
     if key in VOL_PHASE_MULTS:
         return VOL_PHASE_MULTS[key].get(family, 1.0)
     
-    # Check wildcard (regime, '*') for EXTREME
-    wildcard_key = (regime, '*')
+    # Step 3: Check wildcard (regime, '*') for non-zero multipliers
     if wildcard_key in VOL_PHASE_MULTS:
         return VOL_PHASE_MULTS[wildcard_key].get(family, 1.0)
     
