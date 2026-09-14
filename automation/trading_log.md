@@ -3833,3 +3833,40 @@ BY: auto_1hr
 - trend_purity+ at 0%WR/-$0.47 — aging out naturally, EXTREME penalty already applied Sep 12
 - rr_engine_support_br only bad exit reason at -$0.51/7d — worth monitoring
 - All 4 opens are SHORT pullback-entry- — concentration risk but signal performing well
+
+## [2026-09-14 03:00 UTC] Hourly Analysis
+
+**Trades:** 6 closed last hour (4W 2L +$0.05, 67% WR) | 24h: 47T 26W 21L +$0.84 (55.3% WR)
+**Open:** 1 (CAKE pump-chain+ LONG, just opened)
+
+**Last Hour Breakdown:**
+- pump-chain+ LONG SNIPER exits: 4T 3W 1L +$0.05 (75% WR, quick exits 11-33min)
+- pullback-entry- SHORT atr_sl_hit: 2T 0W 2L -$0.28 (LDO -$0.15, ONDO -$0.13)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 27T +$0.54 (57% of trades, avg +$0.02 — profitable)
+- profit-monster-trail: 7T +$0.51 (15%, avg +$0.073 — best)
+- rr_engine_resistance: 5T +$0.25 (11%)
+- rr_engine_support_br: 3T -$0.51 (6%, only bad exit reason)
+- SNIPER exits: 4T +$0.05 (9%)
+
+**24h by Signal:**
+- pullback-entry- SHORT: 17T +$0.68 (best)
+- rr-struct+ LONG: 9T +$0.52
+- pump-chain+ LONG: 9T +$0.44
+- pump-chain- SHORT: 3T +$0.24
+- trend_purity+ LONG: 2T -$0.47 (legacy, EXTREME penalty applied)
+
+**Changes:** None — no kill triggers met
+
+**No Change Needed:**
+- Kill check: 0 signals with 3+ trades and 0% WR last hour
+- trend_purity+ 0%WR but only 2T/24h — below 3+ threshold
+- Trade freq: 6T/hr — normal
+- System +$0.84/24h, healthy
+- pullback-entry- 2 losses last hour: noise — signal still +$0.68/24h best performer
+- SNIPER exits for pump-chain+ working as designed (bearish signal → close LONG)
+
+**Open Questions:** None
+
+BY: auto_1hr
