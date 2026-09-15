@@ -1,3 +1,40 @@
+## [2026-09-15 05:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L +$0.22)
+- ACE SHORT pump-chain- atr_sl_hit: +$0.22
+
+**24h:** 38T 43%WR -$1.12 | 5 open
+**7d:** 309T 52.8%WR -$0.38
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 36T (94.7%) avg -$0.021 — near breakeven, ATR_SL_MIN fix working
+- rr_engine_resistance: 2T avg -$0.180
+
+**24h by Signal:**
+- pump-chain-: 13T 46.2%WR -$0.04
+- rr-struct-v2+: 7T 57.1%WR -$0.16
+- pullback-entry-: 7T 42.9%WR -$0.48 (7d: 60T 60%WR +$2.21 — noise, not signal)
+- pump-chain+: 7T 28.6%WR -$0.38 (KILLED legacy, pre-kill trades flushing)
+
+**Open Positions:** 5 SHORTs (all pullback-entry-)
+- STX/DOT/HYPER: SL below entry (in-profit trailing)
+- SUSHI: SL 0.93% above entry (tight but above floor)
+- FOGO: SL 1.30% (at floor)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR + 3+ trades last hour
+- ATR_SL_MIN fix: working, avg SL exit only -$0.021
+- Trade frequency 38/24h = ~1.6/hr — healthy
+- pullback-entry- bad 24h is noise vs 7d performance
+
+**Monitoring:**
+- rr_engine_resistance: 2T 24h — still low count, needs more data
+- pump-chain+ 7d: 25T 40%WR -$0.28 — already killed
+- trend_purity+ 7d: 11T 36.4%WR -$0.90 — dormant since Sep 13
+- ema300_dip_short 7d: 11T 36.4%WR -$0.78 — dormant since Sep 8
+
 ## [2026-09-15 04:15 UTC] Hourly Analysis
 
 **Trades:** 1 closed in last hour (0W 1L -$0.25)
@@ -4688,3 +4725,46 @@ BY: auto_1hr
 - pump-chain- SHORT 24h: 12T 41.7%WR -$0.26 — below average but not kill threshold
 
 BY: auto_1hr
+
+## FAVORITES Update — 2026-09-15 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE BLUR (WR=50.0%, PnL=$-0.32, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE AIXBT (WR=44.4%, PnL=$-0.53, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE FIL (WR=50.0%, PnL=$-0.23, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE NEO (WR=40.0%, PnL=$0.29, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE DYDX (WR=50.0%, PnL=$-0.21, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE WLD (WR=50.0%, PnL=$0.09, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE KAS (WR=40.0%, PnL=$-0.43, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE PONS (WR=80.0%, AvgPnL=2.47%, Trades=5)
+- PROMOTE BANANA (WR=71.4%, AvgPnL=0.13%, Trades=7)
+
+Final set: ['ACE', 'BABY', 'BANANA', 'CC', 'CFX', 'CHIP', 'DOT', 'ETC', 'IMX', 'POL', 'PONS', 'TURBO']
+
+## LOSERS Update — 2026-09-15 06:05 UTC
+- REMOVE NXPC (insufficient data)
+- ADD AIXBT (WR=44.4%, PnL=$-0.53, negative_pnl ($-0.53))
+- ADD KAS (WR=40.0%, PnL=$-0.43, wr_collapse (66.7% → 40.0%))
+- ADD ZRO (WR=40.0%, PnL=$-0.40, wr_collapse (60.0% → 40.0%))
+- ADD NEO (WR=40.0%, PnL=$0.29, low_wr (40.0%))
+
+Final set: ['AIXBT', 'ENA', 'GRASS', 'KAS', 'NEO', 'ZRO']
+
+## [2026-09-15 06:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L +$0.10)
+- DOT SHORT pullback-entry- atr_sl_hit: +$0.10
+
+**24h:** 38T 44.1%WR -$0.88 | atr_sl_hit 37T avg -$0.018 (near breakeven)
+
+**Changes:** None — no signal meets kill criteria (0%WR + 3+ trades last hour)
+
+**No Change Needed:**
+- ATR_SL_MIN fix working: 97.4% of closes are atr_sl_hit, avg PnL near zero
+- Trade frequency 6T/6hr = 1/hr — healthy
+- 4 SHORT positions open, all near breakeven or in profit
+- No signal has 0% WR with 3+ trades in last hour
+
+**Monitoring:**
+- LONG structural drag: sma20_dip 12T 25%WR -$1.07, trend_purity+ 11T 36.4%WR -$0.90 (dormant, not actively trading)
+- rr_engine_resistance: 1T in 24h — still not validated (need more exits)
+- pump-chain+ LONG 7T 28.6%WR -$0.38 — below kill threshold but underperforming
