@@ -1,43 +1,28 @@
-# Signal Performance Report
-**Generated:** 2026-09-15 18:00 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-09-15 ~07:00 UTC (6h + 24h)
 
-## 6h Performance
+## 24h Summary
+Total: 28 trades, 50% WR, -$0.18 PnL
 
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pullback-entry- | SHORT | 8 | 75.0% | +$0.50 |
-| rr-struct-v2+ | LONG | 3 | 0.0% | -$0.29 |
+## KILLED (executed this cycle)
+None — no signals met kill criteria.
 
-## 24h Performance
+## BOOSTED (executed this cycle)
+None — pullback-entry- SHORT (57.9% WR, +$0.43) is the only 5+ trade signal; consistent but already at natural priority.
 
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pullback-entry- | SHORT | 15 | 53.3% | -$0.05 |
-| rr-struct-v2+ | LONG | 8 | 50.0% | -$0.19 |
-| pump-chain- | SHORT | 6 | 33.3% | -$0.15 |
+## LOSERS (watch list)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| rr-struct-v2+ | LONG | 0.0% | -$0.54 | 4 | ALREADY DEAD (2026-09-15) |
+| breakout-long+ | LONG | 0.0% | -$0.45 | 2 | Watch — below kill threshold (needs 5+) |
 
-## KILLS (executed)
+## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 57.9% | +$0.43 | 19 | Active — best performer |
+| pump-chain- | SHORT | 100% | +$0.35 | 2 | Insufficient sample |
 
-None. No signal meets kill criteria on 24h data.
-
-## BOOSTS (executed)
-
-None. No signal has 5+ trades AND >55% WR AND positive PnL on 24h.
-
-## WATCH LIST
-
-| Signal | Dir | 24h WR | 24h PnL | 7d Verdict | Action |
-|--------|-----|--------|---------|------------|--------|
-| rr-struct-v2+ | LONG | 50.0% | -$0.19 | Already blocked HIGH (0.0), penalized NORMAL (0.2) | Monitor — 24h loss is slippage from prior period |
-| pump-chain- | SHORT | 33.3% | -$0.15 | 60% WR EXTREME, 55% HIGH, 80% NORMAL over 7d | Monitor — 24h is variance, signal is profitable |
-| pullback-entry- | SHORT | 53.3% | -$0.05 | 69% EXTREME, 62% HIGH over 7d | No action — strong performer |
-
-## SIGNAL INVERSIONS
-
-None found.
-
-## NOTES
-
-- rr-struct-v2+ LONG: Already has regime blocks in place. 24h loss likely from trades that opened before blocks took effect. No new action needed.
-- pump-chain- SHORT: 24h loss (6 trades, 33.3% WR) is noise — 7-day data shows 60% WR in EXTREME, 55% in HIGH. Do NOT block EXTREME — it's the best regime for SHORT.
-- pullback-entry- SHORT: Small negative PnL (-$0.05) on 15 trades is negligible. Strong across all regimes.
+## ISSUES
+- No signal inversions detected.
+- breakout-long+ all-time: 5T 40% WR -$0.23 — losing in HIGH regime (4T 25% WR). EXTREME regime 1T 100% but tiny sample. If next cycle adds 3+ losing trades, kill BREAKOUT_LONG_PLUS_ENABLED.
+- Overall system slightly negative (-$0.18 on 28 trades) — mostly from rr-struct-v2+ (already dead) and breakout-long+ (watch).
