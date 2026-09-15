@@ -4803,3 +4803,33 @@ Final set: ['AIXBT', 'ENA', 'GRASS', 'KAS', 'NEO', 'ZRO']
 - LONG structural drag dormant (trend_purity+, sma20_dip not actively trading)
 
 BY: auto_1hr
+
+## [2026-09-15 08:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (2.2h since last close)
+**PnL:** $0.00
+
+**24h:** 36T 52.8%WR -$0.52 | ALL atr_sl_hit (100%) avg -$0.014/trade
+- pump-chain- SHORT: 13T 46%WR -$0.04
+- pullback-entry- SHORT: 7T 57%WR -$0.16
+- rr-struct-v2+ LONG: 7T 57%WR -$0.16
+- pump-chain+ LONG: 6T 33%WR -$0.24
+
+**Open Positions:** 5 SHORTs (all pullback-entry-)
+- HYPER +$0.36 | STX +$0.20 | SUSHI +$0.12 | FOGO +$0.04 | CHIP -$0.05
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No signal has 0% WR with 3+ trades in last hour (0 trades)
+- Trade frequency 36T/24h = 1.5/hr — healthy
+- All 5 open SHORTs in profit or near breakeven
+- ATR SL avg loss tiny (-$0.014) — system is breakeven on stops
+- 100% atr_sl_hit persists but losses are minimal
+
+**Monitoring:**
+- 100% atr_sl_hit in 24h — no TP or trail exits, just tight SLs clipping
+- pump-chain+ LONG 6T 33%WR -$0.24 — already on LOSERS watchlist
+- Open positions all SHORT, consistent with SHORT edge in recent data
+
+BY: auto_1hr
