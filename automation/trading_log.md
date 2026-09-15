@@ -4768,3 +4768,38 @@ Final set: ['AIXBT', 'ENA', 'GRASS', 'KAS', 'NEO', 'ZRO']
 - LONG structural drag: sma20_dip 12T 25%WR -$1.07, trend_purity+ 11T 36.4%WR -$0.90 (dormant, not actively trading)
 - rr_engine_resistance: 1T in 24h — still not validated (need more exits)
 - pump-chain+ LONG 7T 28.6%WR -$0.38 — below kill threshold but underperforming
+
+## [2026-09-15 07:10 UTC] Hourly Analysis
+
+**Trades:** 5 closed last 6h (3W 2L +$0.22)
+- DOT SHORT pullback-entry- atr_sl_hit: +$0.10
+- ACE SHORT pump-chain- atr_sl_hit: +$0.22
+- USUAL SHORT pullback-entry- atr_sl_hit: -$0.18
+- KAS LONG rr-struct-v2+ atr_sl_hit: -$0.25
+- BABY SHORT pump-chain- atr_sl_hit: +$0.13
+
+**24h:** 37T 48.6%WR -$0.66 | ALL atr_sl_hit (100%)
+- pump-chain- SHORT: 13T 46%WR -$0.04
+- pullback-entry- SHORT: 7T 57%WR -$0.16
+- pump-chain+ LONG: 7T 29%WR -$0.38
+- rr-struct-v2+ LONG: 7T 57%WR -$0.16
+
+**7d signals (worst):** trend_purity+ 11T 36%WR -$0.90 | ema300_dip_short 10T 30%WR -$0.80 | sma20_dip 9T 33%WR -$0.77 (all dormant)
+
+**7d signals (best):** pullback-entry- 61T 60.7%WR +$2.31 | pump-chain- 55T 60%WR +$0.62 | rr-struct+ 15T 73.3%WR +$0.59
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No signal has 0% WR with 3+ trades in last hour (0 trades closed)
+- Trade frequency 37T/24h = 1.5/hr — healthy
+- 5 SHORT positions open, SLs correctly placed (trailing stops working)
+- ATR SL losses small (avg -$0.018/trade)
+- 100% atr_sl_hit in 24h is anomaly vs 7d (67 profit-monster-trail exits) — likely NEUTRAL chop
+
+**Monitoring:**
+- 100% atr_sl_hit in 24h — no TP or trail exits. If this persists, check if targets are too ambitious
+- pump-chain+ LONG 25T 40%WR -$0.28 on 7d — already on LOSERS watchlist
+- LONG structural drag dormant (trend_purity+, sma20_dip not actively trading)
+
+BY: auto_1hr
