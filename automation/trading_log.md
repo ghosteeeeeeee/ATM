@@ -4521,3 +4521,64 @@ BY: auto_1hr
 - rr-struct- SHORT 7d: 7T 42.9%WR -$0.42 — below threshold
 
 BY: auto_1hr
+
+## [2026-09-14 23:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (7 open SHORTs)
+**24h:** 40T 47.5%WR -$0.92 | **7d:** 316T 53.8%WR +$0.30
+
+**24h exit breakdown:**
+- atr_sl_hit: 37T (92.5%) avg -$0.023 — near break-even, structural
+- rr_engine_resistance: 3T avg -$0.023
+
+**7d top winners:** pullback-entry- SHORT +$2.57, rr-struct+ LONG +$0.59, mover- SHORT +$0.53
+**7d top losers:** ema300_dip_short SHORT -$0.96, trend_purity+ LONG -$0.90, sma20_dip LONG -$0.73
+
+**Changes:** None — quiet period, no kill threshold hit
+
+**Monitoring:**
+- ema300_dip_short SHORT 7d: 13T 38.5%WR -$0.96 — approaching kill
+- LONG side structurally weak: 5 signals losing
+
+BY: auto_1hr
+
+## [2026-09-15 00:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (0W 1L)
+- ALT SHORT pullback-entry- atr_sl_hit: -$0.18
+
+**24h:** 39T 41%WR -$1.61 | **7d:** 315T 53%WR +$0.06
+
+**24h exit breakdown:**
+- atr_sl_hit: 37T (95%) avg -$0.034 — structural, near break-even
+- rr_engine_resistance: 2T avg -$0.18
+
+**7d regime:** EXTREME +$2.62 | HIGH +$0.04 | NORMAL -$2.60
+
+**7d worst signals:**
+- ema300_dip_short SHORT 12T 33.3%WR -$0.99 — monitor
+- trend_purity+ LONG 11T 36.4%WR -$0.90 — monitor
+- sma20_dip LONG 19T 42.1%WR -$0.73 — monitor
+
+**24h worst signals:**
+- pullback-entry- SHORT 11T 36.4%WR -$0.87 — bad cluster, 7d still +$2.39 top winner
+- pump-chain- SHORT 11T 36.4%WR -$0.39
+- pump-chain+ LONG 7T 28.6%WR -$0.38
+
+**Kill check:** No signal at 0%WR with 3+ trades in last hour ✓
+
+**Changes:** None — no kill trigger hit, system in quiet period
+
+**No Change Needed:**
+- No signal meets kill criteria (0% WR + 3+ trades last hour)
+- ema300_dip_short had 0 trades last hour — can't kill by rule
+- pullback-entry- SHORT 24h bad cluster but 7d top winner (61%WR +$2.39) — variance not signal death
+- Trade frequency 39/24h = ~1.6/hr — healthy
+- 6 open SHORTs slightly profitable — normal
+
+**Monitoring:**
+- ema300_dip_short SHORT 7d: 12T 33.3%WR -$0.99 — approaching kill, watch for next trades
+- NORMAL regime -$2.60/7d — SHORT_NORMAL_PENALTY active, structural
+- pullback-entry- SHORT 24h cluster — if persists into next hour, review
+
+BY: auto_1hr
