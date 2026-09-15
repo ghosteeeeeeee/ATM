@@ -1,3 +1,16 @@
+[2026-09-16 00:15 UTC] brain_auditor: NO CONFIG CHANGE — 5 items monitoring
+  24h: 28T 51.8%WR +$0.02 (FLAT) | 7d: 280T 53.9%WR +$1.83 (POSITIVE)
+  SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 132T 47.0%WR -$1.64 (legacy ages out Sep 16-20)
+  Regime: EXTREME +$2.94★ | HIGH +$0.35 | NORMAL -$0.13
+  Exit: profit-monster-trail +$3.48★ | atr_sl_hit +$2.13 | rr_engine_resistance -$1.33
+  SHORT NORMAL 7d: 35T 62.9%WR +$0.62 (profitable)
+  rr_engine_resistance: 4 exits/48h post-fix (2W/2L -$0.02). NOT VALIDATED.
+  ATR SL below-entry: 62.5% (24h). Root cause: entry timing.
+  Losers 24h: 11. 6 pullback-entry- (normal), 3 rr-struct-v2+ (legacy/killed), 2 breakout-long+ (HIGH).
+  Features NOT recorded: features_recorded=False ALL 279 trades. Critical data gap.
+  Creative: (1) Fix entry feature recording. (2) SHORT NORMAL penalty eval after monitor window.
+  BY: brain_auditor
+
 [2026-09-15 09:15 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, bb_position dead zone MONITORING
 
 [2026-09-15 13:33 UTC] brain_auditor: NO CONFIG CHANGE — 5 items monitoring, rr_engine_resistance NOT VALIDATED
@@ -1974,4 +1987,9 @@
   24h: 28T 50%WR -$0.18 | 82% atr_sl_hit | 1 trail exit
   Kill criteria NOT met: rr-struct-v2+ has 4T 0%WR but 0 trades in last hour
   Root cause: rr-struct-v2+ fires LONG in BEAR_TREND (checks atr_regime, not btc_regime)
+  BY: auto_1hr
+[2026-09-15 23:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (flat), 3 open SHORTs (SYRUP, ETH, IMX)
+  24h: 28T 50%WR +$0.04 | 82% atr_sl_hit
+  No signal meets kill criteria. breakout-long+ 2T/0%WR but below 3T threshold.
   BY: auto_1hr

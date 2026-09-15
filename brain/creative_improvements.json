@@ -698,5 +698,25 @@
     "category": "exit analysis",
     "status": "INVESTIGATE",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-16T00:15:00Z",
+    "idea": "Fix entry feature recording — features_recorded=False for all 279 trades in 7d",
+    "rationale": "Without entry_rsi_14, entry_bb_position, entry_slope_4h, we cannot verify if signal filters are working. We are flying blind on entry-condition analysis. This is the biggest data gap in the system.",
+    "expected_impact": "Enables entry-condition analysis, signal filter verification, and granular loser autopsy",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Find where features_recorded is set to False and fix it. Likely in signal_compactor.py or trade_manager.py."
+  },
+  {
+    "date": "2026-09-16T00:15:00Z",
+    "idea": "SHORT NORMAL regime is profitable — consider removing SHORT_NORMAL_PENALTY after monitor window",
+    "rationale": "SHORT NORMAL 7d: 35T 62.9%WR +$0.62. The penalty (0.85x confidence) may be filtering out marginal trades. After Sep 16 monitor window, evaluate if the penalty is still needed or if SHORT NORMAL edge is self-sustaining.",
+    "expected_impact": "If removed: more SHORT NORMAL trades. If kept: continued filtering of marginal trades.",
+    "category": "regime optimization",
+    "status": "monitoring",
+    "risk": "low",
+    "implementation": "Evaluate after Sep 16 ~05:30 when monitor window ends"
   }
 ]

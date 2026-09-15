@@ -5191,3 +5191,30 @@ BY: auto_1hr
 - Open SHORT positions — ETH and IMX watching
 
 BY: auto_1hr
+
+## [2026-09-15 23:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (flat hour). 3 open SHORTs (SYRUP, ETH, IMX — all pullback-entry-).
+**24h:** 28T 50.0% WR +$0.04 (breakeven)
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 19T 57.9%WR +$0.43 (backbone)
+- pump-chain- SHORT: 2T 100%WR +$0.35
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- rr-struct-v2+ LONG: 4T 0%WR -$0.54 (CEO KILLED 2026-09-15)
+- breakout-long+ LONG: 2T 0%WR -$0.45 (needs 3+ trades for kill review)
+
+**Exit reasons (24h):** 82% atr_sl_hit (23/28) | 2 cut-loser-MAE-GUARD | 1 hard_sl | 1 profit-monster-trail | 1 None
+
+**Changes:** None — no signal meets kill criteria (breakout-long+ only 2 trades, needs 3+)
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour, breakout-long+ at 2T total)
+- Trade frequency healthy (~1.2/hr avg)
+- ATR SL 82% — structural, normal with tpsl_utils.py deployed
+- BTC regime NEUTRAL — SHORT positions aligned
+
+**Open Questions:**
+- breakout-long+ has NO BTC regime filtering (code-level issue, fires LONG in BEAR_TREND). 2T/0%WR. Needs regime gate added in breakout_long.py — out of scope for hourly constants changes.
+
+BY: auto_1hr

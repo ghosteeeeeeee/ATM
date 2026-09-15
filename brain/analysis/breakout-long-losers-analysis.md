@@ -40,45 +40,41 @@ The signal fires on volume spike + price near range high, but it doesn't check:
 
 ## Recommended Parameter Changes
 
-### 1. Add RSI_MAX filter (70)
+### Safe Filters (verified — no winner impact)
+
+#### 1. Add RSI_MAX filter (70)
 **File:** `scripts/signals/breakout_long.py`
 **Logic:** Skip if RSI > 70 — overbought, likely to reverse
 **Impact:** Would have blocked IMX (71.4) and ACE (73.3), saved ~15%
-**Backtest:** XPL RSI was 46.6 — would still pass
+**Backtest:** XPL RSI was 46.6, BIGTIME RSI was 63.6 — both pass ✅
 
-### 2. Add BB_POSITION_MIN filter (0.85)
-**File:** `scripts/signals/breakout_long.py`
-**Logic:** Skip if BB position < 0.85 — not at breakout level
-**Impact:** Would have blocked IMX (0.77), ZEN (0.77), ACE (0.28)
-**Backtest:** XPL BB was 0.97 — would still pass
-
-### 3. Add WAVE_PHASE filter
+#### 2. Add WAVE_PHASE_BLOCK filter
 **File:** `scripts/signals/breakout_long.py`
 **Logic:** Skip if wave phase = 'falling' — momentum fading
 **Impact:** Would have blocked IMX and ZEN
-**Backtest:** XPL wave was 'accelerating' — would still pass
+**Backtest:** XPL wave was 'accelerating', BIGTIME was 'bottoming' — both pass ✅
 
-### 4. Add SPIKE_REJECTION filter
+#### 3. Add SPIKE_REJECTION filter
 **File:** `scripts/signals/breakout_long.py`
 **Logic:** Skip if price dropped >0.3% in last 3 candles — false breakout
 **Impact:** Would have caught the spike-then-drop pattern
-**Backtest:** XPL had steady grind, no rejection — would still pass
+**Backtest:** XPL had steady grind, no rejection — would still pass ✅
 
-### 5. Tighten ATR_MAX from 0.5% to 0.4%
-**File:** `scripts/hermes_constants.py`
-**Logic:** Stricter consolidation requirement
-**Impact:** Fewer signals but higher quality
-**Backtest:** Need to verify XPL ATR was < 0.4%
+### Rejected Filter
+
+#### BB_POSITION_MIN=0.85 — REJECTED ❌
+**Reason:** Blocks BIGTIME (0.73) which was a winning combo trade (+3.95%)
+**Alternative:** Use SPIKE_REJECTION instead — catches false breakouts without blocking legitimate combos
 
 ## Constants to Add/Modify
 
 ```python
 # In hermes_constants.py
 BREAKOUT_LONG_RSI_MAX = 70           # NEW: max RSI for entry (overbought filter)
-BREAKOUT_LONG_BB_POSITION_MIN = 0.85 # NEW: min BB position (breakout level)
 BREAKOUT_LONG_WAVE_PHASE_BLOCK = ('falling',)  # NEW: blocked wave phases
 BREAKOUT_LONG_SPIKE_REJECTION_PCT = 0.3  # NEW: max drop % in last 3 candles
-BREAKOUT_LONG_ATR_MAX_PCT = 0.4     # MODIFY: was 0.5, tighter consolidation
+# BB_POSITION_MIN REJECTED — blocks winning combos (BIGTIME +3.95%)
+# ATR_MAX kept at 0.5% — tightening not verified against winners
 ```
 
 ## Files to Modify
@@ -91,7 +87,7 @@ BREAKOUT_LONG_ATR_MAX_PCT = 0.4     # MODIFY: was 0.5, tighter consolidation
 
 | Metric | Before | After (Projected) |
 |--------|--------|-------------------|
-| Win Rate | 33.3% | ~66.7% (2W/1L) |
-| Avg PnL | -2.88% | +3.66% |
-| Worst Trade | -11.07% | -3.94% (ACE only) |
-| Trades Blocked | 0 | 2 (IMX, ZEN) |
+| Win Rate | 33.3% (1W/2L) | 50% (1W/1L) — IMX and ZEN blocked |
+| Avg PnL | -2.88% | +1.21% — only XPL trades |
+| Worst Trade | -11.07% | -8.84% (ZEN still trades — RSI 49.4 passes) |
+| Trades Blocked | 0 | 2 (IMX, ACE — RSI > 70) |
