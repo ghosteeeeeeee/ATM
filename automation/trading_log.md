@@ -4833,3 +4833,61 @@ BY: auto_1hr
 - Open positions all SHORT, consistent with SHORT edge in recent data
 
 BY: auto_1hr
+
+## [2026-09-15 09:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.11 (HYPER +$0.26, FOGO -$0.15) — both pullback-entry- SHORT, atr_sl_hit
+
+**24h:** 37T 50%WR -$0.18 | ALL atr_sl_hit (100%) | avg -$0.005/trade
+- pullback-entry- SHORT: 9T 56%WR -$0.05
+- pump-chain- SHORT: 13T 46%WR -$0.04
+- rr-struct-v2+ LONG: 7T 57%WR -$0.16
+- pump-chain+ LONG: 5T 40%WR -$0.01
+
+**Open Positions:** 3 SHORTs — CHIP ~BE, SUSHI ~BE, STX ~BE
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No signal has 0% WR with 3+ trades in last hour
+- Trade frequency 37T/24h = 1.5/hr — healthy
+- ATR SL avg loss tiny (-$0.005/trade) — system is breakeven
+- 3 open SHORTs all near breakeven
+
+**Monitoring:**
+- 100% atr_sl_hit persists in 24h (no TP/trail exits) — flagged by brain_auditor, structural
+- Dead signal drag -$3.97/7d — ages out Sep 16-20, no action needed
+- rr_engine_resistance exits: 37T avg -$123.99 over 7d — worst exit type
+- cut-loser-CL-T1: 21T avg -$503.69 — these are the real losers but low frequency
+
+BY: auto_1hr
+
+## [2026-09-15 10:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — CHIP SHORT atr_sl_hit -$0.34
+**Opened:** 3 new (MET SHORT, W SHORT, ATOM LONG)
+**Open positions:** 5
+
+**24h:** 34T 52.9%WR -$0.17 | avg -$0.005/trade | 100% atr_sl_hit
+- pump-chain- SHORT: 11T 54.5%WR +$0.25
+- pullback-entry- SHORT: 9T 44.4%WR -$0.40
+- rr-struct-v2+ LONG: 6T 66.7%WR -$0.09
+- pump-chain+ LONG: 5T 40.0%WR -$0.01
+
+**7d:** 291T 52.9%WR +$0.13
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No signal has 0% WR with 3+ trades in last hour
+- Trade frequency 1.4/hr — healthy
+- 100% atr_sl_hit but losses tiny (-$0.005/trade)
+- pullback-entry- SHORT underperforming but not at kill threshold
+
+**Monitoring:**
+- pullback-entry- SHORT: 9T 44.4%WR -$0.40 — weakest signal
+- 100% atr_sl_hit — structural, no TP/trail exits
+- SUSHI SHORT open 7h+ — oldest position
+
+BY: auto_1hr

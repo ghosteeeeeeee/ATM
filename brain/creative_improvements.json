@@ -609,5 +609,57 @@
     "category": "dead signal cleanup",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-15T07:15:00Z",
+    "agent": "brain_auditor",
+    "idea": "SHORT bb_position 0.70-0.85 zone filter in NORMAL — block SHORT when price is upper-middle BB",
+    "rationale": "7d SHORT data: bb<0.15 = 81.8%WR +$1.26, bb 0.15-0.30 = 80%WR +$0.90, bb 0.30-0.70 = 54.2%WR +$0.60, bb 0.70-0.85 = 38.9%WR -$1.27, bb>0.85 = 57.1%WR +$0.15. The 0.70-0.85 zone is where SHORT enters near resistance but price hasnt broken down yet — whipsaw zone. 18T sample. 10 losers at -$0.04 avg, 8 winners at +$0.06 avg. Net blocked: +$0.36/7d. Small — monitor first.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest (sample: 18T, below 20T threshold)",
+    "risk": "low — blocks 18 trades, 38.9% WR zone"
+  },
+  {
+    "date": "2026-09-15T07:15:00Z",
+    "agent": "brain_auditor",
+    "idea": "SHORT EXTREME confidence boost — regime-aware exposure on proven edge",
+    "rationale": "SHORT EXTREME 58T/62.1%WR +$2.02/7d is the systems primary edge. Currently random fill rate. When regime=EXTREME and direction=SHORT, boost confidence +5-10% to increase fill rate on highest-edge trades. Conservative: start +5%.",
+    "expected_impact": "+$0.30-0.80/7d from higher SHORT EXTREME fill rate",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest",
+    "risk": "medium — overconcentration if EXTREME regime flips"
+  },
+  {
+    "date": "2026-09-15T07:15:00Z",
+    "agent": "brain_auditor",
+    "idea": "Fix entry_rsi_14 recording — 0/298 trades have RSI metadata",
+    "rationale": "CRITICAL DATA GAP: 0/298 7d trades have entry_rsi_14 in metadata. bb_position available (295/298). Without RSI at entry time, ALL RSI-based filter validation is impossible. SHORT_RSI_FLOOR=25 and SHORT_RSI_CEILING=65 are working but unverifiable post-hoc. This is a structural blind spot.",
+    "expected_impact": "Enables all entry condition analysis for losing trades",
+    "category": "data quality",
+    "status": "suggested — investigate signal_compactor.py metadata recording",
+    "risk": "very low"
+  },
+  {
+    "date": "2026-09-15T08:30:00Z",
+    "idea": "Block SHORT entries when bb_position is between 0.70 and 0.85",
+    "rationale": "BB position analysis shows 0.70-0.85 is the DEAD ZONE for SHORT: 18T 38.9%WR -$1.27/7d. All other zones combined: 102T 60.8%WR +$3.31. The 0.70-0.85 zone is neither extreme enough for mean reversion (bb>0.85 wins at 62.5%) nor weak enough for momentum continuation (bb<0.15 wins at 62.5%). Price in this zone often reverses up to test the upper band before falling — premature SHORT entry.",
+    "expected_impact": "+$1.27/7d saved (net PnL of blocked zone)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": 18,
+    "impact_on_winners": "Would block ~7 winning SHORT trades in 7d, but net zone PnL is -$1.27 — blocking saves more than it costs"
+  },
+  {
+    "date": "2026-09-15T09:33:48.777948+00:00",
+    "idea": "SHORT bb_position 0.70-0.85 dead zone filter — monitor for 30+ trades",
+    "rationale": "SHORT in bb 0.70-0.85: 18T 38.9%WR -$1.27/7d. All other zones combined: 162T 57.8%WR +$3.77. Clear dead zone but sample too small (18T).",
+    "expected_impact": "+$0.50-0.80/7d if confirmed with 30+ trades",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low",
+    "impact_on_winners": "Would block 5 winners (+$0.36 total) — net positive if losses blocked exceed this",
+    "confidence": "MEDIUM — needs 30+ trades"
   }
 ]

@@ -1,3 +1,12 @@
+[2026-09-15 09:15 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, bb_position dead zone MONITORING
+  24h: 34T 55.9%WR -$0.11 | 7d: 302T 53.0%WR -$0.23
+  SHORT 7d: 162T 57.4%WR +$2.16★ | LONG 7d: 142T 47.2%WR -$2.60
+  Exit 7d: profit-monster-trail 54T 92.6%WR +$3.97 | atr_sl_hit 154T 50%WR +$0.47
+  rr_engine_resistance 37T 40.5%WR -$1.33 (6T/48h post-fix, NOT VALIDATED)
+  ATR SL below-entry: 55.2% (85/154). BB SHORT dead zone: bb 0.70-0.85 18T 38.9%WR -$1.27.
+  Losers 24h: 15 total. ALL atr_sl_hit. Normal variance + legacy flushing.
+  Creative: bb 0.70-0.85 SHORT dead zone monitoring (18T sample, needs 30+).
+  BY: brain_auditor
 [2026-09-15 05:36 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
   24h: 38T 44.4%WR -$1.12 | 7d: 304T 52.6%WR -$0.44
   SHORT 7d: 162T 57.4%WR +$2.16 | LONG 7d: 142T 47.2%WR -$2.60
@@ -1885,3 +1894,28 @@
   Open: 5 positions (4x pullback-entry- SHORT, 1x pump-chain- SHORT)
   Creative: (1) Regime-specific ATR_SL_MIN for EXTREME SHORT suggested (2) pump-chain- SHORT 24h underperforming — pre-floor trades
   BY: brain_auditor
+[2026-09-15 07:15 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 36T 52.8%WR -$0.52 | 7d: 298T 53.4%WR -$0.17
+  SHORT 7d: EXTREME +$2.02★ | HIGH +$0.96 | NORMAL -$0.73
+  LONG 7d: EXTREME +$0.08 | HIGH -$1.05 | NORMAL -$1.25
+  BB SHORT: bb<0.15 81.8%WR +$1.26 | bb 0.70-0.85 38.9%WR -$1.27
+  ⚠️ 0/298 trades have entry_rsi_14 — metadata gap
+  ATR SL post-fix: below-entry 53-67% (still elevated)
+  Dead signal drag: -$3.97/7d, ages out Sep 16-20
+  No config change — monitoring.
+  BY: brain_auditor
+[2026-09-15 08:30 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 36T 50.0%WR -$0.52 | 7d: 295T 53.6%WR +$0.34
+  SHORT 7d: 161T 57.1%WR +$2.25★ | LONG 7d: 134T 47.8%WR -$1.91
+  Regime 7d: EXTREME +$2.10★ | HIGH +$0.03 | NORMAL -$1.79
+  ATR SL below-entry: 55.3% (still elevated)
+  BB SHORT: bb<0.15 +$1.73★ | bb 0.70-0.85 -$1.27 (dead zone)
+  Creative: BB position 0.70-0.85 SHORT filter suggested
+  No config change — monitoring.
+  BY: brain_auditor
+[2026-09-15 10:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 1T closed (CHIP SHORT -$0.34), 3 opened
+  24h: 34T 52.9%WR -$0.17 | 100% atr_sl_hit | avg -$0.005/trade
+  pullback-entry- SHORT: 9T 44.4%WR -$0.40 — weakest signal
+  No signal meets kill criteria. Trade frequency healthy.
+  BY: auto_1hr
