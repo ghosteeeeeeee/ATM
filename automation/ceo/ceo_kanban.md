@@ -1535,3 +1535,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Losers 24h: 13 total. 6 pullback-entry- SHORT (all ATR SL, HIGH/EXTREME). 3 rr-struct-v2+ LONG (all ATR SL, HIGH regime problem). 2 pump-chain- SHORT. 1 pump-chain+ LONG. 1 MET hard_sl.
   Creative: (1) rr-struct-v2+ LONG HIGH regime 25%WR -$0.39/7d — potential penalty candidate (monitor until 15+ trades). (2) SHORT NORMAL penalty may need strengthening from 0.85 → 0.75 (needs 20+ more NORMAL SHORT trades).
   No config change — 5 items in monitoring, legacy aging out.
+- [2026-09-15 ~15:30 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 32T 50.0%WR -$0.29 | 7d: 283T 54.1%WR +$1.56
+  SHORT 7d: 161T 58.6%WR +$2.69★ | LONG 7d: 122T 47.0%WR -$1.64 (legacy drag, ages out Sep 16-20)
+  Regime 7d: EXTREME 106T 55.7%WR +$2.00★ | HIGH 116T 56.0%WR +$0.63 | NORMAL 59T 49.2%WR -$1.07
+  Exit 7d: profit-monster-trail 46T 91.3%WR +$3.49★ | atr_sl_hit 159T 52.2%WR +$1.20 | rr_engine_resistance 37T 40.5%WR -$1.33 (NOT VALIDATED — 0 post-fix exits in 33h)
+  ATR SL below-entry: 57.2% (91/159). SHORT: pullback-entry- 66.7%, pump-chain- 58.8%. Root cause: entry timing.
+  Losers 24h: 14 total. ALL atr_sl_hit. pullback-entry- 6 SHORT (normal variance). rr-struct-v2+ 3 LONG (KILLED). pump-chain- 3 SHORT. pump-chain+ 2 LONG (legacy).
+  SHORT NORMAL: -$1.07/7d (59T 49.2%WR). SHORT_NORMAL_PENALTY=0.85 reducing entries.
+  rr-struct+ LONG HIGH: 8T 87.5%WR +$0.34 — only profitable LONG signal in HIGH. Monitor after legacy ages out.
+  Creative: (1) RSI_MIN=35 for pullback-entry- SHORT — block oversold entries. Needs 50+ trade sample. (2) rr-struct+ HIGH allocation potential — monitor.
+  No config change — 4 items in monitoring, legacy aging out.
+  BY: brain_auditor

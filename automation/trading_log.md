@@ -4959,3 +4959,59 @@ BY: auto_1hr
 - SUSHI SHORT open 7.5h+, oldest position, +$0.10
 
 BY: auto_1hr
+
+## [2026-09-15 15:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses). +$0.28.
+**PnL:** APT SHORT +$0.07, STX SHORT +$0.21 — both atr_sl_hit winners.
+
+**24h:** 29T -$0.75 total
+- rr-struct-v2+ LONG: 9T -$0.38 — KILLED by CEO at 14:40
+- pullback-entry- SHORT: 11T -$0.34 (weakest active)
+- pump-chain- SHORT: 7T +$0.05
+- Exit: 89.7% atr_sl_hit (structural — no TP/trail)
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No kill candidates (rr-struct-v2+ LONG already killed at 14:40)
+- Trade frequency 1.2/hr — healthy
+- ATR SL dominates but losses tiny (-$0.005/trade)
+- No signal at 0% WR with 3+ trades in hour
+
+**Monitoring:**
+- pullback-entry- SHORT: 11T -$0.34/24h — weakest active signal
+- 100% atr_sl_hit persists — no TP/trail exits active
+- 4 open positions: W, YGG, DOT, BANANA — all pullback-entry- SHORT
+
+BY: auto_1hr
+
+## [2026-09-15 16:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss). +$0.29.
+- W SHORT pullback-entry- atr_sl_hit: +$0.12
+- BANANA SHORT pullback-entry- atr_sl_hit: +$0.09
+- YGG SHORT pullback-entry- atr_sl_hit: +$0.09
+- DOT SHORT pullback-entry- atr_sl_hit: -$0.01
+
+**24h:** 31T 51.6%WR +$0.15
+- pullback-entry- SHORT: 15T 53.3%WR -$0.05 (neutral)
+- pump-chain- SHORT: 6T 33.3%WR -$0.15 (weakest, but 48h: 46.7%WR +$0.14)
+- rr-struct-v2+ LONG: 8T 50%WR -$0.19 (pre-kill trades, killed 14:40)
+- Exit: 90% atr_sl_hit (structural — no TP/trail)
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No kill candidates (no 0% WR signal with 3+ trades in hour)
+- Trade frequency 2.5/hr — slightly elevated but not overtrading
+- System slightly positive (+$0.29 hour, +$0.15/24h)
+- pump-chain- SHORT 33.3%WR looks bad but 48h data shows 46.7%WR +$0.14 — recent dip, not structural
+- 0 open positions — all closed flat
+
+**Monitoring:**
+- 100% atr_sl_hit persists — no TP/trail exits active
+- pump-chain- SHORT 24h WR 33.3% vs 48h 46.7% — watch for degradation
+- System barely positive — watching for regime shift to NEUTRAL
+
+BY: auto_1hr
