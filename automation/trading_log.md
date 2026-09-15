@@ -1,3 +1,45 @@
+## [2026-09-15 04:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (0W 1L -$0.25)
+- KAS LONG rr-struct-v2+ atr_sl_hit: -$0.25
+
+**24h:** 36T 44.4%WR -$1.16 | 6 open
+**7d:** 362T 51.9%WR -$0.13
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 34T (94.4%!) -$0.80 — even higher than yesterday's 76%
+- rr_engine_resistance: 2T -$0.36
+- profit-monster-trail: 0T — not firing at all in 24h
+
+**24h Regime:**
+- EXTREME: 9T 33.3%WR -$0.39 (flipped from best→worst)
+- HIGH: 19T 42.1%WR -$0.49
+- NORMAL: 8T 62.5%WR -$0.28
+
+**24h by Signal:**
+- pump-chain+: 7T 28.6%WR -$0.38 (KILLED, lagging trades flushing)
+- pump-chain-: 12T 41.7%WR -$0.26 (KILLED, lagging trades flushing)
+- pullback-entry-: 6T 50%WR -$0.30
+- rr-struct-v2+: 7T 57.1%WR -$0.16 (RR 0.52: avg win $0.088, avg loss -$0.170)
+
+**SL below entry: 17/34 = 50%** — same as yesterday
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: pump-chain+ and pump-chain- killed yesterday, remaining trades are pre-kill positions flushing out
+- ATR_SL_MIN 1.2%→1.3% deployed Sep 14 — needs more eval time
+- SHORT_NORMAL_PENALTY 0.85x + rr_engine_resistance fix deployed Sep 14 — 48h eval active
+- Trade freq: 1T last hour, 6 open — normal
+- No signal at 0%WR with 3+ trades today
+
+**Open Questions:**
+- profit-monster-trail 0 exits in 24h — why? Trades not reaching 0.40% activation before ATR SL kills them
+- atr_sl_hit 94.4% — significantly above 7d average (42%). Market conditions may be too choppy for 1.3% SL
+- EXTREME regime flipped to worst — regime performance is volatile, watch for persistence
+
+BY: auto_1hr
+
 ## [2026-09-14 16:08 UTC] Hourly Analysis
 
 **Trades:** 4 closed in last 2h (2W 2L +$0.06)
@@ -4580,5 +4622,35 @@ BY: auto_1hr
 - ema300_dip_short SHORT 7d: 12T 33.3%WR -$0.99 — approaching kill, watch for next trades
 - NORMAL regime -$2.60/7d — SHORT_NORMAL_PENALTY active, structural
 - pullback-entry- SHORT 24h cluster — if persists into next hour, review
+
+BY: auto_1hr
+
+## [2026-09-15 02:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (1W 0L)
+- BABY SHORT pump-chain- atr_sl_hit: +$0.13 (SL at 3.19%, profitable despite SL hit)
+
+**24h:** 37T 43.2%WR -$1.19 | **7d:** 312T 53%WR +$0.09
+
+**24h exit breakdown:**
+- atr_sl_hit: 35T (94.6%) avg -$0.024 — near breakeven
+- rr_engine_resistance: 2T avg -$0.180
+
+**ATR_SL_MIN compliance:** Most recent trades SL >= 1.3%. Pre-fix trades still flushing (57/71 last-2d had tight SLs).
+
+**7d regime:** EXTREME +$1.96 | HIGH +$0.04 | NORMAL -$2.39
+
+**Changes:** None — quiet period, no kill threshold hit
+
+**No Change Needed:**
+- 1 trade last hour — system quiet
+- ATR_SL_MIN fix working on new trades
+- No signal meets kill criteria (0%WR + 3+ trades last hour)
+- Trade frequency 37/24h = ~1.5/hr — healthy
+
+**Monitoring:**
+- ema300_dip_short SHORT 7d: 11T 36.4%WR -$0.78 — dormant since Sep 8
+- trend_purity+ LONG 7d: 11T 36.4%WR -$0.90 — dormant since Sep 13
+- NORMAL regime -$2.39/7d — structural, SHORT_NORMAL_PENALTY active
 
 BY: auto_1hr

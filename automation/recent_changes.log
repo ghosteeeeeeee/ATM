@@ -1,3 +1,11 @@
+[2026-09-15 04:15 UTC] auto_1hr: NO CHANGE — recent fixes need more eval time
+  24h: 36T 44.4%WR -$1.16 | 7d: 362T 51.9%WR -$0.13
+  atr_sl_hit 94.4% of 24h closes (up from 76%), 50% SL-below-entry
+  PM_TRAIL 0 exits in 24h — trades not reaching activation before ATR SL
+  Kill check: no trigger. pump-chain+/- flushing pre-kill positions.
+  Eval: ATR_SL_MIN 1.3% (Sep 14), SHORT_NORMAL_PENALTY (Sep 14) — need 48h
+  BY: auto_1hr
+
 [2026-09-14 15:30 UTC] auto_1hr: NO CHANGE — all kill-threshold signals already disabled, eval window active
   24h: 47T 40.4%WR -$1.21 | 7d: 329T 54.4%WR +$1.04
   Kill check: ema300_dip_short (17T), sma20_dip (19T), trend_purity+ (11T) all pre-killed
@@ -1840,4 +1848,20 @@
   7d regime: EXTREME +$3.32 | HIGH +$0.28 | NORMAL -$2.73
   Monitoring: 4 items (rr_engine_resistance, SHORT_NORMAL_PENALTY, rr-struct-, trend_ignition)
   Creative: (1) ATR_SL_MIN 1.2%->1.3% suggested (2) rr-struct- STANDALONE_BYPASS suggested (3) SHORT NORMAL RSI floor 30 suggested
+  BY: brain_auditor
+[2026-09-15 01:30 UTC] brain_auditor: NO CONFIG CHANGE — 4 fixes monitoring, old trades flushing
+  24h: 39T 41.0%WR -$1.61 | 7d: 313T 53.0%WR +$0.09
+  SHORT 24h drag: 23T 34.8%WR -$1.40 (dominant)
+  ATR SL floor: 1 post-change trade, SL=1.30%, working. 36 pre-change trades avg 0.25% SL.
+  Fixes: ATR_SL_MIN 1.3% (1d/48h), rr_engine_resistance (2 exits), SHORT_NORMAL_PENALTY (3 trades), trend_ignition (0 trades)
+  7d regime: EXTREME +$2.44 | HIGH +$0.04 | NORMAL -$2.39
+  Creative: Monitor ATR flush, SHORT NORMAL gate needs backtest, session brain ingestion
+  BY: brain_auditor
+[2026-09-15 02:40 UTC] brain_auditor: NO CONFIG CHANGE — 4 fixes monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 34T 44.1%WR -$1.03 | 7d: 312T 53.2%WR +$1.70
+  SHORT 7d: 160T 57.5%WR +$2.12 | LONG 7d: 152T 48.0%WR -$2.51 (dead signal drag)
+  ATR SL floor: 54% below entry (down from 59%). ALT SHORT first post-fix trade hit SL=1.30%.
+  rr_engine_resistance: NOT VALIDATED — both 48h exits closed BEFORE fix deployment.
+  Losers 24h: 17 total. pump-chain+ 7 LONG (KILLED legacy). pump-chain- 12 SHORT (pre-floor).
+  Creative: (1) rr_engine_resistance fix needs validation (2) pump-chain- 24h underperforming
   BY: brain_auditor
