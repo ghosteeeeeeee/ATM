@@ -4891,3 +4891,30 @@ BY: auto_1hr
 - SUSHI SHORT open 7h+ — oldest position
 
 BY: auto_1hr
+
+## [2026-09-15 11:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour. 5 open positions (3 SHORTs, 2 LONGs).
+**PnL:** System flat — 30T 24h +$0.10 (+$0.003/trade avg)
+
+**24h by signal:**
+- pump-chain- SHORT: 9T +$0.24
+- pump-chain+ LONG: 3T +$0.27
+- pullback-entry- SHORT: 9T -$0.40 (weakest)
+- rr-struct-v2+ LONG: 6T -$0.09
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- 0 trades closed in hour → no kill candidates
+- 100% atr_sl_hit but losses tiny (structural, flagged by brain_auditor)
+- pullback-entry- SHORT weakest but not at kill threshold
+- Trade frequency 1.25/hr — healthy
+- All open positions near breakeven
+
+**Monitoring:**
+- 100% atr_sl_hit persists — no TP/trail exits active
+- pullback-entry- SHORT dragging -$0.40/24h
+- SUSHI SHORT open 7.5h+, oldest position, +$0.10
+
+BY: auto_1hr
