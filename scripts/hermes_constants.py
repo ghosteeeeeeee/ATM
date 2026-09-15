@@ -796,8 +796,8 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Block ALL SHORT entries when RSI < floor (extreme oversold = bounce imminent).
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
-# Backtest 7d: RSI<25 blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
-SHORT_RSI_FLOOR = 25
+# Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
+SHORT_RSI_FLOOR = 35
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
