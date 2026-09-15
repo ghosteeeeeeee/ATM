@@ -572,5 +572,42 @@
     "category": "entry sniper",
     "status": "monitoring — insufficient data",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-15T05:30:00Z",
+    "idea": "SHORT EXTREME is the system edge — concentrate exposure there",
+    "rationale": "7d: SHORT EXTREME 113T 55.8%WR +$2.18. SHORT NORMAL 68T 45.6%WR -$2.24. SHORT HIGH 121T 54.5%WR -$0.38. The alpha is SHORT+EXTREME. If SHORT_NORMAL_PENALTY keeps NORMAL flat after 48h, consider increasing penalty 0.85→0.80 to further suppress NORMAL.",
+    "expected_impact": "+$0.20-0.50/7d if SHORT NORMAL stays negative",
+    "category": "regime concentration",
+    "status": "suggested — needs 48h data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-15T05:30:00Z",
+    "idea": "ATR_SL_MIN 1.3%→1.5% after monitoring window if below-entry rate persists",
+    "rationale": "48.4% of ATR SL exits are below entry (74/153 trades). Trades never reach profit. The 1.3% floor is too tight for current alt ATR. Restoring to 1.5% gives trades room to breathe. Was 1.5% before Sep 8 reversion.",
+    "expected_impact": "+$1.00-2.00/7d if below-entry rate drops from 48.4% to <30%",
+    "category": "exit optimization",
+    "status": "monitoring — needs 48h data from current 1.3% floor",
+    "risk": "medium — wider SL means bigger individual losses on real stops",
+    "impact_on_winners": "Would have saved 7 of 36 winning ATR SL trades at 1.3-1.5% (SYRUP, SEI, TURBO tiny wins). Minor impact."
+  },
+  {
+    "date": "2026-09-15T05:45:00Z",
+    "idea": "SHORT EXTREME confidence boost — concentrate exposure on proven edge",
+    "rationale": "pullback-entry- SHORT EXTREME 81.8% WR +.74/7d. pump-chain- SHORT EXTREME 60%WR +/usr/bin/bash.28/7d. Total SHORT EXTREME +.10/7d. Current exposure random. Boost confidence +10-15% when regime=EXTREME and direction=SHORT to increase fill rate.",
+    "expected_impact": "+$0.50-1.00/7d from higher SHORT EXTREME fill rate",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-15T05:45:00Z",
+    "idea": "trend_ignition investigate or disable — 0 trades in 3+ days",
+    "rationale": "0 trades since Sep 13. NEUTRAL market may not trigger detection conditions. Either broken or market-condition. Investigating costs nothing (0 current trades).",
+    "expected_impact": "neutral or positive",
+    "category": "dead signal cleanup",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

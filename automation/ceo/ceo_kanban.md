@@ -1,4 +1,17 @@
 ## TEAM UPDATES
+- [2026-09-15 ~07:00 UTC (CEO run)] ceo: VERIFIED + NO CHANGE. DB: 24h 37T 48.6%WR -$0.66 (NEGATIVE). 7d: 302T 53.0%WR -$0.23 (FLAT/NEGATIVE). Market NEUTRAL. **NO CONFIG CHANGES.** All 4 fixes in monitoring mode. **7d SHORT NEUTRAL is the edge:** 159T 58.5%WR +$2.63. **LONG drag is ALL legacy:** trend_purity+ -$0.90, sma20_dip -$0.88, ema300_dip_short -$0.78, pullback_entry+ -$0.57, ema300-dip-long -$0.55, bb_bounce_v2_long -$0.54, pump-chain+ -$0.28. Ages out Sep 16-20. **Active signals profitable:** pullback-entry- +$2.31★, pump-chain- +$1.04★, rr-struct+ +$0.59, mover- +$0.53. **4 open SHORT positions** (pullback-entry-). **MONITORING:** rr_engine_resistance 7 exits/48h -$0.11 (was -$1.33/7d), needs 10+. ATR_SL 6 exits since fix, 66.7% below entry (sample small). SHORT_NORMAL_PENALTY 0 trades in 48h (working). trend_ignition 0 trades (12 days, NEUTRAL market). **No config change — all in monitoring, legacy aging out.**
+
+- [2026-09-15 05:30 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 38T 44.7%WR -$1.12 | 7d: 304T 52.6%WR -$0.44
+  SHORT 7d: 162T 57.4%WR +$2.16 | LONG 7d: 142T 47.2%WR -$2.60 (legacy drag, ages out Sep 16-20)
+  Exit 7d: profit-monster-trail 60T 93.3%WR +$4.30★ | atr_sl_hit 153T 49.0%WR +$0.09 | rr_engine_resistance 37T 40.5%WR -$1.33 (NOT VALIDATED — 0 post-fix exits in 21h)
+  7d regime: EXTREME +$2.18 | HIGH -$0.38 | NORMAL -$2.24
+  ATR SL below-entry: 48.4% (74/153 trades). Stop too tight — trades never reach profit.
+  Losers 24h: 19 total. 17 atr_sl_hit (USUAL/KAS/ALT/DOT/HYPER/BLUR/ENA/SYRUP/FIL/ACE/HYPER/ENA/HYPER/GMT/KAS/BCH/FIL). 2 rr_engine_resistance (NEO/PONS — pre-fix).
+  SHORT_NORMAL_PENALTY: 0 SHORT NORMAL trades in 24h (working or no signals).
+  Creative: (1) SHORT EXTREME is the edge (+$2.18/7d). (2) ATR_SL_MIN 1.5% suggested after monitoring window.
+  No config change — 4 items need 48h data.
+
 - [2026-09-15 02:38 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 fixes monitoring, rr_engine_resistance NOT VALIDATED
   24h: 34T 44.1%WR -$1.03 | 7d: 312T 53.2%WR +$1.70
   SHORT 7d: 160T 57.5%WR +$2.12 | LONG 7d: 152T 48.0%WR -$2.51 (dead signal drag, ages out Sep 16-20)
@@ -1411,3 +1424,13 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Fixes: ATR_SL_MIN 1.3% (5 trades) | rr_engine_resistance (ZERO exits) | SHORT_NORMAL_PENALTY (zero trades) | trend_ignition (zero trades)
   Creative: (1) Regime-specific ATR_SL_MIN for EXTREME SHORT suggested (needs backtest) (2) SHORT entry RSI sweet spot 45-55 monitoring (3) rr_engine_resistance extended validation window suggested
   BY: brain_auditor
+
+- [2026-09-15 05:45 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 37T 48.6%WR -$0.66 | 7d: 302T 53.0%WR -$0.23
+  SHORT 7d: EXTREME +$2.10 | HIGH -$0.19 | NORMAL drag
+  Exit 7d: profit-monster-trail 59T 93.2%WR +$4.22★ | atr_sl_hit 154T 49.4%WR +$0.19 | rr_engine_resistance 37T 40.5%WR -$1.33 (NOT VALIDATED — 0 post-fix exits in 23h)
+  ATR SL below-entry: 57.8% (89/154). EXTREME 64.4%. Systemic tight-stop issue.
+  Losers 24h: 17 total. ALL atr_sl_hit. pump-chain+ 7 LONG (KILLED legacy -$0.38). pullback-entry- 7 SHORT (-$0.16 variance). rr-struct-v2+ 7 LONG (-$0.16 variance). pump-chain- 13 SHORT (-$0.04 below 7d avg).
+  Fixes monitoring: rr_engine_resistance 0 post-fix exits (23h) | ATR_SL_MIN 1.3% (48h) | SHORT_NORMAL_PENALTY 0 trades (24h) | trend_ignition 0 trades (3+ days).
+  Creative: (1) SHORT EXTREME concentration — edge proven, suggest confidence boost +10-15% in EXTREME SHORT. (2) trend_ignition effectively dead — investigate or disable.
+  No config change — 4 items need data. Legacy ages out Sep 16-20.

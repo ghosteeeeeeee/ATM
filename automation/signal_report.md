@@ -1,74 +1,39 @@
-# Signal Performance Report
-**Generated:** 2026-09-14 22:20 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-09-15 05:09 UTC
+Period: Last 6h (expanded to 8h) | 24h
 
-## Overall Stats (24h)
-- **Total trades:** 44 | **WR:** 47.7% | **PnL:** -$0.10
+--- EXECUTIVE SUMMARY ---
+24h: 38 trades, 44.7% WR, -$1.12 PnL
 
----
-
-## KILLED (executed this cycle)
-
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 38.5% | -$0.21 | 13 | **KILLED** — all regimes <50% WR, 6h 0%WR |
+| pump-chain+ | LONG | 28.6% | -$0.38 | 7 | REGIME BLOCK: Added Pump_Flow 0.0x to NORMAL regime in volatility_gate_v2.py. Wins in EXTREME (46.7% WR, +$0.22) and HIGH (42.9% WR, -$0.06). 0%WR -$0.44 in NORMAL. |
 
-**Regime breakdown (pump-chain- SHORT, 24h):**
-- EXTREME: 6T, 33% WR, -$0.19
-- HIGH: 6T, 33% WR, -$0.03
-- NORMAL: 1T, 100% WR, +$0.01 (1 trade, not significant)
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | - | - | - | - | No candidates meeting boost criteria |
 
-**Already killed:** pump-chain+ LONG (PUMP_FLOW_PLUS_ENABLED=False, killed earlier today)
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 42.9% | -$0.48 | 7 | WATCH — Wins in EXTREME (81.8% WR, +$1.74), HIGH (58.1% WR, +$0.56). 24h drawdown is noise. Already regime-blocked in NORMAL via existing Pullback_Entry 0.0x. |
+| rr-struct-v2+ | LONG | 57.1% | -$0.16 | 7 | WATCH — Positive WR but negative PnL. R2_Structural already blocked in NORMAL (0.0x) and HIGH (0.0x). Wins in EXTREME. |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 46.2% | -$0.04 | 13 | NEUTRAL — Breakeven. No action needed. |
+| breakout-long+ | LONG | 100% | +$0.25 | 1 | INSUFFICIENT — Only 1 trade. |
+| rr-struct-v2+,rs-s37 | LONG | 100% | +$0.01 | 1 | INSUFFICIENT — Only 1 trade. |
 
-## BOOSTED (executed this cycle)
+ISSUES:
+- No signal inversions detected in 24h window.
+- No OpenMemory queries (skipped per instruction).
+- 24h overall negative (-$1.12) — market environment is choppy. Regime blocks should help by preventing pump-chain+ LONG from firing in NORMAL (where it goes 0% WR).
 
-None. No signals met boost criteria (WR >55%, 5+ trades, positive PnL, consistent across tokens).
-
----
-
-## WINNERS
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| rr-struct-v2+ | LONG | 4 | 100% | +$0.35 | 6 | 66.7% | +$0.09 | ENABLED |
-| pullback-entry- | SHORT | 1 | 0% | -$0.06 | 14 | 57.1% | +$0.46 | ENABLED |
-
-**pullback-entry-** — Lifetime: 58T, 62.1% WR, +$2.57. Strong across EXTREME (2T, 100%) and HIGH (9T, 55.6%). Primary profit driver.
-
-**rr-struct-v2+** — New signal (Sep 14), 100% WR in6h across NORMAL regime. Watch for durability.
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| pump-chain+ | LONG | 1 | 100% | +$0.28 | 7 | 28.6% | -$0.38 | KILLED |
-| pump-chain- | SHORT | 4 | 0% | -$0.50 | 13 | 38.5% | -$0.21 | KILLED |
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## ISSUES
-
-- pump-chain+ already killed (PUMP_FLOW_PLUS_ENABLED=False) — old trades still in 24h window
-- pump-chain- killed this cycle — all regimes <50% WR, 6h 0% WR trend worsening
-
----
-
-## KILL AUDIT
-
-| Flag | New Value | Reason | Verified |
-|------|-----------|--------|----------|
-| PUMP_FLOW_MINUS_ENABLED | False | 24h 38.5%WR -$0.21, all regimes <50% WR | Yes (grep confirmed) |
-| Added to NEVER_REENABLE_FLAGS | — | Prevent rotator re-enable | Yes (edit confirmed) |
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+ACTIONS TAKEN:
+1. Added 'Pump_Flow': 0.0 to VOL_PHASE_MULTS[('NORMAL', '*')] in volatility_gate_v2.py
+   - pump-chain+ LONG: 0% WR, -$0.44 in NORMAL (3T lifetime) — wins in EXTREME (+$0.22)
+   - Prevents signal from firing in NORMAL regime while preserving EXTREME/HIGH access

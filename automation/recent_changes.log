@@ -1,3 +1,13 @@
+[2026-09-15 05:36 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 38T 44.4%WR -$1.12 | 7d: 304T 52.6%WR -$0.44
+  SHORT 7d: 162T 57.4%WR +$2.16 | LONG 7d: 142T 47.2%WR -$2.60
+  Exit 7d: profit-monster-trail 60T 93.3%WR +$4.30 | atr_sl_hit 153T 49.0%WR +$0.09
+  rr_engine_resistance 37T 40.5%WR -$1.33 (NOT VALIDATED — 0 post-fix exits in 21h)
+  Losers 24h: 19 total. 17 atr_sl_hit, 2 rr_engine_resistance (pre-fix).
+  ATR SL below-entry: 48.4% (74/153). Stop too tight.
+  Creative: (1) SHORT EXTREME edge (+$2.18/7d). (2) ATR_SL_MIN 1.5% after monitoring.
+  No config change — 4 items need 48h data.
+  BY: brain_auditor
 [2026-09-15 04:15 UTC] auto_1hr: NO CHANGE — recent fixes need more eval time
   24h: 36T 44.4%WR -$1.16 | 7d: 362T 51.9%WR -$0.13
   atr_sl_hit 94.4% of 24h closes (up from 76%), 50% SL-below-entry

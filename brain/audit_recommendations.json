@@ -1,120 +1,138 @@
 {
-  "timestamp": "2026-09-15T04:33:17Z",
-  "session_brain_stats": {
-    "total_vectors": 174060,
-    "query_topics": [
-      "signal performance",
-      "creative ideas",
-      "problems"
+    "timestamp": "2026-09-15T05:45:00Z",
+    "session_brain_stats": {
+        "total_vectors": 174060,
+        "queries_run": 4,
+        "top_topics": ["signal performance", "creative ideas", "loss patterns", "recurring problems"]
+    },
+    "trade_summary_24h": {
+        "trades": 37,
+        "win_rate": 48.6,
+        "pnl": -0.66,
+        "direction_split": {
+            "LONG": {"trades": 17, "wr": 47.1, "pnl": -0.46},
+            "SHORT": {"trades": 20, "wr": 50.0, "pnl": -0.20}
+        },
+        "signal_breakdown": {
+            "pump_chain_plus_LONG": {"trades": 7, "wr": 28.6, "pnl": -0.38, "note": "KILLED legacy, aging out"},
+            "pullback_entry_minus_SHORT": {"trades": 7, "wr": 57.1, "pnl": -0.16, "note": "Normal variance for 60.7% WR signal"},
+            "rr_struct_v2_plus_LONG": {"trades": 7, "wr": 57.1, "pnl": -0.16, "note": "STAR signal variance"},
+            "pump_chain_minus_SHORT": {"trades": 13, "wr": 46.2, "pnl": -0.04, "note": "Slightly below 7d 60% WR"}
+        },
+        "exit_analysis": "ALL 17 losers atr_sl_hit. 0 structural exits. ATR SL is dominant exit mechanism."
+    },
+    "trade_summary_7d": {
+        "trades": 302,
+        "win_rate": 53.0,
+        "pnl": -0.23,
+        "regime": {
+            "EXTREME": {"trades": 112, "wr": 55.4, "pnl": 2.10, "note": "EDGE — profitable"},
+            "HIGH": {"trades": 121, "wr": 55.4, "pnl": -0.19, "note": "Flat"},
+            "NORMAL": {"trades": 67, "wr": 46.3, "pnl": -2.14, "note": "DRAG — worst regime"}
+        },
+        "exit_analysis": {
+            "profit_monster_trail": {"trades": 59, "wr": 93.2, "pnl": 4.22, "note": "Carries system"},
+            "atr_sl_hit": {"trades": 154, "wr": 49.4, "pnl": 0.19, "note": "57.8% below entry — systemic issue"},
+            "rr_engine_resistance": {"trades": 37, "wr": 40.5, "pnl": -1.33, "note": "NOT VALIDATED — 0 post-fix exits"}
+        },
+        "active_signals": {
+            "pullback_entry_minus_SHORT": {"trades": 61, "wr": 60.7, "pnl": 2.31, "note": "STAR signal — EXTREME 81.8% WR"},
+            "pump_chain_minus_SHORT": {"trades": 55, "wr": 60.0, "pnl": 0.62, "note": "Solid SHORT"},
+            "rr_struct_plus_LONG": {"trades": 15, "wr": 73.3, "pnl": 0.59, "note": "STAR LONG"},
+            "mover_minus_SHORT": {"trades": 7, "wr": 85.7, "pnl": 0.53, "note": "Strong but low sample"}
+        },
+        "dead_signals_aging_out": {
+            "trend_purity_plus_LONG": {"trades": 11, "wr": 36.4, "pnl": -0.90, "age_out": "Sep 14-16"},
+            "sma20_dip_LONG": {"trades": 10, "wr": 30.0, "pnl": -0.88, "age_out": "Sep 16"},
+            "ema300_dip_short_SHORT": {"trades": 11, "wr": 36.4, "pnl": -0.78, "age_out": "Sep 16"},
+            "bb_bounce_v2_long_LONG": {"trades": 6, "wr": 33.3, "pnl": -0.54, "age_out": "Sep 16"},
+            "rr_struct_minus_SHORT": {"trades": 7, "wr": 42.9, "pnl": -0.42, "age_out": "KILLED Sep 14"}
+        }
+    },
+    "drift_findings": [
+        {
+            "item": "rr_engine_resistance fix",
+            "status": "NOT VALIDATED",
+            "detail": "0 post-fix exits in 23+ hours. Fix deployed Sep 14 ~06:45 UTC. Either trades hold through wicks (fix works) or condition never triggers. Need 10+ exits.",
+            "deadline": "Sep 16 ~06:45 UTC"
+        },
+        {
+            "item": "ATR_SL_MIN 1.3%",
+            "status": "MONITORING",
+            "detail": "57.8% below-entry rate (89/154 trades). EXTREME 64.4% below-entry. Systemic tight-stop issue. Need 48h post-fix data.",
+            "deadline": "Sep 16 ~22:34 UTC"
+        },
+        {
+            "item": "SHORT_NORMAL_PENALTY 0.85",
+            "status": "WORKING",
+            "detail": "0 SHORT NORMAL trades in 24h. Filter active. Need trades to evaluate impact.",
+            "deadline": "Sep 16 ~05:30 UTC"
+        },
+        {
+            "item": "trend_ignition",
+            "status": "EFFECTIVELY DEAD",
+            "detail": "0 trades since Sep 13 (3+ days). NEUTRAL market may not trigger detection. Investigate or disable.",
+            "deadline": "Sep 16 ~05:45 UTC"
+        }
     ],
-    "note": "Session brain loaded successfully, 174k vectors indexed"
-  },
-  "trade_summary_24h": {
-    "trades": 38,
-    "win_rate": 44.7,
-    "pnl": -1.12,
-    "avg_pct": -0.58,
-    "short": "7T/57.1%WR -$0.48",
-    "long": "7T/28.6%WR -$0.38",
-    "pump_chain_legacy": "7T/28.6%WR -$0.38 (ALL legacy, confirmed zero new entries post-kill)",
-    "dominant_exit": "atr_sl_hit 36T -$0.76"
-  },
-  "trade_summary_7d": {
-    "trades": 308,
-    "win_rate": 52.9,
-    "pnl": -0.22,
-    "short": "162T/57.4%WR +$2.16",
-    "long": "146T/47.9%WR -$2.38 (dead signal drag)",
-    "regime_extreme": "113T/55.8%WR +$2.18",
-    "regime_high": "124T/54.8%WR -$0.23",
-    "regime_normal": "69T/46.4%WR -$2.17",
-    "top_signal": "pullback-entry- 60T/60%WR +$2.21",
-    "exit_profit_trail": "64T/70.6%WR +$4.52 (carries system)",
-    "exit_rr_resistance": "37T/40.5%WR -$1.33 (fix NOT VALIDATED)"
-  },
-  "drift_findings": [
-    {
-      "finding": "pump-chain+ legacy trades still in 24h/7d window",
-      "status": "RESOLVED - signal killed Sep 14 16:08 UTC, zero new entries confirmed. Legacy positions aging out.",
-      "impact": "25T/7d -$0.28 drag, aging out Sep 16-20"
-    },
-    {
-      "finding": "rr_engine_resistance fix NOT VALIDATED",
-      "status": "ZERO post-fix exits in ~21h. Need 10+ exits to validate.",
-      "impact": "Was -$1.33/7d structural drag. Fix deployed Sep 14 ~06:45.",
-      "deadline": "Sep 16 ~06:45 UTC"
-    },
-    {
-      "finding": "rr-struct-v2+ LONG borderline",
-      "status": "7T/7d 57.1%WR -$0.16. Different signal from rr-struct+ (rr_structural_v2_long.py).",
-      "impact": "Minor drag, needs 15+ trades to evaluate"
-    },
-    {
-      "finding": "LONG structural drag continues",
-      "status": "146T/7d 47.9%WR -$2.38. Mostly dead signal legacy.",
-      "impact": "Active LONG signals profitable. Dead signal drag ages out Sep 16-20."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "SHORT entries near support (bb_position near 0)",
-      "evidence": "NEO SHORT at bb_pos=0.50, DOT SHORT at bb_pos=0.86, ENA SHORT at bb_pos=-0.03. rr_engine_resistance exits cluster near support.",
-      "status": "STRUCTURAL - rr_engine_resistance fix should help but needs validation"
-    },
-    {
-      "problem": "pump-chain+ LONG momentum trap pattern",
-      "evidence": "25T/7d 40%WR -$0.28. All 7 24h losers at RSI 39-75, entry before pump confirms. Signal killed.",
-      "status": "RESOLVED - signal killed, legacy aging out"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "rr_engine_resistance SHORT exit fix validation",
-      "status": "Deployed but NOT VALIDATED - zero post-fix exits in 21h",
-      "deadline": "Sep 16 ~06:45"
-    },
-    {
-      "item": "ATR_SL_MIN 1.3% evaluation",
-      "status": "Deployed Sep 14 ~22:34. 5 trades since fix. KAS LONG still hit SL below entry at -1.43%.",
-      "deadline": "Sep 16 ~06:00"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-15T04:00:00Z",
-      "idea": "SHORT entry RSI sweet spot monitoring",
-      "rationale": "24h data shows SHORT at RSI 45-55 = 100%WR (BANANA, GOAT, ENA winners). SHORT at RSI 75 = momentum trap (HYPER loser). SHORT_RSI_FLOOR=25 blocks oversold, SHORT_RSI_CEILING=65 blocks overbought, but middle zone (55-65) is noisy. Sample too small (10 trades) for config change.",
-      "expected_impact": "Monitor only - insufficient data for filter change",
-      "category": "entry sniper",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-15T04:00:00Z",
-      "idea": "rr_engine_resistance fix needs extended validation window",
-      "rationale": "ZERO post-fix exits in 21h. Either fix working (no premature exits) or no SHORT trades hit resistance yet. Need 10+ exits to validate. Original 48h window may be insufficient if trade volume is low.",
-      "expected_impact": "Validate -$1.33/7d structural drag fix",
-      "category": "exit optimization",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-15T04:00:00Z",
-      "idea": "Regime-specific ATR_SL_MIN for EXTREME SHORT",
-      "rationale": "EXTREME SHORT is strongest combo (113T/7d 55.8%WR +$2.18). Current ATR_SL_MIN=1.3% applies uniformly. In EXTREME, wider ATR SL might let winners run further. Would need to increase ATR_SL_MIN to 1.5% only for SHORT in EXTREME. High risk - needs backtest.",
-      "expected_impact": "Speculative +$0.30-0.50/7d from reduced false SL hits",
-      "category": "exit optimization",
-      "status": "suggested - needs backtest",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Monitor rr_engine_resistance fix validation (48h deadline Sep 16 ~06:45)",
-    "Monitor ATR_SL_MIN 1.3% evaluation (48h deadline Sep 16 ~06:00)",
-    "Monitor SHORT_NORMAL_PENALTY=0.85 (48h deadline Sep 16 ~05:30)",
-    "Monitor trend_ignition (72h deadline Sep 16)",
-    "Verify pump-chain+ legacy fully aged out (expected Sep 16-20)",
-    "LONG improvement after dead signal drag ages out"
-  ]
+    "recurring_problems": [
+        {
+            "problem": "ATR SL below-entry rate 57.8%",
+            "detail": "89/154 ATR SL exits have stop_loss below entry_price. Trades never reach profit. Stops too tight.",
+            "impact": "SYSTEMIC — affects all signals",
+            "suggestion": "ATR_SL_MIN 1.5% after 1.3% monitoring window confirms improvement"
+        },
+        {
+            "problem": "NORMAL regime persistent drag",
+            "detail": "7d NORMAL: 67T/46.3%WR -$2.14. SHORT in NORMAL 18T/50%WR -$0.09. LONG in NORMAL worse.",
+            "impact": "-$2.14/7d",
+            "suggestion": "SHORT_NORMAL_PENALTY working, monitor. LONG_NEUTRAL_BLOCK already active."
+        },
+        {
+            "problem": "trend_ignition zero signals",
+            "detail": "0 trades since Sep 13. NEUTRAL market. Detection thresholds may be too strict.",
+            "impact": "No trades = no value",
+            "suggestion": "Investigate detection conditions or disable if dead"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "rr_engine_resistance fix validation",
+            "reason": "0 post-fix exits in 23h. Can't validate the candle CLOSE fix.",
+            "priority": "HIGH"
+        },
+        {
+            "item": "trend_ignition investigation",
+            "reason": "3+ days with 0 signals. Either broken or market condition.",
+            "priority": "MEDIUM"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-15T05:45:00Z",
+            "idea": "SHORT EXTREME concentration — the edge is proven but we're not maximizing exposure",
+            "rationale": "pullback-entry- SHORT EXTREME: 11T/81.8%WR +$1.74. pump-chain- SHORT EXTREME: 30T/60%WR +$0.28. TOTAL SHORT EXTREME: +$2.10/7d. This is the system's primary edge. Current exposure is random — signal fires when it fires. Consider: if regime is EXTREME and direction is SHORT, boost confidence by +10-15% to increase fill rate.",
+            "expected_impact": "+$0.50-1.00/7d from higher SHORT EXTREME fill rate",
+            "category": "entry sniper",
+            "status": "suggested — needs backtest",
+            "risk": "medium — overconcentration risk if EXTREME regime flips"
+        },
+        {
+            "date": "2026-09-15T05:45:00Z",
+            "idea": "trend_ignition disable or threshold relaxation",
+            "rationale": "0 trades in 3+ days. Either broken or NEUTRAL market never triggers. If it's market-condition, disabling saves no trades (already 0). If broken, fixing saves future trades.",
+            "expected_impact": "Neutral (0 trades currently) or positive if fix enables profitable entries",
+            "category": "dead signal cleanup",
+            "status": "suggested — investigate first",
+            "risk": "low — 0 trades means no downside to investigating"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Monitor rr_engine_resistance fix — need 10+ post-fix exits by Sep 16 ~06:45 UTC",
+        "Monitor ATR_SL_MIN 1.3% — need 48h post-fix data by Sep 16 ~22:34 UTC",
+        "Monitor SHORT_NORMAL_PENALTY — need SHORT NORMAL trades by Sep 16 ~05:30 UTC",
+        "Investigate trend_ignition — 0 trades in 3+ days, check detection thresholds",
+        "Legacy drag ages out Sep 16-20 — system should improve without action"
+    ]
 }

@@ -480,5 +480,160 @@
 1. Retroactive Scan — Level 3, HIGH value, missed breakout safety net
 2. Signal Regime Memory — Level 4, HIGH value, dormant/resurrect lifecycle
 3. Sniper Exit Strategy — Level 3, HIGH value, constants+script exist
-4. Pump-Chain Exit — Level 2, HIGH value, ATR trail for pump-chain momentum
-5. Ponytail Full Audit — Level 1-3, MEDIUM value, 33K lines dead code cleanup
+4. Contrarian Zone Signal — Level 2, HIGH value (84% zone hold rate, depends on SL Memory)
+5. Trend Momentum V4 — Level 2, HIGH value, 54% WR data-driven filters
+6. Spider-Profit — Level 2-3, MEDIUM value, regime-aware profit taking
+7. Ponytail Full Audit — Level 1-3, MEDIUM value, 33K lines dead code cleanup
+
+---
+
+## Plan: 2026-09-11_volatility-gate-tuning.md
+- **Date scanned:** 2026-09-14 06:00 (previous scan)
+- **Status:** IMPLEMENTED
+- **Re-verified:** 2026-09-14 20:00 — get_atr_ratio(), get_btc_trend(), direction-aligned boost all present in volatility_gate_v2.py
+
+## Plan: oversold-bounce-signal.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Mean reversion LONG at extreme oversold (RSI<25, z<-1, BB<0.3)
+- **Difficulty:** Level 2 (new signal, ~200 lines)
+- **Value:** HIGH — 70% WR, +$0.97 total PnL in backtest
+- **Status:** ALREADY IMPLEMENTED
+- **Reason:** scripts/signals/oversold_bounce.py exists. OVERSOLD_BOUNCE_ENABLED=True in hermes_constants.py. Registered in __init__.py, source weights in signal_compactor.py.
+
+## Plan: contrarian-zone-signal.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Flip direction when system enters near strong SL zones (84% zone hold rate)
+- **Difficulty:** Level 2 (new signal ~150 lines + signal_compactor integration)
+- **Value:** HIGH — 72% WR in 0-0.5% band, positive expected value
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No contrarian_zone signal file exists. sl_zones.py has entry_distance_filter() but contrarian logic (flip direction) not implemented. Requires: (1) contrarian_zone.py signal, (2) contrarian flip in signal_compactor.py when SL zone blocks, (3) exit logic for contrarian trades. Depends on sl_memory table existing in PostgreSQL.
+
+## Plan: sl-memory-sr-system-v2.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Use previous SL hits as S/R zones — entry filtering, exit tightening, size reduction
+- **Difficulty:** Level 4 (DB table, zone engine, multi-system integration)
+- **Value:** HIGH — prevents repeated stop-outs, zone-aware trading
+- **Status:** PARTIAL
+- **Reason:** sl_zones.py exists (433 lines) with entry_distance_filter(). Integrated into signal_compactor.py (line 2951). BUT: (1) sl_memory table status unknown (PostgreSQL not accessible), (2) contrarian flip not implemented, (3) zone-aware exit tightening not wired into position_manager, (4) position sizing not wired into decider_run. Phase 1 (data collection) and Phase 2 (zone engine) partially done. Phase 3-6 pending.
+
+## Plan: sniper-exit-strategy.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Proactive position closing on regime shifts — close wrong-side positions
+- **Difficulty:** Level 3 (~350 lines, new systemd service)
+- **Value:** HIGH — estimated +$0.30-$0.75 per transition zone
+- **Status:** CONSTANTS EXIST, SCRIPT EXISTS, NOT VERIFIED
+- **Reason:** SNIPER_* constants in hermes_constants.py. sniper_exit.py exists. But not verified as active or integrated. Needs integration testing.
+
+## Plan: trend_momentum_v4_spec.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Data-driven signal improvements — hour filter (+7% WR), after-win filter (+0.9% WR)
+- **Difficulty:** Level 2 (new signal, ~250 lines)
+- **Value:** HIGH — projected 46%→54% WR, +30% PnL
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No trend_momentum signal exists (only trend_momentum_near_sma which is dead). Requires full signal build. Hour filter overlaps with existing TIME_BLOCK system.
+
+## Plan: trend_momentum_spec.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** New trend + acceleration signal — catches staged moves from compression
+- **Difficulty:** Level 2 (new signal, ~250 lines, 6 file changes)
+- **Value:** HIGH — 35% WR but 3.0:1 R:R, +67.89% net PnL in 14d backtest
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No trend_momentum.py exists. Spec is thorough with backtest data. Conditional GO — needs blacklist, cooldown increase, out-of-sample test.
+
+## Plan: spider-profit.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Regime-aware profit taking — smaller exits in flat markets
+- **Difficulty:** Level 2-3 (modifies profit_monster.py or new script)
+- **Value:** MEDIUM — capital turnover improvement in flat markets
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No SPIDER_* constants exist. Requires profit_monster.py changes. Defer.
+
+## Plan: retroactive-scan-delayed-entry.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Secondary scan after breakout engine — catches missed moves with lower confidence
+- **Difficulty:** Level 3 (~350 lines in breakout_engine.py, new functions)
+- **Value:** HIGH — safety net for missed breakouts (IMX +2.72% case)
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Complex integration into breakout_engine.py. Plan is well-designed (v3, audited). Deferred to separate session.
+
+## Plan: spec-signal-regime-memory.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Per-signal regime memory — dormant/resurrect lifecycle
+- **Difficulty:** Level 4 (multi-system, 3-4 days)
+- **Value:** HIGH — prevents premature signal death
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Requires: persist regime at entry, regime tracker SQLite DB, rotator integration, kill system updates, lifecycle dormant state. Defer.
+
+## Plan: hl-trigger-sl-v2.md
+- **Date scanned:** 2026-09-14 20:00 (re-verified)
+- **Core request:** HL trigger orders V2 — server-side SL/TP to eliminate slippage
+- **Difficulty:** Level 3 (HL SDK integration, guardian changes)
+- **Value:** HIGH — estimated 139% PnL savings over 7 days
+- **Status:** NOT IMPLEMENTED
+- **Reason:** V1 was disabled. V2 spec uses SDK atomic functions. 2 CRITICAL + 4 HIGH audit findings. Requires careful testing. Defer.
+
+## Plan: 2026-09-12_btc-momentum-sync-plan.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** 5-layer defense: BTC momentum gate, transition detection, stale signal filter, RSI/z-score guard, continuum context boost
+- **Difficulty:** Level 3-4 (multiple systems)
+- **Value:** HIGH — projected +$4-6/week
+- **Status:** PARTIAL
+- **Reason:** Layer 1 (BTC Momentum Gate) overlaps with timing guard. Layer 2-5 partially built but not wired. Defer.
+
+## Plan: brain-rag-system.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Feed DSH sessions into FAISS vector index + hourly brain auditor
+- **Difficulty:** Level 4 (new system, 3-4 hours)
+- **Value:** HIGH — cross-session intelligence
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Requires faiss-cpu install, new session_brain.py, systemd timers. Defer.
+
+## Plan: regime-tuner-spec.md
+- **Date scanned:** 2026-09-14 20:00
+- **Core request:** Weekly automated regime analysis — re-enable/disable signals based on per-regime WR
+- **Difficulty:** Level 3 (new system with DB writes, file safety, locking)
+- **Value:** HIGH — prevents stale signal states
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Complex: AST-based writes to volatility_gate_v2.py, NEVER_REENABLE protection. Defer.
+
+---
+
+## Updated Summary (2026-09-14)
+
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED (complete) | 15 |
+| ALREADY IMPLEMENTED | 7 |
+| PARTIAL | 3 |
+| NOT IMPLEMENTED | 12 |
+| N/A (investigation/data) | 3 |
+
+### Implemented This Session
+None new — all recent work was verified as already done.
+
+### Previously Implemented (15 total)
+1. Volatility Gate Tuning — ATR ratio + BTC trend boost
+2. Volatility Regime Adaptive Signals — momentum/mean-reversion weighting
+3. Trend Ignition signal — early-stage breakout (100% WR backtest)
+4. BTC Timing Guard — per-signal-type momentum filter
+5. BTC Pump Rider Gradual Rally — gradual rally detection
+6. CONF_FILTER + TIME_BLOCK — confidence + dead hour filters
+7. BTC Acceleration Detection — crash early warning
+8. PROFIT_MONSTER_BYPASS corrected — exit ownership model
+9. Dead code fix in VEL-FILTER — range(3) → range(5)
+10. Oversold Bounce signal — mean reversion at extremes
+11. EMA300 Breakthrough signal — price crashes through EMA300
+12. Pump-Chain Exit — ATR trailing for pump-chain momentum
+13. BTC Chop Gate — block trend signals in chop
+14. ACCEL_300_MINUS_FLAT_BLOCK — block SHORT in FLAT
+15. SL Zones entry_distance_filter — partial SL Memory integration
+
+### Next Candidates (Prioritized)
+1. **Contrarian Zone Signal** — Level 2, HIGH value, 84% zone hold rate
+2. **Trend Momentum V4** — Level 2, HIGH value, data-driven 54% WR
+3. **Trend Momentum** — Level 2, HIGH value, 3.0:1 R:R
+4. **Sniper Exit Strategy** — Level 3, HIGH value, constants+script exist
+5. **Retroactive Scan** — Level 3, HIGH value, missed breakout safety net
+6. **Spider-Profit** — Level 2-3, MEDIUM value, regime-aware profit taking
+7. **Signal Regime Memory** — Level 4, HIGH value, dormant/resurrect lifecycle
+8. **HL Trigger SL V2** — Level 3, HIGH value, slippage elimination

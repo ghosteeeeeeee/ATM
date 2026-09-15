@@ -246,6 +246,7 @@ VOL_PHASE_MULTS = {
         'R2_Structural': 0.2,         # HEAVILY PENALIZED — rr-struct+ LONG 5T 40%WR -$0.49 in NORMAL (24h). Wins in HIGH (87.5% WR). Tightened from 0.5 2026-09-14
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
+        'Pump_Flow': 0.0,             # BLOCKED — pump-chain+ LONG 0%WR -$0.44 in NORMAL (3T). Wins in EXTREME (46.7% WR, +$0.22)
     },
     # HIGH volatility: block signals that lose here but win in EXTREME/NORMAL
     ('HIGH', '*'): {

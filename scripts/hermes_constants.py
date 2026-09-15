@@ -250,22 +250,17 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
-    'AIXBT',
     'BABY',
-    'BLUR',
+    'BANANA',
     'CC',
     'CFX',
     'CHIP',
     'DOT',
-    'DYDX',
     'ETC',
-    'FIL',
     'IMX',
-    'KAS',
-    'NEO',
     'POL',
-    'TURBO',
-    'WLD'
+    'PONS',
+    'TURBO'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -282,10 +277,14 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
+    'AIXBT',
     'ENA',
     'GRASS',
-    'NXPC'
+    'KAS',
+    'NEO',
+    'ZRO'
 }
+
 
 
 

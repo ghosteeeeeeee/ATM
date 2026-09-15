@@ -1153,3 +1153,10 @@
 [2026-09-14 23:08 UTC]   🟢 OK: rr-struct-v2+: 6 trades, 66.7% WR, PnL=0.11
 [2026-09-14 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-14 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-15 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-15 05:08 UTC]   🟢 OK: pump-chain+: 7 trades, 28.6% WR, PnL=-1.65
+[2026-09-15 05:08 UTC]   🟢 OK: pullback-entry-: 7 trades, 42.9% WR, PnL=-3.71
+[2026-09-15 05:08 UTC]   🟢 OK: pump-chain-: 13 trades, 53.8% WR, PnL=-0.17
+[2026-09-15 05:08 UTC]   🟢 OK: rr-struct-v2+: 7 trades, 57.1% WR, PnL=-1.32
+[2026-09-15 05:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-15 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
