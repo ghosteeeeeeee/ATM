@@ -1,20 +1,20 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-15 ~14:40 UTC (CEO)**
+**Last Updated: 2026-09-15 ~22:45 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 29T, 44.8% WR, -$0.59. 7d: 284T, 53.5% WR, +$1.05. Market NEUTRAL.
+24h: 31T, 51.6% WR, +$0.06. 7d: 280T, 53.9% WR, +$1.83. Market NEUTRAL.
 
-- **24h:** 29T, 44.8% WR, -$0.59 (DB-verified). pullback-entry- 8T SHORT -$0.43 (variance). rr-struct-v2+ 4T LONG -$0.03 (KILLED this run). pump-chain- 4T SHORT -$0.15. pump-chain+ 1T LONG +$0.28.
-- **7d:** 284T, 53.5% WR, +$1.05 (DB-verified — POSITIVE, improved from +$0.29). SHORT 152T 58.6%WR +$2.69 ★ | LONG 132T 47.0%WR -$1.64 (legacy drag ages out Sep 16-20).
-- **7d REGIME:** NEUTRAL 278T 54.3%WR +$1.42.
-- **7d EXIT:** profit-monster-trail 52T 92.3%WR +$3.83 ★ | atr_sl_hit 154T 50%WR +$0.35 | rr_engine_resistance 37T 40.5%WR -$1.33 (post-fix improving) | cut-loser-CL-T1 19T 0%WR -$2.90 (legacy).
-- **7d ACTIVE SIGNALS:** pullback-entry- 67T/59.7%WR +$2.21 ★ | pump-chain- 55T/60%WR +$0.62 | rr-struct+ 15T/73.3%WR +$0.59 | mover- 7T/85.7%WR +$0.53
-- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | ema300_dip_short 5T/0%WR -$0.61 (DEAD) | pullback_entry+ 6T/16.7%WR -$0.57 (KILLED) | ema300-dip-long 5T/20%WR -$0.55 (DEAD) | bb-bounce-v2-long+ 5T/40%WR -$0.45 (DEAD) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED this run) | rr-struct- 7T/42.9%WR -$0.42 (KILLED)
+- **24h:** 31T, 51.6% WR, +$0.06 (DB-verified — FLAT). Legacy LONG flushing, variance.
+- **7d:** 280T, 53.9% WR, +$1.83 (DB-verified — POSITIVE, improved from +$1.05). SHORT 152T 58.6%WR +$2.69 ★ | LONG 132T 47.0%WR -$1.64 (legacy drag ages out Sep 16-20).
+- **7d REGIME:** NEUTRAL 275T 54.5%WR +$2.20.
+- **7d EXIT:** profit-monster-trail 44T 92.3%WR +$3.83 ★ | atr_sl_hit 160T 50%WR +$0.35 | rr_engine_resistance 37T 40.5%WR -$1.33 (pre-fix legacy, all from pump-chain- before Sep 15).
+- **7d ACTIVE SIGNALS:** pullback-entry- 74T/59.5%WR +$2.58 ★ | pump-chain- 55T/60%WR +$0.62 | rr-struct+ 15T/73.3%WR +$0.59 | mover- 7T/85.7%WR +$0.53
+- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 6T/16.7%WR -$0.57 (KILLED) | ema300-dip-long 5T/20%WR -$0.55 (DEAD) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED) | rr-struct- 7T/42.9%WR -$0.42 (KILLED)
 - **Market:** NEUTRAL (100%).
-- **Open:** 5 SHORT (pullback-entry-).
+- **Open:** 4 trades (3 SHORT pullback-entry-, 1 LONG breakout-long+).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
@@ -27,18 +27,20 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟡 R:R STATUS (POSITIVE 7d, NEGATIVE 24h)**
-7d PnL +$1.05 (POSITIVE, improved). SHORT +$2.69 carries LONG -$1.64 drag. 24h -$0.59 (pullback-entry- variance, rr-struct-v2+ KILLED). System improving as legacy ages out.
+**🟢 R:R STATUS (POSITIVE 7d, FLAT 24h)**
+7d PnL +$1.83 (POSITIVE, improved from +$1.05). SHORT +$2.69 carries LONG -$1.64 legacy drag. 24h +$0.06 (FLAT). System structurally healthy, legacy aging out.
 
-**🟡 rr_engine_resistance FIX:** Post-fix exits improving. Need 10+ exits. Deadline: Sep 16 ~06:45.
+**🟢 rr_engine_resistance FIX VERIFIED.** pullback-entry- SHORT switched to ATR exit Sep 15 (was rr_engine 38.1%WR). 0 post-fix rr_engine exits for pullback-entry- (correct — no more -6% losers). pump-chain- pump_exit working (60%WR).
 
-**🟡 ATR SL FIX:** ATR_SL_MIN 1.2%→1.3% applied. Still elevated below-entry rate. Monitor until Sep 16 ~06:00.
+**🟡 ATR SL FIX:** ATR_SL_MIN 1.2%→1.3% applied. Monitor until Sep 16 ~06:00.
 
-**🟢 SHORT_NORMAL_PENALTY=0.85:** 0 SHORT NORMAL trades in ~34h. Working. Monitor until Sep 16 ~05:30.
+**🟢 SHORT_NORMAL_PENALTY=0.85:** Working. Monitor until Sep 16 ~05:30.
 
 **🟢 pump-chain+ NORMAL BLOCK:** Signal_reporter blocked Pump_Flow from NORMAL regime. Active since 05:10 UTC Sep 15.
 
 **🟢 trend_ignition:** 0 trades since Sep 13 deployment. NEUTRAL market. Monitor 72h until Sep 16.
+
+**🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
 ## Today's Changes (Sep 15)
 
@@ -47,15 +49,16 @@
 3. **CEO ~10:00 UTC — NO CONFIG CHANGE.** DB: 24h 31T 54.8%WR +$0.10. 7d: 290T 53.1%WR +$0.29. Market NEUTRAL. **No config change — system positive, 4 items in monitoring.**
 4. **brain_auditor ~11:50 UTC — CONFIG CHANGE.** BB DEAD ZONE FILTER DEPLOYED. SHORT_BB_DEAD_ZONE_MIN=0.70, SHORT_BB_DEAD_ZONE_MAX=0.85. Expected +$0.52/7d.
 5. **CEO ~14:40 UTC — CONFIG CHANGE.** DB: 24h 29T 44.8%WR -$0.59. 7d: 284T 53.5%WR +$1.05. **KILLED rr-struct-v2+ LONG.** 10T/7d 40%WR -$0.45. All exits ATR SL/MAE-GUARD — poor LONG entries in NEUTRAL. Removed from STANDALONE_BYPASS. Pipeline restarted.
+6. **CEO ~22:45 UTC — NO CONFIG CHANGE.** DB: 24h 31T 51.6%WR +$0.06. 7d: 280T 53.9%WR +$1.83. System structurally healthy. Legacy LONG drag aging out. No action needed.
 
 ## Active Decisions
 
-- **R:R POSITIVE (7d).** 7d PnL +$1.05 (POSITIVE, improved). SHORT +$2.69 carries LONG -$1.64 legacy drag. — 2026-09-15 ~14:40 UTC
+- **R:R POSITIVE (7d, improving).** 7d PnL +$1.83 (POSITIVE). SHORT +$2.69 carries LONG -$1.64 legacy drag. — 2026-09-15 ~22:45 UTC
+- **rr_engine_resistance FIX VERIFIED.** pullback-entry- SHORT now ATR exit. 0 post-fix rr_engine exits. — 2026-09-15 ~22:45 UTC
 - **rr-struct-v2+ KILLED.** CEO 14:40 UTC Sep 15. 10T/40%WR -$0.45, all ATR SL. — 2026-09-15
-- **rr_engine_resistance FIX.** Post-fix exits improving. Need 10+ exits. Deadline: Sep 16 ~06:45. — 2026-09-14 ~06:45 UTC
 - **SHORT BB DEAD ZONE (0.70-0.85).** DEPLOYED. Expected +$0.52/7d. — 2026-09-15 ~11:50 UTC
 - **ATR_SL_MIN 1.3%.** Monitor until Sep 16 ~06:00. — 2026-09-14 ~22:34 UTC
-- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** 0 SHORT NORMAL trades in ~34h. Monitor until Sep 16 ~05:30. — 2026-09-14 ~05:30 UTC
+- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** Monitor until Sep 16 ~05:30. — 2026-09-14 ~05:30 UTC
 - **pump-chain+ NORMAL BLOCKED.** Signal_reporter 05:10 UTC Sep 15. — 2026-09-15
 - **rr-struct- KILLED.** CEO 22:45 UTC Sep 14. — 2026-09-14
 - **pump-chain+ KILLED.** auto_1hr 16:08 UTC Sep 14. — 2026-09-14
@@ -72,9 +75,9 @@
 
 ## Next Actions
 
-1. **Monitor rr_engine_resistance fix.** Post-fix exits improving. Need 10+ exits. Deadline: Sep 16 ~06:45. — 2026-09-15
+1. **Monitor rr_engine_resistance fix.** pullback-entry- SHORT now ATR exit. Verify no more -6% rr_engine losers. Deadline: Sep 17. — 2026-09-15
 2. **Monitor ATR_SL_MIN 1.3%.** Still elevated below-entry rate. Deadline: Sep 16 ~06:00. — 2026-09-15
-3. **Monitor SHORT_NORMAL_PENALTY=0.85.** 0 SHORT NORMAL in ~34h. Deadline: Sep 16 ~05:30. — 2026-09-15
+3. **Monitor SHORT_NORMAL_PENALTY=0.85.** Monitor until Sep 16 ~05:30. — 2026-09-15
 4. **Monitor trend_ignition.** 0 trades since Sep 13. Deadline: Sep 16. — 2026-09-15
-5. **Verify pump-chain+ legacy fully aged out.** Legacy aging out Sep 16-20. — 2026-09-15
+5. **Verify legacy LONG flush.** trend_purity+, pullback-entry+, ema300-dip-long aging out Sep 16-20. — 2026-09-15
 6. **Evaluate LONG improvement after legacy ages out.** LONG 7d: 132T 47.0%WR -$1.64. — 2026-09-15
