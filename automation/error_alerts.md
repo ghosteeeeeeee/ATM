@@ -609,3 +609,13 @@
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-15 16:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-15 17:43 UTC
+- **[WARN]**: `[hotset] fallback DB query returned 0 tokens` — hotset fallback empty, non-blocking
+- **[INFO]**: rr-struct-v2+ LONG — 4 trades, 0% win rate, -0.79 PnL today
+- **[INFO]**: pipeline.log 115M — approaching retention threshold

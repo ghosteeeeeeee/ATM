@@ -5015,3 +5015,53 @@ BY: auto_1hr
 - System barely positive — watching for regime shift to NEUTRAL
 
 BY: auto_1hr
+
+## [2026-09-15 17:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (5 open: ETH SHORT, SAND SHORT, IMX LONG, LTC SHORT, SUPER SHORT)
+**24h:** 31T 51.6%WR -$0.10
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No 0%WR signal with 3+ trades in hour
+- Trade frequency 1.3/hr — healthy
+- System breakeven (-$0.10/24h) — noise level
+- pump-chain- SHORT 33%WR/24h but 46.7%WR/48h — recent dip not structural
+- 5 open positions just entered, no SL hits yet
+
+**Monitoring:**
+- 5 open positions — will evaluate next hour when SL/TP triggers
+- pullback-entry- SHORT 53%WR/$-0.05 — flat, watch for degradation
+- 100% atr_sl_hit persists — no TP/trail exits active
+
+BY: auto_1hr
+
+## [2026-09-15 18:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses). $0.00 (breakeven).
+- SAND SHORT pullback-entry- atr_sl_hit: $0.00
+
+**24h:** 30T 50%WR +$0.06
+- pullback-entry-: 16T 50%WR -$0.05 (flat)
+- pump-chain-: 4T 50%WR +$0.01 (flat)
+- pump-chain+: 1T 100%WR +$0.28
+- rr-struct-v2+ (pre-kill): 8T 50%WR -$0.19
+- Exit: 90% atr_sl_hit (structural — no TP/trail)
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- No kill candidates (no 0% WR signal with 3+ trades in hour)
+- Trade frequency 1.3/hr — healthy
+- System breakeven (+$0.06/24h) — noise level
+- pump-chain- SHORT 46.7%WR/48h +$0.14 — within normal range
+- New signal: breakout-long+ (2 open: ZEN, IMX) — first appearance, too early to evaluate
+
+**Monitoring:**
+- 5 open positions: ZEN LONG (breakout-long+), ETH SHORT, IMX LONG (breakout-long+), LTC SHORT, SUPER SHORT
+- breakout-long+ — new signal, watch first close
+- 100% atr_sl_hit persists — no TP/trail exits active
+- System flat 3 hours straight — watching for regime shift
+
+BY: auto_1hr

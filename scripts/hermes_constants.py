@@ -67,7 +67,8 @@ SHORT_BLACKLIST = {
     'RLB', 'RNDR', 'SHIA',
     'MATIC', 'UNIBOT', 'MKR', 'MYRO',
     # 2026-04-04: systematic SHORT losses (net<=$-2.50, phantom trades excluded)
-    # ENA removed for Batch 3 trial 2026-08-02
+    # ENA re-added to SHORT_BLACKLIST 2026-09-15 — 11T/7d, 36.4% WR, -$0.56
+    'ENA',
     'PENGU',   # SHORT net: -$4.36 (1 loss: conf-1s -$4.36)
     # 2026-04-10: CFX removed for Batch 3 trial 2026-08-02
     # 2026-04-19: STABLE — block both directions. Stablecoin pairs have no directional
@@ -805,6 +806,10 @@ SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = moment
 # Blocks 7 losers (-$0.94), 7 winners (+$0.42). Net: +$0.52/7d.
 SHORT_BB_DEAD_ZONE_MIN = 0.70
 SHORT_BB_DEAD_ZONE_MAX = 0.85
+# Second dead zone: 0.35-0.55 BB = chop zone, no edge.
+# 7d: 25T 44%WR -$0.99. Blocks 14 losers (-$2.26), 11 winners (+$1.27). Net: +$0.99/7d.
+SHORT_BB_DEAD_ZONE2_MIN = 0.35
+SHORT_BB_DEAD_ZONE2_MAX = 0.55
 
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
@@ -1118,7 +1123,7 @@ CONF_FILTER_MIN = 70                    # lowered from 75 2026-09-02 — <75 tie
 # Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
 TIME_BLOCK_ENABLED = True               # Penalty during bad hours (extended from 05-07, 2026-09-12)
 TIME_BLOCK_START = 3                    # UTC hour (inclusive) — legacy range start (kept for compat)
-TIME_BLOCK_END = 7                      # UTC hour (exclusive: legacy range end)
+TIME_BLOCK_END = 9                      # UTC hour (exclusive: extended from 7 to 9, 2026-09-15 — hour 9 bleeds -$0.50 despite 57.9% WR)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
@@ -1392,7 +1397,7 @@ SIGNAL_EXIT_CONFIG = {
     'ema300-breakthrough-': 'atr',
     # Pullback entry: structural exit
     'pullback-entry+': 'rr_engine',
-    'pullback-entry-': 'rr_engine',
+    'pullback-entry-': 'atr',  # Changed from rr_engine 2026-09-15 — rr_engine exits SHORT on resistance touch at 38.1% WR vs ATR SL at 69% WR
     # Accel 300 V3 SHORT: structural exit
     'accel-300-v3-short+': 'rr_engine',
     'accel-300-v3-short-': 'rr_engine',
@@ -1444,8 +1449,8 @@ CUT_LOSER_ENABLED      = True   # master switch
 CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0% immediately (7d: 39 trades bled past -5%)
 
 # Tier 1: Quick Cut — -1.0% to -3.0%, fires frequently
-CL_TIER1_MIN_PCT      = -3.0    # floor (widened from -2.0% — 7d data shows trades bleed through)
-CL_TIER1_MAX_PCT      = -1.0    # ceiling (start cutting at -1.0%)
+CL_TIER1_MIN_PCT      = -2.0    # tightened 2026-09-15 — was -3.0, trades bleed through before floor hits
+CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
 CL_TIER1_FIRE_WINDOWS = {"A": (1, 2), "B": (1, 2)}  # CEO Sep 9: tightened from (3,6)
@@ -1841,7 +1846,7 @@ R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LON
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
 # ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip_long.py — catches shallow pullbacks in strong uptrends
-EMA300_DIP_LONG_ENABLED = True           # RE-ENABLED 2026-09-09 — wins in HIGH (57%) and NORMAL (56%). EXTREME blocked via volatility_gate_v2.
+EMA300_DIP_LONG_ENABLED = False          # DISABLED 2026-09-15 — 20% WR, 5T/7d, -$0.55. Catches falling knives in HIGH volatility.
 EMA300_DIP_LONG_EMA_PERIOD = 300          # EMA period
 EMA300_DIP_LONG_MAX_DIST_PCT = 0.5        # max distance from EMA300 (%) — tightened from 0.6
 EMA300_DIP_LONG_MIN_DIST_PCT = 0.3        # min distance from EMA300 (%) — require meaningful dip, not noise

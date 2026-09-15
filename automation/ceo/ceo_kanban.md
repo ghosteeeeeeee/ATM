@@ -1547,3 +1547,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Creative: (1) RSI_MIN=35 for pullback-entry- SHORT — block oversold entries. Needs 50+ trade sample. (2) rr-struct+ HIGH allocation potential — monitor.
   No config change — 4 items in monitoring, legacy aging out.
   BY: brain_auditor
+- [2026-09-15 ~15:50 UTC (brain_auditor run)] brain_auditor: CONFIG CHANGE — SHORT_BB_DEAD_ZONE2 DEPLOYED
+  DB: 24h 31T 50.0%WR -\$0.29 | 7d 283T 54.1%WR +\$1.56
+  SHORT 7d: 155T 56.8%WR +\$2.58★ | LONG 7d: 128T 49.2%WR -\$1.02 (legacy ages out Sep 16-20)
+  Regime 7d: EXTREME 106T 55.7%WR +\$2.00★ | HIGH 115T 55.7%WR +\$0.60 | NORMAL 57T 50.9%WR -\$0.79
+  Exit 7d: profit-monster-trail 45T 91.1%WR +\$3.46★ | atr_sl_hit 158T 52.5%WR +\$1.37 | rr_engine_resistance 37T 40.5%WR -\$1.33 (0 exits in 36h — NOT VALIDATED)
+  ATR SL below-entry: 57.6% (91/158). Still elevated.
+  BB ZONE SHORT 7d: bb<0.15 62.5%WR +\$1.73★ | bb 0.15-0.35 63.6%WR +\$1.51★ | bb 0.35-0.55 44%WR -\$0.99✗ | bb 0.55-0.70 70.6%WR +\$0.95★ | bb 0.70-0.85 50%WR -\$0.60 (filtered) | bb>0.85 64.3%WR +\$0.68
+  **CONFIG: SHORT_BB_DEAD_ZONE2_MIN=0.35, SHORT_BB_DEAD_ZONE2_MAX=0.55.** Blocks 0.35-0.55 chop zone. Expected +\$0.99/7d.
+  Losers 24h: 13 total. ALL atr_sl_hit. pullback-entry- 10 SHORT (normal variance). rr-struct-v2+ 3 LONG (overbought entries, KILLED). pump-chain- 3 SHORT (near breakeven).
+  Creative: (1) BB 0.35-0.55 dead zone — DEPLOYED. (2) rr_engine_resistance 36h gap — INVESTIGATE.
+  Config change: SHORT_BB_DEAD_ZONE2 deployed. Pipeline restarted.
+  BY: brain_auditor

@@ -2636,7 +2636,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 _conn_sf = None
                 try:
@@ -2761,6 +2761,20 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _bb_pos = _bb_data.get('bb_position')
                         if _bb_pos is not None and SHORT_BB_DEAD_ZONE_MIN <= _bb_pos <= SHORT_BB_DEAD_ZONE_MAX:
                             log(f"  🚫 [SHORT-BB-DEAD-ZONE] {tkn}: SHORT blocked — bb_position {_bb_pos:.4f} in [{SHORT_BB_DEAD_ZONE_MIN},{SHORT_BB_DEAD_ZONE_MAX}] (noise zone)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
+            # ── SHORT BB dead zone 2: block SHORT at mid band (chop zone) ──
+            # 0.35-0.55 BB = chop, no edge. 25T 44%WR -$0.99/7d. Preserves 0.55-0.70 (70.6%WR +$0.95).
+            if direction == 'SHORT' and SHORT_BB_DEAD_ZONE2_MIN > 0:
+                try:
+                    _bb_meta2 = entry.get('signal_metadata')
+                    if _bb_meta2:
+                        import json as _json_bb2
+                        _bb_data2 = _json_bb2.loads(_bb_meta2) if isinstance(_bb_meta2, str) else (_bb_meta2 if isinstance(_bb_meta2, dict) else {})
+                        _bb_pos2 = _bb_data2.get('bb_position')
+                        if _bb_pos2 is not None and SHORT_BB_DEAD_ZONE2_MIN <= _bb_pos2 <= SHORT_BB_DEAD_ZONE2_MAX:
+                            log(f"  🚫 [SHORT-BB-DEAD-ZONE2] {tkn}: SHORT blocked — bb_position {_bb_pos2:.4f} in [{SHORT_BB_DEAD_ZONE2_MIN},{SHORT_BB_DEAD_ZONE2_MAX}] (chop zone)")
                             continue
                 except Exception:
                     pass  # non-fatal

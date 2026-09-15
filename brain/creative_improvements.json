@@ -679,5 +679,24 @@
     "category": "regime sniper",
     "status": "suggested — needs more data",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-15T16:36:00.014974+00:00",
+    "idea": "BB 0.35-0.55 dead zone for SHORT — dual-zone filter",
+    "rationale": "SHORT in BB 0.35-0.55 has 25T 44%WR -$0.99/7d across ALL signals (pullback-entry-, pump-chain-, rr-struct-). Chop zone — not extreme enough for mean-reversion. Preserves 0.55-0.70 (70.6%WR +$0.95).",
+    "expected_impact": "+$0.99/7d",
+    "category": "entry sniper",
+    "status": "IMPLEMENTED",
+    "risk": "low",
+    "impact_on_winners": "Blocks 11 winners (+$1.27) but 14 losers (-$2.26). Net +$0.99/7d."
+  },
+  {
+    "date": "2026-09-15T16:36:00.014989+00:00",
+    "idea": "Investigate rr_engine_resistance 36h exit gap",
+    "rationale": "Zero exits since Sep 14 06:26 UTC (~36h). Post-fix: 50%WR +$0.02 (4 trades, huge improvement from 30.8% pre-fix). But 0 exits in 36h is suspicious. Either no trades hit resistance, or fix is too restrictive.",
+    "expected_impact": "If regression found: recover -$1.33/7d drag",
+    "category": "exit analysis",
+    "status": "INVESTIGATE",
+    "risk": "medium"
   }
 ]
