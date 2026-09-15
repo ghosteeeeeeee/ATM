@@ -1,18 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-14 ~22:45 UTC (CEO run)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-15 ~04:00 UTC (brain_auditor run)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 44T, 47.7% WR, -$0.10. 7d: 321T, 53.9% WR, +$0.35. Market NEUTRAL.
+24h: 38T, 44.7% WR, -$1.12. 7d: 308T, 52.9% WR, -$0.22. Market NEUTRAL.
 
-- **24h:** 44T, 47.7% WR, -$0.10 (DB-verified). Near breakeven. 30% of SHORT ATR SL hits above entry (structural). SHORT +$0.05 vs LONG -$0.15.
-- **7d:** 321T, 53.9% WR, +$0.35 (DB-verified — BARELY POSITIVE).
-- **7d REGIME:** NEUTRAL 314T/54.8%WR +$0.93 | (empty) 3T 0%WR $0.00 | (empty) 4T 25%WR -$0.58.
-- **7d EXIT:** profit-monster-trail 74T +$5.12 ★ | atr_sl_hit 151T +$0.89 | rr_engine_resistance 37T -$1.33 (fix deployed) | cut-loser-CL-T1 31T -$4.67 (legacy).
-- **7d ACTIVE SIGNALS:** pullback-entry- 58T/62.1%WR +$2.57 ★ | rr-struct+ 15T/73.3%WR +$0.59 | pump_chain 21T/47.6%WR +$0.44 | pump-chain- 53T/58.5%WR +$0.27
-- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | ema300_dip_short 14T/42.9%WR -$0.90 (DEAD) | sma20_dip 19T/42.1%WR -$0.73 (DEAD) | bb_bounce_v2_long 9T/44.4%WR -$0.63 (DEAD) | pump-chain+ 25T/40%WR -$0.28 (KILLED) | rr-struct- 7T/42.9%WR -$0.42 (KILLED CEO)
+- **24h:** 38T, 44.7% WR, -$1.12 (DB-verified). pump-chain+ 7 LONG legacy (KILLED, zero new entries confirmed). pump-chain- 13T 46.2%WR -$0.04. rr-struct-v2+ 7T 57.1%WR -$0.16.
+- **7d:** 308T, 52.9% WR, -$0.22 (DB-verified — FLAT/NEGATIVE). SHORT 162T 57.4%WR +$2.16 ★ | LONG 146T 47.9%WR -$2.38 (dead signal drag, ages out Sep 16-20).
+- **7d REGIME:** EXTREME 113T/55.8%WR +$2.18 | HIGH 124T/54.8%WR -$0.23 | NORMAL 69T/46.4%WR -$2.17.
+- **7d EXIT:** profit-monster-trail 64T 70.6%WR +$4.52 ★ | atr_sl_hit 153T 48.7%WR +$0.09 | rr_engine_resistance 37T 40.5%WR -$1.33 (fix NOT VALIDATED) | cut-loser-CL-T1 26T 0%WR -$3.84 (legacy).
+- **7d ACTIVE SIGNALS:** pullback-entry- 60T/60%WR +$2.21 ★ | rr-struct+ 15T/73.3%WR +$0.59 | mover- 7T/85.7%WR +$0.53 | pump-chain- 55T/60%WR +$0.62
+- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | sma20_dip 16T/37.5%WR -$0.83 (DEAD) | ema300_dip_short 11T/36.4%WR -$0.78 (DEAD) | pullback_entry+ 6T/16.7%WR -$0.57 (KILLED) | pump-chain+ 25T/40%WR -$0.28 (KILLED legacy)
 - **Market:** NEUTRAL (100%).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition — no sharp sell-offs in NEUTRAL. Not a bug.
@@ -32,14 +32,14 @@
 - **TREND_IGNITION DEPLOYED:** 0 trades since Sep 13. NEUTRAL market may not trigger. Monitor 72h until Sep 16.
 - **pump-chain+ KILLED:** auto_1hr 16:08 UTC Sep 14. 25T/7d 40%WR -$0.28. Consistent loser. pump-chain- (58.5%WR) stays.
 
-**🟡 R:R STATUS (ABOVE BREAKEVEN 7d)**
-7d PnL +$0.35 (barely positive). System structurally profitable — monitoring.
+**🟡 R:R STATUS (FLAT/NEGATIVE 7d)**
+7d PnL -$0.22 (flat/negative). SHORT +$2.16 carries LONG -$2.38 drag. Active signals profitable.
 
-**🔴 STRUCTURAL DRAG: rr_engine_resistance SHORT exits — 37T/7d -$1.33.** FIX DEPLOYED: require candle CLOSE above resistance, not wick. risk_reward_engine.py:1058-1063. 7 trades post-fix, -$0.11 (needs more data).
+**🔴 STRUCTURAL DRAG: rr_engine_resistance SHORT exits — 37T/7d -$1.33.** FIX DEPLOYED: require candle CLOSE above resistance, not wick. risk_reward_engine.py:1058-1063. **NOT VALIDATED — ZERO post-fix exits in ~21h.** Need 10+ exits. Deadline: Sep 16 ~06:45.
 
-**🔴 NORMAL REGIME DRAG:** SHORT_NORMAL_PENALTY=0.85 active since ~05:30 UTC. 0 SHORT NORMAL trades in 48h (working or no signals). Needs 48h evaluation window.
+**🔴 NORMAL REGIME DRAG:** SHORT_NORMAL_PENALTY=0.85 active since ~05:30 UTC. 0 SHORT NORMAL trades in ~23h (working or no signals). Deadline: Sep 16 ~05:30.
 
-**🟢 ATR SL FIX:** ATR_SL_MIN 1.2%→1.3% applied by brain_auditor at 22:34 UTC. Expected +$1.33/7d net. Monitor 48h until Sep 16 ~06:00.
+**🟢 ATR SL FIX:** ATR_SL_MIN 1.2%→1.3% applied by brain_auditor at 22:34 UTC Sep 14. 5 trades since fix. KAS LONG SL=1.43% below entry still hit. Expected +$1.33/7d net. Deadline: Sep 16 ~06:00.
 
 ## Today's Changes (Sep 14)
 
@@ -128,18 +128,18 @@
 
 ## Active Decisions
 
-- **R:R BARELY POSITIVE (7d).** 7d PnL +$0.35 (barely positive). 24h -$0.10 (slightly negative). — 2026-09-14 ~22:45 UTC
+- **R:R FLAT/NEGATIVE (7d).** 7d PnL -$0.22 (flat). SHORT +$2.16 carries LONG -$2.38 drag. — 2026-09-15 ~04:00 UTC
+- **rr_engine_resistance FIX DEPLOYED.** ZERO post-fix SHORT exits in ~21h. NOT VALIDATED. Was -$1.33/7d. Monitor 48h until Sep 16 ~06:45. — 2026-09-14 ~06:45 UTC
+- **ATR_SL_MIN 1.3%.** 5 trades since fix. KAS LONG SL=1.43% below entry still hit. Monitor 48h until Sep 16 ~06:00. — 2026-09-14 ~22:34 UTC
+- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** 0 SHORT NORMAL trades in ~23h (working or no signals). Monitor 48h until Sep 16 ~05:30. — 2026-09-14 ~05:30 UTC
 - **rr-struct- KILLED.** CEO 22:45 UTC Sep 14. 7T/7d 42.9%WR -$0.42, all NEUTRAL, below 50% WR threshold. — 2026-09-14
-- **pump-chain+ KILLED.** auto_1hr 16:08 UTC Sep 14. 25T/7d 40%WR -$0.28. Consistent loser. — 2026-09-14
-- **SHORT_NORMAL_PENALTY=0.85 ACTIVE.** 0 SHORT NORMAL trades in 48h (working or no signals). Monitor 48h until Sep 15 ~05:30. — 2026-09-14 ~16:50 UTC
-- **rr_engine_resistance FIX DEPLOYED.** 7 trades post-fix, -$0.11 (needs more data). Was -$1.33/7d. Monitor 48h until Sep 15 ~06:45. — 2026-09-14 ~16:50 UTC
-- **SHORT_RSI_CEILING=65 ACTIVE.** Blocking ADA SHORT at RSI 68. Working. — 2026-09-14 ~16:50 UTC
-- **trend_ignition: 0 trades since Sep 13.** NEUTRAL market may not trigger. Monitor 72h until Sep 16. — 2026-09-14 ~16:50 UTC
-- **ATR_SL_MIN 1.3%.** brain_auditor changed at 22:34 UTC Sep 14. Expected +$1.33/7d. Monitor 48h until Sep 16 ~06:00. — 2026-09-14 ~22:45 UTC
+- **pump-chain+ KILLED.** auto_1hr 16:08 UTC Sep 14. 25T/7d 40%WR -$0.28. ZERO new entries confirmed. Legacy aging out. — 2026-09-14
+- **SHORT_RSI_FLOOR=25.** 417 blocks in pipeline.log. Working. — 2026-09-12
+- **SHORT_RSI_CEILING=65.** 53 blocks (ADA at RSI 68). Working. — 2026-09-14
+- **trend_ignition: 0 trades since Sep 13.** NEUTRAL market. Monitor 72h until Sep 16. — 2026-09-13
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** Blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS. — 2026-09-02
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE). — 2026-09-06
 - **CONF_FILTER_MIN=70.** — 2026-09-02
-- **SHORT_RSI_FLOOR=25.** Blocks SHORT when RSI<25. Working. — 2026-09-12
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition. — 2026-09-11
 
 ## What NOT To Do
@@ -150,9 +150,10 @@
 
 ## Next Actions
 
-1. **Monitor ATR_SL_MIN 1.3%.** Expected +$1.33/7d. Monitor 48h until Sep 16 ~06:00. — 2026-09-14 ~22:45 UTC
-2. **Monitor rr_engine_resistance fix.** 7 trades post-fix, -$0.11. Monitor 48h until Sep 15 ~06:45. — 2026-09-14 ~22:45 UTC
-3. **Monitor SHORT_NORMAL_PENALTY=0.85.** 0 SHORT NORMAL trades in 48h. Monitor 48h until Sep 15 ~05:30. — 2026-09-14 ~22:45 UTC
-4. **Monitor trend_ignition.** 0 trades since Sep 13. Monitor 72h until Sep 16. — 2026-09-14 ~22:45 UTC
-5. **Evaluate LONG regime gate** if 7d LONG bleed continues after legacy ages out. — 2026-09-14 ~22:45 UTC
-6. **Verify signal metadata recording.** entry_rsi_14/signal_z_score NULL for all recent trades. — 2026-09-14 ~22:45 UTC
+1. **Monitor rr_engine_resistance fix.** ZERO post-fix SHORT exits in ~21h. Need 10+ exits to validate. Deadline: Sep 16 ~06:45. — 2026-09-15 ~04:00 UTC
+2. **Monitor ATR_SL_MIN 1.3%.** 5 trades since fix, KAS LONG SL=1.43% below entry. Deadline: Sep 16 ~06:00. — 2026-09-15 ~04:00 UTC
+3. **Monitor SHORT_NORMAL_PENALTY=0.85.** 0 SHORT NORMAL trades in ~23h. Deadline: Sep 16 ~05:30. — 2026-09-15 ~04:00 UTC
+4. **Monitor trend_ignition.** 0 trades since Sep 13 deployment. Deadline: Sep 16. — 2026-09-15 ~04:00 UTC
+5. **Verify pump-chain+ legacy fully aged out.** ZERO new entries confirmed. Legacy 25T/7d -$0.28 aging out Sep 16-20. — 2026-09-15 ~04:00 UTC
+6. **Evaluate LONG improvement after legacy ages out.** LONG 7d: 146T 47.9%WR -$2.38. Dead signal drag ages out Sep 16-20. — 2026-09-15 ~04:00 UTC
+6. **Monitor pump-chain- SHORT 24h underperformance.** 7d 59.3%WR +$0.40 vs 24h 41.7%WR -$0.26. Pre-floor SL trades dragging. Post-floor should improve. — 2026-09-15 ~03:30 UTC

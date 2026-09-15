@@ -4654,3 +4654,37 @@ BY: auto_1hr
 - NORMAL regime -$2.39/7d — structural, SHORT_NORMAL_PENALTY active
 
 BY: auto_1hr
+
+## [2026-09-15 04:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L)
+- USUAL SHORT pullback-entry- atr_sl_hit: -$0.18 (tiny loss)
+
+**24h:** 37T 43.2%WR -$1.19 | **7d:** 309T 52.8%WR -$0.38
+
+**24h exit breakdown:**
+- atr_sl_hit: 35T (94.6%) avg -$0.028 — near breakeven, ATR_SL_MIN fix working
+- rr_engine_resistance: 2T avg -$0.180
+
+**Open positions:** 6 SHORTs (all pullback-entry- or pump-chain-)
+- SUSHI: SL 0.62% above entry (below 1.3% floor — trailing pulled it down on profit)
+- FOGO: SL 1.19% (just below floor)
+- DOT/STX: SL below entry (in-profit trailing — correct behavior)
+- ACE: SL 1.20% (just below floor)
+- HYPER: SL 1.42% (compliant)
+
+**Changes:** None — no kill threshold hit, system quiet
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR + 3+ trades last hour)
+- Trade frequency 37/24h = ~1.5/hr — healthy
+- ATR_SL_MIN fix deployed and working on new trades
+- SUSHI tight SL is trailing artifact, not a bug — will widen if price moves further in favor
+
+**Monitoring:**
+- ema300_dip_short SHORT 7d: 11T 36.4%WR — dormant since Sep 8
+- trend_purity+ LONG 7d: 11T 36.4%WR — dormant since Sep 13
+- NORMAL regime 7d: -$2.17 — structural, SHORT_NORMAL_PENALTY active
+- pump-chain- SHORT 24h: 12T 41.7%WR -$0.26 — below average but not kill threshold
+
+BY: auto_1hr

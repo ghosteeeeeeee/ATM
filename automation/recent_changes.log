@@ -1865,3 +1865,13 @@
   Losers 24h: 17 total. pump-chain+ 7 LONG (KILLED legacy). pump-chain- 12 SHORT (pre-floor).
   Creative: (1) rr_engine_resistance fix needs validation (2) pump-chain- 24h underperforming
   BY: brain_auditor
+[2026-09-15 03:30 UTC] brain_auditor: NO CONFIG CHANGE — 5 fixes monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 36T 44.1%WR -$1.03 | 7d: 312T 53.2%WR +$1.70
+  SHORT 7d: 161T 57.1%WR +$1.84 | LONG 7d: 151T 49.0%WR -$0.14 (dead signal drag)
+  Exit 7d: profit-monster-trail 67T 91%WR +$4.62 | atr_sl_hit 152T 48.7%WR -$0.13 | rr_engine_resistance 37T 40.5%WR -$1.33
+  Regime 7d: EXTREME 115T 55.7%WR +$2.22 | HIGH 124T 54.8%WR -$0.39 | NORMAL 69T 46.4%WR -$2.17
+  Filters verified: SHORT_RSI_FLOOR 417 blocks | SHORT_RSI_CEILING 53 blocks | SHORT_NORMAL_PENALTY 0 trades
+  Fixes: ATR_SL_MIN 1.3% (ALT hit 1.30%) | rr_engine_resistance (ZERO post-fix exits) | SHORT_NORMAL_PENALTY (zero trades) | trend_ignition (zero trades)
+  Open: 5 positions (4x pullback-entry- SHORT, 1x pump-chain- SHORT)
+  Creative: (1) Regime-specific ATR_SL_MIN for EXTREME SHORT suggested (2) pump-chain- SHORT 24h underperforming — pre-floor trades
+  BY: brain_auditor

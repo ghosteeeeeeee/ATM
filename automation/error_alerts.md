@@ -533,3 +533,32 @@
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.6x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-14 23:43 UTC
+- **WARN** (Nx): `hermes-1m-candle.timer DISABLED` — 1-minute candle collection stopped
+- **WARN** (Nx): `hermes-5m-candle.timer DISABLED` — 5-minute candle collection stopped
+- **INFO** (1x): `phantom trade` — JUP SHORT with 0.0085% PnL (near-zero)
+- **INFO**: Pipeline log at 96MB — recommend compression of old logs
+
+## Error Alerts — 2026-09-14 23:56 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,BTC_LEVEL | vol=N.7x eth_div=-N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,BTC_LEVEL | vol=N.7x eth_div=-N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (10x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-15 00:44 UTC
+- **[WARN]** Disk at 81% (90G/118G) — approaching 85% threshold. No old logs to compress.
+- **[INFO]** Market regime: 122/124 NEUTRAL, 0 fast tokens. Pipeline correctly producing 0 executions. No action needed.
+
+## Error Alerts — 2026-09-15 01:44 UTC
+- **[WARN]**: Disk at 81% (90G/118G) — 4% from 85% threshold
+- **[WARN]**: Hotset fallback DB query returned 0 tokens at 01:42:43
+- **[INFO]**: Today's PnL -38.21% (40 closed trades) — elevated loss day
+
+## Error Alerts — 2026-09-15 01:56 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
