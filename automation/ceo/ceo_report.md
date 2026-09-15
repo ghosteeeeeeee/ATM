@@ -1,3 +1,34 @@
+## CEO Report — 2026-09-15 ~14:40 UTC
+
+### Diagnosis
+24h negative: 29T, 44.8% WR, -$0.59 (VERIFIED). 7d positive: 284T, 53.5% WR, +$1.05 (VERIFIED, improved from +$0.29). 5 open SHORT. Market NEUTRAL.
+
+### Verified Numbers (DB-queried this run)
+- 24h: 29T, 44.8% WR, -$0.59
+- 48h: 77T, 45.5% WR, -$1.42
+- 7d: 284T, 53.5% WR, +$1.05 (improved from +$0.29)
+- 7d SHORT: 152T, 58.6% WR, +$2.69 ★
+- 7d LONG: 132T, 47.0% WR, -$1.64 (legacy drag)
+- 7d ACTIVE: pullback-entry- 67T/59.7%WR +$2.21★ | pump-chain- 55T/60%WR +$0.62 | rr-struct+ 15T/73.3%WR +$0.59 | mover- 7T/85.7%WR +$0.53
+- 7d DRAGGERS (ALL DEAD): trend_purity+ -$0.90 | ema300_dip_short -$0.61 | pullback_entry+ -$0.57 | ema300-dip-long -$0.55 | bb-bounce-v2-long+ -$0.45 | rr-struct-v2+ -$0.45 (KILLED) | rr-struct- -$0.42
+- 48h LOSERS: rr-struct-v2+ LONG 10T -$0.45 (KILLED) | pullback-entry- SHORT 25T -$0.21 (variance)
+
+### Root Cause
+24h negative from pullback-entry- variance (25T/48%WR vs 59.7% 7d) and rr-struct-v2+ LONG (10T/40%WR, all ATR SL exits — poor entries in NEUTRAL). 7d improved to +$1.05 as legacy ages out.
+
+### Fix Applied
+**KILLED rr-struct-v2+ LONG.** 10T/40%WR -$0.45. All exits ATR SL or MAE-GUARD — signal enters LONG in NEUTRAL with poor entry quality. Removed from STANDALONE_BYPASS. Pipeline restarted. Expected impact: removes -$0.45/7d drag.
+
+### Monitoring (4 items at deadline Sep 16)
+| Fix | Status | Deadline |
+|-----|--------|----------|
+| rr_engine_resistance | Post-fix exits improving | Sep 16 ~06:45 |
+| ATR_SL_MIN 1.3% | Still elevated below-entry | Sep 16 ~06:00 |
+| SHORT_NORMAL_PENALTY=0.85 | 0 SHORT NORMAL in ~34h | Sep 16 ~05:30 |
+| trend_ignition | 0 trades since Sep 13 | Sep 16 |
+
+---
+
 ## CEO Report — 2026-09-15 ~05:30 UTC
 
 ### Diagnosis

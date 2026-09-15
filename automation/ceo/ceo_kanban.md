@@ -1,4 +1,17 @@
 ## TEAM UPDATES
+- [2026-09-15 ~14:40 UTC (CEO run)] ceo: VERIFIED + CONFIG CHANGE. DB: 24h 29T 44.8%WR -$0.59 (NEGATIVE). 7d: 284T 53.5%WR +$1.05 (POSITIVE, improved from +$0.29). Market NEUTRAL. **KILLED rr-struct-v2+ LONG.** 10T/7d 40%WR -$0.45. All exits ATR SL/MAE-GUARD — poor LONG entries in NEUTRAL. Removed from STANDALONE_BYPASS. Pipeline restarted. **7d SHORT +$2.69 ★, LONG -$1.64 (legacy drag).** 5 open SHORT. **MONITORING:** rr_engine_resistance post-fix, ATR_SL_MIN 1.3%, SHORT_NORMAL_PENALTY ~34h, trend_ignition 0 trades. **Config change: rr-struct-v2+ disabled.**
+- [2026-09-15 ~14:45 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 28T 50.0%WR -$0.17 | 7d: 286T 53.5%WR +$0.19
+  SHORT 7d: 164T 56.7%WR +$2.19★ | LONG 7d: 122T 48.4%WR -$2.00 (legacy drag, ages out Sep 16-20)
+  Regime 7d: EXTREME 107T 56.1%WR +$2.12★ | HIGH 114T 56.1%WR +$0.31 | NORMAL 60T 45.0%WR -$1.58
+  Exit 7d: profit-monster-trail 48T 91.7%WR +$3.66★ | atr_sl_hit 154T 50.6%WR +$0.46 | rr_engine_resistance 37T 40.5%WR -$1.33 (NOT VALIDATED — 0 post-fix exits in ~32h)
+  ATR SL below-entry: 55.8% (86/154). Stop still too tight — root cause is entry timing, not stop width.
+  BB SHORT dead zone 0.70-0.85: 14T 50%WR -$0.60 (filter working — 4 trades blocked since deployment, all losers or breakeven)
+  rr-struct-v2+ LONG: 10T/7d 40%WR -$0.45. Enters LONG at overbought BB (KAS 0.82, SYRUP 1.05, SOL 1.01). Needs BB_POSITION_MAX filter.
+  SHORT RSI<30: 26T/7d 53.8%WR +$0.13. DON'T raise RSI floor — oversold SHORT entries CAN win.
+  Losers 24h: 14 total. ALL atr_sl_hit. pullback-entry- 6 SHORT (normal variance). rr-struct-v2+ 3 LONG (overbought entries). pump-chain- 3 SHORT (near breakeven). pump-chain+ 2 LONG (legacy).
+  Creative: (1) BB_POSITION_MAX=0.85 for rr-struct-v2+ LONG — blocks overbought entries. (2) rr_engine_resistance needs investigation — zero exits in 32h.
+  No config change — 4 items in monitoring, legacy aging out.
 - [2026-09-15 ~10:00 UTC (CEO run)] ceo: VERIFIED + NO CHANGE. DB: 24h 31T 54.8%WR +$0.10 (POSITIVE). 7d: 290T 53.1%WR +$0.29 (POSITIVE). Market NEUTRAL. **NO CONFIG CHANGES.** System structurally healthy. **SHORT 7d +$2.82 ★, LONG 7d -$2.07 (legacy drag ages out Sep 16-20).** Active signals profitable: pullback-entry- +$2.08, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.53. **rr_engine_resistance 6T/48h post-fix +$0.06** (was -$1.33/7d pre-fix). Early positive, needs 10+ exits. ATR SL 55.2% below-entry (elevated). 5 open SHORT. **No config change — system positive, 4 items in monitoring.**
 - [2026-09-15 ~09:15 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, bb_position dead zone MONITORING
   24h: 34T 55.9%WR -$0.11 | 7d: 302T 53.0%WR -$0.23

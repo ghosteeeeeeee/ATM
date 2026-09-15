@@ -2337,7 +2337,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
-    'rr-struct-v2', 'rr-struct-v2+', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14)
+    'rr-struct-v2', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14). v2+ KILLED CEO 2026-09-15
     'rr-struct-v',  # regex-stripped variant (trailing digits removed: v2 -> v)
     'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
@@ -3208,7 +3208,7 @@ RR_STRUCTURAL_BB_SHORT_MIN    = 0.1    # block SHORT when bb_position < this (ov
 
 # ── RR Structural V2 LONG ───────────────────────────────────────────────────
 # rr_structural_v2_long.py — enhanced LONG signal with falling-knife filter
-RR_STRUCTURAL_V2_LONG_ENABLED       = True   # master kill-switch
+RR_STRUCTURAL_V2_LONG_ENABLED       = False  # CEO KILLED 2026-09-15 — 10T/7d 40%WR -$0.45, all ATR SL/MAE-GUARD exits. Poor LONG entries in NEUTRAL.
 RR_STRUCTURAL_V2_MOM_FALLING_Z_MIN  = -2.0   # block LONG when momentum=falling AND z_score < this
 RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN = 0.0    # block LONG when momentum=falling AND bb_position < this
 

@@ -1930,3 +1930,17 @@
   pullback-entry- SHORT: 9T 44.4%WR -$0.40 — weakest signal
   No signal meets kill criteria. Trade frequency healthy.
   BY: auto_1hr
+[2026-09-15 14:45 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 28T 50.0%WR -$0.17 | 7d: 286T 53.5%WR +$0.19
+  rr_engine_resistance 0 post-fix exits in 32h (NOT VALIDATED)
+  ATR SL 55.8% below-entry (still elevated)
+  rr-struct-v2+ LONG 10T/7d 40%WR -$0.45 (overbought BB entries)
+  Creative: BB_POSITION_MAX=0.85 for rr-struct-v2+ LONG suggested
+  No config change — monitoring.
+  BY: brain_auditor
+[2026-09-15 14:40 UTC] ceo: CONFIG CHANGE — KILLED rr-struct-v2+ LONG
+  DB: 24h 29T 44.8%WR -$0.59 | 7d 284T 53.5%WR +$1.05
+  rr-struct-v2+ LONG: 10T/7d 40%WR -$0.45, ALL exits ATR SL/MAE-GUARD
+  Action: RR_STRUCTURAL_V2_LONG_ENABLED=False, removed from STANDALONE_BYPASS
+  Pipeline restarted. Expected: removes -$0.45/7d drag.
+  BY: CEO
