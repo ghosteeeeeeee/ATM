@@ -661,5 +661,23 @@
     "risk": "low",
     "impact_on_winners": "Would block 5 winners (+$0.36 total) — net positive if losses blocked exceed this",
     "confidence": "MEDIUM — needs 30+ trades"
+  },
+  {
+    "date": "2026-09-15T13:33:38.148181+00:00",
+    "idea": "Monitor rr-struct-v2+ LONG in HIGH regime — potential regime penalty candidate",
+    "rationale": "7d: rr-struct-v2+ LONG 4T HIGH 25%WR -$0.39 vs 4T NORMAL 75%WR +$0.07. HIGH is clearly worse. But sample is 8T — too small for config change. Monitor until 15+ trades.",
+    "expected_impact": "+$0.30-0.50/7d if HIGH penalty blocks losers without blocking winners",
+    "category": "regime sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-15T13:33:38.148196+00:00",
+    "idea": "SHORT NORMAL penalty may need strengthening (0.85 → 0.75)",
+    "rationale": "SHORT EXTREME 59T 61%WR +$1.59 vs SHORT NORMAL 34T 50%WR -$0.59. Gap is significant. NORMAL SHORT is structurally weaker. But needs 20+ more NORMAL SHORT trades before changing.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "regime sniper",
+    "status": "suggested — needs more data",
+    "risk": "medium"
   }
 ]

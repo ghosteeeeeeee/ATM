@@ -1488,3 +1488,37 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Creative: (1) features recorder re-enable (data infrastructure), (2) pump-chain+ LONG NEUTRAL block via VOL_PHASE_MULTS.
   No config change — 4 items in monitoring, features recorder fix needed.
   BY: brain_auditor
+- [2026-09-15 11:33 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, metadata gap confirmed
+  24h: 31T 54.8%WR +$0.10 (POSITIVE) | 7d: 287T 53.1%WR +$0.29 (POSITIVE)
+  SHORT 7d: 162T 57.4%WR +$2.82★ | LONG 7d: 126T 47.6%WR -$2.07 (legacy drag, ages out Sep 16-20)
+  Regime 7d: EXTREME 109T 55.0%WR +$1.90★ | HIGH 115T 56.5%WR +$0.39 | NORMAL 61T 47.5%WR -$1.55
+  Exit 7d: profit-monster-trail 52T 92.3%WR +$3.83★ | atr_sl_hit 154T 50%WR +$0.35 | rr_engine_resistance 37T 40.5%WR -$1.33 (6T/48h post-fix +$0.06, improving)
+  ATR SL below-entry: 29.6% (85/287 trades) — improved from 55.2% (now counting all exits, not just ATR SL)
+  Metadata gap: entry_rsi_14/entry_bb_position NULL for 94% of trades (87/1425 in 30d). features_recorded=FALSE since Aug 23.
+  Losers 24h: 12 total. ALL atr_sl_hit. 7 pullback-entry- SHORT, 2 rr-struct-v2+ LONG, 2 pump-chain- SHORT, 1 pump-chain+ LONG.
+  FIL chase entry: +2.01% 5min move before LONG entry, 0.49% SL — preventable loss.
+  pullback-entry- SHORT by regime: EXTREME 75%WR +$1.40★ | HIGH 58.8%WR +$0.77 | NORMAL 50%WR -$0.09
+  Creative: Regime-specific confidence multiplier for pullback-entry- in EXTREME (75%WR sweet spot).
+  No config change — 4 items in monitoring, metadata gap is top priority.
+- [2026-09-15 ~11:50 UTC (brain_auditor run)] brain_auditor: CONFIG CHANGE — BB dead zone filter deployed
+  24h: 28T 50.0%WR -$0.17 | 7d: 286T 53.5%WR +$0.19
+  SHORT 7d: 160T 58.8%WR +$2.18★ | LONG 7d: 125T 47.2%WR -$1.66 (legacy drag, ages out Sep 16-20)
+  Regime 7d: EXTREME 110T 54.5%WR +$1.78★ | HIGH 114T 56.1%WR +$0.33 | NORMAL 60T 46.7%WR -$1.62
+  Exit 7d: profit-monster-trail 50T 92.0%WR +$3.74★ | atr_sl_hit 155T 49.7%WR +$0.19 | rr_engine_resistance 37T 40.5%WR -$1.33
+  ATR SL below-entry: 55.5% (86/155).
+  BB SHORT: 0.70-0.85 dead zone 17T 41.2%WR -$1.05. Other zones 162T 57.8%WR +$3.77.
+  Losers 24h: 14 total. 8 pullback-entry- SHORT (25%WR -$0.67, normal variance). 3 rr-struct-v2+ LONG (57%WR -$0.25, small sample). 2 pump-chain- SHORT (near breakeven). 1 breakout-long+ LONG.
+  Open: 4 positions (3 SHORT pullback-entry-, 1 LONG rr-struct-v2+ DOGE).
+  CONFIG: SHORT_BB_DEAD_ZONE_MIN=0.70, SHORT_BB_DEAD_ZONE_MAX=0.85 deployed. Blocks SHORT at bb_position 0.70-0.85 (noise zone). Expected +$0.52/7d. Blocks 7 losers (-$0.94), 7 winners (+$0.42).
+  MONITORING: rr_engine_resistance 6T/48h +$0.06 (need 10+), ATR_SL 55.5% below-entry, SHORT_NORMAL_PENALTY 0 trades in 30h, trend_ignition 0 trades, rr-struct-v2+ LONG 9T/7d all ATR SL.
+- [2026-09-15 ~14:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 5 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 28T 50.0%WR -$0.47 | 7d: 284T 53.2%WR +$0.49
+  SHORT 7d: 158T 58.9%WR +$2.82★ | LONG 7d: 126T 47.6%WR -$2.07 (legacy drag, ages out Sep 16-20)
+  Regime 7d: EXTREME 59T 61%WR +$1.59★ | HIGH 66T 57.6%WR +$1.15 | NORMAL 34T 50%WR -$0.59
+  Exit 7d: profit-monster-trail 48T 91.7%WR +$3.66★ | atr_sl_hit 155T 50.3%WR +$0.27 | rr_engine_resistance 37T 40.5%WR -$1.33 (6T/48h post-fix 33.3%WR -$0.20 — NOT VALIDATED)
+  ATR SL below-entry: 56.1% 7d (improving from earlier). 24h 44.4% (12/27).
+  BB dead zone 0.70-0.85: 14T pullback-entry- SHORT 50%WR -$0.60. Filter deployed, needs more time.
+  SHORT NORMAL: 34T 50%WR -$0.59/7d. Penalty=0.85 active but NORMAL still weakest SHORT regime.
+  Losers 24h: 13 total. 6 pullback-entry- SHORT (all ATR SL, HIGH/EXTREME). 3 rr-struct-v2+ LONG (all ATR SL, HIGH regime problem). 2 pump-chain- SHORT. 1 pump-chain+ LONG. 1 MET hard_sl.
+  Creative: (1) rr-struct-v2+ LONG HIGH regime 25%WR -$0.39/7d — potential penalty candidate (monitor until 15+ trades). (2) SHORT NORMAL penalty may need strengthening from 0.85 → 0.75 (needs 20+ more NORMAL SHORT trades).
+  No config change — 5 items in monitoring, legacy aging out.

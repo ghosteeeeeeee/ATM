@@ -1,3 +1,28 @@
+## Error Alerts — 2026-09-15 12:44 UTC
+- **[OK]** Pipeline: running, cycle #200919, 0 errors in pipeline itself
+- **[OK]** Timers: 65 hermes timers active and firing
+- **[OK]** Disk: 81% (22G free) — under threshold
+- **[WARN]** YGG SHORT trade failed (12:37:29) — mirror_open RC=1, stderr empty (HYPE exchange). Signal NOT rolled back. Attempted twice, both failed.
+- **[WARN]** 8 non-critical services in failed state: 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, signal-reporter, trading-checklist
+- **[WARN]** momentum_cache.db: 0 bytes, empty since Sep 12
+- **[INFO]** Signals: 62 generated last hour, 66,610 total
+- **[INFO]** Trades: 11 closed today, -1.06 USDT, 45.5% WR, 0 open
+- **[INFO]** Regime: NEUTRAL (1 long bias, 126 neutral)
+- **[INFO]** Speed: 127/241 tokens >= 50th percentile
+- **INFO** pipeline.log: 109MB — large, consider rotation
+
+## Error Alerts — 2026-09-15 11:43 UTC
+- **[OK]** Pipeline: running, last cycle 11:42:34, 0 errors
+- **[OK]** Trades: 29 closed today, +12.43% PnL, 4 open positions
+- **[OK]** Timers: all active and firing on schedule
+- **[OK]** Disk: 81% (22G free) — under threshold
+- **[WARN]** Signals DB: 66,548 signals accumulating (no cleanup running)
+- **[WARN]** momentum_cache.db: 0 bytes, 451h stale — file empty since Sep 12
+- **[WARN]** 9 services in failed state (non-critical: 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, session-brain-rebuild, signal-reporter, trading-checklist)
+- **[WARN]** trading-checklist: exited status=2 (INVALIDARGUMENT) — momentum_cache check failed
+- **[INFO]** Regime: 127 tokens, all NEUTRAL
+- **[INFO]** Open: 4 positions (W SHORT, SUSHI SHORT, STX SHORT, +1)
+
 ## Error Alerts — 2026-09-12 16:25 UTC
 - **[INFO]** Pipeline: OK — running, last cycle 16:23:19, 0 errors
 - **[INFO]** Signals: 106 generated last hour (healthy flow)

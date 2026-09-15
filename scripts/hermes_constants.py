@@ -799,6 +799,13 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 SHORT_RSI_FLOOR = 25
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
+# ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
+# 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
+# 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.
+# Blocks 7 losers (-$0.94), 7 winners (+$0.42). Net: +$0.52/7d.
+SHORT_BB_DEAD_ZONE_MIN = 0.70
+SHORT_BB_DEAD_ZONE_MAX = 0.85
+
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
 # 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.

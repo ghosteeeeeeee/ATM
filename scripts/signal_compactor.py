@@ -2636,7 +2636,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 _conn_sf = None
                 try:
@@ -2749,6 +2749,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_rsc.close()
                         except Exception:
                             pass
+            # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──
+            # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
+            # 7d: 17T 41.2%WR -$1.05. Other zones: 162T 57.8%WR +$3.77.
+            if direction == 'SHORT' and SHORT_BB_DEAD_ZONE_MIN > 0:
+                try:
+                    _bb_meta = entry.get('signal_metadata')
+                    if _bb_meta:
+                        import json as _json_bb
+                        _bb_data = _json_bb.loads(_bb_meta) if isinstance(_bb_meta, str) else (_bb_meta if isinstance(_bb_meta, dict) else {})
+                        _bb_pos = _bb_data.get('bb_position')
+                        if _bb_pos is not None and SHORT_BB_DEAD_ZONE_MIN <= _bb_pos <= SHORT_BB_DEAD_ZONE_MAX:
+                            log(f"  🚫 [SHORT-BB-DEAD-ZONE] {tkn}: SHORT blocked — bb_position {_bb_pos:.4f} in [{SHORT_BB_DEAD_ZONE_MIN},{SHORT_BB_DEAD_ZONE_MAX}] (noise zone)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
             # ── Global spike filter LONG: block LONG after recent bearish 5m candle ──
             # Mirror of SHORT spike filter — prevents entering LONG at dump lows
             # EXEMPT: v3 pullback signals (accel-300-v3-long+) — bearish candle IS the pullback

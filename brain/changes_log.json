@@ -131,5 +131,16 @@
     "after": "ATR_SL_MIN=0.013, all deps 0.013, TP_PCT_FALLBACK=0.039",
     "rationale": "55% of below-entry ATR SL hits (11/20) had SL distance 0.34-1.28%, would survive with 1.3% floor. Net: saves $1.62 loss, blocks $0.29 tiny wins. Expected +$1.33/7d.",
     "impact": "Reduce ATR_SL triggered exits below entry by ~55%. Trades get 0.1% more room before stop triggers."
+  },
+  {
+    "timestamp": "2026-09-15T11:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Added SHORT BB dead zone filter — blocks SHORT when bb_position in [0.70,0.85]",
+    "type": "filter",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "No BB position filter for SHORT",
+    "after": "SHORT_BB_DEAD_ZONE_MIN=0.70, SHORT_BB_DEAD_ZONE_MAX=0.85",
+    "rationale": "7d: BB 0.70-0.85 SHORT 17T 41.2%WR -$1.05. Other zones 162T 57.8%WR +$3.77. Net +$0.52/7d.",
+    "impact": "+$0.52/7d expected"
   }
 ]

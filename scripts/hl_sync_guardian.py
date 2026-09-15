@@ -1,0 +1,1 @@
+/root/.hermes/scripts/hl-sync-guardian.py

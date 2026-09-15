@@ -1,4 +1,15 @@
 [2026-09-15 09:15 UTC] brain_auditor: NO CONFIG CHANGE — 4 items monitoring, bb_position dead zone MONITORING
+
+[2026-09-15 13:33 UTC] brain_auditor: NO CONFIG CHANGE — 5 items monitoring, rr_engine_resistance NOT VALIDATED
+  24h: 28T 50.0%WR -$0.47 | 7d: 284T 53.2%WR +$0.49
+  SHORT 7d: 158T 58.9%WR +$2.82★ | LONG 7d: 126T 47.6%WR -$2.07 (legacy ages out Sep 16-20)
+  Regime: EXTREME +$1.59★ | HIGH +$1.15 | NORMAL -$0.59
+  Exit: profit-monster-trail +$3.66★ | atr_sl_hit +$0.27 | rr_engine_resistance -$1.33 (6T/48h post-fix 33.3%WR -$0.20 NOT VALIDATED)
+  ATR SL below-entry: 56.1% 7d (improving). 24h 44.4%.
+  BB dead zone 0.70-0.85: 14T 50%WR -$0.60. Needs more time.
+  Losers 24h: 13. 6 pullback-entry- (ATR SL), 3 rr-struct-v2+ LONG (ATR SL, HIGH regime problem), 2 pump-chain-, 1 pump-chain+, 1 hard_sl.
+  Creative: (1) rr-struct-v2+ LONG HIGH regime 25%WR (2) SHORT NORMAL penalty may need strengthening.
+  BY: brain_auditor
   24h: 34T 55.9%WR -$0.11 | 7d: 302T 53.0%WR -$0.23
   SHORT 7d: 162T 57.4%WR +$2.16★ | LONG 7d: 142T 47.2%WR -$2.60
   Exit 7d: profit-monster-trail 54T 92.6%WR +$3.97 | atr_sl_hit 154T 50%WR +$0.47
