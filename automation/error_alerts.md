@@ -619,3 +619,27 @@
 - **[WARN]**: `[hotset] fallback DB query returned 0 tokens` — hotset fallback empty, non-blocking
 - **[INFO]**: rr-struct-v2+ LONG — 4 trades, 0% win rate, -0.79 PnL today
 - **[INFO]**: pipeline.log 115M — approaching retention threshold
+
+## Error Alerts — 2026-09-15 18:45 UTC
+- **WARN** (3x): `PHANTOM-WRITE` blocked SL adjustment — ETH SHORT (dist=0.112%), SUPER SHORT (dist=0.056%) — SL too tight to entry, guardian can't tighten further
+- **WARN** (1x): `TRADE FAILED: MET SHORT` — signal not rolled back (prevents retry loop)
+- **WARN**: Disk at 81% (91G/118G) — approaching 85% threshold
+- **INFO**: 33.3% win rate today (6W/12L) — rough session, 18 closed trades
+- **AUTO-FIX**: None required — pipeline healthy, all timers firing
+
+## Error Alerts — 2026-09-15 18:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-15 19:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+BTC_LEVEL`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,BTC_LEVEL | vol=N.6x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-15 20:56 UTC
+- **REPEATED** (8x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM | vol=N.0x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-15 22:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`

@@ -5065,3 +5065,129 @@ BY: auto_1hr
 - System flat 3 hours straight — watching for regime shift
 
 BY: auto_1hr
+
+## [2026-09-15 19:10 UTC] Hourly Analysis
+
+**Trades:** 7 closed (5 wins, 2 losses). $0.00 net (breakeven).
+- pullback-entry- SHORT: SUPER +$0.20, LTC +$0.09, ETH +$0.13 ✅
+- grind-breakout- SHORT: MET +$0.03 (profit-monster-trail!) ✅
+- breakout-long+ LONG: IMX -$0.25, ZEN -$0.20 ❌ (SL hit both)
+- pullback-entry- SHORT: WLFI $0.00 (exit_reason=None — data bug?)
+
+**24h:** 36T 55.6%WR +$0.72
+- pullback-entry-: 22T 54.5%WR +$0.49 (backbone)
+- pump-chain-: 3T 100%WR +$0.21
+- pump-chain+: 1T +$0.28
+- grind-breakout-: 1T +$0.03 (first profit-monster-trail exit!)
+- breakout-long+: 2T 0%WR -$0.45 (new signal, 3 total trades)
+- Exit: 86% atr_sl_hit (31/36), 1 profit-monster-trail
+
+**Changes:** None — no signal meets kill criteria
+
+**No Change Needed:**
+- breakout-long+ 33%WR/48h but only 3 total trades — too early to kill
+- Trade frequency 7/hr (spike) but under 20/hr threshold
+- System flat 4+ hours — regime-neutral, no action needed
+- ATR SL dominance persists — 1 trail exit appeared, trail system partially active
+
+**Monitoring:**
+- breakout-long+ — needs 5+ trades before kill decision
+- WLFI exit_reason=None — data quality bug, watch for recurrence
+- grind-breakout- got first profit-monster-trail exit — positive sign for trail system
+
+BY: auto_1hr
+
+## [2026-09-15 20:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (flat hour). 0 open positions.
+**24h:** 35T 54.3%WR -$0.02 (breakeven)
+**Last activity:** 18:55 UTC (SUPER SHORT +$0.20)
+
+**Hourly breakdown (12h):**
+- 18:00: 7T +$0.00 | 17:00: 1T +$0.00 | 15:00: 5T +$0.36 ✅
+- 14:00: 1T +$0.21 | 13:00: 2T -$0.13 | 12:00: 2T -$0.07
+- 11:00: 1T -$0.16 | 09:00: 2T -$0.08 | 08:00: 1T -$0.15
+
+**Signal health (24h):**
+- pullback-entry-: 20T 55%WR +$0.37 (backbone)
+- pump-chain-: 3T 66.7%WR +$0.21
+- grind-breakout-: 1T 100%WR +$0.03
+- rr-struct-v2+: 8T 50%WR -$0.19
+- breakout-long+: 2T 0%WR -$0.45 (only 3 total — monitoring)
+
+**Exit reasons (24h):** 85.7% atr_sl_hit | 1 profit-monster-trail | 2 cut-loser-MAE | 1 hard_sl
+
+**Changes:** None — no kill candidates (no signal meets 0% WR + 3+ trades threshold)
+**No Change Needed:**
+- Trade frequency 0/hr — healthy
+- breakout-long+ only 3 total trades — too early to kill
+- System flat 1+ hours — no regime action needed
+- ATR SL dominance persists — 1 trail exit total
+
+**Monitoring:**
+- breakout-long+ — needs 5+ trades before kill decision
+- WLFI exit_reason=None — data quality bug (recurring)
+
+BY: auto_1hr
+
+## [2026-09-15 21:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (flat hour). 1 open (IMX SHORT pullback-entry-).
+**24h:** 30T 53.3%WR +$0.07 (breakeven)
+
+**Signal health (24h):**
+- pullback-entry-: 19T 57.9%WR +$0.43 (backbone)
+- pump-chain-: 2T 100%WR +$0.35
+- grind-breakout-: 1T 100%WR +$0.03
+- rr-struct-v2+: 6T 33.3%WR -$0.29 (underperforming)
+- breakout-long+: 2T 0%WR -$0.45 (needs 3+ trades before kill)
+
+**Exit reasons (24h):** 83.3% atr_sl_hit (25/30) | 2 cut-loser-MAE-GUARD | 1 hard_sl | 1 trail
+
+**Changes:** None — no signal meets kill criteria (breakout-long+ only 2 trades, needs 3+)
+
+**No Change Needed:**
+- Trade frequency healthy (system flat 2+ hours)
+- rr-struct-v2+ underperforming but not at 0% WR
+- ATR SL dominance normal range (83% vs 85% last check)
+- 1 profit-monster-trail exit — trail system working
+
+**Monitoring:**
+- breakout-long+ — 1 more trade triggers kill review
+- rr-struct-v2+ — 6 trades, 33.3% WR, watching for degradation
+
+BY: auto_1hr
+
+## [2026-09-15 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (flat hour). 2 open (ETH SHORT, IMX SHORT — both pullback-entry-).
+**24h:** 28T 50.0%WR -$0.18 (near breakeven)
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 19T 57.9%WR +$0.43 (backbone)
+- pump-chain- SHORT: 2T 100%WR +$0.35
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- rr-struct-v2+ LONG: 4T 0%WR -$0.54 (all losers — BTC regime mismatch)
+- breakout-long+ LONG: 2T 0%WR -$0.45 (needs 3+ trades for kill review)
+
+**Exit reasons (24h):** 82% atr_sl_hit (23/28) | 2 cut-loser-MAE-GUARD | 1 hard_sl | 1 profit-monster-trail | 1 None
+
+**Root cause of LONG losses:**
+- 3/4 rr-struct-v2+ trades had btc_regime='BEAR_TREND' at entry
+- Signal only checks atr_regime (token-level), not BTC market regime
+- This is a code-level issue (not constants), needs regime cross-check added
+
+**Changes:** None — no kill candidate meets strict criteria (0%WR + 3+ trades IN LAST HOUR; last hour had 0 trades)
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour)
+- ATR SL 82% — tpsl_utils.py deployed, structural dominance normal
+- Trade frequency healthy (~1.2/hr avg)
+- regime mismatch is code-level fix, not hourly constants change
+
+**Monitoring:**
+- rr-struct-v2+ LONG — regime filter gap (atr_regime vs btc_regime)
+- breakout-long+ — 1 more trade triggers kill review
+- Open SHORT positions — ETH and IMX watching
+
+BY: auto_1hr

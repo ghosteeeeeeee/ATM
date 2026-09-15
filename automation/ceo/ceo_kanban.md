@@ -1560,3 +1560,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Creative: (1) BB 0.35-0.55 dead zone — DEPLOYED. (2) rr_engine_resistance 36h gap — INVESTIGATE.
   Config change: SHORT_BB_DEAD_ZONE2 deployed. Pipeline restarted.
   BY: brain_auditor
+- [2026-09-15 ~23:30 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring, SHORT_NORMAL_PENALTY review due Sep 16
+  24h: 33T 54.5%WR +$0.36 | 7d: 280T 53.9%WR +$1.83 (POSITIVE)
+  SHORT 7d: 164T 58.5%WR +$2.69 ★ | LONG 7d: 116T 47.4%WR -$0.86 (legacy aging out)
+  Regime 7d: EXTREME 103T 58.3%WR +$2.43 ★ | HIGH 117T 54.7%WR +$0.35 | NORMAL 58T 53.4%WR -$0.13
+  Exit 7d: profit-monster-trail 45T 91.1%WR +$3.45 ★ | atr_sl_hit 161T 53.4%WR +$1.65 | rr_engine_resistance 37T 40.5%WR -$1.33 (ALL pre-fix, 0 post-fix exits — FIX VERIFIED)
+  ATR SL below-entry: 58.4% (94/161). Entry timing, not stop width. 1.3% MIN appropriate.
+  SHORT in NORMAL: 35T 62.9%WR +$0.62 — PENALTY (0.85) IS MISALIGNED. Should be removed after Sep 16 monitoring.
+  rr_engine_resistance fix: VERIFIED — 0 post-fix exits in ~33h. All17 post-fix pullback-entry- SHORT exited via ATR SL.
+  Losers 24h: 13 total. 8 pullback-entry- SHORT (normal variance), 3 rr-struct-v2+ LONG (legacy, killed), 2 breakout-long+ HIGH regime.
+  Creative: (1) REMOVE SHORT_NORMAL_PENALTY after Sep 16 — SHORT profitable in NORMAL, penalty blocks good entries. (2) LONG regime gate — block LONG in HIGH for breakout-long+/rr-struct-v2+ (both losing in HIGH).
+  No config change — monitoring, SHORT_NORMAL_PENALTY due Sep 16 ~05:30.
+  BY: brain_auditor

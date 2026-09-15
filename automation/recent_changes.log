@@ -1958,3 +1958,20 @@
   24h: 30T 50.0%WR +/usr/bin/bash.06 | 90% atr_sl_hit | avg +/usr/bin/bash.003/trade
   No signal meets kill criteria. Trade frequency healthy. System breakeven 3h.
   BY: auto_1hr
+[2026-09-15 19:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 7T closed (5W/2L, $0.00 net), 0 open
+  24h: 36T 55.6%WR +$0.72 | 86% atr_sl_hit | 1 profit-monster-trail exit
+  breakout-long+ 2L/-$0.45 but only 3 total trades — monitoring
+  WLFI exit_reason=None — data quality bug noted
+  BY: auto_1hr
+[2026-09-15 20:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (flat), 0 open
+  24h: 35T 54.3%WR -$0.02 | 85.7% atr_sl_hit
+  No signal meets kill criteria. System flat, watching for activity.
+  BY: auto_1hr
+[2026-09-15 22:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (flat), 2 open SHORTs (ETH, IMX)
+  24h: 28T 50%WR -$0.18 | 82% atr_sl_hit | 1 trail exit
+  Kill criteria NOT met: rr-struct-v2+ has 4T 0%WR but 0 trades in last hour
+  Root cause: rr-struct-v2+ fires LONG in BEAR_TREND (checks atr_regime, not btc_regime)
+  BY: auto_1hr
