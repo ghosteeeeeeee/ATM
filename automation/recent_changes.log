@@ -2016,3 +2016,7 @@
   No signal meets kill criteria. breakout-long+ 3T all-time 0%WR but 0 trades in last hour.
   Root cause: breakout-long+ fires LONG in NEUTRAL without BTC regime gate — needs code fix.
   BY: auto_1hr
+[2026-09-16 02:08 UTC] auto_1hr: KILLED breakout-long+ (BREAKOUT_LONG_PLUS_ENABLED = False)
+  24h: 28T 50%WR -$0.12 | breakout-long+ 3T 0%WR -$0.60 (kill threshold met)
+  Root cause: fires LONG in NEUTRAL without BTC regime gate — needs code fix
+  BY: auto_1hr

@@ -5278,3 +5278,34 @@ BY: auto_1hr
 - System quiet — only 1 trade closed in last 2h
 
 BY: auto_1hr
+
+## [2026-09-16 02:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BIGTIME LONG breakout-long+ -$0.15 atr_sl_hit)
+**24h:** 28T 50%WR -$0.12 | 82% atr_sl_hit
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 19T 63.2%WR +$0.77 (backbone)
+- pump-chain- SHORT: 1T 100%WR +$0.22
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- rr-struct-v2+ LONG: 4T 0%WR -$0.54 (already killed 09-15)
+- **breakout-long+ LONG: 3T 0%WR -$0.60 (KILLED THIS RUN)**
+
+**Open positions (6):** tracked in brain DB
+
+**Exit reasons (24h):** 82% atr_sl_hit (23/28) | 2 cut-loser-MAE-GUARD | 1 hard_sl | 1 trail | 1 None
+
+**Changes:**
+1. **KILLED breakout-long+** — `BREAKOUT_LONG_PLUS_ENABLED = False`. 3T all-time 0%WR/-$0.60. Root cause: fires LONG in NEUTRAL regime without BTC regime gate. Structural flaw in breakout_long.py — needs code fix if re-enabled.
+
+**No Change Needed:**
+- rr-struct-v2+: already killed 09-15 (line 3216)
+- ATR SL 82% — structural, expected
+- Trade frequency healthy (0-1/hr)
+- Short signals performing well (pullback-entry- 63.2% WR)
+
+**Monitoring:**
+- pullback-entry- still backbone — watch for degradation
+- System quiet — 1 trade in last 2h
+
+BY: auto_1hr
