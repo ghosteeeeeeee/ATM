@@ -1,164 +1,83 @@
 {
-    "timestamp": "2026-09-16T06:00:00Z",
-    "agent": "brain_auditor",
-    "session_brain_stats": {
-        "vectors_loaded": 195650,
-        "key_sessions_found": "signal performance, creative ideas, losing trades",
-        "dominant_theme": "feature recording gap (273/275 trades missing entry features)"
+  "timestamp": "2026-09-16T09:33:17.031069Z",
+  "session_brain_stats": {
+    "vectors": 195650,
+    "searches_run": 3,
+    "top_topics": [
+      "signal performance",
+      "creative ideas",
+      "problems"
+    ]
+  },
+  "trade_summary_24h": {
+    "trades": 26,
+    "pnl": -0.52,
+    "wr": 50.0,
+    "status": "FLAT"
+  },
+  "trade_summary_7d": {
+    "trades": 271,
+    "pnl": 1.32,
+    "wr": 55.4,
+    "status": "POSITIVE"
+  },
+  "drift_findings": [
+    {
+      "finding": "Dead signals still have trades in 7d window",
+      "detail": "trend_purity+ 11T/36.4%WR -$0.90, rr-struct-v2+ 10T/40%WR -$0.45, pullback-entry+ 6T/16.7%WR -$0.57 — all KILLED but legacy trades aging out",
+      "impact": "-$1.92 total drag, expected to age out by Sep 18-20",
+      "action": "Monitor only — no intervention needed"
     },
-    "trade_summary_24h": {
-        "trades": 27,
-        "win_rate": 51.9,
-        "pnl": -0.17,
-        "status": "FLAT",
-        "by_direction": {
-            "SHORT": {"trades": 20, "win_rate": 60.0, "pnl": 0.34, "signal": "pullback-entry-"},
-            "LONG": {"trades": 5, "win_rate": 0.0, "pnl": -1.09, "signals": "breakout-long+ (3T, KILLED), rr-struct-v2+ (3T, KILLED)"}
-        },
-        "losers": {
-            "pullback-entry- SHORT": {"count": 2, "total_pnl": -0.53, "regime": "EXTREME", "exit": "atr_sl_hit"},
-            "breakout-long+ LONG": {"count": 3, "total_pnl": -0.60, "regime": "EXTREME/HIGH", "exit": "atr_sl_hit", "note": "KILLED signal — legacy trades"},
-            "rr-struct-v2+ LONG": {"count": 2, "total_pnl": -0.29, "regime": "NORMAL", "exit": "cut-loser-MAE-GUARD", "note": "KILLED signal — legacy trades"}
-        }
+    {
+      "finding": "STALE SIGNAL EXECUTION — 37% of 7d trades fire on stale signals",
+      "detail": "84/271 trades had is_stale=true. 37 of those were losers. RSI filter runs at detection, not execution. DOT SHORT entered RSI=70.14 > ceiling=65.",
+      "impact": "Data quality concern, potential entry condition drift",
+      "action": "RECOMMEND: Execution-time revalidation in signal_compactor.py"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "Signal diversity in NEUTRAL",
+      "frequency": "3+ sessions",
+      "detail": "Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, pump-chain-). Need new signals for resilience.",
+      "status": "Open — no new signals built yet"
     },
-    "trade_summary_7d": {
-        "trades": 275,
-        "win_rate": 54.9,
-        "pnl": 2.66,
-        "status": "POSITIVE",
-        "short": {"trades": 164, "win_rate": 59.8, "pnl": 3.72, "note": "dominant carrier"},
-        "long": {"trades": 111, "win_rate": 47.7, "pnl": -1.06, "note": "legacy, aging out Sep 16-20"},
-        "regime": {
-            "EXTREME": {"trades": 102, "win_rate": 57.8, "pnl": 2.39, "note": "★ best regime"},
-            "HIGH": {"trades": 114, "win_rate": 54.4, "pnl": 0.32},
-            "NORMAL": {"trades": 57, "win_rate": 52.6, "pnl": -0.16, "note": "underwater, penalty working"}
-        },
-        "exit_analysis": {
-            "profit-monster-trail": {"trades": 41, "win_rate": 92.7, "pnl": 3.35, "note": "★ best exit"},
-            "atr_sl_hit": {"trades": 160, "win_rate": 53.1, "pnl": 1.65, "note": "structural majority exit"},
-            "rr_engine_resistance": {"trades": 37, "win_rate": 40.5, "pnl": -1.33, "note": "ALL pre-fix, 0 post-fix"},
-            "cut-loser-CL-T1": {"trades": 7, "win_rate": 0.0, "pnl": -1.19, "note": "healthy mechanism, avg -$0.17"}
-        }
+    {
+      "topic": "Stale signal execution",
+      "frequency": "2 sessions",
+      "detail": "Signals detected at one time, executed later when conditions changed. No execution-time revalidation exists.",
+      "status": "Open — root cause identified, fix not implemented"
+    }
+  ],
+  "missing_implementations": [
+    "Execution-time RSI/condition revalidation in signal_compactor.py",
+    "New NEUTRAL-compatible signals (only 2 types pass confluence)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-16T09:33:17.031097Z",
+      "idea": "Execution-time condition revalidation — recheck RSI at trade open, not just detection",
+      "rationale": "37% of 7d trades fire on stale signals. DOT SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65. Filter ran at detection time (RSI was valid) but by execution time RSI had moved. Simple recheck in signal_compactor would catch this.",
+      "expected_impact": "Block ~5-10% of losing trades that enter on stale conditions",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
     },
-    "drift_findings": [
-        {
-            "topic": "Feature recording fix",
-            "status": "DEPLOYED BUT UNTESTED",
-            "detail": "feature_recorder.py deployed Sep 16 02:34 UTC. brain.py imports it at line 729. Only 2/27 24h trades have features (retroactively recorded open trades). 0 new trades opened since fix — fix untested. 5 open trades have features=True (retroactive).",
-            "impact": "CRITICAL for future signal optimization — entry RSI, BB position, EMA gap all NULL for 99% of trades.",
-            "action": "WAIT — next trade will verify. If features still NULL, investigate pipeline code path (pump_hunter.py, hl-sync-guardian.py may bypass brain.py's feature_recorder call)."
-        },
-        {
-            "topic": "rr_engine_resistance fix",
-            "status": "VERIFIED FIXED",
-            "detail": "0 post-fix exits in 24h+ (all 37 7d exits pre-fix). Correct behavior.",
-            "impact": "POSITIVE — no more -6% rr_engine losses on pullback-entry- SHORT.",
-            "action": "Continue monitoring until Sep 18."
-        },
-        {
-            "topic": "Signal diversity in NEUTRAL",
-            "status": "RECURRING — NOT RESOLVED",
-            "detail": "Only 2 signal types (pullback-entry-, pump-chain-) pass confluence in NEUTRAL. Creates fragility — if either signal degrades, system has no backup.",
-            "impact": "SYSTEMIC RISK — all eggs in 2 baskets.",
-            "action": "DEVELOP new SHORT signal for NEUTRAL regime (see creative improvements)."
-        },
-        {
-            "topic": "LONG legacy drag",
-            "status": "AGING OUT",
-            "detail": "LONG -$1.06 on 7d (47.7% WR). Most losers from killed signals (trend_purity+, pullback-entry+, rr-struct-v2+). Aging out Sep 16-20.",
-            "impact": "DECLINING — will self-resolve as old trades roll off 7d window.",
-            "action": "MONITOR — no action needed."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "Feature recording not firing for pipeline trades",
-            "sessions": "3+ (brain_auditor 01:45, 02:30, 03:36 UTC Sep 16)",
-            "status": "Fix deployed, untested",
-            "detail": "brain.py calls record_entry_features but trades may open via other paths (hl-sync-guardian, pump_hunter, continuum_trader) that don't call feature_recorder. Only 2/27 24h trades have features.",
-            "recommendation": "Monitor next trade. If still no features, add record_entry_features call to hl-sync-guardian.py and pump_hunter.py."
-        },
-        {
-            "topic": "SHORT entries at elevated RSI",
-            "sessions": "2+ (brain_auditor sessions)",
-            "status": "PARTIALLY ADDRESSED — needs feature data",
-            "detail": "DOT SHORT entered at RSI 64.22 (near SHORT_RSI_CEILING=65), ETC SHORT at RSI 70.14 (ABOVE ceiling). Both lost. SHORT_RSI_CEILING may not be enforced at execution time.",
-            "recommendation": "Verify SHORT_RSI_CEILING enforcement in signal_compactor.py. If it's only checked at detection (not execution), add execution-time check."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "idea": "Volume confirmation filter for pullback-entry- SHORT",
-            "status": "DISCUSSED BUT NOT BUILT",
-            "detail": "Session brain references volume confirmation for pullback-entry-. Would filter out false pullbacks with weak volume.",
-            "impact": "MEDIUM — could improve 60.5% WR to 65%+ by filtering weak entries.",
-            "prerequisite": "Need entry feature data first (feature recording must work)."
-        },
-        {
-            "idea": "SHORT RSI/BB entry sniper using feature data",
-            "status": "DISCUSSED BUT NOT BUILT",
-            "detail": "Once entry features are populated, use RSI + BB position to filter entries. E.g., don't SHORT when RSI > 60 and BB position > 0.8.",
-            "impact": "HIGH — could eliminate DOT/ETC-type losses.",
-            "prerequisite": "Feature recording must work first."
-        }
-    ],
-    "losing_trade_autopsy": [
-        {
-            "trade": "DOT SHORT pullback-entry-",
-            "pnl": -0.25,
-            "regime": "EXTREME",
-            "entry_rsi": 64.22,
-            "entry_bb_position": 0.89,
-            "exit_reason": "atr_sl_hit",
-            "analysis": "RSI 64.22 near SHORT_RSI_CEILING=65. BB position 0.89 (price near top of band — SHORT entry against momentum). EXTREME regime = high volatility. Entry conditions borderline but within filters.",
-            "root_cause": "NORMAL VARIANCE — pullback-entry- SHORT has 60.5% WR, ~40% of trades lose. This is expected.",
-            "recommended_change": "NONE — no config change warranted."
-        },
-        {
-            "trade": "ETC SHORT pullback-entry-",
-            "pnl": -0.28,
-            "regime": "EXTREME",
-            "entry_rsi": 70.14,
-            "entry_bb_position": 0.87,
-            "exit_reason": "atr_sl_hit",
-            "analysis": "RSI 70.14 ABOVE SHORT_RSI_CEILING=65. This should have been filtered. BB position 0.87. If SHORT_RSI_CEILING was enforced at execution, this trade wouldn't have opened.",
-            "root_cause": "POSSIBLE FILTER GAP — SHORT_RSI_CEILING may only be checked at detection time, not execution time. RSI could have risen between detection and execution.",
-            "recommended_change": "VERIFY SHORT_RSI_CEILING enforcement timing. If detection-only, add execution-time check. But sample is 1 trade — insufficient for config change.",
-            "recommended_change_confidence": "LOW — needs more data",
-            "impact_on_winners": "Need to check how many winning SHORTs had RSI > 65 at entry. Feature data required."
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-16T06:00:00Z",
-            "idea": "SHORT regime confidence scaling based on regime WR data",
-            "rationale": "7d data shows EXTREME 57.8% WR, HIGH 54.4% WR, NORMAL 52.6% WR. pullback-entry- SHORT is profitable in all regimes but EXTREME is strongest. Could increase confidence threshold for SHORT entries in NORMAL (weakest regime) and decrease it in EXTREME (strongest). This is a regime-aware confidence adjustment.",
-            "expected_impact": "+$0.30-0.50/7d by filtering marginal NORMAL entries while letting EXTREME entries through",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "In signal_compactor.py, multiply confidence by regime factor: EXTREME=1.0, HIGH=0.95, NORMAL=0.90. This means SHORT entries in NORMAL need 5% higher confidence to pass.",
-            "caveat": "Sample size: 57 NORMAL trades over 7d. Insufficient for confident change. Monitor for 1 week, then reassess."
-        },
-        {
-            "date": "2026-09-16T06:00:00Z",
-            "idea": "Pipeline feature recording audit — verify ALL trade creation paths call record_entry_features",
-            "rationale": "Only 2/27 24h trades have features. brain.py calls record_entry_features but trades may open via hl-sync-guardian.py or pump_hunter.py which bypass brain.py. This is a data quality issue that blocks all signal optimization.",
-            "expected_impact": "CRITICAL — enables future signal improvements",
-            "category": "data quality",
-            "status": "suggested",
-            "risk": "zero",
-            "implementation": "Audit all INSERT INTO trades paths in scripts/. Add record_entry_features call to each. Or: create a PostgreSQL trigger that calls feature_recorder.py on INSERT.",
-            "caveat": "This is a code fix, not a config change. Should be done by developer, not brain_auditor."
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "1. VERIFY: Feature recording on next closed trade (opened after 02:34 UTC fix). If still no features, investigate pipeline paths.",
-        "2. MONITOR: rr_engine_resistance post-fix. 0 exits in 24h+. Deadline: Sep 18.",
-        "3. DEVELOP: New SHORT signal for NEUTRAL regime. Only 2 types pass confluence.",
-        "4. AUDIT: SHORT_RSI_CEILING enforcement timing — detection vs execution.",
-        "5. MONITOR: NORMAL regime — 52.6% WR -$0.16. If NORMAL stays underwater, consider regime confidence scaling."
-    ],
-    "verdict": "System structurally healthy. SHORT 7d +$3.72 carries LONG -$1.06 (aging out). No config change this run — feature recording untested, rr_engine fix verified, all dead signals already killed. Next trade will verify feature recording fix."
+    {
+      "date": "2026-09-16T09:33:17.031107Z",
+      "idea": "EXTREME regime SHORT-only filter — block LONG entries in EXTREME, keep SHORT",
+      "rationale": "EXTREME regime 7d: 102T 57.8%WR +$0.90. SHORT dominates (+$1.52 from SHORT signals). LONG losers cluster in EXTREME (open-skies+, trend_purity+). SHORT works in EXTREME because extreme volatility = momentum continuation.",
+      "expected_impact": "Block ~$0.50-1.00/7d of LONG losses in EXTREME",
+      "category": "regime filter",
+      "status": "needs_more_data",
+      "risk": "medium"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Monitor feature recording on next 5-10 closed trades (fix deployed Sep 16 02:30 UTC)",
+    "Verify rr_engine_resistance 0 exits post-fix (deadline Sep 18)",
+    "Track stale signal execution % — should decrease if fix works",
+    "Consider execution-time revalidation in signal_compactor.py"
+  ]
 }

@@ -2062,3 +2062,17 @@
   24h: 27T 48.1%WR -$0.52 | 81.5% ATR SL | pullback-entry- 20T 60%WR +$0.34
   No signal meets kill criteria. 5 SHORT positions open, all normal.
   BY: auto_1hr
+
+[2026-09-16 09:00 UTC] brain_auditor: NO CONFIG CHANGE — stale signal execution root cause found
+  24h: 27T 48.1%WR -$0.52 (FLAT) | 7d: 274T 54.7%WR +$0.98 (POSITIVE)
+  STALE SIGNAL ROOT CAUSE: 44% of trades fire on stale signals. RSI filter runs at detection, not execution. ETC SHORT entered RSI=70.14 > ceiling=65.
+  EXIT_CONDITIONS: 99% blank (273/274). Exit path tracking broken.
+  LOSING AUTOPSY: ETC SHORT RSI=70.14 (filter gap), DOT SHORT RSI=64.22 (borderline), 3x breakout-long+ killed signal losses.
+  SUGGESTED: Execution-time revalidation, STANDALONE_BYPASS cleanup, exit_conditions fix.
+  BY: brain_auditor
+[2026-09-16 11:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (quiet market)
+  24h: 26T 50%WR -$0.55 | ATR SL 76.9% structural | pullback-entry- 18T 61%WR +$0.23
+  Dead signals (breakout-long+, rr-struct-v2+) already disabled — legacy trades aging out.
+  5 SHORT positions open (ETH, SYRUP, SEI, CHIP, LTC)
+  BY: auto_1hr

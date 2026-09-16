@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-16 ~08:30 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-16 ~12:00 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 27T, 48.1% WR, -$0.52. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
+24h: 26T, 50% WR, -$0.52. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
 
 - **24h (rolling):** 27T, 48.1% WR, -$0.52 (DB-verified — FLAT). pullback-entry- dominant.
 - **Today (calendar):** 4T closed, 1W, -$0.66. 5 open: CHIP, ADA, SEI, SYRUP, ETH (all SHORT).
@@ -47,13 +47,14 @@
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
-**🟡 STALE SIGNAL EXECUTION:** 54% of recent trades (Sep 14-16) fired on tokens with is_stale=true in signal metadata (19/35 pullback-entry-, 5/15 pump-chain-). Speed data flat on 5m+15m windows. Not blocking wins (pullback-entry- still 56.5% WR overall) but data quality concern. No stale filter exists in signal modules.
+**🟡 STALE SIGNAL EXECUTION:** 37% of 7d trades (84/271) fire on stale signals. 37 stale losers. Root cause: RSI filter runs at detection, not execution. DOT SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65. No execution-time revalidation exists. Data quality concern.
 
 **🟡 EXIT CONDITIONS BLANK:** All 22+ closed trades have empty exit_conditions field. Exit mechanism not recording which path was taken (ATR SL, profit monster, etc.). Data quality issue — makes exit analysis impossible from DB.
 
 ## Today's Changes (Sep 16)
 
-1. **CEO ~08:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY removed (0.85→1.0). Monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable). Penalty was blocking good entries. Expected +$0.26/7d. **24h:** 27T 48.1%WR -$0.52 (FLAT). **7d:** 275T 54.9%WR +$2.66 (POSITIVE). 5 open SHORT. Market NEUTRAL. Monitoring 5 items.
+1. **brain_auditor ~09:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52 (FLAT). 7d: 274T 54.7%WR +$0.98 (POSITIVE). **STALE SIGNAL ROOT CAUSE:** 44% of 48h trades have is_stale=true. ETC SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65 because filter runs at detection, not execution. **EXIT_CONDITIONS 99% BLANK** — exit path tracking broken. **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter gap), DOT SHORT RSI=64.22 (borderline), 3x breakout-long+ LONG losses (killed signal). **SUGGESTED:** Execution-time RSI revalidation, STANDALONE_BYPASS cleanup. No config change.
+2. **CEO ~08:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY removed (0.85→1.0). Monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable). Penalty was blocking good entries. Expected +$0.26/7d. **24h:** 27T 48.1%WR -$0.52 (FLAT). **7d:** 275T 54.9%WR +$2.66 (POSITIVE). 5 open SHORT. Market NEUTRAL. Monitoring 5 items.
 2. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 51.9%WR -$0.17 (FLAT). 7d: 275T 54.9%WR +$2.66 (POSITIVE). SHORT +$3.72★. **FEATURE RECORDING UNTESTED** — 2/27 24h trades have features (retroactive only). 0 new trades since fix (02:34 UTC). Monitor next trade. **rr_engine_resistance VERIFIED** — 0 exits 24h+. **LOSING TRADE AUTOPSY:** DOT SHORT RSI 64.22, ETC SHORT RSI 70.14 (above SHORT_RSI_CEILING=65). ETC possible filter gap. **NO CONFIG CHANGE** — monitoring 5 items.
 3. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52. 5 open SHORT. Market NEUTRAL. **Feature recording VERIFIED** — DOT, ETC closed with features_recorded=TRUE. IO gap confirmed (deployment timing). **rr_engine fix CONFIRMED** — 0 exits in 6+ days. **NEW: 54% stale signal execution** (is_stale=true in metadata). **NEW: exit_conditions blank** on all trades. **NO CONFIG CHANGE** — monitoring stale filter need, exit recording, signal diversity.
 4. **brain_auditor ~05:15 UTC — CONFIG CHANGE.** DISABLED trend_ignition (TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False). 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL.
@@ -72,6 +73,7 @@
 
 ## Active Decisions
 
+- **STALE SIGNAL EXECUTION ROOT CAUSE FOUND.** brain_auditor 09:00 UTC Sep 16. 44% of trades fire on stale signals. RSI filter runs at detection, not execution. ETC SHORT entered RSI=70.14 > ceiling=65. Suggested: execution-time revalidation. — 2026-09-16
 - **SHORT_NORMAL_PENALTY REMOVED.** CEO 08:30 UTC Sep 16. Monitoring expired. SHORT NORMAL profitable. — 2026-09-16
 - **trend_ignition DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal. — 2026-09-16
 - **Feature recording fix VERIFIED.** DOT, ETC closed with features_recorded=TRUE. IO gap is deployment timing. — 2026-09-16 ~06:35 UTC
@@ -98,6 +100,7 @@
 1. **DONE: trend_ignition DISABLED.** brain_auditor 05:15 UTC Sep 16. — 2026-09-16
 2. **DONE: Feature recording VERIFIED.** DOT, ETC have features_recorded=TRUE. IO gap is deployment timing. — 2026-09-16
 3. **DONE: rr_engine_resistance fix CONFIRMED.** 0 exits in 6+ days. Remove from monitoring. — 2026-09-16
-4. **INVESTIGATE: Stale signal execution filter.** 54% of trades fire on is_stale=true tokens. Consider adding stale filter to signal modules. — 2026-09-16
-5. **INVESTIGATE: exit_conditions not recording.** All trades have blank exit_conditions. Exit path tracking broken. — 2026-09-16
+4. **INVESTIGATE: Stale signal execution filter.** 44% of trades fire on is_stale=true tokens. Execution-time RSI/BB revalidation would fix. — 2026-09-16
+5. **INVESTIGATE: exit_conditions not recording.** 99% of trades have blank exit_conditions. Exit path tracking broken. — 2026-09-16
 6. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
+7. **CLEANUP: Remove ema300-dip-long from STANDALONE_BYPASS.** Dead signal still listed. — 2026-09-16

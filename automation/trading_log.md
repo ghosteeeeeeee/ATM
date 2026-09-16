@@ -5487,3 +5487,79 @@ BY: daily_orchestrator
 - Market quiet — potential regime shift if activity picks up
 
 BY: auto_1hr
+
+## [2026-09-16 10:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet market)
+**PnL:** $0.00
+
+**24h:** 27T 48.1%WR -$0.52 | ATR SL 81.5% | pullback-entry- 20T 60%WR +$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour)
+- ATR SL 81.5% structural — unchanged
+- Trade frequency normal (3 in 6h)
+- Previously killed signals (breakout-long+, rr-struct-v2+) — 6 legacy trades aging out, no new fires
+- Open positions: 5 SHORT, normal SL distances
+
+**Monitoring:**
+- ETH and SYRUP positions aging (10h+)
+- Quiet market — potential regime shift if activity picks up
+- Exit_conditions field blank on trades (data quality issue flagged)
+
+BY: auto_1hr
+
+## [2026-09-16 11:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet market)
+**Last 6h:** 3 closed — ADA +$0.08, DOT -$0.25, ETC -$0.28
+**24h:** 26T 13W 50%WR -$0.55
+
+**24h by exit reason:**
+- atr_sl_hit: 20 (76.9%) — structural, known
+- cut-loser-MAE-GUARD: 2 | profit-monster-trail: 2 | hard_sl: 1 | None: 1
+
+**24h by signal:**
+- pullback-entry-: 18T 11W 61%WR +$0.23 (only active working signal)
+- breakout-long+: 3T 0W 0%WR -$0.60 (DEAD — already disabled, legacy aging)
+- rr-struct-v2+: 3T 0W 0%WR -$0.29 (DEAD — already disabled, legacy aging)
+- grind-breakout-: 1T +$0.03 | mover-: 1T +$0.08
+
+**Open positions:** 5 SHORT (ETH, SYRUP, SEI, CHIP, LTC)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour)
+- ATR SL 76.9% structural — unchanged
+- Dead signals (breakout-long+, rr-struct-v2+) already disabled in config — 6 legacy trades aging out, no new fires
+- pullback-entry- performing at 61%WR, slightly positive
+- Trade frequency normal (26/24h, 0/1h)
+
+**Monitoring:**
+- ADA entry RSI=28.82 (deeply oversold for SHORT) — trade won via profit-monster-trail but entry at extreme oversold is risky pattern
+- ETH and SYRUP positions aging 12h+
+- Quiet market — no regime shift signals yet
+BY: auto_1hr
+
+## [2026-09-16 12:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet market)
+**24h:** 25T 13W 52%WR -$0.21 | ATR SL 76% structural | pullback-entry- 17T 64.7%WR +$0.57
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour)
+- ATR SL 76% structural — unchanged
+- Dead signals (breakout-long+, rr-struct-v2+) already disabled — 6 legacy trades aging out
+- pullback-entry- performing at 64.7%WR, slightly positive
+- Trade frequency normal (25/24h, 0/1h)
+
+**Monitoring:**
+- 5 SHORT positions open: ETH 14h, SYRUP 13h, SEI 11h, CHIP 6h, LTC 4h
+- Quiet market — no regime shift signals yet
+- CHIP SHORT showing 269% PnL — check if size is correct
+BY: auto_1hr

@@ -668,3 +668,18 @@
 
 ## Error Alerts — 2026-09-16 06:56 UTC
 - **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-16 07:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-16 09:45 UTC
+- **CRITICAL** (1x): `hermes-5m-candle.service` failed since Sep 11 — script `_aggregate_5m.py` missing
+- **AUTO-FIX**: Disabled hermes-5m-candle.service and timer (stale, references deleted script)
+- **CRITICAL** (1x): Trading Checklist — pipeline timer active but no recent execution (false positive, pipeline ran at 09:42)
+- **WARN** (3x): Trading Checklist — stale momentum_cache (473h old), 66328 signals need cleanup, pipeline output unclear
+- **WARN** (9x): Non-critical services in failed state: better-coder (ModuleNotFoundError), git-release, session-brain-rebuild (timeout), away-detector, bug-hunter, ceo, mtf-macd-tuner, trading-checklist
+
+## Error Alerts — 2026-09-16 09:56 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`

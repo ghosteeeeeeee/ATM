@@ -765,5 +765,23 @@
     "category": "regime optimization",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-16T09:33:41.947504Z",
+    "idea": "Execution-time condition revalidation — recheck RSI at trade open, not just detection",
+    "rationale": "37% of 7d trades fire on stale signals. DOT SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65. Filter ran at detection time (RSI was valid) but by execution time RSI had moved.",
+    "expected_impact": "Block ~5-10% of losing trades that enter on stale conditions",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-16T09:33:41.947530Z",
+    "idea": "EXTREME regime SHORT-only filter — block LONG entries in EXTREME, keep SHORT",
+    "rationale": "EXTREME regime SHORT dominates (+$1.52). LONG losers cluster in EXTREME. SHORT works because extreme volatility = momentum continuation.",
+    "expected_impact": "Block ~$0.50-1.00/7d of LONG losses in EXTREME",
+    "category": "regime filter",
+    "status": "needs_more_data",
+    "risk": "medium"
   }
 ]

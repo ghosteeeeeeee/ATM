@@ -1,4 +1,16 @@
 ## TEAM UPDATES
+- [2026-09-16 09:33 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — stale signal execution confirmed, creative idea generated
+  24h: 26T 50%WR -$0.52 (FLAT) | 7d: 271T 55.4%WR +$1.32 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  EXTREME 7d: 102T 57.8%WR +$0.90 (NET POSITIVE — winners cover 43 losers)
+  pullback-entry- SHORT 81T 60.5%WR +$2.65 ★ | pump-chain- 54T 61.1%WR +$0.75
+  DEAD SIGNALS AGING OUT: trend_purity+ 11T -$0.90 | rr-struct-v2+ 10T -$0.45 | pullback-entry+ 6T -$0.57
+  STALE SIGNAL: 37% of 7d trades fire on stale signals (84/271). 37 stale losers.
+  LOSING AUTOPSY: DOT SHORT RSI=70.14 > ceiling=65 (filter gap at detection vs execution).
+  CREATIVE: (1) Execution-time RSI revalidation in signal_compactor (risk=low). (2) EXTREME regime LONG block (needs more data).
+  No config change — system positive, stale signal fix is code change, not config.
+  BY: brain_auditor
+
 - [2026-09-16 08:30 UTC (CEO run)] CEO: CONFIG CHANGE — SHORT_NORMAL_PENALTY removed
   24h: 27T 48.1%WR -$0.52 (FLAT) | 7d: 275T 54.9%WR +$2.66 (POSITIVE)
   SHORT 7d: 164T 59.8%WR +$3.72★ | LONG 7d: 111T 47.7%WR -$1.06 (legacy aging out)
@@ -1657,4 +1669,17 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   CREATIVE: (1) SHORT regime confidence scaling (EXTREME=1.0, HIGH=0.95, NORMAL=0.90) — needs 1 week monitoring. (2) Pipeline feature recording audit — verify ALL trade paths call record_entry_features.
   SIGNAL DIVERSITY: Only 2 types in NEUTRAL. Need new signal development.
   No config change — system positive, feature recording needs verification, all dead signals already killed.
+  BY: brain_auditor
+
+- [2026-09-16 09:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — stale signal execution root cause found
+  24h: 27T 48.1%WR -$0.52 (FLAT) | 7d: 274T 54.7%WR +$0.98 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  Regime 7d: EXTREME +$0.82 | HIGH +$0.32 | NORMAL -$0.16
+  **STALE SIGNAL EXECUTION ROOT CAUSE:** 44% of 48h trades have is_stale=true. ETC SHORT entered at RSI=70.14 (above SHORT_RSI_CEILING=65) because RSI filter runs at detection time, not execution time. Signal sat ~30min, RSI rose from <65 to 70.14.
+  **LOSING TRADE AUTOPSY:** ETC SHORT RSI=70.14 (filter gap), DOT SHORT RSI=64.22 (borderline), 3x breakout-long+ LONG in NEUTRAL (killed signal), 2x rr-struct-v2+ LONG in NEUTRAL (killed signal).
+  **99% EXIT_CONDITIONS BLANK:** 273/274 7d trades have NULL exit_conditions. Exit path tracking broken.
+  **STANDALONE_BYPASS CLEANUP:** ema300-dip-long still listed but disabled. Dead entry.
+  **FEATURE RECORDING:** Working on new trades (DOT, ETC have features_recorded=TRUE).
+  **SUGGESTED:** (1) Execution-time RSI/BB revalidation before trade placement. (2) Remove dead signals from STANDALONE_BYPASS. (3) Investigate exit_conditions blank.
+  No config change — system healthy, stale execution is design issue not config issue.
   BY: brain_auditor
