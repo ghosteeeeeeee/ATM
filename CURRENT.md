@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-15 ~22:45 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-16 ~01:45 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 31T, 51.6% WR, +$0.06. 7d: 280T, 53.9% WR, +$1.83. Market NEUTRAL.
+24h: 28T, 57.1% WR, +$0.81. 7d: 277T, 54.5% WR, +$3.16. Market NEUTRAL.
 
-- **24h:** 31T, 51.6% WR, +$0.06 (DB-verified — FLAT). Legacy LONG flushing, variance.
-- **7d:** 280T, 53.9% WR, +$1.83 (DB-verified — POSITIVE, improved from +$1.05). SHORT 152T 58.6%WR +$2.69 ★ | LONG 132T 47.0%WR -$1.64 (legacy drag ages out Sep 16-20).
+- **24h:** 28T, 57.1% WR, +$0.81 (DB-verified — POSITIVE). pullback-entry- SHORT dominant (20T 60%WR +$0.59).
+- **7d:** 277T, 54.5% WR, +$3.16 (DB-verified — POSITIVE, improved from +$1.83). SHORT 152T 58.6%WR +$2.69 ★ | LONG 125T 49.6%WR +$0.47 (improving, legacy aging out Sep 16-20).
 - **7d REGIME:** NEUTRAL 275T 54.5%WR +$2.20.
 - **7d EXIT:** profit-monster-trail 44T 92.3%WR +$3.83 ★ | atr_sl_hit 160T 50%WR +$0.35 | rr_engine_resistance 37T 40.5%WR -$1.33 (pre-fix legacy, all from pump-chain- before Sep 15).
 - **7d ACTIVE SIGNALS:** pullback-entry- 74T/59.5%WR +$2.58 ★ | pump-chain- 55T/60%WR +$0.62 | rr-struct+ 15T/73.3%WR +$0.59 | mover- 7T/85.7%WR +$0.53
@@ -27,12 +27,14 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟢 R:R STATUS (POSITIVE 7d, FLAT 24h)**
-7d PnL +$1.83 (POSITIVE, improved from +$1.05). SHORT +$2.69 carries LONG -$1.64 legacy drag. 24h +$0.06 (FLAT). System structurally healthy, legacy aging out.
+**🟢 R:R STATUS (POSITIVE 7d, POSITIVE 24h)**
+7d PnL +$3.16 (POSITIVE, improved from +$1.83). SHORT +$2.69 carries LONG +$0.47 (improving). 24h +$0.81 (POSITIVE). System structurally healthy.
 
-**🟢 rr_engine_resistance FIX VERIFIED.** pullback-entry- SHORT switched to ATR exit Sep 15 (was rr_engine 38.1%WR). 0 post-fix rr_engine exits for pullback-entry- (correct — no more -6% losers). pump-chain- pump_exit working (60%WR).
+**🟢 rr_engine_resistance FIX VERIFIED.** pullback-entry- SHORT switched to ATR exit Sep 15 (was rr_engine 38.1%WR). 0 post-fix rr_engine exits for pullback-entry- (correct — no more -6% losers). pump-chain- pump_exit working (60%WR). **48h+ with 0 rr_engine exits — continue monitoring until Sep 18.**
 
 **🟡 ATR SL FIX:** ATR_SL_MIN 1.2%→1.3% applied. Monitor until Sep 16 ~06:00.
+
+**🔴 FEATURES NOT RECORDED (CRITICAL):** All 279 trades in 14 days have features_recorded=FALSE. entry_rsi_14, entry_bb_position all NULL. record_entry_features() only called for orphan recovery/flips. Needs pipeline wiring fix. Retroactive fix for 7 open trades recommended.
 
 **🟢 SHORT_NORMAL_PENALTY=0.85:** Working. Monitor until Sep 16 ~05:30.
 
@@ -41,6 +43,10 @@
 **🟢 trend_ignition:** 0 trades since Sep 13 deployment. NEUTRAL market. Monitor 72h until Sep 16.
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
+
+## Today's Changes (Sep 16)
+
+1. **brain_auditor ~01:45 UTC — NO CONFIG CHANGE.** DB: 24h 28T 57.1%WR +$0.81 (POSITIVE). 7d: 277T 54.5%WR +$3.16 (POSITIVE, improved from +$1.83). Market NEUTRAL. **CRITICAL: features_recorded=FALSE ALL 279 trades (14 days). Root cause: record_entry_features() not called in normal pipeline. Recommending retroactive fix for 7 open trades + pipeline wiring.** 3 items in monitoring.
 
 ## Today's Changes (Sep 15)
 
@@ -75,9 +81,9 @@
 
 ## Next Actions
 
-1. **Monitor rr_engine_resistance fix.** pullback-entry- SHORT now ATR exit. Verify no more -6% rr_engine losers. Deadline: Sep 17. — 2026-09-15
-2. **Monitor ATR_SL_MIN 1.3%.** Still elevated below-entry rate. Deadline: Sep 16 ~06:00. — 2026-09-15
-3. **Monitor SHORT_NORMAL_PENALTY=0.85.** Monitor until Sep 16 ~05:30. — 2026-09-15
-4. **Monitor trend_ignition.** 0 trades since Sep 13. Deadline: Sep 16. — 2026-09-15
-5. **Verify legacy LONG flush.** trend_purity+, pullback-entry+, ema300-dip-long aging out Sep 16-20. — 2026-09-15
-6. **Evaluate LONG improvement after legacy ages out.** LONG 7d: 132T 47.0%WR -$1.64. — 2026-09-15
+1. **FIX: Record entry features for 7 open trades (retroactive).** Zero-risk data recovery. Use get_token_intel() + record_entry_features() from guardian. — 2026-09-16
+2. **FIX: Wire record_entry_features() into normal pipeline trade creation.** Currently only called for orphan recovery/flips. — 2026-09-16
+3. **Monitor rr_engine_resistance post-fix.** 0 exits in 48h+. Deadline: Sep 18. — 2026-09-15
+4. **Monitor breakout-long+ HIGH regime.** 2/2 recent losses in HIGH. Deadline: Sep 18. — 2026-09-16
+5. **Monitor ATR_SL_MIN 1.3%.** Still elevated below-entry rate. Deadline: Sep 16 ~06:00. — 2026-09-15
+6. **Verify legacy LONG flush.** trend_purity+, pullback-entry+, ema300-dip-long aging out Sep 16-20. — 2026-09-15

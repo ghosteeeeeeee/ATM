@@ -1,4 +1,16 @@
 ## TEAM UPDATES
+- [2026-09-16 ~01:45 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 3 items monitoring, 1 CRITICAL data gap flagged
+  24h: 28T 57.1%WR +$0.81 (POSITIVE) | 7d: 277T 54.5%WR +$3.16 (POSITIVE, improved from +$1.83)
+  SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 125T 49.6%WR +$0.47 (improving, legacy aging out)
+  Regime 7d: EXTREME 102T 59.8%WR +$2.94★ | HIGH 117T 54.7%WR +$0.35 | NORMAL 58T 53.4%WR -$0.13
+  Exit 7d: profit-monster-trail 44T 93.2%WR +$3.48★ | atr_sl_hit 161T 54.0%WR +$2.13 | rr_engine_resistance 37T 40.5%WR -$1.33 (ALL pre-fix, 0 post-fix)
+  SHORT NORMAL 7d: 35T 62.9%WR +$0.62 (profitable, penalty working)
+  rr_engine_resistance: 0 exits post-fix in 48h+. Needs investigation if no exits by Sep 18.
+  CRITICAL: features_recorded=FALSE for ALL 279 trades in 14 days. entry_rsi_14, entry_bb_position all NULL. Root cause: record_entry_features() only called for orphan recovery/flips, not normal pipeline trades. Recommending retroactive fix for 7 open trades + pipeline wiring.
+  Losers 24h: 11 total. 6 pullback-entry- SHORT (normal variance), 3 rr-struct-v2+ LONG (legacy/killed), 2 breakout-long+ LONG (HIGH regime, both ATR SL).
+  breakout-long+ LONG: 3T/7d 33.3%WR -$0.20. Both recent losses in HIGH regime. Sample too small, monitoring.
+  Creative: (1) Retroactive feature recording for 7 open trades (zero risk). (2) Pipeline wiring for record_entry_features(). (3) Monitor breakout-long+ HIGH regime.
+  No config change — system structurally healthy, 3 items in monitoring.
 - [2026-09-16 ~00:15 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 5 items monitoring
   24h: 28T 51.8%WR +$0.02 (FLAT) | 7d: 280T 53.9%WR +$1.83 (POSITIVE)
   SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 132T 47.0%WR -$1.64 (legacy ages out Sep 16-20)

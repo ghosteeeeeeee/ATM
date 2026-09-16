@@ -1,3 +1,15 @@
+[2026-09-16 01:45 UTC] brain_auditor: NO CONFIG CHANGE — 3 items monitoring, 1 CRITICAL data gap flagged
+  24h: 28T 57.1%WR +$0.81 (POSITIVE) | 7d: 277T 54.5%WR +$3.16 (POSITIVE, improved from +$1.83)
+  SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 125T 49.6%WR +$0.47 (improving)
+  Regime: EXTREME +$2.94★ | HIGH +$0.35 | NORMAL -$0.13
+  Exit: profit-monster-trail +$3.48★ | atr_sl_hit +$2.13 | rr_engine_resistance -$1.33 (ALL pre-fix)
+  rr_engine_resistance: 0 exits post-fix in 48h+. Needs investigation.
+  CRITICAL: features_recorded=FALSE ALL 279 trades 14 days. Root cause: record_entry_features() not called in normal pipeline.
+  Losers 24h: 11. 6 pullback-entry- (normal), 3 rr-struct-v2+ (legacy), 2 breakout-long+ (HIGH regime).
+  breakout-long+ LONG: 3T/7d 33.3%WR -$0.20. HIGH regime pattern. Monitoring.
+  Creative: (1) Retroactive feature recording for 7 open trades. (2) Pipeline wiring fix. (3) Monitor breakout-long+.
+  BY: brain_auditor
+
 [2026-09-16 00:15 UTC] brain_auditor: NO CONFIG CHANGE — 5 items monitoring
   24h: 28T 51.8%WR +$0.02 (FLAT) | 7d: 280T 53.9%WR +$1.83 (POSITIVE)
   SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 132T 47.0%WR -$1.64 (legacy ages out Sep 16-20)

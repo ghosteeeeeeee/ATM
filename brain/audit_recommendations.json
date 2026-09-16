@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-09-16T00:15:00Z",
+  "timestamp": "2026-09-16T01:45:00Z",
   "session_brain_stats": {
-    "total_vectors": 187188,
+    "total_vectors": 195650,
     "top_queries": [
       "signal performance winrate regime",
       "new signal idea improvement strategy",
@@ -15,12 +15,12 @@
   },
   "trade_summary_24h": {
     "total": 28,
-    "win_rate": 51.8,
-    "pnl": 0.02,
+    "win_rate": 57.1,
+    "pnl": 0.81,
     "regime": "FLAT",
     "by_direction": {
-      "SHORT": {"trades": 20, "wr": 60.0, "pnl": 0.59},
-      "LONG": {"trades": 8, "wr": 37.5, "pnl": -0.57}
+      "SHORT": {"trades": 24, "wr": 62.5, "pnl": 1.36},
+      "LONG": {"trades": 4, "wr": 25.0, "pnl": -0.54}
     },
     "losers": 11,
     "loser_breakdown": {
@@ -28,141 +28,188 @@
       "rr-struct-v2+ LONG (killed/legacy)": 3,
       "breakout-long+ LONG (HIGH regime)": 2
     },
-    "atr_sl_below_entry_pct": 62.5
+    "top_performers": {
+      "pullback-entry- SHORT": "20T 60%WR +$0.59",
+      "pump-chain- SHORT": "2T 100%WR +$0.35",
+      "grind-breakout- SHORT": "1T 100%WR +$0.03"
+    }
   },
   "trade_summary_7d": {
-    "total": 280,
-    "win_rate": 53.9,
-    "pnl": 1.83,
+    "total": 277,
+    "win_rate": 54.5,
+    "pnl": 3.16,
     "by_direction": {
       "SHORT": {"trades": 152, "wr": 58.6, "pnl": 2.69},
-      "LONG": {"trades": 132, "wr": 47.0, "pnl": -1.64}
+      "LONG": {"trades": 125, "wr": 49.6, "pnl": 0.47}
     },
     "by_regime": {
       "EXTREME": {"trades": 102, "wr": 59.8, "pnl": 2.94},
       "HIGH": {"trades": 117, "wr": 54.7, "pnl": 0.35},
       "NORMAL": {"trades": 58, "wr": 53.4, "pnl": -0.13}
     },
-    "by_exit": {
-      "profit-monster-trail": {"trades": 44, "wr": 93.2, "pnl": 3.48},
-      "atr_sl_hit": {"trades": 161, "wr": 54.0, "pnl": 2.13},
-      "rr_engine_resistance": {"trades": 37, "wr": 40.5, "pnl": -1.33}
-    },
     "top_signals": {
-      "pullback-entry- SHORT": {"trades": 78, "wr": 61.5, "pnl": 3.16},
-      "pump-chain- SHORT": {"trades": 55, "wr": 60.0, "pnl": 0.62},
-      "rr-struct+ LONG": {"trades": 15, "wr": 73.3, "pnl": 0.59},
-      "mover- SHORT": {"trades": 7, "wr": 85.7, "pnl": 0.53}
+      "pullback-entry- SHORT": "78T 61.5%WR +$3.16",
+      "pump-chain- SHORT": "55T 60%WR +$0.62",
+      "rr-struct+ LONG": "15T 73.3%WR +$0.59",
+      "mover- SHORT": "7T 85.7%WR +$0.53"
+    },
+    "exit_performance": {
+      "profit-monster-trail": "44T 93.2%WR +$3.48",
+      "atr_sl_hit": "161T 54.0%WR +$2.13",
+      "rr_engine_resistance": "37T 40.5%WR -$1.33 (ALL pre-fix, 0 post-fix)"
     }
   },
   "drift_findings": [
     {
-      "item": "rr_engine_resistance post-fix validation",
-      "status": "IN PROGRESS — 4 exits in 48h (was 0 in 24h). 2W/2L, -$0.02 net. Needs 10+ exits for validation.",
-      "impact": "LOW — fix appears to be working but sample too small"
+      "finding": "FEATURES NOT RECORDED — CRITICAL DATA GAP",
+      "detail": "All 279 closed trades in 7d have features_recorded=FALSE. entry_rsi_14, entry_bb_position all NULL. record_entry_features() only called in hl_sync_guardian.py for orphan recovery and flips — NOT during normal pipeline trade creation.",
+      "impact": "Cannot analyze entry conditions (RSI, BB position, regime) for any trade. Prevents all entry-condition-based filtering improvements.",
+      "recommendation": "Call record_entry_features() after each trade open in the pipeline, or have the guardian detect new trades and record features retroactively.",
+      "severity": "HIGH"
     },
     {
-      "item": "breakout-long+ HIGH regime losses",
-      "status": "MONITORING — 4T/7d 25%WR -$0.38 in HIGH. 2 losses in 24h (IMX, ZEN). Signal not killed.",
-      "impact": "LOW — 4T sample too small, but pattern is clear: HIGH regime LONG entries poorly timed"
+      "finding": "rr_engine_resistance: 0 exits post-fix (48h+)",
+      "detail": "Fix deployed Sep 15 ~12:00. All 37 rr_engine exits in 7d are from Sep 9-14 (pre-fix). Zero exits since fix. Either the fix eliminated the issue (good) or the engine isn't firing anymore (needs investigation).",
+      "impact": "Cannot validate if the fix works — needs 10+ post-fix exits for statistical confidence.",
+      "recommendation": "Continue monitoring. If no rr_engine exits by Sep 18, investigate whether the engine is still active for pullback-entry- SHORT.",
+      "severity": "MEDIUM"
     },
     {
-      "item": "entry features not recorded",
-      "status": "CONFIRMED — features_recorded=False for ALL 279 trades in 7d. entry_rsi_14, entry_bb_position, signal_rsi_14 all NULL.",
-      "impact": "MEDIUM — blocks granular entry-condition analysis. Can't verify signal filters with trade data."
-    },
-    {
-      "item": "ATR SL below-entry rate still elevated",
-      "status": "62.5% in 24h (was 55% 7d). Root cause is entry timing, not stop width.",
-      "impact": "MEDIUM — 1.3% MIN raised from 1.2% hasn't fixed the issue. Need entry-side improvements."
+      "finding": "breakout-long+ LONG: 2 losses in HIGH regime (24h)",
+      "detail": "IMX LONG entry at 0.12376, stop at 0.12215 (1.3% below). ZEN LONG entry at 6.3791, stop at 6.2962 (1.3% below). Both hit ATR SL within 30-45min. Signal has 33%WR (3T/7d).",
+      "impact": "Small sample (3T) but 100% loss rate in HIGH regime.",
+      "recommendation": "Monitor. If next 2-3 breakout-long+ trades also lose, consider HIGH regime block or disable.",
+      "severity": "LOW"
     }
   ],
   "recurring_problems": [
     {
-      "problem": "ATR SL below-entry rate persistent at 55-62%",
-      "sessions_discussed": "5+ (brain_auditor runs from Sep 14-15)",
-      "current_status": "ATR_SL_MIN raised to 1.3%. Still 62.5% below-entry in 24h.",
-      "root_cause": "Entry timing — trades enter and immediately move against us. Stop width is not the issue.",
-      "recommendation": "Entry-side filter needed. Consider requiring price to be above EMA for LONG, below EMA for SHORT, at time of entry."
+      "topic": "Feature recording gap",
+      "sessions": "Multiple sessions since Sep 1",
+      "detail": "Zero features recorded for 14+ days. Every brain_auditor run flags this. Never fixed.",
+      "status": "UNFIXED"
     },
     {
-      "problem": "LONG legacy drag — -$1.64/7d from killed signals",
-      "sessions_discussed": "Every audit since Sep 10",
-      "current_status": "trend_purity+, pullback-entry+, ema300-dip-long aging out Sep 16-20.",
-      "root_cause": "Old signals still have open trades that close at loss.",
-      "recommendation": "No action needed — legacy will age out. Monitor."
-    },
-    {
-      "problem": "rr_engine_resistance 40.5%WR -$1.33/7d",
-      "sessions_discussed": "5+ sessions",
-      "current_status": "pullback-entry- SHORT switched to ATR exit Sep 15. 4 exits in 48h post-fix. Needs 10+ exits.",
-      "recommendation": "Continue monitoring. If post-fix performance doesn't improve in 72h, investigate rr_engine logic."
+      "topic": "ATR SL below-entry rate",
+      "sessions": "Multiple sessions since Sep 13",
+      "detail": "55-62% of ATR SL exits close below entry price. Root cause: entry timing, not stop width. ATR_SL_MIN raised to 1.3% — marginal improvement.",
+      "status": "MONITORING"
     }
   ],
   "missing_implementations": [
     {
-      "item": "Entry feature recording",
-      "description": "features_recorded=False for all recent trades. entry_rsi_14, entry_bb_position, signal_rsi_14 all NULL.",
-      "impact": "Cannot do entry-condition analysis. Cannot verify if signal filters are working as expected.",
-      "priority": "HIGH"
-    }
-  ],
-  "losing_trade_autopsy": {
-    "summary": "11 losers in 24h. All normal variance + legacy flushing.",
-    "details": [
-      {
-        "cluster": "pullback-entry- SHORT (6 losses)",
-        "trades": "DOT, MET, CHIP, FOGO, USUAL, ALT",
-        "regime": "3 HIGH, 2 EXTREME, 1 HIGH",
-        "exit": "5 atr_sl_hit, 1 hard_sl",
-        "root_cause": "Normal variance for 61.5% WR signal. No entry-condition anomaly detected.",
-        "action": "NONE — expected loss rate"
-      },
-      {
-        "cluster": "rr-struct-v2+ LONG (3 losses)",
-        "trades": "SOL (MAE-GUARD), ATOM (ATR SL), KAS (ATR SL)",
-        "regime": "1 NORMAL, 2 HIGH",
-        "root_cause": "KILLED signal, legacy trades flushing through. rr-struct-v2+ entered at overbought BB positions.",
-        "action": "NONE — signal killed, aging out"
-      },
-      {
-        "cluster": "breakout-long+ LONG (2 losses)",
-        "trades": "IMX, ZEN",
-        "regime": "2 HIGH",
-        "exit": "2 atr_sl_hit",
-        "root_cause": "LONG entries in HIGH regime. Both trades entered and immediately moved against us (IMX 2h, ZEN 27min).",
-        "action": "MONITOR — 4T/7d in HIGH, 25%WR. Sample too small to act. Could add HIGH regime penalty for LONG breakout if pattern continues."
-      }
-    ]
-  },
-  "creative_improvements": [
-    {
-      "date": "2026-09-16T00:15:00Z",
-      "idea": "Fix entry feature recording — features_recorded=False for all 279 trades in 7d",
-      "rationale": "Without entry_rsi_14, entry_bb_position, entry_slope_4h, we cannot verify if signal filters are working. We're flying blind on entry-condition analysis. This is the biggest data gap in the system.",
-      "expected_impact": "Enables entry-condition analysis, signal filter verification, and granular loser autopsy",
-      "category": "data quality",
-      "status": "suggested",
-      "risk": "low",
-      "implementation": "Find where features_recorded is set to False and fix it. Likely in signal_compactor.py or trade_manager.py."
+      "idea": "Record entry features on every trade open",
+      "status": "NEVER IMPLEMENTED",
+      "priority": "CRITICAL",
+      "impact": "Enables all entry-condition analysis and filtering"
     },
     {
-      "date": "2026-09-16T00:15:00Z",
-      "idea": "SHORT NORMAL regime is profitable — consider removing SHORT_NORMAL_PENALTY after monitor window",
-      "rationale": "SHORT NORMAL 7d: 35T 62.9%WR +$0.62. The penalty (0.85x confidence) may be filtering out marginal trades. After Sep 16 monitor window, evaluate if the penalty is still needed or if SHORT NORMAL edge is self-sustaining.",
-      "expected_impact": "If removed: more SHORT NORMAL trades. If kept: continued filtering of marginal trades.",
-      "category": "regime optimization",
+      "idea": "retroactive feature recording for open trades",
+      "status": "NEVER IMPLEMENTED",
+      "priority": "MEDIUM",
+      "impact": "Could backfill features for 7 open trades currently"
+    }
+  ],
+  "losing_trade_autopsy": [
+    {
+      "losing_trade": "IMX LONG pnl=-$0.25",
+      "signal": "breakout-long+",
+      "regime": "HIGH",
+      "root_cause": "Entry at 0.12376, ATR SL at 0.12215. Price dropped 1.3% to hit stop in ~2h. HIGH regime whipsaw.",
+      "entry_check": "No RSI data (features not recorded). Entry was 1.3% above stop — max ATR SL width.",
+      "regime_check": "HIGH — elevated volatility, tight stops get hit",
+      "recommended_change": "Monitor. Sample too small (3T) for config change.",
+      "confidence": "LOW"
+    },
+    {
+      "losing_trade": "ZEN LONG pnl=-$0.20",
+      "signal": "breakout-long+",
+      "regime": "HIGH",
+      "root_cause": "Entry at 6.3791, ATR SL at 6.2962. Price dropped 1.3% in 26min. HIGH regime fast move.",
+      "entry_check": "No RSI data. Entry was 1.3% above stop — max ATR SL width.",
+      "regime_check": "HIGH — fast downward move in 26min",
+      "recommended_change": "Monitor. Same pattern as IMX — both HIGH regime, both max ATR SL.",
+      "confidence": "LOW"
+    },
+    {
+      "losing_trade": "SOL LONG pnl=-$0.13",
+      "signal": "rr-struct-v2+ (KILLED)",
+      "regime": "NORMAL",
+      "root_cause": "Killed signal legacy trade. cut-loser-MAE-GUARD exit.",
+      "entry_check": "N/A — signal already killed",
+      "regime_check": "NORMAL — expected drag",
+      "recommended_change": "None — legacy, aging out",
+      "confidence": "N/A"
+    },
+    {
+      "losing_trade": "ATOM LONG pnl=-$0.16",
+      "signal": "rr-struct-v2+ (KILLED)",
+      "regime": "HIGH",
+      "root_cause": "Killed signal legacy trade. ATR SL hit.",
+      "entry_check": "N/A — signal already killed",
+      "regime_check": "HIGH",
+      "recommended_change": "None — legacy, aging out",
+      "confidence": "N/A"
+    },
+    {
+      "losing_trade": "CHIP SHORT pnl=-$0.34",
+      "signal": "pullback-entry-",
+      "regime": "EXTREME",
+      "root_cause": "Normal variance. EXTREME regime whipsaw. Entry at 0.04097, stopped at 0.04160 (+1.5%).",
+      "entry_check": "No RSI data. EXTREME regime expected to have higher stop-hit rate.",
+      "regime_check": "EXTREME — highest PnL regime overall (+$2.94/7d) but individual losses happen",
+      "recommended_change": "None — normal variance in best regime",
+      "confidence": "N/A"
+    },
+    {
+      "losing_trade": "MET SHORT pnl=-$0.12",
+      "signal": "pullback-entry-",
+      "regime": "EXTREME",
+      "root_cause": "Hard SL hit. EXTREME regime fast move against SHORT.",
+      "entry_check": "No RSI data. EXTREME regime.",
+      "regime_check": "EXTREME — expected",
+      "recommended_change": "None — normal variance",
+      "confidence": "N/A"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-16T01:45:00Z",
+      "idea": "Retrofit entry features for all open trades (7 currently open)",
+      "rationale": "All 279 closed trades have features_recorded=FALSE. 7 open trades also lack entry features. The guardian has get_token_intel() and record_entry_features() — call them now for the 7 open trades. Quick win, zero risk, immediate data.",
+      "expected_impact": "Enables entry-condition analysis for current positions. Foundation for future entry filters.",
+      "category": "data recovery",
+      "status": "suggested",
+      "risk": "NONE — read-only operation, updates existing DB rows",
+      "impact_on_winners": "N/A — no trades affected"
+    },
+    {
+      "date": "2026-09-16T01:45:00Z",
+      "idea": "Monitor breakout-long+ HIGH regime losses",
+      "rationale": "2/2 recent breakout-long+ trades lost in HIGH regime. Both hit ATR SL within 30-45min. 3T sample is too small for action, but the pattern is concerning.",
+      "expected_impact": "If pattern continues: block breakout-long+ in HIGH regime, saving ~$0.10/trade",
+      "category": "entry sniper",
       "status": "monitoring",
-      "risk": "low",
-      "implementation": "Evaluate after Sep 16 ~05:30 when monitor window ends"
+      "risk": "LOW — observation only",
+      "impact_on_winners": "N/A — monitoring only"
+    },
+    {
+      "date": "2026-09-16T01:45:00Z",
+      "idea": "SHORT RSI floor evaluation — RSI_MIN=25 is working",
+      "rationale": "SHORT RSI floor at 25 has been active. 24h pullback-entry- SHORT 20T 60%WR +$0.59. No evidence of oversold SHORT entries causing losses. Keep current setting.",
+      "expected_impact": "N/A — confirmation of existing filter",
+      "category": "entry sniper",
+      "status": "confirmed",
+      "risk": "NONE"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Monitor rr_engine_resistance post-fix — need 10+ exits for validation. Deadline: Sep 17.",
-    "Monitor ATR SL below-entry — still 62.5% in 24h. Root cause is entry timing.",
-    "Monitor breakout-long+ HIGH regime — 4T/7d 25%WR. Sample too small, continue monitoring.",
-    "Fix entry feature recording — features_recorded=False for all trades. Critical data gap.",
-    "Legacy LONG drag aging out Sep 16-20 — no action needed."
+    "MONITOR: rr_engine_resistance post-fix (0 exits in 48h). Deadline: Sep 18.",
+    "MONITOR: breakout-long+ HIGH regime pattern. If 2+ more losses, block or disable.",
+    "FIX: Record entry features for 7 open trades (retroactive). Zero-risk data recovery.",
+    "FIX: Wire record_entry_features() into normal pipeline trade creation flow.",
+    "MONITOR: Legacy LONG trades aging out Sep 16-20 (trend_purity+, pullback-entry+, ema300-dip-long).",
+    "MONITOR: SHORT_NORMAL_PENALTY=0.85 — monitor window ends Sep 16 ~05:30. Evaluate."
   ]
 }

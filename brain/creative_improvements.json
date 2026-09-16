@@ -718,5 +718,34 @@
     "status": "monitoring",
     "risk": "low",
     "implementation": "Evaluate after Sep 16 ~05:30 when monitor window ends"
+  },
+  {
+    "date": "2026-09-16T01:34:53.751649Z",
+    "idea": "Retrofit entry features for all open trades (7 currently open)",
+    "rationale": "All 279 closed trades have features_recorded=FALSE. 7 open trades also lack entry features. The guardian has get_token_intel() and record_entry_features() — call them now for the 7 open trades. Quick win, zero risk, immediate data.",
+    "expected_impact": "Enables entry-condition analysis for current positions. Foundation for future entry filters.",
+    "category": "data recovery",
+    "status": "suggested",
+    "risk": "NONE — read-only operation, updates existing DB rows",
+    "impact_on_winners": "N/A — no trades affected"
+  },
+  {
+    "date": "2026-09-16T01:34:53.751675Z",
+    "idea": "Monitor breakout-long+ HIGH regime losses",
+    "rationale": "2/2 recent breakout-long+ trades lost in HIGH regime. Both hit ATR SL within 30-45min. 3T sample is too small for action, but the pattern is concerning.",
+    "expected_impact": "If pattern continues: block breakout-long+ in HIGH regime, saving ~$0.10/trade",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "LOW — observation only",
+    "impact_on_winners": "N/A — monitoring only"
+  },
+  {
+    "date": "2026-09-16T01:34:53.751683Z",
+    "idea": "SHORT RSI floor evaluation — RSI_MIN=25 is working",
+    "rationale": "SHORT RSI floor at 25 has been active. 24h pullback-entry- SHORT 20T 60%WR +$0.59. No evidence of oversold SHORT entries causing losses. Keep current setting.",
+    "expected_impact": "N/A — confirmation of existing filter",
+    "category": "entry sniper",
+    "status": "confirmed",
+    "risk": "NONE"
   }
 ]
