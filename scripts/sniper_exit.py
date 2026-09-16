@@ -830,30 +830,68 @@ def sniper_check(dry_run=False):
         log.info(f"  No wrong-side positions (all {shift_direction}-aligned)")
         return
 
+    # ── DIVERGENCE CHECK: don't close if token is diverging from BTC ──
+    # If token is moving opposite to BTC, it might continue independently
+    # e.g., SHORT while token is dumping (even if BTC is pumping)
+    # e.g., LONG while token is pumping (even if BTC is dumping)
+    diverging = []
+    staying = []
+    try:
+        import psycopg2 as _pg
+        _conn = _pg.connect("host=/var/run/postgresql dbname=brain user=postgres", connect_timeout=5)
+        _cur = _conn.cursor()
+        for p in wrong_side:
+            token = p['token']
+            direction = p['direction']
+            _cur.execute("""
+                SELECT price_change_30m FROM token_speeds WHERE token = %s
+            """, (token,))
+            row = _cur.fetchone()
+            if row and row[0] is not None:
+                token_momentum = float(row[0])
+                # SHORT while token dumping = diverging (keep SHORT)
+                # LONG while token pumping = diverging (keep LONG)
+                if (direction == 'SHORT' and token_momentum < -0.5) or \
+                   (direction == 'LONG' and token_momentum > 0.5):
+                    diverging.append(p)
+                    log.info(f"  [DIVERGENCE] {token} {direction} — token momentum {token_momentum:+.2f}% diverging from BTC, keeping")
+                else:
+                    staying.append(p)
+            else:
+                staying.append(p)  # No data — close (safe default)
+        _conn.close()
+    except Exception as e:
+        log.warning(f"Divergence check error: {e}")
+        staying = wrong_side  # On error, close all (safe default)
+
+    if not staying:
+        log.info(f"  All wrong-side positions diverging from BTC — no closes")
+        return
+
     # ── Filter out already-closed-this-shift ──
     closed_ids = set(state.get('closed_this_shift', []))
-    wrong_side = [p for p in wrong_side if p['id'] not in closed_ids]
+    staying = [p for p in staying if p['id'] not in closed_ids]
 
-    if not wrong_side:
+    if not staying:
         log.info(f"  All wrong-side positions already closed this shift")
         return
 
     # ── Categorize wrong-side positions ──
     trail_state = _load_trail_state()
 
-    tier1 = [p for p in wrong_side
+    tier1 = [p for p in staying
              if p['pnl_pct'] > 0
              and str(p['id']) not in trail_state]
 
     tier2 = sorted(
-        [p for p in wrong_side
+        [p for p in staying
          if p['pnl_pct'] < SNIPER_MIN_LOSS_THRESHOLD  # e.g. < -0.5%
          and p.get('open_time') is not None],
         key=lambda p: p['open_time'],
         reverse=True  # LIFO — most recent first
     )
 
-    tier3 = [p for p in wrong_side
+    tier3 = [p for p in staying
              if p['pnl_pct'] > 0
              and str(p['id']) in trail_state]
 
