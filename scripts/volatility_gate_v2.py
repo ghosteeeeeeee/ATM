@@ -235,6 +235,7 @@ VOL_PHASE_MULTS = {
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
+        'Pullback_Entry': 0.5,  # PENALIZED — pullback-entry- 40% WR -$0.47 in EXTREME, wins in NORMAL/HIGH. 2026-09-16
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in EXTREME (oversold = extreme)
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
         'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)

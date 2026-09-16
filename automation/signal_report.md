@@ -1,49 +1,27 @@
-# Signal Performance Report
-**Generated:** 2026-09-16 05:09 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-09-16 08:00 UTC | Last 6h: 0 trades | Last 24h: 20 trades
 
-## Overall Stats (24h)
-- **Total trades:** 28 | **WR:** 50.0% | **PnL:** -$0.42
-- **Active signals:** 3 (pullback-entry- SHORT, grind-breakout- SHORT, grind-breakout+ LONG)
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| breakout-long+ | LONG | 0.0% | -$0.60 | 3 | Already killed 2026-09-16 02:08 UTC |
+| rr-struct-v2+ | LONG | 0.0% | -$0.29 | 3 | Already killed 2026-09-15 |
 
----
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 64.7% | +$0.57 | 17 | Winner — EXTREME regime penalized 0.5x |
 
-## WINNERS (WR > 55%, PnL > 0)
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| pullback-entry- | SHORT | 4 | 50.0% | -$0.35 | 21 | 61.9% | +$0.44 | ENABLED |
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 64.7% | +$0.57 | 17 | Active — EXTREME regime penalized |
 
-**Regime breakdown (all time):** EXTREME 64.7% WR (17T) | HIGH 60% WR (40T) | NORMAL 58.3% WR (24T)
-**Boost executed:** Relaxed NORMAL gate 0.0→0.8 in volatility_gate_v2.py (SHORT wins58% in NORMAL, LONG killed)
-
----
-
-## KILLED (executed this cycle)
-
-None — both candidates were already killed:
-- **breakout-long+ LONG**: killed 2026-09-16 02:08 UTC (0% WR, -$0.60)
-- **rr-struct-v2+ LONG**: killed 2026-09-15 (0% WR, -$0.29)
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| grind-breakout- | SHORT | 1 | 100% | +$0.03 | WATCH (too few trades) |
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## ISSUES
-
-- None this cycle. System healthy.
-
----
-
-*Report generated 2026-09-16 05:09 UTC. Next report: ~6h.*
+ISSUES:
+- No inversions found
+- pullback-entry- loses in EXTREME (40% WR, -$0.47) — added 0.5x multiplier in volatility_gate_v2.py
+- Both kill candidates were already killed in previous sessions
