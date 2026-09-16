@@ -1,83 +1,110 @@
 {
-  "timestamp": "2026-09-16T09:33:17.031069Z",
+  "timestamp": "2026-09-16T10:36:19.585558+00:00",
   "session_brain_stats": {
-    "vectors": 195650,
-    "searches_run": 3,
+    "index_vectors": 195650,
+    "queries_run": 6,
     "top_topics": [
-      "signal performance",
-      "creative ideas",
-      "problems"
+      "stale signal execution",
+      "feature recording",
+      "exit conditions",
+      "signal diversity",
+      "ATR SL structural"
     ]
   },
   "trade_summary_24h": {
-    "trades": 26,
-    "pnl": -0.52,
-    "wr": 50.0,
-    "status": "FLAT"
+    "total": 25,
+    "winners": 16,
+    "losers": 9,
+    "wr": 64.0,
+    "pnl": 0.05,
+    "regime": "EXTREME dominant",
+    "signal_mix": "pullback-entry- SHORT 17T 64.7%WR +$0.57, mover- 1T +$0.08, grind-breakout- 1T +$0.03"
   },
   "trade_summary_7d": {
-    "trades": 271,
-    "pnl": 1.32,
+    "total": 267,
     "wr": 55.4,
-    "status": "POSITIVE"
+    "pnl": 1.32,
+    "by_regime": "EXTREME 101T 58.4%WR +$1.16 | HIGH 109T 55.0%WR +$0.56 | NORMAL 56T 51.8%WR -$0.19",
+    "top_signal": "pullback-entry- SHORT 81T 60.5%WR +$2.65",
+    "stale_pct": 30.7
   },
   "drift_findings": [
     {
-      "finding": "Dead signals still have trades in 7d window",
-      "detail": "trend_purity+ 11T/36.4%WR -$0.90, rr-struct-v2+ 10T/40%WR -$0.45, pullback-entry+ 6T/16.7%WR -$0.57 — all KILLED but legacy trades aging out",
-      "impact": "-$1.92 total drag, expected to age out by Sep 18-20",
-      "action": "Monitor only — no intervention needed"
+      "issue": "SHORT_RSI_CEILING filter uses 5m candles but entry RSI uses 1m data",
+      "evidence": "ETC SHORT entered at RSI=70.14 (>65 ceiling) but passed filter. Filter reads candles_5m, entry_rsi_14 computed from price_history (1m). Timeframe mismatch lets overbought SHORTs through.",
+      "impact": "ETC SHORT loss -$0.28. DOT SHORT borderline at RSI=64.22.",
+      "status": "CODE FIX NEEDED — not config"
     },
     {
-      "finding": "STALE SIGNAL EXECUTION — 37% of 7d trades fire on stale signals",
-      "detail": "84/271 trades had is_stale=true. 37 of those were losers. RSI filter runs at detection, not execution. DOT SHORT entered RSI=70.14 > ceiling=65.",
-      "impact": "Data quality concern, potential entry condition drift",
-      "action": "RECOMMEND: Execution-time revalidation in signal_compactor.py"
+      "issue": "exit_conditions column 99.96% empty (266/267 7d trades)",
+      "evidence": "Only 1 trade has exit_conditions populated. exit_reason works (atr_sl_hit, profit-monster-trail) but exit_conditions (which exit PATH was taken) is never written.",
+      "impact": "Exit analysis impossible from DB. Cannot determine which exit mechanisms work best per signal/regime.",
+      "status": "CODE FIX NEEDED"
+    },
+    {
+      "issue": "Stale signal execution — 30.7% of 7d trades fire on stale signals",
+      "evidence": "82/267 trades have is_stale=true. Stale WR 50.0% vs fresh WR 58.2%. Stale PnL -$1.16 vs fresh +$2.69. Pullback-entry- SHORT: stale 56.1%WR +$0.10 vs fresh 65.0%WR +$2.55.",
+      "impact": "~$3.85/7d lost from stale execution. Fresh signals have 8.2% higher WR.",
+      "status": "MONITORING — execution-time revalidation would fix"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "Signal diversity in NEUTRAL",
-      "frequency": "3+ sessions",
-      "detail": "Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, pump-chain-). Need new signals for resilience.",
-      "status": "Open — no new signals built yet"
+      "topic": "ATR SL below entry",
+      " frequency": "every audit since Sep 10",
+      "data": "34.1% of 7d ATR SL exits close below entry (91/267). pullback-entry- SHORT: 68%. Structural — ATR SL fires before price moves in trade direction.",
+      "status": "MONITORING — ATR_SL_MIN=1.3% already applied, PM_TRAIL protected"
     },
     {
-      "topic": "Stale signal execution",
-      "frequency": "2 sessions",
-      "detail": "Signals detected at one time, executed later when conditions changed. No execution-time revalidation exists.",
-      "status": "Open — root cause identified, fix not implemented"
+      "topic": "Signal diversity in NEUTRAL",
+      "frequency": "mentioned 5+ times in sessions",
+      "data": "Only 2 signal types pass confluence in NEUTRAL: pullback-entry- SHORT and pump-chain- SHORT. System depends entirely on SHORT in flat market.",
+      "status": "DEVELOP — need new NEUTRAL-compatible signals"
     }
   ],
   "missing_implementations": [
-    "Execution-time RSI/condition revalidation in signal_compactor.py",
-    "New NEUTRAL-compatible signals (only 2 types pass confluence)"
+    "Execution-time RSI revalidation (1m data) in signal_compactor",
+    "exit_conditions recording in close_trade() path",
+    "Stale signal filter (block trades where is_stale=true and time_delta > threshold)",
+    "New signals for NEUTRAL regime diversity"
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-16T09:33:17.031097Z",
-      "idea": "Execution-time condition revalidation — recheck RSI at trade open, not just detection",
-      "rationale": "37% of 7d trades fire on stale signals. DOT SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65. Filter ran at detection time (RSI was valid) but by execution time RSI had moved. Simple recheck in signal_compactor would catch this.",
-      "expected_impact": "Block ~5-10% of losing trades that enter on stale conditions",
+      "date": "2026-09-16T10:36:19.585575+00:00",
+      "idea": "Align SHORT_RSI_CEILING filter to use 1m price data instead of 5m candles",
+      "rationale": "ETC SHORT entered at RSI=70.14 (1m data) but passed 5m RSI filter. 5m RSI smooths out spikes, letting overbought SHORTs through. Using 1m data matches the entry RSI and catches these.",
+      "expected_impact": "Block ~2-3% of SHORT entries that currently slip through. ETC-type losses prevented.",
       "category": "entry sniper",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low",
+      "impact_on_winners": "Need to verify: would 1m RSI filter have blocked any recent winners?"
     },
     {
-      "date": "2026-09-16T09:33:17.031107Z",
-      "idea": "EXTREME regime SHORT-only filter — block LONG entries in EXTREME, keep SHORT",
-      "rationale": "EXTREME regime 7d: 102T 57.8%WR +$0.90. SHORT dominates (+$1.52 from SHORT signals). LONG losers cluster in EXTREME (open-skies+, trend_purity+). SHORT works in EXTREME because extreme volatility = momentum continuation.",
-      "expected_impact": "Block ~$0.50-1.00/7d of LONG losses in EXTREME",
-      "category": "regime filter",
-      "status": "needs_more_data",
-      "risk": "medium"
+      "date": "2026-09-16T10:36:19.585578+00:00",
+      "idea": "Add exit_conditions tracking to close_trade() — record which exit path fired",
+      "rationale": "99.96% of trades have blank exit_conditions. We know exit_reason (atr_sl_hit, profit-monster-trail) but not which specific code path triggered. This makes exit analysis impossible.",
+      "expected_impact": "Enable per-signal exit optimization. Identify which exits work best per regime.",
+      "category": "data quality",
+      "status": "suggested",
+      "risk": "low",
+      "impact_on_winners": "None — additive only"
+    },
+    {
+      "date": "2026-09-16T10:36:19.585579+00:00",
+      "idea": "Volume confirmation filter for pullback-entry- SHORT in EXTREME regime",
+      "rationale": "pullback-entry- SHORT: fresh 65.0%WR +$2.55 vs stale 56.1%WR +$0.10. Stale entries often chase already-moved price. Volume spike at entry = late chase. Adding volume ratio >1.5x filter would block late chasers.",
+      "expected_impact": "Block ~5-10% of stale pullback-entry- SHORT entries. Improve WR from 60.5% to ~63-65%.",
+      "category": "entry sniper",
+      "status": "suggested — needs sample size verification",
+      "risk": "medium — needs 20+ trade sample to validate"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Monitor feature recording on next 5-10 closed trades (fix deployed Sep 16 02:30 UTC)",
-    "Verify rr_engine_resistance 0 exits post-fix (deadline Sep 18)",
-    "Track stale signal execution % — should decrease if fix works",
-    "Consider execution-time revalidation in signal_compactor.py"
+    "CODE FIX: Align SHORT_RSI_CEILING to use 1m data (signal_compactor.py:2727)",
+    "CODE FIX: Add exit_conditions recording in brain.py close_trade()",
+    "MONITOR: Stale signal execution — 30.7% stale rate, consider execution-time revalidation",
+    "DEVELOP: New signals for NEUTRAL regime (only 2 types pass confluence)",
+    "VERIFY: Would 1m RSI filter have blocked recent winners? Run backtest before deploying"
   ]
 }

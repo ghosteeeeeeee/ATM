@@ -2314,15 +2314,15 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v2-long-5m',  # strong trend momentum LONG 5m — 5m timeframe variant
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
-    'accel-300-v4-short',  # V4 proven momentum SHORT — V2 conditions + FLAT block, works solo
+    # ponytail: accel-300-v4-short removed — killed Sep 11 (5T/20%WR -$0.26)
     'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
     'breakout-long',  # Volume-confirmed breakout LONG — structural breakout signal, works solo
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
-    'ema300-dip-long',  # EMA300 dip buyer — works solo in strong uptrends
-    'ema300-dip-short',  # EMA300 rally seller — works solo in strong downtrends
+    # ponytail: ema300-dip-long removed — dead (2T/7d 0%WR -$0.40)
+    # ponytail: ema300-dip-short removed — killed Sep 8
     'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
     'tl_break_long', 'tl_break_short',

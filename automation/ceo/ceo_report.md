@@ -1,3 +1,19 @@
+## CEO Report — 2026-09-16 ~10:34 UTC
+
+### Diagnosis
+24h flat: 25T, 52%WR, -$0.21 (VERIFIED). 7d positive: 267T, 55.4%WR, +$1.53 (VERIFIED). SHORT dominant: +$3.79. LONG drag: -$2.26 (legacy aging out). 5 open SHORT. Market NEUTRAL.
+
+### Root Cause
+Dead signals accumulated in STANDALONE_BYPASS (accel-300-v4-short, ema300-dip-long, ema300-dip-short). Regime memory stale 5 days. Signal diversity low — only 2 types in NEUTRAL.
+
+### Fix Applied
+1. Removed 3 dead signals from STANDALONE_BYPASS. Pipeline restarted.
+2. Updated signal_regime_memory.json with fresh 7d DB data.
+3. MONITORING: Signal diversity — only pullback-entry- and pump-chain- in NEUTRAL. Delegate new signal development.
+
+### Verification
+Pipeline restarted clean. STANDALONE_BYPASS now excludes dead signals. Regime memory fresh as of Sep 16.
+
 ## CEO Report — 2026-09-16 ~02:15 UTC
 
 ### Diagnosis

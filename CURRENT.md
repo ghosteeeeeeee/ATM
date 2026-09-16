@@ -1,24 +1,24 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-16 ~12:00 UTC (brain_auditor)**
+**Last Updated: 2026-09-16 ~12:15 UTC (brain_auditor)**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 26T, 50% WR, -$0.52. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
+24h: 25T, 64% WR, +$0.05. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
 
-- **24h (rolling):** 27T, 48.1% WR, -$0.52 (DB-verified — FLAT). pullback-entry- dominant.
-- **Today (calendar):** 4T closed, 1W, -$0.66. 5 open: CHIP, ADA, SEI, SYRUP, ETH (all SHORT).
-- **7d:** 275T, 54.9% WR, +$2.66 (DB-verified — POSITIVE). SHORT +$3.72★ | LONG -$1.06 (improving, legacy aging out).
-- **7d REGIME:** EXTREME 102T 57.8%WR +$2.50 ★ | HIGH 114T 54.4%WR +$0.32 | NORMAL 57T 52.6%WR -$0.16.
-- **7d EXIT:** profit-monster-trail 43T 93%WR +$3.39 ★ | atr_sl_hit 161T 54%WR +$2.14 | rr_engine_resistance 0 exits post-fix ★ | cut-loser-CL-T1 7T -$1.19.
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 79T/62%WR +$3.18 ★ | pump-chain- SHORT 55T/60%WR +$0.62 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 7T/85.7%WR +$0.53
-- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 6T/16.7%WR -$0.57 (KILLED) | ema300-dip-long 5T/20%WR -$0.55 (DEAD) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED)
+- **24h (rolling):** 25T, 64% WR, +$0.05 (DB-verified — FLAT). pullback-entry- dominant.
+- **Today (calendar):** 5T closed, 1W, +$0.05. 5 open: CHIP, SEI, SYRUP, ETH, LTC (all SHORT).
+- **7d:** 267T, 55.4% WR, +$1.32 (DB-verified — POSITIVE). SHORT +$3.72★ | LONG -$1.06 (legacy aging out).
+- **7d REGIME:** EXTREME 101T 58.4%WR +$1.16★ | HIGH 109T 55.0%WR +$0.56 | NORMAL 56T 51.8%WR -$0.19.
+- **7d EXIT:** profit-monster-trail carries system | atr_sl_hit 20T/48h -$3.46 (dominant loss).
+- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 81T/60.5%WR +$2.65★ | pump-chain- SHORT 54T/61.1%WR +$0.75 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 8T/87.5%WR +$0.61
+- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 5T/0%WR -$0.61 (KILLED) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED) | breakout-long+ 4T/25%WR -$0.35 (KILLED)
 - **Market:** NEUTRAL (100%).
 - **Open:** 5 trades (5 SHORT: CHIP pullback-entry-, ADA mover-, SEI pullback-entry-, SYRUP pullback-entry-, ETH pullback-entry-).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
-- **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
+- **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
 - **Disk:** ~81% (23G free).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
@@ -53,14 +53,15 @@
 
 ## Today's Changes (Sep 16)
 
-1. **brain_auditor ~09:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52 (FLAT). 7d: 274T 54.7%WR +$0.98 (POSITIVE). **STALE SIGNAL ROOT CAUSE:** 44% of 48h trades have is_stale=true. ETC SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65 because filter runs at detection, not execution. **EXIT_CONDITIONS 99% BLANK** — exit path tracking broken. **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter gap), DOT SHORT RSI=64.22 (borderline), 3x breakout-long+ LONG losses (killed signal). **SUGGESTED:** Execution-time RSI revalidation, STANDALONE_BYPASS cleanup. No config change.
-2. **CEO ~08:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY removed (0.85→1.0). Monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable). Penalty was blocking good entries. Expected +$0.26/7d. **24h:** 27T 48.1%WR -$0.52 (FLAT). **7d:** 275T 54.9%WR +$2.66 (POSITIVE). 5 open SHORT. Market NEUTRAL. Monitoring 5 items.
-2. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 51.9%WR -$0.17 (FLAT). 7d: 275T 54.9%WR +$2.66 (POSITIVE). SHORT +$3.72★. **FEATURE RECORDING UNTESTED** — 2/27 24h trades have features (retroactive only). 0 new trades since fix (02:34 UTC). Monitor next trade. **rr_engine_resistance VERIFIED** — 0 exits 24h+. **LOSING TRADE AUTOPSY:** DOT SHORT RSI 64.22, ETC SHORT RSI 70.14 (above SHORT_RSI_CEILING=65). ETC possible filter gap. **NO CONFIG CHANGE** — monitoring 5 items.
-3. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52. 5 open SHORT. Market NEUTRAL. **Feature recording VERIFIED** — DOT, ETC closed with features_recorded=TRUE. IO gap confirmed (deployment timing). **rr_engine fix CONFIRMED** — 0 exits in 6+ days. **NEW: 54% stale signal execution** (is_stale=true in metadata). **NEW: exit_conditions blank** on all trades. **NO CONFIG CHANGE** — monitoring stale filter need, exit recording, signal diversity.
-4. **brain_auditor ~05:15 UTC — CONFIG CHANGE.** DISABLED trend_ignition (TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False). 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL.
-5. **brain_auditor ~02:45 UTC — NO CONFIG CHANGE.** FEATURE RECORDING VERIFIED: 5 open trades retroactively recorded (rsi=71.61, 85.17, 70.14, 60.47, 64.22). No new trades since fix — verify next 24h. **trend_ignition DEAD:** 0 trades in 3+ days, recommend disable. **ATR SL below-entry 59.4%** (structural, pullback-entry- 71% but profitable). **SIGNAL DIVERSITY:** Only 2 types in NEUTRAL. **NO CONFIG CHANGE** — monitoring.
-6. **auto_1hr ~02:08 UTC — KILLED breakout-long+.** 3T/7d 0%WR -$0.60. Fires LONG in NEUTRAL without BTC regime gate. Removed from active signals.
-7. **CEO ~02:15 UTC — NO CONFIG CHANGE.** DB: 24h 29T 51.7%WR -$0.10 (FLAT). 7d: 278T 55.8%WR +$3.08 (POSITIVE, improved from +$1.83). Market NEUTRAL. **NEW FINDING: cut-loser-CL-T1 bleed** 7 exits -$1.19. **Signal diversity issue:** Only 2 signal types in NEUTRAL. 5 items in monitoring.
+1. **CEO ~10:34 UTC — CONFIG CHANGE.** DB-verified: 24h 25T 52%WR -$0.21 (FLAT). 7d: 267T 55.4%WR +$1.53 (POSITIVE). SHORT +$3.79★. **STANDALONE_BYPASS CLEANUP:** Removed dead signals: accel-300-v4-short (killed Sep 11), ema300-dip-long (dead 2T/0%WR), ema300-dip-short (killed Sep 8). Pipeline restarted. **UPDATED signal_regime_memory.json** — was 5 days stale (Sep 11). All active signals winning in NEUTRAL. **SIGNAL DIVERSITY:** Only 2 types in NEUTRAL — delegate new signal development.
+2. **brain_auditor ~09:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52 (FLAT). 7d: 274T 54.7%WR +$0.98 (POSITIVE). **STALE SIGNAL ROOT CAUSE:** 44% of 48h trades have is_stale=true. ETC SHORT entered RSI=70.14 > SHORT_RSI_CEILING=65 because filter runs at detection, not execution. **EXIT_CONDITIONS 99% BLANK** — exit path tracking broken. **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter gap), DOT SHORT RSI=64.22 (borderline), 3x breakout-long+ LONG losses (killed signal). **SUGGESTED:** Execution-time RSI revalidation, STANDALONE_BYPASS cleanup. No config change.
+3. **CEO ~08:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY removed (0.85→1.0). Monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable). Penalty was blocking good entries. Expected +$0.26/7d. **24h:** 27T 48.1%WR -$0.52 (FLAT). **7d:** 275T 54.9%WR +$2.66 (POSITIVE). 5 open SHORT. Market NEUTRAL. Monitoring 5 items.
+4. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 51.9%WR -$0.17 (FLAT). 7d: 275T 54.9%WR +$2.66 (POSITIVE). SHORT +$3.72★. **FEATURE RECORDING UNTESTED** — 2/27 24h trades have features (retroactive only). 0 new trades since fix (02:34 UTC). Monitor next trade. **rr_engine_resistance VERIFIED** — 0 exits 24h+. **LOSING TRADE AUTOPSY:** DOT SHORT RSI 64.22, ETC SHORT RSI 70.14 (above SHORT_RSI_CEILING=65). ETC possible filter gap. **NO CONFIG CHANGE** — monitoring 5 items.
+5. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 27T 48.1%WR -$0.52. 5 open SHORT. Market NEUTRAL. **Feature recording VERIFIED** — DOT, ETC closed with features_recorded=TRUE. IO gap confirmed (deployment timing). **rr_engine fix CONFIRMED** — 0 exits in 6+ days. **NEW: 54% stale signal execution** (is_stale=true in metadata). **NEW: exit_conditions blank** on all trades. **NO CONFIG CHANGE** — monitoring stale filter need, exit recording, signal diversity.
+6. **brain_auditor ~05:15 UTC — CONFIG CHANGE.** DISABLED trend_ignition (TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False). 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL.
+7. **brain_auditor ~02:45 UTC — NO CONFIG CHANGE.** FEATURE RECORDING VERIFIED: 5 open trades retroactively recorded (rsi=71.61, 85.17, 70.14, 60.47, 64.22). No new trades since fix — verify next 24h. **trend_ignition DEAD:** 0 trades in 3+ days, recommend disable. **ATR SL below-entry 59.4%** (structural, pullback-entry- 71% but profitable). **SIGNAL DIVERSITY:** Only 2 types in NEUTRAL. **NO CONFIG CHANGE** — monitoring.
+8. **auto_1hr ~02:08 UTC — KILLED breakout-long+.** 3T/7d 0%WR -$0.60. Fires LONG in NEUTRAL without BTC regime gate. Removed from active signals.
+9. **CEO ~02:15 UTC — NO CONFIG CHANGE.** DB: 24h 29T 51.7%WR -$0.10 (FLAT). 7d: 278T 55.8%WR +$3.08 (POSITIVE, improved from +$1.83). Market NEUTRAL. **NEW FINDING: cut-loser-CL-T1 bleed** 7 exits -$1.19. **Signal diversity issue:** Only 2 signal types in NEUTRAL. 5 items in monitoring.
 
 ## Today's Changes (Sep 15)
 
