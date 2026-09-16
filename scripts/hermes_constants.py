@@ -2408,6 +2408,10 @@ SPIKE_EXHAUSTION_VEL_5M_THRESHOLD = 0.5  # block if abs(5m velocity) > 0.5% (spi
 SIGNAL_STALENESS_PRICE_PCT = 0.25  # block if price moved >0.25% since signal (bb_bounce-specific)
 SIGNAL_STALENESS_MAX_AGE_MIN = 5   # V2 2026-08-29 — increased from 3. Code Architect: 3 min too tight for pipeline timing.
 
+# pump-chain+ stale block — 0% WR when stale (5 trades 7d -$0.73). Fresh is 50% WR +$0.45.
+# Block pump-chain+ signals older than this threshold.
+PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stale trades, 0 wins
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period

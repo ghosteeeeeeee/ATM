@@ -3845,7 +3845,32 @@ def run(dry_run=False):
                     continue
             except Exception as _e:
                 log(f'  WARN: staleness check failed for {token}: {_e}')
-        
+
+        # ── pump-chain+ stale block (brain_auditor 2026-09-16) ─────────
+        # pump-chain+ STALE: 0% WR, 5 trades, -$0.73/7d. Fresh: 50% WR +$0.45.
+        # Block pump-chain+ signals older than PUMP_CHAIN_STALE_BLOCK_AGE_MIN.
+        try:
+            if sig_id and source and 'pump-chain+' in source:
+                from hermes_constants import PUMP_CHAIN_STALE_BLOCK_AGE_MIN
+                _conn_pcb = sqlite3.connect(RUNTIME_DB, timeout=5)
+                _cur_pcb = _conn_pcb.cursor()
+                _cur_pcb.execute('SELECT created_at FROM signals WHERE id=?', (sig_id,))
+                _pcb_row = _cur_pcb.fetchone()
+                _conn_pcb.close()
+                if _pcb_row and _pcb_row[0]:
+                    try:
+                        _pcb_ts = time.mktime(time.strptime(_pcb_row[0], '%Y-%m-%d %H:%M:%S'))
+                        _pcb_age_min = (time.time() - _pcb_ts) / 60
+                        if _pcb_age_min > PUMP_CHAIN_STALE_BLOCK_AGE_MIN:
+                            log(f'  🚫 [PUMP-CHAIN-STALE] {token} {direction}: signal {sig_id} is {_pcb_age_min:.0f}min old (> {PUMP_CHAIN_STALE_BLOCK_AGE_MIN}min) — 0% WR when stale, blocking')
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                            skipped += 1
+                            continue
+                    except Exception:
+                        pass
+        except Exception as _e:
+            log(f'  WARN: pump-chain+ stale check failed for {token}: {_e}')
+
         # ── Trade pending checkpoint ───────────────────────────────────
         try:
             checkpoint_write('trade_pending', {'token': token, 'direction': direction, 'original_direction': flipped_direction})

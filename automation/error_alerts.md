@@ -696,3 +696,13 @@
 ## Error Alerts — 2026-09-16 15:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-16 18:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — User or TOK Wallet TOK does not exist.`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(ME): HL TOK failed — User or TOK Wallet TOK does not exist.`
+
+## Error Alerts — 2026-09-16 19:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`

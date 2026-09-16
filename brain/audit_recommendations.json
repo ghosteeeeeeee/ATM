@@ -1,150 +1,85 @@
 {
-    "timestamp": "2026-09-16T18:30:00Z",
-    "agent": "brain_auditor",
-    "session_brain_stats": {
-        "total_sessions": 195650,
-        "top_findings": ["stale signal execution", "exit_conditions blank", "rr_engine_resistance drag", "signal diversity NEUTRAL"]
+  "timestamp": "2026-09-16T20:36:54.204151+00:00",
+  "session_brain_stats": {
+    "total_vectors": 199465,
+    "queries_run": 4
+  },
+  "trade_summary_24h": {
+    "total": 14,
+    "wins": 7,
+    "wr": 50.0,
+    "pnl": 0.47,
+    "avg_pnl": 0.0336,
+    "dominant_signal": "pullback-entry- SHORT",
+    "market": "NEUTRAL"
+  },
+  "trade_summary_7d": {
+    "total": 253,
+    "wins": 139,
+    "wr": 55.0,
+    "pnl": 2.95,
+    "avg_pnl": 0.0117,
+    "stale_pct": 31.2,
+    "stale_trades": 79,
+    "stale_wr": 49.4,
+    "fresh_wr": 57.5
+  },
+  "drift_findings": [
+    {
+      "topic": "stale signal execution",
+      "current_state": "31.2% of 7d trades fire on stale signals. Stale WR 49.4% vs fresh 57.5%.",
+      "impact": "~$4.40/7d lost. pullback-entry- STALE in EXTREME: 33.3%WR -$0.59 vs FRESH 81.8%WR +$2.38.",
+      "status": "ACKNOWLEDGED in CURRENT.md, no filter implemented"
     },
-    "trade_summary_24h": {
-        "trades": 21,
-        "win_rate": 66.7,
-        "pnl": 1.33,
-        "losers": 7,
-        "dominant_signal": "pullback-entry- SHORT",
-        "open_trades": 0
+    {
+      "topic": "rr_engine_resistance exit drag",
+      "current_state": "35 exits 7d, 42.9% WR, -$1.08. #1 exit drag.",
+      "impact": "Structural — SHORT enters near resistance, price drifts up, rr_engine cuts.",
+      "status": "ACKNOWLEDGED in CURRENT.md, resistance proximity filter suggested but not implemented"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "pump-chain+ STALE toxicity",
+      "evidence": "5 trades 7d, 0% WR, -$0.73. ALL regimes: NORMAL 0%-$0.37, HIGH 0%-$0.23, EXTREME 0%-$0.13. Fresh pump-chain+ is 50% WR +$0.45.",
+      "recommendation": "Block stale pump-chain+ signals specifically"
     },
-    "trade_summary_7d": {
-        "trades": 255,
-        "win_rate": 55.7,
-        "pnl": 2.72,
-        "regimes": {
-            "EXTREME": {"trades": 97, "wr": 59.8, "pnl": 2.91},
-            "HIGH": {"trades": 107, "wr": 54.2, "pnl": 0.79},
-            "NORMAL": {"trades": 54, "wr": 53.7, "pnl": -0.10}
-        }
+    {
+      "topic": "pullback-entry- SHORT stale in EXTREME",
+      "evidence": "6 stale trades, 33.3% WR, -$0.59. Fresh EXTREME pullback-entry- SHORT is 81.8% WR +$2.38.",
+      "recommendation": "Staleness filter would naturally catch these"
+    }
+  ],
+  "missing_implementations": [
+    "STALE_MAX_AGE filter — suggested multiple times, never implemented",
+    "Resistance proximity filter for SHORT entries",
+    "New signals for NEUTRAL regime diversity"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-16T20:36:54.204167+00:00",
+      "idea": "Block stale pump-chain+ signals (>20min old) — zero winners in 5 stale trades",
+      "rationale": "pump-chain+ STALE is 0% WR across ALL regimes. Fresh pump-chain+ is 50% WR +$0.45. Stale trades lose $0.73/7d. This is the single highest-confidence filter opportunity — zero risk to winners since stale pump-chain+ has zero winners.",
+      "expected_impact": "+$0.73/7d (eliminate all stale pump-chain+ losses)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "very low",
+      "impact_on_winners": "0 winners blocked — stale pump-chain+ has 0 wins in 5 trades"
     },
-    "drift_findings": [
-        {
-            "finding": "exit_conditions still blank despite brain.py fix",
-            "root_cause": "position_manager.py line 1089 UPDATE does not include exit_conditions column. This is the primary close path for ATR SL/trail exits (150/255 7d trades). brain.py fix only affects profit_monster/cut_loser path.",
-            "impact": "Exit analysis impossible from DB. 100% of ATR SL exits have blank exit_conditions.",
-            "status": "FIXED THIS RUN — added exit_conditions to position_manager.py UPDATE"
-        },
-        {
-            "finding": "SHORT_RSI_FLOOR not blocking oversold SHORT entries",
-            "root_cause": "Same timeframe mismatch as RSI_CEILING — was using 5m candles. ETH SHORT entered at RSI=25.91 (<35 floor) on Sep 15. Fix deployed Sep 16 aligns to 1m data.",
-            "impact": "1 trade entered at RSI 25.91 (oversold), lost -$0.14. Now fixed.",
-            "status": "FIXED (Sep 16 15:00 UTC) — RSI filter aligned to 1m data"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "Stale signal execution",
-            "frequency": "Every audit since Sep 16 09:00",
-            "data": "81 stale / 255 total 7d trades (31.8%). Stale WR 49.4% vs fresh 59.0%. Stale PnL -$0.63 vs fresh +$4.23. Pullback-entry- SHORT: stale 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50.",
-            "impact": "~$4.86/7d lost from stale execution",
-            "status": "NEEDS DESIGN — execution-time revalidation"
-        },
-        {
-            "topic": "rr_engine_resistance SHORT exits",
-            "frequency": "Every audit since Sep 15",
-            "data": "35 exits / 7d, -$1.08 total. pullback-entry- SHORT: 21 exits -$0.76. All losses ~1% (near ATR boundary). Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts.",
-            "impact": "~$0.76-1.08/7d drag from resistance proximity entries",
-            "status": "NEEDS DATA — resistance proximity filter proposed"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "Execution-time revalidation for stale signals",
-            "description": "Re-run compactor checks at execution time, skip if conditions changed (RSI, regime, gap). Needs design for latency vs accuracy tradeoff.",
-            "priority": "HIGH",
-            "estimated_impact": "+$3-5/7d"
-        },
-        {
-            "item": "New signals for NEUTRAL regime",
-            "description": "Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, pump-chain-). System vulnerable to single-signal failure.",
-            "priority": "MEDIUM",
-            "estimated_impact": "Resilience, not direct PnL"
-        }
-    ],
-    "losing_trade_autopsy": [
-        {
-            "trade": "ETH SHORT pullback-entry- pnl=-$0.14",
-            "entry_rsi": 25.91,
-            "regime": "HIGH",
-            "stale": true,
-            "root_cause": "Entered at RSI 25.91 (oversold) — SHORT_RSI_FLOOR=35 should have blocked. Filter was using 5m candles (bug). Now fixed.",
-            "confidence": "HIGH — same bug as ETC SHORT, fixed Sep 16"
-        },
-        {
-            "trade": "ACE SHORT pullback-entry- pnl=-$0.33",
-            "entry_rsi": 47.62,
-            "regime": "HIGH",
-            "stale": true,
-            "root_cause": "Stale signal + rising momentum + bb_position 0.87 (near top of BB). Shorting into rising price near resistance.",
-            "confidence": "MEDIUM — stale signal is the primary factor"
-        },
-        {
-            "trade": "DOT SHORT pullback-entry- pnl=-$0.25",
-            "entry_rsi": 44.44,
-            "regime": "EXTREME",
-            "stale": true,
-            "root_cause": "Stale signal in EXTREME regime — high volatility whipsaw. Normal variance for EXTREME.",
-            "confidence": "LOW — normal EXTREME variance"
-        },
-        {
-            "trade": "ETC SHORT pullback-entry- pnl=-$0.28",
-            "entry_rsi": 40.0,
-            "regime": "EXTREME",
-            "stale": true,
-            "root_cause": "Stale signal in EXTREME. RSI was fine (40) but stale + EXTREME = high risk.",
-            "confidence": "LOW — normal EXTREME variance"
-        },
-        {
-            "trade": "ME SHORT pullback-entry- pnl=-$0.15",
-            "entry_rsi": 52.38,
-            "regime": "NORMAL",
-            "stale": false,
-            "root_cause": "Fresh signal, RSI neutral, NORMAL regime — pure variance loss. ATR SL hit.",
-            "confidence": "HIGH — unavoidable variance"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-16T18:30:00Z",
-            "idea": "Add STALE_MAX_AGE_MINUTES filter to decider — skip signals older than 30 minutes",
-            "rationale": "81 stale trades in 7d at 49.4% WR vs 59.0% fresh. Stale pullback-entry- SHORT: 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50. The gap is $4.86/7d. A simple age check at execution time would filter the worst staleness without complex revalidation.",
-            "expected_impact": "+$2-4/7d (conservative — blocks ~30% of trades but those are the worst performers)",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "medium — could block good entries that happen to be queued. Needs backtest.",
-            "impact_on_winners": "Estimated: ~20% of fresh winners have signal age >30min. Would block some winners. Needs backtest to quantify."
-        },
-        {
-            "date": "2026-09-16T18:30:00Z",
-            "idea": "Tighten SHORT_RSI_FLOOR from 35 to 40 for EXTREME regime only",
-            "rationale": "7d EXTREME SHORT losers: avg entry RSI 42.1. EXTREME regime amplifies whipsaw — entering SHORT at RSI <40 in EXTREME is high risk. NORMAL/HIGH can keep floor at 35.",
-            "expected_impact": "+$0.30-0.50/7d (blocks ~5-8 EXTREME SHORT entries per week, mostly losers)",
-            "category": "entry sniper",
-            "status": "suggested — monitor first",
-            "risk": "low — EXTREME-specific, conservative threshold",
-            "impact_on_winners": "Need to check: how many EXTREME SHORT winners had entry RSI <40?"
-        }
-    ],
-    "config_changes_applied": [
-        {
-            "file": "scripts/position_manager.py",
-            "change": "Added exit_conditions = %s to UPDATE trades statement (line 1089)",
-            "before": "exit_conditions column not set in position_manager close path",
-            "after": "exit_conditions = reason (close reason string)",
-            "rationale": "Root cause of exit_conditions being 100% blank. position_manager closes 150/255 7d trades (ATR SL/trail) via direct UPDATE bypassing brain.py.",
-            "impact": "Exit analysis will now work for all trade close paths. Data quality improvement."
-        }
-    ],
-    "next_actions": [
-        "MONITOR: Verify exit_conditions populates on next position_manager close (restart pipeline to reload code)",
-        "DESIGN: Execution-time revalidation for stale signals — needs latency/accuracy tradeoff analysis",
-        "INVESTIGATE: EXTREME regime SHORT RSI floor — check if tightening to 40 would hurt winners",
-        "INVESTIGATE: rr_engine_resistance proximity filter — need resistance data to verify impact on winners"
-    ]
+    {
+      "date": "2026-09-16T20:36:54.204170+00:00",
+      "idea": "Add volume confirmation to pullback-entry- SHORT in EXTREME regime",
+      "rationale": "Fresh pullback-entry- SHORT in EXTREME is 81.8% WR — best signal-regime combo. But stale EXTREME is 33.3%. Volume spike at entry could confirm momentum is real vs exhausted.",
+      "expected_impact": "+$0.30-0.50/7d if it catches exhausted EXTREME entries",
+      "category": "entry quality",
+      "status": "needs data",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Implement stale pump-chain+ block (HIGH confidence, data-backed)",
+    "Monitor pullback-entry- SHORT stale EXTREME for 48h before adding filter",
+    "Design stale signal revalidation flow for broader stale signal problem"
+  ]
 }

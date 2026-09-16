@@ -10,6 +10,12 @@
 - **Architecture detail:** `/root/.hermes/ATM/ATM-Architecture.md`
 - **SOPs:** `brain/SOPs.md` — standard operating procedures (plans, commits, signals, debugging, memory)
 
+## ⏰ Reminders
+
+| Date | Action | Details |
+|------|--------|---------|
+| **2027-03-12** | 🔴 **HL API KEY EXPIRES IN 3 DAYS** | New wallet: `0xc3e4CC06E086Bf73c38FaCdbbb1FD8E979e5415B`. Set 2026-09-16, valid 180 days. Renew in `.secrets.local` — update `SIGNING_KEY` and `SIGNING_WALLET_ADDRESS`. |
+
 ## Two Data Directories
 
 | Directory | Purpose | Gitignored? |

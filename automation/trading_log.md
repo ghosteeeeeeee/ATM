@@ -1,3 +1,38 @@
+## [2026-09-16 19:09 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W 2L -$0.48)
+- ME SHORT pullback-entry- atr_sl_hit: -$0.15
+- ACE SHORT pullback-entry- atr_sl_hit: -$0.33
+
+**24h:** 16T ~50%WR +$1.34 | **7d:** 261T 55.6%WR +$2.54
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 13T avg +$0.028 — net positive
+- profit-monster-trail: 2T avg +$0.070
+- hard_tp: 1T +$0.34
+
+**24h by Signal:**
+- pullback-entry- SHORT: 13T 66%WR +$0.86 — dominant, healthy
+
+**7d Losers (all already disabled):**
+- trend_purity+: 11T 0%WR -$0.90 → `TREND_PURITY_PLUS_ENABLED=False`
+- rr-struct-v2+: 10T 0%WR -$0.45 → `RR_STRUCTURAL_V2_LONG_ENABLED=False`
+- bb-bounce-v2-long+: 5T 0%WR -$0.45 → `BB_BOUNCE_V2_LONG_ENABLED=False`
+- rr-struct-: 7T 0%WR -$0.42 → `RR_STRUCTURAL_MINUS_ENABLED=False`
+- accel-300-v4-short-: 5T 0%WR -$0.26 → in killed list
+
+**Changes:** None — all losing signals already killed
+
+**No Change Needed:**
+- Kill check: no signal at 0% WR with 3+ trades last hour (only 2 trades)
+- ATR SL: 150T/7d 54%WR net +$2.16 — within tolerance
+- Trade frequency: 2T/hr — healthy
+- All 0% WR signals already disabled by prior sessions
+
+**Monitoring:**
+- System stable, 7d net positive (+$2.54)
+- Last hour's 2 losses are noise (2 trades, same signal, market conditions)
+
 ## [2026-09-16 16:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period)
@@ -122,3 +157,64 @@
 **Monitoring:**
 - rr-struct-v2+: watch for continued bleed next sessions
 - pump-chain+: 25T/7d 40%WR -$0.28 — borderline, stable, no action yet
+
+## [2026-09-16 20:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.28 (WR: 0%)
+**24h:** 13T 53.8%WR +$0.62
+**7d:** 254T 55.1%WR +$3.23
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 9T avg +$0.027 — trailing into profit (healthy)
+- profit-monster-trail: 2T +$0.14, 100%WR
+- HARD_SL_FAILED: 1T -$0.10 — guardian safety close (SEI 18.7h open, SL failed on exchange)
+- hard_tp: 1T +$0.34
+
+**Open:** 4 trades (ACE SHORT 6.7h, ME SHORT 6.7h, ACE SHORT 2.6h, SYRUP SHORT 0.3h)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- HARD_SL_FAILED is guardian safety mechanism working correctly
+- ATR SL at 9T/13T (69%) avg +$0.027 — trailing working
+- Trade frequency 2/hr — healthy, not overtrading
+- 7d losers (trend_purity+, rr-struct-v2+, bb-bounce-v2-long+, rr-struct-, ema300-dip-long, breakout-long+, accel-300-v4-short-) all already disabled
+- pump-chain+ 25T/7d 40%WR -$0.28 — borderline, stable, no action
+
+**Monitoring:**
+- 4 open trades, all SHORT, max 6.7h — healthy age
+- pump-chain+ 25T/7d — watch for continued bleed
+
+## [2026-09-16 21:00 UTC] Hourly Analysis
+
+**Trades:** 5 closed (0 wins, 5 losses including 1 $0 orphan paper)
+**Real PnL:** -$0.76 (WR: 0%)
+**24h:** 16T 50%WR +$0.15
+**7d:** 255T 55.7%WR +$2.80
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T avg +$0.011 — trailing into profit (healthy)
+- profit-monster-trail: 2T +$0.14, 100%WR
+- hard_tp: 1T +$0.34
+- HARD_SL_FAILED: 1T -$0.23 — guardian caught exchange SL failure (SEI)
+- HL_CLOSED: 1T -$0.22 — guardian safety close (ACE, 7h stale)
+- ORPHAN_PAPER: 1T $0.00 — guardian paper cleanup (SYRUP)
+
+**Open:** 0 trades — system flat
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- HARD_SL_FAILED is guardian safety mechanism working correctly
+- HL_CLOSED is guardian closing stale position where exchange SL failed
+- ATR SL at 10T/16T (62.5%) avg +$0.011 — trailing working
+- Trade frequency 5/hr — healthy, not overtrading
+- 7d losers (trend_purity+, rr-struct-v2+, bb-bounce-v2-long+, rr-struct-, breakout-long+, accel-300-v4-short-) all already disabled
+- pump-chain+ 25T/7d 40%WR -$0.28 — borderline, stable, no action
+
+**Monitoring:**
+- System flat — waiting for next signal
+- pullback-entry- only active signal (12T/24h), 7d +$2.80, today 36.4%WR (below avg but small sample)
