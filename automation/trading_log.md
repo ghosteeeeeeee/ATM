@@ -5309,3 +5309,158 @@ BY: auto_1hr
 - System quiet — 1 trade in last 2h
 
 BY: auto_1hr
+
+## [2026-09-16 03:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed (IO SHORT pullback-entry- +$0.02 atr_sl_hit)
+**24h:** 28T 50%WR -$0.12 | 82% atr_sl_hit (structural)
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 20T 65%WR +$0.79 (backbone)
+- pump-chain- SHORT: 1T 100%WR +$0.22
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- breakout-long+ LONG: 3T 0%WR -$0.60 (killed 02:08)
+- rr-struct-v2+ LONG: 3T 0%WR -$0.29 (killed 09-15)
+
+**Open positions (5):** ETH, SEI, ETC, SYRUP, DOT — all pullback-entry- SHORT
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour
+- pullback-entry- healthy at 65%WR
+- Trade frequency: 1/hr — well-filtered
+- ATR SL 82% — structural, expected
+- Previously killed signals (breakout-long+, rr-struct-v2+) not firing
+
+BY: auto_1hr
+
+## [2026-09-16 04:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system quiet)
+**Open positions:** 5 (all pullback-entry- SHORT)
+**24h:** 28T 50%WR -$0.12
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 19T 68.4%WR +$0.97 (backbone)
+- pump-chain- SHORT: 1T 100%WR +$0.22
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- breakout-long+ LONG: 3T 0%WR -$0.60 (killed 02:08)
+- rr-struct-v2+ LONG: 3T 0%WR -$0.29 (killed 09-15)
+
+**Open positions (5):** ETH 6.3h, SYRUP 5.5h, DOT 3.9h, SEI 2.6h, ETC 2.6h — all pullback-entry- SHORT
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour
+- pullback-entry- healthy at 68.4% WR
+- Trade frequency: 0/hr — quiet market
+- ATR SL 81.5% — structural, expected
+- Previously killed signals not firing
+
+**Monitoring:**
+- ETH and SYRUP positions 6+ hours old
+- All positions SHORT — correlation risk if market reverses
+- pullback-entry- still backbone — watch for degradation
+
+BY: auto_1hr
+
+## [2026-09-16 05:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (DOT SHORT -$0.25, ETC SHORT -$0.28)
+**PnL:** -$0.53 (0% WR) — both ATR SL hits
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 21T 61.9%WR +$0.44 (backbone)
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- breakout-long+ LONG: 3T 0%WR -$0.60 (killed 02:08)
+- rr-struct-v2+ LONG: 3T 0%WR -$0.29 (killed 09-15)
+
+**Open positions (4):** SEI 3.8h, SYRUP 6.6h, ETH 7.3h, ADA 0.1h — 3 pullback-entry- SHORT, 1 mover- SHORT
+
+**ATR SL analysis (24h):**
+- 23/28 exits = 82% ATR SL (structural for 1.3-1.5% scalping)
+- 4/23 hit 1.3% floor exactly — SL minimum, no room to breathe
+- k tier: low vol (0.8), normal (1.0), high (1.5) — all clamped to 1.3-1.5%
+- Phase scaling disabled (was compressing SL too aggressively)
+
+**6h vs 24h trend:**
+- pullback-entry-: 6h 50%WR -$0.35 vs 24h 61.9%WR +$0.44 — slight dip, normal variance at4T
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour with 0% WR
+- pullback-entry- healthy at 61.9% WR — 6h dip is variance
+- Trade frequency: 2/hr — well-filtered
+- ATR SL 82% — structural, expected for scalping system
+- Previously killed signals (breakout-long+, rr-struct-v2+) not firing
+- pnl_pct column shows incorrect values (e.g. -694% for1.39% move) — display bug, pnl_usdt correct
+
+**Monitoring:**
+- SYRUP and ETH positions 6+ hours old
+- All positions SHORT — correlation risk if market reverses
+- pullback-entry- slight 6h degradation — watch next hour
+
+BY: auto_1hr
+
+## FAVORITES Update — 2026-09-16 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE DOT (WR=50.0%, PnL=$-0.12, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE BIGTIME (WR=62.5%, AvgPnL=1.78%, Trades=8)
+- PROMOTE APT (WR=66.7%, AvgPnL=0.30%, Trades=9)
+- PROMOTE LTC (WR=80.0%, AvgPnL=0.61%, Trades=5)
+
+Final set: ['ACE', 'APT', 'BABY', 'BANANA', 'BIGTIME', 'CC', 'CFX', 'CHIP', 'ETC', 'IMX', 'LTC', 'POL', 'PONS', 'TURBO']
+
+## LOSERS Update — 2026-09-16 06:05 UTC
+- REMOVE NEO (insufficient data)
+- REMOVE AIXBT (WR=50.0%, PnL=$-0.08, recovered)
+- REMOVE GRASS (insufficient data)
+- REMOVE ZRO (insufficient data)
+- ADD BLUR (WR=42.9%, PnL=$-0.36, low_wr (42.9%))
+- ADD MET (WR=40.0%, PnL=$-0.26, low_wr (40.0%))
+- ADD ETH (WR=40.0%, PnL=$0.01, low_wr (40.0%))
+
+Final set: ['BLUR', 'ENA', 'ETH', 'KAS', 'MET']
+
+## [2026-09-16 07:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet market)
+**PnL:** $0.00
+
+**24h:** 27T 48.1%WR -$0.52 | ATR SL 81.5% | pullback-entry- 20T 60%WR +$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered
+- ATR SL 81.5% structural — expected for 1.3-1.5% scalping system
+- Trade frequency normal (4 in 6h)
+- Previously killed signals (breakout-long+, rr-struct-v2+) not firing
+- All 5 open positions SHORT — correlation risk noted but market trending down
+
+**Monitoring:**
+- ETH (8.3h) and SYRUP (7.5h) positions aging — watch for SL hits
+- CHIP position has tight 0.16% SL — vulnerable to noise
+- ADA position has inverted R:R (SL 1.3% vs TP 0.8%) — structural from entry conditions
+
+BY: auto_1hr
+
+## [2026-09-16 06:35 UTC] Daily Orchestrator
+
+**Trades:** 5 open (CHIP, ADA, SEI, SYRUP, ETH — all SHORT). 4 closed today (1W, -$0.66).
+**24h:** 27T 48.1%WR -$0.52 | **7d:** 275T 54.9%WR +$2.66
+
+**Findings:**
+- Feature recording VERIFIED: DOT, ETC closed with features_recorded=TRUE
+- IO gap confirmed: has _signal_metadata but features_recorded=FALSE (deployment timing)
+- rr_engine fix CONFIRMED: 0 exits in 6+ days (since Sep 10)
+- NEW: 54% of recent trades fired on is_stale=true tokens (speed data flat)
+- NEW: exit_conditions field blank on all closed trades (data quality)
+
+**Changes:** None — no config change needed.
+**Monitoring:** Stale signal filter need, exit recording gap, signal diversity for NEUTRAL.
+
+BY: daily_orchestrator

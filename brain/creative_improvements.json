@@ -747,5 +747,23 @@
     "category": "entry sniper",
     "status": "confirmed",
     "risk": "NONE"
+  },
+  {
+    "date": "2026-09-16T02:30:00Z",
+    "idea": "Feature recording enables data-driven entry optimization",
+    "rationale": "With entry_rsi_14 and entry_bb_position now recorded for every trade, we can analyze: (1) optimal RSI range for SHORT entries, (2) BB position correlation with winrate, (3) which entry conditions predict losses. First analysis possible after 48h of recorded trades.",
+    "expected_impact": "Enables entry-condition winrate analysis. Could identify +5-10% WR improvement by filtering bad entry conditions.",
+    "category": "data infrastructure",
+    "status": "implemented",
+    "risk": "none"
+  },
+  {
+    "date": "2026-09-16T02:30:00Z",
+    "idea": "Evaluate SHORT_NORMAL_PENALTY removal",
+    "rationale": "SHORT NORMAL 7d: 35T 62.9%WR +/usr/bin/bash.62. Penalty=0.85 is working (profitable). Monitor window expires Sep 16 ~05:30. If still profitable, removing penalty could allow more SHORT NORMAL entries for +/usr/bin/bash.20-0.50/7d.",
+    "expected_impact": "+/usr/bin/bash.20-0.50/7d if penalty removed and performance holds",
+    "category": "regime optimization",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]

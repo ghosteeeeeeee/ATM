@@ -251,14 +251,16 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'ACE',
+    'APT',
     'BABY',
     'BANANA',
+    'BIGTIME',
     'CC',
     'CFX',
     'CHIP',
-    'DOT',
     'ETC',
     'IMX',
+    'LTC',
     'POL',
     'PONS',
     'TURBO'
@@ -278,13 +280,13 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'AIXBT',
+    'BLUR',
     'ENA',
-    'GRASS',
+    'ETH',
     'KAS',
-    'NEO',
-    'ZRO'
+    'MET'
 }
+
 
 
 
@@ -919,7 +921,7 @@ CHOP_GATE_LOG_ONLY = True                 # True = log only, don't block. Set Fa
 # Blocks signals when BTC has already moved significantly in the trade direction.
 # Prevents chasing: pump-chain+ loses 70% when BTC > +0.3%, pump-chain- loses 60% when BTC < -0.3%.
 BTC_TIMING_GUARD_ENABLED = True
-BTC_TIMING_GUARD_LOG_ONLY = True          # True = log only, don't block. Set False after 48h clean logs.
+BTC_TIMING_GUARD_LOG_ONLY = False         # Enabled 2026-09-16 — blocks signals when BTC already moved (chase prevention)
 # Per-signal-type BTC 30m momentum thresholds (%)
 BTC_TIMING_GUARD_PUMP_CHAIN_LONG = 0.30   # block pump-chain+ if BTC > this
 BTC_TIMING_GUARD_PUMP_CHAIN_SHORT = -0.30 # block pump-chain- if BTC < this
@@ -3394,8 +3396,8 @@ OPEN_SKIES_SMA50_MODERATE       = 1.5     # % — distance from SMA50 for modera
 # trend_ignition.py — volume spike + compression breakout + trend alignment
 # Backtested: 100% WR (9 signals, 7-day), avg +1.92% return
 # Classification: Trend-following (LONG only — catches start of move)
-TREND_IGNITION_ENABLED          = True    # master kill-switch
-TREND_IGNITION_PLUS_ENABLED     = True    # LONG direction
+TREND_IGNITION_ENABLED          = False   # DISABLED 2026-09-16 brain_auditor — 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL
+TREND_IGNITION_PLUS_ENABLED     = False   # DISABLED 2026-09-16 brain_auditor — 0 trades in 3+ days
 TREND_IGNITION_MINUS_ENABLED    = False   # SHORT not applicable
 
 # Volume

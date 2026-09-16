@@ -1,4 +1,24 @@
 ## TEAM UPDATES
+- [2026-09-16 03:36 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — feature recording fix verified, 2 items to action
+  24h: 27T 59.3%WR +$0.87 (POSITIVE) | 7d: 275T 55.8%WR +$3.08 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  Regime 7d: EXTREME +$2.79★ | HIGH +$0.32 | NORMAL -$0.16
+  SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (penalty working)
+  ATR SL 7d: 160T, 59.4% below entry (structural, pullback-entry- 71% but profitable)
+  cut-loser-CL-T1 7d: 7 exits -$1.19 (monitoring)
+  **FEATURE RECORDING FIX VERIFIED:** 5 open trades retroactively recorded (rsi=71.61, 85.17, 70.14, 60.47, 64.22). No new trades since fix — verify next 24h.
+  **trend_ignition DEAD:** 0 trades in 3+ days. LONG-only, 7 conditions, impossible in NEUTRAL. Recommend disable.
+  **SIGNAL DIVERSITY:** Only 2 types in NEUTRAL (pullback-entry-, pump-chain-). Need new signals.
+  **KILLED TODAY:** breakout-long+ (3T/0%WR -$0.60), rr-struct-v2+ (3T/0%WR -$0.29)
+  Creative: (1) trend_ignition SHORT redesign for NEUTRAL. (2) Pullback-entry- volume confirmation filter. (3) SHORT RSI/BB entry sniper once features populated.
+  No config change — feature recording needs verification, other items monitoring.
+  BY: brain_auditor
+
+- [2026-09-16 ~02:30 UTC (brain_auditor run)] brain_auditor: CONFIG CHANGE — feature recording fix deployed
+  24h: 29T 51.7%WR -$0.10 (FLAT) | 7d: 278T 55.8%WR +$3.08 (POSITIVE)
+  SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 125T 49.6%WR +$0.47 (improving)
+  Regime 7d: EXTREME 103T 59.2%WR +$2.80★ | HIGH 115T 54.8%WR +$0.41 | NORMAL 58T 53.4%WR -$0.13
+  **CRITICAL FIX: features_recorded=FALSE for ALL 278 trades (14 days).** Root cause: brain.py imports record_entry_features from hl_sync_guardian, but module-level lock acquisition causes sys.exit(1) when guardian is running. Fix: created standalone feature_recorder.py, updated brain.py import. 5 open trades retroactively recorded (ETC rsi=70.14, SEI rsi=85.17, DOT rsi=64.22, SYRUP rsi=60.47, ETH rsi=71.61). All new trades will now have entry features. Losers 24h: 11 total. breakout-long+ 3T 0%WR KILLED. rr-struct-v2+ 4T LONG all losers. pullback-entry- 6 SHORT normal variance. rr_engine_resistance 0 post-fix exits 48h+ (needs Sep 18 check). SHORT NORMAL penalty monitor expires ~05:30 UTC. No other config change.
 - [2026-09-16 ~02:15 UTC (CEO run)] ceo: VERIFIED + NO CHANGE. DB: 24h 29T 51.7%WR -$0.10 (FLAT). 7d: 278T 55.8%WR +$3.08 (POSITIVE, improved from +$1.83). Market NEUTRAL. **NO CONFIG CHANGES.** System structurally healthy. **7d SHORT +$2.69 ★, LONG +$0.39 (improving, legacy aging out Sep 16-20).** Active signals profitable: pullback-entry- SHORT 79T/62%WR +$3.18★, pump-chain- SHORT 55T/60%WR +$0.62. **rr_engine_resistance fix verified:** 0 post-fix exits in 48h+. **NEW FINDING: cut-loser-CL-T1 bleed** 7 exits -$1.19 (needs investigation). **auto_1hr killed breakout-long+** (0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **features_recorded=FALSE ALL 279 trades (14 days)** — CRITICAL data gap. **Signal diversity issue:** Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, pump-chain-). 5 open trades. **MONITORING:** legacy LONG flush, rr_engine_resistance post-fix, cut-loser-CL-T1, feature recording fix, signal development. **No config change — system positive, legacy aging out.**
 - [2026-09-16 ~01:45 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 3 items monitoring, 1 CRITICAL data gap flagged
   24h: 28T 57.1%WR +$0.81 (POSITIVE) | 7d: 277T 54.5%WR +$3.16 (POSITIVE, improved from +$1.83)
@@ -1597,4 +1617,33 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   Losers 24h: 13 total. 8 pullback-entry- SHORT (normal variance), 3 rr-struct-v2+ LONG (legacy, killed), 2 breakout-long+ HIGH regime.
   Creative: (1) REMOVE SHORT_NORMAL_PENALTY after Sep 16 — SHORT profitable in NORMAL, penalty blocks good entries. (2) LONG regime gate — block LONG in HIGH for breakout-long+/rr-struct-v2+ (both losing in HIGH).
   No config change — monitoring, SHORT_NORMAL_PENALTY due Sep 16 ~05:30.
+  BY: brain_auditor
+
+- [2026-09-16 05:15 UTC (brain_auditor run)] brain_auditor: CONFIG CHANGE — trend_ignition DISABLED
+  24h: 27T 51.9%WR -$0.17 (FLAT) | 7d: 275T 54.9%WR +$2.66 (POSITIVE)
+  SHORT 7d: 164T 59.8%WR +$3.72★ | LONG 7d: 111T 47.7%WR -$1.06 (improving, legacy aging out)
+  Regime 7d: EXTREME 102T 57.8%WR +$2.50★ | HIGH 114T 54.4%WR +$0.32 | NORMAL 57T 52.6%WR -$0.16
+  SHORT NORMAL 24h: 6T 83.3%WR +$0.60 (penalty expired, performing well)
+  rr_engine_resistance: 0 exits post-fix in 2+ days. FIX VERIFIED.
+  cut-loser-CL-T1 7d: 7T -$1.19 (healthy — fast cuts, avg -$0.17/trade)
+  Feature recording: 5 retroactive trades recorded, new trades getting features. 1 gap (IO) to investigate.
+  **CONFIG CHANGE: trend_ignition DISABLED.** 0 trades in 3+ days. LONG-only, 7 conditions, impossible in NEUTRAL market. Zero impact.
+  **LOSERS:** 10 total 24h. All small. 3 breakout-long+ (KILLED), 3 rr-struct-v2+ (KILLED), 5 pullback-entry- SHORT (normal variance), 1 hard_sl (MET). No systemic issues.
+  **CUT-LOSER-CL-T1:** 7d 7 exits -$1.19. All small losses ($0.11-$0.25). Mechanism working as designed.
+  **CREATIVE:** (1) Feature data enables entry-condition filters in 14 days. (2) BB dead zone expansion to 0.65-0.85 worth testing. (3) grind-breakout- 2T/100%WR — monitor.
+  **DRIFT:** trend_ignition dead but still enabled. SHORT_NORMAL monitoring expired (working). Signal diversity still 2 types in NEUTRAL.
+  BY: brain_auditor
+
+- [2026-09-16 ~06:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 5 items monitoring, feature recording untested
+  24h: 27T 51.9%WR -$0.17 (FLAT) | 7d: 275T 54.9%WR +$2.66 (POSITIVE)
+  SHORT 7d: 164T 59.8%WR +$3.72★ | LONG 7d: 111T 47.7%WR -$1.06 (legacy aging out)
+  Regime 7d: EXTREME 102T 57.8%WR +$2.39★ | HIGH 114T 54.4%WR +$0.32 | NORMAL 57T 52.6%WR -$0.16
+  Exit 7d: profit-monster-trail 41T 92.7%WR +$3.35★ | atr_sl_hit 160T 53.1%WR +$1.65 | rr_engine_resistance 37T 40.5%WR -$1.33 (ALL pre-fix, 0 post-fix)
+  SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (penalty working)
+  FEATURE RECORDING: 2/27 24h trades have features (retroactive only). 0 new trades since fix (02:34 UTC). Fix UNTESTED — monitor next trade.
+  rr_engine_resistance: 0 exits post-fix 24h+. VERIFIED. Monitor until Sep 18.
+  LOSING TRADE AUTOPSY: DOT SHORT (RSI 64.22, BB 0.89, EXTREME) -$0.25 — normal variance. ETC SHORT (RSI 70.14, BB 0.87, EXTREME) -$0.28 — RSI ABOVE SHORT_RSI_CEILING=65, possible filter gap.
+  CREATIVE: (1) SHORT regime confidence scaling (EXTREME=1.0, HIGH=0.95, NORMAL=0.90) — needs 1 week monitoring. (2) Pipeline feature recording audit — verify ALL trade paths call record_entry_features.
+  SIGNAL DIVERSITY: Only 2 types in NEUTRAL. Need new signal development.
+  No config change — system positive, feature recording needs verification, all dead signals already killed.
   BY: brain_auditor

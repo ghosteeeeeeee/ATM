@@ -153,5 +153,27 @@
     "after": "Two dead zones: 0.70-0.85 + 0.35-0.55",
     "rationale": "BB 0.35-0.55 zone: 25T 44%WR -$0.99/7d across all SHORT signals. Chop zone, no edge.",
     "impact": "Expected +$0.99/7d. Blocks 14 losers (-$2.26), 11 winners (+$1.27)."
+  },
+  {
+    "timestamp": "2026-09-16T02:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Created standalone feature_recorder.py and updated brain.py import to fix feature recording",
+    "type": "config",
+    "file": "scripts/brain.py, scripts/feature_recorder.py (new)",
+    "before": "brain.py imported record_entry_features from hl_sync_guardian — module-level lock caused sys.exit(1) when guardian running, features never recorded",
+    "after": "brain.py imports from feature_recorder.py — standalone module, no lock dependency. 5 open trades retroactively recorded.",
+    "rationale": "All 278 trades in 14 days had features_recorded=FALSE. Root cause: hl-sync-guardian.py module-level lock acquisition prevents import from brain.py. feature_recorder.py extracts just the needed functions.",
+    "impact": "All future trades will have entry_rsi_14, entry_bb_position, entry_macd_hist, entry_atr_14 recorded. Enables entry-condition analysis after 48h."
+  },
+  {
+    "timestamp": "2026-09-16T05:15:00Z",
+    "agent": "brain_auditor",
+    "change": "DISABLED trend_ignition (TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "TREND_IGNITION_ENABLED=True, TREND_IGNITION_PLUS_ENABLED=True",
+    "after": "TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False",
+    "rationale": "0 trades in 3+ days. Dead signal. LONG-only, 7 conditions impossible in NEUTRAL market.",
+    "impact": "Zero — no trades to lose"
   }
 ]

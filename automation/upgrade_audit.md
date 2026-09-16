@@ -5,24 +5,24 @@
 - **Core request:** 8 config tweaks to improve PnL by ~$4.21/7d (exit fixes, signal kills, regime gating, token management, speed filter, time block)
 - **Difficulty:** Level 1 (config tweaks)
 - **Value:** HIGH
-- **Status:** IMPLEMENTED (5/8 fixes applied)
-- **Reason:** Highest ROI plan — all changes are single-line constants in hermes_constants.py. Data-backed with two independent audits.
+- **Status:** IMPLEMENTED (6/8 fixes applied)
+- **Reason:** Highest ROI plan. Applied: (1) pullback-entry- exit→atr, (2) ema300-dip-long killed, (3) cut-loser T1 tightened, (4) ENA blacklisted, (5) pump-chain+ blocked in NORMAL, (6) time block extended to 09:00, (7) BTC timing guard enabled. Remaining: LONG speed threshold (HIGH risk), full NORMAL momentum block (needs direction-specific vol gate).
 
 ## Plan: 2026-09-11_volatility-gate-tuning.md
 - **Date scanned:** 2026-09-15
 - **Core request:** Add ATR ratio + BTC trend boost to volatility_gate_v2.py for direction-aligned expansion trades
 - **Difficulty:** Level 2
 - **Value:** MEDIUM
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** VOL_PHASE_MULTS already blocks many family/regime combos. ATR ratio extension is new code (~30 lines).
+- **Status:** IMPLEMENTED
+- **Reason:** ATR ratio + BTC trend boost already in volatility_gate_v2.py:483-503. Constants at hermes_constants.py:935-939. get_atr_ratio() and get_btc_trend() functions exist.
 
 ## Plan: 2026-09-11_volatility-regime-adaptive-signals.md
 - **Date scanned:** 2026-09-15
 - **Core request:** Adapt signal multipliers to volatility regime (expansion/compression) using ATR ratio
 - **Difficulty:** Level 2
 - **Value:** MEDIUM
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** volatility_gate_v2.py already has regime-based multipliers. ATR ratio layer is new (~33 lines).
+- **Status:** IMPLEMENTED
+- **Reason:** vol_regime_mult already computed in signal_compactor.py:1611-1655. Uses ATR ratio from token_speeds. Expansion boosts momentum 1.2x, compression penalizes momentum.
 
 ## Plan: oversold-bounce-signal.md
 - **Date scanned:** 2026-09-15
@@ -30,7 +30,23 @@
 - **Difficulty:** Level 2
 - **Value:** MEDIUM
 - **Status:** IMPLEMENTED
-- **Reason:** OVERSOLD_BOUNCE_ENABLED=True in hermes_constants.py (line 3470). Signal exists in scripts/signals/.
+- **Reason:** OVERSOLD_BOUNCE_ENABLED=True in hermes_constants.py (line 3473). Signal exists in scripts/signals/oversold_bounce.py.
+
+## Plan: 2026-09-11_btc-timing-guard.md
+- **Date scanned:** 2026-09-15
+- **Core request:** Per-signal-type BTC momentum thresholds to prevent chasing
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** Flipped BTC_TIMING_GUARD_LOG_ONLY to False (hermes_constants.py:924). Code fully wired in signal_compactor.py:1127-1180. Blocks pump-chain, pullback-entry, open-skies, accel-300 when BTC already moved.
+
+## Plan: 2026-09-11_chop-regime-signal-gating.md
+- **Date scanned:** 2026-09-15
+- **Core request:** Hard BTC momentum gate + gate STANDALONE_BYPASS in chop
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** BTC_CHOP_GATE exists (hermes_constants.py). STANDALONE_BYPASS gate verified at signal_compactor.py:2163-2171 — checks BTC momentum before allowing bypass.
 
 ## Plan: contrarian-zone-signal.md
 - **Date scanned:** 2026-09-15
@@ -94,15 +110,7 @@
 - **Difficulty:** Level 2
 - **Value:** HIGH
 - **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** BTC_CHOP_GATE (Layer 1) exists. BTC_TIMING_GUARD (partial Layer 3) exists but LOG_ONLY. Stale filter, RSI guard, continuum boost need wiring.
-
-## Plan: 2026-09-11_btc-timing-guard.md
-- **Date scanned:** 2026-09-15
-- **Core request:** Per-signal-type BTC momentum thresholds to prevent chasing
-- **Difficulty:** Level 1
-- **Value:** HIGH
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** Constants exist (BTC_TIMING_GUARD_*) but LOG_ONLY=True. Needs implementation in signal_compactor.py or LOG_ONLY=False.
+- **Reason:** Layer 1 (BTC_CHOP_GATE) and Layer B (STANDALONE_BYPASS gate) implemented. Remaining: stale filter, RSI guard, continuum boost need wiring.
 
 ## Plan: ema300-rejection-signal-spec.md
 - **Date scanned:** 2026-09-15
@@ -112,10 +120,18 @@
 - **Status:** PENDING
 - **Reason:** New signal module (~150 lines). Strong backtest results but not yet built.
 
-## Plan: 2026-09-11_chop-regime-signal-gating.md
-- **Date scanned:** 2026-09-15
-- **Core request:** Hard BTC momentum gate + gate STANDALONE_BYPASS in chop
-- **Difficulty:** Level 1
-- **Value:** HIGH
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** BTC_CHOP_GATE exists. STANDALONE_BYPASS gate (Layer B) needs verification in signal_compactor.py.
+---
+
+## Session Summary (2026-09-16)
+
+**Scanned:** 20 plans
+**Implemented this session:** 1 (BTC timing guard enable)
+**Already implemented:** 6 (profitability fixes, volatility gate, vol regime, oversold bounce, chop gate)
+**Pending:** 8 (contrarian-zone, sl-memory, pump-exit, hl-trigger, brain-rag, spider-profit, btc-momentum-sync remaining layers, ema300-rejection)
+**Skipped:** 1 (sl-memory v1)
+
+**Next candidates (Level 1-2):**
+1. ema300-rejection-signal — Level 2 — MEDIUM — New signal, 69-80% WR SHORT backtest
+2. spider-profit — Level 2 — MEDIUM — Regime-aware profit taking for stuck trades
+3. pump-chain-exit — Level 2 — MEDIUM — ATR trailing exit (single case study)
+4. btc-momentum-sync remaining layers — Level 2 — HIGH — Stale filter + RSI guard

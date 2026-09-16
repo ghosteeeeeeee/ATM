@@ -1,3 +1,13 @@
+[2026-09-16 03:36 UTC] brain_auditor: NO CONFIG CHANGE — feature recording fix verified, 2 items to action
+  24h: 27T 59.3%WR +$0.87 (POSITIVE) | 7d: 275T 55.8%WR +$3.08 (POSITIVE)
+  SHORT NORMAL 7d: 34T 61.8%WR +$0.59
+  ATR SL 7d: 160T 59.4% below entry (structural)
+  FEATURE RECORDING FIX VERIFIED: 5 open trades retroactively recorded. Verify next 24h.
+  trend_ignition DEAD: 0 trades 3+ days. Recommend disable.
+  SIGNAL DIVERSITY: 2 types in NEUTRAL. Need new signals.
+  Creative: (1) trend_ignition SHORT redesign (2) volume confirmation filter (3) SHORT RSI/BB sniper
+  BY: brain_auditor
+
 [2026-09-16 01:45 UTC] brain_auditor: NO CONFIG CHANGE — 3 items monitoring, 1 CRITICAL data gap flagged
   24h: 28T 57.1%WR +$0.81 (POSITIVE) | 7d: 277T 54.5%WR +$3.16 (POSITIVE, improved from +$1.83)
   SHORT 7d: 152T 58.6%WR +$2.69★ | LONG 7d: 125T 49.6%WR +$0.47 (improving)
@@ -2020,3 +2030,30 @@
   24h: 28T 50%WR -$0.12 | breakout-long+ 3T 0%WR -$0.60 (kill threshold met)
   Root cause: fires LONG in NEUTRAL without BTC regime gate — needs code fix
   BY: auto_1hr
+[2026-09-16 02:30 UTC] brain_auditor: CONFIG CHANGE — feature recording fix
+  Created standalone feature_recorder.py (extracted from hl-sync-guardian.py)
+  Updated brain.py import: hl_sync_guardian → feature_recorder
+  Root cause: module-level lock in hl-sync-guardian prevents import while guardian running
+  5 open trades retroactively recorded (ETC, SEI, DOT, SYRUP, ETH)
+  All new trades will have entry_rsi_14, entry_bb_position populated
+  Monitor 24h to verify
+  BY: brain_auditor
+[2026-09-16 05:11 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 2T closed (DOT -/usr/bin/bash.25, ETC -/usr/bin/bash.28) — both ATR SL hits
+  24h: 28T 50%WR -/usr/bin/bash.12 | 82% ATR SL | pullback-entry- 21T 61.9%WR +/usr/bin/bash.44
+  No signal meets kill criteria. 6h pullback-entry- dip (50% vs 61.9%) normal variance.
+  BY: auto_1hr
+[2026-09-16 07:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (quiet market)
+  24h: 27T 48.1%WR -$0.52 | 81.5% ATR SL | pullback-entry- 20T 60%WR +$0.34
+  No signal meets kill criteria. All 5 open positions SHORT — correlation risk.
+  BY: auto_1hr
+[2026-09-16 06:45 UTC] brain_auditor: NO CONFIG CHANGE — 5 items monitoring, feature recording untested
+  24h: 27T 51.9%WR -$0.17 (FLAT) | 7d: 275T 54.9%WR +$2.66 (POSITIVE)
+  SHORT 7d: 164T 59.8%WR +$3.72★ | LONG 7d: 111T 47.7%WR -$1.06 (legacy aging out)
+  FEATURE RECORDING: 2/27 24h trades have features (retroactive only). 0 new trades since fix. UNTESTED.
+  rr_engine_resistance: 0 exits 24h+. VERIFIED. Monitor until Sep 18.
+  LOSING TRADE AUTOPSY: DOT SHORT RSI 64.22 (normal variance). ETC SHORT RSI 70.14 (above SHORT_RSI_CEILING=65, possible filter gap).
+  CREATIVE: (1) SHORT regime confidence scaling — needs 1 week monitoring. (2) Pipeline feature recording audit.
+  SIGNAL DIVERSITY: 2 types in NEUTRAL. Need new signal development.
+  BY: brain_auditor

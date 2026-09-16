@@ -726,7 +726,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             pass
         # ── Record entry features (RSI, MACD, etc.) ──────────────────────────
         try:
-            from hl_sync_guardian import record_entry_features
+            from feature_recorder import record_entry_features
             record_entry_features(int(trade_id), token.upper())
         except Exception as _feat_err:
             print(f"[brain.py] ⚠️ Feature record failed: {_feat_err}")

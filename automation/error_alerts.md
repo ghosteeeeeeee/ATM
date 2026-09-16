@@ -649,3 +649,19 @@
 
 ## Error Alerts — 2026-09-16 01:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: IO TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-09-16 02:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-16 04:44 UTC
+- **[WARN]**: `hotset fallback DB returned 0 tokens` — hotset data empty
+- **[WARN]**: 32 phantom trades in signal_outcomes (|pnl| < 0.01%)
+- **[WARN]**: Today's PnL -7.92%, 25% WR (28 closed)
+- **[INFO]**: Disk at 82% — not critical but trending up
+
+## Error Alerts — 2026-09-16 04:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-16 05:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
