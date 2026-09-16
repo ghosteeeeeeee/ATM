@@ -188,6 +188,7 @@ REGIME_SIGNALS = {
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'breakout-long+',  # Volume-confirmed breakout LONG — continuation in storms
+        'volume-breakout-long+',  # volume-confirmed breakout LONG — works in extreme vol
         'r2-trend-short',  # R² downtrend SHORT — works in all regimes
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
