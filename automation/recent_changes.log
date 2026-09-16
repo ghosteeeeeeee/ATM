@@ -1,3 +1,12 @@
+[2026-09-16 15:45 UTC] brain_auditor: 1 CODE FIX — RSI timeframe alignment
+  24h: 17T 52.9%WR +$0.45 (FLAT) | 7d: 264T 55.7%WR +$2.23 (POSITIVE)
+  SHORT NORMAL 7d: profitable (monitoring expired, penalty removed)
+  rr_engine_resistance 7d: 36T -$1.31 (#1 exit drag)
+  CODE FIX: signal_compactor.py:2728 candles_5m → candles_1m for SHORT_RSI_CEILING
+  CREATIVE: Resistance proximity filter for SHORT entries (~$0.50-0.72/7d potential)
+  STALE SIGNAL: 31.2% of 7d trades, stale WR 49.4% vs fresh 58.1%
+  BY: brain_auditor
+
 [2026-09-16 03:36 UTC] brain_auditor: NO CONFIG CHANGE — feature recording fix verified, 2 items to action
   24h: 27T 59.3%WR +$0.87 (POSITIVE) | 7d: 275T 55.8%WR +$3.08 (POSITIVE)
   SHORT NORMAL 7d: 34T 61.8%WR +$0.59
@@ -2092,4 +2101,38 @@
   1h: 1T closed (1W +$0.34 hard_tp FIL)
   24h: 26T net positive | ATR SL avg +$0.011 | pullback-entry- 18T +$1.15 strong
   Open: 2 positions (SYRUP 14.5h, SEI 11.6h)
+  BY: auto_1hr
+
+[2026-09-16 14:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0 closed, 3 opened (ACE, ME, SUPER SHORTs)
+  24h: 24T 62.5%WR +$0.68 | pullback-entry- 18T +$1.15 strong
+  ATR SL 19 exits avg +$0.011 structural | 5 open SHORTs
+  System healthy, no action needed.
+  BY: auto_1hr
+[2026-09-16 14:36 UTC] brain_auditor: CODE FIX — exit_conditions recording
+  brain.py close_trade() now accepts exit_conditions param, adds to UPDATE, CLI supports --exit-conditions.
+  99.96% of 7d trades had blank exit_conditions — root cause was UPDATE statement missing the column.
+  No behavior change for existing callers (exit_conditions defaults to None).
+  24h: 24T 57.7%WR +$0.55 | 7d: 268T 55.8%WR +$3.73
+  NEW: rr_engine_resistance SHORT exits 36T/7d -$1.31 — needs resistance proximity investigation.
+  BY: brain_auditor
+
+[2026-09-16 15:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 22T 59.1%WR +$0.44 | ATR SL 17T avg -$0.004 | pullback-entry- 16T +$0.87 (62.5%WR)
+  Open: 5 SHORTs (SYRUP 16.5h, SEI 13.6h, ACE/ME/SUPER new)
+  System healthy, no action needed.
+  BY: auto_1hr
+[2026-09-16 15:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0 closed, 0 entries (quiet hour)
+  24h: 18T 55.6%WR +$0.23 | ATR SL 13T 72%of closes avg -$0.028 (within tolerance)
+  7d: 255T 55.7%WR +$2.72 | breakout-long+ 3T 0%WR already disabled
+  Open: 5 SHORTs (all pullback-entry-), max 18.5h
+  System healthy, no action needed.
+  BY: auto_1hr
+[2026-09-16 18:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 4T 100%WR +$1.18 (all pullback-entry- SHORT atr_sl trailing into profit)
+  24h: 21T 66.7%WR +$1.33 | ATR SL 16T 76% avg +$0.051 (trailing working)
+  7d: 255T 55.7%WR +$2.72 | all 7d losers already disabled
+  Open: 2 (ACE SHORT 0.6h, ME SHORT 4.7h)
+  System healthy, no action needed.
   BY: auto_1hr

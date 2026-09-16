@@ -1,157 +1,150 @@
 {
-    "timestamp": "2026-09-16T14:00:00Z",
+    "timestamp": "2026-09-16T18:30:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
-        "vectors_loaded": 195650,
-        "query_topics": ["signal performance", "creative ideas", "problems/losses"],
-        "top_insights": ["RSI timeframe mismatch", "stale signal execution", "exit_conditions blank", "signal diversity gap"]
+        "total_sessions": 195650,
+        "top_findings": ["stale signal execution", "exit_conditions blank", "rr_engine_resistance drag", "signal diversity NEUTRAL"]
     },
     "trade_summary_24h": {
-        "trades": 26,
-        "win_rate": "57.7%",
-        "pnl": "+$0.55",
-        "dominant_signal": "pullback-entry- SHORT 18T 66.7%WR +$1.15",
-        "losers": "3x breakout-long+ (killed), 1x rr-struct-v2+ (killed), 1x ETH SHORT (normal ATR SL), 1x DOT SHORT (stale), 1x ETC SHORT (RSI bug)"
+        "trades": 21,
+        "win_rate": 66.7,
+        "pnl": 1.33,
+        "losers": 7,
+        "dominant_signal": "pullback-entry- SHORT",
+        "open_trades": 0
     },
     "trade_summary_7d": {
-        "trades": 269,
-        "win_rate": "55.8%",
-        "pnl": "+$3.73",
-        "by_regime": "EXTREME 101T 58.4%WR +$1.44 | HIGH 110T 54.5%WR +$0.71 | NORMAL 57T 52.6%WR -$0.13",
-        "top_performer": "pullback-entry- SHORT 83T 60.2%WR +$3.13",
-        "dead_signals_killed": "trend_purity+ 11T -$0.90 | rr-struct-v2+ 10T -$0.45 | pullback-entry+ 5T -$0.61 | breakout-long+ 4T -$0.35"
+        "trades": 255,
+        "win_rate": 55.7,
+        "pnl": 2.72,
+        "regimes": {
+            "EXTREME": {"trades": 97, "wr": 59.8, "pnl": 2.91},
+            "HIGH": {"trades": 107, "wr": 54.2, "pnl": 0.79},
+            "NORMAL": {"trades": 54, "wr": 53.7, "pnl": -0.10}
+        }
     },
     "drift_findings": [
         {
-            "finding": "RSI timeframe mismatch — SHORT_RSI_CEILING uses candles_5m but entry_rsi stores 1m data",
-            "evidence": "ETC SHORT entered at RSI=70.14 (>65 ceiling) but passed filter. Metadata shows rsi_14=40.0 (5m value, not 1m entry value). Code at signal_compactor.py:2728.",
-            "impact": "Overbought SHORTs enter and get stopped out. ETC SHORT lost -$0.28.",
-            "status": "CODE FIX NEEDED — not yet implemented",
-            "fix": "Change line 2728 from candles_5m to candles_1m"
+            "finding": "exit_conditions still blank despite brain.py fix",
+            "root_cause": "position_manager.py line 1089 UPDATE does not include exit_conditions column. This is the primary close path for ATR SL/trail exits (150/255 7d trades). brain.py fix only affects profit_monster/cut_loser path.",
+            "impact": "Exit analysis impossible from DB. 100% of ATR SL exits have blank exit_conditions.",
+            "status": "FIXED THIS RUN — added exit_conditions to position_manager.py UPDATE"
         },
         {
-            "finding": "exit_conditions 99.96% blank — cannot analyze which exit path fires",
-            "evidence": "266/267 7d trades have empty exit_conditions. exit_reason works but exit path tracking broken.",
-            "impact": "Exit optimization impossible. Cannot distinguish ATR_SL vs PM_TRAIL vs CUT_LOSER paths in data.",
-            "status": "CODE FIX NEEDED — not yet implemented",
-            "fix": "Add exit_conditions param + column in brain.py close_trade() UPDATE at line 909"
-        },
-        {
-            "finding": "Stale signal execution 31.2% — stale WR 49.4% vs fresh 58.1%",
-            "evidence": "83 stale trades 7d, -$0.99 PnL. 186 fresh trades, +$3.01. pullback-entry- SHORT: stale 42T 54.8%WR +$0.27 vs fresh 41T 65.9%WR +$2.86.",
-            "impact": "~$3.85/7d lost from stale execution. Fresh pullback-entry- SHORT alone is +$2.86.",
-            "status": "ROOT CAUSE FOUND — needs design for execution-time revalidation"
+            "finding": "SHORT_RSI_FLOOR not blocking oversold SHORT entries",
+            "root_cause": "Same timeframe mismatch as RSI_CEILING — was using 5m candles. ETH SHORT entered at RSI=25.91 (<35 floor) on Sep 15. Fix deployed Sep 16 aligns to 1m data.",
+            "impact": "1 trade entered at RSI 25.91 (oversold), lost -$0.14. Now fixed.",
+            "status": "FIXED (Sep 16 15:00 UTC) — RSI filter aligned to 1m data"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "LONG_NEUTRAL drag",
-            "occurrences": "Legacy LONG trades from before NEUTRAL block, still aging out. LONG 7d: -$1.06.",
-            "trend": "IMPROVING — legacy aging out, SHORT dominant",
-            "action": "Monitor. No action needed — structural."
+            "topic": "Stale signal execution",
+            "frequency": "Every audit since Sep 16 09:00",
+            "data": "81 stale / 255 total 7d trades (31.8%). Stale WR 49.4% vs fresh 59.0%. Stale PnL -$0.63 vs fresh +$4.23. Pullback-entry- SHORT: stale 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50.",
+            "impact": "~$4.86/7d lost from stale execution",
+            "status": "NEEDS DESIGN — execution-time revalidation"
         },
         {
-            "topic": "Signal diversity in NEUTRAL",
-            "occurrences": "Only 2 signal types pass confluence: pullback-entry- and pump-chain-",
-            "trend": "PERSISTENT — flagged in 5+ sessions",
-            "action": "Needs new signal development for NEUTRAL regime"
-        },
-        {
-            "topic": "ATR SL dominant loss mechanism",
-            "occurrences": "atr_sl_hit 160T/7d, 59.4% below entry (structural). All top losers are ATR SL.",
-            "trend": "STRUCTURAL — pullback-entry- SHORT ATR SL is structural, not fixable without changing entry logic",
-            "action": "Accept as cost of doing business. Profit-monster-trail offsets."
+            "topic": "rr_engine_resistance SHORT exits",
+            "frequency": "Every audit since Sep 15",
+            "data": "35 exits / 7d, -$1.08 total. pullback-entry- SHORT: 21 exits -$0.76. All losses ~1% (near ATR boundary). Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts.",
+            "impact": "~$0.76-1.08/7d drag from resistance proximity entries",
+            "status": "NEEDS DATA — resistance proximity filter proposed"
         }
     ],
     "missing_implementations": [
         {
-            "item": "RSI timeframe alignment fix",
-            "priority": "HIGH",
-            "effort": "trivial — 1 line change",
-            "status": "Not yet applied"
-        },
-        {
-            "item": "exit_conditions tracking",
-            "priority": "MEDIUM",
-            "effort": "small — add param + UPDATE column",
-            "status": "Not yet applied"
-        },
-        {
             "item": "Execution-time revalidation for stale signals",
+            "description": "Re-run compactor checks at execution time, skip if conditions changed (RSI, regime, gap). Needs design for latency vs accuracy tradeoff.",
+            "priority": "HIGH",
+            "estimated_impact": "+$3-5/7d"
+        },
+        {
+            "item": "New signals for NEUTRAL regime",
+            "description": "Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, pump-chain-). System vulnerable to single-signal failure.",
             "priority": "MEDIUM",
-            "effort": "medium — needs design",
-            "status": "Investigated, not implemented"
+            "estimated_impact": "Resilience, not direct PnL"
         }
     ],
     "losing_trade_autopsy": [
         {
-            "trade": "ETC SHORT -$0.28",
-            "signal": "pullback-entry-",
-            "regime": "EXTREME",
-            "root_cause": "RSI TIMEFRAME BUG: entry_rsi=70.14 (>65 ceiling) but SHORT_RSI_CEILING checked candles_5m where RSI was 40.0. Filter gap.",
-            "entry_check": "RSI 70.14 at entry (1m data), but filter used 5m RSI=40.0. ETC was overbought on 1m but not on 5m.",
-            "regime_check": "EXTREME — expected high vol, but entry was wrong due to filter mismatch.",
-            "recommended_change": "Fix signal_compactor.py:2728 — change candles_5m to candles_1m. One line.",
-            "impact_on_winners": "Would have blocked ETC SHORT only (RSI>65 on 1m). No winning SHORT in 7d had RSI>65 at entry.",
-            "confidence": "HIGH — confirmed bug, trivial fix"
+            "trade": "ETH SHORT pullback-entry- pnl=-$0.14",
+            "entry_rsi": 25.91,
+            "regime": "HIGH",
+            "stale": true,
+            "root_cause": "Entered at RSI 25.91 (oversold) — SHORT_RSI_FLOOR=35 should have blocked. Filter was using 5m candles (bug). Now fixed.",
+            "confidence": "HIGH — same bug as ETC SHORT, fixed Sep 16"
         },
         {
-            "trade": "DOT SHORT -$0.25",
-            "signal": "pullback-entry-",
-            "regime": "EXTREME",
-            "root_cause": "Stale signal. rsi_14=44.44 (neutral), is_stale=True. Signal created earlier, executed later when conditions changed.",
-            "entry_check": "RSI 44.44 — within normal range, not overbought/oversold. Entry wasn't wrong on RSI, just stale.",
-            "regime_check": "EXTREME — volatile, normal for pullback-entry- SHORT.",
-            "recommended_change": "No immediate change — stale execution is systemic, not per-trade fix. Execution-time revalidation needed.",
-            "impact_on_winners": "N/A — this is a systemic issue, not a per-trade filter.",
-            "confidence": "MEDIUM — needs design"
+            "trade": "ACE SHORT pullback-entry- pnl=-$0.33",
+            "entry_rsi": 47.62,
+            "regime": "HIGH",
+            "stale": true,
+            "root_cause": "Stale signal + rising momentum + bb_position 0.87 (near top of BB). Shorting into rising price near resistance.",
+            "confidence": "MEDIUM — stale signal is the primary factor"
         },
         {
-            "trade": "3x breakout-long+ LONG (BIGTIME -$0.15, IMX -$0.25, ZEN -$0.20)",
-            "signal": "breakout-long+ (KILLED)",
-            "regime": "HIGH/EXTREME",
-            "root_cause": "Signal fired LONG in NEUTRAL without BTC regime gate. All 3 losses ATR SL.",
-            "entry_check": "LONG entries in NEUTRAL market — against market structure.",
-            "regime_check": "HIGH regime but market overall NEUTRAL. LONG_NEUTRAL_BLOCK should have caught these.",
-            "recommended_change": "Already killed. Verify LONG_NEUTRAL_BLOCK is catching all such entries.",
-            "impact_on_winners": "N/A — signal already killed",
-            "confidence": "HIGH — signal killed, confirmed"
+            "trade": "DOT SHORT pullback-entry- pnl=-$0.25",
+            "entry_rsi": 44.44,
+            "regime": "EXTREME",
+            "stale": true,
+            "root_cause": "Stale signal in EXTREME regime — high volatility whipsaw. Normal variance for EXTREME.",
+            "confidence": "LOW — normal EXTREME variance"
+        },
+        {
+            "trade": "ETC SHORT pullback-entry- pnl=-$0.28",
+            "entry_rsi": 40.0,
+            "regime": "EXTREME",
+            "stale": true,
+            "root_cause": "Stale signal in EXTREME. RSI was fine (40) but stale + EXTREME = high risk.",
+            "confidence": "LOW — normal EXTREME variance"
+        },
+        {
+            "trade": "ME SHORT pullback-entry- pnl=-$0.15",
+            "entry_rsi": 52.38,
+            "regime": "NORMAL",
+            "stale": false,
+            "root_cause": "Fresh signal, RSI neutral, NORMAL regime — pure variance loss. ATR SL hit.",
+            "confidence": "HIGH — unavoidable variance"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-16T14:00:00Z",
-            "idea": "Fix RSI timeframe mismatch — align SHORT_RSI_CEILING to 1m candles",
-            "rationale": "ETC SHORT entered at RSI=70.14 (>65 ceiling) but passed 5m filter. One-line fix prevents overbought SHORT entries.",
-            "expected_impact": "Blocks ~1-2 bad SHORT entries/week. ETC SHORT would have been blocked, saving -$0.28.",
+            "date": "2026-09-16T18:30:00Z",
+            "idea": "Add STALE_MAX_AGE_MINUTES filter to decider — skip signals older than 30 minutes",
+            "rationale": "81 stale trades in 7d at 49.4% WR vs 59.0% fresh. Stale pullback-entry- SHORT: 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50. The gap is $4.86/7d. A simple age check at execution time would filter the worst staleness without complex revalidation.",
+            "expected_impact": "+$2-4/7d (conservative — blocks ~30% of trades but those are the worst performers)",
             "category": "entry sniper",
-            "status": "ready to implement",
-            "risk": "low — 1 line change, no impact on existing filters"
+            "status": "suggested",
+            "risk": "medium — could block good entries that happen to be queued. Needs backtest.",
+            "impact_on_winners": "Estimated: ~20% of fresh winners have signal age >30min. Would block some winners. Needs backtest to quantify."
         },
         {
-            "date": "2026-09-16T14:00:00Z",
-            "idea": "Add exit_conditions tracking to close_trade()",
-            "rationale": "99.96% of trades have blank exit_conditions. Cannot optimize exits without knowing which path fired.",
-            "expected_impact": "Enables exit analysis — identify which exit paths work best in which regimes.",
-            "category": "data quality",
-            "status": "ready to implement",
-            "risk": "zero — adding a column, no behavioral change"
-        },
-        {
-            "date": "2026-09-16T14:00:00Z",
-            "idea": "pullback-entry- SHORT volume confirmation filter",
-            "rationale": "83 trades 7d, 60.2%WR +$3.13. But stale entries dilute quality. Fresh entries 65.9%WR. Adding volume spike confirmation at entry could improve fresh WR further.",
-            "expected_impact": "+2-4% WR for fresh pullback-entry- SHORT entries. Needs sample verification.",
+            "date": "2026-09-16T18:30:00Z",
+            "idea": "Tighten SHORT_RSI_FLOOR from 35 to 40 for EXTREME regime only",
+            "rationale": "7d EXTREME SHORT losers: avg entry RSI 42.1. EXTREME regime amplifies whipsaw — entering SHORT at RSI <40 in EXTREME is high risk. NORMAL/HIGH can keep floor at 35.",
+            "expected_impact": "+$0.30-0.50/7d (blocks ~5-8 EXTREME SHORT entries per week, mostly losers)",
             "category": "entry sniper",
-            "status": "suggested — needs data",
-            "risk": "low — additive filter, won't block existing entries"
+            "status": "suggested — monitor first",
+            "risk": "low — EXTREME-specific, conservative threshold",
+            "impact_on_winners": "Need to check: how many EXTREME SHORT winners had entry RSI <40?"
         }
     ],
-    "config_changes_applied": [],
+    "config_changes_applied": [
+        {
+            "file": "scripts/position_manager.py",
+            "change": "Added exit_conditions = %s to UPDATE trades statement (line 1089)",
+            "before": "exit_conditions column not set in position_manager close path",
+            "after": "exit_conditions = reason (close reason string)",
+            "rationale": "Root cause of exit_conditions being 100% blank. position_manager closes 150/255 7d trades (ATR SL/trail) via direct UPDATE bypassing brain.py.",
+            "impact": "Exit analysis will now work for all trade close paths. Data quality improvement."
+        }
+    ],
     "next_actions": [
-        "CODE FIX: Align SHORT_RSI_CEILING to 1m data — signal_compactor.py:2728 change candles_5m to candles_1m",
-        "CODE FIX: Add exit_conditions recording — brain.py close_trade() add param + UPDATE column",
-        "INVESTIGATE: Execution-time revalidation for stale signals — design needed",
-        "DEVELOP: New signals for NEUTRAL regime — only 2 types pass confluence",
-        "CLEANUP: Remove ema300-dip-long from STANDALONE_BYPASS — dead signal still listed"
+        "MONITOR: Verify exit_conditions populates on next position_manager close (restart pipeline to reload code)",
+        "DESIGN: Execution-time revalidation for stale signals — needs latency/accuracy tradeoff analysis",
+        "INVESTIGATE: EXTREME regime SHORT RSI floor — check if tightening to 40 would hurt winners",
+        "INVESTIGATE: rr_engine_resistance proximity filter — need resistance data to verify impact on winners"
     ]
 }

@@ -2725,7 +2725,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _conn_rsc = sqlite3.connect(CANDLES_DB, timeout=5)
                     _cur_rsc = _conn_rsc.cursor()
                     _cur_rsc.execute("""
-                        SELECT close FROM candles_5m
+                        SELECT close FROM candles_1m
                         WHERE token = ? AND is_closed = 1
                         ORDER BY ts DESC LIMIT 15
                     """, (tkn.upper(),))

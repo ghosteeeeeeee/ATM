@@ -197,5 +197,27 @@
     "after": "candles_1m (1m resolution RSI used for ceiling check)",
     "rationale": "ETC SHORT entered RSI=70.14 (>65 ceiling) but passed filter because 5m RSI was 40.0. Filter mismatch allowed overbought SHORT entry.",
     "impact": "Blocks SHORT entries when 1m RSI > 65. ETC SHORT would have been blocked (-$0.28 saved). No winning SHORT in 7d had RSI > 65."
+  },
+  {
+    "timestamp": "2026-09-16T14:36:44.975517+00:00",
+    "agent": "brain_auditor",
+    "change": "exit_conditions recording fix — brain.py close_trade() now accepts exit_conditions param, adds to UPDATE statement, CLI parser supports --exit-conditions",
+    "type": "config",
+    "file": "scripts/brain.py",
+    "before": "exit_conditions column existed but was never populated (99.96% blank). UPDATE statement at line 910 did not include exit_conditions.",
+    "after": "close_trade() accepts exit_conditions param (default None), _close_trade_impl() accepts it, UPDATE sets exit_conditions = COALESCE(%s, exit_conditions), CLI parser has --exit-conditions argument.",
+    "rationale": "Exit analysis impossible without exit_conditions data. Column existed but was never written to. Now callers can pass exit conditions for data quality.",
+    "impact": "Exit analysis becomes possible. No behavior change for existing callers (exit_conditions defaults to None)."
+  },
+  {
+    "timestamp": "2026-09-16 15:45 UTC",
+    "agent": "brain_auditor",
+    "change": "RSI timeframe fix — SHORT_RSI_CEILING now uses 1m candles (candles_5m → candles_1m)",
+    "type": "bugfix",
+    "file": "signal_compactor.py",
+    "before": "candles_5m (5m RSI data, let ETC SHORT RSI=70.14 through)",
+    "after": "candles_1m (1m RSI data, matches entry_rsi_14)",
+    "rationale": "Filter was using 5m RSI but entry_rsi_14 stores 1m RSI. ETC SHORT entered RSI=70.14 (>65 ceiling) but passed 5m filter. With 1m data, would have been blocked.",
+    "impact": "Blocks overbought SHORT entries that previously slipped through. ETC-type trades prevented."
   }
 ]

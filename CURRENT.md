@@ -1,18 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-16 ~18:30 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (implementation pipeline)**
+**Last Updated: 2026-09-16 ~18:30 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 22T, 58% WR, +5.11%. 0 open. Market NEUTRAL. Pipeline running, no errors.
+24h: 21T, 66.7% WR, +$1.33. 0 open. Market NEUTRAL. Pipeline running, no errors.
 
-- **24h (rolling):** 22T, 58% WR, +5.11% (pipeline — GOOD DAY). pullback-entry- dominant.
-- **Today (calendar):** 22T closed. 0 open.
-- **7d:** 269T, 55.8% WR, +$3.73 (DB-verified — POSITIVE). SHORT dominant | LONG legacy aging out.
-- **7d REGIME:** EXTREME 101T 58.4%WR +$1.44★ | HIGH 110T 54.5%WR +$0.71 | NORMAL 57T 52.6%WR -$0.13.
-- **7d EXIT:** profit-monster-trail carries system | atr_sl_hit dominant loss.
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 83T/60.2%WR +$3.13★ | pump-chain- SHORT 53T/60.4%WR +$0.70 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 8T/87.5%WR +$0.61
+- **24h (rolling):** 21T, 66.7% WR, +$1.33 (DB-verified — POSITIVE). pullback-entry- dominant.
+- **Today (calendar):** 21T closed. 0 open.
+- **7d:** 255T, 55.7% WR, +$2.72 (DB-verified — POSITIVE). SHORT dominant | LONG legacy aging out.
+- **7d REGIME:** EXTREME 97T 59.8%WR +$2.91★ | HIGH 107T 54.2%WR +$0.79 | NORMAL 54T 53.7%WR -$0.10.
+- **7d EXIT:** profit-monster-trail carries system | rr_engine_resistance -$1.08 (7d #1 exit drag).
+- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 87T/59.8%WR +$3.78★ | pump-chain- SHORT 49T/61.2%WR +$1.25 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 7T/85.7%WR +$0.56
 - **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 5T/0%WR -$0.61 (KILLED) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED) | breakout-long+ 4T/25%WR -$0.35 (KILLED)
 - **Market:** NEUTRAL (100%).
 - **Open:** 0 trades.
@@ -47,15 +47,16 @@
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
-**🟡 STALE SIGNAL EXECUTION:** 30.7% of 7d trades (82/267) fire on stale signals. Stale WR 50.0% vs fresh 58.2%. Pullback-entry- SHORT: stale 56.1%WR +$0.10 vs fresh 65.0%WR +$2.55. ~$3.85/7d lost from stale execution.
+**🟡 STALE SIGNAL EXECUTION:** 31.8% of 7d trades (81/255) fire on stale signals. Stale WR 49.4% vs fresh 59.0%. Pullback-entry- SHORT: stale 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50. ~$4.86/7d lost from stale execution.
 
-**🟡 EXIT CONDITIONS PARTIALLY FIXED.** brain.py accepts exit_conditions param + CLI. profit_monster, cut_loser, sniper_exit, hl_fill_monitor now all pass exit_conditions. New trades will have exit data. Pre-fix trades (266/267 7d) still blank. — 2026-09-16 ~18:30 UTC
+**🟢 EXIT CONDITIONS FIX COMPLETE.** position_manager.py UPDATE now includes exit_conditions. All close paths (brain.py, position_manager.py) now write exit_conditions. Old blank trades (254/255 7d) remain blank — new trades will have data. — 2026-09-16 ~18:30 UTC
 
 **🟢 RSI TIMEFRAME MISMATCH FIXED.** SHORT_RSI_CEILING now uses 1m data (signal_compactor.py:2728). ETC SHORT RSI=70.14 would have been blocked. — 2026-09-16 ~15:45 UTC
 
 ## Today's Changes (Sep 16)
 
-1. **daily_orchestrator ~18:30 UTC — 4 CODE FIXES APPLIED.** exit_conditions recording COMPLETED: profit_monster.py, cut_loser.py, sniper_exit.py now pass --exit-conditions to brain.py CLI. hl_fill_monitor.py passes exit_conditions= kwarg directly. All 4 callers pass exit mechanism + PnL%. New trades will have exit_conditions populated. DB: 22T 58%WR +5.11% (GOOD DAY). 0 open. Market NEUTRAL. **NO CONFIG CHANGE** — code fix only. Next: stale signal revalidation, resistance proximity filter.
+1. **brain_auditor ~18:30 UTC — 1 CODE FIX APPLIED.** exit_conditions recording COMPLETED: position_manager.py line 1089 UPDATE now includes exit_conditions = reason. Root cause: position_manager closes 150/255 7d trades (ATR SL/trail) via direct UPDATE bypassing brain.py. Previous brain.py fix only covered profit_monster/cut_loser path. DB: 24h 21T 66.7%WR +$1.33 (POSITIVE). 7d: 255T 55.7%WR +$2.72 (POSITIVE). 0 open. Market NEUTRAL. **LOSING AUTOPSY:** 7 losers — 5x pullback-entry- SHORT (4 stale, 1 fresh variance), 2x breakout-long+ (killed). ETH SHORT RSI 25.91 pre-fix (5m filter bug). **STALE:** 81/255 7d trades 31.8%. Stale WR 49.4% vs fresh 59.0%. ~$4.86/7d. **CREATIVE:** STALE_MAX_AGE_MINUTES filter — skip signals >30min. Needs backtest. **NO CONFIG CHANGE.**
+2. **daily_orchestrator ~18:30 UTC — 4 CODE FIXES APPLIED.** exit_conditions recording COMPLETED: profit_monster.py, cut_loser.py, sniper_exit.py now pass --exit-conditions to brain.py CLI. hl_fill_monitor.py passes exit_conditions= kwarg directly. All 4 callers pass exit mechanism + PnL%. New trades will have exit_conditions populated. DB: 22T 58%WR +5.11% (GOOD DAY). 0 open. Market NEUTRAL. **NO CONFIG CHANGE** — code fix only. Next: stale signal revalidation, resistance proximity filter.
 2. **brain_auditor ~17:00 UTC — NO CONFIG CHANGE.** DB: 24h 18T 55.6%WR +$0.15 (FLAT). 7d: 259T 55.6%WR +$2.67 (POSITIVE). **LOSING AUTOPSY:** 6 losers — ETH SHORT RSI=71.61 (pre-fix trade), DOT SHORT RSI=64.22 (borderline EXTREME whipsaw), ETC SHORT RSI=70.14 (BUG FIXED), 3x breakout-long+ (killed). **DRIFT:** exit_conditions brain.py fix applied but profit_monster/cut_loser NOT yet passing --exit-conditions (258/259 7d trades blank). **STALE SIGNAL:** 80 stale 50%WR -$0.64 vs 179 fresh 58.1%WR +$3.31. Gap ~$3.95/7d. **CREATIVE:** Tighten SHORT_RSI_CEILING 65→60: safe (1 trade blocked, 0 winners) but sample too small — monitor. Stale revalidation needs design.
 1. **brain_auditor ~15:45 UTC — 1 CODE FIX APPLIED.** RSI timeframe alignment FIXED: signal_compactor.py:2728 changed candles_5m → candles_1m. SHORT_RSI_CEILING now uses 1m data (matches entry_rsi_14). ETC SHORT RSI=70.14 would have been blocked. DB: 24h 17T 52.9%WR +$0.45 (FLAT). 7d: 264T 55.7%WR +$2.23 (POSITIVE). **LOSING AUTOPSY:** 6 24h losers — 3x pullback-entry- SHORT (ATR SL), 3x breakout-long+ (killed). rr_engine_resistance 36T/7d -$1.31 — #1 exit drag. **CREATIVE:** Resistance proximity filter for SHORT entries (~$0.50-0.72/7d potential). **exit_conditions** partially fixed — brain.py accepts param, callers not yet updated. **Stale signal 31.2%** — stale WR 49.4% vs fresh 58.1%.
 1. **brain_auditor ~15:00 UTC — 1 CODE FIX APPLIED.** exit_conditions recording FIXED: brain.py close_trade() now accepts exit_conditions param, adds to UPDATE statement, and CLI parser supports --exit-conditions. Callers (profit_monster, cut_loser) not yet updated — next step. DB: 24h 24T 57.7%WR +$0.55 (FLAT). 7d: 268T 55.8%WR +$3.73 (POSITIVE). **NEW FINDING: rr_engine_resistance SHORT exits 36T/7d -$1.31.** All losses ~1% (near ATR boundary). Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts. **CREATIVE:** Resistance proximity filter for SHORT entries — skip if price within 1.0% of nearest resistance. Needs data verification. **Stale signal 31.2%** — stale WR 49.4% vs fresh 58.1%.

@@ -330,9 +330,9 @@ LOSERS_REMOVE_PNL_THRESHOLD = 0.0  # Must be profitable to exit
 LOSERS_COOLDOWN_DAYS = 3           # Must be out for 3 days before re-adding
 
 # Multipliers
-LOSERS_MULT = 0.5                  # 50% score penalty in signal_compactor
+LOSERS_MULT = 0.3                  # 70% score penalty in signal_compactor (tightened from 0.5, 2026-09-16 — losers like AIXBT/KAS still trading despite penalty)
 LOSERS_SIZE_MULT = 0.5            # 50% position size reduction
-LOSERS_CONF_PENALTY = -30         # Confidence point penalty (heavy — losers rarely trade)
+LOSERS_CONF_PENALTY = -50         # Confidence point penalty (tightened from -30, 2026-09-16 — need heavier hand to suppress losers)
 
 # Hard block — coins with WR below this are completely blocked from trading
 LOSERS_HARD_BLOCK_WR = 40.0       # Below this WR = no trading at all

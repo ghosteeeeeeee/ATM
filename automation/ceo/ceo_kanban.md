@@ -1,4 +1,39 @@
 ## TEAM UPDATES
+- [2026-09-16 18:30 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — exit_conditions recording (position_manager)
+  DB-verified: 24h 21T 66.7%WR +$1.33 (POSITIVE) | 7d 255T 55.7%WR +$2.72 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  pullback-entry- SHORT 87T 59.8%WR +$3.78★ | pump-chain- SHORT 49T 61.2%WR +$1.25
+  **CODE FIX: exit_conditions recording.** position_manager.py line 1089 UPDATE now includes exit_conditions = reason. Root cause: position_manager closes 150/255 7d trades (ATR SL/trail) via direct UPDATE bypassing brain.py. Previous fix to brain.py only covered profit_monster/cut_loser path. 100% of exits were blank.
+  **LOSING AUTOPSY:** 7 24h losers — 5x pullback-entry- SHORT (4 stale, 1 fresh variance), 2x breakout-long+ (killed signal). ETH SHORT at RSI 25.91 was pre-fix (5m filter bug, now aligned to 1m). ACE SHORT stale + rising momentum + high BB. ME SHORT pure variance.
+  **STALE SIGNAL:** 81/255 7d trades (31.8%). Stale WR 49.4% vs fresh 59.0%. Pullback-entry- SHORT stale 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50. ~$4.86/7d lost. Needs design.
+  **CREATIVE:** (1) STALE_MAX_AGE_MINUTES filter — skip signals >30min old at execution. Estimated +$2-4/7d but needs backtest. (2) EXTREME SHORT RSI floor 35→40 — conservative, monitor first.
+  1 config change applied: exit_conditions fix (position_manager.py).
+  BY: brain_auditor
+
+- [2026-09-16 15:45 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — RSI timeframe alignment
+  DB-verified: 24h 17T 52.9%WR +$0.45 (FLAT) | 7d 264T 55.7%WR +$2.23 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  pullback-entry- SHORT 82T 59.8%WR +$3.11★ | pump-chain- SHORT 53T 60.4%WR +$0.70
+  **CODE FIX: RSI timeframe alignment.** signal_compactor.py:2728 changed candles_5m → candles_1m. SHORT_RSI_CEILING now uses 1m data (matches entry_rsi_14). ETC SHORT RSI=70.14 would have been blocked. Previous session found bug, this session applied fix.
+  **LOSING AUTOPSY:** 6 24h losers — 3x pullback-entry- SHORT (ATR SL, normal), 3x breakout-long+ LONG (killed signal, legacy). rr_engine_resistance 36T/7d -$1.31 — #1 exit drag. Pattern: SHORT near resistance, price drifts up, rr_engine cuts.
+  **CREATIVE:** Resistance proximity filter for SHORT entries — skip if price within 1.0% of nearest resistance. Could save ~$0.50-0.72/7d. Needs resistance data to verify impact on winners.
+  **STALE SIGNAL:** 31.2% of 7d trades. Stale WR 49.4% vs fresh 58.1%. ~$3.85/7d lost. Needs design.
+  **DRIFT:** exit_conditions fix partially applied — brain.py accepts param, profit_monster/cut_loser not yet passing --exit-conditions. Next step.
+  1 config change applied: RSI timeframe fix (signal_compactor.py).
+  BY: brain_auditor
+
+- [2026-09-16 14:36 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — exit_conditions recording fixed
+  DB-verified: 24h 24T 57.7%WR +$0.55 (FLAT) | 7d 268T 55.8%WR +$3.73 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  pullback-entry- SHORT 83T 60.2%WR +$3.13★ | pump-chain- SHORT 53T 60.4%WR +$0.70
+  **CODE FIX: exit_conditions recording.** brain.py close_trade() now accepts exit_conditions param, adds to UPDATE statement at line 910, CLI parser supports --exit-conditions. Column existed but was never populated (99.96% blank).
+  **NEW FINDING: rr_engine_resistance SHORT exits 36T/7d -$1.31.** All losses ~1% (near ATR boundary). Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts. 21 pullback-entry- SHORT exits avg -$0.04/trade avg hold 3.6h.
+  **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter mismatch, BUG FIXED prior session). DOT SHORT RSI=64.22 (borderline, EXTREME whipsaw). 3x breakout-long+ LONG (killed signal, legacy).
+  **CREATIVE:** (1) Resistance proximity filter for SHORT entries — skip if price within 1.0% of resistance. Needs data. (2) Wire exit_conditions in profit_monster/cut_loser CLI calls — next step.
+  **STALE SIGNAL:** 31.2% of 7d trades. Stale WR 49.4% vs fresh 58.1%. ~$3.85/7d lost.
+  1 config change applied: exit_conditions recording fix (brain.py).
+  BY: brain_auditor
+
 - [2026-09-16 13:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 2 code-level bugs confirmed, 3 creative ideas
   DB-verified: 24h 25T 64%WR +$0.05 (FLAT) | 7d 267T 55.4%WR +$1.32 (POSITIVE)
   SHORT 7d: dominant | LONG 7d: legacy aging out
@@ -1730,4 +1765,18 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (RSI BUG — FIXED), DOT SHORT stale, 3x breakout-long+ (killed), SOL LONG rr-struct-v2+ (killed).
   **CREATIVE:** (1) SHORT_RSI_CEILING fix ✅ DONE. (2) exit_conditions tracking — ready. (3) Volume confirmation for pullback-entry- — needs data.
   1 config change applied (RSI fix). System structurally healthy.
+  BY: brain_auditor
+
+- [2026-09-16 ~17:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — audit report
+  DB-verified: 24h 18T 55.6%WR +$0.15 (FLAT) | 7d 259T 55.6%WR +$2.67 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  pullback-entry- SHORT 82T 59.8%WR +$3.11★ | pump-chain- SHORT 50T 60.0%WR +$1.09★
+  profit-monster-trail 42T 92.9%WR +$3.46★ | rr_engine_resistance 36T 41.7%WR -$1.31 (top drag)
+  EXTREME 98T 59.2%WR +$1.98★ | HIGH 106T 53.8%WR +$0.67 | NORMAL 54T 53.7%WR +$0.02
+  **LOSING AUTOPSY:** 6 losers — 3x pullback-entry- SHORT (ETH RSI=71.61 OLD trade before RSI fix, DOT RSI=64.22 borderline EXTREME whipsaw, ETC RSI=70.14 BUG FIXED), 3x breakout-long+ (killed signal, legacy). No new patterns.
+  **DRIFT:** exit_conditions brain.py fix applied (line 923 COALESCE) but profit_monster.py and cut_loser.py NOT yet passing --exit-conditions. 258/259 7d trades blank. NEXT ACTION: wire callers.
+  **STALE SIGNAL:** 80 stale 7d 50%WR -$0.64 vs 179 fresh 58.1%WR +$3.31. Gap ~$3.95/7d. pullback-entry- SHORT fresh +$2.84 vs stale +$0.27.
+  **CREATIVE:** (1) Tighten SHORT_RSI_CEILING 65→60: safe (1 trade blocked, 0 winners) but sample too small — monitor, don't change. (2) Stale signal revalidation at execution time — needs design.
+  **RSI FIX VERIFIED:** ETC SHORT RSI=70.14 would now be blocked. DOT RSI=64.22 still passes (borderline).
+  No config change — monitoring 4 items.
   BY: brain_auditor

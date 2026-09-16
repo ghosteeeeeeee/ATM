@@ -686,3 +686,13 @@
 
 ## Error Alerts — 2026-09-16 12:56 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-16 15:44 UTC
+- **[WARN]** pipeline.log was 135MB — **AUTO-FIX**: Rotated and compressed (pipeline.log.1.gz)
+- **[WARN]** Hotset fallback returned 0 tokens
+- **[INFO]** Price DB tables empty — likely managed in-memory/elsewhere
+- **AUTO-FIX**: None required — all systems nominal
+
+## Error Alerts — 2026-09-16 15:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

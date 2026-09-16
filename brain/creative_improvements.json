@@ -817,5 +817,45 @@
     "risk": "medium (could block valid entries if revalidation too aggressive)",
     "code_change": "signal_compactor.py — add execution-time RSI/BB check before trade open",
     "impact_on_winners": "Needs analysis — some stale entries are still winners"
+  },
+  {
+    "date": "2026-09-16T15:45:00Z",
+    "idea": "Resistance proximity filter for SHORT entries",
+    "rationale": "rr_engine_resistance is the #1 exit drag at -$1.31/7d (36 exits). Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts at ~1%. A filter that blocks SHORT entries within 1.0% of nearest resistance could prevent ~18 of these exits. At avg -$0.04/trade, thats ~$0.72/7d saved.",
+    "expected_impact": "+$0.50-0.72/7d (preventing near-resistance SHORT entries)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs resistance level data to verify",
+    "impact_on_winners": "Needs verification — some winning SHORTs may also enter near resistance"
+  },
+  {
+    "date": "2026-09-16T16:34:18.550746+00:00",
+    "idea": "Tighten SHORT_RSI_CEILING 65→60",
+    "rationale": "SHORT trades with entry_rsi 60-70: only 1 trade (DOT RSI=64.22, -/usr/bin/bash.25). 0%WR in 60-70 range. 0%WR in >=70 range. 0%WR in >=60 range total. Tightening would block 1 additional losing trade with 0 winners blocked.",
+    "expected_impact": "Blocks 1 trade (-/usr/bin/bash.25) with 0 winners blocked. Sample too small to deploy.",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "data": {
+      "short_rsi_60_70_7d": "1T 0%WR -$0.25",
+      "short_rsi_60_65_7d": "1T 0%WR -$0.25",
+      "short_rsi_65_70_7d": "0T (blocked by current CEILING post-fix)",
+      "short_rsi_70_7d": "2T 0%WR -$0.42 (would be blocked anyway)",
+      "short_rsi_60_plus_7d": "3T 0%WR -$0.67"
+    }
+  },
+  {
+    "date": "2026-09-16T16:34:18.550762+00:00",
+    "idea": "Execution-time revalidation for stale signals",
+    "rationale": "Stale signals: 80T 50%WR -$0.64 vs fresh 179T 58.1%WR +$3.31. Gap ~$3.95/7d. If signal age > 10min at execution, re-check RSI filter. Would catch ETC-type cases (RSI moved above ceiling between detection and execution).",
+    "expected_impact": "Unknown — need to quantify how many stale trades have drifted RSI values.",
+    "category": "entry sniper",
+    "status": "needs_design",
+    "risk": "medium",
+    "data": {
+      "stale_7d": "80T 50%WR -$0.64",
+      "fresh_7d": "179T 58.1%WR +$3.31",
+      "gap": "~$3.95/7d"
+    }
   }
 ]

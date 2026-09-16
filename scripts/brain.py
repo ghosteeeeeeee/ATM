@@ -794,13 +794,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     return trade_id
 
 def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
-                 notes: str = None, close_reason: str = None, skip_hl: bool = False):
+                 notes: str = None, close_reason: str = None, skip_hl: bool = False,
+                 exit_conditions: str = None):
     """Close an existing trade. Computes PnL from signal prices (no extra HL API calls).
 
     Args:
         skip_hl: If True, skip HL /info lookup and use signal-based PnL directly.
                  Saves 1 HL API call per close. Use for automated closes (profit-monster,
                  guardian, etc.) where signal exit price is sufficient.
+        exit_conditions: Optional string describing exit conditions at close time.
+                         Stored in trades.exit_conditions for exit analysis.
 
     Bug-G fix: wrap entire body in try/finally to prevent connection leak on any error.
     """
@@ -809,14 +812,14 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
     try:
         cur = conn.cursor()
         try:
-            return _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur)
+            return _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur, exit_conditions)
         finally:
             cur.close()
     finally:
         conn.close()
 
 
-def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur):
+def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur, exit_conditions=None):
     """Implementation of close_trade. Assumes conn/cur are managed by caller."""
     # Get trade metadata
     cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
@@ -917,9 +920,10 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             close_time    = NOW(),
             close_reason  = %s,
             exit_reason   = %s,
+            exit_conditions = COALESCE(%s, exit_conditions),
             notes         = COALESCE(%s, '')
         WHERE id = %s AND status = 'open'
-    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, notes, trade_id))
+    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, exit_conditions, notes, trade_id))
 
     conn.commit()
 
@@ -1263,6 +1267,8 @@ if __name__ == "__main__":
         close_parser.add_argument("--pnl", type=float, help="Manual PnL override")
         close_parser.add_argument("--notes", help="Exit notes")
         close_parser.add_argument("--close-reason", help="Close reason tag (e.g. profit-monster)")
+        close_parser.add_argument("--exit-conditions", dest="exit_conditions",
+                                  help="Exit conditions description (stored in trades.exit_conditions)")
         close_parser.add_argument("--skip-hl", action="store_true",
                                   help="Skip HL /info lookup — use signal-based PnL (saves 1 API call)")
         
@@ -1319,7 +1325,7 @@ if __name__ == "__main__":
         
         elif args.subcommand == "close":
             close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason,
-                        skip_hl=args.skip_hl)
+                        skip_hl=args.skip_hl, exit_conditions=args.exit_conditions)
             print(f"✓ Closed trade #{args.id} @ ${args.exit_price}")
         
         elif args.subcommand == "list":
