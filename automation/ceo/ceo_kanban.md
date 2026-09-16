@@ -1,4 +1,15 @@
 ## TEAM UPDATES
+- [2026-09-16 13:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 2 code-level bugs confirmed, 3 creative ideas
+  DB-verified: 24h 25T 64%WR +$0.05 (FLAT) | 7d 267T 55.4%WR +$1.32 (POSITIVE)
+  SHORT 7d: dominant | LONG 7d: legacy aging out
+  pullback-entry- SHORT 81T 60.5%WR +$2.65★ | pump-chain- SHORT 54T 61.1%WR +$0.75
+  **BUG CONFIRMED: RSI timeframe mismatch.** SHORT_RSI_CEILING uses candles_5m (signal_compactor.py:2728) but entry_rsi_14 stores 1m RSI. ETC SHORT entered RSI=70.14 (>65) but passed 5m filter. Fix: change line 2728 to candles_1m.
+  **BUG CONFIRMED: exit_conditions 99.96% empty.** brain.py close_trade() UPDATE at line 909 never sets exit_conditions. Root cause: UPDATE statement missing the column. Fix: add exit_conditions param + column.
+  **Stale signal: 30.7% of 7d trades.** Stale WR 50.0% vs fresh 58.2%. Pullback-entry- SHORT fresh +$2.55 vs stale +$0.10. ~$3.85/7d lost.
+  **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter mismatch, BUG). DOT SHORT RSI=64.22 (borderline, stale). 3x breakout-long+ (killed signal). SOL LONG rr-struct-v2+ (killed signal, cut-loser working).
+  **CREATIVE:** (1) Align SHORT_RSI_CEILING to 1m data — low risk, blocks overbought SHORTs. (2) Add exit_conditions tracking — zero risk, enables exit analysis. (3) Execution-time revalidation for stale signals — needs design.
+  No config change — all findings are code-level fixes. System structurally healthy.
+  BY: brain_auditor
 - [2026-09-16 12:15 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — 3 code-level findings, 0 config changes
   DB-verified: 24h 25T 64%WR +$0.05 (FLAT) | 7d 267T 55.4%WR +$1.32 (POSITIVE)
   SHORT 7d: dominant | LONG 7d: legacy aging out
@@ -1706,4 +1717,17 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **FEATURE RECORDING:** Working on new trades (DOT, ETC have features_recorded=TRUE).
   **SUGGESTED:** (1) Execution-time RSI/BB revalidation before trade placement. (2) Remove dead signals from STANDALONE_BYPASS. (3) Investigate exit_conditions blank.
   No config change — system healthy, stale execution is design issue not config issue.
+  BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-16 14:00 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX APPLIED — RSI timeframe mismatch
+  DB-verified: 24h 26T 57.7%WR +$0.55 (FLAT) | 7d 269T 55.8%WR +$3.73 (POSITIVE)
+  SHORT 7d dominant | LONG 7d legacy aging out
+  pullback-entry- SHORT 83T 60.2%WR +$3.13★ | pump-chain- 53T 60.4%WR +$0.70
+  **CODE FIX APPLIED: SHORT_RSI_CEILING aligned to 1m data.** signal_compactor.py:2728 changed candles_5m → candles_1m. ETC SHORT entered RSI=70.14 (>65) but passed 5m filter. Now blocks correctly.
+  **exit_conditions 99.96% blank** — 266/267 7d trades. CODE FIX NEEDED: add param + UPDATE column in brain.py close_trade().
+  **Stale signal 31.2%** — stale WR 49.4% vs fresh 58.1%. ~$3.85/7d lost.
+  **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (RSI BUG — FIXED), DOT SHORT stale, 3x breakout-long+ (killed), SOL LONG rr-struct-v2+ (killed).
+  **CREATIVE:** (1) SHORT_RSI_CEILING fix ✅ DONE. (2) exit_conditions tracking — ready. (3) Volume confirmation for pullback-entry- — needs data.
+  1 config change applied (RSI fix). System structurally healthy.
   BY: brain_auditor

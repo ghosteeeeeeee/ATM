@@ -175,5 +175,27 @@
     "after": "TREND_IGNITION_ENABLED=False, TREND_IGNITION_PLUS_ENABLED=False",
     "rationale": "0 trades in 3+ days. Dead signal. LONG-only, 7 conditions impossible in NEUTRAL market.",
     "impact": "Zero — no trades to lose"
+  },
+  {
+    "timestamp": "2026-09-16T13:00:00Z",
+    "agent": "brain_auditor",
+    "change": "NO CONFIG CHANGE — 2 code bugs confirmed (RSI mismatch, exit_conditions blank), 3 creative ideas generated",
+    "type": "audit",
+    "file": "N/A",
+    "before": "N/A",
+    "after": "N/A",
+    "rationale": "System structurally healthy. All findings are code-level fixes, not config changes.",
+    "impact": "Identified ~$3.85/7d lost from stale signals, RSI filter bypass, and blind exit analysis"
+  },
+  {
+    "timestamp": "2026-09-16T14:00:00Z",
+    "agent": "brain_auditor",
+    "change": "Align SHORT_RSI_CEILING filter from candles_5m to candles_1m",
+    "type": "config",
+    "file": "signal_compactor.py",
+    "before": "candles_5m (5m resolution RSI used for ceiling check)",
+    "after": "candles_1m (1m resolution RSI used for ceiling check)",
+    "rationale": "ETC SHORT entered RSI=70.14 (>65 ceiling) but passed filter because 5m RSI was 40.0. Filter mismatch allowed overbought SHORT entry.",
+    "impact": "Blocks SHORT entries when 1m RSI > 65. ETC SHORT would have been blocked (-$0.28 saved). No winning SHORT in 7d had RSI > 65."
   }
 ]

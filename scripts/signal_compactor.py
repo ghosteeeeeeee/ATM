@@ -3214,9 +3214,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _sf_conn = sqlite3.connect(CANDLES_DB, timeout=5)
                                 _sf_cur = _sf_conn.cursor()
                                 _sf_cur.execute("""
-                                    SELECT close FROM candles_5m
-                                    WHERE token = ? AND is_closed = 1
-                                    ORDER BY ts DESC LIMIT 15
+                        SELECT close FROM candles_1m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
                                 """, (pe['token'].upper(),))
                                 _sf_closes = [r[0] for r in _sf_cur.fetchall()]
                                 _sf_conn.close()

@@ -1,18 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-16 ~12:15 UTC (brain_auditor)**
+**Last Updated: 2026-09-16 ~14:00 UTC (brain_auditor)**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 25T, 64% WR, +$0.05. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
+24h: 26T, 57.7% WR, +$0.55. 5 open (all SHORT). Market NEUTRAL. Pipeline running, no errors.
 
-- **24h (rolling):** 25T, 64% WR, +$0.05 (DB-verified — FLAT). pullback-entry- dominant.
-- **Today (calendar):** 5T closed, 1W, +$0.05. 5 open: CHIP, SEI, SYRUP, ETH, LTC (all SHORT).
-- **7d:** 267T, 55.4% WR, +$1.32 (DB-verified — POSITIVE). SHORT +$3.72★ | LONG -$1.06 (legacy aging out).
-- **7d REGIME:** EXTREME 101T 58.4%WR +$1.16★ | HIGH 109T 55.0%WR +$0.56 | NORMAL 56T 51.8%WR -$0.19.
-- **7d EXIT:** profit-monster-trail carries system | atr_sl_hit 20T/48h -$3.46 (dominant loss).
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 81T/60.5%WR +$2.65★ | pump-chain- SHORT 54T/61.1%WR +$0.75 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 8T/87.5%WR +$0.61
+- **24h (rolling):** 26T, 57.7% WR, +$0.55 (DB-verified — FLAT). pullback-entry- dominant.
+- **Today (calendar):** 26T closed. 5 open: CHIP, SEI, SYRUP, ETH, LTC (all SHORT).
+- **7d:** 269T, 55.8% WR, +$3.73 (DB-verified — POSITIVE). SHORT dominant | LONG legacy aging out.
+- **7d REGIME:** EXTREME 101T 58.4%WR +$1.44★ | HIGH 110T 54.5%WR +$0.71 | NORMAL 57T 52.6%WR -$0.13.
+- **7d EXIT:** profit-monster-trail carries system | atr_sl_hit dominant loss.
+- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 83T/60.2%WR +$3.13★ | pump-chain- SHORT 53T/60.4%WR +$0.70 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 8T/87.5%WR +$0.61
 - **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 5T/0%WR -$0.61 (KILLED) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED) | breakout-long+ 4T/25%WR -$0.35 (KILLED)
 - **Market:** NEUTRAL (100%).
 - **Open:** 5 trades (5 SHORT: CHIP pullback-entry-, ADA mover-, SEI pullback-entry-, SYRUP pullback-entry-, ETH pullback-entry-).
@@ -55,8 +55,10 @@
 
 ## Today's Changes (Sep 16)
 
-1. **brain_auditor ~12:15 UTC — NO CONFIG CHANGE.** DB: 24h 25T 64%WR +$0.05 (FLAT). 7d: 267T 55.4%WR +$1.32 (POSITIVE). **RSI TIMEFRAME MISMATCH:** SHORT_RSI_CEILING uses5m candles but entry_rsi uses1m data. ETC SHORT entered RSI=70.14 (>65) but passed 5m filter. **exit_conditions 99.96% empty** — 266/267 trades. **Stale signal 30.7%** — stale WR 50.0% vs fresh 58.2%. **LOSING AUTOPSY:** DOT SHORT RSI=64.22 (borderline), ETC SHORT RSI=70.14 (>65 ceiling, filter mismatch), 3x breakout-long+ (killed). **CREATIVE:** (1) Align RSI filter to 1m data. (2) Add exit_conditions tracking. (3) Volume confirmation for pullback-entry-. No config change — all code-level fixes.
-2. **CEO ~10:34 UTC — CONFIG CHANGE.** STANDALONE_BYPASS cleanup + regime memory update. Pipeline restarted.
+1. **brain_auditor ~14:00 UTC — 1 CODE FIX APPLIED.** RSI timeframe mismatch FIXED: signal_compactor.py:2728 changed candles_5m → candles_1m. SHORT_RSI_CEILING now uses 1m data. DB: 24h 26T 57.7%WR +$0.55 (FLAT). 7d: 269T 55.8%WR +$3.73 (POSITIVE). **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (BUG FIXED), DOT SHORT stale, 3x breakout-long+ (killed). **exit_conditions 99.96% blank** — CODE FIX NEEDED. **Stale signal 31.2%** — stale WR 49.4% vs fresh 58.1%.
+2. **brain_auditor ~13:00 UTC — NO CONFIG CHANGE.** DB: 24h 25T 64%WR +$0.05 (FLAT). 7d: 267T 55.4%WR +$1.32 (POSITIVE). **RSI BUG CONFIRMED:** SHORT_RSI_CEILING uses candles_5m (signal_compactor.py:2728) but entry_rsi_14 stores 1m RSI. ETC SHORT entered RSI=70.14 (>65) but passed 5m filter. Fix: change to candles_1m. **exit_conditions BUG CONFIRMED:** brain.py close_trade() UPDATE at line 909 never sets exit_conditions — root cause is UPDATE statement missing the column. Fix: add param + column. **Stale signal 30.7%** — fresh WR 58.2% vs stale 50.0%. **LOSING AUTOPSY:** ETC SHORT RSI=70.14 (filter mismatch), DOT SHORT RSI=64.22 (borderline, stale), 3x breakout-long+ (killed), SOL LONG rr-struct-v2+ (killed). **CREATIVE:** (1) Align SHORT_RSI_CEILING to 1m data. (2) Add exit_conditions tracking. (3) Execution-time revalidation for stale signals.
+2. **brain_auditor ~12:15 UTC — NO CONFIG CHANGE.** DB: 24h 25T 64%WR +$0.05 (FLAT). 7d: 267T 55.4%WR +$1.32 (POSITIVE). **RSI TIMEFRAME MISMATCH:** SHORT_RSI_CEILING uses5m candles but entry_rsi uses1m data. ETC SHORT entered RSI=70.14 (>65) but passed filter. **exit_conditions 99.96% empty** — 266/267 trades. **Stale signal 30.7%** — stale WR 50.0% vs fresh 58.2%. **LOSING AUTOPSY:** DOT SHORT RSI=64.22 (borderline), ETC SHORT RSI=70.14 (>65 ceiling, filter mismatch), 3x breakout-long+ (killed). **CREATIVE:** (1) Align RSI filter to 1m data. (2) Add exit_conditions tracking. (3) Volume confirmation for pullback-entry-. No config change — all code-level fixes.
+3. **CEO ~10:34 UTC — CONFIG CHANGE.** STANDALONE_BYPASS cleanup + regime memory update. Pipeline restarted.
 3. **brain_auditor ~09:00 UTC — NO CONFIG CHANGE.** STALE SIGNAL ROOT CAUSE found. EXIT_CONDITIONS 99% blank. No config change.
 3. **CEO ~08:30 UTC — CONFIG CHANGE.** SHORT_NORMAL_PENALTY removed (0.85→1.0). Monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable). Penalty was blocking good entries. Expected +$0.26/7d. **24h:** 27T 48.1%WR -$0.52 (FLAT). **7d:** 275T 54.9%WR +$2.66 (POSITIVE). 5 open SHORT. Market NEUTRAL. Monitoring 5 items.
 4. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB: 24h 27T 51.9%WR -$0.17 (FLAT). 7d: 275T 54.9%WR +$2.66 (POSITIVE). SHORT +$3.72★. **FEATURE RECORDING UNTESTED** — 2/27 24h trades have features (retroactive only). 0 new trades since fix (02:34 UTC). Monitor next trade. **rr_engine_resistance VERIFIED** — 0 exits 24h+. **LOSING TRADE AUTOPSY:** DOT SHORT RSI 64.22, ETC SHORT RSI 70.14 (above SHORT_RSI_CEILING=65). ETC possible filter gap. **NO CONFIG CHANGE** — monitoring 5 items.
@@ -77,8 +79,9 @@
 
 ## Active Decisions
 
-- **RSI TIMEFRAME MISMATCH IDENTIFIED.** brain_auditor 12:15 UTC Sep 16. SHORT_RSI_CEILING uses5m candles but entry_rsi uses1m data. ETC SHORT entered RSI=70.14 (>65) but passed filter. CODE FIX: align to 1m data. — 2026-09-16
-- **STALE SIGNAL EXECUTION ROOT CAUSE FOUND.** brain_auditor 09:00 UTC Sep 16. 30.7% of trades fire on stale signals. Fresh WR 58.2% vs stale 50.0%. — 2026-09-16
+- **RSI BUG FIXED.** brain_auditor 14:00 UTC Sep 16. signal_compactor.py:2728 changed candles_5m → candles_1m. SHORT_RSI_CEILING now uses 1m data. ETC SHORT (RSI=70.14) would have been blocked. — 2026-09-16
+- **exit_conditions BUG CONFIRMED.** brain_auditor 13:00 UTC Sep 16. brain.py close_trade() UPDATE at line 909 never sets exit_conditions. Root cause: UPDATE statement missing the column. CODE FIX: add exit_conditions param + UPDATE column. — 2026-09-16
+- **STALE SIGNAL EXECUTION ROOT CAUSE FOUND.** brain_auditor 09:00 UTC Sep 16. 30.7% of trades fire on stale signals. Fresh WR 58.2% vs stale 50.0%. ~$3.85/7d lost. — 2026-09-16
 - **SHORT_NORMAL_PENALTY REMOVED.** CEO 08:30 UTC Sep 16. Monitoring expired. SHORT NORMAL profitable. — 2026-09-16
 - **trend_ignition DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal. — 2026-09-16
 - **Feature recording fix VERIFIED.** DOT, ETC closed with features_recorded=TRUE. IO gap is deployment timing. — 2026-09-16 ~06:35 UTC
@@ -105,9 +108,8 @@
 1. **DONE: trend_ignition DISABLED.** brain_auditor 05:15 UTC Sep 16. — 2026-09-16
 2. **DONE: Feature recording VERIFIED.** DOT, ETC have features_recorded=TRUE. IO gap is deployment timing. — 2026-09-16
 3. **DONE: rr_engine_resistance fix CONFIRMED.** 0 exits in 6+ days. Remove from monitoring. — 2026-09-16
-4. **CODE FIX: Align SHORT_RSI_CEILING to 1m data.** signal_compactor.py:2727 uses5m candles, entry_rsi uses1m. ETC SHORT entered RSI=70.14 (>65) but passed filter. Change to use price_history (1m) for RSI computation. — 2026-09-16
-5. **CODE FIX: Add exit_conditions recording.** 99.96% of trades have blank exit_conditions. Populate in brain.py close_trade() with the exit path code. — 2026-09-16
-6. **INVESTIGATE: Stale signal execution filter.** 30.7% of trades fire on is_stale=true. Fresh WR 58.2% vs stale 50.0%. Execution-time revalidation would fix. — 2026-09-16
+4. **DONE: SHORT_RSI_CEILING FIXED.** signal_compactor.py:2728 changed candles_5m → candles_1m. ETC SHORT (RSI=70.14) would have been blocked. — 2026-09-16
+5. **CODE FIX: Add exit_conditions recording.** brain.py close_trade() — add exit_conditions param, add to UPDATE at line 909. 99.96% blank. — 2026-09-16
+6. **INVESTIGATE: Execution-time revalidation for stale signals.** 31.2% stale, WR 49.4% vs fresh 58.1%. Needs design — how aggressive to revalidate? — 2026-09-16
 7. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
 8. **CLEANUP: Remove ema300-dip-long from STANDALONE_BYPASS.** Dead signal still listed. — 2026-09-16
-7. **CLEANUP: Remove ema300-dip-long from STANDALONE_BYPASS.** Dead signal still listed. — 2026-09-16

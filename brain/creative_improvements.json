@@ -783,5 +783,39 @@
     "category": "regime filter",
     "status": "needs_more_data",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-16T13:00:00Z",
+    "idea": "Align SHORT_RSI_CEILING to 1m candle data",
+    "rationale": "SHORT_RSI_CEILING filter uses candles_5m (signal_compactor.py:2728) but entry_rsi_14 stores 1m RSI. ETC SHORT entered RSI=70.14 (>65) but passed 5m filter. This lets overbought SHORT entries through.",
+    "expected_impact": "Block overbought SHORT entries that bypass filter. ETC SHORT -$0.28 would have been blocked.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "code_change": "signal_compactor.py:2728 — change candles_5m to candles_1m",
+    "impact_on_winners": "Would not block any recent winners (DOT SHORT RSI=64.22 < 65 passes)"
+  },
+  {
+    "date": "2026-09-16T13:00:00Z",
+    "idea": "Add exit_conditions recording to close_trade()",
+    "rationale": "99.96% of 7d trades have blank exit_conditions. Cannot determine which exit path was taken. Makes exit optimization impossible.",
+    "expected_impact": "Enables exit path analysis. Currently blind to which exit mechanism fires for each trade.",
+    "category": "data quality",
+    "status": "boosted",
+    "risk": "zero (additive only)",
+    "code_change": "brain.py close_trade() — add exit_conditions param + UPDATE column at line 909",
+    "impact_on_winners": "Zero — purely additive",
+    "boosted_at": "2026-09-16T12:10:34.909421+00:00"
+  },
+  {
+    "date": "2026-09-16T13:00:00Z",
+    "idea": "Execution-time revalidation gate for stale signals",
+    "rationale": "30.7% of 7d trades fire on stale signals. Fresh WR 58.2% vs stale 50.0%. ~$3.85/7d lost. Filters run at detection time but conditions change before execution.",
+    "expected_impact": "+$3-5/7d by blocking stale entries where RSI/BB conditions have shifted",
+    "category": "entry sniper",
+    "status": "needs-design",
+    "risk": "medium (could block valid entries if revalidation too aggressive)",
+    "code_change": "signal_compactor.py — add execution-time RSI/BB check before trade open",
+    "impact_on_winners": "Needs analysis — some stale entries are still winners"
   }
 ]
