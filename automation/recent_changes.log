@@ -1993,3 +1993,14 @@
   24h: 28T 50%WR +$0.04 | 82% atr_sl_hit
   No signal meets kill criteria. breakout-long+ 2T/0%WR but below 3T threshold.
   BY: auto_1hr
+[2026-09-16 00:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 1T closed (IMX SHORT +/usr/bin/bash.16), 0 open
+  24h: 29T 51.7%WR +/usr/bin/bash.16 | 83% atr_sl_hit
+  No signal meets kill criteria. breakout-long+ 2T/0%WR below 3T threshold.
+  BY: auto_1hr
+[2026-09-16 01:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (flat), 4 open (DOT SHORT, BIGTIME LONG, SYRUP SHORT, ETH SHORT)
+  24h: 28T 53.6%WR +/usr/bin/bash.16 | 82% atr_sl_hit
+  No signal meets kill criteria. breakout-long+ 3T all-time 0%WR but 0 trades in last hour.
+  Root cause: breakout-long+ fires LONG in NEUTRAL without BTC regime gate — needs code fix.
+  BY: auto_1hr

@@ -5218,3 +5218,63 @@ BY: auto_1hr
 - breakout-long+ has NO BTC regime filtering (code-level issue, fires LONG in BEAR_TREND). 2T/0%WR. Needs regime gate added in breakout_long.py — out of scope for hourly constants changes.
 
 BY: auto_1hr
+
+## [2026-09-16 00:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win)
+**PnL:** +$0.16 (WR: 100%) — IMX SHORT pullback-entry- (atr_sl_hit at profit)
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 20T 57.9%WR +$0.59 avg (backbone)
+- pump-chain- SHORT: 2T 100%WR +$0.35
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- rr-struct-v2+ LONG: 4T 0%WR -$0.54 (KILLED 09-15)
+- breakout-long+ LONG: 2T 0%WR -$0.45 (below 3T kill threshold)
+
+**Exit reasons (24h):** 83% atr_sl_hit (24/29) | 2 cut-loser-MAE | 1 hard_sl | 1 trail | 1 None
+
+**Changes:** None — breakout-long+ at 2T (needs 3+), no other kill candidate
+
+**No Change Needed:**
+- Kill criteria not triggered (breakout-long+ 2T/0%WR, below 3T threshold)
+- Trade frequency healthy (1/hr)
+- ATR SL 83% — structural, expected with tpsl_utils.py
+- PnL trend flat (last 6h: $0.16 total)
+
+**Monitoring:**
+- breakout-long+ — 1 more trade triggers kill review
+- Open positions watching
+
+BY: auto_1hr
+
+## [2026-09-16 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (1 in last 2h: IMX SHORT +$0.16 atr_sl_hit at profit)
+**24h:** 28T 53.6%WR +$0.16 total | 82% atr_sl_hit
+
+**Signal health (24h):**
+- pullback-entry- SHORT: 19T 63.2%WR +$0.77 (backbone)
+- pump-chain- SHORT: 2T 100%WR +$0.35
+- grind-breakout- SHORT: 1T 100%WR +$0.03
+- breakout-long+ LONG: 2T/24h 0%WR -$0.45 | 3T all-time 0%WR (NEEDS CODE FIX)
+- rr-struct-v2+ LONG: 4T 0%WR -$0.54 (KILLED 09-15)
+
+**Open positions (4):** DOT SHORT, BIGTIME LONG, SYRUP SHORT, ETH SHORT
+- All tokens NEUTRAL regime (15m scanner, 01:00 UTC)
+- BTC aggregate: NEUTRAL (125 neutral, 2 short bias)
+
+**Exit reasons (24h):** 82% atr_sl_hit (23/28) | 2 cut-loser-MAE | 1 hard_sl | 1 trail
+
+**Changes:** None — no kill criteria met (0 trades in last hour for any signal)
+
+**No Change Needed:**
+- Kill criteria not triggered: breakout-long+ 0 trades in last hour (strict 3+/hr not met)
+- Trade frequency: 0-1/hr — quiet, well-filtered
+- ATR SL 82% — structural, expected
+- All open positions in NEUTRAL regime — valid
+
+**Monitoring:**
+- breakout-long+ 3T all-time 0%WR — root cause: no BTC regime gate (fires LONG in NEUTRAL/BEAR). Needs code fix in breakout_long.py, not constants toggle. Flag for CEO.
+- System quiet — only 1 trade closed in last 2h
+
+BY: auto_1hr
