@@ -511,7 +511,8 @@ def check_trader_exits(new_fills: list):
                 trade_id=perf['trade_id'],
                 exit_price=current_price,
                 close_reason='trader_exit',
-                notes=f"Trader {wallet[:10]}... exited {coin}"
+                notes=f"Trader {wallet[:10]}... exited {coin}",
+                exit_conditions=f"trader-exit({wallet[:8]})"
             )
             update_trader_performance(perf['trade_id'], current_price, 'trader_exit')
         except Exception as e:

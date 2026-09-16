@@ -205,6 +205,7 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
     cmd = [sys.executable, BRAIN_CMD, "trade", "close", str(trade_id), exit_price,
            "--notes", f"profit-monster-{tier}({pnl_pct:.2f}%)",
            "--close-reason", f"profit-monster-{tier}",
+           "--exit-conditions", f"profit-monster-{tier}({pnl_pct:.2f}%)",
            "--skip-hl"]
     try:
         import subprocess

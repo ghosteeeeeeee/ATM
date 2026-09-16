@@ -746,6 +746,7 @@ def sniper_close_position(pos, reason, dry_run=False):
     cmd = [_sys.executable, BRAIN_CMD, "trade", "close", str(trade_id), exit_price,
            "--notes", f"sniper({pnl_pct:+.2f}%)",
            "--close-reason", reason,
+           "--exit-conditions", f"sniper({pnl_pct:+.2f}%, reason={reason})",
            "--skip-hl"]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
