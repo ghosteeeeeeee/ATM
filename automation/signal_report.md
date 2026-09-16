@@ -1,28 +1,49 @@
-=== Signal Performance Report ===
-Period: 2026-09-15 ~07:00 UTC (6h + 24h)
+# Signal Performance Report
+**Generated:** 2026-09-16 05:09 UTC | **Period:** Last 6h + 24h
 
-## 24h Summary
-Total: 28 trades, 50% WR, -$0.18 PnL
+## Overall Stats (24h)
+- **Total trades:** 28 | **WR:** 50.0% | **PnL:** -$0.42
+- **Active signals:** 3 (pullback-entry- SHORT, grind-breakout- SHORT, grind-breakout+ LONG)
+
+---
+
+## WINNERS (WR > 55%, PnL > 0)
+
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| pullback-entry- | SHORT | 4 | 50.0% | -$0.35 | 21 | 61.9% | +$0.44 | ENABLED |
+
+**Regime breakdown (all time):** EXTREME 64.7% WR (17T) | HIGH 60% WR (40T) | NORMAL 58.3% WR (24T)
+**Boost executed:** Relaxed NORMAL gate 0.0→0.8 in volatility_gate_v2.py (SHORT wins58% in NORMAL, LONG killed)
+
+---
 
 ## KILLED (executed this cycle)
-None — no signals met kill criteria.
 
-## BOOSTED (executed this cycle)
-None — pullback-entry- SHORT (57.9% WR, +$0.43) is the only 5+ trade signal; consistent but already at natural priority.
+None — both candidates were already killed:
+- **breakout-long+ LONG**: killed 2026-09-16 02:08 UTC (0% WR, -$0.60)
+- **rr-struct-v2+ LONG**: killed 2026-09-15 (0% WR, -$0.29)
+
+---
 
 ## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| rr-struct-v2+ | LONG | 0.0% | -$0.54 | 4 | ALREADY DEAD (2026-09-15) |
-| breakout-long+ | LONG | 0.0% | -$0.45 | 2 | Watch — below kill threshold (needs 5+) |
 
-## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 57.9% | +$0.43 | 19 | Active — best performer |
-| pump-chain- | SHORT | 100% | +$0.35 | 2 | Insufficient sample |
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|-------|--------|---------|--------|
+| grind-breakout- | SHORT | 1 | 100% | +$0.03 | WATCH (too few trades) |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
 
 ## ISSUES
-- No signal inversions detected.
-- breakout-long+ all-time: 5T 40% WR -$0.23 — losing in HIGH regime (4T 25% WR). EXTREME regime 1T 100% but tiny sample. If next cycle adds 3+ losing trades, kill BREAKOUT_LONG_PLUS_ENABLED.
-- Overall system slightly negative (-$0.18 on 28 trades) — mostly from rr-struct-v2+ (already dead) and breakout-long+ (watch).
+
+- None this cycle. System healthy.
+
+---
+
+*Report generated 2026-09-16 05:09 UTC. Next report: ~6h.*
