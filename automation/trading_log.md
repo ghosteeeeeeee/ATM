@@ -250,3 +250,32 @@
 **Monitoring:**
 - System flat — waiting for next signal
 - pullback-entry- only active signal (12T/24h), 7d +$2.80, today 36.4%WR (below avg but small sample)
+
+## [2026-09-16 22:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system flat)
+**PnL:** $0.00
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T (67%) avg -$0.041 — dominant exit, losses small (1-2% per trade)
+- profit-monster-trail: 2T +$0.14, 100%WR
+- hard_tp: 1T +$0.34
+- HARD_SL_FAILED: 1T -$0.25 — guardian safety
+- HL_CLOSED: 1T -$0.23 — guardian safety
+
+**24h by signal:**
+- pullback-entry-: 12T, -$0.40 total — only active signal, 81T/7d +$1.23
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- ATR SL 67% of closes — expected with 1.3% SL / 3.9% TP (3:1 R:R). Losses avg -$0.041/trade (small)
+- Trailing working: SYRUP +$0.22, CHIP +$0.31, IMX +$0.16 locked profit via trailing
+- Trade frequency 0/hr — system flat, healthy
+- 7d losers all already disabled
+- pump-chain- 49T/7d +$1.25, pullback-entry- 81T/7d +$1.23 — both profitable
+
+**Monitoring:**
+- System flat — waiting for next signal
+- ATR SL at 1.3% floor (ATR_SL_MIN) working as designed

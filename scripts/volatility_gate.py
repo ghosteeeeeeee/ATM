@@ -104,6 +104,8 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'volume-breakout-long+',  # volume-confirmed breakout LONG — works in normal vol
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
@@ -150,6 +152,7 @@ REGIME_SIGNALS = {
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
         'hl_copy_trader',  # pro trader copy — works in all regimes
+        'volume-breakout-long+',  # volume-confirmed breakout LONG — works in high vol
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal

@@ -706,3 +706,6 @@
 
 ## Error Alerts — 2026-09-16 19:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-16 22:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
