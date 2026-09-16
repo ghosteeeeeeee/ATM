@@ -2076,3 +2076,10 @@
   Dead signals (breakout-long+, rr-struct-v2+) already disabled — legacy trades aging out.
   5 SHORT positions open (ETH, SYRUP, SEI, CHIP, LTC)
   BY: auto_1hr
+
+[2026-09-16 09:00 UTC] auto_1hr: NO CHANGE — 24h flat, all bleeding signals already disabled
+  24h: 26T 53.8%WR -$0.15 (FLAT) | 7d: 268T 55.6%WR +$1.59 (POSITIVE)
+  ATR_SL_MIN fix holding: 19/26 exits atr_sl_hit, avg -$0.004
+  All dead signals already disabled: pullback-entry+, ema300-dip-long, trend_purity+
+  Monitoring: breakout-long+ 3T/24h 0%WR, rr-struct-v2+ 3T/24h 0%WR
+  BY: auto_1hr

@@ -5563,3 +5563,45 @@ BY: auto_1hr
 - Quiet market — no regime shift signals yet
 - CHIP SHORT showing 269% PnL — check if size is correct
 BY: auto_1hr
+
+## [2026-09-16 09:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L +$0.06)
+- LTC SHORT r2-trend-short3 profit-monster-trail: +$0.06
+
+**24h:** 26T 53.8%WR -$0.15 | **7d:** 268T 55.6%WR +$1.59
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T (73%) avg -$0.004 — ATR_SL_MIN fix holding, near breakeven
+- profit-monster-trail: 3T avg +$0.057 — strong
+- cut-loser-MAE-GUARD: 2T avg -$0.065 — new exit reason, low sample
+- hard_sl: 1T avg -$0.12
+- None: 1T $0.00
+
+**24h by Signal:**
+- pullback-entry- SHORT: 17T 35.3%WR +$0.57 — main volume driver, winners bigger than losers
+- breakout-long+ LONG: 3T 0%WR -$0.60 — 3 losses, 0 wins (24h bleed)
+- rr-struct-v2+ LONG: 3T 0%WR -$0.29 — losses via combo signals
+- grind-breakout- SHORT: 1T 0%WR +$0.03
+- mover- SHORT: 1T 0%WR +$0.06
+- r2-trend-short3 SHORT: 1T 0%WR +$0.06
+
+**7d Winners:**
+- pullback-entry- SHORT: 81T 60.5%WR +$2.65
+- pump-chain- SHORT: 54T 61.1%WR +$0.75
+- rr-struct+ LONG: 15T 73.3%WR +$0.59
+- mover- SHORT: 8T 87.5%WR +$0.61
+
+**Regime:** 100% NEUTRAL (all 26 24h trades)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: pullback-entry+ (0%WR 7d), ema300-dip-long (0%WR 7d), trend_purity+ (36%WR -$0.90 7d) — ALL already disabled
+- ATR_SL_MIN 1.3%: working — 19/26 exits via atr_sl_hit, avg -$0.004 (near zero)
+- Trade frequency 26/24h = 1.1/hr — healthy
+- 7d net positive (+$1.59), no degradation vs previous session
+
+**Open Questions:**
+- breakout-long+ 24h: 3T 0%WR -$0.60 — all atr_sl_hit losses. 7d only 4T 25%WR -$0.35. Low sample, monitoring.
+- rr-struct-v2+ 24h: 3T 0%WR -$0.29 — combo signal losses. 7d 10T 40%WR -$0.45. Underperforming but not critical.
