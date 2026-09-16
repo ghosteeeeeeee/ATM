@@ -1,3 +1,35 @@
+## [2026-09-16 21:58 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 15T ~40%WR +$0.15 | **7d:** 253T 54.5%WR +$2.03
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T avg -$0.041 — dominant, near breakeven
+- profit-monster-trail: 2T avg +$0.070
+- hard_tp: 1T +$0.34
+- HARD_SL_FAILED: 1T -$0.25
+- HL_CLOSED: 1T -$0.23
+
+**24h by Signal:**
+- pullback-entry- SHORT: 12T -$0.40 — majority of volume, slightly negative
+
+**7d Top Performers:**
+- pullback-entry- SHORT: 84T 56%WR +$2.25 — anchor signal
+- pump-chain- SHORT: 49T 61.2%WR +$1.25
+- rr-struct+ LONG: 15T 73.3%WR +$0.59
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0% WR with 3+ trades last hour (0 trades)
+- ATR SL: 58% of 7d closes, structural — system net positive
+- Trade frequency: 0T/hr — quiet period
+- All losing signals already disabled
+
+**Monitoring:**
+- System stable, 7d +$2.03
+- Quiet period — no action needed
+
 ## [2026-09-16 19:09 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (0W 2L -$0.48)
