@@ -5464,3 +5464,26 @@ BY: auto_1hr
 **Monitoring:** Stale signal filter need, exit recording gap, signal diversity for NEUTRAL.
 
 BY: daily_orchestrator
+
+## [2026-09-16 08:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet market)
+**PnL:** $0.00
+
+**24h:** 27T 48.1%WR -$0.52 | ATR SL 81.5% | pullback-entry- 20T 60%WR +$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered (0 trades in last hour)
+- ATR SL 81.5% structural — unchanged
+- Trade frequency normal (5 in 6h)
+- Previously killed signals (breakout-long+, rr-struct-v2+) — 6 legacy trades aging out, no new fires
+- Open positions: 5 SHORT, all with normal SL distances (0.7-0.95%)
+
+**Monitoring:**
+- ETH (9.3h) and SYRUP (8.5h) positions aging — watch for SL hits
+- ADA position has inverted R:R (SL 0.93% vs TP ~0.77%) — structural
+- Market quiet — potential regime shift if activity picks up
+
+BY: auto_1hr

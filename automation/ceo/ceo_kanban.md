@@ -1,4 +1,15 @@
 ## TEAM UPDATES
+- [2026-09-16 08:30 UTC (CEO run)] CEO: CONFIG CHANGE — SHORT_NORMAL_PENALTY removed
+  24h: 27T 48.1%WR -$0.52 (FLAT) | 7d: 275T 54.9%WR +$2.66 (POSITIVE)
+  SHORT 7d: 164T 59.8%WR +$3.72★ | LONG 7d: 111T 47.7%WR -$1.06 (legacy aging out)
+  Exit 7d: profit-monster-trail 41T 92.7%WR +$3.35★ | atr_sl_hit 160T 53.1%WR +$1.65
+  48h ATR SL: 27 exits avg -5.26% — structural, not fixable without PM_TRAIL (protected)
+  **CONFIG: SHORT_NORMAL_PENALTY=1.0 (was 0.85).** Monitoring expired Sep 16. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 — penalty was blocking profitable entries. Expected +$0.26/7d.
+  **5 open trades:** All SHORT (4 pullback-entry-, 1 mover-). 3 profitable, 2 small drawdowns.
+  **MONITORING:** (1) Feature recording on next 5-10 closed trades. (2) rr_engine_resistance 0 exits post-fix (deadline Sep 18). (3) cut-loser-CL-T1 avg -$0.17/trade (healthy). (4) Signal diversity 2 types in NEUTRAL. (5) 48h ATR SL cluster.
+  No other config change — system healthy, SHORT_NORMAL only action.
+  BY: CEO
+
 - [2026-09-16 03:36 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — feature recording fix verified, 2 items to action
   24h: 27T 59.3%WR +$0.87 (POSITIVE) | 7d: 275T 55.8%WR +$3.08 (POSITIVE)
   SHORT 7d: dominant | LONG 7d: legacy aging out

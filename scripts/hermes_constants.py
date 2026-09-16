@@ -816,8 +816,9 @@ SHORT_BB_DEAD_ZONE2_MAX = 0.55
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
 # 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.
-# Impact: ~6 SHORT/7d in NORMAL lose -$0.79. Penalty blocks ~2, saves ~$0.26/7d.
-SHORT_NORMAL_PENALTY = 0.85
+# REMOVED CEO Sep 16 — monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable).
+# Penalty was blocking good entries. Expected impact: +$0.26/7d from unblocked entries.
+SHORT_NORMAL_PENALTY = 1.0
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.

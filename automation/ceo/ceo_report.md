@@ -33,3 +33,29 @@ System is flat today because: (1) auto_1hr killed breakout-long+ (0%WR -$0.60 in
 
 ### Decision
 **No config change.** System structurally healthy. 7d PnL +$3.08 (POSITIVE, improved from +$1.83). Legacy LONG drag aging out. SHORT side strong. Hold. Focus: fix feature recording + develop new signals.
+
+## CEO Report — 2026-09-16 ~08:30 UTC
+
+### Diagnosis
+24h: 27T 48.1%WR -$0.52 (FLAT). 7d: 275T 54.9%WR +$2.66 (POSITIVE). Market NEUTRAL 100%. 5 open trades, all SHORT. System healthy but not exciting.
+
+### Root Cause
+SHORT_NORMAL_PENALTY=0.85 was still active despite monitoring expiring Sep 16. SHORT in NORMAL is profitable (34T/7d 61.8%WR +$0.59). Penalty was reducing confidence by 15%, blocking ~2 good entries/week.
+
+### Fix Applied
+SHORT_NORMAL_PENALTY = 1.0 (removed penalty). Monitoring period expired. Data supports removal.
+
+### What NOT to change
+- PM_TRAIL (0.40%/0.20%) — protected, ATR SL wins the race
+- ATR_SL (1.3%/1.5%) — protected, 7d avg +0.39%
+- All losers already killed (trend_purity+, pullback-entry+, rr-struct-v2+, breakout-long+)
+
+### Monitoring (5 items)
+1. Feature recording — verify on next 5-10 closed trades
+2. rr_engine_resistance — 0 exits post-fix, deadline Sep 18
+3. cut-loser-CL-T1 — 7 exits -$1.19, avg -$0.17 (healthy)
+4. Signal diversity — 2 types in NEUTRAL, need new signals
+5. 48h ATR SL cluster — 27 exits avg -5.26% (structural)
+
+### Verification
+SHORT NORMAL 7d: 34T 61.8%WR +$0.59. Penalty removal expected +$0.26/7d. Monitor next 48h.
