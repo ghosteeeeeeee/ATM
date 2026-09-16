@@ -5605,3 +5605,50 @@ BY: auto_1hr
 **Open Questions:**
 - breakout-long+ 24h: 3T 0%WR -$0.60 — all atr_sl_hit losses. 7d only 4T 25%WR -$0.35. Low sample, monitoring.
 - rr-struct-v2+ 24h: 3T 0%WR -$0.29 — combo signal losses. 7d 10T 40%WR -$0.45. Underperforming but not critical.
+
+## [2026-09-16 12:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L +$0.17)
+- ETH SHORT pullback-entry-: -$0.14 (atr_sl_hit, price rose 1.2% from entry)
+- CHIP SHORT pullback-entry-: +$0.31 (atr_sl_hit)
+
+**24h:** 27T 63%WR +$0.74 | **7d:** 268T 55.6%WR +$1.59
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 20T (74%) avg +$0.013 — structural, near breakeven
+- profit-monster-trail: 3T avg +$0.057
+- cut-loser-MAE-GUARD: 2T avg -$0.065
+- hard_sl: 1T avg -$0.12
+
+**24h by Signal:**
+- pullback-entry- SHORT: 19T 63.2%WR +$0.74 — strong
+- breakout-long+ LONG: 3T 0%WR -$0.60 — already disabled
+
+**Changes:** None — system net positive, all dead signals already disabled.
+
+**No Change Needed:**
+- ATR_SL_MIN 1.3%: working, 74% of exits near breakeven
+- Trade frequency 1.1/hr — healthy
+- pullback-entry- performing well (63% WR, positive PnL)
+- Open positions: SYRUP SHORT (-$0.10, 18h), SEI SHORT (-$0.01, 15h)
+
+**Open Questions:** None.
+
+## [2026-09-16 13:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.34)
+- FIL SHORT pullback-entry-: +$0.34 (hard_tp)
+
+**24h:** 26T | atr_sl_hit 19T avg +$0.011 | profit-monster-trail 3T avg +$0.057
+**24h by signal:** pullback-entry- SHORT 18T +$1.15 (dominant)
+
+**Open:** SYRUP SHORT 14.5h (-$0.01), SEI SHORT 11.6h (+$0.09)
+
+**Changes:** None — system healthy, pullback-entry- driving positive PnL.
+
+**No Change Needed:**
+- ATR SL structural at 1.3% — 73% of exits, avg near zero
+- Trade frequency 1.1/hr — healthy
+- No losing signals with 3+ trades requiring kill
+
+**Open Questions:** None
