@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~10:45 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-17 ~12:30 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 25T, 36.0% WR, -$0.27. 2 open. Market NEUTRAL. Pipeline running.
+24h: 25T, 32.0% WR, -$0.63. 3 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 25T, 36.0% WR, -$0.27 (DB-verified — WORSENING). pullback-entry- SHORT 13T/30.8%WR -$0.16 (bad streak, all-time profitable). open-skies+ LONG 6T/50%WR +$0.11 (healthy). volume-breakout-long+ 3T/0%WR -$0.10 (low sample).
+- **24h (rolling):** 25T, 32.0% WR, -$0.63 (DB-verified — WORSENING). pullback-entry- SHORT 13T/23.1%WR -$0.47 (cold streak, all-time profitable). open-skies+ LONG 6T/50%WR +$0.11 (healthy). volume-breakout-long+ 3T/0%WR -$0.10 (low sample).
 - **Today (calendar):** 25T closed (Sep 17). 2 open. PnL: +5.96% (dashboard).
-- **7d:** 252T, 52.0% WR, -$0.78 (DB-verified — SLIGHTLY NEGATIVE). SHORT +$2.14 carries LONG -$1.83.
+- **7d:** 251T, 51.4% WR, -$1.21 (DB-verified — SLIGHTLY NEGATIVE). SHORT +$2.14 carries LONG -$1.83.
 - **7d REGIME:** ALL NEUTRAL (251T/52.2%WR -$0.78). No LONG_BIAS/SHORT_BIAS trades.
 - **7d EXIT:** atr_sl_hit dominant exit (11 trades -$1.96). SNIPER exits frequent but mostly break-even.
 - **7d ACTIVE SIGNALS:** pullback-entry- SHORT 78T/51.3%WR +$0.73 | pump-chain- SHORT 49T/61.2%WR +$1.25 | open-skies+ LONG 10T/60%WR +$0.29 | rr-struct+ LONG 15T/73.3%WR +$0.59
@@ -55,6 +55,7 @@
 
 ## Today's Changes (Sep 17)
 
+1. **brain_auditor ~12:30 UTC — NO CONFIG CHANGE.** DB: 24h 25T 32.0%WR -$0.63 (WORSENING). 7d: 251T 51.4%WR -$1.21 (SLIGHTLY NEGATIVE). Market NEUTRAL. 3 open (XPL, SUSHI, AVAX). **STALE FILTER:** Deployed 10:00 UTC. 24h stale=$0.12 vs fresh=-$0.59 (inverted — pre-filter trades). 7d: stale 41T -$0.31 vs fresh 38T +$0.92. Needs 48h to evaluate. **LOSING AUTOPSY:** 14 losers — 9 SNIPER cuts <$0.11 (working), 3 ATR SL, 1 HL_CLOSED, 1 HARD_SL_FAILED (SEI exchange bug). No structural issues. **REGIME:** EXTREME SHORT 61.5%WR +$0.31 (best). HIGH 48.0%WR -$1.37 (worst — legacy aging out). **PULLBACK-ENTRY SHORT:** 7d fresh 38T 50%WR +$0.92 vs stale 41T 51.2%WR -$0.31. 24h fresh 8T 12.5%WR -$0.59 (cold streak, likely variance). **NO CONFIG CHANGE** — monitoring stale filter, pullback-entry- streak.
 1. **CEO ~10:45 UTC — NO CONFIG CHANGE.** DB: 24h 25T 36.0%WR -$0.27 (WORSENING). 7d: 252T 52.0%WR -$0.78 (SLIGHTLY NEGATIVE). Market NEUTRAL (100%). 2 open. **STALE SIGNAL ANALYSIS:** 79 trades marked is_stale (flat momentum) at 48.1%WR -$1.10 vs fresh 172T/54.1%WR +$0.32. Gap $1.42/7d. pullback-entry- SHORT fresh +$1.00 vs stale -$0.27. pump-chain- SHORT stale actually OUTPERFORMS fresh (+$0.76 vs +$0.49). **SIGNAL DIVERSITY:** Only 2 types pass confluence in NEUTRAL (pullback-entry-, open-skies+). **NO CONFIG CHANGE** — stale issue needs code-level fix (staleness_mult decay or hard age block). Signal diversity needs new signal development.
 1. **daily_orchestrator ~06:30 UTC — NO CONFIG CHANGE.** DB: 24h 23T 39.1%WR -$0.14 (FLAT). 7d: 254T 52.4%WR -$0.56 (SLIGHTLY NEGATIVE). Market NEUTRAL/LONG_BIAS. 0 open. **LOSING AUTOPSY:** pullback-entry- SHORT 12T/33.3%WR -$0.16 (bad streak, all-time profitable all regimes). open-skies+ LONG 5T/60%WR +$0.20 (healthy). volume-breakout-long+ 3T/0%WR -$0.10 (low sample, SNIPER exits). **7d REGIME:** EXTREME 57.7%WR +$0.86 (strongest), HIGH 48.5%WR -$1.15 (drag), NORMAL 50.9%WR -$0.27. **EXIT:** SNIPER exits dominant (12/23 24h), mostly break-even. atr_sl_hit 4 trades -$0.33. **SNIPER NOTE:** SNIPER-L3-BEARISH closing LONG trades at small loss/profit — mechanism working as designed. **NO CONFIG CHANGE** — monitoring pullback-entry- streak, volume-breakout-low sample.
 
