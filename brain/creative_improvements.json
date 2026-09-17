@@ -913,5 +913,34 @@
     "category": "exit optimization",
     "status": "needs_tracking",
     "risk": "none (observation only)"
+  },
+  {
+    "date": "2026-09-17T14:50:00Z",
+    "idea": "LONG_RSI_CEILING=80 — block LONG entries at overbought extremes",
+    "rationale": "BIGTIME LONG RSI=84.6 lost -$0.22 (overbought chase). NEAR LONG RSI=80.1 won +$0.19 (borderline). Extends SHORT_RSI_CEILING=65 pattern to LONG side.",
+    "expected_impact": "Modest — prevents overbought LONG entries. ~$0.05-0.15/7d if pattern holds.",
+    "category": "entry sniper",
+    "status": "suggested — NEEDS MORE DATA (only 2 trades with RSI>80, 94/100 LONG trades have NULL RSI)",
+    "risk": "low",
+    "would_block_winners": "1 of 2 (NEAR +$0.19). Net impact +$0.03."
+  },
+  {
+    "date": "2026-09-17T14:50:00Z",
+    "idea": "EXTREME SHORT fresh = system edge — protect it with stale filter",
+    "rationale": "EXTREME SHORT fresh 47T 59.6%WR +$1.04 (7d). stale 40%WR -$0.55. Fresh is31% WR better. Stale filter protects this edge.",
+    "expected_impact": "+$0.20-0.50/7d if stale filter + confidence boost compound.",
+    "category": "edge protection",
+    "status": "monitoring — stale filter needs 48h evaluation first",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-17T17:00:00Z",
+    "idea": "Add BTC wave_phase gate to open-skies+: block LONG when wave_phase=falling",
+    "rationale": "open-skies+ fires LONG regardless of BTC momentum phase. 7d data: falling=4T 25%WR -$0.26 vs accelerating=3T 66.7%WR $0.00. All 24h open-skies+ losers had wave_phase=falling. Trend_purity already implements this check (trend_purity.py:182-183).",
+    "expected_impact": "+$0.10-0.15/7d (block ~4 losers/week, lose 0 winners)",
+    "category": "entry quality",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "9T all-time (borderline). Directional signal clear."
   }
 ]

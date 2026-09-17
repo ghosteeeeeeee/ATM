@@ -124,3 +124,17 @@ SHORT_NORMAL_PENALTY = 1.0 (removed penalty). Monitoring period expired. Data su
 
 ### Verification
 SHORT NORMAL 7d: 34T 61.8%WR +$0.59. Penalty removal expected +$0.26/7d. Monitor next 48h.
+
+## CEO Report — 2026-09-17 ~15:00 UTC
+
+### Diagnosis
+7d: 232T, 52.0%WR, -$0.06 (BREAKEVEN). 24h: 11T, 27.3%WR, -$0.97 (cold streak, tiny sample). 3 open trades (STX, W, WCT — all LONG in NEUTRAL). ALL active signals profitable 7d: rr-struct+ 15T/73.3%WR +$0.59, pump-chain- 44T/56.8%WR +$0.39, pullback-entry- 69T/52.2%WR +$0.36.
+
+### Root Cause
+Stale signal execution = #1 drag ($4.86/7d). 31.8% of trades fire on stale signals (staleness_mult decays over 10min, too slow). Fresh WR 58.2% vs stale 48.6%. Signal diversity = #2 issue (only 2 types pass confluence in NEUTRAL). Cold streak is tiny sample noise.
+
+### Fix Applied
+NO CONFIG CHANGE. System structurally healthy. All dead signals properly disabled. ATR SL exits near breakeven (avg -$0.059). Stale issue needs code-level fix (execution-time revalidation), not config. Signal diversity needs new signal development.
+
+### Verification
+DB-verified. Active signals confirmed profitable. Legacy trades aging out. Pipeline healthy.

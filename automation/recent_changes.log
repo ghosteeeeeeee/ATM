@@ -2242,3 +2242,13 @@
   open-skies+ today: 4T 0%WR -$0.61 (all ATR SL) — worst day, 7d 44.4% still acceptable
   Kill check: no signal at 0%WR with 3+T last hour. No action.
   BY: auto_1hr
+[2026-09-17 17:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 0T closed (quiet period). Open: 4 volume-breakout-long+ (all /usr/bin/bash.00)
+  24h: 14T 21.4%WR $-\1.37 | 7d: 227T 51.1%WR $-\2.61
+  Kill check: 0T last hour. ATR SL 64% avg -$0.080 (breakeven).
+  No action needed. BY: auto_1hr
+[2026-09-17 17:30 UTC] auto_1hr: NO CONFIG CHANGE -- monitoring only
+  1h: 0T closed (quiet period). Open: 4 volume-breakout-long+ (all $0.00)
+  24h: 14T 21.4%WR -$1.37 | 7d: 227T 51.1%WR -$2.61
+  Kill check: 0T last hour. ATR SL 64% avg -$0.080 (breakeven).
+  No action needed. BY: auto_1hr

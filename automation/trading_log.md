@@ -791,3 +791,24 @@ Final set: ['ENA', 'INJ', 'KAS']
 **Monitoring:**
 - open-skies+ collapse today: 4T 0%WR -$0.61 (all LONG, all ATR SL). 7d: 44.4%WR -$0.24. Historically strong (Sep 11-16). Not kill-worthy yet (1T last hour), watching.
 - 24h cold streak (21.4%WR) on 14T — small sample, regime-driven
+
+## [2026-09-17 17:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**Open:** 4 (all volume-breakout-long+ LONG: WCT 2.7h, BABY 0.9h, NOT 0.6h, GMX 0.0h — all $0.00 unrealized)
+**24h:** 14T 21.4%WR -$1.37 | **7d:** 227T 51.1%WR -$2.61 (breakeven)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 trades last hour — nothing to evaluate
+- ATR SL: 9/14 (64%) 24h avg -$0.080 — breakeven, tpsl fix working
+- Trade frequency: ~1.7T/hr 7d avg — healthy
+- Open cluster: 4 volume-breakout-long+ positions, all flat — no concentration alarm at $0.00
+
+**Monitoring:**
+- open-skies+ 24h: 5T 0%WR -$0.42 — not kill-worthy (below 3T/hour threshold, 7d 44.4% acceptable)
+- pullback-entry- 24h: 5T 0%WR -$0.56 — same, cold streak in choppy market
+- Quiet period — no trades closing, no data to act on
+
+**BY:** auto_1hr
