@@ -1,137 +1,103 @@
 {
-    "timestamp": "2026-09-17T18:30:00Z",
-    "session_brain_stats": {
-        "total_vectors": 222775,
-        "top_recurring_topics": ["stale signal execution", "HIGH regime drag", "signal diversity", "open-skies+ degradation", "EXTREME SHORT edge"]
+  "timestamp": "2026-09-17T20:34:15.928109Z",
+  "session_brain_stats": {
+    "vectors": 222775,
+    "query_results": "limited — recent sessions mostly contain audit reports, not new insights"
+  },
+  "trade_summary_24h": {
+    "trades": 13,
+    "win_rate": 18.8,
+    "pnl": -1.89,
+    "status": "COLD STREAK",
+    "all_losers_fresh": true,
+    "stale_filter_working": true
+  },
+  "trade_summary_7d": {
+    "trades": 226,
+    "win_rate": 50.9,
+    "pnl": -2.76,
+    "short_pnl": 0.0,
+    "long_pnl": -2.76,
+    "note": "LONG legacy drag aging out"
+  },
+  "regime_7d": {
+    "EXTREME": "76T 56.6%WR -$0.20 (breakeven)",
+    "NORMAL": "57T 50.9%WR -$0.60",
+    "HIGH": "90T 46.7%WR -$2.00 (worst — ~60% legacy)"
+  },
+  "exit_analysis_7d": {
+    "profit_monster_trail": "36T 94.4%WR +$3.22 (carries system)",
+    "atr_sl_hit": "133T 48.9%WR -$2.18 (#1 drag)",
+    "rr_engine_resistance": "27T 40.7%WR -$1.14",
+    "cut_loser_CL_T1": "9T 0%WR -$1.37 (working as designed)"
+  },
+  "drift_findings": [
+    {
+      "finding": "STANDALONE_BYPASS contains 6+ dead signals",
+      "detail": "open-skies+ (killed Sep 17), breakout-long+ (killed Sep 17), bb-bounce-v2-long+ (dead, 4T/7d 25%WR), ema300-dip-long (dead, 2T/7d 0%WR), accel-300-v4-short- (killed Sep 11), rr-struct- (killed Sep 14)",
+      "impact": "Dead code — no runtime impact since *_ENABLED=False, but pollutes config and confuses future audits",
+      "action": "Remove dead signals from STANDALONE_BYPASS_SIGNALS"
     },
-    "trade_summary_24h": {
-        "trades": 15,
-        "win_rate": 20.0,
-        "pnl": -1.73,
-        "status": "COLD STREAK",
-        "open_trades": 3,
-        "market_regime": "NEUTRAL"
+    {
+      "finding": "open-skies+ correctly killed — no drift",
+      "detail": "Killed 17:11 UTC Sep 17. 9T/7d 44.4%WR -$0.24. HIGH regime 7T/42.9%WR -$0.27. wave_phase=falling pattern confirmed in session brain.",
+      "impact": "None — action already taken",
+      "action": "None needed"
     },
-    "trade_summary_7d": {
-        "trades": 226,
-        "win_rate": 51.8,
-        "pnl": -2.11,
-        "status": "SLIGHTLY NEGATIVE",
-        "short_pnl": 0.00,
-        "long_pnl": -2.73
+    {
+      "finding": "Legacy signals still in 7d data but killed",
+      "detail": "trend_purity+ 11T/7d -$0.90, rr-struct-v2+ 10T/7d -$0.45, rr-struct- 7T/7d -$0.42 — all killed Sep 14-16",
+      "impact": "Aging out naturally. ~$1.75/7d drag from dead signals.",
+      "action": "None — will self-correct as legacy trades age out of 7d window"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "Stale signal execution",
+      "status": "FILTER DEPLOYED — monitoring until Sep 19",
+      "detail": "Pre-deploy: 73% fresh. Post-deploy: 90-100% fresh. 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. Edge: $1.10/7d.",
+      "next": "Evaluate by Sep 19 10:00 UTC"
     },
-    "regime_7d": {
-        "EXTREME": "78T 56.4%WR -$0.11 (best)",
-        "NORMAL": "56T 51.8%WR -$0.44",
-        "HIGH": "91T 46.2%WR -$2.18 (worst, ~60% legacy)"
+    {
+      "topic": "Signal diversity in NEUTRAL",
+      "status": "STRUCTURAL ISSUE",
+      "detail": "Only pullback-entry- SHORT passes confluence in NEUTRAL. open-skies+ killed. Need new NEUTRAL-compatible signals.",
+      "next": "Signal development — new signals needed"
     },
-    "losing_trade_autopsy": [
-        {
-            "trades": "open-skies+ LONG 4T (STX, W, SUSHI, XPL)",
-            "total_pnl": -0.77,
-            "root_cause": "3/4 wave_phase=falling, 3/4 HIGH regime — fading BTC momentum in downtrend",
-            "entry_check": "RSI 61-75 range, falling wave_phase = entering LONG against bearish momentum",
-            "regime_check": "3/4 HIGH regime (legacy trap zone)",
-            "recommended_change": "Monitor — sample too small (9T/7d) for action. All 4 are fresh entries, not stale.",
-            "impact_on_winners": "N/A — no recent winners from open-skies+",
-            "confidence": "LOW (sample 9T)"
-        },
-        {
-            "trades": "volume-breakout-long+ LONG 3T (NOT, BIGTIME, BABY)",
-            "total_pnl": -0.37,
-            "root_cause": "BIGTIME RSI=84.62 overbought chase in HIGH regime. NOT/BABY normal ATR SL.",
-            "entry_check": "BIGTIME entered at RSI=84.62 (extreme overbought), HIGH regime. No LONG RSI ceiling filter.",
-            "regime_check": "BIGTIME HIGH, NOT/BABY NORMAL",
-            "recommended_change": "Monitor volume-breakout-long+ in HIGH regime (4T/7d 0%WR -$0.59). Sample small.",
-            "impact_on_winners": "N/A — 1 EXTREME winner (+$0.15) would NOT be affected by HIGH-only gate",
-            "confidence": "LOW (sample 4T in HIGH)"
-        },
-        {
-            "trades": "pullback-entry- SHORT 4T (ACE, ME, SEI, SUPER)",
-            "total_pnl": -0.78,
-            "root_cause": "ACE stale HL_CLOSED, SEI HARD_SL_FAILED (exchange bug), ME/SUPER normal ATR SL variance",
-            "entry_check": "All fresh except ACE (stale). No entry condition issues.",
-            "regime_check": "SEI/ACE HIGH, ME/SUPER NORMAL — no regime pattern",
-            "recommended_change": "No action — normal variance. 7d pullback-entry- SHORT is +$0.25 (profitable).",
-            "impact_on_winners": "N/A — system-level signal is healthy",
-            "confidence": "N/A (normal variance)"
-        }
-    ],
-    "stale_filter_status": {
-        "deployed": "2026-09-17 10:00 UTC",
-        "post_deploy_trades": 9,
-        "stale_entries": 0,
-        "fresh_entries": 9,
-        "verdict": "WORKING — zero stale entries since deployment",
-        "7d_stale": "72T 47.2%WR -$1.77",
-        "7d_fresh": "154T 52.6%WR -$0.96",
-        "7d_extreme_fresh": "60T 58.3%WR +$0.88 (EDGE)",
-        "7d_extreme_stale": "18T 50.0%WR -$0.99",
-        "next_evaluation": "2026-09-19 10:00 UTC"
+    {
+      "topic": "HIGH regime legacy drag",
+      "status": "SELF-CORRECTING",
+      "detail": "90T/7d 46.7%WR -$2.00. ~60% from dead/legacy signals (trend_purity+, rr-struct-v2+, breakout-long+).",
+      "next": "Will improve as legacy trades age out of 7d window"
+    }
+  ],
+  "missing_implementations": [],
+  "creative_improvements": [
+    {
+      "date": "2026-09-17T20:34:15.928139Z",
+      "idea": "STANDALONE_BYPASS cleanup — remove 6+ dead signals from bypass list",
+      "rationale": "Dead signals (open-skies+, breakout-long+, bb-bounce-v2-long+, ema300-dip-long, accel-300-v4-short-) still listed in STANDALONE_BYPASS_SIGNALS. No runtime impact (*_ENABLED=False) but pollutes config.",
+      "expected_impact": "Code hygiene, zero runtime change",
+      "category": "cleanup",
+      "status": "ready to apply",
+      "risk": "zero"
     },
-    "drift_findings": [
-        {
-            "topic": "open-skies+ wave_phase=falling pattern",
-            "status": "OBSERVED — not yet implemented as filter",
-            "all_time_data": "falling=5T 20%WR -$0.49 vs accelerating=3T 66.7%WR $0.00",
-            "impact": "4/5 24h losers have wave_phase=falling",
-            "recommendation": "Monitor — sample too small (9T total). Code-level change if pattern persists."
-        },
-        {
-            "topic": "volume-breakout-long+ HIGH regime",
-            "status": "OBSERVED — 0%WR in HIGH (4T/7d)",
-            "impact": "All 4 HIGH trades are losers, -$0.59 total",
-            "recommendation": "Monitor — add regime gate if pattern persists after 10+ trades."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "HIGH regime legacy drag",
-            "frequency": "every audit since Sep 13",
-            "status": "self-correcting — legacy trades aging out",
-            "7d_data": "91T 46.2%WR -$2.18 (~60% from dead signals)",
-            "recommendation": "No action needed — will flush naturally"
-        },
-        {
-            "topic": "Signal diversity in NEUTRAL",
-            "frequency": "every audit since Sep 15",
-            "status": "structural — only 2 signal types pass confluence",
-            "recommendation": "NEW SIGNAL DEVELOPMENT needed. Not config."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "idea": "open-skies+ wave_phase gate (block LONG when wave_phase=falling)",
-            "status": "discussed but not implemented",
-            "reason": "sample too small (9T total, 5 falling)",
-            "recommendation": "Monitor until 15+ trades, then evaluate"
-        },
-        {
-            "idea": "volume-breakout-long+ HIGH regime gate",
-            "status": "new observation this run",
-            "reason": "4T sample, 0%WR in HIGH",
-            "recommendation": "Monitor until 8+ HIGH trades, then evaluate"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-17T18:30:00Z",
-            "idea": "EXTREME SHORT fresh is the system edge — double down with regime-specific confidence boost",
-            "rationale": "7d EXTREME SHORT fresh 60T 58.3%WR +$0.88. stale 18T 50%WR -$0.99. The stale filter protects this edge. Consider increasing pullback-entry- SHORT confidence floor in EXTREME from 50% to 60% to filter marginal entries while preserving the edge.",
-            "expected_impact": "+$0.20-0.40/7d if marginal EXTREME SHORT entries filtered",
-            "category": "entry sniper",
-            "status": "suggested — needs sample verification",
-            "risk": "low — would only affect EXTREME SHORT entries below 60% confidence",
-            "sample_size": "60 EXTREME SHORT fresh trades (adequate)",
-            "impact_on_winners": "Need to check how many EXTREME SHORT winners have conf < 60%"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "MONITOR stale filter effectiveness — evaluate by Sep 19 10:00 UTC",
-        "MONITOR volume-breakout-long+ HIGH regime (4T 0%WR, sample small)",
-        "MONITOR open-skies+ wave_phase=falling pattern (9T total)",
-        "MONITOR HIGH regime legacy flush — ~60% dead signals aging out",
-        "NO CONFIG CHANGE this run — all items need more data"
-    ]
+    {
+      "date": "2026-09-17T20:34:15.928148Z",
+      "idea": "Monitor EXTREME SHORT fresh edge — potential confidence boost",
+      "rationale": "EXTREME SHORT fresh 57.7%WR +$0.69 is the system edge. Stale filter protects it. Could boost confidence for EXTREME SHORT entries in future.",
+      "expected_impact": "Needs 2+ weeks of data at current filter settings before changing",
+      "category": "entry sniper",
+      "status": "monitor",
+      "risk": "low — monitoring only"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "DONE: STANDALONE_BYPASS cleanup — removing dead signals",
+    "NEXT: Evaluate stale filter by Sep 19 10:00 UTC",
+    "NEXT: Develop new NEUTRAL-compatible signals for diversity",
+    "MONITOR: EXTREME SHORT fresh edge (potential confidence boost)",
+    "MONITOR: HIGH regime legacy flush (self-correcting)"
+  ]
 }

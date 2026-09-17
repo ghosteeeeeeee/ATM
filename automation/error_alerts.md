@@ -28,3 +28,11 @@
 
 ## Error Alerts — 2026-09-17 16:56 UTC
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-17 18:45 UTC
+- **[WARN]** Disk at 83% (93G/118G) — approaching 85% threshold
+- **[INFO]** Winrate 18.75% (1h window) — signal_analyst REDUCE gate active
+- **[INFO]** 16 trades closed today, -1.76 USDT PnL
+
+## Error Alerts — 2026-09-17 19:56 UTC
+- **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

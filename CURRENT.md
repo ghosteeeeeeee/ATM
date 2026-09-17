@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~18:35 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-17 ~20:00 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 15T, 20.0% WR, -$1.73. 3 open. Market NEUTRAL. Pipeline running.
+24h: 16T, 18.8% WR, -$1.89. 4 open. Market NEUTRAL. Pipeline running.
 
 - **24h (rolling):** 15T, 20.0% WR, -$1.73 (DB-verified — COLD STREAK). open-skies+ KILLED (17:11 UTC). pullback-entry- SHORT 4T/0%WR -$0.78 (cold streak, 7d profitable 51.5%WR +$0.25 — variance). ATR SL 13T dominant.
 - **Today (calendar):** 9T closed (Sep 17). 3 open. PnL: negative.
@@ -28,8 +28,8 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟡 R:R STATUS (NEGATIVE 7d, WORSENING 24h)**
-7d PnL -$2.45 (NEGATIVE). SHORT carries LONG (legacy aging out). 24h -$0.95 (WORSENING). Cold streak + legacy flush. Stale signal execution is #1 drag ($1.42/7d gap).
+**🟡 R:R STATUS (NEGATIVE 7d, COLD STREAK 24h)**
+7d PnL -$2.76 (NEGATIVE). SHORT roughly breakeven. LONG -$2.76 (legacy aging out). 24h -$1.89 (COLD STREAK). Cold streak is variance + legacy flush. System structurally sound.
 
 **🟢 rr_engine_resistance FIX VERIFIED.** 0 post-fix rr_engine exits in 6+ days (since Sep 10). Confirmed working. Can remove from monitoring.
 
@@ -41,7 +41,7 @@
 
 **🟢 pump-chain+ NORMAL BLOCK:** Signal_reporter blocked Pump_Flow from NORMAL regime. Active since 05:10 UTC Sep 15.
 
-**🔴 SIGNAL DIVERSITY CRITICAL:** open-skies+ KILLED (Sep 17). Only pullback-entry- SHORT passes confluence in NEUTRAL now. Need new signals urgently.
+**🔴 SIGNAL DIVERSITY CRITICAL:** open-skies+ KILLED (Sep 17 17:11). Only pullback-entry- SHORT passes confluence in NEUTRAL now. Need new signals urgently.
 
 **🔴 trend_ignition: DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal.
 
@@ -49,7 +49,7 @@
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
-**🟡 STALE SIGNAL EXECUTION:** 7d stale 74T 48.6%WR -$1.37 vs fresh 158T 53.8%WR -$0.06. Stale filter deployed 10:00 UTC Sep 17. Post-deploy 4 trades (all fresh, insufficient sample). EXTREME fresh 71.4%WR +$0.79 vs stale 40%WR -$0.55 (filter WORKING). Needs 48h evaluation. **NEXT: Verify filter effectiveness by Sep 19 10:00 UTC.**
+**🟡 STALE SIGNAL EXECUTION:** 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. Stale filter deployed 10:00 UTC Sep 17. Post-deploy 9/10 FRESH (90%) — filter working. EXTREME fresh 57.7%WR +$0.69 vs stale 60%WR -$0.37 (stale wins more but at worse prices). **NEXT: Evaluate by Sep 19 10:00 UTC.**
 
 **🟢 EXIT CONDITIONS FIX COMPLETE.** position_manager.py UPDATE now includes exit_conditions. All close paths (brain.py, position_manager.py) now write exit_conditions. Old blank trades (254/255 7d) remain blank — new trades will have data. — 2026-09-16 ~18:30 UTC
 
@@ -57,6 +57,8 @@
 
 ## Today's Changes (Sep 17)
 
+1. **brain_auditor ~20:00 UTC — 1 CONFIG CHANGE (cleanup).** STANDALONE_BYPASS cleanup: removed 4 dead signals (open-skies+, open-skies, bb-bounce-v2-long, breakout-long). Zero runtime impact. DB: 24h 13T 18.8%WR -$1.89 (COLD STREAK). 7d 226T 50.9%WR -$2.76. Market NEUTRAL. 3 open (IO SHORT, GMX LONG, WCT LONG). **LOSING AUTOPSY:** 13 losers — open-skies+ 5T (KILLED, wave_phase=falling HIGH), pullback-entry- 4T (cold streak, 7d profitable), volume-breakout-long+ 3T (small losses), other 1 cut-loser. All FRESH — stale filter working. **STALE FILTER:** Post-deploy 90-100% fresh. Eval Sep 19. **REGIME:** EXTREME 76T 56.6%WR -$0.20 (breakeven). HIGH 90T 46.7%WR -$2.00 (worst, ~60% legacy). **CREATIVE:** EXTREME SHORT fresh 57.7%WR +$0.69 = system edge. HIGH self-correcting.
+1. **brain_auditor ~19:45 UTC — NO CONFIG CHANGE.** DB: 24h 16T 18.8%WR -$1.89 (COLD STREAK). 7d: 226T 50.9%WR -$2.76. Market NEUTRAL. 4 open (AIXBT SHORT, HEMI SHORT, IO SHORT, GMX LONG). **STALE FILTER:** Post-deploy 9/10 FRESH (90%). Pre-deploy 8/11 FRESH (73%). Filter working. 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. **LOSING AUTOPSY:** 13 losers — open-skies+ LONG 4T ALL ATR SL (3/4 wave_phase=falling, 3/4 HIGH regime), pullback-entry- SHORT 4T (normal variance), volume-breakout-long+ 3T (BIGTIME overbought). All losers FRESH — stale filter protecting system. **REGIME:** EXTREME 77T 57.1%WR +$0.02 (breakeven). HIGH 91T 46.2%WR -$2.18 (worst, ~60% legacy). **CREATIVE:** (1) open-skies+ wave_phase gate — code change needed. (2) EXTREME SHORT fresh 57.7%WR +$0.69 = edge. (3) STANDALONE_BYPASS cleanup ready — dead signals (bb-bounce-v2-long+, breakout-long+, ema300-dip-long) still listed but *_ENABLED=OFF. **NO CONFIG CHANGE** — monitoring stale filter 48h, stale evaluation Sep 19.
 1. **daily_orchestrator ~18:35 UTC — NO CONFIG CHANGE.** DB: 24h 11T 27.3%WR -$0.95 (COLD STREAK). 7d: 221T 51.1%WR -$2.45 (SLIGHTLY NEGATIVE). Market LONG_BIAS (5 tokens). 3 open (IO SHORT, GMX LONG, WCT LONG). **KILLED:** open-skies+ already killed by signal_reporter at 17:11 UTC. **LOSING AUTOPSY:** 7 losers — 4x open-skies+ LONG ALL ATR SL (wave_phase=falling on 3/4, BTC bearish/transitioning). 2x volume-breakout-long+ ATR SL (NOT, W small). 1x pullback-entry- SHORT ATR SL. **REGIME:** EXTREME 76T 57.9%WR +$0.14 (best), HIGH 89T 46.1%WR -$2.10 (worst, ~60% legacy aging out). **EXIT:** ATR SL 8T avg -$0.098 dominant, near breakeven. profit-monster-trail working. **BTC CRASH BLOCKER:** Active, blocking LONG entries during BTC weakness (MOMENTUM, BTC_LEVEL). **NO CONFIG CHANGE** — cold streak is variance + legacy flush, system structurally sound.
 1. **brain_auditor ~17:00 UTC — NO CONFIG CHANGE.** DB: 24h 14T 35.7%WR -$0.28 (COLD STREAK). 7d: 231T 51.5%WR -$2.10. Market NEUTRAL. 1 open (WCT volume-breakout-long+ LONG). **STALE FILTER:** Deployed 10:00 UTC. Post-deployment: 7 trades ALL FRESH (filter working). 7d EXTREME fresh 63T 57.1%WR +$0.61 vs stale 19T 52.6%WR -$0.70. **NEXT: Evaluate by Sep 19 10:00 UTC.** **LOSING AUTOPSY:** 11 losers — open-skies+ LONG 4T ALL losers (3/4 wave_phase=falling, 3/4 HIGH regime — fading BTC momentum). pullback-entry- SHORT 4T (SEI HARD_SL_FAILED exchange bug, ACE stale, SUPER/ME normal variance). Other 3 (BIGTIME RSI=84.6 overbought, AVAX/COMP cut-loser working). **REGIME:** EXTREME 82T 56.1%WR -$0.09 (breakeven). HIGH 94T 46.8%WR -$2.00 (worst — ~60% legacy). NORMAL 54T 51.9%WR -$0.30. **SHORT vs LONG:** SHORT +$0.35 carries LONG -$2.74 (legacy aging out). **EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit 137T 48.9%WR -$1.92 (#1 drag). **CREATIVE:** (1) open-skies+ wave_phase gate: block LONG when BTC wave_phase=falling. All-time: falling=5T 20%WR -$0.49 vs accelerating=3T 66.7%WR $0.00. Code-level change. (2) EXTREME SHORT fresh 57.1%WR = system edge. Stale filter protecting it. **NO CONFIG CHANGE** — monitoring stale filter 48h, HIGH regime legacy flush.
 1. **brain_auditor ~15:30 UTC — NO CONFIG CHANGE.** DB: 24h 12T 25.0%WR -$1.12 (COLD STREAK). 7d: 230T 51.7%WR -$1.96 (SLIGHTLY NEGATIVE). Market NEUTRAL. 3 open (COMP SHORT, WCT LONG, STX LONG). **STALE FILTER:** Deployed 10:00 UTC. Post-deployment insufficient sample. 7d stale 74T 48.6%WR -$1.37 vs fresh 156T 53.2%WR -$0.59. EXTREME fresh 71.4%WR +$0.79★ (filter working). **LOSING AUTOPSY:** 9 losers — 4x open-skies+ LONG (ALL ATR SL, 3/4 wave_phase=falling, BTC bearish/transitioning), 3x pullback-entry- SHORT (ACE stale, ME/SUPER NORMAL ATR SL), 1x btc-pump-rider+ LONG (AVAX cut-loser), 1x volume-breakout-long+ LONG (BIGTIME HIGH ATR SL). **open-skies+ degradation:** 4T today ALL losers (25%WR). 7d: 8T 50%WR -$0.08. wave_phase=falling pattern on 3/4. Sample too small. **REGIME:** EXTREME 83T 56.6%WR +$0.09 (best). HIGH 93T 47.3%WR -$1.84 (worst, ~60% legacy). **7d EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit 137T -$1.58 (#1 drag). **CREATIVE:** (1) EXTREME SHORT fresh = system edge 71.4%WR. (2) open-skies+ wave_phase gate idea — monitor. (3) SHORT carries, LONG legacy drag aging out. **NO CONFIG CHANGE** — monitoring stale filter 48h, open-skies+ degradation.

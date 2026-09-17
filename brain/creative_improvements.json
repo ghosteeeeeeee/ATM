@@ -942,5 +942,35 @@
     "status": "suggested",
     "risk": "low",
     "sample_size": "9T all-time (borderline). Directional signal clear."
+  },
+  {
+    "date": "2026-09-17T19:45:00Z",
+    "idea": "Remove dead signals from STANDALONE_BYPASS list",
+    "rationale": "bb-bounce-v2-long+, breakout-long+, ema300-dip-long, accel-300-v4-short have *_ENABLED=OFF. Bypass entries are dead code. Zero risk removal reduces maintenance surface.",
+    "expected_impact": "Zero PnL impact. Reduced surface.",
+    "category": "cleanup",
+    "status": "ready to implement",
+    "risk": "low",
+    "impact_on_winners": "0 — dead signals have 0 active trades"
+  },
+  {
+    "date": "2026-09-17T19:45:00Z",
+    "idea": "open-skies+ wave_phase gate — block LONG when BTC wave_phase=falling",
+    "rationale": "Sessions identified: falling=5T 20%WR -$0.49 vs accelerating=3T 66.7%WR $0.00. Code-level change. Trend_purity has similar logic.",
+    "expected_impact": "~$0.20-0.30/7d saved",
+    "category": "entry sniper",
+    "status": "needs code implementation",
+    "risk": "low",
+    "impact_on_winners": "0 — accelerating/bottoming trades NOT blocked"
+  },
+  {
+    "date": "2026-09-17T19:45:00Z",
+    "idea": "EXTREME SHORT confidence boost",
+    "rationale": "EXTREME SHORT fresh 57.7%WR +$0.697d is system edge. Higher confidence = fewer false positives.",
+    "expected_impact": "Needs backtest — sample 26T fresh EXTREME SHORT7d",
+    "category": "entry sniper",
+    "status": "monitor — needs 50+ sample",
+    "risk": "low",
+    "impact_on_winners": "Needs verification"
   }
 ]

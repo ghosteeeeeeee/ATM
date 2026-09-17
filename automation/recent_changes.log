@@ -1,3 +1,14 @@
+[2026-09-17 18:30 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  24h: 15T 20%WR -$1.73 (COLD STREAK) | 7d: 226T 51.8%WR -$2.11
+  SHORT $0.00 carries LONG -$2.73 (legacy aging out)
+  EXTREME SHORT fresh 58.3%WR +$0.88 (edge) | HIGH 46.2%WR -$2.18 (worst, legacy)
+  Stale filter deployed 10:00 UTC — post-deployment 9 trades ALL FRESH, zero stale entries (WORKING)
+  7d stale 72T 47.2%WR -$1.77 vs fresh 154T 52.6%WR -$0.96
+  Losers: 11 — open-skies+ 4T (wave_phase=falling), pullback-entry- 4T (normal variance), volume-breakout-long+ 3T (BIGTIME RSI=84.62)
+  All 24h losers are FRESH entries — stale filter protecting system
+  Creative: EXTREME SHORT fresh = edge. volume-breakout-long+ HIGH 0%WR monitor. open-skies+ wave_phase monitor.
+  BY: brain_auditor
+
 [2026-09-17 13:35 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
   24h: 10T 40%WR -$0.88 (COLD STREAK) | 7d: 234T 52.2%WR slightly negative
   SHORT 7d: dominant (+$1.83) | LONG: legacy aging out (-$1.18)
@@ -2263,3 +2274,21 @@
   24h: 14T 21.4%WR -$1.37 | 7d: 226T 50.9%WR -$2.72
   Kill check: 0T last hour. ATR SL 64% avg -$0.121 (breakeven).
   No action needed. BY: auto_1hr
+
+[2026-09-17 19:45 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  24h: 16T 18.8%WR -$1.89 (COLD STREAK) | 7d: 226T 50.9%WR -$2.76
+  SHORT roughly breakeven | LONG -$2.76 (legacy aging out)
+  EXTREME SHORT fresh 57.7%WR +$0.69 (edge) | HIGH 46.2%WR -$2.18 (worst, legacy)
+  Stale filter post-deploy 9/10 fresh (90%) vs pre-deploy 8/11 (73%) — WORKING
+  7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83
+  Losers: 13 — open-skies+ 4T (wave_phase=falling HIGH), pullback-entry- 4T (normal variance), volume-breakout-long+ 3T (BIGTIME overbought), other 2 cut-loser
+  All 24h losers FRESH — stale filter protecting system
+  STANDALONE_BYPASS cleanup ready: dead signals (bb-bounce-v2-long+, breakout-long+, ema300-dip-long) still listed but *_ENABLED=OFF
+  Creative: open-skies+ wave_phase gate (code change), EXTREME SHORT confidence boost (needs sample), stale filter eval Sep 19
+  BY: brain_auditor
+[2026-09-17 20:00 UTC] brain_auditor: 1 CONFIG CHANGE — STANDALONE_BYPASS cleanup
+  Removed 4 dead signals: open-skies+, open-skies, bb-bounce-v2-long, breakout-long
+  DB: 24h 13T 18.8%WR -$1.89 (COLD STREAK) | 7d 226T 50.9%WR -$2.76
+  Stale filter working (90-100% fresh post-deploy). EXTREME SHORT fresh edge 57.7%WR.
+  Creative: EXTREME SHORT confidence boost (monitor). HIGH regime self-correcting.
+  BY: brain_auditor

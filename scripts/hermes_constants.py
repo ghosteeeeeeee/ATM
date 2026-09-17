@@ -2350,9 +2350,10 @@ BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought ca
 STANDALONE_BYPASS_SIGNALS = (
     'pump-chain', 'pump_chain',  # chain correlation — fires when coin is pumping, BTC flat irrelevant (2026-09-12)
     'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
-    'open-skies+', 'open-skies', 'open_skies',  # breakout LONG — 63% WR, works solo (2026-09-12)
+    # open-skies+ KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v3-long', 'bb-v2-short',
+    # bb-bounce-v2-long removed — dead (4T/7d 25%WR -$0.47)
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
@@ -2364,7 +2365,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
     # ponytail: accel-300-v4-short removed — killed Sep 11 (5T/20%WR -$0.26)
     'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
-    'breakout-long',  # Volume-confirmed breakout LONG — structural breakout signal, works solo
+    # breakout-long removed — killed 2026-09-17 (4T/7d 25%WR -$0.35)
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
@@ -2387,7 +2388,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
-    'open-skies',  # open skies breakout LONG — structural signal, no resistance overhead
+    # open-skies removed — killed 2026-09-17 (same as open-skies+)
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)

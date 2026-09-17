@@ -841,3 +841,67 @@ Final set: ['ENA', 'INJ', 'KAS']
 - 3 volume-breakout-long+ open positions — watching for cluster risk
 
 **BY:** auto_1hr
+
+## [2026-09-17 19:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L -$0.15)
+- WCT LONG volume-breakout-long+ SL hit: -$0.16
+- BABY LONG volume-breakout-long+ SL hit: +$0.01
+
+**Open:** 3 (HEMI SHORT pullback-entry-, IO SHORT pullback-entry-, GMX LONG volume-breakout-long+)
+
+**24h:** 16T 12.5%WR -$1.89 | **7d:** 226T 50.9%WR -$2.72
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T (68.75%) avg -$0.113 — dominant but near breakeven
+- cut-loser-CL-T1: 2T avg -$0.090
+- HARD_SL_FAILED: 1T -$0.250
+- HL_CLOSED: 1T -$0.230
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- ATR SL: 68.75% but avg loss tiny (-$0.113) — structural in choppy market, tpsl fix verified
+- Trade frequency: ~2/hr — healthy
+- pullback-entry- 24h: 4T 0%WR -$0.78 but 7d: 68T 51.5%WR +$0.25 — cold streak, not kill-worthy
+- Open trades: 3 with reasonable SL levels (0.87-1.30%)
+
+**Monitoring:**
+- trend_purity+ 7d: 11T -$0.90 — worst performer but too few trades to act
+- ATR SL dominance structural — losses small, no fix needed
+- 2 pullback-entry- shorts open — watching for reversal risk
+
+**BY:** auto_1hr
+
+## [2026-09-17 20:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+
+**24h:** 16T 12.5%WR -$1.89 | **7d:** 226T 50.9%WR -$2.72
+
+**Open:** 5 (HEMI SHORT pullback-entry-, IO SHORT pullback-entry-, ALT SHORT pullback-entry-, AIXBT SHORT pullback-entry-, GMX LONG volume-breakout-long+)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 11T (68.75%) avg -$0.113 — structural, tpsl fix verified
+- cut-loser-CL-T1: 2T avg -$0.090
+- HARD_SL_FAILED: 1T -$0.250
+- HL_CLOSED: 1T -$0.230
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 trades last hour — no signal qualifies
+- ATR SL: 68.75% but avg loss tiny (-$0.113) — no fix needed
+- Trade frequency: 0/hr — quiet period
+- pullback-entry- cold streak: 24h 0%WR but 7d 51.5%WR +$0.25 — variance, not kill-worthy
+- Open trades: 4 pullback-entry- shorts, 1 volume-breakout-long+ long — no cluster risk
+
+**Monitoring:**
+- 4 pullback-entry- shorts open simultaneously — watching for coordinated reversal
+- ATR SL dominance structural in choppy market
+- Next: watch for breakout from current low-activity period
+
+**BY:** auto_1hr

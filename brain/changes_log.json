@@ -230,5 +230,16 @@
     "after": "Also checks token_speeds.is_stale (momentum state)",
     "rationale": "41 stale pullback-entry- SHORT 7d = -$0.27 vs 37 fresh = +$1.00. Stale tokens have no momentum — pullback entries in flat markets fail. Other signals (trend_purity, r2_trend) already block stale.",
     "expected_impact": "+$0.50-1.00/7d"
+  },
+  {
+    "timestamp": "2026-09-17T20:35:42.953993+00:00",
+    "agent": "brain_auditor",
+    "change": "STANDALONE_BYPASS cleanup — removed 4 dead signals: open-skies+, open-skies, bb-bounce-v2-long, breakout-long",
+    "type": "cleanup",
+    "file": "hermes_constants.py",
+    "before": "open-skies+ (killed Sep 17), open-skies (dead), bb-bounce-v2-long (4T/7d 25%WR), breakout-long (killed Sep 17) in STANDALONE_BYPASS_SIGNALS",
+    "after": "Removed all 4. Comments added explaining removal. Active signals preserved (97 entries).",
+    "rationale": "Dead signals pollute config and confuse audits. No runtime impact since *_ENABLED=False for all removed signals.",
+    "impact": "Zero runtime change. Code hygiene only."
   }
 ]

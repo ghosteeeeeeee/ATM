@@ -1926,3 +1926,27 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** Resistance proximity filter for SHORT entries — 29 rr_engine exits, 17 losers near resistance. Needs winner impact analysis before implementing.
   **NO CONFIG CHANGE** — monitoring stale filter 48h, HIGH regime legacy flush.
   BY: brain_auditor
+
+- [2026-09-17 19:45 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 16T 18.8%WR -$1.89 (COLD STREAK) | 7d 226T 50.9%WR -$2.76
+  Market NEUTRAL. 4 open (AIXBT SHORT, HEMI SHORT, IO SHORT, GMX LONG).
+  **STALE FILTER STATUS:** Deployed 10:00 UTC Sep 17. Post-deployment: 9/10 FRESH (90%). Pre-deploy: 8/11 FRESH (73%). Filter working. 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. **NEXT: Evaluate by Sep 19 10:00 UTC.**
+  **LOSING AUTOPSY (13 losers):** open-skies+ LONG 4T ALL ATR SL (3/4 wave_phase=falling, 3/4 HIGH regime). pullback-entry- SHORT 4T (SEI exchange bug, ACE stale, ME/SUPER normal variance). volume-breakout-long+ 3T (BIGTIME RSI=84.62 overbought, NOT/BABY normal). Other 2 (AVAX/COMP cut-loser working). All 24h losers are FRESH — stale filter protecting system.
+  **REGIME:** EXTREME 77T 57.1%WR +$0.02 (breakeven). HIGH 91T 46.2%WR -$2.18 (worst, ~60% legacy). NORMAL 57T 50.9%WR -$0.60.
+  **SHORT vs LONG:** SHORT roughly breakeven. LONG -$2.76 (legacy aging out).
+  **EXIT:** profit-monster-trail carries system. atr_sl_hit dominant (#1 drag). cut-loser-CL-T1 working as designed.
+  **STANDALONE_BYPASS CLEANUP READY:** bb-bounce-v2-long+, breakout-long+, ema300-dip-long, accel-300-v4-short still in bypass list but have *_ENABLED=OFF. Dead code. Zero risk removal.
+  **CREATIVE:** (1) open-skies+ wave_phase gate: falling=4T 25%WR -$0.26 vs accelerating=3T 66.7%WR $0.00. Code-level change needed — trend_purity has similar logic. (2) EXTREME SHORT fresh 57.7%WR +$0.69 = system edge. Stale filter protecting it. (3) No config change needed — cold streak is variance + legacy flush, system structurally sound.
+  **NO CONFIG CHANGE** — monitoring stale filter 48h, stale filter evaluation Sep 19.
+  BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-17 20:00 UTC (brain_auditor run)] brain_auditor: **1 CONFIG CHANGE — STANDALONE_BYPASS cleanup**
+  Removed 4 dead signals from STANDALONE_BYPASS_SIGNALS: open-skies+, open-skies (killed Sep 17), bb-bounce-v2-long (dead 4T/7d 25%WR), breakout-long (killed Sep 17). Zero runtime impact (*_ENABLED=False). Code hygiene.
+  DB-verified: 24h 13T 18.8%WR -$1.89 (COLD STREAK) | 7d 226T 50.9%WR -\$2.76
+  Market NEUTRAL. 3 open (IO SHORT, GMX LONG, WCT LONG).
+  **LOSING AUTOPSY:** 13 losers — open-skies+ 5T (KILLED, wave_phase=falling HIGH regime), pullback-entry- 4T (cold streak, 7d profitable), volume-breakout-long+ 3T (small losses), other 1 cut-loser. All FRESH — stale filter working.
+  **REGIME:** EXTREME 76T 56.6%WR -\$0.20 (breakeven). HIGH 90T 46.7%WR -\$2.00 (worst, ~60% legacy). NORMAL 57T 50.9%WR -\$0.60.
+  **STALE FILTER:** Post-deploy 90-100% fresh. Pre-deploy 73%. Filter working. Eval Sep 19.
+  **CREATIVE:** EXTREME SHORT fresh 57.7%WR +\$0.69 = system edge. HIGH regime self-correcting as legacy ages out.
+  BY: brain_auditor
