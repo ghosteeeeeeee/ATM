@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~18:35 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-17 ~18:35 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 11T, 27.3% WR, -$0.95. 3 open. Market LONG_BIAS (5 tokens). Pipeline running.
+24h: 15T, 20.0% WR, -$1.73. 3 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 11T, 27.3% WR, -$0.95 (DB-verified — COLD STREAK). open-skies+ KILLED (17:11 UTC). 7 losers today: open-skies+ LONG 4T ALL losers (3/4 wave_phase=falling). 2 wins: RESOLV +$0.01, BABY +$0.01. ATR SL 8T avg -$0.098 dominant.
+- **24h (rolling):** 15T, 20.0% WR, -$1.73 (DB-verified — COLD STREAK). open-skies+ KILLED (17:11 UTC). pullback-entry- SHORT 4T/0%WR -$0.78 (cold streak, 7d profitable 51.5%WR +$0.25 — variance). ATR SL 13T dominant.
 - **Today (calendar):** 9T closed (Sep 17). 3 open. PnL: negative.
 - **7d:** 221T, 51.1% WR, -$2.45 (DB-verified). SHORT carries LONG (legacy aging out).
 - **7d REGIME:** EXTREME 76T 57.9%WR +$0.14 (best) | NORMAL 55T 50.9%WR -$0.49 | HIGH 89T 46.1%WR -$2.10 (worst — ~60% dead/legacy signals).
