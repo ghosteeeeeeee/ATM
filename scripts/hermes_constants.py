@@ -2081,7 +2081,7 @@ ACCEL_300_V3_LONG_EXEC_PRE15_MIN = 0    # min pre15_move — block LONG if price
 
 # ── breakout_long.py — Volume-confirmed breakout LONG ─────────────────────────
 # Catches breakouts from consolidation: low ATR + volume spike + range breakout
-BREAKOUT_LONG_ENABLED = True
+BREAKOUT_LONG_ENABLED = False      # CEO KILLED 2026-09-17 — 4T/7d 25%WR/-$0.35, 48h 3T/0%WR/-$0.60. Fires LONG in NEUTRAL without BTC gate.
 BREAKOUT_LONG_PLUS_ENABLED = False      # KILLED 2026-09-16 02:08 UTC — 3T/0%WR/-$0.60 (fires LONG in NEUTRAL, no BTC regime gate)
 BREAKOUT_LONG_MINUS_ENABLED = False     # SHORT not implemented yet
 BREAKOUT_LONG_ATR_PERIOD = 14           # ATR period (5m candles)
@@ -2344,7 +2344,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
     'open-skies+', 'open-skies', 'open_skies',  # breakout LONG — 63% WR, works solo (2026-09-12)
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-v2-short',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',

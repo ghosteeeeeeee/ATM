@@ -1,3 +1,7 @@
+## CEO DECISIONS
+- [2026-09-17 02:40 UTC] CEO: KILLED BREAKOUT_LONG_ENABLED. 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60. Fires LONG in NEUTRAL without BTC gate. Pipeline restarted.
+- [2026-09-17 02:40 UTC] CEO: SKIP trend_purity+ kill — legacy trades only (Sep 12-13), no active bleed. TREND_PURITY_PLUS_ENABLED already False since Sep 13.
+
 ## TEAM UPDATES
 - [2026-09-16 18:30 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — exit_conditions recording (position_manager)
   DB-verified: 24h 21T 66.7%WR +$1.33 (POSITIVE) | 7d 255T 55.7%WR +$2.72 (POSITIVE)

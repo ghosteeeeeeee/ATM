@@ -1,24 +1,24 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-16 ~18:30 UTC (brain_auditor)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-17 ~02:40 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 21T, 66.7% WR, +$1.33. 0 open. Market NEUTRAL. Pipeline running, no errors.
+24h: 22T, 36.4% WR, -$0.60. 0 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 21T, 66.7% WR, +$1.33 (DB-verified — POSITIVE). pullback-entry- dominant.
-- **Today (calendar):** 21T closed. 0 open.
-- **7d:** 255T, 55.7% WR, +$2.72 (DB-verified — POSITIVE). SHORT dominant | LONG legacy aging out.
-- **7d REGIME:** EXTREME 97T 59.8%WR +$2.91★ | HIGH 107T 54.2%WR +$0.79 | NORMAL 54T 53.7%WR -$0.10.
-- **7d EXIT:** profit-monster-trail carries system | rr_engine_resistance -$1.08 (7d #1 exit drag).
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 87T/59.8%WR +$3.78★ | pump-chain- SHORT 49T/61.2%WR +$1.25 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 7T/85.7%WR +$0.56
-- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (KILLED) | pullback-entry+ 5T/0%WR -$0.61 (KILLED) | rr-struct-v2+ 10T/40%WR -$0.45 (KILLED) | breakout-long+ 4T/25%WR -$0.35 (KILLED)
+- **24h (rolling):** 22T, 36.4% WR, -$0.60 (DB-verified — NEGATIVE). pullback-entry- SHORT dominant losses.
+- **Today (calendar):** 6T closed (Sep 17). 0 open.
+- **7d:** 258T, 52.7% WR, +$0.31 (DB-verified — barely positive). SHORT +$2.14 carries LONG -$1.83.
+- **7d REGIME:** ALL NEUTRAL (257T).
+- **7d EXIT:** atr_sl_hit dominant loss driver. rr_engine_resistance -$1.08 (7d #1 exit drag).
+- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 84T/52.4%WR +$1.00 | pump-chain- SHORT 49T/61.2%WR +$1.25 | rr-struct+ LONG 15T/73.3%WR +$0.59 | mover- SHORT 5T/100%WR +$0.56
+- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (legacy, no active bleed) | breakout-long+ 4T/25%WR -$0.35 (KILLED by CEO) | rr-struct-v2+ 10T/40%WR -$0.45 (legacy, killed)
 - **Market:** NEUTRAL (100%).
 - **Open:** 0 trades.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
-- **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
+- **KILLED (Sep 17 02:40):** breakout-long (CEO, 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60, fires LONG in NEUTRAL). **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
 - **Disk:** ~81% (23G free).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).

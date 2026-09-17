@@ -51,7 +51,6 @@ from hermes_constants import (
     BB_BOUNCE_V3_VOLATILITY_MAX as VOL_MAX,
     BB_BOUNCE_V3_MIN_AGE_SEC as MIN_AGE_SEC,
     BB_BOUNCE_V3_STALE_MAX_AGE_SEC as STALE_MAX_AGE_SEC,
-    BB_BOUNCE_V3_SPEED_MIN as SPEED_MIN,
     BB_BOUNCE_V3_CONF_BASE as CONF_BASE,
     BB_BOUNCE_V3_CONF_CAP as CONF_CAP,
     BB_BOUNCE_V3_REGIME_NORMAL_MULT as REGIME_NORMAL_MULT,
@@ -61,7 +60,6 @@ from hermes_constants import (
 )
 
 # ── State ─────────────────────────────────────────────────────────────────
-_cooldown = {}
 
 
 def _log(msg):
@@ -322,11 +320,16 @@ def detect_bb_bounce_v3_long(token, closes):
     if dist_from_lower > BB_TOUCH_PCT:
         return None
 
-    # ── FILTER 2: BB width — not too wide (squeeze condition) ──
+    # ── FILTER 2: Stale signal — reject old signals (new in v3) ──
+    candle_age_sec = time.time() - (candles[-1][0] if candles else 0)
+    if candle_age_sec > STALE_MAX_AGE_SEC:
+        return None
+
+    # ── FILTER 3: BB width — not too wide (squeeze condition) ──
     if width > BB_WIDTH_MAX:
         return None
 
-    # ── FILTER 3: RSI band — 25-55 (not extreme oversold/overbought) ──
+    # ── FILTER 4: RSI band — 25-55 (not extreme oversold/overbought) ──
     if rsi < RSI_MIN or rsi > RSI_MAX:
         return None
 
@@ -373,11 +376,6 @@ def detect_bb_bounce_v3_long(token, closes):
     # ── FILTER 11: Volatility — low vol = less chop ──
     vol = _get_volatility(token)
     if vol is not None and vol > VOL_MAX:
-        return None
-
-    # ── FILTER 12: Speed minimum — not in free-fall (new in v3) ──
-    # (already checked vel against VEL_MIN above, this is the absolute floor)
-    if vel is not None and vel < SPEED_MIN:
         return None
 
     return {
@@ -455,7 +453,7 @@ def _compute_confidence(sig, token):
 
 def scan_bb_bounce_v3_long_signals(prices_dict):
     """Scan tokens for BB bounce v3 LONG signals."""
-    from signal_schema import add_signal, get_cooldown, set_cooldown
+    from signal_schema import add_signal, get_cooldown
     from hyperliquid_exchange import is_delisted
 
     added = 0

@@ -341,3 +341,36 @@
 - BIGTIME open -6.87% but tiny position (-$0.01), very close to SL
 - WLD open +5.63% — healthy profit
 - SNIPER active on bearish signals in NEUTRAL regime
+
+## [2026-09-17 01:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 20T ~40%WR -$0.02 | **7d:** 255T 53.3%WR +$0.70
+
+**24h Exit Breakdown:**
+- ATR SL: 9T (45%) avg -$0.026 — slightly above 40% threshold, losses tiny
+- SNIPER exits: 6T — protecting system from bad entries
+- profit-monster-trail: 2T +$0.14 — working
+- hard_tp: 1T +$0.34 — working
+
+**Signal Health (24h):**
+- pullback-entry-: 15T 33%WR -$0.67 — rough 24h but 7d still +$1.00
+- open-skies+: 2T 100%WR +$0.34 — working
+- volume-breakout-long+: 1T breakeven — too early to judge
+
+**Open:** 4 LONGs (INJ, DOGE, BIGTIME, WLD) all slightly negative
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- ATR SL 45% slightly elevated but avg loss only -$0.026 (tiny)
+- SNIPER protecting system from bad entries
+- Trade frequency 0/hr — quiet period, not overtrading
+- All losers already disabled
+- 4 open LONGs slightly negative — within normal range
+
+**Monitoring:**
+- ATR SL percentage slightly elevated (45%) — watch next hour
+- BIGTIME at -1.20% — approaching SL zone
+- Market quiet — waiting for next signal

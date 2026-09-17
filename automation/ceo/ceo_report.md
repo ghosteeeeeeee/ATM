@@ -1,4 +1,19 @@
-## CEO Report — 2026-09-16 ~10:34 UTC
+## CEO Report — 2026-09-17 ~02:40 UTC
+
+### Diagnosis
+24h: 22T, 36.4%WR, -$0.60 (VERIFIED — deterioration from 66.7% earlier). 7d: 258T, 52.7%WR, +$0.31 (VERIFIED — barely positive, down from +$2.72). SHORT carries: +$2.14. LONG bleeds: -$1.83. Market 100% NEUTRAL. 0 open.
+
+### Root Cause
+Breakout-long+ still firing LONG in NEUTRAL without BTC regime gate — 3T/0%WR -$0.60 in 48h. Legacy trades from killed signals (rr-struct-v2+, breakout-long+) account for most LONG losses. pullback-entry- SHORT normal variance (84T/7d 52.4%WR +$1.00).
+
+### Fix Applied
+1. KILLED BREAKOUT_LONG_ENABLED (was True). 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60. Pipeline restarted.
+
+### Not Applied (review needed)
+- trend_purity+ LONG: 11T/36.4%WR -$0.90, but ALL trades are legacy (Sep 12-13). TREND_PURITY_PLUS_ENABLED already False since Sep 13. No active bleed — no action needed.
+
+### Verification
+Pipeline restarted, BREAKOUT_LONG_ENABLED=False confirmed in hermes_constants.py.
 
 ### Diagnosis
 24h flat: 25T, 52%WR, -$0.21 (VERIFIED). 7d positive: 267T, 55.4%WR, +$1.53 (VERIFIED). SHORT dominant: +$3.79. LONG drag: -$2.26 (legacy aging out). 5 open SHORT. Market NEUTRAL.
