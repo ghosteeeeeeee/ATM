@@ -461,3 +461,40 @@ Final set: ['ACE', 'APT', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX', 'LTC', 
 - ADD INJ (WR=37.5%, PnL=$-0.51, wr_collapse (73.1% → 37.5%))
 
 Final set: ['ENA', 'INJ', 'KAS']
+
+## [2026-09-17 14:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 0 (system flat)
+**24h:** 26T 42.3%WR -$0.02
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (31.8%) avg +$0.009 — healthy, below 40% threshold
+- SNIPER exits: 10T — protecting system from bearish reversals
+- profit-monster-trail: 2T +$0.14 — working
+- hard_tp: 1T +$0.34 — working
+- HARD_SL_FAILED: 1T -$0.25, HL_CLOSED: 1T -$0.23 — single occurrences
+
+**Signal Health (24h):**
+- pullback-entry- SHORT: 12T -$0.16 — regime-driven weakness (SHORTs in neutral market)
+- open-skies+ LONG: 5T +$0.20 — healthy (60%WR)
+- volume-breakout-long+ LONG: 3T -$0.10 — 0%WR but small sample, monitor
+- mover-, r2-trend-short3: 1T each, 100%WR — working
+
+**Diagnosis:**
+- ATR SL healthy (31.8% of closes, avg +$0.009)
+- SNIPER actively protecting system
+- System flat — quiet market period
+- No overtrading (0/hr)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades in last hour
+- ATR SL well below 40% threshold
+- Trade frequency 0/hr — quiet, not overtrading
+- pullback-entry- SHORT weakness is regime-driven, still profitable over 7d
+
+**Monitoring:**
+- volume-breakout-long+ at 0%WR (3T) — will kill if reaches 3+ trades next hour with 0 wins
+- System flat — waiting for next signal
