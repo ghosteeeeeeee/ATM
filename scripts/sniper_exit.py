@@ -837,18 +837,19 @@ def sniper_check(dry_run=False):
     diverging = []
     staying = []
     try:
-        import psycopg2 as _pg
-        _conn = _pg.connect("host=/var/run/postgresql dbname=brain user=postgres", connect_timeout=5)
+        import sqlite3 as _sc
+        _conn = _sc.connect(RUNTIME_DB, timeout=5)
+        _conn.row_factory = _sc.Row
         _cur = _conn.cursor()
         for p in wrong_side:
             token = p['token']
             direction = p['direction']
             _cur.execute("""
-                SELECT price_change_30m FROM token_speeds WHERE token = %s
+                SELECT price_change_30m FROM token_speeds WHERE token = ?
             """, (token,))
             row = _cur.fetchone()
-            if row and row[0] is not None:
-                token_momentum = float(row[0])
+            if row and row['price_change_30m'] is not None:
+                token_momentum = float(row['price_change_30m'])
                 # SHORT while token dumping = diverging (keep SHORT)
                 # LONG while token pumping = diverging (keep LONG)
                 if (direction == 'SHORT' and token_momentum < -0.5) or \
