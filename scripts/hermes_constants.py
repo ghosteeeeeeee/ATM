@@ -253,17 +253,16 @@ FAVORITES = {
     'ACE',
     'APT',
     'BABY',
-    'BANANA',
     'BIGTIME',
     'CC',
-    'CFX',
     'CHIP',
     'ETC',
     'IMX',
     'LTC',
     'POL',
     'PONS',
-    'TURBO'
+    'TURBO',
+    'USUAL'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -280,12 +279,11 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py
 # Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
 LOSERS = {
-    'BLUR',
     'ENA',
-    'ETH',
-    'KAS',
-    'MET'
+    'INJ',
+    'KAS'
 }
+
 
 
 

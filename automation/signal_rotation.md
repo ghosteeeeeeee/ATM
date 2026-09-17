@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-09-17 01:18 UTC
+# Signal Rotation — 2026-09-17 05:27 UTC
 
 ## Market Regime: LONG_BIAS
 

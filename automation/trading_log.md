@@ -374,3 +374,90 @@
 - ATR SL percentage slightly elevated (45%) — watch next hour
 - BIGTIME at -1.20% — approaching SL zone
 - Market quiet — waiting for next signal
+
+## [2026-09-17 05:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 0 (system flat)
+**24h:** 24T 33.3%WR -$0.73 | **48h:** 52T +$0.03
+
+**48h Exit Breakdown:**
+- ATR SL: 31T (59.6%) avg +$0.003 — elevated % but breakeven avg, SLs working correctly
+- SNIPER exits: 10T total — correctly protecting system from bad entries
+- profit-monster-trail: 3T +$0.17 — working
+- hard_tp: 1T +$0.34 — working
+
+**Signal Health (24h):**
+- pullback-entry- SHORT: 14T 28.6%WR -$0.69 — weakest signal, SHORTs in bullish/neutral regime
+- volume-breakout-long+: 3T 0%WR -$0.10 — small sample, tiny losses
+- open-skies+: 4T 50%WR +$0.14 — working
+- pullback-entry- total (7d): 84T +$1.00 — still profitable long-term
+
+**Diagnosis:**
+- ATR SL at 59.6% of 48h closes — elevated but avg PnL +$0.003 (breakeven). SLs catching exits at fair value.
+- SNIPER correctly protecting LONGs from bearish reversal (SNIPER-L3-BEARISH exits)
+- System flat — 0 open trades, quiet period
+- pullback-entry- SHORT weakness is regime-driven (SHORTs in bullish/neutral = expected losses)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades in last hour (0 trades closed)
+- ATR SL elevated but avg loss breakeven — SLs working as designed
+- SNIPER actively protecting system
+- Trade frequency 0/hr — quiet, not overtrading
+- pullback-entry- SHORT weakness is regime-driven, still profitable over 7d
+
+**Monitoring:**
+- pullback-entry- SHORT win rate in NEUTRAL regime — watch if regime shifts
+- System flat — waiting for next signal
+
+## [2026-09-17 13:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 0 (system flat)
+**24h:** 22T 36.4%WR -$0.05
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (31.8%) avg +$0.009 — healthy, below 40% threshold
+- SNIPER exits: 10T — protecting system from bearish reversals
+- profit-monster-trail: 2T +$0.14 — working
+- hard_tp: 1T +$0.34 — working
+- HARD_SL_FAILED: 1T -$0.25, HL_CLOSED: 1T -$0.23 — single occurrences
+
+**Signal Health (24h):**
+- pullback-entry- SHORT: 12T -$0.16 — regime-driven weakness (SHORTs in neutral/bullish)
+- volume-breakout-long+: 3T -$0.10 — small sample
+- open-skies+: 4T +$0.14 — working
+
+**Diagnosis:**
+- ATR SL healthy (31.8% of closes, avg +$0.009)
+- SNIPER actively protecting system
+- System flat — quiet period
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades in last hour
+- ATR SL well below 40% threshold
+- Trade frequency 0/hr — quiet, not overtrading
+- pullback-entry- SHORT weakness is regime-driven, still profitable over 7d
+
+**Monitoring:**
+- System flat — waiting for next signal
+
+## FAVORITES Update — 2026-09-17 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE BANANA (WR=50.0%, PnL=$-0.07, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE CFX (inactive 7d, no trades)
+- PROMOTE USUAL (WR=60.0%, AvgPnL=0.73%, Trades=5)
+
+Final set: ['ACE', 'APT', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX', 'LTC', 'POL', 'PONS', 'TURBO', 'USUAL']
+
+## LOSERS Update — 2026-09-17 06:05 UTC
+- REMOVE ETH (insufficient data)
+- REMOVE MET (insufficient data)
+- REMOVE BLUR (WR=50.0%, PnL=$-0.13, recovered)
+- ADD INJ (WR=37.5%, PnL=$-0.51, wr_collapse (73.1% → 37.5%))
+
+Final set: ['ENA', 'INJ', 'KAS']

@@ -321,7 +321,19 @@ def detect_bb_bounce_v3_long(token, closes):
         return None
 
     # ── FILTER 2: Stale signal — reject old signals (new in v3) ──
-    candle_age_sec = time.time() - (candles[-1][0] if candles else 0)
+    conn = None
+    try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(ts) FROM candles_5m WHERE token = ?", (token.upper(),))
+        row = cur.fetchone()
+        latest_ts = row[0] if row and row[0] else 0
+    except Exception:
+        latest_ts = 0
+    finally:
+        if conn:
+            conn.close()
+    candle_age_sec = time.time() - latest_ts
     if candle_age_sec > STALE_MAX_AGE_SEC:
         return None
 

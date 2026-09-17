@@ -1784,3 +1784,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **RSI FIX VERIFIED:** ETC SHORT RSI=70.14 would now be blocked. DOT RSI=64.22 still passes (borderline).
   No config change — monitoring 4 items.
   BY: brain_auditor
+
+- [2026-09-17 05:30 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring + creative ideas
+  DB-verified: 24h 22T 36.4%WR -$0.60 | 7d 255T 53.3%WR +$0.70
+  SHORT 7d: +$1.93 (dominant) | LONG 7d: -$1.96 (legacy bleed, aging out)
+  pullback-entry- 79T +$0.81 (53.2%WR) | pump-chain- 49T +$1.25 (61.2%WR) | mover- 8T +$0.61 (100%WR)
+  **STALE SIGNAL:** 80/255 7d trades (31.4%). Stale 48.8%WR -$1.17 vs fresh 54.0%WR +$1.14. ~$2.31/7d gap. Design needed.
+  **rr_engine_resistance:** 31 SHORT exits/7d -$0.92. All SHORT, avg loss -$0.14. Hold 3.3h avg. Pattern: enters near resistance, drifts up, cuts.
+  **LONG in NEUTRAL:** 105 LONG trades/7d -$1.96. 47.6%WR. Signals bypass LONG_NEUTRAL_BLOCK via STANDALONE_BYPASS. Structural drag.
+  **pump-chain+ LONG:** 25T/7d 40%WR -$0.28. #1 ATR SL victim (15/25 exits ATR_SL). Normal regime already blocked but LONG still fires via bypass.
+  **CREATIVE:** (1) STALE_MAX_AGE_MINUTES=30 — skip signals >30min old. ~$1.5-2.5/7d expected. (2) Kill pump-chain+ LONG entirely — net negative, +$1.16/7d. (3) mover- SHORT 100%WR 8T — needs 20+ trades before scaling.
+  **NO CONFIG CHANGE** — monitoring stale fix design, pump-chain+ LONG kill decision, mover- expansion.
+  BY: brain_auditor

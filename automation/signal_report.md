@@ -1,67 +1,107 @@
 # Signal Performance Report
-**Generated:** 2026-09-16 21:00 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-09-17 05:09 UTC | **Period:** Last 6h + 24h
 
-## Activity Summary
-- **Trades closed (6h):** 5 | **Trades closed (24h):** 15 | **Total all-time:** 5,091
-- **System status:** Low activity — fewer trades than usual
-
----
-
-## KILLED (executed this cycle)
-
-None. No signals meet all 3 kill criteria (WR <30%, PnL <-$0.10, >24h active).
+## Overall Stats
+- **Total trades (24h):** 22 | **System PnL:** -$0.20
+- **Total trades (all time):** 5,103
 
 ---
 
-## BOOSTED (executed this cycle)
+## KILLED (executed)
 
-None. No signals meet all 3 boost criteria (WR >55%, PnL >$0.05, 5+ trades) with sufficient sample.
+None. No signals meet kill criteria (WR <30% with 5+ trades in 24h).
+
+---
+
+## BOOSTED (executed)
+
+None. No signals meet boost criteria (WR >55%, 5+ trades, PnL >$0.05 in 24h).
 
 ---
 
 ## LOSERS (watch list)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | 7d WR | 7d PnL | Status |
-|--------|-----|-------|--------|---------|-------|--------|--------|
-| pullback-entry- | SHORT | 14 | 42.9% | -$0.33 | 54.3% | +$1.23 | WATCH — bad 24h patch, profitable 7d |
-| trend_purity+ | LONG | — | — | — | 36.4% | -$0.90 | WATCH — worst 7d performer, EXTREME regime 44.4% WR |
-| rr-struct-v2+ | LONG | — | — | — | 40.0% | -$0.45 | Already regime-blocked (0.2x NORMAL) |
+| Signal | Dir | Trades | WR | PnL | Avg PnL | Status |
+|--------|-----|--------|-----|-----|---------|--------|
+| pullback-entry- | SHORT | 12 | 33.3% | -$0.16 | -$0.01 | TUNE — historically profitable all regimes, bad 24h streak |
+| volume-breakout-long+ | LONG | 3 | 0.0% | -$0.10 | -$0.03 | WATCH — low sample, losses from SNIPER exits |
+| rs-s36,volume-breakout-long+ | LONG | 1 | 0.0% | -$0.22 | -$0.22 | WATCH — single trade, insufficient data |
 
 ---
 
 ## WINNERS
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | 7d WR | 7d PnL | Status |
-|--------|-----|-------|--------|---------|-------|--------|--------|
-| mover- | SHORT | 1 | 100% | +$0.08 | 100% | +$0.56 | ENABLED — small sample |
-| r2-trend-short3 | SHORT | 1 | 100% | +$0.06 | — | — | ENABLED — single trade |
+| Signal | Dir | Trades | WR | PnL | Avg PnL | Status |
+|--------|-----|--------|-----|-----|---------|--------|
+| open-skies+ | LONG | 4 | 50.0% | +$0.14 | +$0.04 | OK — performing within expectations |
+| r2-trend-short3 | SHORT | 1 | 100.0% | +$0.06 | +$0.06 | OK — single trade |
+| mover- | SHORT | 1 | 100.0% | +$0.08 | +$0.08 | OK — single trade |
 
 ---
 
-## SIGNAL INVERSIONS (24h)
+## REGIME ANALYSIS
 
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## REGIME PERFORMANCE (pullback-entry- SHORT — key signal)
-
+### pullback-entry- SHORT (24h)
 | Regime | Trades | WR | PnL |
 |--------|--------|-----|-----|
-| EXTREME | 19 | 68.4% | +$1.46 |
-| HIGH | 44 | 56.8% | +$0.93 |
-| NORMAL | 26 | 53.8% | +$0.21 |
+| EXTREME | 3 | 100.0% | +$0.60 |
+| HIGH | 6 | 16.7% | -$0.39 |
+| NORMAL | 3 | 0.0% | -$0.37 |
 
-**Verdict:** All regimes positive. Bad 24h is noise, not structural.
+**All-time (proven profitable):** EXTREME 70% WR (+$1.53), HIGH 54.3% (+$0.82), NORMAL 51.9% (+$0.14)
+
+**Diagnosis:** Signal fires correctly in EXTREME (100% WR, +$0.60). Struggling in HIGH/NORMAL this period — all-time those regimes are profitable. Likely a bad streak, not structural. SNIPER exits cutting some winners (SNIPER-L1-BULLISH, SNIPER-L2-BULLISH).
+
+### open-skies+ LONG (all-time)
+| Regime | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| EXTREME | 6 | 33.3% | -$0.35 |
+| HIGH | 4 | 75.0% | +$0.18 |
+
+**Diagnosis:** Wins in HIGH, struggles in EXTREME. No kill needed — 50% WR in 24h, small positive PnL.
+
+### volume-breakout-long+ LONG (all-time)
+| Regime | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| EXTREME | 2 | 0.0% | -$0.04 |
+| NORMAL | 1 | 0.0% | -$0.06 |
+
+**Diagnosis:** Very low sample size. All losses from SNIPER-L3-BEARISH exits, not ATR SL. Needs more data before action.
 
 ---
 
-## RECOMMENDATIONS
+## EXIT ANALYSIS (24h)
 
-1. **[NO ACTION]** trend_purity+ LONG — 36.4% WR is below kill threshold (<30%). EXTREME multiplier already at 0.15x. Signal is 1 week old — too early to kill. Monitor next cycle.
-2. **[NO ACTION]** pullback-entry- SHORT — Bad 24h patch (42.9% WR, -$0.33) but profitable across all timeframes and regimes. No intervention needed.
-3. **[INFO]** System trade volume is low (5 trades in 6h). Sample sizes are too small for confident kill/boost decisions. Continue monitoring.
+| Exit Reason | Count | Avg PnL | Notes |
+|-------------|-------|---------|-------|
+| SNIPER-L3-BEARISH | 5 | -$0.03 | Sniper bearish filter closing LONG trades |
+| atr_sl_hit | 8 | +$0.01 | Break-even overall |
+| SNIPER-L1-BULLISH | 2 | +$0.04 | Sniper bullish filter closing SHORT trades |
+| SNIPER-L2-BULLISH | 1 | -$0.11 | |
+| SNIPER-L3-BULLISH | 1 | -$0.07 | |
+| HL_CLOSED | 1 | -$0.23 | |
+| HARD_SL_FAILED | 1 | -$0.25 | Exchange issue? |
+| hard_tp | 1 | +$0.34 | |
+
+**Notable:** 5 SNIPER-L3-BEARISH exits on LONG trades — sniper bearish filter is aggressively closing longs. 2 SNIPER-L1/L2-BULLISH exits on SHORT trades — sniper bullish filter closing shorts. These sniper exits are the dominant source of losses.
 
 ---
 
-*Report auto-generated by signal_reporter. Next report: ~6h from now.*
+## SIGNAL INVERSIONS
+
+None detected.
+
+---
+
+## ISSUES
+
+- **pullback-entry- SHORT HIGH/NORMAL underperformance:** All-time profitable (54.3% / 51.9%) but 24h shows 16.7% / 0%. Monitor next cycle — if persists 48h+, consider regime filter.
+- **SNIPER exits dominating losses:** 10 of 22 trades (45%) exited by SNIPER filters, contributing most of the negative PnL. Consider reviewing SNIPER sensitivity.
+- **volume-breakout-long+ 0% WR:** Only 3 trades, all SNIPER exits. Insufficient sample to act.
+- **HARD_SL_FAILED on SEI (-$0.25):** Possible exchange execution issue. Worth logging.
+
+---
+
+## ACTIONS TAKEN
+
+None. No kill/boost criteria met. All signals within acceptable variance.

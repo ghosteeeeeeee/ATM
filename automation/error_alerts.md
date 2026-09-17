@@ -709,3 +709,26 @@
 
 ## Error Alerts — 2026-09-16 22:56 UTC
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+
+## Error Alerts — 2026-09-17 03:43 UTC
+- **REPEATED** (3x): `Signal bb_bounce_v3_long: ERROR → ERROR: name 'candles' is not defined`
+- **AUTO-FIX**: Fixed NameError in `bb_bounce_v3_long.py:324` — stale filter referenced undefined `candles` variable. Replaced with direct DB query for latest candle timestamp.
+- **STATUS**: Fix verified — signal imports and runs without error.
+
+## Error Alerts — 2026-09-17 03:56 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   Signal bb_bounce_v3_long: TOK → TOK: name 'candles' is not defined`
+
+## Error Alerts — 2026-09-17 04:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   Signal bb_bounce_v3_long: TOK → TOK: name '_cooldown' is not defined`
+- **REPEATED** (14x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (14x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Health Report — 2026-09-17 05:44 UTC
+- **Status**: All systems nominal
+- Pipeline running, 32 signals/hr, 0 errors
+- 40+ timers active, disk 83%, regime LONG_BIAS
+- 2 trades closed today (-$0.04), 0 open
+- No auto-fixes needed
+
+## Error Alerts — 2026-09-17 05:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

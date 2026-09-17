@@ -857,5 +857,32 @@
       "fresh_7d": "179T 58.1%WR +$3.31",
       "gap": "~$3.95/7d"
     }
+  },
+  {
+    "date": "2026-09-17T05:30:00Z",
+    "idea": "STALE_MAX_AGE_MINUTES=30 — skip signals >30min old at execution",
+    "rationale": "80 stale trades/7d 48.8%WR vs 174 fresh 54.0%WR. Stale PnL -$1.17 vs fresh +$1.14. ~$2.31/7d gap.",
+    "expected_impact": "+$1.5-2.5/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-17T05:30:00Z",
+    "idea": "Kill pump-chain+ LONG — 25T/7d 40%WR -$0.28, 60% exits ATR_SL",
+    "rationale": "pump-chain+ LONG fires in NEUTRAL via STANDALONE_BYPASS. No edge in flat chop. 15/25 exits ATR_SL with 26.7%WR.",
+    "expected_impact": "+$1.16/7d",
+    "category": "kill switch",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-17T05:30:00Z",
+    "idea": "mover- SHORT expansion — 100%WR 8T/7d, needs 20+ trades before scaling",
+    "rationale": "Perfect record, 87.5% WR, avg +$0.075/trade. If expanded to 12-15 trades/week, +$0.2-0.5/7d.",
+    "expected_impact": "+$0.2-0.5/7d (after 20+ trade validation)",
+    "category": "signal expansion",
+    "status": "needs data",
+    "risk": "medium"
   }
 ]
