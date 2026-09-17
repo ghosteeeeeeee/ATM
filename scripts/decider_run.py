@@ -1613,15 +1613,54 @@ def execute_trade(token, direction, price, confidence, source,
         from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
         _live_price = get_current_price(token) or price
         price = _live_price  # use live price for entry, not stale signal price
-        if direction == 'LONG':
-            sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
-            tp = round(_live_price * (1 + ATR_TP_MIN), 8)
+        # volume_breakout: use ATR-based SL from the start (not fixed 1.3%)
+        _is_vol_breakout = 'volume-breakout' in (source or '')
+        if _is_vol_breakout:
+            try:
+                from volatility_gate import get_atr_pct as _get_atr_pct
+                from tpsl_utils import compute_atr_sl_pct, compute_atr_tp_pct
+                _atr_pct = _get_atr_pct(token)
+                if _atr_pct and _atr_pct > 0:
+                    sl_pct_val = compute_atr_sl_pct(_atr_pct)
+                    tp_pct_val = compute_atr_tp_pct(_atr_pct)
+                    if direction == 'LONG':
+                        sl = round(_live_price * (1 - sl_pct_val), 8)
+                        tp = round(_live_price * (1 + tp_pct_val), 8)
+                    else:
+                        sl = round(_live_price * (1 + sl_pct_val), 8)
+                        tp = round(_live_price * (1 - tp_pct_val), 8)
+                    log(f'  [ATR-SL] {token} {direction} — SL={sl:.6f} ({sl_pct_val*100:.2f}%) TP={tp:.6f} ({tp_pct_val*100:.2f}%) ATR={_atr_pct:.2f}% [volume-breakout]')
+                else:
+                    # ATR unavailable, fall back to fixed
+                    if direction == 'LONG':
+                        sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
+                        tp = round(_live_price * (1 + ATR_TP_MIN), 8)
+                    else:
+                        sl = round(_live_price * (1 + ATR_SL_MIN_INIT), 8)
+                        tp = round(_live_price * (1 - ATR_TP_MIN), 8)
+                    sl_pct_val = ATR_SL_MIN_INIT
+                    tp_pct_val = ATR_TP_MIN
+                    log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%) [volume-breakout fallback, no ATR]')
+            except Exception as _e:
+                if direction == 'LONG':
+                    sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
+                    tp = round(_live_price * (1 + ATR_TP_MIN), 8)
+                else:
+                    sl = round(_live_price * (1 + ATR_SL_MIN_INIT), 8)
+                    tp = round(_live_price * (1 - ATR_TP_MIN), 8)
+                sl_pct_val = ATR_SL_MIN_INIT
+                tp_pct_val = ATR_TP_MIN
+                log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%) [volume-breakout ATR error: {_e}]')
         else:
-            sl = round(_live_price * (1 + ATR_SL_MIN_INIT), 8)
-            tp = round(_live_price * (1 - ATR_TP_MIN), 8)
-        sl_pct_val = ATR_SL_MIN_INIT
-        tp_pct_val = ATR_TP_MIN
-        log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%) live_price={_live_price:.6f}')
+            if direction == 'LONG':
+                sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
+                tp = round(_live_price * (1 + ATR_TP_MIN), 8)
+            else:
+                sl = round(_live_price * (1 + ATR_SL_MIN_INIT), 8)
+                tp = round(_live_price * (1 - ATR_TP_MIN), 8)
+            sl_pct_val = ATR_SL_MIN_INIT
+            tp_pct_val = ATR_TP_MIN
+            log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%) live_price={_live_price:.6f}')
 
     # Sanity check: SL must provide real protection (only when sl > 0)
     if sl > 0 and direction == 'LONG' and sl >= price:

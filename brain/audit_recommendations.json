@@ -1,85 +1,119 @@
 {
-  "timestamp": "2026-09-16T20:36:54.204151+00:00",
-  "session_brain_stats": {
-    "total_vectors": 199465,
-    "queries_run": 4
-  },
-  "trade_summary_24h": {
-    "total": 14,
-    "wins": 7,
-    "wr": 50.0,
-    "pnl": 0.47,
-    "avg_pnl": 0.0336,
-    "dominant_signal": "pullback-entry- SHORT",
-    "market": "NEUTRAL"
-  },
-  "trade_summary_7d": {
-    "total": 253,
-    "wins": 139,
-    "wr": 55.0,
-    "pnl": 2.95,
-    "avg_pnl": 0.0117,
-    "stale_pct": 31.2,
-    "stale_trades": 79,
-    "stale_wr": 49.4,
-    "fresh_wr": 57.5
-  },
-  "drift_findings": [
-    {
-      "topic": "stale signal execution",
-      "current_state": "31.2% of 7d trades fire on stale signals. Stale WR 49.4% vs fresh 57.5%.",
-      "impact": "~$4.40/7d lost. pullback-entry- STALE in EXTREME: 33.3%WR -$0.59 vs FRESH 81.8%WR +$2.38.",
-      "status": "ACKNOWLEDGED in CURRENT.md, no filter implemented"
+    "timestamp": "2026-09-17T00:15:00Z",
+    "session_brain_stats": {
+        "total_vectors": 199465,
+        "top_findings": "stale signal execution, SNIPER exiting SHORT, LONG drag"
     },
-    {
-      "topic": "rr_engine_resistance exit drag",
-      "current_state": "35 exits 7d, 42.9% WR, -$1.08. #1 exit drag.",
-      "impact": "Structural — SHORT enters near resistance, price drifts up, rr_engine cuts.",
-      "status": "ACKNOWLEDGED in CURRENT.md, resistance proximity filter suggested but not implemented"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "pump-chain+ STALE toxicity",
-      "evidence": "5 trades 7d, 0% WR, -$0.73. ALL regimes: NORMAL 0%-$0.37, HIGH 0%-$0.23, EXTREME 0%-$0.13. Fresh pump-chain+ is 50% WR +$0.45.",
-      "recommendation": "Block stale pump-chain+ signals specifically"
+    "trade_summary_24h": {
+        "trades": 18,
+        "wr": 38.9,
+        "pnl": -0.68,
+        "regime": "EXTREME",
+        "note": "Bad day — all pullback-entry- SHORT losses except 2 SNIPER exits. 4/10 losers are stale."
     },
-    {
-      "topic": "pullback-entry- SHORT stale in EXTREME",
-      "evidence": "6 stale trades, 33.3% WR, -$0.59. Fresh EXTREME pullback-entry- SHORT is 81.8% WR +$2.38.",
-      "recommendation": "Staleness filter would naturally catch these"
-    }
-  ],
-  "missing_implementations": [
-    "STALE_MAX_AGE filter — suggested multiple times, never implemented",
-    "Resistance proximity filter for SHORT entries",
-    "New signals for NEUTRAL regime diversity"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-16T20:36:54.204167+00:00",
-      "idea": "Block stale pump-chain+ signals (>20min old) — zero winners in 5 stale trades",
-      "rationale": "pump-chain+ STALE is 0% WR across ALL regimes. Fresh pump-chain+ is 50% WR +$0.45. Stale trades lose $0.73/7d. This is the single highest-confidence filter opportunity — zero risk to winners since stale pump-chain+ has zero winners.",
-      "expected_impact": "+$0.73/7d (eliminate all stale pump-chain+ losses)",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "very low",
-      "impact_on_winners": "0 winners blocked — stale pump-chain+ has 0 wins in 5 trades"
+    "trade_summary_7d": {
+        "trades": 252,
+        "wr": 53.2,
+        "pnl": 0.36,
+        "extreme": "94T 59.6%WR +$1.62 (only profitable regime)",
+        "high": "102T 49.0%WR -$0.92 (worst)",
+        "normal": "55T 50.9%WR -$0.34",
+        "stale_80T": "48.8%WR -$1.15 (vs fresh 171T 55.6%WR +$1.51)",
+        "fresh_171T": "55.6%WR +$1.51"
     },
-    {
-      "date": "2026-09-16T20:36:54.204170+00:00",
-      "idea": "Add volume confirmation to pullback-entry- SHORT in EXTREME regime",
-      "rationale": "Fresh pullback-entry- SHORT in EXTREME is 81.8% WR — best signal-regime combo. But stale EXTREME is 33.3%. Volume spike at entry could confirm momentum is real vs exhausted.",
-      "expected_impact": "+$0.30-0.50/7d if it catches exhausted EXTREME entries",
-      "category": "entry quality",
-      "status": "needs data",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Implement stale pump-chain+ block (HIGH confidence, data-backed)",
-    "Monitor pullback-entry- SHORT stale EXTREME for 48h before adding filter",
-    "Design stale signal revalidation flow for broader stale signal problem"
-  ]
+    "drift_findings": [
+        {
+            "finding": "STALE SIGNAL EXECUTION — pipeline executes is_stale=true signals",
+            "evidence": "80 stale trades 7d: 48.8%WR -$1.15. pump-chain+ stale: 5T 0%WR -$0.73. pullback-entry- stale EXTREME: 7T 42.9%WR -$0.52.",
+            "impact": "~$2.66/7d drag (stale PnL vs fresh PnL)",
+            "status": "CODE FIX NEEDED — not config",
+            "priority": "HIGH"
+        },
+        {
+            "finding": "rr_engine_resistance drag — 35 exits -$1.08/7d",
+            "evidence": "16 wins (+$0.094 avg) vs 19 losses (-$0.057 avg). Positive expectancy but high loss count. Structural issue.",
+            "impact": "-$1.08/7d",
+            "status": "MONITORING — needs resistance data for filter",
+            "priority": "MEDIUM"
+        },
+        {
+            "finding": "LONG trades net negative — only rr-struct+ and open-skies+ profitable",
+            "evidence": "trend_purity+ 11T -$0.90, pump-chain+ 25T -$0.28, rr-struct-v2+ 10T -$0.45. All except rr-struct+ and open-skies+ losing.",
+            "impact": "Legacy LONG drag aging out",
+            "status": "KILLED most — LONG_NEUTRAL_BLOCK active",
+            "priority": "LOW"
+        },
+        {
+            "finding": "SNIPER exits on SHORT trades — premature bullish exits",
+            "evidence": "WCT SHORT -0.07 (SNIPER-L3-BULLISH), IOTA SHORT -0.11 (SNIPER-L2-BULLISH). 4 exits/7d -$0.11 total.",
+            "impact": "-$0.11/7d (small)",
+            "status": "MONITORING",
+            "priority": "LOW"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "topic": "Stale signal execution",
+            "sessions_discussed": "6+ (brain_auditor runs Sep 14-16)",
+            "root_cause": "Signal is_stale flag recorded but pipeline still executes stale signals",
+            "fix_status": "NEEDS CODE FIX — add execution-time revalidation or STALE_MAX_AGE_MINUTES gate"
+        },
+        {
+            "topic": "rr_engine_resistance SHORT exits",
+            "sessions_discussed": "4+ (brain_auditor runs Sep 14-16)",
+            "root_cause": "SHORT enters near resistance, price drifts up, rr_engine cuts at small loss",
+            "fix_status": "NEEDS RESISTANCE DATA for proximity filter"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "idea": "Execution-time stale signal revalidation",
+            "description": "Check is_stale flag and skip execution if stale. Or add STALE_MAX_AGE_MINUTES config.",
+            "estimated_impact": "+$1-2/7d",
+            "status": "NOT YET IMPLEMENTED"
+        },
+        {
+            "idea": "Resistance proximity filter for SHORT entries",
+            "description": "Skip SHORT entries if price within 1.0% of nearest resistance level",
+            "estimated_impact": "+$0.50-0.72/7d (estimated from rr_engine drag)",
+            "status": "NEEDS DATA — resistance levels not in trade schema"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-17T00:15:00Z",
+            "idea": "pump-chain+ LONG EXTREME gate — block LONG entries when pump-chain+ fires in EXTREME regime",
+            "rationale": "pump-chain+ LONG in EXTREME: 15T 46.7%WR +$0.22 (barely positive, high variance). Stale pump-chain+ 5T 0%WR -$0.73 is the real drag. Blocking EXTREME would kill the +$0.22 but prevent stale EXTREME losses.",
+            "expected_impact": "Neutral to slightly positive — kills marginal winners but prevents stale EXTREME losers",
+            "category": "regime gate",
+            "status": "needs backtest — sample too small (15T)",
+            "risk": "low",
+            "impact_on_winners": "Would have blocked 15T/7d pump-chain+ LONG winners (46.7%WR). Marginal."
+        },
+        {
+            "date": "2026-09-17T00:15:00Z",
+            "idea": "Add STALE_MAX_AGE_MINUTES=30 config param + execution gate",
+            "rationale": "80 stale trades/7d at 48.8%WR vs 171 fresh at 55.6%WR. Stale costs -$1.15/7d. pump-chain+ stale 5T 0%WR -$0.73. pullback-entry- stale EXTREME 7T 42.9%WR -$0.52.",
+            "expected_impact": "+$1-2/7d (eliminate stale drag)",
+            "category": "entry sniper",
+            "status": "recommended — needs code implementation",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-17T00:15:00Z",
+            "idea": "SHORT RSI floor 35→40 for EXTREME regime only",
+            "rationale": "DOT SHORT RSI=64.22 lost -$0.25 in EXTREME. ETC SHORT RSI=70.14 lost -$0.28 in EXTREME (pre-fix). EXTREME is high-vol, oversold bounces violent. Raising floor to 40 blocks entries into oversold conditions in EXTREME.",
+            "expected_impact": "Blocks ~2-3 EXTREME SHORT entries/week. Need to verify no winners have RSI<40.",
+            "category": "entry sniper",
+            "status": "monitor — needs verification against winners",
+            "risk": "low"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "CODE FIX: Add STALE_MAX_AGE_MINUTES=30 to hermes_constants.py + execution gate in signal_compactor.py or trade executor. Skip signals with is_stale=true or age>30min.",
+        "MONITOR: rr_engine_resistance drag — 35 exits -$1.08. Needs resistance data for proximity filter.",
+        "MONITOR: SNIPER exits on SHORT — small drag, watch for pattern.",
+        "DEVELOP: New signals for NEUTRAL regime — only 2 signal types pass confluence."
+    ]
 }

@@ -2278,6 +2278,46 @@ BB_BOUNCE_V2_MOM_MIN = 0.0          # minimum momentum (uptrend required)
 BB_BOUNCE_V2_VOL_MAX = 0.5          # max volatility (low vol = less chop)
 BB_BOUNCE_V2_MIN_AGE_SEC = 600      # 10 min minimum candle age
 
+# ── BB Bounce V3 LONG (high-winrate filter set) ─────────────────────────────
+# v3_long.py — V2 base + 7 new filters from trade analysis.
+# Winners: RSI 30-50, BB position 0.2-0.5, negative speed, fresh signals.
+# Losers: Extreme RSI (<20 or >60), stale=True, EXTREME regime, BB >0.6.
+BB_BOUNCE_V3_LONG_ENABLED = False   # SHADOW MODE — run 48h before enabling live
+# ── Core BB params (inherited from v2) ──
+BB_BOUNCE_V3_BB_PERIOD = 20
+BB_BOUNCE_V3_BB_STDDEV = 1.8
+BB_BOUNCE_V3_BB_TOUCH_PCT = 0.20   # max distance from lower band (widened from v2 0.15 — losers had tight proximity, allow slightly further)
+BB_BOUNCE_V3_BB_MIN_BARS = 30      # min candles for BB computation
+BB_BOUNCE_V3_BB_WIDTH_MAX = 2.5    # max BB width % (same as v2)
+# ── RSI filters (new in v3) ──
+BB_BOUNCE_V3_RSI_PERIOD = 14
+BB_BOUNCE_V3_RSI_MIN = 25          # RSI floor — don't buy extreme oversold (falling knife)
+BB_BOUNCE_V3_RSI_MAX = 55          # RSI ceiling — don't chase overbought bounces
+BB_BOUNCE_V3_RSI_RECOVERY_BARS = 3 # RSI must be higher than N bars ago (recovery confirmed)
+# ── Bounce / velocity / momentum ──
+BB_BOUNCE_V3_BOUNCE_MIN_PCT = 0.10 # minimum bounce strength %
+BB_BOUNCE_V3_VEL_MIN = -0.5        # 15m velocity minimum % — not free-falling (v2 was -0.01)
+BB_BOUNCE_V3_MOM_MIN = 0.0         # 30m momentum minimum (uptrend)
+# ── BB position band (new in v3) ──
+BB_BOUNCE_V3_BB_POS_MIN = 0.10     # minimum BB position — not at extreme bottom
+BB_BOUNCE_V3_BB_POS_MAX = 0.65     # maximum BB position — not chasing near top band
+# ── Volume confirmation (new in v3) ──
+BB_BOUNCE_V3_VOL_RATIO_MIN = 1.2   # volume must be >= 1.2x 20-bar average (bounce confirmed)
+BB_BOUNCE_V3_VOL_LOOKBACK = 20     # bars for volume average
+# ── Volatility / age ──
+BB_BOUNCE_V3_VOLATILITY_MAX = 0.5  # max volatility %
+BB_BOUNCE_V3_MIN_AGE_SEC = 600     # min candle age (10 min)
+BB_BOUNCE_V3_STALE_MAX_AGE_SEC = 300  # max signal age (5 min) — fresh signals only
+# ── Speed filter (new in v3) ──
+BB_BOUNCE_V3_SPEED_MIN = -1.0      # absolute speed floor — block free-falling (<-1% in 15m)
+# ── Regime-aware confidence ──
+BB_BOUNCE_V3_CONF_BASE = 72
+BB_BOUNCE_V3_CONF_CAP = 88
+BB_BOUNCE_V3_REGIME_NORMAL_MULT = 1.1   # boost in NORMAL (best regime)
+BB_BOUNCE_V3_REGIME_HIGH_MULT = 1.0     # full confidence in HIGH
+BB_BOUNCE_V3_REGIME_EXTREME_MULT = 0.7  # penalty in EXTREME (weakest regime)
+BB_BOUNCE_V3_REGIME_FLAT_MULT = 0.9     # mild penalty in FLAT (low energy)
+
 # bb_bounce_v2_short parameters (calibrated from SHORT winner patterns)
 BB_BOUNCE_V2_SHORT_BB_PERIOD = 20
 BB_BOUNCE_V2_SHORT_BB_STDDEV = 1.8
