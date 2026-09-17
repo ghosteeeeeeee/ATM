@@ -2282,7 +2282,7 @@ BB_BOUNCE_V2_MIN_AGE_SEC = 600      # 10 min minimum candle age
 # v3_long.py — V2 base + 7 new filters from trade analysis.
 # Winners: RSI 30-50, BB position 0.2-0.5, negative speed, fresh signals.
 # Losers: Extreme RSI (<20 or >60), stale=True, EXTREME regime, BB >0.6.
-BB_BOUNCE_V3_LONG_ENABLED = False   # SHADOW MODE — run 48h before enabling live
+BB_BOUNCE_V3_LONG_ENABLED = True    # Enabled 2026-09-13 — needs confluence/standalone to fire
 # ── Core BB params (inherited from v2) ──
 BB_BOUNCE_V3_BB_PERIOD = 20
 BB_BOUNCE_V3_BB_STDDEV = 1.8
