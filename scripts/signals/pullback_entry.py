@@ -9,7 +9,7 @@ import sys, os, sqlite3, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
-from paths import HERMES_DATA
+from paths import HERMES_DATA, RUNTIME_DB
 
 from hermes_constants import (
     PULLBACK_ENTRY_ENABLED,
@@ -286,10 +286,25 @@ def scan_signals() -> int:
         if token.startswith('@'):
             continue
 
-        # Staleness check
+        # Staleness check (price data age)
         from hermes_constants import PULLBACK_STALENESS_MIN
         if price_age_minutes(token) > PULLBACK_STALENESS_MIN:
             continue
+
+        # ponytail: block stale tokens — 41T stale 7d -$0.27 vs 37T fresh +$1.00
+        # Pattern: trend_purity.py block, token_speeds.is_stale
+        try:
+            _spd_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+            _spd_row = _spd_conn.execute(
+                'SELECT is_stale FROM token_speeds WHERE token = ?', (token.upper(),)
+            ).fetchone()
+            if _spd_row and _spd_row[0]:
+                continue
+        except Exception:
+            pass
+        finally:
+            if _spd_conn:
+                _spd_conn.close()
 
         sig = detect(token)
         if not sig:

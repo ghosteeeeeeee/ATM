@@ -1,4 +1,5 @@
 ## CEO DECISIONS
+- [2026-09-17 10:45 UTC] CEO: NO CONFIG CHANGE. DB: 24h 25T 36.0%WR -$0.27 | 7d 252T 52.0%WR -$0.78. Stale signal execution = #1 drag ($1.42/7d gap). Signal diversity = #2 issue (2 types in NEUTRAL). System structurally healthy — code-level fixes needed, not config.
 - [2026-09-17 02:40 UTC] CEO: KILLED BREAKOUT_LONG_ENABLED. 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60. Fires LONG in NEUTRAL without BTC gate. Pipeline restarted.
 - [2026-09-17 02:40 UTC] CEO: SKIP trend_purity+ kill — legacy trades only (Sep 12-13), no active bleed. TREND_PURITY_PLUS_ENABLED already False since Sep 13.
 

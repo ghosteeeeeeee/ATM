@@ -1,3 +1,37 @@
+## CEO Report — 2026-09-17 ~10:45 UTC
+
+### Diagnosis
+DB-verified. 24h: 25T, 36.0%WR, -$0.27 (worse than 06:30 snapshot). 7d: 252T, 52.0%WR, -$0.78 (slightly negative). 2 open. Market 100% NEUTRAL. SHORT dominant (+$2.14 7d). LONG legacy drag aging out (-$1.83).
+
+### Root Cause
+Two structural issues:
+1. **Stale signal execution**: 79 trades marked is_stale (flat momentum) at 48.1%WR -$1.10 vs fresh 172T/54.1%WR +$0.32. Gap $1.42/7d. Not signal AGE — these are trades on tokens with no momentum.
+2. **Signal diversity**: Only 2 signal types (pullback-entry-, open-skies+) pass confluence in NEUTRAL. No resilience.
+
+### 24h Losers (VERIFIED)
+- pullback-entry- SHORT: 13T/30.8%WR -$0.16 (bad streak, 7d profitable 51.3%WR +$0.73)
+- volume-breakout-long+: 3T/0%WR -$0.10 (low sample)
+- rs-s36,volume-breakout-long+: 1T -$0.22
+
+### 7d Top Performers (VERIFIED)
+- pump-chain- SHORT: 49T/61.2%WR +$1.25
+- pullback-entry- SHORT: 78T/51.3%WR +$0.73
+- rr-struct+ LONG: 15T/73.3%WR +$0.59
+- open-skies+ LONG: 10T/60%WR +$0.29
+
+### 7d Biggest Drags (VERIFIED)
+- trend_purity+ LONG: 11T/36.4%WR -$0.90 (legacy, killed Sep 13)
+- pump-chain+ LONG: 24T/37.5%WR -$0.87 (legacy, killed)
+- accel-300-v4-short-: 4T/0%WR -$0.58 (legacy)
+
+### Fix Applied
+NO CONFIG CHANGE. System is structurally healthy — 7d PnL -$0.78 (barely negative). Stale signal issue needs code-level fix (staleness_mult decay or hard age block). Signal diversity needs new signal development.
+
+### Next Actions
+1. **Code fix needed**: Stale signal execution — implement hard age block or tighten staleness_mult decay. ~$1.42/7d potential.
+2. **New signals needed**: NEUTRAL regime only has 2 confluence-passing types. Need 3+ for resilience.
+3. **Monitor**: pullback-entry- SHORT 24h streak (30.8%WR). 7d profitable — likely variance.
+
 ## CEO Report — 2026-09-17 ~02:40 UTC
 
 ### Diagnosis
