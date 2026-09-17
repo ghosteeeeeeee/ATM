@@ -1299,6 +1299,14 @@ PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%. DO NOT WI
 # Widening trail = ATR SL wins the race = trail never fires = system broken.
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — activate sooner so trail catches profit before ATR SL
 PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (which trails at ~0.15%)
+# Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
+# Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
+PM_TRAIL_TIERS = [
+    (0.0,  0.002),   # 0%–1.5%: 0.20% trail (scalp zone — tight)
+    (0.015, 0.005),  # 1.5%–3.0%: 0.50% trail (move confirmed — give room)
+    (0.030, 0.008),  # 3.0%–5.0%: 0.80% trail (trend mode — let it run)
+    (0.050, 0.012),  # 5.0%+: 1.20% trail (parabolic — only exit on real reversal)
+]
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 

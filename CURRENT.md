@@ -1,24 +1,24 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~17:00 UTC (brain_auditor)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-17 ~18:35 UTC (daily_orchestrator)**
+**Updated by: daily_orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 14T, 35.7% WR, -$0.28. 1 open. Market NEUTRAL. Pipeline running.
+24h: 11T, 27.3% WR, -$0.95. 3 open. Market LONG_BIAS (5 tokens). Pipeline running.
 
-- **24h (rolling):** 14T, 35.7% WR, -$0.28 (DB-verified — COLD STREAK, losses small avg -$0.16). open-skies+ LONG 4T/0%WR -$0.61 (ALL losers, wave_phase=falling pattern). pullback-entry- SHORT 5T/40%WR -$0.34. Other 5T mixed.
-- **Today (calendar):** 14T closed (Sep 17). 1 open. PnL: slightly negative.
-- **7d:** 231T, 51.5% WR, -$2.10 (DB-verified). SHORT 131T 53.4%WR +$0.35 carries LONG 100T 48.0%WR -$2.74 (legacy aging out).
-- **7d REGIME:** EXTREME 82T 56.1%WR -$0.09 (breakeven) | NORMAL 54T 51.9%WR -$0.30 | HIGH 94T 46.8%WR -$2.00 (worst — ~60% dead/legacy signals).
-- **7d EXIT:** profit-monster-trail 36T 94.4%WR +$3.22 (carries system). atr_sl_hit 137T 48.9%WR -$1.92 (#1 exit drag). rr_engine_resistance 30T 43.3%WR -$0.99.
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 69T/52.2%WR +$0.36 | pump-chain- SHORT 43T/55.8%WR +$0.21 | rr-struct+ LONG 15T/73.3%WR +$0.59
-- **7d DRAGGERS:** trend_purity+ 11T/36.4%WR -$0.90 (legacy) | pump-chain+ LONG 23T/39.1%WR -$0.73 (legacy, killed) | open-skies+ 9T/44.4%WR -$0.24
-- **Market:** NEUTRAL (100% — no LONG_BIAS/SHORT_BIAS tokens).
-- **Open:** 1 trade (WCT LONG volume-breakout-long+).
+- **24h (rolling):** 11T, 27.3% WR, -$0.95 (DB-verified — COLD STREAK). open-skies+ KILLED (17:11 UTC). 7 losers today: open-skies+ LONG 4T ALL losers (3/4 wave_phase=falling). 2 wins: RESOLV +$0.01, BABY +$0.01. ATR SL 8T avg -$0.098 dominant.
+- **Today (calendar):** 9T closed (Sep 17). 3 open. PnL: negative.
+- **7d:** 221T, 51.1% WR, -$2.45 (DB-verified). SHORT carries LONG (legacy aging out).
+- **7d REGIME:** EXTREME 76T 57.9%WR +$0.14 (best) | NORMAL 55T 50.9%WR -$0.49 | HIGH 89T 46.1%WR -$2.10 (worst — ~60% dead/legacy signals).
+- **7d EXIT:** profit-monster-trail carries system. atr_sl_hit dominant (#1 exit drag). rr_engine_resistance 0 exits (fix confirmed).
+- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 68T/51.5%WR +$0.25 | pump-chain- SHORT 33T/57.6%WR +$0.25 | rr-struct+ LONG 15T/73.3%WR +$0.59
+- **7d DRAGGERS:** trend_purity- SHORT 11T/36.4%WR -$0.90 (legacy) | pump-chain+ LONG 22T/40.9%WR -$0.58 (legacy, killed) | open-skies+ KILLED
+- **Market:** LONG_BIAS (5 tokens) — mostly NEUTRAL.
+- **Open:** 3 trades (IO SHORT pullback-entry-, GMX LONG volume-breakout-long+, WCT LONG volume-breakout-long+).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
-- **KILLED (Sep 17 02:40):** breakout-long (CEO, 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60, fires LONG in NEUTRAL). **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
+- **KILLED (Sep 17 17:11):** open-skies+ (brain_auditor, 11T/8d 36%WR -$0.73, wave_phase=falling pattern 5T 20%WR, no regime >50% WR). **KILLED (Sep 17 02:40):** breakout-long (CEO, 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60, fires LONG in NEUTRAL). **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
 - **Disk:** ~83% (20G free).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
@@ -28,8 +28,8 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟡 R:R STATUS (SLIGHTLY NEGATIVE 7d, WORSENING 24h)**
-7d PnL -$0.78 (SLIGHTLY NEGATIVE). SHORT +$2.14 carries LONG -$1.83 (legacy aging out). 24h -$0.27 (WORSENING from -$0.14 at 06:30). Stale signal execution is #1 drag ($1.42/7d gap).
+**🟡 R:R STATUS (NEGATIVE 7d, WORSENING 24h)**
+7d PnL -$2.45 (NEGATIVE). SHORT carries LONG (legacy aging out). 24h -$0.95 (WORSENING). Cold streak + legacy flush. Stale signal execution is #1 drag ($1.42/7d gap).
 
 **🟢 rr_engine_resistance FIX VERIFIED.** 0 post-fix rr_engine exits in 6+ days (since Sep 10). Confirmed working. Can remove from monitoring.
 
@@ -41,9 +41,11 @@
 
 **🟢 pump-chain+ NORMAL BLOCK:** Signal_reporter blocked Pump_Flow from NORMAL regime. Active since 05:10 UTC Sep 15.
 
-**🟡 SIGNAL DIVERSITY ISSUE:** Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, open-skies+). Need new signals for resilience.
+**🔴 SIGNAL DIVERSITY CRITICAL:** open-skies+ KILLED (Sep 17). Only pullback-entry- SHORT passes confluence in NEUTRAL now. Need new signals urgently.
 
 **🔴 trend_ignition: DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal.
+
+**🔴 open-skies+: KILLED.** signal_reporter 17:11 UTC Sep 17. 11T/8d 36%WR -$0.73. No regime >50% WR. NEVER_REENABLE.
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
@@ -55,6 +57,7 @@
 
 ## Today's Changes (Sep 17)
 
+1. **daily_orchestrator ~18:35 UTC — NO CONFIG CHANGE.** DB: 24h 11T 27.3%WR -$0.95 (COLD STREAK). 7d: 221T 51.1%WR -$2.45 (SLIGHTLY NEGATIVE). Market LONG_BIAS (5 tokens). 3 open (IO SHORT, GMX LONG, WCT LONG). **KILLED:** open-skies+ already killed by signal_reporter at 17:11 UTC. **LOSING AUTOPSY:** 7 losers — 4x open-skies+ LONG ALL ATR SL (wave_phase=falling on 3/4, BTC bearish/transitioning). 2x volume-breakout-long+ ATR SL (NOT, W small). 1x pullback-entry- SHORT ATR SL. **REGIME:** EXTREME 76T 57.9%WR +$0.14 (best), HIGH 89T 46.1%WR -$2.10 (worst, ~60% legacy aging out). **EXIT:** ATR SL 8T avg -$0.098 dominant, near breakeven. profit-monster-trail working. **BTC CRASH BLOCKER:** Active, blocking LONG entries during BTC weakness (MOMENTUM, BTC_LEVEL). **NO CONFIG CHANGE** — cold streak is variance + legacy flush, system structurally sound.
 1. **brain_auditor ~17:00 UTC — NO CONFIG CHANGE.** DB: 24h 14T 35.7%WR -$0.28 (COLD STREAK). 7d: 231T 51.5%WR -$2.10. Market NEUTRAL. 1 open (WCT volume-breakout-long+ LONG). **STALE FILTER:** Deployed 10:00 UTC. Post-deployment: 7 trades ALL FRESH (filter working). 7d EXTREME fresh 63T 57.1%WR +$0.61 vs stale 19T 52.6%WR -$0.70. **NEXT: Evaluate by Sep 19 10:00 UTC.** **LOSING AUTOPSY:** 11 losers — open-skies+ LONG 4T ALL losers (3/4 wave_phase=falling, 3/4 HIGH regime — fading BTC momentum). pullback-entry- SHORT 4T (SEI HARD_SL_FAILED exchange bug, ACE stale, SUPER/ME normal variance). Other 3 (BIGTIME RSI=84.6 overbought, AVAX/COMP cut-loser working). **REGIME:** EXTREME 82T 56.1%WR -$0.09 (breakeven). HIGH 94T 46.8%WR -$2.00 (worst — ~60% legacy). NORMAL 54T 51.9%WR -$0.30. **SHORT vs LONG:** SHORT +$0.35 carries LONG -$2.74 (legacy aging out). **EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit 137T 48.9%WR -$1.92 (#1 drag). **CREATIVE:** (1) open-skies+ wave_phase gate: block LONG when BTC wave_phase=falling. All-time: falling=5T 20%WR -$0.49 vs accelerating=3T 66.7%WR $0.00. Code-level change. (2) EXTREME SHORT fresh 57.1%WR = system edge. Stale filter protecting it. **NO CONFIG CHANGE** — monitoring stale filter 48h, HIGH regime legacy flush.
 1. **brain_auditor ~15:30 UTC — NO CONFIG CHANGE.** DB: 24h 12T 25.0%WR -$1.12 (COLD STREAK). 7d: 230T 51.7%WR -$1.96 (SLIGHTLY NEGATIVE). Market NEUTRAL. 3 open (COMP SHORT, WCT LONG, STX LONG). **STALE FILTER:** Deployed 10:00 UTC. Post-deployment insufficient sample. 7d stale 74T 48.6%WR -$1.37 vs fresh 156T 53.2%WR -$0.59. EXTREME fresh 71.4%WR +$0.79★ (filter working). **LOSING AUTOPSY:** 9 losers — 4x open-skies+ LONG (ALL ATR SL, 3/4 wave_phase=falling, BTC bearish/transitioning), 3x pullback-entry- SHORT (ACE stale, ME/SUPER NORMAL ATR SL), 1x btc-pump-rider+ LONG (AVAX cut-loser), 1x volume-breakout-long+ LONG (BIGTIME HIGH ATR SL). **open-skies+ degradation:** 4T today ALL losers (25%WR). 7d: 8T 50%WR -$0.08. wave_phase=falling pattern on 3/4. Sample too small. **REGIME:** EXTREME 83T 56.6%WR +$0.09 (best). HIGH 93T 47.3%WR -$1.84 (worst, ~60% legacy). **7d EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit 137T -$1.58 (#1 drag). **CREATIVE:** (1) EXTREME SHORT fresh = system edge 71.4%WR. (2) open-skies+ wave_phase gate idea — monitor. (3) SHORT carries, LONG legacy drag aging out. **NO CONFIG CHANGE** — monitoring stale filter 48h, open-skies+ degradation.
 1. **brain_auditor ~14:50 UTC — NO CONFIG CHANGE.** DB: 24h 10T 40.0%WR -$0.88 (COLD STREAK). 7d: 234T 52.2%WR slightly negative. Market NEUTRAL. 3 open (STX, W, WCT LONG). **STALE FILTER:** Post-deploy 4 trades (all fresh, insufficient sample). 7d stale 74T 48.6%WR -$1.37 vs fresh 158T 53.8%WR -$0.06. EXTREME fresh 71.4%WR +$0.79★. **LOSING AUTOPSY:** 8 losers — BIGTIME RSI=84.6 overbought chase (volume-breakout-long+), XPL RSI=26.6 EXTREME ATR SL (open-skies+), SUSHI HIGH ATR SL (open-skies+), SEI HIGH HL_CLOSED (exchange bug, pre-RSI-fix), ME/SUPER NORMAL ATR SL (pullback-entry-), AVAX NORMAL cut-loser (btc-pump-rider+). **REGIME:** EXTREME 3T 66.7%WR +$0.25 (best). HIGH 5T 20%WR -$0.83 (worst — legacy aging). NORMAL 3T 0%WR -$0.39 (tiny). **7d REGIME:** EXTREME +$0.47 (strongest). HIGH -$1.69 (worst, ~60% dead/legacy). **CREATIVE:** (1) LONG_RSI_CEILING=80 — blocks overbought LONG. Sample too small (2 trades, 94% NULL RSI). Monitor. (2) EXTREME SHORT fresh = edge (59.6%WR +$1.04). Stale filter protects it. **NO CONFIG CHANGE** — monitoring stale filter 48h.

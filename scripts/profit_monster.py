@@ -13,12 +13,14 @@ from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
+    PM_TRAIL_TIERS,
     PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS, PM_TIER_BYPASS_SIGNALS,
 )
 # FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
 # Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
 PM_TRAIL_ACTIVATE_PCT *= 100
 PM_TRAIL_DISTANCE_PCT *= 100
+PM_TRAIL_TIERS = [(min_p * 100, dist * 100) for min_p, dist in PM_TRAIL_TIERS]  # convert to percent
 import sys, os, json, time, random, argparse
 from datetime import datetime
 from pathlib import Path
@@ -321,13 +323,23 @@ def _load_trail_state():
 def _save_trail_state(state):
     _TRAIL_STATE_FILE.write_text(json.dumps(state, indent=2))
 
+def _trail_distance_for_peak(peak_pnl_pct):
+    """Return trail distance for current peak profit using tier system.
+    Tiers loosen as profit grows — last matching tier wins (highest applicable)."""
+    dist = PM_TRAIL_TIERS[0][1]  # default to first tier
+    for min_profit, d in PM_TRAIL_TIERS:
+        if peak_pnl_pct >= min_profit:
+            dist = d
+    return dist
+
+
 def run_trail(positions, dry_run):
     """Trailing profit tier: mark trades in profit, trail peak, exit on weakness.
 
     Logic:
     1. When trade hits PM_TRAIL_ACTIVATE_PCT → mark as trailing, record peak
-    2. On each check: if current_pnl < peak - PM_TRAIL_DISTANCE_PCT → exit
-    3. If trade drops below activation threshold → clear state (didn't hold)
+    2. On each check: if current_pnl < peak - trail_distance(peak) → exit
+    3. Trail distance loosens as profit grows (tiered system)
     """
     if not PM_TRAIL_ENABLED:
         return 0
@@ -378,15 +390,15 @@ def run_trail(positions, dry_run):
                 continue
 
             # Exit if current price dropped trail distance from peak
-            # MUST check this BEFORE "dropped below activation" — otherwise
-            # a sharp drop clears state instead of triggering exit.
-            trail_floor = trail["peak_pnl"] - PM_TRAIL_DISTANCE_PCT
+            # Trail distance loosens as profit grows (tiered system)
+            trail_dist = _trail_distance_for_peak(trail["peak_pnl"])
+            trail_floor = trail["peak_pnl"] - trail_dist
             # ponytail: removed breakeven guard — was capping avg PM_TRAIL exit at 0.24%
             # despite 0.40% activation. Trades peaked 0.50-0.60% then exited at 0.0%.
             # Now exits at trail_floor, letting R:R improve.
             if pnl <= trail_floor:
                 log(f"  [TRAIL] {pos['token']} trailing exit: peak={trail['peak_pnl']:.2f}% "
-                    f"current={pnl:.2f}% floor={trail_floor:.2f}%")
+                    f"current={pnl:.2f}% floor={trail_floor:.2f}% dist={trail_dist:.2f}%")
                 ok = close_position(pos["id"], pos["token"], pos["direction"],
                                     pnl, pos["current_price"], dry_run, "trail")
                 if ok:
@@ -415,7 +427,7 @@ def run_trail(positions, dry_run):
                         "token": pos["token"],
                     }
                     log(f"  [TRAIL] {pos['token']} activated: pnl={pnl:.2f}% "
-                        f"peak={pnl:.2f}% trail_floor={pnl - PM_TRAIL_DISTANCE_PCT:.2f}%")
+                        f"peak={pnl:.2f}% trail_floor={pnl - _trail_distance_for_peak(pnl):.2f}%")
 
     _save_trail_state(state)
     ts_file.write_text(json.dumps({"ts": time.time()}))

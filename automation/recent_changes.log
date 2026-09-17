@@ -2252,3 +2252,14 @@
   24h: 14T 21.4%WR -$1.37 | 7d: 227T 51.1%WR -$2.61
   Kill check: 0T last hour. ATR SL 64% avg -$0.080 (breakeven).
   No action needed. BY: auto_1hr
+[2026-09-17 ~18:00 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 13T 23.1%WR -$1.37 | 7d 226T 51.8%WR -$2.16
+  open-skies+ KILLED (17:11 UTC). Stale filter working (7/7 FRESH post-deploy).
+  CREATIVE: Resistance proximity filter for SHORT (needs verification).
+  MONITORING: stale filter (48h), HIGH regime legacy flush, pullback-entry- streak.
+  BY: brain_auditor
+[2026-09-17 18:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 1T closed (0W 1L -$0.15). Open: 3 volume-breakout-long+ (GMX/BABY/WCT, all $0.00)
+  24h: 14T 21.4%WR -$1.37 | 7d: 226T 50.9%WR -$2.72
+  Kill check: 0T last hour. ATR SL 64% avg -$0.121 (breakeven).
+  No action needed. BY: auto_1hr

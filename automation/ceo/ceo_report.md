@@ -1,23 +1,37 @@
-## CEO Report — 2026-09-17 ~10:45 UTC
+## CEO Report — 2026-09-17 ~18:35 UTC
 
 ### Diagnosis
-DB-verified. 24h: 25T, 36.0%WR, -$0.27 (worse than 06:30 snapshot). 7d: 252T, 52.0%WR, -$0.78 (slightly negative). 2 open. Market 100% NEUTRAL. SHORT dominant (+$2.14 7d). LONG legacy drag aging out (-$1.83).
+DB-verified. 24h: 15T, 20.0%WR, -$1.73 (COLD STREAK — worst day in 7d). 7d: 226T, 50.9%WR, -$2.73 (slightly negative). 3 open (2 volume-breakout-long+ LONG, 1 pullback-entry- SHORT). Market 100% NEUTRAL.
 
 ### Root Cause
-Two structural issues:
-1. **Stale signal execution**: 79 trades marked is_stale (flat momentum) at 48.1%WR -$1.10 vs fresh 172T/54.1%WR +$0.32. Gap $1.42/7d. Not signal AGE — these are trades on tokens with no momentum.
-2. **Signal diversity**: Only 2 signal types (pullback-entry-, open-skies+) pass confluence in NEUTRAL. No resilience.
+1. **pullback-entry- SHORT cold streak**: 4T/0%WR -$0.78 in 24h. But 7d: 68T/51.5%WR +$0.25 (profitable). This is variance, not structural. All-time profitable in NEUTRAL (58.4%WR +$2.60/30d).
+2. **Legacy losers in 7d stats**: trend_purity+ ($-0.90), pump-chain+ ($-0.58), rr-struct-v2+ ($-0.45), rr-struct- ($-0.42) — all killed/disabled, legacy trades dragging numbers.
+3. **Signal diversity**: Only 2-3 signal types pass confluence in NEUTRAL. No resilience when one has a cold streak.
 
 ### 24h Losers (VERIFIED)
-- pullback-entry- SHORT: 13T/30.8%WR -$0.16 (bad streak, 7d profitable 51.3%WR +$0.73)
-- volume-breakout-long+: 3T/0%WR -$0.10 (low sample)
-- rs-s36,volume-breakout-long+: 1T -$0.22
+- pullback-entry- SHORT: 4T/0%WR -$0.78 (cold streak, 7d profitable)
+- open-skies+ LONG: 5T/20%WR -$0.42 (KILLED 17:11 UTC)
+- volume-breakout-long+: 2T/50%WR -$0.14 (low sample)
 
 ### 7d Top Performers (VERIFIED)
-- pump-chain- SHORT: 49T/61.2%WR +$1.25
-- pullback-entry- SHORT: 78T/51.3%WR +$0.73
-- rr-struct+ LONG: 15T/73.3%WR +$0.59
-- open-skies+ LONG: 10T/60%WR +$0.29
+- rr-struct+ LONG: 15T/73.3%WR +$0.59 ★★
+- mover- SHORT: 4T/100%WR +$0.54 (tiny sample)
+- pullback-entry- SHORT: 68T/51.5%WR +$0.25
+- pump-chain- SHORT: 38T/55.3%WR -$0.03 (breakeven)
+
+### Fix Applied
+**NO CONFIG CHANGE.** System structurally healthy. The 24h cold streak is variance in a profitable signal (pullback-entry-). Legacy losses from killed signals will age out.
+
+### Verification
+- Stale filter: Deployed 10:00 UTC. Post-deploy 7 trades ALL FRESH (working). Evaluate by Sep 19 10:00 UTC.
+- open-skies+ KILLED correctly (17:11 UTC). All 5 24h trades were losers.
+- Regime memory fresh (updated Sep 16). All active signals are NEUTRAL specialists.
+
+### Monitoring
+1. Stale filter effectiveness (48h evaluation by Sep 19 10:00 UTC)
+2. pullback-entry- SHORT recovery from cold streak
+3. HIGH regime legacy flush (94T/7d 46.8%WR -$2.00, ~60% legacy)
+4. Signal diversity — need new signals for NEUTRAL resilience
 
 ### 7d Biggest Drags (VERIFIED)
 - trend_purity+ LONG: 11T/36.4%WR -$0.90 (legacy, killed Sep 13)

@@ -812,3 +812,32 @@ Final set: ['ENA', 'INJ', 'KAS']
 - Quiet period — no trades closing, no data to act on
 
 **BY:** auto_1hr
+
+## [2026-09-17 18:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.15)
+- NOT LONG volume-breakout-long+ atr_sl_hit: -$0.15
+
+**24h:** 14T 21.4%WR -$1.37 | **7d:** 226T 50.9%WR -$2.72
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 9T avg -$0.121 — dominant (64%), near breakeven
+- cut-loser-CL-T1: 2T avg -$0.090
+- HARD_SL_FAILED: 1T -$0.250 (isolated)
+- HL_CLOSED: 1T -$0.230 (isolated)
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- ATR SL: 64% of 24h but avg -$0.121 (near breakeven, tpsl fix verified)
+- Trade frequency: ~1.4T/hr — healthy
+- Open trades: 3 (volume-breakout-long+ LONG: GMX 1h, BABY 1.9h, WCT 3.7h — all $0.00)
+
+**Monitoring:**
+- pullback-entry- 24h: 4T -$0.78 but 7d: 68T 51.5%WR +$0.25 — profitable on wider sample
+- ATR SL dominance structural in choppy market, losses tiny
+- 3 volume-breakout-long+ open positions — watching for cluster risk
+
+**BY:** auto_1hr
