@@ -53,6 +53,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
+        'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -70,6 +71,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
+        'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
@@ -127,6 +129,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
+        'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'breakout-long+',  # Volume-confirmed breakout LONG — ATR compression + volume spike

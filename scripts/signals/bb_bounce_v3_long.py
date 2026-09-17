@@ -60,6 +60,7 @@ from hermes_constants import (
 )
 
 # ── State ─────────────────────────────────────────────────────────────────
+_cooldown = {}
 
 
 def _log(msg):

@@ -1139,6 +1139,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # bb_bounce_v3_long (V3 calibrated from v2 losses)
+            if _comp in ('bb_bounce_v3_long', 'bb-bounce-v3-long+'):
+                try:
+                    from hermes_constants import BB_BOUNCE_V3_LONG_ENABLED
+                    if not BB_BOUNCE_V3_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_V3_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-v4-short (proven momentum SHORT + regime filter)
             if _comp in ('accel-300-v4-short+', 'accel-300-v4-short-'):
                 try:
