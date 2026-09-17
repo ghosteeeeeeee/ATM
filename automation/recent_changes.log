@@ -2157,3 +2157,17 @@
   Open: 0 (system flat)
   System healthy, no action needed.
   BY: auto_1hr
+[2026-09-16 23:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 4T 0%WR -$0.11 (SNIPER exits on pullback-entry- SHORTs, bullish reversal protection)
+  24h: 16T 50%WR -$0.11 | ATR SL 9T avg -$0.063 (small losses, trailing working)
+  7d: 252T 53.2%WR +$0.36 | pullback-entry- 84T/7d +$1.00 (still profitable)
+  Open: 5 LONGs (DOT, BIGTIME, APT, NEAR, WLD) — correct direction bias
+  SNIPER protecting system from bad SHORT entries in bullish NEUTRAL. No action needed.
+  BY: auto_1hr
+[2026-09-17 00:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 3T 67%WR +$0.34 (SNIPER protecting LONGs from bearish reversal)
+  24h: 26T 42.3%WR -$0.02 | ATR SL 10T/26T (38.5%) avg -$0.038 (below 40% threshold)
+  7d: 255T 53.3%WR +$0.70 | pullback-entry- 84T/7d +$1.00 (52.4%WR)
+  Open: 2 (BIGTIME -6.87% tiny, WLD +5.63%)
+  System healthy, SNIPER protecting from bearish reversals. No action needed.
+  BY: auto_1hr

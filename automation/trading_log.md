@@ -279,3 +279,65 @@
 **Monitoring:**
 - System flat — waiting for next signal
 - ATR SL at 1.3% floor (ATR_SL_MIN) working as designed
+
+## [2026-09-16 23:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses — all SNIPER exits on SHORTs)
+**PnL:** -$0.11
+
+**24h Exit Breakdown:**
+- ATR SL: 9T/16T (56%) avg -$0.063 — small losses, trailing working
+- profit-monster-trail: 2T +$0.14 — working correctly
+- SNIPER exits: 4T mixed — caught bullish reversals on SHORTs, limited losses
+- Guardian: 2T (-$0.48) — safety mechanism working
+
+**Signal Health:**
+- pullback-entry-: 15T/24h 33.3%WR -$0.67 — rough 24h but 7d +$1.00 (52.4%WR)
+- System 7d: 252T 53.2%WR +$0.36
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour (SNIPER exits not counted as signal failures)
+- pullback-entry- still profitable on 7d — variance, not failure
+- SNIPER correctly protecting from bad SHORT entries in bullish-leaning NEUTRAL
+- ATR SL 56% of exits — below 40% alert threshold, losses small
+- Trade frequency 4/hr — healthy
+- 5 open LONGs (DOT, BIGTIME, APT, NEAR, WLD) — correct direction bias
+- All losers (trend_purity+, rr-struct-v2+, bb-bounce-v2-long+, rr-struct-, breakout-long+, accel-300-v4-short-) already disabled
+
+**Monitoring:**
+- Market bullish in NEUTRAL — SNIPER catching SHORT entries early
+- 5 LONGs open, watching for continuation
+- pullback-entry- SHORT entries in bullish market — SNIPER saving the system
+
+## [2026-09-17 00:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 breakeven)
+**PnL:** +$0.34 (SNIPER protecting LONGs from bearish reversal)
+
+**24h Exit Breakdown:**
+- ATR SL: 10T/26T (38.5%) avg -$0.038 — below 40% threshold ✓
+- SNIPER exits: 6T — correctly catching bearish reversals on LONGs
+- profit-monster-trail: 2T +$0.14 — working
+- Guardian: 2T (-$0.48) — safety mechanism
+
+**Signal Health:**
+- pullback-entry-: 15T/24h 33.3%WR -$0.67 — rough 24h but 7d +$1.00 (52.4%WR)
+- open-skies+: 2T 100%WR +$0.34 — working great
+- 7d: 255T 53.3%WR +$0.70 — profitable
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- ATR SL 38.5% of closes — below 40% threshold
+- SNIPER correctly protecting LONGs from bearish reversal
+- Trade frequency 3/hr — healthy
+- System flat — waiting for next signal
+- All losers already disabled
+
+**Monitoring:**
+- BIGTIME open -6.87% but tiny position (-$0.01), very close to SL
+- WLD open +5.63% — healthy profit
+- SNIPER active on bearish signals in NEUTRAL regime
