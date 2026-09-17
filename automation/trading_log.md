@@ -498,3 +498,115 @@ Final set: ['ENA', 'INJ', 'KAS']
 **Monitoring:**
 - volume-breakout-long+ at 0%WR (3T) — will kill if reaches 3+ trades next hour with 0 wins
 - System flat — waiting for next signal
+
+## [2026-09-17 15:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 0 (system flat)
+**24h:** 23T 42%WR +$0.01
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (30.4%) avg +$0.009 — healthy, below 40% threshold
+- SNIPER exits: 10T — protecting system from bearish reversals
+- profit-monster-trail: 2T +$0.14 — working
+- hard_tp: 1T +$0.34 — working
+- HARD_SL_FAILED: 1T -$0.25, HL_CLOSED: 1T -$0.23 — single occurrences
+
+**Signal Health (24h):**
+- pullback-entry- SHORT: 12T -$0.16 — regime-driven weakness, small per-trade loss
+- open-skies+ LONG: 5T +$0.20 — healthy (60%WR)
+- volume-breakout-long+ LONG: 3T -$0.10 — 0%WR, monitoring (not yet at 3+ trades kill threshold per hour)
+- mover-, r2-trend-short3: 1T each, 100%WR
+
+**Diagnosis:**
+- ATR SL healthy (30.4% of closes, avg +$0.009)
+- SNIPER actively protecting system
+- System flat — quiet market period
+- No overtrading (0/hr)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades in last hour
+- ATR SL well below 40% threshold
+- Trade frequency 0/hr — quiet, not overtrading
+- volume-breakout-long+ at 0%WR (3T) — monitoring but no action yet
+
+**Monitoring:**
+- volume-breakout-long+ — will kill if next hour shows 3+ trades with 0 wins
+- System flat — waiting for next signal
+
+## [2026-09-17 09:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour
+- ACE LONG (mover+,rs-s61) → SNIPER-L1-BEARISH exit → +$0.04
+
+**24h:** 23T 39%WR -$0.18 | **7d:** 255T 53%WR +$0.70
+**Open:** 1 (BLUR SHORT -9.5%)
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (30.4%) avg +$0.009 — healthy, well below 40%
+- SNIPER exits: 12T total — protecting system from bearish reversals
+- HL_CLOSED: 1T -$0.23, HARD_SL_FAILED: 1T -$0.25 — single occurrences
+
+**Signal Health (24h):**
+- pullback-entry-: 12T 4W -$0.16 — 33%WR, losing short-term but 7d profitable (52%WR)
+- open-skies+: 5T 3W +$0.20 — healthy (60%WR)
+- volume-breakout-long+: 3T 0W -$0.10 — 0%WR, **kill candidate** (only 1T last hour, below 3+ threshold)
+- rs-s36,volume-breakout-long+: 1T 0W -$0.22 — combo signal failing
+
+**Diagnosis:**
+- ATR SL healthy (30.4% of closes)
+- SNIPER actively protecting system (12T exits)
+- volume-breakout-long+ consistently failing — 0%WR across 3 trades
+- pullback-entry- SHORT weakness is regime-driven (still profitable 7d)
+- Trade frequency 1/hr — not overtrading
+- BLUR SHORT open -9.5% — monitor
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: volume-breakout-long+ at 0%WR but only 1T last hour (threshold: 3+ in hour)
+- ATR SL well below 40% threshold
+- Trade frequency 1/hr — quiet, not overtrading
+
+**Monitoring:**
+- volume-breakout-long+ — will kill if next hour shows 3+ trades with 0 wins
+- BLUR SHORT — monitor if loss deepens
+- pullback-entry- — SHORT weakness expected in current regime
+
+## [2026-09-17 10:09 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (FOGO LONG → SNIPER exit -$0.09, BLUR SHORT → SNIPER exit $0.00)
+**24h:** 25T 36%WR -$0.27 | **7d:** 255T 53%WR +$0.70
+**Open:** 1 (HEMI SHORT pullback-entry- +3.15%)
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (28%) avg +$0.009 — healthy, well below 40%
+- SNIPER exits: 15T (60%) — actively protecting system from reversals
+- HARD_SL_FAILED: 1T -$0.25, HL_CLOSED: 1T -$0.23 — single outliers
+
+**Signal Health (24h):**
+- pullback-entry-: 13T 30.8%WR -$0.16 — SHORT weakness (7d: 51.3%WR +$0.73, regime-driven)
+- open-skies+: 6T 50%WR +$0.11 — healthy
+- volume-breakout-long+: 3T 0%WR -$0.10 — 0%WR but 0T last hour (below kill threshold)
+- rs-s36,volume-breakout-long+: 1T 0%WR -$0.22 — combo signal failing
+
+**Diagnosis:**
+- ATR SL healthy at 28% — no SL tightness issue
+- SNIPER dominating exits (60%) — system correctly protecting from bearish reversals
+- volume-breakout-long+ has gone quiet — 0 trades in last 4h, no fresh losses
+- pullback-entry- SHORT dragging 24h PnL but 7d still profitable — regime issue not signal issue
+- Trade frequency 2/hr — not overtrading
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: volume-breakout-long+ at 0%WR but 0T last hour (threshold: 3+T in hour)
+- ATR SL well below 40% threshold
+- Trade frequency 2/hr — normal
+
+**Monitoring:**
+- volume-breakout-long+ — 0%WR persistent, recommend CEO review (not auto-killable since quiet)
+- HEMI SHORT — small position +3.15%, let it run
+- pullback-entry- SHORT — regime-driven, no action needed
