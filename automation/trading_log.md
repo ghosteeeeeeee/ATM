@@ -610,3 +610,30 @@ Final set: ['ENA', 'INJ', 'KAS']
 - volume-breakout-long+ — 0%WR persistent, recommend CEO review (not auto-killable since quiet)
 - HEMI SHORT — small position +3.15%, let it run
 - pullback-entry- SHORT — regime-driven, no action needed
+
+## [2026-09-17 11:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system quiet)
+**24h:** 25T 36%WR -$0.27 | **7d:** 252T 52%WR -$0.78
+**Open:** 2 SHORTs (pullback-entry-) — HEMI -74%, SEI -50% (both 1.3% SL intact)
+
+**24h Exit Breakdown:**
+- ATR SL: 7T (28%) avg +$0.009 — healthy
+- SNIPER: 14T (56%) — dominant, protecting system
+- Outliers: HL_CLOSED 1T -$0.23, HARD_SL_FAILED 1T -$0.25
+
+**Signal Health (24h):**
+- pullback-entry-: 13T 31%WR -$0.16 (7d 51%WR +$0.73 — regime-driven)
+- open-skies+: 6T 50%WR +$0.11
+- volume-breakout-long+: 3T 0%WR -$0.10 (0T last hour — quiet)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: volume-breakout-long+ 3T 0%WR but 0T last hour (below 3+/hour threshold)
+- ATR SL healthy at 28%
+- Trade frequency low — not overtrading
+
+**Monitoring:**
+- HEMI SHORT, SEI SHORT — both deeply underwater, SL at 1.3% distance intact
+- volume-breakout-long+ — persistent 0%WR but quiet
