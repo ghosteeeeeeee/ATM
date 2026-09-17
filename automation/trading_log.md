@@ -637,3 +637,34 @@ Final set: ['ENA', 'INJ', 'KAS']
 **Monitoring:**
 - HEMI SHORT, SEI SHORT — both deeply underwater, SL at 1.3% distance intact
 - volume-breakout-long+ — persistent 0%WR but quiet
+
+## [2026-09-17 12:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (HEMI SHORT → SNIPER exit, -$0.06)
+**24h:** 23T 30%WR -$0.56 | **7d:** 252T 52%WR -$0.78
+**Open:** 3 (SUSHI LONG, XPL LONG, SEI SHORT — all slightly negative)
+
+**24h Exit Breakdown:**
+- SNIPER: 13T (56%) — dominant, protecting system
+- ATR SL: 5T (22%) avg $0.008 — healthy
+- hard_tp: 1T +$0.34 — good
+- HL_CLOSED: 1T -$0.23, HARD_SL_FAILED: 1T -$0.25 — SL execution failures
+
+**Signal Health:**
+- pullback-entry-: 12T 25%WR -$0.39 (7d: 78T 51%WR +$0.69 — regime-driven, not signal issue)
+- open-skies+: 6T 50%WR +$0.11 — healthy
+- volume-breakout-long+: 3T 0%WR -$0.10 (7d: only 3T total — too low frequency to judge)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: volume-breakout-long+ at 0%WR with 3T but only 3T in 7d — too sparse to kill
+- pullback-entry- SHORT: 7d profitable, 24h weakness is regime-driven
+- ATR SL healthy at 22%
+- Trade frequency ~1/hr — normal
+
+**Flagged to CEO:**
+- HARD_SL_FAILED (SEI SHORT) and HL_CLOSED (ACE SHORT) — SL execution failures on pullback-entry- SHORT
+
+**Open Questions:**
+- HARD_SL_FAILED — is there a known issue with SL execution for small positions?

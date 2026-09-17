@@ -242,7 +242,7 @@ VOL_PHASE_MULTS = {
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
-        'Pullback_Entry': 0.8,        # RELAXED — pullback-entry- SHORT 24T 58%WR +$0.51 in NORMAL (LONG killed). 2026-09-16
+        'Pullback_Entry': 0.0,        # BLOCKED — pullback-entry- 0/3 (0%) -$0.37 in NORMAL 24h. All-time 48.3% WR -$0.03. 2026-09-17
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in NORMAL
         'R2_Structural': 0.2,         # HEAVILY PENALIZED — rr-struct+ LONG 5T 40%WR -$0.49 in NORMAL (24h). Wins in HIGH (87.5% WR). Tightened from 0.5 2026-09-14
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime

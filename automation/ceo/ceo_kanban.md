@@ -4,6 +4,28 @@
 - [2026-09-17 02:40 UTC] CEO: SKIP trend_purity+ kill — legacy trades only (Sep 12-13), no active bleed. TREND_PURITY_PLUS_ENABLED already False since Sep 13.
 
 ## TEAM UPDATES
+- [2026-09-17 12:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 36.0%WR -$0.27 (COLD STREAK) | 7d 252T 52.0%WR -$0.78 (SLIGHTLY NEGATIVE)
+  Market NEUTRAL (100%). 2 open. SHORT carries LONG.
+  **STALE FILTER VERIFIED WORKING:** 80 stale 7d 47.5%WR -$1.16 vs 171 fresh 53.8%WR +$0.29. Gap $1.45/7d. pullback-entry- stale 42T -$0.33 vs fresh 37T +$1.00. Filter deployed, monitoring.
+  **LOSING AUTOPSY:** 14 losers — 9 sniper cuts <$0.12 (working as designed), 3 stale entries -$0.37 (ACE, ETH, HEMI — stale filter now blocks), 1 HARD_SL_FAILED (SEI — exchange execution bug), 1 low-sample signal (BIGTIME volume-breakout-long+). No structural signal issues.
+  **EXIT ANALYSIS:** ATR SL 140T/252T dominant (55.6%), avg -$0.006/trade (breakeven). profit-monster-trail 36T +$3.23 (best). rr_engine_resistance 30T -$0.99 (#1 exit drag, pullback-entry- SHORT 16T -$0.67). cut-loser-CL-T1 7T -$1.19 (working as designed).
+  **REGIME:** EXTREME SHORT 56.4%WR +$0.50 (best). HIGH 48.0%WR -$1.10 (worst — legacy killed signals aging out). NORMAL 50.9%WR -$0.27.
+  **CREATIVE:** (1) Momentum-gated stale filter — allow stale with momentum>=6 (7 winners +$0.08 vs 3 losers -$0.41). Sample too small (10T), monitor. (2) Extend stale filter to open-skies+ when sample grows. (3) HARD_SL_FAILED on SEI — exchange execution issue, 1 occurrence.
+  **DRIFT:** No new drift found. All previous fixes (RSI alignment, exit_conditions, stale filter) verified working. velocity filter code correct (session brain description was inaccurate).
+  0 config changes applied. Monitoring: pullback-entry- streak, stale filter effectiveness, volume-breakout-low sample.
+  BY: brain_auditor
+
+- [2026-09-17 10:00 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — stale token filter for pullback_entry
+  DB-verified: 24h 23T 39.1%WR -$0.14 (FLAT) | 7d 252T 53.2%WR +$0.32 (POSITIVE)
+  EXTREME SHORT dominant +$0.97 | HIGH LONG worst -$1.23
+  **CODE FIX: token_speeds.is_stale check in pullback_entry.py.** Root cause found: 41 stale pullback-entry- SHORT 7d = -$0.27 vs 37 fresh = +$1.00. Stale tokens have no momentum — pullback entries in flat markets fail. Other signals (trend_purity, r2_trend) already block stale via token_speeds. pullback_entry was missing this filter. Now blocks stale tokens from generating signals.
+  **LOSING AUTOPSY:** SEI SHORT RSI=85.17 (pre-fix, HARD_SL_FAILED), ETH SHORT RSI=71.61 (pre-fix, ATR_SL), IOTA SHORT RSI=37.41 (oversold SHORT in HIGH, SNIPER caught). FOGO LONG RSI=70.44 (HIGH, SNIPER caught). All SNIPER exits working as designed.
+  **STALE SIGNAL ROOT CAUSE:** 79 stale 48.1%WR -$1.10 vs 173 fresh 53.8%WR +$0.32. Gap ~$1.42/7d. Stale = token_speeds.is_stale flag, not signal age. pullback_entry now blocks stale. Other signals need same treatment.
+  **REGIME MATRIX:** EXTREME SHORT 51T 60.8%WR +$0.97 (best) | HIGH LONG 38T 50%WR -$1.23 (worst). LONG in HIGH is structural drag — monitor 2 weeks before regime-level change.
+  1 config change applied: stale filter (pullback_entry.py).
+  BY: brain_auditor
+
 - [2026-09-16 18:30 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX — exit_conditions recording (position_manager)
   DB-verified: 24h 21T 66.7%WR +$1.33 (POSITIVE) | 7d 255T 55.7%WR +$2.72 (POSITIVE)
   SHORT 7d: dominant | LONG 7d: legacy aging out

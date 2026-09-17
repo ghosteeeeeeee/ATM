@@ -547,6 +547,20 @@
 ## Error Alerts — 2026-09-14 20:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,MOMENTUM | vol=N.3x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
 
+## Error Alerts — 2026-09-17 10:44 UTC
+- **[OK]** Pipeline: running, cycle #203684, 0 errors, 0 tracebacks
+- **[OK]** Services: hermes-pipeline active, hermes-hl-sync-guardian active
+- **[OK]** Timers: 68 active (price-collector, regime scanners, pump-hunter, health-monitor all firing)
+- **[OK]** Disk: 83% (93G/118G) — 2% from threshold
+- **[OK]** Signals: 45 generated last hour (403 today), healthy flow
+- **[OK]** Trades: 0 open, 2 closed today, -0.04 USDT, 50% WR, 0 phantoms
+- **[OK]** Regime: SHORT_BIAS (3 short, 0 long, 124 neutral) — BTC $76,323
+- **[OK]** Speed: 127/241 tokens >= 50th percentile (53%)
+- **[OK]** Prices: fresh (latest signal 10:40 UTC)
+- **[CRITICAL]** (FIXED): `hermes-coding-mcp.service` crash-looped 501,705 times — missing `run_mcp_server.py`. **AUTO-FIX**: stopped + disabled service.
+- **WARN** (9x): Failed services (all auxiliary): 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, session-brain-rebuild, trading-checklist, upgrade-implementer, weather-station-api — not blocking trading
+- **AUTO-FIX**: Stopped and disabled `hermes-coding-mcp.service` (was crash-looping 501K+ times on missing script)
+
 ## Error Alerts — 2026-09-14 21:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,MOMENTUM | vol=N.7x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
@@ -737,3 +751,10 @@
 - **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-17 11:43 UTC
+- **WARN**: Disk at 83% (20G free) — approaching 85% threshold. Consider log rotation.
+- **INFO**: Pipeline running clean, 0 errors. 35 signals/hour, 24 trades closed, -8.57% PnL day.
+
+## Error Alerts — 2026-09-17 11:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

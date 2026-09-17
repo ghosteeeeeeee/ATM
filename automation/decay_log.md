@@ -1196,3 +1196,7 @@
 [2026-09-17 05:08 UTC]   🟢 OK: pullback-entry-: 13 trades, 38.5% WR, PnL=-5.4
 [2026-09-17 05:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-17 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-17 11:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-17 11:08 UTC]   🟢 OK: pullback-entry-: 13 trades, 38.5% WR, PnL=-5.4
+[2026-09-17 11:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-17 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
