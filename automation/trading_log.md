@@ -730,3 +730,64 @@ Final set: ['ENA', 'INJ', 'KAS']
 - 24h cold streak (27.3%WR) on tiny sample (11T) — noise, not structural
 - Open trades: 0 (flat)
 - ATR SL avg losses tiny — system risk under control
+
+## [2026-09-17 15:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.15)
+- WCT open-skies+ LONG atr_sl_hit: -$0.15
+
+**24h:** 12T 25%WR -$1.12 | **7d:** 231T 51.5%WR -$2.10
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 8T avg -$0.070 — dominant (67%), near breakeven (tpsl fix working)
+- cut-loser-CL-T1: 1T -$0.09
+- HARD_SL_FAILED: 1T -$0.25 (isolated)
+- HL_CLOSED: 1T -$0.23 (isolated)
+- profit-monster-trail: 1T +$0.01
+
+**24h by Signal:**
+- pullback-entry- SHORT: 5T 20%WR -$0.56 — cold streak (7d: 52.2%WR, regime-driven)
+- open-skies+ LONG: 4T 25%WR -$0.26 — degrading from 66.7%WR (Sep 11-13)
+- btc-pump-rider+ LONG: 1T 0%WR -$0.09 (below kill threshold)
+- grind-breakout+ LONG: 1T 100%WR +$0.01
+- volume-breakout-long+ LONG: 1T 0%WR -$0.22 (below kill threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour (max 5T but 7d positive)
+- ATR SL: 67% of 24h but avg -$0.070 (near breakeven, tpsl fix verified)
+- Trade frequency: ~1.7T/hr — healthy
+- Open trades: 2 (tiny losses, both under $0.15)
+
+**Monitoring:**
+- open-skies+ daily: Sep 11 66.7%WR → Sep 17 25%WR (4T today, not kill threshold yet)
+- 24h cold streak (25%WR) on 12T — small sample, noise vs structural
+- ATR SL dominance structural in choppy market, losses tiny
+
+## [2026-09-17 16:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.25)
+- COMP SHORT r2-trend-short3 cut-loser-CL-T1: -$0.09
+- STX LONG open-skies+ atr_sl_hit: -$0.16
+
+**24h:** 14T 21.4%WR -$1.37 | **7d:** 231T 51.5%WR -$2.10
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 9T avg -$0.080 — dominant (64%), near breakeven (tpsl fix working)
+- cut-loser-CL-T1: 2T avg -$0.090
+- HARD_SL_FAILED: 1T -$0.250 (isolated)
+- HL_CLOSED: 1T -$0.230 (isolated)
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour (open-skies+ had 1T, not 3+)
+- ATR SL: 64% of 24h but avg -$0.080 (near breakeven, tpsl fix verified)
+- Trade frequency: ~2T/hr — healthy
+- Open trades: 1 (WCT volume-breakout-long+ LONG, 1.7h, $0.00 unrealized)
+
+**Monitoring:**
+- open-skies+ collapse today: 4T 0%WR -$0.61 (all LONG, all ATR SL). 7d: 44.4%WR -$0.24. Historically strong (Sep 11-16). Not kill-worthy yet (1T last hour), watching.
+- 24h cold streak (21.4%WR) on 14T — small sample, regime-driven

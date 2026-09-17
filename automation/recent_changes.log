@@ -2219,3 +2219,26 @@
   ATR SL 64% of 24h but avg -$0.059 (near breakeven, tpsl fix working)
   All previously killed signals remain killed. No new losers.
   BY: auto_1hr
+[2026-09-17 15:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 1T (WCT open-skies+ LONG → ATR SL, -$0.15)
+  24h: 12T 25%WR -$1.12 | ATR SL 8T/12T (67%) avg -$0.070 (breakeven, tpsl fix working)
+  7d: 231T 51.5%WR -$2.10 (breakeven)
+  Open: 2 (WCT -$0.12, STX -$0.11 — tiny)
+  open-skies+ degrading: Sep 11 66.7% → Sep 17 25%WR (4T today, watch but not kill)
+  ATR SL elevated % but avg loss near zero — SLs protecting system. No action needed.
+  BY: auto_1hr
+[2026-09-17 15:30 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 12T 25.0%WR -$1.12 (COLD STREAK) | 7d 230T 51.7%WR -$1.96
+  Market NEUTRAL. 3 open (COMP SHORT, WCT LONG, STX LONG).
+  Stale filter: needs 48h eval (by Sep 19 10:00 UTC). EXTREME fresh 71.4%WR edge.
+  open-skies+ degradation: 4T today ALL losers, wave_phase=falling pattern, monitor.
+  Creative: EXTREME SHORT fresh edge protection, open-skies+ wave_phase gate idea.
+  BY: brain_auditor
+[2026-09-17 16:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 2T (0W 2L -$0.25) — COMP SHORT r2-trend-short3 cut-loser, STX LONG open-skies+ ATR SL
+  24h: 14T 21.4%WR -$1.37 | ATR SL 9T/14T (64%) avg -$0.080 (breakeven, tpsl fix working)
+  7d: 231T 51.5%WR -$2.10 (breakeven)
+  Open: 1 (WCT volume-breakout-long+ LONG, 1.7h, $0.00)
+  open-skies+ today: 4T 0%WR -$0.61 (all ATR SL) — worst day, 7d 44.4% still acceptable
+  Kill check: no signal at 0%WR with 3+T last hour. No action.
+  BY: auto_1hr
