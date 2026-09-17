@@ -668,3 +668,65 @@ Final set: ['ENA', 'INJ', 'KAS']
 
 **Open Questions:**
 - HARD_SL_FAILED — is there a known issue with SL execution for small positions?
+
+## [2026-09-17 13:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (SUSHI LONG ATR SL -$0.14, RESOLV LONG profit-trail +$0.01)
+**PnL:** -$0.13 (50% WR)
+**24h:** 9T 30%WR -$0.56 | **7d:** 252T 52%WR +$0.78
+**Open:** 2 (XPL LONG open-skies+, AVAX LONG btc-pump-rider+)
+
+**24h Exit Breakdown:**
+- ATR SL: 6/9 (67%) avg -$0.042 — elevated but losses negligible
+- HARD_SL_FAILED: 1T -$0.25 (isolated)
+- HL_CLOSED: 1T -$0.23 (isolated)
+- profit-monster-trail: 1T +$0.01
+
+**Signal Health:**
+- pullback-entry-: 5T 20%WR -$0.56 (24h) but 7d: 69T 52%WR +$0.36 — regime-driven
+- open-skies+: 2T 50%WR +$0.05 — healthy
+- volume-breakout-long+: 0T last hour — quiet
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at kill threshold (3+/hour with 0%WR)
+- ATR SL elevated at 67% but avg loss only -$0.042 — SLs working as intended
+- Trade frequency ~2/hr — normal
+- pullback-entry- EXTREME regime = 67%WR, weakness is regime-specific
+
+## [2026-09-17 14:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.25)
+- AVAX LONG btc-pump-rider+ cut-loser-CL-T1: -$0.09
+- XPL LONG open-skies+ atr_sl_hit: -$0.16
+
+**24h:** 11T 27.3%WR -$0.97 | **7d:** 233T 51.9%WR -$1.57
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 7T avg -$0.059 — dominant (64%), near breakeven (tpsl fix working)
+- cut-loser-CL-T1: 1T -$0.09
+- HARD_SL_FAILED: 1T -$0.25 (isolated)
+- HL_CLOSED: 1T -$0.23 (isolated)
+- profit-monster-trail: 1T +$0.01
+
+**24h by Signal:**
+- pullback-entry- SHORT: 5T 20%WR -$0.56 — cold streak (7d: 52.2%WR +$0.36, normal)
+- open-skies+ LONG: 3T 33%WR -$0.11
+- btc-pump-rider+ LONG: 1T 0%WR -$0.09 (below kill threshold)
+- grind-breakout+ LONG: 1T 1W +$0.01
+- volume-breakout-long+ LONG: 1T 0%WR -$0.22 (below kill threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour (max 5T but 7d positive)
+- ATR SL: 64% of 24h closes but avg -$0.059 (near breakeven, tpsl fix verified)
+- Trade frequency: 2T/hr — healthy
+- All previously killed signals remain killed
+- 7d -$1.57 essentially breakeven on 233T
+
+**Monitoring:**
+- 24h cold streak (27.3%WR) on tiny sample (11T) — noise, not structural
+- Open trades: 0 (flat)
+- ATR SL avg losses tiny — system risk under control

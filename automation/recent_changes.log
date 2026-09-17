@@ -1,3 +1,14 @@
+[2026-09-17 13:35 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  24h: 10T 40%WR -$0.88 (COLD STREAK) | 7d: 234T 52.2%WR slightly negative
+  SHORT 7d: dominant (+$1.83) | LONG: legacy aging out (-$1.18)
+  EXTREME SHORT fresh 71.4%WR +$0.79 (edge) | HIGH 47.9%WR -$1.79 (worst, legacy)
+  Stale filter deployed 10:00 UTC — post-deployment 3 fresh trades only (insufficient sample)
+  7d stale 74T 48.6%WR -$1.37 vs fresh 160T 53.8%WR -$0.25
+  Losers: 5 — open-skies+ ATR SL x2, volume-breakout-long+ ATR SL, SEI HL_CLOSED (exchange bug), ME ATR SL
+  No structural signal issues. All SNIPER exits working as designed.
+  Creative: EXTREME SHORT fresh 71.4%WR is the edge. Stale filter blocking stale entries (40%WR). Monitor.
+  BY: brain_auditor
+
 [2026-09-17 10:09 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
   1h: 2T closed (FOGO → SNIPER -$0.09, BLUR SHORT → SNIPER $0.00)
   24h: 25T 36%WR -$0.27 | 7d: 255T 53%WR +$0.70
@@ -2200,4 +2211,11 @@
   Open: 1 (BLUR SHORT -9.5%)
   volume-breakout-long+ 3T 0%WR — kill candidate but only 1T last hour (below threshold)
   SNIPER protecting system (12T exits). No action needed.
+  BY: auto_1hr
+[2026-09-17 14:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  1h: 2T closed (0W 2L -$0.25) — quiet
+  24h: 11T 27.3%WR -$0.97 (COLD STREAK, tiny sample)
+  7d: 233T 51.9%WR -$1.57 (essentially breakeven)
+  ATR SL 64% of 24h but avg -$0.059 (near breakeven, tpsl fix working)
+  All previously killed signals remain killed. No new losers.
   BY: auto_1hr
