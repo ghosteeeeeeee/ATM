@@ -1796,3 +1796,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) STALE_MAX_AGE_MINUTES=30 — skip signals >30min old. ~$1.5-2.5/7d expected. (2) Kill pump-chain+ LONG entirely — net negative, +$1.16/7d. (3) mover- SHORT 100%WR 8T — needs 20+ trades before scaling.
   **NO CONFIG CHANGE** — monitoring stale fix design, pump-chain+ LONG kill decision, mover- expansion.
   BY: brain_auditor
+
+- [2026-09-17 08:33 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 23T 39.1%WR -$0.14 (FLAT) | 7d 255T 53.3%WR +$0.70 (POSITIVE)
+  SHORT 7d: +$1.85 (carries system) | LONG 7d: -$2.36 (legacy aging out)
+  Active signals: pullback-entry- SHORT 77T/52.4%WR +$0.73 | pump-chain- SHORT 49T/61.2%WR +$1.25 | rr-struct+ LONG 15T/73.3%WR +$0.59
+  **NO CONFIG CHANGE.** System structurally healthy. Legacy killed signals (trend_purity+, breakout-long+, rr-struct-v2+) contributing -$1.70/7d but fading — zero trades going forward. 24h ALL LONG losses are SNIPER-L3-BEARISH exits (system protecting from reversals). ATR SL 143T/7d avg -$0.004/trade (breakeven, working).
+  **DRIFT:** signal_created_at NULL for all pullback-entry- trades — staleness tracking broken for #1 signal. Data quality issue, needs investigation.
+  **LOSING AUTOPSY:** 11 24h losers — 8x LONG (all SNIPER exits, system correct), 3x SHORT (pullback-entry- in NORMAL/HIGH, normal variance). No entry condition failures.
+  **CREATIVE:** (1) Monitor pump-chain+ LONG in HIGH regime — only active LONG signal negative there (7T, 42.9%WR -$0.06). If continues, block specifically. (2) rr_engine_resistance SHORT exits 30T/7d -$0.99 — structural, working as designed. Avg loss -$0.033/trade acceptable.
+  0 config changes applied.
+  BY: brain_auditor

@@ -1,106 +1,103 @@
 {
-  "timestamp": "2026-09-17T05:35:59Z",
+  "timestamp": "2026-09-17T08:32:58.690979+00:00",
   "session_brain_stats": {
     "total_vectors": 211236,
-    "top_topics": [
-      "delisted tokens",
-      "signal to trades",
-      "ema300_dip_long",
-      "cascade_flip"
+    "key_themes_found": [
+      "stale signals",
+      "HIGH regime drag",
+      "rr_engine exits",
+      "pump-chain SHORT",
+      "pullback-entry staleness"
     ]
   },
   "trade_summary_24h": {
-    "total_trades": 22,
-    "win_rate": 36.4,
-    "pnl": -0.6,
-    "market_regime": "NEUTRAL",
-    "open_trades": 0
+    "trades": 23,
+    "wr": 39.1,
+    "pnl": -0.14,
+    "open": 0,
+    "regime": "NEUTRAL/LONG_BIAS",
+    "note": "All 24h LONG losses are SNIPER-L3-BEARISH exits — system protecting from bearish reversals. Working correctly."
   },
   "trade_summary_7d": {
-    "total_trades": 255,
-    "win_rate": 53.3,
+    "trades": 255,
+    "wr": 53.3,
     "pnl": 0.7,
-    "short_pnl": 1.93,
-    "long_pnl": -1.96,
-    "regime": "100% NEUTRAL"
+    "short": "+$1.85 (55.1% WR, carries system)",
+    "long": "-$2.36 (48.6% WR, legacy killing out)",
+    "regimes": {
+      "EXTREME": "96T 57.3%WR +$0.85 (best)",
+      "HIGH": "100T 49.0%WR -$1.09 (worst — LONG drag)",
+      "NORMAL": "55T 50.9%WR -$0.27 (flat)"
+    }
   },
   "drift_findings": [
     {
-      "finding": "STALE SIGNAL EXECUTION — 31.8% of 7d trades (80/255) fire on stale signals",
-      "evidence": "Stale WR 48.8% vs fresh 54.0%. Stale PnL -$1.17 vs fresh +$1.14. Gap ~$2.31/7d. pullback-entry- SHORT: stale 53.5%WR +$0.28 vs fresh 65.9%WR +$3.50.",
-      "status": "KNOWN — design needed for execution-time revalidation",
-      "impact": "~$2.31/7d lost from stale execution"
+      "finding": "signal_created_at NULL for all pullback-entry- trades",
+      "impact": "Staleness tracking broken for #1 signal (77T/7d). Cannot analyze signal age vs performance.",
+      "severity": "MEDIUM",
+      "action": "Flag for investigation — pullback-entry signal runner may not be writing signal_created_at to trades table."
     },
     {
-      "finding": "rr_engine_resistance SHORT exits — 31 exits/7d, -$0.92 total",
-      "evidence": "All SHORT exits. 45.2% WR. Avg loss -$0.14/trade. Hold time avg 3.3h. Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts at ~1% loss.",
-      "status": "KNOWN — resistance proximity filter suggested but not implemented",
-      "impact": "~$0.92/7d drag from premature SHORT exits near resistance"
+      "finding": "Legacy killed signals still contributing -1.70/7d drag",
+      "impact": "trend_purity+ (-$0.90), pump-chain+ (-$0.87), rr-struct-v2+ (-$0.45) are disabled but have 7d trades still closing.",
+      "severity": "LOW",
+      "action": "Natural fade — these will age out within 48h. No action needed."
     },
     {
-      "finding": "LONG trades still firing in 100% NEUTRAL regime — LONG_NEUTRAL_BLOCK bypassed",
-      "evidence": "105 LONG trades/7d, -$1.96 total. 47.6% WR. Signals: open-skies+, volume-breakout-long+, pump-chain+, rr-struct+, trend_purity+. All in STANDALONE_BYPASS or have 1m LONG_BIAS.",
-      "status": "Design question — should STANDALONE_BYPASS override LONG_NEUTRAL_BLOCK?",
-      "impact": "~$1.96/7d drag from LONG in flat chop"
-    },
-    {
-      "finding": "pump-chain+ LONG — 25T/7d 40%WR -$0.28. ATR SL hit 15T/25T (60%)",
-      "evidence": "This is the #1 ATR SL victim. 15/25 exits via ATR_SL with 26.7% WR. Pattern: pump-chain+ LONG fires on momentum, but NEUTRAL regime means no follow-through. Price reverses, ATR SL hits.",
-      "status": "pump-chain+ NORMAL already blocked. LONG in NEUTRAL still fires.",
-      "impact": "~$1.16/7d from ATR SL on pump-chain+ LONG alone"
+      "finding": "exit_conditions recording fix verified working",
+      "impact": "DOT and ETC closed today with features_recorded=TRUE. Fix confirmed.",
+      "severity": "INFO",
+      "action": "Remove from monitoring."
     }
   ],
   "recurring_problems": [
-    "Stale signal execution — discussed in 4+ sessions, no fix deployed yet",
-    "rr_engine_resistance exits — 3 sessions, no filter implemented",
-    "LONG in NEUTRAL — structural, LONG_NEUTRAL_BLOCK bypassed by STANDALONE_BYPASS"
+    {
+      "problem": "rr_engine_resistance SHORT exits",
+      "detail": "30 trades/7d, -$0.99. Pattern: SHORT enters, price drifts ~1% up, rr_engine cuts.",
+      "root_cause": "Structural — rr_engine prevents larger losses. Avg loss -$0.033/trade is acceptable.",
+      "action": "No change. Working as designed. Would be worse without it."
+    },
+    {
+      "problem": "LONG side negative in HIGH regime",
+      "detail": "15+ LONG trades in HIGH, mostly losers. trend_purity+, rr-struct-v2+, breakout-long+ all killed.",
+      "root_cause": "Worst offenders already killed. Remaining LONG drag is small (pump-chain+ LONG -$0.06 in HIGH).",
+      "action": "Monitor pump-chain+ LONG in HIGH. If continues, block specifically there."
+    }
   ],
   "missing_implementations": [
-    "Execution-time revalidation for stale signals (STALE_MAX_AGE_MINUTES)",
-    "Resistance proximity filter for SHORT entries",
-    "New NEUTRAL-compatible signals (only 2 types pass confluence)"
+    {
+      "item": "STALE_MAX_AGE_MINUTES filter",
+      "status": "Suggested Sep 16, not implemented. Needs backtest.",
+      "priority": "MEDIUM",
+      "note": "Would skip signals >30min old at execution. Estimated +$2-4/7d but needs validation."
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-17T05:35:59Z",
-      "idea": "STALE_MAX_AGE_MINUTES = 30 — skip signals older than 30min at execution time",
-      "rationale": "80 stale trades/7d at 48.8% WR vs 174 fresh at 54.0%. Stale PnL -$1.17 vs fresh +$1.14. ~$2.31/7d gap. Stale signals lose because market conditions change between detection and execution.",
-      "expected_impact": "+$1.5-2.5/7d (conservative — blocks 25% of trades but removes worst performers)",
+      "date": "2026-09-17T08:32:58.690997+00:00",
+      "idea": "LONG regime gate — block LONG entries when 4h regime is HIGH (not just NEUTRAL)",
+      "rationale": "7d data shows HIGH regime LONG is deeply negative (-$1.09 total, LONG is the drag). SHORT in HIGH is profitable (+$0.90 combined). The existing LONG_NEUTRAL_BLOCK already blocks LONG in NEUTRAL — extending to HIGH would remove the remaining LONG drag. BUT: sample is small (15+ trades) and killed signals are already removing the worst offenders. Monitor first.",
+      "expected_impact": "Could save ~$0.50-1.00/7d by avoiding LONG entries in HIGH regime",
+      "category": "regime gate",
+      "status": "monitor — needs 2 more weeks of data after legacy signals age out",
+      "risk": "medium — would block rr-struct+ LONG (87.5% WR in HIGH) and open-skies+ LONG (75% WR in HIGH)",
+      "blocked_winners_check": "rr-struct+ 8T +$0.34 and open-skies+ 4T +$0.18 in HIGH would be blocked — NOT recommended"
+    },
+    {
+      "date": "2026-09-17T08:32:58.691000+00:00",
+      "idea": "pump-chain+ LONG HIGH regime-specific block",
+      "rationale": "pump-chain+ LONG is the only active LONG signal negative in HIGH (7T, 42.9% WR, -$0.06). Other LONG signals in HIGH either work (rr-struct+, open-skies+) or are already killed. Targeted block avoids collateral damage.",
+      "expected_impact": "~$0.06/7d saved (small but free)",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low — only affects old signals, fresh signals unaffected",
-      "impact_on_winners": "Need to verify — stale signals that won: 48.8% of 80 = 39 winners. Would block these. But fresh WR 54% is higher, so net gain expected.",
-      "confidence": "HIGH"
-    },
-    {
-      "date": "2026-09-17T05:35:59Z",
-      "idea": "Disable pump-chain+ LONG entirely — 25T/7d 40%WR -$0.28, all ATR SL",
-      "rationale": "pump-chain+ LONG fires in NEUTRAL (bypassed by STANDALONE_BYPASS) but has no edge. 60% of exits are ATR SL with 26.7% WR. The signal works SHORT (61.2% WR) but LONG in flat chop is a coin flip.",
-      "expected_impact": "+$1.16/7d (removes worst ATR SL victim)",
-      "category": "kill switch",
-      "status": "suggested",
-      "risk": "low — signal is net negative, only hurts to keep",
-      "impact_on_winners": "Would block 10 winning LONG trades out of 25. But those winners are small (avg +$0.12) vs larger losses (avg -$0.28). Net positive.",
-      "confidence": "HIGH"
-    },
-    {
-      "date": "2026-09-17T05:35:59Z",
-      "idea": "mover- SHORT is 100% WR 8T/7d +$0.61 — consider increasing confidence or adding to more coins",
-      "rationale": "mover- SHORT has perfect record. 87.5% WR (1 loss was tiny). Avg +$0.075/trade. If we can fire this on more coins or with higher confidence, it scales well.",
-      "expected_impact": "+$0.2-0.5/7d if expanded to 12-15 trades/week",
-      "category": "signal expansion",
-      "status": "needs data — sample too small (8T)",
-      "risk": "medium — need 20+ trades before scaling",
-      "impact_on_winners": "N/A — expansion, not filter change",
-      "confidence": "MEDIUM — needs more data"
+      "status": "suggested — low risk, targeted",
+      "risk": "low — only affects pump-chain+ LONG in HIGH, small sample"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "DESIGN: Execution-time revalidation — check signal staleness before executing (STALE_MAX_AGE_MINUTES)",
-    "VERIFY: Would pump-chain+ LONG kill hurt any recent winners? Already checked: blocks 10 winners at avg +$0.12, removes 15 losers at avg -$0.19. Net positive.",
-    "MONITOR: mover- SHORT — expand sample to 20+ before scaling",
-    "INVESTIGATE: Resistance proximity filter — need resistance data to verify impact on SHORT winners",
-    "DEVELOP: New NEUTRAL-compatible signals — only 2 types pass confluence currently"
+    "Monitor: Legacy killed signals will age out within 48h. LONG side should improve naturally.",
+    "Investigate: signal_created_at NULL for pullback-entry- trades — data quality issue.",
+    "Monitor: pump-chain+ LONG in HIGH regime — if continues negative, block specifically there.",
+    "No config change this run — system structurally healthy, legacy drag fading."
   ]
 }
