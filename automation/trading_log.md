@@ -1,3 +1,37 @@
+## [2026-09-17 20:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 12T 25%WR -$1.11 | **7d:** 224T 50.9%WR -$2.80
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 9T avg -$0.104 — dominant, deeply negative
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T avg +$0.010
+
+**24h by Signal:**
+- open-skies+ LONG: 5T -$0.42 → KILLED, trades aging out
+- volume-breakout-long+ LONG: 3T -$0.30 — still enabled, consistent loser
+- btc-pump-rider+ LONG: 1T -$0.09
+- r2-trend-short3 SHORT: 1T -$0.09
+- rs-s36,volume-breakout-long+ LONG: 1T -$0.22
+
+**7d Long vs Short:**
+- LONG: 102T 48%WR -$2.89 → structural bleed
+- SHORT: 122T 53%WR +$0.09 → marginally positive
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal at 0% WR with 3+ trades last hour (0 trades)
+- open-skies+ already killed (OPEN_SKIES_ENABLED=False). 5 trades in 24h are pre-kill residuals.
+- volume-breakout-long+: 25%WR 7d, but no kill criteria met (0 trades last hour)
+- Trade frequency: 0T/hr — quiet period
+
+**Monitoring:**
+- LONG structural bleed continues ($2.89 loss over 7d)
+- ATR SL dominant exit (75% of 24h closes) — structural, not fixable without wider SL
+- System 7d net negative (-$2.80), driven by LONG side
+
 ## [2026-09-16 21:58 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period)

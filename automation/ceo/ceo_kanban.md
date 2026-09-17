@@ -1,4 +1,13 @@
 ## CEO DECISIONS
+- [2026-09-17 20:15 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 9T 33.3%WR -$0.39 (COLD STREAK, losses small avg -$0.04) | 7d 224T 51.3%WR -$2.80
+  Market NEUTRAL. 5 open (GMX LONG, IO SHORT, HEMI SHORT, AIXBT SHORT, ALT SHORT).
+  **LOSING AUTOPSY (9 losers):** open-skies+ LONG 4T ALL losers (3/4 wave_phase=falling, 3/4 HIGH regime — fading BTC momentum). volume-breakout-long+ 3T (BIGTIME RSI=84.62 extreme overbought, WCT stale, NOT normal ATR SL). Other 2 cut-loser (working). All 24h losers FRESH — stale filter protecting system.
+  **REGIME:** EXTREME 76T 56.6%WR -$0.20 (best). HIGH 90T 46.7%WR -$2.00 (worst — ~60% legacy). NORMAL 57T 50.9%WR -$0.60.
+  **EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit 134T 49.3%WR -$2.15 (#1 drag). rr_engine 37T -$1.87 (#2 drag).
+  **CREATIVE:** (1) open-skies+ wave_phase gate: block LONG when wave_phase=falling in HIGH. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Code change needed. (2) EXTREME SHORT fresh 68.4%WR +$1.46 — system edge, stale filter protecting. (3) rr_engine_support_br 30% WR — investigate widening threshold.
+  **NO CONFIG CHANGE** — monitoring stale filter 48h, HIGH regime legacy flush, EXTREME SHORT edge.
+  BY: brain_auditor
 - [2026-09-17 18:35 UTC] CEO: NO CONFIG CHANGE. DB: 24h 15T 20.0%WR -$1.73 (COLD STREAK) | 7d 226T 50.9%WR -$2.73. pullback-entry- SHORT 4T/0%WR -$0.78 (cold streak, 7d profitable 51.5%WR +$0.25 — variance). open-skies+ KILLED correctly. Legacy losers (trend_purity+, pump-chain+, rr-struct-v2+, rr-struct-) aging out. System structurally healthy — no config change needed.
 - [2026-09-17 10:45 UTC] CEO: NO CONFIG CHANGE. DB: 24h 25T 36.0%WR -$0.27 | 7d 252T 52.0%WR -$0.78. Stale signal execution = #1 drag ($1.42/7d gap). Signal diversity = #2 issue (2 types in NEUTRAL). System structurally healthy — code-level fixes needed, not config.
 - [2026-09-17 02:40 UTC] CEO: KILLED BREAKOUT_LONG_ENABLED. 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60. Fires LONG in NEUTRAL without BTC gate. Pipeline restarted.

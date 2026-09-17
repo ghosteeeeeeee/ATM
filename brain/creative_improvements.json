@@ -972,5 +972,32 @@
     "status": "monitor — needs 50+ sample",
     "risk": "low",
     "impact_on_winners": "Needs verification"
+  },
+  {
+    "date": "2026-09-17T20:15:00Z",
+    "idea": "Block open-skies+ LONG when wave_phase=falling in HIGH regime",
+    "rationale": "3/4 open-skies+ losers today had wave_phase=falling in HIGH. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winning trades would be blocked.",
+    "expected_impact": "+$0.49/7d (5T 20%WR eliminated)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-17T20:15:00Z",
+    "idea": "EXTREME SHORT fresh edge: pullback-entry- SHORT 19T 68.4%WR +$1.46",
+    "rationale": "EXTREME SHORT fresh is the systems strongest edge. pullback-entry- SHORT in EXTREME has 68.4% WR. Stale filter now protecting this edge. Consider confidence boost for EXTREME SHORT entries (CONF_FILTER_MIN=75 for EXTREME SHORT).",
+    "expected_impact": "+$0.30-0.50/7d (fewer false positives, higher conviction entries)",
+    "category": "regime optimization",
+    "status": "needs_sample",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-17T20:15:00Z",
+    "idea": "Monitor rr_engine exits — 37T/7d -$1.87 combined (resistance + support_br)",
+    "rationale": "rr_engine_resistance (27T -$1.14) and rr_engine_support_br (10T -$0.73) are #2 and #3 exit drags after atr_sl. The rr_engine_support_br has 30% WR — 7/10 exits are losses. Consider widening support_br threshold to give LONG trades more room.",
+    "expected_impact": "+$0.50-1.00/7d if support_br threshold widened",
+    "category": "exit optimization",
+    "status": "needs_investigation",
+    "risk": "medium"
   }
 ]

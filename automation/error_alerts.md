@@ -36,3 +36,8 @@
 
 ## Error Alerts — 2026-09-17 19:56 UTC
 - **REPEATED** (6x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-17 20:44 UTC
+- **WARN** (32x): `phantom_trades` — trades with <0.01% PnL in signal_outcomes
+- **WARN** (1x): `macro_gate_reduce` — signal analyst macro gate: REDUCE (wr=20% < 30)
+- **INFO** (4x): `systemd_kill_group` — "Failed to kill control group" — cosmetic, no impact
