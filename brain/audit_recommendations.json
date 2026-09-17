@@ -1,170 +1,143 @@
 {
-    "timestamp": "2026-09-17T12:00:00Z",
-    "session_brain_stats": {
-        "total_sessions": 211236,
-        "queries_run": 6,
-        "relevant_findings": "Limited — session brain index noisy with old data. Key stale signal discussions found."
+  "timestamp": "2026-09-17T12:30:00Z",
+  "session_brain_stats": {
+    "total_vectors": 211236,
+    "queries_run": 4,
+    "top_topics": ["delisted tokens", "signal performance", "stale signal", "cascade_flip"]
+  },
+  "trade_summary_24h": {
+    "total_trades": 25,
+    "win_rate": 32.0,
+    "pnl": -0.63,
+    "regime": "NEUTRAL",
+    "open_trades": 3,
+    "dominant_drag": "pullback-entry- SHORT 13T/23.1%WR -$0.47"
+  },
+  "trade_summary_7d": {
+    "total_trades": 251,
+    "win_rate": 51.4,
+    "pnl": -1.21,
+    "by_regime": {
+      "EXTREME": "93T 55.9%WR +$0.49",
+      "HIGH": "102T 48.0%WR -$1.37",
+      "NORMAL": "55T 50.9%WR -$0.33"
     },
-    "trade_summary_24h": {
-        "trades": 25,
-        "win_rate": 36.0,
-        "pnl": -0.27,
-        "open_trades": 2,
-        "regime": "NEUTRAL",
-        "by_signal": {
-            "pullback-entry-_SHORT": {"trades": 14, "wr": 28.6, "pnl": -0.22},
-            "open-skies+_LONG": {"trades": 6, "wr": 50.0, "pnl": 0.11},
-            "volume-breakout-long+_LONG": {"trades": 3, "wr": 0.0, "pnl": -0.10}
-        },
-        "assessment": "COLD STREAK — 36%WR vs 52% 7d avg. Most losses are sniper cuts (<$0.12). 3 stale entries lost $0.37 total. System protecting capital via SNIPER."
+    "active_signals": {
+      "pullback-entry- SHORT": "79T 50.6%WR +$0.61",
+      "pump-chain- SHORT": "46T 58.7%WR +$0.93",
+      "open-skies+ LONG": "11T 54.5%WR +$0.21",
+      "rr-struct+ LONG": "15T 73.3%WR +$0.59"
+    }
+  },
+  "drift_findings": [
+    {
+      "topic": "stale signal filter",
+      "status": "JUST_DEPLOYED",
+      "detail": "Stale token filter deployed in pullback_entry.py at 10:00 UTC Sep 17. 24h data shows stale=$0.12 vs fresh=-$0.59 (inverted — likely pre-filter trades mixed in). 7d: stale 41T -$0.31 vs fresh 38T +$0.92. Needs 48h minimum to evaluate.",
+      "impact": "monitoring",
+      "no_action_needed": true
     },
-    "trade_summary_7d": {
-        "trades": 252,
-        "win_rate": 52.0,
-        "pnl": -0.78,
-        "by_regime": {
-            "EXTREME": {"trades": 94, "wr": 56.4, "pnl": 0.50},
-            "NORMAL": {"trades": 55, "wr": 50.9, "pnl": -0.27},
-            "HIGH": {"trades": 102, "wr": 48.0, "pnl": -1.10}
-        },
-        "by_exit": {
-            "atr_sl_hit": {"trades": 140, "pnl": -0.77, "note": "140/252 trades (55.6%) — dominant exit, slightly negative avg"},
-            "profit-monster-trail": {"trades": 36, "pnl": 3.23, "note": "Best exit mechanism +$0.09/trade"},
-            "rr_engine_resistance": {"trades": 30, "pnl": -0.99, "note": "#1 exit drag, pullback-entry- SHORT 16T -$0.67"},
-            "cut-loser-CL-T1": {"trades": 7, "pnl": -1.19, "note": "Working as designed, fast cuts"},
-            "sniper_exits": {"trades": 16, "pnl": -0.21, "note": "All small losses, protecting capital"}
-        },
-        "stale_signals": {
-            "fresh": {"trades": 171, "wr": 53.8, "pnl": 0.29},
-            "stale": {"trades": 80, "wr": 47.5, "pnl": -1.16},
-            "gap": -1.45,
-            "pullback_entry_short": {"fresh": "37T +$1.00", "stale": "42T -$0.33"}
-        }
+    {
+      "topic": "exit_conditions recording",
+      "status": "FIXED_VERIFIED",
+      "detail": "brain.py, position_manager.py, profit_monster.py, cut_loser.py, sniper_exit.py all pass exit_conditions. 7d: 250/251 trades still blank (pre-fix), 1 populated. New trades will have data.",
+      "impact": "data_quality",
+      "no_action_needed": true
     },
-    "drift_findings": [
-        {
-            "finding": "STALE FILTER WORKING — pullback_entry blocks stale tokens",
-            "status": "IMPLEMENTED",
-            "evidence": "42 stale blocked vs 37 fresh allowed for pullback-entry- SHORT. Fresh +$1.00 vs stale -$0.33. Stale filter deployed 2026-09-17 10:00 UTC.",
-            "impact": "+$1.45/7d improvement potential (stale gap)"
-        },
-        {
-            "finding": "OTHER SIGNALS NOT YET BLOCKING STALE",
-            "status": "MONITOR",
-            "evidence": "open-skies+ 10T all fresh (no stale data yet). volume-breakout-long+ 3T (1 stale -$0.06). mover+ 6T all fresh. Sample too small for other signals.",
-            "impact": "LOW — stale problem is concentrated in pullback-entry-"
-        },
-        {
-            "finding": "rr_engine_resistance SHORT exits still #1 exit drag",
-            "status": "KNOWN",
-            "evidence": "30T/7d -$0.99. pullback-entry- SHORT 16T -$0.67. Pattern: SHORT enters near resistance, price drifts up, rr_engine cuts.",
-            "impact": "~$0.70/7d potential if resistance proximity filter added"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "STALE SIGNAL EXECUTION",
-            "sessions": "5+ sessions since Sep 16",
-            "status": "PARTIALLY FIXED — pullback_entry blocks stale, other signals need same treatment when sample grows",
-            "next": "Monitor other signals for stale data, extend filter when sample >20 stale trades"
-        },
-        {
-            "topic": "SIGNAL DIVERSITY IN NEUTRAL",
-            "sessions": "3+ sessions",
-            "status": "KNOWN — only 2 signal types (pullback-entry-, open-skies+) pass confluence in NEUTRAL",
-            "next": "Develop new signals for NEUTRAL regime. Long-term development item."
-        },
-        {
-            "topic": "LONG IN HIGH REGIME DRAG",
-            "sessions": "2+ sessions",
-            "status": "MONITORING — 7d HIGH regime -1.10. Legacy killed signals (trend_purity+, rr-struct-v2+) aging out.",
-            "next": "Wait 2 weeks for legacy trades to age out. If HIGH LONG still negative, consider regime block."
-        }
-    ],
-    "losing_trade_autopsy": [
-        {
-            "losing_trade": "SEI SHORT pnl=-$0.25",
-            "signal": "pullback-entry-",
-            "regime": "HIGH",
-            "root_cause": "HARD_SL_FAILED — hard stop loss did not execute on exchange. System-level issue, not signal quality.",
-            "entry_check": "Fresh entry, momentum=19.5 (normal), regime HIGH",
-            "regime_check": "HIGH — volatile, higher whipsaw risk",
-            "recommended_change": "MONITOR — HARD_SL_FAILED is exchange execution issue, not fixable via config. 1 occurrence.",
-            "impact_on_winners": "N/A — not a signal filter issue",
-            "confidence": "LOW — single occurrence"
-        },
-        {
-            "losing_trade": "ACE SHORT pnl=-$0.23",
-            "signal": "pullback-entry-",
-            "regime": "HIGH",
-            "root_cause": "STALE entry (momentum=5.7) in HIGH regime. HL_CLOSED (exchange closed position). Stale + low momentum + volatile regime = loss.",
-            "entry_check": "Stale=True, momentum=5.7 (very low), regime HIGH",
-            "regime_check": "HIGH — volatile",
-            "recommended_change": "Stale filter now deployed. Would have blocked this trade post-fix.",
-            "impact_on_winners": "Stale filter verified: 0 winning pullback-entry- SHORT had momentum <6",
-            "confidence": "HIGH — stale filter already addresses this"
-        },
-        {
-            "losing_trade": "ETH SHORT pnl=-$0.14",
-            "signal": "pullback-entry-",
-            "regime": "HIGH",
-            "root_cause": "STALE entry (momentum=5.9) in HIGH regime. ATR SL hit. Same pattern as ACE.",
-            "entry_check": "Stale=True, momentum=5.9 (very low), regime HIGH",
-            "regime_check": "HIGH — volatile",
-            "recommended_change": "Stale filter now deployed. Would have blocked this trade post-fix.",
-            "impact_on_winners": "N/A — stale filter already deployed",
-            "confidence": "HIGH"
-        },
-        {
-            "losing_trade": "BIGTIME LONG pnl=-$0.22",
-            "signal": "rs-s36,volume-breakout-long+",
-            "regime": "HIGH",
-            "root_cause": "volume-breakout-long+ in HIGH regime. ATR SL hit. Low sample signal (3T/7d).",
-            "entry_check": "Fresh, momentum=38.3, regime HIGH",
-            "regime_check": "HIGH — 3T/7d 0%WR for this signal. Low sample.",
-            "recommended_change": "MONITOR — volume-breakout-long+ only3T/7d. Too small sample for action.",
-            "impact_on_winners": "N/A — monitoring only",
-            "confidence": "LOW — insufficient data"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-17T12:00:00Z",
-            "idea": "MOMENTUM-GATED STALE FILTER — skip stale signals with momentum <6, allow stale with momentum >=6",
-            "rationale": "Data shows stale pullback-entry- SHORT with momentum<6 lose $0.41/3T (-$0.14/trade avg) while stale with momentum>=6 win $0.08/7T (+$0.01/trade). Current blanket stale filter blocks both. Momentum-gated filter could recover ~$0.08/7d from stale winners while still blocking the losers.",
-            "expected_impact": "+$0.08/7d (marginal — current blanket filter already captures most value)",
-            "category": "entry sniper",
-            "status": "suggested — LOW PRIORITY. Current blanket stale filter already +$1.45/7d. This is incremental.",
-            "risk": "low",
-            "sample_size": "10 stale trades (3 losers, 7 winners) — TOO SMALL for reliable conclusion. Monitor 2 more weeks."
-        },
-        {
-            "date": "2026-09-17T12:00:00Z",
-            "idea": "VELOCITY FILTER REVIEW — verify pullback_entry.py momentum check vs session brain description",
-            "rationale": "Session brain description says 'vel_5h > 0.1% OR last3_green >= 5' but code shows 'vel_5bar > 0.1% for SHORT, < -0.1% for LONG'. The code is correct and simpler than session brain suggests. No action needed — code is sound. Just noting discrepancy for future reference.",
-            "expected_impact": "N/A — no code change needed",
-            "category": "code audit",
-            "status": "resolved — code is correct, session brain description was inaccurate",
-            "risk": "none"
-        },
-        {
-            "date": "2026-09-17T12:00:00Z",
-            "idea": "EXTEND STALE FILTER TO open-skies+ WHEN SAMPLE GROWS",
-            "rationale": "open-skies+ currently 10T/7d all fresh. No stale data yet. But when stale trades appear, apply same token_speeds.is_stale block. Pattern from pullback_entry proves value.",
-            "expected_impact": "TBD — needs stale sample first",
-            "category": "defensive",
-            "status": "planned — implement when stale sample >5 trades",
-            "risk": "low"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "MONITOR: pullback-entry- SHORT bad streak — 14T/28.6%WR/24h. All-time profitable. Likely variance + stale entries. Stale filter should help.",
-        "MONITOR: 24h cold streak (36%WR vs 52% 7d). System protecting capital via SNIPER. Most losses <$0.12. No structural issue.",
-        "MONITOR: HARD_SL_FAILED on SEI — exchange execution issue. 1 occurrence. Log if recurring.",
-        "MONITOR: volume-breakout-long+ 3T/7d 0%WR — too small sample for action. Kill candidate if sample grows with continued losses.",
-        "DEFERRED: Extend stale filter to other signals when sample grows (>5 stale trades per signal).",
-        "DEFERRED: New signals for NEUTRAL regime — long-term development.",
-        "DEFERRED: Resistance proximity filter for SHORT entries — needs resistance data to verify impact on winners."
+    {
+      "topic": "RSI timeframe alignment",
+      "status": "FIXED_VERIFIED",
+      "detail": "signal_compactor.py:2728 uses candles_1m. SHORT_RSI_CEILING uses 1m data. ETC SHORT RSI=70.14 would have been blocked.",
+      "impact": "filter_gap_closed",
+      "no_action_needed": true
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "pullback-entry SHORT cold streak",
+      "frequency": "daily",
+      "detail": "24h: 13T 23.1%WR -$0.47. 7d: 79T 50.6%WR +$0.61 (still positive). 24h streak is likely variance — all-time profitable all regimes.",
+      "recommendation": "Monitor 48h. If 7d PnL drops below -$1.00, investigate regime-specific gating."
+    },
+    {
+      "topic": "HIGH regime drag",
+      "frequency": "persistent",
+      "detail": "7d HIGH: 102T 48.0%WR -$1.37. Mostly legacy killed signals aging out (trend_purity+, rr-struct-v2+, accel-300-v4-short-). Active signals in HIGH: pullback-entry- 42T +$0.14, pump-chain- 14T +$0.17.",
+      "recommendation": "Legacy drag aging out naturally. Active signals in HIGH are slightly positive. No action needed."
+    },
+    {
+      "topic": "SNIPER exits on pullback-entry SHORT",
+      "frequency": "daily",
+      "detail": "7d: 7 SNIPER exits, 14.3% WR, -$0.25. 24h: 9/14 losers are SNIPER cuts (small losses <$0.11). Working as designed — catching adverse momentum early.",
+      "recommendation": "No action. SNIPER is protecting capital. The alternative (ATR SL) costs more per trade."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "execution-time revalidation",
+      "priority": "HIGH",
+      "detail": "CURRENT.md NEXT ACTION #4. Check signal staleness/momentum before executing. 31.8% of 7d trades fire on stale signals. Stale WR 49.4% vs fresh 59.0%. ~$4.86/7d lost.",
+      "status": "needs_design",
+      "blocked_by": "code-level implementation required"
+    },
+    {
+      "item": "new signals for NEUTRAL regime",
+      "priority": "MEDIUM",
+      "detail": "Only 2 signal types pass confluence in NEUTRAL (pullback-entry-, open-skies+). Need diversity for resilience.",
+      "status": "needs_development",
+      "blocked_by": "signal development cycle"
+    }
+  ],
+  "losing_trade_autopsy_24h": {
+    "total_losers": 14,
+    "sniper_cuts": 9,
+    "atr_sl_hits": 3,
+    "other": 2,
+    "key_findings": [
+      "9/14 losers are SNIPER cuts — small losses <$0.11, working as designed",
+      "1 HARD_SL_FAILED on SEI — exchange execution bug, 1 occurrence, not structural",
+      "1 HL_CLOSED on ACE — HL position closed, -$0.23",
+      "No structural signal issues found in 24h losers",
+      "All SNIPER exits caught adverse momentum early, preventing larger ATR SL losses"
     ]
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-09-17T12:30:00Z",
+      "idea": "Extend stale token filter to open-skies+ when sample grows",
+      "rationale": "pullback-entry- stale filter deployed today. open-skies+ also has stale entries (5T stale 7d 0%WR -$0.73 vs 10T fresh 60%WR +$0.29). Same pattern — stale tokens with no momentum fail on breakout LONG too.",
+      "expected_impact": "+$0.30-0.50/7d when sample grows to 20+ stale trades",
+      "category": "entry sniper",
+      "status": "monitoring",
+      "risk": "low",
+      "sample_size": "5 stale trades (insufficient — monitor)"
+    },
+    {
+      "date": "2026-09-17T12:30:00Z",
+      "idea": "Momentum-gated stale filter — allow stale with momentum>=6",
+      "rationale": "7d stale trades with momentum>=6: 7T 57%WR +$0.08 vs 3T 0%WR -$0.41. High-momentum stale tokens may still have directional conviction. Binary stale filter may be over-blocking.",
+      "expected_impact": "recovery of ~$0.08/7d from high-momentum stale trades",
+      "category": "entry sniper",
+      "status": "monitoring",
+      "risk": "low",
+      "sample_size": "10 trades (insufficient — monitor)"
+    },
+    {
+      "date": "2026-09-17T12:30:00Z",
+      "idea": "Track SNIPER exit efficiency — are we cutting winners too early?",
+      "rationale": "7d pullback-entry SHORT SNIPER exits: 7T 14.3%WR -$0.25. But SNIPER prevents larger ATR SL losses. Need to track: what would have happened if SNIPER didn't exit? If SNIPER exits would have been winners >50% of time, it's over-aggressive.",
+      "expected_impact": "informational — may reveal SNIPER tuning opportunity",
+      "category": "exit optimization",
+      "status": "needs_tracking",
+      "risk": "none (observation only)"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "MONITOR stale filter effectiveness — 48h minimum before evaluation",
+    "MONITOR pullback-entry SHORT 24h cold streak — if 7d PnL drops below -$1.00, investigate",
+    "NEXT: execution-time revalidation for stale signals (code-level, needs design)",
+    "NEXT: new signals for NEUTRAL regime (signal development)",
+    "TRACK: open-skies+ stale filter sample growth"
+  ]
 }

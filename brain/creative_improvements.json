@@ -884,5 +884,34 @@
     "category": "signal expansion",
     "status": "needs data",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-17T12:30:00Z",
+    "idea": "Extend stale token filter to open-skies+ when sample grows",
+    "rationale": "pullback-entry- stale filter deployed today. open-skies+ also has stale entries (5T stale 7d 0%WR -$0.73 vs 10T fresh 60%WR +$0.29). Same pattern — stale tokens with no momentum fail on breakout LONG too.",
+    "expected_impact": "+$0.30-0.50/7d when sample grows to 20+ stale trades",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low",
+    "sample_size": "5 stale trades (insufficient — monitor)"
+  },
+  {
+    "date": "2026-09-17T12:30:00Z",
+    "idea": "Momentum-gated stale filter — allow stale with momentum>=6",
+    "rationale": "7d stale trades with momentum>=6: 7T 57%WR +$0.08 vs 3T 0%WR -$0.41. High-momentum stale tokens may still have directional conviction. Binary stale filter may be over-blocking.",
+    "expected_impact": "recovery of ~$0.08/7d from high-momentum stale trades",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low",
+    "sample_size": "10 trades (insufficient — monitor)"
+  },
+  {
+    "date": "2026-09-17T12:30:00Z",
+    "idea": "Track SNIPER exit efficiency — are we cutting winners too early?",
+    "rationale": "7d pullback-entry SHORT SNIPER exits: 7T 14.3%WR -$0.25. But SNIPER prevents larger ATR SL losses. Need to track: what would have happened if SNIPER didnt exit? If SNIPER exits would have been winners >50% of time, its over-aggressive.",
+    "expected_impact": "informational — may reveal SNIPER tuning opportunity",
+    "category": "exit optimization",
+    "status": "needs_tracking",
+    "risk": "none (observation only)"
   }
 ]

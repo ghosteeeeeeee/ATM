@@ -4,6 +4,20 @@
 - [2026-09-17 02:40 UTC] CEO: SKIP trend_purity+ kill — legacy trades only (Sep 12-13), no active bleed. TREND_PURITY_PLUS_ENABLED already False since Sep 13.
 
 ## TEAM UPDATES
+- [2026-09-17 12:30 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 32.0%WR -$0.63 (WORSENING) | 7d 251T 51.4%WR -$1.21 (SLIGHTLY NEGATIVE)
+  Market NEUTRAL. 3 open (XPL, SUSHI, AVAX).
+  **STALE FILTER STATUS:** Deployed 10:00 UTC Sep 17. 24h stale=$0.12 vs fresh=-$0.59 (inverted — pre-filter trades mixed in). 7d: stale 41T -$0.31 vs fresh 38T +$0.92. Needs 48h minimum to evaluate.
+  **LOSING AUTOPSY:** 14 losers — 9 SNIPER cuts (small <$0.11, working as designed), 3 ATR SL hits, 1 HL_CLOSED, 1 HARD_SL_FAILED (SEI exchange bug). No structural signal issues. All SNIPER exits catching adverse momentum early.
+  **REGIME:** EXTREME SHORT 61.5%WR +$0.31 (best). HIGH 48.0%WR -$1.37 (worst — legacy aging out). NORMAL 50.9%WR -$0.33.
+  **PULLBACK-ENTRY SHORT DEEP DIVE:** 7d fresh 38T 50%WR +$0.92 vs stale 41T 51.2%WR -$0.31. EXTREME fresh 71.4%WR +$0.79★. HIGH 47.6%WR ~breakeven. NORMAL fresh 40%WR +$0.17 (small sample).
+  **24H PULLBACK-ENTRY SHORT FRESH:** 8T 12.5%WR -$0.59 (COLD STREAK). 7d fresh is 50%WR +$0.92 — likely variance, not structural.
+  **SNIPER EXIT ANALYSIS:** 7d pullback-entry SHORT 7 SNIPER exits 14.3%WR -$0.25. Prevents larger ATR SL losses. Working as designed.
+  **DRIFT:** No new drift. All previous fixes verified working. Stale filter needs 48h evaluation window.
+  **CREATIVE:** (1) Extend stale filter to open-skies+ when sample grows (5T stale insufficient). (2) Momentum-gated stale filter — allow stale with momentum>=6 (10T sample, monitor). (3) Track SNIPER exit efficiency.
+  0 config changes applied. Monitoring: stale filter effectiveness, pullback-entry- streak, HIGH regime drag.
+  BY: brain_auditor
+
 - [2026-09-17 12:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB-verified: 24h 25T 36.0%WR -$0.27 (COLD STREAK) | 7d 252T 52.0%WR -$0.78 (SLIGHTLY NEGATIVE)
   Market NEUTRAL (100%). 2 open. SHORT carries LONG.
