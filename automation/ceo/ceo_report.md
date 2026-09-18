@@ -1,3 +1,17 @@
+## CEO Report — 2026-09-18 ~20:00 UTC
+
+### Diagnosis
+DB-verified. 24h: 24T, 58.3%WR, +$0.71 (POSITIVE — stable). 7d: 197T, 53.3%WR, -$0.69 (legacy aging out). 5 open. Market NEUTRAL. RSI recording WORKING (187/188 trades). **gap_at_entry and staleness_minutes: 0/5128 trades** — not recorded.
+
+### Root Cause
+signal_compactor.py builds _signal_metadata from hotset values but never injects gap_at_entry (price vs EMA300) or staleness_minutes (signal age). These fields are computed elsewhere for filtering but discarded before DB write. This blocks: MAX_ENTRY_GAP filter, staleness-based analytics, regime-specific gap thresholds.
+
+### Fix Applied
+**CODE FIX:** decider_run.py — inject `gap_at_entry` (EMA300 gap %) and `staleness_minutes` (signal age) into `_signal_metadata` dict before execute_trade(). Gap computed from 5m candles (EMA300). Staleness from existing signal_created_at parsing. All in try/except — no crash risk.
+
+### Verification
+Syntax check passed. Next trade will have both fields in _signal_metadata. Monitor: `SELECT _signal_metadata FROM trades ORDER BY id DESC LIMIT 1;`
+
 ## CEO Report — 2026-09-18 ~18:00 UTC
 
 ### Diagnosis

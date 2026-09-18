@@ -3070,6 +3070,10 @@ def run(dry_run=False):
         # V2 (2026-08-29): Get current price first (needed for staleness check)
         price = sig.get('price') or get_current_price(token)
 
+        # Track staleness + gap for _signal_metadata recording
+        _staleness_min = None
+        _gap_at_entry = None
+
         if not price:
             log(f'SKIP: {token} — no price available')
             skipped += 1
@@ -3088,6 +3092,7 @@ def run(dry_run=False):
                         sig_ts = sig_ts.replace(tzinfo=_dt.timezone.utc)
                         now = _dt.datetime.now(_dt.timezone.utc)
                         age_min = (now - sig_ts).total_seconds() / 60
+                        _staleness_min = round(age_min, 2)
                         # FIX 2026-09-04: Remove hard 5min staleness block
                         # Condition-based checks (ACCEL-V2-STALE, VOLATILITY GATE, price drift)
                         # already verify validity. A signal with valid conditions should execute
@@ -3975,6 +3980,35 @@ def run(dry_run=False):
         except Exception:
             pass
 
+        # ── Compute gap_at_entry for _signal_metadata ─────────────────
+        try:
+            from signal_schema import get_price_history
+            _candles = get_price_history(token, timeframe='5m', limit=310)
+            if _candles and len(_candles) >= 300:
+                _closes = [float(c[4]) for c in _candles]  # close prices
+                _ema_val = _closes[0]
+                _mult = 2 / (300 + 1)
+                for _p in _closes[1:]:
+                    _ema_val = _p * _mult + _ema_val * (1 - _mult)
+                if _ema_val > 0:
+                    _gap_at_entry = round((price - _ema_val) / _ema_val * 100, 4)
+        except Exception:
+            pass
+
+        # ── Inject staleness + gap into signal_metadata ───────────────
+        _exec_meta = None
+        if sig.get('signal_metadata'):
+            try:
+                _exec_meta = json.loads(sig['signal_metadata']) if isinstance(sig['signal_metadata'], str) else dict(sig['signal_metadata'])
+            except Exception:
+                _exec_meta = {}
+        else:
+            _exec_meta = {}
+        if _gap_at_entry is not None:
+            _exec_meta['gap_at_entry'] = _gap_at_entry
+        if _staleness_min is not None:
+            _exec_meta['staleness_minutes'] = _staleness_min
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             signal_type=sig.get('signal_type', ''),
@@ -3997,8 +4031,7 @@ def run(dry_run=False):
             # JSONB catch-all: all signal indicator values at entry time
             # sig.get() returns a JSON string from hotset.json — deserialize to dict
             # before passing to execute_trade() which will re-serialize via json.dumps()
-            signal_metadata=(json.loads(sig.get('signal_metadata'))
-                             if sig.get('signal_metadata') else None),
+            signal_metadata=_exec_meta if _exec_meta else None,
         )
 
         if success:

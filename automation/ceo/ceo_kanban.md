@@ -1,5 +1,12 @@
 ## CEO DECISIONS
 
+- [2026-09-18 ~20:00 UTC] CEO: CODE FIX — gap_at_entry + staleness_minutes recording
+  DB-verified: 24h 24T 58.3%WR +$0.71 | 7d 197T 53.3%WR -$0.69
+  Market NEUTRAL. 5 open.
+  **FEATURE RECORDING FIX:** 0/5128 trades had gap_at_entry or staleness_minutes in _signal_metadata. Added injection in decider_run.py before execute_trade(). Gap = price vs EMA300 (5m candles). Staleness = signal age from created_at. Enables MAX_ENTRY_GAP filter, staleness analytics, regime-specific gap thresholds.
+  **NO CONFIG CHANGE.** Pipeline will pick up fix on next restart.
+  BY: CEO
+
 - [2026-09-18 ~19:30 UTC] brain_auditor: NO CONFIG CHANGE — documentation fix + audit
   DB-verified: 24h 23T 65.2%WR +$0.98 (POSITIVE) | 7d 197T 53.3%WR -$0.69
   Market NEUTRAL. 5 open.
@@ -2328,4 +2335,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **_signal_metadata GAP:** gap_at_entry and staleness_minutes not computed anywhere. Cannot do chase detection.
   **pullback-entry- SHORT HIGH DRAG:** 34T 44.1%WR -$0.70. Monitor to 50T. If pattern holds, gate SHORT from HIGH.
   **NO ACTION** — monitoring EXTREME SHORT edge 48h, investigating CL_T1 timing.
+  BY: brain_auditor
+
+- [2026-09-18 20:30 UTC] brain_auditor: CONFIG CHANGE — cut-loser fire window widened
+  DB-verified: 24h 16T 50.0%WR +$0.98 (POSITIVE) | 7d 192T 52.6%WR -$0.73
+  Market NEUTRAL. 4 open.
+  **LOSING AUTOPSY (8):** pullback-entry- SHORT 6T ALL ATR SL (-$0.78, 3/6 HIGH regime). cut-loser-CL-T1 2T (-$0.18).
+  **EXIT ANALYSIS:** profit-monster-trail 90.3%WR +$2.16★. cut-loser-CL-T1 0%WR -$0.75 (6T ALL losers — premature). rr_engine combined -$0.91.
+  **REGIME (7d):** EXTREME +$1.54 (best, 60.3%WR). NORMAL +$0.05 (breakeven). HIGH -$2.32 (worst, legacy).
+  **FEATURE RECORDING:** RSI 191/192 ✅. gap_at_entry 0/192 ❌. staleness_minutes 0/192 ❌. Fix needed in decider_run.py.
+  **CONFIG CHANGE:** CL_TIER1_FIRE_WINDOWS (1,2)→(2,3). Rationale: 0% WR, all 6 exits were losers. Widening gives trades recovery time. Expected +$0.75/7d. No winners blocked (0% WR).
+  **CREATIVE:** (1) Add gap_at_entry+staleness to metadata. (2) Monitor rr_engine exits -$0.91/7d. (3) pullback-entry SHORT HIGH gate at 50+ trades.
   BY: brain_auditor

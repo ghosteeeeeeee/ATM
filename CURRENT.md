@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-18 ~19:00 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-18 ~20:00 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 23T, 65.2% WR, +$0.98. 5 open. Market NEUTRAL. Pipeline running.
+24h: 24T, 58.3% WR, +$0.71. 5 open. Market NEUTRAL. Pipeline running.
 
 - **24h (rolling):** 23T, 65.2% WR, +$0.98 (POSITIVE — system recovering from cold streak). Winners: volume-breakout-long+ 10T 80%WR +$1.03, mover+ 3T 100%WR +$0.26. Losers: pullback-entry- SHORT 5T ALL ATR SL (-$0.59, 4/5 HIGH/NORMAL regime).
 - **Today (calendar):** 21T closed (Sep 18). 5 open (FOGO LONG pump-chain+, ADA LONG pump-chain+, DOT SHORT pullback-entry-, CAKE SHORT mover-, NOT SHORT pullback-entry-).
@@ -33,7 +33,7 @@
 
 **🔴 SIGNAL DIVERSITY CRITICAL:** Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals. 30d active: 6 types (+$4.93).
 
-**🟡 FEATURE RECORDING:** _signal_metadata 193/194 trades have RSI+momentum data (RSI fix WORKING). gap_at_entry and staleness_minutes NOT recorded — need to add to signal_compactor metadata dict.
+**🟡 FEATURE RECORDING:** _signal_metadata RSI+momentum 187/188 trades (WORKING). **FIXED: gap_at_entry + staleness_minutes** — decider_run.py now injects EMA300 gap% and signal age into metadata dict before DB write. Next trade will have both fields. Enables MAX_ENTRY_GAP filter + staleness analytics. — 2026-09-18
 
 ## Today's Changes (Sep 18)
 
@@ -79,7 +79,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 4. **DONE: Execution-time SHORT_RSI_CEILING revalidation.** decider_run.py safety section. Prevents RSI drift between detection and execution. — 2026-09-18
 5. **DONE: Stale filter evaluation.** Pre-filter stale 43.8% (7/16). Post-filter stale 9.4% (3/32). Filter reducing stale by 78%. Extending. — 2026-09-18
 6. **DONE: open-skies+ KILLED.** signal_reporter 17:11 UTC Sep 17. No regime >50% WR. Wave_phase gate no longer needed. — 2026-09-17
-7. **NEXT: Feature recording fix.** _signal_metadata 100% NULL for RSI/gap/staleness. Fix from Sep 16 not writing correctly. Investigate signal_compactor.py. — 2026-09-18
+7. **DONE: Feature recording fix.** gap_at_entry (EMA300 gap%) and staleness_minutes (signal age) injected into _signal_metadata in decider_run.py before execute_trade(). — 2026-09-18
 8. **NEXT: Execution-time revalidation for stale signals.** Stale filter now at 9.4% (was 31.8%). Further improvement possible with execution-time check. — 2026-09-16
 9. **INVESTIGATE: rr_engine_support_br 30% WR (10T -$0.73).** Consider widening support_br threshold. — 2026-09-17
 10. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
