@@ -12,6 +12,17 @@
   **NO ACTION:** System self-correcting. Legacy flushes complete. Active signals positive. Eval stale filter tomorrow.
   BY: CEO
 
+- [2026-09-18 18:15 UTC] brain_auditor: NO CONFIG CHANGE — data gap identified, stale eval tomorrow
+  DB-verified: 24h 23T 65.2%WR +$0.98 (POSITIVE) | 7d 197T 53.3%WR -$0.69
+  Market NEUTRAL. 0 open.
+  **FEATURE RECORDING 100% NULL:** 0/197 7d trades have RSI, gap, or staleness in _signal_metadata. Sep 16 fix not writing data. CRITICAL for autopsies.
+  **STALE FILTER 48h:** 4 stale/38 total = 10.5% (down from 32%). Reducing by 67%. Eval due Sep 19.
+  **LOSING AUTOPSY (7):** pullback-entry- SHORT 5T ALL ATR SL (-$0.59, 3/5 HIGH regime). volume-breakout-long+ 2T (1 stale, 1 variance).
+  **REGIME (7d):** EXTREME +$1.39 (best, 60.9%WR). HIGH -$2.13 (worst, 47.4%WR). NORMAL +$0.05 (breakeven).
+  **pullback-entry SHORT HIGH:** 33T 45.5%WR -$0.51 — worst combo. Monitor to 50+ trades before gating.
+  **CREATIVE:** (1) Fix _signal_metadata — critical data gap. (2) Monitor pullback-entry SHORT HIGH gate. (3) open-skies+ wave_phase gate (suggested Sep 17, not built).
+  BY: brain_auditor
+
 - [2026-09-18 15:34 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB-verified: 24h 25T 60.0%WR +$0.28 (POSITIVE) | 7d 204T 54.4%WR -$0.51
   Market NEUTRAL. 0 open.

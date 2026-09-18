@@ -123,3 +123,28 @@
 
 ## Error Alerts — 2026-09-18 15:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-18 16:44 UTC
+- **CRITICAL** (1x): `hermes-coding-mcp.service` crash-looping — restart counter at **509,088**. Script `run_mcp_server.py` missing.
+- **AUTO-FIX**: Disabled `hermes-coding-mcp.service` to stop crash loop.
+- **WARN** (9x): Services in failed state — hermes-5m-candle, hermes-away-detector, hermes-better-coder, hermes-bug-hunter, hermes-git-release, hermes-mtf-macd-tuner, hermes-session-brain-daily-rebuild, hermes-trading-checklist, hermes-upgrade-implementer
+- **WARN**: `momentum_cache` stale — 528h old (22 days). Momentum-based filters may be degraded.
+- **WARN**: Disk at 85% (95G/118G) — at threshold
+- **INFO**: Pipeline OK — running, 1 open trade (NOT), 0 closed today
+- **INFO**: Regime NEUTRAL (122 tokens), 3 LONG bias, 2 SHORT bias
+- **INFO**: 18 signals active, latest at 16:36:15
+- **INFO**: systemd kill control group error — cosmetic, no impact
+
+## Error Alerts — 2026-09-18 17:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Health Check — 2026-09-18 18:43 UTC
+- **PIPELINE**: OK — running, 0 errors, last cycle 18:43:02
+- **Trades (24h)**: 20 closed, 70% WR, +$1.30 USDT
+- **Open positions**: 0 (all flat)
+- **Regime**: NEUTRAL (4 long bias, 1 short bias, 122 neutral)
+- **Disk**: 85% (18G free) — at threshold. coin_tracker.db (2.2G), candles.db (1.9G), state.db (3.1G) dominate
+- **Auto-fix**: none required
+- **WARN**: Disk at 85% threshold — data DBs (not logs) are the cause. Monitor.

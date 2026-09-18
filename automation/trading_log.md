@@ -1555,3 +1555,65 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - 7d WR stable at 53.7%
 
 **BY:** auto_1hr
+
+## [2026-09-18 18:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet)
+**PnL:** — | **24h:** 25T 16W 64%WR +$0.84 | **7d:** 199T 107W 53.8%WR -$0.51
+
+**Open (2):**
+- CAKE SHORT mover- — 1.0h
+- NOT SHORT pullback-entry- — 1.5h
+
+**Signal 24h:**
+- volume-breakout-long+: 12T 9W 75%WR +$0.89 — strong
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all pre-RSI fix SHORT losers)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 17/24h closes (68%) but net +$0.11 — trailing converting SL hits to wins
+- RSI ceiling fix: 0 bad SHORT entries since deploy ~09:45 UTC — holding
+- Trade frequency: ~1/hr — appropriate for NEUTRAL
+- 24h PnL positive (+$0.84) and stable
+- 7d WR stable at 53.8%
+
+**Monitoring:**
+- CAKE and NOT open, trailing
+- 7d WR stable at 53.8%
+
+**BY:** auto_1hr
+
+## [2026-09-18 19:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** — | **24h:** 24T 16W 67%WR +$0.99 | **7d:** 198T 106W 53.5%WR -$0.60
+
+**Open (3):**
+- DOT SHORT pullback-entry- — 45.1m, -$0.02
+- CAKE SHORT mover- — 65.8m, -$0.06
+- NOT SHORT pullback-entry- — 141.0m, -$0.02
+
+**Signal 24h:**
+- volume-breakout-long+: 11T 9W 91%WR +$1.04 — strong
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all pre-RSI fix)
+- Other signals: 6T 3W mixed small
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 16/24h closes (67%) but net +$0.26 — trailing converting SLs to wins
+- RSI ceiling fix: 0 bad SHORT entries since deploy ~09:45 UTC — holding
+- Trade frequency: 1/hr — appropriate for NEUTRAL
+- 24h PnL improved to +$0.99
+- 7d WR stable at 53.5%
+
+**Monitoring:**
+- DOT, CAKE, NOT open SHORTs — all near breakeven
+- 7d PnL improving from -$1.50 to -$0.60
+
+**BY:** auto_1hr

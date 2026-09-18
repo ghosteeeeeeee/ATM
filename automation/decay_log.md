@@ -1217,3 +1217,8 @@
 [2026-09-18 11:08 UTC]   🟢 OK: volume-breakout-long+: 8 trades, 75.0% WR, PnL=3.07
 [2026-09-18 11:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-18 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-18 17:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-18 17:08 UTC]   🟡 WARNING: pullback-entry-: 5 trades, 20.0% WR, PnL=-5.38
+[2026-09-18 17:08 UTC]   🟢 OK: volume-breakout-long+: 11 trades, 72.7% WR, PnL=5.18
+[2026-09-18 17:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-18 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
