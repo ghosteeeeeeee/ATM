@@ -304,6 +304,24 @@ def get_regime() -> dict:
     elif market_phase == 'mover_hunting':
         votes['TREND'] += 1
 
+    # 5. BTC 4h regime override (2026-09-18) — ignores short-term noise when macro trend is clear
+    # When BTC 4h regime is LONG_BIAS or SHORT_BIAS with strong slope, override chop classification
+    try:
+        import psycopg2
+        _pg_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+        _pg_cur = _pg_conn.cursor()
+        _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
+        _btc_4h = _pg_cur.fetchone()
+        _pg_conn.close()
+        if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
+            _slope_4h = float(_btc_4h[1])
+            if _btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35:
+                votes['TREND'] += 2  # strong bullish 4h — override chop
+            elif _btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35:
+                votes['TREND'] += 2  # strong bearish 4h — override chop (SHORT signals are momentum too)
+    except Exception:
+        pass  # if DB unavailable, fall through to existing votes
+
     # Determine regime
     if votes['CRISIS'] >= 3:
         regime = 'CRISIS'

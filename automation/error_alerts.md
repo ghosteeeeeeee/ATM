@@ -98,3 +98,14 @@
 - **WARN**: Disk at 84% (19G free) — 1% below 85% threshold
 - **NOTE**: pullback-entry SHORT signal: 0% win rate (4 losses, -0.62 USDT today) — may need filter review
 - **AUTO-FIX**: none required
+
+## Error Alerts — 2026-09-18 14:44 UTC
+- **OK**: Pipeline health check passed. All core services running.
+- Pipeline: active, last cycle 14:43 (2 open, 0 closed, 17 today)
+- Timers: 30+ active, all firing on schedule
+- Disk: 85% (at threshold — 85G used of 118G)
+- Regime: 5m scanner OK (13 LONG bias, 114 neutral), 4h scanner OK (next at 17:04)
+- Signals: 71 active, 71 generated in last hour
+- Phantom trades: 2 in last 24h (SUSHI +0.006, BABY +0.008) — negligible
+- Auto-fixes: compressed old logs (>7d). mtf_macd_tuner.db (384MB) candidate for cleanup.
+- **WARN**: disk at 85% threshold — monitor. coin_tracker.db (2.2G) and candles.db (1.9G) are largest data files.
