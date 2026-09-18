@@ -148,3 +148,11 @@
 - **Disk**: 85% (18G free) — at threshold. coin_tracker.db (2.2G), candles.db (1.9G), state.db (3.1G) dominate
 - **Auto-fix**: none required
 - **WARN**: Disk at 85% threshold — data DBs (not logs) are the cause. Monitor.
+
+## Error Alerts — 2026-09-18 18:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-09-18 19:44 UTC
+- **WARN** (1x): `Disk at 85%` — 95G/118G used. coin_tracker.db=2.2G, candles.db=1.9G.
+- **AUTO-FIX**: Journal vacuumed to 500MB → freed 2G. Disk now 83%. Logs compressed (150M total).
+- **INFO**: BTC-CRASH warning blocking HEMI LONG — risk management working as intended.
