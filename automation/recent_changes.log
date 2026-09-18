@@ -1,3 +1,16 @@
+
+[2026-09-18 15:34 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 60.0%WR +$0.28 (POSITIVE) | 7d 204T 54.4%WR -$0.51 (SLIGHTLY NEGATIVE)
+  Market NEUTRAL. 0 open.
+  **RSI FIX VERIFIED:** 2/5 pullback-entry- SHORT losers had RSI>65 (IMX=72.53, ALT=68.75) — both BEFORE fix deploy. 0 bad entries since deploy. No winners blocked.
+  **LOSING AUTOPSY (9 losers):** pullback-entry- SHORT 5T ALL ATR SL (-$0.59 — 2/5 pre-fix RSI>65, 2/5 normal RSI variance, 1 winner HEMI RSI=48). volume-breakout-long+ 3T ATR SL (-$0.48 — normal variance, 72.7%WR 7d healthy). open-skies+ 1T killed legacy (-$0.16). Other 2 small losses.
+  **WINNERS (15):** volume-breakout-long+ 11T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12). mover+ 3T all winners. doji-bottom-long +$0.13.
+  **REGIME (7d):** EXTREME 67T 61.2%WR +$1.11 (best). NORMAL 56T 55.4%WR +$0.14. HIGH 80T 48.8%WR -$1.76 (worst, ~60% legacy).
+  **EXTREME SHORT EDGE:** pullback-entry- 11T 63.6%WR +$0.43. pump-chain- 16T 56.3%WR -$0.19. Combined: 33T 60.6%WR +$0.27. Stale filter protecting.
+  **EXIT (7d):** profit-monster-trail 37T 94.6%WR +$2.94★. atr_sl_hit 129T 49.6%WR -$1.18 (#1 drag). cut-loser-CL-T1 7T 0%WR -$1.04.
+  **CREATIVE:** (1) Monitor pullback-entry- SHORT HIGH regime (33T/45.5%WR/-$0.51) post-stale-filter — if stays <48% WR, consider gate. (2) EXTREME SHORT fresh edge confirmed — monitor 20+ fresh trades before confidence boost.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, RSI fix monitoring 48h, active signals positive 30d (+$4.93).
+  BY: brain_auditor
 [2026-09-18 13:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
   24h: 25T 48%WR -$0.67 | 7d: 207T 53.1%WR -$1.19
   Last hour: 2T 1W 1L (-$0.18)

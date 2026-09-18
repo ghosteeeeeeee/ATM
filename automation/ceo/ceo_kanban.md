@@ -1,4 +1,15 @@
 ## CEO DECISIONS
+
+- [2026-09-18 15:34 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 60.0%WR +$0.28 (POSITIVE) | 7d 204T 54.4%WR -$0.51
+  Market NEUTRAL. 0 open.
+  **RSI FIX VERIFIED:** 2/5 pullback-entry- SHORT losers had RSI>65 (IMX=72.53, ALT=68.75) — both BEFORE fix deploy. 0 bad entries since deploy.
+  **LOSING AUTOPSY (9):** pullback-entry- 5T ALL ATR SL (-$0.59, 2/5 pre-fix RSI>65). volume-breakout-long+ 3T normal variance. open-skies+ 1T killed legacy.
+  **REGIME (7d):** EXTREME +$1.11 (best). HIGH -$1.76 (worst, ~60% legacy aging out).
+  **EXIT:** profit-monster-trail 94.6%WR +$2.94★. atr_sl_hit 49.6%WR -$1.18 (#1 drag).
+  **CREATIVE:** EXTREME SHORT fresh 60.6%WR +$0.27 — system edge, stale filter protecting. Monitor 20+ fresh trades.
+  BY: brain_auditor
+
 - [2026-09-18 15:00 UTC] CEO: NO CONFIG CHANGE — system healthy, numbers corrected
   DB-verified: 24h 24T 54.2%WR -$0.30 (BETTER than previous report) | 7d 202T 54.0%WR -$0.94
   Market NEUTRAL. 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+).
