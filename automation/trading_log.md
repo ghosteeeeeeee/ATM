@@ -1265,3 +1265,119 @@ Final set: ['ENA', 'INJ', 'KAS']
 - PROMOTE ATOM (WR=80.0%, AvgPnL=0.94%, Trades=5)
 
 Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX', 'LTC', 'POL', 'PONS', 'USUAL']
+
+## [2026-09-18 07:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W, 0L)
+**24h:** 19T 6W 31.6%WR -$1.22 | **7d:** 217T 110W 50.7%WR -$2.61
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 14T avg -$0.080 — 73.7% of closes, losses tiny
+- profit-monster-trail: 3T avg +$0.027
+- cut-loser-CL-T1: 2T avg -$0.090
+
+**Signal 24h:**
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all SHORT ATR SL hits in chop)
+- open-skies+: 4T 0W 0%WR -$0.61 (ALREADY KILLED)
+- volume-breakout-long+: 4T 2W 50%WR -$0.04
+- warrior-sr-confirm+: 1T 1W 100%WR +$0.04
+- r2-trend-long8: 1T 1W 100%WR +$0.12
+- grind-breakout+: 1T 1W 100%WR +$0.01
+- mover+: 1T 1W 100%WR +$0.03
+
+**Open Trades (3):**
+- GMX LONG: 15h open, trailing SL $7.49 (above entry $7.40) — profit locked, waiting for retracement
+- YGG LONG: 4.6h open, +93% — trailing
+- ME LONG: 0.2h open, -$0.02 — fresh
+
+**Regime:** 100% NEUTRAL — flat all week
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 73.7% of 24h closes but avg loss -$0.080 — structural in chop, not SL tuning issue
+- Trade frequency: 1/hr — quiet, appropriate for NEUTRAL
+- Cold streak: 31.6%WR 24h vs 50.7% 7d — variance, losses tiny
+- pullback-entry-: 20%WR bad 24h but 51.5%WR profitable 7d — variance not structural
+
+**Monitoring:**
+- GMX open 15h — trailing SL working, profit locked
+- 7d WR stable at 50.7%
+- All 24h trades in NEUTRAL regime — flat market all week
+
+**BY:** auto_1hr
+
+## [2026-09-18 09:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**24h:** 20T 6W 30.0%WR -$1.11 | **7d:** 217T 110W 50.7%WR -$2.61
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 15T avg -$0.074 — 75% of closes, losses tiny
+- profit-monster-trail: 3T avg +$0.027
+- cut-loser-CL-T1: 2T avg -$0.090
+
+**Signal 24h:**
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all SHORT ATR SL hits in chop)
+- volume-breakout-long+: 5T 3W 60%WR -$0.03 (break-even)
+- open-skies+: 4T 0W 0%WR -$0.61 (ALREADY KILLED 09-17)
+- Others: 6 signals 1T each, 4W mixed
+
+**Open Trades (4):**
+- FOGO LONG doji-bottom-long: 5min open, +0.02% — fresh
+- ME LONG volume-breakout-long+: 1.3h open, +1.21% — trailing
+- YGG LONG volume-breakout-long+: 5.5h open, +1.26% — trailing
+- GMX LONG volume-breakout-long+: 16h open, +2.35% — stale winner, trailing SL above entry
+
+**Regime:** 100% NEUTRAL — flat all week
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 75% of 24h closes but avg loss -$0.074 — structural in chop, not SL tuning
+- Trade frequency: 1/hr — quiet, appropriate for NEUTRAL
+- Cold streak: 30%WR 24h vs 50.7% 7d — variance, losses tiny ($0.07 avg)
+- pullback-entry-: 20%WR bad 24h but profitable 7d — variance not structural
+- GMX open 16h: trailing SL at $7.49 above entry $7.40, profit locked
+
+**Monitoring:**
+- GMX open 16h — stale winner, trailing SL protecting profit
+- 7d WR stable at 50.7%
+- All trades NEUTRAL regime
+- FOGO just opened — watch for quick stop
+
+**BY:** auto_1hr
+
+## [2026-09-18 11:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 20T 6W 30.0%WR -$1.11 | **7d:** 210T 110W 52.4%WR -$1.72
+
+**Open (5):**
+- GMX volume-breakout-long+ LONG: 17h, +$271 — stale winner, trailing
+- YGG volume-breakout-long+ LONG: 6.8h, +$167 — trailing
+- ME volume-breakout-long+ LONG: 3h, +$153 — trailing
+- FOGO doji-bottom-long LONG: 1.9h, +$124 — trailing
+- DYDX volume-breakout-long+ LONG: 1h, +$58 — fresh
+
+**Signal 24h:**
+- open-skies+: 4T 0W -$0.61 — ALREADY KILLED 09-17
+- pullback-entry-: 5T 1W 20%WR -$0.59 — bad 24h but profitable 7d
+- volume-breakout-long+: 5T 3W 60%WR -$0.03 — break-even
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- ATR SL: 75% of 24h closes but avg loss -$0.074 — structural in chop
+- Trade frequency: 0/hr — quiet, appropriate for NEUTRAL
+- 7d WR stable at 52.4%
+
+**Monitoring:**
+- GMX 17h stale winner — trailing SL protecting profit
+- 7d WR stable at 52.4%
+- All trades NEUTRAL regime
+
+**BY:** auto_1hr

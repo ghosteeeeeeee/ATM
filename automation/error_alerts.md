@@ -87,3 +87,9 @@
 - **WARN** (32x): Phantom trades — trades with near-zero PnL (|pnl_pct| < 0.01%)
 - **WARN**: Disk at 84% — approaching 85% threshold
 - **AUTO-FIX**: None applied — services require investigation before restart
+
+## Error Alerts — 2026-09-18 08:43 UTC
+- **WARN** (2x): `systemd_kill_group` — `Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument` — non-critical cleanup issue, pipeline continues running normally
+- **WARN**: `daily_pnl` — 19 trades closed today with -39.35% cumulative PnL. Short trades (pullback-entry-) mostly losing. Winrate on closed: 5/19 = 26% — below 50% threshold
+- **WARN**: `disk_usage` — disk at 84% (94G/118G), approaching 85% threshold. Compress logs if >85%
+- **INFO**: Pipeline healthy, all core components running, 0 open trades, 20 signals generated in last hour

@@ -1,84 +1,109 @@
 {
-  "timestamp": "2026-09-18T02:38:02.102452Z",
-  "session_brain_stats": {
-    "total_memories": "unknown",
-    "recent_sessions": "unknown",
-    "top_topics": [
-      "signal performance",
-      "stale signal execution",
-      "wave_phase gate"
+    "timestamp": "2026-09-18T11:30:00Z",
+    "session_brain_stats": {
+        "total_vectors": 227310,
+        "queries_run": 3,
+        "top_insights": ["RSI ceiling gap 5T -$0.98", "EXTREME SHORT edge 60%WR", "stale filter working 87% fresh"]
+    },
+    "trade_summary_24h": {
+        "total_trades": 20,
+        "win_rate": "40.0%",
+        "pnl": -1.26,
+        "cold_streak": true,
+        "open_trades": 5,
+        "market": "NEUTRAL"
+    },
+    "trade_summary_7d": {
+        "total_trades": 213,
+        "win_rate": "52.1%",
+        "pnl": -2.42,
+        "regime_breakdown": {
+            "EXTREME": "68T 60.3%WR +$0.72",
+            "NORMAL": "53T 50.9%WR -$0.46",
+            "HIGH": "87T 48.3%WR -$1.76 (legacy drag)"
+        }
+    },
+    "truly_active_30d": {
+        "total_trades": 180,
+        "win_rate": "61.7%",
+        "pnl": 4.13,
+        "breakdown": {
+            "pullback-entry-_SHORT": "94T 56.4%WR +$2.01",
+            "pump-chain-_SHORT": "55T 60.0%WR +$0.62",
+            "mover-_SHORT": "8T 87.5%WR +$0.61",
+            "rr-struct+_LONG": "15T 73.3%WR +$0.59",
+            "mover+_LONG": "8T 87.5%WR +$0.30"
+        }
+    },
+    "drift_findings": [
+        {
+            "issue": "SHORT_RSI_CEILING execution gap",
+            "severity": "HIGH",
+            "detail": "5 SHORT trades entered with RSI>65 in 7d. ALL 5 losers (-$0.98). RSI checked at compaction time, drifts between compaction and execution. No revalidation in execution path.",
+            "evidence": "IMX RSI=72.53, ALT RSI=68.75, ETH RSI=71.61, SEI RSI=85.17, ETC RSI=70.14. All opened AFTER RSI fix (Sep 16). entry_rsi_14 records RSI at trade open, not detection.",
+            "fix": "Add RSI revalidation at execution time in brain.py/position_manager.py",
+            "estimated_impact": "+$0.98/7d saved"
+        },
+        {
+            "issue": "signal_rsi_14 always NULL",
+            "severity": "LOW",
+            "detail": "signal_rsi_14 column exists but 0/209 7d trades have data. entry_rsi_14 only populated for 34/209 (features_recorded=TRUE).",
+            "fix": "Record signal_rsi_14 at compaction time alongside entry_rsi_14"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "topic": "RSI ceiling gap",
+            "sessions": 3,
+            "detail": "Sep 16: RSI bug found (5m→1m fix). Sep 18: execution-time drift discovered. Pattern: fix addresses detection-time but not execution-time drift.",
+            "status": "UNFIXED - needs code change"
+        },
+        {
+            "topic": "stale signal execution",
+            "sessions": 5,
+            "detail": "32% stale pre-deploy → 13% post-deploy. Filter working. Eval due Sep 19.",
+            "status": "MONITORING - eval Sep 19"
+        },
+        {
+            "topic": "signal diversity NEUTRAL",
+            "sessions": 4,
+            "detail": "Only pullback-entry- and pump-chain- pass confluence in NEUTRAL. Need new signals.",
+            "status": "OPEN - needs development"
+        }
+    ],
+    "missing_implementations": [
+        "Execution-time RSI revalidation (RSI ceiling gap fix)",
+        "New NEUTRAL-passing signals (only 2 types)",
+        "signal_rsi_14 recording at compaction time"
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-18T11:30:00Z",
+            "idea": "Execution-time RSI revalidation for SHORT entries",
+            "rationale": "5 SHORT trades entered with RSI>65 in 7d, ALL losers (-$0.98). RSI checked at compaction time but drifts between compaction and execution. Adding a re-check at execution time would block these entries. Sample: 5 trades, 100% loss rate. Verified: 0 winning SHORT trades had RSI>65 in 7d.",
+            "expected_impact": "+$0.98/7d saved (conservative, based on 5-trade sample)",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Checked: 0 winning SHORT trades had RSI>65 in 7d. No winners blocked."
+        },
+        {
+            "date": "2026-09-18T11:30:00Z",
+            "idea": "EXTREME SHORT confidence boost (monitor)",
+            "rationale": "EXTREME SHORT 35T 60.0%WR +$0.25 in 7d. Above 20-trade threshold. System edge confirmed. Could boost confidence for EXTREME SHORT entries specifically.",
+            "expected_impact": "+$0.20-0.40/7d if confidence boost reduces false negatives",
+            "category": "regime edge",
+            "status": "monitor",
+            "risk": "low",
+            "impact_on_winners": "Need to verify current confidence threshold before suggesting change"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "CODE: Add RSI revalidation at execution time (brain.py or position_manager.py) — re-check SHORT_RSI_CEILING from candles_1m before placing order",
+        "MONITOR: Stale filter effectiveness — eval by Sep 19 10:00 UTC",
+        "MONITOR: EXTREME SHORT edge — 35T 60%WR confirmed, consider confidence boost after 50T",
+        "MONITOR: pullback-entry- cold streak — 24h 20%WR but 30d 56.4%WR, likely variance",
+        "DEVELOP: New signals for NEUTRAL regime — only 2 types pass confluence"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 15,
-    "win_rate": 20.0,
-    "pnl": -1.67,
-    "note": "COLD STREAK, losses small avg -$0.11"
-  },
-  "trade_summary_7d": {
-    "trades": 222,
-    "win_rate": 49.1,
-    "pnl": -3.92,
-    "note": "Legacy drags aging out, active signals positive"
-  },
-  "drift_findings": [
-    {
-      "finding": "SHORT_RSI_CEILING filter not blocking high-RSI SHORT trades",
-      "evidence": "5 pullback-entry- SHORT trades with RSI >65 all losers (0% WR). Filter uses candles_1m RSI at detection time, but entry_rsi_14 recorded at entry time (RSI may have risen after detection).",
-      "impact": "-$0.98 in 7d from these 5 trades",
-      "status": "known — execution-time revalidation needed (CURRENT.md line 138)"
-    },
-    {
-      "finding": "open-skies+ wave_phase=falling pattern not gated",
-      "evidence": "5 trades with wave_phase=falling: 20%WR -$0.49. All-time: falling 5T 20%WR vs accelerating 3T 66.7%WR.",
-      "impact": "-$0.49 total, but signal already KILLED (Sep 17)",
-      "status": "suggested code change in trend_purity.py already exists"
-    }
-  ],
-  "recurring_problems": [
-    "Stale signal execution (31.8% of trades, WR 49.4% vs fresh 59.0%)",
-    "HIGH regime legacy drag (~60% dead/legacy trades)",
-    "ATR SL hits (48.5% of exits, -$2.15/7d #1 drag)"
-  ],
-  "missing_implementations": [
-    "Execution-time revalidation for stale signals (design needed)",
-    "New signals for NEUTRAL regime (only 2 types pass confluence)",
-    "rr_engine_support_br threshold widening (30% WR investigation)"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-18T02:38:02.102478Z",
-      "idea": "Add wave_phase=falling gate for open-skies+ LONG in HIGH regime",
-      "rationale": "All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winners blocked. Similar gate already exists in trend_purity.py.",
-      "expected_impact": "+$0.49/7d (eliminate losing pattern)",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T02:38:02.102487Z",
-      "idea": "Add SHORT_RSI_CEILING revalidation at execution time (not just detection)",
-      "rationale": "5 high-RSI SHORT trades slipped through filter due to stale detection. Re-check RSI with 1m candles before execution.",
-      "expected_impact": "+$0.98/7d (block 5 losers, 0 winners blocked)",
-      "category": "execution filter",
-      "status": "suggested (design needed)",
-      "risk": "medium — needs careful implementation to avoid latency"
-    },
-    {
-      "date": "2026-09-18T02:38:02.102494Z",
-      "idea": "Monitor EXTREME SHORT fresh edge (54.2%WR +$0.23/7d) — consider confidence boost when sample >20",
-      "rationale": "EXTREME SHORT fresh 24T 54.2%WR +$0.23, stale 15T 60%WR -$0.37. Stale filter protecting edge. Need 20+ trades for statistical significance.",
-      "expected_impact": "Potential +$0.50/7d if confidence boost applied safely",
-      "category": "confidence tuning",
-      "status": "monitoring",
-      "risk": "low — wait for sample size"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Implement execution-time RSI revalidation for SHORT signals",
-    "Add wave_phase=falling gate for open-skies+ LONG (code change)",
-    "Monitor EXTREME SHORT fresh edge (20+ trades needed)",
-    "Develop new signals for NEUTRAL regime diversity"
-  ]
 }

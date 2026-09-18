@@ -1,3 +1,17 @@
+## CEO Report — 2026-09-18 ~09:45 UTC
+
+### Diagnosis
+DB-verified. 24h: 20T, 40.0%WR, -$1.21 (COLD STREAK). 7d: 209T, 52.6%WR, -$1.50. 0 open. Market NEUTRAL. 5 SHORT trades entered with RSI>65 (all losers, -$0.98) — RSI drifted between detection and execution.
+
+### Root Cause
+SHORT_RSI_CEILING=65 checked at signal detection only. RSI can drift from 45 to 72+ between detection and execution. 5 trades slipped through.
+
+### Fix Applied
+Added `_ctx_gate_get_rsi(token)` + execution-time SHORT_RSI_CEILING check in decider_run.py safety section. Same pattern as existing live z-score check. Expected +$0.98/7d.
+
+### Verification
+Python syntax check passed. Pipeline restart needed to load fix. Monitor next 24h for blocked trades.
+
 ## CEO Report — 2026-09-18 ~06:00 UTC
 
 ### Diagnosis

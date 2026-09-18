@@ -808,6 +808,33 @@ def _ctx_gate_get_zscore(token):
     except Exception:
         return None
 
+def _ctx_gate_get_rsi(token):
+    """Compute RSI from live 1m candles. Returns float or None."""
+    try:
+        import sqlite3
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1m
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC LIMIT 15
+        """, (token.upper(),))
+        closes = [r[0] for r in cur.fetchall()]
+        conn.close()
+        if len(closes) < 15:
+            return None
+        deltas = [closes[i] - closes[i+1] for i in range(len(closes)-1)]
+        gains = [d if d > 0 else 0 for d in deltas[-14:]]
+        losses = [-d if d < 0 else 0 for d in deltas[-14:]]
+        avg_gain = sum(gains) / 14
+        avg_loss = sum(losses) / 14
+        if avg_loss == 0:
+            return 100.0
+        return 100 - (100 / (1 + avg_gain / avg_loss))
+    except Exception:
+        return None
+
 def _ctx_gate_get_phase(token):
     """Get current market phase from token_speeds. Returns phase string or None."""
     try:
@@ -929,6 +956,14 @@ def rule_based_context_gate(token, direction, source, sig):
         _live_z = _ctx_gate_get_zscore(token)
         if _live_z is not None and _live_z > 0.5:
             return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 0.5 (price above mean — downtrend weakened)', 20)
+
+    # 1b-ext2. Execution-time SHORT RSI ceiling — catches RSI drift between detection and execution
+    # brain_auditor: 5 SHORT trades entered RSI>65 (all losers, -$0.98). Detection-time RSI was OK.
+    if direction == 'SHORT':
+        from hermes_constants import SHORT_RSI_CEILING
+        _live_rsi = _ctx_gate_get_rsi(token)
+        if _live_rsi is not None and _live_rsi > SHORT_RSI_CEILING:
+            return ('AMBIGUOUS', f'SHORT RSI ceiling: LIVE RSI {_live_rsi:.1f} > {SHORT_RSI_CEILING} (overbought — bounce risk)', 20)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)

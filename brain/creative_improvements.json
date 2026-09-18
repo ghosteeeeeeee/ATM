@@ -1045,5 +1045,71 @@
     "category": "entry sniper",
     "status": "needs_backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-18T08:32:25.985004+00:00",
+    "idea": "Add wave_phase=falling gate for LONG entries in HIGH regime",
+    "rationale": "3/4 open-skies+ losers today had wave_phase=falling in HIGH. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $. Zero winning trades would be blocked.",
+    "expected_impact": "+$0.49/7d (eliminate losing pattern)",
+    "category": "entry sniper",
+    "status": "suggested (code change needed)",
+    "risk": "low",
+    "impact_on_winners": "0 — no winning LONG trades had wave_phase=falling in HIGH"
+  },
+  {
+    "date": "2026-09-18T08:32:25.985019+00:00",
+    "idea": "Add MOMENTUM_MIN=15 filter for volume-breakout-long+ entries",
+    "rationale": "NOT volume-breakout-long+ LONG had momentum=0.5 (extremely low) and lost. WCT had momentum=13.2 and lost. Winners had momentum=34.2 (WLD) and 20.4 (BABY).",
+    "expected_impact": "+$0.31/7d (block 2 losers, 0 winners blocked)",
+    "category": "entry sniper",
+    "status": "suggested (needs backtest)",
+    "risk": "low",
+    "impact_on_winners": "0 — winners had momentum >20"
+  },
+  {
+    "date": "2026-09-18T09:37:37.973512+00:00",
+    "idea": "Execution-time SHORT_RSI_CEILING revalidation",
+    "rationale": "5 SHORT trades in 7d entered with RSI > 65 (should be blocked). IMX RSI=72.5, ALT RSI=68.8, SEI RSI=85.2, ETH RSI=71.6, ETC RSI=70.1. ALL 5 losers, -$0.98. Filter checks at signal creation, not execution.",
+    "expected_impact": "+$0.98/7d saved",
+    "category": "entry sniper",
+    "status": "suggested (code change needed)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T09:37:37.973526+00:00",
+    "idea": "SHORT_RSI_FLOOR revalidation at execution time",
+    "rationale": "Symmetric to ceiling issue. If RSI drops below35 between detection and execution, SHORT entering oversold = catching falling knife. BANANA SHORT lesson: RSI=10.53 at entry.",
+    "expected_impact": "Prevent oversold SHORT entries",
+    "category": "entry sniper",
+    "status": "suggested (needs backtest)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T09:37:37.973528+00:00",
+    "idea": "EXTREME SHORT confidence boost to 80 after 20+ fresh trades",
+    "rationale": "EXTREME SHORT fresh 21T 61.9%WR +$0.65 (7d). 30d 195T 55.9%WR +$1.31. Strongest edge. Need 1 more trade for threshold.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "confidence tuning",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T11:30:00Z",
+    "idea": "Execution-time RSI revalidation for SHORT entries",
+    "rationale": "5 SHORT trades entered RSI>65 in 7d, ALL losers (-/usr/bin/bash.98). RSI checked at compaction but drifts to >65 by execution. Re-check at execution blocks these. 0 winners blocked.",
+    "expected_impact": "+$0.98/7d saved",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "evidence": "IMX RSI=72.53, ALT RSI=68.75, ETH RSI=71.61, SEI RSI=85.17, ETC RSI=70.14 — all entered AFTER RSI fix (Sep 16). entry_rsi_14 records RSI at trade open, not detection."
+  },
+  {
+    "date": "2026-09-18T11:30:00Z",
+    "idea": "EXTREME SHORT confidence boost (monitor)",
+    "rationale": "EXTREME SHORT 35T 60.0%WR +$0.25 in 7d. Above 20-trade threshold. System edge confirmed. Could boost confidence after 50T.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "regime edge",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

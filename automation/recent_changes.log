@@ -2337,3 +2337,30 @@
   ATR SL 81.2% of 24h closes but avg loss -$0.132 — structural in chop
   0%WR signals below kill threshold: ema300-dip-long (2T), accel-300-v4-short- (2T)
   BY: auto_1hr
+[2026-09-18 07:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  DB: 24h 19T 31.6%WR -$1.22 | 7d 217T 50.7%WR -$2.61
+  Last hour: 1T APT LONG warrior-sr-confirm+ +$0.04 (profit-monster-trail)
+  ATR SL 73.7% of 24h closes but avg loss -$0.080 — structural in chop
+  GMX 15h open — stale winner (1.74% profit, SL trailing at $7.49 above entry)
+  No kill candidates. 7d WR stable at 50.7%. All trades NEUTRAL regime.
+  BY: auto_1hr
+[2026-09-18 09:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  DB: 24h 20T 30.0%WR -$1.11 | 7d 217T 50.7%WR -$2.61
+  Last hour: 1T SUSHI volume-breakout-long+ LONG ATR SL hit, +$0.01
+  ATR SL 75% of 24h closes but avg loss -$0.074 — structural in chop
+  0 kill candidates. 7d WR stable at 50.7%. All trades NEUTRAL regime.
+  4 open trades all in profit or fresh. GMX 16h stale winner trailing.
+  BY: auto_1hr
+[2026-09-18 11:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  DB: 24h 20T 30.0%WR -$1.11 | 7d 210T 52.4%WR -$1.72
+  Last hour: 0 trades closed
+  5 open trades all LONG in profit. GMX 17h stale winner trailing.
+  No kill candidates. 7d WR stable at 52.4%. All trades NEUTRAL regime.
+  BY: auto_1hr
+
+[2026-09-18 11:30 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB: 24h 20T 40.0%WR -$1.26 (COLD STREAK) | 7d 213T 52.1%WR -$2.42
+  Market NEUTRAL. 5 open. Stale filter 87% fresh (working).
+  CRITICAL: RSI CEILING GAP confirmed — 5 SHORT RSI>65 ALL losers -$0.98. Needs code fix.
+  EXTREME SHORT 35T 60%WR +$0.25 (system edge). Truly active 30d 180T 61.7%WR +$4.13.
+  BY: brain_auditor

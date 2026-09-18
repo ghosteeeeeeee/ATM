@@ -1,18 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-18 ~06:00 UTC (CEO)**
+**Last Updated: 2026-09-18 ~09:45 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 18T, 33.3% WR, -$1.26. 2 open. Market NEUTRAL. Pipeline running.
+24h: 20T, 40.0% WR, -$1.21. 0 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 18T, 33.3% WR, -$1.26 (DB-verified — COLD STREAK). open-skies+ 4T ALL losers (killed). pullback-entry- SHORT 5T 20%WR -$0.59 (cold streak, 30d 56.4%WR +$2.01). volume-breakout-long+ 4T 50%WR -$0.04 (mixed).
-- **Today (calendar):** 8T closed (Sep 18). 2 open. PnL: negative.
-- **7d:** 225T, 51.1% WR, -$2.78 (DB-verified). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
-- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90, bb-bounce-v2-long+ -$0.47, rr-struct-v2+ -$0.45, rr-struct- -$0.42, pump-chain+ -$0.37, breakout-long+ -$0.35.
-- **Market:** NEUTRAL (2 open trades).
-- **Open:** 2 trades (volume-breakout-long+ LONG x2).
+- **24h (rolling):** 20T, 40.0% WR, -$1.21 (DB-verified — COLD STREAK). open-skies+ 4T ALL losers (killed). pullback-entry- SHORT 5T 20%WR -$0.59 (cold streak, 30d 56.4%WR +$2.01). volume-breakout-long+ 5T 60%WR -$0.03 (mixed).
+- **Today (calendar):** 20T closed (Sep 18). 0 open.
+- **7d:** 209T, 52.6% WR, -$1.50 (DB-verified). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
+- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90, rr-struct-v2+ -$0.45, rr-struct- -$0.42, breakout-long+ -$0.35, pump-chain+ -$0.26.
+- **Market:** NEUTRAL (0 open trades).
+- **Open:** 0 trades.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED (Sep 17 17:11):** open-skies+ (brain_auditor, 11T/8d 36%WR -$0.73, wave_phase=falling pattern 5T 20%WR, no regime >50% WR). **KILLED (Sep 17 02:40):** breakout-long (CEO, 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60, fires LONG in NEUTRAL). **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
@@ -53,6 +53,10 @@
 **🟢 EXIT CONDITIONS FIX COMPLETE.** position_manager.py UPDATE now includes exit_conditions. All close paths (brain.py, position_manager.py) now write exit_conditions. Old blank trades (254/255 7d) remain blank — new trades will have data. — 2026-09-16 ~18:30 UTC
 
 **🟢 RSI TIMEFRAME MISMATCH FIXED.** SHORT_RSI_CEILING now uses 1m data (signal_compactor.py:2728). ETC SHORT RSI=70.14 would have been blocked. — 2026-09-16 ~15:45 UTC
+
+## Today's Changes (Sep 18)
+
+1. **CEO ~09:45 UTC — CODE FIX APPLIED.** Execution-time SHORT_RSI_CEILING revalidation. Added `_ctx_gate_get_rsi(token)` + SHORT_RSI_CEILING check in decider_run.py safety section (line 960-966). DB: 24h 20T 40.0%WR -$1.21 (COLD STREAK). 7d 209T 52.6%WR -$1.50. Market NEUTRAL. 0 open. **ROOT CAUSE:** 5 SHORT trades entered RSI>65 (all losers, -$0.98) — detection-time RSI was OK, drifted by execution. **FIX:** Live 1m RSI recheck before trade execution. **EXPECTED:** +$0.98/7d. **NO CONFIG CHANGE** — code fix only.
 
 ## Today's Changes (Sep 17)
 
