@@ -45,3 +45,9 @@
 - **WARN** (32x): `phantom_trades` — trades with <0.01% PnL in signal_outcomes
 - **WARN** (1x): `macro_gate_reduce` — signal analyst macro gate: REDUCE (wr=20% < 30)
 - **INFO** (4x): `systemd_kill_group` — "Failed to kill control group" — cosmetic, no impact
+
+## Error Alerts — 2026-09-18 00:44 UTC
+- **[WARN]** Disk at 84% (19G/118G) — approaching 85% threshold
+- **AUTO-FIX**: Compressed 11 old log files (freed ~50MB)
+- **[INFO]** Market extremely quiet — 126/127 tokens NEUTRAL, only BABY has LONG_BIAS
+- **[INFO]** Pipeline healthy — 44 signals generated in last hour, 0 errors

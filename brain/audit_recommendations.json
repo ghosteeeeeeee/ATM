@@ -1,136 +1,148 @@
 {
-    "timestamp": "2026-09-17T23:30:00Z",
+    "timestamp": "2026-09-18T01:15:00Z",
     "session_brain_stats": {
-        "total_vectors": 223856,
-        "query_topics": ["signal performance", "creative ideas", "losing problems", "EXTREME SHORT edge", "signal diversity", "volume breakout"]
+        "vectors": 223856,
+        "top_topics": ["bb_bounce short signal", "delisted tokens", "ema300_dip_long", "cascade_flip", "signal to trades"]
     },
     "trade_summary_24h": {
-        "trades": 13,
-        "win_rate": 30.8,
-        "pnl": -1.09,
-        "regime": "NEUTRAL",
-        "open_trades": 5,
-        "diagnosis": "COLD STREAK driven by legacy open-skies+ (4T -$0.61, KILLED) + volume-breakout-long+ (2T -$0.31, 3 trades total 7d). Small losses avg -$0.08. System structurally healthy."
+        "trades": 15,
+        "win_rate": 20.0,
+        "pnl": -1.73,
+        "status": "COLD STREAK",
+        "losers": 12,
+        "total_loss": -1.77,
+        "market": "NEUTRAL",
+        "open_trades": 5
     },
     "trade_summary_7d": {
-        "trades": 225,
-        "win_rate": 51.1,
-        "pnl": -2.78,
-        "regime_breakdown": {
-            "EXTREME": {"trades": 75, "wr": 56.0, "pnl": -0.23, "verdict": "best — near breakeven"},
-            "NORMAL": {"trades": 56, "wr": 50.0, "pnl": -0.65, "verdict": "middle — SHORT profitable, LONG drags"},
-            "HIGH": {"trades": 91, "wr": 47.3, "pnl": -1.98, "verdict": "worst — ~60% legacy, aging out"}
-        },
-        "active_signals_positive": {
-            "pullback-entry-_SHORT": "69T 52.2%WR +$0.27",
-            "rr-struct+_LONG": "15T 73.3%WR +$0.59",
-            "mover-_SHORT": "4T 100%WR +$0.54",
-            "mover+_LONG": "6T 83.3%WR +$0.15",
-            "pump-chain-_SHORT": "34T 55.9%WR +$0.01"
-        },
-        "legacy_drags": {
-            "trend_purity+": "11T 36.4%WR -$0.90 (KILLED Sep 13)",
-            "pump-chain+": "21T 38.1%WR -$0.61 (KILLED)",
-            "bb-bounce-v2-long+": "4T 25%WR -$0.47 (KILLED)",
-            "rr-struct-v2+": "10T 40%WR -$0.45 (KILLED Sep 15)",
-            "open-skies+": "9T 44.4%WR -$0.24 (KILLED Sep 17)"
-        }
+        "trades": 222,
+        "win_rate": 49.5,
+        "pnl": -3.58,
+        "short_pnl": -0.66,
+        "long_pnl": -2.92,
+        "regime_best": "EXTREME 74T 55.4%WR -$0.47",
+        "regime_worst": "HIGH 89T 46.1%WR -$2.17 (~60% legacy)"
     },
+    "losing_trade_autopsy": [
+        {
+            "cluster": "open-skies+ LONG 4T",
+            "tokens": ["STX", "W", "XPL", "SUSHI"],
+            "pnl_total": -0.61,
+            "regime": "HIGH (3/4), EXTREME (1/4)",
+            "root_cause": "KILLED signal (Sep 17 17:11). All ATR SL. wave_phase=falling on 3/4. Legacy entries fading BTC momentum.",
+            "recommended_change": "None — signal already killed. Legacy trades flushing.",
+            "confidence": "HIGH"
+        },
+        {
+            "cluster": "pullback-entry- SHORT 3T",
+            "tokens": ["AIXBT", "ALT", "IO"],
+            "pnl_total": -0.45,
+            "regime": "NORMAL (2), HIGH (1)",
+            "root_cause": "Normal variance. All FRESH entries. RSI at entry: AIXBT=45.3, ALT=68.8, IO=61.2. Signal 7d profitable 49.3%WR -$0.28. ALT RSI=68.8 near SHORT_RSI_CEILING=65 but entry RSI was under ceiling (filter uses 1m data).",
+            "recommended_change": "Monitor — cold streak 25%WR 24h vs 49.3%WR 7d. Variance, not structural.",
+            "confidence": "MEDIUM"
+        },
+        {
+            "cluster": "volume-breakout-long+ LONG 2T",
+            "tokens": ["WCT", "NOT"],
+            "pnl_total": -0.31,
+            "regime": "NORMAL",
+            "root_cause": "Both ATR SL. WCT stale=True. 7d 3T 33.3%WR -$0.30. Signal fires LONG breakouts regardless of market regime. SMALL SAMPLE — only 3 trades 7d.",
+            "recommended_change": "Monitor until 20+ trades (Oct 1). Both losers in NORMAL where LONG is structurally weak.",
+            "confidence": "LOW — sample too small"
+        },
+        {
+            "cluster": "Other 3T",
+            "tokens": ["COMP", "AVAX", "BIGTIME"],
+            "pnl_total": -0.40,
+            "root_cause": "COMP: r2-trend-short3 cut-loser (working). AVAX: btc-pump-rider+ cut-loser (working). BIGTIME: rs-s36,volume-breakout-long+ stale=False ATR SL. All normal exits.",
+            "recommended_change": "None — cut-loser mechanism working as designed.",
+            "confidence": "HIGH"
+        }
+    ],
     "drift_findings": [
         {
-            "finding": "signal_reason column NULL for ALL trades",
-            "impact": "MEDIUM — cannot identify which signal generated trades from trades table alone. Must use `signal` column instead.",
-            "status": "known schema issue — not blocking but limits analytics"
+            "item": "open-skies+ wave_phase gate",
+            "status": "DISCUSSED but NOT IMPLEMENTED",
+            "last_discussed": "2026-09-17 20:15 UTC",
+            "impact": "Signal already KILLED — gate is moot unless re-enabled. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00.",
+            "action": "Drop — signal killed, no need for gate."
         },
         {
-            "finding": "volume-breakout-long+ still active but 3T/7d 33.3%WR -$0.30",
-            "impact": "LOW — only 3 trades, too small to be statistically significant. But both losers had RSI > 60.",
-            "status": "monitoring — sample too small for config change"
+            "item": "Execution-time stale revalidation",
+            "status": "DISCUSSED but NOT IMPLEMENTED",
+            "last_discussed": "2026-09-17 09:00 UTC",
+            "impact": "~$4.86/7d from stale trades. Stale filter deployed Sep 17 — post-deploy 90%+ fresh. But staleness_mult decay or hard age block still needed for long-term fix.",
+            "action": "Design and implement. Priority: MEDIUM — stale filter is band-aid, revalidation is root fix."
+        },
+        {
+            "item": "rr_engine_support_br threshold",
+            "status": "DISCUSSED but NOT CHANGED",
+            "last_discussed": "2026-09-17 20:15 UTC",
+            "impact": "10T 30%WR -$0.73. HIGH regime 3T 0%WR -$0.50. All LONG entries that hit support and reversed.",
+            "action": "Monitor — sample too small (10T). Needs 20+ before threshold change."
         }
     ],
     "recurring_problems": [
         {
-            "problem": "LONG signals bleed in NEUTRAL/HIGH regime",
-            "evidence": "LONG 101T 47.5%WR -$2.92 vs SHORT 122T 53.3%WR +$0.06 (7d NEUTRAL)",
-            "status": "LONG_NEUTRAL_BLOCK_ENABLED=True is correct. Legacy LONG drags aging out."
+            "topic": "LONG drag in NEUTRAL",
+            "frequency": "Every audit since Sep 14",
+            "detail": "7d LONG -$2.92 vs SHORT -$0.66. All legacy LONG signals (trend_purity+, pump-chain+, rr-struct-v2+, open-skies+) are KILLED but trades still in 7d window. Will self-correct by Sep 20.",
+            "action": "No action — aging out."
         },
         {
-            "problem": "HIGH regime is worst performer",
-            "evidence": "91T 47.3%WR -$1.98 (7d). ~60% legacy trades from killed signals.",
-            "status": "Self-correcting as legacy ages out. No action needed."
+            "topic": "SIGNAL DIVERSITY in NEUTRAL",
+            "frequency": "Every audit since Sep 16",
+            "detail": "Only pullback-entry- SHORT passes confluence in NEUTRAL. Standalone bypass (pump-chain, mover) can fire but limited. Need new NEUTRAL-compatible signals.",
+            "action": "DEVELOP new signals. Priority: HIGH."
+        },
+        {
+            "topic": "atr_sl_hit exit drag",
+            "frequency": "Every audit since Sep 14",
+            "detail": "133T/7d 47.4%WR -$2.67. #1 exit drag. Mostly legacy LONG trades with poor entries. Active SHORT ATR SL losses are small and normal.",
+            "action": "No action — legacy flush will reduce. Active ATR SL is healthy (fast cuts)."
         }
     ],
-    "losing_trade_autopsy": [
-        {
-            "losing_trade": "WCT LONG volume-breakout-long+ pnl=-$0.16",
-            "signal": "volume-breakout-long+",
-            "regime": "NORMAL",
-            "root_cause": "Entered at RSI=66.67 (overbought), wave_phase=falling, is_stale=True. Triple negative: overbought + falling momentum + stale signal.",
-            "entry_check": "RSI 66.67 at entry, wave_phase falling, momentum_score 13.2 (low), speed_percentile 32.3 (slow)",
-            "regime_check": "NORMAL — correct regime for LONG, but entry conditions were wrong",
-            "recommended_change": "Add RSI_MAX=65 to volume-breakout-long+ filter. Would have blocked WCT entry.",
-            "impact_on_winners": "Only 1 winner (BABY RSI=72.73) would be blocked. 3-trade sample — INSUFFICIENT DATA for config change.",
-            "confidence": "LOW — need 20+ trades before changing"
-        },
-        {
-            "losing_trade": "NOT LONG volume-breakout-long+ pnl=-$0.15",
-            "signal": "volume-breakout-long+",
-            "regime": "NORMAL",
-            "root_cause": "Weak momentum (score=0.5, speed_percentile=1.2). BTC ranging (score=49.8). No directional conviction.",
-            "entry_check": "RSI 61.54, momentum_score 0.5 (near zero), speed_percentile 1.2 (dead slow)",
-            "regime_check": "NORMAL — correct regime, but momentum too weak",
-            "recommended_change": "Add MOMENTUM_MIN=5 to volume-breakout-long+ filter.",
-            "impact_on_winners": "BABY (momentum_score=20.4) would pass. 3-trade sample — INSUFFICIENT DATA.",
-            "confidence": "LOW — need 20+ trades before changing"
-        },
-        {
-            "losing_trade": "STX/W/SUSHI/XPL LONG open-skies+ pnl=-$0.61 total",
-            "signal": "open-skies+ (KILLED)",
-            "regime": "HIGH/EXTREME",
-            "root_cause": "Legacy trades from killed signal. open-skies+ was killing LONG entries in HIGH regime when wave_phase=falling.",
-            "entry_check": "All entered in HIGH regime with falling BTC momentum",
-            "regime_check": "HIGH regime + falling wave_phase = wrong conditions for LONG",
-            "recommended_change": "None — signal already killed. Wave_phase gate was identified but kill was faster.",
-            "impact_on_winners": "N/A — signal dead",
-            "confidence": "HIGH — correct kill decision"
-        }
+    "missing_implementations": [
+        "Execution-time stale revalidation (designed Sep 16, not coded)",
+        "New signals for NEUTRAL regime (identified Sep 16, not started)",
+        "rr_engine_support_br threshold investigation (identified Sep 17, sample too small)"
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-17T23:30:00Z",
-            "idea": "Monitor volume-breakout-long+ for RSI/momentum pattern — DO NOT change yet",
-            "rationale": "3-trade sample shows both losers had RSI > 60 and weak momentum. But 3 trades is not statistically significant. Monitor for 2 weeks (need 20+ trades) before adding RSI_MAX or MOMENTUM_MIN filters.",
-            "expected_impact": "TBD — need data",
+            "date": "2026-09-18T01:15:00Z",
+            "idea": "Monitor EXTREME SHORT fresh edge — DO NOT boost confidence yet",
+            "rationale": "7d EXTREME SHORT: 39T 56.4%WR -$0.14 (flat overall). But fresh component: pullback-entry- SHORT EXTREME 12T 58.3%WR +$0.24. Stale filter protecting. Sample 12T is BELOW 20T threshold — monitor, don't act.",
+            "expected_impact": "If confirmed at 20+ trades: +$0.30-0.50/7d with confidence boost",
             "category": "entry sniper",
             "status": "monitoring",
-            "risk": "low",
-            "monitor_until": "2026-10-01"
+            "risk": "low"
         },
         {
-            "date": "2026-09-17T23:30:00Z",
-            "idea": "EXTREME SHORT is the system edge — stale filter protecting it",
-            "rationale": "7d EXTREME SHORT: 52.6%WR +$0.50. Fresh entries outperform stale. The stale filter deployed today is already showing 90%+ fresh entries. This is the highest-edge regime/direction combo.",
-            "expected_impact": "Continue monitoring — stale filter eval Sep 19",
-            "category": "edge identification",
+            "date": "2026-09-18T01:15:00Z",
+            "idea": "volume-breakout-long+ NORMAL regime pattern — both 7d losers in NORMAL",
+            "rationale": "3T 7d 33.3%WR -$0.30. Both losers in NORMAL. 1 winner in NORMAL too. Sample too small (3T) but pattern: LONG breakouts in NEUTRAL/NORMAL = chasing. EXTREME/HIGH breakouts may perform better.",
+            "expected_impact": "Needs 20+ trades before filter. Monitor until Oct 1.",
+            "category": "regime filter",
             "status": "monitoring",
             "risk": "low"
         },
         {
-            "date": "2026-09-17T23:30:00Z",
-            "idea": "Fix signal_reason NULL — schema migration needed",
-            "rationale": "All trades have NULL signal_reason. The `signal` column has the data but signal_reason is never populated. This limits analytics and makes audit harder. Low priority but should be fixed.",
-            "expected_impact": "Better analytics, easier audits",
-            "category": "infrastructure",
-            "status": "suggested",
-            "risk": "low"
+            "date": "2026-09-18T01:15:00Z",
+            "idea": "ALT SHORT entry RSI=68.75 — near SHORT_RSI_CEILING=65 but passed (1m data was under 65)",
+            "rationale": "Entry RSI was 68.75 at close but SHORT_RSI_CEILING uses 1m candle data (fixed Sep 16). The 1m RSI at signal time was likely <65. This is a borderline case — not a filter gap. But suggests SHORT_RSI_CEILING=65 may be too loose for some entries.",
+            "expected_impact": "If tightened to 60: blocks ~5-10% of SHORT entries. Need backtest to verify no winners blocked.",
+            "category": "entry sniper",
+            "status": "needs_backtest",
+            "risk": "medium"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "Monitor stale filter until Sep 19 10:00 UTC — evaluate fresh vs stale performance",
-        "Monitor volume-breakout-long+ for 2 weeks — need 20+ trades before RSI/momentum filter",
-        "HIGH regime self-correcting — legacy drags aging out, no action needed",
-        "Consider fixing signal_reason NULL in trades table (low priority infrastructure)",
-        "SIGNAL DIVERSITY: Only pullback-entry- SHORT and volume-breakout-long+ LONG fire in NEUTRAL — need new signals"
+        "STALE FILTER EVALUATION: Due Sep 19 10:00 UTC. Check post-deploy freshness % and PnL impact.",
+        "SIGNAL DEVELOPMENT: New NEUTRAL-compatible signals urgently needed. Only pullback-entry- SHORT passes confluence.",
+        "MONITOR: EXTREME SHORT fresh edge — need 20+ trades before confidence adjustment.",
+        "MONITOR: volume-breakout-long+ — 3T sample, need 20+ before regime filter.",
+        "DESIGN: Execution-time stale revalidation (root fix for stale signal problem)."
     ]
 }

@@ -979,8 +979,9 @@
     "rationale": "3/4 open-skies+ losers today had wave_phase=falling in HIGH. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winning trades would be blocked.",
     "expected_impact": "+$0.49/7d (5T 20%WR eliminated)",
     "category": "entry sniper",
-    "status": "suggested",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-18T01:09:33.205122+00:00"
   },
   {
     "date": "2026-09-17T20:15:00Z",
@@ -998,6 +999,51 @@
     "expected_impact": "+$0.50-1.00/7d if support_br threshold widened",
     "category": "exit optimization",
     "status": "needs_investigation",
+    "risk": "medium"
+  },
+  {
+    "timestamp": "2026-09-18T00:38:33.659780+00:00",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "EXTREME SHORT fresh confidence boost",
+        "rationale": "71.4% WR +$0.79/7d, stale filter protecting. Need 20+ trades before action.",
+        "status": "monitoring",
+        "risk": "low"
+      },
+      {
+        "idea": "Execution-time revalidation for stale signals",
+        "rationale": "Current stale filter is detection-time only. Re-check at execution could catch detect→execute staleness.",
+        "status": "needs design",
+        "risk": "medium"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-18T01:15:00Z",
+    "idea": "Monitor EXTREME SHORT fresh edge — DO NOT boost confidence yet",
+    "rationale": "7d EXTREME SHORT: 39T 56.4%WR -$0.14 (flat overall). But fresh component: pullback-entry- SHORT EXTREME 12T 58.3%WR +$0.24. Stale filter protecting. Sample 12T is BELOW 20T threshold — monitor, dont act.",
+    "expected_impact": "If confirmed at 20+ trades: +$0.30-0.50/7d with confidence boost",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T01:15:00Z",
+    "idea": "volume-breakout-long+ NORMAL regime pattern — both 7d losers in NORMAL",
+    "rationale": "3T 7d 33.3%WR -$0.30. Both losers in NORMAL. Sample too small (3T) but pattern: LONG breakouts in NEUTRAL/NORMAL = chasing. EXTREME/HIGH breakouts may perform better.",
+    "expected_impact": "Needs 20+ trades before filter. Monitor until Oct 1.",
+    "category": "regime filter",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T01:15:00Z",
+    "idea": "ALT SHORT entry RSI=68.75 — near SHORT_RSI_CEILING=65 but passed (1m data was under 65)",
+    "rationale": "Entry RSI was 68.75 at close but SHORT_RSI_CEILING uses 1m candle data (fixed Sep 16). The 1m RSI at signal time was likely <65. Borderline case — not a filter gap. But suggests SHORT_RSI_CEILING=65 may be too loose.",
+    "expected_impact": "If tightened to 60: blocks ~5-10% of SHORT entries. Need backtest.",
+    "category": "entry sniper",
+    "status": "needs_backtest",
     "risk": "medium"
   }
 ]
