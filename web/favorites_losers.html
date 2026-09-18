@@ -90,6 +90,7 @@
                         <th>WR</th>
                         <th>PnL</th>
                         <th>Status</th>
+                        <th>Dir Stats</th>
                     </tr>
                 </thead>
                 <tbody id="loser-table"></tbody>
@@ -124,6 +125,7 @@
                         <th>Trades</th>
                         <th>WR</th>
                         <th>PnL</th>
+                        <th>Dir Stats</th>
                     </tr>
                 </thead>
                 <tbody id="hall-fame-table"></tbody>
@@ -139,6 +141,7 @@
                         <th>Trades</th>
                         <th>WR</th>
                         <th>PnL</th>
+                        <th>Dir Stats</th>
                     </tr>
                 </thead>
                 <tbody id="hall-shame-table"></tbody>
@@ -224,21 +227,46 @@
         function renderLosers(losers) {
             const tbody = document.getElementById('loser-table');
             tbody.innerHTML = '';
-            
+
             losers.sort((a, b) => a.winrate - b.winrate);
-            
+
             losers.forEach(l => {
                 const isDead = l.winrate < 30 && l.trades >= 10;
                 const rowClass = isDead ? 'dead-row' : 'loser-row';
                 const badge = isDead ? '<span class="badge badge-dead">💀 DEAD</span>' : '<span class="badge badge-loser">🗑️</span>';
-                
+
+                // Direction badges
+                let dirBadge = '';
+                if (l.is_long_fav && l.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑↓</span>';
+                } else if (l.is_long_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑</span>';
+                } else if (l.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488;font-size:9px">↓</span>';
+                }
+
+                // Direction-specific stats
+                let dirStats = '';
+                if (l.direction_stats) {
+                    const longStat = l.direction_stats['LONG'];
+                    const shortStat = l.direction_stats['SHORT'];
+                    if (longStat && shortStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span> <span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    } else if (longStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span>`;
+                    } else if (shortStat) {
+                        dirStats = `<span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
-                        <td class="token">${iconHtml(l.token)}${l.token}</td>
+                        <td class="token">${iconHtml(l.token)}${l.token} ${dirBadge}</td>
                         <td>${l.trades}</td>
                         <td class="${wrClass(l.winrate)}">${l.winrate.toFixed(1)}%</td>
                         <td class="${pnlClass(l.total_pnl_usdt)}">$${l.total_pnl_usdt.toFixed(2)}</td>
                         <td>${badge}</td>
+                        <td>${dirStats}</td>
                     </tr>
                 `;
             });
@@ -293,12 +321,37 @@
             tbody.innerHTML = '';
 
             hall.forEach(t => {
+                // Direction badges
+                let dirBadge = '';
+                if (t.is_long_fav && t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑↓</span>';
+                } else if (t.is_long_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑</span>';
+                } else if (t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488;font-size:9px">↓</span>';
+                }
+
+                // Direction-specific stats
+                let dirStats = '';
+                if (t.direction_stats) {
+                    const longStat = t.direction_stats['LONG'];
+                    const shortStat = t.direction_stats['SHORT'];
+                    if (longStat && shortStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span> <span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    } else if (longStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span>`;
+                    } else if (shortStat) {
+                        dirStats = `<span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr>
-                        <td class="token">${iconHtml(t.token)}${t.token}</td>
+                        <td class="token">${iconHtml(t.token)}${t.token} ${dirBadge}</td>
                         <td>${t.trades}</td>
                         <td class="wr-good">${t.winrate.toFixed(1)}%</td>
                         <td class="pnl-pos">$${t.total_pnl_usdt.toFixed(2)}</td>
+                        <td>${dirStats}</td>
                     </tr>
                 `;
             });
@@ -310,12 +363,37 @@
             tbody.innerHTML = '';
 
             hall.forEach(t => {
+                // Direction badges
+                let dirBadge = '';
+                if (t.is_long_fav && t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑↓</span>';
+                } else if (t.is_long_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑</span>';
+                } else if (t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488;font-size:9px">↓</span>';
+                }
+
+                // Direction-specific stats
+                let dirStats = '';
+                if (t.direction_stats) {
+                    const longStat = t.direction_stats['LONG'];
+                    const shortStat = t.direction_stats['SHORT'];
+                    if (longStat && shortStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span> <span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    } else if (longStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span>`;
+                    } else if (shortStat) {
+                        dirStats = `<span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr>
-                        <td class="token">${iconHtml(t.token)}${t.token}</td>
+                        <td class="token">${iconHtml(t.token)}${t.token} ${dirBadge}</td>
                         <td>${t.trades}</td>
                         <td class="wr-bad">${t.winrate.toFixed(1)}%</td>
                         <td class="pnl-neg">$${t.total_pnl_usdt.toFixed(2)}</td>
+                        <td>${dirStats}</td>
                     </tr>
                 `;
             });

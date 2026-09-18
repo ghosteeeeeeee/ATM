@@ -277,6 +277,43 @@ def run():
 
         # Always write performance JSON first
         try:
+            # Get direction-specific stats for losers
+            from hermes_constants import FAVORITES_LONG, FAVORITES_SHORT
+            direction_stats = {}
+            if new_losers:
+                loser_conn = None
+                try:
+                    import psycopg2
+                    from _secrets import BRAIN_DB_DICT
+                    loser_conn = psycopg2.connect(**BRAIN_DB_DICT)
+                    cur = loser_conn.cursor()
+                    cur.execute("""
+                        SELECT token, direction,
+                               COUNT(*) as trades,
+                               ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as winrate,
+                               ROUND(SUM(pnl_usdt), 2) as total_pnl_usdt
+                        FROM trades
+                        WHERE server = 'Hermes' AND status = 'closed' AND pnl_pct IS NOT NULL
+                          AND close_time > NOW() - INTERVAL '7 days'
+                          AND token = ANY(%s)
+                        GROUP BY token, direction
+                    """, (list(new_losers),))
+                    for row in cur.fetchall():
+                        token, direction, trades, winrate, total_pnl = row
+                        if token not in direction_stats:
+                            direction_stats[token] = {}
+                        direction_stats[token][direction] = {
+                            'trades': int(trades),
+                            'winrate': float(winrate) if winrate else 0,
+                            'total_pnl_usdt': float(total_pnl) if total_pnl else 0
+                        }
+                except Exception:
+                    pass
+                finally:
+                    if loser_conn:
+                        try: loser_conn.close()
+                        except Exception: pass
+
             losers_data = []
             for token in sorted(new_losers):
                 token_stats = stats.get(token, {})
@@ -286,7 +323,10 @@ def run():
                     'winrate': float(token_stats.get('winrate', 0)),
                     'total_pnl_usdt': float(token_stats.get('total_pnl_usdt', 0)),
                     'consecutive_losses': int(token_stats.get('consecutive_losses', 0)),
-                    'reason': 'in_losers'
+                    'reason': 'in_losers',
+                    'is_long_fav': token in FAVORITES_LONG,
+                    'is_short_fav': token in FAVORITES_SHORT,
+                    'direction_stats': direction_stats.get(token, {})
                 })
 
             output = {
