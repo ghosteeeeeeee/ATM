@@ -245,25 +245,19 @@ LONG_BLACKLIST = {
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
-# ── Favorites ─────────────────────────────────────────────────────────────────
+# ── Favorites (Direction-Specific) ─────────────────────────────────────────────
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
-FAVORITES = {
-    'ACE',
-    'APT',
-    'ATOM',
-    'BABY',
-    'BIGTIME',
-    'CC',
-    'CHIP',
-    'ETC',
-    'IMX',
-    'LTC',
-    'POL',
-    'PONS',
-    'USUAL'
+FAVORITES_LONG = {
+    'ACE', 'BLUR', 'CFX', 'DOT', 'DYDX', 'ENA', 'FOGO', 'IMX', 'INJ',
+    'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'WLD', 'ZRO'
 }
+FAVORITES_SHORT = {
+    'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
+}
+# Legacy combined set for backwards compatibility
+FAVORITES = FAVORITES_LONG | FAVORITES_SHORT
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
 FAVORITES_SIZE_MULT = 1.5     # Position size multiplier in decider_run ($11 → $16.50)
@@ -276,13 +270,15 @@ PENALTY_TOKENS = {'ALT','BIGTIME','BLUR','BTC','CASHCAT','CC','COMP','ENS','ETH'
 PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_signal()
 
 # ── Losers List — underperformers get deprioritized ──────────────────────────
-# AUTO-UPDATED daily by losers_tracker.py
-# Populates PENALTY_TOKENS set (CEO recommendation 2026-08-28)
-LOSERS = {
-    'ENA',
-    'INJ',
-    'KAS'
+# AUTO-UPDATED daily by losers_tracker.py (direction-specific)
+LOSERS_LONG = {
+    'BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI'
 }
+LOSERS_SHORT = {
+    'DOT', 'ZRO'
+}
+# Legacy combined set
+LOSERS = LOSERS_LONG | LOSERS_SHORT
 
 
 
@@ -1358,6 +1354,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'ema300-breakthrough',   # EMA300 breakthrough — 15m breakout, manage via ATR SL
     'trend-ignition',        # early-stage breakout — manage via ATR SL, not PM Trail
     'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail
+    'mover+',             # momentum LONG — manage via ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
