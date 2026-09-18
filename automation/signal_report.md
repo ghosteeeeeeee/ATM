@@ -1,37 +1,83 @@
-=== Signal Performance Report ===
-Period: 2026-09-17 19:45 UTC | Last 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-09-18 05:09 UTC | **Period:** Last 6h + 24h
 
-KILLED (executed):
+## Overall Stats
+- **24h:** 16 trades | 25.0% WR | -$1.41 PnL
+- **6h:** 5 trades | 20.0% WR | -$0.35 PnL
+- **All time:** 2,508+ trades | 51.8% WR
+
+---
+
+## KILLED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 20.0% | -$0.42 | 5 | ALREADY KILLED (2026-09-17) — 11T/8d 36%WR/-$0.73, No regime >50% WR. NEVER_REENABLE. Confirmed DISABLED_COMPONENT block in pipeline log at 17:12. |
+| (none) | — | — | — | — | No new kills this cycle |
 
-BOOSTED (executed):
+**open-skies+** already killed 2026-09-17 (flags=False, NEVER_REENABLE). Confirmed dead.
+
+---
+
+## VOLATILITY GATE FIXES (executed)
+
+| Signal | Regime | Old Mult | New Mult | Reason |
+|--------|--------|----------|----------|--------|
+| pullback-entry- | EXTREME | 0.5 (penalized) | 1.0 (pass) | 68% WR +$1.46 lifetime, 64% WR +$0.43/7d |
+| pullback-entry- | HIGH | 0.7 (boosted) | 0.5 (penalized) | 47% WR -$0.38/7d, deteriorating |
+| pullback-entry- | NORMAL | 0.0 (blocked) | 0.0 (blocked) | No change — 50% WR breakeven |
+
+**Why not kill pullback-entry-?** EXTREME regime = 68.4% WR (19T lifetime), 63.6% WR (11T/7d). HIGH = 55.3% WR lifetime. Signal is net profitable ($2.09 lifetime). The 24h loss is HIGH regime variance, not a broken signal.
+
+---
+
+## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signals meet boost criteria (5+ trades, >55% WR, >$0.05 PnL) |
+| (none) | — | — | — | — | No clear boost candidates |
 
-LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 33.3% | -$0.30 | 3 | WATCH — Only 3 trades total (all today), all in NORMAL regime, all SL hits. Too few trades to kill. Monitor next 24h. |
-| rs-s36,volume-breakout-long+ | LONG | 0.0% | -$0.22 | 1 | WATCH — Combo signal, 1 trade only. Not statistically significant. |
-| btc-pump-rider+ | LONG | 0.0% | -$0.09 | 1 | WATCH — 1 trade only. |
-| r2-trend-short3 | SHORT | 0.0% | -$0.09 | 1 | WATCH — 1 trade only. |
+---
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 100.0% | +$0.02 | 1 | OK — 1 trade only, not enough data. |
-| grind-breakout+ | LONG | 100.0% | +$0.01 | 1 | OK — 1 trade only, not enough data. |
+## LOSERS (watch list)
 
-ISSUES:
-- open-skies+ was still firing trades at 17:09-17:11 today despite kill flag being set. DISABLED_COMPONENT block kicked in at 17:12. Trades created at 11:31-14:28 today were from before the kill took effect.
-- volume-breakout-long+ has only 3 trades total — all from today. Needs more data before action.
-- 5 open trades currently active.
-- Low trade volume overall (7 signals, 13 trades in 24h). System is in quiet mode.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| pullback-entry- | SHORT | 4 | 0.0% | -$0.61 | 5 | 20.0% | -$0.59 | Gate-fixed |
 
-SUMMARY:
-- No new kills needed. open-skies+ already killed and confirmed blocked.
-- No boost candidates — no signals with enough volume and positive performance.
-- volume-breakout-long+ is the only signal to watch — needs 7+ more trades before kill threshold.
+---
+
+## MARGINAL
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| volume-breakout-long+ | LONG | 4 | 50.0% | -$0.04 | OK | Breakeven, needs more data |
+
+---
+
+## WINNERS
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|-------|--------|---------|--------|
+| grind-breakout+ | LONG | 1 | 100% | +$0.01 | OK (low volume) |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[DONE] Fix pullback-entry- regime multipliers** — EXTREME was penalized (0.5) despite 68% WR. HIGH was boosted (0.7) despite deteriorating. Corrected to 1.0/0.5/0.0.
+2. **[WATCH] pullback-entry- HIGH regime** — 47% WR/7d. If next cycle shows continued losses, drop multiplier to 0.0 (block HIGH entirely).
+3. **[MONITOR] volume-breakout-long+** — 50% WR breakeven. No action yet.
+4. **[LOW VOLUME]** Only 16 trades in 24h. System is signal-starved. Consider loosening entry thresholds or adding new signals.
+
+---
+
+## CEO KANBAN
+
+## TEAM UPDATES
+- [2026-09-18 05:09 UTC] signal_reporter: No kills — open-skies+ already dead. Fixed pullback-entry- volatility gate: EXTREME 0.5→1.0 (68% WR), HIGH 0.7→0.5 (47% WR/7d). NORMAL blocked (correct). 24h: 16T 25%WR -$1.41. Low volume. No inversions.

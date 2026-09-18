@@ -235,7 +235,7 @@ VOL_PHASE_MULTS = {
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
-        'Pullback_Entry': 0.5,  # PENALIZED — pullback-entry- 40% WR -$0.47 in EXTREME, wins in NORMAL/HIGH. 2026-09-16
+        'Pullback_Entry': 1.0,  # OK — pullback-entry- 68% WR +$1.46 lifetime EXTREME, 64% WR +$0.43/7d. Updated 2026-09-18
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in EXTREME (oversold = extreme)
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
         'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)
@@ -253,7 +253,7 @@ VOL_PHASE_MULTS = {
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
-        'Pullback_Entry': 0.7,   # RELAXED — pullback_entry- 20T 65%WR +$1.01/7d in HIGH. Key fixed 2026-09-13 (was Pullback_Entry_Short, never matched)
+        'Pullback_Entry': 0.5,   # PENALIZED — pullback_entry- 47% WR -$0.38/7d in HIGH, wins in EXTREME (64%). Updated 2026-09-18
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in HIGH
         'R2_Structural': 0.0,    # BLOCKED — rr-struct- 4T 25%WR -$0.41 in HIGH, wins in NORMAL. Key fixed 2026-09-13 (was R2_Structural, already matched but value stands)
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
