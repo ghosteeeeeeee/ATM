@@ -73,7 +73,7 @@
                         <th>WR</th>
                         <th>PnL</th>
                         <th>Size</th>
-                        <th>Status</th>
+                        <th>Direction Stats</th>
                     </tr>
                 </thead>
                 <tbody id="fav-table"></tbody>
@@ -178,20 +178,43 @@
             tbody.innerHTML = '';
             
             favs.sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt);
-            
+
             favs.forEach(f => {
                 const isTop = topFavs.includes(f.token);
                 const rowClass = isTop ? 'top-fav-row' : 'fav-row';
-                const badge = isTop ? '<span class="badge badge-top">⭐ TOP</span>' : '<span class="badge badge-fav">❤</span>';
-                
+
+                // Direction badges
+                let dirBadge = '';
+                if (f.is_long_fav && f.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88">↑↓ BOTH</span>';
+                } else if (f.is_long_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88">↑ LONG</span>';
+                } else if (f.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488">↓ SHORT</span>';
+                }
+
+                // Direction-specific stats
+                let dirStats = '';
+                if (f.direction_stats) {
+                    const longStat = f.direction_stats['LONG'];
+                    const shortStat = f.direction_stats['SHORT'];
+                    if (longStat && shortStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:10px">↑${longStat.winrate}%(${longStat.trades}T)</span> <span style="color:#ff4488;font-size:10px">↓${shortStat.winrate}%(${shortStat.trades}T)</span>`;
+                    } else if (longStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:10px">↑${longStat.winrate}%(${longStat.trades}T)</span>`;
+                    } else if (shortStat) {
+                        dirStats = `<span style="color:#ff4488;font-size:10px">↓${shortStat.winrate}%(${shortStat.trades}T)</span>`;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
-                        <td class="token">${iconHtml(f.token)}${f.token}</td>
+                        <td class="token">${iconHtml(f.token)}${f.token} ${dirBadge}</td>
                         <td>${f.trades}</td>
                         <td class="${wrClass(f.winrate)}">${f.winrate.toFixed(1)}%</td>
                         <td class="${pnlClass(f.total_pnl_usdt)}">$${f.total_pnl_usdt.toFixed(2)}</td>
                         <td class="size-mult">${getSizeMult(f.winrate)}</td>
-                        <td>${badge}</td>
+                        <td>${dirStats}</td>
                     </tr>
                 `;
             });

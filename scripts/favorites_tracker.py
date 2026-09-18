@@ -45,10 +45,11 @@ def get_favorites_stats():
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
+        from hermes_constants import FAVORITES_LONG, FAVORITES_SHORT, LOSERS_LONG, LOSERS_SHORT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
 
-        # Per-token stats (7d)
+        # Per-token stats (7d) - combined
         cur.execute(f"""
             SELECT
                 token,
@@ -73,6 +74,46 @@ def get_favorites_stats():
 
         columns = [desc[0] for desc in cur.description]
         favorites_stats = [dict(zip(columns, [float(v) if hasattr(v, '__float__') else v for v in row])) for row in cur.fetchall()]
+
+        # Add direction info to each favorite
+        for stat in favorites_stats:
+            token = stat['token']
+            stat['is_long_fav'] = token in FAVORITES_LONG
+            stat['is_short_fav'] = token in FAVORITES_SHORT
+
+        # Direction-specific stats (7d)
+        cur.execute(f"""
+            SELECT
+                token,
+                direction,
+                COUNT(*) as trades,
+                ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as winrate,
+                ROUND(SUM(pnl_usdt), 2) as total_pnl_usdt
+            FROM trades
+            WHERE status = 'closed'
+              AND server = 'Hermes'
+              AND pnl_pct IS NOT NULL
+              AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS} days'
+              AND token = ANY(%s)
+            GROUP BY token, direction
+            ORDER BY token, direction
+        """, (list(FAVORITES),))
+
+        direction_stats = {}
+        for row in cur.fetchall():
+            token, direction, trades, winrate, total_pnl = row
+            if token not in direction_stats:
+                direction_stats[token] = {}
+            direction_stats[token][direction] = {
+                'trades': int(trades),
+                'winrate': float(winrate) if winrate else 0,
+                'total_pnl_usdt': float(total_pnl) if total_pnl else 0
+            }
+
+        # Add direction stats to favorites
+        for stat in favorites_stats:
+            token = stat['token']
+            stat['direction_stats'] = direction_stats.get(token, {})
 
         # Field comparison (non-favorites)
         cur.execute(f"""
