@@ -52,7 +52,7 @@ PRICE_BREAK_PCT = 0.1        # close must break above range high by this %
 MIN_BODY_PCT = 0.02          # min candle body as % of price (bullish candle)
 
 # Signal settings
-COOLDOWN_MINUTES = 120       # 2h cooldown between signals
+COOLDOWN_MINUTES = 20        # 20min cooldown between signals
 LOOKBACK_1M = 100            # 1m candles to fetch (60 accum + 40 buffer)
 SIGNAL_TYPE_LONG = 'btc_grind_spike_long'
 SOURCE_TAG = 'grind-spike+'
