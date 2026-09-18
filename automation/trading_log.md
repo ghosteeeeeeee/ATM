@@ -1,3 +1,52 @@
+## [2026-09-18 13:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**24h:** 25T 48.0%WR -$0.67 | **7d:** 207T 53.1%WR -$1.19
+
+**Last Hour:**
+- ONDO volume-breakout-long+ LONG → atr_sl_hit -$0.17
+- FOGO continuation+ LONG → profit-monster-trail -$0.01
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T avg -$0.036 — dominant (76%)
+- profit-monster-trail: 4T avg +$0.048
+- cut-loser-CL-T1: 2T avg -$0.090
+
+**24h by Signal:**
+- pullback-entry- SHORT: 5T -$0.59 (20%WR — variance, 7d still positive)
+- open-skies+ LONG: 3T -$0.47 (residual, already killed)
+- volume-breakout-long+ LONG: 10T +$0.26 (50%WR — now profitable!)
+- mover+ LONG: 1T +$0.03
+
+**7d Direction:**
+- LONG: 98T 53.1%WR -$1.22 — structural bleed (older signals)
+- SHORT: 109T 53.2%WR +$0.03 — flat
+
+**7d Signal Health:**
+- rr-struct+: 15T 73.3%WR +$0.59 (profitable)
+- mover+: 3T 100%WR +$0.36 (profitable, durable)
+- volume-breakout-long+: 10T 70%WR +$0.26 (improving)
+- trend_purity+: 11T 36.4%WR -$0.90 (old trades, not active)
+- rr-struct-v2+: 10T 40%WR -$0.45 (old trades, not active)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: 2 trades last hour, 1 win 1 loss — no 0%WR cluster
+- pullback-entry- SHORT: 5T -$0.59 24h but 69T 50.7%WR +$0.07 7d — variance
+- volume-breakout-long+: 10T +$0.26 — now profitable, no kill
+- Trade frequency: 2T/hr — healthy
+- ATR SL at 76% — structural, not actionable
+
+**Monitoring:**
+- volume-breakout-long+ improved from -$0.04 → +$0.26 (7d) — good sign
+- mover+ 100%WR +$0.36 7d — performing, watch for durability
+- LONG bleed driven by older inactive signals (trend_purity+, rr-struct-v2+)
+- Only 1 open position (mover+ LONG) — low exposure
+
+**Open Questions:**
+- Is LONG bleed fixable without widening SL? Currently 76% of exits are ATR SL hits
+
 ## [2026-09-18 05:10 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (2 wins, 0 losses)
