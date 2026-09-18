@@ -3383,6 +3383,7 @@ def get_token_amp_class(token):
 PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = False        # KILLED 2026-09-14 auto_1hr — 24T/7d 37%WR -$0.56, 24h 9T 44%WR -$0.40. Consistent loser.
 PUMP_FLOW_MINUS_ENABLED = False       # KILLED 2026-09-14 signal_report — 24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR.
+PUMP_CHAIN_V4_ENABLED = True          # NEW 2026-09-18 — pump-chain with BTC oscillator filter. Blocks LONG at BTC>80 (chasing exhaustion), boosts at 40-80.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
