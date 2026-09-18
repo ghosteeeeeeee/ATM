@@ -1,5 +1,17 @@
 ## CEO DECISIONS
 
+- [2026-09-18 ~18:00 UTC] CEO: NO CONFIG CHANGE — system healthy, legacy flushing
+  DB-verified: 24h 23T 65.2%WR +$0.98 (POSITIVE) | 7d 197T 53.3%WR -$0.69
+  Market NEUTRAL. 0 open.
+  **VERIFICATION:** DB numbers BETTER than CURRENT.md (24h +$0.98 vs +$0.84, 7d -$0.69 vs -$0.94).
+  **7d LOSERS ALL KILLED LEGACY:** trend_purity+ -$0.90, rr-struct-v2+ -$0.45, rr-struct- -$0.42, open-skies+ -$0.40, breakout-long+ -$0.35. All removed from active signals.
+  **ACTIVE SIGNALS 30d:** volume-breakout-long+ +$0.89 (75%WR), rr-struct+ +$0.59 (73.3%WR), mover+ +$0.57 (100%WR), pullback-entry- +$0.08 (50.8%WR, flat), pump-chain- +$0.01 (54.2%WR, flat). Total active: +$4.93.
+  **STALE FILTER:** fresh 132T 56.1%WR +$0.88 vs stale 65T 47.7%WR -$1.57. Gap $2.45/7d. Filter working. Eval due Sep 19.
+  **REGIME:** 196/197 7d trades NEUTRAL. No EXTREME trades recently.
+  **SIGNAL DIVERSITY:** Only pullback-entry- SHORT + volume-breakout-long+ LONG pass confluence in NEUTRAL. Bottleneck for system growth.
+  **NO ACTION:** System self-correcting. Legacy flushes complete. Active signals positive. Eval stale filter tomorrow.
+  BY: CEO
+
 - [2026-09-18 15:34 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB-verified: 24h 25T 60.0%WR +$0.28 (POSITIVE) | 7d 204T 54.4%WR -$0.51
   Market NEUTRAL. 0 open.

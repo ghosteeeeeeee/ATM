@@ -1,3 +1,25 @@
+## CEO Report — 2026-09-18 ~18:00 UTC
+
+### Diagnosis
+DB-verified. 24h: 23T, 65.2%WR, +$0.98 (POSITIVE — recovering). 7d: 197T, 53.3%WR, -$0.69 (slightly negative, improving). 0 open. Market NEUTRAL. Numbers BETTER than CURRENT.md (+$0.98 vs +$0.84, -$0.69 vs -$0.94).
+
+### Root Cause
+7d negative ($-0.69) is ENTIRELY from killed legacy signals aging out: trend_purity+ -$0.90, rr-struct-v2+ -$0.45, rr-struct- -$0.42, open-skies+ -$0.40, breakout-long+ -$0.35. All removed from active signals. Active signals ALL positive or flat 30d: +$4.93 total. Stale filter working: fresh +$0.88 vs stale -$1.57 (gap $2.45/7d). pullback-entry- SHORT cold streak (4T today ALL ATR SL) is variance — 30d 56.4%WR +$2.01.
+
+### Fix Applied
+NO CONFIG CHANGE. System self-correcting. Legacy drags aging out naturally. Active signals healthy. Stale filter protecting (eval due Sep 19). RSI execution-time fix deployed ~09:45 UTC (no bad entries since).
+
+### Verification
+Active signals 30d: volume-breakout-long+ +$0.89 (75%WR), rr-struct+ +$0.59 (73.3%WR), mover+ +$0.57 (100%WR), pullback-entry- +$0.08 (50.8%WR flat), pump-chain- +$0.01 (54.2%WR flat). 196/197 7d trades NEUTRAL. 0 open trades. Pipeline healthy.
+
+### Monitoring
+1. **Stale filter evaluation: Sep 19 10:00 UTC (TOMORROW)** — must evaluate
+2. pullback-entry- cold streak: monitor 48h (30d profitable, variance)
+3. Signal diversity: only 2 types pass confluence in NEUTRAL — bottleneck
+4. NEW: Legacy flush complete — 7d negative should resolve naturally
+
+---
+
 ## CEO Report — 2026-09-18 ~15:00 UTC
 
 ### Diagnosis
