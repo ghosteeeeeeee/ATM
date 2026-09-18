@@ -1,29 +1,37 @@
 === Signal Performance Report ===
-Generated: 2026-09-17 16:00 UTC
-
-Period: Last 6h | 24h
+Period: 2026-09-17 19:45 UTC | Last 6h + 24h
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| open-skies+ | LONG | 20% | -$0.42 | 5 (24h) | KILLED — 36% WR all-time, -$0.73. No regime >50% WR. NEVER_REENABLE. |
+| open-skies+ | LONG | 20.0% | -$0.42 | 5 | ALREADY KILLED (2026-09-17) — 11T/8d 36%WR/-$0.73, No regime >50% WR. NEVER_REENABLE. Confirmed DISABLED_COMPONENT block in pipeline log at 17:12. |
 
 BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No signals meet boost criteria (5+ trades, >55% WR, >$0.05 PnL) |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 20% | -$0.56 | 5 (24h) | WATCH — 89T/58%WR/+$2.60 all-time. 4 losses clustered 20:51-20:57. Drawdown, not dead. |
+| volume-breakout-long+ | LONG | 33.3% | -$0.30 | 3 | WATCH — Only 3 trades total (all today), all in NORMAL regime, all SL hits. Too few trades to kill. Monitor next 24h. |
+| rs-s36,volume-breakout-long+ | LONG | 0.0% | -$0.22 | 1 | WATCH — Combo signal, 1 trade only. Not statistically significant. |
+| btc-pump-rider+ | LONG | 0.0% | -$0.09 | 1 | WATCH — 1 trade only. |
+| r2-trend-short3 | SHORT | 0.0% | -$0.09 | 1 | WATCH — 1 trade only. |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| grind-breakout+ | LONG | 100% | +$0.01 | 1 (24h) | OK — too few trades to evaluate |
+| pullback-entry- | SHORT | 100.0% | +$0.02 | 1 | OK — 1 trade only, not enough data. |
+| grind-breakout+ | LONG | 100.0% | +$0.01 | 1 | OK — 1 trade only, not enough data. |
 
 ISSUES:
-- 24h totals: 14 trades, -$1.37 net, 21.4% WR — rough day
-- No direction inversions detected
-- open-skies+ LONG killed (flags set False, added to NEVER_REENABLE_FLAGS)
-- pullback-entry- LONG was already killed by CEO (2026-09-10), SHORT still active
+- open-skies+ was still firing trades at 17:09-17:11 today despite kill flag being set. DISABLED_COMPONENT block kicked in at 17:12. Trades created at 11:31-14:28 today were from before the kill took effect.
+- volume-breakout-long+ has only 3 trades total — all from today. Needs more data before action.
+- 5 open trades currently active.
+- Low trade volume overall (7 signals, 13 trades in 24h). System is in quiet mode.
+
+SUMMARY:
+- No new kills needed. open-skies+ already killed and confirmed blocked.
+- No boost candidates — no signals with enough volume and positive performance.
+- volume-breakout-long+ is the only signal to watch — needs 7+ more trades before kill threshold.

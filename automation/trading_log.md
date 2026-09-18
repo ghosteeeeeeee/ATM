@@ -1,3 +1,46 @@
+## [2026-09-18 00:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 13T 30.8%WR -$1.09 | **7d:** 221T 50.2%WR -$3.20
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T avg -$0.092 — dominant (77%), all negative
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T avg +$0.010
+
+**24h by Direction:**
+- LONG: 11T 27.3%WR -$1.02 — structural bleed continues
+- SHORT: 2T 50%WR -$0.07 — marginally negative
+
+**24h by Signal:**
+- open-skies+: 5T 20%WR -$0.42 (residual, already killed)
+- volume-breakout-long+: 3T 33%WR -$0.30 — still enabled, no kill criteria
+- btc-pump-rider+: 1T 0%WR -$0.09
+- r2-trend-short3: 1T 0%WR -$0.09
+- rs-s36,volume-breakout-long+: 1T 0%WR -$0.22
+- pullback-entry-: 1T 100%WR +$0.02
+- grind-breakout+: 1T 100%WR +$0.01
+
+**7d Chronic Losers:**
+- pump-chain+: 21T 38%WR -$0.61 (no explicit kill flag)
+- trend_purity+: 11T 36%WR -$0.90 (TREND_PURITY_PLUS_ENABLED=False, residual trades)
+- rr-struct-v2+: 10T 40%WR -$0.45
+
+**Open Positions:** 5 trades (4 SHORT pullback-entry-, 1 LONG volume-breakout-long+)
+
+**Changes:** None — no kill criteria met (0%WR with 3+ trades last hour)
+
+**No Change Needed:**
+- Kill check: no signal meets criteria
+- volume-breakout-long+: only 3T 24h, no0%WR cluster
+- Trade frequency: 0T/hr — quiet period
+- ATR SL structural: 77% of exits, consistent with recent pattern
+
+**Monitoring:**
+- LONG structural bleed persists (11T 27%WR -$1.02 in 24h)
+- pump-chain+ chronic loser (21T 38%WR -$0.61 7d) — no kill flag exists
+- 7d net negative (-$3.20) driven by LONG side
+
 ## [2026-09-17 20:15 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period)
@@ -937,5 +980,66 @@ Final set: ['ENA', 'INJ', 'KAS']
 - 4 pullback-entry- shorts open simultaneously — watching for coordinated reversal
 - ATR SL dominance structural in choppy market
 - Next: watch for breakout from current low-activity period
+
+**BY:** auto_1hr
+
+## [2026-09-17 21:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win)
+**PnL:** $0.02 (WR: 100%)
+
+**24h:** 13T 30.8%WR -$1.09 | **7d:** 225T 51.1%WR -$2.78
+
+**Open:** 4 (ALT SHORT pullback-entry-, AIXBT SHORT pullback-entry-, IO SHORT pullback-entry-, GMX LONG volume-breakout-long+)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T avg -$0.092 — dominant, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 76.9% of closes but avg loss -$0.092 — structural, acceptable
+- Trade frequency: 1/hr — quiet, not overtrading
+- 7d stats improving: 51.1%WR (was 50.9%)
+- accel-300-v4-short-: 3T 0%WR -$0.44 over 7d but all from Sep 11 — stale, not actionable
+- Open trades: all with reasonable SL levels (0.34-1.18%)
+
+**Monitoring:**
+- 24h cold streak easing (30.8%WR vs 18.8% earlier)
+- 3 pullback-entry- shorts open — watching for reversal
+- quiet market conditions — no urgency
+
+**BY:** auto_1hr
+
+## [2026-09-17 22:45 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (WR: N/A)
+
+**24h:** 13T 30.8%WR -$1.09 | **7d:** 224T 50.9%WR -$2.81
+
+**Open:** 5 (GMX LONG volume-breakout-long+, IO/AIXBT/ALT/IMX SHORT pullback-entry-)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 10T avg -$0.092 — dominant, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 77% of closes but avg loss -$0.092 — structural, acceptable in chop
+- Trade frequency: 0/hr — quiet
+- 7d WR stable at 50.9%
+- Open trades: all SHORT positions profitable, SL levels reasonable (0.3-1.1%)
+
+**Monitoring:**
+- 4 pullback-entry- shorts open — watching for coordinated reversal
+- ATR SL dominance structural in current chop
+- Next: watch for breakout or trend development
 
 **BY:** auto_1hr

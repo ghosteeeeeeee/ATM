@@ -65,13 +65,13 @@ SIGNAL_OVERRIDES = {
     'continuation_short': 'MOMENTUM',
     'r2_trend_long': 'MOMENTUM',
     'r2_trend_short': 'MOMENTUM',
+    'open_skies': 'MOMENTUM',              # breakout signal — fails in chop (reclassified 2026-09-17)
+    'open_skies_long': 'MOMENTUM',         # breakout signal — fails in chop (reclassified 2026-09-17)
 
     # Mean-reversion signals — always allowed
     'bb_bounce_v2_long': 'MEAN_REVERSION',
     'bb_bounce_long': 'MEAN_REVERSION',
     'bb_bounce_short': 'MEAN_REVERSION',
-    'open_skies': 'MEAN_REVERSION',
-    'open_skies_long': 'MEAN_REVERSION',
     'range_reversion_long': 'MEAN_REVERSION',
     'return_exhaustion_long': 'MEAN_REVERSION',
     'return_exhaustion_short': 'MEAN_REVERSION',

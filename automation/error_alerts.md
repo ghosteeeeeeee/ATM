@@ -1,5 +1,9 @@
 # Error Alerts
 
+## Error Alerts — 2026-09-17 23:44 UTC
+- **WARN** (1x): `disk_usage` — disk at 84% (19G free), approaching 85% threshold. Monitor and compress old logs if it rises.
+- **INFO**: `macro_gate_reduce` — macro gate REDUCE active (wr=20% < 30), system correctly throttling entries.
+
 ## Error Alerts — 2026-09-17 13:43 UTC
 - **OK**: Pipeline health check passed. No WARN or CRITICAL issues detected.
 - Pipeline running (cycle #203864), 10 active signals, 0 open trades, 83% disk.

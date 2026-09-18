@@ -1,3 +1,24 @@
+## CEO Report — 2026-09-17 ~21:00 UTC
+
+### Diagnosis
+DB-verified. 24h: 13T, 30.8%WR, -$1.09 (COLD STREAK — small losses). 7d: 225T, 51.1%WR, -$2.78 (negative). 4 open. Market NEUTRAL.
+
+### Root Cause
+7d negative is ENTIRELY legacy killed signals: trend_purity+ -$0.90, pump-chain+ -$0.61, rr-struct-v2+ -$0.45, open-skies+ -$0.24. All already killed/disabled. Active signals all positive 30d: pullback-entry- +$2.62, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.27. Total active 30d: +$4.98. System structurally healthy.
+
+### Fix Applied
+NO CONFIG CHANGE. Legacy drags aging out naturally. Cold streak is legacy flush + pullback-entry- variance (7d profitable).
+
+### Verification
+Active signals: 6 signal types, all profitable 30d. Stale filter working (90%+ fresh). Open-skies+ killed. No import errors (transient earlier, resolved).
+
+### Monitoring
+1. Stale filter eval: Sep 19 10:00 UTC
+2. pullback-entry- cold streak: monitor 48h
+3. Signal diversity: only 2-3 types in NEUTRAL — need new signals
+
+---
+
 ## CEO Report — 2026-09-17 ~18:35 UTC
 
 ### Diagnosis

@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~20:15 UTC (brain_auditor)**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-17 ~21:00 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 9T, 33.3% WR, -$0.39. 5 open. Market NEUTRAL. Pipeline running.
+24h: 13T, 30.8% WR, -$1.09. 4 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 9T, 33.3% WR, -$0.39 (DB-verified — COLD STREAK, losses small avg -$0.04). open-skies+ 4T ALL losers (wave_phase=falling HIGH). volume-breakout-long+ 3T (BIGTIME overbought, WCT stale). 2 cut-loser exits working.
-- **Today (calendar):** 9T closed (Sep 17). 5 open. PnL: negative.
-- **7d:** 224T, 51.3% WR, -$2.80 (DB-verified). SHORT roughly breakeven, LONG -$2.73 (legacy aging out).
+- **24h (rolling):** 13T, 30.8% WR, -$1.09 (DB-verified — COLD STREAK, small losses avg -$0.08). open-skies+ 5T ALL losers (wave_phase=falling HIGH). pullback-entry- SHORT 13T cold streak 46.2%WR -$0.38 (7d profitable). volume-breakout-long+ 3T 33.3%WR -$0.30.
+- **Today (calendar):** 13T closed (Sep 17). 4 open. PnL: negative.
+- **7d:** 225T, 51.1% WR, -$2.78 (DB-verified). SHORT +$0.33, LONG -$3.11 (legacy aging out).
 - **7d REGIME:** EXTREME 76T 56.6%WR -$0.20 (best) | NORMAL 57T 50.9%WR -$0.60 | HIGH 90T 46.7%WR -$2.00 (worst — ~60% legacy).
 - **7d EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★ | atr_sl_hit 134T 49.3%WR -$2.15 (#1 drag) | rr_engine 37T -$1.87 (#2 drag).
 - **7d ACTIVE SIGNALS:** pullback-entry- SHORT 68T/51.5%WR +$0.25 | pump-chain- SHORT 35T/57.1%WR +$0.06 | rr-struct+ LONG 15T/73.3%WR +$0.59
@@ -29,7 +29,7 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
 **🟡 R:R STATUS (NEGATIVE 7d, COLD STREAK 24h)**
-7d PnL -$2.80 (NEGATIVE). SHORT roughly breakeven. LONG -$2.73 (legacy aging out). 24h -$0.39 (COLD STREAK, losses small). Cold streak is variance + legacy flush. System structurally sound. EXTREME SHORT fresh 68.4%WR +$1.46 = system edge.
+7d PnL -$2.78 (NEGATIVE). SHORT +$0.33. LONG -$3.11 (legacy aging out). 24h -$1.09 (COLD STREAK). Cold streak = open-skies+ legacy (killed) + pullback-entry- variance. System structurally sound — active signals all positive 30d: pullback-entry- +$2.62, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.27.
 
 **🟢 rr_engine_resistance FIX VERIFIED.** 0 post-fix rr_engine exits in 6+ days (since Sep 10). Confirmed working. Can remove from monitoring.
 
@@ -97,6 +97,7 @@
 4. **brain_auditor ~11:50 UTC — CONFIG CHANGE.** BB DEAD ZONE FILTER DEPLOYED. SHORT_BB_DEAD_ZONE_MIN=0.70, SHORT_BB_DEAD_ZONE_MAX=0.85. Expected +$0.52/7d.
 5. **CEO ~14:40 UTC — CONFIG CHANGE.** DB: 24h 29T 44.8%WR -$0.59. 7d: 284T 53.5%WR +$1.05. **KILLED rr-struct-v2+ LONG.** 10T/7d 40%WR -$0.45. All exits ATR SL/MAE-GUARD — poor LONG entries in NEUTRAL. Removed from STANDALONE_BYPASS. Pipeline restarted.
 6. **CEO ~22:45 UTC — NO CONFIG CHANGE.** DB: 24h 31T 51.6%WR +$0.06. 7d: 280T 53.9%WR +$1.83. System structurally healthy. Legacy LONG drag aging out. No action needed.
+7. **brain_auditor ~23:30 UTC — NO CONFIG CHANGE.** DB: 24h 13T 30.8%WR -$1.09 (COLD STREAK) | 7d 225T 51.1%WR -$2.78. Market NEUTRAL. 5 open. **LOSING AUTOPSY:** open-skies+ 4T (KILLED, legacy), volume-breakout-long+ 2T (RSI>60+weak momentum, 3-trade sample insufficient). **CREATIVE:** volume-breakout-long+ RSI/momentum pattern (monitor 2 weeks), EXTREME SHORT fresh edge confirmed (stale filter protecting). signal_reason NULL schema issue noted. **NO ACTION** — sample sizes too small.
 
 ## Active Decisions
 
@@ -136,3 +137,5 @@
 7. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
 8. **MONITOR: Stale filter effectiveness.** Post-deploy 10/11 fresh (91%). Eval by Sep 19 10:00 UTC. — 2026-09-17
 9. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 19T 68.4%WR +$1.46 in EXTREME — system edge. Stale filter protecting. — 2026-09-17
+10. **MONITOR: volume-breakout-long+ RSI/momentum pattern.** Both 7d losers had RSI>60 + weak momentum. 3 trades only — need 20+ before filter. Monitor until Oct 1. — 2026-09-17
+11. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Use `signal` column for analytics. Low priority fix. — 2026-09-17

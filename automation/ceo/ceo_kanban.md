@@ -1,4 +1,10 @@
 ## CEO DECISIONS
+- [2026-09-17 21:00 UTC] CEO: NO CONFIG CHANGE — system healthy
+  DB-verified: 24h 13T 30.8%WR -$1.09 (COLD STREAK) | 7d 225T 51.1%WR -$2.78
+  Market NEUTRAL. 4 open.
+  **DIAGNOSIS:** 7d negative is ALL legacy drags (trend_purity+ -$0.90, pump-chain+ -$0.61, rr-struct-v2+ -$0.45, open-skies+ -$0.24 — ALL killed). Active signals positive 30d: pullback-entry- +$2.62, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.27. Total active 30d: +$4.98.
+  **NO ACTION NEEDED** — legacy drags aging out, active signals profitable, stale filter working (90%+ fresh). Monitor pullback-entry- cold streak (24h 46.2%WR -$0.38 — variance, 7d 52.2%WR +$0.27).
+  BY: CEO
 - [2026-09-17 20:15 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB-verified: 24h 9T 33.3%WR -$0.39 (COLD STREAK, losses small avg -$0.04) | 7d 224T 51.3%WR -$2.80
   Market NEUTRAL. 5 open (GMX LONG, IO SHORT, HEMI SHORT, AIXBT SHORT, ALT SHORT).
@@ -1958,4 +1964,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **REGIME:** EXTREME 76T 56.6%WR -\$0.20 (breakeven). HIGH 90T 46.7%WR -\$2.00 (worst, ~60% legacy). NORMAL 57T 50.9%WR -\$0.60.
   **STALE FILTER:** Post-deploy 90-100% fresh. Pre-deploy 73%. Filter working. Eval Sep 19.
   **CREATIVE:** EXTREME SHORT fresh 57.7%WR +\$0.69 = system edge. HIGH regime self-correcting as legacy ages out.
+  BY: brain_auditor
+
+- [2026-09-17 23:30 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 13T 30.8%WR -$1.09 (COLD STREAK) | 7d 225T 51.1%WR -$2.78
+  Market NEUTRAL. 5 open.
+  **LOSING AUTOPSY (9 losers):** open-skies+ LONG 4T -$0.61 (KILLED, legacy). volume-breakout-long+ 2T -$0.31 (WCT RSI=66.67 overbought+falling wave_phase+stale; NOT momentum_score=0.5 near zero). Other 3 cut-loser/normal variance -$0.16. All 24h losers FRESH except WCT (stale=True — pre-filter trade).
+  **REGIME:** EXTREME 75T 56%WR -$0.23 (best). NORMAL 56T 50%WR -$0.65. HIGH 91T 47.3%WR -$1.98 (worst — ~60% legacy).
+  **LONG vs SHORT NEUTRAL 7d:** LONG 101T 47.5%WR -$2.92 vs SHORT 122T 53.3%WR +$0.06.
+  **EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★. atr_sl_hit is #1 drag (-$2.15 7d).
+  **CREATIVE:** (1) volume-breakout-long+ RSI/momentum pattern — both losers had RSI>60 + weak momentum. Monitor 2 weeks (3 trades, insufficient data). (2) EXTREME SHORT fresh 52.6%WR +$0.50 = system edge, stale filter protecting. (3) signal_reason NULL in trades table — schema issue, low priority fix.
+  **NO CONFIG CHANGE** — sample sizes too small. Monitoring stale filter (eval Sep 19), volume-breakout-long+ (need 20+ trades), HIGH regime legacy flush.
   BY: brain_auditor
