@@ -1074,3 +1074,102 @@ Final set: ['ENA', 'INJ', 'KAS']
 - rr-struct+: 15T/7d 73.3%WR +$0.59 — star performer
 
 **BY:** auto_1hr
+
+## [2026-09-18 02:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.16 (WR: 0%)
+
+**24h:** 16T 18.8%WR -$1.89 | **7d:** 223T 49.3%WR -$3.74
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 13T avg -$0.132 — dominant, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Open:** 1 (GMX LONG volume-breakout-long+)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 81.2% of 24h closes but avg loss -$0.132 — structural in chop, already at 1.3% floor
+- Trade frequency: 1/hr — quiet
+- 7d WR stable at 49.3%
+- Consecutive negative hours: 2 (total -$0.61) — not meaningful enough to reduce size
+- ema300-dip-long (2T/7d 0%WR) and accel-300-v4-short- (2T/7d 0%WR) — below kill threshold
+
+**Monitoring:**
+- IMX SHORT pnl_pct data anomaly (-731.73%) — actual loss -1.47%, tiny position ($11.10)
+- Cold streak: 24h WR 18.8% vs 7d 49.3% — variance, not signal failure
+- ATR SL floor at 1.3% already raised from 1.2% on Sep 14 — further widening risks larger losses in trend reversals
+- rr-struct+ remains star performer: 15T/7d 73.3%WR +$0.59
+
+**BY:** auto_1hr
+
+## [2026-09-18 03:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed, 3 open (WLD LONG, CAKE LONG, GMX LONG)
+**24h:** 15T 3W 12L (20.0%WR) $-1.67 | **7d:** 222T 109W 113L (49.1%WR) $-3.92
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 12T avg -$0.125 — dominant, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Signal 24h:**
+- pullback-entry-: 5T 1W $-0.59
+- open-skies+: 4T 0W $-0.61 (already killed)
+- volume-breakout-long+: 3T 1W $-0.30
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 80% of 24h closes but avg loss -$0.125 — structural in chop
+- Trade frequency: 0/hr — quiet
+- Cold streak: 20%WR 24h vs 49.1% 7d — variance, losses are tiny
+
+**Monitoring:**
+- 3 open trades: CAKE +61% (r2-trend-long8), WLD -48%, GMX -17%
+- 7d WR stable at 49.1%
+- No consecutive negative hours with meaningful losses
+
+**BY:** auto_1hr
+
+## [2026-09-18 04:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 15T 3W 20.0%WR $-1.67 | **7d:** 218T 109W 50.0%WR $-3.32
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 12T avg -$0.125 — 80% of closes, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Signal 24h:**
+- pullback-entry-: 5T 1W $-0.59 (all SHORT ATR SL hits, choppy market)
+- open-skies+: 4T 0W $-0.61 (KILLED)
+- volume-breakout-long+: 3T 1W $-0.30
+
+**Open Trades (4):**
+- GMX LONG: +$1.78% unrealized, 11h old, SL 0.88% below current (tight)
+- CAKE LONG: +$0.72% unrealized, 2h old
+- WLD LONG: +$2.37% unrealized, 1.4h old
+- YGG LONG: -$0.17% unrealized, 0.6h old
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 80% of 24h closes but avg loss -$0.125 — structural in chop
+- Trade frequency: 0/hr — quiet
+- Cold streak: 20%WR 24h vs 50.0% 7d — variance, losses tiny
+
+**Monitoring:**
+- GMX open 11h — longest open trade, SL tight at 0.88%
+- All open trades have NULL last_updated — pipeline not updating open trade prices
+- 4 open trades all LONG in current regime — directional concentration
+- 7d WR stable at 50.0%
+
+**BY:** auto_1hr
