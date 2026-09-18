@@ -253,7 +253,7 @@ VOL_PHASE_MULTS = {
     ('HIGH', '*'): {
         'Coiled_Spring': 0.0,    # BLOCKED — coiled_spring 33% WR in HIGH, wins in NORMAL
         'Trendline': 0.3,        # PENALIZED — tl_break 33% WR in HIGH, wins in NORMAL
-        'Pullback_Entry': 0.5,   # PENALIZED — pullback_entry- 47% WR -$0.38/7d in HIGH, wins in EXTREME (64%). Updated 2026-09-18
+        'Pullback_Entry': 0.0,   # BLOCKED — pullback-entry- 33% WR -$0.30/24h in HIGH, 0% WR -$0.29 in NORMAL. Wins only EXTREME (65% WR). 2026-09-18
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in HIGH
         'R2_Structural': 0.0,    # BLOCKED — rr-struct- 4T 25%WR -$0.41 in HIGH, wins in NORMAL. Key fixed 2026-09-13 (was R2_Structural, already matched but value stands)
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
