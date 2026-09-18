@@ -279,7 +279,12 @@ LOSERS_SHORT = {
     'DOT', 'ZRO'
 }
 # Legacy combined set
-LOSERS = LOSERS_LONG | LOSERS_SHORT
+LOSERS = {
+    'DOT',
+    'HYPER',
+    'INJ'
+}
+
 
 
 
@@ -1426,7 +1431,7 @@ SIGNAL_EXIT_CONFIG = {
     'ema300-breakthrough+': 'atr',
     'ema300-breakthrough-': 'atr',
     # Pullback entry: structural exit
-    'pullback-entry+': 'rr_engine',
+    'pullback-entry+': 'atr',  # Changed from rr_engine — use ATR SL for consistency
     'pullback-entry-': 'atr',  # Changed from rr_engine 2026-09-15 — rr_engine exits SHORT on resistance touch at 38.1% WR vs ATR SL at 69% WR
     # Accel 300 V3 SHORT: structural exit
     'accel-300-v3-short+': 'rr_engine',
@@ -1483,7 +1488,7 @@ CL_TIER1_MIN_PCT      = -2.0    # tightened 2026-09-15 — was -3.0, trades blee
 CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
-CL_TIER1_FIRE_WINDOWS = {"A": (1, 2), "B": (1, 2)}  # CEO Sep 9: tightened from (3,6)
+CL_TIER1_FIRE_WINDOWS = {"A": (2, 3), "B": (2, 3)}  # brain_auditor Sep 18: widened from (1,2) — 0% WR, cutting too early
 
 # Tier 2: Deep Cut — -1.5% to -3.0%, fires less frequently
 CL_TIER2_MIN_PCT      = -3.0    # floor (tightened from -5.0% — hard stop catches below this)
