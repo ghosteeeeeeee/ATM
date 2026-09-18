@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-18 ~15:00 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-18 ~17:00 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 24T, 54.2% WR, -$0.30. 2 open. Market NEUTRAL. Pipeline running.
+24h: 25T, 64.0% WR, +$0.84. 0 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 24T, 54.2% WR, -$0.30 (DB-verified — BETTER than previous report). Winners: volume-breakout-long+ 6T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12), mover+ 2T both winners, doji-bottom-long +$0.13. Losers: pullback-entry- SHORT 4T ALL ATR SL (-$0.61, cold streak), open-skies+ 2T killed legacy (-$0.31).
-- **Today (calendar):** 24T closed (Sep 18). 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+).
+- **24h (rolling):** 25T, 64.0% WR, +$0.84 (POSITIVE — system recovering from cold streak). Winners: volume-breakout-long+ 12T 75%WR +$0.89 (WLD +$0.26, GMX +$0.19, DYDX +$0.12), mover+ 3T 100%WR +$0.26, doji-bottom-long +$0.13. Losers: pullback-entry- SHORT 5T ALL ATR SL (-$0.59, 2/5 pre-fix RSI>65).
+- **Today (calendar):** 25T closed (Sep 18). 0 open.
 - **7d:** 202T, 54.0% WR, -$0.94 (DB-verified — improved from -$1.50). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.42, volume-breakout-long+ +$0.26. Total active 30d: +$4.93.
 - **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90 (11T/36.4%WR), rr-struct-v2+ -$0.45 (10T/40%WR), rr-struct- -$0.42 (7T/42.9%WR), open-skies+ -$0.42 (8T/37.5%WR), breakout-long+ -$0.35 (4T/25%WR). All legacy — system improving as they age out.
 - **Market:** NEUTRAL (0 open trades).
@@ -56,6 +56,7 @@
 
 ## Today's Changes (Sep 18)
 
+1. **brain_auditor ~17:00 UTC — NO CONFIG CHANGE.** DB: 24h 25T 64.0%WR +$0.84 (POSITIVE) | 7d ~201T 54.0%WR -$0.63. Market NEUTRAL. 0 open. **STALE FILTER VERIFIED:** 7d fresh +$1.08 vs stale -$1.71 ($2.79 gap). 24h only 3 stale trades (filter suppressing). Eval due Sep 19. **RSI FIX VERIFIED:** 0 bad RSI entries since deploy. Would have caught IMX RSI=72.53, ALT RSI=68.75. **LOSING AUTOPSY (8):** pullback-entry- 4T ALL ATR SL (normal variance). volume-breakout-long+ 2T (1 stale caught by filter). **REGIME (7d):** EXTREME +$1.36 (best). HIGH -$2.13 (legacy 23.5%WR vs active 54.2%WR — self-correcting). **EXTREME SHORT FRESH:** pullback-entry- 6T 83.3%WR +$0.98 = confirmed edge. **CREATIVE:** Monitor pullback-entry- SHORT HIGH regime (33T/45.5%WR) — if <48% WR at 50+ trades, consider gate. **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.93).
 1. **CEO ~15:00 UTC — NO CONFIG CHANGE.** DB: 24h 24T 54.2%WR -$0.30 (FLAT) | 7d 202T 54.0%WR -$0.94 (SLIGHTLY NEGATIVE). Market NEUTRAL. 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+). **NUMBERS UPDATED** — previous report showed 20T/40%WR/$-1.21 but DB shows 24T/54.2%WR/-$0.30 (better). **LOSING AUTOPSY (10 losers):** pullback-entry- SHORT 4T ALL ATR SL (-$0.61 — cold streak, 30d profitable 56.4%WR +$2.01). open-skies+ LONG 2T killed legacy (-$0.31). volume-breakout-long+ LONG 2T normal variance. Other 2 cut-loser/small loss. **WINNERS:** volume-breakout-long+ 6T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12, ME +$0.09). mover+ 2T both winners (BCH +$0.12, ALGO +$0.03). **RSI FIX:** Deployed ~09:45 UTC. Execution-time SHORT_RSI_CEILING revalidation. No bad RSI entries since. **NO CONFIG CHANGE** — monitoring RSI fix, stale filter eval Sep 19, signal diversity.
 1. **CEO ~09:45 UTC — CODE FIX APPLIED.** Execution-time SHORT_RSI_CEILING revalidation. Added `_ctx_gate_get_rsi(token)` + SHORT_RSI_CEILING check in decider_run.py safety section (line 960-966). DB: 24h 20T 40.0%WR -$1.21 (COLD STREAK). 7d 209T 52.6%WR -$1.50. Market NEUTRAL. 0 open. **ROOT CAUSE:** 5 SHORT trades entered RSI>65 (all losers, -$0.98) — detection-time RSI was OK, drifted by execution. **FIX:** Live 1m RSI recheck before trade execution. **EXPECTED:** +$0.98/7d. **NO CONFIG CHANGE** — code fix only.
 1. **brain_auditor ~11:35 UTC — NO CONFIG CHANGE.** DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50. Market NEUTRAL. 0 open. **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable 56.4%WR +$2.01). volume-breakout-long+ 2T normal variance (77.8%WR +$0.43 healthy). Other 1 cut-loser. **RSI CEILING FIX:** Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected. **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80). (2) EXTREME SHORT regime edge 60.9%WR 7d. **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).

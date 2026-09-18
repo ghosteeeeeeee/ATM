@@ -1526,3 +1526,32 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - pullback-entry- SHORT historically bad but 7d break-even (variance)
 
 **BY:** auto_1hr
+
+## [2026-09-18 15:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins)
+**PnL:** +$0.12 | **24h:** 24T 15W 62.5%WR +$0.53 | **7d:** 201T 108W 53.7%WR -$0.81
+
+**Open (2):**
+- W LONG volume-breakout-long+ — 0.1h
+- NOT SHORT pullback-entry- — 0.4h
+
+**Signal 24h:**
+- volume-breakout-long+: 11T 8W 73%WR +$0.58 — strong
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all pre-RSI fix SHORT losers)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 17/24h closes (71%) but net +$0.11 — trailing converting some to wins
+- RSI ceiling fix: 0 SHORT losers since 12:00 UTC — holding
+- Trade frequency: ~1/hr — appropriate for NEUTRAL
+- 24h PnL turned positive (+$0.53) — improving
+
+**Monitoring:**
+- W and NOT open, trailing
+- 7d WR stable at 53.7%
+
+**BY:** auto_1hr

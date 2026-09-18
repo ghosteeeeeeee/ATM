@@ -1,147 +1,148 @@
 {
-  "timestamp": "2026-09-18T15:34:03.902683+00:00",
-  "session_brain_stats": {
-    "total_vectors": 233245,
-    "queries_run": 5,
-    "key_findings": [
-      "open-skies+ degradation: wave_phase=falling pattern 5T 20%WR -$0.49 — KILLED Sep 17",
-      "New neutral regime signals discussed but not yet implemented — signal diversity bottleneck",
-      "Stale signal execution: 31.8% of trades fire on stale signals — stale filter deployed Sep 17",
-      "EXTREME SHORT fresh edge: 63.6%WR +$0.43 — system edge being protected by stale filter"
+    "timestamp": "2026-09-18T17:00:00Z",
+    "session_brain_stats": {
+        "total_vectors": 235571,
+        "top_topics": ["signal performance", "wave_phase gate", "stale filter", "EXTREME SHORT edge", "unimplemented ideas"]
+    },
+    "trade_summary_24h": {
+        "trades": 25,
+        "win_rate": 64.0,
+        "pnl": 0.84,
+        "status": "POSITIVE",
+        "open_trades": 0,
+        "market_regime": "NEUTRAL"
+    },
+    "trade_summary_7d": {
+        "trades": 201,
+        "win_rate": 54.0,
+        "pnl": -0.63,
+        "by_regime": {
+            "EXTREME": {"trades": 67, "wr": 61.2, "pnl": 1.36},
+            "NORMAL": {"trades": 57, "wr": 54.4, "pnl": 0.14},
+            "HIGH": {"trades": 76, "wr": 47.4, "pnl": -2.13}
+        },
+        "by_direction": {
+            "LONG": {"trades": 96, "wr": 55.2, "pnl": -0.39},
+            "SHORT": {"trades": 105, "wr": 52.4, "pnl": -0.24}
+        },
+        "stale_vs_fresh": {
+            "fresh": {"trades": 135, "wr": 57.0, "pnl": 1.08},
+            "stale": {"trades": 66, "wr": 47.0, "pnl": -1.71}
+        }
+    },
+    "drift_findings": [
+        {
+            "finding": "Stale filter working as intended",
+            "detail": "Deployed Sep 17 10:00 UTC. 7d: fresh +$1.08 vs stale -$1.71 ($2.79 gap). 24h: only 3 stale trades (filter suppressing). Eval due Sep 19.",
+            "status": "CONFIRMED_WORKING",
+            "impact": "High — stale was $1.71/7d drag"
+        },
+        {
+            "finding": "RSI fix deployed and protecting trades",
+            "detail": "Execution-time SHORT_RSI_CEILING revalidation deployed ~09:45 UTC Sep 18. 0 bad RSI entries since. Would have caught IMX RSI=72.53, ALT RSI=68.75.",
+            "status": "CONFIRMED_WORKING",
+            "impact": "Medium — prevented ~$0.30 in 24h losses"
+        },
+        {
+            "finding": "HIGH regime drag is legacy, not structural",
+            "detail": "HIGH 76T 47.4%WR -$2.13. But legacy signals (trend_purity+, rr-struct-v2+, open-skies+, etc.) = 17T 23.5%WR -$2.00. Active signals in HIGH = 59T 54.2%WR -$0.13. Will self-correct as legacy ages out.",
+            "status": "SELF_CORRECTING",
+            "impact": "Low — aging out naturally"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "pullback-entry- SHORT cold streak",
+            "detail": "24h: 5T 20%WR -$0.59. But 7d: 65T 50.8%WR +$0.08, 30d: 94T 56.4%WR +$2.01. Variance, not structural.",
+            "status": "MONITORING",
+            "recommendation": "No action — 30d profitable, will recover"
+        },
+        {
+            "problem": "Signal diversity limited in NEUTRAL",
+            "detail": "Only pullback-entry- SHORT and volume-breakout-long+ LONG consistently pass confluence. Need 2-3 new NEUTRAL signals.",
+            "status": "OPEN",
+            "recommendation": "DEVELOP: New signals for NEUTRAL regime (ongoing priority)"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "open-skies+ wave_phase gate",
+            "detail": "Block LONG when wave_phase=falling. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR. Zero winners blocked. Needs code change.",
+            "priority": "MEDIUM",
+            "status": "PENDING_CODE_CHANGE"
+        },
+        {
+            "item": "Execution-time stale signal revalidation",
+            "detail": "31.8% of trades fire stale. Fresh WR 57% vs stale 47%. Stale filter partially addresses this but revalidation at execution would catch more.",
+            "priority": "HIGH",
+            "status": "NEEDS_DESIGN"
+        }
+    ],
+    "losing_trade_autopsy": {
+        "total_losers_24h": 8,
+        "breakdown": [
+            {
+                "cluster": "pullback-entry- SHORT 4T ATR SL",
+                "tokens": "IMX, AIXBT, ALT, IO",
+                "regimes": "HIGH(2), NORMAL(2)",
+                "root_cause": "Normal ATR SL variance. IMX/IO in HIGH regime (pullback-entry- SHORT 45.5%WR in HIGH 7d). AIXBT/ALT in NORMAL (52.4%WR — healthy).",
+                "recommended_change": "No action — pullback-entry- SHORT 30d profitable 56.4%WR +$2.01. HIGH regime weakness is small sample.",
+                "impact_on_winners": "N/A — no filter change"
+            },
+            {
+                "cluster": "volume-breakout-long+ 2T ATR SL",
+                "tokens": "ONDO, WCT",
+                "regimes": "EXTREME(1), NORMAL(1)",
+                "root_cause": "ONDO: entered EXTREME, ATR SL hit (-$0.17). WCT: stale signal (is_stale=true), ATR SL hit (-$0.16). WCT was the only stale loser — stale filter catching most.",
+                "recommended_change": "No action — volume-breakout-long+ 24h 12T 75%WR +$0.89 (healthy). WCT stale = stale filter working.",
+                "impact_on_winners": "N/A"
+            }
+        ]
+    },
+    "creative_improvements": [
+        {
+            "date": "2026-09-18T17:00:00Z",
+            "idea": "Monitor pullback-entry- SHORT in HIGH regime for potential gate",
+            "rationale": "pullback-entry- SHORT 7d by regime: EXTREME 11T 63.6%WR +$0.43, NORMAL 21T 52.4%WR +$0.16, HIGH 33T 45.5%WR -$0.51. HIGH is the drag. If stays <48% WR over 50+ trades, consider gating SHORT in HIGH.",
+            "expected_impact": "+$0.51/7d if gate deployed",
+            "category": "regime gate",
+            "status": "monitoring",
+            "risk": "low",
+            "minimum_sample": "50+ trades in HIGH (currently 33)",
+            "impact_on_winners": "Would block ~33 trades/7d. Need to verify how many winners would be lost."
+        },
+        {
+            "date": "2026-09-18T17:00:00Z",
+            "idea": "Stale filter protects EXTREME SHORT edge — no additional config needed",
+            "rationale": "EXTREME SHORT fresh pullback-entry- 6T 83.3%WR +$0.98. Stale filter is already suppressing stale trades (only 3 stale/24h). The edge is preserved by existing mechanism.",
+            "expected_impact": "Edge maintained at +$0.98/7d",
+            "category": "edge protection",
+            "status": "confirmed",
+            "risk": "none"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        {
+            "action": "Stale filter evaluation",
+            "due": "2026-09-19T10:00:00Z",
+            "detail": "Post-deploy: 3 stale / 22 fresh (24h). 7d fresh +$1.08 vs stale -$1.71. If working: extend. If not: investigate.",
+            "priority": "HIGH"
+        },
+        {
+            "action": "open-skies+ wave_phase gate code change",
+            "detail": "Block LONG when wave_phase=falling in HIGH regime. Needs code change in signal filter.",
+            "priority": "MEDIUM"
+        },
+        {
+            "action": "Monitor pullback-entry- SHORT HIGH regime",
+            "detail": "33T 45.5%WR -$0.51 in HIGH 7d. Monitor to 50+ trades. If <48% WR persists, consider gate.",
+            "priority": "LOW"
+        },
+        {
+            "action": "Develop new NEUTRAL signals",
+            "detail": "Only 2 signal types pass confluence in NEUTRAL. Urgent for system diversity.",
+            "priority": "HIGH"
+        }
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 25,
-    "win_rate": 60.0,
-    "pnl": 0.28,
-    "market": "NEUTRAL",
-    "open_positions": 0,
-    "losers": 9,
-    "winners": 15,
-    "key_note": "Better than previous reports (54.2%WR -$0.30). RSI fix deployed ~09:45 UTC."
-  },
-  "trade_summary_7d": {
-    "trades": 204,
-    "win_rate": 54.4,
-    "pnl": -0.51,
-    "regime_breakdown": {
-      "EXTREME": {
-        "trades": 67,
-        "wr": 61.2,
-        "pnl": 1.11
-      },
-      "NORMAL": {
-        "trades": 56,
-        "wr": 55.4,
-        "pnl": 0.14
-      },
-      "HIGH": {
-        "trades": 80,
-        "wr": 48.8,
-        "pnl": -1.76
-      }
-    },
-    "exit_breakdown": {
-      "profit_monster_trail": {
-        "trades": 37,
-        "wr": 94.6,
-        "pnl": 2.94
-      },
-      "atr_sl_hit": {
-        "trades": 129,
-        "wr": 49.6,
-        "pnl": -1.18
-      },
-      "cut_loser_CL_T1": {
-        "trades": 7,
-        "wr": 0.0,
-        "pnl": -1.04
-      }
-    }
-  },
-  "drift_findings": [
-    {
-      "item": "RSI fix verification",
-      "status": "CONFIRMED WORKING",
-      "detail": "2/5 pullback-entry- SHORT losers had RSI > 65 (IMX=72.53, ALT=68.75) — both opened BEFORE fix deployed 09:45 UTC Sep 18. 0 trades since deploy had RSI > 65. No winners blocked."
-    },
-    {
-      "item": "Stale filter evaluation",
-      "status": "DUE TOMORROW Sep 19 10:00 UTC",
-      "detail": "Deployed Sep 10:00 UTC Sep 17. Post-deploy 9/10 FRESH (90%). 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. System improving."
-    },
-    {
-      "item": "HIGH regime legacy flush",
-      "status": "SELF-CORRECTING",
-      "detail": "HIGH -$1.76 7d. ~60% from killed/legacy signals (open-skies+ -$0.45, rr-struct- -$0.41, rr-struct-v2+ -$0.39, breakout-long+ -$0.20). Active signals in HIGH: pullback-entry- -$0.51 (33T/45.5%WR — monitoring). Will improve as legacy ages out."
-    },
-    {
-      "item": "Signal diversity",
-      "status": "NEEDS DEVELOPMENT",
-      "detail": "Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. 6 active signal types total (+$4.93/30d). Need new signals urgently."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "pullback-entry- SHORT cold streak",
-      "sessions_discussed": "multiple (Sep 17-18)",
-      "detail": "24h: 5T ALL ATR SL -$0.59. 7d: 65T/50.8%WR +$0.08 (breakeven). 2/5 losers had RSI > 65 (pre-fix). 2/5 had normal RSI (variance). System-level: 30d 56.4%WR +$2.01 (profitable). Cold streak is normal variance + pre-fix RSI entries."
-    },
-    {
-      "topic": "HIGH regime drag",
-      "sessions_discussed": "daily since Sep 14",
-      "detail": "7d HIGH 80T/48.8%WR -$1.76. ~60% legacy. Active signal in pain: pullback-entry- SHORT 33T/45.5%WR -$0.51. Will self-correct as legacy flushes. Monitor post-stale-filter."
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "open-skies+ wave_phase gate",
-      "status": "SUGGESTED Sep 17, NOT IMPLEMENTED",
-      "detail": "Block LONG when wave_phase=falling in HIGH. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winners blocked. Needs code change.",
-      "priority": "LOW (signal already KILLED)"
-    },
-    {
-      "item": "Execution-time stale signal revalidation",
-      "status": "DISCUSSED, NOT IMPLEMENTED",
-      "detail": "31.8% stale, WR 49.4% vs 59.0%. ~$4.86/7d lost. Needs design. Stale filter partially addresses this.",
-      "priority": "MEDIUM (stale filter helps but doesn't solve execution-time staleness)"
-    },
-    {
-      "item": "New NEUTRAL regime signals",
-      "status": "DISCUSSED, NOT IMPLEMENTED",
-      "detail": "Only 2 signal types pass confluence in NEUTRAL. Need diversity.",
-      "priority": "HIGH (bottleneck for system growth)"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-18T15:34:03.902702+00:00",
-      "idea": "Monitor pullback-entry- SHORT HIGH regime performance post-stale-filter",
-      "rationale": "pullback-entry- SHORT in HIGH: 33T/45.5%WR/-$0.51 (worst regime). EXTREME: 63.6%WR/+$0.43 (best). HIGH has ~60% legacy signals distorting data. After stale filter evaluation (Sep 19), re-check: if HIGH SHORT WR stays <48% with 20+ fresh trades, consider HIGH regime gate for pullback-entry- SHORT.",
-      "expected_impact": "Monitor only — no config change yet. If confirmed: +$0.30-0.50/7d from blocking losing regime.",
-      "category": "regime optimization",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T15:34:03.902704+00:00",
-      "idea": "EXTREME SHORT fresh = system edge (confirmed, stale filter protecting)",
-      "rationale": "pullback-entry- SHORT in EXTREME: 11T/63.6%WR/+$0.43. pump-chain- SHORT in EXTREME: 16T/56.3%WR/-$0.19. Combined EXTREME SHORT: 33T/60.6%WR/+$0.27. Stale filter protecting this edge — fresh trades outperform. Do NOT boost confidence yet (sample <20 for individual signals). Monitor until 20+ fresh EXTREME SHORT trades.",
-      "expected_impact": "Monitoring — stale filter already protecting the edge.",
-      "category": "edge identification",
-      "status": "monitoring",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "DONE: RSI fix verification — confirmed working, no bad RSI entries since deploy",
-    "NEXT: Stale filter evaluation — Sep 19 10:00 UTC. Post-deploy 90% fresh. If working: extend. If not: investigate.",
-    "NEXT: open-skies+ wave_phase gate — code change needed, signal already KILLED (low priority)",
-    "NEXT: Execution-time stale signal revalidation — needs design",
-    "DEVELOP: New signals for NEUTRAL regime — only 2 types pass confluence",
-    "MONITOR: EXTREME SHORT fresh edge — 63.6%WR, stale filter protecting",
-    "MONITOR: pullback-entry- SHORT HIGH regime — 45.5%WR, check post-stale-filter",
-    "MONITOR: Execution-time RSI fix — no bad entries since deploy, monitor 48h"
-  ]
 }

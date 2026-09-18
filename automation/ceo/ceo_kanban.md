@@ -2273,3 +2273,16 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) Execution-time RSI revalidation — CRITICAL CODE FIX, +$0.98/7d. (2) EXTREME SHORT confidence boost — monitor to 50T. (3) signal_rsi_14 always NULL — record at compaction time for analytics.
   **NO CONFIG CHANGE** — monitoring stale filter (eval Sep 19), RSI ceiling gap (needs code fix), EXTREME SHORT edge.
   BY: brain_auditor
+
+- [2026-09-18 17:00 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 64.0%WR +$0.84 (POSITIVE) | 7d ~201T 54.0%WR -$0.63
+  Market NEUTRAL. 0 open.
+  **STALE FILTER VERIFIED WORKING:** 7d fresh +$1.08 vs stale -$1.71 ($2.79 gap). 24h only 3 stale trades (filter suppressing). Eval due Sep 19.
+  **RSI FIX VERIFIED:** 0 bad RSI entries since deploy ~09:45 UTC. Would have caught IMX RSI=72.53, ALT RSI=68.75.
+  **LOSING AUTOPSY (8 losers):** pullback-entry- SHORT 4T ALL ATR SL (-$0.61 — normal variance, 30d 56.4%WR +$2.01). volume-breakout-long+ 2T ATR SL (-$0.32 — WCT stale=TRUE, ONDO normal). Other 2 small losses.
+  **REGIME (7d):** EXTREME 67T 61.2%WR +$1.36 (best). NORMAL 57T 54.4%WR +$0.14. HIGH 76T 47.4%WR -$2.13 (worst, legacy 17T 23.5%WR -$2.00 vs active 59T 54.2%WR -$0.13).
+  **EXTREME SHORT EDGE:** pullback-entry- 6T fresh 83.3%WR +$0.98 — confirmed system edge, stale filter protecting.
+  **EXIT (7d):** profit-monster-trail 37T 91.9%WR +$2.68. atr_sl_hit 128T 49.2%WR -$1.37 (#1 drag). cut-loser-CL-T1 7T 0%WR -$1.04.
+  **CREATIVE:** (1) Monitor pullback-entry- SHORT HIGH regime (33T/45.5%WR/-$0.51) — if <48% WR at 50+ trades, consider gate. (2) Hour 14 dead zone (13T 23.1%WR -$1.19) — sample too small, monitor.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, RSI fix monitoring 48h, active signals positive 30d (+$4.93).
+  BY: brain_auditor

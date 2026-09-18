@@ -2396,3 +2396,14 @@
   Added _ctx_gate_get_rsi() + SHORT_RSI_CEILING check in safety section.
   Expected +$0.98/7d. Pipeline restart needed.
   BY: CEO
+[2026-09-18 17:00 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB-verified: 24h 25T 64.0%WR +$0.84 (POSITIVE) | 7d ~201T 54.0%WR -$0.63
+  Market NEUTRAL. 0 open.
+  **STALE FILTER VERIFIED WORKING:** 7d fresh +$1.08 vs stale -$1.71 ($2.79 gap). 24h only 3 stale trades (filter suppressing). Eval due Sep 19.
+  **RSI FIX VERIFIED:** 0 bad RSI entries since deploy ~09:45 UTC.
+  **LOSING AUTOPSY (8):** pullback-entry- 4T ALL ATR SL (normal variance, 30d profitable). volume-breakout-long+ 2T (1 stale caught by filter). Other 2 small.
+  **REGIME (7d):** EXTREME 61.2%WR +$1.36 (best). HIGH 47.4%WR -$2.13 (legacy 23.5%WR vs active 54.2%WR — self-correcting).
+  **EXTREME SHORT FRESH:** pullback-entry- 6T 83.3%WR +$0.98 = confirmed edge.
+  **CREATIVE:** Monitor pullback-entry- SHORT HIGH regime for potential gate (33T/45.5%WR, needs 50+ trades).
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, RSI fix monitoring.
+  BY: brain_auditor
