@@ -1416,3 +1416,31 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - All trades NEUTRAL regime
 
 **BY:** auto_1hr
+
+## [2026-09-18 13:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.09 | **24h:** 25T 13W 52.0%WR -$0.62 | **7d:** 209T 112W 53.6%WR -$0.82
+
+**Open (1):**
+- FOGO continuation+ LONG: $0.00 — trailing
+
+**Signal 24h:**
+- volume-breakout-long+: 9T 78%WR +$0.43 — strong
+- pullback-entry-: 5T 20%WR -$0.59 — bad 24h but 65T/7d 50.8%WR +$0.08 (variance)
+- open-skies+: KILLED, 0 trades today ✅
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 76% of 24h closes but 9/19 profit-locked wins — trailing SL working
+- Trade frequency: 1/hr — appropriate for NEUTRAL
+- All 24h trades NEUTRAL regime
+- 7d WR stable at 53.6%
+
+**Monitoring:**
+- FOGO open, trailing SL
+- 7d WR stable at 53.6%
+
+**BY:** auto_1hr
