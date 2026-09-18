@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -1358,8 +1358,15 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Surfing.md quadrant filter: z-score + acceleration alignment
     zscore_accel_mult = get_zscore_accel_penalty(token, direction)
 
-    # Favorites score boost — proven tokens get higher ranking
-    favorites_mult = FAVORITES_MULT if FAVORITES and token in FAVORITES else 1.0
+    # Favorites score boost — direction-specific
+    is_long_fav = token in FAVORITES_LONG
+    is_short_fav = token in FAVORITES_SHORT
+    if (direction == 'LONG' and is_long_fav) or (direction == 'SHORT' and is_short_fav):
+        favorites_mult = FAVORITES_MULT
+    elif token in FAVORITES:  # Legacy combined check
+        favorites_mult = FAVORITES_MULT
+    else:
+        favorites_mult = 1.0
 
     # 30d leaderboard bonus/penalty — long-term performers get extra boost
     leaderboard_mult = _get_leaderboard_mult(token)
@@ -1374,9 +1381,12 @@ def _score_signal(token, direction, conf, source, signal_type,
         log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR <45%, consistent loser")
         return 0.0
 
-    # Penalty list — underperformers get deprioritized
-    # Losers get stronger penalty (0.5x) than regular penalty tokens (0.7x)
-    if LOSERS and token in LOSERS:
+    # Penalty list — direction-specific losers get stronger penalty
+    is_long_loser = token in LOSERS_LONG
+    is_short_loser = token in LOSERS_SHORT
+    if (direction == 'LONG' and is_long_loser) or (direction == 'SHORT' and is_short_loser):
+        penalty_mult = LOSERS_MULT
+    elif token in LOSERS:  # Legacy combined check
         penalty_mult = LOSERS_MULT
     elif PENALTY_TOKENS and token in PENALTY_TOKENS:
         penalty_mult = PENALTY_MULT

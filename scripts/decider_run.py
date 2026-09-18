@@ -213,7 +213,7 @@ def _get_hotset_last_updated():
     return 0
 
 
-from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_SIZE_MULT, LOSERS, LOSERS_SIZE_MULT
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_SIZE_MULT, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_SIZE_MULT
 
 from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -279,23 +279,37 @@ def _get_amplitude_size_mult(token):
     return AMPLITUDE_SIZE_MULT.get(amp_class, 1.0)
 
 
-def _get_favorite_size_mult(token):
-    """Get position size multiplier based on favorites/losers status +30d performance.
-    - Losers: 0.5x (penalized), but never below HL_MIN_NOTIONAL_USDT
-    - Favorites 75%+ WR (7d): 1.8x (extra bump)
-    - Favorites 50%+ WR (7d): 1.5x (standard boost)
-    - Favorites <50% WR (7d): 1.2x (reduced)
+def _get_favorite_size_mult(token, direction=None):
+    """Get position size multiplier based on direction-specific favorites/losers status.
+    - Direction-specific losers: 0.5x (penalized)
+    - Direction-specific favorites 75%+ WR (7d): 1.8x
+    - Direction-specific favorites 50%+ WR (7d): 1.5x
+    - Direction-specific favorites <50% WR (7d): 1.2x
     - Normal: 1.0x
-    - Bonus: +0.2x if 30d WR >=70% (hall of fame)
-    - Penalty: -0.3x if 30d WR <45% (hall of shame)
     """
-    # Losers get penalized first, but don't go below minimum
-    if LOSERS and token.upper() in LOSERS:
-        # Cap reduction so size stays >= HL_MIN_NOTIONAL_USDT
+    token_upper = token.upper()
+
+    # Direction-specific losers get penalized first
+    if direction:
+        if (direction == 'LONG' and token_upper in LOSERS_LONG) or \
+           (direction == 'SHORT' and token_upper in LOSERS_SHORT):
+            max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
+            return max(LOSERS_SIZE_MULT, max_reduction)
+    # Legacy combined check
+    if LOSERS and token_upper in LOSERS:
         max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
         return max(LOSERS_SIZE_MULT, max_reduction)
 
-    if token.upper() not in FAVORITES:
+    # Check direction-specific favorites
+    is_fav = False
+    if direction:
+        if (direction == 'LONG' and token_upper in FAVORITES_LONG) or \
+           (direction == 'SHORT' and token_upper in FAVORITES_SHORT):
+            is_fav = True
+    if not is_fav and token_upper in FAVORITES:
+        is_fav = True
+
+    if not is_fav:
         return 1.0
     if not _has_enough_trades(token):
         return 1.0
@@ -306,13 +320,23 @@ def _get_favorite_size_mult(token):
         from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute("""
-            SELECT
-                ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
-            FROM trades
-            WHERE token = %s AND server = 'Hermes' AND status = 'closed'
-              AND close_time > NOW() - INTERVAL '7 days'
-        """, (token,))
+        # Query direction-specific WR if direction provided
+        if direction:
+            cur.execute("""
+                SELECT
+                    ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+                FROM trades
+                WHERE token = %s AND direction = %s AND server = 'Hermes' AND status = 'closed'
+                  AND close_time > NOW() - INTERVAL '7 days'
+            """, (token, direction))
+        else:
+            cur.execute("""
+                SELECT
+                    ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+                FROM trades
+                WHERE token = %s AND server = 'Hermes' AND status = 'closed'
+                  AND close_time > NOW() - INTERVAL '7 days'
+            """, (token,))
         row = cur.fetchone()
         if row and row[0] is not None:
             wr = float(row[0])
@@ -682,7 +706,7 @@ def process_delayed_entries(paper=False):
             exp_arg = ['--experiment', exp_json]
 
         _base_size = _get_dynamic_position_size()
-        _trade_size = _base_size * _get_favorite_size_mult(token) * _get_amplitude_size_mult(token)
+        _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
         # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
@@ -1715,7 +1739,7 @@ def execute_trade(token, direction, price, confidence, source,
     paper_flag = '--paper' if not live_trading else '--real'
 
     _base_size = _get_dynamic_position_size()
-    _trade_size = _base_size * _get_favorite_size_mult(token) * _get_amplitude_size_mult(token)
+    _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
     # FIX 2026-09-06: Cap at HL_MIN after multipliers — amplitude/fav mults can reduce below minimum
     _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
