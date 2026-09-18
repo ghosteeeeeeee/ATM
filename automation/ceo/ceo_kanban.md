@@ -1,5 +1,15 @@
 ## CEO DECISIONS
 
+- [2026-09-18 ~19:30 UTC] brain_auditor: NO CONFIG CHANGE — documentation fix + audit
+  DB-verified: 24h 23T 65.2%WR +$0.98 (POSITIVE) | 7d 197T 53.3%WR -$0.69
+  Market NEUTRAL. 5 open.
+  **FEATURE RECORDING CORRECTED:** CURRENT.md said 100% NULL — WRONG. DB shows 193/194 7d trades have RSI+momentum metadata. RSI fix from Sep 16 IS working. gap_at_entry and staleness_minutes still missing from metadata dict.
+  **LOSING AUTOPSY (5):** pullback-entry- SHORT 5T ALL ATR_SL (-$0.59). 2/5 had RSI>65 at entry (pre-fix, would be caught now). 3/5 normal variance in HIGH/NORMAL.
+  **EXIT ANALYSIS:** profit-monster-trail 90.6%WR +$2.21★. cut-loser-CL-T1 0%WR -$1.13 (8T ALL losers — premature exits?). rr_engine_support_br 33.3%WR -$0.63.
+  **CREATIVE:** (1) Add gap_at_entry to _signal_metadata — enables chase detection + entry gap filter. (2) EXTREME SHORT fresh 63.6%WR +$0.43 — monitor for confidence boost. (3) cut-loser-CL-T1 0%WR — investigate premature exits.
+  **NO ACTION** — documentation fix only. Next: investigate gap_at_entry recording.
+  BY: brain_auditor
+
 - [2026-09-18 ~18:00 UTC] CEO: NO CONFIG CHANGE — system healthy, legacy flushing
   DB-verified: 24h 23T 65.2%WR +$0.98 (POSITIVE) | 7d 197T 53.3%WR -$0.69
   Market NEUTRAL. 0 open.

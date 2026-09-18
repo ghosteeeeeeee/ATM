@@ -241,5 +241,16 @@
     "after": "Removed all 4. Comments added explaining removal. Active signals preserved (97 entries).",
     "rationale": "Dead signals pollute config and confuse audits. No runtime impact since *_ENABLED=False for all removed signals.",
     "impact": "Zero runtime change. Code hygiene only."
+  },
+  {
+    "timestamp": "2026-09-18T20:21:11.220150+00:00",
+    "agent": "brain_auditor",
+    "change": "CURRENT.md feature recording status corrected (100% NULL → 193/194 have RSI+momentum)",
+    "type": "documentation",
+    "file": "CURRENT.md",
+    "before": "FEATURE RECORDING: 100% NULL for RSI/gap/staleness",
+    "after": "FEATURE RECORDING: 193/194 trades have RSI+momentum metadata. gap_at_entry and staleness_minutes NOT recorded.",
+    "rationale": "CURRENT.md was stale — RSI fix from Sep 16 is working. DB shows 193/194 trades have metadata.",
+    "impact": "Documentation accuracy — no code change"
   }
 ]

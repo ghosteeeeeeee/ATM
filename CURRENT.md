@@ -33,7 +33,7 @@
 
 **🔴 SIGNAL DIVERSITY CRITICAL:** Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals. 30d active: 6 types (+$4.93).
 
-**🔴 FEATURE RECORDING:** _signal_metadata 100% NULL for RSI/gap/staleness. Fix from Sep 16 not writing correctly. Investigate.
+**🟡 FEATURE RECORDING:** _signal_metadata 193/194 trades have RSI+momentum data (RSI fix WORKING). gap_at_entry and staleness_minutes NOT recorded — need to add to signal_compactor metadata dict.
 
 ## Today's Changes (Sep 18)
 

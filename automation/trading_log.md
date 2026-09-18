@@ -1653,3 +1653,34 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - 7d PnL improving: -$1.50 → -$0.60
 
 **BY:** auto_1hr
+
+## [2026-09-18 21:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CAKE SHORT mover- → cut-loser → -$0.09)
+**24h:** 22T 18W 81.8%WR +$1.05 | **7d:** 194T 102W 53%WR -$0.87
+
+**Signal 24h:**
+- volume-breakout-long+: 9T 8W 89%WR +$1.19 — dominant, strong
+- pullback-entry- SHORT: 5T 1W 20%WR -$0.59 — ALL losses from Sep 17 18-22h (pre-RSI fix). 0 losers post-fix. Fix holding.
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- mover-: 1T 0W 0%WR -$0.09 — 1 trade only, noise
+
+**Open (6):**
+- LONGs: ATOM, BABY, FOGO, ADA (mover+, pump-chain+) — all fresh 0.4-2h
+- SHORTs: DOT, NOT (pullback-entry-) — 2.8h and 4.4h
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour (mover- 1T only)
+- atr_sl_hit: 14/22 24h closes (64%) but net +$0.41 — trailing still converting SLs to wins
+- RSI ceiling fix: 0 bad pullback-entry- SHORT entries since deploy — fix confirmed holding
+- Trade frequency: ~0.9/hr — appropriate for NEUTRAL
+- 24h PnL strong at +$1.05 with 81.8% WR
+- 7d WR stable at 53%
+
+**Monitoring:**
+- 6 open trades, all fresh and near breakeven
+- 7d PnL recovering: -$1.50 → -$0.87
+
+**BY:** auto_1hr

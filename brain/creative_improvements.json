@@ -1111,5 +1111,35 @@
     "category": "regime edge",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-18T19:30:00Z",
+    "idea": "Add gap_at_entry to _signal_metadata",
+    "rationale": "0/194 trades have gap data. gap_at_entry (price vs EMA distance) is #1 predictor of trade success. Enables MAX_ENTRY_GAP filter, regime-specific thresholds, historical gap analysis.",
+    "expected_impact": "+2-4% WR for pullback-entry SHORT in HIGH/NORMAL",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-18T19:30:00Z",
+    "idea": "EXTREME SHORT fresh edge — monitor for confidence boost",
+    "rationale": "pullback-entry SHORT EXTREME: 11T 63.6%WR +$0.43. Fresh: 83.3%WR. If sustained to 20+ fresh trades, boost confidence multiplier.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "regime edge",
+    "status": "monitoring",
+    "risk": "low",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-18T19:30:00Z",
+    "idea": "cut-loser-CL-T1 0%WR — investigate premature exits",
+    "rationale": "8 trades ALL losers -$1.13. Every cut-loser exit lost money. CL_TIER1 parameters may fire too early.",
+    "expected_impact": "+$0.50-1.00/7d if premature exits reduced",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "medium",
+    "agent": "brain_auditor"
   }
 ]
