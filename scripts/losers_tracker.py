@@ -165,8 +165,8 @@ def update_constants_file(new_losers):
         else:
             new_block = "LOSERS = set()\n"
 
-        # Replace existing LOSERS block using regex
-        pattern = r"^LOSERS = \{.*?\}|^LOSERS = set\(\)"
+        # Replace existing LOSERS block using regex (handles legacy format)
+        pattern = r"^LOSERS = \{.*?\}|^LOSERS = set\(\)|^LOSERS = LOSERS_LONG \| LOSERS_SHORT"
         new_content = re.sub(pattern, new_block, content, flags=re.MULTILINE | re.DOTALL)
 
         if new_content == content:

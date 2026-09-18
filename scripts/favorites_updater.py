@@ -252,8 +252,8 @@ def update_constants_file(new_favorites):
         new_block += '\n'.join(lines) + '\n'
         new_block += "}\n"
 
-        # Replace existing FAVORITES block using regex
-        pattern = r"# ── Favorites ─.*?^}\n"
+        # Replace existing FAVORITES block using regex (handles both old and new formats)
+        pattern = r"# ── Favorites.*?^}\n"
         new_content = re.sub(pattern, new_block, content, flags=re.MULTILINE | re.DOTALL)
 
         if new_content == content:

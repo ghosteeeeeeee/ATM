@@ -265,14 +265,15 @@ FAVORITES_RESIDENCY_DECAY = 0.12  # Staleness decay rate for favorites (default 
 
 # Penalty list — consistent underperformers get deprioritized (not blacklisted).
 # Blacklist = never trade. Penalty = tradeable but low priority.
-# Auto-updated by favorites_updater.py.
-PENALTY_TOKENS = {'ALT','BIGTIME','BLUR','BTC','CASHCAT','CC','COMP','ENS','ETH','MERL','MET','MON','NEO','POL','PUMP','WLFI'}
+# Note: Tokens in FAVORITES should NOT be in PENALTY_TOKENS (causes conflicting multipliers)
+PENALTY_TOKENS = {'ALT','BTC','CASHCAT','COMP','ENS','ETH','MERL','MET','MON','NEO'}
 PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_signal()
 
 # ── Losers List — underperformers get deprioritized ──────────────────────────
 # AUTO-UPDATED daily by losers_tracker.py (direction-specific)
+# Note: Tokens should NOT be in both FAVORITES and LOSERS for same direction
 LOSERS_LONG = {
-    'BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SAND', 'SUSHI', 'WLFI'
+    'BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SUSHI', 'WLFI'
 }
 LOSERS_SHORT = {
     'DOT', 'ZRO'
