@@ -2307,3 +2307,18 @@
   Stale filter working (90-100% fresh post-deploy). EXTREME SHORT fresh edge 57.7%WR.
   Creative: EXTREME SHORT confidence boost (monitor). HIGH regime self-correcting.
   BY: brain_auditor
+[2026-09-18 ~00:39 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
+  DB: 24h 12T 33.3%WR -$0.93 (COLD STREAK) | 7d ~219T 50.7%WR -$3.13
+  Stale filter working (12/12 fresh post-deploy). EXTREME SHORT fresh edge 71.4%WR.
+  Losers: 9 — open-skies+ 4T (KILLED), volume-breakout-long+ 2T (variance), other 3 cut-loser/ATR SL.
+  CREATIVE: EXTREME SHORT confidence boost (monitor), stale revalidation (needs design).
+  MONITORING: stale filter (eval Sep 19), HIGH regime legacy flush.
+  BY: brain_auditor
+
+[2026-09-18 01:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  DB: 24h 15T 33.3%WR -$1.73 | 7d 222T 49.5%WR -$3.58
+  Last hour: 3T all pullback-entry- SHORT ATR SL hits, -$0.45 total
+  IMX SHORT open with SL at 0.23% (below ATR_SL_MIN floor) — likely stopped
+  No kill candidates (0%WR with 3+ trades)
+  CREATIVE: monitor pump-chain+ and trend_purity+ for degradation
+  BY: auto_1hr

@@ -1043,3 +1043,34 @@ Final set: ['ENA', 'INJ', 'KAS']
 - Next: watch for breakout or trend development
 
 **BY:** auto_1hr
+
+## [2026-09-18 01:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.45 (WR: 0%)
+
+**24h:** 15T 33.3%WR -$1.73 | **7d:** 222T 49.5%WR -$3.58
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 12T avg -$0.130 — dominant, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Open:** 2 (GMX LONG volume-breakout-long+, IMX SHORT pullback-entry-)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 80% of 24h closes but avg loss -$0.13 — structural in chop
+- Trade frequency: 3/hr — normal
+- 7d WR stable at 49.5%
+- No consecutive negative hours with meaningful losses
+
+**Monitoring:**
+- IMX SHORT: SL at 0.23% — way below ATR_SL_MIN floor (1.3%). Likely to get stopped on noise. Can't fix retroactively.
+- pump-chain+ LONG: 21T/7d 38.1%WR -$0.61 — worst signal by total loss but not at kill threshold
+- trend_purity+ LONG: 11T/7d 36.4%WR -$0.90 — concentrated in INJ/MET, rest profitable
+- rr-struct+: 15T/7d 73.3%WR +$0.59 — star performer
+
+**BY:** auto_1hr
