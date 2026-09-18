@@ -15,6 +15,9 @@ from hermes_constants import (
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
     PM_TRAIL_TIERS,
     PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS, PM_TIER_BYPASS_SIGNALS,
+    SPIDER_ENABLED, SPIDER_REGIME, SPIDER_CONFIDENCE_MIN,
+    SPIDER_TRAIL_ACTIVATE_PCT, SPIDER_TRAIL_DISTANCE_PCT,
+    SPIDER_T1_MIN_PCT, SPIDER_T1_MAX_PCT, SPIDER_MAX_HOLD_MINUTES,
 )
 # FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
 # Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
@@ -51,6 +54,20 @@ def should_fire(ab_group: str, last_run_ts: float, fire_windows: dict) -> bool:
     fire_interval_sec = (min_wait + (max_wait - min_wait) * jitter) * 60
     elapsed = time.time() - last_run_ts
     return elapsed >= fire_interval_sec
+
+
+def get_spider_active() -> bool:
+    """Check if spider-profit should be active (NEUTRAL regime with sufficient confidence)."""
+    if not SPIDER_ENABLED:
+        return False
+    try:
+        import json as _json
+        regime_file = Path("/var/www/hermes/data/regime_15m.json")
+        data = _json.loads(regime_file.read_text())
+        overall = data.get("aggregate", {}).get("overall", "")
+        return overall == SPIDER_REGIME
+    except Exception:
+        return False
 
 
 # ── DB Queries ───────────────────────────────────────────────────────────────
@@ -444,7 +461,23 @@ def run(dry_run=False):
     effective_dry_run = dry_run or cfg.get("dry_run", False) or PM_DRY_RUN
     ab_group = cfg.get("ab_group", "A")
 
-    log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else ""))
+    # Spider-profit: check regime and override params if active
+    spider_active = get_spider_active()
+    if spider_active:
+        log(f"Spider-profit ACTIVE — NEUTRAL regime, tighter thresholds")
+        global PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TRAIL_TIERS
+        PM_TRAIL_ACTIVATE_PCT = SPIDER_TRAIL_ACTIVATE_PCT * 100
+        PM_TRAIL_DISTANCE_PCT = SPIDER_TRAIL_DISTANCE_PCT * 100
+        PM_TIER1_MIN_PCT = SPIDER_T1_MIN_PCT
+        PM_TIER1_MAX_PCT = SPIDER_T1_MAX_PCT
+        # Tighter trail tiers for flat markets
+        PM_TRAIL_TIERS = [
+            (0.0,   0.1),   # 0%–1.5%: 0.10% trail (spider — very tight)
+            (0.015, 0.3),   # 1.5%–3.0%: 0.30% trail
+            (0.030, 0.5),   # 3.0%+: 0.50% trail
+        ]
+
+    log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else "") + (" [SPIDER]" if spider_active else ""))
 
     positions = get_all_open_positions()
     log(f"Found {len(positions)} open positions")

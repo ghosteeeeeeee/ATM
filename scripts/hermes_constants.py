@@ -252,6 +252,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 FAVORITES = {
     'ACE',
     'APT',
+    'ATOM',
     'BABY',
     'BIGTIME',
     'CC',
@@ -261,7 +262,6 @@ FAVORITES = {
     'LTC',
     'POL',
     'PONS',
-    'TURBO',
     'USUAL'
 }
 
@@ -1367,6 +1367,21 @@ PM_TRAIL_BYPASS_SIGNALS = (
 PM_TIER_BYPASS_SIGNALS = (
     # Add signals here that should bypass T1/T2 but keep trail active
 )
+
+# ── Spider-Profit — Regime-Aware Profit Taking ──────────────────────────────
+# In NEUTRAL markets, tighten PM thresholds to grab small wins and free capital.
+# In trending markets, PM uses normal thresholds to let winners run.
+SPIDER_ENABLED = True               # master switch
+SPIDER_REGIME = 'NEUTRAL'           # only activate in this regime
+SPIDER_CONFIDENCE_MIN = 55          # min regime confidence to activate (0-100)
+# Trail params (swapped when NEUTRAL)
+SPIDER_TRAIL_ACTIVATE_PCT = 0.003   # 0.30% — lower than PM (0.40%) for faster exits
+SPIDER_TRAIL_DISTANCE_PCT = 0.001   # 0.10% — tight trail, grab small wins
+# Tier 1 params (swapped when NEUTRAL)
+SPIDER_T1_MIN_PCT = 0.30            # T1 closes at 0.30% in flat (vs 0.65% normal)
+SPIDER_T1_MAX_PCT = 1.0             # T1 max 1.0% in flat (vs 2.0% normal)
+# Timeout — close stuck trades after this many minutes (0 = disabled)
+SPIDER_MAX_HOLD_MINUTES = 120
 
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 

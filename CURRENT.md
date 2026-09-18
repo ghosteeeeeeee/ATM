@@ -1,21 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-17 ~21:00 UTC (CEO)**
+**Last Updated: 2026-09-18 ~06:00 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 13T, 30.8% WR, -$1.09. 4 open. Market NEUTRAL. Pipeline running.
+24h: 18T, 33.3% WR, -$1.26. 2 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 13T, 30.8% WR, -$1.09 (DB-verified — COLD STREAK, small losses avg -$0.08). open-skies+ 5T ALL losers (wave_phase=falling HIGH). pullback-entry- SHORT 13T cold streak 46.2%WR -$0.38 (7d profitable). volume-breakout-long+ 3T 33.3%WR -$0.30.
-- **Today (calendar):** 13T closed (Sep 17). 4 open. PnL: negative.
-- **7d:** 225T, 51.1% WR, -$2.78 (DB-verified). SHORT +$0.33, LONG -$3.11 (legacy aging out).
-- **7d REGIME:** EXTREME 76T 56.6%WR -$0.20 (best) | NORMAL 57T 50.9%WR -$0.60 | HIGH 90T 46.7%WR -$2.00 (worst — ~60% legacy).
-- **7d EXIT:** profit-monster-trail 36T 94.4%WR +$3.22★ | atr_sl_hit 134T 49.3%WR -$2.15 (#1 drag) | rr_engine 37T -$1.87 (#2 drag).
-- **7d ACTIVE SIGNALS:** pullback-entry- SHORT 68T/51.5%WR +$0.25 | pump-chain- SHORT 35T/57.1%WR +$0.06 | rr-struct+ LONG 15T/73.3%WR +$0.59
-- **7d DRAGGERS:** trend_purity+ LONG 11T/36.4%WR -$0.90 (legacy) | pump-chain+ LONG 22T/40.9%WR -$0.58 (legacy) | open-skies+ 9T/44.4%WR -$0.24 (wave_phase issue)
-- **Market:** NEUTRAL (5 open trades).
-- **Open:** 5 trades (GMX LONG, IO SHORT, HEMI SHORT, AIXBT SHORT, ALT SHORT).
+- **24h (rolling):** 18T, 33.3% WR, -$1.26 (DB-verified — COLD STREAK). open-skies+ 4T ALL losers (killed). pullback-entry- SHORT 5T 20%WR -$0.59 (cold streak, 30d 56.4%WR +$2.01). volume-breakout-long+ 4T 50%WR -$0.04 (mixed).
+- **Today (calendar):** 8T closed (Sep 18). 2 open. PnL: negative.
+- **7d:** 225T, 51.1% WR, -$2.78 (DB-verified). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
+- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90, bb-bounce-v2-long+ -$0.47, rr-struct-v2+ -$0.45, rr-struct- -$0.42, pump-chain+ -$0.37, breakout-long+ -$0.35.
+- **Market:** NEUTRAL (2 open trades).
+- **Open:** 2 trades (volume-breakout-long+ LONG x2).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED (Sep 17 17:11):** open-skies+ (brain_auditor, 11T/8d 36%WR -$0.73, wave_phase=falling pattern 5T 20%WR, no regime >50% WR). **KILLED (Sep 17 02:40):** breakout-long (CEO, 4T/7d 25%WR -$0.35, 48h 3T/0%WR -$0.60, fires LONG in NEUTRAL). **KILLED (Sep 16 10:34):** STANDALONE_BYPASS cleanup — removed dead accel-300-v4-short, ema300-dip-long, ema300-dip-short. **KILLED (Sep 16 05:15):** trend_ignition (brain_auditor, 0 trades in 3+ days, dead signal, LONG-only impossible in NEUTRAL). **KILLED (Sep 16 02:08):** breakout-long+ (auto_1hr, 0%WR -$0.60, fires LONG in NEUTRAL without BTC gate). **KILLED (Sep 15 ~14:40):** rr-struct-v2+ (CEO, 10T/40%WR -$0.45, all ATR SL). **KILLED (Sep 15 05:10):** pump-chain+ NORMAL regime blocked (signal_reporter). **KILLED (Sep 14 22:45):** rr-struct- (CEO). **KILLED (Sep 14 16:08):** pump-chain+ (auto_1hr, NEVER_REENABLE). **KILLED (Sep 13):** trend_purity+ (auto_1hr). **KILLED (Sep 11):** accel-300-v4-short-, PUMP_FLOW+ (NEVER_REENABLE). **KILLED (Sep 10):** pullback_entry+ (CEO, NEVER_REENABLE), pump-chain- (NEVER_REENABLE).
@@ -46,6 +43,8 @@
 **🔴 trend_ignition: DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal.
 
 **🔴 open-skies+: KILLED.** signal_reporter 17:11 UTC Sep 17. 11T/8d 36%WR -$0.73. No regime >50% WR. NEVER_REENABLE.
+
+**🟢 ML CLASSIFIER SPEC: REVISIT IN 2 WEEKS.** Spec reviewed Sep 18. Excellent design but wrong timing — 5K rows too thin for 20-feature RF, signal diversity is the real bottleneck (only 1 signal type passes confluence in NEUTRAL). Need 10K+ trades + 3 new signals before ML adds value. When revisiting: start ML_WEIGHT=0.3, not 0.6.
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 

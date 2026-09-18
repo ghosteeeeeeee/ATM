@@ -1,21 +1,22 @@
-## CEO Report — 2026-09-17 ~21:00 UTC
+## CEO Report — 2026-09-18 ~06:00 UTC
 
 ### Diagnosis
-DB-verified. 24h: 13T, 30.8%WR, -$1.09 (COLD STREAK — small losses). 7d: 225T, 51.1%WR, -$2.78 (negative). 4 open. Market NEUTRAL.
+DB-verified. 24h: 18T, 33.3%WR, -$1.26 (COLD STREAK). 7d: 225T, 51.1%WR, -$2.78 (negative). 2 open. Market NEUTRAL.
 
 ### Root Cause
-7d negative is ENTIRELY legacy killed signals: trend_purity+ -$0.90, pump-chain+ -$0.61, rr-struct-v2+ -$0.45, open-skies+ -$0.24. All already killed/disabled. Active signals all positive 30d: pullback-entry- +$2.62, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.27. Total active 30d: +$4.98. System structurally healthy.
+24h cold streak: open-skies+ legacy (killed, 4T ALL losers -$0.61) + pullback-entry- 5T/20%WR -$0.59 (cold streak — 30d profitable 56.4%WR +$2.01, variance). 7d negative is ENTIRELY legacy killed signals: trend_purity+ -$0.90, bb-bounce-v2-long+ -$0.47, rr-struct-v2+ -$0.45, pump-chain+ -$0.37 — ALL dead. Active signals all positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
 
 ### Fix Applied
-NO CONFIG CHANGE. Legacy drags aging out naturally. Cold streak is legacy flush + pullback-entry- variance (7d profitable).
+NO CONFIG CHANGE. Legacy drags aging out naturally. System structurally healthy.
 
 ### Verification
-Active signals: 6 signal types, all profitable 30d. Stale filter working (90%+ fresh). Open-skies+ killed. No import errors (transient earlier, resolved).
+Active signals: 5 signal types, all profitable 30d. Stale filter working (100% fresh post-deploy). Open-skies+ killed. Pipeline healthy.
 
 ### Monitoring
 1. Stale filter eval: Sep 19 10:00 UTC
 2. pullback-entry- cold streak: monitor 48h
-3. Signal diversity: only 2-3 types in NEUTRAL — need new signals
+3. Signal diversity: need new signals for NEUTRAL regime
+4. volume-breakout-long+ 4T 50%WR -$0.04 — mixed, monitor
 
 ---
 
@@ -173,3 +174,52 @@ NO CONFIG CHANGE. System structurally healthy. All dead signals properly disable
 
 ### Verification
 DB-verified. Active signals confirmed profitable. Legacy trades aging out. Pipeline healthy.
+
+---
+
+## CEO Report — 2026-09-18 — ML Trade Classifier Spec Review
+
+### Decision: REJECT (for now — revisit in 2 weeks)
+
+### Why
+
+The spec is excellent — clean architecture, good risk analysis, sensible model choice. **But it solves the wrong problem at the wrong time.**
+
+**Current bottleneck is signal diversity, not scoring quality.**
+- 24h: 15T, 20%WR, -$1.73 (cold streak)
+- 7d: 222T, 49.5%WR, -$3.58
+- **Only 1 signal type passes confluence in NEUTRAL:** pullback-entry- SHORT
+- open-skies+ killed Sep 17. squeeze_reversal zero trades. Signal starvation is the crisis.
+
+The ML classifier would sit AFTER signal detection — it can't help if signals aren't firing. Adding a sophisticated filter on top of a starving pipeline is like installing a bouncer at an empty bar.
+
+**Three reasons to wait:**
+
+1. **5K rows is thin for a 20-feature RandomForest.** With one-hot encoding across ~40 tokens, ~15 signal types, 3 regimes, and 3 volatility states, we'll have sparse feature matrices. Risk of overfitting to historical noise is real. Need 10K+ trades for reliable generalization — that's ~2-3 months at current pace.
+
+2. **Hebbian + signal_compactor already do this.** The composite_score (hebbian_engine.py:535) already weights decayed WR, exit quality, token WR, and combo parts. The ML classifier proposes to learn "RSI < 35 + BULL = 78% WR" — but regime-specific filtering (CURRENT.md policy) already does this with explicit rules and regime memory. The marginal lift over existing rules is unclear without a baseline backtest.
+
+3. **Opportunity cost is high.** 4 days of subagent time = 4 signals not built. The system needs new signals that fire in NEUTRAL (Wyckoff phase, Elliott Wave, volume profile from coin_tracker). These directly address the starvation problem. ML scoring is a tuning knob; new signals are capacity.
+
+### What to do instead (next 2 weeks)
+
+| Priority | Task | Impact |
+|----------|------|--------|
+| **1** | Build 2-3 NEUTRAL-compatible signals (coin_tracker-based) | Directly increases trade capacity |
+| **2** | Let stale filter mature (eval Sep 19) | Data shows 52.9%WR fresh vs 46.6% stale |
+| **3** | Collect more trades (need 10K+ for ML) | Better training data for later ML build |
+| **4** | Backtest ML classifier against current system (shadow mode) | Prove marginal lift before committing |
+
+### When to revisit ML classifier
+
+- After 10K+ closed trades (est. late Oct 2026)
+- After 3+ new signals deployed and matured
+- When signal diversity is no longer the bottleneck
+
+### Key concern with spec
+
+The `ML_WEIGHT = 0.6` + `HEBBIAN_WEIGHT = 0.4` default means ML dominates scoring from day one. This is aggressive for an unproven model. If we do build this, start at `ML_WEIGHT = 0.3` and only increase after backtest proves marginal lift.
+
+### Spec quality
+
+No issues with the spec itself — it's well-designed. The model choice (RF), feature set, fail-open design, and retraining strategy are all sound. It's a "right build, wrong time" situation.

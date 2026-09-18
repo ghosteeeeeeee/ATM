@@ -1,3 +1,12 @@
+[2026-09-18 05:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 18T 27.8%WR -$1.26 | 7d: 219T 50.2%WR -$2.46
+  Last hour: 2T 2W +$0.15 (recovering)
+  pullback-entry- SHORT 5T -$0.59 24h variance | volume-breakout-long+ 4T -$0.04 breakeven
+  LONG structural bleed -$2.27 7d | SHORT flat -$0.19 7d
+  mover+ 7T +$0.18 7d — new signal performing
+  No kill criteria met. No changes.
+  BY: auto_1hr
+
 [2026-09-18 00:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
   24h: 13T 30.8%WR -$1.09 (COLD STREAK) | 7d: 221T 50.2%WR -$3.20
   LONG $1.02 bleed drives 24h loss | SHORT -$0.07 marginally negative
@@ -2321,4 +2330,10 @@
   IMX SHORT open with SL at 0.23% (below ATR_SL_MIN floor) — likely stopped
   No kill candidates (0%WR with 3+ trades)
   CREATIVE: monitor pump-chain+ and trend_purity+ for degradation
+  BY: auto_1hr
+[2026-09-18 02:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  DB: 24h 16T 18.8%WR -$1.89 (COLD STREAK) | 7d 223T 49.3%WR -$3.74
+  Last hour: 1T pullback-entry- SHORT ATR SL hit IMX, -$0.16
+  ATR SL 81.2% of 24h closes but avg loss -$0.132 — structural in chop
+  0%WR signals below kill threshold: ema300-dip-long (2T), accel-300-v4-short- (2T)
   BY: auto_1hr

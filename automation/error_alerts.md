@@ -51,3 +51,39 @@
 - **AUTO-FIX**: Compressed 11 old log files (freed ~50MB)
 - **[INFO]** Market extremely quiet — 126/127 tokens NEUTRAL, only BABY has LONG_BIAS
 - **[INFO]** Pipeline healthy — 44 signals generated in last hour, 0 errors
+
+## Error Alerts — 2026-09-18 01:45 UTC
+- **WARN** (1x): Disk at 84% — 1% from 85% threshold. Monitor for cleanup.
+- **INFO**: Macro gate REDUCING signals — 24h win rate 20% (below 30% threshold). System self-protecting.
+- **INFO**: open-skies+ signal type 0% WR (4 trades, -$0.62) — potential underperformer to review.
+
+## Error Alerts — 2026-09-18 03:44 UTC
+- **WARN** (9x): Services in failed state — hermes-5m-candle, hermes-away-detector, hermes-better-coder, hermes-bug-hunter, hermes-git-release, hermes-mtf-macd-tuner, hermes-session-brain-daily-rebuild, hermes-trading-checklist, hermes-upgrade-implementer
+- **ROOT CAUSE**:
+  - hermes-5m-candle: missing script `_aggregate_5m.py`
+  - hermes-bug-hunter: missing script `bug_hunter.py`
+  - hermes-better-coder: missing module `dispatcher.dispatcher`
+  - hermes-away-detector: missing script
+  - hermes-git-release: dry-run exit code 1 (non-critical)
+  - hermes-mtf-macd-tuner: error during execution
+  - hermes-session-brain-daily-rebuild: rebuild failure
+  - hermes-trading-checklist: missing script
+  - hermes-upgrade-implementer: missing script
+- **IMPACT**: Monitoring/automation services degraded. Pipeline (signal_gen, decider, position_manager) running OK.
+- **AUTO-FIX**: Cannot auto-fix — requires code-level fixes or script restoration.
+- **WARN** (32x): Phantom trades in history (pnl_pct < 0.01%) — pre-existing, not new
+- **WARN** (1x): Disk at 84% — 1% from 85% threshold. Monitor for cleanup.
+- **INFO**: Market quiet — 117/127 tokens NEUTRAL, 10 LONG_BIAS, 0 SHORT_BIAS. 0 trades closed today.
+
+## Error Alerts — 2026-09-18 03:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (4x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-09-18 04:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-09-18 05:44 UTC
+- **WARN** (9x): Services in failed state — hermes-5m-candle (CRITICAL), hermes-away-detector, hermes-better-coder, hermes-brain-auditor, hermes-bug-hunter, hermes-git-release, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-upgrade-implementer
+- **WARN** (32x): Phantom trades — trades with near-zero PnL (|pnl_pct| < 0.01%)
+- **WARN**: Disk at 84% — approaching 85% threshold
+- **AUTO-FIX**: None applied — services require investigation before restart

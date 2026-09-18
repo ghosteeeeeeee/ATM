@@ -1,4 +1,11 @@
 ## CEO DECISIONS
+- [2026-09-18 06:00 UTC] CEO: NO CONFIG CHANGE — system healthy
+  DB-verified: 24h 18T 33.3%WR -$1.26 (COLD STREAK) | 7d 225T 51.1%WR -$2.78
+  Market NEUTRAL. 2 open (volume-breakout-long+ LONG x2).
+  **DIAGNOSIS:** 24h cold streak = open-skies+ legacy (killed, 4T ALL losers -$0.61) + pullback-entry- cold streak (5T 20%WR -$0.59 — 30d profitable 56.4%WR +$2.01, variance). 7d negative is ALL legacy drags (trend_purity+ -$0.90, bb-bounce-v2-long+ -$0.47, rr-struct-v2+ -$0.45, rr-struct- -$0.42, pump-chain+ -$0.37 — ALL killed/disabled). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
+  **NO ACTION NEEDED** — legacy drags aging out, active signals profitable, stale filter working (100% fresh post-deploy). Monitor pullback-entry- cold streak (30d 56.4%WR +$2.01 — will recover).
+  BY: CEO
+
 - [2026-09-17 21:00 UTC] CEO: NO CONFIG CHANGE — system healthy
   DB-verified: 24h 13T 30.8%WR -$1.09 (COLD STREAK) | 7d 225T 51.1%WR -$2.78
   Market NEUTRAL. 4 open.

@@ -1,3 +1,49 @@
+## [2026-09-18 05:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+**24h:** 18T 27.8%WR -$1.26 | **7d:** 219T 50.2%WR -$2.46
+
+**Last Hour:**
+- CAKE r2-trend-long8 LONG → atr_sl_hit +$0.12 (3.12% PnL)
+- ALGO mover+ LONG → profit-monster-trail +$0.03 (1.40% PnL)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 14T avg -$0.080 — dominant (78%), all negative
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 2T avg +$0.020
+
+**24h by Signal:**
+- open-skies+ LONG: 4T -$0.61 (0%WR — residual, already killed)
+- pullback-entry- SHORT: 5T -$0.59 (20%WR — anchor signal, negative streak)
+- volume-breakout-long+ LONG: 4T -$0.04 (50%WR — near breakeven)
+- mover+ LONG: 1T +$0.03 (new signal, performing)
+
+**7d Direction:**
+- LONG: 101T 49.5%WR -$2.27 — structural bleed
+- SHORT: 118T 52.5%WR -$0.19 — flat
+
+**7d Signal Health:**
+- pullback-entry- SHORT: 69T 50.7%WR +$0.07 (anchor, slightly positive)
+- mover+ LONG: 7T +$0.18 (profitable)
+- volume-breakout-long+ LONG: 4T 50%WR -$0.04 (breakeven)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: 2 trades last hour, both won — no 0%WR cluster
+- pullback-entry- SHORT: 5T -$0.59 in 24h but 69T 50.7%WR +$0.07 7d — variance, not structural
+- volume-breakout-long+ LONG: 4T -$0.04 — near breakeven, no kill trigger
+- Trade frequency: 2T/hr — healthy, no overtrading
+- ATR SL at 78% — consistent structural pattern
+
+**Monitoring:**
+- LONG structural bleed persists (7d -$2.27) — system-wide, not signal-specific
+- mover+ is new and performing (+$0.18 7d, 7T) — watch for durability
+- pullback-entry- SHORT in negative streak (5T -$0.59 24h) but 7d still positive
+
+**Open Questions:**
+- Is LONG bleed fixable without widening SL? Currently 78% of exits are ATR SL hits
+
 ## [2026-09-18 00:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet period)
@@ -1173,3 +1219,49 @@ Final set: ['ENA', 'INJ', 'KAS']
 - 7d WR stable at 50.0%
 
 **BY:** auto_1hr
+
+## [2026-09-18 05:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W)
+**24h:** 16T 4W 25.0%WR $-1.41 | **7d:** 217T 110W 50.7%WR $-2.61
+
+**Exit Breakdown (24h):**
+- atr_sl_hit: 13T avg -$0.095 — 81.2% of closes, losses tiny
+- cut-loser-CL-T1: 2T avg -$0.090
+- profit-monster-trail: 1T +$0.010
+
+**Signal 24h:**
+- pullback-entry-: 5T 1W 20%WR $-0.59 (all SHORT ATR SL hits, choppy market)
+- open-skies+: 4T 0W 0%WR $-0.61 (ALREADY KILLED)
+- volume-breakout-long+: 4T 2W 50%WR $-0.04
+- grind-breakout+: 1T 1W 100%WR $0.01
+
+**Open Trades (3):**
+- GMX LONG: +226% unrealized, 12.1h old — STALE (>8h)
+- CAKE LONG: +189% unrealized, 3.0h old, trailing SL above entry
+- YGG LONG: -$0.01 unrealized, 1.6h old
+
+**Regime:** 100% NEUTRAL — choppy market
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: 0 signals at 0%WR with 3+ trades last hour
+- ATR SL: 81.2% of 24h closes but avg loss -$0.095 — structural in chop
+- Trade frequency: 1/hr — quiet
+- Cold streak: 25%WR 24h vs 50.7% 7d — variance, losses tiny
+
+**Monitoring:**
+- GMX open 12.1h — stale, monitoring for exit
+- CAKE trailing SL above entry — profit locked
+- 7d WR stable at 50.7%
+- pullback-entry- SHORTs all hitting ATR SL in NEUTRAL — choppy market
+
+**BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-18 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE TURBO (WR=50.0%, PnL=$-0.13, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ATOM (WR=80.0%, AvgPnL=0.94%, Trades=5)
+
+Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX', 'LTC', 'POL', 'PONS', 'USUAL']
