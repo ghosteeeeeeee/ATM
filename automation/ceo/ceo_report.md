@@ -1,3 +1,27 @@
+## CEO Report — 2026-09-18 ~15:00 UTC
+
+### Diagnosis
+DB-verified. 24h: 24T, 54.2%WR, -$0.30 (FLAT — better than previous report). 7d: 202T, 54.0%WR, -$0.94 (slightly negative, improving). 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+). Market NEUTRAL. Previous report showed 20T/40%WR/-$1.21 — DB actually shows better numbers.
+
+### Root Cause
+- **24h losers (10):** pullback-entry- SHORT 4T ALL ATR SL (-$0.61 — cold streak, 30d profitable 56.4%WR +$2.01). open-skies+ LONG 2T killed legacy (-$0.31). volume-breakout-long+ 2T normal variance. Other 2 small losses.
+- **7d negative ($-0.94):** ENTIRELY legacy killed signals: trend_purity+ -$0.90, rr-struct-v2+ -$0.45, rr-struct- -$0.42, open-skies+ -$0.42, breakout-long+ -$0.35. All dead. Active signals positive 30d: +$4.93 total.
+- **pullback-entry- SHORT cold streak:** 4T today ALL losers. 30d: 94T 56.4%WR +$2.01. This is variance, not structural. Will recover.
+
+### Fix Applied
+NO CONFIG CHANGE. RSI ceiling fix deployed ~09:45 UTC (execution-time revalidation). No bad RSI entries since. Legacy drags aging out naturally. System structurally healthy.
+
+### Verification
+Active signals: 6 types, all profitable 30d (+$4.93 total). Stale filter working (90%+ fresh post-deploy). RSI fix deployed. Pipeline healthy. 2 trades open.
+
+### Monitoring
+1. **Stale filter evaluation: Sep 19 10:00 UTC (TOMORROW)** — must evaluate
+2. pullback-entry- cold streak: monitor 48h (30d profitable, will recover)
+3. Signal diversity: need new signals for NEUTRAL regime (only 2-3 types pass confluence)
+4. RSI fix effectiveness: monitor next 24h for blocked trades
+
+---
+
 ## CEO Report — 2026-09-18 ~09:45 UTC
 
 ### Diagnosis

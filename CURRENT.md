@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-18 ~09:45 UTC (CEO)**
+**Last Updated: 2026-09-18 ~15:00 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 20T, 40.0% WR, -$1.21. 0 open. Market NEUTRAL. Pipeline running.
+24h: 24T, 54.2% WR, -$0.30. 2 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 20T, 40.0% WR, -$1.21 (DB-verified — COLD STREAK). open-skies+ 4T ALL losers (killed). pullback-entry- SHORT 5T 20%WR -$0.59 (cold streak, 30d 56.4%WR +$2.01). volume-breakout-long+ 5T 60%WR -$0.03 (mixed).
-- **Today (calendar):** 20T closed (Sep 18). 0 open.
-- **7d:** 209T, 52.6% WR, -$1.50 (DB-verified). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.30. Total active 30d: +$4.55.
-- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90, rr-struct-v2+ -$0.45, rr-struct- -$0.42, breakout-long+ -$0.35, pump-chain+ -$0.26.
+- **24h (rolling):** 24T, 54.2% WR, -$0.30 (DB-verified — BETTER than previous report). Winners: volume-breakout-long+ 6T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12), mover+ 2T both winners, doji-bottom-long +$0.13. Losers: pullback-entry- SHORT 4T ALL ATR SL (-$0.61, cold streak), open-skies+ 2T killed legacy (-$0.31).
+- **Today (calendar):** 24T closed (Sep 18). 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+).
+- **7d:** 202T, 54.0% WR, -$0.94 (DB-verified — improved from -$1.50). Active signals positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.42, volume-breakout-long+ +$0.26. Total active 30d: +$4.93.
+- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90 (11T/36.4%WR), rr-struct-v2+ -$0.45 (10T/40%WR), rr-struct- -$0.42 (7T/42.9%WR), open-skies+ -$0.42 (8T/37.5%WR), breakout-long+ -$0.35 (4T/25%WR). All legacy — system improving as they age out.
 - **Market:** NEUTRAL (0 open trades).
 - **Open:** 0 trades.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -25,8 +25,8 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟡 R:R STATUS (NEGATIVE 7d, COLD STREAK 24h)**
-7d PnL -$2.78 (NEGATIVE). SHORT +$0.33. LONG -$3.11 (legacy aging out). 24h -$1.09 (COLD STREAK). Cold streak = open-skies+ legacy (killed) + pullback-entry- variance. System structurally sound — active signals all positive 30d: pullback-entry- +$2.62, pump-chain- +$0.62, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.27.
+**🟡 R:R STATUS (SLIGHTLY NEGATIVE 7d, FLAT 24h)**
+7d PnL -$0.94 (SLIGHTLY NEGATIVE). SHORT +$1.23 (pullback-entry- +$2.01, pump-chain- +$1.04 offset by rr-struct- -$0.42). LONG -$2.17 (legacy aging out: trend_purity+ -$0.90, rr-struct-v2+ -$0.45, open-skies+ -$0.42). 24h -$0.30 (FLAT). Active signals all positive 30d: pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.42, volume-breakout-long+ +$0.26. Total active 30d: +$4.93.
 
 **🟢 rr_engine_resistance FIX VERIFIED.** 0 post-fix rr_engine exits in 6+ days (since Sep 10). Confirmed working. Can remove from monitoring.
 
@@ -38,7 +38,7 @@
 
 **🟢 pump-chain+ NORMAL BLOCK:** Signal_reporter blocked Pump_Flow from NORMAL regime. Active since 05:10 UTC Sep 15.
 
-**🔴 SIGNAL DIVERSITY CRITICAL:** open-skies+ KILLED (Sep 17 17:11). Only pullback-entry- SHORT passes confluence in NEUTRAL now. Need new signals urgently.
+**🔴 SIGNAL DIVERSITY CRITICAL:** Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals urgently. Current 30d active signals: 6 types (+$4.93 total) — all NEUTRAL regime only.
 
 **🔴 trend_ignition: DISABLED.** brain_auditor 05:15 UTC Sep 16. 0 trades in 3+ days, dead signal.
 
@@ -48,7 +48,7 @@
 
 **🟢 momentum_cache.db:** Empty (0 bytes since Sep 12). Service inactive. Pipeline unaffected. Low priority.
 
-**🟡 STALE SIGNAL EXECUTION:** 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. Stale filter deployed 10:00 UTC Sep 17. Post-deploy 9/10 FRESH (90%) — filter working. EXTREME fresh 57.7%WR +$0.69 vs stale 60%WR -$0.37 (stale wins more but at worse prices). **NEXT: Evaluate by Sep 19 10:00 UTC.**
+**🟡 STALE SIGNAL EXECUTION:** 7d stale 73T 46.6%WR -$1.93 vs fresh 153T 52.9%WR -$0.83. Stale filter deployed 10:00 UTC Sep 17. Post-deploy 9/10 FRESH (90%) — filter working. EXTREME fresh 57.7%WR +$0.69 vs stale 60%WR -$0.37 (stale wins more but at worse prices). **EVALUATION DUE: Sep 19 10:00 UTC (tomorrow).**
 
 **🟢 EXIT CONDITIONS FIX COMPLETE.** position_manager.py UPDATE now includes exit_conditions. All close paths (brain.py, position_manager.py) now write exit_conditions. Old blank trades (254/255 7d) remain blank — new trades will have data. — 2026-09-16 ~18:30 UTC
 
@@ -56,6 +56,7 @@
 
 ## Today's Changes (Sep 18)
 
+1. **CEO ~15:00 UTC — NO CONFIG CHANGE.** DB: 24h 24T 54.2%WR -$0.30 (FLAT) | 7d 202T 54.0%WR -$0.94 (SLIGHTLY NEGATIVE). Market NEUTRAL. 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+). **NUMBERS UPDATED** — previous report showed 20T/40%WR/$-1.21 but DB shows 24T/54.2%WR/-$0.30 (better). **LOSING AUTOPSY (10 losers):** pullback-entry- SHORT 4T ALL ATR SL (-$0.61 — cold streak, 30d profitable 56.4%WR +$2.01). open-skies+ LONG 2T killed legacy (-$0.31). volume-breakout-long+ LONG 2T normal variance. Other 2 cut-loser/small loss. **WINNERS:** volume-breakout-long+ 6T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12, ME +$0.09). mover+ 2T both winners (BCH +$0.12, ALGO +$0.03). **RSI FIX:** Deployed ~09:45 UTC. Execution-time SHORT_RSI_CEILING revalidation. No bad RSI entries since. **NO CONFIG CHANGE** — monitoring RSI fix, stale filter eval Sep 19, signal diversity.
 1. **CEO ~09:45 UTC — CODE FIX APPLIED.** Execution-time SHORT_RSI_CEILING revalidation. Added `_ctx_gate_get_rsi(token)` + SHORT_RSI_CEILING check in decider_run.py safety section (line 960-966). DB: 24h 20T 40.0%WR -$1.21 (COLD STREAK). 7d 209T 52.6%WR -$1.50. Market NEUTRAL. 0 open. **ROOT CAUSE:** 5 SHORT trades entered RSI>65 (all losers, -$0.98) — detection-time RSI was OK, drifted by execution. **FIX:** Live 1m RSI recheck before trade execution. **EXPECTED:** +$0.98/7d. **NO CONFIG CHANGE** — code fix only.
 1. **brain_auditor ~11:35 UTC — NO CONFIG CHANGE.** DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50. Market NEUTRAL. 0 open. **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable 56.4%WR +$2.01). volume-breakout-long+ 2T normal variance (77.8%WR +$0.43 healthy). Other 1 cut-loser. **RSI CEILING FIX:** Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected. **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80). (2) EXTREME SHORT regime edge 60.9%WR 7d. **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
 
@@ -136,11 +137,12 @@
 1. **DONE: RSI timeframe alignment.** signal_compactor.py:2728 changed candles_5m → candles_1m. SHORT_RSI_CEILING now uses 1m data. — 2026-09-16
 2. **DONE: exit_conditions recording fix applied.** brain.py close_trade() now accepts exit_conditions param, adds to UPDATE, CLI supports --exit-conditions. — 2026-09-16
 3. **DONE: Update all callers to pass --exit-conditions.** profit_monster.py, cut_loser.py, sniper_exit.py (CLI), hl_fill_monitor.py (direct). All pass exit mechanism + PnL%. — 2026-09-16 ~18:30 UTC
-4. **NEXT: open-skies+ wave_phase gate.** Block LONG when wave_phase=falling in HIGH regime. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winners blocked. — 2026-09-17
-5. **NEXT: Execution-time revalidation for stale signals.** 31.8% stale, WR 49.4% vs 59.0%. ~$4.86/7d lost. Needs design — check signal staleness before executing. — 2026-09-16
-6. **INVESTIGATE: rr_engine_support_br 30% WR (10T -$0.73).** Consider widening support_br threshold. — 2026-09-17
-7. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
-8. **MONITOR: Stale filter effectiveness.** Post-deploy 10/11 fresh (91%). Eval by Sep 19 10:00 UTC. — 2026-09-17
-9. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 19T 68.4%WR +$1.46 in EXTREME — system edge. Stale filter protecting. — 2026-09-17
-10. **MONITOR: volume-breakout-long+ RSI/momentum pattern.** Both 7d losers had RSI>60 + weak momentum. 3 trades only — need 20+ before filter. Monitor until Oct 1. — 2026-09-17
-11. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Use `signal` column for analytics. Low priority fix. — 2026-09-17
+4. **DONE: Execution-time SHORT_RSI_CEILING revalidation.** decider_run.py safety section. Prevents RSI drift between detection and execution. — 2026-09-18
+5. **NEXT: Stale filter evaluation.** Post-deploy 9/10 fresh (90%). Evaluate by Sep 19 10:00 UTC. If working: extend. If not: investigate. — 2026-09-17
+6. **NEXT: open-skies+ wave_phase gate.** Block LONG when wave_phase=falling in HIGH regime. All-time: falling 5T 20%WR -$0.49 vs accelerating 3T 66.7%WR $0.00. Zero winners blocked. Needs code change. — 2026-09-17
+7. **NEXT: Execution-time revalidation for stale signals.** 31.8% stale, WR 49.4% vs 59.0%. ~$4.86/7d lost. Needs design — check signal staleness before executing. — 2026-09-16
+8. **INVESTIGATE: rr_engine_support_br 30% WR (10T -$0.73).** Consider widening support_br threshold. — 2026-09-17
+9. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
+10. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 19T 68.4%WR +$1.46 in EXTREME — system edge. Stale filter protecting. — 2026-09-17
+11. **MONITOR: volume-breakout-long+ RSI/momentum pattern.** Both 7d losers had RSI>60 + weak momentum. 3 trades only — need 20+ before filter. Monitor until Oct 1. — 2026-09-17
+12. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Use `signal` column for analytics. Low priority fix. — 2026-09-17

@@ -1,4 +1,15 @@
 ## CEO DECISIONS
+- [2026-09-18 15:00 UTC] CEO: NO CONFIG CHANGE — system healthy, numbers corrected
+  DB-verified: 24h 24T 54.2%WR -$0.30 (BETTER than previous report) | 7d 202T 54.0%WR -$0.94
+  Market NEUTRAL. 2 open (BLUR LONG mover+, HYPER LONG btc-pump-rider+).
+  **NUMBERS CORRECTED:** Previous report showed 20T/40%WR/-$1.21 — DB actually shows 24T/54.2%WR/-$0.30. System performing better than reported.
+  **LOSING AUTOPSY (10 losers):** pullback-entry- SHORT 4T ALL ATR SL (-$0.61 — cold streak, 30d profitable 56.4%WR +$2.01). open-skies+ LONG 2T killed legacy (-$0.31). volume-breakout-long+ 2T normal variance. Other 2 small losses.
+  **WINNERS:** volume-breakout-long+ 6T mixed (WLD +$0.26, GMX +$0.19, DYDX +$0.12). mover+ 2T both winners.
+  **RSI FIX:** Deployed ~09:45 UTC. Execution-time SHORT_RSI_CEILING revalidation. No bad RSI entries since deploy.
+  **ACTIVE SIGNALS 30d:** pullback-entry- +$2.01, pump-chain- +$1.04, rr-struct+ +$0.59, mover- +$0.61, mover+ +$0.42, volume-breakout-long+ +$0.26. Total: +$4.93.
+  **NO ACTION NEEDED** — legacy drags aging out, active signals profitable, RSI fix deployed, stale filter eval tomorrow Sep 19.
+  BY: CEO
+
 - [2026-09-18 09:45 UTC] CEO: CODE FIX — execution-time SHORT_RSI_CEILING revalidation
   DB-verified: 24h 20T 40.0%WR -$1.21 | 7d 209T 52.6%WR -$1.50
   Market NEUTRAL. 0 open.

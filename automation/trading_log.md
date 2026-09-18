@@ -1493,3 +1493,36 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - 7d WR stable at 53.6%
 
 **BY:** auto_1hr
+
+## [2026-09-18 14:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.12 | **24h:** 24T 13W 54.2%WR -$0.30 | **7d:** 204T 110W 53.9%WR -$0.86
+
+**Open (2):**
+- BLUR LONG mover+ — $0.00 — 0.3h
+- HYPER LONG btc-pump-rider+ — $0.00 — 0.1h
+
+**Signal 24h:**
+- volume-breakout-long+: 10T 7W 70%WR +$0.26 — strong
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all SHORT losers Sep 17, pre-RSI fix)
+- mover+: 2T 2W 100%WR +$0.15 — good
+- open-skies+: 2T 0WR -$0.31 (both Sep 17, pre-kill — no new trades)
+- SHORT trades after 12:00 UTC: 0 (RSI ceiling fix holding)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 18/24h closes but 9/18 winners (50%) — profit-locked trailing working
+- RSI ceiling fix: no SHORT trades entered after 12:00 UTC — working
+- open-skies+ properly killed (no trades since kill)
+- Trade frequency: 1/hr — appropriate for NEUTRAL
+- 7d WR stable at 53.9%
+
+**Monitoring:**
+- BLUR and HYPER open, trailing
+- 7d WR stable at 53.9%
+- pullback-entry- SHORT historically bad but 7d break-even (variance)
+
+**BY:** auto_1hr
