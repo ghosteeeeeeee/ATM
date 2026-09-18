@@ -19,7 +19,7 @@ Thesis: pump-chain is a MEAN-REVERSION signal (not momentum).
 - Fails in strong bull (BTC 80-100): pumping coins chase exhaustion
 - Linreg BEAR is sweet spot: downtrend confirms genuine breakouts
 
-Pipeline: runs as a slow signal (every 5 minutes) via signals_runner.
+Pipeline: runs as a fast signal (every minute) via signals_runner.
 
 Author: Hermes Trading System
 Created: 2026-09-18
@@ -34,7 +34,7 @@ from paths import HERMES_DATA, WWW_DATA
 
 from hermes_constants import (
     PUMP_FLOW_ENABLED,
-    PUMP_FLOW_PLUS_ENABLED,
+    PUMP_CHAIN_V4_ENABLED,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
     PUMP_FLOW_COOLDOWN_HOURS,
@@ -102,6 +102,7 @@ def _load_state():
 
 def _get_btc_oscillator():
     """Get current BTC oscillator state from continuum.db."""
+    conn = None
     try:
         conn = sqlite3.connect(CONTINUUM_DB, timeout=5)
         row = conn.execute('''
@@ -112,7 +113,6 @@ def _get_btc_oscillator():
             ORDER BY ts DESC
             LIMIT 1
         ''').fetchone()
-        conn.close()
         
         if not row:
             return None
@@ -128,14 +128,20 @@ def _get_btc_oscillator():
             linreg_bias = 'MIXED'
         
         return {
-            'score': float(score) if score else 50,
+            'score': float(score) if score is not None else 50,
             'linreg_bias': linreg_bias,
             'trend': trend,
-            'zscore': float(zscore) if zscore else 0,
+            'zscore': float(zscore) if zscore is not None else 0,
         }
     except Exception as e:
         _log(f"  [WARN] BTC oscillator check failed: {e}")
         return None
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def _compute_signal_confidence(recommendation, phase_data, btc_state=None):
@@ -192,7 +198,7 @@ def _format_chain_evidence(chains):
     parts = []
     for c in chains[:3]:
         ref = c.get('leader') or c.get('follower', '?')
-        parts.append(f"{ref}({c['lift']}x)")
+        parts.append(f"{ref}({c.get('lift', '?')}x)")
     return ','.join(parts)
 
 
@@ -202,7 +208,7 @@ def scan_signals():
     
     v4 upgrade: blocks LONG at BTC > 80, boosts in sweet spot (40-80).
     """
-    if not PUMP_FLOW_ENABLED or not PUMP_FLOW_PLUS_ENABLED:
+    if not PUMP_FLOW_ENABLED or not PUMP_CHAIN_V4_ENABLED:
         return 0
     
     state = _load_state()
@@ -217,6 +223,13 @@ def scan_signals():
     
     # Get BTC oscillator state
     btc_state = _get_btc_oscillator()
+    
+    # Get all prices once (not per iteration)
+    try:
+        from signal_schema import get_all_latest_prices
+        all_prices = get_all_latest_prices()
+    except Exception:
+        all_prices = {}
     
     added = 0
     
@@ -237,6 +250,7 @@ def scan_signals():
             continue
 
         # Block stale entries
+        _conn_spd = None
         try:
             _conn_spd = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
             _cur_spd = _conn_spd.cursor()
@@ -264,14 +278,7 @@ def scan_signals():
         if confidence < PUMP_FLOW_MIN_CONFIDENCE:
             continue
         
-        price_data = {}
-        try:
-            from signal_schema import get_all_latest_prices
-            all_prices = get_all_latest_prices()
-            price_data = all_prices.get(token, {})
-        except Exception:
-            pass
-        
+        price_data = all_prices.get(token, {})
         price = price_data.get('price') if isinstance(price_data, dict) else None
         if price is None or price <= 0:
             continue

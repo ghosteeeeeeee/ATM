@@ -109,3 +109,17 @@
 - Phantom trades: 2 in last 24h (SUSHI +0.006, BABY +0.008) — negligible
 - Auto-fixes: compressed old logs (>7d). mtf_macd_tuner.db (384MB) candidate for cleanup.
 - **WARN**: disk at 85% threshold — monitor. coin_tracker.db (2.2G) and candles.db (1.9G) are largest data files.
+
+## Health Check — 2026-09-18 15:44 UTC
+- **PIPELINE**: OK — running, 0 errors, last cycle 15:43:23
+- **Trades (24h)**: 25 total, ~68% WR, +$0.96 net
+  - volume-breakout-long: 11 trades, 72.7% WR, +$1.08
+  - pullback-entry: 5 trades, 20% WR, -$0.60 (worst performer)
+- **Open positions**: 1 (HYPER LONG, +0.05%)
+- **Regime**: LONG_BIAS (8 long-bias, 119 neutral, 0 short)
+- **Disk**: 85% (18G free) — driven by data DBs, not logs
+- **Auto-fix**: compressed logs >1d (no space recovered — data DBs dominate)
+- **INFO**: pullback-entry- signal 20% WR over 24h — monitor
+
+## Error Alerts — 2026-09-18 15:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
