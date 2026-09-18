@@ -2319,3 +2319,13 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) Monitor pullback-entry- SHORT HIGH regime (33T/45.5%WR/-$0.51) — if <48% WR at 50+ trades, consider gate. (2) Hour 14 dead zone (13T 23.1%WR -$1.19) — sample too small, monitor.
   **NO CONFIG CHANGE** — stale filter eval Sep 19, RSI fix monitoring 48h, active signals positive 30d (+$4.93).
   BY: brain_auditor
+
+- [2026-09-18 21:00 UTC] brain_auditor: NO CONFIG CHANGE — audit only
+  DB-verified: 24h 24T 65.2%WR +$0.98 (POSITIVE) | 7d 195T 53.3%WR -$0.69
+  Market NEUTRAL.
+  **EXTREME SHORT CONFIRMED EDGE:** pullback-entry- 11T 63.6%WR +$0.43. volume-breakout-long+ 6T 83.3%WR +$0.85. Combined EXTREME: 59%WR +$1.21/7d. Strongest regime.
+  **cut-loser-CL-T1 SYSTEMATIC PREMATURE EXIT:** 68T 14d ALL losers avg -$0.15. Hold time 1.7h vs 3.9h ATR_SL. Some exits would have recovered. Needs investigation.
+  **_signal_metadata GAP:** gap_at_entry and staleness_minutes not computed anywhere. Cannot do chase detection.
+  **pullback-entry- SHORT HIGH DRAG:** 34T 44.1%WR -$0.70. Monitor to 50T. If pattern holds, gate SHORT from HIGH.
+  **NO ACTION** — monitoring EXTREME SHORT edge 48h, investigating CL_T1 timing.
+  BY: brain_auditor

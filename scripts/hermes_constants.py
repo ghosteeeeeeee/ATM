@@ -816,7 +816,7 @@ SHORT_BB_DEAD_ZONE2_MAX = 0.55
 # 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.
 # REMOVED CEO Sep 16 — monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable).
 # Penalty was blocking good entries. Expected impact: +$0.26/7d from unblocked entries.
-SHORT_NORMAL_PENALTY = 1.0
+SHORT_NORMAL_PENALTY = 0.8  # 20% penalty for SHORT in NORMAL — counter-trend risk highest here
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
@@ -897,8 +897,8 @@ WEATHER_VANE_SHIELD_LOSING_ONLY = True      # only shield positions with pnl < 0
 # Use BTC momentum_state from momentum_cache to bias signal scoring.
 # Reduces counter-trend signals during regime shifts (biggest value in transition zones).
 DIRECTIONAL_BIAS_ENABLED = True
-DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY = 0.6  # multiplier — reduce counter-trend scores
-DIRECTIONAL_BIAS_PRO_TREND_BOOST = 1.15       # multiplier — boost pro-trend scores
+DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY = 0.4  # multiplier — HEAVY penalty for counter-trend (was 0.6, SHORT 14% WR when BTC bullish)
+DIRECTIONAL_BIAS_PRO_TREND_BOOST = 1.35       # multiplier — strong boost for pro-trend (was 1.15, SHORT 78% WR when BTC bearish)
 
 # ── Alt-BTC Divergence (Regime Transition Smoothing Layer 4) ────────────────
 # Block LONG when alt is falling but BTC is flat/rising (divergent bearish).

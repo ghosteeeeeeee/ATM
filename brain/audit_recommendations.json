@@ -1,198 +1,105 @@
 {
-  "timestamp": "2026-09-18T20:20:08.809562+00:00",
-  "session_brain_stats": {
-    "total_vectors": 252074,
-    "queries_run": 3,
-    "key_insights": [
-      "Open-skies performance declining (59%→53% WR)",
-      "NEUTRAL regime signal diversity discussed but not implemented",
-      "Stale filter working as designed"
+    "timestamp": "2026-09-18T21:00:00Z",
+    "agent": "brain_auditor",
+    "session_brain_stats": {
+        "total_vectors": 252074,
+        "top_topics": ["open_skies performance", "new neutral regime signals", "delisted tokens", "cascade_flip"]
+    },
+    "trade_summary_24h": {
+        "trades": 24,
+        "wr": 65.2,
+        "pnl": 0.98,
+        "best_signal": "volume-breakout-long+ (9T 88.9%WR +$1.19)",
+        "worst_signal": "pullback-entry- SHORT (6T 16.7%WR -$0.76)"
+    },
+    "trade_summary_7d": {
+        "trades": 195,
+        "wr": 53.3,
+        "pnl": -0.69,
+        "by_regime": {
+            "EXTREME": "61 trades 59.0%WR +$1.21",
+            "NORMAL": "56 trades 53.6%WR +$0.05",
+            "HIGH": "77 trades 46.8%WR -$2.30"
+        }
+    },
+    "drift_findings": [
+        {
+            "finding": "EXTREME SHORT edge confirmed but no confidence boost applied",
+            "detail": "pullback-entry- SHORT EXTREME: 11T 63.6%WR +$0.43. volume-breakout-long+ EXTREME: 6T 83.3%WR +$0.85. Combined EXTREME SHORT: 59%WR +$1.21/7d. This is the system's strongest edge.",
+            "impact": "missed opportunity to concentrate capital in highest-edge regime",
+            "recommendation": "Monitor for 48h, then consider EXTREME SHORT confidence boost if pattern holds"
+        },
+        {
+            "finding": "cut-loser-CL-T1 is systematically premature",
+            "detail": "68 trades over 14d, ALL losers, avg -$0.15. Average hold 1.7h vs 3.9h for ATR_SL. Trades cut before they have time to recover. Some CL_T1 exits at -$0.13 while ATR_SL on same signal/regime would exit at +$0.23 (pump_chain LONG EXTREME).",
+            "impact": "$-1.08/14d from premature exits that may have recovered",
+            "recommendation": "Investigate CL_TIER1_PCT threshold. Current -1.75% may be too tight for volatile alts."
+        },
+        {
+            "finding": "_signal_metadata still missing gap_at_entry and staleness_minutes",
+            "detail": "neither gap_at_entry nor staleness_minutes are computed or recorded anywhere in signal_compactor.py or brain.py. Cannot do chase detection or entry gap analysis.",
+            "impact": "cannot identify chasing entries or stale signal execution",
+            "recommendation": "Add gap_at_entry (price vs EMA at entry) and staleness_minutes (signal age at execution) to signal_compactor metadata dict"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "pullback-entry- SHORT HIGH regime drag",
+            "occurrences": "34T 44.1%WR -$0.70 over 7d. 19 losers vs 15 winners.",
+            "root_cause": "HIGH regime = high volatility + choppy. pullback-entry SHORT fires on pullbacks, but HIGH regime whipsaws back up, hitting ATR_SL. Winners in HIGH are smaller (avg +$0.13) while losers are larger (avg -$0.15).",
+            "recommendation": "Monitor to 50+ trades. If pattern holds, gate pullback-entry- SHORT from HIGH regime."
+        },
+        {
+            "problem": "Signal diversity bottleneck in NEUTRAL",
+            "occurrences": "Only pullback-entry- SHORT and volume-breakout-long+ pass confluence in NEUTRAL regime.",
+            "root_cause": "LONG_NEUTRAL_BLOCK + confluence requirements filter most signals. Active signals 30d: 6 types (+$4.93).",
+            "recommendation": "Need new NEUTRAL-compatible signals. Session brain shows brainstorming sessions but no new signals built."
+        }
+    ],
+    "missing_implementations": [
+        {
+            "idea": "gap_at_entry metadata field",
+            "status": "discussed in sessions but not implemented",
+            "priority": "HIGH — enables chase detection"
+        },
+        {
+            "idea": "EXTREME SHORT confidence boost",
+            "status": "edge confirmed by data but no config change made",
+            "priority": "MEDIUM — monitor then act"
+        },
+        {
+            "idea": "cut-loser-CL-T1 threshold tuning",
+            "status": "68T 0%WR pattern identified but not investigated",
+            "priority": "MEDIUM — needs root cause analysis"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-18T21:00:00Z",
+            "idea": "EXTREME SHORT regime confidence floor",
+            "rationale": "pullback-entry- SHORT EXTREME has 63.6%WR over 11 trades. Combined with volume-breakout-long+ EXTREME 83.3%WR over 6 trades. EXTREME regime is where the system makes money (+$1.21/7d). A confidence floor of 75% for SHORT entries in EXTREME would concentrate capital in the highest-edge regime while still requiring confluence.",
+            "expected_impact": "+$0.30-0.50/7d by avoiding lower-confidence EXTREME SHORT entries that dilute the edge",
+            "category": "entry sniper",
+            "status": "suggested — needs 48h monitoring first",
+            "risk": "low — only affects EXTREME SHORT, sample size still small",
+            "impact_on_winners": "Would block EXTREME SHORT entries below 75% confidence. Need to check how many current winners would be affected."
+        },
+        {
+            "date": "2026-09-18T21:00:00Z",
+            "idea": "cut-loser-CL-T1 expanded fire window for volatile alts",
+            "rationale": "CL_T1 exits at 1.7h avg, ATR_SL at 3.9h. Some CL_T1 exits would have recovered if held to ATR_SL. For coins with >2% ATR, the -1.75% CL threshold may be too tight — normal volatility within a single candle.",
+            "expected_impact": "+$0.20-0.40/7d by letting volatile trades breathe",
+            "category": "exit optimization",
+            "status": "suggested — needs investigation of CL_T1 exit timing",
+            "risk": "medium — expanding fire window could increase losses on truly bad entries",
+            "impact_on_winners": "CL_T1 has 0% WR, so no winners to protect. But need to verify trades aren't being cut before profit targets."
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Monitor EXTREME SHORT edge for 48h — if 63%+ WR holds, boost confidence",
+        "Investigate cut-loser-CL-T1 timing — would trades have recovered if held to ATR_SL?",
+        "Add gap_at_entry and staleness_minutes to signal_compactor metadata dict",
+        "Monitor pullback-entry- SHORT HIGH to 50+ trades — gate if pattern holds"
     ]
-  },
-  "trade_summary_24h": {
-    "total_trades": 23,
-    "win_rate": 65.2,
-    "pnl": 0.98,
-    "open_trades": 5,
-    "market_regime": "NEUTRAL",
-    "top_winner": "volume-breakout-long+ 9T 88.9%WR +$1.19",
-    "top_loser": "pullback-entry- SHORT 5T ALL ATR_SL -$0.59"
-  },
-  "trade_summary_7d": {
-    "total_trades": 197,
-    "win_rate": 53.3,
-    "pnl": -0.69,
-    "regime_breakdown": {
-      "EXTREME": "61T 59.0%WR +$1.21 (BEST)",
-      "NORMAL": "56T 53.6%WR +$0.05 (breakeven)",
-      "HIGH": "76T 47.4%WR -$2.13 (worst, ~60% legacy)"
-    },
-    "exit_breakdown": {
-      "profit-monster-trail": "32T 90.6%WR +$2.21 (STAR)",
-      "atr_sl_hit": "126T 50.0%WR -$0.96 (neutral)",
-      "cut-loser-CL-T1": "8T 0%WR -$1.13 (#1 drag)",
-      "rr_engine_support_br": "6T 33.3%WR -$0.63",
-      "rr_engine_resistance": "13T 46.2%WR -$0.28"
-    }
-  },
-  "drift_findings": [
-    {
-      "issue": "CURRENT.md says _signal_metadata 100% NULL — WRONG",
-      "reality": "193/194 7d trades HAVE metadata (RSI, momentum, z_score, etc.). Only 1 trade NULL (continuum_engine). RSI fix from Sep 16 is WORKING.",
-      "impact": "CURRENT.md misleading — stale documentation",
-      "action": "UPDATE CURRENT.md to reflect actual status"
-    },
-    {
-      "issue": "gap_at_entry and staleness_minutes NOT in _signal_metadata",
-      "reality": "0/194 trades have gap or staleness_minutes in metadata. These fields were never added to the metadata dict in signal_compactor.py.",
-      "impact": "Cannot do entry-gap autopsies or staleness analysis from DB",
-      "action": "INVESTIGATE — add gap_at_entry and staleness_minutes to signal_compactor metadata"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "pullback-entry SHORT cold streak",
-      "frequency": "Multiple sessions (Sep 17-18)",
-      "details": "5 consecutive ATR_SL losses in 24h. ALL losses in HIGH/NORMAL (0 EXTREME). 30d signal still profitable (56.4%WR +$2.01). Cold streak, not signal failure.",
-      "resolution": "Monitor — cold streaks normal for 56%WR signal"
-    },
-    {
-      "topic": "HIGH regime underperformance",
-      "frequency": "Ongoing since Sep 14",
-      "details": "7d HIGH 47.4%WR -$2.13. ~60% legacy trades aging out. Active signals in HIGH: 54.2%WR. Self-correcting.",
-      "resolution": "Monitor — legacy flush will improve"
-    },
-    {
-      "topic": "Signal diversity in NEUTRAL",
-      "frequency": "Multiple sessions",
-      "details": "Only pullback-entry- SHORT + volume-breakout-long+ pass confluence. System bottleneck.",
-      "resolution": "NEXT: develop new NEUTRAL-compatible signals"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "gap_at_entry in _signal_metadata",
-      "priority": "HIGH",
-      "details": "Cannot analyze entry-gap (price vs EMA at entry) from DB. Would enable: (1) gap-based entry filter, (2) chasing detection, (3) regime-specific gap thresholds",
-      "effort": "LOW — add 2 lines to signal_compactor metadata dict"
-    },
-    {
-      "item": "staleness_minutes in _signal_metadata",
-      "priority": "MEDIUM",
-      "details": "Stale filter works at execution level but doesn't record staleness value. Would enable: (1) staleness-based post-analysis, (2) staleness threshold tuning",
-      "effort": "LOW — add age_m to metadata dict"
-    },
-    {
-      "item": "New NEUTRAL-compatible signals",
-      "priority": "MEDIUM",
-      "details": "Only 2 signal types pass confluence in NEUTRAL. Need diversity for system growth.",
-      "effort": "HIGH — requires signal development"
-    }
-  ],
-  "losing_trade_autopsy_24h": [
-    {
-      "trade": "IMX SHORT pnl=-$0.16",
-      "signal": "pullback-entry-",
-      "regime": "HIGH",
-      "root_cause": "ATR SL hit. Entry 0.12163, exit 0.12341 (+1.5%). Price reversed after entry. RSI=72.53 at entry (pre-RSI fix — would be caught now by SHORT_RSI_CEILING=65).",
-      "entry_check": "RSI 72.53 > SHORT_RSI_CEILING=65 — FIXED by Sep 18 deploy",
-      "regime_check": "HIGH regime — legacy underperformance",
-      "recommended_change": "RSI fix already deployed. Monitor.",
-      "impact_on_winners": "RSI ceiling already in place — no additional action needed",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "AIXBT SHORT pnl=-$0.14",
-      "signal": "pullback-entry-",
-      "regime": "NORMAL",
-      "root_cause": "ATR SL hit. Entry 0.019567, exit 0.019816 (+1.3%). Price continued up after SHORT entry.",
-      "entry_check": "NORMAL regime — 52.4%WR baseline. Normal variance.",
-      "regime_check": "NORMAL — marginal signal quality",
-      "recommended_change": "None — cold streak behavior",
-      "impact_on_winners": "N/A",
-      "confidence": "MEDIUM"
-    },
-    {
-      "trade": "ALT SHORT pnl=-$0.15",
-      "signal": "pullback-entry-",
-      "regime": "NORMAL",
-      "root_cause": "ATR SL hit. Entry 0.006509, exit 0.006596 (+1.3%). RSI=68.75 at entry (pre-RSI fix — would be caught now).",
-      "entry_check": "RSI 68.75 > SHORT_RSI_CEILING=65 — FIXED by Sep 18 deploy",
-      "regime_check": "NORMAL regime",
-      "recommended_change": "RSI fix already deployed. Monitor.",
-      "impact_on_winners": "RSI ceiling already in place",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "IO SHORT pnl=-$0.16",
-      "signal": "pullback-entry-",
-      "regime": "HIGH",
-      "root_cause": "ATR SL hit. Entry 0.12877, exit 0.13067 (+1.5%). Extended hold (6h20m).",
-      "entry_check": "HIGH regime — 45.5%WR baseline",
-      "regime_check": "HIGH — legacy underperformance",
-      "recommended_change": "None — cold streak + HIGH regime variance",
-      "impact_on_winners": "N/A",
-      "confidence": "MEDIUM"
-    },
-    {
-      "trade": "CAKE SHORT pnl=-$0.09",
-      "signal": "mover-",
-      "regime": "EXTREME",
-      "root_cause": "cut-loser-CL-T1 triggered. Entry 2.4378, exit 2.4579 (+0.8%). Quick exit (2h17m).",
-      "entry_check": "EXTREME regime — usually best for SHORT",
-      "regime_check": "EXTREME — mover- SHORT unusual loser",
-      "recommended_change": "None — cut-loser working as designed",
-      "impact_on_winners": "N/A",
-      "confidence": "HIGH"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-18T19:30:00Z",
-      "idea": "Add gap_at_entry to _signal_metadata — enable gap-based entry filter",
-      "rationale": "Currently 0/194 trades have gap data in metadata. gap_at_entry (price vs EMA distance at entry) is the #1 predictor of trade success. HIGH regime losers often have gap > 0.3% (chasing). Adding this field enables: (1) MAX_ENTRY_GAP filter (block entries where price is >0.3% above EMA for LONG, below for SHORT), (2) regime-specific gap thresholds, (3) historical gap analysis to find optimal entry zones.",
-      "expected_impact": "+2-4% WR for pullback-entry SHORT in HIGH/NORMAL by filtering chase entries",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T19:30:00Z",
-      "idea": "EXTREME SHORT fresh edge is confirmed — monitor for potential confidence boost",
-      "rationale": "pullback-entry SHORT in EXTREME: 11T 63.6%WR +$0.43 (7d). Fresh signals only: 83.3%WR. This is the strongest edge in the system. If sustained to 20+ fresh trades, consider boosting confidence multiplier for EXTREME SHORT fresh signals.",
-      "expected_impact": "+$0.20-0.40/7d if confidence boost applied",
-      "category": "regime edge",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T19:30:00Z",
-      "idea": "cut-loser-CL-T1 0%WR — investigate premature exits",
-      "rationale": "8 trades, ALL losers, -$1.13. Every cut-loser exit lost money. This suggests the exit fires too early (before price can recover). CL_TIER1 parameters may need adjustment: currently CL_TRAIL_ACTIVATE_PCT=-1.0% with CL_TIER1_MAX_CLOSE=2.",
-      "expected_impact": "+$0.50-1.00/7d if premature exits reduced",
-      "category": "exit optimization",
-      "status": "suggested",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "change": "CURRENT.md feature recording status corrected",
-      "type": "documentation",
-      "file": "CURRENT.md",
-      "before": "FEATURE RECORDING: 100% NULL for RSI/gap/staleness",
-      "after": "FEATURE RECORDING: 193/194 trades have RSI+momentum metadata. gap_at_entry and staleness_minutes NOT recorded.",
-      "rationale": "Current.md was stale — RSI fix from Sep 16 is working",
-      "impact": "Documentation accuracy — no code change"
-    }
-  ],
-  "next_actions": [
-    "UPDATE CURRENT.md — correct feature recording status",
-    "INVESTIGATE gap_at_entry recording — add to signal_compactor metadata dict",
-    "INVESTIGATE staleness_minutes recording — add age_m to metadata dict",
-    "MONITOR pullback-entry SHORT cold streak — 5 consecutive ATR_SL losses",
-    "MONITOR HIGH regime legacy flush — ~60% legacy, self-correcting",
-    "MONITOR EXTREME SHORT fresh edge — 83.3%WR, extend to 20+ trades",
-    "INVESTIGATE cut-loser-CL-T1 0%WR — premature exits?"
-  ]
 }
