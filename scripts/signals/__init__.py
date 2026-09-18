@@ -324,6 +324,11 @@ except Exception:
     _grind_breakout_run = None
 
 try:
+    from signals.btc_grind_spike import run as _btc_grind_spike_run
+except Exception:
+    _btc_grind_spike_run = None
+
+try:
     from signals.squeeze_reversal import run as _squeeze_reversal_run
 except Exception:
     _squeeze_reversal_run = None
@@ -446,6 +451,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
     {'name': 'oversold_bounce',           'enabled': 'OVERSOLD_BOUNCE_ENABLED',       'run': _oversold_bounce_run},
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
+    {'name': 'btc_grind_spike',           'enabled': 'BTC_GRIND_SPIKE_ENABLED',       'run': _btc_grind_spike_run},
     {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
     {'name': 'doji_bottom',               'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_bottom_run},

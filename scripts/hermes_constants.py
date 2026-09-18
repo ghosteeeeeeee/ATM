@@ -1032,6 +1032,13 @@ BTC_PUMP_RIDER_GRADUAL_ALT_MIN_BETA = 0.5     # min correlation with BTC
 BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX = 70       # don't buy overbought alts
 BTC_PUMP_RIDER_GRADUAL_MAX_ALTS = 5           # max alt signals per rally
 
+# ── BTC Grind + Volume Spike Signal (2026-09-18) ─────────────────────────────
+# Catches BTC accumulation grind → first volume spike pattern.
+# Pattern: low ATR compression + gradual upward slope + volume spike breakout.
+# Fires LONG on BTC directly at the first spike, before continuation.
+# Module: signals/btc_grind_spike.py
+BTC_GRIND_SPIKE_ENABLED = True
+
 # ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
 # Multi-layer crash detection using leading indicators:
 #   Layer 1: Dynamic price crash (ATR-scaled, not fixed %)
@@ -3502,6 +3509,7 @@ TREND_IGNITION_CONF_CAP         = 92      # max confidence (system ceiling)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
 PULLBACK_ENTRY_PLUS_ENABLED      = False   # CEO KILLED 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
 PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
+PULLBACK_ENTRY_SHORT_HIGH_BLOCK  = True    # brain_auditor Sep 18 — HIGH regime 33T 45.5%WR -$0.51. EXTREME 63.6%WR +$0.43. Gating HIGH recovers +$0.51/7d.
 
 # Detection parameters
 PULLBACK_IMPULSE_MIN_PCT         = 0.4     # min % move for impulse (tightened from 0.3 — backtest: 68.8% WR +6.00%)
