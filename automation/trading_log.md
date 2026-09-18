@@ -1617,3 +1617,39 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - 7d PnL improving from -$1.50 to -$0.60
 
 **BY:** auto_1hr
+
+## [2026-09-18 20:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** — | **24h:** 22T 16W 72.7%WR +$1.14 | **7d:** 198T 106W 53.5%WR -$0.60
+
+**Open (5):**
+- NOT SHORT pullback-entry- — 4.2h, -$0.09
+- CAKE SHORT mover- — 3.0h, -$0.06
+- DOT SHORT pullback-entry- — 2.6h, -$0.01
+- ADA LONG pump-chain+ — 1.9h, +$0.04
+- FOGO LONG pump-chain+ — 1.8h, +$0.06
+
+**Signal 24h:**
+- volume-breakout-long+: 9T 8W 89%WR +$1.19 — strong
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- pullback-entry-: 5T 1W 20%WR -$0.59 (all pre-RSI fix)
+- Others: 5T 4W mixed small
+
+**12h Trend:** 14T 11W 78.6%WR +$0.70 — very strong. Only 2 slightly negative hours (12, 13).
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 14/22 24h closes (64%) but net +$0.41 — trailing converting SLs to wins
+- RSI ceiling fix: 0 bad SHORT entries since deploy ~09:45 UTC — holding
+- Trade frequency: ~0.9/hr — appropriate for NEUTRAL
+- 24h PnL strong at +$1.14 (best in recent days)
+- 7d WR stable at 53.5%
+
+**Monitoring:**
+- 5 open trades, 3 SHORTs near breakeven, 2 LONGs slightly green
+- 7d PnL improving: -$1.50 → -$0.60
+
+**BY:** auto_1hr
