@@ -2364,3 +2364,12 @@
   CRITICAL: RSI CEILING GAP confirmed — 5 SHORT RSI>65 ALL losers -$0.98. Needs code fix.
   EXTREME SHORT 35T 60%WR +$0.25 (system edge). Truly active 30d 180T 61.7%WR +$4.13.
   BY: brain_auditor
+
+## CEO ~09:45 UTC Sep 18 — CODE FIX
+  DB: 24h 20T 40.0%WR -$1.21 | 7d 209T 52.6%WR -$1.50
+  Market NEUTRAL. 0 open.
+  FIX: Execution-time SHORT_RSI_CEILING revalidation (decider_run.py).
+  5 SHORT trades entered RSI>65 ALL losers -$0.98. RSI drifted detection→execution.
+  Added _ctx_gate_get_rsi() + SHORT_RSI_CEILING check in safety section.
+  Expected +$0.98/7d. Pipeline restart needed.
+  BY: CEO

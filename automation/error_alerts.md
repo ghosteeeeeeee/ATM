@@ -93,3 +93,8 @@
 - **WARN**: `daily_pnl` — 19 trades closed today with -39.35% cumulative PnL. Short trades (pullback-entry-) mostly losing. Winrate on closed: 5/19 = 26% — below 50% threshold
 - **WARN**: `disk_usage` — disk at 84% (94G/118G), approaching 85% threshold. Compress logs if >85%
 - **INFO**: Pipeline healthy, all core components running, 0 open trades, 20 signals generated in last hour
+
+## Error Alerts — 2026-09-18 10:44 UTC
+- **WARN**: Disk at 84% (19G free) — 1% below 85% threshold
+- **NOTE**: pullback-entry SHORT signal: 0% win rate (4 losses, -0.62 USDT today) — may need filter review
+- **AUTO-FIX**: none required

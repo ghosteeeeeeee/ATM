@@ -35,6 +35,15 @@
 - [2026-09-17 02:40 UTC] CEO: SKIP trend_purity+ kill — legacy trades only (Sep 12-13), no active bleed. TREND_PURITY_PLUS_ENABLED already False since Sep 13.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 
 - [2026-09-18 09:30 UTC] brain_auditor: NO CONFIG CHANGE — 1 CRITICAL FINDING
   DB: 24h 20T 40.0%WR -$1.26 (COLD STREAK) | 7d 213T 52.1%WR -$2.42
@@ -1108,7 +1117,16 @@ This is unacceptable. Aug 12: 100 trades. Aug 13: 53. Aug 14: 80. Aug 15: 15. Th
 - [2026-08-09 21:50] ceo: CEO review — verified DB: 24h 64T +$0.73 (57.8% WR — strongest 24h of cycle), 4d 236T +$0.35 (55.9% WR — solidly positive), 7d 439T -$3.87 (44.9% WR — Aug 3-4 64T -$6.57 legacy bleeds aging out, will flip-positive within hours). LONG 24h 48T +$0.69 (60.4%), SHORT 24h 16T +$0.04 (50.0% — bleeding STOPPED 7th day). Stars firing: bb_bounce+,range_finder+ LONG 25T +$0.26 52% (24h) / 42T +$0.83 61.9% (7d), bb-bounce-short,hzscore- SHORT 12T +$0.16 58.3%, bb_bounce+,hzscore+ LONG 6T +$0.27 66.7% (emerging 3rd star), continuation+,hzscore+ LONG 3T +$0.08 100%. All 7d bleeds (zscore-rising-, vel-hermes-, zscore-rising+, bb_bounce SHORT, decider) DISABLED + last fire Aug 5-6. Pipeline LIVE healthy, all 20+ timers on schedule, 6 open (NXPC SHORT, AXS/ETH/MNT/BCH/PROVE LONG). 0 new phantoms 24h. VEL 15m filter deployed 21:39 — effect visible in next 24h. NO TRADING CHANGES — 8th consecutive green day, trajectory strong. Watch: ma100-cross-,vortex_break_short SHORT 4T 25% WR -$0.14 (n=4, parent vortex_break_long killed but -short variant still live).
 - [2026-08-09 21:50] ceo: CEO re-verified at 21:49 (10min after 21:40 read). 24h 63T +$0.75 (58.7% WR — strongest of cycle, +$0.02 vs 21:40 read), today 58T +$0.78 (60.3% WR), 4d 237T +$0.40 (56.1% WR — STRONG 4d rolling), 7d 440T -$3.83 (45.0% WR — legacy bleeds aging out, last fires Aug 5-8). LONG 24h 46T +$0.65 (60.9% WR), SHORT 24h 17T +$0.09 (52.9% WR — bleeding STOPPED 8th day). Stars intact: bb_bounce+,range_finder+ LONG 24T +$0.08 (50.0% 24h) / 42T +$0.83 (61.9% 7d), bb-bounce-short,hzscore- SHORT 13T +$0.20 (61.5%), bb_bounce+,hzscore+ LONG 5T +$0.41 (80.0% 24h, 6T +$0.27 66.7% all-time) ★ EMERGING, hzscore+,range_finder+ LONG 5T +$0.03 (80%), continuation+,hzscore+ LONG 3T +$0.08 (100%), hzscore+,mover+ LONG 3T +$0.04 (66.7%). 0 phantoms 24h. vortex_break_long kill VERIFIED — last fire Aug 9 13:45:04 (1min before 13:46 signal_reporter kill), 0 fires since. vortex_break_short: 0 fires in 24h. ma100-cross-,vortex_break_short: 0 fires in 24h (last Aug 8 11:45) — RESOLVED, decay killed it. Live trading ENABLED, regime LONG_BIAS, pipeline heartbeat LIVE. Watch: bb-bounce-short,hl_copy_trader SHORT 2T 0% WR -$0.07 (last Aug 9 13:30, sub-threshold, signal_reporter auto-kill at 5T<30%). NO TRADING CHANGES — 8+ green days, trajectory confirmed by 4d rolling +$0.40 56.1% WR. Re-check in 24h for VEL filter effect, bb_bounce+,hzscore+ star promotion.
 
-## TEAM UPDATES (read this first)
+## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+ (read this first)
 <!-- Automations log their actions here. CEO reads this to know what the team did. -->
 <!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
 - [2026-08-11 01:40] signal_reporter: Signal performance report — 24h 62T 41.9% WR -$0.31 (red, 2nd rough day). No kills executed (no signal meets all 3 kill criteria). Watch: bb_bounce+,hzscore+ LONG 18T 38.9% -$0.22 (7d still +$0.23 at 50% WR — noise, hold). ASTER 7T 28.6% -$0.17 — token-level bleed, consider blacklist if continues. Winners: bb_bounce+,range_finder+ 53T 58.5% +$0.71 (7d), bb-bounce-short,hzscore- 16T 62.5% +$0.17 (7d). No inversions. 7d still profitable overall. Report: automation/signal_report.md
@@ -1452,7 +1470,16 @@ This is unacceptable. Aug 12: 100 trades. Aug 13: 53. Aug 14: 80. Aug 15: 15. Th
 - [x] 2026-08-10 03:00 — NO CHANGES. Verified DB: 24h 68T +$0.82 (60.3% WR — NEW CYCLE HIGH), 12h 29T +$0.48 (58.6% WR), 7d 455T -$3.13 (45.9% WR — Aug 3-4 62T -$6.28 legacy aging, flip-positive by Aug 11). LONG 24h 50T +$0.79 (64.0% WR — exceptional), SHORT 24h 18T +$0.02 (50.0% WR — flat, bleeding STOPPED 9th day). Stars: bb_bounce+,hzscore+ LONG 9T +$0.56 (77.8% — DOMINANT), bb_bounce+,range_finder+ LONG 21T +$0.14 (57.1%), bb-bounce-short,hzscore- SHORT 11T +$0.09 (54.5%). 7d daily: Aug 3-4 disasters aging out, Aug 5-9 all green (Aug 9 +$0.79). All bleeds DISABLED, last fire Aug 5-6. 0 phantoms. Pipeline healthy. NO TRADING CHANGES — 9th green day, trajectory exceptional.
 - [2026-08-10 03:52] ceo: CEO review — verified DB: 24h 69T +$0.72 (60.9% WR), 7d 403T +$0.31 (48.4% WR — positive, recovering). 11th consecutive green day. LONG 24h 51T +$0.72 (64.7% WR — exceptional), SHORT 24h 18T +$0.00 (50.0% WR — bleeding STOPPED 10th+ day). Stars: bb_bounce+,hzscore+ LONG 11T +$0.58 (81.8% WR — DOMINANT), bb_bounce+,range_finder+ LONG 19T +$0.12 (63.2% WR), bb-bounce-short,hzscore- SHORT 11T +$0.06 (54.5% WR). All legacy bleeds dead (vel-hermes, zscore-rising, pattern_wolf_wave_bear — 0 fires since Aug 5-6). 0 phantoms 24h. Pipeline healthy (03:52:13). 1 open (KAS LONG -$0.02). NO CHANGES — trajectory exceptional.
 
-## TEAM UPDATES (read this first)
+## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+ (read this first)
 <!-- Automations log their actions here. CEO reads this to know what the team did. -->
 <!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
 - [2026-08-10 06:00] ceo: CEO review — verified DB: 24h 70T +$0.69 (60.0% WR), 7d 405T +$0.48 (48.6% WR — JUST FLIPPED POSITIVE). 10th consecutive green day. LONG 24h 51T +$0.69 (66.7% WR — exceptional), SHORT 24h 19T +$0.00 (50.0% WR — bleeding STOPPED 10th day). Stars: bb_bounce+,hzscore+ LONG 11T +$0.58 (81.8% WR — DOMINANT), bb_bounce+,range_finder+ LONG 20T +$0.09 (60.0% WR), bb-bounce-short,hzscore- SHORT 11T +$0.06 (54.5% WR). All legacy bleeds aged out of 7d window. 0 phantoms 24h. Pipeline healthy. NO CHANGES — trajectory exceptional.
@@ -1491,6 +1518,15 @@ EOF
 - [2026-08-11 12:50] ceo: CEO review — NO TRADING CHANGES. Verified DB: 24h 40T -$0.58 (35.0% WR — RED), 7d 364T +$0.47 (51.9% WR — positive). 1 open (ht_sig4 paper). System idle 12h+ (0 trades today). Daily: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 partial 10T -$0.13 (40% WR). bb_bounce+,hzscore+ LONG 13T -$0.33 (23.1% WR — worst, but 7d 33T +$0.20 48.5% intact star). Return_exhaustion SHORT combos bleeding (7d). Cost drivers 48h: atr_sl_hit 36T -$1.64, cut-loser-CL-trail 15T -$0.73. SL revert to 1.2% active, eval window closed — post-revert sample too small (idle). SHORT 24h 7T +$0.09 (57.1% WR — profitable). All 3 stars profitable 7d. Disk 81%. Pipeline healthy, all timers running. NEUTRAL regime. NO CHANGES — 7d trajectory solid, stars intact, overreacting destabilizes.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-08-11 21:05] auto_1hr: NO CHANGES — SL revert eval active (closes 05:20 Aug 12), only 3 trades since revert, need 20+ for signal. 0T last hour, flat market. 24h 37T 35.1% WR -$0.56.
 - [2026-08-11 13:48] signal_reporter: Killed bb_bounce+,hzscore+ LONG — COSIG-GATE poison block. 23.1% WR, -$0.33 (24h, 13T). Today alone 25% WR, -$0.09 (4T). Block at signal_compactor.py:613. Individual components remain enabled for other combos. No other kill candidates (all others under threshold). No boost candidates (none with 3+ trades AND WR>55% in 24h). No inversions. No open trades except stale ht_sig4 (paper).
 - [2026-08-11 19:20] ceo: TRAILING STOP FIX. Root cause of elevated atr_sl_hit (48% of 24h exits): TRAILING_DISTANCE_PCT was 1.0% (= ATR_SL_MIN), causing trailing SL to lock at breakeven when trade hits +1%. Any pullback = stopped out at $0. Changed: TRAILING_DISTANCE_PCT 1.0%→0.20%, TRAILING_ACTIVATION_PCT 0.30%→0.35%. New flow: trade hits +0.35% → trailing locks at +0.15% profit (not breakeven). Trade at +2% → locks at +1.80%. Verified DB: 24h 26T -$0.42 (42.3% WR — RED), 7d 372T +$0.21 (51.9% WR — barely positive). Daily declining: Aug9 +$0.62→Aug10 -$0.10→Aug11 -$0.41. Stars7d intact: bb_bounce+,range_finder+ LONG 53T +$0.71 58.5%, bb-bounce-short,hzscore- SHORT 17T +$0.12 58.8%, hzscore+,mover+ LONG 5T +$0.17 80%. Pipeline running, 7 hotset entries. 2 open. Monitor 24h: if atr_sl_hit >40% → revert trailing to 0.30%. Disk 81%. NEUTRAL regime.
@@ -1555,6 +1591,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 - [2026-08-17 (CEO run — verified, 58th run)] ceo: NO CHANGES — system STRONGEST EVER. Verified DB: 24h 34T +$0.79, 67.6% WR (BEST in weeks). 48h 90T +$0.30, 50.0% WR. 7d 428T -$2.01, 49.3% WR. PM_TRAIL 38T +$1.87/48h DOMINANT (effectively 100% WR via trail). ATR_SL 33T -$2.03 (stable). return_exhaustion_long 4T 100% +$0.43. r2-trend-long2 17T 64.7% +$0.19. bb_bounce+ 24T 58.3% +$0.21. 3 open healthy. All legacy losers killed. Aug 17: 10T +$0.55 80% WR. DECISION: NO CHANGES — system strongest in weeks, no bleeding points. Monitor: PM_TRAIL WR (must hold >80%), ATR_SL count (must stay <35/48h).
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-08-17 10:30] signal_reporter: Killed range_breakout_short — test failed. 28T 46.4% WR -$0.21 (7d). Re-enabled Aug 16 for testing, last 2 trades both ATR SL hits (-$0.17). Added to NEVER_REENABLE_FLAGS. No boost candidates. No inversions. No other kill candidates. System 24h: 38T +$0.48. Report: automation/signal_report.md
 
 - [2026-08-17 17:03] auto_1hr: KILLED range_breakout_short — 0% WR 3T (0W 3L -$0.17). Was at 2T/0%WR for 3+ monitoring cycles, now confirmed 3T. Signal killed per auto-kill protocol.
@@ -1658,24 +1703,87 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 - [2026-09-10 ~20:30 UTC (CEO run — verified)] ceo: VERIFIED + MONITORING. DB: 24h 43T 69.8% WR +$4.12. 7d: 339T 57.2% WR +$0.51. Sep 10: 33T 63.6% WR +$2.25. **R:R 1.751** (avg_win $0.178, avg_loss $0.102). System structurally profitable. All 6 active signals profitable 7d: pullback_entry- 21T/81%WR +$2.35 ★, bb_bounce_v2_long 53T/69.8%WR +$1.34, open_skies 19T/63.2%WR +$1.56, pump_chain 41T/68.3%WR +$1.11, pump_chain- 17T/70.6%WR +$0.65, continuation 6T/83.3%WR +$0.05. **24h highlight:** pump_chain- SHORT 11T/81.8%WR +$1.28. Legacy aging out (ema300_dip_short -$1.48, coiled_spring -$0.65, sma20_dip -$0.73, slow_grind -$0.80). open-skies+ 2T/48h 0%WR -$0.49 — monitoring. 5 open SHORT pump_chain- near breakeven. Disk 84%. Market NEUTRAL. **No param changes.** Legacy exits by Sep 11.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 07:45 UTC] brain_auditor: NORMAL regime bleeds $2.43/7d (53.1% WR, 81T) — #1 loss driver. pump_chain -$0.31, coiled_spring -$0.11, sma20_dip -$0.35 in NORMAL. VOL_PHASE_MULTS penalties insufficient — need hard blocks (0.0). Creative: 4 new ideas (NORMAL hard blocks, EXTREME-only open_skies gate, time-of-day penalty, EXTREME PM_TRAIL widen). Session brain bug FIXED (sessions used before assignment at line 590). Audit written to brain/audit_recommendations.json. No config changes — system improving, legacy aging out.
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 09:15 UTC] brain_auditor: VERIFIED + RECOMMENDATIONS. DB: 24h 58T 58.6% WR $0.13 (breakeven). 7d 344T 56.4% WR $1.10. **REGIME SPLIT: EXTREME 141T/58.9%WR +$3.09 (money printer), NORMAL 77T/50.6%WR -$2.75 (drag).** EXIT ANALYSIS: cut-loser-CL-T1 59T/7d avg -4.97% = -$8.98 (#1 loss driver), profit-monster-trail 121T/7d +$9.27 (only profitable exit). **LOSING TRADE AUTOPSY:** pump-chain- SHORT EXTREME cluster (4 losses -$0.83) — cut-loser exits too early (7-9min). pullback-entry- SHORT rr_engine_resistance 14T/28.6%WR -$0.76 (structural). trend_purity+ LONG EXTREME 3T/33%WR -$0.55 (variance in winning regime). **DRIFT:** Last audit's 4 creative improvements NOT implemented. Session brain EMPTY (needs --ingest). **3 CREATIVE IDEAS:** (1) Regime-gated position sizing (0.5x NORMAL, 2x EXTREME), (2) Adaptive cut-loser delay (7min EXTREME, 15min NORMAL), (3) Signal rotation to prevent same-coin clustering. **NO CONFIG CHANGES** — system improving, legacy aging out. Write to brain/audit_recommendations.json.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 10:30 UTC] brain_auditor: cut-loser-CL-T1 still #1 loss driver (-$8.98/7d). Quick exits at 6-9 minutes show -5.73% to -6.34% loss. Suggested MIN_HOLD_MINUTES=10. SHORT rr_engine_resistance structural in HIGH regime (-$1.13/7d). NORMAL regime underperforming (-$2.75/7d). EXTREME regime strong (+$3.09/7d). No config changes applied (system improving).
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 ~12:00 UTC] brain_auditor: Audit complete. System profitable (24h +$1.07, 7d +$1.25). **KILLED pump-chain+** — only net-negative active signal (13T/30.8%WR/-$0.29/7d). Bare pump_chain works (41T/68.3%WR/+$1.11). Also flagged: cut-loser-CL-T1 premature exits (ENA 7min, ARB 9min — need MIN_HOLD), EXTREME regime kills weak SHORT signals (accel-300-v4-short- 33%WR). No other config changes — system improving, legacy aging out by Sep 13.
 - [2026-09-12 ~12:00 UTC] brain_auditor: AUDIT COMPLETE. System profitable (24h 54T 63%WR +$1.07, 7d 345T 56.5%WR +$1.25). **pump-chain+ already killed Sep 11** — 0 new trades, legacy aging out. **#1 loss driver: cut-loser-CL-T1** 59T/7d -$8.98 (ENA 7min, ARB 9min premature exits — need MIN_HOLD). **NORMAL regime drag:** 77T/50.6%WR/-$2.75 vs EXTREME 142T/59.2%WR/+$3.24. **Creative ideas:** (1) MIN_HOLD_MINUTES=10 for cut-loser, (2) CONF_FILTER_MIN=75 in NORMAL only, (3) Build trend following signal. **No config changes** — system improving, monitor 48h.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 11:00 UTC] brain_auditor: Losing trade autopsy (19 trades 24h). Key finding: EXTREME regime whipsaw (13/19 losers) but EXTREME is most profitable overall (+$3.14/7d). Blanket RSI/speed filters would kill winners (33 winning LONG with RSI > 70, 37 winning trades with speed > 80). **Config change: TIME_BLOCK_START 5→3** — extends 0.7x penalty to cover hour 03 (3rd worst hour at -$1.77/30d). No entry condition impact. Audit saved to brain/audit_recommendations.json.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 13:30 UTC] brain_auditor: AUDIT COMPLETE — SYSTEM PROFITABLE. 24h 46T 63.0%WR +$0.72. 7d 336T 56.5%WR +$1.26. No config changes. Root cause of 3 worst SHORT losses: stale signals with oversold RSI (<30) = catching falling knife in reverse. Creative ideas: (1) NORMAL regime SHORT filter could save ~$1/7d. (2) stale+oversold SHORT block would catch worst entries. (3) Trend following signal never built. Reports: brain/audit_recommendations.json, brain/creative_improvements.json.
 - [2026-09-12 14:30 UTC] brain_auditor: FULL AUDIT. #1 drag: stale signals (35% of 24h trades, 40% WR vs 78.6% fresh, -$0.87/24h). NORMAL regime worst (51.4% WR -$2.36/7d). rr_engine_resistance structural SHORT (14 exits/7d 28.6% WR -$0.76). Recommended: stale+oversold SHORT block (save ~$0.30-0.50/24h), NORMAL confidence boost, rr_engine SHORT threshold increase. No config changes applied (session lock). Files: brain/audit_recommendations.json
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-12 ~16:00 UTC] brain_auditor: FULL AUDIT. 24h: 41T 61.0% WR -$0.24 (verified). 7d: 337T 56.1% WR +$0.51 (verified). **KEY FINDINGS:** (1) NORMAL regime worst at -$2.36/7d — legacy aging out Sep 13, active drag: pullback-entry- SHORT -$0.24. (2) rr_engine_resistance SHORT structural: pullback-entry- 15 exits/7d, 26.7% WR -$0.96. (3) Time-of-day: 03:00-05:00 UTC -$0.90/7d, 17:00-22:00 UTC +$1.66/7d. **CREATIVE IDEAS:** (1) Regime-gate pullback-entry- SHORT to EXTREME+HIGH — saves $0.24/7d, low risk. (2) Time-of-day boost 17:00-22:00 UTC — +$0.30-0.50/7d. (3) pump-chain+ kill candidate — 25% WR SL hits -$0.78/7d. **NO CONFIG CHANGES APPLIED** — system profitable, legacy aging out. Files: brain/audit_recommendations.json, brain/creative_improvements.json
 - [2026-09-12 ~17:26 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE. 24h: 41T 63.4% WR -$0.02 (flat, verified brain DB). **KEY FINDING: cut-loser-CL-T1 has 0% WR in 24h — 5 trades, all losses, -$0.86.** This is structural (exit fires when loss threshold hit). Also: pullback-entry- SHORT in HIGH has 3 rr_engine_resistance losses in 48h (ENA -$0.20, ONDO -$0.08, LINK -$0.08). SHORT side underperforms LONG: SHORT -$0.38 vs LONG +$0.34. **trend_purity+ LONG in EXTREME: 7d actually +$0.17 (13T/61.5%WR) — volatility gate working correctly, no action needed.** Exit analysis: profit-monster-trail 17T 100%WR +$1.50 (dominant winner), atr_sl_hit 10T 50%WR -$0.40. **No config changes — system profitable, legacy aging out by Sep 13.** 3 creative ideas generated: regime-adaptive rr_engine threshold, SHORT confidence floor by regime, time-of-day filter for EXTREME.
 - [2026-09-12 ~22:00 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE. 24h: 36T 61.1%WR -$0.24. 7d: 336T 56.3%WR +$0.40. **KEY FINDINGS:** (1) SHORT_RSI_FLOOR=25 active (19:30 UTC) — 0 trades affected yet, needs 24h verification. BANANA SHORT RSI=10.53 was pre-fix loss. (2) trend_purity EXTREME penalty 0.3x active (15:30 UTC) — 4 losses -$0.71 pre-fix, net +$0.17/7d already. (3) MIN_HOLD_MINUTES=10 still NOT IMPLEMENTED — cut-loser-CL-T1 55T/7d -$8.29 legacy, ages out Sep 13. (4) rr_engine_resistance SHORT structural: 29T/7d -$1.28, 37.9% WR. **LOSING TRADE AUTOPSY:** 14 losers analyzed. 3 clusters: trend_purity+ EXTREME whipsaw (4T -$0.71), pullback-entry- SHORT rr_engine exits (3T -$0.36), cut-loser-CL-T1 premature exits (3T -$0.48). All pre-fix trades. **CREATIVE:** (1) TIME-OF-DAY weighting: 19:00 UTC 83.3%WR +$1.62 vs 03:00-05:00 UTC 33-44%WR -$1.80. Real pattern, needs backtest. (2) SHORT regime gate: block SHORT in NORMAL (mild drag -$0.19/7d). (3) bb_bounce_v2_long NORMAL block: 1 trade -$0.22, tiny but free. **NO CONFIG CHANGE** — two fixes just applied, legacy ages out tomorrow, system at breakeven.
@@ -1703,12 +1811,39 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 - [2026-09-13 00:32 UTC] brain_auditor: AUDIT COMPLETE. 24h: 29T 65.5%WR +$0.58. 7d: 334T 56.9%WR +$1.02. Market 100% NEUTRAL. **KEY FINDINGS:** (1) Legacy -$3.59/7d ages out TOMORROW (Sep 13). System structurally profitable. (2) trend_purity+ EXTREME: 4 losers,7 winners — 0.3x penalty applied, can't block without hurting winners. (3) pullback-entry- SHORT HIGH: 3 losers, all rr_engine_resistance — structural. (4) Time-of-day edge discovered: 19:00 UTC +$1.62/7d, 03:00-05:00 UTC -$1.80/7d. (5) MIN_HOLD_MINUTES still not implemented. **NO CONFIG CHANGE** — system profitable, legacy ages out tomorrow. **CREATIVE:** (1) Time-of-day signal weighting — +$0.50-1.00/7d potential. (2) SHORT NORMAL regime discount — needs backtest. (3) rr-struct- to STANDALONE_BYPASS — needs backtest.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-13 03:30 UTC] brain_auditor: AUDIT COMPLETE. 24h: 24T 54.2%WR -$0.84 (worse than last CEO report). 7d: 334T 56.6%WR +$0.37. Market 100% NEUTRAL. **KEY FINDINGS:** (1) trend_purity+ WORST active signal: 10T/40%WR -$0.72/7d. 5 losers in EXTREME — 0.3x volatility multiplier insufficient. **CONFIG CHANGE APPLIED:** Trend_Purity EXTREME multiplier 0.3x → 0.15x. (2) rr_engine_resistance SHORT exits structural: pullback-entry- 16T/31.3%WR -$0.91/7d. Needs code fix. (3) SHORT_RSI_FLOOR=25 VERIFIED WORKING — zero SHORT trades with RSI<35 in 7d. (4) Legacy -$3.74/7d ages out TODAY. (5) Session brain EMPTY — needs ingest. **LOSING TRADE AUTOPSY (10 losers):** trend_purity+ LONG: INJ -$0.28 (RSI=75.58 overbought), MET -$0.16 (z=3.54 extreme_high), ARB -$0.11 (RSI=72.73+z=2.48), BIGTIME -$0.14 (z=0.61), KAS -$0.23 (z=0.66). pullback-entry- SHORT: ENA -$0.20 (bb_pos=0.08 near support), ONDO -$0.08 (RSI=24.14 stale), LINK -$0.08 (stale). rr-struct- SHORT: INJ -$0.25 (ATR stop). rr-struct+ LONG: WLD -$0.13 (stale). **CREATIVE:** (1) Trend_Purity EXTREME 0.15x — APPLIED. (2) SHORT bb_position > 0.15 support distance filter — suggested. (3) SHORT_RSI_CEILING=55 — suggested. (4) Time-of-day weighting 17:00-19:00 +10%, 03:00-05:00 -5% — suggested.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-13 05:30 UTC] brain_auditor: AUDIT COMPLETE. 24h: 23T 56.5%WR +$0.09 (flat). 7d: 333T 56.5%WR +$0.67 (VERIFIED PROFITABLE). **KEY FINDINGS:** (1) trend_purity+ LONG killed at 04:15 UTC — was dominant 24h loser (6T/16.7%WR -$0.78). Kill correct. (2) EXTREME regime best: 136T/7d 58.8%WR +$2.93. SHORT in NEUTRAL strongest combination (126T/7d 63.5%WR +$2.62). (3) rr_engine_resistance SHORT exits: 15T/7d -$0.45 — structural issue, mostly HIGH regime entries. (4) rr_engine_support_br LONG exits: 7T/7d -$0.69 — 4/7 from trend_purity+ (now dead). (5) NORMAL regime worst: 74T/7d -$1.37 — mostly legacy aging out today. **LOSING TRADE AUTOPSY:** 10 losers analyzed. trend_purity+ LONG 6/10 losers (now killed). rr_engine_resistance SHORT 2/10 (ENA -$0.20, ONDO -$0.08 — HIGH regime). rr_engine_support_br LONG 2/10 (ZRO -$0.29, ARB -$0.11 — EXTREME/HIGH). **CREATIVE:** SHORT_REGIME_BOOST_EXTREME — increase SHORT confidence 15% in EXTREME regime (system's strongest edge: 63.5%WR +$2.62/7d). Needs 50+ trade validation. **No config change this run** — system at breakeven, legacy aging out today, trend_purity+ already killed. Don't fix what isn't broken.
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-13 ~12:00 UTC] brain_auditor: AUDIT COMPLETE. 24h: 21T 61.9%WR +$0.04 (FLAT_POSITIVE). 7d: 331T 56.4%WR +$0.63 (PROFITABLE). Market 100% NEUTRAL. **NO CONFIG CHANGE.** R:R 24h: 0.574 (breakeven 63.5%, actual 61.9%). R:R 7d: 0.754 (breakeven 57.1%, actual 56.4%). **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 4 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28, MET -$0.16) — ALL dead signal, KILLED by auto_1hr 04:15 UTC. rr-struct- 3 SHORT (INJ -$0.25, 2 others -$0.14 total) — 5T sample, R:R 0.41 weak. rr-struct+ 2 LONG (SEI -$0.14, WLD -$0.13) — STAR signal variance, 7d 80%WR +$0.81. pullback-entry- 1 SHORT (ENA -$0.20) — bb_position=0.08 near support, rr_engine_resistance exit. **KEY:** 5/8 dead signal. 3/8 active losses total -$0.52. **EXIT 7d:** cut-loser-CL-T1 51T -$7.70 (legacy), rr_engine_resistance 31T -$1.13 (structural SHORT), profit-monster-trail 105T +$7.19 (carries system). **DRIFT:** (1) Signal metadata columns NULL but data in _signal_metadata JSON. (2) bb_bounce_v2_long degraded Sep 8 (37.5%WR) but 7d still 60%WR. **CREATIVE:** (1) LONG_RSI_CEILING=70 REJECTED — active signals profitable at RSI>70 (pump_chain 31T 74.2%WR +$0.09, bb_bounce 3T 100%WR +$0.18). (2) rr_engine_resistance SHORT exit delay — needs code change + backtest. (3) System structurally healthy — legacy ages out Sep 14. **No config change — monitoring.**
 
 - [2026-09-13 16:30 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE. 24h: 25T 68.0%WR +$0.80 (STRONG). 7d: 329T 57.8%WR +$1.83 (VERIFIED POSITIVE, improved from +$1.42 at 14:35). Market 100% NEUTRAL. **NO CONFIG CHANGE.** R:R 24h: 0.608 (breakeven 62.2%, actual 68.0% — system PROFITABLE, well above breakeven). R:R 7d: 0.754 (breakeven 57.1%, actual 57.8% — ABOVE breakeven). **7d BY REGIME:** EXTREME 133T 59.4%WR +$2.96 ★ | HIGH 124T 58.9%WR +$0.38 | NORMAL 70T 52.9%WR -$1.55. **7d TOP:** pullback-entry- 42T/66.7%WR +$2.42 ★★★ | open_skies 8T/62.5%WR +$1.20 | pump_chain 43T/67.4%WR +$0.98 | rr-struct+ 12T/75%WR +$0.80. **7d LEGACY (aging out Sep 14):** ema300_dip_short -$0.91, trend_purity+ -$0.90, slow_grind -$0.80, sma20_dip -$0.73. **LOSING TRADE AUTOPSY (8 losers):** trend_purity+ 3 LONG (MET -$0.18, ZRO -$0.29, INJ -$0.28) — ALL dead signal, KILLED Sep 13 04:15 UTC. rr-struct- 1 SHORT (INJ -$0.25) — 5T sample, HIGH regime. rr-struct+ 2 LONG (TURBO -$0.14 NORMAL, SEI -$0.14 NORMAL 11.6h hold) — normal variance, STAR signal 75%WR. pullback-entry- 2 SHORT (DYDX -$0.14 NORMAL, NXPC -$0.13 NORMAL) — NORMAL regime, ATR SL. **KEY:** 3/8 dead signal. 5/8 active losses all NORMAL regime, total -$0.94. **EXIT 7d:** cut-loser-CL-T1 46T -$7.01 (legacy), rr_engine_resistance 31T -$1.13 (STRUCTURAL SHORT), profit-monster-trail 101T +$7.03 (carries system). **DRIFT:** (1) Signal metadata NULL 329/329 — entry_rsi_14, signal_z_score not recorded. Blocks entry condition analysis. (2) bb_bounce_v2_long 10 cut-loser exits -$1.51/7d (0%WR avg -5.05%). **CREATIVE:** (1) rr_engine_resistance SHORT code fix — 31 exits/7d -$1.13. Needs grace period or close-above requirement. (2) rr-struct- to STANDALONE_BYPASS — 5T sample, needs 15T first. (3) Fix signal metadata recording — 5-10 lines. **No config change — system profitable, legacy ages out Sep 14.**
@@ -1718,15 +1853,42 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 - [2026-09-13 22:30 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 34T 55.9%WR +$0.17 (ABOVE BREAKEVEN). 7d: 267T 57.3%WR -$0.44 (SLIGHTLY NEGATIVE — legacy drag). Market NEUTRAL. **R:R 24h: 0.938** (breakeven 51.6%, actual 55.9% — ABOVE). **LOSING TRADE AUTOPSY (15 losers):** trend_purity+ 3 LONG (MET -$0.18 EXTREME, ZRO -$0.29 HIGH, INJ -$0.28 HIGH) — ALL dead signal, 11T/7d 36.4%WR -$0.90. pullback-entry- 4 SHORT (ZRO -$0.21 HIGH, DYDX -$0.14 NORMAL, NXPC -$0.13 NORMAL, CAKE -$0.10 NORMAL) — pre-fix NORMAL trades. rr-struct- 3 SHORT (ZEN -$0.16 HIGH, LINK -$0.12 NORMAL, INJ -$0.25 legacy). rr-struct+ 2 LONG (KAS -$0.26, TURBO -$0.14). pump-chain+ 1 LONG (FIL -$0.02 tiny). ema300-dip-long 1 LONG (ONDO -$0.15 NORMAL). **KEY:** 3/15 dead signal. 12/15 active losses -$1.10. **EXIT 7d:** profit-monster-trail 102T 94.1%WR +$7.31 (carries system), cut-loser-CL-T1 46T -$7.01 (legacy aging out), rr_engine_resistance 31T 39.4%WR -$1.34 (STRUCTURAL SHORT). **7d SHORT dominant:** 143T 60.1%WR +$1.91 vs LONG 193T 53.9%WR -$0.70. **VOL_PHASE_MULTS fix verified** — keys now match signal_family() output. **CREATIVE:** (1) rr_engine_resistance SHORT exit: require CLOSE above resistance, not wick (needs code + backtest, 31T sample). (2) Monitor rr-struct- at 15T kill threshold (currently 7T). (3) bb_bounce_v2_long degradation tracking. **No config change — system above breakeven, fix just applied, legacy ages out tomorrow.**
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-13 23:45 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 37T 56.8%WR +$0.60 (ABOVE BREAKEVEN). 7d: 336T 56.3%WR +$1.47 (POSITIVE). Market NEUTRAL. **R:R 24h: 0.981** (breakeven 51%, actual 56.8% — ABOVE). **LOSING TRADE AUTOPSY (15 losers):** trend_purity+ 3 LONG (MET -$0.18 EXTREME, ZRO -$0.29 HIGH, INJ -$0.28 HIGH) — ALL dead signal, 11T/7d 36.4%WR -$0.90. pullback-entry- 4 SHORT (ZRO -$0.21, DYDX -$0.14, NXPC -$0.13, CAKE -$0.10) — rr_engine_resistance exits. rr-struct- 3 SHORT (ZEN -$0.16, LINK -$0.12, INJ -$0.25 legacy). rr-struct+ 2 LONG (KAS -$0.26, TURBO -$0.14). pump-chain+ 1 LONG (FIL -$0.02 tiny). ema300-dip-long 1 LONG (ONDO -$0.15). **KEY:** 3/15 dead signal. 12/15 active losses -$1.10. **7d SIGNALS:** pullback-entry- 46T 65.2%WR +$2.87 ★ | pump_chain 40T 65.0%WR +$0.92 | pump-chain- 40T 65.0%WR +$0.48 | rr-struct+ 15T 73.3%WR +$0.59 | open_skies 8T 62.5%WR +$1.20. **7d REGIME:** EXTREME 136T 59.6%WR +$3.64 ★ | NORMAL 75T 50.7%WR -$1.97 (drag). **7d EXIT:** profit-monster-trail 102T 94.1%WR +$7.31 ★ | cut-loser-CL-T1 45T -$6.73 (legacy aging out) | rr_engine_resistance 33T 39.4%WR -$1.35 (STRUCTURAL SHORT). **DRIFT:** (1) BAD_TRADE_HOURS reverted at 15:09 UTC — recent_changes.log stale. (2) trend_ignition deployed but 0 trades (NEUTRAL market, regime-gated). **CREATIVE:** (1) rr_engine_resistance SHORT exit CLOSE-above-resistance fix (code change + backtest needed). (2) SHORT regime confidence boost in EXTREME (needs backtest). (3) Monitor rr-struct- at 15T kill threshold. **No config change — system above breakeven, legacy ages out tomorrow.**
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-14 01:35 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. DB: 38T/24h 57.9%WR +$1.36 (PROFITABLE). 330T/7d 57.0%WR +$2.66 (PROFITABLE). Market NEUTRAL. **R:R 24h: 1.13** (breakeven 47.3%, actual 57.9% — +10.6% above). **7d REGIME:** EXTREME 135T 60.7%WR +$4.30 ★ | HIGH 119T 58.0%WR +$0.45 | NORMAL 74T 50.0%WR -$2.09. **7d TOP:** pullback-entry- 48T/66.7%WR +$3.26 ★ | pump_chain 38T/65.8%WR +$1.05 | pump-chain- 42T/64.3%WR +$0.66. **LOSING TRADE AUTOPSY (15 losers):** pullback-entry- 5 SHORT (NORMAL regime — pre-VOL_PHASE_MULTS fix, now blocked) -$0.58. rr-struct+ 3 LONG (overbought RSI>60 in NORMAL) -$0.54. trend_purity+ 2 LONG (dead signal, ages out today) -$0.47. rr-struct- 2 SHORT (rr_engine_resistance false breakout) -$0.28. ema300-dip-long 1 LONG (dead) -$0.15. pump-chain+ 1 LONG (tiny) -$0.02. pump-chain- 1 SHORT (tiny) -$0.04. **KEY:** 4/15 dead signal (ages out today). 2/15 tiny. 9/15 active losses -$1.37. **DRIFT:** (1) bb_bounce_v2_long degraded 52.9%WR (was 66.7%) — monitor 48h. (2) NORMAL regime worst 74T/7d -$2.09 — VOL_PHASE_MULTS fix should help. (3) rr-struct- 7T/7d 42.9%WR -$0.42 — monitoring at 15T kill. **CREATIVE:** (1) SHORT_RSI_CEILING=65 — block SHORT at overbought RSI. 20T/7d SHORT at RSI>65: 50%WR -$1.02. Would have blocked 0 winners. (2) rr_engine_resistance SHORT exit: require CLOSE above resistance (needs code + backtest). (3) Monitor rr-struct- at 15T kill. **No config change — system profitable, VOL_PHASE_MULTS fix needs 48h monitoring.**
 - [2026-09-14 07:30 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 41T 48.8%WR -$0.01 (FLAT). 7d: 321T 55.5%WR +$1.96 (PROFITABLE). Market NEUTRAL. **R:R 24h:** needs ~58% WR breakeven, actual 48.8%. **24h SUMMARY:** 21 SHORT trades — 18 pullback-entry- (50%WR +$0.46), 3 pump-chain- (66.7%WR +$0.24). 6 LONG losses: rr-struct+ 3 LONG -$0.19 (STAR variance), rr-struct- 2 SHORT -$0.28, ema300-dip-long 1 LONG -$0.15 (legacy). 1 combo LONG -$0.22 (legacy). **7d REGIME:** EXTREME 130T/60%WR +$4.41 ★ | HIGH 117T/56.4%WR -$0.16 | NORMAL 72T/47.2%WR -$2.29. **7d EXIT:** profit-monster-trail 92T +$6.87 (carries system), atr_sl_hit 125T +$1.62, cut-loser-CL-T1 38T -$5.62 (legacy), rr_engine_resistance 37T -$1.33 (STRUCTURAL SHORT). **CLOSE FIX EFFECT:** rr_engine_resistance SHORT LAST_12H: 4T 50%WR +$0.02 vs PREV 3T 33.3%WR -$0.13 — early improvement signal. **SHORT_NORMAL_PENALTY=0.85:** Only 2 SHORT trades in last 6h (both HIGH/EXTREME, none NORMAL) — working. **rr-struct- MONITORING:** 7T/7d 42.9%WR -$0.42. HIGH regime 4T/7d 25%WR -$0.41 is the drag. NORMAL: 3T 66.7%WR -$0.01 (flat). Kill at 15T. **bb_bounce_v2_long DEGRADING:** 16T/7d 50%WR -$0.47. Below 25T kill threshold. Monitor. **trend_ignition:** 0 trades since Sep 13. Monitor 72h. **CREATIVE:** (1) Add rr-struct- to STANDALONE_BYPASS_SIGNALS — fires independently, NORMAL edge 66.7%WR, HIGH is drag. Low risk. Needs 20+ trades to confirm. (2) Monitor rr_engine_resistance CLOSE fix 48h. **No config change — system flat, all fixes in monitoring phase.**
 - [2026-09-14 ~13:15 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 46T 43.5%WR -$0.87 (BELOW breakeven, variance day). 7d: 320T 55.5%WR +$1.76 (PROFITABLE). Market NEUTRAL. **LOSING TRADE AUTOPSY (26 losers):** pullback-entry- 9 SHORT (normal variance for 63.2%WR signal, 5 NORMAL/4 HIGH, RSI 18-75, bb_pos 0.08-0.99). pump-chain+ 3 LONG (NORMAL 0%WR -$0.44 is the drag). rr-struct+ 2 LONG (STAR signal variance). rr-struct- 2 SHORT (at 7T/15T kill threshold). Others 10 mixed. **KEY:** 0/26 dead signal. 26/26 active losses. Today is pure variance — no systematic entry flaw. **EXIT 7d:** profit-monster-trail 86T 93%WR +$6.12 ★ | atr_sl_hit 138T 49.3%WR +$1.29 | rr_engine_resistance 37T 40.5%WR -$1.33 (FIX DEPLOYED today) | cut-loser-CL-T1 37T 0%WR -$5.44 (legacy). **7d REGIME:** EXTREME 129T/58.9%WR +$4.03 ★ | HIGH 124T/55.6%WR -$0.40 | NORMAL 71T/45.1%WR -$2.65. **SIGNALS AT THRESHOLD:** bb_bounce_v2_long 14T/7d 42.9%WR -$0.86 (kill at 25T, 11 trades away). rr-struct- 7T/7d 42.9%WR -$0.42 (kill at 15T, 8 trades away). **CREATIVE:** (1) pump-chain+ NORMAL 3T/7d 0%WR -$0.44 — monitor, sample too small. (2) bb_position 0.2-0.8 SHORT filter validated but IMPRACTICAL — would block 34 winners and 30 losers, net saves $0.06/7d. (3) bb_bounce_v2_long EXTREME-only filter — 14d shows EXTREME flat, NORMAL/HIGH profitable. Monitor. **No config change — system profitable, two fixes deployed today need evaluation.**
 - [2026-09-14 14:30 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 48T 45.8%WR -$0.83 (BELOW breakeven, variance day). 7d: 328T 54.6%WR +$1.17 (PROFITABLE). Market NEUTRAL. **LOSING TRADE AUTOPSY (24 losers):** pullback-entry- 9 SHORT (-$0.61, 5N/4H, NORMAL drag). pump-chain+ 3 LONG (-$0.41, 2N/1E). rr-struct+ 5 LONG (-$0.22, STAR variance). rr-struct- 2 SHORT (-$0.28, at kill threshold). Others 5 mixed. **KEY:** 0/24 dead signal. 24/24 active losses. Today is pure variance. **EXIT 7d:** profit-monster-trail 86T 93%WR +$6.12 ★ | atr_sl_hit 140T 50%WR +$1.48 | rr_engine_resistance 37T 40.5%WR -$1.33 (fix deployed today) | cut-loser-CL-T1 37T 0%WR -$5.44 (legacy). **7d REGIME:** EXTREME 130T/59.2%WR +$4.16 ★ | HIGH 125T/56.0%WR -$0.34 | NORMAL 71T/45.1%WR -$2.65. **DRIFT:** (1) Signal metadata NULL — all 328/328 7d trades missing entry_rsi_14/signal_z_score (recurring 10+ runs). (2) LONG NORMAL 30T/33.3%WR -$1.85 — worst direction+regime combo. **SIGNALS AT THRESHOLD:** bb_bounce_v2_long 14T/7d 42.9%WR -$0.86 (kill at 25T, 11 away). rr-struct- 7T/7d 42.9%WR -$0.42 (kill at 15T, 8 away). **CREATIVE:** (1) LONG_NORMAL_PENALTY=0.85 — reduce LONG confidence 15% in NORMAL regime. LONG NORMAL 33.3%WR -$1.85 is worse than SHORT NORMAL 53.7%WR -$0.80. Would reduce exposure to worst combo. Needs backtest. (2) Monitor rr_engine_resistance CLOSE fix 48h. **No config change — system in monitoring mode, two fixes deployed today need evaluation.**
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-14 18:25 UTC] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 41T 41.5%WR -$1.12 (NEGATIVE). 7d: 321T 53.3%WR +$0.56 (POSITIVE, barely). Market NEUTRAL. **R:R 24h:** avg_win vs avg_loss needs investigation — 41.5% WR is below breakeven. **24h DIRECTIONAL SPLIT:** SHORT 26T 50%WR +$0.31 (profitable) vs LONG 15T 26.7%WR -$1.43 (bleeding). **LOSING TRADE AUTOPSY (22 losers):** pump-chain+ 6 LONG (FIL 3x, HYPER, KAS, BCH — all atr_sl_hit, 16.7%WR -$0.66). pullback-entry- 5 SHORT (NEO rr_engine_resistance -$0.22, LDO/ONDO/ENS/ENA atr_sl). rr-struct-v2+ 2 LONG (SYRUP/GMT). Others 9 (ema300-dip-long, breakout-long+, pump-chain- 12T 41.7%WR -$0.07). **KEY:** 0/22 dead signal. 22/22 active. pump-chain+ LONG worst active. **FIXES WORKING:** rr_engine_resistance SHORT 0 exits since fix (needs data). SHORT_NORMAL_PENALTY SHORT NORMAL 4T/24h -$0.07 (was -$2.73/7d). SHORT_RSI_CEILING=65 blocking ADA SHORT at RSI 68. **MONITORING:** rr_engine_resistance fix (48h), SHORT_NORMAL_PENALTY (48h), pump-chain+ stale filter (needs 24h), rr-struct- 7T/7d 42.9%WR (kill at 15T), trend_ignition 0 trades (72h). **No config change — 3 fixes need monitoring, system negative but fixes working.**
 - [2026-09-14 ~20:45 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — NO CONFIG CHANGE. 24h: 40T 42.5%WR -$0.86 (NEGATIVE). 7d: 319T 53.6%WR +$0.87 (POSITIVE, degraded). Market NEUTRAL. **LOSING TRADE AUTOPSY (23 losers):** pump-chain+ 5 LONG (pre-kill legacy, -$0.78 combined — all atr_sl_hit). pump-chain- 5 SHORT (HYPER RSI=75 -$0.14, BLUR -$0.20, ENA -$0.16, ENA -$0.13, HYPER RSI=75 -$0.16 — SHORT at overbought RSI=75 = momentum trap). pullback-entry- 5 SHORT (DOT bb=0.86 -$0.06, LDO/ONDO/ENS/ENA atr_sl -$0.63 — STAR signal normal variance). rr-struct-v2+ 2 LONG (SYRUP RSI=28.57 -$0.19, GMT -$0.07). Others 6. **KEY:** 5/23 pre-kill legacy. 18/23 active. **ATR_SL TIGHTNESS WORSENING:** 59.5% of 24h ATR_SL hits exit below entry (was 55% earlier). 22/37 exits below entry, avg -1.26%. Structural — ATR_SL_MIN 1.2% too tight. **EXIT 7d:** profit-monster-trail 76T 92.1%WR +$5.29 | atr_sl_hit 147T 49%WR +$1.47 (55.8% below entry) | rr_engine_resistance 37T 40.5%WR -$1.33 (fix deployed) | cut-loser-CL-T1 33T 0%WR -$4.94 (legacy). **7d REGIME:** EXTREME 127T 56.7%WR +$3.46 | HIGH 122T 55.7%WR +$0.10 | NORMAL 70T 44.3%WR -$2.73. **FIXES MONITORING:** rr_engine_resistance 0 SHORT exits since fix (48h). SHORT_NORMAL_PENALTY 4T/24h -$0.07 (48h). SHORT_RSI_CEILING=65 blocking ADA. **CREATIVE:** (1) ATR_SL_MIN 1.2%->1.3% after Sep 15 monitoring window (reduce 59.5% below-entry rate). (2) pump-chain- SHORT at RSI=75 = momentum trap — monitor. **No config change — 4 items in monitoring, don't stack changes.**
 - [2026-09-14 ~20:55 UTC (brain_auditor run)] brain_auditor: AUDIT COMPLETE — CONFIG CHANGE. 24h: 44T 47.7%WR -$0.10 (NEAR BREAKEVEN). 7d: 321T 53.5%WR +$0.87 (POSITIVE). Market NEUTRAL. **LOSING TRADE AUTOPSY (21 losers):** pump-chain+ 7 LONG (pre-kill legacy, all atr_sl_hit, 28.6%WR -$0.38). pump-chain- 13 SHORT (38.5%WR -$0.21, HYPER RSI=75 momentum trap -$0.14). pullback-entry- 14 SHORT (57.1%WR +$0.46 — STAR signal, normal variance losers). rr-struct-v2+ 7 LONG (66.7%WR +$0.09, SYRUP RSI=28.57 -$0.19). Others 2. **ATR SL TIGHTNESS:** 50% of 24h ATR_SL hits exit below entry. 20/40 exits. **11/20 had SL distance <1.3% — would survive with new floor.** **CONFIG CHANGE: ATR_SL_MIN 1.2%→1.3% (+ all matched deps: ATR_SL_MIN_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK 3.6%→3.9%, STOP_LOSS_DEFAULT, SL_PCT_MIN).** Expected +$1.33/7d net. Saves $1.62 loss, blocks $0.29 tiny wins. **FIXES MONITORING:** rr_engine_resistance 0 SHORT exits since fix (48h). SHORT_NORMAL_PENALTY 4T/24h -$0.07 (48h). SHORT_RSI_CEILING=65 blocking ADA. **MONITORING:** rr-struct- 7T/7d 42.9%WR (kill at 15T), trend_ignition 0 trades (72h). **No additional config change — ATR_SL is the one change this run.**
@@ -1914,6 +2076,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   BY: brain_auditor
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-16 14:00 UTC (brain_auditor run)] brain_auditor: 1 CODE FIX APPLIED — RSI timeframe mismatch
   DB-verified: 24h 26T 57.7%WR +$0.55 (FLAT) | 7d 269T 55.8%WR +$3.73 (POSITIVE)
   SHORT 7d dominant | LONG 7d legacy aging out
@@ -1981,6 +2152,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   BY: brain_auditor
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-17 ~18:00 UTC (brain_auditor run)] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB-verified: 24h 13T 23.1%WR -$1.37 (COLD STREAK) | 7d 226T 51.8%WR -$2.16
   Market NEUTRAL. 1 open (WCT volume-breakout-long+ LONG).
@@ -2007,6 +2187,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   BY: brain_auditor
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 - [2026-09-17 20:00 UTC (brain_auditor run)] brain_auditor: **1 CONFIG CHANGE — STANDALONE_BYPASS cleanup**
   Removed 4 dead signals from STANDALONE_BYPASS_SIGNALS: open-skies+, open-skies (killed Sep 17), bb-bounce-v2-long (dead 4T/7d 25%WR), breakout-long (killed Sep 17). Zero runtime impact (*_ENABLED=False). Code hygiene.
   DB-verified: 24h 13T 18.8%WR -$1.89 (COLD STREAK) | 7d 226T 50.9%WR -\$2.76
@@ -2029,6 +2218,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   BY: brain_auditor
 
 ## TEAM UPDATES
+- [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
+  DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
+  EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).
+  **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable). volume-breakout-long+ 2T normal variance (77.8%WR healthy). Other 1 cut-loser.
+  **RSI CEILING FIX:** Deployed 09:45 UTC. Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected.
+  **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80, +$0.01). (2) EXTREME SHORT regime edge — 60.9%WR 7d. (3) pullback-entry- SHORT HIGH penalty — 47.1%WR HIGH vs 63.6%EXTREME.
+  **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
+  BY: brain_auditor
+
 
 - [2026-09-18 08:00 UTC] brain_auditor: NO CONFIG CHANGE — monitoring only
   DB: 24h 19T 42.1%WR -$1.06 (COLD STREAK) | 7d 214T 52.8%WR -$2.15

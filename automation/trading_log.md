@@ -1381,3 +1381,38 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - All trades NEUTRAL regime
 
 **BY:** auto_1hr
+
+## [2026-09-18 12:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4 wins, 0 losses) — **perfect hour**
+**PnL:** +$0.50 | **24h:** 24T 12W 50.0%WR -$0.71 | **7d:** 212T 114W 53.8%WR -$0.75
+
+**Open (1):**
+- ME volume-breakout-long+ LONG: 3.2h, +$0.11 — trailing
+
+**Last 1h detail:**
+- GMX LONG: +$0.19 (atr_sl_hit — profit locked by trailing)
+- YGG LONG: +$0.06 (atr_sl_hit — profit locked by trailing)
+- FOGO LONG: +$0.13 (profit-monster-trail)
+- DYDX LONG: +$0.12 (atr_sl_hit — profit locked by trailing)
+
+**Signal 24h:**
+- volume-breakout-long+: 8T 75%WR +$0.34 — strong
+- pullback-entry-: 5T 20%WR -$0.59 — bad 24h but 52.2%WR 7d (+$0.26) — variance
+- open-skies+: KILLED, no new trades
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 18/24h closes but trades are profit-locked wins, not losses — trailing SL working correctly
+- Trade frequency: 4/hr — appropriate for NEUTRAL
+- open-skies+ properly killed (False in constants)
+- Pipeline restarted 11:08 UTC with CEO's RSI CEILING fix
+
+**Monitoring:**
+- ME open 3.2h — only position, trailing
+- 7d WR stable at 53.8%
+- All trades NEUTRAL regime
+
+**BY:** auto_1hr

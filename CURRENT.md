@@ -57,6 +57,7 @@
 ## Today's Changes (Sep 18)
 
 1. **CEO ~09:45 UTC — CODE FIX APPLIED.** Execution-time SHORT_RSI_CEILING revalidation. Added `_ctx_gate_get_rsi(token)` + SHORT_RSI_CEILING check in decider_run.py safety section (line 960-966). DB: 24h 20T 40.0%WR -$1.21 (COLD STREAK). 7d 209T 52.6%WR -$1.50. Market NEUTRAL. 0 open. **ROOT CAUSE:** 5 SHORT trades entered RSI>65 (all losers, -$0.98) — detection-time RSI was OK, drifted by execution. **FIX:** Live 1m RSI recheck before trade execution. **EXPECTED:** +$0.98/7d. **NO CONFIG CHANGE** — code fix only.
+1. **brain_auditor ~11:35 UTC — NO CONFIG CHANGE.** DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50. Market NEUTRAL. 0 open. **LOSING AUTOPSY (12 losers):** open-skies+ 4T ALL KILLED legacy. pullback-entry- SHORT 5T cold streak (30d profitable 56.4%WR +$2.01). volume-breakout-long+ 2T normal variance (77.8%WR +$0.43 healthy). Other 1 cut-loser. **RSI CEILING FIX:** Would have caught IMX RSI=72.53 + ALT RSI=68.75. Future trades protected. **CREATIVE:** (1) volume-breakout-long+ LONG_RSI_CEILING=80 — monitor (1 trade at RSI>80). (2) EXTREME SHORT regime edge 60.9%WR 7d. **NO CONFIG CHANGE** — stale filter eval Sep 19, active signals positive 30d (+$4.55).
 
 ## Today's Changes (Sep 17)
 
