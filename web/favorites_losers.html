@@ -108,6 +108,7 @@
                         <th>Trades</th>
                         <th>WR</th>
                         <th>PnL</th>
+                        <th>Dir Stats</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-table"></tbody>
@@ -249,14 +250,38 @@
             tbody.innerHTML = '';
 
             leaderboard.forEach((t, i) => {
-                const fav = t.is_favorite ? '❤' : '';
+                // Direction badges
+                let dirBadge = '';
+                if (t.is_long_fav && t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑↓</span>';
+                } else if (t.is_long_fav) {
+                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑</span>';
+                } else if (t.is_short_fav) {
+                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488;font-size:9px">↓</span>';
+                }
+
+                // Direction-specific stats
+                let dirStats = '';
+                if (t.direction_stats) {
+                    const longStat = t.direction_stats['LONG'];
+                    const shortStat = t.direction_stats['SHORT'];
+                    if (longStat && shortStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span> <span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    } else if (longStat) {
+                        dirStats = `<span style="color:#00ff88;font-size:9px">↑${longStat.winrate}%</span>`;
+                    } else if (shortStat) {
+                        dirStats = `<span style="color:#ff4488;font-size:9px">↓${shortStat.winrate}%</span>`;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr>
                         <td>${i + 1}</td>
-                        <td class="token">${iconHtml(t.token)}${t.token} ${fav}</td>
+                        <td class="token">${iconHtml(t.token)}${t.token} ${dirBadge}</td>
                         <td>${t.trades}</td>
                         <td class="${wrClass(t.winrate)}">${t.winrate.toFixed(1)}%</td>
                         <td class="${pnlClass(t.total_pnl_usdt)}">$${t.total_pnl_usdt.toFixed(2)}</td>
+                        <td>${dirStats}</td>
                     </tr>
                 `;
             });

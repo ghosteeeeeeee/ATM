@@ -150,15 +150,16 @@ def get_favorites_stats():
 
 
 def get_30d_leaderboard():
-    """Query 30d stats for leaderboard and hall of fame."""
+    """Query 30d stats for leaderboard and hall of fame with direction-specific data."""
     conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
+        from hermes_constants import FAVORITES_LONG, FAVORITES_SHORT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
 
-        # All tokens with enough 30d trades
+        # All tokens with enough 30d trades (combined)
         cur.execute(f"""
             SELECT
                 token,
@@ -182,6 +183,42 @@ def get_30d_leaderboard():
 
         columns = [desc[0] for desc in cur.description]
         all_tokens = [dict(zip(columns, [float(v) if hasattr(v, '__float__') else v for v in row])) for row in cur.fetchall()]
+
+        # Direction-specific stats for each token
+        cur.execute(f"""
+            SELECT
+                token,
+                direction,
+                COUNT(*) as trades,
+                ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as winrate,
+                ROUND(SUM(pnl_usdt), 2) as total_pnl_usdt
+            FROM trades
+            WHERE status = 'closed'
+              AND server = 'Hermes'
+              AND pnl_pct IS NOT NULL
+              AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS_30D} days'
+            GROUP BY token, direction
+            HAVING COUNT(*) >= 5
+            ORDER BY token, direction
+        """)
+
+        direction_stats = {}
+        for row in cur.fetchall():
+            token, direction, trades, winrate, total_pnl = row
+            if token not in direction_stats:
+                direction_stats[token] = {}
+            direction_stats[token][direction] = {
+                'trades': int(trades),
+                'winrate': float(winrate) if winrate else 0,
+                'total_pnl_usdt': float(total_pnl) if total_pnl else 0
+            }
+
+        # Add direction info and stats to each token
+        for token_data in all_tokens:
+            token = token_data['token']
+            token_data['is_long_fav'] = token in FAVORITES_LONG
+            token_data['is_short_fav'] = token in FAVORITES_SHORT
+            token_data['direction_stats'] = direction_stats.get(token, {})
 
         # Hall of fame: consistent winners (30d WR >= 60%, trades >=15, profitable)
         hall_of_fame = [
