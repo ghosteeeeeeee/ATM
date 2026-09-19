@@ -1,21 +1,21 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~15:00 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-19 ~18:30 UTC (daily_orchestrator)**
+**Updated by: daily_orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 46T, 41.3% WR, +$0.89. 5 open ($68.70). Market NEUTRAL. Pipeline running.
+24h: 50T, 44.0% WR, +$0.67. 6 open ($74.30). Market LONG_BIAS. Pipeline running.
 
-- **24h (rolling):** 46T, 41.3% WR, +$0.89. Winners: pump-chain+ 13T 38.5%WR +$0.98, volume-breakout-long+ 3T 66.7%WR +$0.50, grind-trend+ 18T 50%WR +$0.24. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend- SHORT 3T 33.3%WR -$0.16.
-- **Today (calendar):** 46T closed (Sep 19). 5 open.
-- **7d:** 206T, 48.5% WR, -$0.84 (DB-verified). NEGATIVE but improving. Active winners: pump-chain+ LONG 25T 44%WR +$0.99, volume-breakout-long+ LONG 13T 69.2%WR +$0.76, rr-struct+ LONG 11T 72.7%WR +$0.58. Legacy killed signals aging out (-$2.46 total).
-- **Market:** NEUTRAL (5 open trades, $68.70 exposure).
+- **24h (rolling):** 50T, 44.0% WR, +$0.67. Winners: pump-chain+ 18T 56%WR +$1.63, grind-trend+ 18T 50%WR +$0.24. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend- SHORT 5T 20%WR -$0.38 (killed 17:12 UTC).
+- **Today (calendar):** 50T closed (Sep 19). 6 open ($74.30 exposure).
+- **7d:** 207T, 49.3% WR, +$0.13 (DB-verified). **POSITIVE.** Active winners: pump-chain+ LONG 30T 53%WR +$1.64, volume-breakout-long+ LONG 13T 69%WR +$0.76, rr-struct+ LONG 9T 67%WR +$0.52, grind-trend+ LONG 18T 50%WR +$0.24. Legacy killed signals aging out.
+- **Market:** LONG_BIAS (6 open trades, $74.30 exposure). 8 long / 0 short / 112 neutral.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
-- **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
+- **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend- (Sep 19, signal_reporter killed — 5T 20%WR -$0.38, no winning regime), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
-- **Disk:** ~85% (18G free). Trending up but below 90% threshold. Compress if crosses 88%.
+- **Disk:** 84% (19G free). Trending up but below 90% threshold. Compress if crosses 88%.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%. (brain_auditor changed MIN 1.2%→1.3% at 22:34 UTC Sep 14)
 - **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active.
@@ -23,19 +23,21 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟡 R:R STATUS (SLIGHTLY NEGATIVE 7d, POSITIVE 24h)**
-7d PnL -$0.69. SHORT +$1.23 carries LONG -$2.17 (legacy aging out). 24h +$0.98. Total active 30d: +$4.93.
+**🟢 R:R STATUS (POSITIVE 7d, POSITIVE 24h)**
+7d PnL +$0.13. SHORT +$0.20 carries LONG +$0.24. 24h +$0.67. Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
 
 **🟢 SYSTEM FIXES VERIFIED:** rr_engine (0 exits 6+ days), cut-loser-CL-T1 (7d -$1.19, working), exit_conditions (new trades have data), RSI timeframe (1m data, 0 bad entries since).
 
-**🔴 SIGNAL DIVERSITY CRITICAL:** Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals. 30d active: 6 types (+$4.93).
+**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence reliably. pullback-entry- SHORT historically profitable but 0%WR 24h. Need new signals. 30d active: 6 types (+$4.93).
 
 **🟢 FEATURE RECORDING:** _signal_metadata RSI+momentum 187/188 trades (WORKING). **gap_at_entry + staleness_minutes** — decider_run.py injects EMA300 gap% and signal age into metadata. Since fix: staleness 23/26 (88%), gap 16/26 (62% — <300 candles = no EMA300), is_stale 26/26 (100%). — 2026-09-19
 
 ## Today's Changes (Sep 19)
 
+1. **daily_orchestrator ~18:30 UTC — NO CONFIG CHANGE.** DB: 24h 50T 44.0%WR +$0.67. 7d 207T 49.3%WR +$0.13 (**POSITIVE**). Market LONG_BIAS. 6 open ($74.30). **grind-trend- SHORT killed** by signal_reporter 17:12 UTC (5T 20%WR -$0.38, no winning regime). **STALE FILTER:** 48h: 3/61 stale (4.9%). **REGIME:** EXTREME 58%WR +$1.74 (best), NORMAL 46%WR -$0.49, HIGH 47%WR -$1.12. **DISK:** 84% (19G free). **NO ACTION NEEDED.**
+1. **signal_reporter ~17:12 UTC — SIGNAL KILL.** grind-trend- SHORT killed (GRIND_TREND_MINUS_ENABLED = False). 5T/24h 20%WR -$0.38, no winning regime (NORMAL 0%WR, HIGH 33.3%WR). Committed.
 1. **CEO ~15:00 UTC — CODE FIX.** Chase filter activated. Added CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py. Fixed decider_run.py: abs() bug (was blocking dip-buying LONGs), added z-score fallback via _ctx_gate_get_zscore (signal_z_score always NULL). Pipeline restart needed. **EXPECTED:** +$1.25/7d.
 1. **CEO ~10:38 UTC — CONFIG CHANGE.** GRIND_TREND_PLUS_ENABLED = False. 14T/7d 35.7%WR -$0.21, all NEUTRAL. Already blocked NORMAL by signal_reporter. Net loser, not CEO_PROTECTED. **EXPECTED:** +$0.21/7d.
 1. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 41T 39.0%WR +$0.04. 7d 196T 46.9%WR -$2.10. Market NEUTRAL. 2 open. **FEATURE RECORDING:** staleness 23/26 (88%), gap_at_entry 16/26 (62% — tokens with <300 candles have no EMA300). **STALE FILTER:** 3/61 stale in 48h (4.9%, down from 43.8% pre-filter). **NO ACTION NEEDED.** Pipeline stable after auto_1hr crash fix.
@@ -95,7 +97,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 9. **NEXT: Execution-time revalidation for stale signals.** Further improvement possible with execution-time check. — 2026-09-16
 10. **INVESTIGATE: rr_engine_support_br 30% WR (10T -$0.73).** Consider widening support_br threshold. — 2026-09-17
 11. **DEVELOP: New signals for NEUTRAL regime.** Only 2 signal types pass confluence. Need diversity. — 2026-09-16
-12. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME — system edge. Stale filter protecting. — 2026-09-18
+12. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME — system edge. Stale filter protecting. 7d EXTREME: 52T 58%WR +$1.74. — 2026-09-19
 13. **MONITOR: volume-breakout-long+ RSI/momentum pattern.** Both 7d losers had RSI>60 + weak momentum. 3 trades only — need 20+ before filter. Monitor until Oct 1. — 2026-09-17
 14. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Use `signal` column for analytics. Low priority fix. — 2026-09-17
-15. **DISK: 83% (20GB free).** Below 88% threshold. Monitor. — 2026-09-19
+15. **DISK: 84% (19G free).** Below 88% threshold. Monitor. — 2026-09-19

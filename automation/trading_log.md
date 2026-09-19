@@ -2556,3 +2556,32 @@ Final set: ['DOT', 'HYPER']
 - pullback-entry- 3T/24h 0%WR -$0.50 — dormant, no action needed
 
 **BY:** auto_1hr
+
+## [2026-09-19 18:30 UTC] Daily Orchestrator
+
+**No Config Change Needed**
+
+**Trades:** 50 closed today, 6 open ($74.30 exposure)
+**24h:** 50T, 44.0% WR, +$0.67
+**7d:** 207T, 49.3% WR, +$0.13 (POSITIVE)
+**Market:** LONG_BIAS (8 long / 0 short / 112 neutral)
+
+**Kills Today:**
+- grind-trend+ LONG: CEO killed 10:38 UTC (14T 35.7%WR -$0.21, all NEUTRAL)
+- grind-trend- SHORT: signal_reporter killed 17:12 UTC (5T 20%WR -$0.38, no winning regime)
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: 18T 56%WR +$1.63 (dominant)
+- grind-trend+ LONG: 18T 50%WR +$0.24
+- pullback-entry- SHORT: 3T 0%WR -$0.50 (watch — historically profitable)
+- grind-trend- SHORT: 5T 20%WR -$0.38 (killed)
+
+**Regime (7d):**
+- EXTREME: 52T 58%WR +$1.74 (best)
+- NORMAL: 63T 46%WR -$0.49
+- HIGH: 91T 47%WR -$1.12
+
+**Stale Filter:** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter)
+**Disk:** 84% (19G free)
+**Pipeline:** Healthy, 0 errors, all timers firing
+**BY:** daily_orchestrator
