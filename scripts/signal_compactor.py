@@ -564,6 +564,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # grind_breakout — steady grind + late breakout (RSI 35-65 quality filter)
     ('grind_breakout_long',  'grind-breakout+'):  1.0,
     ('grind_breakout_short', 'grind-breakout-'):  1.0,
+    # grind_trend — accumulation grind, steady drift (no breakout needed)
+    ('grind_trend_long',  'grind-trend+'):  1.0,
+    ('grind_trend_short', 'grind-trend-'):  1.0,
     # squeeze_reversal — BB squeeze → mean-reversion breakout
     ('squeeze_reversal_long',  'squeeze-reversal+'):  1.0,
     ('squeeze_reversal_short', 'squeeze-reversal-'):  1.0,

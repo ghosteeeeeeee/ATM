@@ -752,6 +752,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
             GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
+            GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, ATR_SPIKE_ENABLED, ATR_SPIKE_PLUS_ENABLED,
             EXHAUSTION_ENABLED,
@@ -944,6 +945,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 return None
             if _comp == 'grind-breakout' and not GRIND_BREAKOUT_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_BREAKOUT_ENABLED=False', flush=True)
+                return None
+            # grind_trend — accumulation grind
+            if _comp == 'grind-trend+' and not GRIND_TREND_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_TREND_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'grind-trend-' and not GRIND_TREND_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_TREND_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'grind-trend' and not GRIND_TREND_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GRIND_TREND_ENABLED=False', flush=True)
                 return None
             # pullback_entry — post-impulse consolidation
             if _comp == 'pullback-entry' and not PULLBACK_ENTRY_ENABLED:
@@ -2629,6 +2640,7 @@ def is_component_disabled(component: str) -> bool:
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
             GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
+            GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
             EMA300_DIP_LONG_ENABLED,
             EMA300_DIP_SHORT_ENABLED,
             EMA300_BREAKTHROUGH_ENABLED, EMA300_BREAKTHROUGH_PLUS_ENABLED, EMA300_BREAKTHROUGH_MINUS_ENABLED,
@@ -2800,6 +2812,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'grind-breakout+': return not GRIND_BREAKOUT_PLUS_ENABLED
     if c == 'grind-breakout-': return not GRIND_BREAKOUT_MINUS_ENABLED
     if c == 'grind-breakout': return not GRIND_BREAKOUT_ENABLED
+    # grind-trend
+    if c == 'grind-trend+': return not GRIND_TREND_PLUS_ENABLED
+    if c == 'grind-trend-': return not GRIND_TREND_MINUS_ENABLED
+    if c == 'grind-trend': return not GRIND_TREND_ENABLED
     # pullback-entry
     if c == 'pullback-entry': return not PULLBACK_ENTRY_ENABLED
     if c == 'pullback-entry+': return not PULLBACK_ENTRY_PLUS_ENABLED

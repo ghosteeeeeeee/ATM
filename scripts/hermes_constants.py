@@ -2011,7 +2011,8 @@ GRIND_TREND_MINUS_ENABLED = True          # SHORT direction
 GRIND_TREND_COOLDOWN_HOURS = 3            # per token+direction cooldown
 # Trend detection
 GRIND_TREND_SLOPE_MIN = 0.003             # min linear regression slope (%/bar)
-GRIND_TREND_LOOKBACK = 60                 # bars for slope/SMA calculation
+GRIND_TREND_LOOKBACK = 60                 # bars for slope calculation
+GRIND_TREND_SMA_PERIOD = 20               # SMA period for trend check (shorter = catches grinds better)
 GRIND_TREND_HL_LOOKBACK = 20              # bars for higher-lows check
 # Volatility filter
 GRIND_TREND_ATR_MAX_PCT = 0.8             # max ATR% — grind = low vol (<0.8%)
@@ -2441,6 +2442,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
+    'grind-trend', 'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works solo (2026-09-19)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
     'rr-struct-v2', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14). v2+ KILLED CEO 2026-09-15

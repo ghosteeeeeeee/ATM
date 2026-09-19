@@ -101,6 +101,9 @@ SIGNAL_OVERRIDES = {
     'ema300_breakthrough': 'MOMENTUM',        # EMA300 breakout — trend continuation, block in chop
     'ema300_breakthrough_long': 'MOMENTUM',
     'ema300_breakthrough_short': 'MOMENTUM',
+    'grind_trend': 'MOMENTUM',               # accumulation grind — trend following, block in chop
+    'grind_trend_long': 'MOMENTUM',
+    'grind_trend_short': 'MOMENTUM',
     # pump-chain: chain-correlation signal, fires when coin is pumping — NOT BTC-dependent (2026-09-13)
     'pump_chain': 'MEAN_REVERSION',
     'pump_chain_long': 'MEAN_REVERSION',

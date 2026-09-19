@@ -40,6 +40,7 @@ REGIME_SIGNALS = {
         'accel-300-v3-long+',  # V3 pullback LONG — works in all regimes (trend-based, not vol-based)
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
+        'grind-trend+', 'grind-trend-',  # accumulation grind — low-vol drift, ideal for FLAT
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'doji-top-short',  # doji exhaustion at top — mean-reversion (exit LONG / enter SHORT)
@@ -111,6 +112,7 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
+        'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in steady markets
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol
@@ -170,6 +172,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
+        'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in high vol
         'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
