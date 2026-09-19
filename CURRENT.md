@@ -1,20 +1,20 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~06:35 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-19 ~10:38 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 41T, 39.0% WR, +$0.04. 2 open. Market NEUTRAL. Pipeline running.
+24h: 47T, 38.3% WR, +$0.46. 7 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 41T, 39.0% WR, +$0.04 (barely positive). Winners: volume-breakout-long+ 7T 71.4%WR +$0.55, doji-bottom-long 1T +$0.13. Losers: pullback-entry- SHORT 2T 0%WR -$0.35, grind-trend+ 12T 33.3%WR -$0.23.
-- **Today (calendar):** 41T closed (Sep 19). 2 open (LINK SHORT grind-trend-, AVAX LONG pump-chain+).
-- **7d:** 196T, 46.9% WR, -$2.10 (DB-verified). NEGATIVE — worsening from -$0.69 yesterday. 7d losers: trend_purity+ -$1.02 (killed), rr-struct-v2+ -$0.45 (killed), rr-struct- -$0.42 (killed), open-skies+ -$0.40 (killed), breakout-long+ -$0.35 (killed). All legacy, aging out.
-- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.90 (11T/36.4%WR), rr-struct-v2+ -$0.45 (10T/40%WR), rr-struct- -$0.42 (7T/42.9%WR), open-skies+ -$0.42 (8T/37.5%WR), breakout-long+ -$0.35 (4T/25%WR). All legacy — system improving as they age out.
-- **Market:** NEUTRAL (5 open trades).
+- **24h (rolling):** 47T, 38.3% WR, +$0.46. Winners: volume-breakout-long+ 8T 75%WR +$0.79, pump-chain+ 11T 27.3%WR +$0.49, mover+ 5T 60%WR +$0.04. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend+ 14T 35.7%WR -$0.21 (NOW KILLED).
+- **Today (calendar):** 47T closed (Sep 19). 7 open.
+- **7d:** 202T, 47.0% WR, -$1.71 (DB-verified). NEGATIVE. 7d active losers: grind-trend+ 14T 35.7%WR -$0.21 (NOW KILLED), pullback-entry- 65T 49.2%WR -$0.34 (cold streak,30d profitable +$1.51).
+- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.91 (killed), rr-struct-v2+ -$0.45 (killed), rr-struct- -$0.42 (killed), open-skies+ -$0.40 (killed), breakout-long+ -$0.35 (killed). All legacy — system improving as they age out.
+- **Market:** NEUTRAL (7 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
-- **KILLED/REGIME BLOCKED:** grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
+- **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
 - **CONF_FILTER_MIN=70.**
 - **Disk:** ~85% (18G free). Trending up but below 90% threshold. Compress if crosses 88%.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
@@ -37,6 +37,7 @@
 
 ## Today's Changes (Sep 19)
 
+1. **CEO ~10:38 UTC — CONFIG CHANGE.** GRIND_TREND_PLUS_ENABLED = False. 14T/7d 35.7%WR -$0.21, all NEUTRAL. Already blocked NORMAL by signal_reporter. Net loser, not CEO_PROTECTED. **EXPECTED:** +$0.21/7d.
 1. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 41T 39.0%WR +$0.04. 7d 196T 46.9%WR -$2.10. Market NEUTRAL. 2 open. **FEATURE RECORDING:** staleness 23/26 (88%), gap_at_entry 16/26 (62% — tokens with <300 candles have no EMA300). **STALE FILTER:** 3/61 stale in 48h (4.9%, down from 43.8% pre-filter). **NO ACTION NEEDED.** Pipeline stable after auto_1hr crash fix.
 1. **auto_1hr ~06:16 UTC — CRITICAL FIX.** FAVORITES_LONG NameError crash. favorites_updater.py overwrote FAVORITES_LONG with FAVORITES. Fixed: renamed to FAVORITES_LONG + updated updater. Committed c4133254.
 1. **signal_reporter ~05:12 UTC — REGIME BLOCK.** grind-trend+ NORMAL blocked (0%WR 5T, wins HIGH 57.1%). Committed 96d68c09.

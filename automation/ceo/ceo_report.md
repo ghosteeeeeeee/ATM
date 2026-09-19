@@ -1,3 +1,22 @@
+## CEO Report — 2026-09-19 ~10:38 UTC
+
+### Diagnosis
+DB-verified. 24h: 47T, 38.3%WR, +$0.46 (barely positive). 7d: 202T, 47.0%WR, -$1.71 (negative, worsening from -$0.69 yesterday). 7 open. Market NEUTRAL. ATR_SL dominates: 72 hits/7d losing $11.73. avg loss -5.39% vs 1.3-1.5% stops = gaps through (entry quality issue, not stop width). Only 2 signal types pass confluence in NEUTRAL.
+
+### Root Cause
+grind-trend+ LONG firing in NEUTRAL (already blocked NORMAL by signal_reporter). 14T, 35.7%WR, -$0.21. Net loser. Cut-loser-CL-T1 cutting winners early (3 exits on grind-trend+). 7d legacy losers aging out (trend_purity+, rr-struct-v2+, rr-struct-, open-skies+, breakout-long+).
+
+### Fix Applied
+**CONFIG:** GRIND_TREND_PLUS_ENABLED = False. Expected +$0.21/7d. Pipeline will pick up on next restart.
+
+### 30d Winners (active signals)
+pullback-entry- SHORT: 97T 54.6%WR +$1.51 | volume-breakout-long+: 13T 69.2%WR +$0.76 | rr-struct+: 15T 73.3%WR +$0.59 | mover+: 13T 76.9%WR +$0.34
+
+### Next
+- Monitor grind-trend- SHORT (2T 0%WR, too few trades to kill)
+- Develop new NEUTRAL regime signals (confluence gap)
+- ATR_SL root cause: entry quality, not stop width
+
 ## CEO Report — 2026-09-19 ~02:40 UTC
 
 ### Diagnosis

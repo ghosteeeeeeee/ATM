@@ -1198,5 +1198,32 @@
     "status": "suggested",
     "risk": "low — monitoring only",
     "sample_size": "insufficient — need 50+ regime transition events"
+  },
+  {
+    "date": "2026-09-19T11:30:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "LONG_ZSCORE_MAX=2.5",
+        "rationale": "z>2.5 LONG = 12.5%WR 7d (1W/7L). Net +.08 if blocked. Small sample (8T).",
+        "expected_impact": "+$1.00-1.10/7d",
+        "status": "monitor",
+        "review_date": "2026-10-03"
+      },
+      {
+        "idea": "grind-trend+ NORMAL block",
+        "rationale": "5T 0%WR in NORMAL, HIGH 55.6%WR. Regime-specific gate.",
+        "expected_impact": "+$0.30/7d",
+        "status": "monitor",
+        "review_date": "2026-10-03"
+      },
+      {
+        "idea": "volume-breakout-long+ EXTREME confidence boost",
+        "rationale": "7T 71.4%WR +$0.72/7d in EXTREME. System edge.",
+        "expected_impact": "+$0.10-0.20/7d",
+        "status": "monitor",
+        "review_date": "2026-10-03"
+      }
+    ]
   }
 ]

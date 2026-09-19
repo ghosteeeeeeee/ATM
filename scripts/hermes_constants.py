@@ -2019,7 +2019,7 @@ GRIND_BREAKOUT_BREAKOUT_BONUS_BUFFER = 0.005  # 0.5% above range for breakout bo
 # ── grind_trend (accumulation grind — steady drift, no breakout needed) ───────
 # grind_trend.py — low-volatility accumulation grind signal
 GRIND_TREND_ENABLED = True                # master kill-switch
-GRIND_TREND_PLUS_ENABLED = True           # LONG direction
+GRIND_TREND_PLUS_ENABLED = False           # CEO KILLED 2026-09-19 — 14T/7d 35.7%WR/-$0.21, all NEUTRAL. Already blocked NORMAL by signal_reporter. Net loser.
 GRIND_TREND_MINUS_ENABLED = True          # SHORT direction
 GRIND_TREND_COOLDOWN_HOURS = 3            # per token+direction cooldown
 # Trend detection
