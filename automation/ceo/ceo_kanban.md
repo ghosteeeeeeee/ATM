@@ -19,6 +19,25 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-19 14:31 UTC] brain_auditor: CONFIG CHANGE — CHASE COMPOSITE filter deployed
+  DB-verified: 24h 46T 41.3%WR +$0.89 | 7d 206T 48.5%WR -$0.84
+  Market NEUTRAL.
+  **CHASE FILTER DEPLOYED:** CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. 7d: 15T LONG z>2.5 OR gap>1.0% = 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28. Blocks 3 small winners ($0.23). Net +$1.32/7d.
+  **LOSING AUTOPSY (23):** grind-trend+ 12T (killed at 10:38 UTC, 10 losers before kill). pullback-entry- 3T 0%WR -$0.50 (NORMAL+EXTREME). pump-chain+ 6T mixed. Most losers have high z/gap (chase pattern).
+  **RSI RECORDING BROKEN:** 0/206 trades have RSI in _signal_metadata. Cannot validate RSI-based filters. Needs fix.
+  **grind-trend+ HIGH WINNER:** 12T 66.7%WR +$0.35/7d. CEO killed all regimes. NORMAL was bad (6T 16.7%WR -$0.11) but HIGH is strong. Suggest restore with NORMAL block.
+  **EXTREME SHORT EDGE:** pullback-entry- SHORT EXTREME 20T/14d 65%WR +$1.30. Best signal+regime combo. Stale filter protecting.
+  BY: brain_auditor
+
+- [2026-09-19 14:00 UTC] brain_auditor: NO CONFIG CHANGE — deep audit + chase analysis
+  DB-verified: 24h 47T 38.3%WR +$0.46 | 7d 207T 47.0%WR -$1.71
+  Market NEUTRAL.
+  **CHASE COMPOSITE (NEW):** z>2.5 OR gap>1.0 LONG: 15T/7d 20%WR -$1.25. Non-chase: 97T 53.6%WR +$1.22. One filter catches ALL chasers. MAX_ENTRY_GAP=1.0 blocks 8T -$0.40. LONG_ZSCORE_MAX=2.5 blocks 8T -$1.01.
+  **SHORT_RSI_FLOOR DRIFT:** RSI<35 SHORT: 27T/14d 55.6%WR +$0.24 (BLOCKED by floor). RSI 35-50 SHORT: 41T/7d 36.6%WR -$1.89 (worst zone, ALLOWED). Floor is backwards. Needs 2+ week monitoring before change.
+  **LOSING AUTOPSY:** ADA -$0.16 (gap=2.83% chase), CC -$0.17 (gap=1.35% chase), FIL -$0.22 (z=2.61 chase). All would be blocked by chase filter.
+  **CREATIVE:** (1) CHASE_COMPOSITE filter — +$1.25/7d. (2) SHORT_RSI floor reversal — monitor. (3) EXTREME SHORT RSI>50 boost — monitor.
+  BY: brain_auditor
+
 - [2026-09-19 11:30 UTC] brain_auditor: NO CONFIG CHANGE — audit + creative ideas
   DB-verified: 24h 47T 38.3%WR +$0.46 | 7d 202T 47.5%WR -$1.88
   Market NEUTRAL.
@@ -28,6 +47,17 @@
   **Z-SCORE CHASING CONFIRMED:** z>2.5 LONG 8T 12.5%WR -$1.01/7d. Only 1 winner (GMX +$0.19). 7 losers all chase entries.
   **CREATIVE:** (1) LONG_ZSCORE_MAX=2.5 — +$1.08/7d net impact (monitor 2 weeks, need 20+ trades). (2) grind-trend+ NORMAL block — 5T 0%WR -$0.30/7d. (3) volume-breakout-long+ EXTREME confidence boost — 7T 71.4%WR +$0.72.
   **NO ACTION** — small samples, monitoring. Session brain empty (needs ingest).
+  BY: brain_auditor
+
+- [2026-09-19 11:45 UTC] brain_auditor: NO CONFIG CHANGE — deep audit + gap analysis
+  DB-verified: 24h 46T 38.3%WR +$0.46 | 7d 205T 47.0%WR -$1.71
+  Market NEUTRAL.
+  **GAP ANALYSIS (NEW — 7d data with gap_at_entry):** Sweet spot 0.3-0.7% = 80%WR +$0.44. >1.0% = 14.3%WR -$0.42 (chasing). <0.3% = 20%WR +$0.29 (oversold/early). Recommendation: MAX_ENTRY_GAP=1.0 (blocks ADA 2.83%, CC 1.35% chases).
+  **STALENESS ANALYSIS (NEW):** <2m entries = 22%WR -$0.71 (too early). 2-5m = 66.7%WR +$0.14 (sweet spot). 5-10m = 28.6%WR +$0.34.
+  **RSI DATA GAP — CRITICAL:** 0/46 trades have RSI recorded. Root cause: signals output 'rsi' key but decider_run.py looks for 'rsi_14'. Key mismatch. Also, many signals (grind_trend, mover, volume_breakout) don't output RSI at all.
+  **LOSING AUTOPSY:** ADA pump-chain+ LONG -$0.16 (gap=2.83%, chasing). CC pump-chain+ LONG -$0.17 (gap=1.35%, chasing). USUAL grind-trend+ -$0.09 (stale=9.87m, NORMAL regime).
+  **CREATIVE:** (1) MAX_ENTRY_GAP=1.0 — blocks chasing, zero impact on recent winners. (2) Fix rsi key mismatch in decider_run.py (one-line fix). (3) volume-breakout-long+ EXTREME confidence boost (7T 71.4%WR, needs more data).
+  **NO ACTION** — gap sample 20 trades (needs 20+). Monitoring. Session brain empty.
   BY: brain_auditor
 
 - [2026-09-19 03:30 UTC] brain_auditor: CONFIG CHANGE — SHORT_NORMAL_PENALTY 0.8→1.0

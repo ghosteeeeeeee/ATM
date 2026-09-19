@@ -274,5 +274,16 @@
     "after": "SHORT_NORMAL_PENALTY = 1.0",
     "rationale": "CEO removed penalty Sep 16 but code drift left it at 0.8. SHORT NORMAL 7d: 28T 57.1%WR +$0.19 — profitable, penalty suppressing entries.",
     "impact": "+$0.19/7d expected from unblocked SHORT NORMAL entries"
+  },
+  {
+    "timestamp": "2026-09-19T14:31:00Z",
+    "agent": "brain_auditor",
+    "change": "Added CHASE composite filter — blocks LONG entries chasing extended moves (z>2.5 OR gap>1.0%)",
+    "type": "config",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "No chase filter existed",
+    "after": "CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. Filter in decider_run.py before execute_trade()",
+    "rationale": "7d data: 15T chase LONG 20%WR -$1.25 vs 96T non-chase 53.1%WR +$1.28. Blocks 3 small winners ($0.23). Net +$1.32/7d.",
+    "impact": "+$1.32/7d expected"
   }
 ]

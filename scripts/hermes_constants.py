@@ -795,6 +795,13 @@ SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) -
 SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
 SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
 
+# ── Chase Filter (cross-signal) ─────────────────────────────────────────────
+# Block entries chasing extended moves. Data (7d LONG): z>2.5 12.5%WR -$1.01,
+# gap>1.0% 25%WR -$0.40. Non-chase: 53.1%WR +$1.28. Net +$1.25/7d if blocked.
+CHASE_FILTER_ENABLED = True
+CHASE_GAP_MAX_PCT = 1.0              # max EMA300 gap% for LONG (blocks chasing pumps)
+CHASE_ZSCORE_MAX = 2.5               # max z-score for LONG (blocks chasing extended moves)
+
 # ── Global Spike Filter ────────────────────────────────────────────────────
 # Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)
 # Backtested: spike>0.3% + RSI<30 blocks 2x more losers than winners (0.5x ratio)
@@ -820,6 +827,12 @@ SHORT_BB_DEAD_ZONE_MAX = 0.85
 # 7d: 25T 44%WR -$0.99. Blocks 14 losers (-$2.26), 11 winners (+$1.27). Net: +$0.99/7d.
 SHORT_BB_DEAD_ZONE2_MIN = 0.35
 SHORT_BB_DEAD_ZONE2_MAX = 0.55
+
+# ── CHASE COMPOSITE filter: block LONG entries chasing extended moves ────
+# z>2.5 OR gap>1.0% (EMA300) = chasing. 7d: 15T 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28.
+# Blocks 3 small winners ($0.23 total). Net: +$1.32/7d.
+CHASE_ZSCORE_MAX = 2.5            # block LONG if z_score > this (overextended)
+CHASE_GAP_MAX_PCT = 1.0           # block LONG if |gap_at_entry| > this% (chasing EMA300)
 
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.

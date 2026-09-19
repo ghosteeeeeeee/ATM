@@ -1,110 +1,152 @@
 {
-    "timestamp": "2026-09-19T11:30:00Z",
-    "agent": "brain_auditor",
-    "session_brain_stats": {
-        "status": "EMPTY — no ingest run. Session brain FAISS index is empty. Run --ingest to populate."
+  "timestamp": "2026-09-19T14:31:00Z",
+  "session_brain_stats": {
+    "total_vectors": 4215,
+    "topics_searched": ["signal performance", "ideas improvements", "losing money", "chase entry quality", "RSI recording bug", "regime edge"],
+    "key_insight": "Chase composite (z>2.5 OR gap>1.0%) is the strongest unimplemented filter — 15T 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28"
+  },
+  "trade_summary_24h": {
+    "total_trades": 46,
+    "win_rate": 41.3,
+    "pnl": 0.89,
+    "open_positions": 7,
+    "market_regime": "NEUTRAL",
+    "best_signal": "pump-chain+ LONG 13T 38.5%WR +$0.98",
+    "worst_signal": "pullback-entry- SHORT 3T 0%WR -$0.50"
+  },
+  "trade_summary_7d": {
+    "total_trades": 206,
+    "win_rate": 48.5,
+    "pnl": -0.84,
+    "regime_breakdown": {
+      "EXTREME": {"trades": 49, "wr": 53.1, "pnl": 1.23, "note": "Best regime — system edge"},
+      "HIGH": {"trades": 93, "wr": 46.2, "pnl": -1.86, "note": "Worst — mostly legacy"},
+      "NORMAL": {"trades": 63, "wr": 49.2, "pnl": -0.21, "note": "Flat"}
+    }
+  },
+  "drift_findings": [
+    {
+      "issue": "RSI recording completely broken",
+      "detail": "0/206 trades have RSI data in _signal_metadata (7d). Feature recording fix on Sep 16 changed candles_5m→candles_1m for RSI computation, but RSI is never written to _signal_metadata.",
+      "impact": "HIGH — Cannot validate RSI-based filters (SHORT_RSI_FLOOR, SHORT_RSI_CEILING). Blind trading.",
+      "status": "unfixed",
+      "suggested_fix": "Inject rsi into _exec_meta in decider_run.py like gap_at_entry and staleness_minutes"
     },
-    "trade_summary_24h": {
-        "trades": 47,
-        "wr": 38.3,
-        "pnl": 0.46,
-        "open": 2,
-        "market_regime": "NEUTRAL"
+    {
+      "issue": "grind-trend+ killed entirely when only NORMAL was bad",
+      "detail": "CEO killed grind-trend+ (all regimes) because 14T/7d 35.7%WR -$0.21. But HIGH was 12T 66.7%WR +$0.35. NORMAL was 6T 16.7%WR -$0.11. Regime block already handles NORMAL.",
+      "impact": "MEDIUM — Lost +$0.35/7d from HIGH winners",
+      "status": "unfixed",
+      "suggested_fix": "Restore grind-trend+ LONG, keep NORMAL regime block via signal_reporter"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "Chase entries (z_score > 2.5 or gap > 1.0%)",
+      "frequency": "3+ sessions (brain_auditor Sep 18, Sep 19, Sep 19 afternoon)",
+      "detail": "LONG entries chasing extended moves consistently lose. z>2.5 LONG: 8T 12.5%WR -$1.01/7d. gap>1.0% LONG: 8T 25%WR -$0.40/7d. Combined chase composite: 15T 20%WR -$1.25.",
+      "resolution": "IMPLEMENTED — Chase filter added to decider_run.py. CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0."
     },
-    "trade_summary_7d": {
-        "trades": 202,
-        "wr": 47.5,
-        "pnl": -1.88,
-        "regimes": {
-            "EXTREME": {"trades": 48, "wr": 52.1, "pnl": 0.89},
-            "HIGH": {"trades": 91, "wr": 44.0, "pnl": -2.20},
-            "NORMAL": {"trades": 62, "wr": 48.4, "pnl": -0.40}
-        }
+    {
+      "topic": "Feature recording gaps",
+      "frequency": "5+ sessions (brain_auditor Sep 16, 17, 18, 19, 19)",
+      "detail": "RSI: 0/206 (broken). Gap: 27/206 (post-fix only). Staleness: 34/206 (post-fix only). Z-score: 205/206 (working).",
+      "resolution": "RSI still broken. Gap and staleness working for post-fix trades."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "RSI injection into _signal_metadata",
+      "priority": "HIGH",
+      "detail": "RSI is computed but never written to _exec_meta. Need to add _exec_meta['rsi'] = sig.get('rsi_14') in decider_run.py.",
+      "estimated_impact": "Enables RSI-based filter validation. Currently blind."
     },
-    "exit_reason_24h": {
-        "atr_sl_hit": {"trades": 25, "wr": 36.0, "pnl": 0.09},
-        "profit_monster_trail": {"trades": 15, "wr": 53.3, "pnl": 0.61},
-        "cut_loser_CL_T1": {"trades": 6, "wr": 0.0, "pnl": -0.55},
-        "hard_tp": {"trades": 1, "wr": 100.0, "pnl": 0.31}
+    {
+      "item": "New signals for NEUTRAL regime",
+      "priority": "MEDIUM",
+      "detail": "Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need diversity.",
+      "status": "Ongoing since Sep 16"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-19T14:31:00Z",
+      "idea": "CHASE composite filter — block LONG when z>2.5 OR gap>1.0%",
+      "rationale": "Strongest unimplemented edge. 15T/7d 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28. One filter catches ALL chasers. Only 3 small winners blocked ($0.23 total).",
+      "expected_impact": "+$1.32/7d net (from -$0.04 to +$1.28)",
+      "category": "entry sniper",
+      "status": "IMPLEMENTED",
+      "risk": "low",
+      "sample_size": 111 trades (15 chase + 96 non-chase)",
+      "winners_blocked": "3 (GMX +$0.19, AIXBT +$0.02, FIL +$0.02)"
     },
-    "drift_findings": [
-        {
-            "finding": "LONG_ZSCORE_MAX not implemented",
-            "detail": "brain_auditor suggested LONG_ZSCORE_MAX=2.0 on Sep 19 but not in hermes_constants.py",
-            "data": "z>2.5 LONG: 8T 12.5%WR -$1.01/7d. z>2.0 LONG: 18T 29.4%WR -$0.39/7d. z>2.5 is cleaner: 1 winner blocked vs 12 losers removed.",
-            "status": "NOT IMPLEMENTED"
-        },
-        {
-            "finding": "BAD_TRADE_HOURS in CURRENT.md but not in hermes_constants.py",
-            "detail": "CURRENT.md says {3,5,13,14,15,21} but no BAD_TRADE_HOURS variable found in config. COPY_BAD_HOURS is disabled.",
-            "status": "CHECK NEEDED"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "cut-loser-CL-T1 always loses",
-            "detail": "9T 0%WR -$0.86/7d. Every single cut-loser exit is a loss. May be premature exits.",
-            "impact": "0.86/7d drag",
-            "recommendation": "Monitor. Safety mechanism — removing risks larger losses."
-        },
-        {
-            "problem": "HIGH regime bleeds",
-            "detail": "91T 44.0%WR -$2.20/7d. 60%+ of trades are legacy. Active signals less affected.",
-            "impact": "2.20/7d drag (mostly legacy aging out)",
-            "recommendation": "No action — legacy flushing. Monitor."
-        },
-        {
-            "problem": "grind-trend+ 24h cold streak",
-            "detail": "14T 35.7%WR -$0.21/24h. Mostly cut-loser exits. 7d: 14T 35.7%WR -$0.21. NORMAL 0%WR.",
-            "impact": "0.21/24h",
-            "recommendation": "Monitor. HIGH regime 55.6%WR +$0.09 — signal works in right regime."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "LONG_ZSCORE_MAX=2.5 filter",
-            "rationale": "z>2.5 LONG trades: 7 losers, 1 winner in 7d. Net +$1.08/7d if blocked. Sample small (8T) but pattern clear.",
-            "confidence": "MEDIUM (small sample, need 20+ trades)",
-            "recommendation": "MONITOR 2 weeks, then implement if pattern holds"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-19T11:30:00Z",
-            "idea": "LONG_ZSCORE_MAX=2.5 — block LONG entries when z_score > 2.5 (overextended chase)",
-            "rationale": "7d data: z>2.5 LONG = 12.5%WR (1W/7L), -$1.01. Only 1 winner blocked (GMX +$0.19). Net impact +$1.08/7d. These are chase entries into extended moves.",
-            "expected_impact": "+$1.00-1.10/7d",
-            "category": "entry sniper",
-            "status": "suggested — needs 20+ trade sample before implementing",
-            "risk": "low — only blocks extreme outliers",
-            "sample_size": "8 trades (insufficient — monitor 2 weeks)",
-            "impact_on_winners": "Would block 1 of 6 winners with z>2.0 (GMX +$0.19)"
-        },
-        {
-            "date": "2026-09-19T11:30:00Z",
-            "idea": "Volume-breakout-long+ in EXTREME is the system edge — monitor for confidence boost",
-            "rationale": "7d: 7T 71.4%WR +$0.72 in EXTREME. 30d: 13T 69.2%WR +$0.76. Consistent across timeframes. Currently firing at base confidence.",
-            "expected_impact": "+$0.10-0.20/7d if confidence boosted to 80% in EXTREME",
-            "category": "regime edge",
-            "status": "monitoring — need 14d more data at current rates",
-            "risk": "low — already the best performing signal+regime combo"
-        },
-        {
-            "date": "2026-09-19T11:30:00Z",
-            "idea": "grind-trend+ NORMAL regime block — 5T 0%WR -$0.30/7d. HIGH 55.6%WR +$0.09.",
-            "rationale": "Signal works in HIGH, bleeds in NORMAL. Block NORMAL for grind-trend+ specifically.",
-            "expected_impact": "+$0.30/7d",
-            "category": "regime filter",
-            "status": "suggested — small sample (5T NORMAL), needs monitoring",
-            "risk": "medium — 5T sample is small, may vary"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "INGEST session brain — data is empty, run --ingest to populate FAISS index",
-        "MONITOR z_score>2.5 pattern — 8T sample, need 20+ before implementing LONG_ZSCORE_MAX",
-        "MONITOR grind-trend+ NORMAL — 5T 0%WR, may need regime gate",
-        "MONITOR cut-loser-CL-T1 — 9T 0%WR but safety mechanism, cannot remove",
-        "VERIFY BAD_TRADE_HOURS — in CURRENT.md but not in config. Clarify source."
-    ]
+    {
+      "date": "2026-09-19T14:31:00Z",
+      "idea": "Restore grind-trend+ LONG with NORMAL regime block only",
+      "rationale": "HIGH regime: 12T 66.7%WR +$0.35/7d. NORMAL: 6T 16.7%WR -$0.11. CEO killed all regimes. signal_reporter already blocks NORMAL. Restore for HIGH edge.",
+      "expected_impact": "+$0.35/7d",
+      "category": "regime optimization",
+      "status": "suggested",
+      "risk": "low",
+      "sample_size": "18 trades (12 HIGH + 6 NORMAL)"
+    },
+    {
+      "date": "2026-09-19T14:31:00Z",
+      "idea": "Pullback-entry- EXTREME SHORT confidence boost",
+      "rationale": "20T/14d 65%WR +$1.30 in EXTREME. Best signal+regime combo. Stale filter protecting (83.3%WR fresh). Could increase confidence for this specific combo.",
+      "expected_impact": "Monitor — need 20+ trades at current filtering before boosting",
+      "category": "confidence tuning",
+      "status": "monitoring",
+      "risk": "low",
+      "sample_size": "20 trades"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "timestamp": "2026-09-19T14:31:00Z",
+      "change": "Added CHASE_ZSCORE_MAX=2.5 and CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py",
+      "type": "config",
+      "file": "hermes_constants.py",
+      "before": "No chase filter existed",
+      "after": "CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0",
+      "rationale": "7d data: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase 96T 53.1%WR +$1.28. Net +$1.32/7d.",
+      "impact": "+$1.32/7d expected"
+    },
+    {
+      "timestamp": "2026-09-19T14:31:00Z",
+      "change": "Added chase composite filter in decider_run.py before execute_trade()",
+      "type": "config",
+      "file": "decider_run.py",
+      "before": "No chase filter at execution time",
+      "after": "Blocks LONG entries when z_score > 2.5 OR |gap_at_entry| > 1.0%",
+      "rationale": "Prevents chasing extended moves — the #1 source of LONG losses.",
+      "impact": "+$1.32/7d expected"
+    }
+  ],
+  "next_actions": [
+    {
+      "action": "FIX: RSI injection into _signal_metadata",
+      "priority": "HIGH",
+      "detail": "Add _exec_meta['rsi'] = sig.get('rsi_14') in decider_run.py after gap_at_entry injection. 0/206 trades have RSI data.",
+      "owner": "brain_auditor"
+    },
+    {
+      "action": "MONITOR: Chase filter impact over 48h",
+      "priority": "HIGH",
+      "detail": "Verify chase filter blocks expected losers and doesn't kill winners. Check logs for CHASE-BLOCK entries.",
+      "owner": "daily_orchestrator"
+    },
+    {
+      "action": "SUGGEST to CEO: Restore grind-trend+ LONG",
+      "priority": "MEDIUM",
+      "detail": "HIGH regime edge 66.7%WR +$0.35/7d. NORMAL already blocked by signal_reporter.",
+      "owner": "brain_auditor"
+    },
+    {
+      "action": "MONITOR: pullback-entry- EXTREME SHORT edge",
+      "priority": "LOW",
+      "detail": "20T/14d 65%WR +$1.30. Stale filter protecting. Consider confidence boost after 20+ trades.",
+      "owner": "daily_orchestrator"
+    }
+  ]
 }
