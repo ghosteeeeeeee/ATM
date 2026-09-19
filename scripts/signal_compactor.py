@@ -133,8 +133,8 @@ def _load_leaderboard():
         return _leaderboard_cache
 
 
-def _get_leaderboard_mult(token):
-    """Get score multiplier based on 30d performance.
+def _get_leaderboard_mult(token, direction=None):
+    """Get score multiplier based on 30d performance (direction-specific if available).
     - Hall of Fame (30d WR >=60%, 15+ trades): 1.3x bonus
     - Strong (30d WR >=50%): 1.15x bonus
     - Hall of Shame (30d WR <45%, 15+ trades): 0.7x penalty
@@ -146,14 +146,21 @@ def _get_leaderboard_mult(token):
     if not data or data['trades'] < 10:
         return 1.0
 
-    wr = data['wr']
-    trades = data['trades']
+    # Try direction-specific WR first
+    dir_stats = data.get('direction_stats', {})
+    if direction and direction.upper() in dir_stats:
+        dir_data = dir_stats[direction.upper()]
+        wr = dir_data.get('winrate', 50)
+        trades = dir_data.get('trades', 0)
+    else:
+        wr = data['wr']
+        trades = data['trades']
 
-    if wr >= 60 and trades >= 15:
-        return 1.3   # Hall of Fame (matches dashboard threshold)
+    if wr >= 60 and trades >= 5:
+        return 1.3   # Hall of Fame
     elif wr >= 50:
         return 1.15  # Strong performer
-    elif wr < 45 and trades >= 15:
+    elif wr < 45 and trades >= 5:
         return 0.7   # Hall of Shame
     elif wr < 50:
         return 0.85  # Below average
@@ -1374,7 +1381,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         favorites_mult = 1.0
 
     # 30d leaderboard bonus/penalty — long-term performers get extra boost
-    leaderboard_mult = _get_leaderboard_mult(token)
+    leaderboard_mult = _get_leaderboard_mult(token, direction)
 
     # Token+Signal+Direction combo bonus — winning combos get huge boost
     combo_mult = _get_combo_mult(token, source, direction)
