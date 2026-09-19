@@ -74,6 +74,7 @@ FAMILY_MAP = {
     'Continuum': ['continuum_score', 'continuum_osc', 'continuum_trend'],
     'Trend_Purity': ['trend_purity', 'trend_purity_long', 'trend_purity_short',
                       'trend_purity+', 'trend_purity-'],
+    'Grind_Trend': ['grind_trend_long', 'grind_trend_short', 'grind-trend+', 'grind-trend-'],
     'R2_Structural': ['rr_structural', 'rr_structural_long', 'rr_structural_short',
                        'rr-struct', 'rr-struct+', 'rr-struct-'],
 }

@@ -248,6 +248,7 @@ VOL_PHASE_MULTS = {
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
         'Pump_Flow': 0.0,             # BLOCKED — pump-chain+ LONG 0%WR -$0.44 in NORMAL (3T). Wins in EXTREME (46.7% WR, +$0.22)
+        'Grind_Trend': 0.0,           # BLOCKED — grind-trend+ LONG 0%WR -$0.30 in NORMAL (5T). Wins in HIGH (57.1% WR). 2026-09-19
     },
     # HIGH volatility: block signals that lose here but win in EXTREME/NORMAL
     ('HIGH', '*'): {
