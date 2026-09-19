@@ -43,7 +43,8 @@ if _parent not in sys.path:
     sys.path.insert(0, _parent)
 
 from signal_schema import add_signal, get_cooldown, price_age_minutes
-from signal_gen import MIN_TRADE_INTERVAL_MINUTES
+from signals.fast_momentum import MIN_TRADE_INTERVAL_MINUTES
+from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, STATIC_DB
 from hermes_constants import (
     MTP_ZSCORE_ENABLED,
@@ -265,7 +266,7 @@ def scan_mtp_zscore_signals(prices_dict: dict) -> int:
         return 0
 
     from position_manager import get_open_positions as _get_open_pos
-    from signal_gen import (
+    from signals.fast_momentum import (
         recent_trade_exists, is_delisted, SHORT_BLACKLIST, LONG_BLACKLIST,
     )
 

@@ -474,7 +474,7 @@ def run(prices_dict: Dict = None) -> int:
     Returns number of signals written to DB.
     """
     from signal_schema import get_all_latest_prices, price_age_minutes
-    from signal_gen import is_delisted, recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
+    from signals.fast_momentum import is_delisted, recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
     from position_manager import get_open_positions
 
     if prices_dict is None:
