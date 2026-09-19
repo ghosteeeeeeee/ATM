@@ -2517,3 +2517,42 @@ Final set: ['DOT', 'HYPER']
 - pullback-entry- 3T/24h 0%WR -$0.50 — dormant, no recent trades
 
 **BY:** auto_1hr
+
+## [2026-09-19 17:45 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.23 (100% WR)
+
+**Last Hour Trades:**
+- INJ pump-chain+ LONG atr_sl_hit +$0.12 (28m hold)
+- IMX pump-chain+ LONG atr_sl_hit +$0.11 (3h39m hold)
+
+**24h Exit Breakdown (47T):**
+| Exit Reason | Trades | PnL | Avg PnL |
+|-------------|--------|-----|---------|
+| atr_sl_hit | 26 (55%) | +$0.62 | +$0.024 |
+| profit-monster-trail | 16 (34%) | +$0.82 | +$0.051 |
+| cut-loser-CL-T1 | 8 (17%) | -$0.77 | -$0.096 |
+
+**24h Signal Ranking:**
+| Signal | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| pump-chain+ | 18 | 55.6% | +$1.63 |
+| grind-trend+ | 18 | 50.0% | +$0.24 |
+| pullback-entry- | 3 | 0% | -$0.50 |
+| grind-trend- | 5 | 20% | -$0.38 |
+
+**Diagnosis:**
+1. **Entry quality:** Low — both winners had positive PnL despite atr_sl_hit (SL wide enough)
+2. **SL behavior:** atr_sl_hit 55% dominant but avg PnL still positive (+$0.024) — not too tight
+3. **Signal quality:** pump-chain+ strong ($1.63, 55.6% WR). grind-trend- and pullback-entry- still losing
+4. **Trade frequency:** 2/hr — normal, no overtrading
+
+**Changes:**
+- None needed. System healthy, both signals profitable.
+
+**Monitoring:**
+- grind-trend- 5T/24h 20%WR -$0.38 — not at kill threshold yet (need 3+ trades/hr at 0%WR)
+- pullback-entry- 3T/24h 0%WR -$0.50 — dormant, no action needed
+
+**BY:** auto_1hr
