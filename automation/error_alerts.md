@@ -214,3 +214,31 @@
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   [_get_meta] fetch failed: <urlopen TOK [Errno -N] Temporary failure in name resolution>`
+
+## Error Alerts — 2026-09-19 06:46 UTC
+- **[WARN]** (1x): `Disk usage at 83% (93G/118G)` — approaching 85% threshold
+- **[WARN]** (1x): `Portfolio PnL today: -9.11% (43 closed, 26.1% WR)` — poor trading performance
+- **[WARN]** (1x): `Stale signal warning: GMT SHORT signal 5.5min old (max 5min)` — conditions verified at execution
+- **[INFO]**: All systems operational. Pipeline cycle #206316, 60 cycles/30min. 3 open positions (JUP/LINK/AVAX). Hotset empty (0 tokens). 412 active signals. 241 tokens tracked.
+- **[INFO]**: No auto-fixes applied. No crashes, no failed timers, no stuck services.
+- **[INFO]**: Legacy zero-byte DBs present (price_candles.db, price_data.db, price_cache.db, etc.) — safe to ignore, not actively used.
+
+## Error Alerts — 2026-09-19 06:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.3s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_analyst: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_analyst: TOK (most recent call last):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   breakout_engine: TOK in N.6s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK breakout_engine: TOK (most recent call last):`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'FAVORITES_LONG' is not defined`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.3s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   hermes-trades-api: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   strategy_optimizer: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK strategy_optimizer: TOK (most recent call last):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   ab_optimizer: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK ab_optimizer: TOK (most recent call last):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor, signal_analyst, breakout_engine, decider_run, position_manager, hermes-trades-api, strategy_optimizer, ab_optimizer`
+- **REPEATED** (148x): `Sep N N:N:N python3[TOK]: TOK (most recent call last):`
+- **REPEATED** (148x): `Sep N N:N:N python3[TOK]: NameError: name 'FAVORITES_LONG' is not defined. Did you mean: 'FAVORITES_SHORT'?`
+- **REPEATED** (148x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
+- **REPEATED** (148x): `Sep N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`

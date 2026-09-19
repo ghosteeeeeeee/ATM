@@ -2150,3 +2150,41 @@ Final set: ['ACE', 'APT', 'BABY', 'BANANA', 'BIGTIME', 'BLUR', 'FOGO', 'LTC', 'P
 - REMOVE INJ (insufficient data)
 
 Final set: ['DOT', 'HYPER']
+
+## [2026-09-19 07:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+- ALGO mover+ LONG → atr_sl_hit -$0.05
+
+**24h:** 43T 42%WR +$0.29 | **6h:** 20T 20%WR -$1.08 (cold streak) | **7d:** 200T 47%WR -$2.08
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 24T 57% avg -$0.012 — dominant, near breakeven
+- profit-monster-trail: 14T 33% avg +$0.045 — working
+- cut-loser-CL-T1: 4T 10% avg -$0.093
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 9T 78%WR +$0.80 ★★ (strongest)
+- mover+ LONG: 5T 60%WR +$0.04
+- grind-trend+ LONG: 12T 33%WR -$0.23 (worst by volume)
+- pump-chain+ LONG: 10T 20%WR -$0.04
+- pullback-entry- SHORT: 2T 0%WR -$0.35
+
+**Open:** 4 positions (BABY, JUP, AVAX pump-chain+ LONG, LINK grind-trend- SHORT)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal with 0%WR and 3+ trades in last hour (only 1 trade)
+- ATR SL 57% but avg -$0.012 — structural, near breakeven
+- Trade frequency ~1-2/hr — healthy, no overtrading
+- 24h still net positive at +$0.29
+- 6h cold streak (20%WR -$1.08) is variance on small sample
+
+**Monitoring:**
+- grind-trend+ LONG 12T 33.3%WR -$0.23 — watch next run, could be variance
+- pump-chain+ LONG 10T 20%WR -$0.04 — watch for continuation
+- 7d at -$2.08, recovering from deeper losses
+
+**BY:** auto_1hr
