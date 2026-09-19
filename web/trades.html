@@ -243,9 +243,11 @@
       if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${(sym||'?').slice(0,2)}</span>`;
       return `<span class="coin-icon-fallback">${(sym||'?').slice(0,2)}</span>`;
     }
-    let FAVORITES = new Set();
+    let FAVORITES_LONG = new Set();
+    let FAVORITES_SHORT = new Set();
     let TOP_FAVS = [];
-    let LOSERS = new Set();
+    let LOSERS_LONG = new Set();
+    let LOSERS_SHORT = new Set();
 
     async function loadFavorites() {
       try {
@@ -255,7 +257,9 @@
         ]);
         const favData = await favR.json();
         const favs = favData.favorites || [];
-        FAVORITES = new Set(favs.map(f => f.token));
+        // Direction-specific favorites
+        FAVORITES_LONG = new Set(favs.filter(f => f.is_long_fav).map(f => f.token));
+        FAVORITES_SHORT = new Set(favs.filter(f => f.is_short_fav).map(f => f.token));
         // Top 5 by PnL
         TOP_FAVS = favs.sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt)
                         .slice(0, 5)
@@ -263,19 +267,40 @@
         // Load losers
         if (losR && losR.ok) {
           const losData = await losR.json();
-          LOSERS = new Set((losData.losers || []).map(l => l.token));
+          const losers = losData.losers || [];
+          LOSERS_LONG = new Set(losers.filter(l => l.is_long_loser).map(l => l.token));
+          LOSERS_SHORT = new Set(losers.filter(l => l.is_short_loser).map(l => l.token));
         }
       } catch(e) {
         // Fallback if fetch fails
-        FAVORITES = new Set(['BABY','CAKE','CHIP','DOGE','FIL','GMT','HBAR','LDO','NXPC','SEI','SYRUP','ZRO']);
-        TOP_FAVS = ['HBAR','DOGE','GMT','ZRO','NXPC'];
+        FAVORITES_LONG = new Set(['ACE','BLUR','CFX','DOT','DYDX','ENA','FOGO','IMX','INJ','KAS','LTC','ME','POL','TURBO','WLD','ZRO']);
+        FAVORITES_SHORT = new Set(['CC','BANANA','SAND','AVNT','PUMP']);
       }
     }
 
-    function favHtml(sym) {
-      if (LOSERS.has(sym)) return '<span class="loser-icon" title="Loser">🗑️</span>';
-      if (TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="Top Favorite">⭐</span>';
-      if (FAVORITES.has(sym)) return '<span class="fav-star" title="Favorite">❤</span>';
+    function favHtml(sym, direction) {
+      const isLongFav = FAVORITES_LONG.has(sym);
+      const isShortFav = FAVORITES_SHORT.has(sym);
+      const isLongLoser = LOSERS_LONG.has(sym);
+      const isShortLoser = LOSERS_SHORT.has(sym);
+
+      // Direction-specific icons
+      if (direction === 'LONG') {
+        if (isLongLoser) return '<span class="loser-icon" title="LONG Loser">🗑️↑</span>';
+        if (isLongFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="LONG Top Favorite">⭐↑</span>';
+        if (isLongFav) return '<span class="fav-star" title="LONG Favorite">❤↑</span>';
+      } else if (direction === 'SHORT') {
+        if (isShortLoser) return '<span class="loser-icon" title="SHORT Loser">🗑️↓</span>';
+        if (isShortFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="SHORT Top Favorite">⭐↓</span>';
+        if (isShortFav) return '<span class="fav-star" title="SHORT Favorite">❤↓</span>';
+      }
+
+      // Fallback: combined check
+      if (isLongFav || isShortFav) {
+        if (TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="Favorite">⭐</span>';
+        return '<span class="fav-star" title="Favorite">❤</span>';
+      }
+      if (isLongLoser || isShortLoser) return '<span class="loser-icon" title="Loser">🗑️</span>';
       return '';
     }
 
@@ -462,7 +487,7 @@
         const closedIcon = pmClose ? 'pm' : atrProfit ? 'atr' : null;
         return `<tr class="${pnlUsdt > 0 && (pmClose || atrProfit) ? 'atr-profit-row' : ''}">
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${closedIcon === 'pm' ? '<span class="pm-badge" title="Profit Monster trail closed">🐉</span>' : closedIcon === 'atr' ? '<span class="atr-badge" title="ATR SL — closed in profit">💵</span>' : ''}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin, dir)}${closedIcon === 'pm' ? '<span class="pm-badge" title="Profit Monster trail closed">🐉</span>' : closedIcon === 'atr' ? '<span class="atr-badge" title="ATR SL — closed in profit">💵</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>
@@ -577,7 +602,7 @@
           ? Math.abs((bestProfitSl - entry) / entry * 100).toFixed(2)
           : null;
         return `<tr class="${trailState[t.id] ? 'pm-row' : ''}${atrGuaranteed ? ' atr-profit-row' : ''}">
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}${atrGuaranteed ? `<span class="atr-badge" title="ATR SL — guaranteed +${atrGuaranteedPct}% if SL hits">💵</span>` : ''}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin, dir)}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}${atrGuaranteed ? `<span class="atr-badge" title="ATR SL — guaranteed +${atrGuaranteedPct}% if SL hits">💵</span>` : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${entry.toFixed(4)}</td>
           <td>$${current.toFixed(4)}</td>
