@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-19 18:39:19",
+  "timestamp": "2026-09-19 19:23:29",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -13,8 +13,8 @@
     },
     {
       "name": "sql_injection",
-      "msg": "31 files with f-string SQL",
-      "file": "hl_sync_guardian.py:3426",
+      "msg": "32 files with f-string SQL",
+      "file": "session_brain.py:498",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {
@@ -43,7 +43,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "72 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py",
+      "msg": "71 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },

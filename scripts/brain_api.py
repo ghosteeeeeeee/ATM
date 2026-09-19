@@ -46,6 +46,11 @@ def query_db(sql: str, params: tuple = ()) -> list:
     conn = sqlite3.connect(str(BRAIN_DB))
     conn.row_factory = sqlite3.Row
     try:
+        # Load sqlite-vec if querying vec_chunks
+        if 'vec_chunks' in sql:
+            import sqlite_vec
+            conn.enable_load_extension(True)
+            sqlite_vec.load(conn)
         rows = conn.execute(sql, params).fetchall()
         return [dict(r) for r in rows]
     finally:

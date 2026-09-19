@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 CREATE TABLE IF NOT EXISTS chunks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     session_id TEXT NOT NULL,
     chunk_index INTEGER NOT NULL,
     text TEXT NOT NULL,
@@ -107,7 +107,6 @@ CREATE TABLE IF NOT EXISTS chunks (
     chunk_type TEXT,  -- user/assistant/tool/reasoning
     char_count INTEGER,
     token_estimate INTEGER,
-    embedding_offset INTEGER,  -- position in FAISS index
     FOREIGN KEY (session_id) REFERENCES sessions(id)
 );
 
@@ -483,64 +482,64 @@ class Embedder:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# FAISS INDEX
+# SQLITE-VEC VECTOR STORE
 # ═══════════════════════════════════════════════════════════════════════
 
 class VectorStore:
-    """FAISS vector store with ID mapping."""
+    """SQLite-vec vector store — incremental adds/deletes, no rebuild needed."""
     
-    def __init__(self, dim: int = 384):
-        import faiss
+    def __init__(self, db: sqlite3.Connection, dim: int = 384):
+        self.db = db
         self.dim = dim
-        self.index = None
-        self.ids = []  # mapping: faiss idx -> chunk_id
-        self._load_or_create(dim)
+        self._init_vec()
     
-    def _load_or_create(self, dim: int):
-        import faiss
-        if FAISS_INDEX.exists():
-            print(f"Loading existing FAISS index from {FAISS_INDEX}...")
-            self.index = faiss.read_index(str(FAISS_INDEX))
-            if FAISS_IDS.exists():
-                with open(FAISS_IDS) as f:
-                    self.ids = json.load(f)
-            print(f"Loaded index: {self.index.ntotal} vectors")
-        else:
-            print(f"Creating new FAISS index (dim={dim})...")
-            # Use IndexFlatIP for inner product (cosine sim with normalized vectors)
-            self.index = faiss.IndexFlatIP(dim)
-            self.ids = []
+    def _init_vec(self):
+        """Create vec virtual table if not exists."""
+        self.db.execute(f"""
+            CREATE VIRTUAL TABLE IF NOT EXISTS vec_chunks USING vec0(
+                id INTEGER PRIMARY KEY,
+                embedding float[{self.dim}]
+            )
+        """)
+        self.db.commit()
     
     def add(self, embeddings: List[List[float]], chunk_ids: List[int]):
         """Add embeddings with their chunk IDs."""
-        import faiss
-        import numpy as np
-        vectors = np.array(embeddings, dtype=np.float32)
-        self.index.add(vectors)
-        self.ids.extend(chunk_ids)
+        import struct
+        for chunk_id, emb in zip(chunk_ids, embeddings):
+            vec_bytes = struct.pack(f'{len(emb)}f', *emb)
+            self.db.execute(
+                "INSERT OR REPLACE INTO vec_chunks (id, embedding) VALUES (?, ?)",
+                (chunk_id, vec_bytes)
+            )
+        self.db.commit()
+    
+    def delete(self, chunk_ids: List[int]):
+        """Delete embeddings by chunk IDs."""
+        if chunk_ids:
+            self.db.execute(
+                f"DELETE FROM vec_chunks WHERE id IN ({','.join('?' * len(chunk_ids))})",
+                chunk_ids
+            )
+            self.db.commit()
     
     def search(self, query: List[float], top_k: int = 10) -> List[Tuple[int, float]]:
-        """Search for similar vectors. Returns [(chunk_id, score), ...]"""
-        import numpy as np
-        q = np.array([query], dtype=np.float32)
-        scores, indices = self.index.search(q, top_k)
-        results = []
-        for score, idx in zip(scores[0], indices[0]):
-            if idx >= 0 and idx < len(self.ids):
-                results.append((self.ids[idx], float(score)))
-        return results
+        """Search for similar vectors. Returns [(chunk_id, distance), ...]"""
+        import struct
+        q_bytes = struct.pack(f'{len(query)}f', *query)
+        results = self.db.execute(
+            "SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? ORDER BY distance LIMIT ?",
+            (q_bytes, top_k)
+        ).fetchall()
+        return [(r[0], r[1]) for r in results]
     
     def save(self):
-        """Save index and ID mapping to disk."""
-        import faiss
-        faiss.write_index(self.index, str(FAISS_INDEX))
-        with open(FAISS_IDS, 'w') as f:
-            json.dump(self.ids, f)
-        print(f"Saved FAISS index: {self.index.ntotal} vectors")
+        """No-op — sqlite-vec persists automatically."""
+        pass
     
     @property
     def size(self) -> int:
-        return self.index.ntotal if self.index else 0
+        return self.db.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -555,6 +554,10 @@ class SessionBrain:
         self.db = sqlite3.connect(str(BRAIN_DB))
         self.db.execute("PRAGMA journal_mode=WAL")
         self.db.execute("PRAGMA synchronous=NORMAL")
+        # Load sqlite-vec extension EARLY (before any table creation)
+        import sqlite_vec
+        self.db.enable_load_extension(True)
+        sqlite_vec.load(self.db)
         self._init_db()
         self.embedder = None
         self.vector_store = None
@@ -570,7 +573,7 @@ class SessionBrain:
     def _ensure_vector_store(self):
         if self.vector_store is None:
             self._ensure_embedder()
-            self.vector_store = VectorStore(self.embedder.dim)
+            self.vector_store = VectorStore(self.db, self.embedder.dim)
     
     def _get_sessions(self) -> Dict[str, Dict]:
         """Get all sessions from DB."""
@@ -598,9 +601,7 @@ class SessionBrain:
         Ingest sessions into the brain.
         
         Args:
-            incremental: if True, only process new/changed sessions.
-                        FAISS index is rebuilt from scratch if any session was updated
-                        (prevents orphaned vectors from old versions).
+            incremental: if True, only process new/changed sessions
             main_only: if True, only ingest main (human) sessions, skip subagents
         """
         start_time = time.time()
@@ -610,19 +611,7 @@ class SessionBrain:
         print(f"Session Brain — {mode.upper()} INGEST{filter_label}")
         print(f"{'='*60}")
         
-        # BUG 4 fix: FAISS doesn't support deletion, so orphaned vectors
-        # accumulate on re-ingest. Solution: only do a FULL rebuild once daily.
-        # Incremental updates just append new vectors (some orphans are OK short-term).
-        # The daily rebuild cleans everything up.
-        needs_rebuild = not incremental  # always rebuild on full ingest
         sessions = self._get_sessions() if incremental else {}
-        if incremental:
-            for sid, existing in sessions.items():
-                fp = SESSIONS_DIR / sid / "session.jsonl.zstd"
-                if fp.exists() and fp.stat().st_mtime > (existing.get("last_modified") or 0):
-                    print(f"Session {sid[:12]} changed — will re-ingest (append to FAISS)")
-                    break
-        
         files = self._get_session_files()
         print(f"Found {len(files)} session files")
         
@@ -670,15 +659,19 @@ class SessionBrain:
             texts = [c["text"] for c in chunks]
             embeddings = self.embedder.embed(texts)
             
-            # Store in FAISS
+            # Delete old vectors for this session (sqlite-vec supports deletion)
             self._ensure_vector_store()
-            chunk_ids = list(range(
-                self.vector_store.size,
-                self.vector_store.size + len(chunks)
-            ))
+            old_chunk_ids = [r[0] for r in self.db.execute(
+                "SELECT id FROM chunks WHERE session_id = ?", (session_id,)
+            ).fetchall()]
+            if old_chunk_ids:
+                self.vector_store.delete(old_chunk_ids)
+            
+            # Create new chunk IDs using session_id + index
+            chunk_ids = [hash(f"{session_id}:{j}") & 0x7FFFFFFF for j in range(len(chunks))]
             self.vector_store.add(embeddings, chunk_ids)
             
-            # BUG 5 fix: Store created_at
+            # Store created_at
             created_at_iso = None
             if created_at_ms:
                 try:
@@ -696,32 +689,22 @@ class SessionBrain:
                  filepath.stat().st_mtime, time.time(), len(chunks), "indexed")
             )
             
-            # Delete old chunks for this session (in case of re-ingest)
+            # Delete old chunks for this session
             self.db.execute("DELETE FROM chunks WHERE session_id = ?", (session_id,))
             
             for j, chunk in enumerate(chunks):
                 topic = extract_topic(chunk["text"], title)
                 self.db.execute(
-                    "INSERT INTO chunks (session_id, chunk_index, text, topic, chunk_type, char_count, token_estimate, embedding_offset) "
+                    "INSERT INTO chunks (id, session_id, chunk_index, text, topic, chunk_type, char_count, token_estimate) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (session_id, j, chunk["text"], topic, chunk["type"],
-                     len(chunk["text"]), len(chunk["text"]) // 4,
-                     chunk_ids[j])
+                    (chunk_ids[j], session_id, j, chunk["text"], topic, chunk["type"],
+                     len(chunk["text"]), len(chunk["text"]) // 4)
                 )
             
             self.db.commit()
             sessions_processed += 1
             chunks_created += len(chunks)
             print("✓")
-        
-        # Save FAISS index
-        if self.vector_store and self.vector_store.size > 0:
-            self.vector_store.save()
-        
-        # Only rebuild on full ingest (daily). Incremental appends new vectors.
-        if needs_rebuild and sessions_processed > 0:
-            print("\nFull ingest complete — rebuilding FAISS from all DB chunks...")
-            self.rebuild_index()
         
         # Log ingest
         duration = time.time() - start_time
@@ -769,7 +752,7 @@ class SessionBrain:
             row = self.db.execute(
                 "SELECT c.session_id, c.text, c.chunk_type, c.chunk_index, "
                 "s.title FROM chunks c JOIN sessions s ON c.session_id = s.id "
-                "WHERE c.embedding_offset = ?",
+                "WHERE c.id = ?",
                 (chunk_id,)
             ).fetchone()
             if row:
@@ -824,16 +807,15 @@ class SessionBrain:
         }
 
     def rebuild_index(self):
-        """Rebuild FAISS index from all chunks in SQLite. Also backfills topics."""
+        """Rebuild sqlite-vec index from all chunks in SQLite."""
         self._ensure_embedder()
         
-        print("Rebuilding FAISS index from DB chunks...")
+        print("Rebuilding vector index from DB chunks...")
         
-        # Remove old index
-        if FAISS_INDEX.exists():
-            FAISS_INDEX.unlink()
-        if FAISS_IDS.exists():
-            FAISS_IDS.unlink()
+        # Drop and recreate vec_chunks table
+        self.db.execute("DROP TABLE IF EXISTS vec_chunks")
+        self.db.commit()
+        self._ensure_vector_store()
         
         # Backfill topics for chunks that don't have them
         no_topic = self.db.execute(
@@ -860,9 +842,6 @@ class SessionBrain:
         
         # Embed in batches
         batch_size = 256
-        self.vector_store = None  # Force fresh creation
-        self._ensure_vector_store()
-        
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i:i+batch_size]
             texts = [c[1] for c in batch]
@@ -874,8 +853,7 @@ class SessionBrain:
             if (i // batch_size) % 10 == 0:
                 print(f"  Embedded {min(i+batch_size, len(chunks))}/{len(chunks)}...")
         
-        self.vector_store.save()
-        print(f"FAISS index rebuilt: {self.vector_store.size} vectors")
+        print(f"Vector index rebuilt: {self.vector_store.size} vectors")
 
 
 # ═══════════════════════════════════════════════════════════════════════
