@@ -248,6 +248,14 @@ class PrecomputedMACD:
         self.closes = closes
         n = len(closes)
 
+        # Not enough data for MACD
+        if n < slow:
+            self.ema_fast = [0.0] * n
+            self.ema_slow = [0.0] * n
+            self.macd = [0.0] * n
+            self.sig_ema = [0.0] * n
+            return
+
         k_f = 2.0 / (fast + 1)
         k_s = 2.0 / (slow + 1)
         k_g = 2.0 / (sig + 1)
