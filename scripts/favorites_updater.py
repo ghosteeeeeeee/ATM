@@ -23,7 +23,7 @@ from math import isnan
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
-from hermes_constants import FAVORITES, SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import FAVORITES_LONG, SHORT_BLACKLIST, LONG_BLACKLIST
 
 CONSTANTS_FILE = '/root/.hermes/scripts/hermes_constants.py'
 LOCK_FILE = '/tmp/hermes-favorites-updater.lock'
@@ -248,7 +248,7 @@ def update_constants_file(new_favorites):
         new_block += "# Proven performers — high WR + profitable + decent sample.\n"
         new_block += "# Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.\n"
         new_block += "# AUTO-UPDATED daily by favorites_updater.py.\n"
-        new_block += "FAVORITES = {\n"
+        new_block += "FAVORITES_LONG = {\n"
         new_block += '\n'.join(lines) + '\n'
         new_block += "}\n"
 
@@ -288,7 +288,7 @@ def run():
             log("No stats available — skipping")
             return
 
-        current_favs = set(FAVORITES)
+        current_favs = set(FAVORITES_LONG)
         new_favs = set(current_favs)
         changes = []
         today = datetime.now(timezone.utc).isoformat()

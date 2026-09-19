@@ -245,13 +245,21 @@ LONG_BLACKLIST = {
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
-# ── Favorites (Direction-Specific) ─────────────────────────────────────────────
+# ── Favorites ─────────────────────────────────────────────────────────────────
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'ACE', 'BLUR', 'CFX', 'DOT', 'DYDX', 'ENA', 'FOGO', 'IMX', 'INJ',
-    'KAS', 'LTC', 'ME', 'POL', 'TURBO', 'WLD', 'ZRO'
+    'ACE',
+    'APT',
+    'BABY',
+    'BANANA',
+    'BIGTIME',
+    'BLUR',
+    'FOGO',
+    'LTC',
+    'POL',
+    'SAND'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -281,9 +289,9 @@ LOSERS_SHORT = {
 # Legacy combined set
 LOSERS = {
     'DOT',
-    'HYPER',
-    'INJ'
+    'HYPER'
 }
+
 
 
 
@@ -818,7 +826,7 @@ SHORT_BB_DEAD_ZONE2_MAX = 0.55
 # 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.
 # REMOVED CEO Sep 16 — monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable).
 # Penalty was blocking good entries. Expected impact: +$0.26/7d from unblocked entries.
-SHORT_NORMAL_PENALTY = 0.8  # 20% penalty for SHORT in NORMAL — counter-trend risk highest here
+SHORT_NORMAL_PENALTY = 1.0  # REMOVED CEO Sep 16 — SHORT NORMAL profitable (57.1%WR +$0.19/7d). brain_auditor verified Sep 19.
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
@@ -3693,6 +3701,24 @@ CONTINUUM_TREND_MIN_ALIGNMENT        = 0.75    # 75%+ of TFs must agree
 CONTINUUM_TREND_MIN_SLOPE            = 0.02    # at least one slope must exceed this
 CONTINUUM_TREND_COOLDOWN_MIN         = 10      # minutes between signals per direction
 CONTINUUM_TREND_CONF_BASE            = 80      # base confidence for trend signals
+
+# ── Continuum MA Signal (continuum_ma.py) ─────────────────────────────────
+# MA-smoothed continuum score crossover detection.
+# When raw score crosses above its MA → momentum building (LONG).
+# When raw score crosses below its MA → momentum fading (SHORT).
+CONTINUUM_MA_ENABLED                 = True    # master kill-switch
+CONTINUUM_MA_LONG_ENABLED            = True    # LONG direction
+CONTINUUM_MA_SHORT_ENABLED           = True    # SHORT direction
+CONTINUUM_MA_PERIOD                  = 10      # MA lookback (10 records = ~5 min at 30s updates)
+CONTINUUM_MA_SCORE_THRESHOLD         = 50      # min score for LONG, max for SHORT
+CONTINUUM_MA_MIN_SLOPE               = 0.1     # min MA slope to confirm trend
+CONTINUUM_MA_COOLDOWN_RECORDS        = 5       # min records between signals
+CONTINUUM_MA_STALENESS_MIN           = 5       # max age of continuum data in minutes
+CONTINUUM_MA_CONF_BASE               = 65      # base confidence
+CONTINUUM_MA_CONF_SPREAD_MULT        = 2.0     # spread bonus multiplier
+CONTINUUM_MA_CONF_SLOPE_MULT         = 50.0    # slope bonus multiplier
+CONTINUUM_MA_CONF_ZONE_BONUS         = 10      # bonus for extreme scores (>80 or <20)
+CONTINUUM_MA_CONF_CAP                = 95      # max confidence
 
 # ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
 # Buy pullback to SMA20 in established uptrends.
