@@ -280,11 +280,13 @@ def _get_amplitude_size_mult(token):
 
 
 def _get_favorite_size_mult(token, direction=None):
-    """Get position size multiplier based on direction-specific favorites/losers status.
+    """Get position size multiplier based on direction-specific favorites/losers status + Hall of Fame.
     - Direction-specific losers: 0.5x (penalized)
+    - Hall of Fame (30d WR >=60%, direction-specific): 2.0x
     - Direction-specific favorites 75%+ WR (7d): 1.8x
     - Direction-specific favorites 50%+ WR (7d): 1.5x
     - Direction-specific favorites <50% WR (7d): 1.2x
+    - Hall of Shame (30d WR <45%): 0.5x
     - Normal: 1.0x
     """
     token_upper = token.upper()
@@ -299,6 +301,30 @@ def _get_favorite_size_mult(token, direction=None):
     if LOSERS and token_upper in LOSERS:
         max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
         return max(LOSERS_SIZE_MULT, max_reduction)
+
+    # Check Hall of Fame status first (highest priority boost)
+    try:
+        from signal_compactor import _get_leaderboard_mult, _load_leaderboard
+        lb_mult = _get_leaderboard_mult(token, direction)
+        lb = _load_leaderboard()
+        lb_data = lb.get(token_upper, {})
+        dir_stats = lb_data.get('direction_stats', {})
+
+        # Direction-specific Hall of Fame check
+        if direction and direction.upper() in dir_stats:
+            dir_wr = dir_stats[direction.upper()].get('winrate', 50)
+            dir_trades = dir_stats[direction.upper()].get('trades', 0)
+            if dir_wr >= 60 and dir_trades >= 5:
+                return 2.0  # Hall of Fame — extra boost
+            elif dir_wr < 45 and dir_trades >= 5:
+                return 0.5  # Hall of Shame — penalty
+        # Combined Hall of Fame check
+        elif lb_data.get('wr', 50) >= 60 and lb_data.get('trades', 0) >= 15:
+            return 2.0  # Hall of Fame — extra boost
+        elif lb_data.get('wr', 50) < 45 and lb_data.get('trades', 0) >= 15:
+            return 0.5  # Hall of Shame — penalty
+    except Exception:
+        pass
 
     # Check direction-specific favorites
     is_fav = False
@@ -346,19 +372,6 @@ def _get_favorite_size_mult(token, direction=None):
                 base_mult = 1.5  # Standard favorite
             else:
                 base_mult = 1.2  # Underperformer — reduced size
-
-            # Apply30d adjustment
-            try:
-                from signal_compactor import _get_leaderboard_mult
-                lb_mult = _get_leaderboard_mult(token)
-                if lb_mult >= 1.3:
-                    base_mult += 0.2  # Hall of fame bonus
-                elif lb_mult <= 0.7:
-                    base_mult -= 0.3  # Hall of shame penalty
-                base_mult = max(1.0, base_mult)  # Floor at 1.0
-            except Exception:
-                pass
-
             return base_mult
         return FAVORITES_SIZE_MULT  # Default if no data
     except Exception:
