@@ -113,6 +113,7 @@ def _load_leaderboard():
                 'pnl': t.get('total_pnl_usdt', 0),
                 'trades': t.get('trades', 0),
                 'is_favorite': t.get('is_favorite', False),
+                'direction_stats': t.get('direction_stats', {}),
             }
         # Add hall of shame tokens (may not be in leaderboard)
         for t in data.get('hall_of_shame', []):
@@ -123,6 +124,7 @@ def _load_leaderboard():
                     'pnl': t.get('total_pnl_usdt', 0),
                     'trades': t.get('trades', 0),
                     'is_favorite': False,
+                    'direction_stats': t.get('direction_stats', {}),
                 }
         _leaderboard_cache = cache
         _leaderboard_cache_ts = now
@@ -1379,10 +1381,21 @@ def _score_signal(token, direction, conf, source, signal_type,
     if combo_mult >= 2.0:
         log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
 
-    # Hall of Shame BLOCK — never trade consistent losers (30d WR <45%, 15+ trades)
-    if leaderboard_mult <= 0.7:
-        log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR <45%, consistent loser")
-        return 0.0
+    # Hall of Shame BLOCK — direction-specific check
+    # Only block if THIS direction is bad, not the whole token
+    lb = _load_leaderboard()
+    lb_data = lb.get(token.upper())
+    if lb_data and lb_data['trades'] >= 15:
+        dir_stats = lb_data.get('direction_stats', {})
+        if direction and direction.upper() in dir_stats:
+            dir_wr = dir_stats[direction.upper()].get('wr', 50)
+            if dir_wr < 45:
+                log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 45%")
+                return 0.0
+        # Fallback to combined WR if no direction data
+        elif lb_data.get('wr', 50) < 45:
+            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 45%")
+            return 0.0
 
     # Penalty list — direction-specific losers get stronger penalty
     is_long_loser = token in LOSERS_LONG
