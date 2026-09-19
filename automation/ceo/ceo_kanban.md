@@ -2380,3 +2380,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CONFIG CHANGE:** CL_TIER1_FIRE_WINDOWS (1,2)→(2,3). Rationale: 0% WR, all 6 exits were losers. Widening gives trades recovery time. Expected +$0.75/7d. No winners blocked (0% WR).
   **CREATIVE:** (1) Add gap_at_entry+staleness to metadata. (2) Monitor rr_engine exits -$0.91/7d. (3) pullback-entry SHORT HIGH gate at 50+ trades.
   BY: brain_auditor
+
+- [2026-09-19 07:35 UTC] brain_auditor: NO CONFIG CHANGE — session brain empty, DB audit
+  DB-verified: 24h 41T 39.0%WR +$0.04 | 7d 199T 46.7%WR -$2.20
+  Market NEUTRAL. 2 open.
+  **SESSION BRAIN EMPTY:** FAISS index has no vectors. All DSH conversation insights unavailable. Run `session_brain --ingest`.
+  **LOSING AUTOPSY (20):** 7d losers: trend_purity+ -$1.02 (killed), rr-struct-v2+ -$0.45 (killed), rr-struct- -$0.42 (killed), open-skies+ -$0.40 (killed), breakout-long+ -$0.35 (killed). All legacy aging out. ACTIVE losers: pullback-entry- -$0.35 (66T, marginal), grind-trend+ -$0.23 (12T, CL-T1 cluster).
+  **CL-T1 PATTERN:** 7 trades ALL losers. 5/7 are grind-trend+ at 03-04 UTC NORMAL regime. Cut at 35-78min before recovery possible. CL_TRAIL disabled but threshold cuts still fire.
+  **REGIME:** EXTREME only profitable (+$0.25). HIGH worst (-$2.20, legacy). NORMAL SHORT profitable (57.1%WR +$0.19).
+  **STARS:** volume-breakout-long+ 13T 69.2%WR +$0.76, rr-struct+ 12T 66.7%WR +$0.45, pump-chain- 16T 50%WR +$0.20.
+  **CREATIVE:** (1) Monitor grind-trend+ CL-T1 cluster 48h. (2) Consider volume-breakout-long+ confidence boost in EXTREME when 20+ trades.
+  **NO CONFIG CHANGE** — system stabilizing, legacy aging out.
+  BY: brain_auditor

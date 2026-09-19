@@ -1,102 +1,104 @@
 {
-    "timestamp": "2026-09-19T03:30:00Z",
-    "session_brain_stats": {
-        "vectors_loaded": 266748,
-        "embedding_model": "all-MiniLM-L6-v2",
-        "queries_run": 3
+  "timestamp": "2026-09-19T07:35:19.633183+00:00",
+  "session_brain_stats": {
+    "status": "EMPTY — brain not ingested, using CURRENT.md + DB data",
+    "note": "Session brain FAISS index exists but has no vectors. Need --ingest."
+  },
+  "trade_summary_24h": {
+    "total_trades": 41,
+    "win_rate": "39.0%",
+    "pnl": "$0.04",
+    "market_regime": "NEUTRAL",
+    "open_trades": 2,
+    "star_signal": "volume-breakout-long+ 9T 77.8%WR +$0.80",
+    "worst_signal": "grind-trend+ 12T 33.3%WR -$0.23"
+  },
+  "trade_summary_7d": {
+    "total_trades": 199,
+    "win_rate": "46.7%",
+    "pnl": "-$2.20",
+    "best_regime": "EXTREME +$0.25",
+    "worst_regime": "HIGH -$2.20",
+    "legacy_drag": "trend_purity+ -$1.02, rr-struct-v2+ -$0.45, rr-struct- -$0.42 (all killed, aging out)",
+    "active_winners": "volume-breakout-long+ +$0.76, rr-struct+ +$0.45, pump-chain- +$0.20"
+  },
+  "drift_findings": [
+    {
+      "finding": "CL_TRAIL_ENABLED=False but CL-T1 tier still firing",
+      "detail": "CL-T1 cuts 7 trades in 7d, ALL losers (0%WR -$0.68). Cut-loser trail mechanism disabled but threshold cuts still active.",
+      "impact": "LOW — losses are small ($0.09-$0.13 each), but pattern is consistent. Trades cut at 35-80min hold time before they can develop.",
+      "action": "MONITOR — see recurring_problems below"
     },
-    "trade_summary_24h": {
-        "total_trades": 30,
-        "win_rate": 58.3,
-        "pnl": 0.71,
-        "losers": 17,
-        "open_positions": 2
+    {
+      "finding": "Session brain is EMPTY",
+      "detail": "FAISS index exists but contains no vectors. All DSH conversation insights are lost.",
+      "impact": "MEDIUM — cannot query historical decisions, debugging sessions, or creative ideas from past conversations.",
+      "action": "Run session_brain --ingest to populate from DSH session files"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "grind-trend+ CL-T1 cluster at 03-04 UTC",
+      "detail": "5 trades in 7d from grind-trend+ at 03-00 to 04:41 UTC, ALL cut by cut-loser-CL-T1, 0%WR, -$0.46 combined. All NORMAL regime. Pattern: signal fires → price dips 0.3-0.5% → CL cuts within 35-78min.",
+      "root_cause": "grind-trend+ fires aggressively in overnight dead zone (03-04 UTC). NORMAL regime + low volatility = trades don't develop. CL-T1 cuts at -0.5% to -1.0% before recovery possible.",
+      "recommendation": "Monitor 48h. If cluster continues: either disable grind-trend+ in NORMAL during 00-04 UTC, or widen CL-T1 threshold for grind-trend+. DO NOT change CL thresholds globally.",
+      "confidence": "MEDIUM — 5 trades is small sample, but pattern is clear and consistent."
     },
-    "trade_summary_7d": {
-        "total_trades": 192,
-        "win_rate": 52.6,
-        "pnl": 0.69,
-        "best_regime": "EXTREME +$0.51",
-        "worst_regime": "HIGH -$1.60"
+    {
+      "problem": "HIGH regime: -$2.20/7d across both directions",
+      "detail": "HIGH LONG 46T 45.7%WR -$1.28. HIGH SHORT 43T 41.9%WR -$0.92. Only profitable regime is EXTREME (+$0.25).",
+      "root_cause": "HIGH regime = elevated volatility without clear direction. Trades get whipsawed. Many are legacy signal losses aging out.",
+      "recommendation": "NO ACTION — HIGH has 89 trades (45% of all 7d volume). Reducing HIGH exposure would kill too many trades. Legacy losses aging out. Monitor.",
+      "confidence": "HIGH — data is clear, but action would be too disruptive."
     },
-    "drift_findings": [
-        {
-            "severity": "CRITICAL",
-            "finding": "SHORT_NORMAL_PENALTY = 0.8 still in code despite CEO removing it Sep 16",
-            "evidence": "hermes_constants.py:821 had 0.8. SHORT NORMAL 7d: 28T 57.1%WR +$0.19 — profitable, penalty was hurting entries.",
-            "action_taken": "FIXED: Set to 1.0 (penalty removed)",
-            "expected_impact": "+$0.19/7d from unblocked SHORT NORMAL entries"
-        },
-        {
-            "severity": "LOW",
-            "finding": "RSI and momentum still not in _signal_metadata (only z_score and gap_at_entry populated)",
-            "evidence": "24h losers show rsi=None, momentum=None for all trades. Only z_score and gap_at_entry present.",
-            "action_taken": "None — pipeline restart needed for CEO's gap_at_entry fix to propagate",
-            "expected_impact": "Data gap limits entry quality analytics"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "cut-loser-CL-T1 premature exits",
-            "frequency": "3 consecutive audit runs",
-            "data": "5T 0%WR -$0.40/7d. All losers. Fire window was widened Sep 18 but too early to evaluate.",
-            "recommendation": "Monitor to 20+ trades before further changes"
-        },
-        {
-            "topic": "LONG entries at extreme z_score",
-            "frequency": "2 audit runs",
-            "data": "7 LONG trades z_score>2.5: 2W 5L -$0.49. But 4 winners also z_score>2.0 in 7d.",
-            "recommendation": "Monitor — LONG_ZSCORE_MAX would block too many winners (4 of 17)"
-        }
-    ],
-    "missing_implementations": [],
-    "creative_improvements": [
-        {
-            "date": "2026-09-19T03:30:00Z",
-            "idea": "Remove SHORT_NORMAL_PENALTY (0.8→1.0)",
-            "rationale": "SHORT NORMAL 7d: 28T 57.1%WR +$0.19 — profitable. CEO said removed Sep 16 but code still had 0.8. Penalty was suppressing profitable entries.",
-            "expected_impact": "+$0.19/7d",
-            "category": "config drift fix",
-            "status": "applied",
-            "risk": "low",
-            "impact_on_winners": "0 winners blocked — removes penalty, doesn't add filter"
-        },
-        {
-            "date": "2026-09-19T03:30:00Z",
-            "idea": "Monitor z_score chasing but do NOT filter yet",
-            "rationale": "7 LONG z_score>2.5 trades: 2W 5L (-$0.49). Pattern real but sample too small. 4 winners also had z_score>2.0. Filtering would kill GMX +$0.19, NEO +$0.69, CAKE +$0.12.",
-            "expected_impact": "N/A — monitoring only",
-            "category": "entry sniper",
-            "status": "monitoring",
-            "risk": "low",
-            "impact_on_winners": "Would block 4 of 17 recent winners if applied"
-        },
-        {
-            "date": "2026-09-19T03:30:00Z",
-            "idea": "grind-trend+ cut-loser-CL-T1 exits are premature",
-            "rationale": "profit-monster-trail exits: 8T 50%WR +$0.24. cut-loser-CL-T1: 2T 0%WR -$0.19. The trailing exit works, CL-T1 kills trades too early.",
-            "expected_impact": "N/A — monitor after CL-T1 window change Sep 18",
-            "category": "exit optimization",
-            "status": "monitoring",
-            "risk": "low",
-            "impact_on_winners": "N/A"
-        }
-    ],
-    "config_changes_applied": [
-        {
-            "timestamp": "2026-09-19T03:30:00Z",
-            "file": "hermes_constants.py",
-            "line": 821,
-            "change": "SHORT_NORMAL_PENALTY 0.8 → 1.0",
-            "rationale": "CEO removed penalty Sep 16, code drift. SHORT NORMAL profitable at 57.1%WR +$0.19/7d.",
-            "expected_impact": "+$0.19/7d"
-        }
-    ],
-    "next_actions": [
-        "Restart pipeline to activate SHORT_NORMAL_PENALTY=1.0 and gap_at_entry fix",
-        "Monitor cut-loser-CL-T1 to 20+ trades (currently 5T 0%WR)",
-        "Monitor z_score chasing pattern — do NOT filter yet",
-        "Evaluate stale filter extension (due Sep 19)",
-        "Track grind-trend+ performance (10T 40%WR +$0.05 — borderline)"
-    ]
+    {
+      "problem": "pullback-entry- SHORT: 66T -$0.35/7d",
+      "detail": "Highest volume signal by far (66T = 33% of all trades). 48.5% WR is close to breakeven but net negative. Losses slightly larger than wins.",
+      "root_cause": "High volume + marginal edge = noise. Signal fires too frequently. Many entries are near-breakeven that drag on PnL after fees/slippage.",
+      "recommendation": "CONF_FILTER_MIN=70 already filters. Consider increasing to 75 for pullback-entry- SHORT specifically. Would reduce volume but improve quality.",
+      "confidence": "MEDIUM — need to verify impact on winners first."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "LONG_ZSCORE_MAX=2.0 filter",
+      "detail": "Suggested Sep 19 02:36 UTC. 6 LONG trades with z_score>2.5: 1W 5L -$0.69. But 4 winners also had z_score>2.0. Filter would kill winners.",
+      "status": "MONITOR — insufficient data, would harm winners"
+    },
+    {
+      "item": "Execution-time stale signal revalidation",
+      "detail": "Listed as NEXT in CURRENT.md item 9. Further improvement on stale filter.",
+      "status": "NOT STARTED"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-19T07:35:19.633201+00:00",
+      "idea": "grind-trend+ NORMAL regime: widen CL-T1 from default to -1.5%",
+      "rationale": "5/7 CL-T1 trades in 7d are grind-trend+ NORMAL at 03-04 UTC. All cut at -0.5% to -1.0% within 35-78min. These trades never had room to develop. Widening CL for this specific combo would let trades breathe. BUT: this is signal-specific CL tuning which doesn't exist in the current system. Simpler: note pattern, monitor 48h, consider disabling grind-trend+ NORMAL if cluster continues.",
+      "expected_impact": "Could save $0.20-0.46/7d if these trades recover",
+      "category": "exit optimization",
+      "status": "suggested — monitor first",
+      "risk": "medium — changing CL thresholds affects all signals"
+    },
+    {
+      "date": "2026-09-19T07:35:19.633203+00:00",
+      "idea": "Volume-breakout-long+ confidence boost to 80% in EXTREME",
+      "rationale": "volume-breakout-long+ is the star: 13T 69.2%WR +$0.76/7d. EXTREME regime has edge (50%WR +$0.25). Boosting confidence for this signal in EXTREME would reduce false positives while keeping the winners. Sample size: 13T is marginal but the signal has been consistently profitable.",
+      "expected_impact": "+$0.10-0.20/7d by filtering low-confidence entries",
+      "category": "entry sniper",
+      "status": "suggested — needs 20+ trades for confidence",
+      "risk": "low — only affects one signal in one regime"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "MONITOR: grind-trend+ CL-T1 cluster at 03-04 UTC — 48h eval",
+    "INGEST: Run session_brain --ingest to populate FAISS index",
+    "MONITOR: Legacy signals aging out (trend_purity+, rr-struct-v2+, etc.)",
+    "MONITOR: pullback-entry- SHORT 66T -$0.35 — consider CONF boost",
+    "DEVELOP: New signals for NEUTRAL regime (CURRENT.md item 11)",
+    "DONE: stale filter working 4.9% (down from 43.8%)",
+    "DONE: feature recording (gap_at_entry, staleness) active"
+  ]
 }

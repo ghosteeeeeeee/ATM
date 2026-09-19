@@ -2188,3 +2188,122 @@ Final set: ['DOT', 'HYPER']
 - 7d at -$2.08, recovering from deeper losses
 
 **BY:** auto_1hr
+
+## [2026-09-19 08:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+- YGG grind-trend+ LONG → profit-monster-trail $0.00 (breakeven)
+- IOTA grind-trend+ LONG → profit-monster-trail +$0.02 (+58.45%)
+
+**24h:** 44T 41%WR +$0.27 | **7d:** 200T 47%WR -$2.08
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 24T 55% avg -$0.012 — dominant, near breakeven
+- profit-monster-trail: 15T 34% avg +$0.041 — working
+- cut-loser-CL-T1: 4T 9% avg -$0.093
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+: 9T 78%WR +$0.80 ★★ (star)
+- mover+: 5T 60%WR +$0.04
+- grind-trend+: 14T 36%WR -$0.21 (improving — last 2 trades won)
+- pump-chain+: 10T 20%WR -$0.04
+- pullback-entry-: 2T 0%WR -$0.35
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal with 0%WR and 3+ trades in last hour
+- ATR SL 55% but avg -$0.012 — structural, near breakeven
+- Trade frequency ~2/hr — healthy
+- grind-trend+ showing improvement (2 consecutive profit-monster wins)
+- 24h still net positive
+
+**Monitoring:**
+- grind-trend+ 14T 36%WR -$0.21 — trending up after cold streak
+- pump-chain+ 10T 20%WR -$0.04 — watch for continuation
+
+**BY:** auto_1hr
+
+## [2026-09-19 09:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+- LINK grind-trend- SHORT → cut-loser-CL-T1 -$0.11
+- IO grind-trend- SHORT → cut-loser-CL-T1 -$0.07
+
+**PnL:** -$0.18 (0% WR)
+
+**24h:** 45T 37.8%WR +$0.08 | **6h:** 20T 20%WR -$1.02 | **7d:** 200T 47%WR -$2.09
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 23T 51% avg -$0.013 — dominant, near breakeven
+- profit-monster-trail: 15T 33% avg +$0.041 — working
+- cut-loser-CL-T1: 6T 13% avg -$0.092 — largest avg loss
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+: 8T 75%WR +$0.79 ★★
+- mover+: 5T 60%WR +$0.04
+- grind-trend+: 14T 35.7%WR -$0.21
+- pump-chain+: 10T 20%WR -$0.04 (all atr_sl_hit, avg -$0.004 — breakeven)
+- pullback-entry-: 2T 0%WR -$0.35
+- grind-trend-: 2T 0%WR -$0.18
+
+**Open:** 5 positions (AVAX +$0.54, BABY +$0.25, JUP +$0.15, GMT +$0.04, ME -$0.09)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: grind-trend- 2T 0%WR (needs 3+), pullback-entry- 2T 0%WR (needs 3+)
+- ATR SL 51% but avg -$0.013 — structural, near breakeven
+- Trade frequency ~2/hr — healthy
+- pump-chain+ 10T 20%WR but avg loss only -$0.004 — essentially breakeven
+- 6h cold streak (20%WR -$1.02) is variance on 20 trades
+
+**Monitoring:**
+- grind-trend- 2T 0%WR — 1 more loss to kill
+- pullback-entry- 2T 0%WR — 1 more loss to kill
+- 6h drawdown — if continues next hour, review regime filters
+
+**BY:** auto_1hr
+
+## [2026-09-19 10:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+- ME pullback-entry- SHORT → atr_sl_hit -$0.15
+- AVAX pump-chain+ LONG → atr_sl_hit +$0.53
+
+**PnL:** +$0.38 (50% WR)
+
+**24h:** 47T 18W 29L +$0.46 (38.3% WR) | **6h:** 14T 3W 11L -$0.45 (improving since 07h)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 25T 53% avg +$0.004 (breakeven — structural)
+- profit-monster-trail: 15T 33% avg +$0.041 (working)
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+: 8T 75%WR +$0.79 ★★
+- mover+: 5T 60%WR +$0.04
+- pump-chain+: 11T 27%WR +$0.49 (avg win outsizes loss)
+- grind-trend+: 14T 36%WR -$0.21
+- pullback-entry-: 3T 0%WR -$0.50 (1T last hour, below kill threshold)
+- grind-trend-: 2T 0%WR -$0.18
+
+**Open:** 7 positions (JUP +$0.51, BABY +$0.21, GMT +$0.06, ACE +$0.01, ENS $0.00, COMP -$0.01, SEI -$0.05)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades in last hour (max 1 per signal)
+- ATR SL 53% but avg +$0.004 — structural, near breakeven
+- Trade frequency ~2/hr — healthy
+- 6h cold improving: 07h+ hours at ~40% WR
+- AVAX pnl_pct 2362% vs actual 4.72% — pre-existing data quality bug, pnl_usdt correct
+
+**Monitoring:**
+- pullback-entry- 3T 0%WR 24h — at 24h kill threshold but not 1h threshold
+- 6h drawdown recovering
+
+**BY:** auto_1hr

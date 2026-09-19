@@ -2489,3 +2489,18 @@
   pump-chain+ 10T 20%WR (watching)
   No kill criteria met. No changes.
   BY: auto_1hr
+[2026-09-19 09:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 45T 37.8%WR +$0.08 | 6h: 20T 20%WR -$1.02 (cold)
+  Last hour: 2T 0W 2L (-$0.18)
+  grind-trend- 2T 0%WR -$0.18 (1 more loss to kill)
+  pullback-entry- 2T 0%WR -$0.35 (1 more loss to kill)
+  pump-chain+ 10T 20%WR but avg SL hit only -$0.004 (breakeven)
+  volume-breakout-long+ 8T 75%WR +$0.79 (star)
+  No kill criteria met. No changes.
+  BY: auto_1hr
+[2026-09-19 10:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 47T 38.3%WR +$0.46 | 6h: 14T 21%WR -$0.45 (improving)
+  Last hour: 2T 1W 1L +$0.38
+  pullback-entry- 3T 0%WR -$0.50 (at 24h threshold but 1T in last hour)
+  No kill criteria met. No changes.
+  BY: auto_1hr
