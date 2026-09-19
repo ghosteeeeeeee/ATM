@@ -3336,10 +3336,15 @@ def run(dry_run=False):
         
         if is_pump_chain:
             # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS
+            # OR if pump-chain is in confluence with another signal (multiple source types)
             from hermes_constants import PUMP_FLOW_MAX_POSITIONS
-            if pump_chain_count >= PUMP_FLOW_MAX_POSITIONS:
-                log(f'SKIP: Max pump-chain positions reached ({pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS})')
+            source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+            is_confluence = len(source_parts) > 1
+            if pump_chain_count >= PUMP_FLOW_MAX_POSITIONS and not is_confluence:
+                log(f'SKIP: Max pump-chain positions reached ({pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS}) — no confluence')
                 continue
+            elif pump_chain_count >= PUMP_FLOW_MAX_POSITIONS and is_confluence:
+                log(f'  ✅ [PUMP-CHAIN-CONFLUENCE] {token}: {pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS} but confluence ({len(source_parts)} sources) — allowed')
         else:
             # Other signals: block if non-pump-chain count >= available slots
             from hermes_constants import PUMP_FLOW_RESERVED_SLOTS
