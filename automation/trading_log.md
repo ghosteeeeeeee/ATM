@@ -1,3 +1,38 @@
+## [2026-09-19 02:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss) | **24h:** 30T 60%WR +$1.56
+
+**Last Hour:**
+- DOT pullback-entry- SHORT → atr_sl_hit -$0.16 (9h hold, normal ATR SL)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 19T avg +$0.044 — dominant (63%), slightly positive
+- profit-monster-trail: 9T avg +$0.057 (30%)
+- cut-loser-CL-T1: 1T -$0.090
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 10T 80%WR +$1.06 ★ (strongest)
+- pump-chain+ LONG: 5T 40%WR +$0.45 (FOGO/ADA winners offset losses)
+- mover+ LONG: 5T 80%WR +$0.12 (steady)
+- pullback-entry- SHORT: 2T 0%WR -$0.35 (small sample, 7d still -$0.35)
+
+**7d:** LONG 97T -$0.45 | SHORT 94T -$0.60 (both nearly flat)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal with 0%WR and 3+ trades last hour
+- 24h profitable at +$1.56 (60%WR) — system healthy
+- ATR SL 63% of exits — structural, avg slightly positive
+- Trade frequency: ~2T/hr — healthy, no overtrading
+- pullback-entry- SHORT 7d: 66T -$0.35 — small drag, not killable
+- 8 open positions (5 grind-trend+, 3 pump-chain+) — normal exposure
+
+**Monitoring:**
+- regime field still NULL in _signal_metadata (known data gap from brain_auditor)
+- EXTREME SHORT fresh edge noted by brain_auditor — monitoring only
+
 ## [2026-09-19 01:00 UTC] Hourly Analysis
 
 **Trades:** 3 closed last hour (0 wins, 3 losses)
