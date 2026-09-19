@@ -1176,9 +1176,11 @@
     "rationale": "6 LONG trades with z_score>2.5 in 7d: 1W 5L, -$0.69. Entering LONG at 2.5+ std devs above mean = chasing. ONDO RSI=97.78 + z_score=2.10 = overbought chase.",
     "expected_impact": "Prevent ~$0.60/7d in losses from chasing overextended LONG entries",
     "category": "entry sniper",
-    "status": "suggested",
+    "status": "rejected",
     "risk": "low — small sample (6 trades) but very clear signal (16.7% WR)",
-    "impact_on_winners": "Would block 1 winner (ME +$0.09) in 7d — acceptable"
+    "impact_on_winners": "Would block 1 winner (ME +$0.09) in 7d — acceptable",
+    "rejected_at": "2026-09-19T12:49:54.000877+00:00",
+    "reject_reason": "needs more data z>2 has some big moves"
   },
   {
     "date": "2026-09-19T02:36:00Z",
@@ -1225,5 +1227,33 @@
         "review_date": "2026-10-03"
       }
     ]
+  },
+  {
+    "date": "2026-09-19T14:00:00Z",
+    "idea": "CHASE_COMPOSITE filter — combined z>2.5 OR gap>1.0 blocks ALL chasing entries",
+    "rationale": "15 chase trades in 7d: 20% WR, -$1.25. Non-chase: 53.6% WR, +$1.22. Single filter catches every chaser.",
+    "expected_impact": "+$1.25/7d net",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "data": "7d: 15 chase trades, 14 losers, 1 winner (GMX +$0.19). Blocked trades all negative."
+  },
+  {
+    "date": "2026-09-19T14:00:00Z",
+    "idea": "Reverse SHORT_RSI_FLOOR — block RSI 35-50 (dead zone) instead of RSI<35",
+    "rationale": "RSI<35 SHORT: 27T/14d 55.6%WR +$0.24. RSI 35-50 SHORT: 41T/7d 36.6%WR -$1.89. Current floor blocks winners, allows losers.",
+    "expected_impact": "+$1.89/7d if implemented — but HIGH RISK, needs 2+ weeks monitoring",
+    "category": "entry filter",
+    "status": "monitor — data contradicts floor but sample needs confirmation",
+    "risk": "high"
+  },
+  {
+    "date": "2026-09-19T14:00:00Z",
+    "idea": "EXTREME SHORT RSI>50 priority boost",
+    "rationale": "In EXTREME regime, SHORT RSI>50 = 66.7%WR +$0.26 (best zone). Consider higher confidence or priority for these entries.",
+    "expected_impact": "Marginal — 6T sample. Monitor.",
+    "category": "regime edge",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

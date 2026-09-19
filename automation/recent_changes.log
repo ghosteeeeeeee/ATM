@@ -2504,3 +2504,18 @@
   pullback-entry- 3T 0%WR -$0.50 (at 24h threshold but 1T in last hour)
   No kill criteria met. No changes.
   BY: auto_1hr
+[2026-09-19 11:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 45T 35.6%WR +$0.46 | 6h: 9T 44.4%WR +$0.67 (recovering)
+  Last hour: 2T 1W 1L +$0.50
+  No kill criteria met. No changes.
+  BY: auto_1hr
+[2026-09-19 12:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 46T 34.8%WR +$0.69 | 6h: 11T 45.5%WR +$1.17 (recovering)
+  Last hour: 2T 2W 0L +$0.23
+  No kill criteria met. No changes.
+  BY: auto_1hr
+[2026-09-19 13:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 46T 34.8%WR +/usr/bin/bash.99 | 6h: 12T recovering
+  Last hour: 2T 2W 0L +/usr/bin/bash.21
+  No kill criteria met. No changes.
+  BY: auto_1hr

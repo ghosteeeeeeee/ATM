@@ -1,17 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~10:38 UTC (CEO)**
+**Last Updated: 2026-09-19 ~15:00 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 47T, 38.3% WR, +$0.46. 7 open. Market NEUTRAL. Pipeline running.
+24h: 46T, 41.3% WR, +$0.89. 5 open ($68.70). Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 47T, 38.3% WR, +$0.46. Winners: volume-breakout-long+ 8T 75%WR +$0.79, pump-chain+ 11T 27.3%WR +$0.49, mover+ 5T 60%WR +$0.04. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend+ 14T 35.7%WR -$0.21 (NOW KILLED).
-- **Today (calendar):** 47T closed (Sep 19). 7 open.
-- **7d:** 202T, 47.0% WR, -$1.71 (DB-verified). NEGATIVE. 7d active losers: grind-trend+ 14T 35.7%WR -$0.21 (NOW KILLED), pullback-entry- 65T 49.2%WR -$0.34 (cold streak,30d profitable +$1.51).
-- **7d DRAGGERS (all killed/disabled):** trend_purity+ -$0.91 (killed), rr-struct-v2+ -$0.45 (killed), rr-struct- -$0.42 (killed), open-skies+ -$0.40 (killed), breakout-long+ -$0.35 (killed). All legacy — system improving as they age out.
-- **Market:** NEUTRAL (7 open trades).
+- **24h (rolling):** 46T, 41.3% WR, +$0.89. Winners: pump-chain+ 13T 38.5%WR +$0.98, volume-breakout-long+ 3T 66.7%WR +$0.50, grind-trend+ 18T 50%WR +$0.24. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend- SHORT 3T 33.3%WR -$0.16.
+- **Today (calendar):** 46T closed (Sep 19). 5 open.
+- **7d:** 206T, 48.5% WR, -$0.84 (DB-verified). NEGATIVE but improving. Active winners: pump-chain+ LONG 25T 44%WR +$0.99, volume-breakout-long+ LONG 13T 69.2%WR +$0.76, rr-struct+ LONG 11T 72.7%WR +$0.58. Legacy killed signals aging out (-$2.46 total).
+- **Market:** NEUTRAL (5 open trades, $68.70 exposure).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
@@ -37,6 +36,7 @@
 
 ## Today's Changes (Sep 19)
 
+1. **CEO ~15:00 UTC — CODE FIX.** Chase filter activated. Added CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py. Fixed decider_run.py: abs() bug (was blocking dip-buying LONGs), added z-score fallback via _ctx_gate_get_zscore (signal_z_score always NULL). Pipeline restart needed. **EXPECTED:** +$1.25/7d.
 1. **CEO ~10:38 UTC — CONFIG CHANGE.** GRIND_TREND_PLUS_ENABLED = False. 14T/7d 35.7%WR -$0.21, all NEUTRAL. Already blocked NORMAL by signal_reporter. Net loser, not CEO_PROTECTED. **EXPECTED:** +$0.21/7d.
 1. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB: 24h 41T 39.0%WR +$0.04. 7d 196T 46.9%WR -$2.10. Market NEUTRAL. 2 open. **FEATURE RECORDING:** staleness 23/26 (88%), gap_at_entry 16/26 (62% — tokens with <300 candles have no EMA300). **STALE FILTER:** 3/61 stale in 48h (4.9%, down from 43.8% pre-filter). **NO ACTION NEEDED.** Pipeline stable after auto_1hr crash fix.
 1. **auto_1hr ~06:16 UTC — CRITICAL FIX.** FAVORITES_LONG NameError crash. favorites_updater.py overwrote FAVORITES_LONG with FAVORITES. Fixed: renamed to FAVORITES_LONG + updated updater. Committed c4133254.
@@ -63,6 +63,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Active Decisions
 
+- **CHASE FILTER ACTIVE.** CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. Blocks LONG chasing. Pipeline restart needed. **EXPECTED:** +$1.25/7d. — 2026-09-19
 - **STALE FILTER:** Working. 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). EXTREME SHORT fresh 83.3%WR +$0.98 = edge. — 2026-09-19
 - **grind-trend+ NORMAL BLOCKED.** signal_reporter 05:12 UTC Sep 19. 0%WR (5T). Wins HIGH 57.1%. — 2026-09-19
 - **pullback-entry- HIGH BLOCKED.** signal_reporter 17:09 UTC Sep 18. 33%WR. Wins only EXTREME (65% WR). — 2026-09-18

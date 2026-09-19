@@ -1,39 +1,68 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h (as of 2026-09-19)
+# Signal Performance Report
+**Generated:** 2026-09-19 (next cycle) | **Period:** Last 6h + 24h
 
-## KILLED (executed):
-None — no blanket kills needed.
+## Overall Stats (24h)
+- **Trades:** 45 | **WR:** 35.6% | **PnL:** +$0.46
 
-## REGIME BLOCKS (executed):
-| Signal | Dir | Regime | 24h WR | 24h PnL | Action |
-|--------|-----|--------|--------|---------|--------|
-| grind-trend+ | LONG | NORMAL | 0.0% | -$0.30 | volatility_gate_v2.py: 0.0x multiplier added |
-| grind-trend+ | LONG | HIGH | 57.1% | +$0.07 | Unchanged (wins here) |
+---
 
-## BOOSTED (executed):
-| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
-|--------|-----|--------|---------|--------|--------|
-| volume-breakout-long+ | LONG | 77.8% | +$0.80 | 9 | Winner — monitor |
-| mover+ | LONG | 80.0% | +$0.12 | 5 | Winner — monitor |
+## KILLED (executed this cycle)
 
-## LOSERS (watch list):
-| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
-|--------|-----|--------|---------|--------|--------|
-| grind-trend+ | LONG | 33.3% | -$0.23 | 12 | NORMAL blocked. HIGH wins (57.1%). Lifetime avg -$0.019/trade |
-| pump-chain+ | LONG | 20.0% | -$0.04 | 10 | Tiny losses (-$0.004/trade). Lifetime EXTREME 52% WR (50T). 24h EXTREME bad luck (3T 0%WR) |
-| pullback-entry- | SHORT | 0.0% | -$0.35 | 2 | Below threshold (2T). Watch next period |
+None. No signals met all kill criteria.
 
-## WINNERS:
-| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
-|--------|-----|--------|---------|--------|--------|
-| volume-breakout-long+ | LONG | 77.8% | +$0.80 | 9 | Hot |
-| mover+ | LONG | 80.0% | +$0.12 | 5 | Hot |
+---
 
-## ISSUES:
-- No signal inversions detected
-- grind-trend+ NORMAL regime: 0% WR across 5 trades — blocked via volatility_gate_v2.py
-- pump-chain+ EXTREME 24h: 0% WR (3T) — likely noise (lifetime EXTREME 52% WR, 50T). No action taken
+## BOOSTED (executed this cycle)
 
-## FILES CHANGED:
-- scripts/volatility_gate_v2.py: Added Grind_Trend NORMAL regime 0.0x multiplier
-- scripts/market_phase_gate.py: Added Grind_Trend family to FAMILY_MAP
+None. No signals met all boost criteria (WR>55%, 5+ trades, PnL>+$0.05).
+
+---
+
+## LOSERS (watch list)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|-------|--------|---------|--------|
+| pullback-entry- | SHORT | 3 | 0.0% | -$0.50 | WATCH — lifetime 54.6% WR $1.51. NORMAL already blocked. Bad streak, not kill-worthy. |
+| grind-trend+ | LONG | 15 | 40.0% | -$0.18 | DISABLED (CEO 2026-09-19) |
+| grind-trend- | SHORT | 2 | 0.0% | -$0.18 | WATCH — only 2 trades, below threshold |
+
+---
+
+## WINNERS
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|-------|--------|---------|--------|
+| pump-chain+ | LONG | 12 | 33.3% | +$0.96 | ENABLED — volatile WR but net positive |
+| volume-breakout-long+ | LONG | 5 | 60.0% | +$0.42 | ENABLED |
+| mover+ | LONG | 5 | 60.0% | +$0.04 | ENABLED |
+| grind-trend+ | LONG | 3 | 66.7% | +$0.05 | DISABLED (6h only) |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect direction labels.
+
+---
+
+## REGIME ANALYSIS
+
+| Signal | Regime | 24h Trades | WR | PnL | Note |
+|--------|--------|------------|-----|-----|------|
+| pullback-entry- | NORMAL | 1 | 0% | -$0.15 | Already blocked by volatility_gate_v2 |
+| pullback-entry- | EXTREME | 1 | 0% | -$0.16 | Lifetime 65% WR — bad luck |
+| pullback-entry- | HIGH | 1 | 0% | -$0.19 | Lifetime 54.2% WR — bad luck |
+| grind-trend+ | NORMAL | 6 | 0% | -$0.30 | All losses in NORMAL |
+| grind-trend+ | HIGH | 9 | 66.7% | +$0.12 | Profitable in HIGH |
+
+---
+
+## RECOMMENDATIONS
+
+1. **No action required this cycle.** All losers either already disabled or have strong lifetime performance.
+2. **Monitor pullback-entry-** — 3-trade cold streak across EXTREME/HIGH. If next cycle shows similar pattern, consider regime-specific blocking.
+3. **grind-trend+ stays dead** — CEO killed 2026-09-19, NORMAL kills it, HIGH barely profitable.
+
+---
+
+*Next report: ~6h from now.*

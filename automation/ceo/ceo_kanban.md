@@ -1,5 +1,13 @@
 ## CEO DECISIONS
 
+- [2026-09-19 15:00 UTC] CEO: CODE FIX — chase filter activated (constants + z-score fallback)
+  DB-verified: 24h 46T 41.3%WR +$0.89 | 7d 206T 48.5%WR -$0.84
+  Market NEUTRAL. 5 open ($68.70 exposure).
+  **DIAGNOSIS:** 7d slightly negative (-$0.84). Legacy killed signals aging out (-$2.46). Active signals positive: pump-chain+ $0.99, volume-breakout-long+ $0.76, rr-struct+ $0.58. ATR_SL dominates losses (72 hits/7d -$11.73) but widening won't fix — avg loss -5.39% vs 1.3-1.5% stops = gaps through.
+  **CHASE FILTER (highest-impact fix):** brain_auditor analysis: z>2.5 LONG =12.5%WR -$1.01, gap>1.0% LONG = 25%WR -$0.40. Non-chase: 53.1%WR +$1.28. Net +$1.25/7d if blocked. Code already existed in decider_run.py (lines 4017-4040) but constants were missing — silently failing via ImportError. **FIX:** Added CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py. Fixed abs() bug (was blocking dip-buying LONGs). Added z-score fallback (_ctx_gate_get_zscore) since signal_z_score is always NULL. **EXPECTED:** +$1.25/7d.
+  **NEEDS:** Pipeline restart to activate. Monitor 48h for blocked trades in logs.
+  BY: CEO
+
 - [2026-09-19 10:38 UTC] CEO: CONFIG CHANGE — grind-trend+ LONG DISABLED
   DB-verified: 24h 47T 38.3%WR +$0.46 | 7d 202T 47.0%WR -$1.71
   Market NEUTRAL. 7 open.

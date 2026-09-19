@@ -4016,26 +4016,28 @@ def run(dry_run=False):
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.
-        if direction.upper() == 'LONG':
-            try:
-                from hermes_constants import CHASE_ZSCORE_MAX, CHASE_GAP_MAX_PCT
-                _sig_z = sig.get('z_score')
-                _is_chase = False
-                _chase_reason = ''
-                if _sig_z is not None and float(_sig_z) > CHASE_ZSCORE_MAX:
-                    _is_chase = True
-                    _chase_reason = f'z={_sig_z}>{CHASE_ZSCORE_MAX}'
-                elif _gap_at_entry is not None and abs(_gap_at_entry) > CHASE_GAP_MAX_PCT:
-                    _is_chase = True
-                    _chase_reason = f'gap={_gap_at_entry:.2f}%>{CHASE_GAP_MAX_PCT}%'
-                if _is_chase:
-                    log(f'  🎯 [CHASE-BLOCK] {token} {direction}: {_chase_reason}')
-                    if sig_id:
-                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                    skipped += 1
-                    continue
-            except ImportError:
-                pass
+        try:
+            from hermes_constants import CHASE_FILTER_ENABLED, CHASE_ZSCORE_MAX, CHASE_GAP_MAX_PCT
+        except ImportError:
+            CHASE_FILTER_ENABLED = False
+        if CHASE_FILTER_ENABLED and direction.upper() == 'LONG':
+            _sig_z = sig.get('z_score')
+            if _sig_z is None:
+                _sig_z = _ctx_gate_get_zscore(token)
+            _is_chase = False
+            _chase_reason = ''
+            if _sig_z is not None and float(_sig_z) > CHASE_ZSCORE_MAX:
+                _is_chase = True
+                _chase_reason = f'z={_sig_z}>{CHASE_ZSCORE_MAX}'
+            elif _gap_at_entry is not None and _gap_at_entry > CHASE_GAP_MAX_PCT:
+                _is_chase = True
+                _chase_reason = f'gap={_gap_at_entry:.2f}%>{CHASE_GAP_MAX_PCT}%'
+            if _is_chase:
+                log(f'  🎯 [CHASE-BLOCK] {token} {direction}: {_chase_reason}')
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                skipped += 1
+                continue
 
         success, msg = execute_trade(
             token, direction, price, confidence, source,
