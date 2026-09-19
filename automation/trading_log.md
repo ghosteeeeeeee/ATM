@@ -2307,3 +2307,157 @@ Final set: ['DOT', 'HYPER']
 - 6h drawdown recovering
 
 **BY:** auto_1hr
+
+## [2026-09-19 11:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+- ENS grind-trend+ LONG → profit-monster-trail +$0.03
+- JUP pump-chain+ LONG → atr_sl_hit +$0.47
+
+**PnL:** +$0.50 (50% WR)
+
+**24h:** 45T 16W 29L +$0.46 (35.6% WR) | **6h:** 9T 4W 5L +$0.67 (recovering)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 23T 51% avg +$0.008 (breakeven — structural)
+- profit-monster-trail: 15T 33% avg +$0.034 (working)
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- pump-chain+: 12T 33%WR +$0.96 (best PnL)
+- volume-breakout-long+: 5T 60%WR +$0.42 (best WR)
+- mover+: 5T 60%WR +$0.04
+- grind-trend+: 15T 40%WR -$0.18
+- pullback-entry-: 3T 0%WR -$0.50
+- grind-trend-: 2T 0%WR -$0.18
+
+**Open:** 5 positions (COMP, SEI, GMT, BABY, ACE) — all flat
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 51% but avg +$0.008 — structural, near breakeven
+- 6h drawdown recovered to +$0.67
+- Trade frequency ~2/hr — healthy
+
+**Monitoring:**
+- grind-trend- 2T 0%WR — 1 more loss to kill
+- pullback-entry- 3T 0%WR — at 24h threshold but not last-hour threshold
+
+**BY:** auto_1hr
+
+## [2026-09-19 12:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+- COMP grind-trend+ LONG → profit-monster-trail +$0.06
+- SEI grind-trend+ LONG → profit-monster-trail +$0.17
+
+**PnL:** +$0.23 (100% WR)
+
+**24h:** 46T 16W 30L +$0.69 (34.8% WR) | **6h:** 11T 5W 6L +$1.17 (recovering)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 22T 48% avg +$0.005 (breakeven — structural)
+- profit-monster-trail: 17T 37% avg +$0.044 (working well)
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- pump-chain+: 12T 33%WR +$0.96 (best PnL)
+- volume-breakout-long+: 4T 50%WR +$0.33
+- grind-trend+: 17T 47%WR +$0.05 (breakeven)
+- mover+: 5T 60%WR +$0.04
+- pullback-entry-: 3T 0%WR -$0.50
+- grind-trend-: 2T 0%WR -$0.18
+- mover-: 1T 0%WR -$0.09
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 48% but avg +$0.005 — structural, near breakeven
+- Trade frequency 2/hr — healthy, no overtrading
+- 6h drawdown recovering (+$1.17)
+
+**Monitoring:**
+- pullback-entry- 3T 0%WR — at 24h threshold, needs 3+ in next hour to kill
+- grind-trend- 2T 0%WR — 1 more loss to kill
+
+**BY:** auto_1hr
+
+## [2026-09-19 13:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+- FIL pump-chain+ LONG → atr_sl_hit +$0.02
+- GMT grind-trend+ LONG → profit-monster-trail +$0.19
+
+**PnL:** +$0.21 (100% WR)
+
+**24h:** 46T 16W 30L +$0.99 (34.8% WR)
+**6h:** 12T, recovering
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 22T 48% avg +$0.013 (structural, breakeven)
+- profit-monster-trail: 17T 37% avg +$0.055 (working)
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- pump-chain+: 13T +$0.98 (star)
+- volume-breakout-long+: 3T +$0.50
+- grind-trend+: 18T +$0.24
+- mover+: 5T +$0.04
+- pullback-entry-: 3T 0%WR -$0.50 (monitoring)
+- grind-trend-: 2T 0%WR -$0.18 (monitoring)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 48% but avg +$0.013 — structural, near breakeven
+- Trade frequency 2/hr — healthy
+- 6h recovering
+
+**Monitoring:**
+- pullback-entry- 3T 0%WR — at 24h threshold, no last-hour trades
+- grind-trend- 2T 0%WR — 1 more loss to kill
+
+**BY:** auto_1hr
+
+## [2026-09-19 14:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+- ACE grind-trend- SHORT → profit-monster-trail +$0.02
+
+**PnL:** +$0.02 (100% WR)
+
+**24h:** 47T 36.2%WR +$1.01
+**24h Exit Breakdown:**
+- atr_sl_hit: 22T 48% avg +$0.013 (structural, near breakeven)
+- profit-monster-trail: 17T 37% avg +$0.049 (working)
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- grind-trend+: 18T 50%WR +$0.24
+- pump-chain+: 13T 38.5%WR +$0.98 (star)
+- mover+: 4T 50%WR -$0.08 (slightly negative)
+- volume-breakout-long+: 3T 66.7%WR +$0.50
+- grind-trend-: 3T 33.3%WR -$0.16 (improved with 1 win)
+- pullback-entry-: 3T 0%WR -$0.50 (monitoring)
+- mover-: 1T 0%WR -$0.09
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 48% but avg +$0.013 — structural, near breakeven
+- Trade frequency 1/hr — healthy
+- grind-trend- improved from 0% to 33.3% WR
+
+**Monitoring:**
+- pullback-entry- 3T 0%WR — still at threshold, needs 3+ in next hour to kill
+
+**BY:** auto_1hr
