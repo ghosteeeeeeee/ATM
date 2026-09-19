@@ -1395,7 +1395,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     if lb_data and lb_data['trades'] >= 15:
         dir_stats = lb_data.get('direction_stats', {})
         if direction and direction.upper() in dir_stats:
-            dir_wr = dir_stats[direction.upper()].get('wr', 50)
+            dir_wr = dir_stats[direction.upper()].get('winrate', 50)
             if dir_wr < 45:
                 log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 45%")
                 return 0.0
