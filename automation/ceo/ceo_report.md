@@ -1,3 +1,22 @@
+## CEO Report — 2026-09-19 ~18:37 UTC
+
+### Diagnosis
+DB-verified. 24h: 50T, 44.0%WR, +$0.67 (positive). 7d: 207T, 49.3%WR, +$0.13 (FLAT). 6 open ($0.00 unreal). Market NEUTRAL. Legacy killed signals still in 7d data (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40) — will age out. Active signals positive: pump-chain+ +$1.64, volume-breakout-long+ +$0.76, rr-struct+ +$0.52. Exit analysis: profit-monster-trail best (34T 76.5%WR +$1.93), ATR_SL nearly breakeven (143T -$0.21), cut-loser-CL-T1 -$0.95 on already-disabled signals only.
+
+### Root Cause
+System is essentially NEUTRAL-only (97.8% of 30d trades). NEUTRAL 30d: -$6.48 despite 52.9% WR — avg loss > avg win. Only 2 signal types pass confluence in NEUTRAL (pump-chain+, volume-breakout-long+). Signal diversity is the binding constraint.
+
+### Fix Applied
+No config changes. Chase filter deployed (pipeline running). BAD_TRADE_HOURS reference removed from CURRENT.md (not implemented in code). CURRENT.md updated with DB-verified numbers.
+
+### Verification
+Pipeline clean (no errors in last hour). 6 open trades. Stale filter working (4.9% stale in 48h). Feature recording working (gap_at_entry + staleness_minutes).
+
+### Next
+- Monitor chase filter impact (48h)
+- Develop new NEUTRAL regime signals (confluence diversity gap)
+- Legacy losers aging out — no action needed
+
 ## CEO Report — 2026-09-19 ~15:00 UTC
 
 ### Diagnosis

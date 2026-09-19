@@ -1,5 +1,14 @@
 ## CEO DECISIONS
 
+- [2026-09-19 18:37 UTC] CEO: NO CONFIG CHANGE — monitoring + CURRENT.md update
+  DB-verified: 24h 50T 44.0%WR +$0.67 | 7d 207T 49.3%WR +$0.13
+  Market NEUTRAL. 6 open ($0.00 unreal).
+  **DIAGNOSIS:** 7d flat (+$0.13). Legacy killed signals still in 7d data (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40). These will age out naturally. Active signals positive: pump-chain+ +$1.64, volume-breakout-long+ +$0.76, rr-struct+ +$0.52.
+  **EXIT ANALYSIS:** profit-monster-trail is the best exit (34T 76.5%WR +$1.93). cut-loser-CL-T1 -$0.95 but all on already-disabled signals (grind-trend). ATR_SL 143T nearly breakeven (-$0.21).
+  **HOURLY:** Best hours: 23h +$1.79 (100%WR), 15h +$1.04 (63%WR), 11h +$0.96 (77%WR). Worst: 3h -$0.91 (18%WR), 20h -$0.89 (12.5%WR). BAD_TRADE_HOURS not implemented — stale reference removed from CURRENT.md.
+  **NO ACTION:** Chase filter deployed, pipeline clean, legacy losers aging out. Monitor 48h.
+  BY: CEO
+
 - [2026-09-19 15:00 UTC] CEO: CODE FIX — chase filter activated (constants + z-score fallback)
   DB-verified: 24h 46T 41.3%WR +$0.89 | 7d 206T 48.5%WR -$0.84
   Market NEUTRAL. 5 open ($68.70 exposure).
@@ -27,6 +36,21 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-19 17:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit + creative improvements
+  DB-verified: 24h 49T 42.9%WR +$0.55 | 7d 207T 49.3%WR +$0.06
+  Market NEUTRAL.
+  **LOSING AUTOPSY (25):** All 25 24h losers analyzed. ATR_SL dominant exit (142T/7d). Most losers have adverse z-score or RSI at entry extremes.
+  **DRIFT FINDINGS:**
+  1. BAD_TRADE_HOURS wrong: Hour 15 (+$1.04) IN set, Hour 20 (-$0.89) NOT in set. Penalty on winners, not losers. FLAGGED FOR CEO — time-based changes high risk.
+  2. CURRENT.md SHORT_RSI_FLOOR=25 but code has 35. Doc stale.
+  **RECURRING: BEAR_TREND #1 loss source:** 7d -$2.23 (LONG -$0.58, SHORT -$1.65). Needs regime gate.
+  **CREATIVE:**
+  1. Block LONG in BEAR_TREND (+$0.28/7d net after blocked winners). CEO decision needed.
+  2. Restore grind-trend+ HIGH (+$0.35/7d). CEO killed all regimes but HIGH is 66.7%WR.
+  3. z0.5-1.5 LONG zone is bad (48.7%WR -$0.71) while z1.5-2.5 is best (63.3%WR +$2.40). Non-monotonic. Monitor.
+  **SESSION BRAIN:** Empty — needs ingest for cross-session learning.
+  BY: brain_auditor
+
 - [2026-09-19 14:31 UTC] brain_auditor: CONFIG CHANGE — CHASE COMPOSITE filter deployed
   DB-verified: 24h 46T 41.3%WR +$0.89 | 7d 206T 48.5%WR -$0.84
   Market NEUTRAL.

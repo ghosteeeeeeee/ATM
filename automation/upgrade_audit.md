@@ -177,8 +177,151 @@
 | PENDING (Medium Value) | 2 | continuum-ma, btc-oscillator-30d |
 | SUPERSEDED | 1 | sl-memory-v1 |
 
-## Next Candidates
+## Additional Plans Scanned (2026-09-19 12:45)
 
-1. **BTC Pump Rider Gradual Rally** — Level 2 — HIGH — extends existing btc_pump_rider.py, catches gradual rallies missed by explosive breakout mode
-2. **Contrarian Zone Signal** — Level 3 — MEDIUM — depends on sl_memory wiring, high complexity
-3. **HL Trigger SL/TP V2** — Level 3 — HIGH — critical for reducing catastrophic losses but complex rework
+### Already Implemented (verified in code)
+
+## Plan: 2026-09-09_regime-transition-smoothing.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** 3-layer fix: directional bias, circuit breaker tightening, alt-BTC divergence
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** DIRECTIONAL_OUTCOME_PENALTY=0.5, LOCK_VELOCITY=0.5, DIRECTIONAL_BIAS_ENABLED=True, ALT_BTC_DIVERGENCE_ENABLED=True all in hermes_constants.py. signal_compactor.py wired at lines 1686-1692.
+
+## Plan: 2026-09-08_short-filter-overhaul.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Fix dead code in VEL-FILTER, relax SHORT filters
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** Dead code bug fixed — range(SHORT_VEL_FILTER_GREEN_THRESHOLD) at signal_compactor.py:2899.
+
+## Plan: losers-list-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Anti-favorites system to penalize underperformers
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED
+- **Reason:** LOSERS_LONG, LOSERS_SHORT, LOSERS sets exist (hermes_constants.py:283-290). LOSERS_MULT=0.3, LOSERS_CONF_PENALTY=-50. signal_compactor.py penalizes at lines 1400, 2516-2517, 3099.
+
+### Pending — Additional Plans
+
+## Plan: 2026-09-08_btc-alignment-crash-protection-overhaul.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** BTC trend alignment + cascade crash protection
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** PARTIALLY IMPLEMENTED
+- **Reason:** BTC momentum gate and crash filter exist. Full cascade protection (exit existing LONGs during BTC crash) NOT implemented.
+
+## Plan: 2026-09-08_trend-ignition-signal-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Trend ignition signal for early trend detection
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No signal script exists. Spec is ready for build.
+
+## Plan: 2026-09-09_pump-chain-v2-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Improved pump-chain signal with better entries
+- **Difficulty:** Level 2
+- **Value:** MEDIUM
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Plan awaiting approval. Existing pump_chain signal works.
+
+## Plan: 2026-09-07_partial-close-trailing-runner.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Partial close (50% scalp, 50% runner) to capture more upside
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Complex position_manager.py rework. Would require HL API support for partial closes.
+
+## Plan: market-sync-protection-plan.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Exit existing LONGs when BTC drops (not just block new entries)
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Crash filter blocks NEW entries but doesn't protect existing positions. High complexity for live position management.
+
+## Plan: regime-tuner-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Weekly automated regime analysis and signal tuning
+- **Difficulty:** Level 3
+- **Value:** MEDIUM
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Comprehensive spec exists. All building blocks exist (regime_memory, volatility_gate, signal flags). Needs new regime_tuner.py + systemd timer.
+
+## Plan: sniper-exit-strategy.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Close only wrong-side positions when market shifts
+- **Difficulty:** Level 3
+- **Value:** MEDIUM
+- **Status:** NOT IMPLEMENTED (brainstorm only)
+- **Reason:** Spec exists but no implementation plan. Depends on accurate transition detection.
+
+## Plan: doji_signal_system.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Doji-based entry and exit signal
+- **Difficulty:** Level 2
+- **Value:** LOW
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Many existing signals already cover reversal patterns. Low priority.
+
+## Plan: 2026-09-04_continuum-engine-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** BTC continuum engine (phase detection, z-score, trend)
+- **Difficulty:** Level 4
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** continuum_engine.py, continuum_context.py, continuum_*.py signals all exist. Core infrastructure built.
+
+## Plan: 2026-09-02_regime-aware-signal-params-spec.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Adaptive signal parameters by regime
+- **Difficulty:** Level 2-3
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED
+- **Reason:** VOL_PHASE_MULTS matrix + regime gate in volatility_gate_v2.py covers this.
+
+## Plan: atr-sl-widen.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Wider ATR SL for volatile markets
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED
+- **Reason:** ATR_SL_MIN_INIT, ATR_SL_WIDENING constants exist. ATR-based SL is the standard exit.
+
+## Plan: 2026-08-19_short-bias-fix.md
+- **Date scanned:** 2026-09-19 12:45
+- **Core request:** Fix SHORT bias in signal generation
+- **Difficulty:** Level 1-2
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED
+- **Reason:** Directional outcome system, directional lock, directional bias all active.
+
+---
+
+## Final Summary
+
+| Status | Count | Notes |
+|--------|-------|-------|
+| IMPLEMENTED | 22 | All Level 1-2 wins captured |
+| PARTIALLY IMPLEMENTED | 5 | sl-memory-v2, btc-momentum-sync, brain-rag, btc-oscillator-correlation, cascade-crash |
+| PENDING (High Value) | 3 | hl-trigger-sl-v2 (L3), partial-close-runner (L3), market-sync-protection (L2-3) |
+| PENDING (Medium Value) | 5 | contrarian-zone (L3), continuum-ma (L2), regime-tuner (L3), sniper-exit (L3), trend-ignition (L2) |
+| SUPERSEDED | 1 | sl-memory-v1 |
+| LOW VALUE | 3 | doji-signal, btc-oscillator-30d (wait), pump-chain-v2 (awaiting approval) |
+
+**Key finding: All Level 1 tasks are complete.** The remaining work is Level 2-3 architecture (HL trigger orders, SL memory wiring, partial closes, market sync protection).
+
+## Next Candidates (sorted by value/effort)
+
+1. **HL Trigger SL/TP V2** — Level 3 — HIGH VALUE — eliminates slippage on catastrophic losses (-172% in 7d). Most impactful single change.
+2. **Partial Close + Trailing Runner** — Level 3 — HIGH VALUE — captures more upside on winners (ICP case: 0.84% → ~2.64%).
+3. **Market Sync Protection** — Level 2-3 — HIGH VALUE — protects existing LONGs during BTC selloffs.
+4. **Continuum MA Signal** — Level 2 — MEDIUM VALUE — new signal using MA-smoothed continuum score.
+5. **Regime Tuner** — Level 3 — MEDIUM VALUE — automates weekly signal regime analysis.

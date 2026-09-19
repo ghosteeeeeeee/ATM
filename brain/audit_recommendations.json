@@ -1,119 +1,98 @@
 {
-  "timestamp": "2026-09-19T15:33:05.657445+00:00",
-  "session_lock": "FRESH (<1h) — READ-ONLY audit, no config changes",
-  "summary": {
-    "24h": "46T, 41.3%WR, +$0.89",
-    "7d": "206T, 48.5%WR, -$0.84",
-    "market": "NEUTRAL",
-    "open_trades": 5,
-    "exposure": "$68.70"
+  "timestamp": "2026-09-19T17:30:00Z",
+  "session_brain_stats": {
+    "status": "EMPTY - needs --ingest",
+    "note": "Cannot cross-reference past decisions"
   },
-  "critical_findings": [
+  "trade_summary_24h": {
+    "trades": 49,
+    "win_rate": 42.9,
+    "pnl": 0.55,
+    "top_winner": "pump-chain+ LONG 17T 52.9%WR +$1.51",
+    "top_loser": "pullback-entry- SHORT 3T 0%WR -$0.50"
+  },
+  "trade_summary_7d": {
+    "trades": 207,
+    "win_rate": 49.3,
+    "pnl": 0.06,
+    "best_regime": "EXTREME 51T 56.9%WR +$1.62",
+    "worst_regime": "HIGH 91T 47.3%WR -$1.12 (legacy aging)"
+  },
+  "drift_findings": [
     {
-      "id": "CRIT-1",
-      "finding": "ATR SL SLIPPAGE CATASTROPHIC",
-      "severity": "CRITICAL",
-      "detail": "70 ATR SL hits in 7d. 60/70 (86%) have 2x+ slippage. 52/70 (74%) have 3x+ slippage. Stop set at 1.3% but actual losses 4-11%. Example: IMX stop=-1.3% actual=-11.07%, FIL stop=-1.3% actual=-9.83%.",
-      "root_cause": "Low-liquidity coins gap through stops. Market orders on thin books = massive slippage. HL execution on altcoins is poor.",
-      "impact": "This IS the #1 loss source. 70 trades, avg -0.11% per hit = massive drag. But widening stops wont help per CEO analysis.",
-      "recommendation": "DO NOT widen stops. Instead: (1) Block LONG in BTC_BEAR_TREND (see CRIT-2), (2) Improve entry quality via chase filter + regime filters. The stop slippage is a symptom of bad entries, not tight stops."
-    },
-    {
-      "id": "CRIT-2",
-      "finding": "BTC BEAR_TREND DESTROYS LONG PERFORMANCE",
-      "severity": "HIGH",
-      "detail": "42 trades when BTC regime=BEAR_TREND: 33.3%WR, -$2.34. pullback-entry- SHORT alone: 27T 33.3%WR -$1.62. When BTC trends bearish, even SHORT signals lose because altcoins are whipsawing.",
-      "root_cause": "pullback-entry- SHORT fires aggressively in BEAR_TREND but altcoins arent trending down cleanly — theyre bouncing. 33% WR means entries are catching bounces, not trends.",
-      "impact": "-$2.34/7d from this regime alone. Fixing this alone would turn 7d negative to positive.",
-      "recommendation": "Add BTC_BEAR_TREND penalty for SHORT signals OR reduce SHORT confidence when BTC is in BEAR_TREND. Monitor 48h before implementing."
-    },
-    {
-      "id": "CRIT-3",
-      "finding": "grind-trend+ HIGH REGIME IS PROFITABLE BUT KILLED",
+      "finding": "BAD_TRADE_HOURS config is inaccurate",
       "severity": "MEDIUM",
-      "detail": "grind-trend+ HIGH: 12T 66.7%WR +$0.35/7d. grind-trend+ NORMAL: 6T 16.7%WR -$0.11/7d. CEO killed all regimes at 10:38 UTC. HIGH is the winner, NORMAL is the loser.",
-      "root_cause": "CEO killed all grind-trend+ because 7d aggregate was bad (35.7%WR -$0.21). But aggregate includes NORMAL kills. HIGH is actually strong.",
-      "impact": "+$0.35/7d being left on table. HIGH regime is 66.7%WR.",
-      "recommendation": "Restore grind-trend+ with NORMAL blocked. Keep HIGH. This is a net positive change."
+      "details": "Set is {3,5,13,14,15,21} but Hour 15 is +$1.04 (best hour), Hour 21 +$0.38, Hour 5 +$0.31, Hour 14 +$0.19. Meanwhile Hour 20 (-$0.89), Hour 2 (-$0.80), Hour 8 (-$0.62), Hour 1 (-$0.59), Hour 17 (-$0.52), Hour 0 (-$0.41) are NOT in the set.",
+      "impact": "Penalty applied to winning hours, not applied to losing hours",
+      "recommendation": "FLAG FOR CEO - time-based changes high risk. Need 2+ weeks data before changing.",
+      "confidence": "HIGH"
+    },
+    {
+      "finding": "CURRENT.md says SHORT_RSI_FLOOR=25 but code has SHORT_RSI_FLOOR=35",
+      "severity": "LOW",
+      "details": "CURRENT.md line 23: 'SHORT_RSI_FLOOR=25: Working.' Code has SHORT_RSI_FLOOR = 35.",
+      "impact": "Informational - filter at 35 blocks more trades than documented at 25",
+      "recommendation": "Update CURRENT.md to reflect actual code value",
+      "confidence": "HIGH"
     }
   ],
-  "losing_trade_autopsy": {
-    "24h_losers": 23,
-    "clusters": [
-      {
-        "signal": "grind-trend+",
-        "trades": 8,
-        "regime": "NORMAL/HIGH",
-        "root_cause": "Killed at 10:38 UTC. 10 losers before kill. Most had btc_regime=TRANSITIONING or BEAR_TREND. Entry conditions were okay but market context was wrong.",
-        "lesson": "grind-trend+ fires in all regimes but only works in HIGH. NORMAL is a killer."
-      },
-      {
-        "signal": "pump-chain+",
-        "trades": 5,
-        "regime": "EXTREME/HIGH",
-        "root_cause": "AZTEC z=2.8 (chasing), ADA z=2.9 (chasing), FIL z=2.6 (chasing). Chase filter would have caught 3/5 losers.",
-        "lesson": "Chase filter is working. AZTEC, ADA, FIL would have been blocked."
-      },
-      {
-        "signal": "pullback-entry- SHORT",
-        "trades": 3,
-        "regime": "NORMAL/EXTREME",
-        "root_cause": "ME RSI=43.75 (okay), DOT RSI=50 (okay), NOT RSI=28.57 (oversold). NOT was shorting into oversold.",
-        "lesson": "RSI floor at 25 is too low. 28.57 RSI SHORT is still catching falling knives."
-      }
-    ]
-  },
-  "regime_analysis": {
-    "7d_regimes": {
-      "EXTREME": "48T 54.2%WR +$1.39 (BEST)",
-      "NORMAL": "64T 50%WR -$0.12",
-      "HIGH": "91T 46.2%WR -$1.67 (WORST — legacy kills aging out)"
+  "recurring_problems": [
+    {
+      "problem": "BEAR_TREND is the #1 systematic loss source",
+      "data": "7d: BEAR_TREND LONG 12T 33.3%WR -$0.58, BEAR_TREND SHORT 31T 35.5%WR -$1.65. Total -$2.23/7d.",
+      "root_cause": "System trades in BEAR_TREND without regime-aware filtering",
+      "recommendation": "CEO decision: block all BEAR_TREND LONG trades"
     },
-    "btc_regimes": {
-      "BULL_TREND": "56T 60.7%WR +$1.44 (BEST)",
-      "RANGING": "40T 57.5%WR +$0.84",
-      "TRANSITIONING": "50T 50%WR +$0.02",
-      "BEAR_TREND": "42T 33.3%WR -$2.34 (WORST)"
+    {
+      "problem": "grind-trend+ HIGH killed but is a winner",
+      "data": "grind-trend+ LONG HIGH: 12T 66.7%WR +$0.35. CEO killed all regimes because NORMAL was 0%WR.",
+      "root_cause": "CEO killed entire signal due to one bad regime",
+      "recommendation": "Restore grind-trend+ LONG with NORMAL block. Needs CEO approval."
     },
-    "insight": "BTC regime is the strongest predictor of trade success. BULL_TREND = 60.7%WR. BEAR_TREND = 33.3%WR. This is the biggest lever we havent pulled."
-  },
+    {
+      "problem": "Session brain empty",
+      "data": "SessionBrain returned empty",
+      "root_cause": "Ingest never ran or was cleared",
+      "recommendation": "Run: python3 scripts/session_brain.py --ingest"
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-09-19T15:33:05.657462+00:00",
-      "idea": "BTC regime gate for SHORT signals in BEAR_TREND",
-      "rationale": "pullback-entry- SHORT fires 27T in BEAR_TREND at 33.3%WR. When BTC is bearish, altcoins bounce erratically — SHORT entries catch bounces not trends. REDUCE SHORT confidence by 15-20% when BTC regime=BEAR_TREND.",
-      "expected_impact": "+$1.50-2.00/7d (turns -$1.62 to near breakeven)",
-      "category": "regime filter",
+      "date": "2026-09-19T17:30:00Z",
+      "idea": "Block all LONG entries when BTC regime = BEAR_TREND",
+      "rationale": "7d: BEAR_TREND LONG 12T 33.3%WR -$0.58. System should not be LONG in BEAR.",
+      "expected_impact": "+$0.58/7d (net +$0.28 after blocked winners)",
+      "category": "regime gate",
       "status": "suggested",
-      "risk": "low — only affects BEAR_TREND SHORT entries which are already losing",
-      "verification": "Would have blocked 15/27 BEAR_TREND SHORT losers. Would NOT have blocked BEAR_TREND SHORT winners (HYPER +0.26, STX +0.21) because those had higher confidence."
+      "risk": "low",
+      "impact_on_winners": "Would block $0.30 in winners, save $0.58 in losers"
     },
     {
-      "date": "2026-09-19T15:33:05.657464+00:00",
-      "idea": "Restore grind-trend+ with NORMAL blocked",
-      "rationale": "grind-trend+ HIGH: 12T 66.7%WR +$0.35/7d. NORMAL: 6T 16.7%WR -$0.11. CEO killed all regimes. Restore HIGH, keep NORMAL blocked.",
-      "expected_impact": "+$0.35/7d",
+      "date": "2026-09-19T17:30:00Z",
+      "idea": "Restore grind-trend+ LONG with NORMAL regime block",
+      "rationale": "HIGH is 12T 66.7%WR +$0.35. CEO killed all regimes due to NORMAL failure.",
+      "expected_impact": "+$0.35/7d from HIGH regime wins",
       "category": "signal restore",
       "status": "suggested",
-      "risk": "low — HIGH is proven profitable, NORMAL was already blocked by signal_reporter"
+      "risk": "low",
+      "impact_on_winners": "No impact"
     },
     {
-      "date": "2026-09-19T15:33:05.657466+00:00",
-      "idea": "pullback-entry- SHORT RSI floor raise from 25 to 30",
-      "rationale": "30d SHORT losers include RSI=18.18, 20.0, 23.53, 25.91, 28.57, 29.17. These are oversold entries catching falling knives. RSI_MIN=25 lets in too many oversold shorts.",
-      "expected_impact": "+$0.30-0.50/7d",
-      "category": "entry filter",
-      "status": "suggested",
-      "risk": "low — would block 8/30 recent SHORT losers, check winners: 0 winning shorts had RSI < 30 in last 7d",
-      "verification_needed": "Run proposed filter against 7d winning shorts to confirm no impact"
+      "date": "2026-09-19T17:30:00Z",
+      "idea": "Investigate z0.5-1.5 LONG zone - non-monotonic z-score performance",
+      "rationale": "z1.5-2.5 = 63.3%WR +$2.40 (BEST). z0.5-1.5 = 48.7%WR -$0.71 (BAD). z>2.5 = 25%WR -$0.76 (chase). Relationship is non-monotonic.",
+      "expected_impact": "Investigation only",
+      "category": "entry sniper",
+      "status": "monitoring",
+      "risk": "none"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "RESTORE grind-trend+ HIGH only (NORMAL already blocked) — +$0.35/7d — LOW RISK",
-    "MONITOR BTC regime gate for SHORT — needs 48h data to validate — MEDIUM PRIORITY",
-    "VERIFY RSI floor raise against winners before implementing — HIGH PRIORITY",
-    "CHASE FILTER deployed today — monitor 48h for blocked trades in logs",
-    "STALE FILTER working — 48h 3/61 stale (4.9%) — extend monitoring"
+    "CEO: Decide on BEAR_TREND LONG block (highest impact, +$0.28/7d net)",
+    "CEO: Decide on grind-trend+ HIGH restore with NORMAL block (+$0.35/7d)",
+    "Run: python3 scripts/session_brain.py --ingest (cross-session learning)",
+    "Monitor: BAD_TRADE_HOURS drift - flag for CEO, need 2+ weeks data",
+    "Monitor: pullback-entry- SHORT HIGH recent degradation (full history +$0.44 but 7d -$0.34)"
   ]
 }

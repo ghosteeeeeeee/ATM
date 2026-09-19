@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~18:30 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-19 ~18:37 UTC (CEO)**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 50T, 44.0% WR, +$0.67. 6 open ($74.30). Market LONG_BIAS. Pipeline running.
+24h: 50T, 44.0% WR, +$0.67. 6 open ($0.00 unreal). Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 50T, 44.0% WR, +$0.67. Winners: pump-chain+ 18T 56%WR +$1.63, grind-trend+ 18T 50%WR +$0.24. Losers: pullback-entry- SHORT 3T 0%WR -$0.50, grind-trend- SHORT 5T 20%WR -$0.38 (killed 17:12 UTC).
-- **Today (calendar):** 50T closed (Sep 19). 6 open ($74.30 exposure).
-- **7d:** 207T, 49.3% WR, +$0.13 (DB-verified). **POSITIVE.** Active winners: pump-chain+ LONG 30T 53%WR +$1.64, volume-breakout-long+ LONG 13T 69%WR +$0.76, rr-struct+ LONG 9T 67%WR +$0.52, grind-trend+ LONG 18T 50%WR +$0.24. Legacy killed signals aging out.
-- **Market:** LONG_BIAS (6 open trades, $74.30 exposure). 8 long / 0 short / 112 neutral.
+- **24h (rolling):** 50T, 44.0% WR, +$0.67. Winners: pump-chain+ 30T 53.3%WR +$1.64, volume-breakout-long+ 13T 69.2%WR +$0.76, rr-struct+ 9T 66.7%WR +$0.52. Losers: legacy signals aging out (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40).
+- **Today (calendar):** 50T closed (Sep 19). 6 open.
+- **7d:** 207T, 49.3% WR, +$0.13 (DB-verified). **FLAT.** Active winners: pump-chain+ LONG 30T 53.3%WR +$1.64, volume-breakout-long+ LONG 13T 69.2%WR +$0.76, rr-struct+ LONG 9T 66.7%WR +$0.52. Legacy killed signals aging out in 7d data.
+- **Market:** NEUTRAL (6 open trades, $0.00 unrealized).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend- (Sep 19, signal_reporter killed — 5T 20%WR -$0.38, no winning regime), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
@@ -18,19 +18,19 @@
 - **Disk:** 84% (19G free). Trending up but below 90% threshold. Compress if crosses 88%.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%. (brain_auditor changed MIN 1.2%→1.3% at 22:34 UTC Sep 14)
-- **BAD_TRADE_HOURS:** {3,5,13,14,15,21} — soft penalty active.
+- **BAD_TRADE_HOURS:** NOT IMPLEMENTED — stale reference, no code exists. REMOVE.
 - **SHORT_NORMAL_PENALTY=1.0:** REMOVED CEO Sep 16. Monitoring expired, SHORT NORMAL profitable (61.8%WR +$0.59/7d). Expected +$0.26/7d.
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟢 R:R STATUS (POSITIVE 7d, POSITIVE 24h)**
+**🟢 R:R STATUS (FLAT 7d, POSITIVE 24h)**
 7d PnL +$0.13. SHORT +$0.20 carries LONG +$0.24. 24h +$0.67. Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
 
 **🟢 SYSTEM FIXES VERIFIED:** rr_engine (0 exits 6+ days), cut-loser-CL-T1 (7d -$1.19, working), exit_conditions (new trades have data), RSI timeframe (1m data, 0 bad entries since).
 
-**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence reliably. pullback-entry- SHORT historically profitable but 0%WR 24h. Need new signals. 30d active: 6 types (+$4.93).
+**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence reliably. rr-struct+ LONG 66.7%WR +$0.52 also strong. pullback-entry- SHORT 49.2%WR -$0.19 nearly breakeven. Need new signals for NEUTRAL diversity. 30d active: 6 types (+$4.93).
 
 **🟢 FEATURE RECORDING:** _signal_metadata RSI+momentum 187/188 trades (WORKING). **gap_at_entry + staleness_minutes** — decider_run.py injects EMA300 gap% and signal age into metadata. Since fix: staleness 23/26 (88%), gap 16/26 (62% — <300 candles = no EMA300), is_stale 26/26 (100%). — 2026-09-19
 
