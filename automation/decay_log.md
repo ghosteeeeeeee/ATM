@@ -1240,3 +1240,8 @@
 [2026-09-19 11:08 UTC]   🟢 OK: mover+: 5 trades, 60.0% WR, PnL=0.57
 [2026-09-19 11:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-19 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-19 17:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-19 17:08 UTC]   🟡 WARNING: grind-trend-: 5 trades, 20.0% WR, PnL=-3.47
+[2026-09-19 17:08 UTC]   🟢 OK: pump-chain+: 16 trades, 62.5% WR, PnL=11.72
+[2026-09-19 17:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-19 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

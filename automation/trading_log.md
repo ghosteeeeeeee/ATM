@@ -2461,3 +2461,59 @@ Final set: ['DOT', 'HYPER']
 - pullback-entry- 3T 0%WR — still at threshold, needs 3+ in next hour to kill
 
 **BY:** auto_1hr
+
+## [2026-09-19 15:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+- FIL warrior-sr-confirm+ LONG → profit-monster-trail +$0.09
+- BABY pump-chain+ LONG → atr_sl_hit +$0.30
+- DOGE pump-chain+ LONG → atr_sl_hit +$0.09
+
+**PnL:** +$0.48 (100% WR)
+
+**24h:** 46T 34.8%WR +$1.08
+- atr_sl_hit: 23T 50% avg +$0.016 (structural)
+- profit-monster-trail: 16T 35% avg +$0.051
+- cut-loser-CL-T1: 6T 13% avg -$0.092
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 50% but avg +$0.016 — structural, near breakeven
+- Trade frequency 3/hr — healthy
+- BABY/DOGE atr_sl_hit positive PnL — trail captured profit
+
+**Monitoring:**
+- pullback-entry- 3T 0%WR — 0 trades last hour, no kill triggered
+- mover+ 3T 33%WR -$0.19 — minor bleed
+
+**BY:** auto_1hr
+
+## [2026-09-19 16:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+- INJ pump-chain+ LONG → atr_sl_hit +$0.03
+- WLFI grind-trend- SHORT → cut-loser-CL-T1 -$0.11
+- DOGE grind-trend- SHORT → cut-loser-CL-T1 -$0.11
+
+**PnL:** -$0.19 (33.3% WR)
+
+**24h:** 46T 34.8%WR +$1.08
+- atr_sl_hit: 24T 50% avg +$0.016 (structural)
+- profit-monster-trail: 16T 35% avg +$0.051
+- cut-loser-CL-T1: 8T avg -$0.096
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no signal had 3+ trades last hour
+- ATR SL 52% but avg +$0.016 — structural, near breakeven
+- Trade frequency 4/hr — healthy
+- pullback-entry- 0 trades last hour, no kill triggered
+
+**Monitoring:**
+- grind-trend- 5T/24h 20%WR -$0.38 — 2 losses last 3h, trending worse but not at kill threshold
+- pullback-entry- 3T/24h 0%WR -$0.50 — dormant, no recent trades
+
+**BY:** auto_1hr

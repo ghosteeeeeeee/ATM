@@ -51,3 +51,14 @@
 - **INFO**: Disk 84% — 1% below WARN threshold (unchanged)
 - **INFO**: HL sync guardian active, pipeline service idle (normal after completion)
 - **INFO**: No hermes timers listed — pipeline triggered by external mechanism
+
+## Error Alerts — 2026-09-19 14:56 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.0s)`
+
+## Error Alerts — 2026-09-19 15:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-19 16:56 UTC
+- **REPEATED** (15x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

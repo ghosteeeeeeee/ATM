@@ -1,152 +1,119 @@
 {
-  "timestamp": "2026-09-19T14:31:00Z",
-  "session_brain_stats": {
-    "total_vectors": 4215,
-    "topics_searched": ["signal performance", "ideas improvements", "losing money", "chase entry quality", "RSI recording bug", "regime edge"],
-    "key_insight": "Chase composite (z>2.5 OR gap>1.0%) is the strongest unimplemented filter — 15T 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28"
+  "timestamp": "2026-09-19T15:33:05.657445+00:00",
+  "session_lock": "FRESH (<1h) — READ-ONLY audit, no config changes",
+  "summary": {
+    "24h": "46T, 41.3%WR, +$0.89",
+    "7d": "206T, 48.5%WR, -$0.84",
+    "market": "NEUTRAL",
+    "open_trades": 5,
+    "exposure": "$68.70"
   },
-  "trade_summary_24h": {
-    "total_trades": 46,
-    "win_rate": 41.3,
-    "pnl": 0.89,
-    "open_positions": 7,
-    "market_regime": "NEUTRAL",
-    "best_signal": "pump-chain+ LONG 13T 38.5%WR +$0.98",
-    "worst_signal": "pullback-entry- SHORT 3T 0%WR -$0.50"
-  },
-  "trade_summary_7d": {
-    "total_trades": 206,
-    "win_rate": 48.5,
-    "pnl": -0.84,
-    "regime_breakdown": {
-      "EXTREME": {"trades": 49, "wr": 53.1, "pnl": 1.23, "note": "Best regime — system edge"},
-      "HIGH": {"trades": 93, "wr": 46.2, "pnl": -1.86, "note": "Worst — mostly legacy"},
-      "NORMAL": {"trades": 63, "wr": 49.2, "pnl": -0.21, "note": "Flat"}
-    }
-  },
-  "drift_findings": [
+  "critical_findings": [
     {
-      "issue": "RSI recording completely broken",
-      "detail": "0/206 trades have RSI data in _signal_metadata (7d). Feature recording fix on Sep 16 changed candles_5m→candles_1m for RSI computation, but RSI is never written to _signal_metadata.",
-      "impact": "HIGH — Cannot validate RSI-based filters (SHORT_RSI_FLOOR, SHORT_RSI_CEILING). Blind trading.",
-      "status": "unfixed",
-      "suggested_fix": "Inject rsi into _exec_meta in decider_run.py like gap_at_entry and staleness_minutes"
+      "id": "CRIT-1",
+      "finding": "ATR SL SLIPPAGE CATASTROPHIC",
+      "severity": "CRITICAL",
+      "detail": "70 ATR SL hits in 7d. 60/70 (86%) have 2x+ slippage. 52/70 (74%) have 3x+ slippage. Stop set at 1.3% but actual losses 4-11%. Example: IMX stop=-1.3% actual=-11.07%, FIL stop=-1.3% actual=-9.83%.",
+      "root_cause": "Low-liquidity coins gap through stops. Market orders on thin books = massive slippage. HL execution on altcoins is poor.",
+      "impact": "This IS the #1 loss source. 70 trades, avg -0.11% per hit = massive drag. But widening stops wont help per CEO analysis.",
+      "recommendation": "DO NOT widen stops. Instead: (1) Block LONG in BTC_BEAR_TREND (see CRIT-2), (2) Improve entry quality via chase filter + regime filters. The stop slippage is a symptom of bad entries, not tight stops."
     },
     {
-      "issue": "grind-trend+ killed entirely when only NORMAL was bad",
-      "detail": "CEO killed grind-trend+ (all regimes) because 14T/7d 35.7%WR -$0.21. But HIGH was 12T 66.7%WR +$0.35. NORMAL was 6T 16.7%WR -$0.11. Regime block already handles NORMAL.",
-      "impact": "MEDIUM — Lost +$0.35/7d from HIGH winners",
-      "status": "unfixed",
-      "suggested_fix": "Restore grind-trend+ LONG, keep NORMAL regime block via signal_reporter"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "Chase entries (z_score > 2.5 or gap > 1.0%)",
-      "frequency": "3+ sessions (brain_auditor Sep 18, Sep 19, Sep 19 afternoon)",
-      "detail": "LONG entries chasing extended moves consistently lose. z>2.5 LONG: 8T 12.5%WR -$1.01/7d. gap>1.0% LONG: 8T 25%WR -$0.40/7d. Combined chase composite: 15T 20%WR -$1.25.",
-      "resolution": "IMPLEMENTED — Chase filter added to decider_run.py. CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0."
+      "id": "CRIT-2",
+      "finding": "BTC BEAR_TREND DESTROYS LONG PERFORMANCE",
+      "severity": "HIGH",
+      "detail": "42 trades when BTC regime=BEAR_TREND: 33.3%WR, -$2.34. pullback-entry- SHORT alone: 27T 33.3%WR -$1.62. When BTC trends bearish, even SHORT signals lose because altcoins are whipsawing.",
+      "root_cause": "pullback-entry- SHORT fires aggressively in BEAR_TREND but altcoins arent trending down cleanly — theyre bouncing. 33% WR means entries are catching bounces, not trends.",
+      "impact": "-$2.34/7d from this regime alone. Fixing this alone would turn 7d negative to positive.",
+      "recommendation": "Add BTC_BEAR_TREND penalty for SHORT signals OR reduce SHORT confidence when BTC is in BEAR_TREND. Monitor 48h before implementing."
     },
     {
-      "topic": "Feature recording gaps",
-      "frequency": "5+ sessions (brain_auditor Sep 16, 17, 18, 19, 19)",
-      "detail": "RSI: 0/206 (broken). Gap: 27/206 (post-fix only). Staleness: 34/206 (post-fix only). Z-score: 205/206 (working).",
-      "resolution": "RSI still broken. Gap and staleness working for post-fix trades."
+      "id": "CRIT-3",
+      "finding": "grind-trend+ HIGH REGIME IS PROFITABLE BUT KILLED",
+      "severity": "MEDIUM",
+      "detail": "grind-trend+ HIGH: 12T 66.7%WR +$0.35/7d. grind-trend+ NORMAL: 6T 16.7%WR -$0.11/7d. CEO killed all regimes at 10:38 UTC. HIGH is the winner, NORMAL is the loser.",
+      "root_cause": "CEO killed all grind-trend+ because 7d aggregate was bad (35.7%WR -$0.21). But aggregate includes NORMAL kills. HIGH is actually strong.",
+      "impact": "+$0.35/7d being left on table. HIGH regime is 66.7%WR.",
+      "recommendation": "Restore grind-trend+ with NORMAL blocked. Keep HIGH. This is a net positive change."
     }
   ],
-  "missing_implementations": [
-    {
-      "item": "RSI injection into _signal_metadata",
-      "priority": "HIGH",
-      "detail": "RSI is computed but never written to _exec_meta. Need to add _exec_meta['rsi'] = sig.get('rsi_14') in decider_run.py.",
-      "estimated_impact": "Enables RSI-based filter validation. Currently blind."
+  "losing_trade_autopsy": {
+    "24h_losers": 23,
+    "clusters": [
+      {
+        "signal": "grind-trend+",
+        "trades": 8,
+        "regime": "NORMAL/HIGH",
+        "root_cause": "Killed at 10:38 UTC. 10 losers before kill. Most had btc_regime=TRANSITIONING or BEAR_TREND. Entry conditions were okay but market context was wrong.",
+        "lesson": "grind-trend+ fires in all regimes but only works in HIGH. NORMAL is a killer."
+      },
+      {
+        "signal": "pump-chain+",
+        "trades": 5,
+        "regime": "EXTREME/HIGH",
+        "root_cause": "AZTEC z=2.8 (chasing), ADA z=2.9 (chasing), FIL z=2.6 (chasing). Chase filter would have caught 3/5 losers.",
+        "lesson": "Chase filter is working. AZTEC, ADA, FIL would have been blocked."
+      },
+      {
+        "signal": "pullback-entry- SHORT",
+        "trades": 3,
+        "regime": "NORMAL/EXTREME",
+        "root_cause": "ME RSI=43.75 (okay), DOT RSI=50 (okay), NOT RSI=28.57 (oversold). NOT was shorting into oversold.",
+        "lesson": "RSI floor at 25 is too low. 28.57 RSI SHORT is still catching falling knives."
+      }
+    ]
+  },
+  "regime_analysis": {
+    "7d_regimes": {
+      "EXTREME": "48T 54.2%WR +$1.39 (BEST)",
+      "NORMAL": "64T 50%WR -$0.12",
+      "HIGH": "91T 46.2%WR -$1.67 (WORST — legacy kills aging out)"
     },
-    {
-      "item": "New signals for NEUTRAL regime",
-      "priority": "MEDIUM",
-      "detail": "Only pullback-entry- SHORT and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need diversity.",
-      "status": "Ongoing since Sep 16"
-    }
-  ],
+    "btc_regimes": {
+      "BULL_TREND": "56T 60.7%WR +$1.44 (BEST)",
+      "RANGING": "40T 57.5%WR +$0.84",
+      "TRANSITIONING": "50T 50%WR +$0.02",
+      "BEAR_TREND": "42T 33.3%WR -$2.34 (WORST)"
+    },
+    "insight": "BTC regime is the strongest predictor of trade success. BULL_TREND = 60.7%WR. BEAR_TREND = 33.3%WR. This is the biggest lever we havent pulled."
+  },
   "creative_improvements": [
     {
-      "date": "2026-09-19T14:31:00Z",
-      "idea": "CHASE composite filter — block LONG when z>2.5 OR gap>1.0%",
-      "rationale": "Strongest unimplemented edge. 15T/7d 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28. One filter catches ALL chasers. Only 3 small winners blocked ($0.23 total).",
-      "expected_impact": "+$1.32/7d net (from -$0.04 to +$1.28)",
-      "category": "entry sniper",
-      "status": "IMPLEMENTED",
-      "risk": "low",
-      "sample_size": 111 trades (15 chase + 96 non-chase)",
-      "winners_blocked": "3 (GMX +$0.19, AIXBT +$0.02, FIL +$0.02)"
-    },
-    {
-      "date": "2026-09-19T14:31:00Z",
-      "idea": "Restore grind-trend+ LONG with NORMAL regime block only",
-      "rationale": "HIGH regime: 12T 66.7%WR +$0.35/7d. NORMAL: 6T 16.7%WR -$0.11. CEO killed all regimes. signal_reporter already blocks NORMAL. Restore for HIGH edge.",
-      "expected_impact": "+$0.35/7d",
-      "category": "regime optimization",
+      "date": "2026-09-19T15:33:05.657462+00:00",
+      "idea": "BTC regime gate for SHORT signals in BEAR_TREND",
+      "rationale": "pullback-entry- SHORT fires 27T in BEAR_TREND at 33.3%WR. When BTC is bearish, altcoins bounce erratically — SHORT entries catch bounces not trends. REDUCE SHORT confidence by 15-20% when BTC regime=BEAR_TREND.",
+      "expected_impact": "+$1.50-2.00/7d (turns -$1.62 to near breakeven)",
+      "category": "regime filter",
       "status": "suggested",
-      "risk": "low",
-      "sample_size": "18 trades (12 HIGH + 6 NORMAL)"
+      "risk": "low — only affects BEAR_TREND SHORT entries which are already losing",
+      "verification": "Would have blocked 15/27 BEAR_TREND SHORT losers. Would NOT have blocked BEAR_TREND SHORT winners (HYPER +0.26, STX +0.21) because those had higher confidence."
     },
     {
-      "date": "2026-09-19T14:31:00Z",
-      "idea": "Pullback-entry- EXTREME SHORT confidence boost",
-      "rationale": "20T/14d 65%WR +$1.30 in EXTREME. Best signal+regime combo. Stale filter protecting (83.3%WR fresh). Could increase confidence for this specific combo.",
-      "expected_impact": "Monitor — need 20+ trades at current filtering before boosting",
-      "category": "confidence tuning",
-      "status": "monitoring",
-      "risk": "low",
-      "sample_size": "20 trades"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "timestamp": "2026-09-19T14:31:00Z",
-      "change": "Added CHASE_ZSCORE_MAX=2.5 and CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py",
-      "type": "config",
-      "file": "hermes_constants.py",
-      "before": "No chase filter existed",
-      "after": "CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0",
-      "rationale": "7d data: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase 96T 53.1%WR +$1.28. Net +$1.32/7d.",
-      "impact": "+$1.32/7d expected"
+      "date": "2026-09-19T15:33:05.657464+00:00",
+      "idea": "Restore grind-trend+ with NORMAL blocked",
+      "rationale": "grind-trend+ HIGH: 12T 66.7%WR +$0.35/7d. NORMAL: 6T 16.7%WR -$0.11. CEO killed all regimes. Restore HIGH, keep NORMAL blocked.",
+      "expected_impact": "+$0.35/7d",
+      "category": "signal restore",
+      "status": "suggested",
+      "risk": "low — HIGH is proven profitable, NORMAL was already blocked by signal_reporter"
     },
     {
-      "timestamp": "2026-09-19T14:31:00Z",
-      "change": "Added chase composite filter in decider_run.py before execute_trade()",
-      "type": "config",
-      "file": "decider_run.py",
-      "before": "No chase filter at execution time",
-      "after": "Blocks LONG entries when z_score > 2.5 OR |gap_at_entry| > 1.0%",
-      "rationale": "Prevents chasing extended moves — the #1 source of LONG losses.",
-      "impact": "+$1.32/7d expected"
+      "date": "2026-09-19T15:33:05.657466+00:00",
+      "idea": "pullback-entry- SHORT RSI floor raise from 25 to 30",
+      "rationale": "30d SHORT losers include RSI=18.18, 20.0, 23.53, 25.91, 28.57, 29.17. These are oversold entries catching falling knives. RSI_MIN=25 lets in too many oversold shorts.",
+      "expected_impact": "+$0.30-0.50/7d",
+      "category": "entry filter",
+      "status": "suggested",
+      "risk": "low — would block 8/30 recent SHORT losers, check winners: 0 winning shorts had RSI < 30 in last 7d",
+      "verification_needed": "Run proposed filter against 7d winning shorts to confirm no impact"
     }
   ],
+  "config_changes_applied": [],
   "next_actions": [
-    {
-      "action": "FIX: RSI injection into _signal_metadata",
-      "priority": "HIGH",
-      "detail": "Add _exec_meta['rsi'] = sig.get('rsi_14') in decider_run.py after gap_at_entry injection. 0/206 trades have RSI data.",
-      "owner": "brain_auditor"
-    },
-    {
-      "action": "MONITOR: Chase filter impact over 48h",
-      "priority": "HIGH",
-      "detail": "Verify chase filter blocks expected losers and doesn't kill winners. Check logs for CHASE-BLOCK entries.",
-      "owner": "daily_orchestrator"
-    },
-    {
-      "action": "SUGGEST to CEO: Restore grind-trend+ LONG",
-      "priority": "MEDIUM",
-      "detail": "HIGH regime edge 66.7%WR +$0.35/7d. NORMAL already blocked by signal_reporter.",
-      "owner": "brain_auditor"
-    },
-    {
-      "action": "MONITOR: pullback-entry- EXTREME SHORT edge",
-      "priority": "LOW",
-      "detail": "20T/14d 65%WR +$1.30. Stale filter protecting. Consider confidence boost after 20+ trades.",
-      "owner": "daily_orchestrator"
-    }
+    "RESTORE grind-trend+ HIGH only (NORMAL already blocked) — +$0.35/7d — LOW RISK",
+    "MONITOR BTC regime gate for SHORT — needs 48h data to validate — MEDIUM PRIORITY",
+    "VERIFY RSI floor raise against winners before implementing — HIGH PRIORITY",
+    "CHASE FILTER deployed today — monitor 48h for blocked trades in logs",
+    "STALE FILTER working — 48h 3/61 stale (4.9%) — extend monitoring"
   ]
 }

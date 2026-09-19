@@ -1255,5 +1255,33 @@
     "category": "regime edge",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-19T15:33:14.699898+00:00",
+    "idea": "BTC regime gate for SHORT signals in BEAR_TREND",
+    "rationale": "pullback-entry- SHORT fires 27T in BEAR_TREND at 33.3%WR. When BTC is bearish, altcoins bounce erratically. REDUCE SHORT confidence by 15-20% when BTC regime=BEAR_TREND.",
+    "expected_impact": "+$1.50-2.00/7d",
+    "category": "regime filter",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-19T15:33:14.699913+00:00",
+    "idea": "Restore grind-trend+ HIGH only (NORMAL blocked)",
+    "rationale": "grind-trend+ HIGH: 12T 66.7%WR +$0.35/7d. NORMAL: 6T 16.7%WR -$0.11. CEO killed all. Restore HIGH.",
+    "expected_impact": "+$0.35/7d",
+    "category": "signal restore",
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-19T17:11:10.638547+00:00"
+  },
+  {
+    "date": "2026-09-19T15:33:14.699915+00:00",
+    "idea": "pullback-entry- SHORT RSI floor raise 25→30",
+    "rationale": "30d SHORT losers include RSI=18.18, 20.0, 23.53, 25.91, 28.57, 29.17. Oversold entries catching falling knives.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry filter",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

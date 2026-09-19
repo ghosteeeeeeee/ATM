@@ -2371,6 +2371,17 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   BY: brain_auditor
 
 ## TEAM UPDATES
+## TEAM UPDATES
+- [2026-09-19 15:33 UTC] brain_auditor: READ-ONLY AUDIT — session lock fresh, no config changes
+  DB-verified: 24h 46T 41.3%WR +$0.89 | 7d 206T 48.5%WR -$0.84
+  Market NEUTRAL. 5 open ($68.70 exposure).
+  **CRITICAL FINDING — ATR SL SLIPPAGE:** 70 ATR SL hits/7d. 86% have 2x+ slippage. 74% have 3x+ slippage. Stop=1.3% but actual losses 4-11%. Low-liquidity coins gap through stops. Root cause is entry quality, not stop width.
+  **BTC BEAR_TREND DESTROYS PERFORMANCE:** 42T 33.3%WR -$2.34. pullback-entry- SHORT 27T 33.3%WR -$1.62. BIGGEST LEVER: add BTC regime gate for SHORT in BEAR_TREND. Expected +$1.50-2.00/7d.
+  **grind-trend+ HIGH PROFITABLE BUT KILLED:** HIGH 12T 66.7%WR +$0.35/7d. NORMAL 6T 16.7%WR -$0.11. CEO killed all at 10:38 UTC. Suggest restore HIGH only.
+  **pullback-entry- SHORT RSI FLOOR:** 30d losers include RSI=18.18, 20.0, 23.53. RSI_MIN=25 too low. Suggest raise to 30.
+  **CHASE FILTER WORKING:** Would have caught AZTEC (z=2.8), ADA (z=2.9), FIL (z=2.6) — all losers.
+  **STALE FILTER WORKING:** 48h 3/61 stale (4.9%, down from 43.8% pre-filter).
+  BY: brain_auditor
 - [2026-09-18 11:35 UTC] brain_auditor: NO CONFIG CHANGE — audit complete
   DB: 24h 25T mixed | 7d 213T 52.1%WR -$1.50
   EXTREME strongest (+$0.84, 60.9%WR). HIGH worst (-$1.51, legacy drag).

@@ -1,68 +1,49 @@
-# Signal Performance Report
-**Generated:** 2026-09-19 (next cycle) | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-09-19 11:00 UTC
 
-## Overall Stats (24h)
-- **Trades:** 45 | **WR:** 35.6% | **PnL:** +$0.46
+## 6h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| grind-trend- | SHORT | 3 | 33.3% | -$0.20 |
+| grind-trend+ | LONG | 3 | 100.0% | +$0.42 |
+| pump-chain+ | LONG | 4 | 100.0% | +$0.44 |
 
----
+## 24h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pullback-entry- | SHORT | 3 | 0.0% | -$0.50 |
+| grind-trend- | SHORT | 5 | 20.0% | -$0.38 |
+| mover+ | LONG | 3 | 33.3% | -$0.19 |
+| grind-trend+ | LONG | 18 | 50.0% | +$0.24 |
+| pump-chain+ | LONG | 16 | 50.0% | +$1.40 |
 
-## KILLED (executed this cycle)
+## KILLED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| grind-trend- | SHORT | 20.0% | -$0.38 | 5 | GRIND_TREND_MINUS_ENABLED = False — no winning regime |
 
-None. No signals met all kill criteria.
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 50.0% | +$1.40 | 16 | Strong performer, consistent across regimes |
 
----
-
-## BOOSTED (executed this cycle)
-
-None. No signals met all boost criteria (WR>55%, 5+ trades, PnL>+$0.05).
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| pullback-entry- | SHORT | 3 | 0.0% | -$0.50 | WATCH — lifetime 54.6% WR $1.51. NORMAL already blocked. Bad streak, not kill-worthy. |
-| grind-trend+ | LONG | 15 | 40.0% | -$0.18 | DISABLED (CEO 2026-09-19) |
-| grind-trend- | SHORT | 2 | 0.0% | -$0.18 | WATCH — only 2 trades, below threshold |
-
----
-
-## WINNERS
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| pump-chain+ | LONG | 12 | 33.3% | +$0.96 | ENABLED — volatile WR but net positive |
-| volume-breakout-long+ | LONG | 5 | 60.0% | +$0.42 | ENABLED |
-| mover+ | LONG | 5 | 60.0% | +$0.04 | ENABLED |
-| grind-trend+ | LONG | 3 | 66.7% | +$0.05 | DISABLED (6h only) |
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect direction labels.
-
----
+## WATCH LIST (NOT killed)
+| Signal | Dir | WR | PnL | Trades | Reason |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 0.0% | -$0.50 | 3 | Historically profitable (EXTREME 61.9%, HIGH 53.8%). Recent 3 trades bad luck, not broken signal. |
+| mover+ | LONG | 33.3% | -$0.19 | 3 | Only 3 trades, too early to judge |
 
 ## REGIME ANALYSIS
+| Signal | Regime | Trades | WR | PnL |
+|--------|--------|--------|-----|-----|
+| grind-trend+ | HIGH | 12 | 66.7% | +$0.35 |
+| grind-trend+ | NORMAL | 6 | 16.7% | -$0.11 |
+| grind-trend- | HIGH | 3 | 33.3% | -$0.16 |
+| grind-trend- | NORMAL | 2 | 0.0% | -$0.22 |
+| pump-chain+ | EXTREME | 7 | 57.1% | +$0.63 |
+| pump-chain+ | HIGH | 8 | 37.5% | +$0.68 |
 
-| Signal | Regime | 24h Trades | WR | PnL | Note |
-|--------|--------|------------|-----|-----|------|
-| pullback-entry- | NORMAL | 1 | 0% | -$0.15 | Already blocked by volatility_gate_v2 |
-| pullback-entry- | EXTREME | 1 | 0% | -$0.16 | Lifetime 65% WR — bad luck |
-| pullback-entry- | HIGH | 1 | 0% | -$0.19 | Lifetime 54.2% WR — bad luck |
-| grind-trend+ | NORMAL | 6 | 0% | -$0.30 | All losses in NORMAL |
-| grind-trend+ | HIGH | 9 | 66.7% | +$0.12 | Profitable in HIGH |
-
----
-
-## RECOMMENDATIONS
-
-1. **No action required this cycle.** All losers either already disabled or have strong lifetime performance.
-2. **Monitor pullback-entry-** — 3-trade cold streak across EXTREME/HIGH. If next cycle shows similar pattern, consider regime-specific blocking.
-3. **grind-trend+ stays dead** — CEO killed 2026-09-19, NORMAL kills it, HIGH barely profitable.
-
----
-
-*Next report: ~6h from now.*
+## ISSUES
+- No signal inversions detected (24h)
+- grind-trend+ LONG: NORMAL regime (16.7% WR) dragging down overall performance. Already killed by CEO on 2026-09-19.
+- pullback-entry- SHORT: 0% WR in 24h window but historically profitable — monitor closely, do NOT blanket kill.

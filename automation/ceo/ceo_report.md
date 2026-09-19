@@ -1,13 +1,16 @@
-## CEO Report — 2026-09-19 ~10:38 UTC
+## CEO Report — 2026-09-19 ~15:00 UTC
 
 ### Diagnosis
-DB-verified. 24h: 47T, 38.3%WR, +$0.46 (barely positive). 7d: 202T, 47.0%WR, -$1.71 (negative, worsening from -$0.69 yesterday). 7 open. Market NEUTRAL. ATR_SL dominates: 72 hits/7d losing $11.73. avg loss -5.39% vs 1.3-1.5% stops = gaps through (entry quality issue, not stop width). Only 2 signal types pass confluence in NEUTRAL.
+DB-verified. 24h: 46T, 41.3%WR, +$0.89 (positive, recovering). 7d: 206T, 48.5%WR, -$0.84 (slightly negative, improving from -$1.71). 5 open ($68.70). Market NEUTRAL. Legacy killed signals aging out (-$2.46). Active signals positive: pump-chain+ $0.99, volume-breakout-long+ $0.76, rr-struct+ $0.58. ATR_SL still dominates losses (72 hits/7d -$11.73) but root cause is entry quality, not stop width.
 
 ### Root Cause
-grind-trend+ LONG firing in NEUTRAL (already blocked NORMAL by signal_reporter). 14T, 35.7%WR, -$0.21. Net loser. Cut-loser-CL-T1 cutting winners early (3 exits on grind-trend+). 7d legacy losers aging out (trend_purity+, rr-struct-v2+, rr-struct-, open-skies+, breakout-long+).
+Chase entries: z>2.5 LONG =12.5%WR -$1.01, gap>1.0% LONG = 25%WR -$0.40. Non-chase: 53.1%WR +$1.28. Brain_auditor identified this as the single biggest filter opportunity (+$1.25/7d). Code existed in decider_run.py but was silently failing — constants CHASE_ZSCORE_MAX and CHASE_GAP_MAX_PCT were never defined in hermes_constants.py. ImportError caught by pass.
 
 ### Fix Applied
-**CONFIG:** GRIND_TREND_PLUS_ENABLED = False. Expected +$0.21/7d. Pipeline will pick up on next restart.
+**CODE FIX:** (1) Added CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py. (2) Fixed abs() bug in gap check — was blocking dip-buying LONGs (negative gap = good entry). (3) Added z-score fallback via _ctx_gate_get_zscore since signal_z_score is always NULL (0/205 trades). **EXPECTED:** +$1.25/7d. Pipeline restart needed.
+
+### Verification
+Constants import verified. Both files compile clean. Filter logic tested: will block z>2.5 LONG and gap>1.0% LONG entries. Monitor logs for [CHASE-BLOCK] entries after pipeline restart.
 
 ### 30d Winners (active signals)
 pullback-entry- SHORT: 97T 54.6%WR +$1.51 | volume-breakout-long+: 13T 69.2%WR +$0.76 | rr-struct+: 15T 73.3%WR +$0.59 | mover+: 13T 76.9%WR +$0.34
