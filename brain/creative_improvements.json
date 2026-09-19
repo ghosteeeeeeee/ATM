@@ -1141,5 +1141,33 @@
     "status": "suggested",
     "risk": "medium",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-18T21:38:10Z",
+    "idea": "Widen CL_TIER1 fire window (1,2)→(2,3) hours",
+    "rationale": "cut-loser-CL-T1 0%WR — all 6 exits were losers. Trades cut before recovery time.",
+    "expected_impact": "+$0.75/7d",
+    "category": "exit optimization",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-18T21:38:10Z",
+    "idea": "Add gap_at_entry + staleness_minutes to signal_metadata at execution time",
+    "rationale": "0/192 trades have these fields. Enables chase detection and staleness analysis.",
+    "expected_impact": "+diagnostic value",
+    "category": "data recording",
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-18T22:13:30.508467+00:00"
+  },
+  {
+    "date": "2026-09-18T21:38:10Z",
+    "idea": "Monitor rr_engine exits — combined -$0.91/7d",
+    "rationale": "rr_engine_support_br 33.3%WR + rr_engine_resistance 46.2%WR = #2 drag after atr_sl_hit.",
+    "expected_impact": "monitor only",
+    "category": "exit optimization",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]

@@ -156,3 +156,18 @@
 - **WARN** (1x): `Disk at 85%` — 95G/118G used. coin_tracker.db=2.2G, candles.db=1.9G.
 - **AUTO-FIX**: Journal vacuumed to 500MB → freed 2G. Disk now 83%. Logs compressed (150M total).
 - **INFO**: BTC-CRASH warning blocking HEMI LONG — risk management working as intended.
+
+## Error Alerts — 2026-09-18 20:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-18 22:45 UTC
+- **WARN** (1x): `ATOM mirror_close FAILED` — HL API rejected reduce-only order (would increase position). DB committed but HL position still open. Requires manual reconciliation.
+- **WARN** (2x): Phantom trades (|pnl| < 0.01 USDT) — HYPER btc-pump-rider+ ($0.0016), SUSHI volume-breakout-long+ ($0.0064). Negligible impact.
+- **INFO**: systemd `Failed to kill control group` errors at 22:18/22:20 — non-critical cleanup issue, pipeline recovered fine.
+
+## Error Alerts — 2026-09-18 22:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Reduce only order would increase position. asset=N`
+
+## Error Alerts — 2026-09-18 23:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

@@ -1222,3 +1222,9 @@
 [2026-09-18 17:08 UTC]   🟢 OK: volume-breakout-long+: 11 trades, 72.7% WR, PnL=5.18
 [2026-09-18 17:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-18 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-18 23:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-18 23:08 UTC]   🟡 RAPID DISABLE BLOCKED: pullback-entry-: 0.0% WR but has winning regimes: ['NEUTRAL']
+[2026-09-18 23:08 UTC]     → Keeping alive in habitat: NEUTRAL
+[2026-09-18 23:08 UTC]   🟢 OK: volume-breakout-long+: 9 trades, 77.8% WR, PnL=6.55
+[2026-09-18 23:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-18 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

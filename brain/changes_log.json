@@ -252,5 +252,16 @@
     "after": "FEATURE RECORDING: 193/194 trades have RSI+momentum metadata. gap_at_entry and staleness_minutes NOT recorded.",
     "rationale": "CURRENT.md was stale — RSI fix from Sep 16 is working. DB shows 193/194 trades have metadata.",
     "impact": "Documentation accuracy — no code change"
+  },
+  {
+    "timestamp": "2026-09-18T21:37:50Z",
+    "agent": "brain_auditor",
+    "change": "CL_TIER1_FIRE_WINDOWS widened from (1,2) to (2,3)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "{\"A\": (1, 2), \"B\": (1, 2)}",
+    "after": "{\"A\": (2, 3), \"B\": (2, 3)}",
+    "rationale": "cut-loser-CL-T1 has 0% WR (6T all losers) — cutting trades before they recover. Widening window gives trades more time.",
+    "impact": "+$0.75/7d if cut trades recover to breakeven"
   }
 ]

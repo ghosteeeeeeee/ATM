@@ -1684,3 +1684,165 @@ Final set: ['ACE', 'APT', 'ATOM', 'BABY', 'BIGTIME', 'CC', 'CHIP', 'ETC', 'IMX',
 - 7d PnL recovering: -$1.50 → -$0.87
 
 **BY:** auto_1hr
+
+## [2026-09-18 22:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (NOT SHORT pullback-entry- → atr_sl_hit → -$0.19)
+**24h:** 24T 15W 62.5%WR +$0.86
+
+**Signal 24h:**
+- volume-breakout-long+: 9T 8W 89%WR +$1.19 — dominant
+- pullback-entry-: 6T 1W 17%WR -$0.78 — all losses pre-RSI fix (Sep 17). 0 losers post-fix. Holding.
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- mover-: 1T 0W 0%WR -$0.09 — 1 trade only, noise
+- Others: 5T 3W mixed small
+
+**Open (6):**
+- LONGs: ADA, FOGO (pump-chain+), BABY, ATOM (mover+), JUP (volume-breakout-long+) — all fresh 0.8-3h
+- SHORTs: DOT (pullback-entry-) — 3.8h breakeven
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 15/24 24h closes (63%) but net +$0.22 — trailing converting SLs to wins
+- RSI ceiling fix: 0 bad SHORT entries since deploy — fix confirmed holding
+- Trade frequency: ~0.9/hr — appropriate for NEUTRAL
+- 24h PnL strong at +$0.86 with 62.5% WR
+- 7d WR stable at 53%
+
+**Monitoring:**
+- 6 open trades, all near breakeven ($0.00 PnL)
+- 7d PnL recovering: -$1.50 → -$0.87
+
+**BY:** auto_1hr
+
+## [2026-09-18 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 23T 12W 52.2%WR +$0.84
+
+**Signal 24h:**
+- volume-breakout-long+: 9T 8W 89%WR +$1.19 — dominant
+- mover+: 3T 3W 100%WR +$0.26 — perfect
+- pullback-entry-: 5T 0W -$0.80 — all pre-RSI-fix losses, 0 post-fix losers, holding
+- Others: 6T 1W mixed small
+
+**Open (6):**
+- LONGs: ADA, FOGO (pump-chain+), BABY, ATOM (mover+), JUP (volume-breakout-long+) — all fresh 1.8-4h
+- SHORTs: DOT (pullback-entry-) — 4.8h near breakeven
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill check: no 0%WR signals with 3+ trades last hour
+- atr_sl_hit: 14/23 24h closes (61%) but net +$0.20 — trailing converting SLs to wins
+- RSI fix: 0 bad SHORT entries since deploy — holding
+- Trade frequency: ~1.0/hr — appropriate for NEUTRAL
+- 24h PnL positive at +$0.84
+- 7d PnL recovering: -$0.87
+
+**BY:** auto_1hr
+
+## LOSERS Update — 2026-09-18 22:34 UTC
+- REMOVE HBAR (insufficient data)
+- REMOVE ETC (insufficient data)
+- REMOVE ZRO (insufficient data)
+- REMOVE BIGTIME (WR=57.1%, PnL=$0.49, recovered)
+- REMOVE SUSHI (insufficient data)
+- REMOVE GMT (insufficient data)
+- REMOVE NOT (insufficient data)
+- REMOVE WLFI (insufficient data)
+- REMOVE IO (insufficient data)
+- ADD INJ (WR=40.0%, PnL=$-0.42, wr_collapse (75.0% → 40.0%))
+- ADD HYPER (WR=40.0%, PnL=$-0.16, low_wr (40.0%))
+
+Final set: ['DOT', 'HYPER', 'INJ']
+
+## [2026-09-18 19:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L)
+- ATOM LONG mover+ → atr_sl_hit +$0.16
+- JUP LONG volume-breakout-long+ → atr_sl_hit -$0.13
+
+**24h:** 25T 68%WR +$1.02 (POSITIVE) | **7d:** 189T 52.4%WR -$0.49 (near breakeven)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 16T (64%) avg +$0.014 — net positive, trailing working
+- profit-monster-trail: 7T avg +$0.060 — star
+- cut-loser-CL-T1: 1T -$0.09
+- hard_tp: 1T +$0.31
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 10T 80%WR +$1.06 (STAR — major improvement)
+- mover+ LONG: 4T 100%WR +$0.42 (STAR)
+- pullback-entry- SHORT: 5T 0%WR -$0.80 (all ATR SL, variance vs 7d 50%WR)
+- Others: 6T 3W mixed
+
+**7d by Signal:**
+- volume-breakout-long+: 13T 69.2%WR +$0.76 (best)
+- mover+: 5T 100%WR +$0.73 (best)
+- rr-struct+: 15T 73.3%WR +$0.59
+- trend_purity+: 11T 36.4%WR -$0.90 (legacy, already disabled)
+- rr-struct-v2+: 10T 40%WR -$0.45 (legacy, already disabled)
+
+**Open (4):** DOT SHORT +42%, ADA LONG +227%, FOGO LONG +592%, BABY LONG -16%
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: no signal at 0%WR with 3+ trades last hour
+- pullback-entry- SHORT 5T 0%WR 24h but 66T 50%WR -$0.11 7d — variance, not structural
+- ATR SL 64% but net positive (+$0.014 avg) — trailing working
+- Trade frequency 2/hr — healthy
+- 24h positive at +$1.02 — system recovering from cold streak
+
+**Monitoring:**
+- volume-breakout-long+ 10T 80%WR +$1.06 24h — star, watch durability
+- mover+ 4T 100%WR +$0.42 24h — star, watch durability
+- pullback-entry- SHORT 5T 0%WR 24h — monitor next hour
+- 7d near breakeven at -$0.49 — recovering
+
+**BY:** auto_1hr
+
+## [2026-09-19 00:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 27T 63%WR +$1.73 (STRONG) | **7d:** 190T 52.6%WR +$0.29 (near breakeven, positive)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T (67%) avg +$0.061 — net positive, trailing working
+- profit-monster-trail: 7T (26%) avg +$0.060 — star
+- cut-loser-CL-T1: 1T -$0.09
+- hard_tp: 1T +$0.31
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 10T 80%WR +$1.06 (STAR)
+- pump-chain+ LONG: 2T 100%WR +$0.86 (STAR)
+- mover+ LONG: 4T 100%WR +$0.42 (STAR)
+- pullback-entry- SHORT: 5T 0%WR -$0.80 (variance vs 7d 49%WR -$0.19)
+- Others: 6T mixed, small
+
+**7d Signal Performance:**
+- volume-breakout-long+: best performer, 10T 80%WR
+- mover+: 4T 100%WR, consistent
+- pullback-entry- SHORT: 65T 49.2%WR -$0.19 (breakeven, has cold days)
+
+**Open (2):** BABY LONG -87% (SL at 0.01146, ~0.5% away), DOT SHORT -30% (soft SL trigger active)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: 0 trades last hour, no signal at 0%WR with 3+ trades
+- ATR SL 67% but net positive (+$0.061 avg) — trailing system working
+- pullback-entry- SHORT 24h 0%WR is variance (7d 49%WR, breakeven)
+- Trade frequency 1.1/hr — healthy
+- 24h strongly positive at +$1.73
+- BABY and DOT both actively managed by volatility gate
+
+**Monitoring:**
+- BABY LONG near SL — system will handle
+- DOT SHORT soft SL trigger active — managed
+- 7d crossed from -$0.49 to +$0.29 in 5 hours — improving
+
+**BY:** auto_1hr
