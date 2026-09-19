@@ -1420,10 +1420,15 @@ SIGNAL_EXIT_CONFIG = {
     'pump_chain+': 'pump_exit',  # underscore variant
     'pump_chain-': 'pump_exit',  # underscore variant
     'pump_chain': 'pump_exit',    # bare variant
-    # Mover: acceleration-based momentum, use pump-exit for trailing
-    'mover+': 'pump_exit',
-    'mover-': 'pump_exit',
-    'mover': 'pump_exit',    # bare variant
+    # Mover: ride-it exit — volume spike override catches explosive moves
+    'mover+': 'ride_it',
+    'mover-': 'ride_it',
+    'mover': 'ride_it',    # bare variant
+    # Volume breakout: ride-it exit — designed for delayed spikes
+    'volume-breakout+': 'ride_it',
+    'volume-breakout-': 'ride_it',
+    'volume_breakout+': 'ride_it',  # underscore variant
+    'volume_breakout-': 'ride_it',  # underscore variant
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',
@@ -3444,6 +3449,37 @@ PUMP_EXIT_MOMENTUM_CANDLES = 2       # consecutive negative candles required
 PUMP_EXIT_TIME_THRESHOLD = 2.0       # min profit % for time exit
 PUMP_EXIT_TIME_HOURS = 2.0           # max hold time in hours
                                        # Backtest: 57%→80% WR, +0.5→+3.36 PnL — 93% winners had positive 30m vel
+
+# ── Ride-It Exit System (v3 — post-audit revision) ──────────────────────────
+# 2-phase exit system for signals that predict delayed big moves.
+# Inspired by pump_exit's 3x ATR trail that survived BABY's +19% spike.
+# Phase 1 (Survival): Wide ATR-based SL, no trailing — survive the wait
+# Phase 2 (Trail): Tighter trail, momentum exit — lock in gains
+# Volume Spike Override: When volume >5x average, switch to tight 0.5% trail
+RIDE_IT_ENABLED = True
+
+# Phase 1: Survival (0-2h) — Wide SL to survive volatility while waiting for spike
+RIDE_IT_SL_PHASE1_MULT = 2.0        # 2.0x ATR initial SL (auditor: 2.5x too wide)
+RIDE_IT_SL_PHASE1_FLOOR = 0.013     # 1.3% floor (matches current ATR SL)
+RIDE_IT_SL_PHASE1_CAP = 0.025       # 2.5% cap (tighter than 3.5%)
+RIDE_IT_TP_PHASE1_MULT = 3.0        # 3x ATR TP target
+
+# Phase 2: Trail (2h+) — Tighter SL + trailing
+RIDE_IT_TRAIL_ACTIVATE = 0.02       # 2% profit to activate trailing
+RIDE_IT_TRAIL_DISTANCE = 0.012      # 1.2% trail distance (matches PM_TRAIL)
+
+# Momentum exit (from pump exit) — exits dying trades
+RIDE_IT_MOMENTUM_VEL = -0.5         # 5m velocity threshold
+RIDE_IT_MOMENTUM_CANDLES = 2        # consecutive negative candles to exit
+
+# Volume Spike Override (any phase) — catches explosive moves
+RIDE_IT_SPIKE_VOLUME_MULT = 5.0     # Volume > 5x 20-bar average (auditor: well-calibrated)
+RIDE_IT_SPIKE_TRAIL_DISTANCE = 0.005  # 0.5% tight trail during spike
+RIDE_IT_SPIKE_MIN_MOVE = 0.03       # Price must move >3% for spike mode
+
+# Safety
+RIDE_IT_MAX_HOLD_HOURS = 24         # Maximum hold time
+RIDE_IT_PHASE1_TO_PHASE2_TIME = 7200  # 2 hours (seconds) for phase transition
 PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.5   # min token 5m Δ% to allow LONG signals (tightened from -0.2%)
                                        # -0.2% was too aggressive — blocked 13 winning trades
 PUMP_FLOW_SHORT_VEL_THRESHOLD = 0      # block SHORT when token 30m vel > 0% (wrong direction)

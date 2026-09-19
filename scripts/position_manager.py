@@ -2694,6 +2694,37 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             except Exception as e:
                 log(f"  [PUMP-EXIT] Error: {e}", "WARN")
         
+        # ── 0b. Ride-It Exit (2-phase + volume spike override) ──────────────
+        # Check if this trade's signal uses ride-it exit
+        signal = str(pos.get("signal", "") or "")
+        from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
+        signal_parts = [s.strip() for s in signal.split(',')]
+        use_ride_it = False
+        if RR_EXIT_ENABLED:
+            for part in signal_parts:
+                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'ride_it':
+                    use_ride_it = True
+                    break
+        if use_ride_it:
+            try:
+                from ride_it_exit import manage_ride_it_exit
+                ride_result = manage_ride_it_exit(token, direction, cur, pos, trade_id)
+                ride_action = ride_result.get('action', 'HOLD')
+                if ride_action == 'EXIT':
+                    reason = ride_result.get('reason', 'ride_it_exit')
+                    close_paper_position(trade_id, reason)
+                    closed_count += 1
+                    log(f"  [RIDE-IT] {token} {direction}: {reason}")
+                    continue
+                elif ride_action == 'TRAIL_SL':
+                    new_sl = ride_result.get('new_sl')
+                    if new_sl and new_sl > 0:
+                        pos['stop_loss'] = new_sl
+            except ImportError:
+                pass  # ride_it_exit not available
+            except Exception as e:
+                log(f"  [RIDE-IT] Error: {e}", "WARN")
+        
         # ── 0. RR Engine structural exit (for configured signals) ──────────────
         # Check if this trade's signal uses RR engine exits
         # Support both exact match and partial match (comma-separated sources)
