@@ -2531,3 +2531,17 @@
   CREATIVE: Block LONG in BEAR_TREND (+/usr/bin/bash.28/7d), restore grind-trend+ HIGH (+/usr/bin/bash.35/7d)
   NO ACTION TAKEN — flagged for CEO
   BY: brain_auditor
+[2026-09-19 19:36 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  24h: 50T 44.0%WR +$0.67 | 7d: 207T 49.3%WR +$0.13
+  CHASE: 16T chase LONG blocked (31.3%WR -$0.89), 97T non-chase (54.6%WR +$1.76). Net +$0.72/7d.
+  Z-DEAD: z_0.5-1.5 LONG 39T 48.7%WR -$0.71 (worst). z_1.5-2.5 31T 64.5%WR +$2.52 (best). Monitor.
+  REGIME: EXTREME +$1.74 (best). HIGH -$1.12 (worst). BEAR_TREND 0 trades 7d.
+  DRIFT: SHORT_RSI_FLOOR doc=25 code=35. BAD_TRADE_HOURS stale ref.
+  CREATIVE: z_min_long monitor, EXTREME confidence boost, HIGH penalty. Flagged for CEO.
+  BY: brain_auditor
+
+[2026-09-19 21:00 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 50T 44%WR +$0.67 | 7d: 207T 49.3%WR +$0.13
+  1T closed last hour (+$0.13 pump-chain+ DYDX)
+  No kill criteria met. No overtrading. All signals within normal variance.
+  BY: auto_1hr

@@ -66,3 +66,15 @@
 ## Error Alerts — 2026-09-19 17:56 UTC
 - **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-19 19:46 UTC
+- **REPEATED** (3x): `signal_compactor: timed out (killed after 60.1s)` at 18:24, 18:42, 19:34 — recovered each time (recent runs 1-2s)
+- **WARN**: hotset.json empty — "no signals survived compaction" — all signals filtered out
+- **INFO**: Disk at 84% (93G/118G) — 1% below WARN threshold. Data DBs: coin_tracker 2.3G, candles 1.9G, signals 777M
+- **OK**: Pipeline running normally,7 open positions, 49 closed today, +36.78% PnL
+- **OK**: All timers firing (hermes-pipeline.timer every 1min)
+- **OK**: Position Manager healthy, 7 open tracked with SL/TP
+
+## Error Alerts — 2026-09-19 21:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

@@ -1,98 +1,110 @@
 {
-  "timestamp": "2026-09-19T17:30:00Z",
+  "timestamp": "2026-09-19T19:35:55.298464Z",
   "session_brain_stats": {
-    "status": "EMPTY - needs --ingest",
-    "note": "Cannot cross-reference past decisions"
+    "top_findings": [
+      "Signal decay - guitar tuning: high relevance, preservation of high-WR signals",
+      "atr-spike: no signal guarantees 100% WR, can improve selectivity",
+      "wave periods: frequency acceleration shows +1.50% avg 6h move (62% WR, n=29)",
+      "signal compactor: overall 200T 51%WR, atr-spike+ 1T 100%WR +$7.39"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 49,
-    "win_rate": 42.9,
-    "pnl": 0.55,
-    "top_winner": "pump-chain+ LONG 17T 52.9%WR +$1.51",
-    "top_loser": "pullback-entry- SHORT 3T 0%WR -$0.50"
+    "total": 50,
+    "win_rate": 44.0,
+    "pnl": 0.67,
+    "open": 6,
+    "unrealized": 0.0,
+    "regime": "NEUTRAL",
+    "best_signal": "pump-chain+ LONG 18T 55.6%WR +$1.63",
+    "worst_signal": "pullback-entry- SHORT 3T 0%WR -$0.50"
   },
   "trade_summary_7d": {
-    "trades": 207,
+    "total": 207,
     "win_rate": 49.3,
-    "pnl": 0.06,
-    "best_regime": "EXTREME 51T 56.9%WR +$1.62",
-    "worst_regime": "HIGH 91T 47.3%WR -$1.12 (legacy aging)"
+    "pnl": 0.13,
+    "best_regime": "EXTREME 52T 57.7%WR +$1.74",
+    "worst_regime": "HIGH 91T 47.3%WR -$1.12",
+    "best_hour": "23h 5T 100%WR +$1.79",
+    "worst_hour": "3h 11T 18.2%WR -$0.91"
   },
   "drift_findings": [
     {
-      "finding": "BAD_TRADE_HOURS config is inaccurate",
-      "severity": "MEDIUM",
-      "details": "Set is {3,5,13,14,15,21} but Hour 15 is +$1.04 (best hour), Hour 21 +$0.38, Hour 5 +$0.31, Hour 14 +$0.19. Meanwhile Hour 20 (-$0.89), Hour 2 (-$0.80), Hour 8 (-$0.62), Hour 1 (-$0.59), Hour 17 (-$0.52), Hour 0 (-$0.41) are NOT in the set.",
-      "impact": "Penalty applied to winning hours, not applied to losing hours",
-      "recommendation": "FLAG FOR CEO - time-based changes high risk. Need 2+ weeks data before changing.",
-      "confidence": "HIGH"
+      "finding": "SHORT_RSI_FLOOR doc stale",
+      "detail": "CURRENT.md says SHORT_RSI_FLOOR=25 but code has 35. Doc is wrong, code is correct.",
+      "severity": "low",
+      "action": "Update CURRENT.md"
     },
     {
-      "finding": "CURRENT.md says SHORT_RSI_FLOOR=25 but code has SHORT_RSI_FLOOR=35",
-      "severity": "LOW",
-      "details": "CURRENT.md line 23: 'SHORT_RSI_FLOOR=25: Working.' Code has SHORT_RSI_FLOOR = 35.",
-      "impact": "Informational - filter at 35 blocks more trades than documented at 25",
-      "recommendation": "Update CURRENT.md to reflect actual code value",
-      "confidence": "HIGH"
+      "finding": "BAD_TRADE_HOURS not implemented",
+      "detail": "CURRENT.md references BAD_TRADE_HOURS but no code exists. Stale reference. Hour 15 (+$1.04) IN current set, Hour 20 (-$0.89) NOT in set. Time filtering penalty on winners not losers.",
+      "severity": "medium",
+      "action": "Remove BAD_TRADE_HOURS reference from CURRENT.md"
+    },
+    {
+      "finding": "grind-trend- SHORT still in 24h data",
+      "detail": "5T -$0.38 in 24h, killed at 17:12 UTC. Trades aged in but signal is dead. Expected to age out.",
+      "severity": "low",
+      "action": "Monitor — will age out"
     }
   ],
   "recurring_problems": [
     {
-      "problem": "BEAR_TREND is the #1 systematic loss source",
-      "data": "7d: BEAR_TREND LONG 12T 33.3%WR -$0.58, BEAR_TREND SHORT 31T 35.5%WR -$1.65. Total -$2.23/7d.",
-      "root_cause": "System trades in BEAR_TREND without regime-aware filtering",
-      "recommendation": "CEO decision: block all BEAR_TREND LONG trades"
+      "problem": "HIGH regime persistent loss source",
+      "detail": "7d: 91T 47.3%WR -$1.12. Combined with NORMAL: 154T 46.5%WR -$1.61. Only EXTREME is profitable.",
+      "impact": "-$1.61/7d from HIGH+NORMAL",
+      "suggestion": "Consider regime-specific confidence adjustments for HIGH"
     },
     {
-      "problem": "grind-trend+ HIGH killed but is a winner",
-      "data": "grind-trend+ LONG HIGH: 12T 66.7%WR +$0.35. CEO killed all regimes because NORMAL was 0%WR.",
-      "root_cause": "CEO killed entire signal due to one bad regime",
-      "recommendation": "Restore grind-trend+ LONG with NORMAL block. Needs CEO approval."
+      "problem": "z_0.5_to_1.5 LONG dead zone",
+      "detail": "39T 48.7%WR -$0.71. Worst z-score zone. While z_1.5_to_2.5 is best (64.5%WR +$2.52).",
+      "impact": "-$0.71/7d from this zone alone",
+      "suggestion": "Monitor. If pattern persists, consider z_0.5_to_1.5 penalty or minimum z-score threshold"
     },
     {
-      "problem": "Session brain empty",
-      "data": "SessionBrain returned empty",
-      "root_cause": "Ingest never ran or was cleared",
-      "recommendation": "Run: python3 scripts/session_brain.py --ingest"
+      "problem": "grind-trend- SHORT (killed) still in data",
+      "detail": "5T 20%WR -$0.38/24h, killed 17:12 UTC. Will age out.",
+      "impact": "-$0.38/24h temporary",
+      "suggestion": "Monitor — signal dead, data aging out"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-19T17:30:00Z",
-      "idea": "Block all LONG entries when BTC regime = BEAR_TREND",
-      "rationale": "7d: BEAR_TREND LONG 12T 33.3%WR -$0.58. System should not be LONG in BEAR.",
-      "expected_impact": "+$0.58/7d (net +$0.28 after blocked winners)",
-      "category": "regime gate",
-      "status": "suggested",
-      "risk": "low",
-      "impact_on_winners": "Would block $0.30 in winners, save $0.58 in losers"
-    },
-    {
-      "date": "2026-09-19T17:30:00Z",
-      "idea": "Restore grind-trend+ LONG with NORMAL regime block",
-      "rationale": "HIGH is 12T 66.7%WR +$0.35. CEO killed all regimes due to NORMAL failure.",
-      "expected_impact": "+$0.35/7d from HIGH regime wins",
-      "category": "signal restore",
-      "status": "suggested",
-      "risk": "low",
-      "impact_on_winners": "No impact"
-    },
-    {
-      "date": "2026-09-19T17:30:00Z",
-      "idea": "Investigate z0.5-1.5 LONG zone - non-monotonic z-score performance",
-      "rationale": "z1.5-2.5 = 63.3%WR +$2.40 (BEST). z0.5-1.5 = 48.7%WR -$0.71 (BAD). z>2.5 = 25%WR -$0.76 (chase). Relationship is non-monotonic.",
-      "expected_impact": "Investigation only",
+      "date": "2026-09-19T19:35:55.298498Z",
+      "idea": "Monitor z_0.5_to_1.5 dead zone — consider z_score_floor for LONG entries",
+      "rationale": "39 trades in 7d at z_0.5-1.5: 48.7%WR -$0.71. This is the worst z-score zone. z_1.5-2.5 is best at 64.5%WR +$2.52. If z_0.5-1.5 stays negative for 2+ more days, suggest ZSCORE_MIN_LONG=0.5 to filter out the dead zone.",
+      "expected_impact": "+$0.35-0.71/7d if pattern holds",
       "category": "entry sniper",
-      "status": "monitoring",
-      "risk": "none"
+      "status": "suggested — monitor first",
+      "risk": "medium — 39 trades is borderline sample, pattern may not hold",
+      "impact_on_winners": "Would block 39 LONG trades (48.7%WR). Net winners in zone: ~19. Edge unclear — monitor."
+    },
+    {
+      "date": "2026-09-19T19:35:55.298508Z",
+      "idea": "EXTREME regime confidence boost for LONG signals",
+      "rationale": "EXTREME LONG 30T 63.3%WR +$1.73 — our best regime. pump-chain+ LONG EXTREME: 16T 62.5%WR +$1.12. Currently all signals use same confidence. Could boost EXTREME LONG confidence by +5-10% for more aggressive entries.",
+      "expected_impact": "+$0.20-0.50/7d from more EXTREME LONG entries",
+      "category": "regime edge",
+      "status": "suggested — needs backtest",
+      "risk": "low — EXTREME is well-established edge",
+      "impact_on_winners": "No impact — purely additive (boosts existing entries, doesn't block anything)"
+    },
+    {
+      "date": "2026-09-19T19:35:55.298521Z",
+      "idea": "HIGH regime LONG penalty (not block)",
+      "rationale": "HIGH LONG 49T 49.0%WR -$0.65/7d. Not terrible but negative. Could add HIGH_LONG_CONF_PENALTY=0.9 (reduce confidence by 10% for HIGH LONG entries). Safer than blocking.",
+      "expected_impact": "+$0.30-0.65/7d",
+      "category": "regime edge",
+      "status": "suggested — needs backtest",
+      "risk": "medium — HIGH LONG has some winners (49% WR), penalty may push some below CONF_FILTER_MIN",
+      "impact_on_winners": "Would reduce confidence for ~49 HIGH LONG trades. Some may fall below CONF_FILTER_MIN=70. Verify before implementing."
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "CEO: Decide on BEAR_TREND LONG block (highest impact, +$0.28/7d net)",
-    "CEO: Decide on grind-trend+ HIGH restore with NORMAL block (+$0.35/7d)",
-    "Run: python3 scripts/session_brain.py --ingest (cross-session learning)",
-    "Monitor: BAD_TRADE_HOURS drift - flag for CEO, need 2+ weeks data",
-    "Monitor: pullback-entry- SHORT HIGH recent degradation (full history +$0.44 but 7d -$0.34)"
+    "Monitor chase filter deployment — pipeline restart needed",
+    "Monitor z_0.5_to_1.5 dead zone — 2 more days of data needed",
+    "Verify EXTREME LONG edge holds (63.3%WR is strong but sample=30)",
+    "Update CURRENT.md: SHORT_RSI_FLOOR=35 (not 25), remove BAD_TRADE_HOURS reference",
+    "HIGH regime LONG: consider confidence penalty if pattern persists"
   ]
 }

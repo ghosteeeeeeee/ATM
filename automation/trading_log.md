@@ -2601,3 +2601,63 @@ Final set: ['DOT', 'HYPER']
 - mover+ LONG — 7d 66.7% WR, bad 24h sample only
 
 **Status:** System stable, no action required
+
+## [2026-09-19 20:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (market quiet)
+**24h:** 49T, 44% WR, +$0.67 (stable)
+**Open:** 8 positions (CAKE SHORT +1.4% 6.7h, DYDX LONG +2.2%, SYRUP SHORT -1.0%, others small)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades closed — no kill criteria, no signal failures
+- atr_sl_hit 52% of closes but trades profitable (+$0.024 avg) — SL working correctly
+- pullback-entry- SHORT 0% WR 24h (3T) — 7d is 49.2% WR on 63T, normal variance
+- grind-trend- SHORT — already KILLED, 2T in last 4h are pre-kill trades
+
+**Open Questions:**
+- cut-loser-CL-T1 has 0% WR over 99 trades / 30d (-$14 total). All trades were already past -2% when cut (avg loss $0.14). Small per-trade loss but systematic bleed. Fire windows already widened by brain_auditor on Sep 18. Flagged for CEO review.
+- CAKE SHORT open 6.7h — oldest position, but profitable (+1.4%). No action needed.
+
+**BY:** auto_1hr
+
+## [2026-09-19 21:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.13 (pump-chain+ DYDX atr_sl_hit)
+**24h:** 50T, 44%WR, +$0.67
+
+**Open:** 7 positions, $85.40 exposure (CAKE SHORT 7.6h oldest, ACE LONG 7h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR on 3+ trades last hour)
+- atr_sl_hit 52% of 24h closes but avg +$0.036 — SL working correctly
+- pullback-entry- SHORT 0% WR 24h but only 2T, 7d is 49.2% on 63T — normal variance
+- cut-loser-CL-T1 7T -$0.68 in 24h — already flagged for CEO review, avg loss $0.097/trade (small)
+- Trade count normal, no overtrading
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
+
+## [2026-09-19 22:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** -$0.20 (HEMI SHORT +$0.08, JUP LONG -$0.14, ADA LONG -$0.14)
+**24h:** 52T, 46.2%WR, +$0.88
+
+**Open:** 4 positions (CAKE SHORT +$0.18 8.6h, ACE LONG -$0.16 8h, SYRUP SHORT +$0.06 3.6h, WCT SHORT $0.00 2.1h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR on 3+ trades last hour)
+- atr_sl_hit 56% of 24h closes but avg +$0.026 — SL working correctly
+- grind-trend- (20% WR -$0.38 24h) — already KILLED previously
+- pullback-entry- (33% WR -$0.23 24h) — only 3T, 7d data shows 49.2% WR, normal variance
+- Trade count normal, no overtrading
+- pump-chain+ carrying system at +$1.48/24h
+
+**BY:** auto_1hr

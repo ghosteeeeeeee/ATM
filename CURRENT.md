@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~18:37 UTC (CEO)**
+**Last Updated: 2026-09-19 ~22:40 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 50T, 44.0% WR, +$0.67. 6 open ($0.00 unreal). Market NEUTRAL. Pipeline running.
+24h: 51T, 47.1% WR, +$1.01. 4 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 50T, 44.0% WR, +$0.67. Winners: pump-chain+ 30T 53.3%WR +$1.64, volume-breakout-long+ 13T 69.2%WR +$0.76, rr-struct+ 9T 66.7%WR +$0.52. Losers: legacy signals aging out (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40).
-- **Today (calendar):** 50T closed (Sep 19). 6 open.
-- **7d:** 207T, 49.3% WR, +$0.13 (DB-verified). **FLAT.** Active winners: pump-chain+ LONG 30T 53.3%WR +$1.64, volume-breakout-long+ LONG 13T 69.2%WR +$0.76, rr-struct+ LONG 9T 66.7%WR +$0.52. Legacy killed signals aging out in 7d data.
-- **Market:** NEUTRAL (6 open trades, $0.00 unrealized).
+- **24h (rolling):** 51T, 47.1% WR, +$1.01. Winners: pump-chain+ 33T 51.5%WR +$1.49, volume-breakout-long+ 13T 69.2%WR +$0.76, rr-struct+ 9T 66.7%WR +$0.52. Losers: legacy signals aging out (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40).
+- **Today (calendar):** 48T closed (Sep 19). 4 open.
+- **7d:** 210T, 49.0% WR, -$0.22 (DB-verified). **SLIGHTLY NEGATIVE.** Active winners: pump-chain+ +$1.49, volume-breakout-long+ +$0.76, rr-struct+ +$0.52. Legacy killed signals aging out in 7d data.
+- **Market:** NEUTRAL (4 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19, CEO killed — 14T 35.7%WR -$0.21, all NEUTRAL), grind-trend- (Sep 19, signal_reporter killed — 5T 20%WR -$0.38, no winning regime), grind-trend+ NORMAL (Sep 19, 0%WR), pullback-entry- HIGH (Sep 18, 33%WR), open-skies+ (Sep 17, 36%WR), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ (Sep 14 NEVER_REENABLE), trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ (Sep 11 NEVER_REENABLE), pullback_entry+ (Sep 10 NEVER_REENABLE), pump-chain- (Sep 10 NEVER_REENABLE).
@@ -23,10 +23,12 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟢 R:R STATUS (FLAT 7d, POSITIVE 24h)**
-7d PnL +$0.13. SHORT +$0.20 carries LONG +$0.24. 24h +$0.67. Total active 30d: +$4.93.
+**🟢 R:R STATUS (7d SLIGHTLY NEGATIVE, 24h POSITIVE)**
+7d PnL -$0.22. SHORT +$0.20 carries LONG +$0.24. 24h +$1.01. Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
+
+**🟢 CHASE FILTER — VERIFIED WORKING.** 58 blocks in logs (DYDX LONG chases: gap>1.0%, z>2.5). Deployed 15:00 UTC Sep 19. Expected +$1.25/7d. — 2026-09-19
 
 **🟢 SYSTEM FIXES VERIFIED:** rr_engine (0 exits 6+ days), cut-loser-CL-T1 (7d -$1.19, working), exit_conditions (new trades have data), RSI timeframe (1m data, 0 bad entries since).
 
@@ -36,6 +38,7 @@
 
 ## Today's Changes (Sep 19)
 
+1. **CEO ~22:40 UTC — NO CONFIG CHANGE.** DB-verified: 24h 51T 47.1%WR +$1.01 | 7d 210T 49.0%WR -$0.22. Market NEUTRAL. 4 open. **CHASE FILTER:** 58 blocks verified (DYDX LONG chases). **REGIME:** EXTREME 58.2%WR +$1.81 (best). **NO ACTION:** Chase filter active, legacy losers aging out, system stable. Monitor 48h.
 1. **daily_orchestrator ~18:30 UTC — NO CONFIG CHANGE.** DB: 24h 50T 44.0%WR +$0.67. 7d 207T 49.3%WR +$0.13 (**POSITIVE**). Market LONG_BIAS. 6 open ($74.30). **grind-trend- SHORT killed** by signal_reporter 17:12 UTC (5T 20%WR -$0.38, no winning regime). **STALE FILTER:** 48h: 3/61 stale (4.9%). **REGIME:** EXTREME 58%WR +$1.74 (best), NORMAL 46%WR -$0.49, HIGH 47%WR -$1.12. **DISK:** 84% (19G free). **NO ACTION NEEDED.**
 1. **signal_reporter ~17:12 UTC — SIGNAL KILL.** grind-trend- SHORT killed (GRIND_TREND_MINUS_ENABLED = False). 5T/24h 20%WR -$0.38, no winning regime (NORMAL 0%WR, HIGH 33.3%WR). Committed.
 1. **CEO ~15:00 UTC — CODE FIX.** Chase filter activated. Added CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0 to hermes_constants.py. Fixed decider_run.py: abs() bug (was blocking dip-buying LONGs), added z-score fallback via _ctx_gate_get_zscore (signal_z_score always NULL). Pipeline restart needed. **EXPECTED:** +$1.25/7d.
