@@ -2427,3 +2427,14 @@
   ATR SL 64% but net positive (+$0.014 avg) — trailing working
   No kill criteria met. No changes.
   BY: auto_1hr
+[2026-09-19 00:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 27T 63%WR +$1.73 (STRONG) | 7d: 190T 52.6%WR +$0.29 (positive)
+  Last hour: 0T (quiet period)
+  volume-breakout-long+ 10T 80%WR +$1.06 (STAR)
+  pump-chain+ 2T 100%WR +$0.86 (STAR)
+  mover+ 4T 100%WR +$0.42 (STAR)
+  pullback-entry- SHORT 5T 0%WR -$0.80 (variance vs 7d 49%WR -$0.19)
+  ATR SL 67% but net positive (+$0.061 avg) — trailing working
+  2 open: BABY LONG -87% (SL managed), DOT SHORT -30% (soft trigger)
+  No kill criteria met. No changes.
+  BY: auto_1hr
