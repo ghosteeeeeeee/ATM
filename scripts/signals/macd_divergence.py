@@ -394,7 +394,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction, hours=3)
+            set_cooldown(token, direction, hours=1/3)
 
     return added
 
