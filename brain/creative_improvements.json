@@ -1281,7 +1281,8 @@
     "rationale": "30d SHORT losers include RSI=18.18, 20.0, 23.53, 25.91, 28.57, 29.17. Oversold entries catching falling knives.",
     "expected_impact": "+$0.30-0.50/7d",
     "category": "entry filter",
-    "status": "suggested",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-19T17:11:35.941737+00:00"
   }
 ]

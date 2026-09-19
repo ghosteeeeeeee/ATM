@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-09-19 11:00 UTC] signal_reporter: Killed grind-trend- SHORT — 20% WR, -$0.38 (24h), no winning regime (NORMAL 0%, HIGH 33.3%). GRIND_TREND_MINUS_ENABLED = False. pump-chain+ strong at 50% WR +$1.40 (16T). pullback-entry- on watch (0% WR recent but historically profitable EXTREME 61.9%/HIGH 53.8%). No inversions. 48T/24h total.
 - [2026-09-18 05:09 UTC] signal_reporter: No kills — open-skies+ already dead. Fixed pullback-entry- volatility gate: EXTREME 0.5→1.0 (68% WR), HIGH 0.7→0.5 (47% WR/7d). NORMAL blocked (correct). 24h: 16T 25%WR -$1.41. Low volume. No inversions.
 - [2026-09-14 14:30 UTC] auto_1hr: NO CHANGE — monitoring phase after today's fixes. 24h: 48T 43.8%WR -$1.03. atr_sl_hit 71% of 24h (34T -$1.00) — tight in NORMAL chop. NORMAL regime worst: 14T 28.6%WR -$1.30. SHORT_NORMAL_PENALTY + rr_engine_resistance fix need 48h eval — don't stack changes. 7 open trades, all flat. Kill check: no trigger.
 - [2026-09-12 17:00 UTC] auto_1hr: NO CHANGES — system healthy. 1T last hour (0W 1L -$0.25 INJ SHORT atr_sl_hit). 24h 40T 62.5%WR -$0.10. Kill criteria not met. atr_sl_hit 24% healthy. Stale vs fresh gap: fresh 24T 71%WR +$0.60, stale 15T 47%WR -$0.72 — stale trades are #1 drag. Stale+oversold SHORT block still top opportunity. 5 open positions. System steady state.
