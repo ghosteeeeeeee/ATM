@@ -171,3 +171,13 @@
 
 ## Error Alerts — 2026-09-18 23:56 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Health Check — 2026-09-19 00:43 UTC
+- **WARN** (Nx): Stale signals (GRASS, STX, INJ) exceeding 5min threshold — caught by verification
+- **INFO**: INJ LONG blocked in cooldown (2 failures, ~52min remaining)
+- **INFO**: 0 open trades, 1 closed today (-$0.30)
+- **NO AUTO-FIX NEEDED**
+
+## Error Alerts — 2026-09-19 00:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3139s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3079s left, N failures)`

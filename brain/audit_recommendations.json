@@ -1,150 +1,109 @@
 {
-  "timestamp": "2026-09-18T21:37:10.599168+00:00",
-  "session_brain_stats": {
-    "indexed_sessions": "252074 vectors",
-    "top_topics": [
-      "signal performance winrate regime",
-      "creative edge improvement",
-      "cut losers premature exit",
-      "feature recording metadata"
+    "timestamp": "2026-09-19T01:30:00Z",
+    "session_brain_stats": {
+        "total_vectors": 258477,
+        "queries_run": 3,
+        "top_insights": [
+            "Signal performance winrate regime — open-skies (defunct, 53%WR recent)",
+            "New neutral regime signal idea — brainstormed but not implemented",
+            "Delisted tokens / cascade_flip — historical, not actionable"
+        ]
+    },
+    "trade_summary_24h": {
+        "trades": 28,
+        "win_rate": 60.7,
+        "pnl": 1.43,
+        "regime_breakdown": {
+            "EXTREME": {"trades": 9, "wr": 66.7, "pnl": 0.67},
+            "HIGH": {"trades": 10, "wr": 60.0, "pnl": 0.48},
+            "NORMAL": {"trades": 9, "wr": 55.6, "pnl": 0.28}
+        },
+        "stars": [
+            "volume-breakout-long+ LONG: 10T 80%WR +$1.06",
+            "pump-chain+ LONG: 2T 100%WR +$0.86",
+            "mover+ LONG: 5T 80%WR +$0.12"
+        ],
+        "losers": [
+            "pullback-entry- SHORT: 5T 0%WR -$0.80 (variance vs 7d 49%WR -$0.19)"
+        ]
+    },
+    "trade_summary_7d": {
+        "trades": 191,
+        "win_rate": 52.9,
+        "pnl": 0.94,
+        "active_signals_30d_total_pnl": 4.93
+    },
+    "drift_findings": [
+        {
+            "issue": "Feature recording gap: gap_at_entry + staleness_minutes = 0% of 24h trades",
+            "status": "Fix deployed by CEO Sep 18 20:00 UTC but pipeline NOT restarted",
+            "impact": "Cannot do chase detection, staleness analytics, or entry gap filtering",
+            "action": "RESTART PIPELINE to activate fix",
+            "severity": "HIGH"
+        },
+        {
+            "issue": "CURRENT.md says EXTREME SHORT fresh 83.3%WR — misleading",
+            "status": "DB shows pullback-entry- SHORT EXTREME = 60%WR (correct), overall EXTREME SHORT fresh = 50%WR",
+            "impact": "Minor documentation drift",
+            "action": "Update CURRENT.md with accurate numbers",
+            "severity": "LOW"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "topic": "pullback-entry SHORT HIGH regime drag",
+            "sessions": "10+",
+            "status": "BLOCKED (PULLBACK_ENTRY_SHORT_HIGH_BLOCK=True since Sep 18)",
+            "resolution": "Working — 0 HIGH trades since block"
+        },
+        {
+            "topic": "Signal diversity in NEUTRAL regime",
+            "sessions": "5+",
+            "status": "OPEN — only pullback-entry- SHORT + volume-breakout-long+ pass confluence",
+            "resolution": "Need new signals developed"
+        },
+        {
+            "topic": "cut-loser-CL-T1 0% WR",
+            "sessions": "3+",
+            "status": "MONITORING — fire windows widened (1,2)->(2,3) Sep 18. 5 trades, -$0.52 total.",
+            "resolution": "Monitor after window change. Small impact."
+        }
+    ],
+    "losing_trade_autopsy": {
+        "trades_analyzed": 10,
+        "pullback_entry_short_losers": {
+            "count": 5,
+            "all_atr_sl": true,
+            "regime_distribution": "3 HIGH, 1 NORMAL, 1 EXTREME",
+            "rsi_range": "28.57-60.0",
+            "root_cause": "HIGH regime is primary drag. RSI filter (FLOOR=35) would block 5 winners ($0.92) to save 12 losers ($0.23) — net negative. Not recommended.",
+            "existing_mitigation": "PULLBACK_ENTRY_SHORT_HIGH_BLOCK=True active since Sep 18"
+        },
+        "other_losers": {
+            "BABY mover+ LONG": "ATR SL in HIGH regime — normal variance for 83.3% WR signal",
+            "JUP volume-breakout-long+ LONG": "ATR SL in EXTREME — tight stop, normal variance",
+            "CAKE mover- SHORT": "cut-loser-CL-T1 — small loss, acceptable"
+        },
+        "verdict": "All losers are normal variance or regime-bound. No systematic entry bug found. HIGH regime block is the correct fix."
+    },
+    "creative_improvements": [
+        {
+            "date": "2026-09-19T01:30:00Z",
+            "idea": "Track regime transition trades separately — trades entering during regime CHANGE (e.g., NEUTRAL->EXTREME) may have different edge than stable regime trades",
+            "rationale": "Regime is the primary performance driver. EXTREME 58.5%WR vs HIGH 48.1%WR. But what about the transition period? If we can detect regime shifts early, we could size up during transitions and reduce during stable LOW-EDGE regimes.",
+            "expected_impact": "Informational first — need data before acting. Could enable regime-adaptive position sizing.",
+            "category": "regime intelligence",
+            "status": "suggested",
+            "risk": "low — monitoring only",
+            "sample_size": "insufficient — need 50+ regime transition events"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "RESTART PIPELINE — activate gap_at_entry + staleness_minutes recording (CRITICAL)",
+        "Monitor CL-T1 after fire window change (2,3) — evaluate in 48h",
+        "Monitor pullback-entry- SHORT after HIGH block — should improve 7d PnL by ~$0.50",
+        "Develop new signals for NEUTRAL regime — diversity bottleneck",
+        "Stale filter eval due Sep 19 — check if extension is warranted"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 16,
-    "winners": 8,
-    "losers": 8,
-    "pnl": "+$0.98",
-    "wr": "50.0%",
-    "best_signal": "volume-breakout-long+ LONG 9T 88.9%WR +$1.19",
-    "worst_signal": "pullback-entry- SHORT 6T 16.7%WR -$0.78"
-  },
-  "trade_summary_7d": {
-    "trades": 192,
-    "pnl": "-$0.73",
-    "wr": "52.6%",
-    "regimes": {
-      "EXTREME": "+$1.54 (60.3% WR, best)",
-      "NORMAL": "+$0.05 (53.6% WR, breakeven)",
-      "HIGH": "-$2.32 (46.8% WR, worst — legacy aging)"
-    },
-    "exit_analysis": {
-      "profit-monster-trail": "31T 90.3%WR +$2.16 (best exit)",
-      "hard_tp": "2T 100%WR +$0.65",
-      "atr_sl_hit": "127T 49.6%WR -$1.15 (main drag)",
-      "cut-loser-CL-T1": "6T 0%WR -$0.75 (0 winners — premature)",
-      "rr_engine_support_br": "6T 33.3%WR -$0.63",
-      "rr_engine_resistance": "13T 46.2%WR -$0.28"
-    }
-  },
-  "drift_findings": [
-    {
-      "topic": "gap_at_entry recording",
-      "status": "NOT IMPLEMENTED",
-      "impact": "Cannot detect chase entries (entered after big move). CURRENT.md lists as NEXT action.",
-      "fix": "Add gap_at_entry to signal_metadata dict in decider_run.py before passing to brain.py open_trade()"
-    },
-    {
-      "topic": "staleness_minutes recording",
-      "status": "NOT IMPLEMENTED",
-      "impact": "Cannot analyze staleness vs execution quality. Also listed as NEXT action.",
-      "fix": "Add staleness_minutes to signal_metadata dict in decider_run.py"
-    },
-    {
-      "topic": "RSI in metadata",
-      "status": "WORKING",
-      "detail": "191/192 7d trades have rsi_14 in _signal_metadata. RSI fix from Sep 16 verified."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "topic": "pullback-entry- SHORT HIGH regime losing",
-      "detail": "34T 44.1%WR -$0.70/7d. NORMAL +$0.16, EXTREME +$0.43. HIGH is the drag.",
-      "status": "Monitoring — needs 50+ trades for gate decision (currently 34)."
-    },
-    {
-      "topic": "cut-loser-CL-T1 0% win rate",
-      "detail": "6T/7d ALL losers, avg -$0.125. Fire window (1,2h) too tight — cutting before recovery.",
-      "status": "FIXED: Widened CL_TIER1_FIRE_WINDOWS from (1,2) to (2,3)."
-    },
-    {
-      "topic": "rr_engine exits negative",
-      "detail": "rr_engine_support_br 33.3%WR -$0.63, rr_engine_resistance 46.2%WR -$0.28. Combined -$0.91/7d.",
-      "status": "Monitoring — may need R:R threshold adjustment."
-    }
-  ],
-  "losing_trade_autopsy": [
-    {
-      "cluster": "pullback-entry- SHORT 24h — 6T ALL ATR SL",
-      "trades": [
-        "NOT -$0.19 HIGH",
-        "IMX -$0.16 HIGH",
-        "AIXBT -$0.14 NORMAL",
-        "ALT -$0.15 NORMAL",
-        "IO -$0.16 HIGH",
-        "NOT -$0.19 HIGH"
-      ],
-      "root_cause": "SHORT in HIGH regime = 44.1%WR. In EXTREME=63.6%WR. Signal works in EXTREME but dragged by HIGH.",
-      "recommended_change": "Monitor to 50T. If HIGH stays <48%WR, gate pullback-entry SHORT to EXTREME/NORMAL only.",
-      "impact_on_winners": "Would NOT affect EXTREME/NORMAL winners. Safe gate."
-    },
-    {
-      "cluster": "cut-loser-CL-T1 7d — 6T ALL losers",
-      "trades": [
-        "CAKE -$0.09",
-        "COMP -$0.09",
-        "AVAX -$0.09",
-        "WLD -$0.13",
-        "BANANA -$0.12",
-        "KAS -$0.23"
-      ],
-      "root_cause": "Fire window (1,2h) cuts trades before they have time to recover. 0% WR = every trade closed by this mechanism lost.",
-      "recommended_change": "APPLIED: Widened CL_TIER1_FIRE_WINDOWS from (1,2) to (2,3).",
-      "impact_on_winners": "No impact — all 6 CL_T1 exits were losers. 0% WR means no winners to block."
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-18T20:30:00Z",
-      "idea": "Widen CL_TIER1 fire window from (1,2) to (2,3) hours",
-      "rationale": "cut-loser-CL-T1 has 0% WR across 6 trades in 7d. Every trade closed by this mechanism lost. The1-2h window is too tight — trades are cut before they have time to recover from normal intraday volatility.",
-      "expected_impact": "+$0.75/7d if trades that would have been cut recover to breakeven or small win",
-      "category": "exit optimization",
-      "status": "APPLIED",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T20:30:00Z",
-      "idea": "Add gap_at_entry + staleness_minutes to signal_metadata at execution time",
-      "rationale": "CURRENT.md lists this as NEXT action. Enables chase detection (gap > 0.3% = chasing) and staleness analysis. 0/192 trades currently have these fields.",
-      "expected_impact": "+diagnostic value. Chase detection could block entries after big moves.",
-      "category": "data recording",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-18T20:30:00Z",
-      "idea": "Monitor rr_engine exits — combined -$0.91/7d from support_br + resistance",
-      "rationale": "rr_engine_support_br 33.3%WR and rr_engine_resistance 46.2%WR are both negative. Combined they're the #2 drag after atr_sl_hit. May need R:R threshold widening.",
-      "expected_impact": "Monitor only — need 20+ trades per exit type before changing thresholds",
-      "category": "exit optimization",
-      "status": "monitoring",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "file": "hermes_constants.py",
-      "change": "CL_TIER1_FIRE_WINDOWS widened from (1,2) to (2,3)",
-      "line": 1486,
-      "rationale": "0% WR on CL_T1 exits. All 6 trades were losers. Widening window gives trades more time to recover.",
-      "expected_impact": "+$0.75/7d if cut trades recover"
-    }
-  ],
-  "next_actions": [
-    "PIPELINE RESTART needed to load new CL_TIER1_FIRE_WINDOWS config",
-    "Monitor CL_T1 exits over next 48h — should see fewer premature cuts",
-    "Implement gap_at_entry + staleness_minutes recording in decider_run.py",
-    "Monitor pullback-entry- SHORT HIGH regime to 50+ trades (currently 34)",
-    "Monitor rr_engine exits for potential threshold adjustment"
-  ]
 }

@@ -1,3 +1,42 @@
+## [2026-09-19 01:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (0 wins, 3 losses)
+**PnL:** -$0.56 (WR: 0.0%) | **24h:** 27T 63%WR +$1.62
+
+**Last Hour:**
+- FIL pump-chain+ LONG → atr_sl_hit -$0.22 (EXTREME regime, 19m hold)
+- APT pump-chain+ LONG → atr_sl_hit -$0.04 (EXTREME regime, 26m hold)
+- BABY mover+ LONG → atr_sl_hit -$0.30 (5h hold, extended)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 18T avg +$0.054 — dominant (67%)
+- profit-monster-trail: 7T avg +$0.060
+- cut-loser-CL-T1: 1T -$0.090
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+: 10T 80%WR +$0.106 (strong)
+- mover+: 5T 80%WR +$0.024 (steady)
+- pump-chain+: 4T 50%WR +$0.150 (FOGO/ADA winners offset FIL/APT losses)
+- pullback-entry-: 2T 0%WR -$0.175 (small sample)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal with 0%WR and 3+ trades in last hour
+- 24h profitable at +$1.62 — system working
+- pump-chain+ 7d has FOGO +$0.69, ADA +$0.17 balancing losses
+- Trade frequency: 3T/hr — healthy
+- ATR SL at 67% — structural, consistent with prior analysis
+
+**Monitoring:**
+- EXTREME regime LONGs getting stopped — 2/3 last hour EXTREME
+- 4 open positions (DOT SHORT, ATOM/LONG pump-chain+, ME+IOTA grind-trend+)
+- mover+ BABY held 5h then stopped — long hold, normal ATR SL
+
+**Open Questions:**
+- EXTREME regime + LONG + ATR SL = frequent stops? Consider regime filter for pump-chain+ LONGs in EXTREME
+
 ## [2026-09-18 13:00 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (1 win, 1 loss)
