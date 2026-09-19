@@ -1,3 +1,126 @@
+## [2026-09-19 06:35 UTC] Daily Orchestrator
+
+**No config changes — pipeline stable, no critical issues requiring action.**
+
+### Intelligence Summary
+
+**Pipeline Status:** RUNNING (crash fixed by auto_1hr at 06:16 UTC)
+**Market:** NEUTRAL (2 open trades: LINK SHORT, AVAX LONG)
+**Disk:** 83% (20GB free, below 88% threshold)
+
+**24h (DB):** 41T 39.0%WR +$0.04 — barely positive
+**7d (DB):** 196T 46.9%WR -$2.10 — NEGATIVE (worsened from -$0.69 yesterday)
+
+### Automation Activity (last 24h)
+
+| Automation | Action | Result |
+|------------|--------|--------|
+| auto_1hr 06:16 | **CRITICAL FIX:** FAVORITES_LONG NameError crash | Fixed — pipeline restored, committed c4133254 |
+| auto_1hr 03:30 | SHORT_NORMAL_PENALTY 0.8→1.0 drift fix | Confirmed — SHORT NORMAL profitable 7d |
+| signal_reporter 05:12 | Regime-block grind-trend+ NORMAL | 0%WR (5T), wins HIGH 57.1% — committed 96d68c09 |
+| health_monitor 05:45 | Full system check | Pipeline OK, timers OK, 83% disk |
+
+### Feature Recording Status (since Sep 18 fix)
+
+| Field | Coverage | Status |
+|-------|----------|--------|
+| staleness_minutes | 23/26 (88%) | ✅ Working — early trades before fix excluded |
+| gap_at_entry | 16/26 (62%) | ⚠️ Partial — tokens with <300 candles have no EMA300 |
+| is_stale | 26/26 (100%) | ✅ Working |
+
+### Stale Filter Performance (48h)
+
+| Category | Trades | WR | PnL |
+|----------|--------|-----|-----|
+| Fresh | 58 | 37.9% | -$1.00 |
+| Stale | 3 | 66.7% | +$0.03 |
+
+Filter suppressing stale trades effectively (3/61 = 4.9% stale, down from 43.8% pre-filter).
+
+### 7d Signal Ranking (losing signals)
+
+| Signal | Trades | WR | PnL | Action |
+|--------|--------|-----|-----|--------|
+| trend_purity+ | 5 | 0% | -$1.02 | KILLED |
+| rr-struct-v2+ | 10 | 40% | -$0.45 | KILLED |
+| rr-struct- | 5 | 40% | -$0.42 | KILLED |
+| open-skies+ | 6 | 33.3% | -$0.40 | KILLED |
+| breakout-long+ | 4 | 25% | -$0.35 | KILLED |
+| grind-trend+ | 12 | 33.3% | -$0.23 | NORMAL blocked |
+| pullback-entry- | 64 | 50% | -$0.19 | HIGH blocked |
+
+All 7d losers either already killed or regime-blocked. Legacy aging out.
+
+### Today's Losers (Sep 19)
+
+- pump-chain+ 10T 20%WR -$0.04 — ALL atr_sl_hit across EXTREME/HIGH/NORMAL
+- grind-trend+ 12T 33.3%WR -$0.23 — 3 cut-loser-CL-T1 in NORMAL
+- pullback-entry- SHORT 2T 0%WR -$0.35
+
+### NO ACTION TAKEN
+
+**Rationale:**
+- FAVORITES_LONG crash already fixed by auto_1hr (committed)
+- grind-trend+ NORMAL already blocked by signal_reporter (committed)
+- No signal meets blanket-kill criteria (all have winning regimes)
+- gap_at_entry partial recording is expected behavior (tokens with <300 candles)
+- 7d negative PnL driven by legacy killed signals aging out
+- Disk at 83% — below 88% compression threshold
+
+**Monitoring:**
+- grind-trend+ LONG 12T 33.3%WR — watch next run, could be variance
+- pump-chain+ EXTREME 0%WR in 24h (3T) — lifetime 52%WR, likely noise
+- 7d HIGH regime -$2.04 — mostly legacy, watch for improvement
+
+### Next Actions
+
+1. **MONITOR:** 7d PnL recovery — legacy losers aging out, should improve
+2. **MONITOR:** grind-trend+ LONG — if continues losing, may need regime blocking in HIGH too
+3. **INFRA:** gap_at_entry recording — tokens with <300 candles can't compute EMA300. Consider fallback (EMA100 or skip gracefully). Low priority.
+4. **DEVELOP:** New signals for NEUTRAL regime — only 2 signal types pass confluence. Need diversity.
+
+---
+
+## [2026-09-19 06:10 UTC] Hourly Analysis
+
+**CRITICAL FIX:** Pipeline was crashing — `FAVORITES_LONG` NameError on every cycle.
+
+**Trades:** 0 closed last hour (quiet) | **24h:** 42T 42.9%WR +$0.34
+**Last 6h:** 22T 5W (22.7%WR) — bad stretch (00:00–04:00 UTC)
+**Open:** 2 (AVAX pump-chain+, ALGO mover+)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 23T avg -$0.010 — dominant (55%), flat
+- profit-monster-trail: 14T avg +$0.045 (33%)
+- cut-loser-CL-T1: 4T avg -$0.093 (10%)
+- hard_tp: 1T +$0.310
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 9T 77.8%WR +$0.80 ★★ (strongest)
+- mover+ LONG: 4T 75%WR +$0.09
+- grind-trend+ LONG: 12T 33.3%WR -$0.23 (worst by volume)
+- pump-chain+ LONG: 10T 20%WR -$0.04 (FOGO/ADA wins offset losses)
+- pullback-entry- SHORT: 2T 0%WR -$0.35
+
+**Changes:**
+1. FIXED: `hermes_constants.py` line 252 `FAVORITES` → `FAVORITES_LONG` (root cause: favorites_updater.py wrote `FAVORITES = {` which overwrote FAVORITES_LONG definition)
+2. FIXED: `favorites_updater.py` updated to import/write `FAVORITES_LONG` (prevents recurrence)
+
+**No Change Needed:**
+- Kill check: No signal with 0%WR and 3+ trades in last hour (0 trades in hour)
+- Trade frequency: ~2.5T/hr avg — healthy, no overtrading
+- SHORT_NORMAL_PENALTY=1.0 already deployed (03:30 UTC brain_auditor fix)
+
+**Root Cause:**
+- `favorites_updater.py` writes `FAVORITES = {...}` to hermes_constants.py daily
+- FAVORITES_LONG was defined at that same location, overwritten by the updater
+- Pipeline crashed on every cycle since the overwrite (exit code 1, `NameError`)
+
+**Monitoring:**
+- 5 consecutive negative hours (00:00–04:00 UTC) — could be regime noise, monitoring
+- grind-trend+ 12T 33.3%WR -$0.23 — too few 7d trades (12T) to kill, monitor
+- pullback-entry- SHORT 66T -$0.35 7d — small persistent drag, not killable
+
 ## [2026-09-19 02:00 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (0 wins, 1 loss) | **24h:** 30T 60%WR +$1.56
@@ -1920,3 +2043,110 @@ Final set: ['DOT', 'HYPER', 'INJ']
 - 7d crossed from -$0.49 to +$0.29 in 5 hours — improving
 
 **BY:** auto_1hr
+
+## [2026-09-19 05:00 UTC] Hourly Analysis
+
+**Trades:** 8 closed last hour (4 wins, 3 losses, 1 breakeven)
+**PnL:** -$0.19 (small drawdown) | **24h:** 38T 58%WR +$1.37 (STRONG) | **7d:** 197T 48.7%WR -$1.54 (recovering)
+
+**Last Hour Close Breakdown:**
+- profit-monster-trail: 4T — SYRUP +$0.14, LDO +$0.05, HBAR -$0.01, IO -$0.02
+- cut-loser-CL-T1: 2T — USAL -$0.09, SEI -$0.10
+- atr_sl_hit: 2T — IMX $0.00, ADA -$0.16
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 21T (55%) avg +$0.032 — net positive, trailing working
+- profit-monster-trail: 13T (34%) avg +$0.052 — star
+- cut-loser-CL-T1: 3T avg -$0.093 — losses contained
+- hard_tp: 1T +$0.31
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 10T 80%WR +$1.06 (STAR)
+- pump-chain+ LONG: 7T 28.6%WR +$0.29 (improving)
+- grind-trend+ LONG: 8T 37.5%WR +$0.06 (breakeven)
+- mover+ LONG: 5T 80%WR +$0.12
+- pullback-entry- SHORT: 2T 0%WR -$0.35 (cold streak, 7d 49%WR)
+
+**Open (6):** IOTA +108%, AIXBT +58%, ALT +31%, BANANA +9%, CC -42%, BABY -46% (SL managed)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal at 0%WR with 3+ trades in last hour
+- ATR SL 55% but net positive (+$0.032 avg) — trailing working
+- pullback-entry- SHORT 2T 0%WR (below 3T threshold)
+- Trade frequency 1.6/hr — healthy
+- 24h strongly positive at +$1.37
+
+**Monitoring:**
+- pullback-entry- SHORT: 2T 0%WR in 24h — watch next hour, could be variance or emerging pattern
+- CC and BABY deep in loss but SLs set, system managing
+
+**BY:** auto_1hr
+
+## [2026-09-19 06:00 UTC] Hourly Analysis
+
+**Trades:** 7 closed (2 wins, 5 losses)
+**PnL:** -$0.62 (drawdown) | **24h:** 44T 45.5%WR +$0.49 | **7d:** 202T 47.5%WR -$1.88
+
+**Last Hour Close Breakdown:**
+- profit-monster-trail: 2T — AIXBT +$0.02, ALT -$0.03
+- cut-loser-CL-T1: 2T — BANANA -$0.09, BABY -$0.19
+- atr_sl_hit: 3T — IOTA $0.00, AZTEC -$0.16, CC -$0.17
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 24T (55%) avg -$0.005 — net neutral, trailing working
+- profit-monster-trail: 15T (34%) avg +$0.044 — star
+- cut-loser-CL-T1: 4T avg -$0.093 — contained
+- hard_tp: 1T +$0.31
+
+**24h by Signal:**
+- volume-breakout-long+ LONG: 9T 77.8%WR +$0.80 (STAR)
+- mover+ LONG: 5T 80%WR +$0.12 (STAR)
+- grind-trend+ LONG: 12T 33.3%WR -$0.23 (struggling)
+- pump-chain+ LONG: 10T 20%WR -$0.04 (small losses)
+
+**Open (1):** ALGO -19.76% (small position, managed)
+
+**Changes:** None — no kill criteria met
+
+**No Change Needed:**
+- Kill check: No signal at 0%WR with 3+ trades in last hour
+- ATR SL 55% but avg -$0.005 (net neutral) — trailing working
+- pullback-entry- SHORT 2T 0%WR -$0.35 (below 3T threshold)
+- Trade frequency 1.8/hr — healthy
+- 24h still net positive at +$0.49
+
+**Monitoring:**
+- grind-trend+ LONG 12T 33.3%WR — watch next hour, could be variance
+- pump-chain+ LONG 10T 20%WR — watch for continuation
+- ALGO small loss position open
+
+**BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-19 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE CC (WR=0.0%, PnL=$-0.17, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ENA (WR=16.7%, PnL=$-0.78, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE DOT (WR=33.3%, PnL=$-0.37, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE WLD (WR=50.0%, PnL=$0.13, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE IMX (WR=50.0%, PnL=$-0.25, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ME (WR=33.3%, PnL=$-0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE AVNT (inactive 11d, no trades)
+- DEMOTE INJ (WR=50.0%, PnL=$-0.12, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ZRO (WR=0.0%, PnL=$-0.50, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE TURBO (WR=50.0%, PnL=$-0.13, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE DYDX (WR=50.0%, PnL=$-0.02, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE KAS (WR=0.0%, PnL=$-0.74, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE CFX (inactive 9d, no trades)
+- DEMOTE PUMP (inactive 15d, no trades)
+- PROMOTE BIGTIME (WR=60.0%, AvgPnL=2.09%, Trades=5)
+- PROMOTE APT (WR=60.0%, AvgPnL=0.21%, Trades=5)
+- PROMOTE BABY (WR=66.7%, AvgPnL=0.76%, Trades=6)
+
+Final set: ['ACE', 'APT', 'BABY', 'BANANA', 'BIGTIME', 'BLUR', 'FOGO', 'LTC', 'POL', 'SAND']
+
+## LOSERS Update — 2026-09-19 06:15 UTC
+- REMOVE INJ (insufficient data)
+
+Final set: ['DOT', 'HYPER']

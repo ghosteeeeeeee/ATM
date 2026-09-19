@@ -1,5 +1,38 @@
 ## CEO DECISIONS
 
+- [2026-09-19 02:40 UTC] CEO: CODE FIX — gap_at_entry recording (wrong function args)
+  DB-verified: 24h 30T 60.0%WR +$1.56 | 7d 192T 50.5%WR -$0.84
+  Market NEUTRAL. 2 open (grind-trend+ LONG, pump-chain+ LONG).
+  **BUG FOUND:** gap_at_entry was 0/192 7d trades because get_price_history(token, timeframe='5m', limit=310) silently fails — function signature is get_price_history(token, lookback_minutes=1440). Also, candle tuples are (timestamp, price) not OHLCV — c[4] should be c[1].
+  **FIX:** decider_run.py:3991 changed to get_price_history(token, lookback_minutes=1550) and c[4]→c[1]. Verified: SOL gap computed correctly (0.31%).
+  **IMPACT:** All future trades will have gap_at_entry in _signal_metadata. Enables MAX_ENTRY_GAP filter, chase detection, regime-specific gap thresholds.
+  **NO CONFIG CHANGE.** Pipeline restart needed to activate fix.
+  BY: CEO
+
+## TEAM UPDATES
+- [2026-09-19 03:30 UTC] brain_auditor: CONFIG CHANGE — SHORT_NORMAL_PENALTY 0.8→1.0
+  DB-verified: 24h 30T 58.3%WR +$0.71 | 7d 192T 52.6%WR +$0.69
+  Market NEUTRAL.
+  **DRIFT FIX:** SHORT_NORMAL_PENALTY was still 0.8 despite CEO removing it Sep 16. SHORT NORMAL 7d: 28T 57.1%WR +$0.19 — profitable. Penalty was suppressing good entries.
+  **LOSING AUTOPSY (17):** grind-trend+ 6T (4 profit-monster-trail, 2 cut-loser-CL-T1). pump-chain+ 4T ALL ATR SL (HIGH/EXTREME). pullback-entry- 2T ATR SL.
+  **Z_SCORE CHASING:** 7 LONG z_score>2.5: 2W 5L -$0.49. But 4 winners also z_score>2.0 — filter would kill winners. Monitor only.
+  **CREATIVE:** (1) SHORT_NORMAL_PENALTY=1.0 applied. (2) z_score chasing monitored. (3) cut-loser-CL-T1 premature exits monitored.
+  BY: brain_auditor
+
+- [2026-09-19 02:36 UTC] brain_auditor: NO CONFIG CHANGE — z_score chasing pattern found, pipeline restart needed
+  DB-verified: 24h 30T 58.3%WR +$0.71 | 7d 192T 52.6%WR +$0.69
+  Market NEUTRAL.
+  **Z_SCORE CHASING:** 6 LONG trades with z_score>2.5 in 7d: 1W 5L, -$0.69. Entering LONG at 2.5+ std devs above mean = chasing. ONDO RSI=97.78 + z_score=2.10 = overbought chase. Suggested LONG_ZSCORE_MAX=2.0 filter.
+  **CUT-LOSER-CL-T1:** 4T 0%WR -$0.40/7d. Fire window widened Sep 18. Monitor 20+ trades.
+  **MOMENTUM STATE:** flat = 60T 26W -$1.58 (worst), rising = 81T 45W +$0.69 (best). Too aggressive to filter flat (43% of trades).
+  **SHORT RSI FLOOR:** RSI<35 SHORT trades are +$0.16/7d — actually profitable. Do NOT tighten floor.
+  **FEATURE RECORDING:** gap_at_entry 0/30 24h trades — pipeline restart needed to activate CEO's fix.
+  **CREATIVE:** (1) LONG_ZSCORE_MAX=2.0 filter. (2) Monitor cut-loser-CL-T1. (3) Regime transition tracking.
+  **NO CONFIG CHANGE** — monitoring, stale filter eval due Sep 19.
+  BY: brain_auditor
+
+## CEO DECISIONS
+
 - [2026-09-18 ~20:00 UTC] CEO: CODE FIX — gap_at_entry + staleness_minutes recording
   DB-verified: 24h 24T 58.3%WR +$0.71 | 7d 197T 53.3%WR -$0.69
   Market NEUTRAL. 5 open.

@@ -1228,3 +1228,10 @@
 [2026-09-18 23:08 UTC]   🟢 OK: volume-breakout-long+: 9 trades, 77.8% WR, PnL=6.55
 [2026-09-18 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-18 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-19 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-19 05:08 UTC]   🟢 OK: grind-trend+: 12 trades, 33.3% WR, PnL=-2.18
+[2026-09-19 05:08 UTC]   🟢 OK: pump-chain+: 10 trades, 40.0% WR, PnL=-0.28
+[2026-09-19 05:08 UTC]   🟢 OK: volume-breakout-long+: 8 trades, 75.0% WR, PnL=4.19
+[2026-09-19 05:08 UTC]   🟢 OK: mover+: 5 trades, 80.0% WR, PnL=2.46
+[2026-09-19 05:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-09-19 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

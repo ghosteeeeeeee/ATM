@@ -310,6 +310,11 @@ except Exception:
     _continuum_trend_run = None
 
 try:
+    from signals.continuum_ma import run as _continuum_ma_run
+except Exception:
+    _continuum_ma_run = None
+
+try:
     from signals.neutral_sniper import run as _neutral_sniper_run
 except Exception:
     _neutral_sniper_run = None
@@ -465,6 +470,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
     {'name': 'continuum_oscillator',      'enabled': 'CONTINUUM_OSC_ENABLED',         'run': _continuum_oscillator_run},
     {'name': 'continuum_trend',           'enabled': 'CONTINUUM_TREND_ENABLED',       'run': _continuum_trend_run},
+    {'name': 'continuum_ma',              'enabled': 'CONTINUUM_MA_ENABLED',          'run': _continuum_ma_run},
     {'name': 'sma20_dip',                'enabled': 'SMA20_DIP_ENABLED',            'run': _sma20_dip_run},
     {'name': 'resistance_break',         'enabled': 'RESISTANCE_BREAK_ENABLED',     'run': _resistance_break_run},
     {'name': 'mover',                    'enabled': 'MOVER_ENABLED',               'run': _mover_run},

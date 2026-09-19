@@ -3988,9 +3988,9 @@ def run(dry_run=False):
         # ── Compute gap_at_entry for _signal_metadata ─────────────────
         try:
             from signal_schema import get_price_history
-            _candles = get_price_history(token, timeframe='5m', limit=310)
+            _candles = get_price_history(token, lookback_minutes=1550)  # 310 candles × 5m
             if _candles and len(_candles) >= 300:
-                _closes = [float(c[4]) for c in _candles]  # close prices
+                _closes = [float(c[1]) for c in _candles]  # price (timestamp, price) tuples
                 _ema_val = _closes[0]
                 _mult = 2 / (300 + 1)
                 for _p in _closes[1:]:

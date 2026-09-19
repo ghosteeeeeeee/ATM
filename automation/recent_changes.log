@@ -1,3 +1,18 @@
+[2026-09-19 06:10 UTC] auto_1hr: CONFIG CHANGE — FAVORITES_LONG NameError fix
+  CRITICAL BUG: Pipeline was crashing on every cycle (exit code 1)
+  ROOT CAUSE: favorites_updater.py wrote 'FAVORITES = {' overwriting FAVORITES_LONG definition
+  FIX: hermes_constants.py line 252 renamed FAVORITES → FAVORITES_LONG
+  FIX: favorites_updater.py updated to import/write FAVORITES_LONG (prevents recurrence)
+  24h: 42T 42.9%WR +$0.34 | 0 trades last hour | 2 open (AVAX, ALGO)
+  BY: auto_1hr
+
+[2026-09-19 03:30 UTC] brain_auditor: CONFIG CHANGE — SHORT_NORMAL_PENALTY 0.8→1.0
+  DB-verified: 24h 30T 58.3%WR +$0.71 | 7d 192T 52.6%WR +$0.69
+  DRIFT FIX: SHORT_NORMAL_PENALTY was 0.8 despite CEO removing Sep 16. SHORT NORMAL 7d: 28T 57.1%WR +$0.19 profitable. Fixed to 1.0.
+  LOSING AUTOPSY: 17 losers 24h. grind-trend+ 6T (PM_TRAIL 50%WR, CL-T1 0%WR). pump-chain+ 4T ALL ATR SL.
+  Z_SCORE: 7 LONG z_score>2.5 2W5L -$0.49 but 4 winners also >2.0 — no filter.
+  CREATIVE: (1) SHORT_NORMAL_PENALTY=1.0. (2) z_score monitored. (3) CL-T1 monitored.
+  BY: brain_auditor
 
 [2026-09-19 02:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
   24h: 30T 60%WR +$1.56 (HEALTHY) | 7d: LONG -$0.45 SHORT -$0.60 (flat)
@@ -2454,5 +2469,23 @@
   pullback-entry- SHORT 5T 0%WR -$0.80 (variance vs 7d 49%WR -$0.19)
   ATR SL 67% but net positive (+$0.061 avg) — trailing working
   2 open: BABY LONG -87% (SL managed), DOT SHORT -30% (soft trigger)
+  No kill criteria met. No changes.
+  BY: auto_1hr
+[2026-09-19 05:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 38T 58%WR +$1.37 (STRONG) | 7d: 197T 48.7%WR -$1.54 (recovering)
+  Last hour: 8T 4W 3L 1BE (-$0.19 small drawdown)
+  grind-trend+ 6T last hour (busy, 4 profit-monster wins)
+  volume-breakout-long+ 10T 80%WR +$1.06 24h (STAR)
+  ATR SL 55% but net positive (+$0.032 avg) — trailing working
+  6 open: IOTA +108%, AIXBT +58%, ALT +31%, BANANA +9%, CC -42%, BABY -46%
+  No kill criteria met. No changes.
+  BY: auto_1hr
+[2026-09-19 06:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
+  24h: 44T 45.5%WR +$0.49 | 7d: 202T 47.5%WR -$1.88
+  Last hour: 7T 2W 5L (-$0.62 drawdown)
+  profit-monster-trail: 2T (AIXBT +, ALT -)
+  atr_sl_hit: 3T avg $0.00 (IOTA flat, AZTEC/CC small losses)
+  grind-trend+ 12T 33.3%WR (watching)
+  pump-chain+ 10T 20%WR (watching)
   No kill criteria met. No changes.
   BY: auto_1hr

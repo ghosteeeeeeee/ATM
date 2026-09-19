@@ -1,3 +1,24 @@
+## CEO Report — 2026-09-19 ~02:40 UTC
+
+### Diagnosis
+DB-verified. 24h: 30T, 60.0%WR, +$1.56 (STRONG — best 24h in days). 7d: 192T, 50.5%WR, -$0.84 (legacy aging out). 2 open. Market NEUTRAL. **gap_at_entry: 0/192 trades** — silently broken since deployment. Stale filter working: fresh +$0.15 vs stale -$0.99 (gap $1.14/7d). Eval due 10:00 UTC today.
+
+### Root Cause
+`get_price_history(token, timeframe='5m', limit=310)` in decider_run.py:3991 — function signature is `get_price_history(token, lookback_minutes=1440)`. Wrong keyword args → silent exception → gap_at_entry never computed. Also, candle tuples are `(timestamp, price)` not OHLCV — `c[4]` should be `c[1]`.
+
+### Fix Applied
+**CODE FIX:** decider_run.py:3991 — `get_price_history(token, lookback_minutes=1550)` + `c[1]` instead of `c[4]`. Verified: SOL gap computed correctly (0.31%). All future trades will have gap_at_entry in _signal_metadata. Enables MAX_ENTRY_GAP filter, chase detection, regime-specific gap thresholds. **Pipeline restart needed.**
+
+### Verification
+SOL: EMA300=113.28, Price=113.64, Gap=0.31%. All 5 Sep 19 trades already have staleness_minutes (working). gap_at_entry will appear on next pipeline cycle.
+
+### Monitoring
+1. **Stale filter eval: 10:00 UTC today** — fresh +$0.15 vs stale -$0.99, gap $1.14/7d. Likely extend.
+2. **pullback-entry- SHORT:** 66T 48.5%WR -$0.35 (30d +$1.66 NEUTRAL). Slight 7d dip, within variance.
+3. **Legacy aging out:** trend_purity+ -$0.92, rr-struct-v2+ -$0.45, open-skies+ -$0.40, breakout-long+ -$0.35, rr-struct- -$0.30. All killed. Will age out by Sep 22-24.
+4. **Sep 19 cold start:** 7T 14.3%WR -$0.78. Too early to diagnose — 7 trades only.
+5. **z_score chasing:** brain_auditor found 6 LONG trades with z_score>2.5 — 1W 5L -$0.69. Suggested LONG_ZSCORE_MAX=2.0.
+
 ## CEO Report — 2026-09-18 ~20:00 UTC
 
 ### Diagnosis

@@ -181,3 +181,36 @@
 ## Error Alerts — 2026-09-19 00:56 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3139s left, N failures)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3079s left, N failures)`
+
+## Error Alerts — 2026-09-19 01:45 UTC
+- **CRITICAL** (Nx): `67,047 signals accumulated in signals table (66,272 >24h old)`
+- **AUTO-FIX**: Purged 66,272 stale signals. Remaining: 775. Root cause: signal_purge only clears executed signals, not stale unexecuted ones.
+- **WARN** (5x): `DOGE SHORT trade rejected — amount_usdt=8.25 < HL_MIN=11.0`
+- **AUTO-FIX**: None — trade size below HL minimum, signal keeps retrying each cycle. Consider adding DOGE to short blacklist or adjusting min trade size.
+- **WARN**: `0% winrate today (0W/1L), -$0.70 PnL`
+
+## Error Alerts — 2026-09-19 01:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-09-19 02:45 UTC
+- **[WARN]** (1x): `Disk usage at 83% (93G/118G)` — approaching 85% threshold
+- **AUTO-FIX**: None applied. No old logs to compress. Manual rotation recommended for pipeline.log (50MB) and signal-compactor.log (43MB).
+
+## Error Alerts — 2026-09-19 02:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Error Alerts — 2026-09-19 03:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.2s)`
+
+## Error Alerts — 2026-09-19 05:56 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   [_get_meta] fetch failed: <urlopen TOK [Errno -N] Temporary failure in name resolution>`

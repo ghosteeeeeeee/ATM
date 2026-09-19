@@ -1169,5 +1169,34 @@
     "category": "exit optimization",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-19T02:36:00Z",
+    "idea": "Add LONG_ZSCORE_MAX=2.0 filter — block LONG entries when z_score > 2.0",
+    "rationale": "6 LONG trades with z_score>2.5 in 7d: 1W 5L, -$0.69. Entering LONG at 2.5+ std devs above mean = chasing. ONDO RSI=97.78 + z_score=2.10 = overbought chase.",
+    "expected_impact": "Prevent ~$0.60/7d in losses from chasing overextended LONG entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — small sample (6 trades) but very clear signal (16.7% WR)",
+    "impact_on_winners": "Would block 1 winner (ME +$0.09) in 7d — acceptable"
+  },
+  {
+    "date": "2026-09-19T02:36:00Z",
+    "idea": "Monitor cut-loser-CL-T1 after fire window change — if 0% WR persists after 20+ trades, investigate",
+    "rationale": "4T 0%WR -$0.40/7d. Fire window widened Sep 18 (1,2)->(2,3). Need 20+ trades to evaluate.",
+    "expected_impact": "monitor only",
+    "category": "exit optimization",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-19T02:36:00Z",
+    "idea": "Regime transition tracking — trades entering during regime CHANGE may have different edge",
+    "rationale": "EXTREME 53.8%WR vs HIGH 48.1%WR. If we can detect regime shifts early, we could adapt.",
+    "expected_impact": "Informational first — need 50+ regime transition events",
+    "category": "regime intelligence",
+    "status": "suggested",
+    "risk": "low — monitoring only",
+    "sample_size": "insufficient — need 50+ regime transition events"
   }
 ]

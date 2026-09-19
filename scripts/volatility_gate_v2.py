@@ -102,6 +102,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
     'HIGH': {
