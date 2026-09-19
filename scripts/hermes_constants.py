@@ -2002,6 +2002,29 @@ GRIND_BREAKOUT_CONF_ACCEL_BONUS = 3         # extra for strong acceleration
 GRIND_BREAKOUT_CONF_BREAKOUT_BONUS = 2      # extra for clean breakout
 GRIND_BREAKOUT_CONF_PURITY_BONUS = 2        # extra for high purity
 GRIND_BREAKOUT_BREAKOUT_BONUS_BUFFER = 0.005  # 0.5% above range for breakout bonus
+
+# ── grind_trend (accumulation grind — steady drift, no breakout needed) ───────
+# grind_trend.py — low-volatility accumulation grind signal
+GRIND_TREND_ENABLED = True                # master kill-switch
+GRIND_TREND_PLUS_ENABLED = True           # LONG direction
+GRIND_TREND_MINUS_ENABLED = True          # SHORT direction
+GRIND_TREND_COOLDOWN_HOURS = 3            # per token+direction cooldown
+# Trend detection
+GRIND_TREND_SLOPE_MIN = 0.003             # min linear regression slope (%/bar)
+GRIND_TREND_LOOKBACK = 60                 # bars for slope/SMA calculation
+GRIND_TREND_HL_LOOKBACK = 20              # bars for higher-lows check
+# Volatility filter
+GRIND_TREND_ATR_MAX_PCT = 0.8             # max ATR% — grind = low vol (<0.8%)
+# RSI filter
+GRIND_TREND_RSI_MIN = 35                  # not oversold
+GRIND_TREND_RSI_MAX = 65                  # not overbought
+# Confidence
+GRIND_TREND_CONF_BASE = 75                # base confidence
+GRIND_TREND_CONF_FLOOR = 50               # min confidence
+GRIND_TREND_CONF_CAP = 88                 # max confidence (system ceiling)
+GRIND_TREND_CONF_SLOPE_BONUS = 5          # extra for strong slope
+GRIND_TREND_CONF_ATR_BONUS = 3            # extra for very low volatility
+GRIND_TREND_CONF_HL_BONUS = 3             # extra for consistent higher-lows
 GRIND_BREAKOUT_PURITY_BONUS_MIN = 0.80      # purity threshold for bonus
 # Data
 GRIND_BREAKOUT_LOOKBACK_1M = 200            # 1m bars to fetch
@@ -3404,7 +3427,7 @@ PUMP_FLOW_COOLDOWN_HOURS = 0.083       # per-token cooldown after pump flow sign
 PUMP_FLOW_MAX_PER_CYCLE = 3            # max pump flow signals per pipeline run
 PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
 PUMP_FLOW_RESERVED_SLOTS = 1           # slots reserved exclusively for pump-chain
-PUMP_FLOW_MAX_POSITIONS = 2            # max concurrent pump-chain positions (reduced from 4, 2026-09-14)
+PUMP_FLOW_MAX_POSITIONS = 3            # max concurrent pump-chain positions
 PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity
 PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
 PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal
