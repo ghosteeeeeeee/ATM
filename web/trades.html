@@ -295,17 +295,17 @@
       const isHallFame = HALL_OF_FAME.has(sym);
       const isHallShame = HALL_OF_SHAME.has(sym);
 
-      // Direction-specific icons
+      // Direction-specific icons (Hall of Fame/Shame take priority)
       if (direction === 'LONG') {
-        if (isHallShame) return '<span class="loser-icon" title="LONG Hall of Shame">💀↑</span>';
+        if (isHallShame && isLongLoser) return '<span class="loser-icon" title="LONG Hall of Shame">💀↑</span>';
         if (isLongLoser) return '<span class="loser-icon" title="LONG Loser">🗑️↑</span>';
-        if (isHallFame && isLongFav) return '<span class="fav-star-top" title="LONG Hall of Fame">🏆↑</span>';
+        if (isHallFame) return '<span class="fav-star-top" title="LONG Hall of Fame">🏆↑</span>';
         if (isLongFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="LONG Top Favorite">⭐↑</span>';
         if (isLongFav) return '<span class="fav-star" title="LONG Favorite">❤↑</span>';
       } else if (direction === 'SHORT') {
-        if (isHallShame) return '<span class="loser-icon" title="SHORT Hall of Shame">💀↓</span>';
+        if (isHallShame && isShortLoser) return '<span class="loser-icon" title="SHORT Hall of Shame">💀↓</span>';
         if (isShortLoser) return '<span class="loser-icon" title="SHORT Loser">🗑️↓</span>';
-        if (isHallFame && isShortFav) return '<span class="fav-star-top" title="SHORT Hall of Fame">🏆↓</span>';
+        if (isHallFame) return '<span class="fav-star-top" title="SHORT Hall of Fame">🏆↓</span>';
         if (isShortFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="SHORT Top Favorite">⭐↓</span>';
         if (isShortFav) return '<span class="fav-star" title="SHORT Favorite">❤↓</span>';
       }
