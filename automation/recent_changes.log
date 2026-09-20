@@ -1,3 +1,9 @@
+[2026-09-20 13:11 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 32T 62.5%WR +$1.32 | 7d: 216T 48.6%WR +$0.29. Pipeline OK.
+  FINDING: 3 stale open trades (400+ min) — position_manager stale exit gap (0% PnL falls between loser/winner thresholds). Needs hard MAX_HOLD_MINUTES.
+  FINDING: pump-chain+ LONG hour 0 uncovered by TIME_BLOCK. Extending START from 1→0 would save ~$0.41/7d.
+  BY: auto_1hr
+
 [2026-09-20 10:50 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 24h 34T | 7d 218T 49.1%WR +$0.51. Market NEUTRAL. 8 open.
   LOSING AUTOPSY: 10 losers — all normal variance or legacy. No actionable entry failures.

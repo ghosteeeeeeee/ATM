@@ -80,6 +80,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Active Decisions
 
+- **JEV/Von ASSESSMENT: HOLD.** Von (open source JEV clone) is free local but no text data in pipeline. sklearn classifier ~200 lines but signal diversity is the bottleneck, not scoring. Revisit when 5+ signal types pass confluence in NEUTRAL (est. late Oct/Nov). — 2026-09-20
 - **CHASE FILTER ACTIVE.** CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. Blocks LONG chasing. Pipeline restart needed. **EXPECTED:** +$1.25/7d. — 2026-09-19
 - **STALE FILTER:** Working. 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). EXTREME SHORT fresh 83.3%WR +$0.98 = edge. — 2026-09-19
 - **grind-trend+ NORMAL BLOCKED.** signal_reporter 05:12 UTC Sep 19. 0%WR (5T). Wins HIGH 57.1%. — 2026-09-19

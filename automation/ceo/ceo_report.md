@@ -401,3 +401,56 @@ The `ML_WEIGHT = 0.6` + `HEBBIAN_WEIGHT = 0.4` default means ML dominates scorin
 ### Spec quality
 
 No issues with the spec itself — it's well-designed. The model choice (RF), feature set, fail-open design, and retraining strategy are all sound. It's a "right build, wrong time" situation.
+
+---
+
+## CEO Report — 2026-09-20 ~15:00 UTC — JEV/Von Updated Assessment
+
+### Previous Assessment (Sep ~10)
+REJECTED — wrong time, signal diversity is the bottleneck. Revisit after 10K+ trades and 3+ new signals.
+
+### What Changed
+
+Open source alternatives alter the cost/benefit:
+
+| Factor | Before (JEV) | Now (Von/sklearn) |
+|--------|-------------|-------------------|
+| Cost | $$$ API calls | $0 local |
+| Setup | Complex API integration | sklearn: ~200 lines, 1 day |
+| Latency | Network round-trip | ~18ms GPU, ~480ms CPU |
+| Accuracy | 97.2% (JEV) | 93.5% (Von), sklearn varies |
+| Text classification | Only option | Von is viable for news/sentiment |
+
+### Updated Verdict: STILL HOLD — but the "when" moved up
+
+**Three questions, three answers:**
+
+**1. Should we build a minimal sklearn classifier (1-day prototype)?**
+**No — but the reason changed.** Previously: "wait for 10K trades." Now: "the bottleneck is still signal diversity." DB shows 5,204 closed trades (not 5K — we've grown). But the constraint isn't data volume, it's that only 2 signal types fire in NEUTRAL. A classifier that scores signals better doesn't help when there are no signals to score. The bar chart metaphor still holds: installing a better sorting algorithm on an empty shelf.
+
+**But:** if someone builds a new NEUTRAL signal and it fires 50+ times, THEN a 1-day sklearn prototype to score it is trivial. The 1-day estimate is credible — `CalibratedClassifierCV` + `StandardScaler` + 5-fold CV is literally 150 lines. The right move: build the signal first, classifier second.
+
+**2. Should we evaluate Von for text-based signal classification?**
+**No — we have no text data.** Von classifies text (news, sentiment, social). Hermes processes numeric indicators (RSI, momentum, gaps, regime). There's no text pipeline. Von is a solution looking for a problem. If we ever add news sentiment analysis, Von becomes relevant — but that's a new feature, not a scoring upgrade.
+
+**3. Or still hold off until 10K+ trades?**
+**Yes — but the timeline is organic, not artificial.** At ~30 trades/day, we hit 10K in ~5 months (Feb 2027). But the real trigger isn't trade count, it's signal diversity. When we have 5+ signal types passing confluence in NEUTRAL, THEN a classifier that learns which conditions predict wins becomes valuable. Right now we're choosing between 2 signal types — there's nothing to classify.
+
+### Bottom Line
+
+| Question | Answer | Reason |
+|----------|--------|--------|
+| Von for text? | Skip | No text data in pipeline |
+| sklearn prototype? | Defer | Build signal first, classifier second |
+| Hold off? | Yes | Signal diversity still the bottleneck |
+
+**The right time to build the classifier is when we have 5+ active signal types in NEUTRAL and want to score which conditions predict wins for each.** That's probably late Oct/Nov 2026, not because of trade count but because of signal portfolio maturity.
+
+### What I'm doing instead
+
+Focus stays on:
+1. **NEUTRAL signal development** (coin_tracker-based: Wyckoff phase, Elliott Wave, volume profile)
+2. **Regime-specialist tuning** (keep signals alive in winning regimes)
+3. **Dead zone / stale filter monitoring** (proven edge, let it compound)
+
+The classifier is a tuning knob. New signals are capacity. Capacity first.

@@ -147,3 +147,22 @@
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-20 12:44 UTC
+- **WARN** (Nx1): Disk usage at 85% (94G/118G, 18G free)
+- **AUTO-FIX**: None applied yet. Monitor — compress old logs if >90%.
+
+## Error Alerts — 2026-09-20 13:44 UTC
+- **WARN** (disk): 84% used (94G/118G) — approaching 85% threshold. pipeline.log=89M, compactor=52M. Consider compressing old logs if usage continues.
+- **INFO** (positions): 7/6 open positions — over limit, new entries being skipped. Position manager running, no SL/TP triggered. Monitor for stuck positions.
+
+## Error Alerts — 2026-09-20 13:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-20 15:46 UTC
+- **WARN** (1x): `signal_compactor timed out (killed after 60.1s)` at 15:22 — auto-recovered, subsequent runs 1.2-1.6s
+- **WARN**: Disk at 85% (94G/118G) — pipeline.log=91M, signal-compactor.log=52M
+
+## Error Alerts — 2026-09-20 15:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`

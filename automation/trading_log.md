@@ -1,3 +1,38 @@
+## [2026-09-20 13:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet period after pipeline restart)
+**24h:** 32T 62.5%WR +$1.32 | **7d:** 216T 48.6%WR +$0.29
+
+**24h by exit reason:**
+- atr_sl_hit: 28/32 (87.5%) — SL doing its job, tight cuts, winners run
+- cut-loser-CL-T1: 2T -$0.22
+- profit-monster-trail: 2T +$0.11
+
+**24h signal ranking (winner → loser):**
+- pump-chain+: 17T 59%WR +$0.67 — STAR, carrying the system
+- pullback-entry-: 9T 67%WR +$0.38 — solid
+- grind-trend-: 3T 33%WR -$0.20 — already KILLED (GRIND_TREND_MINUS_ENABLED=False)
+
+**No Change Needed:**
+- Pipeline running (restarted 13:09 UTC)
+- 24h net positive — no emergency
+- No losing signals with volume to kill
+- grind-trend- already killed Sep 19
+
+**FINDING — Stale Trade Gap (no action this hour):**
+3 trades open 400+ min (GMT, BLUR, ME — all pullback-entry- SHORT). Position manager stale exit NOT firing because:
+- Stale loser requires live_pnl <= -0.6% AND stalled
+- Stale winner requires live_pnl >= +0.6% AND stalled
+- Trades near breakeven (0%) fall in the gap — never caught
+- No hard max-hold-time exists in the system
+- **Recommendation:** Add a hard MAX_HOLD_MINUTES (e.g., 360) that closes any trade still open. Needs CEO approval + backtest.
+
+**FINDING — pump-chain+ dead zone (0-4 UTC):**
+- Hour 0: 3T 0W -$0.41 (uncovered by TIME_BLOCK which starts at hour 1)
+- Hours 1-4: 15T 2W -$1.39 (covered by TIME_BLOCK penalty 0.7x but still losing)
+- Hours 5-23: 27T 19W +$3.46 — STRONG
+- brain_auditor already flagged this. Simple fix: extend TIME_BLOCK_START from 1 to 0. Needs CEO approval.
+
 ## [2026-09-19 06:35 UTC] Daily Orchestrator
 
 **No config changes — pipeline stable, no critical issues requiring action.**
@@ -2990,6 +3025,26 @@ Final set: ['DOT', 'HYPER', 'SEI']
 - No overtrading
 - 24h profitable, 7d improving
 - System healthy
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-20 14:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet), **24h:** 33T 87.9%WR +$0.98
+**Open:** 5 positions open, all reasonable
+
+**Diagnosis:**
+1. **Entry quality:** 24h 87.9% WR — excellent
+2. **SL behavior:** atr_sl_hit = 90.9% of closes, profitable (+$0.037 avg) — trailing working
+3. **Signal quality:** grind-trend- at 0% WR but only 2 trades (kill threshold = 3+). No kill candidates
+4. **Trade frequency:** 3T in last 6h — quiet period, normal
+5. **Open positions:** 5 at cap, mixed long/short
+
+**No Change Needed:**
+- No kill candidates
+- No overtrading
+- 24h profitable, system healthy
 
 **Status:** System stable, no action required.
 **BY:** auto_1hr
