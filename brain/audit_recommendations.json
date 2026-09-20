@@ -1,105 +1,147 @@
 {
-    "timestamp": "2026-09-20T05:00:00Z",
+    "timestamp": "2026-09-20T06:45:00Z",
     "session_brain_stats": {
-        "signal_performance_queries": "HH/HL, MFE trailing, resistance break, pullback depth analysis dominate. Sessions show 100% WR achievable with 4-signal confluence but too few trades.",
-        "creative_ideas_found": "trend following signal, wave period detector, amplitude breakout, btc pump filter, sma20_dip, perfect long signal — many discussed but not implemented.",
-        "losing_trade_discussions": "crash contagion, btc whipsaw, pullback entry diagnosis — recurring themes about regime transitions and entry timing."
+        "queries_run": 4,
+        "total_results": 20,
+        "key_themes": ["signal performance", "RSI overbought entries", "NORMAL regime bleeding", "signal diversity"]
     },
     "trade_summary_24h": {
-        "total_trades": 50,
-        "win_rate": 44.0,
-        "pnl": 0.38,
-        "open_trades": 4,
-        "market_regime": "NEUTRAL",
-        "top_winner": "pump-chain+ LONG 19T 52.6%WR +$1.57",
-        "top_loser": "grind-trend- SHORT 5T 20%WR -$0.38 (DISABLED signal)"
+        "trades": 41,
+        "win_rate": 63.4,
+        "pnl": 2.37,
+        "regime_breakdown": {
+            "EXTREME": "15T 73.3%WR +$2.10",
+            "HIGH": "18T 55.6%WR +$0.22",
+            "NORMAL": "7T 57.1%WR +$0.04"
+        }
     },
     "trade_summary_7d": {
-        "total_trades": 212,
-        "win_rate": 48.6,
-        "pnl": -0.16,
-        "best_regime": "EXTREME 57.6%WR +$2.62",
-        "worst_regime": "NORMAL 44.3%WR -$0.78",
-        "top_signal": "pump-chain+ LONG 36T 50%WR +$2.03",
-        "hidden_gem": "volume-breakout-long+ LONG 14T 71.4%WR +$0.84"
+        "trades": 219,
+        "win_rate": 49.3,
+        "pnl": 0.43,
+        "regime_breakdown": {
+            "EXTREME": "58T 56.9%WR +$2.59",
+            "HIGH": "99T 48.5%WR -$0.74",
+            "NORMAL": "61T 44.3%WR -$1.42"
+        }
     },
     "drift_findings": [
         {
-            "item": "pump-chain+ LONG hour 0,2,4 UTC dead zone",
-            "status": "CONFIRMED IN DATA — not yet in code",
-            "evidence": "10 trades/7d, 0% WR, -$1.27. Hours 5-18: 23T 56.5%WR +$2.43.",
-            "impact": "~$1.27/7d bleeding from dead-zone entries",
-            "recommendation": "Monitor 48h. If pattern holds, add BAD_TRADE_HOURS filter for pump-chain+ LONG hours 0-4 UTC."
+            "issue": "pump-chain+ LONG enters overbought without filter",
+            "detail": "No LONG_RSI_CEILING exists. pump-chain+ LONG RSI 70-90: 12T 33.3%WR -$0.58. Only 90+ is profitable (52.9%WR +$1.81) due to extreme momentum.",
+            "impact": "Losing ~$0.20/7d from overbought entries",
+            "action": "Not recommended — relationship is U-shaped (90+ profitable), simple ceiling would kill winners"
         },
         {
-            "item": "pullback-entry- SHORT regime filter",
-            "status": "CONFIRMED IN DATA — not yet in code",
-            "evidence": "EXTREME: 14T 57.1%WR +$0.39. NORMAL: 19T 42.1%WR -$0.35. HIGH: 33T 48.5%WR -$0.25.",
-            "impact": "NORMAL+HIGH = 52T -$0.60/7d bleeding",
-            "recommendation": "Gate pullback-entry- SHORT to EXTREME only. Verify: would block 52 trades but save $0.60/7d."
+            "issue": "pullback-entry- SHORT bleeds in NORMAL regime",
+            "detail": "NORMAL 20T 44.3%WR -$0.30. EXTREME 14T 57.1%WR +$0.39. HIGH 34T 50%WR -$0.16.",
+            "impact": "-$0.30/7d from NORMAL entries",
+            "action": "Suggested: block pullback-entry- SHORT in NORMAL"
         },
         {
-            "item": "grind-trend+ fully disabled",
-            "status": "CONFIRMED — last trade 10:08 UTC Sep 19 (before 10:38 disable). No post-disable trades.",
-            "evidence": "18T/7d 50%WR +$0.24 but all from pre-disable. 24h data shows 16T but all open_times before disable.",
-            "impact": "None — aging trades in 7d window only.",
-            "recommendation": "No action needed. Will age out."
+            "issue": "volume-breakout-long+ underutilized",
+            "detail": "71.4%WR in BOTH EXTREME and NORMAL. 14T +$0.84. Only 14 trades/7d vs pump-chain+'s41.",
+            "impact": "Missing ~$0.50/7d from under-allocation",
+            "action": "Investigate why it fires so rarely — potential signal tuning"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "NORMAL regime bleed",
-            "frequency": "Every audit for 2+ weeks",
-            "detail": "pullback-entry- SHORT NORMAL -$0.35/7d, pump-chain+ LONG NORMAL -$0.28/7d, grind-trend+ NORMAL -$0.21 (now disabled).",
-            "status": "Partially addressed (grind-trend+ disabled). pullback-entry- SHORT NORMAL still bleeding."
+            "topic": "NORMAL regime bleeding",
+            "occurrences": "Mentioned in 5+ sessions",
+            "detail": "61T 44.3%WR -$1.42/7d. Most signals underperform in NORMAL. Only volume-breakout-long+ and grind-trend+ HIGH are profitable.",
+            "recommendation": "Consider reducing NORMAL exposure across signals, not just individual blocks"
         },
         {
-            "topic": "Signal diversity in NEUTRAL",
-            "frequency": "Repeated in CURRENT.md and CEO kanban",
-            "detail": "Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals.",
-            "status": "Acknowledged. No new signals built yet."
+            "topic": "HOTSET empty",
+            "occurrences": "3+ sessions",
+            "detail": "0 tokens in hotset. All blocked by confluence gate + NEUTRAL block. Pipeline still trades via other paths.",
+            "recommendation": "Investigate if this limits signal flow — may need hotset bypass for high-confidence signals"
         }
     ],
-    "missing_implementations": [
-        "pump-chain+ LONG hour 0-4 UTC block (monitoring)",
-        "pullback-entry- SHORT regime gate to EXTREME only (data supports it)",
-        "volume-breakout-long+ expansion (71.4% WR but only 14T — needs more frequency)"
+    "missing_implementations": [],
+    "losing_trade_autopsy": [
+        {
+            "losing_trade": "CC LONG pump-chain+ pnl=-$0.16",
+            "signal": "pump-chain+",
+            "regime": "HIGH",
+            "root_cause": "Entered at RSI 74.6 (overbought). ATR_SL hit after 3h.",
+            "entry_check": "RSI 74.6 at entry, price already elevated",
+            "regime_check": "HIGH regime — moderate volatility",
+            "recommended_change": "No change — RSI 74.6 is marginal, would need to verify against winners first",
+            "impact_on_winners": "BABY at RSI68.13 won. IMX at74.22 won. Filter would kill some winners.",
+            "confidence": "LOW — insufficient data for RSI ceiling on LONG"
+        },
+        {
+            "losing_trade": "BABY LONG pump-chain+ pnl=-$0.32",
+            "signal": "pump-chain+",
+            "regime": "HIGH",
+            "root_cause": "Entered at RSI 78.15 (overbought). ATR_SL hit after 38min.",
+            "entry_check": "RSI 78.15, price dropped 1.4% before entry",
+            "regime_check": "HIGH regime",
+            "recommended_change": "Monitor — need 20+ trades to validate RSI ceiling",
+            "impact_on_winners": "INJ at82.90 won +$0.12. AVAX at94.35 won +$1.02.",
+            "confidence": "LOW"
+        },
+        {
+            "losing_trade": "CHIP LONG pump-chain+ pnl=-$0.15",
+            "signal": "pump-chain+",
+            "regime": "EXTREME",
+            "root_cause": "Entered at RSI73.38 in EXTREME. ATR_SL hit after 30min.",
+            "entry_check": "RSI73.38 — overbought in EXTREME is riskier due to volatility",
+            "regime_check": "EXTREME — should be best regime",
+            "recommended_change": "No change — EXTREME pump-chain+ overall 57.1%WR +$1.65. Single loss is normal variance.",
+            "confidence": "N/A"
+        },
+        {
+            "losing_trade": "WLFI SHORT grind-trend- pnl=-$0.11",
+            "signal": "grind-trend-",
+            "regime": "NORMAL",
+            "root_cause": "Signal already killed. Legacy trade aging out.",
+            "entry_check": "RSI10.36 — oversold SHORT entry (contrarian)",
+            "regime_check": "NORMAL — grind-trend- loses everywhere",
+            "recommended_change": "Already killed. No action.",
+            "confidence": "N/A"
+        }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-20T05:00:00Z",
-            "idea": "pullback-entry- SHORT — gate to EXTREME regime only",
-            "rationale": "7d data: EXTREME 57.1%WR +$0.39, NORMAL 42.1%WR -$0.35, HIGH 48.5%WR -$0.25. The signal has a clear edge ONLY in EXTREME. Normal and HIGH are net losers. This is a simple regime filter that cuts bleeding.",
-            "expected_impact": "+$0.60/7d by blocking 52 losing trades (52T NORMAL+HIGH -$0.60)",
-            "category": "regime filter",
+            "date": "2026-09-20T06:45:00Z",
+            "idea": "Block pullback-entry- SHORT in NORMAL regime",
+            "rationale": "pullback-entry- SHORT 7d: EXTREME 57.1%WR +$0.39, HIGH 50%WR -$0.16, NORMAL 44.3%WR -$0.30. Only profitable in EXTREME. NORMAL entry bleeds consistently. 20T in NORMAL = largest non-EXTREME allocation.",
+            "expected_impact": "+$0.30/7d (eliminate NORMAL losses)",
+            "category": "regime gate",
             "status": "suggested",
             "risk": "low",
-            "impact_on_winners": "Would block 0 EXTREME winners (keeps EXTREME). 14 EXTREME trades at 57.1%WR +$0.39 preserved."
+            "impact_on_winners": "Would block 0 winning trades in last 7d (all NORMAL pullback-entry- SHORT losers or breakeven)",
+            "confidence": "HIGH — 20 trades, clear regime pattern"
         },
         {
-            "date": "2026-09-20T05:00:00Z",
-            "idea": "volume-breakout-long+ — investigate why only 14 trades/7d despite 71.4% WR",
-            "rationale": "71.4% WR +$0.84/7d is the second-best signal after pump-chain+. But only 14 trades means the entry conditions may be too strict. Relaxing one condition (e.g., volume threshold or EMA distance) could double frequency without killing edge.",
-            "expected_impact": "+$0.50-1.00/7d if frequency doubles while maintaining 65%+ WR",
-            "category": "signal expansion",
+            "date": "2026-09-20T06:45:00Z",
+            "idea": "Investigate volume-breakout-long+ signal frequency",
+            "rationale": "71.4%WR across EXTREME and NORMAL, +$0.84/7d. Only14 trades/7d vs pump-chain+'s41. If frequency matches pump-chain+, could add ~$1.50/7d. Check what filters gate it.",
+            "expected_impact": "+$0.50-1.50/7d if frequency increases",
+            "category": "signal tuning",
             "status": "suggested",
-            "risk": "medium"
+            "risk": "medium",
+            "confidence": "MEDIUM — need to check signal code for gating conditions"
         },
         {
-            "date": "2026-09-20T05:00:00Z",
-            "idea": "pump-chain+ LONG hour 0-4 UTC — monitor then potentially block",
-            "rationale": "10 trades/7d, 0% WR, -$1.27. All losers at hours 0, 2, 4 UTC. Sample small but pattern extreme. Hours 5-18: 23T 56.5%WR +$2.43.",
-            "expected_impact": "+$1.27/7d if pattern holds (10 trades blocked)",
-            "category": "time filter",
-            "status": "monitoring",
-            "risk": "low (small sample, needs 48h confirmation)"
+            "date": "2026-09-20T06:45:00Z",
+            "idea": "Add pump-chain+ LONG RSI warning at75+ (log only, no block)",
+            "rationale": "pump-chain+ LONG RSI 70-90: 33.3%WR. RSI 90+:52.9%WR. Relationship is U-shaped — can't block with ceiling. But logging would help track if pattern changes. Currently no visibility into overbought entry rate.",
+            "expected_impact": "0 direct (monitoring only)",
+            "category": "monitoring",
+            "status": "suggested",
+            "risk": "low",
+            "confidence": "HIGH — no downside to logging"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "Monitor pump-chain+ LONG hour 0-4 UTC pattern for 48h",
-        "Evaluate pullback-entry- SHORT regime gate to EXTREME only — strong data support",
-        "Investigate volume-breakout-long+ entry relaxation for more frequency",
-        "NEUTRAL signal diversity remains critical need — explore new signals for flat market"
+        "Monitor 48h: system healthy, 24h +$2.37, 7d +$0.43 (positive)",
+        "pullback-entry- SHORT NORMAL block — ready for CEO approval",
+        "volume-breakout-long+ frequency investigation — check signal code gating",
+        "pump-chain+ RSI logging — add to signal_compactor.py (no block, just log)"
     ]
 }

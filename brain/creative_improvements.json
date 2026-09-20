@@ -1321,5 +1321,54 @@
     "sample_size": "18 trades (minimum met)",
     "impact_on_winners": "Would block ~20% of EXTREME trades (4/18). Check if any winners blocked.",
     "confidence": "MEDIUM"
+  },
+  {
+    "date": "2026-09-20T05:45:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "BTC Trend Alignment Confidence Boost for LONG entries",
+        "rationale": "ALL LONGs in BTC BULL_TREND: 60T 60%WR +$1.34. ALL LONGs in BTC BEAR_TREND: 52T 36.5%WR -$1.63. BTC regime is a massive predictor. Add +10% confidence when BTC is BULL_TREND and -10% when BEAR_TREND.",
+        "expected_impact": "+$0.50-1.00/7d",
+        "category": "entry sniper",
+        "status": "suggested",
+        "risk": "low"
+      },
+      {
+        "idea": "pump-chain+ LONG RSI sweet-spot boost (RSI 40-60)",
+        "rationale": "pump-chain+ LONG RSI 40-60: 70%WR +$1.88. RSI 60-70: 37.5%WR -$0.55. Edge concentrated in RSI 40-60. Add confidence boost for this range.",
+        "expected_impact": "+$0.30-0.50/7d",
+        "category": "entry sniper",
+        "status": "suggested",
+        "risk": "low"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-20T06:45:00Z",
+    "idea": "Block pullback-entry- SHORT in NORMAL regime",
+    "rationale": "pullback-entry- SHORT 7d: EXTREME 57.1%WR +$0.39, NORMAL 44.3%WR -$0.30. Only profitable in EXTREME. 20T in NORMAL = largest non-EXTREME allocation.",
+    "expected_impact": "+$0.30/7d",
+    "category": "regime gate",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-20T06:45:00Z",
+    "idea": "Investigate volume-breakout-long+ signal frequency",
+    "rationale": "71.4%WR across EXTREME and NORMAL, +$0.84/7d. Only14 trades/7d vs pump-chain+'s41. Check what filters gate it.",
+    "expected_impact": "+$0.50-1.50/7d if frequency increases",
+    "category": "signal tuning",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-20T06:45:00Z",
+    "idea": "Add pump-chain+ LONG RSI warning at75+ (log only)",
+    "rationale": "RSI 70-90:33.3%WR. RSI 90+:52.9%WR. U-shaped — can't block. Logging helps track pattern changes.",
+    "expected_impact": "0 direct (monitoring)",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

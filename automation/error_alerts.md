@@ -87,3 +87,28 @@
 - **OK**: Regime NEUTRAL (116 neutral, 3 long bias, 1 short bias). 127 tokens at >=50th percentile speed.
 - **OK**: All 50+ hermes timers active and firing. HL sync guardian active.
 - **AUTO-FIX**: Attempted log compression — files already compressed, minimal space freed. Disk stable at 84%.
+
+## Error Alerts — 2026-09-20 03:44 UTC
+- **CRITICAL** (Nx): `signal_compactor: FAILED (rc=1)` — IndentationError at line 2259
+- **CRITICAL** (Nx): `position_manager: FAILED (rc=1)` — cascading from signal_compactor import error
+- **AUTO-FIX**: Fixed extra space indentation in signal_compactor.py line 2258 (log statement was 21 spaces instead of 20). Restarted hermes-pipeline.service. Verified clean run — no errors.
+
+## Error Alerts — 2026-09-20 03:56 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TOK position_manager: TOK (most recent call last):`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor, position_manager`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+
+## Error Alerts — 2026-09-20 04:56 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`
+
+## Error Alerts — 2026-09-20 06:56 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

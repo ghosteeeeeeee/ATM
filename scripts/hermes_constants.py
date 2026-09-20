@@ -254,12 +254,15 @@ FAVORITES_LONG = {
     'APT',
     'BABY',
     'BANANA',
-    'BIGTIME',
     'BLUR',
+    'CAKE',
+    'FIL',
     'FOGO',
+    'JUP',
     'LTC',
     'POL',
-    'SAND'
+    'SAND',
+    'SYRUP'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -289,8 +292,10 @@ LOSERS_SHORT = {
 # Legacy combined set
 LOSERS = {
     'DOT',
-    'HYPER'
+    'HYPER',
+    'SEI'
 }
+
 
 
 

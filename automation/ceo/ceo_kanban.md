@@ -1,5 +1,14 @@
 ## CEO DECISIONS
 
+- [2026-09-20 06:45 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 41T 63.4%WR +$2.37 | 7d 219T 49.3%WR +$0.43 (POSITIVE)
+  Market NEUTRAL. Pipeline running.
+  **LOSING AUTOPSY (11 losers 24h):** pump-chain+ LONG 7x ATR_SL — all overbought RSI 51-88. grind-trend- SHORT 4x — already killed, aging out.
+  **KEY FINDING:** volume-breakout-long+ is71.4%WR in BOTH EXTREME and NORMAL (+$0.84/7d) — hidden gem. Only14 trades/7d vs pump-chain+'s41.
+  **SUGGESTED:** Block pullback-entry- SHORT in NORMAL (20T 44.3%WR -$0.30). Investigate volume-breakout-long+ frequency.
+  **NO ACTION** — system healthy, monitoring 48h.
+  BY: brain_auditor
+
 - [2026-09-20 05:15 UTC] CEO: NO CONFIG CHANGE — verification + regime memory update
   DB-verified: 24h 50T 50.0%WR +$1.90 | 7d 216T 49.1%WR +$1.10 (FLIPPED POSITIVE)
   Market NEUTRAL. 4 open (2x pullback-entry- SHORT, 2x pump-chain+ LONG).
@@ -2542,4 +2551,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **REGIME BLEED:** pullback-entry- SHORT NORMAL 19T 42.1%WR -$0.35, HIGH 33T 48.5%WR -$0.25. EXTREME only: 14T 57.1%WR +$0.39.
   **CREATIVE:** (1) Gate pullback-entry- SHORT to EXTREME only (+$0.60/7d) — data strong, low risk. (2) Investigate volume-breakout-long+ frequency (71.4%WR but only 14T). (3) Monitor hour 0-4 pattern 48h.
   **NO ACTION** — all items need more data. Monitor 48h.
+  BY: brain_auditor
+
+- [2026-09-20 05:45 UTC] brain_auditor: NO CONFIG CHANGE — audit + creative improvements
+  DB-verified: 24h 43T 55.8%WR +$1.81 | 7d 218T 49.5%WR +$1.28
+  Market NEUTRAL. 3 open (WLFI SHORT, BABY LONG, CC LONG).
+  **EDGE CONFIRMED:** EXTREME 59T 57.6%WR +$2.65. pump-chain+ LONG EXTREME 21T 57.1%WR +$1.65.
+  **LOSING AUTOPSY:** 16 losers 24h. 7x pump-chain+ LONG ATR_SL (4 HIGH, 3 EXTREME). 4x grind-trend- SHORT CL-T1 (legacy, killed).
+  **RSI SWEET SPOT:** pump-chain+ LONG RSI 40-60 = 70%WR +$1.88. RSI 60-70 = 37.5%WR -$0.55.
+  **BTC REGIME:** ALL LONGs BULL_TREND 60%WR +$1.34. ALL LONGs BEAR_TREND 36.5%WR -$1.63.
+  **CREATIVE:** (1) BTC trend alignment confidence boost. (2) pump-chain+ RSI sweet-spot boost.
+  **NO ACTION:** System healthy, filters working (stale 4.9%, chase 58 blocks). Monitor 48h.
   BY: brain_auditor
