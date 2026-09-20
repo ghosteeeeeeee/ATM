@@ -3048,3 +3048,58 @@ Final set: ['DOT', 'HYPER', 'SEI']
 
 **Status:** System stable, no action required.
 **BY:** auto_1hr
+
+## [2026-09-20 16:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L, +$0.49, 75% WR)
+**24h:** 34T 55.9%WR +$0.99 | **7d:** 212T 48.6%WR +$0.15
+
+**Last hour closes:**
+- ME SHORT pullback-entry- atr_sl_hit +$0.33
+- GMT SHORT pullback-entry- atr_sl_hit +$0.26
+- BLUR SHORT pullback-entry- atr_sl_hit +$0.17
+- DOGE SHORT pullback-entry- atr_sl_hit -$0.27
+
+**Diagnosis:**
+1. **Entry quality:** 75% WR last hour, 56% 24h — acceptable
+2. **SL behavior:** atr_sl_hit = 94% of 24h closes, profitable (+$0.038 avg) — trailing stops working correctly
+3. **Signal quality:** No kill candidates. pullback-entry- leading at +$0.70/24h. grind-trend- at -$0.22 but only 2 trades
+4. **Trade frequency:** 1.4/hr — normal
+5. **Open positions:** 3 (below cap)
+
+**No Change Needed:**
+- No kill candidates (0% WR + 3+ trades)
+- No overtrading
+- 24h profitable, system stable
+- atr_sl_hit mechanism working as designed
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-20 17:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**24h:** 31T 58.1%WR +$1.18
+
+**Last 6h closes:**
+- ME SHORT pullback-entry- atr_sl_hit +$0.33
+- GMT SHORT pullback-entry- atr_sl_hit +$0.26
+- BLUR SHORT pullback-entry- atr_sl_hit +$0.17
+- DOGE SHORT pullback-entry- atr_sl_hit -$0.27
+- LINK SHORT pullback-entry- atr_sl_hit -$0.17
+- COMP LONG pump-chain+ atr_sl_hit -$0.15
+
+**Diagnosis:**
+1. **Entry quality:** 58.1% WR 24h — acceptable
+2. **SL behavior:** 100% atr_sl_hit, profitable (+$0.038 avg) — trailing working
+3. **Signal quality:** pullback-entry- carrying (+$0.70/24h). pump-chain+ barely positive (+$0.10). No kill candidates
+4. **Trade frequency:** Quiet — 0T last hour, 6T last 6h
+5. **Open positions:** 3 (JUP, ADA, ETC) — all pump-chain+ LONG
+
+**No Change Needed:**
+- No kill candidates (0% WR + 3+ trades)
+- No overtrading
+- 24h profitable, system stable
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
