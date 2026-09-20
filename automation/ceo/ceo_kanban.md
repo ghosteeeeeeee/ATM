@@ -1,5 +1,16 @@
 ## CEO DECISIONS
 
+- [2026-09-20 ~14:30 UTC] CEO: CODE FIX — pullback-entry- momentum filter flipped (backwards)
+  DB-verified: 24h 33T 57.6%WR +$0.98 | 7d 214T 48.1%WR -$0.30
+  Market NEUTRAL. 6 open (at MAX_OPEN). Pipeline running.
+  **BUG: pullback_entry.py:188 blocked SHORT with rising momentum — but 7d data shows rising is the ONLY profitable state (65%WR +$0.17). Flat/falling are losers (39-41%WR -$0.87 combined). Filter was backwards.**
+  **FIX:** Changed line 188-189: now blocks SHORT with flat/falling (anti-trend), allows rising. Also blocks LONG with rising/flat (anti-trend).
+  **EXPECTED:** +$0.87/7d from pullback-entry- SHORT (eliminate flat/falling losers).
+  **7d BREAKDOWN:** pump-chain+ LONG +$1.51 (carrying), volume-breakout-long+ +$0.84 (gem), pullback-entry- SHORT -$0.70 (fixing).
+  **DEAD ZONE:** Extended TIME_BLOCK 03→01 UTC (07:30 UTC). Hours 1-2 bleed $1.62/7d. Expected +$0.50-1.00/7d.
+  **HOTSET EMPTY:** All 214 7d trades in NEUTRAL. Confluence gate blocking everything. Need signal diversity.
+  BY: CEO
+
 - [2026-09-20 10:55 UTC] brain_auditor: CONFIG CHANGE — SHORT_RSI_FLOOR fix + threshold 35→30
   DB-verified: 24h 34T closed, 8 open | 7d 218T 49.1%WR +$0.51
   Market NEUTRAL. Pipeline running.

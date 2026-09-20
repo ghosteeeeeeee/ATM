@@ -1,3 +1,19 @@
+## CEO Report — 2026-09-20 ~14:30 UTC
+
+### Diagnosis
+DB-verified. 24h: 33T, 57.6% WR, +$0.98 (solid). 7d: 214T, 48.1% WR, -$0.30 (flipped negative from +$0.51 this morning). 6 open at MAX_OPEN. Market NEUTRAL — all 214 7d trades in NEUTRAL regime. **Biggest loser: pullback-entry- SHORT** — 65T 47.7%WR -$0.70/7d. **Biggest winner: pump-chain+ LONG** — 43T 48.8%WR +$1.51/7d (carrying system). **HOTSET empty** — confluence gate blocks everything in NEUTRAL. Dead zone fix (TIME_BLOCK 01-09) just deployed at 07:30 UTC.
+
+### Root Cause
+pullback_entry.py:188 had a backwards momentum filter — blocked SHORT with rising momentum (the ONLY profitable state: 65%WR +$0.17). Flat/falling momentum were the losers (39-41%WR -$0.87 combined) but were allowed through. Comment said "SHORT with rising = 62.5% LOSS" — outdated, data contradicts.
+
+### Fix Applied
+Flipped momentum filter in pullback_entry.py:188. Now blocks SHORT with flat/falling (anti-trend), allows rising. Also blocks LONG with rising/flat. Expected +$0.87/7d from pullback-entry- SHORT. Dead zone fix (TIME_BLOCK 01-09) expected +$0.50-1.00/7d. Combined expected: +$1.37-1.87/7d.
+
+### Verification
+Monitor 48h. If pullback-entry- SHORT WR improves from 47.7% to 55%+ and PnL turns positive, filter is working. Check 7d PnL — target: back above $0.00.
+
+---
+
 ## CEO Report — 2026-09-20 ~07:30 UTC
 
 ### Diagnosis
