@@ -349,12 +349,18 @@ def get_regime() -> dict:
     except Exception:
         pass  # if continuum unavailable, fall through to existing votes
 
-    # Determine regime
+    # Determine regime — TREND > CHOP wins when continuum provides structural override
+    _continuum_voted = votes['TREND'] >= 5  # continuum added +5 TREND votes
     if votes['CRISIS'] >= 3:
         regime = 'CRISIS'
         reason = f"CRISIS: dir_outcome={dir_outcome}, vol={vol_regime}, btc_mom={btc_momentum['momentum_pct']:+.3f}%"
         momentum_allowed = False
         mean_reversion_allowed = False
+    elif _continuum_voted and votes['TREND'] >= votes['CHOP']:
+        regime = 'TREND'
+        reason = f"TREND (continuum override): votes={votes}, btc_mom={btc_momentum['momentum_pct']:+.3f}%"
+        momentum_allowed = True
+        mean_reversion_allowed = True
     elif votes['CHOP'] >= 3:
         regime = 'CHOP'
         reason = f"CHOP: phase={market_phase}, vol={vol_regime}, btc_mom={btc_momentum['momentum_pct']:+.3f}%"
