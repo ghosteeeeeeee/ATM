@@ -699,6 +699,15 @@ def process_delayed_entries(paper=False):
             still_pending.append(entry)
             continue
 
+        # FIX (2026-09-03): Check position limit before executing delayed entry.
+        # Previously, delayed entries could bypass MAX_OPEN_POSITIONS and push
+        # positions above the limit.
+        from position_manager import get_position_count
+        if get_position_count() >= MAX_POS:
+            log(f'⏰ DELAYED BLOCKED: {token} {direction} — max positions reached ({get_position_count()}/{MAX_POS})')
+            still_pending.append(entry)  # retry later
+            continue
+
         # Pullback reached → execute trade
         log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
