@@ -2521,3 +2521,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) Monitor pump-chain+ LONG hour 0,2,4 pattern (2) Evaluate pullback-entry- SHORT NORMAL regime penalty (3) Volume filter for pump-chain+ LONG EXTREME.
   **NO ACTION** — all items need more data. Monitor 48h.
   BY: brain_auditor
+
+- [2026-09-20 05:00 UTC] brain_auditor: NO CONFIG CHANGE — audit + creative ideas
+  DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16
+  Market NEUTRAL. 4 open.
+  **LOSING AUTOPSY (20):** pump-chain+ LONG 6T -$0.95 (EXTREME/HIGH). grind-trend+ DISABLED 8T -$0.54 (pre-disable trades). grind-trend- DISABLED 4T -$0.40. All disabled signals aging out.
+  **REGIME (7d):** EXTREME 57.6%WR +$2.62 (best). NORMAL 44.3%WR -$0.78 (worst). pump-chain+ LONG EXTREME 20T 60%WR +$1.80.
+  **HOUR PATTERN:** pump-chain+ LONG hours 0,2,4 UTC: 10T 0%WR -$1.27 (monitor 48h, needs 20+ sample).
+  **REGIME BLEED:** pullback-entry- SHORT NORMAL 19T 42.1%WR -$0.35, HIGH 33T 48.5%WR -$0.25. EXTREME only: 14T 57.1%WR +$0.39.
+  **CREATIVE:** (1) Gate pullback-entry- SHORT to EXTREME only (+$0.60/7d) — data strong, low risk. (2) Investigate volume-breakout-long+ frequency (71.4%WR but only 14T). (3) Monitor hour 0-4 pattern 48h.
+  **NO ACTION** — all items need more data. Monitor 48h.
+  BY: brain_auditor

@@ -1,98 +1,105 @@
 {
-  "timestamp": "2026-09-20T00:34:32.685179Z",
-  "session_brain_stats": {
-    "total_sessions": "1000+",
-    "recent_focus": [
-      "signal performance",
-      "regime filtering",
-      "time-based patterns"
+    "timestamp": "2026-09-20T05:00:00Z",
+    "session_brain_stats": {
+        "signal_performance_queries": "HH/HL, MFE trailing, resistance break, pullback depth analysis dominate. Sessions show 100% WR achievable with 4-signal confluence but too few trades.",
+        "creative_ideas_found": "trend following signal, wave period detector, amplitude breakout, btc pump filter, sma20_dip, perfect long signal — many discussed but not implemented.",
+        "losing_trade_discussions": "crash contagion, btc whipsaw, pullback entry diagnosis — recurring themes about regime transitions and entry timing."
+    },
+    "trade_summary_24h": {
+        "total_trades": 50,
+        "win_rate": 44.0,
+        "pnl": 0.38,
+        "open_trades": 4,
+        "market_regime": "NEUTRAL",
+        "top_winner": "pump-chain+ LONG 19T 52.6%WR +$1.57",
+        "top_loser": "grind-trend- SHORT 5T 20%WR -$0.38 (DISABLED signal)"
+    },
+    "trade_summary_7d": {
+        "total_trades": 212,
+        "win_rate": 48.6,
+        "pnl": -0.16,
+        "best_regime": "EXTREME 57.6%WR +$2.62",
+        "worst_regime": "NORMAL 44.3%WR -$0.78",
+        "top_signal": "pump-chain+ LONG 36T 50%WR +$2.03",
+        "hidden_gem": "volume-breakout-long+ LONG 14T 71.4%WR +$0.84"
+    },
+    "drift_findings": [
+        {
+            "item": "pump-chain+ LONG hour 0,2,4 UTC dead zone",
+            "status": "CONFIRMED IN DATA — not yet in code",
+            "evidence": "10 trades/7d, 0% WR, -$1.27. Hours 5-18: 23T 56.5%WR +$2.43.",
+            "impact": "~$1.27/7d bleeding from dead-zone entries",
+            "recommendation": "Monitor 48h. If pattern holds, add BAD_TRADE_HOURS filter for pump-chain+ LONG hours 0-4 UTC."
+        },
+        {
+            "item": "pullback-entry- SHORT regime filter",
+            "status": "CONFIRMED IN DATA — not yet in code",
+            "evidence": "EXTREME: 14T 57.1%WR +$0.39. NORMAL: 19T 42.1%WR -$0.35. HIGH: 33T 48.5%WR -$0.25.",
+            "impact": "NORMAL+HIGH = 52T -$0.60/7d bleeding",
+            "recommendation": "Gate pullback-entry- SHORT to EXTREME only. Verify: would block 52 trades but save $0.60/7d."
+        },
+        {
+            "item": "grind-trend+ fully disabled",
+            "status": "CONFIRMED — last trade 10:08 UTC Sep 19 (before 10:38 disable). No post-disable trades.",
+            "evidence": "18T/7d 50%WR +$0.24 but all from pre-disable. 24h data shows 16T but all open_times before disable.",
+            "impact": "None — aging trades in 7d window only.",
+            "recommendation": "No action needed. Will age out."
+        }
     ],
-    "key_insights": [
-      "pump-chain+ LONG has 0%WR in hours 0,2,4 UTC (10 trades)",
-      "EXTREME regime is best for most signals",
-      "grind-trend+ LONG HIGH has 66.7%WR but is disabled",
-      "pullback-entry- SHORT NORMAL is worst performer"
+    "recurring_problems": [
+        {
+            "topic": "NORMAL regime bleed",
+            "frequency": "Every audit for 2+ weeks",
+            "detail": "pullback-entry- SHORT NORMAL -$0.35/7d, pump-chain+ LONG NORMAL -$0.28/7d, grind-trend+ NORMAL -$0.21 (now disabled).",
+            "status": "Partially addressed (grind-trend+ disabled). pullback-entry- SHORT NORMAL still bleeding."
+        },
+        {
+            "topic": "Signal diversity in NEUTRAL",
+            "frequency": "Repeated in CURRENT.md and CEO kanban",
+            "detail": "Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence in NEUTRAL. Need new signals.",
+            "status": "Acknowledged. No new signals built yet."
+        }
+    ],
+    "missing_implementations": [
+        "pump-chain+ LONG hour 0-4 UTC block (monitoring)",
+        "pullback-entry- SHORT regime gate to EXTREME only (data supports it)",
+        "volume-breakout-long+ expansion (71.4% WR but only 14T — needs more frequency)"
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-20T05:00:00Z",
+            "idea": "pullback-entry- SHORT — gate to EXTREME regime only",
+            "rationale": "7d data: EXTREME 57.1%WR +$0.39, NORMAL 42.1%WR -$0.35, HIGH 48.5%WR -$0.25. The signal has a clear edge ONLY in EXTREME. Normal and HIGH are net losers. This is a simple regime filter that cuts bleeding.",
+            "expected_impact": "+$0.60/7d by blocking 52 losing trades (52T NORMAL+HIGH -$0.60)",
+            "category": "regime filter",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Would block 0 EXTREME winners (keeps EXTREME). 14 EXTREME trades at 57.1%WR +$0.39 preserved."
+        },
+        {
+            "date": "2026-09-20T05:00:00Z",
+            "idea": "volume-breakout-long+ — investigate why only 14 trades/7d despite 71.4% WR",
+            "rationale": "71.4% WR +$0.84/7d is the second-best signal after pump-chain+. But only 14 trades means the entry conditions may be too strict. Relaxing one condition (e.g., volume threshold or EMA distance) could double frequency without killing edge.",
+            "expected_impact": "+$0.50-1.00/7d if frequency doubles while maintaining 65%+ WR",
+            "category": "signal expansion",
+            "status": "suggested",
+            "risk": "medium"
+        },
+        {
+            "date": "2026-09-20T05:00:00Z",
+            "idea": "pump-chain+ LONG hour 0-4 UTC — monitor then potentially block",
+            "rationale": "10 trades/7d, 0% WR, -$1.27. All losers at hours 0, 2, 4 UTC. Sample small but pattern extreme. Hours 5-18: 23T 56.5%WR +$2.43.",
+            "expected_impact": "+$1.27/7d if pattern holds (10 trades blocked)",
+            "category": "time filter",
+            "status": "monitoring",
+            "risk": "low (small sample, needs 48h confirmation)"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Monitor pump-chain+ LONG hour 0-4 UTC pattern for 48h",
+        "Evaluate pullback-entry- SHORT regime gate to EXTREME only — strong data support",
+        "Investigate volume-breakout-long+ entry relaxation for more frequency",
+        "NEUTRAL signal diversity remains critical need — explore new signals for flat market"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 50,
-    "winrate": 44.0,
-    "pnl": 0.38,
-    "market": "NEUTRAL",
-    "open_trades": 4
-  },
-  "drift_findings": [
-    {
-      "topic": "pump-chain+ LONG time pattern",
-      "session_insight": "Hours 0,2,4 UTC have 0%WR across 10 trades",
-      "code_status": "NOT IMPLEMENTED — no time filter exists",
-      "impact": "Medium — .27/7d loss from bad hours",
-      "recommendation": "Monitor 10 more trades before implementing time filter"
-    },
-    {
-      "topic": "grind-trend+ LONG HIGH regime",
-      "session_insight": "12T 66.7%WR +/usr/bin/bash.35 in HIGH regime",
-      "code_status": "DISABLED — signal killed Sep 19",
-      "impact": "Low — signal was net negative overall",
-      "recommendation": "No action — signal disabled for good reason"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "pump-chain+ LONG losses in bad hours",
-      "frequency": "Every audit run",
-      "root_cause": "No time-based filter for pump-chain+",
-      "recommended_fix": "Monitor 10 more trades before implementing"
-    },
-    {
-      "problem": "pullback-entry- SHORT NORMAL underperformance",
-      "frequency": "Weekly",
-      "root_cause": "NORMAL regime choppy for SHORT entries",
-      "recommended_fix": "Add regime penalty for NORMAL (0.7x confidence)"
-    }
-  ],
-  "missing_implementations": [],
-  "creative_improvements": [
-    {
-      "date": "2026-09-20T00:34:32.685206Z",
-      "idea": "Add regime penalty for pullback-entry- SHORT in NORMAL",
-      "rationale": "pullback-entry- SHORT NORMAL: 19T 42.1%WR -/usr/bin/bash.35/7d. EXTREME: 13T 53.8%WR +/usr/bin/bash.27. Clear regime edge.",
-      "expected_impact": "+/usr/bin/bash.20-0.30/7d",
-      "category": "regime filter",
-      "status": "suggested",
-      "risk": "low",
-      "sample_size": "19 trades (minimum met)",
-      "impact_on_winners": "Would block ~35% of NORMAL trades (7/19). Check if any winners blocked."
-    },
-    {
-      "date": "2026-09-20T00:34:32.685215Z",
-      "idea": "Monitor pump-chain+ LONG hour 0,2,4 pattern",
-      "rationale": "10T 0%WR -.27 in hours 0,2,4 UTC. Pattern clear but sample small.",
-      "expected_impact": "+/usr/bin/bash.50-1.00/7d if implemented",
-      "category": "time filter",
-      "status": "monitoring",
-      "risk": "medium",
-      "sample_size": "10 trades (needs 20+)",
-      "impact_on_winners": "Cannot verify yet — need more data"
-    },
-    {
-      "date": "2026-09-20T00:34:32.685222Z",
-      "idea": "Add volume confirmation for pump-chain+ LONG in EXTREME",
-      "rationale": "pump-chain+ LONG EXTREME: 18T 61.1%WR +.11. Could improve with volume filter.",
-      "expected_impact": "+/usr/bin/bash.10-0.20/7d",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low",
-      "sample_size": "18 trades (minimum met)",
-      "impact_on_winners": "Would block ~20% of EXTREME trades (4/18). Check if any winners blocked."
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Monitor pump-chain+ LONG hour 0,2,4 pattern for 10 more trades",
-    "Evaluate pullback-entry- SHORT NORMAL regime penalty after 50+ trades",
-    "Check if volume filter would improve pump-chain+ LONG EXTREME performance",
-    "Continue monitoring stale filter effectiveness",
-    "Track chase filter impact on 24h performance"
-  ]
 }

@@ -7,7 +7,7 @@
 
 24h: 50T, 44.0% WR, +$0.38. 4 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 50T, 44.0% WR, +$0.38. pump-chain+ LONG 19T 47.4%WR +$0.62, grind-trend+ LONG 18T 50.0%WR +$0.24 (disabled). Losers: pump-chain+ LONG 8T -$1.18 (biggest), grind-trend+ LONG 8T -$0.54 (disabled), grind-trend- SHORT 4T -$0.40 (disabled).
+- **24h (rolling):** 50T, 44.0% WR, +$0.38. pump-chain+ LONG 19T 52.6%WR +$1.57, grind-trend+ 16T 50%WR +$0.15 (DISABLED, aging trades), pullback-entry- SHORT 7T 42.9%WR -$0.02. Losers: grind-trend- SHORT 5T 20%WR -$0.38 (DISABLED), pump-chain+ 6T losers -$0.95.
 - **Today (calendar):** 50T closed (Sep 20). 4 open.
 - **7d:** 212T, 48.6% WR, -$0.16 (DB-verified). **SLIGHTLY NEGATIVE.** EXTREME regime best (57.1%WR +$1.81). pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. Legacy killed signals aging out in 7d data.
 - **Market:** NEUTRAL (4 open trades).
@@ -38,7 +38,7 @@
 
 ## Today's Changes (Sep 20)
 
-1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16. Market NEUTRAL. 4 open. **LOSING AUTOPSY (22):** pump-chain+ LONG 8T -$1.18 (biggest loser). grind-trend+ LONG 8T -$0.54 (disabled signal). grind-trend- SHORT 4T -$0.40 (disabled signal). **TIME PATTERN:** pump-chain+ LONG hours 0,2,4 UTC: 10T 0%WR -$1.27. Pattern clear but sample small (needs 20+). **REGIME (7d):** EXTREME best. pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. pullback-entry- SHORT EXTREME 13T 53.8%WR +$0.27. **CREATIVE:** (1) Monitor pump-chain+ LONG hour 0,2,4 pattern (2) Evaluate pullback-entry- SHORT NORMAL regime penalty (3) Volume filter for pump-chain+ LONG EXTREME. **NO ACTION** — all items need more data. Monitor 48h.
+1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16. Market NEUTRAL. 4 open. **LOSING AUTOPSY (20):** pump-chain+ LONG 6T losers -$0.95 (EXTREME/HIGH). grind-trend+ 8T -$0.54 (DISABLED, pre-disable trades). grind-trend- SHORT 4T -$0.40 (DISABLED). **REGIME (7d):** EXTREME best 57.6%WR +$2.62. pump-chain+ LONG EXTREME 20T 60%WR +$1.80. pullback-entry- SHORT EXTREME 14T 57.1%WR +$0.39. **HOUR PATTERN:** pump-chain+ LONG hour 0,2,4 UTC: 10T 0%WR -$1.27 (monitor 48h). **REGIME BLEED:** pullback-entry- SHORT NORMAL 19T 42.1%WR -$0.35, HIGH 33T 48.5%WR -$0.25. Suggested: gate to EXTREME only (+$0.60/7d). **NO ACTION** — all items need more data. Monitor 48h.
 
 ## Today's Changes (Sep 19)
 
