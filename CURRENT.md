@@ -21,7 +21,7 @@
 - **ATR_SL:** MIN 1.3%, MAX 1.5%. (brain_auditor changed MIN 1.2%→1.3% at 22:34 UTC Sep 14)
 - **BAD_TRADE_HOURS:** NOT IMPLEMENTED — stale reference, no code exists. REMOVE.
 - **SHORT_NORMAL_PENALTY=1.0:** REMOVED CEO Sep 16. Monitoring expired, SHORT NORMAL profitable (61.8%WR +$0.59/7d). Expected +$0.26/7d.
-- **SHORT_RSI_FLOOR=25:** Working.
+- **SHORT_RSI_FLOOR=30:** Working. Fixed dead code bug (was sig.get('rsi_14') always None, now uses live RSI). Lowered 35→30 (brain_auditor Sep 20). RSI<30 SHORTs = 37.5%WR -$0.75/7d blocked.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
 **🟢 R:R STATUS (7d POSITIVE +$0.41, 24h STRONG +$2.44)**

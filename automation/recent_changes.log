@@ -1,3 +1,10 @@
+[2026-09-20 10:50 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 24h 34T | 7d 218T 49.1%WR +$0.51. Market NEUTRAL. 8 open.
+  LOSING AUTOPSY: 10 losers — all normal variance or legacy. No actionable entry failures.
+  FINDING: Dead zone 0-4 UTC pump-chain+ LONG -$1.80/7d (15T 0%WR). Hour 0 uncovered by TIME_BLOCK.
+  CREATIVE: pullback-entry- SHORT momentum_state filter — rising=63.6%WR, flat/falling=42.6%WR. +$0.97/7d expected. Needs implementation.
+  BY: brain_auditor
+
 [2026-09-19 06:10 UTC] auto_1hr: CONFIG CHANGE — FAVORITES_LONG NameError fix
   CRITICAL BUG: Pipeline was crashing on every cycle (exit code 1)
   ROOT CAUSE: favorites_updater.py wrote 'FAVORITES = {' overwriting FAVORITES_LONG definition

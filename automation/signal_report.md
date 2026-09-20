@@ -1,34 +1,69 @@
-=== Signal Performance Report ===
-Period: 2026-09-19 ~15:00 UTC (Last 6h / 24h)
+# Signal Performance Report
+**Generated:** 2026-09-20 19:15 UTC | **Period:** Last 6h + 24h
 
-System: 11T 63.6% WR $0.80 (6h) | 40T 62.5% WR $2.47 (24h) — healthy
+## Overall Stats
+- **Total trades (all time):** 5,198 | **WR:** 45.7% | **PnL:** -$8.55
 
-KILLED (executed this cycle):
-None. grind-trend- already killed 2026-09-19 (20% WR, -$0.38, no winning regime).
+---
 
-BOOSTED (executed this cycle):
-None. No signal meets all boost criteria (5+ trades, 55%+ WR, positive PnL, multi-token).
+## WINNERS (WR > 55%, PnL > 0)
 
-WINNERS (24h):
-| Signal            | Dir  | WR     | PnL   | Trades | Status          |
-|-------------------|------|--------|-------|--------|-----------------|
-| pump-chain+       | LONG | 64.7%  | $1.68 | 17     | Active — top performer |
-| grind-trend+      | LONG | 83.3%  | $0.47 | 6      | Active — best WR |
-| pullback-entry-   | SHORT| 62.5%  | $0.28 | 8      | Active          |
-| doji-bottom-long  | LONG | 100%   | $0.30 | 1      | Watch (low vol) |
-| volume-breakout-long+ | LONG | 100% | $0.08 | 1    | Watch (low vol) |
-| warrior-sr-confirm+ | LONG | 100% | $0.09 | 1     | Watch (low vol) |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| pump-chain+ | LONG | 3 | 66.7% | +0.01 | 18 | 61.1% | +0.69 | ENABLED |
+| pullback-entry- | SHORT | 2 | 50.0% | -0.05 | 9 | 66.7% | +0.38 | ENABLED |
+| grind-trend+ | LONG | 0 | — | — | 3 | 100.0% | +0.42 | ENABLED |
 
-LOSERS (24h):
-| Signal         | Dir  | WR    | PnL    | Trades | Status                         |
-|----------------|------|-------|--------|--------|--------------------------------|
-| grind-trend-   | SHORT| 20%   | -$0.38 | 5      | KILLED (already disabled)      |
-| mover+         | LONG | 0%    | -$0.05 | 1      | Watch (low volume, not actionable yet) |
+---
 
-REGIME NOTES:
-- grind-trend- SHORT: NORMAL regime = 12.5% WR (8T, -$0.33), HIGH = 33.3% WR (3T, -$0.16). All regimes negative → blanket kill correct.
-- grind-trend+ LONG: 83.3% WR — only LONG direction is profitable. MINUS already killed.
+## LOSERS (WR < 30%, PnL < -$0.10)
 
-ISSUES:
-- None. No direction inversions found. No bugs detected.
-- grind-trend- trades still appearing (5 in 24h) despite GRIND_TREND_MINUS_ENABLED=False on line 2036. These are from before the kill took effect (all from today before ~15:00 UTC). New trades should not fire.
+None found.
+
+---
+
+## MARGINAL (30-50% WR, negative PnL)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Regime | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| grind-trend- | SHORT | 3 | 33.3% | -0.20 | HIGH: 33.3% (3T), NORMAL: 0% (2T) | Gated NORMAL. Losing HIGH too — only 1 day of data. Watchlist. |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+None found.
+
+---
+
+## KILLED (executed this period)
+
+None. No signals met kill criteria (WR<30% with 5+ trades, PnL<-$0.10, active>24h).
+
+---
+
+## BOOSTED (executed this period)
+
+None. No signals met boost criteria (WR>55% with 5+ trades, PnL>$0.05, consistent across tokens).
+
+---
+
+## ACTIONS TAKEN
+
+- **No kills.** grind-trend- SHORT (33.3% WR, -$0.20) only has 3 trades — below 5-trade kill threshold. Already gated in NORMAL regime via volatility_gate_v2.py. Losing in HIGH too but too few trades for blanket kill.
+- **No boosts.** pump-chain+ LONG is the standout (18T, 61.1%, +$0.69) but already performing well — no config changes needed.
+- **No inversions.** Clean.
+
+---
+
+## WATCHLIST
+
+| Signal | Dir | Trend | Action if degrades |
+|--------|-----|-------|--------------------|
+| grind-trend- | SHORT | 33.3% WR, -$0.20 (24h). Only 1 day of data (9/19). Already gated NORMAL. | Add HIGH gate if 5+ trades with <40% WR |

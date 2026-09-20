@@ -1,5 +1,16 @@
 ## CEO DECISIONS
 
+- [2026-09-20 10:55 UTC] brain_auditor: CONFIG CHANGE — SHORT_RSI_FLOOR fix + threshold 35→30
+  DB-verified: 24h 34T closed, 8 open | 7d 218T 49.1%WR +$0.51
+  Market NEUTRAL. Pipeline running.
+  **BUG FIX: SHORT_RSI_FLOOR was dead code.** decider_run.py:985 used sig.get('rsi_14') which always returns None (rsi_14 nested in signal_metadata JSON). WLD SHORT at RSI=24.07 should have been blocked but wasn't. Fixed: now uses _ctx_gate_get_rsi(token) for live RSI (same pattern as SHORT_RSI_CEILING).
+  **THRESHOLD: 35→30.** RSI<30 SHORTs = 16T 37.5%WR -$0.75/7d (block). RSI 30-35 = 10T 50%WR -$0.09 (keep). Net improvement: +$0.66/7d.
+  **LOSING AUTOPSY (10 losers 24h):** 7 pump-chain+ LONG ATR_SL (normal), 2 grind-trend- SHORT legacy (aging out), 1 pullback-entry- SHORT WLD (RSI=24, now caught by fixed filter).
+  **KEY FINDING: HIGH regime bleed = $1.02/7d from killed signals (open-skies+, rr-struct-v2+, breakout-long+, grind-trend-).** 14T 28.6%WR -$1.18. Active HIGH signals = 82T 50%WR +$0.16. Will self-heal by Sep 22-23.
+  **CREATIVE IDEA: pullback-entry- SHORT momentum_state filter.** Rising = 63.6%WR +$0.38 (22T). Flat/falling = 42.6%WR -$0.59 (47T). Expected +$0.97/7d. Monitor 2 weeks before implementation.
+  **HIDDEN GEM: volume-breakout-long+ 71.4%WR +$0.84/7d.** Works EXTREME+NORMAL equally. Investigate frequency unlock.
+  BY: brain_auditor
+
 - [2026-09-20 07:30 UTC] CEO: CONFIG CHANGE — TIME_BLOCK extended 03-09 → 01-09
   DB-verified: 24h 38T 68.4%WR +$2.26 | 7d 218T 49.1%WR +$0.51
   Market NEUTRAL. 6 open. Pipeline running.

@@ -2951,3 +2951,45 @@ Final set: ['DOT', 'HYPER', 'SEI']
 
 **Status:** System healthy, no action required.
 **BY:** auto_1hr
+
+## [2026-09-20 11:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**24h:** 36T 66.7% WR +$1.76 | **Open:** 8 positions at cap
+
+**Diagnosis:**
+1. **Entry quality:** 66.7% WR 24h — excellent
+2. **SL behavior:** atr_sl_hit = 80.6% of closes, profitable (+$0.05 avg) — trailing stops working
+3. **Signal quality:** No kill candidates
+4. **Trade frequency:** Quiet period, normal
+5. **Open positions:** 8 at cap, all reasonable
+
+**No Change Needed:**
+- No kill candidates
+- No overtrading
+- 24h trend excellent
+- System healthy
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-20 12:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet), **24h:** 34T $1.53 PnL
+**Open:** 8 positions at cap, reasonable SL distances
+
+**Diagnosis:**
+1. **Entry quality:** No recent closes to assess. 24h WR 61-67% by signal — excellent
+2. **SL behavior:** atr_sl_hit = 85.3% of 24h closes, profitable (+$1.45) — trailing stops working
+3. **Signal quality:** No kill candidates (0% WR + 3+ trades last hour). 7d losers have <5 trades — too small to kill
+4. **Trade frequency:** Quiet period, 1.4/hr avg — normal
+5. **Open positions:** 8 at cap, mixed long/short, SL dists 0.3-2.7%
+
+**No Change Needed:**
+- No kill candidates
+- No overtrading
+- 24h profitable, 7d improving
+- System healthy
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr

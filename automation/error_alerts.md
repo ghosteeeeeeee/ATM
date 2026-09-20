@@ -134,3 +134,16 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2578s left, N failures)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2499s left, N failures)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2438s left, N failures)`
+
+## Error Alerts — 2026-09-20 10:45 UTC
+- **[WARN]** (1x): `signal_compactor: timed out (killed after 60.1s)` at 10:42:02 — recovered on next cycle (10:42:37, done in 1.1s)
+- **[WARN]**: Disk at 85% (94G/118G) — at warning threshold, 18G free
+- **[INFO]**: Pipeline 7 open trades, 37 closed today, +81.95% PnL (from pipeline output)
+- **[INFO]**: Market regime: 118 NEUTRAL / 2 SHORT_BIAS (KAS, USELESS) / 0 LONG — very flat
+- **[INFO]**: All 44 hermes timers firing on schedule
+- **AUTO-FIX**: None needed — signal_compactor recovered automatically
+
+## Error Alerts — 2026-09-20 11:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`

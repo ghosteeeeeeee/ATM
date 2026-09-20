@@ -982,12 +982,14 @@ def rule_based_context_gate(token, direction, source, sig):
     # 1b-ext. Pullback-entry safety checks (always active — NOT gated on SIGNAL_FILTER_ENABLED)
     # These are loss-prevention guardrails, not tunable signal quality filters
     from hermes_constants import SHORT_RSI_FLOOR
-    rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
     _is_pullback = source and 'pullback-entry' in source
     if _is_pullback and direction == 'SHORT':
         # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
-        if rsi is not None and rsi < SHORT_RSI_FLOOR:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: RSI {rsi:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
+        # FIX (brain_auditor 2026-09-20): Use LIVE RSI (like SHORT_RSI_CEILING does).
+        # Old code used sig.get('rsi_14') which was always None (rsi_14 nested in signal_metadata).
+        _live_rsi_floor = _ctx_gate_get_rsi(token)
+        if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
+            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _live_z = _ctx_gate_get_zscore(token)
