@@ -3304,7 +3304,7 @@ RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width p
 # Integrated into _score_signal() final_score formula as rr_mult.
 RR_ENGINE_CONF_ENABLED       = True    # master switch for RR confidence adjustment
 RR_ENGINE_CONF_SHADOW        = False   # False = actually block bad R:R setups (was shadow mode)
-RR_ENGINE_CONF_HARD_BLOCK_RR = 1.0     # R:R below this = hard block (0.0x multiplier)
+RR_ENGINE_CONF_HARD_BLOCK_RR = 0.95    # R:R below this = hard block (0.0x multiplier) (lowered from 1.0, 2026-09-20)
 RR_ENGINE_CONF_HARD_BLOCK_SCORE = 35   # Score below this = hard block (grade F)
 RR_ENGINE_CONF_BOOST_THRESHOLD_RR = 4.0  # R:R above this + Grade A = boost
 RR_ENGINE_CONF_BOOST_MULT    = 1.30    # multiplier for exceptional setups (R:R≥4 + Grade A)
