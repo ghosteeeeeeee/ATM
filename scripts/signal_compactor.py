@@ -2229,11 +2229,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # Uses market_phase + structural indicators for robust regime detection
                         # Catches "slow bleeds" where velocity is low but structure is bearish
                         _cont_bearish = (_continuum_phase in ('DECLINING', 'STRONG_DECLINING') or
-                                         (_continuum_phase == 'CALM' and
+                                         (_continuum_phase in ('CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
                         _cont_bullish = (_continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
-                                         (_continuum_phase == 'CALM' and
+                                         (_continuum_phase in ('CALM', 'DISTRIBUTION') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
                                           _cont_row_data.get('ema300_position') == 'ABOVE'))
 

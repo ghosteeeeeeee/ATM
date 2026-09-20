@@ -340,10 +340,10 @@ def get_regime() -> dict:
             _phase, _linreg, _ema_pos = _cont_row[0], _cont_row[1], _cont_row[2]
             # Bearish structure: DECLINING phase OR (CALM + LEAN_BEAR + BELOW EMA300)
             _bearish = (_phase in ('DECLINING', 'STRONG_DECLINING') or
-                        (_phase == 'CALM' and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BEAR'))
+                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
             # Bullish structure: RALLYING phase OR (CALM + LEAN_BULL + ABOVE EMA300)
             _bullish = (_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
-                        (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
+                        (_phase in ('CALM', 'DISTRIBUTION') and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
             if _bearish or _bullish:
                 votes['TREND'] += 2  # continuum shows clear structure — override chop
     except Exception:
