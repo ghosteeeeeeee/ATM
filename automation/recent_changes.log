@@ -2553,3 +2553,8 @@
   24h: 53T 48%WR +$0.82 | 1T closed last hour (CAKE SHORT +$0.09)
   No kill criteria met. No overtrading. SL working correctly (53% closes, -$0.002 avg).
   BY: auto_1hr
+[2026-09-20 00:30 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 49T 47%WR +.66 | 7d: 212T 49.1%WR +.14
+  1T closed last hour (AVAX LONG +.02 pump-chain+)
+  No kill criteria met. No overtrading. pump-chain+ carrying at +.90/24h.
+  BY: auto_1hr

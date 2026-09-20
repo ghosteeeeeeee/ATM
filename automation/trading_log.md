@@ -2702,3 +2702,26 @@ Final set: ['DOT', 'HYPER']
 
 **Status:** System stable
 **BY:** auto_1hr
+
+## [2026-09-20 00:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win: AVAX LONG +$1.02 pump-chain+ atr_sl_hit)
+**24h:** 49T, 47% WR, +$1.66
+**7d:** 212T, 49.1% WR, +$1.14
+
+**Close reasons (24h):** atr_sl_hit 26 (53% avg +$0.058), profit-monster-trail 16 (33% avg +$0.051), cut-loser-CL-T1 7 (14% avg -$0.097)
+**Top signals (24h):** pump-chain+ +$1.90 (55.6% WR), grind-trend+ +$0.24 (50% WR)
+**Open:** 5 positions (ONDO SHORT 0.8h, BCH LONG 1.7h, IMX LONG 1.7h, BABY LONG 2.1h, ACE LONG 11h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR on 3+ trades last hour)
+- atr_sl_hit dominant at 53% but avg +$0.058 — SL correctly calibrated, not a problem
+- pullback-entry- 33%WR/6T 24h but 47.7%WR/65T 7d — normal variance
+- grind-trend- already killed, trend_purity+ only 2T (below threshold)
+- Trade frequency normal (1-3/hr), no overtrading
+- pump-chain+ carrying system at +$1.90/24h
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
