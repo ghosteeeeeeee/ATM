@@ -141,15 +141,19 @@ def get_topic_relationships() -> dict:
     if not BRAIN_DB.exists():
         return {"nodes": [], "edges": []}
     
-    conn = sqlite3.connect(str(BRAIN_DB))
-    conn.row_factory = sqlite3.Row
-    
-    # Get dominant topic per session
-    rows = conn.execute(
-        "SELECT session_id, topic, COUNT(*) as cnt FROM chunks "
-        "WHERE topic IS NOT NULL GROUP BY session_id, topic"
-    ).fetchall()
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(str(BRAIN_DB))
+        conn.row_factory = sqlite3.Row
+        
+        # Get dominant topic per session
+        rows = conn.execute(
+            "SELECT session_id, topic, COUNT(*) as cnt FROM chunks "
+            "WHERE topic IS NOT NULL GROUP BY session_id, topic"
+        ).fetchall()
+    finally:
+        if conn:
+            conn.close()
     
     # Build co-occurrence
     from collections import Counter

@@ -512,7 +512,7 @@ class VectorStore:
                 "INSERT OR REPLACE INTO vec_chunks (id, embedding) VALUES (?, ?)",
                 (chunk_id, vec_bytes)
             )
-        self.db.commit()
+        # BUG 1 fix: Don't commit here — let caller manage transactions
     
     def delete(self, chunk_ids: List[int]):
         """Delete embeddings by chunk IDs."""
@@ -521,7 +521,7 @@ class VectorStore:
                 f"DELETE FROM vec_chunks WHERE id IN ({','.join('?' * len(chunk_ids))})",
                 chunk_ids
             )
-            self.db.commit()
+        # BUG 1 fix: Don't commit here — let caller manage transactions
     
     def search(self, query: List[float], top_k: int = 10) -> List[Tuple[int, float]]:
         """Search for similar vectors. Returns [(chunk_id, distance), ...]"""
@@ -667,8 +667,10 @@ class SessionBrain:
             if old_chunk_ids:
                 self.vector_store.delete(old_chunk_ids)
             
-            # Create new chunk IDs using session_id + index
-            chunk_ids = [hash(f"{session_id}:{j}") & 0x7FFFFFFF for j in range(len(chunks))]
+            # Create deterministic chunk IDs (BUG 3 fix: use hashlib instead of random hash)
+            import hashlib
+            chunk_ids = [int(hashlib.md5(f"{session_id}:{j}".encode()).hexdigest()[:8], 16)
+                         for j in range(len(chunks))]
             self.vector_store.add(embeddings, chunk_ids)
             
             # Store created_at
@@ -787,15 +789,21 @@ class SessionBrain:
             "SELECT chunk_type, COUNT(*) FROM chunks GROUP BY chunk_type"
         ).fetchall()
         
-        # FAISS size
-        faiss_size = FAISS_INDEX.stat().st_size if FAISS_INDEX.exists() else 0
+        # Vector count from sqlite-vec
+        try:
+            vec_count = self.db.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
+        except Exception:
+            vec_count = 0
+        
+        db_size = BRAIN_DB.stat().st_size if BRAIN_DB.exists() else 0
         
         return {
             "sessions_total": session_count,
             "sessions_indexed": indexed,
             "chunks_total": chunk_count,
+            "vectors_total": vec_count,
             "chunk_types": {t: c for t, c in type_counts},
-            "faiss_index_size_mb": round(faiss_size / 1024 / 1024, 1),
+            "db_size_mb": round(db_size / 1024 / 1024, 1),
             "last_ingest": {
                 "completed_at": last_ingest[0] if last_ingest else None,
                 "sessions": last_ingest[1] if last_ingest else 0,
@@ -815,6 +823,7 @@ class SessionBrain:
         # Drop and recreate vec_chunks table
         self.db.execute("DROP TABLE IF EXISTS vec_chunks")
         self.db.commit()
+        self.vector_store = None  # BUG 2 fix: force recreation after DROP
         self._ensure_vector_store()
         
         # Backfill topics for chunks that don't have them
