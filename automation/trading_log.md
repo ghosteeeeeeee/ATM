@@ -2748,3 +2748,105 @@ Final set: ['DOT', 'HYPER']
 
 **Status:** System stable, no action required
 **BY:** auto_1hr
+
+## [2026-09-20 04:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.47 (WR: 0%)
+**24h:** 52T, 48.1%WR, +$1.43 | **7d:** 218T, 48.6%WR, +$0.63
+
+**Close reasons (24h):** atr_sl_hit 31 (60% avg +$0.045), profit-monster-trail 14 (27% avg +$0.052), cut-loser-CL-T1 7 (14% avg -$0.097)
+**Top signals (24h):** pump-chain+ +$1.10 (21T, 48%WR), grind-trend+ +$0.15 (16T, 50%WR)
+**Bottom signals (24h):** grind-trend- -$0.38 (5T, already killed), mover+ -$0.05 (1T, below threshold)
+**Open:** 2 positions (LTC SHORT 1.7h, WLFI SHORT 1.1h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR with 3+ trades last hour)
+- atr_sl_hit dominant at 60% but avg +$0.045 — SL correctly calibrated
+- 2 pump-chain+ SL hits last hour — normal variance, signal still profitable
+- Trade frequency normal (~2/hr), no overtrading
+- grind-trend- already killed, mover+ only 1T below threshold
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
+
+## [2026-09-20 05:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.18 (WR: 100%)
+**24h:** 46T, ~50%WR, +$1.43
+
+**Close reasons (24h):** atr_sl_hit 31 (67% avg +$0.055), profit-monster-trail 10 (22% avg +$0.057), cut-loser-CL-T1 5 (11% avg -$0.098)
+**Top signals (24h):** pump-chain+ +$1.35 (20T, 55%WR), pullback-entry- +$0.23 (7T, 57%WR), grind-trend+ +$0.18 (10T, 60%WR)
+**Open:** 3 positions (WLFI, BABY, CC) — all near breakeven
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met (0% WR with 3+ trades)
+- atr_sl_hit dominant but avg +$0.055 — trailing SL feature, not bug
+- Trade frequency normal (~2/hr)
+- pump-chain+ carrying system at +$1.35/24h
+- All signals profitable with 3+ trades
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
+
+## [2026-09-20 05:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 04:39)
+**24h:** 40T, 62.5%WR, +$2.47 | **Close reasons:** atr_sl_hit 28 (70%, avg +$0.082), profit-monster-trail 8 (20%, avg +$0.073), cut-loser-CL-T1 4 (10%, avg -$0.100)
+**Top signals:** pump-chain+ +$1.68 (17T 65%WR), grind-trend+ +$0.47 (6T 83%WR), pullback-entry- +$0.28 (8T 62%WR)
+**Worst signal:** grind-trend- -$0.38 (5T 20%WR) — already killed
+**Open:** 3 positions (ENS SHORT 0.1h, CC LONG 1.7h, BABY LONG 1.8h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR with 3+ trades last hour)
+- atr_sl_hit dominant at 70% but avg +$0.082 — SL correctly calibrated, feature not bug
+- Trade frequency normal (1.7/hr), no overtrading
+- grind-trend- already killed, mover+ only 1T
+- 24h WR 62.5% is strong, system performing well
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-20 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE BIGTIME (WR=50.0%, PnL=$0.27, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE JUP (WR=60.0%, AvgPnL=2.52%, Trades=5)
+- PROMOTE FIL (WR=60.0%, AvgPnL=0.20%, Trades=10)
+- PROMOTE SYRUP (WR=80.0%, AvgPnL=1.25%, Trades=5)
+- PROMOTE CAKE (WR=60.0%, AvgPnL=0.83%, Trades=5)
+
+Final set: ['ACE', 'APT', 'BABY', 'BANANA', 'BLUR', 'CAKE', 'FIL', 'FOGO', 'JUP', 'LTC', 'POL', 'SAND', 'SYRUP']
+
+## LOSERS Update — 2026-09-20 06:05 UTC
+- ADD SEI (WR=40.0%, PnL=$-0.31, wr_collapse (61.5% → 40.0%))
+
+Final set: ['DOT', 'HYPER', 'SEI']
+
+## [2026-09-20 06:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 04:39)
+**24h:** 40T, 62.5%WR, +$2.47 | **7d:** 217T, 49.3%WR, +$0.58
+**Close reasons (24h):** atr_sl_hit 28 (70%, avg +$0.082), profit-monster-trail 8 (20%, avg +$0.073), cut-loser-CL-T1 4 (10%, avg -$0.100)
+**Top signals:** pump-chain+ +$1.68 (17T 65%WR), grind-trend+ +$0.47 (6T 83%WR), pullback-entry- +$0.28 (8T 63%WR)
+**Open:** 6/6 positions (at MAX_OPEN cap) — regime NEUTRAL
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR with 3+ trades last hour)
+- atr_sl_hit dominant at 70% but avg +$0.082 — trailing SL working correctly as feature, not bug
+- Trade frequency normal (~1.7/hr), no overtrading
+- All active signals profitable over 24h
+- grind-trend- already killed, mover+ only 1 trade
+- 6 open positions = at cap, system correctly limiting exposure
+- 24h WR 62.5% is strong, system performing well
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
