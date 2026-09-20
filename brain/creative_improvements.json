@@ -1284,5 +1284,41 @@
     "status": "boosted",
     "risk": "low",
     "boosted_at": "2026-09-19T17:11:35.941737+00:00"
+  },
+  {
+    "date": "2026-09-20T00:35:14.378962Z",
+    "idea": "Monitor pump-chain+ LONG hour 0,2,4 pattern",
+    "rationale": "10T 0%WR -.27 in hours 0,2,4 UTC. Pattern clear but sample small (needs 20+).",
+    "expected_impact": "+/usr/bin/bash.50-1.00/7d if implemented",
+    "category": "time filter",
+    "status": "monitoring",
+    "risk": "medium",
+    "sample_size": "10 trades (needs 20+)",
+    "impact_on_winners": "Cannot verify yet — need more data",
+    "confidence": "MEDIUM"
+  },
+  {
+    "date": "2026-09-20T00:35:14.378989Z",
+    "idea": "Add regime penalty for pullback-entry- SHORT in NORMAL",
+    "rationale": "pullback-entry- SHORT NORMAL: 19T 42.1%WR -/usr/bin/bash.35/7d. EXTREME: 13T 53.8%WR +/usr/bin/bash.27. Clear regime edge.",
+    "expected_impact": "+/usr/bin/bash.20-0.30/7d",
+    "category": "regime filter",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "19 trades (minimum met)",
+    "impact_on_winners": "Would block ~35% of NORMAL trades (7/19). Check if any winners blocked.",
+    "confidence": "HIGH"
+  },
+  {
+    "date": "2026-09-20T00:35:14.378999Z",
+    "idea": "Add volume confirmation for pump-chain+ LONG in EXTREME",
+    "rationale": "pump-chain+ LONG EXTREME: 18T 61.1%WR +.11. Could improve with volume filter.",
+    "expected_impact": "+/usr/bin/bash.10-0.20/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "18 trades (minimum met)",
+    "impact_on_winners": "Would block ~20% of EXTREME trades (4/18). Check if any winners blocked.",
+    "confidence": "MEDIUM"
   }
 ]

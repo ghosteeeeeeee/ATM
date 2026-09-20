@@ -2510,3 +2510,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) Monitor grind-trend+ CL-T1 cluster 48h. (2) Consider volume-breakout-long+ confidence boost in EXTREME when 20+ trades.
   **NO CONFIG CHANGE** — system stabilizing, legacy aging out.
   BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-20 05:00 UTC] brain_auditor: NO CONFIG CHANGE — monitoring + analysis
+  DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16
+  Market NEUTRAL. 4 open.
+  **LOSING AUTOPSY (22):** pump-chain+ LONG 8T -$1.18 (biggest loser). grind-trend+ LONG 8T -$0.54 (disabled signal). grind-trend- SHORT 4T -$0.40 (disabled signal). pullback-entry- SHORT 2T -$0.31. mover+ LONG 1T -$0.05.
+  **REGIME (7d):** EXTREME best for most signals. pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. pullback-entry- SHORT EXTREME 13T 53.8%WR +$0.27.
+  **TIME PATTERN:** pump-chain+ LONG hours 0,2,4 UTC: 10T 0%WR -$1.27. Pattern clear but sample small (needs 20+).
+  **CREATIVE:** (1) Monitor pump-chain+ LONG hour 0,2,4 pattern (2) Evaluate pullback-entry- SHORT NORMAL regime penalty (3) Volume filter for pump-chain+ LONG EXTREME.
+  **NO ACTION** — all items need more data. Monitor 48h.
+  BY: brain_auditor

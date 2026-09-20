@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-19 ~22:40 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-20 ~05:00 UTC (brain_auditor)**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 51T, 47.1% WR, +$1.01. 4 open. Market NEUTRAL. Pipeline running.
+24h: 50T, 44.0% WR, +$0.38. 4 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 51T, 47.1% WR, +$1.01. Winners: pump-chain+ 33T 51.5%WR +$1.49, volume-breakout-long+ 13T 69.2%WR +$0.76, rr-struct+ 9T 66.7%WR +$0.52. Losers: legacy signals aging out (trend_purity+ -$0.75, rr-struct-v2+ -$0.45, open-skies+ -$0.40).
-- **Today (calendar):** 48T closed (Sep 19). 4 open.
-- **7d:** 210T, 49.0% WR, -$0.22 (DB-verified). **SLIGHTLY NEGATIVE.** Active winners: pump-chain+ +$1.49, volume-breakout-long+ +$0.76, rr-struct+ +$0.52. Legacy killed signals aging out in 7d data.
+- **24h (rolling):** 50T, 44.0% WR, +$0.38. pump-chain+ LONG 19T 47.4%WR +$0.62, grind-trend+ LONG 18T 50.0%WR +$0.24 (disabled). Losers: pump-chain+ LONG 8T -$1.18 (biggest), grind-trend+ LONG 8T -$0.54 (disabled), grind-trend- SHORT 4T -$0.40 (disabled).
+- **Today (calendar):** 50T closed (Sep 20). 4 open.
+- **7d:** 212T, 48.6% WR, -$0.16 (DB-verified). **SLIGHTLY NEGATIVE.** EXTREME regime best (57.1%WR +$1.81). pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. Legacy killed signals aging out in 7d data.
 - **Market:** NEUTRAL (4 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
@@ -24,7 +24,7 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
 **🟢 R:R STATUS (7d SLIGHTLY NEGATIVE, 24h POSITIVE)**
-7d PnL -$0.22. SHORT +$0.20 carries LONG +$0.24. 24h +$1.01. Total active 30d: +$4.93.
+7d PnL -$0.16. SHORT +$0.20 carries LONG +$0.24. 24h +$0.38. Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
 
@@ -35,6 +35,10 @@
 **🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence reliably. rr-struct+ LONG 66.7%WR +$0.52 also strong. pullback-entry- SHORT 49.2%WR -$0.19 nearly breakeven. Need new signals for NEUTRAL diversity. 30d active: 6 types (+$4.93).
 
 **🟢 FEATURE RECORDING:** _signal_metadata RSI+momentum 187/188 trades (WORKING). **gap_at_entry + staleness_minutes** — decider_run.py injects EMA300 gap% and signal age into metadata. Since fix: staleness 23/26 (88%), gap 16/26 (62% — <300 candles = no EMA300), is_stale 26/26 (100%). — 2026-09-19
+
+## Today's Changes (Sep 20)
+
+1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16. Market NEUTRAL. 4 open. **LOSING AUTOPSY (22):** pump-chain+ LONG 8T -$1.18 (biggest loser). grind-trend+ LONG 8T -$0.54 (disabled signal). grind-trend- SHORT 4T -$0.40 (disabled signal). **TIME PATTERN:** pump-chain+ LONG hours 0,2,4 UTC: 10T 0%WR -$1.27. Pattern clear but sample small (needs 20+). **REGIME (7d):** EXTREME best. pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. pullback-entry- SHORT EXTREME 13T 53.8%WR +$0.27. **CREATIVE:** (1) Monitor pump-chain+ LONG hour 0,2,4 pattern (2) Evaluate pullback-entry- SHORT NORMAL regime penalty (3) Volume filter for pump-chain+ LONG EXTREME. **NO ACTION** — all items need more data. Monitor 48h.
 
 ## Today's Changes (Sep 19)
 

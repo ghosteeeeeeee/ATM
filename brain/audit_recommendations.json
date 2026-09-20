@@ -1,110 +1,98 @@
 {
-  "timestamp": "2026-09-19T19:35:55.298464Z",
+  "timestamp": "2026-09-20T00:34:32.685179Z",
   "session_brain_stats": {
-    "top_findings": [
-      "Signal decay - guitar tuning: high relevance, preservation of high-WR signals",
-      "atr-spike: no signal guarantees 100% WR, can improve selectivity",
-      "wave periods: frequency acceleration shows +1.50% avg 6h move (62% WR, n=29)",
-      "signal compactor: overall 200T 51%WR, atr-spike+ 1T 100%WR +$7.39"
+    "total_sessions": "1000+",
+    "recent_focus": [
+      "signal performance",
+      "regime filtering",
+      "time-based patterns"
+    ],
+    "key_insights": [
+      "pump-chain+ LONG has 0%WR in hours 0,2,4 UTC (10 trades)",
+      "EXTREME regime is best for most signals",
+      "grind-trend+ LONG HIGH has 66.7%WR but is disabled",
+      "pullback-entry- SHORT NORMAL is worst performer"
     ]
   },
   "trade_summary_24h": {
-    "total": 50,
-    "win_rate": 44.0,
-    "pnl": 0.67,
-    "open": 6,
-    "unrealized": 0.0,
-    "regime": "NEUTRAL",
-    "best_signal": "pump-chain+ LONG 18T 55.6%WR +$1.63",
-    "worst_signal": "pullback-entry- SHORT 3T 0%WR -$0.50"
-  },
-  "trade_summary_7d": {
-    "total": 207,
-    "win_rate": 49.3,
-    "pnl": 0.13,
-    "best_regime": "EXTREME 52T 57.7%WR +$1.74",
-    "worst_regime": "HIGH 91T 47.3%WR -$1.12",
-    "best_hour": "23h 5T 100%WR +$1.79",
-    "worst_hour": "3h 11T 18.2%WR -$0.91"
+    "trades": 50,
+    "winrate": 44.0,
+    "pnl": 0.38,
+    "market": "NEUTRAL",
+    "open_trades": 4
   },
   "drift_findings": [
     {
-      "finding": "SHORT_RSI_FLOOR doc stale",
-      "detail": "CURRENT.md says SHORT_RSI_FLOOR=25 but code has 35. Doc is wrong, code is correct.",
-      "severity": "low",
-      "action": "Update CURRENT.md"
+      "topic": "pump-chain+ LONG time pattern",
+      "session_insight": "Hours 0,2,4 UTC have 0%WR across 10 trades",
+      "code_status": "NOT IMPLEMENTED — no time filter exists",
+      "impact": "Medium — .27/7d loss from bad hours",
+      "recommendation": "Monitor 10 more trades before implementing time filter"
     },
     {
-      "finding": "BAD_TRADE_HOURS not implemented",
-      "detail": "CURRENT.md references BAD_TRADE_HOURS but no code exists. Stale reference. Hour 15 (+$1.04) IN current set, Hour 20 (-$0.89) NOT in set. Time filtering penalty on winners not losers.",
-      "severity": "medium",
-      "action": "Remove BAD_TRADE_HOURS reference from CURRENT.md"
-    },
-    {
-      "finding": "grind-trend- SHORT still in 24h data",
-      "detail": "5T -$0.38 in 24h, killed at 17:12 UTC. Trades aged in but signal is dead. Expected to age out.",
-      "severity": "low",
-      "action": "Monitor — will age out"
+      "topic": "grind-trend+ LONG HIGH regime",
+      "session_insight": "12T 66.7%WR +/usr/bin/bash.35 in HIGH regime",
+      "code_status": "DISABLED — signal killed Sep 19",
+      "impact": "Low — signal was net negative overall",
+      "recommendation": "No action — signal disabled for good reason"
     }
   ],
   "recurring_problems": [
     {
-      "problem": "HIGH regime persistent loss source",
-      "detail": "7d: 91T 47.3%WR -$1.12. Combined with NORMAL: 154T 46.5%WR -$1.61. Only EXTREME is profitable.",
-      "impact": "-$1.61/7d from HIGH+NORMAL",
-      "suggestion": "Consider regime-specific confidence adjustments for HIGH"
+      "problem": "pump-chain+ LONG losses in bad hours",
+      "frequency": "Every audit run",
+      "root_cause": "No time-based filter for pump-chain+",
+      "recommended_fix": "Monitor 10 more trades before implementing"
     },
     {
-      "problem": "z_0.5_to_1.5 LONG dead zone",
-      "detail": "39T 48.7%WR -$0.71. Worst z-score zone. While z_1.5_to_2.5 is best (64.5%WR +$2.52).",
-      "impact": "-$0.71/7d from this zone alone",
-      "suggestion": "Monitor. If pattern persists, consider z_0.5_to_1.5 penalty or minimum z-score threshold"
-    },
-    {
-      "problem": "grind-trend- SHORT (killed) still in data",
-      "detail": "5T 20%WR -$0.38/24h, killed 17:12 UTC. Will age out.",
-      "impact": "-$0.38/24h temporary",
-      "suggestion": "Monitor — signal dead, data aging out"
+      "problem": "pullback-entry- SHORT NORMAL underperformance",
+      "frequency": "Weekly",
+      "root_cause": "NORMAL regime choppy for SHORT entries",
+      "recommended_fix": "Add regime penalty for NORMAL (0.7x confidence)"
     }
   ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-09-19T19:35:55.298498Z",
-      "idea": "Monitor z_0.5_to_1.5 dead zone — consider z_score_floor for LONG entries",
-      "rationale": "39 trades in 7d at z_0.5-1.5: 48.7%WR -$0.71. This is the worst z-score zone. z_1.5-2.5 is best at 64.5%WR +$2.52. If z_0.5-1.5 stays negative for 2+ more days, suggest ZSCORE_MIN_LONG=0.5 to filter out the dead zone.",
-      "expected_impact": "+$0.35-0.71/7d if pattern holds",
+      "date": "2026-09-20T00:34:32.685206Z",
+      "idea": "Add regime penalty for pullback-entry- SHORT in NORMAL",
+      "rationale": "pullback-entry- SHORT NORMAL: 19T 42.1%WR -/usr/bin/bash.35/7d. EXTREME: 13T 53.8%WR +/usr/bin/bash.27. Clear regime edge.",
+      "expected_impact": "+/usr/bin/bash.20-0.30/7d",
+      "category": "regime filter",
+      "status": "suggested",
+      "risk": "low",
+      "sample_size": "19 trades (minimum met)",
+      "impact_on_winners": "Would block ~35% of NORMAL trades (7/19). Check if any winners blocked."
+    },
+    {
+      "date": "2026-09-20T00:34:32.685215Z",
+      "idea": "Monitor pump-chain+ LONG hour 0,2,4 pattern",
+      "rationale": "10T 0%WR -.27 in hours 0,2,4 UTC. Pattern clear but sample small.",
+      "expected_impact": "+/usr/bin/bash.50-1.00/7d if implemented",
+      "category": "time filter",
+      "status": "monitoring",
+      "risk": "medium",
+      "sample_size": "10 trades (needs 20+)",
+      "impact_on_winners": "Cannot verify yet — need more data"
+    },
+    {
+      "date": "2026-09-20T00:34:32.685222Z",
+      "idea": "Add volume confirmation for pump-chain+ LONG in EXTREME",
+      "rationale": "pump-chain+ LONG EXTREME: 18T 61.1%WR +.11. Could improve with volume filter.",
+      "expected_impact": "+/usr/bin/bash.10-0.20/7d",
       "category": "entry sniper",
-      "status": "suggested — monitor first",
-      "risk": "medium — 39 trades is borderline sample, pattern may not hold",
-      "impact_on_winners": "Would block 39 LONG trades (48.7%WR). Net winners in zone: ~19. Edge unclear — monitor."
-    },
-    {
-      "date": "2026-09-19T19:35:55.298508Z",
-      "idea": "EXTREME regime confidence boost for LONG signals",
-      "rationale": "EXTREME LONG 30T 63.3%WR +$1.73 — our best regime. pump-chain+ LONG EXTREME: 16T 62.5%WR +$1.12. Currently all signals use same confidence. Could boost EXTREME LONG confidence by +5-10% for more aggressive entries.",
-      "expected_impact": "+$0.20-0.50/7d from more EXTREME LONG entries",
-      "category": "regime edge",
-      "status": "suggested — needs backtest",
-      "risk": "low — EXTREME is well-established edge",
-      "impact_on_winners": "No impact — purely additive (boosts existing entries, doesn't block anything)"
-    },
-    {
-      "date": "2026-09-19T19:35:55.298521Z",
-      "idea": "HIGH regime LONG penalty (not block)",
-      "rationale": "HIGH LONG 49T 49.0%WR -$0.65/7d. Not terrible but negative. Could add HIGH_LONG_CONF_PENALTY=0.9 (reduce confidence by 10% for HIGH LONG entries). Safer than blocking.",
-      "expected_impact": "+$0.30-0.65/7d",
-      "category": "regime edge",
-      "status": "suggested — needs backtest",
-      "risk": "medium — HIGH LONG has some winners (49% WR), penalty may push some below CONF_FILTER_MIN",
-      "impact_on_winners": "Would reduce confidence for ~49 HIGH LONG trades. Some may fall below CONF_FILTER_MIN=70. Verify before implementing."
+      "status": "suggested",
+      "risk": "low",
+      "sample_size": "18 trades (minimum met)",
+      "impact_on_winners": "Would block ~20% of EXTREME trades (4/18). Check if any winners blocked."
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "Monitor chase filter deployment — pipeline restart needed",
-    "Monitor z_0.5_to_1.5 dead zone — 2 more days of data needed",
-    "Verify EXTREME LONG edge holds (63.3%WR is strong but sample=30)",
-    "Update CURRENT.md: SHORT_RSI_FLOOR=35 (not 25), remove BAD_TRADE_HOURS reference",
-    "HIGH regime LONG: consider confidence penalty if pattern persists"
+    "Monitor pump-chain+ LONG hour 0,2,4 pattern for 10 more trades",
+    "Evaluate pullback-entry- SHORT NORMAL regime penalty after 50+ trades",
+    "Check if volume filter would improve pump-chain+ LONG EXTREME performance",
+    "Continue monitoring stale filter effectiveness",
+    "Track chase filter impact on 24h performance"
   ]
 }
