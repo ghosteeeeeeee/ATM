@@ -121,3 +121,16 @@
 - **INFO**: Disk at 84% (94G/118G) — no old logs to compress, stable
 - **INFO**: No hermes-* timers listed (pipeline runs as continuous service loop)
 - **INFO**: Hotset empty — no signals survived compaction (consistent with flat market)
+
+## Error Alerts — 2026-09-20 08:44 UTC
+- **WARN**: Speed DBs empty — `speed_hermes.db` has 0 tables, `speeds_hermes_runtime.db` is 0 bytes. Speed-based token filtering inactive. Pipeline still runs (speed is advisory, not blocking).
+- **INFO**: Disk at 84% (stable since 07:47 check). Top: coin_tracker=2.4G, candles=2.0G, signals=781M, session_brain=662M.
+- **INFO**: 2 phantom-trade blocks today (BLUR SHORT, GMT SHORT) — tight SL correctly blocked.
+- **INFO**: Market ~100% NEUTRAL — 1 LONG bias, 1 SHORT bias, 118 neutral tokens.
+
+## Error Alerts — 2026-09-20 09:57 UTC
+- **REPEATED** (11x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2645s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2578s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2499s left, N failures)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2438s left, N failures)`

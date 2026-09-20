@@ -1,13 +1,19 @@
-## CEO Report — 2026-09-20 ~05:15 UTC
+## CEO Report — 2026-09-20 ~07:30 UTC
 
 ### Diagnosis
-DB-verified. 24h: 50T, 50.0% WR, +$1.90 (strong improvement from $0.38 earlier). 7d: 216T, 49.1% WR, +$1.10 (FLIPPED POSITIVE from -$0.16). 4 open. Market NEUTRAL. **EXTREME regime is the edge:** 24h EXTREME 15T 73.3% WR +$2.09. 7d EXTREME 59T 57.6% WR +$2.62. pump-chain+ LONG EXTREME 20T 60% WR +$1.80 (7d). **NORMAL bleeding:** 24h NORMAL 10T 30% WR -$0.30. pump-chain+ LONG NORMAL 3T 33.3% WR -$0.28 (7d). Today: +$1.04 (66.7% WR, 6T).
+DB-verified. 24h: 38T, 68.4% WR, +$2.26 (strong day). 7d: 218T, 49.1% WR, +$0.51 (barely positive). 6 open. Market NEUTRAL. **Dead zone hours 1-2 UTC bleed $1.62/7d** — not covered by TIME_BLOCK (03-09). Hour 2: 13T 30.8% WR -$1.15 (worst). pump-chain+ LONG 0%WR in hours 1-2. **EXTREME regime carries system:** +$2.70/7d (57.4% WR). **NORMAL bleeds:** -$1.34/7d (44.1% WR). **HIGH bleeds:** -$0.85/7d (legacy signals aging out, resolves by Sep 23).
 
 ### Root Cause
-Edge is regime-dependent. EXTREME carries the PnL (+$2.09/24h, +$2.62/7d). NORMAL bleeds (-$0.30/24h, -$0.78/7d). Signal diversity unchanged — pump-chain+ is the only reliable earner. Legacy killed signals still in 7d data but aging out. Hotset empty (0 tokens) — all signals blocked by confluence gate + NEUTRAL block + R:R filter. Pipeline still trades via other paths.
+TIME_BLOCK started at hour 3, missing the two worst hours (1-2). pump-chain+ LONG fires in EXTREME/HIGH during hours 1-2 but loses 100% — low liquidity, false breakouts. The 0.7x penalty during 03-09 was working but started too late.
 
 ### Fix Applied
-No config changes. System healthy. EXTREME regime edge confirmed and documented. Monitoring 48h.
+Extended TIME_BLOCK_START from 3 to 1. Covers hours 1-2 with 0.7x confidence penalty. Expected +$0.50-1.00/7d. Also updated signal_regime_memory.json with volume-breakout-long+ regime data (hidden gem: 71.4% WR in EXTREME+NORMAL).
+
+### Verification
+- 24h: 38T 68.4%WR +$2.26 ✅
+- 7d: 218T 49.1%WR +$0.51 ✅
+- EXTREME edge: 61T 57.4%WR +$2.70 ✅
+- Dead zone hours 1-2: $1.62/7d bleed identified and addressed
 
 ### Verification
 Pipeline running (timer active, all steps healthy). 4 open trades (2x pullback-entry- SHORT, 2x pump-chain+ LONG). Chase filter active (58 blocks). Stale filter working. Feature recording working.

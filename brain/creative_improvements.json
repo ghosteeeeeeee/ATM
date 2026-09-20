@@ -1398,5 +1398,25 @@
     "category": "new signal",
     "status": "suggested — needs signal-lab development",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-20T09:32:09.244021+00:00",
+    "idea": "IMPLEMENT dead zone filter: block new entries 00-04 UTC",
+    "rationale": "49 trades in hours 00-04 lost $3.07/7d at 34.7% WR. pump-chain+ LONG in dead zone: 0% WR in hours 00, 02, 04. Removing dead zone: 169T 53.3%WR +$3.52 (improvement of +$3.95/7d). This is the single biggest leak in the system.",
+    "expected_impact": "+$3.0-3.5/7d",
+    "category": "entry sniper",
+    "status": "recommended-monitor-48h",
+    "risk": "low",
+    "would_block_winners": "17 wins in 7d (10.1% of all wins)",
+    "impact_on_winners_check": "17 wins blocked but 32 losses saved. Net +$3.95/7d."
+  },
+  {
+    "date": "2026-09-20T09:32:09.244037+00:00",
+    "idea": "Monitor volume-breakout-long+ for frequency increase",
+    "rationale": "71.4% WR, +$0.84/7d, 2T/day. Works equally in EXTREME and NORMAL. Could be promoted.",
+    "expected_impact": "+$0.5-1.0/7d if frequency increased",
+    "category": "signal diversity",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]

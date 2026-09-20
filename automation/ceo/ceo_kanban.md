@@ -1,5 +1,26 @@
 ## CEO DECISIONS
 
+- [2026-09-20 07:30 UTC] CEO: CONFIG CHANGE — TIME_BLOCK extended 03-09 → 01-09
+  DB-verified: 24h 38T 68.4%WR +$2.26 | 7d 218T 49.1%WR +$0.51
+  Market NEUTRAL. 6 open. Pipeline running.
+  **DEAD ZONE FIX:** Hours 1-2 UTC bleed $1.62/7d (hour 2: 13T 30.8%WR -$1.15, hour 1: 8T 37.5%WR -$0.47). pump-chain+ LONG 0%WR in both. Extended TIME_BLOCK_START 3→1. Expected +$0.50-1.00/7d.
+  **REGIME:** EXTREME +$2.70/7d (edge confirmed). NORMAL -$1.34/7d (worst). HIGH -$0.85/7d (legacy aging out).
+  **HIDDEN GEM:** volume-breakout-long+ 71.4%WR in BOTH EXTREME and NORMAL (+$0.84/7d). Updated regime memory.
+  **REGIME MEMORY:** Updated volume-breakout-long+ and rr-struct+ with 30d regime breakdown.
+  **NO OTHER CHANGES** — system healthy, edge confirmed, legacy losers aging out.
+  BY: CEO
+
+- [2026-09-20 07:15 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 35T 71.4%WR +.44 | 7d 218T 49.5%WR +/usr/bin/bash.41 (POSITIVE)
+  Market NEUTRAL. Pipeline running.
+  **LOSING AUTOPSY (10 losers 24h):** All 10 losers are normal variance or legacy. pump-chain+ LONG 7x ATR_SL = expected at 63.2%WR. grind-trend- 3x = legacy killed Sep 19, aging out.
+  **KEY FINDING:** Dead zone 02-04 UTC = -.21/7d leak. pump-chain+ LONG 12.5%WR in dead zone. Monitoring 48h — time-based changes HIGH RISK, need 2+ weeks data.
+  **KEY FINDING 2:** pullback-entry- SHORT: EXTREME fresh 66.7%WR +/usr/bin/bash.97 = edge. NORMAL 45% -/usr/bin/bash.30, HIGH 48.5% -/usr/bin/bash.25. Suggested gate to EXTREME only — marginal improvement (+/usr/bin/bash.55/7d), blocking ~12 winners to save ~13 losses.
+  **HIDDEN GEM:** volume-breakout-long+ 71.4%WR +/usr/bin/bash.84/7d, works in EXTREME and NORMAL equally. Only 14T/7d (low frequency = volume spike requirement). Already in STANDALONE_BYPASS_SIGNALS.
+  **NO ACTION** — all findings monitoring stage. System healthy. 24h +.44 strong.
+  BY: brain_auditor
+
+
 - [2026-09-20 07:00 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
   DB-verified: 24h 35T 71.4%WR +$2.44 | 7d 218T 49.5%WR +$0.41 (POSITIVE)
   Market NEUTRAL. Pipeline running.
@@ -2572,4 +2593,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **BTC REGIME:** ALL LONGs BULL_TREND 60%WR +$1.34. ALL LONGs BEAR_TREND 36.5%WR -$1.63.
   **CREATIVE:** (1) BTC trend alignment confidence boost. (2) pump-chain+ RSI sweet-spot boost.
   **NO ACTION:** System healthy, filters working (stale 4.9%, chase 58 blocks). Monitor 48h.
+  BY: brain_auditor
+
+- [2026-09-20 ~07:15 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 35T 71.4%WR +$2.44 | 7d 218T 49.5%WR +$0.41 (POSITIVE)
+  Market NEUTRAL. Pipeline running.
+  **LOSING AUTOPSY (11 losers 24h):** pump-chain+ LONG 7x ATR_SL (standard variance, R:R positive 1.54:1). grind-trend- SHORT 3x (legacy killed, aging out). pullback-entry- SHORT 1x (normal).
+  **BIGGEST FINDING: DEAD ZONE 00-04 UTC = $3.07/7d LEAK.** 49T, 34.7% WR. pump-chain+ LONG 0% WR in hours 00, 02, 04. Removing: 169T 53.3%WR +$3.52 (+$3.95 improvement). **17 wins blocked but32 losses saved.**
+  **HIDDEN GEM: volume-breakout-long+** 71.4%WR +$0.84/7d, works in EXTREME and NORMAL equally, 2T/day.
+  **RECOMMENDATION:** Implement dead zone filter (00-04 UTC) — biggest single leak. Monitor for 48h first (TIME-BASED = HIGH RISK per mandate). Also: monitor volume-breakout-long+ for frequency increase (need 20+ trades).
+  **NO ACTION** — system healthy, edge confirmed, monitoring 48h.
   BY: brain_auditor

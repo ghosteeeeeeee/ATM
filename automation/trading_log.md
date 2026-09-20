@@ -2906,3 +2906,48 @@ Final set: ['DOT', 'HYPER', 'SEI']
 - 7d trend improving: -$2.10 → +$0.41
 
 **System Status:** Stable, no action required.
+
+## [2026-09-20 09:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed since last check (INJ pump-chain+ +$0.16)
+**24h:** 38T 68.4%WR +$2.69 | **Open:** 5 SHORTs (pullback-entry-, $0 PnL)
+
+**Diagnosis:**
+1. **Entry quality:** 68.4% WR 24h — excellent
+2. **SL behavior:** All exits atr_sl_hit — trailing stops working, not tight SLs
+3. **Signal quality:** All profitable except grind-trend- (-$0.20, marginal)
+4. **Trade frequency:** 1.6/hr — normal
+5. **Kill candidates:** None (0% WR with 3+ trades)
+
+**No Change Needed:**
+- No kill candidates
+- No overtrading
+- 5 open positions at reasonable capacity
+- All active signals profitable
+- 7d trend stable
+
+**Status:** System healthy, no action required.
+**BY:** auto_1hr
+
+## [2026-09-20 10:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L), net -$0.05
+**24h:** 38T, 68.4% WR, +$2.26
+**Open:** 6 trades at cap, +$0.65 unrealized
+**7d:** 218T, 49.1% WR, +$0.41 (improving from -$2.10)
+
+**Diagnosis:**
+1. **Entry quality:** 68.4% WR 24h — excellent
+2. **SL behavior:** atr_sl_hit = 72.9% of 7d closes, profitable (+$1.92/24h) — trailing stops working
+3. **Signal quality:** No kill candidates (0% WR, 3+ trades last hour). 7d losers already killed
+4. **Trade frequency:** ~1.6/hr — normal
+5. **Open positions:** 6 at cap, all reasonable
+
+**No Change Needed:**
+- No kill candidates
+- No overtrading
+- All signals profitable or already disabled
+- 7d trend improving
+
+**Status:** System healthy, no action required.
+**BY:** auto_1hr
