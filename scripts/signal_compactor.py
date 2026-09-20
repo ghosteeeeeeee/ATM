@@ -2183,26 +2183,57 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # FIX (2026-08-23): Allow SHORT when 1m shows SHORT_BIAS
             # FIX (2026-08-24): Also allow SHORT when confluence is strong (2+ types)
             # or source is standalone bypass — NEUTRAL market doesn't mean no SHORT edge
-            # Layer B: Gate STANDALONE_BYPASS with BTC momentum check (2026-09-11)
-            # Prevents single-source signals from bypassing neutral block when BTC is flat.
-            # EXEMPTION: pump-chain fires when COIN is pumping — BTC flatness irrelevant (2026-09-12)
-            # EXEMPTION: mover fires on strong momentum — BTC flatness irrelevant (2026-09-12)
-            # EXEMPTION: open-skies breakout — BTC flatness irrelevant (2026-09-12)
+            # Layer B: Gate STANDALONE_BYPASS with BTC momentum + continuum check (2026-09-20)
+            # Primary check: BTC continuum market_phase (structural view)
+            # Fallback: velocity (rate of change) when continuum unavailable
+            # This catches "slow bleeds" where velocity is low but structure is bearish
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
             _is_pump_chain = bare_source in ('pump-chain', 'pump_chain', 'pump-chain+', 'pump-chain-', 'pump_chain+', 'pump_chain-')
             _is_mover = bare_source in ('mover_long', 'mover+', 'mover-', 'mover_long+', 'mover_long-')
             _is_open_skies = bare_source in ('open-skies+', 'open-skies', 'open_skies')
             _is_accel_breakout = 'accel-300-breakout' in bare_source
             _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies or _is_accel_breakout
+            _continuum_phase = None  # will be set if we query continuum
             if BTC_CHOP_GATE_ENABLED and not _btc_exempt:
                 _bypass_conn = None
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+                    # Primary: check continuum market_phase (structural regime)
+                    try:
+                        _cont_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                        _cont_row = _cont_conn.execute(
+                            "SELECT market_phase FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                        _cont_conn.close()
+                        if _cont_row and _cont_row[0]:
+                            _continuum_phase = _cont_row[0]
+                    except Exception:
+                        pass
+
                     _bypass_row = _bypass_conn.execute(
                         "SELECT velocity FROM momentum_cache WHERE token='BTC'"
                     ).fetchone()
                     if _bypass_row and _bypass_row[0] is not None:
-                        _btc_mom_ok_for_bypass = abs(_bypass_row[0]) >= BTC_CHOP_GATE_THRESHOLD
+                        _velocity = _bypass_row[0]
+                        _vel_ok = abs(_velocity) >= BTC_CHOP_GATE_THRESHOLD
+
+                        # Continuum-aware logic:
+                        # DECLINING → SHORT allowed, LONG blocked (regardless of velocity)
+                        # RALLYING/UP → LONG allowed, SHORT blocked (regardless of velocity)
+                        # ACCUMULATION/DISTRIBUTION → use velocity as tiebreaker
+                        if _continuum_phase and direction.upper() == 'SHORT' and _continuum_phase in ('DECLINING', 'STRONG_DECLINING'):
+                            _btc_mom_ok_for_bypass = True
+                            log(f"  ✅ [CONTINUUM-OVERRIDE] {token} SHORT — BTC continuum={_continuum_phase}, allowing despite velocity={_velocity:.3f}")
+                        elif _continuum_phase and direction.upper() == 'LONG' and _continuum_phase in ('DECLINING', 'STRONG_DECLINING'):
+                            _btc_mom_ok_for_bypass = False
+                            log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC continuum={_continuum_phase}, blocking")
+                        elif _continuum_phase and direction.upper() == 'LONG' and _continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP'):
+                            _btc_mom_ok_for_bypass = True
+                        elif _continuum_phase and direction.upper() == 'SHORT' and _continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP'):
+                            _btc_mom_ok_for_bypass = False
+                        else:
+                            # Fallback to velocity check
+                            _btc_mom_ok_for_bypass = _vel_ok
                 except Exception as e:
                     log(f"  [WARN] BTC chop bypass check failed: {e}", 'WARN')
                 finally:
@@ -2257,6 +2288,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if ACCEL_300_MINUS_FLAT_BLOCK and _regime_4h == 'FLAT':
                     log(f"  🚫 [ACCEL300-SHORT-FLAT] {token} SHORT blocked — FLAT regime, no SHORT edge (17% WR)")
                     continue
+            # ── pump-chain+ HIGH regime block ──────────────────────────────
+            # 14T/7d HIGH: 35.7%WR +$0.19 (noise). EXTREME: 57.1%WR +$1.65 (edge).
+            if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
+                try:
+                    from hermes_constants import PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED
+                    if PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED and _regime_4h == 'HIGH':
+                        log(f"  🚫 [PUMP-CHAIN-HIGH] {token} LONG blocked — HIGH regime, no pump-chain+ LONG edge (35.7%WR)")
+                        continue
+                except ImportError:
+                    pass
             # ── Coiled Spring regime filter ──────────────────────────────────
             # 71% WR in NORMAL, 20-40% in others — only trade NORMAL
             if 'coil-spring' in bare_source:
