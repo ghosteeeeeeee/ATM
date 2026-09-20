@@ -2443,7 +2443,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
     # breakout-long removed — killed 2026-09-17 (4T/7d 25%WR -$0.35)
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
-    'return_exhaustion_short', 'return-exhaustion-short',
+    'return_exhaustion_short', 'return-exhaustion-short', 'return_exhaustion-short',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     # ponytail: ema300-dip-long removed — dead (2T/7d 0%WR -$0.40)
@@ -2537,6 +2537,10 @@ SIGNAL_STALENESS_MAX_AGE_MIN = 5   # V2 2026-08-29 — increased from 3. Code Ar
 # pump-chain+ stale block — 0% WR when stale (5 trades 7d -$0.73). Fresh is 50% WR +$0.45.
 # Block pump-chain+ signals older than this threshold.
 PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stale trades, 0 wins
+
+# pump-chain+ HIGH regime block — 14T/7d 35.7%WR +$0.19 (noise). EXTREME 57.1%WR +$1.65 (edge).
+# Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
+PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-09-20 — 14T/7d HIGH noise, redirect to EXTREME
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
