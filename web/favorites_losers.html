@@ -235,14 +235,14 @@
                 const rowClass = isDead ? 'dead-row' : 'loser-row';
                 const badge = isDead ? '<span class="badge badge-dead">💀 DEAD</span>' : '<span class="badge badge-loser">🗑️</span>';
 
-                // Direction badges
+                // Direction badges (show which direction is the loser)
                 let dirBadge = '';
-                if (l.is_long_fav && l.is_short_fav) {
-                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑↓</span>';
-                } else if (l.is_long_fav) {
-                    dirBadge = '<span class="badge" style="background:#00ff8822;color:#00ff88;font-size:9px">↑</span>';
-                } else if (l.is_short_fav) {
-                    dirBadge = '<span class="badge" style="background:#ff448822;color:#ff4488;font-size:9px">↓</span>';
+                if (l.is_long_loser && l.is_short_loser) {
+                    dirBadge = '<span class="badge" style="background:#ff444422;color:#ff4444;font-size:9px">↑↓ LOSERS</span>';
+                } else if (l.is_long_loser) {
+                    dirBadge = '<span class="badge" style="background:#ff444422;color:#ff4444;font-size:9px">↑ LONG LOSER</span>';
+                } else if (l.is_short_loser) {
+                    dirBadge = '<span class="badge" style="background:#ff444422;color:#ff4444;font-size:9px">↓ SHORT LOSER</span>';
                 }
 
                 // Direction-specific stats

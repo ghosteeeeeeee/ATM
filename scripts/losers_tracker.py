@@ -324,6 +324,8 @@ def run():
                     'total_pnl_usdt': float(token_stats.get('total_pnl_usdt', 0)),
                     'consecutive_losses': int(token_stats.get('consecutive_losses', 0)),
                     'reason': 'in_losers',
+                    'is_long_loser': token in LOSERS_LONG,
+                    'is_short_loser': token in LOSERS_SHORT,
                     'is_long_fav': token in FAVORITES_LONG,
                     'is_short_fav': token in FAVORITES_SHORT,
                     'direction_stats': direction_stats.get(token, {})
