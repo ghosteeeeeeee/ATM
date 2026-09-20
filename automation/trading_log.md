@@ -2887,3 +2887,22 @@ Final set: ['DOT', 'HYPER', 'SEI']
 
 **Status:** System healthy, no action required
 **BY:** auto_1hr
+
+## [2026-09-20 07:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (7 closed last 6h, 39 in 24h)
+**PnL:** +$2.35 (24h, 64.1% WR) — 7d: +$0.41 (49.1% WR, improving from -$2.10)
+
+**Diagnosis:**
+1. **Entry quality:** 64.1% WR 24h — healthy
+2. **SL behavior:** atr_sl_hit = 74.4% of closes but +$2.19 PnL — SLs hitting after profit (trailing stops working)
+3. **Signal quality:** No signal with 0% WR and 3+ trades. grind-trend- already killed.
+4. **Trade frequency:** ~1.6/hr — normal, not overtrading
+5. **Open positions:** 5 open (3 SHORT: ENS/GMT/BLUR, 2 LONG: INJ/ME) — reasonable
+
+**No Change Needed:**
+- No signal meets kill threshold (0% WR with 3+ trades)
+- ATR SL dominance is trailing-stop behavior, not tight SLs
+- 7d trend improving: -$2.10 → +$0.41
+
+**System Status:** Stable, no action required.

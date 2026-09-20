@@ -112,3 +112,12 @@
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-20 07:45 UTC
+- **OK**: Pipeline running — last run 07:43, all steps completed (signal_compactor, decider_run, position_manager, trades_api)
+- **OK**: 5 open positions, 13 closed today, +$0.63 PnL, 61.5% WR
+- **WARN** (3x): `signal_compactor: timed out (killed after 60.1s)` at 06:52, 07:24, 07:38 — self-recovered each time (subsequent runs 0.8-3.7s)
+- **WARN**: Market nearly 100% NEUTRAL (118 neutral, 2 short: STX/ACE, 0 long) — low signal environment
+- **INFO**: Disk at 84% (94G/118G) — no old logs to compress, stable
+- **INFO**: No hermes-* timers listed (pipeline runs as continuous service loop)
+- **INFO**: Hotset empty — no signals survived compaction (consistent with flat market)

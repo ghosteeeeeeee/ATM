@@ -1370,5 +1370,33 @@
     "category": "monitoring",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-20T07:00:00Z",
+    "idea": "Block pump-chain+ LONG in NORMAL regime",
+    "rationale": "pump-chain+ LONG NORMAL: 3T 33.3%WR -$0.28/7d. EXTREME: 21T 57.1%WR +$1.65. NORMAL is the only losing regime.",
+    "expected_impact": "+$0.28/7d",
+    "category": "regime filter",
+    "status": "suggested — needs 20+ trades",
+    "risk": "low",
+    "sample_size": "3T — INSUFFICIENT"
+  },
+  {
+    "date": "2026-09-20T07:00:00Z",
+    "idea": "Increase volume-breakout-long+ frequency (71.4%WR, 14T/7d)",
+    "rationale": "Most efficient signal per trade. Relaxing entry conditions could double frequency without degrading WR significantly.",
+    "expected_impact": "+$0.40-0.80/7d if frequency doubles at 65%+ WR",
+    "category": "entry sniper",
+    "status": "suggested — investigate entry conditions",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-20T07:00:00Z",
+    "idea": "NEW SIGNAL: NEUTRAL regime specialist (mean-reversion or range-breakout)",
+    "rationale": "NEUTRAL is where BTC spends 60-70% of time. Current signals depend on momentum/volatility absent in NEUTRAL. Only volume-breakout-long+ and doji-bottom-long fire there.",
+    "expected_impact": "+$1-3/7d (fills NORMAL bleed gap)",
+    "category": "new signal",
+    "status": "suggested — needs signal-lab development",
+    "risk": "medium"
   }
 ]

@@ -1,5 +1,15 @@
 ## CEO DECISIONS
 
+- [2026-09-20 07:00 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 35T 71.4%WR +$2.44 | 7d 218T 49.5%WR +$0.41 (POSITIVE)
+  Market NEUTRAL. Pipeline running.
+  **LOSING AUTOPSY (10 losers 24h):** pump-chain+ LONG 7x ATR_SL (RSI 32-78, normal variance at 63.2% WR). grind-trend- SHORT 3x (legacy killed, aging out). pullback-entry- SHORT 1x (ME, RSI 43, normal). **No actionable losers — all standard variance or legacy.**
+  **KEY FINDING:** pump-chain+ LONG RSI analysis: 70+ bucket is +$0.32 profitable (14T 42.9%WR). RSI ceiling filter would HURT. The 60-70 bucket is worst (-$0.55) — not overbought, just variance. **RSI ceiling for pump-chain+ LONG = BAD IDEA.**
+  **KEY FINDING 2:** HIGH regime -$0.76/7d is mostly legacy killed signals (open-skies+, rr-struct-v2+, breakout-long+, grind-trend-). Will resolve naturally by Sep 23.
+  **SUGGESTED:** Monitor pump-chain+ LONG NORMAL (3T only, need 20+ before action). Investigate volume-breakout-long+ frequency (71.4%WR, 14T/7d — could increase). Develop NEUTRAL-specialist signal.
+  **NO ACTION** — system healthy, edge confirmed, monitoring 48h.
+  BY: brain_auditor
+
 - [2026-09-20 06:45 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
   DB-verified: 24h 41T 63.4%WR +$2.37 | 7d 219T 49.3%WR +$0.43 (POSITIVE)
   Market NEUTRAL. Pipeline running.

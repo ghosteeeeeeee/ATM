@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-20 ~06:45 UTC (brain_auditor)**
+**Last Updated: 2026-09-20 ~07:00 UTC (brain_auditor)**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 40T, 65% WR, +$2.46. 5 open. Market NEUTRAL. Pipeline running.
+24h: 35T, 71.4% WR, +$2.44. 6 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 40T, 65% WR, +$2.46. pump-chain+ LONG 17T 64.7%WR +$1.68 (top). grind-trend+ LONG 6T 83.3%WR +$0.47 (best WR). pullback-entry- SHORT 8T 62.5%WR +$0.28. Losers: grind-trend- SHORT 5T -$0.38 (killed Sep 19), mover+ LONG 1T -$0.05 (watch).
+- **24h (rolling):** 35T, 71.4% WR, +$2.44. pump-chain+ LONG 19T 63.2%WR +$1.53 (top). grind-trend+ LONG 4T 100%WR +$0.45. pullback-entry- SHORT 8T 62.5%WR +$0.28. Losers: pump-chain+ LONG 7 ATR_SL (normal variance), grind-trend- SHORT 3 (legacy killed, aging out).
 - **Today (calendar):** 12T closed. 5 open. +$0.62 58.3% WR.
 - **7d:** 217T, 49.3% WR, +$0.58 (DB-verified). **POSITIVE.** EXTREME regime best. pump-chain+ LONG carrying system. NORMAL bleeds (-$0.78/7d). Legacy killed signals aging out.
 - **Market:** NEUTRAL (5 open trades at MAX_OPEN cap).
@@ -23,8 +23,8 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟢 R:R STATUS (7d POSITIVE +$0.58, 24h STRONG +$2.46)**
-7d PnL +$0.58. EXTREME carries. NORMAL bleeds (-$0.78/7d). 24h +$2.46 (strong). Total active 30d: +$4.93.
+**🟢 R:R STATUS (7d POSITIVE +$0.41, 24h STRONG +$2.44)**
+7d PnL +$0.41. EXTREME carries. NORMAL bleeds (-$1.42/7d). 24h +$2.44 (strong). Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
 
@@ -40,6 +40,7 @@
 
 ## Today's Changes (Sep 20)
 
+1. **brain_auditor ~07:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 35T 71.4%WR +$2.44 | 7d 218T 49.5%WR +$0.41. Market NEUTRAL. Pipeline running. **LOSING AUTOPSY:** 10 losers 24h — pump-chain+ LONG 7x ATR_SL (normal variance at 63.2%WR), grind-trend- SHORT 3x (legacy killed, aging out). No actionable losers. **RSI ANALYSIS:** pump-chain+ LONG 70+ bucket is +$0.32 profitable (14T 42.9%WR) — RSI ceiling filter would HURT. **HIGH REGIME:** -$0.76/7d mostly legacy killed signals (open-skies+, rr-struct-v2+, breakout-long+). Resolving naturally by Sep 23. **CREATIVE IDEAS:** (1) Monitor pump-chain+ NORMAL (3T, need 20+). (2) Investigate volume-breakout-long+ frequency (71.4%WR, 14T/7d). (3) Develop NEUTRAL-specialist signal. **NO ACTION.**
 1. **daily_orchestrator ~06:30 UTC — NO CONFIG CHANGE.** DB: 24h 40T 65%WR +$2.46 | 7d 217T 49.3%WR +$0.58. Market NEUTRAL. 5 open (at MAX_OPEN). **STRONG DAY.** pump-chain+ 17T 64.7%WR +$1.68 (top), grind-trend+ 6T 83.3%WR +$0.47 (best WR). **HEALTH MONITOR:** Timed out 05:48 UTC (300s). Recurring issue (40 timeouts in 7d). Not critical — opencode subprocess slow. **signal_compactor:** Timeout at 05:39 (60s), self-recovered. **Favorites:** DEMOTE BIGTIME, PROMOTE JUP/FIL/SYRUP/CAKE. **LOSERS:** ADD SEI (WR collapse 61.5%→40%). **NO ACTION NEEDED.** System healthy.
 1. **CEO ~05:15 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 50.0%WR +$1.90 | 7d 216T 49.1%WR +$1.10 (**FLIPPED POSITIVE**). Market NEUTRAL. 4 open. **EDGE: EXTREME regime.** 24h EXTREME 15T 73.3%WR +$2.09. pump-chain+ LONG EXTREME 20T 60%WR +$1.80 (7d). **NORMAL BLEEDING:** 24h NORMAL 10T 30%WR -$0.30. 7d NORMAL 61T 44.3%WR -$0.78. **HOTSET EMPTY:** 0 tokens — all signals blocked by confluence gate + NEUTRAL block. Pipeline trades via other paths. **NO ACTION** — system healthy, edge confirmed, monitoring 48h.
 
