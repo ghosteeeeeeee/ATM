@@ -73,15 +73,28 @@ def get_stats() -> dict:
     if faiss_path.exists():
         faiss_size = faiss_path.stat().st_size
     
+    # Get vec count from sqlite-vec
+    vec_count = 0
+    try:
+        import sqlite_vec
+        vec_conn = sqlite3.connect(str(BRAIN_DB))
+        vec_conn.enable_load_extension(True)
+        sqlite_vec.load(vec_conn)
+        vec_count = vec_conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
+        vec_conn.close()
+    except Exception:
+        pass
+    
     db_size = BRAIN_DB.stat().st_size if BRAIN_DB.exists() else 0
     
     return {
         "sessions_total": sessions[0]["cnt"] if sessions else 0,
         "sessions_indexed": indexed[0]["cnt"] if indexed else 0,
         "chunks_total": chunks[0]["cnt"] if chunks else 0,
+        "vectors_total": vec_count,
         "chunk_types": {t["chunk_type"]: t["cnt"] for t in types},
-        "faiss_index_mb": round(faiss_size / 1024 / 1024, 1),
-        "faiss_status": "ready" if faiss_path.exists() else "ingesting",
+        "faiss_index_mb": round(faiss_size / 1024 / 1024, 1) if faiss_size > 0 else 0,
+        "faiss_status": "ready" if vec_count > 0 else "ingesting",
         "db_size_mb": round(db_size / 1024 / 1024, 1),
         "last_ingest": last_ingest[0] if last_ingest else None,
     }

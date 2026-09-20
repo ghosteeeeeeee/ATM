@@ -2661,3 +2661,44 @@ Final set: ['DOT', 'HYPER']
 - pump-chain+ carrying system at +$1.48/24h
 
 **BY:** auto_1hr
+
+## [2026-09-19 23:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.37 (SYRUP SHORT $0.00, WCT SHORT -$0.37) — both pullback-entry- atr_sl_hit
+**24h:** 52T, ~48%WR, +$0.85
+
+**Open:** 4 positions (CAKE SHORT 9.6h, ACE LONG 9h, AVAX LONG 0.5h, BABY LONG 0.1h)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR on 3+ trades last hour)
+- atr_sl_hit 56% of 24h closes but avg +$0.024 — SL working correctly
+- mover+ 0%WR/2T 24h — below kill threshold, too few trades
+- pullback-entry- 20%WR/5T 24h but 49.2%WR/63T on 7d — normal variance
+- Trade count normal (2/hour), no overtrading
+- pump-chain+ still carrying system at +$1.48/24h
+
+**Status:** System stable, no action required
+**BY:** auto_1hr
+
+## [2026-09-19 23:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win: CAKE SHORT +$0.09 atr_sl_hit)
+**24h:** 53T, 48%WR, +$0.82
+
+**Close reasons (24h):** atr_sl_hit 28 (53% avg -$0.002), profit-monster-trail 16 (30% avg +$0.051), cut-loser-CL-T1 7 (13% avg -$0.097)
+**Top signals (24h):** pump-chain+ +$0.62, grind-trend+ +$0.24, warrior-sr-confirm+ +$0.09
+**Bottom signals (24h):** grind-trend- -$0.38 (killed), mover+ -$0.35 (2T, below threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (mover+ 0%WR but only 2T, threshold is 3+)
+- atr_sl_hit dominant at 53% but avg PnL -$0.002 — SL correctly calibrated
+- Trade frequency normal (1-3/hr last 6h)
+- pump-chain+ and grind-trend+ carrying system
+
+**Status:** System stable
+**BY:** auto_1hr

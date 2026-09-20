@@ -78,3 +78,12 @@
 ## Error Alerts — 2026-09-19 21:56 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-20 00:45 UTC
+- **WARN**: hotset.json empty (0 bytes) — "hotset fallback DB query returned 0 tokens" on every pipeline run (3525 occurrences in log). speed_hermes.db also 0 bytes. Not blocking pipeline but hotset filtering is non-functional.
+- **WARN**: Disk at 84% (93G/118G) — 1% below WARN threshold. pipeline.log=74M, signal-compactor.log=48M. Attempted log compression (minimal effect).
+- **OK**: Pipeline completed at 00:43:17, all steps healthy. hermes-pipeline.timer active and firing.
+- **OK**: 83 signals in last hour (80.5% avg confidence). 50 trades closed today, +0.11 USDT PnL, 50% WR.
+- **OK**: Regime NEUTRAL (116 neutral, 3 long bias, 1 short bias). 127 tokens at >=50th percentile speed.
+- **OK**: All 50+ hermes timers active and firing. HL sync guardian active.
+- **AUTO-FIX**: Attempted log compression — files already compressed, minimal space freed. Disk stable at 84%.

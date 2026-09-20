@@ -86,7 +86,7 @@
         <div class="status">
             <div class="stat"><div class="label">Sessions Indexed</div><div class="value" id="stat-sessions">—</div></div>
             <div class="stat"><div class="label">Chunks</div><div class="value" id="stat-chunks">—</div></div>
-            <div class="stat"><div class="label">FAISS Index</div><div class="value" id="stat-faiss">—</div></div>
+            <div class="stat"><div class="label">Vectors</div><div class="value" id="stat-faiss">—</div></div>
             <div class="stat"><div class="label">Last Ingest</div><div class="value" id="stat-last-ingest">—</div></div>
             <div class="stat"><div class="label">Recommendations</div><div class="value" id="stat-recs">—</div></div>
         </div>
@@ -213,7 +213,7 @@
         if (!s) return;
         document.getElementById('stat-sessions').textContent = `${s.sessions_indexed}/${s.sessions_total}`;
         document.getElementById('stat-chunks').textContent = s.chunks_total?.toLocaleString() || '0';
-        document.getElementById('stat-faiss').textContent = s.faiss_status === 'ingesting' ? '⏳ ingesting' : (s.faiss_index_mb + ' MB');
+        document.getElementById('stat-faiss').textContent = s.faiss_status === 'ingesting' ? '⏳ indexing' : (s.vectors_total?.toLocaleString() || '0') + ' vectors';
         document.getElementById('stat-last-ingest').textContent = s.last_ingest ? timeAgo(s.last_ingest.completed_at) : 'never';
     }
     
