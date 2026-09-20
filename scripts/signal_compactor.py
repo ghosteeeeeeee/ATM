@@ -135,10 +135,10 @@ def _load_leaderboard():
 
 def _get_leaderboard_mult(token, direction=None):
     """Get score multiplier based on 30d performance (direction-specific if available).
-    - Hall of Fame (30d WR >=60%, 15+ trades): 1.3x bonus
-    - Strong (30d WR >=50%): 1.15x bonus
-    - Hall of Shame (30d WR <45%, 15+ trades): 0.7x penalty
-    - Below average (30d WR <50%): 0.85x penalty
+    - Hall of Fame (30d WR >=60%, 5+ trades): 1.3x bonus
+    - Strong (30d WR >=55%): 1.15x bonus
+    - Hall of Shame (30d WR <55%, 5+ trades): 0.7x penalty
+    - Below average (30d WR <55%): 0.85x penalty
     - No data: 1.0x (neutral)
     """
     lb = _load_leaderboard()
@@ -158,11 +158,11 @@ def _get_leaderboard_mult(token, direction=None):
 
     if wr >= 60 and trades >= 5:
         return 1.3   # Hall of Fame
-    elif wr >= 50:
+    elif wr >= 55:
         return 1.15  # Strong performer
-    elif wr < 45 and trades >= 5:
+    elif wr < 55 and trades >= 5:
         return 0.7   # Hall of Shame
-    elif wr < 50:
+    elif wr < 55:
         return 0.85  # Below average
     return 1.0
 
@@ -1389,19 +1389,19 @@ def _score_signal(token, direction, conf, source, signal_type,
         log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
 
     # Hall of Shame BLOCK — direction-specific check
-    # Only block the bad direction, allow good directions
+    # Block if direction WR < 55%, allow if >= 55%
     lb = _load_leaderboard()
     lb_data = lb.get(token.upper())
     if lb_data and lb_data['trades'] >= 15:
         dir_stats = lb_data.get('direction_stats', {})
         if direction and direction.upper() in dir_stats:
             dir_wr = dir_stats[direction.upper()].get('winrate', 50)
-            if dir_wr < 45:
-                log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 45%")
+            if dir_wr < 55:
+                log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 55%")
                 return 0.0
         # Fallback to combined WR if no direction data
-        elif lb_data.get('wr', 50) < 45:
-            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 45%")
+        elif lb_data.get('wr', 50) < 55:
+            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 55%")
             return 0.0
 
     # Penalty list — direction-specific losers get stronger penalty
