@@ -1388,21 +1388,21 @@ def _score_signal(token, direction, conf, source, signal_type,
     if combo_mult >= 2.0:
         log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
 
-    # Hall of Shame BLOCK — direction-specific check
-    # Only block if THIS direction is bad, not the whole token
+    # Hall of Shame BLOCK — if combined WR < 45%, block ALL directions
     lb = _load_leaderboard()
     lb_data = lb.get(token.upper())
     if lb_data and lb_data['trades'] >= 15:
+        # Combined WR check — if overall token is bad, block everything
+        if lb_data.get('wr', 50) < 45:
+            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 45%")
+            return 0.0
+        # Direction-specific check — only block the bad direction
         dir_stats = lb_data.get('direction_stats', {})
         if direction and direction.upper() in dir_stats:
             dir_wr = dir_stats[direction.upper()].get('winrate', 50)
             if dir_wr < 45:
                 log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 45%")
                 return 0.0
-        # Fallback to combined WR if no direction data
-        elif lb_data.get('wr', 50) < 45:
-            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 45%")
-            return 0.0
 
     # Penalty list — direction-specific losers get stronger penalty
     is_long_loser = token in LOSERS_LONG
