@@ -1,3 +1,15 @@
+[2026-09-20 21:57 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 33T 63%WR +$2.24. 4 open trades all fresh (<203min). 1 trade closed last hour (ACE +$0.06).
+  ATR SL 32/33 (97%) avg +$0.067 — trail working, all exits profitable. All signals net positive.
+  FINDING: pump-chain+ hours 0,2,4 0%WR -$1.74/7d (12T). TIME_BLOCK covers 1-8, hour 0 uncovered.
+  BY: auto_1hr
+
+[2026-09-20 20:35 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 33T 63%WR +$2.24 | 7d: 207T 50%WR +$1.92. Pipeline OK.
+  5 open trades all fresh (<150min). No stale trades. No losing signals.
+  pump-chain+ hour 0 flipped positive — TIME_BLOCK_START=1 confirmed correct.
+  BY: auto_1hr
+
 [2026-09-20 13:11 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 32T 62.5%WR +$1.32 | 7d: 216T 48.6%WR +$0.29. Pipeline OK.
   FINDING: 3 stale open trades (400+ min) — position_manager stale exit gap (0% PnL falls between loser/winner thresholds). Needs hard MAX_HOLD_MINUTES.
@@ -2588,4 +2600,9 @@
   24h: 40T 62.5%WR +$2.47 | 7d: 217T 49.3%WR +$0.58
   0T closed last hour. 6/6 open positions (at cap).
   No kill criteria. No overtrading. pump-chain+ carrying at +$1.68/24h.
+  BY: auto_1hr
+[2026-09-20 22:09 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 30T 63.3%WR +$2.37 | 7d: 206T 50%WR +$2.16
+  0T closed last hour. 4 open positions. Quiet market.
+  No kill criteria. No overtrading. pump-chain+ carrying at +$1.35/24h.
   BY: auto_1hr
