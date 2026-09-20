@@ -2237,13 +2237,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
                         # Continuum-aware logic:
                         # Uses market_phase + structural indicators for robust regime detection
-                        # Catches "slow bleeds" where velocity is low but structure is bearish
-                        _cont_bearish = (_continuum_phase == 'DECLINING' or
-                                         (_continuum_phase in ('CALM', 'RECOVERY') and
+                        # FIX (Bug Hunter 2026-09-20): DECLINING alone is NOT bearish — it just means RSI<45.
+                        # Require structural confirmation (linreg BEAR + BELOW EMA300) for ALL phases.
+                        # Previously DECLINING was unconditionally bearish, causing 38% false positive rate
+                        # and blocking LONG signals during healthy BTC pullbacks (score 80-95, STRONG_UP).
+                        _cont_bearish = ((_continuum_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
-                        _cont_bullish = (_continuum_phase == 'RECOVERY' or
-                                         (_continuum_phase == 'CALM' and
+                        _cont_bullish = ((_continuum_phase in ('RECOVERY', 'CALM') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
                                           _cont_row_data.get('ema300_position') == 'ABOVE'))
 

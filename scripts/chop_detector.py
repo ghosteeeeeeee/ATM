@@ -354,12 +354,13 @@ def get_regime() -> dict:
             if _cont_ts and (time.time() - _cont_ts) > 600:
                 pass  # stale data, don't override
             else:
-                # Bearish structure: DECLINING phase OR (CALM/RECOVERY + LEAN_BEAR + BELOW EMA300)
-                _bearish = (_phase == 'DECLINING' or
-                            (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
-                # Bullish structure: RECOVERY phase OR (CALM + LEAN_BULL + ABOVE EMA300)
-                _bullish = (_phase == 'RECOVERY' or
-                            (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
+                # FIX (Bug Hunter 2026-09-20): DECLINING alone is NOT bearish — it just means RSI<45.
+                # Require structural confirmation (linreg BEAR + BELOW EMA300) for ALL phases.
+                _bearish = ((_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                             _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
+                # Bullish structure: RECOVERY/CALM + LEAN_BULL + ABOVE EMA300
+                _bullish = ((_phase in ('RECOVERY', 'CALM') and
+                             _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
                 if _bearish or _bullish:
                     votes['TREND'] += 5
                     _continuum_voted = True
