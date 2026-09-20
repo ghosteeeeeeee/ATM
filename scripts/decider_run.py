@@ -3348,7 +3348,14 @@ def run(dry_run=False):
         from position_manager import get_pump_chain_position_count
         pump_chain_count = get_pump_chain_position_count()
         is_pump_chain = 'pump-chain' in (source or '')
-        
+
+        # FIX (2026-09-03): Also check TOTAL position count to prevent exceeding MAX_POS.
+        # Previous logic only checked non-pump-chain count vs available slots, which allowed
+        # positions to exceed MAX_POS when pump-chain positions consumed slots.
+        if open_count >= MAX_POS:
+            log(f'SKIP: Max total positions reached ({open_count}/{MAX_POS})')
+            continue
+
         if is_pump_chain:
             # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS
             # OR if pump-chain is in confluence with another signal (multiple source types)
