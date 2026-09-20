@@ -311,46 +311,60 @@ def get_regime() -> dict:
     # When BTC 4h regime is LONG_BIAS or SHORT_BIAS with strong slope, override chop classification
     try:
         import psycopg2
-        _pg_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-        _pg_cur = _pg_conn.cursor()
-        _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
-        _btc_4h = _pg_cur.fetchone()
-        _pg_conn.close()
-        if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
-            _slope_4h = float(_btc_4h[1])
-            if _btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35:
-                votes['TREND'] += 2  # strong bullish 4h — override chop
-            elif _btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35:
-                votes['TREND'] += 2  # strong bearish 4h — override chop (SHORT signals are momentum too)
+        _pg_conn = None
+        try:
+            _pg_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            _pg_cur = _pg_conn.cursor()
+            _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
+            _btc_4h = _pg_cur.fetchone()
+            if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
+                _slope_4h = float(_btc_4h[1])
+                if _btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35:
+                    votes['TREND'] += 2  # strong bullish 4h — override chop
+                elif _btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35:
+                    votes['TREND'] += 2  # strong bearish 4h — override chop (SHORT signals are momentum too)
+        finally:
+            if _pg_conn:
+                try: _pg_conn.close()
+                except: pass
     except Exception:
         pass  # if DB unavailable, fall through to existing votes
 
     # 6. BTC continuum override (2026-09-20) — structural regime from continuum oscillator
     # When continuum shows clear directional structure (not just velocity), override chop
     # Catches slow bleeds where BTC is drifting but structure is bearish
+    # Actual market_phase values: NEUTRAL, STORMY, CALM, RECOVERY, DECLINING
+    _continuum_voted = False
     try:
         _cont_db = os.path.join(HERMES_DATA, 'continuum.db')
-        _cont_conn = sqlite3.connect(_cont_db, timeout=3)
-        _cont_row = _cont_conn.execute(
-            "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
-            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-        ).fetchone()
-        _cont_conn.close()
+        _cont_conn = None
+        try:
+            _cont_conn = sqlite3.connect(_cont_db, timeout=3)
+            _cont_row = _cont_conn.execute(
+                "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+            ).fetchone()
+        finally:
+            if _cont_conn:
+                try: _cont_conn.close()
+                except: pass
         if _cont_row:
-            _phase, _linreg, _ema_pos = _cont_row[0], _cont_row[1], _cont_row[2]
-            # Bearish structure: DECLINING phase OR (CALM + LEAN_BEAR + BELOW EMA300)
-            _bearish = (_phase in ('DECLINING', 'STRONG_DECLINING') or
-                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
-            # Bullish structure: RALLYING phase OR (CALM + LEAN_BULL + ABOVE EMA300)
-            _bullish = (_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
-                        (_phase in ('CALM', 'DISTRIBUTION') and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
-            if _bearish or _bullish:
-                votes['TREND'] += 5  # continuum overrides all — strongest structural indicator
+            _phase, _linreg, _ema_pos, _cont_ts = _cont_row[0], _cont_row[1], _cont_row[2], _cont_row[3]
+            # Skip if stale (>10 min old)
+            if _cont_ts and (time.time() - _cont_ts) > 600:
+                pass  # stale data, don't override
+            else:
+                # Bearish structure: DECLINING phase OR (CALM/RECOVERY + LEAN_BEAR + BELOW EMA300)
+                _bearish = (_phase == 'DECLINING' or
+                            (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
+                # Bullish structure: RECOVERY phase OR (CALM + LEAN_BULL + ABOVE EMA300)
+                _bullish = (_phase == 'RECOVERY' or
+                            (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
+                if _bearish or _bullish:
+                    votes['TREND'] += 5
+                    _continuum_voted = True
     except Exception:
         pass  # if continuum unavailable, fall through to existing votes
-
-    # Determine regime — TREND > CHOP wins when continuum provides structural override
-    _continuum_voted = votes['TREND'] >= 5  # continuum added +5 TREND votes
     if votes['CRISIS'] >= 3:
         regime = 'CRISIS'
         reason = f"CRISIS: dir_outcome={dir_outcome}, vol={vol_regime}, btc_mom={btc_momentum['momentum_pct']:+.3f}%"

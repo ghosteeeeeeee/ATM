@@ -2199,24 +2199,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
                     # Primary: check continuum market_phase + structural indicators
+                    # Actual market_phase values: NEUTRAL, STORMY, CALM, RECOVERY, DECLINING
                     _cont_row_data = {}
+                    _cont_conn = None
                     try:
                         _cont_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
                         _cont_row = _cont_conn.execute(
-                            "SELECT market_phase, linreg_direction, ema300_position, state_score "
+                            "SELECT market_phase, linreg_direction, ema300_position, state_score, ts "
                             "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
                         ).fetchone()
-                        _cont_conn.close()
                         if _cont_row:
-                            _continuum_phase = _cont_row[0]
-                            _cont_row_data = {
-                                'market_phase': _cont_row[0],
-                                'linreg_direction': _cont_row[1],
-                                'ema300_position': _cont_row[2],
-                                'state_score': _cont_row[3],
-                            }
+                            # Skip if stale (>10 min old)
+                            _cont_ts = _cont_row[4]
+                            if _cont_ts and (time.time() - _cont_ts) > 600:
+                                pass  # stale, don't use
+                            else:
+                                _continuum_phase = _cont_row[0]
+                                _cont_row_data = {
+                                    'market_phase': _cont_row[0],
+                                    'linreg_direction': _cont_row[1],
+                                    'ema300_position': _cont_row[2],
+                                    'state_score': _cont_row[3],
+                                }
                     except Exception:
                         pass
+                    finally:
+                        if _cont_conn:
+                            try: _cont_conn.close()
+                            except: pass
 
                     _bypass_row = _bypass_conn.execute(
                         "SELECT velocity FROM momentum_cache WHERE token='BTC'"
@@ -2228,12 +2238,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # Continuum-aware logic:
                         # Uses market_phase + structural indicators for robust regime detection
                         # Catches "slow bleeds" where velocity is low but structure is bearish
-                        _cont_bearish = (_continuum_phase in ('DECLINING', 'STRONG_DECLINING') or
+                        _cont_bearish = (_continuum_phase == 'DECLINING' or
                                          (_continuum_phase in ('CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
-                        _cont_bullish = (_continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
-                                         (_continuum_phase in ('CALM', 'DISTRIBUTION') and
+                        _cont_bullish = (_continuum_phase == 'RECOVERY' or
+                                         (_continuum_phase == 'CALM' and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
                                           _cont_row_data.get('ema300_position') == 'ABOVE'))
 
