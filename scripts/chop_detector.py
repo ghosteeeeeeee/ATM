@@ -325,6 +325,30 @@ def get_regime() -> dict:
     except Exception:
         pass  # if DB unavailable, fall through to existing votes
 
+    # 6. BTC continuum override (2026-09-20) — structural regime from continuum oscillator
+    # When continuum shows clear directional structure (not just velocity), override chop
+    # Catches slow bleeds where BTC is drifting but structure is bearish
+    try:
+        _cont_db = os.path.join(HERMES_DATA, 'continuum.db')
+        _cont_conn = sqlite3.connect(_cont_db, timeout=3)
+        _cont_row = _cont_conn.execute(
+            "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
+            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+        ).fetchone()
+        _cont_conn.close()
+        if _cont_row:
+            _phase, _linreg, _ema_pos = _cont_row[0], _cont_row[1], _cont_row[2]
+            # Bearish structure: DECLINING phase OR (CALM + LEAN_BEAR + BELOW EMA300)
+            _bearish = (_phase in ('DECLINING', 'STRONG_DECLINING') or
+                        (_phase == 'CALM' and _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BEAR'))
+            # Bullish structure: RALLYING phase OR (CALM + LEAN_BULL + ABOVE EMA300)
+            _bullish = (_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
+                        (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
+            if _bearish or _bullish:
+                votes['TREND'] += 2  # continuum shows clear structure — override chop
+    except Exception:
+        pass  # if continuum unavailable, fall through to existing votes
+
     # Determine regime
     if votes['CRISIS'] >= 3:
         regime = 'CRISIS'
