@@ -1627,8 +1627,8 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
     'PULLBACK_ENTRY_PLUS_ENABLED',  # CEO 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
     'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
-    'OPEN_SKIES_ENABLED',          # SIGNAL REPORTER 2026-09-17 — 11T/8d 36%WR/-$0.73. EXTREME 25%, HIGH 43%. NEVER_REENABLE.
-    'OPEN_SKIES_PLUS_ENABLED',     # SIGNAL REPORTER 2026-09-17 — 11T/8d 36%WR/-$0.73. No regime >50% WR. NEVER_REENABLE.
+    'OPEN_SKIES_ENABLED',          # RE-ENABLED 2026-09-20 for 48h testing (CEO)
+    'OPEN_SKIES_PLUS_ENABLED',     # RE-ENABLED 2026-09-20 for 48h testing (CEO)
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -3523,8 +3523,8 @@ PUMP_FLOW_SHORT_RSI_FLOOR = 15          # block SHORT when RSI < 15 (extremely o
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).
 # Fires when price breaks through all resistance with strong momentum.
-OPEN_SKIES_ENABLED              = False   # SIGNAL REPORTER 2026-09-17 — 11T/8d 36%WR/-$0.73. No regime >50% WR. NEVER_REENABLE.
-OPEN_SKIES_PLUS_ENABLED         = False   # SIGNAL REPORTER 2026-09-17 — 11T/8d 36%WR/-$0.73. EXTREME 25%, HIGH 43%. NEVER_REENABLE.
+OPEN_SKIES_ENABLED              = True    # RE-ENABLED 2026-09-20 for 48h testing (CEO)
+OPEN_SKIES_PLUS_ENABLED         = True    # RE-ENABLED 2026-09-20 for 48h testing (CEO)
 OPEN_SKIES_MINUS_ENABLED        = False   # SHORT not applicable (open skies = bullish)
 
 # Trend filters
