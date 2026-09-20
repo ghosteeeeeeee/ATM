@@ -185,7 +185,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 
 from paths import *
 from hermes_ab_utils import get_cached_ab_variant
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT, ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL, ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK, MAX_HYPE_POSITIONS, STALE_ROTATION_ENABLED
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT, ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL, ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK, MAX_HYPE_POSITIONS, STALE_ROTATION_ENABLED, MAX_OPEN_POSITIONS
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, mirror_open_batch,
@@ -1475,6 +1475,15 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 # add_orphan_trade signature: (token, direction, entry_price, amount_usdt, leverage, ...)
                 # This caused entry_price to receive amount_usdt (~$10 for BTC) and amount_usdt
                 # to receive hl_entry (~$67K for BTC), corrupting all PnL calculations.
+                # FIX (2026-09-03): Check total position count before creating orphan trade.
+                # Guardian was creating trades without checking MAX_OPEN_POSITIONS, causing
+                # position limit to be exceeded (8 positions when limit is 6).
+                from position_manager import get_position_count
+                current_count = get_position_count()
+                if current_count >= MAX_OPEN_POSITIONS:
+                    log(f'  ⚠️ Orphan {coin} skipped — at max positions ({current_count}/{MAX_OPEN_POSITIONS})', 'WARN')
+                    continue
+
                 trade_id = add_orphan_trade(
                     coin, direction, hl_entry, amount_usdt, int(lev), sl_price, tp_price
                 )
