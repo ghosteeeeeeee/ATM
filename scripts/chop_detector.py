@@ -345,7 +345,7 @@ def get_regime() -> dict:
             _bullish = (_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
                         (_phase in ('CALM', 'DISTRIBUTION') and _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
             if _bearish or _bullish:
-                votes['TREND'] += 3  # continuum is the strongest structural indicator — override chop
+                votes['TREND'] += 4  # continuum overrides all other votes — strongest signal
     except Exception:
         pass  # if continuum unavailable, fall through to existing votes
 
