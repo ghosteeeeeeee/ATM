@@ -2198,15 +2198,23 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 _bypass_conn = None
                 try:
                     _bypass_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-                    # Primary: check continuum market_phase (structural regime)
+                    # Primary: check continuum market_phase + structural indicators
+                    _cont_row_data = {}
                     try:
                         _cont_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
                         _cont_row = _cont_conn.execute(
-                            "SELECT market_phase FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                            "SELECT market_phase, linreg_direction, ema300_position, state_score "
+                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
                         ).fetchone()
                         _cont_conn.close()
-                        if _cont_row and _cont_row[0]:
+                        if _cont_row:
                             _continuum_phase = _cont_row[0]
+                            _cont_row_data = {
+                                'market_phase': _cont_row[0],
+                                'linreg_direction': _cont_row[1],
+                                'ema300_position': _cont_row[2],
+                                'state_score': _cont_row[3],
+                            }
                     except Exception:
                         pass
 
@@ -2218,18 +2226,28 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _vel_ok = abs(_velocity) >= BTC_CHOP_GATE_THRESHOLD
 
                         # Continuum-aware logic:
-                        # DECLINING → SHORT allowed, LONG blocked (regardless of velocity)
-                        # RALLYING/UP → LONG allowed, SHORT blocked (regardless of velocity)
-                        # ACCUMULATION/DISTRIBUTION → use velocity as tiebreaker
-                        if _continuum_phase and direction.upper() == 'SHORT' and _continuum_phase in ('DECLINING', 'STRONG_DECLINING'):
+                        # Uses market_phase + structural indicators for robust regime detection
+                        # Catches "slow bleeds" where velocity is low but structure is bearish
+                        _cont_bearish = (_continuum_phase in ('DECLINING', 'STRONG_DECLINING') or
+                                         (_continuum_phase == 'CALM' and
+                                          _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
+                                          _cont_row_data.get('ema300_position') == 'BELOW'))
+                        _cont_bullish = (_continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP') or
+                                         (_continuum_phase == 'CALM' and
+                                          _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
+                                          _cont_row_data.get('ema300_position') == 'ABOVE'))
+
+                        if direction.upper() == 'SHORT' and _cont_bearish:
                             _btc_mom_ok_for_bypass = True
-                            log(f"  ✅ [CONTINUUM-OVERRIDE] {token} SHORT — BTC continuum={_continuum_phase}, allowing despite velocity={_velocity:.3f}")
-                        elif _continuum_phase and direction.upper() == 'LONG' and _continuum_phase in ('DECLINING', 'STRONG_DECLINING'):
+                            log(f"  ✅ [CONTINUUM-OVERRIDE] {token} SHORT — BTC continuum={_continuum_phase} "
+                                f"linreg={_cont_row_data.get('linreg_direction')} ema300={_cont_row_data.get('ema300_position')}, "
+                                f"allowing despite velocity={_velocity:.3f}")
+                        elif direction.upper() == 'LONG' and _cont_bearish:
                             _btc_mom_ok_for_bypass = False
-                            log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC continuum={_continuum_phase}, blocking")
-                        elif _continuum_phase and direction.upper() == 'LONG' and _continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP'):
+                            log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")
+                        elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
-                        elif _continuum_phase and direction.upper() == 'SHORT' and _continuum_phase in ('RALLYING', 'STRONG_RALLYING', 'UP'):
+                        elif direction.upper() == 'SHORT' and _cont_bullish:
                             _btc_mom_ok_for_bypass = False
                         else:
                             # Fallback to velocity check
