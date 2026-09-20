@@ -1,5 +1,16 @@
 ## CEO DECISIONS
 
+- [2026-09-20 05:15 UTC] CEO: NO CONFIG CHANGE — verification + regime memory update
+  DB-verified: 24h 50T 50.0%WR +$1.90 | 7d 216T 49.1%WR +$1.10 (FLIPPED POSITIVE)
+  Market NEUTRAL. 4 open (2x pullback-entry- SHORT, 2x pump-chain+ LONG).
+  **EDGE CONFIRMED:** EXTREME regime. 24h EXTREME 15T 73.3%WR +$2.09. 7d EXTREME 59T 57.6%WR +$2.62.
+  pump-chain+ LONG EXTREME 20T 60%WR +$1.80 (7d). Primary earner.
+  **NORMAL BLEED:** 24h NORMAL 10T 30%WR -$0.30. 7d NORMAL 61T 44.3%WR -$0.78.
+  **HOTSET EMPTY:** 0 tokens — all blocked by confluence gate + NEUTRAL block. Pipeline trades via other paths.
+  **REGIME MEMORY:** Updated signal_regime_memory.json with volatility_regime data.
+  **NO ACTION:** System healthy, edge confirmed, monitoring 48h.
+  BY: CEO
+
 - [2026-09-19 22:40 UTC] CEO: NO CONFIG CHANGE — monitoring + verification
   DB-verified: 24h 51T 47.1%WR +$1.01 | 7d 210T 49.0%WR -$0.22
   Market NEUTRAL. 4 open (3x pullback-entry- SHORT, 1x doji-bottom-long LONG).

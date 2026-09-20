@@ -2725,3 +2725,26 @@ Final set: ['DOT', 'HYPER']
 
 **Status:** System stable, no action required
 **BY:** auto_1hr
+
+## [2026-09-20 02:30 UTC] Hourly Analysis
+
+**Trades:** 5 closed (3 wins, 2 losses)
+**PnL:** +$0.02 (WR: 60%)
+**24h:** 51T, 49%WR, +$1.74 | **7d:** 216T, 49.1%WR, +$1.10
+
+**Close reasons (24h):** atr_sl_hit 30 (59% avg +$0.056), profit-monster-trail 14 (27% avg +$0.052), cut-loser-CL-T1 7 (14% avg -$0.097)
+**Top signals (24h):** pump-chain+ +$1.57 (19T, 40%WR), doji-bottom-long +$0.30 (1T), grind-trend+ +$0.15 (16T)
+**Bottom signals (24h):** grind-trend- -$0.38 (5T, already killed), mover+ -$0.05 (1T, below threshold)
+**Open:** 4 positions (BABY, CHIP, WLFI, LTC)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill criteria (0% WR with 3+ trades last hour)
+- atr_sl_hit dominant at 59% but avg +$0.056 — SL correctly calibrated
+- Trade frequency normal (5 closed, 4 opens last hour)
+- pump-chain+ carrying system at +$1.57/24h
+- pullback-entry- basically breakeven (-$0.02/24h) — 7T, too few trades to kill
+
+**Status:** System stable, no action required
+**BY:** auto_1hr

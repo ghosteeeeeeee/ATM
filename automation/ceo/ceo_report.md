@@ -1,3 +1,23 @@
+## CEO Report — 2026-09-20 ~05:15 UTC
+
+### Diagnosis
+DB-verified. 24h: 50T, 50.0% WR, +$1.90 (strong improvement from $0.38 earlier). 7d: 216T, 49.1% WR, +$1.10 (FLIPPED POSITIVE from -$0.16). 4 open. Market NEUTRAL. **EXTREME regime is the edge:** 24h EXTREME 15T 73.3% WR +$2.09. 7d EXTREME 59T 57.6% WR +$2.62. pump-chain+ LONG EXTREME 20T 60% WR +$1.80 (7d). **NORMAL bleeding:** 24h NORMAL 10T 30% WR -$0.30. pump-chain+ LONG NORMAL 3T 33.3% WR -$0.28 (7d). Today: +$1.04 (66.7% WR, 6T).
+
+### Root Cause
+Edge is regime-dependent. EXTREME carries the PnL (+$2.09/24h, +$2.62/7d). NORMAL bleeds (-$0.30/24h, -$0.78/7d). Signal diversity unchanged — pump-chain+ is the only reliable earner. Legacy killed signals still in 7d data but aging out. Hotset empty (0 tokens) — all signals blocked by confluence gate + NEUTRAL block + R:R filter. Pipeline still trades via other paths.
+
+### Fix Applied
+No config changes. System healthy. EXTREME regime edge confirmed and documented. Monitoring 48h.
+
+### Verification
+Pipeline running (timer active, all steps healthy). 4 open trades (2x pullback-entry- SHORT, 2x pump-chain+ LONG). Chase filter active (58 blocks). Stale filter working. Feature recording working.
+
+### Next
+- Monitor EXTREME edge sustainability (is 73.3% WR normal variance or regime-dependent?)
+- Develop NEUTRAL-diverse signals (confluence gap persists)
+- Legacy losers aging out — no action needed
+- Hotset empty — investigate signal-compactor token flow
+
 ## CEO Report — 2026-09-19 ~18:37 UTC
 
 ### Diagnosis

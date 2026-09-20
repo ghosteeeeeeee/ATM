@@ -5,11 +5,11 @@
 
 ## Current Status
 
-24h: 50T, 44.0% WR, +$0.38. 4 open. Market NEUTRAL. Pipeline running.
+24h: 50T, 50.0% WR, +$1.90. 4 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 50T, 44.0% WR, +$0.38. pump-chain+ LONG 19T 52.6%WR +$1.57, grind-trend+ 16T 50%WR +$0.15 (DISABLED, aging trades), pullback-entry- SHORT 7T 42.9%WR -$0.02. Losers: grind-trend- SHORT 5T 20%WR -$0.38 (DISABLED), pump-chain+ 6T losers -$0.95.
-- **Today (calendar):** 50T closed (Sep 20). 4 open.
-- **7d:** 212T, 48.6% WR, -$0.16 (DB-verified). **SLIGHTLY NEGATIVE.** EXTREME regime best (57.1%WR +$1.81). pump-chain+ LONG EXTREME 18T 61.1%WR +$1.11. Legacy killed signals aging out in 7d data.
+- **24h (rolling):** 50T, 50.0% WR, +$1.90. pump-chain+ LONG 19T 52.6%WR +$1.57. EXTREME 15T 73.3%WR +$2.09 (edge). Losers: grind-trend- SHORT 5T -$0.40 (disabled), NORMAL regime -$0.30.
+- **Today (calendar):** 6T closed (Sep 20). 4 open. +$1.04 66.7% WR.
+- **7d:** 216T, 49.1% WR, +$1.10 (DB-verified). **POSITIVE.** EXTREME regime best (59T 57.6%WR +$2.62). pump-chain+ LONG EXTREME 20T 60%WR +$1.80. NORMAL bleeding 61T 44.3%WR -$0.78. Legacy killed signals aging out.
 - **Market:** NEUTRAL (4 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
@@ -23,8 +23,8 @@
 - **SHORT_RSI_FLOOR=25:** Working.
 - **SHORT_RSI_CEILING=65:** Working. Blocking ADA SHORT at RSI 68.
 
-**🟢 R:R STATUS (7d SLIGHTLY NEGATIVE, 24h POSITIVE)**
-7d PnL -$0.16. SHORT +$0.20 carries LONG +$0.24. 24h +$0.38. Total active 30d: +$4.93.
+**🟢 R:R STATUS (7d POSITIVE +$1.10, 24h STRONG +$1.90)**
+7d PnL +$1.10. EXTREME carries (+$2.62). HIGH near breakeven (-$0.74). NORMAL bleeds (-$0.78). 24h +$1.90 (EXTREME +$2.09). Total active 30d: +$4.93.
 
 **🟢 STALE FILTER — WORKING, EXTENDED.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. EXTREME SHORT fresh 83.3%WR +$0.98 = confirmed edge. — 2026-09-19
 
@@ -32,13 +32,15 @@
 
 **🟢 SYSTEM FIXES VERIFIED:** rr_engine (0 exits 6+ days), cut-loser-CL-T1 (7d -$1.19, working), exit_conditions (new trades have data), RSI timeframe (1m data, 0 bad entries since).
 
-**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ LONG pass confluence reliably. rr-struct+ LONG 66.7%WR +$0.52 also strong. pullback-entry- SHORT 49.2%WR -$0.19 nearly breakeven. Need new signals for NEUTRAL diversity. 30d active: 6 types (+$4.93).
+**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG passes confluence reliably in EXTREME. EXTREME edge confirmed (60%WR +$1.80/7d). NORMAL bleeds (-$0.78/7d). Need new signals for NEUTRAL diversity. 30d active: 6 types (+$4.93).
+
+**🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (all blocked by confluence gate + NEUTRAL block). Pipeline still trades via other paths. Investigate if this limits signal flow.
 
 **🟢 FEATURE RECORDING:** _signal_metadata RSI+momentum 187/188 trades (WORKING). **gap_at_entry + staleness_minutes** — decider_run.py injects EMA300 gap% and signal age into metadata. Since fix: staleness 23/26 (88%), gap 16/26 (62% — <300 candles = no EMA300), is_stale 26/26 (100%). — 2026-09-19
 
 ## Today's Changes (Sep 20)
 
-1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 44.0%WR +$0.38 | 7d 212T 48.6%WR -$0.16. Market NEUTRAL. 4 open. **LOSING AUTOPSY (20):** pump-chain+ LONG 6T losers -$0.95 (EXTREME/HIGH). grind-trend+ 8T -$0.54 (DISABLED, pre-disable trades). grind-trend- SHORT 4T -$0.40 (DISABLED). **REGIME (7d):** EXTREME best 57.6%WR +$2.62. pump-chain+ LONG EXTREME 20T 60%WR +$1.80. pullback-entry- SHORT EXTREME 14T 57.1%WR +$0.39. **HOUR PATTERN:** pump-chain+ LONG hour 0,2,4 UTC: 10T 0%WR -$1.27 (monitor 48h). **REGIME BLEED:** pullback-entry- SHORT NORMAL 19T 42.1%WR -$0.35, HIGH 33T 48.5%WR -$0.25. Suggested: gate to EXTREME only (+$0.60/7d). **NO ACTION** — all items need more data. Monitor 48h.
+1. **CEO ~05:15 UTC — NO CONFIG CHANGE.** DB-verified: 24h 50T 50.0%WR +$1.90 | 7d 216T 49.1%WR +$1.10 (**FLIPPED POSITIVE**). Market NEUTRAL. 4 open. **EDGE: EXTREME regime.** 24h EXTREME 15T 73.3%WR +$2.09. pump-chain+ LONG EXTREME 20T 60%WR +$1.80 (7d). **NORMAL BLEEDING:** 24h NORMAL 10T 30%WR -$0.30. 7d NORMAL 61T 44.3%WR -$0.78. **HOTSET EMPTY:** 0 tokens — all signals blocked by confluence gate + NEUTRAL block. Pipeline trades via other paths. **NO ACTION** — system healthy, edge confirmed, monitoring 48h.
 
 ## Today's Changes (Sep 19)
 

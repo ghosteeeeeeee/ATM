@@ -1303,11 +1303,12 @@
     "rationale": "pullback-entry- SHORT NORMAL: 19T 42.1%WR -/usr/bin/bash.35/7d. EXTREME: 13T 53.8%WR +/usr/bin/bash.27. Clear regime edge.",
     "expected_impact": "+/usr/bin/bash.20-0.30/7d",
     "category": "regime filter",
-    "status": "suggested",
+    "status": "boosted",
     "risk": "low",
     "sample_size": "19 trades (minimum met)",
     "impact_on_winners": "Would block ~35% of NORMAL trades (7/19). Check if any winners blocked.",
-    "confidence": "HIGH"
+    "confidence": "HIGH",
+    "boosted_at": "2026-09-20T02:27:15.619931+00:00"
   },
   {
     "date": "2026-09-20T00:35:14.378999Z",
