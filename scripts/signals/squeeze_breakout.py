@@ -2,7 +2,7 @@
 """
 squeeze_breakout.py — Consolidation breakout signal.
 
-Thesis: When BTC consolidates (BB squeeze + ATR compression),
+Thesis: When BTC consolidates (BB squeeze + ATR compression + low volume),
 the eventual breakout captures +1.27% average. This signal enters at the
 START of the expansion, positioning before the full move.
 
@@ -10,17 +10,20 @@ Uses existing infrastructure:
 - continuum_context for direction (score > 50 = LONG, < 50 = SHORT)
 - BB width for squeeze detection
 - ATR for compression detection
+- Volume for calm-before-storm confirmation
 - Price breakout confirmation
 
-Entry: BB width expands 2x+ from squeeze minimum + price breaks range
-Exit: +0.8% profit, -0.8% loss, or 2 hour time exit (handled by execution layer)
+Entry: BB width expands 2x+ from squeeze minimum + price breaks range + volume < 80% avg
+Exit: +1.0% profit, -0.8% loss, or 2 hour time exit (handled by execution layer)
+R:R = 1.25:1
 
 Fixes (2026-09-21):
 - Expansion detection fires only on FIRST candle of expansion
 - Expansion threshold raised from 1.5x to 2.0x
-- TP target lowered to 0.8% (realistic for low vol)
+- Added volume check (calm before storm)
 - Added price breakout confirmation
 - Widened continuum thresholds to 50/50
+- R:R improved to 1.25:1
 """
 import sys, os, sqlite3, time
 
@@ -133,9 +136,15 @@ def detect(token='BTC'):
     if bb_width is None or atr_pct is None:
         return None
     
-    # Check for squeeze: BB width < 0.5% AND ATR < 0.3%
+    # Check for squeeze: BB width < 0.5% AND ATR < 0.3% AND volume below average
     if bb_width >= 0.5 or atr_pct >= 0.3:
         return None
+    
+    # Volume check: must be below 80% of 20-period average (calm before storm)
+    if len(candles) >= 20:
+        vol_avg = sum(c['volume'] for c in candles[-20:]) / 20
+        if candles[-1]['volume'] > vol_avg * 0.8:
+            return None  # Volume too high — not calm enough
     
     # Check for expansion: compare to 30-bar minimum
     recent_widths = []
