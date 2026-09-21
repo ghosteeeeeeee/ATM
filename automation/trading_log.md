@@ -3614,3 +3614,26 @@ Final set: ['DOT', 'HYPER', 'ME']
 - Weekend volume is low but normal
 
 **Open Questions:** None
+
+## [2026-09-21 15:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (NOT -0.20 doji-bottom-long atr_sl_hit) | 4 open (GMX, ALT, AZTEC, JUP)
+**24h:** 25T 48%WR +$1.93 | **7d:** ~200T 49%WR +$3.51
+
+**Diagnosis:**
+1. Entry quality: NOT loss was -1.78%, normal ATR SL hit. No adverse excursion anomaly.
+2. SL behavior: atr_sl_hit 76% (19/25) but net +$1.91 — trailing working correctly.
+3. Signal quality: pump-chain+ carries (+$1.24/24h, +$2.89/7d, 50%WR). doji-bottom-long 2T 24h 0%WR but below kill threshold (needs 3+).
+4. Trade frequency: ~1/hr — normal weekend.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR with 3+ trades in 24h)
+- System net profitable on both 24h (+$1.93) and 7d (+$3.51)
+- All close reasons except pump_exit_momentum net positive
+- atr_sl_hit dominant but net profitable — trailing stop working as designed
+
+**Note:** NOT pnl_pct displayed as -533% is a display bug (amount_usdt=$11.10, actual pct=-1.78%). Cosmetic, pnl_usdt correct.
+
+**BY:** auto_1hr
