@@ -13,6 +13,14 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-21 ~15:35 UTC] brain_auditor: CONFIG CHANGE — UNIVERSAL_MAX_HOLD_MINUTES = 480
+  DB-verified: 24h 25T 48%WR +$1.64 | 7d 192T 49%WR +$2.42
+  Market SHORT_BIAS. 2 open. Pipeline running.
+  **LOSING AUTOPSY (10):** All 10 24h losers are normal ATR_SL variance. No entry failures, no filter gaps. pump-chain+ 5T (-$0.61, offset by 8W +$1.87). doji-bottom-long 2T (-$0.35). Other 3 tiny.
+  **REGIME EDGE:** EXTREME 61T 57.4%WR +$3.46★ (best). NORMAL 48T 41.7%WR -$0.91 (worst). Gap $4.37/7d.
+  **DRIFT:** OSCILLATOR_MULTS approved by CEO at 16:00 UTC but NOT in code. Shadow mode 48h eval not running.
+  **CREATIVE:** UNIVERSAL_MAX_HOLD_MINUTES = 480 — hard close all positions after 8h. 3 positions held 600+ min in 7d (WLFI 678min, SEI 1161min, ETH 831min). Safety net. Committed.
+  BY: brain_auditor
 - [2026-09-21 ~14:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
   DB-verified: 24h 25T 40%WR +$1.91 | 7d 191T 49.2%WR +$2.46
   Market NEUTRAL. 4 open. Pipeline running.

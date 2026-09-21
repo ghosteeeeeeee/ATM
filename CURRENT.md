@@ -19,6 +19,7 @@
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
 - **SHORT_RSI_FLOOR=30:** Working. RSI<30 SHORTs = 37.5%WR blocked.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
+- **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
 **🟢 R:R STATUS (7d +$2.46 POSITIVE, 24h +$1.93)**
 7d PnL +$2.46. All NEUTRAL. pump-chain+ LONG +$2.89 (44T 50%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h +$1.93.

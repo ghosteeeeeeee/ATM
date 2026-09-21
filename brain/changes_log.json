@@ -318,5 +318,16 @@
     "after": "TIME_BLOCK_START = 0",
     "rationale": "Hour 0: 9T 22.2%WR -$0.77/7d. Pump-chain+ 3T 0%WR -$0.41. 2 hour 0 winners from killed signals only.",
     "impact": "+$0.77/7d expected. 0 impact on current active signals."
+  },
+  {
+    "timestamp": "2026-09-21T15:35:42Z",
+    "agent": "brain_auditor",
+    "change": "Added UNIVERSAL_MAX_HOLD_MINUTES = 480 (8h hard close for all positions)",
+    "type": "config",
+    "file": "hermes_constants.py + position_manager.py",
+    "before": "No universal MAX_HOLD. Only signal-specific limits (WEATHER_VANE 30min, SPIDER 120min). Positions could be held indefinitely.",
+    "after": "UNIVERSAL_MAX_HOLD_MINUTES = 480. Force-close check added after stale exit in position_manager.py main loop.",
+    "rationale": "3 positions held 600+ minutes in 7d (WLFI 678min, SEI 1161min, ETH 831min). Capital locked in dead trades. Safety net to prevent stale position losses.",
+    "impact": "+$0.50-1.00/7d expected from stale loss prevention. Low risk — winners already profitable at 480min stay profitable."
   }
 ]

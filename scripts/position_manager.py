@@ -37,6 +37,7 @@ from hermes_constants import (
     TIME_EXIT_ENABLED, PEAK_EXIT_ENABLED,
     WEATHER_VANE_SHIELD_ENABLED, WEATHER_VANE_SHIELD_TRAILING_PCT,
     WEATHER_VANE_SHIELD_MAX_HOLD_MIN, WEATHER_VANE_SHIELD_LOSING_ONLY,
+    UNIVERSAL_MAX_HOLD_MINUTES,
     DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_LOSS_THRESHOLD,
     DIRECTIONAL_OUTCOME_WR_THRESHOLD, DIRECTIONAL_OUTCOME_MIN_TRADES,
     AMPLITUDE_SL_MULT, AMPLITUDE_MAX_PORTFOLIO_LOSS, TOKEN_AMP_CLASS,
@@ -3062,6 +3063,26 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             closed_count += 1
             log(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
             continue  # Skip trailing SL update for closed position
+
+        # ── 6a. UNIVERSAL MAX HOLD — Safety Net ─────────────────────────────
+        # Force-close any position held longer than UNIVERSAL_MAX_HOLD_MINUTES.
+        # Prevents stale positions from locking capital (WLFI 678min, SEI 1161min).
+        if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time:
+            try:
+                if isinstance(open_time, str):
+                    _open_dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
+                else:
+                    _open_dt = open_time
+                if _open_dt.tzinfo is None:
+                    _open_dt = _open_dt.replace(tzinfo=timezone.utc)
+                _age_min = (datetime.now(timezone.utc) - _open_dt).total_seconds() / 60
+                if _age_min >= UNIVERSAL_MAX_HOLD_MINUTES:
+                    close_paper_position(trade_id, "UNIVERSAL_MAX_HOLD")
+                    closed_count += 1
+                    log(f"  MAX_HOLD {token} {direction} {live_pnl:+.2f}% — held {_age_min:.0f}min > {UNIVERSAL_MAX_HOLD_MINUTES}min")
+                    continue
+            except Exception:
+                pass  # age check failure — skip, don't crash
 
         # ── 6b. SOFT PEAK-EXIT TRIGGER (1hr tight trail) ────────────────────────
         # After 1 hour open, if trade is flat/negative (hasn't gone in our direction),

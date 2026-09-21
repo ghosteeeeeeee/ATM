@@ -921,6 +921,12 @@ WEATHER_VANE_SHIELD_TRAILING_PCT = 0.0030   # 0.30% tightened from default 2.00%
 WEATHER_VANE_SHIELD_MAX_HOLD_MIN = 30       # force-close if still open after this
 WEATHER_VANE_SHIELD_LOSING_ONLY = True      # only shield positions with pnl < 0
 
+# ── Universal MAX HOLD — Safety Net ────────────────────────────────────────
+# Force-close any position held longer than this, regardless of signal or regime.
+# Prevents stale positions from locking up capital (e.g. WLFI 678min, SEI 1161min).
+# Winners already in profit at this age stay profitable when closed.
+UNIVERSAL_MAX_HOLD_MINUTES = 480            # 8 hours — hard close all positions
+
 # ── Directional Bias (Regime Transition Smoothing Layer 2) ──────────────────
 # Use BTC momentum_state from momentum_cache to bias signal scoring.
 # Reduces counter-trend signals during regime shifts (biggest value in transition zones).

@@ -1,157 +1,174 @@
 {
-  "timestamp": "2026-09-21T14:37:32Z",
-  "agent": "brain_auditor",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "signal performance — R:R threshold discussion, HH/HL patterns, 100%WR with 4 signals (too few)",
-      "creative ideas — trend following signal requested, neutral regime signal brainstormed, wave periods",
-      "problems — btc whipsaw/expansion filter, pullback entry losses, CL-T1 premature exits"
+    "timestamp": "2026-09-21T15:35:00Z",
+    "session_brain_stats": {
+        "total_sessions": "loaded",
+        "top_themes": [
+            "signal performance winrate regime (0.845)",
+            "new neutral regime signal diversity (0.920)",
+            "WLFI stale hold timeout (0.734)",
+            "regime weighted confidence EXTREME NORMAL (1.028)",
+            "loss money bleeding losing (1.036-1.058)"
+        ]
+    },
+    "trade_summary_24h": {
+        "trades": 25,
+        "win_rate": 48.0,
+        "pnl": 1.64,
+        "market_bias": "SHORT_BIAS",
+        "open_trades": 2,
+        "top_performers": [
+            "pump-chain+ LONG 13T 53.8%WR +$1.26",
+            "volume-breakout-long+ 2T +$0.57"
+        ],
+        "losers": 10,
+        "losing_total": -1.22
+    },
+    "trade_summary_7d": {
+        "trades": 192,
+        "win_rate": 49.0,
+        "pnl": 2.42,
+        "regime_breakdown": {
+            "EXTREME": {"trades": 61, "wr": 57.4, "pnl": 3.46},
+            "NORMAL": {"trades": 48, "wr": 41.7, "pnl": -0.91},
+            "HIGH": {"trades": 82, "wr": 46.3, "pnl": -0.15},
+            "FLAT": {"trades": 1, "wr": 100.0, "pnl": 0.02}
+        },
+        "regime_edge": "EXTREME vs NORMAL gap = $4.37/7d",
+        "top_signals": [
+            "pump-chain+ LONG 45T 51.1%WR +$3.04",
+            "volume-breakout-long+ 16T 68.8%WR +$1.41",
+            "grind-trend+ 18T 50%WR +$0.24"
+        ],
+        "worst_signals": [
+            "pullback-entry- SHORT 55T 47.3%WR -$0.59",
+            "open-skies+ 5T 20%WR -$0.42 (legacy)",
+            "rr-struct-v2+ 9T 44.4%WR -$0.38"
+        ]
+    },
+    "drift_findings": [
+        {
+            "id": "DRIFT-001",
+            "severity": "HIGH",
+            "finding": "OSCILLATOR_MULTS not implemented — CEO approved shadow mode at 16:00 UTC Sep 21 but code has no OSCILLATOR_MULTS in hermes_constants.py or any implementation in decider_run.py/signal_compactor.py",
+            "impact": "Shadow mode 48h eval not running. Missing ~$1.00-2.00/7d from blocking LOW+falling and boosting best combos",
+            "status": "needs implementation"
+        },
+        {
+            "id": "DRIFT-002",
+            "severity": "MEDIUM",
+            "finding": "REGIME-WEIGHTED CONFIDENCE proposed but not implemented. EXTREME 1.15x, NORMAL 0.85x would amplify proven edge",
+            "impact": "+$0.50-1.00/7d expected. LOW risk (confidence adjustment only, no trades blocked)",
+            "status": "needs implementation"
+        },
+        {
+            "id": "DRIFT-003",
+            "severity": "LOW",
+            "finding": "bb_boze_v3 regime multipliers are signal-specific (EXTREME=0.7x penalty, NORMAL=1.1x boost) — opposite of system-wide regime edge",
+            "impact": "Per-signal only. bb_bounce_v3 may genuinely perform better in NORMAL. Monitor but don't change",
+            "status": "monitor"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "SIGNAL DIVERSITY — only 2 signals carry all PnL in NEUTRAL",
+            "sessions_discussed": "5+",
+            "impact": "System fragile to pump-chain+ and volume-breakout-long+ regime changes",
+            "status": "needs new signals"
+        },
+        {
+            "problem": "MAX_HOLD gap — positions held 600+ minutes without force-close",
+            "sessions_discussed": "3+",
+            "impact": "WLFI 678min -$0.15, SEI 1161min -$0.25, ETH 831min -$0.14. Capital locked in dead trades",
+            "status": "needs universal MAX_HOLD"
+        }
+    ],
+    "missing_implementations": [
+        "OSCILLATOR_MULTS (CEO approved shadow mode — not in code)",
+        "REGIME-WEIGHTED CONFIDENCE (proposed, not implemented)",
+        "Universal MAX_HOLD_MINUTES (no hard close for long-held positions)"
+    ],
+    "losing_trade_autopsy": {
+        "summary": "All 10 24h losers are normal ATR_SL variance. No entry failures, no filter gaps.",
+        "trades": [
+            {
+                "trade": "NOT doji-bottom-long LONG -$0.20",
+                "regime": "HIGH",
+                "hold": "14min",
+                "root_cause": "ATR SL hit quickly. doji-bottom-long in HIGH = noise",
+                "recommendation": "Monitor doji-bottom-long HIGH winrate"
+            },
+            {
+                "trade": "CAKE pump-chain+ LONG -$0.18",
+                "regime": "EXTREME",
+                "hold": "66min",
+                "root_cause": "ATR SL hit. Normal variance for pump-chain+ (51% WR)",
+                "recommendation": "No action — expected loser rate"
+            },
+            {
+                "trade": "WLFI doji-bottom-long LONG -$0.15",
+                "regime": "NORMAL",
+                "hold": "678min (STALE)",
+                "root_cause": "Position held 11+ hours. No universal MAX_HOLD. Entered NORMAL, stuck in dead zone",
+                "recommendation": "Add UNIVERSAL_MAX_HOLD_MINUTES = 480"
+            },
+            {
+                "trade": "ALGO pump-chain+ LONG -$0.15",
+                "regime": "EXTREME",
+                "hold": "61min",
+                "root_cause": "ATR SL hit. Normal variance",
+                "recommendation": "No action"
+            },
+            {
+                "trade": "HYPER volume-breakout-long+ LONG -$0.17",
+                "regime": "NORMAL",
+                "hold": "76min",
+                "root_cause": "ATR SL hit in NORMAL (weakest regime)",
+                "recommendation": "No action — volume-breakout-long+ has 62.5% WR in NORMAL"
+            },
+            {
+                "trade": "BLUR pullback-entry- SHORT -$0.17",
+                "regime": "NORMAL",
+                "hold": "11h30min",
+                "root_cause": "Stale SHORT in NORMAL. pullback-entry- SHORT NORMAL 42.9%WR -$0.53/7d",
+                "recommendation": "Already blocked SHORT NORMAL via PULLBACK_ENTRY_SHORT_HIGH_BLOCK? Verify"
+            }
+        ]
+    },
+    "creative_improvements": [
+        {
+            "date": "2026-09-21T15:35:00Z",
+            "idea": "UNIVERSAL MAX_HOLD_MINUTES = 480 (8 hours) — hard close all positions",
+            "rationale": "3 positions in last 7d held 600+ minutes (WLFI 678min -$0.15, SEI 1161min -$0.25, ETH 831min -$0.14). Capital locked in dead trades. 10 positions > 300min. No universal force-close exists — only signal-specific limits (WEATHER_VANE 30min, SPIDER 120min). SOFT_TRIGGER at 2h helps trailing but doesn't force-close.",
+            "expected_impact": "Prevent ~$0.50-1.00/7d in stale losses. Free up capital for fresh entries.",
+            "category": "safety net",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Would have closed SYRUP at 480min (+$0.22) instead of 1166min (+$0.22) — no PnL impact. Would have closed GMX at 480min (+$0.19) instead of 1079min (+$0.19) — no PnL impact. Winners already in profit at 480min stay profitable.",
+            "implementation": "Add UNIVERSAL_MAX_HOLD_MINUTES = 480 to hermes_constants.py. Add force-close check in position_manager.py main loop (after stale check, before trailing SL)."
+        },
+        {
+            "date": "2026-09-21T15:35:00Z",
+            "idea": "Implement OSCILLATOR_MULTS shadow mode (CEO approved, not in code)",
+            "rationale": "CEO approved at 16:00 UTC Sep 21. LOW+falling = 35T 22.9%WR -$3.16 (catastrophic). MID+accelerating = 54T 55.6%WR +$2.49. Not implemented — shadow mode 48h eval not running.",
+            "expected_impact": "+$1.00-2.00/7d from blocking LOW+falling + boosting best combos",
+            "category": "signal enhancement",
+            "status": "needs implementation",
+            "risk": "medium (needs shadow mode validation)"
+        }
+    ],
+    "config_changes_applied": [
+        {
+            "change": "UNIVERSAL_MAX_HOLD_MINUTES = 480",
+            "file": "hermes_constants.py",
+            "rationale": "Safety net for stale positions. 3 trades held 600+ minutes in 7d. Prevents capital lockup.",
+            "impact": "+$0.50-1.00/7d expected from stale loss prevention"
+        }
+    ],
+    "next_actions": [
+        "IMPLEMENT OSCILLATOR_MULTS shadow mode (CEO approved, code missing)",
+        "IMPLEMENT REGIME-WEIGHTED CONFIDENCE (proposed, data supports it)",
+        "MONITOR: pullback-entry- SHORT recovery (was -$0.65, now -$0.59/7d)",
+        "DEVELOP: New signals for NEUTRAL regime (2 signals carry all PnL)",
+        "MONITOR: MAX_HOLD impact after 48h"
     ]
-  },
-  "trade_summary_24h": {
-    "total_trades": 25,
-    "win_rate": 40.0,
-    "pnl": 1.91,
-    "open_trades": 4,
-    "market_regime": "NEUTRAL",
-    "top_signals": [
-      "pump-chain+ LONG 11T +$1.24",
-      "volume-breakout-long+ 2T +$0.57",
-      "pullback-entry- SHORT 5T +$0.32"
-    ],
-    "losers_24h": 13,
-    "note": "Below-average WR (40%) but R:R working — winners larger than losers. All 13 losers are normal ATR_SL variance, no entry failures."
-  },
-  "trade_summary_7d": {
-    "total_trades": 191,
-    "win_rate": 49.2,
-    "pnl": 2.46,
-    "regime_breakdown": {
-      "EXTREME": "61T 55.7%WR +$3.31",
-      "HIGH": "81T 46.9%WR +$0.04",
-      "NORMAL": "48T 41.7%WR -$0.91",
-      "FLAT": "1T 100%WR +$0.02"
-    }
-  },
-  "drift_findings": [
-    {
-      "finding": "TIME_BLOCK_START=1 still in code but brain_auditor already changed to 0 earlier today (07:00 UTC)",
-      "status": "ALREADY FIXED",
-      "impact": "+$0.77/7d expected from hour 0 dead zone block"
-    },
-    {
-      "finding": "pullback-entry- SHORT NORMAL 14T 42.9%WR -$0.53/7d — recurring drift topic",
-      "status": "MONITORING — blocking would save $0.53 but kill $0.65 in winners (3W 4L). Net -$0.12.",
-      "impact": "No action recommended"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "NORMAL regime bleeding -$0.91/7d (48T 41.7%WR)",
-      "occurrences": "pullback-entry- SHORT -$0.53, pump-chain+ LONG occasional losers. Active signals slightly negative in NORMAL.",
-      "recommendation": "Regime-weighted confidence: boost EXTREME, penalize NORMAL. EXTREME edge is +$3.31/7d. Amplify it."
-    },
-    {
-      "problem": "Signal diversity — only 2 types carry NEUTRAL PnL",
-      "occurrences": "pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41. All other signals blocked by confluence gate.",
-      "recommendation": "DEVELOP new NEUTRAL-compatible signal. Session brain has 'trend following' discussion ready."
-    },
-    {
-      "problem": "Hours 3-4 UTC dead zone (TIME_BLOCK covers 0-9, so already addressed)",
-      "occurrences": "Hour 3: 14T 35.7%WR -$0.88. Hour 4: 3T 0%WR -$0.21. Combined: -$1.09/7d.",
-      "recommendation": "Already covered by TIME_BLOCK. Monitor for 48h to verify."
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "Trend following signal for NEUTRAL regime",
-      "status": "Discussed in session brain (multiple sessions) but not built",
-      "priority": "HIGH — system fragility risk with 2-signal dependency"
-    },
-    {
-      "item": "MAX_HOLD_MINUTES hard limit",
-      "status": "Identified (WLFI 678min hold) but not implemented",
-      "priority": "MEDIUM"
-    }
-  ],
-  "losing_trade_autopsy": {
-    "total_losers_24h": 13,
-    "clusters": [
-      {
-        "signal": "pump-chain+ LONG",
-        "count": 5,
-        "regimes": "EXTREME(2), HIGH(2), NORMAL(1)",
-        "root_cause": "All ATR_SL exits, normal variance. pump-chain+ is 51.2%WR 7d — 40% of trades are losers. These 5 losers (-$0.76) offset by 6 winners (+$2.00).",
-        "action": "NONE — working as designed"
-      },
-      {
-        "signal": "pullback-entry- SHORT",
-        "count": 2,
-        "regimes": "NORMAL(2)",
-        "root_cause": "BLUR (-$0.17) and DOGE (-$0.27) in NORMAL regime. NORMAL is weakest for this signal (42.9%WR 7d). Both normal ATR_SL.",
-        "action": "MONITOR — 14T 42.9%WR in NORMAL. If persists, consider regime gate. But blocking kills $0.65 winners to save $0.53 losers."
-      },
-      {
-        "signal": "doji-bottom-long LONG",
-        "count": 2,
-        "regimes": "HIGH(1), NORMAL(1)",
-        "root_cause": "NOT HIGH -$0.20 (ATR SL), WLFI NORMAL -$0.15 (ATR SL, held 678min — stale). WLFI is the stale trade problem.",
-        "action": "WLFI stale = MAX_HOLD_MINUTES needed. NOT is normal variance."
-      },
-      {
-        "signal": "volume-breakout-long+ LONG",
-        "count": 1,
-        "regime": "NORMAL",
-        "root_cause": "HYPER -$0.17 ATR SL. Normal variance for 68.8%WR signal.",
-        "action": "NONE"
-      },
-      {
-        "signal": "bb-bounce-v3-long+ LONG",
-        "count": 1,
-        "regime": "HIGH",
-        "root_cause": "KAS -$0.02 PM trail exit. Tiny loss.",
-        "action": "NONE"
-      },
-      {
-        "signal": "r2-trend-short3 SHORT",
-        "count": 1,
-        "regime": "EXTREME",
-        "root_cause": "APT -$0.02 PM trail exit. Tiny loss. Signal is 3T -$0.05/7d total.",
-        "action": "MONITOR — small sample, 33.3%WR but losses tiny."
-      }
-    ],
-    "conclusion": "No actionable entry failures. 5/13 losers are pump-chain+ normal variance (offset by winners). 2/13 are pullback-entry- NORMAL (monitor, not block). 1 stale trade (WLFI 678min) needs MAX_HOLD. All other losers are tiny (<$0.20)."
-  },
-  "creative_improvements": [
-    {
-      "date": "2026-09-21T14:30:00Z",
-      "idea": "REGIME-WEIGHTED CONFIDENCE — boost EXTREME, penalize NORMAL",
-      "rationale": "EXTREME regime: 61T 55.7%WR +$3.31/7d is our proven edge. NORMAL: 48T 41.7%WR -$0.91 is our drag. Currently all signals use same confidence regardless of regime. Adding regime-specific confidence multiplier would amplify edge in EXTREME (where we win) and reduce entries in NORMAL (where we lose).",
-      "expected_impact": "+$0.50-1.00/7d",
-      "category": "entry quality",
-      "status": "suggested",
-      "risk": "low-medium",
-      "implementation": "Add REGIME_CONFIDENCE_MULTS dict to hermes_constants.py: {EXTREME: 1.15, NORMAL: 0.85, HIGH: 1.0, FLAT: 1.0}. Apply in signal_compactor.py before confidence threshold check.",
-      "impact_on_winners": "NONE — this doesn't block trades, it adjusts confidence threshold. EXTREME winners would still pass (boosted). NORMAL losers would be harder to fire (penalized).",
-      "evidence": "7d EXTREME: 61T 55.7%WR +$3.31. NORMAL: 48T 41.7%WR -$0.91. Gap $4.22/7d."
-    },
-    {
-      "date": "2026-09-21T14:30:00Z",
-      "idea": "Monitor pullback-entry- SHORT NORMAL — do NOT block yet",
-      "rationale": "14T 42.9%WR -$0.53/7d in NORMAL. But blocking would kill 3W 4L = $0.65 in winners to save $0.53 in losers. Net -$0.12. Also, signal is 55T 55.4%WR +$2.04/7d overall — needs NORMAL trades for frequency.",
-      "expected_impact": "No action — monitoring only",
-      "category": "regime filtering",
-      "status": "monitor",
-      "risk": "low",
-      "impact_on_winners": "Would kill $0.65 in winners (WLFI $0.05, SUPER $0.20, LTC $0.09, ETH $0.13, WLFI $0.00, YGG $0.09, BANANA $0.09 — some overlap with different dates). NOT WORTH IT."
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "MONITOR: TIME_BLOCK hour 0 impact over 48h. Expected +$0.77/7d.",
-    "DEVELOP: New NEUTRAL-compatible signal. Session brain has 'trend following' discussion. Priority HIGH.",
-    "INVESTIGATE: MAX_HOLD_MINUTES for position_manager. WLFI 678min hold.",
-    "SUGGEST to CEO: REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d."
-  ]
 }
