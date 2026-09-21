@@ -307,28 +307,20 @@ def get_regime() -> dict:
     elif market_phase == 'mover_hunting':
         votes['TREND'] += 1
 
-    # 5. BTC 4h regime override (2026-09-18) — ignores short-term noise when macro trend is clear
-    # When BTC 4h regime is LONG_BIAS or SHORT_BIAS with strong slope, override chop classification
+    # 5. BTC continuum oscillator override (2026-09-21) — fast indicator, overrides chop
+    # When BTC continuum score is extreme with strong trend_bias, override chop classification
     try:
-        import psycopg2
-        _pg_conn = None
-        try:
-            _pg_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-            _pg_cur = _pg_conn.cursor()
-            _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
-            _btc_4h = _pg_cur.fetchone()
-            if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
-                _slope_4h = float(_btc_4h[1])
-                if _btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35:
-                    votes['TREND'] += 2  # strong bullish 4h — override chop
-                elif _btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35:
-                    votes['TREND'] += 2  # strong bearish 4h — override chop (SHORT signals are momentum too)
-        finally:
-            if _pg_conn:
-                try: _pg_conn.close()
-                except: pass
+        from continuum_context import get_btc_trend_context
+        _ctx = get_btc_trend_context()
+        if _ctx and _ctx.get('available'):
+            _score = _ctx.get('score', 50)
+            _bias = _ctx.get('trend_bias', 0)
+            if _score > 80 and _bias > 0.5:
+                votes['TREND'] += 2  # strong bullish continuum — override chop
+            elif _score < 20 and _bias < -0.5:
+                votes['TREND'] += 2  # strong bearish continuum — override chop
     except Exception:
-        pass  # if DB unavailable, fall through to existing votes
+        pass  # if continuum unavailable, fall through to existing votes
 
     # 6. BTC continuum override (2026-09-20) — structural regime from continuum oscillator
     # When continuum shows clear directional structure (not just velocity), override chop

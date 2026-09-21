@@ -1120,19 +1120,19 @@ def _score_signal(token, direction, conf, source, signal_type,
             if _gate_row and _gate_row[0] is not None:
                 _btc_30m = _gate_row[0]
                 if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
-                    # BTC is flat — check if 4h regime overrides
+                    # BTC is flat — check if continuum oscillator overrides (fast indicator)
                     _override = False
                     try:
-                        import psycopg2 as _pg
-                        _pg_conn = _pg.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-                        _pg_cur = _pg_conn.cursor()
-                        _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
-                        _btc_4h = _pg_cur.fetchone()
-                        _pg_conn.close()
-                        if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
-                            _slope_4h = float(_btc_4h[1])
-                            if (_btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35 and direction.upper() == 'LONG') or \
-                               (_btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35 and direction.upper() == 'SHORT'):
+                        from continuum_context import get_btc_trend_context
+                        _ctx = get_btc_trend_context()
+                        if _ctx and _ctx.get('available'):
+                            _score = _ctx.get('score', 50)
+                            _bias = _ctx.get('trend_bias', 0)
+                            # Strong bullish: score > 80, bias > 0.5 → allow LONG
+                            # Strong bearish: score < 20, bias < -0.5 → allow SHORT
+                            if _score > 80 and _bias > 0.5 and direction.upper() == 'LONG':
+                                _override = True
+                            elif _score < 20 and _bias < -0.5 and direction.upper() == 'SHORT':
                                 _override = True
                     except Exception:
                         pass

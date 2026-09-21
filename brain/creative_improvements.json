@@ -1418,7 +1418,8 @@
     "rationale": "71.4% WR, +$0.84/7d, 2T/day. Works equally in EXTREME and NORMAL. Could be promoted.",
     "expected_impact": "+$0.5-1.0/7d if frequency increased",
     "category": "signal diversity",
-    "status": "monitoring",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-21T13:28:30.877644+00:00"
   }
 ]
