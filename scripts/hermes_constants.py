@@ -2118,7 +2118,7 @@ SQUEEZE_BREAKOUT_BB_PERIOD = 20           # BB calculation period
 SQUEEZE_BREAKOUT_ATR_PERIOD = 14          # ATR calculation period
 SQUEEZE_BREAKOUT_EXPANSION_LOOKBACK = 30  # bars to find minimum BB width
 SQUEEZE_BREAKOUT_EXPANSION_MULT = 2.0     # expansion = current > min × this
-SQUEEZE_BREAKOUT_COOLDOWN_HOURS = 4       # hours between signals
+SQUEEZE_BREAKOUT_COOLDOWN_HOURS = 0.33         # 20 minutes between signals
 SQUEEZE_BREAKOUT_CONTINUUM_LONG_THRESH = 50  # score > this = LONG
 SQUEEZE_BREAKOUT_CONTINUUM_SHORT_THRESH = 50 # score < this = SHORT
 SQUEEZE_BREAKOUT_SQUEEZE_RANGE_BARS = 30  # bars for high/low range

@@ -1745,11 +1745,13 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Look up multiplier
             key = (zone, wave_phase)
             if key in OSCILLATOR_MULTS:
-                oscillator_mult = OSCILLATOR_MULTS[key]
                 if OSCILLATOR_MULT_ENABLED:
+                    # LIVE MODE — apply multiplier to score
+                    oscillator_mult = OSCILLATOR_MULTS[key]
                     log(f"  🎯 [OSCILLATOR] {token}: {zone}+{wave_phase} → {oscillator_mult:.2f}x")
                 else:
-                    # Shadow mode — log what WOULD happen
+                    # SHADOW MODE — log what WOULD have happened, oscillator_mult stays 1.0
+                    would_be_mult = OSCILLATOR_MULTS[key]
                     shadow_entry = {
                         'timestamp': datetime.now().isoformat(),
                         'token': token,
@@ -1759,8 +1761,8 @@ def _score_signal(token, direction, conf, source, signal_type,
                         'btc_score': btc_score,
                         'wave_phase': wave_phase,
                         'score_zone': zone,
-                        'would_be_multiplier': oscillator_mult,
-                        'confidence_after': score * oscillator_mult,
+                        'would_be_multiplier': would_be_mult,
+                        'confidence_after': score * would_be_mult,
                         'actual_outcome': None
                     }
                     try:
