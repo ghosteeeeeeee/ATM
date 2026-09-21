@@ -1,53 +1,75 @@
 # Signal Performance Report
-**Period:** 2026-09-21 05:09 UTC (6h + 24h + 7d analysis)
+**Generated:** 2026-09-21 16:00 UTC | **Period:** Last 6h + 24h + 7d
+
+## Overall Stats
+- **24h:** 26 trades | 46.2% WR | +$1.81
+- **7d:** 197 trades | 50.3% WR | +$3.19
+- **No inversions found.**
 
 ---
 
-## Summary
-- **6h:** 9 trades, PnL $-0.66 (pump-chain+ LONG -5T drove losses)
-- **24h:** 25 trades, PnL $+0.82 (healthy)
-- **7d:** ~160+ trades across all signals
+## KILLED (executed this cycle)
 
-## KILLED (executed)
-None this cycle.
+None.
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
+---
 
-## PREVIOUSLY KILLED (verify still dead)
-| Signal | Dir | Kill Date | Reason |
-|--------|-----|-----------|--------|
-| grind-trend- | SHORT | 2026-09-19 | 20% WR, -$0.38, no winning regime. Last close Sep 19. |
+## BOOSTED (executed this cycle)
 
-## BOOSTED (executed)
-None this cycle.
+None — no signal meets >55% WR with 5+ trades in 24h.
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
+---
 
-## WATCH LIST
-| Signal | Dir | WR | PnL | Trades (7d) | Status |
-|--------|-----|-----|-----|-------------|--------|
-| open-skies+ | LONG | 36.4% | $-0.73 | 11 | RE-ENABLED Sep 20 for 48h test. No closed trades yet in test window. Monitor next cycle. |
-| pullback-entry- | SHORT | 49.2% | $-0.65 | 59 | 30d: 112T/55.4% WR/$+2.04. Currently net negative on 7d. Below threshold for kill. |
-| rr-struct-v2+ | LONG | 40.0% | $-0.45 | 10 | Mild loss, 40% WR. Monitor. |
+## WINNERS (24h)
 
-## WINNERS
-| Signal | Dir | WR | PnL | Trades (7d) | Tokens | Status |
-|--------|-----|-----|-----|-------------|--------|--------|
-| pump-chain+ | LONG | 46.8% | $+2.11 | 47 | many | Top PnL. WR below 50% but positive R:R carries it. |
-| volume-breakout-long+ | LONG | 66.7% | $+0.67 | 15 | 14 | Excellent. Boost candidate when data matures. |
-| grind-trend+ | LONG | 50.0% | $+0.24 | 18 | many | Steady performer. |
-| mover+ | LONG | 66.7% | $+0.07 | 6 | 5 | Boost candidate. |
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pump-chain+ | LONG | 12 | 50.0% | +$1.09 | OK |
+| volume-breakout-long+ | LONG | 2 | 50.0% | +$0.57 | Needs data |
+| pullback-entry- | SHORT | 6 | 50.0% | +$0.15 | OK |
 
-## 24h ONLY
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| pump-chain+ | LONG | 53.8% | $+0.85 | 13 |
-| pullback-entry- | SHORT | 50.0% | $+0.10 | 8 |
+---
 
-## ISSUES
-- **No signal inversions found** — all signals fire with correct direction.
-- **grind-trend-** killed Sep 19 but still has 5 trades in 7d window (pre-kill data). No new trades since kill. Verified dead.
-- **open-skies+** re-enabled Sep 20 for 48h CEO test — zero closed trades in test window so far. Next report will have actionable data.
-- **6h drawdown** ($-0.66) driven entirely by pump-chain+ LONG hitting SL on 4 of 5 trades. 24h still profitable ($+0.85). Normal variance.
+## WATCH LIST (7d losers, <5 trades in 24h)
+
+| Signal | Dir | 7d Trades | 7d WR | 7d PnL | Regime | Action |
+|--------|-----|-----------|-------|--------|--------|--------|
+| open-skies+ | LONG | 5 | 20.0% | -$0.42 | HIGH: 0% WR (3T) | Watch — re-enabled Sep 20 for 48h test. Losing in HIGH regime. |
+| grind-trend- | SHORT | 5 | 20.0% | -$0.38 | HIGH: 33% (3T), NORMAL: 0% (2T) | Dead. Already killed Sep 19. |
+| rr-struct-v2+ | LONG | 9 | 44.4% | -$0.38 | HIGH: 33% (3T), NORMAL: 50% (6T) | Borderline — losing in HIGH regime only |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+None found.
+
+---
+
+## RECOMMENDATIONS
+
+1. **open-skies+ LONG** — 48h test was re-enabled Sep 20. Current 7d: 20% WR, -$0.42. Losing entirely in HIGH regime. If no improvement by next report, kill.
+2. **rr-struct-v2+ LONG** — 44% WR, -$0.38 over 9T. NORMAL regime is 50% WR (break-even). HIGH regime drags it negative. Consider regime gate for HIGH only.
+3. **grind-trend- SHORT** — already killed Sep 19. Verify flag is False in constants.
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-09-21 | b43981d | Daily trading system update (2026-09-21) |
+| 2026-09-20 | b863b7f | Re-enable open-skies for 48h testing (CEO request) |
+| 2026-09-20 | b3b4c7d | brain_auditor: fix SHORT_RSI_FLOOR dead code bug + lower thr... |
+| 2026-09-20 | 3d7033f | CEO: Extend TIME_BLOCK 01-09, update regime memory |
+| 2026-09-20 | 5c484ec | Daily trading system update (2026-09-20) |
+| 2026-09-20 | dc9ee49 | Bug fixes: continuum override (from bug hunter audit) |
+| 2026-09-20 | efbb59a | Constants: add return_exhaustion-short to STANDALONE_BYPASS ... |
+| 2026-09-20 | f0315cf | Config: lower R:R hard block threshold from 1.0 to 0.95 |
+| 2026-09-19 | 58b5012 | signals: kill grind-trend- SHORT — 20% WR, -$0.38 |
+| 2026-09-19 | 5fb4929 | brain_auditor: CHASE composite filter deployed (z>2.5 OR gap... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+
+---
+*Report auto-generated by signal_reporter. Next report: ~6h.*
