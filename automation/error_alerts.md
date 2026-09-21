@@ -1,3 +1,11 @@
+## Error Alerts — 2026-09-21 18:46 UTC
+- **[WARN]** (23x): `signal_compactor timed out (killed after 60.1s)` — 23 occurrences in last 6h (12:48-18:42). Intermittent — most runs complete in 1-5s. Likely caused by 92MB signal DB with 5,884 active signals (BTC alone has 425 duplicate signals). Pipeline recovers on next cycle each time.
+- **[WARN]**: 0 signals passing compactor — "No signals above 50% confidence — skipping execution" on recent runs. Compactor is filtering everything out. Market regime heavily neutral (117/120 neutral, 3 short).
+- **[WARN]**: Today's performance — 23 trades, 34.8% WR, -$0.55 PnL. 4 phantom trades with <0.05% PnL (ALT 0.0%, GMX 0.017%, KAS -0.003%, BANANA -0.021%).
+- **[INFO]**: 1 open position — CFX SHORT, entry 0.053261, current ~0.05335, PnL ~-0.2%. HIGH volatility gate active (SL 1.5%, TP 1.1%).
+- **[INFO]**: BTC-CRASH block active — DOGE LONG blocked at 18:28:23 (BTC -0.12% from high).
+- **[INFO]**: Pipeline running normally, all timers active, disk 82% (safe).
+
 ## Error Alerts — 2026-09-21 08:46 UTC
 - **[WARN]** (1x): `signal_compactor timed out (killed after 60.1s)` at 08:42:02 — self-recovered on next cycle (0.9s)
 - **[WARN]** (1x): CRV LONG trade execution failed at 08:38:25 — signal rolled back properly, no retry loop
@@ -353,3 +361,29 @@
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Health Report — 2026-09-21 19:46 UTC
+- **STATUS**: OK — Pipeline running, services active
+- **PIPELINE**: Last cycle completed 19:43:41, next started 19:44:00
+- **SIGNALS**: 10 generated in last hour, 5884+ active
+- **TRADES**: 1 open (CFX SHORT, -0.33% PnL), 23 closed today, -5.30% cumulative
+- **REGIME**: LONG_BIAS (3L/0S/117N)
+- **SPEED**: SAGA 100%, BLZ 100%, KPEPE 99.4%
+- **DISK**: 82% (21G free) — safe
+- **TIMERS**: 55 active, none missed
+- **WARN** (3x): signal_compactor timed out at 19:20, 19:33, 19:42 — self-recovered each time
+- **INFO**: CFX SHORT trailing SL active (SL 0.053595, 0.3% trail from 0.053435, age 2.4h)
+
+## Error Alerts — 2026-09-21 20:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-09-21 21:44 UTC
+- **WARN** (19x/4h): `signal_compactor: timed out (killed after 60.1s)` — timeout rate elevated. Pipeline continues but compactor decisions may be missed on affected cycles.
+- **WARN** (189x/4h): `hotset fallback DB query returned 0 tokens` — hotset DB empty or unreachable, using fallback every cycle. Non-critical (dashboard only).
+- **INFO**: Daily PnL -1.53 USDT, win rate 26.9% (7/26). Below target but no system failure.
+- **NO AUTO-FIX NEEDED**: All services running, timers firing, disk 83%. Pipeline healthy.
+
+## Error Alerts — 2026-09-21 21:57 UTC
+- **REPEATED** (11x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

@@ -250,7 +250,7 @@ def scan_signals():
             break
         
         token = rec.get('token', '').upper()
-        direction = rec.get('suggested_direction', '')
+        direction = rec.get('direction', rec.get('suggested_direction', ''))
         
         # Skip WAIT signals
         if direction == 'WAIT':

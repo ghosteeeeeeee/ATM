@@ -1,3 +1,46 @@
+## [2026-09-21 21:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 3 (ALT pump-chain+, AZTEC pump-chain+, BLUR mover+)
+**24h:** 24T 29.2%WR -$0.44 | **7d:** 187T 48.7%WR +$2.22
+
+**24h by exit reason:**
+- atr_sl_hit: 17/24 (71%) avg -$0.021 — SL hits dominate, mostly small losses
+- profit-monster-trail: 4T avg +$0.033 — trail capturing winners
+- pump_exit_dead_money: 2T avg -$0.045
+- pump_exit_momentum: 1T -$0.13
+
+**24h signal ranking:**
+- volume-breakout-long+: 2T 50%WR +$0.57
+- accel-300: 1T 100%WR +$0.17
+- mover+: 1T 100%WR +$0.13
+- doji-bottom-long: 3T 33.3%WR -$0.34
+- pump-chain+: 12T 25%WR -$0.61 — **KILL CANDIDATE**
+- pullback-entry-: 2T 0%WR -$0.32
+
+**Diagnosis:**
+1. **Entry quality:** 29.2% WR 24h — pump-chain+ 25% dragging system negative
+2. **SL behavior:** 71% atr_sl_hit — entries entering at bad levels, hitting SL fast
+3. **Signal quality:** pump-chain+ is the ONLY net-negative signal and dominates trade count
+4. **Trade frequency:** 0T last hour — quiet, not overtrading
+
+**CHANGE: pump-chain+ dead hours block**
+- 7d hourly: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — ZERO wins
+- Added `PUMP_CHAIN_LONG_DEAD_HOURS = [0,1,2,3,4]` — hard block (return 0.0)
+- Soft 0.7x penalty wasn't enough for a 0%WR dead zone
+- Hours 5+ = 46.9%WR +$3.95 — the signal works, just not at night
+
+**Files changed:**
+- `scripts/hermes_constants.py` — new constant
+- `scripts/signal_compactor.py` — hard block in `_score_signal()`, utc_hour always defined
+
+**No Change Needed:**
+- doji-bottom-long 33%WR/24h but 60%WR/7d — variance, not structural
+- pullback-entry- 0%WR/24h — 2 trades only, not statistically significant
+- Other signals net positive
+
+**Status:** pump-chain+ dead hours block deployed. Monitoring for 24h.
+**BY:** auto_1hr
+
 ## [2026-09-21 16:30 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet market) | **Open:** 1 position (INJ pump-chain+ 14min, -56% → heading to SL)
@@ -3767,3 +3810,47 @@ Final set: ['DOT', 'HYPER', 'ME']
 - EXTREME regime performing well
 
 **BY:** daily_orchestrator
+
+## [2026-09-21 21:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (CFX SHORT pullback-entry-, 113min, -$0.01)
+**24h:** 23T, 43.5% WR, +$0.02 (breakeven) | **7d:** ~184T, ~49% WR, +$2.30
+
+**Diagnosis:**
+1. Entry quality: 0 trades closed — cannot assess.
+2. SL behavior: atr_sl_hit 67% (16/24) but net +$0.02 — trailing working correctly.
+3. Signal quality: pump-chain+ degraded today (33.3% WR, -$0.39) but 7d +$3.01 — normal variance. doji-bottom-long 33.3% WR, -$0.34 — 3 trades, borderline. No signal at 0% WR with 3+ trades last hour.
+4. Trade frequency: 0 trades closed last hour — very low, normal for NEUTRAL regime.
+5. Market state: NEUTRAL, system correctly cautious.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met (no 0% WR signal with 3+ trades last hour)
+- System flat (+$0.02 net 24h)
+- 1 open position, normal size
+- All automations healthy
+
+**Open Questions:** None
+
+## [2026-09-21 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (CFX SHORT pullback-entry-, 294min, -$0.10)
+**24h:** 23T, ~43% WR, +$0.02 (breakeven) | **7d:** ~184T, ~49% WR, +$2.30
+
+**Diagnosis:**
+1. Entry quality: 0 trades closed — cannot assess.
+2. SL behavior: atr_sl_hit 70% (16/23) of 24h closes — high but system net +$0.02. Trailing working.
+3. Signal quality: doji-bottom-long 33% WR -$0.34 (3T) borderline. pump-chain+ 33% WR -$0.39 (12T) degraded but 7d +$3.01. No signal at 0% WR with 3+ trades last hour.
+4. Trade frequency: Very low (0/hr). Normal for NEUTRAL regime on Sunday night.
+5. Market: NEUTRAL, HIGH vol. System correctly cautious.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met
+- System flat (+$0.02 net 24h)
+- 1 open position, normal size
+- pump-chain+ within normal variance
+
+**BY:** auto_1hr

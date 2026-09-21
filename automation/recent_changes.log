@@ -1,3 +1,9 @@
+[2026-09-21 21:15 UTC] auto_1hr: ADDED pump-chain+ dead hours block (hours 0-4 UTC)
+  24h: 24T 29.2%WR -$0.44 | 7d: 187T 48.7%WR +$2.22. 3 open trades.
+  pump-chain+ 12T 25%WR -$0.61/24h — hours 0-4 = 0%WR 15T/7d -$1.73.
+  Added PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4] hard block in signal_compactor.py.
+  Commit: 09b0d53e. BY: auto_1hr
+
 [2026-09-21 16:30 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 26T 46.2%WR +$1.51 | 7d: 193T 49.2%WR +$2.65. 1 open trade (INJ, heading to SL).
   ATR SL 18/26 (69%) avg +$0.088 — trail working. profit-monster-trail 4T avg +$0.033.
