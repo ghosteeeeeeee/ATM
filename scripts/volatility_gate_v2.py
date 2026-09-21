@@ -251,6 +251,7 @@ VOL_PHASE_MULTS = {
         'Pump_Flow': 0.0,             # BLOCKED — pump-chain+ LONG 0%WR -$0.44 in NORMAL (3T). Wins in EXTREME (46.7% WR, +$0.22)
         'Grind_Trend': 0.0,           # BLOCKED — grind-trend+ LONG 0%WR -$0.30 in NORMAL (5T). Wins in HIGH (57.1% WR). 2026-09-19
         'Momentum': 0.0,              # BLOCKED — momentum LONG 38.5%WR -$0.99/7d in NORMAL. Wins in EXTREME/HIGH. 2026-09-21
+        'Volume': 0.0,                # BLOCKED — volume-breakout-long+ 62.5%WR -$0.05 in NORMAL (8T/30d). 0 winners 7d NORMAL. Wins in EXTREME (75%WR +$1.46). 2026-09-21
     },
     # HIGH volatility: block signals that lose here but win in EXTREME/NORMAL
     ('HIGH', '*'): {

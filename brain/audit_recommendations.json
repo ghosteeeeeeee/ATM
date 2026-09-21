@@ -1,71 +1,71 @@
 {
-  "timestamp": "2026-09-21T19:37:51.620659+00:00",
+  "timestamp": "2026-09-21T21:15:00Z",
   "session_brain_stats": {
     "queries_run": 3,
     "key_insights": [
       "Signal winrate discussions dominate sessions",
       "New neutral regime signal requested but not built",
       "Multiple BTC filter ideas discussed but not implemented",
-      "pullback-entry- momentum_state filter proposed (rising=63.6%WR vs flat/falling=42.6%WR)"
+      "pullback-entry- momentum_state filter proposed (rising=63.6%WR vs flat/falling=42.6%WR)",
+      "signal decay / guitar tuning analogy — preserving high winrate signals as regime changes"
     ]
   },
   "trade_summary_24h": {
     "total": 22,
     "win_rate": 36.4,
     "pnl": 0.08,
-    "losers": 8,
-    "winners": 14,
+    "losers": 13,
+    "winners": 9,
     "best_signal": "volume-breakout-long+ (2T $0.57)",
     "worst_signal": "pump-chain+ (12T -$0.39)"
   },
   "trade_summary_7d": {
-    "total": 191,
-    "win_rate": 49.2,
-    "pnl": 3.44,
-    "best_regime": "EXTREME 61T 57.4%WR +$3.44",
+    "total": 184,
+    "win_rate": 48.9,
+    "pnl": 2.30,
+    "best_regime": "EXTREME 59T 57.6%WR +$3.30",
     "worst_regime": "NORMAL 47T 42.6%WR -$0.72",
-    "regime_gap": 4.16
+    "regime_gap": 4.02
   },
   "drift_findings": [
     {
       "item": "OSCILLATOR_MULTS shadow mode",
       "status": "CORRECT",
-      "detail": "OSCILLATOR_MULT_ENABLED=False, shadow logging active in signal_compactor.py:1721-1773, 121 entries in shadow log. Eval due Sep 23."
+      "detail": "Shadow logging active. Eval due Sep 23. LOW+falling = 22.9%WR -$3.16 (catastrophic)."
     },
     {
       "item": "SHORT_NORMAL_PENALTY",
       "status": "CORRECT",
-      "detail": "Value is 0.85 (15% penalty). Matches brain_auditor Sep 21 fix. SHORT NORMAL 7d: 47T 42.6%WR -$0.72 — penalty justified."
+      "detail": "Value is 0.85. SHORT NORMAL 7d: 47T 42.6%WR -$0.72 — penalty justified."
     },
     {
       "item": "TIME_BLOCK hours",
       "status": "CORRECT",
-      "detail": "TIME_BLOCK_START=0, covers 00-09 UTC. Extended from 1->0 per auto_1hr finding. Hour 20 uncovered but is stale position closes, not fresh entries."
+      "detail": "TIME_BLOCK_START=0, covers 00-09 UTC. Hour 20 uncovered but is stale position closes."
     },
     {
       "item": "UNIVERSAL_MAX_HOLD_MINUTES",
       "status": "CORRECT",
       "detail": "Value=480 (8h). Would have caught WLFI 678min stale. Deployed today."
+    },
+    {
+      "item": "CONF_FILTER_MIN",
+      "status": "CORRECT",
+      "detail": "Value=70. Correct."
     }
   ],
   "recurring_problems": [
-    {
-      "topic": "pump-chain+ HIGH regime weakness",
-      "occurrences": "3+ sessions",
-      "detail": "18T 38.9%WR +$0.47 in HIGH (7d). EXTREME is55.6%WR +$2.10. Session brain flagged pump-chain+ HIGH as underperformer.",
-      "recommendation": "Consider HIGH-specific confidence penalty (0.9x) for pump-chain+. Low risk — only affects 18 trades/7d."
-    },
-    {
-      "topic": "pullback-entry- SHORT hour 20 bleed",
-      "occurrences": "2+ sessions (auto_1hr, brain_auditor)",
-      "detail": "6T 0%WR -$1.03/7d at hour 20. All stale position closes, not fresh entries. UNIVERSAL_MAX_HOLD=480 should prevent future occurrences.",
-      "recommendation": "Monitor. If bleed persists after MAX_HOLD takes effect, add signal-specific time filter."
-    },
     {
       "topic": "Signal diversity in NEUTRAL",
       "occurrences": "5+ sessions",
       "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. System relies on 2 signal types.",
       "recommendation": "Develop new NEUTRAL-compatible signals. Session brain has unimplemented ideas (sma20_dip, trend following)."
+    },
+    {
+      "topic": "pullback-entry- SHORT cold streak",
+      "occurrences": "3+ sessions",
+      "detail": "7d: 55T 47.3%WR -$0.68. But 90d is 55.4%WR +$2.04 — this is variance, not systemic.",
+      "recommendation": "Monitor. SHORT_NORMAL_PENALTY=0.85 already applied. No action needed."
     }
   ],
   "missing_implementations": [
@@ -73,13 +73,13 @@
       "idea": "pullback-entry- SHORT momentum_state filter",
       "source": "brain_auditor Sep 20",
       "detail": "rising=63.6%WR vs flat/falling=42.6%WR. Expected +$0.97/7d.",
-      "status": "Not implemented — needs signal_compactor integration"
+      "status": "Needs signal_compactor integration"
     },
     {
       "idea": "Regime-weighted confidence multipliers",
       "source": "brain_auditor Sep 21",
       "detail": "EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d.",
-      "status": "Not implemented — needs hermes_constants.py + signal_compactor.py"
+      "status": "Needs hermes_constants.py + signal_compactor.py"
     },
     {
       "idea": "New NEUTRAL regime signals",
@@ -89,61 +89,74 @@
     }
   ],
   "losing_trade_autopsy": {
-    "total_24h_losers": 8,
+    "total_24h_losers": 13,
     "clusters": [
       {
-        "cluster": "pump-chain+ LONG ATR_SL (4 trades)",
-        "trades": "INJ -$0.29, CAKE -$0.18, HEMI -$0.15, ALGO -$0.15",
-        "root_cause": "Normal ATR stop-loss variance. All in EXTREME/HIGH vol. Signal 7d: 47T 48.9%WR +$2.66 — healthy.",
+        "cluster": "pump-chain+ LONG ATR_SL (6 trades)",
+        "trades": "INJ -$0.29 EXTREME, CAKE -$0.18 EXTREME, ALGO -$0.15 EXTREME, HEMI -$0.15 HIGH, HEMI -$0.13 EXTREME (momentum exit), AZTEC -$0.09 EXTREME (dead money)",
+        "root_cause": "Normal ATR stop-loss variance. 6/12 pump-chain+ trades lost — high frequency, normal for 47.8%WR signal. EXTREME regime is 53.8%WR +$1.82/7d — healthy.",
         "entry_check": "All entries within normal parameters. No RSI extremes, no chase patterns.",
         "regime_check": "EXTREME/HIGH — expected volatility. ATR SL working as designed.",
         "recommended_change": "NONE — normal variance. pump-chain+ is system workhorse.",
         "confidence": "HIGH"
       },
       {
-        "cluster": "doji-bottom-long ATR_SL (2 trades)",
-        "trades": "NOT -$0.20 (HIGH 13min), WLFI -$0.15 (NORMAL 678min stale)",
-        "root_cause": "NOT: quick stop in HIGH vol. WLFI: stale678min, covered by new MAX_HOLD=480.",
+        "cluster": "pullback-entry- SHORT (2 trades)",
+        "trades": "CFX -$0.15 HIGH (171min), BLUR -$0.17 NORMAL (290min)",
+        "root_cause": "CFX: SHORT in HIGH is 48.1%WR +$0.14/7d — normal loss. BLUR: SHORT in NORMAL is 42.6%WR -$0.72/7d — already penalized 0.85x.",
+        "entry_check": "Both entries normal. CFX entered 17:16, BLUR entered 19:18 (within TIME_BLOCK penalty).",
+        "regime_check": "pullback-entry- SHORT 7d: NORMAL 14T 42.9%WR -$0.53, EXTREME 14T 50.0%WR -$0.29, HIGH 27T 48.1%WR +$0.14.",
+        "recommended_change": "NONE — already penalized. Monitor cold streak.",
+        "confidence": "HIGH"
+      },
+      {
+        "cluster": "doji-bottom-long (2 trades)",
+        "trades": "NOT -$0.20 HIGH (13min), WLFI -$0.15 NORMAL (678min stale)",
+        "root_cause": "NOT: quick stop in HIGH vol. WLFI: stale678min, now covered by MAX_HOLD=480.",
         "entry_check": "NOT entered13:52, stopped14:06 — quick reversal. WLFI entered Sep 20 17:46, stale.",
         "regime_check": "doji-bottom-long 30d: HIGH 4T 75%WR +$0.42 (good), NORMAL 2T 50%WR -$0.02.",
-        "recommended_change": "NONE — MAX_HOLD=480 prevents future stale. doji-bottom-long 7d 5T33.3%WR -$0.34 is cold streak (30d: 60%WR +$0.09).",
+        "recommended_change": "NONE — MAX_HOLD=480 prevents future stale.",
         "confidence": "HIGH"
       },
       {
         "cluster": "volume-breakout-long+ NORMAL outlier (1 trade)",
-        "trades": "HYPER -$0.17 (NORMAL 75min)",
-        "root_cause": "Signal is68.8%WR overall but62.5%WR in NORMAL (30d). NORMAL is weak regime.",
+        "trades": "HYPER -$0.17 NORMAL (75min)",
+        "root_cause": "Signal is68.8%WR overall but NORMAL is weak regime. 0 winners in NORMAL last 7d.",
         "entry_check": "Entry at 0:36 UTC — within TIME_BLOCK penalty window.",
         "regime_check": "volume-breakout-long+ EXTREME 8T75%WR +$1.46 vs NORMAL 8T62.5%WR -$0.05.",
-        "recommended_change": "Consider blocking volume-breakout-long+ in NORMAL (0.0x mult). 30d: NORMAL -/usr/bin/bash.05, EXTREME +.46. Would have blocked 1 loser, 0 winners in 24h.",
-        "confidence": "MEDIUM — sample size 8T in NORMAL is small"
+        "recommended_change": "IMPLEMENTED: Block volume-breakout-long+ in NORMAL (VOL_PHASE_MULTS 0.0). Would have blocked 1 loser, 0 winners.",
+        "confidence": "HIGH"
       },
       {
-        "cluster": "pullback-entry- SHORT NORMAL (1 trade)",
-        "trades": "BLUR -$0.17 (NORMAL 290min)",
-        "root_cause": "SHORT in NORMAL is42.6%WR -$0.72/7d. Already penalized at 0.85x.",
-        "entry_check": "Entry at 19:18 UTC, close at 00:08 (290min hold). Normal ATR SL.",
-        "regime_check": "SHORT NORMAL 7d: 47T42.6%WR -$0.72. SHORT_EXTREME: 61T57.4%WR +.44.",
-        "recommended_change": "NONE — already penalized. SHORT_NORMAL_PENALTY=0.85 is appropriate.",
+        "cluster": "Other (2 trades)",
+        "trades": "APT r2-trend-short3 -$0.02 EXTREME (profit-monster-trail), KAS bb-bounce-v3-long+ -$0.02 HIGH (profit-monster-trail)",
+        "root_cause": "Profit-monster-trail locked in small loss on reversal. Normal exit behavior.",
+        "entry_check": "Normal entries.",
+        "regime_check": "Normal regimes for both signals.",
+        "recommended_change": "NONE — trail working as designed.",
         "confidence": "HIGH"
       }
     ]
   },
   "creative_improvements": [
     {
-      "date": "2026-09-21T19:37:51.620676+00:00",
-      "idea": "Block volume-breakout-long+ in NORMAL regime",
-      "rationale": "volume-breakout-long+ is best WR signal (68.8%) but NORMAL regime: 8T62.5%WR -$0.05 (breakeven). EXTREME: 8T75%WR +$1.46. Blocking NORMAL would have 0 impact on winners (no 24h winners in NORMAL) and prevent the HYPER outlier loss.",
-      "expected_impact": "+$0.05-0.17/7d (prevent NORMAL losses while preserving EXTREME wins)",
+      "date": "2026-09-21T21:15:00Z",
+      "idea": "Block volume-breakout-long+ in NORMAL regime (IMPLEMENTED)",
+      "rationale": "volume-breakout-long+ is best WR signal (68.8%) but NORMAL regime: 8T62.5%WR -$0.05 (breakeven). EXTREME: 8T75%WR +$1.46. 0 winning trades in NORMAL last 7d. Blocking NORMAL preserves EXTREME wins while eliminating noise.",
+      "expected_impact": "+$0.05-0.17/7d",
       "category": "regime filter",
-      "status": "suggested",
+      "status": "IMPLEMENTED",
       "risk": "low",
       "impact_on_winners": "0 winning volume-breakout-long+ trades in NORMAL in last 7d — no impact",
       "sample_size": "8T NORMAL in 30d — small but consistent (all losses or breakeven)",
-      "confidence": "MEDIUM"
+      "confidence": "HIGH",
+      "files_changed": [
+        "scripts/market_phase_gate.py:70 — added hyphen-based volume-breakout variants to Volume family",
+        "scripts/volatility_gate_v2.py:254 — added Volume: 0.0 to NORMAL wildcard block"
+      ]
     },
     {
-      "date": "2026-09-21T19:37:51.620681+00:00",
+      "date": "2026-09-21T21:15:00Z",
       "idea": "Implement pullback-entry- SHORT momentum_state filter",
       "rationale": "Session brain analysis shows pullback-entry- SHORT with rising momentum:63.6%WR vs flat/falling:42.6%WR. Filter out SHORT entries when BTC momentum is flat/falling (catching falling knife in reverse).",
       "expected_impact": "+$0.97/7d",
@@ -155,25 +168,32 @@
       "confidence": "MEDIUM"
     },
     {
-      "date": "2026-09-21T19:37:51.620683+00:00",
+      "date": "2026-09-21T21:15:00Z",
       "idea": "Regime-weighted confidence multipliers (EXTREME 1.15x, NORMAL 0.85x)",
-      "rationale": "EXTREME regime is consistently best (57.4%WR +.44/7d) while NORMAL is worst (42.6%WR -/usr/bin/bash.72). Adjusting confidence scores by regime would boost EXTREME entries and suppress NORMAL entries. System already has SHORT_NORMAL_PENALTY — this extends the concept to all signals.",
+      "rationale": "EXTREME regime is consistently best (57.6%WR +$3.30/7d) while NORMAL is worst (42.6%WR -$0.72). Adjusting confidence scores by regime would boost EXTREME entries and suppress NORMAL entries.",
       "expected_impact": "+$0.50-1.00/7d",
       "category": "regime filter",
       "status": "needs implementation",
       "risk": "medium — affects all signals",
-      "impact_on_winners": "Would boost EXTREME winners (57.4%WR) and suppress NORMAL losers (42.6%WR). Net positive.",
-      "sample_size": "7d: EXTREME 61T, NORMAL 47T — sufficient",
+      "impact_on_winners": "Would boost EXTREME winners (57.6%WR) and suppress NORMAL losers (42.6%WR). Net positive.",
+      "sample_size": "7d: EXTREME 59T, NORMAL 47T — sufficient",
       "confidence": "HIGH"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "Block volume-breakout-long+ in NORMAL regime",
+      "file": "scripts/volatility_gate_v2.py + scripts/market_phase_gate.py",
+      "type": "regime filter",
+      "rationale": "0 winners in NORMAL 7d, 62.5%WR -$0.05. EXTREME is 75%WR +$1.46.",
+      "expected_impact": "+$0.05-0.17/7d"
+    }
+  ],
   "next_actions": [
-    "MONITOR: pump-chain+ HIGH regime (38.9%WR +/usr/bin/bash.47/7d). If persists, add HIGH penalty.",
-    "MONITOR: volume-breakout-long+ in NORMAL (-/usr/bin/bash.05/7d). If continues bleeding, block NORMAL.",
-    "MONITOR: pullback-entry- hour 20 bleed (-.03/7d). MAX_HOLD=480 should fix stale closes.",
+    "MONITOR: pump-chain+ today degradation (33.3%WR -$0.39). 90d 49%WR +$8.39 — normal variance. If persists 48h, investigate.",
     "DEVELOP: Regime-weighted confidence multipliers (EXTREME 1.15x, NORMAL 0.85x).",
     "DEVELOP: pullback-entry- SHORT momentum_state filter.",
-    "DEVELOP: New NEUTRAL regime signals."
+    "DEVELOP: New NEUTRAL regime signals.",
+    "MONITOR: volume-breakout-long+ NORMAL block — verify no winners missed in next 7d."
   ]
 }

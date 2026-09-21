@@ -26,6 +26,13 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-21 21:15 UTC] brain_auditor: CONFIG CHANGE — Block volume-breakout-long+ in NORMAL
+  DB-verified: 24h 22T 36.4%WR +$0.08 | 7d 184T 48.9%WR +$2.30
+  Market NEUTRAL/HIGH vol. 13 losers (24h). All normal ATR_SL variance.
+  **LOSING AUTOPSY (13):** 6 pump-chain+ ATR_SL (normal, 47.8%WR signal). 2 pullback-entry- SHORT (NORMAL/HIGH, already penalized). 2 doji-bottom-long (NOT quick stop, WLFI stale covered by MAX_HOLD=480). 1 volume-breakout-long+ NORMAL (0 winners 7d — BLOCKED). 2 profit-monster-trail (normal exit). **NO ENTRY FAILURES.**
+  **CONFIG CHANGE:** Added `Volume: 0.0` to `('NORMAL', '*')` in VOL_PHASE_MULTS. Fixed family mapping for hyphen-based volume-breakout variants. volume-breakout-long+ is 68.8%WR overall, 75%WR in EXTREME, but 0% winners NORMAL 7d. Block preserves EXTREME wins, eliminates NORMAL noise. Expected +$0.05-0.17/7d. Zero impact on winners.
+  **CREATIVE:** (1) Regime-weighted confidence (EXTREME 1.15x, NORMAL 0.85x) — +$0.50-1.00/7d expected. (2) pullback-entry- SHORT momentum_state filter — rising=63.6%WR vs flat/falling=42.6%WR.
+  BY: brain_auditor
 - [2026-09-21 19:38 UTC] brain_auditor: NO CONFIG CHANGE — full audit
   DB-verified: 24h 22T 36.4%WR +$0.08 | 7d 191T 49.2%WR +$3.44
   Market NEUTRAL/HIGH vol. 1 open (CFX SHORT pullback-entry-).

@@ -1489,5 +1489,35 @@
     "category": "exit optimization",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-21T21:15:00Z",
+    "idea": "Block volume-breakout-long+ in NORMAL regime",
+    "rationale": "volume-breakout-long+ 68.8%WR overall, 75%WR EXTREME, 0 winners NORMAL 7d. Block preserves EXTREME wins.",
+    "expected_impact": "+$0.05-0.17/7d",
+    "category": "regime filter",
+    "status": "IMPLEMENTED",
+    "risk": "low",
+    "impact_on_winners": "0 winning trades in NORMAL last 7d — no impact"
+  },
+  {
+    "date": "2026-09-21T21:15:00Z",
+    "idea": "Regime-weighted confidence multipliers (EXTREME 1.15x, NORMAL 0.85x)",
+    "rationale": "EXTREME 57.6%WR +$3.30/7d vs NORMAL 42.6%WR -$0.72/7d. Adjust confidence by regime.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "regime filter",
+    "status": "suggested",
+    "risk": "medium",
+    "impact_on_winners": "Boosts EXTREME winners, suppresses NORMAL losers — net positive"
+  },
+  {
+    "date": "2026-09-21T21:15:00Z",
+    "idea": "pullback-entry- SHORT momentum_state filter",
+    "rationale": "rising momentum: 63.6%WR vs flat/falling: 42.6%WR. Filter SHORT when momentum flat/falling.",
+    "expected_impact": "+$0.97/7d",
+    "category": "entry sniper",
+    "status": "needs implementation",
+    "risk": "medium",
+    "impact_on_winners": "Needs verification against winning SHORT entries"
   }
 ]
