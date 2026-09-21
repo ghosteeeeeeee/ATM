@@ -1366,15 +1366,62 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Tide detection: BTC 3h momentum + SHORT WR confirmation
     tide_mult = get_tide_penalty(token, direction)
 
-    # Continuum context boost: BTC trend alignment from continuum engine
-    # Signals aligned with BTC macro trend get boosted, counter-trend penalized
+    # ── CONTINUUM AUTHORITY (2026-09-21) ─────────────────────────────────────
+    # The continuum oscillator is the PRIMARY structural indicator.
+    # When it says DECLINING → SHORT gets priority, LONG gets penalized
+    # When it says RALLYING → LONG gets priority, SHORT gets penalized
+    # When it says CALM → use other indicators as before
+    continuum_mult = 1.0
     try:
-        from continuum_context import get_trend_boost
-        continuum_boost = get_trend_boost(direction)
-        # Convert -0.10..+0.15 boost to a multiplier: boost=0→1.0, +0.15→1.15, -0.10→0.90
-        continuum_mult = 1.0 + continuum_boost
-        if abs(continuum_boost) >= 0.05:
-            log(f"  🌊 [CONTINUUM] {token} {direction}: BTC trend boost {continuum_boost:+.1%} → {continuum_mult:.2f}x")
+        import os as _cont_os
+        _cont_db = _cont_os.path.join(HERMES_DATA, 'continuum.db')
+        _cont_conn = None
+        try:
+            _cont_conn = sqlite3.connect(_cont_db, timeout=3)
+            _cont_row = _cont_conn.execute(
+                "SELECT market_phase, state_score, linreg_direction, ema300_position "
+                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+            ).fetchone()
+        finally:
+            if _cont_conn:
+                try: _cont_conn.close()
+                except: pass
+
+        if _cont_row:
+            _phase, _score, _linreg, _ema = _cont_row[0], _cont_row[1], _cont_row[2], _cont_row[3]
+            _score_val = float(_score) if _score else 50
+
+            # Bearish structure: DECLINING phase, or CALM/RECOVERY with LEAN_BEAR + BELOW EMA300
+            _bearish = (_phase in ('DECLINING',) or
+                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema == 'BELOW'))
+            # Bullish structure: RALLYING phase, or CALM with LEAN_BULL + ABOVE EMA300
+            _bullish = (_phase in ('RALLYING', 'UP') or
+                        (_phase in ('CALM',) and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
+
+            if direction.upper() == 'SHORT' and _bearish:
+                # SHORT aligned with bearish structure — strong boost
+                continuum_mult = 1.5
+                log(f"  🌊 [CONTINUUM-AUTH] {token} SHORT: BTC {_phase} + {_linreg} + {_ema} → 1.5x boost")
+            elif direction.upper() == 'LONG' and _bearish:
+                # LONG against bearish structure — heavy penalty
+                continuum_mult = 0.5
+                log(f"  🚫 [CONTINUUM-AUTH] {token} LONG: BTC {_phase} + {_linreg} + {_ema} → 0.5x penalty")
+            elif direction.upper() == 'LONG' and _bullish:
+                # LONG aligned with bullish structure — boost
+                continuum_mult = 1.5
+                log(f"  🌊 [CONTINUUM-AUTH] {token} LONG: BTC {_phase} + {_linreg} + {_ema} → 1.5x boost")
+            elif direction.upper() == 'SHORT' and _bullish:
+                # SHORT against bullish structure — penalty
+                continuum_mult = 0.5
+                log(f"  🚫 [CONTINUUM-AUTH] {token} SHORT: BTC {_phase} + {_linreg} + {_ema} → 0.5x penalty")
+            else:
+                # CALM or mixed — use existing trend boost
+                try:
+                    from continuum_context import get_trend_boost
+                    continuum_boost = get_trend_boost(direction)
+                    continuum_mult = 1.0 + continuum_boost
+                except Exception:
+                    continuum_mult = 1.0
     except Exception:
         continuum_mult = 1.0
 
@@ -2033,6 +2080,20 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_reg.close()
                             if _reg_row and _reg_row[0] > 1.0:
                                 slope_threshold *= 3.0  # 3x tolerance in SHORT_BIAS
+                        except Exception:
+                            pass
+                        # CONTINUUM OVERRIDE: relax slope filter when BTC structure is bearish
+                        # (short-term slope can be positive even when longer-term structure is declining)
+                        try:
+                            _cont_conn_slope = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            _cont_row_slope = _cont_conn_slope.execute(
+                                "SELECT market_phase, linreg_direction FROM continuum_states "
+                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                            ).fetchone()
+                            _cont_conn_slope.close()
+                            if _cont_row_slope and _cont_row_slope[0] in ('DECLINING',) and _cont_row_slope[1] in ('LEAN_BEAR', 'BEAR'):
+                                slope_threshold *= 2.0  # 2x tolerance when BTC structure is bearish
+                                log(f"  🌊 [SLOPE-OVERRIDE] {token} SHORT: BTC bearish structure → slope threshold relaxed to {slope_threshold:.4f}%")
                         except Exception:
                             pass
                         if slope_pct >= slope_threshold:
