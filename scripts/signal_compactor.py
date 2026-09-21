@@ -4522,7 +4522,7 @@ if __name__ == '__main__':
         result = run_compaction(dry=args.dry, verbose=args.verbose, purge_executed=args.purge_executed)
         _elapsed = _t.time() - _main_start
         print(f"\nResult: {len(result['hotset'])} hotset entries | cycle={result['compaction_cycle']} | "
-              f"approved={result['approved']} | rejected={result['rejected']} | {_elapsed:.1f}s total")
+              f"approved={result['approved']} | rejected={result['rejected']} | {_elapsed:.1f}s total", flush=True)
     except Exception as e:
         import traceback
         _elapsed = _t.time() - _main_start

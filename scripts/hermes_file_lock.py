@@ -53,6 +53,7 @@ class FileLock:
         self.fd        = None
 
     def __enter__(self):
+        import sys as _sys
         self.fd = os.open(self.lockfile, os.O_CREAT | os.O_RDWR, 0o644)
         deadline = time.time() + self.timeout
         while True:
@@ -75,7 +76,10 @@ class FileLock:
                         f"Lock [{self.lockname}] timed out after {self.timeout}s "
                         f"(holder: {self._read_holder()})"
                     )
+                # Log lock contention
+                _wait_start = time.time()
                 time.sleep(self.interval)
+                print(f'  [LOCK-WAIT] {self.lockname}: waited {time.time()-_wait_start:.1f}s, retrying', file=_sys.stderr, flush=True)
 
     def __exit__(self, *args):
         if self.fd is None:
