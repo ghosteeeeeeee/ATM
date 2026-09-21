@@ -220,6 +220,7 @@ def detect_btc_gradual_rally() -> dict | None:
         'btc_change_30m': change_30m,
         'btc_up_candles': up_candles,
         'btc_vol_ratio': vol_ratio,
+        'btc_velocity': 0.0,  # Gradual rally has no velocity spike
         'mode': 'gradual_rally',
     }
 
