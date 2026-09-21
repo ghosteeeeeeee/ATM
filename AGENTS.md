@@ -10,6 +10,12 @@
 - **Architecture detail:** `/root/.hermes/ATM/ATM-Architecture.md`
 - **SOPs:** `brain/SOPs.md` — standard operating procedures (plans, commits, signals, debugging, memory)
 
+## 🎯 Trading Philosophy
+
+**Every pump is a LONG opportunity. Every dump is a SHORT opportunity. Every trade should be a winner.**
+
+This is non-negotiable. If we're losing, we're on the wrong side of the trade — not at the wrong time. The system must catch moves in BOTH directions and never fade momentum. No time-of-day blocks, no blanket regime kills. The oscillator, the volume, the structure — they tell us which side to be on. We follow them.
+
 ## ⏰ Reminders
 
 | Date | Action | Details |
