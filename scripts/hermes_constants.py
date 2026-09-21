@@ -1150,7 +1150,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # time confidence reaches 90+, the easy move is done and you're buying the top.
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
-CONF_FILTER_MAX = 96                    # block if confidence >= this value (raised from 89 — 95+ tier most profitable: 360T/53.1%WR/+$1.98/14d)
+CONF_FILTER_MAX = 92                    # block if confidence >= this value (raised from 89 — 90-95 tier mixed, 95+ was losing historically but winning recently)
 CONF_FILTER_MIN = 65                    # lowered from 70 2026-09-19 — allows pump-chain signals (65-69) to pass. Only affects pump-chain and volume_breakout.
 
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
