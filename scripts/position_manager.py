@@ -2670,7 +2670,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 open_time_str = pos.get('open_time')
                 if open_time_str:
                     try:
-                        entry_dt = datetime.fromisoformat(open_time_str.replace('+00:00', ''))
+                        # Handle both datetime objects and strings
+                        if isinstance(open_time_str, datetime):
+                            entry_dt = open_time_str
+                            if entry_dt.tzinfo is None:
+                                entry_dt = entry_dt.replace(tzinfo=timezone.utc)
+                        else:
+                            entry_dt = datetime.fromisoformat(str(open_time_str).replace('Z', '+00:00'))
                         hold_hours = (datetime.now(timezone.utc) - entry_dt).total_seconds() / 3600
                         # Direction-aware profit calculation
                         if direction == 'LONG':

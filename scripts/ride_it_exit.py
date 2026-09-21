@@ -254,7 +254,7 @@ def _parse_hold_time(open_time_val) -> float:
         elif isinstance(open_time_val, str):
             # Try ISO format with timezone
             try:
-                entry_dt = datetime.fromisoformat(open_time_val.replace('+00:00', '+00:00'))
+                entry_dt = datetime.fromisoformat(open_time_val.replace('Z', '+00:00'))
             except (ValueError, TypeError):
                 try:
                     entry_dt = datetime.strptime(open_time_val, '%Y-%m-%d %H:%M:%S.%f')

@@ -1458,6 +1458,7 @@ SIGNAL_EXIT_CONFIG = {
     'volume-breakout-': 'ride_it',
     'volume_breakout+': 'ride_it',  # underscore variant
     'volume_breakout-': 'ride_it',  # underscore variant
+    'volume_breakout': 'ride_it',   # bare variant
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',
