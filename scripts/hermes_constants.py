@@ -840,7 +840,7 @@ CHASE_GAP_MAX_PCT = 1.0           # block LONG if |gap_at_entry| > this% (chasin
 # 15% confidence penalty reduces false SHORT entries in flat/NORMAL markets.
 # REMOVED CEO Sep 16 — monitoring expired. SHORT NORMAL 7d: 34T 61.8%WR +$0.59 (profitable).
 # Penalty was blocking good entries. Expected impact: +$0.26/7d from unblocked entries.
-SHORT_NORMAL_PENALTY = 1.0  # REMOVED CEO Sep 16 — SHORT NORMAL profitable (57.1%WR +$0.19/7d). brain_auditor verified Sep 19.
+SHORT_NORMAL_PENALTY = 0.85  # brain_auditor Sep 21 — ALL SHORT signals in NORMAL are losers 7d (18T 38.9%WR -$0.78). EXTREME is only profitable SHORT regime (56.5%WR +$3.44). 15% penalty reduces false entries. Was 1.0 (removed Sep 16 when SHORT NORMAL was profitable — data shifted).
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
@@ -1147,7 +1147,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 89                    # block if confidence >= this value (raised from 85 — 90+ tier now +$1.91/7d without ct-hot+, 95+ tier most profitable)
-CONF_FILTER_MIN = 70                    # lowered from 75 2026-09-02 — <75 tier had misclassified SL exits (now fixed). bb-bounce-short conf=60-70 was blocked.
+CONF_FILTER_MIN = 65                    # lowered from 70 2026-09-19 — allows pump-chain signals (65-69) to pass. Only affects pump-chain and volume_breakout.
 
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
 # Penalty during 01:00-09:00 UTC (Asian session close, low-liquidity pre-market).
@@ -2459,7 +2459,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
-    # open-skies removed — killed 2026-09-17 (same as open-skies+)
+    'open-skies', 'open-skies+', 'open-skies-',  # re-enabled 2026-09-21 for 48h testing (CEO)
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
