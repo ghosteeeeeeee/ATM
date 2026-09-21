@@ -1723,6 +1723,17 @@ def _score_signal(token, direction, conf, source, signal_type,
         from hermes_constants import OSCILLATOR_MULTS, OSCILLATOR_MULT_ENABLED, OSCILLATOR_SHADOW_LOG
         btc_score = speed_data.get('btc_score') if speed_data else None
         wave_phase = speed_data.get('wave_phase') if speed_data else None
+        # If btc_score not in speed_data, calculate it from continuum engine
+        if btc_score is None:
+            try:
+                from continuum_context import get_btc_trend_context
+                _btc_ctx = get_btc_trend_context()
+                if _btc_ctx.get('available'):
+                    btc_score = _btc_ctx.get('score')
+                    if wave_phase is None:
+                        wave_phase = _btc_ctx.get('wave_phase')
+            except Exception:
+                pass
         if btc_score is not None and wave_phase:
             # Determine score zone
             if btc_score < 30:

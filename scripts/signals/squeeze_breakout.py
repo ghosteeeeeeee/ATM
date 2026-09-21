@@ -2,21 +2,27 @@
 """
 squeeze_breakout.py — Consolidation breakout signal.
 
-Thesis: When BTC consolidates (BB squeeze + ATR compression + low volume),
+Thesis: When BTC consolidates (BB squeeze + ATR compression),
 the eventual breakout captures +1.27% average. This signal enters at the
 START of the expansion, positioning before the full move.
 
 Uses existing infrastructure:
-- continuum_context for direction (score > 60 = LONG, < 40 = SHORT)
+- continuum_context for direction (score > 50 = LONG, < 50 = SHORT)
 - BB width for squeeze detection
 - ATR for compression detection
-- Volume for calm-before-storm confirmation
+- Price breakout confirmation
 
-Entry: BB width expands 50%+ from squeeze minimum + price breaks range
-Exit: +1.5% profit, -0.5% loss, or 2 hour time exit
+Entry: BB width expands 2x+ from squeeze minimum + price breaks range
+Exit: +0.8% profit, -0.8% loss, or 2 hour time exit (handled by execution layer)
+
+Fixes (2026-09-21):
+- Expansion detection fires only on FIRST candle of expansion
+- Expansion threshold raised from 1.5x to 2.0x
+- TP target lowered to 0.8% (realistic for low vol)
+- Added price breakout confirmation
+- Widened continuum thresholds to 50/50
 """
 import sys, os, sqlite3, time
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from signal_schema import add_signal, get_cooldown, set_cooldown
@@ -29,6 +35,9 @@ from hermes_constants import (
 )
 
 CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
+
+# State tracking — prevents firing on every expansion candle
+_last_expansion_fired = 0  # timestamp of last signal
 
 
 def _get_btc_candles(limit=100):
@@ -46,7 +55,6 @@ def _get_btc_candles(limit=100):
         conn.close()
         if not rows:
             return None
-        # Reverse to chronological
         return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 
                  'close': r[4], 'volume': r[5]} for r in reversed(rows)]
     except Exception:
@@ -107,16 +115,18 @@ def detect(token='BTC'):
     """
     Detect squeeze breakout signal.
     Returns {direction, confidence, value, price, reason} or None.
-    """
-    if token != 'BTC':
-        return None  # Only BTC for now
     
-    # Get candles
+    Fires ONLY on the FIRST candle of expansion from a squeeze.
+    """
+    global _last_expansion_fired
+    
+    if token != 'BTC':
+        return None
+    
     candles = _get_btc_candles(limit=100)
     if not candles or len(candles) < 50:
         return None
     
-    # Calculate indicators
     bb_width = _calc_bb_width(candles, 20)
     atr_pct = _calc_atr(candles, 14)
     
@@ -125,11 +135,11 @@ def detect(token='BTC'):
     
     # Check for squeeze: BB width < 0.5% AND ATR < 0.3%
     if bb_width >= 0.5 or atr_pct >= 0.3:
-        return None  # Not in squeeze
+        return None
     
-    # Check for expansion: compare to recent minimum
+    # Check for expansion: compare to 30-bar minimum
     recent_widths = []
-    for i in range(max(0, len(candles) - 20), len(candles)):
+    for i in range(max(0, len(candles) - 30), len(candles)):
         w = _calc_bb_width(candles[:i+1], 20)
         if w is not None:
             recent_widths.append(w)
@@ -138,36 +148,51 @@ def detect(token='BTC'):
         return None
     
     min_width = min(recent_widths)
-    if bb_width <= min_width * 1.5:
-        return None  # Not expanding yet
     
-    # Get continuum context for direction
+    # Expansion threshold: 2.0x from minimum
+    if bb_width <= min_width * 2.0:
+        return None
+    
+    # First candle check: previous candle must NOT have been expanding
+    if len(candles) >= 2:
+        prev_width = _calc_bb_width(candles[:-1], 20)
+        if prev_width is not None and prev_width > min_width * 2.0:
+            return None
+    
+    # State check: 4h cooldown between signals
+    now = time.time()
+    if now - _last_expansion_fired < 4 * 3600:
+        return None
+    
+    # Get continuum context
     ctx = _get_continuum_context()
     if not ctx:
         return None
     
-    # Determine direction
+    # Direction with price breakout confirmation
     price = candles[-1]['close']
     ema20 = sum(c['close'] for c in candles[-20:]) / 20
+    squeeze_low = min(c['low'] for c in candles[-30:])
+    squeeze_high = max(c['high'] for c in candles[-30:])
     
-    if ctx['score'] > 60 and price > ema20:
+    if ctx['score'] > 50 and price > ema20 and price > squeeze_high:
         direction = 'LONG'
-    elif ctx['score'] < 40 and price < ema20:
+    elif ctx['score'] < 50 and price < ema20 and price < squeeze_low:
         direction = 'SHORT'
     else:
-        return None  # No clear direction
+        return None
     
-    # Calculate confidence
-    squeeze_intensity = (0.5 - bb_width) / 0.5 * 100  # 0-100%
+    # Mark as fired
+    _last_expansion_fired = now
+    
+    # Confidence
+    squeeze_intensity = (0.5 - bb_width) / 0.5 * 100
     confidence = 65 + min(20, squeeze_intensity * 0.3)
-    
-    # Continuum alignment bonus
-    if direction == 'LONG' and ctx['score'] > 70:
+    if direction == 'LONG' and ctx['score'] > 60:
         confidence += 7
-    elif direction == 'SHORT' and ctx['score'] < 30:
+    elif direction == 'SHORT' and ctx['score'] < 40:
         confidence += 7
-    
-    confidence = min(91, confidence)  # Stay under CONF_FILTER_MAX
+    confidence = min(91, confidence)
     
     return {
         'direction': direction,
@@ -218,7 +243,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction, hours=4)  # 4h cooldown
+            set_cooldown(token, direction, hours=4)
             print(f"[SQUEEZE-BREAKOUT] {direction} {token} | conf={sig['confidence']} | reason={sig['reason']}")
     
     return added

@@ -3658,3 +3658,27 @@ Final set: ['DOT', 'HYPER', 'ME']
 - 2 open positions, normal leverage
 
 **BY:** auto_1hr
+
+## [2026-09-21 18:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (AZTEC -$0.09 dead_money, CAKE +$0.13 atr_sl_hit, ALT +$0.01 atr_sl_hit) | 0 open
+**24h:** 26T 48%WR +$1.59 | **7d:** 192T 49%WR +$2.61
+
+**Diagnosis:**
+1. Entry quality: Both SL hits near break-even. No adverse excursion anomaly.
+2. SL behavior: atr_sl_hit 69% (18/26) but net +$1.58 — trailing working correctly.
+3. Signal quality: pump-chain+ carrying (+$1.17/24h, 50%WR, 14T). doji-bottom-long 3T 33.3%WR — not killable but weakest. volume-breakout-long+ solid (+$0.57, 50%WR).
+4. Trade frequency: ~1.5/hr — normal weekend.
+5. Market state: System flat (0 open positions).
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (doji-bottom-long 33.3%WR, needs 0%WR for kill)
+- System net profitable 24h (+$1.59) and 7d (+$2.61)
+- atr_sl_hit dominant but net positive — trailing working as designed
+- pump-chain+ carries 60%+ of total PnL
+
+**Open Questions:** None
+
+**BY:** auto_1hr
