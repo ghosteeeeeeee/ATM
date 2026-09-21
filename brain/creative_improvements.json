@@ -1421,5 +1421,17 @@
     "status": "boosted",
     "risk": "low",
     "boosted_at": "2026-09-21T13:28:30.877644+00:00"
+  },
+  {
+    "date": "2026-09-21T14:39:09Z",
+    "idea": "REGIME-WEIGHTED CONFIDENCE — boost EXTREME, penalize NORMAL",
+    "rationale": "EXTREME regime: 61T 55.7%WR +$3.31/7d is our proven edge. NORMAL: 48T 41.7%WR -$0.91 is our drag. Currently all signals use same confidence regardless of regime. Adding regime-specific confidence multiplier would amplify edge in EXTREME (where we win) and reduce entries in NORMAL (where we lose).",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "entry quality",
+    "status": "suggested",
+    "risk": "low-medium",
+    "implementation": "Add REGIME_CONFIDENCE_MULTS dict to hermes_constants.py: {EXTREME: 1.15, NORMAL: 0.85, HIGH: 1.0, FLAT: 1.0}. Apply in signal_compactor.py before confidence threshold check.",
+    "impact_on_winners": "NONE — this does not block trades, it adjusts confidence threshold. EXTREME winners would still pass (boosted). NORMAL losers would be harder to fire (penalized).",
+    "evidence": "7d EXTREME: 61T 55.7%WR +$3.31. NORMAL: 48T 41.7%WR -$0.91. Gap $4.22/7d."
   }
 ]

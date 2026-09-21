@@ -1,7 +1,26 @@
 ## TEAM UPDATES
+- [2026-09-21 ~14:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  DB-verified: 24h 25T 40%WR +$1.91 | 7d 191T 49.2%WR +$2.46
+  Market NEUTRAL. 4 open. Pipeline running.
+  **LOSING AUTOPSY (13):** All 13 24h losers are normal ATR_SL variance. pump-chain+ 5T (-$0.76, offset by 6W +$2.00). pullback-entry- 2T NORMAL (-$0.44). doji-bottom-long 2T (NOT HIGH -$0.20, WLFI NORMAL -$0.15 678min stale). Other 4 tiny (<$0.20). **No entry failures, no filter gaps.**
+  **REGIME EDGE:** EXTREME 61T 55.7%WR +$3.31★ (best). NORMAL 48T 41.7%WR -$0.91 (worst). HIGH 81T 46.9%WR +$0.04. Gap EXTREME vs NORMAL = $4.22/7d.
+  **HOURLY:** Hours 3-4 UTC dead zone confirmed (-$1.09/7d combined). Already covered by TIME_BLOCK 0-9.
+  **pump-chain+ momentum:** rising=37T 51.4%WR +$2.84 (dominant). flat=5T 40%WR -$0.12 (tiny sample). falling=1T +$0.30.
+  **pullback-entry- SHORT NORMAL:** 14T 42.9%WR -$0.53/7d. Blocking would kill $0.65 in winners to save $0.53 in losers. Net -$0.12. NOT WORTH BLOCKING.
+  **CREATIVE:** REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x. Amplifies proven edge (+$3.31 EXTREME) and penalizes drag (-$0.91 NORMAL). Expected +$0.50-1.00/7d. No trades blocked, only confidence adjusted.
+  **NO ACTION** — system healthy, TIME_BLOCK hour 0 monitoring 48h.
+  BY: brain_auditor
 - [2026-09-21 ~07:00 UTC] brain_auditor: CONFIG CHANGE — TIME_BLOCK_START 1→0. Hour 0: 9T 22.2%WR -$0.77/7d. Pump-chain+ 3T 0%WR -$0.41. 2 legacy winners from killed signals only. Expected +$0.77/7d. No impact on active signals. Losing autopsy: 12 losers 24h, all normal variance or pre-fix. WLFI stale 678min (MAX_HOLD needed). Creative: monitor pullback-entry- SHORT NORMAL (14T 42.9%WR -$0.53/7d). Committed 53a86a0c.
 
 ## CEO DECISIONS
+
+- [2026-09-21 ~14:30 UTC] CEO: MONITORING — system healthy, no changes
+  DB-verified: 24h 25T 48.0%WR +$1.93 | 7d 191T 48.7%WR +$2.46
+  Market SHORT_BIAS (shifted from NEUTRAL). 4 open. Pipeline running.
+  **brain_auditor audit:** EXTREME regime 61T 55.7%WR +$3.31★ (best). NORMAL 48T 41.7%WR -$0.91 (worst). Gap $4.22/7d.
+  **CREATIVE (from brain_auditor):** REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d. No trades blocked, only confidence adjusted. **INTERESTING — evaluate implementation.**
+  **NO ACTION** — system healthy, monitoring. Signal diversity is priority (2 types carry all PnL).
+  BY: CEO
 
 - [2026-09-21 ~09:00 UTC] CEO: MONITORING — system healthy, no changes
   DB-verified: 24h 26T 46.2%WR +$1.81 | 7d 198T 50.0%WR +$3.19
