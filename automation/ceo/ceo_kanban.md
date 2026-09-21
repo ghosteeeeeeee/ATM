@@ -13,6 +13,16 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-21 ~16:31 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  DB-verified: 24h 26T 50%WR +$1.95 | 7d 193T 49.2%WR +$2.61
+  Market SHORT_BIAS. 0 open. Pipeline running.
+  **LOSING AUTOPSY (11):** All 11 24h losers are normal ATR_SL variance or profit-monster-trail. pump-chain+ 5T (-$0.65, offset by 9W +$1.82). WLFI doji-bottom-long -$0.15 (678min stale — now covered by UNIVERSAL_MAX_HOLD=480). NO ENTRY FAILURES, NO FILTER GAPS.
+  **REGIME EDGE (7d):** EXTREME 62T 56.5%WR +$3.37★ (best). NORMAL 47T 42.6%WR -$0.72 (worst). Gap $4.09/7d. LONG EXTREME 39T 61.5%WR +$3.86.
+  **HOURLY (7d):** Hours 0-4, 6, 13, 20 dead zones (-$3.60 combined). Hours 9-12, 15, 17, 23 profitable (+$5.42 combined). TIME_BLOCK 0-9 covering most dead zone.
+  **DRIFT:** OSCILLATOR_MULTS shadow mode active, no drift. SHORT_NORMAL_PENALTY=0.85 correct (CURRENT.md stale — says removed).
+  **CREATIVE:** (1) volume-breakout-long+ frequency unlock — 16T 68.8%WR +$1.41, best WR signal, but only 16T/7d. Suggest reviewing filters to increase frequency. (2) REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d. (3) EXTREME SHORT 30d edge — pullback-entry- 25T 64%WR +$1.45. Monitor for reactivation.
+  **NO ACTION** — system healthy, oscillator shadow eval running.
+  BY: brain_auditor
 - [2026-09-21 ~15:35 UTC] brain_auditor: CONFIG CHANGE — UNIVERSAL_MAX_HOLD_MINUTES = 480
   DB-verified: 24h 25T 48%WR +$1.64 | 7d 192T 49%WR +$2.42
   Market SHORT_BIAS. 2 open. Pipeline running.

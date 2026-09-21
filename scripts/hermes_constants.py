@@ -2111,6 +2111,17 @@ SQUEEZE_REVERSAL_BB_MULT = 2.0             # BB standard deviation multiplier
 SQUEEZE_BREAKOUT_ENABLED = True
 SQUEEZE_BREAKOUT_PLUS_ENABLED = True      # LONG direction
 SQUEEZE_BREAKOUT_MINUS_ENABLED = True     # SHORT direction
+SQUEEZE_BREAKOUT_BB_SQUEEZE_THRESH = 0.5  # BB width % for squeeze detection
+SQUEEZE_BREAKOUT_ATR_SQUEEZE_THRESH = 0.3 # ATR % for compression detection
+SQUEEZE_BREAKOUT_VOLUME_PCT = 0.8         # volume must be below this × 20-bar avg
+SQUEEZE_BREAKOUT_BB_PERIOD = 20           # BB calculation period
+SQUEEZE_BREAKOUT_ATR_PERIOD = 14          # ATR calculation period
+SQUEEZE_BREAKOUT_EXPANSION_LOOKBACK = 30  # bars to find minimum BB width
+SQUEEZE_BREAKOUT_EXPANSION_MULT = 2.0     # expansion = current > min × this
+SQUEEZE_BREAKOUT_COOLDOWN_HOURS = 4       # hours between signals
+SQUEEZE_BREAKOUT_CONTINUUM_LONG_THRESH = 50  # score > this = LONG
+SQUEEZE_BREAKOUT_CONTINUUM_SHORT_THRESH = 50 # score < this = SHORT
+SQUEEZE_BREAKOUT_SQUEEZE_RANGE_BARS = 30  # bars for high/low range
 SQUEEZE_REVERSAL_SQUEEZE_THRESH = 0.8      # max BB Width % for squeeze
 SQUEEZE_REVERSAL_SQUEEZE_MIN_BARS = 60     # min bars in squeeze (1h)
 # Entry

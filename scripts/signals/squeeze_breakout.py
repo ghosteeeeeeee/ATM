@@ -34,6 +34,17 @@ from hermes_constants import (
     SQUEEZE_BREAKOUT_ENABLED,
     SQUEEZE_BREAKOUT_PLUS_ENABLED,
     SQUEEZE_BREAKOUT_MINUS_ENABLED,
+    SQUEEZE_BREAKOUT_BB_SQUEEZE_THRESH,
+    SQUEEZE_BREAKOUT_ATR_SQUEEZE_THRESH,
+    SQUEEZE_BREAKOUT_VOLUME_PCT,
+    SQUEEZE_BREAKOUT_BB_PERIOD,
+    SQUEEZE_BREAKOUT_ATR_PERIOD,
+    SQUEEZE_BREAKOUT_EXPANSION_LOOKBACK,
+    SQUEEZE_BREAKOUT_EXPANSION_MULT,
+    SQUEEZE_BREAKOUT_COOLDOWN_HOURS,
+    SQUEEZE_BREAKOUT_CONTINUUM_LONG_THRESH,
+    SQUEEZE_BREAKOUT_CONTINUUM_SHORT_THRESH,
+    SQUEEZE_BREAKOUT_SQUEEZE_RANGE_BARS,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -64,7 +75,7 @@ def _get_btc_candles(limit=100):
         return None
 
 
-def _calc_bb_width(candles, period=20):
+def _calc_bb_width(candles, period=SQUEEZE_BREAKOUT_BB_PERIOD):
     """Calculate Bollinger Band width as % of price."""
     if len(candles) < period:
         return None
@@ -74,7 +85,7 @@ def _calc_bb_width(candles, period=20):
     return (std * 2) / avg * 100
 
 
-def _calc_atr(candles, period=14):
+def _calc_atr(candles, period=SQUEEZE_BREAKOUT_ATR_PERIOD):
     """Calculate ATR as % of price."""
     if len(candles) < period + 1:
         return None
@@ -130,26 +141,26 @@ def detect(token='BTC'):
     if not candles or len(candles) < 50:
         return None
     
-    bb_width = _calc_bb_width(candles, 20)
-    atr_pct = _calc_atr(candles, 14)
+    bb_width = _calc_bb_width(candles, SQUEEZE_BREAKOUT_BB_PERIOD)
+    atr_pct = _calc_atr(candles, SQUEEZE_BREAKOUT_ATR_PERIOD)
     
     if bb_width is None or atr_pct is None:
         return None
     
-    # Check for squeeze: BB width < 0.5% AND ATR < 0.3% AND volume below average
-    if bb_width >= 0.5 or atr_pct >= 0.3:
+    # Check for squeeze: BB width < threshold AND ATR < threshold AND volume below average
+    if bb_width >= SQUEEZE_BREAKOUT_BB_SQUEEZE_THRESH or atr_pct >= SQUEEZE_BREAKOUT_ATR_SQUEEZE_THRESH:
         return None
     
-    # Volume check: must be below 80% of 20-period average (calm before storm)
-    if len(candles) >= 20:
-        vol_avg = sum(c['volume'] for c in candles[-20:]) / 20
-        if candles[-1]['volume'] > vol_avg * 0.8:
+    # Volume check: must be below threshold of 20-period average (calm before storm)
+    if len(candles) >= SQUEEZE_BREAKOUT_BB_PERIOD:
+        vol_avg = sum(c['volume'] for c in candles[-SQUEEZE_BREAKOUT_BB_PERIOD:]) / SQUEEZE_BREAKOUT_BB_PERIOD
+        if candles[-1]['volume'] > vol_avg * SQUEEZE_BREAKOUT_VOLUME_PCT:
             return None  # Volume too high — not calm enough
     
-    # Check for expansion: compare to 30-bar minimum
+    # Check for expansion: compare to lookback minimum
     recent_widths = []
-    for i in range(max(0, len(candles) - 30), len(candles)):
-        w = _calc_bb_width(candles[:i+1], 20)
+    for i in range(max(0, len(candles) - SQUEEZE_BREAKOUT_EXPANSION_LOOKBACK), len(candles)):
+        w = _calc_bb_width(candles[:i+1], SQUEEZE_BREAKOUT_BB_PERIOD)
         if w is not None:
             recent_widths.append(w)
     
@@ -158,19 +169,19 @@ def detect(token='BTC'):
     
     min_width = min(recent_widths)
     
-    # Expansion threshold: 2.0x from minimum
-    if bb_width <= min_width * 2.0:
+    # Expansion threshold
+    if bb_width <= min_width * SQUEEZE_BREAKOUT_EXPANSION_MULT:
         return None
     
     # First candle check: previous candle must NOT have been expanding
     if len(candles) >= 2:
-        prev_width = _calc_bb_width(candles[:-1], 20)
-        if prev_width is not None and prev_width > min_width * 2.0:
+        prev_width = _calc_bb_width(candles[:-1], SQUEEZE_BREAKOUT_BB_PERIOD)
+        if prev_width is not None and prev_width > min_width * SQUEEZE_BREAKOUT_EXPANSION_MULT:
             return None
     
-    # State check: 4h cooldown between signals
+    # State check: cooldown between signals
     now = time.time()
-    if now - _last_expansion_fired < 4 * 3600:
+    if now - _last_expansion_fired < SQUEEZE_BREAKOUT_COOLDOWN_HOURS * 3600:
         return None
     
     # Get continuum context
@@ -180,13 +191,13 @@ def detect(token='BTC'):
     
     # Direction with price breakout confirmation
     price = candles[-1]['close']
-    ema20 = sum(c['close'] for c in candles[-20:]) / 20
-    squeeze_low = min(c['low'] for c in candles[-30:])
-    squeeze_high = max(c['high'] for c in candles[-30:])
+    ema20 = sum(c['close'] for c in candles[-SQUEEZE_BREAKOUT_BB_PERIOD:]) / SQUEEZE_BREAKOUT_BB_PERIOD
+    squeeze_low = min(c['low'] for c in candles[-SQUEEZE_BREAKOUT_SQUEEZE_RANGE_BARS:])
+    squeeze_high = max(c['high'] for c in candles[-SQUEEZE_BREAKOUT_SQUEEZE_RANGE_BARS:])
     
-    if ctx['score'] > 50 and price > ema20 and price > squeeze_high:
+    if ctx['score'] > SQUEEZE_BREAKOUT_CONTINUUM_LONG_THRESH and price > ema20 and price > squeeze_high:
         direction = 'LONG'
-    elif ctx['score'] < 50 and price < ema20 and price < squeeze_low:
+    elif ctx['score'] < SQUEEZE_BREAKOUT_CONTINUUM_SHORT_THRESH and price < ema20 and price < squeeze_low:
         direction = 'SHORT'
     else:
         return None
@@ -252,7 +263,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction, hours=4)
+            set_cooldown(token, direction, hours=SQUEEZE_BREAKOUT_COOLDOWN_HOURS)
             print(f"[SQUEEZE-BREAKOUT] {direction} {token} | conf={sig['confidence']} | reason={sig['reason']}")
     
     return added

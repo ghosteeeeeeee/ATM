@@ -1451,5 +1451,23 @@
     "category": "signal enhancement",
     "status": "needs_implementation",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-21T16:31:00Z",
+    "idea": "volume-breakout-long+ frequency unlock — remove one filter to increase trades",
+    "rationale": "volume-breakout-long+ is a GEM: 16T 68.8%WR +$1.41/7d. Best WR of any active signal. But only 16 trades — severely constrained. EXTREME: 8T 75%WR +$1.46. Removing one filter could increase frequency without degrading WR.",
+    "expected_impact": "+$0.50-1.00/7d from more high-WR trades",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low-medium"
+  },
+  {
+    "date": "2026-09-21T16:31:00Z",
+    "idea": "EXTREME SHORT 30d edge: pullback-entry- 25T 64%WR +$1.45 — monitor for reactivation",
+    "rationale": "pullback-entry- SHORT in EXTREME has strong 30d edge (25T 64%WR +$1.45). 7d flat (14T -/usr/bin/bash.02) due to market shift. Edge exists but requires EXTREME regime conditions. Monitor for reactivation when EXTREME SHORT volume increases.",
+    "expected_impact": "+$0.50-1.00/7d when edge reactivates",
+    "category": "regime edge",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]
