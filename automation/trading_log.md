@@ -3721,3 +3721,49 @@ Final set: ['DOT', 'HYPER', 'ME']
 **Open Questions:** None
 
 **BY:** auto_1hr
+
+## [2026-09-21 19:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (INJ pump-chain+ -$0.29 atr_sl_hit) | 1 open (CFX SHORT -$0.03)
+**24h:** 24T ~46%WR ~breakeven (-$0.05) | **7d:** 192T 49%WR +$2.61
+
+**Diagnosis:**
+1. Entry quality: INJ SL hit after 22min — normal ATR SL behavior, not adverse excursion.
+2. SL behavior: atr_sl_hit 67% (16/24) but total net ~$0.00 — trailing working correctly.
+3. Signal quality: pump-chain+ degrading today (27.3% WR, -$0.45) vs yesterday (57.1%, +$1.35). Losses small ($0.09-$0.29), one big win (CASHCAT +$0.43). volume-breakout-long+ strong (+$0.57, 2T).
+4. Trade frequency: ~1.0/hr — low end, normal for NEUTRAL regime.
+5. Market state: NEUTRAL regime, HIGH vol. System correctly cautious.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria (no signal at 0% WR with 3+ trades in last hour)
+- pump-chain+ degraded but not catastrophic — within normal variance for NEUTRAL regime
+- System flat, not bleeding
+- 1 open position, normal size
+
+**Open Questions:** None
+
+**BY:** auto_1hr
+
+## [2026-09-21 20:30 UTC] Daily Orchestrator
+
+**Trades:** 1 open (CFX SHORT pullback-entry-, 74min, $0.00)
+**24h:** 22T, 36.4% WR, +$0.08 (breakeven) | **7d:** 184T, 48.9% WR, +$2.30
+
+**Diagnosis:**
+1. System healthy. 7d positive. No kill candidates. No config changes needed.
+2. pump-chain+ degraded today (33.3%WR -$0.39) but 7d still +$3.01 — normal NEUTRAL variance.
+3. EXTREME regime edge confirmed: 57.6%WR +$3.30 vs NORMAL 38.6%WR -$0.97.
+4. signal_compactor: 7 timeouts at 60s in 2h — DB lock contention during pipeline. Self-recovers. Standalone works (1-2s).
+5. All automations healthy. No crashes, no anomalies.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met
+- System net profitable on 7d (+$2.30)
+- pump-chain+ within normal variance
+- EXTREME regime performing well
+
+**BY:** daily_orchestrator

@@ -348,3 +348,8 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.7s (rc=N)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.6s (rc=N)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.0s):`
+
+## Error Alerts — 2026-09-21 17:57 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`

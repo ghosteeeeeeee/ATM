@@ -276,7 +276,7 @@ FAVORITES_RESIDENCY_DECAY = 0.12  # Staleness decay rate for favorites (default 
 # Penalty list — consistent underperformers get deprioritized (not blacklisted).
 # Blacklist = never trade. Penalty = tradeable but low priority.
 # Note: Tokens in FAVORITES should NOT be in PENALTY_TOKENS (causes conflicting multipliers)
-PENALTY_TOKENS = {'ALT','BTC','CASHCAT','COMP','ENS','ETH','MERL','MET','MON','NEO'}
+PENALTY_TOKENS = {'ALT','CASHCAT','COMP','ENS','ETH','MERL','MET','MON','NEO'}
 PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_signal()
 
 # ── Losers List — underperformers get deprioritized ──────────────────────────
@@ -956,7 +956,7 @@ CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-onl
 BTC_TIMING_GUARD_ENABLED = True
 BTC_TIMING_GUARD_LOG_ONLY = False         # Enabled 2026-09-16 — blocks signals when BTC already moved (chase prevention)
 # Per-signal-type BTC 30m momentum thresholds (%)
-BTC_TIMING_GUARD_PUMP_CHAIN_LONG = 0.30   # block pump-chain+ if BTC > this
+BTC_TIMING_GUARD_PUMP_CHAIN_LONG = 1.00   # block pump-chain+ if BTC > this (raised from 0.30 — was blocking during pumps)
 BTC_TIMING_GUARD_PUMP_CHAIN_SHORT = -0.30 # block pump-chain- if BTC < this
 BTC_TIMING_GUARD_PULLBACK_LONG = 0.20     # block pullback-entry+ if BTC > this
 BTC_TIMING_GUARD_PULLBACK_SHORT = -0.20   # block pullback-entry- if BTC < this

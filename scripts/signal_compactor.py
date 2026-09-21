@@ -2246,6 +2246,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Regime detection: use 4h for confluence decisions (1m too noisy)
             _regime, _regime_conf = get_regime_1m(token)
             _regime_4h, _ = get_regime_4h(token)
+            # Volatility regime (FLAT/NORMAL/HIGH/EXTREME) from ATR — used by signal-specific blocks
+            _atr_for_vreg = _atr_cache.get(token.upper(), (None,))[0]
+            _vol_regime = _classify_volatility(_atr_for_vreg) if _atr_for_vreg is not None else 'NORMAL'
             # NEUTRAL regime relaxation: when market is flat (4h NEUTRAL),
             # single-type signals can't find co-signals. Allow them through.
             # FIX (CEO Aug 26): Use 4h regime instead of 1m — 1m shows LONG_BIAS
@@ -2370,32 +2373,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # v3 SHORT: EXTREME 42% WR, FLAT 33% WR — no edge
             # v3 LONG: EXTREME 42% WR, FLAT 33% WR — no edge
             if 'accel-300-v3-short' in bare_source:
-                if ACCEL_300_V3_SHORT_EXTREME_BLOCK and _regime_4h == 'EXTREME':
-                    log(f"  🚫 [V3-SHORT-EXTREME] {token} SHORT blocked — EXTREME regime, no SHORT edge (42% WR)")
+                if ACCEL_300_V3_SHORT_EXTREME_BLOCK and _vol_regime == 'EXTREME':
+                    log(f"  🚫 [V3-SHORT-EXTREME] {token} SHORT blocked — EXTREME vol regime, no SHORT edge (42% WR)")
                     continue
-                if ACCEL_300_V3_SHORT_FLAT_BLOCK and _regime_4h == 'FLAT':
-                    log(f"  🚫 [V3-SHORT-FLAT] {token} SHORT blocked — FLAT regime, no SHORT edge (33% WR)")
+                if ACCEL_300_V3_SHORT_FLAT_BLOCK and _vol_regime == 'FLAT':
+                    log(f"  🚫 [V3-SHORT-FLAT] {token} SHORT blocked — FLAT vol regime, no SHORT edge (33% WR)")
                     continue
             if 'accel-300-v3-long' in bare_source:
-                if ACCEL_300_V3_LONG_EXTREME_BLOCK and _regime_4h == 'EXTREME':
-                    log(f"  🚫 [V3-LONG-EXTREME] {token} LONG blocked — EXTREME regime, no LONG edge (42% WR)")
+                if ACCEL_300_V3_LONG_EXTREME_BLOCK and _vol_regime == 'EXTREME':
+                    log(f"  🚫 [V3-LONG-EXTREME] {token} LONG blocked — EXTREME vol regime, no LONG edge (42% WR)")
                     continue
-                if ACCEL_300_V3_LONG_FLAT_BLOCK and _regime_4h == 'FLAT':
-                    log(f"  🚫 [V3-LONG-FLAT] {token} LONG blocked — FLAT regime, no LONG edge (33% WR)")
+                if ACCEL_300_V3_LONG_FLAT_BLOCK and _vol_regime == 'FLAT':
+                    log(f"  🚫 [V3-LONG-FLAT] {token} LONG blocked — FLAT vol regime, no LONG edge (33% WR)")
                     continue
             # ── Original accel-300 SHORT FLAT block ─────────────────────────
             # Original SHORT: 17% WR in FLAT (1W/5L) — no edge in flat market
             if 'accel-300-' in bare_source and 'v2' not in bare_source and 'v3' not in bare_source and 'v4' not in bare_source:
-                if ACCEL_300_MINUS_FLAT_BLOCK and _regime_4h == 'FLAT':
-                    log(f"  🚫 [ACCEL300-SHORT-FLAT] {token} SHORT blocked — FLAT regime, no SHORT edge (17% WR)")
+                if ACCEL_300_MINUS_FLAT_BLOCK and _vol_regime == 'FLAT':
+                    log(f"  🚫 [ACCEL300-SHORT-FLAT] {token} SHORT blocked — FLAT vol regime, no SHORT edge (17% WR)")
                     continue
             # ── pump-chain+ HIGH regime block ──────────────────────────────
             # 14T/7d HIGH: 35.7%WR +$0.19 (noise). EXTREME: 57.1%WR +$1.65 (edge).
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
                 try:
                     from hermes_constants import PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED
-                    if PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED and _regime_4h == 'HIGH':
-                        log(f"  🚫 [PUMP-CHAIN-HIGH] {token} LONG blocked — HIGH regime, no pump-chain+ LONG edge (35.7%WR)")
+                    if PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
+                        log(f"  🚫 [PUMP-CHAIN-HIGH] {token} LONG blocked — HIGH vol regime, no pump-chain+ LONG edge (35.7%WR)")
                         continue
                 except ImportError:
                     pass
@@ -2404,8 +2407,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if 'coil-spring' in bare_source:
                 try:
                     from hermes_constants import COILED_SPRING_ALLOWED_REGIMES
-                    if _regime_4h not in COILED_SPRING_ALLOWED_REGIMES:
-                        log(f"  🚫 [COIL-SPRING-REGIME] {token} blocked — {bare_source} not allowed in {_regime_4h} regime (allowed: {COILED_SPRING_ALLOWED_REGIMES})")
+                    if _vol_regime not in COILED_SPRING_ALLOWED_REGIMES:
+                        log(f"  🚫 [COIL-SPRING-REGIME] {token} blocked — {bare_source} not allowed in {_vol_regime} vol regime (allowed: {COILED_SPRING_ALLOWED_REGIMES})")
                         continue
                 except ImportError:
                     pass

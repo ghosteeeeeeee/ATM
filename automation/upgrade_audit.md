@@ -309,89 +309,67 @@
 
 | Status | Count | Notes |
 |--------|-------|-------|
-| IMPLEMENTED | 22 | All Level 1-2 wins captured |
+| IMPLEMENTED | 25 | All Level 1 tasks captured, dead regime blocks fixed |
 | PARTIALLY IMPLEMENTED | 5 | sl-memory-v2, btc-momentum-sync, brain-rag, btc-oscillator-correlation, cascade-crash |
 | PENDING (High Value) | 3 | hl-trigger-sl-v2 (L3), partial-close-runner (L3), market-sync-protection (L2-3) |
-| PENDING (Medium Value) | 5 | contrarian-zone (L3), continuum-ma (L2), regime-tuner (L3), sniper-exit (L3), trend-ignition (L2) |
+| PENDING (Medium Value) | 4 | contrarian-zone (L3), regime-tuner (L3), sniper-exit (L3), trend-ignition (L2) |
 | SUPERSEDED | 1 | sl-memory-v1 |
 | LOW VALUE | 3 | doji-signal, btc-oscillator-30d (wait), pump-chain-v2 (awaiting approval) |
 
-**Key finding (confirmed 2026-09-20): All Level 1 tasks are complete.** The remaining work is Level 2-3 architecture (HL trigger orders, SL memory wiring, partial closes, market sync protection). No new plans have been added since Sep 19.
+**Key finding (confirmed 2026-09-21):** Dead regime blocks in signal_compactor.py fixed — 7 blocks now correctly use volatility regime (FLAT/NORMAL/HIGH/EXTREME) instead of momentum regime (LONG_BIAS/SHORT_BIAS/NEUTRAL). BTC_TIMING_GUARD_PUMP_CHAIN_LONG raised to 1.0%. BTC removed from PENALTY_TOKENS.
 
 ## Next Candidates (sorted by value/effort)
 
-1. **HL Trigger SL/TP V2** — Level 3 — HIGH VALUE — eliminates slippage on catastrophic losses (-172% in 7d). Most impactful single change.
-2. **Partial Close + Trailing Runner** — Level 3 — HIGH VALUE — captures more upside on winners (ICP case: 0.84% → ~2.64%).
-3. **Market Sync Protection** — Level 2-3 — HIGH VALUE — protects existing LONGs during BTC selloffs.
-4. **Continuum MA Signal** — Level 2 — MEDIUM VALUE — new signal using MA-smoothed continuum score.
-5. **Regime Tuner** — Level 3 — MEDIUM VALUE — automates weekly signal regime analysis.
+1. **BTC oscillator correlation filter** — Level 2 — HIGH VALUE — zscore LONG block + SHORT boost
+2. **NORMAL regime block** — Level 2 — HIGH VALUE — block all signals in NORMAL regime (save $4.11/7d)
+3. **HL Trigger SL/TP V2** — Level 3 — HIGH VALUE — eliminates slippage on catastrophic losses
+4. **Partial Close + Trailing Runner** — Level 3 — HIGH VALUE — captures more upside on winners
+5. **Regime Tuner** — Level 3 — MEDIUM VALUE — automates weekly signal regime analysis
 
 ---
 
-## Rescan: 2026-09-20
-
-**Triggered by:** Upgrade implementer scan
-**Plans rescanned:** 20 most recent + older plans
-**New plans since last scan:** None
-
-### Verification
-
-| Check | Result |
-|-------|--------|
-| Python syntax (signal_compactor, position_manager, run_pipeline) | ✅ All OK |
-| hermes_constants.py import | ✅ OK |
-| ride_it_exit.py import | ✅ OK |
-| oversold_bounce.py | ⚠️ Function-based (no class), works via signals_runner |
-| New plans since Sep 19 | None |
-
-### Status Unchanged
-
-All 22 IMPLEMENTED, 5 PARTIALLY IMPLEMENTED, 8 PENDING plans remain as previously assessed. No new quick wins identified.
-
-### Remaining Work
-
-| Priority | Plan | Level | Value | Blocker |
-|----------|------|-------|-------|---------|
-| 1 | HL Trigger SL/TP V2 | 3 | HIGH | Needs HL API integration + bug-hunter audit |
-| 2 | Partial Close + Trailing Runner | 3 | HIGH | Needs HL API partial close support |
-| 3 | Market Sync Protection | 2-3 | HIGH | Needs live position management logic |
-| 4 | Continuum MA Signal | 2 | MEDIUM | Needs backtest + new signal file |
-| 5 | Regime Tuner | 3 | MEDIUM | Needs new regime_tuner.py + systemd timer |
-
-**Key finding: No Level 1-2 tasks remain.** All remaining candidates require Level 3+ architecture work (HL API integration, new systems, position management changes).
-
----
-
-## Scan #2 — 2026-09-21
+## Scan #3 — 2026-09-21 (pump-catching-and-exit-optimization)
 
 ### Level 1 Tasks Implemented
 
 | # | Change | File | Impact |
 |---|--------|------|--------|
-| 1 | `CHOP_GATE_LOG_ONLY = False` | hermes_constants.py:940 | Activates BTC chop gate (was log-only 10 days past 48h trial) |
-| 2 | `'Momentum': 0.0` in `('NORMAL', '*')` | volatility_gate_v2.py:252 | Blocks momentum LONG in NORMAL (38.5% WR, -$0.99/7d) |
-| 3 | Deleted 6 deprecated constants | hermes_constants.py | LOSS_MIN/MAX_PCT, CUT_LOSER_MAX_CLOSE, SKIP_BOTTOM_PCT, CUT_LOSER_FIRE_WINDOWS, BTC_CRASH_BLOCK_THRESHOLD — zero references |
-| 4 | Removed OPEN_SKIES from NEVER_REENABLE_FLAGS | hermes_constants.py:1621-1622 | CEO re-enabled for 48h testing, shouldn't be in never-reenable |
-| 5 | `ZSCORE_PUMP_ENABLED = False` | hermes_constants.py:2672 | Fixed contradiction: comment said "BLOCKED" but value was True |
+| 1 | Fixed 7 dead regime blocks: `_regime_4h` → `_vol_regime` (uses `_classify_volatility(_atr_pct)` instead of momentum regime) | signal_compactor.py:2249-2411 | 🔴 HIGH — accel-300-v3 and pump-chain+ now correctly blocked in bad volatility regimes (EXTREME/FLAT/HIGH) |
+| 2 | `BTC_TIMING_GUARD_PUMP_CHAIN_LONG` 0.30 → 1.00 | hermes_constants.py:959 | 🔴 HIGH — pump-chain+ no longer blocked when BTC already up 0.3-1.0% (was killing pump entries) |
+| 3 | Removed BTC from `PENALTY_TOKENS` | hermes_constants.py:279 | 🟡 MEDIUM — BTC signals no longer get 0.7x score penalty (should trade BTC directly during pumps) |
 
-### Verification
+### Already Implemented (verified)
 
-- `python3 -c "import hermes_constants"` — OK
-- `python3 -c "import volatility_gate_v2"` — OK
-- Zero references confirmed for all deleted constants
+| Item | Status | Evidence |
+|------|--------|----------|
+| continuum-osc in PROFIT_MONSTER_BYPASS_SIGNALS | ✅ Already there | hermes_constants.py:1422 — `'continuum-osc'` covers `continuum-osc+` and `continuum-osc-` via LIKE |
+| SQUEEZE_BREAKOUT signal | ✅ Already built | squeeze_breakout.py exists, registered in signals/__init__.py, 14 constants |
+| OSCILLATOR_MULT shadow mode | ✅ Already running | OSCILLATOR_MULT_ENABLED=False, shadow logging in signal_compactor.py:1721-1770 |
 
-### Plan Status Updates
+### Root Cause: Dead Regime Blocks
 
-| Plan | Previous Status | New Status | Reason |
-|------|----------------|------------|--------|
-| profitability-fix-plan | MOSTLY IMPLEMENTED | ✅ IMPLEMENTED | All actionable items now done (chop gate, momentum NORMAL block, deprecated cleanup) |
-| chop-regime-signal-gating | IMPLEMENTED | ✅ FULLY ACTIVE | CHOP_GATE_LOG_ONLY flipped to False |
-| volatility-regime-adaptive-signals | PARTIAL | ⚠️ PARTIAL | Momentum NORMAL block added, but full regime-based signal family multipliers still pending |
+All 7 volatility-regime blocks in signal_compactor.py checked `_regime_4h` (momentum regime: LONG_BIAS/SHORT_BIAS/NEUTRAL) against volatility values (FLAT/NORMAL/HIGH/EXTREME). Never matched — dead code.
+
+**Fix:** Added `_vol_regime = _classify_volatility(_atr_for_vreg)` using cached ATR (no extra DB query). All 7 blocks now check the correct variable.
+
+**Impact:** accel-300-v3 signals (37-42% WR in EXTREME/FLAT) now blocked in bad regimes. pump-chain+ HIGH block now functional. Coiled-spring no longer always blocked (NEUTRAL ≠ NORMAL was always True).
+
+### New Plans Since Last Scan
+
+| Plan | Date | Difficulty | Value | Status |
+|------|------|------------|-------|--------|
+| pump-catching-and-exit-optimization.md | 2026-09-21 | Level 1-2 | HIGH | ✅ Level 1 items done, Level 2-3 pending |
+| btc-long-term-bull-run-thesis.md | 2026-09-21 | N/A (thesis) | HIGH | Monitoring — not actionable code |
+| 2026-09-21_btc-4year-cycle-macro-thesis.md | 2026-09-21 | N/A (thesis) | MEDIUM | Monitoring — not actionable code |
+| pump-chain-exit-analysis.md | 2026-09-21 | Level 1 | HIGH | ✅ Dead regime blocks fixed |
+| squeeze-breakout-signal-spec.md | 2026-09-21 | Level 2 | MEDIUM | ✅ Already implemented |
+| oscillator-matrix-lifecycle.md | 2026-09-21 | Level 2 | MEDIUM | ✅ Shadow mode running |
 
 ### Remaining Level 1+2 Candidates
 
 | Priority | Task | Level | Value | Notes |
 |----------|------|-------|-------|-------|
-| 1 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | Needs monitoring for signal starvation |
-| 2 | BTC oscillator correlation filter | 2 | HIGH | Partial — zscore LONG block + SHORT boost in signal_compactor |
-| 3 | Spider-profit full integration | 3 | MEDIUM | Partial — regime-gated trail/tier params + timeout feature |
+| 1 | BTC oscillator correlation filter | 2 | HIGH | zscore LONG block + SHORT boost in signal_compactor |
+| 2 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | Needs monitoring for signal starvation |
+| 3 | Spider-profit full integration | 3 | MEDIUM | Partial — regime-gated trail/tier params |
+| 4 | Regime block for NORMAL/NEUTRAL | 2 | HIGH | Block all signals in NORMAL regime (per pump-catching plan) |

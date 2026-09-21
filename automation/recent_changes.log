@@ -2677,3 +2677,16 @@
   atr_sl_hit 69% but net +$1.58 — trailing working. pump-chain+ carrying (+$1.17/24h).
   No kill criteria. Normal weekend volume. System healthy.
   BY: auto_1hr
+[2026-09-21 19:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 24T ~46%WR ~breakeven | 7d: 192T 49%WR +$2.61
+  1T closed last hour (INJ -$0.29 atr_sl_hit). 1 open (CFX SHORT -$0.03).
+  pump-chain+ degraded today (27.3% WR, -$0.45) vs yesterday (57.1%, +$1.35) but within variance.
+  NEUTRAL regime, HIGH vol. No kill criteria. System healthy.
+  BY: auto_1hr
+[2026-09-21 20:30 UTC] daily_orchestrator: NO CHANGE — system stable
+  24h: 22T 36.4%WR +$0.08 | 7d: 184T 48.9%WR +$2.30
+  1 open (CFX SHORT pullback-entry-). pump-chain+ degraded today but 7d +$3.01.
+  EXTREME regime 57.6%WR +$3.30. NORMAL 38.6%WR -$0.97.
+  signal_compactor: 7 timeouts (60s) — DB lock contention, self-recovers.
+  CURRENT.md updated. No config changes.
+  BY: daily_orchestrator

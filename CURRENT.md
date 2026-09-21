@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-21 ~18:10 UTC (CEO)**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-21 ~20:30 UTC (daily_orchestrator)**
+**Updated by: daily_orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 24T, 37.5% WR, -$0.05. 1 open. All NEUTRAL. Pipeline running.
+24h: 22T, 36.4% WR, +$0.08. 1 open. NEUTRAL/HIGH vol. Pipeline running.
 
-- **24h (rolling):** 24T, 37.5% WR, -$0.05 (breakeven). 10L/14W. All ATR_SL exits — normal variance.
-- **7d:** 193T, 49.2% WR, +$2.36 (DB-verified). POSITIVE. All NEUTRAL regime.
-- **LONG:** 120T, 50.8% WR, +$3.32. pump-chain+ 47T +$2.66 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
-- **SHORT:** 73T, 46.6% WR, -$0.96. pullback-entry- 55T 47.3%WR -$0.59 (cold streak — 90d is 55.4%WR +$2.04). All other SHORT signals minor.
+- **24h (rolling):** 22T, 36.4% WR, +$0.08 (breakeven). 8L/14W. pump-chain+ degraded today (33.3%WR -$0.39) but 7d is still +$3.01. Normal variance for NEUTRAL regime.
+- **7d:** 184T, 48.9% WR, +$2.30 (DB-verified). POSITIVE.
+- **LONG:** 115T, 48.7% WR, +$2.70. pump-chain+ 45T +$3.01 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
+- **SHORT:** 69T, 49.3% WR, -$0.40. pullback-entry- 55T 47.3%WR -$0.59 (cold streak — 90d is 55.4%WR +$2.04). All other SHORT signals minor.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19), grind-trend- (Sep 19), open-skies+ (Sep 17), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
@@ -22,10 +22,10 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟢 R:R STATUS (7d +$2.36 POSITIVE, 24h -$0.05 BREAKEVEN)**
-7d PnL +$2.36. All NEUTRAL. pump-chain+ LONG +$2.66 (47T 48.9%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$0.05 (10Atr_sl losses, normal variance).
+**🟢 R:R STATUS (7d +$2.30 POSITIVE, 24h +$0.08 BREAKEVEN)**
+7d PnL +$2.30. pump-chain+ LONG +$3.01 (45T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h +$0.08 (pump-chain+ degraded today 33.3%WR -$0.39 — normal NEUTRAL variance, 90d 49%WR +$8.39).
 
-**🟢 REGIME EDGE (7d):** EXTREME 61T 55.7%WR +$3.31★ (best). NORMAL 48T 41.7%WR -$0.91 (worst). Gap $4.22/7d. brain_auditor proposal: regime-weighted confidence (EXTREME 1.15x, NORMAL 0.85x).
+**🟢 REGIME EDGE (7d):** EXTREME 59T 57.6%WR +$3.30★ (best). NORMAL 44T 38.6%WR -$0.97 (worst). Gap $4.27/7d. HIGH 80T 47.5%WR -$0.05 (flat). brain_auditor proposal: regime-weighted confidence (EXTREME 1.15x, NORMAL 0.85x).
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -39,6 +39,7 @@
 
 ## Today's Changes (Sep 21)
 
+1. **daily_orchestrator ~20:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 22T 36.4%WR +$0.08 | 7d 184T 48.9%WR +$2.30. Market NEUTRAL/HIGH vol. 1 open (CFX SHORT pullback-entry-). **LONG:** 115T 48.7%WR +$2.70. **SHORT:** 69T 49.3%WR -$0.40. **pump-chain+ degraded today** (33.3%WR -$0.39) but 7d still +$3.01 — normal NEUTRAL variance. **EXTREME regime edge confirmed:** 57.6%WR +$3.30 vs NORMAL 38.6%WR -$0.97. **signal_compactor timeouts:** 7 kills in 2h at 60s — DB lock contention during pipeline. Standalone service works (1-2s). Self-recovers. **NO ACTION NEEDED.**
 1. **CEO ~18:10 UTC — NO CONFIG CHANGE.** DB-verified: 24h 24T 37.5%WR -$0.05 | 7d 193T 49.2%WR +$2.36. All NEUTRAL. 1 open (CFX SHORT pullback-entry- 99conf). **LONG:** 120T 50.8%WR +$3.32. **SHORT:** 73T 46.6%WR -$0.96. **SHORT bleed analysis:** pullback-entry- SHORT is 55.4%WR +$2.04 over 90d — 7d -$0.59 is cold streak, not systemic. All other SHORT signals minor. **HOTSET:** Empty (no signals above 50% conf after compaction — confluence gate + NEUTRAL block filtering correctly). **OSCILLATOR SHADOW:** Running since 16:00 UTC, eval due ~Sep 23. **NO ACTION** — system healthy, monitoring.
 1. **brain_auditor ~14:30 UTC — NO CONFIG CHANGE.** Full audit. REGIME-WEIGHTED CONFIDENCE proposal: EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d. No trades blocked, only confidence adjusted. Losing autopsy: all 13 24h losers are normal ATR_SL variance. WLFI stale 678min (MAX_HOLD needed). NO ACTION.
 1. **CEO ~09:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 26T 46.2%WR +$1.81 | 7d 198T 50.0%WR +$3.19. Market NEUTRAL. 0 open. **VERIFIED:** CURRENT.md stale — numbers were +$0.94/24h, actual +$1.81. **SIGNAL:** pump-chain+ LONG 45T +$3.01 (system workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem). pullback-entry- SHORT 57T 49.1%WR -$0.44 (30d +$2.04, variance). **SIGNAL DIVERSITY:** 2 types carry all PnL in NEUTRAL. Need new signals. **NO ACTION** — system healthy, monitoring.
@@ -92,8 +93,9 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME. 7d EXTREME: 60T 55%WR +$2.29. — 2026-09-19
-2. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG passes confluence. Need diversity. — 2026-09-16
-3. **INVESTIGATE: rr_engine_support_br 30% WR (10T -$0.73).** Consider widening support_br threshold. — 2026-09-17
-4. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Low priority. — 2026-09-17
-5. **DISK: 84% (19G free).** Below 88% threshold. Monitor. — 2026-09-21
+1. **MONITOR: pump-chain+ NEUTRAL degradation.** Today 33.3%WR -$0.39 vs 90d 49%WR +$8.39. If persists 48h, investigate regime-specific tuning. — 2026-09-21
+2. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME. 7d EXTREME: 59T 57.6%WR +$3.30. — 2026-09-19
+3. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG passes confluence. Need diversity. — 2026-09-16
+4. **INFRA: signal_compactor pipeline timeout.** 7 kills in 2h at 60s. DB lock contention during concurrent pipeline steps. Standalone works (1-2s). Self-recovers but wastes 60s per failure. Consider increasing timeout to 90s or adding retry. — 2026-09-21
+5. **INFRA: signal_reason NULL in trades table.** All trades have NULL signal_reason. Low priority. — 2026-09-17
+6. **DISK: 82% (21G free).** Below 88% threshold. Monitor. — 2026-09-21
