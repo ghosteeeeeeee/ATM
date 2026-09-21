@@ -4133,12 +4133,20 @@ def _purge_executed_signals(hours=1, dry=False):
                 c.execute("SELECT combo_key FROM signals WHERE id=?", (sid,))
                 ck_row = c.fetchone()
                 if ck_row and ck_row[0]:
-                    c.execute("DELETE FROM signals WHERE combo_key=? AND decision='PENDING'", (ck_row[0],))
-                c.execute("""
-                    UPDATE signals
-                    SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
-                    WHERE id=?
-                """, (sid,))
+                    # Delete ALL signals with this combo_key that are PENDING (match the UNIQUE index)
+                    c.execute("DELETE FROM signals WHERE combo_key=? AND decision='PENDING' AND executed=0", (ck_row[0],))
+                try:
+                    c.execute("""
+                        UPDATE signals
+                        SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
+                        WHERE id=?
+                    """, (sid,))
+                except Exception as upd_err:
+                    # Handle UNIQUE constraint race condition gracefully
+                    if 'UNIQUE constraint' in str(upd_err):
+                        log(f"  [PURGE-VERIFY] Skipping signal id={sid} ({tok} {d}) — combo_key conflict (race condition)")
+                    else:
+                        raise
                 restored += 1
                 log(f"  [PURGE-VERIFY] Restored signal id={sid} ({tok} {d}) to PENDING — no recent trade found")
     finally:
