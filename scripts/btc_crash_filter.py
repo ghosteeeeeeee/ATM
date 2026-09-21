@@ -369,9 +369,10 @@ def _check_btc_level() -> Tuple[bool, str, float, float]:
     """
     from hermes_constants import (
         BTC_LEVEL_FILTER_ENABLED,
-        BTC_LEVEL_SHORT_BLOCK_PCT,
-        BTC_LEVEL_LONG_BLOCK_PCT,
         BTC_LEVEL_LOOKBACK_MIN,
+        BTC_LEVEL_MIN_RANGE_PCT,
+        BTC_LEVEL_BOTTOM_BLOCK_PCT,
+        BTC_LEVEL_TOP_BLOCK_PCT,
     )
 
     if not BTC_LEVEL_FILTER_ENABLED:
@@ -394,21 +395,19 @@ def _check_btc_level() -> Tuple[bool, str, float, float]:
     # Calculate range size and relative position (0.0 = at low, 1.0 = at high)
     range_pct = ((session_high - session_low) / session_low * 100) if session_low > 0 else 0
 
-    # Skip level filter if range is too small (< 0.3%) — no meaningful levels
-    if range_pct < 0.3:
+    # Skip level filter if range is too small — no meaningful levels
+    if range_pct < BTC_LEVEL_MIN_RANGE_PCT:
         return False, '', pct_from_high, pct_from_low
 
     # Relative position: 0.0 = at session low, 1.0 = at session high
     relative_pos = pct_from_low / range_pct if range_pct > 0 else 0.5
 
-    # Block SHORT when BTC is in bottom 30% of range (bounce risk)
-    # relative_pos < 0.30 means BTC is near the low
-    if relative_pos < 0.30:
+    # Block SHORT when BTC is in bottom portion of range (bounce risk)
+    if relative_pos < BTC_LEVEL_BOTTOM_BLOCK_PCT:
         return True, 'SHORT', pct_from_high, pct_from_low
 
-    # Block LONG when BTC is in top 30% of range (pullback risk)
-    # relative_pos > 0.70 means BTC is near the high
-    if relative_pos > 0.70:
+    # Block LONG when BTC is in top portion of range (pullback risk)
+    if relative_pos > BTC_LEVEL_TOP_BLOCK_PCT:
         return True, 'LONG', pct_from_high, pct_from_low
 
     return False, '', pct_from_high, pct_from_low

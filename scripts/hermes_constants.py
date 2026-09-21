@@ -1139,10 +1139,11 @@ BTC_MOMENTUM_BLOCK_DURATION_MIN = 10        # minutes to block entries after tri
 # Prevents SHORT entries at session lows (bounce risk) and LONG at highs (pullback risk).
 # Would have prevented all 6 losing SHORT entries in Aug 24 incident (-$34.78 saved).
 BTC_LEVEL_FILTER_ENABLED = True
-BTC_LEVEL_SHORT_BLOCK_PCT = -0.5       # % — block SHORT if BTC > 0.5% below 1h high
-BTC_LEVEL_LONG_BLOCK_PCT = 0.5         # % — block LONG if BTC > 0.5% above 1h low
 BTC_LEVEL_LOOKBACK_MIN = 60            # minutes — how far back to find session high/low
 BTC_LEVEL_BLOCK_DURATION_MIN = 10      # minutes to block entries after trigger
+BTC_LEVEL_MIN_RANGE_PCT = 0.3          # % — skip filter if session range < this (too small for levels)
+BTC_LEVEL_BOTTOM_BLOCK_PCT = 0.30      # relative position (0-1) — block SHORT in bottom 30% of range
+BTC_LEVEL_TOP_BLOCK_PCT = 0.70         # relative position (0-1) — block LONG in top 30% of range
 
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
