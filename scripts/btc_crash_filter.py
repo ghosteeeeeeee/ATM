@@ -504,9 +504,16 @@ def check_crash() -> CrashSignal:
     # ── Severity Assessment ──────────────────────────────────────────────
     # EMERGENCY: Price crash + volume spike + contagion = confirmed cascade
     # CRITICAL:  Price crash + any 1 other layer
-    # WARNING:   Any 2 non-price layers, or price alone
+    # WARNING:   Any 2 non-price GLOBAL layers, or price alone
+    #
+    # IMPORTANT: MOMENTUM and BTC_LEVEL are DIRECTION-SPECIFIC layers.
+    # They should NOT count toward the WARNING threshold (n_layers).
+    # They apply their own blocks independently (later in this function).
+    # Only GLOBAL layers (PRICE, VOLUME, CONTAGION, ACCEL, MULTI_ALT) count.
 
-    n_layers = len(triggered_layers)
+    GLOBAL_LAYERS = {'PRICE', 'VOLUME', 'CONTAGION', 'ACCEL', 'MULTI_ALT'}
+    global_layers = [l for l in triggered_layers if l in GLOBAL_LAYERS]
+    n_global = len(global_layers)
 
     if 'PRICE' in triggered_layers and 'VOLUME' in triggered_layers and 'CONTAGION' in triggered_layers:
         signal.severity = 'EMERGENCY'
@@ -516,7 +523,7 @@ def check_crash() -> CrashSignal:
         signal.layer = '+'.join(triggered_layers)
         signal.block_duration_sec = 600  # 10 min
 
-    elif 'PRICE' in triggered_layers and n_layers >= 2:
+    elif 'PRICE' in triggered_layers and n_global >= 2:
         signal.severity = 'CRITICAL'
         signal.blocked = True
         signal.reason = (f'BTC CRITICAL: {chg_5m:+.2f}% in 5m (threshold {dyn_thresh:.2f}%) '
@@ -524,7 +531,7 @@ def check_crash() -> CrashSignal:
         signal.layer = '+'.join(triggered_layers)
         signal.block_duration_sec = 300  # 5 min
 
-    elif n_layers >= 2:
+    elif n_global >= 2:
         signal.severity = 'WARNING'
         signal.blocked = True
         signal.reason = (f'BTC WARNING: {chg_5m:+.2f}% | layers: {",".join(triggered_layers)} '
