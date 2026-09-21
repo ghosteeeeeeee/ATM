@@ -1389,6 +1389,8 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail
     'mover+',             # momentum LONG — manage via ATR SL, not PM Trail
     'doji',               # doji reversal — manage via ATR SL, not PM Trail
+    'continuum-osc',      # continuum oscillator — manage via ATR SL, not PM Trail
+    'volume-breakout',    # volume breakout — manage via ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
