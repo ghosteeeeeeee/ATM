@@ -3085,6 +3085,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Backtest: ALL 10 losses had negative 30m velocity at entry, ALL 26 winners had positive
             # Catches reversals between signal creation and execution (e.g., GRASS +0.88% at signal → -1.60% at close)
             if direction == 'LONG' and 'pump-chain' in (src or ''):
+                log(f"  🔍 [PUMP-CHAIN-VEL-CHECK] {tkn}: checking LONG velocity filter")
                 _conn_vel_30 = None
                 try:
                     _conn_vel_30 = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3098,6 +3099,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _cur_vel_30.close()
                     if len(_vel_30_closes) >= 6 and _vel_30_closes[-1] > 0:
                         _vel_30m = (_vel_30_closes[0] - _vel_30_closes[-1]) / _vel_30_closes[-1] * 100
+                        log(f"  🔍 [PUMP-CHAIN-VEL-CHECK] {tkn}: vel_30m={_vel_30m:+.3f}%")
                         if _vel_30m < 0:
                             log(f"  🚫 [PUMP-CHAIN-VEL] {tkn}: LONG blocked — 30m vel={_vel_30m:+.3f}% (token declining)")
                             continue
