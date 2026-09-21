@@ -316,7 +316,7 @@
 | SUPERSEDED | 1 | sl-memory-v1 |
 | LOW VALUE | 3 | doji-signal, btc-oscillator-30d (wait), pump-chain-v2 (awaiting approval) |
 
-**Key finding: All Level 1 tasks are complete.** The remaining work is Level 2-3 architecture (HL trigger orders, SL memory wiring, partial closes, market sync protection).
+**Key finding (confirmed 2026-09-20): All Level 1 tasks are complete.** The remaining work is Level 2-3 architecture (HL trigger orders, SL memory wiring, partial closes, market sync protection). No new plans have been added since Sep 19.
 
 ## Next Candidates (sorted by value/effort)
 
@@ -325,3 +325,37 @@
 3. **Market Sync Protection** — Level 2-3 — HIGH VALUE — protects existing LONGs during BTC selloffs.
 4. **Continuum MA Signal** — Level 2 — MEDIUM VALUE — new signal using MA-smoothed continuum score.
 5. **Regime Tuner** — Level 3 — MEDIUM VALUE — automates weekly signal regime analysis.
+
+---
+
+## Rescan: 2026-09-20
+
+**Triggered by:** Upgrade implementer scan
+**Plans rescanned:** 20 most recent + older plans
+**New plans since last scan:** None
+
+### Verification
+
+| Check | Result |
+|-------|--------|
+| Python syntax (signal_compactor, position_manager, run_pipeline) | ✅ All OK |
+| hermes_constants.py import | ✅ OK |
+| ride_it_exit.py import | ✅ OK |
+| oversold_bounce.py | ⚠️ Function-based (no class), works via signals_runner |
+| New plans since Sep 19 | None |
+
+### Status Unchanged
+
+All 22 IMPLEMENTED, 5 PARTIALLY IMPLEMENTED, 8 PENDING plans remain as previously assessed. No new quick wins identified.
+
+### Remaining Work
+
+| Priority | Plan | Level | Value | Blocker |
+|----------|------|-------|-------|---------|
+| 1 | HL Trigger SL/TP V2 | 3 | HIGH | Needs HL API integration + bug-hunter audit |
+| 2 | Partial Close + Trailing Runner | 3 | HIGH | Needs HL API partial close support |
+| 3 | Market Sync Protection | 2-3 | HIGH | Needs live position management logic |
+| 4 | Continuum MA Signal | 2 | MEDIUM | Needs backtest + new signal file |
+| 5 | Regime Tuner | 3 | MEDIUM | Needs new regime_tuner.py + systemd timer |
+
+**Key finding: No Level 1-2 tasks remain.** All remaining candidates require Level 3+ architecture work (HL API integration, new systems, position management changes).

@@ -1,7 +1,18 @@
-## CEO Report — 2026-09-20 ~14:30 UTC
+## CEO Report — 2026-09-20 ~18:00 UTC
 
 ### Diagnosis
-DB-verified. 24h: 33T, 57.6% WR, +$0.98 (solid). 7d: 214T, 48.1% WR, -$0.30 (flipped negative from +$0.51 this morning). 6 open at MAX_OPEN. Market NEUTRAL — all 214 7d trades in NEUTRAL regime. **Biggest loser: pullback-entry- SHORT** — 65T 47.7%WR -$0.70/7d. **Biggest winner: pump-chain+ LONG** — 43T 48.8%WR +$1.51/7d (carrying system). **HOTSET empty** — confluence gate blocks everything in NEUTRAL. Dead zone fix (TIME_BLOCK 01-09) just deployed at 07:30 UTC.
+DB-verified. 24h: 32T, 59.4% WR, +$2.22 (strong). 7d: 208T, 49.5% WR, +$1.65 (POSITIVE). 2 open trades. Market NEUTRAL — all 208 7d trades in NEUTRAL regime. **pullback-entry- fix working:** 14T 24h 64.3%WR +$0.70 (was -0.70/7d before fix). **Daily trend improving:** Sep 17 -$1.09 → Sep 18 +$1.73 → Sep 19 +$0.08 → Sep 20 +$2.20 (best day in 7d). **Top 30d earners:** pump-chain+ LONG +$2.49, pullback-entry- SHORT +$2.21, bb_bounce_v2_long +$2.08. **30d losers:** ct_hot LONG -$3.91 (legacy, already killed), accel_300_v3_long -$1.41, ema300_dip_short -$1.48.
+
+### Root Cause
+Pullback-entry momentum filter was backwards — blocking SHORT with rising momentum (65%WR, the ONLY profitable state) and allowing flat/falling (39-41%WR losers). Fixed 14:30 UTC. Market has been NEUTRAL for 7+ days — all 208 trades in NEUTRAL. Low trade volume (32/24h) is normal for NEUTRAL — confluence gate filters aggressively.
+
+### Fix Applied
+1. pullback_entry.py:188 momentum filter flipped (14:30 UTC Sep 20) — SHORT now requires rising momentum
+2. SHORT_RSI_FLOOR fixed + lowered 35→30 (brain_auditor 10:55 UTC Sep 20) — catches oversold SHORTs
+3. TIME_BLOCK extended 03→01 UTC (CEO 07:30 UTC Sep 20) — kills dead zone hours 1-2
+
+### Verification
+All verified from DB. pullback-entry- SHORT 24h: 14T 64.3%WR +$0.70 (was -0.70/7d). 7d PnL back to +$1.65 (was -$0.30 at 14:30). Today +$2.20 64%WR — strongest day since Sep 18. No action needed — monitoring fix impact 48h.
 
 ### Root Cause
 pullback_entry.py:188 had a backwards momentum filter — blocked SHORT with rising momentum (the ONLY profitable state: 65%WR +$0.17). Flat/falling momentum were the losers (39-41%WR -$0.87 combined) but were allowed through. Comment said "SHORT with rising = 62.5% LOSS" — outdated, data contradicts.

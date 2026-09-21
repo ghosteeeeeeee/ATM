@@ -3260,3 +3260,32 @@ Final set: ['DOT', 'HYPER', 'SEI']
 
 **Status:** System stable, no action required.
 **BY:** auto_1hr
+
+## [2026-09-20 23:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet market, 5 open positions)
+**24h:** 28T 67.9%WR +$2.37 | 7d: 205T 50.2%WR +$2.31
+
+**Last hour closes:** None
+
+**24h by signal:**
+- pump-chain+: 14T 57.1%WR +$1.35
+- pullback-entry-: 11T 72.7%WR +$0.62
+- doji-bottom-long: 1T 100%WR +$0.30
+- volume-breakout-long+: 1T 100%WR +$0.08
+- continuum-: 1T 100%WR +$0.02
+
+**Diagnosis:**
+1. **Entry quality:** N/A — no closures this hour
+2. **SL behavior:** atr_sl_hit 96% (27/28) but profitable (+$0.087 avg) — trailing stops working
+3. **Signal quality:** All signals positive. No kill candidates.
+4. **Trade frequency:** ~1.2T/hr avg — well under 20/hr threshold
+
+**No Change Needed:**
+- No kill candidates (0% WR + 3+ trades)
+- No overtrading
+- 24h profitable, system stable
+- 5 positions open (near cap)
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr

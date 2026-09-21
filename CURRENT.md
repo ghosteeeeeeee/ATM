@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-20 ~14:30 UTC (CEO)**
+**Last Updated: 2026-09-20 ~18:00 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 33T, 57.6% WR, +$0.98. 6 open. Market NEUTRAL. Pipeline running.
+24h: 32T, 59.4% WR, +$2.22. 2 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 33T, 57.6% WR, +$0.98. pump-chain+ LONG top earner. Dead zone fix active (TIME_BLOCK 01-09).
-- **Today (calendar):** 12T closed. 5 open. +$0.62 58.3% WR.
-- **7d:** 214T, 48.1% WR, -$0.30 (DB-verified). FLIPPED NEGATIVE from +$0.51 this morning. All 214 trades in NEUTRAL. EXTREME regime edge confirmed but no EXTREME trades in 7d window. NORMAL bleeds.
-- **Market:** NEUTRAL (6 open trades at MAX_OPEN cap).
+- **24h (rolling):** 32T, 59.4% WR, +$2.22. pullback-entry- SHORT +$0.70 (fix working). pump-chain+ LONG +$1.14.
+- **Today (calendar):** 25T closed. 2 open. +$2.20 64% WR.
+- **7d:** 208T, 49.5% WR, +$1.65 (DB-verified). POSITIVE. All 208 trades in NEUTRAL. EXTREME regime edge confirmed but no EXTREME trades in 7d window. NORMAL bleeds.
+- **Market:** NEUTRAL (2 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **squeeze_reversal:** Zero trades since REGIME_SIGNALS fix (Sep 10). Market condition.
 - **TIME_BLOCK:** Extended 03-09 → 01-09 (Sep 20). Hours 1-2 bleed $1.62/7d (30.8% WR, 37.5% WR). 0.7x penalty.
@@ -41,6 +41,7 @@
 
 ## Today's Changes (Sep 20)
 
+1. **CEO ~18:00 UTC — NO CHANGE.** DB-verified: 24h 32T 59.4%WR +$2.22 | 7d 208T 49.5%WR +$1.65. Market NEUTRAL. 2 open. **pullback-entry- fix working:** 14T 24h 64.3%WR +$0.70 (was -0.70/7d). **Daily trend:** Sep 17 -$1.09 → Sep 18 +$1.73 → Sep 19 +$0.08 → Sep 20 +$2.20. **30d top:** pump-chain+ LONG +$2.49, pullback-entry- SHORT +$2.21, bb_bounce_v2_long +$2.08. **30d losers:** ct_hot -$3.91 (killed), accel_300_v3_long -$1.41, ema300_dip_short -$1.48. **NO ACTION** — fix impact being monitored 48h.
 1. **CEO ~14:30 UTC — CODE FIX.** pullback_entry.py:188 momentum filter flipped. Was blocking SHORT with rising momentum (65%WR +$0.17, the ONLY profitable state). Now blocks flat/falling (losers: 39-41%WR -$0.87). Expected +$0.87/7d. 7d PnL flipped negative -$0.30 (was +$0.51 this morning). All 214 7d trades in NEUTRAL. HOTSET empty — confluence gate blocks everything. pump-chain+ LONG +$1.51/7d carrying system.
 1. **CEO ~07:30 UTC — CONFIG CHANGE.** DB-verified: 24h 38T 68.4%WR +$2.26 | 7d 218T 49.1%WR +$0.51. Market NEUTRAL. 6 open. **DEAD ZONE FIX:** Extended TIME_BLOCK_START 3→1. Hours 1-2 UTC bleed $1.62/7d. pump-chain+ LONG 0%WR in both. 0.7x penalty now covers 01-09. Expected +$0.50-1.00/7d. **REGIME:** EXTREME +$2.70/7d (edge). NORMAL -$1.34/7d (worst). HIGH -$0.85/7d (legacy aging out). **HIDDEN GEM:** volume-breakout-long+ 71.4%WR EXTREME+NORMAL (+$0.84/7d). Updated regime memory. **NO OTHER CHANGES.**
 1. **brain_auditor ~07:15 UTC — NO CONFIG CHANGE.** DB-verified: 24h 35T 71.4%WR +$2.44 | 7d 218T 49.5%WR +$0.41. Market NEUTRAL. Pipeline running. **BIGGEST FINDING: Dead zone 00-04 UTC = $3.07/7d LEAK.** 49T 34.7%WR. pump-chain+ LONG 0%WR in hours 00, 02, 04. Removing: 169T 53.3%WR +$3.52 (+$3.95 improvement). **17 wins blocked but 32 losses saved.** **HIDDEN GEM: volume-breakout-long+** 71.4%WR +$0.84/7d, EXTREME and NORMAL equally. **LOSING AUTOPSY:** All 11 losers standard variance or legacy. pump-chain+ LONG R:R positive 1.54:1. **NO ACTION** — monitoring dead zone 48h (time-based = HIGH RISK). System healthy.

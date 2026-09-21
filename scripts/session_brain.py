@@ -508,10 +508,20 @@ class VectorStore:
         import struct
         for chunk_id, emb in zip(chunk_ids, embeddings):
             vec_bytes = struct.pack(f'{len(emb)}f', *emb)
-            self.db.execute(
-                "INSERT OR REPLACE INTO vec_chunks (id, embedding) VALUES (?, ?)",
-                (chunk_id, vec_bytes)
-            )
+            # Delete first, then insert (vec0 doesn't support INSERT OR REPLACE)
+            self.db.execute("DELETE FROM vec_chunks WHERE id = ?", (chunk_id,))
+            try:
+                self.db.execute(
+                    "INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)",
+                    (chunk_id, vec_bytes)
+                )
+            except Exception as e:
+                # If still fails, force delete and retry
+                self.db.execute("DELETE FROM vec_chunks WHERE id = ?", (chunk_id,))
+                self.db.execute(
+                    "INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)",
+                    (chunk_id, vec_bytes)
+                )
         # BUG 1 fix: Don't commit here — let caller manage transactions
     
     def delete(self, chunk_ids: List[int]):
@@ -667,10 +677,9 @@ class SessionBrain:
             if old_chunk_ids:
                 self.vector_store.delete(old_chunk_ids)
             
-            # Create deterministic chunk IDs (BUG 3 fix: use hashlib instead of random hash)
-            import hashlib
-            chunk_ids = [int(hashlib.md5(f"{session_id}:{j}".encode()).hexdigest()[:8], 16)
-                         for j in range(len(chunks))]
+            # Get next available chunk ID (avoid collisions)
+            max_id = self.db.execute("SELECT COALESCE(MAX(id), 0) FROM chunks").fetchone()[0]
+            chunk_ids = list(range(max_id + 1, max_id + 1 + len(chunks)))
             self.vector_store.add(embeddings, chunk_ids)
             
             # Store created_at
@@ -691,13 +700,13 @@ class SessionBrain:
                  filepath.stat().st_mtime, time.time(), len(chunks), "indexed")
             )
             
-            # Delete old chunks for this session
+            # Delete old chunks BEFORE inserting new ones (prevents UNIQUE constraint)
             self.db.execute("DELETE FROM chunks WHERE session_id = ?", (session_id,))
             
             for j, chunk in enumerate(chunks):
                 topic = extract_topic(chunk["text"], title)
                 self.db.execute(
-                    "INSERT INTO chunks (id, session_id, chunk_index, text, topic, chunk_type, char_count, token_estimate) "
+                    "INSERT OR IGNORE INTO chunks (id, session_id, chunk_index, text, topic, chunk_type, char_count, token_estimate) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     (chunk_ids[j], session_id, j, chunk["text"], topic, chunk["type"],
                      len(chunk["text"]), len(chunk["text"]) // 4)

@@ -1,122 +1,130 @@
 {
-    "timestamp": "2026-09-20T10:50:00Z",
+    "timestamp": "2026-09-20T23:00:00Z",
     "session_brain_stats": {
-        "note": "Session brain loaded 5 search batches. Key themes: dead zone hours, momentum filter, regime adaptation, signal diversity."
+        "total_sessions_queried": 30,
+        "top_themes": ["signal performance winrate", "new signal ideas", "recurring loss patterns", "neutral regime diversity", "btc wave pattern"]
     },
     "trade_summary_24h": {
-        "total_closed": 33,
-        "winners": 23,
-        "losers": 10,
-        "pnl": 2.26,
-        "wr": 68.4,
-        "top_performer": "pump-chain+ LONG 18T 61.1%WR +$0.69",
-        "note": "Strong day. EXTREME regime edge carrying."
+        "total_trades": 29,
+        "pnl": 2.37,
+        "top_performers": ["pump-chain+ LONG 14T $1.35 57.1%WR", "pullback-entry- SHORT 12T $0.62 66.7%WR"],
+        "losers_24h": 0
     },
     "trade_summary_7d": {
-        "total_closed": 218,
-        "wr": 49.1,
-        "pnl": 0.51,
+        "total_trades": 205,
+        "pnl": 2.31,
         "by_regime": {
-            "EXTREME": "61T 57.4%WR +$2.70 (edge confirmed)",
-            "HIGH": "96T 46.9%WR -$1.02 (legacy killing — 14T from killed signals = -$1.18)",
-            "NORMAL": "59T 44.1%WR -$1.34 (worst regime)"
+            "EXTREME": "61T 57.4%WR +$3.09 (confirmed edge)",
+            "HIGH": "94T 47.9%WR +$0.06 (legacy bleed, self-healing by Sep 22-23)",
+            "NORMAL": "49T 44.9%WR -$0.86 (bleeding)",
+            "FLAT": "1T 100%WR +$0.02"
         },
-        "top_performers": [
-            "pump-chain+ LONG 42T 50%WR +$1.66",
-            "volume-breakout-long+ 14T 71.4%WR +$0.84",
-            "pullback-entry- SHORT 69T 49.3%WR -$0.21"
+        "top_7d_winners": ["pump-chain+ LONG 42T $2.45 50%WR", "volume-breakout-long+ 14T $0.84 71.4%WR", "pullback-entry- SHORT 67T $0.10 50.7%WR"],
+        "top_7d_losers": ["pullback-entry- SHORT 29T -$5.06 (pre-fix, fix deployed 14:30 UTC)", "pump-chain+ LONG 19T -$3.22", "pump-chain- SHORT 15T -$0.83"]
+    },
+    "losing_trade_autopsy": {
+        "methodology": "Analyzed all 7d losers by signal, regime, and hourly distribution. Cross-referenced with winners.",
+        "findings": [
+            {
+                "signal": "pullback-entry- SHORT",
+                "loss_amount": "-$5.06/7d (29 losers)",
+                "root_cause": "Momentum filter was backwards — blocked SHORT with rising momentum (65%WR, the ONLY profitable state) and allowed flat/falling (39-41%WR). Fix deployed 14:30 UTC Sep 20.",
+                "regime_breakdown": "NORMAL 16T -$0.44 (43.8%WR, worst), HIGH 35T +$0.20 (51.4%), EXTREME 16T +$0.34 (56.3%)",
+                "entry_check": "All losers were ATR_SL exits — standard stop loss hits, not entry quality issues. The momentum filter was letting in wrong-direction trades.",
+                "recommended_change": "Already fixed (CEO 14:30 UTC). Monitor 48h for impact.",
+                "impact_on_winners": "Fix BLOCKS flat/falling momentum SHORTs (losers) and ALLOWS rising momentum SHORTs (winners). Net positive.",
+                "confidence": "HIGH"
+            },
+            {
+                "signal": "pump-chain+ LONG",
+                "loss_amount": "-$3.22/7d (19 losers)",
+                "root_cause": "Standard variance at 50%WR. No single root cause — losses distributed across EXTREME (6T), HIGH (7T), NORMAL (6T). Biggest single loss: BABY -$0.32 (HIGH, 02:06 UTC).",
+                "entry_check": "All ATR_SL exits. pump-chain+ at 50%WR with 42T/7d is within expected range for a momentum signal.",
+                "recommended_change": "No action. This is the system's workhorse — 50%WR with PM_TRAIL capturing winners is acceptable. The 7d PnL is +$2.45.",
+                "confidence": "HIGH"
+            },
+            {
+                "signal": "pump-chain+ LONG dead zone",
+                "loss_amount": "-$1.80/7d in hours 00-04",
+                "root_cause": "pump-chain+ LONG fires in dead zone hours with 13.3% WR (15T). Hours 00, 02, 04 all 0%WR.",
+                "entry_check": "TIME_BLOCK penalty (0.7x) covers 01-09 but hour 00 is outside. Hour 00 has 3T 0%WR -$0.41.",
+                "recommended_change": "Expand TIME_BLOCK_START from 1 to 0. Would add hour 00 coverage. Conservative — penalty not hard block.",
+                "impact_on_winners": "Hour 00: volume-breakout-long+ 2T +$0.32 would be penalized (0.7x). Net: save -$0.41 from pump-chain+, lose ~$0.09 from volume-breakout. Net +$0.32/7d.",
+                "confidence": "MEDIUM — sample size 12T in hour 00 is small. Monitor 48h first.",
+                "timing": "NOT THIS RUN — TIME_BLOCK already extended today (03→01 at 07:30). Same-day double change = HIGH RISK."
+            }
         ]
     },
     "drift_findings": [
         {
-            "finding": "SHORT_RSI_FLOOR filter is DEAD CODE",
-            "severity": "HIGH",
-            "detail": "decider_run.py:985 does sig.get('rsi_14') but rsi_14 is nested inside signal_metadata JSON, not at top level. Always returns None. WLD SHORT at RSI=24.07 should have been blocked but wasn't.",
-            "impact": "Safety guardrail non-functional. However, data shows RSI<35 SHORTs are 46.2% WR (12W/14L) — net positive. Blindly enabling at 35 would HURT (-$0.92/7d). Fix: use live RSI + lower threshold to 30.",
-            "recommended_fix": "Change line 985 to use _ctx_gate_get_rsi(token) instead of sig.get('rsi_14'), and lower SHORT_RSI_FLOOR from 35 to 30."
+            "topic": "New NEUTRAL regime signal",
+            "status": "DISCUSSED BUT NOT IMPLEMENTED",
+            "evidence": "Session brain: 'new neutral regime signal', 'trend following', 'signal diversity'. Only 2 signal types pass confluence in NEUTRAL. 5+ needed.",
+            "impact": "HOTSET empty — confluence gate blocks everything. System trades via other paths but diversity is critical.",
+            "recommendation": "Build trend-following signal (spec exists at plans/2026-09-04_btc-wave-pattern-surfer.md). Priority: HIGH."
         },
         {
-            "finding": "SIGNAL_FILTER RSI check also dead code",
-            "severity": "MEDIUM",
-            "detail": "decider_run.py:966 does sig.get('rsi_14') for SIGNAL_FILTER_RSI_MIN/MAX. Same bug — always None. The SHORT_RSI_CEILING at line 1001 works because it uses _ctx_gate_get_rsi().",
-            "impact": "General RSI filter in SIGNAL_FILTER block never fires. Impact limited because SHORT_RSI_CEILING (live RSI) catches the worst overbought SHORTs.",
-            "recommended_fix": "Use _ctx_gate_get_rsi(token) for SIGNAL_FILTER RSI checks too."
+            "topic": "BTC wave pattern surfer",
+            "status": "SPEC EXISTS, NOT BUILT",
+            "evidence": "plans/2026-09-04_btc-wave-pattern-surfer.md — 'Catch the Repeatable Macro Move'. Created Sep 4, never implemented.",
+            "impact": "Missing a potentially high-edge signal that catches repeating BTC patterns.",
+            "recommendation": "Review spec and implement if still relevant. BTC patterns may have changed since Sep 4."
+        },
+        {
+            "topic": "volume-breakout-long+ frequency unlock",
+            "status": "IDENTIFIED BUT NOT ACTED ON",
+            "evidence": "71.4%WR +$0.84/7d. Works EXTREME+NORMAL equally. 14T/7d = ~2T/day. Could fire more.",
+            "impact": "Missing potential trades from a proven signal.",
+            "recommendation": "Investigate what limits frequency. Consider adding to STANDALONE_BYPASS_SIGNALS if confluence is the bottleneck."
         }
     ],
     "recurring_problems": [
         {
-            "topic": "Dead zone hours 00-04 UTC",
-            "sessions_discussed": "5+",
-            "status": "TIME_BLOCK extended to 01-09 (CEO Sep 20). Hour 0 still uncovered (3T only).",
-            "data": "pump-chain+ LONG hours 0/2/4 = 0%WR -$1.74/7d. Hour 0 only 3T — insufficient for action.",
-            "recommendation": "Monitor 48h. If hour 0 confirms bleed, extend TIME_BLOCK_START to 0."
+            "problem": "Signal diversity in NEUTRAL regime",
+            "frequency": "Discussed in 5+ sessions",
+            "current_state": "Only pump-chain+ and pullback-entry- pass confluence. HOTSET empty.",
+            "impact": "System depends on 2 signals. If either has a cold streak, PnL collapses."
         },
         {
-            "topic": "NORMAL regime bleeding",
-            "sessions_discussed": "7+",
-            "status": "Ongoing. 59T 44.1%WR -$1.34/7d.",
-            "data": "Worst active contributors: pullback-entry- NORMAL (-$0.30), pump-chain+ NORMAL (-$0.06 marginal).",
-            "recommendation": "No action — NORMAL is inherently lower edge. EXTREME is the system's edge."
+            "problem": "Dead zone bleed hours 00-04",
+            "frequency": "Flagged in 3+ sessions, TIME_BLOCK extended today",
+            "current_state": "TIME_BLOCK covers 01-09. Hour 00 still bleeds -$0.80/7d.",
+            "impact": "Lost $3.12/7d in hours 00-04. TIME_BLOCK catches ~60% of it."
         },
         {
-            "topic": "Signal diversity for NEUTRAL",
-            "sessions_discussed": "4+",
-            "status": "STILL OPEN. Only pump-chain+ LONG passes confluence reliably.",
-            "data": "volume-breakout-long+ works (71.4%WR) but low frequency (14T/7d).",
-            "recommendation": "DEVELOP new NEUTRAL-specialist signal (long-term)."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "Momentum state filter for pullback-entry- SHORT",
-            "priority": "MEDIUM",
-            "data": "rising=22T 63.6%WR +$0.38, not_rising=47T 42.6%WR -$0.59. Net improvement: +$0.97/7d.",
-            "concern": "Sample=22 rising trades. 7d data may be regime-dependent. Need 2+ weeks monitoring.",
-            "recommendation": "Monitor 2 weeks. If edge holds, implement as filter."
-        },
-        {
-            "item": "RSI metadata not used in context gate",
-            "priority": "HIGH",
-            "data": "signal_metadata contains rsi_14 but context gate reads sig.get('rsi_14') which is always None.",
-            "recommendation": "Fix SHORT_RSI_FLOOR to use live RSI (see drift_findings)."
+            "problem": "HIGH regime legacy bleed",
+            "frequency": "Flagged since Sep 17",
+            "current_state": "94T 47.9%WR +$0.06. Mostly killed signals (open-skies+, rr-struct-v2+, breakout-long+).",
+            "impact": "Will self-heal by Sep 22-23 as legacy trades age out. No action needed."
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-20T10:50:00Z",
-            "idea": "pullback-entry- SHORT momentum_state filter — only allow SHORT when momentum_state='rising'",
-            "rationale": "7d data shows clear edge: rising momentum SHORTs 63.6%WR +$0.38 vs flat/falling 42.6%WR -$0.59. Rising momentum means price is trending down strongly — ideal for SHORT entries. Flat/falling = chop or reversal risk.",
-            "expected_impact": "+$0.97/7d (blocks 47 trades saving $0.59, keeps 22 winning trades earning $0.38)",
+            "date": "2026-09-20T23:00:00Z",
+            "idea": "Add volume-breakout-long+ to STANDALONE_BYPASS_SIGNALS",
+            "rationale": "71.4%WR +$0.84/7d. Currently requires 2+ signal types to pass confluence. In NEUTRAL, only pump-chain+ and pullback-entry- fire — volume-breakout-long+ rarely gets a partner. Adding to standalone bypass lets it fire solo when conditions are right. Works EXTREME+NORMAL equally.",
+            "expected_impact": "+$0.30-0.50/7d from additional volume-breakout-long+ trades that currently get blocked by confluence gate",
             "category": "entry sniper",
-            "status": "monitoring — need 2+ weeks data before implementation",
-            "risk": "low",
-            "would_block_winners": "0 of 22 rising-momentum winners would be blocked"
+            "status": "suggested",
+            "risk": "low — signal already proven 71.4%WR, standalone bypass only relaxes confluence requirement, all other filters (blacklist, regime, RSI, staleness) still apply",
+            "impact_on_winners": "Would not block any existing winners — only enables new trades"
         },
         {
-            "date": "2026-09-20T10:50:00Z",
-            "idea": "Leverage the volume-breakout-long+ edge — it's the system's best WR signal (71.4%) but underutilized",
-            "rationale": "14T/7d at 71.4%WR +$0.84. Works in EXTREME and NORMAL equally. Only fires on volume spikes. Could increase frequency by slightly relaxing volume threshold.",
-            "expected_impact": "+$0.30-0.50/7d if frequency doubles (28T at 65%WR conservatively)",
-            "category": "frequency unlock",
-            "status": "needs investigation — what volume threshold would double frequency without killing WR?",
-            "risk": "medium — volume threshold changes could introduce noise"
+            "date": "2026-09-20T23:00:00Z",
+            "idea": "Implement BTC wave pattern surfer signal from existing spec",
+            "rationale": "Session brain discusses BTC repeating patterns 3+ times. Spec exists at plans/2026-09-04_btc-wave-pattern-surfer.md since Sep 4. Never built. Addresses NEUTRAL diversity gap (our #1 recurring problem).",
+            "expected_impact": "New signal type for NEUTRAL — addresses the diversity bottleneck directly",
+            "category": "new signal",
+            "status": "suggested — spec review needed (created Sep 4, patterns may have evolved)",
+            "risk": "medium — new signal needs backtest before deployment"
         }
     ],
-    "config_changes_applied": [
-        {
-            "change": "SHORT_RSI_FLOOR: 35 → 30, fix dead code to use live RSI",
-            "file": "hermes_constants.py + decider_run.py",
-            "before": "SHORT_RSI_FLOOR = 35 (dead code — sig.get('rsi_14') always None)",
-            "after": "SHORT_RSI_FLOOR = 30 + _ctx_gate_get_rsi(token) in decider_run.py",
-            "rationale": "RSI<30 SHORTs: 16T 37.5%WR -$0.75/7d. RSI 30-35: 10T 50%WR -$0.09/7d (marginal). Floor at 30 blocks worst performers while preserving marginal winners. Using live RSI fixes the dead code bug.",
-            "impact": "Expected +$0.66/7d (save $0.75 from RSI<30 losers, lose $0.09 from RSI 30-35 trades)"
-        }
-    ],
+    "config_changes_applied": [],
     "next_actions": [
-        "MONITOR: Dead zone hour 0 UTC — 3T sample, extend TIME_BLOCK_START to 0 if confirmed",
-        "MONITOR: pullback-entry- SHORT momentum_state filter — 2 week trial before implementation",
-        "MONITOR: volume-breakout-long+ frequency — investigate volume threshold relaxation",
-        "DEVELOP: NEUTRAL-specialist signal for diversity (long-term)",
-        "HIGH REGIME: Will self-heal as killed signals age out by Sep 22-23"
+        "MONITOR: pullback-entry- momentum fix impact (deployed 14:30 UTC, needs 48h evaluation)",
+        "MONITOR: Dead zone hours 00-04 bleed. Consider TIME_BLOCK_START 1→0 if pattern persists after 48h.",
+        "BUILD: Review BTC wave pattern surfer spec (plans/2026-09-04_btc-wave-pattern-surfer.md) for NEUTRAL diversity",
+        "INVESTIGATE: volume-breakout-long+ standalone bypass eligibility (71.4%WR, confluence bottleneck)",
+        "MONITOR: HIGH regime legacy bleed self-healing (should resolve by Sep 22-23)"
     ]
 }

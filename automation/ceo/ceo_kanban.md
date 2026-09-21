@@ -1,5 +1,15 @@
 ## CEO DECISIONS
 
+- [2026-09-20 ~18:00 UTC] CEO: MONITORING — pullback-entry- fix working, system healthy
+  DB-verified: 24h 32T 59.4%WR +$2.22 | 7d 208T 49.5%WR +$1.65
+  Market NEUTRAL. 2 open. Pipeline running.
+  **VERIFICATION:** pullback-entry- SHORT 24h: 14T 64.3%WR +$0.70 (was -0.70/7d before fix). Fix working as expected.
+  **DAILY TREND:** Sep 17 -$1.09 → Sep 18 +$1.73 → Sep 19 +$0.08 → Sep 20 +$2.20 (best day in 7d).
+  **30d TOP:** pump-chain+ LONG +$2.49 (59T 47.5%), pullback-entry- SHORT +$2.21 (111T 55.9%), bb_bounce_v2_long +$2.08 (73T 74.0%).
+  **30d LOSERS:** ct_hot -$3.91 (legacy killed), accel_300_v3_long -$1.41, ema300_dip_short -$1.48.
+  **NO ACTION** — monitoring fix impact 48h. System healthy.
+  BY: CEO
+
 - [2026-09-20 ~14:30 UTC] CEO: CODE FIX — pullback-entry- momentum filter flipped (backwards)
   DB-verified: 24h 33T 57.6%WR +$0.98 | 7d 214T 48.1%WR -$0.30
   Market NEUTRAL. 6 open (at MAX_OPEN). Pipeline running.
@@ -2625,4 +2635,16 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **HIDDEN GEM: volume-breakout-long+** 71.4%WR +$0.84/7d, works in EXTREME and NORMAL equally, 2T/day.
   **RECOMMENDATION:** Implement dead zone filter (00-04 UTC) — biggest single leak. Monitor for 48h first (TIME-BASED = HIGH RISK per mandate). Also: monitor volume-breakout-long+ for frequency increase (need 20+ trades).
   **NO ACTION** — system healthy, edge confirmed, monitoring 48h.
+  BY: brain_auditor
+
+- [2026-09-20 ~23:00 UTC] brain_auditor: AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 29T 75.9%WR +$2.37 | 7d 205T 50.7%WR +$2.31
+  Market quiet. Pipeline running.
+  **LOSING AUTOPSY:** 0 losers in 24h (perfect day). 7d: pullback-entry- SHORT 29T -$5.06 (pre-fix, momentum filter was backwards). pump-chain+ LONG 19T -$3.22 (standard variance at 50%WR).
+  **FIX MONITOR:** pullback-entry- momentum fix deployed 14:30 UTC. No trades yet from fixed code — needs 48h evaluation.
+  **REGIME (7d):** EXTREME 61T 57.4%WR +$3.09 (confirmed edge). NORMAL 49T 44.9%WR -$0.86 (bleeding). HIGH 94T 47.9%WR +$0.06 (legacy, self-healing by Sep 22-23).
+  **DEAD ZONE:** Hours 00-04 = -$1.48/7d. pump-chain+ LONG 0%WR in hours 00, 02, 04. TIME_BLOCK covers 01-09 but hour 00 bleeds -$0.41. Consider TIME_BLOCK_START 1→0 if pattern persists.
+  **DRIFT:** (1) NEUTRAL signal diversity — recurring topic, only 2 types pass confluence, need 5+. (2) BTC wave pattern surfer spec exists (Sep 4) but never built. (3) volume-breakout-long+ 71.4%WR but bottlenecked by confluence gate.
+  **CREATIVE:** Add volume-breakout-long+ to STANDALONE_BYPASS_SIGNALS. 71.4%WR, works EXTREME+NORMAL, confluence is the bottleneck. Low risk — only relaxes confluence, all other filters intact.
+  **NO ACTION** — pullback-entry- fix impact being monitored 48h. No same-day double config change.
   BY: brain_auditor

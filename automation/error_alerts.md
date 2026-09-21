@@ -1,3 +1,7 @@
+## Error Alerts — 2026-09-20 17:46 UTC
+- **[WARN]** (1x): `signal_compactor FAILED in 1.3s (rc=1)` at 17:35 — transient, recovered next cycle (17:43)
+- **[WARN]**: Disk at 85% — working set size, no old logs to compress. Monitor.
+
 ## Error Alerts — 2026-09-19 08:45 UTC
 - **[WARN]** (1x): `breakout_engine timed out (killed after 60s)` at 08:35 — recovered on next cycle
 - **[WARN]** (1x): `signal_compactor timed out (killed after 60s)` at 08:42 — recovered on next cycle
@@ -166,3 +170,22 @@
 ## Error Alerts — 2026-09-20 15:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-20 17:57 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.3s):`
+
+## Error Alerts — 2026-09-20 18:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Health Report — 2026-09-20 21:44 UTC
+- **STATUS**: OK — Pipeline running, services active, no errors
+- **PIPELINE**: Cycle #208599, 76 signals/hr, 0 open trades, 26 closed today (+$2.34)
+- **DISK**: 84% used (94G/118G) — 1G below warning threshold, monitor closely
+- **MARKET**: NEUTRAL regime, 3 long/5 short bias, 112 neutral tokens
+- **AUTO-FIXES**: None needed
+- **STALE SIGNAL**: BTC LONG 6.5min old (conditions verified at execution — no action needed)
+
+## Error Alerts — 2026-09-20 21:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,MOMENTUM | vol=N.7x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`

@@ -1,69 +1,40 @@
-# Signal Performance Report
-**Generated:** 2026-09-20 19:15 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-09-20 21:00 UTC | 6h + 24h window
 
-## Overall Stats
-- **Total trades (all time):** 5,198 | **WR:** 45.7% | **PnL:** -$8.55
+KILLED (executed):
+None — no kill candidates in 24h window.
 
----
+BOOST CANDIDATES:
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 57.1% | $1.35 | 14 | Consider compactor weight 1.0→1.2 |
+| pullback-entry- | SHORT | 72.7% | $0.62 | 11 | Consider compactor weight 1.0→1.2 |
 
-## WINNERS (WR > 55%, PnL > 0)
+LOSERS (watch list — 7d, already killed):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| rr-struct-v2+ | LONG | 40.0% | -$0.45 | 10 | KILLED 2026-09-15 (RR_STRUCTURAL_V2_LONG_ENABLED=False) |
+| open-skies+ | LONG | 20.0% | -$0.42 | 5 | RE-ENABLED 2026-09-20 CEO 48h test — no trades yet |
+| grind-trend- | SHORT | 20.0% | -$0.38 | 5 | KILLED 2026-09-19 (GRIND_TREND_MINUS_ENABLED=False) |
+| breakout-long+ | LONG | 25.0% | -$0.35 | 4 | KILLED 2026-09-17 (BREAKOUT_LONG_PLUS_ENABLED=False) |
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| pump-chain+ | LONG | 3 | 66.7% | +0.01 | 18 | 61.1% | +0.69 | ENABLED |
-| pullback-entry- | SHORT | 2 | 50.0% | -0.05 | 9 | 66.7% | +0.38 | ENABLED |
-| grind-trend+ | LONG | 0 | — | — | 3 | 100.0% | +0.42 | ENABLED |
+WINNERS (24h):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 57.1% | $1.35 | 14 | Active, primary earner |
+| pullback-entry- | SHORT | 72.7% | $0.62 | 11 | Active, high WR |
+| doji-bottom-long | LONG | 100% | $0.30 | 1 | Active, low sample |
+| volume-breakout-long+ | LONG | 100% | $0.08 | 1 | Active, low sample |
+| continuum- | SHORT | 100% | $0.02 | 1 | Active, low sample |
 
----
+REGIME GATING (already in place):
+- Grind_Trend NORMAL: 0.0x (blocked)
+- R2_Structural NORMAL: 0.2x (penalized)
+- R2_Structural HIGH: 0.0x (blocked)
+- Breakout HIGH: 0.0x (blocked)
+- Volume_Breakout HIGH: 0.0x (blocked)
 
-## LOSERS (WR < 30%, PnL < -$0.10)
-
-None found.
-
----
-
-## MARGINAL (30-50% WR, negative PnL)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Regime | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| grind-trend- | SHORT | 3 | 33.3% | -0.20 | HIGH: 33.3% (3T), NORMAL: 0% (2T) | Gated NORMAL. Losing HIGH too — only 1 day of data. Watchlist. |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-None found.
-
----
-
-## KILLED (executed this period)
-
-None. No signals met kill criteria (WR<30% with 5+ trades, PnL<-$0.10, active>24h).
-
----
-
-## BOOSTED (executed this period)
-
-None. No signals met boost criteria (WR>55% with 5+ trades, PnL>$0.05, consistent across tokens).
-
----
-
-## ACTIONS TAKEN
-
-- **No kills.** grind-trend- SHORT (33.3% WR, -$0.20) only has 3 trades — below 5-trade kill threshold. Already gated in NORMAL regime via volatility_gate_v2.py. Losing in HIGH too but too few trades for blanket kill.
-- **No boosts.** pump-chain+ LONG is the standout (18T, 61.1%, +$0.69) but already performing well — no config changes needed.
-- **No inversions.** Clean.
-
----
-
-## WATCHLIST
-
-| Signal | Dir | Trend | Action if degrades |
-|--------|-----|-------|--------------------|
-| grind-trend- | SHORT | 33.3% WR, -$0.20 (24h). Only 1 day of data (9/19). Already gated NORMAL. | Add HIGH gate if 5+ trades with <40% WR |
+ISSUES:
+- open-skies+ re-enabled for CEO 48h test (2026-09-20) — monitor closely, historical 20% WR
+- No signal inversions found
+- Low trade count in 24h (28 closed) — pipeline may be slower than usual
