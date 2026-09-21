@@ -154,6 +154,8 @@ SHORT_BLACKLIST = {
     'GRAM', 'ASTER',
     # 2026-09-10: ICP — persistent SHORT losses, all entries at local peaks
     'ICP',
+    # 2026-09-21: NOT — 30d WR=30.8% LONG, -$1.10 total PnL, 18 trades, 2 wins last 10
+    'NOT',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -189,6 +191,8 @@ LONG_BLACKLIST = {
     'AERO', 'CHILLGUY', 'LIT', 'ANIME',  # LONG streaks
     # Batch 3/4/5 INSUFFICIENT — removed 2026-08-12
     # 'ADA', '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    # NOT re-blacklisted 2026-09-21 — 30d WR=27.3% LONG, -$0.91 PnL, bypassed Hall of Shame (not in leaderboard)
+    'NOT',
     # 'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
     # 'GRASS', 'HPOS', 'ONDO',
     # 'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
