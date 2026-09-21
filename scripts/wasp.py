@@ -505,23 +505,19 @@ def check_regime():
     if recent_regime and recent_regime[0]["cnt"] == 0:
         bug("INFO", "regime", "regime_log table has no entries (scanner may not be writing to it)")
 
-    # Check momentum_cache freshness
-    mom = sqlite(RUNTIME_DB,
-        "SELECT COUNT(*) as cnt, MAX(updated_at) as last_update FROM momentum_cache")
-    if mom and mom[0]["cnt"] > 0:
+    # Check momentum_cache freshness (from PostgreSQL — 15m_regime_scanner writes here)
+    mom = psql("SELECT COUNT(*) as cnt, MAX(updated_at) as last_update FROM momentum_cache")
+    if mom and mom[0][0] > 0:
         try:
-            last_update = mom[0]["last_update"]
-            # updated_at may be stored as Unix timestamp (int-as-text) or ISO datetime string
-            if last_update and str(last_update).isdigit() and len(str(last_update)) >= 10:
-                # Unix timestamp — convert to age in hours
-                age_h = (time.time() - float(last_update)) / 3600
+            last_update = mom[0][1]
+            if last_update:
+                age_h = (time.time() - last_update.timestamp()) / 3600
             else:
-                # ISO datetime string
-                age_h = (time.time() - datetime.fromisoformat(last_update).timestamp()) / 3600
+                age_h = 999
         except:
             age_h = 999
         if age_h > 2:
-            bug("WARNING", "momentum", f"Momentum cache stale: {mom[0]['cnt']} entries, last update {age_h:.1f}h ago")
+            bug("WARNING", "momentum", f"Momentum cache stale: {mom[0][0]} entries, last update {age_h:.1f}h ago")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 9. PIPELINE / CRON HEALTH
