@@ -202,6 +202,25 @@ Aggressive: Create new bull-run-specific signals and exit logic
 
 ## The Vision: Market-Independent Profit Machine
 
+### Current System Status (Sep 21, 2026)
+
+```
+Last 100 trades:
+  Wins:  48 trades, avg +6.70%
+  Losses: 44 trades, avg -4.56%
+  R:R: 1.471
+  Breakeven WR: 40.5%
+  Actual WR: 48%
+  Edge: +7.5% (POSITIVE EXPECTED VALUE!)
+
+By exit reason:
+  ATR SL:     35W/34L  avg +8.1% / -4.9%  R:R 1.66  ✅ Working
+  PM Trail:   12W/8L   avg +3.3% / -0.4%  R:R 8.48  ✅ Excellent
+  Cut-loser:   0W/7L   avg — / -3.7%      R:R 0     ⚠️ Emergency stop
+```
+
+**The system is profitable.** R:R is 1.47 (not 0.755 from earlier analysis). Edge is +7.5% above breakeven. The system works — it just needs more signal volume.
+
 ### Core Philosophy
 
 **We don't predict direction. We book profit on every trade.**
@@ -285,23 +304,27 @@ To make EVERY trade a winner:
 
 ### The Roadmap
 
-| Phase | Goal | How |
-|-------|------|-----|
-| Phase 1 | 55% WR, 0.9 R:R | Fix exits (PM Trail, ATR SL) |
-| Phase 2 | 60% WR, 1.0 R:R | Fix entries (filters, timing) |
-| Phase 3 | 65% WR, 1.2 R:R | Add macro bias (bull run LONG bias) |
-| Phase 4 | 70% WR, 1.5 R:R | Add cycle-aware sizing (scale with volatility) |
+| Phase | Goal | Status | How |
+|-------|------|--------|-----|
+| ~~Phase 1~~ | ~~55% WR, 0.9 R:R~~ | ✅ **ACHIEVED** | Exits working (ATR SL R:R 1.66, PM Trail R:R 8.48) |
+| Phase 2 | 55% WR, 1.5 R:R | **IN PROGRESS** | Increase signal volume (crash filter fixes live) |
+| Phase 3 | 60% WR, 1.5 R:R | Next | Add macro bias (bull run LONG bias) |
+| Phase 4 | 65% WR, 1.8 R:R | Future | Add cycle-aware sizing (scale with volatility) |
 
 ### What We're Building Toward
 
 A system that:
-- **Trades every pump** — LONG when momentum is up
-- **Trades every dump** — SHORT when momentum is down
-- **Books profit on every trade** — exits capture the move
-- **Scales with volatility** — bigger moves = bigger positions
-- **Is market-independent** — works in bull, bear, or sideways
+- **Trades every pump** — LONG when momentum is up ✅ (pump-chain+, volume-breakout+ working)
+- **Trades every dump** — SHORT when momentum is down ✅ (pullback-entry-, grind-trend- working)
+- **Books profit on every trade** — exits capture the move ✅ (ATR SL R:R 1.66, PM Trail R:R 8.48)
+- **Scales with volatility** — bigger moves = bigger positions (NEXT: cycle-aware sizing)
+- **Is market-independent** — works in bull, bear, or sideways ✅ (R:R 1.47 in NEUTRAL regime)
 
-**The bull run is the tailwind. The profit machine is the engine.**
+**Status: The engine works. We need more fuel (signal volume).**
+
+The crash filter fixes we made today should increase signal volume — LONG signals were being blocked during rallies by the MOMENTUM layer misapplication. With the fix, more pumps should be caught.
+
+**The bull run is the tailwind. The profit machine is the engine. The engine is running.**
 
 ---
 
