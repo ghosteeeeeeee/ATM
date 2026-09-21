@@ -1,3 +1,10 @@
+[2026-09-21 16:30 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 26T 46.2%WR +$1.51 | 7d: 193T 49.2%WR +$2.65. 1 open trade (INJ, heading to SL).
+  ATR SL 18/26 (69%) avg +$0.088 — trail working. profit-monster-trail 4T avg +$0.033.
+  No kill candidates (0 trades last hour). doji-bottom-long worst 24h (3T 33%WR -$0.34) but 7d positive.
+  FINDING: pullback-entry- SHORT hour 20: 6T 0%WR -$1.03/7d. Needs TIME_BLOCK or signal-specific filter.
+  BY: auto_1hr
+
 [2026-09-20 21:57 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 33T 63%WR +$2.24. 4 open trades all fresh (<203min). 1 trade closed last hour (ACE +$0.06).
   ATR SL 32/33 (97%) avg +$0.067 — trail working, all exits profitable. All signals net positive.

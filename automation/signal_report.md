@@ -1,56 +1,76 @@
 # Signal Performance Report
-**Generated:** 2026-09-21 16:00 UTC | **Period:** Last 6h + 24h + 7d
+**Generated:** 2026-09-21 17:09 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **24h:** 26 trades | 46.2% WR | +$1.81
-- **7d:** 197 trades | 50.3% WR | +$3.19
-- **No inversions found.**
+- **Total trades (all time):** 5,231
+- **Date range:** 2026-05-20 → 2026-09-21
+- **7d closed trades:** 193
 
 ---
 
-## KILLED (executed this cycle)
+## 6h Performance (1+ trades)
 
-None.
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| mover+ | LONG | 1 | 100.0% | +$0.13 |
+| pump-chain+ | LONG | 3 | 33.3% | -$0.07 |
+| doji-bottom-long | LONG | 2 | 50.0% | -$0.19 |
 
----
+## 24h Performance (2+ trades)
 
-## BOOSTED (executed this cycle)
-
-None — no signal meets >55% WR with 5+ trades in 24h.
-
----
-
-## WINNERS (24h)
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| pump-chain+ | LONG | 12 | 50.0% | +$1.09 | OK |
-| volume-breakout-long+ | LONG | 2 | 50.0% | +$0.57 | Needs data |
-| pullback-entry- | SHORT | 6 | 50.0% | +$0.15 | OK |
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain+ | LONG | 14 | 50.0% | +$1.17 |
+| volume-breakout-long+ | LONG | 2 | 50.0% | +$0.57 |
+| doji-bottom-long | LONG | 3 | 33.3% | -$0.34 |
 
 ---
 
-## WATCH LIST (7d losers, <5 trades in 24h)
+## KILLED (executed): None
 
-| Signal | Dir | 7d Trades | 7d WR | 7d PnL | Regime | Action |
-|--------|-----|-----------|-------|--------|--------|--------|
-| open-skies+ | LONG | 5 | 20.0% | -$0.42 | HIGH: 0% WR (3T) | Watch — re-enabled Sep 20 for 48h test. Losing in HIGH regime. |
-| grind-trend- | SHORT | 5 | 20.0% | -$0.38 | HIGH: 33% (3T), NORMAL: 0% (2T) | Dead. Already killed Sep 19. |
-| rr-struct-v2+ | LONG | 9 | 44.4% | -$0.38 | HIGH: 33% (3T), NORMAL: 50% (6T) | Borderline — losing in HIGH regime only |
+No signal meets kill criteria (WR <30% with 5+ trades, net PnL < -$0.10 over 24h, active >24h).
+
+---
+
+## BOOSTED (executed): None
+
+No signal meets all boost criteria (WR >55% with 5+ trades, consistent across tokens). pump-chain+ is the closest at 50% WR / 14 trades — borderline, needs WR bump.
+
+---
+
+## LOSERS (watch list)
+
+| Signal | Dir | Trades | WR | PnL | Status | Notes |
+|--------|-----|--------|-----|-----|--------|-------|
+| doji-bottom-long | LONG | 3 | 33.3% | -$0.34 | WATCH | Lifetime: 66.7% WR (6 trades, +$0.40). 24h noise — too few trades to kill. NORMAL regime is 0% WR (1 trade). |
+| pullback-entry- | SHORT | 1 | 0% | -$0.17 | NO ACTION | Lifetime: 55.4% WR (112 trades, +$2.04). 1 trade = noise. |
+| bb-bounce-v3-long+ | LONG | 1 | 0% | -$0.02 | NO ACTION | Brand new signal (first seen today). No data. |
+| r2-trend-short3 | SHORT | 1 | 0% | -$0.02 | NO ACTION | 4 lifetime trades. Minimal activity. |
+
+---
+
+## WINNERS
+
+| Signal | Dir | Trades | WR | PnL | Status | Notes |
+|--------|-----|--------|-----|-----|--------|-------|
+| pump-chain+ | LONG | 14 | 50.0% | +$1.17 | ACTIVE | Spread across 12 tokens. Winners: ADA (+0.52), JUP (+0.47), CASHCAT (+0.43), ETC (+0.30), AIXBT (+0.09), ACE (+0.06). Losers: HEMI (-0.28), CAKE (-0.18), ALGO (-0.15). |
+| volume-breakout-long+ | LONG | 2 | 50.0% | +$0.57 | ACTIVE | FIL (+0.74), HYPER (-0.17). Too few trades to call. |
+| mover+ | LONG | 1 | 100% | +$0.13 | ACTIVE | 1 trade. No verdict yet. |
+| accel-300-breakout,rs-r64,rs-r66 | SHORT | 1 | 100% | +$0.17 | ACTIVE | 1 trade. Combo signal, no verdict. |
+| continuum- | SHORT | 1 | 100% | +$0.02 | ACTIVE | 1 trade. No verdict. |
 
 ---
 
 ## SIGNAL INVERSIONS (24h)
 
-None found.
+**None found.** All signals respect their direction labels.
 
 ---
 
-## RECOMMENDATIONS
+## ISSUES
 
-1. **open-skies+ LONG** — 48h test was re-enabled Sep 20. Current 7d: 20% WR, -$0.42. Losing entirely in HIGH regime. If no improvement by next report, kill.
-2. **rr-struct-v2+ LONG** — 44% WR, -$0.38 over 9T. NORMAL regime is 50% WR (break-even). HIGH regime drags it negative. Consider regime gate for HIGH only.
-3. **grind-trend- SHORT** — already killed Sep 19. Verify flag is False in constants.
+- **doji-bottom-long NORMAL regime:** 0% WR (1 trade) vs 50% WR in HIGH (2 trades). Too few trades for regime-based blocking. Monitor next cycle — if NORMAL continues losing, add regime gate.
+- **pump-chain+ spread:** Performing well across tokens but some losers (HEMI, CAKE, ALGO). These are coin-specific, not signal-level — no action needed unless a token consistently loses.
 
 ---
 
@@ -58,18 +78,18 @@ None found.
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-09-21 | b43981d | Daily trading system update (2026-09-21) |
-| 2026-09-20 | b863b7f | Re-enable open-skies for 48h testing (CEO request) |
-| 2026-09-20 | b3b4c7d | brain_auditor: fix SHORT_RSI_FLOOR dead code bug + lower thr... |
-| 2026-09-20 | 3d7033f | CEO: Extend TIME_BLOCK 01-09, update regime memory |
-| 2026-09-20 | 5c484ec | Daily trading system update (2026-09-20) |
-| 2026-09-20 | dc9ee49 | Bug fixes: continuum override (from bug hunter audit) |
-| 2026-09-20 | efbb59a | Constants: add return_exhaustion-short to STANDALONE_BYPASS ... |
-| 2026-09-20 | f0315cf | Config: lower R:R hard block threshold from 1.0 to 0.95 |
-| 2026-09-19 | 58b5012 | signals: kill grind-trend- SHORT — 20% WR, -$0.38 |
-| 2026-09-19 | 5fb4929 | brain_auditor: CHASE composite filter deployed (z>2.5 OR gap... |
+| 2026-09-21 | 8f7d401 | config: squeeze_breakout cooldown 4h → 20min |
+| 2026-09-21 | 4f77803 | fix: squeeze_breakout — move all magic numbers to hermes_constants |
+| 2026-09-21 | 1ec8df2 | feat: squeeze_breakout signal — consolidation breakout catcher |
+| 2026-09-21 | 874094c | Oscillator Matrix: shadow mode implementation |
+| 2026-09-21 | 8b63f41 | Fix: BTC_LEVEL constants — remove dead code, add tunable params |
+| 2026-09-21 | ac16c94 | brain_auditor: UNIVERSAL_MAX_HOLD_MINUTES=480 safety net |
+| 2026-09-21 | ba0c034 | config: CONF_FILTER_MAX 89→92 (conservative) |
+| 2026-09-21 | 8c09684 | fix: ride_it_exit no-op replace + pump_exit datetime bug |
+| 2026-09-21 | ba7a244 | config: raise CONF_FILTER_MAX from 89 to 96 |
+| 2026-09-21 | 039a3fe | config: add continuum-osc and volume-breakout to PM Trail by default |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
 
 ---
-*Report auto-generated by signal_reporter. Next report: ~6h.*
+*Report generated 2026-09-21 17:09 UTC. Next report: ~6h.*

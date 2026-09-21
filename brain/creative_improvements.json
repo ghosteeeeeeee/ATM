@@ -1469,5 +1469,25 @@
     "category": "regime edge",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-21T19:00:00Z",
+    "agent": "brain_auditor",
+    "idea": "volume-breakout-long+ frequency audit — investigate confluence gate bottleneck",
+    "rationale": "Best WR signal (68.8%) but only 16T/7d. Session flagged vol-gate blocking in EXTREME, but DB shows 8T/7d in EXTREME (75%WR) — vol gate IS letting it through. Real bottleneck likely confluence gate requiring 2+ signal types. Audit blocked detections.",
+    "expected_impact": "+$0.50-1.00/7d if frequency doubled without WR loss",
+    "category": "signal frequency",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-21T19:00:00Z",
+    "agent": "brain_auditor",
+    "idea": "pump-chain+ dead money exit timing review",
+    "rationale": "2 pump-chain+ trades exited via dead_money (AZTEC 123min, HEMI 272min). Dead money exit works but AZTEC held 2h before exit. If dead money threshold was 60min instead of ~90-120min, would have saved ~$0.05 per trade. Small edge but compounds.",
+    "expected_impact": "+$0.10-0.20/7d if dead money exits 15-30min faster",
+    "category": "exit optimization",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

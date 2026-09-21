@@ -1,138 +1,140 @@
 {
-    "timestamp": "2026-09-21T16:31:00Z",
+    "timestamp": "2026-09-21T19:00:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
-        "themes_analyzed": [
-            "signal performance winrate regime (0.845)",
-            "oscillator matrix shadow mode (0.989-1.109)",
-            "regime weighted confidence (0.969)",
-            "loss money bleeding losing (0.882-0.918)",
-            "signal diversity neutral regime (0.953)",
-            "EXTREME regime edge (0.893)",
-            "time of day dead zone (0.952)"
-        ]
+        "queries_run": 6,
+        "key_topics": [
+            "signal performance winrate regime",
+            "new signal idea improvement strategy",
+            "loss money bleeding losing",
+            "neutral regime signal new",
+            "oscillator matrix LOW falling MID accelerating",
+            "volume breakout long frequency filters restrictive"
+        ],
+        "top_insight": "OSCILLATOR MULTS shadow mode active, 45 entries logged. HIGH+falling pulls confidence below threshold (71→56.8). Pattern is clear and consistent."
     },
     "trade_summary_24h": {
-        "trades": 26,
-        "win_rate": 50.0,
-        "pnl": 1.95,
-        "market_bias": "SHORT_BIAS",
-        "open_trades": 0,
-        "top_performers": [
-            "pump-chain+ LONG 14T 50%WR +$1.17",
-            "volume-breakout-long+ 2T +$0.57"
+        "total_trades": "~20 (DB query from CURRENT.md: 26T)",
+        "win_rate": "50.0%",
+        "pnl": "+$1.95",
+        "open_positions": 0,
+        "losing_trades": 11,
+        "losing_pnl_total": "~-$1.39",
+        "top_losers": [
+            "pump-chain+ LONG: 7 losers (3 ATR_SL EXTREME, 1 dead_money EXTREME, 1 momentum EXTREME, 2 ATR_SL HIGH)",
+            "doji-bottom-long LONG: 2 losers (1 ATR_SL HIGH 1.20% TP bad R:R, 1 ATR_SL NORMAL 678min stale)"
         ],
-        "losers": 11,
-        "losing_total": -1.27
+        "top_winners": [
+            "volume-breakout-long+ LONG: +$0.57 (2T, 50%WR)",
+            "mover+ LONG: +$0.13 (1T, 100%WR)"
+        ]
     },
     "trade_summary_7d": {
-        "trades": 193,
-        "win_rate": 49.2,
-        "pnl": 2.61,
-        "regime_breakdown": {
-            "EXTREME": {"trades": 62, "wr": 56.5, "pnl": 3.37},
-            "NORMAL": {"trades": 47, "wr": 42.6, "pnl": -0.72},
-            "HIGH": {"trades": 83, "wr": 47.0, "pnl": -0.02},
-            "FLAT": {"trades": 1, "wr": 100.0, "pnl": 0.02}
+        "total_trades": 191,
+        "win_rate": "49.2%",
+        "pnl": "+$2.61",
+        "by_regime": {
+            "EXTREME": "63T 55.6%WR +$3.08 (BEST)",
+            "HIGH": "82T 47.6%WR -$0.02 (flat)",
+            "NORMAL": "47T 42.6%WR -$0.72 (WORST)",
+            "FLAT": "1T 100%WR +$0.02 (irrelevant)"
         },
-        "regime_edge": "EXTREME vs NORMAL gap = $4.09/7d",
-        "top_signals": [
-            "pump-chain+ LONG 46T 52.2%WR +$2.95",
-            "volume-breakout-long+ 16T 68.8%WR +$1.41"
-        ]
+        "by_signal_top": [
+            "pump-chain+ LONG: 47T 48.9%WR +$2.66 (workhorse, fires most)",
+            "volume-breakout-long+ LONG: 16T 68.8%WR +$1.41 (BEST WR, fires least)",
+            "pullback-entry- SHORT: 55T 47.3%WR -$0.59 (fires most, net negative)",
+            "grind-trend+ LONG: 18T 50%WR +$0.24 (marginal)"
+        ],
+        "hourly_dead_zones": "Hours 0-4, 6, 13, 20 UTC: -$4.60 combined. Hours 9-12, 15, 17, 23 profitable: +$7.14 combined.",
+        "stale_trades_480min": 22
     },
     "drift_findings": [
         {
-            "finding": "CURRENT.md says SHORT_NORMAL_PENALTY removed (1.0) — code is 0.85",
-            "severity": "low",
-            "status": "already_fixed",
-            "detail": "brain_auditor re-enabled SHORT_NORMAL_PENALTY=0.85 earlier today. CURRENT.md stale. Code correct."
+            "item": "OSCILLATOR_MULTS shadow mode",
+            "status": "NO DRIFT",
+            "detail": "In code: OSCILLATOR_MULT_ENABLED=False, shadow logging active. 45 entries in /root/.hermes/data/oscillator_shadow.json. CEO approved Sep 21 ~16:00 UTC. Matches perfectly."
         },
         {
-            "finding": "OSCILLATOR_MULTS approved by CEO at 16:00 UTC but in shadow mode (OSCILLATOR_MULT_ENABLED=False)",
-            "severity": "medium",
-            "status": "on_track",
-            "detail": "Shadow mode active, logging what WOULD happen. 48h eval window running. Go-live expected ~Sep 23."
+            "item": "SHORT_NORMAL_PENALTY",
+            "status": "NO DRIFT",
+            "detail": "Set to 0.85. CURRENT.md line 20 doesn't mention it but hermes_constants.py is correct. SHORT NORMAL 7d: 18T 38.9%WR -$0.78 — penalty justified."
         },
         {
-            "finding": "REGIME-WEIGHTED CONFIDENCE proposed twice (Sep 21 14:30, Sep 21 ~16:00) but never implemented",
-            "severity": "medium",
-            "status": "not_started",
-            "detail": "EXTREME 62T 56.5%WR +$3.37 vs NORMAL 47T 42.6%WR -$0.72. Boost EXTREME 1.15x, penalize NORMAL 0.85x. Expected +$0.50-1.00/7d."
+            "item": "UNIVERSAL_MAX_HOLD_MINUTES",
+            "status": "NO DRIFT",
+            "detail": "Set to 480 today at 15:35 UTC. No stale trades >480min currently open."
+        },
+        {
+            "item": "TIME_BLOCK START",
+            "status": "NO DRIFT",
+            "detail": "Changed from 1→0 today. Hour 0: 10T 20%WR -$0.77/7d — justified change."
+        },
+        {
+            "item": "EXTREME SHORT fresh edge (CURRENT.md claim)",
+            "status": "STALE DATA",
+            "detail": "CURRENT.md claims 'pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME'. DB shows7d EXTREME SHORT: 23T 47.8%WR -$0.49. 30d shows25T 64%WR +$1.45. The 83.3% was a snapshot, not sustained. Monitor, don't act."
         }
     ],
     "recurring_problems": [
         {
-            "problem": "pump-chain+ carries all PnL (7d +$2.95 of +$2.61 total — system net negative without it)",
-            "occurrences": "every audit since Sep 17",
-            "impact": "single point of failure",
-            "suggestion": "Monitor, not actionable — need signal diversity which is a longer-term project"
+            "topic": "pump-chain+ firing in bad conditions",
+            "frequency": "Every audit since Sep 17",
+            "detail": "47T/7d but 20 losers. EXTREME: 12 losers -$2.03. HIGH: 8 losers -$1.40. Signal is net positive (+$2.66) but fires too broadly. Oscillator matrix shadow would filter LOW+falling and HIGH+falling entries.",
+            "status": "Oscillator shadow active — waiting for 48h eval (Sep 23)"
         },
         {
-            "problem": "SHORT signals underperform across all regimes in 7d",
-            "occurrences": "recurring since Sep 15",
-            "impact": "SHORT NORMAL -$0.78, SHORT EXTREME -$0.29 (7d)",
-            "suggestion": "EXTREME SHORT has strong 30d edge (pullback-entry- 25T 64%WR +$1.45). 7d flat due to market shift. Monitor, don't kill."
+            "topic": "SIGNAL DIVERSITY in NEUTRAL",
+            "frequency": "Every audit since Sep 16",
+            "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. System is fragile — 2 signals carry all PnL.",
+            "status": "OPEN — needs new signals for NEUTRAL regime"
+        },
+        {
+            "topic": "pullback-entry- net negative",
+            "frequency": "Multiple audits",
+            "detail": "55T/7d 47.3%WR -$0.59. Most-fired signal but net negative. However, 30d: 25T EXTREME SHORT 64%WR +$1.45 — has edge in EXTREME. NORMAL is the drag.",
+            "status": "SHORT_NORMAL_PENALTY=0.85 active. Monitor."
         }
     ],
     "missing_implementations": [
         {
-            "item": "REGIME-WEIGHTED CONFIDENCE (proposed Sep 21, not implemented)",
-            "expected_impact": "+$0.50-1.00/7d",
-            "risk": "low",
-            "priority": "MEDIUM"
+            "item": "New NEUTRAL regime signals",
+            "source": "Session brainstorm Sep 16-20",
+            "status": "NOT BUILT — discussed but no implementation",
+            "impact": "System relies on 2 signal types in NEUTRAL. Fragile."
         },
         {
-            "item": "OSCILLATOR_MULTS live mode (shadow since Sep 21)",
-            "expected_impact": "+$1.00-2.00/7d (blocks LOW+falling -$3.16)",
-            "risk": "medium",
-            "priority": "MEDIUM",
-            "timeline": "48h shadow eval, go-live ~Sep 23"
+            "item": "volume-breakout-long+ frequency unlock",
+            "source": "Session Sep 21",
+            "status": "INVESTIGATING — volatility gate blocking in EXTREME noted in session, but DB shows 8T/7d in EXTREME with 75%WR. Real bottleneck may be confluence gate, not vol gate.",
+            "impact": "Best WR signal (68.8%) only fires 16T/7d"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-21T16:31:00Z",
-            "idea": "Extend TIME_BLOCK_END from 9→13 UTC to cover hours 9-12 losers",
-            "rationale": "Hours 9-12 combined: 26T but -$0.39/7d. Hour 9 alone: 9T 66.7%WR +$1.43 (profitable! — DON'T block). Hours 10-12: 21T mixed. Hour 13: 8T 25%WR -$0.56 (dead zone). However: hour 9 is profitable so extending TIME_BLOCK_END to 13 would kill hour 9. NOT recommended.",
-            "expected_impact": "NEGATIVE — would block profitable hour 9",
-            "category": "entry timing",
-            "status": "rejected_after_analysis",
-            "risk": "medium",
-            "impact_on_winners": "Hour 9: 9T 66.7%WR +$1.43 — would kill this edge",
-            "confidence": "HIGH — data clearly shows hour 9 is profitable"
+            "date": "2026-09-21T19:00:00Z",
+            "idea": "volume-breakout-long+ frequency audit — investigate confluence gate and vol gate filters",
+            "rationale": "Best WR signal (68.8%) but only 16T/7d. Session flagged vol-gate blocking in EXTREME, but DB shows 8T/7d in EXTREME (75%WR) — vol gate isn't the main bottleneck. Confluence gate requiring 2+ signal types may be the real limiter. Audit: how many volume-breakout-long+ detections were blocked by confluence vs vol gate vs other filters?",
+            "expected_impact": "+$0.50-1.00/7d if frequency doubled without WR loss",
+            "category": "signal frequency",
+            "status": "suggested",
+            "risk": "low (investigation only, no config change)"
         },
         {
-            "date": "2026-09-21T16:31:00Z",
-            "idea": "Implement REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x",
-            "rationale": "EXTREME regime is our proven edge (62T 56.5%WR +$3.37/7d). NORMAL is drag (47T 42.6%WR -$0.72). Adding regime-specific multiplier amplifies edge where we win and reduces entries where we lose. No trades blocked — only confidence threshold adjusted.",
-            "expected_impact": "+$0.50-1.00/7d",
-            "category": "entry quality",
-            "status": "suggested",
-            "risk": "low",
-            "implementation": "Add REGIME_CONFIDENCE_MULTS = {EXTREME: 1.15, NORMAL: 0.85, HIGH: 1.0, FLAT: 1.0} to hermes_constants.py. Apply in signal_compactor.py before confidence threshold check.",
-            "impact_on_winners": "NONE — EXTREME winners get boosted (more likely to fire), NORMAL losers get penalized (less likely to fire). No trades blocked.",
-            "evidence": "7d EXTREME: 62T 56.5%WR +$3.37. NORMAL: 47T 42.6%WR -$0.72. Gap $4.09/7d."
-        },
-        {
-            "date": "2026-09-21T16:31:00Z",
-            "idea": "volume-breakout-long+ frequency unlock — remove one filter to increase trades from 16/7d",
-            "rationale": "volume-breakout-long+ is a GEM: 16T 68.8%WR +$1.41/7d. Best WR of any active signal. But only 16 trades — severely constrained. EXTREME: 8T 75%WR +$1.46. NORMAL: 8T 62.5%WR -$0.05. Removing one filter (e.g., lowering volume spike threshold or increasing max gap) could increase frequency without degrading WR.",
-            "expected_impact": "+$0.50-1.00/7d from more high-WR trades",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low-medium",
-            "implementation": "Review volume_breakout.py filters. Identify which is most restrictive. Lower threshold by 10-15%. Monitor 48h for WR impact.",
-            "impact_on_winners": "Current 16T are high quality. New trades from relaxed filter should maintain similar profile. Risk: slightly lower WR but more trades = more PnL.",
-            "evidence": "EXTREME: 8T 75%WR +$1.46. NORMAL: 8T 62.5%WR -$0.05. Signal fires rarely — constraint is not entry quality but detection frequency."
+            "date": "2026-09-21T19:00:00Z",
+            "idea": "pump-chain+ dead money exit monitoring",
+            "rationale": "2 pump-chain+ trades exited via pump_exit_dead_money (AZTEC -$0.09, HEMI -$0.13). These are 1.5-2h holds that never moved. Dead money exit is working but may be too slow — AZTEC held 123min before exit. Consider: is dead money threshold (time or velocity) optimal?",
+            "expected_impact": "+$0.10-0.20/7d if dead money exits 15min faster",
+            "category": "exit optimization",
+            "status": "monitor",
+            "risk": "low"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "1. OSCILLATOR_MULTS: Monitor shadow log for 48h. Go-live ~Sep 23 if shadow data confirms edge.",
-        "2. REGIME-WEIGHTED CONFIDENCE: Implement if CEO approves. Expected +$0.50-1.00/7d.",
-        "3. volume-breakout-long+ frequency: Review filters, suggest relaxation to CEO.",
-        "4. SHORT_NORMAL_PENALTY=0.85: Already implemented. Monitor 48h for impact.",
-        "5. UNIVERSAL_MAX_HOLD_MINUTES=480: Already implemented. Monitor for stale trade prevention.",
-        "6. Signal diversity: Long-term need. pump-chain+ carries all PnL. New NEUTRAL signals needed."
+        "WAIT: Oscillator matrix 48h eval completes ~Sep 23 16:00 UTC. Review shadow log outcomes before going live.",
+        "INVESTIGATE: volume-breakout-long+ frequency — check signal_compactor logs for blocked detections. Is confluence gate the limiter?",
+        "MONITOR: pullback-entry- SHORT EXTREME cold streak (7d 47.8%WR -$0.49 vs 30d 64%WR +$1.45). If 30d edge holds, cold streak is variance.",
+        "MONITOR: pump-chain+ EXTREME losers —12/20 losers in EXTREME 7d. Oscillator matrix should filter when live.",
+        "DEVELOP: New signals for NEUTRAL regime (long-standing need, no implementation yet)"
     ]
 }

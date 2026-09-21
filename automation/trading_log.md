@@ -1,3 +1,42 @@
+## [2026-09-21 16:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet market) | **Open:** 1 position (INJ pump-chain+ 14min, -56% → heading to SL)
+**24h:** 26T 46.2%WR +$1.51 | **7d:** 193T 49.2%WR +$2.65
+
+**24h by exit reason:**
+- atr_sl_hit: 18/26 (69%) avg +$0.088 — trail working, winners run
+- profit-monster-trail: 4T avg +$0.033 — trailing profit captures
+- pump_exit_dead_money: 2T avg -$0.045
+- HL_CLOSED: 1T +$0.02
+- pump_exit_momentum: 1T -$0.13
+
+**24h signal ranking:**
+- pump-chain+: 14T 50%WR +$1.17 — STAR
+- volume-breakout-long+: 2T 50%WR +$0.57
+- accel-300: 1T 100%WR +$0.17
+- mover+: 1T 100%WR +$0.13
+- continuum-: 1T 100%WR +$0.02
+- doji-bottom-long: 3T 33.3%WR -$0.34 — worst 24h (but 7d: 60%WR +$0.09, variance)
+- pullback-entry-: 1T 0%WR -$0.17
+
+**Diagnosis:**
+1. **Entry quality:** 46.2% WR 24h — down from 63% (rolling window shifted, not structural)
+2. **SL behavior:** 69% atr_sl_hit avg +$0.088 — healthy, trail capturing profits
+3. **Signal quality:** No kill candidates (0 trades last hour). doji-bottom-long worst 24h but 7d positive
+4. **Trade frequency:** 0T last hour — quiet market, not overtrading
+
+**No Change Needed:**
+- No kill candidates (0%WR + 3+ trades in last hour)
+- 24h profitable (+$1.51)
+- All signals net positive over 7d except known losers (pullback-entry-, open-skies+)
+- open-skies+ 48h test still running (re-enabled Sep 20, no new trades yet)
+
+**FINDING (no action this hour):**
+- pullback-entry- SHORT hour 20: 6T 0%WR -$1.03/7d — worst single hour/signal combo. Needs TIME_BLOCK extension or signal-specific filter. CEO approval required.
+
+**Status:** System stable, no config changes.
+**BY:** auto_1hr
+
 ## [2026-09-20 22:09 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet market) | **Open:** 4 positions

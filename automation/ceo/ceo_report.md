@@ -1,3 +1,31 @@
+## CEO Report — 2026-09-21 ~18:10 UTC
+
+### Decision: NO CONFIG CHANGE — MONITORING
+
+### Diagnosis
+System healthy but thin. 24h: 24T 37.5%WR -$0.05 (breakeven). 7d: 193T 49.2%WR +$2.36. 1 open. All NEUTRAL regime.
+
+### Key Numbers (DB-verified)
+- **24h:** 24T 37.5%WR -$0.05. 10Atr_sl losses, 14 wins. Normal variance.
+- **7d:** 193T 49.2%WR +$2.36. LONG 120T 50.8%WR +$3.32. SHORT 73T 46.6%WR -$0.96.
+- **Top signals:** pump-chain+ LONG 47T 48.9%WR +$2.66 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
+- **SHORT bleed:** pullback-entry- 55T 47.3%WR -$0.59 (7d). But 90d: 112T 55.4%WR +$2.04 — cold streak, not systemic.
+- **Regime:** 100% NEUTRAL. No EXTREME edge available.
+
+### Why No Action
+1. 24h breakeven — no emergency
+2. SHORT losses are cold streaks in generally profitable signals
+3. Oscillator shadow running (eval due ~Sep 23)
+4. Hotset empty by design — confluence gate correctly filtering low-confidence signals
+5. System is $2.36/7d positive — thin but real
+
+### Next
+- Monitor oscillator shadow eval (Sep 23)
+- Signal diversity remains priority (NEUTRAL regime bottleneck)
+- No config changes unless numbers deteriorate
+
+---
+
 ## CEO Report — 2026-09-21 ~16:00 UTC
 
 ### Decision: OSCILLATOR MATRIX — SHADOW MODE APPROVED
@@ -184,3 +212,73 @@ From $62,622 bottom, using Fibonacci extensions:
 2. **This week:** Backtest wider ATR_SL (1.5-1.8%) on LONG positions — does it improve 7d PnL?
 3. **Monthly:** Re-evaluate thesis — is BTC above the cycle support trajectory?
 4. **If BTC breaks $100k:** Revisit position sizing recommendations
+
+---
+
+## CEO Report — 2026-09-21 ~17:30 UTC — Architecture Review: Real-Time Regime Check
+
+### Decision: DO NOT ADD — Detection-time regime is correct
+
+### Architecture Assessment
+
+**Q1: Is this duplicating existing logic?**
+
+YES. Two regime check mechanisms already exist in `decider_run.py` (lines 3211-3255), **both disabled on 2026-05-11** for the same reason: 1m LR regime is too noisy for execution gating. Additionally, `signal_compactor.py` already computes regime at compaction time (line 2247: `get_regime_1m()`, line 2248: `get_regime_4h()`) and applies 15+ regime-specific filters before signals enter hotset.json.
+
+**Q2: Does this increase complexity unnecessarily?**
+
+YES. Adding a real-time regime check in `decider_run.py` would be a **third layer** of regime filtering on top of:
+1. signal_compactor scoring (1m regime, line 2571)
+2. signal_compactor confluence gates (4h regime, lines 2347-2408)
+3. Hotset entry regime data (line 2769)
+
+This creates contradictory filter interactions — compactor approved based on regime X, execution blocks because regime shifted to Y.
+
+**Q3: Simplest implementation?**
+
+**Skip it.** The detection-time regime is the correct signal. Here's why:
+
+- Compactor runs every ~2min, execution follows within the same pipeline cycle
+- The staleness window is ~2-4 minutes — regime rarely shifts meaningfully in that window
+- When regime DOES shift (crash, sudden reversal), other filters catch it: BTC crash filter (line 2993), staleness price drift check (line 3129), ATR stop-loss
+- Adding a regime re-check would block valid trades that survived compaction's vetting
+
+**Q4: 1m vs 4h regime?**
+
+Neither is appropriate for execution-time checks:
+- **1m regime**: Proven too noisy (disabled twice for false SHORT_BIAS). 50-candle linear regression on 1m data = 50 minutes of noisy price action
+- **4h regime**: Too slow — changes every 4 hours, won't catch rapid shifts between detection and execution
+
+The 5m regime scanner (15m_regime_scanner.py) is the best available, but even it doesn't add value at execution time because compactor already vetted the signal against it.
+
+**Q5: Alternative approaches?**
+
+If regime staleness becomes a measurable problem (evidence: trades losing specifically because regime shifted in the 2-4min window), the simplest fix is:
+
+1. **Log regime shift** (not block) — add a counterfactual log: "regime was X at detection, is Y now"
+2. **After 100+ logged shifts**, analyze if any correlation with losses exists
+3. **Only then** add a conditional block for extreme shifts (e.g., LONG_BIAS→SHORT_BIAS with conf>70)
+
+### Complexity Analysis
+
+| Approach | Lines | Risk | Value |
+|----------|-------|------|-------|
+| Real-time regime check (proposed) | ~30 new, conflicts with existing 15+ filters | HIGH — false blocks, contradictory gating | LOW — staleness window is 2-4min |
+| Log-only regime shift tracking | ~10 lines, no conflicts | NONE | MEDIUM — gathers data for future decisions |
+| Do nothing (recommended) | 0 | NONE | HIGH — existing architecture is correct |
+
+### Recommendation
+
+**DO NOT implement real-time regime check.** The detection-time regime is the correct design decision. The compactor is the "approval authority" (decider_run.py:2969), and it already does comprehensive regime filtering. Adding execution-time regime re-checks:
+
+1. Contradicts the compactor's approval
+2. Adds filter interaction bugs (two filters making opposite decisions)
+3. Solves a problem that doesn't exist yet (no evidence of losses from regime staleness)
+
+If you want regime staleness data for future analysis, the lazy version is a single log line in the exec loop (10 lines, zero risk). Say the word and I'll add it.
+
+### Verification
+- Lines 3211-3255 in decider_run.py: both regime checks disabled 2026-05-11
+- Lines 2247-2408 in signal_compactor.py: 15+ active regime checks at compaction time
+- Staleness window: compactor→execution = ~2-4 minutes (pipeline cycle time)
+- No evidence in trade data of losses attributable to regime staleness

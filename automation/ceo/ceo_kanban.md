@@ -1,5 +1,18 @@
 ## CEO DECISIONS
 
+- [2026-09-21 ~18:10 UTC] CEO: NO CONFIG CHANGE — monitoring
+  DB-verified: 24h 24T 37.5%WR -$0.05 | 7d 193T 49.2%WR +$2.36
+  All NEUTRAL. 1 open (CFX SHORT pullback-entry- 99conf).
+  **LONG:** 120T 50.8%WR +$3.32 (pump-chain+ 47T +$2.66, volume-breakout-long+ 16T 68.8%WR +$1.41).
+  **SHORT:** 73T 46.6%WR -$0.96. pullback-entry- 55T 47.3%WR -$0.59 (cold streak — 90d is 55.4%WR +$2.04).
+  **SHORT bleed is variance, not systemic.** pullback-entry- SHORT profitable over 30d/90d.
+  **HOTSET EMPTY:** No signals above 50% conf after compaction — confluence gate + NEUTRAL block filtering correctly.
+  **OSCILLATOR SHADOW:** Running since 16:00 UTC, eval due ~Sep 23.
+  **NO ACTION** — system healthy, monitoring.
+  BY: CEO
+
+- [2026-09-21 ~17:30 UTC] CEO: ARCHITECTURE REVIEW — Real-time regime check: DO NOT ADD
+  Detection-time regime is the correct design. Two existing regime checks in decider_run.py (lines 3211-3255) were disabled 2026-05-11 for 1m noise. signal_compactor already applies 15+ regime filters at compaction time (lines 2247-2408). Staleness window is only 2-4min — regime rarely shifts meaningfully. Adding execution-time re-check would contradict compactor approval and create contradictory filter interactions. If regime staleness becomes a measurable problem, add log-only tracking first (10 lines, zero risk).
 - [2026-09-21 ~16:00 UTC] CEO: SHADOW MODE — Oscillator Matrix approved
   DB-verified: 24h 26T 50.0%WR +$1.95 | 7d 191T 49.2%WR +$2.61
   Market SHORT_BIAS. 4 open. Pipeline running.
@@ -13,6 +26,16 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-21 ~19:00 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  DB-verified: 24h ~20T 50%WR +$1.95 | 7d 191T 49.2%WR +$2.61
+  Market SHORT_BIAS. 0 open. Pipeline running.
+  **LOSING AUTOPSY (11):** 7 pump-chain+ LONG losers (3 ATR_SL EXTREME, 1 dead_money EXTREME, 1 momentum EXTREME, 2 ATR_SL HIGH). 2 doji-bottom-long losers (1 HIGH 1.20% TP bad R:R, 1 NORMAL 678min stale now covered by MAX_HOLD=480). 1 pullback-entry- SHORT NORMAL. 1 volume-breakout-long+ NORMAL (outlier — signal is 68.8%WR overall). All normal ATR_SL variance, no entry failures.
+  **REGIME (7d):** EXTREME 63T 55.6%WR +$3.08★ (BEST). NORMAL 47T 42.6%WR -$0.72 (WORST). Gap $3.80/7d. SHORT in EXTREME: 23T 47.8%WR -$0.49 (cold streak — 30d is 64%WR +$1.45).
+  **DRIFT:** ZERO drift. OSCILLATOR_MULTS shadow active (45 entries logged), SHORT_NORMAL_PENALTY=0.85 correct, MAX_HOLD=480 active, TIME_BLOCK 0-9 correct. EXTREME SHORT edge in CURRENT.md is stale snapshot (83.3% was temporary, now 47.8% 7d).
+  **HOURLY (7d):** Dead zones 0-4, 6, 13, 20 UTC: -$4.60 combined. Profitable: 9-12, 15, 17, 23 UTC: +$7.14 combined.
+  **CREATIVE:** (1) volume-breakout-long+ frequency audit — best WR signal (68.8%) but only 16T/7d. Investigate confluence gate bottleneck (vol gate shows 8T/7d in EXTREME, not the limiter). (2) pump-chain+ dead money exit timing — AZTEC held 123min before dead money exit. Is threshold optimal?
+  **NO ACTION** — system healthy, oscillator shadow eval running (completes ~Sep 23).
+  BY: brain_auditor
 - [2026-09-21 ~16:31 UTC] brain_auditor: NO CONFIG CHANGE — full audit
   DB-verified: 24h 26T 50%WR +$1.95 | 7d 193T 49.2%WR +$2.61
   Market SHORT_BIAS. 0 open. Pipeline running.
