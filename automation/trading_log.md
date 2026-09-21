@@ -3497,3 +3497,51 @@ Final set: ['DOT', 'HYPER', 'ME']
 **Open Questions:** None
 
 **BY:** auto_1hr
+
+## [2026-09-21 09:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet weekend market) | **Open:** 2 positions (CASHCAT, FIL)
+**24h:** 27T 44%WR +$0.75 | **7d:** 204T 48.5%WR +$1.17
+
+**Diagnosis:**
+1. Entry quality: N/A (no trades closed)
+2. SL behavior: atr_sl_hit 78% of 24h closes but net profitable (+$0.73) — trailing working
+3. Signal quality: pump-chain+ carries (12T, 50% WR, +$0.82). Others 1T each — not killable
+4. Trade frequency: 0T/hr — very quiet weekend
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR + 3+ trades)
+- 24h net profitable, 7d net profitable
+- Weekend low volume — expected
+
+**Open Questions:** None
+
+**BY:** auto_1hr
+
+## [2026-09-21 10:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+- CASHCAT LONG pump-chain+ — atr_sl_hit — +$0.43
+
+**24h:** 27T 44.4%WR +$1.02 | Open: 1 (FIL LONG volume-breakout-long+)
+
+**Diagnosis:**
+1. Entry quality: CASHCAT winner +$0.43 — no adverse excursion concern
+2. SL behavior: atr_sl_hit 78% of 24h closes but net profitable (+$1.00) — trailing working correctly
+3. Signal quality: pump-chain+ carries (12T 50%WR +$1.09). Others 1T each — no kill candidates (3+ trades needed)
+4. Trade frequency: 1T/hr — quiet weekend
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR with 3+ trades)
+- System net profitable on 24h basis
+- Weekend low volume — expected
+
+**Side Note:** recent_changes.log has bash variable expansion corruption ($0.75 → /usr/bin/bash.75). Cosmetic — the $ sign is being expanded. Not a trading issue.
+
+**Open Questions:** None
+
+**BY:** auto_1hr
