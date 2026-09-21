@@ -1108,6 +1108,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Hard gate — no voting, no overrides. When BTC 30m momentum is flat,
     # momentum signals have no tailwind and fail in chop.
     # Layer A of chop regime signal gating plan.
+    # OVERRIDE: When BTC 4h is LONG_BIAS/SHORT_BIAS with strong slope, allow through (2026-09-21)
     from hermes_constants import BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, CHOP_GATE_LOG_ONLY
     if BTC_CHOP_GATE_ENABLED:
         _gate_conn = None
@@ -1119,14 +1120,32 @@ def _score_signal(token, direction, conf, source, signal_type,
             if _gate_row and _gate_row[0] is not None:
                 _btc_30m = _gate_row[0]
                 if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
-                    # BTC is flat — check if signal is momentum family
-                    from chop_detector import _classify_signal
-                    _sig_family = _classify_signal(signal_type)
-                    if _sig_family == 'MOMENTUM':
-                        if CHOP_GATE_LOG_ONLY:
-                            log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
-                        else:
-                            log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: BLOCKED — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
+                    # BTC is flat — check if 4h regime overrides
+                    _override = False
+                    try:
+                        import psycopg2 as _pg
+                        _pg_conn = _pg.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+                        _pg_cur = _pg_conn.cursor()
+                        _pg_cur.execute("SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = 'BTC'")
+                        _btc_4h = _pg_cur.fetchone()
+                        _pg_conn.close()
+                        if _btc_4h and _btc_4h[0] and _btc_4h[1] is not None:
+                            _slope_4h = float(_btc_4h[1])
+                            if (_btc_4h[0] == 'LONG_BIAS' and _slope_4h > 0.35 and direction.upper() == 'LONG') or \
+                               (_btc_4h[0] == 'SHORT_BIAS' and _slope_4h < -0.35 and direction.upper() == 'SHORT'):
+                                _override = True
+                    except Exception:
+                        pass
+                    
+                    if not _override:
+                        # BTC is flat — check if signal is momentum family
+                        from chop_detector import _classify_signal
+                        _sig_family = _classify_signal(signal_type)
+                        if _sig_family == 'MOMENTUM':
+                            if CHOP_GATE_LOG_ONLY:
+                                log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
+                            else:
+                                log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: BLOCKED — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
                             return 0.0
         except Exception as e:
             log(f"  [WARN] BTC chop gate check failed: {e}", 'WARN')

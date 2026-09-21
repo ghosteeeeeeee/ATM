@@ -3593,3 +3593,24 @@ Final set: ['DOT', 'HYPER', 'ME']
 **Open Questions:** None
 
 **BY:** auto_1hr
+
+## [2026-09-21 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed | 1 open (GMX LONG pump-chain+)
+**24h:** 26T 46.2%WR +$1.81 | **7d:** 192T 49.5%WR +$2.85
+
+**Diagnosis:**
+1. Entry quality: N/A — no trades closed last hour
+2. SL behavior: atr_sl_hit 77% (20/26) but net +$1.79 — trailing working correctly
+3. Signal quality: pump-chain+ carries (+$1.09/24h, 12T 50%WR). pullback-entry- underperforming (-$0.59/7d) but within variance for 55T
+4. Trade frequency: ~1.1T/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR with 3+ trades)
+- System net profitable on both 24h (+$1.81) and 7d (+$2.85) basis
+- All close reasons except pump_exit_momentum net positive
+- Weekend volume is low but normal
+
+**Open Questions:** None

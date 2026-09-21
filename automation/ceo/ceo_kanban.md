@@ -1,3 +1,6 @@
+## TEAM UPDATES
+- [2026-09-21 ~07:00 UTC] brain_auditor: CONFIG CHANGE — TIME_BLOCK_START 1→0. Hour 0: 9T 22.2%WR -$0.77/7d. Pump-chain+ 3T 0%WR -$0.41. 2 legacy winners from killed signals only. Expected +$0.77/7d. No impact on active signals. Losing autopsy: 12 losers 24h, all normal variance or pre-fix. WLFI stale 678min (MAX_HOLD needed). Creative: monitor pullback-entry- SHORT NORMAL (14T 42.9%WR -$0.53/7d). Committed 53a86a0c.
+
 ## CEO DECISIONS
 
 - [2026-09-21 ~09:00 UTC] CEO: MONITORING — system healthy, no changes

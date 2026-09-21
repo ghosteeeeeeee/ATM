@@ -162,12 +162,15 @@ def detect_volume_breakout(token: str, candles: list) -> Optional[dict]:
     if direction is None:
         return None
 
-    # Confidence: base on volume spike strength + RSI extremity
-    vol_bonus = min(20, (vol_ratio - VOL_SPIKE_MULT) * 10)
+    # Confidence: base on volume spike strength + RSI extremity + momentum
+    vol_bonus = min(25, (vol_ratio - VOL_SPIKE_MULT) * 12)
+    # Extra bonus for very strong volume spikes (>4x)
+    if vol_ratio >= 4.0:
+        vol_bonus = min(30, vol_bonus + 5)
     rsi_extremity = abs(rsi_val - 50) / 50.0 * 15
-    momentum_bonus = min(10, abs(price_change_pct) * 5)
-    confidence = int(min(85, 55 + vol_bonus + rsi_extremity + momentum_bonus))
-    confidence = max(55, confidence)
+    momentum_bonus = min(12, abs(price_change_pct) * 6)
+    confidence = int(min(90, 65 + vol_bonus + rsi_extremity + momentum_bonus))
+    confidence = max(60, confidence)
 
     return {
         'direction': direction,
