@@ -361,6 +361,10 @@ def _check_btc_level() -> Tuple[bool, str, float, float]:
     When BTC is near session lows, SHORT entries risk getting caught in bounces.
     When BTC is near session highs, LONG entries risk getting caught in pullbacks.
 
+    Uses RELATIVE position within range (not absolute %) to work across all range sizes.
+    In a 1.17% range, 0.5% absolute = 43% of range (not near high).
+    In a 2% range, 0.5% absolute = 25% of range (definitely not near high).
+
     Returns: (should_block, direction_blocked, pct_from_high, pct_from_low)
     """
     from hermes_constants import (
@@ -383,16 +387,28 @@ def _check_btc_level() -> Tuple[bool, str, float, float]:
     session_high = max(closes[-BTC_LEVEL_LOOKBACK_MIN:])
     session_low = min(closes[-BTC_LEVEL_LOOKBACK_MIN:])
 
-    # Calculate distance from high and low
+    # Calculate distance from high and low (absolute %)
     pct_from_high = ((current - session_high) / session_high * 100) if session_high > 0 else 0
     pct_from_low = ((current - session_low) / session_low * 100) if session_low > 0 else 0
 
-    # Block SHORT when BTC is near session lows (bounce risk)
-    if pct_from_high < BTC_LEVEL_SHORT_BLOCK_PCT:
+    # Calculate range size and relative position (0.0 = at low, 1.0 = at high)
+    range_pct = ((session_high - session_low) / session_low * 100) if session_low > 0 else 0
+
+    # Skip level filter if range is too small (< 0.3%) — no meaningful levels
+    if range_pct < 0.3:
+        return False, '', pct_from_high, pct_from_low
+
+    # Relative position: 0.0 = at session low, 1.0 = at session high
+    relative_pos = pct_from_low / range_pct if range_pct > 0 else 0.5
+
+    # Block SHORT when BTC is in bottom 30% of range (bounce risk)
+    # relative_pos < 0.30 means BTC is near the low
+    if relative_pos < 0.30:
         return True, 'SHORT', pct_from_high, pct_from_low
 
-    # Block LONG when BTC is near session highs (pullback risk)
-    if pct_from_low > BTC_LEVEL_LONG_BLOCK_PCT:
+    # Block LONG when BTC is in top 30% of range (pullback risk)
+    # relative_pos > 0.70 means BTC is near the high
+    if relative_pos > 0.70:
         return True, 'LONG', pct_from_high, pct_from_low
 
     return False, '', pct_from_high, pct_from_low
