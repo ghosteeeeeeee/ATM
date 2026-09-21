@@ -3637,3 +3637,24 @@ Final set: ['DOT', 'HYPER', 'ME']
 **Note:** NOT pnl_pct displayed as -533% is a display bug (amount_usdt=$11.10, actual pct=-1.78%). Cosmetic, pnl_usdt correct.
 
 **BY:** auto_1hr
+
+## [2026-09-21 17:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (GMX $0.00 dead_money, JUP +$0.02 atr_sl_hit) | 2 open (AZTEC, ALT)
+**24h:** 28T 48%WR +$1.97 | **7d:** 192T 49%WR +$2.61
+
+**Diagnosis:**
+1. Entry quality: Both last-hour trades ~break-even. No adverse excursion anomaly.
+2. SL behavior: atr_sl_hit 71% (20/28) but net +$1.93 — trailing working correctly.
+3. Signal quality: pump-chain+ carrying (+$1.26/24h, +$3.04/7d). No kill candidates.
+4. Trade frequency: ~1.2/hr — normal weekend volume.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met (no signal with 0% WR and 3+ trades in 24h)
+- System net profitable on 24h (+$1.97) and 7d (+$2.61)
+- All close reasons except pump_exit_momentum net positive
+- 2 open positions, normal leverage
+
+**BY:** auto_1hr
