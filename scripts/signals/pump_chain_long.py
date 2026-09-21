@@ -154,15 +154,14 @@ def scan_signals():
             continue
 
         # ponytail: block stale entries — 5T stale 7d = 0%WR -$0.73, 0 winners blocked
+        _conn_spd = None
         try:
-            _conn_spd = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
+            _conn_spd = sqlite3.connect(f"file:{os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')}?mode=ro", uri=True, timeout=5)
             _cur_spd = _conn_spd.cursor()
             _cur_spd.execute('SELECT is_stale FROM token_speeds WHERE token = ?', (token.upper(),))
             _row = _cur_spd.fetchone()
             if _row and _row[0]:
                 _log(f"  [PUMP-CHAIN-LONG] SKIP {token} — stale entry")
-                if _conn_spd:
-                    _conn_spd.close()
                 continue
         except Exception:
             pass

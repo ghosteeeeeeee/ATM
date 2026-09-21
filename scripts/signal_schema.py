@@ -681,7 +681,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
 
                     # Block SHORT only if BOTH 5m AND 15m are BULLISH
                     # Reversion signals (inv-accel-300) are exempt — they fire INTO the trend
-                    if _regime_5m == 'BULLISH' and _regime_15m == 'BULLISH' and not _reversion_exempt:
+                    # Pump-chain is exempt — fires on capital rotation
+                    if _regime_5m == 'BULLISH' and _regime_15m == 'BULLISH' and not _reversion_exempt and not _pump_chain_exempt:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                               f'5m={_regime_5m} 15m={_regime_15m} [regime_confirmation]', flush=True)
                         return None
