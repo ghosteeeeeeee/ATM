@@ -1155,7 +1155,7 @@ CONF_FILTER_MIN = 65                    # lowered from 70 2026-09-19 — allows 
 # Extended from 05:00-07:00 to 03:00-07:00 (2026-09-12) — 30d: Hour 3 is -$1.77 (3rd worst).
 # Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
 TIME_BLOCK_ENABLED = True               # Penalty during bad hours (extended from 05-07, 2026-09-12)
-TIME_BLOCK_START = 1                    # UTC hour (inclusive) — extended 3→1 (2026-09-20) — hours 1-2 bleed $1.62/7d (30.8% WR, 37.5% WR)
+TIME_BLOCK_START = 0                    # UTC hour (inclusive) — extended 1→0 (2026-09-21) — hour 0: 9T 22.2%WR -$0.77/7d, pump-chain+ 0%WR -$0.41
 TIME_BLOCK_END = 9                      # UTC hour (exclusive: extended from 7 to 9, 2026-09-15 — hour 9 bleeds -$0.50 despite 57.9% WR)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
 

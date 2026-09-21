@@ -296,5 +296,27 @@
     "after": "SHORT_RSI_FLOOR=30, _ctx_gate_get_rsi(token) for live RSI check",
     "rationale": "RSI<30 SHORTs 37.5%WR -$0.75/7d (block). RSI 30-35 50%WR -$0.09 (keep). Old filter never fired (sig.get rsi_14 always None). Using live RSI matches SHORT_RSI_CEILING pattern.",
     "impact": "Expected +$0.66/7d. Fixes safety guardrail that was non-functional."
+  },
+  {
+    "timestamp": "2026-09-21T12:00:00Z",
+    "agent": "brain_auditor",
+    "change": "Re-enabled SHORT_NORMAL_PENALTY = 0.85 (was 1.0)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "SHORT_NORMAL_PENALTY = 1.0",
+    "after": "SHORT_NORMAL_PENALTY = 0.85",
+    "rationale": "ALL SHORT signals in NORMAL are losers 7d: pullback-entry- 14T 42.9%WR -$0.53, grind-trend- 2T 0%WR -$0.22, r2-trend-short3 2T 50%WR -$0.03. Total -$0.78/7d. EXTREME is only profitable SHORT regime (56.5%WR +$3.44). Penalty removed Sep 16 when data showed SHORT NORMAL profitable — data shifted.",
+    "impact": "+$0.50-0.78/7d expected from blocked NORMAL SHORT losers"
+  },
+  {
+    "timestamp": "2026-09-21T07:00:00Z",
+    "agent": "brain_auditor",
+    "change": "TIME_BLOCK_START 1→0 — extend dead zone to cover hour 0",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "TIME_BLOCK_START = 1",
+    "after": "TIME_BLOCK_START = 0",
+    "rationale": "Hour 0: 9T 22.2%WR -$0.77/7d. Pump-chain+ 3T 0%WR -$0.41. 2 hour 0 winners from killed signals only.",
+    "impact": "+$0.77/7d expected. 0 impact on current active signals."
   }
 ]

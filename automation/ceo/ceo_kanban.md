@@ -2678,3 +2678,6 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **UPGRADE AUDIT:** 5 Level 1 changes verified live. Monitoring impact 48h.
   **NO ACTION** — system healthy, weekend quiet. All trades NEUTRAL. Monitor for Monday volume.
   BY: CEO
+
+## TEAM UPDATES
+- [2026-09-21 12:00 UTC] brain_auditor: SHORT NORMAL regime bleed detected — re-enabled SHORT_NORMAL_PENALTY=0.85. ALL SHORT signals in NORMAL are losers 7d (18T 38.9%WR -$0.78). EXTREME is only profitable SHORT regime (56.5%WR +$3.44). Data shifted since penalty removal Sep 16. Expected +$0.50-0.78/7d. Monitoring 48h. Signal diversity remains #1 systemic risk — only pump-chain+ LONG and volume-breakout-long+ carry NEUTRAL.

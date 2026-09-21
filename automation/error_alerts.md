@@ -267,3 +267,27 @@
 - **DISK**: 85% used (94G/118G) — at warning threshold
 - **WARN**: signal_compactor 3 timeouts in 30min (09:17, 09:32, 09:38) — self-recovered each time
 - **WARN**: 5289 active signals — high count, consider purge cycle
+
+## Health Report — 2026-09-21 10:44 UTC
+- **STATUS**: OK — Pipeline running, services active
+- **PIPELINE**: Cycle #209378, 0 errors in last 30min
+- **SIGNALS**: 69 generated in last hour
+- **TRADES**: 0 open, 26 closed today (+56.93% cumulative PnL)
+- **REGIME**: NEUTRAL (4 long, 2 short, 114 neutral) — shifted from LONG_BIAS
+- **DISK**: 85% used (94G/118G) — stable, active DBs (coin_tracker 2.5G, candles 2G)
+- **TIMERS**: All key timers firing normally
+- **AUTO-FIXES**: None needed
+
+## Error Alerts — 2026-09-21 10:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.6x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.4x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-21 11:57 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
