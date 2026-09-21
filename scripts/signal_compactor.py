@@ -4129,6 +4129,11 @@ def _purge_executed_signals(hours=1, dry=False):
                 # Note: guardian_orphan trades use 'guardian_orphan_insert' signal, not
                 # the original signal source, so they won't match the signal's token+direction
                 # in a way that masks phantom executions.
+                # First check if there's already a PENDING signal with the same combo_key
+                c.execute("SELECT combo_key FROM signals WHERE id=?", (sid,))
+                ck_row = c.fetchone()
+                if ck_row and ck_row[0]:
+                    c.execute("DELETE FROM signals WHERE combo_key=? AND decision='PENDING'", (ck_row[0],))
                 c.execute("""
                     UPDATE signals
                     SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
