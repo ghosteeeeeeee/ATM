@@ -310,3 +310,9 @@
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-21 15:46 UTC
+- **[CRITICAL]** (8x): `name 'open_time' is not defined` — position_manager.py:3070 — missing `open_time = pos.get('open_time')` in main loop. **AUTO-FIXED**: added missing variable extraction at line 2500.
+- **[WARN]** (3x): `signal_compactor timed out (killed after 60.1s)` at 15:22, 15:39, 15:42 — LLM call timeout, self-recovered.
+- **[WARN]**: Disk at 85% (95G/118G) — same as previous alert.
+- **[INFO]**: Pipeline restarted successfully. Position manager verified clean: 2 open, 0 closed, 0 adjusted.

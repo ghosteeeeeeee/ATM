@@ -2497,6 +2497,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         direction = str(pos.get("direction", "UNKNOWN")).upper()
         pnl_pct = float(pos.get("pnl_pct") or 0)
         trade_id = pos.get("id")
+        open_time = pos.get('open_time')
 
         # ── Compute live pnl first (before any exit decisions) ──
         entry = float(pos.get("entry_price") or 0)
