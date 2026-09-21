@@ -70,3 +70,76 @@ pump-chain+ trades are being stopped out too early, then the price recovers afte
 - Ride-It exit spec: `/root/.hermes/plans/ride-it-exit-spec.md`
 - Ride-It exit module: `/root/.hermes/scripts/ride_it_exit.py`
 - Bug hunter reports: `/root/.hermes/brain/verdicts/ride-it-exit-bug-hunter*.md`
+
+---
+
+# Pump-Chain+ Regime Block Dead Code — 2026-09-21
+
+## Problem Statement
+
+All 7 regime blocks in signal_compactor.py are dead code. They check for volatility regime values (HIGH/EXTREME/FLAT/NORMAL) but the 4h regime scanner only produces momentum values (LONG_BIAS/SHORT_BIAS/NEUTRAL).
+
+## Root Cause
+
+Two independent regime systems were built:
+- **Momentum regime** (4h_regime_scanner → `momentum_cache.regime_4h`): `LONG_BIAS`/`SHORT_BIAS`/`NEUTRAL`
+- **Volatility regime** (ATR-based → `signal_outcomes.regime`): `FLAT`/`NORMAL`/`HIGH`/`EXTREME`
+
+The compactor reads momentum regime but compares against volatility values. Never matches.
+
+## Dead Code Blocks
+
+| Block | Line | Expected | Actual | Status |
+|-------|------|----------|--------|--------|
+| pump-chain+ HIGH | 2344 | HIGH | NEVER True | ❌ DEAD |
+| v3 SHORT EXTREME | 2320 | EXTREME | NEVER True | ❌ DEAD |
+| v3 LONG EXTREME | 2327 | EXTREME | NEVER True | ❌ DEAD |
+| v3 SHORT FLAT | 2323 | FLAT | NEVER True | ❌ DEAD |
+| v3 LONG FLAT | 2330 | FLAT | NEVER True | ❌ DEAD |
+| accel-300 FLAT | 2336 | FLAT | NEVER True | ❌ DEAD |
+| coiled-spring NORMAL | 2354 | NORMAL | NEVER True | ❌ DEAD |
+
+## Impact
+
+- pump-chain+ fires in HIGH regime (47% WR) instead of being blocked
+- accel-300 fires in EXTREME/FLAT (33-42% WR) instead of being blocked
+- Coiled-spring blocks ALL signals (NEUTRAL ≠ NORMAL)
+
+## Fix
+
+Change blocks to use `_get_volatility_regime()` instead of `_regime_4h`.
+
+## Verified By
+
+- Independent audit (own-conclusions skill) — HIGH confidence
+- Pipeline logs — 0 firings of any regime block
+- PostgreSQL momentum_cache — no HIGH/EXTREME/FLAT/NORMAL values exist
+
+---
+
+# Pump-Chain+ Regime Fix — 2026-09-21
+
+## Problem
+
+All 7 regime blocks in signal_compactor.py are dead code or actively broken:
+- Blocks 1-6: Dead code (check for volatility values but momentum scanner never produces them)
+- Block #7 (coiled-spring): **Actively broken** — always blocks because 'NEUTRAL' ≠ 'NORMAL'
+
+## Fix
+
+Change blocks to use `_classify_volatility()` with cached ATR instead of `_regime_4h`:
+- `_classify_volatility()` is already imported in signal_compactor.py (line 64)
+- It takes a pre-computed ATR% and returns FLAT/NORMAL/HIGH/EXTREME
+- Cache ATR% at `run_compaction` level to avoid per-signal DB overhead
+
+## Expected Impact
+
+- pump-chain+ blocked in HIGH regime (47% WR → 56% WR in EXTREME)
+- accel-300 blocked in EXTREME/FLAT (33-42% WR)
+- Coiled-spring unblocked (currently always blocked)
+
+## Verified By
+
+- Independent audit (own-conclusions skill) — HIGH confidence
+- Confirmed 7 dead/broken blocks
+- Confirmed `_classify_volatility()` returns expected values

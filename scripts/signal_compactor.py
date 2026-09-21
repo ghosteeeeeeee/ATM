@@ -1717,7 +1717,52 @@ def _score_signal(token, direction, conf, source, signal_type,
         short_normal_mult = SHORT_NORMAL_PENALTY
         log(f"  📉 [SHORT-NORMAL] {token}: SHORT penalty {SHORT_NORMAL_PENALTY:.2f}x in NORMAL regime")
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult
+    # ── Continuum Oscillator Multiplier (SHADOW MODE) ──────────────────────
+    oscillator_mult = 1.0
+    try:
+        from hermes_constants import OSCILLATOR_MULTS, OSCILLATOR_MULT_ENABLED, OSCILLATOR_SHADOW_LOG
+        btc_score = speed_data.get('btc_score') if speed_data else None
+        wave_phase = speed_data.get('wave_phase') if speed_data else None
+        if btc_score is not None and wave_phase:
+            # Determine score zone
+            if btc_score < 30:
+                zone = 'LOW'
+            elif btc_score <= 70:
+                zone = 'MID'
+            else:
+                zone = 'HIGH'
+            # Look up multiplier
+            key = (zone, wave_phase)
+            if key in OSCILLATOR_MULTS:
+                oscillator_mult = OSCILLATOR_MULTS[key]
+                if OSCILLATOR_MULT_ENABLED:
+                    log(f"  🎯 [OSCILLATOR] {token}: {zone}+{wave_phase} → {oscillator_mult:.2f}x")
+                else:
+                    # Shadow mode — log what WOULD happen
+                    shadow_entry = {
+                        'timestamp': datetime.now().isoformat(),
+                        'token': token,
+                        'direction': direction,
+                        'signal': signal_type,
+                        'confidence_before': score,
+                        'btc_score': btc_score,
+                        'wave_phase': wave_phase,
+                        'score_zone': zone,
+                        'would_be_multiplier': oscillator_mult,
+                        'confidence_after': score * oscillator_mult,
+                        'actual_outcome': None
+                    }
+                    try:
+                        shadow_log = OSCILLATOR_SHADOW_LOG
+                        os.makedirs(os.path.dirname(shadow_log), exist_ok=True)
+                        with open(shadow_log, 'a') as f:
+                            f.write(json.dumps(shadow_entry) + '\n')
+                    except Exception:
+                        pass
+    except ImportError:
+        pass
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult
     return final_score
 
 

@@ -1160,6 +1160,29 @@ CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 92                    # block if confidence >= this value (raised from 89 — 90-95 tier mixed, 95+ was losing historically but winning recently)
 CONF_FILTER_MIN = 65                    # lowered from 70 2026-09-19 — allows pump-chain signals (65-69) to pass. Only affects pump-chain and volume_breakout.
 
+# ── Continuum Oscillator Multipliers (SHADOW MODE) ──────────────────────────
+# btc_score zones: LOW (<30), MID (30-70), HIGH (>70)
+# wave_phase: falling, accelerating, bottoming, decelerating, neutral
+# NOTE: btc_score data only available since Sep 12 (~10 days, 282 trades)
+# Coverage: 8.5% of all trades — matrix affects <9% of total
+# Shadow mode: log what WOULD have been applied, don't affect scores
+OSCILLATOR_MULT_ENABLED = False  # Shadow mode — log only, don't apply
+OSCILLATOR_SHADOW_LOG = '/root/.hermes/data/oscillator_shadow.json'
+OSCILLATOR_MULTS = {
+    ('LOW', 'falling'): 0.6,       # 35T, 22.9%WR, -$3.16 — KILLER ZONE
+    ('LOW', 'accelerating'): 1.1,  # 36T, 52.8%WR, +$0.46 — profitable
+    ('LOW', 'bottoming'): 1.3,     # 4T, 75%WR, +$0.33 — small sample
+    ('LOW', 'decelerating'): 0.95, # 7T, 57.1%WR, -$0.08 — near breakeven
+    ('MID', 'falling'): 1.0,       # 36T, 44.4%WR, +$0.53 — profitable
+    ('MID', 'accelerating'): 1.1,  # 54T, 55.6%WR, +$2.49 — BEST ZONE
+    ('MID', 'bottoming'): 0.8,     # 9T, 66.7%WR, -$0.29 — losing
+    ('MID', 'decelerating'): 0.95, # 7T, avg PnL% negative, barely +$0.27
+    ('HIGH', 'falling'): 0.8,      # 43T, 48.8%WR, -$0.01 — near breakeven
+    ('HIGH', 'accelerating'): 1.2, # 34T, 61.8%WR, +$1.30 — 2ND BEST
+    ('HIGH', 'bottoming'): 1.3,    # 9T, 77.8%WR, +$0.82 — small sample
+    ('HIGH', 'decelerating'): 1.1, # 5T, 60%WR, +$0.20 — small sample
+}
+
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
 # Penalty during 01:00-09:00 UTC (Asian session close, low-liquidity pre-market).
 # Extended 3→1 (2026-09-20) — hours 1-2 bleed $1.62/7d (pump-chain+ LONG 0%WR).

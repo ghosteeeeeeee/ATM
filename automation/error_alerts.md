@@ -316,3 +316,16 @@
 - **[WARN]** (3x): `signal_compactor timed out (killed after 60.1s)` at 15:22, 15:39, 15:42 — LLM call timeout, self-recovered.
 - **[WARN]**: Disk at 85% (95G/118G) — same as previous alert.
 - **[INFO]**: Pipeline restarted successfully. Position manager verified clean: 2 open, 0 closed, 0 adjusted.
+
+## Error Alerts — 2026-09-21 15:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.6s (rc=N)`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
