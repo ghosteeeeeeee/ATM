@@ -1230,11 +1230,20 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # ── Time block: penalty during dead zone (03-07 UTC) ───
     from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_PENALTY, TIME_BLOCK_START, TIME_BLOCK_END
+    utc_hour = datetime.now(timezone.utc).hour
     time_block_mult = 1.0
     if TIME_BLOCK_ENABLED:
-        utc_hour = datetime.now(timezone.utc).hour
         if TIME_BLOCK_START <= utc_hour < TIME_BLOCK_END:
             time_block_mult = TIME_BLOCK_PENALTY  # soft penalty
+
+    # ── pump-chain+ dead hours block ──────────────────────────────────────
+    # 7d: hours 0-4 = 0%WR, 15 trades, -$1.73 — hard block, soft penalty not enough
+    from hermes_constants import PUMP_CHAIN_LONG_DEAD_HOURS
+    _pc_bare = signal_type.rstrip('+-') if signal_type else ''
+    if ('pump-chain' in _pc_bare or 'pump_chain' in _pc_bare) and direction.upper() == 'LONG':
+        if utc_hour in PUMP_CHAIN_LONG_DEAD_HOURS:
+            log(f"  🚫 [PUMP-CHAIN-DEAD-HOUR] {token} LONG blocked — hour {utc_hour} UTC, 0%WR/7d in hours {PUMP_CHAIN_LONG_DEAD_HOURS}")
+            return 0.0
 
     score = float(conf)
 

@@ -1193,6 +1193,11 @@ TIME_BLOCK_START = 0                    # UTC hour (inclusive) — extended 1→
 TIME_BLOCK_END = 9                      # UTC hour (exclusive: extended from 7 to 9, 2026-09-15 — hour 9 bleeds -$0.50 despite 57.9% WR)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
 
+# ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
+# 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
+# Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
+PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4]  # UTC hours — auto_1hr 2026-09-21
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).
