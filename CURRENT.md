@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-21 ~14:30 UTC (CEO)**
+**Last Updated: 2026-09-21 ~16:00 UTC (CEO)**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 25T, 48.0% WR, +$1.93. 4 open. Market SHORT_BIAS. Pipeline running.
+24h: 26T, 50.0% WR, +$1.95. 4 open. Market SHORT_BIAS. Pipeline running.
 
-- **24h (rolling):** 25T, 48.0% WR, +$1.93. pump-chain+ 11T 54.5%WR +$1.24 (carrying). volume-breakout-long+ 2T +$0.57 (gem). pullback-entry- 5T 60%WR +$0.32 (recovering).
-- **7d:** 191T, 48.7% WR, +$2.46 (DB-verified). POSITIVE. All NEUTRAL regime.
+- **24h (rolling):** 26T, 50.0% WR, +$1.95. pump-chain+ 11T 54.5%WR +$1.24 (carrying). volume-breakout-long+ 2T +$0.57 (gem). pullback-entry- 5T 60%WR +$0.32 (recovering).
+- **7d:** 191T, 49.2% WR, +$2.61 (DB-verified). POSITIVE. All NEUTRAL regime.
 - **Market:** SHORT_BIAS (4 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
@@ -74,6 +74,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Active Decisions
 
+- **OSCILLATOR MATRIX SHADOW MODE.** Approved 2026-09-21 ~16:00 UTC. 20% coverage (280/1403 trades). LOW+falling catastrophic (22.9%WR -$3.16/30d). Shadow logging active, 48h eval before live. — 2026-09-21
 - **CHASE FILTER ACTIVE.** CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. — 2026-09-19
 - **STALE FILTER:** Working. 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). — 2026-09-19
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** — 2026-09-02

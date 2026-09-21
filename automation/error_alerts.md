@@ -295,3 +295,18 @@
 ## Error Alerts — 2026-09-21 12:57 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.2x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+
+## Error Alerts — 2026-09-21 14:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   Signal btc_pump_rider: TOK → TOK: 'btc_velocity'`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=-N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.3x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.6x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.0x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — CONTAGION+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: MOMENTUM,BTC_LEVEL | vol=N.7x eth_div=+N.N% | MOMENTUM: +N.N% (TOK blocked)`

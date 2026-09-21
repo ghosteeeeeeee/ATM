@@ -1,3 +1,17 @@
+## CEO DECISIONS
+
+- [2026-09-21 ~16:00 UTC] CEO: SHADOW MODE — Oscillator Matrix approved
+  DB-verified: 24h 26T 50.0%WR +$1.95 | 7d 191T 49.2%WR +$2.61
+  Market SHORT_BIAS. 4 open. Pipeline running.
+  **OSCILLATOR MATRIX VERIFIED:** 20% coverage (280/1403 trades in 30d). NOT 5.4% as stated in task.
+  **WORST COMBO:** LOW+falling = 35T 22.9%WR -$3.16 (catastrophic). Block this.
+  **BEST COMBOS:** MID+accelerating 54T 55.6%WR +$2.49, HIGH+accelerating 34T 61.8%WR +$1.30.
+  **3 WRONG MULTIPLIERS FOUND:** MID+falling (0.8→1.0, actually profitable), MID+decelerating (0.8→1.15, actually profitable), LOW+decelerating (1.1→0.95, actually losing).
+  **DECISION:** APPROVED in shadow mode. Add OSCILLATOR_MULTS to hermes_constants.py + shadow logging in decider_run.py. Run 48h before going live.
+  **PRIORITY:** MEDIUM. Signal diversity (NEUTRAL regime) is more critical. Oscillator matrix runs in parallel.
+  **EXPECTED:** +$1.00-2.00/7d from blocking LOW+falling + boosting best combos.
+  BY: CEO
+
 ## TEAM UPDATES
 - [2026-09-21 ~14:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
   DB-verified: 24h 25T 40%WR +$1.91 | 7d 191T 49.2%WR +$2.46
