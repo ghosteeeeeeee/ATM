@@ -5,12 +5,12 @@
 
 ## Current Status
 
-24h: 26T, 50% WR, +$0.94. 3 open. Market NEUTRAL. Pipeline running.
+24h: 26T, 46.2% WR, +$1.81. 0 open. Market NEUTRAL. Pipeline running.
 
-- **24h (rolling):** 26T, 50% WR, +$0.94. pump-chain+ LONG 12T 58.3%WR +$1.01 (carrying). pullback-entry- SHORT 8T 50%WR +$0.10.
-- **Today (calendar):** 11T closed, 2W 18.2% WR, -$0.70 (rough early day, normal variance).
-- **7d:** 203T, 48.8% WR, +$1.21 (DB-verified). POSITIVE.
-- **Market:** NEUTRAL (3 open trades).
+- **24h (rolling):** 26T, 46.2% WR, +$1.81. pump-chain+ LONG 12T +$1.09 (carrying). volume-breakout-long+ 2T +$0.57 (gem). pullback-entry- SHORT 6T 50%WR +$0.15.
+- **Today (calendar):** 15T closed, 26.7% WR, +$0.29 (rough early day, normal variance).
+- **7d:** 198T, 50.0% WR, +$3.19 (DB-verified). POSITIVE. All NEUTRAL regime.
+- **Market:** NEUTRAL (0 open trades).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 01-09 UTC (extended Sep 20). 0.7x penalty.
 - **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19), grind-trend- (Sep 19), open-skies+ (Sep 17), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
@@ -21,8 +21,8 @@
 - **SHORT_RSI_FLOOR=30:** Working. RSI<30 SHORTs = 37.5%WR blocked.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 
-**🟢 R:R STATUS (7d +$1.21 POSITIVE, 24h +$0.94)**
-7d PnL +$1.21. EXTREME carries (+$2.29). NORMAL bleeds (-$1.27). 24h +$0.94.
+**🟢 R:R STATUS (7d +$3.19 POSITIVE, 24h +$1.81)**
+7d PnL +$3.19. All NEUTRAL. pump-chain+ LONG +$3.01 (45T 51.1%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h +$1.81.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -30,14 +30,14 @@
 
 **🟢 UPGRADE AUDIT (Sep 21):** All Level 1 tasks complete. 5 changes implemented by upgrade_implementer: CHOP_GATE_LOG_ONLY→False, Momentum NORMAL 0.0x, deprecated constants removed, OPEN_SKIES removed from never-reenable, ZSCORE_PUMP_ENABLED→False. All verified live.
 
-**🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG passes confluence in NEUTRAL. EXTREME edge confirmed (55%WR +$2.29/7d). NORMAL bleeds (-$1.27/7d). Need new signals for diversity. 30d active: 6 types.
+**🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. 7d: pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41 carry system.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
 ## Today's Changes (Sep 21)
 
+1. **CEO ~09:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 26T 46.2%WR +$1.81 | 7d 198T 50.0%WR +$3.19. Market NEUTRAL. 0 open. **VERIFIED:** CURRENT.md stale — numbers were +$0.94/24h, actual +$1.81. **SIGNAL:** pump-chain+ LONG 45T +$3.01 (system workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem). pullback-entry- SHORT 57T 49.1%WR -$0.44 (30d +$2.04, variance). **SIGNAL DIVERSITY:** 2 types carry all PnL in NEUTRAL. Need new signals. **NO ACTION** — system healthy, monitoring.
 1. **upgrade_implementer ~06:30 UTC — 5 LEVEL 1 CHANGES IMPLEMENTED.** (1) CHOP_GATE_LOG_ONLY→False — activates BTC chop gate. (2) Momentum NORMAL 0.0x — blocks momentum LONG in NORMAL (38.5%WR -$0.99/7d). (3) Deleted 6 deprecated constants (LOSS_MIN/MAX_PCT, CUT_LOSER_MAX_CLOSE, SKIP_BOTTOM_PCT, CUT_LOSER_FIRE_WINDOWS, BTC_CRASH_BLOCK_THRESHOLD). (4) Removed OPEN_SKIES from NEVER_REENABLE_FLAGS (CEO re-enabled for testing). (5) ZSCORE_PUMP_ENABLED→False (fixed True contradiction). All verified live.
-1. **daily_orchestrator ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 26T 50%WR +$0.94 | 7d 203T 48.8%WR +$1.21. Market NEUTRAL. 3 open. pump-chain+ LONG carrying (+$1.01/24h). Today rough (11T 18.2%WR -$0.70) but early. **No critical issues. All upgrade audit changes verified. System healthy.**
 
 ## Today's Changes (Sep 19)
 

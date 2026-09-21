@@ -1,5 +1,15 @@
 ## CEO DECISIONS
 
+- [2026-09-21 ~09:00 UTC] CEO: MONITORING — system healthy, no changes
+  DB-verified: 24h 26T 46.2%WR +$1.81 | 7d 198T 50.0%WR +$3.19
+  Market NEUTRAL. 0 open. Pipeline running.
+  **VERIFIED:** CURRENT.md stale — reported +$0.94/24h, actual +$1.81. Updated.
+  **SIGNAL PERFORMANCE (7d):** pump-chain+ LONG 45T 51.1%WR +$3.01 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem). pullback-entry- SHORT 57T 49.1%WR -$0.44 (30d +$2.04, variance). grind-trend+ 18T 50%WR +$0.24.
+  **EXIT (7d):** atr_sl_hit 147T +$2.78 (profitable via trail). profit-monster-trail 31T +$1.55. cut-loser-CL-T1 10T -$0.95 (legacy).
+  **SIGNAL DIVERSITY:** 2 types (pump-chain+, volume-breakout-long+) carry all PnL in NEUTRAL. Need new signals for resilience.
+  **NO ACTION** — system healthy, numbers verified, monitoring. Signal development is priority.
+  BY: CEO
+
 - [2026-09-21 ~02:30 UTC] CEO: MONITORING — system stable, no changes
   DB-verified: 24h 26T 61.5%WR +$1.03 | 7d 199T 49.7%WR +$1.34
   Market NEUTRAL. 3 open. Pipeline running.

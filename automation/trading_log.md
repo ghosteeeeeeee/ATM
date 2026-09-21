@@ -3545,3 +3545,29 @@ Final set: ['DOT', 'HYPER', 'ME']
 **Open Questions:** None
 
 **BY:** auto_1hr
+
+---
+
+**BY:** auto_1hr
+
+## [2026-09-21 11:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+- FIL LONG volume-breakout-long+ — atr_sl_hit — +$0.74
+
+**24h:** 26T 46.2%WR +$1.81 | **Open:** 0
+
+**Diagnosis:**
+1. Entry quality: FIL winner — no adverse excursion concern
+2. SL behavior: atr_sl_hit 77% of 24h but net profitable (+$1.79) — trailing working
+3. Signal quality: pump-chain+ carries (12T 50%WR +$1.09). Others 1T each — no kill candidates
+4. Trade frequency: 2-3/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR + 3+ trades)
+- System net profitable on 24h basis (+$1.81)
+- All close reasons net positive except pump_exit_momentum (-$0.13, single trade)
+
+**Open Questions:** None

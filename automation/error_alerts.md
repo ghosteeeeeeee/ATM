@@ -1,3 +1,10 @@
+## Error Alerts — 2026-09-21 08:46 UTC
+- **[WARN]** (1x): `signal_compactor timed out (killed after 60.1s)` at 08:42:02 — self-recovered on next cycle (0.9s)
+- **[WARN]** (1x): CRV LONG trade execution failed at 08:38:25 — signal rolled back properly, no retry loop
+- **[WARN]**: Disk at 85% (94G/118G) — data 6.9G, /tmp 6.1G. No compressible logs found.
+- **[INFO]**: Pipeline cycle #209259, 0 open trades, 9 losses + 1 win in last 7h
+- **[INFO]**: Market regime LONG_BIAS (3L/0S/117N), 5130 active signals
+
 ## Error Alerts — 2026-09-21 00:47 UTC
 - **[OK]**: Pipeline running normally — last cycle 00:44:00, 0 errors
 - **[OK]**: 5 open trades, 27 closed (24h), PnL=+1.84 USDT, WR=63.0%
@@ -246,3 +253,17 @@
 ## Error Alerts — 2026-09-21 06:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
 - **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-09-21 08:57 UTC
+- **REPEATED** (10x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: [TOK-TOK] info_rate: waited N.1s, retrying`
+
+## Health Report — 2026-09-21 09:45 UTC
+- **STATUS**: OK — Pipeline running, services active
+- **PIPELINE**: Cycle #209319, position_manager 0.7s, signal_compactor 2.1s
+- **SIGNALS**: 144 generated in last hour, 5289 total active
+- **TRADES**: 0 open, 1 closed today (+$0.43 CASHCAT LONG win)
+- **REGIME**: LONG_BIAS (28 long, 0 short, 92 neutral)
+- **DISK**: 85% used (94G/118G) — at warning threshold
+- **WARN**: signal_compactor 3 timeouts in 30min (09:17, 09:32, 09:38) — self-recovered each time
+- **WARN**: 5289 active signals — high count, consider purge cycle
