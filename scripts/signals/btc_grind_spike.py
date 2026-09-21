@@ -301,8 +301,8 @@ def run(prices_dict=None) -> int:
         open_pos = {p['token']: p['direction'] for p in get_open_positions()}
         if token in open_pos:
             return 0
-    except Exception:
-        pass
+    except Exception as e:
+        _log(f"  [WARN] Position check failed for {token}: {e}")
     
     # Cooldown check
     if get_cooldown(token, direction='LONG'):
@@ -387,7 +387,10 @@ if __name__ == '__main__':
                 
                 closes = [c['close'] for c in accum]
                 slope = _compute_linreg_slope(closes)
-                print(f"  Slope: {slope:.6f} (min: {ACCUM_SLOPE_MIN})")
+                if slope is not None:
+                    print(f"  Slope: {slope:.6f} (min: {ACCUM_SLOPE_MIN})")
+                else:
+                    print(f"  Slope: N/A (insufficient data, min: {ACCUM_SLOPE_MIN})")
                 
                 volumes = [c['volume'] for c in candles]
                 avg_vol = sum(volumes[-VOL_AVG_PERIOD-1:-1]) / VOL_AVG_PERIOD

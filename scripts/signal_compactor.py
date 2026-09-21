@@ -323,6 +323,7 @@ def _get_open_tokens() -> set:
     pipeline run because PostgreSQL hasn't been updated yet (HL position closed
     but DB record not updated → _get_open_tokens returns nothing → signal passes).
     """
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
@@ -330,10 +331,14 @@ def _get_open_tokens() -> set:
         cur = conn.cursor()
         cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
         tokens = {row[0] for row in cur.fetchall()}
-        cur.close(); conn.close()
+        cur.close()
     except Exception as e:
         log(f"[WARN] Could not query open positions from PostgreSQL: {e}", 'WARN')
         tokens = set()
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
     
     # DEFENSE-IN-DEPTH: Also check guardian closing markers
     # A token in closing markers means guardian has an active HL close in progress.
@@ -376,13 +381,13 @@ def get_regime_1m(coin):
     R² determines confidence: higher R² = more certain trend.
     """
     import statistics
+    conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         rows = conn.execute(
             "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 50",
             (coin.upper(),)
         ).fetchall()
-        conn.close()
         if len(rows) < 20:
             return 'NEUTRAL', 0
         closes = [r[0] for r in reversed(rows)]
@@ -408,12 +413,17 @@ def get_regime_1m(coin):
             return 'NEUTRAL', confidence
     except Exception:
         return 'NEUTRAL', 0
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def get_regime_4h(coin):
     """Get 4h regime from PostgreSQL momentum_cache (written by 4h_regime_scanner).
     Returns (regime_str, confidence_int 0-100). Falls back to NEUTRAL if no data.
     """
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', connect_timeout=3)
@@ -421,12 +431,15 @@ def get_regime_4h(coin):
         cur.execute("SELECT regime_4h FROM momentum_cache WHERE token=%s", (coin.upper(),))
         row = cur.fetchone()
         cur.close()
-        conn.close()
         if row and row[0]:
             return row[0], 80
         return 'NEUTRAL', 0
     except Exception:
         return 'NEUTRAL', 0
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 # ── Signal source weights ────────────────────────────────────────────────────────
 # Source-specific multipliers applied during scoring.
@@ -876,6 +889,7 @@ def _get_btc_momentum() -> float:
     """Get BTC 3h momentum as percentage change.
     Uses 1h candles: (current - 3h ago) / 3h ago * 100.
     Returns momentum % or 0.0 on error."""
+    conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         c = conn.cursor()
@@ -885,7 +899,6 @@ def _get_btc_momentum() -> float:
             ORDER BY ts DESC LIMIT 4
         """)
         rows = c.fetchall()
-        conn.close()
         if len(rows) < 4:
             return 0.0
         now_price = rows[0][0]
@@ -895,6 +908,10 @@ def _get_btc_momentum() -> float:
         return (now_price - ago_price) / ago_price * 100
     except Exception:
         return 0.0
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def _get_short_wr(window: int = 10) -> float:
@@ -1025,6 +1042,7 @@ def _check_directional_cap(direction: str) -> str | None:
     Uses PostgreSQL to count open positions by direction.
     """
     from hermes_constants import DIRECTIONAL_CAP_MAX_PCT
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
@@ -1037,7 +1055,7 @@ def _check_directional_cap(direction: str) -> str | None:
             GROUP BY direction
         """)
         counts = {row[0]: row[1] for row in cur.fetchall()}
-        cur.close(); conn.close()
+        cur.close()
 
         long_count = counts.get('LONG', 0)
         short_count = counts.get('SHORT', 0)
@@ -1069,6 +1087,10 @@ def _check_directional_cap(direction: str) -> str | None:
     except Exception as e:
         log(f"  [WARN] _check_directional_cap PostgreSQL error: {e}", 'WARN')
         return None  # fail open — don't block trades on DB errors
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 # ── Scoring ───────────────────────────────────────────────────────────────────
@@ -1677,6 +1699,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         VOL_GATE_EXPANSION_SHORT_FALLING_BOOST, VOL_GATE_EXPANSION_LONG_RISING_BOOST,
         VOL_GATE_COMPRESSION_MOMENTUM_PENALTY, VOL_GATE_COMPRESSION_MEANREV_BOOST,
     )
+    _vr_conn = None
     try:
         _vr_atr_ratio = None
         _vr_conn = sqlite3.connect(f'{HERMES_DATA}/candles.db', timeout=5)
@@ -1686,7 +1709,6 @@ def _score_signal(token, direction, conf, source, signal_type,
             WHERE token='BTC' AND is_closed=1 ORDER BY ts DESC LIMIT 520
         """)
         _vr_rows = _vr_cur.fetchall()
-        _vr_conn.close()
         if len(_vr_rows) >= 500:
             _vr_candles = list(reversed(_vr_rows))
             _vr_trs = []
@@ -1718,6 +1740,10 @@ def _score_signal(token, direction, conf, source, signal_type,
                 log(f"  📊 [VOL-REGIME] {token} {signal_type}: ATR ratio={_vr_atr_ratio:.2f} → {vol_regime_mult:.2f}x")
     except Exception:
         pass
+    finally:
+        if _vr_conn:
+            try: _vr_conn.close()
+            except Exception: pass
 
     # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
     # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
@@ -1922,12 +1948,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 zscore = row[9] if len(row) > 9 else None
                 rsi = row[8] if len(row) > 8 else None
                 price_val = None
+                _pc = None
                 try:
                     _pc = sqlite3.connect(STATIC_DB, timeout=3)
                     _pr = _pc.execute("SELECT price FROM latest_prices WHERE token=?", (token,)).fetchone()
-                    _pc.close()
                     if _pr: price_val = _pr[0]
                 except Exception: pass
+                finally:
+                    if _pc:
+                        try: _pc.close()
+                        except Exception: pass
                 # Detect block reason
                 block_reason = ''
                 dir_upper = (direction or '').upper()
