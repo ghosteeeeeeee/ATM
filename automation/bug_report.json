@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-21 13:59:51",
+  "timestamp": "2026-09-21 14:17:53",
   "total_checks": 20,
-  "passed": 9,
+  "passed": 10,
   "critical_count": 10,
-  "warning_count": 1,
+  "warning_count": 0,
   "criticals": [
     {
       "name": "pipeline_errors",
@@ -37,7 +37,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "107 bare except clauses in 34 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
+      "msg": "106 bare except clauses in 34 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
@@ -66,12 +66,5 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": [
-    {
-      "name": "trade_frequency",
-      "msg": "2 trades in 6h (0.3/hr)",
-      "file": "",
-      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
-    }
-  ]
+  "warnings": []
 }

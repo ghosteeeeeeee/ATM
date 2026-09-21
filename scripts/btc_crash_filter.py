@@ -581,7 +581,9 @@ def check_crash() -> CrashSignal:
         else:
             if momentum_block_sec > signal.block_duration_sec:
                 signal.block_duration_sec = momentum_block_sec
-                signal.blocked_direction = momentum_dir
+                # Don't overwrite all-direction block with single-direction (2026-09-21)
+                if signal.blocked_direction != '':
+                    signal.blocked_direction = momentum_dir
                 signal.layer = '+'.join(triggered_layers)
                 signal.reason += f' | MOMENTUM: {momentum_pct:+.2f}% ({momentum_dir} blocked)'
 
@@ -605,7 +607,9 @@ def check_crash() -> CrashSignal:
         else:
             if level_block_sec > signal.block_duration_sec:
                 signal.block_duration_sec = level_block_sec
-                signal.blocked_direction = level_dir
+                # Don't overwrite all-direction block with single-direction (2026-09-21)
+                if signal.blocked_direction != '':
+                    signal.blocked_direction = level_dir
                 signal.layer = '+'.join(triggered_layers)
                 signal.reason += f' | BTC_LEVEL: {level_dir} blocked ({pct_from_high:+.2f}% from high)'
 
