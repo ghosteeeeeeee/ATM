@@ -1073,7 +1073,8 @@ def _check_directional_cap(direction: str) -> str | None:
 
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
-                  age_m, compact_rounds, regime, regime_conf, speed_data):
+                  age_m, compact_rounds, regime, regime_conf, speed_data,
+                  _btc_ctx_cached=None):
     """
     Deterministic score formula:
 
@@ -1723,17 +1724,11 @@ def _score_signal(token, direction, conf, source, signal_type,
         from hermes_constants import OSCILLATOR_MULTS, OSCILLATOR_MULT_ENABLED, OSCILLATOR_SHADOW_LOG
         btc_score = speed_data.get('btc_score') if speed_data else None
         wave_phase = speed_data.get('wave_phase') if speed_data else None
-        # If btc_score not in speed_data, calculate it from continuum engine
-        if btc_score is None:
-            try:
-                from continuum_context import get_btc_trend_context
-                _btc_ctx = get_btc_trend_context()
-                if _btc_ctx.get('available'):
-                    btc_score = _btc_ctx.get('score')
-                    if wave_phase is None:
-                        wave_phase = _btc_ctx.get('wave_phase')
-            except Exception:
-                pass
+        # If btc_score not in speed_data, use pre-computed continuum context
+        if btc_score is None and _btc_ctx_cached:
+            btc_score = _btc_ctx_cached.get('score')
+            if wave_phase is None:
+                wave_phase = _btc_ctx_cached.get('wave_phase')
         if btc_score is not None and wave_phase:
             # Determine score zone
             if btc_score < 30:
@@ -2524,6 +2519,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         except Exception as e:
             log(f"Speed DB fallback failed: {e} — using defaults", 'WARN')
 
+        # ── Pre-compute BTC continuum context (once per compaction run) ──
+        # Avoids N duplicate DB queries when scoring N signals
+        _btc_ctx_cached = {}
+        try:
+            from continuum_context import get_btc_trend_context
+            _btc_ctx_cached = get_btc_trend_context()
+        except Exception:
+            pass
+
         # ── Step 4: Regime cache ────────────────────────────────────────────────
         unique_tokens = list({s[0].upper() for s in signals})
         prev_hotset = {}
@@ -2589,6 +2593,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 regime=regime,
                 regime_conf=regime_conf,
                 speed_data=speed_data,
+                _btc_ctx_cached=_btc_ctx_cached,
             )
 
             # Opposing signal penalty: check if opposing direction is firing for this token

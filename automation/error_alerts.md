@@ -329,3 +329,22 @@
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+
+## Error Alerts — 2026-09-21 16:45 UTC
+- **[WARN]** (2x): Phantom trades detected: ALT LONG (0.0% PnL), KAS LONG (-0.0025% PnL) — near-zero PnL entries
+- **[WARN]**: pump-chain+ signal: 10 trades today, 40% WR, -0.43 USDT net — underperforming
+- **[WARN]**: doji-bottom-long signal: 3 trades today, 0% WR, -0.35 USDT net — all losses
+- **AUTO-FIX**: Removed stale state.db (3.1GB, 14 days old, only used for mtime check) — disk 85%→82%
+- **AUTO-FIX**: Removed 4 stale 0-byte DBs (candles_hermes.db, price_cache.db, price_candles.db, price_data.db)
+- **AUTO-FIX**: Compressed 15 old .gz log files older than 7 days
+- **[INFO]**: Pipeline running healthy, cycle #209742, 10 signals in last hour, 0 open trades
+- **[INFO]**: Regime NEUTRAL (117/120 tokens neutral), 2 long bias, 1 short bias
+- **[INFO]**: 61 hermes timers active, all firing on schedule
+
+## Error Alerts — 2026-09-21 16:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.5s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.1s):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.7s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.6s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.0s):`
