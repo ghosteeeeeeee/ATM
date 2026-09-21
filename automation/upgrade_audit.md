@@ -18,8 +18,8 @@
 - **Core request:** New signal using MA-smoothed continuum score for crossover detection
 - **Difficulty:** Level 2
 - **Value:** MEDIUM
-- **Status:** PENDING
-- **Reason:** No signal script exists. Requires continuum.db data + new signal file. Deferred — lower priority than gradual rally.
+- **Status:** IMPLEMENTED
+- **Reason:** scripts/signals/continuum_ma.py exists and is registered. Updated 2026-09-21.
 
 ## Plan: btc-oscillator-30d-plan.md
 - **Date scanned:** 2026-09-19 01:00
@@ -359,3 +359,39 @@ All 22 IMPLEMENTED, 5 PARTIALLY IMPLEMENTED, 8 PENDING plans remain as previousl
 | 5 | Regime Tuner | 3 | MEDIUM | Needs new regime_tuner.py + systemd timer |
 
 **Key finding: No Level 1-2 tasks remain.** All remaining candidates require Level 3+ architecture work (HL API integration, new systems, position management changes).
+
+---
+
+## Scan #2 — 2026-09-21
+
+### Level 1 Tasks Implemented
+
+| # | Change | File | Impact |
+|---|--------|------|--------|
+| 1 | `CHOP_GATE_LOG_ONLY = False` | hermes_constants.py:940 | Activates BTC chop gate (was log-only 10 days past 48h trial) |
+| 2 | `'Momentum': 0.0` in `('NORMAL', '*')` | volatility_gate_v2.py:252 | Blocks momentum LONG in NORMAL (38.5% WR, -$0.99/7d) |
+| 3 | Deleted 6 deprecated constants | hermes_constants.py | LOSS_MIN/MAX_PCT, CUT_LOSER_MAX_CLOSE, SKIP_BOTTOM_PCT, CUT_LOSER_FIRE_WINDOWS, BTC_CRASH_BLOCK_THRESHOLD — zero references |
+| 4 | Removed OPEN_SKIES from NEVER_REENABLE_FLAGS | hermes_constants.py:1621-1622 | CEO re-enabled for 48h testing, shouldn't be in never-reenable |
+| 5 | `ZSCORE_PUMP_ENABLED = False` | hermes_constants.py:2672 | Fixed contradiction: comment said "BLOCKED" but value was True |
+
+### Verification
+
+- `python3 -c "import hermes_constants"` — OK
+- `python3 -c "import volatility_gate_v2"` — OK
+- Zero references confirmed for all deleted constants
+
+### Plan Status Updates
+
+| Plan | Previous Status | New Status | Reason |
+|------|----------------|------------|--------|
+| profitability-fix-plan | MOSTLY IMPLEMENTED | ✅ IMPLEMENTED | All actionable items now done (chop gate, momentum NORMAL block, deprecated cleanup) |
+| chop-regime-signal-gating | IMPLEMENTED | ✅ FULLY ACTIVE | CHOP_GATE_LOG_ONLY flipped to False |
+| volatility-regime-adaptive-signals | PARTIAL | ⚠️ PARTIAL | Momentum NORMAL block added, but full regime-based signal family multipliers still pending |
+
+### Remaining Level 1+2 Candidates
+
+| Priority | Task | Level | Value | Notes |
+|----------|------|-------|-------|-------|
+| 1 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | Needs monitoring for signal starvation |
+| 2 | BTC oscillator correlation filter | 2 | HIGH | Partial — zscore LONG block + SHORT boost in signal_compactor |
+| 3 | Spider-profit full integration | 3 | MEDIUM | Partial — regime-gated trail/tier params + timeout feature |

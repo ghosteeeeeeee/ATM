@@ -2606,3 +2606,28 @@
   0T closed last hour. 4 open positions. Quiet market.
   No kill criteria. No overtrading. pump-chain+ carrying at +$1.35/24h.
   BY: auto_1hr
+[2026-09-21 00:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 28T 64.3%WR +$1.85 | 7d: 202T 49.5%WR +$1.06
+  1T closed last hour (BLUR SHORT ATR SL -/usr/bin/bash.43). 4 open positions.
+  No kill criteria. No overtrading. pump-chain+ carrying at +$1.35/24h.
+  BY: auto_1hr
+[2026-09-21 01:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 27T 63%WR +$1.09 | 7d: 200T 49%WR +$0.81
+  0T closed last hour. 5 open positions. Quiet market.
+  No kill criteria. No overtrading. pump-chain+ carrying at +$0.33/24h.
+  BY: auto_1hr
+[2026-09-21 05:22 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 26T 54%WR +$0.76 | 1 open position (BTC LONG)
+  1T closed last hour (WLFI ATR SL -$0.15). Weekend quiet market.
+  No kill criteria. No overtrading.
+  BY: auto_1hr
+[2026-09-21 07:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 26T 50%WR +$0.80 | 1 open position (KAS was last close, -$0.02)
+  1T closed last hour (KAS profit-monster-trail -$0.02). Weekend quiet market.
+  No kill criteria. No overtrading.
+  BY: auto_1hr
+[2026-09-21 08:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 27T 44%WR +$0.75 | 7d: 205T 48%WR +$1.03
+  3T closed last hour (BTC $0, CAKE -$0.18, APT -$0.02). 1 open position (FIL).
+  4 consecutive negative hours (weekend noise, tiny amounts). No kill criteria.
+  BY: auto_1hr

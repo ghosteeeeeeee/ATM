@@ -251,16 +251,11 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'ACE',
-    'APT',
-    'BABY',
-    'BANANA',
-    'BLUR',
+    'ADA',
     'CAKE',
-    'FIL',
     'FOGO',
     'JUP',
     'LTC',
-    'POL',
     'SAND',
     'SYRUP'
 }
@@ -293,8 +288,9 @@ LOSERS_SHORT = {
 LOSERS = {
     'DOT',
     'HYPER',
-    'SEI'
+    'ME'
 }
+
 
 
 
@@ -942,7 +938,7 @@ ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 # Layer B: Gate STANDALONE_BYPASS — prevent bypass when BTC flat.
 BTC_CHOP_GATE_ENABLED = True
 BTC_CHOP_GATE_THRESHOLD = 0.20            # % — |BTC 30m| below this = CHOP (raised from 0.15 2026-09-11 — too many false entries in tight range)
-CHOP_GATE_LOG_ONLY = True                 # True = log only, don't block. Set False after 48h clean logs.
+CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-only since 2026-09-11, 10 days clean logs
 
 # ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
 # Blocks signals when BTC has already moved significantly in the trade direction.
@@ -1082,7 +1078,7 @@ BTC_CRASH_BLOCK_BASE_THRESHOLD = -1.5   # % — base threshold at baseline ATR
 BTC_CRASH_BLOCK_BASELINE_ATR = 0.8      # % — ATR% at which base threshold applies
 BTC_CRASH_BLOCK_MIN_THRESHOLD = -1.0    # % — tightest threshold (low vol, crashes hurt more)
 BTC_CRASH_BLOCK_MAX_THRESHOLD = -2.5    # % — widest threshold (high vol, normal swings)
-BTC_CRASH_BLOCK_THRESHOLD = -1.5        # DEPRECATED — kept for backward compat, use BASE_THRESHOLD
+
 
 # Layer 2: Volume spike detection
 BTC_CRASH_VOL_SPIKE_ENABLED = True
@@ -1543,12 +1539,7 @@ CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
 CL_MAE_GUARD_ENABLED    = True   # RE-ENABLED 2026-08-23, widened 2026-08-26 to 3.0%
                                  # ATR-aware version scales dynamically. Only catches true crashes.
 CL_MAE_GUARD_THRESHOLD  = 0.030  # 3.0% — legacy fallback (must match BASE_THRESHOLD for ATR-aware code)
-# Legacy constants (keep for backward compat / guardian)
-LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
-LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
-CUT_LOSER_MAX_CLOSE    = 1      # deprecated → use CL_TIER1_MAX_CLOSE
-SKIP_BOTTOM_PCT        = 0      # deprecated → use CL_TIER1_SKIP_BOTTOM_PCT
-CUT_LOSER_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}  # deprecated
+
 
 # ── Signal Kill Switches ───────────────────────────────────────────────────────
 # Master kill switches for each signal family. True = signal can fire.
@@ -1627,8 +1618,6 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
     'PULLBACK_ENTRY_PLUS_ENABLED',  # CEO 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
     'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
-    'OPEN_SKIES_ENABLED',          # RE-ENABLED 2026-09-20 for 48h testing (CEO)
-    'OPEN_SKIES_PLUS_ENABLED',     # RE-ENABLED 2026-09-20 for 48h testing (CEO)
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -2678,7 +2667,7 @@ PUMP_TP_PCT = 0.025   # 2.5% take profit for pump catcher (moved from signal_gen
 
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).
-ZSCORE_PUMP_ENABLED        = True  # True = old standalone would fire (BLOCKED — use signals/zscore_pump.py)
+ZSCORE_PUMP_ENABLED        = False  # DEAD — standalone removed, use signals/zscore_pump.py instead
 # Z-Score Pump (pipeline-integrated signal — migrated from standalone zscore_pump_hunter.py)
 ZSCORE_PUMP_NEW_ENABLED    = False   # master kill-switch for signals/zscore_pump.py (new pipeline)
 ZSCORE_PUMP_PLUS_ENABLED   = True   # zscore-pump+ LONG — PASS

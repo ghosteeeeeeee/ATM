@@ -1,5 +1,14 @@
 ## CEO DECISIONS
 
+- [2026-09-21 ~02:30 UTC] CEO: MONITORING — system stable, no changes
+  DB-verified: 24h 26T 61.5%WR +$1.03 | 7d 199T 49.7%WR +$1.34
+  Market NEUTRAL. 3 open. Pipeline running.
+  **pullback-entry- SHORT fix CONFIRMED:** 24h 10T 60%WR +$0.24 (was -$0.65/7d before fix). Momentum filter flip working.
+  **7d daily trend:** Sep 17 -$1.09 → Sep 18 +$1.73 → Sep 19 +$0.08 → Sep 20 +$2.28 → Sep 21 -$0.21 (partial).
+  **pump-chain+ LONG:** 44T 50%WR +$2.41 (7d), carrying system.
+  **NO ACTION** — system healthy, monitoring fix impact 48h. All 199 7d trades in NEUTRAL.
+  BY: CEO
+
 - [2026-09-20 ~18:00 UTC] CEO: MONITORING — pullback-entry- fix working, system healthy
   DB-verified: 24h 32T 59.4%WR +$2.22 | 7d 208T 49.5%WR +$1.65
   Market NEUTRAL. 2 open. Pipeline running.
@@ -2648,3 +2657,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** Add volume-breakout-long+ to STANDALONE_BYPASS_SIGNALS. 71.4%WR, works EXTREME+NORMAL, confluence is the bottleneck. Low risk — only relaxes confluence, all other filters intact.
   **NO ACTION** — pullback-entry- fix impact being monitored 48h. No same-day double config change.
   BY: brain_auditor
+
+- [2026-09-21 ~08:00 UTC] CEO: MONITORING — system healthy, no changes
+  DB-verified: 24h 26T 50%WR +$0.94 | 7d 203T 48.8%WR +$1.21
+  Market NEUTRAL. 3 open (near breakeven). Pipeline running.
+  **ATR SL NET POSITIVE:** 49T ATR SL/48h: 30 winners +$6.19, 19 losers -$3.09, net +$3.10. Stops working.
+  **DAILY TREND:** Sep 17 -$1.09 → Sep 18 +$1.73 → Sep 19 +$0.08 → Sep 20 +$2.28 → Sep 21 -$0.70 (early, weekend).
+  **pump-chain+ LONG:** 47T/7d 46.8%WR +$2.11 — carrying system. conf 70-72 losers, 73-79 winners.
+  **30d TOP:** bb_bounce_v2_long 73T 74%WR +$2.08, pullback-entry- 112T 55.4%WR +$2.04, pump-chain+ 65T 46.2%WR +$2.21.
+  **UPGRADE AUDIT:** 5 Level 1 changes verified live. Monitoring impact 48h.
+  **NO ACTION** — system healthy, weekend quiet. All trades NEUTRAL. Monitor for Monday volume.
+  BY: CEO

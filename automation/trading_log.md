@@ -3289,3 +3289,211 @@ Final set: ['DOT', 'HYPER', 'SEI']
 
 **Status:** System stable, no action required.
 **BY:** auto_1hr
+
+## [2026-09-21 00:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.43 (24h: 28T 64.3%WR +$1.85 | 7d: 202T 49.5%WR +$1.06)
+
+**Last hour:** BLUR SHORT pullback-entry- hit ATR SL (-$0.43, -390% pct — micro-position fee distortion)
+
+**24h by close reason:**
+- atr_sl_hit: 27T +$1.83 avg $0.068 — trailing stops profitable
+- HL_CLOSED: 1T +$0.02
+
+**24h by signal:**
+- pump-chain+: 14T 57.1%WR +$1.35 (carry)
+- pullback-entry-: 11T 63.6%WR +$0.10 (thin margin)
+- Others: 4T all winners
+
+**Diagnosis:**
+1. **Entry quality:** Micro-position on BLUR caused distorted pct — not a real 390% loss
+2. **SL behavior:** atr_sl_hit 96% but profitable — trailing working correctly
+3. **Signal quality:** No kill candidates. pullback-entry- margin thin but positive
+4. **Trade frequency:** 1T/hr — quiet market, not overtrading
+
+**No Change Needed:**
+- No kill candidates (0% WR + 3+ trades)
+- No overtrading
+- 24h profitable
+- 4 open positions (under cap)
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-21 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet market)
+**PnL:** $0.00 | 24h: 27T 63.0%WR +$1.09 | 7d: 200T 49.0%WR +$0.81
+
+**24h by exit reason:**
+- atr_sl_hit: 26T +$1.07 avg+$0.041 — trailing stops working
+- HL_CLOSED: 1T +$0.02
+
+**24h by signal:**
+- pump-chain+: 13T 54%WR +$0.33 (carry)
+- pullback-entry-: 11T 64%WR +$0.36 (healthy)
+- Others: 3T all winners
+
+**Open positions (5/6):** HYPER, AIXBT, HEMI, BANANA, WLFI — all LONG, ~$11.10 each
+
+**Diagnosis:**
+1. **Entry quality:** N/A — 0 closures this hour
+2. **SL behavior:** atr_sl_hit 96% but profitable (+$0.041 avg) — trailing working correctly
+3. **Signal quality:** All signals positive. No kill candidates.
+4. **Trade frequency:** 0T/hr — quiet market, not overtrading
+
+**No Change Needed:**
+- No kill candidates (0% WR + 3+ trades)
+- No overtrading
+- 24h and 7d both profitable
+- 5 open positions (under cap)
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-21 02:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BANANA LONG pump-chain+ ATR SL +$0.01)
+**PnL:** +$0.01 | 24h: 25T 68%WR +$1.51 | 7d: 200T 50%WR +$1.35
+
+**24h by exit reason:**
+- atr_sl_hit: 22T +$1.45 avg +$0.066 — trailing working
+- profit-monster-trail: 1T +$0.17
+- HL_CLOSED: 1T +$0.02
+- pump_exit_momentum: 1T -$0.13
+
+**24h by signal:**
+- pump-chain+: 12T 75%WR +$1.25 (carry)
+- pullback-entry-: 10T 60%WR +$0.24
+- Others: 3T all winners
+
+**Open positions (4/6):** HEMI, ALGO, BTC, WLFI — all LONG
+
+**Diagnosis:**
+1. **Entry quality:** BANANA closed +20.59% — good entry
+2. **SL behavior:** atr_sl_hit 88% of closes but profitable (+$0.066 avg) — trailing correct
+3. **Signal quality:** All signals positive. No kill candidates.
+4. **Trade frequency:** 1T/hr — quiet market
+
+**No Change Needed:**
+- No kill criteria met (0% WR + 3+ trades)
+- No overtrading
+- 24h and 7d profitable
+- 4 open positions (under cap)
+
+**Status:** System stable, no action required.
+**BY:** auto_1hr
+
+## [2026-09-21 04:09 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (3 in last 2h — all pump-chain+ LONG atr_sl_hit, $0.15 each)
+**24h:** 25T 56%WR +$1.02 | pump-chain+ 13T 53.8%WR +$0.85 | pullback-entry- 9T 55.6%WR +$0.15
+
+**Changes:** None.
+
+**No Change Needed:**
+- No kill candidates (no signal with 0% WR + 3+ trades)
+- ATR SL dominant (88%) but profitable (+$0.044 avg) — trailing working
+- 2 open positions (under cap)
+- 24h net profitable
+- Trade frequency: 0T/hr last hour — quiet market
+
+**Side note:** `pnl_pct` column has bad data (values like -688%, -406%) — dollar PnL is correct. Column calculation bug, not trading issue. Won't fix now (not impacting decisions).
+
+**Open Questions:** None — system stable, night market quiet.
+
+**BY:** auto_1hr
+
+## [2026-09-21 05:22 UTC] Hourly Analysis
+
+**Trades:** 1 closed (WLFI LONG doji-bottom-long ATR SL -$0.15)
+**24h:** 26T 54%WR +$0.76 | atr_sl_hit 88% but profitable (+$0.035 avg)
+
+**6h trend:** 9T net -$0.66 — small consistent losses (weekend noise)
+
+**Diagnosis:**
+1. Entry quality: WLFI loss small (-$0.15), no adverse excursion concern
+2. SL behavior: ATR SL dominant (88%) but profitable — trailing working correctly
+3. Signal quality: doji-bottom-long 0/1, volume-breakout-long+ 0/1 — not killable (need 3+)
+4. Trade frequency: 1T/hr — under-traded, quiet weekend market
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no signal with 0% WR + 3+ trades)
+- Only 1 open position (BTC LONG, $11.10)
+- 24h net profitable
+- Weekend market — low volume expected
+
+**Open Questions:** None
+
+**BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-21 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE APT (WR=50.0%, PnL=$0.07, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BABY (WR=62.5%, PnL=$-0.28, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BANANA (WR=50.0%, PnL=$0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE POL (inactive 7d, no trades)
+- DEMOTE FIL (WR=50.0%, PnL=$-0.06, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BLUR (WR=50.0%, PnL=$-0.09, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ADA (WR=60.0%, AvgPnL=4.23%, Trades=5)
+
+Final set: ['ACE', 'ADA', 'CAKE', 'FOGO', 'JUP', 'LTC', 'SAND', 'SYRUP']
+
+## LOSERS Update — 2026-09-21 06:05 UTC
+- REMOVE SEI (insufficient data)
+- ADD ME (WR=40.0%, PnL=$0.12, wr_collapse (69.0% → 40.0%))
+
+Final set: ['DOT', 'HYPER', 'ME']
+
+## [2026-09-21 07:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (KAS LONG bb-bounce-v3-long+ profit-monster-trail -$0.02)
+**24h:** 26T 50%WR +$0.80 | atr_sl_hit 84.6% but profitable (+$0.76)
+**Open:** 4 positions (APT SHORT, CAKE LONG, FIL LONG, BTC LONG)
+
+**Diagnosis:**
+1. Entry quality: KAS loss negligible (-$0.02), no adverse excursion concern
+2. SL behavior: ATR SL dominant (84.6%) but profitable — trailing working correctly
+3. Signal quality: pump-chain+ carries (13T, 53.8%WR, +$0.85). Others have 1T each — not killable
+4. Trade frequency: 1T/hr — quiet weekend market
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no signal with 0% WR + 3+ trades)
+- 24h net profitable
+- Weekend market — low volume expected
+
+**Open Questions:** None
+
+**BY:** auto_1hr
+
+## [2026-09-21 08:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+- BTC LONG continuum-osc+ — profit-monster-trail — $0.00
+- CAKE LONG pump-chain+ — atr_sl_hit — -$0.18
+- APT SHORT r2-trend-short3 — profit-monster-trail — -$0.02
+
+**24h:** 27T, 44.4% WR, +$0.75 | Open: 1 (FIL LONG)
+**6h:** 4 consecutive negative hours (03:00-06:00) but tiny amounts (-$0.67 total)
+
+**Diagnosis:**
+1. Entry quality: Losses small ($0.18 max), no adverse excursion concern
+2. SL behavior: atr_sl_hit 78% of 24h closes but net profitable (+$0.73)
+3. Signal quality: pump-chain+ carries (12T, 50% WR, +$0.82). No kill candidates.
+4. Trade frequency: 3T/hr — normal weekend market
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (no 0% WR + 3+ trades)
+- Weekend noise, system net profitable
+- 1 open position (FIL LONG)
+
+**Open Questions:** None
+
+**BY:** auto_1hr
