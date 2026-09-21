@@ -157,7 +157,12 @@ def detect(token: str) -> dict:
         
         # Confidence scales with magnitude and score level
         conf = 65 + min(18, cadence['magnitude'] * 3)
-        conf = min(88, conf)
+        # Score bonus: extreme scores = stronger signal (2026-09-21)
+        if cadence['current_score'] > 90:
+            conf += 7  # strong bullish momentum
+        elif cadence['current_score'] > 80:
+            conf += 4
+        conf = min(95, conf)
         
         return {
             'direction': 'LONG',
@@ -174,7 +179,12 @@ def detect(token: str) -> dict:
         cadence['magnitude'] >= CONTINUUM_OSC_SCORE_FALLING_THRESHOLD):
         
         conf = 65 + min(18, cadence['magnitude'] * 3)
-        conf = min(88, conf)
+        # Score bonus: extreme scores = stronger signal (2026-09-21)
+        if cadence['current_score'] < 10:
+            conf += 7  # strong bearish momentum
+        elif cadence['current_score'] < 20:
+            conf += 4
+        conf = min(95, conf)
         
         return {
             'direction': 'SHORT',
