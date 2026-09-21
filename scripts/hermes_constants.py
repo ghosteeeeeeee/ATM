@@ -2105,6 +2105,12 @@ SQUEEZE_REVERSAL_SELLOFF_WINDOW = 120      # bars to check for sell-off (2h of 1
 # BB Squeeze
 SQUEEZE_REVERSAL_BB_PERIOD = 20            # BB period
 SQUEEZE_REVERSAL_BB_MULT = 2.0             # BB standard deviation multiplier
+
+# ── Squeeze Breakout Signal ──────────────────────────────────────────────────
+# Consolidation breakout: enters at START of expansion from squeeze
+SQUEEZE_BREAKOUT_ENABLED = True
+SQUEEZE_BREAKOUT_PLUS_ENABLED = True      # LONG direction
+SQUEEZE_BREAKOUT_MINUS_ENABLED = True     # SHORT direction
 SQUEEZE_REVERSAL_SQUEEZE_THRESH = 0.8      # max BB Width % for squeeze
 SQUEEZE_REVERSAL_SQUEEZE_MIN_BARS = 60     # min bars in squeeze (1h)
 # Entry
