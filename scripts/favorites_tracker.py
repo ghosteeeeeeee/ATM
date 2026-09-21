@@ -227,13 +227,15 @@ def get_30d_leaderboard():
         ][:10]
 
         # Hall of shame: consistent losers (30d WR < 45%, trades >=15, losing)
+        # FIX (2026-09-21): Removed [:10] cap — was cutting off worst losers (sorted by PnL DESC)
         hall_of_shame = [
             t for t in all_tokens
             if t['winrate'] < 45 and t['trades'] >= 15 and t['total_pnl_usdt'] < 0
-        ][:10]
+        ]
 
-        # Top leaderboard (all tokens, sorted by PnL)
-        leaderboard = all_tokens[:20]
+        # Top leaderboard (all qualifying tokens, not just top 20)
+        # FIX (2026-09-21): Include all tokens so signal_compactor cache covers every traded token
+        leaderboard = all_tokens
 
         return {
             'leaderboard': leaderboard,
