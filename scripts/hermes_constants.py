@@ -804,7 +804,7 @@ SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50%
 # Block entries chasing extended moves. Data (7d LONG): z>2.5 12.5%WR -$1.01,
 # gap>1.0% 25%WR -$0.40. Non-chase: 53.1%WR +$1.28. Net +$1.25/7d if blocked.
 CHASE_FILTER_ENABLED = True
-CHASE_GAP_MAX_PCT = 1.0              # max EMA300 gap% for LONG (blocks chasing pumps)
+CHASE_GAP_MAX_PCT = 3.0              # CEO 2026-09-21: raised from 1.0 to catch valid pumps (pipeline latency 2-5min)
 CHASE_ZSCORE_MAX = 2.5               # max z-score for LONG (blocks chasing extended moves)
 
 # ── Global Spike Filter ────────────────────────────────────────────────────
@@ -837,7 +837,7 @@ SHORT_BB_DEAD_ZONE2_MAX = 0.55
 # z>2.5 OR gap>1.0% (EMA300) = chasing. 7d: 15T 20%WR -$1.25 vs non-chase 96T 53.1%WR +$1.28.
 # Blocks 3 small winners ($0.23 total). Net: +$1.32/7d.
 CHASE_ZSCORE_MAX = 2.5            # block LONG if z_score > this (overextended)
-CHASE_GAP_MAX_PCT = 1.0           # block LONG if |gap_at_entry| > this% (chasing EMA300)
+CHASE_GAP_MAX_PCT = 3.0           # CEO 2026-09-21: raised from 1.0 to catch valid pumps
 
 # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
 # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
