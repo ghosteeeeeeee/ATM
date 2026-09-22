@@ -3509,8 +3509,7 @@ def get_token_amp_class(token):
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = True          # 48H TEST 2026-09-18 — pump_chain_v4 uses this flag. DISABLE after 48h.
-PUMP_FLOW_MINUS_ENABLED = True         # RE-ENABLED 2026-09-21 — key mismatch bug fixed (SHORT never fired).
-                                       # Was killed 2026-09-14 by signal reporter, but root cause was the key bug.
+PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
 PUMP_CHAIN_V4_ENABLED = True          # NEW 2026-09-18 — pump-chain with BTC oscillator filter. Blocks LONG at BTC>80 (chasing exhaustion), boosts at 40-80.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence

@@ -4025,3 +4025,24 @@ Final set: ['DOT', 'HYPER', 'ME']
 - atr_sl_hit rate normal
 
 **BY:** auto_1hr
+
+## [2026-09-22 05:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (GOAT LONG +$0.12, GMT SHORT -$0.02) | **Open:** 3 (ADA, ETC, ALGO)
+**24h:** 25T, 24% WR, -$1.00 | **7d:** 192T, 46.9% WR, +$1.30
+
+**Diagnosis:**
+1. Entry quality: GOAT 314% PnL — microcap pump, normal variance
+2. SL behavior: atr_sl_hit 72% (18/25) — consistent baseline
+3. Signal quality: pump-chain+ 24h -$0.50 but 7d +$1.99 (44.2% WR) — regime variance. pump-chain- 4T 0%WR — too few to kill.
+4. Trade frequency: 2/hour — normal
+5. Kill criteria: None met
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria (0 signals with 3+ trades last hour)
+- 7d net positive (+$1.30)
+- System within normal variance
+
+**BY:** auto_1hr
