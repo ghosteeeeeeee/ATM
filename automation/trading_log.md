@@ -3937,3 +3937,25 @@ Final set: ['DOT', 'HYPER', 'ME']
 - 0 open positions, flat book
 
 **BY:** auto_1hr
+
+## [2026-09-22 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 25T, 24% WR, -$0.85 | **7d:** 189T, 47.1% WR, +$1.40
+
+**Diagnosis:**
+1. Entry quality: N/A — 0 trades closed, 0 open. System flat.
+2. SL behavior: 24h atr_sl_hit 72% (18/25) — consistent baseline, not actionable.
+3. Signal quality: pump-chain+ 14.3% WR -$0.92 (24h) — bad day yesterday (Sep 21: 15T 20% WR -$0.92). Sep 20 was +$1.35. Regime variance, not signal failure. 7d pump-chain+ still positive (+$1.87).
+4. Trade frequency: 0/hour — quiet period, normal.
+5. Kill criteria: None — 0 trades last hour, no signal qualifies.
+
+**Changes:** None
+
+**No Change Needed:**
+- No trades in last hour → nothing to act on
+- System flat (0 open, 0 closed)
+- 7d still net positive (+$1.40)
+- pump-chain+ degraded Sep 21 but 7d profitable — regime variance
+
+**BY:** auto_1hr

@@ -2701,3 +2701,9 @@
   signal_compactor: 7 timeouts (60s) — DB lock contention, self-recovers.
   CURRENT.md updated. No config changes.
   BY: daily_orchestrator
+[2026-09-22 01:10 UTC] auto_1hr: NO CHANGE — system flat
+  24h: 25T 24%WR -$0.85 | 7d: 189T 47.1%WR +$1.40
+  0 trades last hour, 0 open positions. System flat and quiet.
+  pump-chain+ Sep 21 bad (15T 20%WR -$0.92) but Sep 20 was +$1.35. 7d still positive.
+  No kill criteria. Normal quiet period.
+  BY: auto_1hr

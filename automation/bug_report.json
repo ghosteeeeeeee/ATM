@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22 01:53:29",
+  "timestamp": "2026-09-22 02:09:31",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -31,7 +31,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "108 bare except clauses in 34 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
+      "msg": "109 bare except clauses in 34 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
