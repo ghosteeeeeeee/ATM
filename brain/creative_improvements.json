@@ -1519,5 +1519,36 @@
     "status": "needs implementation",
     "risk": "medium",
     "impact_on_winners": "Needs verification against winning SHORT entries"
+  },
+  {
+    "date": "2026-09-22T05:00:00Z",
+    "idea": "HEMI token blacklist consideration",
+    "rationale": "3 pump-chain+ losses in 7d, 0% WR, -$0.44. Cluster of losses on one token.",
+    "expected_impact": "+$0.44/7d if blacklisted",
+    "category": "entry filter",
+    "status": "boosted",
+    "risk": "low",
+    "sample_size": "3 trades (INSUFFICIENT)",
+    "boosted_at": "2026-09-22T01:42:32.809331+00:00"
+  },
+  {
+    "date": "2026-09-22T05:00:00Z",
+    "idea": "Implement regime-weighted confidence (CEO approved Sep 21)",
+    "rationale": "EXTREME 53.8%WR +$2.52 vs NORMAL 37.2%WR -$0.99. Boost EXTREME 1.15x, reduce NORMAL 0.85x.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "confidence tuning",
+    "status": "ready_to_implement",
+    "risk": "low",
+    "sample_size": "190+ trades/7d"
+  },
+  {
+    "date": "2026-09-22T05:00:00Z",
+    "idea": "pullback-entry- SHORT NORMAL regime block",
+    "rationale": "14T 42.9%WR -$0.53/7d in NORMAL. EXTREME 50%WR, HIGH 50%WR.",
+    "expected_impact": "+$0.53/7d",
+    "category": "regime filter",
+    "status": "monitor",
+    "risk": "medium",
+    "sample_size": "14 trades (borderline)"
   }
 ]

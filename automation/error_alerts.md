@@ -390,3 +390,23 @@
 
 ## Error Alerts — 2026-09-21 22:57 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-21 23:44 UTC
+- **[WARN]** (5x): `signal_compactor timed out (killed after 60.0s)` — 5 occurrences in last 2h. Recurring issue, pipeline recovers next cycle.
+- **[WARN]**: Win rate 29.6% today (27 trades closed) — below 40% target. 23 LONG (30.4% WR, -$1.05), 4 SHORT (25% WR, -$0.48).
+- **[WARN]**: 2 phantom trades detected (pnl_pct <0.01%).
+- **[INFO]**: 0 open trades currently. Market regime LONG_BIAS (3/120 tokens). Disk 83%.
+- **AUTO-FIX**: No auto-fixes needed — pipeline running, timers active, no critical failures.
+
+## Error Alerts — 2026-09-22 00:44 UTC
+- **WARN** (1x): `signal_compactor: timed out (killed after 60.1s)` at 00:37:02 — self-recovered on next 3 runs (1.8s-3.8s)
+- **WARN**: Disk at 83% (92G/118G) — approaching 85% threshold
+- **AUTO-FIX**: None needed — signal_compactor self-recovered
+
+## Error Alerts — 2026-09-22 00:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-22 01:46 UTC
+- **[WARN]** (Nx1): `Disk usage at 83% (92G/118G)` — approaching 85% threshold
+- **AUTO-FIX**: None applied. Consider compressing old logs or running cleanup.

@@ -1,71 +1,40 @@
-# Signal Performance Report
-**Generated:** 2026-09-21 23:03 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-09-21 23:09 UTC
 
-## Overall Stats
-- **Total trades (all time):** 2,633 | **WR:** 51.9% | **PnL:** -81.96%
-- **Date range:** 2026-07-29 → 2026-09-21
+Period: Last 6h | 24h
 
----
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | - | - | - | - | No kills — no signal meets kill criteria |
 
-## WINNERS (WR > 55%, PnL > 0)
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | - | - | - | - | No boost candidates — no signal with 5+ trades, >55% WR, >$0.05 PnL |
 
-None found.
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 21.4% | -$0.75 | 14 | WATCH — lifetime profitable ($1.80). 24h bad patch in EXTREME (22%WR -$0.69). NORMAL block already active (0.0x mult). Variance, not structural. |
+| doji-bottom-long | LONG | 33.3% | -$0.34 | 3 | WATCH — lifetime 66.7% WR +$0.40. Only 3 trades — insufficient sample. |
+| pullback-entry- | SHORT | 0.0% | -$0.32 | 2 | WATCH — lifetime 54.9% WR +$1.89. Only 2 trades — insufficient sample. |
+| mover+ | LONG | 50.0% | -$0.24 | 2 | WATCH — lifetime 73.3% WR +$0.10. Only 2 trades. |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| volume-breakout-long+ | LONG | 50.0% | +$0.57 | 2 | OK |
+| accel-300-breakout,rs-r64,rs-r66 | SHORT | 100.0% | +$0.17 | 1 | OK |
+| mover- | SHORT | 77.8% | +$0.52 | 9 (7d) | Consistent |
 
-## LOSERS (WR < 30%, PnL < -2%)
+ISSUES:
+- **pump-chain+ bad 24h patch**: 21.4% WR -$0.75 in 24h, but lifetime 43.2% WR +$1.80. Losses concentrated in EXTREME regime (22.2% WR -$0.69) where signal normally wins (50% WR +$1.52 over 7d). This is variance, not a structural failure. NORMAL regime block already active (0.0x multiplier).
+- **Low trade volume**: Only 27 closed trades in 24h across all signals. Insufficient data for many signals to evaluate.
+- **No signal inversions detected**.
+- **1 open position**: pump-chain+ LONG on AIXBT (entry $0.02278).
 
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| pump-chain+ | LONG | 14 | 35.7% | -5.54 | ❓ | Borderline |
-| mover+ | LONG | 2 | 50.0% | -0.53 | ENABLED | Needs more data |
-| volume-breakout-long+ | LONG | 2 | 50.0% | +2.93 | ❓ | Needs more data |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] pump-chain+ LONG** — WR=35.7%, PnL=-5.54% over 14 trades. Monitor next cycle.
-2. **[WATCH] mover+ LONG** — WR=50.0%, PnL=-0.53% over 2 trades. Monitor next cycle.
-3. **[WATCH] volume-breakout-long+ LONG** — WR=50.0%, PnL=+2.93% over 2 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-09-21 | 09b0d53 | signals: block pump-chain+ LONG in hours 0-4 UTC (0%WR/7d de... |
-| 2026-09-21 | ef36d0d | CEO: raise CHASE_GAP_MAX_PCT from 1.0 to 3.0 |
-| 2026-09-21 | 9770b3d | daily_orchestrator: 2026-09-21 ~20:30 UTC — NO CONFIG CHANGE |
-| 2026-09-21 | 8f7d401 | config: squeeze_breakout cooldown 4h → 20min (2026-09-21) |
-| 2026-09-21 | 4f77803 | fix: squeeze_breakout — move all magic numbers to hermes_con... |
-| 2026-09-21 | 1ec8df2 | feat: squeeze_breakout signal — consolidation breakout catch... |
-| 2026-09-21 | 874094c | Oscillator Matrix: shadow mode implementation |
-| 2026-09-21 | 8b63f41 | Fix: BTC_LEVEL constants — remove dead code, add tunable par... |
-| 2026-09-21 | ac16c94 | brain_auditor: UNIVERSAL_MAX_HOLD_MINUTES=480 safety net + f... |
-| 2026-09-21 | ba0c034 | config: CONF_FILTER_MAX 89→92 (conservative) — 95+ was losin... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+DECISIONS MADE:
+- No kills executed — no signal meets kill criteria (WR<30% with 5+ trades in 24h AND PnL<-$0.10 AND active >24h)
+- pump-chain+ NORMAL regime block already in place (Pump_Flow = 0.0x in VOL_PHASE_MULTS)
+- No regime changes needed

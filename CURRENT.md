@@ -1,19 +1,20 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-21 ~20:30 UTC (daily_orchestrator)**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-22 ~CEO**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 22T, 36.4% WR, +$0.08. 1 open. NEUTRAL/HIGH vol. Pipeline running.
+24h: 28T, 25.0% WR, -$0.98. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 22T, 36.4% WR, +$0.08 (breakeven). 8L/14W. pump-chain+ degraded today (33.3%WR -$0.39) but 7d is still +$3.01. Normal variance for NEUTRAL regime.
-- **7d:** 184T, 48.9% WR, +$2.30 (DB-verified). POSITIVE.
-- **LONG:** 115T, 48.7% WR, +$2.70. pump-chain+ 45T +$3.01 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
-- **SHORT:** 69T, 49.3% WR, -$0.40. pullback-entry- 55T 47.3%WR -$0.59 (cold streak — 90d is 55.4%WR +$2.04). All other SHORT signals minor.
+- **24h (rolling):** 28T, 25.0% WR, -$0.98. pump-chain+ bad day (Sep 21 15T 20%WR -$0.92). 30d NEUTRAL pump-chain+ still +$1.59.
+- **7d:** 189T, 47.1% WR, +$1.40 (DB-verified). POSITIVE.
+- **LONG:** 118T, 46.6% WR, +$2.01. pump-chain+ 51T +$2.43 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
+- **SHORT:** 70T, 48.6% WR, -$0.55. pullback-entry- 55T 47.3%WR -$0.68 (cold streak — 90d is 55.4%WR +$2.04). All other SHORT signals minor.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
-- **KILLED/REGIME BLOCKED:** grind-trend+ (Sep 19), grind-trend- (Sep 19), open-skies+ (Sep 17), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5] — CEO fixed Sep 22. Removed hours 20,23 (profitable), added hour 5 (0%WR).
+- **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22 CEO — 48h test expired 36.4%WR), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
@@ -22,10 +23,10 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟢 R:R STATUS (7d +$2.30 POSITIVE, 24h +$0.08 BREAKEVEN)**
-7d PnL +$2.30. pump-chain+ LONG +$3.01 (45T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h +$0.08 (pump-chain+ degraded today 33.3%WR -$0.39 — normal NEUTRAL variance, 90d 49%WR +$8.39).
+**🟢 R:R STATUS (7d +$1.40 POSITIVE, 24h -$0.98 DOWN)**
+7d PnL +$1.40. pump-chain+ LONG +$1.87 (51T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$0.98 (pump-chain+ bad day Sep 21, normal variance). Dead hours fix expected +$0.50-1.00/7d.
 
-**🟢 REGIME EDGE (7d):** EXTREME 59T 57.6%WR +$3.30★ (best). NORMAL 44T 38.6%WR -$0.97 (worst). Gap $4.27/7d. HIGH 80T 47.5%WR -$0.05 (flat). brain_auditor proposal: regime-weighted confidence (EXTREME 1.15x, NORMAL 0.85x).
+**🟢 REGIME EDGE (7d):** EXTREME 62T 54.8%WR +$2.63★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.62/7d. Regime-weighted confidence shadow eval due Sep 23.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -37,8 +38,15 @@
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
+## Today's Changes (Sep 22)
+
+1. **CEO ~CEO UTC — 2 CONFIG CHANGES.** (1) PUMP_CHAIN_LONG_DEAD_HOURS [0,1,2,3,4,20,23] → [0,1,2,3,4,5]. 14d data: hours 20(+$0.19),23(+$0.69) profitable. Hour 5 0%WR added. Expected +$0.50-1.00/7d. (2) OPEN_SKIES_ENABLED/PLUS → False. 48h test expired, 11T 36.4%WR -$0.73. No edge. Updated signal_regime_memory.json (fresh 30d data). pullback-entry- IMPROVED (now wins HIGH). pump-chain+ DEGRADED (no regime >55%WR).
+1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified (recent_changes.log): 24h 25T 48%WR +$1.93 | 7d ~200T 49%WR +$3.51. 17 losers (24h). All normal ATR_SL variance. **LOSING AUTOPSY:** 10 pump-chain+ ATR_SL (HEMI cluster 3T 0%WR -$0.44). 2 doji-bottom-long (WLFI 678min MAX_HOLD race — not a bug). 5 scattered. **DATA QUALITY:** RSI metadata 100% NULL — #1 blocker for entry quality analysis (flagged 3x since Sep 18, still unfixed). **DRIFT:** ZERO. Dead hours [0,1,2,3,4,20,23] correct. Oscillator shadow correct. **REGIME EDGE:** EXTREME 53.8%WR +$2.52 vs NORMAL 37.2%WR -$0.99. **CREATIVE:** (1) HEMI monitor (3T 0%WR, need 10+ trades). (2) Regime-weighted confidence ready to implement. (3) pullback-entry- SHORT NORMAL review (14T 42.9%WR -$0.53, borderline). NO ACTION.
+
 ## Today's Changes (Sep 21)
 
+1. **brain_auditor ~21:45 UTC — NO CONFIG CHANGE.** DB-verified: 24h 27T 25.9%WR -$0.95 | 7d 188T 47.3%WR +$1.46. 15 losers (24h). All normal ATR_SL variance. **LOSING AUTOPSY:** 8 pump-chain+ ATR_SL (2 would-have-been blocked by dead hours hour 3). 2 doji-bottom-long (WLFI 678min stale covered by MAX_HOLD=480). 2 pullback-entry- SHORT (NORMAL/HIGH, already penalized). **DEAD HOURS VALIDATED:** 15T/7d hours 0-4 = 0%WR -$1.73. **REGIME EDGE:** EXTREME 62T 54.8%WR +$2.63 vs NORMAL 43T 37.2%WR -$0.99. Shadow eval due Sep 23. **NO ACTION.**
+1. **auto_1hr ~21:15 UTC — CONFIG CHANGE.** Added PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4] hard block in signal_compactor.py. pump-chain+ hours 0-4 = 0%WR 15T/7d -$1.73. Commit 09b0d53e.
 1. **daily_orchestrator ~20:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 22T 36.4%WR +$0.08 | 7d 184T 48.9%WR +$2.30. Market NEUTRAL/HIGH vol. 1 open (CFX SHORT pullback-entry-). **LONG:** 115T 48.7%WR +$2.70. **SHORT:** 69T 49.3%WR -$0.40. **pump-chain+ degraded today** (33.3%WR -$0.39) but 7d still +$3.01 — normal NEUTRAL variance. **EXTREME regime edge confirmed:** 57.6%WR +$3.30 vs NORMAL 38.6%WR -$0.97. **signal_compactor timeouts:** 7 kills in 2h at 60s — DB lock contention during pipeline. Standalone service works (1-2s). Self-recovers. **NO ACTION NEEDED.**
 1. **CEO ~18:10 UTC — NO CONFIG CHANGE.** DB-verified: 24h 24T 37.5%WR -$0.05 | 7d 193T 49.2%WR +$2.36. All NEUTRAL. 1 open (CFX SHORT pullback-entry- 99conf). **LONG:** 120T 50.8%WR +$3.32. **SHORT:** 73T 46.6%WR -$0.96. **SHORT bleed analysis:** pullback-entry- SHORT is 55.4%WR +$2.04 over 90d — 7d -$0.59 is cold streak, not systemic. All other SHORT signals minor. **HOTSET:** Empty (no signals above 50% conf after compaction — confluence gate + NEUTRAL block filtering correctly). **OSCILLATOR SHADOW:** Running since 16:00 UTC, eval due ~Sep 23. **NO ACTION** — system healthy, monitoring.
 1. **brain_auditor ~14:30 UTC — NO CONFIG CHANGE.** Full audit. REGIME-WEIGHTED CONFIDENCE proposal: EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d. No trades blocked, only confidence adjusted. Losing autopsy: all 13 24h losers are normal ATR_SL variance. WLFI stale 678min (MAX_HOLD needed). NO ACTION.
@@ -79,6 +87,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 - **OSCILLATOR MATRIX SHADOW MODE.** Approved 2026-09-21 ~16:00 UTC. 20% coverage (280/1403 trades). LOW+falling catastrophic (22.9%WR -$3.16/30d). Shadow logging active, eval due ~Sep 23. — 2026-09-21
 - **CHASE FILTER ACTIVE.** CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. — 2026-09-19
+- **PUMP-CHAIN+ DEAD HOURS BLOCK.** Hours 0-4 UTC hard block. 15T/7d 0%WR -$1.73. — 2026-09-21
 - **STALE FILTER:** Working. 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). — 2026-09-19
 - **LONG_NEUTRAL_BLOCK DEPLOYED.** — 2026-09-02
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected. — 2026-09-06
