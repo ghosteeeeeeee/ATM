@@ -4501,3 +4501,30 @@ Final set: ['ME']
 - System stable, no action required
 
 **BY:** auto_1hr
+
+## [2026-09-22 19:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 2 (COMP SHORT, FIL SHORT)
+**24h:** 26T, ~42% WR, -$2.62 | **7d:** 181T, 45.3% WR, -$0.05
+
+**Close Reasons (24h):**
+- atr_sl_hit: 19/26 (73.1%), avg -$0.152 — within 55-75% baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+- Other: 2T, mixed
+
+**Signal Performance (24h):**
+- pump-chain+: 9T, 11.1% WR, -$1.15 — recent degraded but lifetime 41.2% WR +$0.95
+- pullback-entry-: 4T, 0% WR, -$1.10 — all atr_sl_hit, spread over 17h
+- pump-chain-: 6T, 33.3% WR, -$0.38
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ losses in 1 hour)
+- atr_sl_hit 73.1% within baseline
+- 7d near breakeven (-$0.05)
+- Trade frequency normal (0/hr last hour)
+- System stable
+
+**BY:** auto_1hr

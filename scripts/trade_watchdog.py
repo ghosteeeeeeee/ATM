@@ -45,8 +45,41 @@ MFE_GIVEBACK_URGENT_PCT = 5.0      # Gave back 5%+ of MFE = urgent
 MFE_GIVEBACK_WARNING_PCT = 3.0     # Gave back 3%+ of MFE = warning
 
 # Mode: "recommend" or "autopilot"
-# After 48h from deployment, change to "autopilot"
-WATCHDOG_MODE = "recommend"
+# Auto-switches after DEPLOY_TIME + AUTOPILOT_DELAY_HOURS
+AUTOPILOT_DELAY_HOURS = 48
+DEPLOY_TIME_FILE = os.path.join(HERMES_DATA, "watchdog_deploy_time.json")
+AUTO_EXECUTABLE_CATEGORIES = {"profit_lock"}  # Only these actions auto-execute
+
+
+def get_watchdog_mode():
+    """Determine current mode: recommend for first 48h, then autopilot."""
+    now_utc = datetime.now(timezone.utc)
+
+    # Check/create deploy time marker
+    if os.path.exists(DEPLOY_TIME_FILE):
+        try:
+            with open(DEPLOY_TIME_FILE) as f:
+                data = json.load(f)
+            deploy_str = data.get("deploy_time")
+            if deploy_str:
+                deploy_time = datetime.fromisoformat(deploy_str.replace("Z", "+00:00"))
+                elapsed = (now_utc - deploy_time).total_seconds() / 3600
+                if elapsed >= AUTOPILOT_DELAY_HOURS:
+                    return "autopilot", deploy_time, elapsed
+                return "recommend", deploy_time, elapsed
+        except Exception:
+            pass
+
+    # First run — record deploy time
+    deploy_time = now_utc
+    try:
+        atomic_write_json(DEPLOY_TIME_FILE, {
+            "deploy_time": deploy_time.isoformat(),
+            "note": f"Autopilot engages after {AUTOPILOT_DELAY_HOURS}h"
+        })
+    except Exception:
+        pass
+    return "recommend", deploy_time, 0
 
 # ============================================================
 # HELPERS
@@ -472,7 +505,7 @@ def analyze_profit_lock(open_trades):
                     "direction": direction,
                     "new_stop": round(new_stop, 6)
                 },
-                "auto_executable": WATCHDOG_MODE == "autopilot"
+                "auto_executable": watchdog_mode == "autopilot"
             })
 
         # Trade up 2%+ but < 5% → move to breakeven
@@ -491,7 +524,7 @@ def analyze_profit_lock(open_trades):
                         "direction": direction,
                         "new_stop": round(entry, 6)
                     },
-                    "auto_executable": WATCHDOG_MODE == "autopilot"
+                    "auto_executable": watchdog_mode == "autopilot"
                 })
             elif direction == "short" and (current_sl > entry or current_sl == 0):
                 steers.append({
@@ -506,7 +539,7 @@ def analyze_profit_lock(open_trades):
                         "direction": direction,
                         "new_stop": round(entry, 6)
                     },
-                    "auto_executable": WATCHDOG_MODE == "autopilot"
+                    "auto_executable": watchdog_mode == "autopilot"
                 })
 
         # MFE giveback analysis
@@ -527,7 +560,7 @@ def analyze_profit_lock(open_trades):
                 "title": f"{coin} giving back MFE ({giveback:.1f}%)",
                 "detail": f"MFE was {mfe:.1f}%, now +{pnl_pct:.1f}%. Consider tightening.",
                 "trade_id": trade.get("id"),
-                "auto_executable": WATCHDOG_MODE == "autopilot"
+                "auto_executable": watchdog_mode == "autopilot"
             })
 
     return steers
@@ -586,7 +619,7 @@ def analyze_stale_trades(open_trades):
                     "detail": f"Trade open {hours_open:.0f} hours. Only +{pnl_pct:.1f}%. "
                               f"Opportunity cost — consider freeing capital.",
                     "trade_id": trade.get("id"),
-                    "auto_executable": WATCHDOG_MODE == "autopilot"
+                    "auto_executable": watchdog_mode == "autopilot"
                 })
 
         elif hours_open >= STALE_TRADE_WARNING_HOURS:
@@ -900,7 +933,7 @@ def build_output(data, steers):
 
     output = {
         "timestamp": now.isoformat(),
-        "mode": WATCHDOG_MODE,
+        "mode": "recommend",  # Updated in main() with actual mode
         "portfolio_health": health,
         "open_trades": [],
         "steers": steers,
@@ -1001,11 +1034,85 @@ def write_outputs(output, steers, dry_run=False):
             action = s.get("action", {})
             action["timestamp"] = now.isoformat()
             action["reason"] = s.get("detail", "")
-            action["auto_executed"] = WATCHDOG_MODE == "autopilot"
+            action["auto_executed"] = watchdog_mode == "autopilot"
             actions.append(action)
 
         atomic_write_json(ACTIONS_LOG, {"actions": actions})
         log(f"Logged {len(auto_actions)} actions to {ACTIONS_LOG}")
+
+
+def execute_safe_actions(steers, watchdog_mode):
+    """Execute auto-executable steers (profit locks only in autopilot mode)."""
+    if watchdog_mode != "autopilot":
+        return []
+
+    executed = []
+    for steer in steers:
+        if not steer.get("auto_executable"):
+            continue
+        if steer.get("category") not in AUTO_EXECUTABLE_CATEGORIES:
+            continue
+
+        action = steer.get("action", {})
+        if not action:
+            continue
+
+        action_type = action.get("type")
+        symbol = action.get("symbol")
+        new_stop = action.get("new_stop")
+        trade_id = steer.get("trade_id")
+
+        if action_type == "move_stop" and symbol and new_stop:
+            log(f"AUTO-EXEC: Moving {symbol} stop to {new_stop} — {steer.get('detail', '')}")
+            try:
+                # Update stop in brain DB
+                sys.path.insert(0, SCRIPTS_DIR)
+                from position_manager import adjust_stop_loss
+                if trade_id:
+                    adjust_stop_loss(trade_id, new_stop)
+
+                # Place actual SL on Hyperliquid
+                from hyperliquid_exchange import replace_sl
+                direction = action.get("direction", "long")
+                result = replace_sl(symbol, direction, float(new_stop))
+
+                if result.get("success"):
+                    log(f"AUTO-EXEC: {symbol} stop moved to {new_stop} ✅")
+                    executed.append({
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "type": "move_stop",
+                        "symbol": symbol,
+                        "direction": direction,
+                        "new_stop": new_stop,
+                        "reason": steer.get("detail", ""),
+                        "auto_executed": True,
+                        "hl_result": "success"
+                    })
+                else:
+                    err = result.get("error", "unknown")
+                    log(f"AUTO-EXEC: {symbol} stop move FAILED: {err} ❌", "ERROR")
+                    executed.append({
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "type": "move_stop",
+                        "symbol": symbol,
+                        "new_stop": new_stop,
+                        "reason": steer.get("detail", ""),
+                        "auto_executed": False,
+                        "hl_result": f"failed: {err}"
+                    })
+            except Exception as e:
+                log(f"AUTO-EXEC: {symbol} error: {e}", "ERROR")
+                executed.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "type": "move_stop",
+                    "symbol": symbol,
+                    "new_stop": new_stop,
+                    "reason": steer.get("detail", ""),
+                    "auto_executed": False,
+                    "hl_result": f"error: {e}"
+                })
+
+    return executed
 
 
 def main():
@@ -1016,7 +1123,11 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Analyze but don't write outputs")
     args = parser.parse_args()
 
-    log("Trade Watchdog starting...")
+    # Determine mode (recommend → autopilot after 48h)
+    watchdog_mode, deploy_time, elapsed_hrs = get_watchdog_mode()
+    remaining = max(0, AUTOPILOT_DELAY_HOURS - elapsed_hrs)
+    log(f"Trade Watchdog starting... mode={watchdog_mode} "
+        f"(deployed {elapsed_hrs:.1f}h ago, autopilot in {remaining:.1f}h)")
 
     data = collect_all()
 
@@ -1030,15 +1141,40 @@ def main():
 
     steers = analyze_all(data)
     output = build_output(data, steers)
+    output["mode"] = watchdog_mode
+    output["deploy_time"] = deploy_time.isoformat()
+    output["autopilot_in_hours"] = round(remaining, 1)
     write_outputs(output, steers, dry_run=args.dry_run)
+
+    # Execute safe actions if in autopilot mode
+    executed = []
+    if watchdog_mode == "autopilot" and not args.dry_run:
+        log("=== Auto-Executing Safe Actions ===")
+        executed = execute_safe_actions(steers, watchdog_mode)
+        if executed:
+            # Append to actions log
+            existing_actions = []
+            if os.path.exists(ACTIONS_LOG):
+                try:
+                    with open(ACTIONS_LOG) as f:
+                        existing_actions = json.load(f).get("actions", [])[-100:]
+                except Exception:
+                    pass
+            existing_actions.extend(executed)
+            atomic_write_json(ACTIONS_LOG, {"actions": existing_actions})
+            log(f"Executed {len(executed)} actions")
 
     # Summary
     print("\n" + "=" * 60)
-    print(f"Trade Watchdog — {output['portfolio_health'].upper()}")
+    print(f"Trade Watchdog — {output['portfolio_health'].upper()} [{watchdog_mode.upper()}]")
     print(f"Open: {len(output['open_trades'])} trades | "
           f"Unrealized: {output['portfolio_summary']['total_unrealized_pnl']:+.2f} USDT")
     print(f"Steers: {len(steers)} "
           f"({sum(1 for s in steers if s['severity']=='urgent')} urgent)")
+    if executed:
+        print(f"Auto-executed: {len(executed)} actions")
+    if watchdog_mode == "recommend":
+        print(f"⏰ Autopilot in {remaining:.1f} hours")
     print("=" * 60)
 
     for steer in steers:

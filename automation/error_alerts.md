@@ -512,3 +512,20 @@
 - **WARN** (8x/2h): `signal_compactor` timeouts — killed after 60s repeatedly. Not critical (pipeline continues), but indicates compactor overload. Monitor for escalation.
 - **WARN**: Disk at 84% (93G/118G) — approaching 85% threshold. Compressed old logs but no significant savings (already gzipped).
 - **INFO**: 0 open trades — NEUTRAL regime, all 20 today's trades closed. Win rate 40%, net PnL -$0.47 (breakeven day).
+
+## Health Check — 2026-09-22 18:44 UTC
+- **[WARN]** Disk usage 84% (19GB free) — monitor, compress at 90%
+- **[INFO]** Pipeline healthy, 0 errors, 54 signals/hr
+- **[INFO]** Winrate 40% today, PnL -$0.47 (minimal)
+- **[INFO]** pump-chain signals underperforming (26% WR combined)
+
+## Error Alerts — 2026-09-22 18:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-22 19:45 UTC
+- **WARN**: Disk at 84% (93G/118G) — 1% below threshold. No auto-fix needed yet.
+- **INFO**: No errors, no crashes, no stale prices in last 30min. Pipeline clean.
+
+## Error Alerts — 2026-09-22 19:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
