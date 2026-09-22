@@ -1396,9 +1396,10 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Bearish structure: DECLINING phase, or CALM/RECOVERY with LEAN_BEAR + BELOW EMA300
             _bearish = (_phase in ('DECLINING',) or
                         (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema == 'BELOW'))
-            # Bullish structure: RALLYING phase, or CALM/RECOVERY with LEAN_BULL + ABOVE EMA300
-            _bullish = (_phase in ('RALLYING', 'UP') or
-                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
+            # Bullish structure: RECOVERY phase, or CALM/NEUTRAL with LEAN_BULL + ABOVE EMA300
+            # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
+            _bullish = (_phase in ('RECOVERY', 'NEUTRAL') or
+                        (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
 
             if direction.upper() == 'SHORT' and _bearish:
                 # SHORT aligned with bearish structure — strong boost
