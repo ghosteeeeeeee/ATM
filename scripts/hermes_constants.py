@@ -3566,11 +3566,6 @@ RIDE_IT_PHASE1_TO_PHASE2_TIME = 7200  # 2 hours (seconds) for phase transition
 PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.5   # min token 5m Δ% to allow LONG signals (tightened from -0.2%)
                                        # -0.2% was too aggressive — blocked 13 winning trades
 PUMP_FLOW_SHORT_VEL_THRESHOLD = 0      # block SHORT when token 30m vel > 0% (wrong direction)
-PUMP_FLOW_SHORT_15M_THRESHOLD = 0      # block SHORT when token 15m vel > 0% (bounce-in-progress filter)
-                                       # Backtest: catches 4/14 losses, kills 0/21 wins (BCH -$0.12,
-                                       # AVAX -$0.18, INJ -$0.27, BTC -$0.04 — total $0.61 saved)
-PUMP_FLOW_SHORT_RSI_FLOOR = 15          # block SHORT when RSI < 15 (extremely oversold = bounce imminent)
-                                       # Backtest: catches 4/8 losses, kills 0/4 wins (0% WR at RSI<15)
 
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).

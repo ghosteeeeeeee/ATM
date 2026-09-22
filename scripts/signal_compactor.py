@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, PUMP_FLOW_SHORT_15M_THRESHOLD, PUMP_FLOW_SHORT_RSI_FLOOR
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -3236,10 +3236,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel_30.close()
                         except Exception:
                             pass
-            # ── Pump-chain SHORT velocity filters: block SHORT when token is bouncing ──
-            # 15m filter: catches bounce-in-progress (3x 5m candles = 15m)
-            # 30m filter: catches sustained rise (6x 5m candles = 30m)
-            # Backtest 15m: catches 4/14 losses, kills 0/21 wins
+            # ── Pump-chain SHORT velocity filter: block SHORT when token 30m velocity positive ──
+            # Mirror of LONG filter — SHORT needs price declining, block if rising
             if direction == 'SHORT' and 'pump-chain' in (src or ''):
                 try:
                     _conn_vel_30s = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3251,19 +3249,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     """, (tkn.upper(),))
                     _vel_30_closes_s = [r[0] for r in _cur_vel_30s.fetchall()]
                     _cur_vel_30s.close()
-                    # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
-                    if len(_vel_30_closes_s) >= 4 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[3] > 0:
-                        _vel_15m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[3]) / _vel_30_closes_s[3] * 100
-                        if _vel_15m_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                            log(f"  🚫 [PUMP-CHAIN-VEL15-SHORT] {tkn}: SHORT blocked — 15m vel={_vel_15m_s:+.3f}% (bounce in progress)")
-                            continue
-                    # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
-                    if len(_vel_30_closes_s) >= 2 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[1] > 0:
-                        _vel_5m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[1]) / _vel_30_closes_s[1] * 100
-                        if _vel_5m_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                            log(f"  🚫 [PUMP-CHAIN-VEL5-SHORT] {tkn}: SHORT blocked — 5m vel={_vel_5m_s:+.3f}% (micro-bounce)")
-                            continue
-                    # 30m velocity check (6 x 5m candles) — sustained rise filter
                     if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[-1] > 0:
                         _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
                         if _vel_30m_s > 0:
@@ -3274,28 +3259,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 finally:
                     try:
                         _conn_vel_30s.close()
-                    except Exception:
-                        pass
-            # ── Pump-chain SHORT RSI floor: block SHORT when RSI < 15 (oversold = bounce imminent) ──
-            # Backtest: 0% WR at RSI<15, catches 4/8 losses, kills 0/4 wins
-            if direction == 'SHORT' and 'pump-chain' in (src or ''):
-                try:
-                    _conn_rsi_floor = sqlite3.connect(RUNTIME_DB, timeout=3)
-                    _cur_rsi_floor = _conn_rsi_floor.cursor()
-                    _cur_rsi_floor.execute(
-                        "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
-                        (tkn.upper(),)
-                    )
-                    _rsi_floor_row = _cur_rsi_floor.fetchone()
-                    _cur_rsi_floor.close()
-                    if _rsi_floor_row and _rsi_floor_row[0] is not None and _rsi_floor_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
-                        log(f"  🚫 [PUMP-CHAIN-RSI-FLOOR] {tkn}: SHORT blocked — RSI={_rsi_floor_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
-                        continue
-                except Exception:
-                    pass  # non-fatal
-                finally:
-                    try:
-                        _conn_rsi_floor.close()
                     except Exception:
                         pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
@@ -3599,19 +3562,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 """, (pe['token'].upper(),))
                                 _pv_closes = [r[0] for r in _pv_cur.fetchall()]
                                 _pv_conn.close()
-                                # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
-                                if len(_pv_closes) >= 4 and _pv_closes[0] > 0 and _pv_closes[3] > 0:
-                                    _pv_vel_15m = (_pv_closes[0] - _pv_closes[3]) / _pv_closes[3] * 100
-                                    if pe_direction == 'SHORT' and _pv_vel_15m > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-15M] {pe['token']} SHORT preserved — 15m vel={_pv_vel_15m:+.3f}% (bounce in progress)")
-                                        continue
-                                # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
-                                if pe_direction == 'SHORT' and len(_pv_closes) >= 2 and _pv_closes[0] > 0 and _pv_closes[1] > 0:
-                                    _pv_vel_5m = (_pv_closes[0] - _pv_closes[1]) / _pv_closes[1] * 100
-                                    if _pv_vel_5m > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-5M] {pe['token']} SHORT preserved — 5m vel={_pv_vel_5m:+.3f}% (micro-bounce)")
-                                        continue
-                                # 30m velocity check (6 x 5m candles) — sustained rise filter
                                 if len(_pv_closes) >= 6 and _pv_closes[0] > 0 and _pv_closes[-1] > 0:
                                     _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
                                     if pe_direction == 'LONG' and _pv_vel_30m < 0:
@@ -3620,22 +3570,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     if pe_direction == 'SHORT' and _pv_vel_30m > 0:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} SHORT preserved — 30m vel={_pv_vel_30m:+.3f}% (token rising)")
                                         continue
-                            except Exception:
-                                pass  # non-fatal
-                        # ── RSI floor filter for preserved entries ──
-                        if pe_direction == 'SHORT' and 'pump-chain' in pe_src:
-                            try:
-                                _pv_rsi_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
-                                _pv_rsi_cur = _pv_rsi_conn.cursor()
-                                _pv_rsi_cur.execute(
-                                    "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
-                                    (pe['token'].upper(),)
-                                )
-                                _pv_rsi_row = _pv_rsi_cur.fetchone()
-                                _pv_rsi_conn.close()
-                                if _pv_rsi_row and _pv_rsi_row[0] is not None and _pv_rsi_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
-                                    log(f"  🚫 [PRESERVE-PUMP-CHAIN-RSI] {pe['token']} SHORT preserved — RSI={_pv_rsi_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
-                                    continue
                             except Exception:
                                 pass  # non-fatal
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
@@ -3803,18 +3737,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             """, (tok.upper(),))
                             _pv_closes_r = [r[0] for r in _pv_cur_r.fetchall()]
                             _pv_conn_r.close()
-                            # 15m velocity check (index [3] = 3 candles back = 15m) — bounce-in-progress filter
-                            if _rescue_ok and len(_pv_closes_r) >= 4 and _pv_closes_r[0] > 0 and _pv_closes_r[3] > 0:
-                                _pv_vel_15m_r = (_pv_closes_r[0] - _pv_closes_r[3]) / _pv_closes_r[3] * 100
-                                if direc.upper() == 'SHORT' and _pv_vel_15m_r > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                                    _rescue_ok = False
-                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-15M] {tok} SHORT rescue blocked — 15m vel={_pv_vel_15m_r:+.3f}% (bounce in progress)")
-                            # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
-                            if _rescue_ok and direc.upper() == 'SHORT' and len(_pv_closes_r) >= 2 and _pv_closes_r[0] > 0 and _pv_closes_r[1] > 0:
-                                _pv_vel_5m_r = (_pv_closes_r[0] - _pv_closes_r[1]) / _pv_closes_r[1] * 100
-                                if _pv_vel_5m_r > PUMP_FLOW_SHORT_15M_THRESHOLD:
-                                    _rescue_ok = False
-                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-5M] {tok} SHORT rescue blocked — 5m vel={_pv_vel_5m_r:+.3f}% (micro-bounce)")
                             # 30m velocity check (6 x 5m candles) — sustained rise filter
                             if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[0] > 0 and _pv_closes_r[-1] > 0:
                                 _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100
@@ -3824,22 +3746,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 elif direc.upper() == 'SHORT' and _pv_vel_r > 0:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} SHORT rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token rising)")
-                        except Exception:
-                            pass  # non-fatal
-                    # ── RSI floor filter for conflict rescue ──
-                    if _rescue_ok and direc.upper() == 'SHORT' and 'pump-chain' in (loser.get('source', '') or ''):
-                        try:
-                            _rescue_rsi_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
-                            _rescue_rsi_cur = _rescue_rsi_conn.cursor()
-                            _rescue_rsi_cur.execute(
-                                "SELECT rsi_14 FROM momentum_cache WHERE token = ? AND rsi_14 IS NOT NULL",
-                                (tok.upper(),)
-                            )
-                            _rescue_rsi_row = _rescue_rsi_cur.fetchone()
-                            _rescue_rsi_conn.close()
-                            if _rescue_rsi_row and _rescue_rsi_row[0] is not None and _rescue_rsi_row[0] < PUMP_FLOW_SHORT_RSI_FLOOR:
-                                _rescue_ok = False
-                                log(f"  🚫 [RESCUE-PUMP-CHAIN-RSI] {tok} SHORT rescue blocked — RSI={_rescue_rsi_row[0]:.1f} < {PUMP_FLOW_SHORT_RSI_FLOOR} (extremely oversold)")
                         except Exception:
                             pass  # non-fatal
                     if not _rescue_ok:

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22 04:07:48",
+  "timestamp": "2026-09-22 04:13:48",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -31,7 +31,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "123 bare except clauses in 36 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), trade_watchdog.py(13))",
+      "msg": "116 bare except clauses in 36 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
@@ -43,7 +43,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "72 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py",
+      "msg": "71 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
