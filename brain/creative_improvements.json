@@ -1598,5 +1598,38 @@
     "status": "suggested",
     "risk": "low — new signal, no impact on existing",
     "impact_on_winners": "N/A — new signal addition"
+  },
+  {
+    "date": "2026-09-22T17:36:20.151199+00:00",
+    "idea": "PUMP_CHAIN_LONG_ZSCORE_MAX=2.5",
+    "rationale": "pump-chain+ LONG z>=2.5 = 14.3%WR -$0.53/14d. Chasing entries at extreme z-scores consistently lose. Blocks 6 losers vs 1 winner.",
+    "expected_impact": "+$0.53/14d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "verified": true,
+    "data": "7T z>=2.5: 1W 6L. Winners avg z=1.44, losers avg z=1.63."
+  },
+  {
+    "date": "2026-09-22T17:36:20.151199+00:00",
+    "idea": "PULLBACK_SHORT_RSI_MID_BLOCK=[40,50]",
+    "rationale": "pullback-entry- SHORT RSI 40-50 = 25%WR -$1.24/14d. No-man's-land: not overbought enough for SHORT edge, not oversold enough for bounce. RSI 30-40 (64.3%WR) and RSI 50+ (58-71%WR) both profitable.",
+    "expected_impact": "+$1.24/14d",
+    "category": "entry sniper",
+    "status": "suggested (needs monitoring)",
+    "risk": "medium",
+    "verified": true,
+    "data": "31T RSI 40-50: 8W 23L. Only 4 winners in RSI 40-45 (6.5% of all winners)."
+  },
+  {
+    "date": "2026-09-22T17:36:20.151199+00:00",
+    "idea": "New NEUTRAL trend-following signal",
+    "rationale": "Session brain: 3+ requests for trend following signal. Only 2 signal types pass confluence in NEUTRAL. System fragile. 50+ active types but only 2 net positive.",
+    "expected_impact": "Diversification + new edge",
+    "category": "architecture",
+    "status": "needs development",
+    "risk": "medium",
+    "verified": false,
+    "data": "N/A — new signal"
   }
 ]

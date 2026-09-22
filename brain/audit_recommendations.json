@@ -1,126 +1,152 @@
 {
-    "timestamp": "2026-09-22T16:33:00Z",
-    "session_brain_stats": {
-        "topics_found": ["signal performance", "creative ideas", "losing problems"],
-        "key_insight": "PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 defined but NEVER enforced — dead code drift. Also volume_spike never recorded in live trades (exists only in backtest)."
-    },
-    "trade_summary_24h": {
-        "total_trades": 32,
-        "win_rate": 31.3,
-        "pnl": -2.92,
-        "top_losers": "pump-chain+ 10T -$1.44 (dead hours pre-fix), pullback-entry- 4T -$1.10 (cold streak), pump-chain- 6T -$0.38",
-        "exit_dominance": "ATR_SL 26/32 (81%)"
-    },
-    "trade_summary_7d": {
-        "total_trades": 189,
-        "win_rate": 46.9,
-        "pnl": 0.53,
-        "best_regime": "EXTREME 75T 53.3%WR +$2.30",
-        "worst_regime": "NORMAL 39T 35.9%WR -$1.04"
-    },
-    "drift_findings": [
-        {
-            "finding": "PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 defined in hermes_constants.py but NEVER enforced in signal_compactor.py — dead code",
-            "impact": "gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43/14d still firing",
-            "status": "actionable — enforce in signal_compactor.py"
-        },
-        {
-            "finding": "volume_spike never recorded in _signal_metadata — exists only in backtest_v4_short.py",
-            "impact": "0/189 7d trades have volume_spike data. Can't filter by volume quality.",
-            "status": "actionable — add computation to decider_run.py"
-        },
-        {
-            "finding": "dead_hours enforcement FIXED — verified active in signal_compactor.py line 1267",
-            "impact": "+$1.65/7d expected",
-            "status": "resolved"
-        },
-        {
-            "finding": "HEMI blacklist working — all HEMI trades pre-date blacklist",
-            "impact": "prevents -$0.44/14d",
-            "status": "resolved"
-        }
+  "timestamp": "2026-09-22T17:36:09.524423+00:00",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "top_topics": [
+      "signal performance winrate",
+      "creative ideas",
+      "losing trades"
     ],
-    "recurring_problems": [
-        {
-            "topic": "SIGNAL DIVERSITY — only pump-chain+ LONG and volume-breakout-long+ carry system in NEUTRAL",
-            "sessions_discussed": 5,
-            "status": "unresolved"
-        },
-        {
-            "topic": "pullback-entry- SHORT cold streak — 7d 40.9%WR -$1.64 but 30d 53.4%WR +$0.94",
-            "sessions_discussed": 3,
-            "status": "monitoring (cold streak, not systemic)"
-        },
-        {
-            "topic": "volume_spike recording — flagged 3x since Sep 18, still unfixed",
-            "sessions_discussed": 3,
-            "status": "unresolved"
-        }
+    "key_insight": "R:R exits show 100% WR with 4 signals but too few. Trend following signal requested multiple times. Signal diversity remains critical gap."
+  },
+  "trade_summary_24h": {
+    "trades": 26,
+    "win_rate": 34.6,
+    "pnl": -1.56,
+    "top_losers": [
+      "pump-chain+ LONG: 9T 11.1%WR -$1.15",
+      "pullback-entry- SHORT: 4T 0%WR -$1.10",
+      "pump-chain- SHORT: 6T 33.3%WR -$0.38"
     ],
-    "losing_trade_autopsy": {
-        "24h_losers": 19,
-        "pattern": "19/19 ATR_SL exits. pump-chain+ 10T -$1.44 (dead hours pre-fix + chasing). pullback-entry- 4T -$1.10 (cold streak). pump-chain- 6T -$0.38 (EXTREME).",
-        "root_cause": "Dead hours enforcement was off (FIXED). Gap chasing (gap>1.5%) still unblocked — PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 defined but not enforced.",
-        "specific_losers": [
-            {"token": "FOGO", "pnl": -0.30, "rsi": 50, "gap": 2.01, "regime": "HIGH", "cause": "chasing — gap>1.5%"},
-            {"token": "HEMI", "pnl": -0.16, "rsi": 70, "gap": 2.02, "regime": "EXTREME", "cause": "chasing + blacklisted (pre-date)"},
-            {"token": "ADA", "pnl": -0.16, "rsi": 64.71, "gap": 2.83, "regime": "HIGH", "cause": "chasing — gap>1.5%"},
-            {"token": "AIXBT", "pnl": -0.04, "rsi": 48.15, "gap": 1.54, "regime": "EXTREME", "cause": "chasing — gap>1.5%"},
-            {"token": "DYDX", "pnl": -0.30, "rsi": 36.22, "gap": -0.39, "regime": "EXTREME", "cause": "low RSI, normal variance"},
-            {"token": "ETC", "pnl": -0.16, "rsi": 30, "gap": 0.95, "regime": "EXTREME", "cause": "dead hours (pre-fix)"}
-        ]
+    "exit_breakdown": "atr_sl_hit 19T (73%), pump_exit_dead_money 3T, profit-monster-trail 2T",
+    "note": "Dead hours enforcement re-enabled ~09:30 UTC. All 26 trades predate enforcement or are outside dead hours."
+  },
+  "trade_summary_7d": {
+    "trades": 189,
+    "win_rate": 45.5,
+    "pnl": -0.05,
+    "by_regime": {
+      "EXTREME": "75T 53.3%WR +$2.30 (carry)",
+      "HIGH": "74T 41.9%WR -$1.33 (drag)",
+      "NORMAL": "39T 35.9%WR -$1.04 (worst WR)"
     },
-    "signal_quality_analysis": {
-        "pump_chain_long": {
-            "rsi_sweet_spot": "35-65 = 54.2%WR +$1.56/14d (37T)",
-            "rsi_drag": "<35 = 0%WR -$0.67/14d (8T), 80+ = 30.8%WR -$0.29/14d (13T)",
-            "gap_sweet_spot": "<0.5% = 48%WR +$1.05/14d (25T)",
-            "gap_drag": "1.5-2% = 0%WR -$0.04/14d, 2%+ = 38.9%WR -$0.22/14d",
-            "dead_hours_block": "hours 0-5,23 = 0%WR -$3.30/14d (FIXED)",
-            "max_entry_gap_enforcement": "NOT ENFORCED — PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 is dead code"
-        },
-        "pullback_entry_short": {
-            "regime_extreme": "61.5%WR +$1.13/14d — BEST",
-            "regime_normal": "46.9%WR -$0.62/14d — DRAG",
-            "cold_streak_7d": "40.9%WR -$1.64 (30d still +$0.94)"
-        },
-        "volume_breakout_long": {
-            "regime_extreme": "75%WR +$1.46/7d — GEM",
-            "regime_normal": "62.5%WR -$0.05/7d — marginal"
-        }
-    },
-    "config_change_applied": {
-        "file": "scripts/signal_compactor.py",
-        "change": "Enforce PUMP_CHAIN_LONG_MAX_ENTRY_GAP in dead hours block section",
-        "rationale": "Constant defined but never enforced — dead code drift. 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers (-$0.66), 2 marginal winners (+$0.23). Net +$0.43/14d.",
-        "impact_on_winners": "Blocked: GOAT +$0.12 (gap 2.1%), IMX +$0.11 (gap 2.1%). Both marginal wins at high gap.",
-        "confidence": "HIGH"
-    },
-    "creative_improvements": [
-        {
-            "date": "2026-09-22T16:33:00Z",
-            "idea": "Record volume_spike in _signal_metadata (decider_run.py)",
-            "rationale": "0/189 7d trades have volume_spike data. Computation exists in backtest but not live. Adding it enables volume-quality filtering and improves signal metadata for future analysis.",
-            "expected_impact": "+$0.42/7d (volume_spike filter: 50T 46%WR -$1.07 → block low-volume entries)",
-            "category": "infrastructure",
-            "status": "suggested",
-            "risk": "low — metadata-only, no trade impact"
-        },
-        {
-            "date": "2026-09-22T16:33:00Z",
-            "idea": "Register neutral_sniper.py in signals_runner.py for NEUTRAL diversity",
-            "rationale": "NEUTRAL has only 2-3 active signal types. neutral_sniper.py (RSI mean-reversion + CMF + ATR) is built but not running. Adding it diversifies NEUTRAL entries.",
-            "expected_impact": "+1-2 signal types in NEUTRAL, reduced dependency on pump-chain+",
-            "category": "signal diversity",
-            "status": "suggested",
-            "risk": "low — new signal, no impact on existing"
-        }
-    ],
-    "next_actions": [
-        "1. Enforce PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 in signal_compactor.py (IMPLEMENTED THIS RUN)",
-        "2. Add volume_spike computation to decider_run.py (next run)",
-        "3. Register neutral_sniper.py in signals_runner.py (signal diversity)",
-        "4. Monitor dead hours fix impact 48h (expected +$1.65/7d)",
-        "5. Monitor pullback-entry- cold streak (30d still +$0.94, variance likely)"
+    "by_signal_top": [
+      "volume-breakout-long+ LONG: 16T 68.8%WR +$1.41 (gem)",
+      "pump-chain+ LONG: 55T 41.8%WR +$1.23 (workhorse)",
+      "grind-trend+ LONG: 18T 50%WR +$0.24"
     ]
+  },
+  "drift_findings": [
+    {
+      "item": "HEMI blacklist enforcement",
+      "status": "VERIFIED WORKING",
+      "detail": "0 HEMI trades after Sep 22 09:30 UTC enforcement. 7T all-time: LONG 0%WR -$0.44, SHORT 50%WR -$0.09."
+    },
+    {
+      "item": "Dead hours enforcement",
+      "status": "VERIFIED WORKING",
+      "detail": "All pump-chain+ LONG trades in hours 0-5,23 predate enforcement. 0 blocked trades since re-enablement. 14d dead hours = 29T 0%WR -$3.30."
+    },
+    {
+      "item": "Signal metadata recording",
+      "status": "FIXED",
+      "detail": "189/189 trades in 7d have _signal_metadata (was 0% before fix). RSI, z-score, bb_position, momentum all populated."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "ATR_SL dominates exits (92.7% pump-chain+, 90.9% pullback-entry-)",
+      "detail": "Stops are too tight for volatility. Winners and losers both exit via ATR_SL — winners just happen to hit TP before SL.",
+      "impact": "No immediate fix without widening ATR_SL which affects ALL signals",
+      "status": "monitoring"
+    },
+    {
+      "problem": "Signal diversity — only 2 signal types carry all PnL in NEUTRAL",
+      "detail": "pump-chain+ LONG and volume-breakout-long+ are the only net-positive signals. 50+ types active but 48 net negative or blocked.",
+      "impact": "System fragile in NEUTRAL. Any degradation of either signal = system negative.",
+      "status": "needs new signals"
+    }
+  ],
+  "losing_trade_autopsy": {
+    "24h_losers": 18,
+    "pattern": "14/18 atr_sl_hit, 1 cut-loser, 1 pump_exit_dead_money, 1 profit-monster-trail, 1 accelerator",
+    "cluster_analysis": [
+      {
+        "cluster": "pump-chain+ LONG 24h: 9T 11.1%WR -$1.15",
+        "root_cause": "All ATR_SL exits. Entering at 4-6 UTC (dead hours, now blocked). Would have been blocked by dead hours filter if enforced earlier.",
+        "confidence": "HIGH — dead hours fix addresses this"
+      },
+      {
+        "cluster": "pullback-entry- SHORT 24h: 4T 0%WR -$1.10",
+        "root_cause": "DOT/LINK/SYRUP/CFX — all ATR_SL. DOT entered RSI=42 (mid-range, not oversold). LINK entered RSI=42. SYRUP entered RSI=53. CFX entered RSI=62. These are mid-range RSI entries where SHORT has edge in EXTREME but not in HIGH.",
+        "confidence": "MEDIUM — cold streak, 30d still 53.4%WR +$0.94"
+      },
+      {
+        "cluster": "pump-chain- SHORT 24h: 6T 33.3%WR -$0.38",
+        "root_cause": "GOAT/HBAR/HEMI ATR_SL. pump-chain- SHORT is a minor signal (61T/14d 57.4%WR +$0.24). Small losses within normal variance.",
+        "confidence": "LOW — sample too small for action"
+      }
+    ]
+  },
+  "signal_quality_deep_dive": {
+    "pump_chain_long": {
+      "14d": "80T 41.3%WR +$0.95",
+      "sweet_spot": "RSI 50-60 = 19T 63.2%WR +$1.49",
+      "danger_zone": "z>=2.5 = 7T 14.3%WR -$0.53 (chasing)",
+      "winner_profile": "RSI 58.8, z-score 1.44, BB 0.86, momentum 25.3",
+      "loser_profile": "RSI 54.1, z-score 1.63, BB 0.91, momentum 23.8",
+      "key_insight": "Winners enter at LOWER z-score (less extended) and HIGHER RSI (stronger momentum). Losers chase at higher z-scores."
+    },
+    "pullback_entry_short": {
+      "14d": "116T 53.4%WR +$0.94",
+      "sweet_spot": "RSI 70+ = 32T 62.5%WR +$1.83 (overbought SHORT = mechanical edge)",
+      "danger_zone": "RSI 40-50 = 31T 25%WR -$1.24 (mid-range, no edge)",
+      "winner_profile": "RSI 44.9, z-score 0.21, BB 0.55, speed 46.3",
+      "loser_profile": "RSI 43.9, z-score 0.05, BB 0.51, speed 43.4",
+      "key_insight": "Winners and losers have nearly identical entry profiles. The difference is market conditions (regime), not entry quality. RSI 40-50 is the 'no man's land' for SHORT."
+    }
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-09-22T17:36:09.524423+00:00",
+      "idea": "Add PUMP_CHAIN_LONG_ZSCORE_MAX=2.5 filter",
+      "rationale": "pump-chain+ LONG at z>=2.5 = 14.3%WR -$0.53/14d. These are 'chasing' entries — price already extended. Filter blocks 6 losers vs 1 winner.",
+      "expected_impact": "+$0.53/14d (+$0.27/7d)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low",
+      "impact_on_winners": "Would block 1/33 winners (3%) in last 14d",
+      "sample_size": "7 trades (small — monitor after implementation)"
+    },
+    {
+      "date": "2026-09-22T17:36:09.524423+00:00",
+      "idea": "Add PULLBACK_SHORT_RSI_MID_BLOCK=[40,50] filter",
+      "rationale": "pullback-entry- SHORT at RSI 40-50 = 25%WR -$1.24/14d. This is 'no man's land' — not overbought enough for mechanical SHORT edge, not oversold enough for bounce.",
+      "expected_impact": "+$1.24/14d (+$0.62/7d)",
+      "category": "entry sniper",
+      "status": "suggested (needs more data)",
+      "risk": "medium",
+      "impact_on_winners": "Would block 4/62 winners (6.5%) in last 14d",
+      "sample_size": "31 trades — borderline, monitor closely"
+    },
+    {
+      "date": "2026-09-22T17:36:09.524423+00:00",
+      "idea": "New NEUTRAL regime signal — trend following with regime-adaptive entry",
+      "rationale": "Session brain shows repeated requests for 'trend following' signal. Only pump-chain+ and volume-breakout-long+ pass confluence in NEUTRAL. Need diversity. 30d active signals: 50+ types but only 2 are net positive.",
+      "expected_impact": "Diversification — reduces single-signal dependency",
+      "category": "architecture",
+      "status": "needs development",
+      "risk": "medium",
+      "impact_on_winners": "N/A — new signal",
+      "sample_size": "N/A"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "MONITOR: Dead hours fix impact. Verify no pump-chain+ LONG trades in hours 0-5,23 in next 24h. Expected +$1.65/7d.",
+    "SUGGEST to CEO: PUMP_CHAIN_LONG_ZSCORE_MAX=2.5 (blocks chasing entries, low risk)",
+    "SUGGEST to CEO: PULLBACK_SHORT_RSI_MID_BLOCK=[40,50] (blocks no-man's-land entries, needs monitoring)",
+    "FIX: Record volume_spike in _signal_metadata — 0/189 trades have it. Can't filter by volume quality.",
+    "DEVELOP: New NEUTRAL signal for diversity. Session brain has trend following spec."
+  ]
 }

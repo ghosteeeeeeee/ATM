@@ -1,19 +1,19 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-22 ~14:00 UTC**
+**Last Updated: 2026-09-22 ~17:50 UTC**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 32T, 31.3% WR, -$2.92. 0 open. NEUTRAL vol. Pipeline running.
+24h: 26T, 26.9% WR, -$2.51. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 32T, 31.3% WR, -$2.92. ATR_SL dominates (26/32 exits). pump-chain+ 13T 15.4%WR -$1.51 (bad day, dead hours enforcement was disabled — re-enabled today). pullback-entry- 4T 0%WR -$1.10 (cold streak).
-- **7d:** 194T, 46.9% WR, +$0.53 (DB-verified). Barely positive — system fragile.
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, no regime >55%WR — DEGRADED). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, best WR in system).
-- **SHORT:** pullback-entry- 50T 46%WR -$1.07 (cold streak — 30d 116T 53.4%WR +$0.94).
+- **24h (rolling):** 26T, 26.9% WR, -$2.51. ATR_SL dominates (24/26 exits). pump-chain+ 9T 11.1%WR -$1.15 (dead hours trades before fix re-enabled ~09:30 UTC). pullback-entry- 4T 0%WR -$1.10 (cold streak).
+- **7d:** 189T, 45.5% WR, -$0.05 (DB-verified). Barely negative — system fragile.
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, no regime >55%WR — DEGRADED). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, best WR in system). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d (CEO kill Sep 11 was variance, not systemic).
+- **SHORT:** pullback-entry- 44T 40.9%WR -$1.64 (cold streak — 30d 116T 53.4%WR +$0.94).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). Expected +$1.65/7d.
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). **VERIFIED WORKING** — 0 trades after 09:30 UTC. 7d without dead hours: 30T 60%WR +$3.48.
 - **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22 CEO — 48h test expired 36.4%WR), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
@@ -23,8 +23,8 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d +$0.53 BARELY POSITIVE, 24h -$2.92 WORST DAY)**
-7d PnL +$0.53 (fragile). pump-chain+ LONG +$1.23 (55T 41.8%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$2.92 — ATR_SL 26/32 exits, dead hours enforcement was disabled. Re-enabled today, expected +$1.65/7d.
+**🟡 R:R STATUS (7d -$0.05 BARELY NEGATIVE, 24h -$2.51 DEAD HOURS IMPACT)**
+7d PnL -$0.05 (fragile). pump-chain+ LONG +$1.23 (55T 41.8%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). Dead hours fix VERIFIED: 0 trades after 09:30 UTC. Non-dead-hours pump-chain+ = 30T 60%WR +$3.48/7d.
 
 **🟢 REGIME EDGE (7d):** EXTREME 74T 54.1%WR +$2.62★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.61/7d.
 
@@ -33,6 +33,8 @@
 **🟢 CHASE FILTER — WORKING.** 58 blocks verified. — 2026-09-19
 
 **🟢 UPGRADE AUDIT (Sep 21):** All Level 1 tasks complete. 5 changes implemented by upgrade_implementer: CHOP_GATE_LOG_ONLY→False, Momentum NORMAL 0.0x, deprecated constants removed, OPEN_SKIES removed from never-reenable, ZSCORE_PUMP_ENABLED→False. All verified live.
+
+**🟢 BB_BOUNCE_V2_LONG RE-ENABLED.** CEO Sep 22 — signal_reporter killed Sep 11 (4T/24h 25%WR) but30d = 73T 74%WR +$2.08. Best standalone signal by WR. Short-term variance, not systemic.
 
 **🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. 7d: pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41 carry system.
 

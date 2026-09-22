@@ -4389,3 +4389,67 @@ Final set: ['ME']
 - pump-chain- 33% WR -$0.38 — small sample, continue monitoring
 
 **BY:** auto_1hr
+
+## [2026-09-22 16:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 27T 25.9%WR -$2.80 | **7d:** 189T 45.5%WR -$0.05
+
+**Close Reasons (24h):**
+- atr_sl_hit: 20/27 (74.1%), avg -$0.159 — within 55-75% baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+- Other: 2T, mixed
+
+**Signal Performance (24h):**
+- pump-chain+: KILLED — 10T remain (pre-kill), 10% WR, -$1.44
+- pullback-entry-: 4T, 0% WR, -$1.10 — doesn't meet kill criteria (need 3+ losses in 1 hour)
+- pump-chain-: 6T, 33.3% WR, -$0.38 — small sample
+
+**Diagnosis:**
+1. Entry quality: Can't measure adverse excursion
+2. SL behavior: 74.1% — within baseline
+3. Signal quality: No kill criteria met
+4. Trade frequency: 0/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No trades to analyze
+- 7d near breakeven (-$0.05)
+- atr_sl_hit within baseline
+- System stable, no action required
+
+**BY:** auto_1hr
+
+## [2026-09-22 17:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 27T 25.9%WR -$2.80 | **7d:** 189T 45.5%WR -$0.05
+
+**Close Reasons (24h):**
+- atr_sl_hit: 20/27 (74.1%), avg -$0.159 — within 55-75% baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+- Other: 2T, mixed
+
+**Signal Performance (24h):**
+- pump-chain+: KILLED — 10T remain (pre-kill), 10% WR, -$1.44
+- pullback-entry-: 4T, 0% WR, -$1.10 — doesn't meet kill criteria (need 3+ losses in 1 hour)
+- pump-chain-: 6T, 33.3% WR, -$0.38 — small sample
+
+**Diagnosis:**
+1. Entry quality: Can't measure adverse excursion
+2. SL behavior: 74.1% — within baseline
+3. Signal quality: No kill criteria met
+4. Trade frequency: 0/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No trades to analyze
+- 7d near breakeven (-$0.05)
+- atr_sl_hit within baseline
+- System stable, no action required
+
+**BY:** auto_1hr

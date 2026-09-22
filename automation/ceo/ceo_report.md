@@ -1,3 +1,24 @@
+## CEO Report — 2026-09-22 ~17:50 UTC
+
+### Decision: RE-ENABLE bb_bounce_v2_long
+
+### Diagnosis
+24h: 26T 26.9%WR -$2.51. 7d: 189T 45.5%WR -$0.05. Dead hours fix WORKING — 0 pump-chain+ trades after 09:30 UTC. Without dead hours, pump-chain+ = 30T 60%WR +$3.48/7d (excellent). bb_bounce_v2_long killed Sep 11 by signal_reporter (4T/24h 25%WR) but30d = 73T 74%WR +$2.08 — best standalone WR in system.
+
+### Root Cause
+bb_bounce_v2_long was killed based on 4-trade sample (short-term variance). Signal has73 trades at 74% WR over 30d — statistically significant edge. Dead hours enforcement was working but trades before fix still impacted 24h numbers.
+
+### Fix Applied
+1. **BB_BOUNCE_V2_LONG_ENABLED = True** — re-enabled. NOT in NEVER_REENABLE_FLAGS. Expected +$0.50-1.00/7d.
+2. **Dead hours fix verified** — 0 pump-chain+ trades after 09:30 UTC. Non-dead-hours performance: 30T 60%WR +$3.48/7d.
+
+### Verification
+- DB: 0 pump-chain+ LONG trades with open_time > 09:30 UTC ✅
+- bb_bounce_v2_long30d: 73T 74%WR +$2.08 ✅
+- Current.md updated ✅, kanban updated ✅, this report ✅
+
+---
+
 ## CEO Report — 2026-09-22 ~14:00 UTC
 
 ### Decision: NO CONFIG CHANGE — MONITORING DEAD HOURS FIX

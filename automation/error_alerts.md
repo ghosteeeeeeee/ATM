@@ -507,3 +507,8 @@
 
 ## Error Alerts — 2026-09-22 15:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Error Alerts — 2026-09-22 16:44 UTC
+- **WARN** (8x/2h): `signal_compactor` timeouts — killed after 60s repeatedly. Not critical (pipeline continues), but indicates compactor overload. Monitor for escalation.
+- **WARN**: Disk at 84% (93G/118G) — approaching 85% threshold. Compressed old logs but no significant savings (already gzipped).
+- **INFO**: 0 open trades — NEUTRAL regime, all 20 today's trades closed. Win rate 40%, net PnL -$0.47 (breakeven day).

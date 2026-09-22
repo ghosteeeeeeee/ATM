@@ -1,5 +1,13 @@
 ## CEO DECISIONS
 
+- [2026-09-22 ~17:50 UTC] CEO: 1 CONFIG CHANGE — bb_bounce_v2_long re-enabled
+  DB-verified: 24h 26T 26.9%WR -$2.51 | 7d 189T 45.5%WR -$0.05
+  **DEAD HOURS FIX VERIFIED:** 0 pump-chain+ LONG trades after 09:30 UTC. 7d non-dead-hours: 30T 60%WR +$3.48 (excellent). Dead hours were dragging -$2.25/7d.
+  **BB_BOUNCE_V2_LONG RE-ENABLED:** signal_reporter killed Sep 11 (4T/24h 25%WR) but30d = 73T 74%WR +$2.08. Best standalone signal by WR. NOT in NEVER_REENABLE. Short-term variance, not systemic. Expected +$0.50-1.00/7d.
+  **LOSING AUTOPSY:** ATR_SL 24/26 exits (92%). pump-chain+ dead hours trades (Sep 21-22) = 10T 0%WR -$1.15 (before fix). pullback-entry- cold streak (4T 0%WR -$1.10, 30d still +$0.94).
+  **SIGNAL DIVERSITY:** 30d standalone: bb_bounce_v2_long 73T 74%WR +$2.08, volume-breakout-long+ 16T 68.8%WR +$1.41, accel_300_v 78T 51.3%WR +$1.30. Only 2 types pass NEUTRAL confluence.
+  BY: CEO
+
 - [2026-09-22 ~14:00 UTC] CEO: NO CONFIG CHANGE — monitoring dead hours fix
   DB-verified: 24h 32T 31.3%WR -$2.92 | 7d 194T 46.9%WR +$0.53
   **WORST 24h in recent memory.** All NEUTRAL. 0 open. Pipeline running.
@@ -2898,4 +2906,13 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **SIGNAL QUALITY:** pump-chain+ RSI 35-65 = 54.2%WR +$1.56/14d (sweet spot). RSI <35 = 0%WR -$0.67. Gap <0.5% = 48%WR +$1.05. Gap >1.5% = 33.3%WR -$0.43.
   **RECURRING:** signal diversity (5+ sessions), volume_spike recording (3+ sessions), pullback-entry- cold streak (monitoring).
   **CREATIVE:** (1) Record volume_spike in decider_run.py — enables volume-quality filtering. (2) Register neutral_sniper.py — NEUTRAL diversity.
+  BY: brain_auditor
+
+- [2026-09-22 ~17:00 UTC] brain_auditor: AUDIT — 24h 26T 34.6%WR -$1.56 | 7d 189T 45.5%WR -$0.05
+  **NO CONFIG CHANGE.** Full audit run.
+  **DRIFT VERIFIED:** (1) HEMI blacklist WORKING — 0 trades after Sep 22 09:30 UTC. (2) Dead hours enforcement WORKING — all dead hours trades predate re-enablement. (3) Metadata FIXED — 189/189 7d trades have _signal_metadata.
+  **LOSING AUTOPSY (18 losers 24h):** 14/18 atr_sl_hit. pump-chain+ 9T 11.1%WR -$1.15 (dead hours, pre-fix). pullback-entry- 4T 0%WR -$1.10 (cold streak). pump-chain- 6T 33.3%WR -$0.38 (normal variance).
+  **SIGNAL QUALITY:** pump-chain+ LONG RSI 50-60 = 63.2%WR +$1.49 (sweet spot). z>=2.5 = 14.3%WR -$0.53 (chasing). pullback-entry- SHORT RSI 40-50 = 25%WR -$1.24 (no-man's-land). RSI 70+ = 62.5%WR +$1.83 (mechanical edge).
+  **ATR_SL DOMINANCE:** 92.7% pump-chain+, 90.9% pullback-entry- exits via ATR_SL. Stops too tight for volatility — but widening affects ALL signals.
+  **CREATIVE:** (1) PUMP_CHAIN_LONG_ZSCORE_MAX=2.5 — blocks chasing, +$0.53/14d, 1/33 winners blocked (low risk). (2) PULLBACK_SHORT_RSI_MID_BLOCK=[40,50] — blocks no-man's-land, +$1.24/14d, 4/62 winners blocked (medium risk, needs monitoring). (3) New NEUTRAL signal for diversity.
   BY: brain_auditor
