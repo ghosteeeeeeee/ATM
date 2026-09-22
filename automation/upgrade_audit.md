@@ -373,3 +373,57 @@ All 7 volatility-regime blocks in signal_compactor.py checked `_regime_4h` (mome
 | 2 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | Needs monitoring for signal starvation |
 | 3 | Spider-profit full integration | 3 | MEDIUM | Partial — regime-gated trail/tier params |
 | 4 | Regime block for NORMAL/NEUTRAL | 2 | HIGH | Block all signals in NORMAL regime (per pump-catching plan) |
+
+---
+
+## Scan #4 — 2026-09-22 (full re-scan)
+
+### Plans Scanned (new since Scan #3)
+
+| Plan | Date | Difficulty | Value | Status | Reason |
+|------|------|------------|-------|--------|--------|
+| trade-watchdog-spec.md | 2026-09-22 | Level 4 | HIGH | PENDING | Massive system: trade monitor + auto-execution + dashboard. Needs dedicated session. |
+| structural-awareness-overhaul.md | 2026-09-21 | Level 3-4 | HIGH | PENDING | 4-layer architecture (bias engine, entry optimizer, proactive positioner). Depends on wiring existing systems. |
+| btc-long-term-bull-run-thesis.md | 2026-09-21 | N/A | HIGH | MONITORING | Macro thesis — not actionable code, but informs bull-run positioning (70-80% LONG bias). |
+| 2026-09-21_btc-4year-cycle-macro-thesis.md | 2026-09-21 | N/A | MEDIUM | MONITORING | Macro thesis — 4-year cycle analysis. |
+| profitability-fix-plan.md | 2026-09-15 | Level 1-2 | HIGH | MOSTLY DONE | 7/8 Level 1 items implemented. Remaining: SPEED_MIN_THRESHOLD_LONG (HIGH RISK — signal starvation). |
+| conf-filter-plan.md | 2026-08-19 | Level 1 | HIGH | IMPLEMENTED | CONF_FILTER_MAX=89 already blocks raw conf≥90. Time block extended to 0-9 UTC. |
+| confidence-calibration-plan.md | 2026-08-19 | Level 2-3 | MEDIUM | CLOSED | Investigation complete — proposed fix rejected, existing filter confirmed working. |
+| sl-tuning.md | 2026-08-21 | Level 2 | MEDIUM | PARTIALLY DONE | ATR SL 0.75% already standard. Trend mode (0.15% candle) not implemented. |
+| exit-spec-review.md | 2026-08-25 | Level 2 | MEDIUM | NOT SCANNED | Exit mechanics review — needs dedicated scan. |
+| regime-tuner-spec.md | 2026-09-13 | Level 3 | MEDIUM | PENDING | Weekly automated regime analysis — all building blocks exist. |
+
+### Verified: All Level 1 Tasks Complete
+
+Every Level 1 task identified across all plans has been implemented:
+
+| Task | Source Plan | Status | Evidence |
+|------|-------------|--------|----------|
+| Dead regime blocks fix | pump-chain-exit-analysis | ✅ | signal_compactor.py:2357-2359 — _vol_regime via _classify_volatility |
+| BTC_TIMING_GUARD_PUMP_CHAIN_LONG → 1.00 | pump-catching | ✅ | hermes_constants.py:963 |
+| BTC removed from PENALTY_TOKENS | pump-catching | ✅ | hermes_constants.py:283 — set has no 'BTC' |
+| continuum-osc in PROFIT_MONSTER_BYPASS | pump-catching | ✅ | hermes_constants.py:1432 |
+| SHORT_NEUTRAL_BLOCK / LONG_NEUTRAL_BLOCK | profitability-fix | ✅ | hermes_constants.py:1917-1918, signal_compactor.py:2458-2505 |
+| TIME_BLOCK 0-9 UTC | profitability-fix | ✅ | hermes_constants.py:1196-1197 |
+| ENA blacklisted | profitability-fix | ✅ | hermes_constants.py:71 |
+| LOSERS_MULT 0.3, CONF -50 | profitability-fix | ✅ | hermes_constants.py:350,352 |
+| CL_TIER1 tightened | profitability-fix | ✅ | hermes_constants.py:1562-1563 |
+| rr_engine→atr for pullback-entry- | profitability-fix | ✅ | hermes_constants.py:1510 |
+| ema300-dip-long killed | profitability-fix | ✅ | hermes_constants.py:1954 |
+| PUMP_CHAIN_LONG_DEAD_HOURS | pump-chain-exit-analysis | ✅ | hermes_constants.py:1202 — hours 0-5 blocked |
+| PUMP_CHAIN_LONG_RSI_MAX = 75 | pump-chain-exit-analysis | ✅ | hermes_constants.py:1203 |
+| SHORT_NORMAL_PENALTY = 0.85 | brain_auditor | ✅ | hermes_constants.py:851 |
+| NORMAL regime multipliers (vol_gate) | pump-catching | ✅ | volatility_gate_v2.py:244-255 — 9 signal families blocked |
+| BTC from PENALTY_TOKENS removed | pump-catching | ✅ | hermes_constants.py:283 |
+
+### Remaining Candidates (Level 2+)
+
+| Priority | Task | Level | Value | Est. Impact | Notes |
+|----------|------|-------|-------|-------------|-------|
+| 1 | BTC oscillator correlation filter | 2 | HIGH | +$1-2/7d | Block LONG when BTC bearish, boost SHORT — needs zscore data |
+| 2 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | +$2.82/7d | HIGH RISK — may starve LONG signals. Needs 48h shadow test. |
+| 3 | HL Trigger SL/TP V2 | 3 | HIGH | Catastrophic loss prevention | Server-side SL/TP eliminates slippage. Was disabled, needs re-enable with fixes. |
+| 4 | Partial Close + Trailing Runner | 3 | HIGH | +$1-2/7d | 50% scalp + 50% runner — captures more upside on winners |
+| 5 | Trade Watchdog | 4 | HIGH | Autonomous trade steering | Full system: monitor + recommend + auto-execute. Needs dedicated session. |
+| 6 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4-layer architecture: bias engine, entry optimizer, proactive positioner |
+| 7 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | All building blocks exist, needs new regime_tuner.py + timer |
