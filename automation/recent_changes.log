@@ -2734,3 +2734,10 @@
   pump-chain+ degraded Sep 21-22 (20%WR) but 3d EXTREME still +$0.39.
   7d net positive (+$0.73). No kill criteria met.
   BY: auto_1hr
+[2026-09-22 11:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 30T 33.3%WR -$2.26 | 7d: 196T 46.9%WR +$0.99
+  1 trade last hour (ZEN SHORT +$0.10), 2 open (DOT SHORT, LINK SHORT).
+  pump-chain+ killed at 09:30. pump-chain- SHORT 33%WR, -/usr/bin/bash.38 — small sample.
+  atr_sl_hit 73.3% — within 55-75% baseline.
+  No kill criteria met. System stable.
+  BY: auto_1hr

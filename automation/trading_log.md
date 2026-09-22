@@ -4247,3 +4247,43 @@ Final set: ['ME']
 - HIGH regime for pump-chain+ slightly negative (-$0.21) — monitor
 
 **BY:** auto_1hr
+
+## 2026-09-22 ~09:30 UTC — Signal Reporter
+- Killed pump-chain+ LONG: PUMP_FLOW_PLUS_ENABLED=False, PUMP_CHAIN_V4_ENABLED=False. 15.4%WR, -$1.51 (24h), ALL regimes lose. Added to NEVER_REENABLE_FLAGS.
+- pump-chain- SHORT: WATCH (33.3%WR, -$0.38 24h, but lifetime 57.4%WR +$0.24)
+
+## [2026-09-22 11:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (ZEN SHORT, +$0.10 via atr_sl_hit) | **Open:** 2 (DOT SHORT, LINK SHORT)
+**24h:** 30T, 33.3% WR, -$2.26 | **7d:** 196T, 46.9% WR, +$0.99
+
+**Close Reasons (24h):**
+- atr_sl_hit: 22/30 (73.3%), avg -$0.116
+- pump_exit_dead_money: 5/30, avg +$0.016
+- atr_tp_hit: 1/30, +$0.10
+- cut-loser-CL-T1: 1/30, -$0.09
+- profit-monster-trail: 1/30, +$0.20
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: 13T, 15.4% WR, -$1.51 — KILLED at 09:30
+- pullback-entry- SHORT: 2T, 0% WR, -$0.44 — small sample
+- pump-chain- SHORT: 6T, 33% WR, -$0.38
+
+**Diagnosis:**
+1. Entry quality: ZEN SHORT closed in profit despite atr_sl_hit — trailing SL working
+2. SL behavior: 73.3% atr_sl_hit — upper end of 55-75% baseline, within range
+3. Signal quality: No new kill triggers (pullback-entry- 0%WR but only 2 trades)
+4. Trade frequency: ~1.2/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d still positive (+$0.99)
+- pump-chain+ already killed
+- No kill criteria met
+- System stable, normal variance
+
+**Open Questions:**
+- pump-chain+ killed — monitoring pump-chain- SHORT (33%WR, -$0.38)
+
+**BY:** auto_1hr
