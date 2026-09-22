@@ -410,3 +410,23 @@
 ## Error Alerts — 2026-09-22 01:46 UTC
 - **[WARN]** (Nx1): `Disk usage at 83% (92G/118G)` — approaching 85% threshold
 - **AUTO-FIX**: None applied. Consider compressing old logs or running cleanup.
+
+## Health Report — 2026-09-22 02:45 UTC
+- **STATUS**: OK — Pipeline running, services active
+- **PIPELINE**: Last cycle 02:44:12, all steps completed (signal_compactor, decider_run, position_manager, trades_api)
+- **SIGNALS**: 137 generated in last hour
+- **TRADES**: 3 open (GOAT SHORT, ZEN SHORT, GMT SHORT), 2 closed today (+$0.25, 50% WR)
+- **REGIME**: NEUTRAL (116/120 tokens), 3 LONG_BIAS (RENDER, NIL, CHIP), 1 SHORT_BIAS (CASHCAT)
+- **DISK**: 83% (20G free) — stable
+- **WARN** (2x): `signal_compactor timed out (killed after 60.1s)` at 02:22, 02:42 — self-healed on next cycle
+- **INFO**: Hotset empty (0 signals survived compaction) — normal for quiet NEUTRAL market
+- **INFO**: All services active (hermes-pipeline, hl-sync-guardian)
+- **NO AUTO-FIX NEEDED**: All issues self-healed, pipeline healthy
+
+## Error Alerts — 2026-09-22 02:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: CC TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`

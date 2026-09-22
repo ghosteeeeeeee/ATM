@@ -1,10 +1,16 @@
 {
-  "timestamp": "2026-09-22 02:15:32",
+  "timestamp": "2026-09-22 03:09:42",
   "total_checks": 20,
-  "passed": 11,
-  "critical_count": 9,
+  "passed": 10,
+  "critical_count": 10,
   "warning_count": 0,
   "criticals": [
+    {
+      "name": "pipeline_errors",
+      "msg": "3 errors in last 30min",
+      "file": "",
+      "fix": "Check logs/pipeline.log for root cause"
+    },
     {
       "name": "sqlite_leaks",
       "msg": "45 files: ceo_dashboard_api.py, study_winning_combos.py, apply_fixes.py, pump_flow_engine.py, wave_backtest.py",
@@ -31,7 +37,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "109 bare except clauses in 34 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
+      "msg": "110 bare except clauses in 35 files (worst: hl_sync_guardian.py(18), hl-sync-guardian.py(18), context-compactor.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },

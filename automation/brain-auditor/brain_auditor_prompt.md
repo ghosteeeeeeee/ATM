@@ -190,6 +190,43 @@ price_db = sqlite3.connect('/root/.hermes/data/prices.db')
 }
 ```
 
+## Step 5b: Signal Quality Deep-Dive (EVERY RUN)
+
+**Focus on making signals BETTER, not blocking times.**
+
+### The Philosophy
+Every pump is a LONG opportunity. Every dump is a SHORT opportunity. Every trade should be a winner. If a signal is losing, it's firing on bad setups — not that the setup is impossible. Fix the entry quality, not the clock.
+
+### For each signal with <50% WR (14d):
+1. **Query the losing trades** — what exit reason? (atr_sl_hit = SL too tight, cut-loser = premature exit)
+2. **Check entry conditions** — what was RSI at entry? Volume? Price action?
+3. **Compare with winners** — what's different about winning entries vs losing entries?
+4. **Suggest entry filters** — what single filter would have blocked the losers without killing winners?
+
+### Example Analysis:
+```
+Signal: pump-chain+ LONG
+Losses: 22T 9.1% WR -$2.72 (all atr_sl_hit)
+Wins: 10T 100% WR +$2.72 (also atr_sl_hit but larger moves)
+
+Root cause: SL too tight for the volatility of these trades.
+Winners ride the momentum (large moves), losers get stopped out (small moves).
+
+Fix: Increase SL distance by 0.2% for pump-chain+ trades.
+Expected: Block ~40% of losers while preserving winners.
+```
+
+### What NOT to do:
+- ❌ Don't block hours (time-based filtering is fragile)
+- ❌ Don't blanket-kill signals (check regimes first)
+- ❌ Don't suggest changes based on <20 trades (noise)
+
+### What TO do:
+- ✅ Add entry quality filters (RSI, volume, price action)
+- ✅ Tune SL/TP distances based on volatility regime
+- ✅ Improve confidence scoring based on winning patterns
+- ✅ Suggest regime-specific parameter adjustments
+
 ## Step 6: Creative Improvements (MANDATE)
 
 **You MUST generate at least one creative improvement idea per run.**
@@ -213,14 +250,13 @@ Think like a trader who:
    - 55% WR vs 45% WR in 10 trades = noise, not signal
    - 70% WR vs 30% WR in 30 trades = worth investigating
 
-3. **⚠️ TIME-BASED CHANGES ARE HIGH RISK** — be extremely conservative
+3. **⚠️ TIME-BASED CHANGES ARE BANNED** — do not suggest them
    - Hourly PnL data has tiny samples (9-22 trades/hour over 7d)
    - Market conditions change — what's bad today may be good tomorrow
    - DO NOT create new BAD_TRADE_HOURS sets or expand time blocks
-   - If you must suggest time filtering: only block the 3-5 UTC dead zone (well-established)
-   - Prefer: "monitor for 2 weeks" over "block these hours now"
+   - DO NOT suggest TIME_BLOCK_START/END changes
    - Time-of-day edges are the FIRST to decay as market microstructure changes
-   - When in doubt, say "needs more data"
+   - **INSTEAD:** Focus on SIGNAL QUALITY — why are trades losing? Bad entry conditions, not bad hours
 
 3. **Impact on winners**: Check how many winning trades your suggestion would have blocked
    - If your filter would have killed >20% of recent winners: BAD IDEA
