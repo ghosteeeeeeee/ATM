@@ -66,6 +66,7 @@ REGIME_SIGNALS = {
         # pump_catcher — momentum breakout (velocity + acceleration)
         'pump-catcher+', 'pump-catcher-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in NORMAL
         # Trend following + mean reversion in steady markets
@@ -127,6 +128,7 @@ REGIME_SIGNALS = {
         # Breakout works in big moves
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in high vol
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in high vol
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
@@ -205,6 +207,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in storms
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion

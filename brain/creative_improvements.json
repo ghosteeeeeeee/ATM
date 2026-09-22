@@ -1632,5 +1632,24 @@
     "risk": "medium",
     "verified": false,
     "data": "N/A — new signal"
+  },
+  {
+    "date": "2026-09-22T21:32:59Z",
+    "idea": "SHORT_RSI_FLOOR execution-time revalidation for pullback-entry- SHORT",
+    "rationale": "COMP SHORT entered at RSI=13.04 (extreme oversold) despite SHORT_RSI_FLOOR=30. Detection RSI was likely >30, drifted below floor by execution. Same pattern as SHORT_RSI_CEILING drift fixed Sep 16. Would have blocked COMP (-$0.14) and potentially other oversold SHORT entries.",
+    "expected_impact": "+$0.14-0.50/7d (block oversold SHORT entries)",
+    "category": "execution quality",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "RSI<30 SHORT entries 14d: 0/3 winners — no impact on winners"
+  },
+  {
+    "date": "2026-09-22T21:32:59Z",
+    "idea": "Monitor pullback-entry- SHORT HIGH regime — potential future block",
+    "rationale": "pullback-entry- SHORT 14d: NORMAL -$0.62 (blocked), HIGH +$0.43 (marginal), EXTREME +$0.84 (strong). HIGH is borderline. If HIGH degrades to negative, block it too.",
+    "expected_impact": "monitoring only",
+    "category": "regime optimization",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]

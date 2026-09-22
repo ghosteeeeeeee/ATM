@@ -1,3 +1,28 @@
+## CEO Report — 2026-09-22 ~22:00 UTC
+
+### Decision: RAISE SHORT_RSI_FLOOR 30→35
+
+### Diagnosis
+24h: 24T 29.2%WR -$1.98. 7d: 183T 44.8%WR -$0.34. Dead hours fix WORKING — 0 pump-chain+ LONG after 09:30 UTC today. But pullback-entry- SHORT still bleeding: 41T 36.6%WR -$2.35/7d (cold streak — 30d 118T 52.5%WR +$0.65).
+
+### Root Cause
+SHORT_RSI_FLOOR=30 allows oversold SHORT entries. 90d data: RSI<35 SHORTs = 7T 0%WR -$1.27 (ALL losers). RSI 50-60 = 9T 77.8%WR +$0.93 (sweet spot). Oversold SHORTs always lose — entering SHORT when RSI<35 means bouncing into you.
+
+### Fix Applied
+1. **SHORT_RSI_FLOOR raised 30→35** — blocks RSI<35 SHORT entries. 90d: would have blocked 7T -$1.27. Expected +$0.18/7d. Commit 1d91e62d.
+
+### Verification
+- 90d RSI band analysis confirms <35 = 0% WR ✅
+- RSI 50-60 sweet spot preserved ✅
+- Dead hours fix verified working ✅
+
+### Remaining Issues
+- volume_spike still NULL in _signal_metadata (4+ days unfixed)
+- Market 100% NEUTRAL — only2 signal types pass confluence
+- pump_chain SHORT (legacy) 6T 33.3%WR -$0.38/7d — monitor
+
+---
+
 ## CEO Report — 2026-09-22 ~17:50 UTC
 
 ### Decision: RE-ENABLE bb_bounce_v2_long

@@ -19,7 +19,7 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=30:** Working. RSI<30 SHORTs = 37.5%WR blocked.
+- **SHORT_RSI_FLOOR=35:** CEO raised 30→35 (Sep 22). 90d: RSI<35 SHORTs = 7T 0%WR -$1.27. Blocks oversold SHORT entries. RSI 50-60 sweet spot preserved (77.8%WR).
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 

@@ -1,35 +1,42 @@
 === Signal Performance Report ===
-Period: 2026-09-22 11:00–17:00 UTC (6h) | 2026-09-21 17:00–2026-09-22 17:00 UTC (24h)
+Period: Last 6h | 24h | Generated: 2026-09-22 22:45 UTC
 
-**System:** 27 trades/24h, 25.9% WR, -$2.80 PnL | 189 trades/7d, 45.5% WR, -$0.05 PnL
+## 24h Summary
+Total closed trades: 25 (6h: 4)
 
-KILLED (executed earlier today):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 10% | -$1.44 | 10 | PUMP_CHAIN_V4_ENABLED=False (already set) |
+## KILLED (executed):
+None — no signals met blanket-kill criteria.
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 68.8% | +$1.41 | 16 | SOURCE_WEIGHT 1.0→1.15 |
+## REGIME BLOCKS (executed):
+None — existing blocks already cover losing regimes.
+- pullback-entry- SHORT: Already blocked in NORMAL (0.0x). Wins in HIGH (53.4% WR) and EXTREME (55.2% WR). 24h losses are noise.
+- pump-chain+ LONG: Already blocked in NORMAL (Pump_Flow 0.0x). Wins in EXTREME (46.9% WR). 24h losses are noise.
 
-LOSERS (watch list):
+## BOOSTED (executed):
+None — no signals met boost criteria.
+
+## FAMILY_MAP FIXES (executed):
+- Added `pump-chain`, `pump-chain+`, `pump-chain-` to `Pump_Flow` family (were mapping to `Other`)
+- Added `bb-bounce-v2-long`, `bb-bounce-v3-long` to `Bollinger` family
+- Added `continuation` to `Continuation` family
+- Added `grind-breakout` to `Grind_Breakout` family
+- Added `mover` to `Mover` family
+- Added `doji-bottom-long` to `Exhaustion` family
+
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 40.9% | -$1.64 | 44/7d | Watch — wins in EXTREME (61.5%) and HIGH (53.4%) lifetime, NORMAL already blocked |
-| pump-chain- | SHORT | 33.3% | -$0.38 | 6/7d | Watch — low sample, EXTREME only |
-| grind-trend- | SHORT | 20% | -$0.38 | 5/7d | Watch — losing recently |
-| open-skies+ | LONG | 20% | -$0.42 | 5/7d | Watch — losing |
+| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 | Watch — all-time wins in HIGH/EXTREME, 24h bad luck |
+| pump-chain+ | LONG | 16.7% | -$0.85 | 6 | Watch — all-time wins in EXTREME, 24h bad luck |
+| pump-chain- | SHORT | 33.3% | -$0.38 | 6 | Watch — all-time wins in all regimes, 24h noise |
 
-WINNERS:
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 68.8% | +$1.41 | 16/7d | Boosted — wins across 10+ tokens |
-| doji-bottom-long | LONG | 60% | +$0.09 | 5/7d | Healthy |
-| mover+ | LONG | 62.5% | -$0.17 | 8/7d | Good WR, slight negative PnL |
-| grind-trend+ | LONG | 50% | +$0.24 | 18/7d | Steady |
+| (no signal won 3+ trades in 24h) | | | | | |
 
-ISSUES:
-- No signal inversions detected
-- 24h was rough (25.9% WR) but 7d is flat (-$0.05) — system is not broken, just a bad day
-- pullback-entry- SHORT persistent loser across all timeframes but lifetime regime data (EXTREME 61.5%, HIGH 53.4%) supports keeping it alive with NORMAL block
+## ISSUES:
+- **FAMILY_MAP gap fixed**: `pump-chain+` and `pump-chain-` were mapping to `Other` instead of `Pump_Flow`. This meant the existing NORMAL regime block (Pump_Flow 0.0x) was NOT blocking these signals. Fixed by adding hyphen variants to Pump_Flow family.
+- **No signal inversions detected** in 24h window.
+- **Low trade volume**: Only 25 trades in 24h, 4 in 6h. Market may be quiet.
+- **All 24h losers are losing in regimes where they win all-time** — classic noise, not signal decay.

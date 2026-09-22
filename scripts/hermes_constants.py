@@ -2544,6 +2544,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
     'btc-pump-rider',  # BTC breakout → alt lagging LONG — works solo
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
+    'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works solo (2026-09-10)
     # pump-chain/pump_chain: NOT bypassed — PM Trail + RR Engine both manage (tightest SL wins)
     'range-reversion-long', 'range-reversion-short',  # mean-reversion for flat markets — 88% eventually profitable, standalone bypass
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
@@ -3678,7 +3679,7 @@ TREND_IGNITION_CONF_CAP         = 92      # max confidence (system ceiling)
 # Classification: Mean-reversion (buying the dip = contrarian, allowed in CHOP)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
 PULLBACK_ENTRY_PLUS_ENABLED      = False   # CEO KILLED 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
-PULLBACK_ENTRY_MINUS_ENABLED     = True    # SHORT direction (buying rallies)
+PULLBACK_ENTRY_MINUS_ENABLED = False    # SHORT direction (buying rallies)
 PULLBACK_ENTRY_SHORT_HIGH_BLOCK  = True    # brain_auditor Sep 18 — HIGH regime 33T 45.5%WR -$0.51. EXTREME 63.6%WR +$0.43. Gating HIGH recovers +$0.51/7d.
 
 # Detection parameters

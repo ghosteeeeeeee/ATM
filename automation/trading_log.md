@@ -4631,3 +4631,36 @@ Final set: ['ME']
 - 4 open positions manageable
 
 **BY:** auto_1hr
+
+## [2026-09-22 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour | **24h:** 25T, 28% WR, -$2.38 | **7d:** 185T, 44.3% WR, -$0.74
+
+**Close Reasons (24h):**
+- atr_sl_hit: 18/25 (72%), avg -$0.147 — within baseline
+- cut-loser-CL-T1: 2T, avg -$0.095
+- profit-monster-trail: 2T, avg +$0.095
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 6T, 0% WR, -$1.54 — drawdown but lifetime 52.1% WR +$0.35
+- pump-chain+ LONG: 6T, 16.7% WR, -$0.85 — drawdown but lifetime 41.3% WR +$0.95
+- pump-chain- SHORT: 6T, 33.3% WR, -$0.38
+
+**Open:** 2 positions (WCT LONG 1.2h, CFX LONG 3.8h)
+
+**Diagnosis:**
+1. Entry quality: Losses small (~$0.10-$0.30), SL cutting correctly
+2. SL behavior: 72% atr_sl_hit — within 55-75% baseline
+3. Signal quality: pullback-entry- and pump-chain+ in drawdown but lifetime healthy
+4. Trade frequency: ~1/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses in single hour)
+- atr_sl_hit within baseline
+- 7d near breakeven (-$0.74 on 185 trades)
+- Losses small and controlled
+- Open positions manageable
+
+**BY:** auto_1hr
