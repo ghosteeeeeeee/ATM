@@ -3000,11 +3000,42 @@ def run(dry_run=False):
             if _crash.blocked:
                 _block_dir = getattr(_crash, 'blocked_direction', None) or ''
                 if not _block_dir or direction.upper() == _block_dir.upper():
-                    log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash.severity}: {_crash.reason}')
-                    if sig_id:
-                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                    skipped += 1
-                    continue
+                    # CONTINUUM OVERRIDE: allow signal if BTC structure is bullish
+                    _continuum_override = False
+                    try:
+                        import os as _cont_os
+                        _cont_db = _cont_os.path.join(os.environ.get('HERMES_DATA', '/root/.hermes/data'), 'continuum.db')
+                        _cont_conn = None
+                        try:
+                            _cont_conn = sqlite3.connect(_cont_db, timeout=3)
+                            _cont_row = _cont_conn.execute(
+                                "SELECT market_phase, linreg_direction, ema300_position "
+                                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                            ).fetchone()
+                        finally:
+                            if _cont_conn:
+                                try: _cont_conn.close()
+                                except: pass
+                        if _cont_row and direction.upper() == 'LONG':
+                            _p, _l, _e = _cont_row[0], _cont_row[1], _cont_row[2]
+                            if (_p in ('RALLYING', 'UP') or
+                                (_p in ('CALM', 'RECOVERY') and _l in ('LEAN_BULL', 'BULL') and _e == 'ABOVE')):
+                                _continuum_override = True
+                                log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} LONG — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
+                        elif _cont_row and direction.upper() == 'SHORT':
+                            _p, _l, _e = _cont_row[0], _cont_row[1], _cont_row[2]
+                            if (_p in ('DECLINING',) or
+                                (_p in ('CALM', 'RECOVERY') and _l in ('LEAN_BEAR', 'BEAR') and _e == 'BELOW')):
+                                _continuum_override = True
+                                log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} SHORT — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
+                    except Exception:
+                        pass
+                    if not _continuum_override:
+                        log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash.severity}: {_crash.reason}')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
         except Exception as _e:
             log(f'  ⚠️ [BTC-CRASH] filter error in exec loop: {_e} (fail-open)')
 
