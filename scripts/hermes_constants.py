@@ -1349,6 +1349,23 @@ HH_HL_CONF_VOLUME_BONUS = 4     # bonus: strong volume confirmation (>2x avg)
 HH_HL_CONF_HTF_BONUS    = 3     # bonus: 1H trend strongly aligned (EMA spread > 0.2%)
 HH_HL_CONF_MOMENTUM_BONUS = 3   # bonus: RSI in sweet spot (50-60 for LONG, 40-50 for SHORT)
 
+# ── Pullback Entry Mode ────────────────────────────────────────────────────────
+# Instead of entering on breakout (at the peak), wait for pullback to HL/LH level.
+# LONG: HH/HL structure → wait for price to dip to the last higher low → enter
+# SHORT: LH/LL structure → wait for price to rally to the last lower high → enter
+HH_HL_PB_ENABLED         = True    # master switch for pullback mode
+HH_HL_PB_PROXIMITY_ATR   = 0.8    # price must be within this many ATRs of the HL/LH level
+HH_HL_PB_RSI_LONG_MIN    = 30     # pullback LONG RSI floor (can be oversold during pullback)
+HH_HL_PB_RSI_LONG_MAX    = 55     # pullback LONG RSI ceiling (not yet recovered)
+HH_HL_PB_RSI_SHORT_MIN   = 45     # pullback SHORT RSI floor (not yet recovered)
+HH_HL_PB_RSI_SHORT_MAX   = 70     # pullback SHORT RSI ceiling (can be overbought during pullback)
+HH_HL_PB_BOUNCE_BODY_PCT = 0.3    # bounce candle body must be > this % of range (buying pressure)
+HH_HL_PB_MAX_PULLBACK_PCT = 0.618 # max Fibonacci retracement from swing high to swing low (for LONG)
+HH_HL_PB_STRUCT_LOOKBACK  = 3     # how many recent swings to check for HH/HL confirmation
+HH_HL_PB_BOUNCE_LOOKBACK  = 3     # check last N candles for bounce confirmation
+HH_HL_PB_EMA_RELAXED     = True   # allow price below EMA20 during pullback (uptrend intact)
+HH_HL_PB_CONF_BONUS      = 5     # extra confidence for pullback entry (better R:R than breakout)
+
 # ── CHoCH (Change of Character) — kept from v1, separate variant ───────────────
 HH_HL_CHOCH_BASE_CONFIDENCE = 70
 HH_HL_CHOCH_STRUCT_BONUS_MAX = 10
