@@ -1,3 +1,42 @@
+## [2026-09-22 09:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (WCT btc-pump-rider+ LONG cut-loser -$0.09) | **Open:** 1 (ZEN SHORT +$0.12, 2.6h)
+**24h:** 29T 31%WR -$2.36 | **7d:** 196T 46.4%WR +$0.73 | **14d:** 487T 50.3%WR +$0.86
+
+**24h by exit reason:**
+- atr_sl_hit: 21/29 (72%) avg -$0.126 — dominant, structural
+- pump_exit_dead_money: 5T avg +$0.016
+- profit-monster-trail: 1T +$0.200
+- atr_tp_hit: 1T +$0.100
+- cut-loser-CL-T1: 1T -$0.090
+
+**24h signal ranking:**
+- pump-chain+ LONG: 13T 15.4%WR -$1.51 — main bleed source
+- pullback-entry- SHORT: 2T 0%WR -$0.44
+- pump-chain- SHORT: 6T 33.3%WR -$0.38
+- mover+ LONG: 2T 50%WR -$0.24
+
+**24h by regime:**
+- EXTREME: 20T 35%WR -$1.47
+- HIGH: 9T 22.2%WR -$0.89
+- 48h: EXTREME 41.9%WR +$0.05 (profitable over longer window)
+
+**Diagnosis:**
+1. **Entry quality:** 72% atr_sl_hit — entries getting stopped out in EXTREME regime. Structural.
+2. **SL behavior:** ATR SL dominant exit, CEO's SL calibration (1.3%-1.5%). Avg hold 59 min before SL.
+3. **Signal quality:** pump-chain+ 13T 15.4%WR — bleeding but doesn't meet kill criteria (0%WR/3+T last hour: 0 trades last hour).
+4. **Trade frequency:** 29T/24h = ~1.2/hr — normal.
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR with 3+ trades in last hour)
+- atr_sl_hit is structural (CEO's SL calibration)
+- 7d/14d still profitable (+$0.73, +$0.86)
+- 3 consecutive losing hours is normal variance for 50.3% WR system
+- 48h EXTREME regime profitable (41.9%WR +$0.05)
+
+**Commit:** none (analysis only)
+**BY:** auto_1hr
+
 ## [2026-09-22 04:12 UTC] Hourly Analysis
 
 **Trades:** 3 closed last hour (2 losses, 1 win) | **Open:** 2 (GMT pump-chain- SHORT 2h, ALGO pump-chain- SHORT 40min)
