@@ -1394,9 +1394,9 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Bearish structure: DECLINING phase, or CALM/RECOVERY with LEAN_BEAR + BELOW EMA300
             _bearish = (_phase in ('DECLINING',) or
                         (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema == 'BELOW'))
-            # Bullish structure: RALLYING phase, or CALM with LEAN_BULL + ABOVE EMA300
+            # Bullish structure: RALLYING phase, or CALM/RECOVERY with LEAN_BULL + ABOVE EMA300
             _bullish = (_phase in ('RALLYING', 'UP') or
-                        (_phase in ('CALM',) and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
+                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
 
             if direction.upper() == 'SHORT' and _bearish:
                 # SHORT aligned with bearish structure — strong boost
@@ -2085,12 +2085,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # CONTINUUM OVERRIDE: relax slope filter when BTC structure is bearish
                         # (short-term slope can be positive even when longer-term structure is declining)
                         try:
-                            _cont_conn_slope = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                            _cont_row_slope = _cont_conn_slope.execute(
-                                "SELECT market_phase, linreg_direction FROM continuum_states "
-                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                            ).fetchone()
-                            _cont_conn_slope.close()
+                            _cont_conn_slope = None
+                            try:
+                                _cont_conn_slope = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                _cont_row_slope = _cont_conn_slope.execute(
+                                    "SELECT market_phase, linreg_direction FROM continuum_states "
+                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                if _cont_conn_slope:
+                                    try: _cont_conn_slope.close()
+                                    except: pass
                             if _cont_row_slope and _cont_row_slope[0] in ('DECLINING',) and _cont_row_slope[1] in ('LEAN_BEAR', 'BEAR'):
                                 slope_threshold *= 2.0  # 2x tolerance when BTC structure is bearish
                                 log(f"  🌊 [SLOPE-OVERRIDE] {token} SHORT: BTC bearish structure → slope threshold relaxed to {slope_threshold:.4f}%")
