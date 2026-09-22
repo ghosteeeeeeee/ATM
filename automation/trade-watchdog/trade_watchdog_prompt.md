@@ -28,15 +28,13 @@ cat /root/.hermes/data/watchdog_raw.json
 
 Check the regime files:
 ```bash
-cat /root/.hermes/data/continuum_state.json
-cat /root/.hermes/data/BTC_15m.json
-cat /root/.hermes/data/BTC_4h.json
-cat /root/.hermes/data/coin_tracker_data.json
+cat /var/www/hermes/data/continuum_data.json
+cat /var/www/hermes/data/regime_15m.json
 ```
 
 Check what signals are doing right now:
 ```bash
-cat /root/.hermes/data/signals.json
+cat /var/www/hermes/data/signals.json
 ```
 
 Check volatility gate:
@@ -54,7 +52,7 @@ cd /root/.hermes && python3 scripts/trade_watchdog.py
 Read the output:
 ```bash
 cat /var/www/hermes/data/watchdog.json
-cat /root/.hermes/scripts/watchdog_recommendations.json
+cat /root/.hermes/data/watchdog_recommendations.json
 ```
 
 ## Step 4: Deep Analysis (Your Value-Add)
@@ -119,7 +117,7 @@ Write your analysis to the watchdog output. For each steer:
 
 Write your steers to the watchdog recommendations:
 ```bash
-cat > /root/.hermes/scripts/watchdog_recommendations.json << 'EOF'
+cat > /root/.hermes/data/watchdog_recommendations.json << 'EOF'
 {
   "timestamp": "2026-XX-XXTXX:XX:XXZ",
   "steers": [...],

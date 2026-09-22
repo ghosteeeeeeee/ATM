@@ -48,12 +48,34 @@ MFE_GIVEBACK_WARNING_PCT = 3.0     # Gave back 3%+ of MFE = warning
 # After 48h from deployment, change to "autopilot"
 WATCHDOG_MODE = "recommend"
 
+# ============================================================
+# HELPERS
+# ============================================================
+
+def default_serial(obj):
+    """Handle Decimal, datetime, etc for JSON serialization."""
+    from decimal import Decimal
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    return str(obj)
+
+
 now = datetime.now(timezone.utc)
 
 
 def log(msg, level="INFO"):
-    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{ts}] [{level}] {msg}")
+
+
+def atomic_write_json(path, data):
+    """Write JSON atomically — write to .tmp then rename."""
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w") as f:
+        json.dump(data, f, indent=2, default=default_serial)
+    os.rename(tmp_path, path)
 
 
 # ============================================================
@@ -185,7 +207,7 @@ def collect_btc_regime():
                 data = json.load(f)
                 agg = data.get("aggregate", {})
                 regime["btc_15m"] = agg.get("overall", "unknown")
-        except:
+        except Exception:
             pass
 
     # Continuum oscillator (main regime source)
@@ -201,7 +223,7 @@ def collect_btc_regime():
                 regime["acceleration_state"] = current.get("acceleration_state", "unknown")
                 regime["volume_regime"] = current.get("volume_regime", "unknown")
                 regime["linreg_alignment"] = current.get("linreg_alignment", 0)
-        except:
+        except Exception:
             pass
 
     # Volatility gate
@@ -211,7 +233,7 @@ def collect_btc_regime():
             with open(vol_path) as f:
                 data = json.load(f)
                 regime["volatility"] = data.get("current_phase", "unknown")
-        except:
+        except Exception:
             pass
 
     log(f"BTC regime: 15m={regime['btc_15m']}, continuum={regime['continuum']}, "
@@ -231,12 +253,13 @@ def collect_coin_tracker():
                     return data
                 elif isinstance(data, list):
                     return {item.get("coin", item.get("symbol", "")): item for item in data}
-        except:
+        except Exception:
             pass
 
     # Fall back to SQLite
     ct_db_path = os.path.join(HERMES_DATA, "coin_tracker.db")
     if os.path.exists(ct_db_path):
+        conn = None
         try:
             import sqlite3
             conn = sqlite3.connect(ct_db_path)
@@ -248,19 +271,24 @@ def collect_coin_tracker():
 
             coins = {}
             for table in tables:
+                # Validate table name to prevent injection
+                if not table.isidentifier():
+                    continue
                 try:
-                    cur.execute(f"SELECT * FROM {table} ORDER BY rowid DESC LIMIT 1")
+                    cur.execute(f"SELECT * FROM [{table}] ORDER BY rowid DESC LIMIT 1")
                     row = cur.fetchone()
                     if row:
                         coins[table] = dict(row)
-                except:
+                except Exception:
                     pass
-            conn.close()
             if coins:
                 log(f"Coin tracker: loaded {len(coins)} coins from SQLite")
             return coins
         except Exception as e:
             log(f"Error reading coin tracker DB: {e}", "WARN")
+        finally:
+            if conn:
+                conn.close()
 
     return {}
 
@@ -279,7 +307,7 @@ def collect_pipeline_status():
         try:
             lock_age = time.time() - os.path.getmtime(lock_path)
             status["running"] = lock_age < 300  # Running if lock < 5 min old
-        except:
+        except Exception:
             pass
 
     # Check last pipeline log entry
@@ -292,7 +320,7 @@ def collect_pipeline_status():
             )
             if result.stdout:
                 status["last_run"] = result.stdout.strip()[:100]
-        except:
+        except Exception:
             pass
 
     return status
@@ -922,16 +950,6 @@ def build_output(data, steers):
     return output
 
 
-def default_serial(obj):
-    """Handle Decimal, datetime, etc for JSON serialization."""
-    from decimal import Decimal
-    if isinstance(obj, Decimal):
-        return float(obj)
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    return str(obj)
-
-
 def write_outputs(output, steers, dry_run=False):
     """Write output files."""
     if dry_run:
@@ -941,8 +959,7 @@ def write_outputs(output, steers, dry_run=False):
 
     # Write main output
     os.makedirs(os.path.dirname(STEER_OUTPUT), exist_ok=True)
-    with open(STEER_OUTPUT, "w") as f:
-        json.dump(output, f, indent=2, default=default_serial)
+    atomic_write_json(STEER_OUTPUT, output)
     log(f"Wrote {STEER_OUTPUT}")
 
     # Write recommendations (for opencode agent to pick up)
@@ -954,8 +971,7 @@ def write_outputs(output, steers, dry_run=False):
         "open_count": len(output["open_trades"]),
     }
     os.makedirs(os.path.dirname(RECOMMEND_OUTPUT), exist_ok=True)
-    with open(RECOMMEND_OUTPUT, "w") as f:
-        json.dump(recs, f, indent=2, default=default_serial)
+    atomic_write_json(RECOMMEND_OUTPUT, recs)
     log(f"Wrote {RECOMMEND_OUTPUT}")
 
     # Append to actions log (if any auto-executed)
@@ -977,8 +993,7 @@ def write_outputs(output, steers, dry_run=False):
             action["auto_executed"] = WATCHDOG_MODE == "autopilot"
             actions.append(action)
 
-        with open(ACTIONS_LOG, "w") as f:
-            json.dump({"actions": actions}, f, indent=2, default=default_serial)
+        atomic_write_json(ACTIONS_LOG, {"actions": actions})
         log(f"Logged {len(auto_actions)} actions to {ACTIONS_LOG}")
 
 

@@ -33,8 +33,8 @@ echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [START] Trade Watchdog" >> "$LOG_FILE"
 cd /root/.hermes
 python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
-# Step 2: Run opencode agent for deep analysis
+# Step 2: Run opencode agent for deep analysis (with timeout)
 PROMPT=$(cat "$PROMPT_FILE")
-opencode run --port 4099 -p "$PROMPT" >> "$LOG_FILE" 2>&1
+timeout 480 opencode run --port 4099 -p "$PROMPT" >> "$LOG_FILE" 2>&1 || true
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [DONE] Trade Watchdog" >> "$LOG_FILE"
