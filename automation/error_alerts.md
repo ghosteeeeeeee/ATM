@@ -496,3 +496,14 @@
 ## Error Alerts — 2026-09-22 09:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.4s):`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.0s (rc=N)`
+
+## Error Alerts — 2026-09-22 14:44 UTC
+- **WARN** (1x): `disk_usage` — 83% used (93G/118G), approaching 85% threshold
+- **WARN** (1x): `low_winrate` — Today's winrate 35% (18 trades, 6 wins)
+- **INFO**: prices.db is 0 bytes but appears unused — system uses candles.db/coin_tracker.db
+
+## Error Alerts — 2026-09-22 14:57 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-22 15:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`

@@ -2748,3 +2748,15 @@
   atr_sl_hit 74.2% — within 55-75% baseline.
   No kill criteria met. System stable.
   BY: auto_1hr
+[2026-09-22 13:32 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 31T 32.3%WR -$2.72 | 7d: 194T 46.9%WR +$0.53
+  1 trade last hour (DOT SHORT -$0.32), 0 open.
+  atr_sl_hit 74.2% — within 55-75% baseline.
+  No signal meets kill criteria. 7d net positive. System stable.
+  BY: auto_1hr
+[2026-09-22 15:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 30T 32.3%WR -$2.72 | 7d: 193T 46.1%WR +$0.24
+  1 trade last hour (IOTA SHORT -$0.01), 0 open.
+  atr_sl_hit 73.3% — within 55-75% baseline.
+  No signal meets kill criteria. 7d net positive. System stable.
+  BY: auto_1hr

@@ -35,7 +35,6 @@ cd /root/.hermes
 python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
 # Step 2: Run opencode agent for deep analysis (with timeout)
-PROMPT=$(cat "$PROMPT_FILE")
-timeout 480 "$OPENCODE" run --port 4099 -p "$PROMPT" >> "$LOG_FILE" 2>&1 || true
+cat "$PROMPT_FILE" | timeout 480 "$OPENCODE" run --port 4099 >> "$LOG_FILE" 2>&1 || true
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [DONE] Trade Watchdog" >> "$LOG_FILE"

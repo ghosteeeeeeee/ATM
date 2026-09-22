@@ -4322,3 +4322,70 @@ Final set: ['ME']
 - pump-chain- SHORT 33% WR -$0.38 — small sample, continue monitoring
 
 **BY:** auto_1hr
+
+## [2026-09-22 13:32 UTC] Hourly Analysis
+
+**Trades:** 1 closed (DOT SHORT pullback-entry- -$0.32 via atr_sl_hit) | **Open:** 0
+**24h:** 31T, 32.3% WR, -$2.72 | **7d:** 194T, 46.9% WR, +$0.53
+
+**Close Reasons (24h):**
+- atr_sl_hit: 23/31 (74.2%), avg -$0.131 — within 55-75% baseline
+- pump_exit_dead_money: 5/31, avg +$0.016
+- Other: 3 trades, mixed
+
+**Signal Performance (24h):**
+- pump-chain+: KILLED ✓
+- pump-chain-: 6T, 33.3% WR, -$0.38 — small sample, lifetime 57.4%WR +$0.24
+- pullback-entry-: 4T, 0% WR, -$1.10 — below kill threshold (3T/1hr), lifetime 53.4%WR +$0.94
+
+**Diagnosis:**
+1. Entry quality: Can't measure adverse excursion
+2. SL behavior: 74.2% — within baseline
+3. Signal quality: No kill criteria met (3+ losses in 1 hour)
+4. Trade frequency: 1/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d still positive (+$0.53)
+- No signal meets kill criteria
+- System in normal variance dip
+
+**BY:** auto_1hr
+
+## [2026-09-22 15:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (IOTA SHORT -$0.01 via profit-monster-trail) | **Open:** 0
+**24h:** 30T, 32.3% WR, -$2.72 | **7d:** 193T, 46.1% WR, +$0.24
+
+**Close Reasons (24h):**
+- atr_sl_hit: 22/30 (73.3%), avg -$0.138 — within 55-75% baseline
+- pump_exit_dead_money: 4/30, avg +$0.020
+- profit-monster-trail: 2/30, avg +$0.095
+- Other: 2 trades, mixed
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: KILLED ✓ (11T remain from pre-kill, 9.1% WR, -$1.53)
+- pullback-entry- SHORT: 4T, 0% WR, -$1.10 — 7d: 47T, 42.6% WR, -$1.44 (bad week, lifetime 53.4% WR +$0.94)
+- pump-chain- SHORT: 6T, 33.3% WR, -$0.38 — small sample
+- mover+ LONG: 2T, 50% WR, -$0.24
+
+**Diagnosis:**
+1. Entry quality: Can't measure adverse excursion
+2. SL behavior: 73.3% — within baseline
+3. Signal quality: No kill criteria met (need 3+ losses in single hour)
+4. Trade frequency: ~1.2/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d still positive (+$0.24)
+- No signal meets kill criteria (3+ losses in 1 hour)
+- atr_sl_hit within baseline
+- System in normal variance dip
+
+**Open Questions:**
+- pullback-entry- 7d -$1.44 on 47T — worst performer. Lifetime still positive (+$0.94). Monitor, not kill-worthy yet.
+- pump-chain- 33% WR -$0.38 — small sample, continue monitoring
+
+**BY:** auto_1hr

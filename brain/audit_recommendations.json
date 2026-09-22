@@ -1,164 +1,114 @@
 {
-  "timestamp": "2026-09-22T13:36:38.119143+00:00",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "top_topics": [
-      "signal performance",
-      "neutral regime signal",
-      "loss minimization ATR SL"
+    "timestamp": "2026-09-22T15:30:00Z",
+    "session_brain_stats": {
+        "topics_found": ["signal performance", "creative ideas", "losing problems"],
+        "key_insight": "RSI_MAX=65 would block winners (RSI>80 = +$0.95/14d). Gap filter is the real edge."
+    },
+    "trade_summary_24h": {
+        "total_trades": 30,
+        "win_rate": 32.3,
+        "pnl": -2.72,
+        "top_losers": "pump-chain+ 11T -$1.53, pullback-entry- 4T -$1.10, pump-chain- 6T -$0.38",
+        "exit_dominance": "ATR_SL 26/32 (81%)"
+    },
+    "trade_summary_7d": {
+        "total_trades": 189,
+        "win_rate": 46.1,
+        "pnl": 0.24,
+        "best_regime": "EXTREME 75T 53.3%WR +$2.30",
+        "worst_regime": "NORMAL 39T 35.9%WR -$1.04"
+    },
+    "drift_findings": [
+        {
+            "finding": "dead_hours enforcement FIXED — re-enabled Sep 22 ~09:30 UTC",
+            "impact": "+$1.65/7d expected",
+            "status": "resolved"
+        },
+        {
+            "finding": "HEMI blacklist FIXED — applied Sep 22 ~05:30 UTC, all HEMI trades pre-date blacklist",
+            "impact": "prevents -$0.44/14d",
+            "status": "resolved"
+        },
+        {
+            "finding": "neutral_sniper.py exists in signals/ but NOT registered in signals_runner.py",
+            "impact": "NEUTRAL regime has only 2-3 active signal types, diversity critical",
+            "status": "actionable"
+        }
     ],
-    "key_insight": "RSI_MAX_ENTRY for pump-chain+ LONG was discussed but never implemented"
-  },
-  "trade_summary_24h": {
-    "trades": 31,
-    "win_rate": 33.3,
-    "pnl": -2.69,
-    "by_signal": {
-      "pump-chain+ LONG": "13T 15.4%WR -$1.51 (terrible day)",
-      "pullback-entry- SHORT": "3T 0%WR -$0.78 (cold)",
-      "pump-chain- SHORT": "6T 33.3%WR -$0.38"
+    "recurring_problems": [
+        {
+            "topic": "SIGNAL DIVERSITY — only pump-chain+ LONG and volume-breakout-long+ carry system in NEUTRAL",
+            "sessions_discussed": 5,
+            "status": "unresolved"
+        },
+        {
+            "topic": "pullback-entry- SHORT cold streak — 7d 40.9%WR -$1.64 but 30d 53.4%WR +$0.94",
+            "sessions_discussed": 3,
+            "status": "monitoring (cold streak, not systemic)"
+        }
+    ],
+    "losing_trade_autopsy": {
+        "24h_losers": 22,
+        "pattern": "14/22 ATR_SL, 2 chasing (gap>2%), 3 low RSI (<40), 1 dead hours (hour 0)",
+        "root_cause": "Dead hours enforcement was off for pump-chain+ (fixed). Gap chasing (gap>1.5%) = 6 trades -$0.43/14d.",
+        "specific_losers": [
+            {"token": "FOGO", "pnl": -0.30, "rsi": 50, "gap": 2.01, "regime": "HIGH", "cause": "chasing — gap>2%"},
+            {"token": "HEMI", "pnl": -0.16, "rsi": 70, "gap": 2.02, "regime": "EXTREME", "cause": "chasing + blacklisted"},
+            {"token": "ADA", "pnl": -0.16, "rsi": 65, "gap": 2.83, "regime": "HIGH", "cause": "chasing — gap>2%"},
+            {"token": "DYDX", "pnl": -0.30, "rsi": 36, "gap": -0.39, "regime": "EXTREME", "cause": "low RSI, normal variance"},
+            {"token": "CAKE", "pnl": -0.18, "rsi": 19, "gap": -0.36, "regime": "EXTREME", "cause": "extreme oversold, knife catch"}
+        ]
     },
-    "dominant_exit": "atr_sl_hit (24/31 = 77.4%)",
-    "by_regime": {
-      "EXTREME": "21T 38.1%WR -$1.37",
-      "HIGH": "10T 20.0%WR -$1.23"
-    }
-  },
-  "trade_summary_7d": {
-    "trades": 195,
-    "win_rate": 46.7,
-    "pnl": 0.72,
-    "by_regime": {
-      "EXTREME": "74T 54.1%WR +$2.62 (best)",
-      "NORMAL": "43T 37.2%WR -$0.99 (worst)",
-      "HIGH": "77T 44.2%WR -$0.93"
-    }
-  },
-  "drift_findings": [
-    {
-      "item": "HEMI blacklist",
-      "status": "WORKING",
-      "detail": "No HEMI trades since blacklist applied Sep 22 ~05:30 UTC. 3 pre-blacklist trades (7d) all lost $0.44."
+    "signal_quality_analysis": {
+        "pump_chain_long": {
+            "rsi_sweet_spot": "50-60 = 63.2%WR +$1.49/14d (19T)",
+            "rsi_drag": "60+ = 38.7%WR -$0.35/14d (31T)",
+            "gap_sweet_spot": "0-0.5% = 42.9%WR +$0.26/14d (7T)",
+            "gap_drag": ">1.5% = 33.3%WR -$0.43/14d (6T)",
+            "speed_sweet_spot": ">70 = 48.3%WR +$0.85/14d (29T)",
+            "dead_hours_block": "hours 0-5,23 = 0%WR -$3.30/14d (FIXED)"
+        },
+        "pullback_entry_short": {
+            "regime_extreme": "61.5%WR +$1.13/30d — BEST",
+            "regime_normal": "46.9%WR -$0.62/30d — DRAG",
+            "rsi_sweet_spot": "50-70 = 60%+WR"
+        },
+        "volume_breakout_long": {
+            "regime_extreme": "75%WR +$1.46/7d — GEM",
+            "regime_normal": "62.5%WR -$0.05/7d — marginal"
+        }
     },
-    {
-      "item": "Dead hours enforcement",
-      "status": "WORKING (just fixed)",
-      "detail": "Re-enabled Sep 22 ~09:30 UTC. 16 dead-hour trades in 3d data were all before re-enablement. No dead-hour trades since."
+    "config_change_proposed": {
+        "file": "hermes_constants.py",
+        "change": "Add PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5",
+        "rationale": "14d data: gap>1.5% = 6T 33.3%WR -$0.43. Would block 6 trades, 2 winners (+$0.13), 4 losers (-$0.56). Net improvement: +$0.43/14d = +$0.21/7d.",
+        "impact_on_winners": "Blocked 2/19 winners with gap>1.5% — both were marginal wins (GOAT +$0.12, IMX +$0.11). 17/19 winners have gap<1.5%.",
+        "confidence": "HIGH — clear data, no risk to core winners"
     },
-    {
-      "item": "volume_spike data",
-      "status": "DRIFT — 100% NULL",
-      "detail": "55/55 pump-chain+ LONG trades have NULL volume_spike in _signal_metadata. Signal records other fields but not volume_spike. This data gap prevents volume-based entry filtering."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "ATR_SL dominates exits (70.8% of 7d trades)",
-      "detail": "138/195 exits are atr_sl_hit. These trades have 46.4%WR -$0.42 — net negative. Winners come from profit-monster-trail (32T 68.8%WR +$1.75). ATR_SL is too aggressive for many setups.",
-      "impact": "Turns potential winners into losers by triggering SL before momentum resolves"
-    },
-    {
-      "problem": "pump-chain+ LONG degraded (41.8%WR 7d vs 49% 90d)",
-      "detail": "RSI band analysis shows clear pattern: RSI 55-65 = 60%WR +$1.35, RSI >65 = 33%WR, RSI <30 = 0%WR. The signal fires at all RSI levels indiscriminately.",
-      "impact": "15 overbought entries (RSI>65) have 33%WR, dragging overall performance"
-    },
-    {
-      "problem": "pullback-entry- SHORT cold streak (46.9%WR 7d vs 55.4% 90d)",
-      "detail": "RSI <30 entries: 7T 28.6%WR -$0.77. SHORT_RSI_FLOOR=30 blocks RSI<30 but 30-35 band is marginal. Current floor may be too low.",
-      "impact": "Oversold SHORT entries are knife catches in reverse"
-    }
-  ],
-  "losing_trade_autopsy": [
-    {
-      "trade": "CASHCAT pump-chain+ LONG -$0.17",
-      "entry_rsi": 65.98,
-      "gap_at_entry": -0.41,
-      "regime": "EXTREME",
-      "exit": "atr_sl_hit",
-      "root_cause": "Entered at RSI=66 (overbought). RSI>65 band = 33%WR on 15 trades. Chasing momentum at top.",
-      "recommended_filter": "PUMP_CHAIN_LONG_RSI_MAX = 65",
-      "impact_on_winners": "Would have blocked 3 of 20 winners (15%) in 7d. Net impact: +$0.66/7d from blocking 10 losers."
-    },
-    {
-      "trade": "FOGO pump-chain+ LONG -$0.30",
-      "entry_rsi": 50.0,
-      "gap_at_entry": 2.01,
-      "regime": "HIGH",
-      "exit": "atr_sl_hit",
-      "root_cause": "Chasing — gap_at_entry=2.01% means price already pumped 2% before entry. Gap 2%+ band = 40%WR -$0.39.",
-      "recommended_filter": "Already have chase filter (CHASE_GAP_MAX_PCT=1.0). This trade's gap=2.01 should have been caught.",
-      "impact_on_winners": "Chase filter already active. Verify it's catching these."
-    },
-    {
-      "trade": "HEMI pump-chain- SHORT -$0.15",
-      "entry_rsi": 17.65,
-      "regime": "EXTREME",
-      "exit": "atr_sl_hit",
-      "root_cause": "HEMI micro-price ($0.006) = noisy SL triggers. Blacklisted Sep 22.",
-      "status": "FIXED — HEMI blacklisted"
-    }
-  ],
-  "signal_quality_findings": [
-    {
-      "signal": "pump-chain+ LONG",
-      "winrate_7d": "41.8% (55T)",
-      "pnl_7d": "+$1.23",
-      "finding": "RSI 55-65 sweet spot: 15T 60%WR +$1.35. RSI >65: 15T 33%WR +$0.71. RSI <30: 4T 0%WR -$0.18.",
-      "recommendation": "Add PUMP_CHAIN_LONG_RSI_MAX = 65 to block overbought entries",
-      "verified_impact": "Blocks 15 trades (27% of total), of which 10 are losers. Net +$0.66/7d."
-    },
-    {
-      "signal": "pullback-entry- SHORT",
-      "winrate_7d": "46.9% (49T)",
-      "pnl_7d": "-$0.75",
-      "finding": "RSI <30: 7T 28.6%WR -$0.77. SHORT_RSI_FLOOR=30 blocks <30 but 30-35 is marginal (16T 56.3%WR -$0.25).",
-      "recommendation": "Raise SHORT_RSI_FLOOR from 30 to 35. Would block 4 additional trades (RSI 30-35) with 36%WR.",
-      "verified_impact": "Blocks 4 trades. Check: how many RSI 30-35 are winners? 4/11 = 36% winners. Net positive filter."
-    },
-    {
-      "signal": "volume-breakout-long+",
-      "winrate_7d": "68.8% (16T)",
-      "pnl_7d": "+$1.41",
-      "finding": "Gem. Highest WR of any active signal. Don't touch.",
-      "recommendation": "None — monitor only"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-22T13:36:38.119168+00:00",
-      "idea": "PUMP_CHAIN_LONG_RSI_MAX = 65 — RSI band sniper",
-      "rationale": "7d data: RSI 55-65 = 15T 60%WR +$1.35. RSI >65 = 15T 33%WR +$0.71. Blocking RSI>65 removes 10 losers while only killing 3 winners. Session brain discussed this but never implemented.",
-      "expected_impact": "+$0.66/7d from blocking overbought pump-chain+ entries",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low",
-      "verified": "15 trades affected, 10 losers blocked, 3 winners blocked. Net positive."
-    },
-    {
-      "date": "2026-09-22T13:36:38.119170+00:00",
-      "idea": "Record volume_spike in _signal_metadata for pump-chain+",
-      "rationale": "55/55 pump-chain+ trades have NULL volume_spike. This field is never written. Without it, we can't filter by volume quality. volume-breakout-long+ (68.8%WR) likely has higher volume spikes at entry.",
-      "expected_impact": "Enables volume-based entry filtering. Unknown $ impact until data collected.",
-      "category": "data gap",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-22T13:36:38.119172+00:00",
-      "idea": "New NEUTRAL regime signal — trend following with volume confirmation",
-      "rationale": "Only pump-chain+ and volume-breakout-long+ pass confluence in NEUTRAL. Session brain discussed 'trend following' signal but never built. Need diversity. EXTREME has 54%WR but NEUTRAL is dead.",
-      "expected_impact": "+$0.50-1.00/7d if signal achieves 50%+ WR with 5+ trades/week",
-      "category": "signal diversity",
-      "status": "suggested (recurring topic — 3+ sessions)",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "1. CEO DECISION: PUMP_CHAIN_LONG_RSI_MAX = 65 — would have blocked 10 losers, 3 winners. Net +$0.66/7d.",
-    "2. MONITOR: pullback-entry- SHORT RSI_FLOOR 30→35 — would block 4 marginal trades. Review 48h.",
-    "3. FIX: Record volume_spike in _signal_metadata for pump-chain+. Currently 100% NULL.",
-    "4. DEVELOP: New NEUTRAL signal. Recurring topic in 3+ sessions. Only 2 signals pass confluence.",
-    "5. MONITOR: ATR_SL dominance (70.8% exits). Profit-monster-trail captures winners. Consider wider ATR_SL_MIN for higher-vol coins."
-  ]
+    "creative_improvements": [
+        {
+            "date": "2026-09-22T15:30:00Z",
+            "idea": "Register neutral_sniper.py in signals_runner.py for NEUTRAL regime diversity",
+            "rationale": "NEUTRAL regime has only 2-3 active signal types. neutral_sniper.py is already built (RSI mean-reversion + CMF + ATR filter) but not running. Adding it would diversify NEUTRAL entries without changing any existing signals.",
+            "expected_impact": "+1-2 signal types in NEUTRAL, reduced dependency on pump-chain+",
+            "category": "signal diversity",
+            "status": "suggested",
+            "risk": "low — new signal, no impact on existing"
+        },
+        {
+            "date": "2026-09-22T15:30:00Z",
+            "idea": "Lower CONF_FILTER_MIN from 65 to 60 for pump-chain+ LONG only",
+            "rationale": "pump-chain+ RSI 50-60 sweet spot (63.2%WR) fires at confidence 60-65. Currently blocked by CONF_FILTER_MIN=65. Lowering to 60 would capture this band.",
+            "expected_impact": "+3-5% WR for pump-chain+ in sweet spot",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "medium — needs backtest verification"
+        }
+    ],
+    "next_actions": [
+        "1. Add PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5 to hermes_constants.py (gap filter)",
+        "2. Verify gap filter enforcement in signal_compactor.py (check where pump-chain+ entries are validated)",
+        "3. Register neutral_sniper.py in signals_runner.py (signal diversity)",
+        "4. Monitor dead hours fix impact 48h (expected +$1.65/7d)"
+    ]
 }
