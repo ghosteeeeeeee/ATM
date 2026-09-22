@@ -205,7 +205,7 @@ def detect(token):
         'confidence': conf,
         'value': value,
         'price': price,
-        'rsi': rsi,
+        'rsi': rsi_1m if rsi_1m is not None else rsi,
         'z_score': z_score,
         'bb_position': bb_position,
         'momentum_state': momentum_state,

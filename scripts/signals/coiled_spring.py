@@ -230,7 +230,7 @@ def detect_coiled_spring(rows):
         'ema9': ema9_now,
         'ema21': ema21_now,
         'ema50': ema50_now,
-        'rsi': rsi_now,
+        'rsi': rsi_1m if rsi_1m is not None else rsi_now,
         'atr_pct': atr_pct,
         'vol_ratio': vol_ratio,
     }

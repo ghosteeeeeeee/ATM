@@ -281,6 +281,10 @@ def find_lagging_alts_gradual(rally_info: dict) -> list:
         if rsi > BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX:
             continue
 
+        # Compute 1m RSI for metadata
+        from signals.rsi_1m import compute_rsi_1m
+        rsi_1m = compute_rsi_1m(token)
+
         age = price_age_minutes(token)
         if age is not None and age > 5:
             continue
@@ -289,7 +293,7 @@ def find_lagging_alts_gradual(rally_info: dict) -> list:
             'token': token,
             'price': alt_now,
             'beta': beta,
-            'rsi': rsi,
+            'rsi': rsi_1m if rsi_1m is not None else rsi,
             'volume': alt_candles[-1][5],
             'lag_score': beta * (1 - alt_change / BTC_PUMP_RIDER_GRADUAL_ALT_MAX_CHANGE),
         })

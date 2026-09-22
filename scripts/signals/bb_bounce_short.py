@@ -198,6 +198,9 @@ def detect_bb_bounce_short(token, closes):
     prev = closes[-2]
 
     rsi = _compute_rsi(closes)
+    # Compute 1m RSI for metadata
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi is None:
         return None
 
@@ -283,7 +286,7 @@ def detect_bb_bounce_short(token, closes):
         'upper': upper,
         'lower': lower,
         'width': width,
-        'rsi': rsi,
+        'rsi': rsi_1m if rsi_1m is not None else rsi,
         'trend': trend,
         'bounce_pct': bounce_pct,
     }

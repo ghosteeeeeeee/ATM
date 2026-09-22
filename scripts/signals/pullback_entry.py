@@ -226,7 +226,7 @@ def detect(token):
             if dist_from_high < PULLBACK_SUPPORT_PROXIMITY_PCT:
                 return None  # price at resistance = rejection risk for LONG
 
-    # RSI check
+    # RSI check (computed from 5m candles for detection logic)
     rsi = _calc_rsi(closes)
     if rsi is None:
         return None
@@ -234,6 +234,10 @@ def detect(token):
         return None
     if direction == 'SHORT' and (rsi < (100 - PULLBACK_RSI_MAX) or rsi > (100 - PULLBACK_RSI_MIN)):
         return None
+    
+    # Compute 1m RSI for metadata (used by execution filter for drift detection)
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
 
     # 6. Support/Resistance level check (price near recent swing low for LONG, high for SHORT)
     # Already handled by pullback detection above
@@ -269,7 +273,7 @@ def detect(token):
         'pullback_pct': pullback_pct,
         'vol_ratio': vol_ratio,
         'bb_width': bb_width,
-        'rsi': rsi,
+        'rsi': rsi_1m if rsi_1m is not None else rsi,  # prefer 1m RSI for execution filter
         'momentum_state': momentum_state,
         'z_score': z_score,
     }

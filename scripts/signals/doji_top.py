@@ -128,6 +128,9 @@ def _detect_exit(token):
 
     # 4. RSI overbought
     rsi = _calc_rsi(closes)
+    # Compute 1m RSI for metadata
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi is None or rsi < DOJI_RSI_OVERBOUGHT:
         return None
 
@@ -159,7 +162,7 @@ def _detect_exit(token):
         'price': price,
         'advance_pct': advance_pct,
         'vol_ratio': vol_ratio,
-        'rsi': rsi,
+        'rsi': rsi_1m if rsi_1m is not None else rsi,
         'body_pct': (abs(latest['close'] - latest['open']) / (latest['high'] - latest['low'])) * 100 if latest['high'] != latest['low'] else 0,
     }
 

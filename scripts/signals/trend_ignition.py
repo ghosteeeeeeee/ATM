@@ -160,6 +160,9 @@ def _detect_trend_ignition(token, candles):
 
     # 7. RSI < 65 (not overbought)
     rsi = _compute_rsi(closes)
+    # Compute 1m RSI for metadata
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi is None or rsi >= TREND_IGNITION_RSI_MAX:
         return None
 
