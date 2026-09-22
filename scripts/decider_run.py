@@ -4027,13 +4027,15 @@ def run(dry_run=False):
             _stored_rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
             if _stored_rsi is not None:
                 _live_rsi = None
+                _rsi_conn = None
                 try:
                     _rsi_conn = sqlite3.connect(CANDLES_DB, timeout=5)
                     _rsi_cur = _rsi_conn.cursor()
-                    _rsi_cur.execute("SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 15", (token.upper(),))
+                    _rsi_cur.execute("SELECT close FROM candles_1m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 15", (token.upper(),))
                     _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
-                    _rsi_conn.close()
                     if len(_rsi_closes) >= 14:
+                        # DESC order: index 0 = most recent. Reverse for correct delta direction.
+                        _rsi_closes.reverse()
                         _deltas = [_rsi_closes[i] - _rsi_closes[i-1] for i in range(1, len(_rsi_closes))]
                         _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
                         _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
@@ -4043,6 +4045,10 @@ def run(dry_run=False):
                             _live_rsi = 100 - (100 / (1 + _ag / _al))
                 except Exception:
                     pass
+                finally:
+                    if _rsi_conn:
+                        try: _rsi_conn.close()
+                        except: pass
                 
                 if _live_rsi is not None:
                     _drift = abs(_stored_rsi - _live_rsi)
