@@ -639,7 +639,7 @@ def detect(token: str, candles_5m: list = None, candles_1h: list = None) -> Opti
         'bars_since':   bars_since,
         'swing_level':  swing_level,
         'breakout_pct': round(breakout_pct * 100, 4),
-        'rsi':          round(rsi_val, 1),
+        'rsi':          rsi_1m if rsi_1m is not None else round(rsi_val, 1),
         'vol_ratio':    round(vol_ratio, 2),
         'atr_pct':      round(atr_pct, 3),
         'htf_aligned':  htf_aligned,

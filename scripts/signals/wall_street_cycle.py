@@ -216,7 +216,7 @@ def _is_at_extreme(candles, direction, window=None):
         return position < WALL_ST_CYCLE_EXTREME_PCT_BOT
 
 
-def _detect_euphoria(candles_5m, candles_1h, candles_4h):
+def _detect_euphoria(candles_5m, candles_1h, candles_4h, token=None):
     """Detect Euphoria phase (SHORT signal).
 
     Euphoria = parabolic extension + extreme RSI + volume climax + wide BB.
@@ -309,7 +309,7 @@ def _detect_euphoria(candles_5m, candles_1h, candles_4h):
         'confidence': conf,
         'value': round(ema_gap_pct, 2),  # EMA gap as the signal value
         'price': price,
-        'rsi': round(rsi_1h, 1),
+        'rsi': rsi_1m if rsi_1m is not None else round(rsi_1h, 1),
         'vol_ratio': round(vol_ratio, 2),
         'bb_width': round(bb_width, 2),
     }
@@ -403,12 +403,16 @@ def _detect_capitulation(candles_5m, candles_1h, candles_4h):
     conf = min(conf, WALL_ST_CYCLE_CONF_CAP)
     conf = max(conf, WALL_ST_CYCLE_CONF_FLOOR)
 
+    # Compute 1m RSI for metadata
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
+
     return {
         'direction': 'LONG',
         'confidence': conf,
         'value': round(ema_gap_pct, 2),  # EMA gap (crash depth) as the signal value
         'price': price,
-        'rsi': round(rsi_1h, 1),
+        'rsi': rsi_1m if rsi_1m is not None else round(rsi_1h, 1),
         'vol_ratio': round(vol_ratio, 2),
         'wick_ratio': round(wick_ratio, 2),
     }
@@ -493,7 +497,7 @@ def scan_wall_street_cycle_signals():
         candles_4h = _get_candles(token, 'candles_4h', 60)
 
         # Try both detection modes
-        sig = _detect_euphoria(candles_5m, candles_1h, candles_4h)
+        sig = _detect_euphoria(candles_5m, candles_1h, candles_4h, token=token)
         if not sig:
             sig = _detect_capitulation(candles_5m, candles_1h, candles_4h)
         if not sig:
