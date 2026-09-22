@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal, price_age_minutes, get_cooldown, set_cooldown
-from paths import HERMES_DATA, WWW_DATA, RUNTIME_DB, STATIC_DB
+from paths import HERMES_DATA, WWW_DATA, RUNTIME_DB
 
 from hermes_constants import (
     PUMP_FLOW_ENABLED,
@@ -126,6 +126,7 @@ def _check_30m_velocity(token):
     Check 30m velocity using candles_5m (matches compactor logic).
     Returns velocity percentage or None if insufficient data.
     """
+    conn = None
     try:
         from paths import CANDLES_DB
         conn = sqlite3.connect(f"file:{CANDLES_DB}?mode=ro", uri=True, timeout=5)
@@ -137,12 +138,17 @@ def _check_30m_velocity(token):
         """, (token.upper(),))
         closes = [r[0] for r in cur.fetchall()]
         cur.close()
-        conn.close()
         
         if len(closes) >= 6 and closes[-1] > 0:
             return (closes[0] - closes[-1]) / closes[-1] * 100
     except Exception:
         pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
     return None
 
 
@@ -151,6 +157,7 @@ def _check_wave_phase(token):
     Check wave_phase from PostgreSQL signal_metadata.
     Returns phase string or None if not available.
     """
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain', 
@@ -164,13 +171,19 @@ def _check_wave_phase(token):
             ORDER BY close_time DESC LIMIT 1
         """, (token,))
         row = cur.fetchone()
-        conn.close()
+        cur.close()
         
         if row and row[0]:
             meta = json.loads(row[0]) if isinstance(row[0], str) else row[0]
             return meta.get('wave_phase')
     except Exception:
         pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
     return None
 
 
@@ -179,6 +192,7 @@ def _check_momentum_state(token):
     Check momentum_state from PostgreSQL signal_metadata.
     Returns state string or None if not available.
     """
+    conn = None
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain', 
@@ -192,13 +206,20 @@ def _check_momentum_state(token):
             ORDER BY close_time DESC LIMIT 1
         """, (token,))
         row = cur.fetchone()
-        conn.close()
+        cur.close()
         
         if row and row[0]:
             meta = json.loads(row[0]) if isinstance(row[0], str) else row[0]
             return meta.get('momentum_state')
     except Exception:
         pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return None
     return None
 
 
@@ -234,10 +255,6 @@ def scan_signals():
         direction = rec.get('suggested_direction', '')
         
         if direction != 'LONG':
-            continue
-        
-        # Skip WAIT signals
-        if direction == 'WAIT':
             continue
         
         # Blacklist
@@ -355,7 +372,8 @@ if __name__ == '__main__':
                 wave_ok = wave != 'bottoming'
                 momentum_ok = momentum != 'flat'
                 
-                print(f"  {token} conf={conf:.0f}% vel={vel:+.3f}% wave={wave} momentum={momentum}")
+                vel_str = f"{vel:+.3f}%" if vel is not None else "N/A"
+                print(f"  {token} conf={conf:.0f}% vel={vel_str} wave={wave} momentum={momentum}")
                 print(f"    Vel filter: {'PASS' if vel_ok else 'BLOCK'} | Wave filter: {'PASS' if wave_ok else 'BLOCK'} | Momentum filter: {'PASS' if momentum_ok else 'BLOCK'}")
     else:
         n = run()
