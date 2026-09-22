@@ -972,7 +972,8 @@ def rule_based_context_gate(token, direction, source, sig):
             return ('AMBIGUOUS', f'momentum {momentum:.0f} < {SIGNAL_FILTER_MOMENTUM_MIN} (weak trend)', 15)
 
         # RSI filter: penalize overbought/oversold entries
-        rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
+        # FIX 2026-09-22: signals store RSI as 'rsi', not 'rsi_14' — field name mismatch
+        rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
         if rsi is not None:
             if direction == 'LONG' and rsi > SIGNAL_FILTER_RSI_MAX:
                 return ('AMBIGUOUS', f'RSI {rsi:.1f} > {SIGNAL_FILTER_RSI_MAX} (overbought)', 10)
@@ -4017,6 +4018,42 @@ def run(dry_run=False):
                     continue
             except Exception as _e:
                 log(f'  WARN: staleness check failed for {token}: {_e}')
+
+        # ── RSI DRIFT DETECTION (2026-09-22) ──────────────────────────────
+        # If stored RSI differs from live 1m RSI by >15 points, reject.
+        # This catches entries where the signal was created during an extreme
+        # but the extreme reversed before execution.
+        try:
+            _stored_rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
+            if _stored_rsi is not None:
+                _live_rsi = None
+                try:
+                    _rsi_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _rsi_cur = _rsi_conn.cursor()
+                    _rsi_cur.execute("SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 15", (token.upper(),))
+                    _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
+                    _rsi_conn.close()
+                    if len(_rsi_closes) >= 14:
+                        _deltas = [_rsi_closes[i] - _rsi_closes[i-1] for i in range(1, len(_rsi_closes))]
+                        _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
+                        _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
+                        _ag = sum(_gains) / 14
+                        _al = sum(_losses) / 14
+                        if _al > 0:
+                            _live_rsi = 100 - (100 / (1 + _ag / _al))
+                except Exception:
+                    pass
+                
+                if _live_rsi is not None:
+                    _drift = abs(_stored_rsi - _live_rsi)
+                    if _drift > 15:
+                        log(f'  🚫 [RSI-DRIFT] {token} {direction}: stored RSI={_stored_rsi:.1f} vs live={_live_rsi:.1f} (drift={_drift:.1f} > 15) — extreme reversed, blocking')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
+        except Exception as _e:
+            log(f'  WARN: RSI drift check failed for {token}: {_e}')
 
         # ── pump-chain+ stale block (brain_auditor 2026-09-16) ─────────
         # pump-chain+ STALE: 0% WR, 5 trades, -$0.73/7d. Fresh: 50% WR +$0.45.
