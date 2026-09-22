@@ -3915,3 +3915,25 @@ Final set: ['DOT', 'HYPER', 'ME']
 - pump-chain+ 7d still positive ($3.01 per earlier log)
 
 **Open Questions:** pump-chain+ has been consistently bad today — monitor for sustained degradation over more hours before acting.
+
+## [2026-09-22 00:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (SUSHI SHORT +$0.10, AIXBT LONG -$0.04) | 0 open
+**24h:** 28T, 25% WR, -$1.12 (Sep 21 bad day) | **7d:** 188T, 49% WR, +$1.47
+
+**Diagnosis:**
+1. Entry quality: Last hour normal (1 win, 1 loss). 24h skewed by Sep 21 pump-chain+ collapse (15T 20% WR -$0.92).
+2. SL behavior: atr_sl_hit 69% (20/28) 24h — high but same rate on winning days (Sep 20: +$2.28). Trailing SL working correctly.
+3. Signal quality: pump-chain+ degraded Sep 21 (20% WR) but 7d still positive (+$1.87, 43% WR). Not a signal bug — regime-driven variance. No signal at 0% WR with 3+ trades last hour.
+4. Trade frequency: 2/last hour, 28/24h — normal.
+5. Market: NEUTRAL regime, pump-chain+ getting whipsawed.
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met (pump-chain+ had 1 trade last hour, not 3+)
+- 7d pump-chain+ still profitable (+$1.87)
+- atr_sl_hit rate normal for this system
+- 0 open positions, flat book
+
+**BY:** auto_1hr
