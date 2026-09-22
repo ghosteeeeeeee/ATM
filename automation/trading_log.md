@@ -1,3 +1,47 @@
+## [2026-09-22 04:12 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2 losses, 1 win) | **Open:** 2 (GMT pump-chain- SHORT 2h, ALGO pump-chain- SHORT 40min)
+**24h:** 26T 26%WR -$0.95 | **7d:** 191T 47.1%WR +$1.42 | **14d:** 500T 50.6%WR +$1.04
+
+**Last hour closed:**
+- GOAT pump-chain- SHORT: -$0.30 (atr_sl_hit, EXTREME regime)
+- HBAR pump-chain- SHORT: -$0.16 (atr_sl_hit, EXTREME regime)
+- ZEN accel-300- SHORT: +$0.20 (profit-monster-trail)
+
+**24h by exit reason:**
+- atr_sl_hit: 18/26 (69%) avg -$0.063 — dominant exit, entries at bad levels
+- profit-monster-trail: 4T avg +$0.040 — trail working for winners
+- pump_exit_dead_money: 3T avg -$0.030
+- atr_tp_hit: 1T +$0.100
+
+**24h signal ranking:**
+- pump-chain+: 11T 18.2%WR -$0.62 — bleeding in current regime
+- pump-chain-: 3T 0%WR -$0.61 — all atr_sl_hit, EXTREME regime
+- doji-bottom-long: 3T 33.3%WR -$0.34
+- volume-breakout-long+: 1T 100%WR +$0.74
+
+**14d pump-chain+ by hour (dead hours identified):**
+- Hour 2: 5T 0%WR -$0.80 — dead
+- Hour 4: 6T 16.7%WR -$0.23 — dead
+- Hour 14: 5T 20%WR -$0.47 — dead
+- Hour 23: 4T 0%WR -$0.69 — dead
+
+**Diagnosis:**
+1. **Entry quality:** 69% atr_sl_hit — entries at unfavorable levels in EXTREME regime
+2. **SL behavior:** ATR SL is structural, not fixable by signal changes
+3. **Signal quality:** pump-chain- 0%WR/24h but only 3 trades — noise, not structural
+4. **Trade frequency:** 3 trades last hour, 26/24h — normal
+5. **Dead hours block:** CEO disabled pump-chain+ dead hours (commit c61b0b31). 14d data confirms hours 2,4,23 are losers but philosophical decision respected.
+
+**No Change Needed:**
+- 3-trade sample is noise — system is 50.6%WR/14d +$1.04
+- CEO deliberately removed time-of-day blocks
+- No signal meets kill criteria (0%WR with 3+ trades in last hour)
+- System is profitable on 7d (+$1.42) and 14d (+$1.04)
+
+**Commit:** none (analysis only)
+**BY:** auto_1hr
+
 ## [2026-09-22 00:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (CASHCAT pump-chain+ atr_sl_hit -$0.17) | **Open:** 1 (AIXBT pump-chain+ 58min -$0.13)

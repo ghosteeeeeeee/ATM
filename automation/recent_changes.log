@@ -1,3 +1,10 @@
+[2026-09-22 04:12 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 26T 26%WR -$0.95 | 7d: 191T 47.1%WR +$1.42 | 14d: 500T 50.6%WR +$1.04
+  3 trades closed last hour: 2 pump-chain- SHORT losses (GOAT, HBAR) + 1 accel-300- SHORT win (ZEN)
+  All trades in EXTREME regime. 69% atr_sl_hit/24h. pump-chain- 3T 0%WR/24h but <3 trades in last hour.
+  CEO disabled dead hours block (c61b0b31). 14d confirms hours 2,4,23 losers for pump-chain+.
+  No kill candidates, no overtrading, system profitable 7d/14d. BY: auto_1hr
+
 [2026-09-22 00:10 UTC] auto_1hr: EXTENDED pump-chain+ dead hours [0-4,20,23]
   24h: 27T 26%WR -$0.95 | 7d: 200T 49%WR +$5.20. 1 open trade (AIXBT).
   Hours 20+23 confirmed losers: 6T 0%WR/7d -$0.95. Full block saves ~$2.68/7d.
