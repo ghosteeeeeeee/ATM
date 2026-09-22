@@ -1665,6 +1665,8 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
     'PULLBACK_ENTRY_PLUS_ENABLED',  # CEO 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
     'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
+    'PUMP_FLOW_PLUS_ENABLED',      # SIGNAL REPORTER 2026-09-22 — 13T/24h 15.4%WR -$1.51. ALL regimes lose (EXTREME 20%, HIGH 0%). NEVER_REENABLE.
+    'PUMP_CHAIN_V4_ENABLED',       # SIGNAL REPORTER 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -3508,9 +3510,9 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = True          # 48H TEST 2026-09-18 — pump_chain_v4 uses this flag. DISABLE after 48h.
+PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (24h), 20%WR EXTREME, 0%WR HIGH. 80T all-time 41.3%WR +$0.95. NEVER_REENABLE.
 PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
-PUMP_CHAIN_V4_ENABLED = True          # NEW 2026-09-18 — pump-chain with BTC oscillator filter. Blocks LONG at BTC>80 (chasing exhaustion), boosts at 40-80.
+PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
