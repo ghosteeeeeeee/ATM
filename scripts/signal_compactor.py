@@ -699,6 +699,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('wall_street_cycle_short', 'wall-st-cycle-'):  1.25,  # euphoria SHORT — sell the greed
     # trend_ignition — early-stage breakout at trend START (100% WR backtest)
     ('trend_ignition_long', 'trend-ignition+'):  1.3,  # NEW — 100% WR 7-day backtest, volume+compression breakout
+    # volume_breakout — 68.8%WR +$1.41/7d, wins across 10+ tokens. signal_reporter 2026-09-22
+    ('volume_breakout_long', 'volume-breakout-long+'): 1.15,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

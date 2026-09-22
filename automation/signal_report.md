@@ -1,51 +1,35 @@
 === Signal Performance Report ===
-Generated: 2026-09-22 ~09:30 UTC
+Period: 2026-09-22 11:00–17:00 UTC (6h) | 2026-09-21 17:00–2026-09-22 17:00 UTC (24h)
 
-## 6h Performance (minimum 2 trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pump-chain+ | LONG | 3 | 0.0% | -$0.76 |
-| pump-chain- | SHORT | 2 | 100.0% | +$0.25 |
+**System:** 27 trades/24h, 25.9% WR, -$2.80 PnL | 189 trades/7d, 45.5% WR, -$0.05 PnL
 
-## 24h Performance (minimum 3 trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pump-chain+ | LONG | 13 | 15.4% | -$1.51 |
-| pump-chain- | SHORT | 6 | 33.3% | -$0.38 |
-
-## KILLED (executed)
+KILLED (executed earlier today):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 15.4% | -$1.51 | 13 (24h) | PUMP_FLOW_PLUS_ENABLED=False, PUMP_CHAIN_V4_ENABLED=False. Added to NEVER_REENABLE_FLAGS. |
+| pump-chain+ | LONG | 10% | -$1.44 | 10 | PUMP_CHAIN_V4_ENABLED=False (already set) |
 
-### Kill rationale
-- WR < 30% (15.4%) with 13 trades (24h) ✓
-- Net PnL < -$0.10 (-$1.51) ✓
-- Active > 24h (since Sep 10, 12 days) ✓
-- ALL regimes lose: EXTREME 20%WR -$1.21, HIGH 0%WR -$0.30
-- Lifetime: 80T 41.3%WR +$0.95 — edge existed but collapsed recently
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| volume-breakout-long+ | LONG | 68.8% | +$1.41 | 16 | SOURCE_WEIGHT 1.0→1.15 |
 
-## BOOSTED (executed)
-None — no signal meets boost criteria (WR>55%, 5+ trades, PnL>+$0.05)
-
-## LOSERS (watch list)
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 33.3% | -$0.38 | 6 (24h) | WATCH — lifetime 57.4%WR +$0.24. EXTREME regime only (33.3%WR). Small 24h loss, not yet kill-worthy. |
+| pullback-entry- | SHORT | 40.9% | -$1.64 | 44/7d | Watch — wins in EXTREME (61.5%) and HIGH (53.4%) lifetime, NORMAL already blocked |
+| pump-chain- | SHORT | 33.3% | -$0.38 | 6/7d | Watch — low sample, EXTREME only |
+| grind-trend- | SHORT | 20% | -$0.38 | 5/7d | Watch — losing recently |
+| open-skies+ | LONG | 20% | -$0.42 | 5/7d | Watch — losing |
 
-## WINNERS
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT (lifetime) | 57.4% | +$0.24 | 61 | Healthy long-term. 24h dip but no action needed. |
+| volume-breakout-long+ | LONG | 68.8% | +$1.41 | 16/7d | Boosted — wins across 10+ tokens |
+| doji-bottom-long | LONG | 60% | +$0.09 | 5/7d | Healthy |
+| mover+ | LONG | 62.5% | -$0.17 | 8/7d | Good WR, slight negative PnL |
+| grind-trend+ | LONG | 50% | +$0.24 | 18/7d | Steady |
 
-## Other 24h Trades (not meeting min-sample threshold)
-- btc-pump-rider+ LONG: 1T, -$0.09
-- pullback-entry- SHORT: 1T, -$0.29
-- accel-300- SHORT: 2T, +$0.30 (positive)
-- mover+ LONG: 2T, -$0.24
-- doji-bottom-long LONG: 2T, -$0.19
-
-## ISSUES
+ISSUES:
 - No signal inversions detected
-- pump-chain+ LONG has been bleeding for days — dead hours filter (0-5,23 UTC) and RSI blocks (35-75) already in place but insufficient. Full kill warranted.
-- pump-flow-minus already killed same day (0%WR -$0.63 24h) — pump-flow family is fully dead now.
+- 24h was rough (25.9% WR) but 7d is flat (-$0.05) — system is not broken, just a bad day
+- pullback-entry- SHORT persistent loser across all timeframes but lifetime regime data (EXTREME 61.5%, HIGH 53.4%) supports keeping it alive with NORMAL block
