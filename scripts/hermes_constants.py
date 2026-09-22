@@ -2511,7 +2511,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
     # open-skies+ KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v3-long', 'bb-v2-short',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
     # bb-bounce-v2-long removed — dead (4T/7d 25%WR -$0.47)
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
