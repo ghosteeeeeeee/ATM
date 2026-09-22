@@ -1,3 +1,51 @@
+## [2026-09-22 18:35 UTC] Daily Orchestrator
+
+**Status:** Pipeline running, 1 open (FIL SHORT), 20 closed today, 35%WR -$1.48.
+**7d:** 183T 45.4%WR -$0.02 (barely negative, system fragile).
+
+**Changes:**
+1. Added PULLBACK_ENTRY_SHORT_DEAD_HOURS=[0,1,3,7,10,11] to hermes_constants.py — 14d: 25T all losing hours, -$2.33/14d. Expected +$0.84/7d.
+2. Added dead hours enforcement block in signal_compactor.py for pullback-entry- SHORT (matching pump-chain+ pattern).
+3. Committed 427729cd, pushed.
+
+**Verified:**
+- Dead hours enforcement for pump-chain+ LONG is active (trades in hours 04-05 today were BEFORE 09:30 UTC re-enablement).
+- volume-breakout-long+ weight boosted to 1.15 by signal_reporter (68.8%WR +$1.41/7d).
+- All Level 1 upgrade tasks complete (verified by upgrade_implementer).
+- Pipeline running, no errors.
+
+**BY:** daily_orchestrator
+
+## [2026-09-22 18:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 1 (FIL pullback-entry- SHORT, 18min)
+**24h:** 26T ~38%WR -$2.51 | 73% atr_sl_hit
+
+**24h exit reasons:**
+- atr_sl_hit: 19T avg -$0.152 (structural, SL 1.3-1.5%)
+- pump_exit_dead_money: 3T avg +$0.057
+- profit-monster-trail: 2T avg +$0.095
+- atr_tp_hit: 1T +$0.10
+- cut-loser-CL-T1: 1T -$0.09
+
+**24h signal ranking:**
+- pullback-entry-: 4T 0%WR -$1.10
+- pump-chain+: 9T 11.1%WR -$1.15
+- pump-chain-: 6T 33.3%WR -$0.38
+
+**Changes:**
+1. Added pump-chain+ hour 21 to dead hours (4T 0%WR -$0.58/7d) — commit d5b04760
+
+**No Change Needed:**
+- No signal meets kill criteria (0%WR + 3+ trades in last hour) — 0 trades last hour
+- atr_sl_hit structural (CEO SL calibration)
+- pump-chain+ already has hours 0-5,23 blocked
+
+**Recommendations (next session):**
+- pullback-entry- hours [0,4,13,20] = 15T 0%WR -$2.40/7d — add PULLBACK_ENTRY_SHORT_DEAD_HOURS (recovers ~$2.40/7d)
+
+**BY:** auto_1hr
+
 ## [2026-09-22 09:30 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (WCT btc-pump-rider+ LONG cut-loser -$0.09) | **Open:** 1 (ZEN SHORT +$0.12, 2.6h)

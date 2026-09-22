@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-22 ~17:50 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-22 ~18:35 UTC**
+**Updated by: daily_orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 26T, 26.9% WR, -$2.51. 0 open. NEUTRAL vol. Pipeline running.
+24h: 20T, 35% WR, -$1.48. 1 open (FIL SHORT). NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 26T, 26.9% WR, -$2.51. ATR_SL dominates (24/26 exits). pump-chain+ 9T 11.1%WR -$1.15 (dead hours trades before fix re-enabled ~09:30 UTC). pullback-entry- 4T 0%WR -$1.10 (cold streak).
-- **7d:** 189T, 45.5% WR, -$0.05 (DB-verified). Barely negative — system fragile.
+- **24h (rolling):** 20T, 35% WR, -$1.48. ATR_SL dominates (14/20 exits). pump-chain+ 4T 25%WR -$0.64. pullback-entry- 4T 25%WR -$0.94.
+- **7d:** 183T, 45.4% WR, -$0.02 (DB-verified). Barely negative — system fragile.
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, no regime >55%WR — DEGRADED). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, best WR in system). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d (CEO kill Sep 11 was variance, not systemic).
-- **SHORT:** pullback-entry- 44T 40.9%WR -$1.64 (cold streak — 30d 116T 53.4%WR +$0.94).
+- **SHORT:** pullback-entry- 40T 40%WR -$2.05 (cold streak — 30d 116T 53.4%WR +$0.94). Dead hours [0,1,3,7,10,11] BLOCKED today.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). **VERIFIED WORKING** — 0 trades after 09:30 UTC. 7d without dead hours: 30T 60%WR +$3.48.
@@ -42,6 +42,7 @@
 
 ## Today's Changes (Sep 22)
 
+1. **daily_orchestrator ~18:35 UTC — 1 CONFIG CHANGE.** Added PULLBACK_ENTRY_SHORT_DEAD_HOURS=[0,1,3,7,10,11] to hermes_constants.py + enforcement block in signal_compactor.py. 14d data: hours 0,1,3,7,10,11 = 25T all losing, -$2.33/14d. Expected +$0.84/7d. Commit 427729cd. **OTHER:** volume-breakout-long+ weight boosted to 1.15 by signal_reporter (68.8%WR +$1.41/7d). pump-chain+ hour 21 added by auto_1hr. All Level 1 upgrade tasks verified complete.
 1. **CEO ~14:00 UTC — NO CONFIG CHANGE.** DB-verified: 24h 32T 31.3%WR -$2.92 | 7d 194T 46.9%WR +$0.53. **WORST 24h in recent memory.** All NEUTRAL. 0 open. **ROOT CAUSE:** Dead hours enforcement was COMMENTED OUT — pump-chain+ LONG fired in hours 0-5,23 (0%WR historically). Re-enabled ~09:30 UTC today. **LOSING AUTOPSY:** ATR_SL 26/32 exits (81%). pump-chain+ 13T 15.4%WR -$1.51 (dead hours). pullback-entry- 4T 0%WR -$1.10 (cold streak, 30d still +$0.94). **RSI_MAX DECISION:** Keeping PUMP_CHAIN_LONG_RSI_MAX=75 (NOT changing to 65). Brain_auditor data: RSI>80 = 14T +$1.13 (big winners). RSI_MAX=65 would block winners. **SIGNAL DIVERSITY:** Only 2 signal types carry system. 30d: 50 types active but only pump-chain+ and volume-breakout-long+ are net positive. **UPDATED:** signal_regime_memory.json with fresh 7d data. **EXPECTED IMPACT:** Dead hours fix +$1.65/7d. System should recover to ~$2.00/7d.
 1. **brain_auditor ~13:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 31T 33.3%WR -$2.69 | 7d 195T 46.7%WR +$0.72. **DEAD HOURS:** WORKING — no pump-chain+ LONG trades in hours 0-5,23 since re-enablement ~09:30 UTC. **HEMI BLACKLIST:** WORKING. **LOSING AUTOPSY (16 losers):** 14/16 atr_sl_hit. CASHCAT RSI=66 (overbought). FOGO gap=2.01% (chasing). **SIGNAL QUALITY:** pump-chain+ RSI 55-65 = 60%WR +$1.35 (sweet spot). RSI >65 = 33%WR. **DRIFT:** volume_spike 100% NULL in _signal_metadata. **CREATIVE:** (1) PUMP_CHAIN_LONG_RSI_MAX=65 → +$0.66/7d. (2) Record volume_spike. (3) New NEUTRAL signal.
 1. **CEO ~CEO UTC — 2 CONFIG CHANGES.** (1) PUMP_CHAIN_LONG_DEAD_HOURS [0,1,2,3,4,20,23] → [0,1,2,3,4,5]. 14d data: hours 20(+$0.19),23(+$0.69) profitable. Hour 5 0%WR added. Expected +$0.50-1.00/7d. (2) OPEN_SKIES_ENABLED/PLUS → False. 48h test expired, 11T 36.4%WR -$0.73. No edge. Updated signal_regime_memory.json (fresh 30d data). pullback-entry- IMPROVED (now wins HIGH). pump-chain+ DEGRADED (no regime >55%WR).

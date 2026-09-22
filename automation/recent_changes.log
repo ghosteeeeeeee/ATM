@@ -1,3 +1,8 @@
+[2026-09-22 18:13 UTC] auto_1hr: ADDED pump-chain+ hour 21 to dead hours
+  24h: 26T ~38%WR -$2.51. 0 trades last hour. 73% atr_sl_hit.
+  Hour 21: 4T 0%WR -$0.58/7d. Added to PUMP_CHAIN_LONG_DEAD_HOURS [0,1,2,3,4,5,21,23].
+  Commit: d5b04760. Recommendation: add pullback-entry- dead hours [0,4,13,20] next. BY: auto_1hr
+
 [2026-09-22 09:30 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 29T 31%WR -$2.36 | 7d: 196T 46.4%WR +$0.73 | 14d: 487T 50.3%WR +$0.86
   1 trade closed last hour: WCT btc-pump-rider+ LONG cut-loser -$0.09 (held 11 min)

@@ -427,3 +427,35 @@ Every Level 1 task identified across all plans has been implemented:
 | 5 | Trade Watchdog | 4 | HIGH | Autonomous trade steering | Full system: monitor + recommend + auto-execute. Needs dedicated session. |
 | 6 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4-layer architecture: bias engine, entry optimizer, proactive positioner |
 | 7 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | All building blocks exist, needs new regime_tuner.py + timer |
+
+---
+
+## Scan #5 — 2026-09-22 (final re-scan)
+
+### Verification: All Level 1 Tasks Complete
+
+Re-verified every Level 1 task from all plans. All confirmed implemented:
+
+| Task | Source | Evidence |
+|------|--------|----------|
+| Dead regime blocks fix (7 blocks) | pump-chain-exit-analysis | signal_compactor.py:2357-2359 — `_vol_regime` via `_classify_volatility` |
+| BTC_TIMING_GUARD_PUMP_CHAIN_LONG → 1.00 | pump-catching | hermes_constants.py:963 |
+| BTC removed from PENALTY_TOKENS | pump-catching | hermes_constants.py:283 — set has no 'BTC' |
+| continuum-osc in PROFIT_MONSTER_BYPASS | pump-catching | hermes_constants.py:1432 |
+| SHORT_NORMAL_PENALTY = 0.85 | brain_auditor | hermes_constants.py:851 |
+| TIME_BLOCK 0-9 UTC | profitability-fix | hermes_constants.py:1196-1197 |
+| ENA blacklisted | profitability-fix | hermes_constants.py:71 |
+| LOSERS_MULT 0.3, CONF -50 | profitability-fix | hermes_constants.py:350,352 |
+| CL_TIER1 tightened (-2.0/-0.75) | profitability-fix | hermes_constants.py:1562-1563 |
+| rr_engine→atr for pullback-entry- | profitability-fix | hermes_constants.py:1510 |
+| ema300-dip-long killed | profitability-fix | hermes_constants.py:1954 |
+| PUMP_CHAIN_LONG_DEAD_HOURS 0-5 | pump-chain-exit-analysis | hermes_constants.py:1202 |
+| PUMP_CHAIN_LONG_RSI_MAX = 75 | pump-chain-exit-analysis | hermes_constants.py:1203 |
+| NORMAL regime multipliers (vol_gate) | pump-catching | volatility_gate_v2.py:244-255 — 9 signal families blocked in NORMAL |
+| SHORT-in-NEUTRAL block | profitability-fix | signal_compactor.py:2459 |
+| LONG-in-NEUTRAL block | profitability-fix | signal_compactor.py:2496 |
+| Pump-flow engine velocity 0.3% | pump-catching | pump_flow_engine.py:655 |
+
+### Remaining Work Requires Level 2+ Sessions
+
+No more Level 1 tasks found across 120 plans. All config tweaks, blacklist additions, bug fixes, and simple parameter changes are implemented. Remaining work is signal building (Level 2), system integration (Level 3), or architecture (Level 4).

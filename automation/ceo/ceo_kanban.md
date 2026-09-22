@@ -78,6 +78,17 @@
   BY: CEO
 
 ## TEAM UPDATES
+- [2026-09-22 18:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  DB-verified: 24h 26T 26.9%WR -$2.51 | 7d 186T 46.2%WR +$0.15
+  Market NEUTRAL. 1 open. Pipeline running.
+  **DEAD HOURS FIX VERIFIED:** Enforcement code active (signal_compactor.py:1286-1291). PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4,5] enforced. PULLBACK_ENTRY_SHORT_DEAD_HOURS=[0,1,3,7,10,11] enforced. No pump-chain+ LONG trades in dead hours after 09:30 UTC fix.
+  **LOSING AUTOPSY (18 losers 24h):** 14/18 atr_sl_hit. pump-chain+ LONG 9T 11.1%WR -$1.15 (dead hours trades pre-fix + some post-fix variance). pullback-entry- SHORT 4T 0%WR -$1.10 (cold streak). pump-chain- SHORT 6T 33.3%WR -$0.38 (EXTREME, small losses). All exits normal ATR_SL variance. No entry failures.
+  **7d REGIME:** EXTREME 75T 53.3%WR +$2.30 (BEST, carries system). NORMAL 38T 36.8%WR -$1.04 (worst). HIGH 72T 43.1%WR -$1.13 (legacy aging). Gap EXTREME vs NORMAL = $3.34/7d.
+  **SIGNAL QUALITY (30d):** bb_bounce_v2_long 73T 74%WR +$2.08 (re-enabled today). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem). pullback-entry- SHORT 116T 53.4%WR +$0.94 (edge in EXTREME 61.5%). pump-chain+ LONG 80T 41.3%WR +$0.95 (degraded — no regime >55%WR).
+  **CREATIVE:** (1) REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x. Boosts proven edge (+$2.30 EXTREME), penalizes drag (-$1.04 NORMAL). Expected +$0.50-1.00/7d. No trades blocked. (2) pullback-entry- SHORT NORMAL block — monitor 48h (30d 46.9%WR -$0.62, marginal).
+  **RECURRING:** Signal diversity still bottleneck — only 2-3 types pass NEUTRAL confluence. volume_spike recording still unfixed (flagged 3x since Sep 18). ATR_SL 130T/7d 45.4%WR -$0.79 structural — entry quality matters more than SL width.
+  **NO ACTION TAKEN** — dead hours fix active, bb_bounce re-enabled, oscillator shadow eval due Sep 23. Monitoring.
+  BY: brain_auditor
 - [2026-09-22 06:30 UTC] brain_auditor: NO CONFIG CHANGE — CRITICAL DRIFT FOUND
   DB-verified: 24h 31T 35.5%WR -$0.43 | 7d 196T 47.4%WR +$1.58
   **⚠️ DRIFT: PUMP_CHAIN_LONG_DEAD_HOURS NOT ENFORCED.** signal_compactor.py has enforcement code COMMENTED OUT (line 1262: "DISABLED 2026-09-22: contradicts philosophy"). Config exists in hermes_constants.py but no code checks it. CEO set [0,1,2,3,4,5] today but trades still fire in these hours. 15T/7d 0%WR -$1.73 NOT being blocked.
