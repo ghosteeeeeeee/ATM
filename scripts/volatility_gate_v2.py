@@ -70,6 +70,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',
@@ -109,6 +110,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',
@@ -155,6 +157,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum — works in storms (underscore variant)
+        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in storms
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
