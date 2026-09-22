@@ -1197,6 +1197,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
 PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 5]  # CEO 2026-09-22 — 14d data: hours 0-5 all losers. Removed 20(+$0.19),23(+$0.69) — profitable.
+PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-09-22 — 14d: RSI 76-80 = 6T 0%WR -$0.82 (dead zone). RSI>80 = 14T +$1.13 (big winners). Block dead zone, preserve big winners.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.

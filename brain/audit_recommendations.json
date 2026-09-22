@@ -1,152 +1,119 @@
 {
-    "timestamp": "2026-09-22T05:00:00Z",
+    "timestamp": "2026-09-22T05:30:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
         "queries_run": 6,
-        "key_insights": [
-            "Signal decay discussion — signals with high winrate need preservation as market regime changes",
-            "R:R exits — 100% WR with 4 signals but too few for frequency",
-            "Trend following signal requested but not built",
-            "SMA20 dip signal discussed but not deployed",
-            "Regime-weighted confidence approved but not implemented"
+        "top_insights": [
+            "RSI metadata fix verified — entry_rsi_14 populated for all recent trades (was 100% NULL)",
+            "pump-chain+ enters at overbought RSI too often — 16 losers with RSI>70",
+            "Oscillator matrix shadow data NOT recording — signal_z_score_tier and signal_momentum_state all NULL",
+            "NEUTRAL regime signal diversity still critical — only pump-chain+ and volume-breakout-long+ pass confluence"
         ]
     },
-    "trade_summary_24h": {
-        "trades": 25,
-        "win_rate": 48.0,
-        "pnl": 1.93,
-        "open_positions": 4,
-        "best_signal": "pump-chain+ LONG +$1.24",
-        "note": "Data from recent_changes.log (latest ~20:30 UTC Sep 21)"
-    },
-    "trade_summary_7d": {
-        "trades": 200,
-        "win_rate": 49.0,
-        "pnl": 3.51,
-        "best_regime": "EXTREME 53.8%WR +$2.52",
-        "worst_regime": "NORMAL 37.2%WR -$0.99"
-    },
-    "losing_autopsy": {
-        "total_losers_24h": 17,
-        "clusters": [
-            {
-                "signal": "pump-chain+",
-                "count": 10,
-                "total_pnl": -1.44,
-                "regime_breakdown": "8 EXTREME, 2 HIGH",
-                "root_cause": "Normal ATR_SL variance for 47.8% WR signal. No entry condition failures.",
-                "hemi_cluster": "3 HEMI losses -$0.44 (0% WR) — possible token-specific issue",
-                "dead_hours_caught": "2 trades would-have-been blocked by dead hours"
-            },
-            {
-                "signal": "doji-bottom-long",
-                "count": 2,
-                "total_pnl": -0.35,
-                "root_cause": "WLFI 678min stale (MAX_HOLD=480 but ATR_SL hit first). NOT stale-filter issue — position held too long.",
-                "fix": "MAX_HOLD=480 working but ATR trailing can close before MAX_HOLD check runs. Race condition, not a bug."
-            },
-            {
-                "signal": "other",
-                "count": 5,
-                "total_pnl": -0.40,
-                "root_cause": "Scattered losses across mover+, pullback-entry-, r2-trend, bb-bounce, volume-breakout-long+. Normal variance."
-            }
-        ],
-        "data_quality_issue": "100% of losing trades have NULL RSI in _signal_metadata. Cannot validate entry conditions (RSI overbought/oversold). This is the #1 blocker for entry quality analysis."
+    "trade_summary": {
+        "24h": {"trades": 23, "win_rate": 30.4, "pnl": -0.17, "open": 4},
+        "7d": {"trades": 189, "win_rate": 47.1, "pnl": 1.40},
+        "30d_top": "pullback-entry- SHORT 113T 54.9%WR +$1.89, pump-chain+ LONG 76T 42.1%WR +$1.59"
     },
     "drift_findings": [
         {
-            "item": "Dead hours block",
-            "status": "CORRECT",
-            "detail": "PUMP_CHAIN_LONG_DEAD_HOURS = [0,1,2,3,4,20,23]. Hours 20+23 added by auto_1hr today. Verified: 22T/7d 9.1%WR -$2.72 in blocked hours."
+            "item": "DEAD_HOURS_ENABLED=False but dead hours concept still active via PUMP_CHAIN_LONG_DEAD_HOURS",
+            "status": "OK — dead hours now handled signal-specifically in signal_compactor.py",
+            "impact": "none"
         },
         {
-            "item": "Regime-weighted confidence",
-            "status": "NOT_IMPLEMENTED",
-            "detail": "CEO approved shadow mode Sep 21. EXTREME 1.15x, NORMAL 0.85x. Expected +$0.50-1.00/7d. Not coded yet.",
-            "impact": "Missing $0.50-1.00/7d potential edge"
+            "item": "signal_z_score_tier and signal_momentum_state all NULL in trades table",
+            "status": "NOT IMPLEMENTED — oscillator shadow not recording to DB",
+            "impact": "HIGH — blocks regime-weighted confidence, blocks oscillator matrix from using live data",
+            "recommendation": "Verify oscillator shadow data is being logged (check decider_run.py shadow logging). If logging works but DB columns aren't populated, fix brain.py to write these fields."
         },
         {
-            "item": "Oscillator mult shadow",
-            "status": "CORRECT",
-            "detail": "OSCILLATOR_MULT_ENABLED = False (shadow mode). Eval due Sep 23."
-        },
-        {
-            "item": "RSI metadata",
-            "status": "BROKEN",
-            "detail": "0/17 losing trades have RSI data. 100% NULL across all recent trades. Cannot do entry quality analysis.",
-            "impact": "Cannot filter bad RSI entries, cannot validate SHORT_RSI_CEILING effectiveness"
-        },
-        {
-            "item": "SHORT_NORMAL_PENALTY",
-            "status": "CORRECT",
-            "detail": "Drift fix applied Sep 19 (0.8->1.0). SHORT NORMAL 7d: 14T 42.9%WR -$0.53. Still losing but within expected range."
+            "item": "signal_rsi_14 (detection-time RSI) all NULL",
+            "status": "NOT IMPLEMENTED — only entry_rsi_14 (execution-time) is recorded",
+            "impact": "MEDIUM — can't compare detection vs execution RSI drift",
+            "recommendation": "Pass detection-time RSI through signal metadata to brain.py"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "RSI metadata 100% NULL",
-            "sessions": 3,
-            "detail": "Brain auditor flagged this Sep 18, Sep 19, Sep 21. Still not fixed. Signal metadata not writing RSI correctly.",
-            "severity": "HIGH"
+            "topic": "RSI metadata NULL",
+            "occurrences": "Flagged Sep 18, Sep 19, Sep 20, Sep 21",
+            "status": "PARTIALLY FIXED — entry_rsi_14 now works, signal_rsi_14 still NULL",
+            "resolution": "entry_rsi_14 fix verified live. signal_rsi_14 is lower priority."
         },
         {
-            "topic": "NEUTRAL signal diversity",
-            "sessions": 5,
-            "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. Need new signals.",
-            "severity": "MEDIUM"
-        },
-        {
-            "topic": "signal_compactor timeouts",
-            "sessions": 3,
-            "detail": "7 kills in 2h at 60s. DB lock contention during pipeline. Self-recovers but wastes time.",
-            "severity": "LOW"
+            "topic": "pump-chain+ overbought entries",
+            "occurrences": "Repeated losses at RSI>70 across multiple sessions",
+            "status": "NOT ADDRESSED — no RSI filter for pump-chain+ LONG",
+            "recommendation": "Add PUMP_CHAIN_LONG_RSI_MAX=75"
         }
     ],
-    "missing_implementations": [
-        "Regime-weighted confidence multiplier (CEO approved Sep 21, not coded)",
-        "New NEUTRAL regime signals (sma20_dip, ema300_dip_short discussed but not built)",
-        "Trend following signal (requested in session brain, not built)"
-    ],
+    "losing_trade_autopsy": {
+        "total_24h_losers": 16,
+        "dominant_exit": "atr_sl_hit (13/16)",
+        "dominant_signal": "pump-chain+ LONG (10/16 losers)",
+        "key_finding": "pump-chain+ enters at RSI 74.7 avg for losers vs 68.4 for winners",
+        "rsi_dead_zone": "RSI 76-80: 6T 0%WR -$0.82 (ALL losers, zero winners in 14d)",
+        "cluster": "HEMI: 3T pump-chain+ 0%WR -$0.46 (all ATR_SL). Small cap, high vol.",
+        "recommended_change": "Add PUMP_CHAIN_LONG_RSI_MAX=75 to block dead zone while preserving big RSI>80 winners",
+        "impact_on_winners": "Would block 0 recent winners (all RSI>80 winners have RSI>80, not 76-80)"
+    },
+    "signal_quality_deep_dive": {
+        "signals_below_50pct_14d": [
+            {"signal": "trend_purity+", "trades": 11, "wr": 36.4, "pnl": -0.90},
+            {"signal": "ema300_dip_short", "trades": 11, "wr": 36.4, "pnl": -0.78},
+            {"signal": "sma20_dip", "trades": 19, "wr": 42.1, "pnl": -0.73},
+            {"signal": "open-skies+", "trades": 11, "wr": 36.4, "pnl": -0.73},
+            {"signal": "pullback-entry+", "trades": 6, "wr": 16.7, "pnl": -0.57},
+            {"signal": "bb_bounce_v2_long", "trades": 6, "wr": 33.3, "pnl": -0.54},
+            {"signal": "rr-struct-v2+", "trades": 10, "wr": 40.0, "pnl": -0.45}
+        ],
+        "best_signals_14d": [
+            {"signal": "bb_bounce_v2_long", "trades": 73, "wr": 74.0, "pnl": 2.08, "note": "BUT 14d subset is 33.3%WR — different time windows!"},
+            {"signal": "pullback-entry- SHORT", "trades": 113, "wr": 54.9, "pnl": 1.89},
+            {"signal": "pump-chain+ LONG", "trades": 76, "wr": 42.1, "pnl": 1.59},
+            {"signal": "volume-breakout-long+", "trades": 16, "wr": 68.8, "pnl": 1.41}
+        ],
+        "pullback_entry_short_analysis": {
+            "exit_reasons": "atr_sl_hit 79T 58.2%WR +$2.13 (core), rr_engine_resistance 21T 38.1%WR -$0.76 (drag)",
+            "recommendation": "rr_engine_resistance exits are the drag — consider tuning rr_engine threshold or adding momentum_state filter"
+        }
+    },
     "creative_improvements": [
         {
-            "date": "2026-09-22T05:00:00Z",
-            "idea": "HEMI token blacklist consideration",
-            "rationale": "3 pump-chain+ losses in 7d, 0% WR, -$0.44. Cluster of losses on one token. Check if HEMI has unusual microstructure (low liquidity, high spread) that makes pump-chain+ unreliable for this specific token.",
-            "expected_impact": "+$0.44/7d if blacklisted (3 trades)",
-            "category": "entry filter",
-            "status": "monitor",
-            "risk": "low",
-            "sample_size": "3 trades (INSUFFICIENT — monitor 2 more weeks)",
-            "would_block_winners": "0 winning HEMI trades in 7d"
+            "date": "2026-09-22T05:30:00Z",
+            "idea": "Add PUMP_CHAIN_LONG_RSI_MAX=75 — blocks RSI 76-80 dead zone",
+            "rationale": "14d data: RSI 76-80 = 6T 0%WR -$0.82. RSI>80 = 14T 35.7%WR +$1.13 (big winners JUP +$0.47, AVAX +$1.02). Dead zone kills trades without catching the big moves.",
+            "expected_impact": "Blocks 6 losers (-$0.82 saved) while preserving 5 winners (+$2.17 kept). Net: ~+$0.80/14d = ~$0.40/7d.",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low"
         },
         {
-            "date": "2026-09-22T05:00:00Z",
-            "idea": "Implement regime-weighted confidence (CEO approved)",
-            "rationale": "EXTREME 53.8%WR +$2.52 vs NORMAL 37.2%WR -$0.99. Boost confidence for EXTREME, reduce for NORMAL. CEO approved shadow mode Sep 21.",
-            "expected_impact": "+$0.50-1.00/7d",
-            "category": "confidence tuning",
-            "status": "ready_to_implement",
-            "risk": "low",
-            "sample_size": "190+ trades/7d across regimes",
-            "would_block_winners": "0 — only adjusts confidence, doesn't block"
+            "date": "2026-09-22T05:30:00Z",
+            "idea": "Fix oscillator shadow DB recording — signal_z_score_tier and signal_momentum_state all NULL",
+            "rationale": "Shadow eval due Sep 23. Data is being logged to shadow file but NOT written to trades DB. Without DB data, regime-weighted confidence can't use live oscillator state.",
+            "expected_impact": "Enables oscillator matrix going live (+$1.00-2.00/7d expected from blocking LOW+falling)",
+            "category": "infrastructure",
+            "status": "suggested",
+            "risk": "low"
         },
         {
-            "date": "2026-09-22T05:00:00Z",
-            "idea": "pullback-entry- SHORT NORMAL regime penalty",
-            "rationale": "pullback-entry- SHORT in NORMAL: 14T 42.9%WR -$0.53/7d. Already has 0.85x penalty. Consider blocking NORMAL entirely for this signal (50%WR EXTREME, 50% HIGH, 42.9% NORMAL).",
-            "expected_impact": "+$0.53/7d if blocked",
-            "category": "regime filter",
-            "status": "monitor",
-            "risk": "medium",
-            "sample_size": "14 trades in NORMAL (borderline — 20 threshold)",
-            "would_block_winners": "~6 winning SHORTs in NORMAL (42.9% of 14)"
+            "date": "2026-09-22T05:30:00Z",
+            "idea": "pullback-entry- SHORT: add momentum_state filter — rising=63.6%WR vs flat/falling=42.6%WR",
+            "rationale": "Sessions showed momentum_state correlation. Rising momentum SHORT wins more. Need oscillator/momentum data recording first (see above).",
+            "expected_impact": "Could improve pullback-entry- SHORT from 49.1%WR to ~55%WR in 7d",
+            "category": "entry sniper",
+            "status": "blocked_on_data",
+            "risk": "medium"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "FIX: RSI metadata collection — 100% NULL blocks entry quality analysis (HIGH priority)",
-        "IMPLEMENT: Regime-weighted confidence multiplier (CEO approved, ready to code)",
-        "MONITOR: HEMI pump-chain+ cluster (3 losses, 0%WR — need 10+ trades before action)",
-        "MONITOR: pump-chain+ dead hours extension to 20+23 (just added, verify impact)"
+        "1. IMPLEMENT: PUMP_CHAIN_LONG_RSI_MAX=75 in hermes_constants.py + signal_compactor.py filter",
+        "2. INVESTIGATE: oscillator shadow DB recording — why signal_z_score_tier/signal_momentum_state NULL in trades?",
+        "3. MONITOR: HEMI — 3T 0%WR -$0.46. Small sample but consistent. Watch for 10+ trades.",
+        "4. MONITOR: pullback-entry- SHORT rr_engine_resistance exits — 21T 38.1%WR -$0.76 drag",
+        "5. DEAD HOURS: Verify PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4,5] working in signal_compactor.py"
     ]
 }

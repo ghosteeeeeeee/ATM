@@ -3257,6 +3257,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _vel_15m_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
                             log(f"  🚫 [PUMP-CHAIN-VEL15-SHORT] {tkn}: SHORT blocked — 15m vel={_vel_15m_s:+.3f}% (bounce in progress)")
                             continue
+                    # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
+                    if len(_vel_30_closes_s) >= 2 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[1] > 0:
+                        _vel_5m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[1]) / _vel_30_closes_s[1] * 100
+                        if _vel_5m_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
+                            log(f"  🚫 [PUMP-CHAIN-VEL5-SHORT] {tkn}: SHORT blocked — 5m vel={_vel_5m_s:+.3f}% (micro-bounce)")
+                            continue
                     # 30m velocity check (6 x 5m candles) — sustained rise filter
                     if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[-1] > 0:
                         _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
@@ -3599,6 +3605,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     if pe_direction == 'SHORT' and _pv_vel_15m > PUMP_FLOW_SHORT_15M_THRESHOLD:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-15M] {pe['token']} SHORT preserved — 15m vel={_pv_vel_15m:+.3f}% (bounce in progress)")
                                         continue
+                                # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
+                                if pe_direction == 'SHORT' and len(_pv_closes) >= 2 and _pv_closes[0] > 0 and _pv_closes[1] > 0:
+                                    _pv_vel_5m = (_pv_closes[0] - _pv_closes[1]) / _pv_closes[1] * 100
+                                    if _pv_vel_5m > PUMP_FLOW_SHORT_15M_THRESHOLD:
+                                        log(f"  🚫 [PRESERVE-PUMP-CHAIN-5M] {pe['token']} SHORT preserved — 5m vel={_pv_vel_5m:+.3f}% (micro-bounce)")
+                                        continue
                                 # 30m velocity check (6 x 5m candles) — sustained rise filter
                                 if len(_pv_closes) >= 6 and _pv_closes[0] > 0 and _pv_closes[-1] > 0:
                                     _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
@@ -3797,6 +3809,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 if direc.upper() == 'SHORT' and _pv_vel_15m_r > PUMP_FLOW_SHORT_15M_THRESHOLD:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-15M] {tok} SHORT rescue blocked — 15m vel={_pv_vel_15m_r:+.3f}% (bounce in progress)")
+                            # 5m velocity check (index [1] = 1 candle back = 5m) — micro-bounce filter
+                            if _rescue_ok and direc.upper() == 'SHORT' and len(_pv_closes_r) >= 2 and _pv_closes_r[0] > 0 and _pv_closes_r[1] > 0:
+                                _pv_vel_5m_r = (_pv_closes_r[0] - _pv_closes_r[1]) / _pv_closes_r[1] * 100
+                                if _pv_vel_5m_r > PUMP_FLOW_SHORT_15M_THRESHOLD:
+                                    _rescue_ok = False
+                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-5M] {tok} SHORT rescue blocked — 5m vel={_pv_vel_5m_r:+.3f}% (micro-bounce)")
                             # 30m velocity check (6 x 5m candles) — sustained rise filter
                             if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[0] > 0 and _pv_closes_r[-1] > 0:
                                 _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100

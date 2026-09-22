@@ -3959,3 +3959,25 @@ Final set: ['DOT', 'HYPER', 'ME']
 - pump-chain+ degraded Sep 21 but 7d profitable — regime variance
 
 **BY:** auto_1hr
+
+## [2026-09-22 03:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (HEMI pump-chain- SHORT -$0.15, atr_sl_hit) | **Open:** 3 (GOAT SHORT, ZEN SHORT, GMT SHORT)
+**24h:** 25T, 24% WR, -$1.00 | **7d:** 189T, 47.1% WR, +$1.50
+
+**Diagnosis:**
+1. Entry quality: HEMI lost in 4 minutes — SL too tight on microcap (0.006491 entry, 0.006575 SL = 1.3%). Normal for ATR-based.
+2. SL behavior: atr_sl_hit 72% (18/25) 24h — consistent with baseline. System working correctly.
+3. Signal quality: pump-chain+ 13T 24h 15.4% WR -$0.92 (dominant loser). But 7d +$1.87 (43.1% WR). Regime variance in neutral/choppy markets, not signal failure.
+4. Trade frequency: 1/hour — quiet, no overtrading.
+5. Kill criteria: None — no signal has 3+ trades last hour.
+
+**Changes:** None
+
+**No Change Needed:**
+- pump-chain+ 24h bad but 7d positive (+$1.87) — regime-driven, not signal bug
+- No kill criteria met (0 signals with 3+ trades last hour)
+- 3 open shorts (GOAT, ZEN, GMT) — normal position load
+- atr_sl_hit rate normal
+
+**BY:** auto_1hr

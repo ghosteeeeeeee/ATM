@@ -336,6 +336,17 @@ def scan_signals():
                             if token_15m_vel > PUMP_FLOW_SHORT_15M_THRESHOLD:
                                 _log(f"  [pump-flow] {token} 15m Δ={token_15m_vel:+.3f}% > {PUMP_FLOW_SHORT_15M_THRESHOLD}% — skipping SHORT (bounce in progress)")
                                 continue
+                        # 5m velocity (300s) — SHORT only (micro-bounce filter)
+                        _vel5_row_s = _conn_vel.execute("""
+                            SELECT price FROM price_history
+                            WHERE token = ? AND timestamp <= ? - 300
+                            ORDER BY timestamp DESC LIMIT 1
+                        """, (token, _now)).fetchone()
+                        if _vel5_row_s and _vel5_row_s[0] > 0:
+                            token_5m_vel_s = (price - _vel5_row_s[0]) / _vel5_row_s[0] * 100
+                            if token_5m_vel_s > PUMP_FLOW_SHORT_15M_THRESHOLD:
+                                _log(f"  [pump-flow] {token} 5m Δ={token_5m_vel_s:+.3f}% > {PUMP_FLOW_SHORT_15M_THRESHOLD}% — skipping SHORT (micro-bounce)")
+                                continue
                     # 5m velocity (300s) — LONG only
                     if direction == 'LONG':
                         _vel5_row = _conn_vel.execute("""
