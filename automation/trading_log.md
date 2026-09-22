@@ -4060,3 +4060,63 @@ Final set: ['DOT', 'HYPER', 'ME']
 - pump-chain+ LONG: 24h bad (25% WR, -$0.50) but 7d profitable ($1.99, 44.2% WR). EXTREME regime strong.
 - pullback-entry- SHORT: HIGH profitable (52% WR), NORMAL losing (gate already blocks). Not a blanket kill.
 - No direction inversions found.
+
+## LOSERS Update — 2026-09-22 06:05 UTC
+- REMOVE HYPER (insufficient data)
+- REMOVE DOT (insufficient data)
+
+Final set: ['ME']
+
+## [2026-09-22 06:11 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss) | **Open:** 2 (FOGO LONG, SYRUP SHORT)
+**Last hour:** +$0.28 (75% WR) | **24h:** 30T, 36.7% WR, -$0.41 | **7d:** 195T, 47.2% WR, +$1.48
+
+**Diagnosis:**
+1. Entry quality: 3/4 winners (ADA, GOAT, ALGO SHORTs all green). Only loss: ETC LONG atr_sl_hit -$0.16. Normal.
+2. SL behavior: atr_sl_hit 70% (21/30 in 24h). Within normal 55-75% baseline. Sep 20 was anomalous (96.3%).
+3. Signal quality: pump-chain+ LONG bad Sep 21 (-$0.92, 20% WR) but Sep 18-20 was +$2.83 combined. Today: 3T -$0.08. Regime-driven, not signal bug.
+4. Trade frequency: 30T/24h (~1.25/hr) — normal. 4 in last hour — normal.
+5. Kill criteria: None met. pump-chain- already killed (05:10). No signal with 3+ trades at 0% WR in last hour.
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d net positive (+$1.48), system healthy
+- atr_sl_hit rate normal (66.7% today)
+- pump-chain+ within regime variance
+- No overtrading
+
+**BY:** auto_1hr
+
+## [2026-09-22 07:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 3 (DYDX LONG, FOGO LONG, SYRUP SHORT)
+**24h:** 27T, 40.7% WR, -$0.21 (breakeven) | **7d:** 195T, 47.2% WR, +$1.48
+
+**Close Reasons (24h):**
+- atr_sl_hit: 20/27 (74%), -$0.59 — dominant, upper end of normal 55-75% range
+- pump_exit_dead_money: 5/27 (18.5%), +$0.08
+- atr_tp_hit: 1/27, +$0.10
+- profit-monster-trail: 1/27, +$0.20
+
+**Signal Breakdown (24h):**
+- pump-chain+ LONG: 12T, 25% WR, -$0.48 (regime-driven, 7d still positive)
+- pump-chain- SHORT: 6T, killed at 05:10
+- All other signals: <3 trades, small sample
+
+**Diagnosis:**
+1. Entry quality: N/A — no closes last hour
+2. SL behavior: 74% atr_sl_hit — at upper end of baseline but within range
+3. Signal quality: pump-chain+ LONG degraded today but 7d profitable — regime variance
+4. Trade frequency: ~1.1/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet period
+- No kill criteria (no signal with 3+ trades at 0% WR)
+- 7d net positive (+$1.48), system healthy
+- pump-chain- SHORT already killed at 05:10
+
+**BY:** auto_1hr

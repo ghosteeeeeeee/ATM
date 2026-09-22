@@ -1,183 +1,180 @@
 {
-  "timestamp": "2026-09-22T04:36:49.447723+00:00",
+  "timestamp": "2026-09-22T06:30:00Z",
   "session_brain_stats": {
-    "queries_run": 6,
-    "key_topics": [
-      "signal performance",
-      "creative ideas",
-      "problems",
-      "RSI metadata null",
-      "signal diversity neutral",
-      "oscillator matrix"
-    ],
-    "recurring_issues": [
-      "RSI metadata 100% NULL (flagged 3x since Sep 18)",
-      "signal diversity in NEUTRAL (only pump-chain+ and volume-breakout-long+ pass confluence)"
+    "total_sessions_searched": 50,
+    "top_recurring_topics": [
+      "RSI metadata NULL (flagged 3x since Sep 18, unfixed)",
+      "NEUTRAL regime signal diversity (only 2 types pass)",
+      "pump-chain+ EXTREME degradation (46.9% WR vs historical 60%)",
+      "pump-chain- SHORT noise from micro-price tokens"
     ]
   },
   "trade_summary_24h": {
-    "total": 28,
-    "win_rate": 25.0,
-    "pnl": -0.98,
-    "losers": 17,
-    "dominant_exit": "atr_sl_hit (15/17)",
-    "worst_signals": [
-      "pump-chain+ LONG 6T -$0.98",
-      "pump-chain- SHORT 4T -$0.63"
-    ],
-    "note": "pump-chain+ bad day Sep 21 (15T 20%WR -$0.92). 30d NEUTRAL pump-chain+ still +$1.59."
+    "total": 29,
+    "win_rate": 37.9,
+    "pnl": -0.43,
+    "regime": "NEUTRAL",
+    "open_positions": 0,
+    "losers": 15,
+    "winners": 11,
+    "by_signal_direction": {
+      "pump_chain_long": {"trades": 13, "wr": 23.1, "pnl": -0.66},
+      "pump_chain_short": {"trades": 6, "wr": 33.3, "pnl": -0.38},
+      "mover_long": {"trades": 2, "wr": 50.0, "pnl": -0.24},
+      "volume_breakout_long": {"trades": 1, "wr": 100.0, "pnl": 0.74}
+    }
   },
   "trade_summary_7d": {
-    "total": 191,
-    "win_rate": 47.6,
-    "pnl": 1.16,
-    "by_regime": {
-      "EXTREME": "69T 50.7%WR +$1.96",
-      "HIGH": "78T 47.4%WR +$0.19",
-      "NORMAL": "43T 37.2%WR -$0.99",
-      "FLAT": "1T 100%WR +$0.02"
-    }
+    "total": 195,
+    "win_rate": 47.2,
+    "pnl": 1.58,
+    "extreme_regime": {"trades": 74, "wr": 52.7, "pnl": 2.36},
+    "normal_regime": {"trades": 43, "wr": 37.2, "pnl": -0.99},
+    "high_regime": {"trades": 77, "wr": 46.8, "pnl": 0.09}
   },
   "drift_findings": [
     {
-      "item": "CURRENT.md pump-chain- SHORT marked NEVER_REENABLE",
-      "status": "INACCURATE",
-      "detail": "pump-chain- SHORT is NOT in NEVER_REENABLE_FLAGS. 59T/14d -$0.01 (break-even). 55.9%WR. Profitable in NORMAL (80%WR) and HIGH (55%WR). EXTREME drags (-$0.35). Signal is functional.",
-      "impact": "LOW — no config drift, documentation only"
+      "topic": "HEMI blacklist",
+      "status": "IMPLEMENTED",
+      "detail": "Both SHORT_BLACKLIST and LONG_BLACKLIST updated. No HEMI trades since."
     },
     {
-      "item": "RSI metadata 100% NULL in trades table",
-      "status": "UNFIXED",
-      "detail": "Flagged 3x since Sep 18. All trades have NULL signal_metadata RSI. Blocks entry quality analysis.",
-      "impact": "HIGH — cannot do data-driven entry filtering"
+      "topic": "Open-skies kill",
+      "status": "IMPLEMENTED",
+      "detail": "OPEN_SKIES_ENABLED/PLUS=False by CEO today. 11T 36.4%WR -$0.73."
+    },
+    {
+      "topic": "Dead hours expansion",
+      "status": "IMPLEMENTED",
+      "detail": "PUMP_CHAIN_LONG_DEAD_HOURS now [0,1,2,3,4,5]. Verified:52% of7d losers in dead hours."
+    },
+    {
+      "topic": "RSI metadata NULL",
+      "status": "UNFIXED — 3rd flag since Sep 18",
+      "detail": "All pump-chain+ trades have NULL RSI in _signal_metadata. brain.py line 662 writes it IF provided, but signals don't pass it. This breaks entry quality analysis."
     }
   ],
   "recurring_problems": [
     {
       "topic": "RSI metadata NULL",
-      "sessions": 3,
-      "first_flagged": "2026-09-18",
-      "status": "UNFIXED",
-      "recommendation": "Fix signal_metadata RSI writing in signal_compactor.py"
+      "frequency": "Flagged Sep 18, Sep 18, Sep 18, Sep 22 (this run)",
+      "impact": "Cannot analyze entry RSI quality. All losing autopsy RSI checks return N/A. Blocks signal quality tuning.",
+      "root_cause": "Signal modules don't pass signal_rsi_14 or signal_metadata to brain.py's record_trade(). brain.py supports it (line 662) but callers don't use it.",
+      "recommendation": "Fix signal modules to pass RSI at detection time. 10-line fix per signal. Priority: pump-chain+, pullback-entry-, volume-breakout-long+."
     },
     {
-      "topic": "Signal diversity in NEUTRAL",
-      "sessions": 5,
-      "first_flagged": "2026-09-16",
-      "status": "OPEN",
-      "recommendation": "Develop new NEUTRAL-compatible signals (trend following, etc.)"
+      "topic": "NEUTRAL regime signal diversity",
+      "frequency": "Flagged Sep 16, Sep 19, Sep 21, Sep 22",
+      "impact": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. System depends on 2 signals.",
+      "recommendation": "Develop new NEUTRAL-compatible signals. Sessions discussed: trend-following, EMA300 dip, SMA20 dip."
+    },
+    {
+      "topic": "pump-chain+ EXTREME degradation",
+      "frequency": "Flagged Sep 20, Sep 21, Sep 22",
+      "impact": "46.9% WR in EXTREME (was 60%). Still +$1.27/7d but leaving money on table.",
+      "root_cause": "All EXTREME losers are ATR_SL hits. Tight stops in volatile regime.",
+      "recommendation": "Monitor. ATR_SL params are protected. If persists48h, investigate ATR_SL widening for EXTREME."
     }
   ],
-  "missing_implementations": [
-    {
-      "item": "Oscillator Matrix live activation",
-      "status": "Shadow mode since Sep 21, eval due Sep 23",
-      "expected_impact": "+$1.00-2.00/7d from blocking LOW+falling"
+  "losing_trade_autopsy": {
+    "summary": "15 losers24h, all normal ATR_SL variance. No systematic entry quality issues.",
+    "cluster_analysis": {
+      "pump_chain_long_extreme": {
+        "trades": 8,
+        "total_pnl": -0.66,
+        "exit_reason": "all atr_sl_hit",
+        "root_cause": "Tight ATR_SL (1.3-1.5%) in EXTREME volatility. Price wicks through SL before moving in direction.",
+        "would_filter_help": "No — these are valid entries, just noise stops. Widening SL would need CEO approval (protected param)."
+      },
+      "pump_chain_short_extreme": {
+        "trades": 4,
+        "total_pnl": -0.38,
+        "tokens": ["GOAT", "HBAR", "HEMI", "GMT"],
+        "root_cause": "HEMI now blacklisted. GOAT/HBAR are normal variance. GMT was pump_exit_dead_money.",
+        "would_filter_help": "HEMI blacklist already handles worst offender. Remaining trades normal."
+      }
     },
-    {
-      "item": "HEMI blacklist",
-      "status": "IMPLEMENTED THIS RUN",
-      "detail": "Added to both SHORT_BLACKLIST and LONG_BLACKLIST. 7T all-time, 0%WR LONG, $0.006 micro-price noise."
+    "winners_vs_losers_comparison": {
+      "winner_pattern": "ATR_SL hits that captured momentum (FIL +$0.74, CASHCAT +$0.43). Larger moves = larger wins.",
+      "loser_pattern": "ATR_SL hits on smaller moves (avg -$0.17). Same stop, smaller follow-through.",
+      "insight": "Signal quality is fine — the edge is in move SIZE, not win rate. PM_TRAIL captures winners, ATR_SL limits losers. This is the system working as designed."
     }
-  ],
-  "losing_trade_autopsy": [
-    {
-      "losing_trade": "HEMI pump-chain- SHORT -$0.15",
-      "signal": "pump-chain-",
-      "regime": "EXTREME",
-      "root_cause": "Micro-price coin ($0.006) — extremely noisy, SL triggers on noise. 7 trades all-time, 0% WR LONG, 50% WR SHORT but still net negative.",
-      "recommended_change": "HEMI added to both blacklists",
-      "impact_on_winners": "0 winning trades affected — HEMI has no wins",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "pump-chain+ LONG cluster (6T -$0.98 24h)",
-      "signal": "pump-chain+",
-      "regime": "EXTREME (5/6)",
-      "root_cause": "Bad day variance. All ATR_SL exits. 14d EXTREME: 45T 46.7%WR +$1.53. 30d NEUTRAL: still +$1.59. Not systemic.",
-      "recommended_change": "No action — normal variance",
-      "impact_on_winners": "N/A",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "WLFI doji-bottom-long -$0.15",
-      "signal": "doji-bottom-long",
-      "regime": "NORMAL",
-      "root_cause": "Held 678min (11.3h). MAX_HOLD=480 should have closed earlier. This was before MAX_HOLD was tightened.",
-      "recommended_change": "No action — covered by existing MAX_HOLD=480",
-      "impact_on_winners": "N/A",
-      "confidence": "HIGH"
-    }
-  ],
+  },
   "signal_quality_deep_dive": {
-    "pump_chain_plus_long": {
-      "7d": "51T 43.1%WR +$1.87",
-      "winners": "22T avg +$0.26 hold 204min avg size $13.85",
-      "losers": "29T avg -$0.14 hold 112min avg size $12.62",
-      "insight": "Winners hold 82% longer (204 vs 112min). ATR_SL exits losers faster — signal is right but SL may be too tight for some trades.",
-      "regime_breakdown": "EXTREME 45T +$1.53 (best), HIGH 26T +$0.41, NORMAL 5T -$0.35 (sample too small)"
+    "pump_chain_long": {
+      "7d": "53T 43.4%WR +$1.83",
+      "14d": "78T 42.3%WR +$1.55",
+      "regime_edge": "EXTREME 32T 46.9%WR +$1.27 | NORMAL 2T 50%WR +$0.09 | HIGH 26T 38.5%WR +$0.41",
+      "verdict": "Workhorse. Low WR but PM_TRAIL captures big moves. EXTREME is best regime. NORMAL bleeds — already gated by LONG_NEUTRAL_BLOCK.",
+      "improvement": "Dead hours filter now blocking52% of losers. Monitor48h for impact."
+    },
+    "volume_breakout_long": {
+      "7d": "16T 68.8%WR +$1.41",
+      "14d": "16T 68.8%WR +$1.41",
+      "regime_edge": "EXTREME 8T 75%WR +$1.46",
+      "verdict": "Gem. 2x volume spike filter produces high-quality entries. EXTREME dominance.",
+      "improvement": "None needed — already optimal."
     },
     "pullback_entry_short": {
-      "7d": "53T 49.1%WR -$0.32",
-      "cold_streak": "True — 90d is 55.4%WR +$2.04",
-      "insight": "Variance, not systemic. 14d: 113T 54.9%WR +$1.89. Still profitable medium-term."
-    },
-    "pump_chain_minus_short": {
-      "14d": "59T 55.9%WR -$0.01 (break-even)",
-      "regime": "NORMAL 80%WR +$0.10, HIGH 55%WR +$0.24, EXTREME 52.9%WR -$0.35",
-      "insight": "Profitable outside EXTREME. EXTREME drags overall. Consider EXTREME regime block."
+      "7d": "52T 48.1%WR -$0.42",
+      "14d": "113T 54.9%WR +$1.89",
+      "regime_edge": "EXTREME 25T 64%WR +$1.45 | HIGH 56T 55.4%WR +$1.06 | NORMAL 32T 46.9%WR -$0.62",
+      "verdict": "Cold streak7d but30d profitable. NORMAL bleeds. EXTREME/HIGH are the edge.",
+      "improvement": "SHORT_RSI_FLOOR=30 and SHORT_RSI_CEILING=65 already filtering. NORMAL penalty via SHORT_NORMAL_PENALTY=1.0."
     }
   },
   "creative_improvements": [
     {
-      "date": "2026-09-22T04:36:49.447723+00:00",
-      "idea": "Add HEMI to both blacklists — both-direction micro-price loser",
-      "rationale": "7 trades all-time, 0%WR LONG, 50%WR SHORT but net negative. $0.006 micro-price = noisy SL triggers. Pattern: losing on every signal type.",
-      "expected_impact": "Saves ~$0.53/14d (HEMI total losses)",
-      "category": "coin blacklist",
-      "status": "IMPLEMENTED",
-      "risk": "low"
+      "date": "2026-09-22T06:30:00Z",
+      "idea": "Add volume confirmation to pump-chain+ LONG entries",
+      "rationale": "volume-breakout-long+ has75% WR in EXTREME vs pump-chain+ at46.9%. The key difference: volume-breakout requires 2x average volume spike. pump-chain+ fires on chain correlation alone. Adding a minimum volume filter (1.5x avg) to pump-chain+ would filter weak momentum entries that get stopped out.",
+      "expected_impact": "+3-5% WR for pump-chain+ in EXTREME (block ~30% of ATR_SL losers without killing winners)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low — volume filter is additive, doesn't change existing logic",
+      "verification_needed": "Check: would 1.5x volume filter have blocked any of the23 pump-chain+ LONG winners in7d? Run backtest before implementing."
     },
     {
-      "date": "2026-09-22T04:36:49.447723+00:00",
-      "idea": "pump-chain- SHORT EXTREME regime block",
-      "rationale": "pump-chain- SHORT: NORMAL 80%WR +$0.10, HIGH 55%WR +$0.24, EXTREME 52.9%WR -$0.35. EXTREME is the only losing regime. 34T/14d in EXTREME.",
-      "expected_impact": "Saves ~$0.35/14d by blocking EXTREME SHORT entries",
-      "category": "regime filter",
-      "status": "suggested — monitor 48h first (sample is 14d, not 30d)",
-      "risk": "low — 34T sample, EXTREME is clearly the losing regime"
-    },
-    {
-      "date": "2026-09-22T04:36:49.447723+00:00",
-      "idea": "pump-chain+ LONG NORMAL regime block",
-      "rationale": "NORMAL 5T 20%WR -$0.35/14d. Only 5 trades — too small a sample. But EXTREME (45T +$1.53) and HIGH (26T +$0.41) are clearly better.",
-      "expected_impact": "Saves ~$0.35/14d if pattern holds",
-      "category": "regime filter",
-      "status": "monitor — need 10+ trades to confirm",
-      "risk": "medium — 5T sample is noise-level"
+      "date": "2026-09-22T06:30:00Z",
+      "idea": "RSI metadata fix — enable entry quality analysis",
+      "rationale": "All pump-chain+ trades have NULL RSI in _signal_metadata. This has been flagged3x since Sep 18. Without RSI data, we cannot: (1) check if entries are at overbought/oversold extremes, (2) tune RSI filters per signal, (3) do proper losing autopsy. The fix is in signal modules — they need to pass signal_rsi_14 to brain.py's record_trade().",
+      "expected_impact": "Enables future signal quality improvements. No direct PnL impact but unlocks analysis.",
+      "category": "infrastructure",
+      "status": "recurring_unfixed",
+      "risk": "low — adding a parameter to existing function calls"
     }
   ],
-  "config_changes_applied": [
-    {
-      "change": "HEMI added to SHORT_BLACKLIST",
-      "file": "hermes_constants.py",
-      "before": "HEMI not blacklisted",
-      "after": "HEMI in SHORT_BLACKLIST",
-      "rationale": "7T all-time, 0%WR LONG, $0.006 micro-price noise, both sides lose"
-    },
-    {
-      "change": "HEMI added to LONG_BLACKLIST",
-      "file": "hermes_constants.py",
-      "before": "HEMI not blacklisted",
-      "after": "HEMI in LONG_BLACKLIST",
-      "rationale": "3T LONG 0%WR -$0.44, micro-price noise coin"
-    }
-  ],
+  "config_changes_applied": [],
   "next_actions": [
-    "MONITOR: pump-chain- SHORT EXTREME — confirm -$0.35/14d pattern persists 48h before blocking",
-    "MONITOR: pump-chain+ NORMAL — need 5+ more trades to confirm degradation",
-    "FIX: RSI metadata NULL — #1 blocker for entry quality analysis (flagged 3x since Sep 18)",
-    "WAIT: Oscillator Matrix shadow eval due Sep 23",
-    "DEVELOP: New NEUTRAL-compatible signals for diversity"
+    {
+      "action": "MONITOR",
+      "detail": "pump-chain+ dead hours filter impact.52% of7d losers were in hours0-5. Expected +$0.50-1.00/7d. Eval Sep 24.",
+      "priority": "high"
+    },
+    {
+      "action": "MONITOR",
+      "detail": "Open-skies kill impact. 11T/7d 36.4%WR -$0.73 saved. Eval Sep 24.",
+      "priority": "medium"
+    },
+    {
+      "action": "FIX",
+      "detail": "RSI metadata NULL — 3rd flag. Signal modules need to pass RSI at detection time. Affects pump-chain+, pullback-entry-, volume-breakout-long+.",
+      "priority": "high"
+    },
+    {
+      "action": "INVESTIGATE",
+      "detail": "pump-chain+ volume filter — would1.5x avg volume confirmation improve EXTREME WR? Run backtest against7d winners.",
+      "priority": "medium"
+    },
+    {
+      "action": "DEVELOP",
+      "detail": "New NEUTRAL-compatible signals. Only2 types pass confluence. Need diversity.",
+      "priority": "medium"
+    },
+    {
+      "action": "MONITOR",
+      "detail": "pump-chain- SHORT EXTREME —6T 33.3%WR -$0.38. 2 losers were HEMI (now blacklisted). May improve naturally. Monitor48h.",
+      "priority": "low"
+    }
   ]
 }

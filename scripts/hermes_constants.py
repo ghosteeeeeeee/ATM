@@ -294,10 +294,9 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'DOT',
-    'HYPER',
     'ME'
 }
+
 
 
 

@@ -2824,3 +2824,7 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **REGIME EDGE:** EXTREME 50.7%WR +$1.96 vs NORMAL 37.2%WR -$0.99.
   **CREATIVE:** (1) HEMI blacklist IMPLEMENTED. (2) pump-chain- SHORT EXTREME block suggested (monitor 48h). (3) RSI metadata NULL still #1 blocker (flagged 3x since Sep 18).
   BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-22 06:30 UTC] brain_auditor: Full audit. DB-verified: 24h 29T 37.9%WR -$0.43 | 7d 195T 47.2%WR +$1.58. **LOSING AUTOPSY:** 15 losers24h — all normal ATR_SL variance. pump-chain+ 8T EXTREME -$0.66 (tight stops in vol). pump-chain- 4T EXTREME -$0.38 (HEMI now blacklisted). **DEAD HOURS VERIFIED:** 13/25 pump-chain+ LONG7d losers (52%) were in hours0-5. Filter working. **REGIME:** EXTREME 74T 52.7%WR +$2.36★ | NORMAL 43T 37.2%WR -$0.99. **DRIFT:** ZERO — HEMI blacklist, open-skies kill, dead hours all implemented. **RECURRING:** RSI metadata NULL flagged 4th time (since Sep 18). All pump-chain+ trades have NULL RSI — blocks entry quality analysis. **CREATIVE:** (1) Add volume confirmation to pump-chain+ LONG (1.5x avg vol filter). volume-breakout-long+ has75% WR in EXTREME with vol filter vs pump-chain+ at46.9% without. Expected +3-5% WR. Needs backtest. (2) RSI metadata fix —10-line fix per signal module, enables future tuning. **NO CONFIG CHANGE** — system healthy, monitoring dead hours + open-skies kill impact 48h.
+  BY: brain_auditor
