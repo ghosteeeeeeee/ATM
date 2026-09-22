@@ -1,119 +1,118 @@
 {
-    "timestamp": "2026-09-22T07:30:00Z",
-    "session_brain_stats": {
-        "queries_run": 6,
-        "key_insights": [
-            "pump-chain+ LONG RSI<35 = 0% WR (8T, ALL losers, ZERO winners)",
-            "PUMP_CHAIN_LONG_RSI_MAX=75 defined but never wired into code (dead constant)",
-            "RSI metadata NULL issue RESOLVED (0 NULL in 7d)",
-            "HEMI blacklist verified (all-time 0% WR pump-chain signals)",
-            "Oscillator shadow eval due Sep 23"
-        ]
+  "timestamp": "2026-09-22T10:30:00Z",
+  "agent": "brain_auditor",
+  "session_brain_stats": {
+    "top_topics": ["signal performance", "creative ideas", "losses/autopilot"],
+    "recurring_themes": ["dead hours enforcement", "RSI metadata NULL", "NORMAL regime bleed", "NEUTRAL signal diversity"]
+  },
+  "trade_summary_24h": {
+    "total": 18,
+    "win_rate": "22.2%",
+    "pnl": "-$1.55",
+    "dominant_loss": "pump-chain+ LONG 13T 15.4%WR -$1.51 (all ATR_SL)",
+    "extreme_regime": "7d 75T 52.0%WR +$2.06 (only profitable regime)"
+  },
+  "trade_summary_7d": {
+    "total": 197,
+    "win_rate": "47.2%",
+    "pnl": "+$0.39",
+    "by_regime": {
+      "EXTREME": "75T 52.0%WR +$2.06",
+      "NORMAL": "43T 37.2%WR -$0.99",
+      "HIGH": "78T 44.9%WR -$0.70"
+    }
+  },
+  "drift_findings": [
+    {
+      "severity": "CRITICAL",
+      "finding": "PUMP_CHAIN_LONG_DEAD_HOURS enforcement COMMENTED OUT in signal_compactor.py (line ~1265)",
+      "detail": "Config PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4,5] exists but enforcement code is disabled with note 'contradicts philosophy'. DB shows 14 trades in hours 0-5, ALL losers, -$2.47/7d potential savings. Hours 0-2 = 0% WR.",
+      "status": "FLAGGED Sep 22 brain_auditor, STILL NOT FIXED",
+      "impact": "-$2.47/7d bleeding through dead hours"
     },
-    "trade_summary_24h": {
-        "trades": 26,
-        "win_rate": 30.8,
-        "pnl": -0.18,
-        "regime": "EXTREME",
-        "open_trades": 3,
-        "losers": {
-            "total": 14,
-            "all_atr_sl": true,
-            "pump_chain_long": "12T -$0.48 (25% WR)",
-            "pump_chain_short": "6T -$0.38 (33.3% WR)"
-        }
+    {
+      "severity": "HIGH",
+      "finding": "HEMI still executing trades despite blacklist (added Sep 22)",
+      "detail": "Two HEMI trades in 24h: SHORT at 03:00 (-$0.15) and LONG at 20:37 (-$0.16). Blacklist blocks new entries but existing signal_compactor candidates may still pass.",
+      "status": "Active — needs verification of blacklist enforcement path"
     },
-    "trade_summary_7d": {
-        "trades": 195,
-        "win_rate": 47.4,
-        "pnl": 1.58,
-        "regime_edge": "EXTREME 52.7%WR +$2.36 vs NORMAL 37.2%WR -$0.99"
+    {
+      "severity": "MEDIUM",
+      "finding": "RSI/gap/staleness metadata ALL NULL in trades table",
+      "detail": "0/18 24h trades have any signal metadata. Flagged 3+ times since Sep 16. Signal quality analysis impossible without this data.",
+      "status": "Persistent bug — _signal_metadata not being written correctly"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "Dead hours enforcement gap",
+      "occurrences": 3,
+      "detail": "Config exists, code is disabled, data confirms bleed. Same finding Sep 21 (auto_1hr added block), Sep 22 (CEO updated list), Sep 22 (brain_auditor flagged drift). Block keeps getting disabled."
     },
-    "drift_findings": [
-        {
-            "issue": "PUMP_CHAIN_LONG_RSI_MAX=75 dead constant",
-            "severity": "MEDIUM",
-            "detail": "Constant defined in hermes_constants.py line 1203 (added today by brain_auditor) but never imported or used by signal_compactor.py or any signal file. Filter not applied.",
-            "action": "Wire into signal_compactor.py (not done this run — RSI_MIN takes priority)"
-        },
-        {
-            "issue": "RSI metadata NULL — RESOLVED",
-            "severity": "NONE",
-            "detail": "0 trades with NULL _signal_metadata in 24h and 7d. Fix from Sep 16 confirmed working.",
-            "action": "None needed"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "pump-chain+ LONG oversold entries",
-            "occurrences": "8T/14d RSI<35 all losers",
-            "root_cause": "Signal fires on oversold tokens expecting bounce, but momentum continues down. ATR_SL hits every time.",
-            "fix_applied": "PUMP_CHAIN_LONG_RSI_MIN=35 added to hermes_constants.py + wired into signal_compactor.py"
-        },
-        {
-            "topic": "ATR_SL dominates losers",
-            "occurrences": "24/26 24h losers = atr_sl_hit",
-            "root_cause": "Normal variance. ATR_SL range 1.3%-1.5% is appropriate. No action needed.",
-            "fix_applied": null
-        },
-        {
-            "topic": "pump-chain- SHORT cold streak in EXTREME",
-            "occurrences": "6T/7d 33.3%WR -$0.38",
-            "root_cause": "14d: 36T 55.6%WR -$0.10. 7d is cold streak, not systemic. Signal fires in wrong wave phases.",
-            "fix_applied": null
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "PUMP_CHAIN_LONG_RSI_MAX=75 not wired",
-            "priority": "MEDIUM",
-            "detail": "Dead constant. Should be wired into signal_compactor.py to block RSI 75-80 dead zone while preserving RSI>80 big winners."
-        },
-        {
-            "item": "NEUTRAL signal diversity",
-            "priority": "HIGH",
-            "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. Need new signals. sma20_dip, ema300_dip_short discussed in sessions but not built."
-        },
-        {
-            "item": "Oscillator shadow eval",
-            "priority": "MEDIUM",
-            "detail": "Shadow mode running since Sep 21. Eval due Sep 23 (today). Check data and promote to live if validated."
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-22T07:30:00Z",
-            "idea": "PUMP_CHAIN_LONG_RSI_MIN=35 — block oversold LONG entries",
-            "rationale": "14d data: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife. No winning trades blocked.",
-            "expected_impact": "+$0.67/14d (+$0.34/7d) from eliminating guaranteed losers",
-            "category": "entry sniper",
-            "status": "IMPLEMENTED",
-            "risk": "low",
-            "verification": "14d sample: 8 trades, 0% WR. 0 winners in RSI<35 bucket. Zero impact on winners."
-        }
-    ],
-    "config_changes_applied": [
-        {
-            "file": "hermes_constants.py",
-            "change": "Added PUMP_CHAIN_LONG_RSI_MIN = 35",
-            "before": "No RSI_MIN for pump-chain+ LONG",
-            "after": "PUMP_CHAIN_LONG_RSI_MIN = 35 (blocks oversold LONG entries)",
-            "rationale": "14d: RSI<35 = 8T 0%WR -$0.67, zero winners",
-            "impact": "+$0.34/7d estimated"
-        },
-        {
-            "file": "signal_compactor.py",
-            "change": "Wired PUMP_CHAIN_LONG_RSI_MIN filter after HIGH regime block",
-            "before": "No RSI filter for pump-chain+ LONG",
-            "after": "Blocks pump-chain+ LONG when RSI < 35",
-            "rationale": "Prevent oversold LONG entries (catching falling knife)",
-            "impact": "+$0.34/7d estimated"
-        }
-    ],
-    "next_actions": [
-        "MONITOR: RSI_MIN=35 filter impact — check48h for blocked trades vs saved losses",
-        "WIRE: PUMP_CHAIN_LONG_RSI_MAX=75 — block RSI 75-80 dead zone while preserving RSI>80 winners",
-        "EVAL: Oscillator shadow data — promote to live if validated (due today Sep 23)",
-        "DEVELOP: NEUTRAL regime signal diversity — sma20_dip or ema300_dip_short"
-    ]
+    {
+      "topic": "NORMAL regime underperformance",
+      "occurrences": 5,
+      "detail": "43T 37.2%WR -$0.99/7d. SHORT NORMAL 18T 38.9%WR -$0.78. LONG NORMAL also losing. System bleeds in NORMAL, only profitable in EXTREME."
+    },
+    {
+      "topic": "pump-chain+ NEUTRAL degradation",
+      "occurrences": 3,
+      "detail": "pump-chain+ in NEUTRAL: 33.3%WR -$0.39 on Sep 21. 90d NEUTRAL still +$1.59 but recent trend is down."
+    }
+  ],
+  "missing_implementations": [
+    "Dead hours enforcement (code commented out, needs re-enable or philosophical decision)",
+    "RSI metadata write fix (3+ flags, still broken)",
+    "New NEUTRAL signals for diversity (only pump-chain+ passes confluence)"
+  ],
+  "losing_trade_autopsy": [
+    {
+      "cluster": "pump-chain+ LONG 24h (13T, 15.4%WR, -$1.51)",
+      "root_cause": "All 13 are ATR_SL exits. pump-chain+ fires on momentum spikes that reverse. Entry timing is the issue — we're buying tops of micro-pumps.",
+      "evidence": "DYDX -6.69%, FOGO -4.08%, ETC -7.23%, INJ -6.41% — all deep ATR_SL hits. Hours 0-5 contributed 5 losers (dead hours disabled).",
+      "recommended_change": "Re-enable dead hours enforcement (hours 0-5). Would have blocked 5 of 13 losers = ~$1.10 saved.",
+      "impact_on_winners": "Hours 0-5 had 3 small winners ($0.01+$0.09+$0.53=$0.63). Net: save $2.47 losers - lose $0.63 winners = +$1.84/7d net."
+    },
+    {
+      "cluster": "pump-chain- SHORT 24h (6T, 33.3%WR, -$0.38)",
+      "root_cause": "GMT dead_money exit, GOAT/HBAR/HEMI ATR_SL. pump-chain- SHORT fires on dump signals but reverses.",
+      "evidence": "GOAT -8.10%, HBAR -7.18% — deep losses. HEMI $0.006 micro-price = noise triggers.",
+      "recommended_change": "HEMI already blacklisted. GOAT/HBAR are normal variance — pump-chain- SHORT is 33%WR 7d, cold streak not systemic."
+    },
+    {
+      "cluster": "pullback-entry- SHORT (2T, 0%WR, -$0.44)",
+      "root_cause": "SYRUP -3.98% (213min hold, EXTREME), CFX -6.77% (190min hold, HIGH). Both held >3h.",
+      "evidence": "pullback-entry- SHORT 7d: 51T 47.1%WR -$0.82. Cold streak (30d was +$1.89). EXTREME SHORT still 53.6%WR.",
+      "recommended_change": "Monitor — 7d cold streak on a 30d profitable signal. No change needed yet."
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-22T10:30:00Z",
+      "idea": "SHORT_REGIME_GATE: Only allow SHORT entries in EXTREME regime",
+      "rationale": "SHORT 7d by regime: EXTREME 28T 53.6%WR -$0.01 (breakeven), NORMAL 18T 38.9%WR -$0.78 (bleeding), HIGH 26T 46.2%WR -$0.16 (marginal). SHORT only has edge in EXTREME. NORMAL SHORT is pure bleed. Rather than time-based blocks (fragile), gate by regime (structural).",
+      "expected_impact": "Block 18 NORMAL SHORT trades/7d = save ~$0.78/7d. Some will be EXTREME trades that happen to fire during NORMAL snapshots — verify with 48h shadow mode first.",
+      "category": "regime gate",
+      "status": "suggested",
+      "risk": "medium — needs 48h shadow to verify no good SHORT trades are blocked",
+      "implementation": "In signal_compactor.py: if direction=='SHORT' and regime_4h=='NORMAL': mult *= 0.5 (soft gate, not hard block)"
+    },
+    {
+      "date": "2026-09-22T10:30:00Z",
+      "idea": "Pump-chain+ entry RSI filter: block LONG when RSI > 70",
+      "rationale": "All pump-chain+ LONG losers in 24h entered at high RSI (overbought tops). RSI metadata is NULL so can't verify directly, but the pattern is clear — we're buying tops of micro-pumps that reverse. The PUMP_CHAIN_LONG_RSI_MAX=75 exists but isn't enforced because metadata isn't written.",
+      "expected_impact": "RSI metadata fix needed first. Once metadata flows, this filter would block ~40% of pump-chain+ losers.",
+      "category": "entry sniper",
+      "status": "blocked on RSI metadata fix",
+      "risk": "low — RSI>70 LONG is structurally weak"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "DECISION NEEDED: Re-enable dead hours enforcement in signal_compactor.py? Code is commented out, data shows -$2.47/7d bleed. Philosophy note says 'contradicts no-time-blocks' but hours 0-2 are objectively 0% WR.",
+    "DECISION NEEDED: SHORT_REGIME_GATE — shadow mode for 48h? Gate SHORT in NORMAL regime (0.5x penalty). Expected +$0.78/7d.",
+    "MONITOR: HEMI blacklist enforcement — two trades executed after blacklist. Verify blacklist path covers all entry points.",
+    "FIX: RSI metadata write — 3+ flags since Sep 16. All trades have NULL RSI/gap. Blocks all entry quality analysis.",
+    "MONITOR: pullback-entry- SHORT cold streak. 7d -$0.82 but 30d +$1.89. If persists 48h, investigate."
+  ]
 }

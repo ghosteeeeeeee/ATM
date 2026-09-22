@@ -4120,3 +4120,44 @@ Final set: ['ME']
 - pump-chain- SHORT already killed at 05:10
 
 **BY:** auto_1hr
+
+## [2026-09-22 09:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 2 (ZEN SHORT EXTREME, WCT LONG HIGH — just opened)
+**24h:** 29T, 34.5% WR, -$1.51 | **7d:** 196T, 46.4% WR, +$0.48
+
+**Close Reasons (24h):**
+- atr_sl_hit: 22/29 (75.9%), avg -$0.087 — at upper end of 55-75% baseline
+- pump_exit_dead_money: 5/29, avg +$0.016
+- atr_tp_hit / profit-monster-trail: 2/29, +$0.30
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: 13T, 15.4% WR, -$1.51 — degraded (Sep 21-22 bad)
+- pullback-entry-: 2T, 0% WR, -$0.44 — small sample
+- All others: <3 trades
+
+**pump-chain+ Daily Trend:**
+- Sep 18-20: 35T, 57% WR, +$2.83 (strong)
+- Sep 21: 15T, 20% WR, -$0.92 (degraded)
+- Sep 22: 5T, 20% WR, -$0.68 (still degraded)
+- 3d EXTREME regime: 30T, 50% WR, +$1.39 — profitable despite bad 24h
+- 3d HIGH regime: 13T, 38.5% WR, -$0.21 — slightly negative
+
+**Diagnosis:**
+1. Entry quality: SL gaps tight (0.02-0.18%) — noise in EXTREME vol, not bad entries
+2. SL behavior: 75.9% atr_sl_hit — upper end of baseline, within range
+3. Signal quality: pump-chain+ degraded 2 days but 3d+ profitable (+$1.27)
+4. Trade frequency: ~1.2/hr — normal
+5. Kill criteria: NOT met
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d still positive (+$0.48)
+- pump-chain+ degraded but 3d EXTREME profitable
+- No overtrading, no kill triggers
+
+**Open Questions:**
+- pump-chain+ Sep 21-22 degraded — watch if 3d turns negative
+
+**BY:** auto_1hr

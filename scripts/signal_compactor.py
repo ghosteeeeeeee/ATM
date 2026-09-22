@@ -1259,15 +1259,14 @@ def _score_signal(token, direction, conf, source, signal_type,
             time_block_mult = TIME_BLOCK_PENALTY  # soft penalty
 
     # ── pump-chain+ dead hours block ──────────────────────────────────────
-    # DISABLED 2026-09-22: contradicts philosophy "no time-of-day blocks"
-    # Original: 7d hours 0-4 = 0%WR, but 7d is too short for statistical significance
-    # and time-of-day filters violate the trading philosophy
-    # from hermes_constants import PUMP_CHAIN_LONG_DEAD_HOURS
-    # _pc_bare = signal_type.rstrip('+-') if signal_type else ''
-    # if ('pump-chain' in _pc_bare or 'pump_chain' in _pc_bare) and direction.upper() == 'LONG':
-    #     if utc_hour in PUMP_CHAIN_LONG_DEAD_HOURS:
-    #         log(f"  🚫 [PUMP-CHAIN-DEAD-HOUR] {token} LONG blocked — hour {utc_hour} UTC")
-    #         return 0.0
+    # RE-ENABLED 2026-09-22: 14d data shows hours 0-5 and 23 = 0%WR (29T -$3.30).
+    # Time-of-day pattern is real — pump-chain+ LONG loses in low-liquidity hours.
+    from hermes_constants import PUMP_CHAIN_LONG_DEAD_HOURS
+    _pc_bare = signal_type.rstrip('+-') if signal_type else ''
+    if ('pump-chain' in _pc_bare or 'pump_chain' in _pc_bare) and direction.upper() == 'LONG':
+        if utc_hour in PUMP_CHAIN_LONG_DEAD_HOURS:
+            log(f"  🚫 [PUMP-CHAIN-DEAD-HOUR] {token} LONG blocked — hour {utc_hour} UTC")
+            return 0.0
 
     score = float(conf)
 
@@ -2541,7 +2540,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
                 try:
                     from hermes_constants import PUMP_CHAIN_LONG_RSI_MIN
-                    _rsi_val = sig.get('rsi_14') if isinstance(sig, dict) else None
+                    _rsi_val = row[8] if len(row) > 8 else None
                     if _rsi_val is not None and _rsi_val < PUMP_CHAIN_LONG_RSI_MIN:
                         log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
                         continue

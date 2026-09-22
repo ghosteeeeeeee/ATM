@@ -459,3 +459,36 @@
 
 ## Error Alerts — 2026-09-22 06:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Error Alerts — 2026-09-22 07:44 UTC
+- **WARN** (4x): `signal_compactor: timed out (killed after 60.0s)` — happened 4 times in last hour. Self-recovered on next pipeline cycle. Likely LLM timeout in compactor. Monitor — if recurring, may need timeout increase or LLM fallback.
+- **INFO**: `hotset fallback DB query returned 0 tokens` — transient, no impact.
+- **No AUTO-FIX needed** — all issues self-healed.
+
+## Error Alerts — 2026-09-22 07:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.4s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.9s):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.2s):`
+
+## Error Alerts — 2026-09-22 08:57 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (15x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.6s (rc=N)`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.1s):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.2s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.7s):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.3s (rc=N)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.0s (rc=N)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.3s):`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.7s (rc=N)`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.2s):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.5s):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.8s):`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.6s):`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.8s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.9s (rc=N)`
+
+## Error Alerts — 2026-09-22 09:47 UTC
+- **CRITICAL** (recurring): `signal_compactor: FATAL ERROR — NameError: name 'sig' is not defined` in `run_compaction` at line 2544
+- **ROOT CAUSE**: Variable `sig` was never defined in the `for row in rows` loop. It was likely copy-pasted from a signal detection context where `sig` is a dict. In the compactor, signal data comes from SQLite rows (tuple access).
+- **FIX**: Changed `sig.get('rsi_14') if isinstance(sig, dict) else None` → `row[8] if len(row) > 8 else None` (matches the `rsi = row[8] if len(row) > 8 else None` pattern used at lines 1999, 2930, 3796).
+- **AUTO-FIX APPLIED**: signal_compactor.py:2544 patched, verified working (completed in 1.9s, 0 crashes)

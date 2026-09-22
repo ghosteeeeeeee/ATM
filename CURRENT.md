@@ -5,15 +5,15 @@
 
 ## Current Status
 
-24h: 31T, 35.5% WR, -$0.43. 0 open. NEUTRAL vol. Pipeline running.
+24h: 30T, 33.3% WR, -$1.62. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 31T, 35.5% WR, -$0.43. ATR_SL dominates (24T -$4.18). pump_exit_momentum/dead_money 3T -$0.24. 2 phantom trades. Sep 22 daily so far: 12T 50%WR +$0.03.
-- **7d:** 196T, 47.4% WR, +$1.58 (DB-verified). POSITIVE.
+- **24h (rolling):** 30T, 33.3% WR, -$1.62. ATR_SL dominates (15T -$3.18). pump_exit_dead_money 2T -$0.11. Sep 22 daily: 16T 37.5%WR -$0.95.
+- **7d:** 196T, 46.4% WR, +$0.73 (DB-verified). Barely positive.
 - **LONG:** pump-chain+ 53T 43.4%WR +$1.83 (workhorse, EXTREME 46.9%WR +$1.27). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, EXTREME 75%WR +$1.46).
 - **SHORT:** pullback-entry- 53T 49.1%WR -$0.32 (cold streak — 30d +$1.89). Wins HIGH 52%WR +$0.50, loses NORMAL 42.9%WR -$0.53.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5] — CEO fixed Sep 22. Removed hours 20,23 (profitable), added hour 5 (0%WR).
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). Expected +$1.65/7d.
 - **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22 CEO — 48h test expired 36.4%WR), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
@@ -41,6 +41,7 @@
 ## Today's Changes (Sep 22)
 
 1. **CEO ~CEO UTC — 2 CONFIG CHANGES.** (1) PUMP_CHAIN_LONG_DEAD_HOURS [0,1,2,3,4,20,23] → [0,1,2,3,4,5]. 14d data: hours 20(+$0.19),23(+$0.69) profitable. Hour 5 0%WR added. Expected +$0.50-1.00/7d. (2) OPEN_SKIES_ENABLED/PLUS → False. 48h test expired, 11T 36.4%WR -$0.73. No edge. Updated signal_regime_memory.json (fresh 30d data). pullback-entry- IMPROVED (now wins HIGH). pump-chain+ DEGRADED (no regime >55%WR).
+1. **brain_auditor ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 31T 35.5%WR -$0.43 | 7d 196T 47.4%WR +$1.58. **⚠️ CRITICAL DRIFT:** PUMP_CHAIN_LONG_DEAD_HOURS NOT ENFORCED — signal_compactor.py has enforcement code COMMENTED OUT (line 1262). Config exists but trades still fire in hours 0-5. 15T/7d 0%WR -$1.73 NOT blocked. **LOSING AUTOPSY:** 14 losers 24h — all ATR_SL. pump-chain+ 8T -$1.08 (FOGO gap=2.01% chasing, HEMI RSI=70 overbought+blacklisted). ATR_SL 82.5% hit rate on pump-chain+. **HOUR 23:** CEO removed from dead hours (comment says "profitable") but DB shows 4T 0%WR -$0.69. **CREATIVE:** (1) Re-enable dead hours enforcement + add hour 23 → +$1.73-2.42/7d. (2) RSI_MAX_ENTRY=65 for pump-chain+ LONG — RSI 55-65 band = 62.5%WR vs RSI>65 = 44%WR. (3) New NEUTRAL signal needed. **NO ACTION** — drift requires CEO decision.
 1. **brain_auditor ~05:30 UTC — 1 CONFIG CHANGE.** DB-verified: 24h 28T 25.0%WR -$0.98 | 7d 191T 47.6%WR +$1.16. **HEMI BLACKLISTED** (both directions). 7T all-time: LONG 0%WR -$0.44, SHORT 50%WR -$0.09. $0.006 micro-price = noisy SL triggers. **LOSING AUTOPSY:** 17 losers 24h — all normal ATR_SL. pump-chain+ 6T -$0.98 (bad day, 14d EXTREME still +$1.53). pump-chain- 4T -$0.63 (EXTREME). WLFI doji 678min stale (pre-MAX_HOLD). **DRIFT:** ZERO. **REGIME:** EXTREME 50.7%WR +$1.96 vs NORMAL 37.2%WR -$0.99. **CREATIVE:** (1) HEMI blacklist IMPLEMENTED. (2) pump-chain- SHORT EXTREME block suggested (monitor 48h). (3) RSI metadata NULL still unfixed (flagged 3x since Sep 18).
 
 ## Today's Changes (Sep 21)

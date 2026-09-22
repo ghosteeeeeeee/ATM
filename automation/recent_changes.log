@@ -2714,3 +2714,11 @@
   pump-chain+ Sep 21 bad (15T 20%WR -$0.92) but Sep 20 was +$1.35. 7d still positive.
   No kill criteria. Normal quiet period.
   BY: auto_1hr
+[2026-09-22 09:10 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 29T 34.5%WR -$1.51 | 7d: 196T 46.4%WR +$0.48
+  0 trades last hour, 2 open (ZEN SHORT, WCT LONG).
+  pump-chain+ degraded Sep 21-22 (15.4% WR -$1.51) but 3d still +$1.27.
+  3d EXTREME regime for pump-chain+: 30T 50%WR +$1.39 — profitable.
+  atr_sl_hit 75.9% — upper end of 55-75% baseline, within range.
+  No kill criteria met. System in normal down period.
+  BY: auto_1hr
