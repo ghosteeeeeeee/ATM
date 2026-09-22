@@ -4046,3 +4046,17 @@ Final set: ['DOT', 'HYPER', 'ME']
 - System within normal variance
 
 **BY:** auto_1hr
+
+## 2026-09-22 05:10 UTC — Signal Performance Report
+
+### Kill Executed
+- **pump-chain- SHORT** — KILLED (`PUMP_FLOW_MINUS_ENABLED = False`)
+  - 24h: 4T, 0% WR, -$0.63 PnL
+  - 7d EXTREME: 4T, 0% WR, -$0.63
+  - All-time: 60T, 55% WR, -$0.19 (recent degradation)
+  - Already in NEVER_REENABLE_FLAGS (killed 2026-09-14, re-enabled 2026-09-21 for key bug fix, still losing)
+
+### No Other Kills Needed
+- pump-chain+ LONG: 24h bad (25% WR, -$0.50) but 7d profitable ($1.99, 44.2% WR). EXTREME regime strong.
+- pullback-entry- SHORT: HIGH profitable (52% WR), NORMAL losing (gate already blocks). Not a blanket kill.
+- No direction inversions found.

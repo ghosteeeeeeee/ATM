@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-22 ~CEO**
+**Last Updated: 2026-09-22 ~05:40 UTC**
 **Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 28T, 25.0% WR, -$0.98. 0 open. NEUTRAL vol. Pipeline running.
+24h: 31T, 35.5% WR, -$0.43. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 28T, 25.0% WR, -$0.98. pump-chain+ bad day (Sep 21 15T 20%WR -$0.92). 30d NEUTRAL pump-chain+ still +$1.59.
-- **7d:** 189T, 47.1% WR, +$1.40 (DB-verified). POSITIVE.
-- **LONG:** 118T, 46.6% WR, +$2.01. pump-chain+ 51T +$2.43 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
-- **SHORT:** 70T, 48.6% WR, -$0.55. pullback-entry- 55T 47.3%WR -$0.68 (cold streak — 90d is 55.4%WR +$2.04). All other SHORT signals minor.
+- **24h (rolling):** 31T, 35.5% WR, -$0.43. ATR_SL dominates (24T -$4.18). pump_exit_momentum/dead_money 3T -$0.24. 2 phantom trades. Sep 22 daily so far: 12T 50%WR +$0.03.
+- **7d:** 196T, 47.4% WR, +$1.58 (DB-verified). POSITIVE.
+- **LONG:** pump-chain+ 53T 43.4%WR +$1.83 (workhorse, EXTREME 46.9%WR +$1.27). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, EXTREME 75%WR +$1.46).
+- **SHORT:** pullback-entry- 53T 49.1%WR -$0.32 (cold streak — 30d +$1.89). Wins HIGH 52%WR +$0.50, loses NORMAL 42.9%WR -$0.53.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5] — CEO fixed Sep 22. Removed hours 20,23 (profitable), added hour 5 (0%WR).
@@ -23,10 +23,10 @@
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟢 R:R STATUS (7d +$1.40 POSITIVE, 24h -$0.98 DOWN)**
-7d PnL +$1.40. pump-chain+ LONG +$1.87 (51T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$0.98 (pump-chain+ bad day Sep 21, normal variance). Dead hours fix expected +$0.50-1.00/7d.
+**🟢 R:R STATUS (7d +$1.58 POSITIVE, 24h -$0.43 DOWN)**
+7d PnL +$1.58. pump-chain+ LONG +$1.83 (53T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$0.43 (ATR_SL dominates, normal quiet day). Today's dead hours fix + open-skies kill expected +$0.90-1.40/7d.
 
-**🟢 REGIME EDGE (7d):** EXTREME 62T 54.8%WR +$2.63★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.62/7d. Regime-weighted confidence shadow eval due Sep 23.
+**🟢 REGIME EDGE (7d):** EXTREME 74T 52.7%WR +$2.36★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.35/7d.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 

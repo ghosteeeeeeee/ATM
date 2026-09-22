@@ -1,5 +1,19 @@
 ## CEO DECISIONS
 
+- [2026-09-22 ~05:40 UTC] CEO: NO CONFIG CHANGE — monitoring
+  DB-verified: 24h 31T 35.5%WR -$0.43 | 7d 196T 47.4%WR +$1.58
+  All NEUTRAL. 0 open. Pipeline running.
+  **LOSING AUTOPSY (24h):** ATR_SL 24T -$4.18. pump_exit_momentum 1T -$0.13. pump_exit_dead_money 2T -$0.11. 2 phantom trades (ALT 0.0%, KAS -0.003%).
+  **REGIME (7d):** EXTREME 74T 52.7%WR +$2.36★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). HIGH 78T 47.4%WR +$0.19.
+  **SIGNALS (7d):** pump-chain+ 53T 43.4%WR +$1.83 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem). pullback-entry- 53T 49.1%WR -$0.32 (cold streak — 30d +$1.89).
+  **LEGACY LOSERS AGING:** breakout-long+ -$0.60, open-skies+ -$0.42, grind-trend- -$0.38, rr-struct-v2+ -$0.29 — all disabled, will age out.
+  **pump-chain+ REGIME:** EXTREME 32T 46.9%WR +$1.27, HIGH 19T 36.8%WR +$0.47, NORMAL 2T 50%WR +$0.09. No regime >55%WR (degraded).
+  **pullback-entry- REGIME:** HIGH 25T 52%WR +$0.50, EXTREME 14T 50%WR -$0.29, NORMAL 14T 42.9%WR -$0.53.
+  **TODAY'S CHANGES (dead hours + open-skies kill)** not yet reflected in data — expected +$0.90-1.40/7d.
+  **OSCILLATOR SHADOW:** Eval due Sep 23.
+  **NO ACTION** — system healthy, monitoring fix impact 48h.
+  BY: CEO
+
 - [2026-09-22 ~CEO] CEO: 2 CONFIG CHANGES — dead hours fix + open-skies kill
   DB-verified: 24h 28T 25.0%WR -$0.98 | 7d 189T 47.1%WR +$1.40
   All NEUTRAL. 0 open. Pipeline running.
