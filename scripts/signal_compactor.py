@@ -1146,19 +1146,39 @@ def _score_signal(token, direction, conf, source, signal_type,
                 _btc_30m = _gate_row[0]
                 if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
                     # BTC is flat — check if continuum oscillator overrides (fast indicator)
+                    # CONTINUUM OVERRIDE: allow signal if BTC structure is clear
+                    # Uses market_phase + linreg_direction (same as continuum authority)
                     _override = False
                     try:
-                        from continuum_context import get_btc_trend_context
-                        _ctx = get_btc_trend_context()
-                        if _ctx and _ctx.get('available'):
-                            _score = _ctx.get('score', 50)
-                            _bias = _ctx.get('trend_bias', 0)
-                            # Strong bullish: score > 80, bias > 0.5 → allow LONG
-                            # Strong bearish: score < 20, bias < -0.5 → allow SHORT
-                            if _score > 80 and _bias > 0.5 and direction.upper() == 'LONG':
+                        import os as _cont_os2
+                        _cont_db2 = _cont_os2.path.join(HERMES_DATA, 'continuum.db')
+                        _cont_conn2 = None
+                        try:
+                            _cont_conn2 = sqlite3.connect(_cont_db2, timeout=3)
+                            _cont_row2 = _cont_conn2.execute(
+                                "SELECT market_phase, linreg_direction, ema300_position "
+                                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                            ).fetchone()
+                        finally:
+                            if _cont_conn2:
+                                try: _cont_conn2.close()
+                                except: pass
+                        if _cont_row2:
+                            _p2, _l2, _e2 = _cont_row2[0], _cont_row2[1], _cont_row2[2]
+                            # Allow SHORT when BTC is DECLINING or bearish structure
+                            if direction.upper() == 'SHORT' and (
+                                _p2 == 'DECLINING' or
+                                (_p2 in ('CALM', 'RECOVERY') and _l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW')
+                            ):
                                 _override = True
-                            elif _score < 20 and _bias < -0.5 and direction.upper() == 'SHORT':
+                                log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} SHORT — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
+                            # Allow LONG when BTC is bullish structure
+                            elif direction.upper() == 'LONG' and (
+                                _p2 in ('RECOVERY', 'NEUTRAL') or
+                                (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 == 'ABOVE')
+                            ):
                                 _override = True
+                                log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
                     except Exception:
                         pass
                     
