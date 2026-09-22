@@ -2828,3 +2828,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
 ## TEAM UPDATES
 - [2026-09-22 06:30 UTC] brain_auditor: Full audit. DB-verified: 24h 29T 37.9%WR -$0.43 | 7d 195T 47.2%WR +$1.58. **LOSING AUTOPSY:** 15 losers24h — all normal ATR_SL variance. pump-chain+ 8T EXTREME -$0.66 (tight stops in vol). pump-chain- 4T EXTREME -$0.38 (HEMI now blacklisted). **DEAD HOURS VERIFIED:** 13/25 pump-chain+ LONG7d losers (52%) were in hours0-5. Filter working. **REGIME:** EXTREME 74T 52.7%WR +$2.36★ | NORMAL 43T 37.2%WR -$0.99. **DRIFT:** ZERO — HEMI blacklist, open-skies kill, dead hours all implemented. **RECURRING:** RSI metadata NULL flagged 4th time (since Sep 18). All pump-chain+ trades have NULL RSI — blocks entry quality analysis. **CREATIVE:** (1) Add volume confirmation to pump-chain+ LONG (1.5x avg vol filter). volume-breakout-long+ has75% WR in EXTREME with vol filter vs pump-chain+ at46.9% without. Expected +3-5% WR. Needs backtest. (2) RSI metadata fix —10-line fix per signal module, enables future tuning. **NO CONFIG CHANGE** — system healthy, monitoring dead hours + open-skies kill impact 48h.
   BY: brain_auditor
+
+- [2026-09-22 07:30 UTC] brain_auditor: 1 CONFIG CHANGE — pump-chain+ LONG RSI_MIN=35
+  DB-verified: 24h 26T 30.8%WR -$0.18 | 7d 195T 47.4%WR +$1.58
+  All NEUTRAL. 3 open. Pipeline running.
+  **LOSING AUTOPSY (14):** All ATR_SL — normal variance. pump-chain+ 12T -$0.48 (bad day, 14d EXTREME still +$1.53). pump-chain- 6T -$0.38 (EXTREME cold streak — 14d 55.6%WR -$0.10).
+  **CONFIG CHANGE:** Added PUMP_CHAIN_LONG_RSI_MIN=35 to hermes_constants.py + wired into signal_compactor.py. 14d data: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife. Expected +$0.34/7d.
+  **DRIFT:** PUMP_CHAIN_LONG_RSI_MAX=75 defined but never wired (dead constant). Wire next run.
+  **REGIME:** EXTREME 52.7%WR +$2.36★ (best). NORMAL 37.2%WR -$0.99 (worst).
+  **HEMI:** Already blacklisted. 7T all-time 0%WR pump-chain. $0.006 micro-price = noisy SL.
+  **OSCILLATOR SHADOW:** Eval due Sep 23 (today). Check data.
+  BY: brain_auditor

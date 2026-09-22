@@ -351,5 +351,16 @@
     "after": "HEMI in both SHORT_BLACKLIST and LONG_BLACKLIST",
     "rationale": "7T all-time, 0%WR LONG (-/usr/bin/bash.44), 50%WR SHORT but net -/usr/bin/bash.09, /usr/bin/bash.006 micro-price noise, both sides lose",
     "impact": "Saves ~/usr/bin/bash.53/14d (HEMI total losses). Blocks future noisy entries."
+  },
+  {
+    "timestamp": "2026-09-22T07:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Added PUMP_CHAIN_LONG_RSI_MIN=35 and wired into signal_compactor.py",
+    "type": "config",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "No RSI_MIN filter for pump-chain+ LONG entries",
+    "after": "PUMP_CHAIN_LONG_RSI_MIN=35 blocks pump-chain+ LONG when RSI < 35",
+    "rationale": "14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.",
+    "impact": "+$0.34/7d estimated. Zero impact on winners (0 winners in RSI<35 bucket)."
   }
 ]

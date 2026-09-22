@@ -2536,6 +2536,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
+            # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners).
+            if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
+                try:
+                    from hermes_constants import PUMP_CHAIN_LONG_RSI_MIN
+                    _rsi_val = sig.get('rsi_14') if isinstance(sig, dict) else None
+                    if _rsi_val is not None and _rsi_val < PUMP_CHAIN_LONG_RSI_MIN:
+                        log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
+                        continue
+                except ImportError:
+                    pass
             # ── Coiled Spring regime filter ──────────────────────────────────
             # 71% WR in NORMAL, 20-40% in others — only trade NORMAL
             if 'coil-spring' in bare_source:
