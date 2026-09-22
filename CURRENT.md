@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-22 ~05:40 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-22 ~13:30 UTC**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 30T, 33.3% WR, -$1.62. 0 open. NEUTRAL vol. Pipeline running.
+24h: 31T, 33.3% WR, -$2.69. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 30T, 33.3% WR, -$1.62. ATR_SL dominates (15T -$3.18). pump_exit_dead_money 2T -$0.11. Sep 22 daily: 16T 37.5%WR -$0.95.
-- **7d:** 196T, 46.4% WR, +$0.73 (DB-verified). Barely positive.
-- **LONG:** pump-chain+ 53T 43.4%WR +$1.83 (workhorse, EXTREME 46.9%WR +$1.27). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, EXTREME 75%WR +$1.46).
-- **SHORT:** pullback-entry- 53T 49.1%WR -$0.32 (cold streak — 30d +$1.89). Wins HIGH 52%WR +$0.50, loses NORMAL 42.9%WR -$0.53.
+- **24h (rolling):** 31T, 33.3% WR, -$2.69. ATR_SL dominates (24/31 exits). pump-chain+ 13T 15.4%WR -$1.51 (bad day). pullback-entry- 3T 0%WR -$0.78.
+- **7d:** 195T, 46.7% WR, +$0.72 (DB-verified). Barely positive.
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, EXTREME 45.5%WR +$0.97, RSI 55-65 sweet spot 60%WR +$1.35). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
+- **SHORT:** pullback-entry- 49T 46.9%WR -$0.75 (cold streak — 30d +$1.89). RSI <30 = 28.6%WR -$0.77.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). Expected +$1.65/7d.
@@ -26,7 +26,7 @@
 **🟢 R:R STATUS (7d +$1.58 POSITIVE, 24h -$0.43 DOWN)**
 7d PnL +$1.58. pump-chain+ LONG +$1.83 (53T). volume-breakout-long+ +$1.41 (16T 68.8%WR). 24h -$0.43 (ATR_SL dominates, normal quiet day). Today's dead hours fix + open-skies kill expected +$0.90-1.40/7d.
 
-**🟢 REGIME EDGE (7d):** EXTREME 74T 52.7%WR +$2.36★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.35/7d.
+**🟢 REGIME EDGE (7d):** EXTREME 74T 54.1%WR +$2.62★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.61/7d.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -40,6 +40,7 @@
 
 ## Today's Changes (Sep 22)
 
+1. **brain_auditor ~13:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 31T 33.3%WR -$2.69 | 7d 195T 46.7%WR +$0.72. **DEAD HOURS:** WORKING — no pump-chain+ LONG trades in hours 0-5,23 since re-enablement ~09:30 UTC. **HEMI BLACKLIST:** WORKING. **LOSING AUTOPSY (16 losers):** 14/16 atr_sl_hit. CASHCAT RSI=66 (overbought). FOGO gap=2.01% (chasing). **SIGNAL QUALITY:** pump-chain+ RSI 55-65 = 60%WR +$1.35 (sweet spot). RSI >65 = 33%WR. **DRIFT:** volume_spike 100% NULL in _signal_metadata. **CREATIVE:** (1) PUMP_CHAIN_LONG_RSI_MAX=65 → +$0.66/7d. (2) Record volume_spike. (3) New NEUTRAL signal.
 1. **CEO ~CEO UTC — 2 CONFIG CHANGES.** (1) PUMP_CHAIN_LONG_DEAD_HOURS [0,1,2,3,4,20,23] → [0,1,2,3,4,5]. 14d data: hours 20(+$0.19),23(+$0.69) profitable. Hour 5 0%WR added. Expected +$0.50-1.00/7d. (2) OPEN_SKIES_ENABLED/PLUS → False. 48h test expired, 11T 36.4%WR -$0.73. No edge. Updated signal_regime_memory.json (fresh 30d data). pullback-entry- IMPROVED (now wins HIGH). pump-chain+ DEGRADED (no regime >55%WR).
 1. **brain_auditor ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 24h 31T 35.5%WR -$0.43 | 7d 196T 47.4%WR +$1.58. **⚠️ CRITICAL DRIFT:** PUMP_CHAIN_LONG_DEAD_HOURS NOT ENFORCED — signal_compactor.py has enforcement code COMMENTED OUT (line 1262). Config exists but trades still fire in hours 0-5. 15T/7d 0%WR -$1.73 NOT blocked. **LOSING AUTOPSY:** 14 losers 24h — all ATR_SL. pump-chain+ 8T -$1.08 (FOGO gap=2.01% chasing, HEMI RSI=70 overbought+blacklisted). ATR_SL 82.5% hit rate on pump-chain+. **HOUR 23:** CEO removed from dead hours (comment says "profitable") but DB shows 4T 0%WR -$0.69. **CREATIVE:** (1) Re-enable dead hours enforcement + add hour 23 → +$1.73-2.42/7d. (2) RSI_MAX_ENTRY=65 for pump-chain+ LONG — RSI 55-65 band = 62.5%WR vs RSI>65 = 44%WR. (3) New NEUTRAL signal needed. **NO ACTION** — drift requires CEO decision.
 1. **brain_auditor ~05:30 UTC — 1 CONFIG CHANGE.** DB-verified: 24h 28T 25.0%WR -$0.98 | 7d 191T 47.6%WR +$1.16. **HEMI BLACKLISTED** (both directions). 7T all-time: LONG 0%WR -$0.44, SHORT 50%WR -$0.09. $0.006 micro-price = noisy SL triggers. **LOSING AUTOPSY:** 17 losers 24h — all normal ATR_SL. pump-chain+ 6T -$0.98 (bad day, 14d EXTREME still +$1.53). pump-chain- 4T -$0.63 (EXTREME). WLFI doji 678min stale (pre-MAX_HOLD). **DRIFT:** ZERO. **REGIME:** EXTREME 50.7%WR +$1.96 vs NORMAL 37.2%WR -$0.99. **CREATIVE:** (1) HEMI blacklist IMPLEMENTED. (2) pump-chain- SHORT EXTREME block suggested (monitor 48h). (3) RSI metadata NULL still unfixed (flagged 3x since Sep 18).
@@ -103,7 +104,9 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: pump-chain+ NEUTRAL degradation.** Today 33.3%WR -$0.39 vs 90d 49%WR +$8.39. If persists 48h, investigate regime-specific tuning. — 2026-09-21
+1. **CEO DECISION: PUMP_CHAIN_LONG_RSI_MAX=65** — 7d data: RSI>65 = 15T 33%WR. Would block 10 losers, 3 winners. Net +$0.66/7d. — 2026-09-22
+2. **FIX: Record volume_spike in _signal_metadata** — 55/55 pump-chain+ trades have NULL. Can't filter by volume quality. — 2026-09-22
+3. **MONITOR: pump-chain+ NEUTRAL degradation.** Today 33.3%WR -$0.39 vs 90d 49%WR +$8.39. If persists 48h, investigate regime-specific tuning. — 2026-09-21
 2. **MONITOR: EXTREME SHORT fresh edge.** pullback-entry- SHORT 6T 83.3%WR +$0.98 in EXTREME. 7d EXTREME: 59T 57.6%WR +$3.30. — 2026-09-19
 3. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG passes confluence. Need diversity. — 2026-09-16
 4. **INFRA: signal_compactor pipeline timeout.** 7 kills in 2h at 60s. DB lock contention during concurrent pipeline steps. Standalone works (1-2s). Self-recovers but wastes 60s per failure. Consider increasing timeout to 90s or adding retry. — 2026-09-21

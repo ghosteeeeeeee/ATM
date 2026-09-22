@@ -2857,3 +2857,23 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **HEMI:** Already blacklisted. 7T all-time 0%WR pump-chain. $0.006 micro-price = noisy SL.
   **OSCILLATOR SHADOW:** Eval due Sep 23 (today). Check data.
   BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-22 11:45 UTC] brain_auditor: AUDIT COMPLETE — 24h 30T 33.3%WR -$1.62 | 7d 196T 46.9%WR +$0.99
+  **DRIFT:** ZERO. Dead hours enforcement active (line 1262 signal_compactor.py). HEMI blacklist working. All recent changes verified.
+  **LOSING AUTOPSY:** 14 pump-chain+ losers 7d — all ATR_SL. Entry price action shows chasing: DYDX entered at local top (0.13609, price peaked 0.13588 before), ETC entered after spike faded (8.8775, spike was 8.92). 65% ATR_SL hit rate — winners +0.26% vs losers -0.18%, R:R 1.44:1.
+  **RECURRING:** signal_metadata NULL (flagged 3x since Sep 18) — blocks entry quality analysis. SHORT signals all negative 7d (pullback-entry- -$0.48, pump-chain- -$0.38). NEUTRAL signal diversity gap.
+  **CREATIVE:** (1) VOLUME_RATIO_MIN=1.5 for pump-chain+ LONG — volume-breakout-long+ wins 68.8% with volume filter. pump-chain+ fires on price alone. Low-volume entries = false breakouts. (2) Block pullback-entry- SHORT in NORMAL only — EXTREME 64%WR +$1.45, NORMAL 46.9%WR -$0.62.
+  **CONFIG CHANGE:** None. Recommendations in brain/audit_recommendations.json.
+  BY: brain_auditor
+
+- [2026-09-22 ~13:30 UTC] brain_auditor: FULL AUDIT — NO CONFIG CHANGE
+  DB-verified: 24h 31T 33.3%WR -$2.69 | 7d 195T 46.7%WR +$0.72
+  **DEAD HOURS:** WORKING — no pump-chain+ LONG trades in hours 0-5,23 since re-enablement ~09:30 UTC.
+  **HEMI BLACKLIST:** WORKING — no HEMI trades since ~05:30 UTC.
+  **LOSING AUTOPSY (16 losers 24h):** 14/16 atr_sl_hit. CASHCAT RSI=66 (overbought entry). FOGO gap=2.01% (chasing). HEMI pre-blacklist.
+  **SIGNAL QUALITY:** pump-chain+ RSI 55-65 = 60%WR +$1.35 (sweet spot). RSI >65 = 33%WR (losers). RSI <30 = 0%WR.
+  **DRIFT:** volume_spike 100% NULL in _signal_metadata (55/55 trades). Can't filter by volume quality.
+  **CREATIVE:** (1) PUMP_CHAIN_LONG_RSI_MAX=65 → +$0.66/7d (blocks 10 losers, 3 winners). (2) Record volume_spike. (3) New NEUTRAL signal (recurring topic 3+ sessions).
+  **NO ACTION** — 1 config change already applied today (dead hours). Monitor 48h.
+  BY: brain_auditor

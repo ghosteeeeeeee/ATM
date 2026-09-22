@@ -492,3 +492,7 @@
 - **ROOT CAUSE**: Variable `sig` was never defined in the `for row in rows` loop. It was likely copy-pasted from a signal detection context where `sig` is a dict. In the compactor, signal data comes from SQLite rows (tuple access).
 - **FIX**: Changed `sig.get('rsi_14') if isinstance(sig, dict) else None` → `row[8] if len(row) > 8 else None` (matches the `rsi = row[8] if len(row) > 8 else None` pattern used at lines 1999, 2930, 3796).
 - **AUTO-FIX APPLIED**: signal_compactor.py:2544 patched, verified working (completed in 1.9s, 0 crashes)
+
+## Error Alerts — 2026-09-22 09:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK TOK in run_compaction (N.4s):`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.0s (rc=N)`

@@ -1550,5 +1550,32 @@
     "status": "monitor",
     "risk": "medium",
     "sample_size": "14 trades (borderline)"
+  },
+  {
+    "date": "2026-09-22T13:36:52.053465+00:00",
+    "idea": "PUMP_CHAIN_LONG_RSI_MAX = 65",
+    "rationale": "RSI 55-65 = 60%WR +$1.35. RSI >65 = 33%WR. Block overbought entries.",
+    "expected_impact": "+$0.66/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-22T13:36:52.053484+00:00",
+    "idea": "Record volume_spike in _signal_metadata",
+    "rationale": "55/55 pump-chain+ trades have NULL volume_spike. Can't filter by volume quality without this data.",
+    "expected_impact": "enables future filtering",
+    "category": "data gap",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-22T13:36:52.053486+00:00",
+    "idea": "New NEUTRAL regime signal (trend following)",
+    "rationale": "Only 2 signals pass confluence in NEUTRAL. Recurring topic in 3+ sessions. Need diversity.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

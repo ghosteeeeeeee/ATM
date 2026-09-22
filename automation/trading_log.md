@@ -4287,3 +4287,38 @@ Final set: ['ME']
 - pump-chain+ killed — monitoring pump-chain- SHORT (33%WR, -$0.38)
 
 **BY:** auto_1hr
+
+## [2026-09-22 12:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (LINK SHORT -$0.34 via atr_sl_hit) | **Open:** 1 (DOT SHORT)
+**24h:** 31T, 35.5% WR, -$2.69 | **7d:** 195T, 46.7% WR, +$0.72
+
+**Close Reasons (24h):**
+- atr_sl_hit: 23/31 (74.2%), avg -$0.126
+- pump_exit_dead_money: 5/31, avg +$0.016
+- profit-monster-trail: 1/31, +$0.20
+- atr_tp_hit: 1/31, +$0.10
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: KILLED at 09:30
+- pullback-entry- SHORT: 3T, 0% WR, -$0.78 — variance dip, lifetime 53.9% WR +$1.26
+- pump-chain- SHORT: 6T, 33% WR, -$0.38
+
+**Diagnosis:**
+1. Entry quality: Can't measure adverse excursion
+2. SL behavior: 74.2% atr_sl_hit — upper end of 55-75% baseline
+3. Signal quality: No kill criteria met (pullback-entry- 0%WR but only 3T/24h, not 3T/1hr)
+4. Trade frequency: ~1.2/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 7d still positive (+$0.72)
+- No signal meets kill criteria
+- System in normal variance dip
+
+**Open Questions:**
+- pullback-entry- 7d -$0.75 — monitor, not kill-worthy yet
+- pump-chain- SHORT 33% WR -$0.38 — small sample, continue monitoring
+
+**BY:** auto_1hr
