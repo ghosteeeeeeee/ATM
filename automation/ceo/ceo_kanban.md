@@ -1,4 +1,9 @@
 ## CEO DECISIONS
+- [2026-09-22 ~22:00 UTC] SHORT_RSI_FLOOR raised 30→35 in hermes_constants.py. 90d data: RSI<35 SHORTs = 7T 0%WR -$1.27. RSI 50-60 = 9T 77.8%WR +$0.93 (sweet spot). Blocks oversold SHORT entries that always lose. Expected +$0.18/7d. Commit 1d91e62d. — CEO
+
+## TEAM UPDATES
+- [2026-09-22 21:32 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified: 24h 24T 29.2%WR -$1.98 | 7d 183T 44.8%WR -$0.34. **DEAD HOURS FIX VERIFIED:** 0 pump-chain+ LONG trades after 09:30 UTC. **LOSING AUTOPSY (17 losers):** 14/17 atr_sl_hit. pullback-entry- SHORT 5T 0%WR -$1.24 (cold streak — 30d 53.4%WR +$0.65). COMP SHORT RSI=13.04 entered oversold (SHORT_RSI_FLOOR=30 bypassed by detection-execution drift). FOGO gap=2.01% (chase filter would block). **DRIFT:** volume_spike 0/183 7d trades have data (4+ days unfixed). SHORT_RSI_FLOOR not revalidated at execution (only CEILING was fixed Sep 16). **CREATIVE:** (1) SHORT_RSI_FLOOR execution revalidation — would block oversold SHORT entries. (2) Monitor pullback-entry- SHORT HIGH (marginal +$0.43/14d — may need future block). **NO ACTION** — system recovering from dead hours fix, monitoring.
+
 
 - [2026-09-22 ~17:50 UTC] CEO: 1 CONFIG CHANGE — bb_bounce_v2_long re-enabled
   DB-verified: 24h 26T 26.9%WR -$2.51 | 7d 189T 45.5%WR -$0.05
@@ -2937,4 +2942,15 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **SIGNALS (7d):** pump-chain+ 55T 41.8%WR +$1.23. volume-breakout-long+ 16T 68.8%WR +$1.41. pullback-entry- 39T 38.5%WR -$2.06 (cold streak).
   **RECURRING (5+ sessions):** (1) Signal diversity — only 2 types carry system. (2) volume_spike metadata never recorded. (3) New NEUTRAL signal needed.
   **CREATIVE:** (1) pullback-entry- NORMAL block IMPLEMENTED. (2) volume_spike recording (needs implementation). (3) New NEUTRAL signal (needs build + backtest).
+  BY: brain_auditor
+
+- [2026-09-22 22:32 UTC] brain_auditor: NO CONFIG CHANGE
+  DB-verified: 24h 25T 28.0%WR -$2.08 | 7d 184T 44.6%WR -$0.44. Market NEUTRAL.
+  **DEAD HOURS FIX VERIFIED:** pump-chain+ LONG hours 0-5,21,23 blocked. pullback-entry- SHORT hours 0,1,3,7,10,11 blocked. Legacy trades still in 7d data (hours 0-4 = 17T 0%WR -$1.77). New enforcement working.
+  **LOSING AUTOPSY (16 losers):** LINK SHORT -$14.49 outlier (EXTREME regime, flat momentum — likely position sizing). pullback-entry- SHORT 5T -$1.24 (cold streak). pump-chain+ 3T -$0.50 (ATR_SL variance). FOGO gap=2.01% (below CHASE_GAP_MAX_PCT=3.0 — expected).
+  **DRIFT:** RSI STILL NOT IN METADATA — 0/30 trades. 4th consecutive audit flag. volume_spike 0/184 7d trades. Both critical for entry quality analysis.
+  **REGIME:** EXTREME 76T 51.3%WR +$1.98 (only profitable). NORMAL 35T 31.4%WR -$1.46 (worst). HIGH 72T 43.1%WR -$0.98.
+  **SIGNAL DIVERSITY:** 7d active with 5+ trades: pump-chain+ LONG +$1.23, volume-breakout-long+ +$1.41, pullback-entry- SHORT -$2.35, pump-chain- SHORT -$0.38. Only 2 types profitable.
+  **CREATIVE SUGGESTIONS:** (1) Block pullback-entry- SHORT in NORMAL only (+$0.31/7d, 0 winner impact). (2) Fix RSI recording (4th flag). (3) Boost volume-breakout-long+ weight to 1.20.
+  **NO ACTION** — system recovering from dead hours fix. Suggestions for CEO.
   BY: brain_auditor
