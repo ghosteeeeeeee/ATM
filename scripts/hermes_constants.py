@@ -1204,6 +1204,9 @@ PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5
 PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-09-22 — 14d: RSI 76-80 = 6T 0%WR -$0.82 (dead zone). RSI>80 = 14T +$1.13 (big winners). Block dead zone, preserve big winners.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
 
+# pullback-entry- SHORT dead hours — 14d data: hours 0,1,3,7,10,11 = -$2.33/14d (25T). Hour 00: 7T -$0.52, 01: 7T -$0.61, 03: 4T -$0.34, 07: 5T -$0.39, 10: 5T -$0.54, 11: 6T -$0.66.
+PULLBACK_ENTRY_SHORT_DEAD_HOURS = [0, 1, 3, 7, 10, 11]  # orchestrator 2026-09-22 — 14d: 25T all losing hours. Expected +$1.67/14d (~$0.84/7d).
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).

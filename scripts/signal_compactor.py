@@ -1290,6 +1290,15 @@ def _score_signal(token, direction, conf, source, signal_type,
             log(f"  🚫 [PUMP-CHAIN-DEAD-HOUR] {token} LONG blocked — hour {utc_hour} UTC")
             return 0.0
 
+    # ── pullback-entry- SHORT dead hours block ────────────────────────────
+    # 14d data: hours 0,1,3,7,10,11 = -$2.33/14d (25T all losing).
+    from hermes_constants import PULLBACK_ENTRY_SHORT_DEAD_HOURS
+    _pb_bare = signal_type.rstrip('+-') if signal_type else ''
+    if _pb_bare == 'pullback-entry' and direction.upper() == 'SHORT':
+        if utc_hour in PULLBACK_ENTRY_SHORT_DEAD_HOURS:
+            log(f"  🚫 [PULLBACK-DEAD-HOUR] {token} SHORT blocked — hour {utc_hour} UTC")
+            return 0.0
+
     score = float(conf)
 
     # Survival bonus: only if survived previous cycles AND signal is still alive (age < 10min)
