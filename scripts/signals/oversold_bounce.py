@@ -200,6 +200,10 @@ def detect(token):
     # Value = z-score magnitude for sizing (deeper = more extreme = larger position)
     value = abs(z_score)
 
+    # Compute 1m RSI for metadata (execution filter drift detection)
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
+
     return {
         'direction': 'LONG',
         'confidence': conf,

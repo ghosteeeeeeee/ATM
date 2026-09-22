@@ -540,6 +540,9 @@ def detect(token: str, candles_5m: list = None, candles_1h: list = None) -> Opti
     # GATE 4: Momentum (RSI) — mode-aware thresholds
     # ════════════════════════════════════════════════════════════════════════════
     rsi_val = _rsi(closes_5m, HH_HL_RSI_PERIOD)
+    # Compute 1m RSI for metadata (execution filter drift detection)
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi_val is None:
         return None
     if entry_mode == 'pullback':

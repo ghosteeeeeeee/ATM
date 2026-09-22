@@ -218,7 +218,7 @@ def _detect_trend_ignition(token, candles):
         'vol_ratio': round(vol_ratio, 2),
         'bb_width_pct': round(bb_width_pct, 3),
         'ema_dist_pct': round(ema_dist_pct, 3),
-        'rsi': round(rsi, 1),
+        'rsi': rsi_1m if rsi_1m is not None else round(rsi, 1),
         'breakout_pct': round(breakout_pct, 3),
     }
 

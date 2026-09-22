@@ -1475,7 +1475,7 @@ def context_gate(token, direction, source, sig):
 
     # CEO FIX 2026-08-10: similar_setup_lookup runs ALWAYS, even on GO path.
     # Bad historical WR should override strong speed/z-score.
-    rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
+    rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
     z_tier = sig.get('z_score_tier') if isinstance(sig, dict) else None
     setup = similar_setup_lookup(token, source, direction, rsi, z_tier)
     if setup:

@@ -236,6 +236,9 @@ def _detect_euphoria(candles_5m, candles_1h, candles_4h):
     # 1. RSI on 1h — must be extreme overbought
     closes_1h = [c['close'] for c in candles_1h]
     rsi_1h = _compute_rsi(closes_1h, 14)
+    # Compute 1m RSI for metadata (execution filter drift detection)
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi_1h < WALL_ST_CYCLE_EUPHORIA_RSI:
         return None
 

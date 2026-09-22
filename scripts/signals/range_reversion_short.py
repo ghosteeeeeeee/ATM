@@ -161,6 +161,9 @@ def detect_range_reversion_short(token: str, candles: list) -> Optional[dict]:
 
     # RSI
     rsi_val = _rsi(closes)
+    # Compute 1m RSI for metadata (execution filter drift detection)
+    from signals.rsi_1m import compute_rsi_1m
+    rsi_1m = compute_rsi_1m(token)
     if rsi_val is None:
         return None
 
@@ -194,7 +197,7 @@ def detect_range_reversion_short(token: str, candles: list) -> Optional[dict]:
     return {
         'direction': 'SHORT',
         'bb_width': round(bb_width, 4),
-        'rsi': round(rsi_val, 1),
+        'rsi': rsi_1m if rsi_1m is not None else round(rsi_val, 1),
         'atr_pct': round(atr_pct, 3),
         'dist_upper': round(dist_upper, 2),
         'price': current,
