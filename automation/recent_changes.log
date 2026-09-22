@@ -2765,3 +2765,11 @@
   atr_sl_hit 73.3% — within 55-75% baseline.
   No signal meets kill criteria. 7d net positive. System stable.
   BY: auto_1hr
+[2026-09-22 20:00 UTC] auto_1hr: NO CHANGE — system stable
+  24h: 28T 25%WR -$2.46 | 7d: 184T 44.6%WR -$0.15
+  3 open positions (CFX LONG, COMP SHORT, FIL SHORT), 0 trades last hour.
+  atr_sl_hit 64.3% — within 55-75% baseline.
+  pump-chain+ degrading (11.1% WR 24h) but lifetime 41.2%WR +$0.95.
+  pullback-entry- 0/5 in 24h but lifetime 53.9%WR.
+  No kill criteria met. System stable.
+  BY: auto_1hr

@@ -4528,3 +4528,39 @@ Final set: ['ME']
 - System stable
 
 **BY:** auto_1hr
+
+## [2026-09-22 20:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 3 (CFX LONG mover+, COMP SHORT pullback-entry-, FIL SHORT pullback-entry-)
+**24h:** 28T, 25% WR, -$2.46 | **7d:** 184T, 44.6% WR, -$0.15
+
+**Close Reasons (24h):**
+- atr_sl_hit: 18/28 (64.3%), avg -$0.152 — within 55-75% baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+- atr_tp_hit: 1T, +$0.10
+- cut-loser-CL-T1: 1T, -$0.09
+
+**Signal Performance (24h):**
+- pump-chain+ LONG: 9T, 11.1% WR, -$1.15 — degraded vs lifetime 41.2% WR
+- pullback-entry- SHORT: 5T, 0% WR, -$0.95 — all atr_sl_hit, spread over 24h
+- pump-chain- SHORT: 6T, 33.3% WR, -$0.38
+- mover+ LONG: 2T, 0% WR, -$0.37
+
+**Diagnosis:**
+1. Entry quality: Losses small (avg -$0.152), no blowups
+2. SL behavior: 64.3% atr_sl_hit — within baseline
+3. Signal quality: pump-chain+ degrading short-term but lifetime +$0.95. pullback-entry- 0/5 in 24h but lifetime 53.9% WR
+4. Trade frequency: ~1.2/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ losses in 1 hour)
+- atr_sl_hit 64.3% within baseline
+- 7d near breakeven (-$0.15)
+- Trade frequency normal
+- pump-chain+ and pullback-entry- in drawdown phase but lifetime stats healthy
+- 3 open positions manageable
+
+**BY:** auto_1hr
