@@ -103,8 +103,10 @@
             <h3>Regime</h3>
             <div class="stat-row"><span class="stat-label">BTC 4h</span><span class="stat-value" id="regime-4h">-</span></div>
             <div class="stat-row"><span class="stat-label">BTC 15m</span><span class="stat-value" id="regime-15m">-</span></div>
-            <div class="stat-row"><span class="stat-label">Continuum</span><span class="stat-value" id="regime-continuum">-</span></div>
-            <div class="stat-row"><span class="stat-label">Volatility</span><span class="stat-value" id="regime-vol">-</span></div>
+            <div class="stat-row"><span class="stat-label">EMA300 Position</span><span class="stat-value" id="regime-continuum">-</span></div>
+            <div class="stat-row"><span class="stat-label">Z-Score</span><span class="stat-value" id="regime-zscore">-</span></div>
+            <div class="stat-row"><span class="stat-label">Velocity</span><span class="stat-value" id="regime-velocity">-</span></div>
+            <div class="stat-row"><span class="stat-label">Volume</span><span class="stat-value" id="regime-vol">-</span></div>
         </div>
         <div class="card">
             <h3>Steers</h3>
@@ -185,6 +187,8 @@
         document.getElementById('regime-4h').innerHTML = regimeBadge(reg.btc_4h);
         document.getElementById('regime-15m').innerHTML = regimeBadge(reg.btc_15m);
         document.getElementById('regime-continuum').innerHTML = regimeBadge(reg.continuum);
+        document.getElementById('regime-zscore').innerHTML = regimeBadge(reg.zscore_tier);
+        document.getElementById('regime-velocity').innerHTML = regimeBadge(reg.velocity_state);
         document.getElementById('regime-vol').innerHTML = regimeBadge(reg.volatility);
 
         // Steer counts

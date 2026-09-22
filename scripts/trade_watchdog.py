@@ -210,7 +210,18 @@ def collect_btc_regime():
         except Exception:
             pass
 
-    # Continuum oscillator (main regime source)
+    # BTC 4h regime from /var/www/html/regime_4h.json
+    regime_4h_path = "/var/www/html/regime_4h.json"
+    if os.path.exists(regime_4h_path):
+        try:
+            with open(regime_4h_path) as f:
+                data = json.load(f)
+                agg = data.get("aggregate", {})
+                regime["btc_4h"] = agg.get("overall", "unknown")
+        except Exception:
+            pass
+
+    # Continuum oscillator (main regime source — rich data)
     continuum_path = os.path.join(WWW_DATA, "continuum_data.json")
     if os.path.exists(continuum_path):
         try:
@@ -223,10 +234,15 @@ def collect_btc_regime():
                 regime["acceleration_state"] = current.get("acceleration_state", "unknown")
                 regime["volume_regime"] = current.get("volume_regime", "unknown")
                 regime["linreg_alignment"] = current.get("linreg_alignment", 0)
+                regime["wyckoff_phase"] = current.get("wyckoff_phase", "unknown")
+                regime["market_phase"] = current.get("market_phase", "unknown")
+                regime["trend_quality"] = current.get("trend_quality", "unknown")
+                # Volatility from volume_regime (no separate gate JSON)
+                regime["volatility"] = current.get("volume_regime", "unknown")
         except Exception:
             pass
 
-    # Volatility gate
+    # Override volatility with gate if available
     vol_path = os.path.join(HERMES_DATA, "volatility_gate_v2.json")
     if os.path.exists(vol_path):
         try:
@@ -236,8 +252,8 @@ def collect_btc_regime():
         except Exception:
             pass
 
-    log(f"BTC regime: 15m={regime['btc_15m']}, continuum={regime['continuum']}, "
-        f"zscore={regime.get('zscore_tier')}, vel={regime.get('velocity_state')}")
+    log(f"BTC regime: 15m={regime['btc_15m']}, 4h={regime['btc_4h']}, "
+        f"continuum={regime['continuum']}, vol={regime['volatility']}")
     return regime
 
 
