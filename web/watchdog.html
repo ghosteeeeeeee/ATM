@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Watchdog — Hermes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: #0a0a0f; color: #e0e0e0; padding: 20px; }
+
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #1a1a2e;
+        }
+        .header h1 { font-size: 20px; color: #00ff88; }
+        .header .status { font-size: 12px; padding: 4px 12px; border-radius: 12px; font-weight: bold; }
+        .status-good { background: #003300; color: #00ff88; border: 1px solid #00ff88; }
+        .status-warning { background: #332200; color: #ffaa00; border: 1px solid #ffaa00; }
+        .status-critical { background: #330000; color: #ff4444; border: 1px solid #ff4444; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
+
+        .card {
+            background: #111122; border: 1px solid #1a1a3e; border-radius: 8px; padding: 16px;
+        }
+        .card h3 { color: #8888ff; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+        .stat-label { color: #888; }
+        .stat-value { font-weight: bold; }
+        .positive { color: #00ff88; }
+        .negative { color: #ff4444; }
+        .neutral { color: #ffaa00; }
+
+        .regime-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;
+        }
+        .regime-bull { background: #003300; color: #00ff88; }
+        .regime-bear { background: #330000; color: #ff4444; }
+        .regime-chop { background: #332200; color: #ffaa00; }
+        .regime-unknown { background: #222; color: #888; }
+
+        .steers { margin-top: 20px; }
+        .steer {
+            background: #111122; border-left: 3px solid; border-radius: 0 8px 8px 0;
+            padding: 12px 16px; margin-bottom: 8px; font-size: 13px;
+        }
+        .steer-urgent { border-color: #ff4444; background: #1a0a0a; }
+        .steer-warning { border-color: #ffaa00; background: #1a1500; }
+        .steer-info { border-color: #00ff88; background: #0a1a0a; }
+        .steer-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .steer-icon { font-size: 16px; }
+        .steer-title { font-weight: bold; }
+        .steer-detail { color: #aaa; font-size: 12px; }
+        .steer-category { font-size: 10px; color: #666; text-transform: uppercase; }
+
+        .open-trades { margin-top: 20px; }
+        .trade-row {
+            display: grid; grid-template-columns: 60px 60px 1fr 80px 80px 60px;
+            gap: 8px; padding: 8px 12px; background: #0d0d1a; border-radius: 4px;
+            margin-bottom: 4px; font-size: 12px; align-items: center;
+        }
+        .trade-row.header { background: #1a1a2e; font-weight: bold; color: #888; text-transform: uppercase; font-size: 10px; }
+        .trade-coin { font-weight: bold; }
+        .trade-dir { font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+        .dir-long { background: #003300; color: #00ff88; }
+        .dir-short { background: #330000; color: #ff4444; }
+
+        .deep-analysis {
+            background: #111122; border: 1px solid #1a1a3e; border-radius: 8px;
+            padding: 16px; margin-top: 20px; white-space: pre-wrap; font-size: 13px; line-height: 1.6;
+        }
+        .deep-analysis h3 { color: #8888ff; margin-bottom: 10px; font-size: 12px; text-transform: uppercase; }
+
+        .no-data { text-align: center; color: #555; padding: 40px; font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .trade-row { grid-template-columns: 50px 50px 1fr 70px 70px; }
+            .trade-row > *:nth-child(6) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐕 Trade Watchdog</h1>
+        <div>
+            <span id="health-badge" class="status status-good">LOADING...</span>
+            <span id="mode-badge" class="status status-good" style="margin-left: 8px;">recommend</span>
+        </div>
+    </div>
+
+    <div id="timestamp" style="font-size: 11px; color: #555; margin-bottom: 16px;"></div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Portfolio</h3>
+            <div class="stat-row"><span class="stat-label">Open Trades</span><span class="stat-value" id="open-count">-</span></div>
+            <div class="stat-row"><span class="stat-label">Long / Short</span><span class="stat-value" id="direction-split">-</span></div>
+            <div class="stat-row"><span class="stat-label">Unrealized PnL</span><span class="stat-value" id="unrealized-pnl">-</span></div>
+        </div>
+        <div class="card">
+            <h3>Regime</h3>
+            <div class="stat-row"><span class="stat-label">BTC 4h</span><span class="stat-value" id="regime-4h">-</span></div>
+            <div class="stat-row"><span class="stat-label">BTC 15m</span><span class="stat-value" id="regime-15m">-</span></div>
+            <div class="stat-row"><span class="stat-label">Continuum</span><span class="stat-value" id="regime-continuum">-</span></div>
+            <div class="stat-row"><span class="stat-label">Volatility</span><span class="stat-value" id="regime-vol">-</span></div>
+        </div>
+        <div class="card">
+            <h3>Steers</h3>
+            <div class="stat-row"><span class="stat-label">🔴 Urgent</span><span class="stat-value negative" id="urgent-count">0</span></div>
+            <div class="stat-row"><span class="stat-label">🟡 Warning</span><span class="stat-value neutral" id="warning-count">0</span></div>
+            <div class="stat-row"><span class="stat-label">🟢 Info</span><span class="stat-value positive" id="info-count">0</span></div>
+        </div>
+        <div class="card">
+            <h3>Signals (14d)</h3>
+            <div id="signal-perf" style="font-size: 12px;">-</div>
+        </div>
+    </div>
+
+    <h3 style="color: #8888ff; font-size: 12px; text-transform: uppercase; margin-bottom: 10px;">Open Trades</h3>
+    <div class="trade-row header">
+        <span>Coin</span><span>Dir</span><span>Entry → Current</span><span>PnL %</span><span>Hours</span><span>Signal</span>
+    </div>
+    <div id="trades-container"></div>
+
+    <h3 style="color: #8888ff; font-size: 12px; text-transform: uppercase; margin: 20px 0 10px;">Active Steers</h3>
+    <div id="steers-container"></div>
+
+    <div id="deep-analysis-container" style="display: none;">
+        <h3 style="color: #8888ff; font-size: 12px; text-transform: uppercase; margin: 20px 0 10px;">Deep Analysis</h3>
+        <div class="deep-analysis" id="deep-analysis-text"></div>
+    </div>
+
+    <script>
+    const API = 'http://127.0.0.1:54322/api/brain/watchdog';
+
+    function timeAgo(ts) {
+        if (!ts) return '';
+        let d = new Date(ts);
+        if (isNaN(d.getTime())) return '';
+        let s = (Date.now() - d.getTime()) / 1000;
+        if (s < 60) return Math.floor(s) + 's ago';
+        if (s < 3600) return Math.floor(s/60) + 'm ago';
+        if (s < 86400) return Math.floor(s/3600) + 'h ago';
+        return Math.floor(s/86400) + 'd ago';
+    }
+
+    function regimeBadge(r) {
+        if (!r || r === 'unknown') return '<span class="regime-badge regime-unknown">?</span>';
+        const cls = r.includes('bull') || r.includes('expansion') || r.includes('rising') ? 'regime-bull' :
+                    r.includes('bear') || r.includes('contraction') || r.includes('falling') ? 'regime-bear' :
+                    'regime-chop';
+        return `<span class="regime-badge ${cls}">${r}</span>`;
+    }
+
+    function render(data) {
+        if (!data) {
+            document.getElementById('steers-container').innerHTML = '<div class="no-data">No watchdog data yet. First run in progress...</div>';
+            return;
+        }
+
+        // Health badge
+        const hb = document.getElementById('health-badge');
+        hb.textContent = (data.portfolio_health || 'unknown').toUpperCase();
+        hb.className = 'status status-' + (data.portfolio_health || 'good');
+
+        // Mode
+        document.getElementById('mode-badge').textContent = data.mode || 'recommend';
+
+        // Timestamp
+        document.getElementById('timestamp').textContent = 'Last check: ' + (timeAgo(data.timestamp) || 'unknown');
+
+        // Portfolio
+        const ps = data.portfolio_summary || {};
+        document.getElementById('open-count').textContent = ps.total_open || 0;
+        document.getElementById('direction-split').textContent = `${ps.long_count || 0}L / ${ps.short_count || 0}S`;
+        const pnl = ps.total_unrealized_pnl || 0;
+        const pnlEl = document.getElementById('unrealized-pnl');
+        pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + ' USDT';
+        pnlEl.className = 'stat-value ' + (pnl >= 0 ? 'positive' : 'negative');
+
+        // Regime
+        const reg = data.regime_summary || {};
+        document.getElementById('regime-4h').innerHTML = regimeBadge(reg.btc_4h);
+        document.getElementById('regime-15m').innerHTML = regimeBadge(reg.btc_15m);
+        document.getElementById('regime-continuum').innerHTML = regimeBadge(reg.continuum);
+        document.getElementById('regime-vol').innerHTML = regimeBadge(reg.volatility);
+
+        // Steer counts
+        const steers = data.steers || [];
+        document.getElementById('urgent-count').textContent = steers.filter(s => s.severity === 'urgent').length;
+        document.getElementById('warning-count').textContent = steers.filter(s => s.severity === 'warning').length;
+        document.getElementById('info-count').textContent = steers.filter(s => s.severity === 'info').length;
+
+        // Signal performance
+        const sigPerf = data.signal_performance || {};
+        const sigHtml = Object.entries(sigPerf)
+            .sort((a,b) => (b[1].total_pnl || 0) - (a[1].total_pnl || 0))
+            .slice(0, 8)
+            .map(([name, p]) => {
+                const cls = p.total_pnl > 0 ? 'positive' : p.total_pnl < 0 ? 'negative' : 'neutral';
+                return `<div class="stat-row"><span class="stat-label">${name}</span><span class="stat-value ${cls}">${p.wr}% WR, ${p.total_pnl > 0 ? '+' : ''}${p.total_pnl.toFixed(1)} USDT</span></div>`;
+            }).join('');
+        document.getElementById('signal-perf').innerHTML = sigHtml || '-';
+
+        // Trades
+        const trades = data.open_trades || [];
+        const tc = document.getElementById('trades-container');
+        if (trades.length === 0) {
+            tc.innerHTML = '<div class="no-data">No open trades</div>';
+        } else {
+            tc.innerHTML = trades.map(t => {
+                const dirClass = t.direction === 'long' ? 'dir-long' : 'dir-short';
+                const pnlClass = t.pnl_pct >= 0 ? 'positive' : 'negative';
+                return `<div class="trade-row">
+                    <span class="trade-coin">${t.coin || '?'}</span>
+                    <span class="trade-dir ${dirClass}">${(t.direction || '?').toUpperCase()}</span>
+                    <span>${(t.entry_price||0).toFixed(4)} → ${(t.current_price||0).toFixed(4)}</span>
+                    <span class="${pnlClass}">${t.pnl_pct >= 0 ? '+' : ''}${(t.pnl_pct||0).toFixed(1)}%</span>
+                    <span>${t.hours_open ? t.hours_open + 'h' : '-'}</span>
+                    <span style="color:#666">${t.signal || '-'}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // Steers
+        const sc = document.getElementById('steers-container');
+        if (steers.length === 0) {
+            sc.innerHTML = '<div class="no-data">No steers — portfolio looks healthy 🎉</div>';
+        } else {
+            const icons = { urgent: '🔴', warning: '🟡', info: '🟢' };
+            sc.innerHTML = steers.map(s => `
+                <div class="steer steer-${s.severity}">
+                    <div class="steer-header">
+                        <span class="steer-icon">${icons[s.severity] || '⚪'}</span>
+                        <span class="steer-title">${s.title || 'Steer'}</span>
+                        <span class="steer-category">${s.category || ''}</span>
+                    </div>
+                    <div class="steer-detail">${s.detail || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // Deep analysis
+        if (data.deep_analysis) {
+            document.getElementById('deep-analysis-container').style.display = 'block';
+            document.getElementById('deep-analysis-text').textContent = data.deep_analysis;
+        }
+    }
+
+    async function fetchData() {
+        try {
+            const r = await fetch(API);
+            if (r.ok) {
+                const data = await r.json();
+                render(data);
+            } else {
+                // Try direct file
+                const r2 = await fetch('/data/watchdog.json');
+                if (r2.ok) {
+                    render(await r2.json());
+                } else {
+                    render(null);
+                }
+            }
+        } catch(e) {
+            console.error('Fetch failed:', e);
+            try {
+                const r = await fetch('/data/watchdog.json');
+                if (r.ok) render(await r.json());
+                else render(null);
+            } catch(e2) { render(null); }
+        }
+    }
+
+    fetchData();
+    setInterval(fetchData, 60000);
+    </script>
+</body>
+</html>

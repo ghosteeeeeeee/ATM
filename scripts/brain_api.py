@@ -16,6 +16,7 @@ Endpoints:
   GET /api/brain/session/<id>   → single session detail
   GET /api/brain/search?q=      → semantic search across sessions
   GET /api/brain/timeline       → session timeline data
+  GET /api/brain/watchdog       → trade watchdog data (open trades, steers)
 """
 
 import os
@@ -281,6 +282,36 @@ def get_changes() -> list:
     return []
 
 
+def get_watchdog_data() -> dict:
+    """Trade watchdog data for the dashboard."""
+    watchdog_path = Path("/var/www/hermes/data/watchdog.json")
+    recs_path = Path("/root/.hermes/scripts/watchdog_recommendations.json")
+
+    data = {}
+    if watchdog_path.exists():
+        try:
+            with open(watchdog_path) as f:
+                data = json.load(f)
+        except Exception:
+            pass
+
+    # Merge in deep analysis from recommendations if available
+    if recs_path.exists():
+        try:
+            with open(recs_path) as f:
+                recs = json.load(f)
+            if recs.get("deep_analysis"):
+                data["deep_analysis"] = recs["deep_analysis"]
+            if recs.get("regime_context"):
+                data["regime_context"] = recs["regime_context"]
+            if recs.get("pattern_alerts"):
+                data["pattern_alerts"] = recs["pattern_alerts"]
+        except Exception:
+            pass
+
+    return data or {"steers": [], "open_trades": [], "portfolio_health": "unknown"}
+
+
 def reject_creative(index: int, reason: str = "") -> dict:
     """Reject a creative improvement by setting its status to rejected."""
     if not CREATIVE_FILE.exists():
@@ -366,6 +397,8 @@ class BrainAPIHandler(BaseHTTPRequestHandler):
             self._json_response(get_changes())
         elif path == "/api/brain/topic-graph":
             self._json_response(get_topic_relationships())
+        elif path == "/api/brain/watchdog":
+            self._json_response(get_watchdog_data())
         else:
             self._json_response({"error": "Not found"}, 404)
     
@@ -422,6 +455,7 @@ def main():
     print(f"  GET /api/brain/search?q=")
     print(f"  GET /api/brain/timeline")
     print(f"  GET /api/brain/audit-log")
+    print(f"  GET /api/brain/watchdog")
     server.serve_forever()
 
 

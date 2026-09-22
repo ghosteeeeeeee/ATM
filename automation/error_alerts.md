@@ -430,3 +430,22 @@
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK:`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Health Report — 2026-09-22 03:47 UTC
+- **STATUS**: OK — Pipeline running, services active
+- **PIPELINE**: Cycle #210405, last completed 03:43:44, next running 03:44:00
+- **SIGNALS**: 125 generated in last hour, 10 active (5 SHORT, 5 LONG)
+- **TRADES**: 0 open (DB), 27 closed today, -25.55% cumulative PnL
+- **REGIME**: SHORT_BIAS (4 SHORT, 0 LONG, 116 NEUTRAL)
+- **DISK**: 83% (20G free) — approaching 85% threshold
+- **PRICES**: Fresh (BTC 55s old, candles.db 2G/13M rows)
+- **SERVICES**: hermes-pipeline=active, hl-sync-guardian=active
+- **KILL SWITCH**: live_trading = true
+- **WARN** (5x): `signal_compactor timed out (killed after 60.1s)` at 02:50, 02:59, 03:14, 03:34, 03:38 — self-healed each time (subsequent runs 0.6-2.7s)
+- **WARN**: Today's PnL -25.55% across 27 closed trades — bad day, mostly pump-chain + support_resistance signals losing
+- **INFO**: Market quiet, regime SHORT_BIAS, hotset empty (0 signals survived compaction)
+- **NO AUTO-FIX NEEDED**: All issues self-healed, pipeline healthy
+
+## Error Alerts — 2026-09-22 03:57 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
