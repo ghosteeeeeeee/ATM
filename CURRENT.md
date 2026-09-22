@@ -108,10 +108,10 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: Dead hours fix impact.** Expected +$1.65/7d. Verify pump-chain+ LONG trades in hours 0-5,23 are blocked on next pipeline runs. — 2026-09-22
+1. **MONITOR: Dead hours fixes impact.** pump-chain+ LONG hours 0-5,21,23 blocked. pullback-entry- SHORT hours 0,1,3,7,10,11 blocked. Expected combined +$2.49/7d. Verify on next pipeline runs. — 2026-09-22
 2. **FIX: Record volume_spike in _signal_metadata** — 55/55 pump-chain+ trades have NULL. Can't filter by volume quality. — 2026-09-22
-3. **MONITOR: pump-chain+ NEUTRAL degradation.** Today 15.4%WR -$1.51 vs 30d 41.3%WR +$0.95. Dead hours fix should help. If persists 48h, investigate. — 2026-09-22
-4. **MONITOR: pullback-entry- cold streak.** 24h 0%WR -$1.10 but 30d 53.4%WR +$0.94. Variance likely. — 2026-09-22
+3. **MONITOR: pump-chain+ NEUTRAL degradation.** Today 25%WR -$0.64 vs 30d 41.3%WR +$0.95. Dead hours fix should help. If persists 48h, investigate. — 2026-09-22
+4. **MONITOR: pullback-entry- cold streak.** 24h 25%WR -$0.94 but 30d 53.4%WR +$0.94. Dead hours block active. — 2026-09-22
 5. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
 6. **INFRA: signal_compactor pipeline timeout.** 7 kills in 2h at 60s. DB lock contention during concurrent pipeline steps. Self-recovers but wastes 60s per failure. — 2026-09-21
-7. **DISK: 85% (94G/118G).** Below 90% threshold. Monitor. — 2026-09-21
+7. **DISK: 84% (19G free).** Below 90% threshold. Monitor. — 2026-09-22
