@@ -5,6 +5,7 @@
 set -euo pipefail
 
 PROMPT_FILE="/root/.hermes/automation/trade-watchdog/trade_watchdog_prompt.md"
+OPENCODE="/root/.opencode/bin/opencode"
 LOG_DIR="/root/.hermes/logs"
 LOG_FILE="${LOG_DIR}/trade-watchdog.log"
 LOCK_FILE="/tmp/hermes-trade-watchdog.lock"
@@ -35,6 +36,6 @@ python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
 # Step 2: Run opencode agent for deep analysis (with timeout)
 PROMPT=$(cat "$PROMPT_FILE")
-timeout 480 opencode run --port 4099 -p "$PROMPT" >> "$LOG_FILE" 2>&1 || true
+timeout 480 "$OPENCODE" run --port 4099 -p "$PROMPT" >> "$LOG_FILE" 2>&1 || true
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [DONE] Trade Watchdog" >> "$LOG_FILE"
