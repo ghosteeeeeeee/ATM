@@ -2927,3 +2927,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **ATR_SL DOMINANCE:** 92.7% pump-chain+, 90.9% pullback-entry- exits via ATR_SL. Stops too tight for volatility — but widening affects ALL signals.
   **CREATIVE:** (1) PUMP_CHAIN_LONG_ZSCORE_MAX=2.5 — blocks chasing, +$0.53/14d, 1/33 winners blocked (low risk). (2) PULLBACK_SHORT_RSI_MID_BLOCK=[40,50] — blocks no-man's-land, +$1.24/14d, 4/62 winners blocked (medium risk, needs monitoring). (3) New NEUTRAL signal for diversity.
   BY: brain_auditor
+
+- [2026-09-22 ~20:35 UTC] brain_auditor: AUDIT + 1 CONFIG CHANGE
+  DB-verified: 24h 25T 28.0%WR -$2.36 | 7d 181T 45.3%WR -$0.05
+  **CONFIG CHANGE:** PULLBACK_ENTRY_SHORT_NORMAL_BLOCK=True added to hermes_constants.py + enforcement in signal_compactor.py. 14d NORMAL: 8T 12.5%WR -$1.13. EXTREME: 53.8%WR -$0.15. Signal only works in volatile markets. 0 winners blocked. Expected +$0.56/7d.
+  **LOSING AUTOPSY (17 losers 24h):** 14/17 atr_sl_hit (82%). Chasing: FOGO gap=2.01%, HEMI gap=2.02%, AIXBT gap=1.54% (all pre-MAX_ENTRY_GAP enforcement). Oversold SHORT: DOT RSI=27.27, HEMI RSI=17.65 (pre-blacklist). Overbought LONG: CASHCAT RSI=65.98, HEMI RSI=70.0.
+  **DRIFT:** (1) MAX_ENTRY_GAP enforced today — should prevent future chasing. (2) volume_spike STILL NULL 0/181 7d trades (4th time flagged).
+  **REGIME (7d):** EXTREME 74T 52.7%WR +$2.27★. NORMAL 35T 31.4%WR -$1.46 (worst). Gap $3.73/7d.
+  **SIGNALS (7d):** pump-chain+ 55T 41.8%WR +$1.23. volume-breakout-long+ 16T 68.8%WR +$1.41. pullback-entry- 39T 38.5%WR -$2.06 (cold streak).
+  **RECURRING (5+ sessions):** (1) Signal diversity — only 2 types carry system. (2) volume_spike metadata never recorded. (3) New NEUTRAL signal needed.
+  **CREATIVE:** (1) pullback-entry- NORMAL block IMPLEMENTED. (2) volume_spike recording (needs implementation). (3) New NEUTRAL signal (needs build + backtest).
+  BY: brain_auditor

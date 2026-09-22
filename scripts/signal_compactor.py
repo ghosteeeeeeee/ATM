@@ -1299,6 +1299,17 @@ def _score_signal(token, direction, conf, source, signal_type,
             log(f"  🚫 [PULLBACK-DEAD-HOUR] {token} SHORT blocked — hour {utc_hour} UTC")
             return 0.0
 
+    # ── pullback-entry- SHORT NORMAL regime block ─────────────────────────
+    # 14d NORMAL: 8T 12.5%WR -$1.13 (worst). EXTREME: 53.8%WR -$0.15.
+    if _pb_bare == 'pullback-entry' and direction.upper() == 'SHORT':
+        try:
+            from hermes_constants import PULLBACK_ENTRY_SHORT_NORMAL_BLOCK
+            if PULLBACK_ENTRY_SHORT_NORMAL_BLOCK and _vol_regime == 'NORMAL':
+                log(f"  🚫 [PULLBACK-NORMAL] {token} SHORT blocked — NORMAL vol regime, no SHORT edge (12.5% WR)")
+                return 0.0
+        except ImportError:
+            pass
+
     score = float(conf)
 
     # Survival bonus: only if survived previous cycles AND signal is still alive (age < 10min)

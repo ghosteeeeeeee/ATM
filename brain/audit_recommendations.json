@@ -1,197 +1,92 @@
 {
-    "timestamp": "2026-09-22T18:30:00Z",
-    "session_brain_stats": {
-        "queries_run": 5,
-        "top_findings": [
-            "dead hours enforcement drift was critical and now fixed",
-            "oscillator matrix shadow eval due Sep 23",
-            "pullback-entry- SHORT 30d edge confirmed (53.4%WR +$0.94)",
-            "NEUTRAL regime signal diversity remains bottleneck"
-        ]
-    },
-    "trade_summary_24h": {
-        "trades": 26,
-        "win_rate": 26.9,
-        "pnl": -2.51,
-        "regime_breakdown": {
-            "EXTREME": "not dominant in 24h (market mostly NEUTRAL/HIGH)",
-            "HIGH": "multiple losses",
-            "NORMAL": "few trades"
-        },
-        "top_losers": [
-            {"signal": "pump-chain+ LONG", "trades": 9, "wr": 11.1, "pnl": -1.15, "note": "dead hours trades (pre-fix)"},
-            {"signal": "pullback-entry- SHORT", "trades": 4, "wr": 0.0, "pnl": -1.10, "note": "cold streak"},
-            {"signal": "pump-chain- SHORT", "trades": 6, "wr": 33.3, "pnl": -0.38, "note": "EXTREME, small losses"}
-        ],
-        "exit_analysis": "atr_sl_hit dominates (14/18 losers). 7/18 winners 100% WR."
-    },
-    "trade_summary_7d": {
-        "trades": 186,
-        "win_rate": 46.2,
-        "pnl": 0.15,
-        "regime_breakdown": {
-            "EXTREME": {"trades": 75, "wr": 53.3, "pnl": 2.30, "note": "BEST — carries system"},
-            "HIGH": {"trades": 72, "wr": 43.1, "pnl": -1.13, "note": "legacy drags aging out"},
-            "NORMAL": {"trades": 38, "wr": 36.8, "pnl": -1.04, "note": "worst regime"}
-        },
-        "exit_analysis": {
-            "profit_monster_trail": "33T 66.7%WR +$1.74 (best exit)",
-            "atr_sl_hit": "130T 45.4%WR -$0.79 (breakeven via trail)",
-            "cut_loser_CL_T1": "11T 0%WR -$1.04 (legacy safety)"
-        }
-    },
-    "drift_findings": [
-        {
-            "topic": "Dead hours enforcement",
-            "status": "FIXED — verified active in signal_compactor.py:1286-1291",
-            "previous_issue": "Code was COMMENTED OUT on Sep 22 morning. CEO re-enabled ~09:30 UTC.",
-            "current_status": "PUMP_CHAIN_LONG_DEAD_HOURS=[0,1,2,3,4,5] enforced. PULLBACK_ENTRY_SHORT_DEAD_HOURS=[0,1,3,7,10,11] enforced.",
-            "impact": "pump-chain+ LONG hours 0-5,23 blocked. Expected +$1.65/7d recovery.",
-            "severity": "RESOLVED"
-        },
-        {
-            "topic": "volume_spike in _signal_metadata",
-            "status": "UNFIXED — flagged 3x since Sep 18",
-            "current_status": "0/26 24h trades have volume_spike recorded. Cannot filter by volume quality.",
-            "severity": "MEDIUM — limits analytics but doesn't cause losses",
-            "recommendation": "Fix signal output to include volume_spike in metadata dict"
-        }
+  "timestamp": "2026-09-22T20:32:20.667140+00:00",
+  "session_brain_stats": {
+    "topics_found": [
+      "signal performance",
+      "neutral signal ideas",
+      "trend following",
+      "losing trades"
     ],
-    "recurring_problems": [
-        {
-            "topic": "Signal diversity in NEUTRAL",
-            "frequency": "flagged in every audit since Sep 16",
-            "current_status": "Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. bb_bounce_v2_long re-enabled today.",
-            "impact": "System fragile — 2 types carry all PnL. Any regime shift leaves system exposed.",
-            "sessions_discussed": ["new neutral regime signala", "signal diversity", "need new signals"]
-        },
-        {
-            "topic": "pullback-entry- SHORT cold streak",
-            "frequency": "flagged since Sep 20",
-            "current_status": "7d: 44T 40.9%WR -$1.64. 30d: 116T 53.4%WR +$0.94.",
-            "analysis": "EXTREME 30d: 61.5%WR +$1.13 (edge). NORMAL 30d: 46.9%WR -$0.62 (drag). Cold streak is regime-driven — NORMAL/HIGH pulling down EXTREME edge.",
-            "severity": "LOW — variance, not systemic"
-        },
-        {
-            "topic": "ATR_SL dominance",
-            "frequency": "flagged in every losing autopsy",
-            "current_status": "130T/7d 45.4%WR -$0.79. Most exits via SL.",
-            "analysis": "Wins avg +$0.24, losers avg -$0.16. R:R is positive but win rate dragged by tight SL in volatile regime. Widening won't fix — avg loss -5.39% vs 1.3-1.5% stops = gaps through.",
-            "severity": "STRUCTURAL — entry quality matters more than SL width"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "idea": "volume_spike recording in _signal_metadata",
-            "discussed_since": "Sep 18",
-            "status": "NOT IMPLEMENTED",
-            "impact": "Can't filter by volume quality, can't analyze volume-based entry quality"
-        },
-        {
-            "idea": "New NEUTRAL-specialist signal",
-            "discussed_since": "Sep 16",
-            "status": "In progress — bb_bounce_v2_long re-enabled (CEO Sep 22). sma20_dip and ema300_dip_short discussed in sessions.",
-            "impact": "System needs 3+ signal types passing NEUTRAL confluence"
-        }
-    ],
-    "signal_quality_deep_dive": {
-        "pullback_entry_short": {
-            "30d": {"trades": 116, "wr": 53.4, "pnl": 0.94, "note": "profitable long-term"},
-            "7d": {"trades": 44, "wr": 40.9, "pnl": -1.64, "note": "cold streak"},
-            "regime_30d": {
-                "EXTREME": {"trades": 26, "wr": 61.5, "pnl": 1.13, "note": "STRONG EDGE"},
-                "HIGH": {"trades": 58, "wr": 53.4, "pnl": 0.43, "note": "OK"},
-                "NORMAL": {"trades": 32, "wr": 46.9, "pnl": -0.62, "note": "DRAG"}
-            },
-            "root_cause": "Cold streak driven by NORMAL/HIGH regime trades. EXTREME still 61.5%WR. Not a signal quality issue — regime distribution shifted.",
-            "recommendation": "Monitor 48h. If NORMAL pullback-entry- SHORT persists <45%WR 14d, block NORMAL regime."
-        },
-        "pump_chain_long": {
-            "30d": {"trades": 80, "wr": 41.3, "pnl": 0.95},
-            "7d": {"trades": 55, "wr": 41.8, "pnl": 1.23},
-            "regime_30d": {
-                "EXTREME": {"trades": 48, "wr": 45.8, "pnl": 1.19, "note": "primary earner"},
-                "HIGH": {"trades": 27, "wr": 37.0, "pnl": 0.11, "note": "breakeven"},
-                "NORMAL": {"trades": 5, "wr": 20.0, "pnl": -0.35, "note": "too few trades"}
-            },
-            "dead_hours_impact": "Hours 0-5,23 = 29T 0%WR -$3.30/14d. Blocking = +$1.65/7d expected.",
-            "recommendation": "Dead hours fix verified. Monitor 48h for impact."
-        },
-        "bb_bounce_v2_long": {
-            "30d": {"trades": 73, "wr": 74.0, "pnl": 2.08, "note": "BEST standalone WR"},
-            "regime_30d": {
-                "EXTREME": {"trades": 12, "wr": 58.3, "pnl": 0.0, "note": "flat"},
-                "HIGH": {"trades": 35, "wr": 77.1, "pnl": 0.89, "note": "STRONG"},
-                "NORMAL": {"trades": 25, "wr": 76.0, "pnl": 0.87, "note": "STRONG"}
-            },
-            "recommendation": "Re-enabled by CEO today. 30d 74%WR is excellent. Monitor for48h."
-        },
-        "volume_breakout_long_plus": {
-            "30d": {"trades": 16, "wr": 68.8, "pnl": 1.41, "note": "gem — best WR in system"},
-            "regime_30d": {
-                "EXTREME": {"trades": 8, "wr": 75.0, "pnl": 1.46, "note": "STRONG"},
-                "NORMAL": {"trades": 8, "wr": 62.5, "pnl": -0.05, "note": "breakeven"}
-            },
-            "recommendation": "16T/30d is low frequency. Investigate if confluence gate is limiting. EXTREME block already in VOL_PHASE_MULTS."
-        }
+    "recurring_theme": "signal diversity + NEUTRAL regime gap (5+ sessions)"
+  },
+  "trade_summary": {
+    "24h": {
+      "trades": 25,
+      "wr": 28.0,
+      "pnl": -2.36
     },
-    "creative_improvements": [
-        {
-            "date": "2026-09-22T18:30:00Z",
-            "idea": "REGIME-WEIGHTED CONFIDENCE — EXTREME 1.15x, NORMAL 0.85x",
-            "rationale": "7d data confirms EXTREME carries system (+$2.30) while NORMAL drags (-$1.04). Boosting EXTREME confidence amplifies proven edge. Penalizing NORMAL reduces false positives. No trades blocked, only confidence adjusted.",
-            "expected_impact": "+$0.50-1.00/7d (conservative)",
-            "category": "entry sniper",
-            "status": "suggested — needs CEO approval",
-            "risk": "low — no trades blocked, only confidence adjusted",
-            "data_backing": "EXTREME 53.3%WR +$2.30/7d vs NORMAL 36.8%WR -$1.04/7d. Gap $3.34/7d.",
-            "impact_on_winners": "Would NOT block any winners. EXTREME winners already 55.3%WR at 80+ conf. NORMAL losers already 37.9%WR at 80+ conf — penalizing makes them less likely to fire.",
-            "implementation": "In signal_compactor.py conf scoring: if volatility_regime == 'EXTREME': conf *= 1.15; elif volatility_regime == 'NORMAL': conf *= 0.85"
-        },
-        {
-            "date": "2026-09-22T18:30:00Z",
-            "idea": "Pullback-entry- SHORT NORMAL regime block (monitor first)",
-            "rationale": "30d NORMAL: 32T 46.9%WR -$0.62. EXTREME: 26T 61.5%WR +$1.13. Blocking NORMAL would save $0.62/30d but kill potential edge if regime shifts.",
-            "expected_impact": "+$0.21/30d (+$0.05/7d)",
-            "category": "regime filter",
-            "status": "monitor — 14d data needed",
-            "risk": "medium — NORMAL has 46.9% WR, not catastrophic",
-            "data_backing": "32T 46.9%WR -$0.62/30d. 11T 36.4%WR -$0.71/7d (worse than 30d avg).",
-            "impact_on_winners": "~15 winners would be blocked to save ~17 losers. Net +$0.03/trade. Marginal.",
-            "recommendation": "Monitor 48h. If NORMAL pullback-entry- SHORT 14d <45%WR, block."
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        {
-            "action": "MONITOR dead hours fix impact",
-            "deadline": "Sep 24 09:30 UTC",
-            "verification": "Check pump-chain+ LONG trades in hours 0-5,23 are blocked",
-            "expected": "+$1.65/7d recovery"
-        },
-        {
-            "action": "MONITOR bb_bounce_v2_long re-enablement",
-            "deadline": "Sep 24 18:00 UTC",
-            "verification": "Check trades firing, WR, PnL",
-            "expected": "+$0.50-1.00/7d"
-        },
-        {
-            "action": "EVALUATE oscillator matrix shadow mode",
-            "deadline": "Sep 23",
-            "verification": "Check oscillator_shadow.json for LOW+falling blocks and best combo boosts",
-            "expected": "+$1.00-2.00/7d if validated"
-        },
-        {
-            "action": "FIX volume_spike recording in _signal_metadata",
-            "deadline": "Sep 24",
-            "verification": "Query _signal_metadata for volume_spike after fix",
-            "impact": "Enables volume quality filtering and analytics"
-        },
-        {
-            "action": "DEVELOP new NEUTRAL-specialist signal",
-            "deadline": "Sep 30",
-            "verification": "3+ signal types passing NEUTRAL confluence",
-            "impact": "System resilience — reduce dependence on pump-chain+ and volume-breakout-long+"
-        }
+    "7d": {
+      "trades": 181,
+      "wr": 45.3,
+      "pnl": -0.05
+    },
+    "open_positions": 3
+  },
+  "drift_findings": [
+    {
+      "item": "MAX_ENTRY_GAP enforcement",
+      "status": "FIXED TODAY (16:35 UTC)",
+      "detail": "5 trades with gap>1.5% in 24h, all opened BEFORE enforcement. Going forward should block chasing."
+    },
+    {
+      "item": "volume_spike metadata NULL",
+      "status": "STILL BROKEN",
+      "detail": "0/181 7d trades have volume_spike data. Flagged 4+ times since Sep 18. Cannot filter by volume quality.",
+      "severity": "MEDIUM"
+    }
+  ],
+  "losing_trade_autopsy": {
+    "total_losers_24h": 17,
+    "patterns": [
+      {
+        "pattern": "Chasing (gap>1.5%)",
+        "trades": "FOGO gap=2.01%, HEMI gap=2.02%, AIXBT gap=1.54%",
+        "fix": "MAX_ENTRY_GAP=1.5 enforced today — should prevent future occurrences"
+      },
+      {
+        "pattern": "Oversold SHORT entries",
+        "trades": "DOT RSI=27.27 (SHORT), HEMI RSI=17.65 (SHORT)",
+        "fix": "SHORT_RSI_FLOOR=30 already exists but DOT fired at 27.27 — check if filter applies to pullback-entry-"
+      },
+      {
+        "pattern": "ATR_SL dominance",
+        "trades": "14/17 exits (82%) via ATR_SL",
+        "fix": "Stops consistently too tight. ATR_SL range 1.3-1.5% — consider widening for HIGH/EXTREME regimes"
+      },
+      {
+        "pattern": "pump-chain+ at overbought RSI",
+        "trades": "CASHCAT RSI=65.98, HEMI RSI=70.0",
+        "fix": "PUMP_CHAIN_LONG_RSI_MAX=75 — these are below 75 so they pass. But RSI>65 = 33%WR historically"
+      }
     ]
+  },
+  "recurring_problems": [
+    "ATR_SL hit rate 80%+ (stops too tight for volatility)",
+    "Signal diversity — only pump-chain+ and volume-breakout-long+ carry system",
+    "pullback-entry- SHORT cold streak (30d still positive but 7d negative)",
+    "volume_spike metadata never recorded (can't filter by volume quality)"
+  ],
+  "creative_improvements": [
+    {
+      "idea": "Block pullback-entry- SHORT in NORMAL regime",
+      "rationale": "14d: 8T 12.5%WR -.13 in NORMAL. In EXTREME: 53.8%WR -/usr/bin/bash.15. Signal only works in volatile markets.",
+      "expected_impact": "+/usr/bin/bash.56/7d (eliminate NORMAL drag)",
+      "risk": "low — 8T sample, 0 winners in NORMAL to block",
+      "status": "suggested"
+    },
+    {
+      "idea": "Record volume_spike in signal_compactor metadata",
+      "rationale": "Recurring issue 4+ sessions. Enables volume-quality filtering. Currently 0/181 trades have data.",
+      "expected_impact": "Enables future volume-based entry quality filtering",
+      "risk": "none — metadata only",
+      "status": "recurring, needs implementation"
+    },
+    {
+      "idea": "New NEUTRAL-regime signal (trend following or mean reversion)",
+      "rationale": "Only 2 signal types pass NEUTRAL confluence. 5+ sessions discuss this. System fragile in NEUTRAL.",
+      "expected_impact": "Diversity + new edge in NEUTRAL regime",
+      "risk": "medium — needs backtest before live",
+      "status": "recurring, needs build"
+    }
+  ]
 }

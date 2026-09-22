@@ -1605,10 +1605,11 @@
     "rationale": "pump-chain+ LONG z>=2.5 = 14.3%WR -$0.53/14d. Chasing entries at extreme z-scores consistently lose. Blocks 6 losers vs 1 winner.",
     "expected_impact": "+$0.53/14d",
     "category": "entry sniper",
-    "status": "suggested",
+    "status": "boosted",
     "risk": "low",
     "verified": true,
-    "data": "7T z>=2.5: 1W 6L. Winners avg z=1.44, losers avg z=1.63."
+    "data": "7T z>=2.5: 1W 6L. Winners avg z=1.44, losers avg z=1.63.",
+    "boosted_at": "2026-09-22T20:10:04.361383+00:00"
   },
   {
     "date": "2026-09-22T17:36:20.151199+00:00",
