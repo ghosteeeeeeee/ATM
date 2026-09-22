@@ -904,12 +904,7 @@ def build_output(data, steers):
         "portfolio_health": health,
         "open_trades": [],
         "steers": steers,
-        "regime_summary": {
-            "btc_15m": btc.get("btc_15m"),
-            "btc_4h": btc.get("btc_4h"),
-            "continuum": btc.get("continuum"),
-            "volatility": btc.get("volatility"),
-        },
+        "regime_summary": {k: v for k, v in btc.items() if v is not None},
         "portfolio_summary": {
             "total_open": len(open_trades),
             "total_unrealized_pnl": round(total_unrealized, 2),
