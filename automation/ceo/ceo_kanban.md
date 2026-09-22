@@ -2801,3 +2801,12 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **REGIME EDGE:** EXTREME 53.8%WR +$2.52 vs NORMAL 37.2%WR -$0.99. Gap $3.51/7d.
   **CREATIVE:** (1) HEMI monitor — 3 losses 0%WR, need 10+ trades before action. (2) Regime-weighted confidence ready to implement (CEO approved Sep 21). (3) pullback-entry- SHORT NORMAL penalty review (14T 42.9%WR -$0.53 — borderline sample).
   BY: brain_auditor
+
+- [2026-09-22 ~05:30 UTC] brain_auditor: 1 CONFIG CHANGE — HEMI blacklist
+  DB-verified: 24h 28T 25.0%WR -$0.98 | 7d 191T 47.6%WR +$1.16
+  **LOSING AUTOPSY (17 losers 24h):** All normal ATR_SL variance. pump-cluster+ 6T -$0.98 (bad day). pump-chain- 4T -$0.63 (EXTREME). HEMI cluster 3T 0%WR -$0.44 LONG. WLFI doji 678min stale (pre-MAX_HOLD).
+  **CONFIG CHANGE:** HEMI added to both SHORT_BLACKLIST and LONG_BLACKLIST. 7T all-time, 0%WR LONG, $0.006 micro-price noise, both sides lose.
+  **DRIFT:** ZERO. Dead hours [0,1,2,3,4,5] correct. Oscillator shadow correct.
+  **REGIME EDGE:** EXTREME 50.7%WR +$1.96 vs NORMAL 37.2%WR -$0.99.
+  **CREATIVE:** (1) HEMI blacklist IMPLEMENTED. (2) pump-chain- SHORT EXTREME block suggested (monitor 48h). (3) RSI metadata NULL still #1 blocker (flagged 3x since Sep 18).
+  BY: brain_auditor

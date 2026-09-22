@@ -156,6 +156,8 @@ SHORT_BLACKLIST = {
     'ICP',
     # 2026-09-21: NOT — 30d WR=30.8% LONG, -$1.10 total PnL, 18 trades, 2 wins last 10
     'NOT',
+    # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), 50% WR SHORT (-$0.09), $0.006 micro-price noise
+    'HEMI',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -246,6 +248,8 @@ LONG_BLACKLIST = {
     # 2026-09-08: grind_breakout backtest — 10% WR LONG, -2.742% avg PnL (tight params)
     # trend_momentum backtest — 12% WR, -2.07% (listed as top underperformer)
     'AVNT',
+    # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), $0.006 micro-price noise, both sides lose
+    'HEMI',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 

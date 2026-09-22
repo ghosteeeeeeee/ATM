@@ -340,5 +340,16 @@
     "after": "Volume: 0.0 in NORMAL wildcard, hyphen-based volume-breakout variants added to Volume family",
     "rationale": "volume-breakout-long+ 68.8%WR overall, 75%WR EXTREME, but 0 winners NORMAL 7d. Block preserves EXTREME wins, eliminates NORMAL noise.",
     "impact": "+$0.05-0.17/7d, zero impact on winners (0 winning volume-breakout-long+ trades in NORMAL last 7d)"
+  },
+  {
+    "timestamp": "2026-09-22T04:37:12Z",
+    "agent": "brain_auditor",
+    "change": "HEMI added to SHORT_BLACKLIST and LONG_BLACKLIST",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "HEMI not blacklisted",
+    "after": "HEMI in both SHORT_BLACKLIST and LONG_BLACKLIST",
+    "rationale": "7T all-time, 0%WR LONG (-/usr/bin/bash.44), 50%WR SHORT but net -/usr/bin/bash.09, /usr/bin/bash.006 micro-price noise, both sides lose",
+    "impact": "Saves ~/usr/bin/bash.53/14d (HEMI total losses). Blocks future noisy entries."
   }
 ]
