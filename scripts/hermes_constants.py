@@ -2531,6 +2531,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
     'continuum', 'continuum+', 'continuum-',  # continuum score extremes — structural momentum, works solo (2026-09-08)
     'continuum-osc', 'continuum-osc+', 'continuum-osc-',  # continuum oscillator — structural momentum, works solo (2026-09-13)
+    'continuum-trend', 'continuum-trend+', 'continuum-trend-',  # continuum trend — structural trend alignment, works solo (2026-09-21)
     'mover', 'mover+', 'mover-',  # fast mover momentum — volume-confirmed breakout, works solo (2026-09-08)
     'neutral-sniper-long', 'neutral-sniper-short',  # mean-reversion for NEUTRAL regime — StochRSI+CMF, designed for flat markets
     'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion, works solo

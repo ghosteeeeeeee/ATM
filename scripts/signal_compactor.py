@@ -2453,7 +2453,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             pass
 
             if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
-                if _regime == 'SHORT_BIAS':
+                # CONTINUUM OVERRIDE: allow SHORT when BTC structure is bearish
+                _cont_allows_short = False
+                try:
+                    _cont_conn_sn = None
+                    try:
+                        _cont_conn_sn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                        _cont_row_sn = _cont_conn_sn.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        if _cont_conn_sn:
+                            try: _cont_conn_sn.close()
+                            except: pass
+                    if _cont_row_sn:
+                        _sn_phase, _sn_linreg, _sn_ema = _cont_row_sn[0], _cont_row_sn[1], _cont_row_sn[2]
+                        _sn_bearish = (_sn_phase == 'DECLINING' or
+                                       (_sn_phase in ('CALM', 'RECOVERY') and _sn_linreg in ('LEAN_BEAR', 'BEAR') and _sn_ema == 'BELOW'))
+                        if _sn_bearish:
+                            _cont_allows_short = True
+                            log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — BTC continuum={_sn_phase}+{_sn_linreg}+{_sn_ema}, bearish structure overrides NEUTRAL regime")
+                except Exception:
+                    pass
+
+                if _cont_allows_short:
+                    pass  # Allow through — continuum says bearish
+                elif _regime == 'SHORT_BIAS':
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but 1m SHORT_BIAS, allowed")
                 elif unique_signal_types >= 2 or (bare_source in STANDALONE_BYPASS_SIGNALS and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
