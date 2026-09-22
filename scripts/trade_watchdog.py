@@ -1047,6 +1047,15 @@ def write_outputs(output, steers, dry_run=False):
     log(f"Wrote {STEER_OUTPUT}")
 
     # Write recommendations (for opencode agent to pick up)
+    # Preserve any deep_analysis the agent wrote in previous run
+    existing_recs = {}
+    if os.path.exists(RECOMMEND_OUTPUT):
+        try:
+            with open(RECOMMEND_OUTPUT) as f:
+                existing_recs = json.load(f)
+        except Exception:
+            pass
+
     recs = {
         "timestamp": now.isoformat(),
         "steers": steers,
@@ -1054,6 +1063,22 @@ def write_outputs(output, steers, dry_run=False):
         "regime": output["regime_summary"],
         "open_count": len(output["open_trades"]),
     }
+    # Carry forward agent's analysis if it exists and is less than 1 hour old
+    if existing_recs.get("deep_analysis") and existing_recs.get("agent_timestamp"):
+        try:
+            agent_ts = datetime.fromisoformat(existing_recs["agent_timestamp"].replace("Z", "+00:00"))
+            if agent_ts.tzinfo is None:
+                agent_ts = agent_ts.replace(tzinfo=timezone.utc)
+            age_min = (datetime.now(timezone.utc) - agent_ts).total_seconds() / 60
+            if age_min < 60:
+                recs["deep_analysis"] = existing_recs["deep_analysis"]
+                recs["agent_timestamp"] = existing_recs["agent_timestamp"]
+                recs["regime_context"] = existing_recs.get("regime_context", "")
+                recs["pattern_alerts"] = existing_recs.get("pattern_alerts", "")
+                log(f"Preserved agent analysis from {age_min:.0f} min ago")
+        except Exception:
+            pass
+
     os.makedirs(os.path.dirname(RECOMMEND_OUTPUT), exist_ok=True)
     atomic_write_json(RECOMMEND_OUTPUT, recs)
     log(f"Wrote {RECOMMEND_OUTPUT}")

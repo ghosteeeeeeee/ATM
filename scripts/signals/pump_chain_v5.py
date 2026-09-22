@@ -117,7 +117,7 @@ def _format_chain_evidence(chains):
     parts = []
     for c in chains[:3]:
         ref = c.get('leader') or c.get('follower', '?')
-        parts.append(f"{ref}({c['lift']}x)")
+        parts.append(f"{ref}({c.get('lift', '?')}x)")
     return ','.join(parts)
 
 

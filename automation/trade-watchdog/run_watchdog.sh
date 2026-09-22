@@ -35,10 +35,37 @@ cd /root/.hermes
 python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
 # Step 2: Run opencode agent for deep analysis (with timeout)
-if cat "$PROMPT_FILE" | timeout 480 "$OPENCODE" run --port 4099 >> "$LOG_FILE" 2>&1; then
+AGENT_OUTPUT="/tmp/watchdog_agent_analysis.txt"
+if cat "$PROMPT_FILE" | timeout 480 "$OPENCODE" run --port 4099 > "$AGENT_OUTPUT" 2>>"$LOG_FILE"; then
     echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [OK] Opencode agent completed" >> "$LOG_FILE"
+    # Merge agent analysis into recommendations file
+    python3 -c "
+import json, sys
+from datetime import datetime, timezone
+
+recs_path = '/root/.hermes/data/watchdog_recommendations.json'
+try:
+    with open(recs_path) as f:
+        recs = json.load(f)
+except:
+    recs = {}
+
+# Read agent output
+try:
+    with open('$AGENT_OUTPUT') as f:
+        agent_text = f.read()
+    if agent_text.strip():
+        recs['deep_analysis'] = agent_text
+        recs['agent_timestamp'] = datetime.now(timezone.utc).isoformat()
+        with open(recs_path, 'w') as f:
+            json.dump(recs, f, indent=2)
+        print('Agent analysis merged into recommendations')
+except Exception as e:
+    print(f'Failed to merge agent output: {e}')
+" >> "$LOG_FILE" 2>&1
 else
     echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [WARN] Opencode agent failed or timed out (exit $?)" >> "$LOG_FILE"
 fi
+rm -f "$AGENT_OUTPUT"
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [DONE] Trade Watchdog" >> "$LOG_FILE"
