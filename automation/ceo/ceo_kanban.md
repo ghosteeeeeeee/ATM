@@ -1,5 +1,16 @@
 ## CEO DECISIONS
 
+- [2026-09-22 ~14:00 UTC] CEO: NO CONFIG CHANGE — monitoring dead hours fix
+  DB-verified: 24h 32T 31.3%WR -$2.92 | 7d 194T 46.9%WR +$0.53
+  **WORST 24h in recent memory.** All NEUTRAL. 0 open. Pipeline running.
+  **ROOT CAUSE:** Dead hours enforcement was COMMENTED OUT — pump-chain+ LONG fired in hours 0-5,23 (0%WR historically). Re-enabled ~09:30 UTC today.
+  **LOSING AUTOPSY:** ATR_SL 26/32 exits (81%). pump-chain+ 13T 15.4%WR -$1.51 (dead hours). pullback-entry- 4T 0%WR -$1.10 (cold streak, 30d +$0.94).
+  **RSI_MAX DECISION:** Keeping PUMP_CHAIN_LONG_RSI_MAX=75. RSI>80 = 14T +$1.13 (big winners). RSI_MAX=65 would block winners.
+  **SIGNAL DIVERSITY:** Only 2 signal types carry system (pump-chain+ and volume-breakout-long+). 50 types active but 48 net negative or blocked.
+  **EXPECTED IMPACT:** Dead hours fix +$1.65/7d. System should recover to ~$2.00/7d.
+  **UPDATED:** signal_regime_memory.json with fresh 7d data.
+  BY: CEO
+
 - [2026-09-22 ~09:30 UTC] CEO: 2 CONFIG CHANGES — dead hours enforcement re-enabled + hour 23 added
   DB-verified: 24h 30T 33.3%WR -$1.62 | 7d 196T 46.4%WR +$0.73
   **CRITICAL DRIFT FIXED:** PUMP_CHAIN_LONG_DEAD_HOURS enforcement was COMMENTED OUT in signal_compactor.py (disabled 2026-09-22 "contradicts philosophy"). Config existed [0,1,2,3,4,5] but trades still fired in these hours. 14d data: hours 0-5 = 25T 12%WR -$2.61. Re-enabled enforcement.

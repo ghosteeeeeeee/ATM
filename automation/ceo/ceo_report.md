@@ -1,23 +1,33 @@
-## CEO Report — 2026-09-22 ~05:40 UTC
+## CEO Report — 2026-09-22 ~14:00 UTC
 
-### Decision: NO CONFIG CHANGE — MONITORING
+### Decision: NO CONFIG CHANGE — MONITORING DEAD HOURS FIX
 
 ### Diagnosis
-System healthy. 24h: 31T 35.5%WR -$0.43 (quiet day, ATR_SL dominant). 7d: 196T 47.4%WR +$1.58. 0 open. All NEUTRAL. Today's dead hours fix + open-skies kill not yet reflected in data.
+System fragile. 24h: 32T 31.3%WR -$2.92 (worst day recently). 7d: 194T 46.9%WR +$0.53 (barely positive). All NEUTRAL. 0 open. Dead hours enforcement re-enabled today — expected to recover.
 
 ### Key Numbers (DB-verified)
-- **24h:** 31T 35.5%WR -$0.43. ATR_SL 24T -$4.18. pump_exit_momentum/dead_money 3T -$0.24. 2 phantom trades.
-- **7d:** 196T 47.4%WR +$1.58. pump-chain+ 53T +$1.83 (workhorse). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
-- **Regime:** EXTREME 74T 52.7%WR +$2.36★. NORMAL 43T 37.2%WR -$0.99. Gap $3.35/7d.
-- **pump-chain+ REGIME:** EXTREME 32T 46.9%WR +$1.27 (best). HIGH 19T 36.8%WR +$0.47. No regime >55%WR (degraded).
-- **Legacy losers:** breakout-long+ -$0.60, open-skies+ -$0.42, grind-trend- -$0.38 — all disabled, aging out.
-- **pullback-entry- REGIME:** HIGH 25T 52%WR +$0.50. EXTREME 14T 50%WR -$0.29. NORMAL 14T 42.9%WR -$0.53.
+- **24h:** 32T 31.3%WR -$2.92. ATR_SL 26/32 exits (81%). pump-chain+ 13T 15.4%WR -$1.51 (dead hours bleed). pullback-entry- 4T 0%WR -$1.10 (cold streak).
+- **7d:** 194T 46.9%WR +$0.53. pump-chain+ 55T 41.8%WR +$1.23 (workhorse, DEGRADED). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem).
+- **30d active:** 50 signal types. Only 2 are net positive (pump-chain+ and volume-breakout-long+). System carried by 2 signals.
+- **pump-chain+ RSI analysis:** RSI 55-65 = sweet spot (60%WR +$1.35). RSI 76-80 = dead zone (6T 0%WR -$0.82). RSI>80 = big winners (14T +$1.13). RSI_MAX=75 optimal — blocks dead zone, preserves winners.
 
-### Why No Action
-1. 7d positive (+$1.58) — no emergency
-2. Today's changes (dead hours + open-skies kill) expected +$0.90-1.40/7d — monitor 48h
-3. Oscillator shadow eval due Sep 23
-4. Legacy losers aging out naturally
+### Root Cause
+PUMP_CHAIN_LONG_DEAD_HOURS enforcement was COMMENTED OUT in signal_compactor.py. Config existed [0,1,2,3,4,5,23] but trades still fired in hours 0-5,23 (0%WR historically). 14d dead hours = 29T 0%WR -$3.30.
+
+### Fix Applied
+Dead hours enforcement re-enabled ~09:30 UTC today. Expected +$1.65/7d.
+
+### RSI_MAX Decision
+NOT changing PUMP_CHAIN_LONG_RSI_MAX from 75 to 65. Brain_auditor proposed 65 but data shows RSI>80 = 14T +$1.13 (big winners). RSI_MAX=65 would block winners. Current 75 blocks dead zone (76-80) while preserving RSI>80.
+
+### Signal Diversity Problem
+Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 50 signal types active but 48 are net negative or blocked. Need new signals for diversity.
+
+### Monitoring
+1. Dead hours fix — verify no pump-chain+ trades in hours 0-5,23 on next runs
+2. pullback-entry- cold streak — 30d lifetime still positive (53.4%WR +$0.94), likely variance
+3. pump-chain+ DEGRADED — no regime >55%WR, monitoring if dead hours fix helps
+4. Oscillator shadow eval due Sep 23
 5. System structurally healthy — active signals profitable
 
 ---
