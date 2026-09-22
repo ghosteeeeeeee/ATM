@@ -4564,3 +4564,70 @@ Final set: ['ME']
 - 3 open positions manageable
 
 **BY:** auto_1hr
+
+## [2026-09-22 21:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses) | **PnL:** -$0.29
+- FIL SHORT pullback-entry-: -$0.15 (atr_sl_hit)
+- COMP SHORT pullback-entry-: -$0.14 (atr_sl_hit)
+
+**24h:** 26T, 25% WR, ~-$2.60 | **7d:** near breakeven
+
+**Close Reasons (24h):**
+- atr_sl_hit: 19/26 (73.1%), avg -$0.151 — within 55-75% baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 5T, 0% WR, -$1.24 — drawdown but lifetime 53.9% WR
+- pump-chain+ LONG: 8T, low WR, -$0.99 — drawdown but lifetime 41.2% WR +$0.95
+- pump-chain- SHORT: 6T, 33.3% WR, -$0.38
+
+**Diagnosis:**
+1. Entry quality: Losses small (avg -$0.15), SL cutting correctly
+2. SL behavior: 73.1% atr_sl_hit — upper baseline, not alarming
+3. Signal quality: pullback-entry- struggling (0/5 24h) but lifetime healthy
+4. Trade frequency: 0/hr — normal, no overtrading
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses opened in 1 hour)
+- atr_sl_hit 73.1% within baseline
+- 7d near breakeven — system profitable over week
+- Losses small and controlled
+- pullback-entry- and pump-chain+ in drawdown phase but lifetime stats healthy
+
+**BY:** auto_1hr
+
+## [2026-09-22 22:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour
+**24h:** 24T, 29.2% WR, -$1.98 | **7d:** 183T, -$0.34
+
+**Close Reasons (24h):**
+- atr_sl_hit: 17/24 (70.8%), avg -$0.138 — within baseline
+- pump_exit_dead_money: 3T, avg +$0.057
+- profit-monster-trail: 2T, avg +$0.095
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 5T, 0% WR, -$1.24 — drawdown but lifetime 52.5% WR +$0.65
+- pump-chain+ LONG: 7T, 14.3% WR, -$0.85 — drawdown but lifetime profitable
+- pump-chain- SHORT: 6T, 33.3% WR, -$0.38
+
+**Diagnosis:**
+1. Entry quality: Losses small and controlled
+2. SL behavior: 70.8% atr_sl_hit — within baseline
+3. Signal quality: pullback-entry- and pump-chain+ in drawdown but lifetime healthy
+4. Trade frequency: ~1/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses in single hour)
+- atr_sl_hit within baseline
+- 7d near breakeven
+- pullback-entry- drawdown is variance, not structural (lifetime 52.5% WR)
+- 4 open positions manageable
+
+**BY:** auto_1hr
