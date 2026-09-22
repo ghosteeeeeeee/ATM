@@ -1,3 +1,42 @@
+## [2026-09-22 00:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CASHCAT pump-chain+ atr_sl_hit -$0.17) | **Open:** 1 (AIXBT pump-chain+ 58min -$0.13)
+**24h:** 27T 26%WR -$0.95 | **7d:** 200T 49%WR +$5.20
+
+**24h by exit reason:**
+- atr_sl_hit: 19/27 (70%) avg -$0.045 — entries at bad levels hitting SL fast
+- profit-monster-trail: 4T avg +$0.033 — trail capturing winners
+- pump_exit_dead_money: 3T avg -$0.030
+- pump_exit_momentum: 1T -$0.13
+
+**24h signal ranking:**
+- pump-chain+: 15T 20%WR -$0.92 — **dead hours block partially deployed**
+- doji-bottom-long: 3T 33%WR -$0.34 — variance (60%WR/7d)
+- mover+: 2T 50%WR -$0.24
+- volume-breakout-long+: 2T 50%WR +$0.57
+- accel-300: 1T 100%WR +$0.17
+
+**Diagnosis:**
+1. **Entry quality:** 26%WR/24h — pump-chain+ at bad hours dragging system
+2. **SL behavior:** 70% atr_sl_hit — same pattern, entries at unfavorable levels
+3. **Signal quality:** pump-chain+ hours 20+23 also losers (7d 0%WR -$0.95)
+4. **Trade frequency:** 0 trades since midnight — dead hours block working
+
+**CHANGE: Extended pump-chain+ dead hours**
+- Added hours 20 and 23 to dead block (was [0-4], now [0,1,2,3,4,20,23])
+- 7d hours 20+23: 6T 0%WR -$0.95 — confirmed losers
+- Projected pump-chain+ 7d: +$1.91 → +$4.59 after full block
+- signal_compactor.py imports constant dynamically — no code change needed
+
+**No Change Needed:**
+- pullback-entry- 47%WR/7d but losses spread across many hours — no clear dead hours pattern
+- doji-bottom-long 33%WR/24h but 60%WR/7d — variance, not structural
+- Other signals net positive
+
+**Status:** Extended dead hours block deployed. 0 trades opened since midnight — block working.
+**Commit:** b818ad00
+**BY:** auto_1hr
+
 ## [2026-09-21 21:15 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 3 (ALT pump-chain+, AZTEC pump-chain+, BLUR mover+)
@@ -3854,3 +3893,25 @@ Final set: ['DOT', 'HYPER', 'ME']
 - pump-chain+ within normal variance
 
 **BY:** auto_1hr
+
+## [2026-09-21 23:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (ALT pump-chain+, +$0.00, +4%) | 0 open
+**24h:** 27T, 25.9% WR, -$0.95 (worst day in 3d) | **3d:** Sep 18: +$0.86, Sep 19: +$0.08, Sep 20: +$2.28, Sep 21: -$0.95
+
+**Diagnosis:**
+1. Entry quality: Poor — 25.9% WR. pump-chain+ entries getting stopped out.
+2. SL behavior: atr_sl_hit 70% (19/27) — high but trailing works (CASHCAT +$0.43, AIXBT +$0.09).
+3. Signal quality: pump-chain+ 21.4% WR, -$0.75 (14T) — degraded vs yesterday (57.1%, +$1.35). doji-bottom-long 33%WR -$0.34 (3T). pullback-entry- 0%WR -$0.32 (2T).
+4. Trade frequency: 27/24h — moderate, fine.
+5. Kill criteria: None met (no 0%WR signal with 3+ trades last hour).
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria met
+- Today looks like bad day variance in NEUTRAL regime (yesterday was +$2.28)
+- No open positions
+- pump-chain+ 7d still positive ($3.01 per earlier log)
+
+**Open Questions:** pump-chain+ has been consistently bad today — monitor for sustained degradation over more hours before acting.

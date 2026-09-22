@@ -1,3 +1,8 @@
+[2026-09-22 00:10 UTC] auto_1hr: EXTENDED pump-chain+ dead hours [0-4,20,23]
+  24h: 27T 26%WR -$0.95 | 7d: 200T 49%WR +$5.20. 1 open trade (AIXBT).
+  Hours 20+23 confirmed losers: 6T 0%WR/7d -$0.95. Full block saves ~$2.68/7d.
+  Commit: b818ad00. BY: auto_1hr
+
 [2026-09-21 21:15 UTC] auto_1hr: ADDED pump-chain+ dead hours block (hours 0-4 UTC)
   24h: 24T 29.2%WR -$0.44 | 7d: 187T 48.7%WR +$2.22. 3 open trades.
   pump-chain+ 12T 25%WR -$0.61/24h — hours 0-4 = 0%WR 15T/7d -$1.73.
