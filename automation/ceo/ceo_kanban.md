@@ -2888,3 +2888,14 @@ DO NOT REVERT — eval windows active, changing invalidates results.
   **CREATIVE:** (1) PUMP_CHAIN_LONG_RSI_MAX=65 → +$0.66/7d (blocks 10 losers, 3 winners). (2) Record volume_spike. (3) New NEUTRAL signal (recurring topic 3+ sessions).
   **NO ACTION** — 1 config change already applied today (dead hours). Monitor 48h.
   BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-22 16:35 UTC] brain_auditor: AUDIT + CONFIG CHANGE — 24h 32T 31.3%WR -$2.92 | 7d 189T 46.9%WR +$0.53
+  **CONFIG CHANGE:** Enforced PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 in decider_run.py (was dead code). Blocks pump-chain+ LONG entries with gap>1.5% from EMA300. 14d: 6T 33.3%WR -$0.43 blocked. Expected +$0.21/7d.
+  **DRIFT:** (1) PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 defined but never enforced — FIXED THIS RUN. (2) volume_spike 0/189 7d trades have data — exists in backtest but not live.
+  **LOSING AUTOPSY (19 losers 24h):** 19/19 atr_sl_hit. Dead hours trades (hours 0-5) pre-date re-enablement. Chasing: FOGO gap=2.01%, ADA gap=2.83%, AIXBT gap=1.54%.
+  **REGIME:** EXTREME 75T 53.3%WR +$2.30★. NORMAL 39T 35.9%WR -$1.04 (worst). Gap $3.34/7d.
+  **SIGNAL QUALITY:** pump-chain+ RSI 35-65 = 54.2%WR +$1.56/14d (sweet spot). RSI <35 = 0%WR -$0.67. Gap <0.5% = 48%WR +$1.05. Gap >1.5% = 33.3%WR -$0.43.
+  **RECURRING:** signal diversity (5+ sessions), volume_spike recording (3+ sessions), pullback-entry- cold streak (monitoring).
+  **CREATIVE:** (1) Record volume_spike in decider_run.py — enables volume-quality filtering. (2) Register neutral_sniper.py — NEUTRAL diversity.
+  BY: brain_auditor

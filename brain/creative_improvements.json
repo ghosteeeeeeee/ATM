@@ -1575,7 +1575,28 @@
     "rationale": "Only 2 signals pass confluence in NEUTRAL. Recurring topic in 3+ sessions. Need diversity.",
     "expected_impact": "+$0.50-1.00/7d",
     "category": "signal diversity",
+    "status": "boosted",
+    "risk": "medium",
+    "boosted_at": "2026-09-22T16:07:46.691121+00:00"
+  },
+  {
+    "date": "2026-09-22T16:35:00Z",
+    "idea": "Record volume_spike in _signal_metadata (decider_run.py)",
+    "rationale": "0/189 7d trades have volume_spike data. Computation exists in backtest_v4_short.py but not in live execution path. Adding it enables volume-quality filtering and improves signal metadata.",
+    "expected_impact": "+$0.42/7d (volume filter blocks low-volume false breakouts)",
+    "category": "infrastructure",
     "status": "suggested",
-    "risk": "medium"
+    "risk": "low — metadata-only, no trade impact",
+    "impact_on_winners": "N/A — metadata addition, no filters changed"
+  },
+  {
+    "date": "2026-09-22T16:35:00Z",
+    "idea": "Register neutral_sniper.py in signals_runner.py for NEUTRAL regime diversity",
+    "rationale": "NEUTRAL has only 2-3 active signal types (pump-chain+ LONG, volume-breakout-long+). neutral_sniper.py (RSI mean-reversion + CMF + ATR filter) is built but not registered in signals_runner.py. Adding it diversifies NEUTRAL entries without changing existing signals.",
+    "expected_impact": "+1-2 signal types in NEUTRAL, reduced dependency on pump-chain+",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low — new signal, no impact on existing",
+    "impact_on_winners": "N/A — new signal addition"
   }
 ]

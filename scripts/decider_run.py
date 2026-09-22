@@ -4103,6 +4103,21 @@ def run(dry_run=False):
                 skipped += 1
                 continue
 
+        # ── pump-chain+ MAX_ENTRY_GAP filter: block chasing entries ──────────
+        # 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers,2 marginal winners.
+        try:
+            from hermes_constants import PUMP_CHAIN_LONG_MAX_ENTRY_GAP
+            _pc_bare_st = sig.get('signal_type', '').rstrip('+-') if sig.get('signal_type') else ''
+            if ('pump-chain' in _pc_bare_st or 'pump_chain' in _pc_bare_st) and direction.upper() == 'LONG':
+                if _gap_at_entry is not None and _gap_at_entry > PUMP_CHAIN_LONG_MAX_ENTRY_GAP:
+                    log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG: gap={_gap_at_entry:.2f}%>{PUMP_CHAIN_LONG_MAX_ENTRY_GAP}%')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+        except ImportError:
+            pass
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             signal_type=sig.get('signal_type', ''),

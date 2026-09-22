@@ -362,5 +362,16 @@
     "after": "PUMP_CHAIN_LONG_RSI_MIN=35 blocks pump-chain+ LONG when RSI < 35",
     "rationale": "14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.",
     "impact": "+$0.34/7d estimated. Zero impact on winners (0 winners in RSI<35 bucket)."
+  },
+  {
+    "timestamp": "2026-09-22T16:35:00Z",
+    "agent": "brain_auditor",
+    "change": "Enforced PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 in decider_run.py — blocks pump-chain+ LONG entries with gap>1.5% from EMA300",
+    "type": "config",
+    "file": "scripts/decider_run.py",
+    "before": "PUMP_CHAIN_LONG_MAX_ENTRY_GAP=1.5 defined in hermes_constants.py but never enforced (dead code)",
+    "after": "Enforcement added after chase filter — blocks gap>1.5% pump-chain+ LONG entries at execution time",
+    "rationale": "14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers (-$0.66), 2 marginal winners (+$0.23). Net +$0.43/14d.",
+    "impact": "+$0.21/7d expected. Blocked winners: GOAT +$0.12 (gap 2.1%), IMX +$0.11 (gap 2.1%) — both marginal."
   }
 ]
