@@ -52,7 +52,15 @@ AUTO_EXECUTABLE_CATEGORIES = {"profit_lock"}  # Only these actions auto-execute
 
 
 def get_watchdog_mode():
-    """Determine current mode: recommend for first 48h, then autopilot."""
+    """Determine current mode: recommend for first 48h, then autopilot.
+    Env var WATCHDOG_MODE overrides (for emergency manual control).
+    """
+    # Env var override takes precedence
+    env_mode = os.environ.get("WATCHDOG_MODE")
+    if env_mode in ("recommend", "autopilot"):
+        log(f"Mode override from env: {env_mode}")
+        return env_mode, datetime.now(timezone.utc), 0
+
     now_utc = datetime.now(timezone.utc)
 
     # Check/create deploy time marker
@@ -866,15 +874,33 @@ def analyze_coin_heat(open_trades, coin_tracker):
 def collect_all():
     """Collect all data sources."""
     log("=== Data Collection ===")
+    db_ok = True
+
+    open_trades = collect_open_trades()
+    # If DB returned nothing AND we can connect, there are genuinely no open trades
+    # If DB returned nothing because connection failed, flag it
+    if not open_trades:
+        conn = get_db()
+        if conn is None:
+            db_ok = False
+        else:
+            conn.close()
+
+    recent_closed = collect_recent_closed(20)
+    signal_performance = collect_signal_performance()
+
     data = {
         "timestamp": now.isoformat(),
-        "open_trades": collect_open_trades(),
-        "recent_closed": collect_recent_closed(20),
+        "db_healthy": db_ok,
+        "open_trades": open_trades,
+        "recent_closed": recent_closed,
         "btc_regime": collect_btc_regime(),
         "coin_tracker": collect_coin_tracker(),
         "pipeline_status": collect_pipeline_status(),
-        "signal_performance": collect_signal_performance(),
+        "signal_performance": signal_performance,
     }
+    if not db_ok:
+        log("⚠ PostgreSQL unreachable — data may be incomplete", "ERROR")
     log(f"Collection complete: {len(data['open_trades'])} open, "
         f"{len(data['recent_closed'])} recent, "
         f"{len(data['signal_performance'])} signals")
@@ -931,10 +957,24 @@ def build_output(data, steers):
 
     btc = data["btc_regime"]
 
+    # DB error state: if DB is down, force health to "error"
+    if not data.get("db_healthy", True):
+        health = "error"
+        steers.insert(0, {
+            "severity": "urgent",
+            "category": "health",
+            "title": "PostgreSQL unreachable — data may be stale",
+            "detail": "Cannot read open trades or recent performance. "
+                      "Dashboard may show outdated information.",
+            "auto_executable": False,
+            "id": "steer-000"
+        })
+
     output = {
         "timestamp": now.isoformat(),
         "mode": "recommend",  # Updated in main() with actual mode
         "portfolio_health": health,
+        "db_healthy": data.get("db_healthy", True),
         "open_trades": [],
         "steers": steers,
         "regime_summary": {k: v for k, v in btc.items() if v is not None},

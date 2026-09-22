@@ -17,6 +17,8 @@
         .status-good { background: #003300; color: #00ff88; border: 1px solid #00ff88; }
         .status-warning { background: #332200; color: #ffaa00; border: 1px solid #ffaa00; }
         .status-critical { background: #330000; color: #ff4444; border: 1px solid #ff4444; }
+        .status-error { background: #330000; color: #ff0000; border: 1px solid #ff0000; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
 
@@ -171,7 +173,17 @@
         document.getElementById('mode-badge').textContent = data.mode || 'recommend';
 
         // Timestamp
-        document.getElementById('timestamp').textContent = 'Last check: ' + (timeAgo(data.timestamp) || 'unknown');
+        // Timestamp + staleness warning
+        const ts = data.timestamp;
+        const ageMinutes = ts ? (Date.now() - new Date(ts).getTime()) / 60000 : 999;
+        const timeStr = timeAgo(ts) || 'unknown';
+        let stalenessHtml = '';
+        if (ageMinutes > 45) {
+            stalenessHtml = ' <span style="color:#ff4444;font-weight:bold;font-size:11px;">⚠ STALE DATA</span>';
+        } else if (ageMinutes > 30) {
+            stalenessHtml = ' <span style="color:#ffaa00;font-size:11px;">⚠ Aging</span>';
+        }
+        document.getElementById('timestamp').innerHTML = 'Last check: ' + timeStr + stalenessHtml;
 
         // Portfolio
         const ps = data.portfolio_summary || {};

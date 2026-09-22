@@ -285,7 +285,7 @@ def get_changes() -> list:
 def get_watchdog_data() -> dict:
     """Trade watchdog data for the dashboard."""
     watchdog_path = Path("/var/www/hermes/data/watchdog.json")
-    recs_path = Path("/root/.hermes/scripts/watchdog_recommendations.json")
+    recs_path = Path("/root/.hermes/data/watchdog_recommendations.json")
 
     data = {}
     if watchdog_path.exists():

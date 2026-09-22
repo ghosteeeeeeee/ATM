@@ -12,50 +12,25 @@ You are NOT the brain auditor (that's the system-wide weekly tune). You are the 
 
 If we're losing, we're on the wrong side — not at the wrong time. No time-of-day blocks. No blanket regime kills. The oscillator, the volume, the structure tell us which side to be on.
 
-## Step 1: Collect Data
+## Step 1: Read Pre-Computed Data
 
-Run the watchdog collector:
+The Python watchdog has ALREADY run and generated data. **DO NOT re-run it.** Just read the outputs:
+
 ```bash
-cd /root/.hermes && python3 scripts/trade_watchdog.py --collect
+cat /var/www/hermes/data/watchdog.json
 ```
 
-Read the raw data:
-```bash
-cat /root/.hermes/data/watchdog_raw.json
-```
+This contains: open trades, automated steers, regime summary, signal performance, pipeline status.
 
-## Step 2: Read Current Market Context
+## Step 2: Read Additional Market Context
 
-Check the regime files:
 ```bash
 cat /var/www/hermes/data/continuum_data.json
 cat /var/www/hermes/data/regime_15m.json
-```
-
-Check what signals are doing right now:
-```bash
 cat /var/www/hermes/data/signals.json
 ```
 
-Check volatility gate:
-```bash
-cat /root/.hermes/data/volatility_gate_v2.json
-```
-
-## Step 3: Run Analysis
-
-Run the full watchdog analysis:
-```bash
-cd /root/.hermes && python3 scripts/trade_watchdog.py
-```
-
-Read the output:
-```bash
-cat /var/www/hermes/data/watchdog.json
-cat /root/.hermes/data/watchdog_recommendations.json
-```
-
-## Step 4: Deep Analysis (Your Value-Add)
+## Step 3: Deep Analysis (YOUR VALUE-ADD)
 
 The automated checks catch the obvious stuff. YOUR job is the deeper analysis:
 
@@ -77,16 +52,36 @@ The automated checks catch the obvious stuff. YOUR job is the deeper analysis:
 3. **Is a specific signal consistently losing?**
 4. **Are we entering at bad RSI levels?** (e.g., shorting oversold, longing overbought)
 
-## Step 5: Query Session Brain for Context
+## Step 4: Query Session Brain for Context
 
 Search for similar past situations:
 ```bash
 curl -s "http://127.0.0.1:54322/api/brain/search?q=$(python3 -c 'import urllib.parse; print(urllib.parse.quote("trade loss pattern signal quality"))')&limit=3"
 ```
 
-## Step 6: Produce Steers
+## Step 5: Write YOUR Analysis
 
-Write your analysis to the watchdog output. For each steer:
+**IMPORTANT: Do NOT overwrite the existing watchdog_recommendations.json.**
+Instead, use Python to MERGE your analysis into the file:
+
+```python
+import json
+
+path = "/root/.hermes/data/watchdog_recommendations.json"
+with open(path) as f:
+    data = json.load(f)
+
+# Add your analysis (do NOT touch 'steers' — those are from the automated engine)
+data["deep_analysis"] = """Your narrative analysis here"""
+data["regime_context"] = """Current regime and what it means for our trades"""
+data["pattern_alerts"] = """Any patterns you've detected in recent losses"""
+data["agent_timestamp"] = "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+
+print("Analysis merged into watchdog_recommendations.json")
+```
 
 ### Severity Levels:
 - **urgent** 🔴 — Act now or we lose money (e.g., regime misalignment, thesis broken)
@@ -113,43 +108,7 @@ Write your analysis to the watchdog output. For each steer:
 3. Obvious — "price went down" ← not helpful
 4. Unactionable — "hope for the best" ← useless
 
-## Step 7: Update Recommendations File
-
-Write your steers to the watchdog recommendations:
-```bash
-cat > /root/.hermes/data/watchdog_recommendations.json << 'EOF'
-{
-  "timestamp": "2026-XX-XXTXX:XX:XXZ",
-  "steers": [...],
-  "portfolio_health": "good|warning|critical",
-  "deep_analysis": "Your narrative analysis here",
-  "regime_context": "Current regime and what it means for our trades",
-  "pattern_alerts": "Any patterns you've detected in recent losses"
-}
-EOF
-```
-
-## BANNED Changes
-
-These are NEVER appropriate for the Trade Watchdog:
-- ❌ Time-of-day filtering (TIME_BLOCK, BAD_TRADE_HOURS)
-- ❌ Blanket signal disabling (only regime-specific if needed)
-- ❌ Changing signal parameters (that's the brain auditor's job)
-- ❌ Opening new positions (that's the human's job)
-
-## ENFORCED Rules
-
-These MUST be checked every run:
-- ✅ Every open trade must have a regime alignment check
-- ✅ Every trade up 2%+ must have a breakeven stop recommendation
-- ✅ Every trade up 5%+ must have a trailing stop recommendation
-- ✅ Every trade open 8+ hours must be flagged
-- ✅ Portfolio directional exposure must be assessed
-- ✅ Recent loss patterns must be analyzed
-
-## Output Format
-
-After analysis, print a summary:
+## Step 6: Print Summary
 
 ```
 ═══════════════════════════════════════════════════
@@ -173,6 +132,25 @@ Regime: [bull/bear/chop] | Volatility: [low/normal/high]
 2. [Specific actionable recommendation]
 ═══════════════════════════════════════════════════
 ```
+
+## BANNED Changes
+
+These are NEVER appropriate for the Trade Watchdog:
+- ❌ Time-of-day filtering (TIME_BLOCK, BAD_TRADE_HOURS)
+- ❌ Blanket signal disabling (only regime-specific if needed)
+- ❌ Changing signal parameters (that's the brain auditor's job)
+- ❌ Opening new positions (that's the human's job)
+- ❌ Re-running trade_watchdog.py (it already ran before you)
+
+## ENFORCED Rules
+
+These MUST be checked every run:
+- ✅ Every open trade must have a regime alignment check
+- ✅ Every trade up 2%+ must have a breakeven stop recommendation
+- ✅ Every trade up 5%+ must have a trailing stop recommendation
+- ✅ Every trade open 8+ hours must be flagged
+- ✅ Portfolio directional exposure must be assessed
+- ✅ Recent loss patterns must be analyzed
 
 ## Remember
 
