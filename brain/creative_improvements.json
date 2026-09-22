@@ -1651,5 +1651,23 @@
     "category": "regime optimization",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-22T23:15:00Z",
+    "idea": "RSI band SWEET SPOT filter for SHORT entries — boost confidence when RSI 50-60 instead of hard floor",
+    "rationale": "30d data: SHORT RSI 50-60 = 9T 77.8%WR +$0.93 (sweet spot). RSI<35 = 217T 56.2%WR. Edge is in the 50-60 band, not in blocking low RSI. Add SHORT_RSI_SWEET_MIN=45, SHORT_RSI_SWEET_MAX=60 to boost confidence on high-quality entries.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-22T23:15:00Z",
+    "idea": "Verify chase filter covers pump-chain+ signal type",
+    "rationale": "FOGO gap=2.01% LONG lost -$0.30. Chase filter CHASE_GAP_MAX_PCT=1.0 should block gap>1%. Need to verify pump-chain+ is included in chase filter logic.",
+    "expected_impact": "+$0.15-0.30/7d if filter missing",
+    "category": "loss prevention",
+    "status": "needs investigation",
+    "risk": "low"
   }
 ]
