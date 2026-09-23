@@ -1,34 +1,34 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~20:30 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-23 ~22:00 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 30T, 40% WR, -$1.16. EXTREME vol. Pipeline running. 3 open SHORT pump-chain- positions.
+24h: 33T, 42.4% WR, -$0.80. NEUTRAL vol. Pipeline running. 0 open positions.
 
-- **24h (rolling):** 30T, 40% WR, -$1.16. LONG 16T. SHORT 14T. 9/16 losers WOULD BE BLOCKED by current filters — system catching bad entries. 7/16 normal variance.
-- **7d:** 200T, 43.5% WR, -$1.58 (DB-verified). avg winner $0.154 vs avg loser $0.148 (R:R=1.04:1). profit-monster-trail 80T 75%WR +$4.87 (dominant exit).
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, EXTREME R:R=1.52). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
-- **SHORT:** pullback-entry- 34T 29.4%WR -$3.03 (cold streak — 30d 119T 52.1%WR +$0.35). NORMAL regime bleeding -$0.67/14d. HIGH/EXTREME profitable. **SHORT_RSI_FLOOR=25** (CEO lowered 40→25 ~18:00 UTC). **DEAD HOURS BUG FIXED** — enforcement working.
+- **24h (rolling):** 33T, 42.4% WR, -$0.80. Improving from -$2.21 on Sep 22. Dead hours fix + RSI floors reducing losses.
+- **7d:** 201T, 44.3% WR, -$0.73 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (bleeding).
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
+- **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). Detection-time RSI floor bypass BUG FIXED — 6/8 recent trades had detection RSI<50 but executed anyway.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. Was [0,1,2,3,4,5,21,23] which blocked profitable hours (0=+$0.72, 23=+$0.69). **VERIFIED WORKING** — 0 trades after 09:30 UTC. Expected +$1.91/7d.
-- **PULLBACK_ENTRY_SHORT_DEAD_HOURS:** [0,1,3,4,6,8,10,11,13,20] — CEO expanded Sep 23. Was [3,4,6,8,13,20]. Added 0,1,10,11 (25T -$2.33/14d). Expected +$2.57/7d.
-- **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22 CEO — 48h test expired 36.4%WR), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. **VERIFIED WORKING** — 0 trades in blocked hours since fix.
+- **PULLBACK_ENTRY_SHORT_DEAD_HOURS:** [0,1,3,4,6,8,10,11,13,20] — CEO expanded Sep 23.
+- **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=50:** brain_auditor raised 25→50 ~21:00 UTC Sep 23. 14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding band). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot). Blocks 39 losers, loses 0 winners. Net +$2.70/14d.
+- **SHORT_RSI_FLOOR=50:** Blocks RSI<50 SHORT entries. **DETECTION-TIME FIX DEPLOYED** — now checks BOTH live and detection-time RSI. Expected +$0.50-1.00/7d.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
-- **LONG_RSI_FLOOR=30:** brain_auditor added (Sep 23). 14d: RSI<30 LONG = 12T 8.3%WR -$1.45. 7d: 0/3 winners. Blocks falling knife entries. Net +$0.66/7d.
+- **LONG_RSI_FLOOR=30:** Blocks RSI<30 LONG entries. **DETECTION-TIME FIX DEPLOYED** — same pattern as SHORT fix.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$1.58, 24h -$1.16)**
-7d PnL -$1.58 (fragile). pump-chain+ LONG +$1.23 (55T 41%WR). volume-breakout-long+ +$1.46 (18T 67%WR). Dead hours fix VERIFIED: 0 trades in blocked hours. Non-dead-hours pump-chain+ = 30T 60%WR +$3.48/7d. cut-loser-CL-T1 = 16T 0%WR -$1.51 (pure loss machine — needs investigation).
+**🟡 R:R STATUS (7d -$0.73)**
+7d PnL -$0.73 (fragile but improving). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — detection-time RSI fix should help). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (pure loss machine).
 
-**🟢 REGIME EDGE (7d):** EXTREME 77T 48.1%WR +$1.39★ (best). NORMAL 35T 28.6%WR -$1.55 (worst). Gap $2.94/7d.
+**🟢 REGIME EDGE (7d):** NEUTRAL only (201T). EXTREME edge not visible in 7d (all NEUTRAL).
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -44,6 +44,7 @@
 
 ## Today's Changes (Sep 23)
 
+1. **CEO ~22:00 UTC — 1 CODE FIX.** DB-verified: 33T 42.4%WR -$0.80 (24h) | 201T 44.3%WR -$0.73 (7d). **DETECTION-TIME RSI FLOOR BUG FIXED.** SHORT_RSI_FLOOR and LONG_RSI_FLOOR checks in decider_run.py only used detection-time RSI as fallback when live RSI was None. But 6/8 recent pullback-entry- SHORT losers had detection-time RSI<50 yet executed because live RSI was available and above floor. Fix: now blocks if EITHER live OR detection-time RSI < floor. Expected +$0.50-1.00/7d from blocking ~20 trades/7d at 36.4% WR. **ROOT CAUSE:** pullback-entry- SHORT -$2.25/7d largely caused by this bug. **CUT-LOSER-CL-T1:** 23T/14d 0%WR -$2.70. Every trade exits via CL-T1 and loses. Needs investigation.
 1. **brain_auditor ~21:00 UTC — 1 CONFIG CHANGE.** DB-verified: 16T 37.5%WR -$0.62 (24h) | 200T 43.5%WR -$1.58 (7d). **SHORT_RSI_FLOOR 25→50.** 14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding band). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot). 0 winners in 35-50 band in 7d. Would block 39 losers, lose 0 winners. Net +$2.70/14d = +$1.35/7d. **LOSING AUTOPSY (16):** 5 accel-300-breakout SHORT (normal EXTREME whipsaw), 2 mover+ LONG (ACE -$0.28, ADA -$0.22 both atr_sl_hit), 1 SEI SHORT -$0.30 (atr_sl_hit), 2 bb-bounce-v2-long+ LONG (normal variance), 4 cut-loser-CL-T1 (0% WR exit mechanism). **cut-loser-CL-T1 INVESTIGATION:** 16T/7d 0%WR -$1.51. Hold times 8-35min. Every trade exits via CL-T1 and loses. Threshold too tight. **CREATIVE:** (1) RAISE SHORT_RSI_FLOOR 25→50 — DONE. (2) Investigate CL-T1 threshold. (3) Regime-adaptive ATR_SL for EXTREME.
 1. **brain_auditor ~12:00 UTC — NO CONFIG CHANGE.** DB-verified: 23T 34.8%WR -$1.74 (24h) | 192T 44.3%WR -$0.93 (7d). **LOSING AUTOPSY (14):** 5/14 pullback-entry- SHORT now blocked by SHORT_RSI_FLOOR=50 (saved $1.25). WCT RSI=98.86 now blocked by LONG_RSI_CEILING=80. ACE/ADA gap>1.9% still bypassing chase filter (NULL gap_at_entry). **EXIT ANALYSIS:** atr_sl_hit 128T 43.8%WR -$1.59 (dominates). profit-monster-trail 36T 63.9%WR +$1.67 (best). **EXTREME REGIME EDGE:** 48.7%WR +$1.49 vs NORMAL 29.4%WR -$1.52. **CREATIVE:** (1) Regime-adaptive ATR_SL (+$0.10-0.30/7d). (2) REGIME_CONF_MULTIPLIER (+$0.50-1.00/7d). (3) LONG detection-time RSI fallback (+$0.30-0.60/7d). **NO ACTION** — monitoring. 3 code fixes pending: volume_spike, gap_at_entry EMA, LONG RSI revalidation.
 1. **CEO ~09:50 UTC — NO CONFIG CHANGE.** DB-verified: 22T 36.4%WR -$1.57 (24h) | 193T 44.6%WR -$0.63 (7d). **MONITORING MODE** — dead hours fix + SHORT_RSI_FLOOR=50 + LONG_RSI_FLOOR=30 deployed today, too early to measure impact. **24h LOSING AUTOPSY (14):** 8/14 atr_sl_hit (pullback-entry- SHORT 6T). All pre-fix trades. **pullback-entry- SHORT cold streak:** 7d 38T 34.2%WR -$2.30 but 30d 119T 52.1%WR +$0.35 — systemic, not just cold. SHORT_RSI_FLOOR=50 should help. **SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. **volume_spike 100% NULL 5+ days** — chase filter blind to volume quality. **NO ACTION** — monitoring today's fixes impact.
@@ -122,12 +123,10 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: All Sep 23 fixes.** Dead hours + SHORT_RSI_FLOOR=25 + LONG_RSI_FLOOR=30 + gap_at_entry EMA fallback + SHORT_RSI_FLOOR extended to all signals + LONG RSI revalidation. Verify on next runs. Expected combined +$4.63/7d. — 2026-09-23
+1. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor, even if live RSI recovered. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
 2. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 23). — 2026-09-23
-3. **FIX (code): Record volume_spike in _signal_metadata** — 199/199 7d trades have NULL. BTC-level metric, not per-token. Chase filter uses gap/z-score so low priority. Consider: (a) compute per-token volume spike, (b) skip since chase filter covers it. — 2026-09-23
-4. **MONITOR: pullback-entry- SHORT.** 7d 34T 29%WR -$3.03 but 30d 119T 52.1%WR +$0.35. SHORT_RSI_FLOOR=40 (lowered from 50 ~18:00 UTC). Monitor 40-50 RSI band specifically — if negative, raise back to 50. — 2026-09-23
+3. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
+4. **INVESTIGATE: cut-loser-CL-T1.** 23T/14d 0%WR -$2.70. Pure loss machine across multiple signals. Threshold too tight or fires too early. — 2026-09-23
 5. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-6. **INFRA: signal_compactor pipeline timeout.** 1 kill in last 24h at 60s. DB lock contention during concurrent pipeline steps. Self-recovers but wastes 60s per failure. — 2026-09-23
+6. **INFRA: signal_compactor pipeline timeout.** 1 kill in last 24h at 60s. DB lock contention during concurrent pipeline steps. — 2026-09-23
 7. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
-8. **R:R IMBALANCE.** 7d avg winner $0.156 vs avg loser $0.133 (1.17:1). profit-monster-trail only profitable exit. Consider regime-adaptive ATR_SL for EXTREME. — 2026-09-23
-9. **INVESTIGATE: cut-loser-CL-T1.** 23T/14d 0%WR -$2.70. Pure loss machine across multiple signals. Threshold too tight or fires too early. — 2026-09-23
