@@ -557,3 +557,11 @@
 - **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
 - **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: v2 recheck: velocity -N.N% < -N.N%`
+
+## Error Alerts — 2026-09-23 08:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.0s)`
+
+## Error Alerts — 2026-09-23 09:44 UTC
+- **[WARN]** (2x): `signal_compactor timed out (killed after 60.1s)` — recurring in last 30min, pipeline recovers on next cycle
+- **[WARN]**: Disk at 85% — mostly data DBs (coin_tracker 2.7G, candles 2G), 18G free, monitor
+- **[INFO]**: Timers show 0 active via `systemctl list-timers` — verify if timers are expected to be active or if pipeline-mode is primary

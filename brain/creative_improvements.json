@@ -1687,5 +1687,23 @@
     "category": "data quality",
     "status": "recommended",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-23T09:30:00Z",
+    "idea": "Prefer detection-time RSI over live RSI for LONG entry filters",
+    "rationale": "NULL RSI trades (detection-time fallback) have 65.4% WR vs HAS_RSI 48.4%WR. Detection-time RSI captures signal quality at moment of opportunity identification. Extending SHORT fallback pattern to LONG filters would catch extreme overbought entries.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-23T09:30:00Z",
+    "idea": "Regime-adaptive ATR_SL for EXTREME volatility",
+    "rationale": "EXTREME regime 50%WR +$1.88/7d but 8/13 24h losers are atr_sl_hit. Wider SL in EXTREME lets winning trades breathe. EXTREME trades have larger moves on average.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

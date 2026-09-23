@@ -4934,3 +4934,30 @@ Final set: ['ALGO', 'ME']
 - pnl_pct data quality severely miscalculated (cosmetic, pnl_usdt correct)
 
 **BY:** auto_1hr
+
+## [2026-09-23 09:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L, -$0.28) | **Open:** 1 (USUAL SHORT accel-300,rs-r93)
+**24h:** 22T 8W (36.4%WR) -$1.57 | **7d:** 192T 86W (44.8%WR) -$0.54
+
+**Close Reasons (24h):**
+- atr_sl_hit: 12T 4W -$1.52 (54.5% of closes, down from 71% yesterday)
+- profit-monster-trail: 6T +$0.08 (only profitable exit)
+- cut-loser-CL-T1: 3T 0W -$0.29
+- UNIVERSAL_MAX_HOLD: 1T +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR)
+- pullback-entry- 5T 0W — already killed, legacy trades in window
+- atr_sl_hit 54.5% — tpsl_utils.py fix deployed (Aug 26), trending right (71%→54.5%)
+- mover+ 3T 1W — has 1 win, no kill trigger
+- Trade frequency normal (2/hr)
+- System quiet, 1 open position running
+
+**Open Questions:**
+- 0W 4L in last 4 hours — small losing streak but low volume
+- pnl_pct data quality still miscalculated (cosmetic, pnl_usdt correct)
+
+**BY:** auto_1hr
