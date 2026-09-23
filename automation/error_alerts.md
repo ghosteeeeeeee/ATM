@@ -586,3 +586,11 @@
 - **[WARN]** (1x): `signal_compactor timeout at 13:41:02 (60.1s)` — recovered on next cycle
 - **[WARN]** (1x): `Disk at 84%` — approaching 85% threshold, compressed old logs
 - **AUTO-FIX**: Compressed 11 log files >7 days old
+
+## Error Alerts — 2026-09-23 14:45 UTC
+- **[WARN]** (6x): `signal_compactor: timed out (killed after 60.0s)` — 6 occurrences in 30min (14:17, 14:25, 14:33, 14:42, etc). Intermittent DB lock contention. Self-heals on next cycle (typical recovery 0.6-3.2s).
+- **[WARN]**: Disk at 85% (94G/118G) — at WARN threshold. Top consumers: coin_tracker.db 2.7G, candles.db 2.1G, signals_hermes.db 815M. No compressible logs.
+- **[WARN]**: 0 tokens in hotset — all 6 candidate signals blocked by confluence gate (need 2+ unique source types). BTC SHORT passed confluence but blocked by RSI floor (RSI 26.5 < 40).
+- **[INFO]**: 17 trades closed today, -0.43% PnL, 47.1% winrate — below target but not critical.
+- **[INFO]**: Regime SHORT_BIAS (53 short, 0 long, 67 neutral across 120 tokens).
+- **NO AUTO-FIX NEEDED**: signal_compactor self-heals, disk stable, pipeline running normally.

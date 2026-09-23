@@ -3012,10 +3012,27 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
+            # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
             from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
-                _conn_sf = None
+                # Skip spike filter in downtrends — green candles are normal pullbacks
+                _skip_spike = False
                 try:
+                    import os as _sf_os
+                    _cont_sf = sqlite3.connect(_sf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    _cont_row_sf = _cont_sf.execute(
+                        "SELECT linreg_direction FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                    ).fetchone()
+                    _cont_sf.close()
+                    if _cont_row_sf and _cont_row_sf[0] in ('BEAR', 'LEAN_BEAR'):
+                        _skip_spike = True
+                except Exception:
+                    pass
+                _conn_sf = None
+                if _skip_spike:
+                    log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (downtrend, green candles are pullbacks)")
+                else:
+                    try:
                     _skip = False
                     _conn_sf = sqlite3.connect(CANDLES_DB, timeout=5)
                     _cur_sf = _conn_sf.cursor()
