@@ -1871,6 +1871,19 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         except Exception:
             pass
 
+        # ── Get confidence for R:R-based k override (2026-09-23) ────────────────
+        _trade_confidence = 70  # default
+        try:
+            _conf_conn = psycopg2.connect(**BRAIN_DB_DICT)
+            _conf_cur = _conf_conn.cursor()
+            _conf_cur.execute("SELECT confidence FROM trades WHERE token=%s AND status='open' ORDER BY open_time DESC LIMIT 1", (token,))
+            _conf_row = _conf_cur.fetchone()
+            if _conf_row and _conf_row[0]:
+                _trade_confidence = float(_conf_row[0])
+            _conf_conn.close()
+        except Exception:
+            pass
+
         # ── Lifecycle role for SL/TP adjustment ─────────────────────────────
         _lifecycle_role = 'concurrent'
         try:
@@ -1899,7 +1912,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             sl_multiplier=sl_mult,
             trailing_distance=pos.get('trailing_distance'),
             lifecycle_role=_lifecycle_role,
-            confidence=pos.get('confidence', 70),  # R:R-based k override (2026-09-23)
+            confidence=_trade_confidence,  # R:R-based k override (2026-09-23)
         )
 
         new_sl = result['new_sl']
