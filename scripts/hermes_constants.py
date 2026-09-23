@@ -1214,7 +1214,7 @@ PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-09-22 — 14d: RSI 76
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
 
 # pullback-entry- SHORT dead hours — 14d data: hours 4,8,13,20 = -$2.81/14d (25T). Hour 04: 6T 16.7%WR -$0.84, 08: 4T 25%WR -$0.51, 13: 4T 25%WR -$0.44, 20: 11T 18.2%WR -$1.02. CEO 2026-09-23: fixed from [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72).
-PULLBACK_ENTRY_SHORT_DEAD_HOURS = [3, 4, 6, 8, 13, 20]  # 14d: all >2T and clearly negative. Hour 3: 3T -$0.28, hour 6: 3T -$0.25. Expected +$2.81/14d = +$1.40/7d.
+PULLBACK_ENTRY_SHORT_DEAD_HOURS = [0, 1, 3, 4, 6, 8, 10, 11, 13, 20]  # 14d: all >2T and negative. Added 0,1,10,11 (25T -$2.33/14d). Expected +$5.14/14d = +$2.57/7d.
 PULLBACK_ENTRY_SHORT_NORMAL_BLOCK = True  # brain_auditor 2026-09-22 — 14d NORMAL: 8T 12.5%WR -$1.13 (worst regime). EXTREME: 53.8%WR -$0.15. Signal only works in volatile markets.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
