@@ -1,3 +1,34 @@
+## [2026-09-23 15:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (1 in 3h: NXPC bb-bounce-v2-long+ -$0.03 trail) | **Open:** 0
+**24h:** 21T 38.1%WR -$1.10 | **7d:** 192T 43.8%WR -$1.30 | **14d:** 457T 50.8%WR +$1.08
+
+**24h exit reasons:**
+- atr_sl_hit: 9T 42.9% avg -$0.107 (down from 70.8% on 09-22 — CEO fix working)
+- profit-monster-trail: 7T avg +$0.010
+- cut-loser-CL-T1: 4T avg -$0.093
+- UNIVERSAL_MAX_HOLD: 1T +$0.160
+
+**24h signal ranking:**
+- pullback-entry-: 3T 0%WR -$0.59 (SHORT only, 14d: 117T 51.3% +$0.30)
+- mover+: 3T 33%WR -$0.34 (14d: 18T 66.7% -$0.24 — borderline)
+- bb-bounce-v2-long+: 9T 44.4%WR -$0.10 (profitable signals: continuum-osc+, rs-s39, volume-breakout-long+)
+
+**Changes:**
+1. Added pullback-entry- SHORT dead hours [0, 1, 10, 11] — 25T -$2.33/14d, all clearly negative
+
+**No Change Needed:**
+- atr_sl_hit 42.9% (below 40% kill threshold, improved from 70.8%)
+- No overtrading (21T/24h ≈ 0.9T/hr)
+- No stale trades (0 open)
+- pump-chain+ already has comprehensive dead hours
+
+**Open Questions:**
+- 7d still -$1.30 despite 14d +$1.08 — need dead hours to compound
+- mover+ 14d: 18T -$0.24 — borderline, not enough data to kill
+
+**BY:** auto_1hr
+
 ## [2026-09-23 03:55 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (CFX mover+ LONG +$0.16 UNIVERSAL_MAX_HOLD) | **Open:** 3 (BTC continuum-osc+ 202min, YGG volume-breakout-long+ 67min, ADA mover+ 16min — all flat)

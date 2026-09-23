@@ -168,6 +168,7 @@ REGIME_SIGNALS = {
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
+        'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
     },
 }
 

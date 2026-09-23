@@ -598,3 +598,7 @@
 ## Error Alerts — 2026-09-23 14:57 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor, position_manager`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.1s (rc=N)`
+
+## Error Alerts — 2026-09-23 15:44 UTC
+- **WARN** (1x): `signal_compactor` timed out (killed after 60.1s) — pipeline auto-recovered on next cycle
+- **WARN**: Disk at 85% (94G/118G) — consider log compression or cleanup
