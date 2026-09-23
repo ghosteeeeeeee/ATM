@@ -1028,6 +1028,28 @@ def rule_based_context_gate(token, direction, source, sig):
         if _live_rsi is not None and _live_rsi > SHORT_RSI_CEILING:
             return ('AMBIGUOUS', f'SHORT RSI ceiling: LIVE RSI {_live_rsi:.1f} > {SHORT_RSI_CEILING} (overbought — bounce risk)', 20)
 
+    # 1b-ext3. Execution-time LONG RSI ceiling + floor — mirrors SHORT pattern
+    # brain_auditor: LONG_RSI_CEILING/FLOOR only checked at detection time (signal_compactor.py).
+    # RSI can drift between detection and execution — WCT entered at RSI=98.86, lost -$0.15.
+    if direction == 'LONG':
+        from hermes_constants import LONG_RSI_CEILING, LONG_RSI_FLOOR
+        _live_rsi_long = _ctx_gate_get_rsi(token)
+        _detect_rsi_long = None
+        if _live_rsi_long is None and isinstance(sig, dict) and sig.get('signal_metadata'):
+            try:
+                _meta = json.loads(sig['signal_metadata']) if isinstance(sig['signal_metadata'], str) else sig['signal_metadata']
+                _detect_rsi_long = _meta.get('rsi_14')
+            except Exception:
+                pass
+        _effective_rsi_long = _live_rsi_long if _live_rsi_long is not None else _detect_rsi_long
+        if _effective_rsi_long is not None:
+            if LONG_RSI_CEILING > 0 and _effective_rsi_long > LONG_RSI_CEILING:
+                _src = 'LIVE' if _live_rsi_long is not None else 'DETECT'
+                return ('AMBIGUOUS', f'LONG RSI ceiling: {_src} RSI {_effective_rsi_long:.1f} > {LONG_RSI_CEILING} (overbought — pullback risk)', 20)
+            if LONG_RSI_FLOOR > 0 and _effective_rsi_long < LONG_RSI_FLOOR:
+                _src = 'LIVE' if _live_rsi_long is not None else 'DETECT'
+                return ('AMBIGUOUS', f'LONG RSI floor: {_src} RSI {_effective_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 20)
+
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
     # Aligned: LONG z>0 + accel>0 (76.4%), SHORT z<0 + accel<0 (63.3%)

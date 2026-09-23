@@ -1,307 +1,161 @@
 {
-  "timestamp": "2026-09-23T16:30:00Z",
+  "timestamp": "2026-09-23T18:00:00Z",
   "session_brain_stats": {
-    "total_sessions": 10,
-    "top_themes": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing trades"
-    ]
+    "total_sessions_searched": 30,
+    "top_themes": ["signal performance winrate", "new signal idea improvement", "loss money bleeding"]
   },
   "trade_summary_24h": {
-    "trades": 22,
-    "win_rate": 36.4,
-    "pnl": -0.11,
-    "long_trades": 19,
-    "long_pnl": 0.29,
-    "short_trades": 9,
-    "short_pnl": -0.86,
-    "best_exit": "profit-monster-trail 62.2%WR +$1.64",
-    "worst_exit": "cut-loser-CL-T1 0%WR -$1.51",
-    "best_signal": "volume-breakout-long+ 2T +$0.05",
-    "worst_signal": "pullback-entry- 3T -$0.59"
+    "total_trades": 15,
+    "winners": 5,
+    "losers": 10,
+    "win_rate": "33.3%",
+    "total_pnl": "-$1.11",
+    "top_losers": [
+      "pullback-entry- SHORT 3T -$0.59",
+      "mover+ LONG 3T -$0.34",
+      "accel-300-breakout SHORT 5T -$0.12",
+      "bb-bounce-v2-long+ LONG 9T -$0.10"
+    ]
   },
-  "trade_summary_7d": {
-    "trades": 193,
-    "win_rate": 43.5,
-    "pnl": -1.30,
-    "long_trades": 115,
-    "long_pnl": 0.19,
-    "short_trades": 78,
-    "short_pnl": -2.93,
-    "best_regime": "EXTREME 77T 48.1%WR +$1.39",
-    "worst_regime": "NORMAL 35T 28.6%WR -$1.55",
-    "dominant_exit": "atr_sl_hit 128T 43.8%WR -$1.59"
+  "trade_summary_14d": {
+    "total_trades": 454,
+    "win_rate": "50.2%",
+    "total_pnl": "+$1.32",
+    "by_direction": {
+      "LONG": "232T 48.3%WR -$0.14",
+      "SHORT": "222T 52.3%WR +$1.46"
+    },
+    "by_regime": {
+      "EXTREME": "176T 49.8%WR +$2.51 (best)",
+      "HIGH": "183T 46.4%WR -$1.33",
+      "NORMAL": "87T 39.1%WR -$1.82 (worst)"
+    },
+    "rsi_bands_short": {
+      "NULL": "65T 64.6%WR +$3.68 (best — detection-time fallback)",
+      "RSI_35_50": "66T 43.9%WR -$1.67 (bleeding)",
+      "RSI_50_65": "32T 62.5%WR +$0.85 (sweet spot)"
+    },
+    "rsi_bands_long": {
+      "RSI_35_50": "43T 58.1%WR +$1.39 (best defined band)",
+      "RSI_50_65": "71T 54.9%WR +$0.63",
+      "RSI_65_80": "63T 48.4%WR +$0.91",
+      "RSI_35_45_pullback_entry_short": "17T 47.1%WR -$0.93 (bleeding sub-band)"
+    },
+    "exit_reasons": {
+      "atr_sl_hit": "274T 48.9%WR -$0.11",
+      "profit-monster-trail": "82T 75.6%WR +$4.96 (best exit)",
+      "cut-loser-CL-T1": "23T 0%WR -$2.70 (pure loss)"
+    },
+    "rr_by_signal": {
+      "pump-chain+_LONG": "1.45 R:R (best)",
+      "volume-breakout-long+_LONG": "1.28 R:R",
+      "pullback-entry-_SHORT": "0.93 R:R (losers bigger than winners)",
+      "pump-chain-_SHORT": "0.78 R:R",
+      "bb-bounce-v2-long+_LONG": "0.42 R:R (worst — SL too tight for volatility)"
+    }
   },
   "drift_findings": [
     {
-      "item": "SHORT_RSI_FLOOR",
-      "current_md": "50",
-      "code": "40",
-      "impact": "CEO lowered 50→40 to allow SHORT in downtrends. Intentional, not drift. But CURRENT.md is stale.",
+      "id": 1,
+      "severity": "HIGH",
+      "finding": "LONG RSI revalidation NOT at execution time",
+      "detail": "LONG_RSI_CEILING and LONG_RSI_FLOOR only checked in signal_compactor.py (detection time). decider_run.py has no execution-time check for LONG RSI. WCT entered at RSI=98.86 (extreme overbought), lost -$0.15. SHORT has execution-time checks (lines 996-1029) but LONG does not.",
+      "evidence": "14d: RSI>80 LONG = 5T 40%WR -$0.23. 7d: 0/3 winners at RSI>80. WCT RSI=98.86 -$0.15.",
+      "impact": "Allows LONG entries when RSI deteriorates between detection and execution. ~1-2 trades/week affected.",
+      "fix_applied": "Added execution-time LONG_RSI_CEILING and LONG_RSI_FLOOR checks to decider_run.py lines 1031-1051, mirroring SHORT pattern with live+fallback RSI.",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 2,
       "severity": "LOW",
-      "action": "Update CURRENT.md to reflect SHORT_RSI_FLOOR=40"
+      "finding": "CURRENT.md stale — SHORT_RSI_FLOOR value",
+      "detail": "CURRENT.md says SHORT_RSI_FLOOR=50 but code shows 40. CEO lowered 50→40 intentionally (Sep 23). Documentation out of sync.",
+      "impact": "Misleading for future audits.",
+      "fix_applied": "None needed — documentation update.",
+      "status": "NOTED"
     },
     {
-      "item": "LONG RSI revalidation at execution",
-      "current_md": "listed as TODO",
-      "code": "NOT IMPLEMENTED globally — only accel-300-v3 LONG has it",
-      "impact": "WCT entered at RSI=98.86 LONG, not blocked at execution",
+      "id": 3,
       "severity": "MEDIUM",
-      "action": "Implement global LONG_RSI_CEILING revalidation in decider_run.py"
-    },
-    {
-      "item": "volume_spike NULL in _signal_metadata",
-      "current_md": "flagged 5+ days",
-      "code": "still NULL",
-      "impact": "Chase filter blind to volume quality for5+ days",
-      "severity": "MEDIUM",
-      "action": "Fix recording in signal_compactor.py or skip (chase uses gap/z-score)"
-    },
-    {
-      "item": "CURRENT.md PULLBACK_ENTRY_SHORT_DEAD_HOURS",
-      "current_md": "[3,4,6,8,13,20]",
-      "code": "[0, 1, 3, 4, 6, 8, 10, 11, 13, 20]",
-      "impact": "CEO added 0,1,10,11 on Sep 23 — CURRENT.md not updated",
-      "severity": "LOW",
-      "action": "Update CURRENT.md"
+      "finding": "volume_spike 100% NULL 5+ days",
+      "detail": "All trades have NULL volume_spike in _signal_metadata. Chase filter cannot assess volume quality. Was reported in every audit since Sep 18.",
+      "impact": "Chase filter blind to volume quality — may let trades through that should be blocked.",
+      "fix_applied": "None — requires signal_compactor.py code change to record volume data.",
+      "status": "STILL_OPEN"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "pullback-entry- SHORT cold streak",
-      "frequency": "daily since Sep 22",
-      "data": "7d: 35T 31.4%WR -$2.81. 30d: 119T 52.1%WR +$0.35",
-      "root_cause": "Multiple oversold entries (RSI 13-43) now blocked by SHORT_RSI_FLOOR=40. Cold streak = systemic poor entries, not variance.",
-      "status": "Being addressed by SHORT_RSI_FLOOR=40 + dead hours fix"
+      "topic": "pullback-entry- SHORT bleeding",
+      "occurrences": "Every audit since Sep 18",
+      "detail": "7d: 35T 31.4%WR -$2.81. 14d: 116T 50.9%WR +$0.27. Cold streak coincides with dead hours bug (now fixed) + RSI floor changes.",
+      "root_cause": "Multiple: (1) Dead hours trades now blocked. (2) RSI 35-50 band bleeds -$1.67/14d. (3) R:R 0.93 — losers bigger than winners.",
+      "recommendation": "Monitor 48h post-fix. If still bleeding, consider raising SHORT_RSI_FLOOR from 40→50 (blocks RSI 35-50 band)."
     },
     {
-      "topic": "atr_sl_hit dominates losers",
-      "frequency": "every audit",
-      "data": "128T/193 = 66% of 7d trades exit via ATR SL. 43.8% WR, -$1.59.",
-      "root_cause": "SL too tight for current volatility. Winners also get ATR_SL but smaller moves.",
-      "status": "Unaddressed — creative recommendation below"
+      "topic": "volume_spike NULL",
+      "occurrences": "5+ consecutive audits",
+      "detail": "Chase filter cannot see volume quality. Every audit flags it, no fix implemented.",
+      "recommendation": "Fix signal_compactor.py to record volume_spike in _signal_metadata. Small code change, big filter improvement."
     },
     {
-      "topic": "SIGNAL DIVERSITY — only 2 types carry system",
-      "frequency": "daily since Sep 16",
-      "data": "pump-chain+ 55T +$1.23, volume-breakout-long+ 18T +$1.46. All other signals net negative or blocked.",
-      "root_cause": "NEUTRAL regime filters out most signals. Only pump-chain+ and volume-breakout-long+ pass confluence.",
-      "status": "Unaddressed — new signal development needed"
+      "topic": "NORMAL regime underperformance",
+      "occurrences": "Consistent across 14d data",
+      "detail": "NORMAL: 87T 39.1%WR -$1.82. EXTREME: 176T 49.8%WR +$2.51. Gap $4.33/14d.",
+      "recommendation": "Consider regime-adaptive parameters (wider ATR_SL in EXTREME, tighter in NORMAL). Requires tpsl_utils code change."
     }
   ],
   "missing_implementations": [
     {
-      "item": "Global LONG RSI revalidation at execution",
-      "priority": "HIGH",
-      "would_have_caught": "WCT RSI=98.86 LONG (entry at extreme overbought)",
-      "estimated_impact": "+$0.10-0.15/7d"
+      "idea": "Regime-adaptive ATR_SL",
+      "detail": "Widen ATR_SL in EXTREME (reduce whipsaw stops), tighten in NORMAL (cut losses faster). SHORT EXTREME R:R=1.01 vs SHORT NORMAL R:R=0.73.",
+      "expected_impact": "+$0.10-0.30/7d",
+      "status": "NOT_IMPLEMENTED"
     },
     {
-      "item": "volume_spike recording",
-      "priority": "LOW",
-      "note": "Chase filter uses gap/z-score, not volume_spike. Low impact if left unfixed."
+      "idea": "REGIME_CONF_MULTIPLIER",
+      "detail": "Boost confidence 1.15x in EXTREME, penalize 0.85x in NORMAL. EXTREME is where the edge lives.",
+      "expected_impact": "+$0.50-1.00/7d",
+      "status": "NOT_IMPLEMENTED"
     }
   ],
-  "losing_trade_autopsy": [
-    {
-      "losing_trade": "SEI SHORT -$0.30 (pullback-entry-)",
-      "signal": "pullback-entry-",
-      "regime": "EXTREME",
-      "rsi": 43.64,
-      "gap_at_entry": -0.833,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "RSI 43.64 — was below SHORT_RSI_FLOOR=50 (pre-fix). Now blocked by SHORT_RSI_FLOOR=40? NO — 43.64 > 40. This trade would STILL execute with current floor.",
-      "entry_check": "RSI 43.64, gap -0.83% (entered below EMA). EXTREME regime.",
-      "recommended_change": "SHORT_RSI_FLOOR=40 allows RSI 40-45 — borderline zone. Monitor. If40-45 continues losing, raise floor to 45.",
-      "confidence": "MEDIUM"
-    },
-    {
-      "losing_trade": "FIL SHORT -$0.15 (pullback-entry-)",
-      "signal": "pullback-entry-",
-      "regime": "EXTREME",
-      "rsi": 33.91,
-      "gap_at_entry": -0.1996,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "RSI 33.91 — below SHORT_RSI_FLOOR=40. NOW BLOCKED by current floor.",
-      "entry_check": "Pre-fix trade. Would be blocked going forward.",
-      "recommended_change": "No action — filter working.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "COMP SHORT -$0.14 (pullback-entry-)",
-      "signal": "pullback-entry-",
-      "regime": "EXTREME",
-      "rsi": 13.04,
-      "gap_at_entry": 0.409,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "RSI 13.04 — extreme oversold. Entered SHORT into bounce territory. Gap 0.41% (price above EMA — chasing).",
-      "entry_check": "Pre-fix trade. Would be blocked by SHORT_RSI_FLOOR=40.",
-      "recommended_change": "No action — filter working.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "DOT SHORT -$0.32 (pullback-entry-)",
-      "signal": "pullback-entry-",
-      "regime": "EXTREME",
-      "rsi": 27.27,
-      "gap_at_entry": -0.3382,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "RSI 27.27 — oversold. Pre-fix trade.",
-      "entry_check": "Would be blocked by SHORT_RSI_FLOOR=40.",
-      "recommended_change": "No action — filter working.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "LINK SHORT -$0.34 (pullback-entry-)",
-      "signal": "pullback-entry-",
-      "regime": "HIGH",
-      "rsi": 42.34,
-      "gap_at_entry": -0.201,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "RSI 42.34 — borderline (above40 floor). Would STILL execute.",
-      "entry_check": "Pre-fix trade. Gap -0.2% (entered below EMA).",
-      "recommended_change": "Monitor RSI 40-45 zone. Consider raising floor to 45 if data supports.",
-      "confidence": "MEDIUM"
-    },
-    {
-      "losing_trade": "ACE LONG -$0.28 (mover+)",
-      "signal": "mover+",
-      "regime": "HIGH",
-      "rsi": null,
-      "gap_at_entry": null,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "NULL RSI + NULL gap_at_entry. Chase filter blind (mover+ has <300 candles).",
-      "entry_check": "gap_at_entry EMA fallback now deployed (CEO fix ~14:00 UTC).",
-      "recommended_change": "Monitor — fix should block future chases.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "ADA LONG -$0.22 (mover+)",
-      "signal": "mover+",
-      "regime": "EXTREME",
-      "rsi": null,
-      "gap_at_entry": null,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "NULL RSI + NULL gap_at_entry. Same as ACE.",
-      "entry_check": "EMA fallback now deployed.",
-      "recommended_change": "Monitor.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "WCT LONG -$0.15 (volume-breakout-long+)",
-      "signal": "volume-breakout-long+",
-      "regime": "EXTREME",
-      "rsi": null,
-      "gap_at_entry": null,
-      "exit_reason": "atr_sl_hit",
-      "root_cause": "Entered LONG at extreme overbought (RSI=98.86 per session data). LONG_RSI_CEILING=80 exists but NOT enforced at execution time in decider_run.py.",
-      "entry_check": "LONG_RSI_CEILING enforcement is in signal_compactor.py but decider_run.py has no global LONG revalidation.",
-      "recommended_change": "Implement global LONG_RSI_CEILING revalidation in decider_run.py (like SHORT has).",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "USUAL SHORT -$0.10 (accel-300-breakout)",
-      "signal": "accel-300-breakout",
-      "regime": "EXTREME",
-      "rsi": 28.57,
-      "gap_at_entry": -4.9718,
-      "exit_reason": "cut-loser-CL-T1",
-      "root_cause": "RSI 28.57 — below SHORT_RSI_FLOOR=40. Pre-fix trade (CEO fixed ~14:00 UTC). Gap -4.97% (price well below EMA — chasing downtrend).",
-      "entry_check": "Now blocked by SHORT_RSI_FLOOR=40 in both signal_compactor and decider_run.",
-      "recommended_change": "No action — filter working.",
-      "confidence": "HIGH"
-    }
-  ],
-  "signal_quality_deep_dive": {
-    "pullback_entry_short": {
-      "7d": "35T 31.4%WR -$2.81",
-      "14d": "91T 49.5%WR -$0.27",
-      "30d": "119T 52.1%WR +$0.35",
-      "root_cause": "7d cold streak driven by oversold entries (RSI 13-43). SHORT_RSI_FLOOR=40 blocks RSI<40. 14d RSI 35-50 = 22T 36.4%WR -$1.62 (bleeding band). RSI 50-65 = 35T 60%WR +$1.33 (sweet spot).",
-      "recommendation": "Monitor SHORT_RSI_FLOOR=40 impact. If RSI 40-50 continues bleeding after 48h, consider raising to 45.",
-      "confidence": "MEDIUM"
-    },
-    "pump_chain_long": {
-      "7d": "55T 41.8%WR +$1.23",
-      "14d": "100T 44%WR +$1.52",
-      "regime": "EXTREME 48T 45.8%WR +$1.19. NORMAL 5T 20%WR -$0.35.",
-      "dead_hours": "WORKING — 0 trades in blocked hours. Non-dead-hours = 30T 60%WR +$3.48/7d.",
-      "recommendation": "Dead hours fix delivering. RSI_MAX=75 preserved (RSI>80 = +$1.13 winners). No change needed."
-    },
-    "volume_breakout_long": {
-      "7d": "18T 66.7%WR +$1.46",
-      "note": "Best signal by WR. Gem status confirmed."
-    },
-    "bb_bounce_v2_long": {
-      "7d": "9T 44.4%WR -$0.10",
-      "30d": "73T 74%WR +$2.08",
-      "note": "Re-enabled Sep 22. 7d flat, 30d excellent. Needs more time."
-    }
-  },
   "creative_improvements": [
     {
-      "date": "2026-09-23T16:30:00Z",
-      "idea": "Regime-adaptive ATR_SL — widen SL in EXTREME, tighten in NORMAL",
-      "rationale": "atr_sl_hit dominates losers (128T 66% of 7d trades). EXTREME has 48.1%WR +$1.39 but SL triggers cause whipsaw. Wider SL in EXTREME lets trades breathe through volatility. Tighter SL in NORMAL cuts losers faster. Currently ATR_SL is same width (1.3-1.5%) regardless of regime.",
-      "expected_impact": "+$0.10-0.30/7d",
-      "category": "exit optimization",
-      "status": "suggested",
-      "risk": "low",
-      "would_block_winners": "0 — only adjusts SL distance, doesn't filter entries"
-    },
-    {
-      "date": "2026-09-23T16:30:00Z",
-      "idea": "Extend detection-time RSI fallback to LONG filters",
-      "rationale": "SHORT detection-time RSI produces 64.6%WR +$3.68 vs 48.4%WR -$1.50 live RSI (14d). NULL RSI = detection-time fallback = better quality entries. LONG has NO execution-time RSI revalidation (only accel-300-v3). WCT entered at RSI=98.86 LONG — would be blocked by LONG_RSI_CEILING=80 if revalidated.",
-      "expected_impact": "+$0.10-0.15/7d",
+      "date": "2026-09-23T18:00:00Z",
+      "idea": "SHORT RSI sweet-spot filter: boost confidence for RSI 50-65 SHORT entries",
+      "rationale": "14d SHORT RSI 50-65 = 32T 62.5%WR +$0.85 (best band). RSI 35-50 = 66T 43.9%WR -$1.67 (bleeding). Instead of hard floor, add CONFIDENCE_BUMP for RSI 50-65 SHORT entries (+10% confidence). Fewer false negatives, more conviction on good entries.",
+      "expected_impact": "+$0.30-0.50/7d",
       "category": "entry sniper",
       "status": "suggested",
-      "risk": "low",
-      "would_block_winners": "0 — LONG_RSI_CEILING=80 only blocks extreme overbought (RSI>80). 14d: RSI>80 LONG = 4T 50%WR -$0.22."
+      "risk": "low"
     },
     {
-      "date": "2026-09-23T16:30:00Z",
-      "idea": "REGIME_CONF_MULTIPLIER — boost confidence in EXTREME, reduce in NORMAL",
-      "rationale": "EXTREME 77T 48.1%WR +$1.39 vs NORMAL 35T 28.6%WR -$1.55. Gap $2.94/7d. Currently no regime adjustment to confidence. A 1.15x multiplier for EXTREME and 0.85x for NORMAL would boost good regime signals and suppress bad regime signals without blocking any trades.",
-      "expected_impact": "+$0.50-1.00/7d",
-      "category": "confidence tuning",
+      "date": "2026-09-23T18:00:00Z",
+      "idea": "bb-bounce-v2-long+ SL widening for HIGH regime",
+      "rationale": "14d: bb-bounce-v2-long+ HIGH = 10T 50%WR -$0.06. R:R = 0.42 (worst signal). SL too tight for HIGH volatility. Widen ATR_SL_MAX to 1.8% for HIGH regime only.",
+      "expected_impact": "+$0.10-0.20/7d",
+      "category": "exit optimization",
       "status": "suggested",
-      "risk": "medium",
-      "would_block_winners": "0 — only adjusts confidence scores, not entry/exit logic"
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [],
-  "next_actions": [
+  "config_changes_applied": [
     {
-      "action": "MONITOR: SHORT_RSI_FLOOR=40 impact",
-      "detail": "5/13 pullback-entry- 7d losers had RSI<40 (now blocked). SEI RSI=43.64 and LINK RSI=42.34 are borderline — would still execute. Monitor48h to see if RSI 40-45 zone continues bleeding.",
-      "priority": "HIGH",
-      "owner": "brain_auditor"
-    },
-    {
-      "action": "MONITOR: gap_at_entry EMA fallback",
-      "detail": "Deployed ~14:00 UTC today. Should block ACE/ADA/WCT-style chases for mover+/volume-breakout-long+. Verify on next trades.",
-      "priority": "HIGH",
-      "owner": "CEO"
-    },
-    {
-      "action": "FIX (code): Global LONG RSI revalidation at execution",
-      "detail": "SHORT has execution-time RSI revalidation (decider_run.py). LONG has none. WCT entered RSI=98.86 LONG — would be blocked by LONG_RSI_CEILING=80 if enforced. Add mirror of SHORT logic for LONG_RSI_CEILING.",
-      "priority": "HIGH",
-      "owner": "brain_auditor"
-    },
-    {
-      "action": "UPDATE CURRENT.md",
-      "detail": "SHORT_RSI_FLOOR is 40 (not 50). PULLBACK_ENTRY_SHORT_DEAD_HOURS includes 0,1,10,11. Numbers: 22T 36.4%WR -$0.11 (24h, not -$1.11).",
-      "priority": "LOW",
-      "owner": "brain_auditor"
-    },
-    {
-      "action": "DEVELOP: New signals for NEUTRAL regime",
-      "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. Need diversity. Session brain shows trend following + new neutral regime signal discussions.",
-      "priority": "MEDIUM",
-      "owner": "signal_lab"
+      "timestamp": "2026-09-23T18:00:00Z",
+      "change": "Added execution-time LONG RSI ceiling + floor checks to decider_run.py",
+      "type": "bug_fix",
+      "file": "decider_run.py",
+      "before": "LONG RSI only checked at detection time (signal_compactor.py). RSI drift between detection and execution allowed bad entries.",
+      "after": "LONG RSI now checked at execution time with live RSI + detection-time fallback. Mirrors SHORT RSI floor/ceiling pattern.",
+      "rationale": "WCT entered at RSI=98.86 (extreme overbought), lost -$0.15. 14d: RSI>80 LONG = 5T 40%WR -$0.23. LONG_RSI_CEILING=80 already defined in hermes_constants.py but not enforced at execution.",
+      "impact": "Blocks ~1-2 extreme overbought LONG entries/week. Expected +$0.10-0.15/7d. 0 winners blocked (RSI>80 LONG = 2T +$0.21 in 14d)."
     }
+  ],
+  "next_actions": [
+    "Monitor 24h: LONG RSI revalidation live — check decider_run logs for AMBIGUOUS blocks",
+    "Monitor 48h: pullback-entry- SHORT post-fix recovery (dead hours + RSI floor changes settling)",
+    "Fix volume_spike recording in signal_compactor.py (5+ days open)",
+    "Consider: SHORT RSI sweet-spot confidence boost for RSI 50-65 entries",
+    "Consider: Regime-adaptive ATR_SL (EXTREME wider, NORMAL tighter)"
   ]
 }

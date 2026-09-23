@@ -5147,3 +5147,36 @@ Final set: ['ALGO', 'ME']
 - pnl_pct cosmetic miscalc persists (pnl_usdt correct)
 
 **BY:** auto_1hr
+
+## [2026-09-23 15:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, -$0.05) | **Open:** 0 (flat)
+**24h:** 23T 8W (35%WR) -$1.11
+
+**Close Reasons (24h):**
+- atr_sl_hit: 9T -$0.96 (39% — down from 71% on 9/22!)
+- profit-monster-trail: 8T +$0.12 (only profitable exit type)
+- cut-loser-CL-T1: 5T -$0.47
+- UNIVERSAL_MAX_HOLD: 1T +$0.16
+
+**Signal Performance (24h):**
+- volume-breakout-long+: 2T 50%WR +$0.05
+- accel-300-breakout: 2T 50%WR -$0.05
+- bb-bounce-v2-long+: 9T 44%WR -$0.10
+- mover+: 3T 33%WR -$0.34
+- pullback-entry-: 3T 0%WR -$0.59 (trades from Sep 22, kill already active)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL hit 31.6% today (down from 71% on 9/22) — tpsl fix working
+- No signal meets kill criteria (pullback-entry- already killed)
+- mover+ has 1 winner (CFX +$0.16) — not 0% WR
+- Trade frequency 0.5/hr normal
+- System flat, quiet period
+
+**Open Questions:**
+- cut-loser-CL-T1: 5T 0W -$0.47 — different signals, chop market
+- pnl_pct cosmetic miscalc persists
+
+**BY:** auto_1hr
