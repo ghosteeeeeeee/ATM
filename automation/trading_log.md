@@ -5245,3 +5245,67 @@ Final set: ['ALGO', 'ME']
 - pnl_pct cosmetic miscalc persists
 
 **BY:** auto_1hr
+
+## [2026-09-23 19:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L, +$0.03) | **Open:** 2 (GMX SHORT +$0.13, AVAX SHORT -$0.05)
+**24h:** 30T 12W (40.0%WR) -$1.16
+
+**Exit Reasons (24h):**
+- atr_sl_hit: 13T (43% of exits) -$0.90 (still dominant loss source)
+- profit-monster-trail: 11T 5W (45.5%WR) +$0.05 (only profitable exit)
+- cut-loser-CL-T1: 5T 0W -$0.47 (cross-signal chop)
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+T, 0%WR) in last hour
+- mover+ 3T 1W — has a winner, borderline but not killable
+- pullback-entry- legacy trades only (already killed)
+- atr_sl_hit 43% — continued improvement from 71% baseline
+- Trade frequency ~0.5/hr normal
+
+**Open Questions:**
+- R:R barely positive (1.17:1) — brain_auditor flagged
+- cut-loser-CL-T1 0/5 persistent, market chop not fixable by signal kill
+- volume_spike 100% NULL 5+ days — unused signal field
+
+**BY:** auto_1hr
+
+## [2026-09-23 20:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (last close: 19:38 GMX SHORT +$0.11) | **Open:** 3 (CHIP SHORT -$0.06, FOGO SHORT +$0.27, AVAX SHORT -$0.06)
+**24h:** 31T 13W (41.9%WR) -$1.05 | **3h:** 8T 4W (50%WR) +$0.10
+
+**Exit Reasons (24h):**
+- atr_sl_hit: 13T (42%) -$0.90 (avg loss $0.069, shrinking)
+- profit-monster-trail: 11T +$0.05 (only profitable exit type)
+- cut-loser-CL-T1: 5T -$0.47 (cross-signal, ~$0.10 avg loss — SL working, just many hits)
+- pump_exit_dead_money: 1T +$0.11
+- UNIVERSAL_MAX_HOLD: 1T +$0.16
+
+**Signal Perf (24h):**
+- pump-chain-: 4T 3W (75%WR) +$0.16 ⭐
+- bb-bounce-v2-long+: 9T 4W (44%WR) -$0.10
+- accel-300-breakout: 6T 2W (33%WR) -$0.11
+- mover+: 3T 1W (33%WR) -$0.34
+- pullback-entry-: legacy trades only (killed)
+
+**R:R:** 0.60:1 but improving — 6h block trend: $0.157 loss → $0.098 → $0.033 loss (shrinking). Win avg $0.062.
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+T, 0%WR) — pullback-entry- already killed, mover+ has 1 winner
+- atr_sl_hit 42% — down from 71% baseline, continued improvement
+- R:R trending better (0.41:1 → 0.82:1 over 24h)
+- Last 3h profitable (+$0.10)
+- Trade frequency ~1.2/hr normal
+
+**Open Questions:**
+- R:R still below 1:1 (0.60:1) — needs WR >63% to be profitable at current avg loss
+- cut-loser-CL-T1 persistent across signals — is the CL threshold too aggressive?
+- mover+ 3T 1W 33%WR -$0.34 — borderline, monitor next hour
+
+**BY:** auto_1hr
