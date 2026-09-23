@@ -1,3 +1,38 @@
+## [2026-09-23 03:55 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CFX mover+ LONG +$0.16 UNIVERSAL_MAX_HOLD) | **Open:** 3 (BTC continuum-osc+ 202min, YGG volume-breakout-long+ 67min, ADA mover+ 16min — all flat)
+**24h:** 23T 39.1%WR -$1.72 | **7d:** 187T 44.9%WR -$0.63 | **14d:** 461T 51.0%WR +$2.31
+
+**24h exit reasons:**
+- atr_sl_hit: 14T 60.9% avg -$0.141 (down from 70.8% at 00:10 — CEO dead hours fix working)
+- profit-monster-trail: 4T avg +$0.030
+- cut-loser-CL-T1: 2T avg -$0.095
+- pump_exit_dead_money: 2T avg +$0.085
+- UNIVERSAL_MAX_HOLD: 1T +$0.160
+
+**24h signal ranking:**
+- pullback-entry-: 6T 0%WR -$1.54 (14d: big losers H20,H04,H08,H13 all now blocked)
+- pump-chain+: 4T 25%WR -$0.64 (improving from -$1.51 on 09-22)
+- bb-bounce-v2-long+: 4T 75%WR +$0.03 (profitable)
+
+**Changes:**
+1. No config change — CEO fix at 01:51 UTC already comprehensive
+
+**No Change Needed:**
+- CEO dead hours fix deployed (d339ea7e): pullback-entry- [3,4,6,8,13,20], pump-chain+ [1,2,3,4,5,7,8,13,21,22]
+- Bug fix: signal_compactor.py dead hours enforcement now handles dash/underscore variants
+- atr_sl_hit down from 70.8% to 60.9% — dead hours filtering working
+- No stale trades (all open <4h)
+- No overtrading (23T/24h ≈ 1T/hr)
+- No kill candidates (0 trades last hour)
+- 14d profitable (+$2.31) despite 7d negative (-$0.63) — recent losses are dead hours being fixed
+
+**Open Questions:**
+- 7d still negative (-$0.63) despite 14d positive — need CEO dead hours fix to accumulate savings
+- pump-chain+ H14: 5T 40%WR -$0.17/14d — borderline, not enough data to kill yet
+
+**BY:** auto_1hr
+
 ## [2026-09-23 00:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 2 (CFX mover+ 287min, WCT volume-breakout-long+ 135min — both flat)

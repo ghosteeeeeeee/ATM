@@ -1,3 +1,10 @@
+[2026-09-23 03:55 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 23T 39.1%WR -$1.72 | 7d: 187T 44.9%WR -$0.63 | 14d: 461T 51.0%WR +$2.31
+  1 trade closed last hour: CFX mover+ LONG +$0.16 (UNIVERSAL_MAX_HOLD). 3 open trades all flat.
+  CEO dead hours fix (d339ea7e) deployed at 01:51 UTC — atr_sl_hit down from 70.8% to 60.9%.
+  Dead hours: pullback-entry- [3,4,6,8,13,20], pump-chain+ [1,2,3,4,5,7,8,13,21,22]. Bug fix: dash/underscore variants handled.
+  No kill candidates, no overtrading, no stale trades. BY: auto_1hr
+
 [2026-09-23 00:10 UTC] auto_1hr: ADDED pullback-entry- hours 17,22 to dead hours
   24h: 24T ~29%WR -$2.11. 0 trades last hour. 70.8% atr_sl_hit. 7d: 184T 44%WR -$0.90.
   Hour 17: 3T 0%WR -$0.46. Hour 22: 2T 0%WR -$0.46. Added to PULLBACK_ENTRY_SHORT_DEAD_HOURS [0,1,3,7,10,11,17,22].
