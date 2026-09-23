@@ -606,3 +606,8 @@
 ## Error Alerts — 2026-09-23 15:57 UTC
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.2s (rc=N)`
+
+## Error Alerts — 2026-09-23 16:44 UTC
+- **WARN** (1x): `signal_compactor failed` at 16:36:38 — self-recovered on next pipeline run
+- **WARN**: Disk at 85% (94G/118G) — logs compressed, monitor growth
+- **AUTO-FIX**: Compressed logs older than 7 days

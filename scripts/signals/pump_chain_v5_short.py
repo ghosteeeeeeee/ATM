@@ -24,7 +24,8 @@ from paths import HERMES_DATA, WWW_DATA, RUNTIME_DB
 
 from hermes_constants import (
     PUMP_FLOW_ENABLED,
-    PUMP_FLOW_MINUS_ENABLED,
+    PUMP_CHAIN_V5_SHORT_ENABLED,
+    PUMP_CHAIN_V5_SHORT_BB_THRESHOLD,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
     PUMP_FLOW_COOLDOWN_HOURS,
@@ -159,7 +160,7 @@ def scan_signals():
     1. Block when wave_phase='accelerating' AND momentum_state='rising' (0% WR)
     2. Block when wave_phase='falling' AND momentum_state='flat' AND bb_position>0.4 (0% WR)
     """
-    if not PUMP_FLOW_ENABLED or not PUMP_FLOW_MINUS_ENABLED:
+    if not PUMP_FLOW_ENABLED or not PUMP_CHAIN_V5_SHORT_ENABLED:
         return 0
     
     state = _load_state()
@@ -206,7 +207,7 @@ def scan_signals():
         # ── V5 FILTER 2: Falling + Flat + High BB ───────────────────────────
         # Evidence: 0% WR (0W 2L), catches BCH -$0.12, ENA -$0.16
         if (wave_phase == 'falling' and momentum_state == 'flat' 
-            and bb_position is not None and bb_position > 0.4):
+            and bb_position is not None and bb_position > PUMP_CHAIN_V5_SHORT_BB_THRESHOLD):
             _log(f"  [PUMP-CHAIN-V5-SHORT] {token} SHORT blocked — falling+flat+BB>{bb_position:.2f} (0% WR)")
             continue
         
@@ -297,7 +298,7 @@ if __name__ == '__main__':
                 # Check filters
                 filter1 = wave == 'accelerating' and momentum == 'rising'
                 filter2 = (wave == 'falling' and momentum == 'flat' 
-                          and bb is not None and bb > 0.4)
+                          and bb is not None and bb > PUMP_CHAIN_V5_SHORT_BB_THRESHOLD)
                 blocked = filter1 or filter2
                 
                 bb_str = f"{bb:.3f}" if bb is not None else "N/A"

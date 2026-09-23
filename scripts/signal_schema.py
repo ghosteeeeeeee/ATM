@@ -1937,9 +1937,10 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     pass
             if _comp == 'pump-chain-':
                 try:
-                    from hermes_constants import PUMP_FLOW_MINUS_ENABLED
-                    if not PUMP_FLOW_MINUS_ENABLED:
-                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_FLOW_MINUS_ENABLED=False', flush=True)
+                    from hermes_constants import PUMP_FLOW_MINUS_ENABLED, PUMP_CHAIN_V5_SHORT_ENABLED
+                    # V5 SHORT bypasses old kill-switch
+                    if not PUMP_FLOW_MINUS_ENABLED and not PUMP_CHAIN_V5_SHORT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_FLOW_MINUS_ENABLED=False AND PUMP_CHAIN_V5_SHORT_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
@@ -3006,6 +3007,17 @@ def is_component_disabled(component: str) -> bool:
     if c == 'rr-struct-': return not RR_STRUCTURAL_MINUS_ENABLED
     if c == 'rr-struct': return not RR_STRUCTURAL_ENABLED
     if c == 'rr-struct-v2+': return not RR_STRUCTURAL_V2_LONG_ENABLED
+    # pump-chain (capital rotation flow signal)
+    if c == 'pump-chain+': return not PUMP_FLOW_PLUS_ENABLED
+    if c == 'pump-chain-':
+        # V5 SHORT bypasses old kill-switch
+        try:
+            from hermes_constants import PUMP_FLOW_MINUS_ENABLED, PUMP_CHAIN_V5_SHORT_ENABLED
+            if not PUMP_FLOW_MINUS_ENABLED and not PUMP_CHAIN_V5_SHORT_ENABLED:
+                return True
+        except ImportError:
+            pass
+        return False  # V5 SHORT enabled or old flag enabled
     return False  # unknown component — allow (don't block what we can't identify)
 
 

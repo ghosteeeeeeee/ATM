@@ -3548,6 +3548,7 @@ PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h)
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 PUMP_CHAIN_V5_ENABLED = True           # NEW 2026-09-22 — V5 with velocity + continuum oscillator filters. 48h test.
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # NEW 2026-09-23 — V5 SHORT with wave_phase + momentum + BB filters. 0 kills, 4 catches.
+PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
