@@ -1651,7 +1651,29 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
 
     atr_pct = atr / current_price
     k = _atr_multiplier(atr_pct)
-    atr_distance = k * atr
+    
+    # R:R-based k override (2026-09-23): Grade A gets wider SL, Grade D gets tighter
+    try:
+        from hermes_constants import RR_K_GRADE_A, RR_K_GRADE_B, RR_K_GRADE_C, RR_K_GRADE_D
+        _conf = 70  # default
+        if hasattr(trade, 'confidence') and trade.confidence:
+            _conf = trade.confidence
+        elif hasattr(trade, '_signal_metadata') and trade._signal_metadata:
+            try:
+                _meta = json.loads(trade._signal_metadata) if isinstance(trade._signal_metadata, str) else trade._signal_metadata
+                _conf = _meta.get('confidence', 70)
+            except:
+                pass
+        if _conf >= 90:
+            k = RR_K_GRADE_A  # Grade A: wide SL, let winners run
+        elif _conf >= 75:
+            k = RR_K_GRADE_B  # Grade B: standard SL
+        elif _conf >= 60:
+            k = RR_K_GRADE_C  # Grade C: tighter SL
+        else:
+            k = RR_K_GRADE_D  # Grade D: very tight SL
+    except Exception:
+        pass
 
     # ATR_SL_MIN (0.8%) used for trailing, ATR_SL_MIN_INIT (1.0%) used as final floor
     effective_sl_pct = max(atr_distance / current_price, ATR_SL_MIN)

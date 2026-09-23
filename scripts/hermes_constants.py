@@ -695,6 +695,16 @@ ATR_K_INITIAL      = 1.2   # initial SL only (reverted to original)
 ATR_K_LOW_VOL      = 0.8   # trailing/accel SL — atr_pct < 1% (was 0.5 — effective SL=0.4%, noise-level. 0.8 gives min 0.96% SL)
 ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.0% <= atr_pct <= 1.5%
 ATR_K_HIGH_VOL     = 1.5   # trailing/accel SL — atr_pct > 1.5% (HIGH VOL — wider SL to survive spikes)
+# ── R:R-based k overrides (2026-09-23) ────────────────────────────────────────
+# Trade watchdog: Grade A (R:R>4) gets wider SL to let winners run.
+# Grade C/D (R:R<2) gets tighter SL to exit bad trades quickly.
+RR_K_GRADE_A       = 1.5   # R:R > 4.0 — wide SL, let winners run
+RR_K_GRADE_B       = 1.0   # R:R 2.0-4.0 — standard SL
+RR_K_GRADE_C       = 0.7   # R:R 1.5-2.0 — tighter SL, quick exit
+RR_K_GRADE_D       = 0.5   # R:R < 1.5 — very tight SL, immediate exit
+RR_THRESHOLD_A     = 4.0   # R:R above this = Grade A
+RR_THRESHOLD_B     = 2.0   # R:R above this = Grade B
+RR_THRESHOLD_C     = 1.5   # R:R above this = Grade C (below = Grade D)
 ATR_PCT_LOW_THRESH = 0.01  # 1%
 ATR_PCT_HIGH_THRESH= 0.015  # 1.5% — matches EXTREME regime threshold
 
