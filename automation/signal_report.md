@@ -1,89 +1,73 @@
 # Signal Performance Report
-**Generated:** 2026-09-23 13:45 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-09-23 17:03 UTC | **Period:** Last 6h + 24h
 
-## 6h Performance
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| mover+ | LONG | 2 | 0.0% | -$0.50 |
-| bb-bounce-v2-long+ | LONG | 5 | 40.0% | -$0.06 |
-
-## 24h Performance
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pullback-entry- | SHORT | 5 | 0.0% | -$1.25 |
-| mover+ | LONG | 3 | 33.3% | -$0.34 |
-| bb-bounce-v2-long+ | LONG | 8 | 50.0% | -$0.07 |
-
-**24h Total:** 24 trades | 37.5% WR | -$1.64 PnL
+## Overall Stats
+- **Total trades (all time):** 2,677 | **WR:** 51.7% | **PnL:** -99.42%
+- **Date range:** 2026-07-29 → 2026-09-23
 
 ---
 
-## KILLED (executed)
+## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0.0% | -$1.25 | 5 | Already disabled (flag=False since Sep 22 23:12 UTC). 24h trades predate kill. |
-
-No new kills needed. All kill-criteria signals already disabled.
+None found.
 
 ---
 
-## BOOSTED (executed)
+## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 66.7% | +$1.46 | 18 (7d) | Already at 1.15x weight. EXTREME 70% WR. No change needed. |
+None found.
 
 ---
 
-## LOSERS (watch list)
+## MARGINAL (30-50% WR)
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| mover+ | LONG | 33.3% | -$0.34 | 3 (24h) | ENABLED — Historical 66.7% WR (18T). Bad 24h streak. Watch. |
-| bb-bounce-v2-long+ | LONG | 50.0% | -$0.07 | 8 (24h) | ENABLED — Near breakeven. Bollinger family, EXTREME/HIGH only. |
-
----
-
-## WINNERS
-
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 66.7% | +$1.46 | 18 (7d) | ENABLED — 1.15x weight. EXTREME 70% WR. Consistent. |
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| mover+ | LONG | 3 | 33.3% | -1.09 | ENABLED | Needs more data |
+| bb-bounce-v2-long+ | LONG | 9 | 44.4% | -1.05 | ❓ | Borderline |
+| accel-300-breakout | SHORT | 2 | 50.0% | -0.53 | ENABLED | Needs more data |
+| volume-breakout-long+ | LONG | 2 | 50.0% | -0.46 | ❓ | Needs more data |
 
 ---
 
-## ISSUES
+## DISABLED BUT GOOD (candidates for re-enabling)
 
-- **No signal inversions found.** All signals respect direction labels.
-- **No anomalies detected.** Large losses only from already-killed signals.
-- **24h overall WR is low (37.5%)** but sample size is small (24 trades). Not a systemic issue.
+None found. Top performers are already enabled.
 
 ---
 
-## Regime Performance Context
+## SIGNAL INVERSIONS (24h)
 
-**pullback-entry- SHORT (7d):**
-- EXTREME: 12T, 41.7% WR, -$0.39
-- HIGH: 18T, 38.9% WR, -$0.78
-- NORMAL: 8T, 12.5% WR, -$1.13
-- **All regimes < 50% WR → blanket kill confirmed correct**
-
-**mover+ LONG (lifetime):**
-- EXTREME: 7T, 57.1% WR, -$0.48
-- HIGH: 9T, 66.7% WR, +$0.09
-- NORMAL: 2T, 100% WR, +$0.15
-- **Wins in HIGH/NORMAL, loses in EXTREME. No regime block needed yet.**
-
-**bb-bounce-v2-long+ LONG (lifetime):**
-- EXTREME: 2T, 50% WR, -$0.24
-- HIGH: 10T, 50% WR, -$0.06
-- **Bollinger family already blocked in HIGH via VOL_PHASE_MULTS. EXTREME at 0.4x.**
+**No inversions found.** All signals respect their direction labels.
 
 ---
 
-## Actions Taken
+## RECOMMENDATIONS
 
-None. All signals already at correct state. No new kills or boosts needed.
+1. **[WATCH] mover+ LONG** — WR=33.3%, PnL=-1.09% over 3 trades. Monitor next cycle.
+2. **[WATCH] bb-bounce-v2-long+ LONG** — WR=44.4%, PnL=-1.05% over 9 trades. Monitor next cycle.
+3. **[WATCH] accel-300-breakout SHORT** — WR=50.0%, PnL=-0.53% over 2 trades. Monitor next cycle.
+4. **[WATCH] volume-breakout-long+ LONG** — WR=50.0%, PnL=-0.46% over 2 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-09-23 | 2f756ed | Signals: Complete pump_chain_v5_short following add-signal c... |
+| 2026-09-23 | e61cd1f | Fix: add accel-30 to STANDALONE_BYPASS_SIGNALS |
+| 2026-09-23 | b50be86 | fix: add return-exhaustion-short (hyphen) to bypass list — w... |
+| 2026-09-23 | 2f23e0a | signals: add pullback-entry- SHORT dead hours 0,1,10,11 |
+| 2026-09-23 | f52bb96 | fix: RR_ENGINE_CONF_HARD_BLOCK_RR 0.95→0.70 — allow lower R:... |
+| 2026-09-23 | 6b66d7c | fix: SHORT_RSI_FLOOR 50→40 — 50 blocked SHORT in downtrends,... |
+| 2026-09-23 | a668cbf | brain_auditor: 12:00 UTC audit — no config change, 3 creativ... |
+| 2026-09-23 | cec7ef3 | brain_auditor: LONG_RSI_FLOOR=30 added (Sep 23 ~08:00 UTC) |
+| 2026-09-23 | 393ad43 | brain_auditor: SHORT_RSI_FLOOR 35→50 + audit report |
+| 2026-09-23 | d339ea7 | CEO: Fix dead hours bug + correct dead hours configs |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
