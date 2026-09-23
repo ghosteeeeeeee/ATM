@@ -3015,7 +3015,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
             from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
-                # Skip spike filter in downtrends — green candles are normal pullbacks
+                # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
                 try:
                     import os as _sf_os
@@ -3028,53 +3028,54 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _skip_spike = True
                 except Exception:
                     pass
-                _conn_sf = None
+
                 if _skip_spike:
                     log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (downtrend, green candles are pullbacks)")
                 else:
+                    _conn_sf = None
                     try:
-                    _skip = False
-                    _conn_sf = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_sf = _conn_sf.cursor()
-                    _cur_sf.execute("""
-                        SELECT close, open FROM candles_5m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 3
-                    """, (tkn.upper(),))
-                    for _cl, _op in _cur_sf.fetchall():
-                        if _op and _op > 0 and (_cl - _op) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
-                            log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — recent bullish 5m candle +{(_cl-_op)/_op*100:.3f}%")
-                            _skip = True
-                            break
-                    if not _skip:
-                        # No spike — check RSI
+                        _skip = False
+                        _conn_sf = sqlite3.connect(CANDLES_DB, timeout=5)
+                        _cur_sf = _conn_sf.cursor()
                         _cur_sf.execute("""
-                            SELECT close FROM candles_5m
+                            SELECT close, open FROM candles_5m
                             WHERE token = ? AND is_closed = 1
-                            ORDER BY ts DESC LIMIT 15
+                            ORDER BY ts DESC LIMIT 3
                         """, (tkn.upper(),))
-                        _closes = [r[0] for r in _cur_sf.fetchall()]
-                        if len(_closes) >= 15:
-                            _deltas = [_closes[i] - _closes[i-1] for i in range(1, len(_closes))]
-                            _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
-                            _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
-                            _ag = sum(_gains) / 14
-                            _al = sum(_losses) / 14
-                            if _al > 0:
-                                _rsi = 100 - (100 / (1 + _ag / _al))
-                                if _rsi < SPIKE_FILTER_RSI_THRESHOLD:
-                                    log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — RSI {_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
-                                    _skip = True
-                    if _skip:
-                        continue
-                except Exception:
-                    pass  # non-fatal — let signal through on DB error
-                finally:
-                    if _conn_sf:
-                        try:
-                            _conn_sf.close()
-                        except Exception:
-                            pass
+                        for _cl, _op in _cur_sf.fetchall():
+                            if _op and _op > 0 and (_cl - _op) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
+                                log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — recent bullish 5m candle +{(_cl-_op)/_op*100:.3f}%")
+                                _skip = True
+                                break
+                        if not _skip:
+                            # No spike — check RSI
+                            _cur_sf.execute("""
+                                SELECT close FROM candles_5m
+                                WHERE token = ? AND is_closed = 1
+                                ORDER BY ts DESC LIMIT 15
+                            """, (tkn.upper(),))
+                            _closes = [r[0] for r in _cur_sf.fetchall()]
+                            if len(_closes) >= 15:
+                                _deltas = [_closes[i] - _closes[i-1] for i in range(1, len(_closes))]
+                                _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
+                                _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
+                                _ag = sum(_gains) / 14
+                                _al = sum(_losses) / 14
+                                if _al > 0:
+                                    _rsi = 100 - (100 / (1 + _ag / _al))
+                                    if _rsi < SPIKE_FILTER_RSI_THRESHOLD:
+                                        log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — RSI {_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
+                                        _skip = True
+                        if _skip:
+                            continue
+                    except Exception:
+                        pass  # non-fatal — let signal through on DB error
+                    finally:
+                        if _conn_sf:
+                            try:
+                                _conn_sf.close()
+                            except Exception:
+                                pass
             # ── SHORT RSI floor: block SHORT at extreme oversold (bounce imminent) ──
             # Differs from spike filter: runs independently, catches stale signals where
             # RSI was OK at detection but dipped to oversold by execution time.

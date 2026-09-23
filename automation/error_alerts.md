@@ -594,3 +594,7 @@
 - **[INFO]**: 17 trades closed today, -0.43% PnL, 47.1% winrate — below target but not critical.
 - **[INFO]**: Regime SHORT_BIAS (53 short, 0 long, 67 neutral across 120 tokens).
 - **NO AUTO-FIX NEEDED**: signal_compactor self-heals, disk stable, pipeline running normally.
+
+## Error Alerts — 2026-09-23 14:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor, position_manager`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.1s (rc=N)`
