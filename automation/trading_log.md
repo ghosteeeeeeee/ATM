@@ -4873,3 +4873,39 @@ Final set: ['ALGO', 'ME']
 - pump-chain+ 0%WR but only 2 trades — watch next hour
 
 **BY:** auto_1hr
+
+## [2026-09-23 07:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed since 06:10 (CFX LONG bb-bounce-v2-long+, atr_sl_hit +$0.07) | **Open:** 0 (flat)
+**24h:** 22T 36.4%WR -$2.14 | **7d:** 190T 46.3%WR -$0.14
+
+**Close Reasons (24h):**
+- atr_sl_hit: 14T 4W -$2.13 (63.6% of closes, avg -$0.152)
+- profit-monster-trail: 4T 3W +$0.12 (only winning exit type)
+- cut-loser-CL-T1: 3T 0W -$0.29
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Signal Performance (24h):**
+- pullback-entry-: 6T 0W -$1.54 — LEGACY, already killed, no new entries
+- pump-chain+: 2T 0W -$0.60 — below kill threshold (needs 3+)
+- bb-bounce-v2-long+: 5T 3W -$0.04 — mediocre but 60%WR
+- volume-breakout-long+: 2T 1W +$0.05
+- mover+: 2T 1W -$0.06
+
+**RSI Filter Note:** 3 LONG entries above RSI_MAX=72 since lowered (ADA 77.26, YGG 77.78, WCT 86.67). Filter returns AMBIGUOUS penalty (-10) but doesn't hard block. YGG won (+$0.20), ADA and WCT lost. This is current design behavior.
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR in window)
+- pump-chain+ only 2 trades — monitoring next hour
+- pullback-entry- already dead, no new entries
+- atr_sl_hit 63.6% — down from 71% yesterday, trending right direction
+- System quiet (1 trade/hr, 0 open positions)
+- Trade frequency normal
+
+**Open Questions:**
+- pump-chain+ needs 1 more loss to meet kill threshold — watch next hour
+- RSI filter design: penalty vs hard block. Currently AMBIGUOUS allows override by Hebbian gate. Consider if extreme RSI (>80) should be a hard block.
+
+**BY:** auto_1hr
