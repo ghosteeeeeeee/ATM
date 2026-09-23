@@ -1,42 +1,41 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h | Generated: 2026-09-22 22:45 UTC
+# === Signal Performance Report ===
+Period: Last 6h | 24h | 7d  
+Generated: 2026-09-23 05:11 UTC
 
-## 24h Summary
-Total closed trades: 25 (6h: 4)
+## KILLS (already executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 (24h) | KILLED `PULLBACK_ENTRY_MINUS_ENABLED=False` (2026-09-22 23:12 UTC). 38T/7d 34.2%WR -$2.30. No new signals since kill. |
+| open-skies+ | LONG | 20.0% | -$0.42 | 5 (7d) | KILLED `OPEN_SKIES_PLUS_ENABLED=False` (2026-09-22). 3T in HIGH 0%WR. |
+| grind-trend- | SHORT | 20.0% | -$0.38 | 5 (7d) | KILLED `GRIND_TREND_MINUS_ENABLED=False` (2026-09-19). |
 
-## KILLED (executed):
-None — no signals met blanket-kill criteria.
-
-## REGIME BLOCKS (executed):
-None — existing blocks already cover losing regimes.
-- pullback-entry- SHORT: Already blocked in NORMAL (0.0x). Wins in HIGH (53.4% WR) and EXTREME (55.2% WR). 24h losses are noise.
-- pump-chain+ LONG: Already blocked in NORMAL (Pump_Flow 0.0x). Wins in EXTREME (46.9% WR). 24h losses are noise.
-
-## BOOSTED (executed):
-None — no signals met boost criteria.
-
-## FAMILY_MAP FIXES (executed):
-- Added `pump-chain`, `pump-chain+`, `pump-chain-` to `Pump_Flow` family (were mapping to `Other`)
-- Added `bb-bounce-v2-long`, `bb-bounce-v3-long` to `Bollinger` family
-- Added `continuation` to `Continuation` family
-- Added `grind-breakout` to `Grind_Breakout` family
-- Added `mover` to `Mover` family
-- Added `doji-bottom-long` to `Exhaustion` family
+## BOOSTED:
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| volume-breakout-long+ | LONG | 64.7% | +$1.26 | 17 (7d) | WATCH — best performer. EXTREME regime only per volatility_gate_v2. |
 
 ## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 | Watch — all-time wins in HIGH/EXTREME, 24h bad luck |
-| pump-chain+ | LONG | 16.7% | -$0.85 | 6 | Watch — all-time wins in EXTREME, 24h bad luck |
-| pump-chain- | SHORT | 33.3% | -$0.38 | 6 | Watch — all-time wins in all regimes, 24h noise |
+| pump-chain+ | LONG | 0.0% | -$0.76 | 3 (24h) | WATCH — 7d is 41.8%WR +$1.23 (55T). 24h is bad luck in EXTREME. |
+| pump-chain- | SHORT | 33.3% | -$0.38 | 6 (7d) | OK — 30d is 57.4%WR +$0.24 (61T). 7d is noise. |
+| btc-pump-rider+ | LONG | 0.0% | -$0.18 | 3 (30d) | WATCH — 3 trades in 30d, too small to kill. |
 
 ## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| (no signal won 3+ trades in 24h) | | | | | |
+| volume-breakout-long+ | LONG | 64.7% | +$1.26 | 17 (7d) | Running hot |
+| pump-chain+ | LONG | 41.8% | +$1.23 | 55 (7d) | Net positive despite 24h blip |
+| grind-trend+ | LONG | 50.0% | +$0.24 | 18 (7d) | Steady |
+| bb-bounce-v2-long+ | LONG | 66.7% | -$0.01 | 3 (7d) | Tiny rounding loss |
 
 ## ISSUES:
-- **FAMILY_MAP gap fixed**: `pump-chain+` and `pump-chain-` were mapping to `Other` instead of `Pump_Flow`. This meant the existing NORMAL regime block (Pump_Flow 0.0x) was NOT blocking these signals. Fixed by adding hyphen variants to Pump_Flow family.
-- **No signal inversions detected** in 24h window.
-- **Low trade volume**: Only 25 trades in 24h, 4 in 6h. Market may be quiet.
-- **All 24h losers are losing in regimes where they win all-time** — classic noise, not signal decay.
+- **No direction inversions detected**
+- **pullback-entry- was bypassing kill flag** — `PULLBACK_ENTRY_MINUS_ENABLED=False` was set at 23:12 UTC Sep 22, but 6 trades from earlier that day still show in the 24h window. Flag is working (no new signals since).
+- **System 24h: 21 trades, 38.1% WR, -$1.82 PnL** — dominated by pullback-entry- losses (now killed)
+- **System 7d: 185 trades, 45.4% WR, -$0.10 PnL** — roughly breakeven
+- **21 signals in NEVER_REENABLE_FLAGS** — loaded correctly
+
+## Actions taken:
+- None needed this run — all kill candidates already have flags set
+- volume-breakout-long+ flagged for monitoring (boost candidate if trend holds)
