@@ -798,8 +798,8 @@ SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
 SIGNAL_FILTER_SPEED_MIN = 40  # CEO 2026-08-16: RAISED from 30. ATR_SL 37T/48h 2.7% WR -$2.45 dominates. Higher speed min = fewer but better entries. NEUTRAL override at15 unchanged.
 SIGNAL_FILTER_NEUTRAL_SPEED_MIN = 15  # CEO 2026-08-15 — STARVATION FIX: relaxed speed filter in NEUTRAL regime (102/104 tokens flat). 30 still blocks most NEUTRAL signals. 15 lets low-momentum signals through when regime is flat.
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
-SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
-SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) - was 70, raised to allow reversals
+SIGNAL_FILTER_RSI_MIN = 42           # block SHORT when RSI < this (oversold = bounce risk) — raised from 30: RSI<40 SHORT = 0%WR, -$1.67 (2026-09-22 audit)
+SIGNAL_FILTER_RSI_MAX = 72           # block LONG when RSI > this (overbought) — lowered from 80: pump-chain+ LONG RSI>70 = 26.7%WR (2026-09-22 audit)
 SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
 SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
 

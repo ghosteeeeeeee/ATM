@@ -532,3 +532,8 @@
 
 ## Error Alerts — 2026-09-22 20:57 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-22 23:44 UTC
+- **WARN**: Disk at 84% (94G/118G) — approaching 85% threshold. Monitor and compress logs if needed.
+- **WARN**: pullback-entry- SHORT signal type 0% WR today (6 trades, -$1.45 total)
+- **INFO**: No pipeline errors, no crashes, all timers active
