@@ -1669,5 +1669,23 @@
     "category": "loss prevention",
     "status": "needs investigation",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-23T02:34:23Z",
+    "idea": "ATR_SL regime-adaptive: widen SL by 0.2% in EXTREME regime",
+    "rationale": "EXTREME 76T 50%WR +1.54. Losers avg 95min vs 162min winners — SL too tight. EXTREME = higher vol = wider natural range.",
+    "expected_impact": "+0.30-0.80/7d",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-23T02:34:23Z",
+    "idea": "Record RSI at entry in signal metadata",
+    "rationale": "0% of 7d trades have RSI metadata. Computed in signal_compactor.py:2294 but never stored. Would unlock entry quality filtering.",
+    "expected_impact": "Enables data-driven filtering. Est +0.50-1.00/7d once tuned.",
+    "category": "data quality",
+    "status": "recommended",
+    "risk": "low"
   }
 ]

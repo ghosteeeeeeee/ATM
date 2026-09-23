@@ -537,3 +537,8 @@
 - **WARN**: Disk at 84% (94G/118G) — approaching 85% threshold. Monitor and compress logs if needed.
 - **WARN**: pullback-entry- SHORT signal type 0% WR today (6 trades, -$1.45 total)
 - **INFO**: No pipeline errors, no crashes, all timers active
+
+## Error Alerts — 2026-09-23 01:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`

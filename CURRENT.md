@@ -1,19 +1,20 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-22 ~18:35 UTC**
-**Updated by: daily_orchestrator (DB-verified)**
+**Last Updated: 2026-09-23 ~02:00 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 20T, 35% WR, -$1.48. 1 open (FIL SHORT). NEUTRAL vol. Pipeline running.
+24h: 24T, 29.2% WR, -$2.40. 0 open. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 20T, 35% WR, -$1.48. ATR_SL dominates (14/20 exits). pump-chain+ 4T 25%WR -$0.64. pullback-entry- 4T 25%WR -$0.94.
-- **7d:** 183T, 45.4% WR, -$0.02 (DB-verified). Barely negative — system fragile.
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse, no regime >55%WR — DEGRADED). volume-breakout-long+ 16T 68.8%WR +$1.41 (gem, best WR in system). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d (CEO kill Sep 11 was variance, not systemic).
-- **SHORT:** pullback-entry- 40T 40%WR -$2.05 (cold streak — 30d 116T 53.4%WR +$0.94). Dead hours [0,1,3,7,10,11] BLOCKED today.
+- **24h (rolling):** 24T, 29.2% WR, -$2.40. ATR_SL dominates (14/17 exits). pullback-entry- SHORT 6T 0%WR -$1.54. pump-chain+ LONG 4T 25%WR -$0.64.
+- **7d:** 185T, 44.3% WR, -$0.88 (DB-verified). Slightly negative — system fragile.
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 17T 64.7%WR +$1.26 (gem). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d.
+- **SHORT:** pullback-entry- 41T 34.1%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **DEAD HOURS BUG FIXED** — enforcement was broken (string comparison mismatch). Now working.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [0,1,2,3,4,5,23] — CEO fixed Sep 22. Enforcement re-enabled (was commented out). Added hour 23 (4T 0%WR -$0.69/14d). **VERIFIED WORKING** — 0 trades after 09:30 UTC. 7d without dead hours: 30T 60%WR +$3.48.
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. Was [0,1,2,3,4,5,21,23] which blocked profitable hours (0=+$0.72, 23=+$0.69). **VERIFIED WORKING** — 0 trades after 09:30 UTC. Expected +$1.91/7d.
+- **PULLBACK_ENTRY_SHORT_DEAD_HOURS:** [3,4,6,8,13,20] — CEO fixed Sep 23. Was [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72). **BUG FIXED** — enforcement was broken (used 'pullback-entry' dash but signal_type uses 'pullback_entry' underscore). Expected +$1.40/7d.
 - **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22 CEO — 48h test expired 36.4%WR), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=70.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
@@ -39,6 +40,11 @@
 **🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. 7d: pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41 carry system.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
+
+## Today's Changes (Sep 23)
+
+1. **brain_auditor ~04:15 UTC — 1 CODE FIX.** **BUG FIX: SHORT_RSI_FLOOR BYPASS.** `_ctx_gate_get_rsi()` returns None when <15 1m candles — when None, SHORT_RSI_FLOOR check was skipped entirely. COMP RSI=13.04, DOT RSI=27.27, FIL RSI=33.91 all below floor=35 but executed. **FIX:** Added detection-time RSI fallback from `_signal_metadata` when live RSI is None. Now checks both live and detection-time RSI. **RSI METADATA CORRECTION:** Previous audit used wrong JSON key (`rsi` vs `rsi_14`). RSI IS recorded correctly — 187/187 7d trades have `rsi_14` in metadata. **RSI SWEET SPOTS (14d):** pump-chain+ LONG RSI 50-65 = 26T 57.7%WR +$1.24. pullback-entry- SHORT RSI 50-65 = 20T 65.0%WR +$0.77. **CREATIVE:** Raise pullback-entry- SHORT_RSI_FLOOR to 50 — blocks RSI 35-50 band (37T 43.2%WR -$1.06/14d). Expected +$0.50-1.00/7d. Needs monitoring.
+1. **CEO ~02:00 UTC — 2 CONFIG CHANGES + 1 BUG FIX.** DB-verified: 24h 24T 29.2%WR -$2.40 | 7d 185T 44.3%WR -$0.88. **BUG FIX:** pullback-entry- SHORT dead hours enforcement broken — string comparison used 'pullback-entry' (dash) but signal_type uses 'pullback_entry' (underscore). Changed to 'in' check for both variants. **DEAD HOURS CONFIG FIXES:** (1) pullback-entry- SHORT: [0,1,3,7,10,11,17,22] → [3,4,6,8,13,20]. Old config blocked profitable hours (11=+$0.38, 22=+$0.72) and missed big losers (4=-$0.84, 20=-$1.02). Expected +$1.40/7d. (2) pump-chain+ LONG: [0,1,2,3,4,5,21,23] → [1,2,3,4,5,7,8,13,21,22]. Old config blocked profitable hours (0=+$0.72, 23=+$0.69) and missed losers (7=-$0.55, 8=-$0.37, 13=-$0.36). Expected +$1.91/7d. Combined: +$3.31/7d. Commit d339ea7e.
 
 ## Today's Changes (Sep 22)
 

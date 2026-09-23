@@ -4727,3 +4727,61 @@ Final set: ['ME']
 - 4 open positions manageable
 
 **BY:** auto_1hr
+
+## [2026-09-23 02:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) | **24h:** 24T, 25% WR, -$2.33 | **7d:** 185T, 44.3% WR, -$0.88
+
+**Close Reasons (24h):**
+- atr_sl_hit: 17/24 (70.8%), avg -$0.152 — within 55-75% baseline
+- profit-monster-trail: 3T, avg +$0.070
+- cut-loser-CL-T1: 2T, avg -$0.095
+- pump_exit_dead_money: 2T, avg +$0.085
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 6T, 0% WR, -$1.54 — drawdown phase, lifetime profitable
+- pump-chain- SHORT: 6T, 33% WR, -$0.38
+- pump-chain+ LONG: 4T, 25% WR, -$0.64
+- bb-bounce-v2-long+: 2T, 50% WR, -$0.08
+
+**Open:** 4 positions (CFX, BTC, XPL, SYRUP)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses in single hour)
+- atr_sl_hit 70.8% within baseline
+- 7d near breakeven (-$0.88 on 185 trades)
+- Losses small and controlled
+- 4 open positions manageable
+
+**BY:** auto_1hr
+
+## [2026-09-23 03:09 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins) | **24h:** 25T, 25%WR, -.24 | **7d:** 186T, 44.6%WR
+
+**Last Hour Winners:**
+- SYRUP LONG bb-bounce-v2-long+: +/usr/bin/bash.07 (profit-monster-trail)
+- XPL LONG bb-bounce-v2-long+,rs-s39: +/usr/bin/bash.04 (profit-monster-trail)
+
+**Close Reasons (24h):**
+- atr_sl_hit: 16/25 (64%), avg -/usr/bin/bash.153
+- profit-monster-trail: 5T, avg +/usr/bin/bash.064
+- cut-loser-CL-T1: 2T, avg -/usr/bin/bash.095
+- pump_exit_dead_money: 2T, avg +/usr/bin/bash.085
+
+**Open:** 3 positions (YGG, BTC, CFX)
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses in single hour)
+- atr_sl_hit 64% within baseline
+- Last 2 hours both profitable
+- System stable
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-23 03:00 UTC] auto_1hr: NO CHANGE — system stable, 2 consecutive profitable hours

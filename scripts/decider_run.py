@@ -996,10 +996,20 @@ def rule_based_context_gate(token, direction, source, sig):
     if _is_pullback and direction == 'SHORT':
         # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
         # FIX (brain_auditor 2026-09-20): Use LIVE RSI (like SHORT_RSI_CEILING does).
-        # Old code used sig.get('rsi_14') which was always None (rsi_14 nested in signal_metadata).
+        # FIX (brain_auditor 2026-09-23): Fallback to detection-time RSI when live RSI unavailable.
+        # _ctx_gate_get_rsi() returns None when <15 1m candles — without fallback, oversold SHORTs bypass filter.
         _live_rsi_floor = _ctx_gate_get_rsi(token)
-        if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
+        _detect_rsi_floor = None
+        if _live_rsi_floor is None and isinstance(sig, dict) and sig.get('signal_metadata'):
+            try:
+                _meta = json.loads(sig['signal_metadata']) if isinstance(sig['signal_metadata'], str) else sig['signal_metadata']
+                _detect_rsi_floor = _meta.get('rsi_14')
+            except Exception:
+                pass
+        _effective_rsi_floor = _live_rsi_floor if _live_rsi_floor is not None else _detect_rsi_floor
+        if _effective_rsi_floor is not None and _effective_rsi_floor < SHORT_RSI_FLOOR:
+            _src = 'LIVE' if _live_rsi_floor is not None else 'DETECT'
+            return ('AMBIGUOUS', f'pullback-entry SHORT: {_src} RSI {_effective_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _live_z = _ctx_gate_get_zscore(token)

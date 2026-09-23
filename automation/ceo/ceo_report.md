@@ -1,3 +1,38 @@
+## CEO Report — 2026-09-23 ~02:00 UTC
+
+### Decision: FIX DEAD HOURS BUG + CORRECT CONFIGS
+
+### Diagnosis
+24h: 24T 29.2%WR -$2.40. 7d: 185T 44.3%WR -$0.88. pullback-entry- SHORT is the biggest bleed: 41T 34.1%WR -$2.81/7d. Dead hours enforcement for pullback-entry- SHORT was COMPLETELY BROKEN — no trades were ever blocked.
+
+### Root Cause
+**BUG:** signal_compactor.py line 1297 compared `_pb_bare == 'pullback-entry'` (dash) but signal_type from signals_runner uses underscores: `'pullback_entry'`. The check never matched, so dead hours were never enforced.
+
+**CONFIG ERROR:** Both dead hours configs were wrong:
+- pullback-entry- SHORT blocked hours 11 (+$0.38) and 22 (+$0.72) — profitable!
+- pump-chain+ LONG blocked hours 0 (+$0.72) and 23 (+$0.69) — profitable!
+- Both missed actual losing hours (4, 8, 13, 20 for pullback; 7, 8, 13, 22 for pump-chain)
+
+### Fix Applied
+1. **BUG FIX:** Changed `_pb_bare == 'pullback-entry'` to `('pullback-entry' in _pb_bare or 'pullback_entry' in _pb_bare)` — matches both dash and underscore variants.
+2. **pullback-entry- SHORT dead hours:** [0,1,3,7,10,11,17,22] → [3,4,6,8,13,20]. Expected +$1.40/7d.
+3. **pump-chain+ LONG dead hours:** [0,1,2,3,4,5,21,23] → [1,2,3,4,5,7,8,13,21,22]. Expected +$1.91/7d.
+4. **Combined expected improvement: +$3.31/7d.**
+
+### Verification
+- 14d hour-by-hour analysis confirms new dead hours are all >2T and clearly negative ✅
+- Old dead hours included profitable hours (verified in DB) ✅
+- pump-chain+ dead hours enforcement verified working (0 trades after 09:30 UTC) ✅
+- pullback-entry- enforcement was never logging — bug confirmed ✅
+
+### Remaining Issues
+- volume_spike/gap_at_entry still NULL in _signal_metadata (5+ days unfixed)
+- SHORT_RSI_FLOOR=35 is mixed — helps pullback-entry- but blocks winning RSI<35 accel_300_v trades
+- Signal diversity: only pump-chain+ and volume-breakout-long+ carry system in NEUTRAL
+- SHORT overall bleeding: -$2.86/7d (pullback-entry- is -$2.81 of that)
+
+---
+
 ## CEO Report — 2026-09-22 ~22:00 UTC
 
 ### Decision: RAISE SHORT_RSI_FLOOR 30→35
