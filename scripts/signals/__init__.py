@@ -271,6 +271,11 @@ except Exception:
     _pump_chain_v5_run = None
 
 try:
+    from signals.pump_chain_v5_short import run as _pump_chain_v5_short_run
+except Exception:
+    _pump_chain_v5_short_run = None
+
+try:
     from signals.btc_pump_rider import run as _btc_pump_rider_run
 except Exception:
     _btc_pump_rider_run = None
@@ -468,6 +473,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pump_chain_long',           'enabled': 'PUMP_FLOW_PLUS_ENABLED',        'run': _pump_chain_long_run},
     {'name': 'pump_chain_v4',            'enabled': 'PUMP_CHAIN_V4_ENABLED',          'run': _pump_chain_v4_run},
     {'name': 'pump_chain_v5',            'enabled': 'PUMP_CHAIN_V5_ENABLED',          'run': _pump_chain_v5_run},
+    {'name': 'pump_chain_v5_short',      'enabled': 'PUMP_FLOW_MINUS_ENABLED',        'run': _pump_chain_v5_short_run},
     {'name': 'btc_pump_rider',            'enabled': 'BTC_PUMP_RIDER_ENABLED',        'run': _btc_pump_rider_run},
     {'name': 'open_skies',                'enabled': 'OPEN_SKIES_ENABLED',            'run': _open_skies_run},
     {'name': 'neutral_sniper',            'enabled': 'NEUTRAL_SNIPER_ENABLED',        'run': _neutral_sniper_run},

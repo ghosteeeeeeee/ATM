@@ -602,3 +602,7 @@
 ## Error Alerts — 2026-09-23 15:44 UTC
 - **WARN** (1x): `signal_compactor` timed out (killed after 60.1s) — pipeline auto-recovered on next cycle
 - **WARN**: Disk at 85% (94G/118G) — consider log compression or cleanup
+
+## Error Alerts — 2026-09-23 15:57 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   signal_compactor: TOK in N.2s (rc=N)`

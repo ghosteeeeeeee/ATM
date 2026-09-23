@@ -1,3 +1,34 @@
+## [2026-09-23 16:20 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 3 (CFX/PUMP/USUAL accel-300-breakout SHORT ~3min, all flat)
+**24h:** 21T 38.1%WR -$1.10 | **7d:** 192T 44.2%WR -$1.30 | **14d:** 453T 50.6%WR +$1.24
+
+**24h exit reasons:**
+- atr_sl_hit: 9T 42.9% avg -$0.107 (improved from 70.8% on 09-22)
+- profit-monster-trail: 7T avg +$0.010
+- cut-loser-CL-T1: 4T avg -$0.093
+- UNIVERSAL_MAX_HOLD: 1T +$0.160
+
+**24h signal ranking:**
+- pullback-entry-: 3T 0%WR -$0.59 (SHORT only, 14d: 117T 51.3% +$0.30)
+- mover+: 3T 33%WR -$0.34 (14d: 18T 66.7% -$0.24 — borderline)
+- bb-bounce-v2-long+: 9T 44.4%WR -$0.10
+
+**Changes:**
+1. No config change needed
+
+**No Change Needed:**
+- atr_sl_hit 42.9% (below 40% kill threshold, improved from 70.8%)
+- No overtrading (21T/24h ≈ 0.9T/hr)
+- No stale trades (3 open all <3min)
+- No kill candidates (0 trades last hour)
+
+**Open Questions:**
+- 7d still -$1.30 despite 14d +$1.24 — dead hours compounding slowly
+- pullback-entry- 3T -$0.59/24h borderline, no kill
+
+**BY:** auto_1hr
+
 ## [2026-09-23 15:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour (1 in 3h: NXPC bb-bounce-v2-long+ -$0.03 trail) | **Open:** 0
