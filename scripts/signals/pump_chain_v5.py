@@ -24,7 +24,7 @@ from paths import HERMES_DATA, WWW_DATA, RUNTIME_DB
 
 from hermes_constants import (
     PUMP_FLOW_ENABLED,
-    PUMP_FLOW_PLUS_ENABLED,
+    PUMP_CHAIN_V5_ENABLED,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
     PUMP_FLOW_COOLDOWN_HOURS,
@@ -232,7 +232,7 @@ def scan_signals():
     2. Wave phase: Must NOT be 'bottoming' (37.5% WR)
     3. Momentum state: Must NOT be 'flat' (27.3% WR)
     """
-    if not PUMP_FLOW_ENABLED or not PUMP_FLOW_PLUS_ENABLED:
+    if not PUMP_FLOW_ENABLED or not PUMP_CHAIN_V5_ENABLED:
         return 0
     
     state = _load_state()
