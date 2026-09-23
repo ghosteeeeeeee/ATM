@@ -834,8 +834,13 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 50           # raised 25→50 (2026-09-23 CEO). self_learner lowered to 25 based on one stopped-out trade. 14d data: RSI 25-50 SHORT = 79T 47%WR -$1.96 (bleeding). RSI 50-65 = 53T 56.6%WR +$1.15 (sweet spot). Blocks bleeding band, preserves winners. Expected +$1.00-1.70/7d.
+SHORT_RSI_FLOOR = 25           # lowered 40→25 (2026-09-23 CEO decision). RSI below 25 = extreme oversold = catching falling knife. RSI 25-40 = confirmed downtrend, valid SHORT entry in bearish regime. Trade watchdog: RSI 35-40 shows 47%WR only in chop — in trending DOWN, RSI<40 is a strength indicator.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
+
+# ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
+# When SHORT_RSI_FLOOR is 40, RSI 35-40 is still dangerous — the move has already happened.
+# BANANA lesson: SHORT at RSI 10-35 = catching falling knife in reverse. Block these.
+OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold = move already happened)
 
 # ── LONG RSI floor: block LONG entries when RSI is extremely oversold ────
 # 14d: RSI<30 LONG = 12T 8.3%WR -$1.45 (catastrophic — catching falling knife).
@@ -2194,9 +2199,9 @@ SQUEEZE_REVERSAL_RSI_PERIOD = 14
 SQUEEZE_REVERSAL_MIN_BARS = 150            # need enough data for sell-off + squeeze
 SQUEEZE_REVERSAL_FRESHNESS_SECS = 600      # 10 min freshness
 
-TREND_PURITY_ENABLED     = True    # RE-ENABLED 2026-09-11 — wired into pipeline, shadow mode first
+TREND_PURITY_ENABLED     = False   # DISABLED 2026-09-23 emergency fix — 14d: trend_purity+ 36.4%WR -$0.90, trend_purity- 55%WR but offset by LONG losses. Net negative. Kill both directions.
 TREND_PURITY_PLUS_ENABLED    = False   # DISABLED auto_1hr 2026-09-13 — 8T/24h 12.5%WR -$1.22, all NEUTRAL regime
-TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT — enabled for shadow testing
+TREND_PURITY_MINUS_ENABLED   = False   # DISABLED 2026-09-23 emergency fix — SHORT variant underperforms
 VOLUME_HL_ENABLED        = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 VOLUME_HL_PLUS_ENABLED        = False    # volume_hl+ LONG
 VOLUME_HL_MINUS_ENABLED       = True    # volume_hl- SHORT
@@ -2573,6 +2578,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
+    'volume-breakout-short', 'volume-breakout-short-',  # volume-confirmed breakout SHORT — standalone bypass (2026-09-23)
     'grind-trend', 'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works solo (2026-09-19)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)

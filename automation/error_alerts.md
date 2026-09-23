@@ -611,3 +611,14 @@
 - **WARN** (1x): `signal_compactor failed` at 16:36:38 — self-recovered on next pipeline run
 - **WARN**: Disk at 85% (94G/118G) — logs compressed, monitor growth
 - **AUTO-FIX**: Compressed logs older than 7 days
+
+## Error Alerts — 2026-09-23 18:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+
+## Error Alerts — 2026-09-23 19:45 UTC
+- **WARN** (1x): `signal_compactor step failed` at 19:31:32 — transient, recovered on next cycle
+- **AUTO-FIX**: None needed — self-healed. All subsequent runs returned rc=0.
+- **WARN** (continuous): `hotset.json is empty — no signals survived compaction` — 0 tokens in hotset for multiple consecutive cycles. Signals generated (42 in last hour) but all filtered out by RR-engine (grade=F) and spike filter (RSI<30). Market regime is NEUTRAL (118/120 tokens).
+- **AUTO-FIX**: Disk cleanup — vacuumed 1.1G from journal logs (85%→84%)
+- **NOTE**: coin_tracker.db is 2.7G, candles.db is 2.1G — consider VACUUM or pruning old data if disk continues filling.

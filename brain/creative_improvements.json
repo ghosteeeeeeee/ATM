@@ -1732,5 +1732,39 @@
     "category": "entry quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-23T19:00:00Z",
+    "idea": "Regime-adaptive ATR_SL multiplier",
+    "rationale": "EXTREME regime 47%WR but atr_sl_hit dominates exits (130T 43.8% -$1.78/7d). ATR_SL 1.3-1.5% too tight for EXTREME volatility — winners get whipsawed. In EXTREME, wider SL preserves winners.",
+    "implementation": "In ATR_SL calc: multiply ATR by 1.5x when volatility_regime=EXTREME, 1.0x otherwise. ATR_SL_MAX goes from 1.5% to 2.25% in EXTREME.",
+    "expected_impact": "+$0.10-0.30/7d (reduce premature stops in EXTREME)",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "low",
+    "data_backing": "130T atr_sl_hit 43.8%WR -$1.78/7d. EXTREME 83T 47%WR +$1.18. avg_win=0.156, avg_loss=0.133 (1.17:1 ratio). profit-monster-trail 58.5%WR +$1.62 is only profitable exit type.",
+    "impact_on_winners": "Would preserve ~15-20% of atr_sl_hit trades that are premature stops. Estimated +$0.30/7d net."
+  },
+  {
+    "date": "2026-09-23T19:30:00Z",
+    "idea": "bb-bounce-v2-long+ ATR_SL widening for HIGH regime",
+    "rationale": "R:R=0.42 is worst in system. Winners avg $0.052, losers avg $0.123. SL too tight for HIGH volatility. If we widen ATR_SL_MIN from 1.3% to 1.8% for HIGH regime, winners get more room.",
+    "expected_impact": "+$0.10-0.20/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — wider SL means bigger losses on trades that don't recover",
+    "data_backing": "14d: 14T 42.9%WR -$0.55. HIGH regime: 10T 50%WR -$0.06 R:R=0.66. NORMAL: 2T 0%WR -$0.25. EXTREME: 2T 50%WR -$0.24.",
+    "impact_on_winners": "Need backtest — HIGH regime bb-bounce has 10T/14d. Would need to verify wider SL doesn't increase loser size faster than winner size."
+  },
+  {
+    "date": "2026-09-23T19:30:00Z",
+    "idea": "SHORT NULL RSI confidence boost",
+    "rationale": "63T 63.5%WR +$3.59 with detection-time RSI fallback vs 48.4%WR with live RSI. When live RSI unavailable, detection-time fallback is BETTER. Could boost confidence for NULL RSI entries.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "confidence scoring",
+    "status": "suggested",
+    "risk": "low — only boosts confidence, doesn't change entry logic",
+    "data_backing": "14d SHORT NULL RSI: 63T 63.5%WR +$3.59 vs HAS_RSI: 96T 49.0%WR -$1.16. Detection-time entries have 14.5% higher WR and $4.75 more PnL.",
+    "impact_on_winners": "Would boost confidence for existing NULL RSI entries — no winners blocked."
   }
 ]

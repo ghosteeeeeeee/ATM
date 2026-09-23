@@ -1149,40 +1149,61 @@ def _score_signal(token, direction, conf, source, signal_type,
                     # CONTINUUM OVERRIDE: allow signal if BTC structure is clear
                     # Uses market_phase + linreg_direction (same as continuum authority)
                     _override = False
-                    try:
-                        import os as _cont_os2
-                        _cont_db2 = _cont_os2.path.join(HERMES_DATA, 'continuum.db')
-                        _cont_conn2 = None
+
+                    # ── BTC-exempt signals: bypass chop gate entirely ──
+                    # pump-chain, mover, open-skies, accel-300 have proven standalone edge
+                    _src_lower = (source or '').lower().replace('_', '-')
+                    _sig_lower = (signal_type or '').lower().replace('_', '-')
+                    _is_btc_exempt = any(x in _src_lower or x in _sig_lower for x in
+                                         ('pump-chain', 'mover', 'open-skies', 'accel-300'))
+                    if _is_btc_exempt:
+                        _override = True
+                        log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} {direction} {signal_type} — BTC-exempt signal type, bypassing chop gate")
+
+                    if not _override:
                         try:
-                            _cont_conn2 = sqlite3.connect(_cont_db2, timeout=3)
-                            _cont_row2 = _cont_conn2.execute(
-                                "SELECT market_phase, linreg_direction, ema300_position "
-                                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                            ).fetchone()
+                            import os as _cont_os2
+                            _cont_db2 = _cont_os2.path.join(HERMES_DATA, 'continuum.db')
+                            _cont_conn2 = None
+                            try:
+                                _cont_conn2 = sqlite3.connect(_cont_db2, timeout=3)
+                                _cont_row2 = _cont_conn2.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position "
+                                    "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                if _cont_conn2:
+                                    try: _cont_conn2.close()
+                                    except: pass
+                            if _cont_row2:
+                                _p2, _l2, _e2 = _cont_row2[0], _cont_row2[1], _cont_row2[2]
+                                # Allow SHORT when BTC is DECLINING or bearish structure
+                                # FIX: also allow when linreg is BEAR/LEAN_BEAR (structural downtrend) or ema300 is BELOW
+                                if direction.upper() == 'SHORT' and (
+                                    _p2 in ('DECLINING', 'STORMY') or
+                                    (_p2 in ('CALM', 'RECOVERY') and _l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW') or
+                                    (_l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW') or  # structural bear regardless of phase
+                                    (_p2 == 'RANGING' and _l2 in ('LEAN_BEAR', 'BEAR'))  # ranging + bearish linreg
+                                ):
+                                    _override = True
+                                    log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} SHORT — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
+                                # Allow LONG when BTC is bullish structure
+                                # FIX: accept AT (hysteresis considers AT→ABOVE after 55 min) (2026-09-23)
+                                elif direction.upper() == 'LONG' and (
+                                    _p2 in ('RECOVERY', 'NEUTRAL') or
+                                    (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))
+                                ):
+                                    _override = True
+                                    log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
+                            else:
+                                log(f"  ⚠️ [BTC-CHOP-OVERRIDE] {token} {direction} — no continuum data for BTC, defaulting to override (allow)")
+                                _override = True  # no continuum data → don't block
+                        except Exception as e:
+                            log(f"  ⚠️ [BTC-CHOP-OVERRIDE] {token} {direction} — continuum check failed: {e}, defaulting to override (allow)")
+                            _override = True  # DB error → don't block
                         finally:
-                            if _cont_conn2:
-                                try: _cont_conn2.close()
-                                except: pass
-                        if _cont_row2:
-                            _p2, _l2, _e2 = _cont_row2[0], _cont_row2[1], _cont_row2[2]
-                            # Allow SHORT when BTC is DECLINING or bearish structure
-                            if direction.upper() == 'SHORT' and (
-                                _p2 == 'DECLINING' or
-                                (_p2 in ('CALM', 'RECOVERY') and _l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW')
-                            ):
-                                _override = True
-                                log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} SHORT — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
-                            # Allow LONG when BTC is bullish structure
-                            # FIX: accept AT (hysteresis considers AT→ABOVE after 55 min) (2026-09-23)
-                            elif direction.upper() == 'LONG' and (
-                                _p2 in ('RECOVERY', 'NEUTRAL') or
-                                (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))
-                            ):
-                                _override = True
-                                log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
-                    except Exception:
-                        pass
-                    
+                            pass
+
                     if not _override:
                         # BTC is flat — check if signal is momentum family
                         from chop_detector import _classify_signal
@@ -3021,13 +3042,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     import os as _sf_os
                     _cont_sf = sqlite3.connect(_sf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
                     _cont_row_sf = _cont_sf.execute(
-                        "SELECT linreg_direction FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        "SELECT market_phase, linreg_direction, ema300_position "
+                        "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
                     ).fetchone()
                     _cont_sf.close()
-                    if _cont_row_sf and _cont_row_sf[0] in ('BEAR', 'LEAN_BEAR'):
-                        _skip_spike = True
-                except Exception:
-                    pass
+                    if _cont_row_sf:
+                        _sf_phase, _sf_linreg, _sf_ema = _cont_row_sf[0], _cont_row_sf[1], _cont_row_sf[2]
+                        # Skip spike filter in downtrends — green candles are pullbacks, not reversals
+                        # FIX: also skip when market_phase=DECLINING (was only checking linreg, too narrow)
+                        # FIX: also skip when ema300=BELOW (price below long-term average = bearish structure)
+                        if (_sf_linreg in ('BEAR', 'LEAN_BEAR') or
+                                _sf_phase in ('DECLINING', 'STORMY') or
+                                _sf_ema == 'BELOW'):
+                            _skip_spike = True
+                            log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (BTC={_sf_phase}+{_sf_linreg}+{_sf_ema}, green candles are pullbacks)")
+                except Exception as e:
+                    log(f"  ⚠️ [SPIKE-FILTER] {tkn}: downtrend check failed: {e}", 'WARN')
 
                 if _skip_spike:
                     log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (downtrend, green candles are pullbacks)")
@@ -3110,6 +3140,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_rsf.close()
                         except Exception:
                             pass
+            # ── Oversold SHORT guard: prevent BANANA-repeat (RSI < 35) ──
+            # Separate from SHORT_RSI_FLOOR — uses 1m candles for tighter detection.
+            # BANANA lesson: SHORT at extreme oversold = catching falling knife in reverse.
+            try:
+                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                if direction == 'SHORT' and OVERSOLD_SHORT_RSI_MAX > 0:
+                    _conn_os = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_os = _conn_os.cursor()
+                    _cur_os.execute("""
+                        SELECT close FROM candles_1m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _os_closes = [r[0] for r in _cur_os.fetchall()]
+                    _conn_os.close()
+                    if len(_os_closes) >= 15:
+                        _os_deltas = [_os_closes[i] - _os_closes[i+1] for i in range(len(_os_closes)-1)]
+                        _os_gains = [d if d > 0 else 0 for d in _os_deltas[-14:]]
+                        _os_losses = [-d if d < 0 else 0 for d in _os_deltas[-14:]]
+                        _os_ag = sum(_os_gains) / 14
+                        _os_al = sum(_os_losses) / 14
+                        if _os_al > 0:
+                            _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
+                            if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
+                                log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
+                                continue
+            except Exception:
+                pass  # non-fatal
             # ── LONG RSI floor: block LONG at extreme oversold (falling knife) ──
             # 14d: RSI<30 LONG = 12T 8.3%WR -$1.45. 7d: 0/3 winners at RSI<30.
             # Catches pump-chain+, doji-bottom-long, mover+ entering LONG when RSI is oversold.

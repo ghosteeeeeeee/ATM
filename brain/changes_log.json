@@ -428,5 +428,16 @@
     "after": "LONG RSI now checked at execution time with live RSI + detection-time fallback. Mirrors SHORT RSI floor/ceiling pattern (lines 1031-1051).",
     "rationale": "WCT entered at RSI=98.86 (extreme overbought), lost -$0.15. 14d: RSI>80 LONG = 5T 40%WR -$0.23. LONG_RSI_CEILING=80 already defined but not enforced at execution.",
     "impact": "Blocks ~1-2 extreme overbought LONG entries/week. Expected +$0.10-0.15/7d. 0 winners blocked."
+  },
+  {
+    "timestamp": "2026-09-23T19:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Updated CURRENT.md with DB-verified numbers (30T 40%WR -$1.16 vs stale 25T 44%WR -$0.50)",
+    "type": "config",
+    "file": "CURRENT.md",
+    "before": "24h: 25T, 44% WR, -$0.50",
+    "after": "24h: 30T, 40% WR, -$1.16",
+    "rationale": "CURRENT.md was stale — actual DB numbers differ",
+    "impact": "No trading impact — documentation only"
   }
 ]

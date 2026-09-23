@@ -514,3 +514,62 @@ All config tweaks, blacklist additions, parameter changes, dead code fixes, and 
 | 5 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | New regime_tuner.py + timer |
 | 6 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4 new files, wiring existing systems |
 | 7 | Trade Watchdog refinements | 2 | MEDIUM | Dashboard polish | Core system works |
+
+---
+
+## Scan #7 — 2026-09-23 (emergency winrate fix)
+
+### Level 1 Tasks Implemented
+
+| # | Change | File | Impact |
+|---|--------|------|--------|
+| 1 | SHORT_RSI_FLOOR 50→40 — opens 10-point window for SHORT in downtrends | hermes_constants.py:837 | 🔴 HIGH — allows SHORT at RSI 40-50 (was blocked at <50) |
+| 2 | TREND_PURITY_ENABLED False, TREND_PURITY_MINUS_ENABLED False — disable loser signals | hermes_constants.py:2197-2199 | 🟡 MEDIUM — kills trend_purity+ (36.4%WR -$0.90) and trend_purity- |
+| 3 | OVERSOLD_SHORT_RSI_MAX = 35 — BANANA-repeat prevention guard | hermes_constants.py:842 | 🟡 MEDIUM — blocks SHORT when 1m RSI < 35 (extreme oversold) |
+| 4 | Oversold SHORT guard in signal_compactor.py — uses 1m candles for tighter detection | signal_compactor.py:3113-3140 | 🟡 MEDIUM — separate from SHORT_RSI_FLOOR, catches stale signals |
+
+### Plans Scanned (20 most recent)
+
+| Plan | Date | Difficulty | Value | Status | Notes |
+|------|------|------------|-------|--------|-------|
+| emergency-winrate-fix | 2026-09-23 | Level 1 | HIGH | ✅ DONE | 4/5 fixes implemented (Fix 5 is "monitor") |
+| continuum-integration-spec | 2026-09-23 | Level 3 | LOW | PENDING | Too complex for quick win |
+| pump-chain-v5-spec | 2026-09-23 | Level 2 | HIGH | PENDING | Velocity + continuum filters |
+| pump-chain-v5-evidence | N/A | N/A | HIGH | EVIDENCE | Supporting data for pump-chain-v5 |
+| pump-chain-v5-continuum-evidence | N/A | N/A | HIGH | EVIDENCE | Supporting data for pump-chain-v5 |
+| trade-watchdog-spec | 2026-09-22 | Level 4 | HIGH | ✅ DONE | Already implemented |
+| structural-awareness-overhaul | 2026-09-21 | Level 3-4 | HIGH | PENDING | 4-layer architecture, needs dedicated session |
+| pump-catching-and-exit-optimization | 2026-09-21 | Level 1-2 | HIGH | ✅ MOSTLY DONE | Level 1 items done, ride_it built |
+| squeeze-breakout-signal-spec | 2026-09-08 | Level 2 | MEDIUM | ✅ DONE | squeeze_breakout.py exists |
+| oscillator-matrix-lifecycle | 2026-09-21 | Level 2 | MEDIUM | ✅ DONE | Shadow mode running |
+| ride-it-exit-spec | 2026-09-19 | Level 2 | HIGH | ✅ DONE | ride_it_exit.py + constants |
+| continuum-ma-signal-spec | 2026-09-04 | Level 2 | MEDIUM | ✅ DONE | continuum_ma.py exists |
+| profitability-fix-plan | 2026-09-15 | Level 1-2 | HIGH | ✅ DONE | 7/8 fixes done |
+| btc-oscillator-30d-plan | 2026-09-18 | Level 2 | MEDIUM | ⏸️ WAITING | Plan says wait for 30d data |
+| btc-oscillator-correlation-plan | 2026-09-18 | Level 2 | HIGH | ⏸️ PARTIAL | zscore data not available |
+| pump-chain-exit-analysis | 2026-09-21 | Level 1 | HIGH | ✅ DONE | Dead regime blocks fixed |
+| 2026-09-09_grass-breakout-analysis | 2026-09-09 | Level 2 | MEDIUM | ✅ DONE | squeeze_reversal.py built |
+| 2026-09-08_trend-ignition-signal-spec | 2026-09-08 | Level 2 | HIGH | ✅ DONE | trend_ignition.py built |
+| 2026-09-09_regime-transition-smoothing | 2026-09-09 | Level 1-2 | HIGH | ✅ DONE | Directional bias + circuit breaker |
+| 2026-09-08_short-filter-overhaul | 2026-09-08 | Level 1 | HIGH | ✅ DONE | Dead code bug fixed |
+
+### Final Counts
+
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED | 15/20 |
+| PENDING (Level 3+) | 2/20 |
+| WAITING (data) | 1/20 |
+| EVIDENCE only | 2/20 |
+
+### Remaining Level 2+ Candidates
+
+| Priority | Task | Level | Value | Est. Impact | Blocker |
+|----------|------|-------|-------|-------------|---------|
+| 1 | Pump-chain velocity filter | 2 | HIGH | +$1-2/7d | Add vel_15m check to pump_chain_long.py |
+| 2 | BTC oscillator correlation filter | 2 | HIGH | +$1-2/7d | Needs zscore data in signal_compactor |
+| 3 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | +$2.82/7d | HIGH RISK — signal starvation |
+| 4 | HL Trigger SL/TP V2 | 3 | HIGH | Catastrophic loss prevention | Was disabled, needs re-enable |
+| 5 | Partial Close + Trailing Runner | 3 | HIGH | +$1-2/7d | HL API partial close support |
+| 6 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | New regime_tuner.py + timer |
+| 7 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4 new files, wiring existing systems |
