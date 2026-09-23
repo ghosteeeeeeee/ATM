@@ -5060,3 +5060,28 @@ Final set: ['ALGO', 'ME']
 - pnl_pct cosmetic miscalc persists (pnl_usdt correct)
 
 **BY:** auto_1hr
+
+## [2026-09-23 14:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed | **Open:** 0 (flat)
+**24h:** 22T 8W (36%WR) -$1.11
+
+**Close Reasons (24h):**
+- atr_sl_hit: 9T 3W -$0.96 (41% of closes — down from 71% on 9/21)
+- profit-monster-trail: 8T 5W +$0.06 (only profitable avg)
+- cut-loser-CL-T1: 4T 0W -$0.37 (exit reason, not signal)
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No active signals meet kill criteria (pullback-entry- already killed, legacy in window)
+- atr_sl_hit 41% — continued improvement (71% → 41%)
+- Trade frequency ~1/hr normal, no overtrading
+- System flat, quiet period
+
+**Open Questions:**
+- cut-loser-CL-T1: 0W 4L across different signals — market chop, not signal issue
+- pnl_pct cosmetic miscalc persists (pnl_usdt correct)
+
+**BY:** auto_1hr
