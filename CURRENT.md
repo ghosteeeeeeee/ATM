@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~09:50 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-23 ~12:00 UTC**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 22T, 36.4% WR, -$1.57. NEUTRAL vol. Pipeline running.
+24h: 23T, 34.8% WR, -$1.74. NEUTRAL vol. Pipeline running.
 
-- **24h (rolling):** 22T, 36.4% WR, -$1.57. ATR_SL dominates (23/30 exits). pullback-entry- SHORT 6T 33.3%WR -$1.25 (cold streak continues). mover+ LONG 2T 50%WR -$0.06.
-- **7d:** 193T, 44.6% WR, -$0.63 (DB-verified). Slightly negative — system fragile.
+- **24h (rolling):** 23T, 34.8% WR, -$1.74. ATR_SL dominates (128/192 exits 7d). pullback-entry- SHORT 5T 0%WR -$1.25 (all pre-fix, now blocked by RSI_FLOOR=50). mover+ 3T 33.3%WR -$0.34. bb-bounce-v2-long+ 8T 50%WR -$0.07 (re-enabled 3d ago, flat).
+- **7d:** 192T, 44.3% WR, -$0.93 (DB-verified). Slightly negative — system fragile.
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 17T 64.7%WR +$1.26 (gem). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d.
 - **SHORT:** pullback-entry- 41T 34.1%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **DEAD HOURS BUG FIXED** — enforcement was broken (string comparison mismatch). Now working.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -28,7 +28,7 @@
 **🟡 R:R STATUS (7d -$0.05 BARELY NEGATIVE, 24h -$2.51 DEAD HOURS IMPACT)**
 7d PnL -$0.05 (fragile). pump-chain+ LONG +$1.23 (55T 41.8%WR). volume-breakout-long+ +$1.41 (16T 68.8%WR). Dead hours fix VERIFIED: 0 trades after 09:30 UTC. Non-dead-hours pump-chain+ = 30T 60%WR +$3.48/7d.
 
-**🟢 REGIME EDGE (7d):** EXTREME 74T 54.1%WR +$2.62★ (best). NORMAL 43T 37.2%WR -$0.99 (worst). Gap $3.61/7d.
+**🟢 REGIME EDGE (7d):** EXTREME 76T 48.7%WR +$1.49★ (best). NORMAL 34T 29.4%WR -$1.52 (worst). Gap $3.01/7d.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -44,6 +44,7 @@
 
 ## Today's Changes (Sep 23)
 
+1. **brain_auditor ~12:00 UTC — NO CONFIG CHANGE.** DB-verified: 23T 34.8%WR -$1.74 (24h) | 192T 44.3%WR -$0.93 (7d). **LOSING AUTOPSY (14):** 5/14 pullback-entry- SHORT now blocked by SHORT_RSI_FLOOR=50 (saved $1.25). WCT RSI=98.86 now blocked by LONG_RSI_CEILING=80. ACE/ADA gap>1.9% still bypassing chase filter (NULL gap_at_entry). **EXIT ANALYSIS:** atr_sl_hit 128T 43.8%WR -$1.59 (dominates). profit-monster-trail 36T 63.9%WR +$1.67 (best). **EXTREME REGIME EDGE:** 48.7%WR +$1.49 vs NORMAL 29.4%WR -$1.52. **CREATIVE:** (1) Regime-adaptive ATR_SL (+$0.10-0.30/7d). (2) REGIME_CONF_MULTIPLIER (+$0.50-1.00/7d). (3) LONG detection-time RSI fallback (+$0.30-0.60/7d). **NO ACTION** — monitoring. 3 code fixes pending: volume_spike, gap_at_entry EMA, LONG RSI revalidation.
 1. **CEO ~09:50 UTC — NO CONFIG CHANGE.** DB-verified: 22T 36.4%WR -$1.57 (24h) | 193T 44.6%WR -$0.63 (7d). **MONITORING MODE** — dead hours fix + SHORT_RSI_FLOOR=50 + LONG_RSI_FLOOR=30 deployed today, too early to measure impact. **24h LOSING AUTOPSY (14):** 8/14 atr_sl_hit (pullback-entry- SHORT 6T). All pre-fix trades. **pullback-entry- SHORT cold streak:** 7d 38T 34.2%WR -$2.30 but 30d 119T 52.1%WR +$0.35 — systemic, not just cold. SHORT_RSI_FLOOR=50 should help. **SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. **volume_spike 100% NULL 5+ days** — chase filter blind to volume quality. **NO ACTION** — monitoring today's fixes impact.
 1. **brain_auditor ~09:30 UTC — NO CONFIG CHANGE.** DB-verified: 21T 38.1%WR -$1.14 (24h) | 207T 44.4%WR -$0.88 (7d). **LOSING AUTOPSY (13):** 8 atr_sl_hit, 3 cut-loser, 2 profit-monster-trail. DOT/COMP/FIL/SEI all below SHORT_RSI_FLOOR=50 (pre-fix, now blocked — saved $0.91). ACE/ADA/WCT gap>1.9% (chase filter blind — gap_at_entry NULL for <300 candle tokens). **NEW BUG: No LONG RSI revalidation at execution.** WCT entered RSI=98.86 (SHORT has ceiling at line 1019-1025, LONG has none). **NULL RSI EDGE:** 65.4%WR with detection-time fallback vs 48.4%WR live — detection-time is BETTER filter. **DRIFT:** volume_spike 100% NULL 5+ days. gap_at_entry NULL for mover+/volume-breakout-long+. **CREATIVE:** (1) Extend detection-time RSI fallback to LONG filters (would catch WCT). (2) Regime-adaptive ATR_SL for EXTREME. **NO ACTION** — monitoring today's fixes.
 1. **brain_auditor ~08:00 UTC — 1 CONFIG CHANGE.** DB-verified: 22T 40.9%WR -$1.70 (24h) | 186T 45.2%WR -$0.35 (7d) | 461T 51.0%WR +$2.31 (14d). **LONG_RSI_FLOOR=30 ADDED.** 14d: LONG RSI<30 = 12T 8.3%WR -$1.45 (catastrophic). 7d: 0/3 winners at RSI<30. Would block 7 losers ($1.45), 0 winners ($0). Net: +$1.32/14d = +$0.66/7d. Enforcement in signal_compactor.py alongside SHORT_RSI_FLOOR. **NULL RSI EDGE:** pullback-entry- SHORT NULL RSI = 65.4%WR +$1.85 vs HAS_RSI 48.4%WR -$1.50. Detection-time fallback produces higher quality entries. **DRIFT:** volume_spike 100% NULL (5+ days). gap_at_entry NULL for mover+ (chase filter bypass). **NO ACTION** — monitoring SHORT_RSI_FLOOR + LONG_RSI_FLOOR + dead hours impact.

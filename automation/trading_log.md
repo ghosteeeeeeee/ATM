@@ -4961,3 +4961,78 @@ Final set: ['ALGO', 'ME']
 - pnl_pct data quality still miscalculated (cosmetic, pnl_usdt correct)
 
 **BY:** auto_1hr
+
+## [2026-09-23 10:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, +$0.00) | **Open:** 0 (flat)
+**24h:** 23T 9W (39.1%WR) -$1.56 | **7d:** 194T 87W (44.8%WR) -$0.62
+
+**Close Reasons (24h):**
+- atr_sl_hit: 12T 4W -$1.52 (52% of closes, down from 59% last check)
+- profit-monster-trail: 7T +$0.09 (only profitable exit)
+- cut-loser-CL-T1: 3T 0W -$0.29
+- UNIVERSAL_MAX_HOLD: 1T +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR) — pullback-entry- already killed, legacy trades only
+- atr_sl_hit trending right (71% → 59% → 52% over 3 days)
+- Trade frequency normal (~2/hr)
+- No open positions — system flat
+
+**Open Questions:**
+- pnl_pct data quality miscalculated (cosmetic, pnl_usdt correct)
+
+**BY:** auto_1hr
+
+## [2026-09-23 11:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L, -$0.08) | **Open:** 0 (flat)
+**24h:** 24T 9W (37.5%WR) -$1.56 | **7d:** 194T 86W (44%WR) -$0.76
+
+**Close Reasons (24h):**
+- atr_sl_hit: 12T 4W -$1.52 (48% of closes, trending down from 71%)
+- profit-monster-trail: 7T 4W +$0.09 (only profitable exit avg)
+- cut-loser-CL-T1: 4T 0W -$0.37 (no wins but low count)
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR) — pullback-entry- already killed
+- atr_sl_hit at 48% — continued improvement (71% → 52% → 48%)
+- Trade frequency normal (~1/hr)
+- System flat, quiet hours
+
+**Open Questions:**
+- cut-loser-CL-T1: 0W 4L — watch but only 4 trades total
+- pnl_pct cosmetic miscalc persists (pnl_usdt correct)
+
+**BY:** auto_1hr
+
+## [2026-09-23 12:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed | **Open:** 1 (NXPC LONG bb-bounce-v2-long+ $22.10, 0.8h)
+**24h:** 23T 9W (39.1%WR) -$1.74
+
+**Close Reasons (24h):**
+- atr_sl_hit: 11T 3W -$1.62 (47.8% of closes, trending down from 71%)
+- profit-monster-trail: 7T 4W +$0.09 (57.1% WR, only profitable avg)
+- cut-loser-CL-T1: 4T 0W -$0.37
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR)
+- pullback-entry- 5T 0WR — already killed, legacy trades in window
+- atr_sl_hit 47.8% — continued improvement (71% → 48%)
+- Trade frequency low (~1/hr), no overtrading
+- 1 open position running, system quiet
+
+**Open Questions:**
+- cut-loser-CL-T1: 0W 4L — low count, monitor
+- pnl_pct cosmetic miscalc persists (pnl_usdt correct)
+
+**BY:** auto_1hr

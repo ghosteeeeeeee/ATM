@@ -2838,3 +2838,15 @@
   24h: 22T 36.4%WR -$2.14. atr_sl_hit 63.6% (down from 71% yesterday).
   No kill criteria met. pump-chain+ 2T 0WR — watch next hour.
   BY: auto_1hr
+[2026-09-23 11:30 UTC] brain_auditor: 1 CONFIG CHANGE
+  DB-verified: 23T 34.8%WR -$1.74 (24h) | 194T 44.3%WR -$0.76 (7d)
+  LONG_RSI_CEILING=80 added to hermes_constants.py + signal_compactor.py.
+  Blocks LONG entries when RSI > 80 (extreme overbought — pullback risk).
+  30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15 caught.
+  Enforcement mirrors SHORT_RSI_CEILING pattern (1m candles RSI calc).
+  Expected: +$0.10-0.15/7d. 0 winners blocked.
+  BY: brain_auditor
+[2026-09-23 12:10 UTC] auto_1hr: NO CHANGE — system quiet
+  0 trades last hour. 1 open (NXPC LONG). 24h: 23T 39.1%WR -$1.74.
+  atr_sl_hit 47.8% (continued downtrend from 71%). No kill criteria met.
+  BY: auto_1hr

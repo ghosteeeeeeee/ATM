@@ -3011,7 +3011,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 _conn_sf = None
                 try:
@@ -3156,6 +3156,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _conn_rsc:
                         try:
                             _conn_rsc.close()
+                        except Exception:
+                            pass
+            # ── LONG RSI ceiling: block LONG at extreme overbought (pullback risk) ──
+            # Mirror of SHORT_RSI_CEILING — prevents LONGing into overextension.
+            # 30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15 (caught).
+            # Blocks extreme overbought entries where momentum is exhausted.
+            if direction == 'LONG' and LONG_RSI_CEILING > 0:
+                _conn_lrc = None
+                try:
+                    _conn_lrc = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_lrc = _conn_lrc.cursor()
+                    _cur_lrc.execute("""
+                        SELECT close FROM candles_1m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _lrc_closes = [r[0] for r in _cur_lrc.fetchall()]
+                    if len(_lrc_closes) >= 15:
+                        _lrc_deltas = [_lrc_closes[i] - _lrc_closes[i+1] for i in range(len(_lrc_closes)-1)]
+                        _lrc_gains = [d if d > 0 else 0 for d in _lrc_deltas[-14:]]
+                        _lrc_losses = [-d if d < 0 else 0 for d in _lrc_deltas[-14:]]
+                        _lrc_ag = sum(_lrc_gains) / 14
+                        _lrc_al = sum(_lrc_losses) / 14
+                        if _lrc_al > 0:
+                            _lrc_rsi = 100 - (100 / (1 + _lrc_ag / _lrc_al))
+                            if _lrc_rsi > LONG_RSI_CEILING:
+                                log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {LONG_RSI_CEILING} (overbought — pullback risk)")
+                                continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    if _conn_lrc:
+                        try:
+                            _conn_lrc.close()
                         except Exception:
                             pass
             # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──

@@ -1705,5 +1705,32 @@
     "category": "exit optimization",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-23T12:31:52.496410+00:00",
+    "idea": "Regime-adaptive ATR_SL — widen SL by 0.2% in EXTREME regime",
+    "rationale": "EXTREME 48.7%WR best regime but 67% exits are atr_sl_hit. Wider SL lets trades breathe in high-vol.",
+    "expected_impact": "+$0.10-0.30/7d",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-23T12:31:52.496423+00:00",
+    "idea": "REGIME_CONF_MULTIPLIER — boost confidence 1.15x EXTREME, 0.85x NORMAL",
+    "rationale": "EXTREME 48.7%WR +$1.49 vs NORMAL 29.4%WR -$1.52. No regime adjustment to confidence currently.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-23T12:31:52.496425+00:00",
+    "idea": "Extend detection-time RSI fallback to LONG filters",
+    "rationale": "NULL RSI trades 65.4%WR vs live RSI 48.4%WR. Detection-time is BETTER filter. Would catch WCT RSI=98.86.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

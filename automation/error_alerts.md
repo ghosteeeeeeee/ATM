@@ -1,3 +1,12 @@
+## Error Alerts — 2026-09-23 11:44 UTC
+- **[WARN]**: signal_compactor timeout at 11:42:03 (60.1s) — recovered in next cycle (4.4s). Single occurrence, not systemic.
+- **[INFO]**: Disk 85% (95G/118G). Largest consumers: coin_tracker.db 2.7G, candles.db 2.0G, signals_hermes.db 814M. No compressible logs found.
+- **[INFO]**: Pipeline cycle #212326 completed normally. 1 open position (HL), 23 closed today, -55.94% daily PnL.
+
+## Error Alerts — 2026-09-23 10:46 UTC
+- **[WARN]** (7x): `signal_compactor timed out (killed after 60.1s)` — 7 occurrences in 30min window. Transient DB lock contention. Compactor recovered at 10:44 (runs now complete in 3-5s). No fix applied — self-resolved.
+- **[WARN]**: Disk at 85% (95G/118G). Largest log: pipeline.log 76MB, signal-compactor.log 25MB. Consider compressing logs >7 days old.
+
 ## Error Alerts — 2026-09-21 18:46 UTC
 - **[WARN]** (23x): `signal_compactor timed out (killed after 60.1s)` — 23 occurrences in last 6h (12:48-18:42). Intermittent — most runs complete in 1-5s. Likely caused by 92MB signal DB with 5,884 active signals (BTC alone has 425 duplicate signals). Pipeline recovers on next cycle each time.
 - **[WARN]**: 0 signals passing compactor — "No signals above 50% confidence — skipping execution" on recent runs. Compactor is filtering everything out. Market regime heavily neutral (117/120 neutral, 3 short).
@@ -565,3 +574,10 @@
 - **[WARN]** (2x): `signal_compactor timed out (killed after 60.1s)` — recurring in last 30min, pipeline recovers on next cycle
 - **[WARN]**: Disk at 85% — mostly data DBs (coin_tracker 2.7G, candles 2G), 18G free, monitor
 - **[INFO]**: Timers show 0 active via `systemctl list-timers` — verify if timers are expected to be active or if pipeline-mode is primary
+
+## Error Alerts — 2026-09-23 09:57 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-23 10:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.0s)`

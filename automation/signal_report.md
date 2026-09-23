@@ -1,41 +1,89 @@
-# === Signal Performance Report ===
-Period: Last 6h | 24h | 7d  
-Generated: 2026-09-23 05:11 UTC
+# Signal Performance Report
+**Generated:** 2026-09-23 13:45 UTC | **Period:** Last 6h + 24h
 
-## KILLS (already executed):
+## 6h Performance
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| mover+ | LONG | 2 | 0.0% | -$0.50 |
+| bb-bounce-v2-long+ | LONG | 5 | 40.0% | -$0.06 |
+
+## 24h Performance
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pullback-entry- | SHORT | 5 | 0.0% | -$1.25 |
+| mover+ | LONG | 3 | 33.3% | -$0.34 |
+| bb-bounce-v2-long+ | LONG | 8 | 50.0% | -$0.07 |
+
+**24h Total:** 24 trades | 37.5% WR | -$1.64 PnL
+
+---
+
+## KILLED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 (24h) | KILLED `PULLBACK_ENTRY_MINUS_ENABLED=False` (2026-09-22 23:12 UTC). 38T/7d 34.2%WR -$2.30. No new signals since kill. |
-| open-skies+ | LONG | 20.0% | -$0.42 | 5 (7d) | KILLED `OPEN_SKIES_PLUS_ENABLED=False` (2026-09-22). 3T in HIGH 0%WR. |
-| grind-trend- | SHORT | 20.0% | -$0.38 | 5 (7d) | KILLED `GRIND_TREND_MINUS_ENABLED=False` (2026-09-19). |
+| pullback-entry- | SHORT | 0.0% | -$1.25 | 5 | Already disabled (flag=False since Sep 22 23:12 UTC). 24h trades predate kill. |
 
-## BOOSTED:
+No new kills needed. All kill-criteria signals already disabled.
+
+---
+
+## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 64.7% | +$1.26 | 17 (7d) | WATCH — best performer. EXTREME regime only per volatility_gate_v2. |
+| volume-breakout-long+ | LONG | 66.7% | +$1.46 | 18 (7d) | Already at 1.15x weight. EXTREME 70% WR. No change needed. |
 
-## LOSERS (watch list):
+---
+
+## LOSERS (watch list)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 0.0% | -$0.76 | 3 (24h) | WATCH — 7d is 41.8%WR +$1.23 (55T). 24h is bad luck in EXTREME. |
-| pump-chain- | SHORT | 33.3% | -$0.38 | 6 (7d) | OK — 30d is 57.4%WR +$0.24 (61T). 7d is noise. |
-| btc-pump-rider+ | LONG | 0.0% | -$0.18 | 3 (30d) | WATCH — 3 trades in 30d, too small to kill. |
+| mover+ | LONG | 33.3% | -$0.34 | 3 (24h) | ENABLED — Historical 66.7% WR (18T). Bad 24h streak. Watch. |
+| bb-bounce-v2-long+ | LONG | 50.0% | -$0.07 | 8 (24h) | ENABLED — Near breakeven. Bollinger family, EXTREME/HIGH only. |
 
-## WINNERS:
+---
+
+## WINNERS
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 64.7% | +$1.26 | 17 (7d) | Running hot |
-| pump-chain+ | LONG | 41.8% | +$1.23 | 55 (7d) | Net positive despite 24h blip |
-| grind-trend+ | LONG | 50.0% | +$0.24 | 18 (7d) | Steady |
-| bb-bounce-v2-long+ | LONG | 66.7% | -$0.01 | 3 (7d) | Tiny rounding loss |
+| volume-breakout-long+ | LONG | 66.7% | +$1.46 | 18 (7d) | ENABLED — 1.15x weight. EXTREME 70% WR. Consistent. |
 
-## ISSUES:
-- **No direction inversions detected**
-- **pullback-entry- was bypassing kill flag** — `PULLBACK_ENTRY_MINUS_ENABLED=False` was set at 23:12 UTC Sep 22, but 6 trades from earlier that day still show in the 24h window. Flag is working (no new signals since).
-- **System 24h: 21 trades, 38.1% WR, -$1.82 PnL** — dominated by pullback-entry- losses (now killed)
-- **System 7d: 185 trades, 45.4% WR, -$0.10 PnL** — roughly breakeven
-- **21 signals in NEVER_REENABLE_FLAGS** — loaded correctly
+---
 
-## Actions taken:
-- None needed this run — all kill candidates already have flags set
-- volume-breakout-long+ flagged for monitoring (boost candidate if trend holds)
+## ISSUES
+
+- **No signal inversions found.** All signals respect direction labels.
+- **No anomalies detected.** Large losses only from already-killed signals.
+- **24h overall WR is low (37.5%)** but sample size is small (24 trades). Not a systemic issue.
+
+---
+
+## Regime Performance Context
+
+**pullback-entry- SHORT (7d):**
+- EXTREME: 12T, 41.7% WR, -$0.39
+- HIGH: 18T, 38.9% WR, -$0.78
+- NORMAL: 8T, 12.5% WR, -$1.13
+- **All regimes < 50% WR → blanket kill confirmed correct**
+
+**mover+ LONG (lifetime):**
+- EXTREME: 7T, 57.1% WR, -$0.48
+- HIGH: 9T, 66.7% WR, +$0.09
+- NORMAL: 2T, 100% WR, +$0.15
+- **Wins in HIGH/NORMAL, loses in EXTREME. No regime block needed yet.**
+
+**bb-bounce-v2-long+ LONG (lifetime):**
+- EXTREME: 2T, 50% WR, -$0.24
+- HIGH: 10T, 50% WR, -$0.06
+- **Bollinger family already blocked in HIGH via VOL_PHASE_MULTS. EXTREME at 0.4x.**
+
+---
+
+## Actions Taken
+
+None. All signals already at correct state. No new kills or boosts needed.

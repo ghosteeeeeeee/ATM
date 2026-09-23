@@ -832,6 +832,7 @@ SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = moment
 # 7d: RSI<30 LONG = 0 winners (0/3). Would block 7 losers ($1.45 saved), 0 winners ($0 lost).
 # RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot — NOT blocked).
 LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
+LONG_RSI_CEILING = 80           # brain_auditor 2026-09-23: overbought LONG = pullback risk. WCT RSI=98.86 LONG -$0.15. 30d: RSI>80 LONG = 4T 50%WR -$0.22. Blocks extreme overbought entries.
 
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.

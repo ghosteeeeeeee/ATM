@@ -406,5 +406,16 @@
     "after": "LONG_RSI_FLOOR=30 blocks all LONG entries with RSI<30. 14d: 12T 8.3%WR -$1.45. Would block 7 losers ($1.45), 0 winners ($0). Net: +$1.32/14d = +$0.66/7d.",
     "rationale": "14d LONG RSI<30 = 12T 8.3%WR -$1.45 (catastrophic). 7d: 0/3 winners at RSI<30. RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot, NOT blocked). Signal-specific floors miss mover+, doji-bottom-long, rr-struct-v2+.",
     "impact": "+$0.66/7d expected. Zero winners blocked in last 7d."
+  },
+  {
+    "timestamp": "2026-09-23T11:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Added LONG_RSI_CEILING=80 — blocks LONG entries at extreme overbought RSI",
+    "type": "config",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "No LONG RSI ceiling — WCT entered LONG at RSI=98.86 and lost",
+    "after": "LONG_RSI_CEILING=80 enforced at execution time via 1m candles RSI",
+    "rationale": "30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15. Blocks extreme overbought entries where momentum is exhausted. Mirror of SHORT_RSI_CEILING.",
+    "impact": "Expected +$0.10-0.15/7d from blocking extreme overbought LONG entries. 0 winners blocked (no recent winners at RSI>80)."
   }
 ]
