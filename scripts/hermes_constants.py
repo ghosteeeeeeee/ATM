@@ -1798,7 +1798,7 @@ ACCEL_300_CHOP_LOOKBACK        = 50   # bars used for EMA angle and avg-gap chop
 # ── Accel-300 Ultra-Fast Breakout (signals/accel_300.py) ──────────────────────
 # Fires on high-velocity breakouts BEFORE persistence confirms the trend.
 # Backtested: 78% WR, +1.60% avg PnL on STX (11 signals in 3 days).
-ACCEL_300_BREAKOUT_ENABLED     = True   # re-enabled 2026-08-12 — confidence raised to 80
+ACCEL_300_BREAKOUT_ENABLED     = False  # SIGNAL REPORTER 2026-09-23 — 28.6% WR, -$0.12 (24h), ALL EXTREME. In NEVER_REENABLE.
 ACCEL_300_BREAKOUT_VELOCITY    = 1.0    # min price move % in 5 bars (1.0% = fast breakout)
 ACCEL_300_BREAKOUT_GAP_MIN     = 0.5    # min gap % from EMA60 (was 1.0 — too restrictive)
 ACCEL_300_BREAKOUT_TREND_EMA   = 200    # LONG only above this EMA, SHORT only below

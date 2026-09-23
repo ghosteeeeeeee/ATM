@@ -230,7 +230,7 @@ VOL_PHASE_MULTS = {
     },
     # EXTREME volatility: Storm mode — only structural signals
     ('EXTREME', '*'): {
-        'Mover': 1.2,           # Ride the storm
+        'Mover': 0.0,           # BLOCKED — mover+ LONG 4/7 wins EXTREME but -$0.48 lifetime. 1.2x insufficient. signal_reporter 2026-09-23
         'HL_Copy': 1.1,         # Follow smart money
         'Continuation': 1.1,    # Ride the wave
         'Bollinger': 0.4,       # Don't fade storms
