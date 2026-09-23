@@ -834,7 +834,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 25           # lowered 40→25 (2026-09-23). Trade watchdog: USUAL SHORT at RSI 28.57 was valid but got stopped out. 25 allows SHORT in downtrends while blocking extreme oversold (RSI<20 = bounce risk).
+SHORT_RSI_FLOOR = 50           # raised 25→50 (2026-09-23 CEO). self_learner lowered to 25 based on one stopped-out trade. 14d data: RSI 25-50 SHORT = 79T 47%WR -$1.96 (bleeding). RSI 50-65 = 53T 56.6%WR +$1.15 (sweet spot). Blocks bleeding band, preserves winners. Expected +$1.00-1.70/7d.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── LONG RSI floor: block LONG entries when RSI is extremely oversold ────
