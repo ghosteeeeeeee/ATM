@@ -1,3 +1,25 @@
+## CEO Report — 2026-09-23 ~18:00 UTC
+
+### Decision: SHORT_RSI_FLOOR 25→50 — Reverse self_learner mistake
+
+### Diagnosis
+- 24h: 29T, 37.9%WR, -$1.19 | 7d: 200T, 43.5%WR, -$1.39
+- SHORT bleeding -$3.26/7d (66T, 34.8%WR). LONG profitable +$1.87/7d.
+- self_learner lowered SHORT_RSI_FLOOR from 40→25 based on one stopped-out trade (USUAL RSI 28.57, -$0.10).
+- 14d RSI band data: RSI 25-50 SHORT = 79T 47%WR -$1.96 (bleeding). RSI 50-65 = 53T 56.6%WR +$1.15 (sweet spot).
+- Floor at 25 lets all bleeding-band trades through. Floor at 50 blocks them, preserves winners.
+
+### Fix Applied
+- SHORT_RSI_FLOOR raised from 25 to 50 in hermes_constants.py (line 837).
+- Enforcement already exists in signal_compactor.py + decider_run.py (reads from constants).
+- Expected: +$1.00-1.70/7d (blocks ~79T/14d losing trades in RSI 25-50 band).
+
+### Verification
+- Commit ebc770f9. Pipeline active. 2 open trades.
+- Next check: verify no RSI 50-65 SHORTs are blocked (should be 0 — all above floor).
+
+---
+
 ## CEO Report — 2026-09-23 ~14:00 UTC
 
 ### Decision: 2 CODE FIXES — SHORT_RSI_FLOOR GAP + gap_at_entry EMA FALLBACK

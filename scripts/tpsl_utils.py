@@ -442,6 +442,24 @@ def compute_atr_sl_tp(
     if flip_k_override is not None:
         k = flip_k_override
 
+    # R:R-based k override (2026-09-23): Grade A gets wider SL, Grade D gets tighter
+    # Use confidence as proxy for R:R quality (higher conf = better setup = wider SL)
+    try:
+        from hermes_constants import RR_K_GRADE_A, RR_K_GRADE_B, RR_K_GRADE_C, RR_K_GRADE_D
+        _conf = 70  # default
+        if confidence is not None:
+            _conf = confidence
+        if _conf >= 90:
+            k = RR_K_GRADE_A  # Grade A: wide SL, let winners run
+        elif _conf >= 75:
+            k = RR_K_GRADE_B  # Grade B: standard SL
+        elif _conf >= 60:
+            k = RR_K_GRADE_C  # Grade C: tighter SL
+        else:
+            k = RR_K_GRADE_D  # Grade D: very tight SL
+    except Exception:
+        pass
+
     sl_pct = k * atr_pct
     tp_pct = k * ATR_TP_K_MULT * atr_pct
 

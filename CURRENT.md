@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~16:30 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-23 ~18:00 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 22T, 36.4% WR, -$0.11. NEUTRAL vol. Pipeline running. System improving.
+24h: 29T, 37.9% WR, -$1.19. NEUTRAL vol. Pipeline running. SHORT_RSI_FLOOR=50 deployed.
 
-- **24h (rolling):** 22T, 36.4% WR, -$0.11. 13W/9L. pullback-entry- SHORT 3T -$0.59. mover+ 3T -$0.34. bb-bounce-v2-long+ 9T -$0.10. volume-breakout-long+ 2T +$0.05. gap_at_entry EMA fallback deployed — should block future mover+ chases.
-- **7d:** 193T, 43.5% WR, -$1.30 (DB-verified). SHORT bleeding -$2.93 (78T 35.8%WR). LONG slightly negative +$0.19 (115T 48.8%WR).
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). bb_bounce_v2_long RE-ENABLED 9T/3d 55.6%WR -$0.03 (flat).
-- **SHORT:** pullback-entry- 35T 31.4%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **SHORT_RSI_FLOOR=40** (CEO lowered 50→40 to allow SHORT in downtrends). **DEAD HOURS BUG FIXED** — enforcement working.
+- **24h (rolling):** 29T, 37.9% WR, -$1.19. SHORT 8T -$0.39. LONG 21T -$0.80. accel-300-breakout SHORT 6T -$0.10. pullback-entry- SHORT 3T (yesterday, -$0.59). bb-bounce-v2-long+ 9T -$0.03. mover+ 3T -$0.34.
+- **7d:** 200T, 43.5% WR, -$1.39 (DB-verified). SHORT 66T 34.8%WR -$3.26. LONG 134T 47.8%WR +$1.87.
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). bb_bounce_v2_long 9T 44.4%WR -$0.10.
+- **SHORT:** pullback-entry- 35T 31.4%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **SHORT_RSI_FLOOR=50** (CEO raised 25→50 — blocks RSI 25-50 bleeding band 79T 47%WR -$1.96/14d). **DEAD HOURS BUG FIXED** — enforcement working.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. Was [0,1,2,3,4,5,21,23] which blocked profitable hours (0=+$0.72, 23=+$0.69). **VERIFIED WORKING** — 0 trades after 09:30 UTC. Expected +$1.91/7d.
@@ -20,7 +20,7 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=40:** CEO lowered 50→40 (Sep 23). 50 blocked SHORT in downtrends (RSI stays <50). 40 allows SHORT in downtrends while blocking oversold (RSI<35 = bounce risk). 14d: RSI 35-50 SHORT = 46T 43.5%WR -$1.98 (bleeding band). RSI 50-65 = 51T 56.9%WR +$1.19 (sweet spot).
+- **SHORT_RSI_FLOOR=50:** CEO raised 25→50 (Sep 23). self_learner had lowered to 25 based on one trade. 14d: RSI 25-50 SHORT = 79T 47%WR -$1.96 (bleeding). RSI 50-65 = 53T 56.6%WR +$1.15 (sweet spot). Blocks bleeding band, preserves winners. Expected +$1.00-1.70/7d.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **LONG_RSI_FLOOR=30:** brain_auditor added (Sep 23). 14d: RSI<30 LONG = 12T 8.3%WR -$1.45. 7d: 0/3 winners. Blocks falling knife entries. Net +$0.66/7d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
