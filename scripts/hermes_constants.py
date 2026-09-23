@@ -834,11 +834,11 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 25           # lowered 40→25 (2026-09-23 CEO decision). RSI below 25 = extreme oversold = catching falling knife. RSI 25-40 = confirmed downtrend, valid SHORT entry in bearish regime. Trade watchdog: RSI 35-40 shows 47%WR only in chop — in trending DOWN, RSI<40 is a strength indicator.
+SHORT_RSI_FLOOR = 50           # raised 25→50 (brain_auditor 2026-09-23). 14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding band). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot). Blocks 39 losers, loses 0 winners. Net +$2.70/14d.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
-# When SHORT_RSI_FLOOR is 40, RSI 35-40 is still dangerous — the move has already happened.
+# When SHORT_RSI_FLOOR is 50, RSI 35-50 is the bleeding band — block entirely.
 # BANANA lesson: SHORT at RSI 10-35 = catching falling knife in reverse. Block these.
 OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold = move already happened)
 

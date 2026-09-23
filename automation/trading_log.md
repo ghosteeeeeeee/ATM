@@ -5309,3 +5309,34 @@ Final set: ['ALGO', 'ME']
 - mover+ 3T 1W 33%WR -$0.34 — borderline, monitor next hour
 
 **BY:** auto_1hr
+
+## [2026-09-23 21:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0 wins, 2 losses)
+**PnL:** -$0.07 (NEAR SHORT -$0.01 profit-monster-trail, AVAX SHORT -$0.06 pump_exit_dead_money)
+**24h:** 31T 41.9%WR -$0.83
+
+**24h exit reasons:**
+- profit-monster-trail: 12T avg +$0.003
+- atr_sl_hit: 11T 35.5% avg -$0.055 (improved from 42.9% at 16:20)
+- cut-loser-CL-T1: 5T avg -$0.094
+- pump_exit_dead_money: 2T avg +$0.025
+- UNIVERSAL_MAX_HOLD: 1T +$0.16
+
+**24h signal ranking:**
+- pump-chain-: 5T 60%WR +$0.10 (best)
+- volume-breakout-long+: 2T 50%WR +$0.05
+- bb-bounce-v2-long+: 9T 44.4%WR -$0.10
+- accel-300-breakout: 7T 28.6%WR -$0.12
+- mover+: 3T 33%WR -$0.34 (weak but too few trades to kill)
+
+**Open trades:** 3 (FOGO/CHIP/CASHCAT pump-chain- SHORT, 1-2hrs old, flat)
+
+**Changes:** None needed
+**No Action Needed:**
+- atr_sl_hit improved to 35.5%, below 40% threshold
+- Trade frequency normal (~1.5/hr), no overtrading
+- No stale trades, no kill candidates
+- All Sep 23 fixes deployed and settling in
+
+**BY:** auto_1hr

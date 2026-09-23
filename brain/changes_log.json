@@ -439,5 +439,16 @@
     "after": "24h: 30T, 40% WR, -$1.16",
     "rationale": "CURRENT.md was stale — actual DB numbers differ",
     "impact": "No trading impact — documentation only"
+  },
+  {
+    "timestamp": "2026-09-23T21:35:00.374326+00:00",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_FLOOR 25→50 — blocks bleeding RSI 35-50 SHORT band",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "SHORT_RSI_FLOOR = 25",
+    "after": "SHORT_RSI_FLOOR = 50",
+    "rationale": "14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot). 0 winners in 35-50 band. Blocks 39 losers, loses 0 winners.",
+    "impact": "+$2.70/14d = +$1.35/7d"
   }
 ]

@@ -2891,3 +2891,8 @@
   CREATIVE: Regime-adaptive ATR_SL, bb-bounce SL widening, gap_at_entry fix.
   NO ACTION — monitoring Sep 23 fixes.
   BY: brain_auditor
+
+[2026-09-23 21:00 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 31T 41.9%WR -$0.83 | 2 trades last hour (both small losses -$0.07)
+  3 open trades (pump-chain- SHORT, 1-2hrs, flat). atr_sl_hit 35.5% (improved from 42.9%)
+  No kill candidates, no overtrading, no stale trades. BY: auto_1hr

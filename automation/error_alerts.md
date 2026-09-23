@@ -622,3 +622,17 @@
 - **WARN** (continuous): `hotset.json is empty — no signals survived compaction` — 0 tokens in hotset for multiple consecutive cycles. Signals generated (42 in last hour) but all filtered out by RR-engine (grade=F) and spike filter (RSI<30). Market regime is NEUTRAL (118/120 tokens).
 - **AUTO-FIX**: Disk cleanup — vacuumed 1.1G from journal logs (85%→84%)
 - **NOTE**: coin_tracker.db is 2.7G, candles.db is 2.1G — consider VACUUM or pruning old data if disk continues filling.
+
+## Error Alerts — 2026-09-23 20:46 UTC
+- **WARN** (1x): `signal_compactor timed out (killed after 60.1s)` at 20:42:03 — transient, recovered on next cycle (20:43:01 rc=0)
+- **WARN** (13x): `STALE-WARN` signals — signals >5min old reaching decider (max 5min threshold). All verified conditions at execution time.
+- **WARN** (9x in 2h): `BTC-CRASH` guard blocking SHORT entries when BTC near local low — working as designed
+- **WARN**: Disk at 84% (94G/118G) — approaching threshold, monitor growth
+- **INFO**: Today's PnL: -26.05% (32 closed trades). All 3 open positions are SHORT, 2 profitable.
+- **INFO**: Regime NEUTRAL (118/120 tokens). Signal generation healthy (33 unique tokens in last hour).
+- **AUTO-FIX**: None required — all issues self-healing or informational
+
+## Error Alerts — 2026-09-23 20:57 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
