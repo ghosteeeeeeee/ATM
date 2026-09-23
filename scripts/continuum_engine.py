@@ -1026,8 +1026,9 @@ class ContinuumEngine:
                 return  # Score too low, don't enter
             
             # Entry requires volume confirmation (Sep 3 style)
-            # Volume must be HIGH (3.0x+) — this is the first confirmation
-            # that the wave has energy, before the explosion
+            # Volume must be HIGH (3.0x+) OR NORMAL with rising velocity (2026-09-23)
+            # HIGH/PARABOLIC: full entry (100%/75% size)
+            # NORMAL + velocity RISING: partial entry (50% size) — catches moves without extreme volume
             if state.volume_regime in ('HIGH', 'PARABOLIC'):
                 self.entry_phase = 4
                 self.position_side = side
@@ -1036,6 +1037,15 @@ class ContinuumEngine:
                 self._entry_volume = state.volume_regime  # Save volume at Phase 4 entry
                 self._sustained_high_score_count = 0  # Reset sustained score counter
                 print(f"[CONTINUUM] Phase 4: Volume confirmed ({state.volume_regime}) | Score={state.state_score:.1f}")
+            elif state.volume_regime == 'NORMAL' and state.velocity_state == 'RISING':
+                # NORMAL volume with rising velocity — enough energy for partial entry
+                self.entry_phase = 4
+                self.position_side = side
+                self.position_size_pct = 50  # partial size — volume not extreme
+                self.entry_ts = state.ts
+                self._entry_volume = state.volume_regime
+                self._sustained_high_score_count = 0
+                print(f"[CONTINUUM] Phase 4: Volume NORMAL + velocity RISING | Score={state.state_score:.1f} (partial entry)")
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':
                 self.entry_phase = 2  # Step back but don't reset fully
             elif (side == 'LONG' and state.zscore_tier in ('NEG', 'STRONG_NEG')) or \
@@ -1058,15 +1068,10 @@ class ContinuumEngine:
             
             # Require 30+ ticks (15 minutes) of 95+ score
             if self._sustained_high_score_count >= 30:
-                # Verify volume is still valid at Phase 5
-                if state.volume_regime in ('HIGH', 'PARABOLIC'):
-                    self.entry_phase = 5
-                    print(f"[CONTINUUM] Phase 5: Sustained score confirmed ({self._sustained_high_score_count} ticks @ 95+) | Volume={state.volume_regime}")
-                else:
-                    # Volume dropped — step back
-                    self.entry_phase = 2
-                    self._sustained_high_score_count = 0
-                    print(f"[CONTINUUM] Phase 5 BLOCKED: Volume dropped to {state.volume_regime} (was {self._entry_volume})")
+                # Volume confirmation relaxed (2026-09-23) — score sustained at 95+ is sufficient
+                # Original required volume HIGH at tick 30, but volume spikes last 1-2 min then vanish
+                self.entry_phase = 5
+                print(f"[CONTINUUM] Phase 5: Sustained score confirmed ({self._sustained_high_score_count} ticks @ 95+)")
             
             # Exit conditions — step back if conditions degrade
             elif state.ema300_duration < 3 or state.zscore_tier == 'NEUTRAL':

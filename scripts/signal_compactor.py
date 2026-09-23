@@ -1173,9 +1173,10 @@ def _score_signal(token, direction, conf, source, signal_type,
                                 _override = True
                                 log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} SHORT — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
                             # Allow LONG when BTC is bullish structure
+                            # FIX: accept AT (hysteresis considers AT→ABOVE after 55 min) (2026-09-23)
                             elif direction.upper() == 'LONG' and (
                                 _p2 in ('RECOVERY', 'NEUTRAL') or
-                                (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 == 'ABOVE')
+                                (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))
                             ):
                                 _override = True
                                 log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")

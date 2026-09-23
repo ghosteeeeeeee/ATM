@@ -95,6 +95,12 @@ SIGNAL_OVERRIDES = {
     'trend_purity': 'MEAN_REVERSION',       # structural trend confirmation — allowed in chop
     'trend_purity_long': 'MEAN_REVERSION',
     'trend_purity_short': 'MEAN_REVERSION',
+    'continuum_osc_long': 'MEAN_REVERSION',  # continuum oscillator — structural, allowed in chop (2026-09-23)
+    'continuum_osc_short': 'MEAN_REVERSION',
+    'continuum_score_long': 'MEAN_REVERSION',
+    'continuum_score_short': 'MEAN_REVERSION',
+    'continuum_trend_long': 'MEAN_REVERSION',
+    'continuum_trend_short': 'MEAN_REVERSION',
     'doji_top_short': 'MEAN_REVERSION',
     'doji_top_exit': 'MEAN_REVERSION',
     'doji_bottom_long': 'MEAN_REVERSION',    # doji exhaustion at bottom — mean-reversion
