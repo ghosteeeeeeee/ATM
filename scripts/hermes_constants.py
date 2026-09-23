@@ -2536,7 +2536,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
     # breakout-long removed — killed 2026-09-17 (4T/7d 25%WR -$0.35)
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
-    'return_exhaustion_short', 'return-exhaustion-short',  # underscore + hyphen variants
+    'return_exhaustion_short', 'return-exhaustion-short',  # underscore + hyphen variants (2026-09-23: hyphen variant was missing, blocking GOAT SHORT)
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
     # ponytail: ema300-dip-long removed — dead (2T/7d 0%WR -$0.40)
