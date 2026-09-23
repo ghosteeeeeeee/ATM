@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~18:00 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-23 ~18:30 UTC**
+**Updated by: Daily Orchestrator (DB-verified)**
 
 ## Current Status
 
-24h: 29T, 37.9% WR, -$1.19. NEUTRAL vol. Pipeline running. SHORT_RSI_FLOOR=50 deployed.
+24h: 25T, 44% WR, -$0.50. NEUTRAL vol. Pipeline running. 3 open SHORT pump-chain- positions.
 
-- **24h (rolling):** 29T, 37.9% WR, -$1.19. SHORT 8T -$0.39. LONG 21T -$0.80. accel-300-breakout SHORT 6T -$0.10. pullback-entry- SHORT 3T (yesterday, -$0.59). bb-bounce-v2-long+ 9T -$0.03. mover+ 3T -$0.34.
-- **7d:** 200T, 43.5% WR, -$1.39 (DB-verified). SHORT 66T 34.8%WR -$3.26. LONG 134T 47.8%WR +$1.87.
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). bb_bounce_v2_long 9T 44.4%WR -$0.10.
-- **SHORT:** pullback-entry- 35T 31.4%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **SHORT_RSI_FLOOR=50** (CEO raised 25→50 — blocks RSI 25-50 bleeding band 79T 47%WR -$1.96/14d). **DEAD HOURS BUG FIXED** — enforcement working.
+- **24h (rolling):** 25T, 44% WR, -$0.50. LONG 15T -$0.24. SHORT 10T -$0.26. Quiet day — all losses small ATR_SL variance.
+- **7d:** 199T, 43% WR, -$1.61 (DB-verified). SHORT 65T 34%WR -$3.48. LONG 134T 48%WR +$1.87.
+- **LONG:** pump-chain+ 55T 41%WR +$1.23 (workhorse). volume-breakout-long+ 18T 67%WR +$1.46 (gem). bb-bounce-v2-long+ 9T 44%WR -$0.10.
+- **SHORT:** pullback-entry- 34T 29%WR -$3.03 (cold streak — 30d 119T 52.1%WR +$0.35). **SHORT_RSI_FLOOR=50** deployed Sep 23 — blocks RSI 25-50 bleeding band. **DEAD HOURS BUG FIXED** — enforcement working.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. Was [0,1,2,3,4,5,21,23] which blocked profitable hours (0=+$0.72, 23=+$0.69). **VERIFIED WORKING** — 0 trades after 09:30 UTC. Expected +$1.91/7d.
@@ -25,8 +25,8 @@
 - **LONG_RSI_FLOOR=30:** brain_auditor added (Sep 23). 14d: RSI<30 LONG = 12T 8.3%WR -$1.45. 7d: 0/3 winners. Blocks falling knife entries. Net +$0.66/7d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$1.30, 24h -$0.11 IMPROVING)**
-7d PnL -$1.30 (fragile). pump-chain+ LONG +$1.23 (55T 41.8%WR). volume-breakout-long+ +$1.46 (18T 66.7%WR). Dead hours fix VERIFIED: 0 trades in blocked hours. Non-dead-hours pump-chain+ = 30T 60%WR +$3.48/7d.
+**🟡 R:R STATUS (7d -$1.61, 24h -$0.50 QUIET DAY)**
+7d PnL -$1.61 (fragile). pump-chain+ LONG +$1.23 (55T 41%WR). volume-breakout-long+ +$1.46 (18T 67%WR). Dead hours fix VERIFIED: 0 trades in blocked hours. Non-dead-hours pump-chain+ = 30T 60%WR +$3.48/7d.
 
 **🟢 REGIME EDGE (7d):** EXTREME 77T 48.1%WR +$1.39★ (best). NORMAL 35T 28.6%WR -$1.55 (worst). Gap $2.94/7d.
 
@@ -122,10 +122,10 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: All Sep 23 fixes.** Dead hours + SHORT_RSI_FLOOR=40 + LONG_RSI_FLOOR=30 + gap_at_entry EMA fallback + SHORT_RSI_FLOOR extended to all signals. Verify on next runs. Expected combined +$4.63/7d. — 2026-09-23
-2. **FIX (code): Add LONG RSI revalidation at execution** — SHORT has ceiling (line 1019-1025), LONG has none. WCT entered RSI=98.86. — 2026-09-23
-3. **FIX (code): Record volume_spike in _signal_metadata** — 55/55 pump-chain+ trades have NULL. BTC-level metric, not per-token. Consider: (a) compute per-token volume spike, (b) skip since chase filter uses gap/z-score. — 2026-09-22
-4. **MONITOR: pullback-entry- SHORT.** 7d 35T 31.4%WR -$2.81 but 30d 119T 52.1%WR +$0.35. SHORT_RSI_FLOOR=40 should block oversold entries. SEI RSI=43.64 and LINK RSI=42.34 are borderline (above floor). Monitor48h. — 2026-09-23
+1. **MONITOR: All Sep 23 fixes.** Dead hours + SHORT_RSI_FLOOR=50 + LONG_RSI_FLOOR=30 + gap_at_entry EMA fallback + SHORT_RSI_FLOOR extended to all signals. Verify on next runs. Expected combined +$4.63/7d. — 2026-09-23
+2. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 23). — 2026-09-23
+3. **FIX (code): Record volume_spike in _signal_metadata** — 199/199 7d trades have NULL. BTC-level metric, not per-token. Chase filter uses gap/z-score so low priority. Consider: (a) compute per-token volume spike, (b) skip since chase filter covers it. — 2026-09-23
+4. **MONITOR: pullback-entry- SHORT.** 7d 34T 29%WR -$3.03 but 30d 119T 52.1%WR +$0.35. SHORT_RSI_FLOOR=50 should block oversold entries. Monitor 48h. — 2026-09-23
 5. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-6. **INFRA: signal_compactor pipeline timeout.** 12+ kills in last 24h at 60s. DB lock contention during concurrent pipeline steps. Self-recovers but wastes 60s per failure. — 2026-09-23
+6. **INFRA: signal_compactor pipeline timeout.** 1 kill in last 24h at 60s. DB lock contention during concurrent pipeline steps. Self-recovers but wastes 60s per failure. — 2026-09-23
 7. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23

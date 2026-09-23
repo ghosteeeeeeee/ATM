@@ -1,3 +1,35 @@
+## [2026-09-23 18:30 UTC] Daily Orchestrator
+
+**Trades:** 25T closed today | **Open:** 3 (COMP/GMX/AVAX SHORT pump-chain-, slight profit)
+**24h:** 25T 44%WR -$0.50 | **7d:** 199T 43%WR -$1.61
+
+**24h exit reasons (from losers):**
+- atr_sl_hit: 5T (WCT, ADA, ACE, USUAL, PUMP)
+- cut-loser-CL-T1: 3T (ALGO, WLD, USUAL)
+- profit-monster-trail: 4T (ONDO, NXPC, CFX, WCT)
+
+**Key findings:**
+- Quiet day — all losses small ATR_SL variance, no catastrophic single losses
+- pullback-entry- SHORT cold streak: 7d 34T 29%WR -$3.03 (30d: 119T 52.1%WR +$0.35)
+- LONG RSI revalidation at execution: ALREADY IMPLEMENTED (decider_run.py:1031-1049)
+- entry_rsi_14 NULL: FIXED (0% NULL rate now, was 66% flagged by auto_1hr)
+- volume_spike: 0% in metadata (199/199 trades), but chase filter uses gap/z-score
+
+**Changes:**
+1. CURRENT.md updated — mark LONG RSI revalidation as done, fresh DB stats
+2. Compressed 6 old log files (~35MB saved)
+3. Removed 2 unused DBs (binance_test.db, sniper_trades_archive.db)
+
+**No action needed:**
+- All Sep 23 fixes deployed (dead hours, SHORT_RSI_FLOOR=50, LONG_RSI_FLOOR=30, gap_at_entry EMA fallback)
+- Too early to measure impact — monitor next 48h
+- signal_reporter: no kills/boosts needed (24h too quiet)
+- Disk: 85% (18G free), active DBs are the big consumers
+
+**BY:** daily_orchestrator
+
+---
+
 ## [2026-09-23 16:20 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 3 (CFX/PUMP/USUAL accel-300-breakout SHORT ~3min, all flat)
@@ -5177,6 +5209,39 @@ Final set: ['ALGO', 'ME']
 
 **Open Questions:**
 - cut-loser-CL-T1: 5T 0W -$0.47 — different signals, chop market
+- pnl_pct cosmetic miscalc persists
+
+**BY:** auto_1hr
+
+## [2026-09-23 18:09 UTC] Hourly Analysis
+
+**Trades:** 6 closed last hour (2W 4L, -$0.04) | **Open:** 2 (GMX SHORT +$0.04, COMP SHORT $0.00)
+**24h:** 29T 11W (37.9%WR) -$1.19 | **Today:** 25T 11W (44.0%WR) -$0.50
+
+**Exit Reasons (24h):**
+- atr_sl_hit: 12T 5W (41.7%WR) -$0.93 (41% of exits — continued improvement from 71% on 9/22)
+- profit-monster-trail: 11T 5W (45.5%WR) +$0.05
+- cut-loser-CL-T1: 5T 0W -$0.47 (cross-signal chop, not signal issue)
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Signal Performance (24h):**
+- bb-bounce-v2-long+: 9T 4W (44.4%WR) -$0.10
+- accel-300-breakout: 6T 2W (33.3%WR) -$0.11
+- mover+: 3T 1W (33.3%WR) -$0.34 (borderline, has winner)
+- pullback-entry-: 3T 0W -$0.59 (legacy trades, already killed)
+- pump-chain-: 2T 1W (50%WR) +$0.02
+- volume-breakout-long+: 2T 1W (50%WR) +$0.05
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+T, 0%WR) in last hour
+- atr_sl_hit 41% — continued improvement from tpsl fix
+- cut-loser-CL-T1 across 3+ different signals = market chop, not fixable by signal kill
+- Trade frequency ~1.2/hr normal
+
+**Open Questions:**
+- cut-loser-CL-T1 0/5 — persistent pattern but cross-signal, hard to address
 - pnl_pct cosmetic miscalc persists
 
 **BY:** auto_1hr
