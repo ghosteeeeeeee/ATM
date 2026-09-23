@@ -1,3 +1,26 @@
+## CEO Report — 2026-09-23 ~14:00 UTC
+
+### Decision: 2 CODE FIXES — SHORT_RSI_FLOOR GAP + gap_at_entry EMA FALLBACK
+
+### Diagnosis
+24h: 22T 36.4%WR -$1.11. 7d: 192T 43.8%WR -$1.30. SHORT bleeding -$3.17/7d (58T 34.5%WR). LONG profitable +$1.87/7d (134T 47.8%WR). Today's config fixes (dead hours, SHORT_RSI_FLOOR=50, LONG_RSI_FLOOR=30) need more time to show impact.
+
+### Root Cause
+**BUG 1:** `SHORT_RSI_FLOOR` in decider_run.py only checked `pullback-entry` signals (line 995: `_is_pullback = source and 'pullback-entry' in source`). accel-300-breakout SHORT bypasses signal_compactor (STANDALONE_BYPASS), so it hit decider_run.py where the RSI floor was pullback-entry-only. Both recent accel-300-breakout SHORT trades (RSI 28.57, 37.37) executed despite being below floor=50.
+
+**BUG 2:** `gap_at_entry` computation required >=300 candles (EMA300). Tokens with <300 candles got NULL gap_at_entry. Chase filter (CHASE_GAP_MAX_PCT=1.0) was blind to gap for mover+, volume-breakout-long+, and other newer tokens. 5/14 brain_auditor losing autopsy trades had NULL gap_at_entry.
+
+### Fix Applied
+1. **decider_run.py:** Extended `SHORT_RSI_FLOOR` check from `pullback-entry`-only to ALL SHORT signals. accel-300-breakout SHORT now gets blocked at RSI < 50.
+2. **decider_run.py:** Added EMA100/EMA50 fallback for `gap_at_entry` when <300 candles available. Tokens with 100-299 candles now get EMA100-based gap; 50-99 candles get EMA50-based gap. Chase filter gains visibility for newer tokens.
+
+### Verification
+- `py_compile` passes for decider_run.py.
+- SHORT-RSI-FLOOR blocks visible in pipeline.log (173 blocks since deploy).
+- Expected impact: +$0.50-1.00/7d from gap_at_entry coverage + SHORT RSI floor consistency.
+
+---
+
 ## CEO Report — 2026-09-23 ~02:00 UTC
 
 ### Decision: FIX DEAD HOURS BUG + CORRECT CONFIGS

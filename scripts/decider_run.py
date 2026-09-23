@@ -989,11 +989,12 @@ def rule_based_context_gate(token, direction, source, sig):
             if direction == 'SHORT' and z_score > SIGNAL_FILTER_Z_MAX and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
                 return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={_spd_str}% (chasing uptrend)', 15)
 
-    # 1b-ext. Pullback-entry safety checks (always active — NOT gated on SIGNAL_FILTER_ENABLED)
+    # 1b-ext. SHORT RSI floor safety checks (always active — NOT gated on SIGNAL_FILTER_ENABLED)
     # These are loss-prevention guardrails, not tunable signal quality filters
+    # CEO 2026-09-23: Extended from pullback-entry-only to ALL SHORT signals.
+    # accel-300-breakout SHORT bypasses signal_compactor (STANDALONE_BYPASS), was missing floor check.
     from hermes_constants import SHORT_RSI_FLOOR
-    _is_pullback = source and 'pullback-entry' in source
-    if _is_pullback and direction == 'SHORT':
+    if direction == 'SHORT':
         # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
         # FIX (brain_auditor 2026-09-20): Use LIVE RSI (like SHORT_RSI_CEILING does).
         # FIX (brain_auditor 2026-09-23): Fallback to detection-time RSI when live RSI unavailable.
@@ -1009,12 +1010,15 @@ def rule_based_context_gate(token, direction, source, sig):
         _effective_rsi_floor = _live_rsi_floor if _live_rsi_floor is not None else _detect_rsi_floor
         if _effective_rsi_floor is not None and _effective_rsi_floor < SHORT_RSI_FLOOR:
             _src = 'LIVE' if _live_rsi_floor is not None else 'DETECT'
-            return ('AMBIGUOUS', f'pullback-entry SHORT: {_src} RSI {_effective_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
-        # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened
+            _sig_label = source or 'SHORT'
+            return ('AMBIGUOUS', f'{_sig_label}: {_src} RSI {_effective_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
+        # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
-        _live_z = _ctx_gate_get_zscore(token)
-        if _live_z is not None and _live_z > 0.5:
-            return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 0.5 (price above mean — downtrend weakened)', 20)
+        _is_pullback = source and 'pullback-entry' in source
+        if _is_pullback:
+            _live_z = _ctx_gate_get_zscore(token)
+            if _live_z is not None and _live_z > 0.5:
+                return ('AMBIGUOUS', f'pullback-entry SHORT: LIVE z={_live_z:.2f} > 0.5 (price above mean — downtrend weakened)', 20)
 
     # 1b-ext2. Execution-time SHORT RSI ceiling — catches RSI drift between detection and execution
     # brain_auditor: 5 SHORT trades entered RSI>65 (all losers, -$0.98). Detection-time RSI was OK.
@@ -4103,17 +4107,27 @@ def run(dry_run=False):
             pass
 
         # ── Compute gap_at_entry for _signal_metadata ─────────────────
+        # CEO 2026-09-23: Fallback to shorter EMA (100/50) for tokens with <300 candles.
+        # Chase filter was blind to gap for mover+, volume-breakout-long+ (NULL gap).
         try:
             from signal_schema import get_price_history
             _candles = get_price_history(token, lookback_minutes=1550)  # 310 candles × 5m
-            if _candles and len(_candles) >= 300:
-                _closes = [float(c[1]) for c in _candles]  # price (timestamp, price) tuples
-                _ema_val = _closes[0]
-                _mult = 2 / (300 + 1)
-                for _p in _closes[1:]:
-                    _ema_val = _p * _mult + _ema_val * (1 - _mult)
-                if _ema_val > 0:
-                    _gap_at_entry = round((price - _ema_val) / _ema_val * 100, 4)
+            if _candles:
+                _closes = [float(c[1]) for c in _candles]
+                _ema_period = None
+                if len(_closes) >= 300:
+                    _ema_period = 300
+                elif len(_closes) >= 100:
+                    _ema_period = 100
+                elif len(_closes) >= 50:
+                    _ema_period = 50
+                if _ema_period and _ema_period <= len(_closes):
+                    _ema_val = _closes[0]
+                    _mult = 2 / (_ema_period + 1)
+                    for _p in _closes[1:]:
+                        _ema_val = _p * _mult + _ema_val * (1 - _mult)
+                    if _ema_val > 0:
+                        _gap_at_entry = round((price - _ema_val) / _ema_val * 100, 4)
         except Exception:
             pass
 
