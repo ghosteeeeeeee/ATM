@@ -1,3 +1,33 @@
+## [2026-09-23 00:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 2 (CFX mover+ 287min, WCT volume-breakout-long+ 135min — both flat)
+**24h:** 24T ~29%WR -$2.11 | **7d:** 184T 44%WR -$0.90
+
+**24h exit reasons:**
+- atr_sl_hit: 17T 70.8% avg -$0.146 (structural)
+- cut-loser-CL-T1: 2T avg -$0.095
+- profit-monster-trail: 2T avg +$0.095
+- pump_exit_dead_money: 2T avg +$0.085
+- atr_tp_hit: 1T +$0.10
+
+**24h signal ranking:**
+- pullback-entry-: 6T 0%WR -$1.54
+- pump-chain+: 5T 20%WR -$0.68
+- pump-chain-: 6T 33.3%WR -$0.38
+
+**Changes:**
+1. Added pullback-entry- dead hours 17,22 (7d: 5T 0%WR -$0.92) — commit cfc62833
+
+**No Change Needed:**
+- No kill candidates (0 trades last hour)
+- pump-chain+ 7d positive (+$1.23 41.8%WR) despite bad 24h
+- atr_sl_hit structural (CEO SL calibration)
+
+**Open Questions:**
+- CFX open 287min at $0.00 — dead trade? Should cut-loser fire?
+
+**BY:** auto_1hr
+
 ## [2026-09-22 18:35 UTC] Daily Orchestrator
 
 **Status:** Pipeline running, 1 open (FIL SHORT), 20 closed today, 35%WR -$1.48.
@@ -4662,5 +4692,38 @@ Final set: ['ME']
 - 7d near breakeven (-$0.74 on 185 trades)
 - Losses small and controlled
 - Open positions manageable
+
+**BY:** auto_1hr
+
+## [2026-09-23 01:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour | **24h:** 20T, 25% WR, -$2.90 | **7d:** 184T, 44.0% WR, -$0.90
+
+**Close Reasons (24h):**
+- atr_sl_hit: 16/20 (80%), avg -$0.153 — slightly above 55-75% baseline
+- cut-loser-CL-T1: 2T, avg -$0.095
+- profit-monster-trail: 2T, avg +$0.095
+- pump_exit_dead_money: 2T, avg +$0.085
+
+**Signal Performance (24h):**
+- pullback-entry- SHORT: 6T, 0% WR, -$1.54 — drawdown phase, lifetime 52.1% WR
+- pump-chain+ LONG: 4T, 25% WR, -$0.64
+- pump-chain- SHORT: 6T, 33% WR, -$0.38
+
+**Open:** 4 positions (CFX, WCT, POL, BTC)
+
+**Diagnosis:**
+1. Entry quality: No data for adverse excursion in this window
+2. SL behavior: 80% atr_sl_hit — slightly above baseline but system 7d breakeven
+3. Signal quality: pullback-entry- and pump-chain+ in drawdown, not structural
+4. Trade frequency: ~0.8/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (need 3+ losses in single hour; 0 trades last hour)
+- atr_sl_hit 80% slightly elevated but 7d is breakeven — monitor, don't act
+- pullback-entry- drawdown is variance (lifetime profitable)
+- 4 open positions manageable
 
 **BY:** auto_1hr
