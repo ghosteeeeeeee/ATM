@@ -4909,3 +4909,28 @@ Final set: ['ALGO', 'ME']
 - RSI filter design: penalty vs hard block. Currently AMBIGUOUS allows override by Hebbian gate. Consider if extreme RSI (>80) should be a hard block.
 
 **BY:** auto_1hr
+
+## [2026-09-23 08:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (ONDO LONG bb-bounce-v2-long+ profit-monster-trail -$0.04) | **Open:** 2 (HYPER $11.10, ACE $22.10, $33.20 total)
+**24h:** 22T 36.4%WR -$2.14 | **7d:** 191T 45.5%WR -$0.18
+
+**Close Reasons (24h):**
+- atr_sl_hit: 13T 4W -$1.83 (59.1% of closes, down from 71% yesterday)
+- profit-monster-trail: 5T 3W +$0.08 (only profitable exit type)
+- cut-loser-CL-T1: 3T 0W -$0.29
+- UNIVERSAL_MAX_HOLD: 1T 1W +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal meets kill criteria (3+ trades, 0% WR)
+- atr_sl_hit trending right direction (71% → 59%)
+- Trade frequency normal (2/hr)
+- System quiet, 2 open positions running
+
+**Open Questions:**
+- ONDO profit-monster-trail exit at -$0.04 — trail triggered below entry, possible trailing logic issue
+- pnl_pct data quality severely miscalculated (cosmetic, pnl_usdt correct)
+
+**BY:** auto_1hr

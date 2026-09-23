@@ -552,3 +552,8 @@
 
 ## Error Alerts — 2026-09-23 06:57 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-23 07:57 UTC
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: v2 recheck: velocity -N.N% < -N.N%`

@@ -395,5 +395,16 @@
     "after": "SHORT_RSI_FLOOR = 50",
     "rationale": "RSI 35-50 SHORT band = 37T 43.2%WR -$1.06/14d (bleeding). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Blocks losing band, preserves sweet spot. Net: +$0.95/7d.",
     "impact": "+$0.95/7d expected. Would block 22 losers (-$3.84 saved) and lose 20 winners (+$1.94 lost)."
+  },
+  {
+    "timestamp": "2026-09-23T08:32:55Z",
+    "agent": "brain_auditor",
+    "change": "Added LONG_RSI_FLOOR=30 — blocks LONG entries when RSI<30 (extreme oversold = falling knife)",
+    "type": "config",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "No universal LONG RSI floor. pump-chain+ had PUMP_CHAIN_LONG_RSI_MIN=35 but other signals (mover+, doji-bottom-long, rr-struct-v2+) had no floor.",
+    "after": "LONG_RSI_FLOOR=30 blocks all LONG entries with RSI<30. 14d: 12T 8.3%WR -$1.45. Would block 7 losers ($1.45), 0 winners ($0). Net: +$1.32/14d = +$0.66/7d.",
+    "rationale": "14d LONG RSI<30 = 12T 8.3%WR -$1.45 (catastrophic). 7d: 0/3 winners at RSI<30. RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot, NOT blocked). Signal-specific floors miss mover+, doji-bottom-long, rr-struct-v2+.",
+    "impact": "+$0.66/7d expected. Zero winners blocked in last 7d."
   }
 ]

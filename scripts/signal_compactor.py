@@ -3011,7 +3011,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 _conn_sf = None
                 try:
@@ -3089,6 +3089,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _conn_rsf:
                         try:
                             _conn_rsf.close()
+                        except Exception:
+                            pass
+            # ── LONG RSI floor: block LONG at extreme oversold (falling knife) ──
+            # 14d: RSI<30 LONG = 12T 8.3%WR -$1.45. 7d: 0/3 winners at RSI<30.
+            # Catches pump-chain+, doji-bottom-long, mover+ entering LONG when RSI is oversold.
+            # Blocks 7 losers ($1.45), 0 winners ($0). Net: +$1.32/14d = +$0.66/7d.
+            if direction == 'LONG' and LONG_RSI_FLOOR > 0:
+                _conn_lrf = None
+                try:
+                    _conn_lrf = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_lrf = _conn_lrf.cursor()
+                    _cur_lrf.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _lrf_closes = [r[0] for r in _cur_lrf.fetchall()]
+                    if len(_lrf_closes) >= 15:
+                        _lrf_deltas = [_lrf_closes[i] - _lrf_closes[i+1] for i in range(len(_lrf_closes)-1)]
+                        _lrf_gains = [d if d > 0 else 0 for d in _lrf_deltas[-14:]]
+                        _lrf_losses = [-d if d < 0 else 0 for d in _lrf_deltas[-14:]]
+                        _lrf_ag = sum(_lrf_gains) / 14
+                        _lrf_al = sum(_lrf_losses) / 14
+                        if _lrf_al > 0:
+                            _lrf_rsi = 100 - (100 / (1 + _lrf_ag / _lrf_al))
+                            if _lrf_rsi < LONG_RSI_FLOOR:
+                                log(f"  🚫 [LONG-RSI-FLOOR] {tkn}: LONG blocked — RSI {_lrf_rsi:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)")
+                                continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    if _conn_lrf:
+                        try:
+                            _conn_lrf.close()
                         except Exception:
                             pass
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──

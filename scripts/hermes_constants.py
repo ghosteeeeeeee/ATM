@@ -827,6 +827,12 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 SHORT_RSI_FLOOR = 50           # brain_auditor: raised 35→50 (2026-09-23). 14d: RSI 35-50 SHORT = 37T 43.2%WR -$1.06 (bleeding band). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Blocks losing band, preserves sweet spot. Net: +$0.95/7d.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
+# ── LONG RSI floor: block LONG entries when RSI is extremely oversold ────
+# 14d: RSI<30 LONG = 12T 8.3%WR -$1.45 (catastrophic — catching falling knife).
+# 7d: RSI<30 LONG = 0 winners (0/3). Would block 7 losers ($1.45 saved), 0 winners ($0 lost).
+# RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot — NOT blocked).
+LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
+
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.
