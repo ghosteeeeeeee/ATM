@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-09-23 00:10 UTC] auto_1hr: Added pullback-entry- dead hours 17,22 (7d 5T 0%WR -$0.92) — commit cfc62833. 24h: 24T 29%WR -$2.11, 70.8% atr_sl_hit. 7d: 184T 44%WR -$0.90. No kill candidates (0 trades last hour). 2 open trades flat (CFX 287min, WCT 135min).
 - [2026-09-20 19:15 UTC] signal_reporter: No kills — no signals met kill criteria (WR<30% with 5+ trades). grind-trend- SHORT 33.3% WR -$0.20 (3T) below threshold, already gated NORMAL. pump-chain+ LONG star: 18T 61.1%WR +$0.69 (24h). pullback-entry- SHORT solid: 9T 66.7%WR +$0.38. grind-trend+ LONG perfect: 3T 100%WR +$0.42. No inversions. 5,198 total trades all-time. System clean.
 - [2026-09-19 11:00 UTC] signal_reporter: Killed grind-trend- SHORT — 20% WR, -$0.38 (24h), no winning regime (NORMAL 0%, HIGH 33.3%). GRIND_TREND_MINUS_ENABLED = False. pump-chain+ strong at 50% WR +$1.40 (16T). pullback-entry- on watch (0% WR recent but historically profitable EXTREME 61.9%/HIGH 53.8%). No inversions. 48T/24h total.
 - [2026-09-18 05:09 UTC] signal_reporter: No kills — open-skies+ already dead. Fixed pullback-entry- volatility gate: EXTREME 0.5→1.0 (68% WR), HIGH 0.7→0.5 (47% WR/7d). NORMAL blocked (correct). 24h: 16T 25%WR -$1.41. Low volume. No inversions.

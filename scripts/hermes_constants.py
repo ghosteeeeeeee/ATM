@@ -1199,13 +1199,13 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
 # 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
-PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 5, 21, 23]  # CEO 2026-09-22 + auto_1hr 2026-09-22 — 14d: hours 0-5,23 = 0%WR (29T -$3.30). Hour 21: 4T 0%WR -$0.58/7d.
+PUMP_CHAIN_LONG_DEAD_HOURS = [1, 2, 3, 4, 5, 7, 8, 13, 21, 22]  # CEO 2026-09-23: fixed from [0,1,2,3,4,5,21,23]. 14d: hours 1,2,3,4,5,7,8,13,21,22 = 40T -$3.82. Hour 0 (+$0.72) and 23 (+$0.69) were wrongly blocked. Expected +$3.82/14d = +$1.91/7d.
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
 PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-09-22 — 14d: RSI 76-80 = 6T 0%WR -$0.82 (dead zone). RSI>80 = 14T +$1.13 (big winners). Block dead zone, preserve big winners.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
 
-# pullback-entry- SHORT dead hours — 14d data: hours 0,1,3,7,10,11 = -$2.33/14d (25T). Hour 00: 7T -$0.52, 01: 7T -$0.61, 03: 4T -$0.34, 07: 5T -$0.39, 10: 5T -$0.54, 11: 6T -$0.66.
-PULLBACK_ENTRY_SHORT_DEAD_HOURS = [0, 1, 3, 7, 10, 11, 17, 22]  # auto_1hr 2026-09-22 — 7d: hour 17 = 3T 0%WR -$0.46, hour 22 = 2T 0%WR -$0.46. Expected +$0.92/7d.
+# pullback-entry- SHORT dead hours — 14d data: hours 4,8,13,20 = -$2.81/14d (25T). Hour 04: 6T 16.7%WR -$0.84, 08: 4T 25%WR -$0.51, 13: 4T 25%WR -$0.44, 20: 11T 18.2%WR -$1.02. CEO 2026-09-23: fixed from [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72).
+PULLBACK_ENTRY_SHORT_DEAD_HOURS = [3, 4, 6, 8, 13, 20]  # 14d: all >2T and clearly negative. Hour 3: 3T -$0.28, hour 6: 3T -$0.25. Expected +$2.81/14d = +$1.40/7d.
 PULLBACK_ENTRY_SHORT_NORMAL_BLOCK = True  # brain_auditor 2026-09-22 — 14d NORMAL: 8T 12.5%WR -$1.13 (worst regime). EXTREME: 53.8%WR -$0.15. Signal only works in volatile markets.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────

@@ -1294,14 +1294,14 @@ def _score_signal(token, direction, conf, source, signal_type,
     # 14d data: hours 0,1,3,7,10,11 = -$2.33/14d (25T all losing).
     from hermes_constants import PULLBACK_ENTRY_SHORT_DEAD_HOURS
     _pb_bare = signal_type.rstrip('+-') if signal_type else ''
-    if _pb_bare == 'pullback-entry' and direction.upper() == 'SHORT':
+    if ('pullback-entry' in _pb_bare or 'pullback_entry' in _pb_bare) and direction.upper() == 'SHORT':
         if utc_hour in PULLBACK_ENTRY_SHORT_DEAD_HOURS:
             log(f"  🚫 [PULLBACK-DEAD-HOUR] {token} SHORT blocked — hour {utc_hour} UTC")
             return 0.0
 
     # ── pullback-entry- SHORT NORMAL regime block ─────────────────────────
     # 14d NORMAL: 8T 12.5%WR -$1.13 (worst). EXTREME: 53.8%WR -$0.15.
-    if _pb_bare == 'pullback-entry' and direction.upper() == 'SHORT':
+    if ('pullback-entry' in _pb_bare or 'pullback_entry' in _pb_bare) and direction.upper() == 'SHORT':
         try:
             from hermes_constants import PULLBACK_ENTRY_SHORT_NORMAL_BLOCK
             if PULLBACK_ENTRY_SHORT_NORMAL_BLOCK and _vol_regime == 'NORMAL':

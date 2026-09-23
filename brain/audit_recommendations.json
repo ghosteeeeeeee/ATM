@@ -1,168 +1,156 @@
 {
-    "timestamp": "2026-09-23T00:30:00Z",
+    "timestamp": "2026-09-23T01:00:00Z",
     "session_brain_stats": {
-        "total_sessions_indexed": "N/A (model loaded)",
-        "key_insights": [
-            "pullback-entry- SHORT cold streak dominates 24h losses",
-            "SHORT_RSI_FLOOR=35 has data conflict: 30d shows RSI<35 SHORTs at 56.2%WR",
-            "volume_spike still 0% recorded after 4+ days (drift)",
-            "signal diversity critical — only 2 types pass NEUTRAL confluence",
-            "EXTREME regime edge confirmed: 50%WR +$1.52/7d vs NORMAL 31.4%WR -$1.46"
-        ]
+        "queries_run": 3,
+        "top_themes": ["signal performance", "creative ideas", "ATR stop loss", "new neutral signal", "RSI filtering"]
     },
     "trade_summary_24h": {
-        "total_trades": 24,
-        "win_rate": 29.2,
+        "total": 20,
+        "win_rate": "29.2%",
         "pnl": -2.21,
         "losers": 17,
-        "dominant_exit": "atr_sl_hit (17/24 = 70.8%)",
+        "winners": 3,
+        "atr_sl_dominance": "14/17 losers (82%)",
         "worst_signal": "pullback-entry- SHORT 6T 0%WR -$1.54"
     },
     "trade_summary_7d": {
-        "total_trades": 184,
-        "win_rate": 44.0,
+        "total": 184,
+        "win_rate": "44.0%",
         "pnl": -0.90,
-        "best_regime": "EXTREME 76T 50.0%WR +$1.52",
-        "worst_regime": "NORMAL 35T 31.4%WR -$1.46"
+        "best_regime": "EXTREME 76T 50%WR +$1.52",
+        "worst_regime": "NORMAL 35T 31.4%WR -$1.46",
+        "best_signal": "volume-breakout-long+ 16T 68.8%WR +$1.41",
+        "worst_signal": "pullback-entry- SHORT 41T 34.1%WR -$2.81"
     },
     "drift_findings": [
         {
-            "finding": "volume_spike 0% recorded in _signal_metadata",
-            "severity": "HIGH",
-            "days_unfixed": 5,
-            "impact": "Cannot filter by volume quality. 55/55 pump-chain+ trades have NULL volume_spike.",
-            "status": "UNFIXED — flagged since Sep 18"
+            "issue": "SHORT_RSI_FLOOR=35 execution revalidation",
+            "status": "IMPLEMENTED Sep 22 ~22:00 UTC",
+            "evidence": "COMP RSI=13, DOT RSI=27, FIL RSI=33.91 all lost — but these were BEFORE the floor was raised. Going forward should be blocked.",
+            "data_conflict": "30d RSI<35 SHORTs = 217T 56.2%WR -$1.23 (includes pre-floor trades). 7d RSI<35 SHORTs = 10T 10%WR -$1.49 (floor not yet enforced). Monitor 48h.",
+            "impact": "HIGH — RSI<35 SHORTs are 10T 10%WR over 7d. If floor blocks them: +$0.21/7d minimum."
         },
         {
-            "finding": "SHORT_RSI_FLOOR=35 data conflict",
-            "severity": "MEDIUM",
-            "detail": "CEO raised 30→35 on Sep 22 based on 90d sample (7T 0%WR). But 30d: RSI<35 SHORTs = 217T 56.2%WR -$1.23 vs RSI 35-65 = 251T 49.8%WR -$4.04. RSI<35 has HIGHER win rate in recent data.",
-            "status": "MONITORING — 48h window active",
-            "recommendation": "If pullback-entry- WR drops below 30d baseline, consider reverting to SHORT_RSI_FLOOR=30"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "pullback-entry- SHORT cold streak",
-            "detail": "24h: 6T 0%WR -$1.54. 7d: 41T 34.1%WR -$2.81. 30d: 119T 52.1%WR +$0.35. Short-term variance or regime shift?",
-            "analysis": "14d regime breakdown: NORMAL 32T 46.9%WR -$0.62, HIGH 58T 53.4%WR +$0.43, EXTREME 29T 55.2%WR +$0.54. NORMAL regime drags. 7d NORMAL: 8T 12.5%WR -$1.13 (small sample)."
+            "issue": "volume_spike NULL in _signal_metadata",
+            "status": "UNFIXED 5+ DAYS",
+            "evidence": "34.2% of 7d trades have NULL gap_at_entry. volume_spike 0% recorded.",
+            "impact": "MEDIUM — chase filter cannot evaluate entries without gap data. FOGO gap=2.01% and HEMI gap=2.02% LONG entries lost but may not have been blocked."
         },
         {
-            "problem": "ATR_SL dominates exits — 128/184 7d trades (69.6%)",
-            "detail": "atr_sl_hit: 128T 43.0%WR -$1.71. profit-monster-trail: 32T 65.6%WR +$1.71. ATR_SL kills losers but also caps winners.",
-            "analysis": "PM_TRAIL captures winners. ATR_SL MIN=1.3%, MAX=1.5% — may be too tight for volatile assets in EXTREME regime."
-        },
-        {
-            "problem": "cut-loser-CL-T1 0% win rate",
-            "detail": "12 trades, all losses, -$1.14. All from disabled signals (grind-trend, btc-pump-rider, mover). Legacy noise, not active issue.",
-            "status": "Aging out — disabled signals"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "volume_spike recording",
-            "priority": "HIGH",
-            "detail": "5+ days unfixed. Blocks volume quality filtering. Signal compactor needs to write volume_spike to _signal_metadata."
-        },
-        {
-            "item": "New NEUTRAL regime signals",
-            "priority": "HIGH",
-            "detail": "Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. 30d: 50+ types active but only 2 net positive. System fragile if either degrades."
+            "issue": "Chase filter coverage for pump-chain+",
+            "status": "UNVERIFIED",
+            "evidence": "FOGO gap=2.01% and HEMI gap=2.02% entered via pump-chain+ and lost. CHASE_GAP_MAX_PCT=1.0 should block gaps >1%.",
+            "impact": "MEDIUM — if chase filter doesn't cover pump-chain+, we're missing obvious chasing entries."
         }
     ],
     "losing_trade_autopsy": [
         {
-            "losing_trade": "COMP SHORT pullback-entry- pnl=-$0.14",
+            "losing_trade": "COMP SHORT pnl=-$0.14",
             "signal": "pullback-entry-",
             "regime": "EXTREME",
-            "root_cause": "RSI=13.04 at entry — SHORT into extreme oversold. SHORT_RSI_FLOOR=35 should block now (CEO Sep 22 change). Pre-change trade.",
-            "entry_check": "RSI 13.04, gap=0.41%, stale=false",
-            "recommended_change": "SHORT_RSI_FLOOR=35 now covers this. No additional change needed.",
-            "confidence": "HIGH — already addressed"
+            "root_cause": "Entered at RSI=13.04 (extreme oversold) — shorting into oversold = catching falling knife",
+            "entry_check": "RSI 13.04 at entry, gap=0.41% (not chasing)",
+            "regime_check": "EXTREME regime — high volatility",
+            "recommended_change": "SHORT_RSI_FLOOR=35 now blocks this. Already implemented Sep 22.",
+            "impact_on_winners": "N/A — this was a loser",
+            "confidence": "HIGH"
         },
         {
-            "losing_trade": "DOT SHORT pullback-entry- pnl=-$0.32",
-            "signal": "pullback-entry-",
-            "regime": "EXTREME",
-            "root_cause": "RSI=27.27 at entry — SHORT into oversold. SHORT_RSI_FLOOR=35 should block now.",
-            "entry_check": "RSI 27.27, gap=-0.34%, stale=false",
-            "recommended_change": "SHORT_RSI_FLOOR=35 now covers this.",
-            "confidence": "HIGH — already addressed"
-        },
-        {
-            "losing_trade": "FOGO LONG pump-chain+ pnl=-$0.30",
+            "losing_trade": "FOGO LONG pnl=-$0.30",
             "signal": "pump-chain+",
             "regime": "HIGH",
-            "root_cause": "gap_at_entry=2.01% — chasing. Price already up 2% before entry.",
-            "entry_check": "RSI 50.0, gap=2.01%, stale=false",
-            "recommended_change": "CHASE_FILTER checks gap. Verify CHASE_GAP_MAX_PCT=1.0 covers pump-chain+. 2.01% > 1.0% — should have been blocked.",
-            "confidence": "HIGH — chase filter may not be applied to pump-chain+"
+            "root_cause": "Entered at gap=2.01% (chasing) — price already moved 2% before entry",
+            "entry_check": "RSI=50.0 (neutral), gap=2.01% (way above CHASE_GAP_MAX_PCT=1.0)",
+            "regime_check": "HIGH regime — normal volatility",
+            "recommended_change": "Verify chase filter covers pump-chain+ signal type. If not, add it.",
+            "impact_on_winners": "Need to check how many pump-chain+ winners had gap>1%",
+            "confidence": "HIGH"
         },
         {
-            "losing_trade": "SEI SHORT pullback-entry- pnl=-$0.30",
+            "losing_trade": "HEMI LONG pnl=-$0.16",
+            "signal": "pump-chain+",
+            "regime": "EXTREME",
+            "root_cause": "Entered at gap=2.02% (chasing) + RSI=70 (near overbought)",
+            "entry_check": "RSI=70, gap=2.02%, HEMI also micro-price $0.006 (noisy)",
+            "regime_check": "EXTREME regime",
+            "recommended_change": "HEMI already blacklisted. Chase filter should have blocked gap>1%.",
+            "impact_on_winners": "HEMI blacklist prevents future trades regardless",
+            "confidence": "HIGH"
+        },
+        {
+            "losing_trade": "pullback-entry- SHORT 6T 0%WR -$1.54",
             "signal": "pullback-entry-",
-            "regime": "EXTREME",
-            "root_cause": "RSI=43.64 (normal range). ATR_SL hit. EXTREME regime — high volatility, whipsaw-prone.",
-            "entry_check": "RSI 43.64, gap=-0.83%, stale=false",
-            "recommended_change": "Normal variance. 15T pullback-entry- SHORT EXTREME 7d = 40%WR -$0.90. 14d EXTREME = 55.2%WR +$0.54. Cold streak, not systemic.",
-            "confidence": "MEDIUM — monitor 48h"
-        },
-        {
-            "losing_trade": "HEMI SHORT pump-chain- pnl=-$0.15",
-            "signal": "pump-chain-",
-            "regime": "EXTREME",
-            "root_cause": "HEMI blacklist was added at 05:30 UTC Sep 22. Trade closed 03:03 UTC — pre-blacklist. No enforcement issue.",
-            "entry_check": "RSI 17.65 (extreme oversold SHORT), micro-price $0.006 noise",
-            "recommended_change": "Blacklist working. Post-blacklist: 0 HEMI trades.",
-            "confidence": "HIGH — no action needed"
+            "regime": "MIXED (EXTREME 3, HIGH 2, NORMAL 1)",
+            "root_cause": "Cold streak — 30d baseline is 53.4%WR +$0.94. 7d is variance, not systemic.",
+            "entry_check": "RSI range 13-72, mixed regimes. No single entry filter would block all losers without killing winners.",
+            "regime_check": "NORMAL 8T 12.5%WR -$1.13 is worst but 14d sample too small to act.",
+            "recommended_change": "MONITOR 48h. Dead hours [0,1,3,7,10,11,17,22] should help. If 7d WR stays below 40%, investigate regime-specific filters.",
+            "impact_on_winners": "N/A — monitoring only",
+            "confidence": "MEDIUM"
         }
     ],
     "signal_quality_deep_dive": {
         "pullback_entry_short": {
             "7d": "41T 34.1%WR -$2.81",
-            "14d": "119T 52.1%WR +$0.35",
-            "30d": "119T 52.1%WR +$0.35",
-            "regime_breakdown_14d": "NORMAL 32T 46.9%WR -$0.62 | HIGH 58T 53.4%WR +$0.43 | EXTREME 29T 55.2%WR +$0.54",
-            "root_cause": "NORMAL regime dragging. 7d NORMAL 8T 12.5%WR -$1.13 (small sample). 14d NORMAL 32T 46.9%WR -$0.62 (larger sample, marginal).",
-            "recommendation": "MONITOR — do not block NORMAL yet. 7d sample too small. 14d shows NORMAL is marginal but not catastrophic. If 14d NORMAL WR drops below 40%, block.",
-            "would_block_winners": "15 winners in 30d NORMAL — blocking kills 50% of NORMAL trades including winners"
+            "30d": "116T 53.4%WR +$0.94",
+            "root_cause": "Cold streak. ATR_SL 92.7% hit rate. NORMAL regime 8T 12.5%WR -$1.13 is worst.",
+            "rsi_bands_7d": {
+                "RSI<35": "10T 10%WR -$1.49 — catastrophic (should be blocked by floor)",
+                "RSI 35-50": "19T 47.4%WR -$1.30 — marginal",
+                "RSI 50-65": "9T 33.3%WR -$0.03 — breakeven",
+                "RSI>65": "3T 33.3%WR +$0.01 — breakeven"
+            },
+            "fix": "SHORT_RSI_FLOOR=35 should block RSI<35. Monitor 48h. NORMAL regime penalty may help (currently SHORT_NORMAL_PENALTY=1.0)."
         },
         "pump_chain_long": {
             "7d": "55T 41.8%WR +$1.23",
-            "regime_breakdown_7d": "EXTREME 33T 45.5%WR +$0.97 | HIGH 20T 35.0%WR +$0.17 | NORMAL 2T 50%WR +$0.09",
-            "root_cause": "HIGH regime underperforming (35%WR). EXTREME carrying PnL. Dead hours fix expected to help.",
-            "rsi_analysis": "Winners avg RSI=57.0, Losers avg RSI=52.3. No clear RSI filter edge — RSI_MAX=75 correct to keep.",
-            "recommendation": "Monitor dead hours fix impact 48h. HIGH regime 20T 35%WR is marginal — if persists, consider HIGH regime penalty."
+            "30d": "deprecated — degraded, no regime >55%WR",
+            "root_cause": "Dead hours 0-5,21,23 blocked (verified working). Remaining losses: chasing (gap>1%), RSI<35 entries.",
+            "rsi_bands_7d": {
+                "RSI<35": "8T 0%WR -$0.67 — catastrophic",
+                "RSI 35-50": "9T 44.4%WR +$0.33",
+                "RSI 50-65": "23T 60.9%WR +$1.33 — sweet spot",
+                "RSI 65-75": "12T 33.3%WR +$0.58 — marginal",
+                "RSI>75": "3T 33.3%WR -$0.34 — dead zone"
+            },
+            "fix": "RSI_MAX=75 preserves big winners (RSI>80 = +$1.13/30d). Chase filter needs verification for pump-chain+."
         }
     },
     "creative_improvements": [
         {
-            "date": "2026-09-23T00:30:00Z",
-            "idea": "ATR_SL regime-adaptive: wider SL in EXTREME regime",
-            "rationale": "EXTREME regime has 50%WR +$1.52/7d but ATR_SL kills 69.6% of trades. EXTREME = higher volatility = wider SL needed. Current ATR_SL MIN=1.3% MAX=1.5% — one-size-fits-all. Winners in EXTREME ride momentum (avg +$0.26), losers get stopped (avg -$0.15). Wider SL = fewer premature stops = more momentum captured.",
-            "expected_impact": "+$0.50-1.00/7d by reducing premature ATR_SL exits in EXTREME",
-            "category": "exit optimization",
-            "status": "suggested",
-            "risk": "medium — needs backtest to verify wider SL doesn't increase loss size",
-            "implementation": "Add EXTREME_ATR_SL_MULT=1.3 to hermes_constants.py. In signal_compactor, multiply ATR_SL by EXTREME_ATR_SL_MULT when volatility_regime=EXTREME."
+            "date": "2026-09-23T01:00:00Z",
+            "idea": "Add SHORT_RSI_FLOOR execution revalidation for pullback-entry- SHORT",
+            "rationale": "9 pullback-entry- SHORT losers in 7d had RSI<35. The floor was raised to 35 at 22:00 UTC Sep 22. Need to verify it's actually enforced at execution time (not just detection time). The SHORT_RSI_CEILING revalidation was fixed Sep 16 — same pattern needed for FLOOR.",
+            "expected_impact": "+$0.21/7d (block 10T 10%WR trades)",
+            "category": "entry sniper",
+            "status": "needs_verification",
+            "risk": "low"
         },
         {
-            "date": "2026-09-23T00:30:00Z",
-            "idea": "SHORT regime filter: block SHORT entries when 4h regime is EXTREME",
-            "rationale": "EXTREME regime = 76T 50%WR +$1.52 for LONG, but SHORT 22T 40.9%WR -$1.28. EXTREME = strong momentum = LONG wins, SHORT loses. Let LONGs ride EXTREME, block SHORTs entering against the momentum.",
-            "expected_impact": "+$1.28/7d by blocking losing SHORT entries in EXTREME",
-            "category": "regime filter",
-            "status": "suggested",
-            "risk": "medium — need to verify EXTREME SHORT 14d+ data before blocking",
-            "implementation": "Add EXTREME_SHORT_BLOCK_ENABLED=True to hermes_constants.py. Block SHORT entries when 4h regime=EXTREME."
+            "date": "2026-09-23T01:00:00Z",
+            "idea": "Verify chase filter covers pump-chain+ signal type",
+            "rationale": "FOGO gap=2.01% and HEMI gap=2.02% entered via pump-chain+ LONG and lost. CHASE_GAP_MAX_PCT=1.0 should block gaps >1%. If pump-chain+ is excluded from chase filter, these entries slip through.",
+            "expected_impact": "+$0.15-0.30/7d (block chasing entries)",
+            "category": "entry sniper",
+            "status": "needs_verification",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-23T01:00:00Z",
+            "idea": "Fix volume_spike/gap_at_entry recording (34.2% NULL)",
+            "rationale": "34.2% of 7d trades have NULL gap_at_entry. Chase filter can't evaluate entries without this data. Volume_spike has been 0% recorded for 5+ days. This is a data pipeline bug, not a signal issue.",
+            "expected_impact": "+$0.10-0.20/7d (chase filter accuracy improvement)",
+            "category": "data quality",
+            "status": "unfixed_5_days",
+            "risk": "low"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "MONITOR: Dead hours fix impact — pump-chain+ hours 0-5,21,23 blocked. pullback-entry- hours 0,1,3,7,10,11,17,22 blocked. Verify next pipeline runs.",
-        "MONITOR: SHORT_RSI_FLOOR=35 — 48h window. If pullback-entry- WR drops below 30d baseline, consider reverting.",
-        "FIX: volume_spike recording — 5+ days unfixed. High priority.",
-        "INVESTIGATE: Does chase filter cover pump-chain+? FOGO gap=2.01% should have been blocked by CHASE_GAP_MAX_PCT=1.0.",
-        "DEVELOP: New NEUTRAL regime signals for diversity."
+        "MONITOR: SHORT_RSI_FLOOR=35 impact over 48h. 7d data: RSI<35 SHORTs = 10T 10%WR -$1.49. Floor should block these going forward.",
+        "VERIFY: Chase filter coverage for pump-chain+. Check signal_compactor.py for CHASE_FILTER_ENABLED logic.",
+        "FIX: volume_spike/gap_at_entry recording — 34.2% NULL for 5+ days.",
+        "MONITOR: pullback-entry- SHORT cold streak. 7d 34.1%WR vs 30d 53.4%WR. Dead hours active.",
+        "MONITOR: Dead hours combined impact. pump-chain+ hours 0-5,21,23 + pullback-entry- hours 0,1,3,7,10,11,17,22."
     ]
 }
