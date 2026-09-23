@@ -3403,7 +3403,7 @@ RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width p
 # Integrated into _score_signal() final_score formula as rr_mult.
 RR_ENGINE_CONF_ENABLED       = True    # master switch for RR confidence adjustment
 RR_ENGINE_CONF_SHADOW        = False   # False = actually block bad R:R setups (was shadow mode)
-RR_ENGINE_CONF_HARD_BLOCK_RR = 0.95    # R:R below this = hard block (0.0x multiplier) (lowered from 1.0, 2026-09-20)
+RR_ENGINE_CONF_HARD_BLOCK_RR = 0.70    # R:R below this = hard block (0.0x multiplier) — lowered from 0.95 (2026-09-23). In downtrends, SHORT at resistance has low R:R but high probability. 0.70 allows these trades while still blocking garbage (R:R < 0.70).
 RR_ENGINE_CONF_HARD_BLOCK_SCORE = 35   # Score below this = hard block (grade F)
 RR_ENGINE_CONF_BOOST_THRESHOLD_RR = 4.0  # R:R above this + Grade A = boost
 RR_ENGINE_CONF_BOOST_MULT    = 1.30    # multiplier for exceptional setups (R:R≥4 + Grade A)
@@ -3545,6 +3545,7 @@ PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (24h), 20%WR EXTREME, 0%WR HIGH. 80T all-time 41.3%WR +$0.95. NEVER_REENABLE.
 PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
+PUMP_CHAIN_V5_ENABLED = True           # NEW 2026-09-22 — V5 with velocity + continuum oscillator filters. 48h test.
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
