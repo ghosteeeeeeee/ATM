@@ -262,6 +262,7 @@ def compute_atr_sl_tp(
     sl_multiplier: float = 1.0,
     trailing_distance: Optional[float] = None,
     lifecycle_role: str = 'concurrent',
+    confidence: Optional[float] = None,  # R:R-based k override (2026-09-23)
 ) -> dict:
     """
     Compute trailing ATR SL and TP for a position.

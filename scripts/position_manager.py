@@ -1899,6 +1899,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             sl_multiplier=sl_mult,
             trailing_distance=pos.get('trailing_distance'),
             lifecycle_role=_lifecycle_role,
+            confidence=pos.get('confidence', 70),  # R:R-based k override (2026-09-23)
         )
 
         new_sl = result['new_sl']
