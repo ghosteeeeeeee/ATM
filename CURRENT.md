@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~02:00 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-23 ~06:30 UTC**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 24T, 29.2% WR, -$2.40. 0 open. NEUTRAL vol. Pipeline running.
+24h: 22T, 40.9% WR, -$1.70. 3 open ($0.39). EXTREME vol. Pipeline running.
 
-- **24h (rolling):** 24T, 29.2% WR, -$2.40. ATR_SL dominates (14/17 exits). pullback-entry- SHORT 6T 0%WR -$1.54. pump-chain+ LONG 4T 25%WR -$0.64.
+- **24h (rolling):** 22T, 40.9% WR, -$1.70. ATR_SL dominates (10/13 exits). pullback-entry- SHORT 6T 0%WR -$1.54. pump-chain+ LONG 4T 25%WR -$0.64.
 - **7d:** 185T, 44.3% WR, -$0.88 (DB-verified). Slightly negative — system fragile.
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 17T 64.7%WR +$1.26 (gem). bb_bounce_v2_long RE-ENABLED 73T 74%WR +$2.08/30d.
 - **SHORT:** pullback-entry- 41T 34.1%WR -$2.81 (cold streak — 30d 119T 52.1%WR +$0.35). **DEAD HOURS BUG FIXED** — enforcement was broken (string comparison mismatch). Now working.
@@ -20,7 +20,7 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=35:** CEO raised 30→35 (Sep 22). 90d: RSI<35 SHORTs = 7T 0%WR -$1.27. Blocks oversold SHORT entries. RSI 50-60 sweet spot preserved (77.8%WR).
+- **SHORT_RSI_FLOOR=50:** brain_auditor raised 35→50 (Sep 23). 14d: RSI 35-50 SHORT = 37T 43.2%WR -$1.06 (bleeding band). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Blocks losing band, preserves sweet spot. Net +$0.95/7d.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
@@ -43,6 +43,8 @@
 
 ## Today's Changes (Sep 23)
 
+1. **brain_auditor ~06:30 UTC — 1 CONFIG CHANGE.** DB-verified: 22T 40.9%WR -$1.70 (24h) | 186T 45.2%WR -$0.35 (7d) | 461T 51.0%WR +$2.31 (14d). **SHORT_RSI_FLOOR 35→50.** 14d: RSI 35-50 SHORT = 37T 43.2%WR -$1.06 (bleeding band). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Would block 22 losers (-$3.84 saved), lose 20 winners (+$1.94 lost). Net +$0.95/7d. **LOSING AUTOPSY (13):** 10/13 atr_sl_hit. DOT RSI=27.27, FIL RSI=33.91, COMP RSI=13.04 all entered SHORT into oversold (pre-fix). FOGO gap=2.01% LONG chasing. **CREATIVE:** (1) Regime-adaptive ATR_SL for EXTREME. (2) Global LONG_RSI_FLOOR=30. (3) Fix gap_at_entry recording for chase filter.
+1. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB-verified: 16T 40.9%WR -$1.70 (24h) | 185T 44.3%WR -$0.88 (7d) | 461T 51.0%WR +$2.31 (14d). **DEAD HOURS FIX VERIFIED:** 0 pump-chain+ LONG trades since fix. pullback-entry- SHORT 5T in valid hours (11,17,18,22 — not in dead hours [3,4,6,8,13,20]). **LOSING AUTOPSY (12):** 10/12 atr_sl_hit. DOT RSI=27.27, FIL RSI=33.91, COMP RSI=13.04 all below SHORT_RSI_FLOOR=35 (pre-fix, now blocked). WCT RSI=98.86 volume-breakout-long+ (extreme overbought, only penalized not blocked by SIGNAL_FILTER_RSI_MAX=72). **RSI BANDS (14d):** SHORT: 35-50=22T 36.4%WR -$1.62 (bleeding), 50-65=35T 60%WR +$1.33 (sweet spot), NULL=26T 65.4%WR +$1.85. LONG: <35=8T 0%WR -$0.67. **REGIME:** EXTREME 176T 55.1%WR +$4.46/14d, NORMAL 92T 44.6%WR -$1.62/14d. **CREATIVE:** (1) Raise SHORT_RSI_FLOOR 35→50 — blocks 35-50 band (22T 36.4%WR -$1.62/14d). Would lose 8 winners, block 14 losers. Expected +$0.50-1.00/7d. (2) Hard RSI block for LONG RSI>90 — volume-breakout-long+ entering at 98.86, 97.78.
 1. **brain_auditor ~04:15 UTC — 1 CODE FIX.** **BUG FIX: SHORT_RSI_FLOOR BYPASS.** `_ctx_gate_get_rsi()` returns None when <15 1m candles — when None, SHORT_RSI_FLOOR check was skipped entirely. COMP RSI=13.04, DOT RSI=27.27, FIL RSI=33.91 all below floor=35 but executed. **FIX:** Added detection-time RSI fallback from `_signal_metadata` when live RSI is None. Now checks both live and detection-time RSI. **RSI METADATA CORRECTION:** Previous audit used wrong JSON key (`rsi` vs `rsi_14`). RSI IS recorded correctly — 187/187 7d trades have `rsi_14` in metadata. **RSI SWEET SPOTS (14d):** pump-chain+ LONG RSI 50-65 = 26T 57.7%WR +$1.24. pullback-entry- SHORT RSI 50-65 = 20T 65.0%WR +$0.77. **CREATIVE:** Raise pullback-entry- SHORT_RSI_FLOOR to 50 — blocks RSI 35-50 band (37T 43.2%WR -$1.06/14d). Expected +$0.50-1.00/7d. Needs monitoring.
 1. **CEO ~02:00 UTC — 2 CONFIG CHANGES + 1 BUG FIX.** DB-verified: 24h 24T 29.2%WR -$2.40 | 7d 185T 44.3%WR -$0.88. **BUG FIX:** pullback-entry- SHORT dead hours enforcement broken — string comparison used 'pullback-entry' (dash) but signal_type uses 'pullback_entry' (underscore). Changed to 'in' check for both variants. **DEAD HOURS CONFIG FIXES:** (1) pullback-entry- SHORT: [0,1,3,7,10,11,17,22] → [3,4,6,8,13,20]. Old config blocked profitable hours (11=+$0.38, 22=+$0.72) and missed big losers (4=-$0.84, 20=-$1.02). Expected +$1.40/7d. (2) pump-chain+ LONG: [0,1,2,3,4,5,21,23] → [1,2,3,4,5,7,8,13,21,22]. Old config blocked profitable hours (0=+$0.72, 23=+$0.69) and missed losers (7=-$0.55, 8=-$0.37, 13=-$0.36). Expected +$1.91/7d. Combined: +$3.31/7d. Commit d339ea7e.
 

@@ -2819,3 +2819,17 @@
   atr_sl_hit 64% within baseline.
   No signal meets kill criteria. System stable.
   BY: auto_1hr
+
+[2026-09-23 05:30 UTC] brain_auditor: NO CONFIG CHANGE — analysis only
+  24h: 22T 40.9%WR -$1.70 | 7d: 186T 45.2%WR -$0.35 | 14d: 461T 51.0%WR +$2.31
+  CRITICAL: 66% of pullback-entry- SHORT trades have NULL entry_rsi_14 — RSI filters blind to 2/3 of trades (5+ days unfixed).
+  RSI sweet spots: SHORT 50-65 = 60%WR +$0.15/14d. LONG 50-65 = 46.2%WR +$0.66/14d.
+  Losing autopsy: 13 losers 24h, 10/13 atr_sl_hit. DOT/FIL entered SHORT into oversold (RSI<35). FOGO entered LONG at RSI=81.5 (above RSI_MAX=75).
+  Creative: adaptive ATR_SL for EXTREME, BTC expansion filter, regime-adaptive confidence.
+  No config changes — monitoring dead hours + RSI_FLOOR impact. BY: brain_auditor
+[2026-09-23 06:10 UTC] auto_1hr: NO CHANGE — system improving
+  4 trades last hour (2W 2L) -$0.11. 24h: 21T 33.3%WR -$2.21.
+  atr_sl_hit 44.4% today — best in 7 days (was 71% yesterday).
+  pullback-entry- already dead, no new entries. No kill criteria met.
+  1 open position (CFX). System stable and improving.
+  BY: auto_1hr

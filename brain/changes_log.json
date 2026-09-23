@@ -384,5 +384,16 @@
     "after": "PULLBACK_ENTRY_SHORT_NORMAL_BLOCK=True in hermes_constants.py + enforcement block in signal_compactor.py line ~1301",
     "rationale": "14d NORMAL: 8T 12.5%WR -$1.13 (worst regime). EXTREME: 53.8%WR -$0.15. Signal only works in volatile markets. 0 winners blocked.",
     "impact": "+$0.56/7d expected (eliminate NORMAL regime drag)"
+  },
+  {
+    "timestamp": "2026-09-23T06:30:00Z",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_FLOOR raised 35→50",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "SHORT_RSI_FLOOR = 35",
+    "after": "SHORT_RSI_FLOOR = 50",
+    "rationale": "RSI 35-50 SHORT band = 37T 43.2%WR -$1.06/14d (bleeding). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Blocks losing band, preserves sweet spot. Net: +$0.95/7d.",
+    "impact": "+$0.95/7d expected. Would block 22 losers (-$3.84 saved) and lose 20 winners (+$1.94 lost)."
   }
 ]

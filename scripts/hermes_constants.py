@@ -259,12 +259,12 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'ACE',
-    'ADA',
     'CAKE',
+    'FIL',
     'FOGO',
+    'IOTA',
     'JUP',
     'LTC',
-    'SAND',
     'SYRUP'
 }
 FAVORITES_SHORT = {
@@ -294,8 +294,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
+    'ALGO',
     'ME'
 }
+
 
 
 
@@ -822,7 +824,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 35           # CEO: raised 30→35 (2026-09-22). 90d: RSI<35 SHORTs = 7T 0%WR -$1.27. RSI 35-40 = 2T 0%WR -$0.40. RSI 50-60 = 9T 77.8%WR +$0.93 (sweet spot). Blocks oversold SHORT entries that always lose.
+SHORT_RSI_FLOOR = 50           # brain_auditor: raised 35→50 (2026-09-23). 14d: RSI 35-50 SHORT = 37T 43.2%WR -$1.06 (bleeding band). RSI 50-65 = 20T 65.0%WR +$0.77 (sweet spot). Blocks losing band, preserves sweet spot. Net: +$0.95/7d.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────

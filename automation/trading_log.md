@@ -4820,3 +4820,56 @@ Final set: ['ME']
 
 ## TEAM UPDATES
 - [2026-09-23 03:00 UTC] auto_1hr: NO CHANGE — system stable, 2 consecutive profitable hours
+
+## FAVORITES Update — 2026-09-23 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE SAND (inactive 7d, no trades)
+- DEMOTE ADA (WR=57.1%, PnL=$0.41, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE FIL (WR=66.7%, AvgPnL=2.26%, Trades=6)
+- PROMOTE IOTA (WR=80.0%, AvgPnL=1.56%, Trades=5)
+
+Final set: ['ACE', 'CAKE', 'FIL', 'FOGO', 'IOTA', 'JUP', 'LTC', 'SYRUP']
+
+## LOSERS Update — 2026-09-23 06:05 UTC
+- ADD ALGO (WR=40.0%, PnL=$-0.08, low_wr (40.0%))
+
+Final set: ['ALGO', 'ME']
+
+## [2026-09-23 06:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses) | **24h:** 21T, 33.3%WR, -$2.21
+
+**Last Hour Winners:**
+- BTC LONG continuum-osc+: +$0.01 (atr_sl_hit — trail saved)
+- YGG LONG volume-breakout-long+: +$0.20 (atr_sl_hit — trail saved)
+
+**Last Hour Losers:**
+- ALGO LONG bb-bounce-v2-long+: -$0.10 (cut-loser-CL-T1)
+- ADA LONG mover+: -$0.22 (atr_sl_hit)
+
+**Close Reasons (24h):**
+- atr_sl_hit: 13/21 (62%), avg -$0.169 — trending down from 71% yesterday to 44% today
+- profit-monster-trail: 4T, avg +$0.030 — only winning exit type
+- cut-loser-CL-T1: 3T, avg -$0.097
+- UNIVERSAL_MAX_HOLD: 1T, +$0.160
+
+**Signal Performance (24h):**
+- pullback-entry-: 6T, 0%WR, -$1.54 — ALREADY KILLED (line 3684). Legacy trades only.
+- pump-chain+: 2T, 0%WR, -$0.60 — 1 trade opened recently. Monitor.
+- bb-bounce-v2-long+: 4T, 50%WR, -$0.11 — mediocre, not kill-worthy.
+- volume-breakout-long+: 2T, 50%WR, +$0.05
+- mover+: 2T, 50%WR, -$0.06
+
+**Changes:** None
+
+**No Change Needed:**
+- pullback-entry- already dead, no new entries
+- atr_sl_hit rate at 44.4% today — best in 7 days
+- No signal meets kill criteria (3+ losses, 0% WR, last hour)
+- Trade frequency normal (4/hr)
+- Only 1 open position (CFX)
+
+**Open Questions:**
+- pump-chain+ 0%WR but only 2 trades — watch next hour
+
+**BY:** auto_1hr

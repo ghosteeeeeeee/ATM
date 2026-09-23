@@ -459,3 +459,58 @@ Re-verified every Level 1 task from all plans. All confirmed implemented:
 ### Remaining Work Requires Level 2+ Sessions
 
 No more Level 1 tasks found across 120 plans. All config tweaks, blacklist additions, bug fixes, and simple parameter changes are implemented. Remaining work is signal building (Level 2), system integration (Level 3), or architecture (Level 4).
+
+---
+
+## Scan #6 — 2026-09-22 (upgrade implementer full scan)
+
+### Top 20 Most Recent Plans — Re-evaluation
+
+| # | Plan | Difficulty | Value | Status | Notes |
+|---|------|------------|-------|--------|-------|
+| 1 | pump-chain-v5-spec | Level 2 | HIGH | ✅ DONE | pump_chain_v5.py + velocity + continuum filters |
+| 2 | pump-chain-v5-continuum-evidence | N/A | HIGH | ✅ DONE | Evidence for #1 |
+| 3 | pump-chain-v5-evidence | N/A | HIGH | ✅ DONE | Evidence for #1 |
+| 4 | trade-watchdog-spec | Level 4 | HIGH | ✅ DONE | 1253 lines, systemd, dashboard, API |
+| 5 | structural-awareness-overhaul | Level 3-4 | HIGH | ❌ PENDING | 4-layer architecture, needs dedicated session |
+| 6 | pump-catching-and-exit-optimization | Level 1-2 | HIGH | ✅ MOSTLY DONE | All Level 1 items done, btc_breakout.py not built |
+| 7 | btc-long-term-bull-run-thesis | N/A | HIGH | MONITORING | Macro thesis, informs positioning |
+| 8 | 2026-09-21_btc-4year-cycle-macro-thesis | N/A | MEDIUM | MONITORING | Macro thesis |
+| 9 | pump-chain-exit-analysis | Level 1 | HIGH | ✅ DONE | Dead regime blocks fixed |
+| 10 | squeeze-breakout-signal-spec | Level 2 | MEDIUM | ✅ DONE | squeeze_breakout.py exists |
+| 11 | oscillator-matrix-lifecycle | Level 2 | MEDIUM | ✅ DONE | Shadow mode running |
+| 12 | ride-it-exit-spec | Level 2 | HIGH | ✅ DONE | ride_it_exit.py + constants |
+| 13 | continuum-ma-signal-spec | Level 2 | MEDIUM | ✅ DONE | continuum_ma.py exists |
+| 14 | btc-oscillator-30d-plan | Level 2 | MEDIUM | ⏸️ WAITING | Plan says wait for 30d data |
+| 15 | btc-oscillator-correlation-plan | Level 2 | HIGH | ⏸️ PARTIAL | zscore data not available for filter |
+| 16 | profitability-fix-plan | Level 1-2 | HIGH | ✅ DONE | 7/8 fixes done |
+| 17 | 2026-09-11_volatility-gate-tuning | Level 2 | MEDIUM | ✅ DONE | ATR ratio + BTC trend boost |
+| 18 | 2026-09-11_volatility-regime-adaptive-signals | Level 2 | MEDIUM | ✅ DONE | VOL_PHASE_MULTS matrix |
+| 19 | oversold-bounce-signal | Level 2 | MEDIUM | ✅ DONE | oversold_bounce.py exists |
+| 20 | contrarian-zone-signal | Level 3 | MEDIUM | ❌ PENDING | Needs SL zone wiring into compactor |
+
+### Final Counts
+
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED | 15/20 |
+| PARTIALLY IMPLEMENTED | 1/20 |
+| PENDING (Level 3+) | 2/20 |
+| WAITING (data) | 1/20 |
+| MONITORING (thesis) | 1/20 |
+
+### No Level 1 Tasks Remaining
+
+All config tweaks, blacklist additions, parameter changes, dead code fixes, and simple signal enables are complete across 103 plans. The upgrade pipeline is fully tapped for easy wins.
+
+### Next Candidates (Level 2+ only)
+
+| Priority | Task | Level | Value | Est. Impact | Blocker |
+|----------|------|-------|-------|-------------|---------|
+| 1 | BTC oscillator correlation filter | 2 | HIGH | +$1-2/7d | Needs zscore data in signal_compactor |
+| 2 | SPEED_MIN_THRESHOLD_LONG = 50 | 2 | HIGH | +$2.82/7d | HIGH RISK — signal starvation |
+| 3 | HL Trigger SL/TP V2 | 3 | HIGH | Catastrophic loss prevention | Was disabled, needs re-enable |
+| 4 | Partial Close + Trailing Runner | 3 | HIGH | +$1-2/7d | HL API partial close support |
+| 5 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | New regime_tuner.py + timer |
+| 6 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4 new files, wiring existing systems |
+| 7 | Trade Watchdog refinements | 2 | MEDIUM | Dashboard polish | Core system works |
