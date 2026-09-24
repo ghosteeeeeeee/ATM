@@ -5733,6 +5733,38 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 **Watch List:** mover+ signal — if next loss, kill immediately
 **BY:** auto_1hr
 
+## [2026-09-24 10:XX UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (0 wins, 3 losses). All atr_sl_hit. -$0.62.
+**Open:** 1 (AZTEC SHORT pump-chain- +71.8%, 1.4h).
+
+**24h:** 35T 31.4%WR -$1.44 (NEUTRAL regime).
+
+**Key Metrics:**
+- atr_sl_hit: 16T (45.7%) — ABOVE40% threshold. 9/16 at exactly 1.3% SL dist (floor).
+- profit-monster-trail: 8T, 37.5%WR, -$0.02 — breakeven.
+- pump_exit_dead_money: 7T, 57.1%WR, +$0.29 — only profitable exit type.
+- cut-loser-CL-T1: 3T, 0%WR, -$0.38 — small losses as designed.
+
+**Signal Performance (24h):**
+- pump-chain- SHORT: 18T, 44.4%WR, +$0.05 — only profitable signal
+- accel-300-breakout SHORT: 7T, 28.6%WR, -$0.12 — drag
+- bb-bounce-v2-long+ LONG: 4T, 25%WR, -$0.19 — drag
+- mover+ LONG: 3T, 0%WR, -$0.61 — already killed (legacy trades)
+
+**Changes:** None — no kill candidates. mover+ already killed. No signal with 0%WR/3+T in last hour. No overtrading (3/hr).
+
+**No Change Needed:**
+- atr_sl_hit at 45.7% — above 40%, but SL floor widening (1.2%→1.3%) already deployed by brain_auditor Sep 14. Further widening requires CEO approval.
+- No overtrading (3/hr)
+- No signal kill candidates (mover+ already killed)
+
+**Open Questions:**
+- Should ATR_SL_MIN widen further (1.3%→1.4%) to reduce SL hits? 9/16 SL hits at exact 1.3% floor suggests trades need more room.
+- accel-300-breakout 28.6%WR/7T — drag but has some winners, doesn't meet kill rule.
+
+**BY:** auto_1hr
+
 ## [2026-09-24 09:XX UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour. 4 open (BTC LONG 6.7h, BABY LONG 4h, FOGO SHORT 27m, AZTEC SHORT 14m).
