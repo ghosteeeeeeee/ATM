@@ -1,3 +1,37 @@
+## [2026-09-24 02:25 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (ETH bb-bounce-v2-long+ +$0.04, ALT mover+ -$0.01, AVAX mover+ -$0.15) | **Open:** 3 (BTC continuum-osc+ LONG, BABY mover+ LONG, KAS pump-chain- SHORT)
+**24h:** 34T 32.4%WR ~$0 | **7d:** 211T 43.1%WR -$1.41 | **14d:** 453T 49.4%WR -$0.12
+
+**24h exit reasons:**
+- atr_sl_hit: 14T 41.2% avg -$0.075 (above 40% threshold — was 36% last check)
+- profit-monster-trail: 10T avg -$0.005 (slightly negative)
+- pump_exit_dead_money: 6T avg +$0.038
+- cut-loser-CL-T1: 3T avg -$0.090
+- pump_exit_momentum: 1T $0.00
+
+**24h signal ranking:**
+- pump-chain-: 15T -$0.13
+- accel-300-breakout: 7T -$0.12
+- bb-bounce-v2-long+: 6T +$0.05 (only profitable)
+- mover+: 3T 0%WR -$0.44 (KILLED)
+
+**Changes:**
+1. KILLED mover+ LONG (MOVER_PLUS_ENABLED = False) — 3T 0%WR -$0.44 24h, 13T 46%WR -$0.67 7d. All losses via ATR SL. Commit: cb1739ea
+
+**No Change Needed:**
+- No overtrading (34T/24h = 1.4T/hr)
+- No stale trades (3 open all <4h)
+- atr_sl_hit 41.2% — just above 40%, monitoring (was 36% last check, CEO tpsl fix may be drifting)
+
+**Open Questions:**
+- atr_sl_hit trending back up (36%→41.2%) — may need tpsl adjustment if continues
+- profit-monster-trail slightly negative — trail may need tighter lock
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-24 01:25 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (COMP pump-chain- SHORT atr_sl_hit -$0.13) | **Open:** 3 (ARB/AZTEC/CAKE pump-chain- SHORT, 3-45min, fresh)

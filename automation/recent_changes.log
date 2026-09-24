@@ -1,3 +1,8 @@
+[2026-09-24 02:25 UTC] auto_1hr: KILLED mover+ LONG (MOVER_PLUS_ENABLED = False)
+  24h: 34T 32.4%WR ~$0 | 7d: 211T 43.1%WR -$1.41 | 14d: 453T 49.4%WR -$0.12
+  3 trades closed last hour: ETH bb-bounce-v2-long+ +$0.04, ALT/AVAX mover+ -$0.16 total.
+  mover+ 3T 0%WR -$0.44 24h, 13T 46%WR -$0.67 7d. All losses via ATR SL. Commit: cb1739ea. BY: auto_1hr
+
 [2026-09-24 01:25 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 33T 45.5%WR -$0.13 | 7d: 204T 44.1%WR -$0.78 | 14d: 453T 49.4%WR -$0.12
   1 trade closed last hour: COMP pump-chain- SHORT atr_sl_hit -$0.13. 3 open (ARB/AZTEC/CAKE pump-chain- SHORT, all fresh).
