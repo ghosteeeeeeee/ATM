@@ -5,12 +5,12 @@
 
 ## Current Status
 
-24h: 36T, 33.3% WR, -$1.28. EXTREME vol. Pipeline running. 4 open positions.
+24h: 36T, 33.3% WR, -$1.43. Pipeline running. 1 open position.
 
-- **24h (rolling):** 36T, 33.3% WR, -$1.28. CL-T1 fix deployed ~02:00 UTC, 0 CL-T1 exits since (working — no premature cuts). SHORT_RSI_FLOOR hard block fix deployed ~06:00 UTC.
-- **7d:** 209T, 43.1% WR, -$1.44 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
-- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
-- **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 21T 38.1%WR -$0.51/7d (cold streak — 14d 70T 54.3%WR +$0.74).
+- **24h (rolling):** 36T, 33.3% WR, -$1.43. CL-T1 fire windows widened (2,3)→(4,6) ~10:00 UTC. SHORT_RSI_FLOOR=40 hard block deployed ~06:00 UTC. mover+ killed.
+- **7d:** 218T, 42.7% WR, -$2.04 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
+- **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
+- **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. **VERIFIED WORKING** — 0 trades in blocked hours since fix.
@@ -28,7 +28,7 @@
 **🟡 R:R STATUS (7d -$0.78)**
 7d PnL -$0.78 (improving from -$0.80). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — cold streak, 30d still +$0.35). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (FIXED: T1 range widened to -3.0%).
 
-**🟢 REGIME EDGE (7d):** NEUTRAL only (201T). EXTREME edge not visible in 7d (all NEUTRAL).
+**🟢 REGIME EDGE (7d):** NEUTRAL only (218T). EXTREME edge not visible in 7d (all NEUTRAL).
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
