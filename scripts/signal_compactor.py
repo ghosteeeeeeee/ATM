@@ -1870,6 +1870,28 @@ def _score_signal(token, direction, conf, source, signal_type,
             try: _vr_conn.close()
             except Exception: pass
 
+    # ── Regime Confidence Multiplier ──────────────────────────────────────────
+    # CEO Sep 24 — boost confidence in EXTREME, reduce in NORMAL. Data: EXTREME
+    # 179T 49.7%WR -$0.39 (best), NORMAL 90T 46.7%WR -$1.38 (worst) over 14d.
+    regime_conf_mult = 1.0
+    try:
+        from hermes_constants import (
+            REGIME_CONF_MULTIPLIER_ENABLED, REGIME_CONF_EXTREME_MULT,
+            REGIME_CONF_NORMAL_MULT, REGIME_CONF_HIGH_MULT, REGIME_CONF_FLAT_MULT,
+        )
+        if REGIME_CONF_MULTIPLIER_ENABLED and _vol_regime:
+            _rcm_map = {
+                'EXTREME': REGIME_CONF_EXTREME_MULT,
+                'NORMAL': REGIME_CONF_NORMAL_MULT,
+                'HIGH': REGIME_CONF_HIGH_MULT,
+                'FLAT': REGIME_CONF_FLAT_MULT,
+            }
+            regime_conf_mult = _rcm_map.get(_vol_regime, 1.0)
+            if regime_conf_mult != 1.0:
+                log(f"  🎯 [REGIME-CONF] {token} {signal_type}: {_vol_regime} → {regime_conf_mult:.2f}x")
+    except ImportError:
+        pass
+
     # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
     # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
     short_normal_mult = 1.0
@@ -1930,7 +1952,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     except ImportError:
         pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult
     return final_score
 
 

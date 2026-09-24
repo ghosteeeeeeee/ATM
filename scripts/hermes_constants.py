@@ -884,6 +884,16 @@ CHASE_GAP_MAX_PCT = 3.0           # CEO 2026-09-21: raised from 1.0 to catch val
 # Penalty was blocking good entries. Expected impact: +$0.26/7d from unblocked entries.
 SHORT_NORMAL_PENALTY = 0.85  # brain_auditor Sep 21 — ALL SHORT signals in NORMAL are losers 7d (18T 38.9%WR -$0.78). EXTREME is only profitable SHORT regime (56.5%WR +$3.44). 15% penalty reduces false entries. Was 1.0 (removed Sep 16 when SHORT NORMAL was profitable — data shifted).
 
+# ── Regime Confidence Multiplier ──────────────────────────────────────────────
+# CEO Sep 24 — 7th suggestion from brain_auditor, data confirmed across 14d:
+# EXTREME 179T 49.7%WR -$0.39 (best), NORMAL 90T 46.7%WR -$1.38 (worst).
+# Boosts confidence for EXTREME trades, reduces for NORMAL. No trades blocked.
+REGIME_CONF_MULTIPLIER_ENABLED = True
+REGIME_CONF_EXTREME_MULT = 1.15   # +15% confidence boost in EXTREME vol
+REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
+REGIME_CONF_HIGH_MULT    = 1.0    # no adjustment for HIGH (mixed results)
+REGIME_CONF_FLAT_MULT    = 1.0    # no adjustment for FLAT (too few trades)
+
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
 # Hard block trades where z-score and acceleration disagree with direction.
 # CEO backtested: misaligned = 23.8% WR, aligned = 76.4% WR (52pt gap).

@@ -6051,3 +6051,32 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - 14d system at -$4.95 — still marginally negative, needs positive days to recover.
 
 **BY:** auto_1hr
+
+## [2026-09-24 21:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 1 open (BTC LONG continuum-osc+, 2.7h, flat).
+**24h:** 33T, 33.3% WR, -$2.38. **14d:** 444T, 47.3% WR, -$4.83.
+
+**Key Metrics:**
+- atr_sl_hit: 20/33 = 60.6% — above 40% threshold, but avg loss only -$0.11. Trailing SL cutting small by design, not SL-too-tight.
+- pump_exit_dead_money: 8T, +$0.19 — only profitable exit.
+- No signal with 0%WR/3+T closed in last hour.
+
+**Signal Perf 24h (3+ trades):**
+- pump-chain-: 21T, 42.9% WR, -$0.68 — dead hours [2,3] deployed yesterday, monitoring.
+- mover+: 3T, 0% WR, -$0.61 — already KILLED (MOVER_PLUS_ENABLED=False).
+- bb-bounce-v2-long+: 3T, 33.3% WR, -$0.16 — borderline, too early to kill.
+
+**Changes:** None — no kill candidates, no overtrading, no SL-too-tight.
+
+**No Change Needed:**
+- No kill candidates this hour
+- No overtrading
+- atr_sl_hit elevated but avg loss trivial
+- pump-chain- dead hours [2,3] just deployed — need more data
+
+**Open Questions:**
+- pump-chain- still net negative at -$0.68/24h. Dead hours only targets 2 hours. Longer-term tuning may be needed.
+- 14d system at -$4.83 — needs more positive days to recover.
+
+**BY:** auto_1hr

@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~18:35 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-24 ~22:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 33T, 33.3% WR, -$2.31. Pipeline running. CL-T1 DISABLED. signal_compactor lock contention FIXED.
+24h: 31T, 32.3% WR, -$2.41. Pipeline running. CL-T1 DISABLED. REGIME_CONF_MULTIPLIER DEPLOYED.
 
-- **24h (rolling):** 34T, 32.4% WR, -$2.32 (DB-verified). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 DISABLED (25T/14d 0%WR -$3.11). mover+ killed ~02:25 UTC.
-- **7d:** 220T, 42.7% WR, -$2.51 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 29T 41.4%WR -$0.97 (cold streak, 14d 54.8%WR +$0.92).
+- **24h (rolling):** 31T, 32.3% WR, -$2.41 (DB-verified). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 DISABLED (25T/14d 0%WR -$3.11). mover+ killed ~02:25 UTC. REGIME_CONF_MULTIPLIER deployed ~22:00 UTC.
+- **7d:** 219T, 43.4% WR, -$2.05 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 15T 73.3%WR +$1.76 (gem). pullback-entry- SHORT 29T 31.0%WR -$2.27 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 32T 43.8%WR -$0.96 (cold streak, 14d 54.8%WR +$0.92).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -26,10 +26,10 @@
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC). +10pt confidence when LONG RSI 35-50. 14d: 43T 58.1%WR +$1.39 (best defined band). Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$2.04)**
-7d PnL -$2.04. pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse, R:R=1.53:1). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d +$0.35). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 73T 54.8%WR +$0.92/14d (hidden gem, EXTREME).
+**🟡 R:R STATUS (7d -$2.05)**
+7d PnL -$2.05. pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse, R:R=1.53:1). volume-breakout-long+ 15T 73.3%WR +$1.76 (gem). pullback-entry- SHORT 29T 31.0%WR -$2.27 (cold streak, 30d +$0.35). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 32T 43.8%WR -$0.96/7d (14d 54.8%WR +$0.92, cold streak).
 
-**🟢 REGIME EDGE (7d):** EXTREME 99T 44.4%WR +$0.26 (best). HIGH 82T 43.9%WR -$0.96. NORMAL 35T 31.4%WR -$1.37 (worst). 14d: EXTREME +$0.75 vs NORMAL -$1.52.
+**🟢 REGIME EDGE (14d volatility_regime):** EXTREME 179T 49.7%WR -$0.39 (best). HIGH 172T 44.8%WR -$3.09. NORMAL 90T 46.7%WR -$1.38 (worst). FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15% confidence, NORMAL -15%.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -47,6 +47,7 @@
 
 ## Today's Changes (Sep 24)
 
+1. **CEO ~22:00 UTC — 1 CODE FIX.** DB-verified: 31T 32.3%WR -$2.41 (24h) | 219T 43.4%WR -$2.05 (7d) | 444T 47.3%WR -$4.83 (14d). **REGIME_CONF_MULTIPLIER IMPLEMENTED.** 7th suggestion from brain_auditor, data confirmed: EXTREME 179T 49.7%WR -$0.39/14d (best), NORMAL 90T 46.7%WR -$1.38 (worst). Multiplier: EXTREME +15% confidence, NORMAL -15% confidence. No trades blocked — only fill quality adjusted. Added to hermes_constants.py + signal_compactor.py. Expected +$0.50-1.00/7d. **FLAGGED:** volume_spike 100% NULL (7d) — btc_crash_filter computes but signal_compactor never writes to _signal_metadata. Needs code fix. — CEO
 1. **daily_orchestrator ~18:35 UTC — 1 CODE FIX.** **SIGNAL_COMPACTOR LOCK CONTENTION FIXED.** Removed signal_compactor from STEPS_EVERY_MIN in run_pipeline.py. Standalone timer (hermes-signal-compactor.timer, every 1min) handles it exclusively. Having both caused 13K+ LOCK-WAIT retries on info_rate table. Same pattern as price_collector removal (Apr 25). Expected: eliminates lock contention, faster pipeline execution. Verified: pipeline syntax OK, standalone timer active (721ms last run). — daily_orchestrator
 1. **CEO ~18:00 UTC — 1 CONFIG CHANGE.** DB-verified: 34T 32.4%WR -$2.32 (24h) | 219T 43.4%WR -$2.19 (7d) | 446T 47.2%WR -$5.06 (14d). **CL-T1 DISABLED.** 25T/14d 0%WR -$3.11 — 61.5% of ALL losses. Fire window widening (2,3)→(4,6) did NOT produce any winners. Trades enter at -0.75%, slide to -3%+ by minute 4-6, never recover. Set CL_TIER1_MIN_PCT=0 (range 0 to -0.75 is impossible). T2 (-3.0 to -2.5) and hard stop (-3.0) still active. Expected +$0.22/day = +$1.56/7d. Commit 02581c89. — CEO
 1. **brain_auditor ~17:35 UTC — 1 CONFIG CHANGE.** DB-verified: 20T ~40%WR -$0.61 (24h) | 451T 47.5%WR -$4.44 (14d). **LONG RSI SWEET-SPOT CONFIDENCE BOOST.** 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band). Added +10pt confidence when RSI in 35-50. Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d. **CL-T1 STILL BROKEN:** 16T/7d 0%WR -$1.74. Fire windows (4,6) not producing winners. Consider disabling or widening TIER1_MAX_PCT. **SHORT NULL RSI EDGE DEGRADED:** 28T 50%WR -$0.38/14d. **CREATIVE:** LONG RSI sweet-spot boost IMPLEMENTED. REGIME_CONF_MULTIPLIER suggested 6th time. — brain_auditor

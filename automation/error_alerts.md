@@ -89,3 +89,12 @@
 - **[WARN]** (1x): Today's PnL negative (-$2.38, 36.7% winrate, 30 trades) — pump-chain SHORTs underperforming (38.9% WR, -$0.91).
 - **AUTO-FIX**: Compressed old logs >1 day. No critical issues found.
 - **INFO**: Pipeline running (cycle #214254), HL sync guardian active, 0 errors in last 30min. Market regime: LONG_BIAS (7 tokens). 1 open position (BTC LONG).
+
+## Error Alerts — 2026-09-24 20:45 UTC
+- **[WARN]** (2x): Disk at 85% (95G/118G) — at threshold, no old logs eligible for compression.
+- **[WARN]** (1x): Hotset fallback DB query returned 0 tokens — market regime 98% neutral.
+- **INFO**: Pipeline healthy (completed 20:44, rc=0, 24s runtime). 86 signals generated in last hour. 1 open trade (BTC LONG, pnl=-0.07%). 33 closed today, PnL -57.58%. All 55 timers firing on schedule.
+- **AUTO-FIX**: None needed — system operational.
+
+## Error Alerts — 2026-09-24 20:57 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`

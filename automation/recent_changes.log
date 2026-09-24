@@ -2943,3 +2943,8 @@
 [2026-09-24 20:15 UTC] auto_1hr: ADDED pump-chain- SHORT dead hours [2,3]
   14d: hours 2,3 = 7T 14.3%WR -$0.83. Hour 2: 3T 0%WR -$0.41, Hour 3: 4T 25%WR -$0.42.
   Expected +$0.83/14d = +$0.42/7d. Commit: 76ffdba4. BY: auto_1hr
+[2026-09-24 21:00 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 33T 33.3%WR -$2.38. 0 trades last hour. 1 open (BTC LONG continuum-osc+, 2.7h).
+  atr_sl_hit 60.6% — elevated but avg loss trivial (-$0.11). pump-chain- 21T/42.9%WR/-$0.68.
+  No kill candidates. No overtrading.
+  BY: auto_1hr
