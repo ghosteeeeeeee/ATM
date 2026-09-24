@@ -1614,7 +1614,7 @@ CL_TIER1_MIN_PCT      = -3.0    # widened 2026-09-24 — was -2.0, trades slid p
 CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
-CL_TIER1_FIRE_WINDOWS = {"A": (2, 3), "B": (2, 3)}  # brain_auditor Sep 18: widened from (1,2) — 0% WR, cutting too early
+CL_TIER1_FIRE_WINDOWS = {"A": (4, 6), "B": (4, 6)}  # brain_auditor Sep 24: widened from (2,3) — trades slide past -0.75% before recovery window
 
 # Tier 2: Deep Cut — -2.5% to -3.0%, fires less frequently
 # CEO Sep 24: adjusted ceiling -1.5→-2.5. T1 now handles -0.75% to -3.0%.

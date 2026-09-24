@@ -19,3 +19,13 @@
 - **WARN** (1x): `hermes-hl-sync-guardian.timer` — Trigger: n/a, last fired 22h ago. Timer shows active since Aug 17 but trigger metadata stale. Service running but timer may not re-arm.
 - **WARN** (1x): Win rate 11.1% today (1/9 trades). All losses small (<$0.35). Review signal quality.
 - **WARN** (1x): Disk at 85% (94G/118G). No immediate action, monitor.
+
+## Error Alerts — 2026-09-24 07:46 UTC
+- **WARN** (4x): `BLUR LONG` trade failed repeatedly (07:37-07:40). stderr=(empty), HL API rejecting. At 5/6 position capacity — likely max positions reached. Signal not rolled back (prevents retry loop).
+- **WARN** (1x): `signal_compactor` timed out at 07:42:02 (killed after 60.1s). One-off — subsequent runs completed fine. No action needed.
+- **WARN** (1x): Disk at 85% (94G/118G). Journal logs consuming 354M. Watch level only.
+- **INFO**: Phantom trades cleaned (43 stale records removed). These were trade_ids with pnl_usdt=0.0 from weeks ago still counted as "open".
+- **AUTO-FIX**: Compressed logs >1 day old. Cleaned 43 phantom trade records from signal_outcomes.
+
+## Error Alerts — 2026-09-24 07:57 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`

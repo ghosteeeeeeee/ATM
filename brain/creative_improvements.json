@@ -1841,5 +1841,26 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-24T08:30:00Z",
+    "idea": "REGIME_CONF_MULTIPLIER — EXTREME 1.15x, NORMAL 0.85x confidence scaling",
+    "rationale": "14d data: EXTREME 185T 51.4%WR +$1.40 vs NORMAL 87T 44.8%WR -$1.35. Gap $2.75/14d. System trades both regimes equally. Boosting confidence in EXTREME (edge exists) and reducing in NORMAL (system bleeds) amplifies regime edge without blocking trades.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "confidence scaling",
+    "status": "suggested",
+    "risk": "low",
+    "suggested_by": "brain_auditor",
+    "times_suggested": 5
+  },
+  {
+    "date": "2026-09-24T08:30:00Z",
+    "idea": "CL-T1 fire windows (2,3) to (4,6) — give trades more time to recover",
+    "rationale": "7d CL-T1: 6 exits all at -2.38% to -3.47% within 12-35min. Trades hit T1 at -0.75%, slide to -2.5% before next fire window (2-3min), get cut. Widening to (4,6) gives 2 extra minutes for mean reversion.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "exit timing",
+    "status": "suggested",
+    "risk": "medium",
+    "suggested_by": "brain_auditor"
   }
 ]

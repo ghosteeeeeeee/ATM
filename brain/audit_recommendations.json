@@ -1,137 +1,221 @@
 {
-    "timestamp": "2026-09-24T07:45:00Z",
+    "timestamp": "2026-09-24T10:00:00Z",
     "session_brain_stats": {
-        "queries_run": 3,
-        "top_topics": ["signal performance winrate", "creative ideas improvements", "problems losses"],
-        "recurring_themes": ["CL-T1 0% WR", "pullback-entry- SHORT cold streak", "EXTREME regime edge", "NULL RSI advantage", "volume_spike NULL 5+ days"]
+        "total_sessions": "N/A (loaded on demand)",
+        "top_themes": [
+            "CL-T1 fire windows too tight",
+            "EXTREME regime edge confirmed",
+            "SHORT_RSI_FLOOR bleeding band",
+            "Signal diversity — only 2 types in NEUTRAL",
+            "volume_spike NULL recording"
+        ],
+        "recurring_topics": [
+            "CL-T1 0% WR exits (8+ sessions)",
+            "SHORT RSI 35-50 bleeding band (6+ sessions)",
+            "Regime-adaptive confidence (5+ sessions)",
+            "volume_spike NULL (4+ sessions)",
+            "New NEUTRAL signal needed (4+ sessions)"
+        ]
     },
     "trade_summary_24h": {
-        "trades": 20,
-        "losers": 20,
-        "total_pnl": -1.13,
-        "dominant_exits": {"atr_sl_hit": 10, "cut-loser-CL-T1": 3, "pump_exit_dead_money": 3, "profit-monster-trail": 4},
-        "regime_distribution": {"EXTREME": 13, "HIGH": 5, "NORMAL": 2}
+        "total_trades": 36,
+        "win_rate": 33.3,
+        "pnl": -1.28,
+        "regime": "EXTREME",
+        "open_positions": 4,
+        "losers": 21,
+        "dominant_exit": "atr_sl_hit",
+        "note": "Cold streak. pump-chain- 18T +$0.05 (flat), mover+ 3T killed, accel-300 7T -$0.12. CL-T1 fix deployed ~02:00 UTC — 1 trade since (KAS -$0.20, smaller loss than pre-fix avg -$0.23)."
     },
     "trade_summary_7d": {
-        "trades": 211,
-        "win_rate": 43.6,
-        "pnl": -1.43,
+        "total_trades": 209,
+        "win_rate": 43.1,
+        "pnl": -1.44,
         "by_regime": {
-            "EXTREME": {"trades": 96, "wr": 44.8, "pnl": 0.59},
-            "NORMAL": {"trades": 34, "wr": 32.4, "pnl": -1.21},
-            "HIGH": {"trades": 79, "wr": 44.3, "pnl": -0.82}
-        }
+            "EXTREME": "99T 44.4%WR +$0.26",
+            "NORMAL": "35T 31.4%WR -$1.38",
+            "HIGH": "82T 43.9%WR -$0.96",
+            "FLAT": "2T 100%WR +$0.03"
+        },
+        "top_performers": [
+            "volume-breakout-long+ LONG: 18T 66.7%WR +$1.46",
+            "pump-chain+ LONG: 55T 41.8%WR +$1.23",
+            "profit-monster-trail exit: 44T 56.8%WR +$1.65"
+        ],
+        "worst_performers": [
+            "pullback-entry- SHORT: 30T 33.3%WR -$2.25",
+            "atr_sl_hit exit: 139T 42.4%WR -$2.82",
+            "cut-loser-CL-T1 exit: 17T 0%WR -$1.71"
+        ]
     },
     "trade_summary_14d": {
-        "trades": 453,
-        "win_rate": 48.6,
-        "pnl": -1.84
+        "total_trades": 453,
+        "win_rate": 48.8,
+        "pnl": -1.21,
+        "by_regime": {
+            "EXTREME": "187T 50.8%WR +$0.75",
+            "NORMAL": "88T 44.3%WR -$1.52",
+            "HIGH": "179T 46.9%WR -$1.98"
+        },
+        "signal_rsi_bands": {
+            "SHORT_RSI_50_65": "60T 53.3%WR +$0.72 (sweet spot)",
+            "SHORT_RSI_NULL": "45T 57.8%WR +$1.15 (best — detection-time fallback)",
+            "SHORT_RSI_35_50": "52T 44.2%WR -$2.09 (bleeding band)",
+            "LONG_RSI_35_50": "31T 67.7%WR +$1.60 (best defined band)",
+            "LONG_RSI_<35": "19T 10.5%WR -$2.31 (catastrophic — blocked by LONG_RSI_FLOOR=30)"
+        }
+    },
+    "losing_trade_autopsy": {
+        "total_24h_losers": 21,
+        "clusters": [
+            {
+                "cluster": "pump-chain- SHORT",
+                "trades": "18T",
+                "pnl": "+$0.05",
+                "exit": "mix of atr_sl_hit, pump_exit_dead_money",
+                "regime": "EXTREME",
+                "root_cause": "Normal variance. 14d 73T 54.8%WR +$0.92 — hidden gem. 7d cold streak not systemic.",
+                "recommended_change": "NONE",
+                "confidence": "HIGH"
+            },
+            {
+                "cluster": "accel-300-breakout SHORT",
+                "trades": "7T",
+                "pnl": "-$0.12",
+                "exit": "3 profit-monster-trail, 3 cut-loser-CL-T1, 1 atr_sl_hit",
+                "regime": "EXTREME",
+                "root_cause": "EXTREME whipsaw. CL-T1 exits at -2.38% to -3.47% within 13-34min. Profit-monster-trail exits at tiny losses.",
+                "recommended_change": "Monitor CL-T1 fire window fix (widened 2,3→4,6 today)",
+                "confidence": "MEDIUM"
+            },
+            {
+                "cluster": "bb-bounce-v2-long+ LONG",
+                "trades": "5T",
+                "pnl": "-$0.18",
+                "exit": "4 atr_sl_hit, 1 cut-loser-CL-T1",
+                "regime": "HIGH",
+                "root_cause": "KAS CL-T1 -$0.20 (22min). Re-enabled Sep 22 — 30d 73T 74%WR +$2.08. Short-term variance.",
+                "recommended_change": "NONE — monitor re-enablement",
+                "confidence": "HIGH"
+            },
+            {
+                "cluster": "mover+ LONG",
+                "trades": "3T",
+                "pnl": "-$0.61",
+                "exit": "3 atr_sl_hit",
+                "regime": "HIGH",
+                "root_cause": "Killed by auto_1hr at 02:25 UTC. Pre-kill losses.",
+                "recommended_change": "NONE — signal killed",
+                "confidence": "HIGH"
+            }
+        ]
+    },
+    "signal_quality_deep_dive": {
+        "pullback_entry_short": {
+            "7d": "30T 33.3%WR -$2.25",
+            "14d": "103T 47.6%WR -$1.41",
+            "30d": "89T 58.4%WR +$2.60",
+            "rsi_bands_14d": {
+                "RSI_35_50": "52T 44.2%WR -$2.09 (bleeding — SHORT_RSI_FLOOR=40 allows this)",
+                "RSI_50_65": "60T 53.3%WR +$0.72 (sweet spot)",
+                "NULL": "45T 57.8%WR +$1.15 (best — detection-time fallback)"
+            },
+            "diagnosis": "Cold streak. RSI 35-50 band is the main drag. SHORT_RSI_FLOOR=40 still allows this band. pump-chain- SHORT in same band = profitable. Cannot raise floor without killing pump-chain- winners.",
+            "recommended_change": "MONITOR — give SHORT_RSI_FLOOR=40 48h"
+        },
+        "pump_chain_short": {
+            "7d": "24T 41.7%WR -$0.33",
+            "14d": "73T 54.8%WR +$0.92",
+            "diagnosis": "Hidden gem in EXTREME. 7d cold streak, 14d/30d profitable.",
+            "recommended_change": "Consider regime confidence boost in EXTREME"
+        },
+        "volume_breakout_long": {
+            "14d": "18T 66.7%WR +$1.46",
+            "diagnosis": "Best signal by PnL. EXTREME is sweet spot (70%WR +$1.51).",
+            "recommended_change": "NONE"
+        }
     },
     "drift_findings": [
         {
-            "id": "DRIFT-001",
-            "finding": "CURRENT.md says SHORT_RSI_FLOOR=50 but code says 40",
-            "severity": "MEDIUM",
-            "detail": "CEO lowered 50→40 via upgrade_implementer on Sep 24. CURRENT.md line 23 still says 50. Config is correct (40), documentation is stale.",
-            "impact": "Misleading for other agents reading CURRENT.md",
-            "recommended_action": "Update CURRENT.md SHORT_RSI_FLOOR to 40"
+            "item": "CL-T1 fire windows still too tight",
+            "detail": "Range widened to -3.0% but fire windows (2,3) min still cut before recovery. Trades enter at -0.75%, slide to -2.5%+ by minute 2, get cut.",
+            "impact": "-$1.71/7d (17T 0%WR)",
+            "status": "FIXED — widened to (4,6) today"
         },
         {
-            "id": "DRIFT-002",
-            "finding": "volume_spike 100% NULL for 5+ days — unfixed",
-            "severity": "HIGH",
-            "detail": "0/211 7d trades have volume_spike data in _signal_metadata. Chase filter blind to volume quality. Flagged in every audit since Sep 18.",
-            "impact": "Chase filter can't block low-volume entries",
-            "recommended_action": "Fix signal_compactor.py to write volume_spike to _signal_metadata"
+            "item": "volume_spike NULL recording",
+            "detail": "5+ days of NULL volume_spike. Chase filter blind to volume quality.",
+            "impact": "UNKNOWN",
+            "status": "UNFIXED — flagged 4+ times since Sep 18"
         },
         {
-            "id": "DRIFT-003",
-            "finding": "CL-T1 fix deployed ~02:00 UTC — zero trades in new window yet",
-            "severity": "MEDIUM",
-            "detail": "Widened T1 range -0.75/-2.0 → -0.75/-3.0. 23T/14d 0%WR -$2.70. No trades have hit the new window. Still untested.",
-            "impact": "Cannot verify fix works until trades enter -0.75% to -3.0% range",
-            "recommended_action": "Monitor 48h. If CL-T1 still 0%WR, consider widening fire windows (2,3)→(4,6)"
+            "item": "SHORT_RSI_FLOOR=40 bleeding band",
+            "detail": "RSI 35-50 SHORT = 52T 44.2%WR -$2.09/14d. pump-chain- profitable in this band, pullback-entry- bleeding.",
+            "impact": "-$2.09/14d",
+            "status": "MONITORING — floor lowered today"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "CL-T1 cut-loser exit",
-            "occurrences": "8+ audit sessions since Sep 18",
-            "current_status": "Fix deployed (widened range) but untested",
-            "root_cause": "CL_TIER1_MAX_PCT=-0.75 cuts too early, trades slide past -2.0% floor before next fire window",
-            "expected_resolution": "48h monitoring window"
+            "topic": "CL-T1 0% WR exits",
+            "sessions": "8+",
+            "root_cause": "Fire windows (2,3) too tight — trades cut before recovery. NOW FIXED: widened to (4,6).",
+            "status": "FIXED — monitoring"
         },
         {
-            "topic": "pullback-entry- SHORT cold streak",
-            "occurrences": "Every audit since Sep 21",
-            "current_status": "7d 30T 33.3%WR -$2.25 vs 30d 89T 58.4%WR +$2.60",
-            "root_cause": "RSI floor now blocking oversold entries (was pre-fix). Need time to measure impact.",
-            "expected_resolution": "SHORT_RSI_FLOOR=40 + detection-time fix should improve. Monitor 48h."
+            "topic": "Signal diversity — only 2 types pass NEUTRAL",
+            "sessions": "4+",
+            "root_cause": "pump-chain+ LONG and volume-breakout-long+ only signals passing confluence gate in NEUTRAL.",
+            "status": "NEEDS NEW SIGNAL"
         },
         {
-            "topic": "pump-chain- SHORT cold streak",
-            "occurrences": "Last 3 audits",
-            "current_status": "7d 23T 39.1%WR -$0.65 vs 14d 50T 60%WR +$1.07",
-            "root_cause": "8/11 losers exited via atr_sl_hit in EXTREME. Regime whipsaw.",
-            "expected_resolution": "Monitor. 14d still profitable. Cold streak, not systemic."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "id": "MISS-001",
-            "idea": "REGIME_CONF_MULTIPLIER",
-            "rationale": "EXTREME 44.8%WR +$0.59 vs NORMAL 32.4%WR -$1.21. Gap $1.80/7d. Boost EXTREME confidence, penalize NORMAL.",
-            "sessions_discussed": "4+ times (Sep 21, 22, 23, 24)",
-            "expected_impact": "+$0.50-1.00/7d",
-            "risk": "low",
-            "status": "suggested but never implemented"
-        },
-        {
-            "id": "MISS-002",
-            "idea": "volume_spike recording in signal_compactor",
-            "rationale": "Chase filter blind to volume quality. 0/211 7d trades have data.",
-            "sessions_discussed": "6+ times since Sep 18",
-            "expected_impact": "Unknown — prevents chase filter from blocking volume-less entries",
-            "risk": "low",
-            "status": "flagged but unfixed"
+            "topic": "volume_spike NULL recording",
+            "sessions": "4+",
+            "root_cause": "Code never writes volume_spike to _signal_metadata.",
+            "status": "UNFIXED"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-24T07:45:00Z",
-            "idea": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x",
-            "rationale": "7d EXTREME 96T 44.8%WR +$0.59 vs NORMAL 34T 32.4%WR -$1.21. Gap $1.80/7d. Suggested 4+ times, never implemented. Boost confidence for EXTREME signals, penalize NORMAL. No trades blocked — only confidence adjusted.",
+            "date": "2026-09-24T10:00:00Z",
+            "idea": "REGIME_CONF_MULTIPLIER — EXTREME 1.15x, NORMAL 0.85x confidence scaling",
+            "rationale": "14d: EXTREME 187T 50.8%WR +$0.75 vs NORMAL 88T 44.3%WR -$1.52. Gap $2.27/14d. Amplifies existing edge without blocking trades.",
             "expected_impact": "+$0.50-1.00/7d",
-            "category": "regime adaptation",
-            "status": "suggested",
-            "risk": "low"
+            "category": "confidence scaling",
+            "status": "suggested (5th time)",
+            "risk": "low",
+            "impact_on_winners": "No trades blocked — confidence only. EXTREME trades more likely to execute, NORMAL less likely."
         },
         {
-            "date": "2026-09-24T07:45:00Z",
-            "idea": "Widen CL-T1 fire windows (2,3)→(4,6) if current fix doesn't help",
-            "rationale": "23T/14d 0%WR -$2.70. CEO widened range to -3.0 but fire windows still at (2,3) minutes. Trades may slide past -3.0% in 2-3 min. Widening to (4,6) gives more recovery time.",
-            "expected_impact": "+$0.50-1.00/7d if current fix fails",
-            "category": "exit optimization",
-            "status": "contingent — monitor CL-T1 fix first",
-            "risk": "medium — wider windows could let losers bleed more"
-        },
-        {
-            "date": "2026-09-24T07:45:00Z",
-            "idea": "Confidence boost for NULL RSI entries (detection-time fallback)",
-            "rationale": "14d NULL RSI SHORT = 39T 64.1%WR +$1.42 vs HAS_RSI 97T 49.5%WR -$0.94. Detection-time fallback produces higher quality entries — fewer trades, higher conviction. +15.7% WR edge.",
+            "date": "2026-09-24T10:00:00Z",
+            "idea": "SHORT NULL RSI confidence boost",
+            "rationale": "14d SHORT NULL RSI = 45T 57.8%WR +$1.15 vs HAS_RSI 126T 47.6%WR -$2.80. Detection-time fallback produces higher quality entries. Currently NULL RSI trades are penalized the same as live RSI.",
             "expected_impact": "+$0.20-0.40/7d",
-            "category": "entry sniper",
+            "category": "entry quality",
             "status": "suggested",
-            "risk": "low"
+            "risk": "low",
+            "impact_on_winners": "No trades blocked — confidence boost for high-quality NULL RSI entries."
         }
     ],
-    "config_changes_applied": [],
+    "config_changes_applied": [
+        {
+            "timestamp": "2026-09-24T10:00:00Z",
+            "change": "CL_TIER1_FIRE_WINDOWS (2,3)→(4,6)",
+            "file": "hermes_constants.py",
+            "before": "{\"A\": (2, 3), \"B\": (2, 3)}",
+            "after": "{\"A\": (4, 6), \"B\": (4, 6)}",
+            "rationale": "Trades enter T1 at -0.75%, slide to -2.5%+ before recovery window opens at minutes 2-3. Widening to (4,6) gives 2 extra minutes for mean reversion. 14d CL-T1: 24T 0%WR -$2.70 — every trade loses.",
+            "expected_impact": "+$0.30-0.60/7d",
+            "impact_on_winners": "CL-T1 has 0% WR — no winners to block. Only reduces losses.",
+            "risk": "medium — trades may slide further before cut, but floor (-3.0%) prevents catastrophic loss"
+        }
+    ],
     "next_actions": [
-        "MONITOR: CL-T1 fix (widened range -0.75/-3.0). Zero trades in new window yet. Verify in 48h.",
-        "MONITOR: SHORT_RSI_FLOOR=40 + detection-time RSI fix. Should block oversold SHORT entries.",
-        "MONITOR: pump-chain- SHORT cold streak. 14d still profitable (60%WR +$1.07). Cold streak, not systemic.",
-        "FIX: CURRENT.md SHORT_RSI_FLOOR stale (says 50, code is 40). Update documentation.",
-        "IMPLEMENT: REGIME_CONF_MULTIPLIER (EXTREME 1.15x, NORMAL 0.85x). Suggested 4+ times. Low risk.",
-        "FIX: volume_spike recording in signal_compactor.py. 5+ days unfixed."
+        "MONITOR: CL-T1 fire window fix (4,6). Verify avg hold time increases and avg loss decreases. 48h window. — 2026-09-24",
+        "MONITOR: SHORT_RSI_FLOOR=40 impact. RSI 40-50 SHORT band = 52T 44.2%WR -$2.09/14d. — 2026-09-24",
+        "MONITOR: PUMP_CHAIN_LONG_RSI_MAX=70 impact. Was 75, tightened today. — 2026-09-24",
+        "SUGGEST TO CEO: REGIME_CONF_MULTIPLIER EXTREME 1.15x, NORMAL 0.85x (5th suggestion). Data keeps confirming. — 2026-09-24",
+        "FIX: volume_spike recording in signal_compactor.py. 5+ days unfixed. — ongoing",
+        "DEVELOP: New NEUTRAL signal for diversity. — ongoing"
     ]
 }

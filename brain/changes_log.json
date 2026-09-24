@@ -461,5 +461,16 @@
     "after": "PUMP_CHAIN_LONG_RSI_MAX = 70",
     "rationale": "14d: RSI 70-75 = 6T 33.3%WR +$0.35 (dead zone). Tightened to block this band while preserving RSI 50-60 sweet spot (19T 63.2%WR +$1.49). Expected +$0.03-0.10/7d.",
     "impact": "Blocks ~6 pump-chain+ LONG trades/14d in RSI 70-75 range"
+  },
+  {
+    "timestamp": "2026-09-24T10:00:00Z",
+    "agent": "brain_auditor",
+    "change": "CL_TIER1_FIRE_WINDOWS (2,3)->(4,6)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "{\"A\": (2, 3), \"B\": (2, 3)}",
+    "after": "{\"A\": (4, 6), \"B\": (4, 6)}",
+    "rationale": "CL-T1 0% WR 24T/14d. Trades enter at -0.75%, slide to -2.5%+ before recovery window opens at minutes 2-3. Widening to (4,6) gives 2 extra minutes for mean reversion.",
+    "expected_impact": "+$0.30-0.60/7d"
   }
 ]

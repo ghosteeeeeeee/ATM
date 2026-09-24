@@ -5712,3 +5712,49 @@ Final set: ['ACE', 'FIL', 'FOGO', 'IOTA', 'JUP', 'LTC', 'SYRUP']
 - ADD AVAX (WR=40.0%, PnL=$1.25, low_wr (40.0%))
 
 Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
+
+## [2026-09-24 07:XX UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 5 open (DOT, CASHCAT, KAS, BABY, BTC).
+**PnL:** N/A (no closes)
+
+**Changes:**
+1. None — no kill candidates, no actionable triggers.
+
+**No Change Needed:**
+- atr_sl_hit at 41.9% (borderline, SL floor widening is high-risk)
+- mover+ 0% WR but only 3T in 24h, 0 closed this hour — doesn't meet "last hour" kill rule
+- No overtrading (0/hr)
+
+**Open Questions:**
+- Should mover+ be killed proactively despite not meeting strict kill rule? (0% WR, 3T)
+- BABY LONG (mover+) has SL 0.3% from entry — tight, watch closely
+
+**Watch List:** mover+ signal — if next loss, kill immediately
+**BY:** auto_1hr
+
+## [2026-09-24 09:XX UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 4 open (BTC LONG 6.7h, BABY LONG 4h, FOGO SHORT 27m, AZTEC SHORT 14m).
+**PnL:** N/A (no closes). 24h: 34T 35.3%WR -$0.89.
+
+**Key Metrics:**
+- atr_sl_hit: 13T (38.2%) — below 40% threshold, improving
+- cut-loser-CL-T1: 4T, 0%WR, -$0.47 — all losses but small (avg -$0.12)
+- pump_exit_dead_money: 7T, 57.1%WR, +$0.29 — only profitable exit type
+- profit-monster-trail: 9T, 33.3%WR, -$0.01 — breakeven
+
+**Changes:** None — no kill candidates. mover+ has 0%WR but only 2T/24h (below 3T threshold).
+
+**No Change Needed:**
+- No signal 0%WR with 3+ trades in last hour
+- No overtrading (0/hr)
+- atr_sl_hit below 40%
+- cut-loser-CL-T1 is working as designed (small losses, fast cuts)
+
+**Open Questions:**
+- accel-300-breakout at 28.6%WR/7T — close to kill threshold but still has some winners
+- BABY LONG (mover+) open 4h, SL tight at 0.01264 vs entry 0.01276 — 0.9% buffer
+- BTC LONG (continuum-osc+) open 6.7h — long hold
+
+**BY:** auto_1hr
