@@ -5550,3 +5550,79 @@ Final set: ['ALGO', 'ME']
 - profit-monster-trail 9T/24h -$0.010 avg — slight drag, trailing may need adjustment
 
 **BY:** auto_1hr
+
+## [2026-09-24 04:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CAKE SHORT pump-chain-, -$0.09 via dead_money)
+**Open:** 4 (ETH LONG, ACE SHORT, ARB SHORT, BTC LONG)
+**24h:** 33T, 36.4% WR, -$0.66 (stabilizing from -$0.80 yesterday)
+
+**24h exit reasons:**
+- atr_sl_hit: 13T (39.4%) avg -$0.033 — below 40% ✓
+- profit-monster-trail: 9T avg -$0.010
+- pump_exit_dead_money: 6T avg +$0.038 — now profitable ✓
+- cut-loser-CL-T1: 4T avg -$0.093
+
+**7d signal ranking (5+ trades):**
+- volume-breakout-long+: 18T 66.7%WR +$1.46
+- pump-chain+: 55T 41.8%WR +$1.23
+- grind-trend+: 18T 50.0%WR +$0.24
+- pullback-entry-: 30T 33.3%WR -$2.25 (biggest drag)
+- mover+: 11T 54.5%WR -$0.51 (inverted risk)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 39.4% — just below 40% threshold ✓
+- No overtrading (~1.4/hr avg)
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- Trade frequency normal
+
+**Open Questions:**
+- pullback-entry- 30T/7d -$2.25 — biggest long-term drag, tuning needed
+- mover+ 11T/7d 54.5%WR -$0.51 — inverted risk profile
+- cut-loser-CL-T1 systemic across 13 signals — TPSL review pending
+
+**BY:** auto_1hr
+
+## [2026-09-24 05:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (ARB SHORT pump-chain- -$0.14, ACE SHORT pump-chain-,rs-r68 -$0.33). Both atr_sl_hit.
+**Open:** 4 (check current)
+**24h:** 35T, 34.3% WR, -$1.13 (worsening from -$0.66 at04:15)
+
+**24h exit reasons:**
+- atr_sl_hit: 15T (42.9%) avg -$0.060 — **CROSSED 40% threshold** (was 39.4%)
+- profit-monster-trail: 9T avg -$0.010
+- pump_exit_dead_money: 6T avg +$0.038 (profitable)
+- cut-loser-CL-T1: 4T avg -$0.093
+
+**24h signal ranking (3+ trades):**
+- volume-breakout-long+: 18T 66.7%WR +$1.46
+- pump-chain+: 55T 41.8%WR +$1.23
+- grind-trend+: 18T 50.0%WR +$0.24
+- pullback-entry-: 30T 33.3%WR -$2.25 (biggest drag)
+- mover+: 11T 54.5%WR -$0.51
+
+**Key findings:**
+1. atr_sl_hit crossed 40% (42.9%) — both last-hour trades were SL hits at exactly 1.3% floor
+2. 4 consecutive negative hours (01:00-05:00 UTC), total -$0.86
+3. Phase scaling fix IS deployed (line 162 tpsl_utils.py returns base_k)
+4. SL at 1.3% floor is too tight for low-ATR tokens (ARB, ACE)
+5. pump-chain- SHORT: 15T/24h, 40% WR, 8/15 SL hits — signal generating entries that immediately get stopped
+
+**Changes:** None — atr_sl_hit borderline (was39.4%, now 42.9%). Widening SL could hurt profitable signals. Flagging to CEO.
+
+**No Change Needed:**
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- No overtrading (~2/hr)
+- Phase scaling fix already deployed
+
+**Open Questions:**
+- Should ATR_SL_MIN widen from 1.3% to 1.5%? Tradeoff: fewer SL hits but wider losses on real reversals
+- pump-chain- SHORT needs minimum ATR filter to avoid low-vol tokens?
+- 4 consecutive negative hours — regime check needed
+
+**CEO FLAG:** atr_sl_hit at42.9% (>40% threshold). tpsl fix deployed but SL floor (1.3%) too tight for low-ATR tokens. Recommend reviewing ATR_SL_MIN or adding ATR floor to pump-chain- signal.
+
+**BY:** auto_1hr

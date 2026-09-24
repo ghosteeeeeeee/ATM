@@ -1011,9 +1011,9 @@ def rule_based_context_gate(token, direction, source, sig):
         # Detection-time RSI can be below floor even when live RSI recovered — signal was detected in oversold
         _sig_label = source or 'SHORT'
         if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
-            return ('AMBIGUOUS', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 20)
+            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
         if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_FLOOR:
-            return ('AMBIGUOUS', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 20)
+            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _is_pullback = source and 'pullback-entry' in source
@@ -1048,12 +1048,12 @@ def rule_based_context_gate(token, direction, source, sig):
             if LONG_RSI_CEILING > 0 and _live_rsi_long > LONG_RSI_CEILING:
                 return ('AMBIGUOUS', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {LONG_RSI_CEILING} (overbought — pullback risk)', 20)
             if LONG_RSI_FLOOR > 0 and _live_rsi_long < LONG_RSI_FLOOR:
-                return ('AMBIGUOUS', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 20)
+                return ('SKIP', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 0)
         if _detect_rsi_long is not None:
             if LONG_RSI_CEILING > 0 and _detect_rsi_long > LONG_RSI_CEILING:
                 return ('AMBIGUOUS', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {LONG_RSI_CEILING} (detected overbought — pullback risk)', 20)
             if LONG_RSI_FLOOR > 0 and _detect_rsi_long < LONG_RSI_FLOOR:
-                return ('AMBIGUOUS', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 20)
+                return ('SKIP', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 0)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)

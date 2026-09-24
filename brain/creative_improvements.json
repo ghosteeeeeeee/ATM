@@ -1794,5 +1794,25 @@
     "status": "boosted",
     "risk": "low",
     "boosted_at": "2026-09-24T00:02:15.475887+00:00"
+  },
+  {
+    "date": "2026-09-24T03:30:00Z",
+    "idea": "pump-chain+ LONG confidence inversion — cap at 75 or invert scoring",
+    "rationale": "14d: conf 75-85 = 39T 48.7%WR +.61 (sweet spot). conf 85+ = 19T 31.6%WR -/usr/bin/bash.12 (LOSING). Higher confidence = worse performance. pump-chain is mean-reversion — high conf = extended pump = reversal imminent.",
+    "expected_impact": "+$0.12-0.50/7d by blocking 19T/14d of losing 85+ trades",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "Would block 3 winning trades (AVAX +$1.02, CHIP +$0.18, KAS +$0.59) out of 19 — net positive"
+  },
+  {
+    "date": "2026-09-24T03:30:00Z",
+    "idea": "pump-chain- SHORT hidden gem — consider boosting weight or removing SHORT_NORMAL_PENALTY for it",
+    "rationale": "68T/14d 55.9%WR +$0.97. ALL regimes profitable: EXTREME 54.2%WR +$0.42, NORMAL 80%WR +$0.10, HIGH 53.3%WR +$0.45. Underutilized vs pump-chain+ LONG.",
+    "expected_impact": "+$0.05-0.10/7d from removing penalty for this signal",
+    "category": "signal boost",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "0 — pump-chain- SHORT in NORMAL has 80% WR, penalty only hurts"
   }
 ]
