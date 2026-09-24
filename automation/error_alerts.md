@@ -29,3 +29,18 @@
 
 ## Error Alerts — 2026-09-24 07:57 UTC
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+
+## Error Alerts — 2026-09-24 10:57 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.1s)`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_compactor`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-09-24 11:45 UTC
+- **WARN** (5x): `signal_compactor: timed out (killed after 60.0s)` — recurring, 5 timeouts in last hour. Root cause: 10,344 stale signals bloating DB queries.
+- **WARN**: Disk at 85% (95G/118G) — at threshold.
+- **WARN**: Win rate 30.0% today (6/20 trades). PnL: -$1.47 USDT.
+- **INFO**: Pipeline healthy, all timers firing, no crashes. 4 positions managed locally by guardian.
+- **AUTO-FIX**: Purged 9,075 stale signals (>24h old) from signals table (10,344 → 1,637). Compressed old logs. Next signal_compactor run should complete under 60s.
+
+## Error Alerts — 2026-09-24 11:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`

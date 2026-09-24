@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~06:00 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-24 ~11:30 UTC**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 36T, 33.3% WR, -$1.43. Pipeline running. 1 open position.
+24h: 34T, 35.3% WR, -$0.61. Pipeline running. 0 open positions.
 
-- **24h (rolling):** 36T, 33.3% WR, -$1.43. CL-T1 fire windows widened (2,3)→(4,6) ~10:00 UTC. SHORT_RSI_FLOOR=40 hard block deployed ~06:00 UTC. mover+ killed.
-- **7d:** 218T, 42.7% WR, -$2.04 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
+- **24h (rolling):** 34T, 35.3% WR, -$0.61 (improving from -$1.28). CL-T1 fire windows widened (2,3)→(4,6) ~10:00 UTC. SHORT_RSI_FLOOR=40 hard block deployed ~06:00 UTC. mover+ killed ~02:25 UTC.
+- **7d:** 218T, 42.7% WR, -$2.04 (DB-verified). pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 15T 40%WR -$0.60 (7d cold, 14d 54.8%WR +$0.92).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -25,10 +25,10 @@
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$0.78)**
-7d PnL -$0.78 (improving from -$0.80). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — cold streak, 30d still +$0.35). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (FIXED: T1 range widened to -3.0%).
+**🟡 R:R STATUS (7d -$2.04)**
+7d PnL -$2.04. pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse, R:R=1.53:1). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d +$0.35). cut-loser-CL-T1 = 24T/14d 0%WR -$2.90 (FIXED: T1 range widened to -3.0%, fire windows (2,3)→(4,6)). pump-chain- SHORT 73T 54.8%WR +$0.92/14d (hidden gem, EXTREME).
 
-**🟢 REGIME EDGE (7d):** NEUTRAL only (218T). EXTREME edge not visible in 7d (all NEUTRAL).
+**🟢 REGIME EDGE (7d):** EXTREME 99T 44.4%WR +$0.26 (best). HIGH 82T 43.9%WR -$0.96. NORMAL 35T 31.4%WR -$1.37 (worst). 14d: EXTREME +$0.75 vs NORMAL -$1.52.
 
 **🟢 STALE FILTER — WORKING.** 48h: 3/61 stale (4.9%, down from 43.8% pre-filter). Filter reducing stale by 89%. — 2026-09-19
 
@@ -38,12 +38,16 @@
 
 **🟢 BB_BOUNCE_V2_LONG RE-ENABLED.** CEO Sep 22 — signal_reporter killed Sep 11 (4T/24h 25%WR) but30d = 73T 74%WR +$2.08. Best standalone signal by WR. Short-term variance, not systemic.
 
-**🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. 7d: pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41 carry system.
+**🟢 SHORT NULL RSI EDGE.** 14d: 130T 56.9%WR +$2.08 (detection-time fallback) vs HAS_RSI 176T 46.6%WR -$2.52. Detection-time entries are higher quality. Suggested: +15pt confidence boost for NULL RSI SHORT trades.
+
+**🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. pump-chain+ 79T +$0.36/14d, volume-breakout-long+ 18T +$1.46/14d carry system.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
 ## Today's Changes (Sep 24)
 
+1. **brain_auditor ~11:30 UTC — NO CONFIG CHANGE.** DB-verified: 34T 35.3%WR -$0.61 (24h) | 220T 42.7%WR -$2.04 (7d). **24h IMPROVING** — from -$1.28 to -$0.61. **LOSING AUTOPSY (22):** 14 pump-chain- SHORT (EXTREME whipsaw, 14d baseline +$0.92 — cold streak), 3 mover+ LONG (killed today), 3 accel-300-breakout SHORT (trail exits, normal), 2 bb-bounce-v2-long+ LONG (1 CL-T1, 1 trail). **RSI BANDS 14d CONFIRMED:** SHORT NULL RSI = 41T 56.1%WR +$0.85 (BEST). SHORT RSI 40-50 = 36T 38.9%WR -$2.22 (BLEEDING). LONG RSI 35-45 = 22T 72.7%WR +$1.22 (BEST). **EXIT ANALYSIS 7d:** profit-monster-trail 43T 55.8%WR +$1.64 (best). atr_sl_hit 142T 42.3%WR -$3.27 (dominates). cut-loser-CL-T1 17T 0%WR -$1.71 (fix deployed today). **DRIFT (3):** (1) SHORT NULL RSI confidence boost never implemented (3+ sessions). (2) REGIME_CONF_MULTIPLIER suggested 5+ times, never implemented. (3) volume_spike 100% NULL 5+ days. **CREATIVE:** (1) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d, low risk). (2) REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d, 5th suggestion). **NO ACTION** — monitoring CL-T1 fix + SHORT_RSI_FLOOR=40 + mover+ kill. — brain_auditor
+1. **brain_auditor ~10:35 UTC — NO CONFIG CHANGE.** DB-verified: 32T 34.4%WR -$0.61 (24h) | 218T 42.7%WR -$2.04 (7d) | 456T 48.2%WR -$2.57 (14d). **24H IMPROVING** — from -$1.28 to -$0.61. **LOSING AUTOPSY (21):** 9 pump-chain- SHORT (5/9 RSI<35, now blocked by SHORT_RSI_FLOOR=40), 6 accel-300-breakout SHORT (4/6 trail exits, small losses), 3 CL-T1 (fire window fix deployed today, monitoring). **SHORT NULL RSI EDGE CONFIRMED:** 130T 56.9%WR +$2.08/14d vs HAS_RSI 176T 46.6%WR -$2.52/14d. Detection-time fallback entries are higher quality. **SHORT RSI BANDS 14d:** NULL=130T 56.9%WR +$2.08, RSI 50-60=18T 66.7%WR +$1.26, RSI 40-50=27T 48.1%WR -$0.11, RSI 30-40=16T 18.8%WR -$1.90 (bleeding). **CL-T1 14d:** 24T 0%WR -$2.90 (fire windows widened today, monitoring). **CREATIVE (3):** (1) SHORT NULL RSI confidence boost +15pt (+$0.30-0.50/7d). (2) pump-chain- SHORT EXTREME weight boost 1.1x (+$0.10-0.20/7d). (3) REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d, 5th suggestion). **NO ACTION** — monitoring CL-T1 fire windows + SHORT_RSI_FLOOR=40. — brain_auditor
 1. **brain_auditor ~10:00 UTC — 1 CONFIG CHANGE.** DB-verified: 36T 33.3%WR -$1.28 (24h) | 209T 43.1%WR -$1.44 (7d) | 453T 48.8%WR -$1.21 (14d). **CL-T1 FIRE WINDOWS WIDENED (2,3)→(4,6).** 14d CL-T1: 24T 0%WR -$2.70 — every trade loses. Trades enter T1 at -0.75%, slide to -2.5%+ before recovery window opens. Widening to (4,6) gives 2 extra minutes for mean reversion. Expected +$0.30-0.60/7d. **RSI SWEET SPOTS (14d):** SHORT NULL RSI = 45T 57.8%WR +$1.15 (best). SHORT RSI 50-65 = 60T 53.3%WR +$0.72. LONG RSI 35-50 = 31T 67.7%WR +$1.60. **EXTREME DOMINATES:** 187T 50.8%WR +$0.75 vs NORMAL 88T 44.3%WR -$1.52. **CREATIVE:** (1) REGIME_CONF_MULTIPLIER (5th suggestion). (2) SHORT NULL RSI confidence boost. — brain_auditor
 1. **CEO ~06:00 UTC — 1 CODE FIX.** DB-verified: 36T 33.3%WR -$1.28 (24h) | 209T 43.1%WR -$1.44 (7d) | 453T 48.8%WR -$1.21 (14d). **SHORT_RSI_FLOOR/LONG_RSI_FLOOR HARD BLOCK FIX.** decider_run.py returned AMBIGUOUS (20pt soft penalty) instead of SKIP (hard block). STANDALONE_BYPASS signals skip signal_compactor.py (which has hard block) and only hit decider_run.py — oversold SHORTs still executed. 43 SHORT RSI<50 trades/7d lost $2.29. Fixed: both SHORT_RSI_FLOOR and LONG_RSI_FLOOR now return SKIP. Expected +$0.30-0.60/7d. Commit f143248b. — CEO
 1. **brain_auditor ~05:30 UTC — NO CONFIG CHANGE.** DB-verified: 35T 34.3%WR -$1.13 (24h) | 208T 43.3%WR -$1.29 (7d) | 452T 48.9%WR -$1.06 (14d). **CL-T1 FIX DEPLOYED — NOT YET TESTED.** 0 trades hit cut-loser-CL-T1 since fix (~02:00 UTC). **SHORT_RSI_FLOOR=50 WORKING:** 0 pullback-entry- SHORT trades since floor raised. **pump-chain- SHORT COLD STREAK:** 7d 21T 38.1%WR -$0.51 vs 14d 70T 54.3%WR +$0.74. **RSI FLOOR BUG:** SHORT_RSI_FLOOR=50 is SOFT penalty (20pt), NOT hard block. ARB SHORT at RSI=36.36 still executed. **FIXED BY CEO.** — brain_auditor

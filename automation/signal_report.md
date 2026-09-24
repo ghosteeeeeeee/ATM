@@ -1,30 +1,34 @@
 === Signal Performance Report ===
-Period: 2026-09-24 03:45 UTC | Last 6h: 8 trades, -$0.79 | Last 24h: 35 trades, -$1.13
+Generated: 2026-09-24 ~10:00 UTC
 
-KILLED (executed):
+## System Summary
+| Period | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 6h | 12 | -$0.89 | 33.3% |
+| 24h | 36 | -$1.50 | 33.3% |
+
+## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signals meet kill criteria |
+| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | Already killed (line 1808). In NEVER_REENABLE. |
+| mover+ | LONG | 0.0% | -$0.61 | 3 | Already killed (line 3144). All ATR_SL losses. |
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signals meet boost criteria |
+## BOOSTED (executed)
+None — no signals meet boost criteria (WR>55%, 5+ trades, positive PnL).
 
-LOSERS (watch list):
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 40.0% | -$0.13 | 15 | ⚠️ WATCH — 6h WR collapsed to 14.3% (-$0.46).24h 40% WR OK. EXTREME regime 42.9% WR, -$0.04 (OK). Monitor next cycle. |
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | DEAD — already killed 2026-09-23, in NEVER_REENABLE. Trades still closing from prior signals. |
-| bb-bounce-v2-long+ | LONG | 33.3% | -$0.09 | 6 | ⚠️ WATCH — CEO re-enabled Sep 22 (30d: 73T 74%WR).24h underperforming but below5+ kill threshold. |
+| bb-bounce-v2-long+ | LONG | 25.0% | -$0.19 | 4 | WATCH — but 30d:74% WR +$2.08. Short-term variance. |
+| pump-chain- | SHORT | 45.0% | -$0.09 | 20 | OK — 6h shows 60% WR +$0.04. Stabilizing. |
 
-WINNERS:
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 100% | +$0.20 | 1 | OK — single trade, too small to boost |
-| continuum-osc+ | LONG | 100% | +$0.01 | 1 | OK — single trade, noise |
+| pump-chain- | SHORT | 60.0% | +$0.04 | 5 | 6h winner (short window). |
 
-ISSUES:
-- **6h degradation**: pump-chain- SHORT had 7 trades at 14.3% WR in last 6h — worst stretch in weeks. EXTREME regime volatility spike possible.
-- **System-wide negative PnL**: 35 trades / -$1.13 (24h). Only2 of 9 signal types profitable. Quiet market, low-quality entries.
-- **No inversions detected** — signal/direction alignment is clean.
+## ISSUES
+- No signal inversions detected.
+- System-wide 24h WR is low (33.3%) — broad market headwinds, not signal-specific.
+- accel-300-breakout trades in 24h window are from Sep 23 (pre-kill), not new firings.
+- mover+ trades from early today (Sep 24) were executed after kill — possible stale signal in queue.
