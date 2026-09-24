@@ -5790,3 +5790,34 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - BTC LONG (continuum-osc+) open 6.7h — long hold
 
 **BY:** auto_1hr
+
+## [2026-09-24 11:14 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour. 1 open (KAS SHORT pump-chain-).
+**PnL:** -$0.14 (2 SL hits: ALGO -$0.17, AZTEC +$0.03). 24h: 36T 33.3%WR -$1.50.
+
+**Key Metrics:**
+- atr_sl_hit: 18T (50%) — ABOVE 40% threshold, worsening from 38% at 09:XX
+- 6 of 18 SL hits had positive PnL (trailing SL locking small profits — good)
+- 12 actual losing SL hits avg -$0.12 — cuts working, just too many entries
+- pump_exit_dead_money: 7T, 57.1%WR, +$0.29 — only profitable exit
+- profit-monster-trail: 8T, -$0.02 — breakeven
+
+**Signal Performance 24h:**
+- pump-chain- SHORT: 20T, 45%WR, -$0.09 — workhorse, barely breakeven
+- accel-300-breakout SHORT: 7T, 28.6%WR, -$0.12 — drag (already disabled)
+- bb-bounce-v2-long+ LONG: 4T, 25%WR, -$0.19 — drag
+- mover+ LONG: 3T, 0%WR, -$0.61 — already killed
+
+**Changes:** None — no kill candidates. No signal with 0%WR/3+T in last hour. No overtrading (2/hr).
+
+**No Change Needed:**
+- atr_sl_hit at 50% — elevated but SL widening1.2%→1.3% already deployed Sep14. Further widening needs CEO approval. Actual avg loss per SL hit only -$0.12.
+- No overtrading (2/hr)
+- System flat at -$1.50/24h — improving from -$1.84/14d average
+
+**Open Questions:**
+- Should ATR_SL_MIN widen to 1.4%? 9/16 SL hits at exact1.3% floor earlier. But current avg SL loss only -$0.12, widening increases loss per hit.
+- pump-chain- SHORT 45%WR/20T — essentially a coin flip. Is there a filter to improve entry quality?
+
+**BY:** auto_1hr
