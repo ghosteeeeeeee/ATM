@@ -1024,11 +1024,23 @@ def rule_based_context_gate(token, direction, source, sig):
 
     # 1b-ext2. Execution-time SHORT RSI ceiling — catches RSI drift between detection and execution
     # brain_auditor: 5 SHORT trades entered RSI>65 (all losers, -$0.98). Detection-time RSI was OK.
+    # brain_auditor: Changed AMBIGUOUS→SKIP (hard block). FOGO RSI=100.0 SHORT executed today despite ceiling=65.
+    # Same bug pattern as SHORT_RSI_FLOOR — STANDALONE_BYPASS signals bypass signal_compactor.py.
     if direction == 'SHORT':
         from hermes_constants import SHORT_RSI_CEILING
         _live_rsi = _ctx_gate_get_rsi(token)
+        _detect_rsi_short = None
+        if isinstance(sig, dict) and sig.get('signal_metadata'):
+            try:
+                _meta_short = json.loads(sig['signal_metadata']) if isinstance(sig['signal_metadata'], str) else sig['signal_metadata']
+                _detect_rsi_short = _meta_short.get('rsi_14')
+            except Exception:
+                pass
+        # Check BOTH live and detection-time RSI
         if _live_rsi is not None and _live_rsi > SHORT_RSI_CEILING:
-            return ('AMBIGUOUS', f'SHORT RSI ceiling: LIVE RSI {_live_rsi:.1f} > {SHORT_RSI_CEILING} (overbought — bounce risk)', 20)
+            return ('SKIP', f'SHORT RSI ceiling: LIVE RSI {_live_rsi:.1f} > {SHORT_RSI_CEILING} (overbought — bounce risk)', 0)
+        if _detect_rsi_short is not None and _detect_rsi_short > SHORT_RSI_CEILING:
+            return ('SKIP', f'SHORT RSI ceiling: DETECT RSI {_detect_rsi_short:.1f} > {SHORT_RSI_CEILING} (detected overbought — bounce risk)', 0)
 
     # 1b-ext3. Execution-time LONG RSI ceiling + floor — mirrors SHORT pattern
     # brain_auditor: LONG_RSI_CEILING/FLOOR only checked at detection time (signal_compactor.py).

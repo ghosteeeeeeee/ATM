@@ -53,3 +53,15 @@
 - **WARN** (1x): `signal_compactor: timed out (killed after 60.0s)` at 13:44:02 — recovered on next cycle (ran in 0.8s at 13:44:24)
 - **WARN**: Disk at 85% (95G/118G). Top consumers: coin_tracker.db (2.8G), candles.db (2.1G), mtf_macd_tuner.db (840M)
 - **INFO**: 8 zero-byte orphan DBs found (associative_memory.db, brain.db, hermes_brain.db, hermes.db, prices.db, price_candles.db, hermes_prices.db, speeds_hermes_runtime.db) — candidates for cleanup
+
+## Error Alerts — 2026-09-24 14:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-09-24 15:46 UTC
+- **[WARN]** (1x): `signal_compactor timed out (killed after 60.1s)` at 15:35:02
+- **AUTO-FIX**: None needed — self-resolved on next cycle (0.6s). Transient.
+- **[WARN]** (1x): `Disk at85%` — 95G/118G used. Databases = 7.8G (coin_tracker 2.8G, candles 2.1G).
+- **AUTO-FIX**: Compressed old logs. No data dir cleanup (requires manual review).
+
+## Error Alerts — 2026-09-24 15:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.0s)`

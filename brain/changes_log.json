@@ -472,5 +472,17 @@
     "after": "{\"A\": (4, 6), \"B\": (4, 6)}",
     "rationale": "CL-T1 0% WR 24T/14d. Trades enter at -0.75%, slide to -2.5%+ before recovery window opens at minutes 2-3. Widening to (4,6) gives 2 extra minutes for mean reversion.",
     "expected_impact": "+$0.30-0.60/7d"
+  },
+  {
+    "timestamp": "2026-09-24T16:37:44Z",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_CEILING=65 AMBIGUOUS→SKIP (hard block) + detection-time RSI fallback",
+    "type": "bug",
+    "file": "scripts/decider_run.py",
+    "before": "SHORT_RSI_CEILING returned AMBIGUOUS (20pt soft penalty), no detection-time fallback. FOGO RSI=100.0 SHORT executed today.",
+    "after": "SHORT_RSI_CEILING returns SKIP (hard block, 0 confidence). Checks BOTH live and detection-time RSI. Mirrors SHORT_RSI_FLOOR fix.",
+    "rationale": "Same bug pattern as SHORT_RSI_FLOOR fixed earlier today. STANDALONE_BYPASS signals bypass signal_compactor.py (hard block) and only hit decider_run.py (was returning AMBIGUOUS). 4 RSI>65 SHORT trades in 14d: all losers (-$0.23).",
+    "impact": "Block ~4 trades/14d, save ~$0.23/14d. Prevents extreme RSI SHORT entries.",
+    "expected_impact": "+$0.02/7d"
   }
 ]

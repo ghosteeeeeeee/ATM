@@ -5857,3 +5857,47 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - BTC LONG open 2h, entry $83,515, SL $82,429 (1.3% buffer) — monitoring
 
 **BY:** auto_1hr
+
+## [2026-09-24 15:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC LONG, atr_sl_hit, +$0.05 trailing). System flat (0 open).
+**24h:** 41T, -$1.63. atr_sl_hit 53.7% but avg loss only -$0.087. pump-chain- 23T/45%WR, -$0.59 total.
+
+**Changes:** None — no kill candidates (no signal 0%WR/3+T last hour). No overtrading (1/hr).
+
+**No Change Needed:**
+- pump-chain- borderline but not killable (45%WR, tiny avg loss)
+- atr_sl_hit elevated but avg loss per hit only -$0.087 — working as intended
+- System flat, no open trades
+
+**BY:** auto_1hr
+
+## [2026-09-24 16:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period) | **Open:** 1 (SYRUP ema300-breakthrough+ LONG, entry $0.21558, SL $0.2128 -1.3%, TP $0.2217 +2.9%, $22.10 size)
+**24h:** 41T 34.1%WR -$2.13 | **14d:** 450T 47.3%WR -$4.45
+
+**Key Metrics:**
+- atr_sl_hit: 22T (53.7%) — above 40% but avg loss only -$0.087 per hit. Trailing SL working as designed (small cuts).
+- pump_exit_dead_money: 8T, 50% WR, +$0.29 — only profitable exit reason
+- profit-monster-trail: 7T, 29% WR, +$0.01 — flat
+- cut-loser-CL-T1: 3T, -$0.51 — designed small losses
+
+**Signal Performance 24h:**
+- pump-chain-: 23T, 43.5% WR, -$0.59 — volume driver, borderline
+- mover+: 3T, 0% WR, -$0.61 — killed earlier today
+- accel-300-breakout: 7T, 28.6% WR, -$0.12 — already BLOCKED
+
+**Changes:** None — no kill candidates (0 trades closed last hour, no 0%WR/3T+ signals).
+
+**No Change Needed:**
+- No kill candidates this hour
+- No overtrading (0/hr)
+- atr_sl_hit elevated but avg loss trivial (-$0.087) — trailing taking small cuts, not a SL-too-tight issue
+- SYRUP open 7min, monitoring
+
+**Open Questions:**
+- pump-chain- 23T/43.5%WR/-$0.59 — volume driver but net negative. Long-term drag, tuning opportunity.
+- 14d system at -$4.45 — marginally negative, pullback-entry- is biggest drag (-$1.89)
+
+**BY:** auto_1hr
