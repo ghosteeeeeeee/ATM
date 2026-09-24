@@ -44,3 +44,12 @@
 
 ## Error Alerts — 2026-09-24 11:57 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   [brain.py] ❌ REJECTED: TOK TOK — amount_usdt=N.N < HL_MIN=N.N (would TOK on HL)`
+
+## Error Alerts — 2026-09-24 12:45 UTC
+- **CRITICAL** (1x): `Today's PnL: -49.63% with 28.6% winrate (21 trades, -1.79 USDT)` — Severe underperformance
+- **WARN** (1x): `Disk usage at 85%` — At threshold, monitor closely
+
+## Error Alerts — 2026-09-24 13:45 UTC
+- **WARN** (1x): `signal_compactor: timed out (killed after 60.0s)` at 13:44:02 — recovered on next cycle (ran in 0.8s at 13:44:24)
+- **WARN**: Disk at 85% (95G/118G). Top consumers: coin_tracker.db (2.8G), candles.db (2.1G), mtf_macd_tuner.db (840M)
+- **INFO**: 8 zero-byte orphan DBs found (associative_memory.db, brain.db, hermes_brain.db, hermes.db, prices.db, price_candles.db, hermes_prices.db, speeds_hermes_runtime.db) — candidates for cleanup

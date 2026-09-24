@@ -5821,3 +5821,39 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - pump-chain- SHORT 45%WR/20T — essentially a coin flip. Is there a filter to improve entry quality?
 
 **BY:** auto_1hr
+
+## [2026-09-24 13:08 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (1 win, 2 losses). PnL: -$0.49.
+- TURBO SHORT (r2-trend-short4) → cut-loser-CL-T1 → -$0.21
+- CHIP SHORT (pump-chain-) → atr_sl_hit → +$0.04 (trailing profit)
+- KAS SHORT (pump-chain-) → atr_sl_hit → -$0.32
+
+**24h:** 38T, 34.2%WR, -$1.96 (improving from -$3+ earlier this week).
+
+**Key Metrics:**
+- atr_sl_hit: 20T (52.6%) — above 40%, pump-chain- accounts for 14/20 hits
+- cut-loser-CL-T1: 3T, -$0.51 — small losses as designed
+- pump_exit_dead_money: 7T, 57.1%WR, +$0.29 — only profitable exit
+- profit-monster-trail: 7T, breakeven
+
+**Signal Performance 24h:**
+- pump-chain- SHORT: 22T, 45.5%WR, -$0.37 — workhorse, borderline
+- accel-300-breakout SHORT: 7T, 28.6%WR, -$0.12 — drag (disabled)
+- mover+ LONG: 3T, 0%WR, -$0.61 — killed
+- bb-bounce-v2-long+: 3T, 33.3%WR, -$0.16 — small drag
+
+**Open Trades:** 3 (BTC LONG 2h, FIL SHORT, GOAT SHORT)
+
+**Changes:** None — no kill candidates. No signal 0%WR/3+T last hour. No overtrading (3/hr).
+
+**No Change Needed:**
+- No kill candidates this hour
+- atr_sl_hit elevated but pump-chain- at 45.5%WR is borderline, not killable
+- System improving week-over-week
+
+**Open Questions:**
+- pump-chain- SHORT at 22T/45.5%WR is the main volume driver but net negative. Tuning opportunity?
+- BTC LONG open 2h, entry $83,515, SL $82,429 (1.3% buffer) — monitoring
+
+**BY:** auto_1hr
