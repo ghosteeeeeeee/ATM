@@ -1456,13 +1456,16 @@ def _score_signal(token, direction, conf, source, signal_type,
             _phase, _score, _linreg, _ema = _cont_row[0], _cont_row[1], _cont_row[2], _cont_row[3]
             _score_val = float(_score) if _score else 50
 
-            # Bearish structure: DECLINING phase, or CALM/RECOVERY with LEAN_BEAR + BELOW EMA300
-            _bearish = (_phase in ('DECLINING',) or
-                        (_phase in ('CALM', 'RECOVERY') and _linreg in ('LEAN_BEAR', 'BEAR') and _ema == 'BELOW'))
-            # Bullish structure: RECOVERY phase, or CALM/NEUTRAL with LEAN_BULL + ABOVE EMA300
+            # Bearish structure: ALL THREE must agree (phase + linreg + EMA)
+            # FIX 2026-09-24: phase-only check was triggering false bearish when linreg=LEAN_BULL+ema=ABOVE
+            _bearish = (_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                        _linreg in ('LEAN_BEAR', 'BEAR') and
+                        _ema == 'BELOW')
+            # Bullish structure: ALL THREE must agree (phase + linreg + EMA)
             # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
-            _bullish = (_phase in ('RECOVERY', 'NEUTRAL') or
-                        (_phase == 'CALM' and _linreg in ('LEAN_BULL', 'BULL') and _ema == 'ABOVE'))
+            _bullish = (_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
+                        _linreg in ('LEAN_BULL', 'BULL') and
+                        _ema == 'ABOVE')
 
             if direction.upper() == 'SHORT' and _bearish:
                 # SHORT aligned with bearish structure — strong boost
@@ -2540,8 +2543,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             except: pass
                     if _cont_row_sn:
                         _sn_phase, _sn_linreg, _sn_ema = _cont_row_sn[0], _cont_row_sn[1], _cont_row_sn[2]
-                        _sn_bearish = (_sn_phase == 'DECLINING' or
-                                       (_sn_phase in ('CALM', 'RECOVERY') and _sn_linreg in ('LEAN_BEAR', 'BEAR') and _sn_ema == 'BELOW'))
+                        # FIX 2026-09-24: phase-only check was triggering false bearish bypass
+                        _sn_bearish = (_sn_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                                       _sn_linreg in ('LEAN_BEAR', 'BEAR') and
+                                       _sn_ema == 'BELOW')
                         if _sn_bearish:
                             _cont_allows_short = True
                             log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — BTC continuum={_sn_phase}+{_sn_linreg}+{_sn_ema}, bearish structure overrides NEUTRAL regime")
