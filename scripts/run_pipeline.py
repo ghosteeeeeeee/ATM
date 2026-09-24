@@ -18,7 +18,9 @@ LOCK    = '/tmp/hermes-pipeline.lock'
 #   - Was: LLM-based hot-set compactor running every 10 min via ai-decider.timer
 #   - Problem: update_open_positions_skipped() marked every open-position token
 #     SKIPPED every 10 min → 50+ duplicate SKIPPED entries, corrupted signal lifecycle
-#   - Replaced by: signal_compactor.py (in STEPS_EVERY_MIN) — deterministic, LLM-free
+#   - Replaced by: signal_compactor.py — deterministic, LLM-free
+#   - signal_compactor removed from STEPS_EVERY_MIN 2026-09-24 — runs via standalone timer
+#     (hermes-signal-compactor.timer, every 1min). Having both caused 13K+ LOCK-WAIT retries.
 #   - ai-decider.timer + ai-decider.service: STOPPED and DISABLED
 #   - brain.py still has ai_decider import for backward compat only
 
@@ -31,7 +33,7 @@ LOCK    = '/tmp/hermes-pipeline.lock'
 # All master *_ENABLED flags in hermes_constants.py are False; signal_gen was doing
 # expensive computation (get_all_latest_prices, compute_regime, get_momentum_stats)
 # for zero signal output. signals_runner is now the canonical path.
-STEPS_EVERY_MIN  = ['signal_compactor', 'signal_analyst', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
+STEPS_EVERY_MIN  = ['signal_analyst', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
 # price_collector: removed 2026-04-25
 #   - Was firing BOTH via run_pipeline.py AND via hermes-price-collector.timer
 #   - Lock caused ~0.3% skip rate from collision
@@ -47,7 +49,6 @@ STEP_TIMEOUTS = {
     'signals_runner_slow': 240,
     'breakout_engine': 60,
     'decider_run': 360,
-    'signal_compactor': 60,   # deterministic — must be fast (<2s typical)
     'signal_analyst': 30,     # score hotset signals, must be fast
     'position_manager': 120,
     'strategy_optimizer': 300,
@@ -108,8 +109,8 @@ def run(name, args=None):
             # For noisy steps (price_collector etc.) only log errors
             if name in ('position_manager', 'decider_run', 'live-decider'):
                 # ai_decider: DEFUNCT — removed 2026-04-16.
-                # Replaced by signal_compactor.py (STEPS_EVERY_5M) which is deterministic
-                # and LLM-free. signal_compactor runs every minute in STEPS_EVERY_MIN.
+                # Replaced by signal_compactor.py — deterministic and LLM-free.
+                # signal_compactor runs via standalone timer (hermes-signal-compactor.timer).
                 log_lines = [l.strip() for l in lines if l.strip()]
                 if log_lines:
                     for l in log_lines[-8:]:

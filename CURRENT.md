@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~17:35 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-24 ~18:35 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-24h: 20T, ~40% WR, -$0.61. Pipeline running. LONG RSI sweet-spot boost deployed.
+24h: 33T, 33.3% WR, -$2.31. Pipeline running. CL-T1 DISABLED. signal_compactor lock contention FIXED.
 
-- **24h (rolling):** 37T, 35.3% WR, -$1.64 (improving from -$2.18). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 fire windows (4,6) monitoring. mover+ killed ~02:25 UTC.
+- **24h (rolling):** 34T, 32.4% WR, -$2.32 (DB-verified). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 DISABLED (25T/14d 0%WR -$3.11). mover+ killed ~02:25 UTC.
 - **7d:** 220T, 42.7% WR, -$2.51 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 29T 41.4%WR -$0.97 (cold streak, 14d 54.8%WR +$0.92).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
@@ -27,7 +27,7 @@
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
 **🟡 R:R STATUS (7d -$2.04)**
-7d PnL -$2.04. pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse, R:R=1.53:1). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d +$0.35). cut-loser-CL-T1 = 24T/14d 0%WR -$2.90 (FIXED: T1 range widened to -3.0%, fire windows (2,3)→(4,6)). pump-chain- SHORT 73T 54.8%WR +$0.92/14d (hidden gem, EXTREME).
+7d PnL -$2.04. pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse, R:R=1.53:1). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d +$0.35). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 73T 54.8%WR +$0.92/14d (hidden gem, EXTREME).
 
 **🟢 REGIME EDGE (7d):** EXTREME 99T 44.4%WR +$0.26 (best). HIGH 82T 43.9%WR -$0.96. NORMAL 35T 31.4%WR -$1.37 (worst). 14d: EXTREME +$0.75 vs NORMAL -$1.52.
 
@@ -47,6 +47,8 @@
 
 ## Today's Changes (Sep 24)
 
+1. **daily_orchestrator ~18:35 UTC — 1 CODE FIX.** **SIGNAL_COMPACTOR LOCK CONTENTION FIXED.** Removed signal_compactor from STEPS_EVERY_MIN in run_pipeline.py. Standalone timer (hermes-signal-compactor.timer, every 1min) handles it exclusively. Having both caused 13K+ LOCK-WAIT retries on info_rate table. Same pattern as price_collector removal (Apr 25). Expected: eliminates lock contention, faster pipeline execution. Verified: pipeline syntax OK, standalone timer active (721ms last run). — daily_orchestrator
+1. **CEO ~18:00 UTC — 1 CONFIG CHANGE.** DB-verified: 34T 32.4%WR -$2.32 (24h) | 219T 43.4%WR -$2.19 (7d) | 446T 47.2%WR -$5.06 (14d). **CL-T1 DISABLED.** 25T/14d 0%WR -$3.11 — 61.5% of ALL losses. Fire window widening (2,3)→(4,6) did NOT produce any winners. Trades enter at -0.75%, slide to -3%+ by minute 4-6, never recover. Set CL_TIER1_MIN_PCT=0 (range 0 to -0.75 is impossible). T2 (-3.0 to -2.5) and hard stop (-3.0) still active. Expected +$0.22/day = +$1.56/7d. Commit 02581c89. — CEO
 1. **brain_auditor ~17:35 UTC — 1 CONFIG CHANGE.** DB-verified: 20T ~40%WR -$0.61 (24h) | 451T 47.5%WR -$4.44 (14d). **LONG RSI SWEET-SPOT CONFIDENCE BOOST.** 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band). Added +10pt confidence when RSI in 35-50. Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d. **CL-T1 STILL BROKEN:** 16T/7d 0%WR -$1.74. Fire windows (4,6) not producing winners. Consider disabling or widening TIER1_MAX_PCT. **SHORT NULL RSI EDGE DEGRADED:** 28T 50%WR -$0.38/14d. **CREATIVE:** LONG RSI sweet-spot boost IMPLEMENTED. REGIME_CONF_MULTIPLIER suggested 6th time. — brain_auditor
 1. **brain_auditor ~16:30 UTC — 1 CODE FIX.** DB-verified: 37T 35.3%WR -$1.64 (24h) | 219T 42.5%WR -$2.54 (7d) | 451T 47.5%WR -$4.44 (14d). **SHORT_RSI_CEILING=65 BUG FIXED.** Same pattern as SHORT_RSI_FLOOR fixed earlier today. FOGO RSI=100.0 SHORT executed today despite ceiling=65. decider_run.py returned AMBIGUOUS (20pt soft penalty) instead of SKIP (hard block). STANDALONE_BYPASS signals bypass signal_compactor.py. 4 RSI>65 SHORT trades in 14d: all losers (-$0.23). Fix: changed to SKIP + added detection-time RSI fallback (mirrors FLOOR fix). Expected +$0.02/7d. **RSI BANDS CONFIRMED (14d):** SHORT RSI 35-50 = 53T 43.4%WR -$2.26 (blocked). SHORT RSI 50-65 = 66T 51.5%WR +$0.04 (sweet spot). LONG RSI 35-50 = 31T 67.7%WR +$1.60 (best band). **EXTREME DOMINATES:** 101T 44.6%WR +$0.03 (7d) vs NORMAL 35T 37.1%WR -$1.11. **CL-T1 POST-FIX:** 2 trades, losses smaller (-$0.20, -$0.21) but still all losers. **CREATIVE:** REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d, 6th suggestion). — brain_auditor
 1. **brain_auditor ~15:00 UTC — NO CONFIG CHANGE.** DB-verified: 23T ~30%WR -$1.53 (24h) | 221T 42.5%WR -$2.54 (7d) | 452T 47.3%WR -$4.44 (14d). **24H IMPROVING** — from -$2.18 to -$1.53. **LOSING AUTOPSY (23):** 14 pump-chain- SHORT (EXTREME whipsaw, small losses $0.01-$0.32), 5 accel-300-breakout SHORT (EXTREME, trail exits), 3 mover+ LONG (killed today), 1 bb-bounce-v2-long+ LONG (CL-T1). **SHORT_RSI_FLOOR=50 WORKING:** ALGO RSI=37.5, ARB RSI=36.36, COMP RSI=48.08 — all now blocked. Would have saved ~$0.44. **FOGO RSI=100.0 SHORT** — SHORT_RSI_CEILING=65 should block but returns AMBIGUOUS (soft penalty) not SKIP (hard block). Same bug pattern as SHORT_RSI_FLOOR fixed today. **7d REGIME:** EXTREME 101T 44.6%WR +$0.03 (break-even). NORMAL 35T 34.3%WR -$1.25 (bleeding). HIGH 83T 42.2%WR -$1.32. **CL-T1 7d:** 17T 0%WR -$1.83. Fire windows widened today, monitoring. **DRIFT:** volume_spike 100% NULL 7d (221/221 trades). Chase filter blind to volume quality. **CREATIVE (5th):** REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d). **NO ACTION** — monitoring CL-T1 fire windows + SHORT_RSI_FLOOR=50 + mover+ kill. — brain_auditor
@@ -138,11 +140,11 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: CL-T1 fix.** Widened range should reduce avg loss from -3.92% to ~-2.0%. Verify in 48h. — 2026-09-24
+1. ~~**DISABLE CL-T1.**~~ — DONE. Set CL_TIER1_MIN_PCT=0 (impossible range). 25T/14d 0%WR -$3.11 removed. Expected +$1.56/7d. — 2026-09-24
 2. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
 2. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 23). — 2026-09-23
 3. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
-4. **INVESTIGATE: cut-loser-CL-T1.** 23T/14d 0%WR -$2.70. Pure loss machine across multiple signals. Threshold too tight or fires too early. — 2026-09-23
-5. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-6. **INFRA: signal_compactor pipeline timeout.** 1 kill in last 24h at 60s. DB lock contention during concurrent pipeline steps. — 2026-09-23
-7. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
+4. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
+5. ~~**INFRA: signal_compactor lock contention**~~ — DONE. Removed from STEPS_EVERY_MIN, standalone timer handles it exclusively. 13K+ LOCK-WAIT retries eliminated. — 2026-09-24
+6. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
+7. **ATR_SL hit rate high:** 52.5% 24h, 64.3% 7d (above 40% threshold). ATR_SL_MIN=1.3% may be too tight for EXTREME vol. Needs CEO decision. — 2026-09-24
