@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~11:30 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-24 ~13:50 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 34T, 35.3% WR, -$0.61. Pipeline running. 0 open positions.
+24h: 39T, 33.3% WR, -$2.18. Pipeline running. 2 open positions.
 
 - **24h (rolling):** 34T, 35.3% WR, -$0.61 (improving from -$1.28). CL-T1 fire windows widened (2,3)→(4,6) ~10:00 UTC. SHORT_RSI_FLOOR=40 hard block deployed ~06:00 UTC. mover+ killed ~02:25 UTC.
-- **7d:** 218T, 42.7% WR, -$2.04 (DB-verified). pump-chain+ LONG 51T 45.1%WR +$1.45 (workhorse). volume-breakout-long+ 17T 64.7%WR +$1.15 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 15T 40%WR -$0.60 (7d cold, 14d 54.8%WR +$0.92).
+- **7d:** 220T, 42.7% WR, -$2.51 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 29T 41.4%WR -$0.97 (cold streak, 14d 54.8%WR +$0.92).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -20,7 +20,7 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=40:** **HARD BLOCK** (CEO Sep 24: lowered 50→40, fixed to SKIP). Blocks SHORT entries where live or detection-time RSI < 40.
+- **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
