@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~22:00 UTC**
-**Updated by: CEO (DB-verified)**
+**Last Updated: 2026-09-23 ~23:30 UTC**
+**Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 33T, 42.4% WR, -$0.80. NEUTRAL vol. Pipeline running. 0 open positions.
+24h: 32T, 46.9% WR, -$0.20. NEUTRAL vol. Pipeline running. 0 open positions.
 
-- **24h (rolling):** 33T, 42.4% WR, -$0.80. Improving from -$2.21 on Sep 22. Dead hours fix + RSI floors reducing losses.
-- **7d:** 201T, 44.3% WR, -$0.73 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (bleeding).
+- **24h (rolling):** 32T, 46.9% WR, -$0.20. Improving from -$0.80 earlier today. Dead hours fix + RSI floors reducing losses.
+- **7d:** 202T, 44.6% WR, -$0.53 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (bleeding).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). Detection-time RSI floor bypass BUG FIXED — 6/8 recent trades had detection RSI<50 but executed anyway.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -25,8 +25,8 @@
 - **LONG_RSI_FLOOR=30:** Blocks RSI<30 LONG entries. **DETECTION-TIME FIX DEPLOYED** — same pattern as SHORT fix.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$0.73)**
-7d PnL -$0.73 (fragile but improving). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — detection-time RSI fix should help). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (pure loss machine).
+**🟡 R:R STATUS (7d -$0.53)**
+7d PnL -$0.53 (improving from -$0.73). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — detection-time RSI fix should help). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (pure loss machine — CL_TIER1_MAX_PCT=-0.75 too tight).
 
 **🟢 REGIME EDGE (7d):** NEUTRAL only (201T). EXTREME edge not visible in 7d (all NEUTRAL).
 

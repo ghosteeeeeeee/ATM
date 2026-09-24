@@ -2907,3 +2907,11 @@
   atr_sl_hit 37.5% (below 40%, improved from 42.9%). No kill candidates, no stale trades.
   cut-loser-CL-T1 23T/14d -$2.70 systemic across 13 signals — not fixable via signal kill.
   BY: auto_1hr
+[2026-09-24 00:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
+  DB-verified: 32T 46.9%WR -$0.20 (24h) | 204T 44.6%WR -$0.53 (7d) | 452T 50.2%WR +$2.31 (14d).
+  SYSTEM IMPROVING — 24h from -$0.80 to -$0.20. Today's 5 code fixes driving recovery.
+  CL-T1: 23T/14d 0%WR -$2.70 across 13 signals. Widening may not help — no trades in -0.75% to -1.25% band.
+  REGIME EDGE: EXTREME +$1.55 vs NORMAL -$1.25 (7d). Gap $2.80.
+  REGIME_CONF_MULTIPLIER suggested: EXTREME 1.15x, NORMAL 0.85x (+$0.50-1.00/7d).
+  No config changes. Monitoring today's fixes.
+  BY: brain_auditor

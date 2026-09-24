@@ -2406,6 +2406,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             unique_signal_types = len(set(_signal_type_key(p) for p in source_parts))
             source_count = len(source_parts)
             bare_source = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
+            # Also keep a version that only strips directional suffix (no digit strip)
+            # FIX: 'accel-300-' → bare_source='accel-' (strips 300!) → misses bypass list
+            # This version: 'accel-300-' → 'accel-300' → matches bypass entry
+            _src_stripped = source.rstrip('+-') if source else ''
 
             # ══ CONFLUENCE REQUIRED ══ — 2026-05-08
             # Rule: 2+ unique signal types required (when CONFLUENCE_REQUIRED=True).
@@ -2648,7 +2652,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ── Backtested Signal Bypass ──────────────────────────────────────
                 # Signals with proven edge from backtesting — allow standalone.
                 # Strip trailing digits (bars_since) and +/- suffixes for matching.
-                elif unique_signal_types == 1 and bare_source in STANDALONE_BYPASS_SIGNALS:
+                elif unique_signal_types == 1 and (bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS):
                     pass_gate = True
                     gate_msg = f'backtested standalone signal ({source})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
@@ -2661,7 +2665,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
                     bare_src = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
-                    if bare_src in STANDALONE_BYPASS_SIGNALS:
+                    _src_raw = source.rstrip('+-') if source else ''
+                    if bare_src in STANDALONE_BYPASS_SIGNALS or _src_raw in STANDALONE_BYPASS_SIGNALS:
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
                     else:
