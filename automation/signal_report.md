@@ -1,34 +1,45 @@
 === Signal Performance Report ===
-Generated: 2026-09-24 ~10:00 UTC
+Period: Last 6h | 24h
+Generated: 2026-09-24 17:13 UTC
 
-## System Summary
-| Period | Trades | PnL | WR |
-|--------|--------|-----|-----|
-| 6h | 12 | -$0.89 | 33.3% |
-| 24h | 36 | -$1.50 | 33.3% |
-
-## KILLED (executed)
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | Already killed (line 1808). In NEVER_REENABLE. |
-| mover+ | LONG | 0.0% | -$0.61 | 3 | Already killed (line 3144). All ATR_SL losses. |
+| (none killed — no signal met blanket-kill criteria) | | | | | |
 
-## BOOSTED (executed)
-None — no signals meet boost criteria (WR>55%, 5+ trades, positive PnL).
+REGIME BLOCKS (executed):
+| Signal | Dir | Regime | WR | PnL | Trades | Action |
+|--------|-----|--------|-----|-----|--------|--------|
+| pump-chain- | SHORT | EXTREME | 51.9% | -$0.20 | 54 | 0.0x mult (was 1.0x) |
+| pump-chain- | SHORT | HIGH | 50.0% | -$0.28 | 24 | 0.0x mult (was 1.0x) |
+| pump-chain- | SHORT | NORMAL | 83.3% | +$0.13 | 6 | UNBLOCKED (was 0.0x) |
 
-## LOSERS (watch list)
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none — no clear winners in 24h) | | | | | |
+
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 25.0% | -$0.19 | 4 | WATCH — but 30d:74% WR +$2.08. Short-term variance. |
-| pump-chain- | SHORT | 45.0% | -$0.09 | 20 | OK — 6h shows 60% WR +$0.04. Stabilizing. |
+| mover+ | LONG | 0.0% | -$0.61 | 3 | Watch — only 3 trades, too few to act |
+| accel-300-breakout | SHORT | 20.0% | -$0.07 | 5 | Watch — 1d old, 7 total trades, EXTREME only |
+| bb-bounce-v2-long+ | LONG | 33.3% | -$0.16 | 3 | Watch — 1d old, 12 total trades |
 
-## WINNERS
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 60.0% | +$0.04 | 5 | 6h winner (short window). |
+| (no signals with 5+ trades and 55%+ WR in 24h) | | | | | |
 
-## ISSUES
-- No signal inversions detected.
-- System-wide 24h WR is low (33.3%) — broad market headwinds, not signal-specific.
-- accel-300-breakout trades in 24h window are from Sep 23 (pre-kill), not new firings.
-- mover+ trades from early today (Sep 24) were executed after kill — possible stale signal in queue.
+ISSUES:
+- No signal inversions detected
+- No clear winners in 24h window — system is in a rough patch
+- pump-chain- SHORT had its NORMAL regime UNBLOCKED (was incorrectly blocked by old pump-chain+ LONG data)
+
+ACTIONS TAKEN:
+1. Added Pump_Flow 0.0x to EXTREME regime (pump-chain- SHORT 51.9% WR, -$0.20)
+2. Added Pump_Flow 0.0x to HIGH regime (pump-chain- SHORT 50% WR, -$0.28)
+3. Removed Pump_Flow 0.0x from NORMAL regime (pump-chain- SHORT 83.3% WR, +$0.13 — was incorrectly blocked)
+4. Updated comments in volatility_gate_v2.py with evidence dates
+
+NEXT REVIEW: 6 hours

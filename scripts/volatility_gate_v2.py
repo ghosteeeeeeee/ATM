@@ -244,6 +244,7 @@ VOL_PHASE_MULTS = {
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in EXTREME (oversold = extreme)
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
         'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)
+        'Pump_Flow': 0.0,      # BLOCKED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME (54T). Wins in NORMAL (83.3% WR). signal_reporter 2026-09-24
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
@@ -252,7 +253,7 @@ VOL_PHASE_MULTS = {
         'R2_Structural': 0.2,         # HEAVILY PENALIZED — rr-struct+ LONG 5T 40%WR -$0.49 in NORMAL (24h). Wins in HIGH (87.5% WR). Tightened from 0.5 2026-09-14
         # Open_Skies REMOVED 2026-09-12 — was 55.6% WR +$1.06 total, NORMAL was primary regime
         'Engulfing': 0.0,             # BLOCKED — engulfing 50% WR in NORMAL, wins in HIGH
-        'Pump_Flow': 0.0,             # BLOCKED — pump-chain+ LONG 0%WR -$0.44 in NORMAL (3T). Wins in EXTREME (46.7% WR, +$0.22)
+        # Pump_Flow REMOVED from NORMAL block — pump-chain- SHORT 83.3% WR +$0.13 NORMAL (6T). Block was for pump-chain+ LONG only. signal_reporter 2026-09-24
         'Grind_Trend': 0.0,           # BLOCKED — grind-trend+ LONG 0%WR -$0.30 in NORMAL (5T). Wins in HIGH (57.1% WR). 2026-09-19
         'Momentum': 0.0,              # BLOCKED — momentum LONG 38.5%WR -$0.99/7d in NORMAL. Wins in EXTREME/HIGH. 2026-09-21
         'Volume': 0.0,                # BLOCKED — volume-breakout-long+ 62.5%WR -$0.05 in NORMAL (8T/30d). 0 winners 7d NORMAL. Wins in EXTREME (75%WR +$1.46). 2026-09-21
@@ -268,7 +269,7 @@ VOL_PHASE_MULTS = {
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
-        # Pump_Flow removed — SHORT wins 61.5% WR in HIGH, LONG wins 64.7% WR in HIGH
+        'Pump_Flow': 0.0,        # BLOCKED — pump-chain- SHORT 50% WR -$0.28 HIGH (24T). Wins in NORMAL (83.3% WR). signal_reporter 2026-09-24
         'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
     },
 }
