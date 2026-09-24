@@ -2896,3 +2896,14 @@
   24h: 31T 41.9%WR -$0.83 | 2 trades last hour (both small losses -$0.07)
   3 open trades (pump-chain- SHORT, 1-2hrs, flat). atr_sl_hit 35.5% (improved from 42.9%)
   No kill candidates, no overtrading, no stale trades. BY: auto_1hr
+
+[2026-09-23 21:55 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 34T 44.1%WR -$0.60. 3 trades last hour (2W1L +$0.23). 0 open.
+  atr_sl_hit 38.2% (below 40% threshold, improved from 42.9%). No kill candidates.
+  BY: auto_1hr
+
+[2026-09-24 00:12 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 32T ~47%WR -$0.20 | 0 trades last hour (quiet midnight). 2 open (BABY/GMX SHORT, flat, ~2h).
+  atr_sl_hit 37.5% (below 40%, improved from 42.9%). No kill candidates, no stale trades.
+  cut-loser-CL-T1 23T/14d -$2.70 systemic across 13 signals — not fixable via signal kill.
+  BY: auto_1hr

@@ -5340,3 +5340,104 @@ Final set: ['ALGO', 'ME']
 - All Sep 23 fixes deployed and settling in
 
 **BY:** auto_1hr
+
+## [2026-09-23 21:55 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2W 1L, +$0.23) | **Open:** 0
+**24h:** 34T 44.1%WR -$0.60 | **6h:** mixed, no consecutive losing hours
+
+**Last hour trades:**
+- FOGO pump-chain- SHORT +$0.20 (pump_exit_dead_money)
+- CASHCAT pump-chain- SHORT +$0.20 (atr_sl_hit — partial profit taken)
+- CHIP pump-chain- SHORT -$0.17 (atr_sl_hit)
+
+**24h exit reasons:**
+- atr_sl_hit: 13T (38.2%) avg -$0.045 — now below 40% threshold, down from 42.9% @ 16:20
+- profit-monster-trail: 12T avg +$0.003
+- cut-loser-CL-T1: 5T avg -$0.094
+- pump_exit_dead_money: 3T avg +$0.083
+
+**24h signal ranking:**
+- pump-chain-: 8T 62.5%WR +$0.33
+- bb-bounce-v2-long+: 9T 44.4%WR -$0.10
+- accel-300-breakout: 7T 28.6%WR -$0.12
+- mover+: 3T 33.3%WR -$0.34 (14d: 17T 64.7%WR -$0.36 — high WR, losses outsized)
+
+**Changes:**
+1. None
+
+**No Change Needed:**
+- atr_sl_hit 38.2% — below 40% threshold, improved from 42.9% (trending right direction)
+- No overtrading (6T/3h = 2/hr)
+- No consecutive losing hours
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- No stale trades (0 open)
+
+**Open Questions:**
+- mover+ 14d 64.7%WR -$0.36 — losses larger than wins when they hit. Low freq (17T/14d), borderline.
+
+**BY:** auto_1hr
+
+## [2026-09-23 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** unknown (check in AM)
+**24h:** 32T, $-0.20 (~47% WR) | atr_sl_hit 37.5% (below 40%, down from 42.9%)
+
+**24h exit reasons:**
+- atr_sl_hit: 12T (37.5%) avg -$0.023
+- profit-monster-trail: 12T avg +$0.003
+- cut-loser-CL-T1: 4T avg -$0.093
+- pump_exit_dead_money: 3T avg +$0.083
+
+**24h signal ranking:**
+- pump-chain-: 8T 62.5%WR +$0.33 (best performer)
+- bb-bounce-v2-long+: 8T 50%WR $0.00
+- accel-300-breakout: 7T 28.6%WR -$0.12
+- mover+: 3T 33.3%WR -$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 37.5% — below 40% threshold, continued improvement
+- No overtrading (quiet hour)
+- No kill candidates
+- Sep 23 fixes settling in well
+
+**Open Questions:**
+- accel-300-breakout: 7T/14d 28.6%WR -$0.12 — still underperforming but improving from earlier (-$0.30 range)
+- mover+: 3T/14d, borderline — needs more data before kill decision
+
+**BY:** auto_1hr
+
+## [2026-09-24 00:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 2 (BABY SHORT +$0.05, GMX SHORT -$0.01, ~2h each)
+**24h:** 32T, ~47% WR, $-0.20 | atr_sl_hit 37.5% (below 40% threshold)
+
+**24h exit reasons:**
+- atr_sl_hit: 12T (37.5%) avg -$0.023
+- profit-monster-trail: 12T avg +$0.003
+- cut-loser-CL-T1: 4T avg -$0.093
+- pump_exit_dead_money: 3T avg +$0.083
+- UNIVERSAL_MAX_HOLD: 1T avg +$0.160
+
+**24h signal ranking:**
+- pump-chain-: 8T 62.5%WR +$0.33 (best)
+- bb-bounce-v2-long+: 8T 50%WR $0.00
+- accel-300-breakout: 7T 28.6%WR -$0.12
+- mover+: 3T 33.3%WR -$0.34
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 37.5% — below 40% threshold, improved from 42.9% (Sep 23 fixes working)
+- No overtrading (quiet midnight hour)
+- No stale trades (0 open >2h)
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- cut-loser-CL-T1 is systemic (13 signals), not a signal kill target
+
+**Open Questions:**
+- cut-loser-CL-T1: 23T/14d -$2.70 — exit rule across all signals. TPSL review needed if pattern continues.
+- accel-300-breakout: 7T 28.6%WR -$0.12 — improving from -$0.30 range, watching
+
+**BY:** auto_1hr
