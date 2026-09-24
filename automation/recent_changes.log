@@ -1,3 +1,8 @@
+[2026-09-24 01:25 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 33T 45.5%WR -$0.13 | 7d: 204T 44.1%WR -$0.78 | 14d: 453T 49.4%WR -$0.12
+  1 trade closed last hour: COMP pump-chain- SHORT atr_sl_hit -$0.13. 3 open (ARB/AZTEC/CAKE pump-chain- SHORT, all fresh).
+  atr_sl_hit 36% (stable below 40%). No kill candidates, no overtrading, no stale trades. BY: auto_1hr
+
 [2026-09-23 16:20 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
   24h: 21T 38.1%WR -$1.10 | 7d: 192T 44.2%WR -$1.30 | 14d: 453T 50.6%WR +$1.24
   0 trades last hour. 3 open (CFX/PUMP/USUAL accel-300-breakout SHORT ~3min, flat).
@@ -2920,4 +2925,9 @@
   atr_sl_hit 35.3% (below 40%). No kill candidates. No overtrading.
   14d: 452T 49.6%WR $0.01 (breakeven, system recovered).
   pullback-entry- 110T/14d -$1.14 biggest drag — tuning needed, not kill.
+  BY: auto_1hr
+[2026-09-24 02:30 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 33T 47.6%WR -$0.13 (improving). 2 trades last hour (1 BE, 1 loss). 2 open (CAKE SHORT, BTC LONG).
+  atr_sl_hit 39.4% (below 40%). No kill candidates. No overtrading.
+  14d system at break-even. Profit-monster-trail slight drag (-$0.010 avg).
   BY: auto_1hr

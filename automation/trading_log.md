@@ -1,3 +1,39 @@
+## [2026-09-24 01:25 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (COMP pump-chain- SHORT atr_sl_hit -$0.13) | **Open:** 3 (ARB/AZTEC/CAKE pump-chain- SHORT, 3-45min, fresh)
+**24h:** 33T 45.5%WR -$0.13 | **7d:** 204T 44.1%WR -$0.78 | **14d:** 453T 49.4%WR -$0.12
+
+**24h exit reasons:**
+- atr_sl_hit: 12T 36% avg -$0.022 (below 40% threshold)
+- profit-monster-trail: 11T avg +$0.002
+- pump_exit_dead_money: 5T avg +$0.064
+- cut-loser-CL-T1: 4T avg -$0.093
+- UNIVERSAL_MAX_HOLD: 1T +$0.160
+
+**24h signal ranking:**
+- pump-chain-: 11T 54.5%WR +$0.27 (best)
+- mover+: 3T 33.3%WR -$0.34 (worst)
+- accel-300-breakout: 7T 28.6%WR -$0.12
+
+**Changes:**
+1. No config change
+
+**No Change Needed:**
+- atr_sl_hit 36% (below 40% kill threshold, stable since CEO fix)
+- No kill candidates (0%WR + 3+ trades) — only 1 trade last hour
+- No overtrading (33T/24h = 1.4T/hr)
+- No stale trades (3 open all <45min)
+- 7d improving: -$1.30 (Sep 23) → -$0.78 now
+- System basically flat: 14d -$0.12
+
+**Open Questions:**
+- 7d slightly negative (-$0.78) but trending positive — dead hours fixes accumulating savings
+- No action needed — monitoring continues
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-23 18:30 UTC] Daily Orchestrator
 
 **Trades:** 25T closed today | **Open:** 3 (COMP/GMX/AVAX SHORT pump-chain-, slight profit)
@@ -5477,5 +5513,40 @@ Final set: ['ALGO', 'ME']
 - pullback-entry- is the biggest 14d PnL drag (-$1.14). With 110T, this is a tuning problem not a kill candidate.
 - mover+ has inverted risk profile: 64.7% WR but -$0.36 total — when it loses, it loses bigger than it wins.
 - cut-loser-CL-T1 systemic across 13 signals — TPSL review still pending from prior analysis
+
+**BY:** auto_1hr
+
+## [2026-09-24 02:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 BE, 1 loss) | **Open:** 2 (CAKE SHORT -0.17, BTC LONG -0.01)
+**24h:** 33T, 47.6% WR, $-0.13 (improving from -$0.20 yesterday)
+
+**24h exit reasons:**
+- atr_sl_hit: 13T (39.4%) avg -$0.033
+- profit-monster-trail: 9T avg -$0.010
+- pump_exit_dead_money: 5T avg +$0.064
+- cut-loser-CL-T1: 4T avg -$0.093
+- pump_exit_momentum: 1T $0.00
+- UNIVERSAL_MAX_HOLD: 1T avg +$0.160
+
+**7d signal ranking (5+ trades):**
+- volume-breakout-long+: 18T 66.7%WR +$1.46
+- pump-chain+: 55T 41.8%WR +$1.23
+- grind-trend+: 18T 50.0%WR +$0.24
+- pullback-entry-: 30T 33.3%WR -$2.25 (biggest drag)
+- mover+: 11T 54.5%WR -$0.51 (inverted risk)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 39.4% — just below 40% threshold ✓ (improved from 42.9% on Sep 22-23)
+- No overtrading (avg 1.4/hr, peak 6/hr at 16:00 UTC)
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- Trade frequency normal
+
+**Open Questions:**
+- pullback-entry- 30T/7d -$2.25 — biggest long-term drag, tuning not kill
+- mover+ 11T/7d 54.5%WR -$0.51 — inverted risk profile, watching
+- profit-monster-trail 9T/24h -$0.010 avg — slight drag, trailing may need adjustment
 
 **BY:** auto_1hr
