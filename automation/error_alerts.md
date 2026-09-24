@@ -83,3 +83,9 @@
 - **WARN** (1x): Hotset empty — 0 tokens survived compaction. Not an error; no signals meeting criteria right now.
 - **WARN** (1x): Disk at 85% (94G/118G). Freed ~1GB via journal vacuum (423MB) + log compression.
 - **INFO**: Pipeline healthy. 3 open positions (BTC SHORT in profit, CASHCAT SHORT). 34 closed today, -56% PnL. All timers active.
+
+## Error Alerts — 2026-09-24 19:45 UTC
+- **[WARN]** (1x): Disk at 85% (95G/118G) — at threshold, monitor closely.
+- **[WARN]** (1x): Today's PnL negative (-$2.38, 36.7% winrate, 30 trades) — pump-chain SHORTs underperforming (38.9% WR, -$0.91).
+- **AUTO-FIX**: Compressed old logs >1 day. No critical issues found.
+- **INFO**: Pipeline running (cycle #214254), HL sync guardian active, 0 errors in last 30min. Market regime: LONG_BIAS (7 tokens). 1 open position (BTC LONG).

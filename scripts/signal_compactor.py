@@ -1312,6 +1312,14 @@ def _score_signal(token, direction, conf, source, signal_type,
             log(f"  🚫 [PUMP-CHAIN-DEAD-HOUR] {token} LONG blocked — hour {utc_hour} UTC")
             return 0.0
 
+    # ── pump-chain- SHORT dead hours block ────────────────────────────────
+    # 14d data: hours 2,3 = 7T 14.3%WR -$0.83. Hour 2: 3T 0%WR, Hour 3: 4T 25%WR.
+    from hermes_constants import PUMP_CHAIN_SHORT_DEAD_HOURS
+    if ('pump-chain' in _pc_bare or 'pump_chain' in _pc_bare) and direction.upper() == 'SHORT':
+        if utc_hour in PUMP_CHAIN_SHORT_DEAD_HOURS:
+            log(f"  🚫 [PUMP-CHAIN-SHORT-DEAD-HOUR] {token} SHORT blocked — hour {utc_hour} UTC")
+            return 0.0
+
     # ── pullback-entry- SHORT dead hours block ────────────────────────────
     # 14d data: hours 0,1,3,7,10,11 = -$2.33/14d (25T all losing).
     from hermes_constants import PULLBACK_ENTRY_SHORT_DEAD_HOURS

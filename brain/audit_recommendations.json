@@ -1,120 +1,146 @@
 {
-    "timestamp": "2026-09-24T17:35:00Z",
-    "agent": "brain_auditor",
-    "session_brain_stats": {
-        "total_sessions": "loaded",
-        "top_topics": ["signal performance", "CL-T1", "RSI bands", "regime edge", "pullback-entry- SHORT"]
-    },
-    "trade_summary_24h": {
-        "total_trades": 20,
-        "winners": 12,
-        "losers": 8,
-        "pnl": -0.61,
-        "biggest_loser": "BABY mover+ LONG -$0.45",
-        "biggest_winner": "FOGO pump-chain- SHORT +$0.20",
-        "regime_breakdown": {
-            "EXTREME": "dominant — most trades",
-            "HIGH": "mixed",
-            "NORMAL": "few trades"
-        }
-    },
-    "trade_summary_14d": {
-        "total_trades": 451,
-        "overall_wr": 47.5,
-        "overall_pnl": -4.44,
-        "best_signal": "volume-breakout-long+ LONG 18T 66.7%WR +$1.46",
-        "worst_signal": "pullback-entry- SHORT 98T 45.9%WR -$2.00",
-        "best_regime": "EXTREME 101T 44.6%WR +$0.03",
-        "worst_regime": "NORMAL 35T 37.1%WR -$1.11"
-    },
-    "drift_findings": [
-        {
-            "topic": "SHORT NULL RSI edge degraded",
-            "description": "CURRENT.md claims 130T 56.9%WR +$2.08 but 14d query shows 28T 50%WR -$0.38. Edge has evaporated — possibly from RSI floor filtering reducing sample or market regime shift.",
-            "impact": "LOW — edge was always marginal, current RSI floor=50 handles the core problem",
-            "action": "Update CURRENT.md to reflect actual numbers"
-        },
-        {
-            "topic": "volume_spike 100% NULL",
-            "description": "5+ days unfixed. Chase filter blind to volume quality.",
-            "impact": "MEDIUM — chase filter can't block volume-less entries",
-            "action": "Code fix needed in signal_compactor.py recording"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "CL-T1 0% WR",
-            "description": "25T/14d 0%WR -$3.11. 16T/7d 0%WR -$1.74. Fire window widening (2,3)→(4,6) has NOT produced winners. CL-T1 only fires on trades already deep in loss — they never recover.",
-            "recommendation": "Consider disabling CL-T1 or widening TIER1_MAX_PCT from -0.75 to -1.0",
-            "confidence": "HIGH"
-        },
-        {
-            "topic": "pump-chain- SHORT cold streak",
-            "description": "7d 24T 41.7%WR -$0.61 vs 14d 68T 50%WR -$0.98. 30d 79T 54.4%WR +$0.29. Cold streak, not systemic.",
-            "recommendation": "Monitor — 14d and 30d still profitable",
-            "confidence": "MEDIUM"
-        }
-    ],
-    "losing_trade_autopsy": [
-        {
-            "trade": "BABY mover+ LONG -$0.45",
-            "signal": "mover+",
-            "regime": "EXTREME",
-            "root_cause": "ATR_SL hit — normal EXTREME whipsaw. mover+ killed today, no future impact.",
-            "confidence": "HIGH"
-        },
-        {
-            "trade": "KAS pump-chain- SHORT -$0.32",
-            "signal": "pump-chain-",
-            "regime": "HIGH",
-            "root_cause": "ATR_SL hit — pump-chain- cold streak in HIGH regime. 14d HIGH pump-chain- = 15T 40%WR -$0.46.",
-            "confidence": "HIGH"
-        },
-        {
-            "trade": "ACE pump-chain-,rs-r68 SHORT -$0.33",
-            "signal": "pump-chain-",
-            "regime": "EXTREME",
-            "root_cause": "ATR_SL hit — EXTREME whipsaw. Normal variance for pump-chain- in EXTREME.",
-            "confidence": "HIGH"
-        },
-        {
-            "cluster": "pump-chain- SHORT 11 losers -$1.49",
-            "analysis": "24h cluster. But 14d pump-chain- = 68T 50%WR (break-even). Cold streak. 30d 54.4%WR +$0.29. NOT systemic.",
-            "recommendation": "Monitor — no action needed"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-24T17:35:00Z",
-            "idea": "LONG RSI sweet-spot confidence boost (+10pt for RSI 35-50)",
-            "rationale": "14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band). pump-chain+ RSI 35-50 = 9T 55.6%WR +$0.77. Currently no boost — these trades execute at base confidence. Adding 10pt boosts fill quality without blocking anything.",
-            "expected_impact": "+$0.20-0.40/7d from better fills on 3-5 trades/7d",
-            "category": "entry sniper",
-            "status": "IMPLEMENTED",
-            "risk": "low",
-            "files_changed": [
-                "scripts/hermes_constants.py: added LONG_RSI_SWEET_SPOT_MIN/MAX/BOOST constants",
-                "scripts/signal_compactor.py: added sweet-spot boost logic after LONG_RSI_FLOOR check"
-            ],
-            "impact_on_winners": "0 winners blocked — only boosts confidence for trades already executing. Verified: 25 winning LONG trades in RSI 35-50 band in 14d would all still execute with higher confidence."
-        }
-    ],
-    "config_changes_applied": [
-        {
-            "timestamp": "2026-09-24T17:35:00Z",
-            "change": "LONG RSI sweet-spot confidence boost",
-            "type": "config",
-            "file": "hermes_constants.py + signal_compactor.py",
-            "before": "No RSI-based confidence adjustment for LONG entries",
-            "after": "LONG RSI 35-50 gets +10pt confidence boost",
-            "rationale": "43T 58.1%WR +$1.39/14d in this band. Boost improves fill quality without blocking trades.",
-            "impact": "+$0.20-0.40/7d expected"
-        }
-    ],
-    "next_actions": [
-        "MONITOR: CL-T1 fix — 16T/7d 0%WR post-fix. Fire windows (4,6) not helping. Consider disabling or widening TIER1_MAX_PCT.",
-        "MONITOR: LONG RSI sweet-spot boost — verify trades in RSI 35-50 band get boosted and execute cleanly.",
-        "FIX (code): volume_spike recording — 5+ days NULL, chase filter blind.",
-        "DEVELOP: New signals for NEUTRAL regime — only pump-chain+ and volume-breakout-long+ pass confluence."
+  "timestamp": "2026-09-24T19:00:00Z",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "top_findings": [
+      "REGIME_CONF_MULTIPLIER suggested 7+ times across sessions, never implemented",
+      "volume_spike 100% NULL for 5+ days — chase filter blind",
+      "SHORT NULL RSI detection-time fallback has better WR than live RSI"
     ]
+  },
+  "trade_summary_24h": {
+    "total_trades": 36,
+    "win_rate": 33.3,
+    "pnl": -2.34,
+    "long_trades": 10,
+    "short_trades": 26,
+    "best_signal": "pump-chain- SHORT (12W/10L, -$0.55)",
+    "worst_signal": "mover+ LONG (0W/3L, -$0.61, KILLED today)"
+  },
+  "trade_summary_7d": {
+    "total_trades": 199,
+    "win_rate": 42.7,
+    "pnl": -1.96,
+    "by_regime": {
+      "EXTREME": "103T 44.7%WR -$0.19 (best)",
+      "HIGH": "81T 43.2%WR -$1.01",
+      "NORMAL": "33T 39.4%WR -$0.78",
+      "FLAT": "2T 100%WR +$0.03"
+    },
+    "by_signal": {
+      "volume-breakout-long+": "15T 73.3%WR +$1.76 (gem)",
+      "pump-chain+ LONG": "55T 41.8%WR +$1.23 (workhorse)",
+      "pullback-entry- SHORT": "30T 33.3%WR -$2.25 (cold streak)",
+      "pump-chain- SHORT": "31T 45.2%WR -$0.88 (cold streak)",
+      "mover+ LONG": "14T 42.9%WR -$1.12 (KILLED today)"
+    }
+  },
+  "trade_summary_14d": {
+    "total_trades": 444,
+    "win_rate": 47.7,
+    "pnl": -0.34,
+    "by_regime": {
+      "EXTREME": "180T 50%WR -$0.17 (best)",
+      "HIGH": "172T 44.8%WR -$3.19 (worst)",
+      "NORMAL": "90T 46.7%WR -$1.38",
+      "FLAT": "2T 100%WR +$0.03"
+    }
+  },
+  "drift_findings": [
+    {
+      "topic": "REGIME_CONF_MULTIPLIER",
+      "status": "NOT IMPLEMENTED",
+      "sessions_suggested": "7+",
+      "data_support": "EXTREME 180T 50%WR -$0.17 vs NORMAL 90T 46.7%WR -$1.38 (14d). EXTREME has 3.3pt WR advantage and $1.21/14d PnL advantage.",
+      "impact": "Blocks nothing. Only adjusts fill quality. Expected +$0.50-1.00/7d.",
+      "confidence": "HIGH"
+    },
+    {
+      "topic": "volume_spike 100% NULL",
+      "status": "NOT FIXED",
+      "days_unfixed": "5+",
+      "data_support": "220/220 7d trades have NULL volume_spike. Chase filter blind to volume quality.",
+      "impact": "Chase filter cannot block entries on low-volume pumps. Some chasing trades execute that should be blocked.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "topic": "SHORT NULL RSI confidence boost",
+      "status": "NOT IMPLEMENTED",
+      "sessions_suggested": "3+",
+      "data_support": "14d NULL RSI SHORT: 21T 52.4%WR -$0.33 vs HAS_RSI: 152T 46.7%WR -$2.57. Detection-time fallback produces higher quality entries.",
+      "impact": "Boost confidence for higher-quality entries. Expected +$0.20-0.40/7d.",
+      "confidence": "HIGH"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "pullback-entry- SHORT cold streak",
+      "severity": "HIGH",
+      "detail": "7d: 30T 33.3%WR -$2.25. 14d: 98T 45.9%WR -$2.00. 30d: 119T 52.1%WR +$0.35. Cold streak but not systemic — 30d still profitable.",
+      "root_cause": "EXTREME whipsaw + NORMAL regime bleed. 7d NORMAL: 6T 16.7%WR -$0.83. Signal was designed for EXTREME.",
+      "recommendation": "Monitor 48h. If NORMAL regime continues bleeding, consider blocking pullback-entry- in NORMAL only."
+    },
+    {
+      "topic": "pump-chain- SHORT HIGH regime",
+      "severity": "MEDIUM",
+      "detail": "7d HIGH: 4T 25%WR -$0.52. 14d: 68T 51.5%WR -$0.78 total.",
+      "root_cause": "HIGH regime whipsaw — not enough trend for SHORT entries.",
+      "recommendation": "Small sample (4T). Monitor 48h. If HIGH continues bleeding, block pump-chain- SHORT in HIGH only."
+    },
+    {
+      "topic": "CL-T1 disabled",
+      "severity": "RESOLVED",
+      "detail": "CL_TIER1_MIN_PCT=0 (impossible range). 25T/14d 0%WR -$3.11 removed. Only 2 CL-T1 exits since fix (both losses from before disable).",
+      "recommendation": "Verified working. No action needed."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "REGIME_CONF_MULTIPLIER",
+      "priority": "HIGH",
+      "expected_impact": "+$0.50-1.00/7d",
+      "risk": "LOW (blocks nothing, only adjusts confidence)"
+    },
+    {
+      "item": "SHORT NULL RSI confidence boost",
+      "priority": "MEDIUM",
+      "expected_impact": "+$0.20-0.40/7d",
+      "risk": "LOW"
+    },
+    {
+      "item": "volume_spike recording fix",
+      "priority": "MEDIUM",
+      "expected_impact": "Enables chase filter volume quality check",
+      "risk": "LOW (code fix, not config change)"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-24T19:00:00Z",
+      "idea": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x confidence scaling",
+      "rationale": "14d data: EXTREME 180T 50%WR -$0.17 vs NORMAL 90T 46.7%WR -$1.38. EXTREME has 3.3pt WR advantage and $1.21/14d PnL advantage. pump-chain+ LONG EXTREME RSI50-65 = 16T 62.5%WR +$1.10 (best band). Confidence scaling rewards high-quality regime entries, penalizes low-quality ones. No trades blocked — only fill quality adjusted.",
+      "expected_impact": "+$0.50-1.00/7d",
+      "category": "confidence tuning",
+      "status": "suggested (7th time)",
+      "risk": "low",
+      "implementation": "Add to signal_compactor.py or decider_run.py: if volatility_regime == 'EXTREME': confidence *= 1.15, elif volatility_regime == 'NORMAL': confidence *= 0.85"
+    },
+    {
+      "date": "2026-09-24T19:00:00Z",
+      "idea": "pump-chain- SHORT HIGH regime block",
+      "rationale": "7d HIGH: 4T 25%WR -$0.52. 14d total still profitable (51.5%WR -$0.78). HIGH regime whipsaw kills SHORT entries — not enough sustained trend. EXTREME is where pump-chain- SHORT thrives (14d: 25T 44%WR -$0.42 with cold streak, but 30d: 79T 54.4%WR +$0.29).",
+      "expected_impact": "+$0.13/7d (blocks $0.52 bleed, small sample caveat)",
+      "category": "regime filter",
+      "status": "suggested (monitor 48h)",
+      "risk": "low (small sample — 4T)"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "1. IMPLEMENT: REGIME_CONF_MULTIPLIER (EXTREME 1.15x, NORMAL 0.85x) — highest-impact, lowest-risk change. 7th suggestion, data keeps confirming.",
+    "2. MONITOR: CL-T1 disable impact (expected +$1.56/7d). Verify no trades firing in impossible range.",
+    "3. MONITOR: pullback-entry- SHORT cold streak. NORMAL regime bleed (6T 16.7%WR -$0.83/7d). If continues 48h, block in NORMAL only.",
+    "4. FIX (code): volume_spike recording — 100% NULL for 5+ days. Chase filter blind to volume quality.",
+    "5. MONITOR: pump-chain- SHORT HIGH regime (4T 25%WR -$0.52). Small sample — needs 48h more data."
+  ]
 }

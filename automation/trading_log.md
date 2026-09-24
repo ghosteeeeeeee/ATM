@@ -1,3 +1,85 @@
+## [2026-09-24 19:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses) | **Open:** 2 (KAS pump-chain- SHORT 1.6h, BTC continuum-osc+ LONG 0.7h)
+**24h:** 35T 34.3%WR -$2.26 (avg -$0.065) | **7d:** 219T 43.4%WR -$2.14
+
+**Last hour closes:**
+- BTC pump-chain- SHORT: +$0.03 (pump_exit_dead_money)
+- CASHCAT pump-chain- SHORT: +$0.06 (atr_sl_hit — still won despite SL label)
+
+**24h exit reasons:**
+- atr_sl_hit: 20T (57.1%) avg -$0.110 — **ABOVE 40% THRESHOLD (unchanged)**
+- pump_exit_dead_money: 9T avg +$0.036
+- profit-monster-trail: 3T avg +$0.010
+- cut-loser-CL-T1: 2T avg -$0.205
+- pump_exit_momentum: 1T $0.00
+
+**24h signal ranking (3+ trades):**
+- pump-chain-: 22T 45.5%WR -$0.55 (avg -$0.025/trade — nearly flat)
+  - avg_win +$0.094 vs avg_sl_loss -$0.067 (winners bigger than SL losses — good R:R)
+  - Drag from cut-loser exits (-$0.205 avg) and momentum exits ($0)
+- bb-bounce-v2-long+: 3T 33.3%WR -$0.16
+- mover+: 3T 0%WR -$0.61 (ALREADY KILLED 02:25 UTC, legacy)
+
+**7d SL hit trend:**
+- Sep 24: 29T 62.1%SL -$2.53
+- Sep 23: 32T 37.5%SL -$0.20 (best day)
+- Sep 22: 24T 70.8%SL -$2.21
+- Sep 21: 28T 71.4%SL -$1.12
+- Sep 20: 27T 96.3%SL +$2.28 (high SL% but profitable — winners were large)
+
+**Changes:** None — no strict kill candidate (0T closed last hour by losing signal), no overtrading (~1/hr), pump-chain- nearly flat.
+
+**No Change Needed:**
+- No kill candidates by strict criteria
+- No overtrading (2 trades/hr)
+- pump-chain- R:R is slightly favorable (win > SL loss) — exits are the problem, not entry quality
+- atr_sl_hit flagged to CEO at 18:13, still pending
+
+**Open Questions:**
+- **atr_sl_hit 57.1%** — CEO flag from 18:13 still pending. System bleeding -$2.26/24h.
+- cut-loser-CL-T1 at -$0.205 avg is the hidden drag — only 2T but largest per-trade loss.
+- pump-chain- entry quality is fine (45.5% WR, winners bigger than SL losses). The problem is exit management, not signal quality.
+
+**BY:** auto_1hr
+
+## [2026-09-24 18:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 2 (BTC pump-chain- SHORT +$0.05 1.9h, KAS pump-chain- SHORT +$0.09 0.7h)
+**24h:** 35T 34.3%WR -$2.26 (avg -$0.065) | **7d:** 219T 43.4%WR -$2.14
+
+**24h exit reasons:**
+- atr_sl_hit: 20T (57.1%) avg -$0.11 — **ABOVE 40% THRESHOLD** (was 39.4% at 07:12)
+- pump_exit_dead_money: 8T avg +$0.036
+- profit-monster-trail: 3T avg +$0.010
+- cut-loser-CL-T1: 2T avg -$0.205
+- pump_exit_momentum: 1T $0.00
+
+**24h signal ranking (3+ trades):**
+- pump-chain-: 22T 40.9%WR -$0.56 (dominant, nearly flat -$0.025 avg)
+- mover+: 3T 33.3%WR -$0.61 (ALREADY KILLED at 02:25 UTC, legacy trades)
+- bb-bounce-v2-long+: 3T 33.3%WR -$0.16
+
+**Daily SL hit trend (7d):**
+- Sep 23: 32T 37.5%SL -$0.20 (best day)
+- Sep 24: 28T 64.3%SL -$2.56 (worst day — SL hits spiked back up)
+
+**Changes:** None — no strict kill candidate (0 trades last hour), no overtrading (~2/hr), no signal with 0%WR/3+ trades in last hour.
+
+**No Change Needed:**
+- No kill candidates by strict criteria
+- No overtrading
+- pump-chain- nearly flat at -$0.025 avg (not killable)
+
+**Open Questions:**
+- **atr_sl_hit 57.1%** — well above 40% threshold. 1.3% SL floor (ATR_SL_MIN) causing majority of losses. CEO decision needed on widening SL floor.
+- Today is worst day in 7d window: -$2.56 driven by SL hit spike (64.3% vs 37.5% yesterday). Regime-driven?
+- pump-chain- 22T 40.9% WR — signal works but exits kill profitability.
+
+**CEO FLAG:** atr_sl_hit 57.1% (threshold 40%). System bleeding -$2.26/24h, -$2.14/7d. SL floor review needed.
+
+**BY:** auto_1hr
+
 ## [2026-09-24 07:12 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 4 (BTC continuum-osc+ LONG 4.4h, BABY mover+ LONG 2.1h, KAS pump-chain- SHORT 1.1h, CASHCAT pump-chain- SHORT 0.3h)

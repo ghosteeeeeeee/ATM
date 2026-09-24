@@ -1889,5 +1889,23 @@
     "category": "entry sniper",
     "status": "monitor (WATCHDOG)",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-24T19:00:00Z",
+    "idea": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x confidence scaling (7th suggestion)",
+    "rationale": "14d: EXTREME 180T 50%WR -$0.17 vs NORMAL 90T 46.7%WR -$1.38. pump-chain+ LONG EXTREME RSI50-65 = 16T 62.5%WR +$1.10. Blocks nothing — only adjusts fill quality.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "confidence tuning",
+    "status": "suggested (7th time)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-24T19:00:00Z",
+    "idea": "pump-chain- SHORT HIGH regime block (monitor 48h)",
+    "rationale": "7d HIGH: 4T 25%WR -$0.52. Small sample but HIGH regime whipsaw kills SHORT entries. EXTREME is where pump-chain- thrives.",
+    "expected_impact": "+$0.13/7d (blocks $0.52 bleed)",
+    "category": "regime filter",
+    "status": "suggested (monitor)",
+    "risk": "low"
   }
 ]
