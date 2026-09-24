@@ -2915,3 +2915,9 @@
   REGIME_CONF_MULTIPLIER suggested: EXTREME 1.15x, NORMAL 0.85x (+$0.50-1.00/7d).
   No config changes. Monitoring today's fixes.
   BY: brain_auditor
+[2026-09-24 01:10 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 34T 47.1%WR -$0.13 (improving). 0 trades last hour. 1 open (COMP SHORT, 19min, flat).
+  atr_sl_hit 35.3% (below 40%). No kill candidates. No overtrading.
+  14d: 452T 49.6%WR $0.01 (breakeven, system recovered).
+  pullback-entry- 110T/14d -$1.14 biggest drag — tuning needed, not kill.
+  BY: auto_1hr

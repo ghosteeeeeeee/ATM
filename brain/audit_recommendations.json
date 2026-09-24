@@ -1,126 +1,101 @@
 {
-    "timestamp": "2026-09-24T00:30:00Z",
-    "session_brain_stats": {
-        "top_signals": ["signal performance winrate regime", "new signal idea improvement", "loss money bleeding"],
-        "recurring_themes": ["CL-T1 pure loss machine", "NORMAL regime bleeding", "SIGNAL DIVERSITY critical", "volume_spike 100% NULL 5+ days"]
-    },
-    "trade_summary_24h": {
-        "total_trades": 32,
-        "win_rate": 46.9,
-        "pnl": -0.20,
-        "regime": "NEUTRAL",
-        "open_positions": 0,
-        "trend": "IMPROVING from -$0.80 earlier today"
-    },
-    "trade_summary_7d": {
-        "total_trades": 204,
-        "win_rate": 44.6,
-        "pnl": -0.53,
-        "best_signal": "volume-breakout-long+ 18T 66.7%WR +$1.46",
-        "workhorse": "pump-chain+ 55T 41.8%WR +$1.23",
-        "bleeder": "pullback-entry- SHORT 30T 33.3%WR -$2.25"
-    },
-    "trade_summary_14d": {
-        "total_trades": 452,
-        "win_rate": 50.2,
-        "pnl": "+$2.31",
-        "exit_breakdown": {
-            "profit-monster-trail": "79T 74.7%WR +$4.86 (dominant winner)",
-            "atr_sl_hit": "273T 48.4%WR -$1.60 (dominant loser)",
-            "cut-loser-CL-T1": "23T 0%WR -$2.70 (pure loss machine)"
-        }
-    },
-    "drift_findings": [
-        {
-            "issue": "SHORT_RSI_FLOOR enforcement in accel-300-breakout via STANDALONE_BYPASS",
-            "status": "MONITORING — floor was 25 until today, raised to 50. Recent accel-300 trades had RSI 26-64. RSI 26 (CFX) would now be blocked. RSI 28-40 trades also blocked.",
-            "impact": "Low — only 7T/14d, $-0.12 total",
-            "severity": "LOW"
-        },
-        {
-            "issue": "volume_spike 100% NULL in _signal_metadata for 5+ days",
-            "status": "UNFIXED — chase filter blind to volume quality",
-            "impact": "Unknown — can't measure what we can't see",
-            "severity": "MEDIUM"
-        },
-        {
-            "issue": "gap_at_entry NULL for tokens with <300 candles (mover+, volume-breakout-long+)",
-            "status": "FIXED Sep 23 — EMA100/EMA50 fallback added",
-            "impact": "Positive — chase filter now sees these tokens",
-            "severity": "RESOLVED"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "CL-T1 pure loss machine",
-            "data": "23T/14d 0%WR -$2.70. 13 different signals affected. Losses $0.07-$0.25. Hold times 7-315min.",
-            "root_cause": "CL_TIER1_MAX_PCT=-0.75 cuts too early. Trades that would have recovered get stopped.",
-            "recommendation": "Widen CL_TIER1_MAX_PCT from -0.75 to -1.25. But NO DATA shows trades between -0.75% and -1.25% — all losses exceed -1.25%. May not help. NEEDS FURTHER INVESTIGATION.",
-            "confidence": "LOW — insufficient data to confirm widening helps"
-        },
-        {
-            "problem": "NORMAL regime bleeding",
-            "data": "7d: NORMAL 33T 30.3%WR -$1.25 vs EXTREME 92T 47.8%WR +$1.55. Gap $2.80/7d.",
-            "root_cause": "All signals degrade in NORMAL. pump-chain+ LONG NORMAL 5T 20%WR -$0.35. pullback-entry- SHORT NORMAL 30T 43.3%WR -$0.67.",
-            "recommendation": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x. No trades blocked, only confidence adjusted. Expected +$0.50-1.00/7d.",
-            "confidence": "HIGH — 14d data confirms regime edge is real"
-        },
-        {
-            "problem": "SIGNAL DIVERSITY — only 2 types pass NEUTRAL confluence",
-            "data": "pump-chain+ LONG 80T +$0.95/14d, volume-breakout-long+ 18T +$1.46/14d. All others negative or killed.",
-            "root_cause": "NEUTRAL regime blocks most signals. Confluence gate requires 2+ signal types.",
-            "recommendation": "Develop new NEUTRAL-friendly signals. Session brain has unimplemented ideas (trend-following, wave periods, sma20_dip).",
-            "confidence": "HIGH — diversification is critical for edge decay protection"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "volume_spike recording in signal_compactor.py",
-            "status": "Flagged 5+ days, still 100% NULL",
-            "impact": "Chase filter blind to volume quality"
-        },
-        {
-            "item": "NEW NEUTRAL signal",
-            "status": "Discussed in session brain (trend-following, wave periods, sma20_dip) but not built",
-            "impact": "System relies on 2 signal types — single point of failure"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-24T00:30:00Z",
-            "idea": "REGIME_CONF_MULTIPLIER — boost confidence in EXTREME, suppress in NORMAL",
-            "rationale": "EXTREME 14d: pump-chain+ LONG 48T 45.8%WR +$1.19, pump-chain- SHORT 45T 57.8%WR +$0.72, volume-breakout-long+ 10T 70%WR +$1.51. NORMAL: pump-chain+ 5T 20%WR -$0.35, pullback-entry- 30T 43.3%WR -$0.67. Applying 1.15x to EXTREME confidence and 0.85x to NORMAL shifts ~20% of marginal trades toward EXTREME.",
-            "expected_impact": "+$0.50-1.00/7d",
-            "category": "regime adaptation",
-            "status": "suggested",
-            "risk": "low — no trades blocked, only confidence adjusted"
-        },
-        {
-            "date": "2026-09-24T00:30:00Z",
-            "idea": "pump-chain+ LONG RSI_MAX 75→70 — block RSI 70-75 dead zone",
-            "rationale": "14d: RSI 65-75 = 12T 41.7%WR +$0.67 (marginal). RSI 75-85 = 10T 40%WR -$0.32 (dead zone). RSI 85+ = 13T 30.8%WR -$0.29. Would block RSI 70-75 (12T +$0.67) — NET NEGATIVE. Keep RSI_MAX=75.",
-            "expected_impact": "NEGATIVE — would block +$0.67 of winners",
-            "category": "entry sniper",
-            "status": "rejected — data shows RSI 65-75 is marginal positive",
-            "risk": "high — would hurt more than help"
-        },
-        {
-            "date": "2026-09-24T00:30:00Z",
-            "idea": "Widen bb-bounce-v2-long+ SL for HIGH regime — R:R=0.42 worst signal",
-            "rationale": "14d: HIGH 10T 50%WR -$0.06 (flat). R:R=0.42 means SL is too tight for HIGH volatility. Winners can't run. Wider SL would let winners breathe.",
-            "expected_impact": "+$0.10-0.20/7d",
-            "category": "exit optimization",
-            "status": "suggested",
-            "risk": "low — only affects bb-bounce-v2-long+ in HIGH"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "MONITOR: SHORT_RSI_FLOOR=50 impact (deployed today). Expected +$1.00-1.70/7d.",
-        "MONITOR: Dead hours fix impact (deployed today). Expected +$1.91/7d for pump-chain+.",
-        "MONITOR: LONG_RSI_FLOOR=30 impact (deployed today). Expected +$0.66/7d.",
-        "INVESTIGATE: CL-T1 — 23T/14d 0%WR -$2.70. Widening may not help (no data shows recovery). Consider DISABLE_CUT_LOSER for EXTREME regime.",
-        "DEVELOP: New NEUTRAL-friendly signals for diversity.",
-        "FIX: volume_spike recording in signal_compactor.py (5+ days unfixed)."
+  "timestamp": "2026-09-24T01:37:23Z",
+  "session_brain_stats": {
+    "queries_run": 6,
+    "key_insights": [
+      "CL-T1 is 0%WR across all signals — 23T/14d all lose. Fire windows (2,3) too tight.",
+      "pump-chain- SHORT hidden gem: 66T 57.6%WR +$1.14/14d. All EXTREME.",
+      "bb-bounce-v2-long+ CL-T1 losses: 4T/14d. Re-enabled Sep 22, early variance.",
+      "Regime-adaptive ATR_SL discussed but not implemented.",
+      "New NEUTRAL signals needed — only 2 types pass confluence."
     ]
+  },
+  "trade_summary_24h": {
+    "trades": 35,
+    "wr": 45.7,
+    "pnl": -0.26,
+    "regime": "EXTREME dominant",
+    "top_losers": "mover+ LONG -$0.50, accel-300 SHORT -$0.35",
+    "top_winners": "pump-chain- SHORT +$0.27, volume-breakout-long+ +$0.20"
+  },
+  "trade_summary_7d": {
+    "trades": 204,
+    "wr": 44.1,
+    "pnl": -0.78,
+    "extreme": "92T 46.7%WR +$1.23",
+    "normal": "33T 30.3%WR -$1.25",
+    "exit_analysis": "atr_sl_hit 131T 44.3%WR -$1.74, cut-loser-CL-T1 16T 0%WR -$1.51, profit-monster-trail 42T 57.1%WR +$1.61"
+  },
+  "drift_findings": [
+    {
+      "issue": "CL-T1 0%WR 23T/14d. Every trade loses $0.07-$0.25. Fire windows (2,3) minutes too tight — cuts before recovery.",
+      "impact": "-$2.70/14d = -$1.35/7d",
+      "status": "Needs investigation — fire windows or threshold change"
+    },
+    {
+      "issue": "pump-chain- SHORT outperforming (57.6%WR +$1.14/14d) but underutilized. Only 66T/14d vs pump-chain+ 80T.",
+      "impact": "Missed opportunity — pump-chain- has edge in EXTREME",
+      "status": "Consider boosting weight or confluence priority"
+    },
+    {
+      "issue": "volume_spike still 100% NULL in _signal_metadata (5+ days unfixed)",
+      "impact": "Chase filter blind to volume quality",
+      "status": "Code fix needed in signal_compactor.py"
+    }
+  ],
+  "recurring_problems": [
+    "CL-T1 pure loss machine — discussed in every audit since Sep 18",
+    "Signal diversity — only pump-chain+ and volume-breakout-long+ pass NEUTRAL confluence",
+    "NORMAL regime dragging: 33T 30.3%WR -$1.25/7d"
+  ],
+  "missing_implementations": [
+    "Regime-adaptive ATR_SL (wider SL in EXTREME, tighter in NORMAL)",
+    "New NEUTRAL signal for diversity",
+    "volume_spike recording fix",
+    "CL-T1 fire window widening (discussed Sep 18, not changed)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-24T01:37:23Z",
+      "idea": "Tighten PUMP_CHAIN_LONG_RSI_MAX 75→70 to block RSI 70-75 dead zone",
+      "rationale": "14d: RSI 70-75 = 6T 33.3%WR +$0.35 (marginal). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Blocks dead zone entries, preserves best band.",
+      "expected_impact": "+$0.03-0.10/7d (small but positive)",
+      "category": "entry sniper",
+      "status": "implemented",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-24T01:37:23Z",
+      "idea": "Widen CL-T1 fire windows from (2,3) to (4,6) — trades cut at 2-3min before recovery",
+      "rationale": "All 23 CL-T1 trades/14d lose. Hold times 7-316min. Fire windows (2,3) cut before price can recover. Widening gives trades room to breathe.",
+      "expected_impact": "+$0.50-1.00/7d (if even 30% of CL-T1 trades would have recovered)",
+      "category": "exit optimization",
+      "status": "suggested",
+      "risk": "medium — could increase losses on trades that dont recover"
+    },
+    {
+      "date": "2026-09-24T01:37:23Z",
+      "idea": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x confidence scaling",
+      "rationale": "EXTREME 46.7%WR +$1.23 vs NORMAL 30.3%WR -$1.25 (7d). Scaling confidence by regime amplifies strong regime signals and dampens weak ones.",
+      "expected_impact": "+$0.50-1.00/7d",
+      "category": "regime optimization",
+      "status": "suggested",
+      "risk": "low — only adjusts confidence, doesnt block trades"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70",
+      "file": "hermes_constants.py",
+      "rationale": "Block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Preserve RSI 50-60 sweet spot (19T 63.2%WR +$1.49).",
+      "expected_impact": "+$0.03-0.10/7d"
+    }
+  ],
+  "next_actions": [
+    "MONITOR: SHORT_RSI_FLOOR=50 + LONG_RSI_FLOOR=30 + dead hours fixes — deployed Sep 23, need 48h to measure.",
+    "INVESTIGATE: CL-T1 fire windows — consider widening (2,3)→(4,6). 23T/14d 0%WR -.70.",
+    "DEVELOP: New NEUTRAL signal for diversity. Only pump-chain+ and volume-breakout-long+ pass confluence.",
+    "FIX: volume_spike recording in signal_compactor.py (5+ days NULL).",
+    "MONITOR: PUMP_CHAIN_LONG_RSI_MAX=70 impact on pump-chain+ LONG performance."
+  ]
 }

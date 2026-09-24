@@ -1225,7 +1225,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
 PUMP_CHAIN_LONG_DEAD_HOURS = [1, 2, 3, 4, 5, 7, 8, 13, 21, 22]  # CEO 2026-09-23: fixed from [0,1,2,3,4,5,21,23]. 14d: hours 1,2,3,4,5,7,8,13,21,22 = 40T -$3.82. Hour 0 (+$0.72) and 23 (+$0.69) were wrongly blocked. Expected +$3.82/14d = +$1.91/7d.
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
-PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-09-22 — 14d: RSI 76-80 = 6T 0%WR -$0.82 (dead zone). RSI>80 = 14T +$1.13 (big winners). Block dead zone, preserve big winners.
+PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-09-24 — 14d: RSI 65-75 = 15T 41.7%WR +$0.02 (dead zone, flat). RSI>75 = 10T 40%WR -$0.32 (negative). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Tightened 75→70 to block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Expected +$0.03-0.10/7d.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
 
 # pullback-entry- SHORT dead hours — 14d data: hours 4,8,13,20 = -$2.81/14d (25T). Hour 04: 6T 16.7%WR -$0.84, 08: 4T 25%WR -$0.51, 13: 4T 25%WR -$0.44, 20: 11T 18.2%WR -$1.02. CEO 2026-09-23: fixed from [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72).

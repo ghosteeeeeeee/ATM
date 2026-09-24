@@ -5441,3 +5441,41 @@ Final set: ['ALGO', 'ME']
 - accel-300-breakout: 7T 28.6%WR -$0.12 — improving from -$0.30 range, watching
 
 **BY:** auto_1hr
+
+## [2026-09-24 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet night) | **Open:** 1 (COMP SHORT pump-chain- 19min flat)
+**24h:** 34T, 47.1% WR, $-0.13 (improving from -$0.20 yesterday)
+
+**24h exit reasons:**
+- atr_sl_hit: 12T (35.3%) avg -$0.023
+- profit-monster-trail: 12T avg +$0.003
+- pump_exit_dead_money: 5T avg +$0.064
+- cut-loser-CL-T1: 4T avg -$0.093
+- UNIVERSAL_MAX_HOLD: 1T avg +$0.160
+
+**24h signal ranking:**
+- pump-chain-: 10T 60%WR +$0.40 (best)
+- volume-breakout-long+: 2T 50%WR +$0.05
+- bb-bounce-v2-long+: 8T 50%WR $0.00
+- accel-300-breakout: 7T 28.6%WR -$0.12
+- mover+: 3T 33.3%WR -$0.34
+
+**14d big picture:** 452T, 49.6%WR, $0.01 (breakeven — system recovered from Sep 21-22 losses)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 35.3% — below 40% threshold ✓ (improved from 42.9% on Sep 22)
+- No overtrading (1.4/hr avg, 2 last hour)
+- No kill candidates (no signal 0%WR with 3+ trades last hour)
+- mover+: 17T/14d 64.7%WR -$0.36 — high WR but negative PnL (loses big on losses). Marginal, needs more data.
+- pullback-entry-: 110T/14d 48.2%WR -$1.14 — biggest long-term drag but too many trades to kill cleanly
+- trend_purity+: 11T/14d 36.4%WR -$0.90 — bad but small sample
+
+**Open Questions:**
+- pullback-entry- is the biggest 14d PnL drag (-$1.14). With 110T, this is a tuning problem not a kill candidate.
+- mover+ has inverted risk profile: 64.7% WR but -$0.36 total — when it loses, it loses bigger than it wins.
+- cut-loser-CL-T1 systemic across 13 signals — TPSL review still pending from prior analysis
+
+**BY:** auto_1hr

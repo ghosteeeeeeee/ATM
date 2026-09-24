@@ -450,5 +450,16 @@
     "after": "SHORT_RSI_FLOOR = 50",
     "rationale": "14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot). 0 winners in 35-50 band. Blocks 39 losers, loses 0 winners.",
     "impact": "+$2.70/14d = +$1.35/7d"
+  },
+  {
+    "timestamp": "2026-09-24T01:37:33Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "PUMP_CHAIN_LONG_RSI_MAX = 75",
+    "after": "PUMP_CHAIN_LONG_RSI_MAX = 70",
+    "rationale": "14d: RSI 70-75 = 6T 33.3%WR +$0.35 (dead zone). Tightened to block this band while preserving RSI 50-60 sweet spot (19T 63.2%WR +$1.49). Expected +$0.03-0.10/7d.",
+    "impact": "Blocks ~6 pump-chain+ LONG trades/14d in RSI 70-75 range"
   }
 ]
