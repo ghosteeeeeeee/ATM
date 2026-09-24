@@ -513,6 +513,9 @@ def get_combined_multiplier(signal_type, regime, phase):
         pass
     
     # Clamp to reasonable range (prevent extreme multipliers from crushing scores)
+    # 0.0 = hard block (regime ban), preserve it; floor everything else at 0.3
+    if mult == 0.0:
+        return 0.0
     return max(0.3, min(2.0, mult))
 
 
@@ -569,6 +572,11 @@ def should_trade_v2(token, signal=None):
         combined_mult = get_combined_multiplier(signal, regime, phase)
         info['combined_mult'] = combined_mult
         info['signal'] = signal
+        
+        # Hard block: 0.0 multiplier = signal is banned in this regime
+        # Fixes bug where VOL_PHASE_MULTS 0.0 was clamped to 0.3 and ignored
+        if combined_mult == 0.0:
+            return ('SKIP', f'regime_block: {signal} banned in {regime} (mult=0.0)')
         
         # Apply multiplier to confidence (if available)
         # A mult > 1.0 means this is a high-probability setup
