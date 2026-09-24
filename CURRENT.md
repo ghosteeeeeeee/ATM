@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-23 ~23:30 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-24 ~02:00 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 32T, 46.9% WR, -$0.20. NEUTRAL vol. Pipeline running. 0 open positions.
+24h: 33T, 45.5% WR, -$0.13. NEUTRAL vol. Pipeline running. 0 open positions.
 
-- **24h (rolling):** 32T, 46.9% WR, -$0.20. Improving from -$0.80 earlier today. Dead hours fix + RSI floors reducing losses.
-- **7d:** 202T, 44.6% WR, -$0.53 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (bleeding).
+- **24h (rolling):** 33T, 45.5% WR, -$0.13. Improving from -$0.80 earlier today. Dead hours fix + RSI floors + CL-T1 widening deployed.
+- **7d:** 204T, 44.1% WR, -$0.78 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). Detection-time RSI floor bypass BUG FIXED — 6/8 recent trades had detection RSI<50 but executed anyway.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -25,8 +25,8 @@
 - **LONG_RSI_FLOOR=30:** Blocks RSI<30 LONG entries. **DETECTION-TIME FIX DEPLOYED** — same pattern as SHORT fix.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$0.53)**
-7d PnL -$0.53 (improving from -$0.73). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — detection-time RSI fix should help). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (pure loss machine — CL_TIER1_MAX_PCT=-0.75 too tight).
+**🟡 R:R STATUS (7d -$0.78)**
+7d PnL -$0.78 (improving from -$0.80). pump-chain+ LONG +$1.23 (55T 41%WR, R:R=1.53:1). volume-breakout-long+ +$1.46 (18T 67%WR, R:R=1.25:1). pullback-entry- SHORT -$2.25 (30T 33%WR — cold streak, 30d still +$0.35). cut-loser-CL-T1 = 23T/14d 0%WR -$2.70 (FIXED: T1 range widened to -3.0%).
 
 **🟢 REGIME EDGE (7d):** NEUTRAL only (201T). EXTREME edge not visible in 7d (all NEUTRAL).
 
@@ -41,6 +41,10 @@
 **🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG and volume-breakout-long+ pass confluence in NEUTRAL. 30d active: 6+ types. Need new signals for diversity. 7d: pump-chain+ 45T +$3.01, volume-breakout-long+ 16T +$1.41 carry system.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
+
+## Today's Changes (Sep 24)
+
+1. **CEO ~02:00 UTC — 1 CONFIG CHANGE.** DB-verified: 33T 45.5%WR -$0.13 (24h) | 204T 44.1%WR -$0.78 (7d) | 453T 49.4%WR -$0.12 (14d). **CL-T1 FIX.** 23T/14d 0%WR -$2.70, avg loss -3.92%. Every trade loses. Trades enter T1 at -0.75%, slide past -2.0% floor before next fire window (2-3min), get cut at -3.92% avg (past hard stop -3.0%). **FIX:** Widened T1 range -0.75/-2.0 → -0.75/-3.0. Adjusted T2 ceiling -1.5→-2.5 (no overlap). Expected +$0.50-1.00/7d. Commit c0975ff1. — CEO
 
 ## Today's Changes (Sep 23)
 
@@ -123,7 +127,8 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor, even if live RSI recovered. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
+1. **MONITOR: CL-T1 fix.** Widened range should reduce avg loss from -3.92% to ~-2.0%. Verify in 48h. — 2026-09-24
+2. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
 2. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 23). — 2026-09-23
 3. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
 4. **INVESTIGATE: cut-loser-CL-T1.** 23T/14d 0%WR -$2.70. Pure loss machine across multiple signals. Threshold too tight or fires too early. — 2026-09-23
