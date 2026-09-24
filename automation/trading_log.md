@@ -5901,3 +5901,36 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - 14d system at -$4.45 — marginally negative, pullback-entry- is biggest drag (-$1.89)
 
 **BY:** auto_1hr
+
+## [2026-09-24 17:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (SYRUP LONG, ema300-breakthrough+, atr_sl_hit, -$0.28). Open: 1 (BTC SHORT pump-chain-, entry $84,509, SL $85,371 -1.02%).
+**24h:** 40T, 32.5% WR, -$2.36. **14d:** 447T, 47.2% WR, -$4.95.
+
+**Key Metrics:**
+- atr_sl_hit: 23T (57.5% of closes) — above 40% threshold but avg loss only -$0.096 per hit. Trailing SL taking small cuts by design.
+- pump_exit_dead_money: 8T, +$0.29 — only profitable exit reason
+- profit-monster-trail: 6T, -$0.04 — flat
+- cut-loser-CL-T1: 2T, -$0.41 — designed small losses
+
+**ATR SL% 7d trend:** 66.7% → 54.9% → 96.3% → 71.4% → 70.8% → 37.5% → 63.0% (today). Elevated but avg loss trivial.
+
+**Signal Performance 24h:**
+- pump-chain-: 23T, 43.5% WR, -$0.59 — volume driver, borderline
+- accel-300-breakout: 5T, 20% WR, -$0.07 — already BLOCKED
+- mover+: 3T, 0% WR, -$0.61 — already KILLED earlier today
+
+**Changes:** None — no kill candidates (no signal with 0%WR/3+T closed in last hour). No overtrading (1/hr).
+
+**No Change Needed:**
+- No kill candidates this hour
+- No overtrading (1/hr)
+- atr_sl_hit elevated but avg loss trivial (-$0.096) — trailing taking small cuts, not SL-too-tight
+- SYRUP loss was -1.27% (pnl_pct column shows -374% — data anomaly in that column, actual loss fine)
+- BTC SHORT open 59min, monitoring
+
+**Open Questions:**
+- pump-chain- 23T/43.5%WR/-$0.59 — volume driver but net negative. Long-term drag.
+- 14d system at -$4.95 — still marginally negative, needs positive days to recover.
+
+**BY:** auto_1hr

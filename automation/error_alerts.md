@@ -65,3 +65,21 @@
 
 ## Error Alerts — 2026-09-24 15:57 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS TOK signal_compactor: timed out (killed after N.0s)`
+
+## Error Alerts — 2026-09-24 16:45 UTC
+- **[WARN]** (15x/2h): `signal_compactor: timed out (killed after 60.1s)` — caused by DB lock contention on `info_rate` table (13,053 lock-wait retries). Intermittent: recovers on next cycle. Last 3 runs OK (0.8s, 0.9s, 1.9s).
+- **AUTO-FIX**: No action needed — self-healing. If pattern persists, investigate concurrent writers to `info_rate`.
+- **[WARN]** (1x): `Disk at 85%` — 95G/118G used. Top consumers: signal-compactor.log (34M), pipeline.log (30M), 15m_regime.log (25M).
+- **AUTO-FIX**: Compressed old logs. No data dir cleanup (requires manual review).
+
+## Error Alerts — 2026-09-24 16:57 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] W TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-24 17:47 UTC
+- **WARN** (2x): `signal_compactor: timed out (killed after 60.1s)` at 17:35 and 17:43 — DB lock contention on `info_rate` table (13,157 total LOCK-WAIT retries in err.log). Self-heals on next cycle.
+- **WARN** (1x): `ImportError: cannot import name 'SPEED_HOTSET_THRESHOLD'` — stale .pyc files causing intermittent import failure.
+- **AUTO-FIX**: Cleaned all __pycache__/*.pyc files. Verified import works: `SPEED_HOTSET_THRESHOLD=80, SPEED_HOTSET_BONUS=0.15`.
+- **WARN** (1x): Hotset empty — 0 tokens survived compaction. Not an error; no signals meeting criteria right now.
+- **WARN** (1x): Disk at 85% (94G/118G). Freed ~1GB via journal vacuum (423MB) + log compression.
+- **INFO**: Pipeline healthy. 3 open positions (BTC SHORT in profit, CASHCAT SHORT). 34 closed today, -56% PnL. All timers active.

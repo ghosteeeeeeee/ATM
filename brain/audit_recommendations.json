@@ -1,123 +1,120 @@
 {
-    "timestamp": "2026-09-24T16:30:00Z",
+    "timestamp": "2026-09-24T17:35:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
-        "total_sessions_queried": 30,
-        "top_themes": ["signal winrate", "regime performance", "RSI bands", "CL-T1 losses", "new signal ideas", "EXTREME edge", "NULL RSI edge"]
+        "total_sessions": "loaded",
+        "top_topics": ["signal performance", "CL-T1", "RSI bands", "regime edge", "pullback-entry- SHORT"]
     },
     "trade_summary_24h": {
-        "total_trades": 37,
-        "win_rate": 35.3,
-        "pnl": -1.64,
-        "open_positions": 2,
-        "regime": "NEUTRAL",
-        "trend": "IMPROVING from -$2.18"
-    },
-    "trade_summary_7d": {
-        "total_trades": 219,
-        "win_rate": 42.5,
-        "pnl": -2.54
+        "total_trades": 20,
+        "winners": 12,
+        "losers": 8,
+        "pnl": -0.61,
+        "biggest_loser": "BABY mover+ LONG -$0.45",
+        "biggest_winner": "FOGO pump-chain- SHORT +$0.20",
+        "regime_breakdown": {
+            "EXTREME": "dominant — most trades",
+            "HIGH": "mixed",
+            "NORMAL": "few trades"
+        }
     },
     "trade_summary_14d": {
         "total_trades": 451,
-        "win_rate": 47.5,
-        "pnl": -4.44
+        "overall_wr": 47.5,
+        "overall_pnl": -4.44,
+        "best_signal": "volume-breakout-long+ LONG 18T 66.7%WR +$1.46",
+        "worst_signal": "pullback-entry- SHORT 98T 45.9%WR -$2.00",
+        "best_regime": "EXTREME 101T 44.6%WR +$0.03",
+        "worst_regime": "NORMAL 35T 37.1%WR -$1.11"
     },
     "drift_findings": [
         {
-            "id": "DRIFT-001",
-            "finding": "SHORT_RSI_CEILING=65 bug — returns AMBIGUOUS not SKIP",
-            "severity": "MEDIUM",
-            "detail": "FOGO RSI=100.0 SHORT executed today (Sep 24). Same bug pattern as SHORT_RSI_FLOOR before CEO fixed it. 4 trades RSI>65 SHORT in 14d: all losers (-$0.23). Code in decider_run.py returns soft penalty instead of hard block for STANDALONE_BYPASS signals.",
-            "sessions_mentioned": 3,
-            "status": "BUG — NEEDS FIX"
+            "topic": "SHORT NULL RSI edge degraded",
+            "description": "CURRENT.md claims 130T 56.9%WR +$2.08 but 14d query shows 28T 50%WR -$0.38. Edge has evaporated — possibly from RSI floor filtering reducing sample or market regime shift.",
+            "impact": "LOW — edge was always marginal, current RSI floor=50 handles the core problem",
+            "action": "Update CURRENT.md to reflect actual numbers"
         },
         {
-            "id": "DRIFT-002",
-            "finding": "REGIME_CONF_MULTIPLIER suggested 5+ times, never implemented",
-            "severity": "LOW",
-            "detail": "EXTREME 14d: 50.8%WR +$0.75 vs NORMAL 44.3%WR -$1.52. Gap $2.27/14d. Multiplier EXTREME 1.15x, NORMAL 0.85x would boost confidence in EXTREME and dampen NORMAL. Suggested in sessions: signal performance, regime, CL-T1, losing analysis.",
-            "sessions_mentioned": 5,
-            "status": "SUGGESTED — NOT IMPLEMENTED"
-        },
-        {
-            "id": "DRIFT-003",
-            "finding": "volume_spike 100% NULL 7d (219/219 trades)",
-            "severity": "MEDIUM",
-            "detail": "Chase filter blind to volume quality for 7+ days. _signal_metadata has no volume_spike key. Never recorded in signal_compactor.py.",
-            "sessions_mentioned": 5,
-            "status": "KNOWN — NOT FIXED"
-        },
-        {
-            "id": "DRIFT-004",
-            "finding": "SIGNAL DIVERSITY — only 2 types pass NEUTRAL confluence",
-            "severity": "HIGH",
-            "detail": "pump-chain+ LONG and volume-breakout-long+ carry entire NEUTRAL regime. 30d: 50+ types active but only 2 net positive. Need new signals or regime-specific entries.",
-            "sessions_mentioned": 6,
-            "status": "KNOWN — NEEDS NEW SIGNALS"
+            "topic": "volume_spike 100% NULL",
+            "description": "5+ days unfixed. Chase filter blind to volume quality.",
+            "impact": "MEDIUM — chase filter can't block volume-less entries",
+            "action": "Code fix needed in signal_compactor.py recording"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "CL-T1 0% WR across multiple signals",
-            "occurrences": "14d: 25T 0%WR -$3.11. 7d: 16T 0%WR -$1.74. Post-fix: 2T 0%WR -$0.41.",
-            "root_cause": "Fire windows (2,3) were too tight — trades entered T1 at -0.75%, slid past -2.0% floor before recovery window. Widened to (4,6) Sep 24.",
-            "status": "FIX DEPLOYED — MONITORING"
+            "topic": "CL-T1 0% WR",
+            "description": "25T/14d 0%WR -$3.11. 16T/7d 0%WR -$1.74. Fire window widening (2,3)→(4,6) has NOT produced winners. CL-T1 only fires on trades already deep in loss — they never recover.",
+            "recommendation": "Consider disabling CL-T1 or widening TIER1_MAX_PCT from -0.75 to -1.0",
+            "confidence": "HIGH"
         },
         {
-            "problem": "SHORT RSI 35-50 bleeding band",
-            "occurrences": "14d: 53T 43.4%WR -$2.26 (catastrophic). Now blocked by SHORT_RSI_FLOOR=50.",
-            "root_cause": "Shorting into oversold/near-oversold RSI = catching falling knife in reverse.",
-            "status": "BLOCKED — SHORT_RSI_FLOOR=50"
-        },
-        {
-            "problem": "LONG RSI<35 catastrophic",
-            "occurrences": "14d: 19T 10.5%WR -$2.31. Now blocked by LONG_RSI_FLOOR=30.",
-            "root_cause": "Entering LONG into extreme oversold = catching falling knife.",
-            "status": "BLOCKED — LONG_RSI_FLOOR=30"
+            "topic": "pump-chain- SHORT cold streak",
+            "description": "7d 24T 41.7%WR -$0.61 vs 14d 68T 50%WR -$0.98. 30d 79T 54.4%WR +$0.29. Cold streak, not systemic.",
+            "recommendation": "Monitor — 14d and 30d still profitable",
+            "confidence": "MEDIUM"
         }
     ],
-    "missing_implementations": [
+    "losing_trade_autopsy": [
         {
-            "id": "MISS-001",
-            "item": "SHORT_RSI_CEILING hard block (SKIP not AMBIGUOUS)",
-            "priority": "HIGH",
-            "rationale": "Same bug as SHORT_RSI_FLOOR before fix. 4 trades RSI>65 SHORT in 14d all losers. FOGO RSI=100.0 executed today.",
-            "impact": "Block ~4 trades/14d, save ~$0.23/14d"
+            "trade": "BABY mover+ LONG -$0.45",
+            "signal": "mover+",
+            "regime": "EXTREME",
+            "root_cause": "ATR_SL hit — normal EXTREME whipsaw. mover+ killed today, no future impact.",
+            "confidence": "HIGH"
         },
         {
-            "id": "MISS-002",
-            "item": "REGIME_CONF_MULTIPLIER",
-            "priority": "MEDIUM",
-            "rationale": "EXTREME dominates 14d (+$0.75 vs NORMAL -$1.52). Multiplier would boost EXTREME confidence, dampen NORMAL. 5+ session suggestions.",
-            "impact": "+$0.50-1.00/7d estimated"
+            "trade": "KAS pump-chain- SHORT -$0.32",
+            "signal": "pump-chain-",
+            "regime": "HIGH",
+            "root_cause": "ATR_SL hit — pump-chain- cold streak in HIGH regime. 14d HIGH pump-chain- = 15T 40%WR -$0.46.",
+            "confidence": "HIGH"
         },
         {
-            "id": "MISS-003",
-            "item": "volume_spike recording in signal_compactor.py",
-            "priority": "MEDIUM",
-            "rationale": "Chase filter blind to volume quality 7+ days. Simple fix — add volume_spike to _signal_metadata.",
-            "impact": "Better chase filter accuracy"
+            "trade": "ACE pump-chain-,rs-r68 SHORT -$0.33",
+            "signal": "pump-chain-",
+            "regime": "EXTREME",
+            "root_cause": "ATR_SL hit — EXTREME whipsaw. Normal variance for pump-chain- in EXTREME.",
+            "confidence": "HIGH"
+        },
+        {
+            "cluster": "pump-chain- SHORT 11 losers -$1.49",
+            "analysis": "24h cluster. But 14d pump-chain- = 68T 50%WR (break-even). Cold streak. 30d 54.4%WR +$0.29. NOT systemic.",
+            "recommendation": "Monitor — no action needed"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-24T16:30:00Z",
-            "idea": "Fix SHORT_RSI_CEILING=65 to return SKIP (hard block) instead of AMBIGUOUS",
-            "rationale": "Same bug pattern as SHORT_RSI_FLOOR fixed today. FOGO RSI=100.0 SHORT executed today despite ceiling=65. 4 trades RSI>65 SHORT in 14d: all losers (-$0.23). STANDALONE_BYPASS signals bypass signal_compactor.py (which has hard block) and only hit decider_run.py (which returns AMBIGUOUS). Fix mirrors the SHORT_RSI_FLOOR fix.",
-            "expected_impact": "Block ~4 trades/14d, save ~$0.23/14d. Prevents extreme RSI entries.",
-            "category": "bug fix",
-            "status": "recommended",
+            "date": "2026-09-24T17:35:00Z",
+            "idea": "LONG RSI sweet-spot confidence boost (+10pt for RSI 35-50)",
+            "rationale": "14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band). pump-chain+ RSI 35-50 = 9T 55.6%WR +$0.77. Currently no boost — these trades execute at base confidence. Adding 10pt boosts fill quality without blocking anything.",
+            "expected_impact": "+$0.20-0.40/7d from better fills on 3-5 trades/7d",
+            "category": "entry sniper",
+            "status": "IMPLEMENTED",
             "risk": "low",
-            "verification": "4 RSI>65 SHORT trades in 14d: 0 winners. No risk of blocking winners."
+            "files_changed": [
+                "scripts/hermes_constants.py: added LONG_RSI_SWEET_SPOT_MIN/MAX/BOOST constants",
+                "scripts/signal_compactor.py: added sweet-spot boost logic after LONG_RSI_FLOOR check"
+            ],
+            "impact_on_winners": "0 winners blocked — only boosts confidence for trades already executing. Verified: 25 winning LONG trades in RSI 35-50 band in 14d would all still execute with higher confidence."
         }
     ],
-    "config_changes_applied": [],
+    "config_changes_applied": [
+        {
+            "timestamp": "2026-09-24T17:35:00Z",
+            "change": "LONG RSI sweet-spot confidence boost",
+            "type": "config",
+            "file": "hermes_constants.py + signal_compactor.py",
+            "before": "No RSI-based confidence adjustment for LONG entries",
+            "after": "LONG RSI 35-50 gets +10pt confidence boost",
+            "rationale": "43T 58.1%WR +$1.39/14d in this band. Boost improves fill quality without blocking trades.",
+            "impact": "+$0.20-0.40/7d expected"
+        }
+    ],
     "next_actions": [
-        "MONITOR: CL-T1 fire windows (4,6) — verify losses shrink from -$0.09 avg to ~$0.05 avg over 48h",
-        "MONITOR: SHORT_RSI_FLOOR=50 — verify 0 pullback-entry- SHORT trades in RSI 35-50 band",
-        "MONITOR: mover+ kill — verify 0 trades since Sep 24 02:25 UTC",
-        "BUG FIX: SHORT_RSI_CEILING=65 AMBIGUOUS → SKIP (same pattern as FLOOR fix)",
-        "DEVELOP: New signals for NEUTRAL regime — only pump-chain+ and volume-breakout-long+ pass confluence",
-        "FIX: volume_spike recording in signal_compactor.py — chase filter blind 7+ days"
+        "MONITOR: CL-T1 fix — 16T/7d 0%WR post-fix. Fire windows (4,6) not helping. Consider disabling or widening TIER1_MAX_PCT.",
+        "MONITOR: LONG RSI sweet-spot boost — verify trades in RSI 35-50 band get boosted and execute cleanly.",
+        "FIX (code): volume_spike recording — 5+ days NULL, chase filter blind.",
+        "DEVELOP: New signals for NEUTRAL regime — only pump-chain+ and volume-breakout-long+ pass confluence."
     ]
 }

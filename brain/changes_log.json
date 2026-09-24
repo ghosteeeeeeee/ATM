@@ -484,5 +484,16 @@
     "rationale": "Same bug pattern as SHORT_RSI_FLOOR fixed earlier today. STANDALONE_BYPASS signals bypass signal_compactor.py (hard block) and only hit decider_run.py (was returning AMBIGUOUS). 4 RSI>65 SHORT trades in 14d: all losers (-$0.23).",
     "impact": "Block ~4 trades/14d, save ~$0.23/14d. Prevents extreme RSI SHORT entries.",
     "expected_impact": "+$0.02/7d"
+  },
+  {
+    "timestamp": "2026-09-24T17:35:00Z",
+    "agent": "brain_auditor",
+    "change": "LONG RSI sweet-spot confidence boost — +10pt when RSI 35-50",
+    "type": "config",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "No RSI-based confidence adjustment for LONG entries",
+    "after": "LONG RSI 35-50 gets +10pt confidence boost (LONG_RSI_SWEET_SPOT_BOOST=10)",
+    "rationale": "14d: LONG RSI 35-50 = 43T 58.1%WR +.39 (best defined band). Boost improves fill quality without blocking trades.",
+    "impact": "+$0.20-0.40/7d expected from better fills on 3-5 trades/7d"
   }
 ]

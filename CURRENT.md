@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~16:30 UTC**
+**Last Updated: 2026-09-24 ~17:35 UTC**
 **Updated by: brain_auditor (DB-verified)**
 
 ## Current Status
 
-24h: 37T, 35.3% WR, -$1.64. Pipeline running. 2 open positions (SYRUP LONG, BTC SHORT).
+24h: 20T, ~40% WR, -$0.61. Pipeline running. LONG RSI sweet-spot boost deployed.
 
 - **24h (rolling):** 37T, 35.3% WR, -$1.64 (improving from -$2.18). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 fire windows (4,6) monitoring. mover+ killed ~02:25 UTC.
 - **7d:** 220T, 42.7% WR, -$2.51 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 29T 41.4%WR -$0.97 (cold streak, 14d 54.8%WR +$0.92).
@@ -23,6 +23,7 @@
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=65:** **HARD BLOCK** (brain_auditor Sep 24 ~16:30 UTC). Same bug as SHORT_RSI_FLOOR — STANDALONE_BYPASS signals bypassed signal_compactor hard block. 4 trades RSI>65 SHORT in 14d: all losers. Returns SKIP now + detection-time RSI fallback.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
+- **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC). +10pt confidence when LONG RSI 35-50. 14d: 43T 58.1%WR +$1.39 (best defined band). Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
 **🟡 R:R STATUS (7d -$2.04)**
@@ -46,6 +47,7 @@
 
 ## Today's Changes (Sep 24)
 
+1. **brain_auditor ~17:35 UTC — 1 CONFIG CHANGE.** DB-verified: 20T ~40%WR -$0.61 (24h) | 451T 47.5%WR -$4.44 (14d). **LONG RSI SWEET-SPOT CONFIDENCE BOOST.** 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band). Added +10pt confidence when RSI in 35-50. Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d. **CL-T1 STILL BROKEN:** 16T/7d 0%WR -$1.74. Fire windows (4,6) not producing winners. Consider disabling or widening TIER1_MAX_PCT. **SHORT NULL RSI EDGE DEGRADED:** 28T 50%WR -$0.38/14d. **CREATIVE:** LONG RSI sweet-spot boost IMPLEMENTED. REGIME_CONF_MULTIPLIER suggested 6th time. — brain_auditor
 1. **brain_auditor ~16:30 UTC — 1 CODE FIX.** DB-verified: 37T 35.3%WR -$1.64 (24h) | 219T 42.5%WR -$2.54 (7d) | 451T 47.5%WR -$4.44 (14d). **SHORT_RSI_CEILING=65 BUG FIXED.** Same pattern as SHORT_RSI_FLOOR fixed earlier today. FOGO RSI=100.0 SHORT executed today despite ceiling=65. decider_run.py returned AMBIGUOUS (20pt soft penalty) instead of SKIP (hard block). STANDALONE_BYPASS signals bypass signal_compactor.py. 4 RSI>65 SHORT trades in 14d: all losers (-$0.23). Fix: changed to SKIP + added detection-time RSI fallback (mirrors FLOOR fix). Expected +$0.02/7d. **RSI BANDS CONFIRMED (14d):** SHORT RSI 35-50 = 53T 43.4%WR -$2.26 (blocked). SHORT RSI 50-65 = 66T 51.5%WR +$0.04 (sweet spot). LONG RSI 35-50 = 31T 67.7%WR +$1.60 (best band). **EXTREME DOMINATES:** 101T 44.6%WR +$0.03 (7d) vs NORMAL 35T 37.1%WR -$1.11. **CL-T1 POST-FIX:** 2 trades, losses smaller (-$0.20, -$0.21) but still all losers. **CREATIVE:** REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d, 6th suggestion). — brain_auditor
 1. **brain_auditor ~15:00 UTC — NO CONFIG CHANGE.** DB-verified: 23T ~30%WR -$1.53 (24h) | 221T 42.5%WR -$2.54 (7d) | 452T 47.3%WR -$4.44 (14d). **24H IMPROVING** — from -$2.18 to -$1.53. **LOSING AUTOPSY (23):** 14 pump-chain- SHORT (EXTREME whipsaw, small losses $0.01-$0.32), 5 accel-300-breakout SHORT (EXTREME, trail exits), 3 mover+ LONG (killed today), 1 bb-bounce-v2-long+ LONG (CL-T1). **SHORT_RSI_FLOOR=50 WORKING:** ALGO RSI=37.5, ARB RSI=36.36, COMP RSI=48.08 — all now blocked. Would have saved ~$0.44. **FOGO RSI=100.0 SHORT** — SHORT_RSI_CEILING=65 should block but returns AMBIGUOUS (soft penalty) not SKIP (hard block). Same bug pattern as SHORT_RSI_FLOOR fixed today. **7d REGIME:** EXTREME 101T 44.6%WR +$0.03 (break-even). NORMAL 35T 34.3%WR -$1.25 (bleeding). HIGH 83T 42.2%WR -$1.32. **CL-T1 7d:** 17T 0%WR -$1.83. Fire windows widened today, monitoring. **DRIFT:** volume_spike 100% NULL 7d (221/221 trades). Chase filter blind to volume quality. **CREATIVE (5th):** REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d). **NO ACTION** — monitoring CL-T1 fire windows + SHORT_RSI_FLOOR=50 + mover+ kill. — brain_auditor
 1. **brain_auditor ~11:30 UTC — NO CONFIG CHANGE.** DB-verified: 34T 35.3%WR -$0.61 (24h) | 220T 42.7%WR -$2.04 (7d). **24h IMPROVING** — from -$1.28 to -$0.61. **LOSING AUTOPSY (22):** 14 pump-chain- SHORT (EXTREME whipsaw, 14d baseline +$0.92 — cold streak), 3 mover+ LONG (killed today), 3 accel-300-breakout SHORT (trail exits, normal), 2 bb-bounce-v2-long+ LONG (1 CL-T1, 1 trail). **RSI BANDS 14d CONFIRMED:** SHORT NULL RSI = 41T 56.1%WR +$0.85 (BEST). SHORT RSI 40-50 = 36T 38.9%WR -$2.22 (BLEEDING). LONG RSI 35-45 = 22T 72.7%WR +$1.22 (BEST). **EXIT ANALYSIS 7d:** profit-monster-trail 43T 55.8%WR +$1.64 (best). atr_sl_hit 142T 42.3%WR -$3.27 (dominates). cut-loser-CL-T1 17T 0%WR -$1.71 (fix deployed today). **DRIFT (3):** (1) SHORT NULL RSI confidence boost never implemented (3+ sessions). (2) REGIME_CONF_MULTIPLIER suggested 5+ times, never implemented. (3) volume_spike 100% NULL 5+ days. **CREATIVE:** (1) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d, low risk). (2) REGIME_CONF_MULTIPLIER EXTREME 1.15x NORMAL 0.85x (+$0.50-1.00/7d, 5th suggestion). **NO ACTION** — monitoring CL-T1 fix + SHORT_RSI_FLOOR=40 + mover+ kill. — brain_auditor

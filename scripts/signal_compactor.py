@@ -3051,7 +3051,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
             # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
@@ -3219,6 +3219,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_lrf.close()
                         except Exception:
                             pass
+            # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
+            # 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
+            # Does NOT block — only boosts. Trades already pass MIN_EXEC_CONFIDENCE.
+            if direction == 'LONG' and LONG_RSI_SWEET_SPOT_BOOST > 0:
+                try:
+                    _conn_lss = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_lss = _conn_lss.cursor()
+                    _cur_lss.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _lss_closes = [r[0] for r in _cur_lss.fetchall()]
+                    _conn_lss.close()
+                    if len(_lss_closes) >= 15:
+                        _lss_deltas = [_lss_closes[i] - _lss_closes[i+1] for i in range(len(_lss_closes)-1)]
+                        _lss_gains = [d if d > 0 else 0 for d in _lss_deltas[-14:]]
+                        _lss_losses = [-d if d < 0 else 0 for d in _lss_deltas[-14:]]
+                        _lss_ag = sum(_lss_gains) / 14
+                        _lss_al = sum(_lss_losses) / 14
+                        if _lss_al > 0:
+                            _lss_rsi = 100 - (100 / (1 + _lss_ag / _lss_al))
+                            if LONG_RSI_SWEET_SPOT_MIN <= _lss_rsi <= LONG_RSI_SWEET_SPOT_MAX:
+                                entry['confidence'] = min(entry.get('confidence', 50) + LONG_RSI_SWEET_SPOT_BOOST, 100)
+                                log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {_lss_rsi:.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence")
+                except Exception:
+                    pass  # non-fatal
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──
             # Opposite of RSI floor — prevents SHORTing into strength where bounce risk is low
             # but momentum continuation risk is high. 7d: 20T RSI>=65 50%WR -$1.02.

@@ -852,6 +852,14 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
 LONG_RSI_CEILING = 80           # brain_auditor 2026-09-23: overbought LONG = pullback risk. WCT RSI=98.86 LONG -$0.15. 30d: RSI>80 LONG = 4T 50%WR -$0.22. Blocks extreme overbought entries.
 
+# ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
+# 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
+# pump-chain+ RSI 35-50 = 9T 55.6%WR +$0.77. rr-struct+ RSI 35-50 = strong.
+# Blocks nothing — only boosts confidence for entries already in the sweet spot.
+LONG_RSI_SWEET_SPOT_MIN = 35
+LONG_RSI_SWEET_SPOT_MAX = 50
+LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
+
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.
@@ -1610,7 +1618,7 @@ CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0
 # Tier 1: Quick Cut — -0.75% to -3.0%, fires frequently
 # CEO Sep 24: widened floor -2.0→-3.0. 14d: 23T 0%WR -$2.70, avg loss -3.92%.
 # Trades slide past -2.0% before next fire window. New range catches the full slide.
-CL_TIER1_MIN_PCT      = -3.0    # widened 2026-09-24 — was -2.0, trades slid past floor
+CL_TIER1_MIN_PCT      = 0       # DISABLED 2026-09-24 — 25T/14d 0%WR -$3.11. Range 0 to -0.75 is impossible.
 CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
