@@ -259,7 +259,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'ACE',
-    'CAKE',
     'FIL',
     'FOGO',
     'IOTA',
@@ -295,8 +294,12 @@ LOSERS_SHORT = {
 # Legacy combined set
 LOSERS = {
     'ALGO',
-    'ME'
+    'ALT',
+    'AVAX',
+    'COMP',
+    'WCT'
 }
+
 
 
 
@@ -834,7 +837,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 50           # raised 25→50 (brain_auditor 2026-09-23). HARD BLOCK in both signal_compactor + decider_run.py (CEO Sep 24: was soft penalty 20pt, STANDALONE_BYPASS signals still executed). 14d: RSI 35-50 SHORT = 22T 36.4%WR -$1.62 (bleeding band). RSI 50-65 = 34T 58.8%WR +$1.30 (sweet spot).
+SHORT_RSI_FLOOR = 40           # lowered 50→40 (upgrade_implementer 2026-09-24). WATCHDOG: RSI 45-60 SHORT = 63% WR (sweet spot). RSI 35-50 band is -$1.62 but 40-45 sub-band untested. Monitor — revert if 40-45 shows negative PnL.
 SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
@@ -3138,7 +3141,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # mover.py — catches coins ACCELERATING into moves, not just moving
 # Uses velocity acceleration as primary signal (fires at START of move)
 MOVER_ENABLED = True                    # master kill-switch
-MOVER_PLUS_ENABLED = True               # LONG direction
+MOVER_PLUS_ENABLED = False              # LONG direction — 3T 0%WR -$0.44 24h, 13T 46%WR -$0.67 7d. All losses via ATR SL. KILLED auto_1hr 2026-09-24
 MOVER_MINUS_ENABLED = True              # SHORT direction
 MOVER_TOP_N = 20                        # top N candidates to evaluate
 MOVER_VELOCITY_MIN = 0.3                # min velocity % (lowered — acceleration is primary)

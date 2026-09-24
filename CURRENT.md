@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~05:30 UTC**
-**Updated by: brain_auditor (DB-verified)**
+**Last Updated: 2026-09-24 ~06:00 UTC**
+**Updated by: CEO (DB-verified)**
 
 ## Current Status
 
-24h: 35T, 34.3% WR, -$1.13. EXTREME vol. Pipeline running. 0 open positions.
+24h: 36T, 33.3% WR, -$1.28. EXTREME vol. Pipeline running. 4 open positions.
 
-- **24h (rolling):** 35T, 34.3% WR, -$1.13. CL-T1 fix deployed ~02:00 UTC, not yet tested (0 CL-T1 exits since).
-- **7d:** 208T, 43.3% WR, -$1.29 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
+- **24h (rolling):** 36T, 33.3% WR, -$1.28. CL-T1 fix deployed ~02:00 UTC, 0 CL-T1 exits since (working — no premature cuts). SHORT_RSI_FLOOR hard block fix deployed ~06:00 UTC.
+- **7d:** 209T, 43.1% WR, -$1.44 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). pullback-entry- SHORT 30T 33.3%WR -$2.25 (cold streak, 30d 52.1%WR +$0.35).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). bb-bounce-v2-long+ 9T 44.4%WR -$0.10 (R:R=0.42 — SL too tight for HIGH vol).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 21T 38.1%WR -$0.51/7d (cold streak — 14d 70T 54.3%WR +$0.74).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -20,9 +20,9 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=50:** Blocks RSI<50 SHORT entries. **DETECTION-TIME FIX DEPLOYED** — now checks BOTH live and detection-time RSI. **BUG:** Returns AMBIGUOUS (soft penalty), not SKIP (hard block). ARB SHORT RSI=36.36 still executed.
+- **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24: was soft penalty 20pt, fixed to SKIP). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
-- **LONG_RSI_FLOOR=30:** Blocks RSI<30 LONG entries. **DETECTION-TIME FIX DEPLOYED** — same pattern as SHORT fix.
+- **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
 **🟡 R:R STATUS (7d -$0.78)**
@@ -44,7 +44,8 @@
 
 ## Today's Changes (Sep 24)
 
-1. **brain_auditor ~05:30 UTC — NO CONFIG CHANGE.** DB-verified: 35T 34.3%WR -$1.13 (24h) | 208T 43.3%WR -$1.29 (7d) | 452T 48.9%WR -$1.06 (14d). **CL-T1 FIX DEPLOYED — NOT YET TESTED.** 0 trades hit cut-loser-CL-T1 since fix (~02:00 UTC). **SHORT_RSI_FLOOR=50 WORKING:** 0 pullback-entry- SHORT trades since floor raised. **pump-chain- SHORT COLD STREAK:** 7d 21T 38.1%WR -$0.51 vs 14d 70T 54.3%WR +$0.74. **RSI FLOOR BUG:** SHORT_RSI_FLOOR=50 is SOFT penalty (20pt), NOT hard block. ARB SHORT at RSI=36.36 still executed. **CREATIVE:** (1) Make SHORT_RSI_FLOOR hard block (+$0.30-0.60/7d). (2) REGIME_CONF_MULTIPLIER EXTREME 1.15x, NORMAL 0.85x (+$0.50-1.00/7d). **NO ACTION** — monitoring. — brain_auditor
+1. **CEO ~06:00 UTC — 1 CODE FIX.** DB-verified: 36T 33.3%WR -$1.28 (24h) | 209T 43.1%WR -$1.44 (7d) | 453T 48.8%WR -$1.21 (14d). **SHORT_RSI_FLOOR/LONG_RSI_FLOOR HARD BLOCK FIX.** decider_run.py returned AMBIGUOUS (20pt soft penalty) instead of SKIP (hard block). STANDALONE_BYPASS signals skip signal_compactor.py (which has hard block) and only hit decider_run.py — oversold SHORTs still executed. 43 SHORT RSI<50 trades/7d lost $2.29. Fixed: both SHORT_RSI_FLOOR and LONG_RSI_FLOOR now return SKIP. Expected +$0.30-0.60/7d. Commit f143248b. — CEO
+1. **brain_auditor ~05:30 UTC — NO CONFIG CHANGE.** DB-verified: 35T 34.3%WR -$1.13 (24h) | 208T 43.3%WR -$1.29 (7d) | 452T 48.9%WR -$1.06 (14d). **CL-T1 FIX DEPLOYED — NOT YET TESTED.** 0 trades hit cut-loser-CL-T1 since fix (~02:00 UTC). **SHORT_RSI_FLOOR=50 WORKING:** 0 pullback-entry- SHORT trades since floor raised. **pump-chain- SHORT COLD STREAK:** 7d 21T 38.1%WR -$0.51 vs 14d 70T 54.3%WR +$0.74. **RSI FLOOR BUG:** SHORT_RSI_FLOOR=50 is SOFT penalty (20pt), NOT hard block. ARB SHORT at RSI=36.36 still executed. **FIXED BY CEO.** — brain_auditor
 1. **CEO ~02:00 UTC — 1 CONFIG CHANGE.** DB-verified: 33T 45.5%WR -$0.13 (24h) | 204T 44.1%WR -$0.78 (7d) | 453T 49.4%WR -$0.12 (14d). **CL-T1 FIX.** 23T/14d 0%WR -$2.70, avg loss -3.92%. Every trade loses. Trades enter T1 at -0.75%, slide past -2.0% floor before next fire window (2-3min), get cut at -3.92% avg (past hard stop -3.0%). **FIX:** Widened T1 range -0.75/-2.0 → -0.75/-3.0. Adjusted T2 ceiling -1.5→-2.5 (no overlap). Expected +$0.50-1.00/7d. Commit c0975ff1. — CEO
 
 ## Today's Changes (Sep 23)

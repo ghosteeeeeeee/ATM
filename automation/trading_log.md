@@ -5626,3 +5626,18 @@ Final set: ['ALGO', 'ME']
 **CEO FLAG:** atr_sl_hit at42.9% (>40% threshold). tpsl fix deployed but SL floor (1.3%) too tight for low-ATR tokens. Recommend reviewing ATR_SL_MIN or adding ATR floor to pump-chain- signal.
 
 **BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-24 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE CAKE (WR=50.0%, PnL=$-0.02, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['ACE', 'FIL', 'FOGO', 'IOTA', 'JUP', 'LTC', 'SYRUP']
+
+## LOSERS Update — 2026-09-24 06:05 UTC
+- REMOVE ME (insufficient data)
+- ADD WCT (WR=0.0%, PnL=$-0.44, consecutive_losses (5))
+- ADD COMP (WR=33.3%, PnL=$-0.42, low_wr (33.3%))
+- ADD ALT (WR=40.0%, PnL=$-0.18, low_wr (40.0%))
+- ADD AVAX (WR=40.0%, PnL=$1.25, low_wr (40.0%))
+
+Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']

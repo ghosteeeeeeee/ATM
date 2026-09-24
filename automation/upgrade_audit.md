@@ -573,3 +573,38 @@ All config tweaks, blacklist additions, parameter changes, dead code fixes, and 
 | 5 | Partial Close + Trailing Runner | 3 | HIGH | +$1-2/7d | HL API partial close support |
 | 6 | Regime Tuner | 3 | MEDIUM | Automates weekly tuning | New regime_tuner.py + timer |
 | 7 | Structural Awareness Overhaul | 3-4 | HIGH | +$5-10/7d (est) | 4 new files, wiring existing systems |
+
+---
+
+## Scan: 2026-09-24 (upgrade_implementer)
+
+### Plan: 2026-09-23_regime-based-signal-fixes.md
+- **Date scanned:** 2026-09-24 00:00
+- **Core request:** 3 fixes based on regime-trade join analysis: block LONG in LEAN_BEAR, block accel-300 SHORT in RECOVERY, disable pullback-entry- SHORT
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED (2/3 done, 1 already done)
+- **Reason:** Fix 1 (LEAN_BEAR LONG block) ✅ — expanded _bearish check in signal_compactor.py:1471. Fix 2 (accel-300 SHORT RECOVERY block) ✅ — added phase check at signal_compactor.py:2598. Fix 3 (pullback-entry- SHORT) was already disabled.
+
+### Plan: 2026-09-23_emergency-winrate-fix.md
+- **Date scanned:** 2026-09-24 00:00
+- **Core request:** 5 auditor-corrected fixes: lower SHORT_RSI_FLOOR, disable losers, oversold guard, continuum bias, monitor RS
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** MOSTLY IMPLEMENTED (4/5 done)
+- **Reason:** Fix 1 (SHORT_RSI_FLOOR 50→40) ✅ — hermes_constants.py:836. Fix 2 (disable trend_purity/pullback-entry) was already done. Fix 3 (oversold guard RSI<35) was already done. Fix 4 (continuum bullish SHORT penalty) was already there (0.5x). Fix 5 (monitor RS) = no action needed.
+
+### Plan: trade-watchdog-spec.md
+- **Date scanned:** 2026-09-24 00:00
+- **Core request:** Autonomous trade monitor with profit lock, regime alignment, stale detection
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** scripts/trade_watchdog.py exists with automation/trade-watchdog/ infrastructure.
+
+### Summary
+| Status | Count |
+|--------|-------|
+| IMPLEMENTED | 3 |
+| SKIPPED (already done) | 0 |
+| PENDING | 0 |

@@ -1468,10 +1468,11 @@ def _score_signal(token, direction, conf, source, signal_type,
                 # SHORT aligned with bearish structure — strong boost
                 continuum_mult = 1.5
                 log(f"  🌊 [CONTINUUM-AUTH] {token} SHORT: BTC {_phase} + {_linreg} + {_ema} → 1.5x boost")
-            elif direction.upper() == 'LONG' and _bearish:
-                # LONG against bearish structure — heavy penalty
+            elif direction.upper() == 'LONG' and _linreg in ('LEAN_BEAR', 'BEAR'):
+                # LONG against bearish linreg — heavy penalty (any phase/EMA)
+                # Data: ALL LONG signals 0% WR when linreg = LEAN_BEAR (regime-based-signal-fixes)
                 continuum_mult = 0.5
-                log(f"  🚫 [CONTINUUM-AUTH] {token} LONG: BTC {_phase} + {_linreg} + {_ema} → 0.5x penalty")
+                log(f"  🚫 [CONTINUUM-AUTH] {token} LONG: BTC linreg={_linreg} (any phase) → 0.5x penalty")
             elif direction.upper() == 'LONG' and _bullish:
                 # LONG aligned with bullish structure — boost
                 continuum_mult = 1.5
@@ -2593,6 +2594,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if ACCEL_300_MINUS_FLAT_BLOCK and _vol_regime == 'FLAT':
                     log(f"  🚫 [ACCEL300-SHORT-FLAT] {token} SHORT blocked — FLAT vol regime, no SHORT edge (17% WR)")
                     continue
+            # ── accel-300 SHORT RECOVERY block (2026-09-24) ────────────────
+            # Data: RECOVERY phase = 0% WR for accel-300 SHORT. CALM = 50%.
+            # In RECOVERY, market is bouncing — SHORTing a bounce = catching falling knife.
+            if 'accel-300' in bare_source and direction.upper() == 'SHORT' and _continuum_phase == 'RECOVERY':
+                log(f"  🚫 [ACCEL300-SHORT-RECOVERY] {token} SHORT blocked — RECOVERY phase, no SHORT edge (0% WR)")
+                continue
             # ── pump-chain+ HIGH regime block ──────────────────────────────
             # 14T/7d HIGH: 35.7%WR +$0.19 (noise). EXTREME: 57.1%WR +$1.65 (edge).
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
