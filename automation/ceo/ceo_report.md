@@ -1,3 +1,29 @@
+## CEO Report — 2026-09-24 ~02:00 UTC
+
+### Decision: CL-T1 range widened — fix 0%WR loss machine
+
+### Diagnosis
+- 24h: 33T, 45.5%WR, -$0.13 | 7d: 204T, 44.1%WR, -$0.78 | 14d: 453T, 49.4%WR, -$0.12
+- CL-T1: 23T/14d, 0%WR, -$2.70. Every single trade loses. Avg loss -3.92%.
+- Trades enter T1 at -0.75%, slide past -2.0% floor before next fire window (2-3min), get cut at avg -3.92% (past hard stop -3.0%).
+- System improving from yesterday's fixes (dead hours, RSI floors, EMA fallback). 24h from -$0.80 to -$0.13.
+
+### Root Cause
+- T1 range (-0.75% to -2.0%) too narrow for slide speed. By next fire window, trades already past floor.
+- Avg loss -3.92% confirms trades slide 3%+ in 2-3 minutes. T1 can't catch them at -2.0%.
+
+### Fix Applied
+- Widened T1: -0.75/-2.0 → -0.75/-3.0 (catches full slide to hard stop)
+- Adjusted T2: -1.5/-3.0 → -2.5/-3.0 (backup for T1 fire window misses)
+- Expected: +$0.50-1.00/7d from reducing avg CL-T1 loss
+
+### Verification
+- Config changes verified in hermes_constants.py lines 1607-1623
+- No protected flags touched
+- Pipeline needs restart to pick up changes
+
+---
+
 ## CEO Report — 2026-09-23 ~18:00 UTC
 
 ### Decision: SHORT_RSI_FLOOR 25→50 — Reverse self_learner mistake

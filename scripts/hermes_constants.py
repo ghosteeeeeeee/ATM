@@ -1604,16 +1604,20 @@ RR_EXIT_TRAIL_BUFFER = 0.002      # 0.2% below support for SL placement
 CUT_LOSER_ENABLED      = True   # master switch
 CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0% immediately (7d: 39 trades bled past -5%)
 
-# Tier 1: Quick Cut — -1.0% to -3.0%, fires frequently
-CL_TIER1_MIN_PCT      = -2.0    # tightened 2026-09-15 — was -3.0, trades bleed through before floor hits
+# Tier 1: Quick Cut — -0.75% to -3.0%, fires frequently
+# CEO Sep 24: widened floor -2.0→-3.0. 14d: 23T 0%WR -$2.70, avg loss -3.92%.
+# Trades slide past -2.0% before next fire window. New range catches the full slide.
+CL_TIER1_MIN_PCT      = -3.0    # widened 2026-09-24 — was -2.0, trades slid past floor
 CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
 CL_TIER1_FIRE_WINDOWS = {"A": (2, 3), "B": (2, 3)}  # brain_auditor Sep 18: widened from (1,2) — 0% WR, cutting too early
 
-# Tier 2: Deep Cut — -1.5% to -3.0%, fires less frequently
+# Tier 2: Deep Cut — -2.5% to -3.0%, fires less frequently
+# CEO Sep 24: adjusted ceiling -1.5→-2.5. T1 now handles -0.75% to -3.0%.
+# T2 is backup for trades that slip past T1's fire windows.
 CL_TIER2_MIN_PCT      = -3.0    # floor (tightened from -5.0% — hard stop catches below this)
-CL_TIER2_MAX_PCT      = -1.5    # ceiling (T1 handles above this; must be > CUT_LOSER_PNL so Tier 2 isn't dead code)
+CL_TIER2_MAX_PCT      = -2.5    # ceiling (T1 handles above this; adjusted for new T1 range)
 CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
 CL_TIER2_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
 CL_TIER2_FIRE_WINDOWS = {"A": (2, 4), "B": (2, 4)}  # CEO Sep 9: tightened from (6,12)
