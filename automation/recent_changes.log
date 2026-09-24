@@ -2940,3 +2940,6 @@
   24h: 38T 34.2%WR -$1.96 (improving). 3 trades last hour (1 BE, 2 SL). 3 open.
   atr_sl_hit 52.6% — elevated, pump-chain- 14/20 hits. No kill candidates. No overtrading.
   BY: auto_1hr
+[2026-09-24 20:15 UTC] auto_1hr: ADDED pump-chain- SHORT dead hours [2,3]
+  14d: hours 2,3 = 7T 14.3%WR -$0.83. Hour 2: 3T 0%WR -$0.41, Hour 3: 4T 25%WR -$0.42.
+  Expected +$0.83/14d = +$0.42/7d. Commit: 76ffdba4. BY: auto_1hr

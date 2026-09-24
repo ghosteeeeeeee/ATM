@@ -1,3 +1,38 @@
+## [2026-09-24 20:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss) | **Open:** 1 (BTC continuum-osc+ LONG 1.8h, ~flat)
+**24h:** 35T 31.4%WR -$2.45 (avg -$0.070) | **7d:** 220T 43.2%WR -$2.36
+
+**Last hour closes:**
+- KAS pump-chain- SHORT: -$0.08 (pump_exit_dead_money — price moved against, cut before SL)
+
+**24h exit reasons (unchanged):**
+- atr_sl_hit: 20T (57.1%) avg -$0.110 — **ABOVE 40% THRESHOLD**
+- pump_exit_dead_money: 9T avg +$0.014
+- profit-monster-trail: 3T avg +$0.010
+- cut-loser-CL-T1: 2T avg -$0.205
+- pump_exit_momentum: 1T $0.00
+
+**24h signal ranking (2+ trades):**
+- pump-chain- SHORT: 22T 40.9%WR -$0.034/trade (avg_win +$0.092 vs avg_loss -$0.121 — R:R flipped unfavorable)
+- bb-bounce-v2-long+: 3T 33.3%WR -$0.053
+- continuum-osc+: 2T 50%WR -$0.055
+
+**Changes:**
+1. **ADDED PUMP_CHAIN_SHORT_DEAD_HOURS = [2, 3]** — 14d: hours 2,3 = 7T 14.3%WR -$0.83. Hour 2: 3T 0%WR -$0.41, Hour 3: 4T 25%WR -$0.42. Expected +$0.42/7d. Commit: 76ffdba4.
+
+**No Change Needed:**
+- No kill candidates (no signal has 0%WR with 3+ trades in last hour — only 1 trade closed)
+- No overtrading (1 trade/hr)
+- BTC continuum-osc+ LONG healthy (entry $84,432, SL $83,334, TP $85,546, ~1.3% each way)
+
+**Open Questions:**
+- **atr_sl_hit 57.1%** — CEO flag from 18:13 still pending. System bleeding -$2.45/24h.
+- pump-chain- SHORT R:R flipped — avg_loss (-$0.121) now exceeds avg_win (+$0.092). Dead hours should help but the core issue is SL tightness.
+- 24h PnL worsened from -$2.26 to -$2.45.
+
+**BY:** auto_1hr
+
 ## [2026-09-24 19:15 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (2 wins, 0 losses) | **Open:** 2 (KAS pump-chain- SHORT 1.6h, BTC continuum-osc+ LONG 0.7h)
