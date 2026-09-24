@@ -1,3 +1,40 @@
+## [2026-09-24 07:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 4 (BTC continuum-osc+ LONG 4.4h, BABY mover+ LONG 2.1h, KAS pump-chain- SHORT 1.1h, CASHCAT pump-chain- SHORT 0.3h)
+**24h:** 33T 30.3%WR -$1.21 | **7d:** 211T 43.1%WR -$1.41 | **14d:** 453T 48.6%WR -$1.84
+
+**24h exit reasons:**
+- atr_sl_hit: 13T (39.4%) avg -$0.086 — borderline (was 42.9% at last check)
+- profit-monster-trail: 10T avg -$0.005
+- pump_exit_dead_money: 6T avg +$0.038 (profitable)
+- cut-loser-CL-T1: 3T avg -$0.090
+
+**24h signal ranking (3+ trades):**
+- pump-chain-: 15T 40.0%WR -$0.13
+- accel-300-breakout: 7T 28.6%WR -$0.12 (DISABLED — legacy trades from before disable)
+- bb-bounce-v2-long+: 5T 40.0%WR -$0.02
+- mover+: 3T 0.0%WR -$0.44 (0% WR last 24h, all SL hits at 1.3% floor)
+
+**Regime:** ALL NEUTRAL, 24/33 trades in EXTREME vol (33.3% WR -$0.66). System bleeding in EXTREME — not a signal problem, regime problem.
+
+**mover+ 7d:** 13T 46.2%WR -$0.67 — net negative. Losers hit 1.3% SL floor (AVAX, ACE, ADA, BLUR, ALGO, BABY). Winners had wider SLs (ATOM1.4%, BCH 0.35%, BLUR 0.48%). The 1.3% ATR_SL_MIN floor is too tight for HIGH/EXTREME vol tokens.
+
+**Changes:** None — no strict kill candidate (0 trades closed last hour), no overtrading (~2/hr). mover+ 0%WR doesn't meet "3+ trades in last hour" kill threshold.
+
+**No Change Needed:**
+- No kill candidates by strict criteria
+- atr_sl_hit at 39.4% (below40% threshold, was 42.9%)
+- No overtrading
+
+**Open Questions:**
+- REGIME_CONF_MULTIPLIER for EXTREME vol? brain_auditor suggested earlier today. System needs reduced exposure in EXTREME regime — but this is CEO-level decision.
+- mover+ 7d net negative — should it be killed despite not meeting strict last-hour criteria?
+- BABY (mover+) SL only 0.488% away — likely to get stopped
+
+**CEO FLAG:** 5 consecutive negative hours. System bleeding in EXTREME vol regime (24/33 trades). mover+ 0%WR last24h. REGIME_CONF_MULTIPLIER needed for EXTREME vol exposure.
+
+**BY:** auto_1hr
+
 ## [2026-09-24 02:25 UTC] Hourly Analysis
 
 **Trades:** 3 closed last hour (ETH bb-bounce-v2-long+ +$0.04, ALT mover+ -$0.01, AVAX mover+ -$0.15) | **Open:** 3 (BTC continuum-osc+ LONG, BABY mover+ LONG, KAS pump-chain- SHORT)

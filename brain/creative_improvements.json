@@ -1814,5 +1814,32 @@
     "status": "suggested",
     "risk": "low",
     "impact_on_winners": "0 — pump-chain- SHORT in NORMAL has 80% WR, penalty only hurts"
+  },
+  {
+    "date": "2026-09-24T07:45:00Z",
+    "idea": "REGIME_CONF_MULTIPLIER: EXTREME 1.15x, NORMAL 0.85x",
+    "rationale": "7d EXTREME 96T 44.8%WR +$0.59 vs NORMAL 34T 32.4%WR -$1.21. Gap $1.80/7d. Suggested 4+ times, never implemented.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "regime adaptation",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-24T07:45:00Z",
+    "idea": "Widen CL-T1 fire windows (2,3)→(4,6) if current fix fails",
+    "rationale": "23T/14d 0%WR -$2.70. CEO widened range to -3.0 but fire windows still at (2,3) minutes.",
+    "expected_impact": "+$0.50-1.00/7d if current fix fails",
+    "category": "exit optimization",
+    "status": "contingent",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-24T07:45:00Z",
+    "idea": "Confidence boost for NULL RSI entries (detection-time fallback)",
+    "rationale": "14d NULL RSI SHORT = 39T 64.1%WR +$1.42 vs HAS_RSI 97T 49.5%WR -$0.94. +15.7% WR edge.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

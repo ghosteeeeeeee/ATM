@@ -20,7 +20,7 @@
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.5%.
-- **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24: was soft penalty 20pt, fixed to SKIP). Blocks SHORT entries where live or detection-time RSI < 50.
+- **SHORT_RSI_FLOOR=40:** **HARD BLOCK** (CEO Sep 24: lowered 50→40, fixed to SKIP). Blocks SHORT entries where live or detection-time RSI < 40.
 - **SHORT_RSI_CEILING=65:** Working. Blocking high-RSI SHORTs.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
