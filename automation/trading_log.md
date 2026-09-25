@@ -1,3 +1,34 @@
+## [2026-09-25 06:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 21T ~44%WR -$1.62 | **7d:** 214T 43.9%WR -$1.77 | **14d:** 433T 47.6%WR -$4.23
+
+**24h exit reasons:**
+- atr_sl_hit: 12T (57.1%) avg -$0.108 — above 40% threshold but loss is small
+- pump_exit_dead_money: 5T avg +$0.008
+- cut-loser-CL-T1: 2T avg -$0.205
+- profit-monster-trail: 1T $0.00
+- UNIVERSAL_MAX_HOLD: 1T +$0.05
+
+**24h signal ranking:**
+- pump-chain- SHORT: 12T 58.3%WR -$0.42 — biggest volume, still net negative
+- continuum-osc+ LONG: 3T 66.7%WR -$0.06 — best performer
+- bb-bounce-v2-long+ LONG: 2T 0%WR -$0.20 — only 2 trades
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (0 trades closed last hour, no signal at 0%WR/3+T)
+- No overtrading (0 trades/hr)
+- atr_sl_hit 57.1% but avg loss trivial (-$0.108) — trailing SL working
+- System running quiet: 4 trades in 12h, low volatility regime
+
+**Open Questions:**
+- 14d at -$4.23 — slow bleed, needs positive days
+- pump-chain- 58% WR but -$0.42 total — losses concentrated in few trades (FIL -$0.22, KAS -$0.32, ALGO -$0.17)
+
+**BY:** auto_1hr
+
 ## [2026-09-25 06:00 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (BTC continuum-osc+ LONG +$0.05, UNIVERSAL_MAX_HOLD) | **Open:** 0
@@ -6223,3 +6254,22 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - Hour 10 has 60% WR but -$0.12 PnL (avg -$0.024) — not worth blocking yet (5T sample)
 
 **BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-25 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE FIL (WR=50.0%, PnL=$0.26, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE FOGO (WR=57.1%, PnL=$0.79, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE SYRUP (WR=66.7%, PnL=$-0.35, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE CASHCAT (WR=80.0%, AvgPnL=3.74%, Trades=5)
+
+Final set: ['ACE', 'CASHCAT', 'IOTA', 'JUP', 'LTC']
+
+## LOSERS Update — 2026-09-25 06:05 UTC
+- REMOVE WCT (insufficient data)
+- REMOVE AVAX (insufficient data)
+- REMOVE ALT (insufficient data)
+- ADD KAS (WR=20.0%, PnL=$-0.56, wr_collapse (60.0% → 20.0%))
+- ADD AZTEC (WR=20.0%, PnL=$-0.36, low_wr (20.0%))
+- ADD CAKE (WR=40.0%, PnL=$-0.14, low_wr (40.0%))
+
+Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
