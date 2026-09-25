@@ -6198,3 +6198,28 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - signal_version.py doesn't exist — skipped audit trail logging.
 
 **BY:** auto_1hr
+
+## [2026-09-25 02:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. **Open:** 0.
+**24h:** 26T, 38.5% WR, -$2.21. **14d:** 435T, 47.4% WR, -$4.68.
+
+**Key Metrics:**
+- atr_sl_hit: 16/26 = 62% — trailing SL dominant, avg loss trivial (-$0.121)
+- pump-chain- SHORT dead hours working: in dead hours 23T -$1.84, outside 42T +$0.94
+- pullback-entry- SHORT: 95T 14d -$1.75 — only >$1 loss signal, already has dead hours + NORMAL block
+
+**Changes:**
+- None needed.
+
+**No Change Needed:**
+- No kill candidates (no signal with 0%WR/3+T 24h)
+- No overtrading (0 trades last hour)
+- pump-chain- SHORT dead hours [2,3,8,9,11,18,20] working — all losing hours with 3+ trades blocked
+- mover+ already killed (MOVER_PLUS_ENABLED=False)
+
+**Open Questions:**
+- 14d system at -$4.68 — needs more positive days to recover
+- Hour 10 has 60% WR but -$0.12 PnL (avg -$0.024) — not worth blocking yet (5T sample)
+
+**BY:** auto_1hr
