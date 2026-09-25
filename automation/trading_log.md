@@ -1,3 +1,34 @@
+## [2026-09-25 16:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 14h ago
+**24h:** 6T 66.7%WR -$0.19 | **14d:** 408T 48%WR -$3.21
+
+**24h by exit reason:**
+- atr_sl_hit: 2T, avg loss -$0.110 — below 40% threshold, fine
+- pump_exit_dead_money: 3T, avg -$0.007 — breakeven
+- UNIVERSAL_MAX_HOLD: 1T, +$0.050
+
+**Signal watch (14d):**
+- btc-pump-rider+: 3T 0%WR -$0.18 — 0%WR but only 3T over 14d, not 3+ in last hour. Borderline.
+- pullback-entry- SHORT: 90T 46.7%WR -$1.58 — dead hours [0,1,3,4,6,7,8,10,11,13,19,20,22] comprehensive
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No trades last hour — system quiet (14h since last trade)
+- No overtrading (0 trades/hr)
+- No kill candidates meeting strict criteria (0%WR + 3+ trades in last hour)
+- atr_sl_hit 33% — below 40% threshold
+- pullback-entry- SHORT dead hours comprehensive — all losing hours blocked
+- pump-chain- dead hours [2,3,8,9,11,18,20] — comprehensive
+
+**Open Questions:**
+- 14d at -$3.21 — persistent small negative, daily variance normal
+- btc-pump-rider+ 0%WR 3T — borderline, signal barely fires (3 trades in 14d)
+- System very quiet — 14h since last trade, NEUTRAL regime likely
+
+**BY:** auto_1hr
+
 ## [2026-09-25 15:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 13h ago (BTC continuum-osc+ +$0.05)
