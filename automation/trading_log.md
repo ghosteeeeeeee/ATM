@@ -6297,3 +6297,106 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - System quiet — no open trades
 
 **BY:** auto_1hr
+
+## [2026-09-25 08:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. **Open:** 0.
+**24h:** 17T, 47% WR, -$1.61. **14d:** 431T, 47.6% WR, -$4.17.
+
+**Key Metrics:**
+- atr_sl_hit: 11/19 = 57% of closes — dominant but avg loss trivial (-$0.13)
+- System quiet — 0 trades/hr, 0 open positions
+- No kill candidates (no signal with 0%WR/3+T in last hour)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No overtrading (0 trades/hr)
+- atr_sl_hit elevated but avg loss is only -$0.13
+- No signal has 0%WR with 3+ trades in last hour
+- pullback-entry- biggest 14d loser (-$1.49) but has profitable days — inconsistent, not a kill
+
+**Open Questions:**
+- 14d system at -$4.17 — persistently slightly negative, needs review
+- System quiet — no open trades, no recent closes
+
+**BY:** auto_1hr
+
+## [2026-09-25 10:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 14T 50%WR -$0.99 | **14d:** 422T 47.9%WR -$3.54
+
+**24h by exit reason:**
+- atr_sl_hit: 8T (57%), avg loss -$0.101 — dominant but trivial
+- pump_exit_dead_money: 4T, avg -$0.005 — basically breakeven
+- cut-loser-CL-T1: 1T, -$0.21
+- UNIVERSAL_MAX_HOLD: 1T, +$0.05
+
+**24h by signal:**
+- pump-chain-: 9T, -$0.60, 56%WR (biggest volume, slightly negative)
+- continuum-osc+: 2T, +$0.10, 100%WR (only profitable signal)
+- ema300-breakthrough+: 1T, -$0.28 (single trade, not a kill candidate)
+- r2-trend-short4: 1T, -$0.21 (single trade)
+
+**14d top losers (potential watch):**
+- pullback-entry-: 92T, 47.8%WR, -$1.40 (largest volume, consistently slightly negative)
+- trend_purity+: 11T, 36.4%WR, -$0.90 (low WR but small sample)
+- bb-bounce-v2-long+: 14T, 35.7%WR, -$0.74 (low WR)
+
+**14d top winners:**
+- volume-breakout-long+: 18T, 66.7%WR, +$1.46
+- pump-chain+: 72T, 41.7%WR, +$0.97
+- rr-struct+: 15T, 73.3%WR, +$0.59
+
+**Regime:** 5m LONG_BIAS (7 long, 2 short, 109 neutral) — mostly neutral market, explains low activity.
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No overtrading (0 trades/hr, 0 open positions)
+- No kill candidates (no signal with 0%WR and 3+ trades in 24h)
+- atr_sl_hit at 57% but avg loss trivial (-$0.10)
+- System quiet for 7.7h — normal for NEUTRAL-dominated market
+- Pipeline running, all timers active, live trading ON
+
+**Open Questions:**
+- 14d system at -$3.54 — persistent small negative, but daily variance is normal
+- pullback-entry- at 92T is the biggest volume signal but slightly negative — watch but don't kill (has profitable days)
+- trend_purity+ at 36.4%WR over 11 trades is concerning but sample too small to kill
+
+**BY:** auto_1hr
+
+## [2026-09-25 11:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 12T 50%WR -$0.85 | **48h:** 48T 37.5%WR -$2.35 | **14d:** 420T 48.1%WR -$3.07
+
+**48h by exit reason:**
+- atr_sl_hit: 24T (50%), avg loss -$0.089 — dominant but avg loss trivial
+- pump_exit_dead_money: 11T, avg +$0.025 — profitable
+- profit-monster-trail: 8T, avg -$0.003 — breakeven
+- cut-loser-CL-T1: 3T, avg -$0.170
+
+**48h by signal (worst first):**
+- mover+: 3T, 0%WR, -$0.61 (already killed)
+- pump-chain-: 27T, 48.1%WR, -$0.55 (dead hours working, marginal)
+- accel-300-breakout: 7T, 28.6%WR, -$0.12 (small sample)
+- bb-bounce-v2-long+: 4T, 25%WR, -$0.19 (small sample)
+
+**Changes:**
+1. Added pump-chain+ LONG dead hours 14 (4T 25%WR -$0.33) and 20 (3T 0%WR -$0.30). Expected +$0.63/14d = +$0.32/7d. Commit: 9b67d4b0.
+
+**No Change Needed:**
+- No overtrading (0 trades/hr, 0 open positions)
+- No kill candidates (mover+ already killed; no new 0%WR with 3+ trades)
+- SL hit 62.9% 14d but avg loss trivial — structural, not a bug
+- pump-chain- SHORT dead hours already well-tuned [2,3,8,9,11,18,20]
+- System quiet for ~9h — normal for NEUTRAL-dominated market
+
+**Open Questions:**
+- 14d at -$3.07 — persistent small negative, daily variance normal
+- trend_purity+ 36.4%WR over 11T 14d — concerning but sample borderline for kill
+- accel-300-breakout 28.6%WR — needs more data before action
+
+**BY:** auto_1hr
