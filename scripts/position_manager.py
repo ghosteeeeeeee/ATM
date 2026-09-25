@@ -948,7 +948,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
                    pnl_pct, experiment, sl_distance, amount_usdt, signal,
-                   hl_notional_usdt, leverage
+                   hl_notional_usdt, leverage, open_time
             FROM trades WHERE id = %s
         """, (trade_id,))
         row = cur.fetchone()
@@ -1087,6 +1087,18 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         if is_win and LOSS_STREAK_RESET_WIN:
             clear_loss_streak(token, direction)
 
+        # ── Compute MFE/MAE from price history ──────────────────────────────
+        mfe_pct_val, mae_pct_val, mfe_price_val, mae_price_val = None, None, None, None
+        try:
+            trade_open_time = row['open_time']
+            if trade_open_time and entry_price > 0:
+                from hl_sync_guardian import _compute_mfe_mae
+                mfe_pct_val, mae_pct_val, mfe_price_val, mae_price_val = _compute_mfe_mae(
+                    token, direction, entry_price, trade_open_time, now
+                )
+        except Exception as _mfe_e:
+            pass  # non-fatal — MFE is nice-to-have, don't block trade close
+
         cur.execute("""
             UPDATE trades
             SET status = 'closed',
@@ -1101,14 +1113,16 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 hype_realized_pnl_usdt = %s,
                 hype_realized_pnl_pct = %s,
                 exit_conditions = %s,
-                trade_duration = EXTRACT(EPOCH FROM (%s::timestamp - open_time))
+                trade_duration = EXTRACT(EPOCH FROM (%s::timestamp - open_time)),
+                mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s
             WHERE id = %s AND status = 'open'
         """, (now, reason, reason[:20] if reason else reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
               reason,  # exit_conditions: reuse close reason for exit path tracking
-              now, trade_id))
+              now, mfe_pct_val, mae_pct_val, mfe_price_val, mae_price_val,
+              trade_id))
         if cur.rowcount == 0:
             log(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
             conn.rollback()

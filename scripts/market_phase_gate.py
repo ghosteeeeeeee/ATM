@@ -64,7 +64,7 @@ FAMILY_MAP = {
                  'engulfing_long', 'engulfing_short', 'engulfing'],
     'Breakout': ['breakout_long', 'breakout_pullback'],
     'HL_Copy': ['hl_copy_plus', 'hl_copy_minus'],
-    'Support_Resistance': ['support_resistance'],
+    'Support_Resistance': ['support_resistance', 'rs', 'rs_long', 'rs_short'],
     'Hot_Set': ['hot-set'],
     'Continuation': ['continuation_long', 'continuation_short', 'continuation'],
     'Wave': ['wave_catcher_long', 'wave_catcher_short', 'trend_momentum_near_sma', 'guppy'],

@@ -72,3 +72,9 @@
 - **AUTO-FIX**: Disabled hermes-coding-mcp.service to stop CPU-burning restart loop
 - **INFO**: hermes-5m-candle failed 1 week ago (stale, journal rotated)
 - **WARN**: Disk at 76% (90G/118G) — approaching 85% threshold
+
+## Error Alerts — 2026-09-25 19:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.0s (rc=N)`
+
+## Error Alerts — 2026-09-25 20:57 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`

@@ -239,6 +239,7 @@ VOL_PHASE_MULTS = {
         'Coiled_Spring': 0.0,   # BLOCKED — 40% WR in EXTREME, only trade NORMAL
         'Accelerate': 0.0,      # BLOCKED — accel_300_v3_long 37% WR in EXTREME, wins in HIGH/NORMAL
         'EMA300_Dip': 0.0,      # BLOCKED — ema300_dip 25% WR in EXTREME, wins in HIGH/NORMAL
+        'Support_Resistance': 0.0,  # BLOCKED — rs is mean-reversion, only works in NORMAL (2026-09-25)
         'Pullback_Entry_Long': 0.0,  # BLOCKED — pullback_entry+ 0% WR in EXTREME, wins in HIGH
         'Pullback_Entry': 1.0,  # OK — pullback-entry- 68% WR +$1.46 lifetime EXTREME, 64% WR +$0.43/7d. Updated 2026-09-18
         'Oversold_Bounce': 1.0,  # OK — oversold bounce LONG, mean reversion works in EXTREME (oversold = extreme)
@@ -271,6 +272,7 @@ VOL_PHASE_MULTS = {
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
         'Pump_Flow': 0.0,        # BLOCKED — pump-chain- SHORT 50% WR -$0.28 HIGH (24T). Wins in NORMAL (83.3% WR). signal_reporter 2026-09-24
         'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
+        'Support_Resistance': 0.0,  # BLOCKED — rs mean-reversion, only works in NORMAL (2026-09-25)
     },
 }
 

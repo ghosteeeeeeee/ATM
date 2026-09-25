@@ -2982,3 +2982,7 @@
 [2026-09-25 13:10 UTC] auto_1hr: ADDED pullback-entry- SHORT dead hours [7,19]
   14d: hour 7 = 4T 50%WR -$0.40, hour 19 = 4T 25%WR -$0.38. Combined +$0.78/14d.
   Net dead hours: +$6.52/14d = +$3.26/7d. Commit: 9fe15f9e. BY: auto_1hr
+[2026-09-25 18:30 UTC] brain_auditor: NO CHANGE — analysis only
+  24h: 2T 100%WR +$0.08 | 7d: 198T 42.4%WR -$3.06 | 14d: 393T 47.1%WR -$3.87
+  System quiet 16h. ATR_SL_MAX 1.8% + EXTREME 1.2x deployed today — monitoring 48h. No config changes.
+  BY: brain_auditor

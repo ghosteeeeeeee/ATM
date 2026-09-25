@@ -117,6 +117,12 @@ SIGNAL_OVERRIDES = {
     'pump-chain': 'MEAN_REVERSION',
     'pump-chain+': 'MEAN_REVERSION',
     'pump-chain-': 'MEAN_REVERSION',
+    # rs: support/resistance — mean-reversion signal, fires on key levels (2026-09-25)
+    'rs': 'MEAN_REVERSION',
+    'rs_r': 'MEAN_REVERSION',   # rs-r60 normalized
+    'rs_s': 'MEAN_REVERSION',   # rs-s36 normalized
+    'rs_long': 'MEAN_REVERSION',
+    'rs_short': 'MEAN_REVERSION',
 }
 
 
@@ -178,6 +184,17 @@ def _classify_signal(signal_type: str) -> str:
             return 'MEAN_REVERSION'
     except ImportError:
         pass
+
+    # Try stripping trailing digits (e.g. 'rs-r60' -> 'rs-r', 'rs_r60' -> 'rs_r')
+    import re
+    # Strip digits first, then normalize hyphens
+    base_stripped = re.sub(r'\d+$', '', signal_type.replace('+', '').replace('-', '_'))
+    if base_stripped in SIGNAL_OVERRIDES:
+        return SIGNAL_OVERRIDES[base_stripped]
+    # Also try with hyphens preserved
+    base_stripped2 = re.sub(r'\d+$', '', signal_type.rstrip('+-'))
+    if base_stripped2 in SIGNAL_OVERRIDES:
+        return SIGNAL_OVERRIDES[base_stripped2]
 
     # Default: treat unknown signals as momentum (conservative — block in chop)
     return 'MOMENTUM'

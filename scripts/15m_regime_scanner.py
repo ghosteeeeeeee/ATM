@@ -276,6 +276,7 @@ def write_to_brain_cache(results):
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
             trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
+            
             cur.execute("""
                 INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
                 VALUES (%s, %s, %s, %s, %s)
@@ -330,6 +331,35 @@ def main():
 
     # Write per-token regime to PostgreSQL brain momentum_cache
     write_to_brain_cache(results)
+
+    # Also update SQLite momentum_cache (signal_compactor reads from here)
+    try:
+        import sqlite3 as _sqlite3
+        from paths import RUNTIME_DB
+        _sconn = _sqlite3.connect(RUNTIME_DB, timeout=5)
+        _sc = _sconn.cursor()
+        _now = str(int(datetime.now().timestamp()))
+        for token, r in results.items():
+            slope = r.get('slope_pct', 0)
+            regime = r.get('regime', 'NEUTRAL')
+            _phase = regime
+            _vel = slope
+            _state = 'trending' if abs(slope) > 0.1 else 'ranging'
+            _sc.execute("""
+                INSERT INTO momentum_cache (token, velocity, phase, momentum_state, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (token) DO UPDATE SET
+                    velocity = excluded.velocity,
+                    phase = excluded.phase,
+                    momentum_state = excluded.momentum_state,
+                    updated_at = excluded.updated_at
+            """, (token, _vel, _phase, _state, _now))
+        _sconn.commit()
+        _sc.close()
+        _sconn.close()
+        log(f"SQLite momentum_cache: wrote {len(results)} tokens")
+    except Exception as _e:
+        log(f"SQLite momentum_cache write error: {_e}")
 
     log(f"Overall market bias: {aggregate['overall']} ({long_count}L/{short_count}S/{neutral_count}N)")
     print(json.dumps(output, indent=2))

@@ -2697,6 +2697,19 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 elif unique_signal_types == 1 and (bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS):
                     pass_gate = True
                     gate_msg = f'backtested standalone signal ({source})'
+                # ── Individual part bypass: check if ANY source part matches ──
+                # Multi-source signals like 'rs-r54,rs-r56' don't match merged 'rs'
+                elif unique_signal_types == 1 and source_parts:
+                    _part_bypass = False
+                    for _part in source_parts:
+                        _part_bare = re.sub(r'\d+$', '', _part.rstrip('+-'))
+                        _part_stripped = _part.rstrip('+-')
+                        if _part_bare in STANDALONE_BYPASS_SIGNALS or _part_stripped in STANDALONE_BYPASS_SIGNALS:
+                            _part_bypass = True
+                            break
+                    if _part_bypass:
+                        pass_gate = True
+                        gate_msg = f'backtested standalone part ({source})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
                 # Confluence signals (source=conf-2s, conf-3s, etc.) are already merged
                 # from 2+ agreeing indicators. They represent real confluence even though
@@ -3086,6 +3099,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
+                _cont_sf = None
                 try:
                     import os as _sf_os
                     _cont_sf = sqlite3.connect(_sf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
@@ -3093,7 +3107,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         "SELECT market_phase, linreg_direction, ema300_position "
                         "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
                     ).fetchone()
-                    _cont_sf.close()
                     if _cont_row_sf:
                         _sf_phase, _sf_linreg, _sf_ema = _cont_row_sf[0], _cont_row_sf[1], _cont_row_sf[2]
                         # Skip spike filter in downtrends — green candles are pullbacks, not reversals
@@ -3106,6 +3119,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (BTC={_sf_phase}+{_sf_linreg}+{_sf_ema}, green candles are pullbacks)")
                 except Exception as e:
                     log(f"  ⚠️ [SPIKE-FILTER] {tkn}: downtrend check failed: {e}", 'WARN')
+                finally:
+                    if _cont_sf:
+                        try: _cont_sf.close()
+                        except: pass
 
                 if _skip_spike:
                     log(f"  ✅ [SPIKE-FILTER] {tkn}: SHORT — spike filter SKIPPED (downtrend, green candles are pullbacks)")
@@ -3194,26 +3211,31 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             try:
                 from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                 if direction == 'SHORT' and OVERSOLD_SHORT_RSI_MAX > 0:
-                    _conn_os = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_os = _conn_os.cursor()
-                    _cur_os.execute("""
-                        SELECT close FROM candles_1m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 15
-                    """, (tkn.upper(),))
-                    _os_closes = [r[0] for r in _cur_os.fetchall()]
-                    _conn_os.close()
-                    if len(_os_closes) >= 15:
-                        _os_deltas = [_os_closes[i] - _os_closes[i+1] for i in range(len(_os_closes)-1)]
-                        _os_gains = [d if d > 0 else 0 for d in _os_deltas[-14:]]
-                        _os_losses = [-d if d < 0 else 0 for d in _os_deltas[-14:]]
-                        _os_ag = sum(_os_gains) / 14
-                        _os_al = sum(_os_losses) / 14
-                        if _os_al > 0:
-                            _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
-                            if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
-                                log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
-                                continue
+                    _conn_os = None
+                    try:
+                        _conn_os = sqlite3.connect(CANDLES_DB, timeout=5)
+                        _cur_os = _conn_os.cursor()
+                        _cur_os.execute("""
+                            SELECT close FROM candles_1m
+                            WHERE token = ? AND is_closed = 1
+                            ORDER BY ts DESC LIMIT 15
+                        """, (tkn.upper(),))
+                        _os_closes = [r[0] for r in _cur_os.fetchall()]
+                        if len(_os_closes) >= 15:
+                            _os_deltas = [_os_closes[i] - _os_closes[i+1] for i in range(len(_os_closes)-1)]
+                            _os_gains = [d if d > 0 else 0 for d in _os_deltas[-14:]]
+                            _os_losses = [-d if d < 0 else 0 for d in _os_deltas[-14:]]
+                            _os_ag = sum(_os_gains) / 14
+                            _os_al = sum(_os_losses) / 14
+                            if _os_al > 0:
+                                _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
+                                if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
+                                    log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
+                                    continue
+                    finally:
+                        if _conn_os:
+                            try: _conn_os.close()
+                            except: pass
             except Exception:
                 pass  # non-fatal
             # ── LONG RSI floor: block LONG at extreme oversold (falling knife) ──
