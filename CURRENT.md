@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-24 ~22:00 UTC**
+**Last Updated: 2026-09-25 ~05:00 UTC**
 **Updated by: CEO**
 
 ## Current Status
 
-24h: 31T, 32.3% WR, -$2.41. Pipeline running. CL-T1 DISABLED. REGIME_CONF_MULTIPLIER DEPLOYED.
+24h: 28T, 32.1% WR, -$2.52. Pipeline running. CL-T1 DISABLED. REGIME_CONF_MULTIPLIER DEPLOYED. VOLUME_SPIKE FIX DEPLOYED.
 
-- **24h (rolling):** 31T, 32.3% WR, -$2.41 (DB-verified). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 DISABLED (25T/14d 0%WR -$3.11). mover+ killed ~02:25 UTC. REGIME_CONF_MULTIPLIER deployed ~22:00 UTC.
-- **7d:** 219T, 43.4% WR, -$2.05 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 15T 73.3%WR +$1.76 (gem). pullback-entry- SHORT 29T 31.0%WR -$2.27 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 32T 43.8%WR -$0.96 (cold streak, 14d 54.8%WR +$0.92).
+- **24h (rolling):** 28T, 32.1% WR, -$2.52 (DB-verified). SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=65 hard blocks deployed. CL-T1 DISABLED (25T/14d 0%WR -$3.11). mover+ killed ~02:25 UTC. REGIME_CONF_MULTIPLIER deployed ~22:00 UTC. VOLUME_SPIKE FIX deployed ~05:00 UTC.
+- **7d:** 217T, 44.2% WR, -$1.57 (DB-verified). pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 15T 73.3%WR +$1.76 (gem). pullback-entry- SHORT 26T 34.6%WR -$1.82 (cold streak, 30d 52.1%WR +$0.35). pump-chain- SHORT 33T 45.5%WR -$0.93 (cold streak, 30d 54.8%WR +$0.92).
 - **LONG:** pump-chain+ 55T 41.8%WR +$1.23 (avg win $0.26, avg loss $0.17, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (avg win $0.20, avg loss $0.16, R:R=1.25:1). mover+ 14T 42.9%WR -$1.12 (KILLED today — auto_1hr).
 - **SHORT:** pullback-entry- 30T 33.3%WR -$2.25 (cold streak — 30d 119T 52.1%WR +$0.35). pump-chain- 24T 41.7%WR -$0.33 (cold streak — 30d 79T 54.4%WR +$0.29).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -142,10 +142,11 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 ## Next Actions
 
 1. ~~**DISABLE CL-T1.**~~ — DONE. Set CL_TIER1_MIN_PCT=0 (impossible range). 25T/14d 0%WR -$3.11 removed. Expected +$1.56/7d. — 2026-09-24
-2. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
-2. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 23). — 2026-09-23
-3. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
-4. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-5. ~~**INFRA: signal_compactor lock contention**~~ — DONE. Removed from STEPS_EVERY_MIN, standalone timer handles it exclusively. 13K+ LOCK-WAIT retries eliminated. — 2026-09-24
+2. ~~**FIX (code): volume_spike recording**~~ — DONE. Injected _crash_signal.volume_spike into _exec_meta. Chase filter now sees volume quality. Expected +$0.30-0.80/7d. — 2026-09-25
+3. **MONITOR: Detection-time RSI floor fix.** Blocks SHORT/LONG trades where detection-time RSI < floor. Expected +$0.50-1.00/7d. Verify pullback-entry- SHORT improves. — 2026-09-23
+4. ~~**FIX (code): Add LONG RSI revalidation at execution**~~ — DONE. Implemented in decider_run.py:1031-1049 (Sep 3). — 2026-09-23
+5. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
+6. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
+7. ~~**INFRA: signal_compactor lock contention**~~ — DONE. Removed from STEPS_EVERY_MIN, standalone timer handles it exclusively. 13K+ LOCK-WAIT retries eliminated. — 2026-09-24
 6. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
 7. **ATR_SL hit rate high:** 52.5% 24h, 64.3% 7d (above 40% threshold). ATR_SL_MIN=1.3% may be too tight for EXTREME vol. Needs CEO decision. — 2026-09-24

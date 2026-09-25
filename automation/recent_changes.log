@@ -1,3 +1,8 @@
+[2026-09-25 ~05:00 UTC] CEO: FIXED volume_spike recording bug (decider_run.py)
+  DB-verified: 28T 32.1%WR -$2.52 (24h) | 217T 44.2%WR -$1.57 (7d) | 442T 47.1%WR -$4.91 (14d)
+  7+ day drift: btc_crash_filter computed volume_spike but decider_run.py never injected it into _signal_metadata. Chase filter blind.
+  Fix: inject _crash_signal.volume_spike into _exec_meta at decider_run.py:4187. Expected +$0.30-0.80/7d.
+  BY: CEO
 [2026-09-24 02:25 UTC] auto_1hr: KILLED mover+ LONG (MOVER_PLUS_ENABLED = False)
   24h: 34T 32.4%WR ~$0 | 7d: 211T 43.1%WR -$1.41 | 14d: 453T 49.4%WR -$0.12
   3 trades closed last hour: ETH bb-bounce-v2-long+ +$0.04, ALT/AVAX mover+ -$0.16 total.

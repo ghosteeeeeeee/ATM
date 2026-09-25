@@ -1907,5 +1907,59 @@
     "category": "regime filter",
     "status": "suggested (monitor)",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-09-24T23:37:12.551857+00:00",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "Raise SHORT_RSI_CEILING 65→80",
+        "rationale": "14d RSI 65-80 SHORT = +$0.28 (profitable). RSI>80 = -$0.23 (losers). Blocks profitable band while failing to block extremes.",
+        "expected_impact": "+$0.18/7d",
+        "risk": "low",
+        "status": "suggested"
+      },
+      {
+        "idea": "Regime-adaptive ATR_SL for EXTREME",
+        "rationale": "atr_sl_hit 139T/7d -$2.73. EXTREME whipsaw. Wider SL reduces false stops.",
+        "expected_impact": "+$0.10-0.30/7d",
+        "risk": "medium",
+        "status": "suggested"
+      },
+      {
+        "idea": "Fix volume_spike recording (CODE BUG)",
+        "rationale": "7+ days 100% NULL. Chase filter blind to volume quality.",
+        "expected_impact": "+$0.30-0.80/7d",
+        "risk": "low",
+        "status": "flagged"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25T05:30:00Z",
+    "idea": "Raise SHORT_RSI_CEILING 65→80",
+    "rationale": "SHORT RSI 65-80 band 14d: 11T 54.5%WR +/usr/bin/bash.42 (profitable). CASHCAT RSI=65.98 won 3/3 times. Current ceiling=65 blocks this profitable band.",
+    "expected_impact": "+$0.10-0.20/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-25T05:30:00Z",
+    "idea": "ATR_SL widened for EXTREME regime",
+    "rationale": "EXTREME regime 14d: 178T 49.4%WR -$0.63. High whipsaw rate. Current ATR_SL_MIN=1.3% may be too tight for EXTREME vol.",
+    "expected_impact": "+$0.20-0.50/7d",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-25T05:30:00Z",
+    "idea": "Fix volume_spike recording in signal_compactor.py",
+    "rationale": "volume_spike 100% NULL 7d (217/217 trades). Chase filter blind to volume quality for 7+ days. Simple 1-line fix.",
+    "expected_impact": "+$0.30-0.80/7d",
+    "category": "bug fix",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
