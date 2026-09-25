@@ -6273,3 +6273,27 @@ Final set: ['ACE', 'CASHCAT', 'IOTA', 'JUP', 'LTC']
 - ADD CAKE (WR=40.0%, PnL=$-0.14, low_wr (40.0%))
 
 Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
+
+## [2026-09-25 07:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. **Open:** 0.
+**24h:** 21T, -$1.83. **14d:** 431T, 47.6% WR, -$4.17.
+
+**Key Metrics:**
+- atr_sl_hit: 12/21 = 57% — dominant close reason, avg loss -$0.108 (trivial)
+- pump_exit_dead_money: 5T +$0.04 — dead money exits net positive
+- No open trades, no recent closes
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No kill candidates (no signal with 0%WR/3+T in 24h)
+- No overtrading (0 trades last hour)
+- All close reasons have trivial avg losses (<$0.21)
+- mover+ already killed (MOVER_PLUS_ENABLED=False)
+
+**Open Questions:**
+- 14d system at -$4.17 — needs more positive days to recover
+- System quiet — no open trades
+
+**BY:** auto_1hr
