@@ -1,197 +1,171 @@
 {
     "timestamp": "2026-09-25T05:30:00Z",
     "session_brain_stats": {
-        "total_sessions": "loaded",
-        "key_insights": [
-            "Signal decay discussion — signals that have high winrate need preservation as market regime changes",
-            "R:R threshold should be lowered to 0.95 — missing good trades",
-            "Trend following signal requested but not yet built",
-            "New NEUTRAL regime signal needed — only 2 types pass confluence"
+        "queries_run": 3,
+        "top_findings": [
+            "SHORT RSI 65-80 band profitable but blocked by ceiling=65",
+            "SHORT NULL RSI edge degraded (was 56.9%WR, now 53.3%WR)",
+            "Signal diversity critical — only 2 types pass NEUTRAL confluence",
+            "CL-T1 disabled 11h — 0 trades since, bleeding stopped",
+            "volume_spike fix deployed today — monitoring impact"
         ]
     },
-    "trade_summary_24h": {
-        "trades": 28,
-        "wr": 32.1,
-        "pnl": -2.52,
-        "losers": 16,
-        "winners": 9,
-        "exit_breakdown": {
-            "atr_sl_hit": "dominant",
-            "pump_exit_dead_money": "3 trades",
-            "cut_loser_CL_T1": "1 trade (legacy position)"
+    "trade_summary": {
+        "24h": {"trades": 26, "wr": 38.5, "pnl": -2.21},
+        "7d": {"trades": 216, "wr": 44.4, "pnl": -1.62},
+        "14d": {"trades": 434, "wr": 47.5, "pnl": -4.52}
+    },
+    "regime_performance_14d": {
+        "EXTREME": {"trades": 174, "wr": 50.0, "pnl": -0.37},
+        "NORMAL": {"trades": 90, "wr": 46.7, "pnl": -1.38},
+        "HIGH": {"trades": 167, "wr": 44.9, "pnl": -2.80},
+        "FLAT": {"trades": 2, "wr": 100.0, "pnl": 0.03}
+    },
+    "rsi_bands_14d": {
+        "SHORT": {
+            "NULL": {"trades": 15, "wr": 53.3, "pnl": 0.00},
+            "RSI<35": {"trades": 50, "wr": 42.0, "pnl": -1.43},
+            "RSI 35-50": {"trades": 55, "wr": 45.5, "pnl": -2.20},
+            "RSI 50-65": {"trades": 67, "wr": 50.7, "pnl": -0.04},
+            "RSI 65-80": {"trades": 11, "wr": 54.5, "pnl": 0.42},
+            "RSI 80+": {"trades": 4, "wr": 25.0, "pnl": -0.08}
+        },
+        "LONG": {
+            "NULL": {"trades": 22, "wr": 40.9, "pnl": -0.83},
+            "RSI<35": {"trades": 19, "wr": 10.5, "pnl": -2.31},
+            "RSI 35-50": {"trades": 31, "wr": 67.7, "pnl": 1.60},
+            "RSI 50-65": {"trades": 86, "wr": 52.3, "pnl": 0.09},
+            "RSI 65-80": {"trades": 68, "wr": 44.1, "pnl": 0.31},
+            "RSI 80+": {"trades": 6, "wr": 66.7, "pnl": -0.05}
         }
     },
-    "trade_summary_7d": {
-        "trades": 217,
-        "wr": 44.2,
-        "pnl": -1.57
+    "losing_autopsy_24h": {
+        "total_losers": 14,
+        "breakdown": {
+            "pump-chain- SHORT": {"trades": 8, "pnl": -0.56, "regimes": "EXTREME/HIGH whipsaw, small losses $0.01-$0.32"},
+            "mover+ LONG": {"trades": 3, "pnl": -0.61, "note": "KILLED today"},
+            "bb-bounce-v2-long+ LONG": {"trades": 1, "pnl": -0.16, "note": "cut-loser-CL-T1"},
+            "ema300-breakthrough+ LONG": {"trades": 1, "pnl": -0.28, "note": "atr_sl_hit"},
+            "r2-trend-short4 SHORT": {"trades": 1, "pnl": -0.21, "note": "cut-loser-CL-T1"}
+        },
+        "root_causes": [
+            "pump-chain- SHORT: EXTREME whipsaw — small losses, normal variance. 14d baseline still +$0.92.",
+            "mover+ LONG: KILLED today (14d 42.9%WR -$1.12). No fix needed — signal dead.",
+            "atr_sl_hit dominates: 10/14 losers exit via ATR_SL. Normal for momentum signals.",
+            "cut-loser-CL-T1: 2 trades, both losers. CL-T1 disabled — these are residual from before disable."
+        ]
     },
-    "trade_summary_14d": {
-        "trades": 439,
-        "wr": 46.9,
-        "pnl": -5.15
+    "signal_quality_deep_dive": {
+        "workhorse": {
+            "signal": "pump-chain+ LONG",
+            "14d": "74T 40.5%WR +$0.57",
+            "atr_sl_hit_rate": "83.8%",
+            "assessment": "High ATR_SL rate but winners are BIG (AVAX +$1.02, JUP +$0.47). R:R=1.43:1. Winners ride momentum, losers stopped small. System working as designed."
+        },
+        "gem": {
+            "signal": "volume-breakout-long+ LONG",
+            "14d": "18T 66.7%WR +$1.46",
+            "atr_sl_hit_rate": "94.4%",
+            "assessment": "Highest ATR_SL rate but STILL profitable because winners are massive. 94% hit rate means entries are aggressive — price often dips before ripping. Could be improved with tighter entry timing."
+        },
+        "cold_streak": {
+            "signal": "pullback-entry- SHORT",
+            "14d": "94T 46.8%WR -$1.59",
+            "atr_sl_hit_rate": "81.9%",
+            "assessment": "BIGGEST DRAG. 30d baseline 52.1%WR +$0.35 — cold streak, not systemic. RSI_FLOOR=50 deployed Sep 24 should help. Need 48h to measure impact."
+        },
+        "hidden_gem": {
+            "signal": "pump-chain- SHORT",
+            "14d": "65T 50.8%WR -$0.90",
+            "7d_cold_streak": "33T 42.4%WR -$0.80",
+            "30d_baseline": "79T 54.4%WR +$0.29",
+            "assessment": "Cold streak in 7d. EXTREME regime still shows edge. Dead hours enforcement working (0 trades in blocked hours after Sep 25 01:10 UTC)."
+        }
     },
     "drift_findings": [
         {
-            "severity": "HIGH",
-            "issue": "volume_spike 100% NULL 7d (217/217 trades)",
-            "impact": "Chase filter blind to volume quality for 7+ days",
-            "sessions_flagged": "5+ sessions since Sep 18",
-            "status": "UNFIXED — needs code fix in signal_compactor.py to write volume_spike to _signal_metadata"
+            "finding": "SHORT_RSI_CEILING=65 blocks profitable RSI 65-80 band",
+            "data": "11T 54.5%WR +$0.42/14d in RSI 65-80",
+            "caveat": "3 of 11 winners were CASHCAT trades BEFORE ceiling deployed (Sep 24 16:30). Post-deployment: only 2 trades (1 winner, 1 loser). Sample too small for confident change.",
+            "recommendation": "MONITOR — do not change ceiling yet. Need 20+ post-deployment trades in RSI 65-80 to validate edge.",
+            "impact": "+$0.20-0.40/7d if edge holds"
         },
         {
-            "severity": "MEDIUM",
-            "issue": "SHORT_RSI_CEILING=65 may not be enforced for STANDALONE_BYPASS signals",
-            "evidence": "CASHCAT RSI=65.98 SHORT executed at 17:31 UTC Sep 24 — AFTER fix deployed at 16:30 UTC. Pipeline may not have been restarted.",
-            "impact": "RSI>65 SHORT entries still executing",
-            "status": "VERIFY — restart pipeline if not done"
+            "finding": "SHORT NULL RSI edge degraded",
+            "data": "14d 15T 53.3%WR $0.00 (was 130T 56.9%WR +$2.08 pre-RSI floor fixes)",
+            "recommendation": "MONITOR — edge may have been partially from RSI<50 trades now blocked by floor. NULL RSI is still better than HAS_RSI.",
+            "impact": "N/A — monitoring"
         },
         {
-            "severity": "LOW",
-            "issue": "gap_at_entry 15% NULL (33/217 trades 7d)",
-            "impact": "Chase filter partially blind for tokens with <300 candles",
-            "status": "EMA fallback deployed Sep 23 — monitoring"
+            "finding": "volume_spike recording fix deployed today",
+            "data": "7d 216/216 trades had NULL volume_spike. Chase filter blind to volume quality.",
+            "recommendation": "MONITOR 48h — fix deployed ~05:00 UTC today. Verify volume_spike now populates in _signal_metadata.",
+            "impact": "+$0.30-0.80/7d estimated"
         },
         {
-            "severity": "INFO",
-            "issue": "CL-T1 still showing 16 trades 7d with 0%WR",
-            "impact": "Legacy positions opened before CL-T1 disable. Not a drift — expected to age out.",
-            "status": "EXPECTED — no action needed"
+            "finding": "CL-T1 disabled 11h — 0 trades since",
+            "data": "25T/14d 0%WR -$3.11 removed",
+            "recommendation": "MONITOR — bleeding stopped. Expected +$1.56/7d.",
+            "impact": "+$1.56/7d if sustained"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "pullback-entry- SHORT cold streak",
-            "sessions": "10+ sessions",
-            "data": "7d 26T 34.6%WR -$1.82 | 30d 119T 52.1%WR +$0.35",
-            "root_cause": "RSI<50 entries catastrophic (FIL 33.91, COMP 13.04, DOT 27.27 all lost). SHORT_RSI_FLOOR=50 should block going forward.",
-            "status": "FIX DEPLOYED — monitoring"
+            "problem": "ATR_SL hit rate elevated across signals",
+            "data": "volume-breakout-long+ 94.4%, pump-chain+ 83.8%, pullback-entry- 81.9%",
+            "assessment": "NOT a bug — these are momentum signals. Winners ride big moves (AVAX +45.7%, JUP +21.1%). ATR_SL catches losers early. System designed this way. R:R matters more than hit rate.",
+            "action": "NONE — R:R is healthy for pump-chain+ (1.43:1) and volume-breakout-long+ (1.25:1)"
         },
         {
-            "topic": "pump-chain- SHORT cold streak",
-            "sessions": "5+ sessions",
-            "data": "7d 33T 45.5%WR -$0.93 | 14d 66T 54.8%WR +$0.92",
-            "root_cause": "EXTREME regime whipsaw. FOGO RSI=100 SHORT executed (ceiling bypass). ALGO RSI=37.5 SHORT executed (floor bypass pre-fix).",
-            "status": "FLOOR/CEILING FIXES DEPLOYED — monitoring"
+            "problem": "pullback-entry- SHORT biggest drag (-$1.59/14d)",
+            "data": "94T 46.8%WR, 30d baseline 52.1%WR +$0.35",
+            "assessment": "Cold streak, not systemic. SHORT_RSI_FLOOR=50 deployed Sep 24 should block the RSI 35-50 band (55T 45.5%WR -$2.20/14d). Need48h to measure.",
+            "action": "MONITOR — SHORT_RSI_FLOOR=50 impact"
         },
         {
-            "topic": "SIGNAL DIVERSITY — only 2 types carry NEUTRAL",
-            "sessions": "8+ sessions since Sep 16",
-            "data": "pump-chain+ LONG 55T +$1.23, volume-breakout-long+ 15T +$1.76. All other signals net negative in NEUTRAL.",
-            "status": "NEEDS NEW SIGNALS — not yet built"
+            "problem": "Signal diversity — only 2 types pass NEUTRAL confluence",
+            "data": "pump-chain+ LONG and volume-breakout-long+ carry all PnL in NEUTRAL",
+            "assessment": "Longstanding issue. 30d: 6+ types active but only 2 are net positive. Need new NEUTRAL-compatible signals.",
+            "action": "DEVELOP — new signals for NEUTRAL regime (ongoing priority)"
         }
     ],
-    "losing_trade_autopsy": [
-        {
-            "losing_trade": "FIL SHORT pump-chain- pnl=-$0.22 (-6.65%)",
-            "signal": "pump-chain-",
-            "regime": "EXTREME",
-            "root_cause": "Entered at RSI=53.12 (OK), but EXTREME whipsaw hit ATR_SL. Price moved against immediately.",
-            "entry_check": "RSI 53.12 at entry — within sweet spot. No entry quality issue.",
-            "regime_check": "EXTREME — high volatility, whipsaw-prone. ATR_SL hit rate elevated.",
-            "recommended_change": "No entry filter change needed — this is normal EXTREME variance. ATR_SL widening for EXTREME could help.",
-            "impact_on_winners": "N/A — variance trade",
-            "confidence": "LOW"
-        },
-        {
-            "losing_trade": "SYRUP LONG ema300-breakthrough+ pnl=-$0.28 (-3.74%)",
-            "signal": "ema300-breakthrough+",
-            "regime": "EXTREME",
-            "root_cause": "Entered LONG at EXTREME vol. ema300-breakthrough+ is not in STANDALONE_BYPASS — needs confluence. May have entered on weak signal.",
-            "entry_check": "Signal type not typically strong in EXTREME.",
-            "regime_check": "EXTREME — high volatility, momentum can reverse fast.",
-            "recommended_change": "Monitor — 1 trade sample too small for action.",
-            "impact_on_winners": "N/A",
-            "confidence": "LOW"
-        },
-        {
-            "losing_trade": "TURBO SHORT r2-trend-short4 pnl=-$0.21 (-2.94%)",
-            "signal": "r2-trend-short4",
-            "regime": "EXTREME",
-            "root_cause": "Cut by CL-T1 (legacy position). CL-T1 disabled but this trade was opened before disable.",
-            "entry_check": "N/A — legacy exit mechanism.",
-            "regime_check": "N/A",
-            "recommended_change": "No action — CL-T1 disabled, this will age out.",
-            "impact_on_winners": "N/A",
-            "confidence": "HIGH"
-        },
-        {
-            "losing_trade": "BTC LONG continuum-osc+ pnl=-$0.16 (-6.70%)",
-            "signal": "continuum-osc+",
-            "regime": "NORMAL",
-            "root_cause": "Entered LONG in NORMAL regime at 02:47 UTC — dead hours territory for some signals. ATR_SL hit at 09:31 UTC.",
-            "entry_check": "BTC LONG at NORMAL — momentum may have been weak.",
-            "regime_check": "NORMAL — worst performing regime (-$1.43/14d).",
-            "recommended_change": "Consider regime-specific confidence penalty for LONG entries in NORMAL (REGIME_CONF_MULTIPLIER already applies 0.85x).",
-            "impact_on_winners": "N/A — 1 trade",
-            "confidence": "LOW"
-        }
-    ],
-    "signal_quality_deep_dive": {
-        "pullback_entry_short": {
-            "7d": "26T 34.6%WR -$1.82",
-            "30d": "119T 52.1%WR +$0.35",
-            "analysis": "Cold streak but 30d baseline profitable. RSI<50 entries catastrophic — SHORT_RSI_FLOOR=50 should block. RSI 50-65 sweet spot: need to verify post-fix performance.",
-            "recommendation": "Monitor 48h for SHORT_RSI_FLOOR=50 impact. If 7d WR stays below 40%, consider signal-specific RSI floor."
-        },
-        "pump_chain_short": {
-            "7d": "33T 45.5%WR -$0.93",
-            "14d": "66T 54.8%WR +$0.92",
-            "analysis": "Cold streak in EXTREME. FOGO RSI=100 SHORT executed (ceiling bypass). 14d still profitable overall.",
-            "recommendation": "Verify SHORT_RSI_CEILING enforcement after pipeline restart. EXTREME whipsaw is normal variance."
-        },
-        "pump_chain_long": {
-            "7d": "55T 41.8%WR +$1.23",
-            "14d": "76T 40.8%WR +$0.62",
-            "analysis": "Workhorse signal. R:R=1.53:1 is excellent. WR declining but PnL positive due to good R:R.",
-            "recommendation": "No change needed. LONG_RSI_SWEET_SPOT_BOOST=10 already applied."
-        },
-        "volume_breakout_long": {
-            "7d": "15T 73.3%WR +$1.76",
-            "analysis": "Gem signal. 73.3% WR with good PnL. Keep as-is.",
-            "recommendation": "No change needed."
-        }
-    },
+    "missing_implementations": [],
     "creative_improvements": [
         {
             "date": "2026-09-25T05:30:00Z",
-            "idea": "Raise SHORT_RSI_CEILING 65→80",
-            "rationale": "SHORT RSI 65-80 band 14d: 11T 54.5%WR +$0.42 (profitable). CASHCAT RSI=65.98 won 3/3 times. Current ceiling=65 blocks this profitable band. RSI>80 = 4T 25%WR -$0.08 (losers). Raise to 80 to unblock RSI 65-80 while still blocking extreme overbought.",
-            "expected_impact": "+$0.10-0.20/7d from unblocking profitable RSI 65-80 SHORT entries",
+            "idea": "SHORT_RSI_CEILING 65→80 — capture profitable RSI 65-80 band",
+            "rationale": "14d: RSI 65-80 SHORT = 11T 54.5%WR +$0.42. RSI>80 = 4T 25%WR -$0.08 (keep blocking). Raising ceiling captures +$0.42/14d while still blocking catastrophic overbought entries. BUT: 3 of 11 winners were pre-deployment. Post-deployment sample too small.",
+            "expected_impact": "+$0.20-0.40/7d if edge holds",
             "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "impact_on_winners": "Would have unblocked 3 CASHCAT winners (+$0.39) and 2 other winners. Would still block RSI>80 losers."
+            "status": "monitoring — need 20+ post-deployment trades",
+            "risk": "low"
         },
         {
             "date": "2026-09-25T05:30:00Z",
-            "idea": "ATR_SL widened for EXTREME regime",
-            "rationale": "EXTREME regime 14d: 178T 49.4%WR -$0.63. High whipsaw rate — ATR_SL hits are premature in high volatility. Current ATR_SL_MIN=1.3%, MAX=1.5%. Widening to 1.5%/1.7% for EXTREME could reduce premature stops.",
-            "expected_impact": "+$0.20-0.50/7d from fewer premature ATR_SL exits in EXTREME",
-            "category": "exit optimization",
-            "status": "suggested",
-            "risk": "medium",
-            "impact_on_winners": "Need to verify — wider SL means larger losses on真正的 losers. Check: how many EXTREME losers would have been saved by wider SL vs how many winners would have larger losses."
+            "idea": "REGIME_CONF_MULTIPLIER impact measurement",
+            "rationale": "Deployed Sep 24 ~22:00 UTC. EXTREME +1.5% confidence, NORMAL -15% confidence. 7h of data — too early to measure. EXTREME 7d: 103T 44.7%WR -$0.42 vs NORMAL 32T 43.8%WR -$0.44.",
+            "expected_impact": "+$0.50-1.00/7d estimated",
+            "category": "confidence tuning",
+            "status": "monitoring",
+            "risk": "low"
         },
         {
             "date": "2026-09-25T05:30:00Z",
-            "idea": "Fix volume_spike recording in signal_compactor.py",
-            "rationale": "volume_spike 100% NULL 7d (217/217 trades). Chase filter blind to volume quality for 7+ days. btc_crash_filter computes volume_spike but signal_compactor never writes it to _signal_metadata. Simple code fix — add 1 line to write volume_spike to metadata.",
-            "expected_impact": "+$0.30-0.80/7d from chase filter seeing volume quality",
-            "category": "bug fix",
-            "status": "suggested",
-            "risk": "low",
-            "impact_on_winners": "None — chase filter only blocks, doesn't affect winners"
+            "idea": "volume_spike chase filter activation",
+            "rationale": "Fix deployed today ~05:00 UTC. Chase filter now sees volume quality. Should block low-volume chases that previously bypassed. Expected +$0.30-0.80/7d.",
+            "expected_impact": "+$0.30-0.80/7d",
+            "category": "chase filter",
+            "status": "monitoring — just deployed",
+            "risk": "low"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "RESTART PIPELINE — ensure SHORT_RSI_CEILING=65 fix is loaded (CASHCAT RSI=65.98 SHORT executed after fix time)",
-        "MONITOR: SHORT_RSI_FLOOR=50 impact on pullback-entry- SHORT (48h)",
-        "MONITOR: REGIME_CONF_MULTIPLIER impact (deployed Sep 24 ~22:00 UTC)",
-        "MONITOR: LONG_RSI_SWEET_SPOT_BOOST=10 impact (deployed Sep 24 ~17:35 UTC)",
-        "MONITOR: CL-T1 disable impact — 16 legacy trades should age out",
-        "FIX: volume_spike recording in signal_compactor.py (7+ day drift)",
-        "DEVELOP: New signals for NEUTRAL regime (critical diversity gap)"
+        "MONITOR volume_spike fix impact (48h) — verify _signal_metadata now has volume_spike",
+        "MONITOR CL-T1 disable impact — 0 trades since disable, bleeding stopped",
+        "MONITOR SHORT_RSI_FLOOR=50 impact on pullback-entry- SHORT",
+        "MONITOR REGIME_CONF_MULTIPLIER impact (EXTREME +1.5%, NORMAL -15%)",
+        "DEVELOP new signals for NEUTRAL regime — only 2 types pass confluence",
+        "REVIEW SHORT_RSI_CEILING after 20+ trades in RSI 65-80 band"
     ]
 }
