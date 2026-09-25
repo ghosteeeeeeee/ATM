@@ -1,115 +1,33 @@
-# Signal Performance Report
-**Generated:** 2026-09-25 05:09 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: Last 6h (0 trades) | 24h (12 trades)
 
-## Summary
-- **6h closed trades:** 2 (quiet period)
-- **24h closed trades:** 24
-- **Signal inversions:** None
-- **Kills executed:** 0 (no signals meet all3 kill criteria in 24h)
-- **Regime blocks:** Already in place (pump-chain- EXTREME/HIGH, mover+ EXTREME)
-- **Bug found:** volatility_regime column shows NEUTRAL for all trades — regime blocks were leaking before commit c90c998e fix
+KILLED (executed): None — no signals meet hard-kill criteria (WR<30% + 5+ trades + PnL<-$0.10)
 
----
+BOOSTED (executed): None — continuum-osc+ LONG 100%WR but only 2T (insufficient sample)
 
-## 24h Performance (3+ trades)
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 57.1% | -$0.46 | 7 | WATCH — loses in EXTREME/HIGH regimes |
+| ema300-breakthrough+ | LONG | 0% | -$0.28 | 1 | WATCH — single trade, insufficient data |
+| r2-trend-short4 | SHORT | 0% | -$0.21 | 1 | WATCH — single trade, insufficient data |
 
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| pump-chain- | SHORT | 12 | 58.3% | -$0.42 | WATCH — R:R issue |
-| mover+ | LONG | 3 | 0.0% | -$0.61 | KILLED (2026-09-24) |
-| bb-bounce-v2-long+ | LONG | 3 | 33.3% | -$0.16 | OK (all-time 74% WR) |
-| continuum-osc+ | LONG | 3 | 66.7% | -$0.06 | OK (new signal, 4 trades total) |
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| continuum-osc+ | LONG | 100% | +$0.10 | 2 | OK — small sample, keep watching |
 
----
+ISSUES:
+- **Volatility gate bug**: pump-chain- SHORT trades still fire in EXTREME (4T/24h) and HIGH (2T/24h) despite Pump_Flow multiplier=0.0 in both regimes (volatility_gate_v2.py lines 247, 272). The gate reduces confidence but doesn't hard-block — trades pass via STANDALONE_BYPASS. All-time: EXTREME 53.6%WR -$0.11, HIGH 48%WR -$0.36. Only NORMAL is profitable (85.7%WR +$0.16). Recommend: add hard regime block in pump_flow_signal.py or signal_compactor.py for EXTREME/HIGH, not just confidence multiplier.
+- **Low activity**: Only 12 trades in 24h. System is quiet — normal for current market conditions.
+- **No signal inversions** found.
+- **pump-chain-,rs-r61 SHORT**: 1 trade, $0.00 PnL — dead money exit, insufficient data.
 
-## KILLS (executed)
+REGIME BREAKDOWN (pump-chain- SHORT, all-time):
+| Regime | Trades | WR | PnL | Avg PnL |
+|--------|--------|-----|-----|---------|
+| EXTREME | 56 | 53.6% | -$0.11 | -$0.002 |
+| HIGH | 25 | 48.0% | -$0.36 | -$0.014 |
+| NORMAL | 7 | 85.7% | +$0.16 | +$0.023 |
 
-None. No24h signal meets all3 criteria (WR<30%, 5+ trades, PnL<-$0.10).
-
----
-
-## REGIME BLOCKS (already active)
-
-| Signal | Family | Regime | Mult | Reason |
-|--------|--------|--------|------|--------|
-| pump-chain- | Pump_Flow | EXTREME | 0.0 | 53.6% WR -$0.11 lifetime, wins NORMAL |
-| pump-chain- | Pump_Flow | HIGH | 0.0 | 48% WR -$0.36 lifetime, wins NORMAL |
-| mover+ | Mover | EXTREME | 0.0 | 50% WR -$0.93 lifetime, wins NORMAL |
-
-**BUG:** Before commit c90c998e, 0.0 multipliers were clamped to 0.3 — trades leaked through blocked regimes. The 12 pump-chain- SHORT trades in EXTREME/HIGH (24h) are from before this fix.
-
----
-
-## BOOSTS (candidates)
-
-None. No24h signal has WR>55% + 5+ trades + positive PnL.
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | WR | PnL | Trades | Issue |
-|--------|-----|-----|-----|--------|-------|
-| pump-chain- | SHORT | 58.3% | -$0.42 | 12 | R:R: avg_win=$0.065, avg_loss=$-0.18 |
-| ct_hot | LONG | 38.4% | -$4.07 | 99 | All regimes lose (EXTREME 40%, HIGH 34%, NORMAL 41%) |
-| inv_accel_ | LONG | 14.3% | -$0.31 | 77 | Dead signal, all regimes lose |
-| sqx | LONG | 0.0% | -$0.17 | 9 | All trades lose |
-| hl_copy_trader | SHORT | 16.7% | -$0.76 | 6 | Already in NEVER_REENABLE |
-
----
-
-## WINNERS (24h)
-
-None with 5+ trades. Top24h by PnL:
-- pump-chain-|SHORT: 7 wins across6 tokens ($0.38 gross)
-- continuum-osc+|LONG: 2 wins ($0.10 gross)
-
----
-
-## ALL-TIME TOP PERFORMERS
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| accel_300_,rs_s_broken | SHORT | 1021 | 46.4% | +$6.23 |
-| bb_bounce_v2_long | LONG | 73 | 74.0% | +$2.08 |
-| open_skies | LONG | 19 | 63.2% | +$1.56 |
-| volume-breakout-long+ | LONG | 18 | 66.7% | +$1.46 |
-| accel_300_v | SHORT | 72 | 52.8% | +$1.46 |
-| hl_copy_trader | LONG | 73 | 49.3% | +$1.44 |
-| pump_chain | LONG | 41 | 68.3% | +$1.11 |
-| pump-chain+ | LONG | 80 | 41.3% | +$0.95 |
-
----
-
-## SIGNAL INVERSIONS
-
-**None found.** All signals respect their direction labels.
-
----
-
-## ISSUES
-
-1. **volatility_regime column mismatch** — The `volatility_regime` column in the trades table shows NEUTRAL for all recent trades while the `regime` column shows the correct value. The regime gate was using the wrong column, causing trades to leak through blocked regimes. Fixed in commit c90c998e but needs verification that new trades are using the correct regime.
-
-2. **pump-chain- SHORT R:R degradation** — 58.3% WR but negative PnL due to avg_loss ($0.18) being 2.8x avg_win ($0.065). The signal wins more often than it loses, but losses are too large. Consider tightening SL or widening TP for this signal.
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-09-25 | 2f87efe | scripts: add pump-chain- SHORT dead hour 18 |
-| 2026-09-25 | f5c419e | auto_1hr: add pump-chain+ LONG dead hours 0,23 |
-| 2026-09-25 | 52923bc | fix: pump-chain- SHORT dead hours — remove profitable [4,17] |
-| 2026-09-24 | fa3ed2b | scripts: Add pump-chain- SHORT dead hours [4,9,17,20] |
-| 2026-09-24 | 64e2c7a | CEO: REGIME_CONF_MULTIPLIER deployed |
-| 2026-09-24 | 76ffdba | signals: add pump-chain- SHORT dead hours [2,3] |
-| 2026-09-24 | 02581c8 | CEO: DISABLE CL-T1 — 25T/14d 0%WR -$3.11 |
-| 2026-09-24 | 9441fe6 | CEO: RAISE SHORT_RSI_FLOOR 40→50 |
-| 2026-09-24 | cb1739e | signals: KILL mover+ LONG — 3T 0%WR -$0.44 |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
-
----
-*Report auto-generated by signal_reporter. Next report: ~6h from now.*
+Generated: 2026-09-25
