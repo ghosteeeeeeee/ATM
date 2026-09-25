@@ -863,9 +863,10 @@ CONTRARIAN_ZONE_POSITION_SIZE_MULT = 0.5   # position size multiplier (marginal 
 
 # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
 # 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
-# pump-chain+ RSI 35-50 = 9T 55.6%WR +$0.77. rr-struct+ RSI 35-50 = strong.
+# pump-chain+ RSI 55-60 = 8T 75%WR +$1.68 (best). RSI 40-50 = 36T 58.3%WR +$1.64 (solid).
+# Narrowed 35→40: RSI 35-40 = 7T 57.1%WR -$0.25 (dead zone, net negative).
 # Blocks nothing — only boosts confidence for entries already in the sweet spot.
-LONG_RSI_SWEET_SPOT_MIN = 35
+LONG_RSI_SWEET_SPOT_MIN = 40
 LONG_RSI_SWEET_SPOT_MAX = 50
 LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
 
@@ -1253,7 +1254,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
 # 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
-PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 5, 7, 8, 13, 21, 22, 23]  # auto_1hr 2026-09-25 — added 0 (5T 20%WR -$0.36) and 23 (4T 0%WR -$0.69). Data shifted since CEO Sep 23 fix. Expected +$1.05/14d = +$0.53/7d.
+PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 5, 7, 8, 13, 14, 20, 21, 22, 23]  # auto_1hr 2026-09-25 — added 14 (4T 25%WR -$0.33) and 20 (3T 0%WR -$0.30). Net dead hours: +$1.68/14d = +$0.84/7d.
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
 PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-09-24 — 14d: RSI 65-75 = 15T 41.7%WR +$0.02 (dead zone, flat). RSI>75 = 10T 40%WR -$0.32 (negative). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Tightened 75→70 to block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Expected +$0.03-0.10/7d.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
