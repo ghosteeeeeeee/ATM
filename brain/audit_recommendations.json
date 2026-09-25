@@ -1,163 +1,120 @@
 {
-    "timestamp": "2026-09-25T16:00:00Z",
-    "session_brain_stats": {
-        "total_sessions_searched": 30,
-        "top_topics": ["signal winrate", "regime edge", "RSI bands", "ATR_SL hit rate", "dead hours", "CL-T1"]
-    },
-    "trade_summary_24h": {
-        "trades": 6,
-        "wr": 66.7,
-        "pnl": -0.19,
-        "open": 0,
-        "regime": "NEUTRAL/HIGH"
-    },
-    "trade_summary_7d": {
-        "trades": 203,
-        "wr": 41.9,
-        "pnl": -2.46,
-        "best_signal": "pump-chain+ LONG 55T 41.8%WR +$1.23",
-        "best_regime": "EXTREME 97T 42.3%WR -$1.05 (worst 7d but best 14d +$0.31)"
-    },
-    "trade_summary_14d": {
-        "trades": 401,
-        "wr": 47.6,
-        "pnl": -3.72
-    },
-    "drift_findings": [
-        {
-            "topic": "mover+ kill propagation",
-            "severity": "HIGH",
-            "detail": "mover+ killed Sep 24 but 11 trades 7d, 27.3%WR -$1.38. Kill signal not reaching execution path.",
-            "impact": "-$1.38/7d from a disabled signal",
-            "action_needed": "Investigate why mover+ fires post-disable. Check if it's in STANDALONE_BYPASS or if kill flag isn't checked at execution."
-        },
-        {
-            "topic": "SHORT NULL RSI edge degraded",
-            "severity": "LOW",
-            "detail": "14d: 2T NULL RSI SHORT 50%WR -$0.05. Previous 130T 56.9%WR +$2.08. Edge evaporated.",
-            "impact": "Missing ~$0.20-0.40/7d from detection-time fallback boost that was suggested 3+ times",
-            "action_needed": "Monitor. Market conditions may have shifted. No action recommended."
-        }
+  "timestamp": "2026-09-25T17:38:25.952724+00:00",
+  "session_brain_stats": {
+    "query_topics": [
+      "signal performance",
+      "creative ideas",
+      "loss bleeding"
     ],
-    "recurring_problems": [
-        {
-            "topic": "ATR_SL hit rate EXTREME",
-            "sessions_mentioned": 8,
-            "detail": "EXTREME 7d: 72.2% ATR_SL hit rate (70/97). Winners avg +6.78%, losers avg -5.29%. R:R 1.28:1. SL cutting winners short.",
-            "current_status": "ATR_SL_MAX widened 1.5→1.8% today. EXTREME 1.2x multiplier added. Too early to measure."
-        },
-        {
-            "topic": "Signal diversity",
-            "sessions_mentioned": 10,
-            "detail": "Only pump-chain+ LONG ($1.23) and volume-breakout-long+ ($1.25) profitable. System fragile.",
-            "current_status": "Need new NEUTRAL signal. Session brain has 'trend following' and 'sma20_dip' ideas."
-        },
-        {
-            "topic": "pullback-entry- SHORT cold streak",
-            "sessions_mentioned": 6,
-            "detail": "7d: 25T 36%WR -$1.66. But 30d: 119T 52.1%WR +$0.35. Cold streak, not systemic.",
-            "current_status": "SHORT_RSI_FLOOR=50 should help. Monitor."
-        }
-    ],
-    "losing_trade_autopsy": {
-        "losers_24h": 2,
-        "losers_7d": 103,
-        "top_losers_7d": [
-            {
-                "signal": "pullback-entry- SHORT",
-                "trades": 25,
-                "pnl": -1.66,
-                "wr": 36.0,
-                "root_cause": "EXTREME whipsaw + ATR_SL 90.5% hit rate in EXTREME. Winners can't outrun stops.",
-                "fix": "ATR_SL_MAX 1.8% + EXTREME 1.2x deployed today. Monitor 48h."
-            },
-            {
-                "signal": "mover+ LONG",
-                "trades": 11,
-                "pnl": -1.38,
-                "wr": 27.3,
-                "root_cause": "KILLED signal still executing. 10/11 ATR_SL hits.",
-                "fix": "INVESTIGATE kill propagation bug."
-            },
-            {
-                "signal": "pump-chain- SHORT",
-                "trades": 33,
-                "pnl": -0.93,
-                "wr": 45.5,
-                "root_cause": "Cold streak (14d was 54.8%WR +$0.74). ATR_SL 63.4% hit rate in EXTREME.",
-                "fix": "Cold streak, not systemic. ATR_SL_MAX widening should help."
-            }
-        ]
+    "key_insight": "Session brain shows repeated discussion of ATR_SL EXTREME problem (7+ sessions), SHORT NULL RSI edge degradation, and signal diversity crisis."
+  },
+  "trade_summary": {
+    "24h": "5T 80%WR +$0.09 (quiet, positive)",
+    "7d": "200T 41.5%WR -$3.09",
+    "14d": "188T 46.8%WR -$3.24",
+    "atr_sl_hit_rate_14d": "63.6% (CRITICAL — above 40% threshold)",
+    "atr_sl_extreme_14d": "65.4% hit rate, winners +6.78%, losers -4.64%, R:R 1.46:1",
+    "main_signals_7d": {
+      "pump-chain+_LONG": "55T 41.8%WR +$1.23 (workhorse, R:R 1.46:1)",
+      "volume-breakout-long+_LONG": "6T 50%WR +$0.57 (gem)",
+      "pump-chain-_SHORT": "33T 45.5%WR -$0.93 (cold streak)",
+      "pullback-entry-_SHORT": "25T 36%WR -$1.66 (cold streak)",
+      "mover+_LONG": "11T 27.3%WR -$1.38 (KILLED Sep 24, legacy trades)"
+    }
+  },
+  "drift_findings": [
+    {
+      "issue": "SHORT_RSI_FLOOR=50 bypass for STANDALONE_BYPASS",
+      "severity": "MEDIUM",
+      "detail": "3 pump-chain- SHORT trades executed post-fix (Sep 24 06:00) with BOTH live and detection RSI <50. ATOM RSI=31.70/47.06, BTC RSI=28.57/41.66, ALGO RSI=34.63/37.5. All via STANDALONE_BYPASS. Net impact: +$0.06 (2 winners, 1 loser). Filter should block but isn't catching these.",
+      "recommendation": "Verify decider_run.py _ctx_gate_get_rsi() returns valid values for these tokens. Possible: RSI lookup fails for low-volume tokens, returns None, bypassing floor check."
     },
-    "signal_quality_deep_dive": {
-        "pump_chain_long_extreme": {
-            "trades_14d": 40,
-            "wr": 47.5,
-            "pnl": 1.23,
-            "atr_sl_hit_rate": 85.0,
-            "avg_win": 6.78,
-            "avg_loss": -5.29,
-            "verdict": "Workhorse. Still net positive despite high ATR_SL. Winners are big enough."
-        },
-        "volume_breakout_long": {
-            "trades_14d": 18,
-            "wr": 66.7,
-            "pnl": 1.46,
-            "atr_sl_hit_rate": 90.0,
-            "avg_win": 0.34,
-            "avg_loss": -0.15,
-            "verdict": "Gem. 90% ATR_SL hit rate but winners are 2.3x losers. R:R works."
-        },
-        "pullback_entry_short": {
-            "trades_14d": 76,
-            "wr": 44.7,
-            "pnl": -0.34,
-            "atr_sl_hit_rate_7d": 100,
-            "verdict": "30d still positive (52.1%WR +$0.35). 7d cold streak. ATR_SL widening should help."
-        },
-        "mover_plus": {
-            "trades_7d": 11,
-            "wr": 27.3,
-            "pnl": -1.38,
-            "verdict": "KILLED but still firing. Bug. Needs immediate investigation."
-        }
+    {
+      "issue": "mover+ kill propagation — working correctly",
+      "severity": "INFO",
+      "detail": "MOVER_PLUS_ENABLED=False set Sep 24. 0 new entries post-kill. 11 trades in 7d all opened BEFORE kill deployed. Kill working as designed.",
+      "recommendation": "No action needed. Kill is effective."
     },
-    "creative_improvements": [
-        {
-            "date": "2026-09-25T16:00:00Z",
-            "idea": "pump-chain+ LONG CONFIDENCE FLOOR: Set minimum confidence to 70% when EXTREME",
-            "rationale": "EXTREME 7d: pump-chain+ LONG has 85% ATR_SL hit rate. The low-confidence entries (below 70) get stopped out. Higher confidence = better entries = fewer stops. 14d EXTREME pump-chain+ is still +$1.23, but the stops are eating winners.",
-            "expected_impact": "+$0.20-0.40/7d from filtering low-quality EXTREME entries",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low"
-        },
-        {
-            "date": "2026-09-25T16:00:00Z",
-            "idea": "pullback-entry- SHORT HIGH REGIME BLOCK",
-            "rationale": "14d pullback-entry- SHORT in HIGH: 21T 42.9%WR -$1.06. HIGH regime whipsaw kills these. EXTREME is break-even. NORMAL is bleeding. Only FLAT is profitable (2T).",
-            "expected_impact": "+$0.15-0.30/7d from blocking HIGH regime trades that consistently lose",
-            "category": "regime gate",
-            "status": "suggested",
-            "risk": "medium — need to verify won't block 14d winners"
-        },
-        {
-            "date": "2026-09-25T16:00:00Z",
-            "idea": "Investigate mover+ kill propagation — 11 trades post-disable = $1.38 leaked",
-            "rationale": "KILLED Sep 24 but 11 trades 7d at 27.3%WR -$1.38. This is pure leak. Kill flag not reaching execution path. STANDALONE_BYPASS signals may bypass kill check.",
-            "expected_impact": "+$1.38/7d if fix works",
-            "category": "bug fix",
-            "status": "suggested",
-            "risk": "none — pure leak"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "INVESTIGATE: mover+ kill propagation bug — 11 trades post-disable = $1.38/7d leak",
-        "MONITOR: ATR_SL_MAX 1.8% + EXTREME 1.2x (deployed today, too early to measure)",
-        "MONITOR: volume_spike fix (deployed today, untested — 0 trades since)",
-        "MONITOR: CL-T1 disable (working — 0 trades since disable)",
-        "SUGGEST: pump-chain+ EXTREME confidence floor 70% (+$0.20-0.40/7d, needs CEO)",
-        "SUGGEST: pullback-entry- SHORT HIGH regime block (+$0.15-0.30/7d, needs verification)"
-    ]
+    {
+      "issue": "SHORT NULL RSI metadata key mismatch",
+      "severity": "INFO",
+      "detail": "RSI stored as rsi_14 in _signal_metadata, not rsi. Earlier queries using wrong key showed 100% NULL rate. Actual: only 1/188 SHORT trades has NULL rsi_14.",
+      "recommendation": "No action — data is correct, was querying wrong key."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "ATR_SL hit rate CRITICAL (63.6% 14d, 65.4% EXTREME)",
+      "sessions_discussed": "7+ (most discussed issue)",
+      "current_status": "ATR_SL_MAX widened 1.5→1.8% + EXTREME 1.2x multiplier deployed Sep 25",
+      "expected_impact": "+$0.50-1.00/7d from wider SL letting trades breathe",
+      "next_check": "Verify hit rate drops below 50% in 48h"
+    },
+    {
+      "problem": "Signal diversity crisis — only 2 profitable signals",
+      "sessions_discussed": "5+",
+      "current_status": "pump-chain+ LONG +$1.23, volume-breakout-long+ +$0.57 carry system. SHORT side DISABLED.",
+      "recommendation": "Need new NEUTRAL regime signal. Sessions discussed: ema300_dip_short, sma20_dip, trend following. None implemented."
+    },
+    {
+      "problem": "SHORT NULL RSI edge degraded",
+      "sessions_discussed": "4+",
+      "current_status": "7d: 84T 39.3%WR -$3.14 (was 14d 130T 56.9%WR +$2.08). Edge evaporated.",
+      "recommendation": "Monitor. May be market regime shift, not fixable."
+    }
+  ],
+  "missing_implementations": [
+    "ema300_dip_short — discussed but not built",
+    "sma20_dip — discussed but not built",
+    "trend following signal — discussed but not built",
+    "SHORT NULL RSI confidence boost +15pt — suggested 3+ sessions, never implemented"
+  ],
+  "losing_trade_autopsy": {
+    "24h_losers": "1 pump-chain- SHORT KAS -$0.08 (normal variance, RSI 61.64 in HIGH regime, pump_exit_dead_money)",
+    "24h_winners": "4 trades: 3 pump-chain- SHORT (ATOM +$0.03, BTC +$0.03, CASHCAT +$0.06), 1 continuum-osc+ LONG BTC +$0.05",
+    "pattern": "System quiet — only 1 loser in 24h. Loser is normal pump-chain- variance (small loss, dead money exit).",
+    "root_cause": "No systemic issue — normal variance. The $0.08 loss on KAS is within expected range for pump-chain- SHORT."
+  },
+  "atr_sl_deep_dive": {
+    "extreme_14d": "162 trades, 65.4% hit rate. Winners +6.78%, losers -4.64%. R:R 1.46:1.",
+    "pump_chain_extreme": "34 atr_sl_hit trades. 5 under 1.3% (4 winners, 1 loser). 6 under 1.8% (5 winners, 1 loser).",
+    "analysis": "SL cutting winners short at 1.3% floor. Widening to 1.8% lets 1 more trade reach win zone. EXTREME 1.2x multiplier adds breathing room.",
+    "impact_of_widening": "Would have preserved ~1 additional winner in14d EXTREME. Expected: +$0.20-0.50/7d."
+  },
+  "config_changes_applied": [],
+  "creative_improvements": [
+    {
+      "date": "2026-09-25T17:38:25.952749+00:00",
+      "idea": "pump-chain+ EXTREME confidence floor 70%",
+      "rationale": "pump-chain+ LONG EXTREME 40T 47.5%WR +$1.23/14d. R:R works (1.46:1) but WR below 50%. Adding confidence floor 70% in EXTREME would filter low-conviction entries. Sessions show high-confidence entries (>=70%) have ~60% WR vs ~40% for lower confidence.",
+      "expected_impact": "+$0.20-0.40/7d from filtering low-confidence EXTREME entries",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-25T17:38:25.952751+00:00",
+      "idea": "Investigate SHORT_RSI_FLOOR bypass for STANDALONE_BYPASS signals",
+      "rationale": "3 trades executed post-fix with RSI<50. While net impact is small (+$0.06), the filter should work consistently. Root cause likely: _ctx_gate_get_rsi() returns None for low-volume tokens.",
+      "expected_impact": "+$0.10-0.30/7d if fix blocks more losers than winners",
+      "category": "bug fix",
+      "status": "needs_investigation",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-25T17:38:25.952753+00:00",
+      "idea": "NEW SIGNAL: Pullback-in-dip SHORT for NEUTRAL regime",
+      "rationale": "System has only 2 profitable LONG signals. SHORT side disabled. Need diversity. Session brain shows ema300_dip_short, sma20_dip discussed but never built. A simple RSI pullback SHORT (RSI 50-65, price above EMA, volume confirmation) could capture mean reversion in NEUTRAL.",
+      "expected_impact": "+$0.30-0.80/7d if signal achieves 55%+ WR",
+      "category": "new signal",
+      "status": "suggested",
+      "risk": "medium (needs backtest)"
+    }
+  ],
+  "next_actions": [
+    "Monitor ATR_SL hit rate 48h — expect drop from 63.6% to <55% after MAX 1.8% + EXTREME 1.2x",
+    "Investigate SHORT_RSI_FLOOR bypass — check _ctx_gate_get_rsi() for low-volume tokens",
+    "Consider pump-chain+ EXTREME confidence floor 70% (low risk, data-supported)",
+    "CEO decision needed: new NEUTRAL signal or continue with 2-signal system"
+  ]
 }

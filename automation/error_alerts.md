@@ -66,3 +66,9 @@
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+
+## Error Alerts — 2026-09-25 16:46 UTC
+- **CRITICAL** (607,835 restarts): `hermes-coding-mcp.service` — missing `/root/.hermes/scripts/run_mcp_server.py`
+- **AUTO-FIX**: Disabled hermes-coding-mcp.service to stop CPU-burning restart loop
+- **INFO**: hermes-5m-candle failed 1 week ago (stale, journal rotated)
+- **WARN**: Disk at 76% (90G/118G) — approaching 85% threshold

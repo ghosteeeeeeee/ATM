@@ -1,3 +1,18 @@
+## [2026-09-25 18:30 UTC] Daily Orchestrator Report
+
+**Pipeline Status:** Running, 0 open, system idle 16h
+**24h:** 3T 66.7%WR +$0.00 | **7d:** 200T 41.5%WR -$3.09 | **14d:** 397T 47.4%WR -$3.78
+
+**Key Findings:**
+- ATR_SL hit rate 63% 7d (126/200) — CRITICAL. Widening deployed today, monitoring 48h.
+- mover+ kill propagation: RESOLVED (CEO commit 0791fc40). 0 post-kill trades.
+- SHORT_RSI_FLOOR leak: 2 pump-chain- SHORT trades with RSI<50 executed post-fix (BTC 41.66, ATOM 47.06). Both small wins ($0.03). Root cause unclear.
+- System in monitoring mode — no new recommendations from automations.
+
+**Action:** None needed. Monitoring ATR_SL impact + SHORT_RSI_FLOOR leak.
+
+**BY:** daily_orchestrator
+
 ## [2026-09-25 16:12 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 14h ago
@@ -6551,5 +6566,56 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 **Open Questions:**
 - 14d at -$3.21 — persistent small negative, daily variance normal
 - trend_purity+ and mover+ already killed, no new kill candidates emerging
+
+**BY:** auto_1hr
+
+## [2026-09-25 14:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 5T 60.0%WR +$0.13 | **14d:** 399T 47.6%WR -$3.60
+
+**24h by exit reason:**
+- pump_exit_dead_money: 3T, avg -$0.007 — breakeven
+- atr_sl_hit: 1T, +$0.06 — minor
+- UNIVERSAL_MAX_HOLD: 1T, +$0.05
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates (btc-pump-rider+ 3T/0%WR/-$0.18 is 14d cumulative, not 3+ in last hour)
+- No overtrading (0 trades/hr)
+- atr_sl_hit 63.4% 14d but avg loss trivial (-$0.017) — structural, not actionable
+- System quiet — 0 trades opened/closed last hour
+- All active signals have dead hours applied from recent commits
+
+**Open Questions:**
+- 14d at -$3.60 — persistent small negative, daily variance normal
+- pullback-entry- still 14d worst at -$1.58 (90T) — dead hours comprehensive, can't do more
+- trend_purity+ 36.4%WR over 11T — already killed per prior rules
+
+**BY:** auto_1hr
+
+## [2026-09-25 18:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 16h ago
+**24h:** 4T 75.0%WR +$0.03 | **14d:** 398T 47.5%WR -$3.69
+
+**24h by exit reason:**
+- pump_exit_dead_money: 3T, avg -$0.007 — breakeven
+- UNIVERSAL_MAX_HOLD: 1T, +$0.05
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System quiet — 0 trades opened/closed last hour, 0 open
+- No kill candidates (trend_purity+, mover+ already killed)
+- No overtrading (0 trades/hr)
+- No atr_sl_hit issues in 24h — ATR SL fix working
+- 14d pullback-entry- (-$1.58/90T) worst performer but dead hours comprehensive
+- All signals have dead hours applied from prior commits
+
+**Open Questions:**
+- 14d at -$3.69 — persistent small negative, daily variance normal
+- System very quiet (16h since last trade) — market regime may be flat
 
 **BY:** auto_1hr

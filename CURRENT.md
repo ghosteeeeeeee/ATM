@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-25 ~12:00 UTC**
+**Last Updated: 2026-09-25 ~18:30 UTC**
 **Updated by: daily_orchestrator**
 
 ## Current Status
 
-24h: 8T, 62.5% WR, -$0.14. Pipeline running. CL-T1 DISABLED. PUMP_CHAIN_V5_SHORT DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
+24h: 3T, 66.7% WR, +$0.00. Pipeline running. 0 open. System idle 16h. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
 
-- **24h (rolling):** 8T, 62.5% WR, -$0.14 (DB-verified). 0 open.
-- **7d:** 205T, 42.4% WR, -$2.23 (DB-verified). pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 8T 62.5%WR +$1.20 (gem). grind-trend+ 18T 50.0%WR +$0.24. pullback-entry- 25T 36%WR -$1.66 (cold streak). pump-chain- 33T 45.5%WR -$0.93 (DISABLED). mover+ 13T 38.5%WR -$1.15 (killed Sep 24, legacy trades).
-- **14d:** ~427T, ~47.8% WR, ~-$3.73 (DB-verified).
+- **24h (rolling):** 3T, 66.7% WR, +$0.00 (DB-verified). 0 open.
+- **7d:** 200T, 41.5% WR, -$3.09 (DB-verified). ATR_SL hit rate 63% (126/200) — CRITICAL, monitoring widening impact.
+- **14d:** 397T, 47.4% WR, -$3.78 (DB-verified).
 - **LONG:** volume-breakout-long+ 12T 66.7%WR +$1.25. pump-chain+ 55T 41.8%WR +$1.23. grind-trend+ 18T 50.0%WR +$0.24.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$3.66/7d total.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -30,7 +30,7 @@
 **🟡 R:R STATUS (7d -$2.02)**
 7d PnL -$2.02. pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse, R:R=1.53:1). volume-breakout-long+ 12T 66.7%WR +$1.25 (gem). pullback-entry- 25T 36%WR -$1.66 (pre-disable trades). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 33T 45.5%WR -$0.93 (DISABLED Sep 25).
 
-**🔴 ATR_SL HIT RATE:** 62.0% 7d (131/205). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier added. EXTREME: 65.1% hit rate 14d, avg win +6.78%, avg loss -5.30% — SL cutting winners short. Expected +$0.50-1.00/7d from wider SL letting more trades reach win zone.
+**🔴 ATR_SL HIT RATE:** 63.0% 7d (126/200). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier added today. Monitoring impact over next 48h.
 
 **🟢 REGIME EDGE (7d volatility_regime):** EXTREME 103T 44.7%WR -$0.42 (best). HIGH 77T 41.6%WR -$0.94. NORMAL 30T 40.0%WR -$0.69. FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15% confidence, NORMAL -15%.
 
@@ -54,6 +54,7 @@
 
 ## Today's Changes (Sep 25)
 
+1. **daily_orchestrator ~18:30 UTC — NO CONFIG CHANGE.** DB-verified: 3T 66.7%WR +$0.00 (24h) | 200T 41.5%WR -$3.09 (7d) | 397T 47.4%WR -$3.78 (14d). **SYSTEM IDLE 16h** — last trade closed 02:26 UTC (BTC continuum-osc+ +$0.05). Market NEUTRAL, hotset empty. **ATR_SL monitoring:** Widening deployed today, 63% 7d hit rate (126/200). Need 48h to measure impact. **mover+ kill:** CEO fixed (commit 0791fc40). 3 pre-kill trades, 0 post-kill. **SHORT_RSI_FLOOR leak:** 2 pump-chain- SHORT trades (BTC RSI=41.66, ATOM RSI=47.06) executed post-fix Sep 24. Both small wins ($0.03). Root cause unclear — may be STANDALONE_BYPASS timing. **No action needed** — system in monitoring mode. — daily_orchestrator
 1. **CEO ~12:30 UTC — 1 CODE FIX + 1 CONFIG CHANGE.** DB-verified: 8T 62.5%WR -$0.14 (24h) | 205T 42.4%WR -$2.23 (7d). **ATR_SL_MAX WIDENED 1.5→1.8%.** EXTREME vol 65.1% ATR_SL hit rate 14d (108/166). Avg win +6.78%, avg loss -5.30% — SL cutting winners short at 1.3% floor. Widening to 1.8% cap lets trades breathe. **EXTREME REGIME MULTIPLIER ADDED.** tpsl_utils.py: EXTREME gets 1.2x SL widening (like HIGH already has). Combined: up to 1.8% SL in EXTREME vs 1.5% before. Expected +$0.50-1.00/7d from reducing ATR_SL hit rate. TP_PCT_FALLBACK raised 3.9→4.5% to maintain 3:1 R:R. **CL-T1 DISABLED 18h:** 0 cut-loser-CL-T1 trades — bleeding stopped. — CEO
 
 ## Today's Changes (Sep 24)
@@ -159,6 +160,6 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 5. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
 6. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
 7. ~~**INFRA: signal_compactor lock contention**~~ — DONE. Removed from STEPS_EVERY_MIN, standalone timer handles it exclusively. 13K+ LOCK-WAIT retries eliminated. — 2026-09-24
-8. **ATR_SL hit rate CRITICAL:** 61.8% 7d (131/212, above 40% threshold). ATR_SL_MIN=1.3% may be too tight for EXTREME vol (71.8% hit rate, winners avg +6.5%). Needs CEO decision. — 2026-09-25
-9. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
-10. **INVESTIGATE: mover+ kill propagation.** KILLED Sep 24 but 13 trades executing post-disable. — 2026-09-25
+8. **ATR_SL hit rate CRITICAL:** 63.0% 7d (126/200, above 40% threshold). ATR_SL_MAX widened 1.5→1.8% + EXTREME 1.2x multiplier deployed today. Monitoring 48h for impact. — 2026-09-25
+9. **DISK: 80% (23G free).** Below 85% threshold. Monitor. — 2026-09-25
+10. ~~**INVESTIGATE: mover+ kill propagation.**~~ — RESOLVED. CEO fixed with disabled-component guard in decider_run.py (commit 0791fc40). 3 mover+ trades executed Sep 24 were all pre-kill (opened 04:35-05:11, kill ~22:00). 0 post-kill trades. — 2026-09-25

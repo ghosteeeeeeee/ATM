@@ -220,7 +220,6 @@ def _check_momentum_state(token):
             except Exception:
                 pass
     return None
-    return None
 
 
 def scan_signals():
