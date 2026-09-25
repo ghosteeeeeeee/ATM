@@ -1,153 +1,103 @@
 {
-    "timestamp": "2026-09-25T06:00:00Z",
+    "timestamp": "2026-09-25T07:30:00Z",
     "session_brain_stats": {
-        "total_memories": "loaded",
-        "top_topics": ["signal performance", "creative improvements", "losses"]
+        "queries_run": 3,
+        "top_topics": ["signal performance winrate regime", "new signal idea improvement", "loss money bleeding"],
+        "key_insight": "SHORT NULL RSI edge completely stopped (0 trades 7d). Session brain confirms detection-time fallback was producing 70%WR SHORT entries — now gone."
     },
     "trade_summary_24h": {
-        "trades": 24,
-        "winrate": 41.7,
-        "pnl": -1.74,
-        "regime": "EXTREME/HIGH mix"
+        "trades": 14,
+        "win_rate": 50.0,
+        "pnl": -0.40,
+        "regimes": "EXTREME dominant, HIGH second",
+        "top_losers": "pump-chain- SHORT 6T -$0.60, ema300-breakthrough+ LONG -$0.28, r2-trend-short4 SHORT -$0.21",
+        "open": 0
     },
     "trade_summary_7d": {
-        "trades": 215,
-        "winrate": 44.2,
-        "pnl": -1.65
+        "trades": 212,
+        "win_rate": 43.4,
+        "pnl": -2.02,
+        "profitable_signals": "pump-chain+ LONG 55T +$1.23, volume-breakout-long+ 13T +$1.49, grind-trend+ 18T +$0.24",
+        "losing_signals": "pullback-entry- SHORT 25T -$1.66, mover+ 13T -$1.15, pump-chain- SHORT 33T -$0.93",
+        "atr_sl_hit_rate": "62.3% (132/212) — CRITICAL"
     },
-    "trade_summary_14d": {
-        "trades": 433,
-        "winrate": 47.6,
-        "pnl": -4.23
-    },
-    "losing_autopsy_24h": [
-        {
-            "trade": "BABY mover+ LONG",
-            "pnl": -0.45,
-            "regime": "EXTREME",
-            "rsi": 52.4,
-            "gap": 1.687,
-            "exit": "atr_sl_hit",
-            "root_cause": "Micro-price token (0.0128) + gap=1.687% chase. Mover+ in EXTREME bleeds -$0.93/14d.",
-            "would_block_with_gap_2.0": true,
-            "confidence": "HIGH"
-        },
-        {
-            "trade": "ALGO pump-chain- SHORT",
-            "pnl": -0.17,
-            "regime": "HIGH",
-            "rsi": 37.5,
-            "gap": -0.475,
-            "exit": "atr_sl_hit",
-            "root_cause": "RSI=37.5 below SHORT_RSI_FLOOR=50. Should have been blocked by decider_run.py fix. Possible timing issue — trade may predate fix deployment.",
-            "confidence": "MEDIUM"
-        },
-        {
-            "trade": "FOGO pump-chain- SHORT",
-            "pnl": -0.01,
-            "regime": "EXTREME",
-            "rsi": 100.0,
-            "gap": 0.384,
-            "exit": "atr_sl_hit",
-            "root_cause": "RSI=100.0 above SHORT_RSI_CEILING=65. Should have been blocked. Possible STANDALONE_BYPASS timing issue.",
-            "confidence": "MEDIUM"
-        },
-        {
-            "trade": "KAS pump-chain- SHORT",
-            "pnl": -0.32,
-            "regime": "HIGH",
-            "rsi": 61.6,
-            "gap": -1.764,
-            "exit": "atr_sl_hit",
-            "root_cause": "HIGH regime pump-chain- SHORT 14d: 14T 35.7%WR -$0.46. Cold streak in HIGH.",
-            "confidence": "HIGH"
-        },
-        {
-            "trade": "TURBO r2-trend-short4 SHORT",
-            "pnl": -0.21,
-            "regime": "EXTREME",
-            "rsi": 50.0,
-            "exit": "cut-loser-CL-T1",
-            "root_cause": "CL-T1 DISABLED but this is r2-trend-short4 not pump-chain+. May be residual CL-T1 code path still active for non-pump-chain signals.",
-            "confidence": "LOW"
-        }
-    ],
     "drift_findings": [
         {
-            "topic": "CHASE GAP threshold too loose",
-            "detail": "CHASE_GAP_MAX_PCT=3.0 (raised from 1.0 Sep 21). BABY gap=1.687, ACE gap=2.560, ADA gap=1.950 all chased and lost. 3.0 is too permissive for micro-cap tokens.",
-            "code_ref": "hermes_constants.py:825",
-            "impact": "BABY -$0.45, ACE -$0.28, ADA -$0.22 = -$0.95/7d from chasing"
+            "issue": "SHORT NULL RSI edge evaporated — 0 trades in 7d",
+            "detail": "14d: 10T 70%WR +$0.38. 7d: 0 trades. Detection-time RSI fallback stopped generating SHORT trades with NULL RSI.",
+            "impact": "Missed ~$0.20-0.40/7d from high-quality NULL RSI SHORT entries",
+            "recommendation": "Investigate signal_compactor detection-time RSI recording — may be writing RSI even when live RSI was unavailable"
         },
         {
-            "topic": "SHORT_RSI_CEILING=65 blocks profitable band",
-            "detail": "RSI 65-80 SHORT = 11T 54.5%WR +$0.42/14d (profitable, currently blocked). RSI>80 = 4T 25%WR -$0.08 (correctly blocked). Ceiling too tight.",
-            "code_ref": "hermes_constants.py:841",
-            "impact": "+$0.42/14d = +$0.21/7d left on table"
+            "issue": "CL-T1 residual trades still executing (8 trades 7d)",
+            "detail": "CL_TIER1_MIN_PCT=0 set Sep 24 18:00 UTC. All 8 CL-T1 exits after that date opened before the disable. Kill IS working — no new trades since.",
+            "impact": "None — legacy trades only. Kill is properly propagated.",
+            "recommendation": "No action needed"
         },
         {
-            "topic": "pump-chain- SHORT HIGH regime bleeding",
-            "detail": "14d: HIGH 14T 35.7%WR -$0.46. EXTREME 45T 51.1%WR -$0.55. NORMAL 6T 83.3%WR +$0.11. HIGH is worst but not gated.",
-            "code_ref": "hermes_constants.py:1253",
-            "impact": "-$0.46/14d from HIGH regime"
+            "issue": "mover+ kill propagated — 3 legacy trades, 0 new since Sep 24 05:30 UTC",
+            "detail": "MOVER_PLUS_ENABLED=False. 3 trades (AVAX, BABY, ALT) opened between 04:35-05:11 UTC on Sep 24, before kill took effect. All atr_sl_hit losses.",
+            "impact": "None — kill working correctly.",
+            "recommendation": "No action needed"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "mover+ LONG bleeding in EXTREME",
-            "detail": "14d: 8T 50%WR -$0.93 in EXTREME. Micro-price tokens (BABY, ALT) with large gaps. avg_loss=0.232 >> avg_win=0.102 (R:R inverted).",
-            "occurrences": "5+ sessions flagged"
+            "problem": "ATR_SL hit rate 62.3% 7d — above 40% threshold",
+            "detail": "EXTREME regime: 111T atr_sl_hit 14d, winners avg +6.63%, losers avg -5.49%. SL too tight for EXTREME vol.",
+            "sessions_discussed": "10+ (brain_auditor, CEO)",
+            "status": "Awaiting CEO decision on ATR_SL_MIN widening for EXTREME"
         },
         {
-            "topic": "bb-bounce-v2-long+ re-enabled but cold",
-            "detail": "CEO re-enabled Sep 22 (30d 73%WR +$2.08). 14d since: 16T 37.5%WR -$0.73. SHORT sample but trending wrong way.",
-            "occurrences": "3 sessions flagged"
+            "problem": "SIGNAL DIVERSITY — only 2 LONG signals profitable",
+            "detail": "pump-chain+ LONG 55T +$1.23 and volume-breakout-long+ 13T +$1.49 carry system. System fragile.",
+            "sessions_discussed": "5+",
+            "status": "New NEUTRAL signal development in progress (ema300_dip_short, sma20_dip sessions)"
         },
         {
-            "topic": "pullback-entry- SHORT persistent drag",
-            "detail": "94T 46.8%WR -$1.59/14d. 30d 52.1%WR +$0.35. Cold streak but not dead. All regimes negative. R:R=0.84:1 (inverted).",
-            "occurrences": "10+ sessions"
+            "problem": "SHORT NULL RSI detection-time fallback stopped firing",
+            "detail": "Was producing 70%WR entries. Now 0 trades in 7d.",
+            "sessions_discussed": "3+ (was flagged as edge to boost)",
+            "status": "Degraded — needs investigation"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "SHORT NULL RSI confidence boost +15pt",
+            "was_suggested": "Sep 24 10:00 UTC (brain_auditor)",
+            "status": "EDGE DEGRADED — 0 trades 7d. Implementation moot until detection-time fallback is restored.",
+            "impact": "N/A until fixed"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-25T06:00:00Z",
-            "idea": "Tighten CHASE_GAP_MAX_PCT from 3.0 back to 2.0",
-            "rationale": "BABY gap=1.687, ACE gap=2.560, ADA gap=1.950 — all chasing and losing. CEO raised to 3.0 Sep 21 to catch valid pumps, but 2.0 would have blocked these losers without killing winners (pump-chain+ winners avg gap <1.0%).",
-            "expected_impact": "+$0.30-0.60/7d from blocking chase trades",
-            "category": "entry sniper",
+            "date": "2026-09-25T07:30:00Z",
+            "idea": "ATR_SL_MIN 1.3%→1.5% for EXTREME regime only",
+            "rationale": "7d: 132T atr_sl_hit (62.3%). EXTREME 14d: 111T 45.9%WR. Winners avg +6.63%, losers avg -5.49%. SL at 1.3% cuts winners short in EXTREME — price moves 6%+ but SL triggers at 1.3%. Widening to 1.5% lets more trades reach win territory.",
+            "expected_impact": "+$0.20-0.50/7d from reduced whipsaw stops in EXTREME",
+            "category": "exit optimization",
             "status": "suggested",
-            "risk": "low",
-            "would_block_winners": "Checked 14d: 0 winning trades had gap >2.0%"
+            "risk": "low — only affects EXTREME regime, widens SL by 0.2%",
+            "impact_on_winners": "Checked: EXTREME winners avg +6.63% — 1.5% SL still tight enough to protect. Would have blocked 0 recent winners (all >1.5% from entry).",
+            "requires_ceo": true
         },
         {
-            "date": "2026-09-25T06:00:00Z",
-            "idea": "Raise SHORT_RSI_CEILING from 65 to 80",
-            "rationale": "RSI 65-80 SHORT = 11T 54.5%WR +$0.42/14d (profitable). RSI>80 = 4T 25%WR -$0.08 (correctly blocked). Current ceiling blocks a winning band.",
-            "expected_impact": "+$0.21/7d from unblocking RSI 65-80 SHORT winners",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "would_block_winners": "RSI 65-80 SHORT 14d = 11T 6W 5L = +$0.42. All winners preserved."
-        },
-        {
-            "date": "2026-09-25T06:00:00Z",
-            "idea": "Add micro-price token filter for mover+ LONG",
-            "rationale": "BABY (0.0128), ALT (0.0075) — micro-price tokens have noisy price action, wider spreads, unreliable ATR. mover+ EXTREME 8T 50%WR -$0.93 dragged by these.",
-            "expected_impact": "+$0.20-0.40/7d from blocking micro-price mover+ entries",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "would_block_winners": "Need to verify — likely 0-1 winners at price <0.01"
+            "date": "2026-09-25T07:30:00Z",
+            "idea": "Investigate SHORT NULL RSI detection-time fallback — restore 70%WR edge",
+            "rationale": "14d: NULL RSI SHORT = 10T 70%WR +$0.38 (best SHORT band). 7d: 0 trades. Detection-time fallback stopped firing. Either signal_compactor changed RSI recording or market conditions shifted.",
+            "expected_impact": "+$0.20-0.40/7d if restored",
+            "category": "signal quality",
+            "status": "needs investigation",
+            "risk": "low — investigation only",
+            "requires_ceo": false
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "1. TIGHTEN CHASE_GAP_MAX_PCT 3.0→2.0 (suggested, low risk)",
-        "2. RAISE SHORT_RSI_CEILING 65→80 (suggested, low risk)",
-        "3. MONITOR: volume_spike fix deployed today — verify chase filter sees volume quality",
-        "4. MONITOR: REGIME_CONF_MULTIPLIER deployed ~8h ago — measure impact",
-        "5. MONITOR: CL-T1 DISABLED 12h — verify no residual exits",
-        "6. INVESTIGATE: mover+ micro-price bleeding — add price floor filter"
+        "1. CEO DECISION: ATR_SL_MIN 1.3→1.5 for EXTREME only (+$0.20-0.50/7d)",
+        "2. INVESTIGATE: SHORT NULL RSI detection-time fallback stopped firing (0 trades 7d)",
+        "3. MONITOR: REGIME_CONF_MULTIPLIER impact (deployed Sep 24 22:00 UTC, ~9h running)",
+        "4. MONITOR: volume_spike recording fix impact (deployed Sep 25 05:00 UTC)",
+        "5. DEVELOP: New NEUTRAL signal for diversity — system depends on pump-chain+ and volume-breakout-long+ only"
     ]
 }
