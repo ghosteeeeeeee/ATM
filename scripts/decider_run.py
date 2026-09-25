@@ -10,7 +10,8 @@ from typing import NamedTuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
-                           update_signal_decision, validate_source)
+                           update_signal_decision, validate_source,
+                           is_component_disabled)
 from paths import *
 # NOTE: legacy LLM-based compaction removed. Current pipeline uses:
 #   signal_compactor.py (runs every 1 min via hermes-signal-compactor.timer) → writes hotset.json
@@ -3023,6 +3024,19 @@ def run(dry_run=False):
         # have not passed compaction and must NOT execute.
         if not in_hotset:
             log(f'  🚫 [EXEC-BLOCK] {token} {direction} NOT in hot-set — bypass attempt blocked')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+
+        # ── DISABLED-COMPONENT guard (defense-in-depth) ──────────────────────
+        # signal_compactor has this check, but decider_run.py processes signals
+        # from the hot-set which may contain stale entries from before a kill flag
+        # was set. Catches killed signals (e.g. MOVER_PLUS_ENABLED=False) that
+        # bypassed signal_compactor due to race conditions.
+        source_parts = [p.strip() for p in source.split(',') if p.strip()]
+        if any(is_component_disabled(p) for p in source_parts):
+            log(f'  🚫 [DISABLED-COMPONENT] {token} {direction} src="{source}" — skipping disabled signal')
             if sig_id:
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
