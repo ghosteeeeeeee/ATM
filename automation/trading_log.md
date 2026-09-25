@@ -1,3 +1,34 @@
+## [2026-09-25 15:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 13h ago (BTC continuum-osc+ +$0.05)
+**24h:** 6T 66.7%WR -$0.19 | **7d:** 203T 41.9%WR -$2.46 | **14d:** 406T 48%WR -$3.29
+
+**24h by exit reason:**
+- pump_exit_dead_money: 3T 66.7%WR avg -$0.007 — breakeven
+- atr_sl_hit: 2T 50%WR avg -$0.110 — below 40% threshold, fine
+- UNIVERSAL_MAX_HOLD: 1T +$0.050
+
+**24h signal ranking:**
+- pump-chain- SHORT: 4T 75%WR +$0.04 — active, marginal profit
+- continuum-osc+ LONG: 1T 100%WR +$0.05
+- ema300-breakthrough+ LONG: 1T 0%WR -$0.28 — single SYRUP loss (large, not a pattern yet)
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates (ema300-breakthrough+ 1T 0%WR — need 3+ trades to kill)
+- No overtrading (0 trades/hr, system quiet 13h)
+- atr_sl_hit 33% — well below 40% threshold
+- Dead hours doing their job: pump-chain+ only 2 non-dead hours active
+- Low volatility regime — no signal is firing, which is expected
+
+**Open Questions:**
+- 7d at -$2.46, 14d at -$3.29 — persistent small negative, daily variance normal
+- SYRUP ema300-breakthrough+ -$0.28 single trade — monitor if it repeats
+- System quiet 13h — likely low BTC volatility regime. Normal.
+
+**BY:** auto_1hr
+
 ## [2026-09-25 13:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0
@@ -6462,5 +6493,32 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - 14d at -$3.07 — persistent small negative, daily variance normal
 - trend_purity+ 36.4%WR over 11T — borderline, needs more data
 - No clear signal improvements available this hour
+
+**BY:** auto_1hr
+
+## [2026-09-25 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 7T 42.9%WR -$0.14 | **14d:** 408T 48.0%WR -$3.21
+
+**24h by exit reason:**
+- atr_sl_hit: 3T 43%, avg loss -$0.057 — dominant but trivial
+- pump_exit_dead_money: 3T, avg -$0.007 — breakeven
+- UNIVERSAL_MAX_HOLD: 1T, +$0.050
+
+**Changes:**
+1. Added pullback-entry- SHORT dead hours h7 (4T 50%WR -$0.40) and h19 (4T 25%WR -$0.38). Net dead hours: +$6.52/14d = +$3.26/7d. Commit: 9fe15f9e.
+
+**No Change Needed:**
+- No kill candidates (mover+ and trend_purity+ already killed)
+- No overtrading (0 trades/hr)
+- atr_sl_hit 62.7% 14d but avg loss trivial (-$0.057) — structural
+- System quiet — 0 trades opened/closed last hour
+- pump-chain+ dead hours comprehensive [0-5,7,8,13,14,20-23]
+- accel-300-breakout 28.6%WR 7T 14d — borderline, needs more data
+
+**Open Questions:**
+- 14d at -$3.21 — persistent small negative, daily variance normal
+- trend_purity+ and mover+ already killed, no new kill candidates emerging
 
 **BY:** auto_1hr

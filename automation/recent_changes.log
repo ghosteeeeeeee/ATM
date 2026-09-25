@@ -1,3 +1,6 @@
+[2026-09-25 15:10 UTC] auto_1hr: NO CHANGE — 0 trades last hour, quiet regime
+  24h: 6T 66.7%WR -$0.19 | 7d: 203T 41.9%WR -$2.46 | 14d: 406T 48%WR -$3.29
+  System quiet 13h. No kill candidates, no overtrading, atr_sl_hit 33%. BY: auto_1hr
 [2026-09-25 06:10 UTC] auto_1hr: NO CHANGE — 0 trades last hour, quiet regime
 [2026-09-25 06:00 UTC] auto_1hr: ADDED pump-chain- SHORT dead hour [18]
   14d: hour 18 = 5T 40%WR -$0.26. Worst remaining losing hour.
@@ -2973,3 +2976,6 @@
   24h: 26T 38.5%WR -$2.21. 0 trades last hour, 0 open.
   Dead hours working: pump-chain- SHORT in dead hours 23T -$1.84, outside 42T +$0.94.
   No kill candidates, no overtrading. 14d at -$4.68. BY: auto_1hr
+[2026-09-25 13:10 UTC] auto_1hr: ADDED pullback-entry- SHORT dead hours [7,19]
+  14d: hour 7 = 4T 50%WR -$0.40, hour 19 = 4T 25%WR -$0.38. Combined +$0.78/14d.
+  Net dead hours: +$6.52/14d = +$3.26/7d. Commit: 9fe15f9e. BY: auto_1hr
