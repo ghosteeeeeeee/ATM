@@ -1,3 +1,5 @@
+[2026-09-25 21:30 UTC] auto_1hr: ADDED pump-chain- SHORT dead hours [2,3,4,8,9,11,18,20]
+  Hour 4: 3T 0%WR -$0.41/7d, worst remaining losing hour. Expected +$0.41/7d = +$0.82/14d. Commit: 9782da4f. BY: auto_1hr
 [2026-09-25 16:12 UTC] auto_1hr: NO CHANGE — 0 trades last hour, quiet regime
   24h: 6T 66.7%WR -$0.19 | 14d: 408T 48%WR -$3.21
   System quiet 14h. No kill candidates, no overtrading, atr_sl_hit 33%. BY: auto_1hr
