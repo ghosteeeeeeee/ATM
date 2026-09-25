@@ -1,3 +1,8 @@
+[2026-09-25 ~05:30 UTC] auto_1hr: ADDED pump-chain+ LONG dead hours 0, 23
+  24h: 28T 32.1%WR -$2.52 | 7d: 217T 44.2%WR -$1.57
+  14d data shifted since CEO Sep 23 fix. Hour 0: 5T 20%WR -$0.36. Hour 23: 4T 0%WR -$0.69.
+  Commit: f5c419ed. Expected +$1.05/14d = +$0.53/7d. BY: auto_1hr
+
 [2026-09-25 ~05:00 UTC] CEO: FIXED volume_spike recording bug (decider_run.py)
   DB-verified: 28T 32.1%WR -$2.52 (24h) | 217T 44.2%WR -$1.57 (7d) | 442T 47.1%WR -$4.91 (14d)
   7+ day drift: btc_crash_filter computed volume_spike but decider_run.py never injected it into _signal_metadata. Chase filter blind.

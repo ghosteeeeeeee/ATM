@@ -1,3 +1,36 @@
+## [2026-09-25 05:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 1 (BTC continuum-osc+ LONG 7.7h, flat)
+**24h:** 28T 32.1%WR -$2.52 (avg -$0.090) | **7d:** 217T 44.2%WR -$1.57
+
+**24h exit reasons:**
+- atr_sl_hit: 17T (60.7%) avg -$0.124 — **ABOVE 40% THRESHOLD**
+- pump_exit_dead_money: 6T avg -$0.008
+- cut-loser-CL-T1: 2T avg -$0.205
+- profit-monster-trail: 2T avg +$0.020
+- pump_exit_momentum: 1T $0.00
+
+**24h signal ranking (2+ trades):**
+- pump-chain-: 16T 43.8%WR -$0.82 (-$0.051/trade)
+- bb-bounce-v2-long+: 3T 33.3%WR -$0.16
+- mover+: 3T 0%WR -$0.61 (LEGACY — killed 02:25 UTC)
+- continuum-osc+: 2T 50%WR -$0.11
+
+**Changes:**
+1. **ADDED pump-chain+ LONG dead hours 0, 23** — 14d data shifted since CEO Sep 23 fix. Hour 0: 5T 20%WR -$0.36. Hour 23: 4T 0%WR -$0.69. Expected +$1.05/14d = +$0.53/7d. Commit: f5c419ed.
+
+**No Change Needed:**
+- No kill candidates (no signal has 0%WR with 3+ trades in last hour — 0 trades closed)
+- No overtrading (0 trades/hr)
+- BTC continuum-osc+ LONG healthy (entry $84,432, SL $84,167, TP $85,546)
+
+**Open Questions:**
+- **atr_sl_hit 60.7%** — CEO flag from Sep 24 18:13 still pending. System bleeding -$2.52/24h.
+- 24h PnL worsened from -$2.45 to -$2.52.
+- volume_spike fix deployed by CEO at ~05:00 UTC today. Need to verify chase filter is now working.
+
+**BY:** auto_1hr
+
 ## [2026-09-24 20:15 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (0 wins, 1 loss) | **Open:** 1 (BTC continuum-osc+ LONG 1.8h, ~flat)
