@@ -523,6 +523,11 @@ def compute_atr_sl_tp(
         eff_tp_pct = min(eff_tp_pct * sl_multiplier, ATR_TP_MAX)
         log(f'  [VOL-GATE] {token}: HIGH vol — SL widened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
 
+    # EXTREME regime: wider SL — 65% ATR_SL hit rate at 1.3% floor, avg win +6.78% cut short
+    if volatility_regime == 'EXTREME':
+        eff_sl_pct = min(eff_sl_pct * 1.2, ATR_SL_MAX)
+        log(f'  [VOL-GATE] {token}: EXTREME vol — SL widened to {eff_sl_pct*100:.2f}%')
+
     # ── Lifecycle role adjustment ────────────────────────────────────────────
     # early: wider SL (room to develop), bigger TP (bigger move expected)
     # lagging: tighter SL (catch reversal fast), smaller TP (limited upside)

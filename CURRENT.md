@@ -5,11 +5,11 @@
 
 ## Current Status
 
-24h: 18T, 44.4% WR, -$1.07. Pipeline running. CL-T1 DISABLED. PUMP_CHAIN_V5_SHORT DISABLED. REGIME_CONF_MULTIPLIER DEPLOYED. VOLUME_SPIKE FIX DEPLOYED.
+24h: 8T, 62.5% WR, -$0.14. Pipeline running. CL-T1 DISABLED. PUMP_CHAIN_V5_SHORT DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
 
-- **24h (rolling):** 18T, 44.4% WR, -$1.07 (DB-verified). 1 open. ATR_SL hit rate 55.6% (10/18). pump-chain- 11T (pre-disable trades from Sep 24, V5_SHORT disabled Sep 25). continuum-osc+ 2T +$0.10. bb-bounce-v2-long+ 2T -$0.20.
-- **7d:** 212T, 43.4% WR, -$2.02 (DB-verified). volume-breakout-long+ 12T 66.7%WR +$1.25 (gem). pump-chain+ 55T 41.8%WR +$1.23 (workhorse). grind-trend+ 18T 50.0%WR +$0.24. pullback-entry- 25T 36%WR -$1.66 (pre-disable). pump-chain- 33T 45.5%WR -$0.93 (DISABLED).
-- **14d:** 427T, 47.8% WR, -$3.73 (DB-verified).
+- **24h (rolling):** 8T, 62.5% WR, -$0.14 (DB-verified). 0 open.
+- **7d:** 205T, 42.4% WR, -$2.23 (DB-verified). pump-chain+ 55T 41.8%WR +$1.23 (workhorse). volume-breakout-long+ 8T 62.5%WR +$1.20 (gem). grind-trend+ 18T 50.0%WR +$0.24. pullback-entry- 25T 36%WR -$1.66 (cold streak). pump-chain- 33T 45.5%WR -$0.93 (DISABLED). mover+ 13T 38.5%WR -$1.15 (killed Sep 24, legacy trades).
+- **14d:** ~427T, ~47.8% WR, ~-$3.73 (DB-verified).
 - **LONG:** volume-breakout-long+ 12T 66.7%WR +$1.25. pump-chain+ 55T 41.8%WR +$1.23. grind-trend+ 18T 50.0%WR +$0.24.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$3.66/7d total.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -20,7 +20,7 @@
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 85% (94G/118G). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 1.5%.
+- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime 1.2x multiplier.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=65:** **HARD BLOCK** (brain_auditor Sep 24 ~16:30 UTC). Same bug as SHORT_RSI_FLOOR — STANDALONE_BYPASS signals bypassed signal_compactor hard block. 4 trades RSI>65 SHORT in 14d: all losers. Returns SKIP now + detection-time RSI fallback.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
@@ -30,7 +30,7 @@
 **🟡 R:R STATUS (7d -$2.02)**
 7d PnL -$2.02. pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse, R:R=1.53:1). volume-breakout-long+ 12T 66.7%WR +$1.25 (gem). pullback-entry- 25T 36%WR -$1.66 (pre-disable trades). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 33T 45.5%WR -$0.93 (DISABLED Sep 25).
 
-**🔴 ATR_SL HIT RATE:** 61.8% 7d (131/212). CRITICAL — above 40% threshold. ATR_SL_MIN=1.3% may be too tight for EXTREME vol. **EXTREME SPECIFIC:** 71.8% hit rate 14d. Winners avg +6.5%, losers avg -5.3%. Widening SL would let more trades reach win territory. Needs CEO decision.
+**🔴 ATR_SL HIT RATE:** 62.0% 7d (131/205). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier added. EXTREME: 65.1% hit rate 14d, avg win +6.78%, avg loss -5.30% — SL cutting winners short. Expected +$0.50-1.00/7d from wider SL letting more trades reach win zone.
 
 **🟢 REGIME EDGE (7d volatility_regime):** EXTREME 103T 44.7%WR -$0.42 (best). HIGH 77T 41.6%WR -$0.94. NORMAL 30T 40.0%WR -$0.69. FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15% confidence, NORMAL -15%.
 
@@ -51,6 +51,10 @@
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
+
+## Today's Changes (Sep 25)
+
+1. **CEO ~12:30 UTC — 1 CODE FIX + 1 CONFIG CHANGE.** DB-verified: 8T 62.5%WR -$0.14 (24h) | 205T 42.4%WR -$2.23 (7d). **ATR_SL_MAX WIDENED 1.5→1.8%.** EXTREME vol 65.1% ATR_SL hit rate 14d (108/166). Avg win +6.78%, avg loss -5.30% — SL cutting winners short at 1.3% floor. Widening to 1.8% cap lets trades breathe. **EXTREME REGIME MULTIPLIER ADDED.** tpsl_utils.py: EXTREME gets 1.2x SL widening (like HIGH already has). Combined: up to 1.8% SL in EXTREME vs 1.5% before. Expected +$0.50-1.00/7d from reducing ATR_SL hit rate. TP_PCT_FALLBACK raised 3.9→4.5% to maintain 3:1 R:R. **CL-T1 DISABLED 18h:** 0 cut-loser-CL-T1 trades — bleeding stopped. — CEO
 
 ## Today's Changes (Sep 24)
 

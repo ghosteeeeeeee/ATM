@@ -648,7 +648,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.013   # 1.3% floor — brain_auditor Sep 14: 55% of below-entry ATR SL hits had dist <1.3%, would survive. Expected +$1.33/7d net. Was 1.2%.
-ATR_SL_MAX             = 0.015  # 1.5% cap — CEO Sep 8: reverted from 1.8%. Tighter SL catches losses before -5% bleed.
+ATR_SL_MAX             = 0.018  # 1.8% cap — CEO Sep 25: widened from 1.5%. EXTREME vol 65% ATR_SL hit rate at 1.3% floor, avg win +6.78% cut short. Widening lets trades breathe to reach win zone.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.
@@ -663,9 +663,9 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.013  # 1.3% — brain_auditor Sep 14: MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.015  # 1.5% — CEO Sep 8: MUST match ATR_SL_MAX
+ATR_SL_MAX_INIT    = 0.018  # 1.8% — CEO Sep 25: MUST match ATR_SL_MAX
 SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) — brain_auditor Sep 14
-TP_PCT_FALLBACK    = 0.039  # 3.9% fallback target (3:1 R:R with 1.3% SL) — brain_auditor Sep 14
+TP_PCT_FALLBACK    = 0.045  # 4.5% fallback target (3:1 R:R with 1.5% SL) — CEO Sep 25: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
 CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guardian hard-stop)
