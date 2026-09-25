@@ -2968,3 +2968,7 @@
   Removed 4 (1T +$0.16) and 17 (6T 67%WR +$0.21) — were wrongly blocked.
   Added 8 (4T 25%WR -$0.25) and 11 (4T 25%WR -$0.32).
   Expected +$0.94/14d = +$0.47/7d. Commit: 52923bc1. BY: auto_1hr
+[2026-09-25 02:15 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  24h: 26T 38.5%WR -$2.21. 0 trades last hour, 0 open.
+  Dead hours working: pump-chain- SHORT in dead hours 23T -$1.84, outside 42T +$0.94.
+  No kill candidates, no overtrading. 14d at -$4.68. BY: auto_1hr

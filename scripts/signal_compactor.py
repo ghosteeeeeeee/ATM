@@ -1098,7 +1098,7 @@ def _check_directional_cap(direction: str) -> str | None:
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data,
-                  _btc_ctx_cached=None):
+                  _btc_ctx_cached=None, _vol_regime=None):
     """
     Deterministic score formula:
 
@@ -2852,6 +2852,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 regime_conf=regime_conf,
                 speed_data=speed_data,
                 _btc_ctx_cached=_btc_ctx_cached,
+                _vol_regime=_vol_regime,
             )
 
             # Opposing signal penalty: check if opposing direction is firing for this token

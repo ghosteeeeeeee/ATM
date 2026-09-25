@@ -495,5 +495,16 @@
     "after": "LONG RSI 35-50 gets +10pt confidence boost (LONG_RSI_SWEET_SPOT_BOOST=10)",
     "rationale": "14d: LONG RSI 35-50 = 43T 58.1%WR +.39 (best defined band). Boost improves fill quality without blocking trades.",
     "impact": "+$0.20-0.40/7d expected from better fills on 3-5 trades/7d"
+  },
+  {
+    "timestamp": "2026-09-25T06:05:00Z",
+    "agent": "brain_auditor",
+    "change": "CHASE_GAP_MAX_PCT 3.0 → 2.0",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "CHASE_GAP_MAX_PCT = 3.0",
+    "after": "CHASE_GAP_MAX_PCT = 2.0",
+    "rationale": "Gap>2.0% = 8T/14d 25%WR -$1.10. Only 2 winners ($0.23). BABY gap=1.687, ACE=2.56, ADA=1.95 all chased and lost. Tightening blocks chasers without killing winners.",
+    "impact": "Expected +$0.30-0.60/7d from blocking chase trades"
   }
 ]
