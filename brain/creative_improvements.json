@@ -1961,5 +1961,63 @@
     "category": "bug fix",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-25T06:30:00Z",
+    "idea": "ATR_SL_MIN 1.3→1.5 for EXTREME regime only",
+    "rationale": "EXTREME ATR_SL hit rate 71.8% 14d. Winners avg +6.5%, losers avg -5.3%. SL too tight — cutting winners short. Widening lets more trades reach their6.5% avg win.",
+    "expected_impact": "+$0.20-0.50/7d from reduced premature stops",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "moderate"
+  },
+  {
+    "date": "2026-09-25T08:36:05.900576+00:00",
+    "idea": "ATR_SL_MIN 1.3→1.5 for EXTREME regime only",
+    "rationale": "EXTREME ATR_SL winners avg +6.51%, losers avg -5.29%. Wider SL lets more trades reach win territory. HIGH regime already has higher hit rate (42.7% vs EXTREME 46%) but similar avg loss.",
+    "expected_impact": "+0.20-0.50/7d",
+    "category": "exit optimization",
+    "status": "suggested",
+    "risk": "medium",
+    "verification": "Would not affect NORMAL/FLAT/HIGH regimes. Only EXTREME.",
+    "confidence": "HIGH"
+  },
+  {
+    "date": "2026-09-25T08:36:05.900592+00:00",
+    "idea": "SHORT NULL RSI confidence boost +15pt",
+    "rationale": "SHORT NULL RSI = 12T 66.7%WR +/usr/bin/bash.32/14d vs HAS_RSI 67T 50.7%WR -/usr/bin/bash.04/14d. Detection-time fallback entries are higher quality.",
+    "expected_impact": "+0.20-0.40/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "verification": "Blocks nothing — only boosts fill quality for NULL RSI trades.",
+    "confidence": "HIGH"
+  },
+  {
+    "timestamp": "2026-09-25T08:00:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "Raise SHORT_RSI_CEILING 65 to 80",
+        "rationale": "RSI 65-80 SHORT = 11T 54.5%WR +$0.42/14d. Blocked by ceiling=65. RSI>80 = 4T 25%WR -$0.08 (all RSI=100 losers). Raising opens profitable band.",
+        "expected_impact": "+$0.21/7d",
+        "risk": "medium",
+        "status": "suggested"
+      },
+      {
+        "idea": "ATR_SL_MIN 1.3 to 1.5 for EXTREME regime only",
+        "rationale": "EXTREME 14d 71.8% ATR_SL hit rate. Winners avg +6.5%, losers avg -5.3%. SL too tight.",
+        "expected_impact": "+$0.20-0.50/7d",
+        "risk": "medium",
+        "status": "suggested (CEO decision)"
+      },
+      {
+        "idea": "Investigate SHORT NULL RSI detection-time fallback degradation",
+        "rationale": "NULL RSI SHORT was best band (56.9%WR +$2.08/14d). 7d: 0 trades — fallback stopped firing.",
+        "expected_impact": "+$0.20-0.40/7d if restored",
+        "risk": "low",
+        "status": "suggested (diagnostic)"
+      }
+    ]
   }
 ]
