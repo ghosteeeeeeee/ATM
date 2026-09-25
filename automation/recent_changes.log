@@ -1,3 +1,6 @@
+[2026-09-25 06:00 UTC] auto_1hr: ADDED pump-chain- SHORT dead hour [18]
+  14d: hour 18 = 5T 40%WR -$0.26. Worst remaining losing hour.
+  Expected +$0.26/14d = +$0.13/7d. Total dead hours net: +$1.20/14d = +$0.60/7d.
 [2026-09-25 ~05:30 UTC] auto_1hr: ADDED pump-chain+ LONG dead hours 0, 23
   24h: 28T 32.1%WR -$2.52 | 7d: 217T 44.2%WR -$1.57
   14d data shifted since CEO Sep 23 fix. Hour 0: 5T 20%WR -$0.36. Hour 23: 4T 0%WR -$0.69.

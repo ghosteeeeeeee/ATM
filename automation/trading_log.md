@@ -1,3 +1,27 @@
+## [2026-09-25 06:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC continuum-osc+ LONG +$0.05, UNIVERSAL_MAX_HOLD) | **Open:** 0
+**24h:** 27T 37%WR -$2.30 | **14d:** 439T 46.9%WR -$5.28
+
+**Signal Perf 24h:**
+- pump-chain-: 14T 50%WR -$0.65 — biggest drag by volume
+- mover+ (KILLED): 3T 0%WR -$0.61
+- continuum-osc+: 3T 66%WR -$0.06 — best performer
+
+**Changes:**
+1. Added pump-chain- SHORT dead hour [18] — 5T 40%WR -$0.26/14d, worst remaining losing hour. Net dead hours now +$1.20/14d = +$0.60/7d.
+
+**No Change Needed:**
+- No kill candidates (no signal with 0%WR/3+T closed last hour)
+- No overtrading (1 trade last hour)
+- atr_sl_hit 59.3% but avg loss trivial (-$0.12) — trailing SL
+
+**Open Questions:**
+- 14d system at -$5.28 — needs positive days to recover.
+- pump-chain- 50% WR last 24h but still negative avg. Dead hours now block 7 hours.
+
+**BY:** auto_1hr
+
 ## [2026-09-25 05:30 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 1 (BTC continuum-osc+ LONG 7.7h, flat)
