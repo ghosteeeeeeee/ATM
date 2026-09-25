@@ -1,3 +1,35 @@
+## [2026-09-25 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 9T 55.6%WR -$0.36 | **14d:** 412T 47.8%WR -$3.42
+
+**24h by exit reason:**
+- atr_sl_hit: 4T 50%, avg -$0.098 — dominant but trivial
+- pump_exit_dead_money: 4T, avg -$0.005 — breakeven
+- UNIVERSAL_MAX_HOLD: 1T, +$0.050
+
+**14d worst signals (>=3T):**
+- pullback-entry- SHORT: 90T 46.7%WR -$1.58 — dead hours working
+- trend_purity+: 11T 36.4%WR -$0.90 — DISABLED
+- pump-chain-: 61T 50.8%WR -$0.82 — dead hours being tuned
+- mover+: 16T 50%WR -$0.79 — DISABLED
+
+**Changes:**
+1. Added pullback-entry- SHORT dead hour 22 (5T 20%WR -$0.60/14d). Expected +$0.60/14d = +$0.30/7d. Commit: 46add4ba.
+
+**No Change Needed:**
+- No overtrading (0 trades/hr)
+- No kill candidates (no signal with 0%WR and 3+ trades last hour)
+- atr_sl_hit 44% but avg loss trivial (-$0.098) — structural
+- pump-chain- SHORT hour 10 (4T -$0.23) — marginal, deferring
+
+**Open Questions:**
+- 14d at -$3.42 — persistent small negative, daily variance normal
+- trend_purity+ already disabled, mover+ already disabled
+- System quiet ~11h — normal for current market
+
+**BY:** auto_1hr
+
 ## [2026-09-25 06:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0
@@ -6398,5 +6430,37 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - 14d at -$3.07 — persistent small negative, daily variance normal
 - trend_purity+ 36.4%WR over 11T 14d — concerning but sample borderline for kill
 - accel-300-breakout 28.6%WR — needs more data before action
+
+**BY:** auto_1hr
+
+## [2026-09-25 12:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0
+**24h:** 12T 50%WR -$0.85 | **14d:** 420T 48.1%WR -$3.07
+
+**24h by exit reason:**
+- atr_sl_hit: 6T 50%, avg loss -$0.112 — dominant but trivial
+- pump_exit_dead_money: 4T, avg -$0.005 — breakeven
+- cut-loser-CL-T1: 1T, -$0.210
+- UNIVERSAL_MAX_HOLD: 1T, +$0.050
+
+**14d worst signals (>=3T):**
+- pullback-entry- SHORT: 90T 46.7%WR -$1.58 — dead hours working, marginal
+- trend_purity+: 11T 36.4%WR -$0.90 — small sample, borderline
+- pump-chain-: 61T 50.8%WR -$0.82 — dead hours being tuned
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No overtrading (0 trades/hr)
+- No kill candidates (no signal with 0%WR and 3+ trades)
+- atr_sl_hit 50% but avg loss trivial (-$0.112) — not over 40% threshold
+- Worst dead hour combos already blocked (pullback-entry- hour 20, pump-chain+ hour 21)
+- System quiet — normal for NEUTRAL-dominated market
+
+**Open Questions:**
+- 14d at -$3.07 — persistent small negative, daily variance normal
+- trend_purity+ 36.4%WR over 11T — borderline, needs more data
+- No clear signal improvements available this hour
 
 **BY:** auto_1hr
