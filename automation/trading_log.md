@@ -6080,3 +6080,64 @@ Final set: ['ALGO', 'ALT', 'AVAX', 'COMP', 'WCT']
 - 14d system at -$4.83 — needs more positive days to recover.
 
 **BY:** auto_1hr
+
+## [2026-09-24 22:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 2 open (BTC LONG continuum-osc+ 4.7h, ATOM SHORT pump-chain- 1.4h).
+**24h:** 30T, 30.0% WR, -$2.61. **14d:** 443T, 47.2% WR, -$4.86.
+
+**Key Metrics:**
+- atr_sl_hit: 18/30 = 60% — elevated, but avg loss -$0.124 trivial. Trailing cutting small.
+- pump-chain- SHORT: 18T/24h, 38.9% WR, -$0.91 — biggest drag (60% of all trades).
+- pump_exit_dead_money: 7T/24h, -$0.01 — breakeven exit type.
+
+**Signal Perf 24h:**
+- pump-chain-: 18T, 38.9%WR, -$0.91 — dead hours expanded
+- mover+: 3T, 0%WR, -$0.61 — already KILLED
+- bb-bounce-v2-long+: 3T, 33.3%WR, -$0.16 — borderline
+- continuum-osc+: 2T, 50%WR, -$0.11 — small sample
+
+**Changes:**
+1. Added pump-chain- SHORT dead hours [4, 9, 17, 20] — 14d: 24T across blocked hours, 16.7% WR, -$1.80 combined. Hour 20 worst (4T 25%WR -$0.40). Expected +$0.97/14d = +$0.48/7d. Commit: fa3ed2bd.
+
+**No Change Needed:**
+- No kill candidates (no signal with 0%WR/3+T closed last hour)
+- No overtrading (0 trades last hour)
+- atr_sl_hit elevated but avg loss trivial — trailing SL behavior
+
+**Open Questions:**
+- pump-chain- still net negative at -$0.91/24h. Dead hours now block 6 hours. Monitor impact.
+- 14d system at -$4.86 — needs more positive days to recover.
+
+**BY:** auto_1hr
+
+## [2026-09-25 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. **Open:** 1 (BTC continuum-osc+ LONG 7.1h, ~flat).
+**24h:** 29T, 30% WR, -$2.65. **14d:** 439T, -$5.15.
+
+**Key Metrics:**
+- atr_sl_hit: 18/29 = 62% — elevated but avg loss trivial (-$0.124)
+- pump-chain- SHORT: 17T/24h, -$0.95 — 59% of all trades, biggest drag
+- pump_exit_dead_money: 6T, -$0.05 — breakeven
+
+**Signal Perf 24h:**
+- pump-chain- SHORT: 17T, -$0.95 — needs more dead hours
+- mover+ LONG: 3T, -$0.61 — already KILLED
+- bb-bounce-v2-long+: 3T, -$0.16 — borderline
+- continuum-osc+: 2T, -$0.11 — small sample
+
+**Changes:**
+1. Fixed pump-chain- SHORT dead hours: removed [4,17] (profitable), added [8,11] (losing). New: [2,3,8,9,11,20]. Expected +$0.94/14d = +$0.47/7d. Commit: 52923bc1.
+
+**No Change Needed:**
+- No kill candidates (0 trades last hour)
+- No overtrading
+- atr_sl_hit elevated but avg loss trivial — trailing SL behavior
+
+**Open Questions:**
+- pump-chain- still net negative at -$0.95/24h. Dead hours now block 6 hours. Monitor impact.
+- 14d system at -$5.15 — needs more positive days to recover.
+- signal_version.py doesn't exist — skipped audit trail logging.
+
+**BY:** auto_1hr
