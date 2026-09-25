@@ -6619,3 +6619,57 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - System very quiet (16h since last trade) — market regime may be flat
 
 **BY:** auto_1hr
+
+## [2026-09-25 19:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~17h ago
+**24h:** 3T 66.7%WR +$0.00 | **14d:** 397T 47.4%WR -$3.78
+
+**24h by exit reason:**
+- pump_exit_dead_money: 2T, avg -$0.025 — breakeven
+- UNIVERSAL_MAX_HOLD: 1T, +$0.050
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System quiet — 0 trades closed/opened last hour, 0 open
+- No kill candidates (no signal with 3+ trades and 0% WR in last hour)
+- No overtrading (0 trades/hr)
+- No atr_sl_hit issues in 24h — ATR SL fix working
+- All signals have dead hours applied from prior commits
+
+**Open Questions:**
+- 14d at -$3.78 — persistent small negative, daily variance normal
+- System very quiet (~17h since last trade) — market regime likely flat
+
+**BY:** auto_1hr
+
+## [2026-09-25 20:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~17h ago
+**24h:** 3T 66.7%WR +$0.00 | **14d:** 393T 47.5%WR -$3.69
+
+**48h by signal (worst):**
+- pump-chain- SHORT: 23T 43.5%WR -$0.71
+- mover+ LONG: 3T 0%WR -$0.61 (pre-kill trades, already disabled)
+- bb-bounce-v2-long+: 3T 33.3%WR -$0.16
+- continuum-osc+: 3T 66.7%WR -$0.06
+
+**ATR SL:** 54.1% of 48h closes (20/37) | 64.1% of 14d (252/393). CEO widened ATR_SL_MAX to 1.8% today — monitoring for effect.
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System quiet — 0 trades closed/opened last hour, 0 open
+- No kill candidates (no signal with 3+ trades and 0% WR in last hour)
+- No overtrading (0 trades/hr)
+- mover+ kill working — 3 trades in 48h all pre-kill (Sep 24), MOVER_PLUS_ENABLED = False
+- ATR SL MAX widened to 1.8% by CEO — too recent to measure effect (no trades since)
+- pump-chain- SHORT dead hours [2,3,8,9,11,18,20] cover all hours with 3+ trades and negative PnL except hour 10 (4T 50%WR -$0.23, marginal)
+
+**Open Questions:**
+- 14d at -$3.69 — persistent small negative, daily variance normal
+- System very quiet (~17h since last trade) — market regime likely flat
+- ATR SL 64% 14d — monitoring whether 1.8% MAX helps over next 48h
+
+**BY:** auto_1hr
