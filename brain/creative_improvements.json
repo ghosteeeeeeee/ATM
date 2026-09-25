@@ -2019,5 +2019,32 @@
         "status": "suggested (diagnostic)"
       }
     ]
+  },
+  {
+    "timestamp": "2026-09-25T22:00:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "bb-bounce-v2-long+ 48h evaluation window",
+        "rationale": "Re-enabled Sep 22. 7d: 12T 41.7%WR cold. 30d: 73T 74%WR +$2.08 (best by WR). If 48h shows continued underperformance, adjust confidence rather than killing.",
+        "expected_impact": "Preserve best historical signal while managing cold streak",
+        "risk": "low",
+        "status": "suggested"
+      },
+      {
+        "idea": "pump-chain+ LONG EXTREME confidence floor 70%",
+        "rationale": "30d EXTREME: 48T 45.8%WR +$1.19 (best regime). Confidence floor ensures only high-quality EXTREME entries.",
+        "expected_impact": "+$0.10-0.20/7d from better fill quality",
+        "risk": "low",
+        "status": "suggested"
+      },
+      {
+        "idea": "ATR_SL widening success criteria protocol",
+        "rationale": "Define clear pass/fail: if 7d hit rate <50% by Sep 27, widening works. If >55%, consider 2.0% cap or signal-specific SL.",
+        "expected_impact": "Structured evaluation prevents premature reverts",
+        "risk": "low",
+        "status": "suggested"
+      }
+    ]
   }
 ]

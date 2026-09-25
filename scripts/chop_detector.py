@@ -119,10 +119,15 @@ SIGNAL_OVERRIDES = {
     'pump-chain-': 'MEAN_REVERSION',
     # rs: support/resistance — mean-reversion signal, fires on key levels (2026-09-25)
     'rs': 'MEAN_REVERSION',
-    'rs_r': 'MEAN_REVERSION',   # rs-r60 normalized
+    'rs_r': 'MEAN_REVERSION',   # rs-r60 normalized (hyphens→underscores)
     'rs_s': 'MEAN_REVERSION',   # rs-s36 normalized
+    'rs-r': 'MEAN_REVERSION',   # rs-r60 after digit strip (hyphens preserved)
+    'rs-s': 'MEAN_REVERSION',   # rs-s36 after digit strip
+    'rsr': 'MEAN_REVERSION',    # rs-r60 fully stripped (no hyphens, no digits)
+    'rss': 'MEAN_REVERSION',    # rs-s36 fully stripped
     'rs_long': 'MEAN_REVERSION',
     'rs_short': 'MEAN_REVERSION',
+    'support_resistance': 'MEAN_REVERSION',  # family name used as signal_type in scoring
 }
 
 

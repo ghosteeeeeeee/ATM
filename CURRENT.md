@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-25 ~18:30 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-25 ~22:00 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 3T, 66.7% WR, +$0.00. Pipeline running. 0 open. System idle 16h. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
+24h: 2T, 100% WR, +$0.08. Pipeline running. 0 open. System idle 16h+. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
 
-- **24h (rolling):** 3T, 66.7% WR, +$0.00 (DB-verified). 0 open.
-- **7d:** 200T, 41.5% WR, -$3.09 (DB-verified). ATR_SL hit rate 63% (126/200) — CRITICAL, monitoring widening impact.
-- **14d:** 397T, 47.4% WR, -$3.78 (DB-verified).
+- **24h (rolling):** 2T, 100% WR, +$0.08 (DB-verified). 0 open.
+- **7d:** 198T, 41.9% WR, -$2.81 (DB-verified). ATR_SL hit rate 63.1% (125/198) — CRITICAL, monitoring widening impact.
+- **14d:** 390T, 47.2% WR, -$3.54 (DB-verified).
 - **LONG:** volume-breakout-long+ 12T 66.7%WR +$1.25. pump-chain+ 55T 41.8%WR +$1.23. grind-trend+ 18T 50.0%WR +$0.24.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$3.66/7d total.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.

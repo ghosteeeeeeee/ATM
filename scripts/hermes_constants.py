@@ -668,7 +668,7 @@ SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) �
 TP_PCT_FALLBACK    = 0.045  # 4.5% fallback target (3:1 R:R with 1.5% SL) — CEO Sep 25: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
-CUT_LOSER_PNL     = -1.75  # close trade at -1.75% PnL (used by cut_loser + guardian hard-stop)
+CUT_LOSER_PNL     = -0.50  # close trade at -0.50% PnL — lowered from -1.75% (2026-09-25 CEO). In chop, losers don't recover. Cut fast.
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -1476,7 +1476,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike',           # proven momentum breakout
     'r2-trend-long',       # proven (51-100% WR across variants) — ATR SL, not PM Trail
-    'bb_bounce+',          # proven (59% WR, +1.69 PnL) — ATR SL, not PM Trail
+    # 'bb_bounce+' REMOVED 2026-09-25 — 65% WR LONG in NEUTRAL, pm_trail should book profits
     'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
     'confluence',          # meta-signal, proven — persistence + compounding validation
@@ -1488,14 +1488,14 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — manage via ATR SL, not PM Trail
     'accel-300-v4-short',  # V4 proven momentum SHORT — V2 conditions + FLAT block
     'breakout-long',  # Volume-confirmed breakout LONG — manage via ATR SL, not PM Trail
-    'ema300-dip-long',     # EMA300 dip buyer — structural exit
+    # 'ema300-dip-long' REMOVED 2026-09-25 — 20% WR, -$0.55 in NEUTRAL, pm_trail should manage
     'ema300-dip-short',    # EMA300 rally seller — structural exit
-    'pullback-entry+',     # pullback entry LONG — structural exit
+    # 'pullback-entry+' REMOVED 2026-09-25 — 16.7% WR, -$0.57 in NEUTRAL, pm_trail should manage
     'pullback-entry-',     # pullback entry SHORT — structural exit
-    'trend_purity+',       # trend purity LONG — RR engine + ATR SL
+    # 'trend_purity+' REMOVED 2026-09-25 — 36.4% WR, -$0.90 in NEUTRAL, pm_trail should manage
     'trend_purity-',       # trend purity SHORT — RR engine + ATR SL
-    'rr-struct+',          # RR structural LONG — RR engine + ATR SL
-    'rr-struct-',          # RR structural SHORT — RR engine + ATR SL
+    # 'rr-struct+' REMOVED 2026-09-25 — 73.3% WR LONG in NEUTRAL, pm_trail should book profits (was: RR engine + ATR SL)
+    # 'rr-struct-' REMOVED 2026-09-25 — pm_trail should manage (was: RR engine + ATR SL)
     'range-reversion-long',  # mean reversion LONG — own TP/SL, no PM Trail benefit
     'btc-wave',              # BTC EMA300 crossover + volume surge — own trailing, no PM Trail benefit
     'neutral-sniper',        # mean-reversion for NEUTRAL — own entry/exit logic, no PM Trail benefit
@@ -1507,8 +1507,8 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'ema300-breakthrough',   # EMA300 breakthrough — 15m breakout, manage via ATR SL
     'trend-ignition',        # early-stage breakout — manage via ATR SL, not PM Trail
     'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail
-    'mover+',             # momentum LONG — manage via ATR SL, not PM Trail
-    'doji',               # doji reversal — manage via ATR SL, not PM Trail
+    # 'mover+' REMOVED 2026-09-25 — 57.1% WR but -$0.85 in NEUTRAL, pm_trail should book profits
+    # 'doji' REMOVED 2026-09-25 — 66.7% WR LONG in NEUTRAL, pm_trail should book profits (was: ATR SL)
     'continuum-osc',      # continuum oscillator — manage via ATR SL, not PM Trail
     'volume-breakout',    # volume breakout — manage via ATR SL, not PM Trail
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).

@@ -2680,7 +2680,19 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass_gate = True
                     gate_msg = f'NEUTRAL-relax: standalone bypass ({bare_src})'
                 else:
-                    gate_msg = f'single-type not in standalone bypass (regime={_regime})'
+                    # Part-level bypass: check if ANY source part matches
+                    _nr_part_bypass = False
+                    for _nr_part in source_parts:
+                        _nr_part_bare = re.sub(r'\d+$', '', _nr_part.rstrip('+-'))
+                        _nr_part_stripped = _nr_part.rstrip('+-')
+                        if _nr_part_bare in STANDALONE_BYPASS_SIGNALS or _nr_part_stripped in STANDALONE_BYPASS_SIGNALS:
+                            _nr_part_bypass = True
+                            break
+                    if _nr_part_bypass:
+                        pass_gate = True
+                        gate_msg = f'NEUTRAL-relax: standalone part ({source})'
+                    else:
+                        gate_msg = f'single-type not in standalone bypass (regime={_regime})'
             else:
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on

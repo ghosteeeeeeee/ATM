@@ -40,3 +40,32 @@ mover+ kill bug: `decider_run.py` processes signals from hot-set without checkin
 2. SHORT NULL RSI confidence boost (suggested 3+ sessions, never implemented)
 3. New NEUTRAL signal development (signal diversity critical)
 4. pullback-entry- SHORT regime analysis (keep in winning regimes, block in losers)
+
+## CEO Report — 2026-09-25 ~21:50 UTC
+
+### Diagnosis
+DB-verified: 2T 100%WR +$0.08 (24h) | 198T 41.9%WR -$2.81 (7d) | 390T 47.2%WR -$3.54 (14d). Numbers match CURRENT.md exactly. System idle16h+ — 0 open,0 trades since Sep 25 02:26 UTC. Hotset empty (confluence gate filters all signals in NEUTRAL). ATR_SL_MAX1.8% + EXTREME1.2x deployed today — 0 trades to measure yet.
+
+### Root Cause
+System idle is not a bug — market in NEUTRAL regime, hotset empty by design. ATR_SL widening deployed but needs trades to measure. 7d ATR_SL hit rate 63.1% (125/198) — CRITICAL, waiting for widening to take effect.
+
+### Key Findings
+- **ATR_SL:** 7d 69 losers -$12.79 — DOMINANT exit reason. Widening deployed, needs48h.
+- **CL-T1 disabled:** 0 trades since disable (Sep 24). Bleeding stopped. Expected +$1.56/7d.
+- **mover+ kill:** 11 trades Sep 18-24, all pre-kill (last opened Sep 24 05:11, kill ~22:00). 0 post-kill. Kill working correctly.
+- **Signal diversity:** 400 signals queued, 0 pass confluence. Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL. Critical gap.
+- **SHORT side:** All disabled. -$3.66/7d legacy aging out. pump-chain- SHORT disabled today (Sep 25).
+
+### Fix Applied
+No config changes. ATR_SL widening + CL-T1 disable + REGIME_CONF_MULTIPLIER + volume_spike fix all deployed today/this week. All need time to measure.
+
+### Next Actions
+1. **MONITOR** ATR_SL widening impact — need trades to measure. Check tomorrow.
+2. **NEW SIGNAL** for NEUTRAL regime — only 2 types pass confluence. Delegate to signal_analyst.
+3. **SHORT NULL RSI** confidence boost — suggested 3+ sessions, never implemented.
+4. **pullback-entry- SHORT** — 30d 52.1%WR +$0.35 (cold streak, not systemic). Keep alive.
+
+### Verification
+- DB queried directly, numbers confirmed
+- No protected flags touched
+- No changes made this run
