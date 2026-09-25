@@ -2948,3 +2948,10 @@
   atr_sl_hit 60.6% — elevated but avg loss trivial (-$0.11). pump-chain- 21T/42.9%WR/-$0.68.
   No kill candidates. No overtrading.
   BY: auto_1hr
+[2026-09-24 22:00 UTC] auto_1hr: ADDED pump-chain- SHORT dead hours [4,9,17,20]
+  14d: hours 4,9,17,20 = 16T 18.75%WR -$0.97. Combined with [2,3] = 24T 16.7%WR -$1.80.
+  Hour 20: 4T 25%WR -$0.40 (worst). Expected +$0.97/14d = +$0.48/7d. Commit: fa3ed2bd. BY: auto_1hr
+[2026-09-25 01:10 UTC] auto_1hr: FIXED pump-chain- SHORT dead hours [2,3,8,9,11,20]
+  Removed 4 (1T +$0.16) and 17 (6T 67%WR +$0.21) — were wrongly blocked.
+  Added 8 (4T 25%WR -$0.25) and 11 (4T 25%WR -$0.32).
+  Expected +$0.94/14d = +$0.47/7d. Commit: 52923bc1. BY: auto_1hr
