@@ -506,5 +506,16 @@
     "after": "CHASE_GAP_MAX_PCT = 2.0",
     "rationale": "Gap>2.0% = 8T/14d 25%WR -$1.10. Only 2 winners ($0.23). BABY gap=1.687, ACE=2.56, ADA=1.95 all chased and lost. Tightening blocks chasers without killing winners.",
     "impact": "Expected +$0.30-0.60/7d from blocking chase trades"
+  },
+  {
+    "timestamp": "2026-09-25T06:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Narrowed LONG_RSI_SWEET_SPOT_MIN from 35 to 40",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "LONG_RSI_SWEET_SPOT_MIN = 35",
+    "after": "LONG_RSI_SWEET_SPOT_MIN = 40",
+    "rationale": "RSI 35-40 LONG = 7T 57.1%WR -$0.25 (dead zone). RSI 40-50 = 36T 58.3%WR +$1.64. Removing dead zone from boost.",
+    "impact": "Small positive — removes confidence boost from 7 trades/14d that were net negative"
   }
 ]

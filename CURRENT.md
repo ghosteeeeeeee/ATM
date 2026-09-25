@@ -24,13 +24,13 @@
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=65:** **HARD BLOCK** (brain_auditor Sep 24 ~16:30 UTC). Same bug as SHORT_RSI_FLOOR — STANDALONE_BYPASS signals bypassed signal_compactor hard block. 4 trades RSI>65 SHORT in 14d: all losers. Returns SKIP now + detection-time RSI fallback.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
-- **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC). +10pt confidence when LONG RSI 35-50. 14d: 43T 58.1%WR +$1.39 (best defined band). Blocks nothing — only boosts fill quality. Expected +$0.20-0.40/7d.
+- **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC, narrowed Sep 25 ~06:30 UTC). +10pt confidence when LONG RSI 40-50 (was 35-50). 14d: RSI 40-50 = 36T 58.3%WR +$1.64. RSI 35-40 = 7T 57.1%WR -$0.25 (dead zone removed). Blocks nothing — only boosts fill quality.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
 **🟡 R:R STATUS (7d -$2.02)**
 7d PnL -$2.02. pump-chain+ LONG 55T 41.8%WR +$1.23 (workhorse, R:R=1.53:1). volume-breakout-long+ 12T 66.7%WR +$1.25 (gem). pullback-entry- 25T 36%WR -$1.66 (pre-disable trades). cut-loser-CL-T1 = **DISABLED** (CEO Sep 24: 25T/14d 0%WR -$3.11). pump-chain- SHORT 33T 45.5%WR -$0.93 (DISABLED Sep 25).
 
-**🔴 ATR_SL HIT RATE:** 61.8% 7d (131/212). CRITICAL — above 40% threshold. ATR_SL_MIN=1.3% may be too tight for EXTREME vol. Needs CEO decision.
+**🔴 ATR_SL HIT RATE:** 61.8% 7d (131/212). CRITICAL — above 40% threshold. ATR_SL_MIN=1.3% may be too tight for EXTREME vol. **EXTREME SPECIFIC:** 71.8% hit rate 14d. Winners avg +6.5%, losers avg -5.3%. Widening SL would let more trades reach win territory. Needs CEO decision.
 
 **🟢 REGIME EDGE (7d volatility_regime):** EXTREME 103T 44.7%WR -$0.42 (best). HIGH 77T 41.6%WR -$0.94. NORMAL 30T 40.0%WR -$0.69. FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15% confidence, NORMAL -15%.
 
@@ -155,5 +155,6 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 5. ~~**FIX (code): Detection-time RSI floor bypass**~~ — DONE. decider_run.py now checks BOTH live and detection-time RSI for SHORT_RSI_FLOOR and LONG_RSI_FLOOR. — 2026-09-23
 6. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
 7. ~~**INFRA: signal_compactor lock contention**~~ — DONE. Removed from STEPS_EVERY_MIN, standalone timer handles it exclusively. 13K+ LOCK-WAIT retries eliminated. — 2026-09-24
-8. **ATR_SL hit rate CRITICAL:** 61.8% 7d (131/212, above 40% threshold). ATR_SL_MIN=1.3% may be too tight for EXTREME vol. Needs CEO decision. — 2026-09-25
+8. **ATR_SL hit rate CRITICAL:** 61.8% 7d (131/212, above 40% threshold). ATR_SL_MIN=1.3% may be too tight for EXTREME vol (71.8% hit rate, winners avg +6.5%). Needs CEO decision. — 2026-09-25
 9. **DISK: 85% (18G free).** Below 90% threshold. Monitor. — 2026-09-23
+10. **INVESTIGATE: mover+ kill propagation.** KILLED Sep 24 but 13 trades executing post-disable. — 2026-09-25
