@@ -3544,6 +3544,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # SHORT blocked near SUPPORT zones (previous SHORT stops below).
             try:
                 from sl_zones import entry_distance_filter
+                from hermes_constants import (
+                    CONTRARIAN_ZONE_ENABLED, CONTRARIAN_ZONE_MIN_STRENGTH,
+                    CONTRARIAN_ZONE_MIN_HITS, CONTRARIAN_ZONE_MAX_DISTANCE_PCT,
+                    CONTRARIAN_ZONE_POSITION_SIZE_MULT
+                )
                 _conn_slz = sqlite3.connect(CANDLES_DB, timeout=5)
                 try:
                     _cur_slz = _conn_slz.cursor()
@@ -3564,8 +3569,25 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         tkn.upper(), direction, _slz_price, _slz_atr
                     )
                     if not _slz_pass:
-                        log(f"  🚫 [SL-ZONE] {tkn} {direction}: BLOCKED — {_slz_reason}")
-                        continue
+                        _do_contrarian = False
+                        if (CONTRARIAN_ZONE_ENABLED and _slz_zone is not None
+                                and _slz_zone.strength >= CONTRARIAN_ZONE_MIN_STRENGTH
+                                and _slz_zone.hit_count >= CONTRARIAN_ZONE_MIN_HITS):
+                            _cz_dist = abs(_slz_zone.center - _slz_price) / _slz_price * 100
+                            if _cz_dist <= CONTRARIAN_ZONE_MAX_DISTANCE_PCT:
+                                _contrarian_dir = 'LONG' if direction == 'SHORT' else 'SHORT'
+                                log(f"  🔄 [CONTRARIAN-ZONE] {tkn}: {direction} → {_contrarian_dir} "
+                                    f"(zone={_slz_zone.center:.4f}, str={_slz_zone.strength:.2f}, "
+                                    f"hits={_slz_zone.hit_count}, dist={_cz_dist:.2f}%)")
+                                direction = _contrarian_dir
+                                entry['direction'] = _contrarian_dir
+                                entry['contrarian'] = True
+                                entry['zone_center'] = _slz_zone.center
+                                entry['zone_strength'] = _slz_zone.strength
+                                _do_contrarian = True
+                        if not _do_contrarian:
+                            log(f"  🚫 [SL-ZONE] {tkn} {direction}: BLOCKED — {_slz_reason}")
+                            continue
             except ImportError:
                 pass  # sl_zones not available
             except Exception as e:

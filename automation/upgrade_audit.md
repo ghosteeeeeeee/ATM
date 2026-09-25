@@ -1,11 +1,11 @@
 # Upgrade Audit Trail
 
-Generated: 2026-09-24 17:40 UTC
+Generated: 2026-09-25 (latest scan)
 
 ---
 
 ## Plan: 2026-09-23_regime-based-signal-fixes.md
-- **Date scanned:** 2026-09-24 17:40
+- **Date scanned:** 2026-09-25 17:00 (re-verified)
 - **Core request:** Block LONG when linreg=LEAN_BEAR, block accel-300 SHORT in RECOVERY, disable pullback-entry- SHORT
 - **Difficulty:** Level 1 (config + single function edits)
 - **Value:** HIGH
@@ -162,15 +162,43 @@ Generated: 2026-09-24 17:40 UTC
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| ✅ IMPLEMENTED | 17 | regime-fixes, winrate-fix, continuum-integration, pump-chain-v5, trade-watchdog, squeeze-breakout, ride-it-exit, continuum-ma, oversold-bounce, oscillator-matrix, pump-catching, btc-crash-filter, profitability-fix, btc-timing-guard, chop-gating, btc-alignment, structural-awareness (partial) |
-| 🟡 PARTIAL | 1 | structural-awareness-overhaul (Phase 1 done, Phase 2-4 not built) |
-| ❌ NOT IMPLEMENTED | 1 | contrarian-zone-signal |
+| ✅ IMPLEMENTED | 18 | regime-fixes, winrate-fix, continuum-integration, pump-chain-v5, trade-watchdog, squeeze-breakout, ride-it-exit, continuum-ma, oversold-bounce, oscillator-matrix, pump-catching, btc-crash-filter, profitability-fix, btc-timing-guard, chop-gating, btc-alignment, structural-awareness (partial), **contrarian-zone Phase 1** |
+| 🟡 PARTIAL | 3 | structural-awareness (Phase 1), partial-close (Option 3 only), btc-momentum-sync (Layers 3-5) |
+| ❌ NOT IMPLEMENTED | 0 | — |
 | ⚠️ SUPERSEDED | 1 | accel300-v4 (approach abandoned) |
+
+## Plan: contrarian-zone-signal
+- **Date scanned:** 2026-09-25 17:00
+- **Core request:** Flip blocked signals to contrarian direction at strong SL zones (84% hold rate)
+- **Difficulty:** Level 1 (Phase 1: single function edit + 5 constants)
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED (Phase 1 only)
+- **Reason:** Added CONTRARIAN_ZONE_ENABLED + 4 constants to hermes_constants.py:854-858. Modified signal_compactor.py:3566-3589 to flip direction when zone strength >= 0.5, hits >= 3, distance <= 0.5%. Phase 2 (standalone signal) and Phase 3 (exit logic) not implemented.
+
+## Plan: partial-close-trailing-runner
+- **Date scanned:** 2026-09-25 17:00
+- **Core request:** Partial close at PM_TRAIL activation + regime-adaptive trail width
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** 🟡 PARTIAL (Option 3 implemented: tiered trail)
+- **Reason:** PM_TRAIL_TIERS exists in hermes_constants.py:1449-1454 (tiered trail loosens with profit). Option 1 (partial close at 50%) NOT implemented — requires size tracking in position_manager. Option 2 (regime-adaptive trail) NOT implemented — CEO warned against widening trail (line 1442).
+
+## Plan: btc-momentum-sync
+- **Date scanned:** 2026-09-25 17:00
+- **Core request:** 5-layer defense: BTC momentum gate, transition detection, stale filter, RSI guard, continuum boost
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** 🟡 PARTIAL (Layers 3-5 done, Layer 1 partially, Layer 2 not done)
+- **Reason:** Layer 3 (stale filter: staleness_mult=0.1 decay) done. Layer 4 (RSI guard: RSI floors/ceilings) done. Layer 5 (continuum boost: continuum_mult) done. Layer 1 (BTC momentum gate) partially done via BTC_CHOP_GATE + directional_bias. Layer 2 (transition detection) NOT implemented.
+
+---
 
 ## Pending Candidates (Not Implemented)
 
 | Plan | Difficulty | Value | Why Pending |
 |------|-----------|-------|-------------|
-| contrarian-zone-signal | Level 2 | MEDIUM | New signal, needs build |
+| partial-close Phase 1 (50% close) | Level 2-3 | HIGH | Needs position_manager changes, size tracking |
 | structural-awareness Phase 2-4 | Level 3-4 | HIGH | Architecture overhaul, multiple new files |
 | pump-catching medium-term (btc_breakout, ATR trailing) | Level 2-3 | MEDIUM | Not yet prioritized |
+| contrarian-zone Phase 2 (standalone signal) | Level 2 | MEDIUM | Needs new signal file + backtest validation |
+| btc-momentum-sync Layer 2 (transition detection) | Level 2 | MEDIUM | Needs continuum_context.py changes |

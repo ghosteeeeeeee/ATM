@@ -259,12 +259,10 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'ACE',
-    'FIL',
-    'FOGO',
+    'CASHCAT',
     'IOTA',
     'JUP',
-    'LTC',
-    'SYRUP'
+    'LTC'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -294,11 +292,12 @@ LOSERS_SHORT = {
 # Legacy combined set
 LOSERS = {
     'ALGO',
-    'ALT',
-    'AVAX',
+    'AZTEC',
+    'CAKE',
     'COMP',
-    'WCT'
+    'KAS'
 }
+
 
 
 
@@ -851,6 +850,16 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot — NOT blocked).
 LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
 LONG_RSI_CEILING = 80           # brain_auditor 2026-09-23: overbought LONG = pullback risk. WCT RSI=98.86 LONG -$0.15. 30d: RSI>80 LONG = 4T 50%WR -$0.22. Blocks extreme overbought entries.
+
+# ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
+# When SL zone blocks a signal, check if zone is strong enough to flip direction.
+# Zone mechanic: 84% hold rate at structural levels. If price is near a strong
+# support zone and system wants SHORT → flip to LONG (zone will hold and reverse).
+CONTRARIAN_ZONE_ENABLED = True             # enable contrarian direction flip at strong zones
+CONTRARIAN_ZONE_MIN_STRENGTH = 0.5         # minimum zone strength to trigger flip
+CONTRARIAN_ZONE_MIN_HITS = 3               # minimum hit count for zone validity
+CONTRARIAN_ZONE_MAX_DISTANCE_PCT = 0.5     # max distance from zone center to trigger flip (%)
+CONTRARIAN_ZONE_POSITION_SIZE_MULT = 0.5   # position size multiplier (marginal edge — half size)
 
 # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
 # 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
@@ -3591,7 +3600,7 @@ PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (2
 PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 PUMP_CHAIN_V5_ENABLED = True           # NEW 2026-09-22 — V5 with velocity + continuum oscillator filters. 48h test.
-PUMP_CHAIN_V5_SHORT_ENABLED = True     # NEW 2026-09-23 — V5 SHORT with wave_phase + momentum + BB filters. 0 kills, 4 catches.
+PUMP_CHAIN_V5_SHORT_ENABLED = False    # CEO Sep 25 — 30d: 88T 54.5%WR -$0.31 (breakeven). 7d: 33T 45.5%WR -$0.93 (cold streak). SHORT side bleeding -$3.66/7d total. Disable to reduce SHORT noise.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
