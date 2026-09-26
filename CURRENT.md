@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-25 ~22:00 UTC**
+**Last Updated: 2026-09-26 ~06:15 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 2T, 100% WR, +$0.08. Pipeline running. 0 open. System idle 16h+. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED.
+24h: 0T. System idle 26h+. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED. volume_spike METADATA BUG FIXED.
 
-- **24h (rolling):** 2T, 100% WR, +$0.08 (DB-verified). 0 open.
-- **7d:** 198T, 41.9% WR, -$2.81 (DB-verified). ATR_SL hit rate 63.1% (125/198) — CRITICAL, monitoring widening impact.
-- **14d:** 390T, 47.2% WR, -$3.54 (DB-verified).
+- **24h (rolling):** 0T, system idle 26h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **7d:** 193T, 41.3% WR, -$2.83 (DB-verified). ATR_SL hit rate 62.2% (120/193) — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
+- **14d:** 385T, 46.8% WR, -$3.33 (DB-verified).
 - **LONG:** volume-breakout-long+ 12T 66.7%WR +$1.25. pump-chain+ 55T 41.8%WR +$1.23. grind-trend+ 18T 50.0%WR +$0.24.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$3.66/7d total.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -51,6 +51,14 @@
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
+
+## Today's Changes (Sep 26)
+
+1. **brain_auditor ~05:30 UTC — NO CONFIG CHANGE.** DB-verified: 2T 100%WR +$0.08 (24h) | 196T 41.8%WR -$2.84 (7d) | 385T 47.0%WR -$3.33 (14d). **SYSTEM IDLE 22h+** — last trade Sep 25 02:26 UTC. 0 open. **ATR_SL WIDENING DEPLOYED BUT UNTESTED** — 0 trades since deployment at 12:30 UTC Sep 25. Needs 48h monitoring (eval Sep 27). **7d ATR_SL hit rate 62.8% (123/196) — CRITICAL.** EXTREME 72.6% worst. pump-chain+ LONG 92.7% ATR_SL but R:R=1.84:1 saves it (avg win +9.49%, avg loss -5.15%). pullback-entry- SHORT 100% ATR_SL hit rate 24T -$1.47. **REGIME 14d:** EXTREME LONG 74T 52.7%WR +$1.94 (best). SHORT side -$2.86/7d. **SIGNAL DIVERSITY CRITICAL** — only 2 profitable signals. **CREATIVE (3):** (1) ATR_SL widening success criteria — if >55% by Sep 27, consider 2.0% cap for EXTREME. (2) Regime-specific ATR_SL caps suggested. (3) Kill ema300-breakthrough+ (1T/14d 0%WR). **0 CHANGES APPLIED.** — brain_auditor
+
+## Today's Changes (Sep 26)
+
+1. **brain_auditor ~06:15 UTC — 1 CODE FIX.** DB-verified: 0T/24h (idle 26h+) | 193T 41.3%WR -$2.83 (7d) | 385T 46.8%WR -$3.33 (14d). **volume_spike METADATA BUG FIXED.** decider_run.py:4200 — `getattr(_crash_signal, 'volume_spike', 0)` is falsy when volume_spike=0.0 (no spike). Volume_spike NEVER written to _signal_metadata. Chase filter blind to volume quality for 7+ days. Fixed: changed to `if _crash_signal is not None`. Expected +$0.30-0.80/7d. **ATR_SL WIDENING DEPLOYED BUT UNTESTED** — 0 trades since deployment at 12:30 UTC Sep 25. Needs 48h monitoring (eval Sep 27). **7d ATR_SL hit rate 62.2% (120/193) — CRITICAL.** EXTREME 72.6% worst. **SHORT NULL RSI EDGE GONE** — 0 trades/14d (was 130T 56.9%WR +$2.08). Market regime shift. **SIGNAL DIVERSITY CRITICAL** — only pump-chain+ LONG (+$0.37/7d) and volume-breakout-long+ (+$0.70/7d) profitable. **CREATIVE:** (1) ATR_SL widening success criteria — if >55% by Sep 27, consider 2.0% cap for EXTREME. (2) SHORT_RSI_CEILING 65→70 unlocks profitable RSI 65-80 SHORT band (+$0.10-0.20/7d). (3) pullback-entry- SHORT cold streak (30d 52.1%WR +$0.35) — ATR_SL too tight, not entry quality. **1 CHANGE APPLIED:** volume_spike metadata fix. — brain_auditor
 
 ## Today's Changes (Sep 25)
 

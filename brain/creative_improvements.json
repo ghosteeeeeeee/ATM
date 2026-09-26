@@ -2046,5 +2046,32 @@
         "status": "suggested"
       }
     ]
+  },
+  {
+    "date": "2026-09-25T22:35:00Z",
+    "idea": "pump-chain+ LONG EXTREME confidence floor 70%",
+    "rationale": "pump-chain+ LONG in EXTREME: 33T 48.5%WR +$0.97/7d. Winners avg +10.42%, losers avg -5.08%. R:R=2.05:1. Best signal-regime combo. 70% floor ensures priority fills.",
+    "expected_impact": "+$0.10-0.20/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-25T22:35:00Z",
+    "idea": "pullback-entry SHORT EXTREME regime block",
+    "rationale": "10T/7d ALL losers in EXTREME, 100% ATR_SL hit rate. -$0.92. Works in other regimes (30d +$0.35) but EXTREME whipsaw kills it.",
+    "expected_impact": "+$0.13/7d",
+    "category": "regime filter",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-25T22:35:00Z",
+    "idea": "ATR_SL_MAX 2.0% for EXTREME regime",
+    "rationale": "EXTREME ATR_SL hit rate 72.6% despite 1.8% cap + 1.2x multiplier. Winners avg +10.42% — trades have the move, SL triggers too early. Raising effective floor lets winners breathe.",
+    "expected_impact": "+$0.20-0.50/7d",
+    "category": "exit optimization",
+    "status": "suggested — needs CEO",
+    "risk": "medium"
   }
 ]

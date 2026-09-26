@@ -1,123 +1,127 @@
 {
-    "timestamp": "2026-09-25T22:00:00Z",
+    "timestamp": "2026-09-26T06:15:00Z",
     "session_brain_stats": {
-        "total_sessions": "200+",
-        "top_themes": ["ATR_SL hit rate", "RSI bands", "signal diversity", "regime edge", "CL-T1 bleeding"]
+        "queries_run": 3,
+        "top_topics": ["signal performance", "new signal ideas", "losing trades"]
     },
     "trade_summary_24h": {
-        "trades": 2,
-        "win_rate": 100.0,
-        "pnl": 0.08,
-        "note": "System nearly idle — only 2 trades closed in 24h"
+        "trades": 0,
+        "system_idle_hours": 26.3,
+        "last_trade": "2026-09-25 02:26 UTC — BTC continuum-osc+ LONG +$0.05",
+        "note": "System completely idle since Sep 25 02:26 UTC. ATR_SL widening deployed Sep 25 12:30 — 0 trades to measure impact."
     },
     "trade_summary_7d": {
-        "trades": 198,
-        "win_rate": 41.9,
-        "pnl": -2.81,
-        "atr_sl_hit_rate": 63.1,
-        "atr_sl_status": "CRITICAL — above 40% threshold"
+        "trades": 193,
+        "win_rate": 41.3,
+        "pnl": -2.83,
+        "atr_sl_hit_rate": 62.2,
+        "atr_sl_extreme": "72.6% hit rate — CRITICAL",
+        "by_regime": {
+            "EXTREME": "95T 43.2%WR -$0.83 (best PnL)",
+            "HIGH": "71T 39.4%WR -$1.59",
+            "NORMAL": "25T 36.0%WR -$1.01",
+            "FLAT": "2T 100%WR +$0.03"
+        },
+        "exit_analysis": {
+            "atr_sl_hit": "120T 41.7%WR -$3.52 (dominates)",
+            "profit-monster-trail": "36T 52.8%WR +$1.22 (best)",
+            "cut-loser-CL-T1": "15T 0%WR -$1.65 (DISABLED, residual)",
+            "pump_exit_dead_money": "16T 43.8%WR +$0.35"
+        },
+        "top_losers": {
+            "pullback-entry-_SHORT": "24T 37.5%WR -$1.47 (84.3% ATR_SL)",
+            "mover+_LONG": "9T 22.2%WR -$1.24 (killed Sep 25)",
+            "pump-chain-_SHORT": "33T 45.5%WR -$0.93 (cold streak)"
+        }
     },
     "trade_summary_14d": {
-        "trades": 390,
-        "win_rate": 47.2,
-        "pnl": -3.54
+        "trades": 385,
+        "win_rate": 46.8,
+        "pnl": -3.33,
+        "rsi_bands_short": {
+            "NULL": "0T (edge gone — was 130T 56.9%WR +$2.08)",
+            "50-65": "66T 50.0%WR -$0.12 (sweet spot)",
+            "65-80": "11T 54.5%WR +$0.42 (blocked by ceiling=65)",
+            "35-50": "50T 42.0%WR -$2.30 (blocked by floor=50)",
+            "<35": "45T 40.0%WR -$1.34 (blocked by floor=50)"
+        },
+        "rsi_bands_long": {
+            "35-50": "31T 67.7%WR +$1.60 (best, SWEET_SPOT_BOOST active)",
+            "50-65": "83T 53.0%WR +$0.46",
+            "65-80": "68T 44.1%WR +$0.31",
+            "<35": "19T 10.5%WR -$2.31 (catastrophic, blocked by floor=30)"
+        }
     },
     "drift_findings": [
         {
-            "item": "staleness metadata 100% NULL",
-            "status": "ACTIVE DRIFT",
-            "detail": "0/198 trades in 7d have staleness_min in _signal_metadata. Chase filter can't see staleness post-hoc. Stale filter itself works (4.9% stale rate) but metadata not recording.",
-            "impact": "Low — stale filter blocks pre-trade, metadata is for post-hoc analysis only",
-            "suggested_fix": "Investigate _signal_metadata staleness_min recording in signal_compactor.py or decider_run.py"
+            "issue": "volume_spike STILL 100% NULL after CEO fix",
+            "root_cause": "decider_run.py:4200 — condition `getattr(_crash_signal, 'volume_spike', 0)` is falsy when volume_spike=0.0 (no spike). Metadata never written. Chase filter blind to volume quality for 7+ days.",
+            "impact": "Chase filter cannot block low-volume pumps. Lost ~$0.30-0.80/7d estimated.",
+            "status": "FIXED THIS RUN — changed to `if _crash_signal is not None`"
         },
         {
-            "item": "volume_spike metadata 100% NULL",
-            "status": "MONITORING — FIX DEPLOYED",
-            "detail": "Fix deployed Sep 25 05:00 UTC (decider_run.py:4187). System idle since — 0 trades to verify. 0/198 trades in 7d have volume_spike.",
-            "impact": "Medium — chase filter blind to volume quality until verified",
-            "suggested_fix": "Verify on next trade that volume_spike appears in _signal_metadata"
-        },
-        {
-            "item": "SHORT NULL RSI edge degraded",
-            "status": "FADING",
-            "detail": "14d SHORT NULL RSI: 5T 80%WR +$0.40 (tiny sample). Previous: 130T 56.9%WR +$2.08. Edge evaporating — possibly market regime shift or detection-time fallback stopped firing.",
-            "impact": "Low — sample too small for action",
-            "suggested_fix": "Monitor. If NULL RSI trades resume with good WR, consider +15pt confidence boost"
+            "issue": "SHORT NULL RSI edge completely gone",
+            "data": "14d: 0T NULL RSI SHORT trades (was 130T 56.9%WR +$2.08). Detection-time fallback stopped firing.",
+            "impact": "Lost edge. Was our best SHORT band.",
+            "status": "Monitor — may be market regime shift, not a code issue"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "ATR_SL hit rate 63.1% — CRITICAL",
-            "sessions_discussed": "10+",
-            "status": "WIDENING DEPLOYED — MONITORING 48h",
-            "detail": "ATR_SL_MAX widened 1.5→1.8% + EXTREME 1.2x multiplier. 14d EXTREME: winners avg +6.78%, losers avg -5.30%. SL cutting winners short.",
-            "next_check": "2026-09-27 ~12:00 UTC (48h post-deploy)"
+            "problem": "ATR_SL hit rate CRITICAL — 62.2% 7d, 72.6% EXTREME",
+            "detail": "EXTREME winners avg +6.78%, losers avg -5.32%. SL cutting winners short. ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 but 0 trades to measure.",
+            "suggested_7_times": "If hit rate >55% by Sep 27, consider 2.0% cap for EXTREME only.",
+            "status": "MONITORING — eval Sep 27"
         },
         {
-            "problem": "Signal diversity — only 2 signals profitable in NEUTRAL",
-            "sessions_discussed": "8+",
-            "status": "OPEN",
-            "detail": "pump-chain+ LONG 55T +$1.23 and volume-breakout-long+ 6T +$0.57 carry system. No other signal passes NEUTRAL confluence.",
-            "next_step": "Develop new NEUTRAL signal or re-evaluate bb-bounce-v2-long+ (30d 74%WR)"
-        },
-        {
-            "problem": "pullback-entry- SHORT cold streak",
-            "sessions_discussed": "5+",
-            "status": "RSI FLOOR DEPLOYED — MONITORING",
-            "detail": "7d: 24T 37.5%WR -$1.47, 100% ATR_SL hit rate. But 30d: 119T 52.1%WR +$0.35 — cold streak, not systemic. RSI<50 entries (13.04, 26.67, 27.27) now blocked by SHORT_RSI_FLOOR=50.",
-            "next_check": "2026-09-27 — check if RSI floor is blocking losers"
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "New NEUTRAL regime signal",
-            "sessions_discussed": "8+",
-            "priority": "HIGH",
-            "detail": "System needs signal diversity. Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. bb-bounce-v2-long+ (30d 74%WR) was re-enabled Sep 22 — monitor."
-        },
-        {
-            "item": "Regime-adaptive ATR_SL (beyond multiplier)",
-            "sessions_discussed": "5+",
-            "priority": "MEDIUM",
-            "detail": "Current: EXTREME 1.2x multiplier. Could go further: EXTREME gets wider SL, NORMAL gets tighter SL. But needs data from current widening first."
+            "problem": "Signal diversity — only 2 profitable signals in NEUTRAL",
+            "detail": "pump-chain+ LONG 53T +$0.37/7d, volume-breakout-long+ 5T +$0.70/7d. All others disabled or losing.",
+            "status": "OPEN — needs new signal development"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-25T22:00:00Z",
-            "idea": "bb-bounce-v2-long+ 48h evaluation window — adjust confidence if cold streak persists",
-            "rationale": "Re-enabled Sep 22. 7d: 12T 41.7%WR -$0.26 (cold). But 30d: 73T 74%WR +$2.08 (best signal by WR). If 48h post-re-enable shows continued underperformance, adjust confidence threshold rather than killing again.",
-            "expected_impact": "Preserve best historical signal while managing cold streak risk",
-            "category": "signal monitoring",
-            "status": "suggested",
+            "date": "2026-09-26T06:15:00Z",
+            "idea": "pullback-entry- SHORT ATR_SL too tight — not an entry quality problem",
+            "rationale": "pullback-entry- SHORT 7d: 24T 37.5%WR -$1.47. 84.3% ATR_SL hit rate. But 30d: 119T 52.1%WR +$0.35 — cold streak, not systemic. Winners avg +4.78%, losers avg -5.92%. The signal finds good entries but SL cuts them short. Same root cause as EXTREME ATR_SL problem. If ATR_SL widening (1.8% + EXTREME 1.2x) works for pump-chain+, it should work here too.",
+            "expected_impact": "+$0.30-0.50/7d if ATR_SL widening works (shared mechanism)",
+            "category": "entry sniper",
+            "status": "monitoring (ATR_SL widening deployed Sep 25)",
             "risk": "low"
         },
         {
-            "date": "2026-09-25T22:00:00Z",
-            "idea": "pump-chain+ LONG EXTREME confidence floor 70%",
-            "rationale": "30d EXTREME: 48T 45.8%WR +$1.19 (best regime). CURRENT.md confirms EXTREME is strongest. Adding confidence floor ensures only high-quality EXTREME entries execute. Low risk — only boosts fill quality.",
-            "expected_impact": "+$0.10-0.20/7d from better fill quality in best regime",
+            "date": "2026-09-26T06:15:00Z",
+            "idea": "SHORT RSI ceiling 65→70 — unlock profitable band",
+            "rationale": "14d: SHORT RSI 65-80 = 11T 54.5%WR +$0.42 (profitable, currently blocked by SHORT_RSI_CEILING=65). RSI>80 = 4T 25%WR -$0.08 (still blocked at 80). Raising ceiling to 70 unlocks 5-6 trades/14d that are net positive. CASHCAT RSI=65.98 SHORT won $0.06 — this band works.",
+            "expected_impact": "+$0.10-0.20/7d",
             "category": "entry sniper",
             "status": "suggested",
             "risk": "low"
         },
         {
-            "date": "2026-09-25T22:00:00Z",
-            "idea": "ATR_SL widening impact measurement protocol",
-            "rationale": "ATR_SL_MAX 1.5→1.8% + EXTREME 1.2x deployed today. Define clear success criteria: if 7d ATR_SL hit rate drops below 50% by Sep 27, widening works. If still >55%, consider further widening to 2.0% or signal-specific SL tuning.",
-            "expected_impact": "Structured evaluation prevents premature reverts or endless monitoring",
-            "category": "process",
-            "status": "suggested",
-            "risk": "low"
+            "date": "2026-09-26T06:15:00Z",
+            "idea": "New NEUTRAL regime signal — system fragility",
+            "rationale": "Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. If either has a cold streak, system bleeds. Session brain shows 'trend following' and 'sma20_dip' ideas discussed but not built. 30d: 50+ signal types active but only 2 are net positive.",
+            "expected_impact": "+$0.50-1.00/7d (diversification value)",
+            "category": "architecture",
+            "status": "open",
+            "risk": "medium"
         }
     ],
-    "config_changes_applied": [],
+    "config_changes_applied": [
+        {
+            "change": "volume_spike metadata recording fix",
+            "file": "decider_run.py:4200",
+            "before": "if _crash_signal and getattr(_crash_signal, 'volume_spike', 0):",
+            "after": "if _crash_signal is not None:",
+            "rationale": "volume_spike=0.0 is falsy — condition never true when no spike. Chase filter blind to volume for 7+ days.",
+            "impact": "Chase filter can now block low-volume pumps. Expected +$0.30-0.80/7d."
+        }
+    ],
     "next_actions": [
-        "MONITOR: ATR_SL widening impact — check hit rate Sep 27 ~12:00 UTC",
-        "MONITOR: volume_spike fix — verify on next trade",
-        "MONITOR: SHORT_RSI_FLOOR=50 — check if pullback-entry- SHORT losers decrease",
-        "MONITOR: bb-bounce-v2-long+ — 48h evaluation window (Sep 24+)",
-        "EVALUATE: New NEUTRAL signal development — high priority for diversity",
-        "INVESTIGATE: staleness metadata not recording in _signal_metadata"
+        "1. MONITOR ATR_SL widening impact — eval Sep 27. If hit rate >55%, consider 2.0% cap for EXTREME.",
+        "2. VERIFY volume_spike fix — next trade should have volume_spike in _signal_metadata.",
+        "3. DEVELOP new NEUTRAL signal for diversity.",
+        "4. CONSIDER SHORT_RSI_CEILING 65→70 — unlocks profitable RSI 65-80 SHORT band."
     ]
 }
