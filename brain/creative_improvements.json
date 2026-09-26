@@ -583,5 +583,25 @@
     "category": "new signal",
     "status": "suggested — needs signal-lab",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-26T20:35:00Z",
+    "idea": "SHORT RSI 50-65 confidence boost +10pt",
+    "rationale": "SHORT NULL RSI was +$2.08/14d (56.9% WR) but edge dead — 0 trades/7d. Detection-time RSI entries were higher quality. Reframe: boost SHORT trades where detection-time RSI is in 50-65 sweet spot. 14d: SHORT RSI 50-65 = 65T 49.2%WR -$0.24 (near breakeven). Boosting confidence for quality entries.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sessions_suggested": 6,
+    "note": "6th suggestion — edge reframed from NULL RSI to RSI 50-65 boost"
+  },
+  {
+    "date": "2026-09-26T20:35:00Z",
+    "idea": "Monitor ATR_SL widening first trades — success criteria",
+    "rationale": "ATR_SL widening (1.8% MAX + EXTREME 1.2x) deployed Sep 25. 67h+ with 0 trades. EXTREME 70.2% pre-fix. Target: <55% hit rate = success. If first 20 EXTREME trades show >60% hit rate, consider 2.0% cap.",
+    "expected_impact": "+$0.50-1.00/7d if successful",
+    "category": "monitoring",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]

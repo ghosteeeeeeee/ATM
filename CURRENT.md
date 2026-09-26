@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 ~19:00 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-28 ~05:00 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 0T. System idle 67h+. ATR_SL widening UNTESTED (0 trades/67h+). Pipeline healthy, NEUTRAL regime.
+24h: 0T. System idle 85h+. ATR_SL widening UNTESTED (0 trades/85h+). Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 0T, system idle 67h+ (last trade Sep 25 02:26 UTC). 0 open.
-- **7d:** 145T 40.0%WR -$4.00 (DB-verified). ATR_SL 65.5% (95/145) CRITICAL.
-- **14d:** 352T 44.9%WR -$4.25 (DB-verified).
+- **24h (rolling):** 0T, system idle 85h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **7d:** 148T 40.5%WR -$3.75 (DB-verified). ATR_SL 98T 41.8%WR -$3.73 CRITICAL.
+- **14d:** 356T 45.5%WR -$3.91 (DB-verified).
 - **LONG:** pump-chain+ (workhorse), volume-breakout-long+ (gem).
 - **SHORT:** ALL DISABLED or pre-disable.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -29,12 +29,12 @@
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC, narrowed Sep 25 ~06:30 UTC). +10pt confidence when LONG RSI 40-50. 14d: RSI 40-50 = 35T 54.3%WR +$0.34. RSI 50-60 = 44T 63.6%WR +$2.06 (best band). Blocks nothing — only boosts fill quality.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$3.24)**
-7d PnL -$3.24. pump-chain+ LONG 42T 42.9%WR +$0.25 (workhorse, 90.5% ATR_SL hit rate but R:R saves it). volume-breakout-long+ 5T 60%WR +$0.70 (gem, 100% ATR_SL but winners BIG). pullback-entry- 22T 40.9%WR -$1.16 (pre-disable trades, 100% ATR_SL). grind-trend+ not active 7d.
+**🟡 R:R STATUS (7d -$3.75)**
+7d PnL -$3.75. pump-chain+ LONG 35T 34.3%WR -$0.39 (cold streak, 14d still +$1.34). volume-breakout-long+ 5T 60%WR +$0.70 (gem, 100% ATR_SL but winners BIG). pullback-entry- 22T 40.9%WR -$1.16 (pre-disable trades, 100% ATR_SL). mover+ 8T 25%WR -$1.19 (legacy pre-kill, aging out).
 
-**🔴 ATR_SL HIT RATE:** 65.5% 7d (95/145), EXTREME 69.5% (57/82). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. **0 trades since deployment (67h+)** — eval OVERDUE but blocked by no trades. Needs market activity to measure impact.
+**🔴 ATR_SL HIT RATE:** 66.2% 7d (98/148), EXTREME 60.7% (35/58). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **0 trades since deployment (85h+)** — eval OVERDUE but blocked by no trades. Needs market activity to measure impact.
 
-**🟢 REGIME EDGE (7d volatility_regime):** EXTREME 88T 43.2%WR -$1.27. NORMAL 18T 44.4%WR -$0.75. HIGH 50T 38.0%WR -$1.25 (worst). FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).**
+**🟢 REGIME EDGE (7d volatility_regime):** EXTREME 83T 39.8%WR -$1.75. HIGH 48T 37.5%WR -$1.41 (worst). NORMAL 15T 46.7%WR -$0.62. FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).** 14d: EXTREME 136T 47.1%WR +$0.12 (break-even). HIGH 140T 43.6%WR -$2.67 (worst, 39% of all trades).
 
 **🟢 HL-SYNC FALSE ALARM.** auto_1hr flagged "hl_sync: running but no log file" — log was rotated to .gz. Service `hermes-hl-sync-guardian.service` active, timer running. Not a real issue.
 
@@ -55,6 +55,10 @@
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
 
 **🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3751) but NEVER enforced in signal_compactor.py or decider_run.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
+
+## Today's Changes (Sep 28)
+
+1. **brain_auditor ~05:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 85h+) | 148T 40.5%WR -$3.75 (7d) | 356T 45.5%WR -$3.91 (14d). **SYSTEM IDLE 85h+** — last trade Sep 25 02:26. 0 open. **ATR_SL WIDENING STILL UNTESTED** — deployed Sep 25 (1.8% MAX + EXTREME 1.2x) + ATR_SL_MIN_EXTREME=1.5% Sep 27. 0 trades since. **REGIME_CONF_HIGH_MULT=0.50 UNTESTED** — deployed Sep 26. **7d REGIME:** EXTREME 83T 39.8%WR -$1.75. HIGH 48T 37.5%WR -$1.41. NORMAL 15T 46.7%WR -$0.62. **14d REGIME:** EXTREME 136T 47.1%WR +$0.12 (break-even). HIGH 140T 43.6%WR -$2.67 (worst, 39% of all trades). **SIGNAL QUALITY 14d:** pump-chain+ LONG 67T 43.3%WR +$1.34 (ATR_SL 58T 43.1%WR +$1.07 — R:R saves it). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem). bb-bounce-v2-long+ 12T 41.7%WR -$0.26 (cold, 30d 74%WR +$2.08). **LONG RSI 60-70 KILLING FIELD:** 50T 34.0%WR -$2.00/14d — ceiling=70 blocks above 70 but 60-70 bleeds. **SHORT NULL RSI EDGE DEAD:** 0 trades/7d (was 66T 56.1%WR +$1.35/14d). **LOSING AUTOPSY:** 0 losers in 24h (idle). All 7d losses pre-fix legacy aging out. **SIGNAL DIVERSITY CRITICAL** — only pump-chain+ LONG and volume-breakout-long+ profitable. **CREATIVE (3):** (1) LONG_RSI_CEILING 70→65 (+$0.32/7d, blocks 5 losers 0 winners). (2) ATR_SL widening eval criteria — define success before trades arrive. (3) Investigate SHORT NULL RSI fallback death. **0 CHANGES APPLIED.** **MONITORING:** ATR_SL eval (needs market activity), REGIME_CONF_HIGH_MULT=0.50, ATR_SL_MIN_EXTREME=1.5%, volume_spike fix, CL-T1 disable. — brain_auditor
 
 ## Today's Changes (Sep 27)
 
