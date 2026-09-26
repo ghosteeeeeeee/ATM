@@ -3029,3 +3029,7 @@
   7d: 150T 40.7%WR -.76 | 14d: 357T 45.7%WR -.63
   System idle ~41h. ATR_SL dominance 66.7%. TP hit rate 0.7% — suspiciously low.
   No kill candidates, no overtrading. BY: auto_1hr
+[2026-09-27 04:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 49.7h
+  7d: 150T 40.7%WR -$3.76 | 14d: 357T 45.7%WR -$3.63
+  ATR_SL dominance 66.7% (all pre-fix). TP hit rate 0.7% still low.
+  All losers killed (mover+, pullback-entry-). No new kill candidates. BY: auto_1hr

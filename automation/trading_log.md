@@ -7298,3 +7298,36 @@ Final set: ['ALGO', 'COMP', 'KAS']
 
 ## TEAM UPDATES
 - [2026-09-27 03:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle ~41h
+
+## [2026-09-27 04:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 49.7h ago (BTC continuum-osc+ +$0.05)
+**7d:** 150T 40.7%WR -$3.76 | **14d:** 357T 45.7%WR -$3.63
+**ATR_SL 7d:** 100/150 = 66.7% (all pre-fix trades)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 49.7h — pipeline running, regime NEUTRAL, 0 open positions
+- ATR_SL fix deployed Sep 25 — 0 trades since to measure effectiveness
+- No kill candidates: all losers already killed (mover+, pullback-entry-)
+- No overtrading (0 trades/hr)
+
+**7d Exit Reasons:**
+- atr_sl_hit: 100T 66.7% — dominant (all pre-fix)
+- profit-monster-trail: 20T 13.3% — winning exits
+- pump_exit_dead_money: 16T 10.7% — cleanup
+- cut-loser-CL-T1: 8T 5.3% — secondary bleed
+- atr_tp_hit: 1T 0.7% — TP hit rate still suspiciously low
+
+**Signal 7d Watchlist:**
+- `mover+`: 8T 25%WR -$1.19 — KILLED
+- `pullback-entry-`: 22T 40.9%WR -$1.16 — KILLED
+- `pump-chain-`: 33T 45.5%WR -$0.93 — monitoring
+
+**Open Questions:**
+- 49.7h gap — extended quiet, regime needs shift to HIGH/EXTREME
+- ATR_SL fix eval window: ~Sep 27 — still 0 trades, can't evaluate
+- TP hit rate 0.7% — R:R too wide or trailing exits before TP
+
+**BY:** auto_1hr
