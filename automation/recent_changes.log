@@ -3037,3 +3037,9 @@
   7d: 149T 40.3%WR -.89 | 14d: 356T 45.5%WR -.91
   ATR_SL dominance 66.4% (all pre-fix). TP hit rate 0.7% still low.
   No kill candidates, no overtrading. BY: auto_1hr
+[2026-09-27 06:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 43.7h
+  7d: 146T 40.4%WR -$3.69 | ATR_SL dominance 58.9% (all pre-fix)
+  No kill candidates, no overtrading. Awaiting regime shift to resume trading. BY: auto_1hr
+[2026-09-26 23:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle ~45h
+  7d: 144T 41.0%WR -.69 | 14d: 356T 45.5%WR -.91
+  No new trades, no kill candidates, no overtrading. Awaiting regime shift. BY: auto_1hr

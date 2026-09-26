@@ -7365,3 +7365,65 @@ Final set: ['ALGO', 'COMP', 'KAS']
 - TP hit rate 0.7% — R:R too wide or trailing exits before TP
 
 **BY:** auto_1hr
+
+## [2026-09-27 06:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 43.7h ago (BTC continuum-osc+ +$0.05)
+**7d:** 146T 40.4%WR -$3.69 | **14d:** ~357T ~45.5%WR ~-$3.91
+**ATR_SL 7d:** 86/146 = 58.9% — EXTREME regime dominant (81T) with 69% atr_sl_hit
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 43.7h — pipeline running, 0 open positions, waiting for regime shift
+- ATR_SL fix deployed Sep 25 — still 0 trades post-fix to measure effectiveness
+- All kill candidates already dead (mover+, pullback-entry-)
+- No overtrading (0 trades/hr)
+- Only profitable signal: volume-breakout-long+ (5T 60%WR +$0.70)
+
+**7d Exit Reasons:**
+- atr_sl_hit: 86T 58.9% — dominant, fix needs evaluation window
+- profit-monster-trail: 20T 13.7% — winning exits (+$0.034 avg)
+- pump_exit_dead_money: 16T 11.0% — cleanup
+- cut-loser-CL-T1: 8T 5.5% — secondary bleed (-$0.121 avg worst)
+- atr_tp_hit: 1T 0.7% — TP hit rate still suspiciously low
+
+**7d Regime Breakdown:**
+- EXTREME: 81T avg-$0.021 — highest volume, ATR_SL dominant (69%)
+- HIGH: 48T avg-$0.029 — second worst regime
+- NORMAL: 15T avg-$0.041 — worst per-trade avg
+- FLAT: 2T avg+$0.015 — negligible
+
+**Signal 7d Watchlist:**
+- `mover+`: 8T 25%WR -$1.19 — KILLED
+- `pullback-entry-`: 21T 38.1%WR -$1.24 — KILLED  
+- `pump-chain-`: 33T 45.5%WR -$0.93 — monitoring (most losing trades)
+- `pump-chain+`: 34T 35.3%WR -$0.25 — weak but small loss
+- `bb-bounce-v2-long+`: 12T 41.7%WR -$0.26 — marginal
+
+**Open Questions:**
+- 43.7h idle gap — regime still quiet, needs shift to trigger trades
+- ATR_SL fix eval: impossible until trades resume
+- TP hit rate 0.7% — either R:R too wide or trailing exits fire first
+
+**BY:** auto_1hr
+
+## [2026-09-26 23:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~45h ago (BTC continuum-osc+ +$0.05)
+**7d:** 144T 41.0%WR -$3.69 | **14d:** 356T 45.5%WR -$3.91
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle ~45h — pipeline running, 0 open positions, waiting for regime shift
+- ATR_SL fix deployed Sep 25 — still no trades post-fix to measure effectiveness
+- No kill candidates (mover+, pullback-entry- already killed)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 45h idle gap — regime quiet, needs shift to trigger trades
+- ATR_SL fix eval: impossible until trades resume
+- TP hit rate 0.7% — either R:R too wide or trailing exits fire first
+
+**BY:** auto_1hr
