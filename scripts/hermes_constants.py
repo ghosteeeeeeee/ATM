@@ -488,6 +488,7 @@ MAX_TOTAL_POSITIONS = 10  # max total open positions across all tokens
 # position_manager.py, and speed_tracker.py.
 # SPEED FEATURE: filters slow/stale tokens from signal generation and hot-set.
 SPEED_MIN_THRESHOLD   = 30    # pctl < 30 → token blocked from signal generation (lowered from 35 — critical starvation at 0.33/hr, need accel-300+ entries)
+SPEED_MIN_THRESHOLD_LONG = 50  # LONG needs faster momentum — speed<60 LONG = -$2.82/7d (61T). 50 filters the slowest losers. profitability-fix-plan 2026-09-15
 SPEED_BOOST_THRESHOLD = 70    # pctl >= 70 → entry threshold lowered 5% (easier entry)
 SPEED_BOOST_FACTOR   = 0.95  # multiply entry threshold by this (lower = easier)
 SPEED_HOTSET_WEIGHT  = 0.25  # 25% weight for speed in hot-set effective_conf calculation

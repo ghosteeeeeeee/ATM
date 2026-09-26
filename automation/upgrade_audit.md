@@ -117,8 +117,8 @@
 - **Core request:** 8 fixes: disable rr_engine for pullback-entry-, kill ema300-dip-long, blacklist ENA, etc.
 - **Difficulty:** Level 1
 - **Value:** HIGH
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** EMA300_DIP_LONG_ENABLED=False ✅, PULLBACK_ENTRY_MINUS_ENABLED=False ✅, ENA blacklisted ✅. Some fixes done.
+- **Status:** IMPLEMENTED (7/8 done)
+- **Reason:** 6/8 done at scan time. Fix #8 (LONG speed threshold) implemented 2026-09-26: SPEED_MIN_THRESHOLD_LONG=50 added to hermes_constants.py, applied in decider_run.py rule_based_context_gate. Fix #7 (block pump-chain+ in NORMAL) SKIPped — contradicted by pump-chain- SHORT 83.3% WR in NORMAL. Fix #5 (cut-loser T1) was tightened but CL_TIER1_MIN_PCT later DISABLED by CEO.
 
 ## Plan: oversold-bounce-signal.md
 - **Date scanned:** 2026-09-26 00:00
@@ -138,11 +138,11 @@
 
 ## Plan: accel300-long-fix-plan.md
 - **Date scanned:** 2026-09-26 00:00
-- **Core request:** Fix accel-300 LONG (39% WR) with RSI<50 filter, pre15<0 filter
+- **Core request:** Fix accel-300 LONG (39% WR) with RSI<50 filter, pre15<0 filter, mom=falling filter
 - **Difficulty:** Level 1
 - **Value:** MEDIUM
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** accel_300_v3_long.py exists. Specific filters not confirmed.
+- **Status:** PARTIALLY IMPLEMENTED (SKIPped)
+- **Reason:** accel_300_v3_long.py exists with RSI_MIN=35. Plan's RSI<50 filter was based on v1/v2 data (103 trades), not v3 data. v3 has different entry logic (pullback-based). Changing RSI_MIN from 35→50 without v3-specific validation risks overfitting to old data. Monitor v3 performance first.
 
 ## Plan: accel300-v4-killer-signal.md
 - **Date scanned:** 2026-09-26 00:00
@@ -166,13 +166,20 @@
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| ✅ IMPLEMENTED | 10 | trade-watchdog, squeeze-breakout, oscillator-matrix, ride-it-exit, continuum-ma, oversold-bounce, atr-spike, emergency-winrate (CEO override), pump-chain-v5, regime-based-signal-fixes |
-| ⚠️ PARTIAL | 5 | continuum-integration, btc-oscillator-corr, profitability-fix, contrarian-zone, accel300-long, accel300-v4 |
+| ✅ IMPLEMENTED | 11 | trade-watchdog, squeeze-breakout, oscillator-matrix, ride-it-exit, continuum-ma, oversold-bounce, atr-spike, emergency-winrate (CEO override), pump-chain-v5, regime-based-signal-fixes, profitability-fix (7/8) |
+| ⚠️ PARTIAL | 5 | continuum-integration, btc-oscillator-corr, contrarian-zone, accel300-long (SKIPped), accel300-v4 |
 | ❌ NOT DONE | 2 | chop-v2, structural-awareness |
 | N/A | 1 | btc-oscillator-30d (analysis only) |
+
+## Session 2026-09-26 Changes
+
+| Change | File | Impact |
+|--------|------|--------|
+| SPEED_MIN_THRESHOLD_LONG=50 | hermes_constants.py:491 | Blocks slow LONG signals (speed<50). Expected +$1-2/7d from filtering 61 losing LONG trades at speed<60. |
+| Direction-aware speed gate | decider_run.py:967 | LONG uses SPEED_MIN_THRESHOLD_LONG=50, SHORT uses SIGNAL_FILTER_SPEED_MIN=40, NEUTRAL uses SIGNAL_FILTER_NEUTRAL_SPEED_MIN=15. |
 
 ## Next Implementation Candidates
 
 1. **structural-awareness** — Level 4, HIGH — transforms reactive→proactive (multi-day project)
 2. **chop-v2** — Level 3, HIGH — fixes chop losses (new module required)
-3. **profitability-fix** — Level 1, HIGH — verify remaining partial fixes
+3. **profitability-fix #7** — Level 2, needs direction-aware Pump_Flow blocking (can't block SHORT side)

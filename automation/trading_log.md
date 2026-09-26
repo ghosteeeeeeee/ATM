@@ -7232,3 +7232,36 @@ Final set: ['ALGO', 'COMP', 'KAS']
 
 ## TEAM UPDATES
 - [2026-09-27 01:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 38.7h
+
+## [2026-09-27 02:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 39.7h ago (BTC continuum-osc+ +$0.05)
+**7d:** 150T 40.7%WR -$3.76 | **14d:** 357T 45.7%WR -$3.63
+**ATR_SL 7d:** 100/150 = 66.7% (EXTREME dominant)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 39.7h — pipeline running, regime NEUTRAL, 0 open positions
+- ATR_SL fix deployed Sep 25 — 0 trades since fix to measure (eval window ongoing)
+- No kill candidates: no signals with 0%WR/3+ recent trades
+- No overtrading (0 trades/hr)
+
+**7d Exit Reasons:**
+- atr_sl_hit: 100T 66.7% — dominant (pre-fix trades only)
+- profit-monster-trail: 20T 13.3% — winning exits
+- pump_exit_dead_money: 16T 10.7% — cleanup
+- cut-loser-CL-T1: 8T 5.3% — secondary bleed
+- atr_tp_hit: 1T 0.7% — only 1 TP hit
+
+**Signal 7d Watchlist:**
+- `mover+`: 8T 25.0%WR -$1.19 — already killed
+- `pullback-entry-`: 22T 40.9%WR -$1.16 — already killed
+- `pump-chain-`: 33T 45.5%WR -$0.93 — moderate bleed, monitoring
+
+**Open Questions:**
+- 39.7h gap — extended quiet, needs regime shift to HIGH/EXTREME
+- ATR_SL_MAX 1.8% + EXTREME 1.2x pending real-world eval (eval ~Sep 27)
+- TP hit rate extremely low (1/150) — either R:R is too wide or exits happen before TP
+
+**BY:** auto_1hr

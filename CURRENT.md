@@ -1,13 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-26 ~22:30 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-27 ~02:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 0T. System idle 72h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/72h+). REGIME_CONF_HIGH_MULT=0.50 deployed today. Pipeline healthy.
+24h: 0T. System idle 47h+. CEO fixed pump-chain+ HIGH block STANDALONE_BYPASS leak (decider_run.py). ATR_SL widening UNTESTED (0 trades/47h+). Pipeline healthy.
 
-- **24h (rolling):** 0T, system idle 67h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **24h (rolling):** 0T, system idle 47h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **7d:** 150T 40.7%WR -$3.76 (DB-verified). ATR_SL 66.7% (100/150) CRITICAL.
+- **14d:** 358T 45.8%WR -$3.58 (DB-verified).
+- **LONG:** pump-chain+ 37T 35.1%WR -$0.40. volume-breakout-long+ 5T 60%WR +$0.70.
+- **SHORT:** ALL DISABLED or pre-disable.
 - **7d:** 158T, 42.4% WR, -$3.24 (DB-verified). ATR_SL hit rate 70.5% EXTREME — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
 - **14d:** 364T, 45.9% WR, -$4.08 (DB-verified).
 - **LONG:** pump-chain+ 67T 43.3%WR +$1.24. volume-breakout-long+ 18T 66.7%WR +$1.46. grind-trend+ 18T 50%WR +$0.24.
@@ -52,6 +56,12 @@
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
+
+**🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3751) but NEVER enforced in signal_compactor.py or decider_run.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
+
+## Today's Changes (Sep 27)
+
+1. **CEO ~02:00 UTC — 1 CODE FIX.** DB-verified: 0T/24h (idle 47h+) | 150T 40.7%WR -$3.76 (7d) | 358T 45.8%WR -$3.58 (14d). **PUMP-CHAIN+ HIGH BLOCK BUG FIXED.** signal_compactor.py has PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED enforcement (line 2643), but STANDALONE_BYPASS signals skip signal_compactor entirely and go to decider_run.py — which had NO HIGH block. 12 pump-chain+ HIGH trades executed Sep 19-22 despite block being "enabled". Fix: added matching HIGH block check in decider_run.py (line 1520-1529). Expected +$0.50/7d. **ATR_SL WIDENING STILL UNTESTED** — 0 trades since Sep 25 deploy (47h+). EXTREME 70.2% ATR_SL hit rate 7d. Eval window passed — needs market activity. **pump-chain+ LONG 7d -$0.40** (degraded from historical +$1.24). **1 CODE FIX APPLIED.** — CEO
 
 ## Today's Changes (Sep 26)
 
