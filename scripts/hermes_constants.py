@@ -649,6 +649,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.013   # 1.3% floor — brain_auditor Sep 14: 55% of below-entry ATR SL hits had dist <1.3%, would survive. Expected +$1.33/7d net. Was 1.2%.
 ATR_SL_MAX             = 0.018  # 1.8% cap — CEO Sep 25: widened from 1.5%. EXTREME vol 65% ATR_SL hit rate at 1.3% floor, avg win +6.78% cut short. Widening lets trades breathe to reach win zone.
+ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — brain_auditor Sep 27: EXTREME 70.2% ATR_SL hit rate. pump-chain+ EXTREME 89.2%. 8 small winners (<$0.15) in 14d cut too early at 1.3%. Widening to 1.5% (effective 1.8% with 1.2x mult = ATR_SL_MAX) gives maximum room.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.

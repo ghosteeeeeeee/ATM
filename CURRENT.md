@@ -21,7 +21,7 @@
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 81% (22G free). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime 1.2x multiplier.
+- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (brain_auditor Sep 27), 1.2x multiplier.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK** (CEO Sep 26 ~02:00 UTC: RAISED 65→70). 14d: RSI 65-70 SHORT = 19T 63.2%WR +$0.75. RSI>=70 = 11T 27.3%WR -$0.13. Unlocks profitable band, blocks losers. Returns SKIP + detection-time RSI fallback. **0 post-fix violations.**
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK** (CEO Sep 24: same fix as SHORT). Blocks LONG entries where RSI < 30.
@@ -57,6 +57,8 @@
 **🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3751) but NEVER enforced in signal_compactor.py or decider_run.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
 
 ## Today's Changes (Sep 27)
+
+1. **brain_auditor ~20:00 UTC — 1 CONFIG CHANGE.** DB-verified: 0T/24h (idle 67h+) | 150T 40.0%WR -$4.00 (7d) | 357T 44.8%WR -$4.25 (14d). **ATR_SL_MIN_EXTREME = 1.5%.** EXTREME 70.2% ATR_SL hit rate 7d. pump-chain+ EXTREME 89.2% — 8 small winners (<$0.15) in 14d cut too early at 1.3% floor. Widening to 1.5% (effective 1.8% with 1.2x mult = ATR_SL_MAX) gives maximum room. Expected +$0.20-0.50/7d. **7d REGIME:** EXTREME 84T 40.5%WR -$1.62. HIGH 49T 36.7%WR -$1.55 (worst). NORMAL 15T 46.7%WR -$0.62. **SHORT NULL RSI DEAD** — 66T/14d 56.1%WR +$1.35 but 0T/7d. **SIGNAL DIVERSITY CRITICAL** — pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) carry system. **1 CHANGE APPLIED:** ATR_SL_MIN_EXTREME=0.015. — brain_auditor
 
 1. **daily_orchestrator ~19:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 67h+) | 145T 40.0%WR -$4.00 (7d) | 352T 44.9%WR -$4.25 (14d). **SYSTEM IDLE BY DESIGN** — pipeline running, NEUTRAL regime (5 SHORT / 113 NEUTRAL), hotset empty. Filters protecting capital correctly. **ATR_SL WIDENING EVAL OVERDUE** — deployed Sep 25 12:30, 0 trades in 67h+. EXTREME 69.5% ATR_SL hit rate 7d (pre-fix trades only). Needs market activity to measure impact. **SIGNAL REPORTER:** 1018 signals/day generated but all killed by filters (RR-HARD, RSI floor, Hall of Shame, confluence gate). Funnel too tight for NEUTRAL — design choice, not bug. **NO CHANGES APPLIED.** **MONITORING:** ATR_SL widening (needs trades), signal funnel tuning, disk 82%. — daily_orchestrator
 

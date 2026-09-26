@@ -539,5 +539,16 @@
     "after": "0.50 (-50% confidence penalty)",
     "rationale": "HIGH regime 14d: 147T 42.9%WR -$3.33, 39% of all trades. 0.85x insufficient — most trades still pass MIN_EXEC_CONFIDENCE=50. 0.50x blocks majority while preserving rare winners.",
     "impact": "+$1.25-1.50/7d expected"
+  },
+  {
+    "timestamp": "2026-09-27T20:00:00Z",
+    "agent": "brain_auditor",
+    "change": "ATR_SL_MIN_EXTREME = 0.015 (1.5%) for EXTREME regime",
+    "type": "config",
+    "file": "hermes_constants.py + tpsl_utils.py",
+    "before": "ATR_SL_MIN=1.3% applies to all regimes. EXTREME multiplier 1.2x makes effective floor 1.56%.",
+    "after": "EXTREME uses 1.5% floor (ATR_SL_MIN_EXTREME). Effective floor with 1.2x mult = 1.8% = ATR_SL_MAX. Maximum room for EXTREME trades.",
+    "rationale": "EXTREME 70.2% ATR_SL hit rate 7d. pump-chain+ EXTREME 89.2% hit rate. 8 small winners (<$0.15) in 14d cut too early. Widening gives trades room to breathe.",
+    "impact": "+$0.20-0.50/7d from reduced ATR_SL hit rate in EXTREME"
   }
 ]

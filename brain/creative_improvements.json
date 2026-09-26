@@ -556,5 +556,32 @@
     "category": "new signal",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-09-27T02:45:00Z",
+    "idea": "pump-chain+ EXTREME confidence floor 65%",
+    "rationale": "pump-chain+ EXTREME 7d: 24T 37.5%WR +$0.11. Low-confidence EXTREME entries are noise. Floor at 65% blocks weak entries.",
+    "expected_impact": "+$0.10-0.30/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-27T02:45:00Z",
+    "idea": "volume-breakout-long+ EXTREME weight boost 1.2x",
+    "rationale": "volume-breakout-long+ EXTREME 14d: 10T 70%WR +$1.51 (best signal). Only 10 trades/14d — frequency bottleneck. Boost improves fill quality.",
+    "expected_impact": "+$0.20-0.50/7d",
+    "category": "position sizing",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-27T02:45:00Z",
+    "idea": "NEW SIGNAL: EMA-reclaim LONG for NEUTRAL diversity",
+    "rationale": "Only 2 profitable signal types. NEUTRAL needs diversity. EMA-reclaim: LONG when price crosses above EMA20 after being below, with volume confirmation.",
+    "expected_impact": "+$0.50-1.00/7d if 55%+ WR",
+    "category": "new signal",
+    "status": "suggested — needs signal-lab",
+    "risk": "medium"
   }
 ]

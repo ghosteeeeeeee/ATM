@@ -7265,3 +7265,36 @@ Final set: ['ALGO', 'COMP', 'KAS']
 - TP hit rate extremely low (1/150) — either R:R is too wide or exits happen before TP
 
 **BY:** auto_1hr
+
+## [2026-09-27 03:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~41h ago (BTC continuum-osc+ +$0.05)
+**7d:** 150T 40.7%WR -$3.76 | **14d:** 357T 45.7%WR -$3.63
+**ATR_SL 7d:** 100/150 = 66.7% (fix deployed Sep 25, 0 trades since fix)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle ~41h — pipeline running, regime NEUTRAL, 0 open positions
+- ATR_SL fix deployed Sep 25 — 0 trades to measure effectiveness
+- No kill candidates: no signals with 0%WR/3+ recent un-killed trades
+- No overtrading (0 trades/hr)
+- `volume-breakout-long+` 5T 60%WR +$347 — best performer, healthy
+- `pump-chain+` 37T 35%WR +$57 — only other net-positive signal
+
+**7d Exit Reasons:**
+- atr_sl_hit: 100T 66.7% — dominant (all pre-fix)
+- profit-monster-trail: 20T 13.3% — winning exits
+- pump_exit_dead_money: 16T 10.7% — cleanup
+- cut-loser-CL-T1: 8T 5.3% — secondary bleed
+- atr_tp_hit: 1T 0.7% — TP hit rate suspiciously low
+
+**Open Questions:**
+- 41h gap — regime needs shift to HIGH/EXTREME for activity
+- TP hit rate 0.7% — R:R may be too wide or exits trigger before TP
+- ATR_SL fix eval window: ~Sep 27 (need trades to measure)
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-27 03:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle ~41h
