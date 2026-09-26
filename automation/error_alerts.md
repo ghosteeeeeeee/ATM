@@ -85,3 +85,13 @@
 ## Error Alerts — 2026-09-25 22:57 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.5s (rc=N)`
+
+## Error Alerts — 2026-09-26 00:58 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.6s (rc=N)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+
+## Error Alerts — 2026-09-26 01:48 UTC
+- **WARN** (150x): `ERR decider_run: Traceback ... line 4358` — crash after mark_signal_executed on AIXBT/WLFI/NXPC signals. Journalctl truncated traceback. Now resolved (hotset empty). Root cause unknown — will recur on next signal. Needs investigation.
+- **WARN**: Disk at 81% (22GB free of 118GB). Monitor.

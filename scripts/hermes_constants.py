@@ -837,7 +837,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
 SHORT_RSI_FLOOR = 50           # RAISED 40→50 (CEO 2026-09-24). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). RSI 50-65 = 65T 52.3%WR +$0.04 (sweet spot). NULL RSI = 36T 52.8%WR +$0.49 (preserved — NULL not <50). Blocks $3.69/14d bleed. upgrade_implementer lowered to 40 citing "RSI 45-60 = 63%WR" but actual sweet spot is 50-60.
-SHORT_RSI_CEILING = 65          # block SHORT when RSI > 65 (overbought = momentum favors LONG, SHORT at resistance = bounce risk)
+SHORT_RSI_CEILING = 70          # block SHORT when RSI > 70 (overbought = momentum favors LONG, SHORT at resistance = bounce risk). RAISED 65→70 (CEO Sep 26): 14d RSI 65-70 SHORT = 4T all winners +$0.47. RSI>=80 = 4T 25%WR -$0.08. Unlocks profitable band, blocks losers.
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
 # When SHORT_RSI_FLOOR is 50, RSI 35-50 is the bleeding band — block entirely.
