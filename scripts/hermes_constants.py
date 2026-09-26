@@ -848,7 +848,7 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # 7d: RSI<30 LONG = 0 winners (0/3). Would block 7 losers ($1.45 saved), 0 winners ($0 lost).
 # RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot — NOT blocked).
 LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
-LONG_RSI_CEILING = 80           # brain_auditor 2026-09-23: overbought LONG = pullback risk. WCT RSI=98.86 LONG -$0.15. 30d: RSI>80 LONG = 4T 50%WR -$0.22. Blocks extreme overbought entries.
+LONG_RSI_CEILING = 70           # brain_auditor 2026-09-26: RAISED 80→70. 14d: LONG RSI 60-70 = 53T 37.7%WR -$1.79 (killing field). RSI 70+ = 51T 45.1%WR +$0.06 (break-even). Blocks overbought LONG entries that chase extended moves. Hard block (SKIP), not soft penalty.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
 # When SL zone blocks a signal, check if zone is strong enough to flip direction.

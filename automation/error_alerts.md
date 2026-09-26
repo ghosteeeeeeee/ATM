@@ -112,3 +112,6 @@
 
 ## Error Alerts — 2026-09-26 05:58 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for IO: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TOK`
+
+## Error Alerts — 2026-09-26 06:58 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`

@@ -1059,12 +1059,12 @@ def rule_based_context_gate(token, direction, source, sig):
         # Check BOTH live and detection-time RSI for ceiling and floor
         if _live_rsi_long is not None:
             if LONG_RSI_CEILING > 0 and _live_rsi_long > LONG_RSI_CEILING:
-                return ('AMBIGUOUS', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {LONG_RSI_CEILING} (overbought — pullback risk)', 20)
+                return ('SKIP', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {LONG_RSI_CEILING} (overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _live_rsi_long < LONG_RSI_FLOOR:
                 return ('SKIP', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 0)
         if _detect_rsi_long is not None:
             if LONG_RSI_CEILING > 0 and _detect_rsi_long > LONG_RSI_CEILING:
-                return ('AMBIGUOUS', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {LONG_RSI_CEILING} (detected overbought — pullback risk)', 20)
+                return ('SKIP', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {LONG_RSI_CEILING} (detected overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _detect_rsi_long < LONG_RSI_FLOOR:
                 return ('SKIP', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 0)
 
