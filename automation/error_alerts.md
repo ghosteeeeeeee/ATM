@@ -95,3 +95,6 @@
 ## Error Alerts — 2026-09-26 01:48 UTC
 - **WARN** (150x): `ERR decider_run: Traceback ... line 4358` — crash after mark_signal_executed on AIXBT/WLFI/NXPC signals. Journalctl truncated traceback. Now resolved (hotset empty). Root cause unknown — will recur on next signal. Needs investigation.
 - **WARN**: Disk at 81% (22GB free of 118GB). Monitor.
+
+## Error Alerts — 2026-09-26 01:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`

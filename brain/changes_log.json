@@ -517,5 +517,16 @@
     "after": "LONG_RSI_SWEET_SPOT_MIN = 40",
     "rationale": "RSI 35-40 LONG = 7T 57.1%WR -$0.25 (dead zone). RSI 40-50 = 36T 58.3%WR +$1.64. Removing dead zone from boost.",
     "impact": "Small positive — removes confidence boost from 7 trades/14d that were net negative"
+  },
+  {
+    "timestamp": "2026-09-26T07:00:00Z",
+    "agent": "brain_auditor",
+    "change": "REGIME_CONF_HIGH_MULT 1.0 to 0.85 (-15% confidence penalty in HIGH regime)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "REGIME_CONF_HIGH_MULT = 1.0",
+    "after": "REGIME_CONF_HIGH_MULT = 0.85",
+    "rationale": "HIGH regime worst performer: -$3.14/14d (150T 44.0%WR). NO profitable signals in HIGH. Every signal loses. -15% confidence reduces entries in dead zone.",
+    "impact": "Expected +$0.50-1.00/7d from fewer HIGH entries. Blocks 0 winners (none exist)."
   }
 ]

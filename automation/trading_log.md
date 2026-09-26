@@ -1,3 +1,30 @@
+## [2026-09-25 23:20 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 23.7h ago (BTC continuum-osc+ +$0.05)
+**24h:** 1T +$0.05 | **7d:** 188T 41.5%WR -$3.08 | **14d:** 379T ~47%WR -$3.76
+
+**ATR SL rate:** 62.2% 7d (117/188) — CEO deployed widening fix today, monitoring 48h
+
+**Worst signals (7d):**
+- pullback-entry-: 24T ALL ATR_SL, -$1.47 — heavily dead-houred (13 hrs blocked), NORMAL blocked
+- mover+: 9T 22%WR -$1.24 — already killed Sep 24
+- pump-chain-: 33T 21 ATR_SL, -$0.93
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System idle 23.7h — low volatility regime, no trades to analyze
+- No kill candidates in last hour (0 trades)
+- ATR SL widening fix being monitored — too early to judge impact (deployed today)
+
+**Open Questions:**
+- 24h idle stretch continues — system hasn't traded since Sep 25 02:26 UTC
+- pump-chain- SHORT 7d: 33T -$0.93, 21/33 ATR SL hits — candidate for dead hours if activity resumes
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-25 22:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 20h ago (BTC continuum-osc+ +$0.05)
@@ -6813,5 +6840,47 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - 14d at -$3.36 — persistent small negative, daily variance normal
 - 30h gap since last trade — unusual quiet, waiting for regime shift
 - ATR_SL_MAX 1.8% eval due ~Sep 27
+
+**BY:** auto_1hr
+
+## [2026-09-26 09:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 48.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 187T 41.8%WR -$2.84 | **14d:** 385T 47.0%WR -$3.33
+
+**14d exit reasons (top 3):**
+- atr_sl_hit: 250T (65.7%) avg -$0.016 — tiny avg loss, not a crisis
+- profit-monster-trail: 60T (16.8%) avg +$0.044 — working
+- cut-loser-CL-T1: 19T (5.2%) avg -$0.108 — worst per-trade
+
+**14d signal losers (3+ trades, worst first):**
+- pullback-entry- SHORT: 89T 46.1%WR -$1.66 → DISABLED ✅
+- mover+ LONG: 14T 42.9%WR -$1.12 → DISABLED ✅
+- trend_purity+ LONG: 10T 30%WR -$0.92 → DISABLED ✅
+- pump-chain- SHORT: 49T 46.9%WR -$0.73 → DISABLED ✅ (Sep 25)
+- rr-struct-v2+ LONG: 10T 40%WR -$0.45 → DISABLED ✅
+- grind-trend- SHORT: 5T 20%WR -$0.38 → DISABLED ✅
+- bb-bounce-v2-long+ LONG: 12T 41.7%WR -$0.26 → ENABLED (CEO re-enabled Sep 22, monitoring)
+
+**Active enabled losers:**
+- bb-bounce-v2-long+ LONG: 12T 41.7%WR -$0.26 — CEO re-enabled Sep 22 based on 30d data (73T 74%WR +$2.08). Short-term variance.
+
+**Pipeline health:** Running (last run 03:11 UTC). Signals returning 0 (flat/neutral market). `decider_run` warning = defunct ai_decider.py, expected.
+
+**ATR_SL_MAX 1.8%:** Deployed Sep 25. Only 1 trade since (continuum-osc+ UNIVERSAL_MAX_HOLD). Needs 48h+ more data to evaluate.
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 48+ hours — 0 trades, 0 open, market regime flat/neutral
+- All major signal losers already disabled
+- ATR_SL 65.7% but avg loss only -$0.016 — not a crisis
+- No kill candidates (no enabled signal with 3+ trades and 0% WR in last hour)
+- No overtrading (0 trades/hr)
+- ATR_SL_MAX 1.8% eval due ~Sep 27
+
+**Open Questions:**
+- 48h gap since last trade — unusual quiet, waiting for regime shift
+- bb-bounce-v2-long+ monitoring — if 7d WR drops below 40%, flag for CEO
 
 **BY:** auto_1hr

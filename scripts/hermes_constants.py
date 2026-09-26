@@ -901,7 +901,7 @@ SHORT_NORMAL_PENALTY = 0.85  # brain_auditor Sep 21 — ALL SHORT signals in NOR
 REGIME_CONF_MULTIPLIER_ENABLED = True
 REGIME_CONF_EXTREME_MULT = 1.15   # +15% confidence boost in EXTREME vol
 REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
-REGIME_CONF_HIGH_MULT    = 1.0    # no adjustment for HIGH (mixed results)
+REGIME_CONF_HIGH_MULT    = 0.85   # -15% confidence penalty in HIGH vol — brain_auditor Sep 26: HIGH -$3.14/14d, NO profitable signals, dead zone
 REGIME_CONF_FLAT_MULT    = 1.0    # no adjustment for FLAT (too few trades)
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
