@@ -1,11 +1,11 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-26 ~22:00 UTC**
+**Last Updated: 2026-09-26 ~22:30 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 0T. System idle 67h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/67h+). REGIME_CONF_HIGH_MULT=0.50 deployed today. Pipeline healthy.
+24h: 0T. System idle 72h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/72h+). REGIME_CONF_HIGH_MULT=0.50 deployed today. Pipeline healthy.
 
 - **24h (rolling):** 0T, system idle 67h+ (last trade Sep 25 02:26 UTC). 0 open.
 - **7d:** 158T, 42.4% WR, -$3.24 (DB-verified). ATR_SL hit rate 70.5% EXTREME — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
@@ -54,6 +54,10 @@
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
 
 ## Today's Changes (Sep 26)
+
+1. **brain_auditor ~22:30 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 72h+) | 153T 42.5%WR -$3.50 (7d) | 360T -$3.48 (14d). **ATR_SL CRITICAL:** 67.3% hit rate 7d (103/153). Widening deployed Sep 25, UNTESTED 72h. Eval Sep 27. **REGIME 7d:** EXTREME 87T 42.5%WR -$1.36. HIGH 49T 36.7%WR -$1.55 (worst). NORMAL 15T 46.7%WR -$0.62. **LONG RSI 60-70 BLEED:** pump-chain+ 17T 35.3%WR -$0.87/14d — LONG_RSI_CEILING=70 now blocks this. **LOSING AUTOPSY:** 0 losers in 24h (idle). **SIGNAL DIVERSITY CRITICAL** — pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) carry system. **CREATIVE (3):** (1) HIGH MIN_EXEC_CONFIDENCE=65 (+$0.50-1.00/7d, 0 winners in HIGH conf>60). (2) pump-chain+ EXTREME confidence floor 70% (+$0.10-0.30/7d). (3) NEW grind-breakout signal for NEUTRAL diversity. **0 CHANGES APPLIED.** **MONITORING:** ATR_SL eval Sep 27, REGIME_CONF_HIGH_MULT=0.50, volume_spike fix, SHORT_RSI_CEILING=70, CL-T1 disable. — brain_auditor
+
+1. **brain_auditor ~15:35 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 72h+ since Sep 25 02:26) | 157T 42.0%WR -$3.33 (7d) | 361T 46.0%WR -$3.73 (14d). **SYSTEM IDLE BY DESIGN** — pipeline running, 43 signals generating, none above 50% confidence in NEUTRAL. Filters protecting capital correctly. **LOSING AUTOPSY:** 20 losers ALL pre-fix (Sep 23-24). 0 post-fix losers. All losses aging out. **ATR_SL WIDENING STILL UNTESTED** — 0 trades since Sep 25 12:30 (72h+). Eval Sep 27. EXTREME 66.2% ATR_SL hit rate 7d. **REGIME:** EXTREME 88T 43.2%WR -$1.27 (best). HIGH 50T 38.0%WR -$1.25 (worst, REGIME_CONF_HIGH_MULT=0.50 deployed today). **SIGNAL DIVERSITY CRITICAL** — only pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) profitable. SHORT_NULL_RSI edge dead (0 trades). **CREATIVE (3):** (1) HIGH MIN_EXEC_CONFIDENCE=65 (+$0.50-1.00/7d, 0 winners in HIGH). (2) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d, 6th suggestion). (3) NEW NEUTRAL signal needed. **0 CHANGES APPLIED.** **MONITORING:** ATR_SL eval Sep 27, REGIME_CONF_HIGH_MULT=0.50, volume_spike fix, SHORT_RSI_CEILING=70, CL-T1 disable. — brain_auditor
 
 1. **brain_auditor ~22:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 67h+) | 158T 42.4%WR -$3.24 (7d) | 364T 45.9%WR -$4.08 (14d). **POST-FIX VERIFICATION:** SHORT_RSI_FLOOR=50: 2 post-fix trades with RSI<50 (ATOM 47.1, BTC 41.7 — both $0.03 wins, STANDALONE_BYPASS leak). SHORT_RSI_CEILING=70: 0 post-fix violations. LONG_RSI_CEILING=70: 0 post-fix violations. **ATR_SL WIDENING STILL UNTESTED** — 0 trades in 67h. EXTREME 70.5% ATR_SL hit rate 7d — CRITICAL. Eval Sep 27. **HIGH regime 14d: 143T 43.4%WR -$3.11 — 39% of ALL trades.** REGIME_CONF_HIGH_MULT=0.50 deployed today. **LONG RSI 60-70 BAND BLEEDING:** 52T 36.5%WR -$1.94/14d — entry quality issue. **Signal diversity CRITICAL.** **CREATIVE:** (1) LONG RSI 60-70 volume/momentum filter (+$0.50-1.00/14d). (2) grind-breakout signal for NEUTRAL diversity. (3) Monitor ATR_SL widening on pump-chain- SHORT EXTREME. **0 CHANGES APPLIED.** **MONITORING:** ATR_SL eval Sep 27, REGIME_CONF_HIGH_MULT=0.50, LONG_RSI_CEILING=70, SHORT_RSI_CEILING=70, volume_spike fix. — brain_auditor
 

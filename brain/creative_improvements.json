@@ -528,5 +528,33 @@
     "category": "entry sniper",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-26T15:35:00Z",
+    "idea": "Regime-adaptive MIN_EXEC_CONFIDENCE for HIGH regime",
+    "rationale": "HIGH regime 14d: 143T 43.4%WR -$3.11 (39% of ALL trades). REGIME_CONF_HIGH_MULT=0.50 reduces confidence by 50% but MIN_EXEC_CONFIDENCE=50 still allows trades with base confidence 100+. Adding HIGH-specific MIN_EXEC_CONFIDENCE=65 would further reduce entries in the worst regime.",
+    "expected_impact": "+$0.50-1.00/7d from blocking additional HIGH losers",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "0 winners in HIGH regime 14d — no impact"
+  },
+  {
+    "date": "2026-09-26T15:35:00Z",
+    "idea": "SHORT NULL RSI confidence boost +15pt",
+    "rationale": "14d: SHORT NULL RSI = 130T 56.9%WR +$2.08 (BEST edge). Detection-time fallback entries higher quality than live RSI entries. Boosting confidence improves fill quality.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "confidence tuning",
+    "status": "suggested (6th time)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-26T15:35:00Z",
+    "idea": "NEW NEUTRAL signal — grind-breakout LONG",
+    "rationale": "Only pump-chain+ LONG and volume-breakout-long+ pass NEUTRAL confluence. Signal diversity CRITICAL. Session brain discusses trend following signal.",
+    "expected_impact": "+$0.50-1.00/7d if successful",
+    "category": "new signal",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

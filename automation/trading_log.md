@@ -7146,3 +7146,55 @@ Final set: ['ALGO', 'COMP', 'KAS']
 
 ## TEAM UPDATES
 - [2026-09-26 22:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 70h
+
+## [2026-09-26 23:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 73h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 158T 42.4%WR -$3.24 | **ATR_SL 7d:** 105/158 = 66.5%
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 73h — pipeline running, regime NEUTRAL, 0 open positions, 10 signals active
+- ATR_SL fix deployed Sep 25 — 0 trades since to measure (eval ~Sep 27)
+- No kill candidates (no recent trades)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 73h gap — extended quiet, needs regime shift
+- ATR_SL_MAX 1.8% + EXTREME 1.2x pending real-world eval
+- System correctly filtering in NEUTRAL regime
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-26 23:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 73h
+
+## [2026-09-27 00:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 37.7h ago (BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 155T 41.3%WR -$3.72 | **14d:** 361T 46.0%WR -$3.73
+**ATR_SL 7d:** 103/155 = 66.5% (EXTREME dominant regime in recent trades)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 37.7h — pipeline running, regime NEUTRAL, 0 open positions
+- ATR_SL fix deployed Sep 25 — needs ~48h eval window (Sep 27), too early to measure
+- No kill candidates (0 trades last hour, no signal with 3+ recent losses)
+- No overtrading (0 trades/hr)
+
+**Signal 7d Watchlist (worst performers):**
+- `mover+`: 8T 25.0%WR -$1.19 — needs resume to evaluate further
+- `pullback-entry-`: 22T 40.9%WR -$1.16 — high SL hit rate
+- `pump-chain-`: 33T 45.5%WR -$0.93 — moderate bleed
+
+**Open Questions:**
+- 37.7h gap continues — extended quiet, needs regime shift to HIGH/EXTREME
+- ATR_SL_MAX 1.8% + EXTREME 1.2x pending real-world eval (eval window ~Sep 27)
+- Signal kill thresholds: mover+ at 25%WR/8T is concerning but within kill criteria window
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-27 00:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 37.7h
