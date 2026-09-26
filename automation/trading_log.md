@@ -1,3 +1,25 @@
+## [2026-09-25 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 20h ago (BTC continuum-osc+ +$0.05)
+**24h:** 2T 100%WR +$0.08 | **7d:** 198T 41.9%WR -$2.81 | **14d:** 385T 47.0%WR -$3.33
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates (0 trades last hour)
+- No overtrading (0 trades/6h)
+- atr_sl_hit 0% — no SL exits recently (2T both via pump_exit_dead_money and UNIVERSAL_MAX_HOLD)
+- System idle 20h — likely low volatility regime, normal
+
+**Open Questions:**
+- 20h idle stretch — longest quiet period in recent history
+- 7d at -$2.81, 14d at -$3.33 — persistent small negative, daily variance normal
+- Dead hours changes from today (pump-chain- SHORT hours [2,3,4,8,9,11,18,20]) need live trades to verify impact
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-25 18:30 UTC] Daily Orchestrator Report
 
 **Pipeline Status:** Running, 0 open, system idle 16h
@@ -6702,5 +6724,57 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - 14d at -$3.67 — persistent small negative, daily variance normal
 - System very quiet (~18h since last trade) — market regime likely flat
 - ATR SL 1.8% MAX deployed today — need 48h+ data to assess
+
+**BY:** auto_1hr
+
+## [2026-09-25 22:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~19h ago (Sep 25 02:26)
+**24h:** 2T 100%WR +$0.08 | **7d:** 196T 41.8%WR -$2.84 | **14d:** 385T 47.0%WR -$3.33
+
+**14d exit reasons:**
+- atr_sl_hit: 251T (65.2%) avg -$0.015 — dominant, tiny avg loss
+- profit-monster-trail: 64T (16.6%) avg +$0.048 — working
+- cut-loser-CL-T1: 20T (5.2%) avg -$0.109 — worst per-trade loser
+- rr_engine_support_br: 6T avg -$0.105 — marginal
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System very quiet — 0 trades in ~19h, market regime likely flat/neutral
+- ATR_SL 65% but avg loss only -$0.015 — not a crisis, 1.8% MAX deployed today
+- No kill candidates (no signal with 3+ trades and 0% WR recently)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 14d at -$3.33 — persistent small negative, daily variance normal
+- 19h gap since last trade — unusual quiet, waiting for regime shift
+- ATR_SL 1.8% MAX deployed today — need 48h+ data to assess effect
+
+**BY:** auto_1hr
+
+## [2026-09-26 06:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~28h ago (Sep 25 02:26)
+**24h:** 1T 100%WR +$0.05 | **7d:** ~196T ~42%WR ~-$2.8 | **14d:** 384T 46.9%WR -$3.41
+
+**14d exit reasons:**
+- atr_sl_hit: 251T (65.4%) avg -$0.015 — dominant, tiny avg loss
+- profit-monster-trail: 64T (16.7%) avg +$0.048 — working
+- cut-loser-CL-T1: 20T (5.2%) avg -$0.109 — worst per-trade loser
+- pump_exit_dead_money: 16T avg +$0.022 — positive
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System very quiet — 0 trades in ~28h, market regime flat/neutral
+- ATR_SL 65% but avg loss only -$0.015 — not a crisis
+- No kill candidates (no signal with 3+ trades and 0% WR recently)
+- No overtrading (0 trades/hr)
+- cut-loser-CL-T1 20T avg -$0.109 — marginal, monitoring
+
+**Open Questions:**
+- 14d at -$3.41 — persistent small negative, daily variance normal
+- 28h gap since last trade — unusual quiet, waiting for regime shift
 
 **BY:** auto_1hr
