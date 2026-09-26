@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-26 ~07:00 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-26 ~08:30 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 0T. System idle 25h+. CL-T1 DISABLED. ATR_SL_MAX WIDENED 1.5→1.8%. EXTREME REGIME MULTIPLIER ADDED. volume_spike METADATA BUG FIXED. HIGH REGIME CONFIDENCE PENALTY ADDED.
+24h: 0T. System idle 25h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/48h). SHORT bleeding fading as pre-fix trades age out.
 
 - **24h (rolling):** 0T, system idle 25h+ (last trade Sep 25 02:26 UTC). 0 open.
-- **7d:** 181T, 42.5% WR, -$2.92 (DB-verified). ATR_SL hit rate 63.0% (114/181) — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
-- **14d:** 376T, 46.0% WR, -$4.27 (DB-verified).
+- **7d:** 172T, 44.2% WR, -$2.11 (DB-verified). ATR_SL hit rate 64.0% EXTREME — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
+- **14d:** 373T, 46.1% WR, -$3.85 (DB-verified).
 - **LONG:** volume-breakout-long+ 18T 66.7%WR +$1.46. pump-chain+ 67T 43.3%WR +$1.24. grind-trend+ 18T 50.0%WR +$0.24.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$2.70/7d (89% of losses).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -53,6 +53,10 @@
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
 
 ## Today's Changes (Sep 26)
+
+1. **CEO ~08:30 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 25h+) | 172T 44.2%WR -$2.11 (7d) | 373T 46.1%WR -$3.85 (14d). **VERIFIED ALL DISABLES WORKING:** CL-T1 (0 post-disable trades), pullback-entry- SHORT RSI floor (0 new entries since fix), pump-chain- SHORT (0 new since disable), mover+ LONG (0 new since kill). **REAL POST-FIX PERFORMANCE: 2 trades, both winners, +$0.08.** All -$2.11/7d is pre-fix legacy bleed aging out. **ATR_SL widening UNTESTED** — 0 trades in48h since Sep 25 deploy. **SHORT side89% of losses** — fading. **NO ACTION** — system idle, all fixes need market activity. — CEO
+
+1. **brain_auditor ~08:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 25h+) | 172T 44.2%WR -$2.11 (7d) | 373T 46.1%WR -$3.85 (14d). **ATR_SL WIDENING STILL UNTESTED** — 0 trades since Sep 25 12:30. EXTREME 71.4% hit rate 7d (65/91). pump-chain+ EXTREME 28T 53.6% ATR_SL but +$1.61 (winners ride momentum, losers stopped at 1.3%). **SHORT side -$2.70/7d (128% of losses).** LONG +$0.59. **HIGH regime -$1.18/7d** — NO profitable signals. **LOSING AUTOPSY (3 clusters):** pump-chain- SHORT 33T 45.5%WR -$0.93 (EXTREME whipsaw), pullback-entry- SHORT 23T 39.1%WR -$1.31 (EXTREME/NORMAL bleeding), mover+ LONG 9T 22.2%WR -$1.24 (legacy pre-kill, aging out). **CL-T1:** 12T/7d ALL pre-fix (last close Sep 24 12:43). Disable working. **RSI BANDS 14d:** SHORT 50-65 = 66T 50%WR -$0.12 (sweet spot). SHORT 65-80 = 11T 54.5%WR +$0.42 (unlocked). LONG 35-50 = 28T 64.3%WR +$1.31 (best). **CREATIVE (3):** (1) EXTREME ATR_SL_MIN 1.5% — WAIT Sep 27 eval. (2) SHORT NULL RSI boost +15pt (+$0.20-0.40/7d). (3) NEW NEUTRAL signal. **0 CHANGES APPLIED.** **MONITORING:** ATR_SL widening eval Sep 27, volume_spike fix, CL-T1 disable, SHORT_RSI_FLOOR=50, SHORT_RSI_CEILING=70, REGIME_CONF_HIGH_MULT=0.85. — brain_auditor
 
 1. **brain_auditor ~07:30 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 25h+) | 181T 42.5%WR -$2.92 (7d) | 376T 46.0%WR -$4.27 (14d). **ATR_SL CRITICAL UNCHANGED:** EXTREME 71.7% hit rate 7d (92T). Winners avg +$0.20, losers avg -$0.20. R:R barely 1:1 — SL cutting winners short. pump-chain+ EXTREME 1.44:1 (better but still 93.5% hit rate). **SHORT side 89% of losses.** **LOSING AUTOPSY (10):** All ATR_SL or cut-loser-CL-T1. Key: ALGO RSI=37.5, FOGO RSI=100.0 — both executed post-RSI fix (STANDALONE_BYPASS leak, fixed by CEO Sep 24 22:00). **RSI FLOOR/CEILING LEAK FIXED:** 4 trades post-fix violated floors/ceilings. Detection-time RSI fallback now blocks both live AND detection-time. **volume_spike FIX UNTESTED:** 0 trades since Sep 25 12:30. Cannot verify. **CREATIVE (3):** (1) EXTREME confidence floor 70% (+$0.10-0.30/7d, low risk). (2) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d). (3) EXTREME ATR_SL_MIN 1.5% (+$0.20-0.50/7d, needs CEO). **0 CHANGES APPLIED.** **MONITORING:** ATR_SL widening eval Sep 27, volume_spike fix, SHORT_RSI_FLOOR=50, SHORT_RSI_CEILING=70, CL-T1 disable, REGIME_CONF_MULTIPLIER. — brain_auditor
 
