@@ -1,21 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 ~02:00 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-27 ~19:00 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-24h: 0T. System idle 47h+. CEO fixed pump-chain+ HIGH block STANDALONE_BYPASS leak (decider_run.py). ATR_SL widening UNTESTED (0 trades/47h+). Pipeline healthy.
+24h: 0T. System idle 67h+. ATR_SL widening UNTESTED (0 trades/67h+). Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 0T, system idle 47h+ (last trade Sep 25 02:26 UTC). 0 open.
-- **7d:** 150T 40.7%WR -$3.76 (DB-verified). ATR_SL 66.7% (100/150) CRITICAL.
-- **14d:** 358T 45.8%WR -$3.58 (DB-verified).
-- **LONG:** pump-chain+ 37T 35.1%WR -$0.40. volume-breakout-long+ 5T 60%WR +$0.70.
+- **24h (rolling):** 0T, system idle 67h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **7d:** 145T 40.0%WR -$4.00 (DB-verified). ATR_SL 65.5% (95/145) CRITICAL.
+- **14d:** 352T 44.9%WR -$4.25 (DB-verified).
+- **LONG:** pump-chain+ (workhorse), volume-breakout-long+ (gem).
 - **SHORT:** ALL DISABLED or pre-disable.
-- **7d:** 158T, 42.4% WR, -$3.24 (DB-verified). ATR_SL hit rate 70.5% EXTREME — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
-- **14d:** 364T, 45.9% WR, -$4.08 (DB-verified).
-- **LONG:** pump-chain+ 67T 43.3%WR +$1.24. volume-breakout-long+ 18T 66.7%WR +$1.46. grind-trend+ 18T 50%WR +$0.24.
-- **SHORT:** ALL DISABLED or pre-disable. SHORT side -$2.70/7d (89% of losses) — post-fix: 2T +$0.08.
+- **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — CEO fixed Sep 23. **VERIFIED WORKING** — 0 trades in blocked hours since fix.
@@ -35,7 +32,7 @@
 **🟡 R:R STATUS (7d -$3.24)**
 7d PnL -$3.24. pump-chain+ LONG 42T 42.9%WR +$0.25 (workhorse, 90.5% ATR_SL hit rate but R:R saves it). volume-breakout-long+ 5T 60%WR +$0.70 (gem, 100% ATR_SL but winners BIG). pullback-entry- 22T 40.9%WR -$1.16 (pre-disable trades, 100% ATR_SL). grind-trend+ not active 7d.
 
-**🔴 ATR_SL HIT RATE:** 70.5% EXTREME 7d (62/88). CRITICAL — above 40% threshold. EXTREME winners avg +$0.20, losers avg -$0.20 = barely 1:1 R:R. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. **0 trades since deployment (67h)** — monitoring (eval Sep 27).
+**🔴 ATR_SL HIT RATE:** 65.5% 7d (95/145), EXTREME 69.5% (57/82). CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. **0 trades since deployment (67h+)** — eval OVERDUE but blocked by no trades. Needs market activity to measure impact.
 
 **🟢 REGIME EDGE (7d volatility_regime):** EXTREME 88T 43.2%WR -$1.27. NORMAL 18T 44.4%WR -$0.75. HIGH 50T 38.0%WR -$1.25 (worst). FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).**
 
@@ -60,6 +57,8 @@
 **🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3751) but NEVER enforced in signal_compactor.py or decider_run.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
 
 ## Today's Changes (Sep 27)
+
+1. **daily_orchestrator ~19:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 67h+) | 145T 40.0%WR -$4.00 (7d) | 352T 44.9%WR -$4.25 (14d). **SYSTEM IDLE BY DESIGN** — pipeline running, NEUTRAL regime (5 SHORT / 113 NEUTRAL), hotset empty. Filters protecting capital correctly. **ATR_SL WIDENING EVAL OVERDUE** — deployed Sep 25 12:30, 0 trades in 67h+. EXTREME 69.5% ATR_SL hit rate 7d (pre-fix trades only). Needs market activity to measure impact. **SIGNAL REPORTER:** 1018 signals/day generated but all killed by filters (RR-HARD, RSI floor, Hall of Shame, confluence gate). Funnel too tight for NEUTRAL — design choice, not bug. **NO CHANGES APPLIED.** **MONITORING:** ATR_SL widening (needs trades), signal funnel tuning, disk 82%. — daily_orchestrator
 
 1. **CEO ~02:00 UTC — 1 CODE FIX.** DB-verified: 0T/24h (idle 47h+) | 150T 40.7%WR -$3.76 (7d) | 358T 45.8%WR -$3.58 (14d). **PUMP-CHAIN+ HIGH BLOCK BUG FIXED.** signal_compactor.py has PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED enforcement (line 2643), but STANDALONE_BYPASS signals skip signal_compactor entirely and go to decider_run.py — which had NO HIGH block. 12 pump-chain+ HIGH trades executed Sep 19-22 despite block being "enabled". Fix: added matching HIGH block check in decider_run.py (line 1520-1529). Expected +$0.50/7d. **ATR_SL WIDENING STILL UNTESTED** — 0 trades since Sep 25 deploy (47h+). EXTREME 70.2% ATR_SL hit rate 7d. Eval window passed — needs market activity. **pump-chain+ LONG 7d -$0.40** (degraded from historical +$1.24). **1 CODE FIX APPLIED.** — CEO
 
