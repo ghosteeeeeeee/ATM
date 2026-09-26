@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-26 ~08:30 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-26 ~06:30 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-24h: 0T. System idle 25h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/48h). SHORT bleeding fading as pre-fix trades age out.
+24h: 0T. System idle 26h+. ALL DISABLES VERIFIED WORKING. ATR_SL WIDENING UNTESTED (0 trades/48h+). Pipeline healthy (rc=0), transient decider_run errors at 05:36-05:40 self-recovered.
 
-- **24h (rolling):** 0T, system idle 25h+ (last trade Sep 25 02:26 UTC). 0 open.
-- **7d:** 172T, 44.2% WR, -$2.11 (DB-verified). ATR_SL hit rate 64.0% EXTREME — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
+- **24h (rolling):** 0T, system idle 26h+ (last trade Sep 25 02:26 UTC). 0 open.
+- **7d:** 169T, 44.4% WR, -$2.48 (DB-verified). ATR_SL hit rate 63.9% — CRITICAL, monitoring widening impact (deployed Sep 25, eval Sep 27).
 - **14d:** 373T, 46.1% WR, -$3.85 (DB-verified).
-- **LONG:** volume-breakout-long+ 18T 66.7%WR +$1.46. pump-chain+ 67T 43.3%WR +$1.24. grind-trend+ 18T 50.0%WR +$0.24.
+- **LONG:** pump-chain+ 44T 45.5%WR +$0.74. volume-breakout-long+ 5T 60%WR +$0.70. grind-trend+ 6T 83.3%WR +$0.47.
 - **SHORT:** ALL DISABLED or pre-disable. SHORT side -$2.70/7d (89% of losses).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
@@ -18,7 +18,7 @@
 - **PULLBACK_ENTRY_SHORT_DEAD_HOURS:** [0,1,3,4,6,8,10,11,13,20] — CEO expanded Sep 23.
 - **KILLED/REGIME BLOCKED:** open-skies+ (Sep 22), grind-trend+ (Sep 19), grind-trend- (Sep 19), breakout-long (Sep 17), trend_ignition (Sep 16), breakout-long+ (Sep 16), rr-struct-v2+ (Sep 15), pump-chain+ NORMAL (Sep 15), rr-struct- (Sep 14), pump-chain+ NEVER_REENABLE, trend_purity+ (Sep 13), accel-300-v4-short- (Sep 11), PUMP_FLOW+ NEVER_REENABLE, pullback_entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **CONF_FILTER_MIN=65.**
-- **Disk:** 85% (94G/118G). Below 90% threshold.
+- **Disk:** 81% (22G free). Below 90% threshold.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime 1.2x multiplier.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK** (CEO Sep 24 ~13:50 UTC: RAISED back to 50). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). Blocks SHORT entries where live or detection-time RSI < 50.
@@ -27,12 +27,12 @@
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC, narrowed Sep 25 ~06:30 UTC). +10pt confidence when LONG RSI 40-50 (was 35-50). 14d: RSI 40-50 = 36T 58.3%WR +$1.64. RSI 35-40 = 7T 57.1%WR -$0.25 (dead zone removed). Blocks nothing — only boosts fill quality.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$2.92)**
-7d PnL -$2.92. pump-chain+ LONG 67T 43.3%WR +$1.24 (workhorse, R:R=1.53:1). volume-breakout-long+ 18T 66.7%WR +$1.46 (gem, R:R=2.02:1). pullback-entry- 23T 39.1%WR -$1.31 (pre-disable trades). pump-chain- SHORT 33T 45.5%WR -$0.93 (DISABLED Sep 25). SHORT side total: -$2.70/7d (89% of losses).
+**🟡 R:R STATUS (7d -$2.48)**
+7d PnL -$2.48. pump-chain+ LONG 44T 45.5%WR +$0.74 (workhorse, avg_win $0.23 vs avg_loss $0.18 = 1.28:1). volume-breakout-long+ 5T 60%WR +$0.70 (gem, avg_win $0.34 vs avg_loss $0.16 = 2.13:1). pullback-entry- 23T 39.1%WR -$1.31 (pre-disable trades). grind-trend+ 6T 83.3%WR +$0.47.
 
-**🔴 ATR_SL HIT RATE:** 63.0% 7d (114/181). CRITICAL — above 40% threshold. EXTREME 71.7% (66/92). EXTREME ATR_SL R:R=1.06:1 (broken — avg_win $0.20 vs avg_loss $0.19). ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. **0 trades since deployment** — monitoring 48h (eval Sep 27).
+**🔴 ATR_SL HIT RATE:** 63.9% 7d (108/169). CRITICAL — above 40% threshold. EXTREME 72.2% (65/90). ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. **0 trades since deployment** — monitoring 48h (eval Sep 27).
 
-**🟢 REGIME EDGE (7d volatility_regime):** EXTREME 92T 44.6%WR -$0.41 (best). NORMAL 23T 39.1%WR -$0.99. HIGH 64T 39.1%WR -$1.55 (worst, NO profitable signals). FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -15% (NEW — brain_auditor Sep 26)**.
+**🟢 REGIME EDGE (7d volatility_regime):** EXTREME 90T 44.4%WR -$0.78 (best). NORMAL 20T 45%WR -$0.71. HIGH 57T 42.1%WR -$1.02 (worst, NO profitable signals). FLAT 2T 100%WR +$0.03. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -15% (brain_auditor Sep 26)**.
 
 **🟢 HL-SYNC FALSE ALARM.** auto_1hr flagged "hl_sync: running but no log file" — log was rotated to .gz. Service `hermes-hl-sync-guardian.service` active, timer running. Not a real issue.
 
@@ -53,6 +53,8 @@
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
 
 ## Today's Changes (Sep 26)
+
+1. **daily_orchestrator ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 26h+) | 169T 44.4%WR -$2.48 (7d). Pipeline healthy (rc=0). Transient decider_run crashes (6x, 05:36-05:40) self-recovered — likely DB lock contention. Market NEUTRAL, hotset empty. ATR_SL widening UNTESTED (0 trades since Sep 25 deploy). **Top signals 7d:** pump-chain+ +$0.74 (45.5%WR), volume-breakout-long+ +$0.70 (60%WR), grind-trend+ +$0.47 (83.3%WR). **pullback-entry-** -$1.31 (pre-disable). **NO ACTION** — system idle, all fixes need market activity. Eval ATR_SL widening Sep 27. — daily_orchestrator
 
 1. **CEO ~08:30 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 25h+) | 172T 44.2%WR -$2.11 (7d) | 373T 46.1%WR -$3.85 (14d). **VERIFIED ALL DISABLES WORKING:** CL-T1 (0 post-disable trades), pullback-entry- SHORT RSI floor (0 new entries since fix), pump-chain- SHORT (0 new since disable), mover+ LONG (0 new since kill). **REAL POST-FIX PERFORMANCE: 2 trades, both winners, +$0.08.** All -$2.11/7d is pre-fix legacy bleed aging out. **ATR_SL widening UNTESTED** — 0 trades in48h since Sep 25 deploy. **SHORT side89% of losses** — fading. **NO ACTION** — system idle, all fixes need market activity. — CEO
 

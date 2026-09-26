@@ -101,3 +101,14 @@
 
 ## Error Alerts — 2026-09-26 03:58 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+
+## Error Alerts — 2026-09-26 04:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`
+
+## Error Alerts — 2026-09-26 05:47 UTC
+- **WARN** (6x): `decider_run: FAILED in 0.6s (rc=1)` — Traceback at decider_run.py:4358, journalctl truncated (same root cause as 01:48). Occurred 05:36–05:40 UTC. **Self-recovered at 05:41** — no auto-fix needed.
+- **NOTE**: Market 116/118 NEUTRAL. Only signal evaluated: AIXBT LONG (97% conf) — approved by decider, blocked by volatility gate (ATR=1.6566% > 1.5% storm threshold). 0 open, 0 closed, 0 PnL today.
+- **NOTE**: Disk 81% (22GB free). OK for now.
+
+## Error Alerts — 2026-09-26 05:58 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for IO: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TOK`

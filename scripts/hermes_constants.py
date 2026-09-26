@@ -292,11 +292,10 @@ LOSERS_SHORT = {
 # Legacy combined set
 LOSERS = {
     'ALGO',
-    'AZTEC',
-    'CAKE',
     'COMP',
     'KAS'
 }
+
 
 
 

@@ -2073,36 +2073,23 @@
     "category": "exit optimization",
     "status": "suggested — needs CEO",
     "risk": "medium"
-  }
-][
-  {
-    "date": "2026-09-26T07:30:00Z",
-    "idea": "Regime-adaptive confidence floor for EXTREME",
-    "rationale": "EXTREME 71.7% ATR_SL hit rate but pump-chain+ LONG EXTREME still +$1.23/7d (winners ride momentum). Problem is entry quality, not regime. Add confidence floor: EXTREME requires 70%+ confidence (vs 65% default) to filter weak entries.",
-    "expected_impact": "+$0.10-0.30/7d (fewer weak EXTREME entries)",
-    "category": "entry sniper",
-    "status": "suggested",
-    "risk": "low",
-    "impact_on_winners": "Would block ~10% of EXTREME entries (weak confidence). No impact on high-confidence winners."
   },
   {
-    "date": "2026-09-26T07:30:00Z",
+    "timestamp": "2026-09-26T08:00:00Z",
     "idea": "SHORT NULL RSI confidence boost +15pt",
-    "rationale": "Detection-time RSI entries outperform live RSI entries by 10% WR. Boost confidence for NULL RSI SHORT trades to improve fill quality.",
+    "rationale": "14d detection-time RSI entries historically 56.9%WR +$2.08. Boost confidence for NULL RSI SHORT trades to improve fill quality.",
     "expected_impact": "+$0.20-0.40/7d",
     "category": "entry sniper",
     "status": "suggested",
-    "risk": "low",
-    "impact_on_winners": "0 - only boosts confidence, doesn't block anything"
+    "risk": "low"
   },
   {
-    "date": "2026-09-26T07:30:00Z",
-    "idea": "EXTREME ATR_SL_MIN 1.5% (CEO decision needed)",
-    "rationale": "EXTREME ATR_SL winners avg +6.78%, losers avg -5.30%. R:R 1.28:1 but hit rate 71.7% kills it. Widening SL to 1.5% gives trades room to breathe.",
-    "expected_impact": "+$0.20-0.50/7d",
-    "category": "risk management",
-    "status": "needs CEO approval",
-    "risk": "medium",
-    "impact_on_winners": "Would extend SL for all EXTREME trades. Winners may give back more profit before trailing kicks in."
+    "timestamp": "2026-09-26T08:00:00Z",
+    "idea": "NEW signal for NEUTRAL regime diversity",
+    "rationale": "Only 2 signals carry system. 3+ unimplemented concepts in session brain. System fragile.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "signal diversity",
+    "status": "recommended",
+    "risk": "low"
   }
 ]

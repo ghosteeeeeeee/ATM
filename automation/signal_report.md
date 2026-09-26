@@ -1,91 +1,67 @@
 # Signal Performance Report
-**Generated:** 2026-09-25 23:30 UTC | **Period:** 6h (empty), 24h (2 trades), 7d (primary)
+**Generated:** 2026-09-26 05:10 UTC | **Period:** 6h (none), 24h (none), 72h, 7d
+
+## Pipeline Status
+- **Last trade closed:** 2026-09-25 02:26 UTC (continuum-osc+ LONG, +$0.05)
+- **Trades in 48h:** 20 created, 24 closed
+- **Trades in 24h:** 0 (gap since Sep 25)
+- **Trades in 6h:** 0
+- **Total closed trades:** 5,325
 
 ---
 
-## Last 6h Performance
+## KILLED (executed this cycle)
 
-No closed trades in the last 6 hours. Only 2 trades closed in last 24h:
-- `continuum-osc+` LONG BTC: +$0.05 (UNIVERSAL_MAX_HOLD)
-- `pump-chain-` SHORT ATOM: +$0.03 (pump_exit_dead_money)
+None — all underperformers already killed in prior reports.
 
----
-
-## 7d Performance by Signal (>=3 trades)
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| pump-chain+ | LONG | 55 | 41.8% | +$1.23 | ✅ WINNER |
-| volume-breakout-long+ | LONG | 5 | 60.0% | +$0.70 | ✅ WINNER |
-| grind-trend+ | LONG | 18 | 50.0% | +$0.24 | ✅ WINNER |
-| continuum-osc+ | LONG | 4 | 75.0% | -$0.05 | ⚠️ WATCH |
-| doji-bottom-long | LONG | 4 | 50.0% | -$0.04 | ⚠️ WATCH |
-| bb-bounce-v2-long+ | LONG | 12 | 41.7% | -$0.26 | ⚠️ WATCH |
-| accel-300-breakout | SHORT | 7 | 28.6% | -$0.12 | ❌ KILLED (2026-09-23) |
-| grind-trend- | SHORT | 5 | 20.0% | -$0.38 | ❌ KILLED (2026-09-19) |
-| pump-chain- | SHORT | 33 | 45.5% | -$0.93 | ❌ KILLED (CEO Sep 25) |
-| pullback-entry- | SHORT | 24 | 37.5% | -$1.47 | ❌ KILLED |
-| mover+ | LONG | 10 | 20.0% | -$1.54 | ❌ KILLED (2026-09-24) |
+### Already Disabled (confirmed still False)
+| Signal | Flag | Killed | Reason |
+|--------|------|--------|--------|
+| mover+ LONG | `MOVER_PLUS_ENABLED` | 2026-09-24 | 0% WR, -$1.11 (72h). All losses via ATR SL. |
+| accel-300-breakout SHORT | `ACCEL_300_BREAKOUT_ENABLED` | 2026-09-23 | 28.6% WR, -$0.12. In NEVER_REENABLE. |
+| grind-trend+ LONG | `GRIND_TREND_PLUS_ENABLED` | 2026-09-19 | 35.7% WR, -$0.21 (7d) |
+| grind-trend- SHORT | `GRIND_TREND_MINUS_ENABLED` | 2026-09-19 | 20% WR, -$0.38 (24h) |
+| pullback-entry- SHORT | `PULLBACK_ENTRY_MINUS_ENABLED` | pre-2026-09-25 | 39.1% WR, -$1.31 (7d). Worst PnL. |
+| pump-chain- SHORT | `PUMP_CHAIN_V5_SHORT_ENABLED` | 2026-09-25 | 45.5% WR, -$0.93 (7d). CEO killed. |
 
 ---
 
-## KILLED (executed)
+## BOOSTED (executed this cycle)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 45.5% | -$0.93 | 33 | CEO killed V5 SHORT Sep 25 — cold streak, bleeding SHORT noise |
-| mover+ | LONG | 20.0% | -$1.54 | 10 | Already killed Sep 24 |
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | Already killed Sep 23 |
-| grind-trend- | SHORT | 20.0% | -$0.38 | 5 | Already killed Sep 19 |
-| pullback-entry- | SHORT | 37.5% | -$1.47 | 24 | Already killed |
+None — no signal meets all boost criteria (WR > 55%, 5+ trades, PnL > $0.05) in recent windows.
 
-**No new kills executed this run.** All top losers already disabled.
-
----
-
-## BOOSTED
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 41.8% | +$1.23 | 55 | Top performer — EXTREME regime: 45.5%WR +$0.97 |
-| volume-breakout-long+ | LONG | 60.0% | +$0.70 | 5 | Strong WR, consistent |
+### Closest to Boost
+| Signal | Dir | WR | PnL | Trades | Window | Notes |
+|--------|-----|-----|-----|--------|--------|-------|
+| volume-breakout-long+ | LONG | 100% | +$0.20 | 1 | 72h | Too few trades (1) |
+| continuum-osc+ | LONG | 75% | -$0.05 | 4 | 72h | Tiny loss, good WR, under-traded |
+| grind-trend+ | LONG | 83.3% | +$0.47 | 6 | 7d | Already killed by CEO |
 
 ---
 
-## WATCH LIST
+## LOSERS (watch list)
 
-| Signal | Dir | WR | PnL | Trades | Notes |
-|--------|-----|-----|-----|--------|-------|
-| bb-bounce-v2-long+ | LONG | 41.7% | -$0.26 | 12 | HIGH regime: 40%WR -$0.27. 30d: 73T 74%WR +$2.08 (cold streak, not systemic). CEO re-enabled Sep 22. |
-| continuum-osc+ | LONG | 75.0% | -$0.05 | 4 | Tiny sample, slight negative. NORMAL only. |
-
----
-
-## Regime Performance (key signals)
-
-**pump-chain+ LONG (7d):**
-- EXTREME: 33T 45.5%WR +$0.97 ← core edge
-- HIGH: 20T 35.0%WR +$0.17
-- NORMAL: 2T 50%WR +$0.09
-
-**bb-bounce-v2-long+ (7d):**
-- HIGH: 10T 40%WR -$0.27 ← losing
-- NORMAL: 2T 50%WR +$0.01 ← breakeven
+| Signal | Dir | WR | PnL | Trades | Window | Status |
+|--------|-----|-----|-----|--------|--------|--------|
+| pullback-entry- | SHORT | 39.1% | -$1.31 | 23 | 7d | DISABLED — 25% WR in NORMAL, 33% in EXTREME |
+| pump-chain- | SHORT | 48.1% | -$0.55 | 27 | 72h | DISABLED — CEO killed Sep 25 |
+| bb-bounce-v2-long+ | LONG | 33.3% | -$0.25 | 9 | 72h | **ENABLED** — CEO re-enabled Sep 22. 30d: 74% WR, +$2.08. Short-term variance. |
+| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | 72h | DISABLED |
+| continuum-osc+ | LONG | 75% | -$0.05 | 4 | 72h | ENABLED — marginal, tiny loss |
 
 ---
 
-## SIGNAL INVERSIONS (7d)
+## WINNERS
 
-**No inversions found.** All signals respect their direction labels.
+| Signal | Dir | WR | PnL | Trades | Window | Status |
+|--------|-----|-----|-----|--------|--------|--------|
+| volume-breakout-long+ | LONG | 100% | +$0.20 | 1 | 72h | ENABLED — insufficient sample |
+| grind-trend+ | LONG | 83.3% | +$0.47 | 6 | 7d | KILLED by CEO |
 
 ---
 
 ## ISSUES
 
-1. **Low trade volume** — Only 2 trades closed in last 24h. System may be under-trading or signals aren't firing. Check signal generation pipeline.
-2. **bb-bounce-v2-long+ cold streak** — 41.7%WR over 7d despite 30d history of 74%WR. Monitor; if drops below 35%WR with 15+ trades, consider HIGH regime block.
-3. **No new signals firing** — No signal types in the 6h window that weren't present in 7d. Pipeline may need signal diversity check.
-
----
-
-*Report auto-generated by signal_reporter. Next report: ~6h from now.*
+- **Pipeline execution failures:** Pipeline is running but trades failing to execute (rc=1). Latest attempt: BLUR LONG via bb-bounce-v2-long+ at05:12 UTC — `decider_run: FAILED`. Traceback at `decider_run.py:4358`. No open positions (0/6). This is an execution bug, not a signal problem.
+- **No signal inversions detected** in any window.
+- **bb-bounce-v2-long+** is the only active losing signal. CEO rationale for keeping it:30-day 74% WR. Recent 33.3% over9 trades is within normal variance — no action needed unless it persists beyond 7d.

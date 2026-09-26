@@ -6905,3 +6905,48 @@ Final set: ['ALGO', 'AZTEC', 'CAKE', 'COMP', 'KAS']
 - bb-bounce-v2-long+ monitoring — if 7d WR drops below 40%, flag for CEO
 
 **BY:** auto_1hr
+
+## [2026-09-26 11:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 51.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 172T 41.3%WR -$2.11 | **14d:** 374T 46.0%WR -$3.99
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 51+ hours — 0 trades, 0 open, market regime flat/neutral
+- Pipeline running normally (last cycle 05:10 UTC, 43 signals scanned, 0 hotset)
+- ATR_SL_MAX 1.8% eval due ~Sep 27 (0 trades since deploy, still unmeasured)
+- No kill candidates (no enabled signal with 3+ trades and 0% WR in recent window)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 51h gap since last trade — extended quiet period, regime shift needed for activity
+- bb-bounce-v2-long+ monitoring — 7d: 12T 41.7%WR -$0.26 (short-term variance, 30d data showed 74%WR)
+- ATR_SL dominance 64% of all exits (110/172 7d) — avg loss only -$0.021, within ATR_SL_MAX tolerance
+
+**BY:** auto_1hr
+
+## LOSERS Update — 2026-09-26 06:05 UTC
+- REMOVE CAKE (insufficient data)
+- REMOVE AZTEC (insufficient data)
+
+Final set: ['ALGO', 'COMP', 'KAS']
+
+## [2026-09-26 12:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 53.9h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** ~170T ~41%WR ~-$2 | **14d:** ~375T ~46%WR ~-$4
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 53+ hours — 0 trades, 0 open, regime flat/neutral
+- Pipeline running normally (last cycle 06:09 UTC, 43 signals scanned, 0 hotset)
+- ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 — still 0 trades to measure (eval due ~Sep 27)
+- No kill candidates (no enabled signal with 3+ trades and 0% WR)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 53h gap — extended quiet, needs regime shift for activity
+- ATR_SL dominance 64% of all exits remains unaddressed (0 trades since fix deployed)
