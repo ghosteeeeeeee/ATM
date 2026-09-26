@@ -3000,3 +3000,12 @@
   ATR_SL hit rate 62.8% 7d CRITICAL. EXTREME 72.6%. Losing autopsy: all normal ATR_SL variance.
   Creative: regime-specific ATR_SL caps suggested (needs backtest). No config changes.
   BY: brain_auditor
+[2026-09-26 10:11 UTC] auto_1hr: NO CONFIG CHANGE — analysis only
+  7d: 165T 44.8%WR -.28. 0 trades last hour, 0 open. System idle 31+h.
+  ATR_SL dominance 64.8% (EXTREME 71.1%). pullback-entry- SHORT 100% SL hit 22T — watch on resume.
+  No kill candidates, no overtrading. ATR_SL_MAX 1.8% deployed Sep 25 — pending eval. BY: auto_1hr
+[2026-09-26 18:10 UTC] auto_1hr: NO CHANGE — analysis only
+  7d: 161T 44.1%WR -$3.01 | 14d: 366T 45.9%WR -$4.14
+  System idle 64h. Pipeline running, regime NEUTRAL, no hotset. 10 signals active.
+  ATR_SL dominance 65.8% — fix deployed Sep 25, 0 trades to measure (eval ~Sep 27).
+  No kill candidates, no overtrading. BY: auto_1hr

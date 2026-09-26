@@ -6980,3 +6980,114 @@ Final set: ['ALGO', 'COMP', 'KAS']
 **Open Questions:**
 - 53h gap — extended quiet, needs regime shift for activity
 - ATR_SL dominance 64% of all exits remains unaddressed (0 trades since fix deployed)
+
+## [2026-09-26 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 56.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 169T 44.4%WR -$2.08 | **14d:** 368T 45.9%WR -$4.10
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 56+ hours — 0 trades, 0 open, regime flat/neutral
+- Pipeline running normally (last cycle 08:10 UTC, 43 signals scanned)
+- ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 — still 0 trades to measure (eval due ~Sep 27)
+- No kill candidates (no enabled signal with 3+ trades and 0% WR in recent window)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 56h gap — extended quiet, needs regime shift for activity
+- ATR_SL dominance unaddressed (0 trades since fix deployed)
+
+## [2026-09-26 14:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 59.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 167T 44.4%WR -$1.90 | **14d:** 368T 45.9%WR -$4.10
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 59+ hours — 0 trades, 0 open, regime flat/neutral
+- Pipeline running normally
+- ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 — still 0 trades to measure (eval due ~Sep 27)
+- No kill candidates (no enabled signal with 3+ trades and 0% WR)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 59h gap — extended quiet, needs regime shift for activity
+- ATR_SL dominance unaddressed (0 trades since fix deployed)
+
+**BY:** auto_1hr
+
+## [2026-09-26 10:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 31.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 165T 44.8%WR -$2.28 | **14d:** 367T 46.0%WR -$3.99
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 31+ hours — 0 trades, 0 open, regime flat/neutral
+- Pipeline running normally (last cycle 10:10 UTC, 10 signals active, hotset empty)
+- ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 — 0 trades since to measure impact (eval pending)
+- No kill candidates (0 trades last hour — no signal with 3+ trades and 0% WR)
+- No overtrading (0 trades/hr)
+
+**Data Points:**
+- ATR_SL dominance: 64.8% of 7d exits (107/165) — EXTREME worst at 71.1%
+- pullback-entry- SHORT: 22T 7d, 100% SL hit rate, -$0.053 avg — every trade stopped out. Watch for kill on resume.
+- SL hit avg loss: -26.76% (7d) — high due to pnl_pct data representation
+
+**Open Questions:**
+- 31h gap — extended quiet, needs regime shift for activity
+- ATR_SL dominance 64.8% remains unaddressed (0 trades since fix deployed)
+- pullback-entry- SHORT 100% SL hit rate — kill candidate if activity resumes with same pattern
+
+## [2026-09-26 15:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 60.7h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 167T 44.4%WR -$1.90 | **14d:** 368T 45.9%WR -$4.10
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 60+ hours — 0 trades, 0 open, regime flat/neutral
+- Pipeline running normally
+- ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25 — still 0 trades to measure (eval due ~Sep 27)
+- No kill candidates (no enabled signal with 3+ trades and 0% WR in recent window)
+- No overtrading (0 trades/hr)
+
+**Data Points:**
+- ATR_SL dominance: 64.8% of 7d exits (107/165) — EXTREME worst at 71.1%
+- pullback-entry- SHORT: 22T 7d, 100% SL hit rate, -$0.053 avg — every trade stopped out. Kill candidate if activity resumes with same pattern.
+
+**Open Questions:**
+- 60h gap — extended quiet, needs regime shift for activity
+- ATR_SL dominance 64.8% remains unaddressed (0 trades since fix deployed)
+
+**BY:** auto_1hr
+
+## [2026-09-26 18:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 64h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 161T 44.1%WR -$3.01 | **14d:** 366T 45.9%WR -$4.14
+
+**ATR SL rate:** 65.8% 7d (106/161) — ATR_SL_MAX 1.8% + EXTREME 1.2x deployed Sep 25, 0 trades since to measure impact
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 64h — pipeline running (last cycle 12:11 UTC), regime NEUTRAL, hotset empty, 10 signals active
+- No kill candidates (0 trades last hour — no signal with 3+ trades and 0% WR)
+- No overtrading (0 trades/hr)
+- mover+ 7d: 25%WR -$1.19 — already KILLED Sep 24, trades are historical
+- pullback-entry- 7d: 40.9%WR -$1.16 — already KILLED, trades are historical
+- pump-chain-: 33T 45.5%WR -$0.93 — marginal, 45% WR near breakeven, not kill-worthy
+- ATR_SL dominance 65.8% still highest concern but fix pending eval (~Sep 27)
+
+**Open Questions:**
+- 64h gap — extended quiet, needs regime shift for activity
+- ATR_SL fix deployed Sep 25 — will evaluate once trades resume
+- System appears to be filtering correctly in NEUTRAL regime
+
+**BY:** auto_1hr
