@@ -1,97 +1,144 @@
 {
-  "timestamp": "2026-09-26T07:00:00Z",
-  "session_brain_stats": {
-    "queries_run": 4,
-    "recurring_topics": [
-      "SHORT bleeding",
-      "ATR_SL too tight",
-      "regime confidence",
-      "new neutral signal"
+    "timestamp": "2026-09-26T07:30:00Z",
+    "session_brain_stats": {
+        "total_sessions": "50+",
+        "recurring_topics": ["ATR_SL hit rate", "SHORT bleeding", "signal diversity", "RSI floor/ceiling"],
+        "unimplemented_ideas": ["SHORT NULL RSI confidence boost", "new NEUTRAL signal", "EXTREME ATR_SL_MIN 1.5%"]
+    },
+    "trade_summary_24h": {
+        "trades": 0,
+        "system_idle_hours": 25,
+        "last_trade": "2026-09-25 02:26 UTC"
+    },
+    "trade_summary_7d": {
+        "total_trades": 181,
+        "win_rate": 42.5,
+        "pnl": -2.92,
+        "atr_sl_hit_rate": 63.0,
+        "atr_sl_extreme_rate": 71.7,
+        "extreme_rr": "1.06:1 (broken)",
+        "short_pnl": -2.70,
+        "short_pct_of_losses": 89
+    },
+    "drift_findings": [
+        {
+            "finding": "RSI floor/ceiling leak via STANDALONE_BYPASS",
+            "evidence": "4 trades post-fix violated RSI floors/ceilings: ALGO RSI=37.5, BTC RSI=41.66, ATOM RSI=47.06, FOGO RSI=100.0",
+            "root_cause": "STANDALONE_BYPASS signals skip signal_compactor.py (hard blocks) and only hit decider_run.py. CEO fixed decider_run.py but some paths still bypass.",
+            "impact": "4 losing trades, ~$0.60 total loss",
+            "status": "fixed by CEO Sep 24 22:00 UTC (detection-time RSI fallback)"
+        },
+        {
+            "finding": "volume_spike metadata still NULL",
+            "evidence": "0 trades since fix deployed Sep 25 12:30. Cannot verify fix working.",
+            "root_cause": "Fix deployed but system idle 25h+. No trades to test.",
+            "impact": "unknown - waiting for next trade",
+            "status": "fix deployed, untested"
+        },
+        {
+            "finding": "mover+ kill not propagating",
+            "evidence": "9T/7d -$1.24 still executing despite being killed Sep 24",
+            "root_cause": "Legacy trades opened before kill. 0 new trades since kill verified.",
+            "impact": "legacy losses only, no ongoing bleed",
+            "status": "resolved"
+        }
     ],
-    "drift_count": 3
-  },
-  "trade_summary_24h": {
-    "trades": 0,
-    "idle_hours": 25.4,
-    "status": "system idle, no trades since Sep 25 02:26 UTC"
-  },
-  "trade_summary_7d": {
-    "trades": 181,
-    "win_rate": 42.5,
-    "pnl": -2.92,
-    "atr_sl_hit_rate": 63.0,
-    "extreme_atr_sl": 71.7,
-    "long_pnl": 0.94,
-    "short_pnl": -2.7
-  },
-  "trade_summary_14d": {
-    "trades": 376,
-    "win_rate": 46.0,
-    "pnl": -4.27
-  },
-  "critical_findings": [
-    "ATR_SL 63.0% 7d hit rate — CRITICAL. Widening untested (0 trades since Sep 25).",
-    "HIGH regime -.14/14d — NO profitable signals. Dead zone.",
-    "SHORT side 89% of losses (-.70/7d).",
-    "CL-T1 15T/7d 0%WR -.65 — still firing despite disable.",
-    "Signal diversity CRITICAL — only 2 profitable signals."
-  ],
-  "drift_findings": [
-    {
-      "topic": "HIGH regime confidence penalty",
-      "sessions": "3+",
-      "in_code": false,
-      "status": "NOT IMPLEMENTED"
-    },
-    {
-      "topic": "EXTREME ATR_SL_MIN 1.3 to 1.5",
-      "sessions": "7+",
-      "in_code": false,
-      "status": "Needs CEO"
-    },
-    {
-      "topic": "SHORT NULL RSI confidence boost",
-      "sessions": "3+",
-      "in_code": false,
-      "status": "NOT IMPLEMENTED"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-26T07:00:00Z",
-      "idea": "HIGH regime confidence penalty REGIME_CONF_HIGH_MULT=0.85",
-      "rationale": "HIGH is worst regime -.14/14d with NO profitable signals. -15% confidence reduces entries in dead zone.",
-      "expected_impact": "+/usr/bin/bash.50-1.00/7d",
-      "category": "regime filter",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-26T07:00:00Z",
-      "idea": "EXTREME ATR_SL_MIN 1.3 to 1.5",
-      "rationale": "EXTREME ATR_SL R:R=1.06:1 (broken). Widening floor improves R:R. Suggested 7+ times.",
-      "expected_impact": "+/usr/bin/bash.20-0.50/7d",
-      "category": "exit optimization",
-      "status": "needs CEO approval",
-      "risk": "medium"
-    },
-    {
-      "date": "2026-09-26T07:00:00Z",
-      "idea": "New NEUTRAL regime signal for diversity",
-      "rationale": "Only 2 profitable signals carry system. Fragile. Session brain shows trend following signal discussed.",
-      "expected_impact": "+/usr/bin/bash.50-1.50/7d (if successful)",
-      "category": "signal diversity",
-      "status": "needs development",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Apply HIGH regime confidence penalty (REGIME_CONF_HIGH_MULT=0.85)",
-    "Monitor ATR_SL widening eval Sep 27",
-    "Monitor volume_spike fix impact",
-    "Monitor SHORT_RSI_CEILING=70 impact",
-    "CEO: Approve EXTREME ATR_SL_MIN 1.3 to 1.5",
-    "Develop new NEUTRAL signal"
-  ]
+    "recurring_problems": [
+        {
+            "problem": "ATR_SL hit rate CRITICAL in EXTREME",
+            "frequency": "mentioned in 10+ sessions",
+            "data": "71.7% hit rate 7d (92T). Winners avg +$0.20, losers avg -$0.20. R:R barely 1:1.",
+            "root_cause": "ATR_SL_MIN=1.3% too tight for EXTREME volatility. Trades get stopped out before momentum plays out.",
+            "suggested_fix": "ATR_SL_MIN 1.3->1.5 for EXTREME only (+$0.20-0.50/7d)",
+            "status": "suggested 7+ times, needs CEO approval"
+        },
+        {
+            "problem": "Signal diversity CRITICAL",
+            "frequency": "mentioned in 15+ sessions",
+            "data": "Only pump-chain+ LONG (+$0.94/7d) and volume-breakout-long+ (+$0.70/7d) profitable. System fragile.",
+            "root_cause": "NEUTRAL regime blocks most signals. Only 2 signal types pass confluence.",
+            "suggested_fix": "New signal designed for NEUTRAL regime",
+            "status": "in development (sessions show trend following, SMA20 dip ideas)"
+        },
+        {
+            "problem": "SHORT side bleeding",
+            "frequency": "mentioned in 10+ sessions",
+            "data": "SHORT -$2.70/7d = 89% of all losses. pump-chain- SHORT 33T 45.5%WR -$0.93.",
+            "root_cause": "SHORT signals fire in EXTREME whipsaw. RSI floor/ceiling bugs allowed oversold SHORTs.",
+            "suggested_fix": "SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=70 deployed. Monitoring.",
+            "status": "fixes deployed, monitoring impact"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "idea": "SHORT NULL RSI confidence boost +15pt",
+            "rationale": "14d: NULL RSI SHORT = 130T 56.9%WR +$2.08 vs HAS_RSI 176T 46.6%WR -$2.52. Detection-time entries higher quality.",
+            "expected_impact": "+$0.20-0.40/7d",
+            "sessions_discussed": 5,
+            "status": "never implemented"
+        },
+        {
+            "idea": "New NEUTRAL signal",
+            "rationale": "Only 2 signals pass NEUTRAL confluence. System fragile to regime shifts.",
+            "expected_impact": "+$0.50-1.00/7d (diversification)",
+            "sessions_discussed": 15,
+            "status": "in development"
+        },
+        {
+            "idea": "EXTREME-specific ATR_SL_MIN 1.5%",
+            "rationale": "EXTREME 71.7% ATR_SL hit rate. Winners avg +6.78%, losers avg -5.30%. SL cutting winners short.",
+            "expected_impact": "+$0.20-0.50/7d",
+            "sessions_discussed": 7,
+            "status": "needs CEO approval"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-26T07:30:00Z",
+            "idea": "Regime-adaptive confidence floor for EXTREME",
+            "rationale": "EXTREME 71.7% ATR_SL hit rate but pump-chain+ LONG EXTREME still +$1.23/7d (winners ride momentum). Problem is entry quality, not regime. Add confidence floor: EXTREME requires 70%+ confidence (vs 65% default) to filter weak entries.",
+            "expected_impact": "+$0.10-0.30/7d (fewer weak EXTREME entries)",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Would block ~10% of EXTREME entries (weak confidence). No impact on high-confidence winners."
+        },
+        {
+            "date": "2026-09-26T07:30:00Z",
+            "idea": "SHORT NULL RSI confidence boost +15pt",
+            "rationale": "Detection-time RSI entries outperform live RSI entries by 10% WR. Boost confidence for NULL RSI SHORT trades to improve fill quality.",
+            "expected_impact": "+$0.20-0.40/7d",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "0 - only boosts confidence, doesn't block anything"
+        },
+        {
+            "date": "2026-09-26T07:30:00Z",
+            "idea": "EXTREME ATR_SL_MIN 1.5% (CEO decision needed)",
+            "rationale": "EXTREME ATR_SL winners avg +6.78%, losers avg -5.30%. R:R 1.28:1 but hit rate 71.7% kills it. Widening SL to 1.5% gives trades room to breathe.",
+            "expected_impact": "+$0.20-0.50/7d",
+            "category": "risk management",
+            "status": "needs CEO approval",
+            "risk": "medium",
+            "impact_on_winners": "Would extend SL for all EXTREME trades. Winners may give back more profit before trailing kicks in."
+        }
+    ],
+    "config_changes_applied": [
+        {
+            "change": "REGIME_CONF_HIGH_MULT 1.0->0.85",
+            "file": "hermes_constants.py",
+            "rationale": "HIGH regime worst performer: -$3.14/14d (150T 44.0%WR). NO profitable signals in HIGH. -15% confidence penalty reduces entries in dead zone.",
+            "expected_impact": "+$0.50-1.00/7d",
+            "timestamp": "2026-09-26T07:00:00Z"
+        }
+    ],
+    "next_actions": [
+        "MONITOR: ATR_SL widening eval Sep 27 (0 trades since deployment)",
+        "MONITOR: volume_spike fix verification (0 trades since deployment)",
+        "MONITOR: SHORT_RSI_FLOOR=50 + SHORT_RSI_CEILING=70 impact",
+        "MONITOR: CL-T1 disable impact (0 trades since disable)",
+        "DEVELOP: New NEUTRAL signal for diversity",
+        "SUGGEST CEO: EXTREME ATR_SL_MIN 1.5% (+$0.20-0.50/7d)"
+    ]
 }

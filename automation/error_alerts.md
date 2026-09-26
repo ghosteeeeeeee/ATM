@@ -98,3 +98,6 @@
 
 ## Error Alerts — 2026-09-26 01:58 UTC
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`
+
+## Error Alerts — 2026-09-26 03:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
