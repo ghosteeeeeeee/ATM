@@ -1517,6 +1517,16 @@ def context_gate(token, direction, source, sig):
         if isinstance(sig, dict):
             sig['volatility_regime'] = vol_regime
             sig['sl_multiplier'] = get_sl_multiplier(atr_pct) if atr_pct else 1.0
+        # ── pump-chain+ HIGH regime block (mirrors signal_compactor.py) ──
+        # STANDALONE_BYPASS signals skip signal_compactor, so this catch is needed.
+        if vol_regime == 'HIGH' and direction.upper() == 'LONG' and source and ('pump-chain' in source or 'pump_chain' in source):
+            try:
+                from hermes_constants import PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED
+                if PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED:
+                    log(f'  🚫 [PUMP-CHAIN-HIGH] {token} LONG blocked — HIGH vol (decider_run)')
+                    return ('SKIP', 'pump-chain+ HIGH regime block', 0)
+            except ImportError:
+                pass
     except Exception as e:
         log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
 

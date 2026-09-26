@@ -7198,3 +7198,37 @@ Final set: ['ALGO', 'COMP', 'KAS']
 
 ## TEAM UPDATES
 - [2026-09-27 00:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 37.7h
+
+## [2026-09-27 01:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 38.7h ago (BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 152T 41.4%WR -$3.53 | **14d:** 360T 46.1%WR -$3.48
+**ATR_SL 7d:** 102/152 = 67.1% (EXTREME dominant)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 38.7h — pipeline running, regime NEUTRAL, 0 open positions, 0 hotset tokens
+- ATR_SL fix deployed Sep 25 — 0 trades since to measure (eval window ongoing)
+- No kill candidates: mover- (SHORT) active but 0 recent trades; mover+ and pullback-entry- already killed
+- No overtrading (0 trades/hr)
+
+**Signal 7d Watchlist (worst performers):**
+- `mover+`: 8T 25.0%WR -$1.19 — LONG already killed Sep 24; SHORT (mover-) still active
+- `pullback-entry-`: 22T 40.9%WR -$1.16 — already killed; all trades historical
+- `pump-chain-`: 33T 45.5%WR -$0.93 — moderate bleed, monitoring
+
+**ATR_SL Diagnosis:**
+- 67.1% of 7d closes are ATR_SL — still dominant despite fix deployed Sep 25
+- 0 trades since fix deployment → can't evaluate effectiveness yet
+- Cut-loser exits: 8T 0%WR -$0.97 — secondary bleed source
+
+**Open Questions:**
+- 38.7h gap continues — extended quiet, needs regime shift to HIGH/EXTREME
+- ATR_SL_MAX 1.8% + EXTREME 1.2x pending real-world eval
+- System correctly filtering in NEUTRAL regime — patience warranted
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-27 01:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 38.7h

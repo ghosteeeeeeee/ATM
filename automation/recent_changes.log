@@ -3017,3 +3017,7 @@
   7d: 155T 41.3%WR -.72 | 14d: 361T 46.0%WR -.73
   System idle 37.7h. ATR_SL dominance 66.5%. Fix deployed Sep 25 — eval window ~Sep 27.
   No kill candidates, no overtrading. BY: auto_1hr
+[2026-09-27 01:10 UTC] auto_1hr: NO CHANGE — analysis only
+  7d: 152T 41.4%WR -$3.53 | 14d: 360T 46.1%WR -$3.48
+  System idle 38.7h. ATR_SL dominance 67.1%. Fix deployed Sep 25 — 0 trades to measure.
+  No kill candidates, no overtrading. BY: auto_1hr

@@ -1,121 +1,119 @@
 {
-    "timestamp": "2026-09-26T22:30:00Z",
+    "timestamp": "2026-09-27T02:30:00Z",
     "session_brain_stats": {
-        "top_themes": [
-            "signal decay / winrate preservation",
-            "trend following new signal",
-            "loss bleeding patterns",
-            "R:R exits and trailing",
-            "BTC whipsaw / expansion"
-        ],
-        "unimplemented_ideas": [
-            "NEW NEUTRAL signal (recurring 6+ sessions)",
-            "SHORT NULL RSI confidence boost +15pt (recurring 6+ sessions)",
-            "pump-chain- EXTREME weight boost (1-2 sessions)"
-        ]
+        "key_topics_found": ["ATR_SL hit rate CRITICAL", "HIGH regime bleeding", "signal diversity gap", "RSI floor/ceiling fixes", "volume_spike metadata bug", "trend following signal idea", "grind-breakout signal idea"],
+        "recurring_theme": "ATR_SL too tight for EXTREME volatility — discussed in 5+ sessions"
     },
     "trade_summary_24h": {
         "trades": 0,
-        "pnl": 0,
         "system_idle_hours": 72,
-        "last_trade": "2026-09-25 02:26 UTC"
+        "last_trade": "2026-09-25 02:26 UTC",
+        "note": "System idle by design — pipeline running, no signals above confidence threshold in NEUTRAL regime"
     },
     "trade_summary_7d": {
-        "trades": 153,
-        "pnl": -3.50,
-        "win_rate": 42.5,
-        "atr_sl_hit_pct": 67.3,
-        "regime_breakdown": {
-            "EXTREME": "87T 42.5%WR -$1.36",
-            "HIGH": "49T 36.7%WR -$1.55",
-            "NORMAL": "15T 46.7%WR -$0.62",
+        "trades": 151,
+        "win_rate": 41.3,
+        "pnl": -3.53,
+        "atr_sl_hit_rate": 66.9,
+        "atr_sl_extreme": 70.6,
+        "regimes": {
+            "EXTREME": "85T 41.2%WR -$1.50 (ATR_SL 70.6%, R:R 1.08:1)",
+            "HIGH": "49T 36.7%WR -$1.55 (ATR_SL 61.2%, R:R 0.85:1)",
+            "NORMAL": "15T 46.7%WR -$0.62 (ATR_SL 66.7%, R:R 0.30:1)",
             "FLAT": "2T 100%WR +$0.03"
+        }
+    },
+    "trade_summary_14d": {
+        "trades": 360,
+        "win_rate": 46.1,
+        "pnl": -3.48,
+        "profitable_signals": {
+            "pump-chain+ LONG": "67T 43.3%WR +$1.24 (workhorse, 85% ATR_SL in EXTREME but R:R=1.5:1 saves it)",
+            "volume-breakout-long+ LONG": "18T 66.7%WR +$1.46 (gem, 90% ATR_SL but winners BIG)"
         },
-        "signal_winners": "volume-breakout-long+ 5T +$0.70",
-        "signal_losers": "mover+ 8T -$1.19, pullback-entry- 22T -$1.16, pump-chain- 33T -$0.93"
+        "losing_signals": {
+            "pullback-entry- SHORT": "85T 47.1%WR -$1.35 (100% ATR_SL 7d, now pre-disable trades aging out)",
+            "mover+ LONG": "14T 42.9%WR -$1.12 (killed, 0 new trades)",
+            "pump-chain- SHORT": "49T 46.9%WR -$0.73 (disabled Sep 25)"
+        }
     },
     "drift_findings": [
         {
-            "topic": "REGIME_CONF_HIGH_MULT=0.50",
-            "status": "IMPLEMENTED (Sep 26 08:30 UTC)",
-            "impact": "Deployed but 0 trades since — untested (same as other fixes)"
+            "finding": "ATR_SL widening (1.5→1.8% + EXTREME 1.2x) deployed Sep 25 — 72h with 0 trades",
+            "impact": "UNKNOWN — cannot validate",
+            "status": "Monitoring — eval Sep 27"
         },
         {
-            "topic": "volume_spike metadata fix",
-            "status": "IMPLEMENTED (Sep 26 06:15 UTC)",
-            "impact": "Untested — 0 trades since deployment"
+            "finding": "REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26 — 0 trades",
+            "impact": "UNKNOWN — HIGH was -$3.33/14d before fix",
+            "status": "Monitoring — needs market activity"
         },
         {
-            "topic": "SHORT NULL RSI confidence boost +15pt",
-            "status": "NEVER IMPLEMENTED (6th suggestion)",
-            "impact": "Edge faded — 0 trades/14d. Was 130T 56.9%WR +$2.08. Market regime shift killed it. NOT worth implementing now."
+            "finding": "volume_spike metadata fix deployed Sep 26 — 0 trades",
+            "impact": "UNKNOWN — chase filter was blind to volume 7+ days",
+            "status": "Monitoring"
         },
         {
-            "topic": "LONG RSI 60-70 volume filter",
-            "status": "NEVER IMPLEMENTED",
-            "impact": "pump-chain+ LONG RSI 60-70: 17T 35.3%WR -$0.87/14d. LONG_RSI_CEILING=70 now blocks this band. Drift resolved via different mechanism."
+            "finding": "LONG_RSI_CEILING=70 deployed Sep 26 — blocks RSI 60-70 LONG (35.3%WR -$0.87/14d)",
+            "impact": "UNKNOWN — no trades since deployment",
+            "status": "Monitoring"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "ATR_SL hit rate 67.3% EXTREME",
-            "severity": "CRITICAL",
-            "status": "Widening deployed Sep 25, UNTESTED 72h+",
-            "data": "EXTREME 14d: pump-chain+ 85% hit rate but +$1.23 (winners ride momentum). pullback-entry- SHORT 95% hit rate -$0.57. ATR_SL_MAX 1.8% + EXTREME 1.2x multiplier.",
-            "recommendation": "Eval Sep 27 as planned. If still >55%, consider EXTREME-specific ATR_SL_MIN=1.5%."
+            "problem": "ATR_SL hit rate CRITICAL — 66.9% 7d, 70.6% EXTREME",
+            "root_cause": "SL too tight for volatility. Winners are BIGGER (R:R works) but get stopped out too often.",
+            "fix_deployed": "ATR_SL_MAX 1.5→1.8% + EXTREME 1.2x multiplier (Sep 25)",
+            "status": "UNTESTED 72h"
         },
         {
-            "topic": "Signal diversity",
-            "severity": "HIGH",
-            "status": "Only pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) profitable",
-            "data": "50+ signal types in 30d, but only 2 carry PnL in NEUTRAL. SHORT side 89% of losses.",
-            "recommendation": "NEW NEUTRAL signal needed (6th+ session suggestion). grind-breakout or trend-following type."
+            "problem": "HIGH regime worst performer — 49T 36.7%WR -$1.55/7d",
+            "root_cause": "No consistently profitable signals. R:R=0.85:1 (losers bigger than winners).",
+            "fix_deployed": "REGIME_CONF_HIGH_MULT=0.50 — blocks ~70% of HIGH entries",
+            "status": "UNTESTED"
         },
         {
-            "topic": "HIGH regime bleeding",
-            "severity": "MEDIUM",
-            "status": "REGIME_CONF_HIGH_MULT=0.50 deployed, untested",
-            "data": "HIGH 14d: 140T 43.6%WR -$2.67 (39% of ALL trades). NO consistently profitable signals except grind-trend+ +$0.35.",
-            "recommendation": "Monitor HIGH_MULT=0.50 impact. If still bleeding, consider MIN_EXEC_CONFIDENCE=65 for HIGH only."
+            "problem": "Signal diversity critical — only 2 profitable signal types",
+            "root_cause": "SHORT side killed/disabled. NEUTRAL regime has few passing signals.",
+            "status": "grind-breakout+ exists but only 1T/14d — needs tuning"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-26T22:30:00Z",
-            "idea": "HIGH regime MIN_EXEC_CONFIDENCE=65",
-            "rationale": "HIGH regime 14d: 140T 43.6%WR -$2.67. NO signal profitable in HIGH. 0 winners with confidence >60. Raising MIN_EXEC_CONFIDENCE from 50 to 65 for HIGH regime only blocks majority of HIGH entries. Expected +$0.50-1.00/7d. Verified: 0 winners in HIGH at conf>60.",
-            "expected_impact": "+$0.50-1.00/7d",
-            "category": "regime gate",
-            "status": "suggested",
-            "risk": "low",
-            "verification": "0 winning trades in HIGH regime with confidence >60 (14d). Would block 0 winners."
+            "date": "2026-09-27T02:30:00Z",
+            "idea": "Investigate confidence miscalibration — 99+ conf trades are LOSING",
+            "rationale": "14d conf>=99: 166T 43.4%WR -$2.31. conf 70-84: 97T 45.4%WR +$0.79. The highest-confidence trades lose money while mid-confidence trades win. Root cause: disabled signals (pullback-entry-, pump-chain-, mover+) had high confidence but were losers. Now disabled, but pump-chain+ LONG still has 7T conf>=99 LOSING -$1.19. Confidence scoring may be overfitting to signal count rather than quality.",
+            "expected_impact": "Investigation needed — could be +$0.50-1.00/7d if confidence calibration fixed",
+            "category": "signal quality",
+            "status": "investigation needed",
+            "risk": "medium — requires deep dive into confidence scoring logic"
         },
         {
-            "date": "2026-09-26T22:30:00Z",
-            "idea": "pump-chain+ EXTREME confidence floor 70%",
-            "rationale": "pump-chain+ EXTREME 14d: 40T 47.5%WR +$1.23. But EXTREME 85% ATR_SL hit rate — winners ride momentum (avg +9%), losers stopped at 1.3%. Confidence floor 70% means only high-conviction entries fire — likely capturing the momentum winners while blocking the marginal ones.",
-            "expected_impact": "+$0.10-0.30/7d",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "verification": "30d pump-chain+ EXTREME conf>70: need to verify. If sample sufficient, deploy."
-        },
-        {
-            "date": "2026-09-26T22:30:00Z",
-            "idea": "New grind-breakout signal for NEUTRAL diversity",
-            "rationale": "Only 2 profitable signal types (pump-chain+ LONG, volume-breakout-long+) carry entire system. Both are momentum/breakout style — correlated. A grind-breakout signal (consolidation break with volume confirmation) would add uncorrelated diversity. Session brain shows 6+ requests for new NEUTRAL signal.",
-            "expected_impact": "+$0.50-1.50/7d if successful",
+            "date": "2026-09-27T02:30:00Z",
+            "idea": "grind-breakout+ tuning for NEUTRAL diversity",
+            "rationale": "grind-breakout+ exists but only 1T/14d. Session brain discussed 'steady grind with late breakout' pattern. Current PURITY_MIN=0.60 and SLOPE_MIN=0.0005 may be too strict. Relaxing either could increase fire rate in NEUTRAL without sacrificing quality. pump-chain+ and volume-breakout-long+ are the only profitable signals — we need a third.",
+            "expected_impact": "+$0.20-0.50/7d if signal fires 3-5x/week with >50% WR",
             "category": "signal diversity",
-            "status": "suggested",
-            "risk": "medium — new signal needs backtest",
-            "verification": "NEEDS: signal-lab backtest before deployment"
+            "status": "suggested — needs signal-lab investigation",
+            "risk": "low — signal already exists, just needs tuning"
+        },
+        {
+            "date": "2026-09-27T02:30:00Z",
+            "idea": "ATR_SL widening success criteria — if hit rate >55% by Sep 27, consider 2.0% EXTREME cap",
+            "rationale": "Current: ATR_SL_MAX=1.8% + EXTREME 1.2x = up to 2.16% effective. EXTREME 70.6% hit rate suggests even 1.8% may be tight. If by Sep 27 the hit rate is still >55%, widening isn't enough. Consider 2.0% cap (2.4% effective in EXTREME).",
+            "expected_impact": "+$0.30-0.80/7d if hit rate drops from 67% to <50%",
+            "category": "risk management",
+            "status": "conditional — depends on Sep 27 eval",
+            "risk": "medium — wider SL = larger individual losses"
         }
     ],
+    "config_changes_applied": [],
     "next_actions": [
-        "1. ATR_SL eval Sep 27 — if >55%, consider EXTREME ATR_SL_MIN 1.3→1.5",
-        "2. Monitor REGIME_CONF_HIGH_MULT=0.50 impact (untested)",
-        "3. Monitor volume_spike fix impact (untested)",
-        "4. SHORT_RSI_FLOOR=50 leak investigation — 2 pump-chain- trades with RSI<50 post-fix",
-        "5. Consider HIGH MIN_EXEC_CONFIDENCE=65 (low risk, 0 winners to lose)"
+        "Monitor ATR_SL widening impact — eval window Sep 27 (TOMORROW)",
+        "Monitor REGIME_CONF_HIGH_MULT=0.50 — needs market activity",
+        "Monitor volume_spike fix + LONG_RSI_CEILING=70 — needs trades",
+        "Investigate confidence miscalibration (99+ conf losing money)",
+        "Tune grind-breakout+ for NEUTRAL diversity (signal-lab)",
+        "If ATR_SL hit rate >55% by Sep 27: widen to 2.0% EXTREME cap"
     ]
 }
