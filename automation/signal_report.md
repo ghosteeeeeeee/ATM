@@ -1,64 +1,56 @@
 === Signal Performance Report ===
-Generated: 2026-09-26 17:12 UTC | Period: Last 6h / 24h / 7d
+Period: 2026-09-26 23:09 UTC | Last 6h: 0 trades | Last 24h: 0 trades | Last 48h: 0 trades
+Total closed trades in DB: 5,325
 
-## STATUS: SYSTEM STARVED — 0 TRADES IN 38.7 HOURS
-
-Pipeline runs every minute, 1018 signals generated in 24h, but compactor kills ALL of them.
-Only 3 signals pass confluence gate per cycle, all blocked by downstream filters.
-
-### Blockage Chain (every cycle):
-1. USUAL SHORT (rs-r38): RR-HARD BLOCK — R:R=0.46 < 0.7 (risk > reward)
-2. ADA SHORT (mover-): RSI floor — RSI=23.0 < 50 (extreme oversold SHORT block)
-3. BCH LONG (rs-s33,rs-s38): HALL-SHAME — 30d LONG WR=42.9% < 55%
-4. POL LONG (oversold-bounce+): CONFLUENCE-GATE — single-type not in standalone bypass
+**⚠️ QUIET PERIOD: No trades closed in 48h. Last close: 2026-09-25 02:26 UTC.**
+Pipeline running normally. 0 open positions. No errors in logs.
 
 ---
 
-## KILLED (executed): None
-No signals met kill criteria (WR<30% with 5+ trades AND PnL<-$0.10 in 24h).
-Zero trades in 24h window — nothing to evaluate.
+## KILLED (executed this cycle)
+None — no trades in 24h window to evaluate.
 
-## BOOSTED (executed): None
-No signals met boost criteria (WR>55% with 5+ trades in 24h).
+## BOOSTED (executed this cycle)
+None — winners already enabled.
 
----
+## TUNING CANDIDATES (regime-based)
+| Signal | Dir | Regime | WR | PnL | Action |
+|--------|-----|--------|-----|-----|--------|
+| bb_bounce_short | SHORT | EXTREME | 77.8% | +$0.48 | Candidate: re-enable with EXTREME-only filter |
+| bb_bounce_short | SHORT | HIGH | 52.9% | -$0.54 | Block in HIGH |
+| bb_bounce_short | SHORT | NORMAL | 55.2% | -$0.44 | Block in NORMAL |
+| open_skies | LONG | EXTREME | 77.8% | +$1.83 | Candidate: re-enable with EXTREME-only filter |
+| accel_300_v | SHORT | HIGH | 34.8% | -$0.49 | Monitoring — net +$1.31/30d, not worth blocking |
 
-## 7-DAY PERFORMANCE (broader window since 24h empty):
-
-### LOSERS (watch list — already regime-gated):
-| Signal | Dir | WR | PnL | Trades | Regime Status |
-|--------|-----|-----|-----|--------|---------------|
-| mover+ | LONG | 25.0% | -$1.19 | 8 | EXTREME=0.0x (added Sep 23) |
-| pullback-entry- | SHORT | 40.9% | -$1.16 | 22 | NORMAL=0.0x (already blocked) |
-| pump-chain- | SHORT | 45.5% | -$0.93 | 33 | EXTREME/HIGH=0.0x (already blocked) |
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | EXTREME only, tiny sample |
-
-### WINNERS:
+## LOSERS (watch list — all already disabled)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 60.0% | +$0.70 | 5 | EXTREME=70%WR +$1.51 |
-| continuum-osc+ | LONG | 75.0% | -$0.05 | 4 | Tiny sample, borderline |
-| doji-bottom-long | LONG | 50.0% | -$0.04 | 4 | Breakeven |
+| ct_hot | LONG | 38.4% | -$4.07 | 99 | DISABLED (COIN_TRACKER_HOT_ENABLED=False) |
+| accel_300+,rs_s | LONG | 37.8% | -$2.91 | 275 | DISABLED (ACCEL_300_PLUS_ENABLED=False) |
+| ema300_dip_short | SHORT | 41.7% | -$1.48 | 24 | DISABLED (EMA300_DIP_SHORT_ENABLED=False) |
+| accel_300_v3_long | LONG | 43.6% | -$1.41 | 39 | DISABLED in EXTREME via volatility_gate_v2 |
+| accel_300+,rs_s,rs_s | LONG | 25.9% | -$1.21 | 27 | No regime data — combo signal |
+| trend_purity+ | LONG | 36.4% | -$0.90 | 11 | DISABLED (TREND_PURITY_ENABLED=False) |
+| mover+ | LONG | 57.1% | -$0.85 | 21 | DISABLED (MOVER_PLUS_ENABLED=False) |
+| slow_grind | LONG | 40.0% | -$0.80 | 15 | DISABLED (SLOW_GRIND_LONG_ENABLED=False) |
+| hl_copy_trader | SHORT | 16.7% | -$0.76 | 6 | DISABLED (HL_COPY_TRADING_ENABLED=False) |
 
----
+## WINNERS (30d, 5+ trades)
+| Signal | Dir | WR | PnL | Trades | Avg PnL | Status |
+|--------|-----|-----|-----|--------|---------|--------|
+| bb_bounce_v2_long | LONG | 74.0% | +$2.08 | 73 | +$0.029 | ✅ ENABLED — star performer |
+| open_skies | LONG | 63.2% | +$1.56 | 19 | +$0.082 | ⚠️ DISABLED — EXTREME-only candidate |
+| volume-breakout-long+ | LONG | 66.7% | +$1.46 | 18 | +$0.081 | ✅ ENABLED |
+| accel_300_v | SHORT | 52.4% | +$1.31 | 63 | +$0.021 | ✅ ENABLED |
+| pump_chain | LONG | 68.3% | +$1.11 | 41 | +$0.027 | ✅ ENABLED |
+| pump-chain+ | LONG | 41.3% | +$0.95 | 80 | +$0.012 | ✅ ENABLED |
+| rr-struct+ | LONG | 73.3% | +$0.59 | 15 | +$0.039 | ✅ ENABLED |
+| mover- | SHORT | 77.8% | +$0.52 | 9 | +$0.058 | ✅ ENABLED |
+| doji-bottom-long | LONG | 66.7% | +$0.40 | 6 | +$0.067 | ✅ ENABLED |
 
-## SIGNAL INVERSIONS: None found
-
-## ISSUES:
-1. **CRITICAL: System idle 38.7 hours** — hotset.json empty every cycle. Signals generated but all killed by filters. Root cause: current market conditions produce signals that fail RR-engine (low R:R), RSI floor (oversold SHORTs), and Hall of Shame (low WR tokens).
-2. **Starvation is a filter tuning issue, not a signal quality issue** — 1018 signals in 24h proves signal generation works. The funnel is too tight for current conditions.
-3. **No regime changes needed** — existing blocks (Mover EXTREME=0.0, Pullback NORMAL=0.0, Pump_Flow EXTREME/HIGH=0.0) are correctly targeting losing regimes.
-
----
-
-## Daily Summary:
-| Date | Trades | PnL | WR |
-|------|--------|-----|-----|
-| Sep 19 | 9 | +$0.25 | 55.6% |
-| Sep 20 | 27 | +$2.28 | 66.7% |
-| Sep 21 | 28 | -$1.12 | 25.0% |
-| Sep 22 | 24 | -$2.21 | 29.2% |
-| Sep 23 | 32 | -$0.20 | 46.9% |
-| Sep 24 | 31 | -$2.58 | 32.3% |
-| Sep 25 | 1 | +$0.05 | 100% |
-| Sep 26 | 0 | $0.00 | — |
+## ISSUES
+- **No trades in 48h** — pipeline running, 0 positions open. Likely market conditions not meeting signal thresholds.
+- **No signal inversions found** (checked 24h).
+- **bb_bounce_short** has 77.8% WR in EXTREME but negative PnL overall — strong candidate for EXTREME-only re-enable.
+- **open_skies** has 77.8% WR in EXTREME, +$1.83 — strong candidate for EXTREME-only re-enable. Currently fully disabled.
+- **mtp_zscore_,rs_r SHORT** — 58 trades, 50% WR, -$0.75. All-time breakeven. No regime data (None). Watching.

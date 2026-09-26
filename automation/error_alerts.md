@@ -134,3 +134,8 @@
 - **WARN**: Disk at 82% (91G/118G) — monitor for cleanup if approaching 85%
 - **INFO**: decider_run failing (rc=1) every pipeline cycle — expected, ai_decider.py is defunct per AGENTS.md
 - **WARN**: 7 services in failed state: 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, weather-station-api
+
+## Error Alerts — 2026-09-26 22:46 UTC
+- **WARN** (1): `disk_82pct` — Disk at 82% (92G/118G)
+- **INFO**: 0 signals above 50% confidence — market quiet
+- **INFO**: coin_tracker_data.json not found in /var/www/hermes/data/

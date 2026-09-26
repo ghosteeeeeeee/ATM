@@ -1,191 +1,139 @@
 {
-    "timestamp": "2026-09-28T05:00:00Z",
-    "agent": "brain_auditor",
-    "session_brain_stats": {
-        "queries_run": 4,
-        "top_insights": [
-            "ATR_SL widening UNTESTED 85h+ — all recent fixes need market activity",
-            "SIGNAL DIVERSITY CRITICAL — only pump-chain+ LONG and volume-breakout-long+ carry system",
-            "HIGH regime worst performer 14d: 140T 43.6%WR -$2.67",
-            "SHORT NULL RSI edge dead — 0 trades/7d (was 130T 56.9%WR +$2.08/14d)",
-            "LONG RSI 60-70 killing field: 50T 34.0%WR -$2.00/14d — ceiling=70 blocks above 70 but 60-70 still bleeds"
-        ]
-    },
-    "trade_summary": {
-        "24h": "0T, system idle 85h+ (last trade Sep 25 02:26 UTC)",
-        "7d": "148T 40.5%WR -$3.75 (all pre-fix legacy trades)",
-        "14d": "356T 45.5%WR -$3.91",
-        "open": 0,
-        "last_trade": "2026-09-25 02:26 UTC"
-    },
-    "regime_summary_7d": {
-        "EXTREME": "83T 39.8%WR -$1.75 (ATR_SL: 58T 39.7%WR -$2.03)",
-        "HIGH": "48T 37.5%WR -$1.41 (ATR_SL: 29T 44.8%WR -$1.00)",
-        "NORMAL": "15T 46.7%WR -$0.62 (ATR_SL: 10T 40.0%WR -$0.71)",
-        "FLAT": "2T 100%WR +$0.03"
-    },
-    "regime_summary_14d": {
-        "EXTREME": "136T 47.1%WR +$0.12 (break-even)",
-        "HIGH": "140T 43.6%WR -$2.67 (worst — 39% of all trades)",
-        "NORMAL": "77T 45.5%WR -$1.39",
-        "FLAT": "2T 100%WR +$0.03"
-    },
-    "signal_quality_14d": {
-        "pump-chain+_LONG": "67T 43.3%WR +$1.34 (workhorse, ATR_SL 58T 43.1%WR +$1.07)",
-        "volume-breakout-long+": "18T 66.7%WR +$1.46 (gem, ATR_SL 17T 64.7%WR +$1.15)",
-        "bb-bounce-v2-long+": "12T 41.7%WR -$0.26 (cold streak, 30d 74%WR +$2.08)",
-        "pullback-entry-_SHORT": "41T 48.8%WR -$0.35/14d HIGH (pre-disable)",
-        "pump-chain-_SHORT": "33T 45.5%WR -$0.93/7d (disabled Sep 25)"
-    },
-    "atr_sl_analysis": {
-        "status": "WIDENING DEPLOYED BUT UNTESTED (85h+)",
-        "pre_fix_14d": "242T 45.5%WR -$4.23 avg_pct=-0.31%",
-        "post_fix_trades": 0,
-        "pump_chain_extreme": "34T 47.1%WR +$1.18 avg_pct=+2.21% (R:R works — winners ride momentum)",
-        "pump_chain_high": "20T 40.0%WR +$0.17 avg_pct=+0.55%",
-        "pump_chain_normal": "4T 25.0%WR -$0.28 avg_pct=-1.55% (worst regime for pump-chain)",
-        "volume_breakout_extreme": "9T 66.7%WR +$1.20 (best ATR_SL signal)",
-        "verdict": "Widening may help EXTREME (avg_win $0.26 vs avg_loss $0.17 already positive R:R). Cannot measure until trades happen."
-    },
-    "rsi_bands_14d": {
-        "SHORT": {
-            "below_35": "42T 40.5%WR -$1.19 (blocked by floor=50)",
-            "35_50": "46T 43.5%WR -$1.82 (blocked by floor=50)",
-            "50_65": "64T 48.4%WR -$0.52 (sweet spot)",
-            "65_70": "4T 100%WR +$0.47 (unlocked by ceiling=70)",
-            "above_70": "11T 27.3%WR -$0.13"
-        },
-        "LONG": {
-            "below_30": "10T 0%WR -$1.45 (blocked by floor=30)",
-            "30_40": "16T 37.5%WR -$1.11",
-            "40_50": "19T 68.4%WR +$1.45 (sweet spot, SWEET_SPOT_BOOST active)",
-            "50_60": "43T 65.1%WR +$2.22 (best band)",
-            "60_70": "50T 34.0%WR -$2.00 (KILLING FIELD — ceiling=70 blocks above, 60-70 bleeds)",
-            "above_70": "50T 46.0%WR +$0.17 (blocked by ceiling=70)"
-        }
-    },
-    "losing_autopsy": {
-        "24h": "0 losers (system idle 85h+)",
-        "7d_top_losers": [
-            "mover+ LONG: 8T 25%WR -$1.19 (legacy pre-kill, aging out)",
-            "pullback-entry- SHORT: 22T 40.9%WR -$1.16 (pre-disable, ATR_SL 100%)",
-            "pump-chain- SHORT: 33T 45.5%WR -$0.93 (disabled Sep 25)",
-            "pump-chain+ LONG: 35T 34.3%WR -$0.39 (cold streak, 14d still +$1.34)"
-        ],
-        "root_cause": "All7d losses are pre-fix legacy trades aging out. 0 post-fix losers. System filters working correctly — no bad entries since fixes."
-    },
-    "drift_findings": [
-        {
-            "item": "ATR_SL widening (1.8% + EXTREME 1.2x)",
-            "status": "DEPLOYED Sep25 12:30 — UNTESTED 85h+",
-            "impact": "Cannot measure. Needs market activity.",
-            "action": "MONITOR — first 10 trades after restart will tell us"
-        },
-        {
-            "item": "ATR_SL_MIN_EXTREME = 1.5%",
-            "status": "DEPLOYED Sep 27 — UNTESTED",
-            "impact": "Cannot measure. 0 trades since deploy.",
-            "action": "MONITOR — should help EXTREME pump-chain+ small winners"
-        },
-        {
-            "item": "REGIME_CONF_HIGH_MULT = 0.50",
-            "status": "DEPLOYED Sep 26 — UNTESTED",
-            "impact": "48T/7d HIGH 37.5%WR -$1.41 (all pre-fix). Should block most HIGH trades now.",
-            "action": "MONITOR — 0.50x should block majority of HIGH entries"
-        },
-        {
-            "item": "SHORT NULL RSI edge",
-            "status": "DEAD — 0 trades/7d (was 130T 56.9%WR +$2.08/14d)",
-            "impact": "Market regime shifted. Detection-time fallback not firing.",
-            "action": "INVESTIGATE — why did detection-time RSI fallback stop working?"
-        },
-        {
-            "item": "LONG RSI 60-70 bleeding band",
-            "status": "50T 34.0%WR -$2.00/14d — ceiling=70 blocks above 70 but 60-70 still loses",
-            "impact": "$2.00/14d bleed from60-70 band",
-            "action": "CONSIDER raising LONG_RSI_CEILING to 65 (blocks 65-70 losing sub-band)"
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "SIGNAL DIVERSITY — only 2 signal types carry system",
-            "sessions_discussed": "10+",
-            "status": "UNRESOLVED — need new NEUTRAL signal",
-            "impact": "System vulnerable to regime shifts. When pump-chain+ cold streaks, no backup."
-        },
-        {
-            "problem": "HIGH regime worst performer — 140T/14d -$2.67",
-            "sessions_discussed": "8+",
-            "status": "PARTIALLY ADDRESSED — REGIME_CONF_HIGH_MULT=0.50 deployed",
-            "impact": "39% of all trades. Need to verify 0.50x blocks enough."
-        },
-        {
-            "problem": "ATR_SL hit rate CRITICAL —65%+ 7d",
-            "sessions_discussed": "15+",
-            "status": "FIXES DEPLOYED BUT UNTESTED — widening + EXTREME min",
-            "impact": "Cannot measure until trades happen."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "SHORT NULL RSI confidence boost +15pt",
-            "suggested_sessions": "6+",
-            "status": "NEVER IMPLEMENTED",
-            "estimated_impact": "+$0.20-0.40/7d",
-            "blocker": "Edge dead (0 trades/7d) — may not be worth implementing now"
-        },
-        {
-            "item": "NEW NEUTRAL signal for diversity",
-            "suggested_sessions": "10+",
-            "status": "NEVER BUILT",
-            "estimated_impact": "+$0.50-1.00/7d",
-            "blocker": "Needs signal development cycle"
-        },
-        {
-            "item": "HIGH MIN_EXEC_CONFIDENCE=65",
-            "suggested_sessions": "3+",
-            "status": "NEVER IMPLEMENTED",
-            "estimated_impact": "+$0.50-1.00/7d",
-            "blocker": "REGIME_CONF_HIGH_MULT=0.50 may already cover this"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-28T05:00:00Z",
-            "idea": "LONG_RSI_CEILING 70→65 — block the 65-70 losing sub-band",
-            "rationale": "14d: LONG RSI 65-70 = 5T 20%WR -$0.63. RSI 60-65 = 16T 43.8%WR +$0.05 (break-even). Raising ceiling from 70 to 65 blocks the losing sub-band while preserving the break-even band. Low risk — only 5 trades blocked, all losers.",
-            "expected_impact": "+$0.63/14d = +$0.32/7d",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "impact_on_winners": "Would block 5 losers ($0.63) and 0 winners (60-65 band is +$0.05 break-even). Net positive."
-        },
-        {
-            "date": "2026-09-28T05:00:00Z",
-            "idea": "ATR_SL widening eval criteria — define success/failure before trades arrive",
-            "rationale": "ATR_SL widening deployed Sep25, MIN_EXTREME deployed Sep27, both untested. Define criteria NOW so we don't retroactively rationalize: if first 20 post-fix ATR_SL trades have >50% WR in EXTREME, widening works. If <45% WR, consider 2.0% cap for EXTREME.",
-            "expected_impact": "Prevents drift — ensures we actually evaluate the fix",
-            "category": "system integrity",
-            "status": "suggested",
-            "risk": "none (defines evaluation, not a change)"
-        },
-        {
-            "date": "2026-09-28T05:00:00Z",
-            "idea": "Investigate SHORT NULL RSI detection-time fallback death",
-            "rationale": "14d: SHORT NULL RSI = 66T 56.1%WR +$1.35 (BEST edge). 7d: 0 trades. Detection-time fallback stopped firing. Why? Either: (1) all SHORT signals now have live RSI available (more 1m candles), (2) RSI floor=50 blocks NULL entries, or (3) signal generation changed. If (1), edge is gone naturally. If (2) or (3), may be recoverable.",
-            "expected_impact": "+$0.20-0.40/7d if recoverable",
-            "category": "edge recovery",
-            "status": "suggested",
-            "risk": "low (investigation only)"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "MONITOR: ATR_SL widening impact — first 10 post-fix trades will tell us",
-        "MONITOR: ATR_SL_MIN_EXTREME=1.5% impact on pump-chain+ EXTREME small winners",
-        "MONITOR: REGIME_CONF_HIGH_MULT=0.50 blockingHIGH trades",
-        "INVESTIGATE: SHORT NULL RSI detection-time fallback death",
-        "CONSIDER: LONG_RSI_CEILING 70→65 (blocks 5 losers, 0 winners, +$0.32/7d)",
-        "BUILD: New NEUTRAL signal for diversity (medium-term)"
+  "timestamp": "2026-09-26T23:35:17.782920+00:00",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "key_insights": [
+      "ATR_SL widening (1.8% MAX + EXTREME 1.2x) deployed Sep 25 — UNTESTED 85h+ (0 trades)",
+      "SHORT NULL RSI edge DEAD — 0 trades/14d (was 66T 56.1%WR +$1.35). Metadata fix killed the detection-time fallback path.",
+      "Signal diversity CRITICAL — only pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) profitable 14d",
+      "REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26 — UNTESTED (0 HIGH trades since)",
+      "volume_spike fix deployed Sep 25 — UNTESTED (0 trades since)",
+      "HIGH regime 140T 43.6%WR -$2.67/14d — 39% of ALL trades, worst regime. conf>=65 = 139T -$2.50"
     ]
+  },
+  "trade_summary_24h": {
+    "trades": 0,
+    "system_idle_hours": 85,
+    "last_trade": "Sep 25 02:26 UTC",
+    "open_positions": 0
+  },
+  "trade_summary_7d": {
+    "trades": 143,
+    "win_rate": 40.6,
+    "pnl": -3.83,
+    "long": "72T 38.9%WR -$1.44",
+    "short": "71T 42.3%WR -$2.34",
+    "atr_sl_hit_rate": "66.7% NORMAL, 68.8% EXTREME, 58.7% HIGH",
+    "regime": "EXTREME 80T 40.0%WR -$1.69, HIGH 46T 37.0%WR -$1.50, NORMAL 15T 46.7%WR -$0.62"
+  },
+  "trade_summary_14d": {
+    "trades": 356,
+    "win_rate": 45.5,
+    "pnl": -3.91,
+    "long": "189T 46.0%WR -$0.72",
+    "short": "167T 44.9%WR -$3.19",
+    "regime": "EXTREME 136T 47.1%WR +$0.12, HIGH 140T 43.6%WR -$2.67, NORMAL 77T 45.5%WR -$1.39",
+    "atr_sl": "242T 45.5%WR -$4.23 (dominates). Winners +0.16%, losers -0.17%. R:R 0.96:1",
+    "profit_trail": "54T 63.0%WR +$2.33 (best exit)"
+  },
+  "drift_findings": [
+    {
+      "finding": "SHORT NULL RSI edge completely dead",
+      "detail": "0 SHORT trades with null rsi_14 in14d. Metadata fix (Sep 16) now records RSI for all trades, eliminating the detection-time fallback path that produced 56.1% WR entries. The edge was an artifact of incomplete metadata.",
+      "impact": "Lost +$1.35/14d profitable edge. No fix possible — RSI is now always recorded.",
+      "status": "DEAD — no action needed"
+    },
+    {
+      "finding": "ATR_SL widening UNTESTED 85h+",
+      "detail": "ATR_SL_MAX=1.8% + EXTREME 1.2x deployed Sep 25 12:30. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. 0 trades since. All ATR_SL data is pre-fix.",
+      "impact": "Cannot evaluate +$0.50-1.00/7d expected impact. System idle.",
+      "status": "MONITOR — needs market activity"
+    },
+    {
+      "finding": "REGIME_CONF_HIGH_MULT=0.50 UNTESTED",
+      "detail": "Deployed Sep 26 08:30. 0 HIGH regime trades since. HIGH was 39% of all 14d trades (-$2.67).",
+      "impact": "Cannot evaluate +$1.25-1.50/7d expected impact.",
+      "status": "MONITOR — needs market activity"
+    },
+    {
+      "finding": "volume_spike fix UNTESTED",
+      "detail": "Fixed Sep 25 05:00. Chase filter now sees volume quality. 0 trades since.",
+      "impact": "Cannot evaluate +$0.30-0.80/7d expected impact.",
+      "status": "MONITOR — needs market activity"
+    },
+    {
+      "finding": "LONG_RSI_CEILING=70 UNTESTED",
+      "detail": "Deployed Sep 26 ~15:35. Blocks LONG RSI>=70. pump-chain+ RSI 60-70 = 15T 40%WR -$0.38/14d (bleeding band).",
+      "impact": "Cannot evaluate. No trades since deploy.",
+      "status": "MONITOR — needs market activity"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "Signal diversity CRITICAL",
+      "detail": "Only 2 signal types profitable: pump-chain+ LONG (+$1.24/14d) and volume-breakout-long+ (+$1.46/14d). 49 signal types active but only 2 net positive. System fragile — any degradation in either kills PnL.",
+      "sessions_discussed": "10+ (every brain_auditor run since Sep 16)",
+      "status": "OPEN — needs new signals for NEUTRAL"
+    },
+    {
+      "problem": "ATR_SL hit rate CRITICAL",
+      "detail": "68.8% EXTREME, 66.7% NORMAL, 58.7% HIGH (7d). All pre-fix trades. Widening deployed but untested.",
+      "sessions_discussed": "15+ (every brain_auditor run since Sep 14)",
+      "status": "MONITOR — awaiting test results"
+    },
+    {
+      "problem": "SHORT side dominates losses",
+      "detail": "SHORT -$3.19/14d (82% of total losses) vs LONG -$0.72/14d. SHORT_RSI_FLOOR=50 blocks oversold but remaining SHORT entries still lose.",
+      "sessions_discussed": "8+ (since Sep 23)",
+      "status": "MONITOR — SHORT disabled for most signals"
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "New NEUTRAL regime signal",
+      "detail": "LONG_NEUTRAL_BLOCK blocks LONG in NEUTRAL. Only pump-chain+ and volume-breakout-long+ pass confluence. Need diversity.",
+      "priority": "HIGH",
+      "sessions_discussed": "10+",
+      "status": "PLANNED — no implementation"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-26T23:35:17.782936+00:00",
+      "idea": "Define ATR_SL widening success criteria BEFORE market resumes",
+      "rationale": "All ATR_SL data is pre-fix. When trades resume, we need clear pass/fail criteria: (1) ATR_SL hit rate must drop below 55% within 30 trades, (2) EXTREME R:R must improve from 1.18:1 to >1.5:1, (3) avg ATR_SL loss must shrink from -$0.17 to <-$0.12. If criteria not met by 50 trades, consider 2.0% cap for EXTREME.",
+      "expected_impact": "Prevents indefinite monitoring — clear go/no-go by 50 trades",
+      "category": "risk management",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-26T23:35:17.782938+00:00",
+      "idea": "HIGH regime MIN_EXEC_CONFIDENCE=70",
+      "rationale": "HIGH regime 14d: 140T 43.6%WR -$2.67. conf>=65 = 139T -$2.50 (ALL HIGH trades). REGIME_CONF_HIGH_MULT=0.50 reduces confidence 50% but 139/140 trades still have conf>=65. Raising MIN_EXEC_CONFIDENCE to 70 for HIGH would block ~60% of HIGH trades while preserving the edge in EXTREME/NORMAL.",
+      "expected_impact": "+$0.50-1.00/7d from reducing HIGH noise",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "medium"
+    },
+    {
+      "date": "2026-09-26T23:35:17.782940+00:00",
+      "idea": "pump-chain+ EXTREME confidence floor 70%",
+      "rationale": "pump-chain+ LONG EXTREME 14d: 41T 48.8%WR +$1.29. But 82.9% ATR_SL hit rate. Winners avg +7.03%, losers avg -5.37%. Higher confidence = fewer but better entries. Would block ~30% of EXTREME trades while preserving the R:R edge.",
+      "expected_impact": "+$0.10-0.30/7d from improving entry quality",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "MONITOR: ATR_SL widening eval — needs market activity. Success criteria: hit rate <55% by 50 trades, R:R >1.5:1 EXTREME",
+    "MONITOR: REGIME_CONF_HIGH_MULT=0.50 — needs HIGH regime trades to measure",
+    "MONITOR: volume_spike fix — needs trades to verify chase filter now sees volume",
+    "MONITOR: LONG_RSI_CEILING=70 — needs LONG entries with RSI 60-70 to block",
+    "SUGGEST: HIGH MIN_EXEC_CONFIDENCE=70 — blocks 60% of losing HIGH trades",
+    "SUGGEST: pump-chain+ EXTREME confidence floor 70% — improves entry quality",
+    "DEVELOP: New NEUTRAL signal for diversity — system fragile with 2 signals"
+  ]
 }
