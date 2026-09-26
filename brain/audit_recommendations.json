@@ -1,131 +1,137 @@
 {
-    "timestamp": "2026-09-26T09:15:00Z",
+    "timestamp": "2026-09-26T22:00:00Z",
     "session_brain_stats": {
-        "queries_run": 3,
-        "top_insights": [
-            "Signal decay discussion — signals with high winrate need preservation as market regime changes",
-            "Trend following signal idea — requested but not built",
-            "Short bleeding analysis — SHORT in EXTREME was +$1.45/7d at one point, now degraded"
-        ]
+        "query_count": 3,
+        "top_topics": ["ATR_SL hit rate EXTREME", "SHORT RSI floor/ceiling", "HIGH regime dead zone", "signal diversity", "CL-T1 disable", "volume_spike metadata fix"],
+        "unimplemented_ideas_found": ["grind-breakout signal", "ema300-dip-short signal", "SHORT NULL RSI confidence boost", "EXTREME ATR_SL_MIN 1.5%"]
     },
     "trade_summary_24h": {
         "trades": 0,
-        "pnl": 0,
-        "system_idle_hours": 30,
+        "pnl": 0.0,
+        "system_idle_hours": 67,
         "last_trade": "2026-09-25 02:26 UTC"
     },
     "trade_summary_7d": {
-        "trades": 171,
-        "wr": 44.2,
-        "pnl": -2.03,
-        "long_pnl": 1.81,
-        "short_pnl": -3.84,
-        "atr_sl_hit_rate": "45.6% (109/239)",
-        "extreme_atr_sl": "45.8% (65/142)",
-        "cl_t1_trades_post_disable": 0
+        "trades": 158,
+        "win_rate": 42.4,
+        "pnl": -3.24
+    },
+    "trade_summary_14d": {
+        "trades": 364,
+        "win_rate": 45.9,
+        "pnl": -4.08
     },
     "drift_findings": [
         {
-            "issue": "PUMP_CHAIN_LONG_RSI_MAX=70 NEVER ENFORCED",
-            "severity": "HIGH",
-            "detail": "Constant defined in hermes_constants.py:1258 but zero references in signal_compactor.py or decider_run.py. 15 pump-chain+ LONG trades entered at RSI 60-70 (40%WR -$0.38/14d) despite the RSI_MAX=70 setting. The brain_auditor set this on Sep 24 but the enforcement code was never written.",
-            "impact": "-$0.38/14d from pump-chain+ alone. All 46 non-volume-breakout-long+ trades in RSI 60-70 lost $-2.07/14d."
-        },
-        {
-            "issue": "SHORT NULL RSI edge DEAD",
+            "finding": "SHORT RSI FLOOR=50 POST-FIX LEAK — 2 trades executed after Sep 24 13:50 with RSI<50",
+            "detail": "ATOM pump-chain- RSI=47.1 and BTC pump-chain- RSI=41.7. Both $0.03 wins. Likely STANDALONE_BYPASS signals bypassing hard block in signal_compactor.py. Detection-time RSI fallback may not propagate to hotset.",
             "severity": "MEDIUM",
-            "detail": "71T 60.6%WR +$3.60/30d but 0T/14d and 0T/7d. Detection-time RSI fallback stopped producing SHORT signals. Edge was real but market regime shifted.",
-            "impact": "Lost ~$0.25/7d of edge. No action possible — signal stopped firing naturally."
+            "status": "OPEN — needs investigation",
+            "impact": "Low (both trades won) but indicates system not blocking as intended"
         },
         {
-            "issue": "volume_spike fix UNTESTED",
+            "finding": "LONG RSI 60-70 BAND BLEEDING — 52T 36.5%WR -$1.94/14d",
+            "detail": "LONG_RSI_CEILING=70 just deployed (Sep 26). Blocks RSI>70. But RSI 60-70 is the worst LONG band — 36.5% WR. Most losses are atr_sl_hit across EXTREME/HIGH/NORMAL. Entry quality issue, not just overbought chasing.",
             "severity": "MEDIUM",
-            "detail": "Deployed Sep 25 05:00 UTC. 0 trades since deployment (30h+ idle). Code verified working — check_crash() returns volume_spike=0.25. Cannot measure impact.",
-            "impact": "Expected +$0.30-0.80/7d but unverifiable until market activity resumes."
+            "status": "NEW — LONG_RSI_CEILING=70 blocks RSI>70 but RSI 60-70 still bleeds",
+            "impact": "-$1.94/14d from this band alone"
         },
         {
-            "issue": "ATR_SL widening UNTESTED",
+            "finding": "SHORT NULL RSI EDGE DEAD — 0 trades/7d (was 130T 56.9%WR +$2.08/14d)",
+            "detail": "Detection-time RSI fallback stopped firing. 14d still shows 172 trades with NULL RSI at 45.3%WR -$3.26 but these are all pre-fix legacy. No new SHORT NULL RSI trades in 7d. Edge evaporated — possibly market regime shift.",
+            "severity": "LOW",
+            "status": "DEAD — monitoring only",
+            "impact": "Lost +$2.08/14d edge (now $0.00/7d)"
+        },
+        {
+            "finding": "HIGH regime 14d: 143T 43.4%WR -$3.11 — 39% of ALL trades, NO consistently profitable signals",
+            "detail": "Only grind-trend+ (+$0.35) and pump-chain+ (+$0.29) profitable in HIGH. Everything else loses. REGIME_CONF_HIGH_MULT just dropped to 0.50 — should significantly reduce entries.",
             "severity": "HIGH",
-            "detail": "ATR_SL_MAX 1.5→1.8% + EXTREME 1.2x multiplier deployed Sep 25 12:30 UTC. 0 trades in 30h+ since. EXTREME ATR_SL 14d: 101T 46.5%WR -$0.46. pump-chain+ EXTREME ATR_SL: 34T 47.1%WR +$0.035 (R:R=1.56:1 — already improving). Eval scheduled Sep 27.",
-            "impact": "Cannot verify. Widening should reduce hit rate from 45.8% toward 40% target."
+            "status": "FIX DEPLOYED — REGIME_CONF_HIGH_MULT=0.50 (today ~08:30 UTC)",
+            "impact": "Expected +$1.50-2.00/7d from reducing HIGH entries"
+        },
+        {
+            "finding": "ATR_SL widening (1.5→1.8% + EXTREME 1.2x) completely untested — 0 trades in 67h since deploy",
+            "detail": "Deployed Sep 25 12:30. EXTREME ATR_SL hit rate 70.5% 7d — CRITICAL. Widening should reduce premature exits. Cannot evaluate until trades resume.",
+            "severity": "HIGH",
+            "status": "WAITING — eval Sep 27",
+            "impact": "Expected +$0.50-1.00/7d if effective"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "LONG RSI 60-70 KILLING FIELD",
-            "occurrences": "14d data, consistent across sessions",
-            "detail": "53T 37.7%WR -$1.79/14d. Every signal EXCEPT volume-breakout-long+ (57.1%WR +$0.28) loses here. pump-chain+ 15T 40%WR -$0.38, bb-bounce-v2-long+ 6T 33.3%WR -$0.30, grind-trend+ 7T 28.6%WR -$0.06. Excluding volume-breakout-long+: 46T 34.8%WR -$2.07.",
-            "root_cause": "LONG RSI 60-70 = overbought without strong momentum. LONG entries here chase moves that are already extended. pump-chain+ has PUMP_CHAIN_LONG_RSI_MAX=70 but it's never enforced (see drift)."
+            "problem": "ATR_SL dominates exits — 70.5% of EXTREME exits are atr_sl_hit",
+            "sessions_mentioned": "15+",
+            "root_cause": "SL too tight for EXTREME volatility — avg win +$0.20 vs avg loss -$0.20 = barely 1:1 R:R",
+            "status": "WIDENING DEPLOYED (1.8% + EXTREME 1.2x) — untested"
         },
         {
-            "problem": "HIGH REGIME DEAD ZONE",
-            "occurrences": "Consistent across 7d and 14d",
-            "detail": "7d: 58T 41.4%WR -$1.13. 14d: 150T 44.0%WR -$3.14. NO profitable signal type in HIGH. Every signal loses. REGIME_CONF_HIGH_MULT=0.85 deployed Sep 26 but 0 trades since — untested.",
-            "root_cause": "HIGH volatility = choppy, whipsaw-prone. Signals fire on momentum that reverses. No signal has edge in HIGH."
+            "problem": "Signal diversity CRITICAL — only pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) profitable",
+            "sessions_mentioned": "10+",
+            "root_cause": "Short side killed/bleeding, HIGH regime dead zone, many signals disabled",
+            "status": "NEW SIGNALS NEEDED — grind-breakout, ema300-dip-short discussed but not built"
         },
         {
-            "problem": "Signal diversity CRITICAL",
-            "occurrences": "Multiple sessions since Sep 16",
-            "detail": "Only pump-chain+ LONG (+$1.24/7d) and volume-breakout-long+ (+$0.70/7d) are profitable. System is 2-signal fragile. 6+ signal types active but only 2 pass NEUTRAL confluence.",
-            "root_cause": "Most signals were designed for trending markets. NEUTRAL regime needs mean-reversion or range-bound signals."
+            "problem": "SHORT side 89% of7d losses (legacy)",
+            "sessions_mentioned": "8+",
+            "root_cause": "Pre-fix trades (pullback-entry- SHORT, pump-chain- SHORT) aging out",
+            "status": "RESOLVING — post-fix SHORT = 2T +$0.08"
         }
     ],
     "missing_implementations": [
         {
-            "item": "PUMP_CHAIN_LONG_RSI_MAX enforcement",
-            "priority": "HIGH",
-            "detail": "Constant exists (hermes_constants.py:1258) but no code enforces it. Add RSI_MAX check in signal_compactor.py for pump-chain+ LONG, same pattern as SHORT_RSI_FLOOR.",
-            "expected_impact": "+$0.38/14d from blocking pump-chain+ RSI 60-70 entries"
+            "idea": "grind-breakout signal (discussed in session brain, spec exists)",
+            "status": "SPEC ONLY — never built",
+            "potential": "NEUTRAL regime diversity (current gap: only 2 profitable LONG signals pass confluence)"
         },
         {
-            "item": "LONG_RSI_CEILING hard block",
-            "priority": "MEDIUM",
-            "detail": "Currently returns AMBIGUOUS (20pt penalty) not SKIP (hard block). The 60-70 band bleeds $-1.79/14d. Lowering from 80→70 and changing to SKIP would save ~$1.73/14d net.",
-            "expected_impact": "+$1.73/14d (saves $1.79 from 60-70, loses $0.06 from 70+)"
+            "idea": "ema300-dip-short signal",
+            "status": "SPEC ONLY — never built",
+            "potential": "SHORT diversification (currently all SHORT signals disabled or bleeding)"
         },
         {
-            "item": "New NEUTRAL signal",
-            "priority": "HIGH",
-            "detail": "Multiple sessions discussed trend-following, range-bound, and mean-reversion signals for NEUTRAL. None built. System needs diversity.",
-            "expected_impact": "Reduced fragility, +$0.50-1.00/7d if a new signal achieves 55%+ WR"
+            "idea": "SHORT NULL RSI confidence boost +15pt",
+            "status": "SUGGESTED 5+ times — never implemented",
+            "potential": "EDGE DEAD — 0 trades/7d. Monitor only."
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-26T09:15:00Z",
-            "idea": "Fix PUMP_CHAIN_LONG_RSI_MAX=70 enforcement + lower LONG_RSI_CEILING 80→70 as hard block",
-            "rationale": "The data is unambiguous: LONG RSI 60-70 is a killing field (53T 37.7%WR -$1.79/14d). pump-chain+ has its own RSI_MAX=70 but it's never enforced — 15 trades entered at RSI 60-70 when they should have been blocked. Additionally, LONG_RSI_CEILING=80 returns AMBIGUOUS (soft penalty) instead of SKIP (hard block). Two fixes: (1) Add PUMP_CHAIN_LONG_RSI_MAX enforcement in signal_compactor.py. (2) Lower LONG_RSI_CEILING 80→70 and change to hard block. Combined expected: +$1.73-2.11/14d.",
-            "expected_impact": "+$1.73-2.11/14d = +$0.87-1.06/7d",
+            "date": "2026-09-26T22:00:00Z",
+            "idea": "LONG RSI 60-70 entry quality filter — add volume or momentum confirmation",
+            "rationale": "52T 36.5%WR -$1.94/14d. These are entries into extended moves without sufficient volume/momentum confirmation. Winners in this band have higher speed_percentile and volume_spike values.",
+            "expected_impact": "+$0.50-1.00/14d by filtering low-quality LONG entries at RSI 60-70",
             "category": "entry sniper",
             "status": "suggested",
-            "risk": "low — blocks losing band, preserves winning 50-60 band"
+            "risk": "medium — needs backtest against winners in band"
         },
         {
-            "date": "2026-09-26T09:15:00Z",
-            "idea": "SHORT RSI 40-50 hard block — same pattern as LONG RSI 60-70",
-            "rationale": "SHORT RSI 40-50 = 37T 40.5%WR -$2.20/14d (second worst band after <30 which is already blocked by SHORT_RSI_FLOOR=50). Adding SHORT_RSI_CEILING=45 (block SHORT when RSI < 45) would save ~$2.20/14d. But SHORT_RSI_FLOOR=50 already covers RSI <50. Wait — the FLOOR blocks RSI <50, so RSI 40-50 SHOULD be blocked. If trades are still entering at RSI 40-50, there's another enforcement gap.",
-            "expected_impact": "Monitor — if SHORT_RSI_FLOOR=50 is working, this band should be empty. Need to verify.",
-            "category": "entry sniper",
-            "status": "needs_verification",
-            "risk": "low"
+            "date": "2026-09-26T22:00:00Z",
+            "idea": "Build grind-breakout signal for NEUTRAL regime",
+            "rationale": "10+ sessions flagged signal diversity as CRITICAL. Only pump-chain+ and volume-breakout-long+ profitable. NEUTRAL regime has 0 profitable signal types passing confluence. grind-breakout concept discussed in session brain — uses breakout + trend confirmation, different from existing signals.",
+            "expected_impact": "+$0.30-0.80/7d from new NEUTRAL-eligible signal",
+            "category": "new signal",
+            "status": "suggested — needs signal-lab workflow",
+            "risk": "low — additive, no existing trades affected"
         },
         {
-            "date": "2026-09-26T09:15:00Z",
-            "idea": "bb-bounce-v2-long+ RSI sweet spot boost",
-            "rationale": "bb-bounce-v2-long+ is our best standalone signal (73T 74%WR +$2.08/30d) but 7d cold streak (12T 41.7%WR -$0.26). In RSI 50-60 it's 4T 75%WR +$0.08. In RSI 60-70 it's 6T 33.3%WR -$0.30. Adding a bb-bounce-v2-long+ specific RSI_MAX=65 would block the losing band while preserving the winning 50-60 band.",
-            "expected_impact": "+$0.30/14d from blocking RSI 60-70 entries",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low — 6 trades blocked, 4 are losers"
+            "date": "2026-09-26T22:00:00Z",
+            "idea": "Investigate pump-chain- SHORT EXTREME R:R — winners ride momentum, losers stopped at 1.3%",
+            "rationale": "7d pump-chain- SHORT EXTREME: 26T 46.2%WR -$0.39. ATR_SL hit rate 63.6%. But winners avg +8.54%, losers avg -1.11%. The edge exists — winners are BIG. Problem is SL too tight. ATR_SL widening (1.8% + EXTREME 1.2x = up to 2.16% SL) should help. Monitor Sep 27.",
+            "expected_impact": "+$0.20-0.50/7d from ATR_SL widening allowing trades to breathe",
+            "category": "exit optimization",
+            "status": "monitoring — ATR_SL widening deployed Sep 25",
+            "risk": "low — widening already deployed, just waiting for trades"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "1. FIX: Add PUMP_CHAIN_LONG_RSI_MAX=70 enforcement in signal_compactor.py (drift bug)",
-        "2. FIX: Lower LONG_RSI_CEILING 80→70 + change AMBIGUOUS→SKIP in decider_run.py (saves +$1.73/14d)",
-        "3. VERIFY: Is SHORT_RSI_FLOOR=50 actually blocking RSI 40-50 SHORT entries? (37T -$2.20/14d bleeding band)",
-        "4. MONITOR: ATR_SL widening eval Sep 27 (0 trades in 30h since deploy)",
-        "5. MONITOR: volume_spike fix (0 trades in 30h since deploy)",
-        "6. DEVELOP: New NEUTRAL signal for diversity (system is 2-signal fragile)"
+        "MONITOR: ATR_SL widening eval Sep 27 (0 trades in 67h since deploy)",
+        "MONITOR: REGIME_CONF_HIGH_MULT=0.50 impact (deployed today ~08:30 UTC)",
+        "MONITOR: LONG_RSI_CEILING=70 impact (deployed today ~02:00 UTC)",
+        "MONITOR: SHORT_RSI_CEILING=70 impact (deployed today ~02:00 UTC)",
+        "INVESTIGATE: SHORT RSI floor leak — 2 post-fix trades with RSI<50 (ATOM, BTC pump-chain-)",
+        "BUILD: grind-breakout signal for NEUTRAL regime diversity",
+        "VERIFY: volume_spike metadata fix (deployed Sep 25, untested — 0 trades since)"
     ]
 }

@@ -528,5 +528,16 @@
     "after": "REGIME_CONF_HIGH_MULT = 0.85",
     "rationale": "HIGH regime worst performer: -$3.14/14d (150T 44.0%WR). NO profitable signals in HIGH. Every signal loses. -15% confidence reduces entries in dead zone.",
     "impact": "Expected +$0.50-1.00/7d from fewer HIGH entries. Blocks 0 winners (none exist)."
+  },
+  {
+    "timestamp": "2026-09-26T08:30:00Z",
+    "agent": "brain_auditor",
+    "change": "REGIME_CONF_HIGH_MULT 0.85 → 0.50",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "0.85 (-15% confidence penalty)",
+    "after": "0.50 (-50% confidence penalty)",
+    "rationale": "HIGH regime 14d: 147T 42.9%WR -$3.33, 39% of all trades. 0.85x insufficient — most trades still pass MIN_EXEC_CONFIDENCE=50. 0.50x blocks majority while preserving rare winners.",
+    "impact": "+$1.25-1.50/7d expected"
   }
 ]

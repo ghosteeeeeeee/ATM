@@ -3009,3 +3009,7 @@
   System idle 64h. Pipeline running, regime NEUTRAL, no hotset. 10 signals active.
   ATR_SL dominance 65.8% — fix deployed Sep 25, 0 trades to measure (eval ~Sep 27).
   No kill candidates, no overtrading. BY: auto_1hr
+[2026-09-26 21:10 UTC] auto_1hr: NO CHANGE — analysis only
+  7d: 159T 42.8%WR $-3.22 | 14d: 366T 45.9%WR $-4.14
+  System idle 67h. ATR_SL dominance 66.0% (EXTREME 70.5%). Fix deployed Sep 25 — 0 trades to measure (eval ~Sep 27).
+  All major losers killed. No kill candidates. No overtrading. BY: auto_1hr

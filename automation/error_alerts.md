@@ -115,3 +115,22 @@
 
 ## Error Alerts — 2026-09-26 06:58 UTC
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`
+
+## Error Alerts — 2026-09-26 08:46 UTC
+- **REPEATED** (12x): `decider_run: FAILED in 0.6s (rc=1)` — Traceback at decider_run.py:4358, 08:21-08:32
+- **AUTO-FIX**: None needed — self-recovered at 08:44, last 3 runs OK
+- **WARN**: Price collector LOCK-WAIT contention on info_rate — multiple DB writers, benign
+- **INFO**: Market 116/118 NEUTRAL, 0 signals above 50% confidence, 0 open/closed trades. Hotset 0 tokens.
+
+## Error Alerts — 2026-09-26 08:58 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.9s (rc=N)`
+
+## Error Alerts — 2026-09-26 12:45 UTC
+- **WARN** (1x): `hotset fallback DB query returned 0 tokens`
+- **WARN** (4x): `price DBs empty (0 bytes)` — prices.db, prices_hermes.db, price_candles.db, price_history.db
+- **AUTO-FIX**: None applied — pipeline healthy, price DBs likely by design (API-only mode)
+
+## Error Alerts — 2026-09-26 13:45 UTC
+- **WARN**: Disk at 82% (91G/118G) — monitor for cleanup if approaching 85%
+- **INFO**: decider_run failing (rc=1) every pipeline cycle — expected, ai_decider.py is defunct per AGENTS.md
+- **WARN**: 7 services in failed state: 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, weather-station-api

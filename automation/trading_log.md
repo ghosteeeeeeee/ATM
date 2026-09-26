@@ -7091,3 +7091,58 @@ Final set: ['ALGO', 'COMP', 'KAS']
 - System appears to be filtering correctly in NEUTRAL regime
 
 **BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-26 18:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 64h
+
+## [2026-09-26 21:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 67h ago (Sep 25 02:26 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 159T 42.8%WR -$3.22 | **14d:** 366T 45.9%WR -$4.14
+
+**ATR SL rate:** 66.0% 7d (105/159) | EXTREME: 70.5% (62/88)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 67h — pipeline running, regime NEUTRAL, 0 open positions, 10 signals active
+- No kill candidates (no signal with 3+ trades and 0% WR)
+- No overtrading (0 trades/hr)
+- All major losers already killed: mover+ (Sep 24), pullback-entry- (killed), pump-chain- V5 SHORT (Sep 25)
+- bb-bounce-v2-long+: 12T 41.7%WR avg -$0.022 — marginal but not kill-worthy ($0.26 total loss)
+- cut-loser-CL-T1: 10T -$1.19 total, worst exits: bb-bounce-v2-long+ (3T -$0.40), r2-trend-short4 (1T -$0.21)
+- ATR_SL dominance 66.0% — fix deployed Sep 25 (ATR_SL_MAX 1.8% + EXTREME 1.2x), 0 trades since to measure
+- Volume-breakout-long+: 5T 60%WR +$0.70 — best performer, keeping enabled
+
+**Open Questions:**
+- 67h gap — extended quiet, needs regime shift (currently NEUTRAL)
+- ATR_SL fix deployed Sep 25 — eval due ~Sep 27 once trades resume
+- System correctly filtering in NEUTRAL regime (LONG_NEUTRAL_BLOCK_ENABLED blocks LONG bleed)
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-26 21:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 67h
+
+## [2026-09-26 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 70h ago (Sep 24 18:25 UTC, BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 158T 43.7%WR -$3.24 | **ATR_SL 7d:** 105/158 = 66.5%
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle 70h — pipeline running, regime NEUTRAL, 0 open positions, 10 signals active
+- ATR_SL fix deployed Sep 25 — 0 trades since to measure (eval ~Sep 27)
+- No kill candidates (no recent trades)
+- No overtrading (0 trades/hr)
+
+**Open Questions:**
+- 70h gap — extended quiet, needs regime shift
+- ATR_SL_MAX 1.8% + EXTREME 1.2x pending real-world eval
+- System correctly filtering in NEUTRAL regime
+
+**BY:** auto_1hr
+
+## TEAM UPDATES
+- [2026-09-26 22:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 70h
