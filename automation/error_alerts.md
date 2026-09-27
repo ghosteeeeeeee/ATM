@@ -139,3 +139,10 @@
 - **WARN** (1): `disk_82pct` — Disk at 82% (92G/118G)
 - **INFO**: 0 signals above 50% confidence — market quiet
 - **INFO**: coin_tracker_data.json not found in /var/www/hermes/data/
+
+## Error Alerts — 2026-09-26 23:46 UTC
+- **WARN** (4x): `decider_run: FAILED` — transient failures 23:40-23:43, self-recovered at 23:44. First failure took 19.5s (likely DB lock or API timeout).
+- **INFO**: Pipeline healthy, no auto-fix needed — decider_run working normally since 23:44.
+- **WARN**: Hotset empty — 62 signals generated but 0 survived compaction. All 118 tokens in NEUTRAL regime (0 long bias, 0 short bias). Expected for low-volatility Saturday.
+- **INFO**: 0 open trades, 0 closed today — regime filtering is working as designed.
+- **INFO**: Disk at 82% (92G/118G) — stable since last check.

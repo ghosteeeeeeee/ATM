@@ -1,3 +1,33 @@
+## [2026-09-29 ~00:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 85h+ ago (BTC continuum-osc+ +$0.05)
+**24h:** 0T | **7d:** 143T 40.6%WR -$3.78 | **14d:** 356T 45.5%WR -$3.91
+
+**ATR SL rate:** 65.0% 7d (93/143) — still dominant, widening fix deployed Sep 23 but untested (no trades)
+
+**Worst signals (7d):**
+- pullback-entry-: 18T 38.9%WR -$1.33 — dead hours active
+- pump-chain-: 33T 45.5%WR -$0.93 — dead hours active
+- pump-chain+: 34T 35.3%WR -$0.25 — brain_auditor suggests EXTREME floor 70%
+- bb-bounce-v2-long+: 12T 41.7%WR -$0.26
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System idle 85h+ — low volatility regime, 0 trades
+- No kill candidates (0 trades last hour, 0 open positions)
+- ATR SL fix deployed 5+ days ago — zero live trades to evaluate
+- All known losers already killed or have dead hours
+
+**Open Questions:**
+- 85h+ idle stretch — system essentially frozen in low-vol regime
+- ATR SL still 65% despite fix — untestable without trades
+- brain_auditor flagged creative suggestions (ATR_SL eval criteria, HIGH conf=70, pump-chain+ EXTREME floor) — not implemented yet
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-26 00:20 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 25h ago (BTC continuum-osc+ +$0.05)
