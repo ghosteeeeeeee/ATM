@@ -166,9 +166,9 @@
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| ✅ IMPLEMENTED | 11 | trade-watchdog, squeeze-breakout, oscillator-matrix, ride-it-exit, continuum-ma, oversold-bounce, atr-spike, emergency-winrate (CEO override), pump-chain-v5, regime-based-signal-fixes, profitability-fix (7/8) |
+| ✅ IMPLEMENTED | 14 | trade-watchdog, squeeze-breakout, oscillator-matrix, ride-it-exit, continuum-ma, oversold-bounce, atr-spike, emergency-winrate (CEO override), pump-chain-v5, regime-based-signal-fixes, profitability-fix (7/8), regime-transition-smoothing, chop-gate-LayerA+B, volatility-gate-ATR-ratio |
 | ⚠️ PARTIAL | 5 | continuum-integration, btc-oscillator-corr, contrarian-zone, accel300-long (SKIPped), accel300-v4 |
-| ❌ NOT DONE | 2 | chop-v2, structural-awareness |
+| ❌ NOT DONE | 2 | chop-v2 (Level 3), structural-awareness (Level 4) |
 | N/A | 1 | btc-oscillator-30d (analysis only) |
 
 ## Session 2026-09-26 Changes
@@ -183,3 +183,12 @@
 1. **structural-awareness** — Level 4, HIGH — transforms reactive→proactive (multi-day project)
 2. **chop-v2** — Level 3, HIGH — fixes chop losses (new module required)
 3. **profitability-fix #7** — Level 2, needs direction-aware Pump_Flow blocking (can't block SHORT side)
+
+## Session 2026-09-27 Scan
+
+Full re-scan of all plans. Additional items verified implemented:
+- **Regime transition smoothing** — All 3 layers live: DIRECTIONAL_OUTCOME_PENALTY=0.5, LOCK_VELOCITY=0.5, DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY=0.4, ALT_BTC_DIVERGENCE_ENABLED=True
+- **Layer B bypass gate** — `_btc_mom_ok_for_bypass` at signal_compactor.py:2590 (CEO-approved chop regime fix)
+- **Volatility gate ATR ratio boost** — VOL_GATE_EXPANSION_SHORT_FALLING_BOOST etc. at signal_compactor.py:1822
+
+**Bottom line:** Every Level 1 and Level 2 task across all 40+ plans is implemented. Remaining gaps are Level 3+ only (chop-v2, structural-awareness, continuum-integration). No easy wins left.

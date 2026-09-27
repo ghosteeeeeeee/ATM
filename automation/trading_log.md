@@ -1,3 +1,36 @@
+## [2026-09-27 05:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 3h ago (BTC continuum_engine LONG +$0.00)
+**24h:** 1T ORPHAN_PAPER $0 | **7d:** 133T ~42%WR -$0.86 | **14d:** N/A (data truncated)
+
+**ATR SL rate:** 61.7% 7d (82/133) — fix deployed Sep 23, still dominant but no recent trades to judge
+
+**7d exit reasons:**
+- atr_sl_hit: 82T, -$136 total
+- profit-monster-trail: 20T, +$90 (best exit)
+- cut-loser-CL-T1: 8T, -$315 total (worst exit, ~$40 avg loss per trade)
+
+**Worst signals (7d):**
+- pullback-entry-: 15T 26.7%WR -$1.59 — dead hours active, all ATR SL
+- mover+: 8T 25%WR -$1.19 — KILLED Sep 24 (trades are pre-kill)
+- pump-chain-: 33T 45.5%WR -$0.93 — dead hours active
+- pump-chain+: 28T 35.7%WR -$0.41 — dead hours active
+
+**Changes:** None needed
+
+**No Change Needed:**
+- System idle 3h — low volatility, 0 open positions
+- No kill candidates (0 trades last hour)
+- mover+ trades are pre-kill (all before Sep 24), no action needed
+- cut-loser-CL-T1 losses are from Sep 22-24 (old), not recurring
+- All timers running, pipeline active
+
+**Open Questions:**
+- cut-loser-CL-T1 avg -$39/trade but individual trades show tiny USDT losses — possible pnl_pct calculation bug
+- System returning from 85h+ idle — first trade Sep 27 02:17 UTC, waiting for follow-up activity
+
+---
+
 ## [2026-09-29 ~00:00 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 85h+ ago (BTC continuum-osc+ +$0.05)
@@ -7455,5 +7488,98 @@ Final set: ['ALGO', 'COMP', 'KAS']
 - 45h idle gap — regime quiet, needs shift to trigger trades
 - ATR_SL fix eval: impossible until trades resume
 - TP hit rate 0.7% — either R:R too wide or trailing exits fire first
+
+**BY:** auto_1hr
+
+## [2026-09-27 07:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~53h ago (BTC continuum-osc+ +$0.05)
+**7d:** 137T 39.4%WR -$4.82
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle ~53h — regime quiet, 0 open positions
+- ATR_SL fix deployed Sep 25 — no trades post-fix to evaluate
+- No kill candidates, no overtrading
+
+**Open Questions:**
+- 53h idle gap — regime flat. Awaiting shift.
+
+**BY:** auto_1hr
+
+## [2026-09-27 22:50 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (ORPHAN_PAPER $0.00) | **Open:** 0 | **Last real trade:** ~52h ago (BTC continuum-osc+ +$0.05)
+**7d:** 136T 39.7%WR -$4.35
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- System idle ~52h — regime quiet, 0 open positions
+- 1 trade in last hour was ORPHAN_PAPER (paper, $0.00 PnL) — not real
+- ATR_SL still dominates at 62.5% of 7d exits (all pre-fix), but no new data post-fix
+- No kill candidates, no overtrading
+- 7d: atr_sl_hit 85T -$4.33 (avg -$0.051), profit-monster-trail 20T +$0.40 (best), pump_exit_dead_money 16T +$0.35
+
+**Open Questions:**
+- 52h+ idle gap — regime flat. Awaiting shift.
+- ATR_SL fix deployed Sep 25 — still no post-fix trades to evaluate
+- TP hit rate 1/136 (0.7%) — trailing exits likely fire before TP
+
+**BY:** auto_1hr
+
+## [2026-09-28 00:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** ~52h ago (BTC LONG $0.00)
+**7d:** 134T 38.8%WR -$4.53
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle ~52h+, no regime shift, 0 open positions
+- ATR_SL fix deployed Sep 25 — no post-fix trades to evaluate yet
+- No kill candidates (mover+ and pullback-entry- already killed)
+- ATR_SL 61.9% of 7d exits (83/134) — still untested post-fix
+- No overtrading
+
+**Open Questions:**
+- 52h+ idle gap — regime flat, awaiting shift
+- TP hit rate 0.7% — will matter when trading resumes
+
+**BY:** auto_1hr
+
+## FAVORITES Update — 2026-09-27 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE LTC (inactive 7d, no trades)
+- DEMOTE IOTA (WR=50.0%, PnL=$0.16, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE ACE (WR=33.3%, PnL=$-0.55, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['CASHCAT', 'JUP']
+
+## LOSERS Update — 2026-09-27 06:05 UTC
+- REMOVE COMP (insufficient data)
+- REMOVE ALGO (insufficient data)
+
+Final set: ['KAS']
+
+## [2026-09-28 01:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 72h+ ago (Sep 25 02:26 UTC)
+**7d:** 133T 38.3%WR -$4.58 | **14d:** 347T 45.5%WR -$4.00
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 72h+, regime flat, 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to evaluate yet
+- ATR_SL 62.1% of exits (82/132), accounts for -$4.56 of -$4.58 total loss
+- Profit exits healthy: profit-monster-trail +$0.40, pump_exit_dead_money +$0.35
+- No kill candidates, no overtrading
+
+**Open Questions:**
+- 72h+ idle gap — regime flat, awaiting shift
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate 0.7% (1/132) — trailing exits fire before TP
 
 **BY:** auto_1hr

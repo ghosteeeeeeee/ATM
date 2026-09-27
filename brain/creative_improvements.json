@@ -603,5 +603,35 @@
     "category": "monitoring",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-09-27T23:30:00Z",
+    "ideas": [
+      {
+        "idea": "Define ATR_SL widening success criteria BEFORE trades resume",
+        "rationale": "5 fixes deployed Sep 25-27, 0 trades to measure. Need objective pass/fail.",
+        "criteria": "PASS if ATR_SL <55% after 50 trades. FAIL if >60%. EXTREME R:R >1.5:1 = bonus.",
+        "expected_impact": "Enables decisive action when data arrives",
+        "category": "evaluation framework",
+        "status": "suggested",
+        "risk": "low"
+      },
+      {
+        "idea": "volume-breakout-long+ EXTREME weight boost 1.2x",
+        "rationale": "14d EXTREME: 10T 70%WR +.51. Best signal in best regime. Underperforming frequency.",
+        "expected_impact": "+/usr/bin/bash.20-0.50/7d",
+        "category": "entry sniper",
+        "status": "suggested",
+        "risk": "low"
+      },
+      {
+        "idea": "New EMA-reclaim LONG signal for NEUTRAL diversity",
+        "rationale": "Only 2 profitable signal types. Need diversity.",
+        "expected_impact": "+/usr/bin/bash.50-1.00/7d if signal matches pump-chain+ quality",
+        "category": "new signal",
+        "status": "suggested",
+        "risk": "medium"
+      }
+    ]
   }
 ]

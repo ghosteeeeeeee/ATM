@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 ~22:00 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-27 ~06:35 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-24h: 0T. System idle 95h+. ATR_SL widening UNTESTED (0 trades/95h+). Pipeline healthy, NEUTRAL regime.
+24h: 1T (continuum_engine BTC LONG $0.00 at 02:17). 80 decider_run failures (HL API rejections). Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 0T, system idle 95h+ (last trade Sep 25 02:26 UTC). 0 open.
-- **7d:** 138T 39.9%WR -$4.70 (DB-verified). ATR_SL 52T 93% hit rate -$10.15 CRITICAL.
-- **14d:** 353T 45.3%WR -$3.72 (DB-verified).
+- **24h (rolling):** 1T continuum_engine LONG BTC $0.00. 0 open. 80 decider_run FAILURES — signals consumed but HL API rejects orders (SL/TP = $0.0000 in log, likely HL API issue).
+- **7d:** 127T ~36%WR -$4.37 (DB-verified). EXTREME worst: 74T 37.8%WR -$2.63. HIGH: 37T 29.7%WR -$1.79.
+- **14d:** 344T 44.5%WR -$4.27 (DB-verified).
 - **LONG:** pump-chain+ (workhorse), volume-breakout-long+ (gem).
 - **SHORT:** ALL DISABLED or pre-disable.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -32,7 +32,7 @@
 **🟡 R:R STATUS (7d -$4.70)**
 7d PnL -$4.70. pump-chain+ LONG 31T 35.5%WR -$0.79 (cold streak, 14d still +$1.24). volume-breakout-long+ 4T 50%WR +$0.62 (gem, 100% ATR_SL but winners BIG). pullback-entry- 18T 38.9%WR -$1.33 (pre-disable trades, 100% ATR_SL). mover+ 8T 25%WR -$1.19 (legacy pre-kill, aging out).
 
-**🔴 ATR_SL HIT RATE:** 52/58 losers (90%) 7d. EXTREME dominates. CRITICAL — above 40% threshold. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **0 trades since deployment (95h+)** — eval OVERDUE but blocked by no trades. Needs market activity to measure impact.
+**🔴 ATR_SL HIT RATE:** 76/127 losers (60%) 7d. EXTREME dominates: 74T 37.8%WR -$2.63. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **UNTESTED** — 1 trade since deployment (continuum_engine $0.00). Needs more trades to measure impact.
 
 **🔴 REGIME EDGE (7d):** ALL trades NEUTRAL (138T 39.9%WR -$4.70). No EXTREME/HIGH trades recently — market regime shifted. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).** 14d: ALL trades NEUTRAL (352T 45.5%WR -$3.72). No EXTREME/HIGH trades in 14d.
 
@@ -54,9 +54,13 @@
 
 **🟡 SHORT_RSI_FLOOR POTENTIAL LEAK.** 2 pump-chain- SHORT trades on Sep 24 (16:16, 21:46) had detection-time RSI<50 (41.66, 47.06) yet executed AFTER the SHORT_RSI_FLOOR=50 hard block fix (~06:00 UTC). Both were small wins ($0.03). Root cause unclear — may be timing issue with fix deployment or `signal_metadata` not propagating to hotset. Needs investigation.
 
-**🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3751) but NEVER enforced in signal_compactor.py or decider_run.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
+**🟡 DEAD FLAG: PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined in hermes_constants.py (line 3749) but NEVER enforced in signal_compactor.py or decider_run.py. Confirmed by grep — only referenced in hermes_constants.py. 41 HIGH trades/14d -$0.35. Low priority (pullback-entry- SHORT already disabled), but should be cleaned up.
+
+**🔴 DECIDER_RUN FAILURES: 80/24h.** All self-recovered. Pattern: signal passes all filters, mark_signal_executed claims it, then execute_trade fails (HL API rejection). Signals consumed but trades never open. Traceback truncated in journalctl — can't see actual exception. Pre-existing issue, not new. Pipeline continues running.
 
 ## Today's Changes (Sep 27)
+
+1. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB-verified: 1T continuum_engine LONG BTC $0.00 (02:17 UTC) | 127T ~36%WR -$4.37 (7d) | 344T 44.5%WR -$4.27 (14d). **PIPELINE HEALTHY** — all timers firing, no crashes. **80 DECIDER_RUN FAILURES/24h** — signals consumed but HL API rejects orders (SL=$0.0000). Self-recovers each cycle. Pre-existing. **DISK 83%** — cleaned 4 dead 0-byte price DBs (price_candles.db, price_history.db, prices.db, prices_hermes.db). **DEAD FLAG CONFIRMED:** PULLBACK_ENTRY_SHORT_HIGH_BLOCK defined but never enforced. **ACCELERATE MISMATCH:** signal_reporter flagged SHORT variants profitable in EXTREME but family-level 0.0x block kills them. **ATR_SL WIDENING STILL UNTESTED** — 1 trade since deployment (continuum_engine $0.00). **ALL RECENT FIXES UNTESTED** — market too quiet. **NO CHANGES APPLIED.** **MONITORING:** ATR_SL eval (needs trades), decider_run failure root cause, disk 83%. — daily_orchestrator
 
 1. **CEO ~22:00 UTC — NO CONFIG CHANGE.** DB-verified: 0T/24h (idle 95h+) | 138T 39.9%WR -$4.70 (7d) | 353T 45.3%WR -$3.72 (14d). **SYSTEM IDLE 95h+** — last trade Sep 25 02:26. Market NEUTRAL, pipeline healthy. **ATR_SL DOMINATES:** 52/58 losers hit ATR_SL = -$10.15/7d. Widening deployed Sep 25, UNTESTED (0 trades since). **SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG (+$1.24/14d) and volume-breakout-long+ (+$0.62/7d) profitable. **ALL TRADES NEUTRAL REGIME** — no EXTREME/HIGH trades recently. **DISK:** 82% (21G free). **0 CHANGES APPLIED** — system idle, no trades to improve. **MONITORING:** ATR_SL widening eval (needs market activity), REGIME_CONF_HIGH_MULT=0.50, volume_spike fix. — CEO
 

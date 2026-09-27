@@ -146,3 +146,11 @@
 - **WARN**: Hotset empty — 62 signals generated but 0 survived compaction. All 118 tokens in NEUTRAL regime (0 long bias, 0 short bias). Expected for low-volatility Saturday.
 - **INFO**: 0 open trades, 0 closed today — regime filtering is working as designed.
 - **INFO**: Disk at 82% (92G/118G) — stable since last check.
+
+## Health Report — 2026-09-27 05:45 UTC
+- **INFO**: Pipeline OK. Completed at 05:44 (LIVE). 0 open, 0 closed today.
+- **INFO**: All 118 tokens NEUTRAL regime. No long/short bias.
+- **INFO**: 57 timers active, all firing. No missed runs.
+- **WARN**: Disk at 83% (92G/118G) — approaching 85% cleanup threshold.
+- **INFO**: Dead price DBs (price_candles.db, price_history.db, prices.db, prices_hermes.db) are 0 bytes, harmless but stale.
+- **AUTO-FIX**: None required.

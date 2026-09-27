@@ -1,3 +1,14 @@
+[2026-09-29 ~00:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 0T/24h (idle 100h+) | 132T 38.6%WR -$4.42 (7d) | 350T 45.1%WR -$4.00 (14d)
+  SYSTEM IDLE 100h+. ALL FIXES UNTESTED. ATR_SL 67.1% EXTREME CRITICAL.
+  DRIFT: volume_spike 100% NULL, pump-chain+ confidence NULL.
+  CREATIVE: (1) SHORT RSI 35-50 penalty (2) ATR_SL success criteria (3) NEW EMA-reclaim signal.
+  BY: brain_auditor
+
+[2026-09-27 05:10 UTC] auto_1hr: NO CHANGE — 0 trades last hour, system idle 3h
+  Last trade: Sep 27 02:17 BTC continuum_engine +$0.00. 0 open positions.
+  7d: 133T ~42%WR -$0.86 | ATR SL 61.7% (82/133) | No kill candidates. BY: auto_1hr
+
 [2026-09-29 ~00:00 UTC] auto_1hr: NO CHANGE — system idle 85h+, 0 trades, 0 open positions
   7d: 143T 40.6%WR -$3.78 | 14d: 356T 45.5%WR -$3.91 | ATR SL 65.0% (untested)
   No kill candidates, no overtrading. Low volatility regime. BY: auto_1hr
@@ -3046,3 +3057,14 @@
 [2026-09-26 23:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle ~45h
   7d: 144T 41.0%WR -.69 | 14d: 356T 45.5%WR -.91
   No new trades, no kill candidates, no overtrading. Awaiting regime shift. BY: auto_1hr
+[2026-09-27 07:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 53h
+  7d: 137T 39.4%WR -4.82. No trades, no kill candidates. Awaiting regime shift. BY: auto_1hr
+[2026-09-27 ~22:30 UTC] brain_auditor: NO CHANGE — system idle 46h+, 0 trades, 0 open positions
+  7d: 138T 40.6%WR -$3.78 | 14d: 356T 45.5%WR -$3.91 | ATR SL 63% (untested)
+  EXTREME only profitable regime (+$0.12/14d). HIGH worst (-$2.39/14d, 39% of trades).
+  pump-chain+ final_confidence NULL — blocks confidence filtering. No kill candidates. BY: brain_auditor
+[2026-09-27 22:50 UTC] auto_1hr: NO CHANGE — analysis only, system idle 52h
+  7d: 136T 39.7%WR -4.35 | 1 trade last hour (ORPHAN_PAPER /usr/bin/bash)
+  ATR_SL dominance 62.5% (all pre-fix). No kill candidates. Awaiting regime shift. BY: auto_1hr
+[2026-09-28 01:30 UTC] auto_1hr: NO CHANGE — analysis only, system idle 72h+
+  7d: 133T 38.3%WR -4.58 | ATR_SL 62.1% (untested post-fix). No trades, no kill candidates. BY: auto_1hr
