@@ -8004,3 +8004,31 @@ Final set: ['KAS']
 - 7d PnL still negative but improving ($+0.81 post-fix)
 
 **BY:** auto_1hr
+
+## [2026-09-27 22:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L)
+**PnL:** -$0.09 last hour | +$0.72 24h (54.5% WR, 11T)
+**7d:** 127T 35.4%WR -$5.34 | Post-fix (Sep 26+): 11T +$0.72
+
+**Key Findings:**
+- ATR_SL fix confirmed: 0 atr_sl_hit in all 11 post-fix trades, all exits via profit-monster-trail
+- Both last-hour losses are scratches (-$0.07 YGG, -$0.02 HBAR) — trailing stop capping downside correctly
+- 0 open positions — system flat, no risk
+- Trade frequency: ~11/24h = well-filtered, no overtrading
+- pump-chain+ degraded Sep 21-22 but hasn't fired since — no action needed (already not triggering)
+- 7d PnL still negative but entirely from pre-fix era (ATR_SL was killing 65% of trades)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix validated across 11 post-fix trades (was 65% of closes pre-fix, now 0%)
+- No signal kill candidates in last hour
+- Trade frequency normal (~1/2.2h)
+- All losses via trailing stop — risk management working
+
+**Monitoring:**
+- 7d PnL recovery trajectory: -$5.34 total, all losses pre-fix. Post-fix is +$0.72 and climbing.
+- No open positions = no overnight risk
+
+**BY:** auto_1hr

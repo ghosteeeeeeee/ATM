@@ -3136,3 +3136,6 @@
 [2026-09-27 18:10 UTC] auto_1hr: NO CHANGE — ATR_SL fix validated working
   ATR_SL 0% post-fix (was 68% pre-fix). Last atr_sl_hit Sep 24. 5 post-fix closes all trailing/ORPHAN/MAX_HOLD.
   1T last hour (-/usr/bin/bash.04), 5 open LONGs. 7d 122T 35.2%WR -.93 | 14d 330T 44.2%WR -.28. BY: auto_1hr
+[2026-09-27 22:10 UTC] auto_1hr: NO CHANGE — analysis only
+  2T last hour (0W 2L, -/usr/bin/bash.09 scratches). ATR_SL 0% post-fix (11T). 0 open. 24h +/usr/bin/bash.72 (54.5%WR).
+  System flat, trailing working, no kill candidates. BY: auto_1hr

@@ -250,3 +250,6 @@
 ## Error Alerts — 2026-09-27 20:45 UTC
 - **WARN** (1x): Disk usage at 84% (93G/118G) — approaching 85% threshold
 - **AUTO-FIX**: None applied. Consider compressing logs >7 days old.
+
+## Error Alerts — 2026-09-27 21:58 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`
