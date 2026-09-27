@@ -7604,3 +7604,24 @@ Final set: ['KAS']
 - TP hit rate 0.8% (1/131) — trailing exits fire before TP
 
 **BY:** auto_1hr
+
+## [2026-09-28 03:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 82h+ ago (Sep 25 02:26 UTC)
+**7d:** 131T 38.2%WR -$4.43 | **ATR_SL:** 80/131 (61.1%, all pre-fix)
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 82h+, regime mixed (EXTREME/FLAT/HIGH/NORMAL), 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to evaluate yet
+- 14d profitable signals: volume-breakout-long +$1.46, pump-chain +$1.24, grind-trend +$0.24
+- 14d losers: pullback-entry -$1.66, mover -$1.12 (but both have reasonable WR)
+- No kill candidates, no overtrading
+
+**Open Questions:**
+- 82h+ idle gap — regime flat, awaiting shift
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate <1% — trailing exits consistently fire before TP
+
+**BY:** auto_1hr
