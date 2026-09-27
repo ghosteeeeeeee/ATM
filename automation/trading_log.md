@@ -1,3 +1,42 @@
+## [2026-09-27 17:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour | **Open:** 5 (HBAR, POL, LTC, CAKE, HYPER — all LONG)
+**PnL:** +$0.09 (POL +$0.10, IOTA -$0.01) | Both via profit-monster-trail
+**7d:** 124T 37.1%WR -$4.62 | **ATR_SL:** 57.3% (71/124, improving from 67.5% pre-fix)
+**Regime:** 100% NEUTRAL (123/124 trades)
+
+**Open Positions:**
+- HBAR LONG rs-s102 | entry=0.09345 | SL=0.09224 | TP=0.09503 | $11.10
+- POL LONG continuation+ | entry=0.12070 | SL=0.11913 | TP=0.12215 | $11.10
+- LTC LONG rs-s52 | entry=71.13 | SL=70.21 | TP=72.37 | $22.10
+- CAKE LONG doji-bottom-long | entry=2.79 | SL=2.75 | TP=2.85 | $11.10
+- HYPER LONG rs-s118 | entry=0.07525 | SL=0.07428 | TP=0.07667 | $11.10
+
+**Changes:** None
+
+**No Change Needed:**
+- 2 closures net +$0.09 — breakeven hour, no kill candidates
+- pullback-entry- (0%WR 8T -$1.86) and mover+ (25%WR 8T -$1.19) already killed
+- pump-chain- short already killed (PUMP_CHAIN_V5_SHORT_ENABLED=False)
+- rr-struct-v2+ 0%WR 10T -$0.45 — all ATR_SL, systemic issue not signal quality
+- No signal has 0%WR with 3+ trades in last hour specifically
+- ATR_SL still dominant at 57.3% but improving post-fix
+
+**Drift (CRITICAL, non-blocking):**
+- volume_spike: 123/124 NULL (99.2%) — signal_compactor not persisting metadata
+- final_confidence: 124/124 NULL (100%) — blocks confidence filtering
+- atr_at_entry: 124/124 NULL (100%) — blocks ATR-based filtering
+- These are CODE BUGS requiring signal_compactor.py investigation, not constants changes
+
+**Open Questions:**
+- 5 fresh LONGs in NEUTRAL regime — will ATR_SL fix help these?
+- volume_spike/final_confidence NULL drift unfixed — blocking two filter layers
+- Metadata drift is the #1 priority for next code session
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-27 16:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 5 (all LONG, 0.3-1.4h old, all in profit)

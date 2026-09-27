@@ -1,3 +1,8 @@
+[2026-09-27 17:12 UTC] auto_1hr: NO CHANGE — analysis only
+  2 closures (POL +$0.10, IOTA -$$0.01), net +$0.09. 5 open LONGs, all fresh.
+  7d: 124T 37.1%WR -$4.62 | ATR_SL 57.3% (improving from 67.5% pre-fix).
+  CRITICAL DRIFT: volume_spike 99% NULL, final_confidence 100% NULL — code bug, not constants.
+  No kill candidates in last hour. Already-killed signals confirmed disabled.
 [2026-09-27 16:10 UTC] auto_1hr: NO CHANGE — analysis only
   5 fresh LONGs (POL/IOTA/HYPER/LTC/CAKE), 0 closures, system woke after 130h+ idle.
   7d: 122T 36.9%WR -$4.71 | 14d: 334T ATR_SL 68% (all pre-fix).
