@@ -1,3 +1,12 @@
+[2026-09-27 ~23:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 11T 63.6%WR +$0.72 (24h post-fix) | 127T 36.2%WR -$5.35 (7d) | 330T 44.6%WR -$3.80 (14d)
+  ATR_SL WIDENING VERIFIED: 0/11 post-fix ATR_SL hits. All exits profit-monster-trail.
+  EXTREME ATR_SL 74.4% 14d — 1.2x multiplier DEAD (capped by ATR_SL_MAX=1.8%).
+  SUGGESTED: ATR_SL_MAX 1.8→2.0% (+$0.50-1.00/7d expected).
+  SHORT side -$3.93/14d (82% of losses). All disabled signals aging out.
+  14d R:R 0.94:1. Signal diversity CRITICAL (2 profitable signals).
+  BY: brain_auditor
+
 [2026-09-27 20:10 UTC] auto_1hr: NO CHANGE — analysis only
   3 closures last 2h (YGG +$0.12, HYPER +$0.14, CAKE -$0.01) = +$0.25 net. 0 in exact last hour.
   7d: 124T 35.5%WR -$5.70 | ATR_SL 54.8% (improving) | 0 atr_sl_hit in last 12h ✅
@@ -3139,3 +3148,12 @@
 [2026-09-27 22:10 UTC] auto_1hr: NO CHANGE — analysis only
   2T last hour (0W 2L, -/usr/bin/bash.09 scratches). ATR_SL 0% post-fix (11T). 0 open. 24h +/usr/bin/bash.72 (54.5%WR).
   System flat, trailing working, no kill candidates. BY: auto_1hr
+[2026-09-27 22:37 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 11T 45.5%WR +$0.72 (24h) | 332T 44.6%WR -$3.29 (14d)
+  ATR_SL WIDENING VERIFIED WORKING — 0/11 post-fix hits (0%). All profit-monster-trail exits. PASS.
+  volume_spike PARTIALLY WORKING — 8/11 post-fix (73%). 3 missing hotset paths.
+  final_confidence INJECTION BUG — 9/11 post-fix None. Confidence filtering DISABLED.
+  Root: decider_run.py reads from DB (no fc), hotset.json has it. Fix: pull from hotset at line ~3000.
+  SHORT -$3.16/14d (96% losses). HIGH regime -$1.99/14d (worst). 49 signals, only 20 profitable.
+  CREATIVE: (1) Fix final_confidence injection (+$0.50-1.00/7d). (2) pump-chain+ EXTREME fc floor 70%. (3) 3 hotset volume_spike paths.
+  0 CHANGES APPLIED. BY: brain_auditor

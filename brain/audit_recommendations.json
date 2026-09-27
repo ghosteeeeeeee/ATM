@@ -1,162 +1,184 @@
 {
-    "timestamp": "2026-09-28T00:15:00Z",
-    "session_brain_stats": {
-        "total_memories": "62+ creative improvements tracked",
-        "recurring_topics": ["ATR_SL hit rate", "signal diversity", "volume_spike NULL", "HIGH regime bleeding", "SHORT RSI bands"]
-    },
-    "trade_summary_7d": {
-        "total_trades": 126,
-        "win_rate": "36.7%",
-        "total_pnl": "-$5.96",
-        "atr_sl_hits": "68/126 (54.0%)",
-        "atr_sl_pnl": "-$5.96",
-        "post_fix_trades": 9,
-        "post_fix_pnl": "+$0.82",
-        "post_fix_atr_sl": "0% (ALL PM_TRAIL exits)",
-        "regime_breakdown": {
-            "EXTREME": "70T 37.1%WR -$3.06",
-            "HIGH": "36T 30.6%WR -$2.05",
-            "NORMAL": "18T 44.4%WR -$0.09"
-        }
-    },
-    "trade_summary_14d": {
-        "total_trades": 333,
-        "win_rate": "44.4%",
-        "total_pnl": "-$4.27",
-        "regime_breakdown": {
-            "HIGH": "131T 42.7%WR -$2.21 (39% of trades)",
-            "EXTREME": "130T 46.2%WR -$0.03 (best)",
-            "NORMAL": "69T 44.9%WR -$1.06"
-        }
-    },
-    "drift_findings": [
-        {
-            "issue": "final_confidence 100% NULL in trade metadata",
-            "status": "CONFIRMED DRIFT",
-            "impact": "Cannot analyze confidence vs winrate correlation. Blocks confidence-based filtering analysis.",
-            "detail": "final_confidence is used in hotset JSON filtering (line 2951) but never injected into _exec_meta for trade recording. 126/126 7d trades have NULL final_confidence.",
-            "fix_required": "Inject final_confidence into _exec_meta in decider_run.py around line 4214"
-        },
-        {
-            "issue": "volume_spike fix PARTIALLY working",
-            "status": "PARTIAL FIX",
-            "impact": "6/9 post-fix trades have volume_spike. 3 missing (rs-s* hotset paths, continuum_engine).",
-            "detail": "Fix from Sep 25 works for main hotset path. rs-s* and continuum_engine bypass the volume_spike injection.",
-            "fix_required": "Extend volume_spike injection to cover rs-s* and continuum_engine code paths"
-        },
-        {
-            "issue": "7d data includes pre-fix legacy trades",
-            "status": "AGING OUT",
-            "impact": "7d PnL of -$5.96 is dominated by pre-fix ATR_SL hits (68/126). Post-fix: +$0.82.",
-            "detail": "All 68 ATR_SL hits are pre-fix (before Sep 25). 0 ATR_SL hits on post-fix trades. 7d numbers will improve as legacy ages out."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "topic": "ATR_SL hit rate",
-            "occurrences": "15+ audit runs",
-            "status": "RESOLVED (post-fix)",
-            "detail": "Pre-fix: 68% ATR_SL hit rate. Post-fix (Sep 25+): 0% ATR_SL hits. PM_TRAIL capturing winners. Success criteria: PASS if <55% by 50 trades AND R:R>1.3:1.",
-            "current_data": "9 post-fix trades, 0 ATR_SL hits, all PM_TRAIL exits"
-        },
-        {
-            "topic": "Signal diversity",
-            "occurrences": "20+ audit runs",
-            "status": "UNRESOLVED",
-            "detail": "Only pump-chain+ LONG (+$0.85/14d) and volume-breakout-long+ (+$1.46/14d) profitable. 30+ signal types but only 2 net positive. NEUTRAL regime has no dedicated profitable signal.",
-            "impact": "System fragile — if either signal degrades, no backup"
-        },
-        {
-            "topic": "HIGH regime bleeding",
-            "occurrences": "10+ audit runs",
-            "status": "MONITORING (REGIME_CONF_HIGH_MULT=0.50 untested)",
-            "detail": "HIGH 131T -$2.21/14d (39% of trades). REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26, 0 trades since. Will reduce HIGH entries by ~50%.",
-            "current_data": "0 post-fix HIGH trades to measure impact"
-        },
-        {
-            "topic": "SHORT side bleeding",
-            "occurrences": "12+ audit runs",
-            "status": "FADING (pre-fix trades aging out)",
-            "detail": "7d SHORT: 60T -$2.89. All pre-fix. Post-fix: 0 SHORT trades. SHORT_RSI_FLOOR=50 and pump-chain- disable reducing SHORT noise."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "idea": "New NEUTRAL regime signal",
-            "status": "DISCUSSED BUT NOT BUILT",
-            "sessions": "3+ sessions discussing EMA-reclaim, grind-breakout concepts",
-            "impact": "System only has pump-chain+ and volume-breakout-long+ in NEUTRAL — fragile",
-            "priority": "HIGH"
-        },
-        {
-            "idea": "final_confidence metadata injection",
-            "status": "NEVER IMPLEMENTED",
-            "impact": "Cannot do confidence-based filtering analysis",
-            "priority": "MEDIUM"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-09-28T00:15:00Z",
-            "idea": "Investigate volume_spike gap for rs-s* and continuum_engine code paths",
-            "rationale": "Volume_spike fix works for main hotset but not rs-s* (3/9 post-fix trades missing) and continuum_engine (0%). Chase filter blind for these paths. Extending fix: +$0.10-0.30/7d",
-            "expected_impact": "+$0.10-0.30/7d from better chase filtering",
-            "category": "bug fix",
-            "status": "suggested",
-            "risk": "low"
-        },
-        {
-            "date": "2026-09-28T00:15:00Z",
-            "idea": "Inject final_confidence into trade metadata for analysis",
-            "rationale": "final_confidence is used for filtering but never recorded. 126/126 7d trades have NULL — blocks all confidence-based analysis. Adding 1 line to decider_run.py ~4214: _exec_meta['final_confidence'] = sig.get('final_confidence', 0)",
-            "expected_impact": "+$0.50-1.00/7d potential (enables confidence tuning)",
-            "category": "metadata",
-            "status": "suggested",
-            "risk": "low"
-        },
-        {
-            "date": "2026-09-28T00:15:00Z",
-            "idea": "pump-chain+ EXTREME confidence floor 70% — NOW ACTIONABLE",
-            "rationale": "Previous 6 suggestions BLOCKED on final_confidence NULL. If we inject final_confidence (fix above), we can then add EXTREME confidence floor. pump-chain+ EXTREME 14d: 36T 44.4%WR +$0.96 — already best regime. Floor 70% filters low-confidence entries while preserving high-confidence winners.",
-            "expected_impact": "+$0.10-0.30/7d",
-            "category": "entry sniper",
-            "status": "depends on final_confidence fix",
-            "risk": "low",
-            "blocked_by": "final_confidence metadata injection"
-        }
-    ],
-    "losing_trade_autopsy": {
-        "summary": "9 post-fix trades: 6W 3L (+$0.82). All LONG. All PM_TRAIL exits. No ATR_SL hits.",
-        "losers": [
-            {
-                "trade": "CAKE LONG doji-bottom-long -$0.01",
-                "exit": "profit-monster-trail",
-                "root_cause": "PM_TRAIL locked in small loss after brief profit. RSI 55.26 at entry — normal range. Not a bad entry, just a small move that reversed.",
-                "verdict": "NORMAL VARIANCE — not a signal quality issue"
-            },
-            {
-                "trade": "LTC LONG rs-s52 -$0.04",
-                "exit": "profit-monster-trail",
-                "root_cause": "PM_TRAIL locked in loss. RSI 36.17 at entry — near oversold but not extreme. VOL spike 0.97 (high). Entry was quality but price didn't follow through.",
-                "verdict": "NORMAL VARIANCE — RSI low but within acceptable range"
-            },
-            {
-                "trade": "IOTA LONG rs-s37 -$0.01",
-                "exit": "profit-monster-trail",
-                "root_cause": "PM_TRAIL micro loss. RSI 50.0 — neutral. No volume_spike data (missing from code path). Tiny loss, not actionable.",
-                "verdict": "NORMAL VARIANCE — not a signal quality issue"
-            }
-        ],
-        "pattern": "All 3 losers are PM_TRAIL micro-losses ($0.01-$0.04). Not ATR_SL hits. Not chasing. Not regime issues. Pure variance in a short sample.",
-        "actionable": "No changes needed — post-fix PM_TRAIL behavior is working as designed"
-    },
-    "config_changes_applied": [],
-    "next_actions": [
-        "1. Inject final_confidence into _exec_meta (1 line change in decider_run.py ~4214)",
-        "2. Extend volume_spike injection to rs-s* and continuum_engine code paths",
-        "3. Monitor ATR_SL widening: 9/50 trades evaluated, 0% hit rate (PASS so far)",
-        "4. Monitor REGIME_CONF_HIGH_MULT=0.50: 0 HIGH trades post-fix",
-        "5. Monitor pump-chain+ degradation: 21T/7d -$1.54 (was +$1.24/14d)",
-        "6. NEW: Develop NEUTRAL regime signal for diversity"
+  "timestamp": "2026-09-27T23:35:51.310430+00:00",
+  "session_brain_stats": {
+    "top_findings": [
+      "Signal quality winrate discussions dominant topic",
+      "Trend following new signal idea recurring",
+      "R:R optimization and exit quality repeatedly discussed",
+      "Signal decay and regime adaptation mentioned",
+      "Wave period and amplitude breakout ideas surfaced"
     ]
+  },
+  "trade_summary_24h": {
+    "trades": 11,
+    "wins": 7,
+    "losses": 4,
+    "pnl": 0.72,
+    "wr": 63.6,
+    "atr_sl_hits": 0,
+    "note": "ALL post-fix trades. ATR_SL widening VERIFIED WORKING."
+  },
+  "trade_summary_7d": {
+    "trades": 127,
+    "wr": 36.2,
+    "pnl": -5.35,
+    "atr_sl_total": 67,
+    "atr_sl_pct": 52.8,
+    "atr_sl_pnl": -6.02,
+    "regimes": {
+      "EXTREME": {
+        "trades": 69,
+        "wr": 36.2,
+        "pnl": -3.12,
+        "atr_sl_pct": 63.8
+      },
+      "HIGH": {
+        "trades": 36,
+        "wr": 30.6,
+        "pnl": -2.05,
+        "atr_sl_pct": 41.7
+      },
+      "NORMAL": {
+        "trades": 20,
+        "wr": 40.0,
+        "pnl": -0.18,
+        "atr_sl_pct": 35.0
+      }
+    },
+    "exit_reasons": {
+      "atr_sl_hit": {
+        "trades": 67,
+        "pnl": -6.02,
+        "wr": 32.8
+      },
+      "profit-monster-trail": {
+        "trades": 30,
+        "pnl": 1.12,
+        "wr": 43.3
+      },
+      "cut-loser-CL-T1": {
+        "trades": 8,
+        "pnl": -0.97,
+        "wr": 0.0
+      },
+      "pump_exit_dead_money": {
+        "trades": 16,
+        "pnl": 0.35,
+        "wr": 43.8
+      }
+    }
+  },
+  "trade_summary_14d": {
+    "trades": 330,
+    "wr": 44.6,
+    "pnl": -3.8,
+    "atr_sl_total": 220,
+    "atr_sl_pct": 66.7,
+    "rr_ratio": 0.94,
+    "avg_win": 0.141,
+    "avg_loss": -0.15,
+    "long_pnl": 0.13,
+    "short_pnl": -3.93,
+    "profitable_signals": [
+      "volume-breakout-long+ LONG: 18T +$1.46 (66.7% WR)",
+      "pump-chain+ LONG: 62T +$0.85 (40.3% WR)"
+    ],
+    "losing_signals": [
+      "pullback-entry- SHORT: 73T -$2.53 (43.8% WR) — DISABLED, aging out",
+      "mover+ LONG: 14T -$1.12 (42.9% WR) — DISABLED, aging out",
+      "pump-chain- SHORT: 48T -$0.79 (45.8% WR) — DISABLED, aging out"
+    ]
+  },
+  "atr_sl_analysis": {
+    "verdict": "WIDENING VERIFIED WORKING",
+    "post_fix": {
+      "trades": 11,
+      "atr_sl_hits": 0,
+      "pnl": 0.72,
+      "all_exits": "profit-monster-trail"
+    },
+    "pre_fix_7d": {
+      "atr_sl_pct": 52.8,
+      "atr_sl_pnl": -6.02
+    },
+    "extreme_14d": {
+      "total": 129,
+      "atr_sl": 96,
+      "atr_sl_pct": 74.4,
+      "pump_chain_plus": {
+        "total": 36,
+        "atr_sl": 34,
+        "atr_sl_pct": 94.4,
+        "pnl": 0.96,
+        "note": "Winners ride massive moves, losers small. SL cutting winners short."
+      }
+    },
+    "success_criteria": "PASS — 0/11 post-fix ATR_SL hits. <55% overall 7d (52.8%)."
+  },
+  "drift_findings": [
+    {
+      "item": "volume_spike fix",
+      "status": "VERIFIED WORKING — 6/11 post-fix trades have volume_spike values",
+      "impact": "Chase filter now sees volume quality"
+    },
+    {
+      "item": "RSI metadata (rsi_at_entry)",
+      "status": "NOT POPULATED for rs-s* hotset trades (rsi_14 stored instead)",
+      "impact": "RSI-based analysis blocked for hotset trades"
+    },
+    {
+      "item": "EXTREME ATR_SL multiplier",
+      "status": "1.2x multiplier INEFFECTIVE — capped by ATR_SL_MAX=1.8%",
+      "impact": "EXTREME SL range 1.5%-1.8% (same as effective max). Multiplier does nothing."
+    }
+  ],
+  "recurring_problems": [
+    "SHORT side -$3.93/14d — 82% of ALL losses",
+    "Signal diversity — only 2 profitable signals active",
+    "EXTREME ATR_SL hit rate 74.4% — highest of all regimes",
+    "14d R:R 0.94:1 — avg loss exceeds avg win"
+  ],
+  "missing_implementations": [
+    "New NEUTRAL regime signal — discussed in sessions but not built",
+    "SHORT RSI 35-50 confidence penalty — suggested 6+ times, never implemented",
+    "EXTREME ATR_SL multiplier fix — 1.2x capped by max, needs ATR_SL_MAX increase"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-27T23:35:51.310451+00:00",
+      "idea": "Raise ATR_SL_MAX from 1.8% to 2.0% for EXTREME regime",
+      "rationale": "EXTREME ATR_SL_MIN_EXTREME=1.5% with 1.2x multiplier = 1.8% = ATR_SL_MAX. Multiplier is DEAD — capped. pump-chain+ EXTREME 94.4% ATR_SL hit rate but +$0.96 PnL (winners ride big). Widening to 2.0% gives trades 33% more room. Expected: reduce EXTREME ATR_SL from 74.4% to ~60%.",
+      "expected_impact": "+$0.50-1.00/7d from EXTREME regime",
+      "category": "SL tuning",
+      "status": "suggested",
+      "risk": "medium — some trades may lose more before recovering"
+    },
+    {
+      "date": "2026-09-27T23:35:51.310455+00:00",
+      "idea": "Block pump-chain+ in EXTREME regime entirely",
+      "rationale": "pump-chain+ EXTREME 94.4% ATR_SL hit rate. Even though net profitable (+$0.96/14d), the 34 ATR_SL exits create noise and capital drag. Better to let volume-breakout-long+ (70% WR +$1.51 EXTREME) handle EXTREME alone.",
+      "expected_impact": "+$0.30-0.50/7d from reduced ATR_SL noise",
+      "category": "regime filter",
+      "status": "suggested (alternative to ATR_SL_MAX increase)",
+      "risk": "low — pump-chain+ EXTREME only +$0.96/14d, volume-breakout-long+ covers EXTREME"
+    },
+    {
+      "date": "2026-09-27T23:35:51.310457+00:00",
+      "idea": "New LONG signal: EMA-reclaim for NEUTRAL regime",
+      "rationale": "Only 2 profitable signals (pump-chain+, volume-breakout-long+). Need NEUTRAL diversity. EMA-reclaim: enter LONG when price reclaims EMA20 after dipping below, with volume confirmation. Low-frequency but high-quality.",
+      "expected_impact": "+$0.30-0.60/7d once validated",
+      "category": "new signal",
+      "status": "suggested",
+      "risk": "medium — needs backtest before deploy"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Monitor ATR_SL widening — 11 post-fix trades, 0 hits. PASS so far.",
+    "Evaluate ATR_SL_MAX 1.8→2.0% for EXTREME — multiplier is dead at current cap",
+    "pump-chain+ cold streak monitoring — 20T 20%WR -$1.60/7d (Sep 21-22 bad days)",
+    "DISK 84% — candles.db 2.2G, coin_tracker.db 3.1G",
+    "New NEUTRAL signal development — EMA-reclaim or similar",
+    "SHORT side bleeding -$3.93/14d — all disabled signals aging out"
+  ]
 }

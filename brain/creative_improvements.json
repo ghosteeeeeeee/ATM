@@ -660,5 +660,61 @@
     "category": "entry sniper",
     "status": "suggested (6th time)",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-09-27T22:38:55.368345+00:00",
+    "ideas": [
+      {
+        "idea": "Fix final_confidence injection from hotset.json to decider_run.py",
+        "rationale": "9/11 post-fix trades have None final_confidence. signal_compactor writes it to hotset.json but decider_run reads signals from DB (no final_confidence). The 2 trades that DO have it (YGG rs-s94, HBAR bb-bounce-v2-long+) likely got it via a race condition. Fix: at line ~3030, after token is matched in hotset, pull final_confidence from the hotset entry.",
+        "expected_impact": "+$0.50-1.00/7d",
+        "category": "bug fix / entry sniper",
+        "status": "suggested",
+        "risk": "low"
+      },
+      {
+        "idea": "pump-chain+ EXTREME confidence floor 70%",
+        "rationale": "pump-chain+ EXTREME 14d: 36T 94.4% ATR_SL but +$0.96 (winners ride momentum). BLOCKED on final_confidence NULL — needs fix first.",
+        "expected_impact": "+$0.10-0.30/7d",
+        "category": "entry sniper",
+        "status": "blocked (needs final_confidence fix)",
+        "risk": "low"
+      },
+      {
+        "idea": "Investigate 3 hotset signals missing volume_spike (IOTA rs-s37, HYPER rs-s118, BTC continuum_engine)",
+        "rationale": "8/11 post-fix trades have volume_spike. 3 missing are hotset signals. Crash signal volume_spike injection at line 4214 may not fire for these paths.",
+        "expected_impact": "+$0.10-0.20/7d",
+        "category": "bug fix",
+        "status": "suggested",
+        "risk": "low"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-27T23:36:53.572206+00:00",
+    "idea": "Raise ATR_SL_MAX from 1.8% to 2.0% for EXTREME regime",
+    "rationale": "EXTREME ATR_SL_MIN_EXTREME=1.5% with 1.2x multiplier = 1.8% = ATR_SL_MAX. Multiplier is DEAD — capped by max. pump-chain+ EXTREME 94.4% ATR_SL hit rate but +$0.96 PnL (winners ride big moves). Widening to 2.0% gives trades 33% more room to breathe. Expected: reduce EXTREME ATR_SL from 74.4% to ~60%.",
+    "expected_impact": "+$0.50-1.00/7d from EXTREME regime",
+    "category": "SL tuning",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-27T23:36:53.572219+00:00",
+    "idea": "Block pump-chain+ in EXTREME regime entirely",
+    "rationale": "pump-chain+ EXTREME 94.4% ATR_SL hit rate. Even though net profitable (+$0.96/14d), the 34 ATR_SL exits create noise and capital drag. volume-breakout-long+ EXTREME 70% WR +$1.51 — handles EXTREME alone with better quality.",
+    "expected_impact": "+$0.30-0.50/7d from reduced ATR_SL noise",
+    "category": "regime filter",
+    "status": "suggested (alternative)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-27T23:36:53.572221+00:00",
+    "idea": "New LONG signal: EMA-reclaim for NEUTRAL regime",
+    "rationale": "Only 2 profitable signals (pump-chain+, volume-breakout-long+). Need NEUTRAL diversity. EMA-reclaim: enter LONG when price reclaims EMA20 after dipping below, with volume confirmation. Low-frequency but high-quality.",
+    "expected_impact": "+$0.30-0.60/7d once validated",
+    "category": "new signal",
+    "status": "suggested",
+    "risk": "medium — needs backtest"
   }
 ]

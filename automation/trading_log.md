@@ -8032,3 +8032,25 @@ Final set: ['KAS']
 - No open positions = no overnight risk
 
 **BY:** auto_1hr
+
+## [2026-09-27 23:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed, 0 open (system flat)
+**24h:** 11T 54.5%WR +$0.72 | Post-fix (Sep 26+): 11T +$0.72
+**7d:** 127T 35.4%WR -$5.34
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix validated: 0% atr_sl_hit across all 11 post-fix trades
+- All exits via profit-monster-trail — trailing stop working correctly
+- No kill candidates (no signal with 3+ trades and 0% WR in recent window)
+- Trade frequency: 0/hour — quiet period, not under-trading
+- SHORT drag (-$3.16/14d) is 100% pre-fix — 0 SHORT trades post-fix
+
+**Monitoring:**
+- final_confidence injection bug flagged by brain_auditor (9/11 post-fix trades have None) — deferred, requires hotset-to-DB path fix
+- System flat = no overnight risk
+- Continue tracking post-fix win rate as sample grows
+
+**BY:** auto_1hr

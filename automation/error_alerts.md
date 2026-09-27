@@ -253,3 +253,6 @@
 
 ## Error Alerts — 2026-09-27 21:58 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`
+
+## Error Alerts — 2026-09-27 22:58 UTC
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
