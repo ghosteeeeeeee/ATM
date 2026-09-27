@@ -550,5 +550,16 @@
     "after": "EXTREME uses 1.5% floor (ATR_SL_MIN_EXTREME). Effective floor with 1.2x mult = 1.8% = ATR_SL_MAX. Maximum room for EXTREME trades.",
     "rationale": "EXTREME 70.2% ATR_SL hit rate 7d. pump-chain+ EXTREME 89.2% hit rate. 8 small winners (<$0.15) in 14d cut too early. Widening gives trades room to breathe.",
     "impact": "+$0.20-0.50/7d from reduced ATR_SL hit rate in EXTREME"
+  },
+  {
+    "timestamp": "2026-09-28T00:20:00Z",
+    "agent": "brain_auditor",
+    "change": "Inject final_confidence into trade metadata (_exec_meta)",
+    "type": "code",
+    "file": "decider_run.py",
+    "before": "final_confidence 100% NULL in 126/126 7d trades — blocks confidence analysis",
+    "after": "_exec_meta[\"final_confidence\"] = sig[\"final_confidence\"] added after volume_spike injection",
+    "rationale": "final_confidence used for hotset filtering (line 2951) but never recorded in trades. Enables confidence vs winrate analysis. Enables future pump-chain+ EXTREME confidence floor.",
+    "impact": "+$0.50-1.00/7d potential from confidence tuning. 0 risk — metadata-only, no filtering change."
   }
 ]

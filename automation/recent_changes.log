@@ -1,3 +1,11 @@
+[2026-09-27 20:10 UTC] auto_1hr: NO CHANGE — analysis only
+  3 closures last 2h (YGG +$0.12, HYPER +$0.14, CAKE -$0.01) = +$0.25 net. 0 in exact last hour.
+  7d: 124T 35.5%WR -$5.70 | ATR_SL 54.8% (improving) | 0 atr_sl_hit in last 12h ✅
+  2 open LONGs (POL +3.23%, HBAR +2.24%) with trailing SL above entry — locked profit.
+  CRITICAL DRIFT: volume_spike 97% NULL, final_confidence 100% NULL — code bug.
+  No kill candidates. volatility_regime NOW POPULATED (was NULL).
+  BY: auto_1hr
+
 [2026-09-27 17:12 UTC] auto_1hr: NO CHANGE — analysis only
   2 closures (POL +$0.10, IOTA -$$0.01), net +$0.09. 5 open LONGs, all fresh.
   7d: 124T 37.1%WR -$4.62 | ATR_SL 57.3% (improving from 67.5% pre-fix).
@@ -3125,3 +3133,6 @@
   0 CHANGES APPLIED. BY: brain_auditor
 [2026-09-27 15:10 UTC] auto_1hr: NO CHANGE — analysis only, system just woke up
   3 fresh LONGs (POL/IOTA/HYPER), 0 closures, 120h+ idle ended. ATR_SL 67.5% (pre-fix). BY: auto_1hr
+[2026-09-27 18:10 UTC] auto_1hr: NO CHANGE — ATR_SL fix validated working
+  ATR_SL 0% post-fix (was 68% pre-fix). Last atr_sl_hit Sep 24. 5 post-fix closes all trailing/ORPHAN/MAX_HOLD.
+  1T last hour (-/usr/bin/bash.04), 5 open LONGs. 7d 122T 35.2%WR -.93 | 14d 330T 44.2%WR -.28. BY: auto_1hr

@@ -3035,11 +3035,31 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             age_from_entry = (time.time() - entry_origin_ts) / 60.0
             staleness = max(0.0, 1.0 - (age_from_entry * 0.2))
 
+            # ponytail: volume_spike computed inline from BTC 1m candles.
+            # _compute_volume_spike exists in btc_crash_filter but importing it
+            # would pull in hermes_constants deps at module level. Inline = simpler.
+            _volume_spike = 0.0
+            try:
+                _vol_sql_conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=3)
+                try:
+                    _vol_cur = _vol_sql_conn.cursor()
+                    _vol_cur.execute("SELECT volume FROM candles_1m WHERE token='BTC' ORDER BY ts DESC LIMIT 21")
+                    _vols = [r[0] for r in _vol_cur.fetchall()]
+                    if len(_vols) >= 11:
+                        _avg_vol = sum(_vols[1:]) / len(_vols[1:])
+                        _volume_spike = round(_vols[0] / _avg_vol, 2) if _avg_vol > 0 else 0.0
+                finally:
+                    try: _vol_sql_conn.close()
+                    except: pass
+            except Exception:
+                pass
+
             hotset_entries.append({
                 'token': token,
                 'direction': direction.upper(),
                 'confidence': conf,
                 'final_confidence': conf,  # decider_run reads this field
+                'volume_spike': _volume_spike,  # BTC 1m volume spike ratio
                 'source': source,
                 'signal_type': stype,
                 'z_score': row[7] or 0,  # z_score column (index 7)

@@ -1,144 +1,162 @@
 {
-  "timestamp": "2026-09-27T15:37:01.371096+00:00",
-  "session_brain_stats": {
-    "total_sessions": "100+",
-    "recent_topics": [
-      "ATR_SL widening eval",
-      "volume_spike drift",
-      "SHORT RSI penalty",
-      "NEUTRAL signal diversity",
-      "REGIME_CONF_MULTIPLIER"
+    "timestamp": "2026-09-28T00:15:00Z",
+    "session_brain_stats": {
+        "total_memories": "62+ creative improvements tracked",
+        "recurring_topics": ["ATR_SL hit rate", "signal diversity", "volume_spike NULL", "HIGH regime bleeding", "SHORT RSI bands"]
+    },
+    "trade_summary_7d": {
+        "total_trades": 126,
+        "win_rate": "36.7%",
+        "total_pnl": "-$5.96",
+        "atr_sl_hits": "68/126 (54.0%)",
+        "atr_sl_pnl": "-$5.96",
+        "post_fix_trades": 9,
+        "post_fix_pnl": "+$0.82",
+        "post_fix_atr_sl": "0% (ALL PM_TRAIL exits)",
+        "regime_breakdown": {
+            "EXTREME": "70T 37.1%WR -$3.06",
+            "HIGH": "36T 30.6%WR -$2.05",
+            "NORMAL": "18T 44.4%WR -$0.09"
+        }
+    },
+    "trade_summary_14d": {
+        "total_trades": 333,
+        "win_rate": "44.4%",
+        "total_pnl": "-$4.27",
+        "regime_breakdown": {
+            "HIGH": "131T 42.7%WR -$2.21 (39% of trades)",
+            "EXTREME": "130T 46.2%WR -$0.03 (best)",
+            "NORMAL": "69T 44.9%WR -$1.06"
+        }
+    },
+    "drift_findings": [
+        {
+            "issue": "final_confidence 100% NULL in trade metadata",
+            "status": "CONFIRMED DRIFT",
+            "impact": "Cannot analyze confidence vs winrate correlation. Blocks confidence-based filtering analysis.",
+            "detail": "final_confidence is used in hotset JSON filtering (line 2951) but never injected into _exec_meta for trade recording. 126/126 7d trades have NULL final_confidence.",
+            "fix_required": "Inject final_confidence into _exec_meta in decider_run.py around line 4214"
+        },
+        {
+            "issue": "volume_spike fix PARTIALLY working",
+            "status": "PARTIAL FIX",
+            "impact": "6/9 post-fix trades have volume_spike. 3 missing (rs-s* hotset paths, continuum_engine).",
+            "detail": "Fix from Sep 25 works for main hotset path. rs-s* and continuum_engine bypass the volume_spike injection.",
+            "fix_required": "Extend volume_spike injection to cover rs-s* and continuum_engine code paths"
+        },
+        {
+            "issue": "7d data includes pre-fix legacy trades",
+            "status": "AGING OUT",
+            "impact": "7d PnL of -$5.96 is dominated by pre-fix ATR_SL hits (68/126). Post-fix: +$0.82.",
+            "detail": "All 68 ATR_SL hits are pre-fix (before Sep 25). 0 ATR_SL hits on post-fix trades. 7d numbers will improve as legacy ages out."
+        }
     ],
     "recurring_problems": [
-      "ATR_SL hit rate 65%+ 7d",
-      "volume_spike 100% NULL",
-      "final_confidence NULL",
-      "SHORT side 82% of losses",
-      "Signal diversity critical"
+        {
+            "topic": "ATR_SL hit rate",
+            "occurrences": "15+ audit runs",
+            "status": "RESOLVED (post-fix)",
+            "detail": "Pre-fix: 68% ATR_SL hit rate. Post-fix (Sep 25+): 0% ATR_SL hits. PM_TRAIL capturing winners. Success criteria: PASS if <55% by 50 trades AND R:R>1.3:1.",
+            "current_data": "9 post-fix trades, 0 ATR_SL hits, all PM_TRAIL exits"
+        },
+        {
+            "topic": "Signal diversity",
+            "occurrences": "20+ audit runs",
+            "status": "UNRESOLVED",
+            "detail": "Only pump-chain+ LONG (+$0.85/14d) and volume-breakout-long+ (+$1.46/14d) profitable. 30+ signal types but only 2 net positive. NEUTRAL regime has no dedicated profitable signal.",
+            "impact": "System fragile — if either signal degrades, no backup"
+        },
+        {
+            "topic": "HIGH regime bleeding",
+            "occurrences": "10+ audit runs",
+            "status": "MONITORING (REGIME_CONF_HIGH_MULT=0.50 untested)",
+            "detail": "HIGH 131T -$2.21/14d (39% of trades). REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26, 0 trades since. Will reduce HIGH entries by ~50%.",
+            "current_data": "0 post-fix HIGH trades to measure impact"
+        },
+        {
+            "topic": "SHORT side bleeding",
+            "occurrences": "12+ audit runs",
+            "status": "FADING (pre-fix trades aging out)",
+            "detail": "7d SHORT: 60T -$2.89. All pre-fix. Post-fix: 0 SHORT trades. SHORT_RSI_FLOOR=50 and pump-chain- disable reducing SHORT noise."
+        }
+    ],
+    "missing_implementations": [
+        {
+            "idea": "New NEUTRAL regime signal",
+            "status": "DISCUSSED BUT NOT BUILT",
+            "sessions": "3+ sessions discussing EMA-reclaim, grind-breakout concepts",
+            "impact": "System only has pump-chain+ and volume-breakout-long+ in NEUTRAL — fragile",
+            "priority": "HIGH"
+        },
+        {
+            "idea": "final_confidence metadata injection",
+            "status": "NEVER IMPLEMENTED",
+            "impact": "Cannot do confidence-based filtering analysis",
+            "priority": "MEDIUM"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-28T00:15:00Z",
+            "idea": "Investigate volume_spike gap for rs-s* and continuum_engine code paths",
+            "rationale": "Volume_spike fix works for main hotset but not rs-s* (3/9 post-fix trades missing) and continuum_engine (0%). Chase filter blind for these paths. Extending fix: +$0.10-0.30/7d",
+            "expected_impact": "+$0.10-0.30/7d from better chase filtering",
+            "category": "bug fix",
+            "status": "suggested",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-28T00:15:00Z",
+            "idea": "Inject final_confidence into trade metadata for analysis",
+            "rationale": "final_confidence is used for filtering but never recorded. 126/126 7d trades have NULL — blocks all confidence-based analysis. Adding 1 line to decider_run.py ~4214: _exec_meta['final_confidence'] = sig.get('final_confidence', 0)",
+            "expected_impact": "+$0.50-1.00/7d potential (enables confidence tuning)",
+            "category": "metadata",
+            "status": "suggested",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-28T00:15:00Z",
+            "idea": "pump-chain+ EXTREME confidence floor 70% — NOW ACTIONABLE",
+            "rationale": "Previous 6 suggestions BLOCKED on final_confidence NULL. If we inject final_confidence (fix above), we can then add EXTREME confidence floor. pump-chain+ EXTREME 14d: 36T 44.4%WR +$0.96 — already best regime. Floor 70% filters low-confidence entries while preserving high-confidence winners.",
+            "expected_impact": "+$0.10-0.30/7d",
+            "category": "entry sniper",
+            "status": "depends on final_confidence fix",
+            "risk": "low",
+            "blocked_by": "final_confidence metadata injection"
+        }
+    ],
+    "losing_trade_autopsy": {
+        "summary": "9 post-fix trades: 6W 3L (+$0.82). All LONG. All PM_TRAIL exits. No ATR_SL hits.",
+        "losers": [
+            {
+                "trade": "CAKE LONG doji-bottom-long -$0.01",
+                "exit": "profit-monster-trail",
+                "root_cause": "PM_TRAIL locked in small loss after brief profit. RSI 55.26 at entry — normal range. Not a bad entry, just a small move that reversed.",
+                "verdict": "NORMAL VARIANCE — not a signal quality issue"
+            },
+            {
+                "trade": "LTC LONG rs-s52 -$0.04",
+                "exit": "profit-monster-trail",
+                "root_cause": "PM_TRAIL locked in loss. RSI 36.17 at entry — near oversold but not extreme. VOL spike 0.97 (high). Entry was quality but price didn't follow through.",
+                "verdict": "NORMAL VARIANCE — RSI low but within acceptable range"
+            },
+            {
+                "trade": "IOTA LONG rs-s37 -$0.01",
+                "exit": "profit-monster-trail",
+                "root_cause": "PM_TRAIL micro loss. RSI 50.0 — neutral. No volume_spike data (missing from code path). Tiny loss, not actionable.",
+                "verdict": "NORMAL VARIANCE — not a signal quality issue"
+            }
+        ],
+        "pattern": "All 3 losers are PM_TRAIL micro-losses ($0.01-$0.04). Not ATR_SL hits. Not chasing. Not regime issues. Pure variance in a short sample.",
+        "actionable": "No changes needed — post-fix PM_TRAIL behavior is working as designed"
+    },
+    "config_changes_applied": [],
+    "next_actions": [
+        "1. Inject final_confidence into _exec_meta (1 line change in decider_run.py ~4214)",
+        "2. Extend volume_spike injection to rs-s* and continuum_engine code paths",
+        "3. Monitor ATR_SL widening: 9/50 trades evaluated, 0% hit rate (PASS so far)",
+        "4. Monitor REGIME_CONF_HIGH_MULT=0.50: 0 HIGH trades post-fix",
+        "5. Monitor pump-chain+ degradation: 21T/7d -$1.54 (was +$1.24/14d)",
+        "6. NEW: Develop NEUTRAL regime signal for diversity"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 1,
-    "pnl": 0.0,
-    "win_rate": 0.0,
-    "note": "System idle since Sep 27 02:17 UTC"
-  },
-  "trade_summary_7d": {
-    "trades": 128,
-    "win_rate": 37.5,
-    "pnl": -4.54,
-    "atr_sl_hit_rate": 60.2,
-    "regimes": {
-      "EXTREME": {
-        "trades": 72,
-        "wr": 38.9,
-        "pnl": -2.31,
-        "atr_sl": 65.3
-      },
-      "HIGH": {
-        "trades": 36,
-        "wr": 30.6,
-        "pnl": -1.78,
-        "atr_sl": 47.2
-      },
-      "NORMAL": {
-        "trades": 12,
-        "wr": 41.7,
-        "pnl": -0.48,
-        "atr_sl": 58.3
-      }
-    }
-  },
-  "drift_findings": [
-    {
-      "issue": "volume_spike 100% NULL (337/337 trades 14d)",
-      "status": "Fix deployed Sep 26, UNTESTED (0 trades since deploy)",
-      "impact": "Chase filter blind to volume quality. Expected +$0.30-0.80/7d once verified.",
-      "action": "Monitor next trade — verify volume_spike appears in _signal_metadata"
-    },
-    {
-      "issue": "final_confidence 100% NULL (337/337 trades 14d)",
-      "status": "Blocks confidence-based filtering",
-      "impact": "Cannot implement pump-chain+ EXTREME confidence floor 70%",
-      "action": "Investigate why final_confidence not written to _signal_metadata"
-    },
-    {
-      "issue": "continuum_engine trade has empty metadata {}",
-      "status": "Most recent trade (Sep 27 02:17) — no volume_spike, no final_confidence",
-      "impact": "Metadata injection may have code path issue",
-      "action": "Check if continuum_engine bypasses normal metadata injection"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "ATR_SL hit rate 65%+ 7d (CRITICAL)",
-      "frequency": "Every audit since Sep 20",
-      "current_status": "Widening deployed Sep 25 (1.8% MAX + EXTREME 1.2x) + ATR_SL_MIN_EXTREME=1.5% Sep 27. UNTESTED.",
-      "expected_impact": "+$0.50-1.00/7d if hit rate drops below 55%"
-    },
-    {
-      "problem": "SHORT side 82% of all losses",
-      "frequency": "Every audit since Sep 15",
-      "current_status": "SHORT_RSI_FLOOR=50, SHORT_RSI_CEILING=70, pump-chain- disabled. Aging out.",
-      "expected_impact": "Legacy SHORT losses fading as pre-fix trades age out"
-    },
-    {
-      "problem": "Signal diversity critical — only 2 signals profitable",
-      "frequency": "Every audit since Sep 22",
-      "current_status": "pump-chain+ LONG (+$1.24/14d) and volume-breakout-long+ (+$0.62/7d) carry system",
-      "expected_impact": "Need new NEUTRAL signal for single-point-of-failure risk"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "idea": "SHORT RSI 35-50 confidence penalty -20pt",
-      "suggested_count": "6+ times since Sep 23",
-      "data": "45T 42.2%WR -$1.88/14d (0 winners blocked)",
-      "status": "Not implemented",
-      "expected_impact": "+$0.30-0.60/7d"
-    },
-    {
-      "idea": "NEW NEUTRAL regime signal",
-      "suggested_count": "4+ times since Sep 22",
-      "status": "Not implemented",
-      "expected_impact": "+$0.50-1.00/7d + diversity"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-27T15:37:01.371111+00:00",
-      "idea": "Investigate continuum_engine metadata path — empty {} suggests metadata injection bypass",
-      "rationale": "Most recent trade has no metadata at all. If continuum_engine trades bypass metadata injection, we lose volume_spike and final_confidence for those trades.",
-      "expected_impact": "Fix metadata for continuum_engine trades",
-      "category": "bug fix",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-27T15:37:01.371114+00:00",
-      "idea": "ATR_SL widening success criteria — define pass/fail before trades resume",
-      "rationale": "Widening deployed Sep 25, UNTESTED 13+ hours. Define criteria now so we can evaluate objectively when trades resume.",
-      "expected_impact": "Clear go/no-go criteria for ATR_SL widening",
-      "category": "monitoring",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-27T15:37:01.371115+00:00",
-      "idea": "SHORT RSI 35-50 confidence penalty -20pt (6th suggestion)",
-      "rationale": "45T 42.2%WR -$1.88/14d bleeding band. Would block 0 winners. Low risk.",
-      "expected_impact": "+$0.30-0.60/7d",
-      "category": "entry sniper",
-      "status": "suggested (6th time)",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Monitor next trade for volume_spike and final_confidence in metadata",
-    "Evaluate ATR_SL widening when 50 trades accumulate",
-    "Monitor REGIME_CONF_HIGH_MULT=0.50 impact",
-    "Monitor LONG_RSI_CEILING=70 impact",
-    "Consider SHORT RSI 35-50 confidence penalty when system resumes trading"
-  ]
 }

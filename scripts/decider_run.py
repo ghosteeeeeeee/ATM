@@ -4212,6 +4212,9 @@ def run(dry_run=False):
             _exec_meta['staleness_minutes'] = _staleness_min
         if _crash_signal is not None:
             _exec_meta['volume_spike'] = round(getattr(_crash_signal, 'volume_spike', 0.0), 2)
+        # ponytail: inject final_confidence for post-trade analysis (was 100% NULL)
+        if sig.get('final_confidence') is not None:
+            _exec_meta['final_confidence'] = sig['final_confidence']
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.

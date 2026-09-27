@@ -4,4 +4,5 @@
 - [2026-09-12 11:00 UTC] auto_1hr: NO CHANGES — 0T closed (quiet hour). 24h 53T 62.3%WR +$0.92. 5 open positions managed. System healthy, no kill thresholds hit.
 
 ## TEAM UPDATES
+- [2026-09-27 17:12 UTC] auto_1hr: NO CHANGE — 2 closures net +$0.09, 5 open LONGs, all fresh. ATR_SL 57.3%7d (improving). CRITICAL: volume_spike 99% NULL, final_confidence 100% NULL — code bug in signal_compactor. No kill candidates in last hour.
 - [2026-09-18 09:00 UTC] auto_1hr: NO CHANGE — monitoring only. 24h 30%WR (cold streak) but 7d 50.7%WR stable. ATR SL 75% structural in NEUTRAL chop. 4 open trades all profitable. No kill candidates.

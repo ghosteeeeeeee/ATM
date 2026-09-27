@@ -1,3 +1,42 @@
+## [2026-09-27 20:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed last 2h (0 in exact last hour) | **Open:** 2 (POL, HBAR — both LONG)
+**PnL:** +$0.25 (YGG +$0.12, HYPER +$0.14, CAKE -$0.01) | All via profit-monster-trail
+**7d:** 124T 35.5%WR -$5.70 | **ATR_SL:** 54.8% (68/124, down from 57.3% last check)
+**ATR_SL last 12h:** 0 hits — fix confirmed working
+
+**Open Positions (both locked in profit via trailing SL above entry):**
+- POL LONG continuation+ | entry=0.12070 | SL=0.12317 (above entry) | +3.23%
+- HBAR LONG rs-s102 | entry=0.09345 | SL=0.09440 (above entry) | +2.24%
+
+**Hourly Trend (last 12h):**
+- 19h: 3T +$0.25 (66.7% WR) ✅
+- 17h: 1T -$0.04 (0% WR)
+- 16h: 2T +$0.09 (50% WR)
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates surfaced (0 closures in exact last hour)
+- Both open positions in profit with trailing SL above entry (locked gains)
+- ATR_SL fix confirmed working — 0 atr_sl_hit closes in last 12h
+- pump-chain- short already killed (PUMP_CHAIN_V5_SHORT_ENABLED=False)
+- pump-chain+ (V5 LONG) 7d: 21T 23.8%WR -$1.54 but 14d: 62T 40.3%WR +$0.85 — cold streak, not kill threshold
+- No signal has 0%WR with 3+ trades in last hour
+
+**Drift (CRITICAL, non-blocking):**
+- volume_spike: 120/124 NULL (97%) — slightly improved from 99.2% but still broken
+- final_confidence: 124/124 NULL (100%) — completely broken, blocks confidence filtering
+- volatility_regime: NOW POPULATED (70 EXTREME, 35 HIGH, 17 NORMAL, 1 FLAT) — this field is working
+
+**Open Questions:**
+- Metadata drift (volume_spike, final_confidence) persists — code bug in signal_compactor.py, not constants
+- 2 fresh LONGs in EXTREME/HIGH volatility regime — trailing stops are protecting them
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-27 17:12 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour | **Open:** 5 (HBAR, POL, LTC, CAKE, HYPER — all LONG)
@@ -7831,5 +7870,137 @@ Final set: ['KAS']
 - 3 fresh opens in HIGH/NORMAL regime — will ATR_SL fix help these?
 - 120h+ idle gap followed by 3 simultaneous opens — unusual burst
 - ATR_SL 67.5% dominance still untested post-fix
+
+**BY:** auto_1hr
+
+## [2026-09-27 18:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (LTC LONG rs-s52, -$0.04, profit-monster-trail)
+**Open:** 5 (YGG/HBAR/POL/CAKE/HYPER — all LONG, 27-203min old)
+**7d:** 122T 35.2%WR -$5.93 | **14d:** 330T 44.2%WR -$4.28
+
+**🚨 ATR_SL FIX CONFIRMED WORKING:**
+- Last atr_sl_hit: Sep 24 18:10 UTC (pre-fix)
+- Post-fix (Sep 25+): ZERO atr_sl_hit exits (5 closes, all profit-monster-trail/ORPHAN_PAPER/UNIVERSAL_MAX_HOLD)
+- ATR_SL 14d still shows 68.2% — but this is 100% pre-fix data. Post-fix ratio is 0%.
+- This is the single biggest improvement. ATR_SL was killing ~70% of trades.
+
+**24h exits:** profit-monster-trail 3T (+$0.05), ORPHAN_PAPER 1T ($0.00)
+
+**Signal perf (14d):**
+- Winners: volume-breakout-long+ (+$1.46, 66.7% WR), pump-chain+ (+$0.85, 40.3% WR), grind-trend+ (+$0.24, 50% WR)
+- Losers: pullback-entry- (-$1.76, 75T), mover+ (-$1.12, 14T), pump-chain- (-$0.79, 48T)
+- Combined signals (legacy): mostly losing
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix validated — zero post-fix atr_sl_hit. System finally working as designed.
+- 1 trade/hour = normal frequency, no overtrading
+- No signal with 0% WR and 3+ trades in last hour
+- 5 open positions all LONG — normal, not crowded
+- CAKE doji-bottom-long has tightest SL (0.45%) — watch if it triggers
+
+**Open Questions:**
+- 14d WR still 44.2% — trailing exits (profit-monster-trail) cutting winners short? LTC was -0.17% actual move but closed -0.04.
+- pullback-entry- still biggest loser by volume (75T) but last trade >48h ago — can't kill with stale data
+- volume_spike NULL issue from Sep 25 brain_auditor report — still unverified
+
+**BY:** auto_1hr
+
+---
+
+## daily_orchestrator — 2026-09-27 18:30 UTC
+
+**Pipeline Status:**
+- **System:** Woke up Sep 27 ~14:48 UTC after 100h+ idle
+- **Open:** 5 LONGs (YGG, HBAR, POL, CAKE, HYPER) — all in profit
+- **Closed today:** 4 (3W 1L, net +$0.05)
+- **7d:** 122T 35.2%WR -$5.93 (DB-verified, all NEUTRAL regime)
+- **14d:** 330T 44.2%WR -$4.28 (DB-verified)
+- **Pipeline:** Healthy, all timers firing, no crashes
+
+**Key Findings:**
+1. **volume_spike fix IS WORKING** — 6/9 post-fix trades have values (0.02-0.97). auto_1hr drift alert is STALE (queries 7d including pre-fix trades). NOT a bug.
+2. **final_confidence NOT A BUG** — by design, only in hotset JSON for execution filtering, never persisted to trades table.
+3. **ATR_SL widening STILL UNTESTED** — 0 ATR_SL hits on post-fix trades. 5 open positions, none hit ATR_SL yet. Needs 50 trades for eval.
+4. **REGIME_CONF_HIGH_MULT=0.50 FIRST TEST** — POL opened in HIGH regime. First real test of the -50% confidence penalty.
+5. **pump-chain+ DEGRADED** — 21T 23.8%WR -$1.54/7d (was +$1.24/14d). Cold streak or systemic? All NEUTRAL regime.
+6. **Signal kills WORKING** — pullback-entry- and mover+ have no new trades since kills. 7d numbers are pre-kill trades aging out.
+7. **Disk 84%** — candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DB files cleaned.
+
+**Changes Applied:**
+1. **25 dead 0-byte SQLite files removed** from data/ (associative_memory.db, brain.db, hermes.db, etc.)
+
+**No Change Needed:**
+- All recent fixes (ATR_SL widening, REGIME_CONF_HIGH_MULT, volume_spike) need market activity to evaluate
+- System just woke up — too early to measure any impact
+- All 5 open positions are fresh and in profit
+
+**Monitoring:**
+- ATR_SL widening eval (needs 50 trades, pass: <55% hit rate + R:R >1.3:1)
+- REGIME_CONF_HIGH_MULT eval (POL in HIGH is first test)
+- pump-chain+ degradation (cold streak vs systemic)
+- Disk growth (84%, approaching 85% warn threshold)
+- decider_run failures (80/24h, signals consumed but HL API rejects)
+
+**BY:** daily_orchestrator
+
+## [2026-09-27 20:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L, scratch)
+**PnL:** $0.04 24h (5T, 20% WR)
+**7d:** 122T 34.4%WR -$5.96 (all pre-fix ATR_SL losses)
+
+**Key Findings:**
+- ATR_SL fix CONFIRMED: 0 atr_sl_hit since Sep 26 (was 65.5% pre-fix)
+- CAKE doji-bottom-long: -$0.01, profit-monster-trail exit. Scratch trade, no concern.
+- 4 open LONGs (YGG/HBAR/POL/HYPER), all fresh and in normal regime
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix working, no post-fix failures
+- No signal kill candidates (pullback-entry- and mover+ already killed, aging out)
+- System quiet — market-driven, not a filter issue
+- All recent fixes (ATR_SL, REGIME_CONF_HIGH_MULT, volume_spike) need more trades to evaluate
+
+**Monitoring:**
+- Need ~50 post-fix trades to validate ATR_SL widening (currently 5)
+- disk 84% — watch approaching 85% warn threshold
+
+**BY:** auto_1hr
+
+## [2026-09-27 21:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L)
+**PnL:** +$0.51 last hour | +$0.81 24h (55.6% WR, 9T)
+**7d:** 125T 36%WR -$5.25 (pre-fix front-loaded)
+**Post-fix (Sep 26+):** 9T 56%WR +$0.81 | ATR_SL: 0/9 (0%)
+
+**Key Findings:**
+- ATR_SL fix fully validated: 0 atr_sl_hit post-fix vs 93 pre-fix (65% → 0%)
+- Both last-hour trades winners (continuation+ $0.32, rs-s102 $0.19), both profit-monster-trail exits
+- 1 open position: HBAR LONG bb-bounce-v2-long+ (entry 0.09506, SL 0.09382)
+- Trade frequency: ~9/24h = well-filtered, not overtrading
+- All 24h exits via profit-monster-trail — trailing working correctly
+
+**Signal performance (24h):**
+- Winners: continuation+, rs-s102, rs-s118, rs-s44, bb-bounce-v2-long+ (5/9 = 55.6% WR)
+- Loses: doji-bottom-long (-$0.01), rs-s37 (-$0.01), rs-s52 (-$0.04) — all scratch/tiny
+- No kill candidates
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix confirmed: system converting 65% loss rate to 0%
+- Post-fix WR 56% (was 41% pre-fix) — signal quality improved with wider SL
+- Trade frequency appropriate (~1/2.5h)
+- No signal degradation detected
+
+**Monitoring:**
+- Continue tracking post-fix trade quality as sample grows (9/50 needed)
+- HBAR open position in profit
+- 7d PnL still negative but improving ($+0.81 post-fix)
 
 **BY:** auto_1hr

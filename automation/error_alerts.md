@@ -223,3 +223,30 @@
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`
 - **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-27 15:58 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
+
+## Error Alerts — 2026-09-27 16:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-27 17:45 UTC
+- **WARN** (1): `disk 83%` — approaching 85% threshold. candles.db 2.2G, coin_tracker.db 3.1G
+- **AUTO-FIX**: None needed yet. Monitor next 24h. If >85%, prune old candle data.
+
+## Error Alerts — 2026-09-27 17:58 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+
+## Error Alerts — 2026-09-27 19:46 UTC
+- **WARN** (1x): Disk at 84% (93G/118G). Below 85% threshold but trending up. Monitor.
+- **AUTO-FIX**: None needed. No immediate action required.
+
+## Error Alerts — 2026-09-27 20:45 UTC
+- **WARN** (1x): Disk usage at 84% (93G/118G) — approaching 85% threshold
+- **AUTO-FIX**: None applied. Consider compressing logs >7 days old.
