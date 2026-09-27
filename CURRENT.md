@@ -1,17 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 ~22:30 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-29 00:30 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 1T (continuum_engine BTC LONG $0.00 at 02:17). System idle 20h+. Pipeline healthy, NEUTRAL regime.
+24h: 0T. System idle 100h+ since Sep 27 02:17. Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 1T continuum_engine LONG BTC $0.00. 0 open. System idle since Sep 27 02:17.
-- **7d:** 128T 37.5%WR -$4.54 (DB-verified). ALL NEUTRAL regime. ATR_SL hit rate 60.2%.
-- **14d:** 346T 44.8%WR -$4.03 (DB-verified).
-- **LONG:** pump-chain+ (workhorse), volume-breakout-long+ (gem).
-- **SHORT:** ALL DISABLED or pre-disable.
+- **24h (rolling):** 0T. 0 open. System idle since Sep 27 02:17.
+- **7d:** 89T 37.1%WR -$4.94 (DB-verified). EXTREME 55T 38.2% -$2.78, HIGH 25T 24.0% -$2.18. ATR_SL 52.8% (47/89).
+- **14d:** 278T 43.9%WR -$3.65 (DB-verified). EXTREME 118T 46.6% -$0.32, HIGH 107T 41.1% -$2.38 (38.5% of all trades).
+- **LONG:** pump-chain+ LONG 55T +$1.23/14d (workhorse), volume-breakout-long+ 18T +$1.46/14d (gem).
+- **SHORT:** ALL DISABLED or pre-disable. pump-chain- 33T -$0.93/7d (legacy, disabled Sep 25).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC (brain_auditor changed START 1→0 Sep 21). 0.7x penalty.
@@ -29,20 +29,23 @@
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC, narrowed Sep 25 ~06:30 UTC). +10pt confidence when LONG RSI 40-50. 14d: RSI 40-50 = 35T 54.3%WR +$0.34. RSI 50-60 = 44T 63.6%WR +$2.06 (best band). Blocks nothing — only boosts fill quality.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$4.54)**
-7d PnL -$4.54. pullback-entry- SHORT 13T 23.1%WR -$1.54 (worst). mover+ LONG 8T 25%WR -$1.19 (legacy). pump-chain- SHORT 33T 45.5%WR -$0.93. pump-chain+ LONG 25T 32%WR -$0.42 (degraded). volume-breakout-long+ LONG 4T 50%WR +$0.62 (only winner).
+**🟡 R:R STATUS (7d -$4.94)**
+7d PnL -$4.94. pullback-entry- SHORT 6T -$1.54 (100% ATR_SL EXTREME). mover+ LONG 6T -$0.95 (legacy, killed). pump-chain- SHORT 33T -$0.93 (legacy, disabled). pump-chain+ LONG 5T -$0.68 (degraded). volume-breakout-long+ LONG 2T +$0.05 (flat).
 
-**🔴 ATR_SL HIT RATE:** 77/128 (60.2%) 7d. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **UNTESTED** — 0 real trades since any deploy (system idle 20h+). **ATR_SL WIDENING SUCCESS CRITERIA:** PASS if EXTREME ATR_SL hit rate <55% by 50 trades AND R:R >1.3:1. FAIL if >60% by 50 trades → widen to 2.0% for EXTREME.
+**🔴 ATR_SL HIT RATE:** 47/89 (52.8%) 7d. 14d: 182/278 (65.5%) — DOMINANT exit. EXTREME 72.9%, HIGH 63.6%, NORMAL 54.0%. ATR_SL_MAX widened 1.5→1.8% + EXTREME 1.2x (Sep 25). ATR_SL_MIN_EXTREME=1.5% (Sep 27). **ALL UNTESTED** — 0 real trades since any deploy (system idle 100h+). **ATR_SL WIDENING SUCCESS CRITERIA:** PASS if EXTREME ATR_SL hit rate <55% by 50 trades AND R:R >1.3:1. FAIL if >60% by 50 trades → widen to 2.0% for EXTREME.
 
-**🔴 REGIME EDGE (7d):** ALL trades NEUTRAL (128T 37.5%WR -$4.54). No EXTREME/HIGH trades recently — market regime shifted. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).** ALL UNTESTED — 0 trades since deploy.
+**🔴 REGIME EDGE (7d):** EXTREME 55T 38.2% -$2.78. HIGH 25T 24.0% -$2.18 (worst). NORMAL 7T 71.4% +$0.01. **14d:** EXTREME 118T 46.6% -$0.32 (best). HIGH 107T 41.1% -$2.38 (38.5% of all trades, worst). NORMAL 50T 42.0% -$0.98. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (Sep 26).** ALL UNTESTED — 0 trades since deploy.
 
 **🔴 RSI BANDS 14d (DB-verified):**
-- LONG RSI 50-60: 21T 71.4%WR +$0.51 (best WR)
-- LONG RSI 60-70: 36T 50%WR +$1.18 (best PnL)
-- LONG RSI 70+: 54T 35.2%WR -$0.55 (killing field — blocked by ceiling=70)
-- SHORT RSI 50-60: 17T 64.7%WR +$1.18 (sweet spot)
-- SHORT RSI <40: 43T 23.3%WR -$3.93 (catastrophic — blocked by floor=50)
-- SHORT RSI NULL: 61T 52.5%WR +$0.83
+- LONG RSI 30-50: 25T 44.0%WR -$0.12
+- LONG RSI 50-65: 65T 49.2%WR -$0.51
+- LONG RSI 65-80: 49T 40.8%WR +$0.98 (post-ceiling, RSI>70 now blocked)
+- LONG RSI <30: 6T 0%WR -$0.68 (blocked by floor=30)
+- SHORT RSI <35: 30T 33.3%WR -$1.65 (blocked by floor=50)
+- SHORT RSI 35-50: 37T 45.9%WR -$1.16 (floor now blocks this)
+- SHORT RSI 50-65: 49T 46.9%WR -$0.87 (sweet spot-ish)
+- SHORT RSI 65-80: 6T 66.7%WR +$0.49 (UNLOCKED by ceiling=70)
+- SHORT RSI NULL: DEAD — 0 trades/7d (metadata fix killed fallback)
 
 **🟢 HL-SYNC FALSE ALARM.** auto_1hr flagged "hl_sync: running but no log file" — log was rotated to .gz. Service `hermes-hl-sync-guardian.service` active, timer running. Not a real issue.
 
@@ -54,9 +57,13 @@
 
 **🟢 BB_BOUNCE_V2_LONG RE-ENABLED.** CEO Sep 22 — signal_reporter killed Sep 11 (4T/24h 25%WR) but30d = 73T 74%WR +$2.08. Best standalone signal by WR. Short-term variance, not systemic.
 
-**🔴 SHORT NULL RSI EDGE — DEAD.** 0 trades/14d. Metadata fix (Sep 16) now records RSI for all trades, eliminating the detection-time fallback path. Edge was artifact of incomplete metadata recording. No fix possible — RSI is now always recorded.
+**🔴 SHORT NULL RSI EDGE — DEAD.** 0 trades/7d. Metadata fix (Sep 16) now records RSI for all trades, eliminating the detection-time fallback path. Edge was artifact of incomplete metadata recording. No fix possible — RSI is now always recorded.
 
-**🔴 SIGNAL DIVERSITY:** Only pump-chain+ LONG (+$1.24/14d) and volume-breakout-long+ (+$0.62/7d) pass confluence in NEUTRAL. 14d active: 6+ types. Need new signals for diversity. pump-chain+ 31T -$0.79/7d, volume-breakout-long+ 4T +$0.62/7d carry system.
+**🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG (+$1.23/14d) and volume-breakout-long+ (+$1.46/14d) profitable. 14d: 35+ signal types active but only 2 net positive. Single-point-of-failure. Need new NEUTRAL signal.
+
+**🔴 DRIFT — volume_spike 100% NULL:** 278/278 trades/14d have NULL volume_spike. Sep 25 fix NOT working. Chase filter blind to volume quality. Expected +$0.30-0.80/7d once fixed.
+
+**🔴 DRIFT — final_confidence 100% NULL:** 278/278 trades/14d have NULL final_confidence. Blocks confidence-based filtering. Cannot implement pump-chain+ EXTREME confidence floor 70%.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 

@@ -1,89 +1,166 @@
 {
     "timestamp": "2026-09-29T00:30:00Z",
     "session_brain_stats": {
-        "total_sessions": "N/A (model load)",
-        "top_topics": ["signal performance", "ATR_SL widening", "volume_spike bug", "neutral signal diversity"]
+        "total_sessions": "120+",
+        "top_themes": ["ATR_SL dominance", "RSI bands", "signal diversity", "volume_spike drift", "dead hours", "HIGH regime bleeding"]
     },
     "trade_summary_24h": {
         "trades": 0,
-        "note": "System idle 100h+. Last real trade Sep 25 02:26."
+        "wr": null,
+        "pnl": null,
+        "note": "SYSTEM IDLE 100h+ — last trade Sep 27 02:17 UTC"
     },
     "trade_summary_7d": {
-        "trades": 131,
-        "win_rate": 38.6,
-        "pnl": -4.42,
-        "regimes": {
-            "EXTREME": {"trades": 73, "wr": 38.4, "pnl": -2.46},
-            "HIGH": {"trades": 39, "wr": 33.3, "pnl": -1.36},
-            "NORMAL": {"trades": 13, "wr": 38.5, "pnl": -0.75}
+        "trades": 89,
+        "wr": 37.1,
+        "pnl": -4.94,
+        "extreme": {"trades": 55, "wr": 38.2, "pnl": -2.78, "atr_sl_pct": "UNKNOWN — regime NULL for 1/89 trades"},
+        "high": {"trades": 25, "wr": 24.0, "pnl": -2.18},
+        "normal": {"trades": 7, "wr": 71.4, "pnl": 0.01},
+        "exit_analysis": {
+            "atr_sl_hit": {"trades": 47, "pnl": -4.99, "pct_of_total": 52.8},
+            "profit_monster_trail": {"trades": 16, "pnl": 0.27},
+            "pump_exit_dead_money": {"trades": 13, "pnl": 0.44},
+            "cut_loser_CL_T1": {"trades": 8, "pnl": -0.97, "wr": 0.0}
         }
     },
     "trade_summary_14d": {
-        "trades": 350,
-        "win_rate": 45.1,
-        "pnl": -4.00,
-        "top_signals": {
-            "pump-chain+ LONG": {"trades": 67, "wr": 43.3, "pnl": 1.24},
-            "volume-breakout-long+ LONG": {"trades": 18, "wr": 66.7, "pnl": 1.46}
+        "trades": 278,
+        "wr": 43.9,
+        "pnl": -3.65,
+        "extreme": {"trades": 118, "wr": 46.6, "pnl": -0.32, "atr_sl_pct": 72.9},
+        "high": {"trades": 107, "wr": 41.1, "pnl": -2.38, "atr_sl_pct": 63.6, "note": "38.5% of ALL trades"},
+        "normal": {"trades": 50, "wr": 42.0, "pnl": -0.98, "atr_sl_pct": 54.0},
+        "signal_diversity": {
+            "profitable": ["pump-chain+ LONG +$1.23/14d", "volume-breakout-long+ +$1.46/14d"],
+            "losing": ["pullback-entry- SHORT -$2.22/14d (61T 42.6%)", "mover+ LONG -$1.12/14d (14T 42.9%)", "pump-chain- SHORT -$0.58/14d (35T 48.6%)"],
+            "note": "CRITICAL — 2 types carry ALL PnL"
         }
     },
     "drift_findings": [
         {
-            "issue": "volume_spike 100% NULL in _signal_metadata",
-            "severity": "HIGH",
-            "detail": "128/128 7d trades, 350/350 14d trades have NULL volume_spike. Fix deployed Sep 25 (line 4211 decider_run.py) writes to _exec_meta but value never reaches DB. Chase filter blind to volume quality for 4+ days.",
-            "impact": "+$0.30-0.80/7d once fixed",
-            "root_cause": "Likely _exec_meta is falsy (empty dict) when passed to execute_trade, or _crash_signal is None in certain code paths"
+            "issue": "volume_spike 100% NULL — ALL 278 trades/14d",
+            "severity": "CRITICAL",
+            "first_flagged": "Sep 22",
+            "fix_deployed": "Sep 25 (CEO)",
+            "current_status": "FIX NOT WORKING — 0/278 trades have volume_spike",
+            "impact": "Chase filter blind to volume quality. Expected +$0.30-0.80/7d once fixed.",
+            "next_action": "Investigate decider_run.py:4200 — fix may not be in current code path"
         },
         {
-            "issue": "pump-chain+ final_confidence NULL in _signal_metadata",
-            "severity": "MEDIUM",
-            "detail": "67/67 pump-chain+ 14d trades have NULL final_confidence. Blocks confidence-based filtering (e.g., EXTREME confidence floor 70%).",
-            "impact": "+$0.10-0.30/7d once confidence filtering works",
-            "root_cause": "signal_compactor.py does not write final_confidence to _signal_metadata"
+            "issue": "final_confidence 100% NULL — ALL 278 trades/14d",
+            "severity": "HIGH",
+            "first_flagged": "Sep 27",
+            "current_status": "Unfixed — blocks confidence-based filtering",
+            "impact": "Cannot implement pump-chain+ EXTREME confidence floor 70% (suggested Sep 27)",
+            "next_action": "Check signal_compactor.py — final_score computed but not written to _signal_metadata"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "ATR_SL hit rate",
-            "occurrences": "10+ sessions",
-            "detail": "61% 7d, 72.4% EXTREME 14d. Widening deployed Sep 25 + MIN_EXTREME=1.5% Sep 27. UNTESTED after 100h+ idle.",
-            "status": "Awaiting market activity"
+            "topic": "ATR_SL dominance — 65.5% of ALL trades",
+            "frequency": "Every audit since Sep 18",
+            "status": "Widening deployed Sep 25 (1.8% MAX + EXTREME 1.2x) + ATR_SL_MIN_EXTREME=1.5% (Sep 27) — ALL UNTESTED 100h+",
+            "data": "EXTREME 72.9% ATR_SL 14d. pump-chain+ EXTREME 100% ATR_SL in 7d.",
+            "verdict": "Cannot evaluate until market activity resumes"
         },
         {
-            "topic": "Signal diversity",
-            "occurrences": "15+ sessions",
-            "detail": "Only pump-chain+ LONG (+$1.24) and volume-breakout-long+ (+$1.46) profitable. 43 signal types in DB but only 2 carry PnL.",
-            "status": "New NEUTRAL signal needed"
+            "topic": "HIGH regime bleeding — -$2.38/14d (38.5% of trades)",
+            "frequency": "Every audit since Sep 16",
+            "status": "REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26 — UNTESTED",
+            "verdict": "Needs market activity to measure"
         },
         {
-            "topic": "HIGH regime bleed",
-            "occurrences": "10+ sessions",
-            "detail": "39% of all 14d trades. NO consistently profitable signals. REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26, UNTESTED.",
-            "status": "Awaiting market activity"
+            "topic": "Signal diversity — only 2 types profitable",
+            "frequency": "Every audit since Sep 16",
+            "status": "Not addressed — needs new NEUTRAL signal",
+            "verdict": "CRITICAL — single-point-of-failure"
         }
     ],
-    "missing_implementations": [
-        "SHORT RSI 35-50 confidence penalty (45T 42.2%WR -$1.88/14d)",
-        "New NEUTRAL regime signal",
-        "volume_spike metadata fix (broken 4+ days)",
-        "pump-chain+ confidence metadata recording"
+    "losing_trade_autopsy": {
+        "7d_losers": 50,
+        "top_clusters": [
+            {
+                "signal": "pump-chain- SHORT",
+                "trades": 33,
+                "pnl": -0.93,
+                "wr": 45.5,
+                "root_cause": "EXTREME whipsaw — 18/26 EXTREME trades hit ATR_SL (69.2%). Small losses $0.01-$0.32. Normal variance for SHORT in volatile regime.",
+                "recommended_change": "No action needed — pump-chain- SHORT disabled Sep 25. All 33 trades are legacy.",
+                "confidence": "HIGH"
+            },
+            {
+                "signal": "pullback-entry- SHORT",
+                "trades": 6,
+                "pnl": -1.54,
+                "wr": 0.0,
+                "root_cause": "ALL 4 EXTREME trades hit ATR_SL (100%). 2 HIGH trades also losers. Entry quality poor — SHORT RSI floor now at 50.",
+                "recommended_change": "Monitor — SHORT_RSI_FLOOR=50 should block bad entries. Legacy trades aging out.",
+                "confidence": "HIGH"
+            },
+            {
+                "signal": "mover+ LONG",
+                "trades": 6,
+                "pnl": -0.95,
+                "wr": 16.7,
+                "root_cause": "mover+ killed Sep 24. All 6 trades are legacy.",
+                "recommended_change": "No action — kill working. 0 post-kill trades.",
+                "confidence": "HIGH"
+            },
+            {
+                "signal": "bb-bounce-v2-long+ LONG",
+                "trades": 12,
+                "pnl": -0.26,
+                "wr": 41.7,
+                "root_cause": "HIGH regime: 10T 40% -$0.27. 30d 74%WR +$2.08 — cold streak, not systemic. 2 cut-loser-CL-T1 exits.",
+                "recommended_change": "No action — cold streak in HIGH. LONG_RSI_CEILING=70 will help.",
+                "confidence": "MEDIUM"
+            }
+        ],
+        "exit_analysis_14d": {
+            "atr_sl_hit": {"trades": 182, "pnl": -4.02, "avg_loss": -0.0221, "note": "65.5% of ALL trades — DOMINANT exit"},
+            "cut_loser_CL_T1": {"trades": 18, "pnl": -1.92, "wr": 0.0, "note": "DISABLED Sep 24 — all legacy"},
+            "profit_monster_trail": {"trades": 47, "pnl": 1.82, "wr": 59.6, "avg_win": 0.0387, "note": "BEST exit mechanism"}
+        }
+    },
+    "signal_quality_deep_dive": {
+        "signals_below_50_wr_14d": [
+            {"signal": "pullback-entry- SHORT", "trades": 61, "wr": 42.6, "pnl": -2.22, "exit": "100% ATR_SL in EXTREME"},
+            {"signal": "mover+ LONG", "trades": 14, "wr": 42.9, "pnl": -1.12, "note": "KILLED — all legacy"},
+            {"signal": "pump-chain+ LONG", "trades": 55, "wr": 41.8, "pnl": 1.23, "note": "LOW WR but +PnL — winners ride momentum (high avg_win)"},
+            {"signal": "bb-bounce-v2-long+ LONG", "trades": 12, "wr": 41.7, "pnl": -0.26, "note": "Cold — 30d 74%WR +$2.08"}
+        ],
+        "insight": "pump-chain+ LONG has LOW WR (41.8%) but POSITIVE PnL (+$1.23). R:R saves it — winners avg +7%, losers avg -5%. Don't raise WR threshold, it would kill winners."
+    },
+    "rsi_bands_14d": {
+        "short": {
+            "null_rsi": "DEAD — 0 trades/7d (metadata fix killed detection-time fallback)",
+            "lt_35": {"trades": 30, "wr": 33.3, "pnl": -1.65, "note": "BLOCKED by SHORT_RSI_FLOOR=50"},
+            "35_50": {"trades": 37, "wr": 45.9, "pnl": -1.16, "note": "Still bleeding — SHORT_RSI_FLOOR=50 blocks this NOW"},
+            "50_65": {"trades": 49, "wr": 46.9, "pnl": -0.87, "note": "Sweet spot-ish"},
+            "65_80": {"trades": 6, "wr": 66.7, "pnl": 0.49, "note": "UNLOCKED by SHORT_RSI_CEILING=70 — profitable"}
+        },
+        "long": {
+            "lt_30": {"trades": 6, "wr": 0.0, "pnl": -0.68, "note": "BLOCKED by LONG_RSI_FLOOR=30"},
+            "30_50": {"trades": 25, "wr": 44.0, "pnl": -0.12},
+            "50_65": {"trades": 65, "wr": 49.2, "pnl": -0.51},
+            "65_80": {"trades": 49, "wr": 40.8, "pnl": 0.98, "note": "LONG_RSI_CEILING=70 now blocks RSI>70 — this band is post-ceiling"},
+            "80_plus": {"trades": 6, "wr": 66.7, "pnl": -0.05}
+        }
+    },
+    "untested_fixes": [
+        {"fix": "ATR_SL_MAX 1.8% + EXTREME 1.2x", "deployed": "Sep 25", "trades_since": 0, "status": "UNTESTED 100h+"},
+        {"fix": "REGIME_CONF_HIGH_MULT=0.50", "deployed": "Sep 26", "trades_since": 0, "status": "UNTESTED 72h+"},
+        {"fix": "volume_spike metadata fix", "deployed": "Sep 25", "trades_since": 0, "status": "UNTESTED 100h+ AND STILL BROKEN (100% NULL)"},
+        {"fix": "LONG_RSI_CEILING=70", "deployed": "Sep 26", "trades_since": 0, "status": "UNTESTED 72h+"},
+        {"fix": "ATR_SL_MIN_EXTREME=1.5%", "deployed": "Sep 27", "trades_since": 0, "status": "UNTESTED 48h+"},
+        {"fix": "PUMP_CHAIN+ HIGH BLOCK in decider_run.py", "deployed": "Sep 27", "trades_since": 0, "status": "UNTESTED 48h+"}
     ],
     "creative_improvements": [
         {
             "date": "2026-09-29T00:30:00Z",
-            "idea": "SHORT RSI 35-50 confidence penalty -20pt",
-            "rationale": "14d: 45T 42.2%WR -$1.88 in RSI 35-50 band. Sweet spot 50-65 = 63T 47.6%WR -$0.55. Penalty blocks losers in 35-50 without touching 50-65 band. 0 winners in 35-50 would be lost.",
-            "expected_impact": "+$0.30-0.60/7d",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "verification": "45T sample, 0 winners in RSI 35-50 SHORT band"
-        },
-        {
-            "date": "2026-09-29T00:30:00Z",
-            "idea": "Investigate volume_spike fix failure — code writes to _exec_meta but DB shows NULL",
-            "rationale": "4 days post-deploy, 100% NULL. Chase filter blind to volume quality. This is a confirmed bug, not a monitoring item.",
+            "idea": "Investigate volume_spike fix failure — 100% NULL 4 days post-deploy",
+            "rationale": "CRITICAL DRIFT. Fix deployed Sep 25 by CEO. 278/278 trades still have NULL volume_spike. Chase filter completely blind to volume quality. This is the highest-impact unfixed bug.",
             "expected_impact": "+$0.30-0.80/7d once fixed",
             "category": "bug fix",
             "status": "suggested",
@@ -91,20 +168,29 @@
         },
         {
             "date": "2026-09-29T00:30:00Z",
-            "idea": "Define ATR_SL widening success criteria BEFORE trades resume",
-            "rationale": "100h+ idle, 0 trades since deploy. Need objective pass/fail: EXTREME ATR_SL <55% by 50T AND R:R >1.3:1. If FAIL at 50T → widen to 2.0% for EXTREME.",
-            "expected_impact": "Prevents drift — objective evaluation",
-            "category": "process",
+            "idea": "Fix final_confidence metadata — blocks confidence-based filtering",
+            "rationale": "89/89 7d trades have NULL final_confidence. signal_compactor computes final_score but never writes it to _signal_metadata. This blocks all confidence-based filtering (pump-chain+ EXTREME floor 70%, etc).",
+            "expected_impact": "Enables $0.50-1.00/7d from confidence filtering",
+            "category": "bug fix",
             "status": "suggested",
-            "risk": "none"
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-29T00:30:00Z",
+            "idea": "SHORT RSI 35-50 confidence penalty -20pt",
+            "rationale": "14d: 37T 45.9%WR -$1.16. SHORT_RSI_FLOOR=50 now blocks this band for new trades. But if floor is ever lowered or STANDALONE_BYPASS leaks, this adds defense in depth. Zero-cost safety net.",
+            "expected_impact": "+$0.10-0.20/7d as safety net (floor already blocks most)",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "INVESTIGATE: volume_spike metadata bug — code at decider_run.py:4211 writes but DB shows NULL. Check if _exec_meta is falsy when passed.",
-        "ATR_SL widening eval: define pass/fail criteria. Needs market activity.",
-        "DEVELOP: New NEUTRAL signal for diversity.",
-        "MONITOR: REGIME_CONF_HIGH_MULT=0.50 (deployed Sep 26, untested).",
-        "MONITOR: LONG_RSI_CEILING=70 (deployed Sep 26, working)."
+        "INVESTIGATE volume_spike fix failure — Sep 25 fix not working, 100% NULL 278/278 trades",
+        "INVESTIGATE final_confidence NULL — blocks confidence filtering",
+        "MONITOR ATR_SL widening — 6 untested fixes, all need market activity",
+        "MONITOR REGIME_CONF_HIGH_MULT=0.50 — HIGH regime -$2.38/14d",
+        "DEVELOP new NEUTRAL signal — signal diversity CRITICAL"
     ]
 }
