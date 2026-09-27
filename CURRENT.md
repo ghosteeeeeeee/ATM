@@ -203,9 +203,11 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **ATR_SL widening eval:** 95h+ since deployment, 0 trades. Define pass/fail: hit rate <55% by 50 trades, R:R >1.5:1. Needs market activity. — 2026-09-27
-2. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-3. **MONITOR: ATR_SL widening impact.** Deployed Sep 25, UNTESTED. Cannot measure without trades. — 2026-09-25
-4. **MONITOR: REGIME_CONF_HIGH_MULT=0.50.** Deployed Sep 26, UNTESTED. — 2026-09-26
-5. **MONITOR: volume_spike fix.** Deployed Sep 25, UNTESTED. Chase filter now sees volume quality. — 2026-09-25
-6. **DISK: 82% (21G free).** Below 85% threshold. Monitor. — 2026-09-27
+1. **INVESTIGATE: decider_run failures.** 80/24h — signals consumed but HL API rejects orders. Traceback truncated. Need full error to fix. — 2026-09-27
+2. **ATR_SL widening eval:** 1 trade since deployment (continuum_engine $0.00). Define pass/fail: hit rate <55% by 50 trades, R:R >1.5:1. Needs market activity. — 2026-09-27
+3. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
+4. **MONITOR: ATR_SL widening impact.** Deployed Sep 25, UNTESTED. Cannot measure without trades. — 2026-09-25
+5. **MONITOR: REGIME_CONF_HIGH_MULT=0.50.** Deployed Sep 26, UNTESTED. — 2026-09-26
+6. **MONITOR: volume_spike fix.** Deployed Sep 25, UNTESTED. Chase filter now sees volume quality. — 2026-09-25
+7. **CLEANUP: Remove dead flag PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined but never enforced. — 2026-09-27
+8. **DISK: 83% (20G free).** Below 85% threshold but coin_tracker.db is 3.1G. Monitor. — 2026-09-27
