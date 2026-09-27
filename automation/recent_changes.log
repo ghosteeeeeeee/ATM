@@ -1,3 +1,10 @@
+[2026-09-27 16:10 UTC] auto_1hr: NO CHANGE — analysis only
+  5 fresh LONGs (POL/IOTA/HYPER/LTC/CAKE), 0 closures, system woke after 130h+ idle.
+  7d: 122T 36.9%WR -$4.71 | 14d: 334T ATR_SL 68% (all pre-fix).
+  CRITICAL DRIFT: volume_spike 100% NULL (0/334), final_confidence 100% NULL (0/334).
+  Already killed: pullback-entry- (0%WR), mover+ (25%WR). No new kill candidates.
+  BY: auto_1hr
+
 [2026-09-27 15:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 1T/24h (idle 13h+) | 128T 37.5%WR -$4.54 (7d) | 346T 44.8%WR -$4.03 (14d)
   SYSTEM IDLE 13h+. ALL FIXES UNTESTED. ATR_SL 65.3% EXTREME CRITICAL.

@@ -1,3 +1,39 @@
+## [2026-09-27 16:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 5 (all LONG, 0.3-1.4h old, all in profit)
+**7d:** 122T 36.9%WR -$4.71 | **14d:** 334T ~44%WR | **ATR_SL 14d:** 68% (227/334, all pre-fix)
+**Regime:** 99% NEUTRAL (332/334 trades)
+
+**Open Positions:**
+- POL LONG bb-bounce-v2-long+ | entry=0.11956 | curr=0.12091 | +$11.10
+- HYPER LONG rs-s118 | entry=0.07525 | curr=0.07559 | +$11.10
+- IOTA LONG rs-s37 | entry=0.05009 | curr=0.05019 | +$11.10
+- LTC LONG rs-s52 | entry=71.13 | curr=71.30 | +$22.10
+- CAKE LONG doji-bottom-long | entry=2.79 | curr=2.79 | +$11.10
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 closures → no kill candidates surfaced
+- Already-killed signals: pullback-entry- (0%WR 7d), mover+ (25%WR 7d) — confirmed disabled
+- ATR_SL fix deployed Sep 25 — only 1 ORPHAN_PAPER in 24h, still unvalidated
+- No overtrading (5 opens, system just woke up after 130h+ idle)
+- Profit signals: volume-breakout-long+ +$0.62/7d, pump-chain+ -$0.27/7d (deteriorating)
+
+**Drift (CRITICAL, non-blocking):**
+- volume_spike 100% NULL (0/334 14d) — signal_compactor not persisting metadata
+- final_confidence 100% NULL (0/334 14d) — same metadata persistence gap
+- These block confidence filtering and volume-based signal quality scoring
+
+**Open Questions:**
+- 5 fresh LONGs in NEUTRAL regime — will ATR_SL fix help these?
+- volume_spike/final_confidence NULL drift unfixed — blocking two filter layers
+- pump-chain+ deteriorating (was +$1.24/14d, now -$0.27/7d)
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-29 05:30 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 130h+ ago (Sep 27 02:17 UTC)
