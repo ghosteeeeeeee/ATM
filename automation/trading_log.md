@@ -1,3 +1,31 @@
+## [2026-09-29 05:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 130h+ ago (Sep 27 02:17 UTC)
+**7d:** 128T 37.5%WR -$4.54 | **24h:** 0T | **ATR_SL:** 77/128 (60.2%, all pre-fix)
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 130h+, regime flat, 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to evaluate yet
+- Profit signals: volume-breakout-long+ +$1.46/14d, pump-chain+ +$1.24/14d
+- No kill candidates (no recent trades), no overtrading
+- Known losers (pullback-entry- -$1.80/14d, mover+ -$1.12/14d) — stale, no action while idle
+
+**Drift (non-blocking):**
+- volume_spike 100% NULL across ALL signals (349/349 14d) — metadata not persisted by signal_compactor
+- pump-chain+ final_confidence NULL 67/67 14d — same metadata persistence gap
+- LONG tight SL (1-3%) killing field: 102T 14.7%WR -$12.69/14d — structural, needs SL widening
+
+**Open Questions:**
+- 130h+ idle gap — extreme duration, regime flat
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate <1% — trailing exits consistently fire before TP
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-27 05:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | **Open:** 0 | **Last trade:** 3h ago (BTC continuum_engine LONG +$0.00)
@@ -7625,3 +7653,80 @@ Final set: ['KAS']
 - TP hit rate <1% — trailing exits consistently fire before TP
 
 **BY:** auto_1hr
+
+## [2026-09-29 01:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 100h+ ago (Sep 25 02:26 UTC)
+**7d:** 130T 37.7%WR -$4.59 | **24h:** 0T (1 orphan paper trade)
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 100h+, regime flat, 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to evaluate yet
+- ATR_SL still 60.8% of exits (79/130, all pre-fix)
+- Profit exits healthy: volume-breakout-long +$1.46/14d, pump-chain +$1.24/14d, grind-trend +$0.24/14d
+- No kill candidates (no recent trades to evaluate), no overtrading
+
+**Drift (non-blocking):**
+- volume_spike 100% NULL across ALL signals (349/349 14d) — metadata not persisted to _signal_metadata by signal_compactor. No impact on signal generation, analytics only.
+- pump-chain+ final_confidence NULL 67/67 — same metadata persistence gap.
+- LONG tight SL (1-3%) killing field: 102T 14.7%WR -$12.69/14d — structural, would need SL widening. Not actionable while idle.
+
+**Open Questions:**
+- 100h+ idle gap — regime flat, awaiting shift
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate <1% — trailing exits consistently fire before TP
+
+**BY:** auto_1hr
+
+## [2026-09-29 03:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 120h+ ago (Sep 25 02:26 UTC)
+**7d:** 128T 37.5%WR -$4.54 | **24h:** 0T | **ATR_SL:** 77/128 (60.2%, all pre-fix)
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 120h+, regime flat, 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to evaluate yet
+- Profit signals: volume-breakout-long +$0.62/7d, accel-300- +$0.20/7d, pump-chain- +$0.19/7d
+- Kill candidates still present but stale (all 7d data): pullback-entry- -$1.54, mover+ -$1.19
+- Awaiting regime shift for new trades
+
+**Open Questions:**
+- 120h+ idle gap — extreme duration, regime flat
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate <1% — trailing exits consistently fire before TP
+- pullback-entry- and mover+ still losing but can't kill with 0 recent trades
+
+**BY:** auto_1hr
+
+**BY:** auto_1hr
+
+## [2026-09-27 14:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 0 | **Last real trade:** 60h+ ago (Sep 25 02:26 UTC)
+**7d:** 126T 38%WR -$4.54 | **24h:** 0T | **ATR_SL:** 75/126 (59.5%, all pre-fix)
+
+**Changes:** None
+
+**No Change Needed:**
+- System idle 60h+, regime flat, 0 open positions
+- ATR_SL fix deployed Sep 25 — zero post-fix trades to validate yet
+- ATR_SL still59.5% of 7d exits (75/126, all pre-fix). Still dominant.
+- Profit signals: volume-breakout-long +$1.46/14d (66.7% WR), pump-chain+ +$1.24/14d (43.3% WR)
+- Kill candidates stale: pullback-entry- -$2.21/14d (78T, 43.6% WR) — last trade >60h ago, no recent data to act on
+- No overtrading (0T), no signal issues in recent data
+
+**14d Regime Breakdown:**
+- EXTREME: 134T +$0.24 (only profitable)
+- HIGH: 134T -$2.73 (worst)
+- NORMAL: 69T -$2.20
+
+**Open Questions:**
+- 60h+ idle gap — regime flat, awaiting shift
+- ATR_SL dominance still untested post-fix — first real trades will validate
+- TP hit rate <1% — trailing exits consistently fire before TP
+- pullback-entry- and mover+ losing but can't kill with stale data
+

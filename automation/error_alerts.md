@@ -172,3 +172,41 @@
 ## Error Alerts — 2026-09-27 06:58 UTC
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Health Report — 2026-09-27 07:45 UTC
+- **OK**: Pipeline running (LIVE). Last run 07:44:31, rc=0.
+- **OK**: Services: hermes-pipeline=active, hl-sync-guardian=active.
+- **OK**: Signals: 50 generated in last hour, 0 approved (>50% threshold). Market filtering noise correctly.
+- **OK**: Trades: 0 open | 0 closed today. No phantom trades.
+- **INFO**: Market: 118 tokens scanned — 3 LONG_BIAS (NIL, SUI, BIGTIME), 0 SHORT, 115 NEUTRAL. BTC $84,552.
+- **WARN**: Disk at 83% (92G/118G) — approaching 85% cleanup threshold. Monitor.
+- **INFO**: Timers: hermes-price-collector active (running 1d+). All services healthy.
+- **AUTO-FIX**: None required. Pipeline healthy.
+
+## Error Alerts — 2026-09-27 08:58 UTC
+- **REPEATED** (12x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.6s (rc=N)`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Health Report — 2026-09-27 09:46 UTC
+- **OK**: Pipeline running (LIVE). Completed 30 cycles in last 30 min. All services active.
+- **OK**: hermes-pipeline.service = active, hermes-hl-sync-guardian.service = active.
+- **OK**: Signals: 70+ generated in last hour. Latest: KSHIB SHORT (84.8), TRX SHORT (75.0), GMT LONG (75.0), SAND LONG (82.0).
+- **OK**: Trades: 0 open | 0 closed today. Last trade: Sep 25 (BTC LONG continuum-osc+, +0.40%).
+- **OK**: Market: 118 tokens scanned — 3 LONG_BIAS (NIL, SUI, BIGTIME), 0 SHORT_BIAS, 115 NEUTRAL. Overall: NEUTRAL.
+- **WARN**: Disk at 83% (92G/118G) — approaching 85% cleanup threshold. Monitor.
+- **WARN**: decider_run failing 4x/hour (rc=1) — CTX-GATE skipping LLM for SAND (hebbian n=2 < 5, fail-open). Non-blocking, signals marked executed via fail-open path.
+- **OK**: All 40+ timers active, firing on schedule. No missed runs.
+- **OK**: Signal compactor running clean (1/min, deactivated successfully each cycle).
+- **AUTO-FIX**: None required. decider_run failures are non-critical (fail-open design).
+
+## Error Alerts — 2026-09-27 09:58 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-09-27 10:46 UTC
+- **WARN** (5x): `decider_run` crash at line 4368 — BLUR LONG blocked by BTC momentum (-0.22%), mark_signal_executed succeeds (rc=1), then exception after. Non-blocking: pipeline continues. Root cause: exception in execution path after BTC-crash block. 
+- **WARN**: `signal-compactor.err.log` — repeated `LOCK-WAIT info_rate` contention (48+ retries). Lock contention on info_rate DB during concurrent access.
+- **INFO**: No auto-fixes applied — all issues are non-critical, pipeline completing normally.

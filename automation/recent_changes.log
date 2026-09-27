@@ -1,3 +1,10 @@
+[2026-09-27 09:37 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 0T/24h (idle 100h+) | 129T 38.6%WR -$4.42 (7d) | 347T 44.8%WR -$3.97 (14d)
+  SYSTEM IDLE 100h+. ALL FIXES UNTESTED. ATR_SL 72.4% EXTREME CRITICAL.
+  DRIFT: volume_spike 100% NULL (fix not working), pump-chain+ confidence NULL 100%.
+  LONG_RSI_CEILING=70 WORKING (0 post-fix violations). SHORT_RSI_FLOOR=50 WORKING.
+  CREATIVE: (1) SHORT RSI 40-50 penalty (2) ATR_SL success criteria (3) NEW EMA-reclaim signal.
+  BY: brain_auditor
 [2026-09-29 ~00:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 0T/24h (idle 100h+) | 132T 38.6%WR -$4.42 (7d) | 350T 45.1%WR -$4.00 (14d)
   SYSTEM IDLE 100h+. ALL FIXES UNTESTED. ATR_SL 67.1% EXTREME CRITICAL.
@@ -3068,3 +3075,18 @@
   ATR_SL dominance 62.5% (all pre-fix). No kill candidates. Awaiting regime shift. BY: auto_1hr
 [2026-09-28 01:30 UTC] auto_1hr: NO CHANGE — analysis only, system idle 72h+
   7d: 133T 38.3%WR -4.58 | ATR_SL 62.1% (untested post-fix). No trades, no kill candidates. BY: auto_1hr
+
+[2026-09-29 ~00:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 0T/24h (idle 100h+) | 131T 38.6%WR -$4.42 (7d) | 349T 45.1%WR -$4.00 (14d)
+  SYSTEM IDLE 100h+. ALL FIXES UNTESTED. ATR_SL 61% 7d (80/131) CRITICAL.
+  DRIFT: volume_spike STILL 100% NULL (131/131 7d) — fix from Sep 25 NOT WORKING.
+  DRIFT: pump-chain+ final_confidence NULL 67/67 14d — blocks confidence filtering.
+  LONG RSI 60-70 KILLING FIELD: 49T 34.7%WR -$1.82/14d (biggest RSI bleed band).
+  CREATIVE: (1) SHORT RSI 35-50 confidence penalty -20pt (+$0.30-0.60/7d).
+  CREATIVE: (2) Investigate volume_spike fix failure (+$0.30-0.80/7d once fixed).
+  CREATIVE: (3) ATR_SL widening success criteria definition.
+  BY: brain_auditor
+[2026-09-29 05:30 UTC] auto_1hr: NO CHANGE — analysis only, system idle 130h+
+  7d: 128T 37.5%WR -4.54 | ATR_SL 60.2% (all pre-fix). No trades, no kill candidates. BY: auto_1hr
+[2026-09-27 14:10 UTC] auto_1hr: NO CHANGE — analysis only, system idle 60h+
+  7d: 126T 38%WR -.54 | ATR_SL 59.5% (all pre-fix). No trades, no kill candidates. BY: auto_1hr

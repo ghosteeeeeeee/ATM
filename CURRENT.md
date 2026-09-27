@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 ~06:35 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-27 ~22:30 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-24h: 1T (continuum_engine BTC LONG $0.00 at 02:17). 80 decider_run failures (HL API rejections). Pipeline healthy, NEUTRAL regime.
+24h: 1T (continuum_engine BTC LONG $0.00 at 02:17). System idle 20h+. Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 1T continuum_engine LONG BTC $0.00. 0 open. 80 decider_run FAILURES — signals consumed but HL API rejects orders (SL/TP = $0.0000 in log, likely HL API issue).
-- **7d:** 127T ~36%WR -$4.37 (DB-verified). EXTREME worst: 74T 37.8%WR -$2.63. HIGH: 37T 29.7%WR -$1.79.
-- **14d:** 344T 44.5%WR -$4.27 (DB-verified).
+- **24h (rolling):** 1T continuum_engine LONG BTC $0.00. 0 open. System idle since Sep 27 02:17.
+- **7d:** 128T 37.5%WR -$4.54 (DB-verified). ALL NEUTRAL regime. ATR_SL hit rate 60.2%.
+- **14d:** 346T 44.8%WR -$4.03 (DB-verified).
 - **LONG:** pump-chain+ (workhorse), volume-breakout-long+ (gem).
 - **SHORT:** ALL DISABLED or pre-disable.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
@@ -29,12 +29,20 @@
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** (brain_auditor Sep 24 ~17:35 UTC, narrowed Sep 25 ~06:30 UTC). +10pt confidence when LONG RSI 40-50. 14d: RSI 40-50 = 35T 54.3%WR +$0.34. RSI 50-60 = 44T 63.6%WR +$2.06 (best band). Blocks nothing — only boosts fill quality.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h. Safety net for stale trades.
 
-**🟡 R:R STATUS (7d -$4.70)**
-7d PnL -$4.70. pump-chain+ LONG 31T 35.5%WR -$0.79 (cold streak, 14d still +$1.24). volume-breakout-long+ 4T 50%WR +$0.62 (gem, 100% ATR_SL but winners BIG). pullback-entry- 18T 38.9%WR -$1.33 (pre-disable trades, 100% ATR_SL). mover+ 8T 25%WR -$1.19 (legacy pre-kill, aging out).
+**🟡 R:R STATUS (7d -$4.54)**
+7d PnL -$4.54. pullback-entry- SHORT 13T 23.1%WR -$1.54 (worst). mover+ LONG 8T 25%WR -$1.19 (legacy). pump-chain- SHORT 33T 45.5%WR -$0.93. pump-chain+ LONG 25T 32%WR -$0.42 (degraded). volume-breakout-long+ LONG 4T 50%WR +$0.62 (only winner).
 
-**🔴 ATR_SL HIT RATE:** 76/127 losers (60%) 7d. EXTREME dominates: 74T 37.8%WR -$2.63. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **UNTESTED** — 1 trade since deployment (continuum_engine $0.00). Needs more trades to measure impact.
+**🔴 ATR_SL HIT RATE:** 77/128 (60.2%) 7d. ATR_SL_MAX widened 1.5→1.8% + EXTREME regime 1.2x multiplier deployed Sep 25. ATR_SL_MIN_EXTREME=1.5% deployed Sep 27. **UNTESTED** — 0 real trades since any deploy (system idle 20h+). **ATR_SL WIDENING SUCCESS CRITERIA:** PASS if EXTREME ATR_SL hit rate <55% by 50 trades AND R:R >1.3:1. FAIL if >60% by 50 trades → widen to 2.0% for EXTREME.
 
-**🔴 REGIME EDGE (7d):** ALL trades NEUTRAL (138T 39.9%WR -$4.70). No EXTREME/HIGH trades recently — market regime shifted. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).** 14d: ALL trades NEUTRAL (352T 45.5%WR -$3.72). No EXTREME/HIGH trades in 14d.
+**🔴 REGIME EDGE (7d):** ALL trades NEUTRAL (128T 37.5%WR -$4.54). No EXTREME/HIGH trades recently — market regime shifted. **REGIME_CONF_MULTIPLIER DEPLOYED:** EXTREME +15%, NORMAL -15%, **HIGH -50% (brain_auditor Sep 26 ~08:30 UTC).** ALL UNTESTED — 0 trades since deploy.
+
+**🔴 RSI BANDS 14d (DB-verified):**
+- LONG RSI 50-60: 21T 71.4%WR +$0.51 (best WR)
+- LONG RSI 60-70: 36T 50%WR +$1.18 (best PnL)
+- LONG RSI 70+: 54T 35.2%WR -$0.55 (killing field — blocked by ceiling=70)
+- SHORT RSI 50-60: 17T 64.7%WR +$1.18 (sweet spot)
+- SHORT RSI <40: 43T 23.3%WR -$3.93 (catastrophic — blocked by floor=50)
+- SHORT RSI NULL: 61T 52.5%WR +$0.83
 
 **🟢 HL-SYNC FALSE ALARM.** auto_1hr flagged "hl_sync: running but no log file" — log was rotated to .gz. Service `hermes-hl-sync-guardian.service` active, timer running. Not a real issue.
 
@@ -58,7 +66,11 @@
 
 **🔴 DECIDER_RUN FAILURES: 80/24h.** All self-recovered. Pattern: signal passes all filters, mark_signal_executed claims it, then execute_trade fails (HL API rejection). Signals consumed but trades never open. Traceback truncated in journalctl — can't see actual exception. Pre-existing issue, not new. Pipeline continues running.
 
+**🔴 METADATA DRIFT (7d):** volume_spike 100% NULL (0/128 trades). final_confidence 100% NULL (0/128 trades). Both fixes deployed Sep 25 but UNTESTED — 0 real trades since deploy. Chase filter and confidence filtering blind until next trade.
+
 ## Today's Changes (Sep 27)
+
+1. **CEO ~22:30 UTC — NO CONFIG CHANGE.** DB-verified: 1T/24h (idle 20h+) | 128T 37.5%WR -$4.54 (7d) | 346T 44.8%WR -$4.03 (14d). **ALL TRADES NEUTRAL** — no EXTREME/HIGH in 14d. **ATR_SL 60.2% 7d — CRITICAL.** All recent fixes UNTESTED (ATR_SL widening Sep 25, REGIME_CONF_HIGH_MULT=0.50 Sep 26, volume_spike fix Sep 25). 0 real trades since any deploy. **RSI BANDS 14d:** LONG 50-60=21T 71.4%WR +$0.51 (best WR). SHORT 50-60=17T 64.7%WR +$1.18 (sweet spot). **SIGNAL DIVERSITY CRITICAL** — only pump-chain+ LONG (+$1.24/14d) and volume-breakout-long+ (+$0.62/7d) profitable. **ATR_SL WIDENING SUCCESS CRITERIA DEFINED:** PASS if EXTREME ATR_SL <55% by 50T AND R:R>1.3:1. FAIL if >60% by 50T → widen to 2.0%. **0 CHANGES APPLIED.** — CEO
 
 1. **daily_orchestrator ~06:35 UTC — NO CONFIG CHANGE.** DB-verified: 1T continuum_engine LONG BTC $0.00 (02:17 UTC) | 127T ~36%WR -$4.37 (7d) | 344T 44.5%WR -$4.27 (14d). **PIPELINE HEALTHY** — all timers firing, no crashes. **80 DECIDER_RUN FAILURES/24h** — signals consumed but HL API rejects orders (SL=$0.0000). Self-recovers each cycle. Pre-existing. **DISK 83%** — cleaned 4 dead 0-byte price DBs (price_candles.db, price_history.db, prices.db, prices_hermes.db). **DEAD FLAG CONFIRMED:** PULLBACK_ENTRY_SHORT_HIGH_BLOCK defined but never enforced. **ACCELERATE MISMATCH:** signal_reporter flagged SHORT variants profitable in EXTREME but family-level 0.0x block kills them. **ATR_SL WIDENING STILL UNTESTED** — 1 trade since deployment (continuum_engine $0.00). **ALL RECENT FIXES UNTESTED** — market too quiet. **NO CHANGES APPLIED.** **MONITORING:** ATR_SL eval (needs trades), decider_run failure root cause, disk 83%. — daily_orchestrator
 
