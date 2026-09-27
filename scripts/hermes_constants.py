@@ -158,6 +158,11 @@ SHORT_BLACKLIST = {
     'NOT',
     # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), 50% WR SHORT (-$0.09), $0.006 micro-price noise
     'HEMI',
+    # 2026-09-27: pump-chain v5 evidence — 0% WR, consistent losers
+    'GRASS',   # 3T pump-chain, 0% WR, -$4.26
+    'AZTEC',   # 3T pump-chain, 0% WR, -$3.63
+    'BCH',     # 2T pump-chain, 0% WR, -$2.59
+    'ATOM',    # 2T pump-chain, 0% WR, -$2.56
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -250,6 +255,11 @@ LONG_BLACKLIST = {
     'AVNT',
     # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), $0.006 micro-price noise, both sides lose
     'HEMI',
+    # 2026-09-27: pump-chain v5 evidence — 0% WR, consistent losers
+    'GRASS',   # 3T pump-chain, 0% WR, -$4.26
+    'AZTEC',   # 3T pump-chain, 0% WR, -$3.63
+    'BCH',     # 2T pump-chain, 0% WR, -$2.59
+    'ATOM',    # 2T pump-chain, 0% WR, -$2.56
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
