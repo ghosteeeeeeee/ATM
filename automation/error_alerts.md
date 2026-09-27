@@ -1,3 +1,17 @@
+## Health Report — 2026-09-27 06:49 UTC
+- **OK**: Pipeline running (LIVE). Both services active. Timer: `hermes-pipeline.timer` firing every minute.
+- **OK**: Last cycle 06:49 completed clean (rc=0 all steps). 0 open | 0 closed today | +0.00% PnL.
+- **OK**: Signals: 5,124 in DB, 5 generated in last hour. Latest: HBAR SHORT (74.8), LDO LONG (75.0), DOT SHORT (88.0).
+- **OK**: Market: coin_tracker regime NEUTRAL. Macro gate: LONG=FULL, SHORT=REDUCE.
+- **WARN**: Hotset empty — 0 tokens survived compaction. All signals filtered out. No trades possible until compaction promotes signals.
+- **WARN**: `decider_run` intermittent failures (6x in 30min at 06:18-06:41). All were when signals attempted execution (MNT, YGG). Self-recovered at 06:42 — no failures since. Root cause: unclear (truncated traceback at line 4368). Pipeline continued through failures.
+- **OK**: Timers: 40+ active, all firing on schedule. No missed runs.
+- **OK**: Disk: 83% (92G/118G) — stable, below 85% threshold.
+- **OK**: Position Manager: 0 open | 0 closed | 0 adjusted. No phantom trades.
+- **INFO**: Contrarian analysis: 0 hot, 83 warm, 8 cold — NEUTRAL signal.
+- **INFO**: Liquidation heatmap: 9 coins, 112 clusters, 0 cascade zones.
+- **AUTO-FIX**: None required. Pipeline self-recovered from decider_run failures.
+
 ## Error Alerts — 2026-09-25 04:45 UTC
 - **WARN** (1x): `Disk at 85% (95G/118G)` — approaching threshold
 - **AUTO-FIX**: None applied — monitor, compress logs if >90%
@@ -154,3 +168,7 @@
 - **WARN**: Disk at 83% (92G/118G) — approaching 85% cleanup threshold.
 - **INFO**: Dead price DBs (price_candles.db, price_history.db, prices.db, prices_hermes.db) are 0 bytes, harmless but stale.
 - **AUTO-FIX**: None required.
+
+## Error Alerts — 2026-09-27 06:58 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
