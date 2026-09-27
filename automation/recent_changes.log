@@ -1,3 +1,11 @@
+[2026-09-27 15:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 1T/24h (idle 13h+) | 128T 37.5%WR -$4.54 (7d) | 346T 44.8%WR -$4.03 (14d)
+  SYSTEM IDLE 13h+. ALL FIXES UNTESTED. ATR_SL 65.3% EXTREME CRITICAL.
+  DRIFT: volume_spike 100% NULL (fix untested), final_confidence 100% NULL.
+  CONTINUUM METADATA BUG: Most recent trade empty {} — metadata injection bypass suspected.
+  CREATIVE: (1) Investigate continuum_engine metadata (2) ATR_SL success criteria (3) SHORT RSI 35-50 penalty (6th).
+  BY: brain_auditor
+
 [2026-09-27 09:37 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 0T/24h (idle 100h+) | 129T 38.6%WR -$4.42 (7d) | 347T 44.8%WR -$3.97 (14d)
   SYSTEM IDLE 100h+. ALL FIXES UNTESTED. ATR_SL 72.4% EXTREME CRITICAL.
@@ -3103,3 +3111,5 @@
   RSI BANDS 14d LONG: <30 blocked, 30-50 -$0.12, 50-65 -$0.51, 65-80 +$0.98 (ceiling now blocks >70).
   CREATIVE: (1) Investigate volume_spike fix failure (+$0.30-0.80/7d). (2) Fix final_confidence NULL (+$0.50-1.00/7d). (3) SHORT RSI 35-50 penalty -20pt safety net.
   0 CHANGES APPLIED. BY: brain_auditor
+[2026-09-27 15:10 UTC] auto_1hr: NO CHANGE — analysis only, system just woke up
+  3 fresh LONGs (POL/IOTA/HYPER), 0 closures, 120h+ idle ended. ATR_SL 67.5% (pre-fix). BY: auto_1hr

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 00:30 UTC**
+**Last Updated: 2026-09-27 15:35 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-24h: 0T. System idle 100h+ since Sep 27 02:17. Pipeline healthy, NEUTRAL regime.
+24h: 1T (continuum_engine LONG $0.00). System idle 13h+ since Sep 27 02:17. Pipeline healthy, NEUTRAL regime.
 
-- **24h (rolling):** 0T. 0 open. System idle since Sep 27 02:17.
+- **24h (rolling):** 1T. 0 open. System idle since Sep 27 02:17.
 - **7d:** 89T 37.1%WR -$4.94 (DB-verified). EXTREME 55T 38.2% -$2.78, HIGH 25T 24.0% -$2.18. ATR_SL 52.8% (47/89).
 - **14d:** 278T 43.9%WR -$3.65 (DB-verified). EXTREME 118T 46.6% -$0.32, HIGH 107T 41.1% -$2.38 (38.5% of all trades).
 - **LONG:** pump-chain+ LONG 55T +$1.23/14d (workhorse), volume-breakout-long+ 18T +$1.46/14d (gem).
@@ -61,9 +61,11 @@
 
 **🔴 SIGNAL DIVERSITY CRITICAL:** Only pump-chain+ LONG (+$1.23/14d) and volume-breakout-long+ (+$1.46/14d) profitable. 14d: 35+ signal types active but only 2 net positive. Single-point-of-failure. Need new NEUTRAL signal.
 
-**🔴 DRIFT — volume_spike 100% NULL:** 278/278 trades/14d have NULL volume_spike. Sep 25 fix NOT working. Chase filter blind to volume quality. Expected +$0.30-0.80/7d once fixed.
+**🔴 DRIFT — volume_spike 100% NULL:** 337/337 trades/14d have NULL volume_spike. Fix deployed Sep 26 (changed `if _crash_signal and getattr(...)` to `if _crash_signal is not None`). UNTESTED — 0 trades since deploy. Chase filter blind to volume quality. Expected +$0.30-0.80/7d once verified.
 
-**🔴 DRIFT — final_confidence 100% NULL:** 278/278 trades/14d have NULL final_confidence. Blocks confidence-based filtering. Cannot implement pump-chain+ EXTREME confidence floor 70%.
+**🔴 DRIFT — final_confidence 100% NULL:** 337/337 trades/14d have NULL final_confidence. Blocks confidence-based filtering. Cannot implement pump-chain+ EXTREME confidence floor 70%.
+
+**🔴 CONTINUUM METADATA BUG:** Most recent trade (Sep 27 02:17 continuum_engine LONG $0.00) has empty metadata `{}` — no volume_spike, no final_confidence. Suggests metadata injection bypass for continuum_engine trades. Needs investigation.
 
 **🔴 HOTSET EMPTY:** signal-compactor outputs 0 tokens (blocked by confluence gate + NEUTRAL block). Pipeline trades via other paths.
 

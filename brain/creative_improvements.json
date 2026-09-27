@@ -633,5 +633,32 @@
         "risk": "medium"
       }
     ]
+  },
+  {
+    "date": "2026-09-27T15:37:14.154744+00:00",
+    "idea": "Investigate continuum_engine metadata path — empty {} suggests metadata injection bypass",
+    "rationale": "Most recent trade has no metadata at all. If continuum_engine trades bypass metadata injection, we lose volume_spike and final_confidence for those trades.",
+    "expected_impact": "Fix metadata for continuum_engine trades",
+    "category": "bug fix",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-27T15:37:14.154757+00:00",
+    "idea": "ATR_SL widening success criteria — define pass/fail before trades resume",
+    "rationale": "Widening deployed Sep 25, UNTESTED 13+ hours. Define criteria now so we can evaluate objectively when trades resume.",
+    "expected_impact": "Clear go/no-go criteria for ATR_SL widening",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-27T15:37:14.154759+00:00",
+    "idea": "SHORT RSI 35-50 confidence penalty -20pt (6th suggestion)",
+    "rationale": "45T 42.2%WR -$1.88/14d bleeding band. Would block 0 winners. Low risk.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry sniper",
+    "status": "suggested (6th time)",
+    "risk": "low"
   }
 ]

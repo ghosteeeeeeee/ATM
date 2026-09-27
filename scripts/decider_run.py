@@ -3009,6 +3009,8 @@ def run(dry_run=False):
     _regime = 'NEUTRAL'  # default — overridden per-token in hotset loop above
 
     for i, sig in enumerate(scored):
+        _crash_signal = None  # init per-signal (set in crash check below)
+
         # Re-load hot-set on each iteration — prevents race with signal_compactor
         # running mid-loop and updating hotset.json between signals
         try:
@@ -3075,6 +3077,7 @@ def run(dry_run=False):
         try:
             from btc_crash_filter import check_crash
             _crash = check_crash()
+            _crash_signal = _crash  # expose to metadata injection below
             if _crash.blocked:
                 _block_dir = getattr(_crash, 'blocked_direction', None) or ''
                 if not _block_dir or direction.upper() == _block_dir.upper():

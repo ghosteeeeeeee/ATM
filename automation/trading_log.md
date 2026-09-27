@@ -7730,3 +7730,31 @@ Final set: ['KAS']
 - TP hit rate <1% — trailing exits consistently fire before TP
 - pullback-entry- and mover+ losing but can't kill with stale data
 
+
+## [2026-09-27 15:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 3 (POL, IOTA, HYPER — all LONG, <0.5h old)
+**7d:** 126T 38.1%WR -$4.22 | **14d:** 338T 43.5%WR -$3.65 | **ATR_SL:** 67.5% (all pre-fix)
+
+**Open Positions:**
+- POL LONG bb-bounce-v2-long+ | entry=0.11956 SL=-1.30% TP=+1.72% $11.10
+- IOTA LONG rs-s37 | entry=0.05009 SL=-1.30% TP=+1.70% $11.10
+- HYPER LONG rs-s118 | entry=0.07525 SL=-1.30% TP=+1.20% $11.10
+
+**Changes:** None
+
+**No Change Needed:**
+- System just woke up after 120h+ idle — 3 fresh opens, all LONG
+- 0 closures → no kill candidates surfaced
+- HIGH regime worst performer (14d: -$2.88, 67.4% ATR_SL) — monitoring but these are fresh
+- EXTREME only profitable regime (+$0.24/14d)
+- ATR_SL fix deployed Sep 25 — still ZERO post-fix closures to evaluate
+- TP hit 0% — trailing exits consistently fire before TP (expected behavior)
+- signal_versions table doesn't exist — can't audit version log
+
+**Open Questions:**
+- 3 fresh opens in HIGH/NORMAL regime — will ATR_SL fix help these?
+- 120h+ idle gap followed by 3 simultaneous opens — unusual burst
+- ATR_SL 67.5% dominance still untested post-fix
+
+**BY:** auto_1hr

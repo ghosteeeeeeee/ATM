@@ -210,3 +210,16 @@
 - **WARN** (5x): `decider_run` crash at line 4368 — BLUR LONG blocked by BTC momentum (-0.22%), mark_signal_executed succeeds (rc=1), then exception after. Non-blocking: pipeline continues. Root cause: exception in execution path after BTC-crash block. 
 - **WARN**: `signal-compactor.err.log` — repeated `LOCK-WAIT info_rate` contention (48+ retries). Lock contention on info_rate DB during concurrent access.
 - **INFO**: No auto-fixes applied — all issues are non-critical, pipeline completing normally.
+
+## Error Alerts — 2026-09-27 14:58 UTC
+- **REPEATED** (30x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.6s (rc=N)`
+- **REPEATED** (36x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (36x): `Sep N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **REPEATED** (36x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.4s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   decider_run: TOK in N.7s (rc=N)`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
