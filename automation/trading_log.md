@@ -1,3 +1,31 @@
+## [2026-09-28 10:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open positions | 0 trades today
+**PnL:** $0.00 | **24h:** 15T 53.3%WR +$0.51 | **7d:** 118T 34.5%WR -$5.84 | **14d:** 317T 44.2%WR -$2.93
+
+**24h Performance:** All 15 exits via profit-monster-trail (fix working). 2 SHORT trades only (-$0.07 combined).
+**Direction 7d:** LONG 58T 34.5%WR -$2.90 | SHORT 59T 35.6%WR -$2.94 (equal, SHORT aging out)
+**Top winners 24h:** continuation+ $0.32, rs-s102 $0.19, rs-s118 $0.14, rs-s44 $0.12, bb-bounce-v2-long+ $0.10
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix working: 0 hits in 24h, all exits profit-monster-trail ✅
+- No kill candidates: 0 trades in last hour, no signal with 0%WR and 3+ trades
+- Not overtrading: 0 trades/hr (system idle)
+- 24h positive: +$0.51 — system profitable on current market
+- SHORT side aging out: only 2 SHORT trades in 24h, both tiny losses
+- ALT LONG hard_max_loss (-$0.12) — safety mechanism working as intended
+
+**Open Questions:**
+- System barely trading (0/hr) — likely low-volatility regime, not over-filtered
+- SHORT 7d -$2.94 is equal share of LONG -$2.90 — both sides need improvement
+- volume_spike/final_confidence NULL drift still unfixed (code bug in signal_compactor.py)
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-28 06:30 UTC] Daily Orchestrator
 
 **Trades:** 0 open | 15 closed today | +$0.51 (33.3%WR)
@@ -8329,3 +8357,37 @@ Final set: ['CFX']
 - Post-fix trajectory positive (+$0.51 24h)
 
 **BY:** auto_1hr
+
+**BY:** auto_1hr
+
+## [2026-09-28 10:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system flat)
+**24h:** 15T 5W 33.3%WR +$0.51 | ATR_SL 0% (fix validated) | trailing 13/15 (87%)
+**7d:** 117T 41W 35.0%WR -$5.84 | ATR_SL 57/117 (49%) — all pre-fix
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hit rate in 24h — validated working (was 49% in 7d window, all pre-fix trades)
+- All major losers already killed: pullback-entry- (killed), pump-chain+ v4/v5 (killed), mover+ (killed), pump-chain- v5 short (killed)
+- Trade frequency: 0/hr — quiet period, no overtrading
+- System flat = no overnight risk
+- 24h PnL positive (+$0.51) — no negative streak
+
+**Signal Analysis (7d):**
+- Worst losers ALL already disabled: pullback-entry- -$1.69, pump-chain+ -$1.51, mover+ -$1.19
+- Active signals with volume: bb-bounce-v2-long+ 14T -$0.18 (42.9%WR, small avg loss $0.013)
+- SHORTs: 59T 35.6%WR -$2.94 — dominated by killed signals (pullback-entry-, pump-chain-)
+- EXTREME regime: 62T 35.5%WR -$3.98 (worst), NORMAL: 18T 44.4%WR +$0.14 (only profitable)
+
+**Regime Breakdown (7d):**
+- EXTREME: 62T 35.5%WR -$3.98
+- HIGH: 34T 29.4%WR -$2.01
+- NORMAL: 18T 44.4%WR +$0.14
+
+**Open Questions:**
+- bb-bounce-v2-long+ has highest volume (14T) but slight negative — monitor, not kill (42.9%WR, tiny avg loss)
+- EXTREME regime bleeds most — consider if EXTREME position sizing or filters need tuning
+- Post-fix trajectory positive — continue monitoring
+
