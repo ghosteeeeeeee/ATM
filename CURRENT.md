@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 21:30 UTC**
+**Last Updated: 2026-09-28 22:00 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
@@ -22,7 +22,7 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
-- **🔴 signal_rsi_14 NULL DRIFT:** 28-day drift. signal_rsi_14 is NULL for ALL 305 trades in 14d window. Was populated for 3487 older trades. Detection-time RSI filtering impossible. Investigation needed.
+- **🟢 signal_rsi_14 NULL DRIFT — FIXED:** 28-day drift. Root cause: decider_run.py:4283 `sig.get('rsi_14')` but signals store RSI as `rsi` key. Fix: `sig.get('rsi') or sig.get('rsi_14')` applied Sep 28. Unlocks proper RSI floor/ceiling enforcement for STANDALONE_BYPASS signals. Expected +$0.30-0.80/7d.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.

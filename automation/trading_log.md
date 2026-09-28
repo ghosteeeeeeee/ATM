@@ -1393,3 +1393,31 @@ BY: auto_1hr
 - 3 pump-chain- SHORTs open during potentially neutral market — monitor for SL hits
 
 **BY:** auto_1hr
+
+## [2026-09-28 19:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed in 1h (1W 0L) | **Open:** 5 (3 SHORT pump-chain-, 1 LONG rs-s82, 1 LONG continuum-osc+)
+**PnL:** +$0.02 (100% WR last hour) | **24h:** 15T 86.7%WR +$0.66
+
+**24h close reason:**
+- profit-monster-trail: 13T +$0.78 — dominant exit, trail working ✅
+- hard_max_loss: 1T -$0.12 — normal
+- HL_CLOSED: 1T $0.00
+
+**7d signal ranking (>=3T):**
+- pullback-entry-: 7T 0%WR -$1.69 — ALL pre-fix ATR_SL (Sep 21-22)
+- mover+: 7T 14.3%WR -$1.32 — ALL pre-fix ATR_SL (Sep 21-24)
+- pump-chain+: 9T 11.1%WR -$1.15 — ALL pre-fix ATR_SL (Sep 21-22)
+- pump-chain-: 33T 45.5%WR -$0.93 — near breakeven, highest volume
+- bb-bounce-v2-long+: 14T 42.9%WR -$0.18
+- continuum-osc+: 4T 75%WR -$0.05
+
+**No Change Needed:**
+- ATR_SL fix validated (15T+ post-fix, 0 hits)
+- All pre-fix losses aging out, no signal kills warranted
+- System healthy, 24h net positive at 86.7% WR
+
+**Open Questions:**
+- BTC LONG continuum-osc+ flat after 5h — monitoring
+
+**BY:** auto_1hr

@@ -329,3 +329,10 @@
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-09-28 18:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`

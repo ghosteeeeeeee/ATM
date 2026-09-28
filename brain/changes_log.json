@@ -616,5 +616,16 @@
     "after": "LONG_RSI_SWEET_SPOT_MAX = 60",
     "rationale": "RSI 50-60 LONG = 43T 60.5%WR +$1.53/14d. Combined 40-60 = 59T 63.1%WR +$3.22/14d.",
     "impact": "+$0.20-0.40/7d from confidence boost in 50-60 band"
+  },
+  {
+    "timestamp": "2026-09-28T19:33:50Z",
+    "agent": "brain_auditor",
+    "change": "Fix signal_rsi_14 NULL drift — decider_run.py:4283 sig.get(\"rsi_14\") -> sig.get(\"rsi\") or sig.get(\"rsi_14\")",
+    "type": "bugfix",
+    "file": "decider_run.py",
+    "before": "signal_rsi_14=sig.get(\"rsi_14\") — returned None for ALL signals post-Aug 17 (signals store RSI as \"rsi\" key)",
+    "after": "signal_rsi_14=sig.get(\"rsi\") or sig.get(\"rsi_14\") — matches pattern at lines 977 and 4114",
+    "rationale": "28-day drift: ALL 305 14d trades have NULL signal_rsi_14. Detection-time RSI filtering impossible. STANDALONE_BYPASS signals bypass signal_compactor RSI checks — this was the only enforcement path.",
+    "impact": "Expected +$0.30-0.80/7d. Unlocks proper RSI floor/ceiling enforcement for all STANDALONE_BYPASS signals. Enables post-hoc RSI analysis for all signals."
   }
 ]

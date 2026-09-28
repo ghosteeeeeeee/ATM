@@ -4280,7 +4280,7 @@ def run(dry_run=False):
             live_trading=not paper, flipped=bool(flipped_direction), regime=_regime,
             # Signal indicator fields captured from hotset at entry time
             signal_z_score=sig.get('z_score'),
-            signal_rsi_14=sig.get('rsi_14'),
+            signal_rsi_14=sig.get('rsi') or sig.get('rsi_14'),  # FIX: signals store as 'rsi', not 'rsi_14'
             signal_macd_hist=sig.get('macd_hist'),
             signal_momentum_state=sig.get('momentum_state'),
             signal_z_score_tier=sig.get('z_score_tier'),
