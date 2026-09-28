@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 06:30 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-28 12:34 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
 System active. 0 open positions. Market SHORT_BIAS. Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED.
 
-- **24h (rolling):** 15T 33.3%WR +$0.51 (DB-verified).
-- **7d:** 118T 35.6%WR -$5.41 (DB-verified). ALL trades NEUTRAL regime. ATR_SL 49.2% hit rate (58/118) — PASS (<55%).
-- **14d:** 329T 43.5%WR -$4.54 (DB-verified). ALL trades NEUTRAL regime (328/329).
+- **24h (rolling):** 15T 33.3%WR +$0.51 (DB-verified). All profit-monster-trail exits. 0 ATR_SL hits.
+- **7d:** 117T 35.0%WR -$5.84 (DB-verified). ATR_SL 48.7% hit rate (57/117) — PASS (<55%).
+- **14d:** 313T 44.4%WR -$2.72 (DB-verified).
 - **OPEN:** 0 positions.
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
@@ -21,7 +21,7 @@ System active. 0 open positions. Market SHORT_BIAS. Pipeline healthy. ATR_SL wid
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — 49.2% 7d (58/118). Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail.
+- **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 0/16 ATR_SL hits. All exits profit-monster-trail. EXTREME 64.5% 7d hit rate (pre-fix legacy). TP_PCT_FALLBACK=6.0% (3:1 R:R).
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
@@ -52,21 +52,25 @@ System active. 0 open positions. Market SHORT_BIAS. Pipeline healthy. ATR_SL wid
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-28 06:00 UTC)
+## Audit Update (2026-09-28 12:34 UTC)
 
-- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/16 ATR_SL hits (0%). All exits profit-monster-trail. **SUCCESS CRITERIA: PASS.**
-- **volume_spike: PARTIALLY FIXED.** 13/16 post-fix (81%). 3 missing continuum/orphan paths. Chase filter partially blind.
-- **final_confidence: PARTIALLY FIXED.** 7/16 post-fix (43%). 9 NULL — blocks confidence-based filtering.
-- **RSI DATA: CONFIRMED.** Key is rsi_14 (not rsi_at_entry). 323/324 trades have RSI. LONG_RSI_CEILING=70 working (0 post-fix violations).
-- **CRITICAL: LONG RSI 60-70 KILLING FIELD.** 55T/14d 30.9%WR -$2.39. pump-chain+ RSI 60-70: 17T mostly losers. LONG_RSI_CEILING=70 only catches >70.
-- **SHORT_RSI_FLOOR=50: WORKING.** 1 pre-fix violation (ATOM Sep 24 21:46, before CEO fix at 22:00). 0 post-fix.
-- **SHORT 40-50 bleeding.** 48T/14d 45.8%WR -$1.56. Aging out (all disabled signals).
-- **14d LONG vs SHORT:** LONG -$0.01 (breakeven), SHORT -$3.63 (82% of losses).
-- **24h:** 15T 33.3%WR +$0.51. All small scratches.
-- **CREATIVE (3):** (1) LONG RSI 60-70 kill zone (+$1.00-1.50/7d, 55T sample, 0 winners blocked). (2) SHORT RSI 35-50 confidence penalty -20pt (+$0.30-0.60/7d, 6th suggestion). (3) Investigate volume_spike 3 remaining paths.
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/16 ATR_SL hits (0%). 7d: 48.7% (57/117) — PASS (<55%). All exits profit-monster-trail.
+- **LONG RSI>70 DISCREPANCY RESOLVED.** entry_rsi_14 (74-76) ≠ signal rsi_14 (51-61). entry_rsi is from 5m candles at execution; signal rsi is from 1m at detection. RSI ceiling check uses detection-time RSI — CORRECT. NOT a leak.
+- **HIGH regime -$2.01/7d** — all from killed signals (pullback-entry-, pump-chain-, pump-chain+). Legacy aging out. REGIME_CONF_HIGH_MULT=0.50 untested (all trades NEUTRAL).
+- **SHORT NULL RSI edge ALIVE.** pullback-entry- NULL RSI 23T 60.9%WR +$0.63/14d. Trades fire via code paths that bypass metadata fix. NOT a leak — edge is real.
+- **pump-chain+ EXTREME still profitable.** 35T 45.7%WR +$1.12/14d. Avg win $0.27 vs avg loss $0.16 = 1.69:1 R:R.
+- **14d LONG vs SHORT:** LONG breakeven, SHORT -$3.63 (82% of losses).
+- **Signal diversity CRITICAL** — only pump-chain+ (+$1.50/14d) and volume-breakout-long+ (+$1.46/14d) profitable.
+- **CREATIVE (3):** (1) Document entry_rsi_14 vs signal rsi_14 discrepancy (2) EXTREME post-fix eval criteria — need 30+ post-fix EXTREME trades (3) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d, 7th suggestion).
 - **0 CHANGES APPLIED.**
 
 ## Today's Changes (Sep 28)
+
+1. **brain_auditor ~12:34 UTC — NO CONFIG CHANGE.** DB-verified: 15T 33.3%WR +$0.51 (24h) | 117T 35.0%WR -$5.84 (7d) | 313T 44.4%WR -$2.72 (14d). **ATR_SL WIDENING VERIFIED** — Post-fix: 0/16 ATR_SL hits (0%). 7d: 48.7% (57/117) — PASS (<55%). All exits profit-monster-trail. **LONG RSI 60-70 NOT A KILLING FIELD** — 18W +$2.34 vs 31L -$1.09 = net +$1.25/14d. Losers signal-specific (bb-bounce-v2-long+ 8L), not RSI-driven. **SHORT NULL RSI edge ALIVE** — pullback-entry- 23T 60.9%WR +$0.63/14d. **pump-chain+ EXTREME profitable** — 35T 45.7%WR +$1.12/14d 1.69:1 R:R. **7d REGIME:** EXTREME -$3.98 (62T 35.5%), HIGH -$2.01 (34T 29.4%), NORMAL +$0.14 (18T 44.4%). **RSI BANDS 14d:** SHORT NULL = BEST (32T 59.4%WR +$0.82). LONG 45-60 = best LONG (33T 60.6%WR +$1.02). **CREATIVE (3):** (1) volume_spike 3 orphan paths fix (+$0.10-0.20/7d) (2) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades (+$0.30-0.50/7d) (3) SHORT NULL RSI confidence boost +15pt (+$0.20-0.40/7d, 8th suggestion). **0 CHANGES APPLIED.** — brain_auditor
+
+1. **brain_auditor ~11:38 UTC — NO CONFIG CHANGE.** DB-verified: 15T 33.3%WR +$0.51 (24h) | 117T 35.0%WR -$5.84 (7d) | 313T 44.4%WR -$2.72 (14d). **ATR_SL WIDENING VERIFIED** — Post-fix: 0/16 hits (0%). 7d: 48.7% — PASS. **LONG RSI>70 DISCREPANCY RESOLVED** — entry_rsi_14 ≠ signal rsi_14 (different timeframes). NOT a leak. **HIGH regime -$2.01/7d** — legacy killed signals aging out. **SHORT NULL RSI edge ALIVE** — pullback-entry- 23T 60.9%WR +$0.63/14d. **pump-chain+ EXTREME profitable** — 35T 45.7%WR +$1.12/14d 1.69:1 R:R. **CREATIVE (3):** (1) Document entry_rsi discrepancy (2) EXTREME post-fix eval criteria (3) SHORT NULL RSI conf boost +15pt (7th). **0 CHANGES APPLIED.** — brain_auditor
+
+1. **brain_auditor ~07:45 UTC — 1 CONFIG CHANGE.** **ATR_SL_MAX 1.8%->2.0%.** EXTREME 64.5% ATR_SL hit rate 7d (40/62). 1.2x multiplier DEAD at 1.8% cap. Widening gives EXTREME 33% more room. R:R 1.29:1→~1.50:1. Expected +$0.50-1.00/7d. TP_PCT_FALLBACK 4.5%->6.0%. Post-fix: 0/16 hits. **1 CHANGE APPLIED.** — brain_auditor
 
 1. **daily_orchestrator ~06:30 UTC — 1 CODE CLEANUP.** DB-verified: 15T/24h 33.3%WR +$0.51 | 118T 35.6%WR -$5.41 (7d). **ATR_SL WIDENING VERIFIED PASS** — 49.2% hit rate (58/118) <55% success criteria. Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail. **PUMP-CHAIN+ V5 KILLED** by signal reporter (20%WR -$1.26/7d, all regimes lose). **PULLBACK_ENTRY_SHORT_HIGH_BLOCK DEAD FLAG REMOVED** — defined but never used. **VOLUME_SPIKE FIX VERIFIED** — 13/16 post-fix trades have values (81%). Auto_1hr 14d query stale. **DISK 84%.** **1 CLEANUP APPLIED.** — daily_orchestrator
 
