@@ -1,77 +1,53 @@
-# Signal Performance Report
-**Generated:** 2026-09-28 11:10 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-09-28 ~17:00 UTC | 6h: 0 trades | 24h: 13 trades
 
-## Overall Stats
-- **24h trades:** 15 | **W/L:** 5/10 | **WR:** 33.3% | **Net PnL:** +$0.51
-- **Open positions:** 0
-- **Pipeline:** Running (cycle #219510) | **Regime:** NEUTRAL (0% hot, 8% cold)
+**Context:** Very quiet period. 0 closed trades in 6h, 13 in 24h. 7d: 111T, 34.2% WR, -$5.71.
 
----
+## 24h Breakdown
 
-## KILLED (executed this cycle)
+| Signal | Dir | Token | WR | PnL | Regime | Close Reason |
+|--------|-----|-------|-----|-----|--------|--------------|
+| continuation+ | LONG | POL | 100% | +$0.32 | HIGH | profit-monster-trail |
+| rs-s102 | LONG | HBAR | 100% | +$0.19 | NORMAL | profit-monster-trail |
+| rs-s118 | LONG | HYPER | 100% | +$0.14 | NORMAL | profit-monster-trail |
+| rs-s44 | LONG | YGG | 100% | +$0.12 | NORMAL | profit-monster-trail |
+| bb-bounce-v2-long+ | LONG | HBAR | 0% | -$0.02 | NORMAL | profit-monster-trail |
+| rs-s30,rs-s33 | LONG | LTC | 0% | -$0.02 | NORMAL | profit-monster-trail |
+| rs-r66,rs-r74 | SHORT | GOAT | 0% | -$0.03 | NORMAL | profit-monster-trail |
+| mover- | SHORT | CFX | 0% | -$0.04 | HIGH | profit-monster-trail |
+| rs-s52 | LONG | LTC | 0% | -$0.04 | NORMAL | profit-monster-trail |
+| rs-s94 | LONG | YGG | 0% | -$0.07 | NORMAL | profit-monster-trail |
+| rs-s111 | LONG | ALT | 0% | -$0.12 | NORMAL | hard_max_loss_-1.02% |
+| doji-bottom-long | LONG | CAKE | 0% | -$0.01 | NORMAL | profit-monster-trail |
+| continuum+ | LONG | BTC | 100% | $0.00 | FLAT | HL_CLOSED |
 
-None. All 7d losers are already disabled.
+**24h Net:** +$0.42 | **Win Rate:** 30.8% (4W/9L)
 
----
+**Regime Performance (24h):**
+- NORMAL: 10T, 30.0% WR, +$0.14
+- HIGH: 2T, 50.0% WR, +$0.28
+- FLAT: 1T, 0.0% WR, $0.00
 
-## BOOSTED (executed this cycle)
+## KILLED (executed)
+None. No signal meets kill criteria (WR <30%, 5+ trades, 24h).
 
-None. 24h volume too low (15 trades) for statistical significance.
+## BOOSTED (executed)
+None. Too few trades to boost.
 
----
+## LOSERS (watch list)
+No 24h losers with 5+ trades.
 
-## LOSERS (watch list — 24h)
+**All-time losers already killed/disabled:**
+- coin_tracker_hot (all variants) — NEVER_REENABLE
+- slow_grind (LONG/SHORT) — NEVER_REENABLE
+- ema300_dip (LONG/SHORT) — disabled
+- accel_300 variants — most in NEVER_REENABLE
 
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| rs-s111 | LONG | 1 | 0% | -$0.12 | Single trade, hard_max_loss exit |
-| rs-s94 | LONG | 1 | 0% | -$0.07 | Single trade |
-| mover- | SHORT | 1 | 0% | -$0.04 | Single trade |
-| rs-s52 | LONG | 1 | 0% | -$0.04 | Single trade |
-| rs-r66,rs-r74 | SHORT | 1 | 0% | -$0.03 | Single trade |
-| rs-s30,rs-s33 | LONG | 1 | 0% | -$0.02 | Single trade |
-| doji-bottom-long | LONG | 1 | 0% | -$0.01 | Single trade, 228min hold |
-| rs-s37 | LONG | 1 | 0% | -$0.01 | Single trade, 116min hold |
-
-**Note:** All 24h losers are single-trade signals. No signal has enough volume for a kill decision.
-
----
-
-## WINNERS (24h)
-
-| Signal | Dir | Token | PnL | Exit |
-|--------|-----|-------|-----|------|
-| continuation+ | LONG | POL | +$0.32 | profit-monster-trail |
-| rs-s102 | LONG | HBAR | +$0.19 | profit-monster-trail |
-| rs-s118 | LONG | HYPER | +$0.14 | profit-monster-trail |
-| rs-s44 | LONG | YGG | +$0.12 | profit-monster-trail |
-| bb-bounce-v2-long+ | LONG | POL | +$0.10 | profit-monster-trail |
-
----
-
-## 7d LOSERS (already killed — no action needed)
-
-| Signal | Dir | Trades | WR | PnL | Flag Status |
-|--------|-----|--------|-----|-----|-------------|
-| pullback-entry- | SHORT | 7 | 0% | -$1.69 | `PULLBACK_ENTRY_MINUS_ENABLED = False` |
-| pump-chain+ | LONG | 13 | 15.4% | -$1.51 | `PUMP_CHAIN_V5_ENABLED = False` |
-| mover+ | LONG | 8 | 25% | -$1.19 | `MOVER_PLUS_ENABLED = False` |
-| accel-300-breakout | SHORT | 7 | 28.6% | -$0.12 | `ACCEL_300_BREAKOUT_ENABLED = False` |
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
+## WINNERS
+No 24h winners with 5+ trades.
 
 ## ISSUES
-
-- **Low volume:** Only 15 trades in 24h. Market in NEUTRAL regime (0% hot, 8% cold).
-- **33.3% WR but +$0.51 PnL:** Good R:R — winners are larger than losers. No action needed.
-- **No open positions:** System is flat.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+- **7d drawdown:** 111T, 34.2% WR, -$5.71. No single signal is responsible — broad underperformance.
+- **Low activity:** Only 13 closed trades in 24h. System may be filtering too aggressively or market is quiet.
+- **No inversions found.**
+- **Open trades:** 6 open, all fresh (0.1-3.9h). No staleness concerns.
