@@ -299,7 +299,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'mover_short'): 1.0,             # OK — mover SHORT can work in EXTREME
     ('EXTREME', 'pump_chain-'): 0.5,             # PENALIZED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME
     ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
-    ('EXTREME', 'rs'): 0.5,                      # PENALIZED — rs mean-reversion reduced in EXTREME (was 0.0, too harsh)
+    ('EXTREME', 'support_resistance'): 0.5,    # PENALIZED — rs mean-reversion reduced in EXTREME (was 0.0, too harsh). NOTE: signal_type='support_resistance', NOT 'rs'
     # ── NORMAL regime: per-signal overrides ──
     ('NORMAL', 'pullback_entry-'): 0.0,          # BLOCKED — pullback-entry- SHORT 0% WR in NORMAL
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
@@ -307,7 +307,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
-    ('HIGH', 'rs'): 0.3,                         # PENALIZED — rs mean-reversion reduced in HIGH
+    ('HIGH', 'support_resistance'): 0.3,                         # PENALIZED — rs mean-reversion reduced in HIGH. NOTE: signal_type='support_resistance', NOT 'rs'
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH
 }
 
