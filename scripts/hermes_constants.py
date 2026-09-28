@@ -1567,6 +1567,8 @@ SIGNAL_EXIT_CONFIG = {
     # Open-skies: structural exit (resistance/support) + ATR SL as floor
     'open-skies+': 'rr_engine',
     'open-skies-': 'rr_engine',
+    # RS: R:R engine — sets tighter SL for poor setups (POL/SOL lost 9% with default 1.3% SL)
+    'rs': 'rr_engine',
     # ATR spike: proven ATR SL
     'atr-spike+': 'atr',
     'atr-spike-': 'atr',
