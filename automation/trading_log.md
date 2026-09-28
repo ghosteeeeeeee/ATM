@@ -8107,3 +8107,45 @@ Final set: ['KAS']
 - Post-fix PnL +$0.72, trajectory positive
 
 **BY:** auto_1hr
+
+## [2026-09-28 01:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L, -$0.15)
+- ALT LONG rs-s111: -$0.12 (hard_max_loss, safety net)
+- GOAT SHORT rs-r66,rs-r74: -$0.03 (profit-monster-trail, marginal)
+
+**24h:** 14T 57.1% WR +$0.53 | trailing exit 12/14 (86%)
+**14d:** 324T 43.8% WR -$3.98
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits across 24h — still validated
+- No kill candidates (all signals ≤1 trade in window)
+- Trade frequency: 3/hr max, normal
+- Hard_max_loss on ALT = safety net working as designed
+- System flat (0 open) = no overnight risk
+
+**BY:** auto_1hr
+
+## [2026-09-28 02:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed, 0 open (system flat)
+**24h:** 13T 38.5%WR +$0.53 | trailing exit 12/13 (92%)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits across 24h — still validated
+- Trailing exits dominant (92%) — working as designed
+- No kill candidates (all signals ≤1 trade in window)
+- Trade frequency: 0/hr — quiet period, not over-trading
+- System flat = no overnight risk
+
+**Top performers 24h:** continuation+ ($0.32), rs-s102 ($0.19), rs-s118 ($0.14)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.53 24h)
+
+**BY:** auto_1hr
