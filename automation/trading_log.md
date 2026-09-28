@@ -8257,3 +8257,27 @@ Final set: ['KAS']
 - ADD CFX (WR=40.0%, PnL=$0.03, wr_collapse (72.7% → 40.0%))
 
 Final set: ['CFX']
+
+## [2026-09-28 07:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed, 0 open (system flat)
+**24h:** 15T 33.3%WR +$0.51 | trailing exit 13/15 (87%)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits in 24h — validated (was 49.6% pre-fix in 7d window)
+- No kill candidates (0 trades last hour, no signal with 3+ trades at 0% WR)
+- Trade frequency: 0/hr — quiet period, not over-trading
+- System flat = no overnight risk
+- 24h PnL positive — no negative streak
+
+**Top 7d performers:** volume-breakout-long+ (+$0.79, 67%WR), continuation+ (+$0.32, 100%WR)
+
+**7d losers (disabled/monitored):** pullback-entry- already killed (0%WR, -$1.69), mover+ (-$1.19), pump-chain+ (-$1.08)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.51 24h)
+
+**BY:** auto_1hr
