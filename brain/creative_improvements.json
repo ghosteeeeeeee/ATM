@@ -800,5 +800,34 @@
     "category": "bug fix",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-28T15:34:40.604905Z",
+    "idea": "EXTREME MIN_EXEC_CONFIDENCE=70",
+    "rationale": "pump-chain+ EXTREME 35T 45.7%WR +1.12/14d. Higher confidence = fewer false positives in volatile regime.",
+    "expected_impact": "+0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "requirement": "Wait for 50+ post-fix EXTREME trades"
+  },
+  {
+    "date": "2026-09-28T15:34:40.604930Z",
+    "idea": "SHORT NULL RSI confidence boost +15pt",
+    "rationale": "pullback-entry- 22T 59.1%WR +0.55/14d. NULL RSI = edge. Boost confidence to prioritize these entries.",
+    "expected_impact": "+0.20-0.40/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "suggestion_count": 8
+  },
+  {
+    "date": "2026-09-28T15:34:40.604939Z",
+    "idea": "Fix 3 orphan volume_spike paths",
+    "rationale": "volume_spike 81% fixed, 3 missing from rs-s*/continuum_engine. Chase filter blind for 19% of trades.",
+    "expected_impact": "+0.10-0.20/7d",
+    "category": "bug fix",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

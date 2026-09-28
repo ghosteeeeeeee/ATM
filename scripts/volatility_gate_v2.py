@@ -288,18 +288,35 @@ VOL_PHASE_MULTS = {
 # FIRST MATCH WINS — order from most specific to least specific.
 SIGNAL_TYPE_OVERRIDES = {
     # ── EXTREME regime: per-signal overrides of family-level blocks ──
+    # ORDER MATTERS: most specific first (FIRST MATCH WINS via substring)
     ('EXTREME', 'accel_300_v3_long'): 0.0,     # BLOCKED — 37% WR in EXTREME, confirmed loser
     ('EXTREME', 'accel_300_v3_short'): 1.0,     # OK — structural breakout SHORT works in EXTREME
     ('EXTREME', 'accel_300_short'): 1.0,         # OK — star SHORT signal, needs EXTREME access
     ('EXTREME', 'accel_300_long'): 0.5,          # PENALIZED — accel_300_long less reliable in EXTREME
     ('EXTREME', 'ema300_dip_long'): 0.0,         # BLOCKED — 25% WR in EXTREME
     ('EXTREME', 'ema300_dip_short'): 1.0,        # OK — ema300_dip_short structural SHORT
+    ('EXTREME', 'ema300_breakthrough_short'): 1.0,  # OK — structural SHORT works in EXTREME
+    ('EXTREME', 'ema300_breakthrough_long'): 0.0,   # BLOCKED — same as ema300_dip_long family
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.0,              # BLOCKED — mover+ LONG -$0.48 lifetime EXTREME
     ('EXTREME', 'mover_short'): 1.0,             # OK — mover SHORT can work in EXTREME
     ('EXTREME', 'pump_chain-'): 0.5,             # PENALIZED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME
     ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
-    ('EXTREME', 'support_resistance'): 0.5,    # PENALIZED — rs mean-reversion reduced in EXTREME (was 0.0, too harsh). NOTE: signal_type='support_resistance', NOT 'rs'
+    ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
+    # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
+    # These catch signal types like 'ema300_breakthrough+', 'pump-chain-', etc.
+    # that don't match the specific _long/_short overrides above.
+    ('EXTREME', 'ema300_breakthrough'): 1.0,     # OK — bare form fallback for ema300_breakthrough+
+    ('EXTREME', 'ema300_dip'): 1.0,              # OK — bare form fallback (specific _long/_short above take priority)
+    ('EXTREME', 'mover'): 1.0,                   # OK — bare form fallback for mover (coin_tracker_hot variants below)
+    ('EXTREME', 'coin_tracker_hot_long'): 0.0,    # BLOCKED — same as mover_long (Mover family)
+    ('EXTREME', 'coin_tracker_hot_short'): 1.0,   # OK — same as mover_short
+    ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
+    ('EXTREME', 'pump_chain'): 0.5,              # PENALIZED — bare form fallback for pump_chain (not pump_chain+)
+    ('EXTREME', 'pump-chain+'): 0.0,             # BLOCKED — hyphen variant of pump_chain+ (not proven in EXTREME)
+    ('EXTREME', 'pump-chain-'): 0.5,             # PENALIZED — hyphen variant of pump_chain-
+    ('EXTREME', 'pump-chain'): 0.5,              # PENALIZED — hyphen variant fallback (must be AFTER pump-chain+/-)
+    ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──
     ('NORMAL', 'pullback_entry-'): 0.0,          # BLOCKED — pullback-entry- SHORT 0% WR in NORMAL
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
@@ -307,7 +324,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
-    ('HIGH', 'support_resistance'): 0.3,                         # PENALIZED — rs mean-reversion reduced in HIGH. NOTE: signal_type='support_resistance', NOT 'rs'
+    ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH
 }
 

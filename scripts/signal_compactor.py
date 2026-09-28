@@ -2456,7 +2456,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             _regime, _regime_conf = get_regime_1m(token)
             _regime_4h, _ = get_regime_4h(token)
             # Volatility regime (FLAT/NORMAL/HIGH/EXTREME) from ATR — used by signal-specific blocks
+            # FIX: Compute ATR fresh instead of relying on cache (which is empty at process start,
+            # defaulting to NORMAL when all altcoins are EXTREME). This caused REGIME-CONF and
+            # SHORT-NORMAL-PENALTY to use wrong regime for every signal.
             _atr_for_vreg = _atr_cache.get(token.upper(), (None,))[0]
+            if _atr_for_vreg is None:
+                try:
+                    _atr_for_vreg = _get_atr_pct(token)
+                    if _atr_for_vreg is not _atr_cache.get(token.upper(), (None,))[0]:
+                        _atr_cache[token.upper()] = (_atr_for_vreg, time.time())
+                except Exception:
+                    pass
             _vol_regime = _classify_volatility(_atr_for_vreg) if _atr_for_vreg is not None else 'NORMAL'
             # NEUTRAL regime relaxation: when market is flat (4h NEUTRAL),
             # single-type signals can't find co-signals. Allow them through.
