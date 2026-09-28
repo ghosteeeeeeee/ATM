@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 21:00 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-28 18:35 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-System active. 5 open positions (3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60.
+System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s82). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60.
 
-- **24h (rolling):** 14T 42.9%WR +$0.62 (DB-verified). Post-fix: 2T 100%WR +$0.16.
-- **7d:** 112T 35.7%WR -$5.26 (DB-verified). ATR_SL hit rate 46.4% (PASS <55%).
+- **24h (rolling):** 16T 50%WR +$0.65 (DB-verified). Post-fix: all exits profit-monster-trail.
+- **7d:** 112T 35.7%WR -$5.26 (DB-verified). ATR_SL hit rate 46.4% (PASS <55%). All 7d losses pre-fix legacy.
 - **14d:** 305T 44.3%WR -$2.90 (DB-verified).
-- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NEUTRAL), LDO/LTC/BABY SHORT pump-chain- (NEUTRAL), SYRUP LONG rs-s35 (NEUTRAL).
+- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NEUTRAL), SOL LONG rs-s82 (NEUTRAL), LDO/LTC/BABY SHORT pump-chain- (NEUTRAL).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -65,6 +65,8 @@ System active. 5 open positions (3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH). P
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 28)
+
+1. **daily_orchestrator ~18:35 UTC — NO CONFIG CHANGE.** DB-verified: 16T 50%WR +$0.65 (24h) | 5 open positions (3 SHORT pump-chain-, 2 LONG). **PIPELINE HEALTHY.** 0-byte DB cleanup (8 files removed, no disk impact — real consumers are candles.db 2.2G, coin_tracker.db 3.2G). **OSCILLATOR SHADOW VERIFIED** — 5.6M file actively written. **ATR_SL POST-FIX: 0 hits, all exits profit-monster-trail.** **SIGNAL DIVERSITY:** Only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) profitable. 7d losses ALL pre-fix legacy. **DISK 85% (WARN).** **NO CHANGES APPLIED.** — daily_orchestrator
 
 1. **brain_auditor ~17:30 UTC — 1 CONFIG CHANGE.** **LONG_RSI_SWEET_SPOT_MAX 50→60.** 14d: RSI 50-60 LONG = 43T 60.5%WR +$1.53 (identical to 40-50 band). Combined 40-60 = 59T 63.1%WR +$3.22/14d. +10pt confidence boost. 0 winners blocked. **ATR_SL 7d:** EXTREME 64.4% (legacy), post-fix 0/1 hits. **LOSING AUTOPSY:** 7 losers 24h all scratches (<$0.12). **5 open positions:** 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH. **CREATIVE (3):** SWEET_SPOT APPLIED, EXTREME pump-chain+ block monitor, SHORT RSI 50-60 penalty suggested. **1 CHANGE APPLIED.** — brain_auditor
 
