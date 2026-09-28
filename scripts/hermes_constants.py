@@ -1758,6 +1758,7 @@ NEVER_REENABLE_FLAGS = {
     'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
     'PUMP_FLOW_PLUS_ENABLED',      # SIGNAL REPORTER 2026-09-22 — 13T/24h 15.4%WR -$1.51. ALL regimes lose (EXTREME 20%, HIGH 0%). NEVER_REENABLE.
     'PUMP_CHAIN_V4_ENABLED',       # SIGNAL REPORTER 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
+    'PUMP_CHAIN_V5_ENABLED',       # SIGNAL REPORTER 2026-09-28 — pump-chain+ LONG 20%WR -$1.26 (7d). EXTREME 25%WR, HIGH 0%WR. ALL regimes lose. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -3609,7 +3610,7 @@ PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (24h), 20%WR EXTREME, 0%WR HIGH. 80T all-time 41.3%WR +$0.95. NEVER_REENABLE.
 PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-PUMP_CHAIN_V5_ENABLED = True           # NEW 2026-09-22 — V5 with velocity + continuum oscillator filters. 48h test.
+PUMP_CHAIN_V5_ENABLED = False          # KILLED 2026-09-28 — 15T 20%WR -$1.26 (7d). EXTREME 25%WR -$0.96, HIGH 0%WR -$0.30. ALL regimes lose. NEVER_REENABLE.
 PUMP_CHAIN_V5_SHORT_ENABLED = False    # CEO Sep 25 — 30d: 88T 54.5%WR -$0.31 (breakeven). 7d: 33T 45.5%WR -$0.93 (cold streak). SHORT side bleeding -$3.66/7d total. Disable to reduce SHORT noise.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
