@@ -1,53 +1,55 @@
 === Signal Performance Report ===
-Period: 2026-09-28 ~17:00 UTC | 6h: 0 trades | 24h: 13 trades
+Generated: 2026-09-28 23:10 UTC
 
-**Context:** Very quiet period. 0 closed trades in 6h, 13 in 24h. 7d: 111T, 34.2% WR, -$5.71.
+## Summary
+| Period | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 6h | 9 | +$0.09 | 50.0% |
+| 24h | 14 | +$0.09 | 50.0% |
+| 7d | 114 | -$4.30 | 39.5% |
 
-## 24h Breakdown
+## KILLED (executed this run)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 (7d) | Added to SIGNAL_SOURCE_BLACKLIST |
+| accel-300-v4-short- | SHORT | 20.0% | -$0.26 | 5 (30d) | Added to SIGNAL_SOURCE_BLACKLIST |
 
-| Signal | Dir | Token | WR | PnL | Regime | Close Reason |
-|--------|-----|-------|-----|-----|--------|--------------|
-| continuation+ | LONG | POL | 100% | +$0.32 | HIGH | profit-monster-trail |
-| rs-s102 | LONG | HBAR | 100% | +$0.19 | NORMAL | profit-monster-trail |
-| rs-s118 | LONG | HYPER | 100% | +$0.14 | NORMAL | profit-monster-trail |
-| rs-s44 | LONG | YGG | 100% | +$0.12 | NORMAL | profit-monster-trail |
-| bb-bounce-v2-long+ | LONG | HBAR | 0% | -$0.02 | NORMAL | profit-monster-trail |
-| rs-s30,rs-s33 | LONG | LTC | 0% | -$0.02 | NORMAL | profit-monster-trail |
-| rs-r66,rs-r74 | SHORT | GOAT | 0% | -$0.03 | NORMAL | profit-monster-trail |
-| mover- | SHORT | CFX | 0% | -$0.04 | HIGH | profit-monster-trail |
-| rs-s52 | LONG | LTC | 0% | -$0.04 | NORMAL | profit-monster-trail |
-| rs-s94 | LONG | YGG | 0% | -$0.07 | NORMAL | profit-monster-trail |
-| rs-s111 | LONG | ALT | 0% | -$0.12 | NORMAL | hard_max_loss_-1.02% |
-| doji-bottom-long | LONG | CAKE | 0% | -$0.01 | NORMAL | profit-monster-trail |
-| continuum+ | LONG | BTC | 100% | $0.00 | FLAT | HL_CLOSED |
+**Note:** `accel-300` was already blacklisted (Aug 5) but `validate_source()` does exact match — `accel-300` did NOT match `accel-300-breakout` or `accel-300-v4-short-`. Both slipped through for weeks.
 
-**24h Net:** +$0.42 | **Win Rate:** 30.8% (4W/9L)
+## REGIME BLOCKS (already active — verified)
+| Signal | Dir | Blocked Regime | Reason | Status |
+|--------|-----|----------------|--------|--------|
+| pullback-entry- | SHORT | NORMAL | 0% WR, -$0.62 in NORMAL | ✅ Active since Sep 17 |
+| pump-chain+ | LONG | EXTREME | 0.0 mult in EXTREME | ✅ Active since Sep 24 |
+| mover+ | LONG | EXTREME | Mover family=0.0 in EXTREME | ✅ Active since Sep 23 |
 
-**Regime Performance (24h):**
-- NORMAL: 10T, 30.0% WR, +$0.14
-- HIGH: 2T, 50.0% WR, +$0.28
-- FLAT: 1T, 0.0% WR, $0.00
+## BOOSTED
+None. No signal with 3+ trades in 7d has WR>55% AND positive PnL.
 
-## KILLED (executed)
-None. No signal meets kill criteria (WR <30%, 5+ trades, 24h).
+## LOSERS (watch list — 7d, 3+ trades)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 | Regime-blocked NORMAL; EXTREME/HIGH historically profitable |
+| mover+ | LONG | 16.7% | -$0.95 | 6 | EXTREME blocked; HIGH mixed |
+| pump-chain+ | LONG | 16.7% | -$0.85 | 6 | EXTREME blocked; HIGH/NORMAL losing |
+| pump-chain- | SHORT | 48.6% | -$0.74 | 35 | Near breakeven, watch |
+| bb-bounce-v2-long+ | LONG | 42.9% | -$0.18 | 14 | Small loss, watch |
+| continuum-osc+ | LONG | 75.0% | -$0.05 | 4 | Great WR, tiny loss — skip |
 
-## BOOSTED (executed)
-None. Too few trades to boost.
+## WINNERS (7d, 2+ trades)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| volume-breakout-long+ | LONG | 50.0% | +$0.05 | 2 | Insufficient sample |
 
-## LOSERS (watch list)
-No 24h losers with 5+ trades.
+## SIGNAL INVERSIONS
+None found in 24h.
 
-**All-time losers already killed/disabled:**
-- coin_tracker_hot (all variants) — NEVER_REENABLE
-- slow_grind (LONG/SHORT) — NEVER_REENABLE
-- ema300_dip (LONG/SHORT) — disabled
-- accel_300 variants — most in NEVER_REENABLE
-
-## WINNERS
-No 24h winners with 5+ trades.
+## 6h Performance
+| Signal | Dir | WR | PnL | Trades |
+|--------|-----|-----|-----|--------|
+| pump-chain- | SHORT | 100.0% | +$0.19 | 2 |
 
 ## ISSUES
-- **7d drawdown:** 111T, 34.2% WR, -$5.71. No single signal is responsible — broad underperformance.
-- **Low activity:** Only 13 closed trades in 24h. System may be filtering too aggressively or market is quiet.
-- **No inversions found.**
-- **Open trades:** 6 open, all fresh (0.1-3.9h). No staleness concerns.
+1. **Source blacklist gap fixed:** `accel-300-breakout` and `accel-300-v4-short-` were bypassing the `accel-300` blacklist due to exact-match logic in `validate_source()`. Added explicit entries.
+2. **7d system-wide underperformance:** 114 trades, -$4.30 PnL, 39.5% WR. Low activity in 24h (14 trades) suggests regime filtering is working but opportunity set is thin.
+3. **No boost candidates:** Zero signals with 3+ trades and positive PnL in 7d. System is in a drawdown phase.

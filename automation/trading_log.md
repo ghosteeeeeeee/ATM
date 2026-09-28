@@ -1486,3 +1486,32 @@ BY: auto_1hr
 - All7d losses from pre-fix era, aging out
 
 **BY:** auto_1hr
+
+## [2026-09-28 23:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) | **Open:** 4 (+$0.44 combined)
+**PnL:** +$0.05 last hour | **24h:** 14T 50%WR +$0.09 | **Post-fix:** 26T 50%WR +$0.86
+
+**Last hour closes:**
+- IO SHORT pump-chain-: +$0.05 hard_sl (trailed above entry, net positive)
+
+**24h exit breakdown:** 8 profit-monster-trail, 4 hard_sl, 1 hard_max_loss, 1 HL_CLOSED
+- ATR_SL fix: 0/14 hits (24h+ clean — fix validated 26T+)
+
+**14d regime analysis:**
+- EXTREME LONG: 56T 50%WR +$1.22 ✅ (only profitable regime combo)
+- HIGH SHORT: 41T 39%WR -$1.08 ❌ (all pre-fix, aging out)
+- EXTREME SHORT: 68T 47%WR -$1.33 ❌ (pre-fix)
+- NORMAL SHORT: 21T 43%WR -$0.75 ❌
+
+**No Change Needed:**
+- ATR_SL fix: 26T post-fix with 0 hits — confirmed working
+- No kill candidates: no signal with 3+ trades at 0% WR in last hour
+- Trade frequency: 1T/hr — normal
+- All 7d losses from pre-fix era (last ATR_SL hit: Sep 24), aging out
+- Open positions healthy: 2 SHORT pump-chain- (+$0.27), 1 LONG doji-bottom-long (+$0.16), 1 LONG continuum-osc+ (+$0.01)
+
+**Open Questions:**
+- EXTREME SHORT -$1.33/14d — worst regime combo. May warrant MIN_EXEC_CONFIDENCE increase if it persists post-fix, but too early to conclude.
+
+**BY:** auto_1hr
