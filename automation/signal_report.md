@@ -1,62 +1,77 @@
-=== Signal Performance Report ===
-Period: 2026-09-28 05:09 UTC | 7d window (Sep 21-28)
+# Signal Performance Report
+**Generated:** 2026-09-28 11:10 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed this run)
+## Overall Stats
+- **24h trades:** 15 | **W/L:** 5/10 | **WR:** 33.3% | **Net PnL:** +$0.51
+- **Open positions:** 0
+- **Pipeline:** Running (cycle #219510) | **Regime:** NEUTRAL (0% hot, 8% cold)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain+ (V5) | LONG | 20.0% | -$1.26 | 15 | KILLED — PUMP_CHAIN_V5_ENABLED=False, added to NEVER_REENABLE_FLAGS |
+---
 
-Regime breakdown: EXTREME 25%WR -$0.96 (12T), HIGH 0%WR -$0.30 (3T). ALL regimes lose.
+## KILLED (executed this cycle)
 
-## PREVIOUSLY KILLED (still enforced)
+None. All 7d losers are already disabled.
 
-| Signal | Dir | WR | PnL | Trades | Killed |
-|--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0.0% | -$1.69 | 7 | Sep 22 — PULLBACK_ENTRY_MINUS_ENABLED=False |
-| mover+ | LONG | 25.0% | -$1.19 | 8 | Sep 24 — MOVER_PLUS_ENABLED=False |
-| pump-chain- | SHORT | 45.5% | -$0.93 | 33 | Sep 25 — PUMP_CHAIN_V5_SHORT_ENABLED=False |
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 | Sep 23 — ACCEL_300_BREAKOUT_ENABLED=False |
+---
 
-## BOOSTED (executed this run)
+## BOOSTED (executed this cycle)
 
-None — no signals met boost criteria (WR>55%, 5+ trades, positive PnL) in 7d.
+None. 24h volume too low (15 trades) for statistical significance.
 
-## LOSERS (watch list)
+---
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| doji-bottom-long | LONG | 33.3% | -$0.20 | 3 | Low volume, monitor |
-| bb-bounce-v2-long+ | LONG | 42.9% | -$0.18 | 14 | Marginal, EXTREME regime noise |
-| accel-300+,rs_s | LONG | 37.8% | -$2.91 | 275 | All-time chronic loser, combo signal |
+## LOSERS (watch list — 24h)
 
-## WINNERS
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| rs-s111 | LONG | 1 | 0% | -$0.12 | Single trade, hard_max_loss exit |
+| rs-s94 | LONG | 1 | 0% | -$0.07 | Single trade |
+| mover- | SHORT | 1 | 0% | -$0.04 | Single trade |
+| rs-s52 | LONG | 1 | 0% | -$0.04 | Single trade |
+| rs-r66,rs-r74 | SHORT | 1 | 0% | -$0.03 | Single trade |
+| rs-s30,rs-s33 | LONG | 1 | 0% | -$0.02 | Single trade |
+| doji-bottom-long | LONG | 1 | 0% | -$0.01 | Single trade, 228min hold |
+| rs-s37 | LONG | 1 | 0% | -$0.01 | Single trade, 116min hold |
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 66.7% | $0.79 | 3 | Strong but low volume |
-| continuum-osc+ | LONG | 75.0% | -$0.05 | 4 | High WR, slightly negative PnL |
-| r2_trend_long | LONG | 62.2% | $0.59 | 127 | Consistent all-time winner |
+**Note:** All 24h losers are single-trade signals. No signal has enough volume for a kill decision.
 
-## 24h Summary
+---
 
-Only 5 trades closed in last 24h (quiet market):
-- rs-s30,rs-s33 LONG: -$0.02
-- rs-s111 LONG: -$0.12
-- rs-r66,rs-r74 SHORT: -$0.03
-- mover- SHORT: -$0.04
-- rs-s94 LONG: -$0.07
+## WINNERS (24h)
+
+| Signal | Dir | Token | PnL | Exit |
+|--------|-----|-------|-----|------|
+| continuation+ | LONG | POL | +$0.32 | profit-monster-trail |
+| rs-s102 | LONG | HBAR | +$0.19 | profit-monster-trail |
+| rs-s118 | LONG | HYPER | +$0.14 | profit-monster-trail |
+| rs-s44 | LONG | YGG | +$0.12 | profit-monster-trail |
+| bb-bounce-v2-long+ | LONG | POL | +$0.10 | profit-monster-trail |
+
+---
+
+## 7d LOSERS (already killed — no action needed)
+
+| Signal | Dir | Trades | WR | PnL | Flag Status |
+|--------|-----|--------|-----|-----|-------------|
+| pullback-entry- | SHORT | 7 | 0% | -$1.69 | `PULLBACK_ENTRY_MINUS_ENABLED = False` |
+| pump-chain+ | LONG | 13 | 15.4% | -$1.51 | `PUMP_CHAIN_V5_ENABLED = False` |
+| mover+ | LONG | 8 | 25% | -$1.19 | `MOVER_PLUS_ENABLED = False` |
+| accel-300-breakout | SHORT | 7 | 28.6% | -$0.12 | `ACCEL_300_BREAKOUT_ENABLED = False` |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
 
 ## ISSUES
 
-- **No signal inversions detected** — all signals match expected directions.
-- **pump-chain+ LONG V5 was still firing** despite 20% WR — killed this run. V5 was enabled Sep 22 as a "48h test" that ran for 6 days.
-- **pullback-entry- flag bug resolved** — trades stopped after PULLBACK_ENTRY_MINUS_ENABLED=False on Sep 22. The flag is working correctly (no post-disable trades).
+- **Low volume:** Only 15 trades in 24h. Market in NEUTRAL regime (0% hot, 8% cold).
+- **33.3% WR but +$0.51 PnL:** Good R:R — winners are larger than losers. No action needed.
+- **No open positions:** System is flat.
 
-## Flag Changes This Run
+---
 
-```
-scripts/hermes_constants.py:
-  Line 3613: PUMP_CHAIN_V5_ENABLED = False  (was True)
-  Line 1761: Added 'PUMP_CHAIN_V5_ENABLED' to NEVER_REENABLE_FLAGS
-```
+*Report auto-generated. Next report: ~6h from now.*
