@@ -1,4 +1,10 @@
 
+[2026-09-28 15:12 UTC] auto_1hr: NO CHANGE — analysis only
+  0T last hour, 0 open. System idle 9h+ (since 05:59 UTC).
+  24h: 15T 33%WR +$0.51 (0 ATR_SL hits, all profit-monster-trail exits). Fix working ✅
+  Today: 5T 0W 5L -$0.21 (all tiny, avg -$0.04). hard_max_loss ALT -$0.12 caught correctly.
+  7d: 114T 35%WR -$5.66. 14d: SHORT -$3.90 (all losses). No kill candidates. BY: auto_1hr
+
 [2026-09-28 13:10 UTC] auto_1hr: NO CHANGE — analysis only
   0T last hour, 0 open. ATR_SL 0% post-fix (24h). 5T today all tiny losses (avg -$0.04).
   7d 117T 35%WR -$5.84. EXTREME regime 68% of losses (-$3.98) — structural.

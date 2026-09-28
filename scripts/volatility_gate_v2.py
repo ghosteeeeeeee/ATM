@@ -277,6 +277,52 @@ VOL_PHASE_MULTS = {
 }
 
 
+# ── Per-Signal-Type Overrides ────────────────────────────────────────────────
+# FAMILY-level blocks (above) are too coarse. When a specific signal variant
+# (e.g. accel_300_v3_long) loses in a regime, the ENTIRE family gets blocked —
+# killing winning variants (e.g. accel_300_short) in the same family.
+# This dict overrides family-level blocks for SPECIFIC signal types.
+# Key: (vol_regime, signal_type_substring) → multiplier
+# The signal_type is checked with 'in' matching (substring), so 'accel_300_short'
+# matches 'accel_300_short', 'accel_300_short+', etc.
+# FIRST MATCH WINS — order from most specific to least specific.
+SIGNAL_TYPE_OVERRIDES = {
+    # ── EXTREME regime: per-signal overrides of family-level blocks ──
+    ('EXTREME', 'accel_300_v3_long'): 0.0,     # BLOCKED — 37% WR in EXTREME, confirmed loser
+    ('EXTREME', 'accel_300_v3_short'): 1.0,     # OK — structural breakout SHORT works in EXTREME
+    ('EXTREME', 'accel_300_short'): 1.0,         # OK — star SHORT signal, needs EXTREME access
+    ('EXTREME', 'accel_300_long'): 0.5,          # PENALIZED — accel_300_long less reliable in EXTREME
+    ('EXTREME', 'ema300_dip_long'): 0.0,         # BLOCKED — 25% WR in EXTREME
+    ('EXTREME', 'ema300_dip_short'): 1.0,        # OK — ema300_dip_short structural SHORT
+    ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
+    ('EXTREME', 'mover_long'): 0.0,              # BLOCKED — mover+ LONG -$0.48 lifetime EXTREME
+    ('EXTREME', 'mover_short'): 1.0,             # OK — mover SHORT can work in EXTREME
+    ('EXTREME', 'pump_chain-'): 0.5,             # PENALIZED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME
+    ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
+    ('EXTREME', 'rs'): 0.5,                      # PENALIZED — rs mean-reversion reduced in EXTREME (was 0.0, too harsh)
+    # ── NORMAL regime: per-signal overrides ──
+    ('NORMAL', 'pullback_entry-'): 0.0,          # BLOCKED — pullback-entry- SHORT 0% WR in NORMAL
+    ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
+    ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
+    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL
+    # ── HIGH regime: per-signal overrides ──
+    ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
+    ('HIGH', 'rs'): 0.3,                         # PENALIZED — rs mean-reversion reduced in HIGH
+    ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH
+}
+
+
+def _get_signal_type_mult(signal_type, regime):
+    """Check per-signal-type overrides. Returns multiplier or None if no override."""
+    if not signal_type:
+        return None
+    st_lower = signal_type.lower()
+    for (ov_regime, ov_signal), mult in SIGNAL_TYPE_OVERRIDES.items():
+        if ov_regime == regime and ov_signal in st_lower:
+            return mult
+    return None
+
+
 # ── Core Functions ────────────────────────────────────────────────────────────
 
 def get_atr_pct(token):
@@ -465,32 +511,41 @@ def get_combined_multiplier(signal_type, regime, phase):
     mult = 1.0
     family = None
     
-    # 1. Volatility-phase combined multiplier
-    if _CLUSTERING_ENABLED:
-        try:
-            family = signal_family(signal_type)
-            vol_phase_mult = get_vol_phase_mult(family, regime, phase)
-            mult *= vol_phase_mult
-        except Exception:
-            pass
-    
-    # 2. Lifecycle multiplier
-    if _CLUSTERING_ENABLED:
-        try:
-            lifecycle_mult = get_lifecycle_mult(signal_type)
-            mult *= lifecycle_mult
-        except Exception:
-            pass
-    
-    # 3. Inverse correlation penalty (uses cached family from step 1)
-    if _CLUSTERING_ENABLED and family:
-        try:
-            info = detect_phase()
-            dom_fams = info.get('dominant_families', [])
-            inv_mult = inverse_penalty(family, dom_fams)
-            mult *= inv_mult
-        except Exception:
-            pass
+    # 0. Per-signal-type override (highest priority — replaces family-level blocks)
+    # Overrides vol-phase (step 1), lifecycle (step 2), and inverse (step 3) multipliers.
+    # ATR ratio boost (step 4) still applies — it's about BTC trend, not signal family.
+    signal_mult = _get_signal_type_mult(signal_type, regime)
+    if signal_mult is not None:
+        mult *= signal_mult
+        # Skip steps 1-3 (family/phase/lifecycle/inverse) — per-signal override replaces them
+        # Jump to step 4 (ATR ratio boost) below
+    else:
+        # 1. Volatility-phase combined multiplier
+        if _CLUSTERING_ENABLED:
+            try:
+                family = signal_family(signal_type)
+                vol_phase_mult = get_vol_phase_mult(family, regime, phase)
+                mult *= vol_phase_mult
+            except Exception:
+                pass
+        
+        # 2. Lifecycle multiplier
+        if _CLUSTERING_ENABLED:
+            try:
+                lifecycle_mult = get_lifecycle_mult(signal_type)
+                mult *= lifecycle_mult
+            except Exception:
+                pass
+        
+        # 3. Inverse correlation penalty (uses cached family from step 1)
+        if _CLUSTERING_ENABLED and family:
+            try:
+                info = detect_phase()
+                dom_fams = info.get('dominant_families', [])
+                inv_mult = inverse_penalty(family, dom_fams)
+                mult *= inv_mult
+            except Exception:
+                pass
     
     # 4. ATR ratio + BTC trend boost (2026-09-11)
     # Boosts direction-aligned expansion trades (83% WR for SHORT in falling expansion)

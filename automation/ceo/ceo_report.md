@@ -1,36 +1,26 @@
-## CEO Report — 2026-09-28 10:00 UTC
+## CEO Report — 2026-09-28
 
 ### Diagnosis
-System healthy. All recent fixes verified working. DB-verified:
-- **24h:** 15T 33.3%WR +$0.51 (small positive, all profit-monster-trail exits)
-- **7d:** 118T 35.6%WR -$5.10 (legacy bleed aging out, 0 post-fix losers)
-- **14d:** 320T 44.4%WR -$3.04 (improving from -$5.41 on Sep 27)
-- **0 open positions.** Hotset empty — signals generated but killed by RR engine (correct behavior).
-- **ATR_SL widening: PASS.** 0/16 post-fix ATR_SL hits. All exits profit-monster-trail.
+System flat. 15T/24h 33.3%WR +$0.51 (small scratches). 117T/7d 35.0%WR -$5.84 (pre-fix legacy aging out). 308T/14d 43.8%WR -$3.12. ALL trades NEUTRAL — zero EXTREME/HIGH in 14d. ATR_SL widening VERIFIED: 0/16 post-fix hits, 48.7% 7d (PASS). Signal diversity CRITICAL: only 2 of 51 signal types profitable.
 
 ### Root Cause
-7d loss is entirely pre-fix legacy trades aging out. No new losers since ATR_SL widening deploy (Sep 25). The system is correctly protecting capital — signals are being generated but the RR engine blocks poor R:R trades (KAS LONG R:R=0.89 grade D, ONDO SHORT R:R=0.46 hard block).
+1. **NEUTRAL trap** — system generates signals but NEUTRAL regime has no edge. All trades fire in NEUTRAL, no EXTREME/HIGH data for regime multiplier evaluation.
+2. **Signal starvation** — volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.38/14d) carry all PnL. 49 other signal types net negative.
+3. **pump-chain+ cold streak** — 7d 13T 15.4%WR -$1.51. 14d still profitable (+$1.38). Variance: Sep 19-20 were 50%WR +$1.93.
+4. **SHORT NULL RSI edge dead** — 0 trades/7d. Market regime shift killed detection-time fallback.
 
 ### Fix Applied
-**No config changes.** System functioning as designed. The ATR_SL widening, RSI ceilings/floors, and SHORT disables are all verified working.
+**No config changes.** System needs market activity to validate fixes. All recent improvements (ATR_SL widening, REGIME_CONF_HIGH_MULT=0.50, volume_spike fix, LONG_RSI_CEILING=70) remain untested in EXTREME/HIGH regimes.
 
-### What's Working
-- ATR_SL widening: 0/16 post-fix hits (was 49.2% pre-fix)
-- LONG_RSI_CEILING=70: 0 post-fix violations
-- SHORT_RSI_FLOOR=50: 0 post-fix violations
-- volume-breakout-long+: 18T 66.7%WR +$1.46/14d (star signal)
-- pump-chain+ LONG: 60T 41.7%WR +$1.22/14d (cold streak 7d, still net profitable)
-- Chase filter: working
-- Stale filter: working (4.9% stale rate)
+### Verification
+- ATR_SL widening: PASS (0/16 post-fix hits, all profit-monster-trail exits)
+- REGIME_CONF_HIGH_MULT=0.50: UNTESTED (all trades NEUTRAL)
+- volume_spike fix: 81% working (13/16 post-fix trades have values)
+- pump-chain+ HIGH block: WORKING (0 HIGH trades since fix)
+- SHORT_RSI_CEILING=70: WORKING (0 post-fix violations)
+- LONG_RSI_CEILING=70: WORKING (0 post-fix violations)
 
-### What Needs Attention
-1. **Signal diversity CRITICAL** — only 2 signal types profitable. Need new NEUTRAL signals.
-2. **pump-chain+ cold streak** — 6 days without a win (last: Sep 21 09:00). 14d still profitable. Monitor 48h.
-3. **LONG RSI >70 bleeding** — 17T 23.5%WR -$1.68/7d. Ceiling=70 catching most but some leak through.
-4. **SHORT 30-40 bleeding** — 19T 26.3%WR -$1.86/7d. Legacy, aging out as disabled signals fade.
-
-### Next Actions
-1. Monitor pump-chain+ recovery (48h window)
-2. Delegate new NEUTRAL signal development to signal_analyst
-3. ATR_SL widening success criteria: PASS (49.2% < 55%, 58 trades)
-4. REGIME_CONF_HIGH_MULT=0.50: UNTABLED (all trades NEUTRAL)
+### Decisions
+1. **NO ACTION on pump-chain+** — 14d still profitable (+$1.38). Cold streak = variance. Monitor 48h.
+2. **NO ACTION on signal diversity** — need new NEUTRAL signal development. Defer to signal_analyst.
+3. **SHORT NULL RSI boost +15pt** — 9th suggestion. Low risk, needs backtest approval.

@@ -296,3 +296,21 @@
 - **WARN** (1x): Disk at 85% (94G/118G) — at threshold. Compressed 7-day-old logs. No further action without DB cleanup approval.
 - **AUTO-FIX**: Compressed old log files. Freed ~11MB. Databases (8.6G) not touched — require explicit approval.
 - **MONITORING**: Disk has risen from 84% (Sep 27) to 85% (now). Trending up ~1%/day. Will hit 90% in ~5 days if unchecked.
+
+## Error Alerts — 2026-09-28 12:46 UTC
+- **WARN** (1x): Disk usage at 85% — 18G free on 118G volume
+- **AUTO-FIX**: None needed yet. Monitor pipeline.log growth (currently 62M). Compress if >100M.
+- **INFO**: Winrate 42.9% on 14 trades today — below target but low sample size. No action.
+
+## Error Alerts — 2026-09-28 14:46 UTC
+- **[WARN]** (1x): `disk 85%` — 95G free of 118G. Monitor if approaching 90%.
+- **[INFO]** (3x): `position_manager rc=1` — Expected behavior, guardian already running. Not a real crash.
+- **[INFO]**: `0 signals generated` — SHORT_BIAS regime, 30 cooldowns active. No actionable signals.
+- **[INFO]**: `BTC:LONG loss_streak=4` — 1.5h cooldown active. Normal loss management.
+
+## Error Alerts — 2026-09-28 14:58 UTC
+- **REPEATED** (10x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] AR TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`

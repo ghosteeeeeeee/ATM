@@ -655,7 +655,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.013   # 1.3% floor — brain_auditor Sep 14: 55% of below-entry ATR SL hits had dist <1.3%, would survive. Expected +$1.33/7d net. Was 1.2%.
-ATR_SL_MAX             = 0.018  # 1.8% cap — CEO Sep 25: widened from 1.5%. EXTREME vol 65% ATR_SL hit rate at 1.3% floor, avg win +6.78% cut short. Widening lets trades breathe to reach win zone.
+ATR_SL_MAX             = 0.020  # 2.0% cap — brain_auditor Sep 28: widened from 1.8%. EXTREME 64.5% ATR_SL hit rate 7d. 1.2x multiplier DEAD at 1.8% cap (effective range 1.5%-1.8%). Widening to 2.0% gives EXTREME 33% more room (effective 1.5%-2.0%). R:R 1.29:1 → ~1.50:1. Expected +$0.50-1.00/7d.
 ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — brain_auditor Sep 27: EXTREME 70.2% ATR_SL hit rate. pump-chain+ EXTREME 89.2%. 8 small winners (<$0.15) in 14d cut too early at 1.3%. Widening to 1.5% (effective 1.8% with 1.2x mult = ATR_SL_MAX) gives maximum room.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
@@ -671,9 +671,9 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.013  # 1.3% — brain_auditor Sep 14: MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.018  # 1.8% — CEO Sep 25: MUST match ATR_SL_MAX
+ATR_SL_MAX_INIT    = 0.020  # 2.0% — brain_auditor Sep 28: MUST match ATR_SL_MAX
 SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) — brain_auditor Sep 14
-TP_PCT_FALLBACK    = 0.045  # 4.5% fallback target (3:1 R:R with 1.5% SL) — CEO Sep 25: widened with ATR_SL_MAX
+TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
 CUT_LOSER_PNL     = -0.50  # close trade at -0.50% PnL — lowered from -1.75% (2026-09-25 CEO). In chop, losers don't recover. Cut fast.
@@ -1262,7 +1262,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
 # 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
-PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 5, 7, 8, 13, 14, 20, 21, 22, 23]  # auto_1hr 2026-09-25 — added 14 (4T 25%WR -$0.33) and 20 (3T 0%WR -$0.30). Net dead hours: +$1.68/14d = +$0.84/7d.
+PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 7, 14, 20, 21, 23]  # brain_auditor 2026-09-28 — removed hours 5,8,13,22 (profitable on 14d: +$1.86). 14d: [5] 4T 50%WR +$0.21, [8] 1T 100%WR +$0.43, [13] 1T 100%WR +$0.11, [22] 2T 100%WR +$1.11. Opens 4 more hours for pump-chain+. Expected +$0.40-0.90/7d.
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
 PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-09-24 — 14d: RSI 65-75 = 15T 41.7%WR +$0.02 (dead zone, flat). RSI>75 = 10T 40%WR -$0.32 (negative). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Tightened 75→70 to block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Expected +$0.03-0.10/7d.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.

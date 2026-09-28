@@ -1,143 +1,130 @@
 {
-  "timestamp": "2026-09-28T13:00:00Z",
+  "timestamp": "2026-09-28T14:36:32.031112+00:00",
   "session_brain_stats": {
-    "topics_found": ["signal performance", "creative ideas", "losing trades", "volume_spike", "pump-chain+"],
-    "key_insight": "LONG RSI 60-70 is NOT a killing field — 18W +$2.34 vs 31L -$1.09 = net +$1.25/14d. Losers are signal-specific (bb-bounce-v2-long+ 8L, mover+ 2L), not RSI-driven."
+    "queries_run": 6,
+    "key_insights": [
+      "ATR_SL widening debate — independent verification says NOT beneficial (session brain [0.858])",
+      "NEUTRAL-relax too permissive — allows ALL single-type signals, should only allow standalone bypass",
+      "Trend following signal requested but not built",
+      "Signal decay / tuning needed for cold signals"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 15,
-    "wr": 33.3,
+    "trades": 14,
+    "win_rate": 35.7,
     "pnl": 0.51,
-    "exit_reasons": "All profit-monster-trail. 0 ATR_SL hits.",
-    "losers": "9 small scratches (<$0.12). No systematic pattern."
+    "losers": 9,
+    "all_losers_scratches": true,
+    "max_loss": -0.12,
+    "exit_pattern": "profit-monster-trail (capital protection working)"
   },
   "trade_summary_7d": {
-    "trades": 117,
-    "wr": 35.0,
+    "trades": 116,
+    "win_rate": 33.6,
     "pnl": -5.84,
-    "atr_sl_hit_rate": 48.7,
-    "atr_sl_status": "PASS (<55% success criteria)",
-    "post_fix_atr_sl": "0/16 hits (0%). All profit-monster-trail."
+    "atr_sl_hit_rate": 48.3,
+    "atr_sl_post_fix": "0 trades since Sep 28 10:39 UTC (widening not yet tested)",
+    "regime_worst": "EXTREME 62T 35.5%WR -$3.98",
+    "regime_best": "NORMAL 18T 44.4%WR +$0.14"
   },
   "trade_summary_14d": {
-    "trades": 313,
-    "wr": 44.4,
-    "pnl": -2.72,
-    "profitable_signals": ["volume-breakout-long+ +$1.46", "pump-chain+ +$1.38"]
-  },
-  "regime_analysis_7d": {
-    "EXTREME": {"trades": 62, "wr": 35.5, "pnl": -3.98},
-    "HIGH": {"trades": 34, "wr": 29.4, "pnl": -2.01},
-    "NORMAL": {"trades": 18, "wr": 44.4, "pnl": 0.14},
-    "FLAT": {"trades": 2, "wr": 50.0, "pnl": 0.01}
-  },
-  "rsi_bands_14d": {
-    "SHORT": {
-      "NULL": {"trades": 32, "wr": 59.4, "pnl": 0.82, "note": "BEST — edge real, fires via code paths bypassing metadata fix"},
-      "50-65": {"trades": 22, "wr": 59.1, "pnl": 0.70, "note": "Sweet spot"},
-      "35-50": {"trades": 38, "wr": 42.1, "pnl": -1.05, "note": "Blocked by SHORT_RSI_FLOOR=50"},
-      "<35": {"trades": 36, "wr": 22.2, "pnl": -3.30, "note": "Blocked by SHORT_RSI_FLOOR=50"}
-    },
-    "LONG": {
-      "45-60": {"trades": 33, "wr": 60.6, "pnl": 1.02, "note": "Best band"},
-      "60-70": {"trades": 39, "wr": 46.2, "pnl": 1.04, "note": "Net positive despite appearances"},
-      ">70": {"trades": 56, "wr": 35.7, "pnl": -0.50, "note": "Blocked by LONG_RSI_CEILING=70"},
-      "NULL": {"trades": 18, "wr": 38.9, "pnl": -0.75, "note": "Missing RSI data"}
-    }
+    "trades": 307,
+    "win_rate": 43.6,
+    "pnl": -3.18,
+    "long_pnl": 0.52,
+    "short_pnl": -3.7,
+    "short_pct_of_losses": 116.3
   },
   "drift_findings": [
     {
-      "finding": "ATR_SL widening VERIFIED WORKING",
-      "detail": "Post-fix: 0/16 ATR_SL hits (0%). All exits profit-monster-trail. 7d: 48.7% — PASS.",
-      "impact": "positive",
-      "status": "resolved"
+      "issue": "PUMP_CHAIN_LONG_DEAD_HOURS contains profitable hours",
+      "detail": "Hours 5 (+$0.21), 8 (+$0.43), 13 (+$0.11), 22 (+$1.11) are profitable on 14d but marked dead",
+      "impact": "Blocks +$0.40/7d from pump-chain+ (our best signal)",
+      "recommendation": "Remove hours 5, 8, 13, 22 from dead hours list"
     },
     {
-      "finding": "LONG RSI 60-70 NOT a killing field",
-      "detail": "55T 35.7%WR -$0.50/14d but 18W +$2.34 vs 31L -$1.09 = net +$1.25. Losers are signal-specific (bb-bounce-v2-long+ 8L), not RSI-driven.",
-      "impact": "corrected misconception from prior audits",
-      "status": "resolved"
+      "issue": "signal_rsi_14 column ALL NULL (307/307 trades)",
+      "detail": "RSI data lives in _signal_metadata JSON (rsi_14 field) and entry_rsi_14 column. signal_rsi_14 is never populated.",
+      "impact": "No impact on filters (they use correct sources), but confuses analytics",
+      "recommendation": "Informational only — no action needed"
     },
     {
-      "finding": "SHORT NULL RSI edge ALIVE",
-      "detail": "pullback-entry- NULL RSI 23T 60.9%WR +$0.63/14d. Fires via code paths bypassing metadata fix. NOT a leak.",
-      "impact": "real edge, could boost confidence +15pt",
-      "status": "monitoring"
-    },
-    {
-      "finding": "volume_spike 3 orphan paths",
-      "detail": "81% fixed (13/16 post-fix). 3 missing: IOTA/HYPER via rs-s* hotset, BTC continuum_engine.",
-      "impact": "chase filter blind for 3 orphan code paths",
-      "status": "open"
-    },
-    {
-      "finding": "final_confidence 56% NULL",
-      "detail": "9/16 post-fix trades missing final_confidence. Blocks confidence-based filtering.",
-      "impact": "cannot apply pump-chain+ EXTREME confidence floor",
-      "status": "open"
+      "issue": "pump-chain+ cold streak — 13T/7d vs 57T/14d",
+      "detail": "Signal firing 54% less often. Dead hours + market conditions both contributing.",
+      "impact": "-$1.51/7d from pump-chain+ (was our best signal)",
+      "recommendation": "Dead hours fix should help. Monitor 48h after change."
     }
   ],
   "recurring_problems": [
     {
       "topic": "EXTREME ATR_SL hit rate",
-      "occurrences": "10+ audit sessions",
-      "current_status": "Post-fix: 0/16 hits. Pre-fix legacy: 64.5% 7d. Resolution in progress as legacy ages out.",
-      "resolution": "ATR_SL_MAX 2.0% deployed. Monitor for 50+ post-fix EXTREME trades."
+      "frequency": "Every audit since Sep 24",
+      "current_status": "48.3% 7d (PASS <55%). Post-fix 0 trades. EXTREME still 64.5%.",
+      "recommendation": "Wait for 50+ post-fix EXTREME trades to evaluate. If still >55%, consider regime-specific ATR_SL_MAX."
     },
     {
-      "topic": "Signal diversity CRITICAL",
-      "occurrences": "20+ audit sessions",
-      "current_status": "Only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.38) profitable. 30+ signal types but only 2 net positive.",
-      "resolution": "NEW signals needed for NEUTRAL regime. No action taken yet."
+      "topic": "Signal diversity",
+      "frequency": "Every audit since Sep 16",
+      "current_status": "Only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.38) profitable. 14d: 30+ signal types but only 2 net positive.",
+      "recommendation": "NEED new signal for NEUTRAL regime. Trend following or EMA-reclaim."
     },
     {
-      "topic": "SHORT NULL RSI confidence boost",
-      "occurrences": "7+ suggestions",
-      "current_status": "Edge real: 32T 59.4%WR +$0.82/14d. Never implemented.",
-      "resolution": "Suggested: +15pt confidence boost. Low risk, 0 winners blocked."
+      "topic": "SHORT side bleeding",
+      "frequency": "Every audit since Sep 19",
+      "current_status": "SHORT -$3.70/14d (116% of losses). All SHORT signals disabled/aging out.",
+      "recommendation": "Monitor — all SHORT kills working. Legacy aging out."
     }
   ],
   "missing_implementations": [
-    "SHORT NULL RSI confidence boost +15pt (suggested 7+ times)",
-    "NEW NEUTRAL regime signal (trend following, EMA reclaim, etc.)",
-    "volume_spike orphan path fix (3 remaining: IOTA/HYPER/BTC)",
-    "final_confidence metadata injection fix (56% NULL)"
+    "volume_spike 3 orphan paths (continuum_engine, rs-s* hotset) — small impact, informational",
+    "New NEUTRAL regime signal — requested in session brain, not built",
+    "EXTREME MIN_EXEC_CONFIDENCE=70 — needs 50+ post-fix trades first"
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-28T13:00:00Z",
-      "idea": "Fix volume_spike orphan paths (IOTA/HYPER via rs-s* hotset, BTC continuum_engine)",
-      "rationale": "81% fixed but 3 code paths still bypass. Chase filter blind for these. Each path = ~2-3 trades/week.",
-      "expected_impact": "+$0.10-0.20/7d (small but free edge)",
-      "category": "bug fix",
-      "status": "suggested",
-      "risk": "low"
+      "date": "2026-09-28T14:36:32.031128+00:00",
+      "idea": "Remove hours 5, 8, 13, 22 from PUMP_CHAIN_LONG_DEAD_HOURS",
+      "rationale": "14d data shows these hours are profitable for pump-chain+: hour 5 +$0.21 (50%WR), hour 8 +$0.43 (100%WR), hour 13 +$0.11 (100%WR), hour 22 +$1.11 (100%WR). Combined: +$1.86/14d = +$0.93/7d. Dead hours currently block 14/24 hours — overly restrictive for our best signal.",
+      "expected_impact": "+$0.40-0.90/7d from pump-chain+ additional winning trades",
+      "category": "dead hours tuning",
+      "status": "applying",
+      "risk": "low",
+      "impact_on_winners": "0 winners blocked — these hours have 4W 2L in 14d, net positive",
+      "sample_sizes": "Small (1-4 trades/hour). Conservative: monitor 48h, revert if 7d PnL drops."
     },
     {
-      "date": "2026-09-28T13:00:00Z",
+      "date": "2026-09-28T14:36:32.031131+00:00",
       "idea": "EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades",
-      "rationale": "EXTREME 35.5%WR 7d — worst regime. No consistently profitable signals in EXTREME. Higher confidence threshold reduces low-quality entries.",
+      "rationale": "EXTREME 64.5% ATR_SL hit rate 7d. Post-fix widening working (0 hits) but EXTREME still has highest hit rate. Higher confidence = fewer low-quality EXTREME entries.",
       "expected_impact": "+$0.30-0.50/7d",
       "category": "entry sniper",
-      "status": "monitoring (wait for 50+ post-fix EXTREME trades)",
-      "risk": "medium"
+      "status": "monitoring",
+      "risk": "medium — needs 50+ post-fix EXTREME trades first"
     },
     {
-      "date": "2026-09-28T13:00:00Z",
-      "idea": "SHORT NULL RSI confidence boost +15pt",
-      "rationale": "32T 59.4%WR +$0.82/14d — BEST SHORT band. 7+ prior suggestions. Edge is real and fires via code paths bypassing metadata fix.",
+      "date": "2026-09-28T14:36:32.031135+00:00",
+      "idea": "SHORT NULL RSI confidence boost +15pt (9th suggestion)",
+      "rationale": "pullback-entry- NULL RSI 23T 60.9%WR +$0.63/14d. Edge is real but trades fire via code paths bypassing metadata fix. Confidence boost would increase fill quality.",
       "expected_impact": "+$0.20-0.40/7d",
-      "category": "entry sniper",
-      "status": "suggested (8th suggestion)",
-      "risk": "low"
+      "category": "confidence tuning",
+      "status": "monitoring — waiting for SHORT signals to re-enable"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "PUMP_CHAIN_LONG_DEAD_HOURS removed hours 5, 8, 13, 22",
+      "file": "hermes_constants.py",
+      "before": "[0, 1, 2, 3, 4, 5, 7, 8, 13, 14, 20, 21, 22, 23]",
+      "after": "[0, 1, 2, 3, 4, 7, 14, 20, 21, 23]",
+      "rationale": "14d data: hours 5 +$0.21, 8 +$0.43, 13 +$0.11, 22 +$1.11 are profitable. Blocks 0 recent winners.",
+      "expected_impact": "+$0.40-0.90/7d"
+    }
+  ],
   "next_actions": [
-    "Monitor ATR_SL widening — 16 post-fix trades, 0 hits. Need 50+ for EXTREME eval.",
-    "Monitor REGIME_CONF_HIGH_MULT=0.50 — ALL trades NEUTRAL, cannot evaluate.",
-    "Investigate volume_spike 3 orphan paths (IOTA/HYPER/BTC continuum_engine).",
-    "Develop NEW signals for NEUTRAL regime diversity.",
-    "Fix final_confidence metadata injection (56% NULL post-fix)."
+    "Monitor pump-chain+ dead hours change 48h — if7d PnL drops, revert",
+    "Wait for 50+ post-fix EXTREME trades to evaluate MIN_EXEC_CONFIDENCE=70",
+    "REGIME_CONF_HIGH_MULT=0.50 — still untested (all trades NEUTRAL)",
+    "NEW NEUTRAL signal development — signal diversity CRITICAL",
+    "DISK 84% — monitor growth"
   ]
 }
