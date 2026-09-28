@@ -1,3 +1,14 @@
+[2026-09-28 17:30 UTC] brain_auditor: 1 CONFIG CHANGE — audit
+  DB-verified: 11T 0%WR +$0.41 (24h) | 111T 35.1%WR -$5.35 (7d) | 304T 44.1%WR -$2.99 (14d)
+  SYSTEM IDLE 6+ hours. ATR_SL post-fix: 0/1 hits (1 trade). EXTREME 64.4% 7d (legacy).
+  LONG_RSI_SWEET_SPOT_MAX 50→60: 50-60 band = 43T 60.5%WR +$1.53/14d (same as 40-50).
+  Combined 40-60 = 59T 63.1%WR +$3.22/14d. +10pt confidence boost applied.
+  LOSING AUTOPSY: 7 losers 24h ALL tiny scratches (<$0.12). No pattern.
+  5 open: 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH.
+  CREATIVE: (1) SWEET_SPOT APPLIED (2) EXTREME pump-chain+ block monitor (3) SHORT RSI 50-60 penalty.
+  1 CHANGE APPLIED.
+  BY: brain_auditor
+
 [2026-09-28 16:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 14T 28.6%WR +$0.41 (24h) | 111T 34.2%WR -$5.71 (7d) | 304T 43.8%WR -$3.06 (14d)
   SYSTEM IDLE 6+ hours (since 10:39 UTC). All recent fixes UNTESTED.

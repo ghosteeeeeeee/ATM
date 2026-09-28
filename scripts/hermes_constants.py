@@ -875,7 +875,7 @@ CONTRARIAN_ZONE_POSITION_SIZE_MULT = 0.5   # position size multiplier (marginal 
 # Narrowed 35→40: RSI 35-40 = 7T 57.1%WR -$0.25 (dead zone, net negative).
 # Blocks nothing — only boosts confidence for entries already in the sweet spot.
 LONG_RSI_SWEET_SPOT_MIN = 40
-LONG_RSI_SWEET_SPOT_MAX = 50
+LONG_RSI_SWEET_SPOT_MAX = 60  # Extended 50→60: RSI 50-60 LONG = 43T 60.5%WR +$1.53/14d (same as 40-50)
 LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
 
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────

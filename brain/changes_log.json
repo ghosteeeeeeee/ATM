@@ -605,5 +605,16 @@
     "after": "[0, 1, 2, 3, 4, 7, 14, 20, 21, 23]",
     "rationale": "14d data: hours 5 +$0.21, 8 +$0.43, 13 +$0.11, 22 +$1.11 are profitable for pump-chain+. Blocks 0 recent winners. Opens 4 more hours.",
     "impact": "+$0.40-0.90/7d expected"
+  },
+  {
+    "timestamp": "2026-09-28T17:30:00Z",
+    "agent": "brain_auditor",
+    "change": "LONG_RSI_SWEET_SPOT_MAX 50→60",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "LONG_RSI_SWEET_SPOT_MAX = 50",
+    "after": "LONG_RSI_SWEET_SPOT_MAX = 60",
+    "rationale": "RSI 50-60 LONG = 43T 60.5%WR +$1.53/14d. Combined 40-60 = 59T 63.1%WR +$3.22/14d.",
+    "impact": "+$0.20-0.40/7d from confidence boost in 50-60 band"
   }
 ]

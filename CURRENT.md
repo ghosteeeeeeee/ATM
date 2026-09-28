@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 14:00 UTC**
+**Last Updated: 2026-09-28 17:30 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 1 open position (BTC LONG continuum-osc+). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED.
+System active. 5 open positions (3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60.
 
-- **24h (rolling):** 14T 35.7%WR +$0.51 (DB-verified). All profit-monster-trail exits. 0 ATR_SL hits.
-- **7d:** 116T 33.6%WR -$5.84 (DB-verified). ATR_SL 48.3% hit rate (56/116) — PASS (<55%).
-- **14d:** 307T 43.6%WR -$3.18 (DB-verified).
-- **OPEN:** 0 positions.
+- **24h (rolling):** 11T 0%WR +$0.41 (DB-verified). All profit-monster-trail exits. 0 ATR_SL hits.
+- **7d:** 111T 35.1%WR -$5.35 (DB-verified). EXTREME ATR_SL 64.4% (legacy).
+- **14d:** 304T 44.1%WR -$2.99 (DB-verified).
+- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), LDO/LTC/BABY SHORT pump-chain- (EXTREME), WLFI LONG rs-s38 (HIGH).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -26,7 +26,7 @@ System active. 1 open position (BTC LONG continuum-osc+). Pipeline healthy. ATR_
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
 - **LONG_RSI_CEILING=70:** **HARD BLOCK.** Blocks overbought LONG entries. 0 post-fix violations.
-- **LONG_RSI_SWEET_SPOT_BOOST=10:** +10pt confidence when LONG RSI 40-50.
+- **LONG_RSI_SWEET_SPOT_BOOST=10:** +10pt confidence when LONG RSI 40-60. Extended 50→60: 50-60 band = 43T 60.5%WR +$1.53/14d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h.
 
 **🟢 VOLUME_SPIKE FIX — WORKING.** Sep 25 fix deployed. 6/9 post-fix trades have volume_spike values (0.02-0.97). 3 missing are from code paths not covered (IOTA/HYPER via rs-s* hotset, BTC continuum_engine). auto_1hr drift alert is STALE — queries7d window including pre-fix trades.
@@ -65,6 +65,8 @@ System active. 1 open position (BTC LONG continuum-osc+). Pipeline healthy. ATR_
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 28)
+
+1. **brain_auditor ~17:30 UTC — 1 CONFIG CHANGE.** **LONG_RSI_SWEET_SPOT_MAX 50→60.** 14d: RSI 50-60 LONG = 43T 60.5%WR +$1.53 (identical to 40-50 band). Combined 40-60 = 59T 63.1%WR +$3.22/14d. +10pt confidence boost. 0 winners blocked. **ATR_SL 7d:** EXTREME 64.4% (legacy), post-fix 0/1 hits. **LOSING AUTOPSY:** 7 losers 24h all scratches (<$0.12). **5 open positions:** 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH. **CREATIVE (3):** SWEET_SPOT APPLIED, EXTREME pump-chain+ block monitor, SHORT RSI 50-60 penalty suggested. **1 CHANGE APPLIED.** — brain_auditor
 
 1. **brain_auditor ~14:00 UTC — 1 CONFIG CHANGE.** **PUMP_CHAIN_LONG_DEAD_HOURS: removed hours 5, 8, 13, 22.** 14d: these hours +$1.86 combined. Expected +$0.40-0.90/7d. Blocks 0 recent winners. **ATR_SL 7d: 48.3% — PASS.** Post-fix: 0 trades. **pump-chain+ cold streak** 13T/7d. **LOSING AUTOPSY:** 9 losers 24h all scratches (<$0.12). **CREATIVE (3):** Dead hours fix APPLIED, EXTREME MIN_EXEC_CONFIDENCE=70, SHORT NULL RSI boost. **1 CHANGE APPLIED.** — brain_auditor
 

@@ -314,3 +314,12 @@
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] AR TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] AR TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Health Report — 2026-09-28 16:46 UTC
+- **OK**: Pipeline running (LIVE). Last cycle 16:45:37 completed clean. Both services active.
+- **OK**: 57 timers active, all firing on schedule. No missed firings.
+- **OK**: 63 signals generated in last hour. Market flow healthy.
+- **OK**: 0 open | 4 closed today. Trades: mover-SHORT(-$0.04), rs-r66/rs-r74-SHORT($0.00), rs-s111-LONG(-$0.12), rs-s30/rs-s33-LONG($0.00).
+- **OK**: Regime: LONG_BIAS (18 long / 0 short / 99 neutral). Speed leaders: AZTEC(100%), BLZ(100%), ZRO(99.4%).
+- **WARN**: Disk at 85% (95G/118G). Main: coin_tracker.db(3.2G), candles.db(2.2G), mtf_macd_tuner.db(1.2G). No old logs to compress. Trending ~1%/day — hits 90% in ~5 days.
+- **INFO**: 1 phantom trade: LTC LONG 0.0071% PnL ($0.0016). Negligible.
