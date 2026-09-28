@@ -3257,3 +3257,7 @@
 [2026-09-28 15:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
 [2026-09-28 17:15 UTC] auto_1hr: NO CHANGE — analysis only, system flat
   0T last hour, 6 open. ATR_SL 0% post-fix (15T). 24h 13T 30.8%WR +$0.42. No kill candidates. BY: auto_1hr
+[2026-09-28 18:11 UTC] auto_1hr: NO CHANGE — analysis only
+  3T last 6h (3W 0L, all profit-monster-trail). ATR_SL 0% post-fix (15T+). 0 kill candidates.
+  7d losses (pullback-entry-, mover+, pump-chain+) all pre-fix ATR_SL bug. Fix resolved root cause.
+  System healthy, trading lightly. BY: auto_1hr

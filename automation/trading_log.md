@@ -1359,3 +1359,37 @@ BY: auto_1hr
 
 **Status:** Monitoring. System flat, no action required.
 **BY:** auto_1hr
+
+## [2026-09-28 18:11 UTC] Hourly Analysis
+
+**Trades:** 3 closed in 6h (3W 0L) | **Open:** 5 (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s35)
+**PnL:** +$0.17 (WR: 100% last 6h) | **7d:** 113T 36.3%WR -$5.25
+
+**24h close reason:**
+- profit-monster-trail: 3T +$0.17 — all 3 last-6h trades exited via trail ✅
+- ATR_SL: 0 hits post-fix (confirmed across 15+ trades) ✅
+
+**7d signal ranking (>=3T):**
+- pullback-entry-: 7T 0%WR -$1.69 — ALL pre-fix ATR_SL losses (Sep 21-22)
+- mover+: 7T 14.3%WR -$1.32 — ALL pre-fix ATR_SL losses (Sep 21-24)
+- pump-chain+: 9T 11.1%WR -$1.15 — ALL pre-fix ATR_SL losses (Sep 21-22)
+- pump-chain-: 33T 45.5%WR -$0.93 — highest volume, near breakeven
+
+**Key insight:** All bad7d signal stats are from pre-fix ATR_SL era. The Sep 27 ATR_SL widening fix resolved the root cause. Post-fix, all signals are net positive or breakeven. No signal kills needed.
+
+**Diagnosis:**
+1. **Entry quality:** 3/3 winners last 6h. Good.
+2. **SL behavior:** 0% ATR_SL post-fix. Trail capturing profits.
+3. **Signal quality:** Post-fix signals all performing within expectations.
+4. **Trade frequency:** 0.5/hr — low, quality focus.
+5. **Open positions:** 3 pump-chain- SHORTs slightly underwater (~1h old). BTC LONG continuum-osc+ +$0.08 open5h.
+
+**No Change Needed:**
+- ATR_SL fix fully validated (15T+ since fix, 0 hits)
+- pullback-entry- losses are pre-fix, not signal quality issue — no kill needed
+- System healthy, trading lightly
+
+**Open Questions:**
+- 3 pump-chain- SHORTs open during potentially neutral market — monitor for SL hits
+
+**BY:** auto_1hr

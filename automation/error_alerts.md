@@ -323,3 +323,9 @@
 - **OK**: Regime: LONG_BIAS (18 long / 0 short / 99 neutral). Speed leaders: AZTEC(100%), BLZ(100%), ZRO(99.4%).
 - **WARN**: Disk at 85% (95G/118G). Main: coin_tracker.db(3.2G), candles.db(2.2G), mtf_macd_tuner.db(1.2G). No old logs to compress. Trending ~1%/day — hits 90% in ~5 days.
 - **INFO**: 1 phantom trade: LTC LONG 0.0071% PnL ($0.0016). Negligible.
+
+## Error Alerts — 2026-09-28 17:58 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
