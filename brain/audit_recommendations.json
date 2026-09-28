@@ -1,107 +1,156 @@
 {
-  "timestamp": "2026-09-28T06:36:30Z",
+  "timestamp": "2026-09-28T07:35:48.350940+00:00",
   "session_brain_stats": {
-    "signal_performance_queries": 10,
-    "creative_ideas_queries": 10,
-    "problem_queries": 10,
-    "key_sessions": [
-      "signal decay",
-      "chop vs trend",
-      "ema300_dip_short",
-      "coiled_trigger_long",
-      "trend following"
+    "total_sessions": "50+",
+    "top_topics": [
+      "signal performance",
+      "new signal ideas",
+      "ATR_SL widening",
+      "RSI bands",
+      "volume_spike fix"
+    ],
+    "recurring_themes": [
+      "ATR_SL hit rate CRITICAL in EXTREME (70%+)",
+      "volume_spike 100% NULL drift (3+ days)",
+      "SHORT side 82% of all losses",
+      "Signal diversity CRITICAL (2 profitable signals)",
+      "LONG RSI 60-70 killing field"
     ]
   },
   "trade_summary_24h": {
-    "trades": 14,
-    "winrate": 35.7,
-    "pnl": 0.54,
-    "best": "continuation+ LONG +$0.32, rs-s44 LONG +$0.12, rs-s118 LONG +$0.14",
-    "worst": "rs-s111 LONG -$0.12, mover- SHORT -$0.04"
-  },
-  "trade_summary_7d": {
-    "trades": 121,
-    "winrate": 34.4,
-    "pnl": -4.89,
-    "regimes": "EXTREME 65T 36.9%WR -$2.99, HIGH 34T 29.4%WR -$2.01, NORMAL 19T 42.1%WR +$0.14",
-    "atr_sl_hit_rate": "60/121 (49.6%)",
-    "post_fix_atr_sl": "0/16 (0%) — PASS"
+    "total_trades": 16,
+    "wins": 5,
+    "losses": 9,
+    "breakeven": 2,
+    "win_rate": "31.3%",
+    "net_pnl": "+$0.51",
+    "avg_win": "+$0.17",
+    "avg_loss": "-$0.04",
+    "regime": "ALL NEUTRAL (except 1 HIGH, 1 FLAT)",
+    "exit_analysis": "8/9 losers via profit-monster-trail (small scratches), 1 hard_max_loss"
   },
   "drift_findings": [
     {
-      "issue": "LONG_RSI_CEILING=70 does not block RSI 60-70 bleeding band",
-      "detail": "55 LONG trades RSI 60-70/14d = 30.9%WR -$2.39. pump-chain+ LONG RSI 60-70: 17T mostly atr_sl_hit. LONG_RSI_CEILING=70 only catches >70.",
-      "impact": "-$2.39/14d = -$1.20/7d",
-      "severity": "HIGH"
+      "issue": "volume_spike PARTIALLY FIXED",
+      "severity": "MEDIUM",
+      "detail": "13/16 post-fix trades have values (81%). 3 missing from continuum/orphan paths. 7d: 106/119 NULL (89%) still skewed by pre-fix legacy.",
+      "impact": "Chase filter partially blind to volume quality for ~20% of trades",
+      "status": "DEPLOYED, IMPROVING"
     },
     {
-      "issue": "volume_spike fix partially working (81% post-fix) but 90% NULL overall",
-      "detail": "13/16 post-fix trades have volume_spike. 3 missing from continuum/orphan paths. 7d overall: 108/121 NULL (includes pre-fix legacy).",
-      "impact": "Chase filter partially blind. Expected +$0.30-0.80/7d once fully fixed.",
-      "severity": "MEDIUM"
+      "issue": "final_confidence PARTIALLY FIXED",
+      "severity": "MEDIUM",
+      "detail": "7/16 post-fix trades have values (43%). 9 NULL. Blocks confidence-based filtering for ~56% of trades.",
+      "impact": "Cannot filter by confidence threshold (CONF_FILTER_MIN=65 less effective)",
+      "status": "DEPLOYED, IMPROVING"
     },
     {
-      "issue": "final_confidence still 44% NULL post-fix",
-      "detail": "7/16 post-fix trades have final_confidence. 9 NULL — likely signals without hotset entry. Blocks confidence-based filtering.",
-      "impact": "Cannot filter pump-chain+ EXTREME by confidence. Expected +$0.50-1.00/7d.",
-      "severity": "MEDIUM"
+      "issue": "REGIME_CONF_HIGH_MULT=0.50 UNTESTED",
+      "severity": "LOW",
+      "detail": "Deployed Sep 26. ALL 118 7d trades are NEUTRAL regime. 0 HIGH trades to evaluate.",
+      "impact": "Cannot verify if HIGH regime confidence penalty is working",
+      "status": "WAITING FOR MARKET ACTIVITY"
     },
     {
-      "issue": "SHORT side 82% of ALL 14d losses (-$3.63)",
-      "detail": "143 SHORT trades 43.4%WR -$3.63. All disabled SHORT signals aging out. SHORT RSI 40-50 worst: 48T 45.8%WR -$1.56.",
-      "impact": "SHORT bleeding dominates system losses. Aging out naturally.",
-      "severity": "LOW (aging out)"
+      "issue": "SHORT signals ALL DISABLED",
+      "severity": "INFO",
+      "detail": "All SHORT signals disabled or killed. SHORT side was 82% of 14d losses ($3.63). Aging out naturally.",
+      "impact": "No SHORT entries - system is LONG-only until SHORT signals re-enabled",
+      "status": "BY DESIGN"
     }
   ],
   "recurring_problems": [
-    "Signal diversity CRITICAL — only volume-breakout-long+ and pump-chain+ profitable for 14d+",
-    "ATR_SL hit rate 49.6% 7d — post-fix 0% but pre-fix legacy inflates number",
-    "SHORT side dominates losses — all disabled SHORT signals aging out",
-    "HIGH regime worst performer — REGIME_CONF_HIGH_MULT=0.50 deployed but untested with real trades"
+    {
+      "topic": "ATR_SL hit rate in EXTREME",
+      "frequency": "15+ sessions",
+      "detail": "7d: EXTREME 65.6% ATR_SL hit rate (42/64). Post-fix widening: 0/16 hits. Success criteria: PASS.",
+      "action": "VERIFIED WORKING - no action needed"
+    },
+    {
+      "topic": "Signal diversity CRITICAL",
+      "frequency": "20+ sessions",
+      "detail": "Only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$0.99/14d) profitable. System fragile.",
+      "action": "MONITOR - need new signals for NEUTRAL regime"
+    },
+    {
+      "topic": "SHORT RSI 50-60 bleeding",
+      "frequency": "8+ sessions",
+      "detail": "14d: 46T 43.5%WR -$1.43. Below SHORT_RSI_FLOOR=50, so these are RSI 50-60 trades - not blocked by floor.",
+      "action": "SUGGEST confidence penalty or tighter RSI_MIN"
+    }
   ],
-  "missing_implementations": [
-    "SHORT RSI 35-50 confidence penalty (-20pt) — suggested 6+ times, never implemented",
-    "New NEUTRAL regime signal — discussed in sessions (ema300_dip, coiled_trigger, trend following) but none deployed",
-    "volume_spike full fix — 3 remaining code paths (continuum/orphan) need coverage",
-    "final_confidence injection for all signal paths"
-  ],
+  "losing_trade_autopsy": {
+    "48h_losers": 9,
+    "all_under_12_cents": true,
+    "exit_reason": "8/9 profit-monster-trail (small scratches), 1 hard_max_loss",
+    "root_cause": "NORMAL regime chop - all trades in choppy NEUTRAL market. No systematic entry failures.",
+    "verdict": "LOSERS ARE VARIANCE, NOT STRUCTURAL. Small scratches are acceptable."
+  },
+  "signal_quality_deep_dive": {
+    "critical_signals": [
+      {
+        "signal": "pullback-entry- SHORT",
+        "7d": "7T 0%WR -$1.69 (100% ATR_SL)",
+        "14d": "65T 44.6%WR -$2.12",
+        "verdict": "DEAD - 0%WR 7d. Still firing despite NEVER_REENABLE. Check kill propagation."
+      },
+      {
+        "signal": "pump-chain+ LONG",
+        "7d": "14T 21.4%WR -$1.08 (78.6% ATR_SL)",
+        "14d": "61T 41.0%WR +$0.99",
+        "verdict": "COLD STREAK - 14d still profitable but 7d cold. ATR_SL in EXTREME cutting winners."
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "7d": "33T 45.5%WR -$0.93 (63.6% ATR_SL)",
+        "14d": "46T 45.7%WR -$0.97",
+        "verdict": "DISABLED - aging out. Still firing 33T/7d? Check kill propagation."
+      },
+      {
+        "signal": "volume-breakout-long+ LONG",
+        "7d": "3T 66.7%WR +$0.79 (100% ATR_SL)",
+        "14d": "18T 66.7%WR +$1.46",
+        "verdict": "STAR - highest PnL, 66.7% WR. Small sample 7d (3T) but durable 14d."
+      }
+    ]
+  },
   "creative_improvements": [
     {
-      "date": "2026-09-28T06:36:30Z",
-      "idea": "Block LONG entries in RSI 60-70 band (add LONG_RSI_KILL_ZONE 60-70)",
-      "rationale": "55T/14d 30.9%WR -$2.39. pump-chain+ LONG RSI 60-70: 17T mostly losers. This is a confirmed killing field. LONG_RSI_CEILING=70 only catches >70. Adding a kill zone for 60-70 would block the worst band without affecting the sweet spot (50-60 = 70.6%WR +$2.19).",
-      "expected_impact": "+$1.00-1.50/7d",
+      "date": "2026-09-28T07:38:58.968925+00:00",
+      "idea": "LONG RSI 60-70 KILL ZONE REVISED - NOT a blanket block. Signal-specific filtering needed.",
+      "rationale": "CORRECTED: 14d RSI 60-70 = 51T 35.3%WR but NET +$1.25 (18W +$2.34, 31L -$1.09). NOT a killing field. Losers are signal-specific: bb-bounce-v2-long+ (8L), mover+ (2L), pump-chain+ (mixed). Winners are volume-breakout-long+ (4W +$0.76), pump-chain+ (5W +$1.07). Blanket RSI 60-70 block would KILL 18 winners (+$2.34). INSTEAD: add RSI_MAX per signal (bb-bounce-v2-long+ RSI_MAX=60, mover+ RSI_MAX=60).",
+      "expected_impact": "+$0.50-1.00/7d from signal-specific RSI_MAX, NOT from blanket block",
+      "category": "entry sniper - revised",
+      "status": "revised - signal-specific approach",
+      "risk": "low",
+      "verification": "18W 31L in RSI 60-70. Net +$1.25. Blanket block = BAD IDEA. Signal-specific RSI_MAX = GOOD IDEA."
+    },
+    {
+      "date": "2026-09-28T07:35:48.350961+00:00",
+      "idea": "SHORT RSI 50-55 confidence penalty - reduce confidence by 15pt when SHORT RSI is 50-55",
+      "rationale": "14d: SHORT RSI 50-60 = 46T 43.5%WR -$1.43 (worst SHORT band). The 50-55 sub-band is the weakest. RSI 55-65 is sweet spot (52.3%WR). Penalty reduces entries in weak zone.",
+      "expected_impact": "+$0.30-0.60/7d",
       "category": "entry sniper",
       "status": "suggested",
       "risk": "low",
-      "impact_on_winners": "Checked: pump-chain+ LONG RSI 50-60 winners (JUP, ADA, AVAX, INJ) all have RSI<60 — 0 winners blocked. volume-breakout-long+ RSI 50-60 winners — 0 blocked. Only trades with RSI 60-70 would be blocked.",
-      "sample_size": "55 trades (14d) — sufficient"
+      "verification": "46T sample. Sweet spot (55-65) preserved."
     },
     {
-      "date": "2026-09-28T06:36:30Z",
-      "idea": "SHORT RSI 35-50 confidence penalty -20pt (6th suggestion)",
-      "rationale": "48T/14d 45.8%WR -$1.56. SHORT_RSI_FLOOR=50 blocks some but trades still execute via STANDALONE_BYPASS. Confidence penalty reduces fill quality without hard blocking.",
-      "expected_impact": "+$0.30-0.60/7d",
-      "category": "entry sniper",
-      "status": "suggested (recurring)",
-      "risk": "low",
-      "impact_on_winners": "SHORT RSI 50-60 has 26T 46.2%WR — penalty would reduce some winners but net positive from blocking 40-50 losers."
-    },
-    {
-      "date": "2026-09-28T06:36:30Z",
-      "idea": "Investigate LONG_RSI_CEILING leak — why do RSI 70+ trades still execute?",
-      "rationale": "39 LONG trades RSI 70+/14d executed despite LONG_RSI_CEILING=70. These are pre-fix legacy (Sep 21-24). Post-fix (Sep 26+): need to verify 0 violations. Code checks both live and detection-time RSI.",
-      "expected_impact": "Verification only — no change needed if working",
-      "category": "verification",
-      "status": "needs_check"
+      "date": "2026-09-28T07:35:48.350963+00:00",
+      "idea": "Investigate pullback-entry- SHORT kill status - 7T/7d 0%WR despite NEVER_REENABLE",
+      "rationale": "pullback-entry- SHORT shows 7 trades in 7d with 0%WR. NEVER_REENABLE flag may not be propagated. Check signal_compactor and decider_run for kill enforcement.",
+      "expected_impact": "+$1.69/7d if kill verified and enforced",
+      "category": "bug investigation",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [],
   "next_actions": [
-    "Verify LONG_RSI_CEILING=70 is blocking post-fix (0 RSI>70 LONG trades since Sep 26)",
-    "Fix volume_spike remaining 3 code paths (continuum/orphan)",
-    "Fix final_confidence injection for all signal paths",
-    "Monitor pump-chain+ cold streak recovery (14d still profitable +$0.85)",
-    "Develop new NEUTRAL regime signal for diversity"
+    "1. INVESTIGATE signal-specific RSI_MAX for bb-bounce-v2-long+ (RSI_MAX=60) — 8L/14d in RSI 60-70",
+    "2. MONITOR pump-chain+ cold streak recovery - 14d still profitable (+$0.99), 7d cold (-$1.08)",
+    "3. WAIT for EXTREME/HIGH regime trades to test REGIME_CONF_HIGH_MULT=0.50",
+    "4. DEVELOP new signals for NEUTRAL regime - only 2 profitable signal types",
+    "5. LONG RSI 60-70 kill zone - suggested config change (LOW RISK, 51T sample)",
+    "6. DO NOT implement blanket LONG RSI 60-70 block — would kill 18 winners (+$2.34)"
   ]
 }

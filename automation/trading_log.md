@@ -8281,3 +8281,51 @@ Final set: ['CFX']
 - Post-fix trajectory positive (+$0.51 24h)
 
 **BY:** auto_1hr
+
+## [2026-09-28 08:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system flat)
+**24h:** 15T 33.3%WR +$0.51 | trailing exit 13/15 (87%)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits in 24h — validated (was 50% pre-fix in 7d window)
+- No kill candidates (0 trades last hour, no signal with 3+ trades at 0% WR)
+- Trade frequency: 0/hr — quiet period, not over-trading
+- System flat = no overnight risk
+- 24h PnL positive — no negative streak
+
+**Top 24h performers:** continuation+ (+$0.32, 100%WR), rs-s102 (+$0.19, 100%WR), rs-s118 (+$0.14, 100%WR), rs-s44 (+$0.12, 100%WR)
+
+**7d losers (disabled/monitored):** pullback-entry- killed (0%WR, -$1.69), mover+ (-$1.19), pump-chain+ (-$1.08)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.51 24h)
+
+**BY:** auto_1hr
+
+## [2026-09-28 09:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system flat)
+**24h:** 15T 33.3%WR +$0.51 | trailing exit 13/15 (87%)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits in 24h — validated (was 50% pre-fix)
+- No kill candidates (0 trades last hour)
+- Trade frequency: 0/hr — quiet period, not over-trading
+- System flat = no overnight risk
+- 24h PnL positive — no negative streak
+
+**Top 24h performers:** continuation+ (+$0.32, 100%WR), rs-s102 (+$0.19, 100%WR), rs-s118 (+$0.14, 100%WR), rs-s44 (+$0.12, 100%WR)
+
+**7d losers (disabled/monitored):** pullback-entry- killed (0%WR, -$1.69), mover+ (-$1.19), pump-chain+ (-$1.08)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.51 24h)
+
+**BY:** auto_1hr

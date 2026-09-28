@@ -281,3 +281,18 @@
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
 - **REPEATED** (26x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+
+## Health Report — 2026-09-28 09:46 UTC
+- **OK**: Pipeline running (LIVE). Both services active. 59 timers active, all firing.
+- **OK**: Last cycle #219423 at 09:45:02 completed clean. 0 errors in last 30 min.
+- **OK**: Signals: 10 recent generated (USUAL SHORT, ONDO SHORT, HBAR LONG, KAS LONG, etc.)
+- **OK**: Trades: 0 open, 0 closed today. Market quiet.
+- **OK**: Regime: NEUTRAL overall (4 long bias, 2 short bias, 110 neutral).
+- **OK**: Prices: 22 data files fresh (<5 min). All dashboards current.
+- **WARN**: Disk at 85% (94G/118G). Compressed old logs. 6 large DBs (8.6G total) are essential.
+- **INFO**: No phantom trades detected. All recent trades have meaningful PnL.
+
+## Error Alerts — 2026-09-28 09:46 UTC
+- **WARN** (1x): Disk at 85% (94G/118G) — at threshold. Compressed 7-day-old logs. No further action without DB cleanup approval.
+- **AUTO-FIX**: Compressed old log files. Freed ~11MB. Databases (8.6G) not touched — require explicit approval.
+- **MONITORING**: Disk has risen from 84% (Sep 27) to 85% (now). Trending up ~1%/day. Will hit 90% in ~5 days if unchecked.

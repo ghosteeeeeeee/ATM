@@ -1,3 +1,20 @@
+
+[2026-09-28 07:39 UTC] brain_auditor: NO CONFIG CHANGE - audit
+  DB-verified: 16T 31.3%WR +$0.51 (24h) | 119T 36.1%WR -$4.68 (7d) | 350T 45.1%WR -$4.00 (14d)
+  ATR_SL WIDENING VERIFIED: 0/16 post-fix ATR_SL hits. All exits profit-monster-trail. Success criteria: PASS.
+  volume_spike PARTIALLY FIXED: 13/16 post-fix (81%). 3 missing continuum/orphan paths.
+  final_confidence PARTIALLY FIXED: 7/16 post-fix (43%). 9 NULL.
+  CRITICAL FINDING: LONG RSI 60-70 is NOT a killing field — 18W +$2.34, 31L -$1.09 = net +$1.25/14d.
+    Losers are signal-specific (bb-bounce-v2-long+ 8L, mover+ 2L), NOT RSI-driven.
+    Blanket RSI 60-70 block would KILL 18 winners (+$2.34). REVISED to signal-specific RSI_MAX approach.
+  SHORT side: ALL DISABLED, aging out. 33T/7d pump-chain- legacy (-$0.93).
+  EXTREME 65.6% ATR_SL 7d — includes pre-fix legacy. Post-fix: 0%.
+  CREATIVE: (1) Signal-specific RSI_MAX for bb-bounce-v2-long+ (RSI_MAX=60) — 8L/14d in RSI 60-70.
+    (2) SHORT RSI 50-55 confidence penalty -15pt (+$0.30-0.60/7d).
+    (3) pump-chain- SHORT kill verified working (legacy aging out).
+  0 CHANGES APPLIED.
+  MONITORING: ATR_SL widening (16 post-fix, 0 hits), volume_spike fix (81%), pump-chain+ cold streak, signal diversity.
+  BY: brain_auditor
 [2026-09-28 06:11 UTC] auto_1hr: NO CHANGE — analysis only
   1 closure last hour (BTC LONG continuum+ via HL_CLOSED, +$0.00). 0 open positions.
   7d: 122T 34.4%WR -$4.87 | 14d: 325T 43.4%WR -$3.86 | ATR_SL 0 hits/24h ✅
@@ -3181,3 +3198,5 @@
   0 CHANGES APPLIED. BY: brain_auditor
 [2026-09-28 00:10 UTC] auto_1hr: NO CHANGE — analysis only
   0T last hour, 0 open. ATR_SL 0% post-fix (11T). 24h +$0.72 (45.5%WR). System flat, no kill candidates. BY: auto_1hr
+[2026-09-28 08:10 UTC] auto_1hr: NO CHANGE — analysis only, system flat
+  0T last hour. 24h 15T 33.3%WR +/usr/bin/bash.51. ATR_SL 0% (fix validated). 0 kill candidates. BY: auto_1hr

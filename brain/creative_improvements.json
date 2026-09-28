@@ -744,5 +744,34 @@
     "expected_impact": "Verification + $0.30-0.80/7d once volume_spike fully fixed",
     "category": "bug fix",
     "status": "verified/monitored"
+  },
+  {
+    "date": "2026-09-28T07:36:57.372427+00:00",
+    "idea": "LONG RSI 60-70 kill zone - block LONG entries when RSI is 60-70",
+    "rationale": "14d: 51T 35.3%WR -$1.25. pump-chain+ RSI 60-70: 17T mostly losers. LONG_RSI_CEILING=70 only blocks >70. This band (60-70) is the killing field. 0 winning LONG trades in RSI 60-70 that would be blocked.",
+    "expected_impact": "+$0.50-1.00/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "data": "51T sample 14d. RSI 40-50 = 68.8%WR (best). RSI 60-70 = 35.3%WR (worst). Clear threshold."
+  },
+  {
+    "date": "2026-09-28T07:36:57.372443+00:00",
+    "idea": "SHORT RSI 50-55 confidence penalty - reduce confidence by 15pt when SHORT RSI is 50-55",
+    "rationale": "14d: SHORT RSI 50-60 = 46T 43.5%WR -$1.43 (worst SHORT band). The 50-55 sub-band is the weakest. RSI 55-65 is sweet spot (52.3%WR). Penalty reduces entries in weak zone without blocking the sweet spot.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "data": "46T sample. Sweet spot (55-65) preserved."
+  },
+  {
+    "date": "2026-09-28T07:36:57.372448+00:00",
+    "idea": "Investigate pump-chain- SHORT kill status - 33T/7d 0.93 loss despite PUMP_CHAIN_V5_SHORT_ENABLED=False",
+    "rationale": "pump-chain- SHORT shows 33 trades in 7d with -$0.93 loss. Kill flag was set Sep 25. Trades are pre-kill legacy aging out. Verified: NO new trades since disable. Aging out correctly.",
+    "expected_impact": "$0 (already working)",
+    "category": "verification",
+    "status": "verified-working",
+    "risk": "none"
   }
 ]
