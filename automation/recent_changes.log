@@ -1,3 +1,10 @@
+[2026-09-28 01:20 UTC] auto_1hr: NO CHANGE — analysis only
+  1 closure last hour (CFX SHORT mover- -$0.04 via profit-monster-trail). 2 open (GOAT SHORT, ALT LONG).
+  7d: 127T 35.4%WR -$5.21 | 14d: 327T 43.7%WR -$4.40 | ATR_SL 0 hits/24h ✅
+  CRITICAL DRIFT: volume_spike/final_confidence NULL — code bug in signal_compactor.py.
+  No kill candidates. No overtrading (1/hr). pump-chain+ cold streak (7d -$1.60) but 14d +$0.85.
+  BY: auto_1hr
+
 [2026-09-27 ~23:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 11T 63.6%WR +$0.72 (24h post-fix) | 127T 36.2%WR -$5.35 (7d) | 330T 44.6%WR -$3.80 (14d)
   ATR_SL WIDENING VERIFIED: 0/11 post-fix ATR_SL hits. All exits profit-monster-trail.

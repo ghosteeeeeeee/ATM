@@ -1,3 +1,34 @@
+## [2026-09-28 01:20 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CFX SHORT mover- via profit-monster-trail, -$0.04) | **Open:** 2 (GOAT SHORT, ALT LONG)
+**PnL:** -$0.04 | **7d:** 127T 35.4%WR -$5.21 | **14d:** 327T 43.7%WR -$4.40
+**ATR_SL:** 0 hits in 24h (fix confirmed working) | 7d rate 52% (legacy pre-fix trades)
+
+**24h Performance:** 12T 45.5%WR +$0.68 (all profit-monster-trail exits)
+**Top signals 24h:** continuation+ +$0.32, rs-s102 +$0.19, rs-s118 +$0.14
+
+**Open Positions:**
+- GOAT SHORT (rs-r66,rs-r74) | entry=0.019484 | SL=0.01974 | TP=0.01922 | $11.10
+- ALT LONG (rs-s111) | entry=0.007958 | SL=0.00785 | TP=0.00809 | $11.10
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix confirmed working: 0 atr_sl_hit in 24h, all exits via profit-monster-trail
+- No signal has 0%WR with 3+ trades in last hour — no kill candidates
+- Not overtrading: 1 trade/hour
+- pump-chain+ 7d: 20T 20%WR -$1.60 (worst 7d by PnL) but 14d: 62T 40.3%WR +$0.85 — cold streak, not kill threshold
+- pump-chain- 7d: 33T 45.5%WR -$0.93, 14d: 46T 45.7%WR -$0.97 — marginal but above threshold
+- Already-killed signals: pullback-entry- (0%WR 7T), mover+ (25%WR 8T) — confirmed disabled
+
+**Open Questions:**
+- Metadata drift (volume_spike, final_confidence) persists — code bug in signal_compactor.py, not constants
+- System barely trading (1/hr) — may be over-filtered or market in low-vol regime
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-27 20:10 UTC] Hourly Analysis
 
 **Trades:** 3 closed last 2h (0 in exact last hour) | **Open:** 2 (POL, HBAR — both LONG)
