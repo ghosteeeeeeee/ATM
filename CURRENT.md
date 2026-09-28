@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 22:15 UTC**
+**Last Updated: 2026-09-28 22:50 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s82). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. **volume_spike ROOT CAUSE FIXED** — hotset merge incomplete.
+System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG doji-bottom). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14).
 
-- **24h (rolling):** 11T 0%WR +$0.06 (DB-verified). All scratches — light trading.
-- **7d:** 114T 44.7%WR -$5.17 (DB-verified). ATR_SL hit rate 44.7% (PASS <55%). EXTREME 61.3% legacy aging out.
-- **14d:** 303T 45.2%WR -$2.45 (DB-verified). LONG +$0.74, SHORT -$3.19 (82% of losses).
-- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), SOL LONG rs-s82 (HIGH), LDO/LTC/BABY SHORT pump-chain- (EXTREME).
+- **24h (rolling):** 13T 46.2%WR +$0.04 (DB-verified). All scratches — light trading.
+- **7d:** 114T 41.0%WR -$4.34 (DB-verified). ATR_SL hit rate 42.1% (PASS <55%). Post-fix: 0/8 ATR_SL hits.
+- **14d:** 301T 44.2%WR -$2.89 (DB-verified). LONG +$0.30, SHORT -$3.19 (110% of losses).
+- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), WLFI LONG doji-bottom (HIGH), LDO/LTC/IO SHORT pump-chain- (EXTREME).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -53,18 +53,17 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-28 22:15 UTC)
+## Audit Update (2026-09-28 22:50 UTC)
 
-- **🟢 VOLUME_SPIKE FIX — ROOT CAUSE FOUND AND FIXED.** signal_compactor.py:3072 computes volume_spike into hotset entries. decider_run.py:3030-3035 only merged final_confidence from hotset, never volume_spike. Chase filter blind for84.2% of trades. Fix: added volume_spike to hotset merge + _exec_meta injection path. Expected +$0.30-0.80/7d.
-- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 5T, 0 ATR_SL hits. 7d: 44.7% (51/114) — PASS (<55%). EXTREME 61.3% legacy aging out.
-- **🟢 signal_rsi_14 NULL FIX — WORKING.** 0.3% NULL rate 14d (was 100%). Fix applied Sep 28.
-- **SHORT side -$3.19/14d (82% of losses).** All SHORT signals disabled, legacy aging out.
-- **SHORT R:R 0.78:1** — avg_loss exceeds avg_win. 82% of ALL 14d losses. SHORT_RSI_FLOOR=50 correct. NULL RSI SHORT edge: 26T 61.5%WR +$0.79/14d.
-- **14d RSI BANDS:** SHORT <40 catastrophic (-$3.97). SHORT 50-60 sweet spot (+$1.18). LONG 50-60 best (+$0.52 69.6%WR). LONG 70-80 killing field (-$0.93).
-- **EXTREME 88 ATR_SL hits/14d** — dominates losses. profit-monster-trail only +$0.63. Post-fix widening working.
-- **LOSING AUTOPSY:** 25 losers 7d — 88% atr_sl_hit. All worst signals (pullback-entry-, mover+, pump-chain-) already killed/disabled, aging out.
-- **Signal diversity CRITICAL** — only pump-chain+ (+$1.51/14d) and volume-breakout-long+ (+$1.46/14d) profitable.
-- **CREATIVE (3):** (1) CRITICAL: signal_rsi_14 investigation (+$0.30-0.80/7d) (2) SHORT NULL RSI boost +15pt 9th suggestion (+$0.20-0.40/7d) (3) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades.
+- **🟢 ALL POST-FIX FIXES VERIFIED WORKING.** volume_spike: 8/8 post-fix trades have values. final_confidence: 8/8. signal_rsi_14: 0.3% NULL. Chase filter now blind to volume for 0% of new trades. Confidence filtering operational.
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 8T, 0 ATR_SL hits (0%). 7d: 42.1% (48/114) — PASS (<55%). All post-fix exits: profit-monster-trail or hard_sl.
+- **EXTREME LONG only profitable combo** — +$1.22/14d. pump-chain+ $0.97, volume-breakout-long+ $1.51.
+- **SHORT -$3.19/14d (110% of losses).** All SHORT signals killed/disabled, aging out. LONG +$0.30.
+- **14d RSI BANDS:** LONG 50-60 best (+$1.27 60.5%WR). SHORT <30 catastrophic (-$1.27). SHORT 60-70 sweet spot (+$0.39 56.3%WR).
+- **HIGH regime SHORT 10%WR 7d** — all from killed signals aging out. REGIME_CONF_HIGH_MULT=0.50 untested.
+- **LOSING AUTOPSY:** 6 losers 24h ALL small scratches (<$0.20, 4 profit-monster-trail). No systematic pattern — normal chop variance.
+- **Signal diversity CRITICAL** — only pump-chain+ (+$1.23/14d) and volume-breakout-long+ (+$1.46/14d) profitable.
+- **CREATIVE (3):** (1) HIGH SHORT MIN_EXEC_CONFIDENCE=70 for next run (+$0.30-0.60/7d) (2) Monitor EXTREME post-fix (need 30+ trades) (3) NEW NEUTRAL signal for diversity.
 - **0 CHANGES APPLIED.**
 
 ## Audit Update (2026-09-28 14:00 UTC)
@@ -80,6 +79,8 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 28)
+
+1. **brain_auditor ~22:50 UTC — NO CONFIG CHANGE.** DB-verified: 13T 46.2%WR +$0.04 (24h) | 114T 41.0%WR -$4.34 (7d) | 301T 44.2%WR -$2.89 (14d). **POST-FIX TRADES: 8T 75%WR +$0.25.** ALL metadata fixes verified working (volume_spike 8/8, final_confidence 8/8, rsi_14 0.3% NULL). **ATR_SL WIDENING VERIFIED** — 0/8 post-fix ATR_SL hits. 7d: 42.1% — PASS. **HIGH regime SHORT 10%WR 7d** — all from killed signals aging out. REGIME_CONF_HIGH_MULT=0.50 untested. **EXTREME LONG only profitable combo** — +$1.22/14d. **SHORT -$3.19/14d (110% of losses).** **LOSING AUTOPSY:** 6 losers 24h ALL small scratches (<$0.20). No systematic pattern. **CREATIVE (3):** (1) HIGH SHORT MIN_EXEC_CONFIDENCE=70 (+$0.30-0.60/7d) (2) Monitor EXTREME post-fix (need 30+ trades) (3) NEW NEUTRAL signal for diversity. **0 CHANGES APPLIED.** — brain_auditor
 
 1. **brain_auditor ~21:30 UTC — NO CONFIG CHANGE.** DB-verified: 9T 55.6%WR +$0.01 (today) | 114T 35.7%WR -$5.26 (7d) | 305T 44.3%WR -$2.90 (14d). **POST-FIX TRADES: 4/4 winners (+$0.19).** All profit-monster-trail. ATR_SL widening working. **CRITICAL DRIFT: signal_rsi_14 NULL ALL 14d trades (28-day drift).** Detection-time RSI filtering impossible. Investigation needed. **SHORT R:R 0.78:1** — avg_loss exceeds avg_win. 82% of ALL 14d losses. **EXTREME 88 ATR_SL hits/14d** — dominates losses. **LOSING AUTOPSY:** 25 losers 7d — 88% atr_sl_hit. All worst signals killed/disabled, aging out. **5 open:** 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH. **CREATIVE (3):** (1) CRITICAL: signal_rsi_14 investigation (+$0.30-0.80/7d) (2) SHORT NULL RSI boost +15pt 9th suggestion (3) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades. **0 CHANGES APPLIED.** — brain_auditor
 

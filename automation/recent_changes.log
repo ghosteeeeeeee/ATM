@@ -3276,3 +3276,13 @@
 [2026-09-28 20:11 UTC] auto_1hr: NO CHANGE — analysis only
   0T last hour. 6 open (+/usr/bin/bash.47 combined). ATR_SL 0% post-fix. 24h 13T 86.7%WR +/usr/bin/bash.40.
   System healthy, trading lightly. No kill candidates. BY: auto_1hr
+[2026-09-28 22:50 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 13T 46.2%WR +$0.04 (24h) | 114T 41.0%WR -$4.34 (7d) | 301T 44.2%WR -$2.89 (14d)
+  POST-FIX TRADES: 8T 75%WR +$0.25. ALL metadata fixes working (volume_spike, final_confidence, rsi_14).
+  ATR_SL 42.1% 7d — PASS. Post-fix: 0/8 ATR_SL hits.
+  HIGH SHORT 10%WR 7d — all from killed signals aging out.
+  EXTREME LONG only profitable combo +$1.22/14d.
+  SHORT -$3.19/14d (110% of losses).
+  LOSING AUTOPSY: 6 losers 24h all small scratches (<$0.20). No systematic pattern.
+  CREATIVE: (1) HIGH SHORT MIN_EXEC_CONFIDENCE=70 (2) Monitor EXTREME post-fix (3) NEW NEUTRAL signal.
+  0 CHANGES APPLIED. BY: brain_auditor

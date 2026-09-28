@@ -1436,3 +1436,53 @@ BY: auto_1hr
 - System trading lightly with quality — no overtrading, no bad entries
 
 **BY:** auto_1hr
+
+## [2026-09-28 21:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L) | **Open:** 6 (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s82, 1 LONG rs-s31)
+**PnL:** +$0.33 (100% WR last hour) | **24h:** 13T 86.7%WR +$0.42
+
+**Last hour closes:**
+- SYRUP LONG rs-s56: +$0.19 profit-monster-trail ✅
+- BABY SHORT pump-chain-: +$0.14 hard_sl (trailed above entry) ✅
+
+**24h signal breakdown (12T, 83.3%WR):**
+- 10/12 exits: profit-monster-trail ✅
+- 0 atr_sl_hit (fix validated, 24h+ clean)
+- No signal with <30% WR in last hour — no kill candidates
+
+**7d losers (all pre-fix ATR_SL era):**
+- pullback-entry-: 6T -$1.54 | mover+: 7T -$1.32 | pump-chain+: 8T -$0.99
+- All aging out — fix resolved root cause, no action needed
+
+**No Change Needed:**
+- ATR_SL fix: 24h+ with 0 hits, confirmed working
+- Trade frequency: 2T/hr — well under overtrading threshold
+- All signals surviving filters — no 0% WR kill candidates
+- Open positions flat/slight profit, healthy
+
+**BY:** auto_1hr
+
+## [2026-09-28 22:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L) | **Open:** 5 (+$0.69 combined)
+**PnL:** -$0.27 last hour | **24h:** 13T 46%WR +$0.04 | **7d:** 114T 39%WR -$4.35
+
+**Last hour closes:**
+- POL LONG rs-s31: -$0.20 hard_sl
+- SOL LONG rs-s82: -$0.07 hard_sl
+
+**24h exit breakdown:** 8 profit-monster-trail, 3 hard_sl, 1 hard_max_loss, 1 HL_CLOSED
+- hard_sl rate: 23% (below 40% threshold — no TPSL issue)
+- ATR_SL fix: 0 hits in 25T post-fix (confirmed working ✅)
+
+**Open positions healthy:** 3 SHORT pump-chain- (+$0.69), 1 LONG continuum-osc+ (-$0.04), 1 LONG doji-bottom-long (+$0.04)
+
+**No Change Needed:**
+- 0 kill candidates (no signal with 3+ trades at 0% WR)
+- hard_sl rate normal (23% < 40% threshold)
+- ATR_SL fix validated: 25T with 0 hits
+- Trade frequency normal: 2T/hr
+- All7d losses from pre-fix era, aging out
+
+**BY:** auto_1hr
