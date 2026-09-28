@@ -1,7 +1,7 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 18:35 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-28 21:30 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
@@ -21,7 +21,8 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 2/2 trades winners, 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
+- **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
+- **🔴 signal_rsi_14 NULL DRIFT:** 28-day drift. signal_rsi_14 is NULL for ALL 305 trades in 14d window. Was populated for 3487 older trades. Detection-time RSI filtering impossible. Investigation needed.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
@@ -52,6 +53,18 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
+## Audit Update (2026-09-28 21:30 UTC)
+
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 4/4 trades winners (all profit-monster-trail). 0 ATR_SL hits. 7d: 46.4% (52/112) — PASS (<55%).
+- **🔴 CRITICAL DRIFT: signal_rsi_14 NULL ALL 14d trades.** 28-day drift. Detection-time RSI filtering impossible. Investigation needed.
+- **SHORT R:R 0.78:1** — avg_loss exceeds avg_win. 82% of ALL 14d losses. SHORT_RSI_FLOOR=50 correct. NULL RSI SHORT edge: 26T 61.5%WR +$0.79/14d.
+- **14d RSI BANDS:** SHORT <40 catastrophic (-$3.97). SHORT 50-60 sweet spot (+$1.18). LONG 50-60 best (+$0.52 69.6%WR). LONG 70-80 killing field (-$0.93).
+- **EXTREME 88 ATR_SL hits/14d** — dominates losses. profit-monster-trail only +$0.63. Post-fix widening working.
+- **LOSING AUTOPSY:** 25 losers 7d — 88% atr_sl_hit. All worst signals (pullback-entry-, mover+, pump-chain-) already killed/disabled, aging out.
+- **Signal diversity CRITICAL** — only pump-chain+ (+$1.51/14d) and volume-breakout-long+ (+$1.46/14d) profitable.
+- **CREATIVE (3):** (1) CRITICAL: signal_rsi_14 investigation (+$0.30-0.80/7d) (2) SHORT NULL RSI boost +15pt 9th suggestion (+$0.20-0.40/7d) (3) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades.
+- **0 CHANGES APPLIED.**
+
 ## Audit Update (2026-09-28 14:00 UTC)
 
 - **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/0 ATR_SL hits (0 trades since Sep 28 10:39 UTC). 7d: 48.3% (56/116) — PASS (<55%). EXTREME still 64.5% (pre-fix legacy).
@@ -65,6 +78,8 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 28)
+
+1. **brain_auditor ~21:30 UTC — NO CONFIG CHANGE.** DB-verified: 9T 55.6%WR +$0.01 (today) | 114T 35.7%WR -$5.26 (7d) | 305T 44.3%WR -$2.90 (14d). **POST-FIX TRADES: 4/4 winners (+$0.19).** All profit-monster-trail. ATR_SL widening working. **CRITICAL DRIFT: signal_rsi_14 NULL ALL 14d trades (28-day drift).** Detection-time RSI filtering impossible. Investigation needed. **SHORT R:R 0.78:1** — avg_loss exceeds avg_win. 82% of ALL 14d losses. **EXTREME 88 ATR_SL hits/14d** — dominates losses. **LOSING AUTOPSY:** 25 losers 7d — 88% atr_sl_hit. All worst signals killed/disabled, aging out. **5 open:** 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH. **CREATIVE (3):** (1) CRITICAL: signal_rsi_14 investigation (+$0.30-0.80/7d) (2) SHORT NULL RSI boost +15pt 9th suggestion (3) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades. **0 CHANGES APPLIED.** — brain_auditor
 
 1. **daily_orchestrator ~18:35 UTC — NO CONFIG CHANGE.** DB-verified: 16T 50%WR +$0.65 (24h) | 5 open positions (3 SHORT pump-chain-, 2 LONG). **PIPELINE HEALTHY.** 0-byte DB cleanup (8 files removed, no disk impact — real consumers are candles.db 2.2G, coin_tracker.db 3.2G). **OSCILLATOR SHADOW VERIFIED** — 5.6M file actively written. **ATR_SL POST-FIX: 0 hits, all exits profit-monster-trail.** **SIGNAL DIVERSITY:** Only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) profitable. 7d losses ALL pre-fix legacy. **DISK 85% (WARN).** **NO CHANGES APPLIED.** — daily_orchestrator
 

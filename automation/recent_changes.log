@@ -3261,3 +3261,12 @@
   3T last 6h (3W 0L, all profit-monster-trail). ATR_SL 0% post-fix (15T+). 0 kill candidates.
   7d losses (pullback-entry-, mover+, pump-chain+) all pre-fix ATR_SL bug. Fix resolved root cause.
   System healthy, trading lightly. BY: auto_1hr
+[2026-09-28 18:36 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 9T 55.6%WR +$0.01 (today) | 114T 35.7%WR -$5.26 (7d) | 305T 44.3%WR -$2.90 (14d)
+  POST-FIX TRADES: 4/4 winners (+$0.19). ATR_SL widening working.
+  CRITICAL DRIFT: signal_rsi_14 NULL ALL 14d trades (28-day drift). Detection-time RSI filtering impossible.
+  SHORT R:R 0.78:1 (avg_loss > avg_win). LONG R:R 1.07:1.
+  25 losers 7d — 88% atr_sl_hit. All worst signals killed/disabled, aging out.
+  5 open: 3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH.
+  CREATIVE: (1) signal_rsi_14 investigation (2) SHORT NULL RSI boost 9th suggestion (3) EXTREME MIN_EXEC_CONFIDENCE=70.
+  0 CHANGES APPLIED. BY: brain_auditor

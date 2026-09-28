@@ -829,5 +829,32 @@
     "category": "bug fix",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-28T18:36:16.954869+00:00",
+    "idea": "Investigate signal_rsi_14 NULL drift (28 days)",
+    "rationale": "signal_rsi_14 is NULL for ALL 305 14d trades. Detection-time RSI filtering impossible. Fixing enables RSI-based signal quality filtering.",
+    "expected_impact": "+$0.30-0.80/7d",
+    "category": "bug fix",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-28T18:36:16.954882+00:00",
+    "idea": "SHORT NULL RSI confidence boost +15pt (9th suggestion)",
+    "rationale": "NULL RSI SHORT: 26T 61.5%WR +$0.79/14d. These trades bypass RSI filter but still win. +15pt boost ranks them higher.",
+    "expected_impact": "+$0.20-0.40/7d",
+    "category": "entry sniper",
+    "status": "suggested (recurring)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-28T18:36:16.954884+00:00",
+    "idea": "EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades",
+    "rationale": "EXTREME 88 ATR_SL hits/14d. Higher confidence filters low-quality EXTREME entries. Need 50+ post-fix trades (currently 4).",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "medium"
   }
 ]
