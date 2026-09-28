@@ -3157,3 +3157,5 @@
   SHORT -$3.16/14d (96% losses). HIGH regime -$1.99/14d (worst). 49 signals, only 20 profitable.
   CREATIVE: (1) Fix final_confidence injection (+$0.50-1.00/7d). (2) pump-chain+ EXTREME fc floor 70%. (3) 3 hotset volume_spike paths.
   0 CHANGES APPLIED. BY: brain_auditor
+[2026-09-28 00:10 UTC] auto_1hr: NO CHANGE — analysis only
+  0T last hour, 0 open. ATR_SL 0% post-fix (11T). 24h +$0.72 (45.5%WR). System flat, no kill candidates. BY: auto_1hr
