@@ -1341,3 +1341,21 @@ BY: auto_1hr
 **Diagnosis:**
 1. **Entry quality:** 46.2% WR 24h — down from 63% (rolling window shifted, not structural)
 2. **SL behavior:** 69% atr_sl_hit avg +$0.088 — healthy, trail capturing profits
+
+## [2026-09-28 17:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 6 (3 SHORT pump-chain-, 2 LONG rs/continuum, 1 LONG bb-bounce)
+**24h:** 13T 30.8%WR +$0.42 | **7d:** 111T 34.2%WR -$5.71
+
+**Post-fix status (Sep 27+):**
+- ATR_SL: 0 hits ✅ (was 68% pre-fix)
+- Profit-monster-trail: 13/15 exits — trailing working
+- All signals post-fix net positive or within noise
+
+**No Change Needed:**
+- ATR_SL fix validated (15T, 0 hits)
+- No signal has enough losses to kill (max 1 trade each)
+- System trading lightly (15T in 1.5 days), quality over quantity
+
+**Status:** Monitoring. System flat, no action required.
+**BY:** auto_1hr
