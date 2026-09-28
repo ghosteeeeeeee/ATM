@@ -1,4 +1,24 @@
 
+[2026-09-28 13:10 UTC] auto_1hr: NO CHANGE — analysis only
+  0T last hour, 0 open. ATR_SL 0% post-fix (24h). 5T today all tiny losses (avg -$0.04).
+  7d 117T 35%WR -$5.84. EXTREME regime 68% of losses (-$3.98) — structural.
+  All worst signals already killed. System flat, pipeline clean, no kill candidates. BY: auto_1hr
+
+[2026-09-28 10:39 UTC] brain_auditor: 1 CONFIG CHANGE — audit
+  DB-verified: 15T 33.3%WR +$0.51 (24h) | 117T 35.0%WR -$5.84 (7d) | 315T 44.4%WR -$2.65 (14d)
+  ATR_SL_MAX WIDENED 1.8% -> 2.0%. EXTREME 64.5% hit rate 7d. 1.2x multiplier DEAD at 1.8% cap.
+  TP_PCT_FALLBACK 4.5% -> 6.0% (3:1 R:R with 2.0% SL).
+  Post-fix: 0/16 ATR_SL hits. All exits profit-monster-trail. No impact on existing winners.
+  LOSING AUTOPSY: 9 losers 24h, all small scratches (<$0.12). No systematic pattern.
+  CREATIVE: (1) ATR_SL_MAX 2.0% APPLIED (2) bb-bounce-v2 RSI_MAX=65 (3) volume_spike 3 orphan paths.
+  1 CHANGE APPLIED.
+  BY: brain_auditor
+[2026-09-28 10:10 UTC] auto_1hr: NO CHANGE — analysis only
+  0 closures last hour. 0 open positions. System idle.
+  24h: 15T 53.3%WR +$0.51 (all profit-monster-trail exits). ATR_SL 0 hits ✅
+  SHORT side: 2 trades/24h (-$0.07), aging out as expected. No kill candidates.
+  BY: auto_1hr
+
 [2026-09-28 07:39 UTC] brain_auditor: NO CONFIG CHANGE - audit
   DB-verified: 16T 31.3%WR +$0.51 (24h) | 119T 36.1%WR -$4.68 (7d) | 350T 45.1%WR -$4.00 (14d)
   ATR_SL WIDENING VERIFIED: 0/16 post-fix ATR_SL hits. All exits profit-monster-trail. Success criteria: PASS.

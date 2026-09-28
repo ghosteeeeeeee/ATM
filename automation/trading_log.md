@@ -1,3 +1,38 @@
+## [2026-09-28 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open | 5 today (0W 5L, -$0.21)
+**24h:** ~10T 50%WR +$0.51 | **7d:** 117T 35%WR -$5.84
+**Pipeline:** Running clean, no errors, 42 signals/min
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hit rate in 24h — validated (all exits now profit-monster-trail)
+- No kill candidates: all worst signals already disabled (pullback-entry-, pump-chain+, mover+)
+- Trade frequency: 0/hr — quiet market, no overtrading
+- System flat since 05:59 UTC — no overnight risk
+- 24h PnL positive (+$0.51) — no negative streak
+- Today's 5 losses tiny (avg -$0.04), proper risk management
+
+**Signal Analysis (7d):**
+- Active signal with highest volume: bb-bounce-v2-long+ 14T -$0.18 (42.9%WR, avg loss $0.013 — monitor, not kill)
+- pump-chain- 33T -$0.93 but all pre-fix ATR_SL trades, dormant since Sep 24
+- accel-300-breakout 7T -$0.12 (mixed, small loss)
+
+**Regime Breakdown (7d):**
+- EXTREME: 62T 35.5%WR -$3.98 (biggest bleeder, structural issue)
+- HIGH: 34T 29.4%WR -$2.01
+- NORMAL: 18T 44.4%WR +$0.14 (only profitable)
+- FLAT: 2T 50%WR +$0.01
+
+**Open Questions:**
+- EXTREME regime responsible for 68% of 7d loss — structural, needs deeper analysis (not hourly fix)
+- bb-bounce-v2-long+ slight negative with high volume — continue monitoring
+
+BY: auto_1hr
+
+---
+
 ## [2026-09-28 10:10 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | 0 open positions | 0 trades today
