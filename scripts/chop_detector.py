@@ -152,6 +152,135 @@ def _get_token_momentum(token: str) -> float:
             conn.close()
 
 
+def get_coin_trend_score(token: str) -> int:
+    """
+    0-100 per-coin trend score. Extends _get_token_momentum() with richer data.
+
+    0-30: Deep chop → mean-rev only, momentum blocked
+    31-60: Weak trend → momentum penalized (0.3x), mean-rev boosted (1.2x)
+    61-100: Strong trend → full signal set allowed (same as TREND regime)
+
+    All data from candles_1m — no new APIs.
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        token = token.upper()
+
+        # Fetch 1h of 1m candles (60 bars)
+        cur.execute("""
+            SELECT close, high, low, volume FROM candles_1m
+            WHERE token = ? ORDER BY ts DESC LIMIT 60
+        """, (token,))
+        rows = cur.fetchall()
+        if len(rows) < 30:
+            return 50  # insufficient data — neutral score
+
+        closes = [r[0] for r in rows]
+        highs = [r[1] for r in rows]
+        lows = [r[2] for r in rows]
+        volumes = [r[3] for r in rows]
+
+        score = 0
+
+        # 1. EMA20 vs EMA50 alignment (0-30 points)
+        # ponytail: manual EMA calc, stdlib math only
+        def _ema(data, period):
+            if len(data) < period:
+                return data[-1] if data else 0
+            k = 2 / (period + 1)
+            ema = sum(data[-period:]) / period
+            for v in reversed(data[:-period]):
+                ema = v * k + ema * (1 - k)
+            return ema
+
+        ema20 = _ema(closes, 20)
+        ema50 = _ema(closes, min(50, len(closes)))
+        if ema50 > 0:
+            ema_diff_pct = (ema20 - ema50) / ema50 * 100
+            # Strong alignment: +30, weak: +15, crossed: +5
+            if abs(ema_diff_pct) > 0.3:
+                score += 30
+            elif abs(ema_diff_pct) > 0.1:
+                score += 20
+            elif abs(ema_diff_pct) > 0.02:
+                score += 10
+
+        # 2. Price vs EMA20 position (0-20 points)
+        if ema20 > 0:
+            price_vs_ema = (closes[0] - ema20) / ema20 * 100
+            if price_vs_ema > 0.2:
+                score += 20  # price above EMA = bullish
+            elif price_vs_ema > 0.05:
+                score += 10
+            elif price_vs_ema < -0.2:
+                score += 20  # price below EMA = bearish (trending down = also trend)
+            elif price_vs_ema < -0.05:
+                score += 10
+
+        # 3. Consecutive same-direction candles (last 6) (0-20 points)
+        if len(closes) >= 6:
+            recent = closes[:6]
+            up_count = sum(1 for i in range(5) if recent[i] > recent[i+1])
+            down_count = 5 - up_count
+            max_consecutive = max(up_count, down_count)
+            if max_consecutive >= 5:
+                score += 20
+            elif max_consecutive >= 4:
+                score += 15
+            elif max_consecutive >= 3:
+                score += 10
+
+        # 4. ATR ratio (current / 20-period avg) (0-15 points)
+        if len(closes) >= 20:
+            # Current ATR (14-period approximation from recent bars)
+            trs = []
+            for i in range(min(14, len(closes)-1)):
+                tr = max(highs[i]-lows[i], abs(highs[i]-closes[i+1]), abs(lows[i]-closes[i+1]))
+                trs.append(tr)
+            current_atr = sum(trs) / len(trs) if trs else 0
+
+            # 20-period avg ATR
+            all_trs = []
+            for i in range(min(20, len(closes)-1)):
+                tr = max(highs[i]-lows[i], abs(highs[i]-closes[i+1]), abs(lows[i]-closes[i+1]))
+                all_trs.append(tr)
+            avg_atr = sum(all_trs) / len(all_trs) if all_trs else 0
+
+            if avg_atr > 0 and current_atr > 0:
+                atr_ratio = current_atr / avg_atr
+                if atr_ratio > 1.5:
+                    score += 15  # expanding volatility = trending
+                elif atr_ratio > 1.1:
+                    score += 10
+                elif atr_ratio > 0.8:
+                    score += 5
+
+        # 5. Volume trend (0-10 points)
+        if len(volumes) >= 10:
+            recent_vol = sum(volumes[:5]) / 5
+            older_vol = sum(volumes[5:10]) / 5
+            if older_vol > 0:
+                vol_ratio = recent_vol / older_vol
+                if vol_ratio > 1.5:
+                    score += 10  # volume increasing = conviction
+                elif vol_ratio > 1.1:
+                    score += 5
+
+        # 6. Existing momentum bonus (0-5 points)
+        mom = _get_token_momentum(token)
+        if abs(mom) > 0.5:
+            score += 5
+
+        return max(0, min(100, score))
+    except Exception:
+        return 50  # neutral on error
+    finally:
+        if conn:
+            conn.close()
+
+
 def _classify_signal(signal_type: str) -> str:
     """Classify a signal as MOMENTUM or MEAN_REVERSION."""
     # Check overrides first
@@ -491,3 +620,17 @@ if __name__ == '__main__':
         sig_class = _classify_signal(sig)
         status = "✅" if allowed else "🚫"
         print(f"  {status} {sig:>30} [{sig_class:>15}] → {reason}")
+
+    # Per-coin trend scores (chop-v2 foundation)
+    test_tokens = ['BTC', 'ETH', 'SOL', 'DOGE', 'PEPE', 'LINK', 'AVAX', 'BNB']
+    print(f"\n=== Per-Coin Trend Scores ===")
+    for tok in test_tokens:
+        tscore = get_coin_trend_score(tok)
+        if tscore >= 61:
+            zone = "STRONG"
+        elif tscore >= 31:
+            zone = "WEAK"
+        else:
+            zone = "CHOP"
+        mom = _get_token_momentum(tok)
+        print(f"  {tok:>6}: score={tscore:>3}/100 [{zone:>6}]  momentum={mom:+.2f}%")
