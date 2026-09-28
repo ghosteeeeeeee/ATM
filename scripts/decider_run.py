@@ -3027,6 +3027,13 @@ def run(dry_run=False):
         sig_id = sig.get('signal_id')
         token = sig.get('token', '').upper()
         direction = sig['direction']
+        # ponytail: merge final_confidence from hotset.json into sig dict (was 100% NULL)
+        if sig.get('final_confidence') is None:
+            for _hs in _current_hotset:
+                if _hs.get('token', '').upper() == token and _hs.get('direction', '').upper() == direction.upper():
+                    if _hs.get('final_confidence') is not None:
+                        sig['final_confidence'] = _hs['final_confidence']
+                    break
         confidence = sig.get('final_confidence')
         source = sig.get('source', '')
         in_hotset = token in _hot_tokens
@@ -4210,6 +4217,13 @@ def run(dry_run=False):
             _exec_meta['gap_at_entry'] = _gap_at_entry
         if _staleness_min is not None:
             _exec_meta['staleness_minutes'] = _staleness_min
+        # ponytail: inject RSI for post-trade analysis (was 100% NULL 350/350)
+        try:
+            _meta_rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
+            if _meta_rsi is not None:
+                _exec_meta['rsi'] = round(float(_meta_rsi), 2)
+        except Exception:
+            pass
         if _crash_signal is not None:
             _exec_meta['volume_spike'] = round(getattr(_crash_signal, 'volume_spike', 0.0), 2)
         # ponytail: inject final_confidence for post-trade analysis (was 100% NULL)

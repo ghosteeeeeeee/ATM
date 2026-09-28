@@ -561,5 +561,27 @@
     "after": "_exec_meta[\"final_confidence\"] = sig[\"final_confidence\"] added after volume_spike injection",
     "rationale": "final_confidence used for hotset filtering (line 2951) but never recorded in trades. Enables confidence vs winrate analysis. Enables future pump-chain+ EXTREME confidence floor.",
     "impact": "+$0.50-1.00/7d potential from confidence tuning. 0 risk — metadata-only, no filtering change."
+  },
+  {
+    "timestamp": "2026-09-28T00:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Inject RSI into _signal_metadata for post-trade analysis",
+    "type": "code",
+    "file": "decider_run.py",
+    "before": "RSI read for filtering (line 4107) but never written to _exec_meta — 350/350 trades 14d had NULL RSI",
+    "after": "_exec_meta[\"rsi\"] = round(float(_meta_rsi), 2) added at line ~4213 — all future trades will have RSI in metadata",
+    "rationale": "RSI is the primary entry quality metric. Without it in metadata, we cannot analyze entry quality by RSI band, verify RSI filters are working, or tune RSI parameters. 128 EXTREME trades 14d — 0 with RSI.",
+    "impact": "Unlocks RSI-based entry quality analysis. Enables data-driven RSI band optimization. Zero risk — metadata-only write, no filter changes."
+  },
+  {
+    "timestamp": "2026-09-28T00:30:00Z",
+    "agent": "brain_auditor",
+    "change": "Fix final_confidence injection from hotset.json into sig dict",
+    "type": "code",
+    "file": "decider_run.py",
+    "before": "final_confidence only injected if sig.get(final_confidence) was not None (line 4216). But DB signals never have fc — it only exists in hotset.json. 9/11 post-fix trades NULL.",
+    "after": "During hotset reload loop, look up final_confidence from hotset.json and merge into sig dict if missing. 2 lines added at line ~3027.",
+    "rationale": "Blocks confidence-based filtering. pump-chain+ EXTREME could use fc floor 70% to reduce false entries. Also enables MIN_EXEC_CONFIDENCE=65 enforcement for hotset signals.",
+    "impact": "Expected +/usr/bin/bash.50-1.00/7d from confidence filtering. Enables pump-chain+ EXTREME confidence floor suggestion."
   }
 ]
