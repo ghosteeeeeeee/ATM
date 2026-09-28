@@ -256,3 +256,12 @@
 
 ## Error Alerts — 2026-09-27 22:58 UTC
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-28 00:46 UTC
+- **INFO**: Disk at 84% (19G free). 1% from WARN threshold. No action taken.
+- No WARN or CRITICAL issues detected. Pipeline healthy.
+
+## Error Alerts — 2026-09-28 01:46 UTC
+- **CRITICAL** (Nx22/30min): `position_manager: FAILED (rc=1)` — "Guardian already running" race condition. Stale `hl-sync-guardian.py` process (PID 3298260, started Sep 26) blocking new guardian spawns.
+- **AUTO-FIX**: Killed stale guardian PID 3298260. Verified position_manager returns rc=0 on next cycle (#218944).
+- **FOLLOW-UP**: Guardian should be managed by systemd, not a bare process. Root cause: hl-sync-guardian timer/service may not be properly managing process lifecycle.

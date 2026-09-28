@@ -1,18 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-27 23:30 UTC**
+**Last Updated: 2026-09-28 00:30 UTC**
 **Updated by: CEO**
 
 ## Current Status
 
-System active Sep 27 after 100h+ idle. 1 open LONG (YGG +$0.12). Market NEUTRAL. Pipeline healthy.
+System active. 0 open positions. Market NEUTRAL. Pipeline healthy. ATR_SL widening VERIFIED PASS.
 
-- **24h (rolling):** 10T 50%WR +$0.79 (all profit-monster-trail exits — ATR_SL widening WORKING).
-- **7d:** 126T 35.7%WR -$5.27 (DB-verified). ALL trades NEUTRAL regime. ATR_SL 53.2% hit rate (67/126).
-- **14d:** 334T 44.6%WR -$3.29 (DB-verified). ALL trades NEUTRAL regime (333/334).
-- **OPEN:** YGG (rs-s94) +$0.12. 1 position.
-- **LONG:** volume-breakout-long+ 18T/14d +$1.46 (best signal), pump-chain+ 62T/14d +$0.85 (still profitable despite 7d cold streak).
-- **SHORT:** ALL DISABLED. pullback-entry- 75T/14d -$1.76 (legacy, aging out), pump-chain- 48T/14d -$0.79 (legacy).
+- **24h (rolling):** 14T 35.7%WR +$0.54 (DB-verified).
+- **7d:** 128T 34.4%WR -$5.44 (DB-verified). ALL trades NEUTRAL regime. ATR_SL 50.8% hit rate (65/128) — PASS (<55%).
+- **14d:** 329T 43.5%WR -$4.54 (DB-verified). ALL trades NEUTRAL regime (328/329).
+- **OPEN:** 0 positions.
+- **LONG:** volume-breakout-long+ 18T/14d +$1.46 (best signal), pump-chain+ 62T/14d +$0.85 (14d still profitable, 7d cold streak -15.8%WR).
+- **SHORT:** ALL DISABLED. pullback-entry- 7T/7d -$1.69 (pre-disable legacy, all atr_sl_hit). pump-chain- 33T/7d -$0.93 (legacy aging out).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — **VERIFIED WORKING.**
@@ -20,7 +20,7 @@ System active Sep 27 after 100h+ idle. 1 open LONG (YGG +$0.12). Market NEUTRAL.
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **UNTESTED** — 0 ATR_SL hits since deploy.
+- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — 50.8% 7d (65/128). Post-fix: 0/14 ATR_SL hits. All exits profit-monster-trail.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
