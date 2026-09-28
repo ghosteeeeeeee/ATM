@@ -203,10 +203,16 @@ def scan_signals():
     phase = state.get('phase', {})
     recommendations = state.get('recommendations', [])
     
-    # Phase must meet minimum confidence
-    if phase.get('confidence', 0) < PUMP_FLOW_MIN_PHASE_CONFIDENCE:
-        _log(f"  [pump-flow] Phase confidence too low: {phase.get('confidence', 0):.2f}")
+    # Phase must meet minimum confidence — OR individual recommendations are high-confidence
+    # FIX: Phase confidence 0.32 blocks ALL 14 recommendations at 90% conf. Allow through
+    # when individual recommendation confidence is high enough (token-level signal > phase-level filter)
+    phase_conf = phase.get('confidence', 0)
+    max_rec_conf = max((r.get('confidence', 0) for r in recommendations), default=0)
+    if phase_conf < PUMP_FLOW_MIN_PHASE_CONFIDENCE and max_rec_conf < 0.80:
+        _log(f"  [pump-flow] Phase confidence too low: {phase_conf:.2f} and max rec conf: {max_rec_conf:.2f}")
         return 0
+    elif phase_conf < PUMP_FLOW_MIN_PHASE_CONFIDENCE:
+        _log(f"  [pump-flow] Phase confidence low ({phase_conf:.2f}) but max rec conf high ({max_rec_conf:.2f}) — allowing through")
     
     # BTC trend filter — skip LONG when BTC 1h is negative (picking peaks)
     # Backtest: 81% WR → 89% WR, +5.28% → +6.77% PnL by filtering BTC 1h < 0%

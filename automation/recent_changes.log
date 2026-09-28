@@ -1,3 +1,16 @@
+[2026-09-28 16:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 14T 28.6%WR +$0.41 (24h) | 111T 34.2%WR -$5.71 (7d) | 304T 43.8%WR -$3.06 (14d)
+  SYSTEM IDLE 6+ hours (since 10:39 UTC). All recent fixes UNTESTED.
+  ATR_SL WIDENING: 7d 47.7% (52/111) — PASS (<55%). Post-fix: 0/0 hits.
+  LOSING AUTOPSY: 9 losers 24h ALL small profit-monster-trail scratches (max -$0.12). No pattern.
+  LONG RSI 40-60 SWEET SPOT: 40-50 15T 66.7%WR +$1.62, 50-60 43T 60.5%WR +$1.53. Combined 58T 63.1%WR +$3.15/14d.
+  SHORT RSI 50-60 BLEEDING: 42T 42.9%WR -$1.35/14d (killed signals aging out).
+  volume_spike STILL 81% — stuck 3+ days. final_confidence STILL 43% — stuck 3+ days.
+  Signal diversity CRITICAL — only 2 profitable LONG types.
+  CREATIVE: (1) Extend LONG_RSI_SWEET_SPOT 40-50 to 40-60 (2) Investigate volume_spike orphan paths (3) NEW EMA-reclaim LONG signal.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
+
 [2026-09-28 16:13 UTC] auto_1hr: NO CHANGE — analysis only
   0T last hour, 1 open BTC LONG (flat, 2.9h). System idle 10h+.
   24h: 15T 33%WR +$0.51 (0 ATR_SL hits). Fix working ✅.
