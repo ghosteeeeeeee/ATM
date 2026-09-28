@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 17:30 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-28 21:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
 System active. 5 open positions (3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60.
 
-- **24h (rolling):** 11T 0%WR +$0.41 (DB-verified). All profit-monster-trail exits. 0 ATR_SL hits.
-- **7d:** 111T 35.1%WR -$5.35 (DB-verified). EXTREME ATR_SL 64.4% (legacy).
-- **14d:** 304T 44.1%WR -$2.99 (DB-verified).
-- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), LDO/LTC/BABY SHORT pump-chain- (EXTREME), WLFI LONG rs-s38 (HIGH).
+- **24h (rolling):** 14T 42.9%WR +$0.62 (DB-verified). Post-fix: 2T 100%WR +$0.16.
+- **7d:** 112T 35.7%WR -$5.26 (DB-verified). ATR_SL hit rate 46.4% (PASS <55%).
+- **14d:** 305T 44.3%WR -$2.90 (DB-verified).
+- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NEUTRAL), LDO/LTC/BABY SHORT pump-chain- (NEUTRAL), SYRUP LONG rs-s35 (NEUTRAL).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -21,7 +21,7 @@ System active. 5 open positions (3 SHORT EXTREME, 1 LONG NORMAL, 1 LONG HIGH). P
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 0/16 ATR_SL hits. All exits profit-monster-trail. EXTREME 64.5% 7d hit rate (pre-fix legacy). TP_PCT_FALLBACK=6.0% (3:1 R:R).
+- **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 2/2 trades winners, 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
