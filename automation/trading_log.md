@@ -1,3 +1,39 @@
+## [2026-09-28 16:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (BTC LONG continuum-osc+, flat) | 5 today (0W 5L, -$0.21)
+**24h:** 15T 33%WR +$0.51 | **7d:** 114T 35%WR -$5.66 | **14d:** 305T 44%WR -$3.25
+
+**ATR SL:** 0/15 (0%) 24h post-fix ✅ | 55/114 (48.3%) 7d (legacy pre-fix)
+**Exits:** 13 profit-monster-trail, 1 hard_max_loss, 1 HL_CLOSED
+**Direction 14d:** LONG 172T +$0.65 | SHORT 133T -$3.90 (SHORT = all losses)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits 24h, all exits profit-monster-trail ✅
+- No kill candidates: 8 losers in 24h all have 1 trade only (not statistically significant)
+- Trade frequency: 0/hr — idle10h+ since 05:59 UTC
+- BTC LONG open 13:18 UTC (2.9h), flat, SL at83030 (-0.43%) — no action needed
+- Today's 5 losses tiny (avg -$0.04), hard_max_loss safety working
+
+**Signal Analysis (24h):**
+- Winners: continuation+ $0.32, rs-s102 $0.19, rs-s118 $0.14, rs-s44 $0.12
+- Neutral: bb-bounce-v2-long+ 2T +$0.08, continuum+ $0.00
+- Losers: rs-s111 -$0.12, rs-s94 -$0.07, mover- -$0.04, rs-s52 -$0.04 (all 1T)
+
+**Structural Issues (not hourly-fixable):**
+- SHORT side -$3.90/14d — all SHORT signals net negative
+- EXTREME regime = 68% of 7d loss — needs regime-specific filter
+- final_confidence NULL persists — code bug in decider_run.py
+
+**Open Questions:**
+- System idle10h+ — low vol weekend, not over-filtered
+- rs- signals mixed (7W/8L all-time) — need more data, no kills yet
+
+BY: auto_1hr
+
+---
+
 ## [2026-09-28 15:12 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | 0 open | 5 today (0W 5L, -$0.21)
