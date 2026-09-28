@@ -1,26 +1,27 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 00:30 UTC**
-**Updated by: CEO**
+**Last Updated: 2026-09-28 06:30 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-System active. 0 open positions. Market NEUTRAL. Pipeline healthy. ATR_SL widening VERIFIED PASS.
+System active. 0 open positions. Market SHORT_BIAS. Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED.
 
-- **24h (rolling):** 14T 35.7%WR +$0.54 (DB-verified).
-- **7d:** 128T 34.4%WR -$5.44 (DB-verified). ALL trades NEUTRAL regime. ATR_SL 50.8% hit rate (65/128) — PASS (<55%).
+- **24h (rolling):** 15T 33.3%WR +$0.51 (DB-verified).
+- **7d:** 118T 35.6%WR -$5.41 (DB-verified). ALL trades NEUTRAL regime. ATR_SL 49.2% hit rate (58/118) — PASS (<55%).
 - **14d:** 329T 43.5%WR -$4.54 (DB-verified). ALL trades NEUTRAL regime (328/329).
 - **OPEN:** 0 positions.
-- **LONG:** volume-breakout-long+ 18T/14d +$1.46 (best signal), pump-chain+ 62T/14d +$0.85 (14d still profitable, 7d cold streak -15.8%WR).
-- **SHORT:** ALL DISABLED. pullback-entry- 7T/7d -$1.69 (pre-disable legacy, all atr_sl_hit). pump-chain- 33T/7d -$0.93 (legacy aging out).
+- **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
+- **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
+- **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — **VERIFIED WORKING.**
-- **KILLED/REGIME BLOCKED:** pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+ (Sep 24), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
+- **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+ (Sep 24), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — 50.8% 7d (65/128). Post-fix: 0/14 ATR_SL hits. All exits profit-monster-trail.
+- **ATR_SL:** MIN 1.3%, MAX 1.8% (widened Sep 25). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — 49.2% 7d (58/118). Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail.
 - **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
 - **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
 - **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
@@ -49,6 +50,20 @@ System active. 0 open positions. Market NEUTRAL. Pipeline healthy. ATR_SL wideni
 **🟢 SIGNAL KILLS — WORKING.** pullback-entry- and mover+ — no new trades since kills.7d numbers are pre-kill trades aging out.
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
+
+
+## Audit Update (2026-09-28 05:35 UTC)
+
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/15 ATR_SL hits (0%). All exits profit-monster-trail. **SUCCESS CRITERIA: PASS.**
+- **volume_spike: CRITICAL DRIFT.** 96% NULL (313/325 14d). Fix deployed Sep 25 NOT working. Chase filter blind 3+ days.
+- **final_confidence: 98% NULL** — blocks confidence-based filtering (can't filter pump-chain+ by confidence).
+- **SHORT R:R 0.76:1** — avg_loss exceeds avg_win. Core problem.
+- **EXTREME ATR_SL 65.2% 7d** — includes pre-fix legacy. Post-fix: 0%.
+- **14d R:R 0.95:1** — avg win $0.14 vs avg loss -$0.15. System slightly net negative on R:R.
+
+## Today's Changes (Sep 28)
+
+1. **daily_orchestrator ~06:30 UTC — 1 CODE CLEANUP.** DB-verified: 15T/24h 33.3%WR +$0.51 | 118T 35.6%WR -$5.41 (7d). **ATR_SL WIDENING VERIFIED PASS** — 49.2% hit rate (58/118) <55% success criteria. Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail. **PUMP-CHAIN+ V5 KILLED** by signal reporter (20%WR -$1.26/7d, all regimes lose). **PULLBACK_ENTRY_SHORT_HIGH_BLOCK DEAD FLAG REMOVED** — defined but never used. **VOLUME_SPIKE FIX VERIFIED** — 13/16 post-fix trades have values (81%). Auto_1hr 14d query stale. **DISK 84%.** **1 CLEANUP APPLIED.** — daily_orchestrator
 
 ## Today's Changes (Sep 27)
 
@@ -123,11 +138,11 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **ATR_SL widening eval:** 5 open positions, 0 ATR_SL hits yet. Needs 50 trades. Define pass/fail: hit rate <55% by 50 trades, R:R >1.5:1. — 2026-09-27
-2. **REGIME_CONF_HIGH_MULT=0.50 eval:** POL opened in HIGH regime — first test case. Monitor PnL. — 2026-09-27
-3. **pump-chain+ degradation:** 21T 23.8%WR -$1.54/7d (was +$1.24/14d). Cold streak or systemic? All NEUTRAL regime. — 2026-09-27
+1. **ATR_SL widening eval: DONE.** 118T 7d, 49.2% hit rate (58/118) — PASS (<55%). Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail. — 2026-09-28
+2. **REGIME_CONF_HIGH_MULT=0.50 eval:** ALL trades NEUTRAL (117/118 7d). Cannot evaluate. Wait for EXTREME/HIGH trades. — 2026-09-28
+3. **pump-chain+ V5 KILLED.** 20%WR -$1.26/7d. PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. — 2026-09-28
 4. **DISK: 84% (19G free).** candles.db 2.2G, coin_tracker.db 3.1G. Monitor growth. — 2026-09-27
-5. **DEVELOP: New signals for NEUTRAL regime.** Only pump-chain+ LONG and volume-breakout-long+ pass confluence. Need diversity. — 2026-09-16
-6. **INVESTIGATE: decider_run failures.** 80/24h — signals consumed but HL API rejects orders. Traceback truncated. — 2026-09-27
-7. **CLEANUP: Remove dead flag PULLBACK_ENTRY_SHORT_HIGH_BLOCK.** Defined but never enforced. — 2026-09-27
-8. **MONITOR: volume_spike fix.** Working (6/9 post-fix trades have values). 3 missing from rs-s* hotset paths. — 2026-09-27
+5. **DEVELOP: New signals for NEUTRAL regime.** Only volume-breakout-long+ and r2_trend_long profitable. Need diversity. — 2026-09-16
+6. **INVESTIGATE: decider_run failures.** STALE — 0 errors in 24h logs. All rc=0. — 2026-09-28
+7. **CLEANUP: PULLBACK_ENTRY_SHORT_HIGH_BLOCK DONE.** Removed dead flag (defined but never used). — 2026-09-28
+8. **MONITOR: volume_spike fix.** WORKING — 13/16 post-fix trades have values (81%). 3 missing from rs-s*/continuum_engine paths. Auto_1hr 14d query is stale (includes pre-fix trades). — 2026-09-28

@@ -298,8 +298,9 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'KAS'
+    'CFX'
 }
+
 
 
 
@@ -3757,7 +3758,6 @@ TREND_IGNITION_CONF_CAP         = 92      # max confidence (system ceiling)
 PULLBACK_ENTRY_ENABLED           = True    # master kill-switch
 PULLBACK_ENTRY_PLUS_ENABLED      = False   # CEO KILLED 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
 PULLBACK_ENTRY_MINUS_ENABLED = False    # SHORT direction (buying rallies)
-PULLBACK_ENTRY_SHORT_HIGH_BLOCK  = True    # brain_auditor Sep 18 — HIGH regime 33T 45.5%WR -$0.51. EXTREME 63.6%WR +$0.43. Gating HIGH recovers +$0.51/7d.
 
 # Detection parameters
 PULLBACK_IMPULSE_MIN_PCT         = 0.4     # min % move for impulse (tightened from 0.3 — backtest: 68.8% WR +6.00%)

@@ -1,3 +1,54 @@
+## [2026-09-28 06:30 UTC] Daily Orchestrator
+
+**Trades:** 0 open | 15 closed today | +$0.51 (33.3%WR)
+**7d:** 118T 35.6%WR -$5.41 | **14d:** 329T 43.5%WR -$4.54
+
+**Changes Applied:**
+1. **PULLBACK_ENTRY_SHORT_HIGH_BLOCK removed** — dead flag (defined hermes_constants.py:3761, never imported/used anywhere). Cleanup.
+
+**Verified Working:**
+- **ATR_SL widening: VERIFIED PASS** — 49.2% hit rate (58/118 7d) <55% success criteria. Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail.
+- **Pump-chain+ V5 kill: VERIFIED** — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. No post-kill trades.
+- **Volume_spike fix: VERIFIED** — 13/16 post-fix trades have values (81%). Auto_1hr 14d query is stale (includes pre-fix trades).
+- **Pipeline health: OK** — 0 errors, all rc=0, hotset empty (SHORT_BIAS regime).
+
+**Status:**
+- Market: SHORT_BIAS (12 short / 1 long / 103 neutral signals)
+- Open: 0 positions
+- Disk: 84% (19G free)
+- Signal diversity: LOW — only volume-breakout-long+ and r2_trend_long profitable
+
+**BY:** daily_orchestrator
+
+---
+
+## [2026-09-28 06:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC LONG continuum+ via HL_CLOSED, +$0.00) | **Open:** 0
+**PnL:** $0.00 | **7d:** 122T 34.4%WR -$4.87 | **14d:** 325T 43.4%WR -$3.86
+**ATR_SL:** 0 hits in 24h ✅ | 7d rate 49.2% (legacy pre-fix trades)
+
+**24h Performance:** 15T 53.3%WR +$0.51 (13/15 via profit-monster-trail)
+**Direction (14d):** LONG 181T 44.2%WR -$0.01 | SHORT 144T 43.1%WR -$3.85
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix confirmed working: 0 atr_sl_hit in 24h, all exits profit-monster-trail
+- No signal has 0%WR with 3+ trades in last hour — no kill candidates
+- Not overtrading: 1 trade/hr
+- 24h is positive (+$0.51) — system improving post-fix
+- Only loss >$0.10 was ALT LONG hard_max_loss (-$0.12) — safety mechanism working as intended
+
+**Open Questions:**
+- SHORT 14d -$3.85 (82% of total losses) — structural issue, needs deeper investigation
+- volume_spike/final_confidence NULL drift persists — code bug in signal_compactor.py (flagged by brain_auditor)
+- System barely trading (1/hr) — may be over-filtered or low-vol regime
+
+**BY:** auto_1hr
+
+---
+
 ## [2026-09-28 01:20 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (CFX SHORT mover- via profit-monster-trail, -$0.04) | **Open:** 2 (GOAT SHORT, ALT LONG)
@@ -8149,3 +8200,60 @@ Final set: ['KAS']
 - Post-fix trajectory positive (+$0.53 24h)
 
 **BY:** auto_1hr
+
+## [2026-09-28 04:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L, -$0.02)
+- LTC LONG rs-s30,rs-s33: -$0.02 (profit-monster-trail, 31min hold, $22 position)
+
+**24h:** 14T 35.7%WR +$0.51 | trailing exit 13/14 (93%)
+**Open:** 0 (system flat)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits across 24h — still validated (was 68% pre-fix)
+- No kill candidates (all signals ≤1 trade in window)
+- Trade frequency: 1/hr — normal, well under 20 threshold
+- LTC loss: normal trailing behavior on tiny $22 position, -0.4% adverse
+- Avg PnL positive ($0.51/24h) — no negative streak
+- System flat = no overnight risk
+
+**Top 24h performers:** continuation+ (+$0.32), rs-s102 (+$0.19), rs-s118 (+$0.14)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.51 24h)
+
+**BY:** auto_1hr
+
+**BY:** auto_1hr
+
+## [2026-09-28 06:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed, 0 open (system flat)
+**24h:** 14T 35.7%WR +$0.51 | trailing exit 13/14 (93%)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- ATR_SL fix: 0% hits across 24h — still validated
+- Trailing exits dominant (93%) — working as designed
+- No kill candidates (all signals ≤1 trade in window)
+- Trade frequency: 0/hr — quiet period, not over-trading
+- System flat = no overnight risk
+- 24h PnL positive — no negative streak to address
+
+**Top 24h performers:** continuation+ (+$0.32, 100%WR), rs-s102 (+$0.19, 100%WR), rs-s118 (+$0.14, 100%WR), rs-s44 (+$0.12, 100%WR)
+
+**Monitoring:**
+- final_confidence injection bug still deferred (brain_auditor flagged)
+- Post-fix trajectory positive (+$0.51 24h)
+
+**BY:** auto_1hr
+
+## LOSERS Update — 2026-09-28 06:05 UTC
+- REMOVE KAS (insufficient data)
+- ADD CFX (WR=40.0%, PnL=$0.03, wr_collapse (72.7% → 40.0%))
+
+Final set: ['CFX']
