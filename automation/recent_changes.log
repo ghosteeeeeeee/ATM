@@ -1,3 +1,18 @@
+[2026-09-28 06:11 UTC] auto_1hr: NO CHANGE — analysis only
+  1 closure last hour (BTC LONG continuum+ via HL_CLOSED, +$0.00). 0 open positions.
+  7d: 122T 34.4%WR -$4.87 | 14d: 325T 43.4%WR -$3.86 | ATR_SL 0 hits/24h ✅
+  24h: 15T 53.3%WR +$0.51 (all profit-monster-trail exits). SHORT 14d -$3.85 (structural issue).
+  No kill candidates. No overtrading (1/hr).
+  BY: auto_1hr
+
+[2026-09-28 05:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 13T 38.5%WR -$0.04 (24h) | 122T 34.4%WR -$4.89 (7d) | 325T 43.7%WR -$4.00 (14d)
+  ATR_SL WIDENING VERIFIED: 0/15 post-fix ATR_SL hits. All exits profit-monster-trail.
+  CRITICAL DRIFT: volume_spike 96% NULL (313/325 14d) — fix not working 3+ days.
+  final_confidence 98% NULL — blocks confidence filtering.
+  SHORT R:R 0.76:1 (avg_loss > avg_win). SHORT -.99/14d (82% of losses).
+  CREATIVE: (1) volume_spike fix investigation (2) ATR_SL_MAX 2.0% EXTREME (3) SHORT RSI 35-50 penalty.
+  BY: brain_auditor
 [2026-09-28 01:20 UTC] auto_1hr: NO CHANGE — analysis only
   1 closure last hour (CFX SHORT mover- -$0.04 via profit-monster-trail). 2 open (GOAT SHORT, ALT LONG).
   7d: 127T 35.4%WR -$5.21 | 14d: 327T 43.7%WR -$4.40 | ATR_SL 0 hits/24h ✅

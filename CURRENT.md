@@ -52,14 +52,19 @@ System active. 0 open positions. Market SHORT_BIAS. Pipeline healthy. ATR_SL wid
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-28 05:35 UTC)
+## Audit Update (2026-09-28 06:00 UTC)
 
-- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/15 ATR_SL hits (0%). All exits profit-monster-trail. **SUCCESS CRITERIA: PASS.**
-- **volume_spike: CRITICAL DRIFT.** 96% NULL (313/325 14d). Fix deployed Sep 25 NOT working. Chase filter blind 3+ days.
-- **final_confidence: 98% NULL** — blocks confidence-based filtering (can't filter pump-chain+ by confidence).
-- **SHORT R:R 0.76:1** — avg_loss exceeds avg_win. Core problem.
-- **EXTREME ATR_SL 65.2% 7d** — includes pre-fix legacy. Post-fix: 0%.
-- **14d R:R 0.95:1** — avg win $0.14 vs avg loss -$0.15. System slightly net negative on R:R.
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 0/16 ATR_SL hits (0%). All exits profit-monster-trail. **SUCCESS CRITERIA: PASS.**
+- **volume_spike: PARTIALLY FIXED.** 13/16 post-fix (81%). 3 missing continuum/orphan paths. Chase filter partially blind.
+- **final_confidence: PARTIALLY FIXED.** 7/16 post-fix (43%). 9 NULL — blocks confidence-based filtering.
+- **RSI DATA: CONFIRMED.** Key is rsi_14 (not rsi_at_entry). 323/324 trades have RSI. LONG_RSI_CEILING=70 working (0 post-fix violations).
+- **CRITICAL: LONG RSI 60-70 KILLING FIELD.** 55T/14d 30.9%WR -$2.39. pump-chain+ RSI 60-70: 17T mostly losers. LONG_RSI_CEILING=70 only catches >70.
+- **SHORT_RSI_FLOOR=50: WORKING.** 1 pre-fix violation (ATOM Sep 24 21:46, before CEO fix at 22:00). 0 post-fix.
+- **SHORT 40-50 bleeding.** 48T/14d 45.8%WR -$1.56. Aging out (all disabled signals).
+- **14d LONG vs SHORT:** LONG -$0.01 (breakeven), SHORT -$3.63 (82% of losses).
+- **24h:** 15T 33.3%WR +$0.51. All small scratches.
+- **CREATIVE (3):** (1) LONG RSI 60-70 kill zone (+$1.00-1.50/7d, 55T sample, 0 winners blocked). (2) SHORT RSI 35-50 confidence penalty -20pt (+$0.30-0.60/7d, 6th suggestion). (3) Investigate volume_spike 3 remaining paths.
+- **0 CHANGES APPLIED.**
 
 ## Today's Changes (Sep 28)
 

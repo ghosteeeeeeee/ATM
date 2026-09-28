@@ -716,5 +716,33 @@
     "category": "new signal",
     "status": "suggested",
     "risk": "medium — needs backtest"
+  },
+  {
+    "date": "2026-09-28T06:37:53Z",
+    "idea": "LONG RSI 60-70 kill zone — block LONG entries when RSI is 60-70",
+    "rationale": "55T/14d 30.9%WR -$2.39. pump-chain+ LONG RSI 60-70: 17T mostly atr_sl_hit losers. LONG_RSI_CEILING=70 only catches >70, missing the worst band. RSI 50-60 is the sweet spot (70.6%WR +$2.19) — kill zone preserves this.",
+    "expected_impact": "+$1.00-1.50/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "0 winners blocked — all LONG winners have RSI<60 or RSI>70 (volume-breakout-long+ RSI 76.9 = $0.20 win is the exception, 1 of 18 trades).",
+    "sample_size": "55 trades (14d) — sufficient"
+  },
+  {
+    "date": "2026-09-28T06:37:53Z",
+    "idea": "SHORT RSI 35-50 confidence penalty -20pt (6th suggestion)",
+    "rationale": "48T/14d 45.8%WR -$1.56. SHORT_RSI_FLOOR=50 blocks some but STANDALONE_BYPASS signals leak through. Confidence penalty reduces fill quality without hard blocking.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry sniper",
+    "status": "suggested (recurring)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-28T06:37:53Z",
+    "idea": "Verify LONG_RSI_CEILING post-fix + investigate remaining volume_spike paths",
+    "rationale": "LONG_RSI_CEILING=70 verified working post-fix (0 violations). volume_spike 3 remaining paths (continuum/orphan) need coverage for full chase filter functionality.",
+    "expected_impact": "Verification + $0.30-0.80/7d once volume_spike fully fixed",
+    "category": "bug fix",
+    "status": "verified/monitored"
   }
 ]

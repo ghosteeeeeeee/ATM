@@ -1,3 +1,14 @@
+## Health Report — 2026-09-28 04:46 UTC
+- **OK**: Pipeline running (LIVE). Both services active. 59 timers active, all firing.
+- **OK**: Last cycle 04:44:33 completed clean. 0 open | 14 closed today | +22.97% PnL.
+- **OK**: Signals: 57 generated in last hour. Market flow healthy.
+- **OK**: Regime: NEUTRAL overall (112/116). LONG_BIAS: GRT, RUNE, ONDO. SHORT_BIAS: SKY (-4.52%).
+- **OK**: Speed: 127 tokens ≥50th percentile. Coin tracker: 88 processed, 0 errors.
+- **WARN**: Disk at 84% (94G/118G) — 1% below threshold. Monitor closely.
+- **OK**: Phantom trades: 2 near-zero PnL today (GOAT -0.0023, LTC +0.0016) — trivial, not ATR SL hits.
+- **OK**: Hotset: 0 hot, 81 warm, 7 cold. Market quiet, no actionable signals right now.
+- **AUTO-FIX**: None required.
+
 ## Health Report — 2026-09-27 06:49 UTC
 - **OK**: Pipeline running (LIVE). Both services active. Timer: `hermes-pipeline.timer` firing every minute.
 - **OK**: Last cycle 06:49 completed clean (rc=0 all steps). 0 open | 0 closed today | +0.00% PnL.
@@ -265,3 +276,8 @@
 - **CRITICAL** (Nx22/30min): `position_manager: FAILED (rc=1)` — "Guardian already running" race condition. Stale `hl-sync-guardian.py` process (PID 3298260, started Sep 26) blocking new guardian spawns.
 - **AUTO-FIX**: Killed stale guardian PID 3298260. Verified position_manager returns rc=0 on next cycle (#218944).
 - **FOLLOW-UP**: Guardian should be managed by systemd, not a bare process. Root cause: hl-sync-guardian timer/service may not be properly managing process lifecycle.
+
+## Error Alerts — 2026-09-28 01:58 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+- **REPEATED** (26x): `Sep N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`

@@ -1,107 +1,107 @@
 {
-  "timestamp": "2026-09-28T00:30:00Z",
+  "timestamp": "2026-09-28T06:36:30Z",
   "session_brain_stats": {
-    "top_insights": [
-      "RSI filtering at execution but NOT recorded in metadata — blind spot for analysis",
-      "final_confidence injection only works for signals with fc in sig dict — most signals skip it",
-      "pump-chain+ EXTREME 94.4% ATR_SL but +$0.96 — winners ride massive moves",
-      "SHORT RSI bands can't be analyzed — 100% NULL in metadata",
-      "Signal diversity critical — only 2 profitable LONG signals"
-    ],
-    "recurring_themes": [
-      "ATR_SL hit rate dominates losses (66/7d, 128/14d)",
-      "SHORT side = 82% of all losses",
-      "final_confidence metadata gap blocks confidence-based filtering",
-      "volume_spike partial fill — 3 hotset paths missing"
+    "signal_performance_queries": 10,
+    "creative_ideas_queries": 10,
+    "problem_queries": 10,
+    "key_sessions": [
+      "signal decay",
+      "chop vs trend",
+      "ema300_dip_short",
+      "coiled_trigger_long",
+      "trend following"
     ]
   },
   "trade_summary_24h": {
-    "trades": 11,
-    "win_rate": 45.5,
-    "pnl": 0.72,
-    "atr_sl_hits": 0,
-    "exit_reasons": {"profit-monster-trail": 10, "ORPHAN_PAPER": 1},
-    "post_deploy_risk_reward": "5.8:1 (avg_win $0.174 vs avg_loss $0.03)"
+    "trades": 14,
+    "winrate": 35.7,
+    "pnl": 0.54,
+    "best": "continuation+ LONG +$0.32, rs-s44 LONG +$0.12, rs-s118 LONG +$0.14",
+    "worst": "rs-s111 LONG -$0.12, mover- SHORT -$0.04"
+  },
+  "trade_summary_7d": {
+    "trades": 121,
+    "winrate": 34.4,
+    "pnl": -4.89,
+    "regimes": "EXTREME 65T 36.9%WR -$2.99, HIGH 34T 29.4%WR -$2.01, NORMAL 19T 42.1%WR +$0.14",
+    "atr_sl_hit_rate": "60/121 (49.6%)",
+    "post_fix_atr_sl": "0/16 (0%) — PASS"
   },
   "drift_findings": [
     {
-      "issue": "RSI NULL in _signal_metadata — ALL trades (350/350 14d)",
-      "root_cause": "decider_run.py reads RSI for filtering (line 4107) but never writes it to _exec_meta (line 4200-4217). Only gap_at_entry, staleness, volume_spike, final_confidence are injected.",
-      "impact": "Cannot analyze entry quality by RSI band. Blind to whether RSI filters are actually improving entries.",
-      "fix": "Add _exec_meta['rsi'] = _stored_rsi at line ~4212, after the drift check",
-      "effort": "1 line"
+      "issue": "LONG_RSI_CEILING=70 does not block RSI 60-70 bleeding band",
+      "detail": "55 LONG trades RSI 60-70/14d = 30.9%WR -$2.39. pump-chain+ LONG RSI 60-70: 17T mostly atr_sl_hit. LONG_RSI_CEILING=70 only catches >70.",
+      "impact": "-$2.39/14d = -$1.20/7d",
+      "severity": "HIGH"
     },
     {
-      "issue": "final_confidence NULL for 9/11 post-fix trades",
-      "root_cause": "Line 4216: sig.get('final_confidence') returns None for most signals. signal_compactor writes fc to DB but hotset signals bypass signal_compactor entirely. fc only exists in hotset.json, not in sig dict.",
-      "impact": "Cannot filter by confidence. Blocks pump-chain+ EXTREME confidence floor suggestion.",
-      "fix": "In hotset loading (line 2200+), merge fc from hotset_data into sig dict before execution",
-      "effort": "~5 lines"
+      "issue": "volume_spike fix partially working (81% post-fix) but 90% NULL overall",
+      "detail": "13/16 post-fix trades have volume_spike. 3 missing from continuum/orphan paths. 7d overall: 108/121 NULL (includes pre-fix legacy).",
+      "impact": "Chase filter partially blind. Expected +$0.30-0.80/7d once fully fixed.",
+      "severity": "MEDIUM"
     },
     {
-      "issue": "volume_spike missing for hotset-based trades (rs-s*, continuum_engine)",
-      "root_cause": "Line 4214: _crash_signal is None for hotset-based trades — crash_signal only computed for BTC/main signals via btc_crash_filter",
-      "impact": "Chase filter blind to volume quality for 27% of trades",
-      "fix": "In hotset loading, inject volume_spike from hotset data if available",
-      "effort": "~3 lines"
+      "issue": "final_confidence still 44% NULL post-fix",
+      "detail": "7/16 post-fix trades have final_confidence. 9 NULL — likely signals without hotset entry. Blocks confidence-based filtering.",
+      "impact": "Cannot filter pump-chain+ EXTREME by confidence. Expected +$0.50-1.00/7d.",
+      "severity": "MEDIUM"
+    },
+    {
+      "issue": "SHORT side 82% of ALL 14d losses (-$3.63)",
+      "detail": "143 SHORT trades 43.4%WR -$3.63. All disabled SHORT signals aging out. SHORT RSI 40-50 worst: 48T 45.8%WR -$1.56.",
+      "impact": "SHORT bleeding dominates system losses. Aging out naturally.",
+      "severity": "LOW (aging out)"
     }
   ],
-  "losing_trade_autopsy": {
-    "summary": "5 losers in 24h, all $0.01-$0.07, all profit-monster-trail exits. Normal variance, no systemic issue.",
-    "root_cause": "Trail tightening on small moves. Trades barely moved before trail triggered.",
-    "recommendation": "No action needed — these are noise-level losses"
-  },
-  "signal_quality_deep_dive": {
-    "pump_chain_extreme_paradox": {
-      "atr_sl_hit_rate": "94.4% (34/36) in 14d EXTREME",
-      "net_pnl": "+$0.96",
-      "explanation": "Winners avg +$0.266, losers avg -$0.165. Winners ride 3-11% moves. Losers stopped at 1.6% avg. R:R heavily favors winners despite high hit rate.",
-      "implication": "ATR_SL widening is helping — but the real edge is that momentum carries winners far. Don't over-optimize SL."
-    },
-    "signal_diversity": {
-      "profitable_long_signals": ["volume-breakout-long+ (+$1.46/14d, 66.7%WR)", "pump-chain+ (+$0.85/14d, 40.3%WR)"],
-      "profitable_short_signals": "NONE — all SHORT signals negative",
-      "recommendation": "Priority: build 1-2 new LONG signals for NEUTRAL regime diversity"
-    }
-  },
+  "recurring_problems": [
+    "Signal diversity CRITICAL — only volume-breakout-long+ and pump-chain+ profitable for 14d+",
+    "ATR_SL hit rate 49.6% 7d — post-fix 0% but pre-fix legacy inflates number",
+    "SHORT side dominates losses — all disabled SHORT signals aging out",
+    "HIGH regime worst performer — REGIME_CONF_HIGH_MULT=0.50 deployed but untested with real trades"
+  ],
+  "missing_implementations": [
+    "SHORT RSI 35-50 confidence penalty (-20pt) — suggested 6+ times, never implemented",
+    "New NEUTRAL regime signal — discussed in sessions (ema300_dip, coiled_trigger, trend following) but none deployed",
+    "volume_spike full fix — 3 remaining code paths (continuum/orphan) need coverage",
+    "final_confidence injection for all signal paths"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-09-28T00:30:00Z",
-      "idea": "Inject RSI into _signal_metadata for post-trade analysis",
-      "rationale": "350/350 trades have NULL RSI. We can't analyze entry quality, can't verify RSI filters are working, can't tune RSI-based parameters. One line fix unlocks all RSI-based optimization.",
-      "expected_impact": "Unlocks $0.50-1.50/7d from data-driven RSI band optimization",
-      "category": "data quality",
+      "date": "2026-09-28T06:36:30Z",
+      "idea": "Block LONG entries in RSI 60-70 band (add LONG_RSI_KILL_ZONE 60-70)",
+      "rationale": "55T/14d 30.9%WR -$2.39. pump-chain+ LONG RSI 60-70: 17T mostly losers. This is a confirmed killing field. LONG_RSI_CEILING=70 only catches >70. Adding a kill zone for 60-70 would block the worst band without affecting the sweet spot (50-60 = 70.6%WR +$2.19).",
+      "expected_impact": "+$1.00-1.50/7d",
+      "category": "entry sniper",
       "status": "suggested",
       "risk": "low",
-      "effort": "1 line"
+      "impact_on_winners": "Checked: pump-chain+ LONG RSI 50-60 winners (JUP, ADA, AVAX, INJ) all have RSI<60 — 0 winners blocked. volume-breakout-long+ RSI 50-60 winners — 0 blocked. Only trades with RSI 60-70 would be blocked.",
+      "sample_size": "55 trades (14d) — sufficient"
     },
     {
-      "date": "2026-09-28T00:30:00Z",
-      "idea": "Fix final_confidence injection from hotset.json",
-      "rationale": "9/11 post-fix trades NULL. Blocks confidence-based filtering. pump-chain+ EXTREME could use fc floor 70% to reduce false entries.",
-      "expected_impact": "+$0.50-1.00/7d from confidence filtering",
-      "category": "data quality",
-      "status": "suggested",
+      "date": "2026-09-28T06:36:30Z",
+      "idea": "SHORT RSI 35-50 confidence penalty -20pt (6th suggestion)",
+      "rationale": "48T/14d 45.8%WR -$1.56. SHORT_RSI_FLOOR=50 blocks some but trades still execute via STANDALONE_BYPASS. Confidence penalty reduces fill quality without hard blocking.",
+      "expected_impact": "+$0.30-0.60/7d",
+      "category": "entry sniper",
+      "status": "suggested (recurring)",
       "risk": "low",
-      "effort": "5 lines"
+      "impact_on_winners": "SHORT RSI 50-60 has 26T 46.2%WR — penalty would reduce some winners but net positive from blocking 40-50 losers."
     },
     {
-      "date": "2026-09-28T00:30:00Z",
-      "idea": "NEW EMA-reclaim LONG signal for NEUTRAL regime",
-      "rationale": "Only 2 profitable LONG signals. NEUTRAL regime dominates (333/334 trades 14d). Need diversity. Session brain shows repeated requests for new NEUTRAL signal.",
-      "expected_impact": "+$0.50-1.00/7d from diversity + reduced pump-chain+ dependency",
-      "category": "new signal",
-      "status": "suggested",
-      "risk": "medium",
-      "effort": "new signal module"
+      "date": "2026-09-28T06:36:30Z",
+      "idea": "Investigate LONG_RSI_CEILING leak — why do RSI 70+ trades still execute?",
+      "rationale": "39 LONG trades RSI 70+/14d executed despite LONG_RSI_CEILING=70. These are pre-fix legacy (Sep 21-24). Post-fix (Sep 26+): need to verify 0 violations. Code checks both live and detection-time RSI.",
+      "expected_impact": "Verification only — no change needed if working",
+      "category": "verification",
+      "status": "needs_check"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "1. RSI injection fix — 1 line in decider_run.py (unlocks RSI analysis)",
-    "2. final_confidence injection fix — 5 lines in decider_run.py hotset path",
-    "3. Monitor ATR_SL widening (11 post-fix trades, 0 hits — PASS criteria met)",
-    "4. Monitor pump-chain+ cold streak (7d: 20T 20%WR -$1.60 — was +$1.24/14d)",
-    "5. Build new NEUTRAL signal (EMA-reclaim or similar)"
+    "Verify LONG_RSI_CEILING=70 is blocking post-fix (0 RSI>70 LONG trades since Sep 26)",
+    "Fix volume_spike remaining 3 code paths (continuum/orphan)",
+    "Fix final_confidence injection for all signal paths",
+    "Monitor pump-chain+ cold streak recovery (14d still profitable +$0.85)",
+    "Develop new NEUTRAL regime signal for diversity"
   ]
 }
