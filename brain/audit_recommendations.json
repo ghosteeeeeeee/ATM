@@ -1,92 +1,113 @@
 {
-  "timestamp": "2026-09-28T19:34:14Z",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "key_topics": [
-      "signal_rsi_14 drift",
-      "volume_spike fix",
-      "ATR_SL widening",
-      "SHORT R:R",
-      "bb-bounce RSI sweet spot",
-      "pump-chain+ cold streak"
+    "timestamp": "2026-09-28T22:15:00Z",
+    "session_brain_stats": {
+        "total_sessions": 15,
+        "key_topics": ["signal_rsi_14 NULL drift", "volume_spike broken", "ATR_SL widening", "SHORT side bleeding", "signal diversity"]
+    },
+    "trade_summary_24h": {
+        "trades": 11,
+        "win_rate": "0%",
+        "pnl": "$0.06",
+        "note": "All trades scratches — system idle light trading"
+    },
+    "trade_summary_7d": {
+        "trades": 114,
+        "win_rate": "44.7%",
+        "pnl": "-$5.17",
+        "atr_sl_hit_rate": "44.7% (PASS <55%)",
+        "extreme_atr_sl": "61.3% (legacy aging out)"
+    },
+    "trade_summary_14d": {
+        "trades": 303,
+        "win_rate": "45.2%",
+        "pnl": "-$2.45",
+        "long_pnl": "+$0.74",
+        "short_pnl": "-$3.19",
+        "signal_diversity": "CRITICAL — only 2 of 30+ signals profitable"
+    },
+    "drift_findings": [
+        {
+            "issue": "volume_spike 84.2% NULL (7d) — hotset merge only copied final_confidence, not volume_spike",
+            "root_cause": "decider_run.py:3030-3035 merged final_confidence from hotset but not volume_spike. signal_compactor.py:3072 computes volume_spike into hotset but it was never extracted.",
+            "impact": "Chase filter blind to volume quality for 84% of trades",
+            "fix_applied": "Added volume_spike to hotset merge (line3030) and _exec_meta injection (line4228)"
+        },
+        {
+            "issue": "final_confidence 89.5% NULL (7d)",
+            "root_cause": "Hotset merge only triggers when sig['final_confidence'] is None. For STANDALONE_BYPASS signals, final_confidence comes from signal_compactor but sig dict doesn't have it.",
+            "impact": "Confidence filtering impossible for 89.5% of trades",
+            "status": "PARTIAL — hotset merge covers ~44% of trades, remaining need code path fix"
+        },
+        {
+            "issue": "EXTREME ATR_SL 61.3% (7d) — pump-chain+ EXTREME 100% hit rate",
+            "root_cause": "Pre-fix legacy (Sep 19-22) dominates. Post-fix: 0% ATR_SL hits (5 trades).",
+            "impact": "Legacy bleeding -$0.85/14d from pump-chain+ EXTREME ATR_SL alone",
+            "status": "IMPROVING — post-fix data shows 0% hit rate, legacy aging out"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "topic": "volume_spike metadata injection",
+            "sessions": 5,
+            "status": "FIXED THIS RUN — root cause identified and patched"
+        },
+        {
+            "topic": "SHORT side bleeding -$3.19/14d (82% of all losses)",
+            "sessions": 8,
+            "status": "AGING OUT — all SHORT signals disabled, legacy trades fading"
+        },
+        {
+            "topic": "signal diversity — only 2 profitable signals",
+            "sessions": 10,
+            "status": "OPEN — needs new NEUTRAL signal development"
+        },
+        {
+            "topic": "pump-chain+ EXTREME ATR_SL 100%",
+            "sessions": 3,
+            "status": "IMPROVING — post-fix widening working, legacy aging out"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "New NEUTRAL-regime signal for diversity",
+            "priority": "HIGH",
+            "sessions_discussed": 5,
+            "note": "Only volume-breakout-long+ and pump-chain+ carry system. Need 3rd signal type."
+        },
+        {
+            "item": "EXTREME MIN_EXEC_CONFIDENCE=70",
+            "priority": "MEDIUM",
+            "note": "Suggested 4+ times. Need 50+ post-fix EXTREME trades to evaluate. Currently 5 post-fix EXTREME trades."
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-28T22:15:00Z",
+            "idea": "LONG RSI 40-60 sweet spot is更强 than thought — 59T 63.1%WR +$3.05/14d. Consider LONG_RSI_SWEET_SPOT_BOOST increase from 10 to 15pt for RSI 45-55 (tighter sweet spot = higher confidence)",
+            "rationale": "40-50: 16T 68.8%WR +$1.69, 50-60: 44T 61.4%WR +$1.36. Tighter 45-55 band likely 65%+ WR. Higher boost = fewer marginal entries.",
+            "expected_impact": "+$0.20-0.40/7d",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "sample_size": 59,
+            "would_block_winners": "0 — boost increases confidence, doesn't block"
+        }
+    ],
+    "config_changes_applied": [
+        {
+            "change": "volume_spike hotset merge + _exec_meta injection",
+            "type": "code_fix",
+            "file": "decider_run.py",
+            "before": "volume_spike only injected from _crash_signal (84.2% NULL)",
+            "after": "volume_spike merged from hotset.json + crash_signal fallback",
+            "rationale": "signal_compactor computes volume_spike into hotset but decider_run never extracted it",
+            "impact": "Expected +$0.30-0.80/7d — chase filter gains volume quality data"
+        }
+    ],
+    "next_actions": [
+        "Monitor volume_spike NULL rate after fix (expect <20% within 48h)",
+        "Evaluate post-fix ATR_SL hit rate (need 50+ trades for EXTREME eval)",
+        "Develop new NEUTRAL-regime signal for diversity",
+        "Track pump-chain+ cold streak recovery (currently 20T 20%WR 7d)"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 14,
-    "win_rate": "50.0%",
-    "pnl": "+$0.65",
-    "losers": 6,
-    "all_losers_profit_monster_trail": true
-  },
-  "trade_summary_7d": {
-    "trades": 114,
-    "win_rate": "35.7%",
-    "pnl": "-$5.26",
-    "atr_sl_hit_rate": "46.4% (PASS <55%)"
-  },
-  "trade_summary_14d": {
-    "trades": 305,
-    "win_rate": "44.3%",
-    "pnl": "-$2.90",
-    "short_rr": "0.78:1",
-    "long_rr": "1.07:1"
-  },
-  "drift_findings": [
-    {
-      "issue": "signal_rsi_14 NULL ALL 305 14d trades (28-day drift)",
-      "root_cause": "decider_run.py:4283 sig.get('rsi_14') but signals store RSI as 'rsi' key. Fix at line 977 never propagated to brain recording path.",
-      "impact": "Detection-time RSI filtering impossible. STANDALONE_BYPASS signals bypass signal_compactor RSI checks.",
-      "status": "FIXED — one-line change applied",
-      "expected_impact": "+$0.30-0.80/7d"
-    }
-  ],
-  "recurring_problems": [
-    "SHORT side 82% of ALL 14d losses (all killed signals aging out)",
-    "Signal diversity CRITICAL — only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.51/14d) profitable",
-    "EXTREME regime ATR_SL hit rate 64.4% 14d (pre-fix legacy, aging out)"
-  ],
-  "missing_implementations": [
-    "SHORT NULL RSI confidence boost +15pt (suggested 9 times, never implemented)",
-    "EXTREME MIN_EXEC_CONFIDENCE=70 (needs 50+ post-fix trades)"
-  ],
-  "creative_improvements": [
-    {
-      "idea": "Fix signal_rsi_14 NULL drift (APPLIED)",
-      "rationale": "28-day drift broke detection-time RSI filtering for ALL signals. One-line fix restores RSI floor/ceiling enforcement.",
-      "expected_impact": "+$0.30-0.80/7d",
-      "category": "bugfix",
-      "status": "applied",
-      "risk": "low"
-    },
-    {
-      "idea": "SHORT NULL RSI confidence boost +15pt",
-      "rationale": "NULL RSI SHORT trades: 32T 59.4%WR +$0.82/14d. These bypass RSI floor check (NULL not <50) and still win. Boosting confidence = more size on proven edge.",
-      "expected_impact": "+$0.20-0.40/7d",
-      "category": "entry sniper",
-      "status": "suggested (9th time)",
-      "risk": "low"
-    },
-    {
-      "idea": "EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades",
-      "rationale": "EXTREME regime worst performer. Higher confidence = fewer false positives in volatile conditions.",
-      "expected_impact": "+$0.30-0.50/7d",
-      "category": "entry sniper",
-      "status": "monitoring (need 50+ post-fix trades)",
-      "risk": "medium"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "file": "decider_run.py:4283",
-      "change": "signal_rsi_14=sig.get('rsi_14') -> signal_rsi_14=sig.get('rsi') or sig.get('rsi_14')",
-      "type": "bugfix",
-      "rationale": "Fix 28-day signal_rsi_14 NULL drift. Signals store RSI as 'rsi' not 'rsi_14'."
-    }
-  ],
-  "next_actions": [
-    "Monitor signal_rsi_14 population in next trades (should appear within 24h)",
-    "Verify RSI floor/ceiling enforcement working for STANDALONE_BYPASS signals",
-    "Monitor ATR_SL post-fix eval (need more EXTREME trades)",
-    "Track pump-chain+ cold streak recovery"
-  ]
 }

@@ -3027,13 +3027,14 @@ def run(dry_run=False):
         sig_id = sig.get('signal_id')
         token = sig.get('token', '').upper()
         direction = sig['direction']
-        # ponytail: merge final_confidence from hotset.json into sig dict (was 100% NULL)
-        if sig.get('final_confidence') is None:
-            for _hs in _current_hotset:
-                if _hs.get('token', '').upper() == token and _hs.get('direction', '').upper() == direction.upper():
-                    if _hs.get('final_confidence') is not None:
-                        sig['final_confidence'] = _hs['final_confidence']
-                    break
+        # ponytail: merge final_confidence + volume_spike from hotset.json into sig dict (was 100% NULL)
+        for _hs in _current_hotset:
+            if _hs.get('token', '').upper() == token and _hs.get('direction', '').upper() == direction.upper():
+                if sig.get('final_confidence') is None and _hs.get('final_confidence') is not None:
+                    sig['final_confidence'] = _hs['final_confidence']
+                if _hs.get('volume_spike') is not None:
+                    sig['volume_spike'] = _hs['volume_spike']
+                break
         confidence = sig.get('final_confidence')
         source = sig.get('source', '')
         in_hotset = token in _hot_tokens
@@ -4224,8 +4225,12 @@ def run(dry_run=False):
                 _exec_meta['rsi'] = round(float(_meta_rsi), 2)
         except Exception:
             pass
-        if _crash_signal is not None:
-            _exec_meta['volume_spike'] = round(getattr(_crash_signal, 'volume_spike', 0.0), 2)
+        # ponytail: inject volume_spike — hotset first, crash_signal fallback
+        _vs = sig.get('volume_spike')
+        if _vs is None and _crash_signal is not None:
+            _vs = getattr(_crash_signal, 'volume_spike', None)
+        if _vs is not None:
+            _exec_meta['volume_spike'] = round(float(_vs), 2)
         # ponytail: inject final_confidence for post-trade analysis (was 100% NULL)
         if sig.get('final_confidence') is not None:
             _exec_meta['final_confidence'] = sig['final_confidence']

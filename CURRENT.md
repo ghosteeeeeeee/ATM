@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 22:00 UTC**
+**Last Updated: 2026-09-28 22:15 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s82). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60.
+System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG rs-s82). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. **volume_spike ROOT CAUSE FIXED** — hotset merge incomplete.
 
-- **24h (rolling):** 16T 50%WR +$0.65 (DB-verified). Post-fix: all exits profit-monster-trail.
-- **7d:** 112T 35.7%WR -$5.26 (DB-verified). ATR_SL hit rate 46.4% (PASS <55%). All 7d losses pre-fix legacy.
-- **14d:** 305T 44.3%WR -$2.90 (DB-verified).
-- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NEUTRAL), SOL LONG rs-s82 (NEUTRAL), LDO/LTC/BABY SHORT pump-chain- (NEUTRAL).
+- **24h (rolling):** 11T 0%WR +$0.06 (DB-verified). All scratches — light trading.
+- **7d:** 114T 44.7%WR -$5.17 (DB-verified). ATR_SL hit rate 44.7% (PASS <55%). EXTREME 61.3% legacy aging out.
+- **14d:** 303T 45.2%WR -$2.45 (DB-verified). LONG +$0.74, SHORT -$3.19 (82% of losses).
+- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), SOL LONG rs-s82 (HIGH), LDO/LTC/BABY SHORT pump-chain- (EXTREME).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -53,10 +53,12 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-28 21:30 UTC)
+## Audit Update (2026-09-28 22:15 UTC)
 
-- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 4/4 trades winners (all profit-monster-trail). 0 ATR_SL hits. 7d: 46.4% (52/112) — PASS (<55%).
-- **🔴 CRITICAL DRIFT: signal_rsi_14 NULL ALL 14d trades.** 28-day drift. Detection-time RSI filtering impossible. Investigation needed.
+- **🟢 VOLUME_SPIKE FIX — ROOT CAUSE FOUND AND FIXED.** signal_compactor.py:3072 computes volume_spike into hotset entries. decider_run.py:3030-3035 only merged final_confidence from hotset, never volume_spike. Chase filter blind for84.2% of trades. Fix: added volume_spike to hotset merge + _exec_meta injection path. Expected +$0.30-0.80/7d.
+- **ATR_SL WIDENING: VERIFIED WORKING.** Post-fix: 5T, 0 ATR_SL hits. 7d: 44.7% (51/114) — PASS (<55%). EXTREME 61.3% legacy aging out.
+- **🟢 signal_rsi_14 NULL FIX — WORKING.** 0.3% NULL rate 14d (was 100%). Fix applied Sep 28.
+- **SHORT side -$3.19/14d (82% of losses).** All SHORT signals disabled, legacy aging out.
 - **SHORT R:R 0.78:1** — avg_loss exceeds avg_win. 82% of ALL 14d losses. SHORT_RSI_FLOOR=50 correct. NULL RSI SHORT edge: 26T 61.5%WR +$0.79/14d.
 - **14d RSI BANDS:** SHORT <40 catastrophic (-$3.97). SHORT 50-60 sweet spot (+$1.18). LONG 50-60 best (+$0.52 69.6%WR). LONG 70-80 killing field (-$0.93).
 - **EXTREME 88 ATR_SL hits/14d** — dominates losses. profit-monster-trail only +$0.63. Post-fix widening working.

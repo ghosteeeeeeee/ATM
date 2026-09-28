@@ -336,3 +336,10 @@
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`
+
+## Error Alerts — 2026-09-28 19:58 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.6s (rc=N)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`

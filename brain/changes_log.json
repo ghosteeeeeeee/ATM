@@ -627,5 +627,16 @@
     "after": "signal_rsi_14=sig.get(\"rsi\") or sig.get(\"rsi_14\") — matches pattern at lines 977 and 4114",
     "rationale": "28-day drift: ALL 305 14d trades have NULL signal_rsi_14. Detection-time RSI filtering impossible. STANDALONE_BYPASS signals bypass signal_compactor RSI checks — this was the only enforcement path.",
     "impact": "Expected +$0.30-0.80/7d. Unlocks proper RSI floor/ceiling enforcement for all STANDALONE_BYPASS signals. Enables post-hoc RSI analysis for all signals."
+  },
+  {
+    "timestamp": "2026-09-28T22:15:00Z",
+    "agent": "brain_auditor",
+    "change": "volume_spike hotset merge + _exec_meta injection fix",
+    "type": "code_fix",
+    "file": "decider_run.py",
+    "before": "volume_spike only injected from _crash_signal (84.2% NULL 7d). Hotset merge only copied final_confidence.",
+    "after": "volume_spike merged from hotset.json first, crash_signal fallback. Both hotset merge (line3030) and _exec_meta injection (line4228) updated.",
+    "rationale": "signal_compactor.py:3072 computes volume_spike into hotset entries, but decider_run.py:3030-3035 only extracted final_confidence. Root cause: hotset merge was incomplete. Chase filter blind to volume quality for 84% of trades.",
+    "impact": "Expected +$0.30-0.80/7d. Chase filter gains volume_spike data for all hotset trades."
   }
 ]

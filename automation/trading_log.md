@@ -1421,3 +1421,18 @@ BY: auto_1hr
 - BTC LONG continuum-osc+ flat after 5h — monitoring
 
 **BY:** auto_1hr
+
+## [2026-09-28 20:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | **Open:** 6 (3 SHORT pump-chain-, 1 LONG rs-s82, 1 LONG continuum-osc+, 1 LONG rs-s56)
+**Open PnL:** +$0.47 combined — positions healthy, all in profit or flat
+**24h:** 13T 86.7%WR +$0.40 | **Today:** 9T 44.4%WR -$0.02 | **7d:** 114T 36.8%WR -$5.23
+
+**24h close reasons:** profit-monster-trail 11T +$0.52 (dominant exit ✅)
+
+**No Change Needed:**
+- 0 kills — all 7d signal losses from pre-fix ATR_SL era, aging out
+- ATR_SL fix validated (15T+ post-fix, 0 hits)
+- System trading lightly with quality — no overtrading, no bad entries
+
+**BY:** auto_1hr
