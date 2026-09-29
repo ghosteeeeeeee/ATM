@@ -1,3 +1,33 @@
+## [2026-09-28 18:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L, +$0.35) | 4 open (BABY SHORT, WLFI LONG, GOAT SHORT, BTC LONG 17.9h)
+**24h:** 21T 47.6%WR +$0.54 | **7d:** 113T 41.6%WR -$3.92
+
+**ATR SL:** 0/21 (0%) 24h post-fix ✅ | 0 atr_sl_hit in 24h
+**Exits:** 10 profit-monster-trail, 11 hard_sl
+**Direction 7d:** LONG 52T -$1.23 | SHORT 61T -$2.69 (both negative)
+**Regime 7d:** NORMAL 19T +$0.21 | EXTREME 59T -$2.32 | HIGH 32T -$1.82
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits 24h ✅
+- No kill candidates: worst signals already killed (pullback-entry-, mover+, mover-)
+- Trade frequency: 2/hr — low weekend volume, normal
+- 4 open positions manageable
+
+**Signal Analysis (24h):**
+- Winners: pump-chain- 6T +$1.05 (100% WR), rs-s56 $0.19, doji-bottom-long $0.16
+- Losers: mover- 2T -$0.68 (killed), rs-s31 -$0.20, rs-r33,rs-r34,rs-r35 -$0.20
+
+**Structural Issues (not hourly-fixable):**
+- EXTREME regime = 52% of 7d loss ($-2.32)
+- SHORT side 7d = -$2.69 (61T, 41% WR)
+
+BY: auto_1hr
+
+---
+
 ## [2026-09-28 16:13 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | 1 open (BTC LONG continuum-osc+, flat) | 5 today (0W 5L, -$0.21)

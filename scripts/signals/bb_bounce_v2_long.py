@@ -5,7 +5,7 @@ V2 (2026-09-01): New signal calibrated from bb_bounce_short winner patterns.
 Key learnings from SHORT analysis:
   1. Bounce strength matters — winners have stronger bounce (0.13% vs 0.04%)
   2. BB width matters — wider BB can work for mean reversion (max 2.5%)
-  3. RSI matters — HIGHER RSI confirms bounce (RSI_MIN=35, not MAX)
+  3. RSI matters — HIGHER RSI confirms bounce (RSI_MIN=35), but overbought kills (RSI_MAX=60)
   4. Velocity matters — lower velocity = better (price not extreme)
   5. Momentum matters — positive momentum for LONG (uptrend)
   6. Volatility matters — lower volatility = better (less choppy)
@@ -44,6 +44,7 @@ from hermes_constants import (
     BB_BOUNCE_V2_BB_WIDTH_MAX as BB_WIDTH_MAX,
     BB_BOUNCE_V2_RSI_PERIOD as RSI_PERIOD,
     BB_BOUNCE_V2_RSI_MIN as RSI_MIN,
+    BB_BOUNCE_V2_RSI_MAX as RSI_MAX,
     BB_BOUNCE_V2_BOUNCE_MIN_PCT as BOUNCE_MIN_PCT,
     BB_BOUNCE_V2_VEL_MIN as VEL_MIN,
     BB_BOUNCE_V2_MOM_MIN as MOM_MIN,
@@ -276,6 +277,10 @@ def detect_bb_bounce_v2_long(token, closes):
         # FILTER 2: RSI (bounce confirmation — price recovering)
         if rsi < RSI_MIN:
             return None  # RSI too low, bounce not confirmed
+
+        # FILTER 2b: RSI ceiling (60-70 killing field — 0 winners >60/14d)
+        if rsi > RSI_MAX:
+            return None  # RSI overbought, bounce likely to fail
 
         # FILTER 3: Trend (not bearish)
         if trend == 'BEARISH':

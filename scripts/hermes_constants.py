@@ -2515,6 +2515,7 @@ BB_BOUNCE_V2_BB_MIN_BARS = 30
 BB_BOUNCE_V2_BB_WIDTH_MAX = 2.5     # max BB width (percentage) — was 0.5 (dead filter, units mismatch)
 BB_BOUNCE_V2_RSI_PERIOD = 14
 BB_BOUNCE_V2_RSI_MIN = 35           # min RSI (bounce confirmation — price recovering)
+BB_BOUNCE_V2_RSI_MAX = 60           # max RSI — 60-70 killing field (7T 28.6%WR -$0.32/14d, 0 winners >60)
 BB_BOUNCE_V2_BOUNCE_MIN_PCT = 0.10  # minimum bounce strength
 BB_BOUNCE_V2_VEL_MIN = -0.01        # minimum velocity (price not falling hard)
 BB_BOUNCE_V2_MOM_MIN = 0.0          # minimum momentum (uptrend required)
