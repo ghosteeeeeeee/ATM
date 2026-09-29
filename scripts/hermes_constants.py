@@ -1763,7 +1763,6 @@ NEVER_REENABLE_FLAGS = {
     'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
     'PUMP_FLOW_PLUS_ENABLED',      # SIGNAL REPORTER 2026-09-22 — 13T/24h 15.4%WR -$1.51. ALL regimes lose (EXTREME 20%, HIGH 0%). NEVER_REENABLE.
     'PUMP_CHAIN_V4_ENABLED',       # SIGNAL REPORTER 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-    'PUMP_CHAIN_V5_ENABLED',       # SIGNAL REPORTER 2026-09-28 — pump-chain+ LONG 20%WR -$1.26 (7d). EXTREME 25%WR, HIGH 0%WR. ALL regimes lose. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant

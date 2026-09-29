@@ -25,6 +25,7 @@ from paths import HERMES_DATA, WWW_DATA, RUNTIME_DB
 from hermes_constants import (
     PUMP_FLOW_ENABLED,
     PUMP_CHAIN_V5_ENABLED,
+    PUMP_CHAIN_VEL_30M_MIN,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
     PUMP_FLOW_COOLDOWN_HOURS,
@@ -39,7 +40,6 @@ from hermes_constants import (
 )
 
 # ── V5 Constants ──────────────────────────────────────────────────────────────
-PUMP_CHAIN_V5_VELOCITY_THRESHOLD = -0.3   # 30m velocity must be > this to allow LONG
 PUMP_CHAIN_V5_BTC_FILTER = -0.1           # BTC 1h must be > this to allow LONG
 
 SIGNAL_TYPE = 'pump-chain'
@@ -152,10 +152,10 @@ def _check_30m_velocity(token):
     return None
 
 
-def _check_wave_phase(token):
+def _get_signal_metadata(token):
     """
-    Check wave_phase from PostgreSQL signal_metadata.
-    Returns phase string or None if not available.
+    Get wave_phase and momentum_state from PostgreSQL signal_metadata.
+    Returns (wave_phase, momentum_state) tuple or (None, None) if not available.
     """
     conn = None
     try:
@@ -175,7 +175,7 @@ def _check_wave_phase(token):
         
         if row and row[0]:
             meta = json.loads(row[0]) if isinstance(row[0], str) else row[0]
-            return meta.get('wave_phase')
+            return meta.get('wave_phase'), meta.get('momentum_state')
     except Exception:
         pass
     finally:
@@ -184,42 +184,19 @@ def _check_wave_phase(token):
                 conn.close()
             except Exception:
                 pass
-    return None
+    return None, None
+
+
+def _check_wave_phase(token):
+    """Check wave_phase from PostgreSQL."""
+    wave_phase, _ = _get_signal_metadata(token)
+    return wave_phase
 
 
 def _check_momentum_state(token):
-    """
-    Check momentum_state from PostgreSQL signal_metadata.
-    Returns state string or None if not available.
-    """
-    conn = None
-    try:
-        import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', database='brain', 
-                               user='postgres', connect_timeout=3)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT _signal_metadata FROM trades
-            WHERE token = %s AND signal LIKE '%pump-chain%'
-            AND _signal_metadata IS NOT NULL
-            AND direction = 'LONG'
-            ORDER BY close_time DESC LIMIT 1
-        """, (token,))
-        row = cur.fetchone()
-        cur.close()
-        
-        if row and row[0]:
-            meta = json.loads(row[0]) if isinstance(row[0], str) else row[0]
-            return meta.get('momentum_state')
-    except Exception:
-        pass
-    finally:
-        if conn:
-            try:
-                conn.close()
-            except Exception:
-                pass
-    return None
+    """Check momentum_state from PostgreSQL."""
+    _, momentum_state = _get_signal_metadata(token)
+    return momentum_state
 
 
 def scan_signals():
@@ -268,8 +245,8 @@ def scan_signals():
         # Evidence: Winners +0.192%, Losers -1.077% (p=0.000)
         # Must be > -0.3% to allow LONG
         vel_30m = _check_30m_velocity(token)
-        if vel_30m is not None and vel_30m < PUMP_CHAIN_V5_VELOCITY_THRESHOLD:
-            _log(f"  [PUMP-CHAIN-V5] {token} LONG blocked — 30m vel={vel_30m:+.3f}% < {PUMP_CHAIN_V5_VELOCITY_THRESHOLD}%")
+        if vel_30m is not None and vel_30m < PUMP_CHAIN_VEL_30M_MIN:
+            _log(f"  [PUMP-CHAIN-V5] {token} LONG blocked — 30m vel={vel_30m:+.3f}% < {PUMP_CHAIN_VEL_30M_MIN}%")
             continue
         
         # ── V5 FILTER 2: Wave Phase ────────────────────────────────────────
@@ -367,7 +344,7 @@ if __name__ == '__main__':
                 momentum = _check_momentum_state(token)
                 conf = _compute_signal_confidence(rec, phase)
                 
-                vel_ok = vel is None or vel >= PUMP_CHAIN_V5_VELOCITY_THRESHOLD
+                vel_ok = vel is None or vel >= PUMP_CHAIN_VEL_30M_MIN
                 wave_ok = wave != 'bottoming'
                 momentum_ok = momentum != 'flat'
                 

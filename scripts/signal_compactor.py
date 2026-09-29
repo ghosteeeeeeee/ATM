@@ -1095,6 +1095,28 @@ def _check_directional_cap(direction: str) -> str | None:
             except Exception: pass
 
 
+# ── TVS Cooldown Override Rate Limiter ──────────────────────────────────────
+# Max 1 thesis override per token:direction per 4 hours
+_thesis_override_tracker = {}  # {(token, direction): (count, first_time_ts)}
+_THESIS_OVERRIDE_MAX = 1
+_THESIS_OVERRIDE_WINDOW = 14400  # 4 hours
+
+def _can_override_cooldown(token, direction):
+    """Check if we can apply a thesis cooldown override (rate-limited)."""
+    import time
+    key = (token.upper(), direction.upper())
+    now = time.time()
+    count, first_time = _thesis_override_tracker.get(key, (0, 0))
+    if now - first_time > _THESIS_OVERRIDE_WINDOW:
+        # Window expired — reset
+        _thesis_override_tracker[key] = (1, now)
+        return True
+    if count < _THESIS_OVERRIDE_MAX:
+        _thesis_override_tracker[key] = (count + 1, first_time)
+        return True
+    return False
+
+
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data,
@@ -2642,7 +2664,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass  # Allow through — continuum says bearish
                 elif _regime == 'SHORT_BIAS':
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but 1m SHORT_BIAS, allowed")
-                elif unique_signal_types >= 2 or (bare_source in STANDALONE_BYPASS_SIGNALS and _btc_mom_ok_for_bypass):
+                elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
                     if not _btc_mom_ok_for_bypass:
@@ -2653,7 +2675,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if LONG_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL':
                 if _regime == 'LONG_BIAS':
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but 1m LONG_BIAS, allowed")
-                elif unique_signal_types >= 2 or (bare_source in STANDALONE_BYPASS_SIGNALS and _btc_mom_ok_for_bypass):
+                elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
                     if not _btc_mom_ok_for_bypass:
@@ -2991,11 +3013,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _tvs_c2 = _tvs_conn2.cursor()
                                 _tvs_c2.execute("""
                                     SELECT thesis_validated, thesis_mfe FROM signal_outcomes
-                                    WHERE token = ? AND direction = ? AND thesis_validated IS NOT NULL
-                                    ORDER BY created_at DESC LIMIT 3
-                                """, (token.upper(), direction.upper()))
+                                    WHERE token = ? AND direction = ? AND signal_type = ? AND thesis_validated IS NOT NULL
+                                    ORDER BY created_at DESC LIMIT ?
+                                """, (token.upper(), direction.upper(), signal_type, TVS_LOOKBACK_TRADES))
                                 _tvs_rows2 = _tvs_c2.fetchall()
-                                if _tvs_rows2:
+                                if _tvs_rows2 and len(_tvs_rows2) >= 2:
                                     _tvs_validated2 = sum(1 for r in _tvs_rows2 if r[0] == 1)
                                     _tvs_pct2 = _tvs_validated2 / len(_tvs_rows2)
                                     if _tvs_pct2 > 0.5:
@@ -3010,11 +3032,23 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         if _prev_row:
                                             _prev_price = _prev_row[0]
                                         if _prev_price and current_price:
-                                            _price_improved = (
-                                                (direction.upper() == 'SHORT' and current_price < _prev_price) or
-                                                (direction.upper() == 'LONG' and current_price > _prev_price)
-                                            )
-                                            if _price_improved:
+                                            _improvements = 0
+                                            # 1. Price moved in predicted direction
+                                            if (direction.upper() == 'SHORT' and current_price < _prev_price) or \
+                                               (direction.upper() == 'LONG' and current_price > _prev_price):
+                                                _improvements += 1
+                                            # 2. Volatility regime aligned (EXTREME or HIGH)
+                                            try:
+                                                from volatility_gate_v2 import classify_volatility, get_atr_pct as _tv_get_atr
+                                                _tv_atr = _tv_get_atr(token)
+                                                if _tv_atr is not None:
+                                                    _tv_vr = classify_volatility(_tv_atr)
+                                                    if _tv_vr in ('EXTREME', 'HIGH'):
+                                                        _improvements += 1
+                                            except Exception:
+                                                pass
+                                            # 3. Need 2+ improvements to override cooldown
+                                            if _improvements >= 2:
                                                 _tvs_override = True
                             except Exception:
                                 pass
@@ -3026,8 +3060,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass
                 
                 if _tvs_override:
-                    log(f"  ✅ [TVS-OVERRIDE] {token} {direction}: cooldown overridden (thesis validated, setup improved)")
-                else:
+                    if _can_override_cooldown(token, direction):
+                        log(f"  ✅ [TVS-OVERRIDE] {token} {direction}: cooldown overridden (thesis validated, setup improved)")
+                    else:
+                        log(f"  🚫 [TVS-OVERRIDE-BLOCKED] {token} {direction}: max overrides reached for this token")
+                        _tvs_override = False
+                
+                if not _tvs_override:
                     if verbose:
                         log(f"  LOSS-COOLDOWN skip {token} {direction}")
                     continue
@@ -3897,44 +3936,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     continue
             elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 log(f"  ➡️  [HOTSET-FINAL-ALLOW] {tkn}:{direction} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
-            
-            # ── TVS Thesis Boost in Hotset ────────────────────────────────────
-            # Apply thesis validation boost to final score before appending
-            try:
-                from hermes_constants import (
-                    TVS_ENABLED, TVS_BOOST_VALIDATED, TVS_BOOST_STRONG,
-                    TVS_LOOKBACK_TRADES, TVS_MFE_THRESHOLD_STRONG,
-                )
-                if TVS_ENABLED:
-                    _tvs_hc = None
-                    try:
-                        from signal_schema import _runtime, _get_conn
-                        _tvs_hc = _get_conn(_runtime())
-                        _tvs_hc_c = _tvs_hc.cursor()
-                        _tvs_hc_c.execute("""
-                            SELECT thesis_validated, thesis_mfe FROM signal_outcomes
-                            WHERE token = ? AND direction = ? AND thesis_validated IS NOT NULL
-                            ORDER BY created_at DESC LIMIT ?
-                        """, (tkn.upper(), direction.upper(), TVS_LOOKBACK_TRADES))
-                        _tvs_hc_rows = _tvs_hc_c.fetchall()
-                        if _tvs_hc_rows:
-                            _tvs_hv = sum(1 for r in _tvs_hc_rows if r[0] == 1)
-                            _tvs_hc_pct = _tvs_hv / len(_tvs_hc_rows)
-                            _tvs_hm = sum(r[1] for r in _tvs_hc_rows if r[1] is not None) / max(1, sum(1 for r in _tvs_hc_rows if r[1] is not None))
-                            if _tvs_hc_pct > 0.8 and _tvs_hm > TVS_MFE_THRESHOLD_STRONG:
-                                entry['score'] = entry.get('score', 0) * TVS_BOOST_STRONG
-                                log(f"  🎯 [TVS-HOTSET] {tkn}:{direction} score × {TVS_BOOST_STRONG} (strong thesis)")
-                            elif _tvs_hc_pct > 0.5:
-                                entry['score'] = entry.get('score', 0) * TVS_BOOST_VALIDATED
-                                log(f"  🎯 [TVS-HOTSET] {tkn}:{direction} score × {TVS_BOOST_VALIDATED} (thesis validated)")
-                    except Exception:
-                        pass
-                    finally:
-                        if _tvs_hc:
-                            try: _tvs_hc.close()
-                            except: pass
-            except ImportError:
-                pass
             
             log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
             hotset_final.append(entry)
@@ -4850,7 +4851,42 @@ def _filter_safe_prev_hotset(prev_hotset):
         # including per-signal-generator cooldowns that would block valid multi-source
         # signals that never caused a losing trade.
         if _is_loss_cooldown_active(tok, direction):
-            continue
+            # ── TVS Cooldown Override (preserve path) ────────────────────────
+            # Override cooldown if thesis was validated and setup improved
+            # CRITICAL: Must match main scoring loop logic or override gets undone
+            _tvs_preserve_override = False
+            try:
+                from hermes_constants import TVS_ENABLED, TVS_COOLDOWN_OVERRIDE, TVS_MIN_CONFIDENCE_FOR_OVERRIDE
+                if TVS_ENABLED and TVS_COOLDOWN_OVERRIDE:
+                    _conf = entry.get('confidence', 0)
+                    if _conf and _conf >= TVS_MIN_CONFIDENCE_FOR_OVERRIDE:
+                        _tvs_pc = None
+                        try:
+                            from signal_schema import _runtime, _get_conn
+                            _tvs_pc = _get_conn(_runtime())
+                            _tvs_pcc = _tvs_pc.cursor()
+                            _tvs_pcc.execute("""
+                                SELECT thesis_validated FROM signal_outcomes
+                                WHERE token = ? AND direction = ? AND signal_type = ? AND thesis_validated IS NOT NULL
+                                ORDER BY created_at DESC LIMIT ?
+                            """, (tok.upper(), direction.upper(), src.split(',')[0].strip() if src else '', TVS_LOOKBACK_TRADES))
+                            _tvs_pcr = _tvs_pcc.fetchall()
+                            if _tvs_pcr and len(_tvs_pcr) >= 2:
+                                _tvs_pv = sum(1 for r in _tvs_pcr if r[0] == 1)
+                                _tvs_pp = _tvs_pv / len(_tvs_pcr)
+                                if _tvs_pp > 0.5:
+                                    _tvs_preserve_override = True
+                        except Exception:
+                            pass
+                        finally:
+                            if _tvs_pc:
+                                try: _tvs_pc.close()
+                                except: pass
+            except ImportError:
+                pass
+            
+            if not _tvs_preserve_override or not _can_override_cooldown(tok, direction):
+                continue
         src = entry.get('source', '')
         if direction == 'SHORT' and tok in SHORT_BLACKLIST:
             continue
