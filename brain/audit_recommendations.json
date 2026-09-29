@@ -1,112 +1,154 @@
 {
-  "timestamp": "2026-09-29T11:35:50.419136Z",
-  "session_brain_stats": {
-    "topics_found": [
-      "signal performance",
-      "improvement ideas",
-      "losing trades",
-      "RSI filtering",
-      "pump-chain-short"
+    "timestamp": "2026-09-29T12:30:00Z",
+    "session_brain_stats": {
+        "queries_run": 3,
+        "top_insights": [
+            "Signal performance and winrate analysis",
+            "Creative improvement ideas from past sessions",
+            "Loss patterns and recurring problems"
+        ],
+        "key_finding": "Session brain confirms: SHORT structural disadvantage, pump-chain+ cold streak, signal diversity critical"
+    },
+    "trade_summary_24h": {
+        "period": "24h",
+        "trades": 21,
+        "win_rate": 61.9,
+        "pnl": 0.20,
+        "open_positions": 5,
+        "regime_mix": "10 EXTREME, 3 HIGH, 8 NORMAL"
+    },
+    "trade_summary_7d": {
+        "period": "7d",
+        "trades": 120,
+        "win_rate": 41.7,
+        "pnl": -3.92,
+        "atr_sl_hits": 35,
+        "atr_sl_pct": 29.2,
+        "note": "Legacy bleed aging out. Post-fix ATR_SL: 0 hits. profit-monster-trail dominant (43T +$1.43)"
+    },
+    "trade_summary_14d": {
+        "period": "14d",
+        "trades": 315,
+        "win_rate": 45.1,
+        "pnl": -2.81,
+        "long_pnl": 0.70,
+        "short_pnl": -3.51,
+        "long_avg_win": 0.156,
+        "long_avg_loss": -0.144,
+        "short_avg_win": 0.114,
+        "short_avg_loss": -0.152,
+        "short_rr": "0.75:1",
+        "long_rr": "1.08:1"
+    },
+    "regime_performance_14d": {
+        "EXTREME": {"trades": 140, "wr": 48.6, "pnl": -0.43},
+        "HIGH": {"trades": 108, "wr": 42.6, "pnl": -1.65},
+        "NORMAL": {"trades": 63, "wr": 41.3, "pnl": -0.76},
+        "FLAT": {"trades": 3, "wr": 66.7, "pnl": 0.03}
+    },
+    "exit_analysis_14d": {
+        "profit-monster-trail": {"trades": 75, "wr": 60.0, "pnl": 3.18},
+        "atr_sl_hit": {"trades": 172, "wr": 44.8, "pnl": -3.47},
+        "cut-loser-CL-T1": {"trades": 18, "wr": 0.0, "pnl": -1.92, "note": "All legacy, 0 post-disable trades"},
+        "hard_sl": {"trades": 18, "wr": 38.9, "pnl": -1.07},
+        "pump_exit_dead_money": {"trades": 16, "wr": 43.8, "pnl": 0.35}
+    },
+    "drift_findings": [
+        {
+            "item": "pump-chain+ cold streak",
+            "severity": "HIGH",
+            "details": "0 trades/7d. Last trade Sep 22. Was #2 profitable signal (+$1.23/14d). Signal still enabled, dead hours optimized, but not finding setups in NEUTRAL market. V5 killed Sep 28 may have reduced signal diversity.",
+            "impact": "-$0.20/7d from missing profitable trades",
+            "recommendation": "Monitor. If no trades by Oct 1, investigate dead hours or signal parameters."
+        },
+        {
+            "item": "SHORT structural disadvantage",
+            "severity": "MEDIUM",
+            "details": "avg_win $0.114 vs avg_loss $0.152 (0.75:1 R:R). SHORT needs >57% WR to break even. All SHORT signals except pump-chain- EXTREME are losing.",
+            "impact": "-$3.51/14d from SHORT side",
+            "recommendation": "Consider SHORT-specific TP adjustment or confidence boost for proven SHORT signals."
+        },
+        {
+            "item": "bb-bounce-v2-long+ R:R broken",
+            "severity": "LOW",
+            "details": "avg_win $0.047 vs avg_loss $0.082 (0.57:1 R:R). Trail captures tiny gains but losses are larger. Post-fix (RSI_MAX=60): 1 trade only (+$0.02). Need more data.",
+            "impact": "-$0.16/14d",
+            "recommendation": "Monitor post-fix performance. If R:R doesn't improve in 10+ trades, consider wider trail or different entry conditions."
+        }
     ],
-    "key_insight": "Session brain shows recurring discussion about SHORT RSI<50 catastrophic losses and signal diversity. RSI data NULL drift was discussed Sep 28 but column still empty — metadata JSON has RSI but signal_rsi_14 column never populated."
-  },
-  "trade_summary_24h": {
-    "trades": 18,
-    "win_rate": 72.2,
-    "pnl": 0.2,
-    "top_signal": "pump-chain- SHORT 8T 75%WR +$0.88",
-    "regime": "EXTREME dominant"
-  },
-  "trade_summary_7d": {
-    "trades": 114,
-    "win_rate": 43.0,
-    "pnl": -3.54,
-    "atr_sl_rate": 30.7,
-    "post_fix": "27T 63%WR +$0.05, 0 ATR_SL hits",
-    "regime": "EXTREME -$2.70 (61T), HIGH -$1.07 (30T), NORMAL +$0.23 (20T)"
-  },
-  "trade_summary_14d": {
-    "trades": 311,
-    "win_rate": 44.7,
-    "pnl": -2.51,
-    "long_pnl": 0.53,
-    "short_pnl": -3.16,
-    "profitable_signals": [
-      "volume-breakout-long+ +$1.46 (18T, 66.7%WR)",
-      "pump-chain+ +$1.23 (55T, 41.8%WR)"
+    "recurring_problems": [
+        {
+            "problem": "Signal diversity critical",
+            "frequency": "Every audit since Sep 16",
+            "details": "Only volume-breakout-long+ (+$1.54/14d) and pump-chain+ (+$1.23/14d) profitable. 2 signal types carry all PnL.",
+            "recommendation": "Develop new signals for NEUTRAL regime. Session brain has ideas: EMA-reclaim, trend-following, chop-detection."
+        },
+        {
+            "problem": "SHORT side dominates losses",
+            "frequency": "Every audit since Sep 22",
+            "details": "SHORT -$3.51/14d = 125% of total losses. LONG +$0.70.",
+            "recommendation": "All SHORT signals except pump-chain- EXTREME are disabled/killed. Legacy SHORT trades aging out. Monitor."
+        },
+        {
+            "problem": "EXTREME regime drag",
+            "frequency": "Every audit since Sep 25",
+            "details": "EXTREME 140T 48.6%WR -$0.43/14d. Best regime but still losing. HIGH worse at -$1.65.",
+            "recommendation": "ATR_SL widening post-fix: 0 hits. Need more EXTREME trades to evaluate. REGIME_CONF_HIGH_MULT=0.50 still untested (all trades NEUTRAL)."
+        }
     ],
-    "biggest_losers": [
-      "pullback-entry- -$1.73 (55T, killed)",
-      "mover+ -$1.12 (14T, killed)",
-      "bb-bounce-v2-long+ -$0.16 (15T, marginal)"
+    "missing_implementations": [
+        {
+            "item": "New NEUTRAL regime signal",
+            "status": "Suggested Sep 16, still needed",
+            "impact": "Would improve signal diversity and reduce dependence on 2 signals"
+        },
+        {
+            "item": "SHORT TP multiplier",
+            "status": "Suggested Sep 29, not implemented",
+            "impact": "Could fix SHORT R:R structural disadvantage"
+        },
+        {
+            "item": "pump-chain+ cold streak investigation",
+            "status": "Suggested today, needs investigation",
+            "impact": "Recovering this signal would add +$0.20/7d"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-29T12:30:00Z",
+            "idea": "Monitor pump-chain+ recovery — 0 trades/7d is abnormal for a signal that was +$1.23/14d",
+            "rationale": "The signal is enabled, dead hours optimized, but not firing. NEUTRAL market may lack pump setups. If market shifts to EXTREME, pump-chain+ should recover.",
+            "expected_impact": "+$0.20-0.50/7d if recovered",
+            "category": "signal recovery",
+            "status": "monitoring",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-29T12:30:00Z",
+            "idea": "SHORT-specific TP widening — current SHORT avg_win $0.114 vs LONG $0.156 (27% smaller)",
+            "rationale": "SHORT R:R is structurally disadvantaged. Widening SHORT TP by 0.1% could capture more profit per trade without increasing risk. Requires code change in tpsl_utils.py.",
+            "expected_impact": "+$0.30-0.60/7d from improved SHORT R:R",
+            "category": "R:R improvement",
+            "status": "suggested",
+            "risk": "medium"
+        },
+        {
+            "date": "2026-09-29T12:30:00Z",
+            "idea": "New EMA-reclaim LONG signal for NEUTRAL regime",
+            "rationale": "Session brain has detailed specs. NEUTRAL regime has no consistently profitable signals. EMA-reclaim captures mean-reversion bounces in choppy markets.",
+            "expected_impact": "+$0.30-0.80/7d if signal achieves 55%+ WR",
+            "category": "new signal",
+            "status": "suggested",
+            "risk": "medium"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Monitor pump-chain+ recovery (0 trades/7d)",
+        "Evaluate BB_BOUNCE_V2_RSI_MAX=60 post-fix (1 trade only)",
+        "Develop new NEUTRAL regime signal",
+        "Consider SHORT TP adjustment after 50+ post-fix trades",
+        "REGIME_CONF_HIGH_MULT=0.50 eval (all trades NEUTRAL — no data)",
+        "Disk at 84% — monitor growth"
     ]
-  },
-  "drift_findings": [
-    {
-      "finding": "signal_rsi_14 column NULL for ALL 311 14d trades",
-      "detail": "Column exists but never populated. RSI data IS in _signal_metadata JSON (rsi_14 key) for post-fix trades. Fix from Sep 28 writes to JSON but not to column. RSI band analysis from column is impossible.",
-      "impact": "Cannot do column-based RSI analysis. Filters work via JSON metadata. Low impact on trading, high impact on analytics.",
-      "status": "Known drift — metadata JSON has RSI, column empty"
-    },
-    {
-      "finding": "pump-chain+ LONG cold streak — 0 trades in 7d",
-      "detail": "Last trade Sep 22. Signal completely stopped firing. Was #2 profitable signal at +$1.23/14d. Market conditions may not be triggering it, or filters are blocking it.",
-      "impact": "Signal diversity worsened. Only volume-breakout-long+ active as profitable LONG.",
-      "status": "NEW — investigate"
-    },
-    {
-      "finding": "SHORT R:R structural disadvantage persists",
-      "detail": "SHORT avg_win $0.114 vs LONG $0.158 (28% smaller). SHORT avg_loss -$0.149 vs LONG -$0.145. SHORT R:R = 0.77:1 (broken). LONG R:R = 1.09:1.",
-      "impact": "SHORT side contributes 82% of 14d losses despite similar win rates.",
-      "status": "Known — monitor"
-    }
-  ],
-  "recurring_problems": [
-    "Signal diversity — only 2 profitable LONG types for 14d",
-    "EXTREME regime worst performer — 61T 42.6%WR -$2.70/7d",
-    "SHORT structural disadvantage — smaller wins, same losses",
-    "pump-chain+ cold streak — 0 trades/7d"
-  ],
-  "missing_implementations": [
-    "New NEUTRAL regime signal for diversity (discussed multiple sessions)",
-    "SHORT R:R improvement (increase SHORT TP or use different R:R)",
-    "pump-chain+ cold streak root cause investigation"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-29T11:35:50.419165Z",
-      "idea": "Investigate pump-chain+ cold streak — 0 trades in 7d, signal completely stopped firing",
-      "rationale": "pump-chain+ was #2 profitable signal (+$1.23/14d). Its disappearance hurts diversity. Check if LONG_NEUTRAL_BLOCK, dead hours, or confidence filters are blocking it. Market may just not be triggering it.",
-      "expected_impact": "Restore 2-4 trades/week of a proven profitable signal",
-      "category": "signal recovery",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-29T11:35:50.419174Z",
-      "idea": "SHORT TP multiplier — increase SHORT TP by 10-15% to fix R:R",
-      "rationale": "SHORT avg_win $0.114 vs LONG $0.158. Same avg_loss. SHORT R:R = 0.77:1 (broken). If we increase SHORT TP targets, winners become larger without changing SL. Tested: SHORT RSI 50-65 sweet spot has 52.3%WR — the entries are fine, the exits are too tight.",
-      "expected_impact": "+$0.30-0.60/7d from improved SHORT R:R",
-      "category": "exit optimization",
-      "status": "suggested",
-      "risk": "medium — needs backtest first"
-    },
-    {
-      "date": "2026-09-29T11:35:50.419182Z",
-      "idea": "pump-chain- EXTREME SHORT confidence boost — this is the only profitable SHORT combo",
-      "rationale": "pump-chain- SHORT EXTREME: 34T 52.9%WR +$0.49/14d. HIGH: 5T 20%WR -$0.60 (blocked). NORMAL: 2T 100%WR +$0.06. The EXTREME edge is real but drowned out by HIGH losses. PUMP_CHAIN_SHORT_HIGH_BLOCK already blocks HIGH. Consider boosting confidence for EXTREME specifically.",
-      "expected_impact": "+$0.10-0.20/7d from more EXTREME entries",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Investigate pump-chain+ cold streak — why 0 trades in 7d?",
-    "Evaluate bb-bounce-v2-long+ post RSI_MAX=60 filter (need 20+ more trades)",
-    "Monitor pump-chain- SHORT EXTREME edge (/usr/bin/bash.49/14d)",
-    "Track SHORT R:R improvement (avg_win /usr/bin/bash.114 vs LONG /usr/bin/bash.158)",
-    "Signal diversity — new NEUTRAL signal needed"
-  ]
 }

@@ -933,5 +933,32 @@
         "times_suggested": 1
       }
     ]
+  },
+  {
+    "date": "2026-09-29T12:30:00Z",
+    "idea": "Monitor pump-chain+ recovery — 0 trades/7d is abnormal for a signal that was +$1.23/14d",
+    "rationale": "The signal is enabled, dead hours optimized, but not firing. NEUTRAL market may lack pump setups. If market shifts to EXTREME, pump-chain+ should recover.",
+    "expected_impact": "+$0.20-0.50/7d if recovered",
+    "category": "signal recovery",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-29T12:30:00Z",
+    "idea": "SHORT-specific TP widening — current SHORT avg_win $0.114 vs LONG $0.156 (27% smaller)",
+    "rationale": "SHORT R:R is structurally disadvantaged. Widening SHORT TP by 0.1% could capture more profit per trade without increasing risk. Requires code change in tpsl_utils.py.",
+    "expected_impact": "+$0.30-0.60/7d from improved SHORT R:R",
+    "category": "R:R improvement",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-09-29T12:30:00Z",
+    "idea": "New EMA-reclaim LONG signal for NEUTRAL regime",
+    "rationale": "Session brain has detailed specs. NEUTRAL regime has no consistently profitable signals. EMA-reclaim captures mean-reversion bounces in choppy markets.",
+    "expected_impact": "+$0.30-0.80/7d if signal achieves 55%+ WR",
+    "category": "new signal",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

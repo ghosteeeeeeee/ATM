@@ -35,3 +35,12 @@
 ## Error Alerts — 2026-09-29 10:58 UTC
 - **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-09-29 11:46 UTC
+- **[WARN]** (120x/2h): `position_manager: FAILED (rc=1)` — Guardian lock contention. hermes-hl-sync-guardian.service holds lock, position_manager correctly defers. ATR/SL/TP work completes before exit. Cosmetic, no trading impact.
+- **[WARN]** (1x): `Disk at 84%` — 19G free of 118G. 1% from 85% warn threshold. Consider compressing old logs (>7 days).
+- **[WARN]** (1x): `ALGO SHORT loss streak=21` — Consecutive SHORT losses for ALGO. Cooldown active (1.5h). Will auto-resume.
+
+## Error Alerts — 2026-09-29 11:58 UTC
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+AT, allowing despite TOK filter`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`

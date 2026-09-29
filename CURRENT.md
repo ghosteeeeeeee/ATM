@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 11:36 UTC**
+**Last Updated: 2026-09-29 12:30 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS (30.7% 7d, post-fix 0/27 hits). pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14 in JSON). SHORT signals killed/disabled.
+System active. 5 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS (29.2% 7d, post-fix 0 hits). pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14 in JSON). SHORT signals killed/disabled.
 
-- **24h (rolling):** 18T 72.2%WR +$0.20 (DB-verified). pump-chain- SHORT dominant (8T 75%WR +$0.88).
+- **24h (rolling):** 21T 61.9%WR +$0.20 (DB-verified). pump-chain- SHORT dominant (10T 60%WR +$0.41).
 - **7d:** 114T 43.0%WR -$3.54 (DB-verified). ATR_SL 30.7% (35/114) — PASS. Post-fix: 27T 63%WR +$0.05, 0 ATR_SL hits.
 - **14d:** 311T 44.7%WR -$2.51 (DB-verified). LONG +$0.53, SHORT -$3.16 (126% of losses).
 - **OPEN:** 6 positions — BTC LONG continuum-osc+ (NORMAL), ADA LONG rs-s37 (EXTREME), KAS LONG rs-s57 (EXTREME), JUP LONG volume-breakout-long+ (EXTREME), ALGO SHORT pump-chain- (EXTREME), CASHCAT SHORT pump-chain- (EXTREME).
@@ -54,16 +54,16 @@ System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-29 11:36 UTC)
+## Audit Update (2026-09-29 12:30 UTC)
 
-- **🟢 ATR_SL WIDENING VERIFIED PASS.** 7d: 30.7% (35/114). Post-fix: 27T 63%WR +$0.05, 0 ATR_SL hits. Massive improvement from 50%+ pre-fix.
-- **🔴 PUMP-CHAIN+ COLD STREAK — 0 trades/7d.** Last trade Sep 22. Was #2 profitable signal (+$1.23/14d). Signal completely stopped firing. Hurting diversity. Investigation needed.
-- **pump-chain- SHORT EXTREME profitable.** 34T 52.9%WR +$0.49/14d. Only profitable SHORT combo. HIGH blocked by PUMP_CHAIN_SHORT_HIGH_BLOCK.
-- **SHORT R:R 0.77:1 persists.** avg_win $0.114 vs LONG $0.158 (28% smaller). Structural disadvantage.
-- **LOSING AUTOPSY:** 10 losers 24h all small (<$0.47). All EXTREME/HIGH. No systematic pattern — normal chop.
-- **7d REGIME:** EXTREME -$2.70 (61T 42.6%), HIGH -$1.07 (30T 36.7%), NORMAL +$0.23 (20T 50%).
-- **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.23) profitable.
-- **CREATIVE (3):** (1) Investigate pump-chain+ cold streak (2) SHORT TP multiplier for R:R (3) pump-chain- EXTREME confidence boost.
+- **🟢 24h STRONG.** 21T 61.9%WR +$0.20. Legacy losses aging out. Post-fix: 0 ATR_SL hits. profit-monster-trail dominant (15T 80%WR +$0.73).
+- **🔴 PUMP-CHAIN+ COLD STREAK — 0 trades/7d.** Last trade Sep 22. Was #2 profitable signal (+$1.23/14d). Signal enabled, dead hours optimized, not finding setups in NEUTRAL. V5 killed Sep 28 may have reduced diversity.
+- **SHORT structural disadvantage PERSISTS.** avg_win $0.114 vs avg_loss $0.152 (0.75:1 R:R). SHORT needs >57% WR to break even. SHORT -$3.51/14d = 125% of total losses.
+- **LOSING AUTOPSY:** 13 losers 24h all small (<$0.47). 10 EXTREME, 3 HIGH. 4 pump-chain- SHORT (legacy pre-kill), 2 mover- SHORT (killed), 7 rs-s* hotset (normal chop). No systematic pattern.
+- **7d REGIME:** EXTREME -$3.05 (66T 42.4%), HIGH -$1.11 (31T 35.5%), NORMAL +$0.23 (20T 50%).
+- **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.54) and pump-chain+ (+$1.23) profitable.
+- **bb-bounce-v2-long+ R:R 0.57:1** — avg_win $0.047 vs avg_loss $0.082. Post-fix (RSI_MAX=60): 1 trade only. Need more data.
+- **CREATIVE (3):** (1) Monitor pump-chain+ recovery (2) SHORT TP adjustment for R:R (3) New EMA-reclaim signal for NEUTRAL.
 - **0 CHANGES APPLIED.**
 
 ## Audit Update (2026-09-29 07:30 UTC)

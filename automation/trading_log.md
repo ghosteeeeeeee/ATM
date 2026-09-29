@@ -72,3 +72,30 @@ BY: auto_1hr
 - pump-chain- SHORT in recent closes — brain_auditor flagged SHORT_NEUTRAL_BLOCK bypass
 
 BY: auto_1hr
+
+## [2026-09-29 12:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L, -$0.51) | 5 open (BTC LONG 22.9h, JUP LONG 4.4h, ADA LONG 1.8h, ALGO SHORT 1.6h, WLFI LONG 0.1h)
+**24h:** 30T 17W 13L -$0.46 (56.7% WR) | **7d:** 115T 42.6%WR -$3.43
+
+**ATR SL:** 0/30 (0%) 24h ✅ (fix holding 30T+)
+**Exits:** 17 hard_sl (avg -$0.068) | 13 profit-monster-trail (avg +$0.053)
+**Regime:** EXTREME
+
+**Signal leaders 24h:** pump-chain- 10T 60%WR +$0.41
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits, stable
+- No kill candidates: no signal with 3+T/0%WR last hour
+- Trade frequency: 3/hr — normal
+- hard_sl 57% but avg loss $0.068 — trailing stops containing damage
+- BTC LONG 22.9h: stale but has SL/TP set, will auto-close
+- 6h trend: 5 consecutive negative hours but losses small (<$0.50/hr)
+
+**Open Questions:**
+- 24h slightly negative (-$0.46) — within noise for 30-trade sample
+- hard_sl rate elevated (57%) — monitor, may need SL widening if trend continues
+
+BY: auto_1hr

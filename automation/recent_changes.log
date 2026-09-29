@@ -3344,3 +3344,11 @@
   3T last hour (1W2L -$0.28). 24h 27T 59.3%WR +$0.05. 7d 115T 42.6%WR -$3.43.
   ATR_SL 0% (30T+ post-fix). hard_sl avg loss $0.045 — trailing stops working.
   No kill candidates. Trade freq 3/hr normal. System healthy. BY: auto_1hr
+[2026-09-29 12:30 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 21T 61.9%WR +$0.20 (24h) | 120T 41.7%WR -$3.92 (7d) | 315T 45.1%WR -$2.81 (14d)
+  System performing well 24h. Legacy bleed aging out. Post-fix ATR_SL: 0 hits.
+  pump-chain+ LONG 0 trades/7d — CRITICAL cold streak (was #2 profitable +$1.23/14d).
+  SHORT structural disadvantage PERSISTS: avg_win $0.114 vs avg_loss $0.152 (0.75:1 R:R).
+  LOSING AUTOPSY: 13 losers 24h all small (<$0.47). No systematic pattern.
+  CREATIVE: (1) Monitor pump-chain+ recovery (2) SHORT TP adjustment (3) New EMA-reclaim signal.
+  0 CHANGES APPLIED. BY: brain_auditor
