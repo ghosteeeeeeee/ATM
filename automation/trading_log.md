@@ -155,3 +155,33 @@ BY: auto_1hr
 - BTC LONG 24.9h stale — has SL/TP, will auto-close.
 
 BY: auto_1hr
+
+## [2026-09-29 16:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 37T 20W (54.1%) $-0.79 | **7d:** 121T (42.1%) $-3.70 | **Open:** 5 trades
+
+**ATR SL:** 0/37 (0%) 24h ✅ fix stable
+**Exits:** 19 hard_sl (avg -$0.078) | 18 profit-monster-trail (avg +$0.039)
+
+**SHORT R:R remains structural issue:** avg_win $0.121 vs avg_loss $-0.243 → 1:2 ratio.
+All 8 SHORT losses hit hard_sl with price moving 1.77-2.38% against entry before SL.
+The SL is triggering correctly, but SHORT winners trail out small while losers hit wide SL.
+
+**Signal check:**
+- `mover-` SHORT: 2T 0W -$0.68 (24h) — approaching kill threshold but not 3+ in last hour
+- `rs-s30` LONG: 3T 0W -$0.08 (all-time) — small losses, not 3+ in last hour
+- No signal has 3+T/0%WR in last hour → no kill triggered
+
+**Changes:** None
+**No Change Needed:**
+- No kill candidates (no signal with 3+T/0%WR in last hour)
+- Trade frequency normal (0/hr — quiet)
+- ATR_SL fix stable (0 hits)
+- SHORT R:R: requires tpsl_utils.py review for SL/TP ratio, not a quick constant change
+
+**Open Questions:**
+- SHORT structural disadvantage: needs SL tightening or TP widening for shorts specifically
+- `mover-` SHORT approaching kill threshold — watch next trade
+
+BY: auto_1hr

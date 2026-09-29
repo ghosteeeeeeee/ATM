@@ -847,20 +847,19 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 50           # RAISED 40→50 (CEO 2026-09-24). 14d: RSI <50 SHORT = 103T 42.7%WR -$3.69 (catastrophic). RSI 50-65 = 65T 52.3%WR +$0.04 (sweet spot). NULL RSI = 36T 52.8%WR +$0.49 (preserved — NULL not <50). Blocks $3.69/14d bleed. upgrade_implementer lowered to 40 citing "RSI 45-60 = 63%WR" but actual sweet spot is 50-60.
-SHORT_RSI_CEILING = 70          # block SHORT when RSI > 70 (overbought = momentum favors LONG, SHORT at resistance = bounce risk). RAISED 65→70 (CEO Sep 26): 14d RSI 65-70 SHORT = 4T all winners +$0.47. RSI>=80 = 4T 25%WR -$0.08. Unlocks profitable band, blocks losers.
+SHORT_RSI_FLOOR = 40           # LOWERED 50→40 (CEO 2026-09-29). 14d: RSI 45-55 SHORT = 26T 69.2%WR +$1.07 (BEST BAND). RSI <40 SHORT = 72T 27.8%WR -$5.34 (losers). Floor at 40 allows the 69% WR sweet spot while blocking deep oversold.
+SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
-# When SHORT_RSI_FLOOR is 50, RSI 35-50 is the bleeding band — block entirely.
-# BANANA lesson: SHORT at RSI 10-35 = catching falling knife in reverse. Block these.
+# When SHORT_RSI_FLOOR is 40, RSI <40 is blocked. Extra guard for extreme oversold.
 OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold = move already happened)
 
 # ── LONG RSI floor: block LONG entries when RSI is extremely oversold ────
-# 14d: RSI<30 LONG = 12T 8.3%WR -$1.45 (catastrophic — catching falling knife).
-# 7d: RSI<30 LONG = 0 winners (0/3). Would block 7 losers ($1.45 saved), 0 winners ($0 lost).
-# RSI 35-50 LONG = 46T 56.5%WR +$1.27 (sweet spot — NOT blocked).
-LONG_RSI_FLOOR = 30             # brain_auditor 2026-09-23: oversold LONG = bounce risk. 14d: RSI<30 = 12T 8.3%WR -$1.45. Net: +$1.32/14d = +$0.66/7d.
-LONG_RSI_CEILING = 70           # brain_auditor 2026-09-26: RAISED 80→70. 14d: LONG RSI 60-70 = 53T 37.7%WR -$1.79 (killing field). RSI 70+ = 51T 45.1%WR +$0.06 (break-even). Blocks overbought LONG entries that chase extended moves. Hard block (SKIP), not soft penalty.
+# 14d: RSI<25 LONG = 5T 80%WR +$0.15 (BEST — oversold bounces work!). RSI 25-35 = 16T 50%WR +$0.05.
+# RSI 35-45 LONG = 18T 44.4%WR -$0.30 (dead zone).
+# Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
+LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
+LONG_RSI_CEILING = 65          # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ LONG = 80T 41.3%WR -$0.39 (block). RSI 55-65 = 27T 51.9%WR +$1.40 (sweet spot, allowed). Ceiling at 65 blocks overbought LONG entries.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
 # When SL zone blocks a signal, check if zone is strong enough to flip direction.

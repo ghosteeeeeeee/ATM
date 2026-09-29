@@ -3369,3 +3369,8 @@
   7d REGIME: EXTREME -$3.17 (68T 42.6%), HIGH -$0.78 (31T 35.5%), NORMAL +$0.23 (20T 50%).
   CREATIVE: (1) Investigate pump-chain+ dead hours (2) EXTREME confidence floor 70% (3) New EMA-reclaim signal.
   0 CHANGES APPLIED. BY: brain_auditor
+[2026-09-29 16:00 UTC] auto_1hr: NO CONFIG CHANGE — hourly audit
+  24h: 37T 54.1%WR -$0.79 | 7d: 121T 42.1%WR -$3.70
+  0 trades last hour (quiet). ATR_SL fix stable. SHORT R:R structural (avg_loss 2x avg_win).
+  No kill candidates in last hour. Short SL too wide vs TP — needs tpsl_utils.py review.
+  BY: auto_1hr
