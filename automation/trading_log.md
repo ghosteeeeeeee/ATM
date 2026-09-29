@@ -243,3 +243,40 @@ BY: auto_1hr
 - BTC LONG 27.9h stale — will auto-close via SL/TP
 
 BY: auto_1hr
+
+## [2026-09-29 18:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet) | **Open:** 6 (BTC 28.9h stale, 2 SHORT pump-chain-, 3 LONG doji-bottom-long)
+**24h:** 43T 20W (46.5%WR) $-1.09 | **7d:** 130T 54W (41.5%WR) $-3.83
+
+**Exit Breakdown 24h:**
+- hard_sl: 25T 8W (32%WR) avg -$0.065 | profit-monster-trail: 18T 12W (67%WR) avg +$0.029
+- hard_sl at 58% of all exits — structural, not a bug
+
+**Signal Performance 24h:**
+- pump-chain-: 13T 8W (62%WR) +$0.58 — star performer, avg +$0.045/trade
+- RS signals: 22T 8W (36%WR) -$1.25 — collective losers, individual losses tiny
+- mover-: 2T 0W -$0.68 — worst single signal, below kill threshold (2T < 3T)
+- doji-bottom-long: 2T 1W +$0.16 — OK
+
+**Kill Candidates:**
+- rs-s30: 3T 0W -$0.08 — meets "3+T/0%WR" but over 24h, not last hour
+- mover-: 2T 0W -$0.68 — only 2 trades, below threshold
+- No signals meeting strict last-hour kill criteria
+
+**ATR_SL:** 0 hits in 24h — fix stable ✅
+
+**Changes:** None
+**No Change Needed:**
+- No kill candidates meeting strict last-hour threshold
+- ATR_SL fix stable
+- Trade frequency normal (~1.8/hr)
+- hard_sl dominance is structural (58% of exits)
+- SHORT R:R issue flagged last hour — needs tpsl_utils.py review
+
+**Open Questions:**
+- BTC LONG continuum-osc+ 28.9h stale (-9.59%) — should have auto-closed by now
+- SHORT trail exits too conservative (+$0.029 avg) — needs tpsl_utils.py trailing threshold tuning
+- 7d WR at 41.5% — below 50% threshold, but losses small (avg -$0.029)
+
+BY: auto_1hr

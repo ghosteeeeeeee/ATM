@@ -33,6 +33,7 @@ from hermes_constants import (
     PUMP_FLOW_VELOCITY_BONUS,
     PUMP_FLOW_CHAIN_BONUS,
     PUMP_FLOW_PHASE_BONUS,
+    PUMP_CHAIN_VEL_30M_MIN,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -44,6 +45,28 @@ STATE_FILE = os.path.join(HERMES_DATA, 'pump_flow_state.json')
 FULL_STATE_FILE = os.path.join(WWW_DATA, 'pump_flow_data.json')
 
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
+
+
+def _get_30m_velocity(token):
+    """Get 30m velocity from candles_5m (6 candles). Returns % change or None."""
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(f"file:{CANDLES_DB}?mode=ro", uri=True, timeout=5)
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT close FROM candles_5m WHERE token = ? ORDER BY ts DESC LIMIT 6",
+            (token.upper(),)
+        )
+        rows = cur.fetchall()
+        conn.close()
+        if len(rows) < 2:
+            return None
+        old_close, new_close = rows[-1][0], rows[0][0]
+        if old_close <= 0:
+            return None
+        return (new_close - old_close) / old_close * 100
+    except Exception:
+        return None
 
 
 def _log(msg):
@@ -171,6 +194,13 @@ def scan_signals():
                     _conn_spd.close()
             except Exception:
                 pass
+
+        # Velocity filter: block LONG when 30m velocity < threshold (falling tokens)
+        # pump-chain-v5-spec: vel > -0.3% → 90% WR on 10T
+        vel_30m = _get_30m_velocity(token)
+        if vel_30m is not None and vel_30m < PUMP_CHAIN_VEL_30M_MIN:
+            _log(f"  [PUMP-CHAIN-LONG] SKIP {token} — 30m velocity {vel_30m:+.2f}% < {PUMP_CHAIN_VEL_30M_MIN}%")
+            continue
 
         if get_cooldown(token, direction='LONG'):
             continue

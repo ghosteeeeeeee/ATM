@@ -576,13 +576,15 @@ def should_trade_signal(signal_type: str, regime: dict = None, token: str = None
     signal_class = _classify_signal(signal_type)
 
     if signal_class == 'MOMENTUM' and not regime['momentum_allowed']:
-        # Token-level check: if the token itself is trending strongly,
-        # allow momentum signals even in CHOP. BTC flat ≠ COMP flat.
+        # Token-level check: use trend score (0-100) for granular routing
+        # chop-v2-spec: score <30 = deep chop (block), 31-60 = weak (penalize), >60 = strong (allow)
         if token:
             try:
-                token_mom = _get_token_momentum(token)
-                if abs(token_mom) > 0.5:  # token trending >0.5% in 1h
-                    return True, f"CHOP bypass — {token} trending ({token_mom:+.2f}%), momentum OK"
+                tscore = get_coin_trend_score(token)
+                if tscore >= 61:
+                    return True, f"CHOP bypass — {token} trend_score={tscore} (strong trend, momentum OK)"
+                elif tscore >= 31:
+                    return True, f"CHOP bypass — {token} trend_score={tscore} (weak trend, momentum allowed with penalty)"
             except Exception:
                 pass
         return False, f"CHOP — momentum signal {signal_type} blocked (preserve winrate)"

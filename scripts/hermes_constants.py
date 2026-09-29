@@ -3627,6 +3627,7 @@ PUMP_FLOW_MIN_CHAIN_CO_FIRES = 5       # minimum historical co-fires for chain
 PUMP_FLOW_COOLDOWN_HOURS = 0.083       # per-token cooldown after pump flow signal (5 min)
 PUMP_FLOW_MAX_PER_CYCLE = 3            # max pump flow signals per pipeline run
 PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
+PUMP_CHAIN_VEL_30M_MIN = -0.3          # pump-chain LONG: block when 30m velocity < this (plan: vel>-0.3% → 90%WR)
 PUMP_FLOW_RESERVED_SLOTS = 1           # slots reserved exclusively for pump-chain
 PUMP_FLOW_MAX_POSITIONS = 3            # max concurrent pump-chain positions
 PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity

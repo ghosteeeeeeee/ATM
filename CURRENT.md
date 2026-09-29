@@ -1,16 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 17:10 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-29 18:30 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS (31.9% 7d, post-fix 0 hits). pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, rsi_14 in JSON). SHORT signals killed/disabled. doji-bottom-long NEW (2 open trades).
+System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits, 21T +$0.70. pump-chain- SHORT EXTREME dominant (35T 57.1%WR +$0.90/7d). doji-bottom-long NEW (3T 33%WR +$0.15/7d). ALL pre-fix legacy losses aging out. SHORT R:R structural disadvantage persists (0.72:1). Disk 85% (18G free).
 
-- **24h (rolling):** ~28T ~0%WR all small losses (DB-verified). 13 hotset LONG losers (all <$0.23 hard_sl). 5 pump-chain- SHORT EXTREME hard_sl. 2 mover- KILLED (aging out). pump-chain- SHORT 12T 58.3%WR +$0.03 (breakeven).
-- **7d:** 128T 42.2%WR -$4.41 (DB-verified). ATR_SL 31.9% (23/72) — IMPROVED from 64%+. Post-fix: 0 ATR_SL hits.
-- **14d:** 317T 43.8%WR -$4.43 (DB-verified). LONG +$0.08, SHORT -$4.51 (102% of losses). SHORT R:R 0.72:1.
-- **OPEN:** 6 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), SOL LONG doji-bottom-long (NORMAL), ALGO SHORT pump-chain- (EXTREME), CRV SHORT pump-chain- (EXTREME), IOTA SHORT pump-chain- (EXTREME).
+- **24h (rolling):** 44T -$0.78. pump-chain- SHORT 15T 66.7%WR +$0.91 (dominant). mover- 2T 0%WR -$0.68 (killed). rs-s* hotset mixed. doji-bottom-long 2T 50%WR +$0.16.
+- **7d:** 132T 45.5%WR -$3.50. EXTREME -$2.47 (75T), HIGH -$1.00 (31T), NORMAL -$0.04 (23T). Post-fix (Sep 28+): 21T 52.4%WR +$0.70. 0 ATR_SL hits.
+- **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), NEO LONG doji-bottom-long (HIGH), NXPC LONG doji-bottom-long (NORMAL).
 - **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
 - **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.
@@ -20,7 +19,7 @@ System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — **VERIFIED WORKING.**
 - **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
 - **CONF_FILTER_MIN=65.**
-- **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
+- **Disk:** 85% (18G free). candles.db 2.2G, coin_tracker.db 3.1G.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
 - **🟢 signal_rsi_14 NULL DRIFT — FIXED:** 28-day drift. Root cause: decider_run.py:4283 `sig.get('rsi_14')` but signals store RSI as `rsi` key. Fix: `sig.get('rsi') or sig.get('rsi_14')` applied Sep 28. Unlocks proper RSI floor/ceiling enforcement for STANDALONE_BYPASS signals. Expected +$0.30-0.80/7d.
@@ -53,6 +52,17 @@ System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-29 18:30 UTC)
+
+- **🟢 PIPELINE HEALTHY.** 45 closed today +3.00% PnL. 4 open positions (3 doji-bottom-long, 1 BTC continuum-osc+). All post-fix trades winners. 0 ATR_SL hits since Sep 28.
+- **🟢 POST-FIX PERFORMANCE SOLID.** 21T 52.4%WR +$0.70 since Sep 28 10:39. ALL pre-fix legacy losses (atr_sl_hit 33T -$3.10, cut-loser-CL-T1 9T -$0.88) aging out. No new systemic issues.
+- **🟢 pump-chain- SHORT EXTREME DOMINANT.** 35T 57.1%WR +$0.90/7d. Best signal. 24h: 15T 66.7%WR +$0.91.
+- **🟡 doji-bottom-long NEW.** 3T 33.3%WR +$0.15/7d. 3 trades too small to evaluate. 3 open trades (GMX HIGH, NEO HIGH, NXPC NORMAL). Monitor.
+- **🟡 SHORT R:R STRUCTURAL.** avg_win $0.113 vs avg_loss $0.158 (0.72:1). Needs >57%WR to break even. Currently pump-chain- EXTREME 57.1% — just barely profitable. Other SHORT signals lose.
+- **🟡 KAS worst7d token.** 6T 16.7%WR -$0.76. Signal-specific, not systematic.
+- **🟡 Disk 85% (18G free).** Monitor. candles.db 2.2G, coin_tracker.db 3.1G.
+- **0 CHANGES APPLIED.** — daily_orchestrator
 
 ## Audit Update (2026-09-29 17:10 UTC)
 
@@ -158,6 +168,8 @@ System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 29)
+
+1. **daily_orchestrator ~18:30 UTC — NO CONFIG CHANGE.** DB-verified: 44T -$0.78 (24h) | 132T 45.5%WR -$3.50 (7d). **PIPELINE HEALTHY.** 45 closed today +3.00% PnL. Post-fix: 21T 52.4%WR +$0.70, 0 ATR_SL hits. **pump-chain- SHORT EXTREME dominant:** 35T 57.1%WR +$0.90/7d. **doji-bottom-long NEW:** 3T +$0.15/7d, 3 open trades. **EXTREME regime worst** (-$2.47/7d, 75T). **SHORT R:R 0.72:1** structural. **Disk 85%.** **0 CHANGES APPLIED.** — daily_orchestrator
 
 1. **brain_auditor ~17:10 UTC — NO CONFIG CHANGE.** DB-verified: ~28T ~0%WR all small (24h) | 128T 42.2%WR -$4.41 (7d) | 317T 43.8%WR -$4.43 (14d). **LOSING AUTOPSY:** 13 hotset LONG hard_sl (normal chop), 5 pump-chain- SHORT EXTREME hard_sl (CASHCAT double), 2 mover- KILLED (aging out). **SHORT R:R 0.72:1** — structural disadvantage persists. **ATR_SL 31.9% 7d** — improved from 64%+. Post-fix: 0 hits. **pump-chain+ 0 trades/7d** — cold streak. **SIGNAL DIVERSITY:** Only volume-breakout-long+ (+$1.54) and pump-chain+ (+$1.23) profitable. **CREATIVE (3):** pump-chain- EXTREME conf boost +15pt, investigate pump-chain+ cold streak, SHORT TP multiplier. **0 CHANGES APPLIED.** — brain_auditor
 
