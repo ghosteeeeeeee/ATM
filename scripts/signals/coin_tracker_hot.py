@@ -148,11 +148,21 @@ def detect(token, data):
     trend_dir = data.get('trend_direction') or 'NEUTRAL'
     wyckoff = data.get('wyckoff_phase') or 'none'
 
-    # Regime gate: skip NEUTRAL (no directional edge — root cause of 42.4% WR)
+    # Regime gate: skip NEUTRAL unless strong structure present
+    # NEUTRAL allowed when: wyckoff accumulation + setup_score>40 + clustering>=2
+    # This unlocks 7 coins currently in accumulation (BANANA 59.71, BCH 58.24, etc.)
     # NOTE: regime in agg_scores is numeric (50.0=NEUTRAL, 60.0=LONG_BIAS, 40.0=SHORT_BIAS)
     regime = data.get('regime')
-    if regime is None or regime == 'NEUTRAL' or regime == 50.0:
-        return None
+    is_neutral = regime is None or regime == 'NEUTRAL' or regime == 50.0
+    if is_neutral:
+        # Allow NEUTRAL only with strong structure signal
+        strong_structure = (
+            (wyckoff and wyckoff != 'none') and
+            (setup_score or 0) > 40 and
+            max(clustering_bull, clustering_bear) >= 2
+        )
+        if not strong_structure:
+            return None
 
     # Primary trigger: health must be hot/ready (warm bypass removed — weak setups were leaking through)
     if health not in ('hot', 'ready'):

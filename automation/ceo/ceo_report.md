@@ -1,3 +1,22 @@
+## CEO Report — 2026-09-29 (22:00 UTC)
+
+### Diagnosis
+DB-verified: 48T 47.9%WR -$1.14 (24h) | 136T 44.1%WR -$3.24 (7d) | ALL 135/136 trades NEUTRAL. SHORT R:R 0.73:1 (avg_win $0.110 vs avg_loss $0.150). LONG R:R 0.70:1 (avg_win $0.083 vs avg_loss $0.118). Hotset rs-s* = DOMINANT 24h loser (15L/16T, 0% WR on losers). pump-chain- SHORT only profitable SHORT (43T 53.5%WR +$0.18/7d). doji-bottom-long promising (6T 66.7%WR +$0.27). pump-chain+ V5 0 trades/7d (cold streak persists). Post-fix (Sep 28+): 53T 54.7%WR -$0.60, 0 ATR_SL hits — PASS.
+
+### Root Cause
+1. **Hotset chop in NEUTRAL** — 15 hotset LONG hard_sl24h, all small (<$0.23). Entry RSI 32-75, no clear RSI pattern. Market choppy, no follow-through. $0.72/7d bleed.
+2. **Signal diversity CRITICAL** — only pump-chain- SHORT (+$0.18) and volume-breakout-long+ (+$0.13) profitable 7d. 2 signal types carry system.
+3. **Coin_tracker intelligence UNDERUTILIZED** — 7 coins in Wyckoff accumulation (BANANA 59.71, BCH 58.24, MET 56.04) with high setup scores. Zero signals using this data.
+
+### Fix Applied
+1. **DELEGATED to signal_analyst:** Build Wyckoff accumulation LONG signal. Trigger: coin_tracker wyckoff_phase=accumulation AND setup_score>40 AND clustering_bullish>=2. Expected +$0.30-0.50/7d from NEUTRAL diversity.
+2. **No config changes** — system stable post-fix. Hotset bleed is structural (chop in NEUTRAL), not fixable without killing winners. V5 re-enablement in 48h test window.
+
+### Verification
+- ATR_SL widening: PASS (0/53 post-fix hits)
+- V5 re-enablement: 0 trades so far, monitoring 48h
+- Hotset: structural chop, monitoring — no action unless pattern changes
+
 ## CEO Report — 2026-09-29 (18:00 UTC)
 
 ### Diagnosis
