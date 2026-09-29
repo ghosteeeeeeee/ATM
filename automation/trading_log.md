@@ -1595,3 +1595,27 @@ BY: auto_1hr
 - BTC LONG continuum-osc+ has been open since Sep 28 13:18 (13h+) at -$0.07 — monitoring
 
 **BY:** auto_1hr
+
+## [2026-09-29 03:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period since 01:54 UTC) | **Open:** 2 (LTC SHORT +$0.50, BTC LONG -$0.07)
+**24h:** 17T 71%WR +$0.87 | **7d:** 113T 43%WR -$3.33
+
+**24h exit breakdown:** 8 hard_sl (+$0.34), 8 profit-monster-trail (+$0.53), 1 HL_CLOSED ($0.00)
+- hard_sl at 47% but 5/8 profitable trail exits — NOT a SL problem
+- ATR_SL fix: 0 hits (15T+ post-fix validated)
+
+**24h by signal:** pump-chain- 5T 100%WR +$0.81 dominant. All others 1T each (too few to judge).
+**24h by regime:** EXTREME 10T 90%WR +$0.84 (dominant). HIGH 4T 50%WR -$0.02.
+
+**No Change Needed:**
+- 0 kill candidates (0 trades closed in last hour)
+- hard_sl rate normal (profitable trail exits, not SL failures)
+- Trade frequency normal (0.8T/hr)
+- EXTREME regime dominant and highly profitable
+- ATR_SL fix validated 15T+
+
+**Open Questions:**
+- BTC LONG opened 13h+ ago at -$0.07 — still flat, monitoring but no action needed yet
+
+**BY:** auto_1hr

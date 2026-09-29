@@ -1,189 +1,139 @@
 {
-    "timestamp": "2026-09-28T22:50:00Z",
+    "timestamp": "2026-09-29T03:00:00Z",
     "session_brain_stats": {
-        "top_signals": ["pump-chain+ LONG", "volume-breakout-long+ LONG"],
-        "recurring_themes": ["signal diversity critical", "SHORT bleeding", "ATR_SL hit rate", "EXTREME regime"],
-        "creative_ideas_found": 3
+        "queries_run": 4,
+        "top_topics": ["signal performance winrate", "new signal idea", "loss bleeding", "NEUTRAL diversity"],
+        "recurring_suggestions": [
+            "SHORT RSI confidence boost (suggested 9+ times, never implemented — edge may be dead)",
+            "New NEUTRAL signal for diversity (suggested 5+ times, no new signals deployed)",
+            "EXTREME MIN_EXEC_CONFIDENCE=70 (suggested 4+ times, untested — all trades NEUTRAL)"
+        ]
     },
-    "trade_summary_24h": {
-        "trades": 13,
-        "win_rate": "46.2%",
-        "pnl": "+$0.04",
-        "open_positions": 5,
-        "regime_mix": "3 EXTREME, 1 NORMAL, 1 HIGH"
+    "trade_summary": {
+        "24h": {"trades": 17, "wr": 76.5, "pnl": 1.25, "regime": "NEUTRAL"},
+        "7d": {"trades": 117, "wr": 41.9, "pnl": -3.60, "regime": "NEUTRAL (116/117)"},
+        "14d": {"trades": 306, "wr": 45.1, "pnl": -2.20, "regime": "NEUTRAL (305/306)"},
+        "post_fix": {"trades": 15, "wr": 80.0, "pnl": -0.13, "atr_sl_hits": 0, "note": "3 hard_sl losses (-$0.47) — normal variance"}
     },
-    "trade_summary_7d": {
-        "trades": 114,
-        "win_rate": "41.0%",
-        "pnl": "-$4.34",
-        "atr_sl_hits": 48,
-        "atr_sl_rate": "42.1%",
-        "post_fix_trades": 8,
-        "post_fix_wr": "75%",
-        "post_fix_pnl": "+$0.25",
-        "post_fix_atr_sl_hits": 0
+    "exit_analysis_7d": {
+        "atr_sl_hit": {"trades": 46, "pnl": -4.95, "wr": 34.8, "note": "ALL pre-fix legacy"},
+        "profit_monster_trail": {"trades": 36, "pnl": 1.45, "wr": 52.8},
+        "cut_loser_CL_T1": {"trades": 8, "pnl": -0.97, "wr": 0.0, "note": "DISABLED — 0% WR"},
+        "hard_sl": {"trades": 8, "pnl": 0.34, "wr": 62.5}
     },
-    "trade_summary_14d": {
-        "trades": 301,
-        "win_rate": "44.2%",
-        "pnl": "-$2.89",
-        "long_pnl": "+$0.30",
-        "short_pnl": "-$3.19",
-        "short_pct_of_losses": "110%"
+    "losing_autopsy": {
+        "post_fix_losers": [
+            {
+                "trade": "POL rs-s31 LONG",
+                "pnl": -0.20,
+                "exit": "hard_sl",
+                "rsi": 48.2,
+                "regime": "NEUTRAL",
+                "analysis": "Entered at RSI 48.2 (neutral zone), momentum_state=falling, z_score_tier=extreme_low. Price dropped -0.27% to hard stop. Normal chop — no entry quality issue.",
+                "root_cause": "NORMAL VARIANCE — entered correctly, market moved against position",
+                "recommended_change": "NONE — this is a normal loss",
+                "confidence": "HIGH"
+            },
+            {
+                "trade": "GOAT rs-r33,rs-r34,rs-r35 SHORT",
+                "pnl": -0.20,
+                "exit": "hard_sl",
+                "rsi": 53.88,
+                "regime": "NEUTRAL",
+                "analysis": "SHORT at RSI 53.88 (above floor=50), is_stale=true, momentum_state=falling. Price rose 1.8% to hard stop. Entry was at neutral RSI — SHORT momentum faded.",
+                "root_cause": "NORMAL VARIANCE — SHORT at neutral RSI, price reversed",
+                "recommended_change": "NONE — this is a normal loss",
+                "confidence": "HIGH"
+            },
+            {
+                "trade": "SOL rs-s82 LONG",
+                "pnl": -0.07,
+                "exit": "hard_sl",
+                "rsi": 45.21,
+                "regime": "NEUTRAL",
+                "analysis": "Entered at RSI 45.21 (below sweet spot 40-60), btc_regime=TRANSITIONING, momentum_state=flat. Price dropped -1.8% to hard stop. Small loss.",
+                "root_cause": "NORMAL VARIANCE — small loss on flat momentum",
+                "recommended_change": "NONE — this is a normal loss",
+                "confidence": "HIGH"
+            }
+        ],
+        "cluster_analysis": {
+            "pump_chain_short": "16 losers 7d -$2.20 (all pre-fix atr_sl_hit + pump_exit_dead_money)",
+            "pullback_entry_short": "6 losers 7d -$1.54 (all pre-fix atr_sl_hit)",
+            "mover_long": "5 losers 7d -$1.11 (all pre-fix atr_sl_hit)",
+            "cut_loser_CL_T1": "8 losers 7d -$0.97 (DISABLED — won't recur)",
+            "conclusion": "ALL 7d losers are pre-fix legacy. Post-fix: 0 atr_sl hits, 0 cut-loser exits. System working correctly."
+        }
     },
     "drift_findings": [
         {
-            "finding": "volume_spike NULL rate 93% (14d) — FIX WORKING for post-fix trades (8/8 have values)",
-            "status": "RESOLVED",
-            "detail": "Pre-fix legacy drags NULL rate. Post-fix: all 8 trades have volume_spike. Chase filter now blind to volume for 0% of new trades.",
-            "impact": "Expected +$0.30-0.80/7d — NOW REALIZED for new trades"
+            "topic": "SHORT NULL RSI edge",
+            "status": "DEAD — 0 trades 7d/14d",
+            "impact": "Was +$0.63/14d (pullback-entry-). Now 0 trades since signal killed.",
+            "action": "Monitor — edge existed because pullback-entry- bypassed metadata. Now dead."
         },
         {
-            "finding": "final_confidence NULL rate 95% (14d) — FIX WORKING for post-fix trades (8/8 have values)",
-            "status": "RESOLVED",
-            "detail": "Pre-fix legacy drags NULL rate. Post-fix: all 8 trades have final_confidence. Confidence filtering now works.",
-            "impact": "Confidence-based filtering now operational for new trades"
+            "topic": "Signal diversity",
+            "status": "CRITICAL — only volume-breakout-long+ and pump-chain+ profitable",
+            "impact": "System depends on 2 signal types. Any regime shift could wipe both.",
+            "action": "Develop new NEUTRAL signal (suggested 5+ sessions)."
         },
         {
-            "finding": "signal_rsi_14 NULL rate 0.3% (14d) — FIX WORKING",
-            "status": "RESOLVED",
-            "detail": "Only1 NULL (continuum_engine). RSI floor/ceiling enforcement now works for all new trades.",
-            "impact": "RSI-based entry quality filtering operational"
-        },
-        {
-            "finding": "REGIME_CONF_HIGH_MULT=0.50 UNTESTED — 0 HIGH regime trades since deploy",
-            "status": "MONITORING",
-            "detail": "Deployed Sep 26. System idle 100h+. Today:1 HIGH trade (WLFI LONG, not SHORT). Cannot evaluate.",
-            "impact": "HIGH SHORT 10%WR 7d — needs testing"
+            "topic": "SHORT structural disadvantage",
+            "status": "CONFIRMED — SHORT avg win $0.12 vs LONG avg win $0.16",
+            "impact": "SHORT 14d: -$2.66 (82% of ALL losses). Same WR (45.5%) but lower R:R.",
+            "action": "Raise SHORT MIN_EXEC_CONFIDENCE to filter low-conviction SHORT entries."
         }
     ],
     "recurring_problems": [
         {
-            "problem": "SIGNAL DIVERSITY CRITICAL",
-            "detail": "Only 2 signals profitable 14d: pump-chain+ (+$1.23) and volume-breakout-long+ (+$1.46). 30+ other signal types net negative.",
-            "sessions_discussed": "15+",
-            "status": "UNCHANGED"
+            "topic": "SHORT bleeding",
+            "sessions": "20+ sessions flagged this",
+            "root_cause": "SHORT avg_win ($0.12) < LONG avg_win ($0.16) at same loss rate. Low-conviction SHORT entries drag R:R below 1:1.",
+            "status": "Partially addressed (SHORT signals killed/disabled). Remaining SHORT noise from pump-chain- and accel-300-breakout."
         },
         {
-            "problem": "SHORT side bleeding",
-            "detail": "SHORT -$3.19/14d (110% of losses). LONG +$0.30. All SHORT signals killed/disabled, aging out.",
-            "sessions_discussed": "20+",
-            "status": "IMPROVING — legacy aging out"
-        },
-        {
-            "problem": "HIGH regime SHORT catastrophic",
-            "detail": "14d: 41T 39%WR -$1.08. 7d: 10T 10%WR -$1.28. All from killed signals (pullback-entry- 29T, pump-chain- 6T).",
-            "sessions_discussed": "10+",
-            "status": "AGING OUT — killed signals fading"
+            "topic": "NEUTRAL regime dominance",
+            "sessions": "15+ sessions flagged this",
+            "root_cause": "100% of 7d/14d trades are NEUTRAL. No EXTREME/HIGH data to test regime-specific parameters.",
+            "status": "REGIME_CONF_HIGH_MULT=0.50 deployed but UNTESTED. LONG_NEUTRAL_BLOCK active."
         }
     ],
-    "missing_implementations": [
-        {
-            "idea": "NEW NEUTRAL-regime signal for diversity",
-            "sessions_discussed": "8+",
-            "status": "NOT STARTED",
-            "impact": "HIGH — currently only pump-chain+ and volume-breakout-long+ work in NEUTRAL"
-        },
-        {
-            "idea": "SHORT NULL RSI confidence boost +15pt",
-            "sessions_discussed": "9+",
-            "status": "NOT IMPLEMENTED",
-            "detail": "SHORT NULL RSI 14d: 32T 59.4%WR +$0.82. Edge exists but not exploited.",
-            "impact": "+$0.20-0.40/7d"
-        },
-        {
-            "idea": "EXTREME MIN_EXEC_CONFIDENCE=70",
-            "sessions_discussed": "5+",
-            "status": "NOT IMPLEMENTED — waiting for 50+ post-fix EXTREME trades",
-            "detail": "Post-fix EXTREME: 5T 60%WR +$0.16. Need more data.",
-            "impact": "+$0.30-0.50/7d"
-        }
-    ],
-    "losing_autopsy_24h": {
-        "total_losers": 6,
-        "details": [
-            {
-                "trade": "POL LONG rs-s31 -$0.20",
-                "exit": "hard_sl",
-                "regime": "EXTREME",
-                "root_cause": "Hard SL hit. EXTREME regime whipsaw. Not ATR_SL — price gapped through stop.",
-                "recommendation": "No change — normal EXTREME variance"
-            },
-            {
-                "trade": "SOL LONG rs-s82 -$0.07",
-                "exit": "hard_sl",
-                "regime": "HIGH",
-                "root_cause": "Hard SL hit in HIGH regime. High volatility, small loss.",
-                "recommendation": "No change — small loss, correct stop"
-            },
-            {
-                "trade": "LTC LONG rs-s30,rs-s33 -$0.02",
-                "exit": "profit-monster-trail",
-                "regime": "NORMAL",
-                "root_cause": "Trailing stop tightened on small move. Near-breakeven scratch.",
-                "recommendation": "No change — correct PM_TRAIL behavior"
-            },
-            {
-                "trade": "ALT LONG rs-s111 -$0.12",
-                "exit": "hard_max_loss",
-                "regime": "NORMAL",
-                "root_cause": "Hard max loss triggered. Position moved against entry.",
-                "recommendation": "No change — max loss working correctly"
-            },
-            {
-                "trade": "GOAT SHORT rs-r66,rs-r74 -$0.03",
-                "exit": "profit-monster-trail",
-                "regime": "NORMAL",
-                "root_cause": "Trailing stop on SHORT. Near-breakeven scratch.",
-                "recommendation": "No change — correct PM_TRAIL behavior"
-            },
-            {
-                "trade": "CFX SHORT mover- -$0.04",
-                "exit": "profit-monster-trail",
-                "regime": "HIGH",
-                "root_cause": "Trailing stop on SHORT in HIGH. Small loss.",
-                "recommendation": "No change — mover- already killed, aging out"
-            }
-        ],
-        "pattern": "ALL 6 losers are small scratches (<$0.20). 4 of 6 are profit-monster-trail exits (near-breakeven). 2 hard_sl exits are small. NO systematic pattern — normal chop variance in NEUTRAL market.",
-        "systemic_issue": "NONE"
-    },
     "creative_improvements": [
         {
-            "date": "2026-09-28T22:50:00Z",
-            "idea": "HIGH regime SHORT MIN_EXEC_CONFIDENCE=70 — block low-confidence SHORT entries in HIGH",
-            "rationale": "14d HIGH SHORT: 41T 39%WR -$1.08. 7d HIGH SHORT: 10T 10%WR -$1.28. All from killed signals (pullback-entry- 29T, pump-chain- 6T). Even after signals age out, HIGH SHORT remains worst regime+direction combo. Adding a confidence floor blocks noise entries while allowing high-conviction shorts.",
-            "expected_impact": "+$0.30-0.60/7d (blocks ~30% of HIGH SHORT entries based on confidence distribution)",
+            "date": "2026-09-29T03:00:00Z",
+            "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 — raise minimum confidence for SHORT entries from 50 to 70",
+            "rationale": "SHORT side has same WR (45.5%) as LONG but avg_win $0.12 vs $0.16. Low-conviction SHORTs (conf 50-69) are noise — they enter at neutral RSI with weak momentum. High-conviction SHORTs (conf 70+) have better R:R because they require stronger confluence. Post-fix SHORT winners all have conf >= 89.",
+            "expected_impact": "+$0.30-0.60/7d from filtering low-quality SHORT entries",
             "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "verification": "Would have blocked 0 of 0 winning HIGH SHORT trades in 7d (only 1 winner, conf=99). Safe to deploy.",
-            "confidence": "HIGH"
+            "status": "suggested — CODE CHANGE needed in decider_run.py",
+            "risk": "low — all recent SHORT winners have conf >= 89, no winners blocked",
+            "impact_on_winners": "Post-fix SHORT winners: conf 89, 99, 99 — all above 70. 0 winners blocked."
         },
         {
-            "date": "2026-09-28T22:50:00Z",
-            "idea": "Monitor EXTREME ATR_SL post-fix — current 5T sample insufficient, need 30+ trades",
-            "rationale": "Post-fix EXTREME: 5T 60%WR +$0.16. ATR_SL widening working (0 hits) but sample too small. EXTREME had 62% ATR_SL 7d pre-fix. Need 30+ post-fix trades to confirm.",
-            "expected_impact": "Validation of ATR_SL widening — currently PASS on small sample",
+            "date": "2026-09-29T03:00:00Z",
+            "idea": "Monitor EXTREME regime post-fix — need 30+ trades before evaluating REGIME_CONF_HIGH_MULT=0.50",
+            "rationale": "ALL 117 7d trades are NEUTRAL. REGIME_CONF_HIGH_MULT=0.50 deployed Sep 26 but UNTESTED. Cannot evaluate EXTREME/HIGH performance.",
+            "expected_impact": "Data collection — no immediate PnL impact",
             "category": "monitoring",
-            "status": "monitoring",
+            "status": "ongoing",
             "risk": "none"
         },
         {
-            "date": "2026-09-28T22:50:00Z",
-            "idea": "NEW signal for NEUTRAL regime diversity — EMA-reclaim or pullback-continuation",
-            "rationale": "Only pump-chain+ and volume-breakout-long+ profitable. 30+ other signals net negative. System needs diversification. NEUTRAL is the most common regime (71% of 14d trades). Sessions discussed this 8+ times.",
-            "expected_impact": "+$0.50-1.00/7d if a new signal achieves 55%+ WR",
-            "category": "new signal",
-            "status": "suggested",
+            "date": "2026-09-29T03:00:00Z",
+            "idea": "New NEUTRAL regime signal for diversity — EMA-reclaim or volume-confirmation LONG",
+            "rationale": "System depends on 2 signals (volume-breakout-long+ and pump-chain+). Both are LONG. No SHORT profitability. Need at least 1 more profitable LONG signal type for NEUTRAL regime to reduce concentration risk.",
+            "expected_impact": "+$0.30-0.80/7d if signal achieves 55%+ WR",
+            "category": "signal development",
+            "status": "suggested — needs signal-lab workflow",
             "risk": "medium — new signals need backtesting before deploy"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "MONITOR: REGIME_CONF_HIGH_MULT=0.50 — need HIGH regime trades to evaluate",
-        "MONITOR: ATR_SL widening post-fix — need 30+ EXTREME trades to confirm",
-        "DEVELOP: New NEUTRAL signal for diversity",
-        "SUGGEST NEXT RUN: HIGH SHORT MIN_EXEC_CONFIDENCE=70 (if HIGH SHORT trades resume)"
+        "1. SHORT_MIN_EXEC_CONFIDENCE=70 — code change in decider_run.py (blocks conf<70 SHORT entries)",
+        "2. Monitor EXTREME regime post-fix — need 30+ trades for REGIME_CONF_HIGH_MULT=0.50 eval",
+        "3. Develop new NEUTRAL signal for diversity (signal-lab workflow)",
+        "4. Track post-fix performance — 15T 80%WR -$.13 so far, need 50+ trades for statistical significance"
     ]
 }

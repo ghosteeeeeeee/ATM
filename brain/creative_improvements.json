@@ -856,5 +856,34 @@
     "category": "entry sniper",
     "status": "monitoring",
     "risk": "medium"
+  },
+  {
+    "timestamp": "2026-09-29T03:00:00Z",
+    "ideas": [
+      {
+        "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 — code change in decider_run.py",
+        "rationale": "SHORT avg_win $0.12 vs LONG $0.16 at same WR. Low-conviction SHORTs (conf 50-69) are noise. Post-fix SHORT winners all conf >= 89.",
+        "expected_impact": "+$0.30-0.60/7d",
+        "category": "entry sniper",
+        "risk": "low",
+        "status": "suggested — needs code change"
+      },
+      {
+        "idea": "New NEUTRAL signal for diversity (EMA-reclaim or volume-confirmation)",
+        "rationale": "Only 2 profitable signal types. System depends on volume-breakout-long+ and pump-chain+.",
+        "expected_impact": "+$0.30-0.80/7d if 55%+ WR",
+        "category": "signal development",
+        "risk": "medium",
+        "status": "suggested — needs signal-lab"
+      },
+      {
+        "idea": "Monitor EXTREME post-fix (need 30+ trades for REGIME_CONF_HIGH_MULT=0.50 eval)",
+        "rationale": "ALL 117 7d trades NEUTRAL. REGIME_CONF_HIGH_MULT=0.50 UNTESTED.",
+        "expected_impact": "data collection",
+        "category": "monitoring",
+        "risk": "none",
+        "status": "ongoing"
+      }
+    ]
   }
 ]

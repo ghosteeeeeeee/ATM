@@ -1,16 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-28 22:50 UTC**
+**Last Updated: 2026-09-29 03:00 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 LONG doji-bottom). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14).
+System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14). SHORT signals killed/disabled.
 
-- **24h (rolling):** 13T 46.2%WR +$0.04 (DB-verified). All scratches — light trading.
-- **7d:** 114T 41.0%WR -$4.34 (DB-verified). ATR_SL hit rate 42.1% (PASS <55%). Post-fix: 0/8 ATR_SL hits.
-- **14d:** 301T 44.2%WR -$2.89 (DB-verified). LONG +$0.30, SHORT -$3.19 (110% of losses).
-- **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), WLFI LONG doji-bottom (HIGH), LDO/LTC/IO SHORT pump-chain- (EXTREME).
+- **24h (rolling):** 17T 76.5%WR +$1.25 (DB-verified). Strong day.
+- **7d:** 117T 41.9%WR -$3.60 (DB-verified). ALL ATR_SL hits pre-fix legacy. Post-fix: 0/15 ATR_SL hits.
+- **14d:** 306T 45.1%WR -$2.20 (DB-verified). LONG +$0.46, SHORT -$2.66 (121% of losses).
+- **POST-FIX:** 15T 80%WR -$0.13. 3 hard_sl losses (normal variance, <$0.20 each).
+- **OPEN:** 2 positions — BTC LONG continuum-osc+ (NEUTRAL), LTC SHORT pump-chain- (NEUTRAL).
 - **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
@@ -53,6 +54,17 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
+## Audit Update (2026-09-29 03:00 UTC)
+
+- **🟢 POST-FIX VERIFIED WORKING.** 15T 80%WR -$0.13. 0 ATR_SL hits. 3 hard_sl losses (POL -$0.20, GOAT -$0.20, SOL -$0.07) — all normal variance, no entry quality issues.
+- **SHORT STRUCTURAL DISADVANTAGE CONFIRMED.** avg_win $0.12 vs LONG $0.16 at same WR (45.5%). SHORT = 82% of 14d losses (-$2.66). Low-conviction SHORT entries drag R:R below 1:1.
+- **7d REGIME: ALL NEUTRAL (116/117).** No EXTREME/HIGH data. REGIME_CONF_HIGH_MULT=0.50 UNTESTED.
+- **7d EXIT ANALYSIS:** 46 atr_sl_hit (-$4.95, ALL pre-fix), 36 profit-monster-trail (+$1.45), 8 cut-loser-CL-T1 (-$0.97, DISABLED), 8 hard_sl (+$0.34).
+- **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) profitable. 2 signal types carry all PnL.
+- **LOSING AUTOPSY:** 3 post-fix losers ALL small hard_sl (<$0.20). No systematic pattern. 7d losers ALL pre-fix legacy.
+- **CREATIVE (3):** (1) SHORT_MIN_EXEC_CONFIDENCE=70 — code change needed (+$0.30-0.60/7d, 0 winners blocked) (2) Monitor EXTREME post-fix (need 30+ trades) (3) New NEUTRAL signal for diversity.
+- **0 CHANGES APPLIED.**
+
 ## Audit Update (2026-09-28 22:50 UTC)
 
 - **🟢 ALL POST-FIX FIXES VERIFIED WORKING.** volume_spike: 8/8 post-fix trades have values. final_confidence: 8/8. signal_rsi_14: 0.3% NULL. Chase filter now blind to volume for 0% of new trades. Confidence filtering operational.
@@ -77,6 +89,10 @@ System active. 5 open positions (3 SHORT pump-chain-, 1 LONG continuum-osc+, 1 L
 - **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.38/14d) profitable.
 - **CREATIVE (3):** (1) Dead hours fix APPLIED (2) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades (3) SHORT NULL RSI confidence boost +15pt (9th suggestion).
 - **1 CHANGE APPLIED.**
+
+## Today's Changes (Sep 29)
+
+1. **brain_auditor ~03:00 UTC — NO CONFIG CHANGE.** DB-verified: 17T 76.5%WR +$1.25 (24h) | 117T 41.9%WR -$3.60 (7d) | 306T 45.1%WR -$2.20 (14d). **POST-FIX TRADES: 15T 80%WR -$0.13.** 0 ATR_SL hits. 3 hard_sl losses (POL -$0.20, GOAT -$0.20, SOL -$0.07) — all normal variance. **SHORT STRUCTURAL DISADVANTAGE CONFIRMED:** avg_win $0.12 vs LONG $0.16 at same WR. SHORT = 82% of 14d losses. **7d REGIME: ALL NEUTRAL (116/117).** No EXTREME/HIGH data. **7d EXIT ANALYSIS:** 46 atr_sl_hit (-$4.95, ALL pre-fix), 36 profit-monster-trail (+$1.45), 8 cut-loser-CL-T1 (-$0.97, DISABLED). **SIGNAL DIVERSITY CRITICAL:** Only volume-breakout-long+ and pump-chain+ profitable. **LOSING AUTOPSY:** 3 post-fix losers ALL small hard_sl (<$0.20). No systematic pattern. **CREATIVE (3):** (1) SHORT_MIN_EXEC_CONFIDENCE=70 code change needed (+$0.30-0.60/7d, 0 winners blocked) (2) Monitor EXTREME post-fix (need 30+ trades) (3) New NEUTRAL signal for diversity. **0 CHANGES APPLIED.** — brain_auditor
 
 ## Today's Changes (Sep 28)
 

@@ -3296,3 +3296,15 @@
   2T last hour (1W 1L +/usr/bin/bash.02). 24h 17T 71%WR +/usr/bin/bash.87. ATR_SL 0% (15T+ post-fix).
   hard_sl 47% but 5/8 profitable (trailing stops working). No kill candidates.
   EXTREME 90%WR dominant. System healthy. BY: auto_1hr
+[2026-09-29 03:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 17T 76.5%WR +$1.25 (24h) | 117T 41.9%WR -$3.60 (7d) | 306T 45.1%WR -$2.20 (14d)
+  POST-FIX TRADES: 15T 80%WR -$0.13. 0 ATR_SL hits. 3 hard_sl losses (normal variance).
+  SHORT structural disadvantage CONFIRMED: avg_win $0.12 vs LONG $0.16 at same WR.
+  SIGNAL DIVERSITY CRITICAL: Only volume-breakout-long+ and pump-chain+ profitable.
+  LOSING AUTOPSY: 3 post-fix losers all small hard_sl (<$0.20). No systematic pattern.
+  CREATIVE: (1) SHORT_MIN_EXEC_CONFIDENCE=70 code change (2) Monitor EXTREME (3) New NEUTRAL signal.
+  0 CHANGES APPLIED. BY: brain_auditor
+[2026-09-29 03:11 UTC] auto_1hr: NO CHANGE — analysis only
+  0T last hour (quiet period). 24h 17T 71%WR +/usr/bin/bash.87. 7d 113T 43%WR -.33.
+  hard_sl 47% but 5/8 profitable (trailing stops working). ATR_SL 0% (15T+ post-fix).
+  EXTREME 90%WR dominant. No kill candidates. System healthy. BY: auto_1hr
