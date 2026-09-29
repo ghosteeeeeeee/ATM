@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 19:30 UTC**
+**Last Updated: 2026-09-29 20:32 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits. CASHCAT BLACKLISTED from SHORT (2 consecutive losses -$0.68). pump-chain- SHORT EXTREME dominant (41T 53.7%WR +$0.52/14d). pump-chain+ ZERO trades/7d — cold streak (structural: NEUTRAL + BTC guard). SHORT R:R 0.81:1 (improved from 0.59:1 via ATR_TP_K_MULT=2.0). Signal diversity CRITICAL — 2 signals carry all PnL.
+System active. 3 open positions (SOL LONG bb-bounce-v2, COMP LONG volume-breakout-long+, BTC LONG continuum-osc+). Pipeline healthy. Post-fix: 53T 54.7%WR -$0.60, 0 ATR_SL hits. CASHCAT BLACKLISTED from SHORT — WORKING (0 post-blacklist trades). pump-chain- SHORT EXTREME dominant (43T 53.5%WR +$0.18/7d). pump-chain+ ZERO trades/7d — cold streak (NEUTRAL + BTC guard). SHORT R:R 0.74:1 (structural). Signal diversity CRITICAL — 2 signals carry all PnL. doji-bottom-long NEW: 6T 66.7%WR +$0.27/7d — promising.
 
-- **24h (rolling):** 44T 50%WR -$0.78. pump-chain- SHORT 15T 66.7%WR +$0.91 (ONLY profitable). hard_sl 27T 40.7%WR -$1.29 (dominant exit). profit-monster-trail 17T 58.8%WR +$0.51.
+- **24h (rolling):** 48T 50%WR -$0.93. pump-chain- SHORT 15T 60%WR +$0.59 (ONLY profitable). doji-bottom-long 5T 80%WR +$0.28. hotset rs-s* 19T 31.6%WR -$1.09 (DOMINANT loser — 8 hard_sl).
 - **7d:** 132T 45.5%WR -$3.50. EXTREME -$2.47 (75T), HIGH -$1.00 (31T), NORMAL -$0.04 (23T). Post-fix (Sep 28+): 21T 52.4%WR +$0.70. 0 ATR_SL hits.
 - **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), NEO LONG doji-bottom-long (HIGH), NXPC LONG doji-bottom-long (NORMAL).
 - **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
@@ -53,17 +53,32 @@ System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits. CASH
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-29 19:30 UTC)
+## Audit Update (2026-09-29 20:32 UTC)
 
-- **🔴 24h CHOP.** 44T 50%WR -$0.78. 27 hard_sl (-$1.29), 17 profit-monster-trail (+$0.51). pump-chain- SHORT 15T 66.7%WR +$0.91 (ONLY profitable signal).
-- **🔴 CASHCAT BLACKLISTED FROM SHORT.** 2 consecutive pump-chain- SHORT hard_sl losses (-$0.68 24h). Low-cap meme with high reversibility. 0 winning SHORT trades 14d. Expected +$0.10/7d.
-- **🟡 PUMP-CHAIN+ ZERO trades/7d.** Cold streak. Signal enabled but NEUTRAL + BTC guard blocks all setups. Was #2 profitable (+$1.23/14d). Dead hours fix (opened 3h) needs regime shift to matter.
-- **🟡 SHORT R:R 0.81:1** — avg_win $0.123 vs avg_loss $0.158. Needs >55%WR to break even. pump-chain- EXTREME 53.7% — barely profitable.
-- **🟢 ATR_SL 0% post-fix** — VERIFIED WORKING. All exits profit-monster-trail or hard_sl.
-- **7d REGIME:** EXTREME -$2.47 (75T 45.3%), HIGH -$1.00 (31T 35.5%), NORMAL -$0.04 (23T 43.5%).
+- **🟢 ATR_SL 24.1% 7d — VERIFIED WORKING.** Post-fix: 0/53 hits (0%). Massive improvement from 49.2% pre-fix. All exits profit-monster-trail.
+- **🟢 CASHCAT BLACKLIST WORKING.** 0 trades after 19:30 UTC. All3 recent trades were before blacklist application.
+- **🟢 doji-bottom-long NEW — PROMISING.** 6T 66.7%WR +$0.27/7d. All profit-monster-trail. Monitor for 20+ trades.
+- **🟡 HOTSET rs-s* 85+ CONFIDENCE INFLATED.** 30T/7d 40%WR -$0.72. All fire at 85+ confidence but deliver only 40% WR. USUAL entry RSI=81.82 (extreme overbought) -$0.23. No RSI ceiling filter on hotset signals.
+- **🟡 SHORT R:R 0.74:1 PERSISTS.** avg_win $0.110 vs avg_loss $0.150. Needs >57%WR to break even. Currently 42.2%.
+- **🟡 PUMP-CHAIN+ COLD STREAK — 7d 0 trades.** Dead hours + NEUTRAL + BTC guard. 14d still +$1.23.
+- **7d REGIME:** EXTREME -$2.65 (76T 44.7%), HIGH -$0.86 (34T 41.2%), NORMAL -$0.01 (24T 45.8%).
+- **LOSING AUTOPSY:** 22 losers 24h — 8 hotset LONG hard_sl (normal chop, all small <$0.23), 5 pump-chain- SHORT hard_sl (CASHCAT blacklisted), 2 mover- KILLED (aging out), 7 profit-monster-trail scratches. No systematic pattern.
+- **CREATIVE (3):** (1) Hotset RSI ceiling filter RSI_MAX=75 suggested (2) Monitor doji-bottom-long quality (3) Monitor ATR_TP_K_MULT=2.0 SHORT R:R impact.
+- **0 CHANGES APPLIED.** — brain_auditor
+
+## Audit Update (2026-09-29 21:00 UTC)
+
+- **🟢 POST-FIX SOLID.** 45T 51.1%WR +$0.78 (Sep 28 10:39+). 0 atr_sl_hit. All exits profit-monster-trail or hard_sl.
+- **🟡 HOTSET rs-s* SIGNALS: 30T/7d 40%WR -$0.72** — DOMINANT hard_sl source (8/13 hard_sl 24h). Small losses but consistent bleed. CONF_FILTER_MIN=65 may be too permissive.
+- **🟡 PUMP-CHAIN+ V5 RE-ENABLED.** CEO overrode NEVER_REENABLE. 48h test window. 0 trades so far — cold streak persists (7d).
+- **🟡 CEO RSI CHANGES: SHORT_RSI_FLOOR 50→40, SHORT_RSI_CEILING 70→65, LONG_RSI_FLOOR 30→20, LONG_RSI_CEILING 70→65.** Some post-fix violations (USUAL RSI=81.82 LONG -$0.23, CASHCAT RSI=65.98 SHORT -$0.42). Monitor 48h.
+- **🟢 pump-chain- SHORT 15T/24h 66.7%WR +$0.91** — ONLY profitable signal. CASHCAT blacklist working.
+- **🟢 ATR_SL 0% post-fix** — VERIFIED WORKING. Legacy atr_sl_hit (23T EXTREME -$2.17 7d) aging out.
+- **7d REGIME:** EXTREME -$2.47 (75T 45.3%), HIGH -$1.00 (32T 37.5%), NORMAL -$0.04 (23T 43.5%).
+- **SHORT R:R 0.78:1** — avg_win $0.123 vs avg_loss $0.158. Needs >55%WR to break even.
 - **SIGNAL DIVERSITY CRITICAL** — only volume-breakout-long+ (+$1.54) and pump-chain- SHORT (+$0.36) profitable.
-- **CREATIVE (3):** (1) CASHCAT blacklist APPLIED (2) Investigate pump-chain+ cold streak (3) Monitor ATR_TP_K_MULT=2.0 R:R impact.
-- **1 CHANGE APPLIED.** — brain_auditor
+- **CREATIVE (3):** (1) Monitor V5 re-enablement 48h (2) Hotset EXTREME RSI_MIN=45 monitor (3) Investigate hotset confidence distribution.
+- **0 CHANGES APPLIED.** — brain_auditor
 
 ## Audit Update (2026-09-29 18:30 UTC)
 
@@ -180,6 +195,10 @@ System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits. CASH
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 29)
+
+1. **brain_auditor ~20:32 UTC — NO CONFIG CHANGE.** DB-verified: 48T 50%WR -$0.93 (24h) | 137T 43.8%WR -$3.51 (7d) | 318T 44.7%WR -$3.56 (14d). **POST-FIX: 53T 54.7%WR -$0.60 (0 ATR_SL hits).** **ATR_SL 24.1% 7d — VERIFIED WORKING.** Post-fix: 0/53 hits. **CASHCAT BLACKLIST WORKING** — 0 post-blacklist trades. **HOTSET rs-s* 85+ CONFIDENCE INFLATED** — 30T/7d 40%WR -$0.72. USUAL RSI=81.82 -$0.23. **doji-bottom-long NEW** — 6T 66.7%WR +$0.27. **SHORT R:R 0.74:1** structural. **7d REGIME:** EXTREME -$2.65 (76T), HIGH -$0.86 (34T), NORMAL -$0.01 (24T). **LOSING AUTOPSY:** 22 losers 24h — 8 hotset hard_sl (normal chop), 5 pump-chain- (CASHCAT blacklisted), 2 mover- (killed). **CREATIVE (3):** Hotset RSI_MAX=75, monitor doji-bottom-long, monitor ATR_TP_K_MULT. **0 CHANGES APPLIED.** — brain_auditor
+
+1. **brain_auditor ~21:00 UTC — NO CONFIG CHANGE.** DB-verified: 45T 48.9%WR -$0.76 (24h) | 133T 42.9%WR -$3.48 (7d) | 314T 44.3%WR -$3.53 (14d). **POST-FIX: 45T 51.1%WR +$0.78 (0 atr_sl_hit).** **HOTSET rs-s* SIGNALS: 30T/7d 40%WR -$0.72** — DOMINANT hard_sl source (8/13 hard_sl 24h). **pump-chain+ V5 RE-ENABLED** (CEO override of NEVER_REENABLE). 0 trades. **CEO RSI CHANGES:** SHORT_RSI_FLOOR 50→40, SHORT_RSI_CEILING 70→65, LONG_RSI_FLOOR 30→20, LONG_RSI_CEILING 70→65. Post-fix violations: USUAL RSI=81.82 LONG -$0.23, CASHCAT RSI=65.98 SHORT -$0.42. **LOSING AUTOPSY:** 21/45 24h hard_sl (46.7%). CASHCAT blacklisted. KAS worst token. **CREATIVE (3):** V5 monitor, hotset RSI_MIN=45 monitor, hotset conf distribution. **0 CHANGES APPLIED.** — brain_auditor
 
 1. **brain_auditor ~19:30 UTC — 1 CONFIG CHANGE.** **CASHCAT BLACKLISTED FROM SHORT.** 2 consecutive pump-chain- SHORT hard_sl losses in 24h (-$0.68). Low-cap meme, high reversibility, 0 winning SHORT trades 14d. Expected +$0.10/7d. **DB-verified:** 44T 50%WR -$0.78 (24h) | ~132T ~42%WR -$3.51 (7d) | 318T 43.7%WR -$4.43 (14d). **LOSING AUTOPSY:** 21 losers 24h — 16 hard_sl (-$3.34), 5 profit-monster-trail (-$0.14). CASHCAT double (-$0.68), KAS 5 losses (-$0.82). All EXTREME. **SHORT R:R 0.81:1.** **7d REGIME:** EXTREME -$2.47, HIGH -$1.00, NORMAL -$0.04. **pump-chain+ ZERO trades/7d** — cold streak. **SIGNAL DIVERSITY CRITICAL.** **CREATIVE (3):** CASHCAT blacklist APPLIED, pump-chain+ investigation, ATR_TP_K_MULT monitoring. **1 CHANGE APPLIED.** — brain_auditor
 

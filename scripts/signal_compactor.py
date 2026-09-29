@@ -1952,7 +1952,52 @@ def _score_signal(token, direction, conf, source, signal_type,
     except ImportError:
         pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult
+    # ── Thesis Validation System (TVS) ────────────────────────────────────────
+    # Boost/penalize based on historical thesis validation for this token+direction+signal
+    thesis_validation_mult = 1.0
+    try:
+        from hermes_constants import (
+            TVS_ENABLED, TVS_BOOST_VALIDATED, TVS_BOOST_STRONG, TVS_PENALTY_INVALIDATED,
+            TVS_LOOKBACK_TRADES, TVS_MFE_THRESHOLD_STRONG,
+        )
+        if TVS_ENABLED:
+            _tvs_conn = None
+            try:
+                from signal_schema import _runtime, _get_conn
+                _tvs_conn = _get_conn(_runtime())
+                _tvs_c = _tvs_conn.cursor()
+                _tvs_c.execute("""
+                    SELECT thesis_validated, thesis_mfe FROM signal_outcomes
+                    WHERE token = ? AND direction = ? AND signal_type = ?
+                      AND thesis_validated IS NOT NULL
+                    ORDER BY created_at DESC LIMIT ?
+                """, (token.upper(), direction.upper(), signal_type, TVS_LOOKBACK_TRADES))
+                _tvs_rows = _tvs_c.fetchall()
+                if _tvs_rows:
+                    _tvs_validated = sum(1 for r in _tvs_rows if r[0] == 1)
+                    _tvs_count = len(_tvs_rows)
+                    _tvs_pct = _tvs_validated / _tvs_count if _tvs_count > 0 else 0
+                    _tvs_avg_mfe = sum(r[1] for r in _tvs_rows if r[1] is not None) / max(1, sum(1 for r in _tvs_rows if r[1] is not None))
+                    
+                    if _tvs_pct > 0.8 and _tvs_avg_mfe > TVS_MFE_THRESHOLD_STRONG:
+                        thesis_validation_mult = TVS_BOOST_STRONG
+                        log(f"  🎯 [TVS] {token} {direction}: strong thesis ({_tvs_pct:.0%} validated, avg MFE={_tvs_avg_mfe:.2f}%) → {TVS_BOOST_STRONG}x boost")
+                    elif _tvs_pct > 0.5:
+                        thesis_validation_mult = TVS_BOOST_VALIDATED
+                        log(f"  🎯 [TVS] {token} {direction}: thesis validated ({_tvs_pct:.0%}) → {TVS_BOOST_VALIDATED}x boost")
+                    elif _tvs_pct < 0.5:
+                        thesis_validation_mult = TVS_PENALTY_INVALIDATED
+                        log(f"  🚫 [TVS] {token} {direction}: thesis invalidated ({_tvs_pct:.0%}) → {TVS_PENALTY_INVALIDATED}x penalty")
+            except Exception as _tvs_e:
+                pass  # non-fatal
+            finally:
+                if _tvs_conn:
+                    try: _tvs_conn.close()
+                    except: pass
+    except ImportError:
+        pass
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult
     return final_score
 
 
@@ -2927,9 +2972,65 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # signals from other generators.
             from signal_schema import _is_loss_cooldown_active
             if _is_loss_cooldown_active(token, direction):
-                if verbose:
-                    log(f"  LOSS-COOLDOWN skip {token} {direction}")
-                continue
+                # ── TVS Cooldown Override ──────────────────────────────────────
+                # Override cooldown if thesis was validated and setup improved
+                _tvs_override = False
+                try:
+                    from hermes_constants import (
+                        TVS_ENABLED, TVS_COOLDOWN_OVERRIDE, TVS_COOLDOWN_OVERRIDE_MAX,
+                        TVS_COOLDOWN_OVERRIDE_WINDOW, TVS_SETUP_IMPROVEMENT_THRESHOLD,
+                        TVS_MIN_CONFIDENCE_FOR_OVERRIDE,
+                    )
+                    if TVS_ENABLED and TVS_COOLDOWN_OVERRIDE:
+                        if conf and conf >= TVS_MIN_CONFIDENCE_FOR_OVERRIDE:
+                            # Check thesis history
+                            _tvs_conn2 = None
+                            try:
+                                from signal_schema import _runtime, _get_conn
+                                _tvs_conn2 = _get_conn(_runtime())
+                                _tvs_c2 = _tvs_conn2.cursor()
+                                _tvs_c2.execute("""
+                                    SELECT thesis_validated, thesis_mfe FROM signal_outcomes
+                                    WHERE token = ? AND direction = ? AND thesis_validated IS NOT NULL
+                                    ORDER BY created_at DESC LIMIT 3
+                                """, (token.upper(), direction.upper()))
+                                _tvs_rows2 = _tvs_c2.fetchall()
+                                if _tvs_rows2:
+                                    _tvs_validated2 = sum(1 for r in _tvs_rows2 if r[0] == 1)
+                                    _tvs_pct2 = _tvs_validated2 / len(_tvs_rows2)
+                                    if _tvs_pct2 > 0.5:
+                                        # Check setup improvement
+                                        _prev_price = None
+                                        _tvs_c2.execute("""
+                                            SELECT entry_price, signal_rsi_14 FROM trades
+                                            WHERE token = ? AND direction = ? AND status = 'closed'
+                                            ORDER BY close_time DESC LIMIT 1
+                                        """, (token.upper(), direction.upper()))
+                                        _prev_row = _tvs_c2.fetchone()
+                                        if _prev_row:
+                                            _prev_price = _prev_row[0]
+                                        if _prev_price and current_price:
+                                            _price_improved = (
+                                                (direction.upper() == 'SHORT' and current_price < _prev_price) or
+                                                (direction.upper() == 'LONG' and current_price > _prev_price)
+                                            )
+                                            if _price_improved:
+                                                _tvs_override = True
+                            except Exception:
+                                pass
+                            finally:
+                                if _tvs_conn2:
+                                    try: _tvs_conn2.close()
+                                    except: pass
+                except ImportError:
+                    pass
+                
+                if _tvs_override:
+                    log(f"  ✅ [TVS-OVERRIDE] {token} {direction}: cooldown overridden (thesis validated, setup improved)")
+                else:
+                    if verbose:
+                        log(f"  LOSS-COOLDOWN skip {token} {direction}")
+                    continue
 
             scored.append({
                 'row': row,
@@ -3796,6 +3897,45 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     continue
             elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 log(f"  ➡️  [HOTSET-FINAL-ALLOW] {tkn}:{direction} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
+            
+            # ── TVS Thesis Boost in Hotset ────────────────────────────────────
+            # Apply thesis validation boost to final score before appending
+            try:
+                from hermes_constants import (
+                    TVS_ENABLED, TVS_BOOST_VALIDATED, TVS_BOOST_STRONG,
+                    TVS_LOOKBACK_TRADES, TVS_MFE_THRESHOLD_STRONG,
+                )
+                if TVS_ENABLED:
+                    _tvs_hc = None
+                    try:
+                        from signal_schema import _runtime, _get_conn
+                        _tvs_hc = _get_conn(_runtime())
+                        _tvs_hc_c = _tvs_hc.cursor()
+                        _tvs_hc_c.execute("""
+                            SELECT thesis_validated, thesis_mfe FROM signal_outcomes
+                            WHERE token = ? AND direction = ? AND thesis_validated IS NOT NULL
+                            ORDER BY created_at DESC LIMIT ?
+                        """, (tkn.upper(), direction.upper(), TVS_LOOKBACK_TRADES))
+                        _tvs_hc_rows = _tvs_hc_c.fetchall()
+                        if _tvs_hc_rows:
+                            _tvs_hv = sum(1 for r in _tvs_hc_rows if r[0] == 1)
+                            _tvs_hc_pct = _tvs_hv / len(_tvs_hc_rows)
+                            _tvs_hm = sum(r[1] for r in _tvs_hc_rows if r[1] is not None) / max(1, sum(1 for r in _tvs_hc_rows if r[1] is not None))
+                            if _tvs_hc_pct > 0.8 and _tvs_hm > TVS_MFE_THRESHOLD_STRONG:
+                                entry['score'] = entry.get('score', 0) * TVS_BOOST_STRONG
+                                log(f"  🎯 [TVS-HOTSET] {tkn}:{direction} score × {TVS_BOOST_STRONG} (strong thesis)")
+                            elif _tvs_hc_pct > 0.5:
+                                entry['score'] = entry.get('score', 0) * TVS_BOOST_VALIDATED
+                                log(f"  🎯 [TVS-HOTSET] {tkn}:{direction} score × {TVS_BOOST_VALIDATED} (thesis validated)")
+                    except Exception:
+                        pass
+                    finally:
+                        if _tvs_hc:
+                            try: _tvs_hc.close()
+                            except: pass
+            except ImportError:
+                pass
+            
             log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
             hotset_final.append(entry)
 

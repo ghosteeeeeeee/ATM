@@ -280,3 +280,75 @@ BY: auto_1hr
 - 7d WR at 41.5% — below 50% threshold, but losses small (avg -$0.029)
 
 BY: auto_1hr
+
+## [2026-09-29 19:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses) — **PnL: +$0.33** (WR: 100%)
+**Open:** 4 (BTC 30h stale, 3 doji-bottom-long fresh)
+**24h:** 44T 21W (47.7%WR) $-0.78 | **7d:** 132T 56W (42.4%WR) $-3.50
+
+**Last Hour Trades:**
+- IOTA SHORT pump-chain-: +$0.23 (hard_sl, win) — SHORT momentum worked
+- ALGO SHORT pump-chain-: +$0.10 (hard_sl, win) — same pattern
+
+**Exit Breakdown 24h:**
+- hard_sl: 27T 11W (41%WR) avg -$0.048 | profit-monster-trail: 17T 10W (59%WR) avg +$0.030
+- hard_sl still dominant (61% of exits) — structural, not fixable via constants
+
+**Signal Performance 24h:**
+- pump-chain- SHORT: 15T 10W (67%WR) +$0.91 — star performer
+- mover- SHORT: 2T 0W -$0.68 — below kill threshold (2T < 3T)
+- doji-bottom-long: 2T 1W +$0.16 — OK
+- RS signals: 17T 9W (53%WR) — mixed, individual losses tiny
+
+**Kill Candidates:**
+- mover-: 2T 0W -$0.68 — bad but only 2T, need 3+ to kill
+- No signals meeting strict last-hour kill criteria (2/2 trades were wins)
+
+**ATR_SL:** 25% of 7d exits — stable post-fix ✅
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill candidates in last hour
+- ATR_SL fix stable
+- Trade frequency normal (~1.8/hr)
+- pump-chain- SHORT performing well (67%WR)
+- hard_sl dominance is structural (not a constant fix)
+
+**Open Questions:**
+- BTC LONG continuum-osc+ 30h stale (-$1.10 at SL) — should auto-close via tpsl_utils.py
+- mover- SHORT bad streak (0%WR) but only 2T — watch next hour for 3rd trade
+- 7d WR at 42.4% — below 50% but losses are small (avg -$0.027)
+
+BY: auto_1hr
+
+## [2026-09-29 20:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (3W 0L, +$0.12) | 5 open (BTC LONG 30.9h, COMP LONG, DYDX SHORT, SOL LONG, SAND LONG)
+**24h:** 47T 28W 19L -$0.66 (59.6% WR) | **7d:** 135T 43.7%WR -$3.38
+
+**ATR SL:** 0/47 (0%) 24h ✅ | 33/135 (24.4%) 7d ✅
+**Exits 24h:** 27 hard_sl (-$1.29) | 20 profit-monster-trail (+$0.63)
+**LONG vs SHORT 24h:** LONG 27T 44%WR -$0.03 | SHORT 20T 60%WR +$0.003
+
+**Signal leaders 24h:** pump-chain- 15T 67%WR +$0.91 | doji-bottom-long 5T 80%WR +$0.28 | rs-s36/56/35 all 1T 1W
+**Signal drag 24h:** mover- 2T 0W -$0.68 (aging out, killed 06:11) | rs-s30 3T 0W -$0.08
+
+**Regime 24h:** EXTREME 33T 55%WR -$0.21 | HIGH 9T 44%WR -$0.23 | NORMAL 5T 40%WR -$0.22
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits 24h, 24.4% 7d — rock solid (50+ trades since fix)
+- Kill candidates: mover- already killed. rs-s30 has 3T 0%WR but avg loss only -$0.027 — not worth killing
+- Trade frequency: 3/hr — normal Sunday evening
+- doji-bottom-long emerging as quality signal (80% WR)
+- pump-chain- dominant profit source (+$0.91)
+
+**Open Questions:**
+- BTC LONG 30.9h stale ($0 PnL) — will monitor, tpsl_utils should handle
+- 7d -$3.38 (43.7% WR) — recovering, post-fix trades are net positive
+- SHORT R:R structural: avg_win $0.167 vs avg_loss -$0.243 (0.69:1) — persistently below 1:1
+
+BY: auto_1hr

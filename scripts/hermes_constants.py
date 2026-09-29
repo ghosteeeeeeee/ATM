@@ -4130,3 +4130,20 @@ WALL_ST_CYCLE_CONF_BASE = 75               # base confidence
 WALL_ST_CYCLE_CONF_FLOOR = 50              # min confidence
 WALL_ST_CYCLE_CONF_CAP = 88                # max confidence
 WALL_ST_CYCLE_COOLDOWN_HOURS = 1           # per token cooldown
+
+# ── Thesis Validation System (TVS) ───────────────────────────────────────────
+# Tracks whether signal thesis was validated (price moved in predicted direction).
+# Boosts re-entries after validated thesis, overrides cooldowns when setup improves.
+# Spec: plans/thesis-validation-system.md
+TVS_ENABLED = True
+TVS_MFE_THRESHOLD_VALIDATED = 0.0     # MFE > 0 = thesis validated
+TVS_MFE_THRESHOLD_STRONG = 2.0        # MFE > 2% = strongly validated
+TVS_BOOST_VALIDATED = 1.15            # +15% score boost when >50% thesis validated
+TVS_BOOST_STRONG = 1.25               # +25% score boost when >80% validated + avg MFE > 2%
+TVS_PENALTY_INVALIDATED = 0.85        # -15% score penalty when >50% thesis invalidated
+TVS_COOLDOWN_OVERRIDE = True          # override loss cooldown when thesis validated + setup improved
+TVS_COOLDOWN_OVERRIDE_MAX = 1         # max overrides per token:direction per window
+TVS_COOLDOWN_OVERRIDE_WINDOW = 14400  # 4 hours (seconds)
+TVS_SETUP_IMPROVEMENT_THRESHOLD = 2   # min improvements needed to override cooldown
+TVS_LOOKBACK_TRADES = 5               # last N trades to check thesis history
+TVS_MIN_CONFIDENCE_FOR_OVERRIDE = 80  # min signal confidence to allow cooldown override

@@ -584,6 +584,15 @@ def _ensure_signal_outcomes_table():
             c.execute("SELECT regime FROM signal_outcomes LIMIT 1")
         except Exception:
             c.execute("ALTER TABLE signal_outcomes ADD COLUMN regime TEXT")
+        # Add thesis validation columns (2026-09-29 — Thesis Validation System)
+        try:
+            c.execute("SELECT thesis_validated FROM signal_outcomes LIMIT 1")
+        except Exception:
+            c.execute("ALTER TABLE signal_outcomes ADD COLUMN thesis_validated INTEGER DEFAULT NULL")
+        try:
+            c.execute("SELECT thesis_mfe FROM signal_outcomes LIMIT 1")
+        except Exception:
+            c.execute("ALTER TABLE signal_outcomes ADD COLUMN thesis_mfe REAL DEFAULT NULL")
         c.execute("""
             CREATE INDEX IF NOT EXISTS idx_sigout_token ON signal_outcomes(token, direction)
         """)
@@ -1283,7 +1292,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 pnl_usdt=round(actual_pnl_usdt, 4),
                 signal_type=signal_type or 'unknown',
                 confidence=confidence,
-                trade_id=trade_id
+                trade_id=trade_id,
+                mfe_pct=mfe_pct_val,  # Thesis Validation System: pass MFE for thesis validation
             )
         except Exception as rso_err:
             log(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")

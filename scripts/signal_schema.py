@@ -4045,13 +4045,15 @@ def record_signal_outcome(token: str, direction: str,
                           confidence: float = None,
                           is_win: bool = None,
                           trade_id: int = None,
-                          regime: str = None) -> bool:
+                          regime: str = None,
+                          mfe_pct: float = None) -> bool:
     """
     Write one row to signal_outcomes when a trade closes.
     is_win is computed from pnl_usdt sign if not provided.
     trade_id prevents double-recording when both guardian and position_manager fire.
     regime: volatility regime at trade entry ('FLAT','NORMAL','HIGH','EXTREME').
             If None, computed from current ATR (best-effort fallback).
+    mfe_pct: max favorable excursion % (thesis validation). If provided, writes thesis_validated.
     """
     # Auto-detect regime if not provided
     if regime is None:
@@ -4081,10 +4083,18 @@ def record_signal_outcome(token: str, direction: str,
             """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
         if c.fetchone():
             return False  # dedup hit — finally block closes conn
+        # Thesis validation: compute from MFE if provided
+        thesis_validated = None
+        thesis_mfe = None
+        if mfe_pct is not None:
+            thesis_mfe = round(float(mfe_pct), 4)
+            thesis_validated = 1 if float(mfe_pct) > 0 else 0
+        
         c.execute("""
             INSERT INTO signal_outcomes
-                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id, regime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id, regime,
+                 thesis_validated, thesis_mfe)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             token.upper(), direction.upper(),
             signal_type, 1 if is_win else 0,
@@ -4093,6 +4103,8 @@ def record_signal_outcome(token: str, direction: str,
             round(float(confidence or 0), 1),
             trade_id,
             regime,
+            thesis_validated,
+            thesis_mfe,
         ))
         conn.commit()
         

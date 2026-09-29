@@ -90,3 +90,6 @@
 - **REPEATED** (11x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+
+## Error Alerts — 2026-09-29 19:58 UTC
+- **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`

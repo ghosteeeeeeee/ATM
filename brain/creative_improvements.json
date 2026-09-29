@@ -1001,5 +1001,32 @@
     "status": "suggested",
     "risk": "low",
     "impact_on_winners": "0 — CASHCAT has 0 winning pump-chain- SHORT trades in 14d"
+  },
+  {
+    "date": "2026-09-29T20:32:00Z",
+    "idea": "Hotset RSI ceiling filter — block hotset LONG entries when RSI > 75",
+    "rationale": "USUAL entry at RSI=81.82 resulted in -$0.23 loss. Hotset signals have no RSI ceiling filter. Adding RSI_MAX=75 for hotset LONG entries would block extreme overbought entries.",
+    "expected_impact": "+$0.05-0.15/7d (blocks ~1-2 worst entries)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-29T20:32:00Z",
+    "idea": "Monitor doji-bottom-long signal quality — track for 20+ trades before tuning",
+    "rationale": "6T 66.7%WR +$0.27/7d. All profit-monster-trail exits. Consistent small wins. Needs 20+ trades to evaluate.",
+    "expected_impact": "TBD (monitor)",
+    "category": "new signal",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-29T20:32:00Z",
+    "idea": "SHORT R:R structural improvement — monitor ATR_TP_K_MULT=2.0 impact",
+    "rationale": "SHORT R:R 0.74:1 persists. ATR_TP_K_MULT raised to 2.0 by CEO Sep 29. Needs 48h monitoring.",
+    "expected_impact": "+$0.20-0.50/7d if R:R improves to 0.85:1",
+    "category": "R:R improvement",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]
