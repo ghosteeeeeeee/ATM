@@ -1654,20 +1654,18 @@ CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0
 # Tier 1: Quick Cut — -0.75% to -3.0%, fires frequently
 # CEO Sep 24: widened floor -2.0→-3.0. 14d: 23T 0%WR -$2.70, avg loss -3.92%.
 # Trades slide past -2.0% before next fire window. New range catches the full slide.
-CL_TIER1_MIN_PCT      = 0       # DISABLED 2026-09-24 — 25T/14d 0%WR -$3.11. Range 0 to -0.75 is impossible.
-CL_TIER1_MAX_PCT      = -0.75   # tightened 2026-09-15 — was -1.0, start cutting earlier
+CL_TIER1_MIN_PCT      = -0.75   # FIX 2026-09-29: was 0 (impossible range). Now catches -0.75% to -2.5%
+CL_TIER1_MAX_PCT      = -2.5    # ceiling — catches the dead zone between old T1 and T2
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
-CL_TIER1_FIRE_WINDOWS = {"A": (4, 6), "B": (4, 6)}  # brain_auditor Sep 24: widened from (2,3) — trades slide past -0.75% before recovery window
+CL_TIER1_FIRE_WINDOWS = {"A": (2, 4), "B": (2, 4)}  # FIX: tightened — catch losses before they slide to -3%
 
 # Tier 2: Deep Cut — -2.5% to -3.0%, fires less frequently
-# CEO Sep 24: adjusted ceiling -1.5→-2.5. T1 now handles -0.75% to -3.0%.
-# T2 is backup for trades that slip past T1's fire windows.
-CL_TIER2_MIN_PCT      = -3.0    # floor (tightened from -5.0% — hard stop catches below this)
-CL_TIER2_MAX_PCT      = -2.5    # ceiling (T1 handles above this; adjusted for new T1 range)
+CL_TIER2_MIN_PCT      = -3.0    # floor (hard stop catches below this)
+CL_TIER2_MAX_PCT      = -2.5    # ceiling (T1 handles above this)
 CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
 CL_TIER2_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
-CL_TIER2_FIRE_WINDOWS = {"A": (2, 4), "B": (2, 4)}  # CEO Sep 9: tightened from (6,12)
+CL_TIER2_FIRE_WINDOWS = {"A": (1, 2), "B": (1, 2)}  # FIX: tighter — T2 is backup for T1 misses
 
 # Trailing Loss — mirror of PM_TRAIL (inverted logic)
 CL_TRAIL_ENABLED        = False

@@ -583,6 +583,18 @@ def run(dry_run=False):
     # Tier trail: Trailing loss (runs first — catches early losses and trails)
     trail_closed = run_trail(positions, effective_dry_run)
 
+    # Hard stop: immediate exit if loss exceeds -3.0% unleveraged (safety net before tiers)
+    hard_stop_closed = 0
+    HARD_STOP_PCT = -3.0
+    for pos in positions:
+        pnl = pos.get('live_pnl_pct', 0)
+        if pnl is not None and pnl <= HARD_STOP_PCT:
+            log(f"  [HARD-STOP] {pos['token']} {pos['direction']}: pnl={pnl:.2f}% <= {HARD_STOP_PCT}% — closing immediately")
+            if not effective_dry_run:
+                close_position(pos['token'], pos['direction'], pos['current_price'],
+                              pnl, dry_run=effective_dry_run, reason="HARD-STOP")
+            hard_stop_closed += 1
+
     # Load trail state for T1/T2 to skip trailed trades
     trail_state = _load_trail_state() if CL_TRAIL_ENABLED else {}
 

@@ -1974,14 +1974,21 @@ def _check_hard_stops(prices: dict):
             from hermes_constants import SIGNAL_EXIT_CONFIG
             signal_str = str(signal or '')
             signal_parts = [s.strip() for s in signal_str.split(',')]
-            is_rr_engine = any(p in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[p] == 'rr_engine' for p in signal_parts)
+            # FIX: Use prefix matching — 'rs-s34' should match 'rs' key in config
+            def _match_exit_config(part):
+                if part in SIGNAL_EXIT_CONFIG:
+                    return SIGNAL_EXIT_CONFIG[part]
+                for key, val in SIGNAL_EXIT_CONFIG.items():
+                    if part.startswith(key + '-') or part.startswith(key + '_'):
+                        return val
+                return None
+            is_rr_engine = any(_match_exit_config(p) == 'rr_engine' for p in signal_parts)
 
             if direction == 'SHORT':
                 # SHORT: SL is ABOVE entry. Price rising TO or ABOVE SL = loss.
                 # TP is BELOW entry. Price falling TO or BELOW TP = profit target.
-                # Safety margin: for ATR-managed positions, require >0.5% beyond SL
-                # to avoid race conditions with position_manager.
-                _margin = 0.005 if (atr_managed) else 0.0
+                # Safety margin: reduced from 0.5% to 0.1% — was causing 1.5-2.5% extra leveraged loss
+                _margin = 0.001 if (atr_managed) else 0.0
                 if cur_price >= sl * (1 + _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals — let RR engine handle exits
@@ -1991,7 +1998,7 @@ def _check_hard_stops(prices: dict):
             elif direction == 'LONG':
                 # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
                 # TP is ABOVE entry. Price rising TO or ABOVE TP = profit target.
-                _margin = 0.005 if (atr_managed) else 0.0
+                _margin = 0.001 if (atr_managed) else 0.0
                 if cur_price <= sl * (1 - _margin):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals

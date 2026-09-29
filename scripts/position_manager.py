@@ -2605,12 +2605,22 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         except Exception as e:
             log(f"  ⚠️ [SL-ZONE-EXIT] Error for {token}: {e}", 'WARN')
 
-        # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
-        # Check if this trade's signal uses pump-exit
-        # Support both exact match and partial match (comma-separated sources)
+        # ── Shared: match signal parts to exit config ────────────────────────
         signal = str(pos.get("signal", "") or "")
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
         signal_parts = [s.strip() for s in signal.split(',')]
+
+        def _match_exit_config(part):
+            """Match signal part to exit config using exact or prefix match."""
+            if part in SIGNAL_EXIT_CONFIG:
+                return SIGNAL_EXIT_CONFIG[part]
+            for key, val in SIGNAL_EXIT_CONFIG.items():
+                if part.startswith(key + '-') or part.startswith(key + '_'):
+                    return val
+            return None
+
+        # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
+        # Check if this trade's signal uses pump-exit
         use_pump_exit = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
@@ -2754,9 +2764,6 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         
         # ── 0b. Ride-It Exit (2-phase + volume spike override) ──────────────
         # Check if this trade's signal uses ride-it exit
-        signal = str(pos.get("signal", "") or "")
-        from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
-        signal_parts = [s.strip() for s in signal.split(',')]
         use_ride_it = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
@@ -2785,22 +2792,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         
         # ── 0. RR Engine structural exit (for configured signals) ──────────────
         # Check if this trade's signal uses RR engine exits
-        # Support both exact match and partial match (comma-separated sources)
         # FIX: Use prefix matching — 'rs-s34' should match 'rs' key in config
-        signal = str(pos.get("signal", "") or "")
-        from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
-        signal_parts = [s.strip() for s in signal.split(',')]
-        
-        def _match_exit_config(part):
-            """Match signal part to exit config using exact or prefix match."""
-            if part in SIGNAL_EXIT_CONFIG:
-                return SIGNAL_EXIT_CONFIG[part]
-            # Prefix match: 'rs-s34' → check 'rs', 'pump-chain-' → check 'pump-chain-'
-            for key, val in SIGNAL_EXIT_CONFIG.items():
-                if part.startswith(key + '-') or part.startswith(key + '_'):
-                    return val
-            return None
-        
         use_rr_engine = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
