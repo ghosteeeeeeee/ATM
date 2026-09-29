@@ -2482,7 +2482,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Fallback: velocity (rate of change) when continuum unavailable
             # This catches "slow bleeds" where velocity is low but structure is bearish
             _btc_mom_ok_for_bypass = True  # default: allow bypass (backwards compatible)
-            _is_pump_chain = bare_source in ('pump-chain', 'pump_chain', 'pump-chain+', 'pump-chain-', 'pump_chain+', 'pump_chain-', 'pump-chain-v5')
+            _is_pump_chain = 'pump-chain' in bare_source or 'pump_chain' in bare_source
             _is_mover = bare_source in ('mover_long', 'mover+', 'mover-', 'mover_long+', 'mover_long-')
             _is_open_skies = bare_source in ('open-skies+', 'open-skies', 'open_skies')
             _is_accel_breakout = 'accel-300-breakout' in bare_source
