@@ -150,10 +150,15 @@ def _can_override_cooldown(token, direction):
 ### Setup Improvement Detection
 
 ```python
-def _check_setup_improvement(token, direction, current_rsi, current_price, prev_entry):
+def _check_setup_improvement(token, direction, current_rsi, current_price, prev_entry, _vol_regime):
     """
     Check if current setup is better than previous entry.
     Strategy-aware: momentum vs mean-reversion have different "improvement" definitions.
+    
+    prev_entry: dict with keys 'price' (float) and 'rsi' (float)
+    Data source: PostgreSQL trades table — most recent trade for same token+direction+signal_type.
+    RSI at entry: Use signal_rsi_14 column (stored at trade open by position_manager.py line 1279).
+                  If NULL, back-calculate from candles_1m using trade open_time timestamp.
     """
     improvements = 0
     
@@ -166,7 +171,7 @@ def _check_setup_improvement(token, direction, current_rsi, current_price, prev_
     # 2. RSI improved — STRATEGY-AWARE
     # Momentum signals: RSI moving in direction = improvement
     # Mean-reversion signals: RSI at extreme = improvement
-    signal_family = _get_family(signal_type)  # from market_phase_gate
+    signal_family = _signal_family(signal_type)  # from market_phase_gate.py (aliased in signal_compactor.py)
     if signal_family in ('Momentum', 'Accelerate', 'Continuation'):
         # Momentum: RSI moving toward entry direction
         if direction == 'SHORT' and current_rsi < prev_entry['rsi']:
@@ -191,18 +196,29 @@ def _check_setup_improvement(token, direction, current_rsi, current_price, prev_
 
 MFE is already computed in `hl-sync-guardian.py` `_compute_mfe_mae()` (line 2929-2973) and written to PostgreSQL `trades` table (line 3119).
 
-**Integration point:** `_record_trade_outcome()` (line 3283) — update signal_outcomes with thesis validation AFTER trade close.
+**Integration point:** `record_signal_outcome()` in `signal_schema.py` (line ~4042) — update with thesis validation AFTER trade close. This function is called from `position_manager.py`, `cut_loser.py`, and `profit_monster.py`.
+
+**MFE data flow (Option A — pass MFE as parameter):**
+1. Guardian computes MFE in `_compute_mfe_mae()` → writes to PostgreSQL `trades.mfe_pct`
+2. Position manager calls `record_signal_outcome()` after trade close
+3. Position manager queries `trades.mfe_pct` for this trade_id
+4. Passes `mfe_pct` as new parameter to `record_signal_outcome()`
+5. `record_signal_outcome()` writes `thesis_validated` and `thesis_mfe` to signal_outcomes
 
 ```python
-def _record_trade_outcome(trade_id, token, direction, signal_type, is_win, 
-                          pnl_pct, pnl_usdt, confidence, regime, mfe_pct):
-    """Record trade outcome with thesis validation."""
-    thesis_validated = None  # Unknown if MFE not computed
-    if mfe_pct is not None:
-        thesis_validated = 1 if mfe_pct > 0 else 0
-    
-    # Insert into signal_outcomes with thesis data
-    ...
+# In position_manager.py, after trade close (~line 1279):
+mfe = None
+try:
+    pg_conn = psycopg2.connect(...)
+    pg_cur = pg_conn.cursor()
+    pg_cur.execute("SELECT mfe_pct FROM trades WHERE trade_id = %s", (trade_id,))
+    row = pg_cur.fetchone()
+    if row: mfe = row[0]
+    pg_conn.close()
+except: pass
+
+record_signal_outcome(token, direction, signal_type, is_win, pnl_pct, 
+                      pnl_usdt, confidence, regime, mfe_pct=mfe)
 ```
 
 **Handle MFE=None gracefully:** If MFE cannot be computed (very short trades, no price data), set `thesis_validated = NULL`. The `_get_thesis_history()` function treats NULL as "unknown" → neutral multiplier (1.0).
@@ -254,9 +270,27 @@ TVS_LOOKBACK_TRADES = 5               # last N trades to check thesis history
 | File | Change |
 |------|--------|
 | `scripts/signal_compactor.py` | Add thesis_validation_mult to score, override cooldowns (both locations), boost hotset |
-| `scripts/hl-sync-guardian.py` | Update signal_outcomes with MFE/thesis data after trade close |
+| `scripts/signal_schema.py` | Add mfe_pct param to `record_signal_outcome()`, write thesis_validated/thesis_mfe |
+| `scripts/position_manager.py` | ALTER TABLE migration for thesis columns (~line 562), pass MFE to record_signal_outcome (~line 1279) |
 | `scripts/hermes_constants.py` | Add TVS config constants |
-| `scripts/signal_schema.py` | Add thesis_validated, thesis_mfe columns to signal_outcomes |
+
+### Schema Migration
+
+```sql
+-- Run in both position_manager.py (CREATE TABLE location) and signal_schema.py
+-- Use idempotent pattern:
+ALTER TABLE signal_outcomes ADD COLUMN thesis_validated INTEGER DEFAULT NULL;
+ALTER TABLE signal_outcomes ADD COLUMN thesis_mfe REAL DEFAULT NULL;
+-- Wrap in try/except for idempotency (column may already exist):
+try:
+    conn.execute("ALTER TABLE signal_outcomes ADD COLUMN thesis_validated INTEGER DEFAULT NULL")
+except sqlite3.OperationalError:
+    pass  # column already exists
+try:
+    conn.execute("ALTER TABLE signal_outcomes ADD COLUMN thesis_mfe REAL DEFAULT NULL")
+except sqlite3.OperationalError:
+    pass
+```
 
 **No new files needed.** No new tables needed. Everything fits into existing infrastructure.
 
