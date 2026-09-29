@@ -352,3 +352,31 @@ BY: auto_1hr
 - SHORT R:R structural: avg_win $0.167 vs avg_loss -$0.243 (0.69:1) — persistently below 1:1
 
 BY: auto_1hr
+
+## [2026-09-29 21:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L, -$0.18) | 3 open (BTC LONG 31.9h, COMP LONG 1.5h, SOL LONG 1.2h)
+**24h:** 47T 23W 24L -$1.12 (48.9% WR) | **7d:** 135T 60W (44.4% WR) -$3.22
+
+**ATR SL:** 0/47 (0%) 24h ✅ | 31/135 (23.0%) 7d ✅
+**Exits 24h:** 27 hard_sl (-$1.61) | 20 profit-monster-trail (+$0.49)
+**LONG vs SHORT 24h:** LONG 27T 44%WR -$0.86 | SHORT 20T 55%WR -$0.26
+**Regime 24h:** EXTREME 32T 50%WR -$0.72 | HIGH 10T 50%WR -$0.18 | NORMAL 5T 40%WR -$0.22
+
+**Signal leaders 24h:** pump-chain- 15T 60%WR +$0.59 | doji-bottom-long 5T 80%WR +$0.28 | bb-bounce-v2-long+ 3T 67%WR +$0.06
+**Signal drag 24h:** mover- 2T 0W -$0.68 (killed) | rs-s30 3T 0W -$0.08 | rs-s31 1T 0W -$0.20 | rs-s34 1T 0W -$0.21
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill candidates: rs-s30 has 3T 0%WR but loss only -$0.08 — not worth killing
+- ATR_SL: 0% 24h, fix rock solid
+- Trade frequency: ~2/hr — normal
+- pump-chain- and doji-bottom-long are profit engines
+
+**Open Questions:**
+- BTC LONG 31.9h stale — position_manager fires UNIVERSAL_MAX_HOLD but HL reconciliation re-opens it every minute (630 attempts logged). Structural issue: HL position must be closed manually or HL sync fixed.
+- SHORT R:R: avg_win $0.167 vs avg_loss -$0.243 (0.69:1) — persistent structural issue
+- LONG underperforming SHORT: 44%WR vs 55%WR, -$0.86 vs -$0.26
+
+BY: auto_1hr
