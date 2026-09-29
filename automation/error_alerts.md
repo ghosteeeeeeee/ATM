@@ -1,3 +1,18 @@
+## Error Alerts — 2026-09-29 14:48 UTC
+
+### CRITICAL (0)
+- None
+
+### WARN (1)
+- **WARN** (continuous): `position_manager: FAILED` every cycle (120x/2h) — Lock conflict with hermes-hl-sync-guardian.service. Guardian handles SL/TP and positions. Pipeline step reports rc=1 but rest of pipeline completes fine. Portfolio tracking works (5 open, 37 closed, +9.5% PnL). Fix: remove position_manager from pipeline steps since guardian covers all functionality.
+- **WARN**: Disk at 84% (94GB/118GB) — 1% from 85% threshold. Monitor.
+
+### INFO
+- Market regime: NEUTRAL (88 coins, 0% hot, 8% cold)
+- Live trading: ENABLED (CEO re-enabled)
+- 10 active signals (WLFI, GMX, BIGTIME, ADA, SEI, MNT, TURBO, ME, ETC)
+- Phantom write blocked: BTC LONG trade 15705 — SL 0.052% from entry (safety working)
+
 ## Error Alerts — 2026-09-29 08:46 UTC
 
 ### CRITICAL (0)

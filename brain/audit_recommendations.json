@@ -1,115 +1,146 @@
 {
-    "timestamp": "2026-09-29T14:00:00Z",
+    "timestamp": "2026-09-29T15:00:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
-        "searches_run": 3,
-        "top_signal_insights": [
-            "pump-chain-short needs filters to improve winrate — discussed in session",
-            "100% win rate with 4 signals but too few for frequency",
-            "signals need to preserve high winrate as market regime changes",
-            "trend following signal needed for NEUTRAL diversity"
-        ]
+        "signal_performance_topic": "8 results, focus on winrate/regime",
+        "creative_ideas_topic": "8 results, trend following + neutral signals",
+        "problems_topic": "8 results, losing trade patterns"
     },
     "trade_summary_24h": {
-        "total_trades": 22,
-        "winners": 6,
+        "trades": 37,
+        "winrate": 54.1,
+        "pnl": -0.79,
         "losers": 16,
-        "pnl": "+$0.20",
-        "dominant_signal": "pump-chain- SHORT 11T 54.5%WR -$0.01",
-        "biggest_winner": "LTC pump-chain- SHORT +$0.24",
-        "biggest_loser": "CASHCAT pump-chain- SHORT -$0.42"
+        "biggest_loser": "BLUR mover- SHORT -$0.47 (killed, legacy)",
+        "note": "Losing day despite decent WR — small losses across many signals"
     },
     "trade_summary_7d": {
-        "total_trades": 123,
-        "win_rate": "41.5%",
-        "pnl": "-$4.04",
-        "regime_breakdown": {
-            "EXTREME": "69T 42.0%WR -$3.49",
-            "HIGH": "31T 35.5%WR -$0.78",
-            "NORMAL": "20T 50.0%WR +$0.23",
-            "FLAT": "2T 50.0%WR +$0.01"
-        },
-        "atr_sl_hit_rate": "35.3% (34/96) — improved from 60%+",
-        "post_fix": "0 ATR_SL hits"
+        "trades": 122,
+        "winrate": 41.8,
+        "pnl": -3.71,
+        "extreme_regime": "-$3.17 (68T 42.6%)",
+        "high_regime": "-$0.78 (31T 35.5%)",
+        "normal_regime": "+$0.23 (20T 50.0%)",
+        "atr_sl_hit_rate": "34.8% (improved from 50%+)",
+        "exit_analysis": "atr_sl_hit -$3.10, hard_sl -$1.49, profit-monster-trail +$1.40"
     },
     "trade_summary_14d": {
-        "total_trades": 311,
-        "win_rate": "44.7%",
-        "pnl": "-$2.51",
-        "signal_leaders": [
-            "volume-breakout-long+ LONG 19T 68.4%WR +$1.54",
-            "pump-chain+ LONG 55T 41.8%WR +$1.23 (COLD — 0 trades since Sep 22)"
-        ],
-        "signal_losers": [
-            "pullback-entry- SHORT 53T 43.4%WR -$1.66 (disabled, aging out)",
-            "mover+ LONG 14T 42.9%WR -$1.12 (killed)",
-            "pump-chain- SHORT 44T 47.7%WR -$0.94 (disabled)"
-        ],
-        "short_structural": "avg_win $0.110 vs avg_loss $0.155 = 0.71:1 R:R"
+        "trades": 316,
+        "winrate": 44.9,
+        "pnl": -3.18,
+        "long_pnl": "+$0.004 avg (breakeven)",
+        "short_pnl": "-$0.031 avg (structural disadvantage)",
+        "top_winner": "volume-breakout-long+ +$1.54 (68.4%WR)",
+        "second_winner": "pump-chain+ +$1.23 (41.8%WR)",
+        "top_loser": "pullback-entry- -$1.66 (43.4%WR, killed)"
     },
     "drift_findings": [
         {
-            "finding": "pump-chain+ cold streak — 0 trades/7d",
-            "impact": "Was #2 profitable signal (+$1.23/14d). Loss of diversity.",
-            "root_cause": "NEUTRAL regime + dead hours block (10/24h) + BTC timing guard + low volatility. Signal is still enabled but market conditions don't trigger it.",
-            "action": "MONITOR — regime shift or volatility increase should restart it"
+            "topic": "RSI metadata key mismatch",
+            "status": "REPORTING BUG (not functional)",
+            "detail": "Audit queries used signal_rsi_14 key but data is stored as rsi_14. RSI values ARE present (63.7, 46.15, 53.47 etc). Decider uses rsi_14 correctly. Only audit reports affected.",
+            "impact": "LOW — functional RSI filtering works"
         },
         {
-            "finding": "bb-bounce-v2-long+ RSI_MAX=60 APPLIED Sep 29 — working",
-            "impact": "RSI 50-60 = 83.3%WR +$0.20. RSI 60-70 = 25.0%WR -$0.33. Blocking overbought entries.",
-            "root_cause": "Filter correctly blocks entries above RSI 60",
-            "action": "VERIFIED WORKING — keep monitoring"
+            "topic": "pump-chain+ cold streak 7d",
+            "status": "ONGOING — 0 trades since Sep 22",
+            "detail": "Last trade close: Sep 22 08:27. Signal enabled. 14d: 55T +$1.23 (still #2 profitable). Dead hours [0,1,2,3,4,7,14,20,21,23] + NEUTRAL regime = no setups. V5 kill reduced diversity.",
+            "impact": "MEDIUM — lost ~$0.18/day potential (was $1.23/14d = $0.088/day)"
+        },
+        {
+            "topic": "EXTREME regime bleed",
+            "status": "ONGOING — -$3.17/7d",
+            "detail": "68T 42.6% WR. atr_sl_hit 23T -$2.17 dominates. ATR_SL widening helped (34.8% vs 50%+). But EXTREME still worst performer. Pump-chain- SHORT EXTREME is 50% WR but R:R negative.",
+            "impact": "HIGH — 85% of 7d losses from EXTREME"
         }
     ],
     "recurring_problems": [
         {
-            "problem": "Signal diversity CRITICAL — only 2 types carry all PnL",
-            "frequency": "Every audit since Sep 16",
-            "impact": "System vulnerable to single-signal regime changes",
-            "suggestion": "Develop new NEUTRAL signals (EMA-reclaim, trend following)"
+            "topic": "SHORT structural disadvantage",
+            "occurrences": "10+ consecutive audits",
+            "detail": "avg_win $0.113 vs avg_loss $0.156 (0.72:1 R:R). SHORT needs >58% WR to break even. All SHORT signals killed/disabled, aging out. Only pump-chain- SHORT active (STANDALONE_BYPASS).",
+            "recommendation": "LET AGING FINISH — no action needed"
         },
         {
-            "problem": "SHORT structural disadvantage",
-            "frequency": "Every audit since Sep 28",
-            "impact": "avg_win $0.110 vs avg_loss $0.155 = 0.71:1 R:R. SHORT needs >58% WR.",
-            "suggestion": "Consider SHORT TP multiplier to improve R:R"
+            "topic": "Signal diversity critical",
+            "occurrences": "10+ consecutive audits",
+            "detail": "Only 2 signal types profitable: volume-breakout-long+ (+$1.54) and pump-chain+ (+$1.23). 30+ signal types but only 2 net positive.",
+            "recommendation": "NEW SIGNALS for NEUTRAL regime — EMA-reclaim or similar"
         },
         {
-            "problem": "EXTREME regime worst performer 7d",
-            "frequency": "Every audit since Sep 26",
-            "impact": "-$3.49/7d from EXTREME trades",
-            "suggestion": "REGIME_CONF_HIGH_MULT=0.50 untested (all trades NEUTRAL). Wait for EXTREME/HIGH data."
+            "topic": "pump-chain+ cold streak",
+            "occurrences": "7 days, 0 trades",
+            "detail": "Was #2 profitable. Dead hours + NEUTRAL regime + V5 kill = no setups. Not a code bug — signal conditions not met.",
+            "recommendation": "INVESTIGATE if dead hours can be relaxed for specific conditions"
         }
     ],
-    "missing_implementations": [
-        "NEW NEUTRAL signal for diversity (discussed in sessions but not built)",
-        "SHORT TP multiplier for R:R improvement",
-        "pump-chain+ cold streak root cause investigation"
-    ],
+    "losing_trade_autopsy": {
+        "total_losers_24h": 16,
+        "biggest_loser": "BLUR mover- SHORT -$0.47 (killed, EXTREME, hard_sl)",
+        "pattern": "ALL small losses (<$0.47). 8 pump-chain- SHORT EXTREME hard_sl (legacy), 4 rs-s* LONG EXTREME/HIGH (normal chop), 1 mover- SHORT (killed), 1 bb-bounce-v2-long+ HIGH (tiny -$0.01).",
+        "systematic_issue": "NONE — normal chop variance. No entry condition failures.",
+        "regime_breakdown": "12 EXTREME, 3 HIGH, 1 NORMAL",
+        "exit_breakdown": "11 hard_sl, 5 profit-monster-trail"
+    },
+    "signal_quality_deep_dive": {
+        "pump_chain_short": {
+            "trades_7d": 38,
+            "pnl": -0.56,
+            "wr": 50.0,
+            "regime": "EXTREME dominant (30+ trades)",
+            "issue": "R:R negative — avg_win < avg_loss. ATR_SL hits in EXTREME whipsaw.",
+            "recommendation": "MONITOR — already killed/disabled, aging out"
+        },
+        "bb_bounce_v2_long": {
+            "trades_7d": 16,
+            "pnl": -0.17,
+            "wr": 43.8,
+            "issue": "RSI_MAX=60 APPLIED. Post-fix: 1T only. Need more data. Cut-loser-CL-T1 0% WR (-$0.34) dominates losses.",
+            "recommendation": "MONITOR — RSI_MAX=60 working, need 20+ post-fix trades"
+        },
+        "rs_s_hotset": {
+            "trades_7d": "25 across 18 signals",
+            "pnl": "mixed (-$0.24 to +$0.19)",
+            "wr": "mixed (0% to 100%)",
+            "issue": "Highly fragmented — each signal 1-3 trades. No signal has enough sample for evaluation.",
+            "recommendation": "AGGREGATE by hotset source for better analysis"
+        }
+    },
     "creative_improvements": [
         {
-            "date": "2026-09-29T14:00:00Z",
-            "idea": "EMA-reclaim LONG signal for NEUTRAL regime",
-            "rationale": "Sessions discuss trend following and EMA-based entries. NEUTRAL has 50%WR but only 20T/7d — low frequency. New signal type needed for diversity.",
-            "expected_impact": "+$0.30-0.50/7d if 3+ trades at >55% WR",
-            "category": "signal diversity",
+            "date": "2026-09-29T15:00:00Z",
+            "idea": "Investigate pump-chain+ dead hours — are hours 14,20,21,23 justified?",
+            "rationale": "pump-chain+ has 0 trades/7d. Dead hours block 10/24h. Hours 14,20,21,23 were removed from dead list Sep 28 but signal still not firing. Check: does pump-chain+ need momentum conditions that NEUTRAL regime doesn't provide? Or are the remaining dead hours still too restrictive?",
+            "expected_impact": "Recover $0.08-0.18/day if signal resumes",
+            "category": "signal recovery",
+            "status": "suggested",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-29T15:00:00Z",
+            "idea": "EXTREME regime-specific confidence floor 70%",
+            "rationale": "EXTREME -$3.17/7d (85% of losses). ATR_SL hit rate improved to34.8% but still the worst regime. Higher confidence = fewer low-quality entries in volatile regime. 14d EXTREME LONG pump-chain+ 45.7%WR +$1.12 — profitable even in EXTREME. Floor would filter the noise without killing edge.",
+            "expected_impact": "+$0.30-0.50/7d (blocks ~30% of EXTREME losers)",
+            "category": "entry sniper",
             "status": "suggested",
             "risk": "medium"
         },
         {
-            "date": "2026-09-29T14:00:00Z",
-            "idea": "pump-chain+ cold streak — monitor not intervene",
-            "rationale": "Signal is enabled, dead hours optimized, BTC guard at 1.0%. 0 trades/7d is regime-driven (NEUTRAL low volatility). 14d still +$1.23. Don't force — wait for market shift.",
-            "expected_impact": "monitoring only",
-            "category": "regime monitoring",
+            "date": "2026-09-29T15:00:00Z",
+            "idea": "New EMA-reclaim LONG signal for NEUTRAL diversity",
+            "rationale": "Only 2 profitable signal types. NEUTRAL is the only profitable regime (+$0.23/7d). Need signals that work in flat/choppy markets. EMA-reclaim: enter LONG when price reclaims EMA20 from below with volume confirmation. Low momentum requirement = works in NEUTRAL.",
+            "expected_impact": "+$0.20-0.50/7d if 40%+ WR achieved",
+            "category": "new signal",
             "status": "suggested",
-            "risk": "low"
+            "risk": "medium"
         }
     ],
     "config_changes_applied": [],
     "next_actions": [
-        "MONITOR pump-chain+ recovery — 48h watch",
-        "MONITOR EXTREME regime post-fix (need 30+ trades for REGIME_CONF_HIGH_MULT eval)",
-        "DEVELOP new NEUTRAL signal for diversity",
-        "MONITOR bb-bounce-v2-long+ RSI_MAX=60 performance"
+        "INVESTIGATE pump-chain+ cold streak — check if dead hours or NEUTRAL regime is blocking",
+        "MONITOR EXTREME regime post-ATR_SL widening (34.8% hit rate — PASS)",
+        "MONITOR bb-bounce-v2-long+ RSI_MAX=60 (need 20+ post-fix trades)",
+        "NEW SIGNALS for NEUTRAL regime — EMA-reclaim or similar",
+        "RSI metadata key: audit queries should use rsi_14 not signal_rsi_14"
     ]
 }

@@ -1,15 +1,15 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 14:00 UTC**
+**Last Updated: 2026-09-29 15:00 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 5 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS (35.3% 7d, post-fix 0 hits). pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14 in JSON). SHORT signals killed/disabled.
+System active. 5 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS (34.8% 7d, post-fix 0 hits). pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, rsi_14 in JSON). SHORT signals killed/disabled.
 
-- **24h (rolling):** 22T ~55%WR +$0.20 (DB-verified). pump-chain- SHORT 11T 54.5%WR -$0.01 (breakeven). Multiple rs-s* LONG winners.
-- **7d:** 123T 41.5%WR -$4.04 (DB-verified). ATR_SL 35.3% (34/96) — PASS. Post-fix: 0 ATR_SL hits.
-- **14d:** 311T 44.7%WR -$2.51 (DB-verified). LONG +$0.53, SHORT -$3.16 (126% of losses).
+- **24h (rolling):** 37T 54.1%WR -$0.79 (DB-verified). pump-chain- SHORT 11T 54.5%WR -$0.01 (breakeven). Multiple rs-s* LONG winners.
+- **7d:** 122T 41.8%WR -$3.71 (DB-verified). ATR_SL 34.8% (33/95) — PASS. Post-fix: 0 ATR_SL hits.
+- **14d:** 316T 44.9%WR -$3.18 (DB-verified). LONG +$0.004, SHORT -$0.031.
 - **OPEN:** 5 positions — BTC LONG continuum-osc+ (NORMAL), ADA LONG rs-s47/rs-s53 (EXTREME), MNT LONG rs-s44 (NORMAL), WLFI LONG rs-s34 (NORMAL), ALGO SHORT pump-chain- (EXTREME).
 - **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
@@ -53,6 +53,19 @@ System active. 5 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-29 15:00 UTC)
+
+- **🟢 24h STEADY.** 37T 54.1%WR -$0.79. 16 losers all small (<$0.47). Normal chop variance.
+- **🟡 PUMP-CHAIN+ COLD STREAK — 7 days, 0 trades.** Last trade Sep 22 08:27. 14d still +$1.23 (#2 profitable). Dead hours + NEUTRAL regime = no setups.
+- **🟢 ATR_SL 34.8% 7d — PASS.** Post-fix: 0/33 hits. All exits profit-monster-trail or hard_sl.
+- **7d REGIME:** EXTREME -$3.17 (68T 42.6%) — 85% of losses. HIGH -$0.78 (31T 35.5%). NORMAL +$0.23 (20T 50%).
+- **SHORT R:R 0.72:1** — avg_win $0.113 vs avg_loss $0.156. Structural disadvantage persists, aging out.
+- **LOSING AUTOPSY:** 16 losers 24h all small. 8 pump-chain- SHORT EXTREME hard_sl (legacy), 4 rs-s* LONG (normal chop), 1 mover- (killed), 1 bb-bounce-v2-long+ (tiny). No systematic pattern.
+- **RSI metadata key: signal_rsi_14 is WRONG — data stored as rsi_14.** Audit queries affected, functional RSI filtering works.
+- **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.54) and pump-chain+ (+$1.23) profitable.
+- **CREATIVE (3):** (1) Investigate pump-chain+ dead hours (2) EXTREME confidence floor 70% (3) New EMA-reclaim signal for NEUTRAL.
+- **0 CHANGES APPLIED.**
 
 ## Audit Update (2026-09-29 14:00 UTC)
 

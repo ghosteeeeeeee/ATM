@@ -960,5 +960,35 @@
     "category": "new signal",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "timestamp": "2026-09-29T15:00:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "Investigate pump-chain+ dead hours — are hours 14,20,21,23 justified?",
+        "rationale": "pump-chain+ 0 trades/7d. Dead hours block 10/24h. Check if remaining dead hours still too restrictive.",
+        "expected_impact": "+$0.08-0.18/day if signal resumes",
+        "category": "signal recovery",
+        "status": "suggested",
+        "risk": "low"
+      },
+      {
+        "idea": "EXTREME regime-specific confidence floor 70%",
+        "rationale": "EXTREME -.17/7d (85% of losses). Higher confidence = fewer low-quality entries in volatile regime.",
+        "expected_impact": "+$0.30-0.50/7d",
+        "category": "entry sniper",
+        "status": "suggested",
+        "risk": "medium"
+      },
+      {
+        "idea": "New EMA-reclaim LONG signal for NEUTRAL diversity",
+        "rationale": "Only 2 profitable signal types. NEUTRAL only profitable regime. Need signals for flat markets.",
+        "expected_impact": "+$0.20-0.50/7d",
+        "category": "new signal",
+        "status": "suggested",
+        "risk": "medium"
+      }
+    ]
   }
 ]

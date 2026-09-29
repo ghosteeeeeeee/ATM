@@ -1576,11 +1576,12 @@ SIGNAL_EXIT_CONFIG = {
     # Pump catcher: ATR SL (proven)
     'pump-catcher+': 'atr',
     'pump-catcher-': 'atr',
-    # Pump chain: ATR trailing exit (momentum breakout)
+    # Pump chain: SHORT uses rr_engine for tighter SL (CASHCAT lost 6.4% with pump_exit)
+    # LONG keeps pump_exit (momentum exit works for LONG)
     'pump-chain+': 'pump_exit',
-    'pump-chain-': 'pump_exit',
+    'pump-chain-': 'rr_engine',
     'pump_chain+': 'pump_exit',  # underscore variant
-    'pump_chain-': 'pump_exit',  # underscore variant
+    'pump_chain-': 'rr_engine',  # underscore variant — SHORT needs tighter SL
     'pump_chain': 'pump_exit',    # bare variant
     # Mover: ride-it exit — volume spike override catches explosive moves
     'mover+': 'ride_it',
