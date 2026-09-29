@@ -2708,6 +2708,7 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 # pump-chain+ HIGH regime block — 14T/7d 35.7%WR +$0.19 (noise). EXTREME 57.1%WR +$1.65 (edge).
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
 PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-09-20 — 14T/7d HIGH noise, redirect to EXTREME
+PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-09-29 — 5T/14d HIGH 20%WR -$0.60, EXTREME 56.3%WR +$0.66
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period

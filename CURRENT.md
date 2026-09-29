@@ -54,6 +54,10 @@ System active. 4 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
+## Audit Update (2026-09-29 07:30 UTC)
+
+- **🟢 PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True — APPLIED.** 14d: pump-chain- SHORT HIGH 5T 20%WR -$0.60, EXTREME 32T 56.3%WR +$0.66. Blocks HIGH noise, preserves EXTREME edge. 1 tiny winner ($0.06) killed. Net: +$0.54/14d. **LOSING AUTOPSY:** 6 losers 24h all small (<$0.47). 2 EXTREME, 2 HIGH — normal chop. **SHORT structural disadvantage PERSISTS:** avg_win $0.116 vs LONG $0.162. **7d REGIME:** EXTREME -$2.32, HIGH -$1.82, NORMAL +$0.21. **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.23) profitable. **CREATIVE (3):** (1) PUMP_CHAIN_SHORT_HIGH_BLOCK APPLIED (2) accel-300-breakout SHORT RSI_MIN=45 suggested (marginal, 7T) (3) Monitor EXTREME. **1 CHANGE APPLIED.**
+
 ## Audit Update (2026-09-29 07:00 UTC)
 
 - **🟢 BB_BOUNCE_V2_RSI_MAX=60 — APPLIED.** 14d: RSI 60-70 = 7T 28.6%WR -$0.32, 0 winners above RSI 60. 6th suggestion applied. Expected +$0.20-0.30/7d.

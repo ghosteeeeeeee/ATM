@@ -638,5 +638,16 @@
     "after": "volume_spike merged from hotset.json first, crash_signal fallback. Both hotset merge (line3030) and _exec_meta injection (line4228) updated.",
     "rationale": "signal_compactor.py:3072 computes volume_spike into hotset entries, but decider_run.py:3030-3035 only extracted final_confidence. Root cause: hotset merge was incomplete. Chase filter blind to volume quality for 84% of trades.",
     "impact": "Expected +$0.30-0.80/7d. Chase filter gains volume_spike data for all hotset trades."
+  },
+  {
+    "timestamp": "2026-09-29T07:30:00Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True — block pump-chain- SHORT in HIGH regime",
+    "type": "config",
+    "file": "hermes_constants.py, decider_run.py, signal_compactor.py",
+    "before": "No HIGH regime block for pump-chain- SHORT",
+    "after": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True blocks pump-chain- SHORT in HIGH (5T 20%WR -$0.60/14d). EXTREME preserved (32T 56.3%WR +$0.66).",
+    "rationale": "pump-chain- SHORT loses in HIGH (20%WR) but wins in EXTREME (56.3%WR). HIGH = noise for SHORT.",
+    "impact": "+$0.30/7d expected. 1 tiny winner ($0.06) killed."
   }
 ]

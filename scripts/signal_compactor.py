@@ -2655,6 +2655,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── pump-chain- SHORT HIGH regime block ────────────────────────
+            # 14d: HIGH 5T 20%WR -$0.60, EXTREME 32T 56.3%WR +$0.66
+            if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
+                try:
+                    from hermes_constants import PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED
+                    if PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
+                        log(f"  🚫 [PUMP-CHAIN-SHORT-HIGH] {token} SHORT blocked — HIGH vol, no pump-chain- SHORT edge (20%WR)")
+                        continue
+                except ImportError:
+                    pass
             # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
             # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners).
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':

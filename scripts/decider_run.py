@@ -1527,6 +1527,16 @@ def context_gate(token, direction, source, sig):
                     return ('SKIP', 'pump-chain+ HIGH regime block', 0)
             except ImportError:
                 pass
+        # ── pump-chain- SHORT HIGH regime block ──
+        # 14d: HIGH 5T 20%WR -$0.60, EXTREME 32T 56.3%WR +$0.66
+        if vol_regime == 'HIGH' and direction.upper() == 'SHORT' and source and ('pump-chain' in source or 'pump_chain' in source):
+            try:
+                from hermes_constants import PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED
+                if PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED:
+                    log(f'  🚫 [PUMP-CHAIN-SHORT-HIGH] {token} SHORT blocked — HIGH vol, no pump-chain- SHORT edge (decider_run)')
+                    return ('SKIP', 'pump-chain- SHORT HIGH regime block', 0)
+            except ImportError:
+                pass
     except Exception as e:
         log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
 
