@@ -1515,3 +1515,26 @@ BY: auto_1hr
 - EXTREME SHORT -$1.33/14d — worst regime combo. May warrant MIN_EXEC_CONFIDENCE increase if it persists post-fix, but too early to conclude.
 
 **BY:** auto_1hr
+
+## [2026-09-29 00:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) | **Open:** 3 (~breakeven)
+**PnL:** +$0.21 last hour | **24h:** 15T 53%WR +$0.30 | **7d:** 114T 40%WR -$3.92
+
+**Last hour closes:**
+- LDO SHORT pump-chain-: +$0.21 hard_sl (trailed into profit)
+
+**24h exit breakdown:** 8 profit-monster-trail, 5 hard_sl, 1 hard_max_loss, 1 HL_CLOSED
+- hard_sl rate: 33% (below 40% threshold)
+- ATR_SL fix: 0/14 hits (35T+ post-fix clean)
+
+**Regime 24h:** EXTREME SHORT 4T 100%WR +$0.41 (strongest). NORMAL LONG 3T 33%WR -$0.07 (losing).
+
+**No Change Needed:**
+- 0 kill candidates
+- hard_sl rate normal (33%)
+- ATR_SL fix validated: 35T+ with 0 hits
+- Trade frequency normal
+- pump-chain- 100%WR dominant signal
+
+**BY:** auto_1hr

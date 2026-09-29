@@ -1,3 +1,10 @@
+## Health Report — 2026-09-28 23:46 UTC
+- **OK**: Pipeline running (active). 47 timers active, all firing.
+- **OK**: Cycle #220269. 12 signals/hr, 9 trades today (5W/4L), +$0.21 PnL.
+- **WARN**: position_manager lock contention — guardian blocks it every cycle. Trades still execute.
+- **WARN**: Disk 86% (95G/118G). pipeline.log 73MB. Trending up.
+- **OK**: Regime UNKNOWN. Macro gate LONG=FULL, SHORT=REDUCE. Data fresh at 23:45.
+
 ## Health Report — 2026-09-28 04:46 UTC
 - **OK**: Pipeline running (LIVE). Both services active. 59 timers active, all firing.
 - **OK**: Last cycle 04:44:33 completed clean. 0 open | 14 closed today | +22.97% PnL.
@@ -352,3 +359,6 @@
 
 ## Error Alerts — 2026-09-28 22:58 UTC
 - **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+
+## Error Alerts — 2026-09-28 23:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
