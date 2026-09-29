@@ -185,3 +185,61 @@ The SL is triggering correctly, but SHORT winners trail out small while losers h
 - `mover-` SHORT approaching kill threshold — watch next trade
 
 BY: auto_1hr
+
+## [2026-09-29 17:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour, last close 16:07)
+**24h:** 43T 21W (48.8%) $-1.51 | **7d:** 127T (40.9%) $-4.42 | **Open:** 4 trades (BTC 26.9h stale, 3 SHORTs)
+
+**Exits 24h:** hard_sl 23T (30.4%WR, avg -$0.096) | profit-monster-trail 20T (70%WR, avg +$0.035)
+**Direction 24h:** LONG 26T $-0.66 (46.2%WR) | SHORT 17T $-0.85 (52.9%WR)
+**SHORT R:R:** hard_sl avg -$0.064, trail avg +$0.013 — trail wins too small
+
+**Changes:** None
+**No Change Needed:**
+- No kill candidates (0 trades last hour, no signal 3+T/0%WR in last hour)
+- ATR_SL fix stable (0 hits 24h)
+- Trade frequency normal
+- `mover-` SHORT at 2T 0W -$0.68 — watch, below kill threshold
+
+**Open Questions:**
+- hard_sl at 53.5% of exits is structural: LONG hard_sl losses ($-0.147) are 2.3x SHORT ($-0.064)
+- SHORT trail exits too conservative (+$0.013 avg) — needs tpsl_utils.py review
+- BTC stale LONG (26.9h) — will auto-close via SL/TP
+
+BY: auto_1hr
+
+## [2026-09-29 17:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet) | **Open:** 6 (BTC 27.9h stale, 3 SHORT pump-chain-, 2 LONG doji-bottom-long)
+**24h:** 44T 22W (50%) $-1.47 | **7d:** 128T 53W (41%) $-4.38
+
+**Exit Breakdown 24h:**
+- hard_sl: 24T 8W (33%WR) avg -$0.090 | profit-monster-trail: 20T 14W (70%WR) avg +$0.035
+- LONG hard_sl avg_loss $0.175 vs SHORT $0.243 — SHORT SL wider in $
+
+**Direction 24h:** LONG 26T $-0.66 | SHORT 18T $-0.81
+**SHORT trail issue confirmed:** 10 SHORT trail exits 7d, avg $-0.006 (breakeven). LONG trails avg +$0.040.
+
+**ATR_SL:** 0 hits in 24h (last hit Sep 24) — fix stable ✅
+
+**Kill Candidates (7d):**
+- rs-s30: 3T 0W $-0.08 — all-time 3T 0W but tiny losses, sub-signal of RS system
+- mover-: 3T 0W $0 — all-time 12T 7W 58%WR, bad7d streak
+- pullback-entry-: 3T 0W $0 — all-time 119T 62W 52%WR, proven
+- None have 3+T/0%WR in last hour → no immediate kill
+
+**Changes:** None
+**No Change Needed:**
+- No kill candidates meeting strict last-hour threshold
+- ATR_SL fix stable
+- Trade frequency normal (0/hr)
+- SHORT R:R needs tpsl_utils.py review (not a constant change)
+- All 7d kill candidates have healthy all-time track records
+
+**Open Questions:**
+- SHORT trail exits too conservative (+$0.013 avg 24h, $-0.006 avg 7d) — needs tpsl_utils.py trailing threshold tuning
+- 7d WR at 41% — below 50% threshold, but losses are small (avg -$0.034)
+- BTC LONG 27.9h stale — will auto-close via SL/TP
+
+BY: auto_1hr
