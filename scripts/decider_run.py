@@ -1735,6 +1735,43 @@ def execute_trade(token, direction, price, confidence, source,
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
+    # ── RSI Floor/Ceiling at Execution Time ────────────────────────────────────
+    # FIX: RSI floor only checked at compaction time (hours earlier). By execution
+    # time, RSI may have dropped into danger zone. Check NOW at execution time.
+    # CASHCAT教训: RSI 15.5 and 33.4 at entry → -6.4% loss (price bounced from oversold)
+    try:
+        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING
+        import sqlite3 as _rsi_sqlite
+        from paths import CANDLES_DB as _rsi_candles_db
+        _rsi_conn = _rsi_sqlite.connect(f"file:{_rsi_candles_db}?mode=ro", uri=True, timeout=5)
+        try:
+            _rsi_cur = _rsi_conn.cursor()
+            _rsi_cur.execute("""
+                SELECT close FROM candles_5m
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT 15
+            """, (token.upper(),))
+            _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
+            _rsi_cur.close()
+            if len(_rsi_closes) >= 15:
+                _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
+                _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
+                _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
+                _rsi_ag = sum(_rsi_gains) / 14
+                _rsi_al = sum(_rsi_losses) / 14
+                if _rsi_al > 0:
+                    _exec_rsi = 100 - (100 / (1 + _rsi_ag / _rsi_al))
+                    if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
+                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (would be catching falling knife)')
+                        return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+                    if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
+                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
+                        return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+        finally:
+            _rsi_conn.close()
+    except Exception:
+        pass  # non-fatal — don't block trade if RSI check fails
+
     # ── Pump Mode ─────────────────────────────────────────────
     # Spike/pump trades: tight SL/TP, NO trailing. Enter fast, exit fast.
     is_pump = 'pump-' in (source or '')

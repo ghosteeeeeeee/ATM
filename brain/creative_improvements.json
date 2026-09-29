@@ -940,8 +940,9 @@
     "rationale": "The signal is enabled, dead hours optimized, but not firing. NEUTRAL market may lack pump setups. If market shifts to EXTREME, pump-chain+ should recover.",
     "expected_impact": "+$0.20-0.50/7d if recovered",
     "category": "signal recovery",
-    "status": "monitoring",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-09-29T14:59:36.266191+00:00"
   },
   {
     "date": "2026-09-29T12:30:00Z",
