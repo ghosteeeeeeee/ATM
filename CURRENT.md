@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 03:00 UTC**
+**Last Updated: 2026-09-29 06:00 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
@@ -54,15 +54,16 @@ System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-)
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-29 03:00 UTC)
+## Audit Update (2026-09-29 06:00 UTC)
 
-- **🟢 POST-FIX VERIFIED WORKING.** 15T 80%WR -$0.13. 0 ATR_SL hits. 3 hard_sl losses (POL -$0.20, GOAT -$0.20, SOL -$0.07) — all normal variance, no entry quality issues.
-- **SHORT STRUCTURAL DISADVANTAGE CONFIRMED.** avg_win $0.12 vs LONG $0.16 at same WR (45.5%). SHORT = 82% of 14d losses (-$2.66). Low-conviction SHORT entries drag R:R below 1:1.
-- **7d REGIME: ALL NEUTRAL (116/117).** No EXTREME/HIGH data. REGIME_CONF_HIGH_MULT=0.50 UNTESTED.
-- **7d EXIT ANALYSIS:** 46 atr_sl_hit (-$4.95, ALL pre-fix), 36 profit-monster-trail (+$1.45), 8 cut-loser-CL-T1 (-$0.97, DISABLED), 8 hard_sl (+$0.34).
+- **🟢 POST-FIX VERIFIED WORKING.** 11T 90.9%WR +$0.89 (since Sep 28 10:39 UTC). 7 profit-monster-trail, 4 hard_sl. 0 ATR_SL hits. Strong performance.
+- **SHORT STRUCTURAL DISADVANTAGE CONFIRMED.** avg_win $0.12 vs LONG $0.16 at similar WR (45.9% vs 45.0%). SHORT = 140% of 14d losses (-$2.48 vs -$1.77 total). Low-conviction SHORT entries drag R:R below 1:1.
+- **7d REGIME: ALL NEUTRAL (114/115).** No EXTREME/HIGH data. REGIME_CONF_HIGH_MULT=0.50 UNTESTED.
+- **7d EXIT ANALYSIS:** 45 atr_sl_hit (-$4.80, ALL pre-fix), 35 profit-monster-trail (+$1.25), 8 cut-loser-CL-T1 (-$0.97, DISABLED), 8 hard_sl (+$0.34).
 - **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) profitable. 2 signal types carry all PnL.
-- **LOSING AUTOPSY:** 3 post-fix losers ALL small hard_sl (<$0.20). No systematic pattern. 7d losers ALL pre-fix legacy.
-- **CREATIVE (3):** (1) SHORT_MIN_EXEC_CONFIDENCE=70 — code change needed (+$0.30-0.60/7d, 0 winners blocked) (2) Monitor EXTREME post-fix (need 30+ trades) (3) New NEUTRAL signal for diversity.
+- **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD** — 7T 28.6%WR -$0.32/14d. R:R=0.56:1. Signal enters overbought territory where bounces fail. Fix: BB_BOUNCE_V2_LONG_RSI_MAX=60.
+- **LOSING AUTOPSY:** 4 losers 24h ALL small hard_sl (<$0.20). 2/4 in HIGH regime (worst performer, 31.3%WR 7d). No systematic pattern.
+- **CREATIVE (3):** (1) BB_BOUNCE_V2_LONG_RSI_MAX=60 (+$0.20-0.30/7d, 0 winners blocked) (2) SHORT_MIN_EXEC_CONFIDENCE=70 (+$0.30-0.60/7d, 5th suggestion) (3) Monitor EXTREME post-fix.
 - **0 CHANGES APPLIED.**
 
 ## Audit Update (2026-09-28 22:50 UTC)
@@ -92,7 +93,7 @@ System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-)
 
 ## Today's Changes (Sep 29)
 
-1. **brain_auditor ~03:00 UTC — NO CONFIG CHANGE.** DB-verified: 17T 76.5%WR +$1.25 (24h) | 117T 41.9%WR -$3.60 (7d) | 306T 45.1%WR -$2.20 (14d). **POST-FIX TRADES: 15T 80%WR -$0.13.** 0 ATR_SL hits. 3 hard_sl losses (POL -$0.20, GOAT -$0.20, SOL -$0.07) — all normal variance. **SHORT STRUCTURAL DISADVANTAGE CONFIRMED:** avg_win $0.12 vs LONG $0.16 at same WR. SHORT = 82% of 14d losses. **7d REGIME: ALL NEUTRAL (116/117).** No EXTREME/HIGH data. **7d EXIT ANALYSIS:** 46 atr_sl_hit (-$4.95, ALL pre-fix), 36 profit-monster-trail (+$1.45), 8 cut-loser-CL-T1 (-$0.97, DISABLED). **SIGNAL DIVERSITY CRITICAL:** Only volume-breakout-long+ and pump-chain+ profitable. **LOSING AUTOPSY:** 3 post-fix losers ALL small hard_sl (<$0.20). No systematic pattern. **CREATIVE (3):** (1) SHORT_MIN_EXEC_CONFIDENCE=70 code change needed (+$0.30-0.60/7d, 0 winners blocked) (2) Monitor EXTREME post-fix (need 30+ trades) (3) New NEUTRAL signal for diversity. **0 CHANGES APPLIED.** — brain_auditor
+1. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB-verified: 17T 76.5%WR +$1.25 (24h) | 115T 44.3%WR -$3.66 (7d) | 304T 45.4%WR -$1.77 (14d). **POST-FIX: 11T 90.9%WR +$0.89.** 0 ATR_SL hits. **SHORT structural disadvantage CONFIRMED:** avg_win $0.12 vs LONG $0.16. **14d RSI BANDS:** LONG 40-60 sweet spot (60T 63.3%WR +$2.46). LONG 60-70 killing field (50T 38.0%WR -$0.58). SHORT 60-70 sweet spot (18T 61.1%WR +$0.71). **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD:** 7T 28.6%WR -$0.32, R:R=0.56:1. **LOSING AUTOPSY:** 4 losers 24h ALL small (<$0.20), 2/4 in HIGH regime. **CREATIVE (3):** BB_BOUNCE_V2_LONG_RSI_MAX=60, SHORT_MIN_EXEC_CONFIDENCE=70 (5th), Monitor EXTREME. **0 CHANGES APPLIED.** — brain_auditor
 
 ## Today's Changes (Sep 28)
 

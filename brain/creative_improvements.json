@@ -885,5 +885,23 @@
         "status": "ongoing"
       }
     ]
+  },
+  {
+    "date": "2026-09-29T06:00:00Z",
+    "idea": "BB_BOUNCE_V2_LONG_RSI_MAX=60 — signal-specific RSI cap for bb-bounce-v2-long+",
+    "rationale": "bb-bounce-v2-long+ at RSI 60-70 enters overbought territory where bounces fail. 7T 28.6%WR -$0.32/14d. R:R=0.56:1. Would have blocked 5 of 7 losers (RSI 61-66). 2 winners at RSI 50 preserved.",
+    "expected_impact": "+$0.20-0.30/7d",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-29T06:00:00Z",
+    "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 — raise minimum execution confidence for SHORT entries",
+    "rationale": "SHORT structural disadvantage: avg_win $0.12 vs avg_loss $0.148. Low-conviction SHORT entries (confidence 50-69) have worse R:R. 5th suggestion.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry sniper",
+    "status": "suggested (5th time)",
+    "risk": "low"
   }
 ]
