@@ -2653,7 +2653,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'rr-struct',  # structural R:R quality signal — Grade A/B, R:R ≥ 3.0, works solo
     'rr-struct-v2+',  # v2 LONG with falling-knife filter — works solo
     'trend-ignition',  # early-stage breakout — volume spike + compression, works solo
-    'rs', 'rs-r', 'rs-s',  # support/resistance — mean-reversion, standalone bypass NORMAL only (blocked EXTREME/HIGH via VOL_PHASE_MULTS)
+    # rs/rs-r/rs-s REMOVED 2026-09-29 — poor performance, requires confluence (2+ signal types)
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
 )
 
