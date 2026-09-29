@@ -1,12 +1,62 @@
 # Thesis Validation System (TVS) — Spec v2
 
-## Problem Statement
+## Plain English: What We're Building
 
-The system generates 350+ signals per day but executes only 5 (98.6% expiry rate). Signals that validate their thesis (price moves in predicted direction) are treated as fresh starts on re-entry — no memory of past success. Cooldowns block re-entry even when the setup has improved.
+### The Problem
 
-**Data-driven motivation:** 82% of SHORT signals and 84% of LONG signals have MFE > 0 (price moved in predicted direction at some point). The system is right most of the time but doesn't leverage this on re-entry.
+Our system fires 350+ signals per day but only executes 5. Here's why:
 
-## Solution: Thesis Validation Score (TVS)
+1. **Signal fires** → BABY SHORT at RSI 50 (88% confidence)
+2. **Trade opens** → Gets stopped out at -1.3%
+3. **Price drops 3%** → Our thesis was RIGHT
+4. **Same signal fires again** → Blocked by cooldown
+5. **But now RSI is 40, price has dropped** → Setup is BETTER
+6. **System misses the re-entry** → We lose the move
+
+**The system has no memory.** Every signal is treated as a fresh start. It doesn't know that 82% of its signals validate their thesis (price moves in the predicted direction).
+
+### What We're Building
+
+A system that remembers:
+
+**"I was right about BABY SHORT last time. Price moved in my direction. The thesis was correct. When the same signal fires again, boost it to the top of the queue."**
+
+### How It Works
+
+1. **Track MFE after each trade** — Did price move in the predicted direction?
+   - MFE > 0 → Thesis validated ✅
+   - MFE > 2% → Thesis strongly validated 💪
+   - MFE ≤ 0 → Thesis invalidated ❌
+
+2. **Score boost for re-entries** — When the same signal fires again:
+   - Previous thesis validated → **+15% score boost**
+   - Previous thesis strongly validated → **+25% score boost**
+   - Previous thesis invalidated → **-15% score penalty**
+
+3. **Override cooldowns** — If the thesis was validated AND the setup improved:
+   - Price moved in the right direction
+   - RSI improved (more favorable for entry)
+   - Volatility regime aligned
+   → Override cooldown, re-enter with higher priority
+
+4. **Safety guard** — Max 1 override per token per 4 hours. Prevents revenge-trading loops.
+
+### What It Doesn't Do
+
+- Doesn't override RSI blocks (if RSI says don't trade, don't trade)
+- Doesn't override blacklist (if token is banned, stay banned)
+- Doesn't override RR engine (if risk:reward is bad, don't enter)
+- Doesn't override Hall of Shame (if 30-day WR is bad, stay blocked)
+
+### The Goal
+
+Turn our 98.6% signal expiry rate into more executed trades — but only the GOOD ones. Signals that proved they were right should get priority. Signals that proved they were wrong should get penalized.
+
+**In one sentence:** The system learns from its own predictions and double-downs on winners.
+
+---
+
+## Technical Specification
 
 ### Core Concept
 Track whether each signal's thesis validated (price moved in predicted direction). Use this history to:
