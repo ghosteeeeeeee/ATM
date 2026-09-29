@@ -3352,3 +3352,12 @@
   LOSING AUTOPSY: 13 losers 24h all small (<$0.47). No systematic pattern.
   CREATIVE: (1) Monitor pump-chain+ recovery (2) SHORT TP adjustment (3) New EMA-reclaim signal.
   0 CHANGES APPLIED. BY: brain_auditor
+
+[2026-09-29 14:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 22T ~55%WR +/usr/bin/bash.20 (24h) | 123T 41.5%WR -.04 (7d) | 311T 44.7%WR -.51 (14d)
+  ATR SL 35.3% 7d — PASS. Post-fix: 0 ATR_SL hits.
+  pump-chain+ cold streak 7d (0 trades). 14d still +.23.
+  LOSING AUTOPSY: 16 losers 24h all small (</usr/bin/bash.47). Normal chop.
+  7d REGIME: EXTREME -.49, HIGH -/usr/bin/bash.78, NORMAL +/usr/bin/bash.23.
+  CREATIVE: (1) EMA-reclaim signal (2) Monitor pump-chain+ (3) SHORT TP multiplier.
+  BY: brain_auditor

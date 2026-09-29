@@ -99,3 +99,31 @@ BY: auto_1hr
 - hard_sl rate elevated (57%) — monitor, may need SL widening if trend continues
 
 BY: auto_1hr
+
+## [2026-09-29 13:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period) | 6 open (BTC LONG 23.9h, ALGO SHORT 2.6h, WLFI LONG 1.1h, CASHCAT SHORT 0.6h, KAS LONG 0.2h, MNT LONG 0.1h)
+**24h:** 35T 20W 15L -$0.36 (57.1% WR) | **7d:** 121T 42.1%WR -$3.60
+
+**ATR SL:** 0/35 (0%) 24h ✅ (fix holding 35T+)
+**Exits:** 18 hard_sl (avg -$0.059) | 17 profit-monster-trail (avg +$0.042)
+**Regime:** EXTREME
+
+**Signal leaders 24h:** pump-chain- 10T 6W +$0.41
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits, stable
+- No kill candidates: no signal with 3+T/0%WR last hour
+- Trade frequency: 0/hr last hour — quiet, not overtrading
+- hard_sl 51.4% (down from 57% at 12:00) — improving
+- BTC LONG 23.9h: stale but has SL (-1.30%) / TP (+2.28%), will auto-close
+- SHORT R:R structural issue persists (avg_win $0.121 vs avg_loss $0.217) — monitored
+- 14d: 316T 44.9%WR -$2.88 — system breakeven over longer window
+
+**Open Questions:**
+- 6h trend: 12:00 hour was +$0.06 (first positive hour in 5) — recovery signal
+- pump-chain- SHORT continues to dominate PnL despite some hard_sl exits (net +$0.41)
+
+BY: auto_1hr

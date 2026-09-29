@@ -44,3 +44,16 @@
 ## Error Alerts — 2026-09-29 11:58 UTC
 - **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+AT, allowing despite TOK filter`
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+
+## Error Alerts — 2026-09-29 12:46 UTC
+- **[WARN]** (continuous): `position_manager: FAILED (rc=1)` — Guardian lock contention (unchanged). Cosmetic only.
+- **[WARN]** (1x): `ALGO SHORT loss streak=79` — Up from 21 at 11:46. Strategy effectively paused. Cooldown 1.5h per cycle.
+- **[WARN]** (1x): `CHIP SHORT loss streak=34` — Cooldown expiring soon (~18min).
+- **INFO**: Disk at 84% (19G free). No cleanup needed yet.
+- **INFO**: Market regime LONG_BIAS. 5 tokens long, 0 short, 112 neutral.
+- **INFO**: 11 trades today, 63.6% WR, +$0.33 USDT. 0 open positions.
+- **INFO**: 5 tokens on 900h PUMP_RIDER block (LTC, BTC, ME, ACE, ALT) — intentional.
+
+## Error Alerts — 2026-09-29 12:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
