@@ -78,3 +78,9 @@
 
 ## Error Alerts — 2026-09-29 16:58 UTC
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+
+## Error Alerts — 2026-09-29 17:48 UTC
+- **WARN** (4x): `position_manager: FAILED in N.Ns (rc=1)` — Guardian lock contention, not a crash
+- **WARN**: `BTC LONG loss streak = 97` — system keeps trying and losing
+- **WARN**: Disk at 85% (18G free)
+- **INFO**: 6 phantom trades with near-zero PnL

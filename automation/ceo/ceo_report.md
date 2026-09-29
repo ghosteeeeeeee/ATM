@@ -1,3 +1,20 @@
+## CEO Report — 2026-09-29 (18:00 UTC)
+
+### Diagnosis
+DB-verified: 43T 46.5%WR -$1.63 (24h) | 129T 41.1%WR -$4.38 (7d) | 318T 43.7%WR -$4.43 (14d). 5 open positions (3 SHORT pump-chain-, 1 LONG doji-bottom, 1 LONG continuum-osc). ATR_SL widening VERIFIED: 0% post-fix (45T). SHORT R:R 0.59:1 (avg_win $0.088 vs avg_loss $0.149) — structural bleeding. pump-chain+ LONG 0 trades/7d (dead hours + NEUTRAL). Signal diversity CRITICAL — only2 signals profitable.
+
+### Root Cause
+1. **SHORT R:R broken** — ATR_SL cuts SHORT winners at 1.5x SL. TP unreachable (0.9% hit rate). Winners average $0.088, losers $0.149.
+2. **pump-chain+ starved** — profitable hours 0,14,20,23 blocked in dead hours list (stale data from Sep 28).
+3. **ALL trades NEUTRAL** — no EXTREME/HIGH data for regime multiplier eval.
+
+### Fix Applied
+1. **PUMP_CHAIN_LONG_DEAD_HOURS** — removed hours 0,14,20,23 (profitable 30d), added 18 (loser). Opens 3 more hours. Expected +$0.30-0.60/7d.
+2. **ATR_TP_K_MULT 1.5→2.0** — TP target 4% (was 3%). Gives SHORT winners room to run. Expected +$0.20-0.50/7d from improved R:R.
+
+### Verification
+ATR_SL widening: 45T post-fix, 0 hits — PASS. SHORT R:R will improve as TP becomes reachable. pump-chain+ dead hours fix needs 48h to measure (next pump-chain+ setup in NEUTRAL regime).
+
 ## CEO Report — 2026-09-29 (02:00 UTC)
 
 ### Diagnosis

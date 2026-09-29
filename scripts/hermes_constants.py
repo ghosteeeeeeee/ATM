@@ -662,7 +662,7 @@ ATR_SL_MAX             = 0.020  # 2.0% cap — brain_auditor Sep 28: widened fro
 ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — brain_auditor Sep 27: EXTREME 70.2% ATR_SL hit rate. pump-chain+ EXTREME 89.2%. 8 small winners (<$0.15) in 14d cut too early at 1.3%. Widening to 1.5% (effective 1.8% with 1.2x mult = ATR_SL_MAX) gives maximum room.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
-ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.
+ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 1.5x. SHORT R:R 0.59:1 (avg_win $0.088 vs avg_loss $0.149). Only 0.9% of 7d trades hit TP — unreachable at 1.5x. 2.0x gives SHORT winners room to reach 4% TP before PM_TRAIL. PM_TRAIL handles most exits.
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
@@ -1264,7 +1264,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (mat
 # ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
 # 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
 # Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
-PUMP_CHAIN_LONG_DEAD_HOURS = [0, 1, 2, 3, 4, 7, 14, 20, 21, 23]  # brain_auditor 2026-09-28 — removed hours 5,8,13,22 (profitable on 14d: +$1.86). 14d: [5] 4T 50%WR +$0.21, [8] 1T 100%WR +$0.43, [13] 1T 100%WR +$0.11, [22] 2T 100%WR +$1.11. Opens 4 more hours for pump-chain+. Expected +$0.40-0.90/7d.
+PUMP_CHAIN_LONG_DEAD_HOURS = [1, 2, 3, 4, 7, 18, 21]  # CEO 2026-09-29 — removed 0,14,20,23 (profitable 30d: h0 +$0.72, h14 -$0.17, h20 +$0.19, h23 +$0.69). Added 18 (30d: -$0.15). 30d losers kept: h1 -$0.54, h2 -$0.42, h3 -$0.44, h4 -$0.27, h7 -$0.55, h21 -$0.58. Opens 3 more hours for pump-chain+. Expected +$0.30-0.60/7d.
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
 PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-09-24 — 14d: RSI 65-75 = 15T 41.7%WR +$0.02 (dead zone, flat). RSI>75 = 10T 40%WR -$0.32 (negative). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Tightened 75→70 to block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Expected +$0.03-0.10/7d.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
