@@ -1,24 +1,24 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 06:00 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-29 06:30 UTC**
+**Updated by: daily_orchestrator**
 
 ## Current Status
 
-System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-). Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14). SHORT signals killed/disabled.
+System active. 4 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14). SHORT signals killed/disabled.
 
-- **24h (rolling):** 17T 76.5%WR +$1.25 (DB-verified). Strong day.
-- **7d:** 117T 41.9%WR -$3.60 (DB-verified). ALL ATR_SL hits pre-fix legacy. Post-fix: 0/15 ATR_SL hits.
-- **14d:** 306T 45.1%WR -$2.20 (DB-verified). LONG +$0.46, SHORT -$2.66 (121% of losses).
-- **POST-FIX:** 15T 80%WR -$0.13. 3 hard_sl losses (normal variance, <$0.20 each).
-- **OPEN:** 2 positions — BTC LONG continuum-osc+ (NEUTRAL), LTC SHORT pump-chain- (NEUTRAL).
-- **LONG:** volume-breakout-long+ (+$0.79/7d, 66.7%WR), r2_trend_long (+$0.59/7d, 62.2%WR).
-- **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE.
+- **24h (rolling):** 24T 62.5%WR +$0.41 (DB-verified). Good day.
+- **7d:** 114T 41.2%WR -$3.46 (DB-verified). ALL ATR_SL hits pre-fix legacy. Post-fix: 0 ATR_SL hits. 0 atr_sl_hit 24h.
+- **14d:** 307T 43.9%WR -$2.92 (DB-verified). LONG +$0.67, SHORT -$3.59 (123% of losses).
+- **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL, +$0.07), GOAT SHORT pump-chain- (EXTREME, -$0.02), BABY SHORT pump-chain- (EXTREME, -$0.05), WLFI LONG rs-s35 (HIGH, +$0.01).
+- **LONG:** volume-breakout-long+ (+$1.46/14d, 66.7%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
+- **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
+- **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — **VERIFIED WORKING.**
-- **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+ (Sep 24), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
+- **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
 - **CONF_FILTER_MIN=65.**
 - **Disk:** 84% (19G free). candles.db 2.2G, coin_tracker.db 3.1G. 25 dead 0-byte DBs cleaned today.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
@@ -106,6 +106,10 @@ System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-)
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 29)
+
+1. **daily_orchestrator ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 24T 62.5%WR +$0.41 (24h) | 114T 41.2%WR -$3.46 (7d) | 307T 43.9%WR -$2.92 (14d). **PIPELINE HEALTHY.** 4 open positions (BTC LONG, GOAT SHORT, BABY SHORT, WLFI LONG). **mover- SHORT KILLED by auto_1hr 06:14 UTC** — 3T 0%WR -$0.72/7d, all hard_sl. **ATR_SL: 0 atr_sl_hit 24h.** **EXTREME regime worst** (-$2.51/7d, 43.3%WR). **Signal diversity CRITICAL** — volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) carry system. **Disk 84% (19G free).** **0 CHANGES APPLIED.** — daily_orchestrator
+
+1. **auto_1hr ~06:14 UTC — 1 SIGNAL KILL.** **mover- SHORT KILLED** — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d, 2T 0%WR -$0.68 24h. All exits hard_sl — entries consistently wrong side. — auto_1hr
 
 1. **brain_auditor ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 15T 46.7%WR +$0.47 (24h) | 113T 42.0%WR -$3.44 (7d) | 306T 45.2%WR -$2.30 (14d). **POST-FIX: 14T 78.6%WR +$0.89.** 9 profit-monster-trail, 5 hard_sl. 0 ATR_SL hits. **pump-chain- SHORT BYPASSING SHORT_NEUTRAL_BLOCK** — 5T/24h 100%WR +$0.81 via STANDALONE_BYPASS. **SHORT structural disadvantage CONFIRMED:** avg_win $0.12 vs LONG $0.16. **14d RSI BANDS:** SHORT <50 catastrophic (-$3.42 81T). SHORT 50-60 sweet spot (+$1.27 19T 68.4%WR). LONG 50-60 sweet spot (+$0.44 25T 64.0%WR). **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD** — 3T, R:R=0.56:1. **mover+ LONG R:R BROKEN** — 0.52:1, top loser entered RSI 79. **LOSING AUTOPSY:** 5 losers 24h all small (<$0.21). **CREATIVE (3):** BB_BOUNCE_V2_LONG_RSI_MAX=60 (6th), SHORT_MIN_EXEC_CONFIDENCE=70 (5th), mover+ RSI_MAX=75. **0 CHANGES APPLIED.** — brain_auditor
 
