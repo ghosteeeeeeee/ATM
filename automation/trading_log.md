@@ -127,3 +127,31 @@ BY: auto_1hr
 - pump-chain- SHORT continues to dominate PnL despite some hard_sl exits (net +$0.41)
 
 BY: auto_1hr
+
+## [2026-09-29 15:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L) — CASHCAT SHORT hard_sl -$0.42, KAS LONG trail -$0.01
+**24h:** 37T 20W (54%WR) $-0.79 | **7d:** 122T | **Open:** 5 trades
+
+**ATR SL:** 0/37 (0%) 24h ✅ fix stable
+**Exits:** 19 hard_sl (avg -$0.078) | 18 profit-monster-trail (avg +$0.039)
+
+**SHORT R:R remains structural:** avg_win $0.121 vs avg_loss $-0.243 → 0.5:1 ratio. This is the dominant drag.
+
+**Signal check 24h:**
+- `mover-`: 2T 0W -$0.68 (both SHORT, both hard_sl) — worst single signal
+- `rs-s30`: 3T 0W -$0.08 (small but all losses)
+- No signal has 3+T/0%WR in **last hour** → no kill triggered
+
+**No Change Needed:**
+- No kill candidates (no signal with 3+T/0%WR in last hour)
+- Trade frequency normal (2/hr)
+- ATR_SL fix stable (0 hits 24h)
+- SHORT R:R structural issue: monitored but requires broader analysis before tuning TP/SL ratios
+
+**Open Questions:**
+- `mover-` SHORT specifically: 2 consecutive hard_sl losses ($-0.68 combined). Escalate if next SHORT loses.
+- SHORT structural disadvantage: avg_loss 2x avg_win. Needs tpsl_utils.py review.
+- BTC LONG 24.9h stale — has SL/TP, will auto-close.
+
+BY: auto_1hr
