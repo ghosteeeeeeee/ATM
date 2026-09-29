@@ -2614,7 +2614,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         use_pump_exit = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
-                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'pump_exit':
+                if _match_exit_config(part) == 'pump_exit':
                     use_pump_exit = True
                     break
         if use_pump_exit:
@@ -2760,7 +2760,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         use_ride_it = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
-                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'ride_it':
+                if _match_exit_config(part) == 'ride_it':
                     use_ride_it = True
                     break
         if use_ride_it:
@@ -2786,13 +2786,25 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 0. RR Engine structural exit (for configured signals) ──────────────
         # Check if this trade's signal uses RR engine exits
         # Support both exact match and partial match (comma-separated sources)
+        # FIX: Use prefix matching — 'rs-s34' should match 'rs' key in config
         signal = str(pos.get("signal", "") or "")
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
         signal_parts = [s.strip() for s in signal.split(',')]
+        
+        def _match_exit_config(part):
+            """Match signal part to exit config using exact or prefix match."""
+            if part in SIGNAL_EXIT_CONFIG:
+                return SIGNAL_EXIT_CONFIG[part]
+            # Prefix match: 'rs-s34' → check 'rs', 'pump-chain-' → check 'pump-chain-'
+            for key, val in SIGNAL_EXIT_CONFIG.items():
+                if part.startswith(key + '-') or part.startswith(key + '_'):
+                    return val
+            return None
+        
         use_rr_engine = False
         if RR_EXIT_ENABLED:
             for part in signal_parts:
-                if part in SIGNAL_EXIT_CONFIG and SIGNAL_EXIT_CONFIG[part] == 'rr_engine':
+                if _match_exit_config(part) == 'rr_engine':
                     use_rr_engine = True
                     break
         if use_rr_engine:
