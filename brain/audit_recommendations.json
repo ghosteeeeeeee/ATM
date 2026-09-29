@@ -1,133 +1,158 @@
 {
-  "timestamp": "2026-09-29T07:30:00Z",
-  "session_brain_stats": {
-    "query_topics": ["signal performance winrate", "new signal ideas", "loss money bleeding", "bb bounce RSI killing field", "accel-300 breakout losing", "neutral signal diversity"],
-    "insights_found": 30
-  },
-  "trade_summary_24h": {
-    "trades": 21,
-    "win_rate": 70.0,
-    "pnl": 0.54,
-    "losers": 6,
-    "biggest_loser": "BLUR mover- SHORT -$0.47 (EXTREME, hard_sl)",
-    "note": "mover- killed Sep 29 06:14 UTC. All 24h losers small scratches."
-  },
-  "trade_summary_7d": {
-    "trades": 113,
-    "win_rate": 42.0,
-    "pnl": -3.46,
-    "top_losers": ["pump-chain- SHORT 12L -$0.50", "bb-bounce-v2-long+ 6L -$0.18", "pullback-entry- 6L -$1.54", "mover+ 5L -$0.95", "accel-300-breakout 5L -$0.12"],
-    "regime": {"EXTREME": "-$2.32", "HIGH": "-$1.82", "NORMAL": "+$0.21"}
-  },
-  "trade_summary_14d": {
-    "trades": 306,
-    "win_rate": 43.9,
-    "pnl": -2.92,
-    "long_pnl": 0.67,
-    "short_pnl": -3.59,
-    "signal_diversity": "CRITICAL — only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.23) profitable"
-  },
-  "drift_findings": [
-    {
-      "finding": "SHORT structural disadvantage persists",
-      "detail": "avg_win $0.116 vs LONG $0.162 (29% smaller). SHORT -$3.59/14d = 123% of total losses.",
-      "impact": "HIGH — all SHORT signals dragged by structural R:R disadvantage",
-      "status": "MONITORING — all direct SHORT signals killed/disabled"
+    "timestamp": "2026-09-29T10:45:00Z",
+    "session_brain_stats": {
+        "topics_found": 30,
+        "key_insights": [
+            "pump-chain+ cold streak 7d (0 trades) but 14d still profitable (+$1.23)",
+            "Signal diversity CRITICAL — only 2 signal types profitable",
+            "SHORT structural disadvantage persists — avg_win $0.12 vs LONG $0.16",
+            "Session brain suggests SHORT_MIN_EXEC_CONFIDENCE=70 (5th time)",
+            "trend following signal requested by user but not yet built"
+        ]
     },
-    {
-      "finding": "Signal diversity CRITICAL",
-      "detail": "Only 2 signal types profitable (volume-breakout-long+ +$1.46, pump-chain+ +$1.23). 30+ signal types but only 2 net positive.",
-      "impact": "HIGH — system depends on 2 signals, single point of failure",
-      "status": "NEEDS NEW NEUTRAL SIGNAL"
+    "trade_summary_24h": {
+        "trades": 25,
+        "win_rate": 64.0,
+        "pnl": 0.33,
+        "post_fix_wr": 70.0,
+        "atr_sl_hits": 0,
+        "open_positions": 6,
+        "top_performer": "pump-chain- SHORT 8T 75%WR +$0.88",
+        "losers": "9 trades all small (<$0.47), mostly killed signals (mover-, rs-s*)"
     },
-    {
-      "finding": "REGIME_CONF_HIGH_MULT=0.50 UNTESTED",
-      "detail": "Deployed Sep 26. ALL 306 14d trades are NEUTRAL. No EXTREME/HIGH data to evaluate.",
-      "impact": "MEDIUM — filter deployed but untested, could be helping or doing nothing",
-      "status": "WAITING FOR EXTREME/HIGH TRADES"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "pump-chain- SHORT bleeding in HIGH regime",
-      "detail": "5T/14d HIGH 20%WR -$0.60. EXTREME 32T 56.3%WR +$0.66. HIGH is pure noise.",
-      "sessions_discussed": "recurring across 5+ audits",
-      "root_cause": "pump-chain- SHORT has edge in EXTREME (volatile breakouts) but no edge in HIGH (choppy elevated vol)"
+    "trade_summary_7d": {
+        "trades": 113,
+        "win_rate": 42.5,
+        "pnl": -3.24,
+        "regime_breakdown": {
+            "EXTREME": "61T 44.3%WR -$2.39 (dominant loss area)",
+            "HIGH": "30T 36.7%WR -$1.07",
+            "NORMAL": "19T 47.4%WR +$0.21 (only profitable)"
+        },
+        "exit_analysis": {
+            "atr_sl_hit": "36T -$3.66 (ALL pre-fix legacy aging out)",
+            "profit_monster_trail": "39T +$1.41 (53.8%WR)",
+            "hard_sl": "14T -$0.47 (42.9%WR)"
+        }
     },
-    {
-      "problem": "Signal diversity — only 2 profitable signal types",
-      "detail": "Every audit flags this. Need new signals for NEUTRAL regime.",
-      "sessions_discussed": "every audit since Sep 16",
-      "root_cause": "NEUTRAL regime dominates (70%+ of trades) but only 2 signals work there"
+    "trade_summary_14d": {
+        "trades": 309,
+        "win_rate": 45.0,
+        "pnl": -2.51,
+        "profitable_signals": {
+            "volume-breakout-long+": "18T 66.7%WR +$1.46",
+            "pump-chain+": "55T 41.8%WR +$1.23",
+            "grind-trend+": "18T 50.0%WR +$0.24",
+            "doji-bottom-long": "7T 57.1%WR +$0.24"
+        },
+        "losing_signals": {
+            "pullback-entry-": "55T 43.6%WR -$1.73 (killed, aging out)",
+            "mover+": "14T 42.9%WR -$1.12 (killed)",
+            "mover-": "5T 20.0%WR -$0.73 (killed Sep 29)"
+        },
+        "rsi_bands_long": {
+            "40-50": "17T 58.8%WR +$1.19 (sweet spot)",
+            "50-60": "44T 61.4%WR +$1.34 (sweet spot)",
+            "60-70": "51T 39.2%WR -$0.47 (killing field)",
+            "70+": "38T 44.7%WR +$0.51"
+        },
+        "rsi_bands_short": {
+            "<30": "16T 18.8%WR -$1.31 (catastrophic — legacy killed signals)",
+            "60-70": "19T 57.9%WR +$0.50 (sweet spot)",
+            "70+": "8T 25.0%WR -$0.45"
+        }
     },
-    {
-      "problem": "SHORT RSI<50 catastrophic",
-      "detail": "81T/14d SHORT RSI<50 -$3.42. SHORT_RSI_FLOOR=50 blocks direct signals but STANDALONE_BYPASS leak allows pump-chain- at RSI 23-42.",
-      "sessions_discussed": "recurring across 8+ audits",
-      "root_cause": "STANDALONE_BYPASS signals bypass signal_compactor where SHORT_RSI_FLOOR lives"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "NEW NEUTRAL regime signal",
-      "detail": "Only volume-breakout-long+ and pump-chain+ work. Need diversity.",
-      "priority": "HIGH",
-      "status": "REQUESTED since Sep 16"
-    },
-    {
-      "item": "SHORT_MIN_EXEC_CONFIDENCE=70",
-      "detail": "5th suggestion. Would block low-confidence SHORT entries that consistently lose.",
-      "priority": "MEDIUM",
-      "status": "SUGGESTED 5 times, not implemented"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True",
-      "file": "hermes_constants.py",
-      "rationale": "pump-chain- SHORT HIGH 5T 20%WR -$0.60/14d. EXTREME 32T 56.3%WR +$0.66. Block HIGH, preserve EXTREME.",
-      "expected_impact": "+$0.30/7d (blocks $0.60 loss, kills $0.06 tiny winner)",
-      "impact_on_winners": "1 tiny winner killed ($0.06). Net gain: +$0.54/14d.",
-      "files_changed": ["hermes_constants.py", "decider_run.py", "signal_compactor.py"]
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-29T07:30:00Z",
-      "idea": "pump-chain- SHORT HIGH regime block (APPLIED)",
-      "rationale": "14d data shows pump-chain- SHORT loses in HIGH (20%WR -$0.60) but wins in EXTREME (56.3%WR +$0.66). HIGH = noise, EXTREME = edge. Block HIGH to preserve capital.",
-      "expected_impact": "+$0.30/7d",
-      "category": "regime filter",
-      "status": "APPLIED",
-      "risk": "low",
-      "impact_on_winners": "1 tiny winner ($0.06) blocked. 32 EXTREME winners preserved."
-    },
-    {
-      "date": "2026-09-29T07:30:00Z",
-      "idea": "bb-bounce-v2-long+ RSI_MAX=60 — 6th suggestion (ALREADY APPLIED Sep 29)",
-      "rationale": "RSI 60-70 = 9T, net -$0.32. RSI_MAX=60 blocks overbought entries where bounces fail.",
-      "expected_impact": "+$0.20-0.30/7d",
-      "category": "entry sniper",
-      "status": "APPLIED (Sep 29 ~07:00 UTC)",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-29T07:30:00Z",
-      "idea": "accel-300-breakout SHORT RSI_MIN=45 filter (NEW SUGGESTION)",
-      "rationale": "7T/14d avg RSI 44.2. Losers at RSI 35-41 (3/4 lost). Winners at RSI 55-70 (3/3 won). Oversold SHORT entries = catching falling knife. Filter RSI<45.",
-      "expected_impact": "+$0.05-0.10/7d (marginal, low sample)",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low",
-      "impact_on_winners": "Would block 0 of 3 winning trades (all RSI>55)",
-      "confidence": "LOW — only 7 trades sample"
-    }
-  ],
-  "next_actions": [
-    "MONITOR: pump-chain- SHORT HIGH block (new, 48h eval)",
-    "MONITOR: BB_BOUNCE_V2_RSI_MAX=60 (applied Sep 29, 48h eval)",
-    "MONITOR: EXTREME regime post-fix (need 30+ trades for REGIME_CONF_HIGH_MULT=0.50 eval)",
-    "DEVELOP: New NEUTRAL regime signal for diversity (CRITICAL — only 2 profitable signal types)",
-    "SUGGEST: SHORT_MIN_EXEC_CONFIDENCE=70 (5th suggestion — blocks low-confidence SHORT entries)"
-  ]
+    "drift_findings": [
+        {
+            "finding": "SHORT_RSI_FLOOR=50 not blocking all SHORT RSI<50 trades",
+            "evidence": "7d post-fix: SHORT <30 = 6T 0%WR -$0.66, SHORT 30-40 = 6T 33.3%WR -$0.42",
+            "root_cause": "STANDALONE_BYPASS signals bypass signal_compactor where filter lives. decider_run.py has matching check but may have timing gaps.",
+            "impact": "-$1.08/7d from SHORT RSI<50 trades that should be blocked",
+            "status": "monitoring — filters ARE in decider_run.py, losses may be legacy"
+        },
+        {
+            "finding": "pump-chain+ LONG 0 trades/7d (cold streak)",
+            "evidence": "7d: 0 trades. 14d: 55T 41.8%WR +$1.23 still profitable",
+            "root_cause": "Market regime + dead hours + confidence filter. NEUTRAL regime = no pump-chain+ triggers.",
+            "impact": "-$1.23/14d potential not being captured",
+            "status": "monitoring — needs market activity"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "problem": "Signal diversity CRITICAL",
+            "detail": "Only volume-breakout-long+ (+$1.46) and pump-chain+ (+$1.23) profitable. 30+ signal types but only 2 net positive.",
+            "sessions_mentioned": "10+",
+            "status": "ongoing — new NEUTRAL signal needed"
+        },
+        {
+            "problem": "SHORT structural disadvantage",
+            "detail": "avg_win $0.12 vs LONG $0.16. SHORT -$3.59/14d (123% of losses). Even at similar WR, SHORT R:R worse.",
+            "sessions_mentioned": "8+",
+            "status": "acknowledged — SHORT signals being killed/disabled"
+        },
+        {
+            "problem": "EXTREME regime bleeding",
+            "detail": "61T 44.3%WR -$2.39/7d. pump-chain+ EXTREME still profitable (+$0.97/14d) but other signals lose.",
+            "sessions_mentioned": "6+",
+            "status": "monitoring — need more EXTREME data post-fix"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "SHORT_MIN_EXEC_CONFIDENCE=70",
+            "rationale": "5th suggestion. Low-confidence SHORT entries worst R:R 0.75:1.",
+            "expected_impact": "+$0.30-0.60/7d",
+            "status": "suggested — not yet applied"
+        },
+        {
+            "item": "New NEUTRAL regime signal",
+            "rationale": "Only 2 profitable signal types. Need diversity for NEUTRAL market.",
+            "sessions_mentioned": "5+",
+            "status": "requested by user — not yet built"
+        },
+        {
+            "item": "EXTREME MIN_EXEC_CONFIDENCE=70",
+            "rationale": "EXTREME worst regime. Need more post-fix data before applying.",
+            "status": "monitoring — wait for 30+ post-fix EXTREME trades"
+        }
+    ],
+    "config_changes_applied": [],
+    "creative_improvements": [
+        {
+            "date": "2026-09-29T10:45:00Z",
+            "idea": "Monitor pump-chain+ cold streak recovery",
+            "rationale": "0 trades/7d but 14d still profitable (+$1.23). Dead hours fix removed hours 5,8,13,22. Need 48h to measure impact.",
+            "expected_impact": "Recovery to 5-10T/7d = +$0.50-1.00/7d",
+            "category": "monitoring",
+            "status": "monitoring",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-29T10:45:00Z",
+            "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 (5th suggestion)",
+            "rationale": "SHORT structural disadvantage persists. Low-confidence SHORT entries (50-69%) worst R:R. 14d SHORT <50 RSI = catastrophic.",
+            "expected_impact": "+$0.30-0.60/7d",
+            "category": "confidence filter",
+            "status": "suggested",
+            "risk": "low",
+            "times_suggested": 5
+        },
+        {
+            "date": "2026-09-29T10:45:00Z",
+            "idea": "Verify SHORT RSI filters in decider_run.py catching all STANDALONE_BYPASS trades",
+            "rationale": "7d post-fix SHORT RSI<50 = 12T -$1.08. Filters exist in decider_run.py but some trades still slip through. Need to verify filter coverage.",
+            "expected_impact": "+$0.50-1.00/7d if leak confirmed and fixed",
+            "category": "bug investigation",
+            "status": "suggested",
+            "risk": "low"
+        }
+    ],
+    "next_actions": [
+        "Monitor pump-chain+ cold streak — dead hours fix deployed, need 48h data",
+        "Monitor EXTREME regime post-fix — need 30+ trades for confidence filter eval",
+        "NEW NEUTRAL signal development — user requested trend following signal",
+        "Verify SHORT RSI filter coverage in STANDALONE_BYPASS code path",
+        "SHORT_MIN_EXEC_CONFIDENCE=70 — 5th suggestion, ready to apply when requested"
+    ]
 }

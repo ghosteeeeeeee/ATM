@@ -1,16 +1,16 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 07:00 UTC**
+**Last Updated: 2026-09-29 10:45 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 4 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14). SHORT signals killed/disabled.
+System active. 6 open positions. Pipeline healthy. ATR_SL widening VERIFIED PASS. pump-chain+ V5 KILLED. mover- SHORT KILLED (auto_1hr 06:14). Dead hours TUNED. LONG_RSI_SWEET_SPOT extended to 40-60. BB_BOUNCE_V2_RSI_MAX=60 APPLIED. ALL metadata fixes VERIFIED WORKING (volume_spike, final_confidence, signal_rsi_14). SHORT signals killed/disabled.
 
-- **24h (rolling):** 24T 62.5%WR +$0.41 (DB-verified). Good day.
-- **7d:** 114T 41.2%WR -$3.46 (DB-verified). ALL ATR_SL hits pre-fix legacy. Post-fix: 0 ATR_SL hits. 0 atr_sl_hit 24h.
-- **14d:** 307T 43.9%WR -$2.92 (DB-verified). LONG +$0.67, SHORT -$3.59 (123% of losses).
-- **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL, +$0.07), GOAT SHORT pump-chain- (EXTREME, -$0.02), BABY SHORT pump-chain- (EXTREME, -$0.05), WLFI LONG rs-s35 (HIGH, +$0.01).
+- **24h (rolling):** 25T 64%WR +$0.33 (DB-verified). Good day.
+- **7d:** 113T 42.5%WR -$3.24 (DB-verified). ALL ATR_SL hits pre-fix legacy. Post-fix: 0 ATR_SL hits. 0 atr_sl_hit 24h.
+- **14d:** 309T 45.0%WR -$2.51 (DB-verified). LONG +$0.67, SHORT -$3.59 (123% of losses).
+- **OPEN:** 6 positions — BTC LONG continuum-osc+ (NORMAL), ADA LONG rs-s37 (EXTREME), KAS LONG rs-s57 (EXTREME), JUP LONG volume-breakout-long+ (EXTREME), ALGO SHORT pump-chain- (EXTREME), CASHCAT SHORT pump-chain- (EXTREME).
 - **LONG:** volume-breakout-long+ (+$1.46/14d, 66.7%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
 - **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.

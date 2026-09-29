@@ -299,8 +299,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'ema300_breakthrough_long'): 0.0,   # BLOCKED — same as ema300_dip_long family
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.0,              # BLOCKED — mover+ LONG -$0.48 lifetime EXTREME
-    ('EXTREME', 'mover_short'): 1.0,             # OK — mover SHORT can work in EXTREME
-    ('EXTREME', 'pump_chain-'): 0.5,             # PENALIZED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME
+    ('EXTREME', 'mover_short'): 0.0,             # BLOCKED — mover SHORT -$1.54 lifetime EXTREME (32 trades, net negative)
+    ('EXTREME', 'pump_chain-'): 1.0,             # OK — pump-chain- SHORT 51.7% WR +$1.70 lifetime EXTREME (116 trades)
     ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -310,11 +310,11 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'ema300_dip'): 1.0,              # OK — bare form fallback (specific _long/_short above take priority)
     ('EXTREME', 'mover'): 1.0,                   # OK — bare form fallback for mover (coin_tracker_hot variants below)
     ('EXTREME', 'coin_tracker_hot_long'): 0.0,    # BLOCKED — same as mover_long (Mover family)
-    ('EXTREME', 'coin_tracker_hot_short'): 1.0,   # OK — same as mover_short
+    ('EXTREME', 'coin_tracker_hot_short'): 0.0,   # BLOCKED — same as mover_short (Mover family)
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 0.5,              # PENALIZED — bare form fallback for pump_chain (not pump_chain+)
     ('EXTREME', 'pump-chain+'): 0.0,             # BLOCKED — hyphen variant of pump_chain+ (not proven in EXTREME)
-    ('EXTREME', 'pump-chain-'): 0.5,             # PENALIZED — hyphen variant of pump_chain-
+    ('EXTREME', 'pump-chain-'): 1.0,             # OK — hyphen variant of pump_chain- (boosted, same as pump_chain-)
     ('EXTREME', 'pump-chain'): 0.5,              # PENALIZED — hyphen variant fallback (must be AFTER pump-chain+/-)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──

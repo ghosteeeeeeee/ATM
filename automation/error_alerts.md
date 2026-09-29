@@ -1,12 +1,17 @@
-## Error Alerts — 2026-09-29 03:47 UTC
+## Error Alerts — 2026-09-29 08:46 UTC
 
-### CRITICAL (1)
-- **CRITICAL** (continuous): `position_manager: FAILED` — `[FATAL] Guardian already running — exiting` every pipeline run. Root cause: race condition between position_manager step and hl-sync-guardian service. Position_manager exits rc=1 but guardian handles SL/TP updates and position closes. Non-functional but noisy. Fix: either remove position_manager from pipeline (guardian covers it) or add lock-check before TPSL computation.
+### CRITICAL (0)
+- None
 
-### WARN (3)
-- **WARN** (1): `hermes-coding-mcp.service` crash-looping (activating auto-restart). Needs investigation.
-- **WARN** (1): 10 services in failed/dead state — 5m-candle, away-detector, better-coder, brain-auditor, bug-hunter, ceo, git-release, mtf-macd-tuner, trade-watchdog, trading-checklist.
-- **WARN** (1): Hotset empty — no signals survived compaction. 67 signals generated but 0 passed confidence threshold.
+### WARN (1)
+- **WARN** (continuous): `position_manager: FAILED` every cycle — **NOT A BUG**. Lock conflict with hermes-hl-sync-guardian.service. Guardian handles SL/TP and positions. Loss cooldowns + ATR updates complete before exit. Fix: remove position_manager from pipeline steps since guardian covers all functionality.
+
+### INFO
+- **AUTO-FIX** (08:46): Compressed logs older than 7 days
+- Disk at 84% (93GB/118GB) — monitor
+- Market regime: NEUTRAL (117 tokens, no directional bias)
+- Today: 6 trades, 83% WR (5W/1L)
+- Loss cooldowns: CC:LONG streak=50, BABY:SHORT streak=100
 
 ### AUTO-FIXES APPLIED
 - Cleaned /tmp/*.so (2.5GB node-compile-cache files >3 days old)
@@ -19,3 +24,14 @@
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
 - **NEW** (1x): `Sep N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-09-29 07:58 UTC
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+
+## Error Alerts — 2026-09-29 08:58 UTC
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+
+## Error Alerts — 2026-09-29 10:58 UTC
+- **REPEATED** (13x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`

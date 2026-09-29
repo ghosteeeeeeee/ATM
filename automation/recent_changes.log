@@ -3327,3 +3327,10 @@
   MOVER_MINUS_ENABLED = False — 3T 0%WR -$0.72 7d, 2T 0%WR -$0.68 24h. All hard_sl (entries wrong side).
   No open mover- trades. pump-chain- SHORT dominant (5T 5W +$0.81) untouched.
   BY: auto_1hr
+[2026-09-29 10:00 UTC] auto_1hr: NO CHANGE — analysis only
+  0T last hour. 24h 24T 66.7%WR +/usr/bin/bash.33. ATR_SL 0% (26T+ post-fix).
+  5 open trades normal. No kill candidates. System healthy. BY: auto_1hr
+[2026-09-29 11:00 UTC] auto_1hr: NO CHANGE — analysis only
+  3T last hour (1W2L -$0.28). 24h 27T 59.3%WR +$0.05. 7d 115T 42.6%WR -$3.43.
+  ATR_SL 0% (30T+ post-fix). hard_sl avg loss $0.045 — trailing stops working.
+  No kill candidates. Trade freq 3/hr normal. System healthy. BY: auto_1hr

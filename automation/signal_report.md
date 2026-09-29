@@ -1,50 +1,54 @@
-# === Signal Performance Report ===
-**Period:** 2026-09-29 ~12:00 UTC | Last 6h + 24h + 7d context
-
-## System Totals
-| Period | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| 6h | 6 | 83.3% | +$0.59 |
-| 24h | 16 | 75.0% | +$0.89 |
+=== Signal Performance Report ===
+Period: 2026-09-29 11:00 UTC | Last 6h / 24h
 
 ## KILLED (executed)
-None — no signal meets kill criteria (5+ trades, <30% WR, 24h).
+None — no signal meets kill criteria (5+ trades, WR<30%, PnL<-$0.10 in 24h).
 
-## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 100% | +$0.81 | 5 (24h) | Monitor — already strong, no boost needed |
+## REGIME ADJUSTMENTS (executed)
+| Signal | Regime | Change | Reason |
+|--------|--------|--------|--------|
+| pump-chain- SHORT | EXTREME | 0.5→1.0 | +$1.70 lifetime (116 trades), 51.7% WR |
+| mover- SHORT | EXTREME | 1.0→0.0 | -$1.54 lifetime (32 trades), net negative |
+| coin_tracker_hot_short | EXTREME | 1.0→0.0 | Same as mover_short (Mover family) |
+
+## BOOSTED
+None — pump-chain- SHORT performing well at full multiplier already.
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0% | -$1.54 | 6 (7d) | ⚠️ COLD STREAK — all-time 119T 52.1% WR +$0.35. NORMAL already blocked. HIGH+EXTREME both 0% this week. Historical data supports signal — bad week, not broken. |
-| mover+ | LONG | 16.7% | -$0.95 | 6 (7d) | ⚠️ POTENTIAL KILL — all-time 21T 57.1% WR but -$0.85 total. Losses > wins. EXTREME 2T 0% -$0.67. Low sample (21T all-time). Needs monitoring. |
-| pump-chain+ | LONG | 0% | -$0.76 | 3 (7d) | Insufficient sample. All-time 80T 41.3% WR +$0.95. Dead hours already block worst hours. |
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 (7d) | BLACKLISTED 2026-09-28 — no new trades since. 7T are pre-blacklist residuals. |
+| mover- | SHORT | 0% | -$0.68 | 2 | Watch — EXTREME regime blocked, below kill threshold |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 100% | +$0.81 | 5 (24h) | STRONG — 58.8% WR 7d, +$0.51. EXTREME regime 52.2% all-time. |
-| doji-bottom-long | LONG | 100% | +$0.16 | 1 (24h) | Single trade, too early to judge |
-| rs-s94 | LONG | 100% | +$0.07 | 1 (24h) | Single trade |
-| rs-s38 | LONG | 100% | +$0.09 | 1 (24h) | Single trade |
-| rs-s56 | LONG | 100% | +$0.19 | 1 (24h) | Single trade |
+| pump-chain- | SHORT | 75% | +$0.88 | 8 | Active, EXTREME regime boosted |
+
+## ALL 24h SIGNALS (27 total closed trades)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain- | SHORT | 8 | 75.0% | +$0.88 |
+| rs-s35 | LONG | 2 | 100% | +$0.09 |
+| mover- | SHORT | 2 | 0% | -$0.68 |
+| rs-r32 | SHORT | 1 | 100% | +$0.02 |
+| rs-r33,rs-r34,rs-r35 | SHORT | 1 | 0% | -$0.20 |
+| rs-r68 | SHORT | 1 | 100% | +$0.01 |
+| rs-s31 | LONG | 1 | 0% | -$0.20 |
+| rs-s36 | LONG | 1 | 100% | +$0.11 |
+| rs-s38 | LONG | 1 | 100% | +$0.09 |
+| rs-s48 | LONG | 1 | 0% | -$0.04 |
+| rs-s52 | LONG | 1 | 0% | -$0.20 |
+| rs-s56 | LONG | 1 | 100% | +$0.19 |
+| rs-s57 | LONG | 1 | 0% | -$0.21 |
+| rs-s82 | LONG | 1 | 0% | -$0.07 |
+| bb-bounce-v2-long+ | LONG | 1 | 100% | +$0.02 |
+| rs-s94 | LONG | 1 | 100% | +$0.07 |
+| doji-bottom-long | LONG | 1 | 100% | +$0.16 |
+| r2-trend-short5 | SHORT | 1 | 100% | +$0.01 |
 
 ## ISSUES
-- **No signal inversions** found (24h)
-- **accel-300-breakout** blacklisted 2026-09-28 — 7T pre-blacklist trades still in DB showing 28.6% WR. Blacklist is working (no new trades since).
-- **pullback-entry- SHORT cold streak** — 0% WR this week on HIGH+EXTREME (normally profitable regimes). All-time data supports signal. Recommend watching, not killing.
-
-## Regime Context (7d)
-| Regime | SHORT WR | SHORT PnL | Notes |
-|--------|----------|-----------|-------|
-| EXTREME | 56.5% | +$3.44 | Best SHORT regime |
-| HIGH | 42.9% | -$3.33 | Dead zone — 39% of all trades |
-| NORMAL | 44% | -$0.79 | Struggling |
-
-## Next Actions
-1. Monitor pullback-entry- — if 14d WR drops below 45%, consider regime-specific kill
-2. Watch mover+ — if 7d WR stays below 25% with 10+ trades, kill
-3. No immediate kills or boosts required
+- Low volume: only 27 closed trades in 24h. Pipeline running but signal output moderate.
+- Mover- EXTREME regime blocked. Mover- SHORT lifetime in EXTREME is net negative despite 53% WR (wins smaller than losses).
+- pump-chain- EXTREME boosted — proven profitable with 116 lifetime trades.
+- No signal inversion bugs detected.
+- 9018 signals in DB (may need cleanup — flagged in pipeline health check).
