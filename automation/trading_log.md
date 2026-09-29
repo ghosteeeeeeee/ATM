@@ -1619,3 +1619,90 @@ BY: auto_1hr
 - BTC LONG opened 13h+ ago at -$0.07 — still flat, monitoring but no action needed yet
 
 **BY:** auto_1hr
+
+## [2026-09-29 04:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 03:11 UTC) | **Open:** 3 (BTC LONG -$0.05, LTC SHORT +$0.42, AVAX SHORT -$0.03)
+**24h:** 16T 81%WR +$0.89 | **7d:** 113T 42.5%WR -$3.19
+
+**24h exit breakdown:** 8 hard_sl (+$0.34), 7 profit-monster-trail (+$0.55), 1 HL_CLOSED ($0.00)
+- hard_sl at 50% but all profitable — trailing stops working correctly
+- ATR_SL fix: 0 hits (26T+ post-fix validated)
+
+**24h by signal:** pump-chain- 5T 100%WR +$0.81 (dominant). rs-s56 1T +$0.19, doji-bottom-long 1T +$0.16. All others small scratches.
+
+**No Change Needed:**
+- 0 trades closed = no new data to act on
+- 0 kill candidates (no signal with 3+ trades and 0% WR)
+- hard_sl rate normal (profitable trail exits, not SL failures)
+- Trade frequency normal (~0.5T/hr)
+- ATR_SL fix validated 26T+
+
+**Open Questions:**
+- BTC LONG (continuum-osc+) open 24h+ at -$0.05 — still flat, auto-trailing SL should manage
+- LTC SHORT (pump-chain-) open 24h+ at +$0.42 — profitable hold, letting it run
+
+**BY:** auto_1hr
+
+## [2026-09-29 05:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 04:11 UTC) | **Open:** monitoring
+**24h:** 16T 75%WR +$0.89 | **7d:** 113T 42.5%WR -$3.19
+
+**24h exit breakdown:** 8 hard_sl (+$0.34), 7 profit-monster-trail (+$0.55), 1 HL_CLOSED ($0.00)
+- hard_sl at 50% but ALL profitable (avg +$0.043) — trailing stops working correctly
+- ATR_SL fix: 0 hits (26T+ post-fix validated)
+
+**24h by signal:** pump-chain- 5T 100%WR +$0.81 dominant. 11 other signals with 1T each (too few to judge).
+All signal PnLs within normal range. No signal losing >$0.25.
+
+**No Change Needed:**
+- 0 trades closed = no new data to act on
+- 0 kill candidates (all signals have 1T, need 3+ to consider kill)
+- hard_sl rate normal (profitable trail exits, not SL failures)
+- Trade frequency normal (~0 trades/hr this quiet window)
+- ATR_SL fix validated 26T+
+
+**Open Questions:**
+- 7d at 42.5%WR -$3.19 — structural weakness persists but 24h improving (75%WR)
+- EXTREME regime dominant; HIGH regime break-even — no intervention needed
+
+## FAVORITES Update — 2026-09-29 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE JUP (inactive 7d, no trades)
+
+Final set: ['CASHCAT']
+
+## LOSERS Update — 2026-09-29 06:05 UTC
+- REMOVE CFX (insufficient data)
+
+Final set: []
+
+## [2026-09-29 06:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 5 open (BABY SHORT, WLFI LONG, GOAT SHORT, LTC SHORT, BTC LONG 16.9h)
+**24h:** 10T 50%WR +$0.51 | **7d:** 92T 38%WR -$4.46
+
+**ATR SL:** 0/10 (0%) 24h post-fix ✅ | Fix working
+**Open trades:** All flat or small PnL. BTC LONG open 16.9h (continuum-osc+).
+
+**Changes:**
+1. **KILL mover- SHORT** — 3T 0%WR -$0.72 7d, 2T 0%WR -$0.68 24h. All hard_sl. Entries wrong side. `MOVER_MINUS_ENABLED = False`
+
+**No Change Needed:**
+- ATR_SL fix: 0 hits 24h+ ✅
+- pump-chain- SHORT: 5T 5W +$0.81 24h — dominant winner, untouched
+- bb-bounce-v2-long+: 14T 6W -$0.18 7d — borderline, needs more data before kill/tune
+- Trade frequency: quiet weekend, not over-filtered
+- BTC LONG: 16.9h flat, SL at82304 (-1.3%) — within tolerance
+
+**Signal Analysis (24h):**
+- Winners: pump-chain- $0.81, doji-bottom-long $0.16, rs-s56 $0.19, rs-s38 $0.09
+- Neutral: rs-r32 $0.02, rs-s35 $0.02, rs-r68 $0.01, r2-trend-short5 $0.01
+- Losers: mover- -$0.68 (KILLED), rs-r33,rs-r34,rs-r35 -$0.20, rs-s31 -$0.20, rs-s82 -$0.07, rs-s48 -$0.04
+
+**Open Questions:**
+- bb-bounce-v2-long+ RSI_MAX=60 tuning — brain_auditor flagged, but 14T is borderline. Next hour if still negative.
+- System quiet (weekend low vol) — no action needed
+
+BY: auto_1hr

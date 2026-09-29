@@ -54,6 +54,20 @@ System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-)
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
+## Audit Update (2026-09-29 06:30 UTC)
+
+- **🟢 POST-FIX VERIFIED WORKING.** 14T 78.6%WR +$0.89 (since Sep 28 10:39 UTC). 9 profit-monster-trail, 5 hard_sl. 0 ATR_SL hits. Strong performance.
+- **pump-chain- SHORT BYPASSING SHORT_NEUTRAL_BLOCK.** 5T/24h 100%WR +$0.81. STANDALONE_BYPASS signals skip signal_compactor where block lives. 52.6%WR 14d — profitable. Not a bug, but worth noting.
+- **7d REGIME: ALL NEUTRAL (112/113).** No EXTREME/HIGH data. REGIME_CONF_HIGH_MULT=0.50 UNTESTED.
+- **7d EXIT ANALYSIS:** 41 atr_sl_hit (-$4.30, ALL pre-fix), 37 profit-monster-trail (+$1.23), 12 pump_exit_dead_money (+$0.46), 9 hard_sl (+$0.13).
+- **Signal diversity CRITICAL** — only volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d) profitable. 2 signal types carry all PnL.
+- **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD** — 3T/14d RSI 60-70, 1W 2L. R:R=0.56:1. 0 winning trades have RSI>60. Fix: BB_BOUNCE_V2_LONG_RSI_MAX=60. **6th suggestion.**
+- **mover+ LONG R:R BROKEN** — 14T/14d 42.9%WR -$1.12. R:R=0.52:1 (avg_win $0.118 vs avg_loss $0.229). TP too tight. Top loser (BABY -$0.45) entered RSI 79.
+- **LOSING AUTOPSY:** 5 losers 24h ALL small (<$0.21). 2/5 hard_sl, 3/5 profit-monster-trail. No systematic pattern — normal variance. 7d: 41 atr_sl_hit legacy aging out, 0 post-fix.
+- **SHORT RSI<50 CATASTROPHIC** — 81T/14d -$3.42. SHORT_RSI_FLOOR=50 working for direct signals. STANDALONE_BYPASS leak: pump-chain- SHORT still fires at RSI 23-42 (but profitable — 52.6%WR).
+- **CREATIVE (3):** (1) BB_BOUNCE_V2_LONG_RSI_MAX=60 (+$0.20-0.30/7d, 0 winners blocked, 6th suggestion) (2) SHORT_MIN_EXEC_CONFIDENCE=70 (+$0.30-0.60/7d, 5th suggestion) (3) mover+ LONG RSI_MAX=75 (+$0.20-0.40/7d, blocks worst loser entry).
+- **0 CHANGES APPLIED.**
+
 ## Audit Update (2026-09-29 06:00 UTC)
 
 - **🟢 POST-FIX VERIFIED WORKING.** 11T 90.9%WR +$0.89 (since Sep 28 10:39 UTC). 7 profit-monster-trail, 4 hard_sl. 0 ATR_SL hits. Strong performance.
@@ -92,6 +106,8 @@ System active. 2 open positions (BTC LONG continuum-osc+, LTC SHORT pump-chain-)
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 29)
+
+1. **brain_auditor ~06:30 UTC — NO CONFIG CHANGE.** DB-verified: 15T 46.7%WR +$0.47 (24h) | 113T 42.0%WR -$3.44 (7d) | 306T 45.2%WR -$2.30 (14d). **POST-FIX: 14T 78.6%WR +$0.89.** 9 profit-monster-trail, 5 hard_sl. 0 ATR_SL hits. **pump-chain- SHORT BYPASSING SHORT_NEUTRAL_BLOCK** — 5T/24h 100%WR +$0.81 via STANDALONE_BYPASS. **SHORT structural disadvantage CONFIRMED:** avg_win $0.12 vs LONG $0.16. **14d RSI BANDS:** SHORT <50 catastrophic (-$3.42 81T). SHORT 50-60 sweet spot (+$1.27 19T 68.4%WR). LONG 50-60 sweet spot (+$0.44 25T 64.0%WR). **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD** — 3T, R:R=0.56:1. **mover+ LONG R:R BROKEN** — 0.52:1, top loser entered RSI 79. **LOSING AUTOPSY:** 5 losers 24h all small (<$0.21). **CREATIVE (3):** BB_BOUNCE_V2_LONG_RSI_MAX=60 (6th), SHORT_MIN_EXEC_CONFIDENCE=70 (5th), mover+ RSI_MAX=75. **0 CHANGES APPLIED.** — brain_auditor
 
 1. **brain_auditor ~06:00 UTC — NO CONFIG CHANGE.** DB-verified: 17T 76.5%WR +$1.25 (24h) | 115T 44.3%WR -$3.66 (7d) | 304T 45.4%WR -$1.77 (14d). **POST-FIX: 11T 90.9%WR +$0.89.** 0 ATR_SL hits. **SHORT structural disadvantage CONFIRMED:** avg_win $0.12 vs LONG $0.16. **14d RSI BANDS:** LONG 40-60 sweet spot (60T 63.3%WR +$2.46). LONG 60-70 killing field (50T 38.0%WR -$0.58). SHORT 60-70 sweet spot (18T 61.1%WR +$0.71). **bb-bounce-v2-long+ RSI 60-70 KILLING FIELD:** 7T 28.6%WR -$0.32, R:R=0.56:1. **LOSING AUTOPSY:** 4 losers 24h ALL small (<$0.20), 2/4 in HIGH regime. **CREATIVE (3):** BB_BOUNCE_V2_LONG_RSI_MAX=60, SHORT_MIN_EXEC_CONFIDENCE=70 (5th), Monitor EXTREME. **0 CHANGES APPLIED.** — brain_auditor
 

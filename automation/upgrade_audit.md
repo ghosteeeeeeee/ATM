@@ -122,24 +122,108 @@
 
 ---
 
-# Summary (2026-09-28)
+## Plan: contrarian-zone-signal.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** New signal for mean-reversion at structural S/R zones (liquidity sweep + bounce)
+- **Difficulty:** Level 2
+- **Value:** MEDIUM — 70% WR backtest, depends on SL memory S/R (built)
+- **Status:** PENDING
+- **Reason:** Needs integration with sl_zones.py. Not as urgent as chop-v2.
+
+## Plan: sl-memory-sr-system-v2.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Entry distance filtering + regime gate for S/R zones
+- **Difficulty:** Level 3
+- **Value:** MEDIUM — improves entry quality near death zones
+- **Status:** PENDING
+- **Reason:** Complex multi-phase system. Lower priority vs chop-v2.
+
+## Plan: pump-chain-exit-spec.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Replace RR engine exit with momentum exit for pump-chain
+- **Difficulty:** Level 2
+- **Value:** MEDIUM — pump-chain long is DISABLED (NEVER_REENABLE)
+- **Status:** SKIPPED
+- **Reason:** Pump-chain long disabled. V5 short uses different exit logic.
+
+## Plan: hl-trigger-sl-v2.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Use limit orders instead of market orders for SL execution
+- **Difficulty:** Level 3
+- **Value:** HIGH — fixes slippage on SL execution
+- **Status:** PENDING
+- **Reason:** Requires HL SDK changes. High risk, needs careful testing.
+
+## Plan: spider-profit.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Regime-aware profit taking — book small wins in chop, ride in trends
+- **Difficulty:** Level 2
+- **Value:** MEDIUM — addresses capital lockup in flat markets
+- **Status:** PENDING
+- **Reason:** Overlaps with chop-v2 exit module. May be partially addressed there.
+
+## Plan: ema300-rejection-signal-spec.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** New signal for EMA300 breakthrough with momentum continuation
+- **Difficulty:** Level 2
+- **Value:** MEDIUM — 69-80% WR backtest on SHORT
+- **Status:** PENDING
+- **Reason:** Validated backtest but needs live validation. Not urgent.
+
+## Plan: regime-tuner-spec.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Automated weekly regime analysis to re-enable/disable signals
+- **Difficulty:** Level 3
+- **Value:** MEDIUM — reduces manual intervention
+- **Status:** PENDING
+- **Reason:** Complex automation. Lower priority vs chop-v2.
+
+## Plan: sniper-exit-strategy.md
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Close wrong-side positions when BTC regime shifts
+- **Difficulty:** Level 2
+- **Value:** MEDIUM — proactive exit on regime change
+- **Status:** PENDING
+- **Reason:** Partially handled by trade_watchdog.py.
+
+## Plan: oscillator-shadow-verification
+- **Date scanned:** 2026-09-29 06:10
+- **Core request:** Verify oscillator shadow logging works correctly
+- **Difficulty:** Level 1
+- **Value:** MEDIUM — validates shadow data before enabling live
+- **Status:** IMPLEMENTED
+- **Reason:** Shadow log verified: 20,420 entries, Sep 21-29, avg multiplier 0.939. Data quality confirmed. Bug found: wave_phase uses per-token value (correct per spec).
+
+---
+
+# Summary (2026-09-29)
 
 | Status | Count |
 |--------|-------|
-| IMPLEMENTED | 12 |
+| IMPLEMENTED | 13 |
 | PARTIALLY IMPLEMENTED | 2 |
 | SHADOW MODE | 1 |
 | IN PROGRESS | 1 |
-| PENDING | 1 |
+| PENDING | 8 |
+| SKIPPED | 1 |
 
 # Remaining Work
 
-## Level 1-2 (Easy-Medium)
-1. **chop-v2 chop_exit.py** — Chop-specific exit module (CHOP_TRAIL + CHOP_KILL rules). New file, ~200 LOC.
-2. **oscillator shadow verification** — Confirm shadow logging is actually writing data.
+## Level 1-2 (Easy-Medium) — Next
+1. **chop-v2 chop_exit.py** — Chop-specific exit module (CHOP_TRAIL + CHOP_KILL rules). New file, ~200 LOC. **HIGHEST PRIORITY.**
+2. **chop-v2 signal routing** — Wire get_coin_trend_score() into signal_compactor.py for score-based multipliers.
 
-## Level 3 (Hard)
-1. **chop-v2 signal routing** — Wire get_coin_trend_score() into signal_compactor.py for score-based multipliers.
+## Level 2 (Medium) — Backlog
+3. **contrarian-zone-signal** — New signal at S/R zones (depends on sl_zones.py)
+4. **ema300-rejection-signal** — EMA300 breakthrough continuation signal
+5. **spider-profit** — Regime-aware profit taking (partially overlaps chop-v2)
+6. **sniper-exit** — Close wrong-side positions on regime shift
+7. **pump-chain-exit** — SKIPPED (pump-chain long disabled)
 
-## Level 4 (Epic)
-1. **structural-awareness-overhaul.md** — Wire S/R, Wyckoff, trend quality into proactive positioning. Multiple new modules.
+## Level 3 (Hard) — Backlog
+8. **hl-trigger-sl-v2** — Limit orders for SL execution (high risk)
+9. **regime-tuner** — Automated weekly signal re-enable/disable
+10. **sl-memory-sr-system-v2** — Entry distance filtering near S/R zones
+
+## Level 4 (Epic) — Backlog
+11. **structural-awareness-overhaul** — Wire S/R, Wyckoff, trend quality into proactive positioning.

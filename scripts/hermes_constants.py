@@ -268,8 +268,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'CASHCAT',
-    'JUP'
+    'CASHCAT'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -297,9 +296,8 @@ LOSERS_SHORT = {
     'DOT', 'ZRO'
 }
 # Legacy combined set
-LOSERS = {
-    'CFX'
-}
+LOSERS = set()
+
 
 
 
@@ -3191,7 +3189,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # Uses velocity acceleration as primary signal (fires at START of move)
 MOVER_ENABLED = True                    # master kill-switch
 MOVER_PLUS_ENABLED = False              # LONG direction — 3T 0%WR -$0.44 24h, 13T 46%WR -$0.67 7d. All losses via ATR SL. KILLED auto_1hr 2026-09-24
-MOVER_MINUS_ENABLED = True              # SHORT direction
+MOVER_MINUS_ENABLED = False             # SHORT direction — 3T 0%WR -$0.72 7d, 2T 0%WR -$0.68 24h. All hard_sl. KILLED auto_1hr 2026-09-29
 MOVER_TOP_N = 20                        # top N candidates to evaluate
 MOVER_VELOCITY_MIN = 0.3                # min velocity % (lowered — acceleration is primary)
 MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)

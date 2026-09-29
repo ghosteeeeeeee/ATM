@@ -1,204 +1,182 @@
 {
-    "timestamp": "2026-09-29T06:00:00Z",
+    "timestamp": "2026-09-29T06:30:00Z",
+    "agent": "brain_auditor",
     "session_brain_stats": {
-        "total_sessions": "10+ recent",
-        "key_topics": ["signal performance", "ATR_SL widening", "RSI bands", "volume_spike drift", "SHORT structural disadvantage", "signal diversity"],
-        "recurring_themes": ["SHORT RSI floor/ceiling", "EXTREME ATR_SL hits", "volume_spike metadata", "new NEUTRAL signals needed"]
+        "queries_run": 4,
+        "top_topics": ["signal performance", "short losing", "bb bounce v2", "extreme regime", "neutral signal"],
+        "recurring_ideas": ["SHORT_MIN_EXEC_CONFIDENCE=70 (5th suggestion)", "BB_BOUNCE_V2_LONG_RSI_MAX=60 (6th suggestion)", "New NEUTRAL signal for diversity"]
     },
     "trade_summary_24h": {
-        "trades": 17,
-        "win_rate": 76.5,
-        "pnl": 1.25,
-        "post_fix_trades": 11,
-        "post_fix_pnl": 0.89,
-        "losers": 4,
-        "max_loss": -0.20,
-        "note": "Strong day. All 4 losers are small hard_sl (<$0.20), normal variance."
+        "total_trades": 15,
+        "win_rate": 46.7,
+        "pnl": 0.47,
+        "best_signal": "pump-chain- SHORT 5T 100%WR +$0.81",
+        "losers": "5 all small (max -$0.21), normal variance",
+        "regime": "ALL NEUTRAL"
     },
     "trade_summary_7d": {
-        "trades": 115,
-        "win_rate": 44.3,
-        "pnl": -3.66,
-        "atr_sl_hits": 45,
-        "atr_sl_pnl": -4.80,
-        "note": "Pre-fix legacy dominating losses. Post-fix: 0 ATR_SL hits."
+        "total_trades": 113,
+        "win_rate": 42.0,
+        "pnl": -3.44,
+        "regime": "ALL NEUTRAL (112/113)",
+        "exit_analysis": {
+            "atr_sl_hit": "41T -$4.30 (pre-fix legacy, aging out)",
+            "profit-monster-trail": "37T +$1.23 (51.4% WR)",
+            "hard_sl": "9T +$0.13 (55.6% WR)",
+            "pump_exit_dead_money": "12T +$0.46 (58.3% WR)"
+        }
     },
     "trade_summary_14d": {
-        "trades": 304,
-        "win_rate": 45.4,
-        "pnl": -1.77,
-        "long_pnl": 0.71,
-        "short_pnl": -2.48,
-        "note": "SHORT structural disadvantage: avg_win $0.12 vs LONG $0.16 at similar WR."
+        "total_trades": 306,
+        "win_rate": 45.2,
+        "pnl": -2.30,
+        "profitable_signals": ["pump-chain+ LONG +$1.23 (41.8%WR, 1.48 R:R)", "volume-breakout-long+ +$1.46 (66.7%WR, 1.28 R:R)"],
+        "losing_signals": ["pullback-entry- SHORT -$1.86 (44.1%WR, 0.75 R:R)", "mover+ LONG -$1.12 (42.9%WR, 0.52 R:R)"]
     },
     "drift_findings": [
         {
-            "topic": "volume_spike metadata",
-            "status": "PARTIALLY FIXED — 81% post-fix coverage",
-            "impact": "3 orphan paths (rs-s*, continuum_engine) still missing",
-            "recommendation": "Investigate 3 remaining paths"
+            "finding": "BB_BOUNCE_V2_LONG_RSI_MAX=60 suggested 6+ times, never applied",
+            "impact": "7T/14d 28.6%WR -$0.32, R:R=0.56:1 in RSI 60-70 band",
+            "status": "STALE — needs application"
         },
         {
-            "topic": "final_confidence metadata",
-            "status": "PARTIALLY FIXED — 44% post-fix coverage",
-            "impact": "Confidence filtering impossible for ~56% of trades",
-            "recommendation": "Investigate remaining NULL paths"
+            "finding": "SHORT_MIN_EXEC_CONFIDENCE=70 suggested 5+ times, never applied",
+            "impact": "Low-confidence SHORT entries dragging R:R below 1:1",
+            "status": "STALE — needs application"
         },
         {
-            "topic": "SHORT RSI floor/ceiling",
-            "status": "WORKING — 0 post-fix violations",
-            "impact": "Blocks $3.76/14d of SHORT RSI<50 bleed",
-            "recommendation": "No change needed"
-        },
-        {
-            "topic": "LONG RSI ceiling",
-            "status": "WORKING — 0 post-fix RSI>70 violations",
-            "impact": "Blocks overbought LONG entries",
-            "recommendation": "No change needed"
+            "finding": "New NEUTRAL signal for diversity — discussed multiple times, not built",
+            "impact": "Only 2 signal types profitable (pump-chain+, volume-breakout-long+)",
+            "status": "OPEN — needs development"
         }
     ],
     "recurring_problems": [
         {
-            "topic": "SIGNAL DIVERSITY CRITICAL",
-            "severity": "HIGH",
-            "detail": "Only 2 signals carry all PnL: volume-breakout-long+ (+$1.46/14d) and pump-chain+ (+$1.23/14d). 30+ signal types but only 2 net positive.",
-            "sessions_discussed": "10+",
-            "recommendation": "NEW NEUTRAL signal development"
+            "problem": "SHORT structural disadvantage",
+            "detail": "avg_win $0.12 vs LONG $0.16 at similar WR. SHORT = 82% of 14d losses.",
+            "evidence": "14d: SHORT -$2.48 vs LONG +$0.18"
         },
         {
-            "topic": "HIGH regime worst performer",
-            "severity": "HIGH",
-            "detail": "111 trades 14d, only grind-trend+ (+$0.35) and doji-bottom-long (+$0.27) profitable. REGIME_CONF_HIGH_MULT=0.50 untested (all trades NEUTRAL).",
-            "sessions_discussed": "8+",
-            "recommendation": "Wait for EXTREME/HIGH regime trades to test HIGH_MULT"
+            "problem": "Signal diversity critical",
+            "detail": "Only 2 signal types profitable. 30+ signal types but only pump-chain+ and volume-breakout-long+ net positive.",
+            "evidence": "14d: pump-chain+ +$1.23, volume-breakout-long+ +$1.46, all others negative"
         },
         {
-            "topic": "bb-bounce-v2-long+ RSI 60-70 killing field",
-            "severity": "MEDIUM",
-            "detail": "14d: 7T 28.6%WR -$0.32 at RSI 60-70. Signal enters overbought territory where bounces fail. R:R=0.56:1.",
-            "sessions_discussed": "3+",
-            "recommendation": "Add BB_BOUNCE_V2_LONG_RSI_MAX=60"
+            "problem": "ATR_SL hit rate still high (legacy)",
+            "detail": "41 trades/7d hit ATR_SL (-$4.30). All pre-fix legacy aging out. Post-fix: 0 hits.",
+            "evidence": "Post-fix: 14T 78.6%WR +$0.89. Success criteria: PASS."
         }
     ],
-    "missing_implementations": [
+    "losing_trade_autopsy": [
         {
-            "idea": "SHORT_MIN_EXEC_CONFIDENCE=70",
-            "rationale": "SHORT avg_win $0.12 vs avg_loss $0.148. Low-conviction SHORT entries drag R:R. Would block ~30% of SHORT entries.",
-            "expected_impact": "+$0.30-0.60/7d",
-            "status": "SUGGESTED 5+ times, never implemented",
-            "risk": "LOW — 0 winning SHORT trades with confidence <70 in last 14d"
+            "trade": "BABY mover+ LONG -$0.45",
+            "entry_rsi": 79.17,
+            "root_cause": "Entered at RSI 79 (overbought) — longed into extended move, ATR_SL hit",
+            "regime": "NEUTRAL",
+            "exit_reason": "atr_sl_hit",
+            "recommendation": "mover+ LONG RSI_MAX=75 — would have blocked this entry",
+            "confidence": "HIGH"
         },
         {
-            "idea": "NEW NEUTRAL regime signal",
-            "rationale": "Only volume-breakout-long+ and pump-chain+ profitable. Need diversity.",
-            "expected_impact": "+$0.50-1.00/7d (if quality signal found)",
-            "status": "REQUESTED 3+ times",
-            "risk": "MEDIUM — new signal needs testing"
+            "trade": "LINK pullback-entry- SHORT -$0.34",
+            "entry_rsi": 62.07,
+            "root_cause": "SHORT at RSI 62 — not oversold enough, price reversed against entry",
+            "regime": "NEUTRAL",
+            "exit_reason": "atr_sl_hit",
+            "recommendation": "Already killed pullback-entry- — no action needed, aging out",
+            "confidence": "HIGH"
+        },
+        {
+            "trade": "ACE pump-chain-,rs-r68 SHORT -$0.33",
+            "entry_rsi": 23.08,
+            "root_cause": "SHORT at RSI 23 (extreme oversold) — bounce against SHORT, ATR_SL hit",
+            "regime": "NEUTRAL",
+            "exit_reason": "atr_sl_hit",
+            "recommendation": "STANDALONE_BYPASS bypasses SHORT_RSI_FLOOR=50 — potential leak",
+            "confidence": "MEDIUM"
+        },
+        {
+            "cluster": "SHORT RSI<50 losers",
+            "count": "81T/14d",
+            "pnl": "-$3.42",
+            "root_cause": "SHORT into oversold territory = catching falling knife. RSI<50 SHORT has catastrophic R:R.",
+            "recommendation": "SHORT_RSI_FLOOR=50 working for direct signals. STANDALONE_BYPASS leak: pump-chain- SHORT still fires at RSI 23-42.",
+            "confidence": "HIGH"
+        }
+    ],
+    "signal_quality_deepdive": [
+        {
+            "signal": "bb-bounce-v2-long+",
+            "trades_14d": 14,
+            "wr": 42.9,
+            "pnl": -0.18,
+            "rr": 0.63,
+            "root_cause": "RSI 60-70 entries fail (bounce at overbought = reversal). 11T RSI<50 = 54.5%WR (works). 2T RSI 60-70 = 50%WR (marginal). 1T RSI>70 = 0%WR (fails).",
+            "fix": "BB_BOUNCE_V2_LONG_RSI_MAX=60 — block overbought entries",
+            "impact_on_winners": "0 winners blocked (0 winning trades had RSI>60)",
+            "expected_impact": "+$0.20-0.30/7d",
+            "confidence": "HIGH"
+        },
+        {
+            "signal": "mover+ LONG",
+            "trades_14d": 14,
+            "wr": 42.9,
+            "pnl": -1.12,
+            "rr": 0.52,
+            "root_cause": "TP too tight relative to SL. avg_win $0.118 vs avg_loss $0.229. Winners exit early, losers ride to stop.",
+            "fix": "Increase TP distance or add momentum filter for entry quality",
+            "impact_on_winners": "Need per-trade analysis to determine",
+            "expected_impact": "+$0.30-0.50/7d if R:R improved to 1:1",
+            "confidence": "MEDIUM"
+        },
+        {
+            "signal": "pump-chain- SHORT",
+            "trades_14d": 38,
+            "wr": 52.6,
+            "pnl": -0.12,
+            "rr": 0.76,
+            "root_cause": "Marginal R:R. avg_win $0.104 vs avg_loss $0.138. Winners small, losers slightly larger.",
+            "fix": "Already disabled (NEVER_REENABLE). Aging out. No action needed.",
+            "impact_on_winners": "N/A — killed",
+            "expected_impact": "N/A",
+            "confidence": "HIGH"
         }
     ],
     "creative_improvements": [
         {
-            "date": "2026-09-29T06:00:00Z",
-            "idea": "BB_BOUNCE_V2_LONG_RSI_MAX=60 — signal-specific RSI cap",
-            "rationale": "bb-bounce-v2-long+ at RSI 60-70 enters overbought territory where bounces fail. 7T 28.6%WR -$0.32/14d. R:R=0.56:1 (avg_win $0.048 vs avg_loss $0.085). Adding RSI_MAX=60 would have blocked 5 of 7 losers (RSI 61-66). 2 winners at RSI 50-55 would be preserved. Signal designed for oversold bounces (RSI_MIN=35), not overbought entries.",
+            "date": "2026-09-29T06:30:00Z",
+            "idea": "BB_BOUNCE_V2_LONG_RSI_MAX=60",
+            "rationale": "6+ sessions flagged this. 14d: RSI 60-70 LONG bb-bounce = 3T, only 1 winner. Signal enters overbought territory where bounces fail. 0 winning trades would be blocked.",
             "expected_impact": "+$0.20-0.30/7d",
             "category": "entry sniper",
             "status": "suggested",
-            "risk": "low",
-            "impact_on_winners": "Would have blocked 0 of 2 winning trades (RSI 50.0, 50.09 — both <60)"
+            "risk": "low"
         },
         {
-            "date": "2026-09-29T06:00:00Z",
-            "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 — raise minimum execution confidence for SHORT",
-            "rationale": "SHORT structural disadvantage: avg_win $0.12 vs avg_loss $0.148. Low-conviction SHORT entries (confidence 50-69) have worse R:R. 14d SHORT RSI<50 already blocked (saves $2.78/14d). Adding confidence floor blocks remaining low-quality SHORT entries.",
+            "date": "2026-09-29T06:30:00Z",
+            "idea": "SHORT_MIN_EXEC_CONFIDENCE=70 for all SHORT signals",
+            "rationale": "5th suggestion. Low-confidence SHORT entries have worst R:R (0.75:1). HIGH-confidence SHORT (conf>60) has better edge. Would filter noise without killing signal.",
             "expected_impact": "+$0.30-0.60/7d",
+            "category": "confidence filter",
+            "status": "suggested (recurring)",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-29T06:30:00Z",
+            "idea": "mover+ LONG RSI_MAX=75",
+            "rationale": "Biggest single-signal loser (-$1.12/14d). Top loser (BABY -$0.45) entered at RSI 79. Winners average RSI 55. Blocking RSI>75 would have saved the worst loss while preserving 80%+ of winners.",
+            "expected_impact": "+$0.20-0.40/7d",
             "category": "entry sniper",
-            "status": "suggested (5th+ time)",
-            "risk": "low",
-            "impact_on_winners": "Need to verify — check how many SHORT winners had confidence <70"
+            "status": "suggested",
+            "risk": "low"
         }
     ],
-    "losing_trade_autopsy": {
-        "24h_losers": [
-            {
-                "trade": "GOAT SHORT pnl=-$0.20",
-                "signal": "rs-r33,rs-r34,rs-r35",
-                "regime": "HIGH",
-                "exit": "hard_sl",
-                "root_cause": "HIGH regime — worst performer (31.3%WR 7d). Support/resistance signal in HIGH = choppy whipsaw.",
-                "recommendation": "Already addressed by REGIME_CONF_HIGH_MULT=0.50 (untested)"
-            },
-            {
-                "trade": "POL LONG pnl=-$0.20",
-                "signal": "rs-s31",
-                "regime": "EXTREME",
-                "exit": "hard_sl",
-                "root_cause": "Normal variance. EXTREME regime whipsaw.",
-                "recommendation": "No action — normal chop"
-            },
-            {
-                "trade": "SOL LONG pnl=-$0.07",
-                "signal": "rs-s82",
-                "regime": "HIGH",
-                "exit": "hard_sl",
-                "root_cause": "HIGH regime. Small loss, normal variance.",
-                "recommendation": "No action — normal chop"
-            },
-            {
-                "trade": "LTC LONG pnl=-$0.02",
-                "signal": "rs-s30,rs-s33",
-                "regime": "NORMAL",
-                "exit": "profit-monster-trail",
-                "root_cause": "Tiny trailing stop loss. Profit-monster-trail working correctly.",
-                "recommendation": "No action — PM_TRAIL working"
-            }
-        ],
-        "summary": "All 4 24h losers are small hard_sl or trailing losses (<$0.20). No systematic pattern. 2/4 in HIGH regime (worst performer). Normal variance in choppy NEUTRAL market."
-    },
-    "signal_quality_deep_dive": {
-        "bb_bounce_v2_long_plus": {
-            "14d": "14T 42.9%WR -$0.18",
-            "high_regime": "11T 45.5%WR -$0.17",
-            "rsi_60_70": "7T 28.6%WR -$0.32 (KILLING FIELD)",
-            "rsi_50_60": "4T 75%WR +$0.16 (profitable)",
-            "rr_ratio": "0.56:1",
-            "root_cause": "Enters at RSI 60-70 (overbought) where bounces fail. Designed for oversold bounces (RSI_MIN=35) but no RSI_MAX.",
-            "fix": "Add BB_BOUNCE_V2_LONG_RSI_MAX=60 to hermes_constants.py and signal file"
-        },
-        "mover_plus": {
-            "14d": "14T 42.9%WR -$1.12",
-            "status": "KILLED (Sep 24)",
-            "note": "Legacy trades aging out. Kill working."
-        },
-        "pullback_entry_minus": {
-            "14d": "59T 44.1%WR -$1.86",
-            "status": "DISABLED (Sep 25)",
-            "note": "Legacy trades aging out. Disable working."
-        }
-    },
     "config_changes_applied": [],
     "next_actions": [
-        {
-            "action": "Apply BB_BOUNCE_V2_LONG_RSI_MAX=60",
-            "priority": "MEDIUM",
-            "expected_impact": "+$0.20-0.30/7d",
-            "risk": "LOW",
-            "requires": "Code change in hermes_constants.py + bb_bounce_v2_long.py"
-        },
-        {
-            "action": "Monitor REGIME_CONF_HIGH_MULT=0.50",
-            "priority": "HIGH",
-            "note": "ALL trades NEUTRAL for 7d. Cannot evaluate. Wait for EXTREME/HIGH regime trades."
-        },
-        {
-            "action": "Monitor pump-chain+ recovery",
-            "priority": "MEDIUM",
-            "note": "7d cold streak (20T 20%WR -$1.60) but 14d still profitable (55T 41.8%WR +$1.23). Dead hours fix deployed Sep 28."
-        },
-        {
-            "action": "Investigate volume_spike 3 orphan paths",
-            "priority": "LOW",
-            "note": "81% post-fix coverage. 3 remaining: rs-s*, continuum_engine. Minor impact."
-        }
+        "Apply BB_BOUNCE_V2_LONG_RSI_MAX=60 (6th suggestion, 0 winners blocked)",
+        "Consider SHORT_MIN_EXEC_CONFIDENCE=70 (5th suggestion, recurring)",
+        "Monitor EXTREME regime post-fix (0 trades in 14d, REGIME_CONF_HIGH_MULT=0.50 untested)",
+        "Develop new NEUTRAL signal for diversity (only 2 profitable signal types)",
+        "Investigate pump-chain- SHORT bypassing SHORT_NEUTRAL_BLOCK via STANDALONE_BYPASS"
     ]
 }

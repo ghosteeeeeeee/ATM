@@ -1,55 +1,50 @@
-=== Signal Performance Report ===
-Generated: 2026-09-28 23:10 UTC
+# === Signal Performance Report ===
+**Period:** 2026-09-29 ~12:00 UTC | Last 6h + 24h + 7d context
 
-## Summary
-| Period | Trades | PnL | WR |
+## System Totals
+| Period | Trades | WR | PnL |
 |--------|--------|-----|-----|
-| 6h | 9 | +$0.09 | 50.0% |
-| 24h | 14 | +$0.09 | 50.0% |
-| 7d | 114 | -$4.30 | 39.5% |
+| 6h | 6 | 83.3% | +$0.59 |
+| 24h | 16 | 75.0% | +$0.89 |
 
-## KILLED (executed this run)
+## KILLED (executed)
+None — no signal meets kill criteria (5+ trades, <30% WR, 24h).
+
+## BOOSTED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 (7d) | Added to SIGNAL_SOURCE_BLACKLIST |
-| accel-300-v4-short- | SHORT | 20.0% | -$0.26 | 5 (30d) | Added to SIGNAL_SOURCE_BLACKLIST |
+| pump-chain- | SHORT | 100% | +$0.81 | 5 (24h) | Monitor — already strong, no boost needed |
 
-**Note:** `accel-300` was already blacklisted (Aug 5) but `validate_source()` does exact match — `accel-300` did NOT match `accel-300-breakout` or `accel-300-v4-short-`. Both slipped through for weeks.
-
-## REGIME BLOCKS (already active — verified)
-| Signal | Dir | Blocked Regime | Reason | Status |
-|--------|-----|----------------|--------|--------|
-| pullback-entry- | SHORT | NORMAL | 0% WR, -$0.62 in NORMAL | ✅ Active since Sep 17 |
-| pump-chain+ | LONG | EXTREME | 0.0 mult in EXTREME | ✅ Active since Sep 24 |
-| mover+ | LONG | EXTREME | Mover family=0.0 in EXTREME | ✅ Active since Sep 23 |
-
-## BOOSTED
-None. No signal with 3+ trades in 7d has WR>55% AND positive PnL.
-
-## LOSERS (watch list — 7d, 3+ trades)
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pullback-entry- | SHORT | 0.0% | -$1.54 | 6 | Regime-blocked NORMAL; EXTREME/HIGH historically profitable |
-| mover+ | LONG | 16.7% | -$0.95 | 6 | EXTREME blocked; HIGH mixed |
-| pump-chain+ | LONG | 16.7% | -$0.85 | 6 | EXTREME blocked; HIGH/NORMAL losing |
-| pump-chain- | SHORT | 48.6% | -$0.74 | 35 | Near breakeven, watch |
-| bb-bounce-v2-long+ | LONG | 42.9% | -$0.18 | 14 | Small loss, watch |
-| continuum-osc+ | LONG | 75.0% | -$0.05 | 4 | Great WR, tiny loss — skip |
+| pullback-entry- | SHORT | 0% | -$1.54 | 6 (7d) | ⚠️ COLD STREAK — all-time 119T 52.1% WR +$0.35. NORMAL already blocked. HIGH+EXTREME both 0% this week. Historical data supports signal — bad week, not broken. |
+| mover+ | LONG | 16.7% | -$0.95 | 6 (7d) | ⚠️ POTENTIAL KILL — all-time 21T 57.1% WR but -$0.85 total. Losses > wins. EXTREME 2T 0% -$0.67. Low sample (21T all-time). Needs monitoring. |
+| pump-chain+ | LONG | 0% | -$0.76 | 3 (7d) | Insufficient sample. All-time 80T 41.3% WR +$0.95. Dead hours already block worst hours. |
+| accel-300-breakout | SHORT | 28.6% | -$0.12 | 7 (7d) | BLACKLISTED 2026-09-28 — no new trades since. 7T are pre-blacklist residuals. |
 
-## WINNERS (7d, 2+ trades)
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 50.0% | +$0.05 | 2 | Insufficient sample |
-
-## SIGNAL INVERSIONS
-None found in 24h.
-
-## 6h Performance
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| pump-chain- | SHORT | 100.0% | +$0.19 | 2 |
+| pump-chain- | SHORT | 100% | +$0.81 | 5 (24h) | STRONG — 58.8% WR 7d, +$0.51. EXTREME regime 52.2% all-time. |
+| doji-bottom-long | LONG | 100% | +$0.16 | 1 (24h) | Single trade, too early to judge |
+| rs-s94 | LONG | 100% | +$0.07 | 1 (24h) | Single trade |
+| rs-s38 | LONG | 100% | +$0.09 | 1 (24h) | Single trade |
+| rs-s56 | LONG | 100% | +$0.19 | 1 (24h) | Single trade |
 
 ## ISSUES
-1. **Source blacklist gap fixed:** `accel-300-breakout` and `accel-300-v4-short-` were bypassing the `accel-300` blacklist due to exact-match logic in `validate_source()`. Added explicit entries.
-2. **7d system-wide underperformance:** 114 trades, -$4.30 PnL, 39.5% WR. Low activity in 24h (14 trades) suggests regime filtering is working but opportunity set is thin.
-3. **No boost candidates:** Zero signals with 3+ trades and positive PnL in 7d. System is in a drawdown phase.
+- **No signal inversions** found (24h)
+- **accel-300-breakout** blacklisted 2026-09-28 — 7T pre-blacklist trades still in DB showing 28.6% WR. Blacklist is working (no new trades since).
+- **pullback-entry- SHORT cold streak** — 0% WR this week on HIGH+EXTREME (normally profitable regimes). All-time data supports signal. Recommend watching, not killing.
+
+## Regime Context (7d)
+| Regime | SHORT WR | SHORT PnL | Notes |
+|--------|----------|-----------|-------|
+| EXTREME | 56.5% | +$3.44 | Best SHORT regime |
+| HIGH | 42.9% | -$3.33 | Dead zone — 39% of all trades |
+| NORMAL | 44% | -$0.79 | Struggling |
+
+## Next Actions
+1. Monitor pullback-entry- — if 14d WR drops below 45%, consider regime-specific kill
+2. Watch mover+ — if 7d WR stays below 25% with 10+ trades, kill
+3. No immediate kills or boosts required

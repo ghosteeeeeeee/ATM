@@ -903,5 +903,35 @@
     "category": "entry sniper",
     "status": "suggested (5th time)",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-09-29T06:30:00Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "idea": "BB_BOUNCE_V2_LONG_RSI_MAX=60",
+        "rationale": "6+ sessions flagged. 14d: RSI 60-70 LONG bb-bounce = 3T, only 1 winner. 0 winners blocked.",
+        "expected_impact": "+$0.20-0.30/7d",
+        "category": "entry sniper",
+        "risk": "low",
+        "times_suggested": 6
+      },
+      {
+        "idea": "SHORT_MIN_EXEC_CONFIDENCE=70",
+        "rationale": "5th suggestion. Low-confidence SHORT entries worst R:R 0.75:1.",
+        "expected_impact": "+$0.30-0.60/7d",
+        "category": "confidence filter",
+        "risk": "low",
+        "times_suggested": 5
+      },
+      {
+        "idea": "mover+ LONG RSI_MAX=75",
+        "rationale": "Biggest single-signal loser -$1.12/14d. Top loser entered RSI 79.",
+        "expected_impact": "+$0.20-0.40/7d",
+        "category": "entry sniper",
+        "risk": "low",
+        "times_suggested": 1
+      }
+    ]
   }
 ]
