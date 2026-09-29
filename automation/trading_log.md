@@ -1538,3 +1538,60 @@ BY: auto_1hr
 - pump-chain- 100%WR dominant signal
 
 **BY:** auto_1hr
+
+## [2026-09-29 01:11 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3W 0L) | **Open:** 3 (+$0.35 combined)
+**PnL:** +$0.36 last hour | **24h:** 17T 65%WR +$0.70
+
+**Last hour closes:**
+- CASHCAT SHORT pump-chain-: +$0.19 hard_sl (trailed into profit)
+- WLFI LONG doji-bottom-long: +$0.16 profit-monster-trail
+- LDO SHORT r2-trend-short5: +$0.01 profit-monster-trail
+
+**24h exit breakdown:** 9 profit-monster-trail, 6 hard_sl, 1 hard_max_loss, 1 HL_CLOSED
+- hard_sl rate: 35% (below 40% threshold)
+- ATR_SL fix: 0/17 hits (35T+ post-fix clean)
+
+**24h by signal:** pump-chain- 4T 100%WR +$0.59 dominant. All signals non-negative except small scratches.
+
+**No Change Needed:**
+- 0 kill candidates
+- hard_sl rate normal (35%)
+- ATR_SL fix validated 35T+
+- Trade frequency normal (3T/hr)
+- All open positions healthy
+
+**BY:** auto_1hr
+
+## [2026-09-29 02:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L) | **Open:** 2 (LTC SHORT +$0.49, BTC LONG -$0.07)
+**PnL:** +$0.02 last hour | **24h:** 17T 71%WR +$0.87 | **7d:** 117T 42%WR -$3.60
+
+**Last hour closes:**
+- ALGO SHORT pump-chain-: +$0.22 hard_sl (trailed into profit)
+- GOAT SHORT rs-r33,rs-r34,rs-r35: -$0.20 hard_sl (price reversed against short)
+
+**24h exit breakdown:** 8 hard_sl, 8 profit-monster-trail, 1 HL_CLOSED
+- hard_sl rate: 47% (above 40% threshold BUT 5/8 are profitable trail exits)
+- hard_sl PnL: +$0.34 total — exit mechanism working, not failing
+- ATR_SL fix: 0/15 hits (24h+ post-fix clean)
+
+**24h by signal:** pump-chain- 5T 100%WR +$0.81 dominant. RS signals mixed (1L each, small scratches).
+
+**24h by direction:** SHORT 8T 88%WR +$0.63 (strong). LONG 9T 56%WR +$0.24.
+
+**24h by regime:** EXTREME 10T 90%WR +$0.84 (dominant). HIGH 4T 50%WR -$0.02.
+
+**No Change Needed:**
+- 0 kill candidates (no signal with 3+ trades and 0% WR)
+- hard_sl at 47% is trailing stops working — 5/8 profitable, NOT a SL problem
+- ATR_SL fix validated 15T+ with 0 hits
+- Trade frequency normal (2T/hr, well under 20 threshold)
+- EXTREME regime dominant and highly profitable
+
+**Open Questions:**
+- BTC LONG continuum-osc+ has been open since Sep 28 13:18 (13h+) at -$0.07 — monitoring
+
+**BY:** auto_1hr

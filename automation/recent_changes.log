@@ -3289,3 +3289,10 @@
 [2026-09-28 23:11 UTC] auto_1hr: NO CHANGE — analysis only
   1T last hour (1W +/usr/bin/bash.05 hard_sl trailed). 24h 14T 50%WR +/usr/bin/bash.09. Post-fix 26T 50%WR +/usr/bin/bash.86.
   ATR_SL 0% post-fix (26T+). EXTREME LONG only profitable regime +.22/14d. System healthy. BY: auto_1hr
+[2026-09-29 01:11 UTC] auto_1hr: NO CHANGE — analysis only
+  3T last hour (3W +$0.36). ATR_SL 0% post-fix (35T+). 24h 17T 65%WR +$0.70.
+  System healthy, no kill candidates. BY: auto_1hr
+[2026-09-29 02:11 UTC] auto_1hr: NO CHANGE — analysis only
+  2T last hour (1W 1L +/usr/bin/bash.02). 24h 17T 71%WR +/usr/bin/bash.87. ATR_SL 0% (15T+ post-fix).
+  hard_sl 47% but 5/8 profitable (trailing stops working). No kill candidates.
+  EXTREME 90%WR dominant. System healthy. BY: auto_1hr
