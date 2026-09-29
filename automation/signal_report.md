@@ -1,44 +1,32 @@
-# Signal Performance Report
-**Generated:** 2026-09-29 17:10 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: Last 6h | 24h
+Generated: 2026-09-29 13:00 UTC
 
-## Overall Stats (24h)
-- **Trades:** 44 | **WR:** 50.0% | **PnL:** -$1.47
+KILLED (executed):
+(none — no signals meet blanket-kill criteria)
 
----
+BOOSTED (executed):
+(none — no signals meet boost criteria with sufficient trade volume)
 
-## KILLED (executed)
+REGIME-BLOCKED (executed):
+| Signal | Dir | Regime | WR | PnL | Trades | Action |
+|--------|-----|--------|-----|-----|--------|--------|
+| mover- | SHORT | EXTREME | 0% | -$0.68 | 2 | BLOCKED via volatility_gate_v2.py — added 0.0x override |
 
-None. No signals meet kill criteria (WR<30%, 5+ trades, 24h).
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| rs-s30 | LONG | 0% | -$0.08 | 3 (all-time) | NEW — only 3 trades today, insufficient data. Monitor. |
+| mover- | SHORT | 0% | -$0.68 | 2 (24h) | EXTREME regime blocked. 58.3% all-time WR — signal works, regime context was wrong. |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 57.1% | +$0.54 | 14 (24h) | ✅ Performing well |
+| doji-bottom-long | LONG | 80% | +$0.28 | 5 (24h) | ✅ Performing well |
+| bb-bounce-v2-long+ | LONG | 50% | +$0.04 | 4 (24h) | ⚠️ Neutral — watching |
 
-## BOOSTED (executed)
-
-None. No signals meet boost criteria (WR>55%, 5+ trades, $0.05+ PnL).
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|------|--------|
-| mover- | SHORT | 2 (24h), 3 (48h) | 0% | -$0.68 / -$0.72 | WATCH — 0% WR over 48h, below 5-trade kill threshold |
-| rs-s30 | LONG | 3 | 0% | -$0.08 | WATCH — 0% WR but only 3 trades |
-
----
-
-## WINNERS
-
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|------|--------|
-| pump-chain- | SHORT | 12 | 58.3% | +$0.03 | OK — EXTREME regime only, performing |
-
----
-
-## ISSUES
-
-None. No inversions, no bugs, no anomalies.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+ISSUES:
+- No signal inversions detected.
+- rs-s30 is brand new (first trade 2026-09-29 11:40). All 3 trades lost. Too early to kill — needs 10+ trades for statistical significance. Monitor closely.
+- mover- losses are EXTREME-regime specific. All-time WR is 58.3% (12 trades). Regime block applied, signal left enabled.

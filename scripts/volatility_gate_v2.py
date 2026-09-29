@@ -308,6 +308,7 @@ SIGNAL_TYPE_OVERRIDES = {
     # that don't match the specific _long/_short overrides above.
     ('EXTREME', 'ema300_breakthrough'): 1.0,     # OK — bare form fallback for ema300_breakthrough+
     ('EXTREME', 'ema300_dip'): 1.0,              # OK — bare form fallback (specific _long/_short above take priority)
+    ('EXTREME', 'mover-_short'): 0.0,            # BLOCKED — mover- SHORT 0% WR in EXTREME (2 trades, -$0.68). signal_reporter 2026-09-29
     ('EXTREME', 'mover'): 1.0,                   # OK — bare form fallback for mover (coin_tracker_hot variants below)
     ('EXTREME', 'coin_tracker_hot_long'): 0.0,    # BLOCKED — same as mover_long (Mover family)
     ('EXTREME', 'coin_tracker_hot_short'): 0.0,   # BLOCKED — same as mover_short (Mover family)
