@@ -43,7 +43,7 @@ PUMP_CHAIN_V5_VELOCITY_THRESHOLD = -0.3   # 30m velocity must be > this to allow
 PUMP_CHAIN_V5_BTC_FILTER = -0.1           # BTC 1h must be > this to allow LONG
 
 SIGNAL_TYPE = 'pump-chain'
-SOURCE = 'pump-chain+'
+SOURCE = 'pump-chain-v5'
 
 STATE_FILE = os.path.join(HERMES_DATA, 'pump_flow_state.json')
 FULL_STATE_FILE = os.path.join(WWW_DATA, 'pump_flow_data.json')
