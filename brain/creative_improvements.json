@@ -991,5 +991,15 @@
         "risk": "medium"
       }
     ]
+  },
+  {
+    "date": "2026-09-29T18:35:06Z",
+    "idea": "Blacklist CASHCAT from pump-chain- SHORT",
+    "rationale": "2 consecutive hard_sl losses in 24h (-$0.68). CASHCAT is a low-cap meme coin with high reversibility — pump-chain- SHORT catches falling knives. 0 winning pump-chain- SHORT trades for CASHCAT in 14d.",
+    "expected_impact": "+$0.10/7d (prevent ~2 losses/week)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "0 — CASHCAT has 0 winning pump-chain- SHORT trades in 14d"
   }
 ]

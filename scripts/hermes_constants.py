@@ -45,6 +45,7 @@ SHORT_BLACKLIST = {
     # Additional high-beta / recent pumps (shorting pumps = catching knives)
     'POPCAT',  # meme pump history
     'VIRTUAL', 'MELANIA', 'FARTCOIN',  # meme coins
+    'CASHCAT',  # brain_auditor 2026-09-29 — 2 consecutive pump-chain- SHORT hard_sl losses (-$0.68 24h), 0 winning SHORT trades 14d, low-cap meme with high reversibility
     # 2026-04-01: tokens with negative avg SHORT returns
     'RENDER', 'PORT3',
     # 2026-04-01: sketchy volume and price action

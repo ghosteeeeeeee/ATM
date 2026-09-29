@@ -1,175 +1,100 @@
 {
-  "timestamp": "2026-09-29T17:35:53.156069+00:00",
+  "timestamp": "2026-09-29T18:34:59Z",
   "session_brain_stats": {
-    "total_sessions": "N/A",
-    "top_insights": [
-      "pump-chain signals may pick peaks when BTC is pumping",
-      "ATR SL trailing at profit then system skipped SL — reported by user",
-      "accel-300 LONG is a peak-chaser structurally",
-      "ema300_breakthrough needs bigger timeframe rejection"
+    "queries": 3,
+    "key_findings": [
+      "pump-chain+ ZERO trades/7d — cold streak, was #2 profitable (+$1.23/14d)",
+      "pump-chain- SHORT EXTREME 41T 53.7%WR +$0.52/14d — only profitable SHORT combo",
+      "SHORT R:R 0.81:1 persists — avg_win $0.123 vs avg_loss $0.158",
+      "CASHCAT double loss (-$0.68) — pump-chain- SHORT, both hard_sl EXTREME",
+      "KAS 5 losses (-$0.82) across 4 different signals — coin-specific drag"
     ]
   },
   "trade_summary_24h": {
-    "trades": 28,
-    "winners": "small (max $0.19)",
-    "losers": "20 (all <$0.47)",
-    "biggest_loser": "mover- SHORT BLUR -$0.47 (KILLED signal)",
-    "pump_chain_short": "12T 58.3%WR +$0.03 (breakeven)",
-    "hotset_long_losers": "13 rs-s* LONGs all -$0.01 to -$0.23",
-    "0_pump_chain_plus": "CRITICAL — 7d cold streak continues"
+    "trades": 44,
+    "wr": 50.0,
+    "pnl": -0.78,
+    "hard_sl": "27T 40.7%WR -$1.29",
+    "profit_monster_trail": "17T 58.8%WR +$0.51",
+    "pump_chain_short": "15T 66.7%WR +$0.91 (ONLY profitable signal)"
   },
   "trade_summary_7d": {
-    "overall": "128T 42.2%WR -$4.41",
-    "by_regime": {
-      "EXTREME": "72T 43.1%WR -$3.35 (82% of losses)",
+    "trades": 132,
+    "wr": 42.0,
+    "pnl": -3.51,
+    "regime": {
+      "EXTREME": "75T 45.3%WR -$2.47 (dominates losses)",
       "HIGH": "31T 35.5%WR -$1.00",
-      "NORMAL": "22T 45.5%WR -$0.04",
+      "NORMAL": "23T 43.5%WR -$0.04 (nearly breakeven)",
       "FLAT": "2T 50%WR +$0.01"
     },
-    "atr_sl_hit": "33T -$3.10 (post-fix: 0/33 pre-fix)",
-    "hard_sl": "24T -$2.17",
-    "profit_monster_trail": "47T +$1.41"
-  },
-  "trade_summary_14d": {
-    "overall": "317T 43.8%WR -$4.43",
-    "LONG": "187T 44.9%WR +$0.08 (breakeven)",
-    "SHORT": "130T 42.3%WR -$4.51 (102% of losses)",
-    "short_rr": "0.72:1 (avg_win $0.113 vs avg_loss $0.158)",
-    "short_needs_wr": ">57% to break even"
-  },
-  "losing_autopsy": [
-    {
-      "cluster": "hotset LONGs (rs-s*) — 13 trades",
-      "exit_reason": "all hard_sl",
-      "loss_range": "-$0.01 to -$0.23",
-      "regime_mix": "EXTREME(5), HIGH(4), NORMAL(4)",
-      "root_cause": "Normal chop variance in NEUTRAL/EXTREME. Entries at slightly unfavorable levels, stops hit within hours. No systematic pattern — these are the cost of doing business in a ranging market.",
-      "confidence": "LOW — normal variance"
-    },
-    {
-      "cluster": "pump-chain- SHORT — 5 trades",
-      "exit_reason": "all hard_sl",
-      "loss_range": "-$0.08 to -$0.42",
-      "regime": "EXTREME (all 5)",
-      "root_cause": "CASHCAT lost twice (-$0.42, -$0.26) — same coin, back-to-back SHORTs in EXTREME. Price bounced from local lows. CHIP and BABY same pattern — SHORTing into EXTREME bounce.",
-      "confidence": "MEDIUM — CASHCAT double loss suggests coin-specific risk",
-      "note": "pump-chain- SHORT EXTREME 50%WR 14d — near breakeven. structural R:R 0.77:1 hurts."
-    },
-    {
-      "cluster": "mover- SHORT (KILLED) — 2 trades",
-      "exit_reason": "hard_sl",
-      "loss_range": "-$0.21 to -$0.47",
-      "root_cause": "KILLED signal still executing. BLUR -$0.47 is biggest single loser. Kill confirmed working (MOVER_MINUS_ENABLED=False) but pre-kill entries still closing.",
-      "confidence": "RESOLVED — kill working, aging out"
-    }
-  ],
-  "signal_quality_deep_dive": {
-    "volume_breakout_long_plus": {
-      "14d": "19T 68.4%WR +$1.54 (#1 profitable)",
-      "7d": "3T 66.7%WR +$0.13",
-      "verdict": "STRONG — keep monitoring"
-    },
-    "pump_chain_plus": {
-      "14d": "55T 41.8%WR +$1.23 (#2 profitable)",
-      "7d": "0T — CRITICAL cold streak",
-      "last_trade": "Sep 22 08:27 UTC",
-      "root_cause": "Dead hours (10/24h blocked) + NEUTRAL regime + BTC timing guard = no setups. 14d still profitable. Signal enabled but market conditions not triggering.",
-      "verdict": "MONITOR — cold streak is environment, not quality"
-    },
-    "pump_chain_minus": {
-      "14d": "45T 48.9%WR -$0.90",
-      "7d": "39T 51.3%WR -$0.52",
-      "extreme_14d": "38T 50%WR -$0.36 (near breakeven)",
-      "high_14d": "5T 20%WR -$0.60 (KILLED by HIGH_BLOCK)",
-      "verdict": "EXTREME near breakeven, HIGH noise blocked. structural R:R 0.77:1 hurts."
-    },
-    "bb_bounce_v2_long_plus": {
-      "14d": "17T 47.1%WR -$0.13",
-      "verdict": "RSI_MAX=60 applied. Post-fix data limited (1-2 trades). Need more data."
-    },
-    "mover_plus": {
-      "14d": "14T 42.9%WR -$1.12",
-      "verdict": "KILLED Sep 29. Legacy aging out. R:R 0.52:1 broken."
-    },
-    "hotset_rs_signals": {
-      "14d_losing": "rs-s129 -$0.23, rs-s47/rs-s53 -$0.22, rs-s57 -$0.21, rs-s34 -$0.21, rs-s52 -$0.24",
-      "verdict": "Normal chop. 1-2 trades each, no signal to act on."
+    "exit_analysis": {
+      "atr_sl_hit": "20T -$3.95 (legacy, pre-fix)",
+      "hard_sl": "16T -$3.34 (current problem)",
+      "profit_monster_trail": "19T +$0.56 (working)"
     }
   },
-  "recurring_problems": [
-    {
-      "issue": "SHORT structural R:R disadvantage",
-      "detail": "0.72:1 across 14d (130T). avg_win $0.113 vs avg_loss $0.158. SHORT needs >57% WR to break even. Currently at 42.3%.",
-      "status": "PERSISTENT — 14d unchanged",
-      "suggestion": "SHORT take-profit multiplier or wider ATR_SL for SHORT"
-    },
-    {
-      "issue": "pump-chain+ cold streak",
-      "detail": "0 trades/7d. Last trade Sep 22. Signal enabled but no setups due to dead hours + NEUTRAL + BTC guard.",
-      "status": "MONITORING — environment-driven"
-    },
-    {
-      "issue": "Signal diversity critical",
-      "detail": "Only volume-breakout-long+ (+$1.54) and pump-chain+ (+$1.23) profitable 14d. 2 signal types carry entire system.",
-      "status": "PERSISTENT — need new signals for NEUTRAL"
-    },
-    {
-      "issue": "EXTREME regime 82% of 7d losses",
-      "detail": "72T 43.1%WR -$3.35. ATR_SL 31.9% (23/72). post-fix improved but EXTREME still worst.",
-      "status": "IMPROVING — post-fix 0 ATR_SL hits"
-    }
-  ],
   "drift_findings": [
     {
-      "item": "mover- KILLED signal still executing",
-      "detail": "2 trades Sep 29 (BLUR, AVAX). Kill flag confirmed working (MOVER_MINUS_ENABLED=False). Pre-kill hotset entries closing.",
-      "status": "RESOLVED — aging out"
+      "finding": "pump-chain+ completely dormant (0 trades/7d)",
+      "in_code": "Enabled, dead hours updated, but NEUTRAL regime + BTC guard blocking all setups",
+      "impact": "Lost +$0.12-0.18/day from #2 profitable signal",
+      "status": "Structural — needs regime shift or signal diversity"
     },
     {
-      "item": "pump-chain- SHORT bypassing SHORT_NEUTRAL_BLOCK",
-      "detail": "39T/7d via STANDALONE_BYPASS. Profitable at 51.3%WR. Not a bug — STANDALONE_BYPASS signals skip signal_compactor where block lives.",
-      "status": "BY DESIGN — not a drift"
+      "finding": "SHORT R:R structural disadvantage persists",
+      "in_code": "SHORT_RSI_FLOOR=40, SHORT_RSI_CEILING=65 applied Sep 29",
+      "impact": "SHORT avg_win $0.123 vs avg_loss $0.158 (0.81:1 R:R)",
+      "status": "Addressed by CEO RSI changes, needs monitoring"
     }
+  ],
+  "recurring_problems": [
+    "CASHCAT repeated pump-chain- SHORT losses (-$0.68 7d)",
+    "KAS multi-signal losses (-$0.82 7d across 4 signals)",
+    "EXTREME regime dominates losses (-$2.47/7d, 57% of all losses)",
+    "hard_sl exits still dominant (16T -$3.34/7d)"
+  ],
+  "missing_implementations": [
+    "pump-chain+ cold streak root cause — signal enabled but structural filters block all setups",
+    "Coin-level repeat loss prevention (no cooldown after hard_sl)",
+    "EXTREME-specific entry quality filter (regime loses 57% of losses)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-09-29T17:35:53.156086+00:00",
-      "idea": "pump-chain- EXTREME confidence boost +15pt",
-      "rationale": "38T 50%WR -$0.36/14d EXTREME — near breakeven. avg_win $0.118 vs avg_loss $0.153 (0.77:1 R:R). At 50%WR we need 57% to break even. +15pt confidence = higher priority entries = better fill quality = slightly higher WR. 50% -> 53% WR = breakeven. Low risk, EXTREME already near breakeven.",
-      "expected_impact": "+$0.10-0.20/7d (marginal improvement to near-breakeven signal)",
-      "category": "entry quality",
+      "date": "2026-09-29T18:34:59Z",
+      "idea": "Blacklist CASHCAT from pump-chain- SHORT",
+      "rationale": "2 consecutive hard_sl losses in 24h (-$0.68). CASHCAT is a low-cap meme coin with high reversibility — pump-chain- SHORT catches falling knives on this coin.",
+      "expected_impact": "+$0.10/7d (prevent ~2 losses/week)",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low",
+      "impact_on_winners": "0 — CASHCAT has 0 winning pump-chain- SHORT trades in 14d"
     },
     {
-      "date": "2026-09-29T17:35:53.156089+00:00",
-      "idea": "Investigate pump-chain+ 7d cold streak root cause",
-      "rationale": "0 trades/7d. Last trade Sep 22. Dead hours [0,1,2,3,4,7,14,20,21,23] = 10/24h blocked. BTC_TIMING_GUARD=1.00 blocks when BTC>+1%. NEUTRAL regime. All three conditions must align for a setup. Need to check: are there periods where all 3 conditions were met but no signal fired?",
-      "expected_impact": "informational — could recover +$1.23/14d signal",
-      "category": "signal recovery",
+      "date": "2026-09-29T18:34:59Z",
+      "idea": "Investigate pump-chain+ cold streak — is NEUTRAL regime permanent?",
+      "rationale": "pump-chain+ was #2 profitable (+$1.23/14d) but 0 trades/7d. All 7d trades are NEUTRAL. Signal needs volatility or trend to fire. If NEUTRAL persists, need new signal for this regime.",
+      "expected_impact": "Determine if pump-chain+ will recover or if new NEUTRAL signal needed",
+      "category": "diagnostic",
       "status": "suggested",
-      "risk": "low"
+      "risk": "none"
     },
     {
-      "date": "2026-09-29T17:35:53.156090+00:00",
-      "idea": "SHORT take-profit multiplier 1.2x",
-      "rationale": "SHORT R:R 0.72:1 structural. avg_win $0.113 vs avg_loss $0.158. A SHORT TP that is 80% of LONG TP (vs 100%) would improve R:R. Example: if LONG TP = 3%, SHORT TP = 2.4%. This means SHORTs close earlier with smaller wins but reduce the time exposed to reversals.",
-      "expected_impact": "+$0.30-0.60/7d if it improves SHORT R:R to >0.85:1",
-      "category": "R:R improvement",
-      "status": "suggested",
-      "risk": "medium — needs backtest validation",
-      "blocked_by": "Need SHORT TP config in hermes_constants.py"
+      "date": "2026-09-29T18:34:59Z",
+      "idea": "SHORT R:R improvement via ATR_TP_K_MULT monitoring",
+      "rationale": "CEO widened ATR_TP_K_MULT 1.5 to 2.0 on Sep 29. SHORT R:R was 0.59:1, now 0.81:1. Monitor if 2.0x TP gives SHORT winners room to reach target before PM_TRAIL exits.",
+      "expected_impact": "+$0.20-0.50/7d if R:R improves to 1.0+",
+      "category": "exit optimization",
+      "status": "monitoring",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "next_actions": [
-    "MONITOR: pump-chain+ cold streak recovery (0 trades/7d, environment-driven)",
-    "MONITOR: EXTREME regime post-fix (23/72 ATR_SL 7d, improving from 64%+)",
-    "MONITOR: new doji-bottom-long signal (2 open trades, GMX LONG HIGH, SOL LONG NORMAL)",
-    "MONITOR: pump-chain- SHORT CASHCAT double loss (coin-specific risk)",
-    "SUGGESTED: pump-chain- EXTREME confidence boost +15pt (low risk, near-breakeven)",
-    "SUGGESTED: SHORT TP multiplier to fix 0.72:1 R:R",
-    "SUGGESTED: Investigate pump-chain+ dead hours alignment",
-    "NO CHANGES APPLIED this run"
+    "Monitor pump-chain+ recovery after dead hours fix (3 more hours opened)",
+    "Evaluate ATR_TP_K_MULT=2.0 impact on SHORT R:R (need 20+ trades)",
+    "Track CASHCAT — if blacklisted, verify no impact on other signals",
+    "NEW NEUTRAL signal development — pump-chain+ structural dead zone",
+    "Disk 84% — monitor growth"
   ]
 }

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 18:30 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-29 19:30 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits, 21T +$0.70. pump-chain- SHORT EXTREME dominant (35T 57.1%WR +$0.90/7d). doji-bottom-long NEW (3T 33%WR +$0.15/7d). ALL pre-fix legacy losses aging out. SHORT R:R structural disadvantage persists (0.72:1). Disk 85% (18G free).
+System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits. CASHCAT BLACKLISTED from SHORT (2 consecutive losses -$0.68). pump-chain- SHORT EXTREME dominant (41T 53.7%WR +$0.52/14d). pump-chain+ ZERO trades/7d — cold streak (structural: NEUTRAL + BTC guard). SHORT R:R 0.81:1 (improved from 0.59:1 via ATR_TP_K_MULT=2.0). Signal diversity CRITICAL — 2 signals carry all PnL.
 
-- **24h (rolling):** 44T -$0.78. pump-chain- SHORT 15T 66.7%WR +$0.91 (dominant). mover- 2T 0%WR -$0.68 (killed). rs-s* hotset mixed. doji-bottom-long 2T 50%WR +$0.16.
+- **24h (rolling):** 44T 50%WR -$0.78. pump-chain- SHORT 15T 66.7%WR +$0.91 (ONLY profitable). hard_sl 27T 40.7%WR -$1.29 (dominant exit). profit-monster-trail 17T 58.8%WR +$0.51.
 - **7d:** 132T 45.5%WR -$3.50. EXTREME -$2.47 (75T), HIGH -$1.00 (31T), NORMAL -$0.04 (23T). Post-fix (Sep 28+): 21T 52.4%WR +$0.70. 0 ATR_SL hits.
 - **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), NEO LONG doji-bottom-long (HIGH), NXPC LONG doji-bottom-long (NORMAL).
 - **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
@@ -52,6 +52,18 @@ System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits, 21T 
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-29 19:30 UTC)
+
+- **🔴 24h CHOP.** 44T 50%WR -$0.78. 27 hard_sl (-$1.29), 17 profit-monster-trail (+$0.51). pump-chain- SHORT 15T 66.7%WR +$0.91 (ONLY profitable signal).
+- **🔴 CASHCAT BLACKLISTED FROM SHORT.** 2 consecutive pump-chain- SHORT hard_sl losses (-$0.68 24h). Low-cap meme with high reversibility. 0 winning SHORT trades 14d. Expected +$0.10/7d.
+- **🟡 PUMP-CHAIN+ ZERO trades/7d.** Cold streak. Signal enabled but NEUTRAL + BTC guard blocks all setups. Was #2 profitable (+$1.23/14d). Dead hours fix (opened 3h) needs regime shift to matter.
+- **🟡 SHORT R:R 0.81:1** — avg_win $0.123 vs avg_loss $0.158. Needs >55%WR to break even. pump-chain- EXTREME 53.7% — barely profitable.
+- **🟢 ATR_SL 0% post-fix** — VERIFIED WORKING. All exits profit-monster-trail or hard_sl.
+- **7d REGIME:** EXTREME -$2.47 (75T 45.3%), HIGH -$1.00 (31T 35.5%), NORMAL -$0.04 (23T 43.5%).
+- **SIGNAL DIVERSITY CRITICAL** — only volume-breakout-long+ (+$1.54) and pump-chain- SHORT (+$0.36) profitable.
+- **CREATIVE (3):** (1) CASHCAT blacklist APPLIED (2) Investigate pump-chain+ cold streak (3) Monitor ATR_TP_K_MULT=2.0 R:R impact.
+- **1 CHANGE APPLIED.** — brain_auditor
 
 ## Audit Update (2026-09-29 18:30 UTC)
 
@@ -168,6 +180,8 @@ System active. 4 open positions. Pipeline healthy. Post-fix: 0 ATR_SL hits, 21T 
 - **1 CHANGE APPLIED.**
 
 ## Today's Changes (Sep 29)
+
+1. **brain_auditor ~19:30 UTC — 1 CONFIG CHANGE.** **CASHCAT BLACKLISTED FROM SHORT.** 2 consecutive pump-chain- SHORT hard_sl losses in 24h (-$0.68). Low-cap meme, high reversibility, 0 winning SHORT trades 14d. Expected +$0.10/7d. **DB-verified:** 44T 50%WR -$0.78 (24h) | ~132T ~42%WR -$3.51 (7d) | 318T 43.7%WR -$4.43 (14d). **LOSING AUTOPSY:** 21 losers 24h — 16 hard_sl (-$3.34), 5 profit-monster-trail (-$0.14). CASHCAT double (-$0.68), KAS 5 losses (-$0.82). All EXTREME. **SHORT R:R 0.81:1.** **7d REGIME:** EXTREME -$2.47, HIGH -$1.00, NORMAL -$0.04. **pump-chain+ ZERO trades/7d** — cold streak. **SIGNAL DIVERSITY CRITICAL.** **CREATIVE (3):** CASHCAT blacklist APPLIED, pump-chain+ investigation, ATR_TP_K_MULT monitoring. **1 CHANGE APPLIED.** — brain_auditor
 
 1. **daily_orchestrator ~18:30 UTC — NO CONFIG CHANGE.** DB-verified: 44T -$0.78 (24h) | 132T 45.5%WR -$3.50 (7d). **PIPELINE HEALTHY.** 45 closed today +3.00% PnL. Post-fix: 21T 52.4%WR +$0.70, 0 ATR_SL hits. **pump-chain- SHORT EXTREME dominant:** 35T 57.1%WR +$0.90/7d. **doji-bottom-long NEW:** 3T +$0.15/7d, 3 open trades. **EXTREME regime worst** (-$2.47/7d, 75T). **SHORT R:R 0.72:1** structural. **Disk 85%.** **0 CHANGES APPLIED.** — daily_orchestrator
 

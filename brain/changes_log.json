@@ -649,5 +649,16 @@
     "after": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True blocks pump-chain- SHORT in HIGH (5T 20%WR -$0.60/14d). EXTREME preserved (32T 56.3%WR +$0.66).",
     "rationale": "pump-chain- SHORT loses in HIGH (20%WR) but wins in EXTREME (56.3%WR). HIGH = noise for SHORT.",
     "impact": "+$0.30/7d expected. 1 tiny winner ($0.06) killed."
+  },
+  {
+    "timestamp": "2026-09-29T18:35:38Z",
+    "agent": "brain_auditor",
+    "change": "CASHCAT added to SHORT_BLACKLIST",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "CASHCAT not blacklisted",
+    "after": "CASHCAT in SHORT_BLACKLIST — blocks all SHORT entries",
+    "rationale": "2 consecutive pump-chain- SHORT hard_sl losses in 24h (-$0.68). CASHCAT is low-cap meme with high reversibility. 0 winning pump-chain- SHORT trades in 14d. Prevents repeat losses.",
+    "impact": "+$0.10/7d (prevent ~2 losses/week), 0 winners blocked"
   }
 ]
