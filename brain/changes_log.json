@@ -671,5 +671,16 @@
     "after": "CONF_FILTER_MIN = 90",
     "rationale": "89.8 conf bucket: 11T 36.4%WR -$0.61/7d. Blocks worst hotset entries. Zero winning trades blocked.",
     "impact": "+$0.61/7d"
+  },
+  {
+    "timestamp": "2026-09-30T10:37:15Z",
+    "agent": "brain_auditor",
+    "change": "DOC CORRECTION: CURRENT.md false claim that PUMP_CHAIN_SHORT_RSI_MIN=25 is dead code. Filter is LIVE — 37 blocks in pipeline.log today (BABY RSI=23.1, LDO RSI=23.8). row[8] IS rsi_14 from signals table.",
+    "type": "tweak",
+    "file": "CURRENT.md",
+    "before": "PUMP_CHAIN_SHORT_RSI_MIN=25 is DEAD CODE (reads row[8] always NULL)",
+    "after": "PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED WORKING — 37 blocks today, oversold SHORT entries blocked",
+    "rationale": "False dead-code claim would cause future agents to re-fix a working filter or disable it. Log evidence proves filter fires.",
+    "impact": "Doc accuracy. Filter behavior unchanged (was already working)."
   }
 ]

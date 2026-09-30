@@ -588,5 +588,45 @@
     "category": "verification",
     "status": "monitoring",
     "risk": "none"
+  },
+  {
+    "date": "2026-09-30T10:37:15Z",
+    "idea": "pump-chain- SHORT RSI dead-zone band block 30-40",
+    "rationale": "14d: RSI 30-40 = 17T 29.4%WR -$1.11. RSI_MIN=25 preserves 25-30 (87.5%WR +$0.78) but 30-40 still bleeds. CASHCAT RSI=33.42 -$0.42 slipped through RSI_MIN=25.",
+    "expected_impact": "+$0.30-0.55/7d if exec-time floor=40 doesn't already catch these",
+    "category": "entry sniper",
+    "status": "monitor_48h",
+    "risk": "low",
+    "blockers": "Exec-time SHORT_RSI_FLOOR=40 deployed 06:30 today — may already cover. Need production data before adding band filter."
+  },
+  {
+    "date": "2026-09-30T10:37:15Z",
+    "idea": "volume-breakout-long+ RSI 50-70 confidence boost +10pt",
+    "rationale": "14d: RSI 50-70 = 12T 83.3%WR +$2.52 vs outside = 8T 25%WR -$0.63. Boost ranking in hotset without blocking any trades.",
+    "expected_impact": "Higher hotset priority for best-signal entries. No trades blocked.",
+    "category": "confidence tuning",
+    "status": "suggested",
+    "risk": "very_low",
+    "sample": "20T total signal — boost is additive, not filtering"
+  },
+  {
+    "date": "2026-09-30T10:37:15Z",
+    "idea": "doji-bottom-long HIGH regime confidence boost +10pt",
+    "rationale": "14d: HIGH regime 6T 83.3%WR +$0.56 vs NORMAL 5T 40%WR +$0.00. Signal fires well in HIGH.",
+    "expected_impact": "Prioritize doji-bottom-long in HIGH. No trades blocked.",
+    "category": "confidence tuning",
+    "status": "monitor",
+    "risk": "low",
+    "sample": "6T HIGH — below 20 threshold. Monitor at 10+ HIGH trades."
+  },
+  {
+    "date": "2026-09-30T10:37:15Z",
+    "idea": "Research new NEUTRAL regime signal (EMA-reclaim / trend-following)",
+    "rationale": "Session brain repeatedly requests. Signal diversity critical — only 2 signals net positive with 5+ trades/14d. 99% of market is NEUTRAL. pump-chain+ cold streak due to NEUTRAL + guards.",
+    "expected_impact": "Diversify PnL source. Structural fix for single-signal dependency.",
+    "category": "new signal",
+    "status": "backlog",
+    "risk": "medium",
+    "note": "Use add-signal skill. Independent backtest required before live."
   }
 ]

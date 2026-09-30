@@ -1,3 +1,12 @@
+[2026-09-30 10:38 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 32T 43.8%WR -$0.13 (24h) | 122T 43.4%WR -$1.81 (7d) | POST-FIX: 57T 52.6%WR +$0.11
+  PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED WORKING — 37 blocks today. CURRENT.md dead-code claim FALSE — corrected.
+  Exec-time RSI ceiling deployed 06:30 — 0 trades since, unverified.
+  LOSING AUTOPSY: pump-chain- SHORT oversold EXTREME hard_sl (RSI<25 now blocked). 30-35 band still 27.3%WR -$0.91/14d.
+  CREATIVE: (1) pump-chain- 30-40 dead-zone band monitor 48h (2) volume-breakout RSI 50-70 conf boost (3) doji-bottom HIGH conf boost monitor (4) NEUTRAL signal backlog.
+  0 CHANGES APPLIED. Doc correction only (CURRENT.md).
+  BY: brain_auditor
+
 - [2026-09-30 06:36 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 37T 43.2%WR -$0.32 (24h) | 128T 43.0%WR -$2.14 (7d)
   POST-FIX: 57T 52.6%WR +$0.11 (0 ATR_SL hits). System stable.

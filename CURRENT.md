@@ -1,34 +1,35 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 08:00 UTC**
+**Last Updated: 2026-09-30 10:37 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System stable. 0 open positions. Pipeline healthy. 36T 24h 41.7%WR -$0.43. Post-fix: 57T 52.6%WR +$0.11 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — monitor 24h. PUMP_CHAIN_SHORT_RSI_MIN=25 is DEAD CODE (reads row[8] always NULL). doji-bottom-long 11T 63.6%WR +$0.36/14d — promising. volume-breakout-long+ 20T 70%WR +$2.48/14d — best signal.
+System stable. 0 open positions. Pipeline healthy. 32T 24h 43.8%WR -$0.13. Post-fix: 57T 52.6%WR +$0.11 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — monitor 24h. PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING** (37 blocks in pipeline.log today — BABY RSI=23.1, LDO RSI=23.8). doji-bottom-long 11T 63.6%WR +$0.36/14d — promising. volume-breakout-long+ 20T 70%WR +$2.48/14d — best signal.
 
-- **24h:** 36T 41.7%WR -$0.43. volume-breakout-long+ 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12. pump-chain- 10T 40%WR -$0.43.
-- **7d:** 126T ~43%WR -$2.17. EXTREME -$1.18 (71T), HIGH -$0.94 (27T), NORMAL -$0.05 (26T). Post-fix (Sep 28+): 57T 52.6%WR +$0.11. 0 ATR_SL hits.
-- **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), NEO LONG doji-bottom-long (HIGH), NXPC LONG doji-bottom-long (NORMAL).
-- **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
+- **24h:** 32T 43.8%WR -$0.13. volume-breakout-long+ 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12. pump-chain- 9T 44.4%WR -$0.34.
+- **7d:** 122T 43.4%WR -$1.81. EXTREME -$1.09 (70T), HIGH -$0.67 (24T), NORMAL -$0.05 (26T). Post-fix (Sep 28+): 57T 52.6%WR +$0.11. 0 ATR_SL hits.
+- **OPEN:** 0 positions.
+- **LONG:** volume-breakout-long+ (+$2.48/14d, 70%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
 - **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,5,7,8,13,21,22] — **VERIFIED WORKING.**
+- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,7,18,21] — **VERIFIED WORKING.**
 - **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
-- **CONF_FILTER_MIN=65.**
+- **CONF_FILTER_MIN=90.**
 - **Disk:** 85% (18G free). candles.db 2.2G, coin_tracker.db 3.1G.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
 - **🟢 signal_rsi_14 NULL DRIFT — FIXED:** 28-day drift. Root cause: decider_run.py:4283 `sig.get('rsi_14')` but signals store RSI as `rsi` key. Fix: `sig.get('rsi') or sig.get('rsi_14')` applied Sep 28. Unlocks proper RSI floor/ceiling enforcement for STANDALONE_BYPASS signals. Expected +$0.30-0.80/7d.
-- **SHORT_RSI_FLOOR=50:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 50.
-- **SHORT_RSI_CEILING=70:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. 0 post-fix violations.
-- **LONG_RSI_FLOOR=30:** **HARD BLOCK.** Blocks LONG entries where RSI < 30.
-- **LONG_RSI_CEILING=70:** **HARD BLOCK.** Blocks overbought LONG entries. 0 post-fix violations.
+- **SHORT_RSI_FLOOR=40:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 40. Exec-time check added Sep 30 06:30 (decider_run.py:1764).
+- **SHORT_RSI_CEILING=65:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. Exec-time check added Sep 30 06:30.
+- **LONG_RSI_FLOOR=20:** **HARD BLOCK.** Blocks LONG entries where RSI < 20. Exec-time check added Sep 30 06:30.
+- **LONG_RSI_CEILING=65:** **HARD BLOCK.** Blocks overbought LONG entries. Exec-time check added Sep 30 06:30 (catches hotset metadata-empty bypass).
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** +10pt confidence when LONG RSI 40-60. Extended 50→60: 50-60 band = 43T 60.5%WR +$1.53/14d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h.
+- **🟢 PUMP_CHAIN_SHORT_RSI_MIN=25 — VERIFIED WORKING (Sep 30).** NOT dead code. pipeline.log: 37 blocks today (BABY RSI=23.1, LDO RSI=23.8). row[8] IS rsi_14 from `SELECT MAX(rsi_14)` in signals query. 14d: RSI<25 = 9T 22.2%WR -$0.66 (blocked). RSI 25-30 = 8T 87.5%WR +$0.78 (preserved). RSI 30-35 = 11T 27.3%WR -$0.91 (still open — monitor exec-time floor=40).
 
 **🟢 VOLUME_SPIKE FIX — WORKING.** Sep 25 fix deployed. 6/9 post-fix trades have volume_spike values (0.02-0.97). 3 missing are from code paths not covered (IOTA/HYPER via rs-s* hotset, BTC continuum_engine). auto_1hr drift alert is STALE — queries7d window including pre-fix trades.
 
