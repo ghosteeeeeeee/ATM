@@ -1,3 +1,14 @@
+- [2026-09-30 06:36 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 37T 43.2%WR -$0.32 (24h) | 128T 43.0%WR -$2.14 (7d)
+  POST-FIX: 57T 52.6%WR +$0.11 (0 ATR_SL hits). System stable.
+  CASHCAT blacklist working (0 post-blacklist trades).
+  CONF_FILTER_MIN=90 working (blocking worst hotset bucket).
+  pump-chain- SHORT EXTREME degrading (43T 51.2%WR 0.91:1 R:R).
+  Hotset RSI ceiling gap: 8 trades/7d RSI>70, 25%WR, metadata empty bypass.
+  doji-bottom-long 11T 63.6%WR +$0.36 — PROMISING, monitor 20+ trades.
+  CREATIVE: (1) Hotset RSI ceiling enforcement (2) Monitor doji-bottom-long (3) Hotset EXTREME RSI_MIN=45.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
 
 [2026-09-30 03:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 41T 43.9%WR -$0.76 (24h) | 131T 43.5%WR -$2.23 (7d) | POST-FIX: 56T 53.6%WR +$0.13

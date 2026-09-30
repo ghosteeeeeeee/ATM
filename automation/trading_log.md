@@ -611,3 +611,40 @@ BY: auto_1hr
 - 7d -$2.23 — recovering from pre-fix losses
 
 BY: auto_1hr
+
+## LOSERS Update — 2026-09-30 06:05 UTC
+- ADD KAS (WR=16.7%, PnL=$-0.76, consecutive_losses (5))
+- ADD GOAT (WR=40.0%, PnL=$-0.29, low_wr (40.0%))
+
+Final set: ['GOAT', 'KAS']
+
+## [2026-09-30 07:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 opened | 1 open (BTC LONG 41h stale)
+**24h:** 37T 44.7%WR -$0.76 | 7d: 131T 43.5%WR -$2.23
+**ATR SL:** 0/37 (0%) ✅ fix stable 37T+
+**Exits:** 19 hard_sl (51%, avg -$0.069) | 17 profit-monster-trail (46%, avg +$0.019) | 1 HARD_SL_FAILED (+$0.94)
+**Regime 24h:** EXTREME dominant, HIGH 57%WR, NORMAL 33%WR
+**Signals 24h (opened in window):**
+- pump-chain- 9T 44.4%WR -$0.34 — main drag, -$0.038/trade
+- doji-bottom-long 4T 75%WR +$0.12 — best active signal
+- volume-breakout-long+ 2T 100%WR +$1.02 — small sample
+- bb-bounce-v2-long+ 4T 50%WR +$0.04 — break-even
+- RS signals: 15T legacy trades (all opened before Sept 29 16:00 UTC cutoff) — no new RS trades
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — overnight quiet
+- No signals meeting kill criteria (3+T, 0%WR, last hour)
+- ATR_SL fix: stable 0 hits 37T+
+- pump-chain- 9T -$0.34 — 44%WR not 0%, not kill candidate
+- RS signals: all legacy, no new opens after cutoff — kill confirmed
+- BTC LONG 41h stale — persists, needs manual reconciliation
+
+**Open Questions:**
+- BTC LONG 41h stale — manual close or reconciliation needed
+- hard_sl 51% dominant — losses contained, structural
+- pump-chain- underperformance — monitor, not kill threshold
+
+BY: auto_1hr

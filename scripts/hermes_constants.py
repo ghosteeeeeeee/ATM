@@ -297,7 +297,11 @@ LOSERS_SHORT = {
     'DOT', 'ZRO'
 }
 # Legacy combined set
-LOSERS = set()
+LOSERS = {
+    'GOAT',
+    'KAS'
+}
+
 
 
 

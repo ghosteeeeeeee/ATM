@@ -1767,6 +1767,13 @@ def execute_trade(token, direction, price, confidence, source,
                     if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                         log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                         return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+                    # ponytail: ceiling checks — same pattern as floor, catches RSI drift between detection and execution
+                    if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
+                        log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
+                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
+                    if direction.upper() == 'LONG' and LONG_RSI_CEILING > 0 and _exec_rsi > LONG_RSI_CEILING:
+                        log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {LONG_RSI_CEILING} at execution time (overbought — chasing)')
+                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {LONG_RSI_CEILING}'
         finally:
             _rsi_conn.close()
     except Exception:

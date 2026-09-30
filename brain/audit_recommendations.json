@@ -1,179 +1,103 @@
 {
-    "timestamp": "2026-09-30T05:00:00Z",
-    "session_brain_stats": {
-        "signal_performance_queries": "pump-chain- SHORT RSI edge, hotset confidence inverse, doji-bottom-long promising",
-        "improvement_ideas": "trend following signal, EMA-reclaim for NEUTRAL, volume confirmation hotset",
-        "recurring_topics": "SHORT R:R structural (0.77:1), signal diversity (2 signals carry PnL), STANDALONE_BYPASS RSI leak"
-    },
-    "trade_summary_24h": {
-        "total_trades": 38,
-        "win_rate": 44.7,
-        "pnl": -0.53,
-        "best_trade": "COMP volume-breakout-long+ +$0.94",
-        "worst_trade": "BLUR mover- SHORT -$0.47",
-        "pump_chain_short": "12T 41.7%WR -$0.27",
-        "hotset_rs_signals": "15T scattered losses (all small <$0.23)"
-    },
-    "trade_summary_7d": {
-        "total_trades": 131,
-        "win_rate": 43.5,
-        "pnl": -2.23,
-        "regime_breakdown": {
-            "EXTREME": "73T 46.6%WR -$1.20",
-            "HIGH": "30T 36.7%WR -$1.01",
-            "NORMAL": "25T 44.0%WR -$0.03",
-            "FLAT": "2T 50%WR +$0.01"
-        }
-    },
-    "drift_findings": [
-        {
-            "issue": "pump-chain- SHORT RSI floor bypass via STANDALONE_BYPASS",
-            "severity": "MEDIUM",
-            "detail": "SHORT_RSI_FLOOR=40 but pump-chain- SHORT enters at RSI 13-37 via STANDALONE_BYPASS. 14d: RSI<25 = 9T 22.2%WR -$0.66. But7d: RSI<30 = 16T 56.3%WR (edge exists but noisy). Not a simple floor fix — oversold bounce edge is real but token-specific.",
-            "status": "KNOWN — coverage gap, not a bug"
-        },
-        {
-            "issue": "LONG RSI>70 coverage gap persists",
-            "severity": "LOW",
-            "detail": "CC rs-s52 entered at RSI=74.89 on Sep 29 07:25 (LONG_RSI_CEILING=65). 7d: 12 trades RSI>70, 41.7%WR -$0.70. Sample too small to confirm systematic issue. Some are pre-fix legacy.",
-            "status": "MONITORING — insufficient data"
-        },
-        {
-            "issue": "REGIME_CONF_HIGH_MULT=0.50 still untested",
-            "severity": "LOW",
-            "detail": "Deployed Sep 26. 7d has 30 HIGH trades but most are legacy killed signals aging out. Need clean 50+ trades to evaluate.",
-            "status": "MONITORING"
-        }
+  "timestamp": "2026-09-30T06:34:21.053483+00:00",
+  "session_brain_stats": {
+    "total_sessions": "30+",
+    "top_topics": [
+      "signal performance",
+      "RSI filtering",
+      "ATR_SL widening",
+      "hotset confidence",
+      "pump-chain cold streak"
     ],
-    "recurring_problems": [
-        {
-            "topic": "SHORT R:R structural disadvantage",
-            "occurrences": "Every audit for 7+ days",
-            "detail": "avg_win $0.12 vs avg_loss $0.16 (0.77:1). Needs >55%WR to break even. Currently 42.3%.",
-            "root_cause": "SHORT entries in EXTREME regime get stopped out by ATR volatility before momentum plays out",
-            "suggestion": "ATR_SL widening already deployed and verified. Monitor for 50+ post-fix trades."
-        },
-        {
-            "topic": "Signal diversity — 2 signals carry all PnL",
-            "occurrences": "Every audit for 14+ days",
-            "detail": "volume-breakout-long+ (+$2.48/14d) and pump-chain+ (+$1.23/14d) are only profitable signals. 30+ signal types but only 2 net positive.",
-            "suggestion": "CEO already working on new NEUTRAL signals (coin_tracker_hot.py fix Sep 29). Monitor."
-        }
-    ],
-    "missing_implementations": [
-        {
-            "item": "pump-chain- SHORT RSI floor in signal_compactor",
-            "rationale": "STANDALONE_BYPASS bypasses decider_run.py RSI check. Need to add RSI_MIN=30 check in signal_compactor for pump-chain- SHORT specifically.",
-            "expected_impact": "+$0.20-0.40/7d (blocks worst entries, preserves oversold bounce edge)",
-            "risk": "LOW — targeted at one signal, one direction"
-        }
-    ],
-    "losing_trade_autopsy": [
-        {
-            "losing_trade": "CASHCAT SHORT pnl=-$0.42",
-            "signal": "pump-chain-",
-            "regime": "EXTREME",
-            "root_cause": "Low-cap meme, high reversibility. Already blacklisted — this was pre-blacklist trade.",
-            "entry_check": "RSI=33.42 at entry",
-            "regime_check": "EXTREME — pump caught, reversed",
-            "recommended_change": "ALREADY BLACKLISTED — no action needed",
-            "confidence": "N/A — resolved"
-        },
-        {
-            "losing_trade": "BLUR SHORT pnl=-$0.47",
-            "signal": "mover-",
-            "regime": "EXTREME",
-            "root_cause": "mover- KILLED (Sep 29). Pre-kill trade.",
-            "entry_check": "RSI=14.01 (extreme oversold)",
-            "recommended_change": "ALREADY KILLED — no action needed",
-            "confidence": "N/A — resolved"
-        },
-        {
-            "losing_trade": "CC LONG pnl=-$0.20",
-            "signal": "rs-s52",
-            "regime": "EXTREME",
-            "root_cause": "Entered at RSI=74.89 (overbought) despite LONG_RSI_CEILING=65. Coverage gap in hotset code path.",
-            "entry_check": "RSI=74.89 at entry — should have been blocked",
-            "regime_check": "EXTREME",
-            "recommended_change": "Investigate hotset RSI ceiling enforcement. Sample too small to act.",
-            "confidence": "LOW — 1 trade, may be noise"
-        },
-        {
-            "losing_trade": "WLFI LONG pnl=-$0.21",
-            "signal": "rs-s34",
-            "regime": "NORMAL",
-            "root_cause": "Entered at RSI=59.70 (acceptable). Normal chop loss.",
-            "entry_check": "RSI=59.70 — within range",
-            "recommended_change": "No action — normal variance",
-            "confidence": "N/A — variance"
-        }
-    ],
-    "signal_quality_deep_dive": {
-        "pump_chain_short": {
-            "14d": "50T 50.0%WR -$0.39",
-            "rsi_bands": {
-                "<25": "9T 22.2%WR -$0.66 (CATASTROPHIC)",
-                "25-40": "25T 48.0%WR -$0.33 (losing)",
-                "40-55": "13T 69.2%WR +$0.53 (PROFITABLE — SWEET SPOT)",
-                "55+": "3T 66.7%WR +$0.07 (profitable)"
-            },
-            "root_cause": "Signal works in 40-55 RSI band but oversold entries (<25) drag down overall. STANDALONE_BYPASS bypasses RSI floor.",
-            "fix": "Add RSI_MIN=30 guard in signal_compactor for pump-chain- SHORT. Would block 9T/14d losers while preserving oversold bounce edge (some RSI<30 winners exist)."
-        },
-        "bb_bounce_v2_long": {
-            "14d": "18T 44.4%WR -$0.14",
-            "note": "RSI_MAX=60 already deployed (Sep 29).7d losses: 2 cut-loser-CL-T1 (-$0.30), 5 profit-monster-trail scratches (-$0.12). R:R improving.",
-            "status": "MONITOR — post-fix"
-        },
-        "doji_bottom_long": {
-            "14d": "11T 63.6%WR +$0.36",
-            "24h": "4T 75%WR +$0.12",
-            "note": "All profit-monster-trail exits. RSI 14-55 (oversold bounces). Promising but need 20+ trades.",
-            "status": "MONITOR"
-        },
-        "volume_breakout_long_plus": {
-            "14d": "20T 70.0%WR +$2.48",
-            "24h": "2T 100%WR +$1.02",
-            "note": "Best signal. Consistent performer.",
-            "status": "HEALTHY"
-        }
-    },
-    "creative_improvements": [
-        {
-            "date": "2026-09-30T05:00:00Z",
-            "idea": "Add pump-chain- SHORT RSI_MIN=30 in signal_compactor (not decider_run.py)",
-            "rationale": "STANDALONE_BYPASS bypasses decider_run.py RSI check. 14d: RSI<25 = 9T 22.2%WR -$0.66 (worst band). But7d: RSI<30 = 56.3%WR — oversold bounce edge is real but noisy. RSI_MIN=30 blocks catastrophic RSI<25 entries while preserving 25-30 edge. Expected +$0.20-0.40/7d. Impact: 9T blocked, but some are winners (9 of 16 RSI<30 winners in 7d).",
-            "expected_impact": "+$0.20-0.40/7d",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "low",
-            "caveat": "Would block 9 winning trades in 7d (RSI 25-30). Net positive but needs monitoring."
-        },
-        {
-            "date": "2026-09-30T05:00:00Z",
-            "idea": "Monitor doji-bottom-long at 20+ trades for statistical significance",
-            "rationale": "11T 63.6%WR +$0.36/14d. All profit-monster-trail. Oversold bounce entries (RSI 14-55). Need 20+ trades to confirm edge is real vs variance.",
-            "expected_impact": "informational",
-            "category": "monitoring",
-            "status": "monitoring",
-            "risk": "none"
-        },
-        {
-            "date": "2026-09-30T05:00:00Z",
-            "idea": "Investigate hotset RSI ceiling enforcement — CC rs-s52 entered at RSI=74.89 despite LONG_RSI_CEILING=65",
-            "rationale": "7d: 12 trades RSI>70, 41.7%WR -$0.70. Some are pre-fix legacy but CC entry on Sep 29 is post-fix. Hotset code path may bypass RSI ceiling check. If confirmed, blocking overbought hotset entries could save $0.50-0.70/7d.",
-            "expected_impact": "+$0.50-0.70/7d if confirmed",
-            "category": "bug investigation",
-            "status": "suggested",
-            "risk": "low"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "Monitor pump-chain- SHORT performance after any RSI guard changes",
-        "Monitor doji-bottom-long at 20+ trades (currently 11T)",
-        "Investigate hotset RSI ceiling enforcement for CC rs-s52 RSI=74.89 entry",
-        "Verify EXTREME regime post-fix with 50+ trades (currently 73T but many legacy)",
-        "Track LONG RSI>70 coverage gap — if pattern confirms, add hotset RSI check"
+    "unimplemented_ideas": [
+      "EMA-reclaim signal for NEUTRAL",
+      "SHORT TP multiplier for R:R",
+      "hotset RSI ceiling enforcement"
     ]
+  },
+  "trade_summary_24h": {
+    "total_trades": 37,
+    "win_rate": 43.2,
+    "pnl": -0.32,
+    "best_signal": "volume-breakout-long+ 2T 100%WR +$1.02",
+    "worst_signal": "pump-chain- SHORT 11T 36.4%WR -$0.51",
+    "regime": "ALL NEUTRAL (130/131 7d)"
+  },
+  "drift_findings": [
+    {
+      "issue": "signal_rsi_14 NULL for ALL trades (28-day drift)",
+      "impact": "Detection-time RSI filtering impossible. RSI ceiling/floor checks at execution rely on live RSI only.",
+      "status": "KNOWN - not fixable without code change to persist RSI at detection time",
+      "severity": "MEDIUM"
+    },
+    {
+      "issue": "Hotset signals bypass RSI ceiling check when signal_metadata is empty",
+      "impact": "USUAL rs-s129 RSI=81.82 LONG executed above LONG_RSI_CEILING=65 (-$0.23). 8 trades/7d with RSI>70, only 2 winners (25%WR).",
+      "status": "KNOWN - code path at decider_run.py:1061-1067 only fires when _detect_rsi_long is not None",
+      "severity": "HIGH"
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "Hotset confidence inversely predicts quality",
+      "evidence": "NULL conf 50%WR +$0.18. 85-95 conf 33.3%WR -$0.63. 95+ conf 38.9%WR -$0.39.",
+      "status": "CONF_FILTER_MIN=90 applied, blocking worst bucket",
+      "next_step": "Monitor 48h. If 90+ conf still losing, consider CONF_FILTER_MIN=95 or hotset RSI ceiling."
+    },
+    {
+      "topic": "pump-chain- SHORT degrading in EXTREME",
+      "evidence": "14d: 43T 51.2%WR +$0.15 (0.91:1 R:R). Was 56.3%WR +$0.66 before CASHCAT losses.",
+      "status": "CASHCAT blacklisted (Sep 29 19:30). PUMP_CHAIN_SHORT_RSI_MIN=25 applied (Sep 30 05:30).",
+      "next_step": "Monitor 48h. If EXTREME still 51%WR, consider confidence boost or regime-specific filter."
+    },
+    {
+      "topic": "Signal diversity critical",
+      "evidence": "Only volume-breakout-long+ (+$2.48/14d) and pump-chain+ (+$1.23/14d) profitable. 30+ signal types, only 2 net positive.",
+      "status": "NEED: New NEUTRAL signal for diversity. doji-bottom-long promising (11T 63.6%WR +$0.36).",
+      "next_step": "Monitor doji-bottom-long at 20+ trades. Consider EMA-reclaim signal."
+    }
+  ],
+  "missing_implementations": [
+    "Hotset RSI ceiling enforcement (signal_metadata empty bypass)",
+    "EMA-reclaim signal for NEUTRAL regime diversity",
+    "SHORT TP multiplier for R:R improvement (currently 0.82:1 for pump-chain-)",
+    "signal_rsi_14 persistence fix (28-day drift)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-09-30T06:34:21.053499+00:00",
+      "idea": "Enforce RSI ceiling for hotset signals even when signal_metadata is empty",
+      "rationale": "8 trades/7d with RSI>70, only 2 winners (25%WR, -$0.68). USUAL rs-s129 RSI=81.82 LONG lost -$0.23. Hotset code path bypasses RSI ceiling check when _detect_rsi_long is None. Fix: use live RSI as fallback for hotset signals.",
+      "expected_impact": "+$0.30-0.50/7d (block overbought LONG entries)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-30T06:34:21.053502+00:00",
+      "idea": "Monitor doji-bottom-long at 20+ trades before enabling broadly",
+      "rationale": "11T 63.6%WR +$0.36/14d. All profit-monster-trail exits. Entries at RSI 14-55 (oversold bounces). Sample too small for confident deployment.",
+      "expected_impact": "monitoring only",
+      "category": "signal quality",
+      "status": "monitoring",
+      "risk": "low"
+    },
+    {
+      "date": "2026-09-30T06:34:21.053503+00:00",
+      "idea": "Hotset EXTREME RSI_MIN=45 to preserve pump-chain- edge",
+      "rationale": "Hotset EXTREME trades include pump-chain- SHORT entries at oversold RSI. RSI_MIN=45 would block oversold SHORT entries while preserving overbought LONG entries.",
+      "expected_impact": "+$0.10-0.20/7d",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Monitor PUMP_CHAIN_SHORT_RSI_MIN=25 (applied Sep 30 05:30) for 48h",
+    "Monitor CONF_FILTER_MIN=90 (applied Sep 29 23:15) for 48h",
+    "Monitor doji-bottom-long at 20+ trades",
+    "Investigate hotset RSI ceiling enforcement (signal_metadata empty bypass)",
+    "Track pump-chain- SHORT EXTREME post-CASHCAT-blacklist performance"
+  ]
 }
