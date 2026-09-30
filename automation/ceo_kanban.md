@@ -41,3 +41,8 @@
 
 ## TEAM UPDATES
 - [2026-09-30 09:48 UTC] health_monitor: Auto-fixed disk 85%→84% via journald vacuum (~1GB freed). Cleared failed state on 8 non-trading units. Verified candle data fresh via price_collector despite inactive 1m/5m candle timers (redundant path). Pipeline OK: 116 signals/1h, 0 open trades, LONG_BIAS market. Open items for code owners: bug-hunter findings (hardcoded passwords, dead signal_gen imports), git-release dry-run failure, prices_hermes.db empty artifact.
+
+## TEAM UPDATES
+- [2026-09-30 16:50 UTC] health_monitor: Auto-fixed failed non-trading services via reset-failed (5m-candle, better-coder, git-release, trading-checklist, weather-station-api). Trading path clean.
+- [2026-09-30 16:50 UTC] health_monitor: Vacuumed journald (freed 255MB) — disk still 86% from DB growth (coin_tracker 3.4G, candles 2.3G). No log files >7d.
+- [2026-09-30 16:50 UTC] health_monitor: position_manager FATAL x3 = guardian lock contention (by design), not a crash. Guardian healthy 9h. Next-cycle recovery confirmed. Pipeline LIVE, 3 open / 15 closed today / +55.2% PnL. 89 signals/1h. LONG_BIAS.

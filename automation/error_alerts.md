@@ -63,3 +63,9 @@
 ## Error Alerts — 2026-09-30 15:58 UTC
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-09-30 16:49 UTC
+- **WARN** (3x): position_manager `[FATAL] Guardian already running` at 16:37/16:40/16:41 — lock contention with hl-sync-guardian, NOT a crash. Guardian healthy (9h uptime). Position manager succeeded on subsequent cycles (16:42/16:44/16:46+). Working as designed (next-cycle retry). No auto-fix required.
+- **WARN** (1x): disk **86%** (96G/118G, 16G free). AUTO-FIX: vacuumed journald (freed 255MB). Logs only 162M total — growth is DBs (coin_tracker.db 3.4G, candles.db 2.3G, signals_hermes.db 925M, session_brain.db 850M). No logs >7d to compress. Monitor; DB growth is structural.
+- **INFO** (6x): non-trading services failed — 5m-candle (redundant), better-coder, ceo, git-release (known dry-run fail), trading-checklist (exit-2 by design), weather-station-api. AUTO-FIX: reset-failed applied. Trading path unaffected.
+- **INFO**: Pipeline healthy. 89 signals/1h (pump-chain 65), 7 executed. 3 open trades (LDO/BLUR/DOT LONG, all green), 15 closed today, +55.2% PnL. Regime LONG_BIAS (11L/0S/105N). Speed 53% tokens >=50th pct. Prices fresh (0.3min, 86 tokens). Core timers firing every 1min. 0 phantom-like tiny-PnL outliers flagged.

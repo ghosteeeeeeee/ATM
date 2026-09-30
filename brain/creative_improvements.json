@@ -744,5 +744,26 @@
     "status": "backlog_signal_analyst",
     "risk": "medium",
     "note": "Search sessions: trend following + NEUTRAL signal requested repeatedly"
+  },
+  {
+    "date": "2026-09-30T17:34:55Z",
+    "idea": "doji-bottom-long HIGH regime confidence boost +10pt (MONITOR at 20+ trades)",
+    "rationale": "14d: HIGH 6T 83.3%WR +$0.36 vs NORMAL 5T 40%WR $0.00. 5/6 HIGH winners exit profit-monster-trail. HIGH loss entered RSI=25 (oversold LONG). Signal is a HIGH specialist.",
+    "expected_impact": "+2-4% WR for doji-bottom-long in HIGH regime",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "11T — BELOW 20 threshold. MONITOR."
+  },
+  {
+    "date": "2026-09-30T17:34:55Z",
+    "idea": "Fix continuum metadata injection — unlock RSI/volume filtering for continuum trades",
+    "rationale": "BTC continuum_engine trades have empty _signal_metadata {} — known bug 5+ sessions. Bypasses RSI floors/ceilings, volume filters, confidence scoring. Code fix, not config change.",
+    "expected_impact": "Unknown — enables proper filtering of continuum trades",
+    "category": "bug fix / infrastructure",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "N/A — bug fix",
+    "action": "Delegate to bug_hunter"
   }
 ]

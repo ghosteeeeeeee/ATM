@@ -1,32 +1,67 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h
-Generated: 2026-09-30 11:10 UTC
+# Signal Performance Report
+**Generated:** 2026-09-30 17:03 UTC | **Period:** Last 6h + 24h
 
-KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No kill candidates — see analysis |
+## Overall Stats
+- **Total trades (all time):** 2,720 | **WR:** 51.9% | **PnL:** -106.01%
+- **Date range:** 2026-07-29 → 2026-09-30
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No boost candidates (doji-bottom near-miss: 4T < 5T threshold) |
+---
 
-LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| rs-s30 | LONG | 0.0% | -$0.08 | 3 | Watch — below 5T kill threshold. All exits profit-monster-trail scratches (2×ZEN, 1×USUAL). No regime sample. |
-| bb-bounce-v2-long+ | LONG | 33.3% | +$0.02 | 3 | Watch — positive PnL, low sample. Not a kill. |
+## WINNERS (WR > 55%, PnL > 0)
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| doji-bottom-long | LONG | 75.0% | +$0.12 | 4 | Active — 3/4 wins (NEO, NXPC, GMX; SOL scratch). Near boost threshold; needs 5T. |
-| pump-chain- | SHORT | 44.4% | -$0.34 | 9 | Active — NOT a kill. Loss is CASHCAT-driven (-$0.68, blacklisted 2026-09-29). Excl. blacklisted: 7T 57.1% WR +$0.34. Regime: EXTREME 50.8% WR +$1.30 (edge), HIGH 41.5% WR -$0.25 (already blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True). CEO set PUMP_CHAIN_SHORT_RSI_MIN=25 today. |
+None found.
 
-ISSUES:
-- No direction inversions found in 24h window.
-- No kills executed this cycle — no signal met all three kill criteria (WR<30%, 5+ trades, PnL<-$0.10, active>24h).
-- No boosts executed — no signal met all three boost criteria (WR>55%, 5+ trades, PnL>$0.05). doji-bottom-long is closest at 75% WR / 4T / +$0.12; recheck next cycle if 5th trade lands.
-- CASHCAT trades on 2026-09-29 11:33/11:38 predate the blacklist (added same day after the losses) — expected, not a bug.
-- 6h window: zero closed trades meeting HAVING COUNT(*)>=2 (quiet period).
+---
+
+## LOSERS (WR < 30%, PnL < -2%)
+
+None found.
+
+---
+
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| bb-bounce-v2-long+ | LONG | 2 | 50.0% | +0.26 | ❓ | Needs more data |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] bb-bounce-v2-long+ LONG** — WR=50.0%, PnL=+0.26% over 2 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-09-30 | 28375e5 | Fix 6 bugs found by bug hunter on dynamic RSI + standalone b... |
+| 2026-09-30 | 3294f89 | Raise LONG_RSI_CEILING from 65 to 70 |
+| 2026-09-30 | 3e5722a | Remove all time blocks — focus on entry quality filters |
+| 2026-09-30 | 8815282 | CRITICAL FIX: CONF_FILTER_MIN blocked ALL signals |
+| 2026-09-30 | 6997518 | Brain Audit: 2026-09-30 06:00 UTC — system stable, hotset RS... |
+| 2026-09-30 | 5523239 | CEO: pump-chain- SHORT RSI_MIN=25 filter — blocks oversold e... |
+| 2026-09-30 | eff23ff | brain-audit: Sep 30 03:35 UTC — LONG RSI>70 leak, hotset con... |
+| 2026-09-29 | b76bec7 | fix: bug hunter findings — V5 integration bugs |
+| 2026-09-29 | 9265efa | Implement Thesis Validation System (TVS) |
+| 2026-09-29 | f9daa25 | fix: pump_chain_v5 not reaching hotset — add to compactor wh... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
