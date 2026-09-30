@@ -2606,7 +2606,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300-v3-long',  # V3 pullback LONG — structural breakout signal, works solo
     'accel-300-v3-short',  # V3 anti-bottom-catch SHORT — structural breakout signal, works solo
     # ponytail: accel-300-v4-short removed — killed Sep 11 (5T/20%WR -$0.26)
-    'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
+    'oversold-bounce+', 'oversold-bounce',  # oversold bounce LONG — mean reversion at extreme oversold, works solo
     # breakout-long removed — killed 2026-09-17 (4T/7d 25%WR -$0.35)
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',  # underscore + hyphen variants (2026-09-23: hyphen variant was missing, blocking GOAT SHORT)

@@ -1767,10 +1767,10 @@ def _score_signal(token, direction, conf, source, signal_type,
                     token, direction, _rr_price, signal_type=signal_type)
                 if rr_mult != 1.0:
                     log(f"  🎯 [RR-ENGINE] {token} {direction}: {rr_reason} → mult={rr_mult:.2f}")
-                if RR_ENGINE_CONF_SHADOW:
-                    rr_mult = 1.0  # shadow mode: log but don't adjust
-                # Store rr_mult for dynamic RSI ceiling
+                # Store RAW rr_mult for dynamic RSI ceiling (before shadow override)
                 _rr_mult_tracker[(token.upper(), direction.upper())] = rr_mult
+                if RR_ENGINE_CONF_SHADOW:
+                    rr_mult = 1.0  # shadow mode: log but don't adjust score
     except ImportError:
         pass
     except Exception as e:
@@ -3548,14 +3548,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Blocks extreme overbought entries where momentum is exhausted.
             if direction == 'LONG' and LONG_RSI_CEILING > 0:
                 # Dynamic RSI ceiling based on R:R grade
-                # Grade A (R:R>=4.0, mult=1.30): RSI ceiling 80
-                # Grade B (R:R 2.0-4.0, mult=1.15): RSI ceiling 70
-                # Grade C/D (R:R<2.0, mult<=0.85): RSI ceiling 60
+                # Grade A (R:R>=4.0, mult>=1.30): RSI ceiling 80
+                # Grade B (R:R 2.0-4.0, mult>=1.15): RSI ceiling 70
+                # Neutral (mult=1.0, fail-open, tracker-miss): RSI ceiling 70 (default)
+                # Grade C/D (R:R<2.0, mult<1.15): RSI ceiling 60
                 _rr_m = _rr_mult_tracker.get((tkn.upper(), direction.upper()), 1.0)
                 if _rr_m >= 1.30:
                     _dynamic_ceiling = 80  # Grade A — exceptional R:R justifies higher RSI
                 elif _rr_m >= 1.15:
                     _dynamic_ceiling = LONG_RSI_CEILING  # Grade B — standard ceiling
+                elif _rr_m >= 1.0:
+                    _dynamic_ceiling = LONG_RSI_CEILING  # Neutral/fail-open — default ceiling
                 else:
                     _dynamic_ceiling = min(LONG_RSI_CEILING, 60)  # Grade C/D — tighter ceiling
                 _conn_lrc = None
@@ -3959,7 +3962,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 elif CONFLUENCE_NEUTRAL_RELAX:
                     _r4h, _ = get_regime_4h(tkn)
                     bare_src_final = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
-                    if _r4h == 'NEUTRAL' and bare_src_final in STANDALONE_BYPASS_SIGNALS:
+                    _src_stripped_final = src.rstrip('+-') if src else ''
+                    if _r4h == 'NEUTRAL' and (bare_src_final in STANDALONE_BYPASS_SIGNALS or _src_stripped_final in STANDALONE_BYPASS_SIGNALS):
                         log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} NEUTRAL-relax: standalone bypass ({bare_src_final}) at final guard (4h={_r4h})")
                     else:
                         log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (4h={_r4h}, not standalone bypass)")
@@ -4455,7 +4459,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         bare_src = re.sub(r'\d+$', '', source.rstrip('+-')) if source else ''
-                        if bare_src in STANDALONE_BYPASS_SIGNALS:
+                        _src_stripped = source.rstrip('+-') if source else ''
+                        if bare_src in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS:
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
                             # ── Contrarian flip at pending approve ────────────────────
                             if bare_src == 'trend_momentum_near_sma':
@@ -4626,7 +4631,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
                 bare_src = re.sub(r'\d+$', '', (src or '').rstrip('+-'))
-                if bare_src in STANDALONE_BYPASS_SIGNALS:
+                _src_stripped_s = (src or '').rstrip('+-')
+                if bare_src in STANDALONE_BYPASS_SIGNALS or _src_stripped_s in STANDALONE_BYPASS_SIGNALS:
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
                     # ── Contrarian flip at safety filter (last resort) ───────────
                     if bare_src == 'trend_momentum_near_sma':
@@ -4983,7 +4989,8 @@ def _filter_safe_prev_hotset(prev_hotset):
         elif len(sp) < 2:
             # Check if single-source signal is in the standalone bypass list
             bare_src_check = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
-            if bare_src_check in STANDALONE_BYPASS_SIGNALS:
+            _src_stripped_p = src.rstrip('+-') if src else ''
+            if bare_src_check in STANDALONE_BYPASS_SIGNALS or _src_stripped_p in STANDALONE_BYPASS_SIGNALS:
                 pass  # backtested standalone — allow through preserve
             else:
                 log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
