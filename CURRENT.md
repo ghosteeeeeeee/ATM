@@ -1,14 +1,14 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 06:30 UTC**
-**Updated by: daily_orchestrator**
+**Last Updated: 2026-09-30 08:00 UTC**
+**Updated by: brain_auditor**
 
 ## Current Status
 
-System active. 0 open positions. Pipeline healthy. 37T 24h 43.2%WR -$0.32. ATR_SL fix stable (0 hits 37T+). Hotset empty (NEUTRAL, no signals >50% confidence). doji-bottom-long 11T 63.6%WR +$0.36/14d — promising (HIGH 83.3%WR). volume-breakout-long+ 2T 100%WR +$1.02/24h — best signal. pump-chain- SHORT 11T 36.4%WR -$0.51/24h — main drag.
+System stable. 0 open positions. Pipeline healthy. 36T 24h 41.7%WR -$0.43. Post-fix: 57T 52.6%WR +$0.11 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — monitor 24h. PUMP_CHAIN_SHORT_RSI_MIN=25 is DEAD CODE (reads row[8] always NULL). doji-bottom-long 11T 63.6%WR +$0.36/14d — promising. volume-breakout-long+ 20T 70%WR +$2.48/14d — best signal.
 
-- **24h:** 37T 43.2%WR -$0.32. volume-breakout-long+ 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12. pump-chain- 11T 36.4%WR -$0.51.
-- **7d:** 132T 45.5%WR -$3.50. EXTREME -$2.47 (75T), HIGH -$1.00 (31T), NORMAL -$0.04 (23T). Post-fix (Sep 28+): 21T 52.4%WR +$0.70. 0 ATR_SL hits.
+- **24h:** 36T 41.7%WR -$0.43. volume-breakout-long+ 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12. pump-chain- 10T 40%WR -$0.43.
+- **7d:** 126T ~43%WR -$2.17. EXTREME -$1.18 (71T), HIGH -$0.94 (27T), NORMAL -$0.05 (26T). Post-fix (Sep 28+): 57T 52.6%WR +$0.11. 0 ATR_SL hits.
 - **OPEN:** 4 positions — BTC LONG continuum-osc+ (NORMAL), GMX LONG doji-bottom-long (HIGH), NEO LONG doji-bottom-long (HIGH), NXPC LONG doji-bottom-long (NORMAL).
 - **LONG:** volume-breakout-long+ (+$1.54/14d, 68.4%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
 - **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
@@ -53,19 +53,22 @@ System active. 0 open positions. Pipeline healthy. 37T 24h 43.2%WR -$0.32. ATR_S
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
-## Audit Update (2026-09-30 06:00 UTC)
+## Audit Update (2026-09-30 07:15 UTC)
 
-- **🟡 24h 37T 43.2%WR -$0.32.** volume-breakout-long+ 2T 100%WR +$1.02 (best). pump-chain- SHORT 11T 36.4%WR -$0.51. doji-bottom-long 4T 75%WR +$0.12 (promising).
-- **🟢 POST-FIX STABLE.** 57T 52.6%WR +$0.11 (0 ATR_SL hits). System slightly positive. All recent fixes working.
-- **🟢 CASHCAT BLACKLIST WORKING.** 0 post-blacklist trades (Sep 29 19:30). 2 pre-blacklist losses aging out.
-- **🟢 CONF_FILTER_MIN=90 WORKING.** Blocking worst hotset bucket (85-95 conf 33.3%WR -$0.63).
-- **🟡 pump-chain- SHORT EXTREME DEGRADING.** 14d: 43T 51.2%WR +$0.15 (0.91:1 R:R). Was 56.3%WR +$0.66 before CASHCAT losses. PUMP_CHAIN_SHORT_RSI_MIN=25 applied today — monitor 48h.
-- **🟡 HOTSET RSI CEILING GAP.** 8 trades/7d RSI>70, 25%WR -$0.68. USUAL rs-s129 RSI=81.82 LONG -$0.23. Hotset code path bypasses RSI ceiling check when signal_metadata is empty.
-- **🟢 doji-bottom-long 11T 63.6%WR +$0.36/14d.** All profit-monster-trail. Monitor at 20+ trades.
-- **🟢 volume-breakout-long+ 20T 70%WR +$2.48/14d.** Best signal. 100%WR 24h.
-- **7d REGIME:** EXTREME -$1.18 (71T 46.5%), HIGH -$0.91 (29T 37.9%), NORMAL -$0.05 (26T 42.3%).
-- **LOSING AUTOPSY:** 19 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT pre-blacklist), 9 hotset rs-s* (normal chop), 2 bb-bounce-v2-long+ (profit-monster-trail scratches), 1 continuum-osc+ (cut-loser-MAE-GUARD).
-- **CREATIVE (3):** (1) Hotset RSI ceiling enforcement (+$0.30-0.50/7d) (2) Monitor doji-bottom-long at 20+ trades (3) Hotset EXTREME RSI_MIN=45.
+- **🟢 24h 36T 41.7%WR -$0.43.** volume-breakout-long+ 2T 100%WR +$1.02 (best). pump-chain- SHORT 11T 36.4%WR -$0.51 (drag). doji-bottom-long 4T 75%WR +$0.12 (promising).
+- **🟢 EXEC-TIME RSI CEILING FIX DEPLOYED 06:30 UTC.** daily_orchestrator applied. 4 hotset trades entered LONG RSI>70 in 7d (2/4 losers: rs-s52 -$0.20, rs-s94 -$0.07). Now blocks at execution time. Expected +$0.30-0.50/7d. Monitor 24h.
+- **🟡 HOTSET RSI 30-50 BAND WORST.** 7d: 11T 27.3%WR -$0.53. Oversold LONG entries = catching falling knives. Winners from RSI 50-65 (breakeven) and 65-75 (100%WR). SUGGESTED: HOTSET_RSI_FLOOR_EXTREME=45 to block in EXTREME only.
+- **🟢 POST-FIX STABLE.** 57T 52.6%WR +$0.11 (0 ATR_SL hits). System slightly positive.
+- **🟢 CASHCAT BLACKLIST WORKING.** 0 post-blacklist trades.
+- **🟢 PUMP_CHAIN_SHORT_HIGH_BLOCK WORKING.** 0 pump-chain- SHORT HIGH since Sep 29 07:30.
+- **🟡 pump-chain- SHORT EXTREME DEGRADING.** 14d: 43T 51.2%WR +$0.15 (0.91:1 R:R). BARELY profitable. PUMP_CHAIN_SHORT_RSI_MIN=25 applied — monitor 48h.
+- **🟢 LONG RSI SWEET SPOT CONFIRMED.** 49T 61.2%WR +$2.32/14d in RSI 50-60.
+- **🟢 doji-bottom-long 11T 63.6%WR +$0.36/14d.** HIGH regime 83.3%WR. Monitor at 20+ trades.
+- **🟢 volume-breakout-long+ 20T 70%WR +$2.48/14d.** Best signal.
+- **🟡 SIGNAL DIVERSITY CRITICAL.** Only 4 signals profitable with 5+ trades/14d. volume-breakout-long+ (+$2.48), pump-chain+ (+$1.23), doji-bottom-long (+$0.36), grind-trend+ (+$0.24).
+- **7d REGIME:** EXTREME -$1.18 (71T 46.5%), HIGH -$0.98 (28T 35.7%), NORMAL -$0.05 (26T 42.3%).
+- **LOSING AUTOPSY:** 19 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT pre-blacklist + normal chop), 9 hotset LONG (RSI 30-60 chop), 2 bb-bounce-v2-long+ (scratches), 1 continuum-osc+ (MAE guard).
+- **CREATIVE (3):** (1) Monitor exec-time RSI ceiling fix 24h (2) SUGGESTED: HOTSET RSI 30-50 FLOOR in EXTREME (+$0.20-0.40/7d) (3) Monitor doji-bottom-long at 20+ trades.
 - **0 CHANGES APPLIED.** — brain_auditor
 
 ## Orchestrator Report (2026-09-30 06:30 UTC)

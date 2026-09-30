@@ -3455,3 +3455,28 @@
   CREATIVE: (1) pump-chain- RSI_MIN=30 signal_compactor (2) doji monitor (3) hotset RSI ceiling investigation.
   0 CHANGES APPLIED.
   BY: brain_auditor
+
+[2026-09-30 07:38 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 36T 41.7%WR -$0.43 (24h) | 127T 42.5%WR -$2.21 (7d) | 317T 44.5%WR -$2.35 (14d).
+  POST-FIX: 57T 52.6%WR +$0.11 (0 ATR_SL hits).
+  EXEC-TIME RSI CEILING FIX DEPLOYED 06:30 UTC — monitor 24h.
+  HOTSET RSI 30-50 BAND WORST: 11T 27.3%WR -$0.53.
+  SIGNAL DIVERSITY CRITICAL: 4 profitable signals/14d.
+  CREATIVE: (1) Monitor exec-time fix (2) SUGGESTED hotset RSI floor EXTREME (3) Monitor doji-bottom-long.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
+
+
+- [2026-09-30 08:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 36T 41.7%WR -$0.43 (24h) | 126T ~43%WR -$2.17 (7d) | 317T 44.5%WR -$2.35 (14d).
+  POST-FIX: 57T 52.6%WR +$0.11 (0 ATR_SL hits). System stable.
+  **DRIFT: PUMP_CHAIN_SHORT_RSI_MIN=25 IS DEAD CODE** — signal_compactor.py:2740 reads row[8] which is always NULL for pump-chain- signals. Filter never fires. CEO deployed to block oversold SHORT entries but implementation reads wrong column.
+  **HOTSET RSI NULL** — 31/31 hotset trades 14d have NULL signal_rsi_14. Detection-time RSI filtering impossible. Exec-time fix deployed 06:30 UTC today should catch this.
+  **HOTSET CONFIDENCE INVERSE** — 85-90 conf 9T 44.4%WR -$0.57 (worst). 95+ conf 17T 41.2%WR -$0.39. CONF_FILTER_MIN=90 working.
+  **doji-bottom-long 11T 63.6%WR +$0.36/14d** — promising, monitor at 20+ trades.
+  **volume-breakout-long+ 20T 70%WR +$2.48/14d** — best signal.
+  **7d REGIME:** EXTREME -$1.18 (71T), HIGH -$0.94 (27T), NORMAL -$0.05 (26T).
+  **7d EXIT:** profit-monster-trail 49T 53.1%WR +$1.47 (best). atr_sl_hit 25T -$2.42 (legacy aging out).
+  **LOSING AUTOPSY:** 18 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT/oversold, blacklist working), 9 hotset rs-s* chop (normal), 2 mover- killed (aging out).
+  **CREATIVE (3):** (1) Fix PUMP_CHAIN_SHORT_RSI_MIN row[8] bug (dead code) (+$0.20-0.40/7d) (2) Monitor doji-bottom-long 20+ trades (3) Verify exec-time RSI ceiling fix.
+  **0 CHANGES APPLIED.** — brain_auditor

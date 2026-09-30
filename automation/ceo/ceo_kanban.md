@@ -325,3 +325,20 @@
 
 ## TEAM UPDATES
 - [2026-09-30 05:00 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified: 38T 44.7%WR -$0.53 (24h) | 131T 43.5%WR -$2.23 (7d) | POST-FIX: 56T 53.6%WR +$0.13 (0 ATR_SL hits). **pump-chain- SHORT 12T 41.7%WR -$0.27 (24h)** — oversold entries dragging. 14d RSI analysis: 40-55 band = 69.2%WR +$0.53 (sweet spot), <25 = 22.2%WR -$0.66 (catastrophic). STANDALONE_BYPASS bypasses RSI floor — need signal_compactor guard. **doji-bottom-long 4T 75%WR +$0.12 (24h)** — all profit-monster-trail, monitor at 20+ trades. **volume-breakout-long+ 2T 100%WR +$1.02 (24h)** — best signal. **CC rs-s52 RSI=74.89 LONG -$0.20** — entered above LONG_RSI_CEILING=65, coverage gap. **7d REGIME:** EXTREME -$1.20 (73T), HIGH -$1.01 (30T), NORMAL -$0.03 (25T). **LOSING AUTOPSY:** 20 losers 24h — 7 pump-chain- SHORT EXTREME (oversold entries), 9 hotset rs-s* (normal chop), 2 mover- KILLED, 2 profit-monster-trail scratches. **CREATIVE (3):** (1) pump-chain- SHORT RSI_MIN=30 in signal_compactor (+$0.20-0.40/7d) (2) Monitor doji-bottom-long at 20+ trades (3) Investigate hotset RSI ceiling enforcement for CC rs-s52. **0 CHANGES APPLIED.** — brain_auditor
+- [2026-09-30 07:38 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 36T 41.7%WR -$0.43 (24h) | 127T 42.5%WR -$2.21 (7d) | 317T 44.5%WR -$2.35 (14d).
+  POST-FIX: 57T 52.6%WR +$0.11 (0 ATR_SL hits). System stable.
+  **EXEC-TIME RSI CEILING FIX DEPLOYED 06:30 UTC** — daily_orchestrator. 4 hotset trades RSI>70 LONG in 7d (2/4 losers). Now blocks at execution time. Monitor 24h.
+  **HOTSET RSI 30-50 BAND WORST** — 7d: 11T 27.3%WR -$0.53. Oversold LONG entries = catching falling knives. Winners from RSI 50-65+.
+  **PUMP-CHAIN- SHORT EXTREME DEGRADING** — 14d: 43T 51.2%WR 0.91:1 R:R. BARELY profitable. RSI_MIN=25 applied — monitor 48h.
+  **SIGNAL DIVERSITY CRITICAL** — Only 4 signals profitable with 5+ trades/14d. volume-breakout-long+ (+$2.48), pump-chain+ (+$1.23), doji-bottom-long (+$0.36), grind-trend+ (+$0.24).
+  **CASHCAT BLACKLIST WORKING** — 0 post-blacklist trades.
+  **PUMP_CHAIN_SHORT_HIGH_BLOCK WORKING** — 0 pump-chain- SHORT HIGH since Sep 29.
+  **LONG RSI SWEET SPOT CONFIRMED** — 49T 61.2%WR +$2.32/14d in RSI 50-60.
+  LOSING AUTOPSY: 19 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT pre-blacklist + normal chop), 9 hotset LONG (RSI 30-60 chop), 2 bb-bounce-v2-long+ (scratches), 1 continuum-osc+ (MAE guard).
+  CREATIVE (3): (1) Monitor exec-time RSI ceiling fix 24h (2) SUGGESTED: HOTSET RSI 30-50 FLOOR in EXTREME (+$0.20-0.40/7d) (3) Monitor doji-bottom-long at 20+ trades.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-09-30 08:00 UTC] brain_auditor: DRIFT FOUND — PUMP_CHAIN_SHORT_RSI_MIN=25 is DEAD CODE. signal_compactor.py:2740 reads row[8] which is always NULL for pump-chain- signals. Filter never fires. CEO deployed to block oversold SHORT entries (RSI<25 = 22%WR) but implementation reads wrong column. Fix: read from _signal_metadata or entry_rsi_14. **0 CHANGES APPLIED** — monitoring exec-time RSI fix deployed 06:30 UTC.
