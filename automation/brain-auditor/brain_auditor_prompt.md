@@ -190,7 +190,7 @@ price_db = sqlite3.connect('/root/.hermes/data/prices.db')
 }
 ```
 
-## Step 5b: Signal Quality Deep-Dive (EVERY RUN)
+## Step 5c: Signal Quality Deep-Dive (EVERY RUN)
 
 **Focus on making signals BETTER, not blocking times.**
 
