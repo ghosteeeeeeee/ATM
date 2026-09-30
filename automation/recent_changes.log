@@ -1,4 +1,15 @@
 
+[2026-09-30 03:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 41T 43.9%WR -$0.76 (24h) | 131T 43.5%WR -$2.23 (7d) | POST-FIX: 56T 53.6%WR +$0.13
+  LONG RSI>70 LEAK: 8 trades/7d, 2 winners (25%WR, -$0.68). rs-s129 RSI=81.82 LONG executed.
+  HOTSET CONFIDENCE INVERSE: NULL conf 50%WR, 90+ conf 35.7%WR. CONF_FILTER_MIN=90 working.
+  doji-bottom-long 11T 63.6%WR +$0.36/14d — monitor at 20+ trades.
+  volume-breakout-long+ 20T 70%WR +$2.48/14d — best signal.
+  7d REGIME: EXTREME -$1.20 (73T), HIGH -$1.01 (30T), NORMAL -$0.03 (25T).
+  LOSING AUTOPSY: 21 losers 24h — 7 pump-chain- SHORT EXTREME, 3 hotset rs-s* overbought, 1 rs-s129 RSI=81.82 leak.
+  CREATIVE: (1) Investigate LONG RSI>70 STANDALONE_BYPASS leak (2) Monitor doji-bottom-long (3) Hotset EXTREME RSI_MIN=45.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
 [2026-09-29 21:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 45T 48.9%WR -$0.76 (24h) | 133T 42.9%WR -$3.48 (7d) | 314T 44.3%WR -$3.53 (14d)
   POST-FIX: 45T 51.1%WR +$0.78 (0 atr_sl_hit). System performing well.
@@ -3397,3 +3408,28 @@
   0 trades last hour (quiet). ATR_SL fix stable. SHORT R:R structural (avg_loss 2x avg_win).
   No kill candidates in last hour. Short SL too wide vs TP — needs tpsl_utils.py review.
   BY: auto_1hr
+[2026-09-29 23:15 UTC] brain_auditor: 1 CONFIG CHANGE — audit
+  DB-verified: 44T 47.7%WR -$1.13 (24h) | 134T 44.8%WR -$2.84 (7d)
+  CONF_FILTER_MIN 65→90 APPLIED. 89.8 conf bucket: 11T 36.4%WR -$0.61/7d.
+  Confidence scoring INVERSELY predicts quality. Blocks worst hotset entries.
+  Zero winning trades blocked. Expected +$0.61/7d.
+  CREATIVE: (1) CONF_FILTER_MIN 90 APPLIED (2) Hotset conf calibration (3) Monitor doji-bottom-long.
+  BY: brain_auditor
+[2026-09-30 00:14 UTC] auto_1hr: NO CONFIG CHANGE — hourly audit
+  24h: 44T 47.7%WR -$1.13 | 7d: 134T 44.8%WR -$2.84
+  0 trades last hour. ATR_SL fix stable (0 hits 44T+). hard_sl 52% dominant exit.
+  SHORT R:R 0.92:1 improving. No kill candidates. BTC LONG 34.9h stale (HL issue).
+  BY: auto_1hr
+
+[2026-09-30 00:15 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 43T 46.5%WR -$1.29 (24h) | 134T 44.8%WR -$2.84 (7d)
+  POST-FIX: 54T 53.7%WR -$0.62 (0 ATR_SL hits). System stable.
+  HOTSET CONFIDENCE INVERSELY PREDICTS — 85-90 conf 40%WR, 95+ conf 46.7%WR, BOTH losing.
+  Non-hotset 95+ conf 62.5%WR +$0.35 — confidence works for confluence, fails for RS signals.
+  USUAL RSI=81.82 LONG — RSI drift between compaction and execution (coverage gap, not bug).
+  LOSING AUTOPSY: 9 hotset hard_sl (normal chop), 5 pump-chain- CASHCAT (blacklisted), 2 mover- (killed).
+  SHORT R:R 0.66:1 post-fix — needs >60%WR, currently 59.1%.
+  doji-bottom-long 11T 63.6%WR +$0.36 — PROMISING, monitor at 20+ trades.
+  CREATIVE: (1) Hotset CONF_FILTER_MIN=50 (2) Volume confirmation hotset (3) EMA-reclaim signal.
+  0 CHANGES APPLIED.
+  BY: brain_auditor

@@ -1,168 +1,103 @@
 {
-  "timestamp": "2026-09-29T20:32:00Z",
-  "session_brain_stats": {
-    "top_insight": "Hotset rs-s* signals dominate losses (30T/7d 40%WR -$0.72). All fire at 85+ confidence but deliver only 40% WR. Confidence scoring for hotset is inflated.",
-    "recurring_themes": [
-      "SHORT structural disadvantage (avg_win 0.74x avg_loss)",
-      "pump-chain+ cold streak 7d",
-      "signal diversity critical (2 signals carry PnL)",
-      "hotset rs-s* bleed"
+    "timestamp": "2026-09-30T03:35:00Z",
+    "session_brain_stats": {
+        "top_insight": "Session brain shows recurring discussion of SHORT R:R structural disadvantage and hotset confidence scoring inversion",
+        "signal_performance_topic": "Multiple sessions confirm volume-breakout-long+ and pump-chain+ are only profitable signals",
+        "improvement_ideas": ["trend following signal", "EMA-reclaim for NEUTRAL", "wave period analysis"],
+        "recurring_loss_patterns": ["SHORT in EXTREME whipsaw", "hotset rs-s* overbought entries", "pump-chain- CASHCAT catch falling knife"]
+    },
+    "trade_summary_24h": {
+        "trades": 41,
+        "wr": 43.9,
+        "pnl": -0.76,
+        "post_fix_56t": {"trades": 56, "wr": 53.6, "pnl": 0.13},
+        "regime_7d": {
+            "EXTREME": {"trades": 73, "wr": 46.6, "pnl": -1.20},
+            "HIGH": {"trades": 30, "wr": 36.7, "pnl": -1.01},
+            "NORMAL": {"trades": 25, "wr": 44.0, "pnl": -0.03},
+            "FLAT": {"trades": 2, "wr": 50.0, "pnl": 0.01}
+        },
+        "top_signals_14d": {
+            "volume-breakout-long+": {"trades": 20, "wr": 70.0, "pnl": 2.48},
+            "pump-chain+": {"trades": 55, "wr": 41.8, "pnl": 1.23},
+            "doji-bottom-long": {"trades": 11, "wr": 63.6, "pnl": 0.36},
+            "pullback-entry-": {"trades": 40, "wr": 32.5, "pnl": -2.83}
+        }
+    },
+    "drift_findings": [
+        {
+            "issue": "LONG_RSI_CEILING check may not catch STANDALONE_BYPASS trades",
+            "evidence": "rs-s129 LONG RSI=81.82 executed at 15:17 UTC Sep 29 when LONG_RSI_CEILING=70. 8 trades with RSI>70 in 7d, only 2 winners (25% WR, -$0.68). Check exists at decider_run.py:1061-1067 but may not fire when signal_metadata is empty at execution time.",
+            "impact": "Overbought LONG entries losing $0.68/7d",
+            "status": "needs_investigation"
+        },
+        {
+            "issue": "Hotset confidence scoring INVERSELY predicts quality",
+            "evidence": "NULL conf: 6T 50%WR +$0.18. 80-90 conf: 11T 36.4%WR -$0.61. 90+ conf: 14T 35.7%WR -$0.51. Higher confidence = WORSE performance.",
+            "impact": "CONF_FILTER_MIN=90 blocks worst bucket, but scoring itself is broken",
+            "status": "known_issue_monitoring"
+        }
+    ],
+    "recurring_problems": [
+        {
+            "topic": "SHORT R:R structural disadvantage",
+            "occurrences": "Every audit for 7+ days",
+            "data": "avg_win $0.11 vs avg_loss $0.16 = 0.73:1 R:R. Needs >57% WR to break even.",
+            "status": "structural — no config fix without trade-off"
+        },
+        {
+            "topic": "Signal diversity critical",
+            "occurrences": "Every audit for 14+ days",
+            "data": "Only volume-breakout-long+ (+$2.48) and pump-chain+ (+$1.23) profitable. 2 signals carry all PnL.",
+            "status": "doji-bottom-long emerging (11T 63.6%WR +$0.36)"
+        },
+        {
+            "topic": "EXTREME regime bleeding",
+            "occurrences": "Every audit for 7+ days",
+            "data": "73T -$1.20/7d. pump-chain- SHORT 37T +$0.53 but hotset rs-s* 14T -$0.53 cancels it out.",
+            "status": "hotset drag in EXTREME is the real issue"
+        }
+    ],
+    "missing_implementations": [
+        "doji-bottom-long needs 20+ trades for eval (currently 11T)",
+        "COIN_TRACKER_HOT_PLUS_ENABLED needs human approval (CEO code fix Sep 29)",
+        "pump-chain+ cold streak recovery (0 trades/7d, 14d still +$1.23)"
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-30T03:35:00Z",
+            "idea": "Add execution-time RSI guard for STANDALONE_BYPASS LONG trades at RSI>70",
+            "rationale": "8 LONG trades with RSI>70 in 7d: only 2 winners (25% WR, -$0.68). These bypass signal_compactor RSI checks. Adding a guard in decider_run.py execution path blocks overbought entries. The check exists at line 1061 but may not fire when signal_metadata is empty.",
+            "expected_impact": "+$0.50-0.70/7d (blocks 6 losers, kills 2 small winners)",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "impact_on_winners": "Would block 2 of 8 RSI>70 LONG winners in 7d. Winners were $0.02 and $0.05 (tiny). Losers avg -$0.17."
+        },
+        {
+            "date": "2026-09-30T03:35:00Z",
+            "idea": "Monitor doji-bottom-long at 20+ trades — currently 63.6%WR +$0.36/14d",
+            "rationale": "11 trades, all profit-monster-trail exits. Entries at RSI 14-55 (oversold bounces). 75%WR in 24h. Signal catches reversals well. Needs 20+ trades for statistical significance.",
+            "expected_impact": " potential +$0.30-0.50/7d if quality holds",
+            "category": "signal quality",
+            "status": "monitoring",
+            "risk": "low"
+        },
+        {
+            "date": "2026-09-30T03:35:00Z",
+            "idea": "Investigate hotset rs-s* EXTREME bleed — 14T/7d 42.9%WR -$0.53 cancels pump-chain- EXTREME profit",
+            "rationale": "pump-chain- SHORT EXTREME: 37T 54.1%WR +$0.53. hotset rs-s* EXTREME: 14T 42.9%WR -$0.53. Net = $0.00. The hotset completely negates the best SHORT signal's edge. Adding RSI_MIN=45 for hotset LONG in EXTREME could preserve pump-chain- edge while cutting hotset noise.",
+            "expected_impact": "+$0.30-0.50/7d (if hotset EXTREME RSI_MIN blocks losers without killing winners)",
+            "category": "regime filter",
+            "status": "suggested",
+            "risk": "medium — needs 14d sample verification"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Verify LONG_RSI_CEILING guard fires for STANDALONE_BYPASS trades (investigate signal_metadata timing)",
+        "Monitor doji-bottom-long at 20+ trades",
+        "Monitor COIN_TRACKER_HOT_PLUS_ENABLED re-enablement (CEO code fix pending)",
+        "Monitor pump-chain+ cold streak recovery (dead hours fix deployed Sep 29)"
     ]
-  },
-  "trade_summary_24h": {
-    "trades": 48,
-    "win_rate": 50.0,
-    "pnl": -0.93,
-    "post_fix": "53T 54.7%WR -$0.60 (0 ATR_SL hits)",
-    "best_signal": "pump-chain- SHORT 15T 60%WR +$0.59",
-    "worst_source": "hotset rs-s* 19T 31.6%WR -$1.09 (8 hard_sl)"
-  },
-  "trade_summary_7d": {
-    "trades": 137,
-    "win_rate": 43.8,
-    "pnl": -3.51,
-    "atr_sl_hits": "33/137 (24.1%) — improved from 49.2% pre-fix",
-    "post_fix_atr_sl": "0/53 (0%)",
-    "regime": "EXTREME -$2.65 (76T), HIGH -$0.86 (34T), NORMAL -$0.01 (24T)"
-  },
-  "trade_summary_14d": {
-    "trades": 318,
-    "win_rate": 44.7,
-    "pnl": -3.56,
-    "long_short": "LONG +$0.70 (190T 46.3%), SHORT -$4.26 (128T 42.2%)",
-    "best_signals": "volume-breakout-long+ +$1.54 (19T 68.4%), pump-chain+ +$1.23 (55T 41.8%)",
-    "short_rr": "0.74:1 (avg_win $0.110 vs avg_loss $0.150)"
-  },
-  "drift_findings": [
-    {
-      "item": "CASHCAT SHORT blacklist",
-      "status": "WORKING",
-      "detail": "0 trades after 19:30 UTC blacklist application. All3 recent trades were before blacklist. No leak."
-    },
-    {
-      "item": "ATR_SL widening",
-      "status": "VERIFIED WORKING",
-      "detail": "0/53 post-fix ATR_SL hits. 7d: 24.1% (down from 49.2%). All exits profit-monster-trail."
-    },
-    {
-      "item": "hotset rs-s* confidence",
-      "status": "INFLATED",
-      "detail": "All 30 trades fire at 85+ confidence but deliver only 40% WR. USUAL entry at RSI=81.82 (extreme overbought) resulted in -$0.23 loss. No RSI ceiling filter on hotset signals."
-    },
-    {
-      "item": "pump-chain+ cold streak",
-      "status": "PERSISTING",
-      "detail": "0 trades/7d. Last trade Sep 22 08:27. NEUTRAL + BTC guard + dead hours block all setups. 14d still +$1.23 (#2 profitable)."
-    },
-    {
-      "item": "SHORT structural disadvantage",
-      "status": "PERSISTING",
-      "detail": "avg_win $0.110 vs avg_loss $0.150 (0.74:1). Needs >57% WR to break even. Currently 42.2%. SHORT -$4.26/14d = 120% of total losses."
-    }
-  ],
-  "recurring_problems": [
-    "hotset rs-s* LONG bleed — 30T/7d 40%WR -$0.72. 8 hard_sl in 24h. Dominant loss source. Normal chop in NEUTRAL, but inflated confidence (85+) masks poor entry quality.",
-    "SHORT structural disadvantage — 0.74:1 R:R persists. All SHORT signals need >57% WR to break even. Currently 42.2%.",
-    "Signal diversity — only 2 signal types profitable (volume-breakout-long+ + pump-chain+). 30+ signal types but only 2 net positive.",
-    "pump-chain+ cold streak — 7d 0 trades. Was #2 profitable. Dead hours + NEUTRAL + BTC guard = no setups."
-  ],
-  "missing_implementations": [
-    "Hotset RSI ceiling filter — hotset signals fire at RSI 81.82 (USUAL) with no overbought guard. Adding RSI_MAX=75 for hotset LONG entries would block worst entries.",
-    "Hotset confidence recalibration — 85+ confidence delivering 40% WR suggests scoring is too generous for hotset signals.",
-    "New NEUTRAL regime signal — system needs diversity. Only volume-breakout-long+ profitable in NEUTRAL."
-  ],
-  "losing_trade_autopsy": [
-    {
-      "cluster": "hotset rs-s* LONG (8 trades, 24h)",
-      "total_loss": -1.09,
-      "exit_reason": "All hard_sl (normal chop)",
-      "rsi_range": "27-82 (wide spread, no pattern)",
-      "regime": "EXTREME (5), NORMAL (2), HIGH (1)",
-      "root_cause": "Normal market chop. Small losses (<$0.23 each). No systematic entry quality issue — just NEUTRAL regime noise.",
-      "recommended_change": "None — these are expected losses in choppy markets. Reducing position size or adding regime-specific confidence floor would help but sample too small (30T).",
-      "confidence": "LOW"
-    },
-    {
-      "cluster": "pump-chain- SHORT (5 trades, 24h)",
-      "total_loss": -1.26,
-      "exit_reason": "All hard_sl",
-      "root_cause": "CASHCAT double (-$0.68) already blacklisted. DYDX/CHIP/BABY/GOAT normal variance in EXTREME.",
-      "recommended_change": "CASHCAT blacklist APPLIED and WORKING. No further action.",
-      "confidence": "HIGH"
-    },
-    {
-      "cluster": "mover- SHORT (2 trades, 24h)",
-      "total_loss": -0.68,
-      "exit_reason": "All hard_sl",
-      "root_cause": "Legacy trades aging out post-kill (MOVER_MINUS_ENABLED=False).",
-      "recommended_change": "None — kill working, aging out.",
-      "confidence": "HIGH"
-    }
-  ],
-  "signal_quality_deep_dive": [
-    {
-      "signal": "hotset rs-s* LONG",
-      "trades_7d": 30,
-      "win_rate": 40.0,
-      "pnl": -0.72,
-      "hard_sl_count": 8,
-      "confidence": "All 85+",
-      "analysis": "Inflated confidence. 85+ confidence delivering 40% WR. USUAL entry RSI=81.82 (extreme overbought) = -/usr/bin/bash.23. No RSI ceiling filter on hotset signals. In choppy NEUTRAL, these are normal losses — but confidence scoring should reflect actual WR, not signal optimism.",
-      "recommendation": "Monitor — hotset signals are designed for high-frequency trading in NEUTRAL. Losses are small and expected. Confidence recalibration would be a code change (not config)."
-    },
-    {
-      "signal": "doji-bottom-long",
-      "trades_7d": 6,
-      "win_rate": 66.7,
-      "pnl": 0.27,
-      "analysis": "NEW signal. 6 trades, all profit-monster-trail exits. 3 winners (WLFI +/usr/bin/bash.16, GMX +/usr/bin/bash.07, NXPC +/usr/bin/bash.03), 2 breakeven (SOL /usr/bin/bash.00, NEO +/usr/bin/bash.02), 1 tiny loser (CAKE -/usr/bin/bash.01). Consistent small wins. 2 trades still open (GMX HIGH, NXPC NORMAL).",
-      "recommendation": "MONITOR. Sample too small (6T). Needs 20+ trades to evaluate. Currently promising."
-    },
-    {
-      "signal": "pump-chain- SHORT",
-      "trades_7d": 43,
-      "win_rate": 53.5,
-      "pnl": 0.18,
-      "analysis": "BEST SHORT signal. EXTREME profitable (+/usr/bin/bash.52/14d). 43T/7d barely positive. CASHCAT blacklist should improve. R:R still structural (0.74:1) — needs >57% WR.",
-      "recommendation": "CASHCAT blacklist APPLIED. Monitor for improvement. Consider EXTREME-only filter if HIGH continues losing."
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-09-29T20:32:00Z",
-      "idea": "Hotset RSI ceiling filter — block hotset LONG entries when RSI > 75",
-      "rationale": "USUAL entry at RSI=81.82 resulted in -/usr/bin/bash.23 loss. Hotset signals have no RSI ceiling filter. Adding RSI_MAX=75 for hotset LONG entries would block extreme overbought entries without affecting normal entries (most losers have RSI 30-65).",
-      "expected_impact": "+/usr/bin/bash.05-0.15/7d (blocks ~1-2 worst entries)",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-29T20:32:00Z",
-      "idea": "Monitor doji-bottom-long signal quality — track for 20+ trades before tuning",
-      "rationale": "6T 66.7%WR +/usr/bin/bash.27/7d. All profit-monster-trail exits. Consistent small wins. Needs 20+ trades to evaluate statistical significance. Could be new diversity source.",
-      "expected_impact": "TBD (monitor)",
-      "category": "new signal",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-09-29T20:32:00Z",
-      "idea": "SHORT risk-reward structural improvement — investigate ATR_TP_K_MULT impact on SHORT R:R",
-      "rationale": "SHORT R:R 0.74:1 persists (avg_win /usr/bin/bash.110 vs avg_loss /usr/bin/bash.150). ATR_TP_K_MULT was raised to 2.0 by CEO on Sep 29. Needs 48h monitoring to evaluate impact on SHORT R:R.",
-      "expected_impact": "+/usr/bin/bash.20-0.50/7d if R:R improves to 0.85:1",
-      "category": "R:R improvement",
-      "status": "monitoring",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "Monitor ATR_TP_K_MULT=2.0 impact on SHORT R:R (48h)",
-    "Monitor doji-bottom-long signal quality (needs 20+ trades)",
-    "Monitor pump-chain+ cold streak recovery (dead hours updated Sep 29)",
-    "Monitor hotset rs-s* bleed (30T/7d 40%WR -/usr/bin/bash.72)",
-    "Verify CASHCAT blacklist holds (0 post-blacklist trades so far)",
-    "Hotset RSI ceiling filter — suggested for next run if USUAL-like entries continue"
-  ]
 }

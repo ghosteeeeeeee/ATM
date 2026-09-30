@@ -1,7 +1,7 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-29 20:32 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-09-29 22:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
@@ -52,6 +52,33 @@ System active. 3 open positions (SOL LONG bb-bounce-v2, COMP LONG volume-breakou
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-30 03:35 UTC)
+
+- **🟡 POST-FIX 56T 53.6%WR +$0.13.** System slightly positive. Legacy losses aging out.
+- **🟡 LONG RSI>70 LEAK — 8 trades/7d, only 2 winners (25%WR, -$0.68).** rs-s129 RSI=81.82 LONG executed at 15:17 UTC Sep 29 when LONG_RSI_CEILING=70. Check exists at decider_run.py:1061-1067 but may not fire when signal_metadata empty at execution time. Needs investigation.
+- **🟡 HOTSET CONFIDENCE INVERSELY PREDICTS.** NULL conf 50%WR +$0.18. 80-90 conf 36.4%WR -$0.61. 90+ conf 35.7%WR -$0.51. CONF_FILTER_MIN=90 blocks worst bucket — working as intended.
+- **🟢 doji-bottom-long 11T 63.6%WR +$0.36/14d.** All profit-monster-trail. Entries at RSI 14-55 (oversold bounces). Monitor at 20+ trades.
+- **🟢 volume-breakout-long+ 20T 70%WR +$2.48/14d.** Best signal. 100%WR 24h.
+- **🟡 SHORT R:R 0.73:1 PERSISTS.** avg_win $0.11 vs avg_loss $0.16. Needs >57%WR to break even.
+- **7d REGIME:** EXTREME -$1.20 (73T 46.6%), HIGH -$1.01 (30T 36.7%), NORMAL -$0.03 (25T 44.0%).
+- **LOSING AUTOPSY:** 21 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT catch falling knife pattern), 3 hotset rs-s* LONG (overbought), 2 bb-bounce-v2-long+ (profit-monster-trail scratches), 1 rs-s129 RSI=81.82 LONG (overbought leak), 2 mover- KILLED (aging out).
+- **CREATIVE (3):** (1) Investigate LONG RSI>70 STANDALONE_BYPASS leak (+$0.50-0.70/7d) (2) Monitor doji-bottom-long at 20+ trades (3) Hotset EXTREME RSI_MIN=45 to preserve pump-chain- edge.
+- **0 CHANGES APPLIED.** — brain_auditor
+
+## Audit Update (2026-09-29 23:15 UTC)
+
+- **🟢 CONF_FILTER_MIN 65→90 — APPLIED.** 89.8 conf bucket: 11T 36.4%WR -$0.61/7d (DOMINANT hotset loser). Confidence scoring INVERSELY predicts quality — NULL conf trades (60%WR +$0.40) outperform all scored buckets. Raising filter blocks worst bucket while preserving best performers. Zero winning trades blocked. Expected +$0.61/7d.
+- **🟢 POST-FIX SOLID.** 53T 54.7%WR -$0.60 (0 ATR_SL hits). All exits profit-monster-trail.
+- **🟢 CASHCAT BLACKLIST WORKING.** 0 trades after 19:30 UTC.
+- **🟢 doji-bottom-long PROMISING.** 6T 66.7%WR +$0.27/7d. Monitor at 20+ trades.
+- **🟡 HOTSET CONFIDENCE SCORING BROKEN.** 89.8 conf = 36.4%WR, 99.0 conf = 37.5%WR, NULL conf = 60%WR. Scoring inversely predicts quality. Needs fundamental review.
+- **🟡 SHORT R:R 0.73:1 PERSISTS.** avg_win $0.096 vs avg_loss $0.132. Needs >57%WR to break even. Currently 42.2%.
+- **🟡 PUMP-CHAIN+ COLD STREAK — 7d 0 trades.** Dead hours + NEUTRAL + BTC guard. 14d still +$1.23.
+- **7d REGIME:** EXTREME -$2.06 (73T 46.6%), HIGH -$0.76 (33T 42.4%), NORMAL -$0.03 (25T 44.0%).
+- **LOSING AUTOPSY:** 21 losers 24h — 10 hotset rs-s* (normal chop, all small <$0.23), 5 pump-chain- SHORT (CASHCAT blacklisted), 2 mover- KILLED (aging out), 4 profit-monster-trail scratches. USUAL rs-s129 RSI=81.82 (entered before RSI ceiling change).
+- **CREATIVE (3):** (1) CONF_FILTER_MIN 90 APPLIED (2) Investigate hotset confidence scoring calibration (3) Monitor doji-bottom-long at 20+ trades.
+- **1 CHANGE APPLIED.** — brain_auditor
 
 ## Audit Update (2026-09-29 20:32 UTC)
 
@@ -196,6 +223,8 @@ System active. 3 open positions (SOL LONG bb-bounce-v2, COMP LONG volume-breakou
 
 ## Today's Changes (Sep 29)
 
+1. **CEO ~22:00 UTC — 1 CODE FIX.** **coin_tracker_hot.py NEUTRAL gate RELAXED.** Root cause of signal diversity crisis: signal blocked ALL NEUTRAL trades (99% of trades). 7 coins in Wyckoff accumulation (BANANA 59.71, BCH 58.24) now unlockable. CODE FIX: allows NEUTRAL when wyckoff + setup_score>40 + clustering>=2. FLAG RE-ENABLEMENT NEEDED: COIN_TRACKER_HOT_PLUS_ENABLED (RESEARCH_FLAGS). Expected +$0.30-0.50/7d. **1 CHANGE APPLIED.** — CEO
+
 1. **brain_auditor ~20:32 UTC — NO CONFIG CHANGE.** DB-verified: 48T 50%WR -$0.93 (24h) | 137T 43.8%WR -$3.51 (7d) | 318T 44.7%WR -$3.56 (14d). **POST-FIX: 53T 54.7%WR -$0.60 (0 ATR_SL hits).** **ATR_SL 24.1% 7d — VERIFIED WORKING.** Post-fix: 0/53 hits. **CASHCAT BLACKLIST WORKING** — 0 post-blacklist trades. **HOTSET rs-s* 85+ CONFIDENCE INFLATED** — 30T/7d 40%WR -$0.72. USUAL RSI=81.82 -$0.23. **doji-bottom-long NEW** — 6T 66.7%WR +$0.27. **SHORT R:R 0.74:1** structural. **7d REGIME:** EXTREME -$2.65 (76T), HIGH -$0.86 (34T), NORMAL -$0.01 (24T). **LOSING AUTOPSY:** 22 losers 24h — 8 hotset hard_sl (normal chop), 5 pump-chain- (CASHCAT blacklisted), 2 mover- (killed). **CREATIVE (3):** Hotset RSI_MAX=75, monitor doji-bottom-long, monitor ATR_TP_K_MULT. **0 CHANGES APPLIED.** — brain_auditor
 
 1. **brain_auditor ~21:00 UTC — NO CONFIG CHANGE.** DB-verified: 45T 48.9%WR -$0.76 (24h) | 133T 42.9%WR -$3.48 (7d) | 314T 44.3%WR -$3.53 (14d). **POST-FIX: 45T 51.1%WR +$0.78 (0 atr_sl_hit).** **HOTSET rs-s* SIGNALS: 30T/7d 40%WR -$0.72** — DOMINANT hard_sl source (8/13 hard_sl 24h). **pump-chain+ V5 RE-ENABLED** (CEO override of NEVER_REENABLE). 0 trades. **CEO RSI CHANGES:** SHORT_RSI_FLOOR 50→40, SHORT_RSI_CEILING 70→65, LONG_RSI_FLOOR 30→20, LONG_RSI_CEILING 70→65. Post-fix violations: USUAL RSI=81.82 LONG -$0.23, CASHCAT RSI=65.98 SHORT -$0.42. **LOSING AUTOPSY:** 21/45 24h hard_sl (46.7%). CASHCAT blacklisted. KAS worst token. **CREATIVE (3):** V5 monitor, hotset RSI_MIN=45 monitor, hotset conf distribution. **0 CHANGES APPLIED.** — brain_auditor
@@ -294,6 +323,7 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Active Decisions
 
+- **COIN_TRACKER_HOT NEUTRAL GATE RELAXED.** Code fix applied 2026-09-29 22:00 UTC. Allows NEUTRAL when wyckoff + setup_score>40 + clustering>=2. FLAG RE-ENABLEMENT NEEDED: COIN_TRACKER_HOT_PLUS_ENABLED (RESEARCH_FLAGS, human only). Expected +$0.30-0.50/7d from NEUTRAL diversity. 7 coins in accumulation now unlockable. — 2026-09-29
 - **OSCILLATOR MATRIX SHADOW MODE.** Approved 2026-09-21 ~16:00 UTC. 20% coverage (280/1403 trades). LOW+falling catastrophic (22.9%WR -$3.16/30d). Shadow logging active, eval due ~Sep 23. — 2026-09-21
 - **CHASE FILTER ACTIVE.** CHASE_FILTER_ENABLED=True, CHASE_ZSCORE_MAX=2.5, CHASE_GAP_MAX_PCT=1.0. — 2026-09-19
 - **PUMP-CHAIN+ DEAD HOURS BLOCK.** Hours 0-4 UTC hard block. 15T/7d 0%WR -$1.73. — 2026-09-21

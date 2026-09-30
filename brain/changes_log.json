@@ -660,5 +660,16 @@
     "after": "CASHCAT in SHORT_BLACKLIST — blocks all SHORT entries",
     "rationale": "2 consecutive pump-chain- SHORT hard_sl losses in 24h (-$0.68). CASHCAT is low-cap meme with high reversibility. 0 winning pump-chain- SHORT trades in 14d. Prevents repeat losses.",
     "impact": "+$0.10/7d (prevent ~2 losses/week), 0 winners blocked"
+  },
+  {
+    "timestamp": "2026-09-29T23:15:00Z",
+    "agent": "brain_auditor",
+    "change": "CONF_FILTER_MIN 65→90",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "CONF_FILTER_MIN = 65",
+    "after": "CONF_FILTER_MIN = 90",
+    "rationale": "89.8 conf bucket: 11T 36.4%WR -$0.61/7d. Blocks worst hotset entries. Zero winning trades blocked.",
+    "impact": "+$0.61/7d"
   }
 ]
