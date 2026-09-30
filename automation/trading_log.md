@@ -745,3 +745,42 @@ BY: auto_1hr
 - hard_sl 48.5% dominant — structural, losses contained
 
 BY: auto_1hr
+
+## [2026-09-30 10:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 33T 14W 19L -$0.22 (42.4% WR) | 7d: 124T 54W 70L -$1.89 (43.5% WR)
+**ATR SL:** 0/33 (0%) ✅ fix stable 33T+ — NOT dominant, no SL-tightening needed
+**Exits 24h:** 16 hard_sl (48.5%, avg -$0.080) | 15 profit-monster-trail (45.5%, avg +$0.009) | 1 cut-loser-MAE-GUARD | 1 HARD_SL_FAILED (+$0.94)
+
+**Signal performance 24h:**
+- volume-breakout-long+ 2T 100%WR +$1.02 — best
+- doji-bottom-long 4T 75%WR +$0.12 — strong
+- bb-bounce-v2-long+ 4T 50%WR +$0.04 — breakeven
+- pump-chain- SHORT 10T 40%WR -$0.43 — main drag; 7d 46T 50.0%WR -$0.34 (AT revert threshold, not below)
+- RS signals: all legacy (pre-cutoff), all losing, 0 new opens
+
+**Diagnosis:**
+1. Entry quality: N/A — 0 trades last hour
+2. SL behavior: atr_sl_hit 0% — NOT tight; hard_sl structural
+3. Signal quality: no signal with 3+T 0%WR in last hour → no kill candidates
+4. Trade frequency: 0/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — overnight quiet
+- ATR_SL fix: 0 hits, 33T+ confirmed deployed
+- No kill candidates (no signal 3+T 0%WR in last hour)
+- pump-chain- SHORT: 7d WR = 50.0% exactly (revert threshold is <50%, not ≤50%) — monitor, do not kill
+- hard_sl 48.5% dominant — structural, losses contained
+- Trade frequency: 0/hr — normal
+
+**Sideways Find (no action):** brain_auditor 08:00 claimed PUMP_CHAIN_SHORT_RSI_MIN is dead code (row[8] always NULL). **VERIFIED WRONG** — filter is live: logs show 2026-09-30 blocks for BABY (RSI=23.1) and LDO (RSI=23.8) < 25. signals query SELECT includes MAX(rsi_14) AS rsi_14 at row[8]; pump-chain- signals have rsi_14 populated (401/409 non-NULL in 24h). Do NOT "fix" this filter — it works.
+
+**Open Questions:**
+- pump-chain- SHORT at exactly 50.0% 7d WR — one more losing trade drops it below threshold → then kill/disable
+- 7d -$1.89 recovery slow — pre-fix losses still weighing
+- hard_sl 48.5% dominance — structural exit, not fixable without TP/SL timing changes
+
+BY: auto_1hr
