@@ -54,3 +54,4 @@
 
 ## TEAM UPDATES
 - [2026-09-30 22:10 UTC] auto_1hr: NO CONFIG CHANGE — quiet hour, 0T closed. 24h: 11T 6W +$1.13, atr_sl_hit 0% (ATR fix stable). 4 open: IOTA/BABY pump-chain- SHORT +, ADA -$0.07, MNT bb-bounce +. No kill candidates, not overtrading. SIDWAYS: signal_version.py still missing (~9h). 0 CHANGES APPLIED.
+- [2026-09-30 23:11 UTC] auto_1hr: NO CHANGE — 2T last hour (IOTA flat, ADA -$0.17 pump-chain- SHORT hard_sl). 24h: 13T 6W +$0.96, atr_sl_hit 0% (fix stable). No kill candidates (2T < 3T/hr threshold), not overtrading. pump-chain- SHORT 24h 5T -$0.30 worst but BABY open, watch only. signal_version.py stop-flagging per CEO 22:00 correction (JSON store exists). 0 CHANGES APPLIED.

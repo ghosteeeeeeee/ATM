@@ -1173,3 +1173,42 @@ BY: auto_1hr
 - hard_sl closes in profit 24h — trailing/hard SL not bleeding anymore (was the old problem)
 
 BY: auto_1hr
+
+## [2026-09-30 23:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 1 loss, 1 flat)
+**PnL:** -$0.17 (WR: 0%) — 24h: 13T, 6 wins, **+$0.96** (WR 46.2%)
+
+**Closed this hour:**
+- IOTA pump-chain- SHORT hard_sl $0.00 (flat)
+- ADA pump-chain- SHORT hard_sl -$0.17 (pnl_pct -1.53%)
+
+**24h by close reason:**
+- hard_sl 8T -$0.03 (avg -0.004) — flat, not bleeding
+- cut-loser-MAE-GUARD 1T -$0.02
+- HARD_SL_FAILED 1T +$0.94
+- HL_CLOSED 1T $0.00, ORPHAN_PAPER 1T $0.00
+- profit-monster-trail 1T +$0.07
+- atr_sl_hit **0T (0%)** — well under 40% threshold
+
+**Diagnosis:**
+1. Entry quality: both closes via hard_sl at ~breakeven/tiny loss — SL exits are tight but not bleeding. MFE/MAE still not queryable on older closes (schema gap, known).
+2. SL behavior: atr_sl_hit 0/13 (0%) 24h — ATR fix confirmed deployed (`tpsl_utils.py` ATR_SL_MIN floor, line 546). No CEO alert.
+3. Signal quality: pump-chain- SHORT 24h **5T 2W -$0.30** — worst signal. Kill rule NOT met: needs 0% WR with 3+ trades *in last hour*; only 2T closed this hour (1 flat, not a 3rd loss). BABY pump-chain- SHORT still open (flat).
+4. Trade frequency: 2/hr << 20 — not overtrading.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — fix stable, no CEO alert
+- No kill candidates (pump-chain- SHORT 2T last hour < 3T threshold; 24h WR 40% not 0%)
+- 24h net +$0.96 — no regime size reduction
+- 2/hr — not overtrading
+- brain_auditor conf-boost candidates (vol-breakout/doji/pump-chain golden) — samples below 20T/15T thresholds, not applying (max 1 change/hr, none justified)
+
+**Open Questions / Sideways:**
+- **signal_version.py: STOP FLAGGING as missing.** CEO 22:00 corrected: audit store is `data/signal_versions.json` (exists), not a Python script — "NOT a gap." SOP/AGENTS references to `python3 scripts/signal_version.py log ...` are stale; if a future constants change needs audit, append to the JSON manually. Consider cleaning the SOP ref separately.
+- pump-chain- SHORT 24h -$0.30/5T — if BABY closes as 3rd loss, still not auto-kill (rule is per-hour 0%WR+3T). Revisit SHORT config only if 24h WR drops further or pattern becomes systematic (mid-RSI EXTREME variance noted by brain_auditor — ADA/ALGO both mid-RSI inside edge bands).
+- V5 test: 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3.
+
+BY: auto_1hr

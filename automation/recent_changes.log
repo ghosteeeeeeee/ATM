@@ -3600,3 +3600,22 @@
   Open: BABY/ADA/IOTA pump-chain- SHORT, MNT bb-bounce LONG.
   SIDWAYS: signal_version.py missing (7h); mfe/mae NULL; ONDO pnl_pct outlier.
   BY: auto_1hr
+
+2026-09-30 22:30 UTC brain_auditor: NO CONFIG CHANGE - audit
+  DB-verified: 12T 50.0%WR +$0.96 (24h) | 114T 44.7%WR -$1.68 (7d) | POST-FIX: 66T 53.0%WR +$0.34
+  LOSING AUTOPSY: 4 losers 24h all tiny (<$0.20). ADA/ALGO pump-chain- SHORT mid-RSI EXTREME variance. LDO v5 -$0.17. No pattern.
+  DRIFT-001 CONFIRMED: bb_bounce_v2_long.py:282 candle-RSI filter vs :318 rsi_1m metadata mismatch. 60-70 band 12T 33%WR -$0.28 still firing -> bug_hunter.
+  signal_version.py STILL MISSING -> bug_hunter.
+  V5 TEST: 3T +$0.27. Eval Oct 1. RECOMMEND extend to Oct 3 (CEO).
+  MONITOR: vol-breakout EXTREME RSI60-80 @20T (7T), doji-bottom HIGH @20T (7T), pump-chain- golden band @15T (7T), MIN=25 dead-zone 48h.
+  CREATIVE (5): V5 extend | vol-breakout conf boost | doji-bottom HIGH boost | pump-chain- golden boost | bb-bounce soft RSI60-70 penalty.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
+
+- [2026-09-30 23:11 UTC] auto_1hr: NO CONFIG CHANGE
+  2T last hour closed (IOTA flat, ADA -$0.17 pump-chain- SHORT hard_sl). 24h: 13T 6W +$0.96.
+  atr_sl_hit 0% (ATR fix stable). No kill candidates (2T/hr < 3T threshold). Not overtrading.
+  pump-chain- SHORT 24h 5T 2W -$0.30 — worst signal, BABY still open, watch only.
+  signal_version.py: STOP FLAGGING — CEO corrected 22:00 (JSON path exists, not a gap).
+  0 CHANGES APPLIED.
+  BY: auto_1hr
