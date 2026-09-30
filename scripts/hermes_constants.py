@@ -1231,7 +1231,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 92                    # block if confidence >= this value (raised from 89 — 90-95 tier mixed, 95+ was losing historically but winning recently)
-CONF_FILTER_MIN = 90                    # raised 65→90 (brain_auditor 2026-09-29) — 89.8 conf bucket: 11T 36.4%WR -$0.61/7d. Blocks worst hotset entries. Zero winning trades blocked (89.8 has 0% of7d hotset winners).
+CONF_FILTER_MIN = 70                    # FIX 2026-09-30: lowered 90→70. CONF_FILTER_MIN=90 blocked ALL signals (67/hour, 0 passed). 89.8 bucket only had 11T — not enough data to justify blocking everything below 90. 70 is natural floor for our signals.
 
 # ── Continuum Oscillator Multipliers (SHADOW MODE) ──────────────────────────
 # btc_score zones: LOW (<30), MID (30-70), HIGH (>70)

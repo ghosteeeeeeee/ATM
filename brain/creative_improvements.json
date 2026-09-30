@@ -655,5 +655,35 @@
     "category": "signal quality",
     "status": "monitoring",
     "risk": "none"
+  },
+  {
+    "date": "2026-09-30T12:36:12Z",
+    "idea": "Align bb-bounce-v2 RSI_MAX filter with execution-time RSI",
+    "rationale": "Filter deployed Sep 29 07:00 but 3 trades with RSI 61-65 executed after. Metadata rsi_14 is likely execution-time (5m candles) while filter checks detection-time (1m). Same entry_rsi discrepancy documented Sep 28. Add exec-time RSI check (5m candles) before execution, matching the pattern already used in decider_run.py for RSI ceiling.",
+    "expected_impact": "Restore filter integrity. Low direct PnL (+$0.02 on 3 trades) but prevents future overbought entries. Pattern from hotset fix: exec-time checks catch drift between detection and execution.",
+    "category": "bug fix / filter integrity",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Add exec-time RSI check in decider_run.py execution path for bb-bounce-v2-long+ using 5m candle RSI, blocking if > BB_BOUNCE_V2_RSI_MAX"
+  },
+  {
+    "date": "2026-09-30T12:36:12Z",
+    "idea": "pump-chain- SHORT RSI_MIN 25→40 after 48h monitoring",
+    "rationale": "14d RSI bands: 25-40 = 4T 0%WR -$0.50 (catastrophic), 40-55 = 26T 61.5%WR +$0.41 (sweet spot). CEO set RSI_MIN=25 today — correct first step. But 25-40 band still bleeds. If pattern persists 48h (sample grows to 6-8T), raise to 40. Broader context: SHORT RSI<40 = 72T 27.8%WR -$5.34 across all signals.",
+    "expected_impact": "+$0.20-0.30/7d by blocking 25-40 band. 0 winners in that band (all 4 trades are losers).",
+    "category": "entry sniper",
+    "status": "suggested — WAIT 48h",
+    "risk": "low",
+    "sample_note": "4T sample too small for immediate change. Monitor."
+  },
+  {
+    "date": "2026-09-30T12:36:12Z",
+    "idea": "Study volume-breakout-long+ EXTREME winner DNA and doji-bottom-long HIGH winner DNA",
+    "rationale": "Two best-performing signal+regime combos: volume-breakout-long+ EXTREME (12T 75%WR +$2.53/14d) and doji-bottom-long HIGH (6T 83.3%WR +$0.36/14d). What entry conditions do these winners share? RSI range, volume spike, BB width, momentum? If common 'winner DNA' exists: (a) boost confidence when conditions align, (b) build new signal on those conditions, (c) add confluence filters to weaker signals.",
+    "expected_impact": "Unknown — discovery phase. Could unlock new signal or improve existing. Highest creative upside.",
+    "category": "signal development",
+    "status": "suggested",
+    "risk": "low (research, not config change)",
+    "implementation": "Query winning trades' _signal_metadata for volume_spike, rsi_14, BB width, momentum across both signal+regime combos. Find common patterns."
   }
 ]
