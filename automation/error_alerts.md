@@ -77,3 +77,9 @@
 - **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
 - **REPEATED** (4x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+
+## Error Alerts — 2026-09-30 18:58 UTC
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
+- **NEW** (2x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: TOK floor: N.N < N`

@@ -1011,10 +1011,41 @@ def rule_based_context_gate(token, direction, source, sig):
         # Block if EITHER live or detection-time RSI < floor
         # Detection-time RSI can be below floor even when live RSI recovered — signal was detected in oversold
         _sig_label = source or 'SHORT'
+        # Bearish structure override: if BTC continuum says bearish, oversold = continuation
+        _ctx_bearish_override = False
+        try:
+            import os as _ctx_os
+            import time as _ctx_time
+            _ctx_cont = sqlite3.connect(_ctx_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+            try:
+                _ctx_row = _ctx_cont.execute(
+                    "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                ).fetchone()
+            finally:
+                _ctx_cont.close()
+            if _ctx_row:
+                _ctx_phase, _ctx_linreg, _ctx_ema, _ctx_ts = _ctx_row
+                _ctx_age = _ctx_time.time() - (_ctx_ts or 0)
+                if _ctx_age < 600:
+                    _ctx_bearish = (_ctx_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                                    _ctx_linreg in ('LEAN_BEAR', 'BEAR') and
+                                    _ctx_ema == 'BELOW')
+                    if _ctx_bearish:
+                        _ctx_bearish_override = True
+        except Exception:
+            pass
+        
         if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
-            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
+            if _ctx_bearish_override:
+                pass  # Bearish structure — oversold = continuation, not bounce risk
+            else:
+                return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
         if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_FLOOR:
-            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
+            if _ctx_bearish_override:
+                pass  # Bearish structure — oversold = continuation, not bounce risk
+            else:
+                return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _is_pullback = source and 'pullback-entry' in source
@@ -1764,8 +1795,26 @@ def execute_trade(token, direction, price, confidence, source,
                     # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
                     _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
                     if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
-                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (would be catching falling knife)')
-                        return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+                        # Bearish structure override: oversold = continuation in downtrend
+                        _exec_bearish = False
+                        try:
+                            import os as _ex_os
+                            _ex_cont = sqlite3.connect(_ex_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _ex_row = _ex_cont.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
+                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _ex_cont.close()
+                            if _ex_row and _ex_row[0] in ('DECLINING', 'CALM', 'RECOVERY') and \
+                               _ex_row[1] in ('LEAN_BEAR', 'BEAR') and _ex_row[2] == 'BELOW':
+                                _exec_bearish = True
+                        except Exception:
+                            pass
+                        if not _exec_bearish:
+                            log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (would be catching falling knife)')
+                            return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
                     if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                         log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                         return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'

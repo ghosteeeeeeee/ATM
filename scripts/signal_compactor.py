@@ -3361,7 +3361,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             """, (tkn.upper(),))
                             _closes = [r[0] for r in _cur_sf.fetchall()]
                             if len(_closes) >= 15:
-                                _deltas = [_closes[i] - _closes[i-1] for i in range(1, len(_closes))]
+                                # FIX: Use closes[i]-closes[i+1] (not i-1) for DESC-ordered data
+                                # Previous formula computed 100-true_RSI (inverted)
+                                _deltas = [_closes[i] - _closes[i+1] for i in range(len(_closes)-1)]
                                 _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
                                 _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
                                 _ag = sum(_gains) / 14
@@ -3391,20 +3393,25 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 _rsf_bearish_override = False
                 try:
                     import os as _rsf_os
+                    import time as _rsf_time
                     _rsf_cont = sqlite3.connect(_rsf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                    _rsf_row = _rsf_cont.execute(
-                        "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
-                        "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                    ).fetchone()
-                    _rsf_cont.close()
+                    try:
+                        _rsf_row = _rsf_cont.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _rsf_cont.close()
                     if _rsf_row:
-                        _rsf_phase, _rsf_linreg, _rsf_ema = _rsf_row
-                        # Bearish structure: ALL THREE must agree
-                        _rsf_bearish = (_rsf_phase in ('DECLINING', 'CALM', 'RECOVERY') and
-                                        _rsf_linreg in ('LEAN_BEAR', 'BEAR') and
-                                        _rsf_ema == 'BELOW')
-                        if _rsf_bearish:
-                            _rsf_bearish_override = True
+                        _rsf_phase, _rsf_linreg, _rsf_ema, _rsf_ts = _rsf_row
+                        # Staleness guard: reject data >10min old (match chop_detector pattern)
+                        _rsf_age = _rsf_time.time() - (_rsf_ts or 0)
+                        if _rsf_age < 600:
+                            _rsf_bearish = (_rsf_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                                            _rsf_linreg in ('LEAN_BEAR', 'BEAR') and
+                                            _rsf_ema == 'BELOW')
+                            if _rsf_bearish:
+                                _rsf_bearish_override = True
                 except Exception:
                     pass
                 
@@ -3443,9 +3450,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Oversold SHORT guard: prevent BANANA-repeat (RSI < 35) ──
             # Separate from SHORT_RSI_FLOOR — uses 1m candles for tighter detection.
             # BANANA lesson: SHORT at extreme oversold = catching falling knife in reverse.
+            # BUT: in bearish structure (BTC RECOVERY+LEAN_BEAR+BELOW), oversold = continuation
             try:
                 from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                 if direction == 'SHORT' and OVERSOLD_SHORT_RSI_MAX > 0:
+                    # Bearish override: reuse the same check from SHORT RSI floor above
+                    _os_bearish_override = _rsf_bearish_override  # from SHORT RSI floor check above
                     _conn_os = None
                     try:
                         _conn_os = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3465,8 +3475,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             if _os_al > 0:
                                 _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
                                 if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
-                                    log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
-                                    continue
+                                    if _os_bearish_override:
+                                        log(f"  ✅ [OVERSOLD-SHORT-OVERRIDE] {tkn}: SHORT allowed — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} but BTC bearish (oversold = continuation)")
+                                    else:
+                                        log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
+                                        continue
                     finally:
                         if _conn_os:
                             try: _conn_os.close()
