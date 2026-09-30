@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 16:00 UTC**
+**Last Updated: 2026-09-30 16:33 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
@@ -16,9 +16,9 @@ System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%W
 - **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. V5 re-enabled Sep 29 for test (0 trades, ends Oct 1).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
-- **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,7,18,21] — **VERIFIED WORKING.**
+- **PUMP_CHAIN_LONG_DEAD_HOURS: [] — DISABLED 2026-09-30** (entry quality filters instead of time blocks). Was [1,2,3,4,7,18,21].
 - **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
-- **CONF_FILTER_MIN=90.**
+- **CONF_FILTER_MIN=70.** (FIXED Sep 30: 90→70 — MIN=90 blocked ALL signals, 67/hour, 0 passed. 89.8 bucket only 11T — not enough to justify.)
 - **Disk:** 85% (18G free). candles.db 2.2G, coin_tracker.db 3.1G.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
@@ -26,10 +26,10 @@ System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%W
 - **SHORT_RSI_FLOOR=40:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 40. Exec-time check added Sep 30 06:30 (decider_run.py:1764).
 - **SHORT_RSI_CEILING=65:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. Exec-time check added Sep 30 06:30.
 - **LONG_RSI_FLOOR=20:** **HARD BLOCK.** Blocks LONG entries where RSI < 20. Exec-time check added Sep 30 06:30.
-- **LONG_RSI_CEILING=65:** **HARD BLOCK.** Blocks overbought LONG entries. Exec-time check added Sep 30 06:30 (catches hotset metadata-empty bypass).
+- **LONG_RSI_CEILING=70:** **HARD BLOCK.** CEO raised 65→70 Sep 30 (30d backtest: RSI<70 LONG = 133T 51.1%WR +$2.43). Exec-time check added Sep 30 06:30 (catches hotset metadata-empty bypass). volume-breakout-long+ override: VOLUME_BREAKOUT_LONG_RSI_CEILING=95.
 - **LONG_RSI_SWEET_SPOT_BOOST=10:** +10pt confidence when LONG RSI 40-60. Extended 50→60: 50-60 band = 43T 60.5%WR +$1.53/14d.
 - **UNIVERSAL_MAX_HOLD_MINUTES=480:** Hard close all positions after 8h.
-- **🟢 PUMP_CHAIN_SHORT_RSI_MIN=25 — VERIFIED WORKING (Sep 30).** NOT dead code. pipeline.log: 37 blocks today (BABY RSI=23.1, LDO RSI=23.8). row[8] IS rsi_14 from `SELECT MAX(rsi_14)` in signals query. 14d: RSI<25 = 9T 22.2%WR -$0.66 (blocked). RSI 25-30 = 8T 87.5%WR +$0.78 (preserved). RSI 30-35 = 11T 27.3%WR -$0.91 (still open — monitor exec-time floor=40).
+- **🟢 PUMP_CHAIN_SHORT_RSI_MIN=25 — VERIFIED WORKING (Sep 30).** NOT dead code. pipeline.log: 37 blocks today (BABY RSI=23.1, LDO RSI=23.8). row[8] IS rsi_14 from `SELECT MAX(rsi_14)` in signals query. **trades._signal_metadata.rsi_14 14d (verified 16:33 UTC):** RSI<25 = 1T -$0.15 (blocked). RSI 30-40 = 3T 0%WR -$0.50 (DEAD ZONE — next candidate for MIN=35 after 48h monitor). RSI 40-45 = 5T 100%WR +$0.45 (edge preserved). RSI 50-55 = 17T 58.8%WR +$0.34 (core edge). RSI 65-70 = 7T 71.4%WR -$0.05. **NOTE:** Earlier CURRENT.md claims "RSI 25-30 = 8T 87.5% +$0.78" and "RSI 30-35 = 11T 27.3% -$0.91" do NOT match trades.rsi_14 (band 25 = 1T flat, band 35 = 3T -$0.50). Those figures likely came from a different RSI source/window — trust trades._signal_metadata.rsi_14.
 
 **🟢 VOLUME_SPIKE FIX — WORKING.** Sep 25 fix deployed. 6/9 post-fix trades have volume_spike values (0.02-0.97). 3 missing are from code paths not covered (IOTA/HYPER via rs-s* hotset, BTC continuum_engine). auto_1hr drift alert is STALE — queries7d window including pre-fix trades.
 
@@ -37,7 +37,7 @@ System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%W
 
 **🟢 ATR_SL WIDENING — VERIFIED WORKING.** Post-fix: 0/10 ATR_SL hits (0%). All 10 post-fix trades exit via profit-monster-trail.7d overall: 53.2% (67/126) — includes pre-fix legacy. **SUCCESS CRITERIA: PASS** (<55% by 50 trades). R:R improving as legacy ages out.
 
-**🔴 REGIME (14d):** ALL 334 trades NEUTRAL (333/334). No EXTREME/HIGH data to evaluate REGIME_CONF_HIGH_MULT=0.50 (deployed Sep 26, UNTESTED).
+**🔴 REGIME (7d, verified Sep 30 16:33 UTC):** EXTREME 70T 50.0%WR -$0.85, HIGH 24T 37.5%WR -$0.67, NORMAL 25T 44.0%WR -$0.02. NOT all-NEUTRAL — earlier "ALL NEUTRAL" notes were stale. REGIME_CONF_HIGH_MULT=0.50 still untested (HIGH bleeds but sample thin).
 
 **🔴 SIGNAL DIVERSITY CRITICAL:** Only volume-breakout-long+ (+$0.62/7d) and pump-chain+ (+$0.85/14d) profitable. 14d: 30+ signal types but only 2 net positive.
 
@@ -53,6 +53,24 @@ System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%W
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-30 16:33 UTC)
+
+- **🟢 24h 16T 62.5%WR +$1.64 (verified 16:33 UTC).** Best day in weeks. pump-chain- SHORT 7T 71.4%WR +$0.57 (best). volume-breakout-long+ 1T 100%WR +$0.94. doji-bottom-long 4T 75%WR +$0.12. Only 4 losers, all small (<$0.20).
+- **🟢 POST-FIX: 60T 53.3%WR +$0.17.** System positive. 0 ATR_SL hits.
+- **🟢 PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED.** 14d trades.rsi_14: RSI<25 = 1T -$0.15 blocked. RSI 40-45 = 5T 100%WR +$0.45 preserved. **DEAD ZONE: RSI 30-40 = 3T 0%WR -$0.50.** Next candidate: MIN 25→35 after 48h monitor — 14d winners blocked = 0. 30d RSI<35 winners = 8T +$0.65 but ALL from Sep 9-15 (pre-filter era).
+- **🟢 volume-breakout-long+ DNA CONFIRMED.** EXTREME RSI 60-80 = 7T 100%WR +$2.03 (14d AND 30d identical). NORMAL RSI 60-70 = 6T 50%WR -$0.22. Edge is regime-specific. Sample 7T < 20 — conf boost MONITOR until 20+.
+- **🟢 doji-bottom-long HIGH specialist CONFIRMED.** HIGH 6T 83.3%WR +$0.36, NORMAL 5T 40%WR $0.00. 11T total — sample <20, monitor.
+- **🟢 Exec-time RSI ceiling fix (06:30) — 3 trades since, 66.7%WR +$0.06.** Too early to evaluate. Monitor 48h.
+- **🟡 pump-chain+ 0 trades/7d.** Classic killed Sep 22 (PUMP_FLOW_PLUS_ENABLED=False). V5 test 0 closed trades, ends Oct 1.
+- **🟡 NEUTRAL signal NOT BUILT.** neutral_sniper.py exists but NEUTRAL_SNIPER_ENABLED=False since Sep 12 (per T). CEO delegated volume-dry-up/EMA-reclaim to signal_analyst — no new files in scripts/signals/.
+- **🟡 DOC DRIFT CORRECTED:** CONF_FILTER_MIN 90→70, DEAD_HOURS [] (disabled), LONG_RSI_CEILING 65→70, REGIME not all-NEUTRAL, pump-chain- RSI band numbers rewritten from verified trades.rsi_14.
+- **🟡 SIDEWAYS FIND:** doji_bottom gated on DOJI_TOP_ENABLED (signals/__init__.py:488) — family kill-switch, intentional, not a bug. No separate DOJI_BOTTOM_ENABLED.
+- **LOSING AUTOPSY:** 4 losers 24h — BTC continuum-osc+ -$0.02 MAE guard, SOL bb-bounce-v2-long+ -$0.02 scratch, ALGO pump-chain- SHORT -$0.19 hard_sl EXTREME RSI 46.7, DYDX pump-chain- SHORT -$0.18 hard_sl EXTREME RSI 55.9. No systematic pattern — both SHORT losers mid-RSI in EXTREME chop. Post-fix losers: CASHCAT (pre-blacklist), mover- (killed), USUAL RSI=81.82 (pre exec-ceiling fix), hotset chop.
+- **7d REGIME:** EXTREME -$0.85 (70T 50.0%), HIGH -$0.67 (24T 37.5%), NORMAL -$0.02 (25T 44.0%).
+- **14d signals (8+ trades):** volume-breakout-long+ 20T 70%WR +$2.48 (BEST), doji-bottom-long 11T 63.6%WR +$0.36, pump-chain+ 55T 41.8%WR +$1.23, grind-trend+ 18T 50%WR +$0.24. Losers: pullback-entry- 35T 31.4%WR -$2.81 (killed, aging), mover+ 14T 42.9%WR -$1.12 (killed), pump-chain- 52T 51.9%WR -$0.33 (breakeven).
+- **CREATIVE (3):** (1) volume-breakout EXTREME RSI 60-80 conf boost +15pt — monitor until 20+ trades (7T now, 100%WR +$2.03) (2) pump-chain- SHORT RSI_MIN 25→35 — monitor MIN=25 for 48h, RSI 30-40 dead zone = 0%WR, 0 winners blocked14d (3) NEUTRAL signal backlog — signal_analyst, neutral_sniper disabled, no new signal files.
+- **0 CHANGES APPLIED.** Doc corrections only (CURRENT.md). — brain_auditor
 
 ## Audit Update (2026-09-30 07:15 UTC)
 
