@@ -648,3 +648,33 @@ Final set: ['GOAT', 'KAS']
 - pump-chain- underperformance — monitor, not kill threshold
 
 BY: auto_1hr
+
+## [2026-09-30 08:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L, -$0.02) | 0 open
+**24h:** 36T 44.4%WR -$0.60 | 7d: 131T 43.5%WR -$2.23
+**ATR SL:** 0/36 (0%) ✅ fix stable 38T+
+**Exits:** 18 hard_sl (50%, avg -$0.087) | 16 profit-monster-trail (44%, avg +$0.013) | 1 cut-loser-MAE-GUARD (-$0.02) | 1 HARD_SL_FAILED (+$0.94)
+**Signals 24h:**
+- pump-chain- SHORT 11T 36.4%WR -$0.51 — main drag (-$0.046/trade)
+- doji-bottom-long 4T 75%WR +$0.12 — best active signal
+- volume-breakout-long+ 2T 100%WR +$1.02 — small sample
+- bb-bounce-v2-long+ 4T 50%WR +$0.04 — breakeven
+- RS signals: 15T legacy trades (all opened before Sept 29 16:00 UTC cutoff) — 0%WR, no new opens
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — overnight quiet, normal
+- ATR_SL fix: stable 0 hits 38T+
+- BTC LONG stale → resolved (MAE-GUARD closed it, -$0.02 breakeven)
+- No open trades — clean slate
+- No signals meeting kill criteria (3+T, 0%WR, last hour)
+- pump-chain- 36.4%WR — not at 0% kill threshold
+
+**Open Questions:**
+- pump-chain- SHORT 36.4%WR persistent drag — monitor, may need RSI_MIN filter
+- hard_sl 50% dominant — losses contained (-$0.087 avg), structural
+- RS legacy trades all losing — already killed, just waiting for final closes
+
+BY: auto_1hr
