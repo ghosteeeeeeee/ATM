@@ -1095,6 +1095,11 @@ def _check_directional_cap(direction: str) -> str | None:
             except Exception: pass
 
 
+# ── RR Multiplier Tracker (for dynamic RSI ceiling) ──────────────────────────
+# Stores the last RR multiplier computed by _score_signal() for each token:direction
+# Used by the RSI ceiling check to allow high-RR signals at higher RSI levels
+_rr_mult_tracker = {}  # {(token, direction): rr_mult}
+
 # ── TVS Cooldown Override Rate Limiter ──────────────────────────────────────
 # Max 1 thesis override per token:direction per 4 hours
 _thesis_override_tracker = {}  # {(token, direction): (count, first_time_ts)}
@@ -1764,6 +1769,8 @@ def _score_signal(token, direction, conf, source, signal_type,
                     log(f"  🎯 [RR-ENGINE] {token} {direction}: {rr_reason} → mult={rr_mult:.2f}")
                 if RR_ENGINE_CONF_SHADOW:
                     rr_mult = 1.0  # shadow mode: log but don't adjust
+                # Store rr_mult for dynamic RSI ceiling
+                _rr_mult_tracker[(token.upper(), direction.upper())] = rr_mult
     except ImportError:
         pass
     except Exception as e:
@@ -3540,6 +3547,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # 30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15 (caught).
             # Blocks extreme overbought entries where momentum is exhausted.
             if direction == 'LONG' and LONG_RSI_CEILING > 0:
+                # Dynamic RSI ceiling based on R:R grade
+                # Grade A (R:R>=4.0, mult=1.30): RSI ceiling 80
+                # Grade B (R:R 2.0-4.0, mult=1.15): RSI ceiling 70
+                # Grade C/D (R:R<2.0, mult<=0.85): RSI ceiling 60
+                _rr_m = _rr_mult_tracker.get((tkn.upper(), direction.upper()), 1.0)
+                if _rr_m >= 1.30:
+                    _dynamic_ceiling = 80  # Grade A — exceptional R:R justifies higher RSI
+                elif _rr_m >= 1.15:
+                    _dynamic_ceiling = LONG_RSI_CEILING  # Grade B — standard ceiling
+                else:
+                    _dynamic_ceiling = min(LONG_RSI_CEILING, 60)  # Grade C/D — tighter ceiling
                 _conn_lrc = None
                 try:
                     _conn_lrc = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3558,8 +3576,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _lrc_al = sum(_lrc_losses) / 14
                         if _lrc_al > 0:
                             _lrc_rsi = 100 - (100 / (1 + _lrc_ag / _lrc_al))
-                            if _lrc_rsi > LONG_RSI_CEILING:
-                                log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {LONG_RSI_CEILING} (overbought — pullback risk)")
+                            if _lrc_rsi > _dynamic_ceiling:
+                                log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
                                 continue
                 except Exception:
                     pass  # non-fatal
@@ -3921,7 +3939,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
                 bare_src = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
-                if bare_src in STANDALONE_BYPASS_SIGNALS:
+                # FIX: also check rstripped-only version (without digit strip)
+                # 'pump-chain-v5' → bare_src='pump-chain-v' (digit stripped, WRONG)
+                #               → _src_stripped='pump-chain-v5' (correct match)
+                _src_stripped = src.rstrip('+-') if src else ''
+                if bare_src in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS:
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                     # ── Contrarian flip: trend_momentum_near_sma ────────────────
                     # This signal is consistently wrong — LONG loses, SHORT wins.

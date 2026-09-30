@@ -3521,3 +3521,9 @@
   SIDWAYS: scripts/signal_version.py MISSING (audit trail blocked).
   0 CHANGES APPLIED.
   BY: auto_1hr
+- [2026-09-30 16:15 UTC] auto_1hr: NO CONFIG CHANGE — healthy hour
+  1T last hour: COMP pump-chain- SHORT +$0.03 hard_sl (trailing into profit). 1 open: DOT LONG.
+  24h: hard_sl 8T +$0.61 | profit-trail 6T +$0.15 | atr_sl_hit 0% (fix stable).
+  pump-chain- 8T 75%WR +$0.61 best signal. Hourly PnL positive last 3h.
+  No kill candidates. Not overtrading. No changes applied.
+  BY: auto_1hr

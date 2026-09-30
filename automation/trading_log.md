@@ -943,3 +943,35 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 16:15] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) | 1 open (DOT pump-chain-v5,rs-s32 LONG)
+**PnL:** +$0.03 (WR: 100%) — COMP pump-chain- SHORT entry 25.158 exit 25.099, hard_sl (trailing into profit).
+**24h exits:** hard_sl 8T +$0.61 (47%) | profit-monster-trail 6T +$0.15 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00
+**24h signals:** pump-chain- 8T 75%WR +$0.61 (best) | volume-breakout-long+ 1T +$0.94 | doji-bottom-long 4T 75%WR +$0.12 | bb-bounce-v2-long+ 2T 50%WR +$0.03 | continuum-osc+ 1T -$0.02 | continuum_engine 1T $0.00
+**Hourly PnL:** 12:00 $0 | 14:00 +$0.03 | 16:00 +$0.03 — positive/neutral streak, no negative hours
+
+**Diagnosis:**
+1. Entry quality: COMP SHORT clean — no extreme RSI, trailing exit locked profit
+2. SL behavior: hard_sl 8/17 (47%) 24h but includes profitable trailing exits; atr_sl_hit 0% — ATR fix stable
+3. Signal quality: no signal with 3+T at 0% WR last hour → no kill candidates (continuum-osc+ 0%WR but only 1T)
+4. Trade frequency: 1/hr — not overtrading, not starved
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no CEO alert
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl positive this hour — no regime size reduction
+- Trade count 1/hr << 20/hr
+- pump-chain- 24h 75%WR +$0.61 — best signal, leave alone
+- REGIME_CONF_HIGH_MULT=0.50 — correctly starves in HIGH vol (data-backed from prior analysis)
+
+**Open Questions:**
+- DOT pump-chain-v5,rs-s32 LONG open: entry 1.2242, SL 1.23225, TP 1.26934 — watch
+- hotset empty root cause already diagnosed (REGIME_CONF_HIGH_MULT in HIGH vol) — execution path healthy via pump-chain
+- **SIDWAYS FIND:** `scripts/signal_version.py` still MISSING — audit trail blocked. Flagged prior hours.
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr

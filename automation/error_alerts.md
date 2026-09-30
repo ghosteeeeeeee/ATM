@@ -52,3 +52,14 @@
 - **INFO** (1x): `hermes-trading-checklist` exit-2 — BY DESIGN when it flags items, not a crash. Flags: signals DB 11385 rows (checklist cleanup threshold), pipeline_recent "unclear output" (multiline log parse false-positive), 0 decisions written in 2h (compactor produced no new decisions — possible quiet market or check later). AUTO-FIX: `reset-failed`.
 - **INFO**: `systemctl list-timers hermes-*` returns 0 — GLOB QUIRK, not missing timers. Full `list-timers --all | grep hermes` shows 67 hermes timers, pipeline/price-collector/signal-compactor/watchdog/15m-regime all firing on schedule.
 - **INFO**: Pipeline healthy — completed 13:45:35 (LIVE), 0 errors/30min, 0 tracebacks, Position Manager 0 open / 0 closed this cycle, Portfolio 20 closed today. 60 signals/1h (support_resistance dominant). Regime LONG_BIAS (14 long / 1 short / 101 neutral, 116 tokens). Speed 127/241 ≥50th pct. Prices fresh (13:45:30, 86 tokens). Open trades: 0. Phantom trades 24h: 0. No auto-fixes needed on trading path.
+
+## Error Alerts — 2026-09-30 15:47 UTC
+- **WARN** (1): `Disk 85% (95G/118G)` — approaching critical. Main consumers: coin_tracker.db=3.3G, candles.db=2.3G, hl_copy.db=345M.
+  - **AUTO-FIX**: Compressed 17 log files >7 days (gzip). Disk unchanged — growth is DBs, not logs.
+- **WARN** (1): `Hotset empty — 0 approved signals` — compactor filters blocking all candidates (LONG-RSI-BLOCK oversold freefall, CONFLUENCE-GATE, RSI-CEILING). Market SHORT_BIAS (1L/5S/110N of 116). Filters working as designed (BANANA lesson: no oversold longs). Not a pipeline failure.
+  - **AUTO-FIX**: None. No signals to execute; position manager still managing 2 open trades (DOT LONG, COMP SHORT) with trailing SLs.
+- **INFO**: Pipeline healthy. Timers firing (pipeline 20s ago, price-collector 58s ago). 0 errors in 30min logs. No phantom trades. No crashes/tracebacks.
+
+## Error Alerts — 2026-09-30 15:58 UTC
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Sep N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
