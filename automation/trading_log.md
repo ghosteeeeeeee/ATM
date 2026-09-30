@@ -910,3 +910,36 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 15:15] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) | 1 open (COMP pump-chain- SHORT)
+**PnL:** +$0.03 (WR: 100%) — DYDX pump-chain- SHORT entry 0.14528 exit 0.14492, exit_reason hard_sl = trailing stop locked profit (price move +0.25%). `pnl_pct` column stores percent units (0.2478 = +0.25%); template `pnl_pct*100` display is double-scaled — do not read as +24.78%.
+**24h exits:** hard_sl 11T -$0.14 (48%) | profit-monster-trail 8T +$0.15 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00
+**24h signals:** pump-chain- 7T 5W +$0.58 (best) | volume-breakout-long+ 1T +$0.94 | doji-bottom-long 4T 75%WR +$0.12 | rs-s* all 1T single-trade noise
+
+**Diagnosis:**
+1. Entry quality: DYDX winner — RSI at entry 40.4 (not oversold), gap 0.86% — clean SHORT entry
+2. SL behavior: hard_sl 11/23 (48%) 24h avg -$0.013; atr_sl_hit 0% — ATR fix stable; hard_sl includes profitable trailing exits (DYDX +$0.03 labeled hard_sl)
+3. Signal quality: no signal with 3+T at 0% WR last hour → no kill candidates (rs-s* are 1T each)
+4. Trade frequency: 1/hr — not overtrading, not starved
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no CEO alert
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl positive this hour — no regime size reduction
+- Trade count 1/hr << 20/hr
+- CONF_FILTER_MIN=70 (already lowered 90→70 today, commit 88152829) — keep
+- PUMP_CHAIN_SHORT_RSI_MIN=25 — live, blocking oversold shorts (CHIP RSI 23.9 blocked this hour)
+- REGIME_CONF_HIGH_MULT=0.50 — data-backed: pump-chain- SHORT HIGH vol 7d 6T 16.7%WR -$0.60; EXTREME 39T 53.8%WR +$0.23. Do not weaken. Starvation in HIGH vol is correct behavior.
+
+**Open Questions:**
+- **HOTSET EMPTY refined root cause:** not CONF_FILTER_MIN. Compaction correctly applies REGIME_CONF_HIGH_MULT=0.50 when vol=HIGH → 88 conf × 0.50 = 44 < MIN_EXEC_CONFIDENCE=50 → "No signals above 50% confidence". Confluence gate PASSES pump-chain- SHORTs (BLUR); execution starves only because market vol=HIGH. Correct per data. pump-chain path still executes when conditions align (14:03/14:07 DYDX/COMP).
+- COMP SHORT still open: entry 25.158, trailing SL 25.1097 (locked below entry = in-profit trail), TP 24.3158
+- **SIDWAYS FIND:** `scripts/signal_version.py` MISSING — AGENTS requires logging every constants change; only `data/signal_versions.json` exists. Audit trail blocked. Create tool or fix AGENTS reference.
+- DYDX exit_price 0.14492 ≠ stored stop_loss 0.14461 — trailing SL may update after hit or hard_sl uses hit-time SL; minor labeling question, not costing money (trade won)
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr
