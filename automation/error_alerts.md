@@ -22,3 +22,7 @@
 
 ## Error Alerts — 2026-09-30 04:58 UTC
 - **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+
+## Error Alerts — 2026-09-30 06:46 UTC
+- **WARN** (1x): `disk 84%` — 18G free of 118G, approaching 85% threshold. Monitor.
+- **INFO**: Market entirely neutral (116/116 tokens). 0 open trades. No signals above 50% confidence. Pipeline healthy, just quiet.
