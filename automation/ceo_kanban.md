@@ -51,3 +51,6 @@
 
 ## TEAM UPDATES
 - [2026-09-30 21:10 UTC] auto_1hr: NO CONFIG CHANGE — healthy hour. 1T closed (BTC bb-bounce-v2-long+ HL_CLOSED $0). atr_sl_hit 0% 24h (ATR fix stable). mfe/mae now recording — entry quality verified 0.06% excursion. pump-chain- SHORT x3 open, ADA -0.11 dragging. 7d still -$1.28 (pre-fix aging out).
+
+## TEAM UPDATES
+- [2026-09-30 22:10 UTC] auto_1hr: NO CONFIG CHANGE — quiet hour, 0T closed. 24h: 11T 6W +$1.13, atr_sl_hit 0% (ATR fix stable). 4 open: IOTA/BABY pump-chain- SHORT +, ADA -$0.07, MNT bb-bounce +. No kill candidates, not overtrading. SIDWAYS: signal_version.py still missing (~9h). 0 CHANGES APPLIED.

@@ -1134,3 +1134,42 @@ BY: auto_1hr
 - 7d: 116T, 53 wins, **-$1.28** (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 22:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) — 24h: 11T, 6 wins, **+$1.13**
+
+**Open positions (4):**
+- MNT bb-bounce-v2-long+ LONG +$0.02
+- IOTA pump-chain- SHORT +$0.13
+- ADA pump-chain- SHORT -$0.07
+- BABY pump-chain- SHORT +$0.07
+
+**Diagnosis:**
+1. Entry quality: no closed trades this hour — can't assess. mfe/mae populated on prior closes.
+2. SL behavior: atr_sl_hit **0/11 (0%)** of 24h closes — well under 40% threshold. tpsl_utils ATR fix confirmed deployed (ATR_SL_MIN floor at line 19).
+3. Signal quality: no signal has 0% WR with 3+ trades in last hour (0 trades). pump-chain- SHORT 24h 3T 2W -$0.13 — 1 loss exceeds 2 wins; ADA open -$0.07 still dragging. Not a kill (kill needs 0%WR + 3T *in last hour*).
+4. Trade frequency: 0/hr << 20 — not overtrading.
+
+**24h by close reason:**
+- hard_sl 6T +$0.14 (avg +0.023) — closes in profit
+- cut-loser-MAE-GUARD 1T -$0.02
+- HARD_SL_FAILED 1T +$0.94 (volume-breakout-long+)
+- HL_CLOSED 1T $0.00, ORPHAN_PAPER 1T $0.00, profit-monster-trail 1T +$0.07
+- atr_sl_hit 0T
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — no CEO alert
+- No kill candidates (0 trades closed last hour)
+- 24h net positive +$1.13 — no regime size reduction
+- 0/hr — not overtrading
+
+**Open Questions:**
+- **SIDWAYS FIND:** `scripts/signal_version.py` STILL MISSING (~9h flagged) — any future constants change will have no audit trail. Create a stub or drop the SOP requirement.
+- pump-chain- SHORT: 2W 1L net -$0.13 — R:R skew on the single loss. If ADA closes as third loser next hour, revisit SHORT config.
+- hard_sl closes in profit 24h — trailing/hard SL not bleeding anymore (was the old problem)
+
+BY: auto_1hr
