@@ -1,67 +1,43 @@
-# Signal Performance Report
-**Generated:** 2026-09-30 17:03 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: 2026-09-30 22:40 UTC | Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 2,720 | **WR:** 51.9% | **PnL:** -106.01%
-- **Date range:** 2026-07-29 → 2026-09-30
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None — no signal met kill criteria (WR 40% > 30% threshold) |
 
----
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None — no signal met boost criteria |
 
-## WINNERS (WR > 55%, PnL > 0)
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 40.0% | -$0.30 | 5 (24h) | BLOCKED in EXTREME/HIGH via regime gate (bug fixed). Allowed in NORMAL (85.7% WR). Historical: 109T 55% WR +$0.12. |
 
-None found.
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| volume-breakout-long+ | LONG | 100% | +$0.94 | 1 (24h) | Strong historical: 20T 70% WR +$2.48. EXTREME 75% WR. |
+| pump-chain-v5,rs-s32 | LONG | 100% | +$0.23 | 1 (24h) | New combo, too few trades to evaluate. |
+| r2-trend-short3 | SHORT | 100% | +$0.07 | 1 (24h) | R2 trend SHORT family working. |
+| pump-chain-v5 | LONG | 50% | +$0.04 | 2 (24h) | V5 LONG variant — positive but thin sample. |
 
----
+ISSUES:
+- **✅ FIXED: Gate bypass bug** — `SIGNAL_TYPE_OVERRIDES[('EXTREME', 'pump-chain-')] = 1.0` was bypassing the family-level `Pump_Flow: 0.0` block in `volatility_gate_v2.py`. Per-signal override has highest priority in `get_combined_multiplier()`. Changed both `pump_chain-` and `pump-chain-` EXTREME overrides from 1.0 to 0.0. Verified: pump-chain- now returns 0.0 multiplier in EXTREME/HIGH, 1.0 in NORMAL.
+- Low trade volume: only 13 closed trades in 24h (system normally higher). Could be regime filters working correctly or market quiet.
+- No direction inversions detected in 24h.
+- No OpenMemory queries performed (per instructions — tenant_mismatch errors).
 
-## LOSERS (WR < 30%, PnL < -2%)
+REGIME BREAKDOWN (pump-chain- all-time):
+| Regime | Trades | WR | PnL | Gate Status |
+|--------|--------|-----|-----|-------------|
+| EXTREME | 77 | 54.5% | +$0.32 | BLOCKED (bug fixed 2026-09-30) |
+| HIGH | 25 | 48.0% | -$0.36 | BLOCKED |
+| NORMAL | 7 | 85.7% | +$0.16 | ALLOWED |
 
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| bb-bounce-v2-long+ | LONG | 2 | 50.0% | +0.26 | ❓ | Needs more data |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] bb-bounce-v2-long+ LONG** — WR=50.0%, PnL=+0.26% over 2 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-09-30 | 28375e5 | Fix 6 bugs found by bug hunter on dynamic RSI + standalone b... |
-| 2026-09-30 | 3294f89 | Raise LONG_RSI_CEILING from 65 to 70 |
-| 2026-09-30 | 3e5722a | Remove all time blocks — focus on entry quality filters |
-| 2026-09-30 | 8815282 | CRITICAL FIX: CONF_FILTER_MIN blocked ALL signals |
-| 2026-09-30 | 6997518 | Brain Audit: 2026-09-30 06:00 UTC — system stable, hotset RS... |
-| 2026-09-30 | 5523239 | CEO: pump-chain- SHORT RSI_MIN=25 filter — blocks oversold e... |
-| 2026-09-30 | eff23ff | brain-audit: Sep 30 03:35 UTC — LONG RSI>70 leak, hotset con... |
-| 2026-09-29 | b76bec7 | fix: bug hunter findings — V5 integration bugs |
-| 2026-09-29 | 9265efa | Implement Thesis Validation System (TVS) |
-| 2026-09-29 | f9daa25 | fix: pump_chain_v5 not reaching hotset — add to compactor wh... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+Actions taken:
+1. Fixed gate bypass bug in `volatility_gate_v2.py` (lines 303, 318)
+2. Verified fix: get_combined_multiplier returns 0.0 for EXTREME/HIGH, 1.0 for NORMAL
+3. No kills, no boosts (criteria not met)

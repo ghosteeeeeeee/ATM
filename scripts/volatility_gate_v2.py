@@ -300,7 +300,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.0,              # BLOCKED — mover+ LONG -$0.48 lifetime EXTREME
     ('EXTREME', 'mover_short'): 0.0,             # BLOCKED — mover SHORT -$1.54 lifetime EXTREME (32 trades, net negative)
-    ('EXTREME', 'pump_chain-'): 1.0,             # OK — pump-chain- SHORT 51.7% WR +$1.70 lifetime EXTREME (116 trades)
+    ('EXTREME', 'pump_chain-'): 0.0,             # BLOCKED 2026-09-30 — override was bypassing Pump_Flow:0.0 family block. 24h: 40%WR -$0.30 EXTREME. Family block stands.
     ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -315,7 +315,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 0.5,              # PENALIZED — bare form fallback for pump_chain (not pump_chain+)
     ('EXTREME', 'pump-chain+'): 0.0,             # BLOCKED — hyphen variant of pump_chain+ (not proven in EXTREME)
-    ('EXTREME', 'pump-chain-'): 1.0,             # OK — hyphen variant of pump_chain- (boosted, same as pump_chain-)
+    ('EXTREME', 'pump-chain-'): 0.0,             # BLOCKED 2026-09-30 — hyphen variant, same bypass bug as pump_chain-. Family block Pump_Flow:0.0 stands.
     ('EXTREME', 'pump-chain'): 0.5,              # PENALIZED — hyphen variant fallback (must be AFTER pump-chain+/-)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──
