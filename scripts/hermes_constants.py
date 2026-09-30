@@ -864,7 +864,7 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # RSI 35-45 LONG = 18T 44.4%WR -$0.30 (dead zone).
 # Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
 LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
-LONG_RSI_CEILING = 65          # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ LONG = 80T 41.3%WR -$0.39 (block). RSI 55-65 = 27T 51.9%WR +$1.40 (sweet spot, allowed). Ceiling at 65 blocks overbought LONG entries.
+LONG_RSI_CEILING = 70          # RAISED 65→70 (CEO 2026-09-30). 30d backtest: RSI<70 LONG = 133T 51.1%WR +$2.43 (optimal). RSI>=70 = 58T 36.2%WR -$0.68 (correctly blocked). RSI 65-70 adds 24T +$2.09 while blocking overbought entries.
 VOLUME_BREAKOUT_LONG_RSI_CEILING = 95  # brain_auditor 2026-09-30 — volume-breakout-long+ is STANDALONE_BYPASS momentum signal. 14d RSI>70: 9T 77.8%WR +$1.23 (BEST band). Blanket LONG_RSI_CEILING=65 kills its edge. 95 blocks only exhausted zone (RSI>95: 2L -$0.32, 0W). Same pattern as existing vol-breakout RSI<20 exclusion in signal_compactor.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
