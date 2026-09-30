@@ -851,3 +851,33 @@ BY: auto_1hr
 - 7d still -$1.73 — recovery pending more volume on winners (volume-breakout-long+ is the bright spot)
 
 BY: auto_1hr
+
+## [2026-09-30 13:12] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC continuum_engine LONG ORPHAN_PAPER $0.00 — orphan paper artifact, not a real trade) | 0 open
+**24h exits:** hard_sl 11T -$0.59 | profit-monster-trail 9T +$0.14 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00
+**24h signals:** pump-chain- 7T 57.1%WR +$0.13 | doji-bottom-long 4T 75%WR +$0.12 | volume-breakout-long+ 1T +$0.94 | rs-s* singles mostly negative (hotset chop)
+**Last real close:** 2026-09-30 06:11 UTC (BTC continuum-osc+ cut-loser-MAE-GUARD -$0.02) — ~7h with no real trade flow
+
+**Diagnosis:**
+1. Entry quality: N/A — no real trades last hour
+2. SL behavior: hard_sl 11/23 (48%) of 24h closes; atr_sl_hit 0% — ATR fix stable; hard_sl is structural, not SL-too-tight
+3. Signal quality: no signal with 3+ trades at 0% WR last hour → no kill candidates
+4. Trade frequency: 0 real trades/hr — not overtrading; undertrading caused by empty hotset + regime blocks
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no alert
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl: no 3+ consecutive negative hours with real trades
+- Trade count not >20/hr
+- CONF_FILTER_MIN=90, PUMP_CHAIN_SHORT_RSI_MIN=25 already in place from prior hours
+- pipeline LIVE, timers active, signals_runner clean (0 errors)
+
+**Open Questions:**
+- **HOTSET EMPTY:** hotset.json = 0 tokens (cycle 14251, age <10s). Logs: "no signals survived compaction". This is the likely reason 7h+ with no real trades. Not a config I can fix in signals/constants — needs signal_compactor investigation. Flag for CEO/brain_auditor.
+- Regime blocks active: BTC SHORT blocked NEUTRAL/flat; pump-chain+ LONG blocked HIGH vol (35.7% WR). Filters doing their job.
+- 7d still -$1.73 (pre-fix losses aging out)
+
+BY: auto_1hr
