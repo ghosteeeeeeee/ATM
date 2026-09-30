@@ -19,3 +19,6 @@
 - **WARN**: Disk 84% used (19G free of 118G)
 - **WARN**: BTC LONG loss streak=13 (1.5h cooldown active)
 - **INFO**: Position manager "FAILED" = Guardian lock (hl-sync-guardian running). NOT a crash — working as designed.
+
+## Error Alerts — 2026-09-30 04:58 UTC
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`

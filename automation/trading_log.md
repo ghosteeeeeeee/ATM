@@ -558,3 +558,56 @@ BY: auto_1hr
 - 7d -$2.07 — recovering from pre-fix losses
 
 BY: auto_1hr
+
+## [2026-09-30 04:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 opened | 1 open (BTC LONG 38.9h stale)
+**24h:** 41T 44%WR -$0.76 | 7d: 131T 43.5%WR -$2.23
+**ATR SL:** 0/41 (0%) ✅ fix stable 41T+
+**Exits:** 21 hard_sl (avg -$0.095) | 19 profit-monster-trail (avg +$0.016) | 1 HARD_SL_FAILED (+$0.94)
+**Regime 24h:** EXTREME 28T 43%WR -$0.45 | HIGH 7T 57%WR -$0.07 | NORMAL 6T 33%WR -$0.24
+**Signals 24h:** pump-chain- 12T SHORT 42%WR -$0.27 | doji-bottom-long 4T 75%WR +$0.12 | volume-breakout-long+ 2T 100%WR +$1.02
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — nothing to act on
+- RS signals: removal confirmed (0 opened after Sept 29 16:00 UTC)
+- ATR_SL fix: stable 41T+
+- No signals meeting kill criteria (3+T 0%WR in last hour)
+- pump-chain- 12T -$0.27 — tiny per-trade loss, not a kill candidate
+- mover- 2T 0%WR — under kill threshold (needs 3+)
+- Trade frequency: 0/hr — normal overnight
+
+**Open Questions:**
+- BTC LONG 38.9h stale — needs reconciliation or manual close
+- hard_sl 51% — expected post-ATR fix, avg loss contained
+- 7d -$2.23 — recovering
+
+BY: auto_1hr
+
+## [2026-09-30 05:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 opened | 1 open (BTC LONG 39.9h stale at -15.29%)
+**24h:** 41T 43.9%WR -$0.76 | 7d: 131T 43.5%WR -$2.23
+**ATR SL:** 0/41 (0%) ✅ fix stable 41T+
+**Exits:** 21 hard_sl (avg -$0.095) | 19 profit-monster-trail (avg +$0.016) | 1 HARD_SL_FAILED (+$0.94)
+**Regime 24h:** EXTREME dominant, HIGH 57%WR, NORMAL 33%WR
+**Signals 24h:** pump-chain- 12T 42%WR -$0.27 | doji-bottom-long 4T 75%WR +$0.12 | volume-breakout-long+ 2T 100%WR +$1.02
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — nothing to act on
+- No signals meeting kill criteria (3+ trades, 0% WR, last hour)
+- ATR_SL fix: stable 0 hits 41T+
+- Trade frequency: 0/hr — normal overnight
+- pump-chain- 12T -$0.27 — tiny per-trade loss, not kill candidate
+- BTC LONG 39.9h stale — persists, needs reconciliation
+
+**Open Questions:**
+- BTC LONG 39.9h stale — needs reconciliation or manual close
+- hard_sl 51% dominant exit — expected post-ATR fix, avg loss contained
+- 7d -$2.23 — recovering from pre-fix losses
+
+BY: auto_1hr

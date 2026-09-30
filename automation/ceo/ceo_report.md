@@ -1,3 +1,20 @@
+## CEO Report — 2026-09-30 (05:30 UTC)
+
+### Diagnosis
+DB-verified: 38T 44.7%WR -$0.53 (24h) | 131T 43.5%WR -$2.23 (7d) | 316T 44.6%WR -$2.33 (14d). POST-FIX: 56T 53.6%WR +$0.13 (0 ATR_SL hits). System slightly positive post-fix, legacy losses aging out. **pump-chain- SHORT RSI<25 = CATASTROPHIC** — 9T 22.2%WR -$0.66/14d. Oversold entries via STANDALONE_BYPASS bypass SHORT_RSI_FLOOR=40. RSI 45-55 sweet spot: 7T 85.7%WR +$0.86. **SIGNAL DIVERSITY CRITICAL** — only volume-breakout-long+ (+$2.48/14d) and pump-chain+ (+$1.23/14d) profitable. doji-bottom-long promising (11T 63.6%WR +$0.36). **HOTSET CONFIDENCE INVERSE** — 85-95 conf 33.3%WR, 95+ conf 38.9%WR. CONF_FILTER_MIN=90 working. **1 open:** BTC LONG continuum-osc+ NEUTRAL.
+
+### Root Cause
+pump-chain- SHORT fires at extreme oversold RSI (<25) via STANDALONE_BYPASS, which bypasses the general SHORT_RSI_FLOOR. These are "catch falling knife in reverse" entries — shorting into oversold conditions. 22% WR, -$0.66/14d.
+
+### Fix Applied
+**PUMP_CHAIN_SHORT_RSI_MIN=25** added to hermes_constants.py + signal_compactor.py filter. Blocks pump-chain- SHORT entries where RSI<25. RSI 45-55 sweet spot (85.7%WR) preserved. Expected +$0.20-0.40/7d.
+
+### Verification
+- ATR_SL widening: PASS (0/56 post-fix hits)
+- pump-chain- RSI_MIN: Will verify on next pump-chain- SHORT RSI<25 signal
+- doji-bottom-long: Monitor at 20+ trades (currently 11T 63.6%WR)
+- COIN_TRACKER_HOT_PLUS_ENABLED: RESEARCH_FLAGS — needs human approval to enable
+
 ## CEO Report — 2026-09-29 (22:00 UTC)
 
 ### Diagnosis

@@ -3433,3 +3433,14 @@
   CREATIVE: (1) Hotset CONF_FILTER_MIN=50 (2) Volume confirmation hotset (3) EMA-reclaim signal.
   0 CHANGES APPLIED.
   BY: brain_auditor
+- [2026-09-30 05:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 38T 44.7%WR -$0.53 (24h) | 131T 43.5%WR -$2.23 (7d)
+  POST-FIX: 56T 53.6%WR +$0.13 (0 ATR_SL hits). System stable.
+  pump-chain- SHORT 12T 41.7%WR -$0.27 — oversold entries via STANDALONE_BYPASS.
+  doji-bottom-long 4T 75%WR +$0.12 — promising, monitor 20+ trades.
+  volume-breakout-long+ 2T 100%WR +$1.02 — best signal.
+  CC rs-s52 RSI=74.89 LONG -$0.20 — RSI ceiling coverage gap.
+  LOSING AUTOPSY: 7 pump-chain- SHORT oversold (EXTREME), 9 hotset chop, 2 mover- killed.
+  CREATIVE: (1) pump-chain- RSI_MIN=30 signal_compactor (2) doji monitor (3) hotset RSI ceiling investigation.
+  0 CHANGES APPLIED.
+  BY: brain_auditor

@@ -1272,6 +1272,7 @@ PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35
 
 # pump-chain- SHORT dead hours — 14d data: hours 2,3 = 7T 14.3%WR -$0.83 (worst hours, 0%WR in hour 2). Hour 2: 3T 0%WR -$0.41, Hour 3: 4T 25%WR -$0.42. Expected +$0.83/14d = +$0.42/7d.
 PUMP_CHAIN_SHORT_DEAD_HOURS = [2, 3, 4, 8, 9, 11, 18, 20]  # auto_1hr 2026-09-25 — added 4 (3T 0%WR -$0.41/7d, worst remaining losing hour). Net dead hours: +$1.61/14d = +$0.81/7d.
+PUMP_CHAIN_SHORT_RSI_MIN = 25           # CEO 2026-09-30 — 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST). Blocks oversold SHORT entries via STANDALONE_BYPASS. Expected +$0.20-0.40/7d.
 
 # pullback-entry- SHORT dead hours — 14d data: hours 4,8,13,20 = -$2.81/14d (25T). Hour 04: 6T 16.7%WR -$0.84, 08: 4T 25%WR -$0.51, 13: 4T 25%WR -$0.44, 20: 11T 18.2%WR -$1.02. CEO 2026-09-23: fixed from [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72).
 PULLBACK_ENTRY_SHORT_DEAD_HOURS = [0, 1, 3, 4, 6, 7, 8, 10, 11, 13, 19, 20, 22]  # auto_1hr 2026-09-25 — added 7 (4T 50%WR -$0.40) and 19 (4T 25%WR -$0.38). Net dead hours: +$6.52/14d = +$3.26/7d.

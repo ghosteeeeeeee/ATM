@@ -1388,3 +1388,5 @@
 [2026-09-29 23:08 UTC]   🟢 OK: doji-bottom-long: 5 trades, 80.0% WR, PnL=2.46
 [2026-09-29 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-09-29 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-09-30 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-09-30 05:08 UTC] No signals with sufficient trades in 24h window

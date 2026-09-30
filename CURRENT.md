@@ -53,6 +53,18 @@ System active. 3 open positions (SOL LONG bb-bounce-v2, COMP LONG volume-breakou
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
 
+## Audit Update (2026-09-30 05:00 UTC)
+
+- **🟡 24h 38T 44.7%WR -$0.53.** COMP volume-breakout-long+ +$0.94 (best). pump-chain- SHORT 12T 41.7%WR -$0.27. doji-bottom-long 4T 75%WR +$0.12 (promising).
+- **🟡 pump-chain- SHORT RSI SWEET SPOT IDENTIFIED.** 14d: 40-55 RSI = 13T 69.2%WR +$0.53 (BEST). <25 RSI = 9T 22.2%WR -$0.66 (CATASTROPHIC). STANDALONE_BYPASS bypasses RSI floor — oversold entries drag signal. Suggested: RSI_MIN=30 in signal_compactor.
+- **🟡 CC rs-s52 RSI=74.82 LONG -$0.20 — RSI CEILING COVERAGE GAP.** Entered above LONG_RSI_CEILING=65. Hotset code path may bypass check. 7d: 12 trades RSI>70, 41.7%WR -$0.70. Needs investigation.
+- **🟢 doji-bottom-long 4T 75%WR +$0.12 (24h).** 11T 63.6%WR +$0.36/14d. All profit-monster-trail. Monitor at 20+ trades.
+- **🟢 volume-breakout-long+ 2T 100%WR +$1.02 (24h).** 20T 70%WR +$2.48/14d. Best signal.
+- **7d REGIME:** EXTREME -$1.20 (73T 46.6%), HIGH -$1.01 (30T 36.7%), NORMAL -$0.03 (25T 44.0%).
+- **LOSING AUTOPSY:** 20 losers 24h — 7 pump-chain- SHORT EXTREME (oversold entries, CASHCAT pre-blacklist), 9 hotset rs-s* (normal chop), 2 mover- KILLED (aging out), 2 profit-monster-trail scratches.
+- **CREATIVE (3):** (1) pump-chain- SHORT RSI_MIN=30 in signal_compactor (+$0.20-0.40/7d) (2) Monitor doji-bottom-long at 20+ trades (3) Investigate hotset RSI ceiling enforcement.
+- **0 CHANGES APPLIED.** — brain_auditor
+
 ## Audit Update (2026-09-30 03:35 UTC)
 
 - **🟡 POST-FIX 56T 53.6%WR +$0.13.** System slightly positive. Legacy losses aging out.

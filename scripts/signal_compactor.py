@@ -2732,6 +2732,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
+            # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
+            if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
+                try:
+                    from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
+                    _rsi_val_s = row[8] if len(row) > 8 else None
+                    if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
+                        log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d)")
+                        continue
+                except ImportError:
+                    pass
             # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
             # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners).
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
