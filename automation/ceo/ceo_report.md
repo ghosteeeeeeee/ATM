@@ -136,3 +136,17 @@ Candle timers active. 1m timer triggers every 1min, 5m every 5min. Next candle c
 | Post-fix WR | 52.6% | 55% | 24h |
 | doji-bottom-long trades | 6 | 20+ | 7d |
 | Candle freshness | 0/hr | 60/hr 1m | 1h |
+
+## CEO Report — 2026-09-30 22:00 UTC
+
+### Diagnosis
+24h: 11T 54.5%WR +$1.13 — POSITIVE, recovering. 7d: 114T 45.6%WR -$1.31 — improving from -$4.41 (Sep 29). Daily trajectory: Sep 24 -$2.58 → Sep 29 -$1.13 → Sep 30 +$1.13. Post-fix (Sep 28+) consistently positive. ATR_SL fix verified (0% post-fix). RSI metadata fixed (58/59 in 48h). SHORT R:R still structural: 7d 51T 49.0%WR -$1.46, avg_win $0.112 vs avg_loss $0.164 (0.68:1). Bleeding is legacy aging out.
+
+### Root Cause
+System was bleeding from pre-fix legacy losses (ATR_SL tight, RSI filters broken, metadata NULL). All fixes deployed Sep 25-30 now working. Legacy trades aging out of 7d window. No new systemic issues. Signal diversity still thin — only volume-breakout-long+ (70%WR) and doji-bottom-long (66.7%WR) consistent winners. neutral_sniper (NEUTRAL mean-reversion) human-disabled Sep 12 — cannot override. coin_tracker_hot_plus in NEVER_REENABLE — code fix deployed but flag blocked.
+
+### Fix Applied
+**0 config changes.** System recovering on its own. All recent fixes verified working. No param change has enough data to justify (V5 eval Oct 1, doji-bottom at 20+ trades). Corrected signal_version.py false alarm (JSON path, not missing script). Re-flagged dead signal_gen imports to bug_hunter (4 files still importing defunct module).
+
+### Verification
+11T 54.5%WR +$1.13 (24h) — DB-verified. 4 open positions healthy. Pipeline active. Regime memory fresh (updated today). Next evals: V5 Oct 1, doji-bottom at 20+ trades, SHORT R:R recovery tracking.
