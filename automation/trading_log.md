@@ -1006,3 +1006,36 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 18:11] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L)
+**PnL:** +$0.06 (WR: 50%) — DOT pump-chain-v5,rs-s32 LONG +$0.23 hard_sl, LDO pump-chain-v5 LONG -$0.17 hard_sl.
+**24h exits:** hard_sl 9T +$0.29 (53%) | profit-monster-trail 5T +$0.15 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00 — atr_sl_hit 0%
+**24h signals:** volume-breakout-long+ 1T +$0.94 | pump-chain-v5,rs-s32 1T +$0.23 | doji-bottom-long 3T 100%WR +$0.12 | pump-chain-v5 2T 50%WR +$0.04 | bb-bounce-v2-long+ 2T 50%WR +$0.03 | pump-chain- 6T 67%WR +$0.02 | continuum_engine 1T $0.00 | continuum-osc+ 1T -$0.02
+**Hourly PnL:** 12:00 $0 | 14:00 +$0.03 | 16:00 +$0.24 | 17:00 +$0.06 — positive streak 4h
+
+**Diagnosis:**
+1. Entry quality: DOT clean winner (entry 1.2242 → exit 1.2369). LDO entered 0.46823, hard SL 0.46214 (-1.30%), exited 0.46108 (-1.52%) — ~0.2% slippage past SL, normal
+2. SL behavior: atr_sl_hit 0% 24h — ATR fix stable. hard_sl 53% of closes but NET +$0.29 — these are profitable hard stops / trailing exits, not tight-SL bleed
+3. Signal quality: no signal with 3+T 0%WR last hour → no kill candidates. pump-chain- 24h 67%WR +$0.02 breakeven+, leave
+4. Trade frequency: 2/hr — not overtrading (<<20), not starved
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no CEO alert
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl positive this hour (+$0.06) — no regime size reduction
+- Trade count 2/hr << 20/hr
+- hard_sl dominant share but profitable — no tpsl change
+- pump-chain-v5 2T +$0.04 — leave (V5 test until Oct 1)
+
+**Open Questions:**
+- **SIDWAYS FIND:** `scripts/signal_version.py` STILL MISSING — audit trail blocked. Flagged 5 hours running. Constants changes still possible (log manually to recent_changes.log).
+- **SIDWAYS FIND:** DOT trade `pnl_pct` column shows 103.74% but price move was only ~+1.04% (1.2242→1.2369) and pnl_usdt $0.23 on $22.10 = +1.04%. pnl_pct column inconsistent — check trade recorder if it persists.
+- Open now: MNT bb-bounce-v2-long+ LONG (17:13), ONDO r2-trend-short3 SHORT (17:51)
+- pump-chain- 24h only +$0.02 net on 6T — watch if it flips negative
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr
