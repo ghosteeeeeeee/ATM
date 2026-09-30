@@ -872,5 +872,53 @@
     "category": "confidence boost",
     "status": "suggested — gate at 15T, currently 6T",
     "risk": "low"
+  },
+  {
+    "date": "2026-09-30T21:34:35Z",
+    "idea": "volume-breakout-long+ confidence ceiling 90→95 (CODE change in volume_breakout.py, not constants)",
+    "rationale": "22T 68.2%WR +$2.36/14d (threshold 20T MET). EXTREME 76.9%WR. Signal caps at min(90,...) but delivers 68% WR — underconfident vs edge. Higher conf = more competitive in confluence scoring = more of these winners fire.",
+    "expected_impact": "+$0.30-0.60/7d from better confluence ranking",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "gate": "REQUIRES independent backtest + code review (AGENTS.md mandate). Not a blind constants change.",
+    "run_ts": "2026-09-30T21:34:35Z",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-30T21:34:35Z",
+    "idea": "Extend pump-chain-v5 test eval Oct 1 → Oct 3",
+    "rationale": "Only 3 closed trades (+$0.27 net). V5 filters are strict (vel/wave/momentum). Quiet NEUTRAL market = low fire rate. Killing on n=3 or scaling on n=3 both premature.",
+    "expected_impact": "Avoids premature kill/scale of potentially good signal",
+    "category": "test governance",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "CEO decision",
+    "run_ts": "2026-09-30T21:34:35Z",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-30T21:34:35Z",
+    "idea": "doji-bottom-long HIGH-regime confidence boost +10pt at 20T threshold",
+    "rationale": "Session data: HIGH 6T 83.3%WR vs NORMAL 5T 40%WR. Currently 11T total — below 20T. HIGH exits are profit-monster-trail (winners riding), NORMAL has atr_sl hits.",
+    "expected_impact": "+$0.15-0.30/7d if pattern holds at 20T",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "MONITOR to 20T trades — insufficient sample now",
+    "run_ts": "2026-09-30T21:34:35Z",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-30T21:34:35Z",
+    "idea": "bug_hunter follow-up: signal_rsi_14 injection for volume-breakout path",
+    "rationale": "Best signal has NULL detection-time RSI (22/22 14d). entry_rsi_14 works but signal_rsi_14 drives RSI filters at detection. Fix enables proper RSI analysis and filter coverage for our edge signal.",
+    "expected_impact": "Enables RSI-based quality filtering on best signal; fixes analysis blindness",
+    "category": "data integrity",
+    "status": "delegated",
+    "risk": "low",
+    "gate": "bug_hunter code fix — already flagged, needs follow-up",
+    "run_ts": "2026-09-30T21:34:35Z",
+    "agent": "brain_auditor"
   }
 ]
