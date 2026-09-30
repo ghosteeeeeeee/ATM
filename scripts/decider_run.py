@@ -580,13 +580,18 @@ def get_ab_params_for_trade(direction: str) -> dict:
     raw_act  = ts_variant.get('config', {}).get('trailingActivationPct')
     raw_dist = ts_variant.get('config', {}).get('trailingDistancePct')
     def _norm_pct(val, default=None):
-        if val is None or val <= 0:
-            return default  # None means use hermes_constants value
+        if val is None or val < 0:
+            return default  # None means use hermes_constants value; 0 is VALID (disabled)
         if val > 0.01:   # value like 0.5 (= 50%) or 1.0 (= 100%) — divide by 100
             return val / 100.0
-        return val        # already a small fraction like 0.005 (= 0.5%)
-    trailing_activation = _norm_pct(raw_act) or TRAILING_ACTIVATION_PCT
-    trailing_distance   = _norm_pct(raw_dist) or TRAILING_DISTANCE_PCT
+        return val        # already a small fraction like 0.005 (= 0.5%), or 0 (disabled)
+    # FIX (2026-09-30): `_norm_pct(...) or DEFAULT` was a falsy-zero bug — an explicit
+    # 0 (meaning "disabled") was swallowed by `or` and replaced with the default.
+    # Use explicit None checks so 0 passes through as 0.
+    _act_raw = _norm_pct(raw_act)
+    trailing_activation = TRAILING_ACTIVATION_PCT if _act_raw is None else _act_raw
+    _dist_raw = _norm_pct(raw_dist)
+    trailing_distance = TRAILING_DISTANCE_PCT if _dist_raw is None else _dist_raw
     trailing_phase2_dist = _norm_pct(ts_variant.get('config', {}).get('trailingPhase2DistancePct'))
 
     # Experiment metadata
@@ -1843,9 +1848,18 @@ def execute_trade(token, direction, price, confidence, source,
     if is_pump:
         sl_pct_val = PUMP_SL_PCT    # 1.5% SL
         tp_pct_val = PUMP_TP_PCT    # 2.5% TP
-        trailing_activation = 0      # disable trailing
-        trailing_distance   = 0
-        log(f'  [PUMP MODE] {token} {direction} — SL={PUMP_SL_PCT*100:.1f}% TP={PUMP_TP_PCT*100:.1f}% NO trailing')
+        # FIX (2026-09-30): pump mode previously set trailing_activation=0 /
+        # trailing_distance=0 ("NO trailing"), but a falsy-zero bug in brain.py
+        # (`or None`) silently converted 0 → None → defaults (0.006/0.012), and
+        # tpsl_utils + the RR engine both ignore per-trade trailing config anyway.
+        # Net effect: pump trades HAVE been trailing at 1.2% — and it HELPS.
+        # DOT +2.61% MFE locked +1.04%; BLUR +2.38% MFE locked +0.93%; all 5
+        # "hard_sl" trail exits were profitable. Disabling trailing would turn
+        # these into round-trip losses. We now set defaults EXPLICITLY so the
+        # code is honest and the behavior is intentional.
+        trailing_activation = TRAILING_ACTIVATION_PCT
+        trailing_distance   = TRAILING_DISTANCE_PCT
+        log(f'  [PUMP MODE] {token} {direction} — SL={PUMP_SL_PCT*100:.1f}% TP={PUMP_TP_PCT*100:.1f}% trailing={trailing_distance*100:.2f}% (explicit)')
     else:
         sl_pct_val = float(sl_pct)  # sl_pct is already a fraction (0.01 = 1%)
 
@@ -3639,9 +3653,12 @@ def run(dry_run=False):
         # Recalculate speed_pctl for logging (sp was from _exec_score scope)
         sig_spd = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
         sp_now = sig_spd.get('speed_percentile', 50.0) if sig_spd else 50.0
+        # NOTE: sl=0/tp=0 here is CORRECT — ATR-based SL/TP is set by
+        # position_manager._collect_atr_updates() within 1 min of entry.
+        # The trail= values below are the REAL trailing config passed to brain.py.
         log(f'EXEC: {token} {direction} @ ${price:.6f} conf={confidence:.0f}% '
-            f'SL=${sl:.4f} TP=${tp:.4f} [{source}] '
-            f'[SL={sl_pct:.1f}% trail={trailing_activation*100:.1f}%/{trailing_distance*100:.1f}%]'
+            f'SL=ATR TP=ATR [{source}] '
+            f'[sl_pct={sl_pct:.1f}% trail={trailing_activation*100:.2f}%/{trailing_distance*100:.2f}%]'
             f'[spd={sp_now:.0f}%]')
 
         # ── Signal Inversion (static + dynamic, BEFORE context gate) ─────

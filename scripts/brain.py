@@ -1295,9 +1295,14 @@ if __name__ == "__main__":
                 confidence=args.confidence,
                 sl_group=args.sl_group,
                 sl_distance=args.sl_distance,
-                trailing_activation=args.trailing_activation or None,
-                trailing_distance=args.trailing_distance or None,
-                trailing_phase2_dist=args.trailing_phase2 or None,
+                # FIX (2026-09-30): falsy-zero bug — `0 or None` converted an explicit
+                # 0 (pump mode "disable trailing") to None, which then defaulted to
+                # TRAILING_ACTIVATION_PCT/TRAILING_DISTANCE_PCT downstream. Pass the
+                # raw value through; None still means "use default" via the checks at
+                # brain.py:487-490, but 0 now stays 0.
+                trailing_activation=args.trailing_activation,
+                trailing_distance=args.trailing_distance,
+                trailing_phase2_dist=args.trailing_phase2,
                 leverage=args.leverage,
                 experiment=args.experiment,
                 flipped_from_trade=args.flipped,

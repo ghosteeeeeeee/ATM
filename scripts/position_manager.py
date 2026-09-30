@@ -2621,11 +2621,34 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         signal_parts = [s.strip() for s in signal.split(',')]
 
         def _match_exit_config(part):
-            """Match signal part to exit config using exact or prefix match."""
+            """Match signal part to exit config using exact or prefix match.
+
+            FIX (2026-09-30): Direction-suffixed keys ('pump-chain+', 'pump-chain-')
+            previously failed to match versioned signal names ('pump-chain-v5')
+            because the matcher appended another '-' to keys already ending in
+            '+/-' — 'pump-chain--' matched nothing, so the signal silently fell
+            through to the default exit path. Now we also try the key as a raw
+            prefix (keys ending in +/- are already prefixes) and strip -vN
+            version suffixes before matching.
+            """
             if part in SIGNAL_EXIT_CONFIG:
                 return SIGNAL_EXIT_CONFIG[part]
+            import re as _re
+            # Strip version suffix: 'pump-chain-v5' → 'pump-chain'
+            _base = _re.sub(r'-v\d+$', '', part)
+            if _base != part and _base in SIGNAL_EXIT_CONFIG:
+                return SIGNAL_EXIT_CONFIG[_base]
             for key, val in SIGNAL_EXIT_CONFIG.items():
                 if part.startswith(key + '-') or part.startswith(key + '_'):
+                    return val
+                # Direction-suffixed keys are already prefixes:
+                # 'pump-chain-v5'.startswith('pump-chain-') → True
+                if key.endswith(('+', '-')) and part.startswith(key):
+                    return val
+                # Version-stripped base matches a direction-suffixed key's stem:
+                # 'pump-chain' matches key 'pump-chain+' (first dict hit wins)
+                _key_stem = key.rstrip('+-')
+                if _key_stem and _base == _key_stem:
                     return val
             return None
 

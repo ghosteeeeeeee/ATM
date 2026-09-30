@@ -1945,8 +1945,10 @@ def _check_hard_stops(prices: dict):
         # GUARDIAN HARD-STOP: Fires for ALL positions with SL set.
         # ATR-managed positions are also covered — catches cases where ATR engine
         # produces an unfillable SL (e.g., wrong-side guard chasing price).
-        # Safety margin: only fires when price is >0.5% beyond SL to avoid
-        # race conditions with position_manager's own SL checks.
+        # Safety margin: only fires when price is >0.1% beyond SL (atr_managed)
+        # or >0% (non-ATR) to avoid race conditions with position_manager's own
+        # SL checks. Reduced from 0.5% → 0.1% on 2026-09-30 (was costing 1.5-2.5%
+        # extra leveraged loss on every hard_sl close).
         cur.execute("""
             SELECT id, token, direction, entry_price, stop_loss, target,
                    leverage, amount_usdt, paper, atr_managed, signal
@@ -1976,10 +1978,22 @@ def _check_hard_stops(prices: dict):
             signal_parts = [s.strip() for s in signal_str.split(',')]
             # FIX: Use prefix matching — 'rs-s34' should match 'rs' key in config
             def _match_exit_config(part):
+                # FIX (2026-09-30): same fix as position_manager._match_exit_config —
+                # direction-suffixed keys didn't match versioned names ('pump-chain-v5').
+                # Also try the key as a raw prefix and strip -vN version suffixes.
                 if part in SIGNAL_EXIT_CONFIG:
                     return SIGNAL_EXIT_CONFIG[part]
+                import re as _re
+                _base = _re.sub(r'-v\d+$', '', part)
+                if _base != part and _base in SIGNAL_EXIT_CONFIG:
+                    return SIGNAL_EXIT_CONFIG[_base]
                 for key, val in SIGNAL_EXIT_CONFIG.items():
                     if part.startswith(key + '-') or part.startswith(key + '_'):
+                        return val
+                    if key.endswith(('+', '-')) and part.startswith(key):
+                        return val
+                    _key_stem = key.rstrip('+-')
+                    if _key_stem and _base == _key_stem:
                         return val
                 return None
             is_rr_engine = any(_match_exit_config(p) == 'rr_engine' for p in signal_parts)
@@ -2005,6 +2019,17 @@ def _check_hard_stops(prices: dict):
                 if tp > 0 and cur_price >= tp * (1 + _margin):
                     if not is_rr_engine:
                         hit_reason = 'hard_tp'
+
+            # FIX (2026-09-30): Distinguish trailing profit-lock exits from genuine
+            # protective SL hits. A trailed SL sits on the PROFIT side of entry
+            # (LONG: sl > entry, SHORT: sl < entry). Labeling these 'hard_sl' made
+            # profitable trail exits look like stop-loss losses in analytics.
+            # Bug-hunter verified: DOT/BLUR/COMP/DYDX/IOTA "hard_sl" exits were all
+            # trail locks (+0.03% to +1.04% PnL); only ADA/LDO/ALGO were real SL hits.
+            if hit_reason == 'hard_sl':
+                if (direction == 'LONG' and sl > entry_px) or \
+                   (direction == 'SHORT' and sl < entry_px):
+                    hit_reason = 'trail_sl'
 
             if hit_reason:
                 pnl_pct = 0
