@@ -1,3 +1,12 @@
+
+2026-09-30 19:35 UTC brain_auditor: NO CONFIG CHANGE - audit
+  DB-verified: 16T 62.5%WR +$1.10 (24h) | 118T 45.8%WR -$1.24 (7d) | POST-FIX: 64T 54.7%WR +$0.51
+  LOSING AUTOPSY: 5 losers 24h all small (<$0.20). ALGO/DYDX pump-chain- SHORT mid-RSI EXTREME - variance.
+  V5 TEST: 3T 66.7%WR +$0.27. Eval Oct 1. RECOMMEND extend to Oct 3 (3T insufficient).
+  BB_BOUNCE_V2_RSI_MAX=60 bypass: 3 post-deploy RSI>60 trades slipped -> bug_hunter.
+  CREATIVE: (1) V5 extend eval (2) volume-breakout RSI 60-80 conf boost at 20T (3) doji-bottom HIGH conf boost at 20T (4) pump-chain- RSI 40-45 conf boost at 15T.
+  0 CHANGES APPLIED.
+  BY: brain_auditor
 [2026-09-30 10:38 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 32T 43.8%WR -$0.13 (24h) | 122T 43.4%WR -$1.81 (7d) | POST-FIX: 57T 52.6%WR +$0.11
   PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED WORKING — 37 blocks today. CURRENT.md dead-code claim FALSE — corrected.
