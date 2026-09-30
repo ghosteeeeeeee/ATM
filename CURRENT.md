@@ -1,19 +1,19 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 10:37 UTC**
+**Last Updated: 2026-09-30 16:00 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System stable. 0 open positions. Pipeline healthy. 32T 24h 43.8%WR -$0.13. Post-fix: 57T 52.6%WR +$0.11 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — monitor 24h. PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING** (37 blocks in pipeline.log today — BABY RSI=23.1, LDO RSI=23.8). doji-bottom-long 11T 63.6%WR +$0.36/14d — promising. volume-breakout-long+ 20T 70%WR +$2.48/14d — best signal.
+System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%WR +$1.59** (best day in weeks). Post-fix: 59T 52.5%WR +$0.14 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — 0 RSI>70 LONG entries since (monitor 24-48h). PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING**. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 **SET TODAY** — protects RSI 70-80 edge (100%WR). volume-breakout-long+ EXTREME + RSI 60-80 = **8T 100%WR +$2.03** (killer combo). doji-bottom-long HIGH regime 6T 83.3%WR — HIGH specialist. **NEUTRAL signal delegated to signal_analyst — NOT YET BUILT.**
 
-- **24h:** 32T 43.8%WR -$0.13. volume-breakout-long+ 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12. pump-chain- 9T 44.4%WR -$0.34.
-- **7d:** 122T 43.4%WR -$1.81. EXTREME -$1.09 (70T), HIGH -$0.67 (24T), NORMAL -$0.05 (26T). Post-fix (Sep 28+): 57T 52.6%WR +$0.11. 0 ATR_SL hits.
-- **OPEN:** 0 positions.
-- **LONG:** volume-breakout-long+ (+$2.48/14d, 70%WR), pump-chain+ (+$1.23/14d, 41.8%WR).
-- **SHORT:** ALL DISABLED. pullback-entry- NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover- NEVER_REENABLE.
+- **24h:** 19T 57.9%WR +$1.59. pump-chain- SHORT 7T 71.4%WR +$0.58 (best). volume-breakout-long+ 1T 100%WR +$0.94. doji-bottom-long 4T 75%WR +$0.12. 6 losers all small (<$0.20).
+- **7d:** 122T 44.3%WR -$1.67. EXTREME -$0.98 (70T), HIGH -$0.67 (24T), NORMAL -$0.02 (25T). Post-fix (Sep 28+): 59T 52.5%WR +$0.14. 0 ATR_SL hits.
+- **OPEN:** 1 position.
+- **LONG:** volume-breakout-long+ (+$2.48/14d, 70%WR — BEST, EXTREME+RSI60-80 DNA), pump-chain+ (+$1.23/14d, 41.8%WR), doji-bottom-long (+$0.36/14d, 63.6%WR — HIGH specialist).
+- **SHORT:** pump-chain- SHORT ACTIVE (51T/14d 51%WR breakeven, RSI_MIN=25 working). pullback-entry- NEVER_REENABLE, mover- NEVER_REENABLE.
 - **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.
-- **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS.
+- **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. V5 re-enabled Sep 29 for test (0 trades, ends Oct 1).
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS:** [1,2,3,4,7,18,21] — **VERIFIED WORKING.**

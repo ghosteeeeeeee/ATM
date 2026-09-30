@@ -685,5 +685,34 @@
     "status": "suggested",
     "risk": "low (research, not config change)",
     "implementation": "Query winning trades' _signal_metadata for volume_spike, rsi_14, BB width, momentum across both signal+regime combos. Find common patterns."
+  },
+  {
+    "date": "2026-09-30T16:00:00Z",
+    "idea": "volume-breakout-long+ confidence boost +10pt when EXTREME regime AND RSI 60-80",
+    "rationale": "8T 100%WR +$2.03 in this combo. Signal fires at base confidence — boost prioritizes the highest-quality entries.",
+    "expected_impact": "Prioritize 8/20 trades (40% of signal) that are 100% WR. No winners blocked.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "8 trades — below 20 threshold, but 100% WR is clear signal. Monitor 20+ before applying."
+  },
+  {
+    "date": "2026-09-30T16:00:00Z",
+    "idea": "Gate doji-bottom-long to HIGH regime only",
+    "rationale": "HIGH 6T 83.3%WR +$0.36 vs NORMAL 5T 40%WR $0.00. NORMAL trades contribute zero PnL.",
+    "expected_impact": "Block 5 NORMAL trades ($0.00 net impact). Preserve 6 HIGH winners.",
+    "category": "regime gate",
+    "status": "monitoring",
+    "risk": "low",
+    "sample_size": "11 total — below threshold. Monitor to 20+ trades."
+  },
+  {
+    "date": "2026-09-30T16:00:00Z",
+    "idea": "Follow up on delegated NEUTRAL signal — volume-dry-up/EMA-reclaim",
+    "rationale": "Delegated to signal_analyst Sep 30 14:00. Not yet built. This is the signal diversity fix.",
+    "expected_impact": "New profitable signal in NEUTRAL (99% of trades).",
+    "category": "signal diversity",
+    "status": "action_needed",
+    "risk": "none (research/build)"
   }
 ]
