@@ -3489,3 +3489,11 @@
   **LOSING AUTOPSY:** 18 losers 24h — 7 pump-chain- SHORT EXTREME (CASHCAT/oversold, blacklist working), 9 hotset rs-s* chop (normal), 2 mover- killed (aging out).
   **CREATIVE (3):** (1) Fix PUMP_CHAIN_SHORT_RSI_MIN row[8] bug (dead code) (+$0.20-0.40/7d) (2) Monitor doji-bottom-long 20+ trades (3) Verify exec-time RSI ceiling fix.
   **0 CHANGES APPLIED.** — brain_auditor
+
+- [2026-09-30 11:15 UTC] auto_1hr: NO CONFIG CHANGE — quiet hour
+  0T closed last hour, 0 open. 24h: 30T 50%WR +$0.06 | 7d: 121T 43.8%WR -$1.73.
+  ATR_SL 0% — fix stable. No kill candidates. pump-chain- SHORT 7d 52.3%WR breakeven (not below revert).
+  VERIFIED: PUMP_CHAIN_SHORT_RSI_MIN filter LIVE (50 log blocks today: DOT RSI=9.5, CRV 24.9, FIL 21.6).
+  brain_auditor 08:00 "dead code" claim WRONG — do not touch.
+  0 CHANGES APPLIED.
+  BY: auto_1hr
