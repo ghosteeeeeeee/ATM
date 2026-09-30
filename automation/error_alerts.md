@@ -36,3 +36,12 @@
 - **WARN** (2x): `hermes-1m-candle.timer INACTIVE`, `hermes-5m-candle.timer INACTIVE` — candle collection timers stopped. 15m regime, auto-1hr, archive timers still active. May be intentional (manual stop) or timer expiry. Check if candles are still collecting via price_collector.
 - **WARN** (1x): `disk 84%` — sustained at 84% since 00:48 (8 hours). 18G free. Below threshold but not decreasing. Consider log rotation if it doesn't drop.
 - **INFO**: Pipeline running, 0 open trades, 0 signals last hour. Market entirely NEUTRAL (115/116 tokens). Prices fresh (1.6min). 0 errors in logs. No auto-fixes applied — candle timers may be intentional pause.
+
+## Error Alerts — 2026-09-30 09:48 UTC
+- **WARN** (1x): `disk 85%` — was 94G/118G used. AUTO-FIX: vacuumed journald (~1GB freed) → 84% (93G/118G). Still near threshold; compress >2d logs next cycle if it creeps back.
+- **WARN** (1x): `hermes-1m-candle.timer` + `hermes-5m-candle.timer` INACTIVE. NOT an outage — `hermes-price-collector` is writing candles directly (1m age 1.2min, 5m age 3.2min). Standalone candle aggregator services are redundant; 5m-candle.service failed 2026-09-27. No data gap.
+- **WARN** (1x): `hermes-bug-hunter.service` FAILED 09:45 — real findings: hardcoded passwords (4 files), dead imports of defunct `signal_gen`/`ai_decider` (4 files), trade freq 0.2/hr. Not auto-fixed (needs code changes).
+- **WARN** (1x): `hermes-git-release.service` FAILED 08:59 — `update-git.py --dry-run` exit 1. Backup/seed zip not running. Not auto-fixed.
+- **INFO**: 8 non-trading units were in failed state (5m-candle, away-detector, better-coder, brain-auditor, bug-hunter, git-release, mtf-macd-tuner, trading-checklist). Cleared via `reset-failed`. Trading path unaffected.
+- **INFO**: Pipeline healthy — 0 errors/30min, 116 signals/1h, 0 open trades, 1 closed today (continuum-osc+ LONG -$0.02). Market LONG_BIAS (6 long / 0 short / 110 neutral). Speed 126/241 ≥50th pct. Prices fresh. Timers firing (pipeline, price-collector, signal-compactor, watchdog all on schedule).
+- **INFO**: `prices_hermes.db` is a 0-byte empty file (Aug 10 artifact). Live prices flow through price_history + candles.db. Harmless but confusing — candidate for deletion.

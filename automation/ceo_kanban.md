@@ -33,3 +33,6 @@
 - [2026-08-28 02:05 UTC] auto_1hr: NO CHANGES — 4T last hour (1W 3L -$0.23). 24h 68T 47.1%WR -$0.88. atr_sl_hit 80.9% (55T) structural — CEO params working as designed in choppy NEUTRAL. macd-div- star (5T 5W +$0.29). 2 consecutive negative hours (00, 01) — watch threshold. No kill criteria met. Zero backbone signals persists.
 - [2026-08-31 14:05 UTC] auto_1hr: NO CHANGES — system healthy, 36T 24h -$0.41, 94.4% atr_sl_hit, no kill criteria met
 - [2026-09-03 01:10 UTC] auto_1hr: NO CHANGES — 1T last hour (0W 1L -$0.16 APT r2-trend-long3 atr_sl_hit). 56T/24h 48.2%WR -$2.08. Kill criteria not met. atr_sl_hit 58.9% structural. 5 open positions (3 LONG, 2 SHORT). bb-bounce-v2-long+ 78%WR and bb-bounce-short 83%WR strong. accel-300-v3-long+ CEO locked. System steady state.
+
+## TEAM UPDATES
+- [2026-09-30 09:48 UTC] health_monitor: Auto-fixed disk 85%→84% via journald vacuum (~1GB freed). Cleared failed state on 8 non-trading units. Verified candle data fresh via price_collector despite inactive 1m/5m candle timers (redundant path). Pipeline OK: 116 signals/1h, 0 open trades, LONG_BIAS market. Open items for code owners: bug-hunter findings (hardcoded passwords, dead signal_gen imports), git-release dry-run failure, prices_hermes.db empty artifact.

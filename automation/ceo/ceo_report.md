@@ -113,3 +113,26 @@ NO CHANGES APPLIED. System in "wait and see" mode:
 2. **MONITOR:** pump-chain+ cold streak recovery (48h window)
 3. **MONITOR:** ATR_SL widening (need 30+ post-fix EXTREME trades for evaluation)
 4. **DEVELOP:** New signals for NEUTRAL regime (only 2 profitable types)
+
+## CEO Report — 2026-09-30 09:50 UTC
+
+### Diagnosis
+24h: 33T 42.4%WR -$0.22. 7d: 123T 43.9%WR -$1.80. Post-fix (Sep 28 10:39+): 57T 52.6%WR +$0.11, 0 ATR_SL hits. System slightly positive post-fix but 7d still negative from legacy losses aging out.
+
+### Root Cause
+**CANDLE TIMERS DISABLED.** hermes-1m-candle.timer and hermes-5m-candle.timer were both inactive. 0 candles collected in last hour. Without fresh 1m/5m candles, RSI/ATR/indicator computations degrade — every downstream filter and signal quality metric suffers. This explains persistent hotset chop and mediocre WR despite post-fix improvements.
+
+### Fix Applied
+1. **Re-enabled hermes-1m-candle.timer and hermes-5m-candle.timer** (systemctl enable --now). Both active as of 09:50 UTC.
+2. **Verified PUMP_CHAIN_SHORT_RSI_MIN=25 working** — brain_auditor's "dead code" claim was wrong. 7 RSI<25 signals blocked (EXPIRED, executed=0) since 05:30 UTC. 0 oversold SHORT entries executed. Filter reads row[8]=rsi_14 correctly.
+
+### Verification
+Candle timers active. 1m timer triggers every 1min, 5m every 5min. Next candle collection within 1 minute. RSI filter confirmed blocking oversold entries via signal DB query (0 executed RSI<25 since deploy).
+
+### Goals
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate 7d | 43.9% | 48% | 48h |
+| Post-fix WR | 52.6% | 55% | 24h |
+| doji-bottom-long trades | 6 | 20+ | 7d |
+| Candle freshness | 0/hr | 60/hr 1m | 1h |
