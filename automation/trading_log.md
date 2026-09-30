@@ -881,3 +881,32 @@ BY: auto_1hr
 - 7d still -$1.73 (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 14:15] Hourly Analysis
+
+**Trades:** 0 closed last hour | 2 open (COMP/DYDX pump-chain- SHORT, entered 14:03/14:07 — flow RESUMED)
+**24h exits:** hard_sl 10T -$0.17 (avg -0.017) | profit-monster-trail 8T +$0.15 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00
+**24h signals:** pump-chain- 6T 66.7%WR +$0.55 (improving: was 57.1%+$0.13 @12:15) | volume-breakout-long+ 1T +$0.94 | doji-bottom-long 4T 75%WR +$0.12 | rs-s* singles mostly 1T negatives (hotset chop, sample too small to kill)
+
+**Diagnosis:**
+1. Entry quality: N/A — 0 closed last hour; open shorts entered at RSI 40-49 (not oversold) — good
+2. SL behavior: hard_sl 10/21 (48%) 24h; atr_sl_hit 0% — ATR fix stable, hard_sl structural not SL-too-tight
+3. Signal quality: no signal with 3+T 0%WR last hour → no kill candidates
+4. Trade frequency: 0 closed/hr but 2 opened — not overtrading, not starved
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl: no 3+ consecutive negative hours with real trades
+- Trade count not >20/hr
+- CONF_FILTER_MIN=90, PUMP_CHAIN_SHORT_RSI_MIN=25 already in place
+- pump-chain- SHORT 24h 66.7%WR +$0.55 — RSI_MIN filter continuing to work; do not touch
+
+**Open Questions:**
+- hotset.json still empty (cycle 14309) — signals still fire via pump-chain/signals_runner path; compactor "no signals survived" persists but execution is NOT blocked. Not a constants fix — flagged prior hours.
+- 2 open pump-chain- SHORTs to watch: COMP entry 25.158 SL 25.425 TP 24.580 | DYDX entry 0.14528 SL 0.14637 TP 0.14163 — RR-engine trailing active
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr

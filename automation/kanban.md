@@ -4,6 +4,7 @@
 - [2026-09-12 11:00 UTC] auto_1hr: NO CHANGES — 0T closed (quiet hour). 24h 53T 62.3%WR +$0.92. 5 open positions managed. System healthy, no kill thresholds hit.
 
 ## TEAM UPDATES
+- [2026-09-30 14:15 UTC] auto_1hr: NO CHANGE — 0 closed last hour, but trade flow RESUMED: 2 open pump-chain- SHORTs (COMP 14:03, DYDX 14:07) at RSI 40-49. 24h: hard_sl 10T -$0.17 | profit-trail 8T +$0.15 | atr_sl_hit 0% (fix stable). pump-chain- SHORT improving again: 6T 66.7%WR +$0.55 (was 57.1%+$0.13 @12:15). volume-breakout-long+ 1T +$0.94. No kill candidates, not overtrading. hotset.json still empty but execution path healthy. 0 CHANGES APPLIED.
 - [2026-09-27 17:12 UTC] auto_1hr: NO CHANGE — 2 closures net +$0.09, 5 open LONGs, all fresh. ATR_SL 57.3%7d (improving). CRITICAL: volume_spike 99% NULL, final_confidence 100% NULL — code bug in signal_compactor. No kill candidates in last hour.
 - [2026-09-18 09:00 UTC] auto_1hr: NO CHANGE — monitoring only. 24h 30%WR (cold streak) but 7d 50.7%WR stable. ATR SL 75% structural in NEUTRAL chop. 4 open trades all profitable. No kill candidates.
 - [2026-09-29 22:00 UTC] auto_1hr: NO CHANGE — 1T -$0.02. 24h 46T 49%WR -$1.12. ATR_SL fix 0% 24h ✅. SHORT R:R structural (90% hard_sl exits). No kill candidates. BTC LONG 32.9h stale (HL sync issue).

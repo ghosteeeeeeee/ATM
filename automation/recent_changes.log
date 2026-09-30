@@ -3505,3 +3505,10 @@
   volume-breakout-long+ best: 2T 100%WR +$1.02. doji-bottom-long 4T 75%WR +$0.12.
   No kill candidates, no overtrading (0/hr). 0 CHANGES APPLIED.
   BY: auto_1hr
+- [2026-09-30 14:15 UTC] auto_1hr: NO CONFIG CHANGE — flow resumed
+  0T closed last hour, 2 open pump-chain- SHORTs (COMP/DYDX) entered 14:03/14:07.
+  24h: hard_sl 10T -$0.17 | profit-trail 8T +$0.15 | atr_sl_hit 0% (fix stable).
+  pump-chain- SHORT 24h 66.7%WR +$0.55 (improving). volume-breakout-long+ 1T +$0.94.
+  No kill candidates. hotset empty but execution healthy via pump-chain path.
+  0 CHANGES APPLIED.
+  BY: auto_1hr
