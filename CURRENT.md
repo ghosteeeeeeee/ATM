@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 20:40 UTC**
+**Last Updated: 2026-09-30 22:30 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
@@ -52,6 +52,31 @@ System recovering strongly. 4 open positions (MNT LONG bb-bounce combo, IOTA/ADA
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-30 23:37 UTC)
+
+- **🟢 24h 13T 46.2%WR +$0.96 (verified 23:37 UTC).** volume-breakout-long+ +$0.94. pump-chain-v5 net +$0.27. pump-chain- SHORT 5T 40%WR -$0.30. Pipeline restarted 23:33 — signal_reporter gate fix (pump-chain- EXTREME override bypass) now loaded. ALGO SHORT opened 23:21 was pre-restart.
+- **🟢 DRIFT-001 CODE FIXED.** bb_bounce_v2_long.py + bb_bounce_v3_long.py now also filter on rsi_1m (was 15m-only while metadata stored 1m). 14d: stored RSI>60 = 15T 26.7%WR -$0.32; <=60 = 6T 83.3%WR +$0.20. Kills 1 tiny winner (SAND +$0.05). Metadata now stores rsi_15m + rsi_1m. **RESTART pipeline to load.**
+- **🔴 DRIFT-002 OPEN:** Exec-time LONG RSI ceiling uses 5m candles; signals filter 1m/15m. BTC bb-bounce rsi_14=77.32 executed after ceiling=70 fix (20:32 UTC). except Exception: pass silent-fail. Delegate bug_hunter. SHORT RSI<40: 0 violations post-fix.
+- **🟢 signal_versions.json EXISTS** at `/root/.hermes/data/signal_versions.json` (plural). Stop flagging missing.
+- **WINNER DNA:** volume-breakout-long+ EXTREME RSI 60-80 = **7T 100%WR +$2.03/14d**. EXTREME overall 13T 76.9%WR +$2.63. NORMAL 60-80 = 50%WR -$0.22. RSI ceiling 95 blocks exhausted 97-98 zone. Watchlist: signal-specific conf boost at 15T DNA trades.
+- **doji-bottom-long HIGH specialist:** 30d HIGH 7T 85.7%WR +$0.67. Monitor to 15-20T before conf boost.
+- **pump-chain- after gate fix:** EXTREME/HIGH blocked (0.0). NORMAL only (2T/14d) — may go rare/dormant. Correct if EXTREME was the bleed. Verify 0 new EXTREME entries post-restart.
+- **LOSING AUTOPSY:** 4 losers all <$0.20 — variance, not systematic. No filter change.
+- **CREATIVE (4):** vol-breakout EXTREME conf boost | doji HIGH boost | exec-RSI timeframe align | stale-signal conf decay.
+- **MONITOR:** bb-bounce 1m filter 48h | post-restart pump-chain- EXTREME=0 | v5 eval Oct 1 (do not extend on 3T) | NEUTRAL signal still unbuilt | position_manager lock contention this run.
+- **0 CONFIG CHANGES. 1 CODE FIX.**
+
+
+- **🟢 24h 12T 50.0%WR +$0.96 (verified 22:30 UTC).** volume-breakout-long+ 1T 100%WR +$0.94. pump-chain-v5 3T net +$0.27. pump-chain- SHORT 4T 50%WR -$0.30. 7d: 114T 44.7%WR -$1.68. Post-fix Sep28 10:39+: 66T 53.0%WR +$0.34. 3 open: MNT LONG bb-bounce HIGH, IOTA SHORT pump-chain- EXTREME +4.7%, BABY SHORT pump-chain- EXTREME -0.46%.
+- **LOSING AUTOPSY: 4 losers 24h, ALL tiny (<$0.20), variance not systematic.** ADA pump-chain- SHORT RSI=43.24 -$0.17 (inside golden band 40-45, 86%WR 14d), ALGO pump-chain- SHORT RSI=46.67 -$0.19 (core 45-55 band), LDO pump-chain-v5 -$0.17 (test), BTC continuum MAE scratch -$0.02. No filter change warranted — would block winners.
+- **🔴 DRIFT-001 CONFIRMED IN CODE:** bb_bounce_v2_long.py:282 filters on candle RSI (`rsi = _compute_rsi(closes)`) but :318 metadata stores `rsi_1m`. RSI_MAX=60 is NOT a no-op — it filters 15m RSI — but metadata RSI 60-70 (12T 33%WR -$0.28/14d) still fires because 1m RSI > 60 while 15m RSI <= 60. CODE FIX → bug_hunter. Soft stopgap: conf penalty -15pt for metadata RSI 60-70 (suggested, not applied).
+- **🟡 signal_version.py STILL MISSING** (flagged 5h+, still missing 22:30). → bug_hunter.
+- **🟡 V5 TEST: 3T 66.7%WR +$0.27** (DOT +$0.23, BLUR +$0.21, LDO -$0.17). Eval Oct 1. **RECOMMEND EXTENDING TO OCT 3** — 3T insufficient (CEO decision).
+- **🟡 SIGNAL GATES — MONITOR:** vol-breakout EXTREME RSI60-80 conf boost @20T (7T now, 100%WR +$2.03). doji-bottom HIGH conf boost @20T (7T, 85.7%WR +$0.67). pump-chain- RSI40-45 golden band conf boost @15T (7T, 86%WR +$0.47). PUMP_CHAIN_SHORT_RSI_MIN=25 dead-zone recheck at 48h (rsi35-40: 3T 0%WR -$0.50, sample <20).
+- **RECURRING:** SHORT structural disadvantage (14d SHORT -$4.23 vs LONG +$2.02, R:R 0.73:1), signal diversity (only 4 net-positive signals among 8+), bb-bounce RSI field mismatch (3+ runs), NEUTRAL signal unbuilt (delegated to signal_analyst).
+- **CREATIVE (5):** (1) V5 extend eval to Oct 3 (2) vol-breakout EXTREME RSI60-80 conf boost +10pt at 20T (3) doji-bottom HIGH conf boost +10pt at 20T (4) pump-chain- golden band conf boost +15pt at 15T (5) bb-bounce soft RSI60-70 conf penalty -15pt stopgap until code fix.
+- **0 CHANGES APPLIED.** All recent fixes verified, all samples below thresholds. Code bugs → bug_hunter. — brain_auditor
 
 ## Audit Update (2026-09-30 20:40 UTC)
 

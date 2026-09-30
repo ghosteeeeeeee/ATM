@@ -282,6 +282,13 @@ def detect_bb_bounce_v2_long(token, closes):
         if rsi > RSI_MAX:
             return None  # RSI overbought, bounce likely to fail
 
+        # FILTER 2c: 1m RSI ceiling — DRIFT-001 fix. Metadata stores rsi_1m;
+        # filter only checked 15m, so 1m>60 while 15m<=60 slipped through.
+        # 14d impact if enforced on stored RSI: block 15T -$0.32 26.7%WR,
+        # keep 6T +$0.20 83.3%WR, kill only 1 tiny winner (SAND +$0.05).
+        if rsi_1m is not None and rsi_1m > RSI_MAX:
+            return None
+
         # FILTER 3: Trend (not bearish)
         if trend == 'BEARISH':
             return None  # Counter-trend
@@ -316,6 +323,8 @@ def detect_bb_bounce_v2_long(token, closes):
             'lower': lower,
             'width': width,
             'rsi': rsi_1m if rsi_1m is not None else rsi,
+            'rsi_15m': rsi,
+            'rsi_1m': rsi_1m,
             'trend': trend,
             'bounce_pct': bounce_pct,
             'velocity': vel,

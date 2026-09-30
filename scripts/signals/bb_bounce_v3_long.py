@@ -349,6 +349,11 @@ def detect_bb_bounce_v3_long(token, closes):
     if rsi < RSI_MIN or rsi > RSI_MAX:
         return None
 
+    # ── FILTER 4b: 1m RSI band — same leak as v2 (DRIFT-001). Metadata stores
+    # rsi_1m; 15m band check alone let 1m extremes through.
+    if rsi_1m is not None and (rsi_1m < RSI_MIN or rsi_1m > RSI_MAX):
+        return None
+
     # ── FILTER 4: Trend — not bearish ──
     trend = _get_15m_trend(token)
     if trend == 'BEARISH':
@@ -401,6 +406,8 @@ def detect_bb_bounce_v3_long(token, closes):
         'lower': lower,
         'width': width,
         'rsi': rsi_1m if rsi_1m is not None else rsi,
+        'rsi_15m': rsi,
+        'rsi_1m': rsi_1m,
         'rsi_prev': rsi_prev,
         'trend': trend,
         'bounce_pct': bounce_pct,

@@ -920,5 +920,88 @@
     "gate": "bug_hunter code fix — already flagged, needs follow-up",
     "run_ts": "2026-09-30T21:34:35Z",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-09-30T22:30:13Z",
+    "idea": "Extend pump-chain-v5 eval window to Oct 3",
+    "rationale": "V5 test only 3T (net +$0.27, 66.7%WR). Criteria pass but 3T is noise. Extend 48h for meaningful sample.",
+    "expected_impact": "Prevents premature KEEP/KILL on noise",
+    "category": "test governance",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T22:30:13Z",
+    "idea": "volume-breakout-long+ conf boost +10pt when EXTREME+RSI60-80 hits 20T",
+    "rationale": "EXTREME RSI 60-80 = 7T 100%WR +$2.03 (14d+30d identical). Gate at 20T.",
+    "expected_impact": "Rewards core DNA, blocks nothing",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T22:30:13Z",
+    "idea": "doji-bottom-long HIGH regime conf boost +10pt at 20T",
+    "rationale": "HIGH 7T 85.7%WR +$0.67 vs NORMAL 5T 40%WR $0.00. Gate at 20T.",
+    "expected_impact": "Prefer HIGH setups; NORMAL unchanged",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T22:30:13Z",
+    "idea": "pump-chain- SHORT RSI 40-45 golden band conf boost +15pt at 15T",
+    "rationale": "RSI 40-45 = 7T 86%WR +$0.47. Gate at 15T.",
+    "expected_impact": "More golden-band execution; core band unchanged",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T22:30:13Z",
+    "idea": "bb-bounce soft conf penalty -15pt for metadata RSI 60-70 (stopgap)",
+    "rationale": "While bug_hunter fixes RSI field mismatch, soft penalty reduces killing field (12T 33%WR) without hard-block. 50-60 band untouched.",
+    "expected_impact": "Fewer 60-70 entries; 50-60 preserved",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low-medium"
+  },
+  {
+    "date": "2026-09-30T23:37:10Z",
+    "idea": "volume-breakout-long+ signal-specific confidence boost when regime=EXTREME AND RSI 55-85 (winner DNA)",
+    "rationale": "14d EXTREME RSI 60-80 = 7T 100%WR +$2.03. EXTREME overall 76.9%WR +$2.63. NORMAL 60-80 = 50%WR -$0.22. Global EXTREME mult 1.15 already active; signal-specific boost doubles down on clearest edge. DNA band under 20T — watchlist only.",
+    "expected_impact": "+$0.20-0.40/7d (boost fill rate of proven band, not new risk)",
+    "category": "entry sniper",
+    "status": "watchlist",
+    "risk": "low",
+    "sample": "7T DNA band — promote at 15T. HIGH-only if ever applied to doji; this boost is EXTREME-only."
+  },
+  {
+    "date": "2026-09-30T23:37:10Z",
+    "idea": "doji-bottom-long HIGH-regime confidence boost",
+    "rationale": "30d HIGH: 7T 85.7%WR +$0.67. 14d HIGH: 6T 83.3%WR +$0.36. Specialist. NORMAL 40%WR flat — boost must be HIGH-only.",
+    "expected_impact": "+$0.10-0.20/7d in HIGH regime",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "sample": "7T/30d HIGH — promote at 15-20T"
+  },
+  {
+    "date": "2026-09-30T23:37:10Z",
+    "idea": "Exec-time RSI check on same timeframe as signal filter + log failures (no silent except:pass)",
+    "rationale": "BTC bb-bounce rsi_14=77.32 executed after LONG_RSI_CEILING=70 because exec check uses 5m RSI. except Exception: pass swallows failures. Three RSI sources = audit blind spots.",
+    "expected_impact": "Blocks overbought LONG leaks; +$0.10-0.30/7d",
+    "category": "systems / bug",
+    "status": "suggested — bug_hunter",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T23:37:10Z",
+    "idea": "Stale-signal confidence decay (is_stale=True → scale final_confidence)",
+    "rationale": "BTC: is_stale=True, 6.23min, final_confidence=93.8, entered RSI 77, flat in 90s. High conf on stale signal is wrong.",
+    "expected_impact": "+$0.10-0.25/7d",
+    "category": "entry quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
