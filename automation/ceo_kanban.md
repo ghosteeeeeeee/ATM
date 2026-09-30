@@ -48,3 +48,6 @@
 - [2026-09-30 16:50 UTC] health_monitor: Auto-fixed failed non-trading services via reset-failed (5m-candle, better-coder, git-release, trading-checklist, weather-station-api). Trading path clean.
 - [2026-09-30 16:50 UTC] health_monitor: Vacuumed journald (freed 255MB) — disk still 86% from DB growth (coin_tracker 3.4G, candles 2.3G). No log files >7d.
 - [2026-09-30 16:50 UTC] health_monitor: position_manager FATAL x3 = guardian lock contention (by design), not a crash. Guardian healthy 9h. Next-cycle recovery confirmed. Pipeline LIVE, 3 open / 15 closed today / +55.2% PnL. 89 signals/1h. LONG_BIAS.
+
+## TEAM UPDATES
+- [2026-09-30 21:10 UTC] auto_1hr: NO CONFIG CHANGE — healthy hour. 1T closed (BTC bb-bounce-v2-long+ HL_CLOSED $0). atr_sl_hit 0% 24h (ATR fix stable). mfe/mae now recording — entry quality verified 0.06% excursion. pump-chain- SHORT x3 open, ADA -0.11 dragging. 7d still -$1.28 (pre-fix aging out).

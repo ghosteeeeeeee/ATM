@@ -1104,3 +1104,33 @@ BY: auto_1hr
 - 7d still negative (117T -$1.35, pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 21:10] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $0.00 (WR: 0.0%) — 24h net +$1.11; hourly 20:00 still flat
+
+**Detail:** BTC `bb-bounce-v2-long+` LONG → HL_CLOSED $0.00 (pnl_pct -0.0012). Entry RSI 81.16, conf 98.8, 5x, duration 80m. **mfe/mae now populated**: MFE=MAE≈0.06% — near-flat excursion, not a setup failure.
+
+**Diagnosis:**
+1. Entry quality: mfe/mae live — adverse excursion 0.06% << 0.5%. Quality OK; HL_CLOSED looks like fee/hl-exit edge, not bad entry.
+2. SL behavior: atr_sl_hit 0% of 24h closes (12T) — ATR floor + VOL-GATE in `tpsl_utils.py` confirmed present (lines 19, 524–548). Not a CEO alert.
+3. Signal quality: bb-bounce-v2-long+ 24h 2T 0W -$0.02 — not a kill (needs 0%WR + 3T *in last hour*; last hour 1T). pump-chain- 24h 3T -$0.13 still worst but ADA open -$0.11 dragging it.
+4. Trade frequency: 1/hr << 20 — not overtrading.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — no CEO alert
+- No kill candidates this hour
+- 24h avg_pnl positive — no regime size cut
+- 1/hr — no confidence raise
+
+**Open Questions / Sideways:**
+- **`scripts/signal_version.py` STILL MISSING** (8h flagged) — any future constants change will have no audit trail. Create a stub or drop the SOP requirement.
+- **mfe/mae unblocked** — entry-quality checks now possible going forward.
+- pump-chain- SHORT x3 open (IOTA +0.03 / ADA -0.11 / BABY +0.02) — net slightly negative; watch close-out this hour
+- MNT bb-bounce LONG still open -$0.09
+- 7d: 116T, 53 wins, **-$1.28** (pre-fix losses aging out)
+
+BY: auto_1hr
