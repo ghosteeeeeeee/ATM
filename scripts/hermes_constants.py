@@ -865,6 +865,7 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
 LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
 LONG_RSI_CEILING = 65          # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ LONG = 80T 41.3%WR -$0.39 (block). RSI 55-65 = 27T 51.9%WR +$1.40 (sweet spot, allowed). Ceiling at 65 blocks overbought LONG entries.
+VOLUME_BREAKOUT_LONG_RSI_CEILING = 95  # brain_auditor 2026-09-30 — volume-breakout-long+ is STANDALONE_BYPASS momentum signal. 14d RSI>70: 9T 77.8%WR +$1.23 (BEST band). Blanket LONG_RSI_CEILING=65 kills its edge. 95 blocks only exhausted zone (RSI>95: 2L -$0.32, 0W). Same pattern as existing vol-breakout RSI<20 exclusion in signal_compactor.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
 # When SL zone blocks a signal, check if zone is strong enough to flip direction.
@@ -1261,26 +1262,26 @@ OSCILLATOR_MULTS = {
 # Extended 3→1 (2026-09-20) — hours 1-2 bleed $1.62/7d (pump-chain+ LONG 0%WR).
 # Extended from 05:00-07:00 to 03:00-07:00 (2026-09-12) — 30d: Hour 3 is -$1.77 (3rd worst).
 # Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
-TIME_BLOCK_ENABLED = True               # Penalty during bad hours (extended from 05-07, 2026-09-12)
-TIME_BLOCK_START = 0                    # UTC hour (inclusive) — extended 1→0 (2026-09-21) — hour 0: 9T 22.2%WR -$0.77/7d, pump-chain+ 0%WR -$0.41
-TIME_BLOCK_END = 9                      # UTC hour (exclusive: extended from 7 to 9, 2026-09-15 — hour 9 bleeds -$0.50 despite 57.9% WR)
-TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
+TIME_BLOCK_ENABLED = False              # DISABLED 2026-09-30 — T: "pumps and dumps happen at all times, we need to dial in entry conditions"
+TIME_BLOCK_START = 0                    # UTC hour (inclusive) — kept for reference
+TIME_BLOCK_END = 9                      # UTC hour (exclusive) — kept for reference
+TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone — disabled
 
-# ── pump-chain+ Dead Hours ────────────────────────────────────────────────────
-# 7d data: hours 0-4 UTC = 0%WR, 15 trades, -$1.73 — NO wins. Hour 5+ = 46.9%WR +$3.95.
-# Hard block (return 0.0) — soft penalty insufficient for 0%WR dead zone.
-PUMP_CHAIN_LONG_DEAD_HOURS = [1, 2, 3, 4, 7, 18, 21]  # CEO 2026-09-29 — removed 0,14,20,23 (profitable 30d: h0 +$0.72, h14 -$0.17, h20 +$0.19, h23 +$0.69). Added 18 (30d: -$0.15). 30d losers kept: h1 -$0.54, h2 -$0.42, h3 -$0.44, h4 -$0.27, h7 -$0.55, h21 -$0.58. Opens 3 more hours for pump-chain+. Expected +$0.30-0.60/7d.
-PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # brain_auditor 2026-09-22 — 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries. Verified: 0/19 RSI 50-60 winners have gap>1.5%.
-PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-09-24 — 14d: RSI 65-75 = 15T 41.7%WR +$0.02 (dead zone, flat). RSI>75 = 10T 40%WR -$0.32 (negative). RSI 50-60 = 19T 63.2%WR +$1.49 (sweet spot). Tightened 75→70 to block RSI 70-75 dead zone (6T 33.3%WR +$0.35). Expected +$0.03-0.10/7d.
-PUMP_CHAIN_LONG_RSI_MIN = 35          # brain_auditor 2026-09-22 — 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners). Oversold LONG = catching falling knife.
+# ── pump-chain+ Entry Quality (replaced dead hours) ─────────────────────────
+# T philosophy: "Every pump is a LONG opportunity. Every dump is a SHORT opportunity."
+# Fix entry conditions, not the clock.
+PUMP_CHAIN_LONG_DEAD_HOURS = []         # DISABLED 2026-09-30 — use entry quality filters instead
+PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries.
+PUMP_CHAIN_LONG_RSI_MAX = 70          # 14d: RSI 65-75 = 15T 41.7%WR (dead zone). RSI 50-60 = 19T 63.2%WR (sweet spot).
+PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers). Oversold LONG = catching falling knife.
 
-# pump-chain- SHORT dead hours — 14d data: hours 2,3 = 7T 14.3%WR -$0.83 (worst hours, 0%WR in hour 2). Hour 2: 3T 0%WR -$0.41, Hour 3: 4T 25%WR -$0.42. Expected +$0.83/14d = +$0.42/7d.
-PUMP_CHAIN_SHORT_DEAD_HOURS = [2, 3, 4, 8, 9, 11, 18, 20]  # auto_1hr 2026-09-25 — added 4 (3T 0%WR -$0.41/7d, worst remaining losing hour). Net dead hours: +$1.61/14d = +$0.81/7d.
-PUMP_CHAIN_SHORT_RSI_MIN = 25           # CEO 2026-09-30 — 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST). Blocks oversold SHORT entries via STANDALONE_BYPASS. Expected +$0.20-0.40/7d.
+# pump-chain- SHORT entry quality (replaced dead hours)
+PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
+PUMP_CHAIN_SHORT_RSI_MIN = 25         # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
 
-# pullback-entry- SHORT dead hours — 14d data: hours 4,8,13,20 = -$2.81/14d (25T). Hour 04: 6T 16.7%WR -$0.84, 08: 4T 25%WR -$0.51, 13: 4T 25%WR -$0.44, 20: 11T 18.2%WR -$1.02. CEO 2026-09-23: fixed from [0,1,3,7,10,11,17,22] which blocked profitable hours (11=+$0.38, 22=+$0.72).
-PULLBACK_ENTRY_SHORT_DEAD_HOURS = [0, 1, 3, 4, 6, 7, 8, 10, 11, 13, 19, 20, 22]  # auto_1hr 2026-09-25 — added 7 (4T 50%WR -$0.40) and 19 (4T 25%WR -$0.38). Net dead hours: +$6.52/14d = +$3.26/7d.
-PULLBACK_ENTRY_SHORT_NORMAL_BLOCK = True  # brain_auditor 2026-09-22 — 14d NORMAL: 8T 12.5%WR -$1.13 (worst regime). EXTREME: 53.8%WR -$0.15. Signal only works in volatile markets.
+# pullback-entry- SHORT entry quality (replaced dead hours)
+PULLBACK_ENTRY_SHORT_DEAD_HOURS = []  # DISABLED 2026-09-30 — use entry quality filters instead
+PULLBACK_ENTRY_SHORT_NORMAL_BLOCK = True  # 14d NORMAL: 8T 12.5%WR -$1.13 (worst regime). EXTREME: 53.8%WR. Signal only works in volatile markets.
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.

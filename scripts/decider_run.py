@@ -1740,7 +1740,7 @@ def execute_trade(token, direction, price, confidence, source,
     # time, RSI may have dropped into danger zone. Check NOW at execution time.
     # CASHCAT教训: RSI 15.5 and 33.4 at entry → -6.4% loss (price bounced from oversold)
     try:
-        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING
+        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
         import sqlite3 as _rsi_sqlite
         from paths import CANDLES_DB as _rsi_candles_db
         _rsi_conn = _rsi_sqlite.connect(f"file:{_rsi_candles_db}?mode=ro", uri=True, timeout=5)
@@ -1761,6 +1761,8 @@ def execute_trade(token, direction, price, confidence, source,
                 _rsi_al = sum(_rsi_losses) / 14
                 if _rsi_al > 0:
                     _exec_rsi = 100 - (100 / (1 + _rsi_ag / _rsi_al))
+                    # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
+                    _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
                     if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
                         log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (would be catching falling knife)')
                         return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
@@ -1771,9 +1773,9 @@ def execute_trade(token, direction, price, confidence, source,
                     if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
                         log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
                         return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
-                    if direction.upper() == 'LONG' and LONG_RSI_CEILING > 0 and _exec_rsi > LONG_RSI_CEILING:
-                        log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {LONG_RSI_CEILING} at execution time (overbought — chasing)')
-                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {LONG_RSI_CEILING}'
+                    if direction.upper() == 'LONG' and _long_ceiling > 0 and _exec_rsi > _long_ceiling:
+                        log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
+                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'
         finally:
             _rsi_conn.close()
     except Exception:
