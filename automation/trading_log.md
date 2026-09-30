@@ -380,3 +380,126 @@ BY: auto_1hr
 - LONG underperforming SHORT: 44%WR vs 55%WR, -$0.86 vs -$0.26
 
 BY: auto_1hr
+
+## [2026-09-29 22:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L, -$0.02) | 2 open (BTC LONG 32.9h stale, COMP LONG 2.5h)
+**24h:** 46T 23W 23L -$1.12 (48.9% WR) | **7d:** 135T 60W (44.4% WR) -$3.14
+
+**ATR SL:** 0/46 (0%) 24h ✅ | 31/135 (23.0%) 7d (old trades, fix working)
+**Exits 24h:** 25 hard_sl (-$1.34) | 21 profit-monster-trail (+$0.47)
+**LONG vs SHORT 24h:** LONG 27T 44%WR -$0.86 | SHORT 20T 55%WR -$0.26
+**Regime 24h:** EXTREME 31T 52%WR -$0.52 | HIGH 9T 56%WR -$0.11 | NORMAL 6T 33%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 15T 60%WR +$0.59 | doji-bottom-long 5T 80%WR +$0.28
+**Signal drag 24h:** mover- 2T 0W -$0.68 (killed) | rs-s30 3T 0W -$0.08
+
+**Structural: SHORT trailing capture**
+- SHORT trail exits captured only 4.8-5.8% of move vs TP targets
+- 18/20 SHORT exits are hard_sl (90%) vs LONG 7/26 hard_sl (27%)
+- SHORT winners trail out too early, losers hit full SL
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill candidates: none (no signal with 3+ trades and 0 wins in last 2h)
+- ATR_SL fix: 0 hits 24h, rock solid
+- Trade frequency: ~1-2/hr, normal Sunday night
+- SHORT R:R structural — logged for pattern tracking, needs deeper tpsl_utils review before changing
+
+**Open Questions:**
+- BTC LONG 32.9h stale — HL reconciliation re-opens every minute. Manual HL close needed.
+- SHORT trailing capture ratio low — TRAILING_DISTANCE_PCT (1.2%) may be too wide for SHORTs that don't trend
+
+BY: auto_1hr
+
+## [2026-09-29 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 3 open (BTC LONG 33.9h stale, COMP LONG 3.5h, ALGO SHORT 0.3h)
+**24h:** 45T 22W 23L -$0.92 (48.9% WR, avg -$0.02) | **7d:** 134T 60W -$2.84 (44.8% WR)
+
+**ATR SL:** 0/45 (0%) 24h ✅
+**Exits 24h:** 24 hard_sl (-$1.39) | 21 profit-monster-trail (+$0.47)
+**LONG vs SHORT 24h:** LONG 26T 46%WR -$0.61 | SHORT 19T 53%WR -$0.31
+**Regime 24h:** EXTREME 30T 50%WR -$0.57 | HIGH 9T 56%WR -$0.11 | NORMAL 6T 33%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 14T 57%WR +$0.54 | doji-bottom-long 5T 80%WR +$0.28
+**Signal drag 24h:** mover- 2T 0W -$0.68 (killed) | rs-s30 3T 0W -$0.08 (tiny)
+
+**SHORT R:R improved:** pump-chain- SHORT avg_win=$0.22 avg_loss=$0.21 → 1.08:1 (was 0.69:1 earlier)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet Sunday night
+- No kill candidates (no signal 3+T 0%WR with meaningful losses)
+- ATR_SL fix: 0 hits 24h, stable
+- Trade frequency ~2/hr — normal
+- SHORT R:R improved, no action needed
+
+**Open Questions:**
+- BTC LONG 33.9h stale — HL reconciliation structural issue, re-opens every minute. Manual HL close or HL sync fix needed.
+
+BY: auto_1hr
+
+---
+
+## [2026-09-30 00:14 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 3 open (BTC LONG 34.9h, COMP LONG 4.5h, ALGO SHORT 1.3h)
+**24h:** 44T 21W 23L -$1.13 (47.7% WR) | **7d:** 134T 60W 74L -$2.84 (44.8% WR)
+
+**ATR SL:** 0/44 (0%) 24h ✅
+**Exits 24h:** 23 hard_sl (-$1.60) | 21 profit-monster-trail (+$0.47)
+**LONG vs SHORT 24h:** LONG 26T 46%WR -$0.61 | SHORT 18T 50%WR -$0.31
+**SHORT R:R 7d:** pump-chain- SHORT avg_win=$0.130 avg_loss=$0.141 → 0.92:1 (improving)
+
+**Regime 24h:** EXTREME 29T 48%WR -$0.78 | HIGH 9T 56%WR -$0.11 | NORMAL 6T 33%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 13T 54%WR +$0.33 | doji-bottom-long 5T 80%WR +$0.28
+**Signal drag 24h:** mover- 2T 0W -$0.68 (killed) | rs-s30 3T 0W -$0.08 (tiny)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet Monday early morning
+- No kill candidates: mover-/mover+ already killed, rs-s30 tiny losses
+- ATR_SL fix: 0 hits 24h, stable 44T+
+- hard_sl 52% exits — structural, needs tpsl_utils.py refactor
+- SHORT R:R improving (0.92:1 7d) — pump-chain- SHORT acceptable
+- CONF_FILTER_MIN 90 blocking low-conf entries
+
+**Open Questions:**
+- BTC LONG 34.9h stale — HL reconciliation issue. Needs manual close or sync fix.
+- 7d -$2.84 — recovering from pre-fix losses. EXTREME = 79% of 7d losses.
+
+BY: auto_1hr
+
+---
+
+
+## [2026-09-30 01:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L, -$0.19) | 2 open (BTC LONG 36h stale, COMP LONG 5.5h)
+**24h:** 42T 19W 23L -$1.68 (45.2% WR)
+**ATR SL:** 0/42 (0%) 24h ✅ (fix holding 42T+)
+**Exits:** 23 hard_sl (avg -$0.213) | 19 profit-monster-trail (avg +$0.016)
+**Regime 24h:** EXTREME 28T 42.9%WR -$1.17 | HIGH 8T 50%WR -$0.27 | NORMAL 6T 33.3%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 13T 46.2%WR -$0.05 | doji-bottom-long 4T 75%WR +$0.12 | bb-bounce-v2-long+ 4T 50%WR +$0.04
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — too small a sample to act
+- No kill candidates: mover- 2T at 0%WR but under 3T threshold; full history 12T 58.3%WR
+- ATR_SL fix: 0 hits, stable
+- Trade frequency: 1/hr — normal early morning
+- hard_sl 54.8% elevated but avg loss contained ($0.213)
+
+**Open Questions:**
+- hard_sl avg loss $0.213 vs profit-monster-trail avg gain $0.016 — R:R skewed (13:1 loss-to-gain ratio on exits)
+- BTC LONG 36h stale — needs reconciliation
+- 7d recovering from pre-fix losses
+
+BY: auto_1hr
