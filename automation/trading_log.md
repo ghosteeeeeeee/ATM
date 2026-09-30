@@ -975,3 +975,34 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 17:11] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L)
+**PnL:** +$0.21 (WR: 100%) — BLUR pump-chain-v5 LONG entry→exit +93.06%, hard_sl.
+**24h exits:** hard_sl 8T +$0.78 (47%) | profit-monster-trail 6T +$0.15 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00 — atr_sl_hit 0%
+**24h signals:** pump-chain- 7T 71%WR +$0.57 | volume-breakout-long+ 1T +$0.94 | pump-chain-v5 1T +$0.21 | doji-bottom-long 4T 75%WR +$0.12 | bb-bounce-v2-long+ 2T 50%WR +$0.03 | continuum-osc+ 1T -$0.02 | continuum_engine 1T $0.00
+**Hourly PnL:** 12:00 $0 | 14:00 +$0.03 | 16:00 +$0.24 — positive streak
+
+**Diagnosis:**
+1. Entry quality: BLUR LONG clean winner, hard_sl locked profit
+2. SL behavior: atr_sl_hit 0% 24h — ATR fix stable, hard_sl is profitable trailing exits not tight-SL bleed
+3. Signal quality: no signal 3+T 0%WR last hour → no kill candidates
+4. Trade frequency: 1/hr — not overtrading, not starved
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — no CEO alert
+- No kill candidates
+- avg_pnl positive — no regime size reduction
+- Trade count 1/hr << 20/hr
+- pump-chain family continues as best signal cluster
+- REGIME_CONF_HIGH_MULT=0.50 — leave
+
+**Open Questions:**
+- **SIDWAYS FIND:** `scripts/signal_version.py` STILL MISSING — audit trail for constants changes blocked. Flagged 3 hours running.
+- Dead zone RSI 30-40 pump-chain- SHORT (0%WR -$0.50 from brain_auditor) — candidate MIN 25→35 after 48h data
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr
