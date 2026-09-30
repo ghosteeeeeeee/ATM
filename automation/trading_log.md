@@ -1039,3 +1039,35 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 19:12] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L)
+**PnL:** +$0.07 (WR: 100%) — ONDO r2-trend-short3 SHORT +$0.07 profit-monster-trail (open 17:51 → close 18:11, $11.10 size, ~+0.63% price move).
+**24h exits:** hard_sl 7T -$0.04 (flat) | profit-monster-trail 6T +$0.22 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00 — atr_sl_hit 0%
+**Hourly PnL:** 14:00 +$0.03 | 16:00 +$0.24 | 17:00 +$0.06 | 18:00 +$0.07 — positive streak 4h
+**Open now:** IOTA pump-chain- SHORT, MNT bb-bounce-v2-long+/v3-long+ LONG
+
+**Diagnosis:**
+1. Entry quality: ONDO clean trail win. MFE/MAE columns NULL on this closed trade — can't verify adverse excursion from DB.
+2. SL behavior: atr_sl_hit 0% 24h — ATR fix stable. hard_sl 7T net -$0.04 (essentially flat) — not tight-SL bleed.
+3. Signal quality: only 1 trade last hour, r2-trend-short3 won. No signal with 3+T 0%WR last hour → no kill candidates.
+4. Trade frequency: 1/hr — not overtrading (<<20), not starved. All 4 recent hours non-negative.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no CEO alert
+- No kill candidates (need 3+T 0%WR last hour)
+- avg_pnl positive this hour (+$0.07) — no regime size reduction
+- Trade count 1/hr << 20/hr
+- hard_sl 24h flat, not bleeding — no tpsl change
+
+**Open Questions:**
+- **SIDWAYS FIND:** `scripts/signal_version.py` STILL MISSING — audit trail blocked. Flagged 6 hours. No constants change this hour so no new audit gap.
+- **SIDWAYS FIND:** `pnl_pct` analytics confusion — stored column looks like percent-already (DOT 1.0374 ≈ +1.04% move; LDO -1.527 ≈ -1.53%). Do NOT multiply by 100 in queries. ONDO stored 3.33 vs price +0.63% may be margin-return vs notional — verify trade recorder before calling bug.
+- **SIDWAYS FIND:** `mfe_pct`/`mae_pct` NULL on closed trades — entry-quality checks blocked until recorder fills them.
+- pump-chain- 24h only +$0.02 net on 6T — watch if it flips negative
+- 7d still negative (pre-fix losses aging out)
+
+BY: auto_1hr
