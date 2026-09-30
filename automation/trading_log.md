@@ -828,3 +828,26 @@ brain_auditor 08:00 claimed filter is dead code (row[8] always NULL). **VERIFIED
 - hard_sl 46.7% dominance — structural exit, not fixable without TP/SL timing changes
 
 BY: auto_1hr
+
+## [2026-09-30 12:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h exits:** 13 profit-monster-trail +$0.16 (avg +0.012) | 12 hard_sl -$0.51 (avg -0.043) | 1 cut-loser-MAE-GUARD -$0.02 | 1 HARD_SL_FAILED +$0.94
+**24h signals:** volume-breakout-long+ 2T 100%WR +$1.02 | doji-bottom-long 4T 75%WR +$0.12 | pump-chain- 7T 57.1%WR +$0.13 (improving — was 44.4% at 11:15)
+**Last 6h:** 0 trades closed — overnight quiet continues
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — no kill candidates, no overtrading
+- ATR_SL: 0% of 24h closes — fix stable
+- pump-chain- SHORT 24h now 57.1%WR +$0.13 (up from 44.4%-$0.34) — RSI_MIN=25 filter working as intended, do not touch
+- hard_sl 12/27 24h (44%) — structural, not SL-too-tight (atr_sl_hit=0)
+- avg_pnl: no 3+ consecutive negative hours (no hours with trades in last 6h)
+- CONF_FILTER_MIN=90 in place — blocks 85-90 conf hotset bleed
+
+**Open Questions:**
+- Trade flow near zero for 6h+ — check if pipeline/signal detection is healthy, or genuinely no setups
+- 7d still -$1.73 — recovery pending more volume on winners (volume-breakout-long+ is the bright spot)
+
+BY: auto_1hr
