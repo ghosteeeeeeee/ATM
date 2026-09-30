@@ -3386,6 +3386,28 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # RSI was OK at detection but dipped to oversold by execution time.
             # Backtest 7d: blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
             if direction == 'SHORT' and SHORT_RSI_FLOOR > 0:
+                # Bearish structure override: if BTC continuum says bearish, oversold = continuation
+                # Not bounce risk — in a downtrend, oversold coins keep falling
+                _rsf_bearish_override = False
+                try:
+                    import os as _rsf_os
+                    _rsf_cont = sqlite3.connect(_rsf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    _rsf_row = _rsf_cont.execute(
+                        "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
+                        "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                    ).fetchone()
+                    _rsf_cont.close()
+                    if _rsf_row:
+                        _rsf_phase, _rsf_linreg, _rsf_ema = _rsf_row
+                        # Bearish structure: ALL THREE must agree
+                        _rsf_bearish = (_rsf_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                                        _rsf_linreg in ('LEAN_BEAR', 'BEAR') and
+                                        _rsf_ema == 'BELOW')
+                        if _rsf_bearish:
+                            _rsf_bearish_override = True
+                except Exception:
+                    pass
+                
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3405,8 +3427,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
                             if _rsf_rsi < SHORT_RSI_FLOOR:
-                                log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
-                                continue
+                                if _rsf_bearish_override:
+                                    log(f"  ✅ [SHORT-RSI-FLOOR-OVERRIDE] {tkn}: SHORT allowed — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
+                                else:
+                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:

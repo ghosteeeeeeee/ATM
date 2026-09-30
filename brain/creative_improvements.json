@@ -761,9 +761,40 @@
     "rationale": "BTC continuum_engine trades have empty _signal_metadata {} — known bug 5+ sessions. Bypasses RSI floors/ceilings, volume filters, confidence scoring. Code fix, not config change.",
     "expected_impact": "Unknown — enables proper filtering of continuum trades",
     "category": "bug fix / infrastructure",
-    "status": "suggested",
+    "status": "boosted",
     "risk": "low",
     "sample_size": "N/A — bug fix",
-    "action": "Delegate to bug_hunter"
+    "action": "Delegate to bug_hunter",
+    "boosted_at": "2026-09-30T18:05:38.312385+00:00"
+  },
+  {
+    "date": "2026-09-30T18:34:03Z",
+    "idea": "pump-chain-v5 test EVAL CRITERIA before Oct 1 deadline",
+    "rationale": "V5 test ends Oct 1. 3 trades so far: DOT +$0.23, BLUR +$0.21, LDO -$0.17 = net +$0.27. All EXTREME, all hard_sl. Without pre-set criteria, decision will be gut-feel. Set them NOW: KEEP if 7d net PnL>0 AND WR>=50%; KILL if net negative. Do NOT extend without data.",
+    "expected_impact": "Prevents premature re-enable or premature kill of a potentially viable signal",
+    "category": "decision framework",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "3T — insufficient for signal verdict, sufficient for setting eval criteria"
+  },
+  {
+    "date": "2026-09-30T18:34:03Z",
+    "idea": "bb-bounce-v2-long+ RSI 60-70 confidence penalty -15pt (NOT hard block)",
+    "rationale": "14d RSI>60: 13T net -$0.30. But 4 winners live in the band (50% of bb-bounce's winners). Hard RSI_MAX=60 would save $0.30 but kill half the edge. Confidence penalty reduces false positives while keeping winners available. Softer than the6x-suggested hard block.",
+    "expected_impact": "+$0.10-0.20/7d from fewer RSI>60 entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "13T — BELOW 20 threshold. MONITOR 48h before applying."
+  },
+  {
+    "date": "2026-09-30T18:34:03Z",
+    "idea": "volume-breakout-long+ RSI 60-80 confidence boost +10pt at 20+ trades",
+    "rationale": "14d: RSI 60-80 = 13T 76.9%WR +$1.81 (KILLER band). RSI 80+ = 4T 50%WR -$0.22 (VOLUME_BREAKOUT_LONG_RSI_CEILING=95 protects). Approaching 20T threshold for conf boost. Same pattern as doji-bottom HIGH specialist.",
+    "expected_impact": "+3-5% WR for volume-breakout in the 60-80 band",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "sample_size": "13T — approaching 20T. Recheck in 48h."
   }
 ]

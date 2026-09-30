@@ -1,19 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 17:35 UTC**
+**Last Updated: 2026-09-30 18:35 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
 
-System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%WR +$1.59** (best day in weeks). Post-fix: 59T 52.5%WR +$0.14 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — 0 RSI>70 LONG entries since (monitor 24-48h). PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING**. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 **SET TODAY** — protects RSI 70-80 edge (100%WR). volume-breakout-long+ EXTREME + RSI 60-80 = **8T 100%WR +$2.03** (killer combo). doji-bottom-long HIGH regime 6T 83.3%WR — HIGH specialist. **NEUTRAL signal delegated to signal_analyst — NOT YET BUILT.**
+System recovering strongly. 1 open position (MNT LONG bb-bounce combo). Pipeline healthy. **24h: 16T 62.5%WR +$1.10** (best day in weeks continues). Post-fix: 61T 54.1%WR +$0.38 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — 0 RSI>70 LONG entries since (monitor 24-48h). PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING**. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 **SET TODAY** — protects RSI 70-80 edge. volume-breakout-long+ RSI 60-80 = **13T 76.9%WR +$1.81** (killer combo, approaching 20T for conf boost). doji-bottom-long HIGH regime 6T 83.3%WR — HIGH specialist. pump-chain-v5 test: 3T net +$0.27, ends Oct 1 — eval criteria set. **NEUTRAL signal delegated to signal_analyst — NOT YET BUILT.** signal_version.py MISSING — flagged 5h, still missing.
 
-- **24h:** 19T 57.9%WR +$1.59. pump-chain- SHORT 7T 71.4%WR +$0.58 (best). volume-breakout-long+ 1T 100%WR +$0.94. doji-bottom-long 4T 75%WR +$0.12. 6 losers all small (<$0.20).
-- **7d:** 122T 44.3%WR -$1.67. EXTREME -$0.98 (70T), HIGH -$0.67 (24T), NORMAL -$0.02 (25T). Post-fix (Sep 28+): 59T 52.5%WR +$0.14. 0 ATR_SL hits.
-- **OPEN:** 1 position.
+- **24h:** 16T 62.5%WR +$1.10. volume-breakout-long+ 1T 100%WR +$0.94. doji-bottom-long 3T 100%WR +$0.12. pump-chain- SHORT 4T 50%WR -$0.31. 5 losers all small (<$0.20).
+- **7d:** 119T 46.2%WR -$1.21 (improving from -$1.67). EXTREME -$0.52 (67T, 52.2%WR), HIGH -$0.67 (24T), NORMAL -$0.02 (25T). Post-fix (Sep 28+): 61T 54.1%WR +$0.38. 0 ATR_SL hits.
+- **OPEN:** 1 position — MNT LONG bb-bounce-v2-long+,bb-bounce-v3-long+.
 - **LONG:** volume-breakout-long+ (+$2.48/14d, 70%WR — BEST, EXTREME+RSI60-80 DNA), pump-chain+ (+$1.23/14d, 41.8%WR), doji-bottom-long (+$0.36/14d, 63.6%WR — HIGH specialist).
-- **SHORT:** pump-chain- SHORT ACTIVE (51T/14d 51%WR breakeven, RSI_MIN=25 working). pullback-entry- NEVER_REENABLE, mover- NEVER_REENABLE.
-- **KILLED (Sep 29):** mover- SHORT — MOVER_MINUS_ENABLED=False. 3T 0%WR -$0.72/7d. All hard_sl.
-- **KILLED (Sep 28):** pump-chain+ LONG V5 — PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. V5 re-enabled Sep 29 for test (0 trades, ends Oct 1).
+- **SHORT:** pump-chain- SHORT ACTIVE (52T/14d 51.9%WR breakeven, RSI_MIN=25 working). pullback-entry- NEVER_REENABLE, mover- NEVER_REENABLE.
+- **V5 TEST (ends Oct 1):** 3T since Sep 29: DOT +$0.23, BLUR +$0.21, LDO -$0.17 = net +$0.27. All EXTREME, all hard_sl. **EVAL CRITERIA: KEEP if 7d net>0 AND WR>=50%; KILL if net negative. Do NOT extend without data.**
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS: [] — DISABLED 2026-09-30** (entry quality filters instead of time blocks). Was [1,2,3,4,7,18,21].
@@ -53,6 +52,29 @@ System recovering strongly. 1 open position. Pipeline healthy. **24h: 19T 57.9%W
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-30 18:35 UTC)
+
+- **🟢 24h 16T 62.5%WR +$1.10 (verified 2026-09-30 18:30 UTC).** System recovering. 7d improving: 119T 46.2%WR -$1.21 (was -$1.67). 1 open: MNT LONG bb-bounce combo.
+- **🟢 ALL RECENT FIXES VERIFIED WORKING:**
+  - Exec-time RSI ceiling (Sep 30 06:30): 0 LONG RSI>70 leaks.
+  - PUMP_CHAIN_SHORT_RSI_MIN=25: RSI<25 blocked. RSI 40-45 edge preserved (6T 100%WR +$0.64/14d).
+  - pump-chain- HIGH block (Sep 29): 0 HIGH trades since.
+  - VOLUME_BREAKOUT_LONG_RSI_CEILING=95: protects 60-80 band (13T 76.9%WR +$1.81/14d).
+  - CONF_FILTER_MIN=70: system firing normally.
+- **LOSING AUTOPSY: 5 losers 24h, ALL small (<$0.20), variance not systematic.** ALGO/DYDX pump-chain- SHORT EXTREME mid-RSI (46.7, 56.0) — inside core edge bands, not oversold knives. LDO pump-chain-v5 -$0.17 (V5 test, net +$0.27 so far). BTC continuum MAE guard scratch -$0.02. SOL bb-bounce trail scratch -$0.02. No pattern.
+- **🟡 PUMP-CHAIN- SHORT RSI DEAD ZONE:** RSI 35-40 = 3T 0%WR -$0.50/14d. MIN 25→35 candidate — 0 winners blocked in 40-45 band, but 3T sample < 20. Monitor 48h.
+- **🟡 BB-BOUNCE-V2-LONG+ RSI>60:** 13T net -$0.30/14d (60-70: 11T 36.4%WR -$0.26; 70+: 2T -$0.04). BUT 4 winners in band (50% of bb-bounce's winners). Hard RSI_MAX=60 suggested 6+ sessions, never applied — kills half the edge. **Soft alternative: confidence penalty -15pt.** Sample 13T <20, MONITOR.
+- **🟢 VOLUME-BREAKOUT RSI 60-80:** 13T 76.9%WR +$1.81/14d. Approaching 20T threshold for conf boost +10pt. RSI 80+ = 4T 50%WR -$0.22 (ceiling=95 protects).
+- **🟡 DOJI-BOTTOM HIGH SPECIALIST:** HIGH 6T 83.3%WR +$0.36 vs NORMAL 5T 40%WR $0.00. Sample 11T < 20. Monitor.
+- **🟡 7d REGIME:** EXTREME 67T 52.2%WR -$0.52, HIGH 24T 37.5%WR -$0.67, NORMAL 25T 44.0%WR -$0.02. EXTREME WR >50%.
+- **🟡 V5 TEST (ends Oct 1):** 3T net +$0.27 (DOT +$0.23, BLUR +$0.21, LDO -$0.17). All EXTREME hard_sl. **EVAL CRITERIA SET: KEEP if 7d net>0 AND WR>=50%; KILL if net negative.**
+- **🟡 DRIFT — signal_version.py MISSING:** auto_1hr flagged 5h ago, still missing. Code fix → bug_hunter.
+- **🟡 DRIFT — neutral_sniper.py EXISTS (Sep 22) but NOT deployed.** NEUTRAL gap persists (99% market). Escalate to signal_analyst.
+- **🟡 CONTINUUM METADATA:** Improved — 2 empty/7d (was 100%). 3 orphan paths remain → bug_hunter.
+- **RECURRING:** signal diversity (only volume-breakout-long+ +$2.48/14d and pump-chain+ +$1.23/14d net positive), NEUTRAL regime dominance, SHORT R:R structural disadvantage (improving).
+- **CREATIVE (3 new):** (1) pump-chain-v5 test eval criteria before Oct 1 (2) bb-bounce RSI 60-70 confidence penalty -15pt (soft alternative to hard block) (3) volume-breakout RSI 60-80 conf boost +10pt at 20T.
+- **0 CHANGES APPLIED.** All fixes working, samples below thresholds. Monitor before changing more. — brain_auditor
 
 ## Audit Update (2026-09-30 17:35 UTC)
 

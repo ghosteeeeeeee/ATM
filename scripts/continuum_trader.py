@@ -354,11 +354,16 @@ class ContinuumTrader:
                     print(f"[TRADER] Closing orphaned {pos['side']} @ entry ${pos['entry_price']:.1f}")
                     if not PAPER_MODE:
                         result = close_hl_position()
+                        err = (result.get('error') or result.get('message') or '')
                         if result.get('success'):
                             print(f"[TRADER] Orphaned position closed")
                             track_exit(pos['entry_price'], state.price, pnl)
+                        elif 'No open position' in err:
+                            # HL confirms flat — drop phantom from tracking, don't retry forever
+                            print(f"[TRADER] No HL position — dropping phantom from tracking")
+                            track_exit(pos['entry_price'], state.price, pnl)
                         else:
-                            print(f"[TRADER] Close failed: {result.get('error')}")
+                            print(f"[TRADER] Close failed: {err}")
                     else:
                         track_exit(pos['entry_price'], state.price, pnl)
             
@@ -435,7 +440,7 @@ class ContinuumTrader:
                 track_entry(side, fill_price, size_usd, order_id=str(order_id))
                 
                 # Register in paper DB to prevent guardian from closing as orphan
-                self._register_in_paper_db(side, fill_price, fill_size, order_id)
+                self._register_in_paper_db(side, fill_price, fill_size, order_id, state)
                 
                 self.last_trade_time = time.time()
                 self.last_entry_time = time.time()
@@ -445,28 +450,56 @@ class ContinuumTrader:
                 # Update last_trade_time to prevent retry spam
                 self.last_trade_time = time.time()
     
-    def _register_in_paper_db(self, side: str, entry_price: float, size_btc: float, order_id):
+    def _register_in_paper_db(self, side: str, entry_price: float, size_btc: float, order_id, state=None):
         """Register continuum position in paper DB to prevent guardian from closing as orphan."""
         try:
+            import json
             from _secrets import BRAIN_DB_DICT
             import psycopg2
-            
+
+            meta = {}
+            conf = 80.0
+            if state is not None:
+                conf = round(float(state.state_score), 1)
+                meta = {
+                    'z_score': round(state.zscore_val, 4),
+                    'z_score_tier': state.zscore_tier,
+                    'volume_spike': round(state.volume_ratio_val, 3),
+                    'volume_regime': state.volume_regime,
+                    'btc_score': conf,
+                    'ema300_position': state.ema300_position,
+                    'ema300_duration': state.ema300_duration,
+                    'velocity': round(state.velocity_val, 4),
+                    'velocity_state': state.velocity_state,
+                    'price_acceleration': round(state.acceleration_val, 4),
+                    'linreg_slope_state': state.linreg_slope_state,
+                    'linreg_direction': state.linreg_direction,
+                    'wyckoff_phase': state.wyckoff_phase,
+                    'ewave_count': state.ewave_count,
+                    'trend_quality': state.trend_quality,
+                    'market_phase': state.market_phase,
+                    'entry_phase': state.entry_phase,
+                    'price_at_signal': state.price,
+                    'final_confidence': conf,
+                }
+
             conn = psycopg2.connect(**BRAIN_DB_DICT)
             cur = conn.cursor()
-            
+
             # Insert into trades table (used by guardian for orphan detection)
             cur.execute("""
-                INSERT INTO trades (token, direction, strategy, amount_usdt, entry_price, 
+                INSERT INTO trades (token, direction, strategy, amount_usdt, entry_price,
                                    status, exchange, signal, paper, server, confidence, leverage,
-                                   open_time, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-            """, ('BTC', side, 'continuum', size_btc, entry_price, 
-                  'open', 'hyperliquid', 'continuum_engine', True, 'main', 80.0, 10))
-            
+                                   open_time, created_at, _signal_metadata)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
+            """, ('BTC', side, 'continuum', size_btc, entry_price,
+                  'open', 'hyperliquid', 'continuum_engine', True, 'main', conf, 10,
+                  json.dumps(meta)))
+
             conn.commit()
             cur.close()
             conn.close()
-            print(f"[TRADER] Registered in paper DB: {side} BTC @ ${entry_price:.1f}")
+            print(f"[TRADER] Registered in paper DB: {side} BTC @ ${entry_price:.1f} meta_keys={len(meta)}")
         except Exception as e:
             print(f"[TRADER] WARNING: Failed to register in paper DB: {e}")
             # Non-fatal — position still tracked in continuum_positions.json
