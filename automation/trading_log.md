@@ -678,3 +678,70 @@ BY: auto_1hr
 - RS legacy trades all losing — already killed, just waiting for final closes
 
 BY: auto_1hr
+
+---
+
+
+## [2026-09-30 09:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 35T 44.4%WR -$0.60 | 7d: 126T 42.9%WR -$2.17
+**ATR SL:** 0/35 (0%) ✅ fix stable 38T+
+**Exits 24h:** 18 hard_sl (51%, avg -$0.087) | 15 profit-monster-trail (43%, avg +$0.009) | 1 cut-loser-MAE-GUARD | 1 HARD_SL_FAILED
+
+**Signal leaders 24h:**
+- volume-breakout-long+ 2T 100%WR +$1.02 — best
+- doji-bottom-long 4T 75%WR +$0.12 — strong
+- bb-bounce-v2-long+ 4T 50%WR +$0.04 — breakeven
+- pump-chain- SHORT 11T 36.4%WR -$0.51 — main drag
+- RS signals: 15T legacy (pre-cutoff) — all losing, 0%WR for recent trades
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — Sunday night quiet
+- ATR_SL fix: 0 hits, 38T+ confirmed
+- No kill candidates (no signal 3+T 0%WR in last hour)
+- pump-chain- 36.4%WR — drag but not at 0% kill threshold
+- hard_sl 51% dominant — structural, losses contained (-$0.087 avg)
+- Trade frequency: 0/hr — normal
+
+**Open Questions:**
+- pump-chain- SHORT persistent drag — may need RSI_MIN filter or regime restriction
+- hard_sl 51% dominance — structural exit, not fixable without TP/SL timing changes
+- 7d -$2.17 recovery slow — pre-fix losses still weighing
+
+BY: auto_1hr
+
+## [2026-09-30 10:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 33T 14W 19L -$0.22 (42.4% WR) | 7d: 124T 54W 70L -$1.89 (43.5% WR)
+**ATR SL:** 0/33 (0%) ✅ fix stable 33T+
+**Exits 24h:** 16 hard_sl (48.5%, avg -$0.080) | 15 profit-monster-trail (45.5%, avg +$0.009) | 1 cut-loser-MAE-GUARD | 1 HARD_SL_FAILED (+$0.94)
+
+**Signal performance 24h:**
+- volume-breakout-long+ 2T 100%WR +$1.02 — best
+- doji-bottom-long 4T 75%WR +$0.12 — strong
+- bb-bounce-v2-long+ 4T 50%WR +$0.04 — breakeven
+- pump-chain- SHORT 10T 40%WR -$0.43 — main drag
+- RS signals: all legacy (pre-cutoff), all losing, 0 new opens
+
+**Frequency:** 1 trade in 6h — Sunday night quiet
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — overnight quiet
+- ATR_SL fix: 0 hits, 33T+ confirmed
+- No kill candidates: no signal 3+T 0%WR in last hour
+- pump-chain- 40%WR — drag but not at 0% kill threshold
+- RS signals: all legacy, already killed, no new opens
+- Trade frequency: 1/6h — normal
+
+**Open Questions:**
+- pump-chain- SHORT persistent drag — monitor, may need RSI_MIN filter
+- 7d -$1.89 recovery slow — pre-fix losses still weighing
+- hard_sl 48.5% dominant — structural, losses contained
+
+BY: auto_1hr
