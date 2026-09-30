@@ -260,6 +260,10 @@ System active. 0 open positions. Pipeline healthy. 37T 24h 43.2%WR -$0.32. ATR_S
 - **CREATIVE (3):** (1) Dead hours fix APPLIED (2) EXTREME MIN_EXEC_CONFIDENCE=70 after 50+ post-fix trades (3) SHORT NULL RSI confidence boost +15pt (9th suggestion).
 - **1 CHANGE APPLIED.**
 
+## Today's Changes (Sep 30)
+
+1. **daily_orchestrator ~06:30 UTC — 1 CODE FIX.** **EXEC-TIME RSI CEILING — APPLIED.** decider_run.py execution-time RSI check (line 1762+) was missing SHORT_RSI_CEILING and LONG_RSI_CEILING checks. Only floors were checked. 3 hotset signals (rs-s52, rs-s94, rs-s44) + 1 doji-bottom-long entered LONG with RSI>70 in last 7d (2/4 losers: rs-s52 -$0.20, rs-s94 -$0.07). Root cause: context_gate RSI ceiling check depends on signal_metadata rsi_14 key, which hotset signals sometimes lack (signal_rsi_14=NULL). EXEC-TIME fix uses5m candle RSI, catches drift between detection and execution. Expected +$0.30-0.50/7d. **1 CHANGE APPLIED.** — daily_orchestrator
+
 ## Today's Changes (Sep 29)
 
 1. **CEO ~22:00 UTC — 1 CODE FIX.** **coin_tracker_hot.py NEUTRAL gate RELAXED.** Root cause of signal diversity crisis: signal blocked ALL NEUTRAL trades (99% of trades). 7 coins in Wyckoff accumulation (BANANA 59.71, BCH 58.24) now unlockable. CODE FIX: allows NEUTRAL when wyckoff + setup_score>40 + clustering>=2. FLAG RE-ENABLEMENT NEEDED: COIN_TRACKER_HOT_PLUS_ENABLED (RESEARCH_FLAGS). Expected +$0.30-0.50/7d. **1 CHANGE APPLIED.** — CEO
