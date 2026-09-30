@@ -1,196 +1,285 @@
 {
-  "timestamp": "2026-09-30T10:37:15Z",
-  "session_brain_stats": {
-    "queries_run": 5,
-    "top_themes": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing",
-      "hotset confidence RSI ceiling",
-      "doji-bottom-long volume-breakout"
+    "timestamp": "2026-09-30T11:35:06Z",
+    "agent": "brain_auditor",
+    "session_brain_stats": {
+        "queries_run": [
+            "signal performance winrate regime",
+            "new signal idea improvement strategy",
+            "loss money bleeding losing",
+            "pump-chain cold streak zero trades",
+            "signal_rsi_14 NULL metadata",
+            "doji-bottom long performance"
+        ],
+        "top_insights": [
+            "Repeated topic: signal diversity critical — only volume-breakout-long+ and pump-chain+ profitable across 14d sessions",
+            "Repeated topic: signal_rsi_14 NULL metadata drift — 28+ day recurring issue across sessions",
+            "Repeated topic: doji-bottom-long discussed as promising new signal — now live with 63.6% WR",
+            "Repeated topic: pump-chain+ cold streak — sessions kept investigating; root cause found this run (HIGH block + market HIGH regime)",
+            "Session lesson: 'blocking hours isn't the option, pumps/dumps happen all the time' — quality filters over time blocks"
+        ]
+    },
+    "trade_summary_24h": {
+        "trades": 30,
+        "winrate": 43.3,
+        "pnl": 0.06,
+        "long_pnl": 0.40,
+        "short_pnl": -0.34,
+        "by_signal_direction": [
+            {"signal": "pump-chain-", "direction": "SHORT", "trades": 9, "pnl": -0.34, "wr": 44.4},
+            {"signal": "rs-s129", "direction": "LONG", "trades": 1, "pnl": -0.23, "wr": 0.0},
+            {"signal": "rs-s47,rs-s53", "direction": "LONG", "trades": 1, "pnl": -0.22, "wr": 0.0},
+            {"signal": "rs-s34", "direction": "LONG", "trades": 1, "pnl": -0.21, "wr": 0.0},
+            {"signal": "rs-s30", "direction": "LONG", "trades": 3, "pnl": -0.08, "wr": 0.0},
+            {"signal": "doji-bottom-long", "direction": "LONG", "trades": 4, "pnl": 0.12, "wr": 75.0},
+            {"signal": "volume-breakout-long+", "direction": "LONG", "trades": 2, "pnl": 1.02, "wr": 100.0}
+        ],
+        "post_fix_window": {
+            "note": "CEO 2026-09-30 05:30: POST-FIX 56T 53.6%WR +$0.13 (0 ATR_SL hits). System slightly positive."
+        }
+    },
+    "trade_summary_7d": {
+        "trades": 121,
+        "winrate": 43.8,
+        "pnl": -1.73,
+        "long_pnl": -0.15,
+        "short_pnl": -1.58,
+        "by_regime": [
+            {"regime": "EXTREME", "trades": 69, "wr": 47.8, "pnl": -1.01},
+            {"regime": "HIGH", "trades": 24, "wr": 37.5, "pnl": -0.67},
+            {"regime": "NORMAL", "trades": 26, "wr": 42.3, "pnl": -0.05}
+        ],
+        "exit_reasons": [
+            {"exit": "profit-monster-trail", "trades": 47, "wr": 53.2, "pnl": 1.46},
+            {"exit": "atr_sl_hit", "trades": 24, "wr": 37.5, "pnl": -2.14},
+            {"exit": "hard_sl", "trades": 29, "wr": 37.9, "pnl": -1.66},
+            {"exit": "cut-loser-CL-T1", "trades": 3, "wr": 0.0, "pnl": -0.51}
+        ]
+    },
+    "trade_summary_14d": {
+        "trades": 315,
+        "winrate": 44.1,
+        "pnl": -2.49,
+        "top_profitable_signals_3plus": [
+            {"signal": "volume-breakout-long+", "direction": "LONG", "trades": 20, "pnl": 2.48, "wr": 70.0},
+            {"signal": "pump-chain+", "direction": "LONG", "trades": 55, "pnl": 1.23, "wr": 41.8},
+            {"signal": "doji-bottom-long", "direction": "LONG", "trades": 11, "pnl": 0.36, "wr": 63.6},
+            {"signal": "grind-trend+", "direction": "LONG", "trades": 18, "pnl": 0.24, "wr": 50.0}
+        ],
+        "top_losing_signals_3plus": [
+            {"signal": "pullback-entry-", "direction": "SHORT", "trades": 38, "pnl": -2.30, "wr": 34.2, "note": "DISABLED, aging out"},
+            {"signal": "mover+", "direction": "LONG", "trades": 14, "pnl": -1.12, "wr": 42.9, "note": "KILLED, aging out"},
+            {"signal": "pump-chain-", "direction": "SHORT", "trades": 50, "pnl": -0.39, "wr": 50.0, "note": "breakeven overall, EXTREME +$0.15, HIGH -$0.60 blocked"}
+        ]
+    },
+    "drift_findings": [
+        {
+            "finding": "pump-chain+ cold streak ROOT CAUSE FOUND",
+            "detail": "0 trades/7d, last close Sep 22 08:27. Logs 2026-09-30 show signals DETECTED (DOT, BLUR, ADA, APT, HBAR) but blocked by PUMP-CHAIN-HIGH — market currently in HIGH vol. PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED=True working as designed. 14d HIGH: 20T 35.0%WR +$0.17 (slightly positive, not pure noise). EXTREME: 33T 45.5%WR +$0.97.",
+            "in_code": "Yes — PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED=True (line 2713)",
+            "impact": "Signal correctly idle while market is HIGH. Will resume when regime returns to EXTREME/NORMAL/FLAT. REGIME_CONF_HIGH_MULT=0.50 already penalizes HIGH confidence."
+        },
+        {
+            "finding": "CASHCAT blacklist VERIFIED WORKING",
+            "detail": "0 CASHCAT trades after blacklist timestamp 2026-09-29 19:30 UTC. Double loss -$0.68 was pre-blacklist (10:26, 12:37).",
+            "in_code": "Yes — 'CASHCAT' in SHORT blacklist line 48",
+            "impact": "Fixed. No further action."
+        },
+        {
+            "finding": "PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED LIVE",
+            "detail": "auto_1hr 2026-09-30 11:15 confirmed 50 log blocks today (DOT RSI=9.5, CRV 24.9, FIL 21.6). Earlier brain_auditor 'dead code' claim (08:35) was WRONG — filter reads correct path at execution time.",
+            "in_code": "Yes — PUMP_CHAIN_SHORT_RSI_MIN=25 line 1279",
+            "impact": "Working. Oversold SHORT entries blocked via STANDALONE_BYPASS path."
+        },
+        {
+            "finding": "signal_rsi_14 STILL 100% NULL for doji-bottom / volume-breakout / hotset",
+            "detail": "All 11 doji-bottom, all 20 volume-breakout-long+, all hotset rs-s* trades have NULL signal_rsi_14. Detection-time RSI quality filters impossible on our BEST signals. 28+ day recurring drift — metadata injection bypass for these code paths.",
+            "in_code": "No — metadata injection missing for these signal paths",
+            "impact": "Blocks detection-time entry quality filters on highest-WR signals. Code fix (not config) needed. Delegate to bug_hunter."
+        },
+        {
+            "finding": "bb-bounce-v2-long+ RSI_MAX=60 suggestion DEAD",
+            "detail": "14d entry_rsi bands: <40=7T 71.4%WR -$0.02, 40-50=4T 25%WR -$0.10, 50-60=4T 25%WR -$0.01, 60-70=2T 50%WR -$0.01. No clear killing field. Sample 18T overall. Previous RSI_MAX suggestion no longer justified.",
+            "in_code": "N/A — suggestion withdrawn",
+            "impact": "Do not implement RSI_MAX for bb-bounce-v2-long+."
+        }
     ],
-    "recurring_topics": [
-      "SHORT R:R structural disadvantage (avg_win < avg_loss)",
-      "signal diversity critical (only 2-4 profitable signals)",
-      "hotset confidence inversely predicts quality",
-      "pump-chain+ cold streak (0 trades/7d)",
-      "EXTREME regime bleeding",
-      "new NEUTRAL regime signal requested repeatedly"
+    "recurring_problems": [
+        {
+            "topic": "SIGNAL DIVERSITY",
+            "frequency": "10+ sessions",
+            "status": "OPEN",
+            "detail": "Only volume-breakout-long+ (+$2.48/14d) and pump-chain+ (+$1.23/14d, HIGH-blocked currently) profitable. doji-bottom-long (11T +$0.36) promising but below 20T threshold. NEUTRAL regime has thin profitable coverage.",
+            "recommendation": "Develop new NEUTRAL-regime signal (EMA-reclaim or similar). Monitor doji-bottom to 20T."
+        },
+        {
+            "topic": "signal_rsi_14 NULL metadata",
+            "frequency": "8+ sessions over 28 days",
+            "status": "OPEN",
+            "detail": "100% NULL for doji-bottom, volume-breakout-long+, hotset rs-s*, continuum. volume_spike fix worked (81% populated) but RSI path still broken for these signals.",
+            "recommendation": "bug_hunter task: trace metadata injection for doji_bottom.py, volume-breakout, coin_tracker_hot.py paths."
+        },
+        {
+            "topic": "SHORT side structural bleed",
+            "frequency": "recurring but IMPROVING",
+            "status": "MONITORING",
+            "detail": "7d SHORT -$1.58 (93% of losses) but pump-chain- SHORT is breakeven (-$0.01/7d, 52.3% WR). Extreme SHORT kills (pullback-entry-, mover-) disabled and aging out. SHORT R:R still weak but improving post-fix.",
+            "recommendation": "No new SHORT config. Let legacy losses age out. Keep pump-chain- SHORT as only SHORT source."
+        }
     ],
-    "missing_implementations_from_sessions": [
-      "new NEUTRAL signal (EMA-reclaim / trend following) — discussed many times, never built",
-      "hotset confidence recalibration — MIN=90 applied, inverse pattern persists at 90-95",
-      "pump-chain- SHORT RSI dead-zone band 30-40 — identified, not implemented"
-    ]
-  },
-  "trade_summary_24h": {
-    "trades": 32,
-    "win_rate": "43.8%",
-    "pnl": -0.13,
-    "best": "volume-breakout-long+ 2T 100%WR +$1.02",
-    "good": "doji-bottom-long 4T 75%WR +$0.12",
-    "drag": "pump-chain- SHORT 9T 44.4%WR -$0.34; hotset rs-s* many small hard_sl",
-    "losers_24h": 15,
-    "post_fix_since_sep28_1039": "57T 52.6%WR +$0.11, 0 ATR_SL hits"
-  },
-  "trade_summary_7d": {
-    "trades": 122,
-    "win_rate": "43.4%",
-    "pnl": -1.81,
-    "regime": {
-      "EXTREME": "70T 47.1%WR -$1.09",
-      "HIGH": "24T 37.5%WR -$0.67",
-      "NORMAL": "26T 42.3%WR -$0.05"
+    "missing_implementations": [
+        {
+            "idea": "NEUTRAL regime signal diversity",
+            "detail": "Sessions repeatedly call for new NEUTRAL signal. Candidates discussed: EMA-reclaim LONG, amplitude breakout, frequency change detector. None built yet.",
+            "cross_ref": "scripts/signals/ has no dedicated NEUTRAL-reclaim signal. doji-bottom-long partially covers this.",
+            "priority": "HIGH"
+        },
+        {
+            "idea": "Detection-time RSI metadata for doji-bottom / volume-breakout / hotset",
+            "detail": "These paths bypass signal_rsi_14 injection. Blocks all detection-time RSI filters.",
+            "cross_ref": "scripts/signals/doji_bottom.py, volume-breakout path, scripts/signals/coin_tracker_hot.py",
+            "priority": "HIGH"
+        },
+        {
+            "idea": "COIN_TRACKER_HOT_PLUS_ENABLED re-enablement",
+            "detail": "Code fix (NEUTRAL gate relaxed) deployed Sep 29. Flag is in RESEARCH_FLAGS — needs human (T) approval. Expected +$0.30-0.50/7d from NEUTRAL diversity (7 coins in Wyckoff accumulation).",
+            "cross_ref": "hermes_constants.py line 3366 — currently False, NEVER_REENABLE comment",
+            "priority": "MEDIUM — requires human approval"
+        }
+    ],
+    "losing_trade_autopsy_24h": {
+        "losers": 15,
+        "clusters": [
+            {
+                "cluster": "pump-chain- SHORT EXTREME hard_sl",
+                "trades": "CASHCAT x2 (-$0.68, pre-blacklist), CHIP -$0.21, ALGO x2 (-$0.19+$0.04), DYDX -$0.18",
+                "root_cause": "EXTREME whipsaw — pump-chain- SHORT catches falling knives that bounce. CASHCAT fixed via blacklist (0 trades after). Remaining are small hard_sl scratches on low-cap coins.",
+                "entry_check": "All EXTREME regime. Losses small (max -$0.21 post-blacklist). No RSI pattern in metadata (NULL).",
+                "recommended_change": "NONE — blacklist working, remaining losses within normal variance for 50%WR breakeven signal",
+                "impact_on_winners": "N/A — no change proposed",
+                "confidence": "HIGH"
+            },
+            {
+                "cluster": "hotset rs-s* LONG hard_sl / scratches",
+                "trades": "USUAL rs-s129 -$0.23, ADA rs-s47/53 -$0.22, WLFI rs-s34 -$0.21, MNT rs-s44 -$0.06, plus small pmt scratches",
+                "root_cause": "Normal chop in NEUTRAL/HIGH. Composite rs-s* signals fire at high confidence but deliver 27-40% WR. CONF_FILTER_MIN=90 already applied and reducing volume.",
+                "entry_check": "Hotset signal_rsi_14 100% NULL — detection-time RSI filtering impossible. Entry RSI unknown at detection.",
+                "recommended_change": "NONE config — metadata fix (code) would enable detection-time RSI filter. CONF_FILTER_MIN=90 already in place.",
+                "impact_on_winners": "N/A — no config change proposed",
+                "confidence": "HIGH"
+            }
+        ],
+        "verdict": "No systematic new pattern in 24h losers. All clusters are known issues with fixes already deployed (blacklist, CONF_FILTER_MIN, RSI_MIN) or aging out. Losses are small scratches."
+    },
+    "signal_quality_deep_dive": {
+        "signals_below_50wr_14d_with_20plus_trades": [
+            {
+                "signal": "pump-chain- SHORT",
+                "trades_14d": 50,
+                "wr": 50.0,
+                "pnl": -0.39,
+                "note": "Breakeven. EXTREME 43T 51.2%WR +$0.15 (edge). HIGH 5T 20%WR -$0.60 (blocked). atr_sl_hit 21T -$1.18 is bleed source but ATR_SL widening fixed 0 hits recently — 24h exits all hard_sl.",
+                "fix_status": "HIGH_BLOCK + RSI_MIN=25 + blacklist all deployed. Post-fix breakeven. No further change."
+            }
+        ],
+        "promising_signals": [
+            {
+                "signal": "doji-bottom-long",
+                "trades_14d": 11,
+                "wr": 63.6,
+                "pnl": 0.36,
+                "recent_streak": "6 consecutive non-losing trades (Sep 27-30), all profit-monster-trail exits",
+                "wins_vs_losses_rsi": "Wins avg entry_rsi 49.0, losses avg 55.4 (tiny sample)",
+                "recommendation": "MONITOR to 20T. If streak holds, candidate for confidence boost. Sample <20 — do not change config now.",
+                "confidence": "MEDIUM"
+            },
+            {
+                "signal": "volume-breakout-long+",
+                "trades_14d": 20,
+                "wr": 70.0,
+                "pnl": 2.48,
+                "note": "BEST signal. 24h +$1.02 (COMP +$0.94, JUP +$0.08). All RSI NULL. atr_sl_hit 17T still 64.7%WR +$1.15 — winners ride momentum.",
+                "recommendation": "No change — already optimal. Fix RSI metadata to enable future quality filters."
+            }
+        ]
+    },
+    "drift_vs_sessions": [
+        {
+            "session_teaching": "SHORT RSI 45-55 = 85.7%WR sweet spot for pump-chain-",
+            "in_code": "YES — PUMP_CHAIN_SHORT_RSI_MIN=25 blocks below 25; SHORT_RSI_FLOOR=40 blocks below 40",
+            "status": "IMPLEMENTED AND VERIFIED LIVE (50 blocks today)"
+        },
+        {
+            "session_teaching": "CASHCAT blacklist from SHORT",
+            "in_code": "YES — in blacklist line 48",
+            "status": "IMPLEMENTED AND VERIFIED (0 trades after blacklist)"
+        },
+        {
+            "session_teaching": "doji-bottom-long is promising new signal",
+            "in_code": "YES — scripts/signals/doji_bottom.py exists and is firing",
+            "status": "IMPLEMENTED — 11T 63.6%WR +$0.36/14d"
+        },
+        {
+            "session_teaching": "New NEUTRAL regime signal needed for diversity",
+            "in_code": "NO — no dedicated NEUTRAL-reclaim signal built",
+            "status": "NOT IMPLEMENTED — still open, highest-priority gap"
+        },
+        {
+            "session_teaching": "signal_rsi_14 NULL drift must be fixed",
+            "in_code": "PARTIAL — volume_spike fixed (81%), RSI still NULL for doji/volume-breakout/hotset",
+            "status": "INCOMPLETE — code fix still needed"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-09-30T11:35:06Z",
+            "idea": "Evaluate pump-chain+ HIGH block redundancy — HIGH 20T/14d is +$0.17 not pure noise; REGIME_CONF_HIGH_MULT=0.50 already penalizes HIGH confidence",
+            "rationale": "Logs show pump-chain+ signals firing constantly today but blocked by PUMP-CHAIN-HIGH. 14d HIGH data: 20T 35.0%WR +$0.17 (slightly positive). Original block cited 35.7%WR as 'no edge' but PnL is positive because winners are larger (momentum rides). With REGIME_CONF_HIGH_MULT=0.50 already cutting HIGH confidence by 50%, the additional signal-specific HIGH block may be double-penalizing a marginally profitable regime. EXTREME remains the primary edge (+$0.97).",
+            "expected_impact": "+$0.10-0.25/7d if HIGH stays net-positive; risk contained by 0.50x confidence multiplier",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "verification": "14d HIGH 20T 35%WR +$0.17 (positive PnL). Would not block EXTREME trades (45.5%WR +$0.97 preserved). One variable only: remove PUMP_CHAIN_LONG_HIGH_BLOCK, keep REGIME_CONF_HIGH_MULT=0.50.",
+            "prerequisite": "Monitor 48h — if HIGH stays net-positive, implement. Do NOT change now (max 1 config/run, and this run has none)."
+        },
+        {
+            "date": "2026-09-30T11:35:06Z",
+            "idea": "bug_hunter: fix signal_rsi_14 metadata injection for doji_bottom.py, volume-breakout, and coin_tracker_hot.py paths",
+            "rationale": "All 11 doji-bottom, all 20 volume-breakout-long+, all hotset trades have NULL signal_rsi_14. These are our BEST signals (63.6% and 70% WR). Detection-time RSI quality filters cannot run. volume_spike fix worked (81% populated) proving the pattern — RSI path for these signals was never wired.",
+            "expected_impact": "+$0.30-0.80/7d once detection-time RSI filters can operate on quality signals",
+            "category": "metadata fix",
+            "status": "suggested",
+            "risk": "low",
+            "verification": "100% NULL confirmed via DB query this run. volume_spike parallel fix proves feasibility.",
+            "prerequisite": "Delegate to bug_hunter subagent — not a config change."
+        },
+        {
+            "date": "2026-09-30T11:35:06Z",
+            "idea": "Monitor doji-bottom-long to 20T — 6 consecutive non-losing trades, all profit-monster-trail exits",
+            "rationale": "doji-bottom-long: 11T 63.6%WR +$0.36/14d. Last 6 trades (Sep 27-30): CAKE -$0.01, WLFI +$0.16, SOL $0.00, NEO +$0.02, NXPC +$0.03, GMX +$0.07 — zero hard_sl losses in the streak. Exits clean via profit-monster-trail. Session brain shows T explicitly requested this signal be developed to 'top notch quality'. Wins avg RSI 49.0 vs losses 55.4 (suggests slight RSI ceiling edge once sample grows).",
+            "expected_impact": "If pattern holds to 20T: confidence boost candidate (+$0.10-0.20/7d). Not actionable yet — sample <20.",
+            "category": "signal quality",
+            "status": "monitoring",
+            "risk": "none",
+            "verification": "11T total, 6-streak verified via DB this run. Below 20T threshold — no config change.",
+            "prerequisite": "Wait for 20+ trades before any suggestion quality rules allow a change."
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "MONITOR: doji-bottom-long to 20T trades — if 60%+ WR holds, candidate for confidence boost",
+        "MONITOR: pump-chain+ HIGH block — if market stays HIGH and HIGH stays net-positive, evaluate removing block (keep REGIME_CONF_HIGH_MULT=0.50)",
+        "DELEGATE: bug_hunter — fix signal_rsi_14 metadata for doji_bottom.py / volume-breakout / coin_tracker_hot.py",
+        "DELEGATE: bug_hunter or T — COIN_TRACKER_HOT_PLUS_ENABLED re-enablement needs human approval (RESEARCH_FLAGS)",
+        "DEVELOP: new NEUTRAL-regime signal (EMA-reclaim or similar) — diversity gap remains open",
+        "MONITOR: pump-chain- SHORT post-fix — breakeven 7d, EXTREME edge intact, no further changes",
+        "CORRECTION LOGGED: brain_auditor 08:35 'PUMP_CHAIN_SHORT_RSI_MIN dead code' claim was WRONG — auto_1hr verified 50 live blocks today"
+    ],
+    "sanity_check": {
+        "session_lock": "none — config changes permitted",
+        "max_config_changes_per_run": "1 — this run applied 0 (none justified by data)",
+        "ceo_protected_flags": "untouched",
+        "time_based_changes_suggested": "none (banned)",
+        "blanket_changes_suggested": "none",
+        "sample_size_compliance": "all change suggestions require 20+ trades; doji-bottom (11T) and bb-bounce RSI bands marked monitoring-only"
     }
-  },
-  "trade_summary_14d_signals": {
-    "volume-breakout-long+": "20T 70%WR +$2.48 (BEST)",
-    "pump-chain+": "55T 41.8%WR +$1.23",
-    "doji-bottom-long": "11T 63.6%WR +$0.36 (promising)",
-    "grind-trend+": "18T 50%WR +$0.24",
-    "pump-chain-": "50T 50%WR -$0.39 (EXTREME edge thinning)",
-    "pullback-entry-": "38T 34.2%WR -$2.30 (killed, aging out)",
-    "mover+": "14T 42.9%WR -$1.12 (killed, aging out)"
-  },
-  "drift_findings": [
-    {
-      "finding": "CURRENT.md claims PUMP_CHAIN_SHORT_RSI_MIN=25 is DEAD CODE (row[8] always NULL)",
-      "reality": "FALSE — filter is LIVE. pipeline.log shows 37 blocks today: BABY SHORT RSI=23.1, LDO SHORT RSI=23.8 (repeated 06:37-06:58 UTC). row[8] IS rsi_14 from signals table (SELECT MAX(rsi_14) ... row[8]). CEO change deployed Sep 30 05:30 is working.",
-      "impact": "Doc was misleading. Filter correctly blocks RSI<25 oversold SHORT. 25-30 band (87.5%WR +$0.78/14d) preserved.",
-      "action": "CURRENT.md corrected this run."
-    },
-    {
-      "finding": "Session brain: hotset RSI>70 leak + exec-time ceiling",
-      "reality": "ALIGNED — daily_orchestrator deployed exec-time RSI ceiling fix 06:30 UTC today (decider_run.py:1770+). 0 production trades since deploy. Unverified in live flow.",
-      "impact": "Expected +$0.30-0.50/7d if it catches hotset overbought LONGs.",
-      "action": "Monitor 24h."
-    },
-    {
-      "finding": "Session brain: new NEUTRAL signal for diversity",
-      "reality": "NEVER IMPLEMENTED. Signal diversity still critical — only volume-breakout-long+ and pump-chain+ net positive with 5+ trades/14d.",
-      "impact": "System depends on 2 signals. NEUTRAL regime (99% of market) has thin edge.",
-      "action": "Backlog — research EMA-reclaim / trend-following for NEUTRAL."
-    },
-    {
-      "finding": "Session brain: hotset confidence inversely predicts",
-      "reality": "PARTIALLY ADDRESSED — CONF_FILTER_MIN=90 applied Sep 29 (blocks 89.8 bucket). 7d: 85-90 still 9T 44.4%WR -$0.57 (pre-filter legacy aging). 90-95: 3T -$0.06. 95+: 16T 43.8%WR -$0.17.",
-      "impact": "Worst bucket blocked. Inverse pattern remains at 90-95 but sample too small to raise MIN further.",
-      "action": "Monitor 48h before raising CONF_FILTER_MIN."
-    }
-  ],
-  "losing_trade_autopsy": {
-    "cluster_1_pump_chain_short_extreme": {
-      "trades": "9T 24h, -$0.34, 44.4%WR — all hard_sl, all EXTREME",
-      "losers_rsi": [
-        "CASHCAT RSI=15.45 -$0.26 (now blocked by RSI_MIN=25)",
-        "CHIP RSI=13.61 -$0.21 (now blocked)",
-        "DYDX RSI=16.04 -$0.18 (now blocked)",
-        "BABY RSI=17.53 -$0.09 (now blocked)",
-        "CASHCAT RSI=33.42 -$0.42 (NOT blocked by RSI_MIN=25 — 30-35 dead zone)",
-        "ALGO RSI=28.44 -$0.19 (25-30 band, single loss in winning band)"
-      ],
-      "root_cause": "Oversold SHORT entries in EXTREME — shorting after dump = catching bounce. RSI<25 catastrophic (16.7%WR -$0.79/14d). RSI 30-35 worse (27.3%WR -$0.91/14d).",
-      "fix_status": "RSI_MIN=25 LIVE (blocks <25). SHORT_RSI_FLOOR=40 exec-time should catch 25-40 when live RSI also low. CASHCAT blacklisted.",
-      "remaining_gap": "RSI 30-40 dead zone: 17T 29.4%WR -$1.11/14d. If exec-time floor=40 doesn't catch (live RSI recovered), need signal-specific band block. Monitor 48h."
-    },
-    "cluster_2_hotset_rs_sl39_long": {
-      "trades": "Many small hard_sl <$0.23, normal chop",
-      "examples": "USUAL rs-s129 conf=99 RSI=45.45 -$0.23 HIGH; KAS rs-s57 conf=99 RSI=51.57 -$0.21 EXTREME; ADA conf=98.8 RSI=50.88 -$0.22 EXTREME; CC rs-s52 conf=89.8 RSI=74.89 -$0.20 EXTREME (overbought)",
-      "root_cause": "Normal chop — small hard_sl losses, not systematic entry failure. CC RSI=74.89 is overbought leak (pre exec-time fix). CONF_FILTER_MIN=90 now blocks 89.8 bucket.",
-      "fix_status": "CONF_FILTER_MIN=90 working. Exec-time RSI ceiling deployed 06:30 today. 0 trades since deploy.",
-      "remaining_gap": "90-95 conf still slightly negative (3T -$0.06). Sample too small. Monitor."
-    },
-    "cluster_3_bb_bounce_scratches": {
-      "trades": "SOL -$0.02, KAS -$0.01 profit-monster-trail",
-      "root_cause": "Scratches, not systematic. BB_BOUNCE_V2_RSI_MAX=60 working (RSI 50-60 = 83.3%WR +$0.20/14d).",
-      "fix_status": "Filter in place. No action."
-    }
-  },
-  "signal_quality_deep_dive": {
-    "pump_chain_short": {
-      "14d_rsi_bands": {
-        "25-30": "8T 87.5%WR +$0.78 (BEST — preserve)",
-        "45-50": "5T 80%WR +$0.58",
-        "50-55": "2T 100%WR +$0.28",
-        "30-35": "11T 27.3%WR -$0.91 (CATASTROPHIC)",
-        "35-40": "6T 33.3%WR -$0.20",
-        "40-45": "6T 50%WR -$0.33",
-        "<20": "6T 16.7%WR -$0.79 (now blocked)",
-        "20-25": "3T 33.3%WR +$0.13"
-      },
-      "recommendation": "RSI_MIN=25 correctly preserves 25-30 winners. 30-40 dead zone remains — monitor exec-time floor=40 impact 48h before adding band filter."
-    },
-    "volume_breakout_long_plus": {
-      "14d_rsi_bands": {
-        "50-60": "6T 83.3%WR +$1.26",
-        "60-70": "6T 83.3%WR +$1.26",
-        "70-80": "2T 100%WR +$0.51",
-        "40-50": "2T 0%WR -$0.32",
-        "80+": "3T 33.3%WR -$0.31"
-      },
-      "recommendation": "Sweet spot RSI 50-70. Already 70%WR — do NOT add filter (risk breaking winner). Creative: confidence boost when RSI 50-70. Monitor."
-    },
-    "doji_bottom_long": {
-      "14d": "11T 63.6%WR +$0.36. HIGH regime 6T 83.3%WR +$0.56. Winners avg RSI 49, losers avg RSI 55.",
-      "recommendation": "Promising. Monitor at 20+ trades. Do not tune yet (n<20)."
-    }
-  },
-  "creative_improvements": [
-    {
-      "date": "2026-09-30T10:37:15Z",
-      "idea": "pump-chain- SHORT RSI dead-zone band block 30-40",
-      "rationale": "14d: RSI 30-40 = 17T 29.4%WR -$1.11. RSI_MIN=25 preserves 25-30 (87.5%WR +$0.78) but 30-40 still bleeds. CASHCAT RSI=33.42 -$0.42 slipped through RSI_MIN=25.",
-      "expected_impact": "+$0.30-0.55/7d if exec-time floor=40 doesn't already catch these",
-      "category": "entry sniper",
-      "status": "monitor_48h",
-      "risk": "low",
-      "blockers": "Exec-time SHORT_RSI_FLOOR=40 deployed 06:30 today — may already cover. Need production data before adding band filter."
-    },
-    {
-      "date": "2026-09-30T10:37:15Z",
-      "idea": "volume-breakout-long+ RSI 50-70 confidence boost +10pt",
-      "rationale": "14d: RSI 50-70 = 12T 83.3%WR +$2.52 vs outside = 8T 25%WR -$0.63. Boost ranking in hotset without blocking any trades.",
-      "expected_impact": "Higher hotset priority for best-signal entries. No trades blocked.",
-      "category": "confidence tuning",
-      "status": "suggested",
-      "risk": "very_low",
-      "sample": "20T total signal — boost is additive, not filtering"
-    },
-    {
-      "date": "2026-09-30T10:37:15Z",
-      "idea": "doji-bottom-long HIGH regime confidence boost +10pt",
-      "rationale": "14d: HIGH regime 6T 83.3%WR +$0.56 vs NORMAL 5T 40%WR +$0.00. Signal fires well in HIGH.",
-      "expected_impact": "Prioritize doji-bottom-long in HIGH. No trades blocked.",
-      "category": "confidence tuning",
-      "status": "monitor",
-      "risk": "low",
-      "sample": "6T HIGH — below 20 threshold. Monitor at 10+ HIGH trades."
-    },
-    {
-      "date": "2026-09-30T10:37:15Z",
-      "idea": "Research new NEUTRAL regime signal (EMA-reclaim / trend-following)",
-      "rationale": "Session brain repeatedly requests. Signal diversity critical — only 2 signals net positive with 5+ trades/14d. 99% of market is NEUTRAL. pump-chain+ cold streak due to NEUTRAL + guards.",
-      "expected_impact": "Diversify PnL source. Structural fix for single-signal dependency.",
-      "category": "new signal",
-      "status": "backlog",
-      "risk": "medium",
-      "note": "Use add-signal skill. Independent backtest required before live."
-    }
-  ],
-  "config_changes_applied": [],
-  "monitoring": [
-    "Exec-time RSI ceiling fix (deployed 06:30 UTC) — 0 trades since. Verify it fires on hotset overbought LONG.",
-    "PUMP_CHAIN_SHORT_RSI_MIN=25 — VERIFIED WORKING (37 blocks today). Expect +$0.20-0.40/7d as oversold SHORT losers age out.",
-    "CONF_FILTER_MIN=90 — 89.8 bucket blocked. Watch 90-95 conf for 48h.",
-    "doji-bottom-long — evaluate at 20+ trades (currently 11T).",
-    "pump-chain- SHORT 30-40 dead zone — if losses continue after exec-time floor, add band filter.",
-    "SHORT R:R structural — avg_win still < avg_loss. ATR_TP_K_MULT=2.0 deployed Sep 29, monitor."
-  ],
-  "next_actions": [
-    "brain_auditor: next run evaluate exec-time RSI ceiling effectiveness (need post-06:30 trades)",
-    "brain_auditor: next run check pump-chain- SHORT 30-40 band after exec-time floor has production data",
-    "research: new NEUTRAL signal via add-signal skill (backlog)",
-    "monitor: doji-bottom-long at 20+ trades",
-    "monitor: CONF_FILTER_MIN=90 impact on 90-95 bucket 48h"
-  ]
 }

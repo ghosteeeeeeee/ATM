@@ -628,5 +628,32 @@
     "status": "backlog",
     "risk": "medium",
     "note": "Use add-signal skill. Independent backtest required before live."
+  },
+  {
+    "date": "2026-09-30T11:35:06Z",
+    "idea": "Evaluate pump-chain+ HIGH block redundancy — HIGH 20T/14d +$0.17 not pure noise; REGIME_CONF_HIGH_MULT=0.50 already penalizes",
+    "rationale": "Logs show pump-chain+ firing but HIGH-blocked today. 14d HIGH: 20T 35%WR +$0.17 (positive PnL via larger winners). Double penalty may be over-blocking.",
+    "expected_impact": "+$0.10-0.25/7d if HIGH stays net-positive",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T11:35:06Z",
+    "idea": "bug_hunter: fix signal_rsi_14 metadata for doji_bottom / volume-breakout / hotset paths",
+    "rationale": "100% NULL on our BEST signals (11T doji 63.6%WR, 20T volume-breakout 70%WR, all hotset). Detection-time RSI filters impossible. volume_spike parallel fix proves pattern.",
+    "expected_impact": "+$0.30-0.80/7d once RSI filters work on quality signals",
+    "category": "metadata fix",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T11:35:06Z",
+    "idea": "Monitor doji-bottom-long to 20T — 6 consecutive non-losing trades, all profit-monster-trail",
+    "rationale": "11T 63.6%WR +$0.36/14d. Streak Sep 27-30 zero hard_sl losses. Wins RSI 49.0 vs losses 55.4. Sample <20 — monitoring only.",
+    "expected_impact": "Confidence boost candidate if holds to 20T (+$0.10-0.20/7d)",
+    "category": "signal quality",
+    "status": "monitoring",
+    "risk": "none"
   }
 ]
