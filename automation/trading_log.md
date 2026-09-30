@@ -1071,3 +1071,36 @@ BY: auto_1hr
 - 7d still negative (pre-fix losses aging out)
 
 BY: auto_1hr
+
+## [2026-09-30 20:15] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 (no closes) — 24h 13T net ~+$1.25; hourly streak positive 4h (14:00 +$0.03 | 16:00 +$0.24 | 17:00 +$0.06 | 18:00 +$0.07)
+**24h exits:** hard_sl 7T -$0.04 (flat) | profit-monster-trail 3T +$0.10 | cut-loser-MAE-GUARD 1T -$0.02 | HARD_SL_FAILED 1T +$0.94 | ORPHAN_PAPER 1T $0.00 — **atr_sl_hit 0%**
+
+**Open now:** BABY pump-chain- SHORT (19:31), ADA pump-chain- SHORT (19:22, -$0.03), IOTA pump-chain- SHORT (18:59, +$0.02), MNT bb-bounce LONG (17:13, -$0.08)
+
+**Diagnosis:**
+1. Entry quality: mfe/mae still NULL on closes — adverse-excursion check blocked (carried sideways find).
+2. SL behavior: atr_sl_hit 0% 24h — ATR floor fix confirmed deployed in tpsl_utils.py (ATR_SL_MIN floor + VOL-GATE). hard_sl 7T flat, not bleeding.
+3. Signal quality: pump-chain- SHORT worst 24h (4T 2W, -$0.31) — 50% WR, not a kill (needs 0%WR + 3T in last hour; last hour had 0 closes). continuum-osc+/continuum_engine 1T each, trivial.
+4. Trade frequency: 0/hr << 20 — not overtrading, slight quiet spell.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% threshold — no CEO alert
+- No kill candidates (0 trades closed last hour)
+- Recent hourly PnL all positive — no regime size reduction
+- Trade count 0/hr — not overtrading
+- pump-chain- -$0.31/24h — watch but no kill criteria met
+- tpsl_utils ATR fix verified present and working (atr_sl_hit 0%)
+
+**Open Questions:**
+- **SIDWAYS FIND:** `scripts/signal_version.py` STILL MISSING — audit trail blocked. Flagged 7 hours. No constants change this hour so no new audit gap.
+- **SIDWAYS FIND:** `pnl_pct` mostly = price move % (DOT 1.0374 ≈ +1.04%); ONDO SHORT outlier: price +0.67% but pnl_pct 3.33 — likely leverage/margin return on that one, verify trade recorder if pattern spreads.
+- **SIDWAYS FIND:** `mfe_pct`/`mae_pct` NULL on closed trades — entry-quality checks still blocked.
+- pump-chain- SHORT open x3 (BABY/ADA/IOTA) — if all 3 lose, revisit pump-chain- SHORT config next hour
+- 7d still negative (117T -$1.35, pre-fix losses aging out)
+
+BY: auto_1hr

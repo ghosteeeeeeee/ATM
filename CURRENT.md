@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 19:45 UTC**
+**Last Updated: 2026-09-30 20:40 UTC**
 **Updated by: brain_auditor**
 
 ## Current Status
@@ -52,6 +52,23 @@ System recovering strongly. 4 open positions (MNT LONG bb-bounce combo, IOTA/ADA
 
 **🟢 DEAD DB FILES CLEANED.** 25 dead 0-byte SQLite files removed from data/.
 
+
+## Audit Update (2026-09-30 20:40 UTC)
+
+- **🟢 24h 11T 54.5%WR +$1.11 (verified 2026-09-30 20:35 UTC).** System recovering. 7d: 116T 45.7%WR -$1.29 (improving). Post-fix: 64T 54.7%WR +$0.51 (0 ATR_SL hits). 4 open: BABY/ADA/IOTA pump-chain- SHORT EXTREME, MNT bb-bounce LONG HIGH.
+- **LOSING AUTOPSY: 4 losers 24h, ALL tiny (<$0.20), variance not systematic.** LDO v5 -$0.17 (test), ALGO pump-chain- -$0.19 (mid-RSI, inside edge), BTC continuum scratch -$0.02, SOL bb-bounce trail scratch -$0.02. No pattern.
+- **🔴 DRIFT-001 HIGH: BB_BOUNCE_V2_RSI_MAX=60 NOT ENFORCED** — 3 post-deploy trades RSI>60 slipped (SOL 63.08, SAND 64.71, KAS 61.64). Detection RSI (rsi_1m) vs metadata RSI (rsi) mismatch. Filter at bb_bounce_v2_long.py:282 checks wrong field. -> bug_hunter.
+- **🟡 DRIFT-003: position_manager rc=1 on guardian lock race** — '[FATAL] Guardian already running' + LOCK-WAIT retries. Work completes before exit (ADA closed, BABY cooldown applied). Management OK, exit code wrong. -> bug_hunter low priority.
+- **🟡 signal_version.py STILL MISSING** (5h+). data/signal_versions.json exists. -> bug_hunter.
+- **🟢 SIGNAL DEEP-DIVE RESULTS:**
+  - pump-chain- SHORT golden band RSI 40-45 = 6T 100%WR +$0.64/14d. Dead zone 35-40 = 3T 0%WR -$0.50 (MIN=35 candidate, sample<20, monitor 48h). Post-fix health: 19T 63.2%WR +$0.60.
+  - volume-breakout-long+ DNA: RSI 60-80 = 14T 71.4%WR +$1.59/14d. RSI 70-80 alone = 6T 83.3%WR +$1.23. Ceiling=95 working (RSI>95: 2T 0%WR -$0.32). Conf boost +10pt gate at 20T (currently 14T).
+  - doji-bottom-long HIGH specialist: 7T 85.7%WR +$0.67/30d vs NORMAL 5T 40%WR $0.00. Conf boost +10pt gate at 20T (currently 7T).
+  - bb-bounce RSI 60-70 killing field: 14T 25%WR -$0.32/14d, 0 winners. RSI_MAX=60 filter should block but doesn't (DRIFT-001).
+- **🟢 V5 TEST: 3T 66.7%WR +$0.27** (DOT +$0.23, BLUR +$0.21, LDO -$0.17). All EXTREME hard_sl. EVAL Oct 1. **RECOMMEND EXTENDING TO OCT 3** — 3T insufficient for KEEP/KILL decision.
+- **RECURRING:** SHORT structural disadvantage (14d -$4.84 vs LONG +$2.02), signal diversity (only 3 net-positive signals among 8+), bb-bounce RSI bypass (3+ runs), volume_spike orphan paths (5+ runs), NEUTRAL signal not built (delegated to signal_analyst).
+- **CREATIVE (4):** (1) V5 extend eval to Oct 3 (2) vol-breakout conf boost +10pt at 20T RSI 60-80 (3) doji-bottom HIGH conf boost +10pt at 20T (4) pump-chain- golden band conf boost +15pt at 15T.
+- **0 CHANGES APPLIED.** All recent fixes verified working, samples below thresholds. Monitor before changing more. — brain_auditor
 
 ## Audit Update (2026-09-30 19:45 UTC)
 

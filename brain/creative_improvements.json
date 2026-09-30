@@ -836,5 +836,41 @@
     "status": "suggested",
     "risk": "low",
     "sample_note": "6T now - monitor until 15T before applying"
+  },
+  {
+    "date": "2026-09-30T20:40:00Z",
+    "idea": "Extend V5 test eval window from Oct 1 to Oct 3",
+    "rationale": "3T 66.7%WR +$0.27 passing criteria but 3T is noise. Extending 48h gets meaningful sample. All EXTREME hard_sl consistent.",
+    "expected_impact": "Better eval data. No risk.",
+    "category": "evaluation",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T20:40:00Z",
+    "idea": "volume-breakout-long+ RSI 60-80 confidence boost +10pt at 20T",
+    "rationale": "RSI 60-80 = 14T 71.4%WR +$1.59/14d. Signal DNA is momentum entries in hot RSI. Boost confidence without blocking anything.",
+    "expected_impact": "+3-5% WR for volume-breakout-long+",
+    "category": "confidence boost",
+    "status": "suggested — gate at 20T, currently 14T",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T20:40:00Z",
+    "idea": "doji-bottom-long HIGH regime confidence boost +10pt at 20T",
+    "rationale": "HIGH 7T 85.7%WR +$0.67/30d vs NORMAL 5T 40%WR $0.00. Clear specialist — doji bottoms work in HIGH vol reversal conditions.",
+    "expected_impact": "+5% WR for doji-bottom-long in HIGH",
+    "category": "confidence boost",
+    "status": "suggested — gate at 20T, currently 7T HIGH",
+    "risk": "low"
+  },
+  {
+    "date": "2026-09-30T20:40:00Z",
+    "idea": "pump-chain- SHORT golden band RSI 40-45 confidence boost +15pt at 15T",
+    "rationale": "RSI 40-45 = 6T 100%WR +$0.64/14d. Mid-RSI momentum shorts in EXTREME are the edge. Prioritize golden band over dead zone.",
+    "expected_impact": "+2-4% WR for pump-chain- SHORT",
+    "category": "confidence boost",
+    "status": "suggested — gate at 15T, currently 6T",
+    "risk": "low"
   }
 ]

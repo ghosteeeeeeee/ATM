@@ -3593,3 +3593,10 @@
   No kill candidates, not overtrading. No changes applied.
   SIDWAYS: pnl_pct column appears percent-already (don't *100 in queries); mfe/mae NULL on closes; signal_version.py still missing (6h).
   BY: auto_1hr
+
+- [2026-09-30 20:15 UTC] auto_1hr: NO CONFIG CHANGE
+  0T last hour closed. atr_sl_hit 0% 24h (ATR fix stable). No kill candidates, not overtrading.
+  Hourly PnL positive 4h straight. pump-chain- SHORT worst 24h (-$0.31/4T) — watch only.
+  Open: BABY/ADA/IOTA pump-chain- SHORT, MNT bb-bounce LONG.
+  SIDWAYS: signal_version.py missing (7h); mfe/mae NULL; ONDO pnl_pct outlier.
+  BY: auto_1hr
