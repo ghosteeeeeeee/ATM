@@ -503,3 +503,58 @@ BY: auto_1hr
 - 7d recovering from pre-fix losses
 
 BY: auto_1hr
+
+## [2026-09-30 02:13 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L, +$0.94) | 1 open (BTC LONG 36.9h stale, +$0.01)
+**24h:** 41T 19W 22L -$0.76 (46.3% WR)
+**ATR SL:** 0/41 (0%) 24h ✅ (fix stable 41T+)
+**Exits:** 21 hard_sl (avg -$0.095) | 19 profit-monster-trail (avg +$0.016) | 1 HARD_SL_FAILED (+$0.94)
+**Regime 24h:** EXTREME 28T 35.7%WR -$0.46 (64.3% hard_sl) | HIGH 7T 57.1%WR -$0.07 | NORMAL 6T 50%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 12T SHORT 41.7%WR -$0.27 | doji-bottom-long 4T 75%WR +$0.12
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — COMP LONG winner (+$0.94), HARD_SL_FAILED exit (SL failed, closed profitable)
+- ATR_SL fix: 0 hits, stable
+- hard_sl 51% of exits but avg loss tiny ($0.095). 64% in EXTREME regime — structural, not fixable via constants
+- pump-chain- SHORT 12T -$0.27 — tiny per-trade loss, not a kill candidate
+- Trade frequency normal (1/hr)
+- No signals meeting kill criteria (3+T 0%WR last hour)
+
+**Open Questions:**
+- BTC LONG 36.9h stale — needs reconciliation or manual close
+- hard_sl 51% dominant exit — expected post-ATR fix (absorbs former ATR_SL hits). Avg loss contained.
+- 7d -$1.96 — recovering. EXTREME regime = primary drag (64.3% hard_sl rate)
+
+BY: auto_1hr
+
+## [2026-09-30 03:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (BTC LONG continuum-osc+ 37.9h stale ⚠️)
+**24h:** 41T 18W 23L -$0.76 (43.9% WR)
+**ATR SL:** 0/41 (0%) ✅
+**Exits:** 21 hard_sl (avg -$0.095) | 19 profit-monster-trail (avg +$0.016) | 1 HARD_SL_FAILED (+$0.94)
+**Regime 24h:** EXTREME 28T 43%WR -$0.45 | HIGH 7T 57%WR -$0.07 | NORMAL 6T 33%WR -$0.24
+
+**Signal leaders 24h:** pump-chain- 12T 42%WR -$0.27 | doji-bottom-long 4T 75%WR +$0.12 | bb-bounce-v2-long+ 4T 50%WR +$0.04 | volume-breakout-long+ 2T 100%WR +$1.02
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — nothing to act on
+- RS signals: removal confirmed working (0 trades opened after Sept 29 16:00 UTC)
+- ATR_SL fix: stable 41T+
+- mover- 2T 0%WR — under kill threshold (needs 3+)
+- hard_sl 51% — avg loss contained ($0.095), EXTREME regime structural
+- Trade frequency: 0/hr — normal overnight
+- No signals meeting kill criteria
+
+**Open Questions:**
+- BTC LONG 37.9h stale — needs reconciliation or manual close
+- hard_sl 51% dominant exit — expected post-ATR fix (absorbs former ATR_SL hits)
+- 7d -$2.07 — recovering from pre-fix losses
+
+BY: auto_1hr
