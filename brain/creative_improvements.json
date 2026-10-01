@@ -1282,5 +1282,83 @@
     "category": "filter check",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-01T11:38:44Z",
+    "idea": "SHORT_RSI_HARD_FLOOR=25 under bearish-structure override",
+    "rationale": "Bearish override allowed RSI 2-24 SHORT through (accel-300- cluster -$0.37, 14d RSI<25 SHORT 12T 25%WR -$0.89). Oversold is bounce risk even in downtrend — BANANA lesson.",
+    "expected_impact": "+$0.40-0.90/7d from blocking oversold SHORT bleed. 0 real winners killed (3 scratches +$0.01).",
+    "category": "entry sniper",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T11:38:44Z",
+    "idea": "Monitor SHORT RSI 25-39 override zone — 26T 23.1%WR -$1.87/14d",
+    "rationale": "Override zone (25-40 when bearish) also bleeding. After hard floor at 25 stabilizes, evaluate whether override should be removed or raised to 30.",
+    "expected_impact": "Potential +$0.50-1.00/7d if override zone confirmed bad",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — sample 26T, need 48h post-hard-floor data"
+  },
+  {
+    "date": "2026-10-01T11:38:44Z",
+    "idea": "doji-bottom-long RSI 30-50 confidence boost +10pt at 20T",
+    "rationale": "11T 63.6%WR +$0.36/14d. Winners cluster RSI 25-50 (GMX 44.4, WLFI 33.3, NEO 29.2, SOL 30.8), exits profit-monster-trail. Below sample threshold now.",
+    "expected_impact": "+2-4% WR for doji-bottom in RSI 30-50 band",
+    "category": "confidence tuning",
+    "status": "watchlist",
+    "risk": "low — wait for 20T"
+  },
+  {
+    "date": "2026-10-01T11:38:44Z",
+    "idea": "pump-chain- RSI_MIN 40→45 if golden band stays <55% WR for 7d",
+    "rationale": "RSI 50-59 = 21T 57.1%WR +$0.54 (real edge). RSI 40-45 = 10T 50%WR -$0.01 (eroding). Today post-RSI_MIN=40: 40-44 band 6T 33.3%WR -$0.26.",
+    "expected_impact": "+$0.20-0.40/7d if 40-45 confirmed noise",
+    "category": "entry sniper",
+    "status": "monitor 48h",
+    "risk": "medium — 10T sample, wait for more post-min=40 data"
+  },
+  {
+    "date": "2026-10-01T11:38:44Z",
+    "idea": "Build NEUTRAL volume-dry-up / EMA-reclaim signal (CEO delegation still open)",
+    "rationale": "Only 2-3 profitable signals in 14d. Signal diversity is the structural fix. CEO delegated Sep 30 to signal_analyst — no file exists in scripts/signals/. doji-bottom-long is the template (mean-reversion at exhaustion, works solo, profit-monster-trail exits).",
+    "expected_impact": "+$0.30-0.60/7d from new NEUTRAL diversity",
+    "category": "new signal",
+    "status": "suggested — escalate to signal_analyst/CEO",
+    "risk": "low — backtest first per add-signal skill"
+  },
+  {
+    "date": "2026-10-01T12:36:25Z",
+    "idea": "Extend SIGNAL_FILTER_RSI_MIN=42 enforcement to STANDALONE_BYPASS path (or raise SHORT_RSI_HARD_FLOOR 25→30 after 48h monitor)",
+    "rationale": "Today's accel-300- cluster proved SIGNAL_FILTER_RSI_MIN=42 is not evaluated on bypass path: 5 SHORTs with detection RSI 2.9-24.3 all fired and all lost. Hard floor 25 patches <25 but 25-30 band is 9T 0%WR -$1.17 with 0 real winners — pure bleed still open. Root cause is bypass skipping the filter, not the filter value being wrong.",
+    "expected_impact": "+$0.15-0.30/7d from blocking 25-30 SHORT band (9T -$1.17/14d historical, scaled). 0 winners in band to preserve.",
+    "category": "entry sniper / code fix",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "9T in 25-30 band 14d — below 20T but 0%WR with 0 real winners makes it a guardrail, not a tunable filter",
+    "implementation": "bug_hunter: grep decider_run.py for SIGNAL_FILTER_RSI_MIN application points. If bypass path skips it, add check alongside SHORT_RSI_HARD_FLOOR (already at detection+exec gates)."
+  },
+  {
+    "date": "2026-10-01T12:36:25Z",
+    "idea": "Build NEUTRAL volume-dry-up / EMA-reclaim signal (highest-leverage missing piece)",
+    "rationale": "Signal diversity flagged in 10+ consecutive sessions. Only 2-3 profitable signals in 14d. CEO delegated Sep 30 — no file exists. doji-bottom-long (11T 63.6%WR +$0.36) is the template: mean-reversion at exhaustion, works solo, profit-monster-trail exits. Volume-dry-up / EMA-reclaim is the same market condition, different trigger — complementary, not duplicate.",
+    "expected_impact": "+$0.30-0.60/7d from new NEUTRAL diversity",
+    "category": "new signal",
+    "status": "suggested (recurring — delegated, not built)",
+    "risk": "medium",
+    "sample_size": "N/A — new signal",
+    "implementation": "T decision: re-enable neutral_sniper vs build-new. Either way, signal_analyst should own this. Reference doji_bottom.py as template."
+  },
+  {
+    "date": "2026-10-01T12:36:25Z",
+    "idea": "Reject blanket burst-cluster guard (3+ same-dir within 90s) — data does not support it",
+    "rationale": "Tested today: 5 clusters found in 14d. Blanket guard would save $0.43 from losers but kill $0.75 from winners (net -$0.32). The profitable pump-chain+ LONG cluster (+$0.67, ETC/COMP/ADA RSI 57-67) is exactly the kind of burst we WANT. Burst = market event, not always bad.",
+    "expected_impact": "N/A — idea REJECTED by data",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "high if forced",
+    "sample_size": "5 clusters 14d — small but directionally clear",
+    "implementation": "None. Do not build. If revisited, restrict to SHORT-only + detection RSI < 30 (would have blocked only the 2 losing clusters, net +$0.43)."
   }
 ]

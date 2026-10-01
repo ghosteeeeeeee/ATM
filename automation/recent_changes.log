@@ -3692,3 +3692,15 @@ atr_sl_hit 0% 24h. 6 consecutive negative hours; regime HIGH not NEUTRAL.
 pump-chain- 11T -$0.57 24h worst but 0T this hour — CEO decision if full family off.
   0 CHANGES APPLIED.
   BY: auto_1hr
+
+- [2026-10-01 12:36 UTC] brain_auditor: NO CONFIG CHANGE — audit
+  DB-verified: 36T 36.1%WR -$0.86 (24h) | post-restore 17T 17.6%WR -$0.91 | 7d: EXTREME 64T 51.6%WR -$0.52
+  HARD_FLOOR=25 VERIFIED: would block 5/19 24h losers (accel-300- cluster RSI 2.9-24.3, -$0.37), kill 3 scratches (+$0.03). Net +$0.34. 0 logs yet — hotset empty.
+  DRIFT-SFRSI-BYPASS: SIGNAL_FILTER_RSI_MIN=42 NOT enforced on bypass path — 5 SHORTs fired at RSI 2.9-24.3 today. Hard floor partial patch (25-30 band still 9T 0%WR -$1.17). DELEGATE bug_hunter.
+  signal_rsi_14 column 100% NULL (340/340 14d) — metadata has values, column empty. Since Sep 28.
+  Golden band eroding: pump-chain- RSI 40-45 post-fix CHIP 44.88 L, ALGO 44.17 L. Monitor 48h.
+  V5 aging out (8T -$0.13, opened pre-kill). No action.
+  14d winners: volume-breakout-long+ +$2.48 (70%WR, 20T threshold met), pump-chain+ +$1.23, doji-bottom-long +$0.36 (11T, below 20T).
+  CREATIVE: (1) Extend SIGNAL_FILTER_RSI_MIN to bypass path / raise hard floor 25→30 after monitor (2) NEUTRAL diversity signal still unbuilt — T decision (3) REJECTED blanket burst-cluster guard (net -$0.32, kills profitable pump-chain+ bursts).
+  0 CHANGES APPLIED — hard floor 2h old, golden band in monitor window, max 1 change/run respected.
+  BY: brain_auditor
