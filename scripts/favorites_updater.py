@@ -237,24 +237,21 @@ def update_constants_file(new_favorites):
         with open(CONSTANTS_FILE, 'r') as f:
             content = f.read()
 
-        # Build the new FAVORITES block
+        # Build the new FAVORITES_LONG assignment
+        # Empty set must be set(), not {} — {} is a dict and dict|set crashes Python
         sorted_favs = sorted(new_favorites)
-        lines = []
-        for i, token in enumerate(sorted_favs):
-            comma = ',' if i < len(sorted_favs) - 1 else ''
-            lines.append(f"    '{token}'{comma}")
+        if not sorted_favs:
+            new_assign = "FAVORITES_LONG = set()"
+        else:
+            lines = []
+            for i, token in enumerate(sorted_favs):
+                comma = ',' if i < len(sorted_favs) - 1 else ''
+                lines.append(f"    '{token}'{comma}")
+            new_assign = "FAVORITES_LONG = {\n" + '\n'.join(lines) + "\n}"
 
-        new_block = "# ── Favorites ─────────────────────────────────────────────────────────────────\n"
-        new_block += "# Proven performers — high WR + profitable + decent sample.\n"
-        new_block += "# Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.\n"
-        new_block += "# AUTO-UPDATED daily by favorites_updater.py.\n"
-        new_block += "FAVORITES_LONG = {\n"
-        new_block += '\n'.join(lines) + '\n'
-        new_block += "}\n"
-
-        # Replace existing FAVORITES block using regex (handles both old and new formats)
-        pattern = r"# ── Favorites.*?^}\n"
-        new_content = re.sub(pattern, new_block, content, flags=re.MULTILINE | re.DOTALL)
+        # Replace only the FAVORITES_LONG assignment — matches both {} and set() forms
+        pattern = r"FAVORITES_LONG = \{.*?\n\}|FAVORITES_LONG = set\(\)"
+        new_content = re.sub(pattern, lambda m: new_assign, content, flags=re.MULTILINE | re.DOTALL)
 
         if new_content == content:
             log("WARNING: regex replacement didn't match — FAVORITES block unchanged")

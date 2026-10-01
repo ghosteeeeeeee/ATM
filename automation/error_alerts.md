@@ -158,3 +158,10 @@
   - `hermes-trading-checklist.service` — was falsely CRIT "pipeline no recent execution". **ROOT CAUSE**: `journalctl -n 5`/-n 3 on verbose pipeline output never includes "Started hermes-pipeline.service". **AUTO-FIX**: removed -n limit, match run markers (`position_manager: done`, etc.). Verified: both checks now pass (True).
   - `hermes-wasp.service` — exits 1 when findings exist (by design). pipeline-log ERROR was the checklist false positive; next run should clear.
 - **NOTE**: `systemctl list-timers hermes-*` shows 0 with glob; use `--all | grep hermes` (66 timers active). Pipeline timer firing correctly every 1min.
+
+## Error Alerts — 2026-10-01 04:58 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-01 05:58 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`

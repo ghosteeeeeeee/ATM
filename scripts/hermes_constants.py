@@ -269,13 +269,14 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'CASHCAT'
+
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
 }
 # Legacy combined set for backwards compatibility
-FAVORITES = FAVORITES_LONG | FAVORITES_SHORT
+# set() wrap: empty FAVORITES_LONG is {} (dict), not set — dict|set crashes Python
+FAVORITES = set(FAVORITES_LONG) | set(FAVORITES_SHORT)
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
 FAVORITES_SIZE_MULT = 1.5     # Position size multiplier in decider_run ($11 → $16.50)
@@ -298,9 +299,9 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'GOAT',
     'KAS'
 }
+
 
 
 

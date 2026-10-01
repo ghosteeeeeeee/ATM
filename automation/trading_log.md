@@ -1376,3 +1376,46 @@ Final set: []
 - [2026-10-01 06:12] auto_1hr: NO CONFIG CHANGE — 1T last hour (AIXBT pump-chain-v5 win +$0.07). 24h: 19T +$0.05, 47.4% WR. atr_sl_hit 0% (fix stable). Kill rule not met (1T < 3T/hr). Not overtrading. Not 3 consecutive negative hours. pump-chain- 44.4% WR watch only.
 
 BY: auto_1hr
+
+## LOSERS Update — 2026-10-01 06:35 UTC
+- REMOVE GOAT (insufficient data)
+
+Final set: ['KAS']
+
+## [2026-10-01 06:40 UTC] Daily Orchestrator
+
+**CRITICAL FIX — FAVORITES dict|set crash (pipeline DOWN 06:00–06:32 UTC).**
+
+**Symptom:** hermes-pipeline.service crash-looping every 5s:
+`TypeError: unsupported operand type(s) for |: 'dict' and 'set'`
+at hermes_constants.py:278 `FAVORITES = FAVORITES_LONG | FAVORITES_SHORT`.
+
+**Root cause:** favorites_updater.py 06:00 run demoted CASHCAT, wrote `FAVORITES_LONG = {\n\n}`. Empty `{}` is a Python **dict**, not a set. `dict | set` is invalid. FAVORITES_SHORT remained a set. Pipeline imports paths → hermes_constants → crash before any step. Position management offline ~32 min (1 open position unmanaged).
+
+**Fixes applied (2 files):**
+1. `scripts/hermes_constants.py:278` — `FAVORITES = set(FAVORITES_LONG) | set(FAVORITES_SHORT)` (type-safe regardless of empty/non-empty). Code robustness fix, no value changes.
+2. `scripts/favorites_updater.py` — empty favorites now emits `FAVORITES_LONG = set()` (not `{}`); regex matches both `{...}` and `set()` forms via lambda replacement (no escape issues). Mirrors losers_tracker.py which already handled this correctly.
+
+**Validation:**
+- `import hermes_constants` OK; FAVORITES is set with expected members
+- Regex matches current `{}` block; empty + non-empty replacements preserve FAVORITES_SHORT
+- favorites_updater.py compiles
+- `from paths import *` OK
+- Pipeline restarted 06:32; full cycle: signal_analyst/breakout_engine/signals_runner/decider_run/position_manager/hermes-trades-api all rc=0
+- Portfolio logged: 1 open | 17 closed today | -2.18% PnL
+- All systemd timers healthy post-restore
+
+**No config changes.** RSI_MIN=40 (CEO 02:00) already live. V5 extended to Oct 3 (monitoring).
+
+**Status checks:**
+- DRIFT-002: code fixes confirmed in decider_run.py (loaded by 01:47 + 06:32 restarts). 04:35 audit "OPEN" entry stale.
+- DRIFT-001: monitoring, combo metadata gap noted.
+- NEUTRAL: neutral_sniper.py exists, disabled per T — re-enable vs build-new is T's call.
+- health_monitor guardian-lock fix verified (position_manager rc=0).
+- Dead imports (signal_gen) still present in disabled/dead signals — no live impact.
+
+**Sideways:** AGENTS.md HL API key "expires in 3 days" reminder appears stale (key set 2026-09-16 +180d ≈ 2027-03-15; today 2026-10-01). T: verify reminder date.
+
+**QUALITY:** Tasks: 1 critical fix, 1 attempt, success. 0 config changes.
+
+— daily_orchestrator
