@@ -1212,3 +1212,22 @@ BY: auto_1hr
 - V5 test: 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3.
 
 BY: auto_1hr
+
+## [2026-10-01 00:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) — 24h: 13T, 6 wins, +$0.96 net (24h reasons: hard_sl 8T -$0.03, HARD_SL_FAILED +$0.94, profit-monster-trail +$0.07, MAE-GUARD -$0.02, 2 flat)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0/13 (0%) 24h — ATR fix (tpsl_utils.py) stable, no CEO alert
+- No kill candidates: 0 trades closed this hour, rule needs 3T + 0% WR in last hour
+- 24h net +$0.96 — no regime size reduction
+- 0/hr — not overtrading
+
+**Open Questions:**
+- pump-chain- SHORT still worst 24h signal (5T 2W -$0.30) — watch only; BABY position if still open
+- V5 test 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3
+
+BY: auto_1hr
