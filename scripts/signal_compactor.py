@@ -2644,20 +2644,26 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _sc_score = float(_sc_row[0]) if _sc_row[0] is not None else 50.0
                             _sc_z = _sc_row[1] or 'NEUTRAL'
                             if _sc_score > SHORT_CONTINUUM_SCORE_MAX and _sc_z not in SHORT_CONTINUUM_ALLOW_Z:
-                                # Token-level z-score exception (2026-10-01): allow if token is oversold
+                                # Token-level z-score exception — DISABLED by bug_hunter (avg_z has no live writer)
+                                from hermes_constants import SHORT_CONTINUUM_TOKEN_Z_ENABLED
                                 _token_z_ok = False
-                                try:
-                                    _tz_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
-                                    _tz_row = _tz_conn.execute(
-                                        "SELECT avg_z, z_direction FROM momentum_cache WHERE token = ?", (token,)
-                                    ).fetchone()
-                                    _tz_conn.close()
-                                    if _tz_row and _tz_row[0] is not None:
-                                        _token_z = float(_tz_row[0])
-                                        if _token_z < -0.5:  # token is oversold
-                                            _token_z_ok = True
-                                except Exception:
-                                    pass
+                                if SHORT_CONTINUUM_TOKEN_Z_ENABLED:
+                                    _tz_conn = None
+                                    try:
+                                        _tz_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
+                                        _tz_row = _tz_conn.execute(
+                                            "SELECT avg_z, z_direction FROM momentum_cache WHERE token = ?", (token,)
+                                        ).fetchone()
+                                        if _tz_row and _tz_row[0] is not None:
+                                            _token_z = float(_tz_row[0])
+                                            if _token_z < -0.5:
+                                                _token_z_ok = True
+                                    except Exception:
+                                        pass
+                                    finally:
+                                        if _tz_conn:
+                                            try: _tz_conn.close()
+                                            except: pass
                                 if _token_z_ok:
                                     log(f"  ✅ [SHORT-CONTINUUM-TOKEN-Z] {token} SHORT allowed — BTC score={_sc_score:.1f} but token z-score < -0.5 (oversold)")
                                 else:

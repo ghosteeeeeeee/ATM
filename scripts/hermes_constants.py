@@ -1288,8 +1288,9 @@ PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI b
 # neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
 # Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
 SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
-SHORT_CONTINUUM_SCORE_MAX = 40         # raised from 10 (2026-10-01) — 30d data: score 10-30 band is breakeven noise
+SHORT_CONTINUUM_SCORE_MAX = 30         # raised from 10 (2026-10-01) — 30d data: score 10-30 band is breakeven noise
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
+SHORT_CONTINUUM_TOKEN_Z_ENABLED = False  # DISABLED 2026-10-01 — avg_z has no live writer, reads 4-month-old stale data (bug_hunter HIGH)
 
 # pullback-entry- SHORT entry quality (replaced dead hours)
 PULLBACK_ENTRY_SHORT_DEAD_HOURS = []  # DISABLED 2026-09-30 — use entry quality filters instead
@@ -2497,9 +2498,9 @@ SQUEEZE_CROSS_MINUS_ENABLED = False    # squeeze_cross- SHORT — DISABLED 2026-
 
 # ── Bollinger Squeeze Signal ─────────────────────────────────────────────────
 # bollinger_squeeze.py — BB squeeze + breakout from price_history ticks
-BOLLINGER_SQUEEZE_ENABLED = False  # DISABLED 2026-08-01 — 0% WR (4 trades), -$2.41. Dominant signal but all losers.
-BOLLINGER_SQUEEZE_PLUS_ENABLED  = False    # bb-squeeze+ LONG — DISABLED 2026-08-02: matches master flag
-BOLLINGER_SQUEEZE_MINUS_ENABLED = False    # bb-squeeze- SHORT — DISABLED 2026-08-02: matches master flag
+BOLLINGER_SQUEEZE_ENABLED = True   # CEO 2026-10-01 — RE-ENABLED. Research PASS 805T 70.8%WR +0.77% avg. Prior kill (Aug 1) was 4-trade tiny sample (-$2.41). LONG only this run.
+BOLLINGER_SQUEEZE_PLUS_ENABLED  = True     # bb-squeeze+ LONG — 74.1%WR 436T research. ON.
+BOLLINGER_SQUEEZE_MINUS_ENABLED = False    # bb-squeeze- SHORT — 66.9%WR 369T research. OFF: SHORT side -$1.16/7d, keep off until SHORT R:R fixed.
 BOLLINGER_SQUEEZE_PERIOD       = 20       # SMA window for Bollinger Bands
 BOLLINGER_SQUEEZE_MULT         = 2.0      # stddev multiplier
 BOLLINGER_SQUEEZE_THRESH       = 0.04     # bandwidth < 4% = squeeze

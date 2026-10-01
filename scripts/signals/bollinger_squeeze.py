@@ -209,5 +209,10 @@ def scan_bollinger_squeeze():
     return signals_found
 
 
+def run():
+    """Entry point for signals_runner."""
+    return scan_bollinger_squeeze()
+
+
 if __name__ == '__main__':
-    scan_bollinger_squeeze()
+    run()

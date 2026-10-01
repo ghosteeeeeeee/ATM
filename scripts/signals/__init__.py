@@ -361,6 +361,11 @@ except Exception:
     _squeeze_breakout_run = None
 
 try:
+    from signals.bollinger_squeeze import run as _bollinger_squeeze_run
+except Exception:
+    _bollinger_squeeze_run = None
+
+try:
     from signals.resistance_break import run as _resistance_break_run
 except Exception:
     _resistance_break_run = None
@@ -484,6 +489,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'btc_grind_spike',           'enabled': 'BTC_GRIND_SPIKE_ENABLED',       'run': _btc_grind_spike_run},
     {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'squeeze_breakout',          'enabled': 'SQUEEZE_BREAKOUT_ENABLED',      'run': _squeeze_breakout_run},
+    {'name': 'bollinger_squeeze',         'enabled': 'BOLLINGER_SQUEEZE_ENABLED',     'run': _bollinger_squeeze_run},
     {'name': 'doji_top',                  'enabled': 'DOJI_TOP_ENABLED',              'run': _doji_top_run},
     {'name': 'doji_bottom',               'enabled': 'DOJI_BOTTOM_ENABLED',           'run': _doji_bottom_run},
     {'name': 'continuum_score',           'enabled': 'CONTINUUM_SCORE_ENABLED',       'run': _continuum_score_run},
