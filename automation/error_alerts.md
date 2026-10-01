@@ -129,3 +129,6 @@
 - **WARN** (1x): `hermes-atr-sl-updater.timer` unit not found (stale reference).
 - **NOTE**: hotset empty + decisions table stale since 2026-04-13 while signals_1h=60 — compaction/filter path is rejecting all signals (expected if confidence gates working; worth review).
 - **NOTE**: Prior error_alerts entries contain broken redaction (`TOK` placeholders) from error analyzer — analyzer regex/log-pipeline issue, not runtime.
+
+## Error Alerts — 2026-10-01 01:58 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`

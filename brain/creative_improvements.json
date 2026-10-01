@@ -1088,5 +1088,32 @@
     "status": "suggested — add override flag to _signal_metadata",
     "risk": "none (metadata only)",
     "sample_size": "N/A — data collection"
+  },
+  {
+    "date": "2026-10-01T02:33:45Z",
+    "idea": "pump-chain- SHORT RSI_MAX=60 (conditional)",
+    "rationale": "14d: RSI>=60 = 16T 50%WR -$0.31. RSI 65-70 has avg_loss -$0.34 (largest losers in signal). Blocks overbought SHORT entries where bounce risk is highest.",
+    "expected_impact": "+$0.15-0.30/7d if pattern holds",
+    "category": "entry sniper",
+    "status": "monitor — 16T < 20T sample threshold. Re-eval at 20+ trades.",
+    "risk": "low — would kill 8 winners in band but net band is negative"
+  },
+  {
+    "date": "2026-10-01T02:33:45Z",
+    "idea": "volume-breakout-long+ EXTREME confidence boost +15pt when RSI 65-85",
+    "rationale": "14d winner DNA: EXTREME 12T 75%WR +$2.53. RSI 70-80 = 5T 100%WR +$1.45. RSI 65-85 combined ~13T 77%WR +$1.81. Concentrate capital on proven best setups instead of spreading equally.",
+    "expected_impact": "+$0.30-0.60/7d by increasing size/fill on highest-conviction trades",
+    "category": "confidence scoring",
+    "status": "suggested — needs signal_compactor change, delegate to signal_analyst",
+    "risk": "low — boost only, never blocks. Pattern is 100% WR in 70-80 band."
+  },
+  {
+    "date": "2026-10-01T02:33:45Z",
+    "idea": "doji-bottom-long regime-specific confidence: boost in HIGH, penalize in NORMAL",
+    "rationale": "14d: HIGH 6T 83.3%WR +$0.36 vs NORMAL 5T 40%WR $0.00. Signal works in HIGH vol (oversold bounces), fails in NORMAL (chop).",
+    "expected_impact": "+$0.10-0.20/7d if pattern holds",
+    "category": "regime tuning",
+    "status": "monitor — 6T HIGH sample too small. Re-eval at 20+ trades total.",
+    "risk": "low — confidence adjust only"
   }
 ]
