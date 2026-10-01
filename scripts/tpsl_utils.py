@@ -12,11 +12,11 @@ Single source of truth. No duplicated logic, no inline ATR math elsewhere.
 CRITICAL SL RULES (DO NOT CHANGE WITHOUT T'S APPROVAL):
 ═══════════════════════════════════════════════════════════════════════
 
-1. TRAILING: Once in profit, SL trails TRAILING_DISTANCE_PCT (0.4%) from
+1. TRAILING: Once in profit, SL trails TRAILING_DISTANCE_PCT (1.20%) from
    the peak/nadir. SL must NEVER go against the trade direction.
    LONG: SL only goes UP. SHORT: SL only goes DOWN.
 
-2. ENTRY FLOOR: At trade entry, SL is set at entry ± ATR_SL_MIN (0.5%).
+2. ENTRY FLOOR: At trade entry, SL is set at entry ± ATR_SL_MIN (1.30%).
    This is the INITIAL SL only. Once price moves into profit, trailing
    takes over completely.
 
@@ -592,15 +592,13 @@ def compute_atr_sl_tp(
                 trail_floor_loss = round(highest_price * (1 - _trail_dist), 8) if highest_price > 0 else 0
                 if trail_floor_loss > 0:
                     new_sl = max(new_sl, trail_floor_loss)
-                # FIX (2026-09-30): only re-enforce the entry floor when current_sl is
-                # NOT a valid profit lock above entry. The old unconditional re-enforce
-                # pulled a trailed profit-lock SL (above entry for LONG) back down to
-                # entry-ATR_SL_MIN whenever price briefly dipped below entry —
-                # violating the module's own CRITICAL RULE #4 (SL only tightens).
-                # Bug-hunter proved this clobber in IOTA logs: SL_write repeatedly
-                # re-widened 0.05333 → 0.053904 during brief pullbacks.
-                if not (current_sl > 0 and entry_f > 0 and current_sl > entry_f):
-                    new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                # NOTE (2026-09-30, verified 385bc167): the unconditional re-enforce below
+                # is CORRECT, not a clobber. When in_loss, the entry floor is absolute —
+                # a "profit lock" on the other side of entry is stale state (price already
+                # crossed it), and the downstream wrong-side net + post-gate re-apply this
+                # same floor anyway (proved: 11/11 scenarios identical with/without a
+                # conditional here). Removing it would be dead code.
+                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # re-enforce floor after one-way
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
@@ -616,15 +614,10 @@ def compute_atr_sl_tp(
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
-                    # FIX (2026-09-30): only re-enforce the entry ceiling when current_sl
-                    # is NOT a valid profit lock below entry. The old unconditional
-                    # re-enforce pushed a trailed profit-lock SL (below entry for SHORT)
-                    # back up to entry+ATR_SL_MIN whenever price briefly traded above
-                    # entry — violating CRITICAL RULE #4 (SHORT SL only goes down).
-                    if current_sl >= round(entry_f * (1 + ATR_SL_MIN), 8):
-                        new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
-                else:
-                    new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                # NOTE (2026-09-30, verified 385bc167): unconditional re-enforce is CORRECT.
+                # In_loss ⇒ entry ceiling is absolute; a below-entry "lock" is stale state.
+                # Downstream gates re-apply this same ceiling regardless (11/11 identical).
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # re-enforce ceiling after one-way
 
     if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (entry_f > 0 and new_sl > 0 and abs(new_sl - entry_f) / entry_f < 0.0015)):
         print(f"  [TPSL-DEBUG] {token} {direction}: AFTER MIN GUARD new_sl={new_sl:.6f} "

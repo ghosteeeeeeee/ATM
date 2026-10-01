@@ -470,6 +470,24 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
             elif cur <= tp:
                 hit = 'atr_tp_hit'
 
+        # FIX (2026-09-30, verified 385bc167): reclassify profitable trail exits.
+        # A trailed SL sits on the PROFIT side of entry (LONG sl>entry, SHORT
+        # sl<entry). Guardian's _check_hard_stops already got this fix; this is
+        # the PRIMARY exit path (historically ~46 atr_sl_hit/7d) and still
+        # labeled every breach 'atr_sl_hit', so profitable ATR trail exits were
+        # recorded as losses in analytics. Note: position_manager.py:1176 checks
+        # `reason in ('atr_sl_hit','atr_tp_hit')` only to cancel stale HL orders
+        # — 'atr_trail_hit' skips that cleanup, which is acceptable (no stale
+        # trigger orders exist for an already-trailed position).
+        if hit == 'atr_sl_hit':
+            try:
+                _ep = float(pos.get('entry_price') or 0)
+            except (TypeError, ValueError):
+                _ep = 0.0
+            if _ep > 0:
+                if (direction == 'LONG' and sl > _ep) or (direction == 'SHORT' and sl < _ep):
+                    hit = 'atr_trail_hit'
+
         if hit:
             hits.append({
                 'trade_id': trade_id,
@@ -2623,13 +2641,19 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         def _match_exit_config(part):
             """Match signal part to exit config using exact or prefix match.
 
-            FIX (2026-09-30): Direction-suffixed keys ('pump-chain+', 'pump-chain-')
-            previously failed to match versioned signal names ('pump-chain-v5')
-            because the matcher appended another '-' to keys already ending in
-            '+/-' — 'pump-chain--' matched nothing, so the signal silently fell
-            through to the default exit path. Now we also try the key as a raw
-            prefix (keys ending in +/- are already prefixes) and strip -vN
-            version suffixes before matching.
+            FIX (2026-09-30, rev 2 — verified 385bc167): Direction-suffixed keys
+            ('pump-chain+', 'pump-chain-') failed to match versioned signal names
+            ('pump-chain-v5') because the matcher appended another '-' to keys
+            already ending in '+/-' — 'pump-chain--' matched nothing.
+
+            Rev 1 of this fix used a raw `part.startswith(key)` branch, which
+            regressed 'volume-breakout-long+' (top signal, 70% WR) onto
+            'volume-breakout-' → ride_it, because the remainder 'long+' is a
+            direction word, not a version tag. Rev 2 restricts the new branches
+            to genuine version suffixes only (-vN): the remainder after the
+            matched key must be exactly '-vN', and the version-stripped base must
+            equal the key's stem. Everything else falls through to the original
+            behavior (default exit path), which is what those signals traded on.
             """
             if part in SIGNAL_EXIT_CONFIG:
                 return SIGNAL_EXIT_CONFIG[part]
@@ -2641,12 +2665,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             for key, val in SIGNAL_EXIT_CONFIG.items():
                 if part.startswith(key + '-') or part.startswith(key + '_'):
                     return val
-                # Direction-suffixed keys are already prefixes:
-                # 'pump-chain-v5'.startswith('pump-chain-') → True
+                # Version-only raw-prefix match: key 'pump-chain-' + remainder '-v5'.
+                # The remainder MUST be exactly a -vN tag — '-long+' etc. must not match.
                 if key.endswith(('+', '-')) and part.startswith(key):
-                    return val
-                # Version-stripped base matches a direction-suffixed key's stem:
-                # 'pump-chain' matches key 'pump-chain+' (first dict hit wins)
+                    _rem = part[len(key):]
+                    if _re.fullmatch(r'-v\d+', _rem):
+                        return val
+                # Version-stripped base equals the key's stem:
+                # 'pump-chain' (from 'pump-chain-v5') == stem of 'pump-chain+'.
                 _key_stem = key.rstrip('+-')
                 if _key_stem and _base == _key_stem:
                     return val

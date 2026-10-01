@@ -174,8 +174,10 @@ def _live_trailing_sl(trade_id, direction, entry_price, current_price, trail_act
     entry = float(entry_price or 0)
     current = float(current_price or 0)
     direction = str(direction or '').upper()
-    trail_act_pct = float(trail_act or 0.01) * 100
-    trail_dist_pct = float(trail_dist or 0.01)
+    # FIX (2026-09-30, verified 385bc167): falsy-zero — an explicit 0 (meaning
+    # "trailing disabled") was swallowed by `or` and rendered as 1% on dashboard.
+    trail_act_pct = (0.01 if trail_act is None else float(trail_act)) * 100
+    trail_dist_pct = 0.01 if trail_dist is None else float(trail_dist)
 
     if entry <= 0 or current <= 0:
         return None

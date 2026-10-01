@@ -1990,8 +1990,14 @@ def _check_hard_stops(prices: dict):
                 for key, val in SIGNAL_EXIT_CONFIG.items():
                     if part.startswith(key + '-') or part.startswith(key + '_'):
                         return val
+                    # Version-only raw-prefix match (rev 2, verified 385bc167):
+                    # the remainder after the key MUST be exactly a -vN tag.
+                    # Rev 1 allowed any remainder, which regressed
+                    # 'volume-breakout-long+' onto 'volume-breakout-' → ride_it.
                     if key.endswith(('+', '-')) and part.startswith(key):
-                        return val
+                        _rem = part[len(key):]
+                        if _re.fullmatch(r'-v\d+', _rem):
+                            return val
                     _key_stem = key.rstrip('+-')
                     if _key_stem and _base == _key_stem:
                         return val
@@ -2122,7 +2128,8 @@ def _check_hard_stops(prices: dict):
                     # Add to _CLOSED_HL_COINS so Step 11 doesn't also attempt to close this token
                     _CLOSED_HL_COINS.add(token.upper())
                     try:
-                        _close_paper_trade_db(trade_id, token, cur_price, 'HARD_SL_FAILED')
+                        _close_paper_trade_db(trade_id, token, cur_price,
+                                               f'{hit_reason}_FAILED' if hit_reason == 'trail_sl' else 'HARD_SL_FAILED')
                         log(f'  [HARD-{hit_reason.upper()}] {token} paper trade force-closed '
                             f'at {cur_price:.6f} ({pnl_pct:.2f}%) — HL position may be ghost', 'WARN')
                     except Exception as db_err:
