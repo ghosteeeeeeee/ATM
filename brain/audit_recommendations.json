@@ -1,226 +1,240 @@
 {
-  "timestamp": "2026-10-01T21:36:47Z",
+  "timestamp": "2026-10-01T22:34:01Z",
   "agent": "brain_auditor",
-  "session_lock": "none_active",
-  "config_changes_applied": [],
-  "config_change_rationale": "0 changes. Monitor windows active (SHORT-CONTINUUM 18:15, SHORT_RSI_HARD_FLOOR 11:50, PUMP_CHAIN_SHORT_RSI_MIN=40, V5/accel kills aging out). Standing decision: no stacked changes during monitor windows. All 24h losses are legacy pre-kill opens aging out.",
+  "session_lock": false,
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy creative",
-      "loss money bleeding losing entry filter",
-      "NEUTRAL signal diversity starvation"
-    ],
+    "queries_run": 3,
     "top_insights": [
-      "R:R threshold 0.95 suggested in sessions — ENTRY_RR_MIN_RATIO still 2.0 in entry_gates.py (not in hermes_constants.py)",
-      "NEUTRAL volume-dry-up/EMA-reclaim discussed 5+ days — still unbuilt; range_reversion KILLED, neutral_sniper disabled per T",
-      "ema300_dip_short session-positive but data-killed (41.7%WR, no winning regime) — data overruled session",
-      "pump-chain- short filter deep-dive already implemented (RSI_MIN, HIGH_BLOCK, EXTREME block)"
+      "R:R threshold 0.95 discussed (signal to trades) — ENTRY_RR_MIN_RATIO=2.0 still hardcoded in entry_gates.py",
+      "pump-chain-short deeper filters + backtest win DNA discussed",
+      "Signal decay / regime species discussion — regime-specific signal health tracking",
+      "NEUTRAL signal still #1 diversity gap (ema-reclaim delegated, deadline Oct 3)"
     ]
   },
-  "trade_summary": {
-    "24h": {
-      "trades": 32,
-      "win_rate": 37.5,
-      "pnl": -0.95,
-      "open": "BTC LONG continuum_engine @85036 (17:45) — continuum-osc+ closed +0.16, double-BTC resolved"
-    },
-    "7d": {
-      "trades": 115,
-      "win_rate": 46.1,
-      "pnl": -0.09,
-      "regime": {
-        "EXTREME": "60T 53.3%WR +$0.12 (FLIPPED POSITIVE — vol gate cleanup working)",
-        "HIGH": "20T 45.0%WR -$0.12",
-        "NORMAL": "29T 41.4%WR $0.00"
-      },
-      "long_short": {
-        "LONG": "67T 46.3%WR +$1.31 R:R=1.78",
-        "SHORT": "48T 47.9%WR -$1.16 R:R=0.73"
-      }
-    },
-    "14d_best": {
-      "volume-breakout-long+": "17T 76.5%WR +$2.78 (EXTREME 13T 76.9%)",
-      "doji-bottom-long": "11T 63.6%WR +$0.36 (post-fix 5T 80%WR +$0.28)",
-      "pump-chain+": "55T 41.8%WR +$1.23"
-    },
-    "14d_worst_killed": {
-      "pullback-entry-": "30T -$2.25 NEVER_REENABLE",
-      "mover+": "14T -$1.12 NEVER_REENABLE",
-      "pump-chain-": "61T -$0.96 (breakeven post-filters)"
-    }
+  "trade_summary_24h": {
+    "trades": 31,
+    "winrate": 38.7,
+    "pnl_usdt": -0.78,
+    "open_positions": [
+      "BTC LONG continuum_engine @85036 opened 17:45 (amt=0.00 ORPHAN_PAPER hygiene)",
+      "SUSHI LONG doji-bottom-long @0.26112 opened 21:32 conf=95 RSI=25.08 gap=-0.49% vol_spike=0.0"
+    ]
   },
-  "losing_trade_autopsy_24h": {
-    "total_losers": 18,
-    "clusters": [
-      {
-        "signal": "accel-300- SHORT",
-        "trades": 8,
-        "pnl": -0.34,
-        "regime": "HIGH/NORMAL",
-        "rsi": "2.9-24.3 all oversold",
-        "root_cause": "LEGACY — killed 10:50 Oct 1. Oversold SHORT = falling knife. Correct kill.",
-        "action": "None — aging out 48h"
+  "trade_summary_7d": {
+    "trades": 115,
+    "winrate": 47.0,
+    "pnl_usdt": 0.15,
+    "long": {
+      "trades": 67,
+      "wr": 46.3,
+      "pnl": 1.31,
+      "avg_win": 0.121,
+      "avg_loss": -0.084
+    },
+    "short": {
+      "trades": 48,
+      "wr": 47.9,
+      "pnl": -1.16,
+      "avg_win": 0.101,
+      "avg_loss": -0.145
+    },
+    "by_regime": {
+      "EXTREME": {
+        "trades": 60,
+        "wr": 53.3,
+        "pnl": 0.12,
+        "note": "flipped positive — vol cleanup working"
       },
-      {
-        "signal": "pump-chain-v5 LONG",
-        "trades": 6,
-        "pnl": -0.17,
-        "regime": "EXTREME/NORMAL",
-        "root_cause": "LEGACY — killed 10:18 Oct 1. Pre-kill opens.",
-        "action": "None — aging out"
+      "HIGH": {
+        "trades": 20,
+        "wr": 45.0,
+        "pnl": -0.12
       },
-      {
-        "signal": "pump-chain- SHORT",
-        "trades": 6,
-        "pnl": -0.55,
-        "regime": "EXTREME",
-        "rsi": "29.7-44.9",
-        "root_cause": "Opened when PUMP_CHAIN_SHORT_RSI_MIN was still 25 (raised to 40 on Oct 1). BABY RSI=29.7, ALGO 36.1, JUP 36.4 all <40 — would be blocked today. Post-40: ALGO +0.03 RSI=60.4 only trade.",
-        "action": "None — filter now tighter, monitor golden band 40-44"
+      "NORMAL": {
+        "trades": 29,
+        "wr": 41.4,
+        "pnl": 0.0
       },
-      {
-        "signal": "bb-bounce-v3-long+",
-        "trades": 2,
-        "pnl": -0.12,
-        "regime": "HIGH/NORMAL",
-        "root_cause": "Scratches. Below 3T kill threshold.",
-        "action": "Monitor 48h"
+      "FLAT": {
+        "trades": 3,
+        "wr": 33.3,
+        "pnl": 0.15
       }
-    ],
-    "verdict": "No NEW systematic bleeding. All 24h losses = legacy pre-kill opens aging out + filter-tightening lag. Filters verified working."
+    },
+    "exit_reasons_dominant": {
+      "profit-monster-trail": "47T 63.8%WR +$1.70",
+      "hard_sl": "38T 39.5%WR -$1.78",
+      "hard_max_loss_cluster": "13T 0%WR -$1.05 (legacy kills aging out)"
+    }
   },
   "drift_findings": [
     {
+      "id": "DRIFT-005",
+      "severity": "HIGH",
+      "finding": "entry_regime_4h is 100% NULL (334/334 trades, 14d). CEO 21:55 rejected volume-breakout EXTREME conf boost by querying entry_regime_4h=NULL and concluding 'EXTREME data does not exist'. WRONG COLUMN. volatility_regime has REAL data: volume-breakout EXTREME 13T 76.9%WR +$2.63 (10W/3L).",
+      "code_state": "feature_recorder.py:158 writes entry_regime_4h; hl-sync-guardian.py:2535 also writes it. Column never populated. regime_memory.py already COALESCEs volatility_regime first — correct pattern.",
+      "impact": "Any decision keyed on entry_regime_4h is blind. CEO rejected evidence-backed boost on dead column.",
+      "recommendation": "Fix feature_recorder writer OR stop using entry_regime_4h. Use volatility_regime for all regime decisions. CEO should re-evaluate vol-breakout boost with correct column.",
+      "status": "reported"
+    },
+    {
       "id": "DRIFT-004",
-      "issue": "ENTRY_RR_MIN_RATIO=2.0 hardcoded in entry_gates.py:31 — NOT in hermes_constants.py (convention violation). Sessions suggested lowering to 0.95 to catch missed trades. Used by enabled signals: engulfing, breakout_pullback, volume_climax.",
-      "status": "OPEN",
-      "impact": "Potential signal starvation — R:R>2.0 at entry is strict. No backtest data for 0.95. Do NOT change without backtest.",
-      "action": "Delegated: backtest rr_gate against 14d winners — what % have entry R:R between 0.95-2.0?"
+      "severity": "MEDIUM",
+      "finding": "ENTRY_RR_MIN_RATIO=2.0 hardcoded in entry_gates.py:31 — violates no-hardcoded-constants convention. Sessions suggested 0.95 (missed trades). No backtest run.",
+      "impact": "Potential missed entries if 2.0 too strict; potential bad entries if lowered blindly.",
+      "recommendation": "Backtest 0.95/1.25/1.5/2.0 against 14d before any change. Move constant to hermes_constants.py.",
+      "status": "delegated (bug_hunter/previous runs) — carry forward"
     },
     {
-      "id": "DRIFT-002",
-      "issue": "Exec-time LONG RSI uses 5m vs signal detection 1m — BTC bb-bounce RSI=77.32 slipped past LONG_RSI_CEILING=70",
-      "status": "OPEN",
-      "owner": "bug_hunter",
-      "action": "Carry forward"
-    },
-    {
-      "id": "DRIFT-003",
-      "issue": "SIGNAL_FILTER_RSI_MIN unenforced on STANDALONE_BYPASS path — HARD_FLOOR=25 partial patch applied 11:50",
-      "status": "OPEN_MONITOR",
-      "owner": "bug_hunter",
-      "action": "Monitor HARD_FLOOR logs 24h"
-    },
-    {
-      "id": "VERIFY",
-      "issue": "PUMP_CHAIN_SHORT_RSI_MIN=40 — RSI<40 losers opened when threshold was 25, NOT a filter failure. Post-40 sample: 1W 0L. Filter working as designed.",
-      "status": "RESOLVED",
-      "action": "None"
-    },
-    {
-      "id": "VERIFY",
-      "issue": "Double-BTC exposure resolved — continuum-osc+ closed +$0.16, only continuum_engine open.",
-      "status": "RESOLVED",
-      "action": "None"
+      "id": "DRIFT-006",
+      "severity": "LOW",
+      "finding": "VOLUME_BREAKOUT_LONG_RSI_CEILING=95 allows entries at RSI 84-86 which lost -$0.31/14d (3 trades). Comment says 'RSI>95: 2L' but losses exist at 84-86.",
+      "impact": "Minor leak in exhausted zone. 14d n=3 — below action threshold.",
+      "recommendation": "Monitor. If RSI>80 losses continue, consider ceiling 85 after 20T sample.",
+      "status": "monitor"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "SHORT structural R:R deficit",
-      "evidence": "7d SHORT R:R=0.73 (avgW $0.101 vs avgL $0.139), 14d R:R=0.78. Needs >55%WR to breakeven, currently 47.9%.",
-      "status": "PERSISTING",
-      "note": "SHORT-CONTINUUM filter (18:15) blocks bullish-market SHORTs — 7d window still includes pre-filter losses"
-    },
-    {
       "topic": "Signal diversity / NEUTRAL starvation",
-      "evidence": "Hotset thin; volume-dry-up/EMA-reclaim delegated Sep 26, still unbuilt. range_reversion KILLED, neutral_sniper disabled per T.",
-      "status": "OPEN_5PLUS_DAYS",
-      "owner": "signal_analyst / T"
+      "frequency": "every session 10+ days",
+      "status": "delegated signal_analyst — ema-reclaim spec at automation/ceo/spec_neutral_signal_ema_reclaim.md, deadline Oct 3 12:00 UTC",
+      "note": "Hotset empty cycles. BTC-CHOP-GATE blocks momentum when BTC flat. #1 gap unchanged."
     },
     {
-      "topic": "Conf 95+ paradox",
-      "evidence": "7d conf>=95: 79T 46.8%WR -$0.45. Losers dominated by legacy killed signals (mover- 0%, accel-300- 37.5%, V5 42.9%). doji-bottom 5T 80%WR +$0.28 at conf95+.",
-      "status": "AGING_OUT",
-      "note": "Paradox should improve as legacy signals age out"
+      "topic": "SHORT R:R structural disadvantage",
+      "frequency": "every session ~14 days",
+      "current": "7d SHORT avg_win $0.101 vs avg_loss -$0.145 = 0.70:1. Needs >59% WR to break even; currently 47.9%.",
+      "root_cause_lever": "MFE realization — hard_sl winners capture small % of favorable excursion. PM_TRAIL activate=0.40% locks scratch on 2-6% dumps.",
+      "status": "PM_TRAIL protected — backtest signal-level override (PM_TRAIL_BYPASS_SIGNALS) before any change"
+    },
+    {
+      "topic": "Legacy signal losses aging out",
+      "frequency": "daily since Oct 1 kills",
+      "status": "working as designed — accel-300- killed 10:50, pump-chain-v5 killed 10:18, opens pre-kill age out via hard_max_loss",
+      "note": "No new action. Expect clean 24h by Oct 3."
     }
   ],
   "missing_implementations": [
     {
-      "item": "NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
-      "discussed": "Multiple sessions + 5+ kanban entries",
-      "status": "UNBUILT",
-      "priority": "#1"
+      "item": "NEUTRAL volume-dry-up / EMA-reclaim signal",
+      "discussed": "multiple sessions, CEO delegated signal_analyst 3rd time",
+      "exists": false,
+      "status": "spec delivered path, deadline Oct 3 12:00 UTC"
     },
     {
-      "item": "ENTRY_RR_MIN_RATIO moved to hermes_constants.py + backtest of 2.0→1.25 middle ground",
-      "discussed": "Session: 'R:R threshold should be lowered to 0.95'",
-      "status": "NOT_IMPLEMENTED",
-      "priority": "medium"
+      "item": "ENTRY_RR_MIN_RATIO backtest (0.95/1.25/2.0)",
+      "discussed": "signal-to-trades session + DRIFT-004",
+      "exists": false,
+      "status": "backlog — no backtest run yet"
     },
     {
-      "item": "volume-breakout-long+ EXTREME confidence boost",
-      "discussed": "Prior brain_auditor runs, CEO/T gate",
-      "status": "AT_THRESHOLD_AWAITING_CEO",
-      "evidence": "17T/14d 76.5%WR +$2.78; 20T/30d 70%WR. RSI ceiling 95 blocks 0 winners."
+      "item": "SHORT MFE realization backtest (signal-level PM_TRAIL bypass)",
+      "discussed": "brain_auditor 21:36 creative",
+      "exists": false,
+      "status": "backlog — PM_TRAIL protected, need evidence before touching PM_TRAIL_BYPASS_SIGNALS"
     },
     {
-      "item": "doji-bottom-long HIGH conf boost",
-      "discussed": "Prior runs",
-      "status": "BELOW_THRESHOLD",
-      "evidence": "11T/14d < 20T requirement. Post-fix 5T 80%WR promising."
+      "item": "entry_regime_4h writer fix",
+      "discussed": "this run",
+      "exists": false,
+      "status": "NEW — feature_recorder/hl-sync-guardian write path broken or not invoked"
     }
   ],
+  "losing_trade_autopsy_24h": {
+    "losers": 18,
+    "clusters": [
+      {
+        "signal": "accel-300- SHORT",
+        "trades": "5 hard_max_loss -$0.37",
+        "entry_check": "RSI 2.9-14.3 at entry (metadata) — catastrophic oversold SHORTs",
+        "regime": "NORMAL/HIGH",
+        "root_cause": "Shorting extreme oversold = falling knife reverse. Signal KILLED Oct 1 10:50.",
+        "recommended_change": "NONE — already killed. Aging out.",
+        "confidence": "HIGH"
+      },
+      {
+        "signal": "pump-chain-v5 LONG",
+        "trades": "4 hard_max_loss -$0.27",
+        "entry_check": "EXTREME/NORMAL chop, opened pre-kill",
+        "root_cause": "V5 test failed quiet-market filter quality. KILLED Oct 1 10:18.",
+        "recommended_change": "NONE — already killed. Aging out.",
+        "confidence": "HIGH"
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "trades": "5 hard_sl -$0.55 (opened Sep 30 19:31 - Oct 1 08:35)",
+        "entry_check": "All pre RSI_MIN=40 fix. Post-fix ALGO SHORT13:08 = +$0.03 winner (atr_trail_hit).",
+        "regime": "EXTREME (all)",
+        "root_cause": "Pre-filter opens. PUMP_CHAIN_SHORT_RSI_MIN=40 now blocks RSI<40.",
+        "recommended_change": "NONE — filter working. Post-fix 1W 0L.",
+        "confidence": "HIGH"
+      },
+      {
+        "signal": "bb-bounce-v3-long+ LONG",
+        "trades": "2T 0%WR -$0.12 (WLFI PM-trail scratch, ZORA HIGH hard_max_loss)",
+        "entry_check": "n=2 — below 3T kill threshold",
+        "root_cause": "Noise at tiny sample. rsi_1m filter fix live since Sep 30.",
+        "recommended_change": "Monitor to 3T. Kill if still 0%WR.",
+        "confidence": "MEDIUM"
+      }
+    ],
+    "impact_on_winners": "N/A — no new filter proposed this run",
+    "verdict": "No NEW systematic loss pattern. All 24h losers are legacy kills aging out or pre-filter opens. Filters verified working."
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-01T21:36:47Z",
-      "idea": "SHORT MFE realization gap — pump-chain- captures median ~40% of MFE via PM_TRAIL activate=0.40%",
-      "rationale": "7d pump-chain- SHORT hard_sl winners: CRV MFE=6.05% realized 4.9% (+$0.55); COMP MFE=1.61% realized 0.23% (+$0.03); IO MFE=2.36% realized 0.43%; BABY MFE=2.66% realized 0.92%. Median capture ~40%. PM_TRAIL locks scratch profit on 2-6% dumps instead of letting them run. Exit taxonomy shows winners as hard_sl = trailed stop hit after trail engaged too early.",
-      "expected_impact": "If capture raised 40%→60%: SHORT avg_win +50%, R:R 0.73→~1.1, SHORT side approaches breakeven at current 47.9% WR",
-      "category": "exit quality",
+      "date": "2026-10-01T22:34:01Z",
+      "idea": "Fix entry_regime_4h dead column (334/334 NULL) — CEO rejected valid vol-breakout boost on wrong column",
+      "rationale": "CEO 21:55: 'DB shows ALL 20 volume-breakout trades are regime=NEUTRAL, entry_regime_4h=NULL'. volatility_regime shows EXTREME 13T 76.9%WR +$2.63. Dead column caused false rejection of evidence-backed edge.",
+      "expected_impact": "Restores regime decision integrity. Vol-breakout boost re-evaluable (+$2.63/14d edge preserved/boosted).",
+      "category": "data integrity",
       "status": "suggested",
-      "risk": "medium",
-      "constraint": "PM_TRAIL global ACTIVATE=0.40%/DISTANCE=0.20% is PROTECTED. Needs signal-level trail override path or CEO/T approval. Do not change global PM_TRAIL.",
-      "next_step": "Backtest: what if pump-chain- SHORT trail activate were 0.80%? Replay 7d MFE data — which winners capture more, which losers get worse?"
-    },
-    {
-      "date": "2026-10-01T21:36:47Z",
-      "idea": "ENTRY_RR_MIN_RATIO backtest — 2.0 current vs 1.25 middle ground vs session-suggested 0.95",
-      "rationale": "Sessions flagged R:R>2.0 as missing good trades. Value hardcoded in entry_gates.py (convention violation). Used by 3 enabled signals. No backtest exists.",
-      "expected_impact": "Unknown until backtested — could unlock signal flow or flood with noise",
-      "category": "signal starvation",
-      "status": "suggested",
-      "risk": "medium",
-      "constraint": "Must move constant to hermes_constants.py first (convention). Backtest before any value change.",
-      "next_step": "Replay 14d trades through rr_gate at thresholds 0.95/1.25/1.5/2.0 — measure winners blocked vs losers blocked"
-    },
-    {
-      "date": "2026-10-01T21:36:47Z",
-      "idea": "CARRIED: volume-breakout-long+ EXTREME confidence boost +10-15pt",
-      "rationale": "17T/14d 76.5%WR +$2.78, EXTREME 13T 76.9% +$2.63. RSI ceiling 95 verified: 0 winners blocked (max winner ME 91.7). Needs CEO/T per standing rules.",
-      "expected_impact": "+3-5% WR for volume-breakout in EXTREME",
-      "category": "entry sniper",
-      "status": "awaiting_ceo_t",
       "risk": "low"
     },
     {
-      "date": "2026-10-01T21:36:47Z",
-      "idea": "REJECTED: time-based blocks, blanket signal kills, vol-breakout RSI ceiling 90, bb-bounce-v3 kill",
-      "rationale": "Time blocks banned by policy. vol-breakout RSI 90 would kill ME +$0.09 winner. bb-bounce-v3 n=4T noise.",
-      "status": "rejected"
+      "date": "2026-10-01T22:34:01Z",
+      "idea": "Re-propose volume-breakout EXTREME confidence boost with CORRECT column data",
+      "rationale": "volatility_regime=EXTREME: 13T 76.9%WR +$2.63 (10W/3L). NORMAL: 5T 80%WR +$0.25. 14d total 18T 77.8%WR +$2.88. At sample threshold (>=10). RSI>80 exhausted zone = 3L -$0.31 (already near VOLUME_BREAKOUT_LONG_RSI_CEILING=95).",
+      "expected_impact": "+$0.30-0.60/7d if EXTREME priority boost passes more high-quality setups through CONF_FILTER_MIN=70",
+      "category": "entry sniper",
+      "status": "suggested_ceo_reeval",
+      "risk": "low",
+      "impact_on_winners": "Boost (not block) — does not kill winners. Ceiling=95 already protects exhausted zone."
+    },
+    {
+      "date": "2026-10-01T22:34:01Z",
+      "idea": "SHORT MFE realization backtest — signal-level PM_TRAIL_BYPASS for pump-chain-",
+      "rationale": "7d SHORT avg_win $0.101 vs avg_loss -$0.145 (0.70:1). hard_sl winners capture small % of MFE (CRV +4.9% pnl but trail locked; IOTA +2.03%; COMP/IO noted in 21:36 audit). PM_TRAIL activate=0.40% locks scratch on 2-6% dumps. PM_TRAIL protected but PM_TRAIL_BYPASS_SIGNALS is a separate lever.",
+      "expected_impact": "If bypass improves SHORT R:R from 0.70:1 toward 1.0:1: +$0.30-0.80/7d on 48 SHORT trades",
+      "category": "exit engineering",
+      "status": "suggested_backtest_first",
+      "risk": "medium",
+      "prerequisite": "Backtest needed. Do NOT touch PM_TRAIL_ACTIVATE/DISTANCE (protected). Only evaluate adding pump-chain- to PM_TRAIL_BYPASS_SIGNALS after evidence."
+    },
+    {
+      "date": "2026-10-01T22:34:01Z",
+      "idea": "doji-bottom-long approaching conf-boost threshold",
+      "rationale": "12 closed + 1 open (SUSHI conf=95 RSI=25.08 gap=-0.49%). Post-fix (Sep 27+): 5W 1L +$0.27. Lifetime 63.6%WR +$0.36. Threshold for HIGH conf boost = 20T.",
+      "expected_impact": "If reaches 20T at current WR: conf boost increases fire rate on quality setups",
+      "category": "confidence tuning",
+      "status": "monitor",
+      "risk": "low"
     }
   ],
+  "config_changes_applied": [],
+  "config_change_rationale": "0 CHANGES. Monitor windows active (SHORT-CONTINUUM, HARD_FLOOR=25, RSI_MIN=40, V5/accel aging, bollinger_squeeze 48h, bb-bounce-v3). Standing decision: no stacking during measurement windows. hermes_constants values need CEO/T. volume-breakout boost wrongly rejected by CEO on dead column — reported, not overridden.",
   "next_actions": [
-    "MONITOR: BTC LONG continuum_engine outcome, SL/TP/trail behavior",
-    "MONITOR: SHORT-CONTINUUM filter — no legitimate STRONG_NEG SHORTs blocked",
-    "MONITOR: PUMP_CHAIN_SHORT_RSI_MIN=40 golden band 40-44 (n=6 7d 33%WR erosion — insufficient data, 14d 40-44 was 63.6%WR)",
-    "MONITOR: doji-bottom-long at 20T conf-boost threshold (currently 11T/14d, post-fix 5T 80%)",
-    "MONITOR: volume-breakout-long+ at CEO/T conf-boost gate",
-    "MONITOR: HARD_FLOOR=25 SKIP_HARD logs 24h (DRIFT-003)",
-    "DELEGATE: rr_gate backtest (ENTRY_RR_MIN_RATIO 2.0 vs 1.25 vs 0.95)",
-    "DELEGATE: SHORT MFE realization analysis — pump-chain- trail activate backtest (PM_TRAIL protected — signal-level override only)",
-    "CEO/T: volume-breakout EXTREME conf boost decision",
-    "T: NEUTRAL signal decision — still unbuilt 5+ days (#1 diversity gap)",
-    "PENDING CEO: disk prune (87%), bollinger_squeeze re-enable, HL key reminder correction in AGENTS.md"
+    "CEO: re-evaluate volume-breakout EXTREME conf boost using volatility_regime column (NOT entry_regime_4h). Data: 13T 76.9%WR +$2.63.",
+    "CEO/T: entry_regime_4h writer fix — feature_recorder.py / hl-sync-guardian.py path broken. Or formally deprecate column.",
+    "signal_analyst: NEUTRAL ema-reclaim signal — deadline Oct 3 12:00 UTC",
+    "backlog: ENTRY_RR_MIN_RATIO backtest 0.95/1.25/2.0 (DRIFT-004)",
+    "backlog: SHORT MFE realization backtest before any PM_TRAIL_BYPASS_SIGNALS change",
+    "monitor: bollinger_squeeze first signals 48h (0 trades so far — quiet market)",
+    "monitor: doji-bottom at 20T, bb-bounce-v3 at 3T kill threshold",
+    "monitor: SUSHI doji open (vol_spike=0.0 — no volume confirmation, watch)",
+    "monitor: BTC continuum_engine ORPHAN_PAPER amt=0.00 hygiene",
+    "monitor: legacy aging clean by Oct 3 (accel-300-, pump-chain-v5)",
+    "monitor: VOLUME_BREAKOUT RSI>80 losses (3T -$0.31, n small)"
   ]
 }

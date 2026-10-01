@@ -1507,5 +1507,41 @@
     "idea": "REJECTED: time-based blocks, blanket signal kills, vol-breakout RSI ceiling 90, bb-bounce-v3 kill",
     "rationale": "Time blocks banned by policy. vol-breakout RSI 90 would kill ME +$0.09 winner. bb-bounce-v3 n=4T noise.",
     "status": "rejected"
+  },
+  {
+    "date": "2026-10-01T22:34:01Z",
+    "idea": "Fix entry_regime_4h dead column — CEO wrongly rejected vol-breakout boost on NULL column; volatility_regime has real EXTREME 13T 76.9%WR +$2.63",
+    "rationale": "334/334 trades 14d have entry_regime_4h=NULL. feature_recorder.py writes it but never lands. Regime decisions keyed on this column are blind.",
+    "expected_impact": "Restores regime data integrity; unblocks CEO re-eval of +$2.63/14d edge",
+    "category": "data integrity",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T22:34:01Z",
+    "idea": "Re-propose volume-breakout EXTREME confidence boost with correct volatility_regime data (was wrongly rejected 21:55)",
+    "rationale": "EXTREME 13T 76.9%WR +$2.63 REAL via volatility_regime. NORMAL 5T 80%WR +$0.25. Total 18T 77.8%WR. At sample threshold.",
+    "expected_impact": "+$0.30-0.60/7d",
+    "category": "entry sniper",
+    "status": "suggested_ceo_reeval",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T22:34:01Z",
+    "idea": "SHORT MFE realization backtest — pump-chain- PM_TRAIL_BYPASS candidate (PM_TRAIL itself protected)",
+    "rationale": "7d SHORT R:R 0.70:1 (win $0.101 / loss $0.145). hard_sl winners lock small % of MFE. PM_TRAIL activate=0.40% scratches 2-6% dumps.",
+    "expected_impact": "+$0.30-0.80/7d if R:R improves toward 1:1",
+    "category": "exit engineering",
+    "status": "suggested_backtest_first",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-01T22:34:01Z",
+    "idea": "doji-bottom-long conf boost at 20T threshold — currently 12T 63.6%WR +$0.36, post-fix 5W1L",
+    "rationale": "Emerging quality signal. SUSHI open conf=95. Do not boost below 20T.",
+    "expected_impact": "Increased fire rate on quality NEUTRAL setups",
+    "category": "confidence tuning",
+    "status": "monitor",
+    "risk": "low"
   }
 ]
