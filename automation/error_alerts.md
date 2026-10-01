@@ -266,3 +266,13 @@
 - **WARN** (1x): `hermes-atr-sl-updater.timer` unit file not-found (ghost systemd reference). ATR SL/TP path is healthy — managed locally by guardian via DB per pipeline logs.
 - **AUTO-FIX**: `systemctl daemon-reload` run. No functional gap; stale reference remains in list-timers until unit file removed/recreated.
 - **INFO**: Pipeline OK — 0 tracebacks, 0 real errors in 30min. 54 signals/hr, 2 open positions, 21 closed today (-$0.84, 33.3% WR). Hotset empty (confidence gate), regime NEUTRAL.
+
+## Error Alerts — 2026-10-01 18:47 UTC
+- **WARN** (ongoing): Disk **88%** used (98G/118G, 15G free) — up from 86% at 16:47. Root cause is DB growth, not logs. Largest: coin_tracker.db 3.3G, candles.db-wal **3.0G**, candles.db 2.3G, mtf_macd_tuner.db 1.3G, signals_hermes.db 894M, session_brain.db 835M. No .log files >7d to gzip.
+- **AUTO-FIX**: `PRAGMA wal_checkpoint(TRUNCATE)` on candles.db run — no space reclaimed (WAL recreates under active price-collector writes). journalctl previously vacuumed. **CEO DB-pruning decision still required** — cannot safely auto-delete trade/price data.
+- **WARN** (repeating): Hotset EMPTY — 49 signals/hr generated, 0 approved (none ≥50% confidence). Market LONG_BIAS but 110/116 NEUTRAL. 1 open position (BTC LONG +0.81%). No new trades until signals clear compactor.
+- **WARN** (1x): Watchdog low-signal WARNING — 3-5 signals/5min vs watchdog min 20. Not a pipeline failure: signals are generating, just below watchdog's aggressive threshold. Market quiet/neutral.
+- **AUTO-FIX**: Watchdog auto-restarted 3 failed services at 18:45: hermes-better-coder, hermes-bug-hunter, hermes-mtf-macd-tuner.
+- **INFO**: Pipeline OK — active (timer every 1min), 0 Tracebacks/CRASH/FATAL in 30min. All major timers firing (pipeline, price-collector, signal-compactor, watchdog, hl-sync-guardian all <1min ago). Prices fresh (162/241 token_speeds updated <5min, 42 stale). Phantom trades: 0. Today: 23 closed, 9 wins (39.1% WR), -0.73 USDT. Kill switch LIVE enabled. OpenMemory running (Docker :8080).
+- **INFO**: Inactive timers noted: `hermes-regime-24h-check.timer`, `hermes-regime-transition-check.timer` (loaded but inactive/dead). `hermes-atr-sl-updater.timer` still not-found (known ghost).
+- **AUTO-FIXES APPLIED**: Watchdog service restarts (3x); WAL checkpoint attempt (no reclaim). No pipeline restart needed — system healthy, just disk pressure + quiet market.
