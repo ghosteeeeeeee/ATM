@@ -2608,6 +2608,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
     'bb-squeeze',  # bollinger squeeze breakout — works solo (2026-10-01)
+    'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long'). 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
