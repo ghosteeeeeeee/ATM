@@ -1991,3 +1991,25 @@ BY: daily-orchestrator
 - BTC continuum_engine open row amount_usdt=0.00 persists (open 17:45, unrealized NULL). Pattern: prior continuum_engine BTC closes are all ORPHAN_PAPER with amount_usdt=0.00 (4x in last 3 weeks). Paper/orphan hygiene — pipeline exit-recorder issue, not a signal-logic config fix. Flagged prior hour; still open.
 - hard_max_loss_* family still the dominant 24h bleed (~-$1.03/12 exits) — trades dying before developing. Monitor window on hard-floor 25→30 proposal remains active.
 - mfe/mae NULL on trail exits persists — entry-quality gap for winners. Data-path issue, not signal logic.
+
+## [2026-10-01 23:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no trades) — quiet hour
+
+**24h context:** 30 closed. Exit reasons: profit-monster-trail 7T +$0.15 | hard_max_loss_* family 12T ~-$1.02 | trail_sl 2T +$0.09 | hard_sl 2T -$0.28 | pump_exit_dead_money 2T +$0.10 | HL_CLOSED 2T +$0.15 | atr_sl_hit 0T | atr_trail_hit 1T +$0.03. 24h signals n≥3: pump-chain- 7T 28.6%WR -$0.46 (RSI_MIN=40 live, post-fix 1W 0L per auditor) | pump-chain-v5 6T 33.3%WR -$0.17 (killed 10:18) | accel-300- 8T 37.5%WR -$0.34 (killed 10:50). Hourly with trades this week: 13:00 +$0.03, 17:00 +$0.09, 18:00 +$0.03, 21:00 +$0.16. Open: SUSHI doji-bottom-long LONG 21:32 ($11.10) + BTC continuum_engine LONG 17:45 (amount_usdt=0.00, phantom paper — recurring ORPHAN_PAPER pattern).
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/30 (0%) of 24h closes. tpsl_utils.py fix deployed and stable. Dominant bleed remains hard_max_loss_* family (~-$1.02/12 exits, trades dying before developing). Hard-floor 25→30 proposal still in monitor window — do not stack. No CEO alert.
+- **Kill rule:** 0 signals with 0% WR and 3+ trades in last hour (0 trades). pump-chain- 28.6%WR is 7T/24h with live RSI_MIN=40 fix + monitor window — not last-hour trigger. V5/accel already killed; losses aging out.
+- **PnL streak:** No consecutive negative hours with activity. Size-reduction rule inactive.
+- **Trade frequency:** 0/hr — signal-starved, not overtrading.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor proposal, DRIFT-004 ENTRY_RR_MIN_RATIO delegated. brain_auditor 21:36 applied 0 changes. Do not stack.
+
+**Open Questions:**
+- BTC continuum_engine amount_usdt=0.00 open row persists (ORPHAN_PAPER hygiene, pipeline exit-recorder) — flagged prior hours, not auto_1hr config.
+- hard_max_loss_* still dominant 24h bleed — monitor window active on hard-floor 25→30.
+- mfe/mae_pct exists in schema; prior NULL trail-exit data gap still noted — data-path, not signal logic.
