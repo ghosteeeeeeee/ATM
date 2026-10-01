@@ -999,7 +999,7 @@ def rule_based_context_gate(token, direction, source, sig):
     # These are loss-prevention guardrails, not tunable signal quality filters
     # CEO 2026-09-23: Extended from pullback-entry-only to ALL SHORT signals.
     # accel-300-breakout SHORT bypasses signal_compactor (STANDALONE_BYPASS), was missing floor check.
-    from hermes_constants import SHORT_RSI_FLOOR
+    from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR
     if direction == 'SHORT':
         # CAKE DNA: SHORTing into oversold (RSI < SHORT_RSI_FLOOR) = bounce risk
         # FIX (brain_auditor 2026-09-20): Use LIVE RSI (like SHORT_RSI_CEILING does).
@@ -1016,6 +1016,12 @@ def rule_based_context_gate(token, direction, source, sig):
         # DRIFT-002 fix: fall back to top-level sig RSI when metadata lacks rsi_14
         if _detect_rsi_floor is None and isinstance(sig, dict):
             _detect_rsi_floor = sig.get('rsi_14') or sig.get('rsi')
+        # HARD FLOOR first — no bearish override. RSI<25 SHORT = falling knife even in downtrend.
+        # 14d: 12T 25%WR -$0.89; 0 real winners. Catches STANDALONE_BYPASS + bearish-override hole.
+        if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_HARD_FLOOR:
+            return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
+        if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_HARD_FLOOR:
+            return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
         # Block if EITHER live or detection-time RSI < floor
         # Detection-time RSI can be below floor even when live RSI recovered — signal was detected in oversold
         _sig_label = source or 'SHORT'
@@ -1789,7 +1795,7 @@ def execute_trade(token, direction, price, confidence, source,
     # time, RSI may have dropped into danger zone. Check NOW at execution time.
     # CASHCAT教训: RSI 15.5 and 33.4 at entry → -6.4% loss (price bounced from oversold)
     try:
-        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
+        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
         import sqlite3 as _rsi_sqlite
         from paths import CANDLES_DB as _rsi_candles_db
         _rsi_conn = _rsi_sqlite.connect(f"file:{_rsi_candles_db}?mode=ro", uri=True, timeout=5)
@@ -1812,6 +1818,10 @@ def execute_trade(token, direction, price, confidence, source,
                     _exec_rsi = 100 - (100 / (1 + _rsi_ag / _rsi_al))
                     # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
                     _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
+                    # HARD FLOOR first — no bearish override. Catches STANDALONE_BYPASS + override hole at exec time.
+                    if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
+                        log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
+                        return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
                     if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
                         # Bearish structure override: oversold = continuation in downtrend
                         _exec_bearish = False

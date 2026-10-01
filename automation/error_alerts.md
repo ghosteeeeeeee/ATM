@@ -205,3 +205,30 @@
 - **WARN** (1x): hermes-trading-checklist.service — flags `signals_db: 12908 signals (0 approved, 5 pending)` — symptom of empty hotset, not a separate bug.
 - **INFO**: hermes-git-release.service + hermes-upgrade-implementer.service failed (exit 1 / exit 124 timeout) — **AUTO-FIX**: reset-failed applied, both non-trading.
 - **INFO**: Pipeline path clean — 0 errors/tracebacks in 30min. Prices fresh (11s, 86 tokens). Regime NEUTRAL (0L/2S/114N). 3 open SHORT positions all IN_PROFIT (BANANA, CFX, HYPER).
+
+## Error Alerts — 2026-10-01 08:47 UTC
+- **WARN** (1x): Disk usage 85% on / (95G/118G, 18G free)
+- **AUTO-FIX**: None applied — no logs older than 7 days to gzip; large consumers are active DBs (coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G). No cleanup safe to auto-run.
+- Note: atr-sl-updater timer is DEFUNCT (renamed unit), intentional. Other inactive timers (hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check) appear intentionally disabled — no missed firings on active timers.
+
+## Error Alerts — 2026-10-01 08:58 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-01 11:46 UTC
+- **WARN** (ongoing): Disk at 85% (95G/118G). No logs >7d uncompressed to gzip (17 .gz already present). Large consumers are DBs: coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G. **Needs CEO call on DB pruning.**
+- **WARN** (ongoing): Hotset EMPTY — 68 signals generated last hour, 0 approved by compactor (none ≥50% confidence). No new trades will open until signals clear compactor. Pipeline healthy, 0 open positions.
+- **WARN** (repeating): hermes-wasp.service failing every cycle — `[LOCK-WAIT]` / exit 1. Code-owner fix needed.
+- **WARN** (repeating): hermes-better-coder.service — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. Path/sys.path issue, code-owner fix.
+- **INFO**: Pipeline path clean — 0 errors/tracebacks in 30min. 30 successful pipeline runs. Prices fresh (29s, 86 tokens). Regime NEUTRAL (0L/0S/116N). Speed 53% tokens ≥50th pctl. Kill switch LIVE enabled. Phantom trades: 0. hl-sync-guardian active (long-running, 11h).
+- **INFO**: Daily PnL -33.74% on 34 closed trades (LONG 3/9 win, SHORT 3/11 win) — trading performance, not infra.
+- **AUTO-FIXES APPLIED**: None — no actionable auto-fix this cycle (disk logs already compressed; pipeline not crashed; timers firing).
+
+## Error Alerts — 2026-10-01 12:47 UTC
+- **WARN** (ongoing): Disk at 85% (95G/118G, 17G free). No logs >7d uncompressed to gzip. Large consumers are active DBs: coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G, signals_hermes 892M. **Needs CEO call on DB pruning — no safe auto-fix.**
+- **WARN** (ongoing): Hotset EMPTY — 62 signals generated last hour, 0 approved by compactor (none ≥50% confidence). Market NEUTRAL (2L/0S/114N). No new trades will open until signals clear compactor. Pipeline healthy, 0 open positions.
+- **WARN** (repeating): hermes-price-collector.service — lock contention: `[LOCK-WAIT] info_rate` retries + `candles_15m/1h/4h: aggregation error: database is locked`. Collector still completes (86 prices, candles updated). Code-owner fix needed for candle-aggregation lock path.
+- **INFO**: Pipeline path clean — 0 errors/tracebacks in 30min. 30 successful pipeline runs. Prices fresh (20s, 86 tokens). Regime NEUTRAL. Speed 53.1% tokens ≥50th pctl. Phantom trades: 0. Open trades: 0. Today: 20 closed, 30% WR, -0.87 USDT.
+- **INFO**: token_speeds: 79/241 flagged stale (32.8%). decisions table empty since April (expected — signal_compactor is LLM-free, doesn't write decisions).
+- **INFO**: Several 0-byte DB files present (brain.db, hermes.db, hermes_live.db, hermes_runtime.db, hermes_trades.db, hotset.db, price_cache.db, price_history.db, prices.db, runtime.db, signals.db). System uses signals_hermes_runtime.db / candles.db / coin_tracker.db instead — likely intentional placeholders. Flagging for awareness, not auto-deleting.
+- **AUTO-FIXES APPLIED**: None actionable — pipeline not crashed; timers all firing; no logs >7d to gzip; disk pressure is DB growth not logs. No restart or force-run warranted.
