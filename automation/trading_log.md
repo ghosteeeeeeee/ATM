@@ -1419,3 +1419,29 @@ at hermes_constants.py:278 `FAVORITES = FAVORITES_LONG | FAVORITES_SHORT`.
 **QUALITY:** Tasks: 1 critical fix, 1 attempt, success. 0 config changes.
 
 — daily_orchestrator
+
+## [2026-10-01 07:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.07 (WR: 0.0%)
+**Trade:** JUP pump-chain-v5 LONG hard_max_loss_-0.52% (RSI 36.6 entry, paper MAE 49.9%)
+
+**Diagnosis:**
+- **Entry quality:** 24h winners avg MAE 18.4% vs losers 83.0% (paper leverage noise) — no clean-edge signal
+- **SL behavior:** atr_sl_hit 0% of 24h closes (0 over 48h) — tpsl fix stable
+- **Signal quality:** pump-chain- 48h: 20T 8W 40%WR -$0.91 (still bleeding, 0 trades this hour); pump-chain-v5 48h: 5T 3W +$0.07 (OK); 6h pump-chain- 4T 2W -$0.12
+- **Frequency:** 1T/hour — not overtrading; not 3 consecutive negative hours (05:00 +$0.07)
+
+**Changes:**
+1. None
+
+**No Change Needed:**
+- Kill rule: no signal with 0% WR and 3+ trades in last hour (JUP = 1T only)
+- atr_sl_hit 0% — no CEO alert needed
+- Position size/reduce rule: avg_pnl not negative for 3+ consecutive hours
+- Overtrading: 1T << 20T/hr threshold
+
+**Open Questions:**
+- pump-chain- remains on watch (40% WR -$0.91/48h) — not auto-killable by hourly rule; needs longer-window audit or T decision
+
+BY: auto_1hr
