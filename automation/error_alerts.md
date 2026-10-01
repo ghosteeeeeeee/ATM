@@ -142,3 +142,19 @@
   - **AUTO-FIX**: Guarded lock acquisition behind `if __name__ == '__main__'` in hl-sync-guardian.py. Import path no longer triggers lock. Pipeline restarted. Verified: position_manager rc=0 post-fix.
 - **WARN**: Disk 86% used (16G free). Compressed logs >7 days old. Largest active: pipeline.log 45M, signal-compactor.log 37M, trade-watchdog.log 32M.
 - **WARN**: hermes-better-coder.service failed, hermes-git-release.service failed (not auto-fixed — need manual investigation).
+
+## Error Alerts — 2026-10-01 03:58 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-10-01 04:49 UTC
+- **PIPELINE**: OK — running every minute, position_manager rc=0, hl-sync active, 41 signals/1h, 2 closed today (pnl -0.08), regime NEUTRAL (116 tokens), prices fresh (seconds).
+- **WARN** (disk): `/` at 86% (17G free). Bulk is DBs (coin_tracker 3.3G, candles 2.3G+WAL 1.5G, mtf_macd 1.3G, signals_hermes 889M). No logs >7d to gzip. candles WAL checkpoint attempted (busy, candle service active). No DB vacuum — CEO decision needed.
+- **WARN** (hotset): empty — decider reports "no signals survived compaction", 0 approved signals above 50% confidence despite 41 raw signals/1h. Filters rejecting all; worth signal-quality review, not a crash.
+- **WARN** (signals): LTC rapid-fire duplicate `support_resistance` 4x (from wasp).
+- **WARN** (services failed, not trading-critical):
+  - `hermes-better-coder.service` — `ModuleNotFoundError: dispatcher.dispatcher`. `mcp/hermes-coding-mcp/dispatcher/` is EMPTY (code removed in cleanup commit 4e21f7a0). Service already disabled. Needs source restore or task retirement — not auto-fixable.
+  - `hermes-git-release.service` — dry-run exits 1 on uncommitted changes + skills/shared symlinks. By design (advisory dirty-tree check), not a crash.
+  - `hermes-trading-checklist.service` — was falsely CRIT "pipeline no recent execution". **ROOT CAUSE**: `journalctl -n 5`/-n 3 on verbose pipeline output never includes "Started hermes-pipeline.service". **AUTO-FIX**: removed -n limit, match run markers (`position_manager: done`, etc.). Verified: both checks now pass (True).
+  - `hermes-wasp.service` — exits 1 when findings exist (by design). pipeline-log ERROR was the checklist false positive; next run should clear.
+- **NOTE**: `systemctl list-timers hermes-*` shows 0 with glob; use `--all | grep hermes` (66 timers active). Pipeline timer firing correctly every 1min.

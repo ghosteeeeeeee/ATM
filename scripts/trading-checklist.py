@@ -42,10 +42,15 @@ def check_pipeline_service():
         if timer_status != 'active':
             return False, f'hermes-pipeline.timer is {timer_status}', [f'pipeline timer {timer_status}']
 
-        # Also verify service ran recently via journal (check last 2 entries to find Started/Deactivated)
-        r2 = subprocess.run(['journalctl', '-u', 'hermes-pipeline.service', '-n', '5', '--since', '15 minutes ago'],
+        # Also verify service ran recently via journal.
+        # Do NOT use -n N: pipeline is verbose, so the last N lines are mid-run
+        # python output and never include "Started hermes-pipeline.service".
+        r2 = subprocess.run(['journalctl', '-u', 'hermes-pipeline.service',
+                            '--since', '15 minutes ago', '--no-pager'],
                            capture_output=True, text=True, timeout=10)
-        if 'Started hermes-pipeline.service' not in r2.stdout and 'Deactivated successfully' not in r2.stdout:
+        markers = ('Started hermes-pipeline.service', 'Deactivated successfully',
+                   'position_manager: done', 'signals_runner: done', 'decider_run: done')
+        if not any(m in r2.stdout for m in markers):
             return False, 'pipeline timer active but no recent execution', ['no recent pipeline run']
         return True, 'pipeline timer active + recent run OK', []
     except Exception as e:
@@ -87,13 +92,17 @@ def check_hl_sync():
 # ─── Check 3: Pipeline ran recently ───────────────────────────────────
 def check_pipeline_recent():
     try:
-        r = subprocess.run(['journalctl', '-u', 'hermes-pipeline.service', '-n', '3',
+        # Full since-window, not -n 3: last lines of a verbose run look "unclear"
+        r = subprocess.run(['journalctl', '-u', 'hermes-pipeline.service',
                           '--no-pager', '--since', '5 minutes ago'],
                          capture_output=True, text=True, timeout=15)
         output = r.stdout
         if not output.strip():
             return False, 'no pipeline runs in last 5 minutes', ['pipeline silent 5min']
-        if 'Started hermes-pipeline' in output or 'signal_gen' in output or 'Pipeline PAPER' in output or 'Deactivated successfully' in output:
+        markers = ('Started hermes-pipeline', 'signal_gen', 'Pipeline PAPER',
+                   'Deactivated successfully', 'position_manager: done',
+                   'signals_runner: done', 'decider_run: done', 'Running position_manager')
+        if any(m in output for m in markers):
             return True, 'pipeline ran recently', []
         return False, f'pipeline output unclear: {output[:100]}', ['pipeline unclear output']
     except Exception as e:
