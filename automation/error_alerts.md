@@ -95,3 +95,37 @@
 - **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
 - **REPEATED** (6x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
 - **REPEATED** (3x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+
+## Error Alerts — 2026-09-30 23:58 UTC
+- **REPEATED** (9x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
+- **REPEATED** (8x): `Sep N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (7x): `Sep N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-01 00:58 UTC
+- **REPEATED** (59x): `Oct N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+- **REPEATED** (48x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.0s (rc=N)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.7s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.6s (rc=N)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.9s (rc=N)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.4s (rc=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.5s (rc=N)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-01 01:48 UTC
+- **WARN** (1x): Disk `/` at 86% used (118G, 17G free). Logs only 182M — bulk is DBs: coin_tracker.db 3.3G, candles.db 2.3G + WAL 1.5G, mtf_macd_tuner.db 1.3G, signals_hermes.db 888M, session_brain.db 830M.
+- **AUTO-FIX**: journal vacuum (0B free — already tight); attempted candles WAL checkpoint (busy, active DB); no idle large logs to gzip. No DB vacuum run (data loss risk) — CEO decision needed.
+- **WARN** (2x): `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` enabled but inactive (OnBootSec=24h/72h; up 46d so they wait for next boot). Not calendar-scheduled.
+- **WARN** (1x): `hermes-atr-sl-updater.timer` unit not found (stale reference).
+- **NOTE**: hotset empty + decisions table stale since 2026-04-13 while signals_1h=60 — compaction/filter path is rejecting all signals (expected if confidence gates working; worth review).
+- **NOTE**: Prior error_alerts entries contain broken redaction (`TOK` placeholders) from error analyzer — analyzer regex/log-pipeline issue, not runtime.

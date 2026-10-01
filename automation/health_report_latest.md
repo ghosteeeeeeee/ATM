@@ -1,34 +1,31 @@
-# Health Report — 2026-09-30 13:48 UTC
+=== Health Report ===
+Time: 2026-10-01 01:48 UTC
 
-## PIPELINE: OK
-- Status: completed 13:45:35 (LIVE) — service inactive between timer fires (normal)
-- Cycle: rc=0, 31s CPU, 0 errors, 0 tracebacks
-- Position Manager: 0 open | 0 closed this cycle
-- Portfolio: 0 open | 20 closed today
-- Signals (1h): 60 generated (ONDO/IOTA/IMX/BIGTIME/ACE support_resistance @ 74–88 conf)
-- Decisions (2h): 0 written — compactor quiet, worth a look next cycle
-- Errors (30min): 0
+PIPELINE: OK
+- Status: running (last cycle 01:45:34, all steps rc=0)
+- Signals (1h): 60 generated
+- Trades: 3 open (JUP/HBAR/ALGO SHORT pump-chain), 1 closed today (MNT LONG win +0.0129 USDT)
+- Errors: 0 real (Traceback/CRASH none in last 30m)
+- Hotset: empty — no signals survived compaction; decider skipped (no signal >50% conf)
 
-## MARKET
-- Regime: LONG_BIAS — 14 LONG / 1 SHORT / 101 NEUTRAL (116 tokens, ts 13:45:05)
-- Speed: 127/241 tokens ≥50th percentile (52.7%)
-- Open trades: 0 | Closed today: 20 | Phantom trades 24h: 0
+MARKET:
+- Regime: LONG_BIAS — 3 LONG / 0 SHORT / 113 NEUTRAL (116 scanned)
+- Speed: 53.1% tokens >= 50th percentile (128/241)
 
-## SYSTEM
-- Timers: 67 hermes units — pipeline, price-collector, signal-compactor, watchdog, 15m-regime all firing on schedule
-- hl-sync-guardian: active (live_trading=True, DRY=False)
-- Disk: 84% used (93G/118G, 19G free) — sustained 13h, under 85% threshold
-- Prices: 86 tokens, fresh (13:45:30) — candles.db 2.3GB updated 13:45:43
-- Failed units: 0 after reset (was 5: 4 non-trading + checklist-by-design)
-- Journald: 212MB (vacuumed earlier today)
+SYSTEM:
+- Timers: core hermes-pipeline/price-collector/signal-compactor/watchdog/hl-sync all active
+- Disk: 86% used — WARN (DBs, not logs)
+- Prices: 86 tokens, updated 54s ago — fresh
+- Services: hermes-pipeline + hermes-hl-sync-guardian active
+- Load: 5.69 / 5.01 / 4.74 (elevated but pipeline completing)
 
-## AUTO-FIXES APPLIED
-- `reset-failed` × 5: 5m-candle (redundant), better-coder, brain-auditor, git-release, trading-checklist (exit-2 by design)
-- No disk cleanup needed — no logs >7d, journald already small
-- No pipeline restart needed — cycle completed cleanly
+AUTO-FIXES APPLIED:
+- journalctl vacuum (freed 0B)
+- candles.db WAL checkpoint attempted (busy — DB under active use)
+- scanned for idle large logs >7d / >1h — none safe to gzip
 
-## ALERTS
-- WARN: disk 84% sustained 13h — monitor, compress if it crosses 85%
-- INFO: signals DB 11385 rows — checklist flags for cleanup; archive timer runs daily 04:00
-- INFO: 0 decisions in 2h — recheck if signals keep firing without compactor output
-- INFO: `list-timers hermes-*` glob returns 0 — use `list-timers --all | grep hermes` instead
+ALERTS:
+- Disk 86% — main consumers are SQLite DBs (~9.3G+ across 5 files). No auto-vacuum applied (destructive). Needs CEO decision: archive/prune coin_tracker, candles, mtf_macd_tuner, session_brain history.
+- Regime check timers OnBootSec-only (not OnCalendar) — won't fire until reboot.
+- hermes-atr-sl-updater.timer missing.
+- decisions table last write 2026-04-13 — likely dead path post-signal_compactor migration.
