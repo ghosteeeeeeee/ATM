@@ -1388,13 +1388,16 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # ── Trend Alignment Multiplier (consolidated 2026-10-01) ──────────────────
     # Replaces: reg_mult, continuum_mult, dir_bias_mult, trend_filter_mult, alt_btc_div_mult
-    # Single authority: continuum engine (most granular), fallback to 4h regime
+    # Single authority: continuum engine (most granular), fallback to token 1m regime
     # CEO approved: collapse 5 trend multipliers into 1 to reduce 85x score spread
     trend_alignment_mult = 1.0
     try:
-        # Primary: continuum engine (BTC structural trend)
-        from continuum_context import get_btc_trend_context
-        _ctx = get_btc_trend_context()
+        # Primary: continuum engine (BTC structural trend) — use cached context if available
+        _ctx = _btc_ctx_cached
+        if not _ctx:
+            from continuum_context import get_btc_trend_context
+            _ctx = get_btc_trend_context()
+
         if _ctx and _ctx.get('available'):
             _score = _ctx.get('score', 50)
             _bias = _ctx.get('trend_bias', 0)
@@ -1407,17 +1410,32 @@ def _score_signal(token, direction, conf, source, signal_type,
             elif _score < 30 and _bias < -0.3:
                 trend_alignment_mult = 1.4 if direction == 'SHORT' else 0.6
                 log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
-            # Neutral/mixed: fallback to 4h regime
+            # Neutral/mixed: fallback to token 1m regime
             else:
                 if regime_conf > 0:
                     if (regime == 'LONG_BIAS' and direction == 'LONG') or \
                        (regime == 'SHORT_BIAS' and direction == 'SHORT'):
                         trend_alignment_mult = 1.2
+                        log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC neutral, regime {regime} aligned → {trend_alignment_mult:.2f}x")
                     elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
                          (regime == 'SHORT_BIAS' and direction == 'LONG'):
                         trend_alignment_mult = 0.7
-    except Exception:
+                        log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC neutral, regime {regime} counter → {trend_alignment_mult:.2f}x")
+        else:
+            # Continuum unavailable — still try regime fallback
+            log(f"  ⚠️ [TREND-ALIGN] {token}: continuum unavailable, trying regime fallback", 'WARN')
+            if regime_conf > 0:
+                if (regime == 'LONG_BIAS' and direction == 'LONG') or \
+                   (regime == 'SHORT_BIAS' and direction == 'SHORT'):
+                    trend_alignment_mult = 1.2
+                    log(f"  📊 [TREND-ALIGN] {token} {direction}: regime {regime} aligned (no continuum) → {trend_alignment_mult:.2f}x")
+                elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+                     (regime == 'SHORT_BIAS' and direction == 'LONG'):
+                    trend_alignment_mult = 0.7
+                    log(f"  📊 [TREND-ALIGN] {token} {direction}: regime {regime} counter (no continuum) → {trend_alignment_mult:.2f}x")
+    except Exception as e:
         trend_alignment_mult = 1.0
+        log(f"  ⚠️ [TREND-ALIGN] {token} {direction}: exception → {e} → 1.0x", 'WARN')
 
     # Source weight multiplier
     source_mult = _get_source_weight(signal_type, source)

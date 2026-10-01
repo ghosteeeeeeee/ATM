@@ -2808,7 +2808,7 @@ def _run_hot_set():
             # No regime conviction = no market edge. Apply a mild flat penalty
             # to ensure only the strongest signals (high base conf + good wave/speed)
             # survive. Milder than counter-regime penalty (max 30pt) since the
-            # compactor already applied 0.5x reg_mult at scoring stage.
+            # compactor already applied trend_alignment_mult at scoring stage.
             elif _regime == 'NEUTRAL':
                 neutral_penalty = 10  # flat 10 pts — enough to filter weak entries
                 # Survival round forgiveness: each round proves the signal holds in

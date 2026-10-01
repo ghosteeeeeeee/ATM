@@ -798,10 +798,10 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
         # In NEUTRAL → keep existing behavior (higher confidence wins)
     elif has_support and regime == 'SHORT_BIAS':
         # Counter-regime LONG: 20% haircut applied downstream at signal construction (lines 520-524)
-        pass  # signal still fires; compactor applies 0.5x reg_mult
+        pass  # signal still fires; compactor applies trend_alignment_mult penalty
     elif has_resistance and regime == 'LONG_BIAS':
         # Counter-regime SHORT: 20% haircut applied downstream at signal construction (lines 552-556)
-        pass  # signal still fires; compactor applies 0.5x reg_mult
+        pass  # signal still fires; compactor applies trend_alignment_mult penalty
 
     # Re-check: compute signal from whichever direction(s) remain valid
     signal = None
