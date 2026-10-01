@@ -1394,5 +1394,34 @@
     "risk": "medium — needs careful tuning to not block valid delayed entries",
     "sample_size": "Concept from sessions, no backtest yet",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-01T18:35:20Z",
+    "idea": "REVERSE stale-signal confidence decay — investigate TTL extension for quality signals instead of penalty",
+    "rationale": "14d DB-verified: stale=true 50T 48.0%WR +$0.99 vs stale=false 284T 43.7%WR -$3.22. Previous creative idea (confidence decay for stale) is CONTRADICTED by data. Stale-only winners: doji-bottom 5T 80%WR +$0.45, volume-breakout 5T 60%WR +$0.75, pump-chain- 8T 50%WR +$0.30. Confound: these are also the better signals — not proof staleness causes wins. But penalty would have hurt +$0.99 of winners.",
+    "expected_impact": "If TTL too short for doji/volume-breakout: recover expired winners. If not, kill the decay idea permanently.",
+    "category": "signal lifecycle",
+    "status": "suggested",
+    "risk": "low — investigate first, do not implement decay",
+    "action": "1) Log EXPIRED signals and paper-forward their outcome 2) For doji + volume-breakout only, compare TTL 5m vs 15m vs 30m on 14d signal history"
+  },
+  {
+    "date": "2026-10-01T18:35:20Z",
+    "idea": "volume-breakout-long+ conf boost blocked by NULL final_confidence — fix conf pipeline for this signal FIRST",
+    "rationale": "EXTREME RSI 60-80: 8T 100%WR +$2.18/21d (60-70: 5T +$0.93, 70-80: 3T +$1.25). Edge is real. But 21/23 trades have final_confidence=NULL — conf boost cannot apply. Signal-level 23T >=20T threshold. Without conf values, any boost is dead code.",
+    "expected_impact": "Once conf populated: EXTREME boost could add +$0.30-0.50/7d. Until then: 0.",
+    "category": "entry sniper / infra",
+    "status": "blocked-on-data",
+    "risk": "low",
+    "action": "bug_hunter: why does volume-breakout path skip final_confidence write? Same root as final_confidence NULL issue."
+  },
+  {
+    "date": "2026-10-01T18:35:20Z",
+    "idea": "pump-chain- SHORT: do NOT tighten RSI further — golden band 40-45 is eroding in EXTREME chop but sample post-fix is n=3 SHORT (2L CHIP/ALGO RSI 44-45, 1W ALGO RSI 60.37)",
+    "rationale": "Post RSI_MIN=40: losses are in the band that WAS 75%WR. Tightening RSI_MIN to 45 would kill LDO +$0.05 (RSI 43.38) and DYDX +$0.03 (RSI 40.44) winners. One variable at a time — RSI_MIN=40 is 1 day old. Monitor 48h.",
+    "expected_impact": "If golden band stays <50%WR over 48h with n>=10: then investigate non-RSI filter (e.g. BTC divergence, hold-time).",
+    "category": "monitor",
+    "status": "monitor",
+    "risk": "none — no change"
   }
 ]
