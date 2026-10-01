@@ -1423,5 +1423,50 @@
     "category": "monitor",
     "status": "monitor",
     "risk": "none — no change"
+  },
+  {
+    "date": "2026-10-01T19:34:50Z",
+    "idea": "Winner-DNA: volume-breakout-long+ EXTREME signal-specific confidence boost (+10-15pt)",
+    "rationale": "14d: 17-18T 76.5%WR +$2.78 (BEST signal). EXTREME: 13T 76.9%WR +$2.63. Exit path atr_sl_hit 15/18 but 73.3% still win — winners ride large momentum moves. RSI>95 already ceiling-blocked (ONDO/WCT 2L -$0.32). final_confidence already 90-99 on winners. REGIME_CONF_EXTREME_MULT=1.15 exists globally — add signal-specific layer.",
+    "expected_impact": "Fewer false positives at margin; +2-4% WR for volume-breakout in EXTREME; +$0.20-0.40/7d if it fires more selective entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "impact_on_winners": "0 winners blocked (confidence BOOST not filter). Sample 17-18T — AT/near 20T standing threshold.",
+    "blocked_by": "CEO/T approval for hermes_constants VALUES + monitor windows active"
+  },
+  {
+    "date": "2026-10-01T19:34:50Z",
+    "idea": "Double-BTC continuum exposure guard / audit",
+    "rationale": "2 open BTC LONGs simultaneously: continuum-osc+ @84229 (13:49 FLAT) + continuum_engine @85036 (17:45 regime NULL). DIRECTIONAL_CAP_MAX_PCT=80 allows it (designed for 5L/0S extreme). continuum_engine closed 3/3 as ORPHAN_PAPER at $0 — possible paper-trade artifact contaminating DB. If both real and both SL-hit, correlated double loss on BTC.",
+    "expected_impact": "Prevent correlated BTC double-loss; clean ORPHAN_PAPER data",
+    "category": "risk / data hygiene",
+    "status": "suggested",
+    "risk": "low",
+    "recommendation": "Monitor both trade outcomes. Delegate ORPHAN_PAPER cleanup to bug_hunter. No config change — directional cap works as designed."
+  },
+  {
+    "date": "2026-10-01T19:34:50Z",
+    "idea": "Pump-chain- golden band erosion watchlist (RSI 40-45)",
+    "rationale": "Post PUMP_CHAIN_SHORT_RSI_MIN=40: RSI 40-45 = ALGO 44.17 L -$0.06, CHIP 44.88 L -$0.11 (both EXTREME hard_max_loss). Historical golden band 40-45 was 75%WR +$0.47. Post-fix RSI 60+ = ALGO 60.37 W +$0.03. n=3 — insufficient for action.",
+    "expected_impact": "If erosion confirmed after 48h: consider raising PUMP_CHAIN_SHORT_RSI_MIN 40→45",
+    "category": "entry quality",
+    "status": "monitor",
+    "risk": "low",
+    "sample_size": "3T post-fix — INSUFFICIENT, monitor only"
+  },
+  {
+    "date": "2026-10-01T19:34:50Z",
+    "idea": "REJECTED: volume-breakout RSI ceiling 95→90",
+    "rationale": "Would block ME RSI=91.67 +$0.09 winner. RSI>95 zone already blocked (2L -$0.32). No new losers in 90-95 band.",
+    "status": "rejected",
+    "reason": "Kills a winner, saves nothing"
+  },
+  {
+    "date": "2026-10-01T19:34:50Z",
+    "idea": "REJECTED: bb-bounce-v3-long+ blanket kill",
+    "rationale": "14d 4T 0%WR -$0.14 (HIGH 3T + NORMAL 1T) — loses all regimes = policy-eligible. BUT n=4T << 20T threshold = noise. ZORA/WLFI are scratches.",
+    "status": "rejected",
+    "reason": "Sample too small. Monitor 48h; kill only if 5T+ still 0%WR with clear pattern."
   }
 ]
