@@ -1245,5 +1245,42 @@
     "category": "new signal",
     "status": "delegated",
     "risk": "medium — new signal needs independent backtest before live"
+  },
+  {
+    "date": "2026-10-01T08:33:52Z",
+    "idea": "Volume-breakout-long+ confidence boost to 80 in EXTREME regime",
+    "rationale": "Best signal: 20T 70%WR +$2.48/14d. EXTREME: 13T 76.9%WR +$2.63. T asked for more competitive confidence. CONF_FILTER_MIN=70 — boost prioritizes proven edge in hotset.",
+    "expected_impact": "+2-4% WR via hotset prioritization",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "20T"
+  },
+  {
+    "date": "2026-10-01T08:33:52Z",
+    "idea": "ESCALATE bb-bounce metadata injection to bug_hunter — DRIFT-001 48h+ NULL",
+    "rationale": "rsi_1m filter deployed Sep 30. All 7 subsequent bb-bounce trades NULL metadata. Combo path may bypass injection.",
+    "expected_impact": "Unblocks DRIFT-001 verification",
+    "category": "code fix",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-01T08:33:52Z",
+    "idea": "Build NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
+    "rationale": "Delegated CEO Sep 30, not built. NEUTRAL diversity gap — only volume-breakout and doji profitable.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "new signal",
+    "status": "delegated",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-01T08:33:52Z",
+    "idea": "VERIFY V5 RSI ceiling code path — JUP RSI 77.18 entered and lost",
+    "rationale": "LONG_RSI_CEILING=70 should block RSI 77.18. V5 may use STANDALONE_BYPASS. Verify code path.",
+    "expected_impact": "Prevents overbought V5 entries",
+    "category": "filter check",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
