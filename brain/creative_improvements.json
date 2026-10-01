@@ -1206,5 +1206,44 @@
     "category": "entry sniper",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-01T07:37:38Z",
+    "idea": "Direction-specific TP asymmetry for SHORT trades",
+    "rationale": "14d SHORT avg_win $0.109 vs LONG $0.154 (29% smaller). SHORT R:R 0.78:1 needs >56% WR to break even. ATR_TP_K_MULT=2.0 (Sep 29) is global — SHORT winners may need tighter TP to actually reach target before whipsaw, while LONG winners ride momentum.",
+    "expected_impact": "+$0.30-0.60/7d if SHORT R:R improves from 0.78 toward 1.0",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "medium — needs backtest before implementation",
+    "prerequisite": "50+ post-ATR_TP_K_MULT SHORT trades to establish baseline"
+  },
+  {
+    "date": "2026-10-01T07:37:38Z",
+    "idea": "pump-chain- SHORT golden-band (RSI 40-45) confidence boost +10pt",
+    "rationale": "14d RSI 40-45 = 9T 78%WR +$0.52. Filter preserves this band. Boosting confidence when signal fires in golden band would prioritize these over weaker RSI 50-65 setups in portfolio heat limits.",
+    "expected_impact": "+$0.10-0.20/7d by rotating heat toward highest-WR band",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "note": "SAMPLE INSUFFICIENT — 9T < 20T threshold. Do NOT implement until 20T in golden band."
+  },
+  {
+    "date": "2026-10-01T07:37:38Z",
+    "idea": "bb-bounce combo metadata path fix (code, not config)",
+    "rationale": "DRIFT-001 rsi_1m filter is live but ALL bb-bounce trades have NULL rsi_1m metadata — combo signal path strips it. Filter effectiveness unverifiable. ZORA loser today has no RSI data.",
+    "expected_impact": "Enables verification of existing filter; may reveal additional entry quality issues",
+    "category": "data hygiene / debug",
+    "status": "suggested",
+    "risk": "low — code fix to metadata propagation, no trading logic change",
+    "action": "Delegate to bug_hunter if still NULL at 48h mark (Sep 30 23:37 + 48h = Oct 2 23:37)"
+  },
+  {
+    "date": "2026-10-01T07:37:38Z",
+    "idea": "Volume-dry-up / EMA-reclaim NEUTRAL continuation signal",
+    "rationale": "CEO delegated Sep 30. 99% of trades are NEUTRAL. doji-bottom-long (63.6%WR) works in NEUTRAL accumulation but only catches reversal. A continuation signal for the same condition (dry-up then reclaim) would add diversity without fighting regime.",
+    "expected_impact": "+$0.30-0.50/7d from NEUTRAL diversity (CEO estimate)",
+    "category": "new signal",
+    "status": "delegated",
+    "risk": "medium — new signal needs independent backtest before live"
   }
 ]
