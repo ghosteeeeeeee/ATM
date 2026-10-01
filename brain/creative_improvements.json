@@ -1360,5 +1360,39 @@
     "risk": "high if forced",
     "sample_size": "5 clusters 14d — small but directionally clear",
     "implementation": "None. Do not build. If revisited, restrict to SHORT-only + detection RSI < 30 (would have blocked only the 2 losing clusters, net +$0.43)."
+  },
+  {
+    "date": "2026-10-01T14:34:36Z",
+    "idea": "volume-breakout-long+ confidence boost when signal fires in EXTREME regime",
+    "rationale": "14d data: 20T 70%WR +$2.48 overall. EXTREME: 13T 76.9%WR +$2.63 (BEST regime). RSI 70-80: 5T 100%WR +$1.45 (golden band). Signal is STANDALONE_BYPASS momentum — higher conf in EXTREME = fewer false positives while preserving edge. Now AT the 20T sample threshold.",
+    "expected_impact": "+5-8% WR for volume-breakout-long+ in EXTREME. Fewer low-conf fires.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "20T/14d (meets threshold). EXTREME 13T.",
+    "impact_on_winners": "Boost only — does not block any trades. Conf boost raises priority, doesn't filter.",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-01T14:34:36Z",
+    "idea": "doji-bottom-long HIGH regime confidence boost (MONITOR — below threshold)",
+    "rationale": "14d: HIGH 6T 83.3%WR +$0.36 vs NORMAL 5T 40%WR $0.00. Clear regime edge but n=11 < 20T threshold. When it hits 20T, boost conf in HIGH only.",
+    "expected_impact": "At 20T: +10-15% WR for doji in HIGH regime.",
+    "category": "confidence",
+    "status": "monitor",
+    "risk": "low",
+    "sample_size": "11T/14d — BELOW 20T threshold. Do NOT change yet.",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-01T14:34:36Z",
+    "idea": "Stale-signal confidence decay — time-based conf penalty for signals that execute late after detection",
+    "rationale": "Session brain: signal decay discussed (guitar tuning analogy). STALENESS vs TRADE-LENGTH gap documented in AGENTS.md (SYRUP lesson). No implementation exists. If signal detected at T and executed at T+15min, conditions may have changed.",
+    "expected_impact": "Prevents chasing stale setups. Could improve entry quality across all signals.",
+    "category": "execution quality",
+    "status": "suggested",
+    "risk": "medium — needs careful tuning to not block valid delayed entries",
+    "sample_size": "Concept from sessions, no backtest yet",
+    "agent": "brain_auditor"
   }
 ]

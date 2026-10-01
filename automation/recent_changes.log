@@ -3704,3 +3704,12 @@ pump-chain- 11T -$0.57 24h worst but 0T this hour — CEO decision if full famil
   CREATIVE: (1) Extend SIGNAL_FILTER_RSI_MIN to bypass path / raise hard floor 25→30 after monitor (2) NEUTRAL diversity signal still unbuilt — T decision (3) REJECTED blanket burst-cluster guard (net -$0.32, kills profitable pump-chain+ bursts).
   0 CHANGES APPLIED — hard floor 2h old, golden band in monitor window, max 1 change/run respected.
   BY: brain_auditor
+
+2026-10-01 14:34 UTC brain_auditor: NO CONFIG CHANGE - audit
+  DB-verified: 36T 38.9%WR -$0.83 (24h) | 7d near-breakeven (EXTREME -$0.10/62T, HIGH -$0.20/21T, NORMAL -$0.04/29T)
+  LOSING AUTOPSY: 19 losers — accel-300-(5T)+pump-chain-v5(6T)=legacy pre-kill, aging out 48h. Active: pump-chain- SHORT EXTREME chop.
+  FILTERS VERIFIED: CASHCAT blacklist, SHORT_RSI_CEILING=65, PUMP_CHAIN_SHORT_RSI_MIN=40, ATR_SL widening — all WORKING.
+  DRIFT-002 OPEN: exec-time LONG RSI 5m vs 1m — bug_hunter owns.
+  CREATIVE: (1) volume-breakout EXTREME conf boost (20T AT threshold, +$2.48/14d) (2) doji HIGH boost MONITOR (3) stale-signal conf decay.
+  0 CHANGES APPLIED — monitor windows active.
+  BY: brain_auditor
