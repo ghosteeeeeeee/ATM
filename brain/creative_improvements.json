@@ -1048,5 +1048,45 @@
     "category": "regime tuning",
     "status": "monitor-48h",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-01T01:34:39Z",
+    "idea": "volume-breakout-long+ EXTREME RSI 60-80 confidence boost — auto-trigger at 15T",
+    "rationale": "7T 100%WR +$2.03/14d. Cleanest DNA in system. Currently fires at normal confidence. +10pt boost in EXTREME when RSI 60-80 would filter out remaining 50% WR non-DNA trades.",
+    "expected_impact": "+2-4% WR for volume-breakout-long+ in EXTREME",
+    "category": "entry sniper",
+    "status": "suggested — watchlist trigger at 15T",
+    "risk": "low",
+    "sample_size": "7T (< 20T threshold — monitor, don't change yet)"
+  },
+  {
+    "date": "2026-10-01T01:34:39Z",
+    "idea": "doji-bottom-long HIGH regime specialist confidence boost — auto-trigger at 20T",
+    "rationale": "HIGH: 7T 85.7%WR +$0.67/30d vs NORMAL: 5T 40%WR $0.00. Signal works in HIGH, not NORMAL. +15pt boost in HIGH when sample sufficient.",
+    "expected_impact": "+3-5% WR for doji-bottom-long in HIGH",
+    "category": "regime specialist",
+    "status": "suggested — watchlist trigger at 20T",
+    "risk": "low",
+    "sample_size": "7T HIGH (< 20T threshold — monitor, don't change yet)"
+  },
+  {
+    "date": "2026-10-01T01:34:39Z",
+    "idea": "Extend pump-chain-v5 test from Oct 1 to Oct 3",
+    "rationale": "3T since Sep 29: net +$0.27, 2W 1L. 3T is noise — can't evaluate KEEP/KILL criteria. Need 10+ trades for meaningful eval.",
+    "expected_impact": "N/A — test extension only, no live change",
+    "category": "test governance",
+    "status": "recommended — extend test",
+    "risk": "none (test phase)",
+    "sample_size": "3T (way below threshold — must extend)"
+  },
+  {
+    "date": "2026-10-01T01:34:39Z",
+    "idea": "Bearish-structure override win-rate tracking",
+    "rationale": "SHORT_RSI_FLOOR=40 has bearish override (BTC DECLINING/CALM/RECOVERY + LEAN_BEAR/BEAR + ema BELOW → oversold SHORT = continuation). BABY RSI=29.67 traded via this override, lost -$0.17. Need to measure: what is override WR vs non-override SHORT WR?",
+    "expected_impact": "Data collection — if override WR < 40%, tighten conditions or remove",
+    "category": "audit infrastructure",
+    "status": "suggested — add override flag to _signal_metadata",
+    "risk": "none (metadata only)",
+    "sample_size": "N/A — data collection"
   }
 ]
