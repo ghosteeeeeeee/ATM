@@ -1,43 +1,62 @@
-=== Signal Performance Report ===
-Period: 2026-09-30 22:40 UTC | Last 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-10-01 ~05:20 UTC | **Period:** Last 6h + 24h + 7d monitor
 
-KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met kill criteria (WR 40% > 30% threshold) |
+## 24h Performance (closed trades, HAVING >= 1)
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pump-chain- | SHORT | 9 | 44.4% | -$0.40 | WATCH — meets PnL trigger but WR >= 30%, no kill |
+| pump-chain-v5 | LONG | 3 | 66.7% | +$0.07 | WATCH — good WR but < 5 trades, no boost yet |
+| pump-chain-v5,rs-s32 | LONG | 1 | 100% | +$0.23 | n/a |
+| bb-bounce-v2-long+ | LONG | 1 | 0% | $0.00 | n/a |
+| continuum-osc+ | LONG | 1 | 0% | -$0.02 | n/a |
+| continuum_engine | LONG | 2 | 0% | $0.00 | n/a |
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met boost criteria |
+## 6h Performance (HAVING >= 2)
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pump-chain- | SHORT | 5 | 40.0% | -$0.29 | WATCH |
 
-LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 40.0% | -$0.30 | 5 (24h) | BLOCKED in EXTREME/HIGH via regime gate (bug fixed). Allowed in NORMAL (85.7% WR). Historical: 109T 55% WR +$0.12. |
+## KILLED (executed)
+None. No signal met ALL kill criteria (WR < 30% AND 5+ trades AND PnL < -$0.10 AND active > 24h).
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 100% | +$0.94 | 1 (24h) | Strong historical: 20T 70% WR +$2.48. EXTREME 75% WR. |
-| pump-chain-v5,rs-s32 | LONG | 100% | +$0.23 | 1 (24h) | New combo, too few trades to evaluate. |
-| r2-trend-short3 | SHORT | 100% | +$0.07 | 1 (24h) | R2 trend SHORT family working. |
-| pump-chain-v5 | LONG | 50% | +$0.04 | 2 (24h) | V5 LONG variant — positive but thin sample. |
+## BOOSTED (executed)
+None. No signal met ALL boost criteria (WR > 55% AND 5+ trades AND PnL > $0.05 AND multi-token). pump-chain-v5 is close (66.7%WR, 3 tokens) but needs 5+ trades.
 
-ISSUES:
-- **✅ FIXED: Gate bypass bug** — `SIGNAL_TYPE_OVERRIDES[('EXTREME', 'pump-chain-')] = 1.0` was bypassing the family-level `Pump_Flow: 0.0` block in `volatility_gate_v2.py`. Per-signal override has highest priority in `get_combined_multiplier()`. Changed both `pump_chain-` and `pump-chain-` EXTREME overrides from 1.0 to 0.0. Verified: pump-chain- now returns 0.0 multiplier in EXTREME/HIGH, 1.0 in NORMAL.
-- Low trade volume: only 13 closed trades in 24h (system normally higher). Could be regime filters working correctly or market quiet.
-- No direction inversions detected in 24h.
-- No OpenMemory queries performed (per instructions — tenant_mismatch errors).
+## LOSERS (watch list)
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pump-chain- | SHORT | 9 (24h) / 38 (7d) | 44.4% / 55.3% | -$0.40 / -$0.28 | WATCH — 7d WR still above V5_SHORT revert threshold (50%). CEO RSI_MIN 25→40 already applied today. HIGH regime already blocked. |
 
-REGIME BREAKDOWN (pump-chain- all-time):
-| Regime | Trades | WR | PnL | Gate Status |
-|--------|--------|-----|-----|-------------|
-| EXTREME | 77 | 54.5% | +$0.32 | BLOCKED (bug fixed 2026-09-30) |
-| HIGH | 25 | 48.0% | -$0.36 | BLOCKED |
-| NORMAL | 7 | 85.7% | +$0.16 | ALLOWED |
+## WINNERS
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| pump-chain-v5 | LONG | 3 | 66.7% | +$0.07 | WATCH — new signal (first trade Sep 30 16:32), healthy early. Boost when 5+ trades. |
 
-Actions taken:
-1. Fixed gate bypass bug in `volatility_gate_v2.py` (lines 303, 318)
-2. Verified fix: get_combined_multiplier returns 0.0 for EXTREME/HIGH, 1.0 for NORMAL
-3. No kills, no boosts (criteria not met)
+## pump-chain- SHORT Regime Analysis (7d)
+| Regime | Trades | WR | PnL | Action |
+|--------|--------|-----|-----|--------|
+| EXTREME | 32 | 56.3% | +$0.17 | Edge — leave enabled |
+| HIGH | 4 | 25.0% | -$0.51 | Already blocked (PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True) |
+| NORMAL | 2 | 100% | +$0.06 | Fine, tiny sample |
+
+Regime routing already in place. No new multiplier needed.
+
+## V5_SHORT Monitor Check
+- Condition: revert if 7d WR < 50%
+- Actual 7d: **55.3% WR (38 trades)** → **NOT triggered**, stays enabled.
+
+## SIGNAL INVERSIONS (24h)
+None found.
+
+## ISSUES
+- None critical. Traffic is light (~13 closed trades/24h) — sample sizes below kill/boost thresholds.
+- `continuum_engine` LONG: 2 trades, 0% WR, $0.00 — below threshold, watch.
+- CEO RSI_MIN=40 change for pump-chain- SHORT is fresh (today); give it 24h before re-evaluating.
+
+## Actions Taken
+- No kills executed.
+- No boosts executed.
+- No code/config changes required this cycle.
+
+---
+*Report auto-generated by signal_reporter. Next report ~6h.*
