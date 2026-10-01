@@ -196,3 +196,12 @@
 - **REPEATED** (352x): `Oct N N:N:N python3[TOK]: TypeError: unsupported operand type(s) for |: 'dict' and 'set'`
 - **REPEATED** (352x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
 - **REPEATED** (352x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`
+
+## Error Alerts — 2026-10-01 07:49 UTC
+- **WARN** (1x): Disk at 86% (96G/118G) — DB growth (coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G), not logs. Journald vacuum freed 0B (already clean). No log files >7d uncompressed. **Needs CEO call on DB pruning.**
+- **WARN** (ongoing): Hotset EMPTY — 137 signals generated last hour, 0 approved by compactor (none ≥50% confidence). Pipeline healthy, 3 open positions managed, but no new trades will open until signals clear compactor.
+- **WARN** (repeating): hermes-wasp.service failing every ~2min cycle — endless `[LOCK-WAIT] info_rate` retry loop in wasp.err.log. Lock contention, not a crash. Code-owner fix needed.
+- **WARN** (repeating): hermes-better-coder.service — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'` in run_better_coder.py:19. Path/sys.path issue.
+- **WARN** (1x): hermes-trading-checklist.service — flags `signals_db: 12908 signals (0 approved, 5 pending)` — symptom of empty hotset, not a separate bug.
+- **INFO**: hermes-git-release.service + hermes-upgrade-implementer.service failed (exit 1 / exit 124 timeout) — **AUTO-FIX**: reset-failed applied, both non-trading.
+- **INFO**: Pipeline path clean — 0 errors/tracebacks in 30min. Prices fresh (11s, 86 tokens). Regime NEUTRAL (0L/2S/114N). 3 open SHORT positions all IN_PROFIT (BANANA, CFX, HYPER).

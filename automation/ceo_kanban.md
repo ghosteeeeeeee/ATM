@@ -60,3 +60,6 @@
 
 ## TEAM UPDATES
 - [2026-10-01 01:48] health_monitor: Pipeline OK — 3 open SHORT positions (JUP/HBAR/ALGO), 60 signals/1h, no crashes. Disk at 86% WARN (DBs ~9.3G, not logs) — journal vacuum + WAL checkpoint attempted, no DB prune (needs CEO call). Regime check timers are OnBootSec-only; atr-sl-updater unit missing. decisions table stale since Apr 2026 (likely dead post-compactor).
+
+## TEAM UPDATES
+- [2026-10-01 07:49 UTC] health_monitor: Pipeline OK — running, 0 errors/30min, 3 open SHORT (BANANA/CFX/HYPER) all IN_PROFIT, prices fresh (86 tokens, 11s), regime NEUTRAL. Auto-fixes: journald vacuum (0B freed, already clean), reset-failed on git-release + upgrade-implementer. WARNs: disk 86% from DB growth (needs CEO prune call); hotset empty — 137 signals/hr generated but 0 approved by compactor (signal quality, not pipeline failure); hermes-wasp lock-wait loop on info_rate; hermes-better-coder ModuleNotFoundError dispatcher.dispatcher. No trading-path issues.
