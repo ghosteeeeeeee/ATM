@@ -135,3 +135,10 @@
 
 ## Error Alerts — 2026-10-01 02:58 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.3s (rc=N)`
+
+## Error Alerts — 2026-10-01 03:48 UTC
+- **CRITICAL** (7x): `position_manager FAILED rc=1 — [FATAL] Guardian already running — exiting`
+  - **ROOT CAUSE**: `hl-sync-guardian.py:183` acquired guardian flock at module import time. `position_manager.py:1122` imports `_compute_mfe_mae` from it during trade close → SystemExit (uncatchable by `except Exception`) → position_manager died every time it closed a trade. Trade 15776 (JUP SHORT) re-closed 5+ times, loss cooldown streak escalated 1→5.
+  - **AUTO-FIX**: Guarded lock acquisition behind `if __name__ == '__main__'` in hl-sync-guardian.py. Import path no longer triggers lock. Pipeline restarted. Verified: position_manager rc=0 post-fix.
+- **WARN**: Disk 86% used (16G free). Compressed logs >7 days old. Largest active: pipeline.log 45M, signal-compactor.log 37M, trade-watchdog.log 32M.
+- **WARN**: hermes-better-coder.service failed, hermes-git-release.service failed (not auto-fixed — need manual investigation).

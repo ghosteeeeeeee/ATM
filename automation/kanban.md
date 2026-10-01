@@ -8,3 +8,6 @@
 - [2026-09-27 17:12 UTC] auto_1hr: NO CHANGE — 2 closures net +$0.09, 5 open LONGs, all fresh. ATR_SL 57.3%7d (improving). CRITICAL: volume_spike 99% NULL, final_confidence 100% NULL — code bug in signal_compactor. No kill candidates in last hour.
 - [2026-09-18 09:00 UTC] auto_1hr: NO CHANGE — monitoring only. 24h 30%WR (cold streak) but 7d 50.7%WR stable. ATR SL 75% structural in NEUTRAL chop. 4 open trades all profitable. No kill candidates.
 - [2026-09-29 22:00 UTC] auto_1hr: NO CHANGE — 1T -$0.02. 24h 46T 49%WR -$1.12. ATR_SL fix 0% 24h ✅. SHORT R:R structural (90% hard_sl exits). No kill candidates. BTC LONG 32.9h stale (HL sync issue).
+
+## TEAM UPDATES
+- [2026-10-01 03:48] health_monitor: Auto-fixed position_manager crash loop — root cause was hl-sync-guardian.py acquiring guardian lock at module import time; position_manager's import of _compute_mfe_mae triggered SystemExit every trade close. Fixed by guarding lock behind __main__. Pipeline restarted, rc=0 verified. Also compressed old logs (disk was 86%).

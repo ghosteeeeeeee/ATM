@@ -180,7 +180,9 @@ def _acquire_lock_with_heartbeat():
 
     return _lock_fd
 
-_lock_fd = _acquire_lock_with_heartbeat()
+_lock_fd = None  # only acquire when run as script, not when imported (position_manager imports _compute_mfe_mae)
+if __name__ == '__main__':
+    _lock_fd = _acquire_lock_with_heartbeat()
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from paths import *
