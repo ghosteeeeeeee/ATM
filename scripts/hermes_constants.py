@@ -1897,7 +1897,7 @@ ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 # ── Coiled Spring (volume contraction pullback in bullish trend) ────────────────
 # coiled_spring.py — LONG only. Catches volume dead zones during pullbacks
 # in established bullish trends, entries near EMA support.
-COILED_SPRING_ENABLED           = True    # master kill-switch
+COILED_SPRING_ENABLED           = False   # KILLED 2026-10-01 — 30d: 21T 42.9%WR -$0.65. Loses in ALL regimes (EXTREME -$0.31, NORMAL -$0.11, HIGH -$0.23).
 COILED_SPRING_PLUS_ENABLED      = False   # KILLED 2026-09-06 15:07 UTC — 5T last hour 0%WR -$0.70. Kill criteria met.
 COILED_SPRING_MINUS_ENABLED     = False   # SHORT not implemented (pattern is LONG-only)
 COILED_SPRING_COOLDOWN_MINUTES  = 15      # per-token cooldown between fires
@@ -3913,7 +3913,7 @@ CONTINUUM_MA_CONF_CAP                = 95      # max confidence
 # ── SMA20 Dip Signal (sma20_dip.py) ───────────────────────────────────────
 # Buy pullback to SMA20 in established uptrends.
 # Reference: INJ LONG 2026-09-07 +40.57% (5x), entry at SMA20
-SMA20_DIP_ENABLED              = True    # master kill-switch
+SMA20_DIP_ENABLED              = False   # KILLED 2026-10-01 — 30d: 19T 42.1%WR -$0.73. Loses in ALL regimes (EXTREME -$0.02, NORMAL -$0.35, HIGH -$0.36).
 SMA20_DIP_PLUS_ENABLED         = False   # LONG direction — killed 2026-09-08 12:10 UTC: 0%WR 3T last hour, 47.1%WR all-time, -$0.42 PnL
 SMA20_DIP_MINUS_ENABLED        = False   # SHORT not applicable
 

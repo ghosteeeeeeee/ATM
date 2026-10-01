@@ -246,6 +246,9 @@ VOL_PHASE_MULTS = {
         'Pattern': 0.3,              # PENALIZED — Structure Sniper unreliable in storms, fires on noise
         'Trend_Purity': 0.15,        # PENALIZED — trend_purity+ LONG 40% WR in EXTREME, -$0.72/7d. 0.3x insufficient (2026-09-13 brain_auditor)
         'Pump_Flow': 0.0,      # BLOCKED — pump-chain- SHORT 51.9% WR -$0.20 EXTREME (54T). Wins in NORMAL (83.3% WR). signal_reporter 2026-09-24
+        'Slow_Grind': 0.0,     # BLOCKED — slow_grind 20% WR -$0.58 EXTREME (5T). Wins in NORMAL. 2026-10-01
+        'Open_Skies': 0.0,     # BLOCKED — open-skies+ 25% WR -$0.46 EXTREME (4T). No winning regime. 2026-10-01
+        'SMA20_Dip': 0.0,      # BLOCKED — sma20_dip 57% WR -$0.02 EXTREME (7T). Marginal. 2026-10-01
     },
     # NORMAL volatility: block signals that lose here but win in EXTREME/HIGH
     ('NORMAL', '*'): {
