@@ -532,7 +532,7 @@ MOMENTUM_EXHAUSTION_THRESHOLD = 0.5  # % — if price moved this much in 30m, do
 STALE_WINNER_TIMEOUT_MINUTES = 60  # close winners flat for 60+ min (was 45)
 STALE_LOSER_TIMEOUT_MINUTES = 8   # cut losers flat for 8+ min (was 10)
 STALE_WINNER_MIN_PROFIT = 0.6    # % profit required to be a "winner" (was 0.8%)
-STALE_LOSER_MAX_LOSS   = -0.6   # % loss required to be a "loser" (was -0.8%)
+STALE_LOSER_MAX_LOSS   = -1.0   # % loss required to be a "loser" (was -0.6, widened 2026-10-01 to match CL_TIER1_MIN_PCT=-1.00. -0.6 was cutting stalled trades before they could reach trail activation +0.40% and recover.)
 
 # ── Cascade Flip Constants ──────────────────────────────────────────────────────
 # Used by cascade_flip.py and position_manager.py
@@ -682,7 +682,7 @@ SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) �
 TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
-CUT_LOSER_PNL     = -1.00  # close trade at -1.00% PnL — widened from -0.50% (2026-10-01 CEO). 30d data: cut-loser-CL-T1 = 96T 0%WR -$13.62. -0.50% is inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%). Trades were being cut before they could reach trail activation (+0.40%) and recover. -1.00% gives room while still cutting genuine losers.
+CUT_LOSER_PNL     = -1.00  # close trade at -1.00% PnL — widened from -0.50% (2026-10-01 CEO). NOTE: this constant only governs position_manager's HARD_MAX_LOSS exit + Priority-3 fallback (which is unreachable when sl_distance exists). The main cut-loser engine (cut_loser.py) uses CL_TIER1_MIN_PCT — see that constant for the primary cut-loser lever. -0.50% was inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%).
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -690,7 +690,7 @@ CUT_LOSER_PNL     = -1.00  # close trade at -1.00% PnL — widened from -0.50% (
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO Oct 1: was 0.60%. 30d data: profit-monster-trail = 331T 84%WR +$19.58 (ONLY profitable exit path). atr_sl_hit = 435T 42%WR -$10.05. Lower activation shifts more trades from the 42% ATR_SL path to the 84% trail path. Trail distance (1.20%) unchanged — gives room to breathe.
+TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO Oct 1: was 0.60%. Governs brain/HL trailing (passed via --trailing-threshold, stored per-trade, enforced by position_manager/HL guardian). NOTE: profit-monster-trail path uses PM_TRAIL_ACTIVATE_PCT (separate constant, already 0.40% before this change). This change affects new trades' brain/HL trailing activation. Trail distance (1.20%) unchanged.
 TRAILING_DISTANCE_PCT   = 0.0120  # 1.20% — CEO Aug 27: tighter trail caused too many premature exits. 1.2% gives trades room to breathe while still locking profits.
 
 # ── Loss Cooldown Constants
@@ -1664,7 +1664,7 @@ CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0
 # Tier 1: Quick Cut — -0.75% to -3.0%, fires frequently
 # CEO Sep 24: widened floor -2.0→-3.0. 14d: 23T 0%WR -$2.70, avg loss -3.92%.
 # Trades slide past -2.0% before next fire window. New range catches the full slide.
-CL_TIER1_MIN_PCT      = -0.75   # FIX 2026-09-29: was 0 (impossible range). Now catches -0.75% to -2.5%
+CL_TIER1_MIN_PCT      = -1.00   # FIX 2026-10-01: was -0.75. 30d data: cut-loser-CL-T1 = 96T 0%WR -$13.62. -0.75% is inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%). Widening to -1.00 gives trades room to reach trail activation (+0.40%) and recover. Was 0 (impossible range) before Sep 29 fix.
 CL_TIER1_MAX_PCT      = -2.5    # ceiling — catches the dead zone between old T1 and T2
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
@@ -2643,7 +2643,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
     'rr-struct-v2', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14). v2+ KILLED CEO 2026-09-15
-    'rr-struct',  # base variant — source 'rr-struct+' strips to 'rr-struct'. 30d: 15T 73%WR +$0.59 WINNER. Added 2026-10-01.
     'rr-struct-v',  # regex-stripped variant (trailing digits removed: v2 -> v)
     'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo

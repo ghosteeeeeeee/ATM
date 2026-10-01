@@ -1655,7 +1655,7 @@ def _score_signal(token, direction, conf, source, signal_type,
             _phase = _get_v2_phase()
             
             # Compute combined multiplier (replaces phase + inverse + lifecycle)
-            combined_mult = _get_combined_mult(signal_type, _regime, _phase)
+            combined_mult = _get_combined_mult(signal_type, _regime, _phase, source=source or '')
             
             # Decompose for logging (combined = phase * inverse * lifecycle)
             # We keep the individual multipliers as 1.0 since V2 handles them

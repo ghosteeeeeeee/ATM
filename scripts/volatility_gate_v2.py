@@ -327,7 +327,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
     ('NORMAL', 'pullback-entry+'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.57. Structurally weak LONG variant.
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
-    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL
+    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL (underscore legacy form)
+    ('NORMAL', 'pump-chain-'): 1.0,              # OK — hyphen form (runtime signal_type is 'pump-chain')
     # ── NORMAL: bleeding signals (30d cross-tab) ──
     ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
     ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
@@ -341,12 +342,16 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'trend_purity'): 0.3,             # PENALIZED — bare form fallback
     ('NORMAL', 'range_reversion'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.62. Structurally weak.
     ('NORMAL', 'range-reversion'): 0.3,          # PENALIZED — hyphen variant
-    ('NORMAL', 'ema300-dip-long'): 0.3,          # PENALIZED — 30d: 5T 20%WR -$0.55. Structurally weak.
-    ('NORMAL', 'ema300_dip_long'): 0.3,          # PENALIZED — underscore variant
-    # ── NORMAL: wrong-variant signals (hyphen+ losers vs underscore winners) ──
-    ('NORMAL', 'bb-bounce-v2-long+'): 0.3,       # PENALIZED — 30d: 24T 42%WR -$0.59. Wrong variant (winner is bb_bounce_v2_long 74%WR).
-    ('NORMAL', 'open-skies+'): 0.3,              # PENALIZED — 30d: 11T 36%WR -$0.73. Wrong variant (winner is open_skies 63%WR).
-    ('NORMAL', 'rr-struct-v2+'): 0.3,            # PENALIZED — 30d: 10T 40%WR -$0.45. Wrong variant (winner is rr-struct+ 73%WR).
+    # NOTE: ('NORMAL','ema300_dip_long') removed — dead-by-theft (bare 'ema300_dip' matches first, same 0.3 value)
+    # ── NORMAL: wrong-variant signals — REMOVED 2026-10-01 ──
+    # ('NORMAL','bb-bounce-v2-long+'), ('NORMAL','open-skies+'), ('NORMAL','rr-struct-v2+')
+    # were removed: bb_bounce_v2_long.py emits source='bb-bounce-v2-long+' and open_skies.py
+    # emits source='open-skies+' — the WINNERS' own source strings. The DB 'loser' rows are
+    # older trades recorded in source form (trades.signal switched formats ~2026-09-11);
+    # winner and loser share signal_type AND source, so these keys cannot discriminate
+    # and with source-matching enabled they would penalize the winners (caught by test:
+    # bb_bounce_v2_long NORMAL returned 0.3 instead of None). rr-struct-v2+ kept out too —
+    # RR_STRUCTURAL_V2_LONG_ENABLED=False means it can't fire anyway.
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
@@ -359,19 +364,24 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'sma20_dip'): 0.3,                  # PENALIZED — 30d HIGH: 7T -$0.36. 42% WR overall.
     ('HIGH', 'sma20-dip'): 0.3,                  # PENALIZED — hyphen variant
     ('HIGH', 'slow_grind'): 0.3,                 # PENALIZED — 30d HIGH: 7T -$0.24. 40% WR overall.
-    ('HIGH', 'rr-struct-v2+'): 0.3,              # PENALIZED — 30d HIGH: 4T -$0.39. Wrong variant.
-    ('HIGH', 'bb-bounce-v2-long+'): 0.3,         # PENALIZED — 30d HIGH: 15T -$0.12. Wrong variant.
-    ('HIGH', 'open-skies+'): 0.3,                # PENALIZED — 30d HIGH: 7T -$0.27. Wrong variant.
+    # HIGH wrong-variant keys removed 2026-10-01 — same reason as NORMAL (share source with winners).
 }
 
 
-def _get_signal_type_mult(signal_type, regime):
-    """Check per-signal-type overrides. Returns multiplier or None if no override."""
-    if not signal_type:
+def _get_signal_type_mult(signal_type, regime, source=None):
+    """Check per-signal-type overrides. Returns multiplier or None if no override.
+    Matches against BOTH signal_type (underscore form, e.g. 'open_skies_long') AND
+    source (hyphen+/- form, e.g. 'open-skies+'). This is critical: the signals DB
+    stores signal_type as underscore+_long/_short, but some override keys are written
+    in source form. Without source matching, those keys are dead code (2026-10-01 fix)."""
+    if not signal_type and not source:
         return None
-    st_lower = signal_type.lower()
+    st_lower = (signal_type or '').lower()
+    src_lower = (source or '').lower()
     for (ov_regime, ov_signal), mult in SIGNAL_TYPE_OVERRIDES.items():
-        if ov_regime == regime and ov_signal in st_lower:
+        if ov_regime != regime:
+            continue
+        if ov_signal in st_lower or (src_lower and ov_signal in src_lower):
             return mult
     return None
 
@@ -548,10 +558,10 @@ def get_vol_phase_mult(family, regime, phase):
     return 1.0
 
 
-def get_combined_multiplier(signal_type, regime, phase):
+def get_combined_multiplier(signal_type, regime, phase, source=None):
     """
     Get combined multiplier from volatility + phase + lifecycle.
-    
+
     This is the core innovation: instead of just checking if a signal
     "works" in a regime, we compute a multiplier that considers:
     1. Volatility regime fit
@@ -567,7 +577,7 @@ def get_combined_multiplier(signal_type, regime, phase):
     # 0. Per-signal-type override (highest priority — replaces family-level blocks)
     # Overrides vol-phase (step 1), lifecycle (step 2), and inverse (step 3) multipliers.
     # ATR ratio boost (step 4) still applies — it's about BTC trend, not signal family.
-    signal_mult = _get_signal_type_mult(signal_type, regime)
+    signal_mult = _get_signal_type_mult(signal_type, regime, source=source)
     if signal_mult is not None:
         mult *= signal_mult
         # Skip steps 1-3 (family/phase/lifecycle/inverse) — per-signal override replaces them
