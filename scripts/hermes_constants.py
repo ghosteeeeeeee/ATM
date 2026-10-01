@@ -2603,6 +2603,7 @@ BB_BOUNCE_V2_SHORT_REQUIRE_2_CANDLE = True # require 2 consecutive overbought ca
 STANDALONE_BYPASS_SIGNALS = (
     'pump-chain', 'pump_chain',  # chain correlation — fires when coin is pumping, BTC flat irrelevant (2026-09-12)
     'mover_long', 'mover+', 'mover-',  # momentum breakout — 85.7% WR, works solo (2026-09-12)
+    'mtf-regime-trend+', 'mtf-regime-trend-',  # regime alignment + momentum entry — works solo (2026-10-01)
     # open-skies+ KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
