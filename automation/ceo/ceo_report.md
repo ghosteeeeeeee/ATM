@@ -68,3 +68,22 @@ Rationale: Lower priority than Items 1–2 — performance-history systems are s
 
 ### Protected flags — untouched
 CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS — all preserved.
+
+## CEO Decision — Tier 2 Item 2 (2026-10-01)
+
+### Question 1: BTC Threshold
+Options: A) 0.20 (momentum_cache) or B) 0.15 (candles_1m)
+VERDICT: B
+Rationale: 0.15 is used by 2 of 3 existing checks and is the tighter gate — safer default while unified; 0.20 was the outlier.
+
+### Question 2: Fail-Closed Behavior
+When regime engine fails, block all signals (fail-closed) or allow (fail-open)?
+VERDICT: FAIL-CLOSED
+Rationale: Spec confirms fail-open on import errors — a botched merge silently disables gating while LIVE_TRADING_ENABLED=True; never ship that path.
+
+### Question 3: Timeline
+Implement now or defer until Tier 1 changes stabilize (48h monitor)?
+VERDICT: DEFER
+Rationale: 8 consumer files + circular dependency + 500 lines of verbatim data tables — do not stack a 2k-line merge on unsettled Tier 1 changes.
+
+### Overall: GO for implementation — after 48h Tier 1 stability window, with FAIL-CLOSED + threshold 0.15 as non-negotiable acceptance criteria.
