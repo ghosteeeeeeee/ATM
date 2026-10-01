@@ -1770,6 +1770,8 @@ BY: auto_1hr
 
 **KANBAN**
 ## TEAM UPDATES
+- [2026-10-01 18:11] auto_1hr: NO CONFIG CHANGE — 1T closed last hour (ETH bb-bounce-v2-long+ +$0.09 WIN). Open 2/6 BTC LONGs healthy (continuum-osc+ +$0.28 unrealized, continuum_engine opened 17:45). 24h: 31T ~36%WR -$1.09. atr_sl_hit 0% (tpsl fix stable). Kill rule empty. Not overtrading (1T/hr). No negative-hour streak. 24h losers root-caused already: pump-chain- SHORT 10T ALL EXTREME -$0.60 fixed 18:15 by upgrade_implementer (EXTREME allowlist removal); accel-300- ACCEL_300_MINUS killed ~10:50, aging out; PUMP_CHAIN_V5 already killed. Max 1 change/hr unused correctly. SIDeways: scripts/signal_version.py still missing; bb-bounce-v3-long+ 2T 0%WR monitor; DRIFT-SFRSI-BYPASS still with bug_hunter.
+
 - [2026-10-01 17:11] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (last close 13:00 ALGO pump-chain- SHORT +$0.03). Open 2/6 (BTC continuum-osc+ +$0.19, ETH bb-bounce-v2+ +$0.02). 24h: 33T 12W -$1.10 (36.4% WR). atr_sl_hit 0% (tpsl fix stable). Kill rule empty (0T). Not overtrading. Negative-hour streak broken 13:00 — size rule inactive. EXTREME regime drag known. Max 1 change/hr unused correctly. SIDeways: scripts/signal_version.py still missing.
 
 BY: auto_1hr
@@ -1814,3 +1816,37 @@ BY: auto_1hr
 - pump_chain_v5_short generator RSI filter — Level 2, execution gates hold
 
 BY: upgrade_implementer
+
+## [2026-10-01 18:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.09 (WR: 100.0%)
+**Open:** 2/6 (BTC continuum-osc+ +$0.28 unrealized, BTC continuum_engine LONG opened 17:45)
+
+**Last hour:**
+- ETH bb-bounce-v2-long+ LONG +$0.09 (profit-monster-trail) — opened 15:30, closed 17:51
+
+**24h context:** 31T ~36% WR -$1.09. Dominant close reasons: profit-monster-trail (7T +$0.19, 85.7% WR), hard_sl (4T -$0.45), hard_max_loss cluster (13T -$1.12). atr_sl_hit = 0% — tpsl fix stable, NOT SL-too-tight.
+
+**Diagnosis:**
+1. Entry quality: ETH win captured +0.72% move on $11.10 size — clean trail exit
+2. SL behavior: atr_sl_hit 0% of 24h closes — no action
+3. Signal quality: pump-chain- SHORT 10T ALL EXTREME -$0.60 30%WR — root cause already fixed at 18:15 (EXTREME allowlist removal, volatility_gate.py:210). accel-300- SHORT 8T -$0.34 — ACCEL_300_MINUS already killed ~10:50, trades aging out. pump-chain-v5 LONG already killed earlier.
+4. Trade frequency: 1T/hour — not overtrading
+
+**Changes:**
+1. NONE — max 1 change/hr unused correctly. All actionable 24h losers' root causes already addressed earlier today (EXTREME pump-chain- cleanup by upgrade_implementer 18:15; ACCEL_300_MINUS kill ~10:50; PUMP_CHAIN_V5 kill). No new signal hit kill rule (0%WR 3+T/hr). No negative-hour streak (13:00 +$0.03, 17:00 +$0.09). atr_sl_hit 0% — no SL alert.
+
+**No Change Needed:**
+- Kill rule: empty (1T last hour, it was a win)
+- atr_sl_hit >40%? No — 0%
+- Negative avg_pnl 3+ consecutive hours? No
+- Overtrading >20/hr? No — 1/hr
+
+**Open Questions:**
+- scripts/signal_version.py still missing — audit trail gap for any future constants changes (flagged previously, not blocking this hour)
+- bb-bounce-v3-long+ 2T 0%WR -$0.12 (24h) — below 3T kill threshold, monitor next hour
+- DRIFT-SFRSI-BYPASS still with bug_hunter (SIGNAL_FILTER_RSI_MIN not enforced on bypass path) — ACCEL_300_MINUS killed mitigates the visible symptom, root fix pending
+- 2 open BTC LONGs both healthy — no stuck positions
+
+BY: auto_1hr
