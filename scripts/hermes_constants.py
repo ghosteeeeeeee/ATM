@@ -4183,7 +4183,7 @@ MTF_REGIME_TREND_PULLBACK_PCT = 0.1       # min 1m pullback % from recent high/l
 MTF_REGIME_TREND_VOLUME_MIN = 0.2         # min volume vs 20-bar average (lowered from 1.0 — market is quiet)
 MTF_REGIME_TREND_EMA_PERIOD = 300         # EMA period for macro trend
 MTF_REGIME_TREND_ATR_PERIOD = 14          # ATR period for stops/trails
-MTF_REGIME_TREND_COOLDOWN_MINUTES = 30    # cooldown between signals per token
+MTF_REGIME_TREND_COOLDOWN_MINUTES = 15    # cooldown between signals per token (lowered from 30)
 
 MTF_REGIME_TREND_CONF_BASE = 70           # base confidence
 MTF_REGIME_TREND_CONF_CAP = 95            # max confidence
