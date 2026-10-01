@@ -1342,3 +1342,37 @@ BY: auto_1hr
 - [2026-10-01 05:11] auto_1hr: NO CONFIG CHANGE — 2T last hour, net +$0.03 (CC pump-chain-v5 win, BTC paper-zero). atr_sl_hit 0% 24h (fix stable). Kill rule not met (2T, no 0%-WR signal with 3T). Not overtrading. Not 3 negative hours. pump-chain- 44.4% WR watch only.
 
 BY: auto_1hr
+
+## FAVORITES Update — 2026-10-01 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE CASHCAT (WR=60.0%, PnL=$-0.30, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: []
+
+## [2026-10-01 06:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.07 (WR: 100%) — AIXBT pump-chain-v5 LONG pump_exit_dead_money +$0.07 (95.48% pnl_pct).
+24h: 19T, 9 wins, +$0.05 net (47.4% WR). Reasons: hard_sl 9T -$0.12 | trail_sl 2T +$0.09 | profit-monster-trail 2T +$0.08 | pump_exit_dead_money 2T +$0.10 | ORPHAN_PAPER 2T $0 | hard_max_loss 1T -$0.10 | MAE-GUARD 1T -$0.02 | HL_CLOSED 1T $0.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0/19 24h — ATR fix (tpsl_utils.py) deployed and stable. No CEO alert.
+- Kill rule not met: 1T last hour, 100% WR. No signal with 3T + 0% WR this hour.
+- 1/hr — not overtrading. No confidence raise.
+- Hourly trend: 01: +$0.01, 02: -$0.06, 03: -$0.06, 04: +$0.03, 05: +$0.07 — not 3 consecutive negative hours. No regime size action.
+- pump-chain- 24h: 9T -$0.40, 44.4% WR — worst signal but 0 trades this hour. Kill rule (0% WR + 3T in last hour) not triggered. Watch only.
+- pump-chain-v5: 4T +$0.14, 75% WR (+ combined rs-s32) — healthy. JUP LONG open since 05:49.
+- Open positions: 1 (JUP pump-chain-v5 LONG). Kill switch live_trading=true.
+
+**Open Questions / Sideways:**
+- mover-/mover+ 0% WR over 7d still escapes last-hour kill rule — CEO decision pending on 24h variant. Unchanged.
+- hard_sl 9T/24h dominant (47%) but avg -$0.013 — small losses, not SL-too-tight bleed.
+- ORPHAN_PAPER trades ($0) still in PG — data hygiene, not trading logic.
+
+**KANBAN**
+## TEAM UPDATES
+- [2026-10-01 06:12] auto_1hr: NO CONFIG CHANGE — 1T last hour (AIXBT pump-chain-v5 win +$0.07). 24h: 19T +$0.05, 47.4% WR. atr_sl_hit 0% (fix stable). Kill rule not met (1T < 3T/hr). Not overtrading. Not 3 consecutive negative hours. pump-chain- 44.4% WR watch only.
+
+BY: auto_1hr
