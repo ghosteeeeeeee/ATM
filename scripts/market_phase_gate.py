@@ -45,9 +45,12 @@ FAMILY_MAP = {
                     'spike_exhaustion_short', 'doji_bottom_long', 'doji-bottom-long'],
     'R2': ['r2_rev', 'r2_trend', 'r2_trend_long', 'r2_trend_short'],
     'Accelerate': ['accel_300', 'accel_300_long', 'accel_300_short', 'inverse_accel_300_long', 'inverse_accel_300_short',
-                    'accel_300_v3_long', 'accel_300_v3_short'],
+                    'accel_300_v3_long', 'accel_300_v3_short',
+                    'accel-300', 'accel-300-', 'accel-300-long', 'accel-300-short',  # hyphen variants (actual DB values)
+                    'accel-300-v2-long', 'accel-300-v2-short', 'accel-300-v3-long', 'accel-300-v3-short'],
     'Pump_Flow': ['pump_chain', 'pump_chain+', 'pump_chain-', 'pump_chain-',
                    'pump-chain', 'pump-chain+', 'pump-chain-',  # hyphen variants (actual DB values)
+                   'pump-chain-v5', 'pump_chain_v5',  # V5 variants
                    'pump-catcher', 'pump-catcher+', 'pump-catcher-'],
     'Pullback_Entry': ['pullback_entry', 'pullback_entry+', 'pullback_entry-', 'pullback-entry', 'pullback-entry+', 'pullback-entry-'],
     'Oversold_Bounce': ['oversold_bounce', 'oversold_bounce_long', 'oversold-bounce', 'oversold-bounce+'],

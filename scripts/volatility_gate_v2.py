@@ -358,6 +358,8 @@ SIGNAL_TYPE_OVERRIDES = {
     # RR_STRUCTURAL_V2_LONG_ENABLED=False means it can't fire anyway.
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
+    ('HIGH', 'accel-300-'): 0.0,                # BLOCKED 2026-10-01 — accel-300- SHORT HIGH 0%WR -$0.31 (4T). NORMAL 75%WR. signal_reporter
+    ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH (legacy underscore form)
     ('HIGH', 'pullback-entry-'): 1.0,            # OK — 30d HIGH: 58T +$0.43. Works in HIGH, bleeds NORMAL.

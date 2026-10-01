@@ -1592,6 +1592,18 @@ def context_gate(token, direction, source, sig):
                     return ('SKIP', 'pump-chain- SHORT HIGH regime block', 0)
             except ImportError:
                 pass
+        # ── pump-chain- SHORT EXTREME regime block ──
+        # all-time: EXTREME 84T 52.4%WR -$0.14 (bleed), NORMAL 7T 85.7%WR +$0.16 (edge).
+        # v2 gate Pump_Flow:0.0 exists but STANDALONE_BYPASS + fail-open let trades through.
+        # signal_reporter 2026-10-01
+        if vol_regime == 'EXTREME' and direction.upper() == 'SHORT' and source and ('pump-chain' in source or 'pump_chain' in source):
+            try:
+                from hermes_constants import PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED
+                if PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED:
+                    log(f'  🚫 [PUMP-CHAIN-SHORT-EXTREME] {token} SHORT blocked — EXTREME vol, pump-chain- SHORT bleeds (decider_run)')
+                    return ('SKIP', 'pump-chain- SHORT EXTREME regime block', 0)
+            except ImportError:
+                pass
     except Exception as e:
         log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
 

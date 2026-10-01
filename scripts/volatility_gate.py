@@ -127,7 +127,8 @@ REGIME_SIGNALS = {
     'HIGH': {
         # Breakout works in big moves
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in high vol
+        'pump-chain', 'pump-chain+',  # chain correlation LONG — HIGH edge for +
+        # pump-chain- SHORT removed 2026-10-01 — HIGH 48%WR -$0.36 bleed. NORMAL 85.7%WR edge. signal_reporter
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in high vol
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
