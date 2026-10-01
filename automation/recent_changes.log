@@ -3668,3 +3668,8 @@
   BY: auto_1hr
 
 - [2026-10-01 07:37 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified: 21T 47.6%WR -$0.13 (24h) | 115T 47.0%WR -$1.13 (7d). **PUMP_CHAIN_SHORT_RSI_MIN=40 VERIFIED WORKING** — 739 blocks in log. Post-02:00 only LDO SHORT executed (metaRSI=43.38, golden band). All RSI<40 DB trades are pre-02:00 legacy. Golden band 40-45: 9T 78%WR +$0.52 preserved. **VOLUME_BREAKOUT CEILING=95 VERIFIED** — WCT/ONDO RSI>95 losses are pre-Sep-30 legacy; no post-fix violations. **bb-bounce rsi_1m metadata STILL NULL** (ZORA today post-restart) — DRIFT-001 filter unverifiable, escalate to bug_hunter if NULL at 48h mark. **LOSING AUTOPSY:** 7 losers all <$0.17. 4 pump-chain- SHORT = pre-filter legacy (correctly blocked now). V5 test 4W2L +$0.30 (eval Oct 3). ZORA bb-bounce no metadata. No systematic post-fix pattern. **SHORT R:R 0.78:1** structural persists (avg_win $0.109 vs LONG $0.154). **14d BEST:** volume-breakout-long+ 20T 70%WR +$2.48, doji-bottom-long 11T 63.6%WR +$0.36. **CREATIVE (4):** SHORT TP asymmetry | pump-chain- golden band conf boost (monitor, 9T<20T) | bb-bounce combo metadata fix (delegate bug_hunter) | NEUTRAL volume-dry-up signal (delegated). **0 CHANGES APPLIED.** **MONITOR:** golden band 48h, bb-bounce metadata 48h, V5 Oct 3, doji-bottom 20T. — brain_auditor
+
+2026-10-01 10:18 UTC auto_1hr: KILL pump-chain-v5
+  PUMP_CHAIN_V5_ENABLED True->False. 3T 0%WR -$0.20 last hour (ALGO/HYPER/DYDX all hard_max_loss).
+  24h: 8T 3W -$0.13. Hourly kill rule (0%WR with 3+T in last hour).
+  V5 SHORT untouched. Audit: data/signal_versions.json pump-chain-v5 v1.

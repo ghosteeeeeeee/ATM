@@ -1472,3 +1472,40 @@ BY: auto_1hr
 - bb-bounce rsi_1m metadata NULL (per brain_auditor 07:37) — escalate at 48h mark if still NULL
 
 BY: auto_1hr
+
+## [2026-10-01 10:18 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses)
+**PnL:** -$0.21 (WR: 0.0%)
+
+**Trades detail:**
+- ALGO pump-chain-v5 LONG hard_max_loss -0.58% (-$0.07)
+- HYPER pump-chain-v5 LONG hard_max_loss -0.58% (-$0.07)
+- DYDX pump-chain-v5 LONG hard_max_loss -0.52% (-$0.06)
+- WLFI bb-bounce-v3-long+ LONG profit-monster-trail (-$0.01)
+
+**Diagnosis:**
+- **Entry quality:** 0 winners this hour — no MAE signal. paper pnl_pct noise continues (leverage artifacts on hard_max_loss exits).
+- **SL behavior:** atr_sl_hit 0% of 24h closes (0 over 48h+) — tpsl fix stable. hard_sl 9T avg -$0.013 (tiny). hard_max_loss family 8T -$0.65/24h is the bleed cluster — 4 of them this hour were pump-chain-v5.
+- **Signal quality:** pump-chain-v5 3T 0W -$0.20 this hour → KILL RULE MET. 24h 8T 3W -$0.13. bb-bounce-v3-long+ 1T -$0.01 (1T < 3T threshold). pump-chain- 11T 4W -$0.57/24h — worst 24h signal but 0T this hour (watch only).
+- **Frequency:** 4T/hour << 20T — not overtrading.
+- **Consecutive negative hours:** 06:00 -$0.07, 07:00 -$0.11, 08:00 -$0.15, 09:00 -$0.07, 10:00 -$0.14 = 5 consecutive negative. Regime check: pump_flow phase=MARKDOWN (conf 0.48), alt flowing_out — NOT NEUTRAL, so size-reduction rule not triggered. Max 1 change/hour already used for the kill.
+
+**Changes:**
+1. `PUMP_CHAIN_V5_ENABLED = False` — kill rule: 0% WR with 3+ trades in last hour (3T -$0.20). Audit: `data/signal_versions.json` pump-chain-v5 v1. Pipeline restart required to load.
+
+**No Change Needed:**
+- atr_sl_hit 0% — no CEO alert
+- Overtrading: 4T << 20T/hr
+- Position size: regime is MARKDOWN not NEUTRAL (rule only prescribes size cut for NEUTRAL); kill took the single change budget
+- bb-bounce-v3-long+: 1T this hour < 3T kill threshold
+- pump-chain-: 0T this hour, not auto-killable
+
+**Open Questions:**
+- MARKDOWN phase + 5 negative hours — LONG-heavy system in capital outflow. CEO decision: reduce LONG exposure / boost SHORT side, or wait for phase flip?
+- pump-chain- 11T 4W -$0.57/24h still bleeding — needs 3T/hr 0%WR window or T decision
+- bb-bounce rsi_1m metadata NULL (still open from brain_auditor 07:37)
+- V5 test eval Oct 3 moot after kill — do NOT re-enable without fresh 48h positive evidence
+- signal_versions.json uses mixed formats (structured versions[] vs flat list for pump-chain-) — cosmetic, not blocking
+
+BY: auto_1hr
