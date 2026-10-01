@@ -3673,3 +3673,14 @@
   PUMP_CHAIN_V5_ENABLED True->False. 3T 0%WR -$0.20 last hour (ALGO/HYPER/DYDX all hard_max_loss).
   24h: 8T 3W -$0.13. Hourly kill rule (0%WR with 3+T in last hour).
   V5 SHORT untouched. Audit: data/signal_versions.json pump-chain-v5 v1.
+2026-10-01 10:39 UTC brain_auditor: NO CONFIG CHANGE
+31T 41.9%WR -$0.49 (24h) | 118T 46.6%WR -$0.86 (7d) | 336T 44.0%WR -$2.90 (14d).
+V5 KILLED 10:18 auto_1hr (CURRENT.md stale). RSI_MIN=40 verified (golden band 11T 63.6%WR +$0.35).
+DRIFT-003 NEW: accel-300- 8T SHORT at RSI 1.9-24.33 despite RSI filters — path bypass, sample <20T monitor.
+DRIFT-001 open (bb-bounce rsi_1m NULL), DRIFT-002 residual (5 LONG RSI>70 leaks 7d, JUP v5 post-fix).
+4 creative ideas logged. bug_hunter delegated x3. 0 changes applied.
+
+2026-10-01 11:12 UTC auto_1hr: KILL accel-300-
+  ACCEL_300_MINUS_ENABLED True->False. 4T 0%WR -$0.31 last hour (CFX/WCT/TURBO/ENS all hard_max_loss SHORT RSI 25-38).
+  24h: 7T 3W -$0.28. Hourly kill rule (0%WR with 3+T in last hour). DRIFT-003 path bypass noted.
+  LONG side already dead (ACCEL_300_PLUS_ENABLED=False). Audit: data/signal_versions.json accel-300- v1.

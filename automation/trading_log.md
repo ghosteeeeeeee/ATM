@@ -1509,3 +1509,40 @@ BY: auto_1hr
 - signal_versions.json uses mixed formats (structured versions[] vs flat list for pump-chain-) — cosmetic, not blocking
 
 BY: auto_1hr
+
+## [2026-10-01 11:12 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses)
+**PnL:** -$0.31 (WR: 0.0%)
+
+**Trades detail:**
+- CFX accel-300- SHORT hard_max_loss_-0.50% (-$0.04) entry RSI 25.68
+- WCT accel-300- SHORT hard_max_loss_-0.70% (-$0.09) entry RSI 28.87
+- TURBO accel-300- SHORT hard_max_loss_-0.59% (-$0.09) entry RSI 37.50
+- ENS accel-300- SHORT hard_max_loss_-0.75% (-$0.09) entry RSI 35.58
+
+**Diagnosis:**
+- **Entry quality:** 0 winners — all 4 SHORTs entered oversold (RSI 25-38) then hard_max_loss. Matches BANANA SHORT lesson + DRIFT-003 (accel-300- SHORT path bypassing RSI filters). Morning 07:30 winners were same signal RSI ~28-30 with profit-monster-trail — same knife, different exit.
+- **SL behavior:** atr_sl_hit 0% of 24h closes (still 0 over 48h+) — tpsl fix stable. hard_max_loss family is the bleed: 9T/24h across levels. No CEO alert (atr_sl_hit rule not met).
+- **Signal quality:** accel-300- 4T 0W -$0.31 this hour → KILL RULE MET. 24h 7T 3W -$0.28. pump-chain-v5 already killed 10:18. pump-chain- 0T this hour, watch only.
+- **Frequency:** 4T/hour << 20T — not overtrading.
+- **Consecutive negative hours:** 06:00 through 10:00 all negative (5+ hours). Regime MARKDOWN/alt outflow — size-reduction rule only prescribes NEUTRAL; kill took the single change budget.
+
+**Changes:**
+1. `ACCEL_300_MINUS_ENABLED = False` — kill rule: 0% WR with 3+ trades in last hour (4T -$0.31, all hard_max_loss SHORT). Audit: `data/signal_versions.json` accel-300- v1. LONG side already dead (`ACCEL_300_PLUS_ENABLED=False`).
+
+**No Change Needed:**
+- atr_sl_hit 0% — no CEO alert
+- Overtrading: 4T << 20T/hr
+- Position size: regime MARKDOWN not NEUTRAL (rule only prescribes size cut for NEUTRAL); kill consumed the 1-change budget
+- bb-bounce-v3-long+: 0T this hour
+- pump-chain-v5: already killed 10:18 this hour-cycle, not re-killed
+
+**Open Questions:**
+- MARKDOWN + 6 consecutive negative hours — LONG-heavy system in capital outflow. CEO: reduce LONG exposure / boost SHORT, or wait for phase flip?
+- accel-300- SHORT RSI filter path bypass (DRIFT-003) — if re-enabled later, must fix path before re-enable; do NOT re-enable without 48h positive evidence
+- SHORT structural R:R ~0.78:1 still persists (brain_auditor 10:39)
+- bb-bounce rsi_1m metadata NULL (still open from brain_auditor 07:37)
+- signal_version.py still missing — logged via data/signal_versions.json directly
+
+BY: auto_1hr
