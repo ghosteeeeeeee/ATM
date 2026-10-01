@@ -1923,3 +1923,27 @@ BY: daily-orchestrator
 **Open Questions:**
 - mfe_pct/mae_pct NULL on most profit-monster-trail exits — entry-quality (adverse excursion) can't be verified for trail winners. Data gap, not a trading bug. Worth a one-line fix in the exit-recording path if trail closes skip writing MFE/MAE.
 - hard_max_loss_* exits show MFE <0.21% with MAE ~0.3-0.5% — trades dying before developing. Pattern known from prior audits; monitor window active on hard-floor 25→30 proposal (brain_auditor). No stacked change.
+
+## [2026-10-01 20:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no trades) — quiet hour
+
+**24h context:** 32 closed, 11W, 34.4% WR, -$1.11. Exit reasons: profit-monster-trail 7T +$0.15 | hard_sl 4T -$0.45 | hard_max_loss_* family 12T ~-$1.03 | atr_sl_hit 0T. Worst signals (legacy aging): pump-chain- SHORT 9T -$0.63 (RSI_MIN fix 18:15), accel-300- 8T -$0.34 (killed 10:50), pump-chain-v5 6T -$0.17 (killed 10:18). bb-bounce-v3-long+ 2T 0%WR -$0.12. Open: 2 BTC LONGs (continuum-osc+ 13:49 + continuum_engine 17:45) — double exposure, known hygiene flag from brain_auditor 19:35.
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0% of 24h closes. tpsl_utils.py fix deployed and stable (verified prior hours + brain_auditor 19:35). Dominant closes are hard_sl / hard_max_loss_* — hard cap mechanism, not ATR SL. No CEO alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades in last hour (0 trades last hour total). bb-bounce-v3-long+ 0%WR is only 2T/24h — below threshold. accel-300-/pump-chain-v5 already killed; 24h losses are pre-kill opens aging out.
+- **PnL streak:** No negative-hour streak. Prior hours with trades positive (13:00/17:00/18:00). Size rule inactive.
+- **Trade frequency:** 0/hr — system is signal-starved (hotset empty), not overtrading.
+- **Regime:** 24h EXTREME -$0.70 / HIGH -$0.41 / NORMAL +$0.01. No size-reduction trigger (no 3+ consecutive negative hours with trades).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40 (18:15), SHORT-CONTINUUM filter, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging. Do not stack.
+
+**Open Questions:**
+- Two BTC LONGs open simultaneously (continuum-osc+ + continuum_engine) — brain_auditor flagged ORPHAN_PAPER hygiene at 19:35. Not an auto_1hr kill candidate (no config rule for double exposure); needs orchestrator/CEO call.
+- health_monitor 19:48 reported "0 open" while PG shows 2 open BTC LONGs — data-source discrepancy (likely trades.json vs PostgreSQL). PG is source of truth per AGENTS.md.
+- hard_max_loss_* family still the dominant 24h bleed (-$1.03 across 12 exits) — trades dying before developing. Known pattern; monitor window active on hard-floor proposal. No stacked change this hour.
+- mfe/mae NULL on trail exits persists from prior hour — entry-quality unverifiable for those winners. Data-gap, not a trading-path bug this hour.
