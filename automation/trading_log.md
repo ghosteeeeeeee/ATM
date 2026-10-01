@@ -1947,3 +1947,25 @@ BY: daily-orchestrator
 - health_monitor 19:48 reported "0 open" while PG shows 2 open BTC LONGs — data-source discrepancy (likely trades.json vs PostgreSQL). PG is source of truth per AGENTS.md.
 - hard_max_loss_* family still the dominant 24h bleed (-$1.03 across 12 exits) — trades dying before developing. Known pattern; monitor window active on hard-floor proposal. No stacked change this hour.
 - mfe/mae NULL on trail exits persists from prior hour — entry-quality unverifiable for those winners. Data-gap, not a trading-path bug this hour.
+
+## [2026-10-01 21:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.16 (WR: 100%) — BTC continuum-osc+ LONG, HL_CLOSED @ +72.09% pnl_pct
+
+**24h context:** 32 closed, 11W, 34.4% WR, -$1.11. Exit reasons: profit-monster-trail 7T +$0.15 | hard_max_loss_* family 12T ~-$1.03 | hard_sl 4T -$0.45 | atr_sl_hit 0T (atr_trail_hit 1T +$0.03 positive). Hourly PnL 6h: 17:00 +$0.09, 18:00 +$0.03, 21:00 +$0.16 — no negative-hour streak.
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0% of 24h closes. tpsl_utils.py fix deployed and stable (prior hours + brain_auditor 19:35). Dominant bleed remains hard_max_loss_* family (hard cap, not ATR SL). No CEO alert.
+- **Kill rule:** 0 signals with 0% WR and 3+ trades last hour (only 1 trade total). bb-bounce-v3-long+ 0%WR is 2T/24h — below threshold. accel-300-/pump-chain-v5 already killed, losses aging out.
+- **PnL streak:** Positive trades in all hours with activity this week-window — size-reduction rule inactive. Regime EXTREME -$0.70 / HIGH -$0.41 / NORMAL +$0.01 (24h) — still no 3+ consecutive negative hours.
+- **Trade frequency:** 1/hr — signal-starved, not overtrading.
+- **Double BTC exposure resolved:** continuum-osc+ closed this hour; only continuum_engine LONG remains open (amount_usdt=0.00 — position size reads zero, likely already flat/exited-but-not-closed-recorded; data hygiene note, not a config change).
+
+**Open Questions:**
+- continuum_engine open row shows amount_usdt=0.00 — either phantom open or exit not recorded. Worth a pipeline/exit-recorder check next hour; not an auto_1hr config fix.
+- hard_max_loss_* family still dominant 24h bleed (~-$1.03/12 exits, MFE <0.21% pattern). Monitor window on hard-floor 25→30 proposal remains active — do not stack changes.
+- mfe/mae NULL on some trail exits — entry-quality gap persists. Data-path issue, not signal logic.

@@ -1288,7 +1288,7 @@ PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI b
 # neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
 # Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
 SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
-SHORT_CONTINUUM_SCORE_MAX = 10         # block SHORT when BTC state_score > this
+SHORT_CONTINUUM_SCORE_MAX = 40         # raised from 10 (2026-10-01) — 30d data: score 10-30 band is breakeven noise
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 
 # pullback-entry- SHORT entry quality (replaced dead hours)

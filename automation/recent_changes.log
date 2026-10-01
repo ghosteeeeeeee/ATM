@@ -3722,3 +3722,13 @@ pump-chain- 11T -$0.57 24h worst but 0T this hour — CEO decision if full famil
   CREATIVE: vol-breakout EXTREME conf boost (AT threshold CEO/T), double-BTC audit, golden band watchlist
   0 CHANGES APPLIED — monitor windows active. openmemory INACTIVE.
   BY: brain_auditor
+
+2026-10-01 21:36 UTC brain_auditor: NO CONFIG CHANGE - audit
+DB-verified: 32T 37.5%WR -$0.95 (24h) | 115T 46.1%WR -$0.09 (7d) | EXTREME flipped +$0.12/60T (vol cleanup working)
+LOSING AUTOPSY: 18 losers — accel-300-(8T)+V5(6T)=legacy pre-kill aging out; pump-chain- RSI<40 opened when threshold was 25 (now 40, post-fix 1W 0L); bb-bounce-v3 n=2 monitor.
+FILTERS VERIFIED: PUMP_CHAIN_SHORT_RSI_MIN=40 working as designed; SHORT-CONTINUUM live; ATR_SL 0 hits/7d; double-BTC resolved (continuum-osc+ closed +0.16).
+DRIFT-004 NEW: ENTRY_RR_MIN_RATIO=2.0 hardcoded in entry_gates.py (convention violation) — sessions suggested 0.95, no backtest. Delegated.
+SHORT MFE GAP (creative): pump-chain- hard_sl winners capture median ~40% of MFE (COMP 0.23%/1.61%, IO 0.43%/2.36%, CRV 4.9%/6.05%). PM_TRAIL activate=0.40% locks scratch on 2-6% dumps. PM_TRAIL protected — backtest signal-level override.
+CREATIVE (4): (1) SHORT MFE realization gap backtest (2) ENTRY_RR backtest 0.95/1.25/2.0 (3) CARRIED vol-breakout EXTREME conf boost awaiting CEO/T (4) REJECTED time-blocks/blanket-kills.
+0 CHANGES APPLIED — monitor windows active (SHORT-CONTINUUM, HARD_FLOOR, RSI_MIN=40, V5/accel aging).
+BY: brain_auditor

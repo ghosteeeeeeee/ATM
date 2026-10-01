@@ -1470,5 +1470,42 @@
     "rationale": "14d 4T 0%WR -$0.14 (HIGH 3T + NORMAL 1T) — loses all regimes = policy-eligible. BUT n=4T << 20T threshold = noise. ZORA/WLFI are scratches.",
     "status": "rejected",
     "reason": "Sample too small. Monitor 48h; kill only if 5T+ still 0%WR with clear pattern."
+  },
+  {
+    "date": "2026-10-01T21:36:47Z",
+    "idea": "SHORT MFE realization gap — pump-chain- captures median ~40% of MFE via PM_TRAIL activate=0.40%",
+    "rationale": "7d pump-chain- SHORT hard_sl winners: CRV MFE=6.05% realized 4.9% (+$0.55); COMP MFE=1.61% realized 0.23% (+$0.03); IO MFE=2.36% realized 0.43%; BABY MFE=2.66% realized 0.92%. Median capture ~40%. PM_TRAIL locks scratch profit on 2-6% dumps instead of letting them run. Exit taxonomy shows winners as hard_sl = trailed stop hit after trail engaged too early.",
+    "expected_impact": "If capture raised 40%→60%: SHORT avg_win +50%, R:R 0.73→~1.1, SHORT side approaches breakeven at current 47.9% WR",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium",
+    "constraint": "PM_TRAIL global ACTIVATE=0.40%/DISTANCE=0.20% is PROTECTED. Needs signal-level trail override path or CEO/T approval. Do not change global PM_TRAIL.",
+    "next_step": "Backtest: what if pump-chain- SHORT trail activate were 0.80%? Replay 7d MFE data — which winners capture more, which losers get worse?"
+  },
+  {
+    "date": "2026-10-01T21:36:47Z",
+    "idea": "ENTRY_RR_MIN_RATIO backtest — 2.0 current vs 1.25 middle ground vs session-suggested 0.95",
+    "rationale": "Sessions flagged R:R>2.0 as missing good trades. Value hardcoded in entry_gates.py (convention violation). Used by 3 enabled signals. No backtest exists.",
+    "expected_impact": "Unknown until backtested — could unlock signal flow or flood with noise",
+    "category": "signal starvation",
+    "status": "suggested",
+    "risk": "medium",
+    "constraint": "Must move constant to hermes_constants.py first (convention). Backtest before any value change.",
+    "next_step": "Replay 14d trades through rr_gate at thresholds 0.95/1.25/1.5/2.0 — measure winners blocked vs losers blocked"
+  },
+  {
+    "date": "2026-10-01T21:36:47Z",
+    "idea": "CARRIED: volume-breakout-long+ EXTREME confidence boost +10-15pt",
+    "rationale": "17T/14d 76.5%WR +$2.78, EXTREME 13T 76.9% +$2.63. RSI ceiling 95 verified: 0 winners blocked (max winner ME 91.7). Needs CEO/T per standing rules.",
+    "expected_impact": "+3-5% WR for volume-breakout in EXTREME",
+    "category": "entry sniper",
+    "status": "awaiting_ceo_t",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T21:36:47Z",
+    "idea": "REJECTED: time-based blocks, blanket signal kills, vol-breakout RSI ceiling 90, bb-bounce-v3 kill",
+    "rationale": "Time blocks banned by policy. vol-breakout RSI 90 would kill ME +$0.09 winner. bb-bounce-v3 n=4T noise.",
+    "status": "rejected"
   }
 ]
