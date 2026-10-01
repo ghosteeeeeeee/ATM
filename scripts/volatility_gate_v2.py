@@ -319,14 +319,49 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'pump-chain'): 0.5,              # PENALIZED — hyphen variant fallback (must be AFTER pump-chain+/-)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──
-    ('NORMAL', 'pullback_entry-'): 0.0,          # BLOCKED — pullback-entry- SHORT 0% WR in NORMAL
+    # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
+    # Entries use BOTH underscore and hyphen forms — substring matching means
+    # 'pullback_entry-' does NOT match 'pullback-entry-' (underscore ≠ hyphen).
+    ('NORMAL', 'pullback_entry-'): 0.0,          # BLOCKED — pullback-entry- SHORT 0% WR in NORMAL (legacy underscore form)
+    ('NORMAL', 'pullback-entry-'): 0.5,          # PENALIZED — 30d NORMAL: 32T -$0.62. HIGH: 58T +$0.43. Route by regime.
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
+    ('NORMAL', 'pullback-entry+'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.57. Structurally weak LONG variant.
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
     ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL
+    # ── NORMAL: bleeding signals (30d cross-tab) ──
+    ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
+    ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
+    ('NORMAL', 'coiled_spring'): 0.3,            # PENALIZED — 30d NORMAL: 7T -$0.11. 43% WR overall.
+    ('NORMAL', 'sma20_dip'): 0.3,                # PENALIZED — 30d NORMAL: 5T -$0.35. 42% WR overall.
+    ('NORMAL', 'sma20-dip'): 0.3,                # PENALIZED — hyphen variant
+    ('NORMAL', 'slow_grind'): 0.3,               # PENALIZED — 30d: 15T 40%WR -$0.80. Both regimes bleed.
+    ('NORMAL', 'r2_trend_long'): 0.3,            # PENALIZED — 30d NORMAL: 4T -$0.18. 36% WR overall.
+    ('NORMAL', 'r2-trend-long'): 0.3,            # PENALIZED — hyphen variant
+    ('NORMAL', 'trend_purity+'): 0.3,            # PENALIZED — 30d: 11T 36%WR -$0.90. Structurally weak.
+    ('NORMAL', 'trend_purity'): 0.3,             # PENALIZED — bare form fallback
+    ('NORMAL', 'range_reversion'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.62. Structurally weak.
+    ('NORMAL', 'range-reversion'): 0.3,          # PENALIZED — hyphen variant
+    ('NORMAL', 'ema300-dip-long'): 0.3,          # PENALIZED — 30d: 5T 20%WR -$0.55. Structurally weak.
+    ('NORMAL', 'ema300_dip_long'): 0.3,          # PENALIZED — underscore variant
+    # ── NORMAL: wrong-variant signals (hyphen+ losers vs underscore winners) ──
+    ('NORMAL', 'bb-bounce-v2-long+'): 0.3,       # PENALIZED — 30d: 24T 42%WR -$0.59. Wrong variant (winner is bb_bounce_v2_long 74%WR).
+    ('NORMAL', 'open-skies+'): 0.3,              # PENALIZED — 30d: 11T 36%WR -$0.73. Wrong variant (winner is open_skies 63%WR).
+    ('NORMAL', 'rr-struct-v2+'): 0.3,            # PENALIZED — 30d: 10T 40%WR -$0.45. Wrong variant (winner is rr-struct+ 73%WR).
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
-    ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH
+    ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH (legacy underscore form)
+    ('HIGH', 'pullback-entry-'): 1.0,            # OK — 30d HIGH: 58T +$0.43. Works in HIGH, bleeds NORMAL.
+    # ── HIGH: bleeding signals (30d cross-tab) ──
+    ('HIGH', 'ema300_dip_short'): 0.3,           # PENALIZED — 30d HIGH: 12T -$0.64. Bleeds BOTH regimes.
+    ('HIGH', 'ema300_dip'): 0.5,                 # PENALIZED — 30d HIGH: 28T -$0.17. Bleeds less than NORMAL.
+    ('HIGH', 'coiled_spring'): 0.3,              # PENALIZED — 30d HIGH: 6T -$0.23. 43% WR overall.
+    ('HIGH', 'sma20_dip'): 0.3,                  # PENALIZED — 30d HIGH: 7T -$0.36. 42% WR overall.
+    ('HIGH', 'sma20-dip'): 0.3,                  # PENALIZED — hyphen variant
+    ('HIGH', 'slow_grind'): 0.3,                 # PENALIZED — 30d HIGH: 7T -$0.24. 40% WR overall.
+    ('HIGH', 'rr-struct-v2+'): 0.3,              # PENALIZED — 30d HIGH: 4T -$0.39. Wrong variant.
+    ('HIGH', 'bb-bounce-v2-long+'): 0.3,         # PENALIZED — 30d HIGH: 15T -$0.12. Wrong variant.
+    ('HIGH', 'open-skies+'): 0.3,                # PENALIZED — 30d HIGH: 7T -$0.27. Wrong variant.
 }
 
 

@@ -682,7 +682,7 @@ SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) �
 TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
-CUT_LOSER_PNL     = -0.50  # close trade at -0.50% PnL — lowered from -1.75% (2026-09-25 CEO). In chop, losers don't recover. Cut fast.
+CUT_LOSER_PNL     = -1.00  # close trade at -1.00% PnL — widened from -0.50% (2026-10-01 CEO). 30d data: cut-loser-CL-T1 = 96T 0%WR -$13.62. -0.50% is inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%). Trades were being cut before they could reach trail activation (+0.40%) and recover. -1.00% gives room while still cutting genuine losers.
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -690,7 +690,7 @@ CUT_LOSER_PNL     = -0.50  # close trade at -0.50% PnL — lowered from -1.75% (
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0060  # 0.60% — CEO Sep 4: was 0.40%, matches PM_TRAIL. Lets winners run further.
+TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO Oct 1: was 0.60%. 30d data: profit-monster-trail = 331T 84%WR +$19.58 (ONLY profitable exit path). atr_sl_hit = 435T 42%WR -$10.05. Lower activation shifts more trades from the 42% ATR_SL path to the 84% trail path. Trail distance (1.20%) unchanged — gives room to breathe.
 TRAILING_DISTANCE_PCT   = 0.0120  # 1.20% — CEO Aug 27: tighter trail caused too many premature exits. 1.2% gives trades room to breathe while still locking profits.
 
 # ── Loss Cooldown Constants
@@ -2596,7 +2596,7 @@ STANDALONE_BYPASS_SIGNALS = (
     # open-skies+ KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
-    # bb-bounce-v2-long removed — dead (4T/7d 25%WR -$0.47)
+    # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long'). 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
@@ -2643,6 +2643,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
     'rr-struct-v2', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14). v2+ KILLED CEO 2026-09-15
+    'rr-struct',  # base variant — source 'rr-struct+' strips to 'rr-struct'. 30d: 15T 73%WR +$0.59 WINNER. Added 2026-10-01.
     'rr-struct-v',  # regex-stripped variant (trailing digits removed: v2 -> v)
     'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
     'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion LONG, works solo
