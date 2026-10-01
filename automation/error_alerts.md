@@ -232,3 +232,15 @@
 - **INFO**: token_speeds: 79/241 flagged stale (32.8%). decisions table empty since April (expected — signal_compactor is LLM-free, doesn't write decisions).
 - **INFO**: Several 0-byte DB files present (brain.db, hermes.db, hermes_live.db, hermes_runtime.db, hermes_trades.db, hotset.db, price_cache.db, price_history.db, prices.db, runtime.db, signals.db). System uses signals_hermes_runtime.db / candles.db / coin_tracker.db instead — likely intentional placeholders. Flagging for awareness, not auto-deleting.
 - **AUTO-FIXES APPLIED**: None actionable — pipeline not crashed; timers all firing; no logs >7d to gzip; disk pressure is DB growth not logs. No restart or force-run warranted.
+
+## Error Alerts — 2026-10-01 14:46 UTC
+- **WARN** (ongoing): Disk at 85% (95G/118G, 18G free). No logs >7d uncompressed (0 files). Large consumers are active DBs: coin_tracker 3.5G, candles 2.4G. **Needs CEO call on DB pruning — no safe auto-fix.**
+- **WARN** (ongoing): Hotset EMPTY — 89 signals generated last hour, 0 approved by compactor (none ≥50% confidence). Market NEUTRAL (0L/2S/114N). 1 open position (BTC LONG trade_id=15799, in profit +0.37%). No new trades will open until signals clear compactor.
+- **WARN** (repeating): hermes-wasp.service failing every cycle — exit 1/FAILURE. Not trading-path critical; code-owner fix needed.
+- **WARN** (repeating): hermes-better-coder.service — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. Path/sys.path issue, code-owner fix.
+- **WARN** (repeating): hermes-price-collector.service — `[LOCK-WAIT] info_rate` retries + `candles_1h/4h: aggregation error: database is locked`. Collector still completes. Code-owner fix for candle-aggregation lock path.
+- **INFO**: Pipeline path clean — 0 errors/tracebacks in 30min. hl-sync-guardian + pipeline both active. Prices fresh (token_speeds updated 14:45:32, 241 tokens). Regime NEUTRAL (0L/2S/114N). Speed 53.1% tokens ≥50th pctl. Phantom trades: 0. Today: 21 closed, 33.3% WR, -0.84 USDT.
+- **INFO**: token_speeds: 58/241 stale (24.1%). decisions table empty (expected — signal_compactor is LLM-free).
+- **INFO**: hermes-atr-sl-updater.timer is not-found (defunct unit file present as -DEFUNCT). hermes-regime-24h-check.timer and hermes-regime-transition-check.timer inactive/dead — may be intentional (3-day check retired?). Flagging, not auto-deleting.
+- **INFO**: Pipeline reports 1 open position but signal_outcomes shows 0 open rows (pnl_usdt NULL). Open BTC position likely tracked in HL/position-manager store until close — signal_outcomes appears closed-only. Not a bug unless expected open tracking there.
+- **AUTO-FIXES APPLIED**: None — pipeline not crashed; timers firing; no logs >7d to gzip; disk pressure is DB growth not logs. No restart or force-run warranted.
