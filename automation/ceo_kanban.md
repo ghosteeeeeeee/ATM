@@ -63,3 +63,6 @@
 
 ## TEAM UPDATES
 - [2026-10-01 07:49 UTC] health_monitor: Pipeline OK — running, 0 errors/30min, 3 open SHORT (BANANA/CFX/HYPER) all IN_PROFIT, prices fresh (86 tokens, 11s), regime NEUTRAL. Auto-fixes: journald vacuum (0B freed, already clean), reset-failed on git-release + upgrade-implementer. WARNs: disk 86% from DB growth (needs CEO prune call); hotset empty — 137 signals/hr generated but 0 approved by compactor (signal quality, not pipeline failure); hermes-wasp lock-wait loop on info_rate; hermes-better-coder ModuleNotFoundError dispatcher.dispatcher. No trading-path issues.
+
+## TEAM UPDATES
+- [2026-10-01 08:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (ZORA bb-bounce-v3-long+ LONG hard_max_loss -$0.11). 24h: 21T 10W 47.6%WR -$0.13. atr_sl_hit 0% (ATR fix stable). Kill rule not met (1T < 3T/hr, no 0%-WR signal with 3T). Not overtrading. 2 consecutive negative hours (06,07) — 05 was positive, watch 08:00. pump-chain- 9T/24h 44%WR -$0.40 watch only (0 trades this hour). 0 CHANGES APPLIED.

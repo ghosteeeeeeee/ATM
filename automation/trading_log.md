@@ -1445,3 +1445,30 @@ at hermes_constants.py:278 `FAVORITES = FAVORITES_LONG | FAVORITES_SHORT`.
 - pump-chain- remains on watch (40% WR -$0.91/48h) — not auto-killable by hourly rule; needs longer-window audit or T decision
 
 BY: auto_1hr
+
+## [2026-10-01 08:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 (WR: 0.0%)
+**Trade:** ZORA bb-bounce-v3-long+ LONG hard_max_loss_-0.71% (open 06:59 → close 07:22, $11.10, pnl_pct -285.97% paper leverage noise)
+
+**Diagnosis:**
+- **Entry quality:** ZORA same paper-MAE artifact as prior JUP (pnl_pct -285.97% = leverage, not real). No clean-edge signal data from 1T.
+- **SL behavior:** atr_sl_hit 0% of 24h closes (0 over 48h+) — tpsl fix stable. hard_sl 9T avg -$0.013 (tiny); hard_max_loss exits 3T -$0.28 total are larger bleeders per-trade but not dominant count.
+- **Signal quality:** 24h worst: pump-chain- 9T 4W 44.4%WR -$0.40 — 0 trades this hour, not auto-killable. bb-bounce-v3-long+ 1T -$0.11 this hour only (1T < 3T kill threshold). pump-chain-v5 5T 3W +$0.07 OK.
+- **Frequency:** 1T/hour — not overtrading. Consecutive-negative: 06:00 -$0.07, 07:00 -$0.11 (2h) — 05:00 was +$0.07, so NOT 3 consecutive; watch if 08:00 also negative.
+
+**Changes:**
+1. None
+
+**No Change Needed:**
+- Kill rule: no signal with 0% WR and 3+ trades in last hour
+- atr_sl_hit 0% — no CEO alert
+- Position size: avg_pnl not negative 3+ consecutive hours
+- Overtrading: 1T << 20T/hr
+
+**Open Questions:**
+- pump-chain- remains on watch (9T 44%WR -$0.40/24h) — needs 3T/hr 0%WR window or T decision
+- bb-bounce rsi_1m metadata NULL (per brain_auditor 07:37) — escalate at 48h mark if still NULL
+
+BY: auto_1hr
