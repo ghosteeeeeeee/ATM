@@ -1,27 +1,27 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-09-30 22:30 UTC**
-**Updated by: brain_auditor**
+**Last Updated: 2026-10-01 02:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-System recovering strongly. 4 open positions (MNT LONG bb-bounce combo, IOTA/ADA/BABY pump-chain- SHORT EXTREME). Pipeline healthy. **24h: 16T 62.5%WR +$1.10** (best day in weeks continues). Post-fix: 64T 54.7%WR +$0.51 (0 ATR_SL hits). Exec-time RSI ceiling fix deployed 06:30 UTC — 0 RSI>70 LONG entries since (monitor 24-48h). PUMP_CHAIN_SHORT_RSI_MIN=25 **VERIFIED WORKING**. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 **SET TODAY** — protects RSI 70-80 edge. volume-breakout-long+ RSI 60-80 = **13T 76.9%WR +$1.81** (killer combo, approaching 20T for conf boost). doji-bottom-long HIGH regime 7T 85.7%WR +$0.67/30d — HIGH specialist. pump-chain-v5 test: 3T net +$0.27, ends Oct 1 — **RECOMMEND EXTENDING to Oct 3 (3T insufficient)**. **NEUTRAL signal delegated to signal_analyst — NOT YET BUILT.** signal_version.py MISSING — flagged 5h+, still missing. BB_BOUNCE_V2_RSI_MAX=60 bypass: 3 post-deploy RSI>60 trades slipped -> bug_hunter.
+System recovering. 3 open positions (ALL hyperliquid SHORT pump-chain- — cluster risk). Pipeline healthy, restarted 01:47 UTC (DRIFT-001 fix loaded). **24h: 13T 46.2%WR +$0.05.** 7d: 114T 44.7%WR -$1.78. LONG +$0.16 profitable (64T, R:R 1.09:1). SHORT -$1.94 bleeding (50T, R:R 0.59:1). **PUMP_CHAIN_SHORT_RSI_MIN raised 25→40 today** — blocks RSI 25-40 losing bands (5T -$0.67 0%WR), preserves 40-45 sweet spot (8T 75%WR +$0.47). V5 test EXTENDED to Oct 3 (3T +$0.27 insufficient). DRIFT-001 fix live (bb_bounce 1m RSI filter) — eval 48h. Hotset exec-time RSI ceiling fix — eval 48h. **NEUTRAL signal still unbuilt** — re-delegated signal_analyst.
 
-- **24h:** 16T 62.5%WR +$1.10. volume-breakout-long+ 1T 100%WR +$0.94. doji-bottom-long 3T 100%WR +$0.12. pump-chain- SHORT 4T 50%WR -$0.31. 5 losers all small (<$0.20).
-- **7d:** 119T 46.2%WR -$1.21 (improving from -$1.67). EXTREME -$0.52 (67T, 52.2%WR), HIGH -$0.67 (24T), NORMAL -$0.02 (25T). Post-fix (Sep 28+): 61T 54.1%WR +$0.38. 0 ATR_SL hits.
-- **OPEN:** 1 position — MNT LONG bb-bounce-v2-long+,bb-bounce-v3-long+.
-- **LONG:** volume-breakout-long+ (+$2.48/14d, 70%WR — BEST, EXTREME+RSI60-80 DNA), pump-chain+ (+$1.23/14d, 41.8%WR), doji-bottom-long (+$0.36/14d, 63.6%WR — HIGH specialist).
-- **SHORT:** pump-chain- SHORT ACTIVE (52T/14d 51.9%WR breakeven, RSI_MIN=25 working). pullback-entry- NEVER_REENABLE, mover- NEVER_REENABLE.
-- **V5 TEST (ends Oct 1):** 3T since Sep 29: DOT +$0.23, BLUR +$0.21, LDO -$0.17 = net +$0.27. All EXTREME, all hard_sl. **EVAL CRITERIA: KEEP if 7d net>0 AND WR>=50%; KILL if net negative. Do NOT extend without data.**
+- **24h:** 13T 46.2%WR +$0.05. pump-chain- SHORT 5T 40%WR -$0.28. pump-chain-v5 3T +$0.27 (2W 1L, all hard_sl hyperliquid). bb-bounce-v2-long+ 1T flat. Exit reasons: hard_sl 8T -$0.01 (breakeven), profit-monster-trail 2T +$0.08.
+- **7d:** 114T 44.7%WR -$1.78. ALL NEUTRAL (112/114). LONG +$0.16 (64T), SHORT -$1.94 (50T). Hotset rs-s*/rs-r* 37T -$1.02. volume-breakout-long+ 2T +$1.02 100%WR (best). doji-bottom-long 6T +$0.27 66.7%WR.
+- **OPEN:** 3 positions — ALL hyperliquid SHORT pump-chain- (JUP/HBAR/ALGO). Cluster risk flagged by auto_1hr.
+- **PUMP_CHAIN_SHORT_RSI_MIN=40** (CEO Oct 1, was 25). 14d bands: 25-30=2T 0%WR -$0.17, 35-40=3T 0%WR -$0.50 (blocked). 40-45=8T 75%WR +$0.47 (preserved). 50-55=19T 52.6%WR +$0.01. Monitor 48h — if still <50%WR at 20+ trades, raise to 45.
+- **V5 TEST EXTENDED to Oct 3.** 3T +$0.27 since Sep 29. All hard_sl hyperliquid (cluster). Too few trades to judge.
 - **LONG_NEUTRAL_BLOCK_ENABLED=True** — blocks LONG entries when 4h regime is NEUTRAL. Bypass: 2+ signal types or 1m LONG_BIAS.
 - **TIME_BLOCK:** 00-09 UTC. 0.7x penalty.
 - **PUMP_CHAIN_LONG_DEAD_HOURS: [] — DISABLED 2026-09-30** (entry quality filters instead of time blocks). Was [1,2,3,4,7,18,21].
 - **KILLED/REGIME BLOCKED:** pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
 - **CONF_FILTER_MIN=70.** (FIXED Sep 30: 90→70 — MIN=90 blocked ALL signals, 67/hour, 0 passed. 89.8 bucket only 11T — not enough to justify.)
-- **Disk:** 85% (18G free). candles.db 2.2G, coin_tracker.db 3.1G.
+- **Disk:** 86% (17G free). candles.db 2.2G, coin_tracker.db 3.1G.
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
 - **ATR_SL:** MIN 1.3%, MAX 2.0% (widened Sep 28, was 1.8%). EXTREME regime: MIN 1.5% (Sep 27), 1.2x multiplier. **VERIFIED WORKING** — Post-fix: 4/4 trades winners (all profit-monster-trail), 0 ATR_SL hits. 7d overall: 46.4% (52/112) — PASS (<55%). EXTREME legacy 64.4% aging out. TP_PCT_FALLBACK=6.0% (3:1 R:R).
 - **🟢 signal_rsi_14 NULL DRIFT — FIXED:** 28-day drift. Root cause: decider_run.py:4283 `sig.get('rsi_14')` but signals store RSI as `rsi` key. Fix: `sig.get('rsi') or sig.get('rsi_14')` applied Sep 28. Unlocks proper RSI floor/ceiling enforcement for STANDALONE_BYPASS signals. Expected +$0.30-0.80/7d.
+- **🟢 DRIFT-001 FIX LIVE (Oct 1 01:47):** bb_bounce_v2_long.py + bb_bounce_v3_long.py now filter on rsi_1m (was 15m-only). Pipeline restarted. Eval 48h.
 - **SHORT_RSI_FLOOR=40:** **HARD BLOCK.** Blocks SHORT entries where live or detection-time RSI < 40. Exec-time check added Sep 30 06:30 (decider_run.py:1764).
 - **SHORT_RSI_CEILING=65:** **HARD BLOCK.** Unlocks profitable RSI 65-70 band. Exec-time check added Sep 30 06:30.
 - **LONG_RSI_FLOOR=20:** **HARD BLOCK.** Blocks LONG entries where RSI < 20. Exec-time check added Sep 30 06:30.
@@ -508,11 +508,11 @@ Key events: RSI timeframe fixed (candles_5m→1m). exit_conditions recording fix
 
 ## Next Actions
 
-1. **ATR_SL widening eval: DONE.** 118T 7d, 49.2% hit rate (58/118) — PASS (<55%). Post-fix: 0/15 ATR_SL hits. All exits profit-monster-trail. — 2026-09-28
-2. **REGIME_CONF_HIGH_MULT=0.50 eval:** ALL trades NEUTRAL (117/118 7d). Cannot evaluate. Wait for EXTREME/HIGH trades. — 2026-09-28
-3. **pump-chain+ V5 KILLED.** 20%WR -$1.26/7d. PUMP_CHAIN_V5_ENABLED=False, NEVER_REENABLE_FLAGS. — 2026-09-28
-4. **DISK: 84% (19G free).** candles.db 2.2G, coin_tracker.db 3.1G. Monitor growth. — 2026-09-27
-5. **DEVELOP: New signals for NEUTRAL regime.** Only volume-breakout-long+ and r2_trend_long profitable. Need diversity. — 2026-09-16
-6. **INVESTIGATE: decider_run failures.** STALE — 0 errors in 24h logs. All rc=0. — 2026-09-28
-7. **CLEANUP: PULLBACK_ENTRY_SHORT_HIGH_BLOCK DONE.** Removed dead flag (defined but never used). — 2026-09-28
-8. **MONITOR: volume_spike fix.** WORKING — 13/16 post-fix trades have values (81%). 3 missing from rs-s*/continuum_engine paths. Auto_1hr 14d query is stale (includes pre-fix trades). — 2026-09-28
+1. **MONITOR: PUMP_CHAIN_SHORT_RSI_MIN=40 eval 48h** (raised from 25 today). If pump-chain- SHORT WR still <50% at 20+ trades, raise to 45. Target: >55%WR. — 2026-10-01
+2. **MONITOR: DRIFT-001 fix (bb_bounce 1m RSI filter).** Live since 01:47 UTC pipeline restart. Eval 48h. — 2026-10-01
+3. **MONITOR: Hotset exec-time RSI ceiling fix** (deployed Sep 30 06:30). rs-s* 37T -$1.02/7d. Eval 48h. — 2026-10-01
+4. **MONITOR: V5 test extended to Oct 3.** 3T +$0.27 so far. All hard_sl hyperliquid (cluster). Eval Oct 3. — 2026-10-01
+5. **DEVELOP: NEUTRAL signal.** Re-delegated to signal_analyst. Still unbuilt. volume-breakout-long+ and doji-bottom-long carry system. — 2026-10-01
+6. **CLUSTER RISK: 3/3 open = hyperliquid SHORT pump-chain-.** If HYPE dumps, all 3 hit SL (~-$0.50). auto_1hr flagged. No action — position_manager handles. — 2026-10-01
+7. **DISK: 86% (17G free).** candles.db 2.2G, coin_tracker.db 3.1G. Monitor growth. — 2026-10-01
+8. **WATCHLIST conf boosts (approaching thresholds):** vol-breakout EXTREME RSI 60-80 @20T (7T now, 100%WR +$2.03). doji-bottom HIGH @20T (7T, 85.7%WR +$0.67). pump-chain- RSI 40-45 golden band @15T (7T, 86%WR +$0.47). — 2026-10-01
