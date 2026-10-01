@@ -3626,3 +3626,10 @@
   pump-chain- SHORT still worst 24h signal — watch only.
   0 CHANGES APPLIED.
   BY: auto_1hr
+
+- [2026-10-01 01:12 UTC] auto_1hr: NO CONFIG CHANGE
+  1T last hour (BABY pump-chain- SHORT hard_sl -$0.17). 24h: 13T 6W +$0.96, atr_sl_hit 0% (fix stable).
+  Kill rule not met (1T < 3T/hr threshold; pump-chain- SHORT 24h 40%WR not 0%). Not overtrading.
+  Regime EXTREME — no size action. SIDWAYS: 3/4 open positions are pump-chain- SHORT (JUP/HBAR/ALGO) — watch cluster.
+  0 CHANGES APPLIED.
+  BY: auto_1hr

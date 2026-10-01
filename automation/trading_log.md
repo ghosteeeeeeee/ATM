@@ -1231,3 +1231,25 @@ BY: auto_1hr
 - V5 test 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3
 
 BY: auto_1hr
+
+## [2026-10-01 01:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.17 (WR: 0%) — BABY pump-chain- SHORT hard_sl (-$0.17 / -154.41% pct on $11.10 size)
+24h: 13T, 6 wins, +$0.96 net (hard_sl 8T avg -$0.001 | atr_sl_hit 0T | HARD_SL_FAILED +$0.94 | profit-trail +$0.07 | MAE-GUARD -$0.02 | 2 flat)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0/13 (0%) 24h — ATR fix (tpsl_utils.py:546) stable, no CEO alert
+- Kill rule not met: 1T last hour, rule needs 3T + 0% WR in last hour. pump-chain- SHORT 24h 5T 2W -$0.28 (40% WR, not 0%)
+- 24h net +$0.96 — no regime size reduction. 3 consecutive tiny negative hours ($0, -$0.17, -$0.17) but regime is EXTREME not NEUTRAL
+- 1/hr — not overtrading
+- Entry quality OK: BABY hard SL exit clean (entry 0.0136, SL 0.013777, exit 0.013810) — SL working as designed, not a blown stop
+
+**Open Questions / Sideways:**
+- **pump-chain- SHORT cluster:** 3 of 4 open positions are pump-chain- SHORT (JUP -$0.02, HBAR +$0.11, ALGO -$0.01) — all $11.10 size. Signal still firing on worst-24h performer. Watch: if any 2 more hard_sl losses close as a cluster, escalate to CEO for regime gate review (auto-kill rule is per-hour, won't catch multi-hour bleed)
+- volume-breakout-long+ COMP +$0.94 closed via HARD_SL_FAILED (SL failed and trade won) — odd exit path, not a loss; don't over-index
+- V5 test 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3
+
+BY: auto_1hr
