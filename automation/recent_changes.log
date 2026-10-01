@@ -3684,3 +3684,11 @@ DRIFT-001 open (bb-bounce rsi_1m NULL), DRIFT-002 residual (5 LONG RSI>70 leaks 
   ACCEL_300_MINUS_ENABLED True->False. 4T 0%WR -$0.31 last hour (CFX/WCT/TURBO/ENS all hard_max_loss SHORT RSI 25-38).
   24h: 7T 3W -$0.28. Hourly kill rule (0%WR with 3+T in last hour). DRIFT-003 path bypass noted.
   LONG side already dead (ACCEL_300_PLUS_ENABLED=False). Audit: data/signal_versions.json accel-300- v1.
+
+2026-10-01 12:12 UTC auto_1hr: NO CONFIG CHANGE
+1T closed (WLFI accel-300- residual -$0.06). 0 opens, 0 open positions.
+Kill rules not met (no 3+T 0%WR signal). Kills from 10:18/11:12 holding.
+atr_sl_hit 0% 24h. 6 consecutive negative hours; regime HIGH not NEUTRAL.
+pump-chain- 11T -$0.57 24h worst but 0T this hour — CEO decision if full family off.
+  0 CHANGES APPLIED.
+  BY: auto_1hr

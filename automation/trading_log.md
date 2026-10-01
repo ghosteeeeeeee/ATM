@@ -1546,3 +1546,37 @@ BY: auto_1hr
 - signal_version.py still missing — logged via data/signal_versions.json directly
 
 BY: auto_1hr
+
+## [2026-10-01 12:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) | 0 open
+**PnL:** -$0.06 (WR: 0.0%)
+**Trades detail:**
+- WLFI accel-300- SHORT hard_max_loss_-0.52% (-$0.06) — opened 10:12, closed 11:28 (residual from before 11:12 kill)
+
+**Diagnosis:**
+- **Entry quality:** N/A this hour — 1 residual trade only. Kills working: 0 new opens after accel-300- kill (11:12) and pump-chain-v5 kill (10:18).
+- **SL behavior:** atr_sl_hit 0% of 24h closes — tpsl fix stable, no CEO alert. hard_max_loss family still dominant bleed (~13T/24h across levels, ~-$1.0).
+- **Signal quality:** No signal had 3+T this hour → hourly kill rule not met. pump-chain- remains worst 24h: 11T 36.4%WR -$0.57 (all pre-kill window closes; last close 10:04). bb-bounce-v3-long+ 2T 0%WR -$0.12 (< 3T threshold).
+- **Frequency:** 0 opened / 1 closed << 20T/hr — not overtrading. System fully flat.
+- **Consecutive negative hours:** 06:00 through 11:00 all negative (6 hours). Vol regime HIGH (CFX/ENS/TURBO/WCT), not NEUTRAL — size-cut rule not prescribed.
+
+**Changes:** None — 0 CHANGES APPLIED.
+
+**No Change Needed:**
+- atr_sl_hit 0% — no CEO alert
+- Kill rule: no signal with 0%WR + 3+T last hour
+- Overtrading: 0T opened
+- Position size: regime HIGH not NEUTRAL
+- pump-chain-: 0T this hour, cannot auto-kill; master PUMP_FLOW_ENABLED=True also gates v5_short (still live) — CEO decision if wants full pump-chain family off
+- accel-300- / pump-chain-v5: already killed, residual only
+
+**Open Questions:**
+- 6 consecutive negative hours + MARKDOWN/HIGH vol — LONG-heavy system in capital outflow. CEO: reduce LONG exposure / boost SHORT, or wait for phase flip?
+- pump-chain- 11T 3W -$0.57/24h still worst — needs 3T/hr 0%WR window or explicit T decision. PUMP_CHAIN_SHORT_RSI_MIN=40 already verified working (golden band preserved).
+- hard_max_loss family ~13T/24h — entries too wide or size too large for regime; not an atr_sl issue
+- SHORT structural R:R ~0.78:1 persists (brain_auditor 10:39)
+- bb-bounce rsi_1m metadata NULL (open since 07:37)
+- signal_version.py still missing — no constants change this hour so N/A; still needed for future kills
+
+BY: auto_1hr
