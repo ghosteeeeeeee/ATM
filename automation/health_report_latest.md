@@ -1,31 +1,34 @@
 === Health Report ===
-Time: 2026-10-01 01:48 UTC
+Time: 2026-10-01 15:48 UTC
 
 PIPELINE: OK
-- Status: running (last cycle 01:45:34, all steps rc=0)
-- Signals (1h): 60 generated
-- Trades: 3 open (JUP/HBAR/ALGO SHORT pump-chain), 1 closed today (MNT LONG win +0.0129 USDT)
-- Errors: 0 real (Traceback/CRASH none in last 30m)
-- Hotset: empty — no signals survived compaction; decider skipped (no signal >50% conf)
+- Status: running (active since 15:46:02, triggered by hermes-pipeline.timer)
+- Cycle health: 191 rc=0 steps in 30min; 0 Traceback/CRASH/FATAL
+- Signals (1h): 107 generated | 30m: 62
+- Decider: hotset EMPTY — no signals survived compaction (none ≥50% conf)
+- Trades: 2 open (ETH LONG -0.19%, BTC LONG +0.32%), 21 closed today (7W / 33.3% WR / -0.84 USDT)
+- Errors: 0 real pipeline errors (1 false-positive "CRASH" line = BTC-CRASH-OVERRIDE informational)
 
 MARKET:
-- Regime: LONG_BIAS — 3 LONG / 0 SHORT / 113 NEUTRAL (116 scanned)
+- Regime: NEUTRAL — 1 LONG_BIAS (ACE) / 1 SHORT_BIAS (AERO) / 114 NEUTRAL (116 scanned)
 - Speed: 53.1% tokens >= 50th percentile (128/241)
 
 SYSTEM:
-- Timers: core hermes-pipeline/price-collector/signal-compactor/watchdog/hl-sync all active
-- Disk: 86% used — WARN (DBs, not logs)
-- Prices: 86 tokens, updated 54s ago — fresh
-- Services: hermes-pipeline + hermes-hl-sync-guardian active
-- Load: 5.69 / 5.01 / 4.74 (elevated but pipeline completing)
+- Services: hermes-pipeline active; hermes-hl-sync-guardian active (15h)
+- Timers: hermes-pipeline.timer active (every 1min); core hermes timers firing (watchdog, signal-compactor, price-collector, coin-tracker, regime scanners)
+- Disk: 86% used — WARN (DB growth, not logs)
+- Prices: 86 tokens, updated 55s ago — fresh
+- token_speeds: 241 tokens, 88 stale (36.5%)
+- Kill switch: LIVE enabled (hermes_constants + /var/www/hermes/data/hype_live_trading.json)
+- Load: 7.96 / 6.94 / 6.54 (elevated; pipeline still completing)
 
 AUTO-FIXES APPLIED:
-- journalctl vacuum (freed 0B)
-- candles.db WAL checkpoint attempted (busy — DB under active use)
-- scanned for idle large logs >7d / >1h — none safe to gzip
+- None this cycle — pipeline healthy, timers firing, prices fresh, no logs >7d to gzip, no crash/restart warranted
 
 ALERTS:
-- Disk 86% — main consumers are SQLite DBs (~9.3G+ across 5 files). No auto-vacuum applied (destructive). Needs CEO decision: archive/prune coin_tracker, candles, mtf_macd_tuner, session_brain history.
-- Regime check timers OnBootSec-only (not OnCalendar) — won't fire until reboot.
-- hermes-atr-sl-updater.timer missing.
-- decisions table last write 2026-04-13 — likely dead path post-signal_compactor migration.
+- Disk 86% — consumers are SQLite DBs (~9.2G+). No safe auto-vacuum (destructive). Needs CEO decision: archive/prune coin_tracker, candles, mtf_macd_tuner, session_brain history.
+- Hotset EMPTY — 107 signals/hr generated, 0 approved by compactor. No new trades until signals clear. Market NEUTRAL.
+- hermes-wasp.service exit 1 every cycle — code-owner fix.
+- hermes-better-coder.service ModuleNotFoundError: dispatcher.dispatcher — code-owner fix.
+- hermes-price-collector intermittent candle-aggregation "database is locked" — latest run succeeded; lock path needs code-owner fix.
+- decisions table dead since 2026-04-13 — expected after signal_compactor migration.

@@ -11,3 +11,6 @@
 
 ## TEAM UPDATES
 - [2026-10-01 03:48] health_monitor: Auto-fixed position_manager crash loop — root cause was hl-sync-guardian.py acquiring guardian lock at module import time; position_manager's import of _compute_mfe_mae triggered SystemExit every trade close. Fixed by guarding lock behind __main__. Pipeline restarted, rc=0 verified. Also compressed old logs (disk was 86%).
+
+## TEAM UPDATES
+- [2026-10-01 15:48 UTC] health_monitor: NO AUTO-FIXES — pipeline OK (191 rc=0/30min, 0 tracebacks). 2 open (ETH LONG -0.19%, BTC LONG +0.32%), 21 closed today 33.3% WR -0.84 USDT. Hotset EMPTY (107 sig/hr, 0 ≥50% conf). Disk 86% WARN — DB growth, no logs >7d to gzip. Recurring: wasp exit1, better-coder ModuleNotFoundError, price-collector candle lock (latest run OK). CEO still needs DB pruning decision.
