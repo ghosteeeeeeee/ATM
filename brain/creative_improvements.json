@@ -1115,5 +1115,32 @@
     "category": "regime tuning",
     "status": "monitor — 6T HIGH sample too small. Re-eval at 20+ trades total.",
     "risk": "low — confidence adjust only"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "Re-enable neutral_sniper LONG-only for NEUTRAL regime coverage",
+    "rationale": "neutral_sniper.py exists, disabled Sep 12 per T. 1 trade +$0.06 100%WR. NEUTRAL is 99% of market. LONG_NEUTRAL_BLOCK blocks regular LONG in NEUTRAL but neutral_sniper is designed FOR NEUTRAL. T decision required.",
+    "expected_impact": "Unknown (1T sample) but addresses #1 diversity problem (8+ sessions).",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "Monitor pump-chain- RSI 65-70 band for SHORT ceiling adjustment",
+    "rationale": "RSI 65-70 = 7T 71.4%WR -$0.05/14d. High WR but net negative — wins smaller than losses. If holds at 15T, consider pump-chain- specific SHORT_RSI_CEILING 65→70.",
+    "expected_impact": "Unknown — 7T sample, noise level.",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "Confidence decay meta-filter: -10pt when signal 7d WR drops >20pts below 14d WR",
+    "rationale": "Session brain guitar-tuning concept. Catches decaying signals without hard-kill. Would have caught pump-chain+ cold streak (14d 41.8% vs 7d 20%).",
+    "expected_impact": "Theoretical — needs backtest.",
+    "category": "meta-filter",
+    "status": "research",
+    "risk": "medium"
   }
 ]
