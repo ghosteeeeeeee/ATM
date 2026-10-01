@@ -1850,3 +1850,54 @@ BY: upgrade_implementer
 - 2 open BTC LONGs both healthy — no stuck positions
 
 BY: auto_1hr
+
+## [2026-10-01 18:45 UTC] Daily Orchestrator — Verify + Reconcile
+
+**Session:** Phase 0-5 pipeline. Gathered intelligence → analyzed → verified → reconciled bugs → documented.
+
+### Intelligence Gathered
+- CURRENT.md (13:51), health monitor, auto-1hr (18:11), signal_reporter (17:18), upgrade_audit, blacklist log (complete), pipeline logs, PG trade data, bugs.json, signal_compactor logs, systemd timers
+
+### Verified (upgrade_implementer 18:15 changes LIVE)
+1. **SHORT-CONTINUUM filter firing correctly** — logs show WLD/ALT/TRX/BTC/PUMP SHORT blocked (BTC score=92-98, z=POS, not STRONG_NEG). Plan continuum-filter-analysis.md implemented. LONG untouched.
+2. **OSCILLATOR_MULT_ENABLED=True** — constants verified
+3. **DOJI_BOTTOM_ENABLED=True** — flag decoupled from DOJI_TOP, constants verified
+4. **REGIME_SIGNALS EXTREME cleanup** — pump-chain- removed from volatility_gate.py + volatility_gate_v2.py
+5. **py_compile OK** on signal_compactor.py, volatility_gate*.py, doji_bottom.py, signals/__init__.py
+
+### bugs.json Reconciliation (4 stale FIXED corrected)
+| Bug | Was | Now | Verification |
+|-----|-----|-----|--------------|
+| BUG-001 MACD histogram | OPEN CRITICAL | FIXED | Runtime test: hist=line-sig confirmed in coin_tracker_score.py |
+| BUG-011 PG conn leak | OPEN MEDIUM | FIXED | Static: _get_token_wr/_get_open_tokens have try/finally + conn.close() |
+| BUG-020 PRESERVE zombie | OPEN HIGH | FIXED | Code: 30min age guard + entry_origin_ts as created_at + get_approved_signals includes created_at |
+| BUG-021 chop hyphen | OPEN HIGH | FIXED | Test: 14/14 hyphen variants classify correctly; overrides added |
+
+11 bugs remain OPEN (coin_tracker/backfill cluster — not trading-path).
+
+### Pipeline Status (PG live)
+- **Open:** 1 — BTC LONG continuum-osc+ (entry $84229, opened 13:49)
+- **24h:** 31 closed, 11W, WR 35.5%, PnL -$1.11
+- **7d:** 112 closed, 53W, WR 47.3%, PnL -$0.09. LONG +$1.15 (63T), SHORT -$1.24 (49T)
+- **24h losers:** pump-chain- SHORT 9T -$0.63 (EXTREME, fixed 18:15), accel-300- 8T -$0.34 (killed 10:50), pump-chain-v5 6T -$0.17 (killed 10:18)
+- **Hotset:** empty — signal starvation (NEUTRAL signal unbuilt)
+
+### Changes Applied
+1. **bugs.json** — 4 statuses OPEN→FIXED with verification notes + orchestrator_note
+2. **CURRENT.md** — full refresh (18:45 UTC), monitor list updated, orchestrator report section added
+
+### Not Done (by design)
+- 0 config changes — monitor windows active (SHORT-CONTINUUM 30min, SHORT_RSI_HARD_FLOOR 7h, pump-chain- RSI_MIN, V5/accel kills aging)
+- NEUTRAL signal — delegated signal_analyst, not orchestrator's build
+- Disk prune — needs CEO call, do NOT VACUUM during trading
+- bollinger_squeeze re-enable — research PASS but live historically 0%WR, CEO call
+- pump_chain_v5_short generation RSI filter — spam not money-losing, gates hold, fix later if worsens
+- Dead signal_gen imports — orphan files not in 73-entry registry, backlog
+
+### Quality Metrics
+- Tasks completed: 2 (verify + reconcile)
+- First-attempt success: 100%
+- Critical issues found: 0 new (4 stale statuses corrected)
+- Config changes: 0 (correct — monitor windows)
+
+BY: daily-orchestrator

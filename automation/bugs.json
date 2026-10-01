@@ -4,19 +4,20 @@
       "id": "BUG-001",
       "title": "MACD histogram returns macd_line instead of macd_line - signal_line",
       "severity": "CRITICAL",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "coin_tracker_score.py"
       ],
       "symptom": "All macd_hist values in coin_tracker.db are wrong \u2014 equal to macd_line, not the actual histogram",
       "root_cause": "macd() at line 64 returns (macd_line, None, macd_line) \u2014 third element should be macd_line - signal_line, but signal_line is never computed",
-      "fix": "Compute signal line as EMA of macd_line over `signal` period, then return (macd_line, signal_line, macd_line - signal_line)",
-      "verified_by": "code review",
+      "fix": "macd() in coin_tracker_score.py now computes signal_line as EMA of macd_series and returns (macd_line, signal_line, macd_line-signal_line). Test: hist == line - sig confirmed.",
+      "verified_by": "daily-orchestrator runtime test",
       "date_found": "2026-08-12",
-      "date_fixed": null,
+      "date_fixed": "2026-10-01",
       "found_by": "agent",
       "git_commit": null,
-      "related_bugs": []
+      "related_bugs": [],
+      "orchestrator_note": "Previously OPEN (OPEN). Re-verified fixed 2026-10-01 by daily-orchestrator."
     },
     {
       "id": "BUG-002",
@@ -190,19 +191,20 @@
       "id": "BUG-011",
       "title": "signal_compactor.py: PostgreSQL connections may leak on exception in _get_token_wr",
       "severity": "MEDIUM",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "scripts/signal_compactor.py"
       ],
       "symptom": "PostgreSQL connections opened at lines 51-52 and 89-90 may not close on exception",
       "root_cause": "_get_token_wr (line 50-75) and _get_open_tokens (line 87-97) open psycopg2 connections but only call cur.close(); conn.close() in the happy path. If an exception occurs between open and close, the connection leaks.",
-      "fix": "Wrap in try/finally to ensure conn.close() is always called",
-      "verified_by": "code review",
+      "fix": "_get_token_wr and _get_open_tokens in signal_compactor.py now use conn=None + try/finally with conn.close() in finally block.",
+      "verified_by": "daily-orchestrator static analysis",
       "date_found": "2026-08-12",
-      "date_fixed": null,
+      "date_fixed": "2026-10-01",
       "found_by": "agent",
       "git_commit": null,
-      "related_bugs": []
+      "related_bugs": [],
+      "orchestrator_note": "Previously OPEN (OPEN). Re-verified fixed 2026-10-01 by daily-orchestrator."
     },
     {
       "id": "BUG-012",
@@ -360,56 +362,58 @@
     },
     {
       "id": "BUG-020",
-      "title": "PRESERVE-APPROVED-UPSERT creates zombie loop — stale signals survive indefinitely via created_at=CURRENT_TIMESTAMP",
+      "title": "PRESERVE-APPROVED-UPSERT creates zombie loop \u2014 stale signals survive indefinitely via created_at=CURRENT_TIMESTAMP",
       "severity": "HIGH",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "scripts/signal_compactor.py",
         "scripts/decider_run.py",
         "scripts/signal_schema.py"
       ],
-      "symptom": "Preserved hotset entries get APPROVED rows with created_at=CURRENT_TIMESTAMP, refreshing their age. The compactor's 10-minute query picks them up again, creating an infinite cycle: DB→hotset→preserve→UPSERT→DB. Signals like ema300-dip can maintain perpetual hotset slots, accumulating survival_rounds (observed up to 108) while the two staleness checks in decider_run.py are dead code because get_approved_signals() does not return created_at or entry_origin_ts.",
-      "root_cause": "Three interacting bugs: (1) PRESERVE-APPROVED-UPSERT (signal_compactor.py:2267-2285) writes APPROVED rows with CURRENT_TIMESTAMP, refreshing the signal's age to 'just now'. (2) get_approved_signals() (signal_schema.py:2645-2683) SQL SELECT does not include created_at or entry_origin_ts, so decider_run.py:2728 (V2 staleness check) and decider_run.py:3045 (accel staleness check) are dead code — sig.get('created_at') always returns None. (3) entry_origin_ts resets to time.time() (signal_compactor.py:1813) when a preserved entry drops and a new PENDING signal fires, restarting the staleness clock.",
-      "fix": "Two-pronged: (1) Add created_at to get_approved_signals() SQL SELECT so staleness checks in decider_run.py are no longer dead code. (2) Add maximum age guard to PRESERVE-APPROVED-UPSERT: if preserved entry's entry_origin_ts is >30 minutes old, don't write the APPROVED row — let it expire naturally.",
-      "verified_by": "Bug hunter audit: SQL queries confirmed no ema300-dip signal was ever APPROVED in DB (all EXPIRED/SKIPPED), yet ICP LONG trades were executed with ema300-dip source. signal_schema.py SELECT confirmed created_at not returned. decider_run.py confirmed sig.get('created_at') always None. signal_compactor.py confirmed CURRENT_TIMESTAMP in INSERT. DB confirmed survival_rounds up to 108 with hot_cycle_count=0.",
+      "symptom": "Preserved hotset entries get APPROVED rows with created_at=CURRENT_TIMESTAMP, refreshing their age. The compactor's 10-minute query picks them up again, creating an infinite cycle: DB\u2192hotset\u2192preserve\u2192UPSERT\u2192DB. Signals like ema300-dip can maintain perpetual hotset slots, accumulating survival_rounds (observed up to 108) while the two staleness checks in decider_run.py are dead code because get_approved_signals() does not return created_at or entry_origin_ts.",
+      "root_cause": "Three interacting bugs: (1) PRESERVE-APPROVED-UPSERT (signal_compactor.py:2267-2285) writes APPROVED rows with CURRENT_TIMESTAMP, refreshing the signal's age to 'just now'. (2) get_approved_signals() (signal_schema.py:2645-2683) SQL SELECT does not include created_at or entry_origin_ts, so decider_run.py:2728 (V2 staleness check) and decider_run.py:3045 (accel staleness check) are dead code \u2014 sig.get('created_at') always returns None. (3) entry_origin_ts resets to time.time() (signal_compactor.py:1813) when a preserved entry drops and a new PENDING signal fires, restarting the staleness clock.",
+      "fix": "PRESERVE-APPROVED-UPSERT has 30-min age guard ([PRESERVE-APPROVED-AGE-BLOCK]) and INSERT uses original entry_origin_ts as created_at instead of CURRENT_TIMESTAMP. get_approved_signals() SELECT includes created_at (FIX 2026-09-04).",
+      "verified_by": "daily-orchestrator code inspection + get_approved_signals SQL",
       "date_found": "2026-09-04",
-      "date_fixed": null,
+      "date_fixed": "2026-10-01",
       "found_by": "agent",
       "git_commit": null,
       "related_bugs": [
         "BUG-014"
-      ]
+      ],
+      "orchestrator_note": "Previously OPEN (OPEN). Re-verified fixed 2026-10-01 by daily-orchestrator."
     },
     {
       "id": "BUG-021",
-      "title": "Chain-data parsing in _classify_signal doesn't normalize hyphens to underscores — 11 MEAN_REVERSION signals misclassified as MOMENTUM",
+      "title": "Chain-data parsing in _classify_signal doesn't normalize hyphens to underscores \u2014 11 MEAN_REVERSION signals misclassified as MOMENTUM",
       "severity": "HIGH",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "scripts/chop_detector.py"
       ],
       "symptom": "When _classify_signal receives hyphen-based source strings (from preserved entries), MEAN_REVERSION signals like bb-bounce-v2-long+, open-skies+, coil-spring+, neutral-sniper-long+, pullback-entry+, doji-top-short, doji-bottom-long, liq-hunt+, return-exhaustion-long+, range-reversion-long+ are classified as MOMENTUM and BLOCKED in CHOP. Verified: 11 of 16 source strings with hyphens return wrong classification.",
       "root_cause": "SIGNAL_OVERRIDES keys use underscores (bb_bounce_v2_long, open_skies, etc.) but source strings use hyphens (bb-bounce-v2-long+, open-skies+, etc.). The chain-data parsing strips ALL hyphens via .replace('-', '') producing unreadable strings (bbbouncev2long) that never match override keys. Missing normalization step: convert hyphens to underscores before checking.",
-      "fix": "In _classify_signal chain-data parsing (line 139-146): add p_normalized = p.replace('-', '_').replace('+', '') before checking against SIGNAL_OVERRIDES. Also add missing abbreviated entries: 'coil_spring': 'MEAN_REVERSION', 'liq_hunt': 'MEAN_REVERSION', 'liq_hunt_long': 'MEAN_REVERSION', 'liq_hunt_short': 'MEAN_REVERSION'.",
-      "verified_by": "Bug hunter classification test: 16 source strings tested, 11 returned wrong classification. DB signal_types (underscore-based) all pass correctly.",
+      "fix": "_classify_signal normalizes hyphens to underscores (p_normalized) before SIGNAL_OVERRIDES lookup. Missing overrides added: coil_spring, liq_hunt*, doji_bottom_long, neutral_sniper*, pullback_entry*, return_exhaustion_long, range_reversion_long. All tested hyphen variants classify correctly.",
+      "verified_by": "daily-orchestrator classification test (14 source strings)",
       "date_found": "2026-09-13",
-      "date_fixed": null,
+      "date_fixed": "2026-10-01",
       "found_by": "agent",
       "git_commit": null,
       "related_bugs": [
         "BUG-020"
-      ]
+      ],
+      "orchestrator_note": "Previously OPEN (OPEN). Re-verified fixed 2026-10-01 by daily-orchestrator."
     },
     {
       "id": "BUG-022",
-      "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES — defaults correctly by accident",
+      "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES \u2014 defaults correctly by accident",
       "severity": "LOW",
       "status": "OPEN",
       "files": [
         "scripts/chop_detector.py"
       ],
       "symptom": "ema300_dip and ema300_dip_short are in SIGNAL_OVERRIDES but ema300_dip_long is not. Classification defaults to MOMENTUM (correct) via the catch-all default, but this is accidental and inconsistent.",
-      "root_cause": "Omission during SIGNAL_OVERRIDES authoring — ema300_dip_long was never added despite ema300_dip_short being present.",
+      "root_cause": "Omission during SIGNAL_OVERRIDES authoring \u2014 ema300_dip_long was never added despite ema300_dip_short being present.",
       "fix": "Add 'ema300_dip_long': 'MOMENTUM' to SIGNAL_OVERRIDES.",
       "verified_by": "Bug hunter: confirmed ema300_dip_long not in dict, defaults correctly only because of line 160 default.",
       "date_found": "2026-09-13",
