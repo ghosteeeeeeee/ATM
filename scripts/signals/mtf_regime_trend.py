@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """MTF Regime Trend — Cross-timeframe regime alignment signal.
 
-Thesis: 4h regime + pullback entry = institutional trend following.
-Entry: 4h regime LONG_BIAS/SHORT_BIAS + price pullback + volume confirmation.
+Thesis: 4h regime + momentum entry = trend following with acceleration confirmation.
+Entry: 4h regime LONG_BIAS/SHORT_BIAS + momentum from recent low/high + not reversing + volume confirmation.
 Exits: Handled downstream by position_manager (ATR SL, PM Trail, etc.)
 
 Signal types:
-  - mtf_regime_trend_long  : LONG (4h LONG_BIAS + pullback)
-  - mtf_regime_trend_short : SHORT (4h SHORT_BIAS + bounce)
+  - mtf_regime_trend_long  : LONG (4h LONG_BIAS + upward momentum)
+  - mtf_regime_trend_short : SHORT (4h SHORT_BIAS + downward momentum)
 
 Family: Trend (pairs with Volume, Momentum for confluence)
 """
@@ -88,8 +88,11 @@ def _get_candles(token, table='candles_1m', limit=350):
             ) sub ORDER BY ts ASC
         """, (token.upper(), limit))
         rows = cur.fetchall()
-        return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
-                for r in rows]
+        # Skip corrupted rows (NULL OHLC) and coerce NULL volume — these crash
+        # EMA/momentum/accel math downstream (TypeError/ZeroDivisionError).
+        return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5] or 0.0}
+                for r in rows
+                if r[1] is not None and r[2] is not None and r[3] is not None and r[4] is not None]
     except Exception:
         return []
     finally:
@@ -151,6 +154,8 @@ def detect(token):
 
     closes = [c['close'] for c in candles]
     price = closes[-1]
+    if not price or price <= 0:
+        return None  # corrupted/zero price — never fire (SHORT momentum_pct would read 100%)
 
     # EMA300 filter
     ema300 = _compute_ema(closes, MTF_REGIME_TREND_EMA_PERIOD)
@@ -190,26 +195,27 @@ def detect(token):
     accel_lookback = 5  # last 5 minutes
     if len(candles) >= accel_lookback:
         recent_candles = candles[-accel_lookback:]
+        last_3_changes = []
+        for i in range(-3, 0):
+            prev_close = recent_candles[i-1]['close']
+            if not prev_close:
+                return None  # zero/None close — corrupted data, skip token
+            last_3_changes.append((recent_candles[i]['close'] - prev_close) / prev_close * 100)
+        avg_change = sum(last_3_changes) / len(last_3_changes)
         if direction == 'LONG':
             # For LONG: price should be rising, not falling
-            last_3_changes = [(recent_candles[i]['close'] - recent_candles[i-1]['close']) / recent_candles[i-1]['close'] * 100
-                            for i in range(-3, 0)]
-            avg_change = sum(last_3_changes) / len(last_3_changes)
             if avg_change < -0.05:  # price falling hard — not momentum
                 return None
         else:
             # For SHORT: price should be falling, not rising
-            last_3_changes = [(recent_candles[i]['close'] - recent_candles[i-1]['close']) / recent_candles[i-1]['close'] * 100
-                            for i in range(-3, 0)]
-            avg_change = sum(last_3_changes) / len(last_3_changes)
             if avg_change > 0.05:  # price rising hard — not momentum
                 return None
 
     # Volume check
-    volumes = [c['volume'] for c in candles[-20:]]
+    volumes = [(c['volume'] or 0.0) for c in candles[-20:]]
     if len(volumes) >= 20:
         vol_avg = sum(volumes) / len(volumes)
-        vol_now = candles[-1]['volume']
+        vol_now = candles[-1]['volume'] or 0.0
         if vol_avg > 0 and vol_now < vol_avg * MTF_REGIME_TREND_VOLUME_MIN:
             return None  # volume too low
 
@@ -277,8 +283,12 @@ def scan_signals():
         if get_cooldown(token, direction=direction):
             continue
 
-        # Detect signal
-        result = detect(token)
+        # Detect signal — isolate per-token failures (bad candle data must not kill the scan)
+        try:
+            result = detect(token)
+        except Exception as e:
+            _log(f"ERROR detect {token}: {e}")
+            continue
         if result is None:
             continue
 
