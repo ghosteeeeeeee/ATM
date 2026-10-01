@@ -77,3 +77,8 @@
 
 ## TEAM UPDATES
 - [2026-10-01 08:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (ZORA bb-bounce-v3-long+ LONG hard_max_loss -$0.11). 24h: 21T 10W 47.6%WR -$0.13. atr_sl_hit 0% (ATR fix stable). Kill rule not met (1T < 3T/hr, no 0%-WR signal with 3T). Not overtrading. 2 consecutive negative hours (06,07) — 05 was positive, watch 08:00. pump-chain- 9T/24h 44%WR -$0.40 watch only (0 trades this hour). 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-01 20:47] health_monitor: Auto-fixed disk pressure — journalctl vacuum freed 87.3MB (journal now 17M). Disk still 86% (WARN); bulk is DBs not logs (coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G). Needs retention plan, not log cleanup.
+- [2026-10-01 20:47] health_monitor: Pipeline OK — active, 0 errors, 70 signals/1h, 1 open BTC LONG in profit, regime LONG_BIAS, prices fresh. No restart applied.
+- [2026-10-01 20:47] health_monitor: Flagged 5 dead timers (hl-copy inactive since Aug 15; regime-24h-check, regime-transition-check, gate2-circuit-breaker, ma-cross-5m-tuner never fired). Owner confirmation needed before disable.

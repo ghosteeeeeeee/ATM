@@ -285,3 +285,8 @@
 - **INFO**: `hermes-atr-sl-updater.timer` still not-found (known ghost; ATR SL managed by guardian via DB).
 - **INFO**: Pipeline OK — active (1min timer), 192 rc=0 / 30min, **0 Tracebacks**. All core timers firing <1min (pipeline, price-collector, signal-compactor, hl-sync-guardian, watchdog). Prices fresh (prices.json 0.6min, 162/241 token_speeds <5min). Today (runtime DB): 23 closed, 9 wins (39.1% WR), **-0.73 USDT**. Kill switch LIVE enabled.
 - **AUTO-FIXES APPLIED**: coding-mcp stop+disable (crash loop); journalctl vacuum (0B freed, already clean). No pipeline restart needed.
+
+## Error Alerts — 2026-10-01 20:47 UTC
+- **WARN** (1x): disk usage 86% (threshold 85%). Top consumers: coin_tracker.db 3.3G, candles.db 2.3G, mtf_macd_tuner.db 1.3G. **AUTO-FIX**: journalctl vacuum freed 87.3MB; log gzip scan found nothing eligible. Recommend retention policy for large analytics DBs.
+- **WARN** (5x): inactive/never-fired timers — hermes-hl-copy.timer (last run Aug 15), hermes-regime-24h-check.timer, hermes-regime-transition-check.timer, hermes-gate2-circuit-breaker.timer, hermes-ma-cross-5m-tuner.timer. atr-sl-updater is known ghost. **AUTO-FIX**: none — need owner confirmation before disabling/re-enabling; hl-copy may be intentionally retired.
+- **INFO**: pipeline healthy — active, 0 Tracebacks/30m, 70 signals/1h, 1 open BTC LONG in profit. Regime LONG_BIAS. Prices fresh.
