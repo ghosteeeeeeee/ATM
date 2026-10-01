@@ -41,3 +41,30 @@ DB-verified: 36T 38.9%WR -$0.83 (24h) | 118T 45.8%WR -$0.35 (7d). LONG +$0.80/7d
 | hard_max_loss exits | ~20/24h | <5/24h | 48h (aging out) |
 | NEUTRAL signal built | 0 | 1 | 7d |
 | Disk | 87% | <85% | 7d |
+
+## CEO Decision — Tier 2 Simplification (2026-10-01)
+
+### Item 1: Collapse 5 Trend Multipliers → 1
+VERDICT: APPROVE
+Rationale: Audit proves catastrophic compounding — reg_mult × dir_bias_mult × continuum_mult × trend_filter_mult × alt_btc_div_mult produce ~85x score spread on identical confidence (0.035x worst vs 3.0x best). Overlapping trend checks starve valid signals without improving PnL (net negative). Collapse to one trend multiplier.
+
+### Item 2: Merge 4 Chop/Regime Systems → 1
+VERDICT: APPROVE
+Rationale: Vol regime applied three ways (vol_regime_mult, regime_conf_mult, short_normal_mult) plus BTC chop gate + chop detector — redundant gates that all block the same momentum trades. Single regime system reduces gate count and makes signal behavior predictable.
+
+### Item 3: Merge 6 Performance-History Systems → 1
+VERDICT: DEFER
+Rationale: Lower priority than Items 1–2 — performance-history systems are soft multipliers (less catastrophic than the trend multipliers' hard compounding). Defer until Items 1–2 land and we measure whether score variance drops.
+
+### Priority Order: [1, 2, defer 3]
+- Execute Item 1 first (biggest compounding conflict, clearest root cause)
+- Execute Item 2 second (regime starvation + BTC-CHOP-GATE already flagged as starving NEUTRAL diversity)
+- Item 3 deferred — revisit after Items 1–2 are verified in logs
+
+### Delegation
+- signal_analyst: backtest collapsed trend multiplier — confirm score distribution improves before enabling
+- bug_hunter: audit signal_compactor.py after each merge — no gate should lose hard-block capability that was protecting money
+- self_learner: update signal_regime_memory.json after chop/regime merge — snapshot winning params per signal per regime
+
+### Protected flags — untouched
+CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS — all preserved.

@@ -1132,7 +1132,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     score = confidence
             × survival_bonus   (1 + cr*0.15, only if cr>0 AND age_m<5)
             × staleness_mult  max(0, 1.0 - age_m*0.1)  → 0 at 10min (CEO: was 5min, too aggressive)
-            × reg_mult        (+50% aligned / -50% counter-regime / -50% NEUTRAL or no-data)
+            × trend_alignment_mult  (consolidated 2026-10-01 — was reg_mult + continuum_mult + trend_filter_mult + dir_bias_mult + alt_btc_div_mult)
             × source_mult     (from _get_source_weight)
             × speed_mult      (+15% if speed_percentile >= 80)
     """
@@ -1386,20 +1386,38 @@ def _score_signal(token, direction, conf, source, signal_type,
     # At age=1min → mult=0.8 (20% penalty still alive)
     staleness_mult = max(0.0, 1.0 - (age_m * 0.1))  # CEO: 10min decay (was 5min) — give signals time to execute
 
-    # Regime multiplier: +50% aligned, -50% counter-regime, -50% neutral
-    # No regime data at all → 0.5x floor
-    reg_mult = 1.0
-    if regime_conf > 0:
-        if (regime == 'LONG_BIAS' and direction == 'LONG') or \
-           (regime == 'SHORT_BIAS' and direction == 'SHORT'):
-            reg_mult = 1.50
-        elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-             (regime == 'SHORT_BIAS' and direction == 'LONG'):
-            reg_mult = 0.50
-        elif regime == 'NEUTRAL':
-            reg_mult = 0.50
-    else:
-        reg_mult = 0.50
+    # ── Trend Alignment Multiplier (consolidated 2026-10-01) ──────────────────
+    # Replaces: reg_mult, continuum_mult, dir_bias_mult, trend_filter_mult, alt_btc_div_mult
+    # Single authority: continuum engine (most granular), fallback to 4h regime
+    # CEO approved: collapse 5 trend multipliers into 1 to reduce 85x score spread
+    trend_alignment_mult = 1.0
+    try:
+        # Primary: continuum engine (BTC structural trend)
+        from continuum_context import get_btc_trend_context
+        _ctx = get_btc_trend_context()
+        if _ctx and _ctx.get('available'):
+            _score = _ctx.get('score', 50)
+            _bias = _ctx.get('trend_bias', 0)
+
+            # Strong bullish: score > 70, bias > 0.3
+            if _score > 70 and _bias > 0.3:
+                trend_alignment_mult = 1.4 if direction == 'LONG' else 0.6
+                log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
+            # Strong bearish: score < 30, bias < -0.3
+            elif _score < 30 and _bias < -0.3:
+                trend_alignment_mult = 1.4 if direction == 'SHORT' else 0.6
+                log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
+            # Neutral/mixed: fallback to 4h regime
+            else:
+                if regime_conf > 0:
+                    if (regime == 'LONG_BIAS' and direction == 'LONG') or \
+                       (regime == 'SHORT_BIAS' and direction == 'SHORT'):
+                        trend_alignment_mult = 1.2
+                    elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+                         (regime == 'SHORT_BIAS' and direction == 'LONG'):
+                        trend_alignment_mult = 0.7
+    except Exception:
+        trend_alignment_mult = 1.0
 
     # Source weight multiplier
     source_mult = _get_source_weight(signal_type, source)
@@ -1472,109 +1490,8 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Tide detection: BTC 3h momentum + SHORT WR confirmation
     tide_mult = get_tide_penalty(token, direction)
 
-    # ── CONTINUUM AUTHORITY (2026-09-21) ─────────────────────────────────────
-    # The continuum oscillator is the PRIMARY structural indicator.
-    # When it says DECLINING → SHORT gets priority, LONG gets penalized
-    # When it says RALLYING → LONG gets priority, SHORT gets penalized
-    # When it says CALM → use other indicators as before
-    continuum_mult = 1.0
-    try:
-        import os as _cont_os
-        _cont_db = _cont_os.path.join(HERMES_DATA, 'continuum.db')
-        _cont_conn = None
-        try:
-            _cont_conn = sqlite3.connect(_cont_db, timeout=3)
-            _cont_row = _cont_conn.execute(
-                "SELECT market_phase, state_score, linreg_direction, ema300_position "
-                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-            ).fetchone()
-        finally:
-            if _cont_conn:
-                try: _cont_conn.close()
-                except: pass
-
-        if _cont_row:
-            _phase, _score, _linreg, _ema = _cont_row[0], _cont_row[1], _cont_row[2], _cont_row[3]
-            _score_val = float(_score) if _score else 50
-
-            # Bearish structure: ALL THREE must agree (phase + linreg + EMA)
-            # FIX 2026-09-24: phase-only check was triggering false bearish when linreg=LEAN_BULL+ema=ABOVE
-            _bearish = (_phase in ('DECLINING', 'CALM', 'RECOVERY') and
-                        _linreg in ('LEAN_BEAR', 'BEAR') and
-                        _ema == 'BELOW')
-            # Bullish structure: ALL THREE must agree (phase + linreg + EMA)
-            # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
-            _bullish = (_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
-                        _linreg in ('LEAN_BULL', 'BULL') and
-                        _ema == 'ABOVE')
-
-            if direction.upper() == 'SHORT' and _bearish:
-                # SHORT aligned with bearish structure — strong boost
-                continuum_mult = 1.5
-                log(f"  🌊 [CONTINUUM-AUTH] {token} SHORT: BTC {_phase} + {_linreg} + {_ema} → 1.5x boost")
-            elif direction.upper() == 'LONG' and _linreg in ('LEAN_BEAR', 'BEAR'):
-                # LONG against bearish linreg — heavy penalty (any phase/EMA)
-                # Data: ALL LONG signals 0% WR when linreg = LEAN_BEAR (regime-based-signal-fixes)
-                continuum_mult = 0.5
-                log(f"  🚫 [CONTINUUM-AUTH] {token} LONG: BTC linreg={_linreg} (any phase) → 0.5x penalty")
-            elif direction.upper() == 'LONG' and _bullish:
-                # LONG aligned with bullish structure — boost
-                continuum_mult = 1.5
-                log(f"  🌊 [CONTINUUM-AUTH] {token} LONG: BTC {_phase} + {_linreg} + {_ema} → 1.5x boost")
-            elif direction.upper() == 'SHORT' and _bullish:
-                # SHORT against bullish structure — penalty
-                continuum_mult = 0.5
-                log(f"  🚫 [CONTINUUM-AUTH] {token} SHORT: BTC {_phase} + {_linreg} + {_ema} → 0.5x penalty")
-            else:
-                # CALM or mixed — use existing trend boost
-                try:
-                    from continuum_context import get_trend_boost
-                    continuum_boost = get_trend_boost(direction)
-                    continuum_mult = 1.0 + continuum_boost
-                except Exception:
-                    continuum_mult = 1.0
-    except Exception:
-        continuum_mult = 1.0
-
-    # Universal trend filter: block counter-trend trades when EMA20/50 disagree
-    trend_filter_mult = 1.0
-    try:
-        from hermes_constants import TREND_FILTER_ENABLED, TREND_FILTER_TIMEFRAME, TREND_FILTER_EMA_FAST, TREND_FILTER_EMA_SLOW, TREND_FILTER_NEUTRAL_PCT
-        if TREND_FILTER_ENABLED:
-            import sqlite3 as _tf_sqlite
-            from paths import CANDLES_DB
-            _tf_conn = _tf_sqlite.connect(CANDLES_DB, timeout=5)
-            try:
-                _tf_cur = _tf_conn.cursor()
-                _tf_table = f'candles_{TREND_FILTER_TIMEFRAME}'
-                _tf_cur.execute(f"SELECT close FROM {_tf_table} WHERE token=? ORDER BY ts DESC LIMIT ?", (token, max(TREND_FILTER_EMA_FAST, TREND_FILTER_EMA_SLOW) + 10))
-                _tf_closes = [r[0] for r in _tf_cur.fetchall()]
-                _tf_cur.close()
-                if len(_tf_closes) >= TREND_FILTER_EMA_SLOW:
-                    # Reverse to oldest-first for correct EMA calculation
-                    _tf_closes_asc = list(reversed(_tf_closes))
-                    # Compute SMA-seeded EMAs (oldest → newest)
-                    _k_fast = 2 / (TREND_FILTER_EMA_FAST + 1)
-                    _k_slow = 2 / (TREND_FILTER_EMA_SLOW + 1)
-                    _ema_fast = sum(_tf_closes_asc[:TREND_FILTER_EMA_FAST]) / TREND_FILTER_EMA_FAST
-                    _ema_slow = sum(_tf_closes_asc[:TREND_FILTER_EMA_SLOW]) / TREND_FILTER_EMA_SLOW
-                    for _p in _tf_closes_asc[TREND_FILTER_EMA_FAST:]:
-                        _ema_fast = _p * _k_fast + _ema_fast * (1 - _k_fast)
-                    for _p in _tf_closes_asc[TREND_FILTER_EMA_SLOW:]:
-                        _ema_slow = _p * _k_slow + _ema_slow * (1 - _k_slow)
-                    _ema_spread = abs(_ema_fast - _ema_slow) / _ema_slow * 100 if _ema_slow > 0 else 0
-                    _trend_bull = _ema_fast > _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
-                    _trend_bear = _ema_fast < _ema_slow and _ema_spread > TREND_FILTER_NEUTRAL_PCT
-                    if direction == 'LONG' and _trend_bear:
-                        trend_filter_mult = 0.7  # counter-trend penalty
-                        log(f"  📉 [TREND-FILTER] {token} LONG: EMA20={_ema_fast:.2f} < EMA50={_ema_slow:.2f} bearish → {trend_filter_mult:.2f}x")
-                    elif direction == 'SHORT' and _trend_bull:
-                        trend_filter_mult = 0.7
-                        log(f"  📈 [TREND-FILTER] {token} SHORT: EMA20={_ema_fast:.2f} > EMA50={_ema_slow:.2f} bullish → {trend_filter_mult:.2f}x")
-            finally:
-                _tf_conn.close()
-    except Exception:
-        pass
+    # continuum_mult REMOVED 2026-10-01 — consolidated into trend_alignment_mult
+    # trend_filter_mult REMOVED 2026-10-01 — consolidated into trend_alignment_mult
 
     # Surfing.md quadrant filter: z-score + acceleration alignment
     zscore_accel_mult = get_zscore_accel_penalty(token, direction)
@@ -1782,74 +1699,8 @@ def _score_signal(token, direction, conf, source, signal_type,
     except Exception as e:
         log(f"  [WARN] RR engine failed (fail-open): {e}", 'WARN')
 
-    # ── Directional Bias (Regime Transition Smoothing Layer 2) ──────────────
-    # Use BTC momentum_state to boost pro-trend / penalize counter-trend signals.
-    dir_bias_mult = 1.0
-    from hermes_constants import (
-        DIRECTIONAL_BIAS_ENABLED, DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY,
-        DIRECTIONAL_BIAS_PRO_TREND_BOOST,
-    )
-    if DIRECTIONAL_BIAS_ENABLED:
-        _bias_conn = None
-        try:
-            _bias_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-            _bias_row = _bias_conn.execute(
-                "SELECT momentum_state FROM momentum_cache WHERE token='BTC'"
-            ).fetchone()
-            if _bias_row and _bias_row[0]:
-                _btc_mom = _bias_row[0]
-                if _btc_mom in ('strong_long', 'strong_short', 'bullish', 'bearish'):
-                    _is_pro_trend = (
-                        (_btc_mom in ('strong_long', 'bullish') and direction == 'LONG') or
-                        (_btc_mom in ('strong_short', 'bearish') and direction == 'SHORT')
-                    )
-                    _is_counter_trend = (
-                        (_btc_mom in ('strong_long', 'bullish') and direction == 'SHORT') or
-                        (_btc_mom in ('strong_short', 'bearish') and direction == 'LONG')
-                    )
-                    if _is_counter_trend:
-                        dir_bias_mult = DIRECTIONAL_BIAS_COUNTER_TREND_PENALTY
-                        log(f"  🧭 [DIR-BIAS] {token} {direction}: counter-trend to BTC {_btc_mom} → {dir_bias_mult:.2f}x")
-                    elif _is_pro_trend:
-                        dir_bias_mult = DIRECTIONAL_BIAS_PRO_TREND_BOOST
-        except Exception:
-            pass
-        finally:
-            if _bias_conn:
-                try:
-                    _bias_conn.close()
-                except Exception:
-                    pass
-
-    # ── Alt-BTC Divergence (Regime Transition Smoothing Layer 4) ────────────
-    # Block LONG when alt is falling but BTC is flat/rising (divergent bearish).
-    alt_btc_div_mult = 1.0
-    from hermes_constants import (
-        ALT_BTC_DIVERGENCE_ENABLED, ALT_BTC_DIVERGENCE_THRESHOLD,
-        ALT_BTC_DIVERGENCE_BTC_MIN, ALT_BTC_DIVERGENCE_LONG_PENALTY,
-    )
-    if ALT_BTC_DIVERGENCE_ENABLED and direction == 'LONG':
-        _div_conn = None
-        try:
-            _alt_chg = speed_data.get('price_change_30m', 0.0) or 0.0
-            _div_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-            _div_row = _div_conn.execute(
-                "SELECT velocity FROM momentum_cache WHERE token='BTC'"
-            ).fetchone()
-            if _div_row and _div_row[0] is not None:
-                # momentum_cache.velocity for BTC = 30m price change (same as token_speeds.price_change_30m)
-                _btc_chg = _div_row[0]
-                if _alt_chg < ALT_BTC_DIVERGENCE_THRESHOLD and _btc_chg > ALT_BTC_DIVERGENCE_BTC_MIN:
-                    alt_btc_div_mult = ALT_BTC_DIVERGENCE_LONG_PENALTY
-                    log(f"  📉 [ALT-BTC-DIV] {token}: alt30m={_alt_chg:+.3f}% BTC30m={_btc_chg:+.3f}% → {alt_btc_div_mult:.2f}x")
-        except Exception:
-            pass
-        finally:
-            if _div_conn:
-                try:
-                    _div_conn.close()
-                except Exception:
-                    pass
+    # dir_bias_mult REMOVED 2026-10-01 — consolidated into trend_alignment_mult
+    # alt_btc_div_mult REMOVED 2026-10-01 — consolidated into trend_alignment_mult
 
     # ── Volatility Regime Adaptive: boost momentum in expansion, mean-rev in compression ──
     # Different vol regimes favor different signal families.
@@ -2032,7 +1883,9 @@ def _score_signal(token, direction, conf, source, signal_type,
     except ImportError:
         pass
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * continuum_mult * trend_filter_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * dir_bias_mult * alt_btc_div_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult
+    # 2026-10-01: 5 trend multipliers consolidated into 1 (trend_alignment_mult)
+    # Removed: reg_mult, continuum_mult, trend_filter_mult, dir_bias_mult, alt_btc_div_mult
+    final_score = score * survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult
     return final_score
 
 
