@@ -4167,3 +4167,23 @@ TVS_COOLDOWN_OVERRIDE_WINDOW = 14400  # 4 hours (seconds)
 TVS_SETUP_IMPROVEMENT_THRESHOLD = 2   # min improvements needed to override cooldown
 TVS_LOOKBACK_TRADES = 5               # last N trades to check thesis history
 TVS_MIN_CONFIDENCE_FOR_OVERRIDE = 80  # min signal confidence to allow cooldown override
+
+# ── MTF Regime Trend Signal ───────────────────────────────────────────────────
+# Cross-timeframe regime alignment signal.
+# Thesis: 4h regime + pullback entry = institutional trend following.
+# Spec: plans/mtf-regime-trend-signal-spec.md
+MTF_REGIME_TREND_ENABLED = True
+MTF_REGIME_TREND_PLUS_ENABLED = True
+MTF_REGIME_TREND_MINUS_ENABLED = True
+
+MTF_REGIME_TREND_SLOPE_THRESHOLD = 0.5    # min 4h slope % for trend confirmation
+MTF_REGIME_TREND_PULLBACK_PCT = 0.1       # min 1m pullback % from recent high/low (lowered from 0.2)
+MTF_REGIME_TREND_VOLUME_MIN = 0.2         # min volume vs 20-bar average (lowered from 1.0 — market is quiet)
+MTF_REGIME_TREND_EMA_PERIOD = 300         # EMA period for macro trend
+MTF_REGIME_TREND_ATR_PERIOD = 14          # ATR period for stops/trails
+MTF_REGIME_TREND_COOLDOWN_MINUTES = 30    # cooldown between signals per token
+
+MTF_REGIME_TREND_CONF_BASE = 70           # base confidence
+MTF_REGIME_TREND_CONF_CAP = 95            # max confidence
+MTF_REGIME_TREND_SLOPE_BONUS_MAX = 20     # max bonus from slope
+MTF_REGIME_TREND_PULLBACK_BONUS_MAX = 10  # max bonus from pullback quality

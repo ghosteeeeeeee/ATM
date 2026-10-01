@@ -430,6 +430,11 @@ try:
 except Exception:
     _trend_ignition_run = None
 
+try:
+    from signals.mtf_regime_trend import run as _mtf_regime_trend_run
+except Exception:
+    _mtf_regime_trend_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -510,6 +515,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'rr_structural_v2_long',    'enabled': 'RR_STRUCTURAL_V2_LONG_ENABLED', 'run': _rr_structural_v2_long_run},
     {'name': 'wall_street_cycle',        'enabled': 'WALL_ST_CYCLE_ENABLED',     'run': _wall_street_cycle_run},
     {'name': 'trend_ignition',            'enabled': 'TREND_IGNITION_ENABLED',    'run': _trend_ignition_run},
+    {'name': 'mtf_regime_trend',          'enabled': 'MTF_REGIME_TREND_ENABLED',  'run': _mtf_regime_trend_run},
 ]
 
 
