@@ -268,15 +268,12 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
-FAVORITES_LONG = {
-
-}
+FAVORITES_LONG = set()
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
 }
 # Legacy combined set for backwards compatibility
-# set() wrap: empty FAVORITES_LONG is {} (dict), not set — dict|set crashes Python
-FAVORITES = set(FAVORITES_LONG) | set(FAVORITES_SHORT)
+FAVORITES = FAVORITES_LONG | FAVORITES_SHORT
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
 FAVORITES_SIZE_MULT = 1.5     # Position size multiplier in decider_run ($11 → $16.50)
@@ -855,6 +852,11 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
 SHORT_RSI_FLOOR = 40           # LOWERED 50→40 (CEO 2026-09-29). 14d: RSI 45-55 SHORT = 26T 69.2%WR +$1.07 (BEST BAND). RSI <40 SHORT = 72T 27.8%WR -$5.34 (losers). Floor at 40 allows the 69% WR sweet spot while blocking deep oversold.
 SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
+# Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:
+# STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
+# and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
+# -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
+SHORT_RSI_HARD_FLOOR = 25      # brain_auditor 2026-10-01 — hard block, NO bearish override. Applied in decider_run.py detection + execution gates.
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
 # When SHORT_RSI_FLOOR is 40, RSI <40 is blocked. Extra guard for extreme oversold.

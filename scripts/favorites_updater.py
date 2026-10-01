@@ -249,8 +249,8 @@ def update_constants_file(new_favorites):
                 lines.append(f"    '{token}'{comma}")
             new_assign = "FAVORITES_LONG = {\n" + '\n'.join(lines) + "\n}"
 
-        # Replace only the FAVORITES_LONG assignment — matches both {} and set() forms
-        pattern = r"FAVORITES_LONG = \{.*?\n\}|FAVORITES_LONG = set\(\)"
+        # Replace only the FAVORITES_LONG assignment — matches {}, set(), and multi-line {} forms
+        pattern = r"FAVORITES_LONG = \{\}|FAVORITES_LONG = \{.*?\n\}|FAVORITES_LONG = set\(\)"
         new_content = re.sub(pattern, lambda m: new_assign, content, flags=re.MULTILINE | re.DOTALL)
 
         if new_content == content:
