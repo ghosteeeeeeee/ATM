@@ -165,3 +165,34 @@
 
 ## Error Alerts — 2026-10-01 05:58 UTC
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-01 06:46 UTC
+- **CRITICAL** (recovered): Pipeline import crash 06:00–06:32 — `hermes_constants.py:278 FAVORITES = FAVORITES_LONG | FAVORITES_SHORT` TypeError `dict | set` (empty `FAVORITES_LONG = {}` is a dict). run_pipeline died at import every minute.
+  - **STATUS**: Fixed already (commit `158e5d68` 06:35:40): `FAVORITES = set(FAVORITES_LONG) | set(FAVORITES_SHORT)`. position_manager rc=0 since 06:32. No further action.
+  - **SIDE FINDING**: `FAVORITES_LONG` is empty `{}` — favorites_updater may have wiped long favorites. Check `favorites_updater` output before next session.
+- **WARN** (disk 85%): `/` 95G/118G used, 17G free. No logs >7d to gzip. Prior alerts note DB bulk (coin_tracker 3.3G, candles 2.3G+WAL 1.5G). No auto-fix applied — needs CEO decision on vacuum/retention.
+- **WARN** (hotset empty): 47 signals/1h, 499 today, but 0 approved above 50% confidence — "no signals survived compaction", hotset.json empty, fallback DB query 0 tokens. Not a crash; signal-quality/filter review.
+- **WARN** (token_speeds stale): 103/241 rows flagged `is_stale=1`. Last update 06:45:27 (fresh timestamps, but many marked stale).
+- **WARN** (inactive timers): `hermes-hl-copy.timer` last run 2026-08-15 (1.5mo); `hermes-ma-cross-5m-tuner.timer` never ran; `hermes-regime-24h-check.timer` / `hermes-regime-transition-check.timer` show no last-run. Not trading-critical if intentional.
+- **INFO**: Pipeline + hl-sync-guardian ACTIVE. Regime NEUTRAL (115/116). 0 open / 5 closed today (pnl -0.05). No phantom trades. 128/241 tokens ≥50th pct speed. Timers: 56 active hermes-*.
+
+## Error Alerts — 2026-10-01 06:58 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   signal_analyst: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK signal_analyst: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   breakout_engine: TOK in N.5s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK breakout_engine: TOK (most recent call last):`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS signals_runner: TOK — unsupported operand type(s) for |: 'dict' and 'set'`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   hermes-trades-api: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   strategy_optimizer: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK strategy_optimizer: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   ab_optimizer: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK ab_optimizer: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: signal_analyst, breakout_engine, decider_run, position_manager, hermes-trades-api, strategy_optimizer, ab_optimizer`
+- **REPEATED** (352x): `Oct N N:N:N python3[TOK]: TOK (most recent call last):`
+- **REPEATED** (352x): `Oct N N:N:N python3[TOK]: TypeError: unsupported operand type(s) for |: 'dict' and 'set'`
+- **REPEATED** (352x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
+- **REPEATED** (352x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`
