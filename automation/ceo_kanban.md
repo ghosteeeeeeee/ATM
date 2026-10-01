@@ -85,3 +85,6 @@
 
 ## TEAM UPDATES
 - [2026-10-01 21:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T closed (BTC continuum-osc+ LONG HL_CLOSED +$0.16/+72%). 24h: 32T 11W 34.4%WR -$1.11; atr_sl_hit 0% (ATR fix stable). No kill candidates, not overtrading, no negative-hour streak. Double-BTC exposure resolved (osc+ closed; only continuum_engine open, amount_usdt=0.00 — possible phantom open, data-path check next hour). 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-01 22:48 UTC] health_monitor: Pipeline OK — active, 0 errors/Tracebacks in 30min, 54 signals/1h, 1 open SUSHI LONG, regime NEUTRAL, prices fresh (58s). No restart applied. Disk 86% WARN — journal vacuum freed 0B; DB-pruning decision still open (coin_tracker 3.3G, candles 2.3G). Hotset EMPTY — 54 signals generated, 0 approved by compactor gate. 7 non-critical services failed (ceo timeout, git-release backup exit 1, trading-checklist hotset symptom). Today: 23 closed, 39.1% WR, -0.73 USDT.
