@@ -1277,7 +1277,7 @@ PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers
 
 # pump-chain- SHORT entry quality (replaced dead hours)
 PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
-PUMP_CHAIN_SHORT_RSI_MIN = 25         # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
+PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI bands: 25-30=2T 0%WR -$0.17, 35-40=3T 0%WR -$0.50 (both losing). 40-45=8T 75%WR +$0.47 (SWEET SPOT preserved). Blocks confirmed losers, keeps edge. Was 25 (brain_auditor Sep 30).
 
 # pullback-entry- SHORT entry quality (replaced dead hours)
 PULLBACK_ENTRY_SHORT_DEAD_HOURS = []  # DISABLED 2026-09-30 — use entry quality filters instead

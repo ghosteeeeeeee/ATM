@@ -150,3 +150,17 @@ System was bleeding from pre-fix legacy losses (ATR_SL tight, RSI filters broken
 
 ### Verification
 11T 54.5%WR +$1.13 (24h) — DB-verified. 4 open positions healthy. Pipeline active. Regime memory fresh (updated today). Next evals: V5 Oct 1, doji-bottom at 20+ trades, SHORT R:R recovery tracking.
+
+## CEO Report — 2026-10-01 02:00 UTC
+
+### Diagnosis
+24h: 13T 46.2%WR +$0.05 (recovering). 7d: 114T 44.7%WR -$1.78. LONG +$0.16 (64T, R:R 1.09:1) is profitable. SHORT -$1.94 (50T, R:R 0.59:1) bleeds — needs >63%WR to break even at current win/loss ratios. pump-chain- SHORT 38T 50%WR -$0.56/7d is the volume leader but structurally disadvantaged. Hotset rs-s*/rs-r* 37T -$1.02/7d — small individual losses, RSI scattered 21-82.
+
+### Root Cause
+pump-chain- SHORT fires in RSI 25-40 bands that are 0%WR (5T -$0.67 combined 14d). Sweet spot is RSI 40-45 (8T 75%WR +$0.47). SHORT avg_loss $0.186 vs avg_win $0.110 — structural R:R problem worsened by oversold entries.
+
+### Fix Applied
+**PUMP_CHAIN_SHORT_RSI_MIN 25→40.** Blocks losing bands, preserves 40-45 edge. Expected +$0.10-0.20/7d. V5 test extended to Oct 3 (3T +$0.27 too few). DRIFT-001 fix live (pipeline restarted 01:47) — eval 48h. Hotset exec-time RSI ceiling fix — eval 48h. Re-delegated NEUTRAL signal to signal_analyst.
+
+### Verification
+Pending — param change needs pipeline restart to load. Monitor pump-chain- SHORT WR over next 48h. Target: >55%WR (from 50%). If still <50% at 20+ trades, raise MIN to 45.
