@@ -3732,3 +3732,17 @@ SHORT MFE GAP (creative): pump-chain- hard_sl winners capture median ~40% of MFE
 CREATIVE (4): (1) SHORT MFE realization gap backtest (2) ENTRY_RR backtest 0.95/1.25/2.0 (3) CARRIED vol-breakout EXTREME conf boost awaiting CEO/T (4) REJECTED time-blocks/blanket-kills.
 0 CHANGES APPLIED — monitor windows active (SHORT-CONTINUUM, HARD_FLOOR, RSI_MIN=40, V5/accel aging).
 BY: brain_auditor
+
+2026-10-01 23:36 UTC brain_auditor: NO CONFIG CHANGE - audit
+DB-verified: 30T 40.0%WR -$0.78 (24h) | 115T 47.0%WR +$0.15 (7d) | LONG +$1.31/7d, SHORT -$1.16/7d
+0 closes since last audit 22:34. 2 OPEN: SUSHI doji-bottom-long (HIGH, -$0.01) + BTC continuum_engine LONG
+LOSING AUTOPSY: 18 losers — ALL legacy pre-kill/pre-block (accel-300- 8T, pump-chain-v5 6T, pump-chain- 4T EXTREME pre-18:15). No new cluster.
+FILTERS VERIFIED: ATR_SL 0/97 post-widening PASS | SHORT-CONTINUUM 0 SHORT since 18:15 | pump-chain- EXTREME block 0 opens since 18:15 | bb-bounce rsi_1m live
+DRIFT-002 OPEN day4: signal_rsi_14 334/334 NULL — escalate bug_hunter
+DRIFT-004 DOWNGRADED: ENTRY_RR_MIN_RATIO=2.0 in entry_gates.py is DEAD CODE — live path is risk_reward_engine regime mins (constants RR_ENGINE_MIN_RATIO_*)
+DRIFT-005: volume-breakout EXTREME 13T 76.9%WR +$2.63 REAL via volatility_regime (CEO 21:55 used entry_regime_4h=NULL wrong column) — CEO re-eval
+DRIFT-006: ALGO/CHIP exec RSI 24-25 were pre-EXTREME-block opens — EXTREME block covers. Exec-time RSI floor REJECTED (would kill $2 winners)
+CREATIVE (4): (1) VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 backtest-first (2T 0%WR 85+ band) (2) exec-RSI floor rejected (3) LONG 65-75 winning band for bypass signals — don't lower ceiling (4) vol-breakout EXTREME boost carried CEO re-eval
+0 CHANGES APPLIED — monitor windows active (SHORT-CONTINUUM, HARD_FLOOR, RSI_MIN=40, EXTREME block, V5/accel aging, bollinger_squeeze 48h, bb-bounce 1m)
+MONITOR: SUSHI doji, BTC continuum_engine, bollinger_squeeze first signals, pump-chain- NORMAL recovery 48h, bb-bounce-v3 at 3T, NEUTRAL signal Oct 3 deadline
+BY: brain_auditor

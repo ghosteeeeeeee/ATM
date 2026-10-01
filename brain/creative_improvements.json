@@ -1543,5 +1543,41 @@
     "category": "confidence tuning",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-01T23:36:35Z",
+    "idea": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85",
+    "rationale": "14d volume-breakout-long+ exec RSI bands: 85+ = 2T 0%WR -$0.32 (ONDO 86.42, WCT 86.67 — both atr_sl_hit EXTREME). 70-85 = 3T 100%WR +$0.52. Current ceiling 95 lets the exhausted 85-90 zone through. Ceiling 85 blocks both losers, 0 winners (84.63 winner stays).",
+    "expected_impact": "+$0.32/14d blocked losses, 0 winners killed. Tiny sample — needs 5+ more 85+ trades before live.",
+    "category": "entry sniper",
+    "status": "suggested_backtest_first",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T23:36:35Z",
+    "idea": "Do not add exec-time RSI floor for STANDALONE_BYPASS SHORT — EXTREME block already covers",
+    "rationale": "ALGO/CHIP entered at exec RSI 24-25 post RSI_MIN=40, but both were pre-EXTREME-block (opened 08:09/08:35, block live 18:15). 14d pump-chain- SHORT winners with entry_rsi<40 = 17T ~+$2.01. Exec floor would kill $2 of winners to prevent losses already blocked by EXTREME regime gate.",
+    "expected_impact": "Avoided negative change. SHORT-CONTINUUM + EXTREME block are the correct fixes.",
+    "category": "filter integrity",
+    "status": "rejected_exec_floor",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-01T23:36:35Z",
+    "idea": "LONG exec-RSI 65-75 is a WINNING band for STANDALONE_BYPASS momentum signals — do not lower LONG_RSI_CEILING",
+    "rationale": "7d LONG entry_rsi 65-75: 9T 77.8%WR +$0.56. Occupied by pump-chain-v5 (bypass), continuum-osc+, volume-breakout (own ceiling 95), doji, hotset. These signals skip or override blanket LONG_RSI_CEILING=70. 50-65 is the killing field (21T 28.6%WR) — mean-reversion bounce-fails, already filtered at detection by bb-bounce RSI_MAX=60.",
+    "expected_impact": "Prevents a harmful blanket ceiling change. Signal-specific ceilings already correct.",
+    "category": "entry sniper",
+    "status": "insight_documented",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-01T23:36:35Z",
+    "idea": "Carried: volume-breakout EXTREME conf boost — CEO re-eval with volatility_regime column",
+    "rationale": "EXTREME 13T 76.9%WR +$2.63 REAL via volatility_regime. entry_regime_4h is NULL (wrong column used in 21:55 rejection). At 14d sample threshold. Best signal in system.",
+    "expected_impact": "+$0.30-0.60/7d if conf boost applied at EXTREME",
+    "category": "confidence tuning",
+    "status": "suggested_ceo_reeval",
+    "risk": "low"
   }
 ]
