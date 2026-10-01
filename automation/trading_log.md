@@ -1580,3 +1580,55 @@ BY: auto_1hr
 - signal_version.py still missing — no constants change this hour so N/A; still needed for future kills
 
 BY: auto_1hr
+
+## [2026-10-01 13:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (ALGO pump-chain- SHORT entered 13:08, $11.10, entry 0.12730 SL 0.12780 TP 0.12419 — trailing SL active above entry, 5 min old)
+**24h:** 35T 13W 22L -$0.86 (37.1% WR) | **7d:** 118T 53W 65L -$0.60 (44.9% WR)
+
+**ATR SL:** 0/35 (0%) 24h ✅ | 4/118 (3.4%) 7d — fix rock solid
+**Exits 24h:** hard_sl 9T -$0.12 | profit-monster-trail 6T +$0.10 | hard_max_loss family 13T -$0.93 | trail_sl 2T +$0.09 | pump_exit_dead_money 2T +$0.10 | HL_CLOSED 2T -$0.01 | ORPHAN_PAPER 1T $0
+**Direction 24h:** LONG 14T 5W -$0.01 | SHORT 21T 8W -$0.85 (SHORT structural drag continues)
+**Hourly PnL:** 05 +$0.07 | 06 -$0.07 | 07 -$0.11 | 08 -$0.15 | 09 -$0.07 | 10 -$0.45 | 11 -$0.06 | 12 $0 (quiet) — 6 consecutive negative hours with trades (06-11), all small, avg -$0.077/hr
+
+**Kills already applied today (verified live):**
+- pump-chain-v5: PUMP_CHAIN_V5_ENABLED=False @ 10:18 — 3T 0W -$0.20 last-hour rule
+- accel-300-: ACCEL_300_MINUS_ENABLED=False @ 11:12 — 4T 0W -$0.31 last-hour rule
+- Both audited in data/signal_versions.json. Residual closes aging out.
+
+**Signal check 24h:**
+- pump-chain- SHORT: 11T 4W -$0.57 — worst active, but 0T last hour. RSI_MIN=40 verified working this cycle (blocked LINK RSI=22.9, IOTA RSI=38.7; JUP blocked HIGH vol). Not auto-killable.
+- bb-bounce-v3-long+: 2T 0W -$0.12 — under 3T threshold
+- accel-300-/pump-chain-v5: killed, residual only
+- doji-bottom-long 6T 4W +$0.27 7d — still best active signal
+
+**Diagnosis:**
+1. Entry quality: mfe/mae still NULL on most closes — adverse-excursion check blocked (carried sideways find). Recent winners show clean trail exits.
+2. SL behavior: atr_sl_hit 0% of 24h closes (0 over 48h+) — tpsl_utils.py ATR fix stable. NOT tight. hard_max_loss family 13T/24h is loss-cap working as designed (0W — capping bad entries), not SL logic bug. All hard_max_loss trades from signals now killed.
+3. Signal quality: no signal with 3+T at 0% WR last hour → no kill candidates. pump-chain- worst but 0T last hour + filters verified working.
+4. Trade frequency: 0/hr << 20 — not overtrading. 1 fresh open (ALGO) — not starved.
+5. avg_pnl: 6 consecutive negative hours (06-11) — trigger check: regime is NEUTRAL per signal_analyst macro gate but MARKDOWN per pump_flow (conf 0.4, alt flowing_in). Losses small/contained (-$0.46 total over 6h). Today's kills already removed the bleed sources. Not taking size-cut action — max 1 change/hr and no kill candidate to spend it on; size-cut rule says "consider" and losses are noise-level.
+
+**Changes:** None — 0 CHANGES APPLIED
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — no CEO alert
+- Kill rule: no signal with 0% WR and 3+ trades in last hour (0 trades closed)
+- Overtrading: 0T << 20T/hr
+- Position size: 6 negative hours but regime ambiguous (NEUTRAL/MARKDOWN) and bleed sources already killed; avg loss tiny ($0.077/hr). No change.
+- pump-chain-: RSI_MIN=40 + HIGH-vol block verified working live this cycle; not killable (0T/hr); leave
+- Today's kills (accel-300-, pump-chain-v5) confirmed deployed and holding
+
+**Open Questions / Sideways:**
+- **hard_max_loss exit family: 13T/7d 0W 100% lose rate** — working as designed (loss cap on bad entries), not a bug. All sources now killed. If a NEW signal starts producing hard_max_loss exits, that's the early-kill signal.
+- **SHORT direction 24h -$0.85** vs LONG -$0.01 — structural drag persists (brain_auditor 10:39 flagged 0.61-0.78:1 R:R). Needs tpsl_utils.py review, not a constants change.
+- **Regime disagreement:** signal_analyst=NEUTRAL, pump_flow=MARKDOWN. 6h bleed aligns with MARKDOWN. Worth a cross-check between regime systems — not this hour's change.
+- **ALGO pump-chain- SHORT** opened 13:08 via pump-chain path despite worst-24h status — filters let it through (RSI >= 40). If this loses AND another pump-chain- SHORT opens+closes as 0%WR, revisit.
+- ORPHAN_PAPER / paper pnl_pct noise still in PG — data hygiene, not trading logic.
+- hotset empty (0 tokens) — known, REGIME_CONF_HIGH_MULT in HIGH vol; execution path healthy via pump-chain (ALGO just opened).
+
+**KANBAN**
+## TEAM UPDATES
+- [2026-10-01 13:15] auto_1hr: NO CONFIG CHANGE — 0T closed last hour, 1 open (ALGO pump-chain- SHORT). 24h: 35T -$0.86 (37.1%WR). atr_sl_hit 0% (fix stable). No kill candidates (0T last hour). 6 small negative hours 06-11 (avg -$0.077/hr) but bleed sources (accel-300-, pump-chain-v5) already killed 10:18/11:12 and confirmed live. Not overtrading. pump-chain- filters (RSI_MIN=40, HIGH-vol block) verified working this cycle.
+
+BY: auto_1hr
