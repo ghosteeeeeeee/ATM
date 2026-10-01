@@ -1901,3 +1901,25 @@ BY: auto_1hr
 - Config changes: 0 (correct — monitor windows)
 
 BY: daily-orchestrator
+
+## [2026-10-01 19:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (WR: 100%) — ETH continuation+ LONG, profit-monster-trail
+
+**24h context:** 32 closed, ~11W. Exit reasons: profit-monster-trail 7T +$0.15 | hard_sl 4T -$0.45 | hard_max_loss_* family 12T ~-$1.03 | atr_sl_hit 0T. Worst signals: pump-chain- SHORT 9T -$0.63 (RSI_MIN fix deployed 18:15, monitor window), accel-300- 8T -$0.34 (killed 10:50, aging out), pump-chain-v5 6T -$0.17 (killed 10:18, aging out).
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0% of 24h closes. tpsl_utils.py fix IS deployed (ATR_SL widening + EXTREME VOL-GATE code verified in file; brain_auditor 14:34 confirmed working). hard_max_loss_* family (12T) is the hard max-loss cap, not ATR SL — different mechanism, no alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades in last hour. bb-bounce-v3-long+ is 0%WR but only 2T/24h and 0T last hour — below threshold. accel-300-/pump-chain-v5 already killed; their 24h losses are pre-kill opens aging out.
+- **PnL streak:** Last 3 hours with trades all positive (13:00 +$0.03, 17:00 +$0.09, 18:00 +$0.03). Negative-hour streak rule inactive.
+- **Trade frequency:** 1/hr, 2 open — not overtrading; system is signal-starved (hotset empty), not over-filtered this hour.
+- **Regime size rule:** Not triggered (no 3+ consecutive negative hours; trades positive).
+- **Recent changes untouched:** pump-chain- RSI_MIN (18:15), SHORT-CONTINUUM filter (upgrade_implementer) still in monitor windows — do not stack changes.
+
+**Open Questions:**
+- mfe_pct/mae_pct NULL on most profit-monster-trail exits — entry-quality (adverse excursion) can't be verified for trail winners. Data gap, not a trading bug. Worth a one-line fix in the exit-recording path if trail closes skip writing MFE/MAE.
+- hard_max_loss_* exits show MFE <0.21% with MAE ~0.3-0.5% — trades dying before developing. Pattern known from prior audits; monitor window active on hard-floor 25→30 proposal (brain_auditor). No stacked change.
