@@ -308,3 +308,11 @@
 ## Error Alerts — 2026-10-01 22:59 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-01 23:47 UTC
+- **WARN** (ongoing): Disk **86%** used (96G/118G, 16G free) — above 85% threshold. Top consumers: coin_tracker.db 3.3G, candles.db 2.3G, signals 96M, continuum 38M. No .log files >7d eligible to gzip. **CEO DB-pruning decision still open** — cannot safely auto-delete trade/price data.
+- **WARN** (repeating): Hotset EMPTY — **67 signals/hr** generated, **0 approved** (none clear compactor/confidence gate). Regime NEUTRAL (115 neutral / 2 long_bias). Not a code crash; gate working. decisions_1h=0.
+- **WARN** (1x this cycle): `hermes-price-collector` candle aggregation hit `database is locked` (candles_5m/15m/1h/4h) while `hermes-1m-candle` held candles.db. Collector still collected 86 prices and service completed. Concurrent DB access pattern — watch for recurring lock contention; not restartable as a "fix."
+- **WARN** (known): 7 failed non-critical services unchanged: better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs: hardcoded passwords, dead signal_gen imports), ceo (exit 124 timeout), git-release (exit 1), mtf-macd-tuner, trading-checklist (hotset-empty symptom), upgrade-implementer. Core trading path unaffected.
+- **INFO**: Pipeline OK — active, **0 Tracebacks/CRASH/FATAL in 30min**. Open: 1/6 SUSHI LONG (entry 0.26112, SL trail, pnl≈-0.16%). Today (runtime DB): **23 closed, 39.1% WR, -0.73 USDT**. Phantom atr_sl_hit <0.01%: 0. Prices fresh (candles_1m age ~60s; 86 prices collected; token_speeds max_updated 23:45:39Z). Speed: 124/241 ≥50th pct fresh, 99 stale. Core timers firing <1min (pipeline, signal-compactor, price-collector, watchdog, coin-tracker). hl-sync-guardian active.
+- **AUTO-FIXES APPLIED**: None required — pipeline healthy, no restart, timers firing, nothing safe to gzip. Disk + hotset + failed agent services are policy/investigation items, not auto-fixable.
