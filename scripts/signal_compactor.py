@@ -1206,8 +1206,9 @@ def _score_signal(token, direction, conf, source, signal_type,
                                 _p2, _l2, _e2 = _cont_row2[0], _cont_row2[1], _cont_row2[2]
                                 # Allow SHORT when BTC is DECLINING or bearish structure
                                 # FIX: also allow when linreg is BEAR/LEAN_BEAR (structural downtrend) or ema300 is BELOW
+                                # STORMY removed 2026-10-01 — audit found STORMY shorts lost at 30.8% WR (n=26, t=-2.40)
                                 if direction.upper() == 'SHORT' and (
-                                    _p2 in ('DECLINING', 'STORMY') or
+                                    _p2 == 'DECLINING' or
                                     (_p2 in ('CALM', 'RECOVERY') and _l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW') or
                                     (_l2 in ('LEAN_BEAR', 'BEAR') and _e2 == 'BELOW') or  # structural bear regardless of phase
                                     (_p2 == 'RANGING' and _l2 in ('LEAN_BEAR', 'BEAR'))  # ranging + bearish linreg
@@ -2562,7 +2563,27 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
-                    if not _btc_mom_ok_for_bypass:
+                    # Continuum score exception (2026-10-01): 60≤score<80 + mean-reversion only
+                    # Audit: n=102, 61.8% WR, +$3.96 (best bucket in dataset)
+                    _cont_score_ok = False
+                    try:
+                        from continuum_context import get_btc_trend_context
+                        _ctx = get_btc_trend_context()
+                        if _ctx and _ctx.get('available'):
+                            _score = _ctx.get('score', 50)
+                            _cont_score_ok = (60 <= _score < 80)
+                    except Exception:
+                        pass
+                    _is_mean_reversion = False
+                    try:
+                        from chop_detector import _classify_signal
+                        _sig_fam = _classify_signal(signal_type)
+                        _is_mean_reversion = (_sig_fam == 'MEAN_REVERSION')
+                    except Exception:
+                        pass
+                    if _cont_score_ok and _is_mean_reversion:
+                        log(f"  ✅ [LONG-NEUTRAL-CONTINUUM] {token} LONG — BTC score 60-80 + mean-reversion signal, allowed")
+                    elif not _btc_mom_ok_for_bypass:
                         log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
                     else:
                         log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
