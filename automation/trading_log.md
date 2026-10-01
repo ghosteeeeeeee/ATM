@@ -1704,3 +1704,38 @@ BY: auto_1hr
 - [2026-10-01 15:12] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (last close 13:00 ALGO pump-chain- SHORT +$0.03). 24h: 35T 13W -$0.86 (37.1% WR). atr_sl_hit 0% (tpsl fix stable). Kill rule empty (0T). Not overtrading. Max 1 change/hr unused correctly. mfe/mae now populated (entry-quality check unblocked). SIDeways: scripts/signal_version.py missing — audit trail for future constants changes will no-op until restored.
 
 BY: auto_1hr
+
+## 2026-10-01 16:12 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses) — last close 13:00 ALGO pump-chain- SHORT +$0.03
+**PnL:** $0.00 (WR: n/a). Open 2/6: BTC continuum-osc+ LONG 13:49 (+$0.12, SL/TP intact), ETH bb-bounce-v2-long+ LONG 15:30 (flat, new)
+**24h closed:** 34T 12W (35.3% WR) -$0.89 | atr_sl_hit 0/34 (0%) | hard_max_loss family 11T ~-$0.99
+
+**Diagnosis:**
+1. Entry quality: winners with MAE data show low adverse excursion (ALGO SHORT MAE 0.008%, LDO MAE 0.002%, AIXBT MAE 0.16%). Legacy losers MAE 0.3-1.4% — already killed / aging out. No new entry-quality bug.
+2. SL behavior: atr_sl_hit 0% < 40% (0 hits in 48h) — tpsl_utils ATR fix stable. Dominant closes = hard_max_loss family (loss caps on bad entries, working as designed) + hard_sl on EXTREME shorts.
+3. Signal quality: 0T closed last hour → kill rule (0% WR + 3T) empty. 24h worst: pump-chain- SHORT 9T 2W -$0.63 (regime-aligned SHORT_BIAS, filters active, monitor windows open); accel-300- 8T 3W -$0.34 and pump-chain-v5 8T 3W -$0.13 — both killed 10:18/11:12, aging out. bb-bounce-v3-long+ 2T 0W -$0.12 below 3T threshold.
+4. Trade frequency: 0T/hr << 20 — not overtrading. Hotset empty + 0 approved — known PRESERVE-EMPTY path, pipeline healthy (16:11 decider rc=0, PM 2 open/0 closed).
+5. avg_pnl streak: negative hours 06-11 broken at 13:00 (+$0.03); 14:00/15:00 closed 0 (not negative hours). Streak inactive. Regime 5m aggregate NEUTRAL (113/116) — size-cut rule requires 3+ consecutive negative hours, not met.
+
+**Changes:** None — 0 CHANGES APPLIED
+
+**No Change Needed:**
+- atr_sl_hit 0% < 40% — no CEO alert
+- Kill rule: 0 closes last hour
+- Overtrading: 0T
+- Position size: streak inactive; regime NEUTRAL alone insufficient
+- pump-chain- SHORT: no last-hour closes; 24h drag known, filters + monitor windows active
+- Max 1 change/hr unused correctly — no trigger this cycle
+
+**Open Questions / Sideways:**
+- **signal_version.py still MISSING** — SOP audit path no-ops on any future constants change. Restore or drop the SOP step. No constants change this hour so no impact yet.
+- pnl_pct scale noise on open trades (BTC +52.99% vs unrealized $0.12) — ORPHAN_PAPER family, data hygiene not trading logic.
+- hotset empty (0 tokens) + 5 pending — known, not this hour's change.
+- SHORT R:R structural drag + RSI bypass still with bug_hunter / tpsl review pending after monitor window.
+
+**KANBAN**
+## TEAM UPDATES
+- [2026-10-01 16:12] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (last close 13:00 ALGO pump-chain- SHORT +$0.03). Open 2/6 (BTC continuum-osc+ +$0.12, ETH bb-bounce-v2+ flat). 24h: 34T 12W -$0.89 (35.3% WR). atr_sl_hit 0% (tpsl fix stable, 0 hits/48h). Kill rule empty (0T). Not overtrading. Negative-hour streak broken 13:00 — size rule inactive. Regime NEUTRAL. Max 1 change/hr unused correctly. SIDeways: scripts/signal_version.py still missing.
+
+BY: auto_1hr
