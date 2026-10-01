@@ -311,6 +311,15 @@ def _classify_signal(signal_type: str) -> str:
     # Try market_phase_gate family lookup
     try:
         from market_phase_gate import signal_family
+        # Try original signal_type first — signal_family does its own suffix
+        # stripping + fallback to full name. Stripping here first breaks
+        # lookups: volume_breakout_short -> volume_breakout -> 'Other' -> MOMENTUM.
+        family = signal_family(signal_type)
+        if family in MOMENTUM_FAMILIES:
+            return 'MOMENTUM'
+        elif family in MEAN_REVERSION_FAMILIES:
+            return 'MEAN_REVERSION'
+        # Fall back to pre-stripped base
         family = signal_family(base)
         if family in MOMENTUM_FAMILIES:
             return 'MOMENTUM'

@@ -1309,17 +1309,23 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Detects chop via WR degradation + BTC flatness + FLAT vol regime.
     # Blocks momentum signals in chop (preserves their WR for next trend).
     # Allows mean-reversion signals (they thrive in chop).
+    # CEO 2026-10-01: STANDALONE_BYPASS signals skip chop detector — they have
+    # proven edge and are explicitly allowed to fire solo. Chop detector exists
+    # to protect momentum winrates; standalone bypass signals don't need that.
     from hermes_constants import CHOP_DETECTOR_ENABLED
     if CHOP_DETECTOR_ENABLED:
-        try:
-            from chop_detector import get_regime, should_trade_signal
-            _chop_regime = get_regime()
-            _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime, token=token)
-            if not _allowed:
-                log(f"  🌊 [CHOP] {token} {direction} {signal_type}: BLOCKED — {_chop_reason}")
-                return 0.0
-        except Exception as e:
-            log(f"  [WARN] Chop detector check failed: {e}", 'WARN')
+        _chop_sig_norm = signal_type.replace('-', '_').rstrip('_+-')
+        _chop_bypass_norm = {s.replace('-', '_').rstrip('_+-') for s in STANDALONE_BYPASS_SIGNALS}
+        if _chop_sig_norm not in _chop_bypass_norm:
+            try:
+                from chop_detector import get_regime, should_trade_signal
+                _chop_regime = get_regime()
+                _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime, token=token)
+                if not _allowed:
+                    log(f"  🌊 [CHOP] {token} {direction} {signal_type}: BLOCKED — {_chop_reason}")
+                    return 0.0
+            except Exception as e:
+                log(f"  [WARN] Chop detector check failed: {e}", 'WARN')
 
     # ── Time block: penalty during dead zone (03-07 UTC) ───
     from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_PENALTY, TIME_BLOCK_START, TIME_BLOCK_END
