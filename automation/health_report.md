@@ -1,28 +1,39 @@
-# Health Report — 2026-09-18 16:44 UTC
+=== Health Report ===
+Time: 2026-10-01 16:47 UTC
 
-## PIPELINE: OK
-- Status: running (last cycle 16:43:22)
-- Signals (1h): 18 active
-- Trades: 1 open (NOT), 0 closed today
-- Errors: 0 pipeline errors
+PIPELINE: OK
+- Status: running (last cycle 16:45:39, all steps rc=0)
+- Signals (1h): 54 generated
+- Trades: 2 open (BTC LONG, ETH LONG), 21 closed today
+- Today PnL: -$0.84 USDT | WR 33.3% (7W/21)
+- Errors: 0 real (grep hits were coin_tracker "0 errors")
 
-## MARKET
-- Regime: 3 LONG / 2 SHORT / 122 NEUTRAL
-- Speed: ~normal (93 coins tracked)
+MARKET:
+- Regime: 2 LONG_BIAS (ZRO, PUMP) / 0 SHORT / 114 NEUTRAL — overall NEUTRAL
+- Speed: 50.3% tokens >= 50th percentile (81/161)
+- Hotset: empty — 5 signals pending top-10, 0 survived compaction (confidence <50%)
 
-## SYSTEM
-- Timers: 30+ active, all firing on schedule
-- Disk: 85% (95G/118G) — at threshold
-- Data DBs: coin_tracker 2.2G, candles 1.9G, signals 765M
-- Logs: 145M total
+SYSTEM:
+- Timers: ~50+ hermes timers active and firing on schedule
+- Disk: 86% used (118G, 17G free) — WARN
+- Prices: fresh (token_speeds.updated_at = 16:46 UTC)
+- Guardian: active | Pipeline: active | Key timers (price-collector, 1m-candle, signal-compactor, trade-watchdog, watchdog): all active
+- Journal: vacuumed, freed 84MB
 
-## AUTO-FIXES APPLIED
-- [CRITICAL] Disabled hermes-coding-mcp.service — crash-looping 509K times (script missing)
-- Compressed old log files (no space recovered — data DBs dominate)
+DB DISK BREAKDOWN (growth root cause):
+- coin_tracker.db 3.3G
+- candles.db 2.3G (+961M WAL)
+- mtf_macd_tuner.db 1.3G
+- signals_hermes.db 893M
+- session_brain.db 835M
 
-## ALERTS
-- [CRITICAL] hermes-coding-mcp.service crash-looping 509K+ restarts — script run_mcp_server.py missing. DISABLED.
-- [WARN] 9 services in failed state (defunct scripts/modules): 5m-candle, away-detector, better-coder, bug-hunter, git-release, mtf-macd-tuner, session-brain-rebuild, trading-checklist, upgrade-implementer
-- [WARN] momentum_cache stale 528h (22 days) — momentum filters may be degraded
-- [WARN] Disk at 85% — at threshold, data DBs are main consumers
-- [INFO] pullback-entry- signal 20% WR (5 trades, -$0.60) — underperformer
+AUTO-FIXES APPLIED:
+- journalctl --vacuum-size=50M → freed 84MB archived journals
+- systemctl daemon-reload → cleared stale hermes-atr-sl-updater.timer ghost reference (unit file does not exist; ATR SL managed locally by guardian via DB — not a functional gap)
+
+ALERTS:
+- WARN: Disk 86% — DB growth not logs (no .log files >7d). Needs CEO pruning decision for coin_tracker.db / candles.db / mtf_macd_tuner.db. Recurring since 2026-10-01 15:48.
+- WARN: hermes-atr-sl-updater.timer unit file missing (not-found). Inert ghost entry — SL/TP path healthy via guardian. Delete stale reference or recreate unit if local ATR updater desired.
+- INFO: Hotset empty — signal starvation continues (54 sig/hr raw, 0 pass confidence gate). Same as 15:48 report.
+- INFO: 53/241 token_speeds is_stale=1 but updated_at fresh — flag means "no recent price move", not data staleness.
+- INFO: Today red day (-$0.84, 33.3% WR) — within normal variance, no kill triggers.

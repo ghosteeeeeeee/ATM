@@ -14,3 +14,4 @@
 
 ## TEAM UPDATES
 - [2026-10-01 15:48 UTC] health_monitor: NO AUTO-FIXES — pipeline OK (191 rc=0/30min, 0 tracebacks). 2 open (ETH LONG -0.19%, BTC LONG +0.32%), 21 closed today 33.3% WR -0.84 USDT. Hotset EMPTY (107 sig/hr, 0 ≥50% conf). Disk 86% WARN — DB growth, no logs >7d to gzip. Recurring: wasp exit1, better-coder ModuleNotFoundError, price-collector candle lock (latest run OK). CEO still needs DB pruning decision.
+- [2026-10-01 16:47 UTC] health_monitor: NO CRITICAL — pipeline OK (rc=0, 0 tracebacks). 54 sig/hr, 2 open (BTC LONG, ETH LONG), 21 closed today -$0.84 33.3% WR. Regime NEUTRAL (2 LONG_BIAS). Auto-fixes: journal vacuum (84MB freed), daemon-reload (atr-sl-updater ghost). Disk 86% WARN — DB growth recurring, CEO pruning decision still open. Hotset empty (confidence gate), not a code bug.

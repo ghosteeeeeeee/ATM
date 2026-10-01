@@ -259,3 +259,10 @@
 
 ## Error Alerts — 2026-10-01 15:58 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-01 16:47 UTC
+- **WARN** (1x): Disk 86% used — root cause is DB growth (coin_tracker.db 3.3G, candles.db 2.3G+WAL 961M, mtf_macd_tuner.db 1.3G), not logs. No .log files >7d to gzip.
+- **AUTO-FIX**: `journalctl --vacuum-size=50M` freed 84MB archived journals. Disk still 86%. CEO pruning decision still needed for large DBs.
+- **WARN** (1x): `hermes-atr-sl-updater.timer` unit file not-found (ghost systemd reference). ATR SL/TP path is healthy — managed locally by guardian via DB per pipeline logs.
+- **AUTO-FIX**: `systemctl daemon-reload` run. No functional gap; stale reference remains in list-timers until unit file removed/recreated.
+- **INFO**: Pipeline OK — 0 tracebacks, 0 real errors in 30min. 54 signals/hr, 2 open positions, 21 closed today (-$0.84, 33.3% WR). Hotset empty (confidence gate), regime NEUTRAL.
