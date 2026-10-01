@@ -1142,5 +1142,69 @@
     "category": "meta-filter",
     "status": "research",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "SHORT R:R structural investigation — avg_loss $0.170 vs avg_win $0.104 (0.61:1)",
+    "rationale": "Even at 49% WR SHORT loses. ATR_TP_K_MULT=2.0 deployed Sep 29 but PM_TRAIL exits before TP. Root cause: SL too wide or TP too far for SHORT momentum.",
+    "expected_impact": "+$0.50-1.00/7d if R:R improved to 1.0:1",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "pump-chain- SHORT RSI 40-45 golden band conf boost +10pt at 15T",
+    "rationale": "9T 77.8%WR +$0.52/14d. Below 20T threshold. Monitor to 15T then boost.",
+    "expected_impact": "+$0.15-0.25/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "volume-breakout-long+ EXTREME RSI 60-80 conf boost +10pt at 15T",
+    "rationale": "7T 100%WR +$2.03/14d. Perfect but small sample. Watchlist at 15T.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T03:45:00Z",
+    "idea": "Build NEUTRAL volume-dry-up signal — 3rd delegation",
+    "rationale": "97% of trades NEUTRAL. No NEUTRAL-optimized signal exists. Complements doji-bottom.",
+    "expected_impact": "+$0.30-0.60/7d from diversity",
+    "category": "signal development",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T05:37:52Z",
+    "idea": "Bearish-override audit for SHORT entries — log _ctx_bearish_override firings + subsequent WR",
+    "rationale": "decider_run.py SHORT_RSI_FLOOR has bearish-override that passes oversold SHORT when BTC continuum says bearish. JUP (RSI 22.82) and ALGO (RSI 18.29) executed despite RSI_MIN — override is prime suspect. 14d data: even bearish-oversold SHORT loses net (-$1.59 on RSI<40 band).",
+    "expected_impact": "+$0.20-0.40/7d if override trades are net negative and we tighten it",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Add debug log line when _ctx_bearish_override fires on SHORT; track WR in brain over 7d before changing logic."
+  },
+  {
+    "date": "2026-10-01T05:37:52Z",
+    "idea": "pump-chain- SHORT RSI 45-55 golden band confidence boost +10pt at 15T",
+    "rationale": "9T 88.9%WR +$1.09/14d. 8/9 winners. Below 20T threshold — monitor. Once 15T reached, boost conf to increase frequency of highest-quality entries.",
+    "expected_impact": "+$0.15-0.25/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T05:37:52Z",
+    "idea": "volume-breakout-long+ EXTREME RSI 60-80 conf boost +10pt at 15T",
+    "rationale": "5T 100%WR +$1.65/14d (was 7T +$2.03 — window shifted). Perfect record, small sample. Watchlist.",
+    "expected_impact": "+$0.30-0.50/7d",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]
