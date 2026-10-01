@@ -1283,3 +1283,31 @@ BY: auto_1hr
 - [2026-10-01 02:12] auto_1hr: NO CONFIG CHANGE — 1T MNT +$0.01. atr_sl_hit 14.9% 7d (fix stable). No kill candidates (1T/hr, need 3T+0%WR). Not overtrading. pump-chain- 24h 40%WR watch only; 3 open SHORTs green.
 
 BY: auto_1hr
+
+## [2026-10-01 03:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.06 (WR: 50%) — ALGO pump-chain- SHORT hard_sl (-$0.11 / -100.85% pct), LDO pump-chain- SHORT trail_sl (+$0.05 / +8.17%).
+24h: 15T, 7 wins, +$0.05 net (46.7% WR). Reasons: hard_sl 9T -$0.12 | profit-monster-trail 2T +$0.08 | trail_sl 1T +$0.05 | MAE-GUARD 1T -$0.02 | HL_CLOSED+ORPHAN_PAPER 2T $0.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0/15 24h — ATR fix (tpsl_utils.py) stable, no CEO alert
+- Kill rule not met: 2T last hour (ALGO loss, LDO win = 50% WR). Rule needs 3T + 0% WR in last hour.
+- 2/hr — not overtrading
+- No 3 consecutive negative hours (22:00 -$0.17, 00:00 -$0.17, 01:00 +$0.01, 02:00 -$0.06). No regime size action.
+- 24h net +$0.05 — flat, not crisis
+
+**Open Questions / Sideways:**
+- **mover- / mover+ 0% WR over 7d:** mover- 3T -$0.72, mover+ 3T -$0.61 — both 0 wins. Kill rule is last-hour-only, so multi-hour 0% WR bleed escapes it. No trades this hour so rule still not triggered. Flag for CEO: consider 24h kill variant for 0%-WR signals with 3+ trades.
+- pump-chain- 7d: 38T 20W (52.6% WR) -$0.45 net — high volume, slightly negative. Not a kill under current rules.
+- 2 open pump-chain- SHORTs remain (JUP, HBAR) — ALGO cluster member already hard_sl'd. Watch.
+- ALGO hard_sl pnl_pct -100.85% on -$0.11 / $11.10 size (~-1% cash) — pnl_pct column looks broken vs cash PnL. Data-quality flag, not this hour's change.
+- Open positions: 3 (CC pump-chain-v5 LONG, JUP/HBAR pump-chain- SHORT). Kill switch live_trading=True.
+
+**KANBAN**
+## TEAM UPDATES
+- [2026-10-01 03:12] auto_1hr: NO CONFIG CHANGE — 2T last hour, net -$0.06 (ALGO hard_sl, LDO trail win). atr_sl_hit 0% 24h (fix stable). Kill rule not met (2T, 50% WR). Not overtrading. SIDWAYS: mover-/mover+ 0% WR 7d (3T each) escape last-hour kill rule — recommend 24h 0%-WR kill variant review.
+
+BY: auto_1hr

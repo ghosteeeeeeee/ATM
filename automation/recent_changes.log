@@ -3639,3 +3639,9 @@
   SIDWAYS: ceo_dashboard open_positions=0 / trades_24h=3 disagrees with PG (3 open, 13T) — dashboard stale, PG SoT. MFE/MAE NULL in PG.
   0 CHANGES APPLIED.
   BY: auto_1hr
+- [2026-10-01 03:12 UTC] auto_1hr: NO CONFIG CHANGE
+  2T last hour (ALGO pump-chain- SHORT hard_sl -$0.11, LDO pump-chain- SHORT trail_sl +$0.05). 24h: 15T 7W +$0.05. atr_sl_hit 0% (fix stable).
+  Kill rule not met (2T < 3T/hr). Not overtrading. No 3-consecutive-negative-hours.
+  SIDWAYS: mover-/mover+ 0% WR over 7d (3T each, -$0.72/-$0.61) — kill rule is last-hour-only; recommend 24h variant for CEO review.
+  0 CHANGES APPLIED.
+  BY: auto_1hr
