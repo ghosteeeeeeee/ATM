@@ -682,5 +682,16 @@
     "after": "PUMP_CHAIN_SHORT_RSI_MIN=25 VERIFIED WORKING — 37 blocks today, oversold SHORT entries blocked",
     "rationale": "False dead-code claim would cause future agents to re-fix a working filter or disable it. Log evidence proves filter fires.",
     "impact": "Doc accuracy. Filter behavior unchanged (was already working)."
+  },
+  {
+    "timestamp": "2026-10-01T00:39:15Z",
+    "agent": "brain_auditor",
+    "change": "DRIFT-002 code fix: context gate LONG ceiling uses VOLUME_BREAKOUT_LONG_RSI_CEILING for volume-breakout sources; detection-time RSI falls back to sig.rsi/sig.rsi_14 for LONG+SHORT ceiling/floor checks",
+    "type": "code",
+    "file": "decider_run.py",
+    "before": "Context gate used global LONG_RSI_CEILING=70 for all LONG (killed volume-breakout RSI 70-95 = 7T 100%WR +$1.55); detection RSI only from signal_metadata.rsi_14 (sig.rsi leaks bypassed)",
+    "after": "volume-breakout uses VOLUME_BREAKOUT_LONG_RSI_CEILING=95; detection RSI also reads sig.get(\"rsi_14\") or sig.get(\"rsi\") when metadata lacks rsi_14",
+    "rationale": "execute_trade path already had volume-breakout exemption; context gate did not — inconsistency killed best signal band. sig.rsi fallback closes BTC rsi=77.32 / USUAL rsi=81.82 leak.",
+    "impact": "Preserve +$1.55/14d volume-breakout band; block non-exempt rsi>70 entries"
   }
 ]

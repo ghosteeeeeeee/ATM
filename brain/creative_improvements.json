@@ -1003,5 +1003,50 @@
     "category": "entry quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-01T00:39:15Z",
+    "idea": "DRIFT-002 code fix — volume-breakout RSI exemption + sig.rsi detection fallback in context gate",
+    "rationale": "volume-breakout RSI 70-95 = 7T 100%WR +$1.55 was killed by global ceiling=70 in context gate. execute_trade path already had exemption; context gate did not. Also closes BTC rsi=77.32 / USUAL rsi=81.82 leak path.",
+    "expected_impact": "Preserve +$1.55/14d volume-breakout band; block non-exempt rsi>70 losers (~$0.27/14d saved)",
+    "category": "entry sniper",
+    "status": "APPLIED THIS RUN",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T00:39:15Z",
+    "idea": "Extend pump-chain-v5 test to Oct 3 (from Oct 1)",
+    "rationale": "3T +$0.27 (2W 1L) — too few to conclude. V5 adds velocity + continuum oscillator filters on pump-chain+. Eval date is today; recommend +2 days.",
+    "expected_impact": "Better sample for kill/keep decision. Net positive so far.",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T00:39:15Z",
+    "idea": "doji-bottom-long HIGH regime confidence boost at 20+ trades",
+    "rationale": "HIGH 7T/30d 85.7%WR +$0.67. All recent exits profit-monster-trail. Entries at RSI 14-55 (oversold bounces). Sample still 12T total — wait for 20T.",
+    "expected_impact": "+$0.20-0.40/7d if pattern holds",
+    "category": "entry sniper",
+    "status": "watchlist",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T00:39:15Z",
+    "idea": "volume-breakout-long+ EXTREME confidence boost at 20T (currently 12T)",
+    "rationale": "EXTREME 12T 75%WR +$2.53 vs NORMAL 8T 62.5%WR -$0.05. RSI 70-80 band 5T 100%WR. Watchlist until 20T sample.",
+    "expected_impact": "+$0.30-0.50/7d if EXTREME edge holds",
+    "category": "entry sniper",
+    "status": "watchlist",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-01T00:39:15Z",
+    "idea": "Revisit pump_chain- EXTREME gate: 0.0 block vs 0.5 penalty after 48h data",
+    "rationale": "30d EXTREME 77T 54.5%WR +$0.32 is the only profitable SHORT band. Block based on 5T 24h noise. If 48h confirms edge, set override to 0.5 (penalize, not kill). One variable. 'Every dump is a SHORT.'",
+    "expected_impact": "If reverted to 0.5: recover ~$0.32/30d EXTREME edge while still reducing HIGH noise",
+    "category": "regime tuning",
+    "status": "monitor-48h",
+    "risk": "medium"
   }
 ]

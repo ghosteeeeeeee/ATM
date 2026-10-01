@@ -568,7 +568,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
     """
     # SL test
     sl_variant = get_ab_variant('sl-distance-test', direction)
-    sl_pct = max(0.5, sl_variant.get('config', {}).get('slPct', 0.02))  # floor at 0.5%
+    sl_pct = max(0.005, sl_variant.get('config', {}).get('slPct', 0.02))  # floor at 0.5% (was 0.5 = 50%, verified 385bc167)
 
     # Entry timing test
     entry_variant = get_ab_variant('entry-timing-test', direction)
@@ -1013,6 +1013,9 @@ def rule_based_context_gate(token, direction, source, sig):
                 _detect_rsi_floor = _meta.get('rsi_14')
             except Exception:
                 pass
+        # DRIFT-002 fix: fall back to top-level sig RSI when metadata lacks rsi_14
+        if _detect_rsi_floor is None and isinstance(sig, dict):
+            _detect_rsi_floor = sig.get('rsi_14') or sig.get('rsi')
         # Block if EITHER live or detection-time RSI < floor
         # Detection-time RSI can be below floor even when live RSI recovered — signal was detected in oversold
         _sig_label = source or 'SHORT'
@@ -1073,6 +1076,10 @@ def rule_based_context_gate(token, direction, source, sig):
                 _detect_rsi_short = _meta_short.get('rsi_14')
             except Exception:
                 pass
+        # DRIFT-002 fix: signals store RSI as top-level 'rsi'/'rsi_14' (bb-bounce etc);
+        # metadata may lack rsi_14 at gate time. Fall back to sig dict fields.
+        if _detect_rsi_short is None and isinstance(sig, dict):
+            _detect_rsi_short = sig.get('rsi_14') or sig.get('rsi')
         # Check BOTH live and detection-time RSI
         if _live_rsi is not None and _live_rsi > SHORT_RSI_CEILING:
             return ('SKIP', f'SHORT RSI ceiling: LIVE RSI {_live_rsi:.1f} > {SHORT_RSI_CEILING} (overbought — bounce risk)', 0)
@@ -1082,8 +1089,10 @@ def rule_based_context_gate(token, direction, source, sig):
     # 1b-ext3. Execution-time LONG RSI ceiling + floor — mirrors SHORT pattern
     # brain_auditor: LONG_RSI_CEILING/FLOOR only checked at detection time (signal_compactor.py).
     # RSI can drift between detection and execution — WCT entered at RSI=98.86, lost -$0.15.
+    # DRIFT-002 fix: (1) volume-breakout exemption (RSI 70-95 = 7T 100%WR +$1.55 — was killed by global ceiling=70)
+    # (2) detection-time fallback to sig.rsi/sig.rsi_14 when metadata lacks rsi_14 (BTC bb-bounce rsi=77.32 leak).
     if direction == 'LONG':
-        from hermes_constants import LONG_RSI_CEILING, LONG_RSI_FLOOR
+        from hermes_constants import LONG_RSI_CEILING, LONG_RSI_FLOOR, VOLUME_BREAKOUT_LONG_RSI_CEILING
         _live_rsi_long = _ctx_gate_get_rsi(token)
         _detect_rsi_long = None
         if isinstance(sig, dict) and sig.get('signal_metadata'):
@@ -1092,15 +1101,19 @@ def rule_based_context_gate(token, direction, source, sig):
                 _detect_rsi_long = _meta.get('rsi_14')
             except Exception:
                 pass
+        if _detect_rsi_long is None and isinstance(sig, dict):
+            _detect_rsi_long = sig.get('rsi_14') or sig.get('rsi')
+        # volume-breakout rides momentum — higher ceiling (matches execute_trade path ~line 1801)
+        _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
         # Check BOTH live and detection-time RSI for ceiling and floor
         if _live_rsi_long is not None:
-            if LONG_RSI_CEILING > 0 and _live_rsi_long > LONG_RSI_CEILING:
-                return ('SKIP', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {LONG_RSI_CEILING} (overbought — chasing extended move)', 0)
+            if _long_ceiling > 0 and _live_rsi_long > _long_ceiling:
+                return ('SKIP', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {_long_ceiling} (overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _live_rsi_long < LONG_RSI_FLOOR:
                 return ('SKIP', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 0)
         if _detect_rsi_long is not None:
-            if LONG_RSI_CEILING > 0 and _detect_rsi_long > LONG_RSI_CEILING:
-                return ('SKIP', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {LONG_RSI_CEILING} (detected overbought — chasing extended move)', 0)
+            if _long_ceiling > 0 and _detect_rsi_long > _long_ceiling:
+                return ('SKIP', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {_long_ceiling} (detected overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _detect_rsi_long < LONG_RSI_FLOOR:
                 return ('SKIP', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 0)
 
