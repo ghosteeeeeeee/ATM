@@ -3,7 +3,7 @@
 
 Thesis: 4h regime + pullback entry = institutional trend following.
 Entry: 4h regime LONG_BIAS/SHORT_BIAS + price pullback + volume confirmation.
-Exit: Trail 1.5x ATR, stop 1.0x ATR, regime exit, 30min time exit.
+Exits: Handled downstream by position_manager (ATR SL, PM Trail, etc.)
 
 Signal types:
   - mtf_regime_trend_long  : LONG (4h LONG_BIAS + pullback)
@@ -15,14 +15,12 @@ Family: Trend (pairs with Volume, Momentum for confluence)
 import sys
 import os
 import sqlite3
-import time
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
 from paths import HERMES_DATA
 
 from hermes_constants import (
-    MTF_REGIME_TREND_ENABLED,
     MTF_REGIME_TREND_PLUS_ENABLED,
     MTF_REGIME_TREND_MINUS_ENABLED,
     MTF_REGIME_TREND_SLOPE_THRESHOLD,
@@ -55,14 +53,18 @@ def _get_4h_regime(token):
     """Get 4h regime and slope from PostgreSQL momentum_cache."""
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = %s",
-            (token.upper(),)
-        )
-        row = cur.fetchone()
-        conn.close()
+        conn = None
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT regime_4h, slope_4h FROM momentum_cache WHERE token = %s",
+                (token.upper(),)
+            )
+            row = cur.fetchone()
+        finally:
+            if conn:
+                conn.close()
         if row and row[0] and row[1] is not None:
             return row[0], float(row[1])
         return None, None
@@ -165,11 +167,15 @@ def detect(token):
     if len(candles) >= lookback:
         if direction == 'LONG':
             recent_high = max(c['high'] for c in candles[-lookback:])
+            if recent_high <= 0:
+                return None  # invalid price data
             pullback_pct = (recent_high - price) / recent_high * 100
             if pullback_pct < MTF_REGIME_TREND_PULLBACK_PCT:
                 return None  # no pullback — price near high
         else:
             recent_low = min(c['low'] for c in candles[-lookback:])
+            if recent_low <= 0:
+                return None  # invalid price data
             bounce_pct = (price - recent_low) / recent_low * 100
             if bounce_pct < MTF_REGIME_TREND_PULLBACK_PCT:
                 return None  # no bounce — price near low
@@ -215,16 +221,21 @@ def scan_signals():
     # Get tokens from PostgreSQL momentum_cache (tokens with strong 4h trends)
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT token, regime_4h, slope_4h FROM momentum_cache
-            WHERE regime_4h IN ('LONG_BIAS', 'SHORT_BIAS')
-              AND ABS(slope_4h) > ?
-        """, (MTF_REGIME_TREND_SLOPE_THRESHOLD,))
-        tokens = [(r[0], r[1], r[2]) for r in cur.fetchall()]
-        conn.close()
-    except Exception:
+        conn = None
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT token, regime_4h, slope_4h FROM momentum_cache
+                WHERE regime_4h IN ('LONG_BIAS', 'SHORT_BIAS')
+                  AND ABS(slope_4h) > %s
+            """, (MTF_REGIME_TREND_SLOPE_THRESHOLD,))
+            tokens = [(r[0], r[1], r[2]) for r in cur.fetchall()]
+        finally:
+            if conn:
+                conn.close()
+    except Exception as e:
+        _log(f"ERROR getting tokens: {e}")
         tokens = []
 
     for token, regime_4h, slope_4h in tokens:
