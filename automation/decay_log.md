@@ -1405,3 +1405,6 @@
 [2026-10-01 17:08 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-01 17:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-01 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-01 23:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-01 23:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-01 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

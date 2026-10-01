@@ -162,23 +162,48 @@ def detect(token):
     if direction == 'SHORT' and price > ema300:
         return None  # price above EMA300 — not in downtrend
 
-    # Pullback/bounce detection
-    lookback = 15  # minutes
-    if len(candles) >= lookback:
+    # Momentum entry (2026-10-01)
+    # Enter when price is moving in the trend direction
+    # LONG: price rising from recent low (momentum)
+    # SHORT: price falling from recent high (momentum)
+    momentum_lookback = 15  # minutes
+    if len(candles) >= momentum_lookback:
         if direction == 'LONG':
-            recent_high = max(c['high'] for c in candles[-lookback:])
-            if recent_high <= 0:
-                return None  # invalid price data
-            pullback_pct = (recent_high - price) / recent_high * 100
-            if pullback_pct < MTF_REGIME_TREND_PULLBACK_PCT:
-                return None  # no pullback — price near high
-        else:
-            recent_low = min(c['low'] for c in candles[-lookback:])
+            # For LONG: price should be rising from recent low
+            recent_low = min(c['low'] for c in candles[-momentum_lookback:])
             if recent_low <= 0:
-                return None  # invalid price data
-            bounce_pct = (price - recent_low) / recent_low * 100
-            if bounce_pct < MTF_REGIME_TREND_PULLBACK_PCT:
-                return None  # no bounce — price near low
+                return None
+            momentum_pct = (price - recent_low) / recent_low * 100
+            if momentum_pct < MTF_REGIME_TREND_PULLBACK_PCT:
+                return None  # no upward momentum
+        else:
+            # For SHORT: price should be falling from recent high
+            recent_high = max(c['high'] for c in candles[-momentum_lookback:])
+            if recent_high <= 0:
+                return None
+            momentum_pct = (recent_high - price) / recent_high * 100
+            if momentum_pct < MTF_REGIME_TREND_PULLBACK_PCT:
+                return None  # no downward momentum
+
+    # Momentum acceleration check (2026-10-01)
+    # Price should be ACCELERATING in trend direction, not decelerating
+    accel_lookback = 5  # last 5 minutes
+    if len(candles) >= accel_lookback:
+        recent_candles = candles[-accel_lookback:]
+        if direction == 'LONG':
+            # For LONG: price should be rising, not falling
+            last_3_changes = [(recent_candles[i]['close'] - recent_candles[i-1]['close']) / recent_candles[i-1]['close'] * 100
+                            for i in range(-3, 0)]
+            avg_change = sum(last_3_changes) / len(last_3_changes)
+            if avg_change < -0.05:  # price falling hard — not momentum
+                return None
+        else:
+            # For SHORT: price should be falling, not rising
+            last_3_changes = [(recent_candles[i]['close'] - recent_candles[i-1]['close']) / recent_candles[i-1]['close'] * 100
+                            for i in range(-3, 0)]
+            avg_change = sum(last_3_changes) / len(last_3_changes)
+            if avg_change > 0.05:  # price rising hard — not momentum
+                return None
 
     # Volume check
     volumes = [c['volume'] for c in candles[-20:]]
@@ -197,16 +222,18 @@ def detect(token):
     slope_bonus = min(MTF_REGIME_TREND_SLOPE_BONUS_MAX, abs(slope_4h) * 5)
     conf += slope_bonus
 
-    if direction == 'LONG' and len(candles) >= lookback:
-        recent_high = max(c['high'] for c in candles[-lookback:])
-        pullback_pct = (recent_high - price) / recent_high * 100
-        pullback_bonus = min(MTF_REGIME_TREND_PULLBACK_BONUS_MAX, pullback_pct * 20)
-        conf += pullback_bonus
-    elif direction == 'SHORT' and len(candles) >= lookback:
-        recent_low = min(c['low'] for c in candles[-lookback:])
-        bounce_pct = (price - recent_low) / recent_low * 100
-        bounce_bonus = min(MTF_REGIME_TREND_PULLBACK_BONUS_MAX, bounce_pct * 20)
-        conf += bounce_bonus
+    if direction == 'LONG' and len(candles) >= momentum_lookback:
+        recent_low = min(c['low'] for c in candles[-momentum_lookback:])
+        if recent_low > 0:
+            momentum_pct = (price - recent_low) / recent_low * 100
+            momentum_bonus = min(MTF_REGIME_TREND_PULLBACK_BONUS_MAX, momentum_pct * 20)
+            conf += momentum_bonus
+    elif direction == 'SHORT' and len(candles) >= momentum_lookback:
+        recent_high = max(c['high'] for c in candles[-momentum_lookback:])
+        if recent_high > 0:
+            momentum_pct = (recent_high - price) / recent_high * 100
+            momentum_bonus = min(MTF_REGIME_TREND_PULLBACK_BONUS_MAX, momentum_pct * 20)
+            conf += momentum_bonus
 
     conf = min(MTF_REGIME_TREND_CONF_CAP, int(conf))
 
