@@ -256,3 +256,6 @@
 - **INFO**: Several 0-byte DB files present (brain.db, hermes.db, hermes_live.db, hermes_runtime.db, hermes_trades.db, hotset.db, price_cache.db, price_history.db, prices.db, runtime.db, signals.db). System uses signals_hermes_runtime.db / candles.db / coin_tracker.db instead — likely intentional placeholders. Flagging for awareness, not auto-deleting.
 - **INFO**: Load elevated: 7.96 / 6.94 / 6.54. Pipeline still completing all steps.
 - **AUTO-FIXES APPLIED**: None actionable — pipeline not crashed; timers firing; prices fresh; no logs >7d to gzip; disk pressure is DB growth not logs; price-collector lock self-recovered on next tick. No restart or force-run warranted.
+
+## Error Alerts — 2026-10-01 15:58 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
