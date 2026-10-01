@@ -276,3 +276,12 @@
 - **INFO**: Pipeline OK — active (timer every 1min), 0 Tracebacks/CRASH/FATAL in 30min. All major timers firing (pipeline, price-collector, signal-compactor, watchdog, hl-sync-guardian all <1min ago). Prices fresh (162/241 token_speeds updated <5min, 42 stale). Phantom trades: 0. Today: 23 closed, 9 wins (39.1% WR), -0.73 USDT. Kill switch LIVE enabled. OpenMemory running (Docker :8080).
 - **INFO**: Inactive timers noted: `hermes-regime-24h-check.timer`, `hermes-regime-transition-check.timer` (loaded but inactive/dead). `hermes-atr-sl-updater.timer` still not-found (known ghost).
 - **AUTO-FIXES APPLIED**: Watchdog service restarts (3x); WAL checkpoint attempt (no reclaim). No pipeline restart needed — system healthy, just disk pressure + quiet market.
+
+## Error Alerts — 2026-10-01 19:48 UTC
+- **WARN** (ongoing): Disk **85%** used (95G/118G, 18G free) — down from 87-88% earlier today; candles.db-wal shrank 3.0G→305M (checkpoint landed). Root cause remains DB growth (coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G). No .log files >7d to gzip. **CEO DB-pruning decision still open.**
+- **WARN** (repeating): Hotset EMPTY — 98 signals/hr generated, **0 approved** (none ≥50% conf gate). Regime NEUTRAL (1 LONG_BIAS / 115 neutral). Not a code bug; signals generating, compactor approving none. 0 open trades in runtime DB.
+- **WARN** (1x): `hermes-coding-mcp.service` crash-looping — 696k restarts, `run_mcp_server.py` missing from scripts/. **AUTO-FIX**: service stopped + disabled (script gone; restart storm was burning CPU/log noise every 5s). Restore script or delete unit if intentionally retired.
+- **WARN** (recurring): 7 failed non-critical services: better-coder, bug-hunter, ceo, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer. trading-checklist exits 1 on the signals_db WARN (0 approved) — symptom of hotset gate, not independent failure. git-release exit 1 at 18:59 (backup path). Watchdog owns restarts.
+- **INFO**: `hermes-atr-sl-updater.timer` still not-found (known ghost; ATR SL managed by guardian via DB).
+- **INFO**: Pipeline OK — active (1min timer), 192 rc=0 / 30min, **0 Tracebacks**. All core timers firing <1min (pipeline, price-collector, signal-compactor, hl-sync-guardian, watchdog). Prices fresh (prices.json 0.6min, 162/241 token_speeds <5min). Today (runtime DB): 23 closed, 9 wins (39.1% WR), **-0.73 USDT**. Kill switch LIVE enabled.
+- **AUTO-FIXES APPLIED**: coding-mcp stop+disable (crash loop); journalctl vacuum (0B freed, already clean). No pipeline restart needed.
