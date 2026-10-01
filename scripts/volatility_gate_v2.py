@@ -155,9 +155,10 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',
         'confluence+', 'confluence-',
         'macd-div', 'macd-div+', 'macd-div-',
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms (hyphen variant)
-        'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum — works in storms (underscore variant)
-        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in storms
+        'pump-chain', 'pump-chain+',  # chain correlation LONG — EXTREME edge (57% WR)
+        'pump_chain', 'pump_chain+',  # underscore LONG variant
+        'pump-chain-v5',  # V5 — LONG killed, SHORT regime-routed via VOL_PHASE_MULTS (EXTREME Pump_Flow=0.0)
+        # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA

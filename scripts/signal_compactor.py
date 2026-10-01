@@ -2725,6 +2725,37 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if 'accel-300' in bare_source and direction.upper() == 'SHORT' and _continuum_phase == 'RECOVERY':
                 log(f"  🚫 [ACCEL300-SHORT-RECOVERY] {token} SHORT blocked — RECOVERY phase, no SHORT edge (0% WR)")
                 continue
+            # ── SHORT continuum phase filter (2026-10-01) ────────────────────
+            # plans/continuum-filter-analysis.md: block SHORT when score>10 AND z!=STRONG_NEG.
+            # Best SHORT state = extreme bearish (score<5, z=STRONG_NEG). Neutral/other lose.
+            if direction.upper() == 'SHORT':
+                try:
+                    from hermes_constants import (
+                        SHORT_CONTINUUM_FILTER_ENABLED,
+                        SHORT_CONTINUUM_SCORE_MAX,
+                        SHORT_CONTINUUM_ALLOW_Z,
+                    )
+                    if SHORT_CONTINUUM_FILTER_ENABLED:
+                        _sc_conn = None
+                        _sc_row = None
+                        try:
+                            _sc_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            _sc_row = _sc_conn.execute(
+                                "SELECT state_score, zscore_tier FROM continuum_states "
+                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                            ).fetchone()
+                        finally:
+                            if _sc_conn:
+                                try: _sc_conn.close()
+                                except: pass
+                        if _sc_row:
+                            _sc_score = float(_sc_row[0]) if _sc_row[0] is not None else 50.0
+                            _sc_z = _sc_row[1] or 'NEUTRAL'
+                            if _sc_score > SHORT_CONTINUUM_SCORE_MAX and _sc_z not in SHORT_CONTINUUM_ALLOW_Z:
+                                log(f"  🚫 [SHORT-CONTINUUM] {token} SHORT blocked — BTC score={_sc_score:.1f} z={_sc_z} (not STRONG_NEG, score>{SHORT_CONTINUUM_SCORE_MAX})")
+                                continue
+                except Exception:
+                    pass
             # ── pump-chain+ HIGH regime block ──────────────────────────────
             # 14T/7d HIGH: 35.7%WR +$0.19 (noise). EXTREME: 57.1%WR +$1.65 (edge).
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':

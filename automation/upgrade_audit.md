@@ -1,5 +1,115 @@
 # Upgrade Audit Trail
 
+## Plan: oscillator-matrix-lifecycle.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Enable continuum oscillator confidence multipliers after shadow validation (Phase 1→3).
+- **Difficulty:** Level 1 (EASY) — flag flip after validation
+- **Value:** MEDIUM-HIGH — penalizes losing zones (LOW falling, HIGH falling, MID bottoming), boosts winners
+- **Status:** ✅ FULLY IMPLEMENTED (2026-10-01)
+- **Reason:** Shadow log had 24,596 entries (Sep 21–Oct 1). Joined 1,035 shadow entries to closed PostgreSQL trades. Penalized zones (mult<1): n=300, total -$8.61, 33.3% WR. Boosted zones (mult>1): n=627, total +$9.87, 50.9% WR. Matrix directionally correct. `OSCILLATOR_MULT_ENABLED = True` set in hermes_constants.py. Pipeline restarted.
+
+## Plan: system-overhaul-plan.md (Tier 1 items only — plan itself PENDING CEO APPROVAL)
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Multi-tier system overhaul. This session only implemented discrete Level 1 data-hygiene items, NOT the full plan.
+- **Difficulty:** Level 1 for items done; Level 2-4 for remaining tiers
+- **Value:** HIGH for executed items
+- **Status:** PARTIAL — Tier 1 item 9 (doji_bottom flag) DONE; item 4 (time blocks) intentionally NOT done (T disabled 2026-09-30); items 1-3 still pending CEO
+- **Reason:** Fixed doji_bottom gated by DOJI_TOP_ENABLED (data inconsistency). Time-block repopulation skipped — CEO explicitly disabled TIME_BLOCK 2026-09-30 ("pumps and dumps happen at all times"). Confluence inversion / PnL reconciliation / profitable-family focus still need CEO approval.
+
+## Plan: continuum-filter-analysis.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Block SHORT when BTC continuum score>10 AND zscore_tier!=STRONG_NEG. Do NOT block low-score LONGs.
+- **Difficulty:** Level 1-2 — filter + constants (~40 LOC)
+- **Value:** HIGH — data-backed (338T/14d). Neutral-zone SHORTs 22T 40.9% -$0.61; other states 88T 38.6% -$3.91. Filter would block both.
+- **Status:** ✅ FULLY IMPLEMENTED (2026-10-01) — SHORT side only
+- **Reason:** SHORT_CONTINUUM_FILTER_ENABLED=True, SCORE_MAX=10, ALLOW_Z=('STRONG_NEG',) in hermes_constants.py. Filter in signal_compactor.py after accel-300 RECOVERY block. LONG side intentionally untouched (plan: low-score LONGs are profitable mean-reversion).
+
+## Plan: pump-chain-exit-analysis.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Fix pump-chain+ early stops; clean stale REGIME_SIGNALS EXTREME allowlist for pump-chain-.
+- **Difficulty:** Level 1 (allowlist cleanup); Level 2+ for entry-quality generator filters
+- **Value:** MEDIUM — allowlist was dead-path hygiene; entry quality already enforced at execution (RSI_MIN=40, HIGH block)
+- **Status:** PARTIALLY IMPLEMENTED
+- **Reason:** Removed pump-chain- SHORT from REGIME_SIGNALS['EXTREME'] in volatility_gate.py and volatility_gate_v2.py (stale, contradicts VOL_PHASE_MULTS Pump_Flow=0.0). Keep pump-chain+ LONG in EXTREME (57% WR edge). Generator-side RSI filter for pump_chain_v5_short NOT done — execution gates hold (0 executed today); noise not money-losing. Deferred as Level 2.
+
+## Plan: ride-it-exit-spec.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** 2-phase ATR trail + volume spike override for volume-breakout/mover exits.
+- **Difficulty:** Level 2-3
+- **Value:** HIGH (per BABY case study)
+- **Status:** ✅ FULLY IMPLEMENTED
+- **Reason:** ride_it_exit.py exists, RIDE_IT_ENABLED=True, all v3 constants present, SIGNAL_EXIT_CONFIG maps volume-breakout+/mover+ to ride_it. Verified 2026-10-01.
+
+## Plan: squeeze-breakout-signal-spec.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** New squeeze_breakout signal (BB compression → breakout).
+- **Difficulty:** Level 3
+- **Value:** MEDIUM
+- **Status:** ✅ FULLY IMPLEMENTED
+- **Reason:** signals/squeeze_breakout.py registered, SQUEEZE_BREAKOUT_ENABLED=True with full constant set.
+
+## Plan: continuum-ma-signal-spec.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** MA-smoothed continuum score crossover signal.
+- **Difficulty:** Level 3
+- **Value:** MEDIUM
+- **Status:** ✅ FULLY IMPLEMENTED
+- **Reason:** signals/continuum_ma.py registered, CONTINUUM_MA_ENABLED=True.
+
+## Plan: 2026-09-08_short-filter-overhaul.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Fix VEL-FILTER dead code (range(3)); relax SHORT filters after simulation.
+- **Difficulty:** Level 1 for dead-code fix
+- **Value:** HIGH for dead-code fix; threshold changes UNSOUND per prior audit
+- **Status:** ✅ Dead-code FIXED; threshold changes SKIPPED
+- **Reason:** signal_compactor.py:3758-3760 now uses `range(SHORT_VEL_FILTER_GREEN_THRESHOLD)`. Simulation script still not built — do NOT raise VEL threshold without it. Prior independent audit called original plan UNSOUND.
+
+## Plan: thesis-validation-system.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** MFE thesis validation + re-entry scoring + cooldown override.
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Still no TVS_ENABLED / thesis_validated column. Multi-file DB migration — not a Level 1 win. Next session candidate after L1 backlog clear.
+
+## Plan: chop-v2-spec.md
+- **Date scanned:** 2026-10-01 18:10
+- **Core request:** Per-coin trend score routing + chop_exit module.
+- **Difficulty:** Level 2-3
+- **Value:** HIGH
+- **Status:** PARTIALLY IMPLEMENTED
+- **Reason:** get_coin_trend_score() exists. should_trade_signal_v2(), chop_exit.py, score-based routing still missing. Large change — not attempted this session.
+
+---
+
+## Summary (2026-10-01)
+
+### Scanned this session: 20 recent plans + prior audit (25 plans)
+### Evaluated: 20 new/re-checked
+### Implemented this session: 4 Level 1 wins
+1. oscillator-matrix-lifecycle — OSCILLATOR_MULT_ENABLED=True (validated 1035 trade joins)
+2. system-overhaul Tier1#9 — doji_bottom own flag DOJI_BOTTOM_ENABLED
+3. continuum-filter-analysis — SHORT continuum filter (score>10, z!=STRONG_NEG)
+4. pump-chain-exit-analysis — stale REGIME_SIGNALS EXTREME pump-chain- removed
+
+### Already implemented (verified, no action): ride-it-exit, squeeze-breakout, continuum-ma, VEL-FILTER dead code, pump-chain-v5-spec, regime-fixes, winrate-fix, btc-timing-guard, chop-gating, volatility-gate-tuning, volatility-regime-adaptive, regime-transition-smoothing, profitability-fix, 30s-migration
+
+### Remaining High-Value Candidates
+1. **chop-v2-spec.md** — Level 2-3 — HIGH — trend-score routing + chop_exit
+2. **thesis-validation-system.md** — Level 3 — HIGH — MFE re-entry scoring
+3. **pump_chain_v5_short generator RSI filter** — Level 2 — MEDIUM — stop spam generation (execution already gates)
+4. **partial-close-trailing-runner.md Option 1** — Level 2-3 — HIGH — 50% partial close at trail activation
+5. **system-overhaul Tier 1 items 1-3** — need CEO — confluence invert, profitable-family focus, PnL reconcile
+
+### Success Rate this session: 4/4 Level 1 implemented (100%)
+### Cumulative from prior audit + this session: ~21/29 fully or mostly implemented (72%)
+
+### Sideways findings
+- signal_report ISSUES #1 still open: pump_chain_v5_short generates without RSI/vol filters (execution gates hold)
+- MID falling oscillator zone has mult=1.0 but 23.1% WR / -$6.99 in join — candidate for future multiplier tuning (0.5-0.7x)
+- hermes-signal-compactor.service inactive (timer-based, fires later) — not an error
+
+
 ## Plan: thesis-validation-system.md
 - **Date scanned:** 2026-09-29 17:00, 2026-09-30 12:00
 - **Core request:** Track MFE after each trade to validate thesis. Boost re-entry scores when thesis was validated. Override cooldowns when setup improves.

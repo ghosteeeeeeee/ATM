@@ -15,7 +15,7 @@ from signal_schema import add_signal, get_cooldown, price_age_minutes, set_coold
 from paths import HERMES_DATA
 
 from hermes_constants import (
-    DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED,
+    DOJI_BOTTOM_ENABLED,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -174,10 +174,8 @@ def scan_signals() -> int:
         if not sig:
             continue
 
-        # Kill-switch: master + direction
-        if not DOJI_TOP_ENABLED:
-            continue
-        if not DOJI_TOP_PLUS_ENABLED:
+        # Kill-switch
+        if not DOJI_BOTTOM_ENABLED:
             continue
 
         # Blacklists

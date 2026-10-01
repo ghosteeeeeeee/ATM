@@ -1773,3 +1773,44 @@ BY: auto_1hr
 - [2026-10-01 17:11] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (last close 13:00 ALGO pump-chain- SHORT +$0.03). Open 2/6 (BTC continuum-osc+ +$0.19, ETH bb-bounce-v2+ +$0.02). 24h: 33T 12W -$1.10 (36.4% WR). atr_sl_hit 0% (tpsl fix stable). Kill rule empty (0T). Not overtrading. Negative-hour streak broken 13:00 — size rule inactive. EXTREME regime drag known. Max 1 change/hr unused correctly. SIDeways: scripts/signal_version.py still missing.
 
 BY: auto_1hr
+
+---
+
+## [2026-10-01 18:15 UTC] Upgrade Implementer — Level 1 Wins
+
+**Session:** Scan plans → implement easy wins → verify → commit
+
+### Changes applied
+1. **OSCILLATOR_MULT_ENABLED = True** (hermes_constants.py)
+   - Shadow validated: 1,035 shadow→trade joins
+   - Penalized zones (mult<1): 300T, -$8.61, 33.3% WR
+   - Boosted zones (mult>1): 627T, +$9.87, 50.9% WR
+   - Source plan: plans/oscillator-matrix-lifecycle.md
+
+2. **doji_bottom flag decoupled** (doji_bottom.py, signals/__init__.py, hermes_constants.py)
+   - Was gated by DOJI_TOP_ENABLED (wrong flag — system-overhaul Tier1#9)
+   - Now DOJI_BOTTOM_ENABLED = True (own kill-switch)
+
+3. **SHORT continuum phase filter** (signal_compactor.py + constants)
+   - Block SHORT when BTC state_score > 10 AND zscore_tier != STRONG_NEG
+   - Source plan: plans/continuum-filter-analysis.md (338T/14d)
+   - LONG side untouched — low-score LONGs are profitable mean-reversion
+
+4. **REGIME_SIGNALS EXTREME cleanup** (volatility_gate.py, volatility_gate_v2.py)
+   - Removed pump-chain- SHORT from EXTREME allowlist (stale dead path)
+   - Contradicts VOL_PHASE_MULTS Pump_Flow=0.0 EXTREME hard block
+   - pump-chain+ LONG kept in EXTREME (57% WR edge)
+
+### Verification
+- py_compile: all 6 modified files OK
+- Filter logic unit-checked (6 cases)
+- Pipeline + signal-compactor restarted to load new code
+- Registry + imports verified
+
+### Not done (by design)
+- TIME_BLOCK repopulation — CEO disabled 2026-09-30
+- Confluence invert / profitable-family focus — needs CEO (system-overhaul)
+- VEL threshold raise — prior audit called UNSOUND without simulation
+- pump_chain_v5_short generator RSI filter — Level 2, execution gates hold
+
+BY: upgrade_implementer

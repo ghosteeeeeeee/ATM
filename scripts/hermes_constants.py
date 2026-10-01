@@ -1243,7 +1243,7 @@ CONF_FILTER_MIN = 70                    # FIX 2026-09-30: lowered 90→70. CONF_
 # NOTE: btc_score data only available since Sep 12 (~10 days, 282 trades)
 # Coverage: 8.5% of all trades — matrix affects <9% of total
 # Shadow mode: log what WOULD have been applied, don't affect scores
-OSCILLATOR_MULT_ENABLED = False  # Shadow mode — log only, don't apply
+OSCILLATOR_MULT_ENABLED = True   # ENABLED 2026-10-01 — shadow validated: 1035 joined trades, penalized zones -$8.61/33.3%WR, boosted +$9.87/50.9%WR
 OSCILLATOR_SHADOW_LOG = '/root/.hermes/data/oscillator_shadow.json'
 OSCILLATOR_MULTS = {
     ('LOW', 'falling'): 0.6,       # 35T, 22.9%WR, -$3.16 — KILLER ZONE
@@ -1281,6 +1281,15 @@ PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers
 # pump-chain- SHORT entry quality (replaced dead hours)
 PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
 PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI bands: 25-30=2T 0%WR -$0.17, 35-40=3T 0%WR -$0.50 (both losing). 40-45=8T 75%WR +$0.47 (SWEET SPOT preserved). Blocks confirmed losers, keeps edge. Was 25 (brain_auditor Sep 30).
+
+# ── SHORT Continuum Phase Filter ─────────────────────────────────────────────
+# plans/continuum-filter-analysis.md 2026-10-01 — 338T/14d
+# SHORT by continuum state: extreme bearish (score<5, z=STRONG_NEG) 27T 48.1% (best);
+# neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
+# Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
+SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
+SHORT_CONTINUUM_SCORE_MAX = 10         # block SHORT when BTC state_score > this
+SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 
 # pullback-entry- SHORT entry quality (replaced dead hours)
 PULLBACK_ENTRY_SHORT_DEAD_HOURS = []  # DISABLED 2026-09-30 — use entry quality filters instead
@@ -3841,13 +3850,14 @@ OVERSOLD_BOUNCE_CONF_BONUS_BB       = 3       # confidence bonus for deep lower 
 DOJI_TOP_ENABLED              = True    # master kill-switch
 DOJI_TOP_PLUS_ENABLED         = True    # LONG direction (not used — doji_top is SHORT-only)
 DOJI_TOP_MINUS_ENABLED        = True    # SHORT direction (exit LONG, enter SHORT)
+DOJI_BOTTOM_ENABLED           = True    # master kill-switch for doji_bottom LONG (was wrongly gated by DOJI_TOP_ENABLED)
 DOJI_BODY_MAX_PCT             = 15      # max body % for doji classification (relaxed from 10%)
 DOJI_ADVANCE_MIN_PCT          = 0.5     # min % advance before doji (prior move must be meaningful)
-DOJI_DECLINE_MIN_PCT          = 0.5     # min % decline for bottom signal (future: doji_bottom)
+DOJI_DECLINE_MIN_PCT          = 0.5     # min % decline for bottom signal (doji_bottom)
 DOJI_VOLUME_SPIKE_RATIO       = 1.5     # volume > 1.5x average for top confirmation
 DOJI_VOLUME_DRY_RATIO         = 0.5     # volume < 0.5x average for bottom confirmation
 DOJI_RSI_OVERBOUGHT           = 70      # RSI > 70 for top (validated: 40.4% reversal rate)
-DOJI_RSI_OVERSOLD             = 35      # RSI < 35 for bottom (future: doji_bottom)
+DOJI_RSI_OVERSOLD             = 35      # RSI < 35 for bottom (doji_bottom)
 DOJI_LOOKBACK                 = 5       # candles to look back for advance/decline
 DOJI_COOLDOWN_HOURS           = 0.25    # 15 min cooldown between entries per token
 DOJI_CONF_BASE                = 75      # base confidence

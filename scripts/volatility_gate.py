@@ -206,8 +206,9 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
-        'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — works in storms
-        'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in storms
+        'pump-chain', 'pump-chain+',  # chain correlation LONG — EXTREME edge (57% WR)
+        # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
+        'pump-chain-v5',  # V5 — LONG killed, SHORT regime-routed via VOL_PHASE_MULTS
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
