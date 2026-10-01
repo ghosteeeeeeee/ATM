@@ -3633,3 +3633,9 @@
   Regime EXTREME — no size action. SIDWAYS: 3/4 open positions are pump-chain- SHORT (JUP/HBAR/ALGO) — watch cluster.
   0 CHANGES APPLIED.
   BY: auto_1hr
+- [2026-10-01 02:12 UTC] auto_1hr: NO CONFIG CHANGE
+  1T last hour (MNT bb-bounce +$0.01 trail). 24h: 13T 6W +$0.05 net (46.2%WR), atr_sl_hit 0% 24h / 14.9% 7d (ATR fix stable).
+  Kill rule not met (1T < 3T/hr). Not overtrading. No 3-consecutive-negative-hours. Regime 5m NEUTRAL.
+  SIDWAYS: ceo_dashboard open_positions=0 / trades_24h=3 disagrees with PG (3 open, 13T) — dashboard stale, PG SoT. MFE/MAE NULL in PG.
+  0 CHANGES APPLIED.
+  BY: auto_1hr

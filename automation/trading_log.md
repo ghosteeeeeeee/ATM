@@ -1253,3 +1253,33 @@ BY: auto_1hr
 - V5 test 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3
 
 BY: auto_1hr
+
+## [2026-10-01 02:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.01 (WR: 100%) — MNT bb-bounce-v2/v3 LONG profit-monster-trail (+$0.01 / +29.38% on $11.10). Opened Sep 30 17:13 (~8h hold). Entry 0.69771, exit 0.69812, SL 0.68864 — trail exit, never near stop.
+24h (PG): 13T, 6 wins, +$0.05 net (46.2% WR). Reasons: hard_sl 8T -$0.01 | profit-monster-trail 2T +$0.08 | MAE-GUARD 1T -$0.02 | HL_CLOSED 1T $0 | ORPHAN_PAPER 1T $0.
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 0/13 24h; 7d 17/114 (14.9%) — well under 40% threshold. ATR fix deployed (tpsl_utils.py:546 floor-always-wins). No CEO alert.
+- Kill rule not met: 1T last hour (MNT was a win). Rule needs 3T + 0% WR in last hour. No 0%-WR signal has 3T this hour.
+- pump-chain- still worst 24h signal (5T 2W -$0.28, 40% WR) — watch only; 40% ≠ 0%, and 3 open SHORTs (ALGO/HBAR/JUP) are all unrealized green this hour (+$0.02/+0.13/+0.05). Not auto-kill.
+- 24h net +$0.05 — not crisis. Note: prior hour log showed +$0.96; HARD_SL_FAILED +$0.94 win aged out of 24h window. Don't over-read one outlier.
+- avg_pnl not negative 3+ consecutive hours (00:12 $0, 01:12 -$0.17, 02:12 +$0.01). No regime size action.
+- 1/hr — not overtrading. No confidence raise needed.
+- Regime: 5m aggregate NEUTRAL (116/116). 15m mostly NEUTRAL, few LONG_BIAS (ALGO/MEME). ALGO 15m LONG_BIAS vs open ALGO SHORT — tension noted, position green, leave it.
+
+**Open Questions / Sideways:**
+- **Dashboard drift:** ceo_dashboard.json says open_positions=0, trades_24h=3, pnl_24h=0.06 — PG has 3 open + 13 closed/24h +$0.05. Dashboard reads stale/wrong source; PG is SoT per AGENTS.md. Worth a separate fix pass on ceo_dashboard feed, not this hour.
+- **MFE/MAE NULL in PG** for MNT — cannot measure adverse excursion from DB for this trade. Data gap, flag for schema/backfill investigation later.
+- pump-chain- SHORT cluster all green this hour — watch continues; escalate only if cluster flips to hard_sl bleed.
+- ceo_dashboard goal_progress: consecutive_losses=3, daily_pnl_7d=-0.15, pnl_30d=-4.98 — system-level soft warning, not this hour's auto-tune trigger.
+- V5 test 3T +$0.27, eval Oct 1 — CEO decision pending on extending to Oct 3.
+
+**KANBAN**
+## TEAM UPDATES
+- [2026-10-01 02:12] auto_1hr: NO CONFIG CHANGE — 1T MNT +$0.01. atr_sl_hit 14.9% 7d (fix stable). No kill candidates (1T/hr, need 3T+0%WR). Not overtrading. pump-chain- 24h 40%WR watch only; 3 open SHORTs green.
+
+BY: auto_1hr
