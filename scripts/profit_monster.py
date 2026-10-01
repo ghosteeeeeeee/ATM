@@ -62,7 +62,7 @@ def get_spider_active() -> bool:
         return False
     try:
         import json as _json
-        regime_file = Path("/var/www/hermes/data/regime_15m.json")
+        regime_file = Path("/var/www/hermes/data/regime_5m.json")
         data = _json.loads(regime_file.read_text())
         overall = data.get("aggregate", {}).get("overall", "")
         return overall == SPIDER_REGIME

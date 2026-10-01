@@ -240,8 +240,8 @@ def collect_btc_regime():
         "volatility": None
     }
 
-    # BTC 15m regime from regime_15m.json (per-token regimes)
-    regime_15m_path = os.path.join(WWW_DATA, "regime_15m.json")
+    # BTC regime from regime_5m.json (scanner renamed output file)
+    regime_15m_path = os.path.join(WWW_DATA, "regime_5m.json")
     if os.path.exists(regime_15m_path):
         try:
             with open(regime_15m_path) as f:

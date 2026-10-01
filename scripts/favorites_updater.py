@@ -137,12 +137,7 @@ def get_all_token_stats():
 def get_current_regime():
     """Get current market regime from the regime scanner output."""
     try:
-        # Try regime_15m.json first (15m scanner output)
-        regime_file = '/var/www/hermes/data/regime_15m.json'
-        if os.path.exists(regime_file):
-            data = json.loads(Path(regime_file).read_text())
-            return data.get('aggregate', {}).get('overall', 'unknown')
-        # Fallback to regime_5m.json
+        # Scanner writes to regime_5m.json
         regime_file = '/var/www/hermes/data/regime_5m.json'
         if os.path.exists(regime_file):
             data = json.loads(Path(regime_file).read_text())
