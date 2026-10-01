@@ -75,6 +75,13 @@ FAMILY_MAP = {
     'ATR': ['atr_spike_long'],
     'Open_Skies': ['open_skies', 'open_skies_long', 'open-skies', 'open-skies+'],
     'Coiled_Spring': ['coiled_spring_long', 'coiled_spring_short'],
+    # FIX 2026-10-01 (bug_hunter): these families were missing — signal_family()
+    # returned 'Other' for slow_grind/sma20_dip, making the ('EXTREME','*') 0.0
+    # blocks in volatility_gate_v2.VOL_PHASE_MULTS dead code.
+    'Slow_Grind': ['slow_grind', 'slow_grind_long', 'slow_grind_short',
+                   'slow-grind', 'slow-grind+', 'slow-grind-'],
+    'SMA20_Dip': ['sma20_dip', 'sma20_dip_long', 'sma20_dip_short',
+                  'sma20-dip', 'sma20-dip+', 'sma20-dip-'],
     'Continuum': ['continuum_score', 'continuum_osc', 'continuum_trend'],
     'Trend_Purity': ['trend_purity', 'trend_purity_long', 'trend_purity_short',
                       'trend_purity+', 'trend_purity-'],
