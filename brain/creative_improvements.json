@@ -1888,5 +1888,41 @@
     "category": "new signal",
     "status": "suggested — research for signal_analyst",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T20:32:30Z",
+    "idea": "pump-chain- SHORT RSI 60+ confidence dampener (watchlist)",
+    "rationale": "14d RSI 60+ = 17T 52.9%WR -$0.28 — only unblocked losing band. RSI 40-50 = 58.8%WR +$0.03, 50-60 = 50%WR +$0.08. Dampener preserves entries but lowers hotset priority.",
+    "expected_impact": "+$0.15-0.25/7d if applied",
+    "category": "regime gate",
+    "status": "watchlist — wait for SHORT-CONTINUUM window",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T20:32:30Z",
+    "idea": "doji-bottom-long HIGH habitat conf boost (watchlist)",
+    "rationale": "14d HIGH 5W 1L +$0.46 vs NORMAL 3W 2L -$0.12. HIGH is clearly the better habitat. 12T total < 20T threshold.",
+    "expected_impact": "+$0.10-0.20/7d if applied at 20T",
+    "category": "entry sniper",
+    "status": "watchlist — 20T threshold",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T20:32:30Z",
+    "idea": "Winner-DNA: volume-breakout entry conditions for NEUTRAL signal specs",
+    "rationale": "14d: RSI 50-80 + volume spike + momentum = 8/8 winners. doji HIGH 87.5%WR. ema_reclaim (Oct 3 deadline) and any new NEUTRAL signal should inherit these entry-quality patterns.",
+    "expected_impact": "Better NEUTRAL diversity signal quality",
+    "category": "new signal",
+    "status": "suggested — research for signal_analyst",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T20:32:30Z",
+    "idea": "bb-squeeze+ post-boost auto-monitor",
+    "rationale": "Boost 1.2x applied 17:12. Only 1 trade since (ACE -$0.27). Need 20+ post-boost trades to evaluate. Track EXTREME vs HIGH habitat split post-boost.",
+    "expected_impact": "Data collection for next audit",
+    "category": "monitoring",
+    "status": "active",
+    "risk": "none"
   }
 ]
