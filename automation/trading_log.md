@@ -2244,3 +2244,40 @@ Final set: ['ADA']
 - Disk 85% (improved from 86%).
 
 **Artifacts:** CURRENT.md rewritten (PG-verified). Report: automation/daily_orchestrator_report_2026-10-02.md. Kanban TEAM UPDATES appended.
+
+## [2026-10-02 19:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.51 (WR: 0.0%)
+
+**Last hour:**
+- ACE bb-squeeze+ LONG hard_sl -$0.27 (MAE 0.80%, MFE 0.11%)
+- COMP pump-chain-v5 LONG hard_max_loss -1.09% -$0.24 (MAE 1.07%, MFE 0.42%)
+
+**24h by close reason:**
+- profit-monster-trail 35T +$1.64 (dominant, healthy)
+- atr_sl_hit 0T — tpsl_utils.py fix still deployed and stable
+- hard_max_loss family 7T -$1.10; hard_sl 3T -$0.58
+
+**Diagnosis:**
+1. **Entry quality:** 24h winners MAE avg 0.31% (<0.5% threshold) — good. This hour's losers had MAE 0.80–1.07% (hit hard SL/max-loss), not entry-quality failures.
+2. **SL behavior:** atr_sl_hit = 0% of 24h closes — NOT dominant. No CEO alert.
+3. **Signal quality:** No signal with 0% WR and 3+ trades this hour (each loser was a single trade). mtf-regime-trend+ kill holding (0 new opens since 15:11). bb-squeeze+ 26T/24h 57.7%WR -$0.06 — scratchy but near breakeven; EXTREME monitor window still active.
+4. **Trade frequency:** 2/hour — not overtrading.
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Kill rule:** No 0%-WR signal with 3+ closes this hour.
+- **atr_sl_hit >40%:** No — 0%. tpsl fix confirmed deployed.
+- **Negative PnL streak:** 18:00 (-$0.51) and 17:00 (-$0.21) negative, but 16:00 had 0 trades (streak reset per prior convention). Not 3 consecutive.
+- **Overtrading:** 2T/hr « 20.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune (MID falling 0.7 / LOW accelerating 0.9). Do not stack.
+- **Open positions:** BTC ORPHAN_PAPER amount=0.00 continuum_engine (known data-path hygiene).
+
+**Open Questions:**
+- continuum+ 7d 2T 0%WR -$0.21 — still below kill threshold (needs 3 closes in one hour at 0% WR).
+- pump-chain-v5 1T 0%WR this hour — single trade, not killable; watch.
+- pnl_pct column still nonsense (-123% / -533% on small losses) — data-path bug, not signal logic.
+- BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
