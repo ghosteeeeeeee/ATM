@@ -425,3 +425,14 @@
 - **WARN**: disk `/` **86%** used (17G free). Journal vacuum freed 0B (already clean). No logs >7d to gzip. Bulk remains DBs. **CEO DB-retention decision still open (recurring since 2026-10-01).**
 - **INFO**: pipeline.service `inactive` is NORMAL (oneshot+timer). Last run LIVE 15:45:27: 2 open / 51 closed today / +29.28% PnL. 0 Tracebacks in 30min. Guardian active. Timers all firing. Prices fresh (21s, 86 tokens). Regime SHORT_BIAS (0L/5S/112N). Phantom trades 0. Speed 128/241 ≥50th pct (53%).
 - **INFO**: 12 non-critical units in `failed` (better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer, weather-station-api, + hl ghost). Trading path unaffected.
+
+## Error Alerts — 2026-10-02 15:59 UTC
+- **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 16:48 UTC
+- **INFO**: pipeline.service `inactive` is NORMAL (oneshot+timer). Last run LIVE 16:45:43: **1 open / 52 closed today / +28.04% PnL**. 0 Tracebacks in 30min. Guardian active. Timers firing. Prices fresh (~34s, 86 tokens). Regime NEUTRAL (1L/0S/116N). Phantom trades 0. Speed 128/241 ≥50th pct (53%). Signals 127/hr — healthy.
+- **WARN**: disk `/` **85%** used (94G/118G, 18G free). AUTO-FIX: journal vacuum freed 0B (already clean). No logs >7d to gzip. Bulk remains DBs (coin_tracker 3.3G, candles 2.3G+walm, signals 0.9G, session_brain 0.9G). **CEO DB-retention decision still open — recurring since 2026-10-01.**
+- **WARN**: `hermes-price-collector` candle aggregation `database is locked` (5m/15m/1h/4h) — concurrent writers: `_aggregate_1m.py` (PID 1692261) + price_collector both holding `candles.db` (2.3G). Prices themselves collect fine (86 tokens written). Service completes rc=0 after aggregation errors. Not auto-fixed — needs WAL/busy_timeout or write serialization in `_store_candles`.
+- **WARN**: hotset.json **empty again** (cycle 17308, 0 tokens) — "[hotset] fallback DB query returned 0 tokens" + "no signals survived compaction". Was recovered 14:48 with 7 tokens; regressed. Compactor runs every minute; may be filter/quality gate, not crash. Monitor — if empty >1h, audit signal_compactor thresholds.
+- **INFO**: 10 non-critical units in `failed` (better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer). Known pattern: LLM jobs timing out. Trading path unaffected (pipeline, guardian, timers all OK).
+- **INFO**: price DB stubs (`prices.db`, `price_cache.db`, `price_history.db`) are 0-byte files — unused; live prices come via `prices.json` + static price_history (12.4M rows). Not a bug.
