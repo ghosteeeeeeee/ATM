@@ -2281,3 +2281,26 @@ Final set: ['ADA']
 - pump-chain-v5 1T 0%WR this hour — single trade, not killable; watch.
 - pnl_pct column still nonsense (-123% / -533% on small losses) — data-path bug, not signal logic.
 - BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
+
+## [2026-10-02 20:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (no closes)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Kill rule:** No closes this hour → no 0%-WR signal with 3+ trades.
+- **atr_sl_hit >40%:** 24h = 0% (tpsl fix stable). No CEO alert.
+- **Negative PnL streak:** 17:00 -0.21, 18:00 -0.51, then 19:00+ 0 trades — streak not 3 consecutive.
+- **Overtrading:** 0T/hr « 20.
+- **24h snapshot:** profit-monster-trail 35T +$1.64 dominant; hard_max_loss family 7T -$1.24; hard_sl 3T -$0.58. 19:00 prior hour was also 0 trades — possible quiet window, not a stall (last close 18:5x).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **Open positions:** BTC ORPHAN_PAPER continuum_engine amount=0.00 opened 2026-10-01 17:45 — known data-path hygiene, not a real position.
+
+**Open Questions:**
+- Is 0-close hour (19:00 + 20:00) signal drought or pipeline stall? Health monitor last reported 54–218 signals/hr with CTX-GATE/compactor as gate — verify next hour if still 0 closes.
+- continuum+ still below kill threshold (1T 0%WR 24h).
+- pnl_pct nonsense + ORPHAN_PAPER amount=0 persist — data-path bugs.
+---
