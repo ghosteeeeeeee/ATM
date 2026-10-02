@@ -109,6 +109,7 @@ REGIME_SIGNALS = {
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic (added 2026-10-02: was FLAT-only, killed conf=99 SHORT "not suited for NORMAL")
         'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — SHORT added 2026-10-02: asymmetry fix
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
@@ -172,6 +173,8 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic (added 2026-10-02: was FLAT-only, killed conf=99 SHORT "not suited for NORMAL")
         'coil-spring+', 'coil-spring', 'coil-spring-',  # coiled spring breakout — volatility compression release
         'resistance-break+',  # resistance break + pullback — works in volatile breakouts
         'open-skies+',  # open skies breakout — structural, regime-agnostic
@@ -226,6 +229,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
+        'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic (added 2026-10-02: was FLAT-only, killed conf=99 SHORT "not suited for NORMAL")
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
         'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
