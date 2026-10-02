@@ -518,8 +518,8 @@ def get_regime() -> dict:
                 # Require structural confirmation (linreg BEAR + BELOW EMA300) for ALL phases.
                 _bearish = ((_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                              _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
-                # Bullish structure: RECOVERY/CALM + LEAN_BULL + ABOVE EMA300
-                _bullish = ((_phase in ('RECOVERY', 'CALM') and
+                # Bullish structure: RECOVERY/CALM/NEUTRAL + LEAN_BULL + ABOVE EMA300
+                _bullish = ((_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
                              _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
                 if _bearish or _bullish:
                     votes['TREND'] += 5

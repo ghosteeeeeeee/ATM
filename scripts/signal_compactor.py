@@ -1410,6 +1410,7 @@ def _score_signal(token, direction, conf, source, signal_type,
             if _score > 70 and _bias > 0.3:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing SHORT
                 # Compute live from price_history (momentum_cache percentiles are dead)
+                from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
                 _coin_momentum_ok = False
                 try:
                     import sqlite3 as _mom_sqlite
@@ -1419,7 +1420,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                         # Get recent 15m candles for velocity calculation
                         _candles = _mom_conn.execute(
                             "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
-                            (token,)
+                            (token.upper(),)
                         ).fetchall()
                     finally:
                         _mom_conn.close()
@@ -1432,7 +1433,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                         _sma = sum(_closes[-20:]) / len(_closes[-20:])
                         _above_sma = _closes[-1] > _sma
                         # Coin has strong SHORT momentum: falling price + below SMA
-                        if direction == 'SHORT' and _vel < -0.5 and not _above_sma:
+                        if direction == 'SHORT' and _vel < -TREND_ALIGN_VELOCITY_THRESHOLD and not _above_sma:
                             _coin_momentum_ok = True
                             trend_alignment_mult = 1.0  # neutral — don't penalize
                             log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish BUT coin falling (vel={_vel:+.2f}%, below SMA) → 1.0x")
@@ -1446,6 +1447,7 @@ def _score_signal(token, direction, conf, source, signal_type,
             elif _score < 30 and _bias < -0.3:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing LONG
                 # Compute live from price_history (momentum_cache percentiles are dead)
+                from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
                 _coin_momentum_ok = False
                 try:
                     import sqlite3 as _mom_sqlite
@@ -1455,7 +1457,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                         # Get recent 15m candles for velocity calculation
                         _candles = _mom_conn.execute(
                             "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
-                            (token,)
+                            (token.upper(),)
                         ).fetchall()
                     finally:
                         _mom_conn.close()
@@ -1468,12 +1470,16 @@ def _score_signal(token, direction, conf, source, signal_type,
                         _sma = sum(_closes[-20:]) / len(_closes[-20:])
                         _above_sma = _closes[-1] > _sma
                         # Coin has strong LONG momentum: rising price + above SMA
-                        if direction == 'LONG' and _vel > 0.5 and _above_sma:
+                        if direction == 'LONG' and _vel > TREND_ALIGN_VELOCITY_THRESHOLD and _above_sma:
                             _coin_momentum_ok = True
                             trend_alignment_mult = 1.0  # neutral — don't penalize
                             log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish BUT coin rising (vel={_vel:+.2f}%, above SMA) → 1.0x")
                 except Exception as _mom_e:
                     log(f"  ⚠️ [TREND-ALIGN] {token} {direction}: momentum check failed: {_mom_e}", 'WARN')
+                
+                if not _coin_momentum_ok:
+                    trend_alignment_mult = 1.4 if direction == 'SHORT' else 0.6
+                    log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
             # Neutral/mixed: fallback to token 1m regime
             else:
                 if regime_conf > 0:
@@ -2553,7 +2559,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _cont_bearish = ((_continuum_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
-                        _cont_bullish = ((_continuum_phase in ('RECOVERY', 'CALM') and
+                        _cont_bullish = ((_continuum_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
                                           _cont_row_data.get('ema300_position') == 'ABOVE'))
 
@@ -2564,7 +2570,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 f"allowing despite velocity={_velocity:.3f}")
                         elif direction.upper() == 'LONG' and _cont_bearish:
                             # FIX 2026-10-02: Check coin's own momentum before blocking LONG
-                            # If coin is rising (velocity > 0.5% + above SMA), allow even if BTC bearish
+                            # If coin is rising (velocity > threshold + above SMA), allow even if BTC bearish
+                            from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
                             _coin_rising = False
                             try:
                                 import sqlite3 as _mom_sqlite2
@@ -2573,7 +2580,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 try:
                                     _candles2 = _mom_conn2.execute(
                                         "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
-                                        (token,)
+                                        (token.upper(),)
                                     ).fetchall()
                                 finally:
                                     _mom_conn2.close()
@@ -2583,14 +2590,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     _vel2 = (_closes2[-1] - _closes2[-6]) / _closes2[-6] * 100 if _closes2[-6] > 0 else 0
                                     _sma2 = sum(_closes2[-20:]) / len(_closes2[-20:])
                                     _above_sma2 = _closes2[-1] > _sma2
-                                    if _vel2 > 0.5 and _above_sma2:
+                                    if _vel2 > TREND_ALIGN_VELOCITY_THRESHOLD and _above_sma2:
                                         _coin_rising = True
-                            except Exception:
-                                pass
+                            except Exception as _mom_e2:
+                                log(f"  ⚠️ [CONTINUUM-BLOCK] {token} momentum check failed: {_mom_e2}", 'WARN')
                             
                             if _coin_rising:
                                 _btc_mom_ok_for_bypass = True
-                                log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising, allowing")
+                                log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising (vel={_vel2:+.2f}%, above SMA), allowing")
                             else:
                                 _btc_mom_ok_for_bypass = False
                                 log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")

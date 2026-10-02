@@ -3031,6 +3031,11 @@ TREND_FILTER_EMA_SLOW = 50
 TREND_FILTER_NEUTRAL_PCT = 0.6 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
+# ── TREND-ALIGN momentum check ─────────────────────────────────────────────
+# Minimum velocity % for coin to override BTC trend penalty
+# Coin must have velocity > threshold AND be above/below SMA to be considered rising/falling
+TREND_ALIGN_VELOCITY_THRESHOLD = 0.5  # 0.5% velocity over 5 candles (15m)
+
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
 # Check market conditions before trading. Adjust position sizing.
 MACRO_GATE_ENABLED = True
