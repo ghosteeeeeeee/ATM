@@ -1112,6 +1112,7 @@ def rule_based_context_gate(token, direction, source, sig):
         # volume-breakout rides momentum — higher ceiling (matches execute_trade path ~line 1801)
         _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
         # Check BOTH live and detection-time RSI for ceiling and floor
+        # Detection RSI is checked independently — live RSI being None doesn't skip it
         if _live_rsi_long is not None:
             if _long_ceiling > 0 and _live_rsi_long > _long_ceiling:
                 return ('SKIP', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {_long_ceiling} (overbought — chasing extended move)', 0)
@@ -1814,13 +1815,18 @@ def execute_trade(token, direction, price, confidence, source,
         try:
             _rsi_cur = _rsi_conn.cursor()
             _rsi_cur.execute("""
-                SELECT close FROM candles_5m
+                SELECT close, ts FROM candles_5m
                 WHERE token = ? AND is_closed = 1
                 ORDER BY ts DESC LIMIT 15
             """, (token.upper(),))
-            _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
+            _rsi_rows = _rsi_cur.fetchall()
+            _rsi_closes = [r[0] for r in _rsi_rows]
             _rsi_cur.close()
-            if len(_rsi_closes) >= 15:
+            # brain_auditor 2026-10-02 — HYPER SHORT opened at exec RSI 19.63 (candles_5m stale).
+            # HARD_FLOOR=25 must fail-closed when candle data is stale/insufficient for SHORT.
+            _rsi_max_ts = _rsi_rows[0][1] if _rsi_rows else None
+            _rsi_stale = (_rsi_max_ts is None) or ((time.time() - _rsi_max_ts) > 900)
+            if len(_rsi_closes) >= 15 and not _rsi_stale:
                 _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
                 _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
                 _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
@@ -1858,13 +1864,21 @@ def execute_trade(token, direction, price, confidence, source,
                     if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                         log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                         return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
-                    # ponytail: ceiling checks — same pattern as floor, catches RSI drift between detection and execution
                     if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
                         log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
                         return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
-                    if direction.upper() == 'LONG' and _long_ceiling > 0 and _exec_rsi > _long_ceiling:
+                    if direction.upper() == 'LONG' and _exec_rsi > _long_ceiling:
                         log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
                         return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'
+                else:
+                    if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+                        log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — flat candle series, cannot verify RSI floor (fail-closed)')
+                        return False, 'RSI hard floor: flat candles — SHORT blocked (fail-closed)'
+            else:
+                if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+                    _age = int(time.time() - _rsi_max_ts) if _rsi_max_ts else -1
+                    log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — candle data stale/insufficient (age={_age}s, n={len(_rsi_closes)}) — fail-closed')
+                    return False, f'RSI hard floor: stale candles age={_age}s — SHORT blocked (fail-closed)'
         finally:
             _rsi_conn.close()
     except Exception:

@@ -1924,5 +1924,41 @@
     "category": "monitoring",
     "status": "active",
     "risk": "none"
+  },
+  {
+    "timestamp": "2026-10-02T21:37:27Z",
+    "idea": "SHORT 'data-integrity gate': treat stale candles as UNKNOWN, not PASS",
+    "rationale": "14d SHORT <25 exec RSI = 23T 8.7%WR -$2.62. 4 missed blocks post HARD_FLOOR all stale-candle tokens. Fail-closed on unknown is the only way oversold SHORT stops leaking without raising floor (raising floor to 40 would kill 24 SHORT winners <40 in 14d).",
+    "expected_impact": "+$0.30-0.60/7d from blocked oversold SHORTs; 0 config change",
+    "category": "entry sniper",
+    "status": "IMPLEMENTED this run (code fix decider_run.py)",
+    "risk": "low — only blocks SHORT when RSI unverifiable; LONG unchanged"
+  },
+  {
+    "timestamp": "2026-10-02T21:37:27Z",
+    "idea": "bb-squeeze HIGH-habitat confidence dampener for EXTREME (watchlist)",
+    "rationale": "14d winners: HIGH 7T 100% +$0.49, EXTREME 6T 100% +$0.30, NORMAL 2T +$0.06. EXTREME losers are trail scratches + hard_max_loss, not signal failure. Prior EXTREME dampener idea still valid post-boost data.",
+    "expected_impact": "Cut EXTREME micro-losses without touching HIGH edge",
+    "category": "regime tuning",
+    "status": "watchlist — need 20T post-boost (currently 1 post-boost trade)",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T21:37:27Z",
+    "idea": "volume-breakout-long+ EXTREME conf boost CARRIED",
+    "rationale": "14d 10T 70%WR +$2.53. EXTREME trades now real in DB (IMX +$0.82, JUP +$0.12, FIL +$0.74, YGG +$0.20) — prior CEO rejection was on unverified regime=NEUTRAL data; actual EXTREME rows exist. Still <20T threshold.",
+    "expected_impact": "If applied at 20T: catch more of EXTREME momentum",
+    "category": "entry sniper",
+    "status": "watchlist — sample threshold 20T",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T21:37:27Z",
+    "idea": "SHORT NORMAL habitat: protect the remaining edge instead of more blocks",
+    "rationale": "After EXTREME/HIGH/oversold blocks, remaining SHORT edge is NORMAL pump-chain- RSI 40-55 (14d +$0.83, 61.5%WR). 24h SHORT=1 trade. Drought is by design post-bleed. Creative move: ensure RSI 40-55 NORMAL pump-chain- still FIRES (don't stack more filters on it); monitor continuum SHORT_CONTINUUM_SCORE_MAX=40 for legitimate STRONG_NEG SHORTs.",
+    "expected_impact": "Preserve +$0.83/14d band; avoid over-blocking",
+    "category": "signal quality",
+    "status": "monitor",
+    "risk": "none"
   }
 ]
