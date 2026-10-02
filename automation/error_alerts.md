@@ -355,3 +355,37 @@
 
 ## Error Alerts — 2026-10-02 06:59 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-02 07:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 08:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 09:59 UTC
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 10:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 11:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: v2 recheck: velocity -N.N% < -N.N%`
+
+## Error Alerts — 2026-10-02 12:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-02 13:47 UTC
+- **WARN** (persistent): `hotset.json is empty — no signals survived compaction` + `[hotset] fallback DB query returned 0 tokens` — 218 signals/1h generated, 0 approved by compactor gate. Signal-quality issue, not pipeline failure. No auto-fix (gate/config decision, not health).
+- **WARN**: disk `/` 86% used (17G free). Bulk is DBs (coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G, signals_hermes 0.9G, session_brain 0.9G). No logs >7d to gzip; journald already vacuumed (0B prior runs). **Needs CEO DB-retention decision — do not auto-prune.**
+- **WARN**: 11 non-critical systemd units in `failed` state (auto-1hr, signal-reporter, summarizer, trading-checklist, daily-orchestrator, better-coder, bug-hunter, mtf-macd-tuner, upgrade-implementer, git-release, weather-station-api). Pattern: opencode/LLM jobs timing out at 10min; better-coder/bug-hunter have `ModuleNotFoundError` (dispatcher code bug). Trading path unaffected (pipeline + guardian active). Not reset — timer retries fire regardless; code bugs need owners.
+- **INFO**: dead/never-fired timers unchanged: `hermes-atr-sl-updater.timer` (unit not-found), `hermes-hl-copy.timer` (last: Aug 15), `hermes-ma-cross-5m-tuner.timer` (never), `hermes-regime-24h-check.timer` / `hermes-regime-transition-check.timer` (never). Owner confirmation still needed before disable.
+- **INFO**: `token_speeds` has stale rows from 2026-07-19 (BLZ, MKR) mixed with fresh rows (13:47). Harmless dead-token residue.
+- **AUTO-FIX**: none required. Pipeline completed LIVE at 13:45 (3 open / 43 closed today / +45.20%). Guardian active, 0 errors/Tracebacks/CRASH in 30min. Prices fresh (candles_1m 46s). Regime LONG_BIAS (5L/1S/111N). Phantom trades 0/24h. No restart applied.
