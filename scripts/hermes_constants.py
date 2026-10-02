@@ -4191,7 +4191,7 @@ TVS_MIN_CONFIDENCE_FOR_OVERRIDE = 80  # min signal confidence to allow cooldown 
 # Thesis: 4h regime + pullback entry = institutional trend following.
 # Spec: plans/mtf-regime-trend-signal-spec.md
 MTF_REGIME_TREND_ENABLED = True
-MTF_REGIME_TREND_PLUS_ENABLED = True
+MTF_REGIME_TREND_PLUS_ENABLED = False  # KILLED auto_1hr 2026-10-02 15:11 — 4T 0%WR -$0.70 last hour (hard_sl/hard_max_loss). 48h 7T 3W -$0.41. Flip from 3W +$0.29 prior hour.
 MTF_REGIME_TREND_MINUS_ENABLED = True
 
 MTF_REGIME_TREND_SLOPE_THRESHOLD = 0.5    # min 4h slope % for trend confirmation

@@ -2102,3 +2102,25 @@ Final set: ['ADA']
 - hard_max_loss_* still dominant 24h bleed (5T/-$0.73) — hard-floor 25→30 monitor window active.
 - mtf-regime-trend+ first live test passed (3/3) — continue watching for more samples before concluding.
 - BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene, not signal logic).
+
+## [2026-10-02 15:11 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses)
+**PnL:** $-0.70 (WR: 0.0%)
+
+**Breakdown:** ALL mtf-regime-trend+ LONG — HBAR/TURBO hard_sl (-$0.31), SOL/DOT hard_max_loss (-$0.39). Flip from prior hour (3T 100%WR +$0.29). 48h total: 7T 3W 4L -$0.41.
+
+**Changes:**
+1. `MTF_REGIME_TREND_PLUS_ENABLED = False` — kill rule: 0% WR with 4 trades last hour. 2 open COMP/JUP positions remain (TPSL manages). MINUS untouched. Audit: data/signal_versions.json mtf-regime-trend+ v1.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/49 (0%) of 24h closes. tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule other signals:** No other signal with 0% WR and 3+ trades last hour.
+- **PnL streak:** -$0.70 this hour. Prior hour was +$0.51 — not 3 consecutive negative hours. Size-reduction rule inactive.
+- **Trade frequency:** 4/hr — not overtrading.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, RR_ENGINE_SHADOW, bb-bounce rsi_1m, volume-breakout RSI_CEILING, bb-squeeze 48h EXTREME, doji 20T. Do not stack.
+
+**Open Questions:**
+- pnl_pct column shows nonsense (-135 to -591%) on these trades — looks like price-move % not trade return %. Data-path bug, not signal logic. Prior logs noted "pnl_pct column appears percent-already". Verify column semantics before trusting any % analysis.
+- hard_max_loss_* family still dominant 24h bleed (6T/-$0.77). hard-floor 25→30 monitor window active.
+- 2 open mtf-regime-trend+ (COMP, JUP) opened before kill — let TPSL manage, flag if both hard_sl.

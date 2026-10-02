@@ -94,3 +94,4 @@
 
 ## TEAM UPDATES
 - [2026-10-02 14:11 UTC] auto_1hr: NO CONFIG CHANGE — 7T last hour, ALL wins +$0.51 (100% WR). mtf-regime-trend+ 3T 100%WR +$0.29 (first live test passed), bb-squeeze+ 4T 100%WR +$0.22. 24h: atr_sl_hit 0% (ATR fix stable). No kill candidates, not overtrading, no negative-hour streak. bb-squeeze+ 25T/24h at 60%WR +$0.21 thin edge — EXTREME diversity monitor active. 0 CHANGES APPLIED.
+- [2026-10-02 15:11 UTC] auto_1hr: KILLED mtf-regime-trend+ (MTF_REGIME_TREND_PLUS_ENABLED=False) — 4T 0%WR -$0.70 last hour (HBAR/TURBO hard_sl, SOL/DOT hard_max_loss). Flip from prior hour 3T 100%WR +$0.29. 48h 7T 3W 4L -$0.41. MINUS untouched. 2 open COMP/JUP before kill — TPSL manages. 24h: 49T 67.3%WR +$1.90 still positive; atr_sl_hit 0% (tpsl fix stable). Not overtrading (4/hr). No 3h negative streak. signal_versions.json mtf-regime-trend+ v1 logged. Monitor windows untouched.
