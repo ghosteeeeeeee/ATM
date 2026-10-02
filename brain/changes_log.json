@@ -704,5 +704,16 @@
     "after": "SHORT blocked when candles stale>900s, <15 closes, or flat series; LONG path unchanged; existing floor/ceiling checks intact when data fresh",
     "rationale": "HARD_FLOOR=25 configured but not firing on stale low-cap tokens; oversold SHORT bleed ($2.62/14d at RSI<25)",
     "impact": "Block oversold SHORTs with unverifiable RSI; restart required to load"
+  },
+  {
+    "timestamp": "2026-10-02T23:36:24Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_V5_ENABLED True → False (48h test expired + failed)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "True (RE-ENABLED 2026-10-01 for 48h test)",
+    "after": "False (test expired, 9T 33.3%WR -$0.37, velocity SLOW habitat)",
+    "rationale": "Post-reenable 7T 2W5L -$0.41 all hard_max_loss/hard_sl. Watchdog: would NOT open fresh. OPEN_SKIES precedent. SHORT flag untouched. GMT open trade unaffected.",
+    "impact": "Stop pump-chain-v5 LONG entries. Expected halt ~$0.05/trade bleed at current rate."
   }
 ]

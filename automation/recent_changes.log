@@ -3800,3 +3800,15 @@ DRIFT: ema_reclaim 0 signals (confluence gap) | DRIFT-002 pending | vol-breakout
 CREATIVE (3): bb-squeeze EXTREME conf dampener | ema_reclaim confluence map | trail-scratch economics
 0 CHANGES APPLIED - monitor windows active
 BY: brain_auditor
+
+BY: brain_auditor
+
+2026-10-02 23:36 UTC brain_auditor: 1 CONFIG CHANGE - V5 test expired
+DB-verified: 53T 60.4%WR +$0.73 (24h) | 166T 50.6%WR +$0.80 (7d) | 3 open pump-chain LONGs
+CHANGE: PUMP_CHAIN_V5_ENABLED True→False — 48h test failed (9T 33.3%WR -$0.37, post-reenable 7T 2W5L -$0.41)
+WATCHDOG: mtf/pullback-entry steers STALE (already killed); HYPER RSI=19.63 leak fixed 21:37 fail-closed; oversold-short queue gated
+AUTOPSY: v5 COMP disabled | bb-squeeze trail scratches (EXTREME already blocked) | BTC continuum chop | mtf legacy
+RSI MAP: pump-chain- SHORT 45-55=88.9%WR +$1.09 sweet spot; MIN=45 target when post-Fix2 n>=15
+CREATIVE (3): RSI 45-55 routing | fail-closed exception logging | mover+ RSI_MAX=75 pre-arm
+1 CHANGE APPLIED - pipeline restart to load flag
+BY: brain_auditor

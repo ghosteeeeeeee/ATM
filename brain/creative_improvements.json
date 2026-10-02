@@ -1990,5 +1990,35 @@
     "status": "suggested",
     "risk": "low",
     "gate": "Requires MFE/MAE breakdown per exit_reason — one-off query, no config change."
+  },
+  {
+    "date": "2026-10-02T23:36:24Z",
+    "idea": "pump-chain- SHORT RSI sweet-spot routing: target MIN=45 when post-Fix2 n>=15",
+    "rationale": "14d RSI map is unambiguous: 45-55 = 88.9%WR +$1.09 (only profitable band). <25 catastrophic14.3% -$1.39. 35-45 net -$0.67. Current MIN=40 still admits the 40-45 death band. Post-Fix2 sample too thin (1 trade) to move now — but the target is pre-computed.",
+    "expected_impact": "+$0.40/14d on paper if 40-45 stays negative post-fix; 0 winners in 40-45 worth >$0.10 individually",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "Re-eval at 15 post-Fix2 pump-chain- SHORT trades"
+  },
+  {
+    "date": "2026-10-02T23:36:24Z",
+    "idea": "RSI gate fail-closed exception logging (no silent pass)",
+    "rationale": "HYPER SHORT RSI=19.63 executed after HARD_FLOOR=25 live. changes_log shows fail-closed fix applied 21:37 — but decider_run RSI block still has `except Exception: pass` which can swallow future failures silently. Add one log line on exception instead of silent pass. Defense-in-depth after HYPER leak.",
+    "expected_impact": "Prevents silent filter bypass; visibility into RSI-check failures",
+    "category": "safety",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "bug_hunter — code path review, not config"
+  },
+  {
+    "date": "2026-10-02T23:36:24Z",
+    "idea": "mover+ RSI_MAX=75 pre-arm (signal dormant)",
+    "rationale": "14d mover+ 10T 20%WR -$1.54, all entered RSI 61-94 (chasing). RSI_MAX=75 blocks 4 losers -$0.98, 0 winners. Signal hasn't fired since Sep 24 — no live bleed, but pre-arming the filter costs nothing while dormant.",
+    "expected_impact": "+$0.98/14d if signal returns with same entry pattern",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "n=10 < 20 — monitor, apply only if signal resumes firing"
   }
 ]

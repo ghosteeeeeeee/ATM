@@ -3678,7 +3678,7 @@ PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-22 (CEO — "every pump is a LONG opportunity")
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-22 (CEO — "every dump is a SHORT opportunity")
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-PUMP_CHAIN_V5_ENABLED = True           # RE-ENABLED 2026-10-01 — V5 with velocity + continuum oscillator filters. 48h test.
+PUMP_CHAIN_V5_ENABLED = False          # 48h test EXPIRED brain_auditor 2026-10-02 23:20 — re-enabled Oct 1, failed. 14d 9T 33.3%WR -$0.37; post-reenable closed 7T 2W5L -$0.41 (COMP/HYPER/ALGO/DYDX/JUP hard_max_loss+hard_sl, only AIXBT/CC tiny pump_exit). Velocity SLOW + BTC 4h SHORT_BIAS = bad habitat. Watchdog: "would NOT open fresh." OPEN_SKIES precedent (48h test expired → disable). SHORT flag separate, untouched.
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
