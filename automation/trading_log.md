@@ -2013,3 +2013,33 @@ BY: daily-orchestrator
 - BTC continuum_engine amount_usdt=0.00 open row persists (ORPHAN_PAPER hygiene, pipeline exit-recorder) — flagged prior hours, not auto_1hr config.
 - hard_max_loss_* still dominant 24h bleed — monitor window active on hard-floor 25→30.
 - mfe/mae_pct exists in schema; prior NULL trail-exit data gap still noted — data-path, not signal logic.
+
+## [2026-10-02 00:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no trades) — quiet hour
+
+**24h context:** 30 closed, 12W, 40.0% WR, -$0.78. Exit reasons: hard_max_loss_* family 13T -$1.02 (dominant bleed) | profit-monster-trail 7T +$0.15 | trail_sl 2T +$0.09 | pump_exit_dead_money 2T +$0.10 | HL_CLOSED 2T +$0.15 | hard_sl 2T -$0.28 | atr_trail_hit 1T +$0.03 | ORPHAN_PAPER 1T 0.00 | atr_sl_hit 0T. Worst 24h signals: pump-chain- 7T 28.6%WR -$0.46 (RSI_MIN=40 live) | accel-300- 8T 37.5%WR -$0.34 (killed 10:50) | pump-chain-v5 6T 33.3%WR -$0.17 (killed 10:18) | bb-bounce-v3-long+ 2T 0%WR -$0.12.
+
+**Open positions (4):**
+- JUP volume-breakout-long+ LONG $11.10 @ 0.326440 (opened 00:05:41 — NEW)
+- IMX volume-breakout-long+ LONG $22.10 @ 0.170400 (opened 23:55:49 — NEW)
+- SUSHI doji-bottom-long LONG $11.10 @ 0.261120 (opened 21:32 — monitored)
+- BTC continuum_engine LONG amount_usdt=0.00 @ 85036 (opened 17:45 — phantom paper, known)
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/30 (0%) of 24h closes. tpsl_utils.py fix deployed and stable. Dominant bleed remains hard_max_loss_* family (13 exits, ~-$1.02) — trades dying before developing. Hard-floor 25→30 proposal monitor window still active — do not stack. No CEO alert.
+- **Kill rule:** No signal with 0% WR and 3+ trades in last hour (0 trades closed). bb-bounce-v3-long+ 0%WR is 2T/24h — below threshold. accel-300-/pump-chain-v5 already killed; 24h losses are pre-kill aging out.
+- **PnL streak:** Hours with trades this week: 17:00 +$0.09, 18:00 +$0.03, 21:00 +$0.16 — no 3+ consecutive negative hours. Size-reduction rule inactive.
+- **Trade frequency:** 0/hr closed — signal-starved, not overtrading. Two fresh volume-breakout-long+ opens (JUP+IMX) are the signal brain_auditor rated 76.9%WR +$2.63/13T REAL (DRIFT-005) — positive development, not a problem.
+- **Entry quality (winners):** Only 1/12 winners has MAE <0.5%. Many trail-exit winners have NULL mfe/mae (data-path gap, not signal logic). One outlier: continuum-osc+ HL_CLOSED +$0.16 with MAE ~74% — deep drawdown that recovered; already closed, no action.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-bounce 1m, volume-breakout RSI_CEILING backtest-first. DRIFT-004 ENTRY_RR delegated (dead code, live path is risk_reward_engine). Do not stack.
+
+**Open Questions:**
+- BTC continuum_engine amount_usdt=0.00 open row persists (ORPHAN_PAPER hygiene, pipeline exit-recorder) — flagged prior hours, not auto_1hr config.
+- hard_max_loss_* still dominant 24h bleed (13T/-$1.02) — monitor window active on hard-floor 25→30.
+- mfe/mae NULL on trail exits persists; unit ambiguity on non-null values — data-path, not signal logic.
+- Two volume-breakout-long+ positions just opened — first live test since DRIFT-005 verified signal quality. Watch for outcome.
