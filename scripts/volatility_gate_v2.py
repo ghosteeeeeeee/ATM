@@ -274,7 +274,7 @@ VOL_PHASE_MULTS = {
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
-        'Pump_Flow': 0.0,        # BLOCKED — pump-chain- SHORT 50% WR -$0.28 HIGH (24T). Wins in NORMAL (83.3% WR). signal_reporter 2026-09-24
+        'Pump_Flow': 1.0,        # RE-ENABLED 2026-09-22 (CEO — every pump is a LONG, every dump is a SHORT)
         'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
         'Support_Resistance': 0.0,  # BLOCKED — rs mean-reversion, only works in NORMAL (2026-09-25)
     },
@@ -302,25 +302,25 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'ema300_breakthrough_short'): 1.0,  # OK — structural SHORT works in EXTREME
     ('EXTREME', 'ema300_breakthrough_long'): 0.0,   # BLOCKED — same as ema300_dip_long family
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
-    ('EXTREME', 'mover_long'): 0.0,              # BLOCKED — mover+ LONG -$0.48 lifetime EXTREME
-    ('EXTREME', 'mover_short'): 0.0,             # BLOCKED — mover SHORT -$1.54 lifetime EXTREME (32 trades, net negative)
-    ('EXTREME', 'pump_chain-'): 0.0,             # BLOCKED 2026-09-30 — override was bypassing Pump_Flow:0.0 family block. 24h: 40%WR -$0.30 EXTREME. Family block stands.
-    ('EXTREME', 'pump_chain+'): 0.0,             # BLOCKED — pump-chain+ LONG not proven in EXTREME
+    ('EXTREME', 'mover_long'): 1.0,              # RE-ENABLED 2026-09-22 (CEO — every pump is a LONG)
+    ('EXTREME', 'mover_short'): 1.0,             # RE-ENABLED 2026-09-22 (CEO — every dump is a SHORT)
+    ('EXTREME', 'pump_chain-'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
+    ('EXTREME', 'pump_chain+'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
     # These catch signal types like 'ema300_breakthrough+', 'pump-chain-', etc.
     # that don't match the specific _long/_short overrides above.
     ('EXTREME', 'ema300_breakthrough'): 1.0,     # OK — bare form fallback for ema300_breakthrough+
     ('EXTREME', 'ema300_dip'): 1.0,              # OK — bare form fallback (specific _long/_short above take priority)
-    ('EXTREME', 'mover-_short'): 0.0,            # BLOCKED — mover- SHORT 0% WR in EXTREME (2 trades, -$0.68). signal_reporter 2026-09-29
+    ('EXTREME', 'mover-_short'): 1.0,            # RE-ENABLED 2026-09-22 (CEO)
     ('EXTREME', 'mover'): 1.0,                   # OK — bare form fallback for mover (coin_tracker_hot variants below)
     ('EXTREME', 'coin_tracker_hot_long'): 0.0,    # BLOCKED — same as mover_long (Mover family)
     ('EXTREME', 'coin_tracker_hot_short'): 0.0,   # BLOCKED — same as mover_short (Mover family)
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 0.5,              # PENALIZED — bare form fallback for pump_chain (not pump_chain+)
-    ('EXTREME', 'pump-chain+'): 0.0,             # BLOCKED — hyphen variant of pump_chain+ (not proven in EXTREME)
-    ('EXTREME', 'pump-chain-'): 0.0,             # BLOCKED 2026-09-30 — hyphen variant, same bypass bug as pump_chain-. Family block Pump_Flow:0.0 stands.
-    ('EXTREME', 'pump-chain'): 0.5,              # PENALIZED — hyphen variant fallback (must be AFTER pump-chain+/-)
+    ('EXTREME', 'pump-chain+'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
+    ('EXTREME', 'pump-chain-'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
+    ('EXTREME', 'pump-chain'): 1.0,              # RE-ENABLED 2026-09-22 (CEO)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──
     # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
