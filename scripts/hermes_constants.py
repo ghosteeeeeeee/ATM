@@ -1248,10 +1248,10 @@ OSCILLATOR_MULT_ENABLED = True   # ENABLED 2026-10-01 — shadow validated: 1035
 OSCILLATOR_SHADOW_LOG = '/root/.hermes/data/oscillator_shadow.json'
 OSCILLATOR_MULTS = {
     ('LOW', 'falling'): 0.6,       # 35T, 22.9%WR, -$3.16 — KILLER ZONE
-    ('LOW', 'accelerating'): 1.1,  # 36T, 52.8%WR, +$0.46 — profitable
-    ('LOW', 'bottoming'): 1.3,     # 4T, 75%WR, +$0.33 — small sample
-    ('LOW', 'decelerating'): 0.95, # 7T, 57.1%WR, -$0.08 — near breakeven
-    ('MID', 'falling'): 1.0,       # 36T, 44.4%WR, +$0.53 — profitable
+    ('LOW', 'accelerating'): 0.9,  # 81T, 42.0%WR, -$0.94 — WAS 1.1 (old 36T sample profitable). Zone flipped — stop boosting losers (45d join 2026-10-02)
+    ('LOW', 'bottoming'): 1.3,     # 17T, 70.6%WR, +$1.11 — profitable
+    ('LOW', 'decelerating'): 0.95, # 13T, 46.2%WR, -$0.10 — near breakeven
+    ('MID', 'falling'): 0.7,       # 62T, 40.3%WR, -$1.25 — WAS 1.0 (old 36T sample profitable). Losing zone, penalize (45d join 2026-10-02)
     ('MID', 'accelerating'): 1.1,  # 54T, 55.6%WR, +$2.49 — BEST ZONE
     ('MID', 'bottoming'): 0.8,     # 9T, 66.7%WR, -$0.29 — losing
     ('MID', 'decelerating'): 0.95, # 7T, avg PnL% negative, barely +$0.27

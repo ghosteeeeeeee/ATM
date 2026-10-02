@@ -2168,3 +2168,24 @@ Final set: ['ADA']
 - Zero trades closed this hour — pipeline idle? Check if detection/execution is stalled or market genuinely quiet.
 - pnl_pct column still shows nonsense values — data-path bug, not signal logic.
 - BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
+
+## [2026-10-02 18:20 UTC] Upgrade Implementer — Oscillator Matrix Retune
+
+**Change:** OSCILLATOR_MULTS retuned (hermes_constants.py:1251,1254)
+- `('MID','falling')`: 1.0 → **0.7** — 62T, 40.3% WR, -$1.25 (45d PG × _signal_metadata join)
+- `('LOW','accelerating')`: 1.1 → **0.9** — 81T, 42.0% WR, -$0.94 (zone flipped from old 36T profitable sample; was actively boosting a loser)
+
+**Data source:** 1,793 closed trades / 45d, 539 with oscillator context (btc_score+wave_phase in _signal_metadata). Independent re-verification of Oct 1 sideways finding.
+
+**Impact:** Signals in these zones now score lower → fewer entries in losing oscillator states. ~30% trade coverage.
+
+**Pipeline:** restarted hermes-pipeline.service (active).
+
+**Also evaluated this session (audit/upgrade_audit.md):**
+- regime-direction-filter-spec — SKIPPED (redundant with TREND_FILTER + regime_confirmation; spec buggy)
+- tier2 chop-regime merge — SKIPPED (Level 4, 3 open CEO questions)
+- mtf-regime-trend — already implemented, PLUS auto-killed 15:11 today
+- thesis-validation — CORRECTED to IMPLEMENTED (prior audit stale)
+- pump_chain_v5_short generator RSI — SKIPPED (execution gate already holds)
+
+**Monitor:** MID falling / LOW accelerating WR over next 7d. Zones are non-stationary — re-validate matrix monthly.

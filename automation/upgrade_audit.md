@@ -1,5 +1,90 @@
 # Upgrade Audit Trail
 
+## Plan: regime-direction-filter-spec.md
+- **Date scanned:** 2026-10-02 18:15
+- **Core request:** Block wrong-direction signals in add_signal() using 5m regime from regime_5m.json (LONG_BIAS blocks SHORT, SHORT_BIAS blocks LONG).
+- **Difficulty:** Level 1-2 (small filter + constants)
+- **Value:** LOW-MEDIUM (redundant — see reason)
+- **Status:** ⏭️ SKIPPED
+- **Reason:** Two direction filters already exist in add_signal(): (1) TREND_FILTER_ENABLED=True — EMA20/50 on 1H blocks counter-trend with full exemption set (choch, reversion, pump-chain, mtf_zscore, coin_tracker_hot); (2) 5m+15m regime confirmation blocks SHORT when both EMAs BULLISH. Spec is also internally contradictory — logic says NEUTRAL→allow, but the RESOLV motivating example claims a NEUTRAL-regime SHORT "would have blocked." Spec code has wrong JSON path (`regime_data.get(token)` vs actual `regime_data['regimes'][token]`). Marginal value does not justify a third overlapping direction gate.
+
+## Plan: tier2-item2-chop-regime-merge-spec.md
+- **Date scanned:** 2026-10-02 18:15
+- **Core request:** Merge 4 chop/regime systems (chop_detector, market_phase_gate, volatility_gate_v2, BTC_CHOP_GATE inline) into regime_engine.py facade + shims.
+- **Difficulty:** Level 4 (EPIC) — ~1,964 lines, 8 consumer files, golden-master test, cutover
+- **Value:** HIGH (reduces duplication) but high risk
+- **Status:** ⏭️ SKIPPED (pending CEO)
+- **Reason:** Spec itself lists 3 open questions for CEO: (1) BTC threshold unify 0.20 vs 0.15, (2) fail-closed confirm, (3) implement now vs defer. Circular dependency + fail-open risk while LIVE_TRADING_ENABLED=True. Not an implementer decision.
+
+## Plan: mtf-regime-trend-signal-spec.md + multi-timeframe-regime-trend-spec.md (duplicate pair)
+- **Date scanned:** 2026-10-02 18:15
+- **Core request:** New mtf_regime_trend signal — 4h regime alignment + 1m pullback entry. Two files, same signal.
+- **Difficulty:** Level 3 (new signal module)
+- **Value:** MEDIUM (was HIGH pre-deployment)
+- **Status:** ✅ IMPLEMENTED 2026-10-02 → 🛑 PLUS SIDE AUTO-KILLED
+- **Reason:** signals/mtf_regime_trend.py exists (12,887 bytes), constants present, registered. MTF_REGIME_TREND_PLUS_ENABLED=False (auto_1hr 2026-10-02 15:11) — 48h 7T 3W -$0.41, last hour flipped 3W→4L -$0.70 hard_sl/hard_max_loss. MTF_REGIME_TREND_MINUS_ENABLED still True (no SHORT sample yet). No re-implementation needed. Duplicate plan file is redundant — no action.
+
+## Plan: thesis-validation-system.md
+- **Date scanned:** 2026-10-02 18:15 (CORRECTS prior "NOT IMPLEMENTED" entry)
+- **Core request:** MFE thesis validation + re-entry scoring + cooldown override.
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** ✅ FULLY IMPLEMENTED (prior audit entry was stale)
+- **Reason:** TVS_ENABLED=True (hermes_constants.py:4181). Full constant set present (MFE thresholds, boosts 1.15x/1.25x, penalty 0.85x, lookback=5). DB columns thesis_validated + thesis_mfe on signal_outcomes (added in position_manager.py:607-613). MFE write path in signal_schema.py:4087-4107. Score integration in signal_compactor.py:1929+ (thesis_validation_mult in final_score product). Implemented between 2026-10-01 18:10 audit and 2026-10-02.
+
+## Plan: oscillator-matrix-lifecycle.md (FOLLOW-UP retune)
+- **Date scanned:** 2026-10-02 18:15
+- **Core request:** Follow-up from Oct 1 sideways finding — MID falling zone at mult=1.0 was losing.
+- **Difficulty:** Level 1 (constant value update)
+- **Value:** HIGH — stops boosting two losing zones
+- **Status:** ✅ RETUNED
+- **Reason:** Re-ran 45d join on PostgreSQL trades × _signal_metadata (btc_score+wave_phase), 539/1793 trades with oscillator context. MID falling: 62T 40.3% WR -$1.25 at mult 1.0 → set 0.7. LOW accelerating: 81T 42.0% WR -$0.94 at mult 1.1 (actively boosted a loser — old 36T sample said profitable, zone flipped) → set 0.9. Constants in hermes_constants.py:1251,1254. Pipeline restarted.
+
+## Plan: pump_chain_v5_short generator RSI filter (from signal_report ISSUES)
+- **Date scanned:** 2026-10-02 18:15
+- **Core request:** Add RSI filter at signal GENERATION time for pump-chain SHORT (execution already gates).
+- **Difficulty:** Level 2
+- **Value:** LOW (noise reduction only)
+- **Status:** ⏭️ SKIPPED
+- **Reason:** PUMP_CHAIN_SHORT_RSI_MIN=40 already enforced at execution in signal_compactor.py:2797-2800. Same for LONG RSI_MIN/MAX. Generator-side filter would reduce signal spam but not change money outcomes (0 executed blocked by RSI today). YAGNI — execution gate is the money path.
+
+---
+
+## Summary (2026-10-02)
+
+### Scanned this session: 4 unaudited Oct-1-evening plans + 1 follow-up + 1 sideways finding
+### Evaluated: 6
+### Implemented this session: 1 (Level 1)
+1. oscillator-matrix retune — MID falling 1.0→0.7, LOW accelerating 1.1→0.9 (data: 45d PostgreSQL × _signal_metadata join)
+
+### Status corrections
+- thesis-validation-system: NOT IMPLEMENTED → ✅ FULLY IMPLEMENTED (audit was stale)
+- mtf-regime-trend: implemented same-day, PLUS side auto-killed on poor WR
+
+### Skipped this session: 4
+1. regime-direction-filter — redundant with TREND_FILTER + regime_confirmation, spec buggy/contradictory
+2. tier2 chop-regime merge — Level 4, 3 open CEO questions
+3. mtf-regime-trend re-implementation — already built, PLUS auto-killed
+4. pump_chain_v5_short generator RSI — execution gate already holds
+
+### Remaining High-Value Candidates
+1. **chop-v2-spec.md** — Level 2-3 — HIGH — should_trade_signal_v2 + chop_exit.py still missing
+2. **partial-close-trailing-runner.md Option 1** — Level 2-3 — HIGH — 50% partial close at trail activation
+3. **continuum-integration-spec.md remaining items** — Level 2 — MEDIUM-HIGH — phase/market_phase/volume_regime boosts
+4. **MID bottoming mult** — Level 1 — LOW — 13T 61.5% WR but -$0.69 (big losers); sample small, already at 0.8
+5. **neutral wave_phase** — wave_phase='neutral' falls through to 1.0x (6T all losing); tiny sample, skip until more data
+
+### Sideways findings
+- 1254/1793 closed trades (70%) lack oscillator context in _signal_metadata — coverage gap, mult only affects ~30% of trades
+- LOW accelerating zone flipped from profitable (old 36T sample) to losing (81T current) — zones are non-stationary; consider periodic re-validation cron
+- HIGH accelerating still boosted 1.2x at 53.8% WR +$0.61 — acceptable, monitor
+- pipeline.service is long-running; signal-compactor is timer-based (fresh process/min). Constants reload on next timer fire either way; restarted pipeline.service anyway
+
+### Success Rate this session: 1/1 implemented (100%)
+### Cumulative: ~22/34 fully or mostly implemented or correctly skipped (65%)
+
+---
+
 ## Plan: oscillator-matrix-lifecycle.md
 - **Date scanned:** 2026-10-01 18:10
 - **Core request:** Enable continuum oscillator confidence multipliers after shadow validation (Phase 1→3).
@@ -7,6 +92,7 @@
 - **Value:** MEDIUM-HIGH — penalizes losing zones (LOW falling, HIGH falling, MID bottoming), boosts winners
 - **Status:** ✅ FULLY IMPLEMENTED (2026-10-01)
 - **Reason:** Shadow log had 24,596 entries (Sep 21–Oct 1). Joined 1,035 shadow entries to closed PostgreSQL trades. Penalized zones (mult<1): n=300, total -$8.61, 33.3% WR. Boosted zones (mult>1): n=627, total +$9.87, 50.9% WR. Matrix directionally correct. `OSCILLATOR_MULT_ENABLED = True` set in hermes_constants.py. Pipeline restarted.
+
 
 ## Plan: system-overhaul-plan.md (Tier 1 items only — plan itself PENDING CEO APPROVAL)
 - **Date scanned:** 2026-10-01 18:10
