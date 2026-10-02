@@ -196,36 +196,41 @@ def _get_trend_quality(token: str) -> Optional[str]:
 def _macd_crossover(token: str, minutes: int):
     """
     Compute MACD histogram for a token at given timeframe.
+    Reads directly from candles_{tf} table (214 tokens vs price_history's 130).
     Returns: (histogram, macd_line, signal_line, crossover_dir)
     """
-    tf_sec = minutes * 60
-    # FIX 2026-10-02: lookback must cover slow+signal+buffer, not fixed 40
-    params = get_macd_params(token)
-    slow, sig = params['slow'], params['signal']
-    lookback_raw = minutes * (slow + sig + 20)
-    rows = get_price_history(token, lookback_minutes=lookback_raw)
-    if not rows or len(rows) < 40:
+    _VALID_TF = {1: '1m', 5: '5m', 15: '15m', 60: '1h', 240: '4h'}
+    tf_name = _VALID_TF.get(minutes)
+    if tf_name is None:
         return None
-
-    # Aggregate into TF candles (open, high, low, close)
-    buckets = {}
-    for ts, close in rows:
-        bucket_ts = (ts // tf_sec) * tf_sec
-        if bucket_ts not in buckets:
-            buckets[bucket_ts] = [close, close, close, close]
-        else:
-            buckets[bucket_ts][1] = max(buckets[bucket_ts][1], close)   # high
-            buckets[bucket_ts][2] = min(buckets[bucket_ts][2], close)   # low
-            buckets[bucket_ts][3] = close                                # close
-
-    sorted_ts = sorted(buckets.keys())
-    if len(sorted_ts) < 4:
-        return None
-
-    closes_all = [buckets[ts][3] for ts in sorted_ts]
 
     params = get_macd_params(token)
     fast, slow, sig = params['fast'], params['slow'], params['signal']
+    # Need slow + sig + buffer candles
+    n_needed = slow + sig + 20
+
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        # FIX 2026-10-02: read from candles_{tf} directly (not price_history)
+        cur.execute(f"""
+            SELECT ts, open, high, low, close FROM candles_{tf_name}
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC LIMIT ?
+        """, (token.upper(), n_needed))
+        rows = cur.fetchall()
+        conn.close()
+    except Exception:
+        return None
+
+    if not rows or len(rows) < 40:
+        return None
+
+    # Rows are newest-first, reverse to chronological
+    rows.reverse()
+    closes_all = [r[4] for r in rows]  # close prices
+
     n_bars = len(closes_all[:-1])   # previous bar
     if n_bars < slow + sig:
         return None
