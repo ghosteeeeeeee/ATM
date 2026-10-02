@@ -1,3 +1,5 @@
+## TEAM UPDATES
+- [2026-10-02 22:49] health_monitor: Pipeline OK (0 errors, 47 closed today / 30 wins). Disk WARN 88% — WAL checkpointed session_brain+signals_hermes (~78MB freed); candles.db WAL 3.2GB locked by active collector. Hotset empty (all-neutral regime, expected). Failed non-critical units: better-coder (broken import), mtf-macd-tuner (PrecomputedMACD.warmup), wasp. CEO DB-retention decision still open.
 
 ## TEAM UPDATES
 - [2026-10-02 19:46 UTC] health_monitor: Pipeline OK — last cycle 19:45 all rc=0, 0 errors, 0 open / 47 closed today, 96 signals/1h, regime SHORT_BIAS (1L/34S/82N), speed 53.5% ≥50th pct, prices fresh, timers firing. AUTO-FIX: compressed logs >7d — disk 88%→85%. WARN: 5 failed non-trading units (better-coder ModuleNotFoundError, bug-hunter found hardcoded passwords + dead signal_gen imports, git-release dry-run fail, mtf-macd-tuner PrecomputedMACD.warmup AttributeError, trading-checklist 0-approved signals WARN). Trading path healthy. Note: `list-timers hermes-*` glob returns 0 — use `list-timers --all | grep hermes`. Details: automation/error_alerts.md

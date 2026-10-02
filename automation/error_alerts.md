@@ -1,5 +1,15 @@
 # Error Alerts
 
+## Error Alerts — 2026-10-02 22:49 UTC
+- **WARN** (1x): disk `/` **88%** used (98G/118G, 15G free) — up from 87% an hour ago.
+  - **AUTO-FIX**: WAL checkpoint on `session_brain.db` (freed 73.8MB) and `signals_hermes.db` (freed 4.6MB). `candles.db` WAL is 3.2GB but locked by active `price_collector` — cannot checkpoint mid-run. No logs >7d to compress. Remaining bulk is active DBs (coin_tracker 3.3G, candles 2.3G, signals_hermes 905M, session_brain 866M, mtf_macd_tuner 529M). **CEO DB-retention decision still open.**
+- **WARN** (repeated): `hotset.json` empty — `[hotset] fallback DB query returned 0 tokens` + `no signals survived compaction` every cycle. 83 signals generated in last hour but 0 approved. Regime fully NEUTRAL (117N/0L/0S) explains execution block; DB-fallback returning 0 despite 16839 rows in `signals` table is worth auditing in signal_compactor filters. Not a crash — trading path healthy.
+- **INFO** (repeated): `hermes-better-coder.service` failing — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. Broken import path. Not auto-fixed (needs code review).
+- **INFO** (repeated): `hermes-mtf-macd-tuner.service` failing — `AttributeError: 'PrecomputedMACD' object has no attribute 'warmup'`. Code bug in tuner, not in trading execution path.
+- **INFO**: `hermes-wasp.service` failing every 30min (exit 1). Health-monitor unit itself broken — ironic but non-critical.
+- **NOTE**: `signals` table holds 16839 rows — `hermes-signal-purge.timer` may not be reclaiming. Worth retention audit.
+- **INFO**: Pipeline healthy — 0 Tracebacks/CRASH in 30min. Position manager clean. Prices fresh (86 tokens, 32s). 47 trades closed today, 30 wins (63.8% WR). 0 open, 0 phantom. All key timers firing.
+
 ## Error Alerts — 2026-10-02 19:46 UTC
 - **WARN** (1): `Disk at 85% (95G/118G)` — was 88% at check start. pipeline.log 81M, signal-compactor.log 49M, trade-watchdog.log 43M, 15m_regime.log 28M.
   - **AUTO-FIX**: Compressed `*.log` older than 7d via gzip. Disk 88%→85%. No new large files found >7d in logs/.
