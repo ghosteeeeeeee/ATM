@@ -90,15 +90,20 @@ def is_delisted(token: str) -> bool:
 
 def _get_zscore(token: str, timeframe: str = '1h') -> Optional[float]:
     """Calculate z-score from local candles.db (inline, no signal_gen dependency)."""
+    # Validate timeframe against allowlist to prevent injection
+    _VALID_TF = {'1m', '5m', '15m', '1h', '4h'}
+    if timeframe not in _VALID_TF:
+        return None
     try:
         from paths import CANDLES_DB
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
-        cur.execute("""
-            SELECT close FROM candles
-            WHERE token = ? AND timeframe = ?
+        # FIX 2026-10-02: per-TF table names (candles_1h, candles_15m, etc.)
+        cur.execute(f"""
+            SELECT close FROM candles_{timeframe}
+            WHERE token = ? AND is_closed = 1
             ORDER BY ts DESC LIMIT 500
-        """, (token.upper(), timeframe))
+        """, (token.upper(),))
         rows = [r[0] for r in cur.fetchall()]
         conn.close()
         if len(rows) >= 20:
@@ -113,15 +118,19 @@ def _get_zscore(token: str, timeframe: str = '1h') -> Optional[float]:
 
 def _get_rsi(token: str, timeframe: str = '1m', period: int = 14) -> Optional[float]:
     """Calculate RSI from local candles.db."""
+    _VALID_TF = {'1m', '5m', '15m', '1h', '4h'}
+    if timeframe not in _VALID_TF:
+        return None
     try:
         from paths import CANDLES_DB
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
-        cur.execute("""
-            SELECT close FROM candles
-            WHERE token = ? AND timeframe = ?
+        # FIX 2026-10-02: per-TF table names + is_closed filter
+        cur.execute(f"""
+            SELECT close FROM candles_{timeframe}
+            WHERE token = ? AND is_closed = 1
             ORDER BY ts DESC LIMIT ?
-        """, (token.upper(), timeframe, period + 1))
+        """, (token.upper(), period + 1))
         rows = [r[0] for r in cur.fetchall()]
         conn.close()
         if len(rows) < period + 1:
@@ -190,7 +199,10 @@ def _macd_crossover(token: str, minutes: int):
     Returns: (histogram, macd_line, signal_line, crossover_dir)
     """
     tf_sec = minutes * 60
-    lookback_raw = minutes * 40
+    # FIX 2026-10-02: lookback must cover slow+signal+buffer, not fixed 40
+    params = get_macd_params(token)
+    slow, sig = params['slow'], params['signal']
+    lookback_raw = minutes * (slow + sig + 20)
     rows = get_price_history(token, lookback_minutes=lookback_raw)
     if not rows or len(rows) < 40:
         return None
@@ -412,7 +424,8 @@ def run():
         )
         if sid:
             added += 1
-            _log(f'  SIGNAL: {token} {mtf_direction} @{price:.6f} conf={conf:.1f} z_1h={z_1h:.2f} rsi={rsi:.1f if rsi else "N/A"}')
+            rsi_s = f'{rsi:.1f}' if rsi is not None else 'N/A'
+            _log(f'  SIGNAL: {token} {mtf_direction} @{price:.6f} conf={conf:.1f} z_1h={z_1h:.2f} rsi={rsi_s}')
 
     _log(f'Done: {added} signals added')
     return added

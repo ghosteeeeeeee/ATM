@@ -85,12 +85,13 @@ def run() -> int:
         try:
             _conn = _sqlite3.connect(CANDLES_DB, timeout=10)
             _cur = _conn.cursor()
+            # FIX 2026-10-02: per-TF table names (candles_4h, candles_1h, candles_15m)
             for tf in ['4h', '1h', '15m']:
-                _cur.execute("""
-                    SELECT close FROM candles
-                    WHERE token = ? AND timeframe = ?
+                _cur.execute(f"""
+                    SELECT close FROM candles_{tf}
+                    WHERE token = ? AND is_closed = 1
                     ORDER BY ts DESC LIMIT 500
-                """, (token.upper(), tf))
+                """, (token.upper(),))
                 rows = [r[0] for r in _cur.fetchall()]
                 if len(rows) >= 20:
                     import statistics
