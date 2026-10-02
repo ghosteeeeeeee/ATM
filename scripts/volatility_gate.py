@@ -234,7 +234,9 @@ REGIME_SIGNALS = {
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic (added 2026-10-02: was FLAT-only, killed conf=99 SHORT "not suited for NORMAL")
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
-        'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
+        # bb-squeeze+ LONG removed from EXTREME 2026-10-02 — 12T 50%WR -$0.15 (hard_sl/hard_max_loss). HIGH 63.6%WR +$0.14 edge kept. signal_reporter
+        'bb-squeeze-',  # SHORT disabled (BOLLINGER_SQUEEZE_MINUS_ENABLED=False) — keep out of EXTREME too
+        'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol

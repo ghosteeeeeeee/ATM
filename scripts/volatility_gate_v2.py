@@ -322,6 +322,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'pump-chain-'): 0.5,             # PENALIZED 2026-09-22 — 52.4% WR but -$0.14 (84T)
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
+    ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
     # ── NORMAL regime: per-signal overrides ──
     # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
     # Entries use BOTH underscore and hyphen forms — substring matching means

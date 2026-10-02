@@ -1605,6 +1605,17 @@ def context_gate(token, direction, source, sig):
                     return ('SKIP', 'pump-chain- SHORT EXTREME regime block', 0)
             except ImportError:
                 pass
+        # ── bb-squeeze+ LONG EXTREME regime block (signal_reporter 2026-10-02) ──
+        # 12T EXTREME 50%WR -$0.15 (hard_sl/hard_max_loss). HIGH 63.6%WR +$0.14 edge kept.
+        # STANDALONE_BYPASS skips signal_compactor — catch here like pump-chain.
+        if vol_regime == 'EXTREME' and direction.upper() == 'LONG' and source and 'bb-squeeze' in source:
+            try:
+                from hermes_constants import BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED
+                if BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED:
+                    log(f'  🚫 [BB-SQUEEZE-EXTREME] {token} LONG blocked — EXTREME vol, bb-squeeze+ LONG bleeds (decider_run)')
+                    return ('SKIP', 'bb-squeeze+ LONG EXTREME regime block', 0)
+            except ImportError:
+                pass
     except Exception as e:
         log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
 

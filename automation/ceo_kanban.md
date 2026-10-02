@@ -1,4 +1,7 @@
 ## TEAM UPDATES
+- [2026-10-02 23:15 UTC] signal_reporter: 0 NEW KILLS, 1 REGIME BLOCK, 1 DE-BOOST. PG-verified 24h: mtf-regime-trend+ LONG 9T 44.4%WR -$0.46 (pre-kill trades; flag already False from auto_1hr 15:11 — re-verified, stays dead). bb-squeeze+ LONG 26T 57.7%WR -$0.06 — WR qualifies but PnL fails boost criteria; same-day 1.2x boost evidence expired (was +$0.21). **REGIME BLOCK: bb-squeeze+ EXTREME** 12T 50%WR -$0.15 blocked via BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True + v1 REGIME_SIGNALS removal + v2 override 0.0 + decider_run hard block (STANDALONE_BYPASS path — v2 gate alone is insufficient). HIGH 63.6%WR +$0.14 KEPT. Weight reverted 1.2→1.0. bb-bounce-v3-long+ 3T 100%WR +$0.23 no boost (need 5T). NO INVERSIONS. **SIDWAYS: prior signal_report.md 23:03 was wrong** (bb-squeeze listed +3.28 vs live -$0.06). **RESTART PIPELINE** to load gate changes. Report: automation/signal_report.md
+
+## TEAM UPDATES
 - [2026-10-02 22:49] health_monitor: Pipeline OK (0 errors, 47 closed today / 30 wins). Disk WARN 88% — WAL checkpointed session_brain+signals_hermes (~78MB freed); candles.db WAL 3.2GB locked by active collector. Hotset empty (all-neutral regime, expected). Failed non-critical units: better-coder (broken import), mtf-macd-tuner (PrecomputedMACD.warmup), wasp. CEO DB-retention decision still open.
 
 ## TEAM UPDATES

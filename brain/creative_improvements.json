@@ -1960,5 +1960,35 @@
     "category": "signal quality",
     "status": "monitor",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-02T22:33:14Z",
+    "idea": "bb-squeeze EXTREME confidence dampener (-10 to -15pt), not a regime block",
+    "rationale": "7d EXTREME 13T 46.2%WR -$0.25 vs HIGH 11T 63.6% +$0.14. The signal is valid (research PASS 805T 70.8%); EXTREME squeeze breakouts just have thinner follow-through. A conf dampener lets high-conviction EXTREME setups through while reducing noise fires. RSI_MIN=60 was correctly rejected (7 winners in 50-60 band).",
+    "expected_impact": "Reduce EXTREME bb-squeeze fire rate ~20-30%, preserve HIGH volume. Est. +$0.10-0.20/7d if EXTREME is net-negative after dampen.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "Monitor window active on bb-squeeze — do NOT apply until 20T EXTREME eval. Sample 13T is borderline."
+  },
+  {
+    "date": "2026-10-02T22:33:14Z",
+    "idea": "ema_reclaim confluence partner map — pair with volume-breakout / doji when both fire same token",
+    "rationale": "ema_reclaim detection CONFIRMED (XPL conf=79) but 0 solo signals — not in STANDALONE_BYPASS by design. The gap is that no confluence pair spec exists, so the signal can never contribute. Pairing with already-profitable volume-breakout-long+ (81.3% EXTREME) or doji-bottom (87.5% HIGH) would give it a path to fire.",
+    "expected_impact": "Unlocks NEUTRAL diversity without new signal build. Est. +$0.10-0.30/7d if pairs fire 1-2x/day.",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "Requires compactor/SIGNAL_REGISTRY confluence entry — not a constants-only change. Delegate signal_analyst or implement after monitor windows clear."
+  },
+  {
+    "date": "2026-10-02T22:33:14Z",
+    "idea": "Trail-scratch economics: score bb-squeeze EXTREME on trail-positive expectancy, not binary WR",
+    "rationale": "24h bb-squeeze EXTREME: 9 trail scratches net +$0.18, but 3 hard SLs -$0.46. Binary WR counts scratches as losses. PM_TRAIL dominates system exits (82T +$3.34/7d). If scratch trades are ~breakeven and only hard SLs are the real cost, the fix is SL placement / MAE pre-check in EXTREME — not signal blocking.",
+    "expected_impact": "Analytics reframing — may unlock a narrower fix (e.g. wider SL in EXTREME) once scratch vs hard-SL economics are separated.",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low",
+    "gate": "Requires MFE/MAE breakdown per exit_reason — one-off query, no config change."
   }
 ]

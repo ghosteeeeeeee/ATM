@@ -2761,6 +2761,10 @@ PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO
 PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 
+# bb-squeeze+ LONG EXTREME regime block — 12T 50%WR -$0.15 EXTREME (hard_sl/hard_max_loss).
+# HIGH 63.6%WR +$0.14, NORMAL 66.7%WR kept. signal_reporter 2026-10-02.
+BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED = True
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period
