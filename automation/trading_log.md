@@ -2076,3 +2076,29 @@ BY: daily-orchestrator
 - ADD ADA (WR=40.0%, PnL=$-0.35, low_wr (40.0%))
 
 Final set: ['ADA']
+
+## [2026-10-02 14:11 UTC] Hourly Analysis
+
+**Trades:** 7 closed (7 wins, 0 losses)
+**PnL:** $0.51 (WR: 100.0%)
+
+**Breakdown:** mtf-regime-trend+ 3T +$0.29 (100%WR) | bb-squeeze+ 4T +$0.22 (100%WR). All profit-monster-trail exits.
+
+**24h context:** 45 closed, atr_trail_hit 0/45 (tpsl fix stable). hard_max_loss_* family 5 exits -$0.73 dominant bleed. bb-squeeze+ 25T/24h at 60%WR +$0.21 — thin edge but positive. mtf-regime-trend+ first live test: 3T 100%WR +$0.29.
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0% of 24h closes. tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** No signal with 0% WR and 3+ trades in last hour. Both active signals 100%WR this hour.
+- **PnL streak:** +$0.51 this hour. Positive. No size reduction needed.
+- **Trade frequency:** 7/hr — normal range.
+- **Entry quality:** All 7 winners trail-exited with profit-monster-trail. MAE data null on trail exits (known data-path gap).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-bounce 1m, volume-breakout RSI_CEILING backtest-first. Do not stack.
+
+**Open Questions:**
+- bb-squeeze+ 25T/24h at 60%WR — thin edge, watch if WR degrades further. EXTREME diversity monitor still active.
+- hard_max_loss_* still dominant 24h bleed (5T/-$0.73) — hard-floor 25→30 monitor window active.
+- mtf-regime-trend+ first live test passed (3/3) — continue watching for more samples before concluding.
+- BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene, not signal logic).
