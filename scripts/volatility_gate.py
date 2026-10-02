@@ -116,7 +116,7 @@ REGIME_SIGNALS = {
         'mtf-regime-trend+',  # multi-timeframe regime trend — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
-        'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
+        'doji-bottom-long', 'doji-top-short',  # doji exhaustion — SHORT added 2026-10-02: asymmetry fix (doji-top-short was only in FLAT)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in steady markets
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in normal vol
@@ -135,7 +135,7 @@ REGIME_SIGNALS = {
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
-        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
+        'bb-bounce-v2-long', 'bb-v2-short',  # V2 bounce — SHORT added 2026-10-02: asymmetry fix (LONG was whitelisted, SHORT was not)
         'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
@@ -176,12 +176,13 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in volatile breakouts
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
-        'bb-squeeze+',  # bollinger squeeze breakout — works in high vol
-        'mtf-regime-trend+',  # multi-timeframe regime trend — works in high vol
+        'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in high vol (SHORT added 2026-10-02: asymmetry fix)
+        'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — LONG added 2026-10-02 (reverse asymmetry fix: SHORT was added but LONG was never in HIGH)
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — works in high vol (SHORT added 2026-10-02: asymmetry fix, LONG was whitelisted but SHORT was not)
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in high vol
         'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
-        'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
+        'doji-bottom-long', 'doji-top-short',  # doji exhaustion — SHORT added 2026-10-02: asymmetry fix (doji-top-short was only in FLAT)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — works in high vol
@@ -200,7 +201,7 @@ REGIME_SIGNALS = {
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
         'breakout-long+',  # Volume-confirmed breakout LONG — continuation in storms
-        'volume-breakout-long+',  # volume-confirmed breakout LONG — works in extreme vol
+        'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
         'r2-trend-short',  # R² downtrend SHORT — works in all regimes
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
@@ -227,8 +228,8 @@ REGIME_SIGNALS = {
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
-        'bb-squeeze+',  # bollinger squeeze breakout — works in extreme vol
-        'mtf-regime-trend+',  # multi-timeframe regime trend — works in extreme vol
+        'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in extreme vol
