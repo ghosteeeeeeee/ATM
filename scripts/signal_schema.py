@@ -3024,7 +3024,14 @@ def is_component_disabled(component: str) -> bool:
     if c == 'rr-struct': return not RR_STRUCTURAL_ENABLED
     if c == 'rr-struct-v2+': return not RR_STRUCTURAL_V2_LONG_ENABLED
     # pump-chain (capital rotation flow signal)
-    if c == 'pump-chain+': return not PUMP_FLOW_PLUS_ENABLED
+    if c == 'pump-chain+':
+        try:
+            from hermes_constants import PUMP_FLOW_PLUS_ENABLED
+            if not PUMP_FLOW_PLUS_ENABLED:
+                return True
+        except ImportError:
+            pass
+        return False
     if c == 'pump-chain-':
         # V5 SHORT bypasses old kill-switch
         try:
