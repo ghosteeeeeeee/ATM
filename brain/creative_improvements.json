@@ -1622,8 +1622,9 @@
     "rationale": "Strongest signal-regime edge in system. CEO rejected on wrong column (entry_regime_4h=NULL); volatility_regime is correct (DRIFT-005 verified). 7d EXTREME trades all positive. Below 20T threshold — CANNOT boost yet.",
     "expected_impact": "+$0.30-0.50/7d when enabled at 20T",
     "category": "entry sniper",
-    "status": "carried — re-propose at 20T EXTREME trades",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-10-02T15:54:47.763227+00:00"
   },
   {
     "date": "2026-10-02T13:34:44Z",
@@ -1649,8 +1650,9 @@
     "rationale": "IMX hard_tp +3.7% EXTREME, COMP HARD_SL_FAILED +42% EXTREME, JUP atr_trail_hit +5.2% EXTREME. volume-breakout-long+ catches exactly what the philosophy demands: every pump = LONG opportunity. NEUTRAL signal spec (due Oct 3) should study this DNA — volume confirmation + momentum + regime alignment is the recipe.",
     "expected_impact": "NEUTRAL signal built on proven DNA = higher baseline WR",
     "category": "signal design",
-    "status": "input to signal_analyst NEUTRAL spec",
-    "risk": "none — advisory"
+    "status": "boosted",
+    "risk": "none — advisory",
+    "boosted_at": "2026-10-02T15:55:19.844353+00:00"
   },
   {
     "date": "2026-10-02T15:30:00Z",
@@ -1676,8 +1678,9 @@
     "rationale": "Dry-run: 1 full hit/15 tokens (ORDI). Detection works, pattern rare by design. Missing piece is partner signal, not looser entry.",
     "expected_impact": "NEUTRAL diversity once partner built",
     "category": "signal diversity",
-    "status": "suggested",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-10-02T15:54:26.343503+00:00"
   },
   {
     "date": "2026-10-02T15:37:36Z",
@@ -1714,5 +1717,50 @@
     "category": "process",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "mtf-regime-trend LONG det-RSI ceiling=60 in re-enable checklist",
+    "rationale": "24h: winners det RSI 26-57 (pullback), losers det RSI 60-66 (chase). Ceiling=60 blocks 0 winners, 3/5 losers. DRIFT-002 aligned.",
+    "expected_impact": "Eliminate chase-entry mtf losses if pattern holds at 20T+",
+    "category": "entry sniper",
+    "status": "suggested — checklist only, not live config",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "REJECT bb-squeeze RSI_MIN=60 — full 7d shows RSI 50-60 has 7 winners",
+    "rationale": "Prior 6T sample incomplete. Full 26T 7d: RSI_MIN=60 kills 7/15 winners (47%). Losses are trail noise + 3 hard_max_loss, not RSI.",
+    "expected_impact": "Avoids destroying signal win base",
+    "category": "signal quality",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "bb-squeeze EXTREME regime watch — 13T 46.2% -$0.25 vs HIGH 10T 70% +$0.41",
+    "rationale": "Clear regime split. Below 20T threshold. Re-enable window active — do not stack.",
+    "expected_impact": "If EXTREME <50% at 20T, regime-block saves bleed without touching HIGH winners",
+    "category": "regime specialist",
+    "status": "monitor to 20T",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "Multi-source confidence compound (2+ signals agree → conf boost)",
+    "rationale": "ME bb-bounce+vol-breakout +$0.36. High conf alone not predictive (85-95 conf 33%WR). Needs backtest.",
+    "expected_impact": "Research — could fix conf calibration inverse",
+    "category": "confidence engineering",
+    "status": "carried — research only",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "volume-breakout-long+ EXTREME conf boost — re-eval at 20T (now 9T 77.8%WR +$2.72)",
+    "rationale": "Best signal, EXTREME habitat. Under threshold. Prior rejection was wrong column.",
+    "expected_impact": "+2-4% WR on already-winning setups",
+    "category": "entry sniper",
+    "status": "carried — 20T threshold",
+    "risk": "low"
   }
 ]

@@ -1,249 +1,289 @@
 {
-  "timestamp": "2026-10-02T15:45:00Z",
+  "timestamp": "2026-10-02T16:34:39Z",
   "agent": "brain_auditor",
   "session_lock": false,
   "config_changes_applied": [],
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing",
-      "ema_reclaim detection coverage"
-    ],
-    "key_insights": [
-      "Sessions repeatedly discuss RR_ENGINE_SHADOW->FORCE — still True (log-only) at hermes_constants.py:3450; FORCE needs backtest first (DRIFT-007)",
-      "volume-breakout EXTREME conf boost discussed 4+ times — still 9T EXTREME, under 20T threshold",
-      "ema_reclaim / NEUTRAL diversity remains #1 gap — 0 trades, delegated signal_analyst",
-      "Exit system historically #1 profit leak — ATR_SL fix + profit-monster-trail now dominant (35T 80%WR +$1.81/24h)",
-      "DRIFT-002 now QUANTIFIED: detect-exec RSI gap>25 = 39T/7d -$1.09 vs gap<=15 86T +$2.78"
+    "queries_run": 6,
+    "top_recurring": [
+      "detect-exec RSI collapse (DRIFT-002) — mtf/pump-chain losers det 55-66 exec collapse",
+      "bb-squeeze scratch trail noise since re-enable",
+      "SHORT R:R structural disadvantage (-$1.32/7d)",
+      "monitor window stacking prevents measurement",
+      "vol-breakout EXTREME boost waiting on 20T threshold"
     ]
   },
   "trade_summary_24h": {
-    "verified_live": "50T 66.0%WR +$1.70 (PG direct; CURRENT.md 14:00 snapshot 44T +$2.43 is stale — more trades closed since, still positive)",
-    "long_24h_dominant": "volume-breakout +$0.94 (2T 100%), bb-squeeze+ +$0.21 (25T 60%), doji +$0.12, bb-bounce family +$0.40",
-    "short_24h": "1T pump-chain- -$0.13 (HYPER — det RSI 58.8 passed RSI_MIN=40 correctly, exec RSI collapsed to 19.63 = DRIFT-002)",
-    "by_regime_7d": {
-      "EXTREME": "74T 52.7%WR +$0.78",
-      "HIGH": "39T 56.4%WR +$0.26",
-      "NORMAL": "39T 48.7%WR +$0.18",
-      "FLAT": "5T 40%WR +$0.27"
+    "closed_24h": 52,
+    "wr_24h": 65.4,
+    "pnl_24h": 1.65,
+    "closed_7d": 162,
+    "wr_7d": 51.2,
+    "pnl_7d": 1.44,
+    "long_7d": {
+      "trades": 114,
+      "wr": 53.5,
+      "pnl": 2.76
     },
-    "totals_7d": "160T 51.3%WR +$1.49 (all regimes positive)",
-    "open_positions": "3: COMP + JUP mtf-regime-trend+ (opened 14:56-14:58 pre-PLUS-kill) + BTC continuum_engine amount=0.00 phantom",
-    "best_signals": {
-      "volume-breakout-long+": "7d 4T 100%WR +$1.96 | 14d EXTREME 9T 77.8%WR +$2.93 | since Oct1: JUP+IMX+ME all positive",
-      "doji-bottom-long": "7d 8T 75%WR +$0.39 (HIGH 8T 87.5% +$0.48 — regime specialist)",
-      "bb-squeeze+": "7d 25T 60%WR +$0.21 (HIGH 10T 70% +$0.41 vs EXTREME 13T 46% -$0.25)",
-      "pump-chain- SHORT": "7d 29T 48.3%WR -$0.16 near breakeven (SHORT_CONTINUUM working)"
+    "short_7d": {
+      "trades": 48,
+      "wr": 45.8,
+      "pnl": -1.32
     },
-    "worst_active": {
-      "mtf-regime-trend+": "7d 7T 42.9%WR -$0.41 — PLUS KILLED auto_1hr 15:11 UTC today (4T 0%WR -$0.70 last hour)",
-      "pump-chain-v5 LONG": "7d 8T 37.5%WR -$0.13 (48h re-enable test window — monitor, do not stack)"
-    }
+    "regime_7d": {
+      "EXTREME": {
+        "trades": 74,
+        "wr": 52.7,
+        "pnl": 0.78
+      },
+      "HIGH": {
+        "trades": 40,
+        "wr": 55.0,
+        "pnl": 0.2
+      },
+      "NORMAL": {
+        "trades": 40,
+        "wr": 50.0,
+        "pnl": 0.19
+      },
+      "FLAT": {
+        "trades": 5,
+        "wr": 40.0,
+        "pnl": 0.27
+      }
+    },
+    "signal_24h": {
+      "mtf-regime-trend+": {
+        "trades": 9,
+        "wr": 44.4,
+        "pnl": -0.46
+      },
+      "bb-squeeze+": {
+        "trades": 25,
+        "wr": 60.0,
+        "pnl": 0.21
+      },
+      "volume-breakout-long+": {
+        "trades": 2,
+        "wr": 100.0,
+        "pnl": 0.94
+      },
+      "doji-bottom-long": {
+        "trades": 2,
+        "wr": 100.0,
+        "pnl": 0.12
+      }
+    },
+    "open_positions": [
+      "BTC continuum+ LONG @ 85401 (opened 15:37 NORMAL)",
+      "BTC continuum_engine LONG @ 85036 ORPHAN_PAPER amount=0.00 (opened Oct 1 17:45)"
+    ],
+    "note": "System positive. 24h PnL +$1.65 (52T 65.4%WR). 7d +$1.44 all regimes positive. SHORT still -$1.32/7d structural."
   },
   "drift_findings": [
     {
       "id": "DRIFT-002",
+      "status": "OPEN day5+",
       "severity": "HIGH",
-      "status": "OPEN — now quantified, not config-fixable",
-      "finding": "Detect-exec RSI gap is the dominant live loss mechanism. GAP>25: 39T/7d 51.3%WR -$1.09 vs GAP<=15: 86T 53.5%WR +$2.78. Pattern: detection RSI mid-band (50-66) looks valid, by execution price collapsed (exec RSI 13-25) = falling knife LONG.",
-      "evidence_24h": "mtf-regime-trend+ TURBO det=65.52 exec=25.00 -$0.31 | DOT det=65.77 exec=12.97 -$0.26 | SOL det=54.9 exec=18.97 -$0.13 | pump-chain- HYPER SHORT det=58.8 exec=19.63 -$0.13",
-      "why_not_blanket_fix": "gap>25 also contains winners (CRV pump-chain- SHORT +$0.55 det=58.44 exec=32.04 — price falling favors SHORT). LONG exec RSI<30 7d: 12T 8W net -$0.25 — negative ONLY because of 3 mtf losers; excluding mtf: 9T 8W +$0.45. Doji/bb-bounce WIN at oversold exec (WLFI +$0.16 exec RSI=20.92). Blanket exec-RSI floor would kill mean-reversion winners.",
-      "code_filter_status": "mtf_regime_trend.py det-RSI<30 filter committed 15:06 UTC (6967dafa). Would NOT block the 3 afternoon losers (det RSI 55-66 > 30). Would kill 1 historical winner (SOL +$0.06 det RSI=26.92). Filter correct for oversold-detection cases; insufficient for detect-exec collapse.",
-      "owner": "bug_hunter",
-      "recommendation": "Scoped exec-time re-validation for TREND-FAMILY LONG only (mtf-regime-trend, continuum) when exec RSI < 25 — NOT blanket. Verify against doji/bb-bounce winners before any code change. Do not stack config this run.",
-      "impact_on_winners_if_blanket_exec_floor_25": "Would kill WLFI doji +$0.16, POL bb-bounce +$0.10, WLFI rs-s38 +$0.09, ADA rs-s37 +$0.04, plus 4 more small winners — BAD IDEA as blanket"
-    },
-    {
-      "id": "DRIFT-005",
-      "severity": "MEDIUM",
-      "status": "CARRIED — under 20T threshold",
-      "finding": "volume-breakout-long+ EXTREME conf boost still proposed. 14d EXTREME 9T 77.8%WR +$2.93. 0 winners with RSI>=90 — VOLUME_BREAKOUT_LONG_RSI_CEILING=95 VERIFIED correct (blocks only exhausted zone).",
-      "live_tests": "Since Oct 1: JUP +$0.12 EXTREME, IMX +$0.82 EXTREME hard_tp, ME +$0.36 NORMAL combo — all positive",
-      "recommendation": "Re-eval boost at 20T EXTREME. No change now."
+      "detail": "Detect-exec RSI collapse. Prior quant: gap>25 = 39T/7d -$1.09 vs gap<=15 = 86T +$2.78. mtf losers det RSI 55-66, exec collapsed. Blanket exec-floor REJECTED (doji/bb-bounce win at oversold exec). Scoped trend-family fix delegated bug_hunter.",
+      "evidence": "TURBO det 65.52, DOT 65.77, JUP 60.03 all lost. Winners SOL 26.92 / AIXBT 38.61 / BLUR 30.71 (pullback entries)."
     },
     {
       "id": "DRIFT-007",
+      "status": "OPEN",
       "severity": "MEDIUM",
-      "status": "OPEN — shadow mode",
-      "finding": "RR_ENGINE_SHADOW=True at hermes_constants.py:3450 — regime RR mins log-only, never block. risk_reward_engine.py:723 reads it.",
-      "recommendation": "Backtest FORCE before any flip. Do not change this run."
+      "detail": "RR_ENGINE_SHADOW=True — regime R:R mins (FLAT 2.5/NORMAL 2.0/HIGH 1.3/EXTREME 2.0) are log-only. Only CONF path R:R<0.70 enforced. Needs FORCE backtest before flip."
     },
     {
-      "id": "DRIFT-signal_rsi_14",
-      "severity": "MEDIUM",
-      "status": "OPEN day5+",
-      "finding": "signal_rsi_14 NULL 50/50 (24h) and 160/160 (7d). Detection-time RSI filtering impossible from trades table alone; _signal_metadata rsi_14 works for some signals (mtf, pump-chain, bb-squeeze) but not universal.",
-      "owner": "bug_hunter"
-    },
-    {
-      "id": "STALE-CURRENT-MD",
+      "id": "SIGNAL_RSI_14_NULL",
+      "status": "PERSISTENT",
       "severity": "LOW",
-      "status": "NOTED",
-      "finding": "CURRENT.md (14:00 UTC) says mtf-regime-trend+ hotset live + 6 open positions. Reality 15:45: PLUS killed 15:11, 3 open. CEO/status docs lag auto_1hr kills.",
-      "recommendation": "Orchestrator should refresh CURRENT.md after auto_1hr kills — or auto_1hr should writeback."
+      "detail": "signal_rsi_14 column NULL 160/160 7d. Dead — do not query it. Use _signal_metadata.rsi_1m instead (populated)."
     },
     {
-      "id": "ema_reclaim",
+      "id": "ORPHAN_PAPER",
+      "status": "OPEN",
+      "severity": "LOW",
+      "detail": "BTC continuum_engine amount_usdt=0.00 open since Oct 1 17:45 (>22h). Data hygiene, not trading-path."
+    },
+    {
+      "id": "CURRENT_MD_STALE",
+      "status": "OPEN",
       "severity": "MEDIUM",
-      "status": "OPEN — delegated",
-      "finding": "0 trades despite ENABLED=True + registered. Detection requires decline>=0.4% + reclaim vol>=0.6x + RSI 35-55 mid-band. Dry-run: rare pattern (1 full hit/15 tokens). Not broken — rare by design.",
-      "owner": "signal_analyst",
-      "recommendation": "Keep filters. Build confluence partner signal instead of loosening entry."
+      "detail": "CURRENT.md last updated 14:00 UTC. mtf-regime-trend+ PLUS killed auto_1hr 15:11 not reflected in monitor list. auto_1hr kills should writeback CURRENT.md."
+    },
+    {
+      "id": "AGENTS_HL_KEY_STALE",
+      "status": "OPEN",
+      "severity": "LOW",
+      "detail": "AGENTS.md says HL API key expires in 3 days. Actual ~164 days (set 2026-09-16, valid 180). T to verify and correct."
     }
   ],
-  "losing_trade_autopsy_24h": {
-    "total_losers": 15,
-    "clusters": [
-      {
-        "signal": "bb-squeeze+",
-        "count": "9x (incl. 7 trail scratches -$0.01 to -$0.04 + SYRUP -$0.23 + SAND -$0.13 + HYPE -$0.11)",
-        "regime": "EXTREME/NORMAL/HIGH mixed",
-        "root_cause": "PM_TRAIL scratch noise during re-enable monitor window — not entry-quality failure. Profitable band is RSI 60-75 (14T 71.4% +$0.28). RSI 40-60 = 6T 16.7% -$0.23 (sample <20).",
-        "recommended_change": "NONE this run — monitor window. Watchlist: BB_SQUEEZE_LONG_RSI_MIN=60 when 20T sample confirms. Would block 1 of 15 7d winners if applied now.",
-        "confidence": "MEDIUM (sample too small for change)"
-      },
-      {
-        "signal": "mtf-regime-trend+ LONG",
-        "count": "3x TURBO/DOT/SOL = -$0.70",
-        "regime": "HIGH/NORMAL",
-        "root_cause": "DRIFT-002 — detection RSI valid (54.9-65.8), execution RSI collapsed (13.0-25.0). Market reversed between detect and execute. NOT oversold-at-detection.",
-        "entry_check": "det rsi_14 from _signal_metadata: 65.52/65.77/54.9 — all mid-band, would pass any det RSI filter. exec entry_rsi_14: 25.00/12.97/18.97 — falling knife at open.",
-        "regime_check": "2 HIGH + 1 NORMAL — regime not the differentiator. Early winners BLUR/AIXBT/SOL were also HIGH/NORMAL but entered before reversal (13:27-13:31 vs losers 13:52-13:54).",
-        "recommended_change": "PLUS already KILLED auto_1hr 15:11. Det-RSI<30 filter committed 15:06 does NOT catch these. Real fix = exec-time RSI re-check for trend-family LONG (bug_hunter, scoped). Re-enable PLUS only after: (1) scoped exec check OR 48h clean with filter live, (2) pipeline confirmed loaded filter.",
-        "impact_on_winners": "Det-RSI<30 filter would have killed SOL +$0.06 (det 26.92). Would NOT have blocked the 3 losers. Exec-floor would kill doji/bb-bounce winners — do NOT apply blanket.",
-        "confidence": "HIGH (pattern clear across 3 trades + 7d gap stats)"
-      },
-      {
-        "signal": "pump-chain- SHORT",
-        "count": "1x HYPER -$0.13",
-        "regime": "NORMAL",
-        "root_cause": "DRIFT-002 SHORT variant — det RSI 58.8 (passes RSI_MIN=40 correctly), exec RSI 19.63 (price bounced hard = oversold SHORT catch). SHORT_CONTINUUM + RSI_MIN working at detection; gap is execution timing.",
-        "recommended_change": "NONE — 7d pump-chain- 29T 48.3% -$0.16 near breakeven. Do not raise RSI_MIN further (would risk sweet spot 40-50 = 14T 64.3% +$0.31).",
-        "confidence": "HIGH"
-      },
-      {
-        "signal": "continuum-osc+ / combo scratches",
-        "count": "2x BTC -$0.20 cut-loser-MAE-GUARD + SAGA -$0.10 rr_engine_support_br",
-        "root_cause": "Normal variance / RR engine shadow logging. Not systematic.",
-        "recommended_change": "NONE"
-      }
-    ],
-    "no_change_rationale": "Monitor windows active (bollinger_squeeze Oct 1 21:55, volume-breakout tests, SHORT-CONTINUUM, HARD_FLOOR=25, doji 20T, ema_reclaim shadow, pump-chain-v5 48h, mtf PLUS just killed 15:11). Standing decision: 0 config changes when fixes in monitor windows. hermes_constants.py VALUES need CEO/T. No filter this run would have blocked losers without hurting winners."
-  },
+  "losing_trade_autopsy_24h": [
+    {
+      "losing_trade": "mtf-regime-trend+ LONG cluster: TURBO -1.38%, DOT -5.91%, SOL -5.47%, HBAR -1.35%, JUP -1.33% = -$0.46/24h (5L)",
+      "signal": "mtf-regime-trend+ (PLUS killed 15:11, base still enabled)",
+      "regime": "HIGH 3L + NORMAL 2L",
+      "root_cause": "Detect-exec RSI collapse (DRIFT-002). Losers entered at det RSI 55-66 (chasing mid-high RSI), exec collapsed. Winners entered at det RSI 26-38 (pullback). HBAR det 22.8 = oversold exception, separate failure mode.",
+      "entry_check": "Winners: SOL 26.92, AIXBT 38.61, BLUR 30.71, COMP 57.3. Losers: TURBO 65.52, DOT 65.77, SOL 54.9, JUP 60.03, HBAR 22.81. Pattern: det RSI >60 LONG = chasing.",
+      "regime_check": "HIGH/NORMAL. Not EXTREME-driven. Volume min lowered to 0.2 may be too loose for HIGH chop.",
+      "recommended_change": "Include det-RSI ceiling=60 in mtf re-enable checklist. NOT a config change now — PLUS already killed, sample 9T too small, monitor windows active.",
+      "impact_on_winners": "Ceiling=60 blocks 0/4 winners (max winner COMP 57.3). Blocks 3/5 losers (TURBO/DOT/JUP). HBAR (det 22.8) would NOT be caught by ceiling — oversold exception needs separate handling.",
+      "confidence": "MEDIUM (pattern clear, sample 9T below 20T threshold)"
+    },
+    {
+      "losing_trade": "bb-squeeze+ 11L/7d: 8 PM_TRAIL scratches (<$0.05) + 3 hard_max_loss (SAND -6.0%, SYRUP -3.1%, HYPE -4.7%)",
+      "signal": "bb-squeeze+ (re-enable monitor window active since Oct 1 21:55)",
+      "regime": "EXTREME dominant bleed: 13T 46.2%WR -$0.25 vs HIGH 10T 70%WR +$0.41",
+      "root_cause": "NOT entry RSI. Full 7d RSI bands: WIN 50-60=7, 70+=4, 60-70=3; LOSS 50-60=5, 40-50=2, 60-70=2. 50-60 is BOTH top win and top loss band. Losses are trail re-enable noise + 3 hard_max_loss with mixed RSI 40-69.",
+      "entry_check": "SAND RSI 39.9, SYRUP 58.2, HYPE 68.7 — no clean RSI pattern on hard_max_loss losers. Trail scratches are variance, not systematic entry failure.",
+      "regime_check": "EXTREME is weak habitat for bb-squeeze (46.2% WR, 13T). Below 20T regime-block threshold. HIGH is strong (70% WR).",
+      "recommended_change": "NO RSI_MIN filter. REJECT prior RSI_MIN=60 watchlist — full 7d data shows RSI 50-60 has 7 winners; ceiling would kill 7/15 winners. Monitor EXTREME regime only until 20T.",
+      "impact_on_winners": "RSI_MIN=60 would block 7/15 winners = 47% of winners killed. BAD IDEA. Confirmed by complete 7d dataset (prior 6T sample was incomplete).",
+      "confidence": "HIGH (full 7d dataset, clear RSI_MIN rejection)"
+    }
+  ],
   "signal_quality_deep_dive": {
     "mtf-regime-trend+": {
-      "sample": "7T 42.9%WR -$0.41 (7d) — PLUS disabled, MINUS still enabled (STX SHORT conf=50 just fired 15:34)",
-      "winner_dna": "Early entries 13:27-13:31 before reversal: det RSI 26.9-38.6, exec RSI 41.7-51.6, all profit-monster-trail. Late entries 13:52-13:54 after reversal: det RSI 54.9-65.8, exec RSI 13-25, all hard_sl/hard_max_loss.",
-      "filter_assessment": "Det-RSI<30 (live 15:06) addresses wrong axis. Momentum-state-at-detection would catch late entries but is a signal-code change, not config. PLUS kill is correct short-term.",
-      "re_enable_criteria": "Not time-based: (1) scoped exec RSI check for trend LONG OR 48h clean post-filter, (2) pipeline confirmed loaded, (3) MINUS SHORT sample collected first."
+      "sample_24h": "9T 44.4%WR -$0.46",
+      "pattern": "Winners = pullback entries (det RSI 26-38). Losers = chase entries (det RSI 55-66) + one oversold exception (HBAR 22.8). Detect-exec collapse compounds the chase problem.",
+      "exit_reasons": "hard_max_loss 2, hard_sl 2, profit-monster-trail 1",
+      "fix_path": "Re-enable checklist must include det-RSI ceiling=60 + exec-time re-validation (DRIFT-002 scoped fix). Do not re-enable PLUS without both.",
+      "status": "PLUS killed 15:11. Base MTF_REGIME_TREND_ENABLED still True. Monitor."
     },
     "bb-squeeze+": {
-      "sample": "25T 60%WR +$0.21 (7d) — re-enable monitor",
-      "rsi_bands_7d": "40-60: 6T 16.7% -$0.23 | 60-75: 14T 71.4% +$0.28 | >=75: 6T 66.7% +$0.06",
-      "regime_bands_14d": "HIGH 10T 70% +$0.41 | EXTREME 13T 46.2% -$0.25 | NORMAL 3T 66.7% -$0.05",
-      "filter_assessment": "RSI_MIN=60 and/or EXTREME regime block both candidate. BOTH below 20T for RSI and at 13T for EXTREME. Monitor 48h more.",
-      "would_rsi_min_60_kill_winners": "1 of 15 7d winners (6.7%) — acceptable IF sample confirms, not now"
-    },
-    "doji-bottom-long": {
-      "sample": "8T 75%WR +$0.39 (7d) — below 20T conf-boost threshold",
-      "regime": "HIGH 8T 87.5% +$0.48 specialist | NORMAL 4T 25% -$0.13 bleed",
-      "filter_assessment": "HIGH conf boost MONITOR. NORMAL bleed 4T — do not regime-block at 4T (standing: regime-block only if signal loses in ALL regimes — HIGH wins)."
+      "sample_7d": "26T 57.7%WR (15W/11L)",
+      "regime_split": "EXTREME 13T 46.2% -$0.25 | HIGH 10T 70% +$0.41 | NORMAL 3T 66.7% -$0.05",
+      "pattern": "Scratch trail losses are re-enable noise. Real bleed = 3 hard_max_loss. No entry RSI pattern. EXTREME regime is weak habitat.",
+      "fix_path": "Do NOT stack RSI filters during re-enable window. Monitor to 48h. Regime-block EXTREME only if sample reaches 20T with continued bleed.",
+      "status": "Monitor window active. 0 changes."
     },
     "volume-breakout-long+": {
-      "sample": "BEST signal — 7d 4T 100% +$1.96, 14d EXTREME 9T 77.8% +$2.93",
-      "rsi_ceiling_95": "VERIFIED — 0 winners RSI>=90 14d. Losers all atr_sl_hit (WCT RSI 86.67, JUP 52.71, HYPER 46.05). No change.",
-      "filter_assessment": "Do not blanket-filter. EXTREME conf boost at 20T."
+      "sample_14d": "12T 75%WR +$2.99. EXTREME 9T 77.8%WR +$2.72.",
+      "pattern": "Best signal. Live tests JUP/IMX/ME positive. RSI ceiling 95 correct (WCT 98.86 loser blocked, RSI 70-79 band wins).",
+      "fix_path": "Conf boost still under 20T regime threshold. Re-eval at 20T. Do not boost on 9T.",
+      "status": "Carried. STANDALONE_BYPASS. Live tests running."
     },
-    "pump-chain- SHORT": {
-      "sample": "29T 48.3% -$0.16 (7d) near breakeven post SHORT_CONTINUUM + RSI_MIN=40",
-      "rsi_bands_14d": "<30: 26T -$0.64 | 30-40: 21T -$1.22 | 40-50: 14T +$0.31 | >=50: 5T +$0.35 — RSI_MIN=40 correctly targets losing bands",
-      "filter_assessment": "Filters working at detection. Do not raise further."
+    "doji-bottom-long": {
+      "sample_14d": "12T 66.7%WR +$0.35",
+      "pattern": "HIGH habitat strong (7T 85.7% prior). NORMAL weak (4T 25%). Winners at low RSI (14-50). Approaching 20T threshold.",
+      "fix_path": "Conf boost at 20T if HIGH WR holds. Regime specialist — do not blanket-filter.",
+      "status": "Monitor to 20T."
     }
   },
   "recurring_problems": [
-    "DRIFT-002 detect-exec RSI gap — 5+ sessions, now quantified: gap>25 = -$1.09/7d. Dominant live loss mechanism. bug_hunter owns scoped fix.",
-    "ema_reclaim 0 signals / NEUTRAL diversity — 3+ sessions, delegated signal_analyst. Rare pattern, not broken code.",
-    "bb-squeeze EXTREME bleed vs HIGH edge — re-enable monitor 48h. EXTREME 13T 46% -$0.25.",
-    "RR_ENGINE_SHADOW FORCE — discussed 4+ sessions. Backtest first (DRIFT-007).",
-    "signal_rsi_14 NULL metadata — day5+, bug_hunter owns.",
-    "CURRENT.md lag after auto_1hr kills — status docs stale vs live config (mtf PLUS killed 15:11, not reflected in 14:00 CURRENT.md)."
+    {
+      "topic": "Detect-exec RSI collapse (DRIFT-002)",
+      "frequency": "Daily since Sep 30",
+      "impact": "-$1.09/7d on gap>25 trades vs +$2.78 on gap<=15",
+      "status": "Scoped fix delegated bug_hunter. Blanket floor rejected."
+    },
+    {
+      "topic": "SHORT R:R structural disadvantage",
+      "frequency": "Persistent 14d+",
+      "impact": "SHORT -$1.32/7d (48T 45.8%). avg_win < avg_loss.",
+      "status": "SHORT-CONTINUUM + HARD_FLOOR=25 + RSI filters active. Monitor windows. No new SHORT config."
+    },
+    {
+      "topic": "Monitor window stacking / measurement blindness",
+      "frequency": "Every run",
+      "impact": "Cannot evaluate fixes when 5+ windows active simultaneously.",
+      "status": "Standing decision: 0 changes when windows active. Followed this run."
+    },
+    {
+      "topic": "CURRENT.md staleness after auto_1hr kills",
+      "frequency": "Recurring",
+      "impact": "Monitor lists lag reality by hours. mtf PLUS kill at 15:11 not in 14:00 CURRENT.md.",
+      "status": "Suggested: auto_1hr kills writeback CURRENT.md."
+    }
   ],
   "missing_implementations": [
-    "ema_reclaim confluence partner — NEUTRAL diversity gap. Delegated, spec exists.",
-    "Exec-time RSI re-check for trend-family LONG (scoped DRIFT-002 fix) — not built. Do NOT build as blanket.",
-    "RR_ENGINE FORCE mode — needs backtest harness first.",
-    "Winner-DNA confidence compounding — discussed, no data pipeline yet."
+    {
+      "item": "NEUTRAL diversity: volume-dry-up / ema_reclaim partner signal",
+      "status": "ema_reclaim built+enabled, 0 trades (rare pattern by design). volume-dry-up still unbuilt. Partner signal needed per CEO Oct 1 delegation.",
+      "deadline": "Oct 3 12:00 UTC (signal_analyst)"
+    },
+    {
+      "item": "RR_ENGINE_FORCE backtest",
+      "status": "DRIFT-007. Engine built, SHADOW mode. Need backtest: would FORCE with current regime mins improve 7d without killing winners?"
+    },
+    {
+      "item": "Scoped exec-time RSI re-check (trend-family LONG only)",
+      "status": "Delegated bug_hunter. DRIFT-002 root fix. Not yet deployed."
+    },
+    {
+      "item": "Winner DNA template for NEUTRAL signal spec",
+      "status": "volume+momentum+RSI pattern from vol-breakout/doji winners as input to Oct 3 NEUTRAL signal spec."
+    },
+    {
+      "item": "Dead code cleanup: orphan signal_gen imports",
+      "status": "Backlog. Not trading-path."
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-02T15:45:00Z",
-      "idea": "bb-squeeze LONG RSI_MIN=60 watchlist — 40-60 is killing field, 60-75 is sweet spot",
-      "rationale": "7d bb-squeeze+ RSI bands: 40-60 = 6T 16.7%WR -$0.23 vs 60-75 = 14T 71.4%WR +$0.28 vs >=75 = 6T 66.7% +$0.06. Classic entry-quality pattern, not time-based.",
-      "expected_impact": "+$0.20-0.30/7d if confirmed at 20T (currently 6T in bad band)",
+      "date": "2026-10-02T16:34:39Z",
+      "idea": "mtf-regime-trend LONG det-RSI ceiling=60 in re-enable checklist",
+      "rationale": "24h: all 4 winners det RSI 26-57, 3/5 losers det RSI 60-66 (chase entries). Ceiling=60 blocks 0 winners, 3/5 losers. Aligns with DRIFT-002 quantification (gap>25 bleed). HBAR oversold exception (det 22.8) needs separate oversold-chaos handling, not ceiling.",
+      "expected_impact": "If pattern holds at 20T+: eliminate chase-entry losses (~3/5 of mtf losers).",
       "category": "entry sniper",
-      "status": "monitor — below 20T sample threshold",
+      "status": "suggested — include in mtf re-enable checklist, NOT a live config change (PLUS killed, sample 9T, monitor windows active)",
       "risk": "low",
-      "impact_on_winners_if_applied_now": "Would block 1 of 15 7d winners (6.7%) — acceptable IF sample confirms"
+      "impact_on_winners": "0/4 winners blocked at ceiling 60 (max winner COMP 57.3). Sample too small to apply now."
     },
     {
-      "date": "2026-10-02T15:45:00Z",
-      "idea": "Scoped exec-time RSI re-check for trend-family LONG only (bug_hunter code fix, not config)",
-      "rationale": "DRIFT-002 quantified: gap>25 = 39T/7d -$1.09. mtf losers had VALID det RSI (55-66) — det filters cannot catch. But blanket exec floor WRONG: doji/bb-bounce WIN at exec RSI 19-28 (WLFI +$0.16 exec=20.92). Scope to trend-family (mtf, continuum) where oversold exec = falling knife.",
-      "expected_impact": "Would have blocked TURBO/DOT/SOL (-$0.70) 24h without touching doji/bb-bounce winners",
-      "category": "drift fix",
-      "status": "delegated bug_hunter",
-      "risk": "medium — verify against all trend-family winners before deploy"
+      "date": "2026-10-02T16:34:39Z",
+      "idea": "REJECT bb-squeeze RSI_MIN=60 watchlist — full 7d data contradicts prior sample",
+      "rationale": "Prior run suggested RSI_MIN=60 from incomplete 6T sample (40-60 killing field). Full 7d: RSI 50-60 has 7 WINS (top win band) AND 5 losses. RSI_MIN=60 would kill 7/15 winners = 47%. Losses are trail scratches + 3 hard_max_loss with mixed RSI 40-69. RSI is not the quality signal for bb-squeeze.",
+      "expected_impact": "Avoids a filter that would destroy the signal's win base. Corrects prior auditor error.",
+      "category": "signal quality",
+      "status": "rejected — do not apply RSI_MIN. Monitor EXTREME regime instead (13T 46.2% vs HIGH 10T 70%).",
+      "risk": "n/a (rejection)",
+      "impact_on_winners": "RSI_MIN=60 would block 7/15 winners — confirmed BAD IDEA."
     },
     {
-      "date": "2026-10-02T15:45:00Z",
-      "idea": "mtf-regime-trend+ re-enable checklist (non-time-based criteria)",
-      "rationale": "PLUS killed 15:11 for good reason (4T 0%WR). Re-enable only when: (1) det-RSI filter confirmed loaded in running pipeline, (2) scoped exec RSI check OR 48h clean, (3) MINUS SHORT sample collected. Avoids re-bleeding same pattern.",
-      "expected_impact": "Prevents repeat of -$0.70 afternoon cluster on re-enable",
-      "category": "kill hygiene",
-      "status": "suggested",
-      "risk": "low"
+      "date": "2026-10-02T16:34:39Z",
+      "idea": "bb-squeeze EXTREME regime watch (not block) — 13T 46.2% -$0.25 vs HIGH 10T 70% +$0.41",
+      "rationale": "Clear regime split. EXTREME is weak habitat for squeeze-breakout mean-reversion. But sample 13T < 20T regime threshold, and re-enable monitor window active (Oct 1 21:55). Stacking a regime block now prevents measuring the re-enable itself.",
+      "expected_impact": "If EXTREME stays <50% WR at 20T, regime-block saves ~$0.25-0.50/7d without touching HIGH winners.",
+      "category": "regime specialist",
+      "status": "monitor — re-eval at 20T EXTREME trades",
+      "risk": "low",
+      "impact_on_winners": "If blocked at 20T: would remove EXTREME trades only. HIGH 70%WR winners untouched. Check winners at block time."
     },
     {
-      "date": "2026-10-02T15:45:00Z",
-      "idea": "Volume-breakout EXTREME conf boost — carried, re-eval at 20T (now 9T)",
-      "rationale": "14d EXTREME 9T 77.8%WR +$2.93. Live tests JUP/IMX/ME all positive since Oct 1. Ceiling 95 verified (0 winners RSI>=90). Sample still under threshold.",
-      "expected_impact": "+3-5% WR for vol-breakout in EXTREME if 20T confirms",
-      "category": "confidence boost",
-      "status": "carried — monitor to 20T",
-      "risk": "low"
+      "date": "2026-10-02T16:34:39Z",
+      "idea": "Multi-source confidence compound — when 2+ independent signals agree on coin+direction, boost confidence",
+      "rationale": "ME trade: bb-bounce + vol-breakout both fired, +$0.36 winner. Agreement across independent detectors = higher-quality setup. Prior sessions discussed but never built.",
+      "expected_impact": "Research. Could improve hotset confidence calibration (prior: 85-95 conf 33%WR, 95+ conf 39%WR — high conf alone is not predictive).",
+      "category": "confidence engineering",
+      "status": "carried — research, needs backtest before implementation",
+      "risk": "medium (confidence system already has inverse-conf problem)",
+      "impact_on_winners": "Unknown until backtest. Do not implement without."
     },
     {
-      "date": "2026-10-02T15:45:00Z",
-      "idea": "Orchestrator writeback: auto_1hr kills should update CURRENT.md monitor list",
-      "rationale": "CURRENT.md 14:00 says mtf hotset live + 6 open; reality 15:45 PLUS killed + 3 open. Status lag causes agents to stack changes against stale state.",
-      "expected_impact": "Prevents wasted cycles and accidental config stacking",
-      "category": "process",
-      "status": "suggested",
-      "risk": "none"
+      "date": "2026-10-02T16:34:39Z",
+      "idea": "volume-breakout-long+ EXTREME conf boost — carried, re-eval at 20T (now 9T EXTREME 77.8%WR +$2.72/14d)",
+      "rationale": "Strongest signal. EXTREME habitat is its edge. Sample 9T < 20T threshold. Prior CEO rejection was wrong column (entry_regime_4h NULL vs volatility_regime real data).",
+      "expected_impact": "+2-4% WR if boost fires on already-winning setups",
+      "category": "entry sniper",
+      "status": "carried — re-eval at 20T EXTREME trades. Do not boost on 9T.",
+      "risk": "low",
+      "impact_on_winners": "At 20T re-eval: quantify winners that would gain conf vs losers that would newly qualify."
     }
   ],
   "next_actions": [
-    "MONITOR open COMP+JUP mtf-regime-trend+ (opened pre-kill) — outcome + SL/TP behavior",
-    "BUG_HUNTER: scoped DRIFT-002 fix — exec-time RSI re-check for trend-family LONG only (not blanket). Verify against doji/bb-bounce winners first.",
-    "SIGNAL_ANALYST: ema_reclaim detection-coverage (open delegation from CEO Oct 1)",
-    "MONITOR bb-squeeze+ to 20T for RSI_MIN=60 + EXTREME regime block eval",
-    "MONITOR volume-breakout EXTREME to 20T for conf boost (now 9T)",
-    "MONITOR pump-chain-v5 LONG 48h test (8T 37.5% -$0.13 — revert if worsens)",
-    "MONITOR doji-bottom-long at 20T for HIGH conf boost",
-    "DATA HYGIENE: BTC continuum_engine amount=0.00 phantom open since Oct 1",
-    "RR_ENGINE: backtest FORCE before any SHADOW flip (DRIFT-007)",
-    "VERIFY AGENTS.md HL API key reminder — flagged STALE in CURRENT.md backlog",
-    "ORCHESTRATOR: refresh CURRENT.md after auto_1hr kills (mtf PLUS now False)"
-  ],
-  "sanity_check": {
-    "pipeline_active": true,
-    "pipeline_lock": "stale timestamp Sep 10 — auto-releases on exit, current cycle #225530 running",
-    "live_trading": "LIVE_TRADING_ENABLED=True + runtime kill switch path unchanged (not touched)",
-    "never_reenable_flags": "untouched",
-    "ceo_protected_flags": "untouched",
-    "pm_trail": "untouched (protected)",
-    "time_based_changes": "none suggested (banned)",
-    "min_sample_violations": "none — all change suggestions gated at 20T+ or explicitly marked monitor"
-  }
+    "MONITOR: mtf-regime-trend+ base signal (PLUS killed) — watch for more det-RSI>60 chase losses",
+    "MONITOR: bb-squeeze+ re-enable 48h window — scratches vs systematic; EXTREME at 20T",
+    "MONITOR: volume-breakout-long+ EXTREME at 20T for conf boost re-eval",
+    "MONITOR: doji-bottom-long at 20T for HIGH conf boost",
+    "MONITOR: SHORT R:R (-$1.32/7d) — SHORT-CONTINUUM + HARD_FLOOR working?",
+    "MONITOR: BTC continuum+ LONG (opened 15:37) + ORPHAN_PAPER continuum_engine",
+    "BUG_HUNTER: scoped exec-RSI fix for trend-family LONG (DRIFT-002)",
+    "SIGNAL_ANALYST: ema_reclaim partner / volume-dry-up (Oct 3 deadline)",
+    "ORCHESTRATOR: writeback CURRENT.md — mtf PLUS kill at 15:11 not reflected (stale 14:00)",
+    "T/CEO: verify AGENTS.md HL key reminder (~164 days, not 3)",
+    "BACKTEST: RR_ENGINE_SHADOW→FORCE (DRIFT-007) before any flip",
+    "REJECT: bb-squeeze RSI_MIN=60 — would kill 7/15 winners"
+  ]
 }
