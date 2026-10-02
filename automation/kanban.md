@@ -24,3 +24,6 @@
 
 ## TEAM UPDATES
 - [2026-10-02 14:48 UTC] health_monitor: Pipeline OK — 30/30 LIVE runs rc=0/30min, 0 Tracebacks. 4 open / 46 closed today / +40.07% PnL (DB: 41 closed, +1.11 USDT, 70.7% WR). Hotset RECOVERED (7 LONG tokens). 209 sig/hr. Regime NEUTRAL. AUTO-FIX: journal vacuum +259.7M. Disk still 86% WARN (DB growth, CEO pruning decision open). WARN: git-release fails hourly — uncommitted-changes gate + symlink `scripts/hl_sync_guardian.py`; backup/seed zip blocked. 10 failed non-critical LLM units (trading path clean). Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-02 15:49 UTC] health_monitor: Pipeline OK — LIVE 15:45:27, 2 open / 51 closed today / +29.28% PnL, 0 Tracebacks, guardian active, timers firing, prices fresh (21s). Regime SHORT_BIAS (0L/5S/112N). Speed 53% ≥50th pct. Phantom 0. **AUTO-FIX: decider_run.py psycopg2 UnboundLocalError** — local `import psycopg2` at line 3660 inside `run()` shadowed module import; broke rate-limit check (fail-open, 15s gap disabled) and losers WR hard-block (fail-closed, over-blocking). Removed shadowing import; fix lands next pipeline run. Disk 86% WARN — CEO DB-pruning decision still open. 12 failed non-critical LLM units (trading path clean). Details: automation/error_alerts.md

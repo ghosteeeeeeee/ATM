@@ -3657,7 +3657,9 @@ def run(dry_run=False):
         if 'mtf-regime-trend' in (source or ''):
             from hermes_constants import MTF_REGIME_TREND_MAX_POSITIONS
             try:
-                import psycopg2
+                # ponytail: use module-level psycopg2 (line 8). A local `import psycopg2`
+                # here made the name function-local for all of run(), breaking the rate-limit
+                # check (3043) and losers hard-block (4096) with UnboundLocalError.
                 _mtf_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
                 _mtf_cur = _mtf_conn.cursor()
                 _mtf_cur.execute("""

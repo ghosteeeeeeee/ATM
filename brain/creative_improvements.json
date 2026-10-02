@@ -1678,5 +1678,41 @@
     "category": "signal diversity",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-02T15:37:36Z",
+    "idea": "bb-squeeze LONG RSI_MIN=60 watchlist — 40-60 killing field vs 60-75 sweet spot",
+    "rationale": "7d bb-squeeze+ RSI bands: 40-60=6T 16.7%WR -$0.23 vs 60-75=14T 71.4%WR +$0.28 vs >=75=6T 66.7% +$0.06. Entry-quality pattern, not time-based. Below 20T threshold.",
+    "expected_impact": "+$0.20-0.30/7d if confirmed at 20T (6T in bad band now). Would block 1 of 15 7d winners if applied now.",
+    "category": "entry sniper",
+    "status": "monitor — below 20T",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02T15:37:36Z",
+    "idea": "Scoped exec-time RSI re-check for trend-family LONG only (bug_hunter code fix, NOT config)",
+    "rationale": "DRIFT-002 QUANTIFIED: gap>25 RSI = 39T/7d -$1.09. mtf losers had VALID det RSI 55-66 — det filters cannot catch exec collapse. Blanket exec floor WRONG: doji/bb-bounce WIN at exec RSI 19-28 (WLFI +$0.16 exec=20.92). Scope to trend-family only.",
+    "expected_impact": "Would have blocked TURBO/DOT/SOL -$0.70 without touching mean-reversion winners",
+    "category": "drift fix",
+    "status": "delegated bug_hunter",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-02T15:37:36Z",
+    "idea": "mtf-regime-trend+ re-enable checklist (non-time-based)",
+    "rationale": "PLUS killed 15:11 UTC for 4T 0%WR. Re-enable only when det-RSI filter confirmed loaded + scoped exec check OR 48h clean + MINUS SHORT sample collected. Prevents repeat bleed.",
+    "expected_impact": "Prevents repeat of -$0.70 afternoon cluster",
+    "category": "kill hygiene",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02T15:37:36Z",
+    "idea": "Orchestrator writeback: auto_1hr kills update CURRENT.md",
+    "rationale": "CURRENT.md 14:00 stale vs 15:45 reality (mtf PLUS killed, open positions 6→3). Status lag causes config stacking against stale state.",
+    "expected_impact": "Prevents wasted cycles / accidental stacking",
+    "category": "process",
+    "status": "suggested",
+    "risk": "none"
   }
 ]

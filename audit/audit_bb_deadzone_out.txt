@@ -1,0 +1,470 @@
+Loaded 1971 closed SHORT trades with entry_bb_position (all-time)
+Date range: 2026-05-20 19:05:41.702537 .. 2026-10-02 08:18:22.156809
+
+Baseline all closed SHORTs: n=3051, with_bb=1971 (64.6% coverage), WR=45.23%, avg_pnl=-0.0015
+bb-recorded subset WR: 43.58%  avg_pnl=-0.0008
+
+====================================================================================================
+BAND TABLE — ALL-TIME (n=1971)
+====================================================================================================
+band                     n     WR%   sumPnL$   avgPnL$   avgPnL%   sumPnL%   avgAmt              CI95 meanPnL
+-------------------------------------------------------------------------------------------------------------
+1_<0.20                855    45.3      3.51    0.0041   -0.0429    -36.70    11.53       [-0.0029, +0.0113]
+2_0.20-0.35            306    44.4     -1.18   -0.0039   -0.0983    -30.07    11.29       [-0.0154, +0.0073]
+3_0.35-0.50            171    43.3     -0.98   -0.0057   -0.1177    -20.13    11.13       [-0.0198, +0.0089]
+3b_0.50-0.55            43    55.8      1.34    0.0312    0.4785     20.57    11.47       [+0.0086, +0.0542]
+4_0.55-0.70            160    44.4      0.26    0.0016   -0.0540     -8.64    11.05       [-0.0118, +0.0148]
+5_DEAD_0.70-0.85       167    35.9     -1.23   -0.0074   -0.0658    -10.98    11.05       [-0.0198, +0.0051]
+6a_0.85-0.95           109    40.4     -2.10   -0.0193   -0.2708    -29.51    11.13       [-0.0367, -0.0012]
+6b_0.95-1.00            60    38.3     -0.79   -0.0132   -0.0518     -3.11    10.93       [-0.0380, +0.0127]
+6c_>1.00               100    40.0     -0.44   -0.0044   -0.0313     -3.13    11.34       [-0.0245, +0.0145]
+
+====================================================================================================
+BAND TABLE — LAST 30 DAYS (n=150)
+====================================================================================================
+band                     n     WR%   sumPnL$   avgPnL$   avgPnL%   sumPnL%   avgAmt              CI95 meanPnL
+-------------------------------------------------------------------------------------------------------------
+1_<0.20                 50    30.0     -2.78   -0.0556   -1.9788    -98.94    13.19       [-0.1032, -0.0050]
+2_0.20-0.35             38    34.2     -2.29   -0.0603   -1.0511    -39.94    13.50       [-0.1074, -0.0129]
+3_0.35-0.50             28    50.0     -0.29   -0.0104   -0.5258    -14.72    11.89       [-0.0511, +0.0321]
+3b_0.50-0.55             4   100.0      0.38    0.0950    2.4135      9.65    16.05       [+0.0350, +0.1800]
+4_0.55-0.70             10    70.0     -0.01   -0.0010   -0.2179     -2.18    11.87       [-0.1020, +0.0880]
+5_DEAD_0.70-0.85         8    25.0     -0.26   -0.0325   -0.3464     -2.77    12.48       [-0.1388, +0.0762]
+6a_0.85-0.95             6    50.0     -0.24   -0.0400   -2.3205    -13.92    13.85       [-0.1983, +0.1433]
+6b_0.95-1.00             3    66.7      0.03    0.0100    1.8761      5.63    11.10       [-0.2500, +0.2600]
+6c_>1.00                 3    33.3     -0.12   -0.0400   -2.0796     -6.24    11.10       [-0.1600, +0.0400]
+
+====================================================================================================
+BAND TABLE — LAST 90 DAYS (n=430)
+====================================================================================================
+band                     n     WR%   sumPnL$   avgPnL$   avgPnL%   sumPnL%   avgAmt              CI95 meanPnL
+-------------------------------------------------------------------------------------------------------------
+1_<0.20                140    19.3     -3.96   -0.0283   -0.7746   -108.45    11.70       [-0.0473, -0.0094]
+2_0.20-0.35             80    30.0     -2.68   -0.0335   -0.5439    -43.52    12.17       [-0.0588, -0.0091]
+3_0.35-0.50             58    31.0     -1.06   -0.0183   -0.3920    -22.74    11.41       [-0.0395, +0.0048]
+3b_0.50-0.55            12    50.0      0.54    0.0450    1.0333     12.40    12.68       [+0.0100, +0.0858]
+4_0.55-0.70             56    26.8     -0.52   -0.0093   -0.2907    -16.28    11.16       [-0.0304, +0.0095]
+5_DEAD_0.70-0.85        43    23.3     -0.36   -0.0084   -0.0660     -2.84    11.20       [-0.0344, +0.0165]
+6a_0.85-0.95            19    52.6     -0.16   -0.0084   -0.6582    -12.51    11.76       [-0.0653, +0.0500]
+6b_0.95-1.00            12    25.0     -0.17   -0.0142    0.2779      3.33    11.02       [-0.0800, +0.0558]
+6c_>1.00                10    30.0      0.03    0.0030   -0.3505     -3.51    10.46       [-0.0410, +0.0360]
+
+====================================================================================================
+STATISTICAL SIGNIFICANCE TESTS (all-time)
+====================================================================================================
+
+--- SIGNIFICANCE: Dead zone 0.70-0.85 (band=5_DEAD_0.70-0.85) vs REST ---
+  WR: band 35.9% (n=167) vs rest 44.3% (n=1804)
+  2-prop z-test: z=-2.085, p=0.0371
+  Fisher exact: odds=0.705, p=0.0413
+  Permutation (mean pnl diff): -0.0072 USD/trade, p=0.3806, 95% CI [-0.0201, +0.0060]
+  vs overall bb-recorded SHORT WR 43.6%: z=-1.918, p=0.0551
+  band WR 95% CI: [28.7, 43.2]
+  band total pnl: -1.23 USD | avg pnl_pct -0.0658%
+  blocked-if-filter-always-on: 167 trades, -1.23 USD foregone (profit avoided)
+
+--- SIGNIFICANCE: 0.85-0.95 (band=6a_0.85-0.95) vs REST ---
+  WR: band 40.4% (n=109) vs rest 43.8% (n=1862)
+  2-prop z-test: z=-0.696, p=0.4862
+  Fisher exact: odds=0.870, p=0.5512
+  Permutation (mean pnl diff): -0.0195 USD/trade, p=0.0449, 95% CI [-0.0378, -0.0008]
+  vs overall bb-recorded SHORT WR 43.6%: z=-0.659, p=0.5098
+  band WR 95% CI: [31.2, 49.6]
+  band total pnl: -2.10 USD | avg pnl_pct -0.2708%
+  blocked-if-filter-always-on: 109 trades, -2.10 USD foregone (profit avoided)
+
+--- SIGNIFICANCE: 0.95-1.00 (band=6b_0.95-1.00) vs REST ---
+  WR: band 38.3% (n=60) vs rest 43.7% (n=1911)
+  2-prop z-test: z=-0.833, p=0.4050
+  Fisher exact: odds=0.799, p=0.4304
+  Permutation (mean pnl diff): -0.0127 USD/trade, p=0.3314, 95% CI [-0.0396, +0.0137]
+  vs overall bb-recorded SHORT WR 43.6%: z=-0.808, p=0.4191
+  band WR 95% CI: [26.0, 50.6]
+  band total pnl: -0.79 USD | avg pnl_pct -0.0518%
+  blocked-if-filter-always-on: 60 trades, -0.79 USD foregone (profit avoided)
+
+--- SIGNIFICANCE: >1.00 (band=6c_>1.00) vs REST ---
+  WR: band 40.0% (n=100) vs rest 43.8% (n=1871)
+  2-prop z-test: z=-0.741, p=0.4584
+  Fisher exact: odds=0.856, p=0.4710
+  Permutation (mean pnl diff): -0.0038 USD/trade, p=0.7112, 95% CI [-0.0240, +0.0152]
+  vs overall bb-recorded SHORT WR 43.6%: z=-0.705, p=0.4808
+  band WR 95% CI: [30.4, 49.6]
+  band total pnl: -0.44 USD | avg pnl_pct -0.0313%
+  blocked-if-filter-always-on: 100 trades, -0.44 USD foregone (profit avoided)
+
+--- combined 0.85+ vs rest ---
+  WR: 39.8% (n=269) vs 44.2% (n=1702) | z=-1.354 p=0.1756
+  mean pnl diff -0.0134 p=0.0387 CI[-0.0257,-0.0006]
+
+--- SIGNIFICANCE: Good band 0.55-0.70 (band=4_0.55-0.70) vs REST ---
+  WR: band 44.4% (n=160) vs rest 43.5% (n=1811)
+  2-prop z-test: z=0.211, p=0.8328
+  Fisher exact: odds=1.036, p=0.8680
+  Permutation (mean pnl diff): +0.0027 USD/trade, p=0.7486, 95% CI [-0.0115, +0.0163]
+  vs overall bb-recorded SHORT WR 43.6%: z=0.195, p=0.8458
+  band WR 95% CI: [36.7, 52.1]
+  band total pnl: +0.26 USD | avg pnl_pct -0.0540%
+  blocked-if-filter-always-on: 160 trades, +0.26 USD foregone (PROFIT FOREGONE)
+
+--- SIGNIFICANCE: 0.50-0.55 (cut by DEAD_ZONE2) (band=3b_0.50-0.55) vs REST ---
+  WR: band 55.8% (n=43) vs rest 43.3% (n=1928)
+  2-prop z-test: z=1.636, p=0.1019
+  Fisher exact: odds=1.653, p=0.1199
+  Permutation (mean pnl diff): +0.0327 USD/trade, p=0.0353, 95% CI [+0.0086, +0.0557]
+  vs overall bb-recorded SHORT WR 43.6%: z=1.599, p=0.1098
+  band WR 95% CI: [41.0, 70.7]
+  band total pnl: +1.34 USD | avg pnl_pct +0.4785%
+  blocked-if-filter-always-on: 43 trades, +1.34 USD foregone (PROFIT FOREGONE)
+
+--- SIGNIFICANCE: Most profitable <0.20 (band=1_<0.20) vs REST ---
+  WR: band 45.3% (n=855) vs rest 42.3% (n=1116)
+  2-prop z-test: z=1.318, p=0.1877
+  Fisher exact: odds=1.128, p=0.1994
+  Permutation (mean pnl diff): +0.0087 USD/trade, p=0.0532, 95% CI [-0.0002, +0.0176]
+  vs overall bb-recorded SHORT WR 43.6%: z=0.827, p=0.4083
+  band WR 95% CI: [41.9, 48.6]
+  band total pnl: +3.51 USD | avg pnl_pct -0.0429%
+  blocked-if-filter-always-on: 855 trades, +3.51 USD foregone (PROFIT FOREGONE)
+
+====================================================================================================
+CONFOUNDERS
+====================================================================================================
+
+--- CONFOUNDER: signal type [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  accel_300_,rs_s_broken                      97    37.1     -0.82
+  accel_300_,rs_r                             26    46.2      0.09
+  rs_r,rs_s_broken                            10    50.0      0.05
+  inv_accel_                                  10    20.0      0.01
+
+--- CONFOUNDER: volatility_regime [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     159    36.5     -0.97
+  EXTREME                                      6    33.3      0.05
+
+--- CONFOUNDER: entry_regime_4h [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     167    35.9     -1.23
+
+--- CONFOUNDER: month [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  2026-06                                    117    40.2     -0.89
+  2026-07                                     36    25.0     -0.03
+  2026-09                                      8    25.0     -0.26
+  2026-05                                      6    33.3     -0.05
+
+--- CONFOUNDER: paper/live [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  live                                       166    36.1     -1.19
+
+--- CONFOUNDER: sl_group [DEAD ZONE] — ['5_DEAD_0.70-0.85'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  control                                    167    35.9     -1.23
+
+--- CONFOUNDER: signal type [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  accel_300_,rs_s_broken                     169    43.2      0.02
+  accel_300_,rs_r                             48    27.1     -1.86
+  rs_r,rs_s_broken                            22    50.0     -0.15
+  pullback-entry-                              9    33.3     -0.40
+  (null)                                       5     0.0     -0.37
+  inv_accel_                                   5    40.0      0.01
+
+--- CONFOUNDER: volatility_regime [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     256    39.5     -2.88
+  HIGH                                         7    28.6     -0.07
+  EXTREME                                      6    66.7     -0.38
+
+--- CONFOUNDER: entry_regime_4h [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     269    39.8     -3.33
+
+--- CONFOUNDER: month [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  2026-06                                    222    41.0     -2.13
+  2026-07                                     31    32.3     -0.05
+  2026-09                                     12    50.0     -0.33
+
+--- CONFOUNDER: paper/live [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  live                                       264    40.5     -2.96
+  paper                                        5     0.0     -0.37
+
+--- CONFOUNDER: sl_group [0.85+] — ['6a_0.85-0.95', '6b_0.95-1.00', '6c_>1.00'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  control                                    269    39.8     -3.33
+
+--- CONFOUNDER: signal type [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  accel_300_,rs_s_broken                      87    48.3      0.48
+  inv_accel_                                  26    11.5     -0.21
+  accel_300_,rs_r                             21    42.9     -0.46
+  pullback-entry-                              5    40.0     -0.47
+
+--- CONFOUNDER: volatility_regime [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     148    43.2      0.51
+  EXTREME                                      7    71.4      0.26
+
+--- CONFOUNDER: entry_regime_4h [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  (null)                                     160    44.4      0.26
+
+--- CONFOUNDER: month [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  2026-06                                     97    53.6      0.83
+  2026-07                                     47    17.0     -0.54
+  2026-09                                      9    66.7     -0.05
+
+--- CONFOUNDER: paper/live [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  live                                       159    44.0      0.20
+
+--- CONFOUNDER: sl_group [GOOD 0.55-0.70] — ['4_0.55-0.70'] band breakdown ---
+  value                                        n     WR%    sumPnL
+  control                                    160    44.4      0.26
+
+--- SIGNAL x DEAD-ZONE interaction (top 12 SHORT signals) ---
+  signal                                    inDZ n     WR     pnl  outDZ n     WR     pnl
+  accel_300_,rs_s_broken                        97   37.1   -0.82      924   47.4    7.05
+  accel_300_,rs_r                               26   46.2    0.09      254   45.3   -1.95
+  rs_r,zscore_pump                               4   25.0   -0.10      189   43.4    0.82
+  inv_accel_                                    10   20.0    0.01       65   16.9   -0.21
+  pump-chain-                                    2   50.0    0.19       60   46.7   -1.28
+  mtp_zscore_,rs_r                               1  100.0    0.06       57   49.1   -0.81
+  rs_r,rs_s_broken                              10   50.0    0.05       36   55.6    0.22
+  pullback-entry-                                3    0.0   -0.61       37   35.1   -2.22
+  accel_                                         0    nan    0.00       30   16.7   -0.03
+  rs_r,rs_r,zscore_pump                          0    nan    0.00       22   22.7   -0.59
+  accel_300_,rs_r,rs_s_broken                    1    0.0   -0.07       20   60.0    0.50
+  accel_300_,rs_r,rs_r                           2    0.0   -0.15       12   66.7    0.45
+
+--- SIGNAL x 0.85+ interaction (top 12 SHORT signals) ---
+  signal                                   in085 n     WR     pnl out085 n     WR     pnl
+  accel_300_,rs_s_broken                       169   43.2    0.02      852   47.1    6.21
+  accel_300_,rs_r                               48   27.1   -1.86      232   49.1    0.00
+  rs_r,zscore_pump                               2    0.0   -0.61      191   43.5    1.33
+  inv_accel_                                     5   40.0    0.01       70   15.7   -0.21
+  pump-chain-                                    1  100.0    0.04       61   45.9   -1.13
+  mtp_zscore_,rs_r                               0    nan    0.00       58   50.0   -0.75
+  rs_r,rs_s_broken                              22   50.0   -0.15       24   58.3    0.42
+  pullback-entry-                                9   33.3   -0.40       31   32.3   -2.43
+  accel_                                         0    nan    0.00       30   16.7   -0.03
+  rs_r,rs_r,zscore_pump                          0    nan    0.00       22   22.7   -0.59
+  accel_300_,rs_r,rs_s_broken                    3   66.7    0.11       18   55.6    0.32
+  accel_300_,rs_r,rs_r                           0    nan    0.00       14   57.1    0.30
+
+====================================================================================================
+WINNERS INSIDE BLOCKED ZONES (opportunity cost)
+====================================================================================================
+
+DEAD 0.70-0.85: n=180, winners=69 (38.3%), losers/flat=111
+  winners pnl sum: +5.75 | losers pnl sum: -6.37 | net: -0.62
+  top-5 winners:
+    2026-09-16 FIL      pullback-entry-                    bb=0.8500 pnl=+0.34 regime=HIGH
+    2026-09-23 CASHCAT  pump-chain-                        bb=0.7700 pnl=+0.20 regime=EXTREME
+    2026-09-22 ALGO     pump-chain-,rs-r64                 bb=0.7400 pnl=+0.19 regime=EXTREME
+    2026-07-12 CASHCAT  accel_300_,rs_s_broken             bb=0.7900 pnl=+0.17 regime=None
+    2026-06-05 ADA      accel_300_,rs_s_broken             bb=0.8200 pnl=+0.13 regime=None
+  top-5 losers:
+    2026-09-22 SEI      pullback-entry-                    bb=0.8200 pnl=-0.30 regime=EXTREME
+    2026-09-18 IO       pullback-entry-                    bb=0.7500 pnl=-0.16 regime=HIGH
+    2026-09-18 ALT      pullback-entry-                    bb=0.7500 pnl=-0.15 regime=NORMAL
+    2026-06-05 BLUR     accel_300_,rs_s_broken             bb=0.8200 pnl=-0.13 regime=None
+    2026-06-08 XLM      accel_300_,rs_s_broken             bb=0.8300 pnl=-0.13 regime=None
+
+0.85+: n=269, winners=107 (39.8%), losers/flat=162
+  winners pnl sum: +8.99 | losers pnl sum: -12.32 | net: -3.33
+  top-5 winners:
+    2026-09-16 FIL      pullback-entry-                    bb=0.8500 pnl=+0.34 regime=HIGH
+    2026-09-20 GMT      pullback-entry-                    bb=0.9700 pnl=+0.26 regime=HIGH
+    2026-06-05 AXS      accel_300_,rs_s_broken             bb=1.0900 pnl=+0.19 regime=None
+    2026-06-05 2Z       accel_300_,rs_s_broken             bb=0.9700 pnl=+0.17 regime=None
+    2026-06-02 LINK     accel_300_,rs_s_broken             bb=0.9800 pnl=+0.15 regime=None
+  top-5 losers:
+    2026-05-20 APEX     rs_r,zscore_pump                   bb=1.0100 pnl=-0.56 regime=None
+    2026-09-16 ETC      pullback-entry-                    bb=0.8700 pnl=-0.28 regime=EXTREME
+    2026-09-16 DOT      pullback-entry-                    bb=0.8900 pnl=-0.25 regime=EXTREME
+    2026-09-16 SEI      pullback-entry-                    bb=0.9600 pnl=-0.25 regime=HIGH
+    2026-06-11 AVNT     accel_300_,rs_r                    bb=0.8900 pnl=-0.23 regime=None
+
+====================================================================================================
+BOUNDARY & DATA-QUALITY CHECKS
+====================================================================================================
+Trades with bb in [0.83,0.87] (boundary of proposed 0.85 cut): n=63
+  2026-05-31 TRB      bb=0.83 pnl=-0.01 accel_300_,rs_r
+  2026-06-01 APEX     bb=0.83 pnl=-0.07 accel_300_,rs_s_broken
+  2026-06-07 LINK     bb=0.83 pnl=-0.08 accel_300_,rs_s_broken
+  2026-06-08 XLM      bb=0.83 pnl=-0.13 accel_300_,rs_s_broken
+  2026-06-09 DASH     bb=0.83 pnl=+0.12 accel_300_,rs_r
+  2026-06-11 SKR      bb=0.83 pnl=-0.09 accel_300_,rs_s_broken
+  2026-06-13 ENS      bb=0.83 pnl=-0.07 accel_300_,rs_r,rs_r
+  2026-06-26 ZEN      bb=0.83 pnl=-0.04 accel_300_,rs_s_broken
+  2026-07-06 ETH      bb=0.83 pnl=-0.06 accel_300_,rs_s_broken
+  2026-07-09 SKY      bb=0.83 pnl=+0.09 accel_300_,rs_s_broken
+  2026-05-22 ETHFI    bb=0.84 pnl=-0.07 rs_r,zscore_pump
+  2026-06-01 CAKE     bb=0.84 pnl=-0.01 rs_r,rs_s_broken
+  2026-06-02 ADA      bb=0.84 pnl=-0.10 accel_300_,rs_s_broken
+  2026-06-03 AVAX     bb=0.84 pnl=-0.10 accel_300_,rs_s_broken
+  2026-06-03 GRIFFAIN bb=0.84 pnl=-0.12 rs_r,rs_s_broken
+  2026-06-04 BSV      bb=0.84 pnl=-0.10 accel_300_,rs_s_broken
+  2026-06-04 APEX     bb=0.84 pnl=-0.11 accel_300_,rs_s_broken
+  2026-06-07 SKR      bb=0.84 pnl=+0.10 accel_300_,rs_s_broken
+  2026-06-11 ME       bb=0.84 pnl=-0.06 accel_300_,rs_s_broken
+  2026-06-13 MET      bb=0.84 pnl=+0.00 accel_300_,rs_r
+  2026-07-08 ETH      bb=0.84 pnl=+0.00 accel_300_,rs_s_broken
+  2026-07-08 0G       bb=0.84 pnl=+0.02 accel_300_,rs_s_broken
+  2026-07-28 LINK     bb=0.84 pnl=-0.06 sqx
+  2026-06-01 ONDO     bb=0.85 pnl=+0.00 accel_300_,rs_s_broken
+  2026-06-01 FET      bb=0.85 pnl=+0.08 accel_300_,rs_s_broken
+  2026-06-03 LINEA    bb=0.85 pnl=-0.02 accel_300_,rs_s_broken
+  2026-06-04 XRP      bb=0.85 pnl=-0.01 accel_300_,rs_s_broken
+  2026-06-05 XMR      bb=0.85 pnl=+0.09 accel_300_,rs_s_broken
+  2026-06-21 ENS      bb=0.85 pnl=+0.08 accel_300_,rs_s_broken
+  2026-06-22 0G       bb=0.85 pnl=-0.07 accel_300_,rs_s_broken
+  2026-06-28 APEX     bb=0.85 pnl=+0.08 accel_300_,rs_s_broken
+  2026-06-29 XRP      bb=0.85 pnl=+0.01 accel_300_,rs_r
+  2026-07-25 0G       bb=0.85 pnl=+0.01 inv_accel_
+  2026-07-26 FET      bb=0.85 pnl=+0.01 inv_accel_
+  2026-09-16 FIL      bb=0.85 pnl=+0.34 pullback-entry-
+  2026-09-29 LDO      bb=0.85 pnl=+0.01 r2-trend-short5
+  2026-05-21 STRK     bb=0.86 pnl=-0.05 rs_r,zscore_pump
+  2026-06-01 ONDO     bb=0.86 pnl=+0.09 accel_300_,rs_s_broken
+  2026-06-01 SKR      bb=0.86 pnl=+0.11 rs_r,rs_s_broken
+  2026-06-01 MON      bb=0.86 pnl=-0.11 accel_300_,rs_s_broken
+  2026-06-02 CAKE     bb=0.86 pnl=+0.08 accel_300_,rs_r,rs_s_broken
+  2026-06-05 AXS      bb=0.86 pnl=+0.08 accel_300_,rs_s_broken
+  2026-06-05 XLM      bb=0.86 pnl=+0.02 accel_300_,rs_s_broken
+  2026-06-07 MORPHO   bb=0.86 pnl=-0.10 accel_300_,rs_r
+  2026-06-12 GALA     bb=0.86 pnl=-0.11 accel_300_,rs_r
+  2026-06-25 UMA      bb=0.86 pnl=-0.09 accel_300_,rs_s_broken
+  2026-06-25 APEX     bb=0.86 pnl=+0.09 accel_300_,rs_s_broken
+  2026-06-26 PURR     bb=0.86 pnl=-0.06 accel_300_,rs_s_broken
+  2026-07-14 UNI      bb=0.86 pnl=-0.12 accel_300_,rs_s_broken
+  2026-07-14 GRAM     bb=0.86 pnl=+0.08 accel_300_,rs_s_broken
+  2026-09-19 HEMI     bb=0.86 pnl=+0.08 pullback-entry-
+  2026-06-01 PURR     bb=0.87 pnl=-0.17 accel_300_,rs_r
+  2026-06-01 BLUR     bb=0.87 pnl=-0.14 rs_r,rs_s_broken
+  2026-06-02 ETH      bb=0.87 pnl=+0.08 rs_r,rs_s_broken
+  2026-06-02 NIL      bb=0.87 pnl=+0.11 accel_300_,rs_s_broken
+  2026-06-05 ASTER    bb=0.87 pnl=-0.19 accel_300_,rs_s_broken
+  2026-06-07 AVNT     bb=0.87 pnl=-0.17 accel_300_,rs_s_broken
+  2026-06-13 MET      bb=0.87 pnl=-0.10 accel_300_,rs_r
+  2026-06-18 ONDO     bb=0.87 pnl=+0.05 accel_300_,rs_s_broken
+  2026-06-18 SKY      bb=0.87 pnl=-0.10 accel_300_,rs_r
+  2026-06-25 BCH      bb=0.87 pnl=+0.09 accel_300_,rs_s_broken
+  2026-06-28 LINK     bb=0.87 pnl=+0.00 accel_300_,rs_s_broken
+  2026-09-16 ETC      bb=0.87 pnl=-0.28 pullback-entry-
+
+Trades with BOTH column bb and metadata bb: n=151
+  |col - meta| mean=0.2229 max=0.9760
+  band assignments that differ (col vs meta, incl. rounding at 0.85): n=90
+    2026-08-22 HYPE     col=0.57 meta=0.9078 pnl=-0.13
+    2026-09-16 DOT      col=0.89 meta=0.3107 pnl=-0.25
+    2026-09-16 LTC      col=0.54 meta=0.2446 pnl=+0.06
+    2026-09-16 CHIP     col=0.47 meta=0.5704 pnl=+0.31
+    2026-09-16 ETH      col=0.94 meta=0.2267 pnl=-0.14
+    2026-09-16 FIL      col=0.85 meta=0.3162 pnl=+0.34
+    2026-09-16 SYRUP    col=0.5 meta=1.031 pnl=+0.22
+    2026-09-16 SEI      col=0.96 meta=0.8937 pnl=-0.25
+    2026-09-16 ME       col=0.39 meta=0.6505 pnl=-0.14
+    2026-09-16 ACE      col=0.05 meta=0.2255 pnl=-0.23
+
+bb_position recording coverage by month (all closed SHORTs):
+  2026-05: 304/304 (100%)
+  2026-06: 1215/1215 (100%)
+  2026-07: 299/419 (71%)
+  2026-08: 3/719 (0%)
+  2026-09: 132/376 (35%)
+  2026-10: 18/18 (100%)
+
+Dead-zone share of bb-recorded shorts by month:
+  2026-05: dz 6/304 (2.0%)
+  2026-06: dz 117/1215 (9.6%)
+  2026-07: dz 36/299 (12.0%)
+  2026-08: dz 0/3 (0.0%)
+  2026-09: dz 8/132 (6.1%)
+  2026-10: dz 0/18 (0.0%)
+
+====================================================================================================
+RECENT-WINDOW VERDICTS
+====================================================================================================
+
+Last 30 days (n=150):
+  DEAD 0.70-0.85: n=8 WR=25.0% pnl=-0.26 avg=-0.0325
+    vs rest-of-window WR: z=-0.882 p=0.3779
+  0.85+: n=12 WR=50.0% pnl=-0.33 avg=-0.0275
+    vs rest-of-window WR: z=0.632 p=0.5276
+
+Last 90 days (n=430):
+  DEAD 0.70-0.85: n=43 WR=23.3% pnl=-0.36 avg=-0.0084
+    vs rest-of-window WR: z=-0.526 p=0.5987
+  0.85+: n=41 WR=39.0% pnl=-0.30 avg=-0.0073
+    vs rest-of-window WR: z=1.641 p=0.1008
+
+====================================================================================================
+FILTER'S ACTUAL VIEW: metadata bb_position (what signal_compactor reads)
+====================================================================================================
+n=695 closed SHORTs with metadata bb_position
+  1_<0.20              n= 315 WR=  54.0% pnl=   -1.61 avg=-0.0051
+  2_0.20-0.35          n= 136 WR=  45.6% pnl=   -1.81 avg=-0.0133
+  3_0.35-0.50          n=  51 WR=  47.1% pnl=   -1.66 avg=-0.0325
+  3b_0.50-0.55         n=  11 WR=  45.5% pnl=   -0.42 avg=-0.0382
+  4_0.55-0.70          n=  55 WR=  63.6% pnl=   +1.46 avg=+0.0265
+  5_DEAD_0.70-0.85     n=  50 WR=  58.0% pnl=   -0.88 avg=-0.0176
+  6a_0.85-0.95         n=  41 WR=  43.9% pnl=   -1.27 avg=-0.0310
+  6b_0.95-1.00         n=  10 WR=  20.0% pnl=   -1.02 avg=-0.1020
+  6c_>1.00             n=  26 WR=  65.4% pnl=   +0.98 avg=+0.0377
+
+====================================================================================================
+COUNTERFACTUAL: dead zone vs currently-ALLOWED bands
+====================================================================================================
+  dead zone WR 38.3% (n=180) vs allowed-bands WR 45.0% (n=1321) | z=-1.681 p=0.0928
+  mean pnl diff -0.0054 p=0.5086 CI[-0.0188,+0.0084]
+  0.85+ WR 39.8% (n=269) vs allowed-bands WR 45.0% | z=-1.562 p=0.1182
+  mean pnl diff -0.0143 p=0.0390 CI[-0.0277,-0.0013]
+
+====================================================================================================
+SHORT BOOK CONTEXT
+====================================================================================================
+  all closed SHORTs: n=3051, sum_pnl=-4.62 USD, WR=45.23%, avg_amount=11.36 USD
+  bb-recorded subset: n=1971, sum_pnl=-1.61 USD, WR=43.6%
+  dead zone share of bb shorts: 180/1971 (9.1%)
+  0.85+ share of bb shorts: 269/1971 (13.6%)
+  combined block 0.70+: 449/1971 (22.8%) of bb-recorded SHORTs
+  combined 0.70+ net pnl if always blocked: +3.95 USD avoided
+
+--- MFE/MAE by band (downside excursion available to SHORT) ---
+  band                     n   avgMFE   avgMAE  MFE_win MFE_loss
+  1_<0.20                855    1.348    0.834    2.767    0.213
+  2_0.20-0.35            306    1.048    1.035    2.557    0.584
+  3_0.35-0.50            171    0.873    0.649    1.350    0.158
+  3b_0.50-0.55            43     None     None     None     None
+  4_0.55-0.70            160    1.697    0.047    1.697     None
+  5_DEAD_0.70-0.85       167     None     None     None     None
+  6a_0.85-0.95           109    0.279    0.262    0.279     None
+  6b_0.95-1.00            60    1.841    2.161     None    1.841
+  6c_>1.00               100     None     None     None     None
+
+====================================================================================================
+FILTER COVERAGE: metadata bb_position by signal family (closed SHORTs)
+====================================================================================================
+  accel_300_,rs_s_broken                           0/1021  (0%)
+  accel_300_,rs_r                                  0/281   (0%)
+  rs_r,zscore_pump                                 0/193   (0%)
+  pullback-entry-                                119/119   (100%)
+  pump-chain-                                    117/117   (100%)
+  inv_accel_                                       0/98    (0%)
+  tl_break_short                                  16/86    (19%)
+  accel_                                           0/79    (0%)
+  accel_300_v                                     72/72    (100%)
+  bb_bounce_short                                 65/65    (100%)
+  mtp_zscore_,rs_r                                 0/58    (0%)
+  vel_hermes                                       0/50    (0%)
+  rs_r,rs_s_broken                                 0/46    (0%)
+  hzscore                                         10/45    (22%)
+  zscore_rising                                    0/38    (0%)
+
+DONE

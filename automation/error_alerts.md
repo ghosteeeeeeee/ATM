@@ -416,3 +416,12 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS Rate limit check failed (DB TOK): cannot access local variable 'psycopg2' where it is not associated with a value — proceeding without rate limit`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] ME TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 15:49 UTC
+- **REPEATED** (5x/30min): `Rate limit check failed (DB error): cannot access local variable 'psycopg2' where it is not associated with a value — proceeding without rate limit`
+  - **ROOT CAUSE**: `decider_run.py` line 3660 had `import psycopg2` inside `run()` (starts line 3008). Python treats any local import as function-scoped for the whole function — shadowing module-level `import psycopg2` (line 8). Every earlier `psycopg2` use in `run()` hit UnboundLocalError.
+  - **IMPACT**: (1) Rate-limit check (15s min gap between entries) was FAIL-OPEN — disabled on every run. (2) Losers hard-block WR<40% (line 4098) was FAIL-CLOSED — all LOSERS tokens blocked on DB error, not actual WR data.
+  - **AUTO-FIX**: Removed the shadowing `import psycopg2` at line 3660. Module-level import now resolves correctly. py_compile OK. Effect on next pipeline run (~1min).
+- **WARN**: disk `/` **86%** used (17G free). Journal vacuum freed 0B (already clean). No logs >7d to gzip. Bulk remains DBs. **CEO DB-retention decision still open (recurring since 2026-10-01).**
+- **INFO**: pipeline.service `inactive` is NORMAL (oneshot+timer). Last run LIVE 15:45:27: 2 open / 51 closed today / +29.28% PnL. 0 Tracebacks in 30min. Guardian active. Timers all firing. Prices fresh (21s, 86 tokens). Regime SHORT_BIAS (0L/5S/112N). Phantom trades 0. Speed 128/241 ≥50th pct (53%).
+- **INFO**: 12 non-critical units in `failed` (better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer, weather-station-api, + hl ghost). Trading path unaffected.
