@@ -14,6 +14,23 @@ cat automation/ceo/ceo_kanban.md | head -40
 cat automation/recent_changes.log | tail -20
 ```
 
+## Step 1b: Read Trade Watchdog Steers
+
+The Trade Watchdog runs every 30 minutes and catches real-time issues. Read its latest output:
+
+```bash
+cat /var/www/hermes/data/watchdog.json
+cat /root/.hermes/data/watchdog_recommendations.json
+```
+
+The watchdog outputs:
+- **open_trades**: Current positions with PnL, hours open, signal origin
+- **steers**: Real-time warnings (stale trades, wrong-side patterns, regime misalignment)
+- **deep_analysis**: The watchdog agent's narrative analysis of what's going wrong
+- **regime_summary**: BTC regime from continuum oscillator
+
+**Use these steers as INPUT for your audit.** If the watchdog keeps flagging the same signal as losing, investigate why. If it sees a wrong-side pattern, verify it. If it recommends an RSI filter, evaluate whether to implement it. The watchdog is your eyes on the ground — you decide what systemic changes are needed.
+
 ## Step 2: Query the Session Brain
 
 The session brain contains all DSH conversations — every decision, every debugging session, every signal analysis. Search it for insights:
