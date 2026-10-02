@@ -2043,3 +2043,30 @@ BY: daily-orchestrator
 - hard_max_loss_* still dominant 24h bleed (13T/-$1.02) — monitor window active on hard-floor 25→30.
 - mfe/mae NULL on trail exits persists; unit ambiguity on non-null values — data-path, not signal logic.
 - Two volume-breakout-long+ positions just opened — first live test since DRIFT-005 verified signal quality. Watch for outcome.
+
+## [2026-10-02 02:45 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $0.79 (WR: 50.0%)
+
+**24h context:** 33 closed, 14W, 40.9% WR, +$0.17. atr_sl_hit 0/33 (tpsl fix stable). hard_max_loss_* family still dominant bleed (~10 exits). Worst signals aging out (accel-300-, pump-chain-v5 already killed). Open: 4x bb-squeeze+ (MON/WLD/CRV/USELESS), JUP vol-breakout, BTC ORPHAN_PAPER.
+
+**Winners last hour:**
+- IMX volume-breakout-long+ LONG hard_tp +$0.82, MAE 0.035% — excellent entry quality (well under 0.5%)
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/33 (0%) of 24h closes. tpsl_utils.py fix deployed and stable. Dominant bleed remains hard_max_loss_* family — monitor window on hard-floor 25→30 still active. Do not stack.
+- **Kill rule:** 0 signals with 0% WR and 3+ trades in last hour. bb-bounce-v3-long+ 0%WR is 2T/24h — below threshold. V5/accel already killed; losses aging out.
+- **PnL streak:** +$0.79 this hour. No consecutive negative hours. Size-reduction rule inactive.
+- **Trade frequency:** 2/hr — not overtrading.
+- **Entry quality:** IMX winner MAE 0.035% (<0.5% target). CHIP MAE NULL (trail-exit data gap, known).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, RR_ENGINE_SHADOW, bb-bounce rsi_1m, volume-breakout RSI_CEILING backtest-first. Do not stack.
+
+**Open Questions:**
+- BTC continuum_engine amount_usdt=0.00 persists (ORPHAN_PAPER hygiene).
+- hard_max_loss_* still dominant 24h bleed — hard-floor 25→30 monitor window active.
+- CHIP MAE/MFE NULL — trail-exit data gap, data-path not signal logic.
+- 4x bb-squeeze+ positions open simultaneously — diversity risk if squeeze fails en masse.
