@@ -965,7 +965,7 @@ def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000
 # They check the kill switch before doing anything.
 
 def mirror_open(token: str, direction: str, entry_price: float, leverage: int = None,
-                size_mult: float = 1.0) -> dict:
+                size_mult: float = 1.0, size_usdt_override: float = None) -> dict:
     """
     Open a real Hyperliquid position mirroring a paper trade.
     BLOCKED if live trading is disabled (kill switch).
@@ -976,6 +976,7 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
         entry_price: Entry price for size calculation
         leverage:    HL leverage to use (default: coin max up to 10x)
         size_mult:   Position size multiplier (e.g. 1.5 for cluster confluence)
+        size_usdt_override: Optional pre-computed size (skips _get_trade_size_usdt())
 
     Returns:
         dict with 'success', 'message', 'size', 'entry_price'
@@ -986,12 +987,15 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     if is_delisted(token):
         return {"success": False, "message": f"{token} is delisted on Hyperliquid — cannot open new positions"}
 
-    size_usdt = _get_trade_size_usdt()
-
-    # Apply cluster/conviction multiplier (e.g., multiple pro traders = bigger position)
-    if size_mult > 1.0:
-        size_usdt *= size_mult
-        print(f"[mirror_open] {token}: applied size_mult={size_mult:.2f} → ${size_usdt:.2f}")
+    if size_usdt_override is not None:
+        size_usdt = size_usdt_override
+        print(f"[mirror_open] {token}: using pre-computed size_usdt=${size_usdt:.2f}")
+    else:
+        size_usdt = _get_trade_size_usdt()
+        # Apply cluster/conviction multiplier (e.g., multiple pro traders = bigger position)
+        if size_mult > 1.0:
+            size_usdt *= size_mult
+            print(f"[mirror_open] {token}: applied size_mult={size_mult:.2f} → ${size_usdt:.2f}")
 
     if size_usdt < MIN_TRADE_USDT:
         return {"success": False, "message": f"Balance too low (${size_usdt:.2f} < ${MIN_TRADE_USDT})"}

@@ -532,18 +532,22 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         _size_mult = 1.0 + (_cluster_size - 1) * HL_COPY_CLUSTER_SIZE_MULT
         print(f"[brain.py] 📊 Cluster bonus: {_cluster_size} traders → size_mult={_size_mult:.2f}")
 
-    # Apply favorites/losers multiplier
+    # Apply favorites/losers multiplier (direction-specific)
     try:
         from decider_run import _get_favorite_size_mult
-        _fav_mult = _get_favorite_size_mult(token)
+        _fav_mult = _get_favorite_size_mult(token, direction)
         if _fav_mult != 1.0:
             _size_mult *= _fav_mult
-            print(f"[brain.py] ❤️ Favorites multiplier: {_fav_mult:.1f}x → size_mult={_size_mult:.2f}")
+            print(f"[brain.py] ❤️ Favorites multiplier ({direction}): {_fav_mult:.1f}x → size_mult={_size_mult:.2f}")
     except Exception:
         pass
 
-    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult})")
-    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult)
+    # Compute pre-computed size and pass to mirror_open
+    from hyperliquid_exchange import _get_trade_size_usdt as _get_hl_base_size
+    _base_size = _get_hl_base_size()
+    _precomputed_size = _base_size * _size_mult
+    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult}, size_usdt=${_precomputed_size:.2f})")
+    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
           f"size={result.get('size')}, total_sz={result.get('total_sz')}, "
           f"notional_usdt={result.get('notional_usdt')}, entry_price={result.get('entry_price')}")
