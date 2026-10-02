@@ -2212,3 +2212,35 @@ Final set: ['ADA']
 - continuum+ 7d 2T 0%WR -$0.21 — small sample, not killable yet. Re-check if it hits 3 closes in one hour at 0% WR.
 - pnl_pct column still shows nonsense (-472% on a -1.04% hard_max_loss trade) — data-path bug, not signal logic.
 - BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
+
+## [2026-10-02 18:45 UTC] Daily Orchestrator — Verify + Document (0 config changes)
+
+**Phase:** Gather → Analyze → Verify → Report. No strategic decisions. No trading config changes.
+
+**PG-verified numbers (status='closed', close_time):**
+- 24h: 53T, 33W (62.3% WR), +$1.11
+- Today: 51T, 31W (60.8% WR), +$0.92
+- 7d: 164T, 83W (50.6% WR), +$0.99 (14:00 snapshot said +$2.22 — stale)
+- LONG 7d +$2.31 (116T); SHORT 7d -$1.32 (48T)
+- Regimes 7d: EXTREME +$0.78, FLAT +$0.27, HIGH +$0.20, NORMAL **-$0.26** (flipped)
+- OPEN: 1 row — BTC ORPHAN_PAPER amount=0.00 continuum_engine (hygiene only)
+
+**Automation implementations verified:**
+1. auto_1hr kill mtf-regime-trend+ (15:11) — 0 LONG signals since kill. Regime check: HIGH -$0.40, NORMAL -$0.06, no wins → policy OK.
+2. signal_reporter bb-squeeze+ 1.2x + FAMILY_MAP Squeeze — code confirmed signal_compactor.py:616 + market_phase_gate.py.
+3. upgrade_implementer OSCILLATOR_MULTS retune (18:20) — constants confirmed; pipeline restarted; monitor window active.
+4. ema_reclaim detection — XPL LONG conf=79 @ 15:20:14. Prior "0 signals" CURRENT entry was stale. Delegation to signal_analyst closable.
+
+**0-open diagnosis (not a failure):**
+- STX SHORT conf=93 → CTX-GATE volatility storm ATR 1.62%>1.5%
+- BTC SHORT conf=77 → CTX-GATE LLM rejected (harmful setup)
+- Hotset intermittent empty between compaction cycles; gates are the active filter
+
+**Changes:** None — monitor windows: bollinger_squeeze re-enable, volume-breakout tests, SHORT-CONTINUUM, HARD_FLOOR, ema_reclaim shadow, bb-squeeze EXTREME, doji 20T, oscillator retune (18:20). Stacking prevents measurement.
+
+**Side findings:**
+- AGENTS.md HL API key "expires in 3 days" is STALE (set 2026-09-16). T to correct.
+- Health monitor "compactor 0/218" partially misattributed — distinguish empty hotset vs execution blocks in future prompt.
+- Disk 85% (improved from 86%).
+
+**Artifacts:** CURRENT.md rewritten (PG-verified). Report: automation/daily_orchestrator_report_2026-10-02.md. Kanban TEAM UPDATES appended.
