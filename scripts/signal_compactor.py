@@ -1409,30 +1409,35 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Strong bullish: score > 70, bias > 0.3
             if _score > 70 and _bias > 0.3:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing SHORT
-                # If coin shows strong SHORT momentum (pShort > 80%, velocity < 0), don't penalize
+                # Compute live from price_history (momentum_cache percentiles are dead)
                 _coin_momentum_ok = False
                 try:
                     import sqlite3 as _mom_sqlite
                     from paths import HERMES_DATA as _MOM_DATA
-                    _mom_conn = _mom_sqlite.connect(f'{_MOM_DATA}/signals_hermes_runtime.db', timeout=3)
+                    _mom_conn = _mom_sqlite.connect(f'{_MOM_DATA}/candles.db', timeout=3)
                     try:
-                        _mom_row = _mom_conn.execute(
-                            "SELECT percentile_short, velocity, momentum_state FROM momentum_cache WHERE token=?",
+                        # Get recent 15m candles for velocity calculation
+                        _candles = _mom_conn.execute(
+                            "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
                             (token,)
-                        ).fetchone()
+                        ).fetchall()
                     finally:
                         _mom_conn.close()
-                    if _mom_row:
-                        _pShort, _vel, _state = _mom_row
-                        _pShort = float(_pShort or 0)
-                        _vel = float(_vel or 0)
-                        # Coin has strong SHORT momentum: high percentile + negative velocity
-                        if direction == 'SHORT' and _pShort > 80 and _vel < 0:
+                    
+                    if len(_candles) >= 10:
+                        _closes = [r[0] for r in reversed(_candles)]
+                        # Velocity: % change over last 5 candles
+                        _vel = (_closes[-1] - _closes[-6]) / _closes[-6] * 100 if _closes[-6] > 0 else 0
+                        # Trend: price above/below SMA
+                        _sma = sum(_closes[-20:]) / len(_closes[-20:])
+                        _above_sma = _closes[-1] > _sma
+                        # Coin has strong SHORT momentum: falling price + below SMA
+                        if direction == 'SHORT' and _vel < -0.5 and not _above_sma:
                             _coin_momentum_ok = True
                             trend_alignment_mult = 1.0  # neutral — don't penalize
-                            log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish BUT coin momentum strong (pShort={_pShort:.0f}%, vel={_vel:+.4f}) → 1.0x")
-                except Exception:
-                    pass
+                            log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish BUT coin falling (vel={_vel:+.2f}%, below SMA) → 1.0x")
+                except Exception as _mom_e:
+                    log(f"  ⚠️ [TREND-ALIGN] {token} {direction}: momentum check failed: {_mom_e}", 'WARN')
                 
                 if not _coin_momentum_ok:
                     trend_alignment_mult = 1.4 if direction == 'LONG' else 0.6
@@ -1440,34 +1445,35 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Strong bearish: score < 30, bias < -0.3
             elif _score < 30 and _bias < -0.3:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing LONG
-                # If coin shows strong LONG momentum (pLong > 80%, velocity > 0), don't penalize
+                # Compute live from price_history (momentum_cache percentiles are dead)
                 _coin_momentum_ok = False
                 try:
                     import sqlite3 as _mom_sqlite
                     from paths import HERMES_DATA as _MOM_DATA
-                    _mom_conn = _mom_sqlite.connect(f'{_MOM_DATA}/signals_hermes_runtime.db', timeout=3)
+                    _mom_conn = _mom_sqlite.connect(f'{_MOM_DATA}/candles.db', timeout=3)
                     try:
-                        _mom_row = _mom_conn.execute(
-                            "SELECT percentile_long, velocity, momentum_state FROM momentum_cache WHERE token=?",
+                        # Get recent 15m candles for velocity calculation
+                        _candles = _mom_conn.execute(
+                            "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
                             (token,)
-                        ).fetchone()
+                        ).fetchall()
                     finally:
                         _mom_conn.close()
-                    if _mom_row:
-                        _pLong, _vel, _state = _mom_row
-                        _pLong = float(_pLong or 0)
-                        _vel = float(_vel or 0)
-                        # Coin has strong LONG momentum: high percentile + positive velocity
-                        if direction == 'LONG' and _pLong > 80 and _vel > 0:
+                    
+                    if len(_candles) >= 10:
+                        _closes = [r[0] for r in reversed(_candles)]
+                        # Velocity: % change over last 5 candles
+                        _vel = (_closes[-1] - _closes[-6]) / _closes[-6] * 100 if _closes[-6] > 0 else 0
+                        # Trend: price above/below SMA
+                        _sma = sum(_closes[-20:]) / len(_closes[-20:])
+                        _above_sma = _closes[-1] > _sma
+                        # Coin has strong LONG momentum: rising price + above SMA
+                        if direction == 'LONG' and _vel > 0.5 and _above_sma:
                             _coin_momentum_ok = True
                             trend_alignment_mult = 1.0  # neutral — don't penalize
-                            log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish BUT coin momentum strong (pLong={_pLong:.0f}%, vel={_vel:+.4f}) → 1.0x")
-                except Exception:
-                    pass
-                
-                if not _coin_momentum_ok:
-                    trend_alignment_mult = 1.4 if direction == 'SHORT' else 0.6
-                    log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
+                            log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish BUT coin rising (vel={_vel:+.2f}%, above SMA) → 1.0x")
+                except Exception as _mom_e:
+                    log(f"  ⚠️ [TREND-ALIGN] {token} {direction}: momentum check failed: {_mom_e}", 'WARN')
             # Neutral/mixed: fallback to token 1m regime
             else:
                 if regime_conf > 0:
