@@ -2189,3 +2189,26 @@ Final set: ['ADA']
 - pump_chain_v5_short generator RSI — SKIPPED (execution gate already holds)
 
 **Monitor:** MID falling / LOW accelerating WR over next 7d. Zones are non-stationary — re-validate matrix monthly.
+
+## [2026-10-02 18:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.21 (WR: 0.0%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/52 (0%) of 24h closes. tpsl_utils.py fix deployed and stable.
+- **Kill rule:** No signal with 0% WR and 3+ trades this hour. continuum+ 1T 0%WR -$0.21 — below threshold (7d: 2T 0%WR, still watch).
+- **mtf-regime-trend+ kill holding:** 0 new opens after 15:11. 2 post-kill closes (JUP/COMP) were pre-existing positions exiting via profit-monster-trail.
+- **PnL streak:** 17h negative (-$0.21, 1 trade). 16h was 0 trades — streak resets. 3-consecutive-negative trigger inactive.
+- **Trade frequency:** 1/hr — not overtrading.
+- **hard_max_loss_* family:** 7 exits /-$1.20 over 24h but profit-monster-trail 36 exits +$1.67 offsets. 24h net +$1.35 (52T, 63.5% WR). Monitor window active — no action.
+- **Open positions:** COMP pump-chain-v5 LONG $22.10 (17:33), BTC continuum_engine ORPHAN_PAPER amount=0.00 (known data-path hygiene, not signal).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune (MID falling 0.7 / LOW accelerating 0.9). Do not stack.
+
+**Open Questions:**
+- continuum+ 7d 2T 0%WR -$0.21 — small sample, not killable yet. Re-check if it hits 3 closes in one hour at 0% WR.
+- pnl_pct column still shows nonsense (-472% on a -1.04% hard_max_loss trade) — data-path bug, not signal logic.
+- BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
