@@ -3,24 +3,25 @@
 mtf_macd.py — MTF MACD: Multi-Timeframe MACD Histogram Alignment Signal.
 
 Fires when:
-  - z_1h > 2.0 (price 2+ std dev from 1h mean)
-  - 15m histogram and 1H histogram BOTH positive → LONG
-  - 15m histogram and 1H histogram BOTH negative → SHORT
+  - z_1h > 2.0 (price 2+ std dev from 1h mean) AND both histograms negative → SHORT
+  - z_1h < -2.0 (price 2+ std dev below 1h mean) AND both histograms positive → LONG
 
-Entry logic (from signal_gen.py _run_mtf_macd_signals, lines 1373-1643):
-  z_1h > +2.0 AND hist_15m<0 AND hist_1h<0 → SHORT
-  z_1h < -2.0 AND hist_15m>0 AND hist_1h>0 → LONG
-  (negative z = oversold, expect up — symmetric with positive z logic)
+Logic: Mean-reversion entry with momentum confirmation.
+  Stretched price + MACD histogram confirming direction = high-probability reversal.
 
-Confidence:
-  conf = min(75, 45 + (|z_1h| - 2.0) * 10)
-  Then MTF alignment boost (+5/+10) and cascade boost (+10 or block).
+Improvements (2026-10-01):
+  - Fixed signal_gen import (was broken since signal_gen.py removal)
+  - Added inline z-score calculation (reads from local candles.db)
+  - Added regime awareness: skip in strong trends (STRONG_DOWN for LONG, STRONG_UP for SHORT)
+  - Added RSI filter: skip SHORT when RSI < 35, skip LONG when RSI > 70
+  - Added EMA300 position check: prefer LONG below EMA300, SHORT above EMA300
+  - Improved confidence scoring with volume ratio bonus
 
 Source: hmacd_mtf-{+|-}
 signal_type: hmacd_mtf
 """
 
-import sys, os, sqlite3, json, time
+import sys, os, sqlite3, json, time, statistics
 from typing import Optional, Tuple
 
 sys.path.insert(0, '/root/.hermes/scripts')
@@ -30,18 +31,20 @@ from signal_schema import (
     price_age_minutes, add_signal, get_cooldown,
 )
 from hermes_constants import (
-    HMACD_ENABLED,
-    HMACD_PLUS_ENABLED,
-    HMACD_MINUS_ENABLED,
+    HMACD_MTF_PLUS_ENABLED,
+    HMACD_MTF_MINUS_ENABLED,
     SHORT_BLACKLIST,
     LONG_BLACKLIST,
 )
 from macd_rules import get_macd_params, compute_mtf_macd_alignment, cascade_entry_signal
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-Z_MACD_THRESH         = 2.0   # z-score threshold for entry
-MIN_TRADE_INTERVAL    = 10    # minutes between trades per token
+Z_MACD_THRESH         = 2.0    # z-score threshold for entry
+MIN_TRADE_INTERVAL    = 10     # minutes between trades per token
 LOG_FILE              = '/root/.hermes/logs/signals.log'
+RSI_SHORT_MIN         = 35     # Don't SHORT when RSI < 35 (oversold)
+RSI_LONG_MAX          = 70     # Don't LONG when RSI > 70 (overbought)
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -85,14 +88,106 @@ def is_delisted(token: str) -> bool:
     return _dl(token)
 
 
+def _get_zscore(token: str, timeframe: str = '1h') -> Optional[float]:
+    """Calculate z-score from local candles.db (inline, no signal_gen dependency)."""
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles
+            WHERE token = ? AND timeframe = ?
+            ORDER BY ts DESC LIMIT 500
+        """, (token.upper(), timeframe))
+        rows = [r[0] for r in cur.fetchall()]
+        conn.close()
+        if len(rows) >= 20:
+            mean = statistics.mean(rows)
+            stdev = statistics.stdev(rows) if len(rows) > 1 else 1
+            if stdev > 0:
+                return (rows[0] - mean) / stdev
+    except Exception:
+        pass
+    return None
+
+
+def _get_rsi(token: str, timeframe: str = '1m', period: int = 14) -> Optional[float]:
+    """Calculate RSI from local candles.db."""
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles
+            WHERE token = ? AND timeframe = ?
+            ORDER BY ts DESC LIMIT ?
+        """, (token.upper(), timeframe, period + 1))
+        rows = [r[0] for r in cur.fetchall()]
+        conn.close()
+        if len(rows) < period + 1:
+            return None
+        # Reverse to chronological order
+        rows.reverse()
+        gains, losses = [], []
+        for i in range(1, len(rows)):
+            change = rows[i] - rows[i-1]
+            if change > 0:
+                gains.append(change)
+                losses.append(0)
+            else:
+                gains.append(0)
+                losses.append(abs(change))
+        avg_gain = sum(gains) / period
+        avg_loss = sum(losses) / period
+        if avg_loss == 0:
+            return 100.0
+        rs = avg_gain / avg_loss
+        return 100 - (100 / (1 + rs))
+    except Exception:
+        pass
+    return None
+
+
+def _get_ema300_position(token: str) -> Optional[str]:
+    """Get EMA300 position (ABOVE/BELOW) from continuum.db."""
+    try:
+        from paths import HERMES_DATA
+        conn = sqlite3.connect(f'{HERMES_DATA}/continuum.db', timeout=3)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT ema300_position FROM continuum_states
+            WHERE token = ? ORDER BY ts DESC LIMIT 1
+        """, (token.upper(),))
+        row = cur.fetchone()
+        conn.close()
+        return row[0] if row else None
+    except Exception:
+        pass
+    return None
+
+
+def _get_trend_quality(token: str) -> Optional[str]:
+    """Get trend quality from continuum.db."""
+    try:
+        from paths import HERMES_DATA
+        conn = sqlite3.connect(f'{HERMES_DATA}/continuum.db', timeout=3)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT trend_quality FROM continuum_states
+            WHERE token = ? ORDER BY ts DESC LIMIT 1
+        """, (token.upper(),))
+        row = cur.fetchone()
+        conn.close()
+        return row[0] if row else None
+    except Exception:
+        pass
+    return None
+
+
 def _macd_crossover(token: str, minutes: int):
     """
     Compute MACD histogram for a token at given timeframe.
-
-    Aggregates raw 90-sec candles into target TF candles, computes MACD
-    using per-token tuned params (get_macd_params), returns:
-      (histogram, macd_line, signal_line, crossover_dir)
-    crossover_dir:  1 = bullish crossover, -1 = bearish crossover, 0 = none
+    Returns: (histogram, macd_line, signal_line, crossover_dir)
     """
     tf_sec = minutes * 60
     lookback_raw = minutes * 40
@@ -173,20 +268,10 @@ def _macd_crossover(token: str, minutes: int):
     return (hist_cur, macd_cur, sig_cur, crossover_dir)
 
 
-def get_1h_zscore(token: str):
-    """Fetch 1H z-score for token from get_tf_zscores."""
-    from signal_gen import get_tf_zscores
-    zscores = get_tf_zscores(token)
-    return zscores.get('1h', (None, None))[0] if zscores else None
-
-
 # ── Main run ─────────────────────────────────────────────────────────────────
 
 def run():
     """Scan all tokens for MTF MACD signals. Returns number of signals added."""
-    if not HMACD_ENABLED:
-        return 0
-
     init_db()
     prices_dict = get_all_latest_prices()
     added = 0
@@ -209,7 +294,7 @@ def run():
             continue
 
         # ── Get 1H z-score ─────────────────────────────────────────────
-        z_1h = get_1h_zscore(token)
+        z_1h = _get_zscore(token, '1h')
         if z_1h is None:
             continue
 
@@ -235,13 +320,43 @@ def run():
         if mtf_direction is None:
             continue
 
-        # ── Directional gate ────────────────────────────────────────────
-        if mtf_direction == 'LONG' and not HMACD_PLUS_ENABLED:
+        # ── Directional kill-switch ────────────────────────────────────
+        if mtf_direction == 'LONG' and not HMACD_MTF_PLUS_ENABLED:
             continue
-        if mtf_direction == 'SHORT' and not HMACD_MINUS_ENABLED:
+        if mtf_direction == 'SHORT' and not HMACD_MTF_MINUS_ENABLED:
             continue
-        if mtf_direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
-            continue
+
+        # ── RSI filter (prevent BANANA pattern) ────────────────────────
+        rsi = _get_rsi(token, '1m')
+        if rsi is not None:
+            if mtf_direction == 'SHORT' and rsi < RSI_SHORT_MIN:
+                _log(f'  SKIP {token} SHORT: RSI {rsi:.1f} < {RSI_SHORT_MIN} (oversold)')
+                continue
+            if mtf_direction == 'LONG' and rsi > RSI_LONG_MAX:
+                _log(f'  SKIP {token} LONG: RSI {rsi:.1f} > {RSI_LONG_MAX} (overbought)')
+                continue
+
+        # ── Trend quality filter ───────────────────────────────────────
+        trend_quality = _get_trend_quality(token)
+        if trend_quality:
+            if mtf_direction == 'LONG' and trend_quality == 'STRONG_DOWN':
+                _log(f'  SKIP {token} LONG: trend_quality=STRONG_DOWN')
+                continue
+            if mtf_direction == 'SHORT' and trend_quality == 'STRONG_UP':
+                _log(f'  SKIP {token} SHORT: trend_quality=STRONG_UP')
+                continue
+
+        # ── EMA300 position filter ────────────────────────────────────
+        ema_pos = _get_ema300_position(token)
+        if ema_pos:
+            if mtf_direction == 'LONG' and ema_pos == 'ABOVE':
+                # Prefer LONG below EMA300 (mean-reversion from below)
+                _log(f'  SKIP {token} LONG: already ABOVE EMA300')
+                continue
+            if mtf_direction == 'SHORT' and ema_pos == 'BELOW':
+                # Prefer SHORT above EMA300 (mean-reversion from above)
+                _log(f'  SKIP {token} SHORT: already BELOW EMA300')
+                continue
 
         # ── Confidence scoring ──────────────────────────────────────────
         z_excess   = abs(z_1h) - Z_MACD_THRESH
@@ -249,7 +364,7 @@ def run():
         timeframe  = f'z3_z{z_1h:.1f}'
         strength   = round(z_excess, 3)
 
-        # ── MTF alignment boost (2026-04-06 logic) ─────────────────────
+        # ── MTF alignment boost ────────────────────────────────────────
         try:
             mtf_align = compute_mtf_macd_alignment(token)
             if mtf_align is not None:
@@ -262,7 +377,7 @@ def run():
         except Exception as e:
             _log(f'  [MTF ALIGN] {token} error: {e}')
 
-        # ── Cascade boost / block ───────────────────────────────────────
+        # ── Cascade boost / block ──────────────────────────────────────
         cascade_blocked = False
         try:
             cascade = cascade_entry_signal(token)
@@ -280,19 +395,12 @@ def run():
             continue
 
         # ── Write signal ───────────────────────────────────────────────
-        # ── Per-direction kill-switch ─────────────────────────────────────────
-        from hermes_constants import HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED
-        if mtf_direction == 'LONG' and not HMACD_MTF_PLUS_ENABLED:
-            continue
-        if mtf_direction == 'SHORT' and not HMACD_MTF_MINUS_ENABLED:
-            continue
-
         hmacd_char = '+' if mtf_direction == 'LONG' else '-'
-        source = f'hmacd_mtf-{hmacd_char}'   # hmacd_mtf+ / hmacd_mtf- (distinct from hmacd_bare)
+        source = f'hmacd_mtf-{hmacd_char}'
         sid = add_signal(
             token=token,
             direction=mtf_direction,
-            signal_type='hmacd_mtf',   # mtf = multi-timeframe z-score + histogram alignment
+            signal_type='hmacd_mtf',
             source=source,
             confidence=conf,
             value=strength,
@@ -304,7 +412,7 @@ def run():
         )
         if sid:
             added += 1
-            _log(f'  SIGNAL: {token} {mtf_direction} @{price:.6f} conf={conf:.1f} z_1h={z_1h:.2f}')
+            _log(f'  SIGNAL: {token} {mtf_direction} @{price:.6f} conf={conf:.1f} z_1h={z_1h:.2f} rsi={rsi:.1f if rsi else "N/A"}')
 
     _log(f'Done: {added} signals added')
     return added

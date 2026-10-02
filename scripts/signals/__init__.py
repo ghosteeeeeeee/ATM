@@ -60,6 +60,7 @@ from hermes_constants import (
     EMA300_BREAKTHROUGH_MINUS_ENABLED,
     WALL_ST_CYCLE_ENABLED, WALL_ST_CYCLE_PLUS_ENABLED, WALL_ST_CYCLE_MINUS_ENABLED,
     TREND_IGNITION_ENABLED, TREND_IGNITION_PLUS_ENABLED, TREND_IGNITION_MINUS_ENABLED,
+    HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
 )
 
 
@@ -436,6 +437,11 @@ except Exception:
     _trend_ignition_run = None
 
 try:
+    from signals.mtf_macd import run as _mtf_macd_run
+except Exception:
+    _mtf_macd_run = None
+
+try:
     from signals.mtf_regime_trend import run as _mtf_regime_trend_run
 except Exception:
     _mtf_regime_trend_run = None
@@ -522,6 +528,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'wall_street_cycle',        'enabled': 'WALL_ST_CYCLE_ENABLED',     'run': _wall_street_cycle_run},
     {'name': 'trend_ignition',            'enabled': 'TREND_IGNITION_ENABLED',    'run': _trend_ignition_run},
     {'name': 'mtf_regime_trend',          'enabled': 'MTF_REGIME_TREND_ENABLED',  'run': _mtf_regime_trend_run},
+    {'name': 'mtf_macd',                  'enabled': 'HMACD_MTF_PLUS_ENABLED',    'run': _mtf_macd_run},
 ]
 
 
