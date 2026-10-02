@@ -1762,5 +1762,41 @@
     "category": "entry sniper",
     "status": "carried — 20T threshold",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "mtf-regime-trend+ exec-RSI alignment filter — block exec RSI<30 or detect-exec gap>25",
+    "rationale": "Loser DNA: det RSI 55-66 → exec RSI 10-25 (gap 35-53). 1m: DOT/SOL pre-entry downtrends. Winners det RSI 27-39 recover during lag. 4/5 losers blocked, 0/3 winners blocked.",
+    "expected_impact": "+15-25% WR on mtf-regime-trend+ if pattern holds to 20T",
+    "category": "entry sniper",
+    "status": "suggested watchlist — monitor window + 9T < 20T + bug_hunter owns DRIFT-002",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "volume-breakout-long+ EXTREME conf boost re-eval — EXTREME data NOW exists (8T 75%WR +$2.62/14d)",
+    "rationale": "Live tests JUP +5.16% / IMX +3.70% proved habitat. Prior CEO rejection was NEUTRAL-only column issue. Winner DNA: det RSI 57-77 momentum zone.",
+    "expected_impact": "+2-4% WR at 20T threshold",
+    "category": "entry sniper",
+    "status": "carried — 20T threshold",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "Verify RR_ENGINE_SHADOW logging — 0/162 metadata hits, 1 exit/7d",
+    "rationale": "Shadow with no log = wasted wait. Cannot flip FORCE without knowing if path evaluates.",
+    "expected_impact": "Unblocks RR_ENGINE_FORCE decision",
+    "category": "systems",
+    "status": "suggested — code owner",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-02",
+    "idea": "prices.db 0 bytes — verify price_collector write path",
+    "rationale": "prices.db and price_history.db both 0 bytes. candles.db (2.3G) has data and works for 1m autopsy. Scripts using prices.db get silent empty reads.",
+    "expected_impact": "Prevent silent data-loss bugs in price-dependent scripts",
+    "category": "systems",
+    "status": "flagged — price_collector owner",
+    "risk": "none"
   }
 ]
