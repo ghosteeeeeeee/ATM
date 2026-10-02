@@ -2124,3 +2124,26 @@ Final set: ['ADA']
 - pnl_pct column shows nonsense (-135 to -591%) on these trades — looks like price-move % not trade return %. Data-path bug, not signal logic. Prior logs noted "pnl_pct column appears percent-already". Verify column semantics before trusting any % analysis.
 - hard_max_loss_* family still dominant 24h bleed (6T/-$0.77). hard-floor 25→30 monitor window active.
 - 2 open mtf-regime-trend+ (COMP, JUP) opened before kill — let TPSL manage, flag if both hard_sl.
+
+## [2026-10-02 16:11] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** $-0.25 (WR: 33.3%)
+
+**Breakdown:** JUP/COMP mtf-regime-trend+ pre-kill opens closed via profit-monster-trail (±$0.06). BTC continuum-osc+ cut-loser-MAE-GUARD -$0.20. 24h: 52T +$1.65.
+
+**Changes:**
+1. None — no trigger conditions met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/52 (0%) of 24h closes. atr_trail_hit 2T +$0.15. tpsl_utils.py fix stable. No CEO alert.
+- **Kill rule:** No signal with 0% WR and 3+ trades last hour. continuum-osc+ 1T only. mtf-regime-trend+ PLUS already killed 15:11 — remaining open COMP/JUP closed clean via trail.
+- **PnL streak:** 14h -$0.70 + 15h -$0.25 = 2 consecutive negative hours. Size-reduction rule needs 3+ — not triggered. Watch next hour.
+- **Trade frequency:** 3/hr — not overtrading.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-bounce 1m, volume-breakout RSI_CEILING backtest-first, bb-squeeze EXTREME 20T, doji 20T. Do not stack.
+
+**Open Questions:**
+- hard_max_loss_* family still 24h bleed: 6 exits -$0.99. hard-floor 25→30 monitor window active.
+- pnl_pct column still shows nonsense (-132% on JUP trail) — data-path bug, not signal logic.
+- BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
+- If next hour is negative, 3-consecutive-negative trigger activates → consider NEUTRAL regime size reduction.
