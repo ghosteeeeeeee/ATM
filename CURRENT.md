@@ -1,34 +1,31 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-01 18:45 UTC**
-**Updated by: daily-orchestrator**
+**Last Updated: 2026-10-02 14:00 UTC**
+**Updated by: CEO**
 
 ## Current Status
 
-**PIPELINE HEALTHY.** 1 open: BTC LONG continuum-osc+ (entry $84229, opened 13:49, IN_PROFIT). Hotset empty — signal starvation continues (NEUTRAL signal unbuilt, #1 gap). Pipeline live, compactor cycling every minute, SHORT-CONTINUUM filter firing correctly.
+**PIPELINE HEALTHY + SYSTEM POSITIVE.** 2 open: BTC LONG continuum-osc+ ($22.10 @ $86180, opened 09:01) + BTC LONG continuum_engine amount_usdt=0.00 phantom paper (ORPHAN_PAPER hygiene). Hotset LIVE — JUP LONG mtf-regime-trend+ conf=83 (starvation ending). Regime NEUTRAL/BULL_TREND, BTC score ~92 z=POS.
 
-**24h (PG live):** 31T 35.5%WR -$1.11. **7d:** 112T 47.3%WR -$0.09. LONG 7d +$1.15 (63T). SHORT 7d -$1.24 (49T). Regime NEUTRAL / BTC score 92-98 z=POS (strongly bullish — SHORTs correctly blocked by new filter).
+**24h (PG live, CEO-verified):** 44T 72.7%WR +$2.43. **7d:** 154T 52.6%WR +$2.22. LONG 7d +$3.54 (106T 55.7%). SHORT 7d -$1.32 (48T 45.8%). All regimes near-breakeven+: EXTREME +$0.78 (74T), HIGH +$0.66 (35T), NORMAL +$0.31 (38T), FLAT +$0.47 (4T). Today alone: 41T 70.7%WR +$2.15.
 
-- **🟢 SHORT-CONTINUUM FILTER LIVE + VERIFIED** (upgrade_implementer 18:15). Blocks SHORT when BTC state_score>10 AND zscore_tier != STRONG_NEG. Logs show constant correct blocks: WLD/ALT/TRX/BTC/PUMP SHORT blocked (score=92-98, z=POS). Plans/continuum-filter-analysis.md implemented. LONG side untouched.
-- **🟢 upgrade_implementer 4 changes VERIFIED LIVE:** OSCILLATOR_MULT_ENABLED=True, DOJI_BOTTOM_ENABLED=True (flag decoupled from DOJI_TOP), SHORT continuum filter, REGIME_SIGNALS EXTREME cleanup (pump-chain- removed from both volatility_gate files). py_compile OK. Pipeline + compactor restarted.
-- **🟢 bugs.json RECONCILED.** 4 bugs verified fixed in code but stale status: BUG-001 (MACD histogram — runtime test confirmed hist=line-sig), BUG-011 (PG conn leak — try/finally present), BUG-020 (PRESERVE zombie — 30min age guard + entry_origin_ts as created_at live), BUG-021 (chop hyphen — p_normalized + overrides added, 14/14 tests pass). Marked FIXED with verification notes. 11 bugs remain OPEN (coin_tracker/backfill cluster — not trading-path).
-- **🟡 SIGNAL STARVATION PERSISTS.** Hotset empty 18:32-18:41. 40+ signals generated/cycle, 0-5 pass compaction (confidence<50 or safety filters). NEUTRAL diversity signal (volume-dry-up/EMA-reclaim) still unbuilt — delegated signal_analyst Sep 30, re-delegated 13:51. momentum signals (r2-trend) blocked by BTC-CHOP-GATE when BTC flat, then expire.
-- **🟡 24h losers root-caused + fixed:** pump-chain- SHORT 9T 22.2% WR -$0.63 (all EXTREME — vol gate 0.0 + EXTREME allowlist removal 18:15). accel-300- SHORT 8T 37.5% -$0.34 (killed 10:50). pump-chain-v5 LONG 6T -$0.17 (killed 10:18). Legacy aging out.
-- **🟡 doji-bottom-long** still below 20T conf-boost threshold. **bb-bounce-v3-long+** 2T 0%WR -$0.12 — below 3T kill threshold, monitor.
-- **🟡 DISK 87%** (97G/118G, 15G free). DB growth: coin_tracker 3.3G, candles 2.3G, mtf_macd_tuner 1.3G. **Needs CEO prune call** — do NOT VACUUM active DBs during trading. Delegated bug_hunter for safe analysis.
-- **🟡 Failing non-trading services:** hermes-wasp (LOCK-WAIT loop, timer still fires 30min), hermes-better-coder (ModuleNotFoundError). Both disabled, code-owner fixes delegated. hermes-atr-sl-updater.timer is ghost (unit renamed -DEFUNCT; ATR managed locally by guardian via DB — not a gap).
-- **🟡 pump_chain_v5_short.py** generates without generation-time RSI/vol (rsi:0 in file). 342 signals/day, 0 executed — execution gates in signal_compactor hold (RSI_MIN=40, HIGH_BLOCK, SHORT-CONTINUUM). Signal spam, not money-losing. Fix later if spam worsens.
-- **🟡 bollinger_squeeze research PASS** (70.8%WR, 805T historical) but BOLLINGER_SQUEEZE_ENABLED=False since Aug 1 (0%WR on 4 live trades). Existing bollinger_squeeze.py already implements pattern; _candidates/ are stubs. Re-enable = CEO call.
-- **OPEN:** 1 position (BTC LONG continuum-osc+).
-- **KILLED/REGIME BLOCKED:** pump-chain-v5 LONG (Oct 1 10:18), accel-300- SHORT (Oct 1 10:50), pump-chain+ V5 NEVER_REENABLE (Sep 28), pullback-entry+ NEVER_REENABLE, pump-chain- NEVER_REENABLE, mover+/- NEVER_REENABLE (Sep 24/29), open-skies+ (Sep 22), grind-trend+/- (Sep 19), breakout-long+ (Sep 16), trend_ignition (Sep 16), PUMP_FLOW+ NEVER_REENABLE.
-- **CONF_FILTER_MIN=70.** LONG_RSI_CEILING=70. SHORT_RSI_FLOOR=40 / CEILING=65 / HARD_FLOOR=25. PUMP_CHAIN_SHORT_RSI_MIN=40. LONG_RSI_FLOOR=20.
+- **🟢 SYSTEM RECOVERED.** 24h PnL flipped from -$1.11 (Oct 1 stale report) to +$2.43. 7d flipped -$0.09 → +$2.22. Legacy kills aging out correctly.
+- **🟢 bollinger_squeeze RE-ENABLE VERIFIED (CEO Oct 1 21:55).** bb-squeeze+ 25T 60%WR +$0.21/7d. HIGH habitat 10T 70%WR +$0.41. Generating 272 signals/2d. SHORT side stays OFF.
+- **🟢 volume-breakout-long+ BEST SIGNAL.** 4T 100%WR +$1.96/7d. EXTREME habitat 14d: 10T 80%WR +$3.25. STANDALONE_BYPASS. Do not blanket-filter. 2 live tests overnight (JUP/IMX).
+- **🟢 doji-bottom-long strong.** 8T 75%WR +$0.39/7d. HIGH habitat 8T 87.5%WR +$0.48. NORMAL 4T 25%WR -$0.13 — regime specialist, below 20T conf-boost threshold.
+- **🟢 mtf-regime-trend+ live.** 3T 100%WR +$0.29/7d. Hotset JUP conf=83.
+- **🟢 ema_reclaim_long BUILT + REGISTERED + ENABLED** (signal_analyst delivered per spec). EMA_RECLAIM_ENABLED=True, in SIGNAL_REGISTRY, MeanReversion family, compactor weight 1.0. NOT standalone-bypass — needs 2-type confluence. **0 signals in DB since deploy** — dry-run scan=0. Shadow by design; detection may be tight or market hasn't produced decline+reclaim pattern yet. **Delegate detection-coverage check to signal_analyst — do NOT stack config changes.**
+- **🟢 DISK PRUNED 0.87G** (CEO). mtf_macd_tuner.db 1.39G→0.52G — deleted backtest_runs/results >7d old (4845 runs / 5.1M result rows). **token_best_config (124 rows) KEPT** — live path via macd_rules.py. coin_tracker.db (3.3G) + candles.db (2.3G) NOT touched — active trading data, no vacuum during trading. Disk now 86% (96G/118G, 16G free).
+- **🟡 SHORT still bleeding -$1.32/7d** but much improved. Filters working: SHORT-CONTINUUM, RSI floors/ceilings, HARD_FLOOR=25. No new SHORT config this run (monitor windows).
+- **🟡 SHORT_CONTINUUM_SCORE_MAX raised 10→30** (found in constants, comment: "30d data: score 10-30 band is breakeven noise"). Was 10 in prior CURRENT.md. Monitor — not reverted.
+- **🟡 pump_chain_v5_short.py** still generates without generation-time RSI/vol (rsi:0). Signal spam filtered by execution gates. Monitor.
+- **🟡 Failing non-trading services:** hermes-wasp (LOCK-WAIT), hermes-better-coder (ModuleNotFoundError dispatcher). Both disabled, code-owner fixes delegated. Not trading-path.
+- **🟡 DRIFT-002 OPEN:** exec-time LONG RSI uses 5m vs signal 1m — bug_hunter owns.
+- **CONF_FILTER_MIN=70.** LONG_RSI_CEILING=70. SHORT_RSI_FLOOR=40 / CEILING=65 / HARD_FLOOR=25. LONG_RSI_FLOOR=20. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 (signal-specific).
 - **PM_TRAIL:** ACTIVATE 0.40%, DISTANCE 0.20%. Protected (DO NOT CHANGE).
-- **ATR_SL:** MIN 1.3%, MAX 2.0%. EXTREME: MIN 1.5%, 1.2x. VERIFIED — 3 hits/7d, atr_sl_hit 0% today.
-- **BTC_CHOP_GATE:** blocks momentum signals when BTC 30m flat. Correct behavior but starves NEUTRAL diversity — NEUTRAL signal is the fix.
-- **SHORT_CONTINUUM_FILTER_ENABLED=True.** SCORE_MAX=10. ALLOW_Z=('STRONG_NEG',).
-- **Disk:** 87% (15G free).
-- **LONG_NEUTRAL_BLOCK_ENABLED=True.**
+- **ATR_SL:** MIN 1.3%, MAX 2.0%. EXTREME: MIN 1.5%, 1.2x. VERIFIED — 24h exits dominated by profit-monster-trail (35T 80%WR +$1.81).
 - **FINAL_CONFIDENCE:** by design not in _signal_metadata — hotset JSON only.
+- **Regime memory UPDATED** 2026-10-02 from live PG (snapshot wr 52.6, 7d +$2.22).
 
 ## Standing Decisions (do not re-litigate)
 
@@ -37,38 +34,42 @@
 - **hermes_constants.py:** do not change VALUES without CEO/T approval. Crash-bug code fixes allowed (type-safety, imports). Loss-prevention guardrails (RSI floors/ceilings) treated as non-tunable safety nets.
 - **NEUTRAL_SNIPER_ENABLED=False** — human-disabled Sep 12 per T. Do not re-enable without T.
 - **Blacklist testing COMPLETE** — 77 tokens, 0 KEEP. Stop rotating.
-- **0 config changes when fixes are in monitor windows** — stacking changes prevents measurement. Active windows: SHORT-CONTINUUM (18:15), SHORT_RSI_HARD_FLOOR (11:50), pump-chain- RSI_MIN, V5/accel kills aging out.
+- **0 config changes when fixes are in monitor windows** — stacking changes prevents measurement. Active windows: bollinger_squeeze re-enable (Oct 1 21:55), volume-breakout live tests, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, doji at 20T, ema_reclaim shadow.
 - **signal_version.py missing** — CEO 22:00 Sep 30: stop flagging, JSON store exists.
+- **Disk prune:** mtf_macd_tuner backtest data OK to prune (>7d). coin_tracker/candles NEVER vacuum during trading. Next prune call when disk >88%.
 
 ## Monitor List (next 48h)
 
 1. BTC LONG continuum-osc+ — outcome, SL/TP/trail behavior
-2. SHORT-CONTINUUM filter — confirm no legitimate STRONG_NEG SHORTs blocked; BTC score trend
-3. SHORT_RSI_HARD_FLOOR=25 — SKIP_HARD logs, RSI<25 SHORT opens
-4. hard_max_loss exits — should decline as accel-300-/V5 age out
-5. doji-bottom-long — 20T conf-boost threshold
-6. bb-bounce-v3-long+ — 3T kill threshold
-7. NEUTRAL volume-dry-up/EMA-reclaim signal — still unbuilt? signal_analyst status
-8. Disk growth rate — CEO prune call pending
-9. pump_chain_v5_short spam — 342/day, fix if worsens
-10. hermes-wasp LOCK-WAIT + better-coder ModuleNotFoundError — code-owner fixes
+2. volume-breakout-long+ live tests (JUP/IMX) — first live since DRIFT-005
+3. bollinger_squeeze first trades — HIGH habitat 70%WR holding?
+4. doji-bottom-long — 20T conf-boost threshold; NORMAL regime bleed
+5. ema_reclaim_long — still 0 signals? detection-coverage (signal_analyst)
+6. Hotset fill rate — mtf-regime-trend+ and others clearing compactor
+7. SHORT_CONTINUUM_SCORE_MAX=30 — any legitimate STRONG_NEG SHORTs blocked/unblocked?
+8. bb-bounce-v3-long+ — 3T kill threshold
+9. Disk growth rate — coin_tracker 3.3G, candles 2.3G
+10. pump_chain_v5_short spam — fix if worsens
+11. hermes-wasp LOCK-WAIT + better-coder ModuleNotFoundError — code-owner fixes
+12. SHORT R:R — still structural disadvantage (-$1.32/7d)
 
 ## Backlog / Delegated (not orchestrator's call)
 
-- **NEUTRAL signal:** re-enable neutral_sniper vs build-new — **T decision** (build-new delegated to signal_analyst)
-- **bollinger_squeeze re-enable** — research PASS but live 0%WR historically — CEO call
-- **mover-/mover+ 24h 0%-WR kill variant** — CEO decision pending
-- **Signal conf boosts** (vol-breakout EXTREME @20T, doji HIGH @20T, pump-chain- RSI 50-59 @15T) — below sample thresholds
-- **Dead code cleanup:** orphan signal files with signal_gen imports (phase_accel, pump_catcher, ma_cross_5m, etc.) — NOT in active 73-entry registry, dead files, backlog
-- **bugs.json OPEN (11):** coin_tracker/backfill cluster (BUG-002..010, 012, 022) — not trading-path
-- **ORPHAN_PAPER $0 trades** in PG — data hygiene
-- **AGENTS.md HL API key reminder appears STALE** — says "expires in 3 days" dated 2027-03-12; key set 2026-09-16 valid 180d → ~2027-03-15. On 2026-10-01 ≈165 days left. **T: verify and correct the reminder.**
+- **ema_reclaim detection coverage** — 0 signals despite enabled; shadow by design but verify detection runs on live candles — **DELEGATED signal_analyst**
+- **bollinger_squeeze SHORT side** — research PASS historically but OFF until SHORT R:R fixed
+- **NEUTRAL diversity beyond ema_reclaim** — volume-dry-up still unbuilt
+- **Signal conf boosts** (vol-breakout EXTREME, doji HIGH, pump-chain- RSI 40-45) — below sample thresholds
+- **Dead code cleanup:** orphan signal files with signal_gen imports — backlog
+- **bugs.json OPEN (11):** coin_tracker/backfill cluster — not trading-path
+- **ORPHAN_PAPER $0 trades** in PG — data hygiene (continuum_engine BTC open)
+- **AGENTS.md HL API key reminder appears STALE** — T: verify and correct
+- **Coin tracker intelligence** — Wyckoff/Elliott/Volume signals still unbuilt; coin_tracker_hot NEUTRAL gate relaxed Sep 29 but COIN_TRACKER_HOT_PLUS needs T approval
 
-## Orchestrator Report (2026-10-01 18:45 UTC)
+## Orchestrator / CEO Report (2026-10-02 14:00 UTC)
 
-- **0 CONFIG CHANGES.** Multiple fixes in monitor windows (SHORT-CONTINUUM 30min old, SHORT_RSI_HARD_FLOOR 7h, pump-chain- RSI_MIN, V5/accel kills aging).
-- **VERIFIED** upgrade_implementer's 4 changes live + SHORT-CONTINUUM filter firing correctly (BTC score 92-98 z=POS, SHORTs blocked as designed).
-- **RECONCILED bugs.json** — 4 stale FIXED statuses corrected with runtime/static verification (BUG-001/011/020/021).
-- **24h:** 31T 35.5%WR -$1.11. Losers root-caused (pump-chain- EXTREME, accel-300-, V5 — all already fixed/killed).
-- **DELEGATED (unchanged):** signal_analyst (NEUTRAL signal), bug_hunter (disk safe analysis + wasp/better-coder), CEO (disk prune, bollinger_squeeze re-enable, HL key reminder).
-- **MONITOR:** BTC trade outcome, SHORT-CONTINUUM correctness, SKIP_HARD logs, hard_max_loss aging, doji at 20T, NEUTRAL signal 48h, disk.
+- **0 TRADING CONFIG CHANGES.** System positive (+$2.43/24h, +$2.22/7d). Multiple monitor windows active (bollinger_squeeze, volume-breakout tests, SHORT-CONTINUUM, HARD_FLOOR, ema_reclaim shadow). Stacking changes prevents measurement.
+- **VERIFIED** all numbers from PG directly (not stale reports). CURRENT.md was wrong (-$1.11 → actual +$2.43 24h).
+- **1 NON-TRADING PRUNE:** mtf_macd_tuner backtest data >7d deleted (0.87G freed). Live token_best_config kept. Disk 87%→86%.
+- **REGIME MEMORY UPDATED** from live DB (snapshot 2026-10-02, wr 52.6, 7d +$2.22).
+- **DELEGATED:** signal_analyst — ema_reclaim detection-coverage check (0 signals despite enabled).
+- **MONITOR:** volume-breakout live tests, bollinger_squeeze trades, ema_reclaim, doji at 20T, SHORT R:R, disk.
