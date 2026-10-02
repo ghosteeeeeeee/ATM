@@ -2792,13 +2792,41 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass
             # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
+            # Bearish override 2026-10-02: in downtrend, oversold = continuation, not bounce.
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
                 try:
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
                     if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
-                        log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d)")
-                        continue
+                        # Bearish override: check BTC continuum — if bearish, oversold = continuation
+                        _pcs_bearish_override = False
+                        try:
+                            import os as _pcs_os
+                            import time as _pcs_time
+                            _pcs_cont = sqlite3.connect(_pcs_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _pcs_row = _pcs_cont.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _pcs_cont.close()
+                            if _pcs_row:
+                                _pcs_phase, _pcs_linreg, _pcs_ema, _pcs_ts = _pcs_row
+                                _pcs_age = _pcs_time.time() - (_pcs_ts or 0)
+                                if _pcs_age < 600:
+                                    _pcs_bearish = (_pcs_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                                                    _pcs_linreg in ('LEAN_BEAR', 'BEAR') and
+                                                    _pcs_ema == 'BELOW')
+                                    if _pcs_bearish:
+                                        _pcs_bearish_override = True
+                        except Exception:
+                            pass
+                        if _pcs_bearish_override:
+                            log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT bypass — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bearish (oversold = continuation)")
+                        else:
+                            log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d)")
+                            continue
                 except ImportError:
                     pass
             # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
