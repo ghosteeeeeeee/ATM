@@ -3663,6 +3663,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Mirror of SHORT_RSI_CEILING — prevents LONGing into overextension.
             # 30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15 (caught).
             # Blocks extreme overbought entries where momentum is exhausted.
+            # Bullish override 2026-10-02: in uptrend, overbought = momentum confirming, not exhaustion.
             if direction == 'LONG' and LONG_RSI_CEILING > 0:
                 # Dynamic RSI ceiling based on R:R grade
                 # Grade A (R:R>=4.0, mult>=1.30): RSI ceiling 80
@@ -3678,6 +3679,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _dynamic_ceiling = LONG_RSI_CEILING  # Neutral/fail-open — default ceiling
                 else:
                     _dynamic_ceiling = min(LONG_RSI_CEILING, 60)  # Grade C/D — tighter ceiling
+                # Bullish override: check BTC continuum — if bullish, overbought = momentum
+                _lrc_bullish_override = False
+                try:
+                    import os as _lrc_os
+                    import time as _lrc_time
+                    _lrc_cont = sqlite3.connect(_lrc_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _lrc_row = _lrc_cont.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _lrc_cont.close()
+                    if _lrc_row:
+                        _lrc_phase, _lrc_linreg, _lrc_ema, _lrc_ts = _lrc_row
+                        _lrc_age = _lrc_time.time() - (_lrc_ts or 0)
+                        if _lrc_age < 600:
+                            _lrc_bullish = (_lrc_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
+                                            _lrc_linreg in ('LEAN_BULL', 'BULL') and
+                                            _lrc_ema == 'ABOVE')
+                            if _lrc_bullish:
+                                _lrc_bullish_override = True
+                except Exception:
+                    pass
                 _conn_lrc = None
                 try:
                     _conn_lrc = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3697,8 +3722,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _lrc_al > 0:
                             _lrc_rsi = 100 - (100 / (1 + _lrc_ag / _lrc_al))
                             if _lrc_rsi > _dynamic_ceiling:
-                                log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
-                                continue
+                                if _lrc_bullish_override:
+                                    log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
+                                else:
+                                    log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:
