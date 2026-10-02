@@ -1407,8 +1407,35 @@ def _score_signal(token, direction, conf, source, signal_type,
 
             # Strong bullish: score > 70, bias > 0.3
             if _score > 70 and _bias > 0.3:
-                trend_alignment_mult = 1.4 if direction == 'LONG' else 0.6
-                log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
+                # FIX 2026-10-02: Check coin's own momentum before penalizing SHORT
+                # If coin shows strong SHORT momentum (pShort > 80%, velocity < 0), don't penalize
+                _coin_momentum_ok = False
+                try:
+                    import sqlite3 as _mom_sqlite
+                    from paths import HERMES_DATA as _MOM_DATA
+                    _mom_conn = _mom_sqlite.connect(f'{_MOM_DATA}/signals_hermes_runtime.db', timeout=3)
+                    try:
+                        _mom_row = _mom_conn.execute(
+                            "SELECT percentile_short, velocity, momentum_state FROM momentum_cache WHERE token=?",
+                            (token,)
+                        ).fetchone()
+                    finally:
+                        _mom_conn.close()
+                    if _mom_row:
+                        _pShort, _vel, _state = _mom_row
+                        _pShort = float(_pShort or 0)
+                        _vel = float(_vel or 0)
+                        # Coin has strong SHORT momentum: high percentile + negative velocity
+                        if direction == 'SHORT' and _pShort > 80 and _vel < 0:
+                            _coin_momentum_ok = True
+                            trend_alignment_mult = 1.0  # neutral — don't penalize
+                            log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish BUT coin momentum strong (pShort={_pShort:.0f}%, vel={_vel:+.4f}) → 1.0x")
+                except Exception:
+                    pass
+                
+                if not _coin_momentum_ok:
+                    trend_alignment_mult = 1.4 if direction == 'LONG' else 0.6
+                    log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
             # Strong bearish: score < 30, bias < -0.3
             elif _score < 30 and _bias < -0.3:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing LONG
