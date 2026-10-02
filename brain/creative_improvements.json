@@ -1843,5 +1843,50 @@
     "category": "entry sniper",
     "status": "carried — 20T threshold",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T19:35:55Z",
+    "idea": "SHORT trail scratch audit — trail fires on 0.2-0.9% moves locking $0.01-0.02 wins while hard_sl eats $0.15-0.21 losses",
+    "rationale": "14d SHORT trail: 11 winners, 7 are pnl_pct 0.2-0.9% scratches. Only 4 real momentum captures (PUMP 2.2%, ONDO 3.3%, IOTA 4.6%, ZEN 8.9%). LONG trail avg_win $0.075 vs SHORT $0.053.",
+    "expected_impact": "Research first — if trail activation threshold for SHORT raised ~0.3%, scratch wins convert to either bigger wins or hard_sl/TP exits. Do NOT change PM_TRAIL (protected).",
+    "category": "exit engineering",
+    "status": "suggested — research/backtest first (19T < 20T)",
+    "risk": "medium"
+  },
+  {
+    "timestamp": "2026-10-02T19:35:55Z",
+    "idea": "RR_ENGINE_SHADOW FORCE backtest — highest-leverage pending SHORT lever",
+    "rationale": "7d SHORT hard_sl 26T 46.2% -$0.73 with avg_loss $0.212. RR engine regime mins exist but never block. Shadow eval: would FORCE have blocked these losers while preserving 12 pump-chain- EXTREME hard_sl winners?",
+    "expected_impact": "If FORCE blocks >50% of SHORT hard_sl losers and 0 winners: flip shadow->force (1 config change, post-monitor).",
+    "category": "regime gate",
+    "status": "suggested — DELEGATE signal_analyst shadow eval",
+    "risk": "low (eval only)"
+  },
+  {
+    "timestamp": "2026-10-02T19:35:55Z",
+    "idea": "volume-breakout EXTREME conf boost carried — 14d EXTREME 9T 77.8%WR +$2.72, total 12T 70% +$2.99",
+    "rationale": "Best signal in system. 24h live tests JUP+IMX both positive. Still 12T < 20T signal-level threshold.",
+    "expected_impact": "+3-5% WR EXTREME at 20T if pattern holds",
+    "category": "entry sniper",
+    "status": "carried — re-eval at 20T",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T19:35:55Z",
+    "idea": "bb-squeeze+ EXTREME habitat dampener (not block) — EXTREME 13T 46.2% -$0.25 vs HIGH 11T 63.6% +$0.14",
+    "rationale": "Re-enable noise dominates 24h scratches; real losses concentrated EXTREME. RSI_MIN=60 REJECTED (7 winners 50-60). Confidence dampener preserves entries while lowering hotset priority in EXTREME.",
+    "expected_impact": "Monitor to 20T first. If EXTREME stays <50%WR, dampen conf in EXTREME only.",
+    "category": "regime gate",
+    "status": "watchlist — 20T threshold",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T19:35:55Z",
+    "idea": "Winner-DNA NEUTRAL spec input — volume-breakout + doji entry conditions for ema_reclaim partner",
+    "rationale": "volume-breakout EXTREME wins: volume spike + momentum + mid-high RSI. doji HIGH 87.5%WR. NEUTRAL signal (Oct 3 deadline) should inherit these entry-quality patterns, not be a weaker copy.",
+    "expected_impact": "Better NEUTRAL diversity signal quality",
+    "category": "new signal",
+    "status": "suggested — research for signal_analyst",
+    "risk": "low"
   }
 ]
