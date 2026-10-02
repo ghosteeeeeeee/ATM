@@ -274,7 +274,7 @@ VOL_PHASE_MULTS = {
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
         'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
-        'Pump_Flow': 1.0,        # RE-ENABLED 2026-09-22 (CEO — every pump is a LONG, every dump is a SHORT)
+        'Pump_Flow': 0.5,        # PENALIZED 2026-09-22 — HIGH pump-chain+ 37% WR, pump-chain- 48% WR. Bare pump_chain 76.9% WR though.
         'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
         'Support_Resistance': 0.0,  # BLOCKED — rs mean-reversion, only works in NORMAL (2026-09-25)
     },
@@ -302,25 +302,25 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'ema300_breakthrough_short'): 1.0,  # OK — structural SHORT works in EXTREME
     ('EXTREME', 'ema300_breakthrough_long'): 0.0,   # BLOCKED — same as ema300_dip_long family
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
-    ('EXTREME', 'mover_long'): 1.0,              # RE-ENABLED 2026-09-22 (CEO — every pump is a LONG)
-    ('EXTREME', 'mover_short'): 1.0,             # RE-ENABLED 2026-09-22 (CEO — every dump is a SHORT)
-    ('EXTREME', 'pump_chain-'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
-    ('EXTREME', 'pump_chain+'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
+    ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
+    ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
+    ('EXTREME', 'pump_chain-'): 0.5,             # PENALIZED 2026-09-22 — 52.4% WR but -$0.14 (84T)
+    ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
     # These catch signal types like 'ema300_breakthrough+', 'pump-chain-', etc.
     # that don't match the specific _long/_short overrides above.
     ('EXTREME', 'ema300_breakthrough'): 1.0,     # OK — bare form fallback for ema300_breakthrough+
     ('EXTREME', 'ema300_dip'): 1.0,              # OK — bare form fallback (specific _long/_short above take priority)
-    ('EXTREME', 'mover-_short'): 1.0,            # RE-ENABLED 2026-09-22 (CEO)
-    ('EXTREME', 'mover'): 1.0,                   # OK — bare form fallback for mover (coin_tracker_hot variants below)
+    ('EXTREME', 'mover-_short'): 0.5,            # PENALIZED 2026-09-22 — same as mover_short
+    ('EXTREME', 'mover'): 0.5,                   # PENALIZED — bare form fallback (same family as mover+) (coin_tracker_hot variants below)
     ('EXTREME', 'coin_tracker_hot_long'): 0.0,    # BLOCKED — same as mover_long (Mover family)
     ('EXTREME', 'coin_tracker_hot_short'): 0.0,   # BLOCKED — same as mover_short (Mover family)
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
-    ('EXTREME', 'pump_chain'): 0.5,              # PENALIZED — bare form fallback for pump_chain (not pump_chain+)
-    ('EXTREME', 'pump-chain+'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
-    ('EXTREME', 'pump-chain-'): 1.0,             # RE-ENABLED 2026-09-22 (CEO)
-    ('EXTREME', 'pump-chain'): 1.0,              # RE-ENABLED 2026-09-22 (CEO)
+    ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
+    ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
+    ('EXTREME', 'pump-chain-'): 0.5,             # PENALIZED 2026-09-22 — 52.4% WR but -$0.14 (84T)
+    ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     # ── NORMAL regime: per-signal overrides ──
     # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
@@ -331,8 +331,12 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
     ('NORMAL', 'pullback-entry+'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.57. Structurally weak LONG variant.
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
-    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 83.3% WR in NORMAL (underscore legacy form)
+    ('NORMAL', 'pump_chain+'): 0.0,              # BLOCKED 2026-09-22 — 20% WR (5T) in NORMAL
+    ('NORMAL', 'pump-chain+'): 0.0,              # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain+
+    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 75% WR in NORMAL (8T)
     ('NORMAL', 'pump-chain-'): 1.0,              # OK — hyphen form (runtime signal_type is 'pump-chain')
+    ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
+    ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback
     # ── NORMAL: bleeding signals (30d cross-tab) ──
     ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
     ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
@@ -358,6 +362,14 @@ SIGNAL_TYPE_OVERRIDES = {
     # RR_STRUCTURAL_V2_LONG_ENABLED=False means it can't fire anyway.
     # ── HIGH regime: per-signal overrides ──
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
+    ('HIGH', 'mover+'): 0.5,                     # PENALIZED 2026-09-22 — 54.5% WR but -$0.07 (11T)
+    ('HIGH', 'mover-'): 1.0,                     # OK 2026-09-22 — 66.7% WR, +$0.26 (3T)
+    ('HIGH', 'pump_chain+'): 0.0,                # BLOCKED 2026-09-22 — 37% WR (27T) in HIGH
+    ('HIGH', 'pump-chain+'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain+
+    ('HIGH', 'pump_chain-'): 0.0,                # BLOCKED 2026-09-22 — 48% WR (25T) in HIGH
+    ('HIGH', 'pump-chain-'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain-
+    ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH
+    ('HIGH', 'pump-chain'): 1.0,                 # OK — bare form fallback
     ('HIGH', 'accel-300-'): 0.0,                # BLOCKED 2026-10-01 — accel-300- SHORT HIGH 0%WR -$0.31 (4T). NORMAL 75%WR. signal_reporter
     ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
