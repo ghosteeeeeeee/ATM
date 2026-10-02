@@ -1798,5 +1798,50 @@
     "category": "systems",
     "status": "flagged — price_collector owner",
     "risk": "none"
+  },
+  {
+    "timestamp": "2026-10-02T18:40:00Z",
+    "idea": "Trail-DNA confidence modulation — boost confidence when signal×regime×RSI band historical profit-monster-trail rate >60%",
+    "rationale": "7d: trail 82T 69.5%WR +$3.34 vs hard_sl 40T 37.5%WR -$2.09. Trail IS the edge. Confidence should reward historically trail-prone setups.",
+    "expected_impact": "+2-4% WR system-wide if backtest confirms",
+    "category": "confidence / entry quality",
+    "status": "suggested — research/backtest first",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T18:40:00Z",
+    "idea": "bb-squeeze EXTREME regime dampener — monitor to 20T then regime-block EXTREME only",
+    "rationale": "14d EXTREME 13T 46.2% -$0.25 vs HIGH 10T 70% +$0.41. Sample <20T. RSI_MIN=60 rejected (kills 7 winners in 50-60 band).",
+    "expected_impact": "Remove EXTREME bleed while keeping HIGH edge at 20T threshold",
+    "category": "regime habitat",
+    "status": "watchlist — 20T threshold",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T18:40:00Z",
+    "idea": "ema_reclaim dry-run near-miss scan — loosen ONE param if near-misses abundant",
+    "rationale": "0 signals since deploy. Near-miss scan (decline 0.2-0.4%, vol 0.4-0.6x) distinguishes param-tightness from detection-path bug.",
+    "expected_impact": "Unblock NEUTRAL diversity",
+    "category": "signal quality",
+    "status": "suggested — DELEGATE signal_analyst",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-02T18:40:00Z",
+    "idea": "Winner-DNA extraction for NEUTRAL spec — volume-breakout+ and doji-bottom entry conditions → ema_reclaim/volume-dry-up gates",
+    "rationale": "Only 2 proven NEUTRAL signals. Bake their winning entry DNA (RSI band, vol ratio, EMA distance) into unbuilt NEUTRAL signals.",
+    "expected_impact": "New NEUTRAL signals start closer to positive WR",
+    "category": "signal quality / diversity",
+    "status": "suggested — research for signal_analyst",
+    "risk": "none"
+  },
+  {
+    "timestamp": "2026-10-02T18:40:00Z",
+    "idea": "volume-breakout EXTREME conf boost carried — re-eval at 20T (now 9T 77.8%WR +$2.72/14d)",
+    "rationale": "DB-verified EXTREME data now exists (CEO earlier rejected unverified claim). Below 20T threshold.",
+    "expected_impact": "+3-5% WR EXTREME at 20T",
+    "category": "entry sniper",
+    "status": "carried — 20T threshold",
+    "risk": "low"
   }
 ]
