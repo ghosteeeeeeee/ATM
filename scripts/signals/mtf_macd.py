@@ -117,43 +117,45 @@ def _get_zscore(token: str, timeframe: str = '1h') -> Optional[float]:
 
 
 def _get_rsi(token: str, timeframe: str = '1m', period: int = 14) -> Optional[float]:
-    """Calculate RSI from local candles.db."""
+    """Calculate RSI from local candles.db. Falls back to 5m/15m if 1m unavailable."""
     _VALID_TF = {'1m', '5m', '15m', '1h', '4h'}
     if timeframe not in _VALID_TF:
         return None
-    try:
-        from paths import CANDLES_DB
-        conn = sqlite3.connect(CANDLES_DB, timeout=10)
-        cur = conn.cursor()
-        # FIX 2026-10-02: per-TF table names + is_closed filter
-        cur.execute(f"""
-            SELECT close FROM candles_{timeframe}
-            WHERE token = ? AND is_closed = 1
-            ORDER BY ts DESC LIMIT ?
-        """, (token.upper(), period + 1))
-        rows = [r[0] for r in cur.fetchall()]
-        conn.close()
-        if len(rows) < period + 1:
-            return None
-        # Reverse to chronological order
-        rows.reverse()
-        gains, losses = [], []
-        for i in range(1, len(rows)):
-            change = rows[i] - rows[i-1]
-            if change > 0:
-                gains.append(change)
-                losses.append(0)
-            else:
-                gains.append(0)
-                losses.append(abs(change))
-        avg_gain = sum(gains) / period
-        avg_loss = sum(losses) / period
-        if avg_loss == 0:
-            return 100.0
-        rs = avg_gain / avg_loss
-        return 100 - (100 / (1 + rs))
-    except Exception:
-        pass
+    # Try requested TF first, then fallbacks
+    _TF_ORDER = [timeframe, '5m', '15m']
+    for tf in _TF_ORDER:
+        try:
+            from paths import CANDLES_DB
+            conn = sqlite3.connect(CANDLES_DB, timeout=10)
+            cur = conn.cursor()
+            cur.execute(f"""
+                SELECT close FROM candles_{tf}
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT ?
+            """, (token.upper(), period + 1))
+            rows = [r[0] for r in cur.fetchall()]
+            conn.close()
+            if len(rows) < period + 1:
+                continue
+            # Reverse to chronological order
+            rows.reverse()
+            gains, losses = [], []
+            for i in range(1, len(rows)):
+                change = rows[i] - rows[i-1]
+                if change > 0:
+                    gains.append(change)
+                    losses.append(0)
+                else:
+                    gains.append(0)
+                    losses.append(abs(change))
+            avg_gain = sum(gains) / period
+            avg_loss = sum(losses) / period
+            if avg_loss == 0:
+                return 100.0
+            rs = avg_gain / avg_loss
+            return 100 - (100 / (1 + rs))
+        except Exception:
+            continue
     return None
 
 
