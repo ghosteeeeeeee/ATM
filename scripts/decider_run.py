@@ -1051,15 +1051,9 @@ def rule_based_context_gate(token, direction, source, sig):
             pass
         
         if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
-            if _ctx_bearish_override:
-                pass  # Bearish structure — oversold = continuation, not bounce risk
-            else:
-                return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
+            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
         if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_FLOOR:
-            if _ctx_bearish_override:
-                pass  # Bearish structure — oversold = continuation, not bounce risk
-            else:
-                return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
+            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _is_pullback = source and 'pullback-entry' in source
