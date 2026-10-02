@@ -296,8 +296,9 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'KAS'
+    'ADA'
 }
+
 
 
 
@@ -3867,6 +3868,20 @@ DOJI_LOOKBACK                 = 5       # candles to look back for advance/decli
 DOJI_COOLDOWN_HOURS           = 0.25    # 15 min cooldown between entries per token
 DOJI_CONF_BASE                = 75      # base confidence
 DOJI_CONF_CAP                 = 88      # max confidence (system ceiling)
+
+# ── ema_reclaim_long (EMA20 reclaim after decline) ───────────────────────────
+# ema_reclaim_long.py — NEUTRAL diversity signal (CEO 2026-10-02, spec Oct 1).
+# Pairs with doji-bottom for 2-type mean-reversion confluence. NOT standalone-bypass
+# until shadow/backtest proves edge. LONG only.
+EMA_RECLAIM_ENABLED              = True    # master kill-switch (shadow: generates, no solo trade)
+EMA_RECLAIM_DECLINE_MIN_PCT      = 0.4     # min prior decline % before reclaim
+EMA_RECLAIM_LOOKBACK             = 6       # 5m candles to measure decline
+EMA_RECLAIM_VOL_MIN_RATIO        = 0.6     # reclaim vol >= 0.6x avg (confirmation, not dry-up)
+EMA_RECLAIM_RSI_MIN              = 35      # mid-band floor (doji uses <35 oversold)
+EMA_RECLAIM_RSI_MAX              = 55      # mid-band ceiling
+EMA_RECLAIM_CONF_BASE            = 72      # base confidence
+EMA_RECLAIM_CONF_CAP             = 85      # max confidence
+EMA_RECLAIM_COOLDOWN_HOURS       = 0.5     # 30 min cooldown per token
 
 # ── Continuum Score Signal ───────────────────────────────────────────────────
 # continuum_score.py — contrarian + momentum signals from continuum engine

@@ -601,6 +601,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('doji_top_short', 'doji-top-short'):  1.0,  # exit LONG / enter SHORT, standard weight
     # doji_bottom — doji exhaustion at bottom (mean-reversion)
     ('doji_bottom_long', 'doji-bottom-long'):  1.0,  # enter LONG, standard weight
+    # ema_reclaim — EMA20 reclaim after decline (mean-reversion, NEUTRAL diversity)
+    ('ema_reclaim_long', 'ema-reclaim-long'):  1.0,  # CEO 2026-10-02 — shadow, no solo trade
     # ema300_dip_long — buy dips to EMA300 during strong uptrends
     ('ema300_dip_long', 'ema300-dip-long'):  1.2,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 70%WR +$0.29, 14 tokens
     # ema300_dip_short — sell rallies to EMA300 during strong downtrends
@@ -1753,7 +1755,7 @@ def _score_signal(token, direction, conf, source, signal_type,
 
         if _vr_atr_ratio is not None:
             _is_momentum = signal_type and ('mover' in signal_type or 'pump' in signal_type or 'accel' in signal_type or 'continuation' in signal_type)
-            _is_mean_rev = signal_type and ('bb_bounce' in signal_type or 'range-reversion' in signal_type or 'squeeze' in signal_type or 'oversold' in signal_type)
+            _is_mean_rev = signal_type and ('bb_bounce' in signal_type or 'range-reversion' in signal_type or 'squeeze' in signal_type or 'oversold' in signal_type or 'ema_reclaim' in signal_type or 'doji_bottom' in signal_type)
 
             if _vr_atr_ratio > VOL_GATE_ATR_RATIO_EXPANSION:
                 if _is_momentum:

@@ -2070,3 +2070,9 @@ BY: daily-orchestrator
 - hard_max_loss_* still dominant 24h bleed — hard-floor 25→30 monitor window active.
 - CHIP MAE/MFE NULL — trail-exit data gap, data-path not signal logic.
 - 4x bb-squeeze+ positions open simultaneously — diversity risk if squeeze fails en masse.
+
+## LOSERS Update — 2026-10-02 06:05 UTC
+- REMOVE KAS (insufficient data)
+- ADD ADA (WR=40.0%, PnL=$-0.35, low_wr (40.0%))
+
+Final set: ['ADA']

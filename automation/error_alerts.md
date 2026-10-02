@@ -316,3 +316,42 @@
 - **WARN** (known): 7 failed non-critical services unchanged: better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs: hardcoded passwords, dead signal_gen imports), ceo (exit 124 timeout), git-release (exit 1), mtf-macd-tuner, trading-checklist (hotset-empty symptom), upgrade-implementer. Core trading path unaffected.
 - **INFO**: Pipeline OK — active, **0 Tracebacks/CRASH/FATAL in 30min**. Open: 1/6 SUSHI LONG (entry 0.26112, SL trail, pnl≈-0.16%). Today (runtime DB): **23 closed, 39.1% WR, -0.73 USDT**. Phantom atr_sl_hit <0.01%: 0. Prices fresh (candles_1m age ~60s; 86 prices collected; token_speeds max_updated 23:45:39Z). Speed: 124/241 ≥50th pct fresh, 99 stale. Core timers firing <1min (pipeline, signal-compactor, price-collector, watchdog, coin-tracker). hl-sync-guardian active.
 - **AUTO-FIXES APPLIED**: None required — pipeline healthy, no restart, timers firing, nothing safe to gzip. Disk + hotset + failed agent services are policy/investigation items, not auto-fixable.
+
+## Error Alerts — 2026-10-02 00:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-02 01:45 UTC
+- **WARN** (ongoing): Disk **86%** used (95G/118G, 17G free) — above 85% threshold. No .log files >7d eligible to gzip. Top logs: pipeline 62M, signal-compactor 42M, trade-watchdog 40M. **CEO DB-pruning decision still open** — cannot safely auto-delete trade/price data.
+- **WARN** (ongoing): Hotset EMPTY (`hotset: []`) — signals generating (168 in `signals` last hour; mtf_regime_trend_short, continuum_osc_short, etc.) but none clearing compactor/confidence gate into hotset. Regime SHORT_BIAS (1 long / 4 short / 112 neutral). Not a code crash.
+- **INFO**: Pipeline OK — last run completed 01:45:28 LIVE, 0 Tracebacks. Open: 1 (JUP LONG, trade_id 15805, pnl≈+1.0%, trailing SL/TP active). Portfolio line: 32 closed today, -26.60% PnL. `signal_outcomes` today: 4 rows, -0.039 USDT, 50% WR (subset — open positions tracked by position manager, not signal_outcomes). Phantom atr_sl_hit <0.01%: 0. Prices fresh (token_speeds max 01:45:25Z; 128/241 ≥50th pct; 98 stale). Timers all firing <1min (pipeline, compactor, price-collector, watchdog, coin-tracker). hl-sync-guardian active. 17 "CRASH" log matches = BTC-CRASH filter warnings, not crashes.
+- **AUTO-FIXES APPLIED**: None required — pipeline healthy, no restart, timers firing, nothing safe to gzip.
+
+## Error Alerts — 2026-10-02 01:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+AT, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 02:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 03:59 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-10-02 04:59 UTC
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-02 05:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+- **REPEATED** (22x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 06:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

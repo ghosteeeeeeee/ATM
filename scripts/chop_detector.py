@@ -104,6 +104,8 @@ SIGNAL_OVERRIDES = {
     'doji_top_short': 'MEAN_REVERSION',
     'doji_top_exit': 'MEAN_REVERSION',
     'doji_bottom_long': 'MEAN_REVERSION',    # doji exhaustion at bottom — mean-reversion
+    'ema_reclaim_long': 'MEAN_REVERSION',    # EMA20 reclaim after decline — mean-reversion (CEO 2026-10-02)
+    'ema-reclaim-long': 'MEAN_REVERSION',    # source string variant
     'ema300_breakthrough': 'MOMENTUM',        # EMA300 breakout — trend continuation, block in chop
     'ema300_breakthrough_long': 'MOMENTUM',
     'ema300_breakthrough_short': 'MOMENTUM',

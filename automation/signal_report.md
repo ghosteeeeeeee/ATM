@@ -1,141 +1,74 @@
 # Signal Performance Report
+**Generated:** 2026-10-02 05:03 UTC | **Period:** Last 6h + 24h
 
-**Period:** Last 6h | 24h  
-**Generated:** 2026-10-01 ~22:45 UTC  
-**Analyst:** signal_reporter
-
----
-
-## 6h Performance
-
-No signals with 2+ closed trades in the last 6h window. Clean.
+## Overall Stats
+- **Total trades (all time):** 2,761 | **WR:** 51.9% | **PnL:** -108.46%
+- **Date range:** 2026-07-29 → 2026-10-02
 
 ---
 
-## 24h Performance
+## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | Trades | WR | PnL | Verdict |
-|--------|-----|--------|-----|-----|---------|
-| pump-chain- | SHORT | 7 | 28.6% | -$0.46 | LOSER — regime-blocked |
-| accel-300- | SHORT | 8 | 37.5% | -$0.34 | KILLED (already, auto_1hr) |
-| pump-chain-v5 | LONG | 6 | 33.3% | -$0.17 | KILLED (already, hourly rule) |
-| bb-bounce-v3-long+ | LONG | 2 | 0.0% | -$0.12 | Watch — too few trades |
+None found.
 
 ---
 
-## KILLED (executed this run)
+## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No new kills. accel-300- and pump-chain-v5 LONG already killed earlier today. |
-
-**Prior kills verified:**
-- `ACCEL_300_MINUS_ENABLED = False` — auto_1hr kill 2026-10-01 ~10:50 (4T 0%WR -$0.31 last hour, falling-knife SHORTs at RSI 25-38)
-- `PUMP_CHAIN_V5_ENABLED = False` — hourly kill rule 2026-10-01 (3T 0%WR -$0.20)
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
+| pump-chain-v5 | LONG | — | —% | — | 5 | 20.0% | -2.12 | DISABLED | **DISABLE** |
 
 ---
 
-## REGIME BLOCKS (executed this run)
+## MARGINAL (30-50% WR)
 
-Per SOP: signal wins in ANY regime → block losing regimes, do NOT blanket-kill.
-
-### pump-chain- SHORT — NORMAL wins (85.7% WR, +$0.16 all-time)
-
-| Regime | Trades | WR | PnL | Action |
-|--------|--------|-----|-----|--------|
-| NORMAL | 7 | 85.7% | +$0.16 | ✅ KEPT |
-| HIGH | 25 | 48.0% | -$0.36 | 🚫 BLOCKED |
-| EXTREME | 84 | 52.4% | -$0.14 | 🚫 BLOCKED |
-
-**Fixes applied:**
-1. `decider_run.py` — added EXTREME hard block for pump-chain SHORT (was missing; v2 gate Pump_Flow:0.0 existed but STANDALONE_BYPASS + fail-open let trades through)
-2. `hermes_constants.py` — added `PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True`
-3. `volatility_gate.py` — removed `pump-chain-` from HIGH REGIME_SIGNALS (stale allow: HIGH 48%WR -$0.36 bleed)
-4. Existing: `PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True` (decider_run HIGH block)
-5. Existing: v2 `('EXTREME','*'): Pump_Flow=0.0` and `('HIGH','*'): Pump_Flow=0.0`
-
-### accel-300- SHORT — NORMAL wins (75% WR), HIGH loses (0% WR)
-
-| Regime | Trades | WR | PnL | Action |
-|--------|--------|-----|-----|--------|
-| NORMAL | 4 | 75.0% | -$0.03 | ✅ KEPT |
-| HIGH | 4 | 0.0% | -$0.31 | 🚫 BLOCKED |
-
-**Fixes applied (defense-in-depth; signal already killed at source):**
-1. `volatility_gate_v2.py` — added `('HIGH', 'accel-300-'): 0.0` to SIGNAL_TYPE_OVERRIDES
-2. `market_phase_gate.py` — added `accel-300-` + hyphen variants to Accelerate FAMILY_MAP (was returning 'Other', making family-level blocks dead code)
-3. Signal already disabled: `ACCEL_300_MINUS_ENABLED = False`
-
-### pump-chain-v5 LONG — no winning regime (EXTREME 42.9% WR)
-
-Already killed: `PUMP_CHAIN_V5_ENABLED = False`. SHORT variant (`PUMP_CHAIN_V5_SHORT_ENABLED = True`) regime-routed via existing v2 blocks.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| accel-300- | SHORT | 8 | 37.5% | -2.98 | DISABLED | Borderline |
+| bb-bounce-v3-long+ | LONG | 3 | 33.3% | +0.01 | ❓ | Needs more data |
+| bb-squeeze+ | LONG | 11 | 45.5% | +0.20 | ENABLED | Borderline |
 
 ---
 
-## BOOSTED (executed this run)
+## DISABLED BUT GOOD (candidates for re-enabling)
 
-None. No signal met boost criteria (WR > 55% with 5+ trades in 24h). All 24h "winners" had only 1 trade each.
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 0.0% | -$0.12 | 2 | Watch — below trade threshold |
-| continuum-trend- | SHORT | 0.0% | -$0.01 | 1 | Noise — single trade |
+None found. Top performers are already enabled.
 
 ---
 
-## WINNERS
+## SIGNAL INVERSIONS (24h)
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| continuum-osc+ | LONG | 100% | +$0.16 | 1 | Insufficient sample |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.09 | 1 | Insufficient sample |
-| pump-chain- (NORMAL only) | SHORT | 85.7% | +$0.16 | 7 | ✅ Edge preserved via regime block |
+**No inversions found.** All signals respect their direction labels.
 
 ---
 
-## ISSUES
+## RECOMMENDATIONS
 
-1. **CRITICAL (fixed):** pump-chain- SHORT was firing in EXTREME despite v2 `Pump_Flow=0.0` family block. Root cause: decider_run.py only had HIGH block, not EXTREME; STANDALONE_BYPASS signals skip signal_compactor; exception handler fail-opens. Fixed with explicit EXTREME hard block in decider_run.py.
-
-2. **FIXED:** `accel-300-` (hyphen form, actual DB value) was missing from FAMILY_MAP — returned 'Other', making all Accelerate family regime blocks dead code for this variant. Added hyphen variants to Accelerate family.
-
-3. **FIXED:** `pump-chain-v5` was missing from FAMILY_MAP Pump_Flow — returned 'Other'. Added.
-
-4. **FIXED:** `pump-chain-` was still in volatility_gate.py HIGH REGIME_SIGNALS (stale allow entry from before HIGH became a bleed regime). Removed.
-
-5. **No inversions found** in 24h window. Direction labels clean.
-
-6. **Sideways find:** `accel-300-` remains in volatility_gate.py HIGH/EXTREME REGIME_SIGNALS (allow lists). Harmless while `ACCEL_300_MINUS_ENABLED=False`, but stale. Clean up on next constants pass.
+1. **[DISABLE] pump-chain-v5 LONG** — WR=20.0%, PnL=-2.12% over 5 trades (24h).
+2. **[WATCH] accel-300- SHORT** — WR=37.5%, PnL=-2.98% over 8 trades. Monitor next cycle.
+3. **[WATCH] bb-bounce-v3-long+ LONG** — WR=33.3%, PnL=+0.01% over 3 trades. Monitor next cycle.
+4. **[WATCH] bb-squeeze+ LONG** — WR=45.5%, PnL=+0.20% over 11 trades. Monitor next cycle.
 
 ---
 
-## Files Changed
-
-| File | Change |
-|------|--------|
-| `scripts/decider_run.py` | Added pump-chain SHORT EXTREME hard block |
-| `scripts/hermes_constants.py` | Added `PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True` |
-| `scripts/volatility_gate_v2.py` | Added `('HIGH','accel-300-'): 0.0` override |
-| `scripts/volatility_gate.py` | Removed `pump-chain-` from HIGH REGIME_SIGNALS |
-| `scripts/market_phase_gate.py` | Added accel-300- and pump-chain-v5 to FAMILY_MAP |
+*Report auto-generated. Next report: ~6h from now.*
 
 ---
 
-## Verification
+## PARAM CHANGE LOG (last 7 days)
 
-```
-signal_family('accel-300-') = 'Accelerate'          ✅
-signal_family('pump-chain-v5') = 'Pump_Flow'        ✅
-get_combined_multiplier('accel-300-', 'HIGH') = 0.0 ✅
-get_combined_multiplier('pump-chain-', 'EXTREME') = 0.0 ✅
-get_combined_multiplier('pump-chain-', 'NORMAL') = 1.0  ✅ (edge preserved)
-PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True       ✅
-ACCEL_300_MINUS_ENABLED = False                     ✅
-PUMP_CHAIN_V5_ENABLED = False                       ✅
-```
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-10-01 | fcc69e2 | Config: add mtf-regime-trend to STANDALONE_BYPASS_SIGNALS |
+| 2026-10-01 | 9582b3d | config: mtf_regime_trend cooldown 30→15 min (2026-10-01) |
+| 2026-10-01 | 7554d96 | config: add mtf-regime-trend to STANDALONE_BYPASS_SIGNALS (2... |
+| 2026-10-01 | cd72643 | signals: regime-block pump-chain- EXTREME/HIGH, accel-300- H... |
+| 2026-10-01 | e6a2d05 | signals: add mtf_regime_trend — cross-timeframe regime align... |
+| 2026-10-01 | 22178a4 | Config: add bb-squeeze to STANDALONE_BYPASS_SIGNALS |
+| 2026-10-01 | 93b5834 | fix: bug_hunter — disable token-z exception (dead data) + lo... |
+| 2026-10-01 | 8c91b56 | config: SHORT-CONTINUUM — raise threshold 10→40 + add token-... |
+| 2026-10-01 | 4ee9c38 | scripts: Level 1 upgrade wins — oscillator mults live, doji_... |
+| 2026-10-01 | 3746da2 | config: regime blocks + kills based on 30d regime analysis (... |
 
-**Pipeline restart required** after commit to load new gate code.
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
