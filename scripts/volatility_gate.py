@@ -113,6 +113,7 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'bb-squeeze+',  # bollinger squeeze breakout — works in normal vol
+        'mtf-regime-trend+',  # multi-timeframe regime trend — works in normal vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
         'doji-bottom-long',  # doji exhaustion at bottom — mean-reversion (enter LONG)
@@ -176,6 +177,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'bb-squeeze+',  # bollinger squeeze breakout — works in high vol
+        'mtf-regime-trend+',  # multi-timeframe regime trend — works in high vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in high vol
         'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
@@ -226,6 +228,7 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
         'bb-squeeze+',  # bollinger squeeze breakout — works in extreme vol
+        'mtf-regime-trend+',  # multi-timeframe regime trend — works in extreme vol
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in extreme vol
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in extreme vol
