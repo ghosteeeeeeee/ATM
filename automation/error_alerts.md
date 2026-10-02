@@ -401,3 +401,18 @@
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — BTC_LEVEL`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: [TOK-TOK] info_rate: waited N.1s, retrying`
+
+## Error Alerts — 2026-10-02 14:48 UTC
+- **INFO**: pipeline.service `inactive` is NORMAL (oneshot+timer). Last run completed LIVE 14:45:28: 4 open / 46 closed today / +40.07% PnL. 30/30 runs rc=0 in 30min, 0 Tracebacks. "CRASH" grep hits are `BTC-CRASH-OVERRIDE` ALLOW messages (continuum recovery), not failures.
+- **WARN**: disk `/` **86%** used (17G free). AUTO-FIX: journal vacuum freed **259.7M** (archived journals). No logs >7d to gzip. Bulk remains DBs (coin_tracker 3.3G, candles 2.3G+walm, mtf_macd 1.3G, signals 0.9G, session_brain 0.9G). **CEO DB-retention decision still open — recurring since 2026-10-01.**
+- **WARN**: `hermes-git-release.service` failing hourly (exit 1) — root cause: `update-git.py` refuses release on (1) uncommitted changes (error_alerts.md etc. churn hourly) and (2) `SYMLINKS FOUND: ./scripts/hl_sync_guardian.py`. Blocks hourly backup + seed zip. Not auto-fixed (commit needs owner; symlink needs code change). Suggested: add symlink allowlist or replace symlink with import path in update-git.py.
+- **INFO**: 10 non-critical units in `failed` (better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer). Known pattern: LLM jobs timing out; bug-hunter exits 1 on real findings (hardcoded passwords, dead signal_gen imports, non-atomic JSON). Trading path unaffected (pipeline, guardian, price-collector, hl-copy all active/running).
+- **INFO**: hotset.json **recovered** — 7 tokens approved (SYRUP, AIXBT, COMP, LDO, WCT, DYDX all mtf_regime_trend_long). The 13:47 "hotset empty" alert is RESOLVED. `decisions` table shows 0/hr but compactor writes hotset.json — table likely legacy, not a signal-loss bug.
+- **INFO**: token_speeds 162 fresh / 79 stale >5min (stale = dead-token residue, July rows for BLZ/MKR pattern). Latest update 14:47:25 — prices fresh. Regime NEUTRAL (1L/3S/113N). Speed: 128/241 ≥50th pct (53%). Phantom trades 0.
+
+## Error Alerts — 2026-10-02 14:59 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+AT, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.9s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS Rate limit check failed (DB TOK): cannot access local variable 'psycopg2' where it is not associated with a value — proceeding without rate limit`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] ME TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`

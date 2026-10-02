@@ -21,3 +21,6 @@
 
 ## TEAM UPDATES
 - [2026-10-01 23:47] health_monitor: Pipeline healthy — no auto-fix required. Disk 86% WARN (DB growth, nothing gzip-eligible); hotset empty (67 sig/hr, 0 approved); price_collector transient "database is locked" on candle agg while 1m-candle ran. 1 open SUSHI LONG. 23 closed today 39.1% WR -0.73 USDT. Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-02 14:48 UTC] health_monitor: Pipeline OK — 30/30 LIVE runs rc=0/30min, 0 Tracebacks. 4 open / 46 closed today / +40.07% PnL (DB: 41 closed, +1.11 USDT, 70.7% WR). Hotset RECOVERED (7 LONG tokens). 209 sig/hr. Regime NEUTRAL. AUTO-FIX: journal vacuum +259.7M. Disk still 86% WARN (DB growth, CEO pruning decision open). WARN: git-release fails hourly — uncommitted-changes gate + symlink `scripts/hl_sync_guardian.py`; backup/seed zip blocked. 10 failed non-critical LLM units (trading path clean). Details: automation/error_alerts.md

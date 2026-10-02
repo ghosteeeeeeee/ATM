@@ -1651,5 +1651,32 @@
     "category": "signal design",
     "status": "input to signal_analyst NEUTRAL spec",
     "risk": "none — advisory"
+  },
+  {
+    "date": "2026-10-02T15:30:00Z",
+    "idea": "volume-breakout-long+ EXTREME confidence boost at 20T threshold",
+    "rationale": "15T/20d EXTREME 80%WR +$3.57. Winners avg +10.24% pnl_pct vs losers -5.30%. Edge is real. Re-eval at 20T.",
+    "expected_impact": "+$0.30-0.60/7d from higher hotset priority",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02T15:30:00Z",
+    "idea": "bb-squeeze EXTREME regime watch — HIGH holds 70%WR, EXTREME 46%WR bleed",
+    "rationale": "HIGH 10T 70%WR +$0.41 vs EXTREME 13T 46.2%WR -$0.25. If 48h EXTREME still negative, propose regime block EXTREME only.",
+    "expected_impact": "+$0.20-0.30/7d if EXTREME blocked at 48h eval",
+    "category": "regime router",
+    "status": "monitor 48h",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02T15:30:00Z",
+    "idea": "ema_reclaim_long — keep filters, build confluence partner instead of loosening",
+    "rationale": "Dry-run: 1 full hit/15 tokens (ORDI). Detection works, pattern rare by design. Missing piece is partner signal, not looser entry.",
+    "expected_impact": "NEUTRAL diversity once partner built",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

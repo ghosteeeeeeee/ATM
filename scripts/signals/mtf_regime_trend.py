@@ -167,6 +167,26 @@ def detect(token):
     if direction == 'SHORT' and price > ema300:
         return None  # price above EMA300 — not in downtrend
 
+    # RSI filter (2026-10-02)
+    # LONG: block when RSI < 30 (oversold = catching falling knife)
+    # SHORT: block when RSI > 70 (overbought = catching rising knife)
+    # Backtest: RSI <30 LONG = 3T 0%WR -$0.70 (all losers), RSI >=40 = 3T 100%WR +$0.29
+    if len(closes) >= 14:
+        deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
+        gains = [d if d > 0 else 0 for d in deltas[-14:]]
+        losses = [-d if d < 0 else 0 for d in deltas[-14:]]
+        avg_gain = sum(gains) / 14
+        avg_loss = sum(losses) / 14
+        if avg_loss > 0:
+            rs = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + rs))
+        else:
+            rsi = 100
+        if direction == 'LONG' and rsi < 30:
+            return None  # oversold — catching falling knife
+        if direction == 'SHORT' and rsi > 70:
+            return None  # overbought — catching rising knife
+
     # Momentum entry (2026-10-01)
     # Enter when price is moving in the trend direction
     # LONG: price rising from recent low (momentum)
