@@ -2147,3 +2147,24 @@ Final set: ['ADA']
 - pnl_pct column still shows nonsense (-132% on JUP trail) — data-path bug, not signal logic.
 - BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).
 - If next hour is negative, 3-consecutive-negative trigger activates → consider NEUTRAL regime size reduction.
+
+## [2026-10-02 17:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:**
+1. None — no trades closed, no triggers met.
+
+**No Change Needed:**
+- **SL behavior:** atr_sl_hit = 0/52 (0%) of 24h closes. tpsl_utils.py fix deployed and stable.
+- **Kill rule:** No signal with 0% WR and 3+ trades this hour (0 trades). mtf-regime-trend+ already killed 15:11, still worst 24h signal (9T -$0.46) but no new closes.
+- **PnL streak:** 2 consecutive negative hours (15h -$0.70, 16h -$0.25). This hour 0 trades — streak resets. Size-reduction rule inactive.
+- **Trade frequency:** 0/hr — not overtrading.
+- **hard_max_loss_* family:** 7 exits /-$1.16 over 24h but profit-monster-trail 37 exits +$1.76 offsets. Net 24h positive. Monitor window active — no action.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, V5/accel kills aging, hard-floor 25→30 proposal, EXTREME block, bb-squeeze EXTREME 20T, doji 20T. Do not stack.
+
+**Open Questions:**
+- Zero trades closed this hour — pipeline idle? Check if detection/execution is stalled or market genuinely quiet.
+- pnl_pct column still shows nonsense values — data-path bug, not signal logic.
+- BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene).

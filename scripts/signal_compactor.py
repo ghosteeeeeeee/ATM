@@ -613,6 +613,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 85%WR +$0.74, 13 tokens
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
+    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.2,  # SIGNAL REPORTER 2026-10-02 — 25T/24h 60%WR +$0.21, 24 tokens
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
     ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)
