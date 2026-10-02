@@ -2326,3 +2326,26 @@ Final set: ['ADA']
 - continuum+ / pump-chain-v5 / continuum-osc+ all 1T 0%WR 24h — single trades each, not killable yet. Watch next hour.
 - pnl_pct nonsense + ORPHAN_PAPER amount=0 persist — data-path bugs, not signal logic.
 - Only 1 close in hour 21:00 — still low volume vs earlier (7T at 13:00). Check next hour if drought continues.
+
+## [2026-10-02 22:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no closes)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Drought explained (not a stall):** health monitor 21:46 + pipeline 22:11 show 54–218 signals/hr detected, 0 executed — regime fully NEUTRAL (117N/0L/0S). SHORT-NEUTRAL blocks + standalone-bypass denial + confidence gate filtering everything. Last close 20:46; 0 open positions. HL: 0 positions, DB: 0 open. Pipeline active (cycle #225937), 0 errors/Tracebacks.
+- **Kill rule:** 0 closes this hour → no 0%-WR signal with 3+ trades. Single-trade 0%WR (pump-chain-v5, continuum+, continuum-osc+, pump-chain-) still below threshold.
+- **atr_sl_hit >40%:** 24h = 0/53 (0%). tpsl fix stable. No CEO alert.
+- **Negative PnL streak:** 17:00 -0.21, 18:00 -0.51, 19:00 0T (reset), 20:00 +0.08, 21:00 0T — not 3 consecutive.
+- **Overtrading:** 0T/hr « 20.
+- **24h snapshot:** profit-monster-trail 35T +$1.64 dominant; hard_max_loss family 7T -$1.24; hard_sl 3T -$0.58; bb-squeeze+ 26T 57.7%WR -$0.06 near breakeven (EXTREME monitor active). mtf-regime-trend+ kill holding (9T -$0.46 residual, no new opens since 15:11).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **Health monitor unit inactive:** normal — one-shot service that completed at 21:46, not a long-running failure.
+
+**Open Questions:**
+- Disk 87% WARN (up from 85%): coin_tracker 3.3G + candles 2.3G — needs CEO retention/vacuum call, not auto-1hr fix.
+- pnl_pct nonsense + BTC ORPHAN_PAPER amount=0.00 open row — known data-path hygiene bugs, not signal logic.
+- NEUTRAL regime is blocking ALL shorts — if this persists 24h+, position size/long-only posture is a CEO/regime question, not auto-1hr.

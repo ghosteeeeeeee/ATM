@@ -108,3 +108,6 @@
 
 ## TEAM UPDATES
 - [2026-10-02 20:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (2 quiet hours in a row: 19:00 also 0). 24h: profit-monster-trail 35T +$1.64 dominant; atr_sl_hit 0% (tpsl fix stable). No kill candidates, not overtrading, no 3h negative streak. Only open = BTC ORPHAN_PAPER amount=0.00 (known hygiene). Monitor windows untouched. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-02 22:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. Drought explained: regime fully NEUTRAL (117N/0L/0S), pipeline active (cycle #225937, 54–218 signals/hr detected), SHORT-NEUTRAL + confidence gate blocking all execution. Last close 20:46, 0 open positions. 24h: atr_sl_hit 0% (tpsl fix stable), profit-monster-trail 35T +$1.64 dominant. No kill candidates, not overtrading, no 3h negative streak. Monitor windows untouched. Disk 87% WARN (DB growth) needs CEO retention call. 0 CHANGES APPLIED.
