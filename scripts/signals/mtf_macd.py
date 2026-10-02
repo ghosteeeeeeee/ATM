@@ -370,11 +370,29 @@ def run():
                 _log(f'  SKIP {token} SHORT: already BELOW EMA300')
                 continue
 
-        # ── Confidence scoring ──────────────────────────────────────────
+        # ── Confidence scoring (competitive with RS=88) ────────────────
         z_excess   = abs(z_1h) - Z_MACD_THRESH
-        conf       = min(75.0, 45.0 + z_excess * 10)
+        # Base: 55 + z_excess * 15 (capped at 85)
+        # z=2.0 → 55, z=2.5 → 62.5, z=3.0 → 70, z=3.5 → 77.5, z=4.0 → 85
+        conf       = min(85.0, 55.0 + z_excess * 15)
         timeframe  = f'z3_z{z_1h:.1f}'
         strength   = round(z_excess, 3)
+
+        # RSI boost: extreme RSI = higher confidence
+        if rsi is not None:
+            if mtf_direction == 'SHORT' and rsi >= 55:
+                conf += 5   # SHORT at RSI 55+ = good setup
+            elif mtf_direction == 'LONG' and rsi <= 45:
+                conf += 5   # LONG at RSI 45- = good setup
+
+        # MACD histogram magnitude boost: stronger histogram = more conviction
+        avg_hist = abs((h_15m + h_1h) / 2)
+        price_scale = price if price > 0 else 1
+        hist_ratio = avg_hist / price_scale
+        if hist_ratio > 0.005:
+            conf += 5   # strong histogram
+        elif hist_ratio > 0.002:
+            conf += 3   # moderate histogram
 
         # ── MTF alignment boost ────────────────────────────────────────
         try:
@@ -405,6 +423,9 @@ def run():
 
         if cascade_blocked:
             continue
+
+        # ── Final confidence clamp (match RS cap of 88) ────────────────
+        conf = min(88.0, conf)
 
         # ── Write signal ───────────────────────────────────────────────
         hmacd_char = '+' if mtf_direction == 'LONG' else '-'
