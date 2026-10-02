@@ -1672,11 +1672,14 @@ RR_EXIT_TRAIL_BUFFER = 0.002      # 0.2% below support for SL placement
 CUT_LOSER_ENABLED      = True   # master switch
 CL_HARD_STOP_PCT       = -3.0   # CEO Sep 9: hard stop — cut ANY trade at -3.0% immediately (7d: 39 trades bled past -5%)
 
-# Tier 1: Quick Cut — -0.75% to -3.0%, fires frequently
+# Tier 1: Quick Cut — window [-2.5% .. -1.0%], fires frequently
 # CEO Sep 24: widened floor -2.0→-3.0. 14d: 23T 0%WR -$2.70, avg loss -3.92%.
-# Trades slide past -2.0% before next fire window. New range catches the full slide.
-CL_TIER1_MIN_PCT      = -1.00   # FIX 2026-10-01: was -0.75. 30d data: cut-loser-CL-T1 = 96T 0%WR -$13.62. -0.75% is inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%). Widening to -1.00 gives trades room to reach trail activation (+0.40%) and recover. Was 0 (impossible range) before Sep 29 fix.
-CL_TIER1_MAX_PCT      = -2.5    # ceiling — catches the dead zone between old T1 and T2
+# FIX 2026-10-02 (bug-hunter verified): MIN/MAX were INVERTED since Sep 29 (e5c119d0)
+# — filter_by_pnl requires min_pct <= pnl <= max_pct, so -1.00 <= pnl <= -2.5 was
+# mathematically empty and T1 fired ZERO trades for 3 days. Corrected: MIN=-2.5 (deep),
+# MAX=-1.0 (shallow). Window now contiguous with T2 [-3.0..-2.5] + hard stop -3.0.
+CL_TIER1_MIN_PCT      = -2.5    # deep edge — was wrongly -1.00 (inverted); T1 catches -1.0% to -2.5% losses
+CL_TIER1_MAX_PCT      = -1.00   # shallow edge — cut trades that reach -1.0% before they slide further. Was wrongly -2.5.
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 0   # CEO Sep 9: removed skip — was letting worst losers bleed
 CL_TIER1_FIRE_WINDOWS = {"A": (2, 4), "B": (2, 4)}  # FIX: tightened — catch losses before they slide to -3%
