@@ -113,3 +113,6 @@
 
 ## TEAM UPDATES
 - [2026-10-02 22:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. Drought explained: regime fully NEUTRAL (117N/0L/0S), pipeline active (cycle #225937, 54–218 signals/hr detected), SHORT-NEUTRAL + confidence gate blocking all execution. Last close 20:46, 0 open positions. 24h: atr_sl_hit 0% (tpsl fix stable), profit-monster-trail 35T +$1.64 dominant. No kill candidates, not overtrading, no 3h negative streak. Monitor windows untouched. Disk 87% WARN (DB growth) needs CEO retention call. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-02 23:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. Drought may be breaking: 3 fresh opens 23:05–23:10 (ME/ENS pump-chain+ LONG, GMT pump-chain-v5 LONG) — all healthy SL/TP, not paper. 24h: 53T 60.4%WR +$0.73; atr_sl_hit 0% (tpsl fix stable); hard_max_loss family 8T -$1.44 0 wins (exit working on bad NEUTRAL entries); winners MFE 2.16%/MAE 0.21% vs losers MFE 0.10%/MAE 0.87%. mtf-regime-trend+ kill holding (PLUS_ENABLED=False, 0 opens since 15:11). No kill candidates (0T this hour), not overtrading, no 3h negative streak. Monitor windows untouched. Disk 88% WARN needs CEO retention call. 0 CHANGES APPLIED.

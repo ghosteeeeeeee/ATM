@@ -2349,3 +2349,28 @@ Final set: ['ADA']
 - Disk 87% WARN (up from 85%): coin_tracker 3.3G + candles 2.3G — needs CEO retention/vacuum call, not auto-1hr fix.
 - pnl_pct nonsense + BTC ORPHAN_PAPER amount=0.00 open row — known data-path hygiene bugs, not signal logic.
 - NEUTRAL regime is blocking ALL shorts — if this persists 24h+, position size/long-only posture is a CEO/regime question, not auto-1hr.
+
+## [2026-10-02 23:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no closes)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Kill rule:** 0 closes this hour → no 0%-WR signal with 3+ trades. Single-trade 0%WR (pump-chain-v5, continuum+, continuum-osc+, pump-chain-) still below threshold.
+- **atr_sl_hit >40%:** 24h = 0/53 (0%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 17:00 -0.21, 18:00 -0.51, 19:00 0T (reset), 20:00 +0.08, 21:00 0T, 22:00 0T — not 3 consecutive negative.
+- **Overtrading:** 0T/hr « 20.
+- **Entry quality (MFE/MAE 24h, n=16 with data):** WIN n=4 MFE 2.16% / MAE 0.21% (winners run, small adverse — good). LOSS n=12 MFE 0.10% / MAE 0.87% (losers never move in favor). Entry quality for winners is fine; loss subset is entry-timing in NEUTRAL, not a param this hour.
+- **24h snapshot:** 53T 32W 60.4%WR +$0.73. profit-monster-trail 35T +$1.64 dominant; hard_max_loss family 8T -$1.44 0 wins (exit mechanism working on bad entries); hard_sl 3T -$0.58; bb-squeeze+ 26T 57.7%WR -$0.06 near breakeven (EXTREME monitor active).
+- **mtf-regime-trend+ kill holding:** MTF_REGIME_TREND_PLUS_ENABLED=False verified; 0 opens after 15:11 (9T residual -$0.46 only). MINUS/base untouched.
+- **Pipeline re-engaged:** 3 fresh opens 23:05–23:10 UTC — ME/ENS pump-chain+ LONG, GMT pump-chain-v5 LONG. All healthy (SL+TP set, paper=False, amount>0). BTC ORPHAN_PAPER from prior logs no longer in open set.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+
+**Open Questions:**
+- Is the 23:05–23:10 3-open burst a regime shift or one-off? Confirm next hour.
+- pump-chain-v5 re-opened (GMT LONG) after 1T 0%WR earlier — single trade, not killable; watch.
+- Disk 88% WARN (health_monitor 22:49, WAL checkpointed ~78MB; candles.db WAL 3.2GB locked by collector) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
