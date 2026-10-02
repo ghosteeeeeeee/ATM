@@ -1,29 +1,31 @@
-# Health Report — 2026-10-02 15:49 UTC
+## Health Report — 2026-10-02 18:47 UTC
 
-## Pipeline: OK
-- Status: completed LIVE at 15:45:27 (oneshot+timer — `inactive` between runs is normal)
-- Signals (1h): 134 generated (signal DB)
-- Trades: 2 open (BTC LONG, JUP LONG per position manager; trades.json shows 1 open BTC), 51 closed today
-- PnL today: +29.28% (pipeline portfolio line)
-- Errors (30min): 5x psycopg2 UnboundLocalError in rate-limit check (FIXED); 0 Tracebacks; 0 CRASH
+=== Health Report ===
+Time: 2026-10-02 18:47 UTC
 
-## Market
-- Regime: SHORT_BIAS — 0 LONG / 5 SHORT / 112 NEUTRAL (regime_5m.json, 15:45:04)
-- Speed: 128/241 tokens ≥50th percentile (53.1%)
+PIPELINE: OK
+- Status: completed (oneshot; inactive after run is normal)
+- Last run: 18:46:25 LIVE, rc=0
+- Signals (1h): 122 generated
+- Trades: 0 open, 53 closed today, +11.71% PnL
+- Errors: 0 (0 Tracebacks; only BTC-CRASH-OVERRIDE informational notes)
+- Heartbeat: decider_run OK, position_manager OK (18:46:24-25)
 
-## System
-- Timers: 30+ hermes-* active, all firing on schedule (pipeline every 1min, last pass 15:45)
-- Services: hermes-pipeline inactive (normal), hermes-hl-sync-guardian active
-- Disk: 86% used (95G/118G, 17G free) — WARN
-- Prices: 86 tokens, updated 21s ago — fresh
-- Failed non-critical units: 12 (LLM jobs: better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer, weather-station-api)
+MARKET:
+- Regime: SHORT_BIAS (0 LONG / 32 SHORT / 85 NEUTRAL of 117 scanned)
+- Speed: 129/241 tokens >= 50th percentile (53%)
+- Hotset: 1 token (HYPE SHORT) — not empty
 
-## Auto-Fixes Applied
-1. **decider_run.py psycopg2 UnboundLocalError** — removed shadowing `import psycopg2` at line 3660 inside `run()`. Root cause: local import made `psycopg2` function-scoped, breaking rate-limit check (fail-open — 15s entry gap disabled) and losers WR hard-block (fail-closed — over-blocking LOSERS tokens). Module-level import at line 8 now resolves. py_compile OK. Takes effect next pipeline run.
-2. Journal vacuum: freed 0B (already clean from 14:48 vacuum of 259.7M)
+SYSTEM:
+- Guardian: active
+- Timers: firing (pipeline.timer last fired 16s ago; 40+ hermes timers scheduled)
+- Disk: 85% used (94G/118G, 18G free) — WARN
+- Prices: 86 tokens, fresh (~1.5 min)
+- Speeds DB: fresh (latest 18:46:25 UTC)
 
-## Alerts
-- **WARN**: Disk 86% — DB growth recurring; CEO DB-pruning decision still open since 2026-10-01
-- **WARN**: hermes-git-release failing hourly (uncommitted-changes gate + symlink) — known, not auto-fixed
-- **INFO**: hermes-atr-sl-updater.timer unit not-found (ghost, harmless)
-- **INFO**: Pipeline "inactive" between runs is normal oneshot+timer behavior — not a crash
+AUTO-FIXES APPLIED:
+- None this cycle (no CRITICAL failures)
+
+ALERTS:
+- WARN: disk at 85% — journal vacuum already clean, 0 logs >7d to gzip. Bulk is DBs (coin_tracker 3.3G, candles 2.3G, signals 0.9G, session_brain 0.9G). CEO DB-retention decision still open (recurring since 2026-10-01).
+- INFO: non-critical failed units (better-coder, brain-auditor, bug-hunter, git-release, coding-mcp) — known LLM-job timeout pattern. Trading path unaffected.

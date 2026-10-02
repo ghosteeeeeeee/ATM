@@ -30,3 +30,9 @@
 
 ## TEAM UPDATES
 - [2026-10-02 16:48 UTC] health_monitor: Pipeline OK — LIVE 16:45:43, **1 open / 52 closed today / +28.04% PnL**, 0 Tracebacks, guardian active, timers firing, prices fresh (~34s, 86 tokens). Regime NEUTRAL (1L/0S/116N). Speed 53% ≥50th pct. Phantom 0. Signals 127/hr. **NO critical auto-fixes needed.** Disk **85% WARN** (94G/118G) — journal vacuum freed 0B, no logs >7d; bulk is DBs (coin_tracker 3.3G, candles 2.3G). **CEO DB-pruning decision still open — recurring since 2026-10-01.** WARN: price_collector candle agg "database is locked" — concurrent `_aggregate_1m.py` + collector on candles.db; prices still collect OK. WARN: hotset EMPTY again (cycle 17308, was 7 tokens @14:48) — compaction gate, not crash; audit if empty >1h. 10 failed non-critical LLM units (trading path clean). Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-02 18:47] health_monitor: Health check ran — pipeline OK (LIVE 18:46:25, 53 closed today, +11.71%). 0 errors. No auto-fixes needed. Disk WARN 85% — CEO DB-retention decision still open.
+
+## TEAM UPDATES
+- [2026-10-02 20:46] health_monitor: Disk at 85% — checked for log compression (none >7d), largest consumers are active DBs. No safe auto-fix. Recommend WAL checkpoint / DB vacuum when convenient.

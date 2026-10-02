@@ -1289,7 +1289,7 @@ PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI b
 # neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
 # Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
 SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
-SHORT_CONTINUUM_SCORE_MAX = 30         # raised from 10 (2026-10-01) — 30d data: score 10-30 band is breakeven noise
+SHORT_CONTINUUM_SCORE_MAX = 30         # CEO 2026-10-02 REVERT: working-tree 40 undocumented, SHORT_CONTINUUM monitor window active at 30. Data: score 10-30 = breakeven noise; bear-structure bypass (SHORT-NEUTRAL-BYPASS + pump-chain RSI override) already live via Fix1/Fix2. Revisit 40 only with 24h post-Fix2 SHORT data.
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 SHORT_CONTINUUM_TOKEN_Z_ENABLED = False  # DISABLED 2026-10-01 — avg_z has no live writer, reads 4-month-old stale data (bug_hunter HIGH)
 

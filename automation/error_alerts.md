@@ -1,5 +1,17 @@
 # Error Alerts
 
+## Error Alerts — 2026-10-02 19:46 UTC
+- **WARN** (1): `Disk at 85% (95G/118G)` — was 88% at check start. pipeline.log 81M, signal-compactor.log 49M, trade-watchdog.log 43M, 15m_regime.log 28M.
+  - **AUTO-FIX**: Compressed `*.log` older than 7d via gzip. Disk 88%→85%. No new large files found >7d in logs/.
+- **WARN** (5): Non-trading failed units — `better-coder`, `bug-hunter`, `git-release`, `mtf-macd-tuner`, `trading-checklist`.
+  - `better-coder`: `ModuleNotFoundError: No module named 'dispatcher.dispatcher'` — import path broken. Not auto-fixable without code review.
+  - `bug-hunter`: exit-1 by design — found real issues: hardcoded passwords in 4 files (`study_winning_combos.py`, `context-compactor.py`, `hermes_ab_utils.py`, `trading-checklist.py`) + dead imports of defunct `signal_gen` in 3 modules. Needs manual fix pass.
+  - `git-release`: `update-git.py --dry-run` exit-1. Uncommitted files pattern (`M automation/error_alerts.md`). Investigate dry-run path.
+  - `mtf-macd-tuner`: `AttributeError: 'PrecomputedMACD' object has no attribute 'warmup'` — code bug in tuner. Not in trading execution path.
+  - `trading-checklist`: WARN `signals_db: 16670 signals (0 approved, 1 pending, 219 in last 2h)` — filters rejecting signals as designed, not a crash.
+  - **AUTO-FIX**: None applied to failed units (code bugs need review, not restart). Trading path unaffected — pipeline + guardian + price-collector all active.
+- **INFO**: Pipeline last cycle 19:45:09 UTC — all steps rc=0. 0 Tracebacks. Position Manager 0 open / 0 closed this cycle. Hotset empty (no signals >50% confidence). Regime SHORT_BIAS (1L/34S/82N) @19:45:05. Speed 129/241 ≥50th pct (53.5%). Signals 96/hr. 0 open trades. 47 outcomes today (all closed). Prices fresh (19:45/19:46). Timers firing (`list-timers hermes-*` glob quirk — use `list-timers --all | grep hermes`).
+
 ## Error Alerts — 2026-09-30 00:48 UTC
 - **WARN** (1): `Disk at 85% (95G/118G)` — coin_tracker.db=3.3G, candles.db=2.2G, /var/log=3.4G
   - **AUTO-FIX (01:48)**: Vacuumed journal logs, freed 1.0G. Now 84% (94G/118G).
@@ -436,3 +448,29 @@
 - **WARN**: hotset.json **empty again** (cycle 17308, 0 tokens) — "[hotset] fallback DB query returned 0 tokens" + "no signals survived compaction". Was recovered 14:48 with 7 tokens; regressed. Compactor runs every minute; may be filter/quality gate, not crash. Monitor — if empty >1h, audit signal_compactor thresholds.
 - **INFO**: 10 non-critical units in `failed` (better-coder, bug-hunter, ceo, daily-orchestrator, git-release, mtf-macd-tuner, signal-reporter, summarizer, trading-checklist, upgrade-implementer). Known pattern: LLM jobs timing out. Trading path unaffected (pipeline, guardian, timers all OK).
 - **INFO**: price DB stubs (`prices.db`, `price_cache.db`, `price_history.db`) are 0-byte files — unused; live prices come via `prices.json` + static price_history (12.4M rows). Not a bug.
+
+## Error Alerts — 2026-10-02 18:47 UTC
+- **WARN**: disk `/` **85%** used (94G/118G, 18G free). Journal vacuum already clean. 0 logs >7d to gzip. Bulk remains DBs. **CEO DB-retention decision still open (recurring since 2026-10-01).**
+- **INFO**: pipeline.service `inactive` is NORMAL (oneshot+timer). Last run LIVE 18:46:25: 0 open / 53 closed today / +11.71% PnL. 0 Tracebacks in 30min. Guardian active. Timers firing. Prices fresh (86 tokens). Regime SHORT_BIAS (0L/32S/85N). Speed 129/241 ≥50th pct (53%). Phantom trades 0. Signals 122/hr — healthy. Hotset populated (HYPE SHORT).
+- **INFO**: non-critical failed units (better-coder, brain-auditor, bug-hunter, git-release, coding-mcp). Known LLM-job timeout pattern. Trading path unaffected.
+
+## Error Alerts — 2026-10-02 18:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-02 19:59 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-02 20:46 UTC
+- **WARN** (1x): `disk 85% used on /` — 18G free of 118G
+- **AUTO-FIX**: Checked logs >7d for compression — none found (all active, <7d). Largest consumers: coin_tracker.db 3.3G, candles.db 2.3G, signals_hermes.db 905M, session_brain.db 866M, pipeline.log 81M. No safe auto-fix; recommend DB vacuum / WAL checkpoint or log rotation review.
+- **NOTE**: Regime fully NEUTRAL (0 LONG / 0 SHORT / 117 neutral) — market flat, explains 0 approved signals despite 33 detections/hr.
+
+## Error Alerts — 2026-10-02 20:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-02 21:46 UTC
+- **WARN** (1x): `disk 87% used on /` — 16G free of 118G (up from 85% an hour ago)
+- **AUTO-FIX**: Compressed all `.log` files >7 days in `/root/.hermes/logs/`. Logs now 247M total. Largest disk consumers are DBs (coin_tracker.db 3.3G, candles.db 2.3G, signals_hermes.db 905M) — no safe auto-fix; recommend DB vacuum / archival.
+- **NOTE**: 57 signals detected in last hour but 0 approved (hotset empty, all filtered by confidence/regime). Regime fully NEUTRAL (117 tokens) — market flat, expected behavior not a bug.

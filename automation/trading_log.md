@@ -2304,3 +2304,25 @@ Final set: ['ADA']
 - continuum+ still below kill threshold (1T 0%WR 24h).
 - pnl_pct nonsense + ORPHAN_PAPER amount=0 persist — data-path bugs.
 ---
+
+## [2026-10-02 21:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.08 (WR: 100%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Kill rule:** No 0%-WR signal with 3+ trades this hour. Single-trade losers (pump-chain-v5, continuum+, continuum-osc+, pump-chain-) all below threshold.
+- **atr_sl_hit >40%:** 24h = 0%. tpsl fix stable. No CEO alert.
+- **Negative PnL streak:** 17:00 -0.21, 18:00 -0.51, 19:00 0 trades (streak reset), 20:00 +0.08 — not 3 consecutive.
+- **Overtrading:** 1T/hr « 20.
+- **24h snapshot:** profit-monster-trail 35T +$1.64 dominant; hard_max_loss family 8T -$1.34; hard_sl 3T -$0.58. bb-squeeze+ 26T 57.7%WR -$0.06 near breakeven (EXTREME monitor active).
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **Open positions:** BTC ORPHAN_PAPER amount=0.00 open row persists (data-path hygiene). This hour's BTC trade also closed via `no_sl_tp` — same data-path gap.
+
+**Open Questions:**
+- continuum+ / pump-chain-v5 / continuum-osc+ all 1T 0%WR 24h — single trades each, not killable yet. Watch next hour.
+- pnl_pct nonsense + ORPHAN_PAPER amount=0 persist — data-path bugs, not signal logic.
+- Only 1 close in hour 21:00 — still low volume vs earlier (7T at 13:00). Check next hour if drought continues.
