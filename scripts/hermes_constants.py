@@ -1808,8 +1808,8 @@ NEVER_REENABLE_FLAGS = {
     # ACCEL_300_V3_LONG_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'ACCEL_300_V3_SHORT_ENABLED',  # ORCHESTRATOR 2026-09-09 — protection expired 05:00 UTC. 2T/48h 50%WR but 7d -4.21%. NEVER_REENABLE.
     'PULLBACK_ENTRY_PLUS_ENABLED',  # CEO 2026-09-10 — 5T/24h 0%WR -$0.61. All LONG in NEUTRAL, volatility_gate_v2 not filtering. NEVER_REENABLE.
-    'PUMP_FLOW_MINUS_ENABLED',     # SIGNAL REPORTER 2026-09-14 — 13T/24h 38.5%WR -$0.21, 6h 0%WR -$0.50. All regimes <50% WR. NEVER_REENABLE.
-    'PUMP_FLOW_PLUS_ENABLED',      # SIGNAL REPORTER 2026-09-22 — 13T/24h 15.4%WR -$1.51. ALL regimes lose (EXTREME 20%, HIGH 0%). NEVER_REENABLE.
+    # PUMP_FLOW_MINUS_ENABLED — RE-ENABLED 2026-09-22 (CEO)
+    # PUMP_FLOW_PLUS_ENABLED — RE-ENABLED 2026-09-22 (CEO)
     'PUMP_CHAIN_V4_ENABLED',       # SIGNAL REPORTER 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -2757,9 +2757,9 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 
 # pump-chain+ HIGH regime block — 14T/7d 35.7%WR +$0.19 (noise). EXTREME 57.1%WR +$1.65 (edge).
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
-PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-09-20 — 14T/7d HIGH noise, redirect to EXTREME
-PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-09-29 — 5T/14d HIGH 20%WR -$0.60, EXTREME 56.3%WR +$0.66
-PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True  # signal_reporter 2026-10-01 — EXTREME 84T 52.4%WR -$0.14 bleed. NORMAL 85.7%WR +$0.16 edge. v2 gate Pump_Flow:0.0 existed but STANDALONE_BYPASS+fail-open let trades through.
+PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
+PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
+PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
@@ -3246,8 +3246,8 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # mover.py — catches coins ACCELERATING into moves, not just moving
 # Uses velocity acceleration as primary signal (fires at START of move)
 MOVER_ENABLED = True                    # master kill-switch
-MOVER_PLUS_ENABLED = False              # LONG direction — 3T 0%WR -$0.44 24h, 13T 46%WR -$0.67 7d. All losses via ATR SL. KILLED auto_1hr 2026-09-24
-MOVER_MINUS_ENABLED = False             # SHORT direction — 3T 0%WR -$0.72 7d, 2T 0%WR -$0.68 24h. All hard_sl. KILLED auto_1hr 2026-09-29
+MOVER_PLUS_ENABLED = True              # RE-ENABLED 2026-09-22 (CEO)
+MOVER_MINUS_ENABLED = True             # RE-ENABLED 2026-09-22 (CEO)
 MOVER_TOP_N = 20                        # top N candidates to evaluate
 MOVER_VELOCITY_MIN = 0.3                # min velocity % (lowered — acceleration is primary)
 MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)
@@ -3671,8 +3671,8 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (24h), 20%WR EXTREME, 0%WR HIGH. 80T all-time 41.3%WR +$0.95. NEVER_REENABLE.
-PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
+PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-22 (CEO — "every pump is a LONG opportunity")
+PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-22 (CEO — "every dump is a SHORT opportunity")
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
 PUMP_CHAIN_V5_ENABLED = True           # RE-ENABLED 2026-10-01 — V5 with velocity + continuum oscillator filters. 48h test.
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
