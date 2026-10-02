@@ -1579,5 +1579,41 @@
     "category": "confidence tuning",
     "status": "suggested_ceo_reeval",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-02T00:34:18Z",
+    "idea": "Backtest RR_ENGINE_SHADOW→FORCE with current regime mins",
+    "rationale": "RR engine is live but shadow-only for regime thresholds. CONF path blocks R:R<0.70, but FLAT/NORMAL/HIGH/EXTREME mins never enforce. If FORCE would have blocked 7d losers without killing winners, enabling it is free edge. Engine already built — we're leaving it on the table.",
+    "expected_impact": "unknown until backtest; potentially +$0.30-0.80/7d if bad-R:R setups are being taken",
+    "category": "exit/entry quality",
+    "status": "suggested — backtest first",
+    "risk": "low (backtest before change)"
+  },
+  {
+    "date": "2026-10-02T00:34:18Z",
+    "idea": "Volume-breakout EXTREME conf boost +10-15pt — RE-PROPOSE with correct column",
+    "rationale": "CEO rejected on entry_regime_4h=NULL (dead column). volatility_regime shows EXTREME LONG 12T 75%WR +$2.53/14d. RSI 70-79 = 4T 100%WR. Sample 12T < 20T regime threshold — monitor 2 live EXTREME opens (JUP, IMX), re-eval at 20T.",
+    "expected_impact": "+3-5% WR for volume-breakout in EXTREME; 0 winners blocked (boost only raises confidence)",
+    "category": "entry sniper",
+    "status": "carried — CEO re-eval at 20T EXTREME",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-02T00:34:18Z",
+    "idea": "bb-squeeze+ EXTREME diversity play — monitor SAGA/SAND outcome",
+    "rationale": "bollinger_squeeze re-enabled today (CEO, LONG only). First 2 live signals just opened in EXTREME. Research: 74.1%WR 436T. If they win, we have 2 independent EXTREME LONG edges (vol-breakout + bb-squeeze) — diversity improving where it matters.",
+    "expected_impact": "if 2/2 win: EXTREME LONG book strengthens; signal diversity improves",
+    "category": "signal diversity",
+    "status": "monitor 48h",
+    "risk": "none (no change)"
+  },
+  {
+    "date": "2026-10-02T00:34:18Z",
+    "idea": "Doji-bottom-long HIGH specialist — monitor SUSHI, conf boost at 20T",
+    "rationale": "14d: HIGH 7T 85.7%WR +$0.67 vs NORMAL 5T 40% $0.00. SUSHI open is HIGH — matches specialist pattern. Overall 12T < 20T threshold. If HIGH pattern holds to 20T, consider HIGH-only confidence boost.",
+    "expected_impact": "+5-8% WR for doji-bottom in HIGH if pattern holds",
+    "category": "entry sniper",
+    "status": "monitor — below 20T",
+    "risk": "low"
   }
 ]
