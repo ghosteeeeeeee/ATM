@@ -589,6 +589,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # grind_trend — accumulation grind, steady drift (no breakout needed)
     ('grind_trend_long',  'grind-trend+'):  1.0,
     ('grind_trend_short', 'grind-trend-'):  1.0,
+    # grind_accumulator — enter during accumulation, ride the spike
+    ('grind_accumulator_long',  'grind-accum+'):  1.0,
+    ('grind_accumulator_short', 'grind-accum-'):  1.0,
     # squeeze_reversal — BB squeeze → mean-reversion breakout
     ('squeeze_reversal_long',  'squeeze-reversal+'):  1.0,
     ('squeeze_reversal_short', 'squeeze-reversal-'):  1.0,

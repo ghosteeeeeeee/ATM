@@ -46,6 +46,7 @@ from hermes_constants import (
     GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
     GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
     BTC_GRIND_SPIKE_ENABLED,
+    GRIND_ACCUM_ENABLED, GRIND_ACCUM_PLUS_ENABLED, GRIND_ACCUM_MINUS_ENABLED,
     SQUEEZE_REVERSAL_ENABLED, SQUEEZE_REVERSAL_PLUS_ENABLED, SQUEEZE_REVERSAL_MINUS_ENABLED,
     RESISTANCE_BREAK_ENABLED, RESISTANCE_BREAK_PLUS_ENABLED, RESISTANCE_BREAK_MINUS_ENABLED,
     MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
@@ -357,6 +358,11 @@ except Exception:
     _btc_grind_spike_run = None
 
 try:
+    from signals.grind_accumulator import run as _grind_accum_run
+except Exception:
+    _grind_accum_run = None
+
+try:
     from signals.squeeze_reversal import run as _squeeze_reversal_run
 except Exception:
     _squeeze_reversal_run = None
@@ -503,6 +509,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
     {'name': 'grind_trend',              'enabled': 'GRIND_TREND_ENABLED',            'run': _grind_trend_run},
     {'name': 'btc_grind_spike',           'enabled': 'BTC_GRIND_SPIKE_ENABLED',       'run': _btc_grind_spike_run},
+    {'name': 'grind_accumulator',         'enabled': 'GRIND_ACCUM_ENABLED',           'run': _grind_accum_run},
     {'name': 'squeeze_reversal',          'enabled': 'SQUEEZE_REVERSAL_ENABLED',      'run': _squeeze_reversal_run},
     {'name': 'squeeze_breakout',          'enabled': 'SQUEEZE_BREAKOUT_ENABLED',      'run': _squeeze_breakout_run},
     {'name': 'bollinger_squeeze',         'enabled': 'BOLLINGER_SQUEEZE_ENABLED',     'run': _bollinger_squeeze_run},

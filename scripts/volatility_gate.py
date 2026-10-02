@@ -41,6 +41,7 @@ REGIME_SIGNALS = {
         'slow-grind-',  # slow grinding downtrend — ideal for low-volatility FLAT markets
         'slow-grind+',  # slow grinding uptrend — ideal for low-volatility FLAT markets
         'grind-trend+', 'grind-trend-',  # accumulation grind — low-vol drift, ideal for FLAT
+        'grind-accum+', 'grind-accum-',  # enter during accumulation, ride the spike — ideal for FLAT/NORMAL
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'doji-top-short',  # doji exhaustion at top — mean-reversion (exit LONG / enter SHORT)
@@ -117,6 +118,7 @@ REGIME_SIGNALS = {
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — SHORT added 2026-10-02: asymmetry fix
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
+        'grind-accum+', 'grind-accum-',  # enter during accumulation, ride the spike — works in normal vol
         'doji-bottom-long', 'doji-top-short',  # doji exhaustion — SHORT added 2026-10-02: asymmetry fix (doji-top-short was only in FLAT)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in steady markets
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in normal vol

@@ -1151,6 +1151,31 @@ BTC_PUMP_RIDER_GRADUAL_MAX_ALTS = 5           # max alt signals per rally
 # Module: signals/btc_grind_spike.py
 BTC_GRIND_SPIKE_ENABLED = True
 
+# ── Grind Accumulator Signal (2026-09-21) ─────────────────────────────────
+# Enter DURING the accumulation grind, BEFORE the spike.
+# The spike becomes exit, not entry. Solves "buying tops" problem.
+# Pattern: compression (low ATR, tight range) + proximity to MA180 + positive drift + volume contraction
+# Module: signals/grind_accumulator.py
+GRIND_ACCUM_ENABLED = True           # master kill-switch
+GRIND_ACCUM_PLUS_ENABLED = True      # LONG direction
+GRIND_ACCUM_MINUS_ENABLED = False    # SHORT (not applicable — grind is bullish setup)
+GRIND_ACCUM_COOLDOWN_HOURS = 3       # per token+direction cooldown
+GRIND_ACCUM_LOOKBACK = 180           # 1m candles to analyze (3 hours)
+GRIND_ACCUM_MA_PERIOD = 180          # MA period (3 hours)
+GRIND_ACCUM_ATR_PERIOD = 14          # ATR period
+GRIND_ACCUM_ATR_PCT_MAX = 0.15       # max ATR% to qualify as compressed
+GRIND_ACCUM_RANGE_PCT_MAX = 0.5      # max range% over lookback
+GRIND_ACCUM_SLOPE_MIN = 0.001        # min upward slope (positive = grinding up)
+GRIND_ACCUM_SLOPE_MAX = 0.02         # max slope (too steep = already pumped)
+GRIND_ACCUM_VOL_RATIO_MAX = 0.8      # max recent/avg volume ratio (must be contracting)
+GRIND_ACCUM_VOL_WINDOW = 20          # recent volume window (bars)
+GRIND_ACCUM_VOL_AVG_WINDOW = 30      # average volume window (bars)
+GRIND_ACCUM_PROXIMITY_PCT = 0.3      # max distance from MA180 as %
+GRIND_ACCUM_CONF_BASE = 72           # base confidence
+GRIND_ACCUM_CONF_FLOOR = 55          # min confidence
+GRIND_ACCUM_CONF_CAP = 88            # max confidence (system ceiling)
+GRIND_ACCUM_PRICE_AGE_MAX = 10       # max price staleness in minutes
+
 # ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
 # Multi-layer crash detection using leading indicators:
 #   Layer 1: Dynamic price crash (ATR-scaled, not fixed %)
@@ -2652,6 +2677,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'btc-wave',  # BTC EMA300 crossover + volume surge — BTC-only, high-conviction wave pattern
     'coil-spring',  # volume contraction pullback in bullish trend — works solo, backtested +3.3R
     'open-skies', 'open-skies+', 'open-skies-',  # re-enabled 2026-09-21 for 48h testing (CEO)
+    'grind-accum', 'grind-accum+', 'grind-accum-',  # enter during accumulation, ride the spike — works solo (2026-09-21)
     'resistance-break',  # resistance break + pullback LONG — structural breakout, works solo
     'volume-breakout', 'volume-breakout+', 'volume-breakout-',  # volume-confirmed breakout — works solo, wins in EXTREME (67% WR)
     'volume-breakout-long',  # volume-confirmed breakout LONG — standalone bypass (2026-09-14)
