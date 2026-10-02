@@ -3652,6 +3652,25 @@ def run(dry_run=False):
                 continue
             elif pump_chain_count >= PUMP_FLOW_MAX_POSITIONS and is_confluence:
                 log(f'  ✅ [PUMP-CHAIN-CONFLUENCE] {token}: {pump_chain_count}/{PUMP_FLOW_MAX_POSITIONS} but confluence ({len(source_parts)} sources) — allowed')
+        
+        # mtf-regime-trend: max positions check (2026-10-02)
+        if 'mtf-regime-trend' in (source or ''):
+            from hermes_constants import MTF_REGIME_TREND_MAX_POSITIONS
+            try:
+                import psycopg2
+                _mtf_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+                _mtf_cur = _mtf_conn.cursor()
+                _mtf_cur.execute("""
+                    SELECT COUNT(*) FROM trades 
+                    WHERE status = 'open' AND signal LIKE '%mtf-regime-trend%'
+                """)
+                mtf_count = _mtf_cur.fetchone()[0]
+                _mtf_conn.close()
+            except Exception:
+                mtf_count = 0
+            if mtf_count >= MTF_REGIME_TREND_MAX_POSITIONS:
+                log(f'SKIP: Max mtf-regime-trend positions reached ({mtf_count}/{MTF_REGIME_TREND_MAX_POSITIONS})')
+                continue
         else:
             # Other signals: block if non-pump-chain count >= available slots
             from hermes_constants import PUMP_FLOW_RESERVED_SLOTS

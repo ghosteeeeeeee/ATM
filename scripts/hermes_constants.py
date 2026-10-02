@@ -3640,7 +3640,7 @@ PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = False         # KILLED 2026-09-22 — 15.4%WR -$1.51 (24h), 20%WR EXTREME, 0%WR HIGH. 80T all-time 41.3%WR +$0.95. NEVER_REENABLE.
 PUMP_FLOW_MINUS_ENABLED = False        # KILLED 2026-09-22 — 0%WR -$0.63 (24h), 0%WR EXTREME (7d), 60T all-time 55%WR -$0.19. NEVER_REENABLE.
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-PUMP_CHAIN_V5_ENABLED = False           # KILLED 2026-10-01 — 3T 0%WR -$0.20 last hour (ALGO/HYPER/DYDX hard_max_loss). Hourly kill rule. Test eval Oct 3 moot.
+PUMP_CHAIN_V5_ENABLED = True           # RE-ENABLED 2026-10-01 — V5 with velocity + continuum oscillator filters. 48h test.
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
@@ -4200,6 +4200,7 @@ MTF_REGIME_TREND_VOLUME_MIN = 0.2         # min volume vs 20-bar average (lowere
 MTF_REGIME_TREND_EMA_PERIOD = 300         # EMA period for macro trend
 MTF_REGIME_TREND_ATR_PERIOD = 14          # ATR period for stops/trails
 MTF_REGIME_TREND_COOLDOWN_MINUTES = 15    # cooldown between signals per token (lowered from 30)
+MTF_REGIME_TREND_MAX_POSITIONS = 2        # max concurrent mtf-regime-trend positions (2026-10-02)
 
 MTF_REGIME_TREND_CONF_BASE = 70           # base confidence
 MTF_REGIME_TREND_CONF_CAP = 95            # max confidence

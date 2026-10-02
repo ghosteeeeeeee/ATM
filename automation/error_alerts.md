@@ -389,3 +389,15 @@
 - **INFO**: dead/never-fired timers unchanged: `hermes-atr-sl-updater.timer` (unit not-found), `hermes-hl-copy.timer` (last: Aug 15), `hermes-ma-cross-5m-tuner.timer` (never), `hermes-regime-24h-check.timer` / `hermes-regime-transition-check.timer` (never). Owner confirmation still needed before disable.
 - **INFO**: `token_speeds` has stale rows from 2026-07-19 (BLZ, MKR) mixed with fresh rows (13:47). Harmless dead-token residue.
 - **AUTO-FIX**: none required. Pipeline completed LIVE at 13:45 (3 open / 43 closed today / +45.20%). Guardian active, 0 errors/Tracebacks/CRASH in 30min. Prices fresh (candles_1m 46s). Regime LONG_BIAS (5L/1S/111N). Phantom trades 0/24h. No restart applied.
+
+## Error Alerts — 2026-10-02 13:59 UTC
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: [TOK-TOK] info_rate: waited N.1s, retrying`

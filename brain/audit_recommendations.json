@@ -1,357 +1,194 @@
 {
-  "timestamp": "2026-10-02T00:34:18Z",
-  "agent": "brain_auditor",
-  "session_lock": false,
-  "config_changes_applied": [],
+  "timestamp": "2026-10-02T13:34:44Z",
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing",
-      "ENTRY_RR risk reward engine backtest",
-      "volume-breakout EXTREME confidence boost",
-      "bollinger squeeze re-enable",
-      "NEUTRAL ema-reclaim volume dry up signal"
-    ],
+    "queries_run": 4,
     "top_insights": [
-      "RR engine hard-blocks R:R<0.70 via conf path; regime mins are SHADOW (log-only)",
-      "volume-breakout LONG is STANDALONE_BYPASS momentum signal — wins in EXTREME",
-      "signal starvation is NEUTRAL-specific; EXTREME LONG is firing (4/6 opens)",
-      "NEUTRAL ema-reclaim/volume-dry-up signal still unbuilt (Oct 3 deadline)"
+      "Exit system diagnosis: profit-monster-trail 7d 76T +$3.00 68.4%WR — exit leak FIXED, entry quality is remaining lever",
+      "RR engine: R:R < 0.70 only enforced; regime mins SHADOW (DRIFT-007) — log-only, validate before FORCE",
+      "signal decay / regime memory: doji-bottom + volume-breakout persist as winners across regime shifts",
+      "NEUTRAL diversity signal still unbuilt — #1 gap, delegated signal_analyst, deadline Oct 3 12:00 UTC"
     ]
   },
   "trade_summary_24h": {
-    "trades": 30,
-    "wr": 40.0,
-    "pnl": -0.78,
-    "by_signal_direction": [
-      [
-        "pump-chain-",
-        "SHORT",
-        7,
-        -0.46,
-        28.6
-      ],
-      [
-        "accel-300-",
-        "SHORT",
-        8,
-        -0.34,
-        37.5
-      ],
-      [
-        "pump-chain-v5",
-        "LONG",
-        6,
-        -0.17,
-        33.3
-      ],
-      [
-        "bb-bounce-v3-long+",
-        "LONG",
-        2,
-        -0.12,
-        0.0
-      ],
-      [
-        "continuum-osc+",
-        "LONG",
-        1,
-        0.16,
-        100.0
-      ],
-      [
-        "continuation+",
-        "LONG",
-        1,
-        0.03,
-        100.0
-      ]
-    ],
-    "open_positions": [
-      [
-        "SAGA",
-        "bb-squeeze+",
-        "LONG",
-        "EXTREME",
-        "2026-10-02 00:23"
-      ],
-      [
-        "SAND",
-        "bb-squeeze+",
-        "LONG",
-        "EXTREME",
-        "2026-10-02 00:13"
-      ],
-      [
-        "JUP",
-        "volume-breakout-long+",
-        "LONG",
-        "EXTREME",
-        "2026-10-02 00:05"
-      ],
-      [
-        "IMX",
-        "volume-breakout-long+",
-        "LONG",
-        "EXTREME",
-        "2026-10-01 23:55"
-      ],
-      [
-        "SUSHI",
-        "doji-bottom-long",
-        "LONG",
-        "HIGH",
-        "2026-10-01 21:32"
-      ],
-      [
-        "BTC",
-        "continuum_engine",
-        "LONG",
-        "ORPHAN_PAPER amt=0.00",
-        "2026-10-01 17:45"
-      ]
-    ]
+    "trades": 42,
+    "win_rate": 71.4,
+    "pnl": 2.24,
+    "long": {
+      "n": 40,
+      "pnl": 2.34,
+      "wr": 72.5
+    },
+    "short": {
+      "n": 2,
+      "pnl": -0.1,
+      "wr": 50.0
+    },
+    "dominant_exit": "profit-monster-trail 31T +$1.42 77.4%WR",
+    "best_signal_24h": "volume-breakout-long+ 2T +$0.94 100%WR (IMX hard_tp +$0.82 EXTREME)",
+    "note": "BEST 24h performance in weeks. System flipped positive after SHORT-CONTINUUM + RSI filters + ATR_SL fix + bollinger_squeeze re-enable."
   },
   "trade_summary_7d": {
-    "trades": 114,
-    "wr": 46.5,
-    "pnl": 0.12,
-    "regime": [
-      [
-        "EXTREME",
-        59,
-        52.5,
-        0.09
-      ],
-      [
-        "HIGH",
-        20,
-        45.0,
-        -0.12
-      ],
-      [
-        "NORMAL",
-        29,
-        41.4,
-        0.0
-      ],
-      [
-        "FLAT",
-        3,
-        33.3,
-        0.15
-      ]
-    ],
-    "best_signals": [
-      [
-        "doji-bottom-long",
-        6,
-        0.27,
-        66.7
-      ],
-      [
-        "continuum-osc+",
-        3,
-        0.19,
-        66.7
-      ],
-      [
-        "bb-bounce-v2-long+",
-        8,
-        0.21,
-        50.0
-      ]
-    ]
+    "trades": 151,
+    "pnl": 2.0,
+    "long": {
+      "n": 103,
+      "pnl": 3.32,
+      "wr": 54.4
+    },
+    "short": {
+      "n": 48,
+      "pnl": -1.32,
+      "wr": 45.8
+    },
+    "regime": {
+      "EXTREME": "+$0.68/73T 52.1%WR",
+      "HIGH": "+$0.60/34T 58.8%WR",
+      "NORMAL": "+$0.25/37T 48.6%WR",
+      "FLAT": "+$0.47/4T 50%WR"
+    },
+    "note": "All regimes net positive 7d. SHORT still negative but count collapsing (2/24h) via SHORT-CONTINUUM + HARD_FLOOR — correct behavior."
   },
-  "filters_verified": [
-    {
-      "filter": "PUMP_CHAIN_SHORT_EXTREME_BLOCK",
-      "status": "WORKING",
-      "evidence": "0 pump-chain- SHORT opens since 18:15 UTC Oct 1"
-    },
-    {
-      "filter": "SHORT-CONTINUUM",
-      "status": "WORKING",
-      "evidence": "0 SHORT opens post-18:15; BTC score 92-98 z=POS"
-    },
-    {
-      "filter": "PUMP_CHAIN_SHORT_RSI_MIN=40",
-      "status": "WORKING",
-      "evidence": "all RSI<40 losers are pre-raise legacy"
-    },
-    {
-      "filter": "ATR_SL widening 2.0%",
-      "status": "WORKING",
-      "evidence": "0 atr_sl_hit post-widening / 7d"
-    },
-    {
-      "filter": "SHORT_RSI_HARD_FLOOR=25",
-      "status": "LIVE",
-      "evidence": "applied 11:50 UTC, monitor window"
-    },
-    {
-      "filter": "VOLUME_BREAKOUT_LONG_RSI_CEILING=95",
-      "status": "WORKING",
-      "evidence": "RSI>95 blocked (WCT 98.86 L, ONDO 97.78 L); RSI 70-79 = 4T 100%WR preserved"
-    }
+  "open_positions": [
+    "BTC continuum_engine LONG amount_usdt=0.00 ORPHAN_PAPER (opened Oct 1 17:45, >19h) — data hygiene, not trading-path",
+    "BTC continuum-osc+ LONG $22.10 @ 86180 (Oct 2 09:01)",
+    "ZRO bb-squeeze+ LONG $11.10 @ 1.892 (12:59)",
+    "AIXBT mtf-regime-trend+ LONG $22.10 (13:29) — FIRST LIVE TEST",
+    "SOL mtf-regime-trend+ LONG $11.10 @ 122.30 (13:27) — FIRST LIVE TEST",
+    "BLUR mtf-regime-trend+ LONG $22.10 @ 0.02185 (13:31) — FIRST LIVE TEST"
   ],
   "losing_trade_autopsy": {
-    "losers_24h": 18,
-    "verdict": "ALL legacy pre-kill / pre-block opens aging out. No new systematic pattern.",
-    "clusters": [
-      {
-        "signal": "accel-300- SHORT",
-        "trades": 8,
-        "pnl": -0.34,
-        "cause": "killed 10:50 UTC Oct 1; opens pre-kill; hard_max_loss exits correct"
-      },
-      {
-        "signal": "pump-chain-v5 LONG",
-        "trades": 6,
-        "pnl": -0.17,
-        "cause": "killed 10:18 UTC Oct 1; opens pre-kill"
-      },
-      {
-        "signal": "pump-chain- SHORT",
-        "trades": 4,
-        "pnl": -0.34,
-        "cause": "EXTREME opens pre-18:15 block; block now live, 0 post-block opens"
-      },
-      {
-        "signal": "bb-bounce-v3-long+",
-        "trades": 2,
-        "pnl": -0.12,
-        "cause": "n=2 scratches, below 3T kill threshold, monitor"
-      }
-    ],
-    "recommended_change": null,
-    "reason": "No new post-fix loser cluster. Legacy aging out. Monitor windows active — do not stack changes."
+    "losers_24h": 12,
+    "cluster": "bb-squeeze+ LONG 10/12 losers — mostly profit-monster-trail scratches (<$0.05) + 3 hard_max_loss (SYRUP -$0.23 EXTREME, SAND -$0.13 EXTREME, HYPE -$0.11 NORMAL)",
+    "non_squeeze_loser": "HYPER pump-chain- SHORT -$0.13 hard_max_loss NORMAL — only SHORT trade 24h, regime filters let NORMAL SHORT through (correct — EXTREME/HIGH blocked)",
+    "root_cause": "NO systematic entry-quality failure. bb-squeeze+ is high-frequency (24T/24h) with normal variance. RSI at entry: winners avg 69.5, losers avg 65.4 — no oversold/overbought pattern. Hard_max_loss hits are normal ATR-SL noise, not bad entries.",
+    "recommended_change": "NONE — insufficient signal-specific pattern. Monitor bb-squeeze+ EXTREME bucket (12T 41.7%WR -$0.35/14d) at 20T threshold.",
+    "confidence": "HIGH — no action justified by data"
   },
   "drift_findings": [
     {
       "id": "DRIFT-002",
-      "status": "OPEN day4",
-      "finding": "signal_rsi_14 column 100% NULL (340/334+ trades) — metadata has values, column empty since Sep 28",
-      "impact": "Column-based RSI queries fail; use _signal_metadata->>'rsi_14'",
-      "owner": "bug_hunter",
-      "action": "escalate"
+      "status": "OPEN day 5",
+      "finding": "signal_rsi_14 STILL 100% NULL — 42/42 trades last 24h. Detection-time RSI filtering impossible on stored trades.",
+      "impact": "Cannot verify RSI filters from trade records; must rely on runtime logs (SKIP_HARD, RSI blocks).",
+      "owner": "bug_hunter (delegated)"
+    },
+    {
+      "id": "DRIFT-005",
+      "status": "CARRIED — VERIFIED REAL",
+      "finding": "volume-breakout-long+ EXTREME = 11T 81.8%WR +$3.35/14d via volatility_regime column. 7d EXTREME trades ALL positive: IMX +$0.82, COMP +$0.94, JUP +$0.12, JUP +$0.08.",
+      "impact": "Strongest signal-regime edge in system. 11T < 20T conf-boost threshold — CANNOT boost yet. CEO rejected earlier on wrong column (entry_regime_4h=NULL); volatility_regime is the correct column.",
+      "action": "Re-propose conf boost at 20T EXTREME trades"
+    },
+    {
+      "id": "DRIFT-007",
+      "status": "OPEN — monitor",
+      "finding": "RR_ENGINE_SHADOW=True — regime RR mins (FLAT 2.5, NORMAL 2.0, HIGH 1.3, EXTREME 2.0) log-only, never block. CONF R:R<0.70 only enforced. SAGA exited via rr_engine_support_br -$0.10 — support-break exit fires correctly; min-ratio gate does not.",
+      "action": "Backtest FORCE mode before flipping. Do not flip without backtest."
     },
     {
       "id": "DRIFT-004",
       "status": "DOWNGRADED",
-      "finding": "ENTRY_RR_MIN_RATIO=2.0 in entry_gates.py is DEAD CODE — live path is risk_reward_engine regime mins",
-      "impact": "none on live trades",
-      "owner": "brain_auditor",
-      "action": "backtest RR_ENGINE_SHADOW→FORCE instead"
-    },
-    {
-      "id": "DRIFT-005",
-      "status": "CARRIED — CEO re-eval needed",
-      "finding": "volume-breakout EXTREME boost rejected on wrong column (entry_regime_4h=NULL). Correct column volatility_regime shows EXTREME LONG 12T 75%WR +$2.53/14d",
-      "impact": "missed conf boost on best signal",
-      "owner": "CEO/T",
-      "action": "re-propose at 20T EXTREME sample; 2 live EXTREME opens now"
-    },
-    {
-      "id": "DRIFT-007",
-      "status": "NEW",
-      "finding": "RR_ENGINE_SHADOW=True — regime RR mins (FLAT 2.5/NORMAL 2.0/HIGH 1.3/EXTREME 2.0) log-only, never block. Only RR_ENGINE_CONF_HARD_BLOCK_RR=0.70 is enforced",
-      "impact": "RR engine largely decorative; potential missed blocks on bad-R:R setups",
-      "owner": "brain_auditor",
-      "action": "backtest FORCE=True before any config change"
+      "finding": "ENTRY_RR_MIN_RATIO=2.0 in entry_gates.py is DEAD CODE — live path is risk_reward_engine regime mins (RR_ENGINE_MIN_RATIO_*).",
+      "action": "cleanup in backlog, not trading-path"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "SIGNAL STARVATION (NEUTRAL)",
-      "frequency": "5+ sessions",
-      "status": "OPEN — #1 diversity gap",
-      "detail": "Hotset empty in NEUTRAL; volume-dry-up/EMA-reclaim signal unbuilt; delegated signal_analyst, deadline Oct 3 12:00 UTC",
-      "resolution_path": "T decision: re-enable neutral_sniper vs build-new"
+      "topic": "SIGNAL DIVERSITY / NEUTRAL starvation",
+      "frequency": "10+ sessions",
+      "status": "UNRESOLVED — #1 gap",
+      "detail": "NEUTRAL volume-dry-up/EMA-reclaim signal still unbuilt. Delegated signal_analyst 3rd time (Sep 30 + Oct 1 x2). Spec: automation/ceo/spec_neutral_signal_ema_reclaim.md. Deadline Oct 3 12:00 UTC.",
+      "mitigation_in_place": "bollinger_squeeze re-enabled (LONG only), mtf-regime-trend+ first live test today, bb-squeeze+ active. Diversity improving but NEUTRAL-specific signal still missing."
     },
     {
-      "topic": "SHORT structural R:R disadvantage",
-      "frequency": "8+ sessions",
-      "status": "MONITOR",
-      "detail": "SHORT avg_win < avg_loss; 7d SHORT -$1.16 vs LONG +$1.31. SHORT signals killed or EXTREME-blocked; remaining edge is pump-chain- NORMAL only",
-      "resolution_path": "fix exits/entries before re-enabling SHORT signals (bb-squeeze- stays OFF)"
+      "topic": "SHORT R:R structural disadvantage",
+      "frequency": "every audit for 2+ weeks",
+      "status": "MITIGATED via filters, not fixed",
+      "detail": "SHORT 7d -$1.32/48T 45.8%WR. SHORT-CONTINUUM + HARD_FLOOR=25 + RSI_MIN=40 collapsing SHORT count (2/24h). Correct long-term approach: block bad SHORT entries, keep good ones. Don't add more blocks — let filters work."
     },
     {
-      "topic": "volume-breakout conf boost",
-      "frequency": "4+ sessions",
-      "status": "CARRIED — awaiting correct-column re-eval",
-      "detail": "Best 14d signal (18T 77.8%WR +$2.88). EXTREME subset 12T < 20T regime threshold. 2 live EXTREME opens will add data",
-      "resolution_path": "CEO re-eval at 20T EXTREME; +10-15pt boost, 0 winners blocked"
+      "topic": "ORPHAN_PAPER amount_usdt=0.00",
+      "frequency": "recurring data hygiene",
+      "status": "OPEN",
+      "detail": "BTC continuum_engine LONG amount_usdt=0.00 opened Oct 1 17:45, still open >19h. Not trading-path but pollutes open-position counts and dashboard.",
+      "action": "data hygiene cleanup — close or mark ORPHAN"
+    },
+    {
+      "topic": "AGENTS.md HL API key reminder STALE",
+      "frequency": "flagged Oct 1 CURRENT.md",
+      "status": "OPEN — T verify",
+      "detail": "Reminder says 'expires in 3 days' dated 2027-03-12; key set 2026-09-16 valid 180d → ~2027-03-15. On 2026-10-02 ≈164 days left. Reminder text is wrong/stale.",
+      "action": "T: verify and correct AGENTS.md reminder"
     }
   ],
   "missing_implementations": [
     {
-      "idea": "RR_ENGINE_SHADOW → FORCE backtest",
-      "detail": "Engine computes regime RR mins but shadow mode never blocks. Backtest: would FORCE=True with current mins have improved 7d PnL without killing winners?",
-      "status": "proposed — backtest first",
-      "blocked_by": "need historical RR engine output or replay"
+      "idea": "NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
+      "status": "delegated signal_analyst, deadline Oct 3 12:00 UTC",
+      "priority": "P1 — #1 diversity gap"
     },
     {
-      "idea": "NEUTRAL volume-dry-up / EMA-reclaim signal",
-      "detail": "#1 diversity gap. Spec at automation/ceo/spec_neutral_signal_ema_reclaim.md. Delegated 5+ days",
-      "status": "delegated signal_analyst",
-      "deadline": "2026-10-03 12:00 UTC"
+      "idea": "Multi-source confidence compound in signal_compactor",
+      "status": "suggested today — ME trade bb-bounce-v2+volume-breakout +$0.36 shows agreement = quality",
+      "priority": "P3 — creative improvement"
     },
     {
-      "idea": "SHORT MFE realization gap (PM_TRAIL activate 0.40% locks scratch on 2-6% dumps)",
-      "detail": "pump-chain- hard_sl winners capture ~40% MFE. PM_TRAIL protected — needs signal-level trail override backtest, not global change",
-      "status": "backtest queued",
-      "note": "pump-chain- SHORT now EXTREME-blocked; only NORMAL remains (85.7%WR). Lower priority while EXTREME block ages in."
+      "idea": "RR_ENGINE_SHADOW → FORCE",
+      "status": "blocked on backtest — DRIFT-007",
+      "priority": "P2 — validate then flip"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-02T00:34:18Z",
-      "idea": "Backtest RR_ENGINE_SHADOW→FORCE with current regime mins",
-      "rationale": "RR engine is live but shadow-only for regime thresholds. CONF path blocks R:R<0.70, but FLAT/NORMAL/HIGH/EXTREME mins never enforce. If FORCE would have blocked 7d losers without killing winners, enabling it is free edge. Engine already built — we're leaving it on the table.",
-      "expected_impact": "unknown until backtest; potentially +$0.30-0.80/7d if bad-R:R setups are being taken",
-      "category": "exit/entry quality",
-      "status": "suggested — backtest first",
-      "risk": "low (backtest before change)"
-    },
-    {
-      "date": "2026-10-02T00:34:18Z",
-      "idea": "Volume-breakout EXTREME conf boost +10-15pt — RE-PROPOSE with correct column",
-      "rationale": "CEO rejected on entry_regime_4h=NULL (dead column). volatility_regime shows EXTREME LONG 12T 75%WR +$2.53/14d. RSI 70-79 = 4T 100%WR. Sample 12T < 20T regime threshold — monitor 2 live EXTREME opens (JUP, IMX), re-eval at 20T.",
-      "expected_impact": "+3-5% WR for volume-breakout in EXTREME; 0 winners blocked (boost only raises confidence)",
+      "date": "2026-10-02T13:34:44Z",
+      "idea": "volume-breakout-long+ EXTREME confidence boost — CARRIED at 11T 81.8%WR +$3.35/14d",
+      "rationale": "Strongest signal-regime edge in system. CEO rejected on wrong column (entry_regime_4h=NULL); volatility_regime is correct (DRIFT-005 verified). 7d EXTREME trades all positive. Below 20T threshold — CANNOT boost yet.",
+      "expected_impact": "+$0.30-0.50/7d when enabled at 20T",
       "category": "entry sniper",
-      "status": "carried — CEO re-eval at 20T EXTREME",
+      "status": "carried — re-propose at 20T EXTREME trades",
       "risk": "low"
     },
     {
-      "date": "2026-10-02T00:34:18Z",
-      "idea": "bb-squeeze+ EXTREME diversity play — monitor SAGA/SAND outcome",
-      "rationale": "bollinger_squeeze re-enabled today (CEO, LONG only). First 2 live signals just opened in EXTREME. Research: 74.1%WR 436T. If they win, we have 2 independent EXTREME LONG edges (vol-breakout + bb-squeeze) — diversity improving where it matters.",
-      "expected_impact": "if 2/2 win: EXTREME LONG book strengthens; signal diversity improves",
-      "category": "signal diversity",
-      "status": "monitor 48h",
-      "risk": "none (no change)"
+      "date": "2026-10-02T13:34:44Z",
+      "idea": "Multi-source confidence compound — bonus when 2+ historically profitable signals agree on same coin+direction",
+      "rationale": "ME trade signal='bb-bounce-v2-long+,volume-breakout-long+' +$0.36 trail_sl NORMAL. Signals currently concatenate in signal field with no confidence bonus for agreement. doji-bottom (66.7%WR) + volume-breakout (75%WR) agreeing should compound confidence, not just co-fire.",
+      "expected_impact": "fewer marginal entries, higher WR on multi-source trades",
+      "category": "confidence scoring",
+      "status": "suggested",
+      "risk": "low — additive bonus, no new blocks"
     },
     {
-      "date": "2026-10-02T00:34:18Z",
-      "idea": "Doji-bottom-long HIGH specialist — monitor SUSHI, conf boost at 20T",
-      "rationale": "14d: HIGH 7T 85.7%WR +$0.67 vs NORMAL 5T 40% $0.00. SUSHI open is HIGH — matches specialist pattern. Overall 12T < 20T threshold. If HIGH pattern holds to 20T, consider HIGH-only confidence boost.",
-      "expected_impact": "+5-8% WR for doji-bottom in HIGH if pattern holds",
-      "category": "entry sniper",
-      "status": "monitor — below 20T",
-      "risk": "low"
+      "date": "2026-10-02T13:34:44Z",
+      "idea": "bb-squeeze+ EXTREME regime watch — 12T 41.7%WR -$0.35/14d vs HIGH 10T 70%WR +$0.41/14d",
+      "rationale": "Signal re-enabled Oct 1 (LONG only). EXTREME bucket losing while HIGH winning. Both buckets <20T — insufficient for config change. If EXTREME hits 20T still <50%WR: add bb-squeeze+ to EXTREME regime block (keep HIGH edge).",
+      "expected_impact": "if blocked at 20T: preserve HIGH +$0.41, cut EXTREME -$0.35",
+      "category": "regime routing",
+      "status": "monitor — 20T threshold",
+      "risk": "low — conservative default"
+    },
+    {
+      "date": "2026-10-02T13:34:44Z",
+      "idea": "Winner DNA template: volume breakout + momentum + not-exhausted RSI = every-trade-winner",
+      "rationale": "IMX hard_tp +3.7% EXTREME, COMP HARD_SL_FAILED +42% EXTREME, JUP atr_trail_hit +5.2% EXTREME. volume-breakout-long+ catches exactly what the philosophy demands: every pump = LONG opportunity. NEUTRAL signal spec (due Oct 3) should study this DNA — volume confirmation + momentum + regime alignment is the recipe.",
+      "expected_impact": "NEUTRAL signal built on proven DNA = higher baseline WR",
+      "category": "signal design",
+      "status": "input to signal_analyst NEUTRAL spec",
+      "risk": "none — advisory"
     }
   ],
+  "config_changes_applied": [],
   "next_actions": [
-    "MONITOR: 4 EXTREME LONG opens (SAGA/SAND bb-squeeze, JUP/IMX vol-breakout) — first live test of re-enabled squeeze + best signal",
-    "MONITOR: SUSHI doji-bottom LONG HIGH regime — specialist pattern check",
-    "CEO/T: re-evaluate volume-breakout EXTREME conf boost when EXTREME sample hits 20T (correct column: volatility_regime)",
-    "DELEGATE backtest: RR_ENGINE_FORCE=True with current regime mins — would it have improved 7d without killing winners?",
-    "bug_hunter: DRIFT-002 signal_rsi_14 column NULL day4 — escalate",
-    "signal_analyst: NEUTRAL ema-reclaim/volume-dry-up signal — deadline Oct 3 12:00 UTC",
-    "MONITOR: pump-chain- NORMAL recovery 48h (EXTREME block live, NORMAL edge 85.7%WR preserved)",
-    "MONITOR: bb-bounce-v3-long+ at 3T kill threshold",
-    "NO CONFIG CHANGES — monitor windows active (SHORT-CONTINUUM, HARD_FLOOR, RSI_MIN=40, EXTREME block, V5/accel aging, bollinger_squeeze 48h, bb-bounce 1m)"
+    "MONITOR: mtf-regime-trend+ first live test — 3 simultaneous LONGs (SOL/AIXBT/BLUR). If 3/3 lose → kill. If wins → study DNA.",
+    "MONITOR: bollinger_squeeze first signals 48h (re-enabled Oct 1 21:55)",
+    "MONITOR: bb-squeeze+ EXTREME bucket toward 20T threshold",
+    "MONITOR: volume-breakout EXTREME trades toward 20T for conf boost re-propose",
+    "MONITOR: SHORT-CONTINUUM correctness — BTC score trend, legitimate STRONG_NEG SHORTs",
+    "MONITOR: SHORT_RSI_HARD_FLOOR=25 SKIP_HARD logs",
+    "MONITOR: doji-bottom-long toward 20T conf-boost threshold",
+    "MONITOR: NEUTRAL ema-reclaim signal — signal_analyst deadline Oct 3 12:00 UTC",
+    "ESCALATE: DRIFT-002 signal_rsi_14 100% NULL day 5 — bug_hunter",
+    "ESCALATE: ORPHAN_PAPER BTC amount_usdt=0.00 — data hygiene cleanup",
+    "T ACTION: AGENTS.md HL API key reminder stale — correct dates",
+    "CEO: disk 87% prune call still pending"
   ]
 }
