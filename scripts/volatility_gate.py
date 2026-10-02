@@ -53,7 +53,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in range-bound
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
-        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners, works in all regimes
+        'bb-bounce-v2-long', 'bb-v2-short',  # V2 bounce — SHORT added 2026-10-02: asymmetry fix (LONG was whitelisted, SHORT was not)
         'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
@@ -72,7 +72,7 @@ REGIME_SIGNALS = {
         # Trend following + mean reversion in steady markets
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
-        'bb-bounce-v2-long',  # V2 LONG bounce — calibrated from SHORT winners
+        'bb-bounce-v2-long', 'bb-v2-short',  # V2 bounce — SHORT added 2026-10-02: asymmetry fix (LONG was whitelisted, SHORT was not)
         'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
@@ -109,11 +109,11 @@ REGIME_SIGNALS = {
         'sma20-dip+',  # SMA20 pullback — works in any uptrend
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
-        'volume-breakout-long+',  # volume-confirmed breakout LONG — works in normal vol
+        'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — SHORT added 2026-10-02: asymmetry fix
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
-        'bb-squeeze+',  # bollinger squeeze breakout — works in normal vol
-        'mtf-regime-trend+',  # multi-timeframe regime trend — works in normal vol
+        'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — SHORT added 2026-10-02: asymmetry fix
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — SHORT added 2026-10-02: asymmetry fix
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
         'doji-bottom-long', 'doji-top-short',  # doji exhaustion — SHORT added 2026-10-02: asymmetry fix (doji-top-short was only in FLAT)
