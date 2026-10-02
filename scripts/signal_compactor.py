@@ -2563,8 +2563,37 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 f"linreg={_cont_row_data.get('linreg_direction')} ema300={_cont_row_data.get('ema300_position')}, "
                                 f"allowing despite velocity={_velocity:.3f}")
                         elif direction.upper() == 'LONG' and _cont_bearish:
-                            _btc_mom_ok_for_bypass = False
-                            log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")
+                            # FIX 2026-10-02: Check coin's own momentum before blocking LONG
+                            # If coin is rising (velocity > 0.5% + above SMA), allow even if BTC bearish
+                            _coin_rising = False
+                            try:
+                                import sqlite3 as _mom_sqlite2
+                                from paths import HERMES_DATA as _MOM_DATA2
+                                _mom_conn2 = _mom_sqlite2.connect(f'{_MOM_DATA2}/candles.db', timeout=3)
+                                try:
+                                    _candles2 = _mom_conn2.execute(
+                                        "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
+                                        (token,)
+                                    ).fetchall()
+                                finally:
+                                    _mom_conn2.close()
+                                
+                                if len(_candles2) >= 10:
+                                    _closes2 = [r[0] for r in reversed(_candles2)]
+                                    _vel2 = (_closes2[-1] - _closes2[-6]) / _closes2[-6] * 100 if _closes2[-6] > 0 else 0
+                                    _sma2 = sum(_closes2[-20:]) / len(_closes2[-20:])
+                                    _above_sma2 = _closes2[-1] > _sma2
+                                    if _vel2 > 0.5 and _above_sma2:
+                                        _coin_rising = True
+                            except Exception:
+                                pass
+                            
+                            if _coin_rising:
+                                _btc_mom_ok_for_bypass = True
+                                log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising, allowing")
+                            else:
+                                _btc_mom_ok_for_bypass = False
+                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")
                         elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
                         elif direction.upper() == 'SHORT' and _cont_bullish:
