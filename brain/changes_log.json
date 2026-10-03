@@ -715,5 +715,16 @@
     "after": "False (test expired, 9T 33.3%WR -$0.37, velocity SLOW habitat)",
     "rationale": "Post-reenable 7T 2W5L -$0.41 all hard_max_loss/hard_sl. Watchdog: would NOT open fresh. OPEN_SKIES precedent. SHORT flag untouched. GMT open trade unaffected.",
     "impact": "Stop pump-chain-v5 LONG entries. Expected halt ~$0.05/trade bleed at current rate."
+  },
+  {
+    "timestamp": "2026-10-03T11:34:19Z",
+    "agent": "brain_auditor",
+    "change": "ACE re-added to LONG_BLACKLIST — 7d 3T 0W -$0.55, 14d 3W/8T 37.5% -$0.78 across 5 signals. Watchdog URGENT confirmed. 0 recent winners blocked.",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "ACE not in LONG_BLACKLIST (removed 2026-08-24)",
+    "after": "'ACE' in LONG_BLACKLIST",
+    "rationale": "Coin-level bleed across bb-squeeze+ and pump-chain+ — root cause is the coin, not signal logic. Aug 24 removal was premature.",
+    "impact": "Blocks future ACE LONG entries; expected +$0.20-0.55/7d saved"
   }
 ]

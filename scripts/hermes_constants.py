@@ -170,6 +170,8 @@ LONG_BLACKLIST = {
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','MEW','PROVE',
     # TST, KAS removed 2026-08-07 — no specific block reason
     # ACE removed from LONG_BLACKLIST 2026-08-24 — re-enabled for longs
+    # ACE re-blacklisted 2026-10-03 — 7d 3T 0W -$0.55 (bb-squeeze+ x2, pump-chain+), 14d 3W/8T 37.5% -$0.78 across 5 signals. Watchdog URGENT: coin-level bleed, not signal logic. Aug 24 removal was premature.
+    'ACE',
     # TRUMP added 2026-08-08 — political meme coin, high volatility
     # PROVE re-blacklisted 2026-08-10 — 25% WR, -0.25% avg PnL, -$0.22 total
     'BOME', 'USTC', 'RSR',

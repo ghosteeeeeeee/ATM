@@ -2138,5 +2138,32 @@
     "status": "suggested",
     "risk": "low",
     "sample_note": "14d pump-chain+ LONG n=51 with metadata; EXTREME n=36 supports routing. Requires independent backtest (own-conclusions) before live."
+  },
+  {
+    "date": "2026-10-03T11:34:19Z",
+    "idea": "Coin Toxicity Score as standing brain_auditor query — flag tokens with n>=3 trades, WR<=33%, net PnL<=-$0.30, across 2+ signals in 7d as blacklist candidates",
+    "rationale": "This run's watchdog URGENT on ACE was correct and DB-verified, but the detection was ad-hoc. Systematizing the query catches ACE/CHIP/GOAT-class bleeds same-run instead of waiting for watchdog narrative.",
+    "expected_impact": "Earlier coin-level kills; estimated +$0.10-0.30/7d from blocking multi-signal toxic coins before they bleed",
+    "category": "coin hygiene",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T11:34:19Z",
+    "idea": "When volume_regime flips NORMAL/HIGH, lean into volume-breakout-long+ (30d 26T 73.1%WR +$3.81) over bb-bounce-v2 (47.6%WR) — confidence multiplier or hotset priority, NOT a blanket change",
+    "rationale": "Watchdog deep analysis + 30d DB both show vol-breakout is the best signal in the current regime. Currently only a conf boost 1.15→1.25 is queued (post-bollinger window). A volume-regime-conditional priority is the next lever.",
+    "expected_impact": "+2-4% WR on LONG book when volume expands; 0 impact in LOW volume (signal self-selects)",
+    "category": "entry sniper",
+    "status": "suggested — defer until conf boost eval + volume_regime data n>=20",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T11:34:19Z",
+    "idea": "Watchlist: CHIP + GOAT for next-run blacklist eval (CHIP 3T 0W -$0.35 2 sigs, GOAT 4T 1W -$0.27 4 sigs)",
+    "rationale": "Same coin-toxicity pattern as ACE. Below ACE severity but above noise. One-variable-at-a-time: ACE first, monitor 48h, then evaluate CHIP.",
+    "expected_impact": "+$0.20-0.40/7d if both confirmed toxic",
+    "category": "coin hygiene",
+    "status": "watchlist",
+    "risk": "low"
   }
 ]
