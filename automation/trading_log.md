@@ -2374,3 +2374,27 @@ Final set: ['ADA']
 - pump-chain-v5 re-opened (GMT LONG) after 1T 0%WR earlier — single trade, not killable; watch.
 - Disk 88% WARN (health_monitor 22:49, WAL checkpointed ~78MB; candles.db WAL 3.2GB locked by collector) — CEO retention/vacuum call, not auto-1hr.
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+## [2026-10-03 00:25 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no closes)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Drought continues (not a stall):** pipeline active (cycle #17727 at 00:11), 3 open trades (ME/ENS/GMT pump-chain LONGs from 23:05–23:10). 0 closes this hour. Signal detection working — 15 PENDING signals waiting top-10, but filters (HALL-SHAME, RR-ENGINE hard block, SHORT-NEUTRAL, BB-DEAD-ZONE, LONG-RSI-CEILING) blocking execution.
+- **Kill rule:** 0 closes → no 0%-WR signal with 3+ trades this hour. Single-trade 0%WR signals (pump-chain-, pump-chain-v5, continuum-osc+, continuum+) still below threshold. **pump-chain-v5 killed by brain_auditor at 23:36 UTC (48h test failed: 9T 33.3%WR -$0.37)** — respected, not reverted.
+- **atr_sl_hit >40%:** 24h = 0/53 (0%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 18:00 -0.51, 19:00 0T, 20:00 +0.08, 21:00 0T, 22:00 0T, 23:00 0T — not 3 consecutive negative.
+- **Overtrading:** 0T/hr « 20.
+- **24h snapshot:** 53T 32W 60.4%WR +$0.73. profit-monster-trail 35T +$1.64 dominant; bb-squeeze+ 26T 57.7%WR -$0.06 near breakeven (EXTREME monitor active); mtf-regime-trend+ killed (9T -$0.46 residual); hard_max_loss family 8T 0 wins; hard_sl 3T -$0.58.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified from brain_auditor 23:36 change — v5 test expired, respecting kill.
+
+**Open Questions:**
+- 3 open pump-chain LONGs (ME/ENS/GMT) from 23:05–23:10 — will they close this hour? Monitor next cycle.
+- NEUTRAL regime continues blocking ALL shorts — if 24h+ persists, position size/long-only posture is a CEO/regime question, not auto-1hr.
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.

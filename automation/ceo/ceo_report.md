@@ -1,23 +1,23 @@
-## CEO Report — 2026-10-02 21:55 UTC
+## CEO Report — 2026-10-03 02:00 UTC
 
 ### Diagnosis
-Verified PG brain directly: **24h 53T 60.4%WR +$0.73 | 7d 166T 50.6%WR +$0.80** (faded from +$2.22 at 14:00). LONG 7d +$2.12/118T 52.5%. SHORT 7d **-$1.32/48T 45.8%** — avg_win $0.104 vs avg_loss $0.139 (structural R:R, needs >57% WR to break even). Volatility regimes 7d: EXTREME +$0.78, FLAT +$0.27, HIGH -$0.07, **NORMAL -$0.26**. 0 open trades. Hotset empty — confluence gate blocking single-type MON SHORT (hmacd_mtf--) in SHORT_BIAS market. **volume-breakout-long+ EXTREME 30d 16T 81.3%WR +$3.72** is the clear best signal (conf-boost threshold 20T — 4T remaining).
+PG-verified: **24h 50T 62.0%WR +$0.30 | 7d 168T 51.2%WR +$1.16**. LONG 7d +$2.48/120T. SHORT 7d **-$1.32/48T 45.8%** — **0 SHORT closed since Fix1/Fix2** (Oct 2 15:30). 122 SHORT pump-chain signals/6h all EXPIRED — confluence gate + flat NEUTRAL, not detector failure. grind_accumulator ERROR every ~60s (`GRIND_ACCUM_VOL_WINDOW` NameError). Disk **89%** (threshold 88%). Best: volume-breakout-long+ EXTREME **14T 78.6%WR +$3.47/30d** (boost waits 20T). doji-bottom HIGH 9T 88.9% +$0.79. Pipeline healthy (rc=0).
 
 ### Root Cause
-1. **Config drift:** working tree had `SHORT_CONTINUUM_SCORE_MAX` raised 30→40 without kanban/report entry, while SHORT_CONTINUUM monitor window is active at 30. Stacking prevented measurement.
-2. **SHORT bleed is exit-quality, not entry-starvation:** post-Oct1 pump-chain- SHORT 8T 25%WR -$0.59 despite bear-override (RSI_MIN bypass) being live — losses exit via hard_max_loss/hard_sl, not bad entries. avg_loss 33% bigger than avg_win.
-3. **Hotset emptiness is gates working:** 45 signal types run, MON SHORT passes NEUTRAL-bypass but fails confluence (1 source type, not in STANDALONE_BYPASS). Not a pipeline failure.
-4. **PnL fade:** +$2.22→+$0.99→+$0.80/7d — mtf-regime-trend+ (killed 15:11) + pump-chain-v5 + accel-300- legacy losses aging out; new winners thin.
+1. **grind_accumulator** used `GRIND_ACCUM_VOL_WINDOW`/`GRIND_ACCUM_VOL_AVG_WINDOW` without importing them — constants existed in hermes_constants.py:1171-1172, import block omitted them. Signal never ran.
+2. **Disk growth:** mtf_macd_tuner backtest data (5M results rows) + hl_copy fills (1M) + unrotated logs. coin_tracker/candles are the bulk but untouchable during trading.
+3. **SHORT drought is gates working:** market flat NEUTRAL, SHORTs fail confluence (single-type) or SHORT_CONTINUUM_SCORE_MAX=30. Do not loosen without post-Fix2 data.
 
 ### Fix Applied
-- **REVERTED `SHORT_CONTINUUM_SCORE_MAX` 40→30** in `scripts/hermes_constants.py` (undo undocumented drift; monitor window intact). Compactor is timer-driven one-shot — restart cycle loaded SCORE_MAX=30 (verified import + log cycle=17614).
-- **0 protected flags touched** (CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, CEO_PROTECTED_FLAGS).
-- **Regime memory updated** snapshot 2026-10-02 21:55 (wr=50.6, 7d=+$0.80).
-- **DELEGATE signal_analyst:** SHORT exit quality — hard_sl/hard_max_loss dominant; profit-monster-trail works on LONG (35T 77%WR) but not SHORT. Fix R:R after gates unblocked.
-- **DELEGATE signal_analyst:** volume-breakout EXTREME conf-boost when 20T reached (currently 16T 81.3%WR +$3.72 — do NOT boost yet).
+- **CODE:** added `GRIND_ACCUM_VOL_WINDOW` + `GRIND_ACCUM_VOL_AVG_WINDOW` to grind_accumulator.py imports. Pipeline restarted 01:53 — `Signal grind_accumulator: 0` verified.
+- **DISK 89%→85%:** mtf_macd_tuner >7d prune + vacuum (token_best_config KEPT); hl_copy fills >30d + vacuum; 4 logs rotated+compressed; journal vacuum.
+- **0 trading config changes** — monitor windows active. V5 LONG already disabled by brain_auditor.
+- **Regime memory** snapshot 2026-10-03 wr=51.2 7d=+$1.16.
+- **DELEGATE signal_analyst:** SHORT exit quality; vol-breakout EXTREME conf-boost at 20T.
+- **DELEGATE bug_hunter:** DRIFT-002 exec-time RSI timeframe.
 
 ### Verification
-- SCORE_MAX=30 confirmed in process import + post-restart compactor log.
-- Protected flags unchanged (grep verified).
-- No new trades expected until confluence forms (flat NEUTRAL/SHORT_BIAS market).
-- **Monitor 24h:** SHORT trade count post-Fix1/Fix2, pump-chain- bear-override WR at 15 trades, volume-breakout to 20T, disk 87%→88% prune threshold, hotset fill rate.
+- grind_accumulator: post-restart log shows `Signal grind_accumulator: 0` (was ERROR ×30+/hr).
+- Disk: `df` 85% (was 89%). mtf 497M, hl_copy 152M. coin_tracker/candles untouched.
+- Protected flags unchanged. 0 open trades — confluence starvation, expected in flat market.
+- **Monitor 24h:** SHORT count post-Fix2, vol-breakout to 20T, doji to 20T, grind first signals, disk, mover+ R:R (30d 57.1%WR but -$0.85).
