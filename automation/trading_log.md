@@ -2772,3 +2772,31 @@ BY: auto_1hr
 - bb-squeeze+ now 5T 2W3L across 24h windows (+$0.13 pure + -$0.11 composite) — 2 fresh opens this hour; watch, don't retune.
 
 BY: auto_1hr
+
+## [2026-10-03 15:12] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.09 (WR: 100%) | 24h: +$0.49 / 34T / ~47%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** ARB + XPL bb-squeeze+ both exited profit-monster-trail, both winners. No losers this hour to compare adverse excursion.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant losses are hard_max_loss family (~10T, ~-$1.65) — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades this hour (2T, both wins). 24h 3+T signals ALL net positive: bb-bounce-v3-long+ 3T 100%WR +$0.12, pump-chain- 5T 60%WR +$0.18, bb-squeeze+ 6T 67%WR +$0.22, pump-chain+ 6T 50%WR +$0.90. No kill needed.
+- **Negative PnL streak:** 12:00 $0.00, 13:00 -$0.11, 14:00 +$0.30, 15:00 +$0.09. NOT 3 consecutive negative.
+- **Overtrading:** 2T this hour. 24h 34T — fine.
+- **Open positions (2):** NEAR bb-squeeze+ 14:53, GMT pump-chain+ 13:25 — both unrealized $0.00.
+- **Monitor windows untouched:** pump-chain- RSI_MIN, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+
+**Sideways:**
+- 24h PnL recovered from +$0.06 (14:00 report) to +$0.49 — earlier wins aged in and ARB/XPL winners added.
+- pnl_pct data-path nonsense persists (XPL +337% on $0.08) — known bug class, not signal logic.
+- 24h WR ~47% with positive PnL — trailing exits carrying edge.
+
+**Open Questions:**
+- hard_max_loss family (~10T -$1.65) is the main 24h loss concentration — not atr_sl_hit. If this grows, review stop placement vs signal structure, not tpsl_utils.
+- XPL +337% pnl_pct on $0.08 move — data-path bug class continues; brain_auditor/data-path pass still pending.
+
+BY: auto_1hr
