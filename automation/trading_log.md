@@ -2827,3 +2827,29 @@ BY: auto_1hr
 - 24h net +$0.90 recovered nicely from +$0.49 at 15:12 — trailing exits still carrying the edge.
 
 BY: auto_1hr
+
+## [2026-10-03 17:11] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $+0.13 (WR: 100%) | 24h ~28T +$0.90+ / ~57%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** 3/3 winners. DYDX pump-chain+ atr_trail_hit +$0.02; MON bb-squeeze+ profit-monster-trail +$0.02; SYRUP bb-squeeze+ profit-monster-trail +$0.09. No losers to compare MAE.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant 24h exit is profit-monster-trail 9T +$0.73; main loss concentration remains hard_max_loss family (9T, ~-$1.61) — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades in last hour (bb-squeeze+ 2T 100%, pump-chain+ 1T 100%). All active signals flat-or-positive. No kill needed.
+- **Negative PnL streak:** 13:00 +$0.30, 15:00 -$0.11, 16:00 +$0.09, 17:00 +$0.04. NOT 3 consecutive negative hours.
+- **Overtrading:** 3T this hour, 24h ~28T — fine.
+- **Monitor windows untouched:** pump-chain- RSI_MIN, SHORT-CONTINUUM, HARD_FLOOR, EXTREME blocks, vol-breakout 20T, doji 20T, V5 disabled. Do not stack.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (MON +973%, SYRUP +122%, DYDX +53% on tiny $ moves) — known bug class, not signal logic; brain_auditor/data-path pass still pending.
+- hard_max_loss family (~9T -$1.61) remains sole 24h loss concentration — if it grows, review stop placement vs signal structure, not tpsl_utils.
+- NEAR double-size ($22.10 vs $11.10) flag from 16:12 still open for sizing-path audit when not mid-monitor-window.
+
+**Open Questions:**
+- hard_max_loss exits on ~-1% levels vs pnl_pct showing -50%+ — semantics confirmed previously as lev/decimal scaling bug owned by bug_hunter.
+
+BY: auto_1hr
