@@ -2128,5 +2128,15 @@
     "status": "suggested — verify coverage, then decide if code gap exists",
     "risk": "low",
     "sample_size": "N/A (infra check)"
+  },
+  {
+    "date": "2026-10-03T08:38:26Z",
+    "idea": "pump-chain+ Winner-DNA confidence routing: boost +10pt when z_score>=1.5 AND rsi_14 in [55,70] AND gap_at_entry<=1.2; cut -15pt when z_score<0.5 OR rsi_14<40 OR gap_at_entry>1.5",
+    "rationale": "14d metadata DNA: winners cluster z>1.5 / RSI 55-67 / gap -0.5..+1.1; hard_max_loss losers cluster gap>1.5 (chase) or RSI<35 (knife) or z~0 (dead money). Routing amplifies proven edge, shrinks bad entries — entry quality, not clock.",
+    "expected_impact": "Research target: +$0.20-0.40/7d if DNA holds; must backtest before any param change",
+    "category": "entry sniper / confidence routing",
+    "status": "suggested",
+    "risk": "low",
+    "sample_note": "14d pump-chain+ LONG n=51 with metadata; EXTREME n=36 supports routing. Requires independent backtest (own-conclusions) before live."
   }
 ]

@@ -1,244 +1,212 @@
 {
-  "timestamp": "2026-10-03T06:37:00Z",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "Exit system flagged as #1 profit leak in older sessions (pre-ATR_SL-fix)",
-      "trend-following signal + sma20_dip + neutral regime signals discussed but not all built",
-      "signal decay / guitar-tuning concept: preserve high-WR signals as regime shifts",
-      "NEUTRAL diversity gap recurring: volume-dry-up / EMA-reclaim still unbuilt"
-    ]
-  },
+  "timestamp": "2026-10-03T08:38:26Z",
+  "agent": "brain_auditor",
+  "session_lock": false,
+  "config_changes_applied": [],
   "trade_summary_24h": {
-    "trades": 45,
-    "win_rate": 62.2,
-    "pnl_usdt": 0.31,
-    "long_7d": {
-      "trades": 125,
-      "wr": 52.8,
-      "pnl": 3.24
-    },
-    "short_7d": {
-      "trades": 51,
-      "wr": 47.1,
-      "pnl": -1.48
-    },
-    "overall_7d": {
-      "trades": 176,
-      "wr": 51.1,
-      "pnl": 1.76
-    },
-    "open_trades": 3,
-    "regime_24h_note": "EXTREME 83T 54.2%WR +$1.75/7d now positive; NORMAL 42T 47.6%WR -$0.26 worst"
+    "trades": 39,
+    "win_rate_pct": 59.0,
+    "pnl_usdt": 0.17,
+    "note": "PG verified at audit time ~08:30 UTC; CEO 06:00 snapshot showed 43T 65.1% +$0.74 (improving intraday)"
   },
-  "watchdog_steers_analysis": [
-    {
-      "steer": "JUP+INJ correlated cluster (pump-chain+ longs, 8min apart)",
-      "verdict": "VALID — correlation risk real. Both against 4h SHORT_BIAS. No config change; PORTFOLIO_HEAT should be verified to catch same-signal clusters.",
-      "action": "monitor open trades; verify PORTFOLIO_HEAT same-signal coverage"
+  "trade_summary_7d": {
+    "trades": 177,
+    "win_rate_pct": 50.8,
+    "pnl_usdt": 1.69,
+    "long": {
+      "trades": 126,
+      "wr_pct": 52.4,
+      "pnl": 3.17
     },
-    {
-      "steer": "7 recent losses look like wrong-side",
-      "verdict": "PARTIALLY STALE — majority are mtf-regime-trend+ aging trades (signal killed Oct 2 15:11) + pump-chain+ EXTREME chop. Not a new systematic bleed.",
-      "action": "none — losses aging out"
-    },
-    {
-      "steer": "mtf-regime-trend+ losing streak (4L -$0.76)",
-      "verdict": "STALE — MTF_REGIME_TREND_PLUS_ENABLED=False since 2026-10-02 15:11 (auto_1hr kill). Watchdog is flagging a disabled signal.",
-      "action": "watchdog code fix: check *_ENABLED before flagging (next action, not trading-path)"
+    "short": {
+      "trades": 51,
+      "wr_pct": 47.1,
+      "pnl": -1.48
     }
-  ],
-  "losing_trade_autopsy": {
-    "method": "Every 24h loser queried from PG with _signal_metadata RSI, exit_reason, regime; cross-ref 14d signal performance",
-    "clusters": [
-      {
-        "cluster": "mtf-regime-trend+ LONG 9T -$0.46 (24h)",
-        "root_cause": "Signal already KILLED 2026-10-02 15:11. Losses are pre-kill opens aging out. 14d: HIGH 6T 33.3%WR -$0.40, NORMAL 3T 66.7%WR -$0.06.",
-        "entry_check": "24h losers RSI 55-66 (mid-high), NOT oversold. Watchdog claimed RSI<35 oversold longing — DB metadata contradicts (SOL RSI=54.9, DOT RSI=65.8). Possible DRIFT-002 (5m vs 1m RSI source mismatch).",
-        "recommended_change": "NONE — already disabled. Watchdog steer is stale.",
-        "impact_on_winners": "N/A",
-        "confidence": "HIGH"
-      },
-      {
-        "cluster": "pump-chain- SHORT 4T -$0.29 (24h)",
-        "root_cause": "APT RSI=41.5 EXTREME conf=99 hard_max_loss; HYPER RSI=58.8 NORMAL conf=102 hard_max_loss. 14d: EXTREME 60T 50%WR -$0.69 (breakeven-minus-fees), HIGH 6T legacy (pre-Oct-1-block, all Sep 24), NORMAL 3T 66.7%WR -$0.07.",
-        "entry_check": "RSI range 41-59 — not oversold extremes. HIGH block WORKING (0 HIGH trades post Oct 1). RSI_MIN=40 working.",
-        "regime_check": "EXTREME is the bulk (60T) at 50%WR — structural breakeven, not a killing field.",
-        "recommended_change": "NONE now. Monitor EXTREME WR: alert if drops below 48% over next 7d (suggest confidence penalty -10pt in EXTREME only if that happens).",
-        "impact_on_winners": "N/A (no change proposed)",
-        "confidence": "HIGH"
-      },
-      {
-        "cluster": "pump-chain+ LONG (24h net +$0.97 — profitable)",
-        "root_cause": "ACE -$0.27 RSI=62.9 EXTREME + INJ -$0.22 RSI=52.5 EXTREME — mid-RSI EXTREME chop losses, not extreme-RSI entries. 14d RSI bands: 50-60=18T 66.7%WR +$1.68 (SWEET SPOT), 60-70=13T 53.8%WR +$1.01, <40=9T 22.2%WR -$0.49 (filtered by RSI_MIN=35), 70-80=8T 25%WR -$0.08 (filtered by RSI_MAX=70).",
-        "entry_check": "RSI 35-50 band (6T 14d): 3W 3L +$0.13 breakeven. Raising RSI_MIN 35→45 would block ~3 winners (+$0.47) and ~3 losers (+$0.64 saved) — net +$0.17 but kills 3 winners. Sample=6T << 20 threshold.",
-        "recommended_change": "NONE — insufficient sample. MONITOR RSI 35-50 band.",
-        "impact_on_winners": "Would block 3 of 6 winners in band — BAD IDEA at current sample",
-        "confidence": "MEDIUM"
-      },
-      {
-        "cluster": "pullback-entry- SHORT 23T -$1.31 (14d, worst absolute drain)",
-        "root_cause": "ALL 14 losses exit=atr_sl_hit — SL too tight / chasing, NOT RSI-driven (winners and losers overlap RSI 33-71). PULLBACK_ENTRY_MINUS_ENABLED=False — signal ALREADY DISABLED.",
-        "entry_check": "Winners avg RSI ~47, losers avg RSI ~38 — overlapping, no clean RSI filter.",
-        "recommended_change": "NONE — already disabled. SHORT exit quality (atr_sl_hit) delegated to signal_analyst.",
-        "impact_on_winners": "N/A",
-        "confidence": "HIGH"
-      },
-      {
-        "cluster": "bb-squeeze+ LONG 16T -$0.01 (24h, 27T -$0.07 14d)",
-        "root_cause": "Noise — mostly profit-monster-trail scratches (avg -$0.024). EXTREME already blocked (BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True).",
-        "entry_check": "Not a bleed. 55.6%WR 14d near breakeven.",
-        "recommended_change": "NONE — monitor HIGH habitat as per CEO list.",
-        "impact_on_winners": "N/A",
-        "confidence": "HIGH"
-      }
+  },
+  "session_brain_stats": {
+    "queries_run": [
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing",
+      "pump-chain+ long gating SHORT_BIAS",
+      "volume-breakout conf boost"
+    ],
+    "top_insights": [
+      "Exit system + SHORT R:R structural bleed recurring in sessions",
+      "NEUTRAL diversity / ema_reclaim still unbuilt (recurring since Sep 30)",
+      "volume-breakout conf boost repeatedly identified, waiting on monitor window",
+      "Session philosophy: every pump LONG / every dump SHORT — entry quality not clock"
     ]
   },
   "drift_findings": [
     {
-      "finding": "Watchdog flags disabled signals (mtf-regime-trend+)",
-      "severity": "LOW",
-      "detail": "trade_watchdog.py losing-streak logic does not check *_ENABLED flags before flagging. Causes stale steers that mislead agents.",
-      "status": "open — code fix suggested, not trading-path"
+      "id": "DRIFT-RSI-MIN-POST",
+      "severity": "info",
+      "finding": "PUMP_CHAIN_LONG_RSI_MIN=35 committed 2026-09-22 07:39. RSI<35 pump-chain+ LONG 14d = 6T 0%WR -$0.50 ALL pre-filter (last ETC opened 04:10 same day, before commit). Post-filter: 0 RSI<35 trades observed.",
+      "code_reflected": true,
+      "impact": "Filter appears live; insufficient post-filter sample to confirm. No action."
     },
     {
-      "finding": "regime_15m.json MISSING (watchdog referenced stale 2026-05-05)",
-      "severity": "LOW",
-      "detail": "File does not exist at /root/.hermes/data/regime_15m.json. trade_watchdog.py actually reads regime_5m.json (WWW_DATA). Naming confusion, not a trading bug.",
-      "status": "open — data hygiene"
+      "id": "DRIFT-RSI14-COL",
+      "severity": "low",
+      "finding": "trades.signal_rsi_14 still 100% NULL (344/344 14d). decider_run injects rsi into _signal_metadata (ponytail fix) but column itself never populated.",
+      "code_reflected": false,
+      "impact": "Analytics-only; detection-time filters run in code. Delegate bug_hunter for column write path."
     },
     {
-      "finding": "pnl_pct=0.0000 for profitable BTC continuum_engine trade",
-      "severity": "LOW",
-      "detail": "entry=85036 exit=85162.58 (+0.148%) but pnl_pct=0.0000. Known data-path bug on CURRENT.md monitor list.",
-      "status": "open — low impact"
+      "id": "DRIFT-002",
+      "severity": "medium",
+      "finding": "Exec-time LONG RSI uses 5m vs signal 1m — still open, bug_hunter owns (standing).",
+      "code_reflected": false,
+      "impact": "Known ceiling/leak class. No new evidence this run beyond standing item."
     },
     {
-      "finding": "DRIFT-002 exec-time RSI 5m vs signal 1m",
-      "severity": "MEDIUM",
-      "detail": "Still open. May explain watchdog vs DB RSI discrepancies (watchdog claimed SOL RSI=19, DB shows RSI=54.9 for same trade). bug_hunter owns.",
-      "status": "open — delegated"
+      "id": "DRIFT-VOLBREAKOUT-BOOST",
+      "severity": "info",
+      "finding": "volume-breakout-long+ 30d 25T 72.0%WR +$3.71 (EXTREME 15T 80% +$3.62). Crossed 20T. Conf boost READY — blocked only by active monitor window per standing decision.",
+      "code_reflected": false,
+      "impact": "Queued correctly. signal_analyst owns params; apply when window ends."
     },
     {
-      "finding": "volume-breakout conf boost READY but blocked by monitor window",
-      "severity": "INFO",
-      "detail": "22T threshold met (22T 72.7%WR +$3.42/30d, ALL NEUTRAL confirmed). Correctly queued — apply when volume-breakout monitor window ends.",
-      "status": "queued — not forgotten"
-    },
-    {
-      "finding": "Worst 14d losers already killed/disabled",
-      "severity": "INFO",
-      "detail": "pullback-entry- (DISABLED), mtf-regime-trend+ (DISABLED), pump-chain-v5 LONG (DISABLED). System self-corrected. Remaining pump-chain- SHORT bleed is structural (EXTREME 50%WR breakeven-minus-fees), not a new bug.",
-      "status": "resolved in prior runs"
+      "id": "DRIFT-HIGHBLOCK-LOG",
+      "severity": "low",
+      "finding": "signal-compactor.log shows PUMP-CHAIN-HIGH blocks firing 2026-10-02 17:31-20:12 but PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED=False in committed constants. Pipeline restarted 2026-10-03 01:53 — either stale pre-restart process or flag flipped after those logs. Oct 3 pump-chain+ opens are all EXTREME (consistent with HIGH blocked OR no HIGH pumps).",
+      "code_reflected": "ambiguous",
+      "impact": "Verify flag loaded post-restart; do NOT re-enable HIGH block (n=13 HIGH 14d < 20 threshold; 5 HIGH winners +$1.01)."
     }
   ],
   "recurring_problems": [
     {
-      "topic": "SHORT structural bleed",
-      "frequency": "every audit for 2+ weeks",
-      "status": "heavily filtered — RSI_MIN=40, HIGH block, HARD_FLOOR=25, SHORT_CONTINUUM_SCORE_MAX=30 all live. 7d SHORT -$1.48/51T 47.1%WR. EXTREME 60T 50%WR is breakeven-minus-fees, not catastrophic.",
-      "verdict": "Do NOT raise SHORT_CONTINUUM_SCORE_MAX without post-Fix2 data (CEO standing decision). Monitor."
+      "topic": "SHORT R:R structural disadvantage",
+      "sessions": "many (Sep 28 - Oct 3)",
+      "status": "7d SHORT -$1.48 (51T 47.1%); avg_win 0.098 < avg_loss 0.142",
+      "action": "Monitor post-Fix2 n>=15 before any SHORT RSI retune. ATR_TP_K_MULT + floors already live."
     },
     {
-      "topic": "NEUTRAL signal diversity gap",
-      "frequency": "recurring since late Sep",
-      "status": "ema_reclaim built+registered (0 trades, shadow). volume-breakout conf boost queued. doji-bottom at 14T (needs 20T).",
-      "verdict": "Partially addressed. Watch for ema_reclaim confluence partners."
+      "topic": "NEUTRAL signal diversity / hotset starvation",
+      "sessions": "recurring since Sep 30",
+      "status": "ema_reclaim shadow built, 0-1 signals, needs confluence partners. volume-breakout boost queued.",
+      "action": "DELEGATE signal_analyst: ship NEUTRAL confluence partners (doji-bottom, volume-dry-up) for ema_reclaim."
     },
     {
-      "topic": "signal_rsi_14 NULL / RSI source inconsistency",
-      "frequency": "flagged since Sep 28",
-      "status": "metadata RSI now readable (we get rsi/rsi_14/entry_rsi from _signal_metadata). DRIFT-002 still open for exec-time timeframe mismatch.",
-      "verdict": "Partially fixed. DRIFT-002 is the remaining piece."
+      "topic": "Longs into bearish BTC label",
+      "sessions": "watchdog 2026-10-03 08:07",
+      "status": "Watchdog recommended no new longs under 4h SHORT_BIAS. REFUTED by PnL: 7d LONG +$3.17/126T, pump-chain+ EXTREME +$2.29/14d.",
+      "action": "Do NOT gate longs on 4h label. Entry quality filters only (standing). Label is lagging/noisy (wyckoff ACCUMULATION flicker)."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "volume-breakout-long+ confidence boost",
-      "discussed": "multiple sessions + CEO reports",
-      "exists_in_code": "queued, blocked by monitor window",
-      "gap": "not yet applied — correct per standing decision"
+      "item": "ema_reclaim NEUTRAL confluence partners",
+      "status": "delegated signal_analyst, unbuilt",
+      "priority": "high — #1 diversity gap"
     },
     {
-      "idea": "NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
-      "discussed": "repeatedly since Sep 30 (#1 diversity gap)",
-      "exists_in_code": "ema_reclaim_long built+registered+enabled (shadow, 0 trades)",
-      "gap": "needs confluence partners to fire — delegated to signal_analyst"
+      "item": "volume-breakout-long+ confidence boost",
+      "status": "READY (25T 72%), waiting on monitor window",
+      "priority": "high — apply post-window"
     },
     {
-      "idea": "coin_tracker Wyckoff / phase-transition signal",
-      "discussed": "CEO backlog, Sep 29 + Oct 3",
-      "exists_in_code": "unbuilt — COIN_TRACKER_HOT_PLUS needs T approval",
-      "gap": "DELEGATE signal_analyst (1/week minimum)"
+      "item": "signal_rsi_14 column write path",
+      "status": "open data bug",
+      "priority": "low — delegate bug_hunter"
+    }
+  ],
+  "losing_trade_autopsy": [
+    {
+      "cluster": "mtf-regime-trend+ LONG",
+      "trades_24h": "9T 44.4%WR -$0.46",
+      "root_cause": "Signal KILLED auto_1hr 2026-10-02 15:11 (MTF_REGIME_TREND_PLUS_ENABLED=False). All 9 trades opened pre-kill same day. Losses aging out.",
+      "recommended_change": "None — already disabled. Confirm flag stays False.",
+      "impact_on_winners": "N/A — kill already applied",
+      "confidence": "HIGH"
     },
     {
-      "idea": "trend-following solid signal",
-      "discussed": "session brain 'trend following' query",
-      "exists_in_code": "not found as dedicated signal",
-      "gap": "spec via signal-lab skill if pursued"
+      "cluster": "pump-chain+ LONG (watchdog 3-loss streak)",
+      "trades_24h": "6T 50%WR +$0.90 net (winners ME +0.88, LDO +0.38, ENS +0.20; losers JUP -0.07, INJ -0.22, ACE -0.27)",
+      "root_cause": "Short-window noise on net-positive signal. 14d EXTREME 36T 50%WR +$2.29. HIGH 13T 38.5% -$0.21 is weak habitat but n=13<20.",
+      "entry_check": "Losers: INJ gap_at_entry=1.98 (chase), ACE gap=1.50, JUP z=0.03 (dead money). Winners: z often >1.5, RSI 55-67.",
+      "regime_check": "EXTREME is the edge habitat. HIGH is noise but undersampled for a block.",
+      "recommended_change": "None this run. MONITOR HIGH habitat (n to 20). Do NOT disable pump-chain+.",
+      "impact_on_winners": "HIGH block would kill +$1.01 of 5 HIGH winners to save -$1.22 of 8 losers (net +$0.21) — marginal, n=13<20, CEO flag deliberately False.",
+      "confidence": "HIGH on no-disable; MEDIUM on future HIGH block once n>=20"
+    },
+    {
+      "cluster": "pump-chain- SHORT APT",
+      "trades_24h": "1T -$0.21 hard_max_loss (shorted, price rose 0.7927→0.8003)",
+      "root_cause": "Single trade variance. SHORT filters (RSI_MIN=40, HARD_FLOOR=25, CEILING=65) verified working in prior audits. DYDX SHORT same family currently winning on structure.",
+      "recommended_change": "None",
+      "impact_on_winners": "N/A",
+      "confidence": "HIGH"
+    },
+    {
+      "cluster": "bb-squeeze+ LONG",
+      "trades_24h": "11T 63.6% -$0.18",
+      "root_cause": "14d EXTREME 13T 46.2% -$0.25 already blocked (BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True). HIGH 12T 58.3% +$0.13 positive. Losses are EXTREME aging + trail scratches.",
+      "recommended_change": "None — EXTREME block live. Monitor HIGH habitat.",
+      "impact_on_winners": "N/A",
+      "confidence": "HIGH"
+    },
+    {
+      "cluster": "oversold SHORT queue (ADA RSI 10.8, HBAR 11.1, etc.)",
+      "trades_24h": "pending/expired signals, not opened",
+      "root_cause": "BANANA-short falling-knife pattern. SHORT_RSI_HARD_FLOOR=25 + SHORT_RSI_FLOOR=40 should block. Watchdog correctly flags human-approval only.",
+      "recommended_change": "None — filters cover RSI<40. Do not auto-approve.",
+      "impact_on_winners": "N/A",
+      "confidence": "HIGH"
+    }
+  ],
+  "watchdog_steer_adjudication": [
+    {
+      "steer": "8 recent losses look like wrong-side trades / no new longs until 4h flips",
+      "verdict": "REJECTED as config trigger",
+      "evidence": "7d LONG +$3.17/126T 52.4%WR. pump-chain+ EXTREME 14d +$2.29. volume-breakout-long+ 30d +$3.71 blocked by regime per watchdog is the BEST signal. Philosophy: follow momentum, not the 4h label.",
+      "action": "Report only. Entry-quality filters, not direction gates."
+    },
+    {
+      "steer": "pump-chain+ losing streak: 3 losses — consider disabling",
+      "verdict": "REJECTED",
+      "evidence": "24h pump-chain+ +$0.90 net. 14d +$2.17 with EXTREME +$2.29. Streak is variance on a working signal.",
+      "action": "Monitor. No disable."
+    },
+    {
+      "steer": "pending shorts at RSI 10-28 — BANANA trap",
+      "verdict": "ACCEPTED (aligned with existing filters)",
+      "evidence": "SHORT_RSI_HARD_FLOOR=25, SHORT_RSI_FLOOR=40, OVERSOLD_SHORT_RSI_MAX=35 all live.",
+      "action": "Human approval only — no config change needed."
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-03T06:37:00Z",
-      "idea": "Apply volume-breakout-long+ confidence boost when monitor window ends",
-      "rationale": "22T 72.7%WR +$3.42/30d, ALL NEUTRAL (EXTREME habitat claim was stale/unverified). Crossed 20T threshold. Strongest signal in system.",
-      "expected_impact": "+$0.30-0.50/7d from higher conviction on proven edge",
-      "category": "confidence routing",
-      "status": "queued — apply post-monitor-window",
+      "date": "2026-10-03T08:38:26Z",
+      "idea": "pump-chain+ Winner-DNA confidence routing: boost +10pt when z_score>=1.5 AND rsi_14 in [55,70] AND gap_at_entry<=1.2; cut -15pt when z_score<0.5 OR rsi_14<40 OR gap_at_entry>1.5",
+      "rationale": "14d metadata DNA: winners cluster z>1.5 / RSI 55-67 / gap -0.5..+1.1; hard_max_loss losers cluster gap>1.5 (chase) or RSI<35 (knife) or z~0 (dead money). Routing amplifies proven edge, shrinks bad entries — entry quality, not clock.",
+      "expected_impact": "Research target: +$0.20-0.40/7d if DNA holds; must backtest before any param change",
+      "category": "entry sniper / confidence routing",
+      "status": "suggested",
       "risk": "low",
-      "sample_size": "22T (meets 20T threshold)"
-    },
-    {
-      "date": "2026-10-03T06:37:00Z",
-      "idea": "pump-chain- SHORT EXTREME confidence penalty (-10pt) — CONTINGENT",
-      "rationale": "EXTREME 60T 50%WR -$0.69/14d — large sample, breakeven-minus-fees. Not kill-worthy (50%WR) but confidence penalty could reduce size on marginal setups without blocking.",
-      "expected_impact": "+$0.10-0.20/7d if EXTREME WR holds at 50%",
-      "category": "entry sniper",
-      "status": "suggested — CONTINGENT on EXTREME WR < 48% over next 7d",
-      "risk": "low-medium — might block future winners",
-      "sample_size": "60T (meets threshold)"
-    },
-    {
-      "date": "2026-10-03T06:37:00Z",
-      "idea": "Stale-signal confidence decay (adaptive, not time-based)",
-      "rationale": "Session brain: 'signals that have a high winrate at some point need to be preserved, as the current market regime has changed.' Concept: if rolling 7d WR drops >15pt below 30d WR, apply confidence penalty until regime shifts. Adaptive to regime, not clock-based.",
-      "expected_impact": "reduces bleed from signals degrading as regime shifts; preserves edge when regime matches",
-      "category": "adaptive filter",
-      "status": "concept — needs backtest before implementation",
-      "risk": "medium — complex, needs independent verification",
-      "sample_size": "N/A (concept)"
-    },
-    {
-      "date": "2026-10-03T06:37:00Z",
-      "idea": "Verify PORTFOLIO_HEAT catches same-signal correlated clusters",
-      "rationale": "Watchdog flagged JUP+INJ both pump-chain+ longs opened 8 min apart, same leverage/size. PORTFOLIO_HEAT_ENABLED=True exists but may not block same-(signal,direction) clusters. One BTC dump kills both.",
-      "expected_impact": "reduces correlated blowup risk; no WR impact if heat already works",
-      "category": "risk control",
-      "status": "suggested — verify coverage, then decide if code gap exists",
-      "risk": "low",
-      "sample_size": "N/A (infra check)"
+      "sample_note": "14d pump-chain+ LONG n=51 with metadata; EXTREME n=36 supports routing. Requires independent backtest (own-conclusions) before live."
     }
   ],
-  "config_changes_applied": [],
-  "config_change_rationale": "0 changes — monitor windows active (CEO standing decision: bollinger_squeeze, volume-breakout tests, SHORT-CONTINUUM@30, HARD_FLOOR, ema_reclaim shadow, bb-squeeze EXTREME, doji 20T, oscillator retune). Worst 14d losers already killed/disabled in prior runs. No new systematic bleed requiring immediate action. All recommendations are monitor/queue/contingent.",
+  "config_changes_applied_detail": [],
   "next_actions": [
-    "Apply volume-breakout conf boost when monitor window ends (queued, 22T met)",
-    "Watchdog code fix: check *_ENABLED before flagging losing signals (stale mtf steer)",
-    "bug_hunter: DRIFT-002 exec-time RSI 5m vs 1m still open",
-    "Monitor pump-chain- SHORT EXTREME WR — alert if <48% over next 7d",
-    "Verify PORTFOLIO_HEAT same-signal cluster coverage (JUP+INJ pattern)",
-    "signal_analyst: mover+ entry quality (already delegated)",
-    "signal_analyst: SHORT exit quality / atr_sl_hit (already delegated)",
-    "signal_analyst: ema_reclaim confluence partners (0 trades shadow)",
-    "Fix pnl_pct data-path bug (BTC trade pnl_pct=0.0000 on +0.148% move)"
+    "DELEGATE signal_analyst: apply volume-breakout-long+ conf boost when monitor window ends (25T 72% +$3.71/30d ready)",
+    "DELEGATE signal_analyst: ship NEUTRAL ema_reclaim confluence partners (doji-bottom, volume-dry-up)",
+    "DELEGATE bug_hunter: signal_rsi_14 column write path (344/344 NULL 14d); verify PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED=False loaded post-2026-10-03 01:53 restart",
+    "MONITOR: pump-chain+ HIGH habitat to n>=20 before any HIGH block decision",
+    "MONITOR: post-Fix2 SHORT count before SHORT_CONTINUUM_SCORE_MAX retune (do not raise without data)",
+    "MONITOR: bb-squeeze+ HIGH habitat; doji-bottom-long to 20T; disk at 88% prune threshold",
+    "RESEARCH (own-conclusions): backtest Winner-DNA confidence routing for pump-chain+ before any param change",
+    "INFRA NOTE: watchdog.json pipeline_status.running uses lock-age<300s — false negative between periodic pipeline cycles; prefer last_run timestamp. regime_15m.json at /var/www is orphan (15m scanner writes brain momentum_cache, timer healthy)."
   ],
   "sanity_check": {
-    "numbers_verified": "All from PostgreSQL brain DB live queries this run",
-    "watchdog_cross_checked": "Yes — steers compared against DB; mtf steer found stale",
-    "session_brain_queried": "Yes — 3 queries run",
-    "config_checked": "Yes — ENABLED flags + RSI filters + VOL_PHASE_MULTS reviewed",
-    "lock_check": "No session lock — config changes permitted, but 0 applied per monitor windows",
-    "verdict": "System HEALTHY and IMPROVING. 24h +$0.31/62.2%WR, 7d +$1.76/51.1%WR. LONG edge intact (+$3.24/7d). SHORT structural bleed contained by filters. No action required this run."
+    "numbers_from_pg_directly": true,
+    "session_brain_queried": true,
+    "watchdog_read": true,
+    "time_based_changes_suggested": false,
+    "blanket_changes_suggested": false,
+    "min_sample_respected": true,
+    "config_changes_this_run": 0
   }
 }
