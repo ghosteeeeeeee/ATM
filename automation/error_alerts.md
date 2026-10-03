@@ -585,3 +585,17 @@
 - **WARN** (7): Non-critical services in `failed` state — `hermes-better-coder`, `hermes-bug-hunter`, `hermes-git-release`, `hermes-mtf-macd-tuner`, `hermes-trading-checklist`, `hermes-upgrade-implementer`, `hermes-wasp`
 - **AUTO-FIX**: Disk 86% → 80% — gzipped `*.log` older than 7 days in `/root/.hermes/logs/`
 - **NOTE**: Core trading path healthy (pipeline, hl-sync-guardian, price-collector, signal-compactor all active). Failed units are maintenance/analyzer jobs, not trade-critical.
+
+## Error Alerts — 2026-10-03 19:47 UTC
+- **HEALTH** — Pipeline OK: active, cycle #227236 at 19:45:25 (still cycling at 19:47). Position Manager healthy (3 open / 0 closed, ATR SL/TP updates running). Signals (1h): 68. Trades today: 28 closed in signal_outcomes (19 wins, +1.81 USDT). No Tracebacks, no CRASH in last 30min. Disk 84%. Regime: 2 LONG_BIAS (MON, PUMP) / 0 SHORT / 115 NEUTRAL (overall NEUTRAL). Speeds: 53.5% tokens ≥50th pct (129/241). Prices fresh (85 tokens, prices.json 19:46:25 UTC). hl-sync-guardian active.
+- **WARN** (known, unchanged): `signals` active table 18,897 rows — trading-checklist flags "may need cleanup". Purge/archive may not clear active table. Not on execution path.
+- **WARN** (known, 8 failed units): better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), brain-auditor, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer, wasp, weather-station-api. None on trading path. Root causes tracked — no auto-fix.
+- **WARN** (known): `hotset.json` empty — regime fully NEUTRAL (115/117). Expected compaction behavior, not a bug.
+- **INFO**: Disk 84% (was 80% at 17:47 check) — under 85% WARN threshold. No logs >7 days to gzip; largest live log pipeline.log 21M. Monitor next cycle.
+- **INFO**: `hermes-atr-sl-updater.timer` not-found (DEFUNCT unit file; ATR runs inside pipeline Position Manager — no functional gap). `hermes-regime-24h-check.timer` / `hermes-regime-transition-check.timer` inactive/dead. `hermes-hl-copy` last ran 2026-08-15 (likely intentional).
+- **INFO**: `systemctl list-timers hermes-*` prints "0 timers listed" without `--all` — cosmetic; `--all`/grep confirms core timers firing (pipeline 1min, price-collector 30s, signal-compactor 1min, watchdog, coin-tracker, 15m-regime).
+- **INFO**: 0 phantom trades (`atr_sl_hit` <0.01% PnL) today.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL conditions; no restarts or cleanups needed.
+
+## Error Alerts — 2026-10-03 20:59 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

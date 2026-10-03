@@ -1,5 +1,87 @@
 # Upgrade Audit Trail
 
+## Plan: short-signal-drought-2026-10-02.md
+- **Date scanned:** 2026-10-03 18:10
+- **Core request:** Root-cause SHORT drought (49 LONG vs 1 SHORT on SHORT_BIAS day). Proposed 6 fixes.
+- **Difficulty:** Level 1 (table/exemption fixes) — Fixes 4-6 need CEO
+- **Value:** HIGH — conf=99 shorts were dying at decider vol gate
+- **Status:** ✅ Fixes 1-3 IMPLEMENTED (2026-10-02); Fixes 4-6 PENDING CEO
+- **Reason:** Verified in code: (1) v1 REGIME_SIGNALS has continuum-trend± all regimes + mtf-regime-trend± asymmetry fix (volatility_gate.py comments dated 2026-10-02); (2) PUMP-CHAIN-SHORT-RSI-MIN bearish override shipped (commit 151bf30a); (3) VEL-FILTER bear-gated downtrend exemption shipped (signal_compactor.py:3819-3840). Fixes 4 (PRESERVE-SPIKE vs RSI-FLOOR), 5 (RSI ceiling bear exemption), 6 (full SHORT-gate audit) are CEO decisions — not implementer calls.
+
+## Plan: chop-v2-spec.md (score multipliers — remaining piece)
+- **Date scanned:** 2026-10-03 18:10
+- **Core request:** Per-coin trend score routing + chop exit module. Audit said should_trade_signal_v2 + chop_exit.py missing.
+- **Difficulty:** Level 2 (multiplier wiring); chop_exit.py still Level 2-3
+- **Value:** HIGH for multipliers — CHOP 14d MEAN-REV LONG only profitable family; weak-trend momentum was allowed with phantom "penalty"
+- **Status:** ✅ SCORE MULTIPLIERS IMPLEMENTED this session; chop_exit.py still PENDING
+- **Reason:** should_trade_signal already routes block/allow by trend score (score>=61 momentum OK, 31-61 allowed, <30 blocked). Gap: 31-59 momentum allowed at FULL confidence despite reason text saying penalty; mean-rev boost never applied. Wired CHOP_MOMENTUM_PENALTY_MULT=0.3 and CHOP_MEANREV_BOOST_MULT=1.2 into signal_compactor final_score. chop_exit.py (CHOP_TRAIL/CHOP_KILL) deferred — <2h killer already gone (14d <2h: 8T +$2.62); current NEUTRAL bleed is atr_sl/hard_sl, not young-trade bleed. Revisit chop_exit only with fresh exit data.
+
+## Plan: 2026-09-07_partial-close-trailing-runner.md Option 1
+- **Date scanned:** 2026-10-03 18:10
+- **Core request:** 50% partial close at PM_TRAIL activation + runner trail (ICP case study).
+- **Difficulty:** Level 2-3 (tpsl_utils partial size + profit_monster)
+- **Value:** MEDIUM (was HIGH) — plan requires backtest before deploy
+- **Status:** ⏭️ SKIPPED (data does not justify yet)
+- **Reason:** Ran plan's validation SQL on PostgreSQL trades (30d): winners_with_mfe=43, would_benefit(mfe/pnl>2)=16 → 37.2% (passes plan's >30% gate) BUT mfe coverage only 11.1% (109/985 closed). Median left-on-table on winners = 0.47pp (not ICP-scale 4pp); only 20/43 winners had mfe>pnl+0.5pp. Sample too thin + coverage gap → do not build partial-close plumbing on this. Option 3 (PM_TRAIL_TIERS) already live. Option 2 (regime-adaptive trail) conflicts with CEO "DO NOT CHANGE PM_TRAIL_DISTANCE" guard. Re-run backtest when mfe_pct coverage >50%.
+
+## Plan: regime-direction-filter-spec.md
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Core request:** Block wrong-direction signals via 5m regime in add_signal().
+- **Difficulty:** Level 1
+- **Value:** LOW-MEDIUM
+- **Status:** ⏭️ SKIPPED (reconfirmed)
+- **Reason:** Prior audit (2026-10-02) correct — redundant with TREND_FILTER + 5m/15m regime_confirmation; spec internally contradictory; wrong JSON path. No action.
+
+## Plan: tier2-item2-chop-regime-merge-spec.md
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Core request:** Merge 4 chop/regime systems into regime_engine.py.
+- **Difficulty:** Level 4
+- **Value:** HIGH (duplication) but high risk
+- **Status:** ⏭️ SKIPPED (reconfirm) — pending CEO (3 open questions in spec)
+- **Reason:** Circular dependency + fail-open risk while LIVE_TRADING_ENABLED=True. Not implementer decision.
+
+## Plan: oscillator-matrix-lifecycle.md
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Core request:** Oscillator confidence multipliers shadow→live.
+- **Difficulty:** Level 1
+- **Value:** MEDIUM-HIGH
+- **Status:** ✅ ALREADY LIVE (reconfirm)
+- **Reason:** OSCILLATOR_MULT_ENABLED=True since 2026-10-01 (validated 1035 joins). Retuned 2026-10-02 (MID falling 0.7, LOW accelerating 0.9). No action.
+
+## Plan: system-overhaul-plan.md
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Core request:** Multi-tier overhaul (confluence invert, family focus, etc).
+- **Difficulty:** Level 2-4
+- **Value:** HIGH but PENDING CEO
+- **Status:** ⏭️ SKIPPED (reconfirm) — items 1-3 need CEO; item 4 time-blocks intentionally NOT done (T disabled 2026-09-30, philosophy: no time-of-day blocks); item 9 doji flag done
+- **Reason:** Not implementer decisions. Time-block repopulation contradicts trading philosophy.
+
+## Plan: mtf-regime-trend + multi-timeframe-regime-trend
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Status:** ✅ IMPLEMENTED then 🛑 PLUS auto-killed (48h 7T 3W -$0.41). MINUS still enabled. No action.
+
+## Plan: thesis-validation-system.md
+- **Date scanned:** 2026-10-03 18:10 (reconfirm)
+- **Status:** ✅ FULLY IMPLEMENTED (TVS_ENABLED=True). No action.
+
+## Plan: regime-aware-signal-params-spec.md (accel_300_v3)
+- **Date scanned:** 2026-10-03 18:10
+- **Core request:** Per-volatility-regime parameter tuning for accel_300_v3; noted v1/v2 REGIME_SIGNALS mismatch.
+- **Difficulty:** Level 2 (needs vol-regime-at-entry data collection first)
+- **Value:** LOW-MEDIUM — accel-300-v3-low sample; v1/v2 mismatch largely addressed by Oct 2 vol-gate symmetry fixes
+- **Status:** ⏭️ SKIPPED
+- **Reason:** Spec itself says vol regime not stored on trades — prerequisite data collection not in place. v1 now has accel-300-v3-long+ in all regimes; v2 handles via SIGNAL_TYPE_OVERRIDES EXTREME block. Not a clean L1.
+
+## Plan: Empty/stub plans + already-shipped signal plans (batch)
+- **Date scanned:** 2026-10-03 18:10
+- **Plans:** oversold-bounce, contrarian-zone, breakout-long, btc-crash-filter, conf-filter, spider-profit, losers-list, ema300-rejection, accel300-long-fix, exit-mechanics-v2, short-bias-fix (2026-08-19)
+- **Difficulty:** N/A
+- **Value:** LOW (already shipped or investigation-only)
+- **Status:** ✅ VERIFIED SHIPPED / ⏭️ SKIPPED
+- **Reason:** oversold_bounce.py registered (OVERSOLD_BOUNCE_ENABLED); breakout_long.py registered; btc-crash-filter constants live (BTC_CRASH_BLOCK_ENABLED=True); conf-filter live; spider constants live; contrarian zone is coin_tracker_score analysis not a signal module; losers-list constants live; short-bias-fix was investigation-complete (no filter changes needed). No implementation debt.
+
+---
+
 ## Plan: regime-direction-filter-spec.md
 - **Date scanned:** 2026-10-02 18:15
 - **Core request:** Block wrong-direction signals in add_signal() using 5m regime from regime_5m.json (LONG_BIAS blocks SHORT, SHORT_BIAS blocks LONG).

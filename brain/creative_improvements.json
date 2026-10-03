@@ -2245,5 +2245,24 @@
     "status": "monitor",
     "risk": "low",
     "prereq": "Auto_1hr/CEO: if disk >86% before 21:55 UTC, consider off-path prune (mtf_macd_tuner backtest tables >7d, hl_copy trader_fills >30d) — NOT candles/coin_tracker."
+  },
+  {
+    "date": "2026-10-03T19:39:48Z",
+    "idea": "Per-signal regime affinity map — refresh volatility_gate blocks against current 14d regime performance",
+    "rationale": "Regime flip confirmed: EXTREME now BEST (+$2.07/7d 54.5% 88T), NORMAL WORST (-$0.31 46.7% 45T). volume-breakout EXTREME 81.3%WR +$3.72/30d. Blocks from Sep era may be stale dead code.",
+    "expected_impact": "Identify 1-3 stale regime blocks suppressing profitable signal-regime combinations.",
+    "category": "regime intelligence",
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-10-03T20:36:35.149180+00:00"
+  },
+  {
+    "date": "2026-10-03T19:39:48Z",
+    "idea": "bb-bounce mid-RSI dead zone monitor — RSI 40-50 underperforms vs 30-40 sweet spot",
+    "rationale": "14d bb-bounce: RSI 30-40 = 83.3%WR +$0.31 BEST, 40-50 = 44.4% -$0.07 weak. COMP open trade RSI 46.67 sits in weak band. Sample 9T insufficient to change.",
+    "expected_impact": "If 40-50 continues losing past 20T, add z<-1.5 gate for mid-RSI bounces. Blocks ~9 losing trades/14d, spares 30-40 winners.",
+    "category": "entry sniper",
+    "status": "monitor_48h",
+    "risk": "low"
   }
 ]

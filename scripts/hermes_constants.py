@@ -968,6 +968,15 @@ CHOP_DETECTOR_ENABLED = True
 CHOP_DETECTOR_WR_THRESHOLD = 50            # % — directional outcome WR below this = chop vote
 CHOP_DETECTOR_BTC_MOM_THRESHOLD = 0.15     # % — BTC 30m momentum below this = flat = chop vote
 CHOP_DETECTOR_CACHE_TTL = 120              # seconds — regime cache lifetime
+# ── Chop V2 score multipliers (plans/chop-v2-spec.md) ────────────────────
+# CHOP 14d: MEAN-REV LONG only profitable family (+$82, 53.3%WR); MOMENTUM SHORT -$12 (37.9%WR).
+# should_trade_signal already routes by trend score (block <30, allow >=31); these multipliers
+# apply the missing confidence penalty/boost for weak-trend scores (31-59).
+CHOP_SCORE_MULT_ENABLED = True
+CHOP_MOMENTUM_PENALTY_MULT = 0.3           # weak-trend momentum in CHOP → confidence 0.3x
+CHOP_MEANREV_BOOST_MULT = 1.2              # weak-trend mean-rev in CHOP → confidence 1.2x
+CHOP_SCORE_MOMENTUM_PENALIZE = 60          # score < this → momentum penalized (>=61 = full access)
+CHOP_SCORE_MEANREV_BOOST = 60              # score < this → mean-rev boosted
 
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.

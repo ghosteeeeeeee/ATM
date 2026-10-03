@@ -1,262 +1,333 @@
 {
-  "timestamp": "2026-10-03T18:38:05Z",
+  "timestamp": "2026-10-03T20:36:00Z",
   "agent": "brain_auditor",
-  "session_lock": false,
-  "config_changes_applied": [],
+  "session_lock": "absent — allowed to audit; trading config frozen by bollinger window until 21:55 UTC",
   "session_brain_stats": {
-    "queries_run": 8,
-    "top_recurring_themes": [
-      "signal decay / regime affinity (species-of-fish)",
-      "chasing entries / gap_at_entry slippage",
-      "NEUTRAL momentum signal gap (ema_reclaim still 0 trades)",
-      "exit-system profit leak (older, partially fixed via hard_max_loss)",
-      "trend-following signal ideas (unbuilt)"
-    ],
-    "drift_vs_code": "REGIME_SIGNAL_AFFINITY exists in signal_rotator.py but only drives rotation enable/disable via signal_lifecycle.py — NOT per-trade confidence decay as session brain envisioned. Partial implementation."
+    "queries_run": 6,
+    "top_insights": [
+      "signal decay / guitar-tuning: high-WR signals need preservation as regime changes — supports regime-affinity refresh idea",
+      "trend_purity / pullback-entry: signal detected at one time, executed later under different conditions — DRIFT-002 class",
+      "hard_max_loss / CUT_LOSER_PNL sessions: pnl_pct is leveraged, exit_reason embeds live_pnl — dual-metric confirmed again in DB this run",
+      "new NEUTRAL signal brainstorming sessions exist but ema_reclaim_long still fires 0 — execution gap, not idea gap",
+      "bb_bounce deep-analysis sessions: 232 bb_bounce trades studied historically; RSI>60 was flagged as killing field — re-tested this run, data has CHANGED (4 winners now exist RSI>60)"
+    ]
   },
   "trade_summary_24h": {
-    "source": "PostgreSQL brain, status=closed",
-    "trades": 31,
-    "win_rate": 61.3,
-    "pnl_usdt": 1.36,
-    "open": 1,
-    "open_detail": "COMP bb-bounce-v3-long+ LONG -0.47% (SUSHI closed per watchdog exit plan)",
+    "closed_24h": "30T 63.3%WR +$1.63 (PG-verified 20:30 UTC)",
+    "closed_7d": "195T 52.3%WR +$2.35",
+    "long_7d": "142T 54.2%WR +$3.49",
+    "short_7d": "53T 47.2%WR -$1.14 (improving from -$1.48)",
     "regime_7d": {
-      "EXTREME": {
-        "n": 88,
-        "wr": 54.5,
-        "pnl": 2.07,
-        "note": "BEST — opposite of old bleed narrative"
-      },
-      "HIGH": {
-        "n": 52,
-        "wr": 57.7,
-        "pnl": 0.24
-      },
-      "NORMAL": {
-        "n": 45,
-        "wr": 46.7,
-        "pnl": -0.31,
-        "note": "WORST — new bleed habitat"
-      },
-      "FLAT": {
-        "n": 5,
-        "wr": 40.0,
-        "pnl": 0.27
-      }
+      "EXTREME": "88T 54.5%WR +$2.07 BEST",
+      "HIGH": "52T 57.7%WR +$0.24",
+      "FLAT": "5T 40.0%WR +$0.27",
+      "NORMAL": "45T 46.7%WR -$0.31 WORST"
     },
-    "7d_total": {
-      "trades": 195,
-      "wr": 52.3,
-      "pnl": 2.35
-    },
-    "signal_24h": {
-      "pump-chain+ LONG": {
-        "n": 8,
-        "wr": 62.5,
-        "pnl": 0.95
-      },
-      "pump-chain- SHORT": {
-        "n": 5,
-        "wr": 60.0,
-        "pnl": 0.18
-      },
-      "bb-bounce-v3-long+": {
-        "n": 4,
-        "wr": 75.0,
-        "pnl": 0.12
-      },
-      "bb-squeeze+ LONG": {
-        "n": 10,
-        "wr": 60.0,
-        "pnl": -0.02,
-        "note": "24h drag — 4 hard_max_loss losers"
-      }
-    },
-    "watchdog_steers_used": true,
-    "disk_pct": 84,
-    "pipeline": "active (pipeline + price_collector + trade_watchdog timers all active)"
+    "best_signals_14d": [
+      "volume-breakout-long+ 9T 77.8%WR +$2.66 | 4T/7d +$1.96 100%WR — boost still QUEUED 1.15→1.25",
+      "doji-bottom-long 12T 66.7% +$0.35 (14T/30d 71.4% +$0.79 — below 20T)",
+      "pump-chain+ TODAY 8T 62.5% +$0.95 all EXTREME conf 96-99 — carrying the book",
+      "bb-squeeze+ 35T 60%WR +$0.19",
+      "bb-bounce-v3-long+ 10T 60%WR +$0.21"
+    ],
+    "worst_signals_14d": [
+      "mover+ 8T 25%WR -$1.19 (sample <20 — monitor, not change)",
+      "pullback-entry- 22T 40.9% -$1.16 (disabled, aging out)",
+      "pump-chain- 67T 47.8% -$0.91 (RSI_MIN=40 working)",
+      "bb-bounce-v2-long+ 21T 47.6% -$0.02 marginal"
+    ],
+    "losers_24h": "9T all hard_max_loss family (~1% price move trigger, pnl_pct leveraged 3-6% at lev 3-5). Exit system CORRECT. Entry-quality bleed, not SL-width bug.",
+    "open": "4 LONG all bb-bounce/squeeze: SYRUP bb-squeeze +0.16%, ENS bb-bounce-v3 +0.07%, ZEN bb-bounce-v2 +0.35%, COMP bb-bounce-v3 -0.76% (weakest — watchdog: cut if 15m < 25.30)",
+    "disk": "84% (prune at 88%)",
+    "bollinger_window": "ACTIVE until 21:55 UTC — 0 trading config changes this run"
   },
   "drift_findings": [
     {
-      "finding": "Watchdog claims 15m regime scanner BROKEN (ImportError SPEED_HOTSET_THRESHOLD)",
-      "verdict": "FALSE POSITIVE — scanner is healthy",
-      "evidence": "systemd hermes-15m-regime-scanner.service exit=0/SUCCESS every 15min; manual run succeeds; momentum_cache max(updated_at)=2026-10-03 18:32:57 UTC (146 tokens); regime_5m.json fresh 18:30. err.log TypeError dict|set at FAVORITES was historical (favorites_updater wrote FAVORITES_LONG as dict), already fixed — both now sets, import works. regime_15m.json May-5 staleness is a DEAD FILENAME artifact: scanner OUTPUT_FILE=regime_5m.json. signal_schema _get_regime('15m') reads candles_15m from SQLite directly, not regime_15m.json.",
-      "impact": "None on trading. Watchdog deep_analysis wasted cycles on stale err.log. Recommend watchdog stop reading 15m_regime.err.log for health checks; use systemd status + momentum_cache freshness.",
-      "confidence": "HIGH"
+      "id": "DRIFT-HML-CONFIRMED",
+      "finding": "hard_max_loss exit_reason prints leveraged live_pnl while CUT_LOSER_PNL=-1.00 triggers on ~1% PRICE move",
+      "evidence": "position_manager.py:3265-3267 uses CUT_LOSER_PNL_HERMES then close_paper_position(f\"hard_max_loss_{live_pnl:+.2f}%\"). DB 7d: lev5 avg price_move 0.86% avg pnl_pct -4.28%; lev3 avg price_move 0.99% avg pnl_pct -2.97%. 24h: 8/9 losers hard_max_loss family, exit_reason shows -4.84%/-5.13% while actual price move ~1%.",
+      "verdict": "NOT A TRADING BUG — dual-metric by design (prior brain_auditor 17:38 confirmed). Reporting is misleading. bug_hunter can close with documentation or rename exit_reason to include _px suffix.",
+      "code_reflection": "Already correct in code. No drift in behavior. Drift is in human interpretation of logs.",
+      "impact": "None on PnL. Wastes analyst/CEO attention re-investigating every run."
     },
     {
-      "finding": "Watchdog pattern_alerts: high-RSI LONG entries are the killers (NEAR@87.5, STX@72.1, INJ@60.8)",
-      "verdict": "MOSTLY FALSE for current data — do NOT implement high-RSI LONG filters",
-      "evidence": "DB rsi_14 at entry: NEAR=51.32 (not 87.5), STX=75.47, INJ=52.45 (not 60.8). Watchdog RSI values do not match trade metadata. 7d LONG RSI>70: 13 trades, 8W/4L/1 flat, net ~+$0.31. bb-squeeze+ WINS at high RSI (SUSHI rsi=82.29 +$0.08, XPL rsi=77.18 +$0.08, MNT rsi=73.57 +$0.02, MON rsi=76.48 +$0.03). Blocking RSI>70 would kill +$0.83 winners to save $0.43 losers = NET WORSE. STX loss = single trade via designed BTC-bullish bypass (btc_score=94.6, BULL_TREND), not a leak.",
-      "impact": "If CEO/watchdog acts on this narrative, we'd kill bb-squeeze+ winners. Correct the narrative: the losing band is OVERSOLD LONG (<40), not overbought LONG, in current MARKUP regime.",
-      "confidence": "HIGH"
+      "id": "DRIFT-RSIMAX60-REVISED",
+      "finding": "bb-bounce-v2-long+ RSI_MAX=60 was suggested 6+ prior runs claiming '0 winners blocked' — CURRENT DATA CONTRADICTS",
+      "evidence": "14d RSI bands with metadata: 50-60 = 7T 6W +$0.23 (sweet spot), 60-70 = 11T 4W -$0.21, 70+ = 3T 0W -$0.04. Winners with RSI>60: SAND +0.05 (64.71), SYRUP +0.01 (61.9), ETH +0.09 (65.99), POL +0.02 (66.43) = 4 winners +$0.17. Losers RSI>60: 10T -$0.42.",
+      "verdict": "REJECTED by quality rule — filter would block 4/10 winners = 40% > 20% threshold. Net PnL +$0.25/14d is positive but winner-kill rate disqualifies. Do NOT implement. Prior suggestions are STALE.",
+      "code_reflection": "RSI_MAX=60 not in code — correctly absent.",
+      "impact": "Prevents a bad filter from shipping on stale '0 winners blocked' claim."
     },
     {
-      "finding": "Session brain: signal decay should remember WHY signals were good / WHEN they'll be good again (species-of-fish)",
-      "verdict": "PARTIALLY IMPLEMENTED — rotation-only, not per-trade decay",
-      "evidence": "REGIME_SIGNAL_AFFINITY in signal_rotator.py:40 boosts/penalizes signals by regime (1.5x/0.5x) but only when signal_lifecycle.py:303 runs rotation. Live per-trade confidence (signal_compactor SOURCE_WEIGHTS) is static regime-agnostic except volume-breakout 1.15 queued.",
-      "impact": "Signal decay remains a blunt hammer. Gap: no per-trade regime-aware confidence memory. Post-window research item, not a config change.",
-      "confidence": "MEDIUM"
+      "id": "DRIFT-FAMILY-CAP-REJECTED",
+      "finding": "Signal-family concentration cap (max 2 open bb-bounce/bb-squeeze) — watchdog steered 4/4 same-family exposure",
+      "evidence": "Simulated cap=2 over last 7d bb-family trades (58 closed, 35W/23L): would block 17 winners (+$1.36) and 7 losers (-$0.44). Winners blocked 17/35 = 49% >> 20% threshold.",
+      "verdict": "REJECTED. bb-squeeze is high-frequency small-winner signal — capping concurrency destroys edge. Precedents exist (PUMP_CATCHER_MAX=3, MTF_REGIME_TREND_MAX=2) but those signals have different frequency profiles.",
+      "code_reflection": "No family-level cap exists in code (only direction cap 80%, portfolio heat 15%, MAX_OPEN_POSITIONS=6). Correct to not have one for bb-family.",
+      "impact": "Documents rejection so idea is not re-proposed without new evidence."
     },
     {
-      "finding": "volume-breakout conf boost 1.15→1.25 QUEUED for post-21:55 UTC",
-      "verdict": "CORRECTLY QUEUED — still 1.15 at signal_compactor.py:709",
-      "evidence": "Line re-verified. 22T 72.7%WR +$3.42/30d all NEUTRAL. Bollinger window active until 21:55 UTC. Do not apply early.",
-      "impact": "None yet. Apply after window, restart pipeline.",
-      "confidence": "HIGH"
+      "id": "DRIFT-REGIME15M-ORPHAN",
+      "finding": "regime_15m.json stale May 5 confuses watchdog AGENT, but CODE path is correct",
+      "evidence": "trade_watchdog.py:243-244 reads regime_5m.json (fresh Oct 3 20:30). Stale regime_15m.json still sits at /var/www/hermes/data/regime_15m.json. Watchdog agent deep_analysis flags 'regime_15m.json 5 months stale' — agent confusion, not code bug.",
+      "verdict": "Infra/doc drift, not trading-path. Fix: delete orphan regime_15m.json OR update trade_watchdog_prompt.md to reference regime_5m.json.",
+      "code_reflection": "Code already correct — reads regime_5m.json.",
+      "impact": "None on trading. Causes wasted watchdog-agent cycles flagging non-issue."
     },
     {
-      "finding": "accel_300_v3_long ENABLED=True, EXTREME/FLAT blocks don't cover active NEUTRAL regime",
-      "verdict": "CONFIRMED — still on monitor, window blocks change",
-      "evidence": "ACCEL_300_V3_LONG_ENABLED=True. 30d: 5T -$0.21 50%WR. CEO watch: 7T/7d -$0.37 42.9% all NEUTRAL. EXTREME/FLAT blocks exist; NEUTRAL is the only active regime and it loses there.",
-      "impact": "Post-window: NEUTRAL block or disable. No change now.",
-      "confidence": "HIGH"
+      "id": "DRIFT-EMA-RECLAIM-0",
+      "finding": "ema_reclaim_long still fires 0 signals every cycle — #1 diversity gap unresolved",
+      "evidence": "CURRENT.md monitor list item 8. Delegated to signal_analyst 4+ times (Sep 30, Oct 1 x2, Oct 2, Oct 3). File exists scripts/signals/ema_reclaim_long.py. 0 closed trades, 0 signals. volume-breakout-long+ (77.8%WR) also has zero open exposure while book is 4/4 bb-bounce/squeeze.",
+      "verdict": "Missing implementation — detection coverage or confluence starvation. Not a config issue.",
+      "code_reflection": "Signal registered/enabled but never fires. Root cause undiagnosed.",
+      "impact": "System remains concentrated in mediocre signals while best signal sits idle."
+    },
+    {
+      "id": "DRIFT-002-OPEN",
+      "finding": "Exec-time LONG RSI uses 5m candles while signals filter on 1m — BTC bb-bounce slipped RSI=77.32 past ceiling=70",
+      "evidence": "Prior sessions. bug_hunter owns. Still open.",
+      "verdict": "Open code bug. Not re-verified this run beyond session-brain recall.",
+      "code_reflection": "Unchanged.",
+      "impact": "Occasional overbought/oversold entries slip through ceiling/floor checks."
     }
   ],
   "recurring_problems": [
     {
-      "problem": "Chasing / gap_at_entry >= 1% at execution",
-      "evidence_7d": "gap 0.5-1%: 27T 67%WR +$1.71 (BEST) vs gap 1-2%: 39T 54%WR -$0.15 (WORST). 24h losers with gap>1.4%: INJ 1.98, ACE 1.50, SUSHI 1.58 — all hard_max_loss.",
-      "signal_specific": "pump-chain+ gap<1%: 4T 75%WR +$1.04 vs gap>=1%: 4T 50%WR -$0.09 (n=8, INSUFFICIENT). bb-squeeze+ gap doesn't discriminate (57% both bands).",
-      "verdict": "Real pattern overall, but signal-specific filters need larger samples. MONITOR — do not add global gap filter.",
-      "session_echo": "Sessions mention chasing (fills above signal 1.7-2.5%) and 49min exec delay repeatedly."
+      "problem": "hard_max_loss semantics confusion",
+      "frequency": "5+ sessions",
+      "status": "NOW VERIFIED dual-metric, not a bug — close the loop",
+      "action": "bug_hunter documents or renames; stop re-investigating every run"
     },
     {
-      "problem": "Oversold LONG — pump-chain+ catching falling knives",
-      "evidence_30d": "pump-chain+ LONG RSI bands: <25=3T -$0.40 0%WR, 25-35=6T -$0.49 0%WR, 35-40=4T -$0.12 50%WR, 40-55=18T +$0.54 55.6%WR, 55-70=30T +$2.47 56.7%WR, 70+=29T -$0.26 34.5%WR. Filter RSI_MIN=40: blocks 2 winners (+$0.31), saves 11 losers (-$1.32), net +$1.01/30d.",
-      "verdict": "STRONG candidate for post-window config: PUMP_CHAIN_LONG_RSI_MIN=40. Philosophy-aligned: every dump is SHORT — don't LONG pump-chain into oversold.",
-      "sample_size": "30d n=90 pump-chain+ LONG total, 13 trades in RSI<40 band — meets 20T signal-level threshold for the filter decision (13 blocked + 2 blocked winners)."
+      "problem": "ema_reclaim_long 0 signals",
+      "frequency": "6+ sessions",
+      "status": "STILL OPEN — delegated repeatedly, never diagnosed",
+      "action": "signal_analyst: run detection-coverage dry-scan; check confluence gate and STANDALONE_BYPASS eligibility"
     },
     {
-      "problem": "hard_max_loss family still main 24h bleed (~8-10T -$1.40-1.67)",
-      "evidence": "24h losers: 8/10 exit via hard_max_loss/hard_sl. Watchdog: 'hard_max_loss exits work — the problem is ENTRY QUALITY, not stops.'",
-      "verdict": "Do NOT loosen hard_max_loss. Fix entry quality (oversold filter, chasing). Already on CEO monitor list via bug_hunter (price vs leveraged PnL semantics)."
+      "problem": "SHORT structural bleed",
+      "frequency": "10+ sessions",
+      "status": "IMPROVING — -$1.14/7d from -$1.48; post-Fix2 SHORT 5T +$0.18 60%WR",
+      "action": "Monitor. Do NOT raise SHORT_CONTINUUM_SCORE_MAX. RSI_MIN=40 verified working."
     },
     {
-      "problem": "bb-squeeze+ 24h drag — 10T -$0.02 with 4 hard_max_loss losers (SUSHI, NEAR, STX, ACE)",
-      "evidence_21d": "HIGH habitat 20T +$0.40 65%WR (KEEP). EXTREME 13T -$0.25 46.2% (block already live). NORMAL 4T -$0.17 50% (n=4 insufficient).",
-      "verdict": "Signal is net positive on 7d (+$0.31). Losers are normal variance + one STX high-RSI via designed bypass. NO filter change — monitor."
+      "problem": "Signal concentration / diversity",
+      "frequency": "8+ sessions",
+      "status": "Family cap REJECTED (49% winners blocked). Alternative: hotset priority for volume-breakout.",
+      "action": "Post-window: consider volume-breakout hotset priority (prior creative idea). Do not re-propose family cap."
     },
     {
-      "problem": "SHORT still bleeding 7d -$1.14/53T 47.2%",
-      "evidence": "LONG 7d +$3.61/141T 54.6%. SHORT structural R:R disadvantage persists. SHORT_CONTINUUM_SCORE_MAX=30, HARD_FLOOR=25 monitor windows active.",
-      "verdict": "Already on CEO monitor. Do not raise without post-Fix2 SHORT data. No change."
-    },
-    {
-      "problem": "ema_reclaim_long: 0 signals every cycle (NEUTRAL diversity gap)",
-      "evidence": "Built+registered+ENABLED Sep 2, still 0 closed trades. Needs confluence partners, not standalone.",
-      "verdict": "Still #1 diversity gap. DELEGATE signal_analyst — detection coverage. Already on monitor list."
+      "problem": "DRIFT-002 exec-time RSI timeframe",
+      "frequency": "4+ sessions",
+      "status": "OPEN — bug_hunter owns",
+      "action": "Escalate if not fixed by next run"
     }
   ],
   "missing_implementations": [
     {
-      "item": "Per-trade regime-aware confidence decay (session brain vision)",
-      "status": "gap — REGIME_SIGNAL_AFFINITY only affects rotation, not per-trade confidence",
-      "priority": "research post-window"
+      "item": "ema_reclaim_long detection coverage",
+      "owner": "signal_analyst",
+      "status": "delegated 4+ times, 0 signals, never diagnosed",
+      "priority": "HIGH — #1 diversity gap"
     },
     {
-      "item": "PUMP_CHAIN_LONG_RSI_MIN=40 oversold filter",
-      "status": "analyzed this run — READY post-window (net +$1.01/30d, 2 winners blocked vs 11 losers saved)",
-      "priority": "apply after 21:55 UTC if no other change queued that conflicts"
+      "item": "volume-breakout conf boost 1.15→1.25",
+      "owner": "brain_auditor / next agent after 21:55 UTC",
+      "status": "QUEUED at signal_compactor.py:709 — apply post-window, restart pipeline",
+      "priority": "HIGH — 22T 72.7%WR +$3.42/30d threshold met"
     },
     {
-      "item": "Execution-time gap guard (block fill when gap_at_entry > threshold)",
-      "status": "not built — global pattern real but signal-specific n too small",
-      "priority": "monitor 7d more"
+      "item": "DRIFT-002 RSI timeframe alignment",
+      "owner": "bug_hunter",
+      "status": "OPEN",
+      "priority": "MEDIUM"
     },
     {
-      "item": "NEUTRAL momentum signal (volume-dry-up / trend-continuation)",
-      "status": "ema_reclaim exists but 0 signals — confluence starvation",
-      "priority": "delegate signal_analyst (already delegated)"
+      "item": "mover+ entry quality",
+      "owner": "signal_analyst",
+      "status": "8T/14d 25%WR -$1.19 — sample <20, monitor. Winners had RSI 42-52, losers 50-76 (chase pattern).",
+      "priority": "MEDIUM — re-eval at 20T"
+    },
+    {
+      "item": "Coin tracker Wyckoff/phase-transition signal",
+      "owner": "signal_analyst",
+      "status": "unbuilt",
+      "priority": "LOW"
+    },
+    {
+      "item": "Orphan regime_15m.json cleanup",
+      "owner": "anyone",
+      "status": "delete file or fix trade_watchdog_prompt.md",
+      "priority": "LOW — infra noise only"
     }
   ],
   "losing_trade_autopsy_24h": {
-    "losers_n": 10,
-    "total_pnl": -1.43,
-    "exit_reasons": {
-      "hard_max_loss": 6,
-      "hard_sl": 1,
-      "pump_exit_dead_money": 1,
-      "profit-monster-trail_scratch": 2
-    },
+    "losers": 9,
+    "total_loss": "-$1.36",
+    "all_exit_reason": "hard_max_loss family (price ~1% move trigger)",
     "clusters": [
       {
-        "cluster": "bb-squeeze+ LONG",
-        "losers": "SUSHI -$0.12 (gap=1.58), NEAR -$0.23 (gap=0.28), STX -$0.11 (rsi=75.47), ACE -$0.01 + -$0.27",
-        "root_cause": "NORMAL/HIGH chop + one designed high-RSI bypass. No single filter — signal still net + on 21d HIGH habitat.",
-        "recommended_change": "NONE — monitor",
-        "confidence": "HIGH"
+        "signal": "pump-chain+ LONG EXTREME",
+        "trades": "ACE -0.27 (RSI 62.9 conf 99, 0.2h), INJ -0.22 (RSI 52.5 conf 99, 0.3h), JUP -0.07 pump_exit",
+        "root_cause": "EXTREME whipsaw — pump started then reversed within 15-20min. Entry RSI 52-63 is in sweet spot (50-60 historically 66.7%WR +$1.68). Confidence 99 does NOT separate winners from losers.",
+        "filterable": "NO — RSI fine, conf fine. Momentum-failure class. Would need failed-momentum early cut (-0.6%/15min) — needs backtest vs winners MAE.",
+        "impact_on_winners_if_filtered": "Cannot filter by RSI/conf. Early-cut idea must be backtested."
       },
       {
-        "cluster": "pump-chain+ LONG chasing",
-        "losers": "INJ -$0.22 (gap=1.98), ACE -$0.27 (gap=1.50), JUP -$0.07 (dead_money)",
-        "root_cause": "Entered after move already happened (gap>1.5%). ME +$0.88 same signal same day had gap=0.25.",
-        "recommended_change": "MONITOR gap filter for pump-chain+ — n=8 signal-specific insufficient. Global gap>=1% filter would kill SYRUP +$0.21 (gap=1.83) and other bb-squeeze winners.",
-        "impact_on_winners": "Global gap filter would block multiple 24h winners. Do not apply globally.",
-        "confidence": "MEDIUM"
+        "signal": "bb-squeeze+ LONG HIGH/NORMAL",
+        "trades": "NEAR -0.23 (RSI 51.3 conf 89), SUSHI -0.12 (RSI 57.8 conf 95), STX -0.11, ACE -0.01",
+        "root_cause": "RSI 50-60 is squeeze's weak band (14d: 16T 9W -$0.39). Conf 89-95 on losers too.",
+        "filterable": "PARTIAL — RSI 50-60 confidence penalty candidate (see creative idea #1). Hard block would kill 9 winners in same band.",
+        "impact_on_winners_if_filtered": "Penalty (not block) may reduce fire rate; winners in band have conf 89-99 — needs backtest to confirm penalty doesn't kill them."
       },
       {
-        "cluster": "pump-chain- SHORT",
-        "losers": "CRV -$0.11 (rsi=50.93), APT -$0.21 (rsi=41.46) — both EXTREME",
-        "root_cause": "EXTREME chop SHORTs. DYDX +$0.45 same signal same day (rsi=45.13) won — variance, not systematic.",
-        "recommended_change": "NONE — SHORT filters (RSI_MIN=40, HARD_FLOOR=25) already live. Monitor.",
-        "confidence": "HIGH"
+        "signal": "pump-chain- SHORT EXTREME",
+        "trades": "APT -0.21 (RSI 41.5, just above MIN=40), CRV -0.11",
+        "root_cause": "SHORT EXTREME chop. APT RSI 41.5 is in historical sweet spot (40-45 = 75%WR +$0.47).",
+        "filterable": "NO — raising RSI_MIN again would block sweet-spot entries. RSI_MIN=40 already verified working (0 RSI<40 post Oct 1 11:50).",
+        "impact_on_winners_if_filtered": "Would block historical winners. Do not raise."
       }
     ],
-    "philosophy_check": "Losers are chasing + normal chop, NOT wrong-side momentum fades. hard_max_loss working. Entry quality is the fix target."
+    "cross_reference_winners": "24h winners: pump-chain+ 5W all EXTREME (ME +0.88 RSI 64.7, LDO +0.38 RSI 59.6, ENS +0.20 RSI 65.1) — same signal, same regime, similar RSI to losers. Regime/RSI do not separate. Difference is momentum follow-through (winners rode, losers reversed).",
+    "conclusion": "No safe single-variable filter blocks 24h losers without risking same-signal winners. Entry-quality/momentum-failure class. Monitor. Failed-momentum early cut is the only candidate — needs independent backtest."
+  },
+  "signal_quality_deep_dive": {
+    "bb-squeeze+": {
+      "14d": "35T 60%WR +$0.19",
+      "rsi_affinity_INVERTED": {
+        "70+": "7T 6W +$0.45 (85.7%WR — BEST)",
+        "60-70": "7T 5W +$0.21",
+        "50-60": "16T 9W -$0.39 (56%WR — weak band, avg_loss>avg_win)",
+        "<40": "2T 0W -$0.14"
+      },
+      "insight": "Squeeze = momentum continuation — HIGHER RSI wins, opposite of bb-bounce (oversold). Prior sessions never tested squeeze RSI bands. NEW finding.",
+      "recommendation": "Confidence PENALTY (not block) for RSI 50-60 squeeze entries — needs backtest. Do NOT add RSI_MAX (would kill 70+ edge).",
+      "regime": "HIGH habitat 19T 68.4%WR +$0.51 | EXTREME blocked (12T 50% -$0.15 — block CORRECT) | NORMAL 4T 50% -$0.17 marginal"
+    },
+    "bb-bounce-v2-long+": {
+      "14d": "21T 47.6%WR -$0.02 marginal",
+      "rsi_bands": "50-60 = 7T 6W +$0.23 sweet spot | 60-70 = 11T 4W -$0.21 | 70+ = 3T 0W -$0.04",
+      "rsi_max_60": "REJECTED — 4/10 winners blocked (40% > 20% rule). Net +$0.25 saved but disqualified.",
+      "regime": "HIGH 14T 50% -$0.10 | NORMAL 7T 42.9% +$0.08"
+    },
+    "bb-bounce-v3-long+": {
+      "14d": "10T 60%WR +$0.21",
+      "rsi_bands": "<40 = 4T 3W +$0.03 | 40-50 = 5T 3W +$0.20 BEST | 60-70 = 1T 0W -$0.02",
+      "insight": "v3 likes TRUE oversold (RSI<50), opposite of v2's current pattern. COMP open at RSI 46.67 is in v3's best band — watchdog 'weak' call is about SL/thesis, not RSI band.",
+      "recommendation": "No change — sample 10T < 20T threshold."
+    },
+    "volume-breakout-long+": {
+      "14d": "9T 77.8%WR +$2.66 | 4T/7d +$1.96 100%WR",
+      "conf_boost": "STILL 1.15 at signal_compactor.py:709 — QUEUED post-21:55 UTC",
+      "exposure": "ZERO open positions while book is 4/4 bb-bounce/squeeze",
+      "recommendation": "Apply boost post-window. Consider hotset priority post-window (prior creative idea)."
+    },
+    "pump-chain+": {
+      "today": "8T 62.5%WR +$0.95 all EXTREME conf 96-99 RSI 52-69 — carrying the book",
+      "14d": "45T 40%WR +$0.55 recovering after V5 kill",
+      "recommendation": "DO NOT TOUCH — working today. Watchdog 'don't disable' respected."
+    },
+    "mover+": {
+      "14d": "8T 25%WR -$1.19 worst signal",
+      "pattern": "Winners RSI 42-52, losers RSI 50-76 — chase pattern. atr_sl_hit deep losses at conf 99.",
+      "sample": "8T < 20T — insufficient to change. Monitor to 20T."
+    },
+    "doji-bottom-long": {
+      "30d": "14T 71.4%WR +$0.79 | 7d 8T 75%WR +$0.39",
+      "status": "Below 20T threshold for conf boost. Monitor."
+    }
+  },
+  "filters_verified_working": {
+    "PUMP_CHAIN_SHORT_RSI_MIN=40": "3 RSI<40 trades Oct 1 00:45-03:47 (pre-raise), 0 since post-11:50 ✓",
+    "CASHCAT_blacklist": "Last trade Sep 29 13:19 ✓",
+    "bb-squeeze_EXTREME_block": "No EXTREME opens post-block; HIGH habitat 68.4%WR kept ✓",
+    "PUMP_CHAIN_V5_ENABLED=False": "Disabled, aging out ✓",
+    "volume-breakout_RSI_CEILING=95": "In constants, STANDALONE_BYPASS momentum signal ✓",
+    "ATR_SL widening": "atr_trail_hit 5T +$1.40/24h, 8T +$1.58/7d — working ✓",
+    "volume-breakout conf boost": "STILL 1.15 — QUEUED, NOT YET APPLIED (window active) ✓"
   },
   "creative_improvements": [
     {
-      "date": "2026-10-03T18:38:05Z",
-      "idea": "PUMP_CHAIN_LONG_RSI_MIN=40 — block pump-chain+ LONG when RSI < 40 (oversold falling-knife)",
-      "rationale": "30d pump-chain+ LONG RSI<40: 13T 15.4%WR -$1.01. Sweet spot starts at RSI 40-55 (18T 55.6% +$0.54) and peaks 55-70 (30T 56.7% +$2.47). Philosophy: every dump is SHORT — pump-chain+ LONG into oversold is wrong-side. Filter blocks 2 winners (+$0.31) vs 11 losers (-$1.32), net +$1.01/30d. Sample: 13 trades in blocked band — sufficient for signal-level filter.",
-      "expected_impact": "+$0.20-0.35/7d if trade frequency holds (~3-4 pump-chain+ LONG RSI<40 per 30d → ~1/7d)",
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "bb-squeeze+ inverted-RSI confidence penalty for 50-60 band",
+      "rationale": "14d RSI bands: 70+ = 7T 6W +$0.45 (85.7%WR BEST), 60-70 = 7T 5W +$0.21, 50-60 = 16T 9W -$0.39 (56%WR weak band), <40 = 2T 0W -$0.14. Squeeze = momentum continuation — higher RSI wins, OPPOSITE of bb-bounce oversold preference. Prior sessions never tested squeeze RSI affinity. 16T weak-band sample exceeds 20T-adjacent threshold for investigation. 24h losers NEAR RSI 51.3 + SUSHI RSI 57.8 both in weak band; winners SEI RSI 70.5 + XPL RSI 77.2 in strong band.",
+      "expected_impact": "If penalty (-10pt conf) blocks ~30-40% of 50-60 band fires without killing the 9 winners in band (conf 89-99), saves ~$0.15-0.25/14d. MUST backtest first — winners have high conf, penalty may push them below execution threshold.",
       "category": "entry sniper",
       "status": "suggested_post_window",
-      "risk": "low",
-      "prereq": "Apply AFTER bollinger window ends 21:55 UTC. One variable only. Do not stack with other pump-chain changes."
+      "risk": "low — no config change until signal_analyst backtests penalty vs winners in band",
+      "verification": "DB-verified 14d RSI bands this run. Not time-based. Sample 16T weak band."
     },
     {
-      "date": "2026-10-03T18:38:05Z",
-      "idea": "Regime-flip habitat review — EXTREME is now BEST (+$2.07/7d), NORMAL is WORST (-$0.31/7d)",
-      "rationale": "7d PG: EXTREME 88T 54.5%WR +$2.07, NORMAL 45T 46.7%WR -$0.31. Old narrative (EXTREME bleeds, NEUTRAL-only) is inverted in current MARKUP/STRONG_UP BTC regime. Existing EXTREME blocks (bb-squeeze EXTREME, pump-chain- EXTREME) may now block the profitable habitat. BUT standing decision: 0 config changes during monitor windows; do not re-litigate kills without new data.",
-      "expected_impact": "Unknown — if EXTREME blocks are blocking winners now, relaxing them could add edge. MUST backtest 7d post-Fix2 data before any change.",
-      "category": "regime",
-      "status": "suggested_monitor",
-      "risk": "medium",
-      "prereq": "Post-window: re-run regime×signal matrix with last 7d. Only then consider relaxing an EXTREME block. One signal at a time."
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "REJECTED: bb-bounce-v2-long+ RSI_MAX=60",
+      "rationale": "Prior sessions suggested 6+ times claiming '0 winners blocked'. CURRENT 14d data: 4 winners exist with RSI>60 (SAND 64.71 +$0.05, SYRUP 61.9 +$0.01, ETH 65.99 +$0.09, POL 66.43 +$0.02). Filter would block 4/10 winners = 40% > 20% quality-rule threshold. Net PnL +$0.25/14d positive but disqualified by winner-kill rate.",
+      "expected_impact": "N/A — rejected",
+      "category": "rejected",
+      "status": "rejected_quality_rule",
+      "risk": "n/a",
+      "verification": "DB-verified this run. Do NOT re-propose on stale '0 winners blocked' claim."
     },
     {
-      "date": "2026-10-03T18:38:05Z",
-      "idea": "Watchdog RSI data-quality fix — deep_analysis RSI values don't match trade metadata",
-      "rationale": "Watchdog claimed NEAR@87.5 / INJ@60.8; DB rsi_14 shows NEAR=51.32 / INJ=52.45. If watchdog computes RSI from different timeframe/source than signal_metadata, its 'high-RSI longs are killers' steer is systematically wrong and will drive bad filters. 7d LONG RSI>70 is net POSITIVE (8W/4L).",
-      "expected_impact": "Prevents false-positive filter suggestions (would have killed bb-squeeze winners at RSI 72-82).",
-      "category": "systems",
-      "status": "suggested",
-      "risk": "low",
-      "prereq": "Watchdog owner: align RSI source with trade_metadata.rsi_14, or label which timeframe RSI is shown."
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "REJECTED: signal-family concentration cap (max 2 open bb-bounce/bb-squeeze)",
+      "rationale": "Watchdog steered 4/4 same-family exposure. Simulated cap=2 over 7d bb-family (58 trades): would block 17/35 winners = 49% >> 20% threshold. bb-squeeze is high-frequency small-winner signal — concurrency cap destroys edge.",
+      "expected_impact": "N/A — rejected",
+      "category": "rejected",
+      "status": "rejected_quality_rule",
+      "risk": "n/a",
+      "verification": "Overlap simulation DB-verified this run."
     },
     {
-      "date": "2026-10-03T18:38:05Z",
-      "idea": "Disk trajectory alert — 84% now, was 80% at CEO 17:50 (~4%/3h)",
-      "rationale": "If trajectory holds, hits 88% prune threshold within ~6-8h. coin_tracker 3.3G + candles 2.3G untouched. Prune policy: next prune when disk >88%, NEVER vacuum coin_tracker/candles during trading.",
-      "expected_impact": "Avoid emergency prune during live trading hours.",
-      "category": "systems",
-      "status": "monitor",
-      "risk": "low",
-      "prereq": "Auto_1hr/CEO: if disk >86% before 21:55 UTC, consider off-path prune (mtf_macd_tuner backtest tables >7d, hl_copy trader_fills >30d) — NOT candles/coin_tracker."
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "Failed-momentum early cut — exit LONG at -0.6% unrealized / 15min if velocity negative, before hard_max_loss ~1% price",
+      "rationale": "24h losers: pump-chain+ ACE/INJ entered RSI sweet spot (52-63) conf 99 then reversed within 15-20min to hard_max_loss. RSI/conf do NOT separate winners from losers — momentum follow-through does. Early cut would exit failed pumps before full ~1% price loss. Prior run 17:38 floated same idea.",
+      "expected_impact": "If backtest vs winners MAE shows <20% of winners dip below -0.6% in first 15min before recovering, saves ~$0.15-0.30/24h on failed pumps. Unknown until backtest.",
+      "category": "exit quality",
+      "status": "needs_backtest",
+      "risk": "medium — could cut winners that dip then recover; MUST verify against winner MAE distribution",
+      "verification": "24h autopsy DB-verified. Not time-of-day — it's intra-trade momentum state."
+    },
+    {
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "volume-breakout hotset priority — ensure best signal (77.8%WR) gets book exposure",
+      "rationale": "volume-breakout-long+ 9T 77.8%WR +$2.66/14d, 4T/7d +$1.96 100%WR — ZERO open positions while book is 4/4 bb-bounce/squeeze (marginal ~60%WR). Watchdog: 'betting the book on mediocre signals while the best signal sits unused.'",
+      "expected_impact": "If hotset prioritizes volume-breakout setups when present, shifts exposure from 47-60%WR family to 78%WR signal. Prior creative idea from 17:38 run.",
+      "category": "portfolio intelligence",
+      "status": "suggested_post_window",
+      "risk": "low — prioritization, not blocking",
+      "verification": "DB-verified exposure gap this run."
+    },
+    {
+      "date": "2026-10-03T20:36:00Z",
+      "idea": "hard_max_loss exit_reason clarity — append _px or print price-move pnl instead of leveraged live_pnl",
+      "rationale": "exit_reason 'hard_max_loss_-4.84%' shows LEVERAGED pnl while trigger is ~1% PRICE move (CUT_LOSER_PNL=-1.00). Causes CEO/auditor to re-investigate every run. position_manager.py:3267 prints live_pnl. System is CORRECT — reporting is misleading.",
+      "expected_impact": "Zero PnL impact. Saves analyst cycles. Closes recurring 'hard_max_loss semantics' problem permanently.",
+      "category": "observability",
+      "status": "suggested_post_window",
+      "risk": "trivial — string format change only",
+      "verification": "Code + DB verified this run (lev5: price_move 0.86% vs pnl_pct -4.28%)."
     }
   ],
+  "config_changes_applied": [],
   "next_actions": [
-    "21:55 UTC: apply volume-breakout conf boost 1.15→1.25 at signal_compactor.py:709 (QUEUED, verified still 1.15). Restart pipeline after.",
-    "Post-window (after boost applied + monitor): evaluate PUMP_CHAIN_LONG_RSI_MIN=40 — data ready, net +$1.01/30d.",
-    "Post-window: accel_300_v3_long NEUTRAL block or disable (7T/7d -$0.37 42.9% all NEUTRAL).",
-    "Watchdog owner: fix RSI source in pattern_alerts (false high-RSI narrative). Stop treating 15m_regime.err.log as health signal.",
-    "DELEGATE signal_analyst: ema_reclaim detection coverage (0 signals).",
-    "DELEGATE bug_hunter: hard_max_loss price vs leveraged PnL semantics (still open).",
-    "Monitor: disk 84%→88% prune threshold; COMP open trade; SHORT count post-Fix2; doji to 20T.",
-    "NO trading config changes this run — bollinger_squeeze 48h window active until 21:55 UTC."
+    "AFTER 21:55 UTC: APPLY volume-breakout conf boost 1.15→1.25 at signal_compactor.py:709, restart pipeline (22T 72.7%WR +$3.42/30d verified, threshold met)",
+    "Post-window: signal_analyst backtest bb-squeeze 50-60 RSI confidence penalty vs 9 winners in band",
+    "Post-window: verify accel_300_v3_long actual trade naming — CEO says 7T/7d -$0.37 but DB shows 0 trades any accel-v3 naming last 7d (possible underscore/hyphen mismatch or aging). Do NOT NEUTRAL-block until verified.",
+    "Post-window: consider volume-breakout hotset priority (creative idea #5)",
+    "Infra: delete orphan regime_15m.json OR fix trade_watchdog_prompt.md (code already reads regime_5m.json correctly)",
+    "signal_analyst: ema_reclaim_long STILL 0 signals — run detection-coverage dry-scan, check confluence gate + STANDALONE_BYPASS eligibility",
+    "bug_hunter: DRIFT-002 still open (escalate). hard_max_loss semantics now VERIFIED dual-metric — document/close.",
+    "Monitor: COMP open -0.76% (watchdog: cut if 15m < 25.30), doji at 20T (14T/30d), SHORT post-Fix2, disk 84%→prune at 88%",
+    "DO NOT re-propose: family concentration cap (49% winners blocked), bb-bounce RSI_MAX=60 (40% winners blocked), time-based blocks, SHORT_CONTINUUM_SCORE_MAX raise, pump-chain+ disable (working today +$0.95)",
+    "DO NOT apply trading config until bollinger window ends 21:55 UTC"
   ],
-  "verdict": "SYSTEM HEALTHY. 24h +$1.36/61.3%WR (31T). 7d +$2.35/52.3%. Watchdog steers used but two claims REFUTED with DB evidence (15m scanner healthy; high-RSI longs net positive). Real edge leak = pump-chain+ oversold LONGs — filter analyzed, queued post-window. 0 config changes applied."
+  "sanity_check": {
+    "system": "HEALTHY and IMPROVING — 24h +$1.63 63.3%WR, 7d +$2.35 52.3%WR",
+    "long_edge": "INTACT +$3.49/7d 54.2%",
+    "short_containment": "IMPROVING -$1.14/7d from -$1.48; filters verified working",
+    "regime_flip": "EXTREME now BEST +$2.07/7d — blocks from Sep era need sunset review (prior creative idea)",
+    "worst_14d_signals": "Already killed/disabled in prior runs, aging out",
+    "open_risk": "4/4 long into LOW-conviction chop (watchdog) — correlation risk real but positions near-flat, do not add",
+    "this_run_changes": "0 trading config (window active). 0 code changes. Audit + creative log only."
+  }
 }
