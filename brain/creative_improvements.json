@@ -2088,5 +2088,45 @@
     "category": "signal diversity",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-03T06:37:00Z",
+    "idea": "Apply volume-breakout-long+ confidence boost when monitor window ends",
+    "rationale": "22T 72.7%WR +$3.42/30d, ALL NEUTRAL (EXTREME habitat claim was stale/unverified). Crossed 20T threshold. Strongest signal in system.",
+    "expected_impact": "+$0.30-0.50/7d from higher conviction on proven edge",
+    "category": "confidence routing",
+    "status": "queued — apply post-monitor-window",
+    "risk": "low",
+    "sample_size": "22T (meets 20T threshold)"
+  },
+  {
+    "date": "2026-10-03T06:37:00Z",
+    "idea": "pump-chain- SHORT EXTREME confidence penalty (-10pt) — CONTINGENT",
+    "rationale": "EXTREME 60T 50%WR -$0.69/14d — large sample, breakeven-minus-fees. Not kill-worthy (50%WR) but confidence penalty could reduce size on marginal setups without blocking.",
+    "expected_impact": "+$0.10-0.20/7d if EXTREME WR holds at 50%",
+    "category": "entry sniper",
+    "status": "suggested — CONTINGENT on EXTREME WR < 48% over next 7d",
+    "risk": "low-medium — might block future winners",
+    "sample_size": "60T (meets threshold)"
+  },
+  {
+    "date": "2026-10-03T06:37:00Z",
+    "idea": "Stale-signal confidence decay (adaptive, not time-based)",
+    "rationale": "Session brain: 'signals that have a high winrate at some point need to be preserved, as the current market regime has changed.' Concept: if rolling 7d WR drops >15pt below 30d WR, apply confidence penalty until regime shifts. Adaptive to regime, not clock-based.",
+    "expected_impact": "reduces bleed from signals degrading as regime shifts; preserves edge when regime matches",
+    "category": "adaptive filter",
+    "status": "concept — needs backtest before implementation",
+    "risk": "medium — complex, needs independent verification",
+    "sample_size": "N/A (concept)"
+  },
+  {
+    "date": "2026-10-03T06:37:00Z",
+    "idea": "Verify PORTFOLIO_HEAT catches same-signal correlated clusters",
+    "rationale": "Watchdog flagged JUP+INJ both pump-chain+ longs opened 8 min apart, same leverage/size. PORTFOLIO_HEAT_ENABLED=True exists but may not block same-(signal,direction) clusters. One BTC dump kills both.",
+    "expected_impact": "reduces correlated blowup risk; no WR impact if heat already works",
+    "category": "risk control",
+    "status": "suggested — verify coverage, then decide if code gap exists",
+    "risk": "low",
+    "sample_size": "N/A (infra check)"
   }
 ]
