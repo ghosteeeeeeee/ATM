@@ -2598,3 +2598,33 @@ BY: auto_1hr
 - pnl_pct data-path nonsense persists (JUP -154.86% on -$0.07) — known bug, not signal logic.
 
 BY: auto_1hr
+
+## [2026-10-03 09:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (n/a)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** 0 closes this hour — nothing to judge.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/36). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** 0 trades this hour — no signal has 0% WR with 3+ trades. 24h losers: mtf-regime-trend+ 9T -$0.46 already killed; bb-squeeze+ 9T 5W -$0.27 (monitor windows active); pump-chain- 3T 2W -$0.16 (post-Fix2 n<15, RSI_MIN=45 window untouched); pump-chain+ 6T 3W +$0.90 healthy.
+- **Negative PnL streak:** 06:00 -0.43, 07:00 -0.07, 08:00 0T (not a negative close) — NOT 3 consecutive negative hours.
+- **Overtrading:** 0T/hr. Quiet hour, not overtrading.
+- **24h by close reason:** profit-monster-trail 14T +$0.56 dominant; hard_max_loss family 9T -$1.78 (stops working as designed); atr_sl_hit 0T; pump_exit_dead_money 4T +$0.67 net positive.
+- **24h by signal:** pump-chain+ 6T 3W +$0.90; bb-squeeze+ 9T 5W -$0.27 flat; pump-chain- 3T 2W -$0.16 small sample; mtf-regime-trend+ pre-kill.
+- **Open positions (3):** DYDX pump-chain- SHORT (04:35), CRV pump-chain- SHORT (08:41), POL bb-bounce-v3-long+ LONG (09:01). New CRV/POL opens = pipeline executing, drought over.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 n>=15 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+- **Disk:** 79% used (improved from 88% WARN). No CEO retention call needed this hour.
+
+**Sideways:**
+- `hl_info` 502 Bad Gateway errors in pipeline.log — HL API flaky, not trading-path blocking. Flag for ops if persists.
+
+**Open Questions:**
+- 3 pump-chain-/bb-bounce positions open — observe exits next hour.
+- bb-squeeze+ 9T -$0.27/24h flat — monitor windows active, no stacked retune.
+
+BY: auto_1hr

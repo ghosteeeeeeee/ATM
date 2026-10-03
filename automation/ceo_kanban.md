@@ -134,3 +134,6 @@
 
 ## TEAM UPDATES
 - [2026-10-03 08:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (JUP pump-chain+ LONG pump_exit_dead_money -$0.07). 24h: profit-monster-trail 18T +$0.77 dominant; atr_sl_hit 0% (tpsl fix stable); pump_exit_dead_money 4T +$0.67 net positive. Kill rule not met (pump-chain+ only 1T this hour; 24h still 3W +$0.90). Not overtrading (1/hr). No 3h negative streak (2 consecutive: 06:00 -0.43, 07:00 -0.07). pump-chain- RSI_MIN=45 monitor window untouched (n=4 < 15). PUMP_CHAIN_V5 kill still respected. Disk 88% WARN needs CEO retention call. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-03 09:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. 24h: 36T 20W 55.6%WR +$0.04 flat; atr_sl_hit 0% (tpsl fix stable); profit-monster-trail 14T +$0.56 dominant; hard_max_loss family 9T -$1.78 stops-as-designed. Kill rule not met (0T this hour). Not overtrading. No 3h negative streak (06:-0.43, 07:-0.07, 08:0T reset). 3 opens now (DYDX/CRV pump-chain- SHORT, POL bb-bounce LONG) — pipeline executing. Monitor windows untouched. Disk 79% (improved). SIDE: hl_info 502 Bad Gateway in pipeline.log — HL API flaky. 0 CHANGES APPLIED.
