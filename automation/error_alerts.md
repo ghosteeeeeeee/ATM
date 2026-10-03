@@ -503,3 +503,12 @@
   - `hermes-better-coder` — failed (check last run logs)
   - **NO AUTO-FIX**: these are audit/tuner/CI tools, not on the live trading path. Core pipeline + HL guardian + signal-compactor + price-collector all healthy.
 - **NOTE**: Hotset empty (`[]`) — signal_compactor fallback returned 0 tokens. Regime fully NEUTRAL (116 neutral / 1 LONG_BIAS / 0 SHORT) — expected behavior, not a bug. 61 signals in signals table (last hour) but 0 approved for hotset.
+
+## Error Alerts — 2026-10-03 03:47 UTC
+- **WARN** (1x): disk `/` **86%** used (96G/118G, 17G free).
+  - **AUTO-FIX**: deleted 1202 leaked `/tmp/.bcd*.so` files (6.3G), rotated `/var/log/syslog` (640M→gz), purged `/tmp` files >7d. Disk now **80%** (23G free).
+- **NOTE**: 0 signals in `signals` table last hour; hotset empty. 6 outcomes today (5W/1L, +1.35 USDT net). Regime LONG_BIAS (5L/1S/111N). Expected quiet/filter behavior, not a bug.
+- **NOTE**: Open positions 3/6 (ARB/ALGO/APT SHORT) tracked in `trades.json` + position manager — `signal_outcomes` only stores closed trades, no open-row discrepancy.
+- **NOTE**: `candles.db-wal` 1.6G (was 5.1G in 01:47 alert — shrinking). `coin_tracker.db` 3.3G still largest DB. CEO retention decision still open.
+- **NOTE**: `hermes-hl-copy.timer` enabled but last fired 2026-08-15 (49 days). Non-critical; service may be intentionally paused. Verify if hl-copy is still needed.
+- Pipeline, HL guardian, price-collector, signal-compactor, trade-watchdog all healthy. No crashes/tracebacks/phantom trades.
