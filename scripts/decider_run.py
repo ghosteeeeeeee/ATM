@@ -1813,7 +1813,7 @@ def execute_trade(token, direction, price, confidence, source,
     # time, RSI may have dropped into danger zone. Check NOW at execution time.
     # CASHCAT教训: RSI 15.5 and 33.4 at entry → -6.4% loss (price bounced from oversold)
     try:
-        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
+        from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, SHORT_RSI_HARD_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
         import sqlite3 as _rsi_sqlite
         from paths import CANDLES_DB as _rsi_candles_db
         _rsi_conn = _rsi_sqlite.connect(f"file:{_rsi_candles_db}?mode=ro", uri=True, timeout=5)
@@ -1845,33 +1845,41 @@ def execute_trade(token, direction, price, confidence, source,
                     if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
                         log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
                         return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
+                    # bf96d7cd completion 2026-10-03: SHORT_RSI_FLOOR blocks ALL shorts below floor at exec
+                    # time too — no bearish override. Data: 77 RSI<40 shorts = 31%WR -$4.66/14d.
+                    # Oversold coins bounce regardless of BTC regime (detection-time override already removed).
                     if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
-                        # Bearish structure override: oversold = continuation in downtrend
-                        _exec_bearish = False
+                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — no bearish override)')
+                        return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+                    if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
+                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
+                        return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+                    # CEO Fix5 2026-10-02: RSI 65-75 bear-structure-gated exemption; RSI>75 always blocked.
+                    if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
+                        if SHORT_RSI_HARD_CEILING > 0 and _exec_rsi > SHORT_RSI_HARD_CEILING:
+                            log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING} at execution time (hard ceiling — no bear exemption)')
+                            return False, f'RSI hard ceiling: {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING}'
+                        _exec_ceiling_bearish = False
                         try:
-                            import os as _ex_os
-                            _ex_cont = sqlite3.connect(_ex_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            import os as _ec_os
+                            _ec_cont = sqlite3.connect(_ec_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
                             try:
-                                _ex_row = _ex_cont.execute(
+                                _ec_row = _ec_cont.execute(
                                     "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
                                     "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
                                 ).fetchone()
                             finally:
-                                _ex_cont.close()
-                            if _ex_row and _ex_row[0] in ('DECLINING', 'CALM', 'RECOVERY') and \
-                               _ex_row[1] in ('LEAN_BEAR', 'BEAR') and _ex_row[2] == 'BELOW':
-                                _exec_bearish = True
+                                _ec_cont.close()
+                            if _ec_row and (_ec_row[1] in ('LEAN_BEAR', 'BEAR') or
+                                            _ec_row[0] in ('DECLINING', 'STORMY') or
+                                            _ec_row[2] == 'BELOW'):
+                                _exec_ceiling_bearish = True
                         except Exception:
                             pass
-                        if not _exec_bearish:
-                            log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (would be catching falling knife)')
-                            return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
-                    if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
-                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
-                        return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
-                    if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
-                        log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
-                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
+                        if not _exec_ceiling_bearish:
+                            log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
+                            return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
+                        log(f'  ✅ [EXEC-RSI-CEILING-OVERRIDE] {token} SHORT allowed — RSI {_exec_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)')
                     if direction.upper() == 'LONG' and _exec_rsi > _long_ceiling:
                         log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
                         return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'

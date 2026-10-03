@@ -2795,41 +2795,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass
             # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
-            # Bearish override 2026-10-02: in downtrend, oversold = continuation, not bounce.
+            # bf96d7cd completion 2026-10-03: NO bearish override — oversold = bounce risk even in bear
+            # (77 RSI<40 shorts = 31%WR -$4.66/14d; same data that killed SHORT_RSI_FLOOR override).
+            # Decider blocks all RSI<40 unconditionally — compactor override was dead/confusing path.
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
                 try:
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
                     if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
-                        # Bearish override: check BTC continuum — if bearish, oversold = continuation
-                        _pcs_bearish_override = False
-                        try:
-                            import os as _pcs_os
-                            import time as _pcs_time
-                            _pcs_cont = sqlite3.connect(_pcs_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                            try:
-                                _pcs_row = _pcs_cont.execute(
-                                    "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
-                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                                ).fetchone()
-                            finally:
-                                _pcs_cont.close()
-                            if _pcs_row:
-                                _pcs_phase, _pcs_linreg, _pcs_ema, _pcs_ts = _pcs_row
-                                _pcs_age = _pcs_time.time() - (_pcs_ts or 0)
-                                if _pcs_age < 600:
-                                    _pcs_bearish = (_pcs_phase in ('DECLINING', 'CALM', 'RECOVERY') and
-                                                    _pcs_linreg in ('LEAN_BEAR', 'BEAR') and
-                                                    _pcs_ema == 'BELOW')
-                                    if _pcs_bearish:
-                                        _pcs_bearish_override = True
-                        except Exception:
-                            pass
-                        if _pcs_bearish_override:
-                            log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT bypass — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bearish (oversold = continuation)")
-                        else:
-                            log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d)")
-                            continue
+                        log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d — no bearish override)")
+                        continue
                 except ImportError:
                     pass
             # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
@@ -3469,34 +3444,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Differs from spike filter: runs independently, catches stale signals where
             # RSI was OK at detection but dipped to oversold by execution time.
             # Backtest 7d: blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
+            # bf96d7cd completion 2026-10-03: NO bearish override — blocks ALL RSI<SHORT_RSI_FLOOR.
+            # Data: 77 RSI<40 shorts = 31%WR -$4.66/14d. Oversold bounces regardless of BTC regime.
+            # (Decider detection+exec already unconditional; this removes the leftover compactor override.)
             if direction == 'SHORT' and SHORT_RSI_FLOOR > 0:
-                # Bearish structure override: if BTC continuum says bearish, oversold = continuation
-                # Not bounce risk — in a downtrend, oversold coins keep falling
-                _rsf_bearish_override = False
-                try:
-                    import os as _rsf_os
-                    import time as _rsf_time
-                    _rsf_cont = sqlite3.connect(_rsf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                    try:
-                        _rsf_row = _rsf_cont.execute(
-                            "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
-                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                        ).fetchone()
-                    finally:
-                        _rsf_cont.close()
-                    if _rsf_row:
-                        _rsf_phase, _rsf_linreg, _rsf_ema, _rsf_ts = _rsf_row
-                        # Staleness guard: reject data >10min old (match chop_detector pattern)
-                        _rsf_age = _rsf_time.time() - (_rsf_ts or 0)
-                        if _rsf_age < 600:
-                            _rsf_bearish = (_rsf_phase in ('DECLINING', 'CALM', 'RECOVERY') and
-                                            _rsf_linreg in ('LEAN_BEAR', 'BEAR') and
-                                            _rsf_ema == 'BELOW')
-                            if _rsf_bearish:
-                                _rsf_bearish_override = True
-                except Exception:
-                    pass
-                
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3516,11 +3467,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
                             if _rsf_rsi < SHORT_RSI_FLOOR:
-                                if _rsf_bearish_override:
-                                    log(f"  ✅ [SHORT-RSI-FLOOR-OVERRIDE] {tkn}: SHORT allowed — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
-                                else:
-                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
-                                    continue
+                                log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold — no bearish override)")
+                                continue
                 except Exception:
                     pass  # non-fatal
                 finally:
@@ -3532,12 +3480,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Oversold SHORT guard: prevent BANANA-repeat (RSI < 35) ──
             # Separate from SHORT_RSI_FLOOR — uses 1m candles for tighter detection.
             # BANANA lesson: SHORT at extreme oversold = catching falling knife in reverse.
-            # BUT: in bearish structure (BTC RECOVERY+LEAN_BEAR+BELOW), oversold = continuation
+            # bf96d7cd completion 2026-10-03: NO bearish override — oversold = bounce risk even in bear.
             try:
                 from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                 if direction == 'SHORT' and OVERSOLD_SHORT_RSI_MAX > 0:
-                    # Bearish override: reuse the same check from SHORT RSI floor above
-                    _os_bearish_override = _rsf_bearish_override  # from SHORT RSI floor check above
                     _conn_os = None
                     try:
                         _conn_os = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3557,11 +3503,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             if _os_al > 0:
                                 _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
                                 if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
-                                    if _os_bearish_override:
-                                        log(f"  ✅ [OVERSOLD-SHORT-OVERRIDE] {tkn}: SHORT allowed — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} but BTC bearish (oversold = continuation)")
-                                    else:
-                                        log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
-                                        continue
+                                    log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention — no bearish override)")
+                                    continue
                     finally:
                         if _conn_os:
                             try: _conn_os.close()
@@ -3632,7 +3575,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──
             # Opposite of RSI floor — prevents SHORTing into strength where bounce risk is low
             # but momentum continuation risk is high. 7d: 20T RSI>=65 50%WR -$1.02.
+            # CEO Fix5 2026-10-02: RSI 65-75 bear-structure-gated exemption (overbought+pump in bear
+            # = short per philosophy). RSI>75 (HARD_CEILING) always blocked — no exemption.
             if direction == 'SHORT' and SHORT_RSI_CEILING > 0:
+                from hermes_constants import SHORT_RSI_HARD_CEILING
                 _conn_rsc = None
                 try:
                     _conn_rsc = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3652,8 +3598,35 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsc_al > 0:
                             _rsc_rsi = 100 - (100 / (1 + _rsc_ag / _rsc_al))
                             if _rsc_rsi > SHORT_RSI_CEILING:
-                                log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_CEILING} (overbought)")
-                                continue
+                                # Hard ceiling: RSI>75 always blocked
+                                if SHORT_RSI_HARD_CEILING > 0 and _rsc_rsi > SHORT_RSI_HARD_CEILING:
+                                    log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_HARD_CEILING} (hard ceiling — no bear exemption)")
+                                    continue
+                                # RSI 65-75: bear-structure-gated exemption
+                                _rsc_bearish = False
+                                try:
+                                    import os as _rsc_os
+                                    _rsc_cont = sqlite3.connect(_rsc_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                    try:
+                                        _rsc_row = _rsc_cont.execute(
+                                            "SELECT market_phase, linreg_direction, ema300_position "
+                                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                        ).fetchone()
+                                    finally:
+                                        _rsc_cont.close()
+                                    if _rsc_row:
+                                        _rsc_phase, _rsc_linreg, _rsc_ema = _rsc_row
+                                        if (_rsc_linreg in ('BEAR', 'LEAN_BEAR') or
+                                                _rsc_phase in ('DECLINING', 'STORMY') or
+                                                _rsc_ema == 'BELOW'):
+                                            _rsc_bearish = True
+                                except Exception:
+                                    pass
+                                if _rsc_bearish:
+                                    log(f"  ✅ [SHORT-RSI-CEILING-OVERRIDE] {tkn}: SHORT allowed — RSI {_rsc_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)")
+                                else:
+                                    log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_CEILING} (overbought)")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:
@@ -3843,35 +3816,59 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
             # ── Global SHORT velocity filter (backtested: vel>0.1% OR last3_green>=3 → 12% WR) ──
+            # CEO Fix3 2026-10-02: bear-gated downtrend exemption — mirror spike filter.
+            # In confirmed bear structure, positive 5h vel / green candles are pullbacks inside a
+            # downtrend, not reversal risk. Exemption is bear-structure-gated, NOT blanket.
             if direction == 'SHORT' and SHORT_VEL_FILTER_ENABLED:
-                _conn_vel = None
+                _skip_vel = False
                 try:
-                    import sqlite3 as _sqlite3_vel
-                    _conn_vel = _sqlite3_vel.connect(CANDLES_DB, timeout=5)
-                    _cur_vel = _conn_vel.cursor()
-                    _cur_vel.execute("""
-                        SELECT close FROM candles_5m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 10
-                    """, (tkn.upper(),))
-                    _vel_closes = [r[0] for r in _cur_vel.fetchall()]
-                    _cur_vel.close()
-                    if len(_vel_closes) >= 6:
-                        _vel_5h = (_vel_closes[0] - _vel_closes[5]) / _vel_closes[5] * 100 if _vel_closes[5] > 0 else 0
-                        # Check newest N candles for green (DESC order: [0]=newest)
-                        # NOTE: range must match threshold — was range(3) with threshold=5 = dead code
-                        _lastN_green = sum(1 for i in range(SHORT_VEL_FILTER_GREEN_THRESHOLD) if i + 1 < len(_vel_closes) and _vel_closes[i] > _vel_closes[i + 1])
-                        if _vel_5h > SHORT_VEL_FILTER_VEL_THRESHOLD or _lastN_green >= SHORT_VEL_FILTER_GREEN_THRESHOLD:
-                            log(f"  🚫 [VEL-FILTER] {tkn}: SHORT blocked — vel={_vel_5h:+.3f}% lastNg={_lastN_green}")
-                            continue
-                except Exception:
-                    pass  # non-fatal
-                finally:
-                    if _conn_vel:
-                        try:
-                            _conn_vel.close()
-                        except Exception:
-                            pass
+                    import os as _vel_os
+                    _vel_cont = sqlite3.connect(_vel_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _vel_row = _vel_cont.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position "
+                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _vel_cont.close()
+                    if _vel_row:
+                        _vel_phase, _vel_linreg, _vel_ema = _vel_row
+                        if (_vel_linreg in ('BEAR', 'LEAN_BEAR') or
+                                _vel_phase in ('DECLINING', 'STORMY') or
+                                _vel_ema == 'BELOW'):
+                            _skip_vel = True
+                            log(f"  ✅ [VEL-FILTER] {tkn}: SHORT — vel filter SKIPPED (BTC={_vel_phase}+{_vel_linreg}+{_vel_ema}, pullback in downtrend)")
+                except Exception as e:
+                    log(f"  ⚠️ [VEL-FILTER] {tkn}: downtrend check failed: {e}", 'WARN')
+                if not _skip_vel:
+                    _conn_vel = None
+                    try:
+                        import sqlite3 as _sqlite3_vel
+                        _conn_vel = _sqlite3_vel.connect(CANDLES_DB, timeout=5)
+                        _cur_vel = _conn_vel.cursor()
+                        _cur_vel.execute("""
+                            SELECT close FROM candles_5m
+                            WHERE token = ? AND is_closed = 1
+                            ORDER BY ts DESC LIMIT 10
+                        """, (tkn.upper(),))
+                        _vel_closes = [r[0] for r in _cur_vel.fetchall()]
+                        _cur_vel.close()
+                        if len(_vel_closes) >= 6:
+                            _vel_5h = (_vel_closes[0] - _vel_closes[5]) / _vel_closes[5] * 100 if _vel_closes[5] > 0 else 0
+                            # Check newest N candles for green (DESC order: [0]=newest)
+                            # NOTE: range must match threshold — was range(3) with threshold=5 = dead code
+                            _lastN_green = sum(1 for i in range(SHORT_VEL_FILTER_GREEN_THRESHOLD) if i + 1 < len(_vel_closes) and _vel_closes[i] > _vel_closes[i + 1])
+                            if _vel_5h > SHORT_VEL_FILTER_VEL_THRESHOLD or _lastN_green >= SHORT_VEL_FILTER_GREEN_THRESHOLD:
+                                log(f"  🚫 [VEL-FILTER] {tkn}: SHORT blocked — vel={_vel_5h:+.3f}% lastNg={_lastN_green}")
+                                continue
+                    except Exception:
+                        pass  # non-fatal
+                    finally:
+                        if _conn_vel:
+                            try:
+                                _conn_vel.close()
+                            except Exception:
+                                pass
             # ── Pump-chain LONG velocity filter: block LONG when token 30m velocity negative ──
             # Backtest: ALL 10 losses had negative 30m velocity at entry, ALL 26 winners had positive
             # Catches reversals between signal creation and execution (e.g., GRASS +0.88% at signal → -1.60% at close)

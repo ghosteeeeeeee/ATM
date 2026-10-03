@@ -268,7 +268,10 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
-FAVORITES_LONG = set()
+FAVORITES_LONG = {
+    'HBAR',
+    'LDO'
+}
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
 }
@@ -296,8 +299,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'ADA'
+    'ADA',
+    'BTC'
 }
+
 
 
 
@@ -853,6 +858,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
 SHORT_RSI_FLOOR = 40           # LOWERED 50→40 (CEO 2026-09-29). 14d: RSI 45-55 SHORT = 26T 69.2%WR +$1.07 (BEST BAND). RSI <40 SHORT = 72T 27.8%WR -$5.34 (losers). Floor at 40 allows the 69% WR sweet spot while blocking deep oversold.
 SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
+SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocked — NO bear exemption. RSI 65-75 SHORT: bear-structure-gated exemption only (overbought+pump in bear = short per philosophy). DYDX RSI=75.3 blocked by this.
 # Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:
 # STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
