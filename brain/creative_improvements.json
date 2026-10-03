@@ -2165,5 +2165,15 @@
     "category": "coin hygiene",
     "status": "watchlist",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-03T13:35:22Z",
+    "idea": "Signal-to-fill staleness decay: block or discount fills where detection→execution delay exceeds N minutes, or scale confidence by delay",
+    "rationale": "Entry_rsi_14 data shows trades executing in RSI zones detection-time filters should block (SHORT entry_rsi<40: 32T/7d; LONG entry_rsi>70: 30T/7d). STX chase: signal 0.36993→fill 0.37243 (+0.67%), killed 3min. APT SHORT held 4h against us. Conditions drift between detect and fill — DRIFT-002 class. A staleness gate (e.g. block fill if >10min after detection, or confidence *= 0.95^minutes) would cut stale entries without time-of-day blocks.",
+    "expected_impact": "Reduce chase/stale losses; STX-pattern losses (~$0.1-0.3 each) + oversold-short leaks. Estimated +$0.20-0.50/7d if 20% of stale entries blocked.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest on signal-to-fill timestamps before deploy",
+    "evidence": "7d SHORT entry_rsi<35: 32T -$1.09 43.8%WR (14d: 63T -$3.93 33.3%WR). LONG entry_rsi>70: 30T +$1.64 but includes chase losses. Watchdog chase-entry pattern: STX/BIGTIME/PURR."
   }
 ]

@@ -1,146 +1,132 @@
 {
-  "timestamp": "2026-10-03T11:34:19Z",
+  "timestamp": "2026-10-03T13:35:00Z",
   "session_brain_stats": {
-    "queries_run": [
-      "ACE coin blacklist toxic",
-      "mtf-regime-trend regime gate",
-      "pump-chain+ velocity bypass",
-      "hard_max_loss semantics pnl"
-    ],
+    "queries_run": 8,
     "top_insights": [
-      "Session history confirms ACE removal from LONG_BLACKLIST (Aug 24) was premature — coin still bleeding across signals",
-      "hard_max_loss exit_reason names ~1% PRICE-move trigger; pnl_pct 3-6% at lev=5 (position PnL) — semantics delegated bug_hunter",
-      "pump-chain+ historical losses trace to velocity-filter bypass paths, not signal logic — do not disable",
-      "mtf-regime-trend+ killed Oct 2; 9T/7d -$0.46 all from Oct 2 cluster, aging out"
+      "Recurring: SHORT RSI oversold bleed / falling-knife shorts (BANANA lesson, watchdog steer)",
+      "Recurring: exec-time vs detection-time RSI drift (DRIFT-002, still open)",
+      "Recurring: signal diversity gap — NEUTRAL regime signal still unbuilt (ema_reclaim shadow)",
+      "Idea discussed but unbuilt: stale-signal confidence decay (now promoted to creative improvement this run)",
+      "volume-breakout conf boost discussed repeatedly — queued, window ends 21:55 UTC"
     ]
   },
   "trade_summary_24h": {
-    "trades": 39,
-    "pnl_usdt": 0.25,
-    "wr_pct": 56.4,
-    "by_signal": {
-      "pump-chain+ LONG": "6T +0.90 50%WR",
-      "pump-chain- SHORT": "5T +0.18 60%WR",
-      "mtf-regime-trend+ LONG": "9T -0.46 44.4%WR (killed Oct 2, aging out)",
-      "bb-squeeze+ LONG": "10T -0.07 60%WR",
-      "bb-bounce-v3-long+": "3T +0.10 100%WR"
+    "closed_24h": 32,
+    "pnl_24h": 0.15,
+    "wr_24h": 46.9,
+    "closed_7d": 183,
+    "pnl_7d": 2.15,
+    "wr_7d": 50.8,
+    "long_7d": "130T +$3.29 52.3%WR",
+    "short_7d": "53T -$1.14 47.2%WR",
+    "regime_7d": "EXTREME 86T +$2.02 53.5% | HIGH 45T +$0.04 53.3% | NORMAL 42T -$0.26 47.6% | FLAT 5T +$0.27",
+    "best_signals_30d": {
+      "volume-breakout-long+": "26T 73.1%WR +$3.81 (conf boost queued to 1.25 post-21:55)",
+      "doji-bottom-long": "8T 75%WR +$0.39/7d (below 20T threshold)",
+      "pump-chain+ LONG": "88T 42%WR +$1.69/30d — DO NOT DISABLE (rolling 200 +1.15)"
     },
-    "by_regime_7d": {
-      "EXTREME": "86T 53.5%WR +2.02 (BEST — flipped from earlier week)",
-      "HIGH": "44T 54.5%WR +0.15",
-      "NORMAL": "42T 47.6%WR -0.26",
-      "FLAT": "5T 40.0%WR +0.27"
-    },
-    "direction_7d": {
-      "LONG": "128T 53.1%WR +3.40",
-      "SHORT": "53T 47.2%WR -1.14"
-    },
-    "open_trades": 0
+    "watchdog_steers_used": [
+      "ACE re-entry without cooldown — ACTED (6h manual cooldown applied)",
+      "Oversold-short bleed — VERIFIED via entry_rsi_14: <25 = 15.4%WR -$1.51/7d, 25-35 = 63.2%WR +$0.42/7d sweet spot",
+      "Chase-entry slippage (STX +0.67%) — REAL, needs code fix (execution slippage cap)",
+      "mtf-regime-trend+ regime gates — STALE steer, signal already killed 2026-10-02 15:11",
+      "Do NOT disable pump-chain+ — CONFIRMED correct (3-loss streak is noise vs +1.15 rolling)"
+    ]
   },
   "drift_findings": [
     {
-      "finding": "ACE removed from LONG_BLACKLIST Aug 24 but coin never recovered — 14d 3W/8T 37.5% -$0.78 across 5 signals",
-      "in_code": "was not in LONG_BLACKLIST until this run",
-      "impact": "bled -$0.55 in 7d alone (bb-squeeze+ x2, pump-chain+)",
-      "action": "ACE re-added to LONG_BLACKLIST this run"
+      "finding": "signal_rsi_14 is 100% NULL for 14d (341/341) but entry_rsi_14 is populated",
+      "impact": "RSI audits using signal_rsi_14 return empty; all prior band analysis was blind. entry_rsi_14 works as substitute.",
+      "status": "OPEN — code fix needed (populate signal_rsi_14 or standardize on entry_rsi_14). Delegate bug_hunter with DRIFT-002.",
+      "severity": "HIGH"
     },
     {
-      "finding": "hard_max_loss semantics: exit_reason 'hard_max_loss_-1.01%' vs pnl_pct -4.91% at lev~5",
-      "in_code": "delegated bug_hunter (CEO 09:51)",
-      "impact": "if CUT_LOSER_PNL=-1.00 is position-PnL intended, SL is 5x too loose; if price-move intended, naming is wrong",
-      "action": "no change — bug_hunter owns"
+      "finding": "SHORT_RSI_FLOOR=40 blocks the entry_rsi 25-35 sweet spot (63-69%WR) per new entry_rsi_14 data",
+      "impact": "CEO raised floor 25→40 on 2026-09-29 when signal_rsi_14 was NULL (no RSI data). New column shows 25-35 is best SHORT band, <25 is catastrophic.",
+      "status": "MONITOR — do not change this run. HARD_FLOOR=25 correctly targets catastrophe. FLOOR=40 vs 25 needs 48h entry_rsi_14 observation before any move.",
+      "severity": "MEDIUM"
     },
     {
-      "finding": "mtf-regime-trend+ LONG regime misalignment (DECLINING phase + 4h short-bias)",
-      "in_code": "signal killed Oct 2 15:11 — already disabled",
-      "impact": "9T/7d -$0.46 all from Oct 2 cluster, aging out",
-      "action": "no change — already dead"
+      "finding": "Detection-time RSI filters do not re-validate at execution (DRIFT-002 class)",
+      "impact": "32 SHORT trades/7d with entry_rsi<35 executed despite SHORT_RSI_FLOOR=40. 30 LONG trades/7d with entry_rsi>70 executed despite LONG_RSI_CEILING=70.",
+      "status": "OPEN — exec-time checks exist at decider_run.py:1845-1861 but leak (silent fail-open or STANDALONE_BYPASS path). bug_hunter owns.",
+      "severity": "HIGH"
     },
     {
-      "finding": "signal_rsi_14 NULL (Sep 28 finding) — not re-checked this run",
-      "in_code": "unknown",
-      "impact": "detection-time RSI filtering blind if still NULL",
-      "action": "monitor — do not expand scope"
+      "finding": "mtf-regime-trend+ watchdog steer is stale",
+      "impact": "Signal already KILLED (MTF_REGIME_TREND_PLUS_ENABLED=False, auto_1hr 2026-10-02 15:11). 9 trades all pre-kill legacy Oct 2 13:27-14:58. No action.",
+      "status": "CLOSED — no action needed",
+      "severity": "LOW"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "Coin-level toxicity (not signal-level)",
-      "evidence": "7d losers n>=3: ACE 3T 0W -$0.55 (2 sigs), CHIP 3T 0W -$0.35 (2 sigs), GOAT 4T 1W -$0.27 (4 sigs). CASHCAT already SHORT-blacklisted.",
-      "status": "ACE blacklisted this run; CHIP + GOAT on watchlist"
+      "topic": "SHORT structural bleed (-$1.14/7d, 47.2%WR)",
+      "sessions_mentioned": "10+",
+      "current_state": "SHORT_RSI_HARD_FLOOR=25 live, SHORT_RSI_FLOOR=40 live, pump-chain- HIGH/EXTREME blocks applied. SHORT still negative.",
+      "root_cause_hypothesis": "Entry quality at execution, not detection. Filters set on NULL RSI data. entry_rsi_14 now available — re-audit before further RSI changes."
     },
     {
-      "topic": "SHORT structural bleed",
-      "evidence": "7d SHORT 53T 47.2%WR -$1.14 vs LONG +$3.40. SHORT_CONTINUUM_SCORE_MAX=30 do-not-raise standing decision.",
-      "status": "monitor — Fix1/Fix2 still settling, n<15 post-Fix2 for RSI retune"
+      "topic": "Exec-time vs detection-time drift (DRIFT-002)",
+      "sessions_mentioned": "8+",
+      "current_state": "Open, delegated to bug_hunter multiple times. Exec RSI checks exist but leak.",
+      "root_cause_hypothesis": "except:pass silent-fail + STANDALONE_BYPASS path + different RSI timeframes (1m detect vs 5m exec)."
     },
     {
-      "topic": "hard_max_loss exit concentration",
-      "evidence": "Multiple 24h losers exit_reason hard_max_loss_-1.0x% with pnl_pct -3 to -5% (leveraged).",
-      "status": "delegated bug_hunter for semantics clarification"
+      "topic": "Signal diversity — NEUTRAL regime starved",
+      "sessions_mentioned": "6+",
+      "current_state": "ema_reclaim_long built+enabled, 0 signals (shadow). volume-breakout is best but rare.",
+      "root_cause_hypothesis": "BTC on EMA300 shelf with LOW volume = decision point, no altcoin trends. Not a code problem — market condition."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "Coin Toxicity Score — standing audit query (per-coin 7d net PnL + WR + signal diversity; n>=3, wr<=33%, net<=-$0.30, 2+ signals = blacklist candidate)",
-      "why": "Watchdog URGENT steers flag coin-level bleed but brain_auditor only acts ad-hoc. This run found ACE (acted) + CHIP + GOAT (watchlist) in one query.",
-      "status": "creative_improvement logged — implement as audit helper when convenient"
+      "idea": "Stale-signal confidence decay / signal-to-fill staleness gate",
+      "discussed": "Multiple sessions (brain_auditor creative list Sep 29-30)",
+      "status": "NEVER BUILT — promoted to creative improvement this run",
+      "evidence": "STX chase +0.67% slippage killed 3min; APT SHORT 4h hold; entry_rsi leaks at exec"
     },
     {
-      "idea": "NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
-      "why": "Recurring #1 diversity gap — delegated signal_analyst Sep 30, still unbuilt. ema_reclaim_long registered but 0 closed trades (shadow).",
-      "status": "still delegated, not built"
+      "idea": "Execution slippage cap (skip fills >0.3-0.5% above signal price)",
+      "discussed": "Watchdog 2026-10-03 pattern alerts",
+      "status": "NEVER BUILT — INVERSE_ACCEL_300_V2 has per-signal slippage=0.30 but no global cap",
+      "evidence": "STX signal 0.36993→fill 0.37243 (+0.67%); BIGTIME +2.5%; PURR +1.7%"
+    },
+    {
+      "idea": "volume-breakout-long+ confidence boost 1.15→1.25",
+      "discussed": "CEO 09:51 UTC, signal_analyst delegated",
+      "status": "QUEUED — blocked by bollinger_squeeze 48h monitor window until 21:55 UTC",
+      "evidence": "26T 30d 73.1%WR +$3.81 — best signal in book"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-03T11:34:19Z",
-      "idea": "Coin Toxicity Score as standing brain_auditor query — flag tokens with n>=3 trades, WR<=33%, net PnL<=-$0.30, across 2+ signals in 7d as blacklist candidates",
-      "rationale": "This run's watchdog URGENT on ACE was correct and DB-verified, but the detection was ad-hoc. Systematizing the query catches ACE/CHIP/GOAT-class bleeds same-run instead of waiting for watchdog narrative.",
-      "expected_impact": "Earlier coin-level kills; estimated +$0.10-0.30/7d from blocking multi-signal toxic coins before they bleed",
-      "category": "coin hygiene",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-03T11:34:19Z",
-      "idea": "When volume_regime flips NORMAL/HIGH, lean into volume-breakout-long+ (30d 26T 73.1%WR +$3.81) over bb-bounce-v2 (47.6%WR) — confidence multiplier or hotset priority, NOT a blanket change",
-      "rationale": "Watchdog deep analysis + 30d DB both show vol-breakout is the best signal in the current regime. Currently only a conf boost 1.15→1.25 is queued (post-bollinger window). A volume-regime-conditional priority is the next lever.",
-      "expected_impact": "+2-4% WR on LONG book when volume expands; 0 impact in LOW volume (signal self-selects)",
+      "date": "2026-10-03T13:35:00Z",
+      "idea": "Signal-to-fill staleness decay: block fills >N min after detection, or scale confidence by delay (0.95^minutes)",
+      "rationale": "entry_rsi_14 shows trades executing in RSI zones detection filters should block. Conditions drift between detect and fill. STX/BIGTIME/PURR chase pattern = execution problem, not signal problem. A staleness gate cuts stale entries without time-of-day blocks (banned).",
+      "expected_impact": "+$0.20-0.50/7d if ~20% of stale/chase entries blocked. Evidence: SHORT entry_rsi<35 32T/7d 43.8%WR; LONG entry_rsi>70 30T/7d including chases.",
       "category": "entry sniper",
-      "status": "suggested — defer until conf boost eval + volume_regime data n>=20",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-03T11:34:19Z",
-      "idea": "Watchlist: CHIP + GOAT for next-run blacklist eval (CHIP 3T 0W -$0.35 2 sigs, GOAT 4T 1W -$0.27 4 sigs)",
-      "rationale": "Same coin-toxicity pattern as ACE. Below ACE severity but above noise. One-variable-at-a-time: ACE first, monitor 48h, then evaluate CHIP.",
-      "expected_impact": "+$0.20-0.40/7d if both confirmed toxic",
-      "category": "coin hygiene",
-      "status": "watchlist",
-      "risk": "low"
+      "status": "suggested",
+      "risk": "medium — needs backtest on detection→fill timestamps before deploy",
+      "data_requirement": "Query trades for signal detection time vs open_time delta; correlate with pnl"
     }
   ],
   "config_changes_applied": [
     {
-      "change": "ACE re-added to LONG_BLACKLIST",
-      "file": "scripts/hermes_constants.py",
-      "before": "not in LONG_BLACKLIST (removed 2026-08-24)",
-      "after": "'ACE' in LONG_BLACKLIST",
-      "evidence": "7d 3T 0W -$0.55 (bb-squeeze+ x2, pump-chain+); 14d 3W/8T 37.5% -$0.78 across 5 signals; 0 ACE winners in last 7d; last ACE wins Sep 19-20",
-      "impact_on_winners": "0 winning trades blocked in last 7d",
-      "confidence": "HIGH"
+      "change": "ACE:LONG added to loss_cooldowns.json with 6h manual cooldown (reason='loss')",
+      "file": "/root/.hermes/data/loss_cooldowns.json",
+      "type": "kill",
+      "rationale": "Watchdog urgent: ACE 0/3 -$0.55/7d, two hard_max_loss exits today, system cooldowns (20-90min) too short",
+      "impact": "Blocks ACE LONG re-entry until ~19:35 UTC. 0 winning ACE trades blocked. Verified active via _is_loss_cooldown_active.",
+      "gotcha": "_is_loss_cooldown_active only honors reason in ('loss','guardian') — free-text reason silently ignored. Fixed to reason='loss'."
     }
   ],
   "next_actions": [
-    "RESTART hermes-pipeline.service to load ACE blacklist",
-    "volume-breakout conf boost 1.15→1.25 — APPLY after 21:55 UTC (bollinger window ends; signal_compactor.py:709 currently 1.15)",
-    "CHIP + GOAT watchlist — eval after 48h ACE monitor",
-    "bug_hunter: hard_max_loss semantics (price vs leveraged PnL) — still open",
-    "bug_hunter: DRIFT-002 exec-time RSI 5m vs 1m — still open",
-    "Monitor SHORT trade count post-Fix2 (51→53 closed 7d, -$1.14) — do not raise SHORT_CONTINUUM_SCORE_MAX",
-    "signal_analyst: ema_reclaim detection-coverage + mover+ entry quality — still delegated",
-    "Disk 81% — prune at 88%",
-    "regime_15m.json stale (2026-05-05) — 15m scanner not refreshing; watchdog flagged"
+    "brain_auditor next run (after 21:55 UTC): apply volume-breakout conf boost 1.15→1.25 — CEO queued, window ends 21:55",
+    "bug_hunter: (1) populate signal_rsi_14 or standardize audits on entry_rsi_14; (2) DRIFT-002 exec-RSI fail-open + STANDALONE_BYPASS leak",
+    "signal_analyst: backtest signal-to-fill staleness gate — query detection→open_time deltas vs pnl",
+    "MONITOR: ACE no re-entry before 19:35 UTC; SHORT entry_rsi bands with new column for 48h before any FLOOR change; doji-bottom to 20T; bb-squeeze+ HIGH habitat; disk 85%",
+    "CEO note: SHORT_RSI_FLOOR=40 may be blocking the 25-35 entry_rsi sweet spot (63-69%WR) — set on NULL RSI data Sep 29, new column tells different story. Monitor 48h, do not change yet.",
+    "SIDEWAYS FIND: watchdog mtf-regime-trend+ steer is stale (signal killed Oct 2 15:11). Watchdog should exclude killed signals from steers."
   ]
 }

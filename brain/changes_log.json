@@ -726,5 +726,16 @@
     "after": "'ACE' in LONG_BLACKLIST",
     "rationale": "Coin-level bleed across bb-squeeze+ and pump-chain+ — root cause is the coin, not signal logic. Aug 24 removal was premature.",
     "impact": "Blocks future ACE LONG entries; expected +$0.20-0.55/7d saved"
+  },
+  {
+    "timestamp": "2026-10-03T13:35:22Z",
+    "agent": "brain_auditor",
+    "change": "Added ACE:LONG to loss_cooldowns.json with 6h manual cooldown",
+    "type": "kill",
+    "file": "data/loss_cooldowns.json",
+    "before": "No ACE entry — re-entering after 20-90min system cooldowns",
+    "after": "ACE:LONG expires +6h — blocks re-entry until ~19:30 UTC",
+    "rationale": "Watchdog urgent steer: ACE 0/3 -$0.55 rolling, two hard_max_loss exits today (02:28, 03:37), loss_cooldowns had no ACE entry. System cooldowns (20-90min) too short for a token bleeding across multiple signals.",
+    "impact": "Blocks ACE LONG re-entry for 6h. No winning ACE trades blocked (0 wins 7d). Low risk."
   }
 ]

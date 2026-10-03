@@ -1428,3 +1428,9 @@
 [2026-10-03 05:08 UTC]   🟢 OK: bb-squeeze+: 15 trades, 73.3% WR, PnL=1.97
 [2026-10-03 05:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-03 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-03 11:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-03 11:08 UTC]   🟢 OK: pump-chain+: 6 trades, 50.0% WR, PnL=5.08
+[2026-10-03 11:08 UTC]   🟢 OK: pump-chain-: 5 trades, 60.0% WR, PnL=2.49
+[2026-10-03 11:08 UTC]   🟢 OK: bb-squeeze+: 9 trades, 66.7% WR, PnL=1.36
+[2026-10-03 11:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-03 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

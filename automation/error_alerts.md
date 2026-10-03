@@ -532,3 +532,22 @@
 - **INFO**: Hotset `[]` empty — regime fully NEUTRAL (114/117). 142 signals generated last hour, 0 approved for execution. Expected compaction behavior, not a bug.
 - **INFO**: Disk `/` **82%** used (was 86% this morning, cleaned to 80%, crept back). Under 85% warn threshold.
 - **INFO**: No pipeline crashes, no Tracebacks, no phantom trades (`atr_sl_hit` <0.01% PnL: 0 in 24h). Position manager healthy (2 open, DYDX SHORT adjusted).
+
+## Error Alerts — 2026-10-03 09:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS TOK breakout_engine: timed out (killed after N.0s)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: breakout_engine`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] IO: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-03 10:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-03 11:47 UTC
+- **HEALTH** — Pipeline OK: last run 11:45 completed clean (LIVE). Signals (1h): 63. Trades today: 0 open / 15 closed (9 wins, +1.45 USDT). Disk 80%. Regime: 1 LONG (ZRO) / 0 SHORT / 116 NEUTRAL. Prices fresh (85 tokens, ~71s). No Tracebacks, no phantom trades.
+- **WARN** (1x): `hermes-price-collector.service` exit 1 — `sqlite3.OperationalError: database is locked` on candles.db. Prices still fresh via successful runs. **AUTO-FIX**: none — self-heals via 30s timer.
+- **WARN** (6x): failed units unchanged — better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer. Known audit/dirty-git failures, not on trading path. **AUTO-FIX**: none.
+- **INFO**: `signals` table 18,327 rows since 2026-09-23 — purge timer may only archive, not clear active table. Not blocking execution.
+- **INFO**: Pipeline portfolio counter (37 closed today) ≠ signal_outcomes (15). DB remains source of truth.
