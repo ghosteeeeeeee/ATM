@@ -512,3 +512,23 @@
 - **NOTE**: `candles.db-wal` 1.6G (was 5.1G in 01:47 alert — shrinking). `coin_tracker.db` 3.3G still largest DB. CEO retention decision still open.
 - **NOTE**: `hermes-hl-copy.timer` enabled but last fired 2026-08-15 (49 days). Non-critical; service may be intentionally paused. Verify if hl-copy is still needed.
 - Pipeline, HL guardian, price-collector, signal-compactor, trade-watchdog all healthy. No crashes/tracebacks/phantom trades.
+
+## Error Alerts — 2026-10-03 04:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] TOK TOK BLOCKED — candle data stale/insufficient (age=925s, n=N) — TOK-closed`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: stale candles age=925s — TOK blocked (TOK-closed)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK floor: N.N < N`
+
+## Error Alerts — 2026-10-03 05:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-03 06:48 UTC
+- **CRITICAL** (fixed): `hermes-coding-mcp.service` crash-looping — `run_mcp_server.py` missing (exit 2), **NRestarts=713,209**, restart every 5s burning CPU.
+  - **AUTO-FIX**: `systemctl stop + disable hermes-coding-mcp.service`. Script does not exist at `/root/.hermes/scripts/run_mcp_server.py`. Recreate script or remove unit if MCP host no longer needed.
+- **WARN** (3x): `hermes-bug-hunter.service` failed — audit checks FAIL (cursor_leaks 53 files, connection_leaks 53, bare_except 127, sql_injection 33 f-string SQL, hardcoded_passwords 4, defunct_imports signal_gen still imported by 3 files, sqlite_leaks 49). Real code-quality findings, not runtime crashes. Not on trading path.
+- **WARN** (2x): `hermes-better-coder.service` failed — similar audit failures.
+- **WARN** (1x): `hermes-ceo.service` exit 1 — OpenMemory MCP rejected call (`Not Acceptable: Client must accept both application/json and text/event-stream`) + dirty git. Reports/kanban written before failure; work completed.
+- **WARN** (2x): `hermes-git-release.service` failed — dirty git (`M automation/error_alerts.md`) blocks hourly backup/seed zip.
+- **WARN** (132x/2h): `hermes-price-collector.service` intermittent `sqlite3.OperationalError: database is locked` on `candles.db` (2.3GB) — concurrent writers (pipeline + collectors). 74/206 runs succeeded; latest run OK (seeded 2/2, 86 prices). Self-heals via timer; no restart applied.
+- **INFO**: Hotset `[]` empty — regime fully NEUTRAL (114/117). 142 signals generated last hour, 0 approved for execution. Expected compaction behavior, not a bug.
+- **INFO**: Disk `/` **82%** used (was 86% this morning, cleaned to 80%, crept back). Under 85% warn threshold.
+- **INFO**: No pipeline crashes, no Tracebacks, no phantom trades (`atr_sl_hit` <0.01% PnL: 0 in 24h). Position manager healthy (2 open, DYDX SHORT adjusted).
