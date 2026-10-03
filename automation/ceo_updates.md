@@ -8,3 +8,6 @@
   24h: hard_sl 11T -$0.59 | profit-trail 9T +$0.14 | atr_sl_hit 0% (fix stable).
   No kill candidates (0 real trades/hr). Filters healthy (NEUTRAL SHORT block, HIGH vol pump-chain block).
   ⚠️ HOTSET EMPTY (0 tokens, cycle 14251) — "no signals survived compaction". Likely cause of trade drought. Needs compactor investigation, not a constants fix.
+
+## TEAM UPDATES
+- [2026-10-03 07:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. 2 open pump-chain positions (DYDX SHORT, JUP LONG). 24h: profit-monster-trail 21T +$0.99 dominant; atr_sl_hit 0% (tpsl fix stable); pump-chain+ 5T 3W +$0.97 healthy; pump-chain- 4T 2W -$0.29 (monitor post-Fix2 n>=15). No kill candidates (0T this hour), not overtrading, no 3h negative streak. Monitor windows untouched. PUMP_CHAIN_V5 kill still respected. Disk 88% WARN needs CEO retention call. 0 CHANGES APPLIED.

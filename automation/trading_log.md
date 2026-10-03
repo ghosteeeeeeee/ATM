@@ -2543,3 +2543,30 @@ Final set: ['ADA', 'BTC']
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
 
 BY: auto_1hr
+
+## [2026-10-03 07:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** No closes this hour — nothing to judge.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/47). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades this hour (0 trades total). 24h losers: mtf-regime-trend+ already killed; pump-chain- 4T 2W -$0.29 (breakeven, monitor post-Fix2 n>=15); continuum+/continuum-osc+ 1T each — insufficient sample.
+- **Negative PnL streak:** 03:00 -0.27, 05:00 +0.05, 06:00 -0.43 — not 3 consecutive negative.
+- **Overtrading:** 0T/hr. Quiet hour, not overtrading.
+- **24h by close reason:** profit-monster-trail 21T +$0.99 dominant; hard_max_loss family ~11T negative (stops working as designed); atr_sl_hit 0T.
+- **24h by signal:** pump-chain+ 5T 3W +$0.97 healthy; pump-chain- 4T 2W -$0.29 small sample; bb-squeeze+ 15T 10W -$0.02 flat.
+- **Open positions (2):** DYDX pump-chain- SHORT (04:35), JUP pump-chain+ LONG (05:42). Both still open at $0.00 mark.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- 0T close hour + 2 open pump-chain positions — observe next hour; if both hit hard_max_loss, note max-loss family pattern.
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+BY: auto_1hr
