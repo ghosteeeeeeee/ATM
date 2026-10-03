@@ -2447,3 +2447,28 @@ Final set: ['ADA']
 - 3 open pump-chain- SHORTs (APT/ALGO/ARB) — first cluster since NEUTRAL short-block concern. If they all stop out, re-check SHORT-NEUTRAL / SHORT-RSI floors next hour (one change max).
 - Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+## [2026-10-03 04:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.27 (WR: 0.0%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** only close was ACE pump-chain+ LONG -$0.27 via hard_max_loss_-1.15% — single stop-out, not enough samples for entry-quality verdict. ME/LDO pump-chain+ winners from prior hours still hold the signal's 4T/3W +$1.19 24h profile.
+- **Kill rule:** 1 close this hour → no 0%-WR signal with 3+ trades. Single-trade 0%WR signals (continuum+, continuum-osc+, pump-chain- via APT float) still below threshold. mtf-regime-trend+ already killed (residual 9T -$0.46 24h).
+- **atr_sl_hit >40%:** 24h = 0 atr_sl_hit exits (0/47 closes). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 01:00 +0.36, 02:00 +1.25, 03:00 +0.36, 04:00 -0.27 — one negative hour after a three-hour positive streak, not 3 consecutive negative.
+- **Overtrading:** 1T/hr « 20.
+- **24h by close reason:** profit-monster-trail dominant (28T +$1.51); hard_max_loss_* variants ~10T -$1.62 (small stops working as designed); atr_trail_hit 1T +$0.88.
+- **24h by signal (3+T):** pump-chain+ 4T 3W +$1.19 healthy; bb-bounce-v3-long+ 3T 3W +$0.23 healthy; bb-squeeze+ 19T 11W -$0.09 breakeven (EXTREME monitor active); mtf-regime-trend+ already killed.
+- **Open positions (3):** ARB/ALGO/APT pump-chain- SHORTs — all float $0.00, none stopped out. The 03:11 re-check condition ("if they all stop out, re-check SHORT-NEUTRAL / SHORT-RSI floors") is NOT met. No SHORT-RSI floor change.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- 3 open pump-chain- SHORTs still flat — one more hour of observation. If any close with loss, re-check SHORT-NEUTRAL / SHORT-RSI floors (one change max).
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
