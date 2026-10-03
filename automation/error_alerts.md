@@ -568,3 +568,12 @@
 - **INFO**: 18 historical |pnl_pct|<0.01% outcomes exist (none `atr_sl_hit`, none today — newest 2026-09-28). Not phantom-trade events in the current window.
 - **INFO**: `prices.db` / `runtime.db` / `hermes_prices.db` have empty tables — live prices served from `prices.json` (85 tokens). Not a data-loss issue.
 - **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found; no restarts or cleanups needed.
+
+## Error Alerts — 2026-10-03 16:47 UTC
+- **HEALTH** — Pipeline OK: last run 16:45:40 completed clean (LIVE). Position Manager healthy (5 open, SL/TP updated on 5). Signals (1h): 92 / 24h: 2362. Trades today: 5 open / 24 closed (16 wins, +1.63 USDT) per signal_outcomes + trades.json (pipeline counter 27 closed / +31.48% — counter ≠ DB, DB is source of truth). No Tracebacks, no CRASH. Phantom trades (`atr_sl_hit` <0.01% PnL): 0 today / 0 in 24h. Disk 81%. Regime: 1 LONG_BIAS / 0 SHORT / 116 NEUTRAL (overall NEUTRAL). Speeds: 53.5% tokens ≥50th pct (129/241), updated 16:47:20. Prices fresh (85 tokens, prices.json updated 16:46:49 UTC, ~41s). hl-sync-guardian active.
+- **WARN** (known, unchanged): `hotset.json` empty — pipeline logs `fallback DB query returned 0 tokens`. Expected when regime is fully NEUTRAL; not a crash. No auto-fix.
+- **WARN** (known, 7 failed units): better-coder, brain-auditor (NEW vs 15:47 — same class of agent/audit failures), bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer. None on trading path. No auto-fix (root causes tracked).
+- **WARN** (known): `signals` active table large (purge/archive may not clear it). Not on execution path.
+- **INFO**: `systemctl list-timers hermes-*` still prints "0 timers listed" — cosmetic; `--all`/grep shows core timers firing (pipeline, price-collector, watchdog, coin-tracker, signal-compactor, 15m-regime). Not a missed-timer condition.
+- **INFO**: Inactive/dead timers: `hermes-atr-sl-updater` (ATR runs inside pipeline Position Manager), `hermes-regime-24h-check`, `hermes-regime-transition-check`, `hermes-hl-copy` (last ran 2026-08-15 — likely intentional/disabled). No functional gap on trading path.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found; no restarts, cleanups, or forced runs needed.
