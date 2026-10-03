@@ -577,3 +577,6 @@
 - **INFO**: `systemctl list-timers hermes-*` still prints "0 timers listed" — cosmetic; `--all`/grep shows core timers firing (pipeline, price-collector, watchdog, coin-tracker, signal-compactor, 15m-regime). Not a missed-timer condition.
 - **INFO**: Inactive/dead timers: `hermes-atr-sl-updater` (ATR runs inside pipeline Position Manager), `hermes-regime-24h-check`, `hermes-regime-transition-check`, `hermes-hl-copy` (last ran 2026-08-15 — likely intentional/disabled). No functional gap on trading path.
 - **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found; no restarts, cleanups, or forced runs needed.
+
+## Error Alerts — 2026-10-03 16:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

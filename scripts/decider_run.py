@@ -4469,8 +4469,11 @@ def run(dry_run=False):
         # 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers,2 marginal winners.
         try:
             from hermes_constants import PUMP_CHAIN_LONG_MAX_ENTRY_GAP
-            _pc_bare_st = sig.get('signal_type', '').rstrip('+-') if sig.get('signal_type') else ''
-            if ('pump-chain' in _pc_bare_st or 'pump_chain' in _pc_bare_st) and direction.upper() == 'LONG':
+            # ponytail: live sig payload stores name in `source`, not signal_type —
+            # filter was dead (INJ gap=1.98% filled 2026-10-03 despite 1.5% cap).
+            # Mirror the working PUMP-CHAIN-STALE check above which reads `source`.
+            _pc_st = f"{sig.get('signal_type') or ''} {source or ''}"
+            if ('pump-chain' in _pc_st or 'pump_chain' in _pc_st) and direction.upper() == 'LONG':
                 if _gap_at_entry is not None and _gap_at_entry > PUMP_CHAIN_LONG_MAX_ENTRY_GAP:
                     log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG: gap={_gap_at_entry:.2f}%>{PUMP_CHAIN_LONG_MAX_ENTRY_GAP}%')
                     if sig_id:

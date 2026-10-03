@@ -767,6 +767,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
             OVERSOLD_BOUNCE_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
+            DOJI_BOTTOM_ENABLED,
             MOVER_ENABLED, MOVER_PLUS_ENABLED, MOVER_MINUS_ENABLED,
             CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
             CONTINUATION_ENABLED,
@@ -993,8 +994,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" DOJI_TOP_MINUS_ENABLED=False', flush=True)
                 return None
             # doji_bottom — doji exhaustion at bottom (LONG entry)
-            if _comp == 'doji-bottom-long' and not DOJI_TOP_PLUS_ENABLED:
-                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" DOJI_TOP_PLUS_ENABLED=False', flush=True)
+            if _comp == 'doji-bottom-long' and not DOJI_BOTTOM_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" DOJI_BOTTOM_ENABLED=False', flush=True)
                 return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
@@ -2671,6 +2672,7 @@ def is_component_disabled(component: str) -> bool:
             PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
             OVERSOLD_BOUNCE_ENABLED,
             DOJI_TOP_ENABLED, DOJI_TOP_PLUS_ENABLED, DOJI_TOP_MINUS_ENABLED,
+            DOJI_BOTTOM_ENABLED,
             CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
             CONTINUUM_OSC_ENABLED, CONTINUUM_OSC_PLUS_ENABLED, CONTINUUM_OSC_MINUS_ENABLED,
             CONTINUUM_SCORE_MOMENTUM_ENABLED,
@@ -2847,7 +2849,7 @@ def is_component_disabled(component: str) -> bool:
     if c == 'doji-top-': return not DOJI_TOP_MINUS_ENABLED
     if c == 'doji-top-short': return not DOJI_TOP_MINUS_ENABLED
     # doji-bottom
-    if c == 'doji-bottom-long': return not DOJI_TOP_PLUS_ENABLED
+    if c == 'doji-bottom-long': return not DOJI_BOTTOM_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
     if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED

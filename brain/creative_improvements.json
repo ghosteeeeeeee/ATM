@@ -2175,5 +2175,35 @@
     "status": "suggested",
     "risk": "medium — needs backtest on signal-to-fill timestamps before deploy",
     "evidence": "7d SHORT entry_rsi<35: 32T -$1.09 43.8%WR (14d: 63T -$3.93 33.3%WR). LONG entry_rsi>70: 30T +$1.64 but includes chase losses. Watchdog chase-entry pattern: STX/BIGTIME/PURR."
+  },
+  {
+    "date": "2026-10-03T17:38:13Z",
+    "idea": "Failed-momentum early cut: exit when price moves >0.6% against entry within 15 minutes if volume is not spiking (not a flash crash)",
+    "rationale": "24h hard_max_loss: 9/9 losers show 0.94-1.20% adverse moves, hold times 14-120min. hard_max_loss at -1.00% is the designed cut, but entries that fail immediately could cut at -0.6% and save ~40% of bleed. Distinct from SL widening (which made losses worse per Aug 25 data).",
+    "expected_impact": "Save ~$0.60-0.80/7d of hard_max_loss bleed IF winners' MAE at 15min < 0.6%. MUST backtest first — atr_sl_hit winners (43T +$7.29/14d) may dip early then recover.",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium",
+    "prereq": "signal_analyst backtest: distribution of 15min adverse move for winners vs hard_max_loss losers"
+  },
+  {
+    "date": "2026-10-03T17:38:13Z",
+    "idea": "Volume-breakout priority: when volume-breakout-long+ appears in candidates, rank it above lower-WR bounce signals in hotset selection",
+    "rationale": "Watchdog pattern: best signal (77.8% WR, +$2.66) has zero book exposure while we're in bb-bounce (66.7%) and bb-squeeze (61.8%). SOURCE_WEIGHTS boost (1.15→1.25 queued) helps confidence score but may not fix allocation if detection frequency or confluence gates starve it.",
+    "expected_impact": "Shift book toward highest-WR signal. Could add +$0.30-0.50/7d if volume-breakout would have fired but lost rank to bounce setups.",
+    "category": "allocation",
+    "status": "suggested",
+    "risk": "low",
+    "prereq": "signal_analyst: why zero exposure? detection frequency? gate filters? hotset rank?"
+  },
+  {
+    "date": "2026-10-03T17:38:13Z",
+    "idea": "Per-coin 15m slope filter for bounce/squeeze LONG signals — block when coin's own slope is strongly negative with high r2",
+    "rationale": "Watchdog caught COMP long fighting bearish 15m structure (-0.143, r2=0.89) at 5x leverage. Bounce signals detect a setup but the bounce doesn't come when structure is falling. Regime labels say LONG_BIAS but per-coin microstructure disagrees.",
+    "expected_impact": "Block falling-structure bounces. Would have skipped COMP-style setups. Unknown count — needs historical slope data at entry.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "prereq": "Need 15m slope stored at entry (may require metadata addition). Backtest before implement."
   }
 ]
