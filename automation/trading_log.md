@@ -2472,3 +2472,74 @@ Final set: ['ADA']
 - 3 open pump-chain- SHORTs still flat — one more hour of observation. If any close with loss, re-check SHORT-NEUTRAL / SHORT-RSI floors (one change max).
 - Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+## [2026-10-03 05:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.04 (WR: 100.0%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** only close was ALGO pump-chain- SHORT +$0.04 via atr_trail_hit (opened 03:07) — winner, 1 sample not enough for adverse-excursion verdict.
+- **Kill rule:** 1 close this hour → no 0%-WR signal with 3+ trades. Single-trade 0%WR signals (continuum+, continuum-osc+) still below threshold. mtf-regime-trend+ already killed (residual 9T -$0.46 24h).
+- **atr_sl_hit >40%:** 24h = 0 atr_sl_hit exits (0/47 closes). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 01:00 +0.36, 02:00 +1.25, 03:00 -0.27, 05:00 +0.04 — not 3 consecutive negative.
+- **Overtrading:** 1T/hr « 20.
+- **24h by close reason:** profit-monster-trail 22T +$1.00 dominant; hard_max_loss family ~9T negative (small stops working as designed); hard_sl 3T -$0.58; atr_sl_hit 0T.
+- **24h by signal (3+T):** pump-chain- SHORT closing small (this hour's ALGO win); bb-squeeze+ breakeven (EXTREME monitor active); mtf-regime-trend+ already killed.
+- **Open positions (3):** DYDX pump-chain- SHORT (04:35), ARB pump-chain- SHORT (03:09), APT pump-chain- SHORT (02:10). ALGO closed this hour +$0.04. The 03:11 re-check condition ("if they all stop out, re-check SHORT-NEUTRAL / SHORT-RSI floors") is NOT met — 1 of 3 closed as a win. No SHORT-RSI floor change.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- ARB/APT pump-chain- SHORTs still open (one +66% pnl_pct path, one -24% — pnl_pct nonsense known). If both stop out next hour, re-check SHORT floors (one change max).
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+BY: auto_1hr
+
+## FAVORITES Update — 2026-10-03 06:00 UTC
+- Regime: NEUTRAL
+- PROMOTE LDO (WR=80.0%, AvgPnL=2.07%, Trades=5)
+- PROMOTE HBAR (WR=60.0%, AvgPnL=1.82%, Trades=5)
+
+Final set: ['HBAR', 'LDO']
+
+## LOSERS Update — 2026-10-03 06:05 UTC
+- ADD BTC (WR=37.5%, PnL=$0.04, wr_collapse (70.0% → 37.5%))
+
+Final set: ['ADA', 'BTC']
+
+## [2026-10-03 06:55 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** -$0.43 (WR: 33.3%)
+
+**Closes:**
+- INJ pump-chain+ LONG: hard_max_loss_-1.03% → -$0.23
+- APT pump-chain- SHORT: hard_max_loss_-1.03% → -$0.21
+- ARB pump-chain- SHORT: atr_trail_hit → +$0.01
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** 1 winner (ARB +$0.01 via atr_trail_hit); 2 losses capped at ~1.03% max-loss. 1 sample insufficient for adverse-excursion verdict.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/47). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades this hour. pump-chain- went 1W/1L (50%) this hour; 24h = 4T 2W -$0.29 (breakeven, not killable). pump-chain+ 24h = 5T 3W +$0.96 healthy. mtf-regime-trend+ already killed.
+- **Negative PnL streak:** 01:00 +0.36, 02:00 +1.25, 03:00 -0.27, 05:00 +0.05, 06:00 -0.44 — not 3 consecutive negative.
+- **Overtrading:** 3T/hr « 20.
+- **24h by close reason:** profit-monster-trail 22T +$1.00 dominant; hard_max_loss family ~11T negative (small stops working as designed); atr_sl_hit 0T.
+- **Open positions (2):** JUP pump-chain+ LONG (05:42), DYDX pump-chain- SHORT (04:35). ARB closed this hour +$0.01 win; APT closed this hour -$0.21 loss. ARB win → prior re-check condition ("if both stop out") NOT met. No SHORT-RSI floor change.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- pump-chain- SHORTs: 4T 24h at -$0.29 — small sample, monitor post-Fix2 n>=15 before any RSI retune (brain_auditor directive).
+- JUP/DYDX open — observe next hour; if either hits hard_max_loss again, note pattern (max-loss family bleeding ~$2 over 24h as designed).
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+BY: auto_1hr
