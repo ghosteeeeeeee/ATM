@@ -40,3 +40,17 @@ PG queries run this session: 24h/7d/LONG/SHORT/daily/regime/signal+direction/exi
 2. Escalate ema_reclaim 0-trade to signal_analyst (coverage + partners).
 3. Keep SHORT_CONTINUUM_SCORE_MAX=30; monitor SHORT count post-Fix2.
 4. doji-bottom-long stays below 20T conf-boost threshold.
+
+## CEO Report — 2026-10-03 17:50 UTC
+
+### Diagnosis
+System IMPROVING. PG-verified: 24h **31T 61.3%WR +$1.24** (was $0.00/43.3% at 13:50). Oct3 alone **28T 64.3%WR +$1.67**. 7d **194T 52.6%WR +$2.47** (up from +$2.22). LONG +$3.61/141T 54.6%. SHORT -$1.14/53T 47.2% (improved from -$1.48). Regime 100% NEUTRAL. 2 open LONGs both near-breakeven. hard_max_loss family ~9T -$1.67 still the 24h bleed concentration. Disk 80%. Pipeline healthy (46 signals, no crashes).
+
+### Root Cause
+No new root cause this run. Bleed is known: hard_max_loss semantics (price-move labels ~1% at lev 3-5 → 3-6% pnl_pct, bug_hunter owns) + legacy kills aging out (accel-300-, pump-chain-v5, mtf-regime-trend+ PLUS). volume-breakout-long+ remains the best signal (22T 72.7%WR +$3.42/30d all NEUTRAL) but boost is blocked by active bollinger 48h window.
+
+### Fix Applied
+**0 trading config changes** — bollinger_squeeze monitor window active until 21:55 UTC. Volume-breakout conf boost 1.15→1.25 still QUEUED (signal_compactor.py:709 re-verified). Regime memory refreshed (snapshot 17:50 wr=52.6 7d=+2.47). **NEW WATCH flagged: accel_300_v3_long still ENABLED, 7T/7d -$0.37 42.9%WR all NEUTRAL** — EXTREME/FLAT blocks don't cover the only active regime. Post-window: NEUTRAL block or disable. Delegations unchanged (ema_reclaim coverage, mover+ entry quality, hard_max_loss semantics, DRIFT-002, coin_tracker signal).
+
+### Verification
+24h improved +$1.24 from $0.00 at 13:50. 7d improved +$2.47 from +$2.22. SHORT bleed easing. Next apply window: volume-breakout boost after 21:55 UTC + accel_300_v3_long review same window.

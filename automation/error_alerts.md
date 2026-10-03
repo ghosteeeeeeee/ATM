@@ -580,3 +580,8 @@
 
 ## Error Alerts — 2026-10-03 16:59 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-03 17:47 UTC
+- **WARN** (7): Non-critical services in `failed` state — `hermes-better-coder`, `hermes-bug-hunter`, `hermes-git-release`, `hermes-mtf-macd-tuner`, `hermes-trading-checklist`, `hermes-upgrade-implementer`, `hermes-wasp`
+- **AUTO-FIX**: Disk 86% → 80% — gzipped `*.log` older than 7 days in `/root/.hermes/logs/`
+- **NOTE**: Core trading path healthy (pipeline, hl-sync-guardian, price-collector, signal-compactor all active). Failed units are maintenance/analyzer jobs, not trade-critical.

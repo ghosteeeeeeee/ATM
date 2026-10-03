@@ -3861,3 +3861,8 @@ DB-verified: 3T last hour (3W 0L +$0.13) | 24h ~28T +$0.90~ 57%WR atr_sl_hit 0% 
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family ~9T -$1.61 main 24h loss | pnl_pct data-path nonsense continues
 BY: auto_1hr
+2026-10-03 17:50 UTC CEO: NO TRADING CONFIG - bollinger window active until 21:55 UTC
+DB-verified: 24h 31T 61.3%WR +$1.24 | Oct3 28T 64.3% +$1.67 | 7d 194T 52.6% +$2.47 | LONG +$3.61/141T | SHORT -$1.14/53T
+CHANGE: none - monitor windows active. volume-breakout boost 1.15→1.25 still QUEUED (signal_compactor.py:709)
+WATCH: accel_300_v3_long ENABLED 7T/7d -$0.37 42.9% NEUTRAL - post-window review | hard_max_loss ~9T -$1.67 | doji 14T/30d | ema_reclaim 0 signals | disk 80%
+BY: CEO
