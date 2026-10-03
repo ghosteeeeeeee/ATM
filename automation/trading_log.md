@@ -2744,3 +2744,31 @@ BY: auto_1hr
 - ORPHAN_PAPER rows — should they be filtered from hourly WR/PnL calculations automatically?
 
 BY: auto_1hr
+
+## [2026-10-03 14:12] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $+0.30 (WR: 100%) | 24h: +$0.06 / 31T / 45.2%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** 3/3 winners this hour — SEI bb-bounce-v3-long+, ZEN bb-bounce-v3-long+, SYRUP bb-squeeze+. All exited profit-monster-trail. No losers this hour, so no adverse-excursion comparison needed. 24h: profit-monster-trail 7T +$0.48, atr_trail_hit 4T +$1.38, pump_exit_dead_money 4T +$0.67 — winners trailing correctly.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades this hour (0 losers). 24h worst: mtf-regime-trend+ 6T -$0.75 — all closes Oct 2 pre-kill (15:11 UTC), flag re-verified False. pump-chain-v5 2T -$0.08 — PUMP_CHAIN_V5_ENABLED=False verified. No new kill needed.
+- **Negative PnL streak:** 10:00 +0.57, 12:00 -0.11, 13:00 +0.30. NOT 3 consecutive negative hours.
+- **Overtrading:** 3T this hour. 24h 31T — fine.
+- **Open positions (3):** ARB bb-squeeze+ 14:09, XPL bb-squeeze+ 14:06, GMT pump-chain+ 13:25 — all fresh/unrealized $0.00, no action.
+- **Monitor windows untouched:** pump-chain- RSI_MIN, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+
+**Sideways:**
+- 24h PnL drifted from +$0.27 (13:00 report) to +$0.06 — earlier winners aged out of the 24h window and hard_max_loss family (~10T -$1.60) absorbed more weight. Still net positive; no action trigger.
+- pnl_pct data-path nonsense persists (SYRUP +283%, ZEN +293% on sub-$1 moves) — known bug class, not signal logic.
+- 24h WR 45.2% with near-flat PnL — trailing exits carrying edge, raw WR not meaningful without exit context.
+
+**Open Questions:**
+- 24h net +$0.06 is thin. If next hours go negative, check regime before touching signal params — hard_max_loss family is the loss concentration, not atr_sl_hit.
+- bb-squeeze+ now 5T 2W3L across 24h windows (+$0.13 pure + -$0.11 composite) — 2 fresh opens this hour; watch, don't retune.
+
+BY: auto_1hr

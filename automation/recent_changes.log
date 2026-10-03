@@ -3841,3 +3841,8 @@ DB-verified: 2T last hour (0W 1L -$0.11 + 1 ORPHAN_PAPER $0) | 24h 35T +$0.27 at
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: STX MAE 76.79% vs -1.10% stop (data-path class bug) | monitor windows active
 BY: auto_1hr
+2026-10-03 14:12 UTC auto_1hr: NO CONFIG CHANGE - hourly audit
+DB-verified: 3T last hour (3W 0L +$0.30) | 24h 31T +$0.06 45.2%WR atr_sl_hit 0% | open 3 (ARB/XPL bb-squeeze+, GMT pump-chain+)
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+WATCH: 24h PnL thinned to +$0.06 (window aging + hard_max_loss family) | bb-squeeze+ 2 fresh opens | pnl_pct data-path nonsense continues
+BY: auto_1hr
