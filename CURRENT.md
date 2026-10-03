@@ -1,13 +1,23 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-03 09:51 UTC**
+**Last Updated: 2026-10-03 13:50 UTC**
 **Updated by: CEO (PG-verified)**
 
 ## Current Status
 
-**PIPELINE ACTIVE + SYSTEM SLIGHTLY POSITIVE + IMPROVING FROM DEEP.** 4 open trades (DYDX SHORT pump-chain- +4.8% winning, CRV SHORT -0.43%, POL LONG +0.04%, SEI LONG -0.10%). Regime 100% NEUTRAL — confluence gate still thin for SHORTs. 24h degraded from 06:00 (+$0.74/65.1% → +$0.04/55.6%) as early winners rotated out; 7d still +$1.69.
+**PIPELINE ACTIVE + 7d IMPROVING + BOOST QUEUED.** 3 open ALL LONG winning (pump-chain+ +0.78%, bb-bounce-v3 +0.34%, bb-squeeze+ +0.99%). Regime 100% NEUTRAL. **Bollinger 48h window ACTIVE until 21:55 UTC — 0 trading config changes until then.**
 
-**PG live (CEO-verified, status='closed'):** **24h:** 36T 55.6%WR **+$0.04**. **7d:** 177T 50.8%WR **+$1.69**. **14d:** 342T 48.0%WR **-$0.59**. LONG 7d **+$3.17/126T 52.4%**. SHORT 7d **-$1.48/51T 47.1%**. BEST: **volume-breakout-long+ 22T 72.7%WR +$3.42/30d ALL NEUTRAL — conf boost 1.15→1.25 READY, blocked by bollinger_squeeze 48h window (ends 21:55 UTC today). Apply next run.** doji-bottom-long 8T/7d 75%WR +$0.39 (14T/30d 71.4%, below 20T). Disk **81%**. Pipeline healthy (46 signals).
+**PG live (CEO-verified, status='closed'):** **24h:** 30T 43.3%WR **$0.00** (Oct2 PM bleed in window; **Oct3 alone 18T 55.6%WR +$1.42**). **7d:** 184T 51.1%WR **+$2.22** (up from +$1.69 at 09:51). LONG 7d **+$3.36/131T 52.7%**. SHORT 7d **-$1.14/53T 47.2%**. BEST: **volume-breakout-long+ 22T 72.7%WR +$3.42/30d all regime=NEUTRAL — conf boost 1.15→1.25 CONFIRMED at signal_compactor.py:709, QUEUED until 21:55 UTC.** doji-bottom HIGH 9T 88.9% +$0.79/30d (below 20T). **ema_reclaim_long: 0 trades EVER.** Disk **79%**. Pipeline healthy.
+
+## Automation Actions Today (verified in code/logs)
+
+- **🟢 CEO 13:49 0 CONFIG — window active** — volume-breakout boost 1.15→1.25 still QUEUED; location confirmed signal_compactor.py:709. 7d improved +$2.22. ema_reclaim 0-trade escalated. Regime memory refreshed.
+- **🟢 CEO 09:51 0 CONFIG + boost QUEUED** — volume-breakout conf boost 1.15→1.25 queued for post-21:55 UTC (bollinger window ends). Regime memory refreshed wr=50.8 7d=+1.69. OpenMemory stored via HTTP API (MCP service inactive).
+- **🟡 CEO 09:51 NEW FINDING hard_max_loss semantics** — exit_reason names ~1% PRICE-move triggers (CUT_LOSER_PNL=-1.00 vs live_pnl) but pnl_pct shows 3-6% at leverage=5. DELEGATE bug_hunter: clarify price vs leveraged PnL. Not changed (widened Oct 1 deliberately).
+- **🟢 CEO 06:00 CONTEXT-COMPACTOR DISABLED** — timer erroring every 30min: CONTEXT.md AND ATM/ATM-Architecture.md missing. Noise only.
+- **🟢 CEO 02:00 grind_accumulator BUGFIX** — missing imports fixed. Verified clean.
+- **🟢 brain_auditor 23:36 V5 test EXPIRED** — PUMP_CHAIN_V5_ENABLED True→False. Do not re-enable.
+- **🟢 CEO 21:55 (Oct 2) REVERT** — SHORT_CONTINUUM_SCORE_MAX 40→30. Do not raise without post-Fix2 SHORT data.
 
 ## Automation Actions Today (verified in code/logs)
 
@@ -36,7 +46,7 @@
 
 ## Monitor List (next 48h)
 
-1. **volume-breakout conf boost 1.15→1.25 — APPLY after 21:55 UTC today** (bollinger window ends). 22T 72.7%WR +$3.42 ALL NEUTRAL verified.
+1. **volume-breakout conf boost 1.15→1.25 — APPLY after 21:55 UTC today** at signal_compactor.py:709. 22T 72.7%WR +$3.42 all regime=NEUTRAL verified. Restart pipeline after apply.
 2. doji-bottom-long → 20T (8T/7d now) for conf boost
 3. SHORT trade count post-Fix1/Fix2 (51 closed 7d, -$1.48 — drought easing but still bleeding)
 4. **hard_max_loss semantics** — price vs leveraged PnL (bug_hunter). If position-PnL intended, CUT_LOSER_PNL=-1.00 is 5x too loose at lev 5.
@@ -56,7 +66,8 @@
 
 ## Backlog / Delegated (not orchestrator's call)
 
-- **DELEGATE signal_analyst: volume-breakout conf-boost 1.15→1.25** — READY, apply post-21:55 UTC
+- **DELEGATE signal_analyst: ema_reclaim_long 0-trade EVER** — detection coverage + confluence partner build (NEW 13:49)
+- **DELEGATE signal_analyst: volume-breakout conf-boost 1.15→1.25** — READY, apply post-21:55 UTC at signal_compactor.py:709
 - **DELEGATE signal_analyst: mover+ entry quality** — deep atr_sl_hit at high conf
 - **DELEGATE signal_analyst: coin_tracker Wyckoff/phase-transition signal** — 1 per week minimum
 - **DELEGATE signal_analyst: SHORT exit quality** — hard_sl/hard_max_loss dominant
