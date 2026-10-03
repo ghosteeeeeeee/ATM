@@ -2800,3 +2800,30 @@ BY: auto_1hr
 - XPL +337% pnl_pct on $0.08 move — data-path bug class continues; brain_auditor/data-path pass still pending.
 
 BY: auto_1hr
+
+## [2026-10-03 16:12] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $-0.20 (WR: 50%) | 24h: +$0.90 / 28T / ~57%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** NEAR bb-squeeze+ LONG hit hard_max_loss_-1.15% (-$0.23); GMT pump-chain+ LONG exited pump_exit_dead_money (+$0.03). Only 1 loser — no adverse-excursion comparison possible. NEAR size was $22.10 (2x normal $11.10) — flag for review, not an auto-trigger.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant losses remain hard_max_loss family (~10T, ~-$1.61) — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades in last hour (2T only). 24h 3+T signals all flat-or-positive: pump-chain+ 7T 57%WR +$0.93, pump-chain- 5T 60%WR +$0.18, bb-bounce-v3-long+ 3T 100%WR +$0.12, bb-squeeze+ 7T 57%WR -$0.01. No kill needed.
+- **Negative PnL streak:** 10:00 +$0.23, 12:00 -$0.11, 13:00 +$0.30, 15:00 -$0.11. NOT 3 consecutive negative hours. No size/regime change.
+- **Overtrading:** 2T this hour. 24h 28T — fine.
+- **Open positions:** 0 — all closed.
+
+**Sideways:**
+- pnl_pct data-path nonsense persists (NEAR -512% on hard stop, XPL +337% on $0.08) — known bug class, not signal logic.
+- NEAR position was double-size ($22.10 vs $11.10) — sizing anomaly worth a look when the data-path/size audit lands.
+- hard_max_loss family (~10T -$1.61) continues as the sole 24h loss concentration — not atr_sl_hit.
+
+**Open Questions:**
+- Why did NEAR open at 2x normal size? Check amount logic / regime sizing path when not mid-monitor-window.
+- 24h net +$0.90 recovered nicely from +$0.49 at 15:12 — trailing exits still carrying the edge.
+
+BY: auto_1hr

@@ -3851,3 +3851,8 @@ DB-verified: 2T last hour (2W 0L +$0.09) | 24h 34T +$0.49 ~47%WR atr_sl_hit 0% |
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family ~10T -$1.65 is main 24h loss concentration | pnl_pct data-path nonsense continues
 BY: auto_1hr
+2026-10-03 16:12 UTC auto_1hr: NO CONFIG CHANGE - hourly audit
+DB-verified: 2T last hour (1W 1L -$0.20) | 24h 28T +$0.90 ~57%WR atr_sl_hit 0% | open 0
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+WATCH: NEAR double-size $22.10 (vs $11.10 normal) | hard_max_loss family ~10T -$1.61 | pnl_pct data-path nonsense continues
+BY: auto_1hr
