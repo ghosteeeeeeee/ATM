@@ -219,22 +219,51 @@ def get_30d_leaderboard():
             token_data['is_long_fav'] = token in FAVORITES_LONG
             token_data['is_short_fav'] = token in FAVORITES_SHORT
             token_data['direction_stats'] = direction_stats.get(token, {})
+            # Direction-specific Hall of Fame flags
+            dir_stats = direction_stats.get(token, {})
+            long_stats = dir_stats.get('LONG', {})
+            short_stats = dir_stats.get('SHORT', {})
+            token_data['is_long_hof'] = (long_stats.get('winrate', 0) >= 60 and long_stats.get('trades', 0) >= 5)
+            token_data['is_short_hof'] = (short_stats.get('winrate', 0) >= 60 and short_stats.get('trades', 0) >= 5)
+            token_data['is_long_hos'] = (long_stats.get('winrate', 100) < 45 and long_stats.get('trades', 0) >= 5)
+            token_data['is_short_hos'] = (short_stats.get('winrate', 100) < 45 and short_stats.get('trades', 0) >= 5)
 
-        # Hall of fame: consistent winners (30d WR >= 60%, trades >=15, profitable)
-        hall_of_fame = [
-            t for t in all_tokens
-            if t['winrate'] >= 60 and t['trades'] >= 15 and t['total_pnl_usdt'] > 0
-        ][:10]
+        # Hall of fame: consistent winners
+        # - Combined: 60%+ WR, 15+ trades, profitable
+        # - Direction-specific: 60%+ WR, 5+ trades, AND that direction has positive PnL
+        hall_of_fame = []
+        for t in all_tokens:
+            dir_stats = t.get('direction_stats', {})
+            long_stats = dir_stats.get('LONG', {})
+            short_stats = dir_stats.get('SHORT', {})
+
+            # Combined HoF
+            if t['winrate'] >= 60 and t['trades'] >= 15 and t['total_pnl_usdt'] > 0:
+                hall_of_fame.append(t)
+                continue
+
+            # Direction-specific HoF (must have positive PnL in that direction)
+            if t.get('is_long_hof') and long_stats.get('total_pnl_usdt', 0) > 0:
+                hall_of_fame.append(t)
+                continue
+            if t.get('is_short_hof') and short_stats.get('total_pnl_usdt', 0) > 0:
+                hall_of_fame.append(t)
+                continue
+
+        # Sort by PnL and cap at 20
+        hall_of_fame.sort(key=lambda x: x.get('total_pnl_usdt', 0), reverse=True)
+        hall_of_fame = hall_of_fame[:20]
 
         # Hall of shame: consistent losers (30d WR < 45%, trades >=15, losing)
-        # FIX (2026-09-21): Removed [:10] cap — was cutting off worst losers (sorted by PnL DESC)
+        # PLUS direction-specific HoS (5+ trades, <45% WR)
         hall_of_shame = [
             t for t in all_tokens
-            if t['winrate'] < 45 and t['trades'] >= 15 and t['total_pnl_usdt'] < 0
+            if (t['winrate'] < 45 and t['trades'] >= 15 and t['total_pnl_usdt'] < 0)
+            or t.get('is_long_hos')
+            or t.get('is_short_hos')
         ]
 
         # Top leaderboard (all qualifying tokens, not just top 20)
-        # FIX (2026-09-21): Include all tokens so signal_compactor cache covers every traded token
         leaderboard = all_tokens
 
         return {
