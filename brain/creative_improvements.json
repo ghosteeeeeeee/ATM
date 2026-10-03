@@ -2020,5 +2020,35 @@
     "status": "suggested",
     "risk": "low",
     "gate": "n=10 < 20 — monitor, apply only if signal resumes firing"
+  },
+  {
+    "date": "2026-10-03T01:37:16Z",
+    "idea": "ema_reclaim near-miss telemetry — log which gate fails (decline/reclaim/vol/RSI) per scan cycle",
+    "rationale": "Diagnostic shows 114/146 no_decline, 15 no_vol, 15 no_reclaim, 2 no_rsi, 0 pass. We currently only see 'Signal ema_reclaim_long: 0'. Telemetry tells us when habitat returns vs when a filter is wrongly tight. Zero trading risk.",
+    "expected_impact": "Visibility only. Enables data-driven partner-map timing without loosening entry quality.",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "none",
+    "gate": "code change in ema_reclaim_long.py — no config"
+  },
+  {
+    "date": "2026-10-03T01:37:16Z",
+    "idea": "Watchdog stale-kill aging — suppress steers for signals with enabled=False",
+    "rationale": "steer-004 'mtf-regime-trend+ losing streak 4 losses -$0.76' fires after the signal was killed 15:11. Operators waste cycles re-investigating closed cases. One filter in watchdog steer generation.",
+    "expected_impact": "Cleaner operator attention. No trading impact.",
+    "category": "ops safety",
+    "status": "suggested",
+    "risk": "none",
+    "gate": "watchdog owner — not hermes_constants"
+  },
+  {
+    "date": "2026-10-03T01:37:16Z",
+    "idea": "Pre-arm: LONG confidence dampener when BTC 4h SHORT_BIAS + volatility LOW + portfolio long-biased (soft multiplier, NOT a block)",
+    "rationale": "Recurring session pattern + live watchdog steer-002: 4 open LONGs vs BTC 4h SHORT_BIAS, market_phase DECLINING, vol LOW. Prior instance was 11 LONGs/0 SHORT against SHORT_BIAS. A 0.7-0.85x confidence multiplier (not a kill) lets structure filter bad clusters while preserving strong setups that still pass. Time-based ideas BANNED; this is regime-alignment quality.",
+    "expected_impact": "Reduce wrong-side cluster bleed in downtrend bounces. Unknown $ — needs 50+ sample before live.",
+    "category": "regime alignment",
+    "status": "suggested",
+    "risk": "medium",
+    "gate": "backtest first — 7d+ sample of opens vs 4h regime at open. Do not apply without CEO. Monitor windows active."
   }
 ]
