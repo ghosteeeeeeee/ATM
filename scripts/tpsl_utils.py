@@ -586,7 +586,7 @@ def compute_atr_sl_tp(
                 # When trail_floor >= entry (line 580), the calculation can produce SL above
                 # entry if highest_price is far above entry. This happened on ME and GMT.
                 # Enforce entry floor as absolute minimum.
-                new_sl = min(new_sl, min_from_entry)
+                new_sl = min(new_sl, min_from_entry)  # CRITICAL: SL must never be above entry for LONG
                 # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
                 # one-way logic AND wrong-side correction. Adding one-way here would block
                 # the trailing gate from correcting a wrong-sided current_sl.
