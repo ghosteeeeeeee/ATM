@@ -2931,3 +2931,32 @@ BY: auto_1hr
 - Post-window (21:55 UTC): re-evaluate accel_300_v3_long ENABLED 7T/7d -$0.37 42.9% NEUTRAL and volume-breakout boost 1.15→1.25 queued change.
 
 BY: auto_1hr
+
+## [2026-10-03 21:11] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $-0.05 (WR: 66.7% on 3T) | 24h ~31T +$0.78 ~57%WR
+
+**Closes:** COMP bb-bounce-v3-long+ hard_max_loss -$0.14 | ZEN bb-bounce-v2-long+ +$0.01 | SYRUP bb-squeeze+ +$0.08
+
+**Changes:**
+1. None — no triggers met. Bollinger window active until 21:55 UTC (44 min remaining; CEO directive: no trading config).
+
+**No Change Needed:**
+- **Entry quality:** 2W/1L last hour. Winner exits profit-monster-trail (good). Loser = COMP hard_max_loss -$0.14 on ~$11 size (~-1.27% move). Not enough for MAE/MFE.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. 24h exits: profit-monster-trail 12T +$0.82, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70, hard_max_loss family 9T -$1.42, ORPHAN_PAPER 1T $0.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour. 6h: bb-bounce-v3-long+ 2T 0W -$0.14 (below 3T threshold), bb-squeeze+ 5T 3W -$0.16 avg -0.03 (winners but loss-sized losers — monitor, not kill), pump-chain+ 2T 2W +$0.05. No kill needed.
+- **Negative PnL streak:** 15:00 -$0.20, 16:00 +$0.09, 17:00 +$0.04, 18:00 -$0.12, 21:00 -$0.05 — NOT 3 consecutive negative hours.
+- **Overtrading:** 3T last hour. Fine.
+- **Open:** ENS bb-bounce-v3-long+, CRV volume-breakout-long+ (2 open, both flat).
+
+**Sideways:**
+- hard_max_loss family 9T -$1.42 sole 24h loss concentration — not atr_sl_hit. Stop placement vs signal structure review still open post-window.
+- bb-squeeze+ 6h: 5T 3W but net -$0.16 — R:R inverted (losses > wins). Known monitor item from signal_reporter 12:05.
+- pnl_pct data-path nonsense continues (COMP -$0.14 shows -634%) — known bug class, owned by bug_hunter.
+- Post-window queue unchanged: APPLY volume-breakout boost 1.15→1.25 (signal_compactor.py:709) + accel_300_v3_long ENABLED 7T/7d -$0.37 42.9% NEUTRAL review.
+
+**Open Questions:**
+- Window ends 21:55 UTC — next run (22:11) should be first eligible for queued changes.
+
+BY: auto_1hr
