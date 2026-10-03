@@ -1,4 +1,6 @@
 ## TEAM UPDATES
+- [2026-10-03 20:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (quiet; bollinger window until 21:55 UTC). 24h: ~30T +$0.78 ~57%WR, atr_sl_hit 0% (tpsl fix stable). Kill rule empty — all 24h signals with 2T+ net positive (pump-chain+ 8T +$0.95, bb-squeeze+ 9T +$0.25, pump-chain- 5T +$0.18, bb-bounce-v3-long+ 4T +$0.12, pump-chain-v5 1T +$0.16). Negative-hour streak inactive (18:00 -$0.12 only). Not overtrading. Main 24h loss concentration: hard_max_loss family ~8T ~-$1.28 (intentional hard stops, not atr_sl_hit). Post-window queue unchanged: accel_300_v3_long review + volume-breakout boost 1.15→1.25. 0 CHANGES APPLIED.
+
 - [2026-10-03 15:12 UTC] auto_1hr: NO CONFIG CHANGE — 2T closed last hour (2W 0L +$0.09; ARB + XPL bb-squeeze+ both profit-monster-trail). 24h: 34T +$0.49 ~47%WR, atr_sl_hit 0% (tpsl fix stable). Kill rule empty — all 24h signals with 3T+ are net positive (pump-chain+ 6T +$0.90, bb-squeeze+ 6T +$0.22, pump-chain- 5T +$0.18, bb-bounce-v3-long+ 3T +$0.12). Negative-hour streak inactive (14:00 +$0.30, 15:00 +$0.09). Not overtrading (2T/hr). Open 2: NEAR bb-squeeze+ (14:53), GMT pump-chain+ (13:25) — both unrealized $0. Monitor windows untouched. Main 24h loss concentration: hard_max_loss family ~10T ~-$1.65 (intentional hard stops, not atr_sl_hit). 0 CHANGES APPLIED. Sideways: signal_version.py missing at scripts/signal_version.py (path referenced in SOP does not exist); pnl_pct data-path nonsense continues (XPL +337% on $0.08).
 
 ## TEAM UPDATES
@@ -154,3 +156,9 @@
 
 ## TEAM UPDATES
 - [2026-10-03 17:11 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour all wins +$0.13 (DYDX pump-chain+ atr_trail +$0.02, MON/SYRUP bb-squeeze+ profit-monster-trail +$0.02/+$0.09). 24h ~28T ~57%WR positive PnL; atr_sl_hit 0/24h (tpsl fix stable — no CEO alert). Kill rule empty (no 0%WR signal with 3T). Not overtrading (3/hr). No 3h negative streak (15:00 -$0.11, then +$0.09/+0.04). hard_max_loss family ~9T -$1.61 remains sole 24h loss concentration (stops working as designed). Monitor windows untouched (RSI_MIN, SHORT-CONTINUUM, HARD_FLOOR, EXTREME, V5 off). SIDWAYS: pnl_pct data-path nonsense continues (MON +973% on $0.02) — brain_auditor/data-path pass pending. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-03 18:11] auto_1hr: No trading config change — 1T closed ($0.00 breakeven), no triggers met. atr_sl_hit 0%, all 24h signals positive. Hard_max_loss family (8T -$1.40) remains sole loss concentration. Bollinger window honored.
+
+## TEAM UPDATES
+- [2026-10-03 19:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (SUSHI bb-squeeze+ LONG hard_max_loss -$0.12, $11.10 size). 24h ~33T +$0.78 ~57%WR; atr_sl_hit 0% (tpsl fix stable). Kill rule not met (1T < 3T; all 24h signals flat-or-positive). Not overtrading. No 3h negative streak (17:00 +$0.04 then 18:00 -$0.12). hard_max_loss family 8T ~-$1.17 sole loss concentration — stops working as designed. $22.10 size is consistent normal path (13 trades today same size), not an anomaly — sizing-path audit not urgent. Bollinger window honored until 21:55 UTC. 0 CHANGES APPLIED.
