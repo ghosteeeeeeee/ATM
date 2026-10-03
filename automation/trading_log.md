@@ -2570,3 +2570,31 @@ BY: auto_1hr
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
 
 BY: auto_1hr
+
+## [2026-10-03 08:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.07 (WR: 0.0%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** Single JUP pump-chain+ LONG closed pump_exit_dead_money -$0.07 — no winners this hour, nothing to judge for adverse excursion.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/~47). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** No signal has 0% WR with 3+ trades this hour. pump-chain+ only 1T this hour (-$0.07); 24h pump-chain+ = 6T 3W +$0.90 still healthy. pump-chain- 24h = 4T 2W -$0.29 small sample. mtf-regime-trend+ already killed.
+- **Negative PnL streak:** 03:00 -0.27, 05:00 +0.05, 06:00 -0.43, 07:00 -0.07 — only 2 consecutive negative hours, not 3.
+- **Overtrading:** 1T/hr « 20.
+- **24h by close reason:** profit-monster-trail 18T +$0.77 dominant; hard_max_loss family ~14T negative (small stops working as designed); atr_sl_hit 0T; pump_exit_dead_money 4T +$0.67 (dead-money exits net positive).
+- **24h by signal:** pump-chain+ 6T 3W +$0.90 healthy; pump-chain- 4T 2W -$0.29 monitor; bb-squeeze+ 12T 8W -$0.10 flat; mtf-regime-trend+ 9T -$0.46 (kill holding — pre-kill trades).
+- **Open positions:** DYDX pump-chain- SHORT (04:35) still open. JUP closed this hour -$0.07 dead_money exit.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 n>=15 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- pump-chain- SHORTs: 4T 24h at -$0.29 — small sample, monitor post-Fix2 n>=15 before any RSI retune (brain_auditor directive).
+- DYDX pump-chain- SHORT still open — observe next hour.
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists (JUP -154.86% on -$0.07) — known bug, not signal logic.
+
+BY: auto_1hr

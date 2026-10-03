@@ -131,3 +131,6 @@
 
 ## TEAM UPDATES
 - [2026-10-03 05:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour ALGO pump-chain- SHORT +$0.04 atr_trail_hit (win). 24h: profit-monster-trail 22T +$1.00 dominant; atr_sl_hit 0% (tpsl fix stable). Kill rule not met (1T < 3T). Not overtrading (1/hr). No 3h negative streak (03:00 -0.27 then 05:00 +0.04). 3 pump-chain- SHORTs open (DYDX/ARB/APT) — ALGO closed win, so "all stop out" SHORT-floor re-check condition NOT met. Monitor windows untouched. PUMP_CHAIN_V5 kill still respected. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-03 08:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (JUP pump-chain+ LONG pump_exit_dead_money -$0.07). 24h: profit-monster-trail 18T +$0.77 dominant; atr_sl_hit 0% (tpsl fix stable); pump_exit_dead_money 4T +$0.67 net positive. Kill rule not met (pump-chain+ only 1T this hour; 24h still 3W +$0.90). Not overtrading (1/hr). No 3h negative streak (2 consecutive: 06:00 -0.43, 07:00 -0.07). pump-chain- RSI_MIN=45 monitor window untouched (n=4 < 15). PUMP_CHAIN_V5 kill still respected. Disk 88% WARN needs CEO retention call. 0 CHANGES APPLIED.
