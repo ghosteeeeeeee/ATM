@@ -559,3 +559,12 @@
 - **WARN** (known, 5 failed units): better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs: hardcoded passwords, dead signal_gen imports, cursor/connection leaks), git-release (dirty git blocks backup), trading-checklist (exits 1 on signals_db WARN — by design), upgrade-implementer (timeout exit 124). None on trading path. No auto-fix (root causes tracked, not transient).
 - **INFO**: `hermes-hl-sync-guardian` active. Timers healthy — pipeline/price-collector/signal-compactor/watchdog all firing ~1min/30s cadence. No missed core timers. `hermes-atr-sl-updater.timer` not-found (dead unit file; ATR updates run inside pipeline Position Manager — no functional gap).
 - **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found.
+
+## Error Alerts — 2026-10-03 15:47 UTC
+- **HEALTH** — Pipeline OK: last run 15:45:46 completed clean (LIVE); next run 15:46:33 already cycling. Position Manager healthy (0 open / 0 closed this cycle). Signals (1h): 63. Trades today: 23 closed in signal_outcomes (15 wins, +1.57 USDT), 0 open; pipeline portfolio counter 26 closed / +29.27% (counter ≠ DB — DB is source of truth). No Tracebacks, no CRASH. Disk 80%. Regime: 0 LONG / 0 SHORT / 117 NEUTRAL (fully neutral). Speeds: 53.5% tokens ≥50th pct (129/241). Prices fresh (85 tokens, prices.json ~0.5min). hl-sync-guardian active.
+- **WARN** (known, unchanged): `hotset.json` empty — regime fully NEUTRAL (117/117). Pipeline logs `fallback DB query returned 0 tokens`. Expected compaction behavior, not a bug. No auto-fix.
+- **WARN** (known, 5 failed units): better-coder, bug-hunter, git-release, trading-checklist, upgrade-implementer — same root causes as 14:48 entry, none on trading path. No auto-fix.
+- **INFO**: `systemctl list-timers hermes-*` prints "0 timers listed" — cosmetic; individual `systemctl status` confirms pipeline/price-collector/coin-tracker timers active and firing. Not a missed-timer condition.
+- **INFO**: 18 historical |pnl_pct|<0.01% outcomes exist (none `atr_sl_hit`, none today — newest 2026-09-28). Not phantom-trade events in the current window.
+- **INFO**: `prices.db` / `runtime.db` / `hermes_prices.db` have empty tables — live prices served from `prices.json` (85 tokens). Not a data-loss issue.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found; no restarts or cleanups needed.
