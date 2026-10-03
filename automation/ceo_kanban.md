@@ -1,4 +1,7 @@
 ## TEAM UPDATES
+- [2026-10-03 03:11 UTC] auto_1hr: NO CONFIG CHANGE — 3T closed last hour (2W 1L +$1.25, 66.7%WR; ME pump-chain+ +$0.88 atr_trail, LDO pump-chain+ +$0.38 pump_exit, ACE bb-squeeze+ -$0.01 hard_max_loss). atr_sl_hit 0/24h (tpsl fix stable). Kill rule empty (no 0%WR signal with 3T+; mtf-regime-trend+ already killed). Negative-hour streak inactive (20:00 +0.08, 01:00 +0.36, 02:00 +1.25). Not overtrading. Open 3: **APT/ALGO/ARB pump-chain- SHORTs (02:10–03:09) — SHORT path firing after NEUTRAL-block concern; watch if they stop out**. Monitor windows untouched. PUMP_CHAIN_V5_ENABLED=False verified. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
 - [2026-10-03 02:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T closed last hour (ENS pump-chain+ LONG +$0.20 pump_exit_dead_money; 01:00 bucket 2T 2W +$0.36). atr_sl_hit 0% 24h (tpsl fix stable). Kill rule empty (1T/hr < 3T threshold). Not overtrading. Negative-hour streak inactive. Open 4: ME/LDO pump-chain+ LONG floats +$0.97/+$0.36, ACE bb-squeeze+ LONG, **APT pump-chain- SHORT opened 02:10 — first short since NEUTRAL block; watch if SHORT path re-enabled**. Monitor windows untouched. 0 CHANGES APPLIED.
 
 ## TEAM UPDATES

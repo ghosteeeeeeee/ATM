@@ -2423,3 +2423,27 @@ Final set: ['ADA']
 - NEUTRAL regime — if shorts resume firing, re-check SHORT-RSI floors before stacking changes.
 - Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+## [2026-10-03 03:11 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$1.25 (WR: 66.7%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** winners were ME pump-chain+ LONG +$0.88 (atr_trail_hit) and LDO pump-chain+ LONG +$0.38 (pump_exit_dead_money). ACE bb-squeeze+ LONG lost -$0.01 via hard_max_loss_-1.00% — tiny, not an entry-quality failure.
+- **Kill rule:** 3 closes this hour; no 0%-WR signal with 3+ trades. Single-trade 0%WR signals (continuum+, continuum-osc+, pump-chain-) still below threshold. mtf-regime-trend+ already killed (residual 9T -$0.46 24h).
+- **atr_sl_hit >40%:** 24h = 0 atr_sl_hit exits. tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 20:00 +0.08, 01:00 +0.36, 02:00 +1.25 — positive, not 3 consecutive negative.
+- **Overtrading:** 3T/hr « 20.
+- **24h by signal (3+T):** pump-chain+ 3T 3W 100% +$1.46 (healthy); bb-squeeze+ 19T 11W -$0.09 breakeven (EXTREME monitor active); mtf-regime-trend+ already killed.
+- **Open positions (3):** APT pump-chain- SHORT (02:10, float -$0.07), ALGO pump-chain- SHORT (03:07, +$0.01), ARB pump-chain- SHORT (03:09, flat) — SHORT path firing again after prior NEUTRAL-block concern; no auto-1hr change, RR-engine/regime gates still in charge.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 target), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- 3 open pump-chain- SHORTs (APT/ALGO/ARB) — first cluster since NEUTRAL short-block concern. If they all stop out, re-check SHORT-NEUTRAL / SHORT-RSI floors next hour (one change max).
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.
