@@ -2264,5 +2264,32 @@
     "category": "entry sniper",
     "status": "monitor_48h",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-03T22:40:00Z",
+    "idea": "Watchdog execution-metadata guard — when a trade is open, read trade._signal_metadata.rsi_14 instead of live signals.json stream RSI",
+    "rationale": "Tonight URGENT steer claimed IO SHORT entered at RSI 13.42 (a non-executed 21:03 detection). Actual trade entered at RSI 44.79 (21:16 signal). False urgent steers cause bad manual interventions.",
+    "expected_impact": "Eliminates false wrong-side urgents; watchdog steers become trade-accurate",
+    "category": "data quality / watchdog",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T22:40:00Z",
+    "idea": "Contingent: pump-chain- SHORT RSI_MIN 40→45 if 40-45 band stays breakeven-negative for 7d more post-Fix2",
+    "rationale": "14d bands: 40-45 = 13T 8W $0.00, 45-55 = 26T 15W +$0.40. Edge is 45-55. Sample of 40-45 currently neutral — need more post-Fix2 data before change.",
+    "expected_impact": "If confirmed: +$0.10-0.20/7d from skipping breakeven band",
+    "category": "entry sniper",
+    "status": "suggested_contingent",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T22:40:00Z",
+    "idea": "ema_reclaim_long STANDALONE_BYPASS evaluation for NEUTRAL diversity",
+    "rationale": "0 signals ever despite ENABLED=True. NEUTRAL is 100% of active regime. If detection is sound but confluence-starved, bypass would unlock the intended habitat. Needs signal_analyst dry-run first.",
+    "expected_impact": "Unlocks unbuilt NEUTRAL signal; unknown WR with 0 sample — monitor-only until dry-run",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

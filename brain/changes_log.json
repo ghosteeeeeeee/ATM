@@ -759,5 +759,16 @@
     "after": "doji-bottom-long gated on DOJI_BOTTOM_ENABLED (correct constant)",
     "rationale": "Latent wiring bug — disabling doji-top LONG would have incorrectly killed doji-bottom-long. Constants comment already noted the historical mistake but schema was never updated. Both flags currently True = no live trade impact. Restart pipeline to load.",
     "impact": "None today (both flags True). Prevents future false-disable of doji-bottom-long. Restart required."
+  },
+  {
+    "timestamp": "2026-10-03T22:40:00Z",
+    "agent": "brain_auditor",
+    "change": "Disabled ACCEL_300_V3_LONG_ENABLED (True→False)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "ACCEL_300_V3_LONG_ENABLED = True",
+    "after": "ACCEL_300_V3_LONG_ENABLED = False",
+    "rationale": "CEO post-window monitor item. 39T all-time -$1.41 43.6%WR (EXTREME 34T -$1.49 38.2%). Last trade Sep 7 (26d). EXTRENE/FLAT blocks never covered active NEUTRAL regime.",
+    "impact": "Zero live (signal not firing). Prevents future noise when market heats up."
   }
 ]
