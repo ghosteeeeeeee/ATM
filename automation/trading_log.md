@@ -2689,3 +2689,29 @@ BY: auto_1hr
 - signals_db 0-approved state — is approval workflow intentional or stuck?
 
 BY: auto_1hr
+
+## [2026-10-03 12:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h: ~$0.49 / 37T / ~59.5%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** No closes this hour. 24h: WIN avg MAE 14.1% vs LOSS avg MAE 87.6% — winners still have far lower adverse excursion.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/~38). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** 0T this hour — no signal has 0% WR with 3+ trades. 24h 3+T losers: mtf-regime-trend+ 9T -$0.46 (already killed); bb-squeeze+ 8T 6W +$0.17 (positive now, monitor windows active). pump-chain-v5 2T -$0.08 pre-disable; PUMP_CHAIN_V5_ENABLED=False verified.
+- **Negative PnL streak:** 07:00 -0.07 then 10:00 +$0.57; hours 08/09/11/12 have no closes. NOT 3 consecutive negative hours.
+- **Overtrading:** 0T opened last hour. 24h ~37T — fine.
+- **24h by close reason:** profit-monster-trail 15T +$0.80 dominant; atr_trail_hit 4T +$1.38; pump_exit_dead_money 4T +$0.67; hard_max_loss family ~10T -$1.66 + hard_sl 3T -$0.58 (stops working as designed); atr_sl_hit 0T.
+- **24h by signal:** pump-chain+ 6T 3W +$0.90; pump-chain- 5T 3W +$0.18; bb-bounce-v3-long+ 3T 3W +$0.10; bb-squeeze+ 8T 6W +$0.17 (recovered from -$0.07); mtf-regime-trend+ pre-kill -$0.46.
+- **Open positions (0):** All closed. Pipeline idle-clean this hour.
+- **Monitor windows untouched:** pump-chain- RSI_MIN (post-Fix2 n>=15), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor kill.
+
+**Open Questions:**
+- bb-squeeze+ now +$0.17/8T after SEI win — keep monitor windows; no retune.
+- pnl_pct data-path nonsense persists (DYDX +2002% on +$0.45) — known bug, not signal logic.
+
+BY: auto_1hr
