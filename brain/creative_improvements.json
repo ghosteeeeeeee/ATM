@@ -2050,5 +2050,43 @@
     "status": "suggested",
     "risk": "medium",
     "gate": "backtest first — 7d+ sample of opens vs 4h regime at open. Do not apply without CEO. Monitor windows active."
+  },
+  {
+    "date": "2026-10-03T05:39:03Z",
+    "idea": "Concentration-aware slot reservation: when >=2 open positions share signal family+direction, block new entries from that family until 1 slot frees — prefer alternate long-side quality signal (volume-breakout-long+ / doji-bottom) if hotset offers one",
+    "rationale": "Current book is 3-4/4 pump-chain- SHORT. Watchdog cluster risk valid. Long side printing (vol-breakout 77.8% WR) while short family nets slightly negative. Not a time block — a portfolio construction rule.",
+    "expected_impact": "Reduce single-factor blowups; improve capital rotation to proven long edge. Hard to quantify without backtest — propose shadow log first.",
+    "category": "portfolio construction",
+    "status": "suggested",
+    "risk": "low",
+    "sample_note": "Qualitative — no n>=20 backtest yet. SHADOW/log-only first per conservative rule."
+  },
+  {
+    "date": "2026-10-03T05:39:03Z",
+    "idea": "Bearish-override RSI band: when SHORT_RSI_FLOOR bypass fires due to BTC bearish structure, still require exec RSI in [35, 55] for pump-chain- (sweet spot 40-55 detection; hard-floor 25 absolute remains)",
+    "rationale": "Fix2 bypass currently admits any RSI>=25 when bearish. 14d entry_rsi<40 net -$1.52. Band keeps oversold-continuation thesis but avoids deepest oversold exec entries where move already happened.",
+    "expected_impact": "If applied historically to entry_rsi: would cut deep-oversold exec shorts. MUST verify winners blocked before any code change — entry_rsi<35 14d still has 14 winners (high collateral).",
+    "category": "entry sniper",
+    "status": "suggested-deferred",
+    "risk": "medium",
+    "sample_note": "Insufficient post-Fix2 n. Do NOT implement during monitor window. Revisit at n>=15 post-Fix2 closes."
+  },
+  {
+    "date": "2026-10-03T05:39:03Z",
+    "idea": "ACE-class LONG exec ceiling audit: verify PUMP_CHAIN_LONG_RSI_MAX / LONG_RSI_CEILING fire on exec-time 1m RSI (not just detection 5m/metadata). Log SKIP when entry_rsi_14 > ceiling at fill.",
+    "rationale": "ACE pump-chain+ entered entry_rsi=73.68 > MAX=70 and lost -0.27. Same DRIFT-002 class as SHORT leaks. Code-path audit + debug log, not a new threshold.",
+    "expected_impact": "Closes overbought LONG leak class; enables future filter tuning with trustworthy exec RSI.",
+    "category": "debug/audit",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T05:39:03Z",
+    "idea": "Ship NEUTRAL ema_reclaim confluence partners (doji-bottom, volume-dry-up) so shadow signal can fire — diversity gap open since Sep 30",
+    "rationale": "Sessions + CEO kanban repeatedly flag NEUTRAL diversity. ema_reclaim built but 1 signal/48h without confluence. Every pump LONG / every dump SHORT needs a second qualified source in flat NEUTRAL.",
+    "expected_impact": "More qualified hotset fills without weakening confluence gate.",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

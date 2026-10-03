@@ -3812,3 +3812,12 @@ RSI MAP: pump-chain- SHORT 45-55=88.9%WR +$1.09 sweet spot; MIN=45 target when p
 CREATIVE (3): RSI 45-55 routing | fail-closed exception logging | mover+ RSI_MAX=75 pre-arm
 1 CHANGE APPLIED - pipeline restart to load flag
 BY: brain_auditor
+
+2026-10-03 05:39 UTC brain_auditor: NO CONFIG CHANGE - audit
+DB-verified: 42T 64.3%WR +$0.73 (24h) | 173T 51.4%WR +$2.18 (7d) | 3 open pump-chain- SHORT
+WATCHDOG: oversold SHORT entries = exec RSI drift + Fix2 bearish override (by design); mtf steer STALE (killed)
+DRIFT: signal_rsi_14 NULL | DRIFT-002 5m vs 1m | EXTREME per-signal 0.5 | ACE LONG entry_rsi 73.68 > MAX 70
+AUTOPSY: no new systematic bleed; monitor post-Fix2 n>=15 before SHORT RSI retune
+CREATIVE (4): concentration slots | bearish-override RSI band (deferred) | exec-ceiling audit | ema_reclaim partners
+0 CHANGES APPLIED - monitor windows active
+BY: brain_auditor
