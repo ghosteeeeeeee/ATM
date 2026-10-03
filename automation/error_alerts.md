@@ -599,3 +599,14 @@
 
 ## Error Alerts — 2026-10-03 20:59 UTC
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-03 23:48 UTC
+- **HEALTH** — Pipeline OK: last run 23:45:33 completed clean (LIVE, Result=success). Position Manager healthy (2 open / 0 closed, ATR SL/TP updated on LDO). Signals (1h): 59. Trades today: 2 open / 33 closed in signal_outcomes (+1.44 USDT; pipeline counter +37.51% — counter ≠ DB sum, DB is source of truth). No Tracebacks, no CRASH. Phantom trades (`atr_sl_hit` <0.01% PnL): 0. Disk 82%. Regime: 1 LONG_BIAS / 0 SHORT / 116 NEUTRAL (overall NEUTRAL, 117 tokens, ts 23:45). Speeds: 53.5% tokens ≥50th pct (129/241). Prices fresh (trades.json 0.7min, regime_5m.json 1.1min, coin_tracker_data.json exported 23:48 — 112 coins at `/var/www/html/` via nginx alias, not WWW_DATA). hl-sync-guardian active. pipeline.timer active, next 23:47:00.
+- **WARN** (known, 8 failed units — none on trading path): `hermes-better-coder` (ModuleNotFoundError: dispatcher.dispatcher), `hermes-bug-hunter` (audit FAILs: hardcoded passwords + dead signal_gen imports — expected when findings exist), `hermes-ceo` (exit 124 timeout), `hermes-git-release` (update-git.py --dry-run exit 1), `hermes-mtf-macd-tuner` (AttributeError: PrecomputedMACD.warmup), `hermes-trading-checklist` (1 WARN signals_db), `hermes-upgrade-implementer` (exit 124), `hermes-wasp` (exit 1), `weather-station-api`. Root causes tracked — no auto-fix.
+- **WARN** (new): `/root/.hermes/data/coin_tracker.db` is **3.5 GB** (112 coin tables × ~44k rows each). Disk at 82%. Under 85% cleanup threshold, but retention is missing — flag for a prune job. Do not delete without schema review.
+- **WARN** (known, unchanged): `signals` active table ~19,156 rows — trading-checklist flags cleanup. Not on execution path.
+- **WARN** (known): `hotset.json` loaded 1 token — regime fully NEUTRAL (116/117). Expected compaction, not a crash.
+- **INFO**: `systemctl list-timers hermes-*` prints "0 timers listed" without `--all` — cosmetic. `--all` confirms core timers firing (pipeline 1min, price-collector, watchdog, coin-tracker 30min, signal-compactor, 15m-regime, pump-hunter).
+- **INFO**: `decisions` table last row 2026-04-13 — decider path migrated to signal_compactor; table not written by current runtime. Not a pipeline failure.
+- **INFO**: Inactive/dead timers: `hermes-atr-sl-updater` (DEFUNCT; ATR runs in Position Manager), `hermes-regime-24h-check`, `hermes-regime-transition-check`, `hermes-hl-copy` (last 2026-08-15). No trading-path gap.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL conditions; pipeline healthy, disk under threshold, timers firing. No restarts or cleanups needed.
