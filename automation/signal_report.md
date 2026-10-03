@@ -1,74 +1,70 @@
 # Signal Performance Report
-**Generated:** 2026-10-03 05:17 UTC | **Period:** Last 6h + 24h
-**Source:** PostgreSQL brain DB (live query, not cached)
+**Generated:** 2026-10-03 (PG-verified) | **Period:** Last 6h + 24h
 
-## KILLED (executed this run)
+All numbers queried live from PostgreSQL `brain` DB. Prior 11:03 UTC report was wrong (inflated PnL, listed killed mtf-regime-trend+ as re-enable candidate) — overwritten.
+
+## 6h Performance
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain+ | LONG | 2 | 0.0% | -$0.29 |
+| bb-bounce-v3-long+ | LONG | 1 | 100% | +$0.03 |
+| pump-chain- | SHORT | 4 | 60%* | +$0.14 |
+| bb-squeeze+ | LONG | 1 | 100% | +$0.20 |
+
+*pump-chain- 6h: 4T with HAVING>=2 filter at6h window had 5T/60%/+$0.18 in the mandated query (includes a close slightly outside the loose window).
+
+## 24h Performance
+
+| Signal | Dir | Trades | WR | PnL | AvgWin | AvgLoss |
+|--------|-----|--------|-----|-----|--------|---------|
+| mtf-regime-trend+ | LONG | 9 | 44.4% | -$0.46 | +$0.075 | -$0.190 |
+| bb-squeeze+ | LONG | 10 | 60.0% | -$0.07 | +$0.075 | -$0.130 |
+| bb-bounce-v3-long+ | LONG | 3 | 100% | +$0.10 | — | — |
+| pump-chain- | SHORT | 5 | 60.0% | +$0.18 | +$0.167 | -$0.160 |
+| pump-chain+ | LONG | 6 | 50.0% | +$0.90 | +$0.487 | -$0.187 |
+
+## KILLED (executed)
+None. No signal met all three kill criteria (WR<30% + 5T + PnL<-$0.10 + active>24h).
+
+## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met kill criteria |
+| pump-chain- | SHORT | 60.0% | +$0.18 | 5 | **0.5x → 1.0x** in `volatility_gate_v2.py` SIGNAL_TYPE_OVERRIDES EXTREME (hyphen + underscore forms) |
 
-## BOOSTED (executed this run)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met boost criteria |
+Boost rationale: WR>55 ✓, PnL>$0.05 ✓, 5T ✓, wins on 3 tokens (DYDX +$0.45, ALGO +$0.04, ARB +$0.01). All 5 trades were EXTREME regime. Lifetime EXTREME is breakeven (89T 52.8% +$0.04) — not a knockout edge, but recent window clears the boost bar. HIGH remains 0.0 blocked (25T 48% -$0.36). NORMAL already 1.0 (8T 75% +$0.03).
 
 ## LOSERS (watch list)
-| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
-|--------|-----|--------|---------|--------|--------|
-| mtf-regime-trend+ | LONG | 44.4% | -$0.46 | 9 | **Already killed** (MTF_REGIME_TREND_PLUS_ENABLED=False since 2026-10-02 15:11). All 9 trades pre-date kill; flag re-verified False; no opens after kill. Residual bleed only. |
-| continuum+ | LONG | 0% | -$0.21 | 1 | Watch — below 5T kill threshold. BTC-only. |
-| continuum-osc+ | LONG | 0% | -$0.20 | 1 | Watch — below 5T kill threshold. BTC-only. |
-| pump-chain- | SHORT | 50.0% | -$0.09 | 2 | Watch — below threshold. 7d 30T 50% WR breakeven. Regime gates active (EXTREME/HIGH blocked). 3 SHORTs open (DYDX/ARB/APT) per auto_1hr. |
-| pump-chain-v5 | LONG | 50.0% | -$0.08 | 2 | **Already killed** (PUMP_CHAIN_V5_ENABLED=False, brain_auditor 2026-10-02 23:20). GMT open 23:05 pre-dates kill. Flag re-verified False. |
-| accel-300- | SHORT | — | — | 0 (24h) | **Already killed** (ACCEL_300_MINUS_ENABLED=False since 2026-10-01). No opens after kill. Flag re-verified False. |
+
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb-squeeze+ | LONG | 60.0% | -$0.07 | 10 | R:R inverted — avg loss 1.73x avg win. EXTREME already blocked (33.3% -$0.14). HIGH edge kept (66.7% +$0.05). Monitor exits. |
+| pump-chain+ | LONG | 50.0% | +$0.90 | 6 | Positive PnL, below boost WR bar. No change. |
+| bb-bounce-v3-long+ | LONG | 100% | +$0.10 | 3 | Below 5T boost threshold. No change. |
 
 ## WINNERS
-| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
-|--------|-----|--------|---------|--------|--------|
-| pump-chain+ | LONG | 75.0% | +$1.19 | 4 | **Healthy.** 3W/1L. Wins: ME +$0.88, LDO +$0.38, ENS +$0.20. Loss: ACE -$0.27. Regime-routed correctly: EXTREME 75% WR (kept 1.0x), NORMAL/HIGH blocked (20%/37% WR). Not boosted — 4T < 5T threshold. |
-| bb-squeeze+ | LONG | 68.8% | -$0.01 | 16 | **Breakeven, high WR.** 11W/5L. Avg win $0.056 vs avg loss $0.126 — R:R inverted (losses 2.2x wins). EXTREME already blocked (50% WR -$0.15 all-time). HIGH 75% WR +$0.15 is the edge. Losses concentrated ACE -$0.28, SYRUP -$0.23, HYPE -$0.11. Not boosted — PnL fails $0.05 criterion. Monitor R:R, do not stack changes (auto_1hr monitor window active). |
-| bb-bounce-v3-long+ | LONG | 100% | +$0.07 | 2 | Healthy. Below boost threshold (2T < 5T). |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.03 | 1 | Healthy (plus 2 combo trades +$0.40). 7d 9T 55.6% +$0.24. |
-| warrior-sr-confirm+ | LONG | 100% | +$0.01 | 1 | Healthy, low volume. |
-| continuum_engine | LONG | 100% | +$0.08 | 1 | Healthy, low volume. |
+
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 60.0% | +$0.18 | 5 | BOOSTED (see above) |
+| pump-chain+ | LONG | 50.0% | +$0.90 | 6 | Enabled, no change |
+
+## Dead signals (pre-kill trades still closing)
+
+| Signal | Dir | WR | PnL | Trades | Flag |
+|--------|-----|-----|-----|--------|------|
+| mtf-regime-trend+ | LONG | 44.4% | -$0.46 | 9 | `MTF_REGIME_TREND_PLUS_ENABLED = False` (killed auto_1hr 2026-10-02 15:11) — re-verified False. All 9 trades created Oct 2 13:27–15:45, pre-kill. HIGH 6T 33.3% -$0.40 / NORMAL 3T 66.7% -$0.06 — would not qualify for regime-block (all regimes <50% WR on PnL), and signal is already dead. |
 
 ## ISSUES
-- **No direction inversions** (24h). All `*long*` signals closed LONG, all `*short*` closed SHORT.
-- **Prior signal_report.md (05:03 UTC) was wrong** — listed bb-squeeze+ as +1.97 winner and mtf-regime-trend+ as re-enable candidate. Live PG shows bb-squeeze+ at -$0.01 and mtf-regime-trend+ already dead. This report supersedes it.
-- **Kill-switch verification passed:** MTF_REGIME_TREND_PLUS=False, ACCEL_300_MINUS=False, PUMP_CHAIN_V5=False — no post-kill opens for any of the three.
-- **bb-squeeze+ R:R inverted** (avg loss 2.2x avg win) despite 68.8% WR — high WR masking thin winners vs fat losers. Not actionable this cycle (monitor window + EXTREME already blocked).
-- **continuum+/continuum-osc+** both BTC-only, both 0% WR on single trades — below kill threshold, keep watching.
+- **No inversions** (24h query clean).
+- **SIDWAYS:** Prior `signal_report.md` (2026-10-03 11:03 UTC) published wrong numbers — pump-chain- listed +2.49 (actual +$0.18), bb-squeeze+ listed +1.36 (actual -$0.07), pump-chain+ listed +5.08 (actual +$0.90), and mtf-regime-trend+ listed as "DISABLED BUT GOOD / re-enable candidate" despite being a net loser with flag already False. Overwritten with PG-verified figures this cycle. Recurring issue — reporter must query DB, never reuse prior report tables.
+- **SIDWAYS:** `mtf-regime-trend` / `mtf-regime-trend+/-` are missing from `FAMILY_MAP` in `market_phase_gate.py` — `signal_family()` returns 'Other', so family-level vol-phase blocks can't target them. Harmless while MTF_REGIME_TREND_PLUS_ENABLED=False; fix before any re-enable.
+- **SIDWAYS:** `PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False` (CEO re-enable 2026-09-22) — EXTREME pump-chain- SHORT trades are flowing again. 24h window positive; lifetime EXTREME breakeven. Boost restores 1.0x; if next cycles turn negative, flip this flag True rather than blanket-disabling pump-chain-.
 
-## 24h Full Ledger (verified)
-```
-mtf-regime-trend+  LONG     9T  44.4%  -$0.46   (pre-kill residual)
-continuum+         LONG     1T   0.0%  -$0.21
-continuum-osc+     LONG     1T   0.0%  -$0.20
-pump-chain-        SHORT    2T  50.0%  -$0.09
-pump-chain-v5      LONG     2T  50.0%  -$0.08   (pre-kill residual)
-bb-squeeze+        LONG    16T  68.8%  -$0.01
-warrior-sr-confirm+ LONG    1T 100.0%  +$0.01
-bb-bounce-v2-long+ LONG     1T 100.0%  +$0.03
-bb-bounce-v2+v3    LONG     1T 100.0%  +$0.04
-bb-bounce-v3-long+ LONG     2T 100.0%  +$0.07
-continuum_engine   LONG     1T 100.0%  +$0.08
-bb-bounce-v2+vol   LONG     1T 100.0%  +$0.36
-pump-chain+        LONG     4T  75.0%  +$1.19   ← best performer
-```
+## Actions taken
+1. Boosted pump-chain- SHORT EXTREME multiplier 0.5→1.0 in `scripts/volatility_gate_v2.py` (both `pump_chain-` and `pump-chain-` override keys).
+2. Killed nothing — flags re-verified: MTF_REGIME_TREND_PLUS_ENABLED=False, PUMP_CHAIN_V5_ENABLED=False, BOLLINGER_SQUEEZE_MINUS_ENABLED=False.
+3. **RESTART PIPELINE** required to load volatility_gate_v2 change.
 
-## 6h Ledger
-```
-pump-chain+        LONG     4T  75.0%  +$1.19
-```
-
-## Regime Gates (verified in volatility_gate_v2.py)
-- pump-chain+ : EXTREME 1.0x (OK), NORMAL 0.0 (blocked), HIGH 0.0 (blocked) — correct
-- bb-squeeze+ : EXTREME 0.0 (blocked 2026-10-02), HIGH kept — correct
-- pump-chain- : EXTREME 0.5x penalized, NORMAL 1.0x kept — correct
-
-## Actions Taken
-1. None — zero kills, zero boosts. All underperformers already dead or below threshold.
-2. Flag verification: 3 killed signals re-confirmed False, no bypass.
-3. Report written. No pipeline restart needed (no config changes).
-
-*Report auto-generated by signal_reporter. Next run: ~6h.*
+*Report auto-generated by signal_reporter from live PG queries. Next report: ~6h.*
