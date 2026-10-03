@@ -551,3 +551,11 @@
 - **WARN** (6x): failed units unchanged — better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer. Known audit/dirty-git failures, not on trading path. **AUTO-FIX**: none.
 - **INFO**: `signals` table 18,327 rows since 2026-09-23 — purge timer may only archive, not clear active table. Not blocking execution.
 - **INFO**: Pipeline portfolio counter (37 closed today) ≠ signal_outcomes (15). DB remains source of truth.
+
+## Error Alerts — 2026-10-03 14:48 UTC
+- **HEALTH** — Pipeline OK: last run 14:45:44 completed clean (LIVE). Signals (1h): 78. Trades today: 3 open / 28 closed per position manager (+17.61% PnL); signal_outcomes 19 closed (12 wins). No Tracebacks in pipeline logs. No phantom trades. Prices fresh (85 tokens, prices.json ~38s). Speeds: 53.5% tokens ≥50th percentile (129/241). Regime: 2 LONG_BIAS / 0 SHORT / 115 NEUTRAL (overall NEUTRAL). Disk 82%.
+- **WARN** (known, unchanged): `hotset.json` empty — no signals survived compaction (regime fully neutral). Pipeline logs `fallback DB query returned 0 tokens` every run. Expected in NEUTRAL regime; not a crash. No auto-fix.
+- **WARN** (known): `signals` table 18,574 rows — trading-checklist flags "may need cleanup". Purge/archive may not clear active table. Not on execution path.
+- **WARN** (known, 5 failed units): better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs: hardcoded passwords, dead signal_gen imports, cursor/connection leaks), git-release (dirty git blocks backup), trading-checklist (exits 1 on signals_db WARN — by design), upgrade-implementer (timeout exit 124). None on trading path. No auto-fix (root causes tracked, not transient).
+- **INFO**: `hermes-hl-sync-guardian` active. Timers healthy — pipeline/price-collector/signal-compactor/watchdog all firing ~1min/30s cadence. No missed core timers. `hermes-atr-sl-updater.timer` not-found (dead unit file; ATR updates run inside pipeline Position Manager — no functional gap).
+- **AUTO-FIXES APPLIED**: none. No CRITICAL conditions found.
