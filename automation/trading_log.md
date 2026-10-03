@@ -2656,3 +2656,36 @@ BY: auto_1hr
 - pnl_pct data-path nonsense persists (DYDX +2002% on +$0.45) — known bug, not signal logic.
 
 BY: auto_1hr
+
+## [2026-10-03 11:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses) — net +$0.23
+- SEI bb-squeeze+ LONG +$0.20 profit-monster-trail (09:46→10:51)
+- POL bb-bounce-v3-long+ LONG +$0.03 profit-monster-trail (09:01→10:30)
+**PnL:** +$0.23 (WR: 100.0%) | 24h: $0.25 / 39T / 56.4%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** Both winners trailed out via profit-monster-trail — good exit discipline. SEI bb-squeeze+ finally won: signal 24h now 10T 6W -$0.07 (was 9T -$0.27). Nearly flat.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/39). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** 2T this hour, both winners. No signal has 0% WR with 3+T this hour. 24h 3+T losers: mtf-regime-trend+ 9T -$0.46 (already killed); bb-squeeze+ 10T 6W -$0.07 (flip to near-flat — monitor windows active, no retune).
+- **Negative PnL streak:** 06:00 -0.43, 07:00 -0.07, 08:00 0T, 09:00 0T, 10:00 +$0.57. NOT 3 consecutive negative hours.
+- **Overtrading:** 0T opened last hour. 24h 39T — fine.
+- **24h by close reason:** profit-monster-trail 16T +$0.79 dominant; atr_trail_hit 4T +$1.38; pump_exit_dead_money 4T +$0.67; hard_max_loss family ~13T -$2.17 (stops working as designed); atr_sl_hit 0T.
+- **24h by signal:** pump-chain+ 6T 3W +$0.90; pump-chain- 5T 3W +$0.18; bb-bounce-v3-long+ 3T 3W +$0.10; bb-squeeze+ 10T 6W -$0.07 (post-SEI-win); mtf-regime-trend+ pre-kill.
+- **Open positions (0):** All closed. DYDX/CVR exits logged previous hour; POL/SEI trailed out this hour. Pipeline executing cleanly.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=40 (post-Fix2 n>=15 target), SHORT-CONTINUUM_SCORE_MAX=30, SHORT_RSI_HARD_FLOOR, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor kill.
+- **Disk/ops:** No new ops issues beyond known hl_info 502 flakiness.
+
+**Sideways:**
+- `signals_db` health check WARN recurring: "18283 signals (0 approved, 4 pending, 160 in last 2h)" — signals generating but 0 approved. May be by-design approval workflow or a stuck approval path. Flag for ops/next brain_auditor pass; not trading-path blocking.
+- pnl_pct data-path nonsense persists (SEI +457% on +$0.20) — known bug, not signal logic.
+
+**Open Questions:**
+- bb-squeeze+ flipped to near-flat (-$0.07/10T) after SEI win — monitor windows still active, observe next 24h before any retune consideration.
+- signals_db 0-approved state — is approval workflow intentional or stuck?
+
+BY: auto_1hr
