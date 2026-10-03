@@ -250,6 +250,10 @@
     let LOSERS_SHORT = new Set();
     let HALL_OF_FAME = new Set();
     let HALL_OF_SHAME = new Set();
+    let HALL_OF_FAME_LONG = new Set();
+    let HALL_OF_FAME_SHORT = new Set();
+    let HALL_OF_SHAME_LONG = new Set();
+    let HALL_OF_SHAME_SHORT = new Set();
 
     async function loadFavorites() {
       try {
@@ -274,11 +278,17 @@
           LOSERS_LONG = new Set(losers.filter(l => l.is_long_loser).map(l => l.token));
           LOSERS_SHORT = new Set(losers.filter(l => l.is_short_loser).map(l => l.token));
         }
-        // Load Hall of Fame/Shame from leaderboard
+        // Load Hall of Fame/Shame from leaderboard (with direction-specific flags)
         if (lbR && lbR.ok) {
           const lbData = await lbR.json();
-          HALL_OF_FAME = new Set((lbData.hall_of_fame || []).map(t => t.token));
-          HALL_OF_SHAME = new Set((lbData.hall_of_shame || []).map(t => t.token));
+          const hof = lbData.hall_of_fame || [];
+          const hos = lbData.hall_of_shame || [];
+          HALL_OF_FAME = new Set(hof.map(t => t.token));
+          HALL_OF_SHAME = new Set(hos.map(t => t.token));
+          HALL_OF_FAME_LONG = new Set(hof.filter(t => t.is_long_hof).map(t => t.token));
+          HALL_OF_FAME_SHORT = new Set(hof.filter(t => t.is_short_hof).map(t => t.token));
+          HALL_OF_SHAME_LONG = new Set(hos.filter(t => t.is_long_hos).map(t => t.token));
+          HALL_OF_SHAME_SHORT = new Set(hos.filter(t => t.is_short_hos).map(t => t.token));
         }
       } catch(e) {
         // Fallback if fetch fails
@@ -294,18 +304,22 @@
       const isShortLoser = LOSERS_SHORT.has(sym);
       const isHallFame = HALL_OF_FAME.has(sym);
       const isHallShame = HALL_OF_SHAME.has(sym);
+      const isHallFameLong = HALL_OF_FAME_LONG.has(sym);
+      const isHallFameShort = HALL_OF_FAME_SHORT.has(sym);
+      const isHallShameLong = HALL_OF_SHAME_LONG.has(sym);
+      const isHallShameShort = HALL_OF_SHAME_SHORT.has(sym);
 
       // Direction-specific icons (Hall of Fame/Shame take priority)
       if (direction === 'LONG') {
-        if (isHallShame && isLongLoser) return '<span class="loser-icon" title="LONG Hall of Shame">💀↑</span>';
+        if (isHallShameLong) return '<span class="loser-icon" title="LONG Hall of Shame">💀↑</span>';
         if (isLongLoser) return '<span class="loser-icon" title="LONG Loser">🗑️↑</span>';
-        if (isHallFame) return '<span class="fav-star-top" title="LONG Hall of Fame">🏆↑</span>';
+        if (isHallFameLong) return '<span class="fav-star-top" title="LONG Hall of Fame">🏆↑</span>';
         if (isLongFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="LONG Top Favorite">⭐↑</span>';
         if (isLongFav) return '<span class="fav-star" title="LONG Favorite">❤↑</span>';
       } else if (direction === 'SHORT') {
-        if (isHallShame && isShortLoser) return '<span class="loser-icon" title="SHORT Hall of Shame">💀↓</span>';
+        if (isHallShameShort) return '<span class="loser-icon" title="SHORT Hall of Shame">💀↓</span>';
         if (isShortLoser) return '<span class="loser-icon" title="SHORT Loser">🗑️↓</span>';
-        if (isHallFame) return '<span class="fav-star-top" title="SHORT Hall of Fame">🏆↓</span>';
+        if (isHallFameShort) return '<span class="fav-star-top" title="SHORT Hall of Fame">🏆↓</span>';
         if (isShortFav && TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="SHORT Top Favorite">⭐↓</span>';
         if (isShortFav) return '<span class="fav-star" title="SHORT Favorite">❤↓</span>';
       }
