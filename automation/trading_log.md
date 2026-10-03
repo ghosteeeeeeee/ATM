@@ -2715,3 +2715,32 @@ BY: auto_1hr
 - pnl_pct data-path nonsense persists (DYDX +2002% on +$0.45) — known bug, not signal logic.
 
 BY: auto_1hr
+
+## [2026-10-03 13:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 1 loss, 1 orphan-paper)
+**PnL:** $-0.11 (WR: 0.0% real) | 24h: +$0.27 / 35T / ~57.1%WR
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** STX bb-squeeze+ composite (rs-s102,rs-s114) hard_max_loss -1.10%, -$0.11, MAE 76.79%. No winners this hour so no "low MAE" winners to evaluate. MAE 76.79% vs -1.10% stop is inconsistent — likely MAE data-path (same class as pnl_pct nonsense, STX showed -502%). Not a signal-logic trigger.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/35). tpsl_utils.py fix deployed and stable. No CEO alert. Dominant exits: profit-monster-trail 11T +$0.69, atr_trail_hit 4T +$1.38, pump_exit_dead_money 4T +$0.67; losing side hard_max_loss family 10T -$1.77 + hard_sl 3T -$0.58 (stops working as designed).
+- **Kill rule:** 1 real trade this hour (STX loss) — no signal has 0% WR with 3+ trades this hour. 24h 3+T losers: mtf-regime-trend+ 9T -$0.46 (already killed, flag re-verified False in prior hours). bb-squeeze+ 7T 71.4%WR +$0.14 (recovered from -$0.07, monitor windows active). pump-chain+ 6T +$0.90, pump-chain- 5T +$0.18 — both positive.
+- **Negative PnL streak:** 06:00 -0.43, 07:00 -0.07, then 10:00 +$0.57, 12:00 -0.11, 13:00 $0.00 (orphan). NOT 3 consecutive negative.
+- **Overtrading:** 2T this hour (1 real + 1 orphan paper). 24h 35T — fine.
+- **Open positions (1):** SYRUP bb-squeeze+ LONG opened 13:07, unrealized $0.00 — fresh, no action.
+- **Monitor windows untouched:** pump-chain- RSI_MIN (post-Fix2 n>=15), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** and **MTF_REGIME_TREND_PLUS_ENABLED=False** — respecting prior kills.
+
+**Sideways:**
+- **STX MAE 76.79% vs -1.10% hard stop** — MAE metric or stop placement inconsistent. Same class as recurring pnl_pct data-path nonsense (STX -502% on -$0.11). Not trading-path blocking; flag for brain_auditor/data-path pass.
+- **ORPHAN_PAPER BTC continuum_engine** closed this hour at $0.00 — paper orphan noise in PG trades. Hygiene issue, not live PnL.
+- **signals_db 0-approved WARN** continues (from prior hours) — approval workflow vs stuck path still unresolved for ops.
+
+**Open Questions:**
+- Is MAE computed against entry or against a different reference that can exceed hard stop by 70x? Worth a data-path fix eventually.
+- ORPHAN_PAPER rows — should they be filtered from hourly WR/PnL calculations automatically?
+
+BY: auto_1hr
