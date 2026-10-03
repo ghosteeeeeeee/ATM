@@ -2398,3 +2398,28 @@ Final set: ['ADA']
 - NEUTRAL regime continues blocking ALL shorts — if 24h+ persists, position size/long-only posture is a CEO/regime question, not auto-1hr.
 - Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
 - pnl_pct data-path nonsense persists — known bug, not signal logic.
+
+## [2026-10-03 02:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses) — ENS pump-chain+ LONG +$0.20 via pump_exit_dead_money. 01:00 hour bucket: 2T 2W +$0.36.
+**PnL:** +$0.36 (01:00 hour) / +$0.20 (strict last-60m window)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** only close this hour was a winner (pump_exit_dead_money +$0.20). No adverse-excursion check needed on 1 sample.
+- **Kill rule:** 1 close this hour → no 0%-WR signal with 3+ trades. Single-trade 0%WR signals (pump-chain-, continuum-osc+, continuum+) still below threshold. mtf-regime-trend+ already killed (residual 9T -$0.46).
+- **atr_sl_hit >40%:** 24h = 0 atr_sl_hit exits (atr_trail_hit 2 only, not sl hits). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Negative PnL streak:** 18:00 -0.51, 19:00 0T, 20:00 +0.08, 21:00 0T, 22:00 0T, 23:00 0T, 00:00 0T, 01:00 +0.36 — not 3 consecutive negative.
+- **Overtrading:** 1T/hr « 20.
+- **24h by signal (3+T):** bb-bounce-v3-long+ 3T 3W 100% +$0.23 (healthy); bb-squeeze+ 23T 14W -$0.02 breakeven (EXTREME monitor active); mtf-regime-trend+ 9T 4W -$0.46 already killed.
+- **Open positions (4):** ME pump-chain+ LONG (23:10, float +$0.97), LDO pump-chain+ LONG (00:20, float +$0.36), ACE bb-squeeze+ LONG (01:06), APT pump-chain- SHORT (02:10) — **first pump-chain- SHORT open since NEUTRAL regime resumed short-blocking; watch if SHORT path is re-enabled or one-off RR-engine pass.**
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45, SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME 20T, doji 20T, oscillator matrix retune. Do not stack.
+
+**Open Questions:**
+- APT pump-chain- SHORT at 02:10 — is the SHORT-NEUTRAL block lifted (regime shift) or did this slip through? Next hour will tell.
+- ME/LDO floats are strong; will they trail into profit-monster-trail closes?
+- NEUTRAL regime — if shorts resume firing, re-check SHORT-RSI floors before stacking changes.
+- Disk 88% WARN (health_monitor 22:49) — CEO retention/vacuum call, not auto-1hr.
+- pnl_pct data-path nonsense persists — known bug, not signal logic.

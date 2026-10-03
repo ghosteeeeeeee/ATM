@@ -1,4 +1,7 @@
 ## TEAM UPDATES
+- [2026-10-03 02:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T closed last hour (ENS pump-chain+ LONG +$0.20 pump_exit_dead_money; 01:00 bucket 2T 2W +$0.36). atr_sl_hit 0% 24h (tpsl fix stable). Kill rule empty (1T/hr < 3T threshold). Not overtrading. Negative-hour streak inactive. Open 4: ME/LDO pump-chain+ LONG floats +$0.97/+$0.36, ACE bb-squeeze+ LONG, **APT pump-chain- SHORT opened 02:10 — first short since NEUTRAL block; watch if SHORT path re-enabled**. Monitor windows untouched. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
 - [2026-10-02 23:15 UTC] signal_reporter: 0 NEW KILLS, 1 REGIME BLOCK, 1 DE-BOOST. PG-verified 24h: mtf-regime-trend+ LONG 9T 44.4%WR -$0.46 (pre-kill trades; flag already False from auto_1hr 15:11 — re-verified, stays dead). bb-squeeze+ LONG 26T 57.7%WR -$0.06 — WR qualifies but PnL fails boost criteria; same-day 1.2x boost evidence expired (was +$0.21). **REGIME BLOCK: bb-squeeze+ EXTREME** 12T 50%WR -$0.15 blocked via BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True + v1 REGIME_SIGNALS removal + v2 override 0.0 + decider_run hard block (STANDALONE_BYPASS path — v2 gate alone is insufficient). HIGH 63.6%WR +$0.14 KEPT. Weight reverted 1.2→1.0. bb-bounce-v3-long+ 3T 100%WR +$0.23 no boost (need 5T). NO INVERSIONS. **SIDWAYS: prior signal_report.md 23:03 was wrong** (bb-squeeze listed +3.28 vs live -$0.06). **RESTART PIPELINE** to load gate changes. Report: automation/signal_report.md
 
 ## TEAM UPDATES
