@@ -2205,5 +2205,45 @@
     "status": "suggested",
     "risk": "medium",
     "prereq": "Need 15m slope stored at entry (may require metadata addition). Backtest before implement."
+  },
+  {
+    "date": "2026-10-03T18:38:05Z",
+    "idea": "PUMP_CHAIN_LONG_RSI_MIN=40 — block pump-chain+ LONG when RSI < 40 (oversold falling-knife)",
+    "rationale": "30d pump-chain+ LONG RSI<40: 13T 15.4%WR -$1.01. Sweet spot starts at RSI 40-55 (18T 55.6% +$0.54) and peaks 55-70 (30T 56.7% +$2.47). Philosophy: every dump is SHORT — pump-chain+ LONG into oversold is wrong-side. Filter blocks 2 winners (+$0.31) vs 11 losers (-$1.32), net +$1.01/30d. Sample: 13 trades in blocked band — sufficient for signal-level filter.",
+    "expected_impact": "+$0.20-0.35/7d if trade frequency holds (~3-4 pump-chain+ LONG RSI<40 per 30d → ~1/7d)",
+    "category": "entry sniper",
+    "status": "suggested_post_window",
+    "risk": "low",
+    "prereq": "Apply AFTER bollinger window ends 21:55 UTC. One variable only. Do not stack with other pump-chain changes."
+  },
+  {
+    "date": "2026-10-03T18:38:05Z",
+    "idea": "Regime-flip habitat review — EXTREME is now BEST (+$2.07/7d), NORMAL is WORST (-$0.31/7d)",
+    "rationale": "7d PG: EXTREME 88T 54.5%WR +$2.07, NORMAL 45T 46.7%WR -$0.31. Old narrative (EXTREME bleeds, NEUTRAL-only) is inverted in current MARKUP/STRONG_UP BTC regime. Existing EXTREME blocks (bb-squeeze EXTREME, pump-chain- EXTREME) may now block the profitable habitat. BUT standing decision: 0 config changes during monitor windows; do not re-litigate kills without new data.",
+    "expected_impact": "Unknown — if EXTREME blocks are blocking winners now, relaxing them could add edge. MUST backtest 7d post-Fix2 data before any change.",
+    "category": "regime",
+    "status": "suggested_monitor",
+    "risk": "medium",
+    "prereq": "Post-window: re-run regime×signal matrix with last 7d. Only then consider relaxing an EXTREME block. One signal at a time."
+  },
+  {
+    "date": "2026-10-03T18:38:05Z",
+    "idea": "Watchdog RSI data-quality fix — deep_analysis RSI values don't match trade metadata",
+    "rationale": "Watchdog claimed NEAR@87.5 / INJ@60.8; DB rsi_14 shows NEAR=51.32 / INJ=52.45. If watchdog computes RSI from different timeframe/source than signal_metadata, its 'high-RSI longs are killers' steer is systematically wrong and will drive bad filters. 7d LONG RSI>70 is net POSITIVE (8W/4L).",
+    "expected_impact": "Prevents false-positive filter suggestions (would have killed bb-squeeze winners at RSI 72-82).",
+    "category": "systems",
+    "status": "suggested",
+    "risk": "low",
+    "prereq": "Watchdog owner: align RSI source with trade_metadata.rsi_14, or label which timeframe RSI is shown."
+  },
+  {
+    "date": "2026-10-03T18:38:05Z",
+    "idea": "Disk trajectory alert — 84% now, was 80% at CEO 17:50 (~4%/3h)",
+    "rationale": "If trajectory holds, hits 88% prune threshold within ~6-8h. coin_tracker 3.3G + candles 2.3G untouched. Prune policy: next prune when disk >88%, NEVER vacuum coin_tracker/candles during trading.",
+    "expected_impact": "Avoid emergency prune during live trading hours.",
+    "category": "systems",
+    "status": "monitor",
+    "risk": "low",
+    "prereq": "Auto_1hr/CEO: if disk >86% before 21:55 UTC, consider off-path prune (mtf_macd_tuner backtest tables >7d, hl_copy trader_fills >30d) — NOT candles/coin_tracker."
   }
 ]
