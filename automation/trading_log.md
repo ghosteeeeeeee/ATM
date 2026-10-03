@@ -2853,3 +2853,81 @@ BY: auto_1hr
 - hard_max_loss exits on ~-1% levels vs pnl_pct showing -50%+ — semantics confirmed previously as lev/decimal scaling bug owned by bug_hunter.
 
 BY: auto_1hr
+
+## [2026-10-03 18:11] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses) — ZORA bb-bounce-v3-long+ profit-monster-trail $0.00 breakeven
+**PnL:** $0.00 (WR: 100% on 1T) | 24h ~32T +$0.90 / ~57%WR
+
+**Changes:**
+1. None — no triggers met. Bollinger window active until 21:55 UTC (CEO directive: no trading config).
+
+**No Change Needed:**
+- **Entry quality:** Only 1 closed trade — ZORA breakeven on trail exit. No losers to compare MAE.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits are profit-monster-trail 10T +$0.73 and atr_trail_hit 5T +$1.40. Loss concentration = hard_max_loss family (8T, ~-$1.40) — intentional hard stops.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (only 1T). 24h 3+T signals all positive: pump-chain+ 8T 62.5% +$0.95, bb-squeeze+ 9T 66.7% +$0.10, pump-chain- 5T 60% +$0.18, bb-bounce-v3-long+ 4T 75% +$0.12. No kill needed. pump-chain-v5 2T -$0.08 (only 2 trades, below kill threshold; one was from Oct 2 18:23).
+- **Negative PnL streak:** 12:00 -$0.11, 13:00 +$0.30, 15:00 -$0.11, 16:00 +$0.09, 17:00 +$0.04 — NOT 3 consecutive negative hours.
+- **Overtrading:** 1T last hour. Fine.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (ZORA $0.00 shows +92.68%) — known bug class.
+- hard_max_loss family (8T ~-$1.40) sole 24h loss concentration — not atr_sl_hit.
+- pump-chain-v5 has only 2 trades / -$0.08 — below kill threshold, keep watching.
+- Open positions: 2 (not yet closed).
+
+**Open Questions:**
+- NEAR double-size anomaly from 16:12 still open for sizing-path audit.
+
+BY: auto_1hr
+
+## [2026-10-03 19:11] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — SUSHI bb-squeeze+ LONG hard_max_loss_-1.15% -$0.12
+**PnL:** $-0.12 (WR: 0.0% on 1T) | 24h ~33T +$0.78 / ~57%WR
+
+**Changes:**
+1. None — no triggers met. Bollinger window active until 21:55 UTC (CEO directive: no trading config).
+
+**No Change Needed:**
+- **Entry quality:** Only 1 closed trade — SUSHI hard_max_loss at -$0.12 on $11.10 size (~-1.08% price move, pnl_pct nonsense shows -334% known data-path bug). No MAE/MFE comparison possible on 1T.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 10T +$0.73, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70. Loss concentration = hard_max_loss family (8T, ~-$1.17) — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (1T). 24h all signals positive or flat: pump-chain+ 8T +$0.95, bb-squeeze+ 9T +$0.25, pump-chain- 5T +$0.18, bb-bounce-v3-long+ 4T +$0.12, continuum_engine 2T +$0.08. pump-chain-v5 1T +$0.16 this window. No kill needed.
+- **Negative PnL streak:** 13:00 +$0.30, 15:00 -$0.11, 16:00 +$0.09, 17:00 +$0.04, 18:00 -$0.12 — NOT 3 consecutive negative hours.
+- **Overtrading:** 1T last hour. Fine.
+- **$22.10 size "anomaly":** 13 trades today at $22.10 — this is the normal double-size path, not an anomaly. All $22.10 trades are the same size consistently. NEAR $22.10 hard_max_loss -$0.23 fits the same pattern. Sizing-path audit not urgent.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (SUSHI -$0.12 shows -334%) — known bug class, not signal logic.
+- hard_max_loss family (8T ~-$1.17) sole 24h loss concentration — not atr_sl_hit. If it grows post-window, review stop placement vs signal structure.
+- One open position: $11.10 size.
+
+**Open Questions:**
+- hard_max_loss exits on ~-1% levels vs pnl_pct showing -300%+ — semantics confirmed previously as lev/decimal scaling bug owned by bug_hunter.
+
+BY: auto_1hr
+
+## [2026-10-03 20:11] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no trades) | 24h ~30T +$0.78 / ~57%WR
+
+**Changes:**
+1. None — no triggers met. Bollinger window active until 21:55 UTC (CEO directive: no trading config).
+
+**No Change Needed:**
+- **Entry quality:** 0 closed trades this hour — nothing to assess.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 10T +$0.73, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70. Loss concentration = hard_max_loss family (~8T, ~-$1.28) — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (0T). 24h all signals positive: pump-chain+ 8T 62.5% +$0.95, bb-squeeze+ 9T 66.7% +$0.25, pump-chain- 5T 60% +$0.18, bb-bounce-v3-long+ 4T 75% +$0.12, pump-chain-v5 1T +$0.16. No kill needed.
+- **Negative PnL streak:** 15:00 -$0.11, 16:00 +$0.09, 17:00 +$0.04, 18:00 -$0.12 — NOT 3 consecutive negative hours. Quiet hour after.
+- **Overtrading:** 0T last hour. Fine.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (known bug class, owned by bug_hunter).
+- hard_max_loss family (~8T ~-$1.28) sole 24h loss concentration — not atr_sl_hit. If it grows post-window, review stop placement vs signal structure.
+- pump-chain-v5 still only 1T/24h — below kill threshold, keep watching.
+- Open positions: need open check — not queried this hour (0 closes, window active).
+
+**Open Questions:**
+- Post-window (21:55 UTC): re-evaluate accel_300_v3_long ENABLED 7T/7d -$0.37 42.9% NEUTRAL and volume-breakout boost 1.15→1.25 queued change.
+
+BY: auto_1hr
