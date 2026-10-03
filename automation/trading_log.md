@@ -2960,3 +2960,34 @@ BY: auto_1hr
 - Window ends 21:55 UTC — next run (22:11) should be first eligible for queued changes.
 
 BY: auto_1hr
+
+## [2026-10-03 22:11] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no trades) | 24h ~31T +$0.78 ~57%WR
+
+**Changes:**
+1. volume-breakout boost 1.15→1.25 in `signal_compactor.py:709` — post-window queued change. DB 7d: volume-breakout-long+ 4T 4W +$1.96 (100% WR) + 1 combo +$0.36. Boost justified by live data. Pipeline restart needed to load.
+
+**No Change Needed:**
+- **Entry quality:** 0 closed trades last hour — nothing to assess.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 12T +$0.82, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70. Loss concentration = hard_max_loss family 9T -$1.42 — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (0T). 24h: pump-chain+ 8T 5W +$0.95, bb-squeeze+ 10T 7W +$0.33, pump-chain- 5T 3W +$0.18, bb-bounce-v3-long+ 5T 3W -$0.02, pump-chain-v5 1T +$0.16. No kill needed.
+- **Negative PnL streak:** 15:00 -$0.11, 16:00 +$0.09, 17:00 +$0.04, 18:00 -$0.12, 21:00 -$0.05, 22:00 $0.00 — NOT 3 consecutive negative hours.
+- **Overtrading:** 0T last hour. Fine.
+- **accel_300_v3_long review (queued):** Brain DB 14d = 0 closed trades for accel-300-v3-long*. signal_reporter 7T/7d -$0.37 42.9% figure does NOT match DB. Signal not actually executing trades in brain DB. Left ENABLED — if signal_reporter data is paper/signal-level only, no live exposure; if trades are being logged under a different name, bug_hunter should trace. No kill (doesn't meet auto-kill trigger: not 0%WR, not 3T+ last hour).
+- **Open (4):** LDO bb-squeeze+ LONG (21:20), IO pump-chain- SHORT (21:17), CRV volume-breakout-long+ LONG (20:30), ENS bb-bounce-v3-long+ LONG (19:40).
+
+**Sideways:**
+- **scripts/signal_version.py MISSING** — SOP references it for audit trail after every hermes_constants.py change, but the file does not exist in scripts/. Change logged manually in this log + recent_changes.log. Need: either create the script or remove it from SOP.
+- signal_reporter vs brain DB discrepancy on accel_300_v3_long (7T vs 0T) — data-path mismatch, worth a bug_hunter look.
+- pnl_pct data-path nonsense continues (known bug class, owned by bug_hunter).
+- hard_max_loss family 9T -$1.42 sole 24h loss concentration — not atr_sl_hit. Stop placement vs signal structure review still open.
+- bb-squeeze+ 24h: 10T 7W +$0.33 — positive now (R:R inverted concern from 6h window resolved). No action.
+- Open position IO pump-chain- SHORT — first SHORT in a while (NEUTRAL short-block concern from earlier logs); watch if SHORT path is healthy.
+
+**Open Questions:**
+- Pipeline restart needed to load volume-breakout 1.25 weight — will it pick up automatically on next signal_compactor import, or does the running process need restart?
+- accel_300_v3_long: is signal_reporter tracking a different data source than brain DB? If signal-level (pre-execution) tracking shows 7 detections that never become trades, the filters are working — but the -$0.37 suggests some execution path exists.
+
+BY: auto_1hr

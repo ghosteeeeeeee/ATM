@@ -3887,3 +3887,11 @@ DB-verified: 3T last hour (2W 1L -$0.05) | 24h ~31T +$0.78 ~57%WR atr_sl_hit 0% 
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met. Bollinger window until 21:55 UTC.
 WATCH: hard_max_loss family 9T -$1.42 main 24h loss | bb-squeeze+ 6h 5T 3W -$0.16 R:R inverted | post-window queue: vol-breakout boost 1.15->1.25 + accel_300_v3_long review
 BY: auto_1hr
+2026-10-03 22:11 UTC auto_1hr: CONFIG CHANGE - volume-breakout boost 1.15->1.25
+DB-verified: 0T last hour | 24h ~31T +$0.78 ~57%WR atr_sl_hit 0% | open 4
+CHANGE: signal_compactor.py:709 volume_breakout_long combo_weight 1.15 -> 1.25
+WHY: post-window queued change; DB 7d volume-breakout-long+ 4T 4W +$1.96 (100% WR) + 1 combo +$0.36
+REVIEWED: accel_300_v3_long — 0 DB executions 14d vs signal_reporter 7T/7d -$0.37; left ENABLED, discrepancy flagged
+FINDING: scripts/signal_version.py MISSING (SOP references it, file absent); change logged manually
+ACTION: restart pipeline to load new weight
+BY: auto_1hr
