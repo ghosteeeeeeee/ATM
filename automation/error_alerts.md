@@ -484,3 +484,22 @@
 - **WARN** (1x): `disk 87% used on /` — 16G free of 118G (up from 85% an hour ago)
 - **AUTO-FIX**: Compressed all `.log` files >7 days in `/root/.hermes/logs/`. Logs now 247M total. Largest disk consumers are DBs (coin_tracker.db 3.3G, candles.db 2.3G, signals_hermes.db 905M) — no safe auto-fix; recommend DB vacuum / archival.
 - **NOTE**: 57 signals detected in last hour but 0 approved (hotset empty, all filtered by confidence/regime). Regime fully NEUTRAL (117 tokens) — market flat, expected behavior not a bug.
+
+## Error Alerts — 2026-10-02 23:59 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: ME TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-03 00:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run, position_manager`
+
+## Error Alerts — 2026-10-03 01:47 UTC
+- **WARN** (1x): disk `/` **90%** used (100G/118G, 13G free) — up from 88% an hour ago.
+  - **AUTO-FIX**: `journalctl --vacuum-size=100M` freed 170M archived journals (90%→89%). No logs >7d to compress. Remaining bulk: `candles.db-wal` 5.1G (locked by active price_collector — do not checkpoint mid-run), `coin_tracker.db` 3.3G, `candles.db` 2.3G, `signals_hermes.db` 907M, `session_brain.db` 871M. **CEO DB-retention decision still open.**
+- **WARN** (5x): failed non-critical services:
+  - `hermes-bug-hunter` — FAIL: hardcoded_passwords (4 files: study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, trading-checklist.py) + dead_imports (zscore_momentum→signal_gen, trend_purity_signals→signal_gen, candle_predictor→signal_gen)
+  - `hermes-mtf-macd-tuner` — AttributeError: `PrecomputedMACD` object has no attribute `warmup`
+  - `hermes-trading-checklist` — signals_db: 17236 signals (0 approved, 1 pending, 224 in last 2h)
+  - `hermes-git-release` — exit 1 (push blocked by modified error_alerts.md)
+  - `hermes-better-coder` — failed (check last run logs)
+  - **NO AUTO-FIX**: these are audit/tuner/CI tools, not on the live trading path. Core pipeline + HL guardian + signal-compactor + price-collector all healthy.
+- **NOTE**: Hotset empty (`[]`) — signal_compactor fallback returned 0 tokens. Regime fully NEUTRAL (116 neutral / 1 LONG_BIAS / 0 SHORT) — expected behavior, not a bug. 61 signals in signals table (last hour) but 0 approved for hotset.
