@@ -1320,17 +1320,34 @@ def _score_signal(token, direction, conf, source, signal_type,
     # proven edge and are explicitly allowed to fire solo. Chop detector exists
     # to protect momentum winrates; standalone bypass signals don't need that.
     from hermes_constants import CHOP_DETECTOR_ENABLED
+    chop_score_mult = 1.0
     if CHOP_DETECTOR_ENABLED:
         _chop_sig_norm = signal_type.replace('-', '_').rstrip('_+-')
         _chop_bypass_norm = {s.replace('-', '_').rstrip('_+-') for s in STANDALONE_BYPASS_SIGNALS}
         if _chop_sig_norm not in _chop_bypass_norm:
             try:
-                from chop_detector import get_regime, should_trade_signal
+                from chop_detector import get_regime, should_trade_signal, get_coin_trend_score, _classify_signal
+                from hermes_constants import (
+                    CHOP_SCORE_MULT_ENABLED, CHOP_MOMENTUM_PENALTY_MULT,
+                    CHOP_MEANREV_BOOST_MULT, CHOP_SCORE_MOMENTUM_PENALIZE,
+                    CHOP_SCORE_MEANREV_BOOST,
+                )
                 _chop_regime = get_regime()
                 _allowed, _chop_reason = should_trade_signal(signal_type, _chop_regime, token=token)
                 if not _allowed:
                     log(f"  🌊 [CHOP] {token} {direction} {signal_type}: BLOCKED — {_chop_reason}")
                     return 0.0
+                # chop-v2-spec: weak-trend (31-59) momentum penalized, mean-rev boosted.
+                # should_trade_signal already allows these paths; multipliers were never applied.
+                if CHOP_SCORE_MULT_ENABLED and token and _chop_regime.get('regime') == 'CHOP':
+                    _chop_sc = get_coin_trend_score(token)
+                    _chop_cls = _classify_signal(signal_type)
+                    if _chop_cls == 'MOMENTUM' and _chop_sc < CHOP_SCORE_MOMENTUM_PENALIZE:
+                        chop_score_mult = CHOP_MOMENTUM_PENALTY_MULT
+                        log(f"  🌊 [CHOP-V2] {token}: momentum penalized {chop_score_mult:.2f}x (score={_chop_sc})")
+                    elif _chop_cls == 'MEAN_REVERSION' and _chop_sc < CHOP_SCORE_MEANREV_BOOST:
+                        chop_score_mult = CHOP_MEANREV_BOOST_MULT
+                        log(f"  🌊 [CHOP-V2] {token}: mean-rev boosted {chop_score_mult:.2f}x (score={_chop_sc})")
             except Exception as e:
                 log(f"  [WARN] Chop detector check failed: {e}", 'WARN')
 
@@ -1976,7 +1993,7 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # 2026-10-01: 5 trend multipliers consolidated into 1 (trend_alignment_mult)
     # Removed: reg_mult, continuum_mult, trend_filter_mult, dir_bias_mult, alt_btc_div_mult
-    final_score = score * survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult
+    final_score = score * survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult
     return final_score
 
 
@@ -4799,7 +4816,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'direction': e['direction'],
                 'confidence': e['confidence'],
                 'final_confidence': e.get('final_confidence', e['confidence']),  # decider_run reads this
-                'reason': e['reason'],
+                'reason': e.get('reason', ''),
                 'source': src,
                 'signal_type': e.get('signal_type', ''),  # actual signal_type from DB (not merged source)
                 'entries_count': entries_count,
