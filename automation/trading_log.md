@@ -2628,3 +2628,31 @@ BY: auto_1hr
 - bb-squeeze+ 9T -$0.27/24h flat — monitor windows active, no stacked retune.
 
 BY: auto_1hr
+
+## [2026-10-03 10:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — net +$0.34
+- DYDX pump-chain- SHORT +$0.45 atr_trail_hit
+- CRV pump-chain- SHORT -$0.11 hard_max_loss_-1.01%
+**PnL:** +$0.34 (WR: 50.0%)
+
+**Changes:**
+1. None — no triggers met.
+
+**No Change Needed:**
+- **Entry quality:** 24h WIN avg MAE 15.6% vs LOSS avg MAE 87.1% — winners still have far lower adverse excursion. Last hour: DYDX trailed out in profit; CRV stopped at hard_max_loss (designed small-stop behavior).
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0/~38). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** 2T closed this hour (both pump-chain-). No signal has 0% WR with 3+ trades this hour. 24h 3+T negative: mtf-regime-trend+ 9T -$0.46 (already killed), bb-squeeze+ 9T -$0.27 (monitor windows active, signal_reporter noted R:R inverted — no stacked retune). pump-chain- 24h now 5T 3W +$0.18 (DYDX win flipped it positive).
+- **Negative PnL streak:** 06:00 -0.43, 07:00 -0.07, 08:00 0T (not a negative close), 10:00 +$0.34. NOT 3 consecutive negative hours.
+- **Overtrading:** 1T opened last hour << 20.
+- **24h by close reason:** profit-monster-trail 14T +$0.56 dominant; pump_exit_dead_money 4T +$0.67; atr_trail_hit 4T +$1.38; hard_max_loss family ~11T negative (stops working as designed); atr_sl_hit 0T.
+- **Open positions (2):** POL bb-bounce-v3-long+ LONG (09:01), SEI bb-squeeze+ LONG (09:46, opened last hour). Monitor SEI exit next hour.
+- **Monitor windows untouched:** pump-chain- RSI_MIN=45 (post-Fix2 n>=15), SHORT-CONTINUUM, SHORT_RSI_HARD_FLOOR=25, EXTREME block, bb-squeeze EXTREME, oscillator matrix. Do not stack.
+- **PUMP_CHAIN_V5_ENABLED=False** verified — respecting brain_auditor 23:36 kill.
+
+**Open Questions:**
+- SEI bb-squeeze+ LONG opened 09:46 — bb-squeeze+ 9T -$0.27/24h with inverted R:R; observe this exit. Monitor windows remain active; no retune this hour.
+- POL bb-bounce-v3-long+ still open since 09:01 — 24h 2T 2W +$0.07 healthy small sample.
+- pnl_pct data-path nonsense persists (DYDX +2002% on +$0.45) — known bug, not signal logic.
+
+BY: auto_1hr

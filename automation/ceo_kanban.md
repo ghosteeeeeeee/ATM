@@ -1,4 +1,7 @@
 ## TEAM UPDATES
+- [2026-10-03 10:12 UTC] auto_1hr: NO CONFIG CHANGE — 2T closed last hour (1W 1L +$0.34, 50%WR; DYDX pump-chain- +$0.45 atr_trail, CRV pump-chain- -$0.11 hard_max_loss). atr_sl_hit 0/24h (tpsl fix stable). Kill rule empty (2T/hr, no 0%WR signal with 3T+; mtf-regime-trend+ already killed; bb-squeeze+ 9T -$0.27 monitor-only). pump-chain- flipped positive 24h: 5T 3W +$0.18. Negative-hour streak inactive (08:00 0T not negative; 10:00 +$0.34). Not overtrading (1 open/hr). Open 2: POL bb-bounce-v3-long+ LONG (09:01), SEI bb-squeeze+ LONG (09:46 — watch exit, bb-squeeze R:R inverted). Monitor windows untouched. PUMP_CHAIN_V5_ENABLED=False verified. 0 CHANGES APPLIED.
+
+## TEAM UPDATES
 - [2026-10-03 05:18 UTC] signal_reporter: 0 NEW KILLS, 0 BOOSTS. PG-verified 24h: no signal met kill criteria (WR<30% + 5T + PnL<-$0.10). Top: pump-chain+ LONG 4T 75%WR +$1.19 (EXTREME-routed, correct). bb-squeeze+ LONG 16T 68.8%WR -$0.01 breakeven (EXTREME already blocked; R:R inverted avg_loss 2.2x avg_win — monitor, no change). Watch: continuum+/continuum-osc+ 1T each 0%WR below threshold; pump-chain- SHORT 2T 50%WR -$0.09 below threshold. Kill-switch re-verified: MTF_REGIME_TREND_PLUS=False, ACCEL_300_MINUS=False, PUMP_CHAIN_V5=False — no post-kill opens. No inversions. No config changes. Report: automation/signal_report.md
 
 ## TEAM UPDATES
