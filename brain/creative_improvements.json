@@ -2623,5 +2623,43 @@
     "category": "anti-regression",
     "status": "suggested — revise standing queue",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-04T23:37:35Z",
+    "idea": "Hotset drought fallback: when compaction produces 0 approved tokens, emit top-N by raw confidence from signals that already passed all non-hotset gates (confluence, blacklists, regime, RSI floors) instead of writing an empty hotset",
+    "rationale": "Hotset empty is chronic (watchdog 23:12: 0 tokens; sessions: 147 sig/2h 0 approved, 'PENDING top-10' then wrote 0). Pipeline generates signals; hotset writer starves execution. Proven edges never fire during drought: volume-breakout-long+ 7d 5T +$1.85 80%, pump-chain+ 10T +$1.09 70%. Session brain repeatedly lands on this as systemic miss. All safety filters already apply upstream — fallback only changes the hotset admission cutoff, not risk gates.",
+    "expected_impact": "Convert drought minutes into trades on already-vetted signals; target 24h PnL >= $0 faster after regime shifts",
+    "category": "pipeline throughput",
+    "status": "suggested",
+    "risk": "medium — may admit lower-confidence tokens; mitigate: fallback only when hotset would otherwise be empty, keep max 3 tokens, require conf >= existing hotset floor",
+    "blocked_on": "bug_hunter root-cause of top-10 stall first — if writer has a bug, fix the bug instead of adding fallback"
+  },
+  {
+    "date": "2026-10-04T23:37:35Z",
+    "idea": "Enforce SIGNAL_FILTER_RSI_MAX/MIN on STANDALONE_BYPASS path in signal_compactor Layer B (not just decider_run)",
+    "rationale": "mover+ in STANDALONE_BYPASS has entries at RSI 79-94 in DB; 30d rsi>65 band 11T -$1.21 36.4%. SIGNAL_FILTER_RSI_MAX=72 only appears in decider_run.py:990. pump-chain- post-Oct1 still shows rsi<40 entries (12T -$0.38) suggesting floor not applied on all paths. b960ffe8 fixed decider holes; standalone bypass may be the remaining hole class.",
+    "expected_impact": "Block overbought LONG chase and oversold SHORT knife-catches on bypass path; preserve rsi sweet-spot bands (pump-chain- rsi>=50 5T 80% +$0.35)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — extends existing constants, no new values",
+    "blocked_on": "bug_hunter path trace confirming the hole (sample 11T < 20T for mover+-specific value change; path fix is correctness not tuning)"
+  },
+  {
+    "date": "2026-10-04T23:37:35Z",
+    "idea": "REJECTED this run: post-expansion squeeze gate (bb_position>1.0 skip) — watchdog pattern_alert PATTERN 1",
+    "rationale": "Data REFUTES: bb-squeeze+ entry_bb_position>1.0 is the BEST band (7d 17T 70.6% WR +$0.39). Loser band is 0.5-0.8 (14T 50% -$0.25). SUPER/LDO post-expansion losers are exceptions, not the rule. Implementing watchdog gate would have killed 17 winners.",
+    "expected_impact": "N/A — rejected",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "would hurt winners (>20% of squeeze winners) — FAILS impact-on-winners test"
+  },
+  {
+    "date": "2026-10-04T23:37:35Z",
+    "idea": "REJECTED this run: widen CUT_LOSER_PNL / hard_max_loss semantics change",
+    "rationale": "MFE data: 7d hard_max_loss 42T — 32/42 had MFE 0-0.5% (never bounced), only 5/42 MFE>0.5. 30d avg MFE 0.212 vs atr_sl_hit 1.754. Widening stop deepens losses on trades that go straight down. Entry quality is the bug.",
+    "expected_impact": "N/A — rejected",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "would deepen bleed — FAILS evidence test"
   }
 ]
