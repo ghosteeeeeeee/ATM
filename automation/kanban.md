@@ -50,3 +50,6 @@
 
 ## TEAM UPDATES
 - [2026-10-04 08:11 UTC] auto_1hr: NO CHANGE — 2T closed last hour (2W 0L +$0.20, both bb-squeeze+ profit-monster-trail). 24h: 33T 66.7%WR +$0.93, atr_sl_hit 0% (fix stable). bb-squeeze+ 15T 86.7%WR +$1.01 star. No kill/size/overtrade/negative-streak triggers. 5 open bb-squeeze+ LONGs (correlated exposure). WATCH: hard_max_loss family 7T -$1.06 | pnl_pct nonsense | signal_version.py still missing.
+
+## TEAM UPDATES
+- [2026-10-04 12:48 UTC] health_monitor: Pipeline OK — LIVE 12:46:46 rc=0, 0 Tracebacks, 3 open / 34 closed today / -7.73% PnL (brain trades; 7d +86.80%). 87 signals/1h, regime SHORT_BIAS (14L/26S/77N), speed 53.5% ≥50th pct, prices fresh, disk 80%, phantom 0. NO AUTO-FIXES — system healthy. Recurring WARN: price_collector candle-agg lock (code fix pending). Details: automation/error_alerts.md
