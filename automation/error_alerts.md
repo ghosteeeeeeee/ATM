@@ -1,5 +1,14 @@
 # Error Alerts
 
+## Error Alerts — 2026-10-04 17:47 UTC
+- **INFO** — Pipeline healthy: active (running), last run 17:46:37 rc=0. Position Manager clean (2 open: HBAR LONG, ETC LONG; 0 closed this cycle; no Traceback/CRASH in 30m). Signals (1h): 102 generated (18 in last 15m). Closed today: 23 | WR 52.2% | PnL -0.70. Phantom trades: 0.
+- **WARN** (recurring): `hotset.json` empty — `no signals survived compaction` / `No signals above 50% confidence — skipping execution`. 102 signals generated in last hour but 0 approved. Regime SHORT_BIAS (13L/29S/75N @ 17:45) may be suppressing approvals. Same pattern as 08:48 and 10-02 entries — signal_compactor filter audit still open.
+- **INFO**: Disk 81% (90G/118G) — under 85% threshold, no cleanup needed.
+- **INFO** (recurring): Non-trading failed units — `better-coder`, `bug-hunter`, `git-release`, `mtf-macd-tuner`, `trading-checklist`, `weather-station-api`. Known; not on execution path.
+- **INFO**: `hermes-atr-sl-updater.timer` not-found (dead ref; DEFUNCT unit exists). Timers otherwise firing (pipeline, price-collector, signal-compactor, hl-sync-guardian all recent). `list-timers hermes-*` without `--all` shows 0 — cosmetic quirk.
+- **INFO**: Speeds 127/241 (52.7%) ≥50th pct. Prices fresh (token_speeds updated_at 17:46:09). Regime file fresh (17:45).
+- **AUTO-FIXES APPLIED**: none required. Trading path healthy.
+
 ## Error Alerts — 2026-10-04 08:48 UTC
 - **INFO** — Pipeline healthy: last run 08:46:44 rc=0. Portfolio: 1 open | 36 closed today | +19.21% PnL. Position Manager clean (no Traceback/CRASH in 30m). Signals (1h): 130 generated. Hotset empty (0 approved) — no signals survived compaction; 130 raw signals still generated. Regime: LONG_BIAS (28L/17S/72N @ 08:45). Speeds: 129/241 (53.5%) ≥50th pct. Prices fresh: 160 tokens updated <5m, latest 08:46:24. Phantom trades: 0. Open via signal_outcomes=0 (portfolio source of truth = position_manager: 1 open).
 - **INFO** (recurring): Non-trading failed units — `better-coder` (ModuleNotFoundError dispatcher.dispatcher), `bug-hunter` (exit-1 by design — found 9 CRITICAL: sqlite/cursor/connection leaks, sql_injection, bare_except, hardcoded passwords, dead signal_gen imports), `git-release` (dry-run exit-1), `mtf-macd-tuner` (PrecomputedMACD.warmup AttributeError), `trading-checklist` (exit-1). All known; none on trading execution path.

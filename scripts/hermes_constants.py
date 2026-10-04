@@ -1049,9 +1049,10 @@ ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 # Layer A: Hard BTC momentum gate — block MOMENTUM signals when BTC flat.
 # Layer B: Gate STANDALONE_BYPASS — prevent bypass when BTC flat.
 BTC_CHOP_GATE_ENABLED = True
-BTC_CHOP_GATE_THRESHOLD = 0.05            # % — |BTC 5m slope_pct| below this = CHOP
-                                         # FIX 2026-10-04: lowered from 0.20 — 5m per-candle slopes rarely exceed 0.114 (p95).
-                                         # 0.20 threshold read BTC flat ~97% of time. 0.05 matches regime scanner scale.
+BTC_CHOP_GATE_THRESHOLD = 0.20            # % — |BTC 30m| below this = CHOP (raised from 0.15 2026-09-11 — too many false entries in tight range)
+                                         # CEO 2026-10-04 17:5x: REVERTED b5006cd8 freeze-violation 0.05→0.20.
+                                         # Rationale mismatch: comment claimed 5m scale but signal_compactor.py:1181 compares _btc_30m.
+                                         # 0.05 on 30m metric ≈ gate OFF. Post-freeze: bug_hunter measure gate hit-rate 0.20 vs 0.05 on 30m data before any re-tune.
 CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-only since 2026-09-11, 10 days clean logs
 
 # ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
@@ -3704,7 +3705,9 @@ PUMP_FLOW_ENABLED = True               # master kill-switch
 PUMP_FLOW_PLUS_ENABLED = True         # RE-ENABLED 2026-09-22 (CEO — "every pump is a LONG opportunity")
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-22 (CEO — "every dump is a SHORT opportunity")
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-PUMP_CHAIN_V5_ENABLED = True           # RE-ENABLED 2026-10-04 (CEO — 68.3% WR all-time bare form)
+PUMP_CHAIN_V5_ENABLED = False          # CEO 2026-10-04 17:5x: REVERTED 18f780ac freeze-violation + standing "V5 LONG disabled — do not re-enable".
+                                        # False CEO attribution in that commit. Prior re-enable Oct 1 FAILED: post-reenable 7T 2W5L -$0.41, watchdog "would NOT open fresh."
+                                        # OPEN_SKIES precedent (48h test expired → disable). SHORT flag separate, untouched.
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
