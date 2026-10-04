@@ -17,6 +17,15 @@ from _secrets import BRAIN_DB_DICT
 
 from paths import *
 from hermes_log import log
+# FIX 2026-10-04 (bug hunter): MOMENTUM_STATE_TREND_THRESHOLD used in main() but was only
+# imported inside determine_regime() — function-local imports don't leak. Caused NameError
+# every run: "SQLite momentum_cache write error: name 'MOMENTUM_STATE_TREND_THRESHOLD' is
+# not defined" — SQLite momentum_cache froze at 14:00 data (BTC chop gate reads stale velocity).
+# Also constantize write_to_brain_cache trend threshold (was hardcoded 0.05 after fix 2).
+from hermes_constants import (
+    MOMENTUM_STATE_TREND_THRESHOLD,
+    REGIME_SCANNER_TREND_THRESHOLD,
+)
 INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/hermes/data/regime_5m.json"
 LOG_FILE = "/root/.hermes/logs/15m_regime.log"
@@ -282,7 +291,7 @@ def write_to_brain_cache(results):
         for token, r in results.items():
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
-            trend = 'uptrend' if slope_pct > 0.05 else 'downtrend' if slope_pct < -0.05 else 'ranging'
+            trend = 'uptrend' if slope_pct > REGIME_SCANNER_TREND_THRESHOLD else 'downtrend' if slope_pct < -REGIME_SCANNER_TREND_THRESHOLD else 'ranging'
             
             cur.execute("""
                 INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
