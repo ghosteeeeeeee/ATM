@@ -3109,3 +3109,43 @@ BY: auto_1hr
 - accel_300_v3_long: prior discrepancy (signal_reporter 7T/7d vs brain DB 0 executions) — left ENABLED=False per CEO Oct 3, not re-audited this hour.
 
 BY: auto_1hr
+
+## FAVORITES Update — 2026-10-04 06:00 UTC
+- Regime: LONG_BIAS
+- PROMOTE COMP (WR=60.0%, AvgPnL=6.16%, Trades=5)
+- PROMOTE BLUR (WR=80.0%, AvgPnL=1.49%, Trades=5)
+- PROMOTE SYRUP (WR=83.3%, AvgPnL=1.28%, Trades=6)
+- PROMOTE DYDX (WR=66.7%, AvgPnL=3.02%, Trades=6)
+
+Final set: ['BLUR', 'COMP', 'DYDX', 'HBAR', 'LDO', 'SYRUP']
+
+## LOSERS Update — 2026-10-04 06:05 UTC
+- ADD CHIP (WR=33.3%, PnL=$-0.28, low_wr (33.3%))
+- ADD JUP (WR=42.9%, PnL=$-0.02, low_wr (42.9%))
+
+Final set: ['ADA', 'BTC', 'CHIP', 'JUP']
+
+## [2026-10-04 06:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L, +$0.05) — NEAR bb-squeeze+ LONG, profit-monster-trail
+**PnL:** $0.05 last hour | 24h: 32T 20W 12L +$0.66 (WR: 62.5%) | Open: 1 (CHIP bb-squeeze+ LONG 05:55)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** NEAR +$0.05 clean trail win. No adverse-excursion concern on 1-trade hour.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0% of closes). tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 19T +$1.33, atr_trail_hit 2T +$0.47. Loss concentration = hard_max_loss family 7T -$1.06 (intentional hard stops; improved from 9T -$1.49 at 05:13 as trades age out).
+- **Kill rule:** 0T with 0%WR + 3+ trades in last hour. 24h n>=3 signals: bb-squeeze+ 13T 84.6%WR +$0.81 (star), pump-chain- 3T 33.3%WR +$0.10 (net positive, keep), pump-chain+ 3T 66.7%WR -$0.02 (noise), bb-bounce-v3-long+ 7T 57.1%WR -$0.02 (noise). No kill.
+- **Negative PnL streak:** 02:00 +$0.13, 03:00 -$0.06, 04:00 +$0.30, 05:00 +$0.05 — NOT 3 consecutive negative hours. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Regime:** No NEUTRAL streak in prior 24h mix (HIGH/EXTREME dominant). No size change.
+- **24h trend:** +$0.19 (05:13) → +$0.66 on 32T, WR 58.8%→62.5% — improving as losses age out.
+
+**Open Questions:**
+- hard_max_loss family 7T -$1.06 still sole 24h loss concentration — stop-placement vs signal-structure review still open.
+- pnl_pct data-path nonsense continues (NEAR +$0.05 → +116.65%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, but SOP reference is still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr

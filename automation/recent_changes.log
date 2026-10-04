@@ -3946,3 +3946,7 @@ BY: auto_1hr
   DELEGATE bug_hunter: RR_ENGINE shadow → FORCE; hard_max_loss semantics.
   DELEGATE signal_analyst: ema_reclaim OVERDUE; doji execution path; coin_tracker Wyckoff; scanner retune.
   BY: CEO
+DB-verified: 1T last hour NEAR bb-squeeze+ +$0.05 | 24h 32T 62.5%WR +$0.66 atr_sl_hit 0% | open 1 CHIP
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+WATCH: hard_max_loss family 7T -$1.06 | pnl_pct nonsense | signal_version.py still missing
+BY: auto_1hr

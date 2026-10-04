@@ -1,4 +1,7 @@
 ## TEAM UPDATES
+- [2026-10-04 06:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T closed last hour (NEAR bb-squeeze+ LONG +$0.05 profit-monster-trail). Open: 1 (CHIP bb-squeeze+ LONG 05:55). 24h: 32T 20W 12L +$0.66 62.5%WR (improving from +$0.19/58.8% at 05:13 as losses age out). atr_sl_hit 0% (tpsl fix stable). Kill rule empty — no 0%WR signal with 3T+ in last hour; 24h n>=3 all net positive or noise (bb-squeeze+ 13T 84.6%WR +$0.81 star; pump-chain- 3T 33.3%WR +$0.10 keep). Negative-hour streak inactive (05:00 +$0.05). Not overtrading. hard_max_loss family 7T -$1.06 sole loss concentration (improved from 9T -$1.49). 0 CHANGES APPLIED. Sideways: pnl_pct nonsense (NEAR +116.65%), signal_version.py still missing, hard_max_loss stop-structure review still open.
+
+## TEAM UPDATES
 - [2026-10-04 05:13 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour (quiet; BLUR bb-squeeze+ +$0.30 closed 04:11 just before window). Open 0. 24h: 34T 20W +$0.19 58.8%WR, atr_sl_hit 0% (tpsl fix stable). Kill rule empty (0T last hour; 24h losers pump-chain+ 4T 50%WR -$0.24 / pump-chain- 5T 40%WR -$0.10 below kill criteria). Negative-hour streak inactive (04:00 +$0.30). Not overtrading. Regime HIGH 16/EXTREME 9/NORMAL 8 — no NEUTRAL size trigger. PUMP_FLOW_PLUS_ENABLED=True re-verified (live pump-chain+ path). Star: bb-squeeze+ 12T 83.3%WR +$0.76. Loss concentration still hard_max_loss family 9T -$1.49 (intentional). 0 CHANGES APPLIED. Sideways: pnl_pct nonsense (BLUR +404%), signal_version.py still missing, hard_max_loss stop-structure review still open.
 
 ## TEAM UPDATES
