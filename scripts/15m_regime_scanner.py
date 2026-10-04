@@ -277,7 +277,7 @@ def write_to_brain_cache(results):
         for token, r in results.items():
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
-            trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
+            trend = 'uptrend' if slope_pct > 0.05 else 'downtrend' if slope_pct < -0.05 else 'ranging'
             
             cur.execute("""
                 INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
@@ -346,7 +346,7 @@ def main():
             regime = r.get('regime', 'NEUTRAL')
             _phase = regime
             _vel = slope
-            _state = 'trending' if abs(slope) > 0.1 else 'ranging'
+            _state = 'trending' if abs(slope) > 0.05 else 'ranging'
             _sc.execute("""
                 INSERT INTO momentum_cache (token, velocity, phase, momentum_state, updated_at)
                 VALUES (?, ?, ?, ?, ?)
