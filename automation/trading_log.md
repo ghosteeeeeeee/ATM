@@ -3048,3 +3048,33 @@ BY: auto_1hr
 - hard_max_loss family growing (11T) — worth a dedicated stop-structure review when not mid-monitor-window.
 
 BY: auto_1hr
+
+## [2026-10-04 04:11] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.06 (WR: 0.0%) | 24h: 35T 60%WR +$0.23
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** ENS bb-bounce-v3-long+ LONG -$0.04 (UNIVERSAL_MAX_HOLD) and CHIP continuation+ LONG -$0.02 (profit-monster-trail). Combined -$0.06 on tiny sizes — noise, not signal death.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 17T +$0.98, atr_trail_hit 4T +$0.52. Loss concentration = hard_max_loss family 9T -$1.49 — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (2T total). 24h worst: pump-chain+ 4T -$0.24 (50%WR), pump-chain- 6T -$0.06 (near flat), bb-bounce-v3-long+ 7T -$0.02 (57%WR near flat). No kill.
+- **Negative PnL streak:** 02:00 +$0.13, 03:00 -$0.06 — NOT 3 consecutive negative hours. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Open positions:** 0 open. LDO/IO/ENS/CRV all closed.
+- **Volume-breakout 1.25 boost** deployed and live (pipeline restarted 23:10:59 UTC prior session). No further action.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (ENS -$0.04 shows -162.66%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — audit script referenced by SOP not deployed (flagged 22:11, still absent). No config change this hour so nothing to log.
+- hard_max_loss family 9T -$1.49 sole 24h loss concentration — intentional hard stops. Stop-placement vs signal-structure review still open.
+- 24h PnL dipped: +$1.20 (00:11) → +$0.23 (now) on 35T. Still net positive, 60% WR. Mostly one quiet hour of tiny losses.
+
+**Open Questions:**
+- accel_300_v3_long: signal_reporter 7T/7d vs brain DB 0 executions 14d — discrepancy still unexplained, left ENABLED (CEO confirmed ENABLED=False Oct 3; verify which flag is live if it fires).
+- hard_max_loss family (9T) — worth a dedicated stop-structure review when not mid-monitor-window.
+- 24h regime mix EXTREME 10 / HIGH 16 / NORMAL 8 — no NEUTRAL streak, no size change required.
+
+BY: auto_1hr
