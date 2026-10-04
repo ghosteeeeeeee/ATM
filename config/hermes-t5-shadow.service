@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes T5 Shadow — Trade Learning System P4 (shadow trainer, 15min)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/t5_shadow.py --since-min 20
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
+TimeoutStartSec=300

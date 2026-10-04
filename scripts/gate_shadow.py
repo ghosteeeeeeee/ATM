@@ -171,14 +171,14 @@ def close_events():
             if row:
                 sig, pnl = row
                 cur.execute(
-                    "UPDATE events SET closed=1, would_trade=1, would_win=%s, "
-                    "would_pnl=%s, outcome_signal=%s, closed_at=%s WHERE id=?",
+                    "UPDATE events SET closed=1, would_trade=1, would_win=?, "
+                    "would_pnl=?, outcome_signal=?, closed_at=? WHERE id=?",
                     (1 if (pnl or 0) > 0 else 0, float(pnl or 0), sig,
                      datetime.now(timezone.utc).isoformat(), eid))
                 n_trade += 1
             else:
                 cur.execute(
-                    "UPDATE events SET closed=1, would_trade=0, closed_at=%s WHERE id=?",
+                    "UPDATE events SET closed=1, would_trade=0, closed_at=? WHERE id=?",
                     (datetime.now(timezone.utc).isoformat(), eid))
             n_closed += 1
         conn.commit()

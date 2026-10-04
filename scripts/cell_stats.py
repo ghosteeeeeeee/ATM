@@ -302,6 +302,36 @@ def write_store(cells, glob_f, days):
     return snapshot
 
 
+def write_store_st(cells_st, days):
+    """Write signal_type-keyed outcome cells to cells_st table (same DB).
+    Separate table: percent units (avg_pnl_pct), no MFE/MAE — never mixed
+    with the USD-denominated cells table."""
+    conn = sqlite3.connect(CELL_DB)
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS cells_st (
+                signal TEXT, direction TEXT, regime TEXT,
+                n INTEGER, wins INTEGER, wr_raw REAL, wr_blended REAL,
+                avg_pnl_pct REAL, total_pnl_pct REAL,
+                admission TEXT, tradeable INTEGER,
+                computed_at TEXT,
+                PRIMARY KEY (signal, direction, regime))
+        """)
+        cur.execute("DELETE FROM cells_st")
+        now = datetime.now(timezone.utc).isoformat()
+        for c in cells_st:
+            cur.execute("INSERT INTO cells_st VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (c['signal'], c['direction'], c['regime'], c['n'], c['wins'],
+                         c['wr_raw'], c['wr_blended'], c['avg_pnl_pct'], c['total_pnl_pct'],
+                         c['admission'], int(c['tradeable']), now))
+        conn.commit()
+        cur.close()
+    finally:
+        conn.close()
+    return len(cells_st)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--days', type=int, default=CELL_STATS_WINDOW_DAYS)
@@ -317,6 +347,16 @@ def main():
 
     cells, glob_f, _sig = compute_cells(rows)
     snap = write_store(cells, glob_f, args.days)
+
+    # signal_type-keyed outcome cells (covers live families source-form keys miss)
+    st_rows = fetch_signal_outcomes(args.days)
+    if st_rows:
+        cells_st = compute_outcome_cells(st_rows)
+        n_st = write_store_st(cells_st, args.days)
+        st_adm = sum(1 for c in cells_st if c['admission'] == 'cell')
+        log(f'signal_type cells: {n_st} written ({st_adm} admitted), from {len(st_rows)} outcomes')
+    else:
+        log('signal_outcomes empty — cells_st not written')
 
     admitted = [c for c in cells if c['admission'] == 'cell']
     tradeable = [c for c in cells if c['tradeable']]

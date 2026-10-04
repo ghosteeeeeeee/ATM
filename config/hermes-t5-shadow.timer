@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes T5 Shadow — every 15 min (shadow decisions + closes + report)
+
+[Timer]
+OnUnitActiveSec=900
+OnBootSec=3min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

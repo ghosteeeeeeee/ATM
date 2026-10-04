@@ -119,7 +119,22 @@ def _lookup_cell(cell_cur, key_signal, direction, regime):
             (direction, reg, key_signal, key_signal)).fetchone()
         if row:
             return row[:3], f'substr:{row[3][:40]}|{reg}'
-    # 3. regime-agnostic signal-level fallback (uses stored signal_n/signal_wr)
+    # 3. signal_type-keyed outcome cells (cells_st — covers live families like
+    #    support_resistance/hmacd_mtf that trades.signal source-form keys miss)
+    for reg in regimes:
+        row = cell_cur.execute(
+            "SELECT n, wr_blended, admission FROM cells_st "
+            "WHERE signal=? AND direction=? AND regime=?",
+            (key_signal, direction, reg)).fetchone()
+        if row:
+            return row, f'cells_st:{key_signal}|{reg}'
+    row = cell_cur.execute(
+        "SELECT n, wr_blended, admission FROM cells_st "
+        "WHERE direction=? AND instr(signal, ?) > 0 ORDER BY n DESC LIMIT 1",
+        (direction, key_signal)).fetchone()
+    if row:
+        return row, f'cells_st_sub:{key_signal}'
+    # 4. regime-agnostic signal-level fallback (uses stored signal_n/signal_wr)
     row = cell_cur.execute(
         "SELECT signal_n, signal_wr, 'signal' FROM cells "
         "WHERE direction=? AND (? = '' OR instr(signal, ?) > 0) "
@@ -228,12 +243,12 @@ def close_events():
             if row:
                 pnl = float(row[0] or 0)
                 cur.execute(
-                    "UPDATE decisions SET closed=1, would_win=%s, would_pnl=%s, closed_at=%s WHERE id=?",
+                    "UPDATE decisions SET closed=1, would_win=?, would_pnl=?, closed_at=? WHERE id=?",
                     (1 if pnl > 0 else 0, pnl, datetime.now(timezone.utc).isoformat(), did))
                 n_trade += 1
             else:
                 cur.execute(
-                    "UPDATE decisions SET closed=1, closed_at=%s WHERE id=?",
+                    "UPDATE decisions SET closed=1, closed_at=? WHERE id=?",
                     (datetime.now(timezone.utc).isoformat(), did))
             n_closed += 1
         conn.commit()
