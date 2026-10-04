@@ -3963,3 +3963,7 @@ DB-verified: 4T last hour bb-squeeze+ -$0.31 (ALT trail +$0.05, AIXBT/USELESS/CH
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family 10T -$1.42 | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+DB-verified: 1T last hour PURR bb-squeeze+ LONG atr_sl_hit -$0.13 | 24h 38T ~63%WR +$0.49 atr_sl_hit 1/38=2.8% | open 2 SUSHI/ME bb-bounce-v3-long+
+CHANGE: none - no kill/size/overtrade trigger met; 2 consecutive neg hours (08:-0.31, 09:-0.13) not yet 3
+WATCH: hard_max_loss family 10T -$1.42 | negative-hour streak 2/3 | pnl_pct nonsense | signal_version.py still missing
+BY: auto_1hr

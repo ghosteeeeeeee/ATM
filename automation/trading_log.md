@@ -3225,3 +3225,29 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 10:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L, -$0.13) — PURR bb-squeeze+ LONG, atr_sl_hit (SL 1.3% below entry, price hit ATR stop)
+**PnL:** -$0.13 last hour | 24h: 38T ~24W 14L +$0.49 (WR: ~63%) | Open: 2 (SUSHI, ME — both bb-bounce-v3-long+ LONG, opened 10:05/10:09)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** PURR opened 08:11, closed 09:37 (~86 min hold). SL placed ~1.3% below entry (ATR_SL_MIN=0.013), price hit it. Normal ATR stop, not a tight-SL bug. No winners this hour so no adverse-excursion comparison needed.
+- **atr_sl_hit >40%:** 1/38 (2.8%) of 24h closes. tpsl_utils.py fix stable (atr_trail_hit also active, +$0.02). Dominant exits: profit-monster-trail 22T +$1.58. No CEO alert. hard_max_loss family still sole loss concentration: 10T -$1.42/24h (stops working as designed, CUT_LOSER_PNL=-1.00 fires before 1.3% ATR SL).
+- **Kill rule:** No signal with 0% WR + 3+ trades in last hour. 24h n>=2: bb-squeeze+ 20T 70%WR +$0.57 (star), pump-chain+ 2T 100% +$0.05, bb-bounce-v2-long+ 2T 100% +$0.03, bb-bounce-v3-long+ 7T 57.1%WR -$0.02 (noise, 0 closes this hour). No kill.
+- **Negative PnL streak:** 07:00 +$0.20, 08:00 -$0.31, 09:00 -$0.13 — TWO consecutive negative hours, NOT 3. No size-reduction trigger. Watch next hour: a third negative closes the streak.
+- **Overtrading:** 1T last hour. Fine.
+- **Regime:** No NEUTRAL streak trigger. Prior note LONG_BIAS. Open exposure now bb-bounce-v3-long+ (SUSHI/ME) — different signal family than the morning bb-squeeze pile, not correlated.
+- **24h trend:** +$0.62 (09:00 report) → +$0.49 on 38T, WR 62.2%→~63% — mild drift down from atr_sl_hit on PURR, still net positive.
+
+**Open Questions:**
+- hard_max_loss family 10T -$1.42/24h still sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- Two consecutive negative hours (08:00, 09:00) — if 10:00 is also negative, next hour must check NEUTRAL regime + consider size reduction per SOP.
+- pnl_pct data-path nonsense continues (PURR -$0.13 → -460.51%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
