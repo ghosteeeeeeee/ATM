@@ -274,9 +274,12 @@ def report():
         rows = cur.execute("""
             SELECT shadow_decision,
                    COUNT(*) as n,
-                   SUM(CASE WHEN closed=1 THEN 1 ELSE 0 END) as closed_n,
+                   -- closed WITH an outcome (follow-on trade existed) — the only rows
+                   -- a WR denominator may use. Closed with no follow-on trade
+                   -- (would_win NULL) = 'no outcome', NOT a loss (gap-hunt 2026-10-04).
+                   SUM(CASE WHEN would_win IS NOT NULL THEN 1 ELSE 0 END) as with_outcome,
                    SUM(CASE WHEN would_win=1 THEN 1 ELSE 0 END) as wins,
-                   ROUND(SUM(COALESCE(would_pnl,0)), 2) as pnl,
+                   ROUND(SUM(CASE WHEN would_win IS NOT NULL THEN COALESCE(would_pnl,0) ELSE 0 END), 2) as pnl,
                    SUM(live_executed) as live_taken
             FROM decisions GROUP BY 1 ORDER BY n DESC
         """).fetchall()
@@ -284,21 +287,24 @@ def report():
             log('report: no decisions yet')
             return
         log('─── T5 SHADOW REPORT (would-trade vs live) ───')
-        log(f'{"decision":14} {"n":>6} {"closed":>6} {"wins":>5} {"wr":>6} {"pnl":>8} {"live_taken":>10}')
-        for dec, n, closed_n, wins, pnl, live_taken in rows:
-            wr = (wins / closed_n * 100) if closed_n else 0.0
-            log(f'{dec:14} {n:6} {closed_n:6} {wins:5} {wr:5.1f}% {pnl:+8.2f} {live_taken:10}')
-        # the gate metric: WOULD_TRADE cohort outcome
+        log(f'{"decision":14} {"n":>6} {"outcomes":>8} {"wins":>5} {"wr":>6} {"pnl":>8} {"live_taken":>10}')
+        for dec, n, with_outcome, wins, pnl, live_taken in rows:
+            wr_s = f'{wins/with_outcome*100:5.1f}%' if with_outcome else '  n/a '
+            log(f'{dec:14} {n:6} {with_outcome:8} {wins:5} {wr_s} {pnl:+8.2f} {live_taken:10}')
+        # the gate metric: WOULD_TRADE cohort outcome quality (outcomes only)
         wt = cur.execute("""
-            SELECT COUNT(*), SUM(CASE WHEN closed=1 THEN 1 ELSE 0 END),
-                   SUM(CASE WHEN would_win=1 THEN 1 ELSE 0 END), ROUND(SUM(COALESCE(would_pnl,0)),2)
+            SELECT COUNT(*),
+                   SUM(CASE WHEN would_win IS NOT NULL THEN 1 ELSE 0 END),
+                   SUM(CASE WHEN would_win=1 THEN 1 ELSE 0 END),
+                   ROUND(SUM(CASE WHEN would_win IS NOT NULL THEN COALESCE(would_pnl,0) ELSE 0 END),2)
             FROM decisions WHERE shadow_decision='WOULD_TRADE'
         """).fetchone()
         if wt and wt[1] and wt[1] >= 5:
-            log(f"P4 GATE: WOULD_TRADE cohort closed={wt[1]} wr={wt[2]/wt[1]*100:.1f}% pnl={wt[3]:+.2f} "
+            log(f"P4 GATE: WOULD_TRADE outcomes={wt[1]}/{wt[0]} wr={wt[2]/wt[1]*100:.1f}% pnl={wt[3]:+.2f} "
                 f"(P5 requires 7d of this comparison + freeze lift)")
         else:
-            log(f'P4 GATE: WOULD_TRADE cohort closed={wt[1] if wt else 0} — accumulating (need 7d series)')
+            log(f"P4 GATE: WOULD_TRADE outcomes={wt[1] if wt else 0}/{wt[0] if wt else 0} — accumulating "
+                f"(need >=5 outcomes, then 7d series)")
     finally:
         conn.close()
 

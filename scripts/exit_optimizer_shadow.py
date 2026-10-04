@@ -74,7 +74,12 @@ def fetch_cell_trades(days):
         cur = conn.cursor()
         cur.execute("""
             SELECT signal, direction,
-                   COALESCE(regime, volatility_regime, 'UNKNOWN'),
+                   -- FIX 2026-10-04 (gap-hunt): must match cell_stats.py regime source
+                   -- (volatility_regime preferred) or by_cell keys silently miss the
+                   -- regime-correct store and admitted cells get skipped as having
+                   -- 'insufficient trades' (the first gap-hunt P2 run evaluated only
+                   -- 18/53 cells this way — verdict was noise, not signal).
+                   COALESCE(NULLIF(volatility_regime, ''), NULLIF(regime, ''), 'UNKNOWN') AS regime,
                    pnl_pct, mfe_pct, mae_pct, exit_reason, entry_rsi_14
             FROM trades
             WHERE status='closed'

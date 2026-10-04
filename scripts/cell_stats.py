@@ -69,7 +69,15 @@ def fetch_trades(days):
         cur = conn.cursor()
         cur.execute("""
             SELECT signal, direction,
-                   COALESCE(regime, volatility_regime, 'UNKNOWN') AS regime,
+                   -- FIX 2026-10-04 (gap-hunt GAP A): trades.regime is a DIFFERENT
+                   -- concept (roughly 96 pct NEUTRAL — market-bias scanner vocabulary)
+                   -- while the live classifier + t5 lookups use volatility_regime
+                   -- (EXTREME/HIGH/NORMAL/FLAT). Old COALESCE(regime, volatility_regime)
+                   -- lumped 285/513 cells into a fake NEUTRAL bucket (36/54 admitted),
+                   -- making the primary store regime-blind. Prefer volatility_regime;
+                   -- NULLIF strips empty strings. (No bare percent signs in SQL comments
+                   -- — psycopg2 parses them as parameter placeholders.)
+                   COALESCE(NULLIF(volatility_regime, ''), NULLIF(regime, ''), 'UNKNOWN') AS regime,
                    exit_reason, pnl_usdt, pnl_pct,
                    mfe_pct, mae_pct, entry_rsi_14, confidence
             FROM trades

@@ -39,7 +39,7 @@ CLOSE_AFTER_HOURS = 24
 #   🔒 [CONFLUENCE-GATE-BLOCK] TOKEN DIRECTION: reason
 #   🚧 [BTC-CHOP-GATE] TOKEN DIRECTION ... BLOCKED — reason
 BLOCK_RE = re.compile(
-    r'(?:🚫|🔒|🚧)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Za-z][A-Za-z0-9]*)\s+(LONG|SHORT)\b'
+    r'(?:🚫|🔒|🚧|🌊)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Za-z0-9]+)\s+(LONG|SHORT)\b'
     r'.*?(?:blocked|BLOCKED)',
     re.IGNORECASE,
 )
