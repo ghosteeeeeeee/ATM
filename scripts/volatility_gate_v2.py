@@ -307,7 +307,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
     ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
-    ('EXTREME', 'pump_chain-'): 0.0,             # BLOCKED 2026-10-04 signal_reporter — EXTREME 5T 40%WR -$0.10 (24h), all-time 90T 52.2% -$0.20 bleed. NORMAL 75%WR edge kept. Reverted 10-03 boost (1.0) — was overfit to transient 5T 60%WR window.
+    ('EXTREME', 'pump_chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor — MoE model A habitat. 30d EXTREME RSI>=40: 18T +$0.96 72.2%WR (ONLY profitable SHORT cell). 0.0 block used 24h 5T mixed-oversold sample; RSI floors (>=40) are the oversold defense. HIGH stays blocked.
     ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -322,7 +322,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
     ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
-    ('EXTREME', 'pump-chain-'): 0.0,             # BLOCKED 2026-10-04 signal_reporter — hyphen variant. EXTREME 5T 40%WR -$0.10 (24h), all-time 90T 52.2% -$0.20. NORMAL 75%WR kept. Reverted 10-03 boost.
+    ('EXTREME', 'pump-chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor — hyphen variant. MoE habitat EXTREME+RSI>=40: 30d 18T +$0.96 72.2%WR. HIGH remains blocked (26T -$0.36). Oversold blocked by RSI floors not regime kill.
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter

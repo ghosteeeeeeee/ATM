@@ -658,3 +658,8 @@
 - **WARN** (known, non-trading-path): `hermes-atr-sl-updater.timer` not-found (dead unit ref — ATR SL/TP managed locally by guardian via DB). `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` inactive dead (UnitFileState=enabled but not scheduled) — regime scanners themselves (4h/15m) are active and firing.
 - **INFO**: `signal_outcomes` closed-today=8 vs portfolio 33 — outcomes table is partial/closed-only; portfolio source of truth remains position_manager + trades.json (consistent with prior reports).
 - **AUTO-FIXES APPLIED**: none required. Pipeline running; price-collector crash self-healed via systemd restart; disk under threshold; no missed trading-path timers; no stale prices. No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 06:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK:`

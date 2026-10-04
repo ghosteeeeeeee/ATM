@@ -3149,3 +3149,28 @@ Final set: ['ADA', 'BTC', 'CHIP', 'JUP']
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 07:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h: 32T 20W 12L +$0.66 (WR: 62.5%) | Open: 3 (BLUR bb-squeeze+ LONG +86.4% open, ALT bb-squeeze+ LONG -2.5%, CHIP bb-squeeze+ LONG -12.9%)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** N/A — 0 trades closed last hour.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h (0% of closes). tpsl_utils.py fix stable. Dominant exits: profit-monster-trail 19T +$1.33, atr_trail_hit 2T +$0.47. Loss concentration = hard_max_loss family 7T -$1.06 (intentional hard stops, 0% WR — known entry-quality bleed, not exit bug).
+- **Kill rule:** 0T closed last hour — rule requires 3+ trades. 24h n>=3 signals all net-positive or noise: bb-squeeze+ 13T 84.6%WR +$0.81 (star), pump-chain- 3T 33.3%WR +$0.10, pump-chain+ 3T 66.7%WR -$0.02, bb-bounce-v3-long+ 7T 57.1%WR -$0.02. No kill.
+- **Negative PnL streak:** 02:00 +$0.13, 03:00 -$0.06, 04:00 +$0.30, 05:00 +$0.05 — NOT 3 consecutive negative hours (06:00 had 0 closes). No size-reduction trigger.
+- **Overtrading:** 0T last hour. Fine.
+- **Regime:** LONG_BIAS per 06:00 FAVORITES update. No NEUTRAL streak. No size change.
+
+**Open Questions:**
+- 3 open bb-squeeze+ LONGs correlated (BLUR/ALT/CHIP) — treat as one position exposure.
+- hard_max_loss family 7T -$1.06 still sole 24h loss concentration — stop-placement vs signal-structure review still open.
+- pnl_pct data-path nonsense continues — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr

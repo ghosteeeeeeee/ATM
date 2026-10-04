@@ -2381,5 +2381,34 @@
     "category": "infra/data hygiene",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-04T06:39:54Z",
+    "idea": "Equity-normalized hard_max_loss (price_stop = equity_budget / leverage) — e.g. -2% equity instead of -1% price",
+    "rationale": "7d 33T all-loss -$4.35 at avg lev 4.27. Exit reason strings show ~1% price; pnl_pct = lev × price_move. Simulation @-2% equity: -$2.25. HML is SL-fallback path — winners use hard_sl/atr/profit-monster, so HML semantic change should not kill winners.",
+    "expected_impact": "+$1.50-2.00/7d on HML bleed alone (if no new stop-outs on recoverable dips)",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium",
+    "blocked_by": "b960ffe8 monitor + bug_hunter owns semantics + needs winner MAE re-check on recoverable dips before apply"
+  },
+  {
+    "date": "2026-10-04T06:39:54Z",
+    "idea": "Quiet-market confluence pair: doji-bottom-long + ema_reclaim_long same token within 1h → confidence boost (mean-reversion pair for LOW vol / NEUTRAL)",
+    "rationale": "Both built, both bypass-listed, both 0 fires this window. Constants comment already pairs them ('Pairs with doji-bottom for 2-type mean-reversion confluence'). When volume_regime leaves LOW or regime softens from MARKUP, pair fires before single-signal starvation resolves.",
+    "expected_impact": "Unlocks NEUTRAL diversity without new signal build; target 20T doji + first ema_reclaim trades when setups exist",
+    "category": "signal diversity",
+    "status": "suggested",
+    "risk": "low",
+    "blocked_by": "Needs signal_analyst confluence wiring (already delegated)"
+  },
+  {
+    "date": "2026-10-04T06:39:54Z",
+    "idea": "HOLD: pump-chain- EXTREME as SHORT habitat with RSI>=40 only — do not add more EXTREME kills",
+    "rationale": "30d cell: EXTREME RSI>=40 18T +$0.96 72.2%WR. All other SHORT regime×RSI cells negative or marginal. This run reverted signal_reporter's 0.0 overblock. Future SHORT tweaks must preserve this cell.",
+    "expected_impact": "Preserves ~+$0.96/30d edge; oversold still blocked by floors",
+    "category": "entry model",
+    "status": "applied_this_run",
+    "risk": "low"
   }
 ]

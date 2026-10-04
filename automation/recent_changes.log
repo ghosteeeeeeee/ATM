@@ -3950,3 +3950,8 @@ DB-verified: 1T last hour NEAR bb-squeeze+ +$0.05 | 24h 32T 62.5%WR +$0.66 atr_s
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family 7T -$1.06 | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+[2026-10-04 06:39 UTC] brain_auditor: 1 GATE REVERT — EXTREME pump-chain- SHORT 0.0→1.0 (volatility_gate_v2.py). 30d EXTREME RSI>=40 = 18T +$0.96 72.2%WR. RSI floors untouched (b960ffe8 monitor). 24h +$0.66/62.5% | 7d +$2.42/53.1%. hard_max_loss 33T -$4.35/7d still #1 bleed (bug_hunter). BY: brain_auditor
+DB-verified: 0T last hour | 24h 32T 62.5%WR +$0.66 atr_sl_hit 0% | open 3 bb-squeeze+ (BLUR/ALT/CHIP)
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+WATCH: hard_max_loss family 7T -$1.06 | 3 correlated bb-squeeze LONGs open | signal_version.py still missing
+BY: auto_1hr

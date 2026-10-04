@@ -182,3 +182,6 @@
 
 ## TEAM UPDATES
 - [2026-10-03 23:12 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (CRV volume-breakout-long+ LONG hard_max_loss -$0.11). 24h 33T ~67%WR +$1.39 (improved from +$0.78); atr_sl_hit 0% (tpsl fix stable). Kill rule not met (1T < 3T; volume-breakout all-history 23T 16W +$3.31 healthy). No 3h negative streak (gaps at 19:00/20:00). Not overtrading (1/hr). volume-breakout boost 1.25 CONFIRMED DEPLOYED (pipeline restarted 23:10:59 UTC after 22:11 change; compactor timer fresh every min) — prior open question resolved. Open 3: LDO bb-squeeze+, IO pump-chain- SHORT, ENS bb-bounce-v3-long+. SIDWAYS: pnl_pct nonsense (CRV -476% on -$0.11); scripts/signal_version.py still missing; hard_max_loss family 10T -$1.53 sole loss concentration (stops working as designed). 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-04 07:11 UTC] auto_1hr: NO CONFIG CHANGE — 0T closed last hour. 24h: 32T 20W 12L +$0.66 62.5%WR; atr_sl_hit 0% (tpsl fix stable). Kill rule not met (0T < 3T). No 3h negative streak (05:00 +$0.05, 06:00 0T). Not overtrading. Open 3: BLUR/ALT/CHIP bb-squeeze+ LONGs (correlated alt-long exposure — treat as one position). hard_max_loss family 7T -$1.06 sole 24h loss concentration (stops working as designed). 0 CHANGES APPLIED.

@@ -781,5 +781,16 @@
     "after": "MIN and MAX both checked at detection; RSI>70 pump-chain+ LONG blocked",
     "rationale": "14d RSI>=70 = 17T 23.5%WR -$0.58 vs 60-70 = 15T 60%WR +$0.72. Constant existed with this rationale; wiring = bug fix.",
     "impact": "Net +$0.58/14d expected (13 losers blocked, 4 winners blocked). Pipeline restarted 04:35."
+  },
+  {
+    "timestamp": "2026-10-04T06:39:54Z",
+    "agent": "brain_auditor",
+    "change": "Revert EXTREME pump-chain- SHORT regime block 0.0→1.0 in volatility_gate_v2.py SIGNAL_TYPE_OVERRIDES",
+    "type": "config",
+    "file": "scripts/volatility_gate_v2.py",
+    "before": "('EXTREME','pump_chain-'): 0.0 and ('EXTREME','pump-chain-'): 0.0",
+    "after": "1.0 / 1.0 — HIGH remains 0.0",
+    "rationale": "MoE model A habitat EXTREME; 30d EXTREME RSI>=40 pump-chain- = 18T +$0.96 72.2%WR. signal_reporter 05:15 overblock used 24h mixed-oversold sample. RSI floors unchanged (b960ffe8 monitor).",
+    "impact": "Restores only profitable SHORT cell when exec RSI>=40. Multiplier verified EXTREME=1.0 HIGH=0.0 NORMAL=1.0."
   }
 ]
