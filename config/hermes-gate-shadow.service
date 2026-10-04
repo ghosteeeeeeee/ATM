@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Gate Shadow — Trade Learning System P3 (record blocks + close 24h outcomes)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/gate_shadow.py --since-hours 6
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
+TimeoutStartSec=300

@@ -1,0 +1,9 @@
+[Unit]
+Description=Hermes Gate Shadow — hourly (record gate blocks, close 24h outcomes, report)
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
