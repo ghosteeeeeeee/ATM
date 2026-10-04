@@ -3073,6 +3073,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── DISABLED-COMPONENT GUARD (scoring loop) ───────────────────────────
             if any(is_component_disabled(p) for p in source_parts):
                 continue  # skip stale signal with disabled component
+            # ── Per-token vol_regime (FIX 2026-10-04: was stale from pre-filter) ──
+            # Bug: _vol_regime was computed per-token in pre-filter loop but scoring
+            # loop used the leftover value from the last pre-filtered token.
+            _atr_score = _atr_cache.get(token.upper(), (None,))[0]
+            if _atr_score is None:
+                try:
+                    _atr_score = _get_atr_pct(token)
+                    if _atr_score is not _atr_cache.get(token.upper(), (None,))[0]:
+                        _atr_cache[token.upper()] = (_atr_score, time.time())
+                except Exception:
+                    pass
+            _vol_regime_score = _classify_volatility(_atr_score) if _atr_score is not None else 'NORMAL'
             # ── Confluence gate (2+ unique signal types) ──────────────────────────
             # Handled at line 573-608 (pre-filter). No per-signal-type hard requirements here.
             # Previously had a hard RS requirement — removed 2026-08-06 because:
@@ -3093,7 +3105,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 regime_conf=regime_conf,
                 speed_data=speed_data,
                 _btc_ctx_cached=_btc_ctx_cached,
-                _vol_regime=_vol_regime,
+                _vol_regime=_vol_regime_score,  # FIX: per-token, not stale from pre-filter
             )
 
             # Opposing signal penalty: check if opposing direction is firing for this token
