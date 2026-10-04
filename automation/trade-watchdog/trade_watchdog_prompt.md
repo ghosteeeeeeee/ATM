@@ -26,7 +26,7 @@ This contains: open trades, automated steers, regime summary, signal performance
 
 ```bash
 cat /var/www/hermes/data/continuum_data.json
-cat /var/www/hermes/data/regime_15m.json
+cat /var/www/hermes/data/regime_5m.json
 cat /var/www/hermes/data/signals.json
 ```
 

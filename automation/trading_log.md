@@ -3478,3 +3478,32 @@ BY: upgrade_implementer
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 18:45 UTC] Daily Orchestrator — freeze-safe run
+
+**Freeze:** b960ffe8 until Oct 6 00:38 — 0 trading config changes. No new violations since CEO reverts 17:49 (constants/gates git-clean).
+
+**PG verified (source of truth):**
+- 24h: 29T 15W -$0.87 51.7%WR
+- 7d: 220T 116W +$1.43 52.7%WR (LONG 165T +$2.75 54.5%, SHORT 55T -$1.32 47.3%)
+- 30d: 951T 491W -$0.92 51.6%WR
+- Open 5: DOT bb-squeeze+, GMT+IMX pump-chain+, HBAR bb-bounce-v3-long+, ETC bb-bounce-v2+v3 combo
+- 24h exits: profit-monster-trail 16T +$1.04 | hard_max_loss 11T -$1.74
+- bb-bounce-v3 7d by regime: HIGH 5T 80% +$0.11 (keep) | NORMAL 15T 46.7% -$0.51 (block candidate)
+- b960ffe8: 1 SHORT since restart (RESOLV entry_rsi=82.02, closed +1.51%) — oversold filter HOLDING
+
+**Changes (freeze-safe, non-trading-path):**
+1. **CLOSED regime_15m.json item** — ROOT CAUSE: `15m_regime_scanner.py` is a 5m scanner (CANDLE_TF=5m, CANDLE_TABLE=candles_5m) writing `/var/www/hermes/data/regime_5m.json`. Timer healthy (fires :00/:15/:30/:45), log fresh 18:30, err.log historical only (FAVORITES dict|set bug fixed Oct 2). Production: trade_watchdog.py reads regime_5m.json; signal_schema `_get_regime('15m')` reads candles DB not JSON. **Orphan `/var/www/hermes/data/regime_15m.json` DELETED** + `trade_watchdog_prompt.md` fixed (cat regime_5m.json). Creative idea already logged — executed.
+2. **CURRENT.md rewritten** — stats refreshed, item 21 closed, freeze standing preserved, monitor list trimmed.
+3. **CEO kanban** — orchestrator team-activity entry prepended.
+
+**Not changed:** hermes_constants.py, volatility_gate_v2, signal_compactor, market_phase_gate, any exit/kill flags. Protected flags untouched.
+
+**Post-freeze queue (Oct 6 00:38):** bb-bounce-v3-long+ NORMAL 0.0x + HIGH 1.0x regime-block + FAMILY_MAP underscore fix; hotset-empty audit (102 sig/h 0 approved); DRIFT-005 path audit; BTC_CHOP_GATE hit-rate 0.20 vs 0.05.
+
+**Sideways finds:**
+- Hotset EMPTY recurring (health monitor 17:48 + 08:48) — capital-efficiency bug, not freeze-violating to audit, deferred post-freeze.
+- trades.json open rows have None entry_price/status — PG is source of truth; dashboard data-path issue (non-trading-path).
+- 15m_regime.err.log stale since Oct 2 — no action needed (historical).
+
+BY: daily_orchestrator
