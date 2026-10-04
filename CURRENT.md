@@ -1,7 +1,19 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 21:05 UTC**
-**Updated by: CEO (RSI consolidation decision)**
+**Last Updated: 2026-10-04 21:15 UTC**
+**Updated by: CEO (BTC momentum Option C decision)**
+
+## CEO DECISIONS 21:15 — BTC Momentum Detection
+
+**DECISION: Option C — BTC multi-window flat check. Queue post-freeze Oct 6 00:38. 0 trading-config changes this run.**
+
+**Verified:** chop threshold live **0.20** (task brief said 0.05 — stale; 0.05 was reverted freeze-violation b5006cd8). velocity=0.017 = **16×5m regression slope_pct (%/5m candle)** from 15m_regime_scanner → SQLite momentum_cache, NOT 30m % as threshold comment claims — **UNIT MISMATCH**. BTC 3h **+0.62%** confirmed (85312→85835); 30m +0.26%. Continuum BTC DECLINING+BULL+ABOVE+99.96 → `_cont_bullish` phase-gated False → velocity fallback → "BTC flat" blocks (ZRO/AVAX/IMX/JUP/WLFI 21:04–21:09). `_get_btc_momentum()` already at signal_compactor.py:898 (tide uses it; chop gate ignores). PG: 24h **32T −$0.70 56.3%** | 7d **221T +$0.79 52.9%** (LONG +$2.11/166T, SHORT −$1.32/55T) | open=0 in PG | 48h hard_max_loss 20T −$3.26.
+
+**Reject A:** TF change ≠ unit fix; lag risk. **Reject B:** live is 0.20 not 0.05; 0.02 still fails 0.017; freeze already reverted this class. **Reject D:** pump not chop — "every pump is a LONG opportunity".
+
+**Post-freeze Oct 6 00:38 — bug_hunter:** (1) hit-rate 0.20 vs unit-corrected first; (2) chop gate Layer A+B not-flat if |vel|>=threshold OR |_get_btc_momentum()|>=**BTC_CHOP_GATE_3H_PCT=0.50** (new constant; DO NOT change BTC_CHOP_GATE_THRESHOLD value); (3) continuum bullish structural override (BULL/LEAN_BULL+ABOVE any phase) mirror 2026-09-20 bearish fix.
+
+**Metrics:** BTC-flat false blocks during |3h|>0.5% → 0 by Oct 7; hotset approved >0; 24h PnL ≥$0. **Sideways:** brief stale on threshold+velocity unit; continuum bullish/bearish asymmetry; chop gate ignores existing 3h helper.
 
 ## CEO DECISIONS 21:03 — RSI Consolidation Gap
 
