@@ -2547,5 +2547,32 @@
     "category": "capital efficiency",
     "status": "suggested — CEO/signal_analyst decision post-freeze",
     "risk": "medium — NEUTRAL volume-breakout is marginal (-$0.05/8T); EXTREME is the real edge. Adding bypass may fire low-quality NEUTRAL entries."
+  },
+  {
+    "date": "2026-10-04T18:38:22Z",
+    "idea": "VOLUME UNBLOCK: fix price_collector alt-candle volume ingestion to unlock volume-breakout-long+ and bb-bounce-v3 VOL_RATIO",
+    "rationale": "volume-breakout-long+ is 30d BEST signal (23T +$3.31 69.6%) despite being data-starved: candles_1m 49.5% zero volume, candles_15m 69.9% zero (measured on candles.db this run). DRIFT-007 flagged 3 sessions, unfixed. Fixing ingestion is not a signal change — it makes the best signal fire on real data.",
+    "expected_impact": "Higher-quality volume-breakout entries; reduced false volume-confirmations on zero-vol candles; target post-boost sample >=10T >=60% WR by Oct 11.",
+    "category": "infrastructure / signal enabler",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T18:38:22Z",
+    "idea": "SIGNAL_RSI WRITE-PATH: populate trades.signal_rsi_14 at execution (currently NULL 0/951 over 30d)",
+    "rationale": "Exec-RSI audits, chase-filter backtests, b960ffe8 oversold-SHORT proof, and DRIFT-005 path audit are all blind — signal RSI never stored. entry_rsi_14 is 98.2% populated; write path exists for entry side only. Data-layer, freeze-safe.",
+    "expected_impact": "Unlocks chase>10 winner/loser impact, b960ffe8 verification without candle re-derivation, future exec-RSI gate backtests.",
+    "category": "audit infrastructure",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T18:38:22Z",
+    "idea": "RE-VERIFY bb-bounce-v3 NORMAL 0.0x block with volatility_regime before Oct 6 — prefer NORMAL penalty or HIGH-only over kill",
+    "rationale": "Planned Oct 6 NORMAL 0.0x block counterfactual (14d, volatility_regime correct vocab): kills 7 NORMAL winners +$0.32 (DOT x2, WCT, ZEN, BANANA, HYPER, DOGE) while catching 7 losers -$0.83. 64% winner-kill exceeds >20% rule. Prior plan may have used market-bias regime (wrong lens).",
+    "expected_impact": "Avoid shipping a gate that removes the signal's only current winners. Safer: NORMAL conf penalty ~0.85 or HIGH-only enable.",
+    "category": "entry sniper / regime gate",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
