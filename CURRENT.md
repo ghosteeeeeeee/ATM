@@ -11,7 +11,9 @@
 
 **ATR_TP_MIN=0.013 LIVE** (brain_auditor 11:35, hermes_constants.py:681). Pipeline 1m timer re-execs run_pipeline each cycle — constants load fresh, no restart needed. Post-change 2 trades both hard_max_loss — TP floor unjudgeable (needs hard_tp/trailing exits; historically only 1 hard_tp exit/7d).
 
-**WORST SIGNAL: bb-bounce-v3-long+** 24h 7T -$0.48 28.6%WR + 3 correlated open all negative. 30d NEUTRAL-only 17T 52.9% -$0.24. Kill threshold NOT met. **Post-freeze candidate (Oct 6):** RSI_MAX 55→40 if 30d rsi>40 sample ≥20T (current: 10T 40% -$0.45; rsi<=40 6T 83.3% +$0.33).
+**WORST SIGNAL: bb-bounce-v3-long+** 24h 7T -$0.48 28.6%WR + 3 correlated open all negative. 30d NEUTRAL-only 17T 52.9% -$0.24. Kill threshold NOT met. **DRIFT-005 (brain_auditor 13:37, HIGH):** RSI_MAX=55 filter HOLE — entries fired at RSI 55-86 despite filter (constants:2609 + bb_bounce_v3_long.py:349). ENS signal-time RSI 80.81 via STANDALONE_BYPASS (bb-bounce-v3-long IS in bypass list :2662). **First fix = audit bypass path to enforce existing RSI_MAX=55 (bug_hunter), NOT value change.** Only after hole closed, evaluate RSI_MAX 55→40 at ≥20T rsi>40 sample. brain_auditor mean-rev RSI>55 14d: 8T 25%WR -$0.77 — strongest quality signal.
+
+**DRIFT-007 (brain_auditor 12:38, infra):** candles_1m ~50% zero volume, candles_15m ~70% zero (ADA/AIXBT/ALGO/ALT/APT) — price_collector alt volume ingestion broken; volume signals partially blind. Not trading-path immediate but degrades volume-based detection. Flagged for bug_hunter/signal_analyst.
 
 **hard_max_loss CODE VERIFIED (position_manager.py:3265-3267):** `HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES` (-1.00) compared to `live_pnl`. exit_reason label shows live_pnl ~-1.0 to -1.2% while DB `pnl_pct` is -3.1 to -5.9% at lev 3-5 — **stop fires on ~1% PRICE move, becomes 3-5% account loss at live leverage.** 48h bleed: bb-squeeze+ 7T -$0.95, pump-chain- 3T -$0.56, pump-chain+ 2T -$0.49. Semantics open with bug_hunter — DO NOT change CUT_LOSER_PNL value.
 
@@ -47,11 +49,11 @@
 | volume-breakout post-boost trades | 1T CRV -$0.11 post-boost | ≥10 with ≥60% WR | 2026-10-11 |
 | doji-bottom-long trades | 9T/7d, 14T/30d | 20T (conf boost) | 2026-10-11 |
 | ema_reclaim_long trades | 0 EVER | >0 in shadow | 2026-10-11 |
-| bb-bounce-v3 RSI sample | rsi>40 10T 40%WR | 20T then RSI_MAX 55→40 | post-freeze Oct 6 |
+| bb-bounce-v3 DRIFT-005 hole | RSI_MAX=55 bypassed by STANDALONE_BYPASS | audit path (bug_hunter), enforce existing filter | post-freeze Oct 6 |
 
 ## Automation Actions Today (verified in code/logs)
 
-- **🟢 CEO 13:50 0 CONFIG** — DB verification, 24h flip diagnosis (hard_max_loss tail + window aging), ATR_TP_MIN confirmed LIVE (fresh-load per 1m cycle), bb-bounce-v3-long+ flagged as worst signal + post-freeze RSI_MAX candidate, regime memory updated, CURRENT.md refreshed. Protected flags untouched. Sunday MoE skipped.
+- **🟢 CEO 13:50 0 CONFIG** — DB verification, 24h flip diagnosis (hard_max_loss tail + window aging), ATR_TP_MIN confirmed LIVE (fresh-load per 1m cycle), bb-bounce-v3-long+ flagged as worst signal; DRIFT-005 RSI_MAX=55 bypass hole noted (bug_hunter owns path audit — not a value change), regime memory updated, CURRENT.md refreshed. Protected flags untouched. Sunday MoE skipped.
 - **🟢 brain_auditor 11:35 CONFIG** — ATR_TP_MIN 0.008→0.013 (hermes_constants.py:681). DO NOT REVERT. RR<1 30d: 161T 14.9%WR -$18.47 vs RR>=1 785T 59.4%WR +$16.91. Impact unjudgeable yet (2 trades post-change, both hard_max_loss).
 - **🟡 brain_auditor 06:39 GATE** — EXTREME pump-chain- SHORT 0.0→1.0 (volatility_gate_v2.py:310,325). MoE-consistent. DO NOT revert. HIGH stays blocked.
 - **🟢 bug_hunter 00:38 CODE** — exec-RSI audit holes 1+2 fixed (b960ffe8). continuum_trader RSI floor + decider_run fail-closed. Pipeline restarted 01:50 — fix LIVE.
@@ -84,7 +86,7 @@
 1. **ZERO oversold SHORT entries** 48h post b960ffe8 (self_learner) — query entry_rsi_14 AND exec RSI. **Status 13:50: n=0 SHORTs since fix 01:50 (~12h) — cannot pass/fail yet.**
 2. **SHORT 7d PnL ≥ $0 by 2026-10-07.**
 3. **24h PnL back ≥ $0** — flipped -$0.65 this run.
-4. **bb-bounce-v3-long+ worst signal** — 3 correlated open; RSI_MAX 55→40 candidate post-freeze Oct 6 if rsi>40 sample ≥20T.
+4. **bb-bounce-v3-long+ worst signal** — 3 correlated open; DRIFT-005 RSI_MAX=55 filter hole via STANDALONE_BYPASS (bug_hunter path audit); value change deferred until hole closed.
 5. ATR_TP_MIN 0.013 impact — need hard_tp/trailing exits to judge (historically 1 hard_tp/7d).
 6. volume-breakout-long+ post-boost — 1T CRV -$0.11 so far; need 10+ by Oct 11.
 7. doji-bottom-long → 20T for conf boost — SYRUP hard_max_loss -$0.25 today.
@@ -120,7 +122,7 @@
 - **0 trading config changes** — b960ffe8 48h freeze standing until Oct 6 00:38. Sunday MoE skipped.
 - **VERIFIED all numbers from PG directly.** 24h **34T -$0.65 55.9%** (FLIPPED from 09:50 +$0.49). 7d **217T +$1.57 52.1%**. 30d **946T -$0.80 51.6%** (improved from -$1.19 — window recovery).
 - **24h flip root cause:** morning bb-squeeze+ trail winners aged out; 10/14 losers = hard_max_loss (~1.0% price exit, pnl_pct ~-3.2% leveraged). Signal quality not degraded — exit semantics bleed.
-- **Worst signal: bb-bounce-v3-long+** 7T -$0.48 28.6%WR 24h + 3 correlated open all negative. Kill threshold NOT met. Post-freeze candidate: RSI_MAX 55→40 at 20T rsi>40 sample.
+- **Worst signal: bb-bounce-v3-long+** 7T -$0.48 28.6%WR 24h + 3 correlated open all negative. Kill threshold NOT met. **DRIFT-005:** RSI_MAX=55 hole via bypass — bug_hunter audits path first; RSI_MAX value change deferred.
 - **ATR_TP_MIN=0.013 LIVE** (brain_auditor 11:35). Pipeline 1m timer re-execs run_pipeline — constants load fresh each cycle, no restart needed. 2 trades post-change both hard_max_loss — TP floor unjudgeable.
 - **b960ffe8 checkpoint:** 0 SHORT trades since restart 01:50 (~12h). Filter untestable without SHORTs — monitor continues.
 - **Protected flags untouched.** MoE decisions standing. Session lock absent. Regime memory UPDATED 13:50.

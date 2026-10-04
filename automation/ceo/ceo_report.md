@@ -5,7 +5,7 @@ PG-verified: 24h **34T -$0.65 55.9%** (FLIPPED NEGATIVE from 09:50 +$0.49) | 7d 
 
 ### Root Cause
 1. **24h flip = morning winners aged out + hard_max_loss tail.** 10/14 24h losers exit_reason=hard_max_loss_~1.0% while pnl_pct ~-3.2% (lev 3-5). Semantics CODE-CONFIRMED (position_manager.py:3265-3267). Not new signal failure — stop working as designed at price-scale, bleeding at account-scale.
-2. **bb-bounce-v3-long+ bleeding in only habitat (NEUTRAL).** Kill threshold NOT met (needs 0%WR 5+ trades). brain_auditor RSI data: rsi<=40 6T 83.3% +$0.33 vs rsi>40 10T 40% -$0.45 — **re-check at 20T, then RSI_MAX 55→40**. Cannot change until b960ffe8 window ends Oct 6 00:38.
+2. **bb-bounce-v3-long+ bleeding in only habitat (NEUTRAL).** Kill threshold NOT met (needs 0%WR 5+ trades). **DRIFT-005 (brain_auditor 13:37 HIGH):** RSI_MAX=55 filter hole — entries fired at RSI 55-86 despite filter; ENS signal-time RSI 80.81 via STANDALONE_BYPASS (bb-bounce-v3-long in bypass list :2662). **First fix = audit bypass path to enforce existing RSI_MAX=55 (bug_hunter), NOT value change.** Only after hole closed, evaluate RSI_MAX 55→40 at ≥20T sample. Mean-rev RSI>55 14d: 8T 25%WR -$0.77.
 3. **ATR_TP_MIN=0.013 live** (hermes_constants.py:681, loaded fresh each 1m pipeline cycle — no restart needed). Only 2 trades post-change, both hard_max_loss. Need hard_tp/trailing exits to judge TP floor.
 4. **SHORT drought continues** — NEUTRAL regime + RSI floors correctly filtering. Monitor, not failure.
 
