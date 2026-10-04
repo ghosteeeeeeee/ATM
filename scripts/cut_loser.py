@@ -600,8 +600,16 @@ def run(dry_run=False):
         if pnl is not None and pnl <= HARD_STOP_PCT:
             log(f"  [HARD-STOP] {pos['token']} {pos['direction']}: pnl={pnl:.2f}% <= {HARD_STOP_PCT}% — closing immediately")
             if not effective_dry_run:
-                close_position(pos['token'], pos['direction'], pos['current_price'],
-                              pnl, dry_run=effective_dry_run, reason="HARD-STOP")
+                # FIX 2026-10-04 (T-approved safety-net repair): was
+                # close_position(pos['token'], pos['direction'], pos['current_price'], pnl,
+                #               dry_run=..., reason="HARD-STOP") — wrong positional order,
+                #   missing trade_id/tier, nonexistent reason= kwarg -> TypeError every
+                #   time a trade hit -3%: the hard-stop safety net was dead.
+                # Now mirrors the working MAE-GUARD/TIER call pattern.
+                ok = close_position(pos['id'], pos['token'], pos['direction'],
+                                    pnl, pos['current_price'], effective_dry_run, "HARD-STOP")
+                if not ok:
+                    log(f"  [HARD-STOP] {pos['token']} close returned False (guardian/sniper may be handling)", "WARN")
             hard_stop_closed += 1
 
     # Load trail state for T1/T2 to skip trailed trades
