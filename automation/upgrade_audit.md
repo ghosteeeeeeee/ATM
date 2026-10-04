@@ -1,5 +1,67 @@
 # Upgrade Audit Trail
 
+## Session: 2026-10-04 ~18:15 UTC — Upgrade Implementer (freeze-safe only)
+
+**Freeze context:** b960ffe8 active until 2026-10-06 00:38 UTC. Trading-behavior / constants VALUES blocked. Data + prompt hygiene only. Trade-learning P0–P4 already shipped by prior agent (cell_stats, gate_shadow, t5_shadow, trade_watchdog timers live).
+
+### Implemented this session (3 Level 1)
+
+#### 1. auto_1hr pnl_pct false-alarm root cause FIXED
+- **Plan/source:** recurring trading_log/ceo_kanban "pnl_pct nonsense" (CFX -585%, USELESS -355%, BLUR +404%, CRV -476%…)
+- **Difficulty:** Level 1 (prompt SQL one-liner)
+- **Value:** HIGH — removed false bug class that wasted hourly agent cycles for days
+- **Status:** ✅ IMPLEMENTED
+- **Root cause:** `automation/auto_1hr_prompt.md` Step 2 SQL used `ROUND(pnl_pct*100,2)`. Column is ALREADY in percent units (`pnl_pct = raw_price_move × leverage`). Example live: CFX stored pnl_pct=-5.85 → old display -585.47. Every "nonsense" figure in logs is this double-scale.
+- **Fix:** `ROUND(pnl_pct,2)` + comment: hard_max_loss ~1% PRICE move → ~3–5% account at 3–5x leverage is expected (matches CURRENT.md hard_max_loss note + bug_hunter ownership).
+- **Verified:** live PG sample last 24h — old vs new display table produced; prompt asserts pass (`pnl_pct*100` absent).
+- **Related standing rule:** CUT_LOSER_PNL / hard_max_loss semantics still with bug_hunter — do NOT change values.
+
+#### 2. signal_version.py SOP stale refs cleaned
+- **Plan/source:** auto_1hr + trading_log false "signal_version.py missing" alarms
+- **Difficulty:** Level 1
+- **Value:** MEDIUM — stops dead-end flags; CEO already corrected 2026-09-30 (store = `data/signal_versions.json`, script does not exist)
+- **Status:** ✅ IMPLEMENTED
+- **Fix:** `auto_1hr_prompt.md` now documents JSON append snippet (18 signals already logged in store) instead of `python3 scripts/signal_version.py log ...`. Key-file path updated.
+
+#### 3. Trade-learning system status verified + logged
+- **Plan/source:** `plans/trade-learning-system-EXECUTION.md` (CEO-approved)
+- **Difficulty:** N/A (verification)
+- **Value:** HIGH (cross-session clarity)
+- **Status:** ✅ VERIFIED LIVE — do not re-implement
+- **Evidence:** `scripts/cell_stats.py` + `hermes-cell-stats.timer` (00:20); `brain/cell_stats.db` (653 cells + cells_st 736); `gate_shadow.db` 624 events + hourly timer; `t5_shadow.db` 413 decisions + 15min timer; trade_watchdog 30min timer; CURRENT.md + ceo_report confirm MFE/MAE ~97% closes, hard_max_loss family normalized. P5/P6 gated on freeze lift + CEO.
+
+### Plans re-scanned this session
+| Plan | Status | Action |
+|------|--------|--------|
+| trade-learning-system-EXECUTION | ✅ P0–P4 live | none |
+| continuum-filter-analysis | ✅ SHORT filter live | none |
+| pump-catching-and-exit-optimization | Partial; PM_TRAIL/CEO-protected frozen | skip freeze |
+| profitability-fix-plan | ✅ largely shipped (ENA, SPEED_MIN_THRESHOLD_LONG, PM bypass cleanup) | none |
+| ride-it-exit-spec | ✅ implemented | none |
+| squeeze-breakout / continuum-ma / pump-chain-v5 | ✅ implemented | none |
+| chop-v2-spec | Score mults live; chop_exit.py deferred post-freeze | PENDING freeze/CEO |
+| doji_signal_system | ✅ doji_bottom/top + DOJI_* constants live | none |
+| grind-breakout-signal-spec | ✅ implemented (AVNT blacklisted on backtest) | none |
+| btc-wave-pattern-surfer | BTC_WAVE_* constants live, ENABLED=False (paper-first) | intentional |
+| progressive-context-shaping | ✅ CURRENT.md exists (CEO-owned) | none |
+| automation-team-improvements | Timers exist (session/self/hebbian-openmemory); A/B still absent | PENDING (L2 additive) |
+| copy-trader-evolution | Phase gap (per-trader tracking) Level 2–3 | PENDING post-freeze |
+| brain-rag-system | Level 3–4, embeddings degraded | PENDING |
+| structural-awareness / tier2-chop-merge / system-overhaul | Level 4 / CEO-gated | SKIP |
+| regime-direction-filter / partial-close Option1 | already skipped/reconfirmed | none |
+| cronr-timer-plugin | DSH plugin, not trading | SKIP |
+
+### Sideways findings
+1. **pnl_usdt vs pnl_pct scale (INFO, not new bug):** majority of closes store pnl_pct = leveraged account return while pnl_usdt ≈ margin × raw move (not notional×move). 30d recorded sum ≈ -$1.06 vs amount×pnl_pct/100 ≈ -$1.92. Dollar totals understate leveraged economics ~2x. Sign/WR unaffected. With bug_hunter on hard_max_loss semantics — document, don't rewire mid-freeze.
+2. **gate_shadow closer:** 624 events since ~11:07 UTC; many still `closed=0` (24h counterfactual worker). Healthy, not stuck.
+3. **Dead 0-byte DBs** still on disk (brain.db, hermes*.db, etc.) — P0/cleanup scope; live code paths use signals_hermes_runtime.db / associative_memory.db.
+4. **should_trade_v2** still production-dead (prior sideways) — no action.
+
+### Success rate this session: 3/3 L1 freeze-safe (100%)
+### Cumulative: high (plans mature; freeze blocks remaining L2+ trading changes)
+
+---
+
 ## Plan: short-signal-drought-2026-10-02.md
 - **Date scanned:** 2026-10-03 18:10
 - **Core request:** Root-cause SHORT drought (49 LONG vs 1 SHORT on SHORT_BIAS day). Proposed 6 fixes.

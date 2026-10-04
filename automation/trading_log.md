@@ -3439,3 +3439,18 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 18:20 UTC] Upgrade Implementer — freeze-safe L1
+
+**Freeze:** b960ffe8 until Oct 6 00:38 — no constants VALUES / gates / exits touched.
+
+**Changes:**
+1. **FIXED auto_1hr pnl_pct false alarms** — `automation/auto_1hr_prompt.md` used `ROUND(pnl_pct*100,2)`. Column is already percent (pnl_pct = raw_move × leverage). That single line produced every "nonsense" figure (CFX -585% was actually -5.85%). SQL now `ROUND(pnl_pct,2)` + comment that hard_max_loss ~1% price → 3-5% account at 3-5x is expected.
+2. **Cleaned signal_version.py SOP refs** — store is `data/signal_versions.json` (CEO 2026-09-30). Prompt now has JSON append snippet; no more false "script missing" flags.
+3. **Trade-learning P0–P4 verified live** — cell_stats + gate_shadow + t5_shadow timers/DBs healthy. P5/P6 remain freeze+CEO gated.
+
+**Not changed:** hermes_constants.py, CUT_LOSER_PNL, hard_max_loss semantics (bug_hunter), PM_TRAIL_*, any live trading path.
+
+**Verified:** live PG last-24h old-vs-new pnl display table; prompt asserts pass.
+
+BY: upgrade_implementer

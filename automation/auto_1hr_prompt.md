@@ -19,10 +19,13 @@ conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='post
 cur = conn.cursor()
 
 # Trades closed in last hour
+# pnl_pct is ALREADY in percent units (5.0 = +5.0% account return = raw move × leverage).
+# Do NOT multiply by 100 — that produced fake "nonsense" like CFX -585% (= -5.85% × 100).
+# hard_max_loss ~1% PRICE move becomes ~3-5% account loss at 3-5x leverage — expected, not a bug.
 cur.execute("""
-    SELECT token, signal, direction, exit_reason, 
-           ROUND(pnl_usdt,2) as pnl, ROUND(pnl_pct*100,2) as pnl_pct
-    FROM trades 
+    SELECT token, signal, direction, exit_reason,
+           ROUND(pnl_usdt,2) as pnl, ROUND(pnl_pct,2) as pnl_pct
+    FROM trades
     WHERE close_time > NOW() - INTERVAL '1 hour' AND status = 'closed'
     ORDER BY close_time DESC
 """)
@@ -85,8 +88,33 @@ Rules:
 - Log to `automation/trading_log.md`
 
 ### After ANY hermes_constants.py change, log the version:
+Audit store is `data/signal_versions.json` (NOT a Python script — scripts/signal_version.py does not exist; CEO 2026-09-30).
+Append an entry under the signal key:
 ```bash
-python3 scripts/signal_version.py log <signal_name> '{"param": "value"}' --by auto_1hr --reason "brief reason"
+python3 - <<'PY'
+import json
+from datetime import datetime, timezone
+path = "/root/.hermes/data/signal_versions.json"
+signal = "SIGNAL_NAME"  # e.g. volume-breakout
+entry = {
+    "version": 1,
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+    "params": {"PARAM": "value"},
+    "metrics": {},
+    "changed_by": "auto_1hr",
+    "reason": "brief reason",
+    "prev_version": None,
+}
+data = json.load(open(path))
+cur = data.get(signal, {}).get("current_version", 0)
+entry["version"] = cur + 1
+entry["prev_version"] = cur or None
+data.setdefault(signal, {"versions": [], "current_version": 0})
+data[signal]["versions"].append(entry)
+data[signal]["current_version"] = entry["version"]
+json.dump(data, open(path, "w"), indent=2)
+print(f"Logged {signal} v{entry['version']}")
+PY
 ```
 This creates an audit trail of all parameter changes. Without this, we lose track of what changed and why.
 - **Report to CEO kanban:**
@@ -140,4 +168,4 @@ If a query fails with `UndefinedColumn`, check column names against this list be
 - TPSL logic: `scripts/tpsl_utils.py`
 - Trading log: `automation/trading_log.md`
 - Recent changes: `automation/recent_changes.log`
-- Signal versions: `scripts/signal_version.py` (log changes after every edit)
+- Signal versions: `data/signal_versions.json` (append after every constants edit — no scripts/signal_version.py)
