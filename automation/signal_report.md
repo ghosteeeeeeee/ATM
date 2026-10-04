@@ -1,60 +1,81 @@
 # Signal Performance Report
-**Generated:** 2026-10-04 05:15 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-04 (verified via brain DB live query)
+**Period:** Last 6h + 24h
 
-## Overall Stats
-- **24h closed:** 35 trades | **PnL:** +$0.23
-- **6h closed:** 8 trades | **PnL:** +$0.18
+## Verified Numbers (queried live, not from prior reports)
 
----
+### 24h (closed trades, HAVING >= 3)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-bounce-v3-long+ | LONG | 6 | 50.0% | -$0.05 |
+| bb-squeeze+ | LONG | 19 | 68.4% | +$0.37 |
+
+### 6h (closed trades, HAVING >= 2)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-squeeze+ | LONG | 8 | 50.0% | -$0.19 |
+
+### Single-trade losers (24h, too thin to act on)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain- | SHORT | 1 | 0% | -$0.24 |
+| volume-breakout-long+ | LONG | 1 | 0% | -$0.11 |
+| bb-squeeze+,rs-s102,rs-s114 | LONG | 1 | 0% | -$0.11 |
+| continuation+ | LONG | 1 | 0% | -$0.02 |
 
 ## KILLED (executed)
-None. No signal met kill criteria (WR < 30% + 5T + PnL < -$0.10).
-
----
+None. No signal meets kill criteria (WR < 30% AND PnL < -$0.10 AND 5+ trades 24h).
 
 ## BOOSTED (executed)
-None this cycle. bb-squeeze+ already at 1.2 (boosted 2026-10-03), confirming with 24h 12T 83.3% WR +$0.76.
-
----
-
-## REGIME BLOCK (executed)
-| Signal | Dir | Regime | 24h WR | 24h PnL | All-time | Action |
-|--------|-----|--------|--------|---------|----------|--------|
-| pump-chain- | SHORT | EXTREME | 40.0% (5T) | -$0.10 | 90T 52.2% -$0.20 | v2 mult 1.0→0.0 (revert 10-03 overfit boost) |
-
-- NORMAL kept at 1.0 — 8T all-time 75% WR +$0.03 (the actual edge).
-- HIGH already 0.0 (25T 48% -$0.36).
-- Root cause: 2026-10-03 boost to 1.0 was based on a transient 5T 60%WR +$0.18 window that reversed within 24h. Lifetime EXTREME has always bled.
-
----
+None new. bb-squeeze+ already boosted to 1.2x on 2026-10-03 23:13 (signal_compactor.py). Auto-tuned combo_weights.json has it at 1.14. EXTREME regime already blocked (0.0x in volatility_gate_v2.py, BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True). 6h dip (-$0.19, 50% WR) is short-term noise — 7d still 47T 61.7% +$0.50 across 31 tokens.
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 50.0% | -$0.24 | 4 | WATCH — all 4 in EXTREME; all-time EXTREME 56T 48.2% +$2.14 (edge). NORMAL/HIGH already blocked. 24h = noise. |
-| bb-bounce-v3-long+ | LONG | 57.1% | -$0.02 | 7 | WATCH — NORMAL 5T 40% -$0.07 is weak but sample too small to block (all-time NORMAL 8T 50% -$0.01). |
-
----
+| bb-bounce-v3-long+ | LONG | 50.0% | -$0.05 | 6 (24h) | WATCH — does NOT meet kill criteria. 7d: 12T 58.3% +$0.09. Regime: HIGH 60% WR +$0.08, NORMAL 50% -$0.01 (break-even, not losing). Signal active since 2026-09-21. Not a kill, not a boost. Monitor next cycle. |
+| pump-chain- | SHORT | 0% | -$0.24 | 1 (24h) | WATCH — single trade, too thin. Signal has 123 total trades since 2026-09-09. |
+| volume-breakout-long+ | LONG | 0% | -$0.11 | 1 (24h) | WATCH — single trade, too thin. |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 83.3% | +$0.76 | 12 | ENABLED @1.2 — HIGH 10T 90% +$0.58, NORMAL 2T 50% +$0.18. EXTREME blocked (correct). Multi-token: SYRUP/BLUR/SEI/XPL/CHIP/LDO/MON/ARB winners. |
+| bb-squeeze+ | LONG | 68.4% | +$0.37 | 19 (24h) | ACTIVE + ALREADY BOOSTED. Multi-token consistent: SYRUP 3T/100%/+$0.38, BLUR 2T/100%/+$0.49, ALT 2T/100%/+$0.06. 7d: 47T 61.7% +$0.50 / 31 tokens. EXTREME regime blocked (50% WR -$0.15). HIGH 65.4% +$0.38, NORMAL 66.7% +$0.27 kept. No action needed. |
 
-6h detail: bb-squeeze+ 3T 100% +$0.42 | bb-bounce-v3-long+ 2T 50% $0.00
+## Regime Breakdown (full history, HAVING >= 3)
 
----
+### bb-bounce-v3-long+
+| Regime | Trades | Wins | WR | PnL |
+|--------|--------|------|-----|-----|
+| HIGH | 5 | 3 | 60.0% | +$0.08 |
+| NORMAL | 8 | 4 | 50.0% | -$0.01 |
+
+No regime < 50% WR. HIGH wins (60% >= 55% threshold). NORMAL is break-even. No regime block warranted — signal overall not in kill territory.
+
+### bb-squeeze+
+| Regime | Trades | Wins | WR | PnL |
+|--------|--------|------|-----|-----|
+| EXTREME | 12 | 6 | 50.0% | -$0.15 |
+| HIGH | 26 | 17 | 65.4% | +$0.38 |
+| NORMAL | 9 | 6 | 66.7% | +$0.27 |
+
+EXTREME losing — already blocked via volatility_gate_v2.py 0.0x multiplier (line 328) and BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True. HIGH/NORMAL winning, correctly kept enabled.
 
 ## ISSUES
-- **No inversions found.** All signal/direction pairs consistent.
-- 24h sample is thin (35 closed trades total). pump-chain+ -$0.24 is within noise for a historically profitable EXTREME edge — no action.
-- Prior signal_report.md (2026-10-04 05:03) used percent-as-USD (bb-squeeze +5.08 vs actual +$0.76) — overwritten with PG numbers this cycle.
+- **No inversions found** (24h): zero trades where signal name says long but direction=SHORT or vice versa.
+- **Thin sample overall**: only 2 signals have >= 3 closed trades in 24h. Pipeline may be undertrading or many signals blocked by gates. Not necessarily a bug — could be regime/filters doing their job.
+- **bb-squeeze+ 6h cool-off**: 8T 50% WR -$0.19 in last 6h. 3 hard_max_loss exits (CHIP/USELESS/AIXBT ~-1.0% each) + 1 atr_sl_hit (PURR). 24h and 7d still firmly positive. Not actionable — normal variance for a 68% WR signal.
+- **bb-bounce-v3-long+ NORMAL regime at 50%**: break-even, not losing. No action per regime-blocking rules (need < 50% WR to block; HIGH 60% wins so blanket kill inappropriate anyway).
 
----
+## Actions Taken This Cycle
+1. Queried brain DB directly for 6h/24h numbers (did not trust prior report).
+2. Checked regime breakdown before any kill consideration.
+3. Checked inversions — clean.
+4. Verified bb-squeeze+ already boosted + EXTREME-blocked (no double-boost).
+5. No kills executed — no signal met criteria.
+6. No boosts executed — only boost candidate already boosted.
+7. No code changes to hermes_constants.py, volatility_gate_v2.py, or signal_compactor.py.
 
-## Changes Applied
-1. `scripts/volatility_gate_v2.py` — SIGNAL_TYPE_OVERRIDES: `('EXTREME','pump-chain-')` and `('EXTREME','pump_chain-')` 1.0 → 0.0.
-2. No hermes_constants.py flag changes.
-3. Pipeline timers pick up gate change on next run (no long-lived process).
-
-*Report auto-generated by signal_reporter. Next report: ~6h.*
+## Recommendation for Next Cycle
+- Monitor bb-bounce-v3-long+ — if 24h WR drops below 30% with 5+ trades AND PnL < -$0.10, re-evaluate. Currently 50% WR -$0.05, far from kill threshold.
+- Watch pump-chain- — 1 trade -$0.24 this cycle but 123 total trades historically. Needs more 24h data before any action.
+- No OpenMemory store performed (task instruction: skip all OpenMemory calls).
