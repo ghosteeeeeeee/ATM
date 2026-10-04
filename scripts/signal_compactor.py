@@ -1889,17 +1889,19 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # ── SHORT-in-NORMAL regime penalty ──────────────────────────────────────
     # SHORT struggles in NORMAL: 30T/7d 44%WR -$0.79. EXTREME 11T 81.8%WR +$1.74.
+    # FIX: use _vol_regime (volatility), not regime (which is LONG_BIAS/SHORT_BIAS/NEUTRAL)
     short_normal_mult = 1.0
     from hermes_constants import SHORT_NORMAL_PENALTY
-    if direction.upper() == 'SHORT' and regime == 'NORMAL':
+    if direction.upper() == 'SHORT' and _vol_regime == 'NORMAL':
         short_normal_mult = SHORT_NORMAL_PENALTY
         log(f"  📉 [SHORT-NORMAL] {token}: SHORT penalty {SHORT_NORMAL_PENALTY:.2f}x in NORMAL regime")
 
     # ── SHORT regime gate (CEO 2026-10-04) ──────────────────────────────────
     # SHORT only fires in EXTREME habitat; NORMAL/HIGH require quality gates.
-    # 30d data: EXTREME +$4.47 (377T 52.5%), NORMAL -$4.49 (232T), HIGH -$2.94 (341T).
+    # 30d data: EXTREME least bad, NORMAL/HIGH SHORTs lose money.
     # Quality gate: confidence >= 75 OR proven SHORT family.
-    if direction.upper() == 'SHORT' and regime in ('NORMAL', 'HIGH'):
+    # FIX: use _vol_regime (volatility), not regime (which is LONG_BIAS/SHORT_BIAS/NEUTRAL)
+    if direction.upper() == 'SHORT' and _vol_regime in ('NORMAL', 'HIGH'):
         _short_quality_ok = False
         # Quality gate: high confidence
         if conf >= 75:
@@ -1909,7 +1911,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         if any(p in (source or '') for p in _proven_short):
             _short_quality_ok = True
         if not _short_quality_ok:
-            log(f"  🚫 [SHORT-REGIME-GATE] {token} SHORT blocked — {regime} vol regime, no quality gate (conf={conf:.0f}, need>=75 or proven family)")
+            log(f"  🚫 [SHORT-REGIME-GATE] {token} SHORT blocked — {_vol_regime} vol regime, no quality gate (conf={conf:.0f}, need>=75 or proven family)")
             short_normal_mult = 0.0  # Kill score
 
     # ── Continuum Oscillator Multiplier (SHADOW MODE) ──────────────────────

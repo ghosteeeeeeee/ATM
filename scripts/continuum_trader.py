@@ -398,6 +398,7 @@ class ContinuumTrader:
         # RSI floor check for SHORT (2026-10-03 audit: Hole 1)
         # Block SHORT when RSI < 40 — oversold = bounce risk, not SHORT entry
         if side == 'SHORT':
+            _rsi_conn = None
             try:
                 import sqlite3 as _rsi_sqlite
                 from paths import CANDLES_DB as _rsi_cdb
@@ -409,7 +410,6 @@ class ContinuumTrader:
                     ORDER BY ts DESC LIMIT 15
                 """)
                 _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
-                _rsi_conn.close()
                 if len(_rsi_closes) >= 15:
                     _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
                     _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
@@ -421,12 +421,21 @@ class ContinuumTrader:
                         if _rsi_val < 40:
                             print(f"[TRADER] ENTRY BLOCKED: SHORT RSI {_rsi_val:.1f} < 40 (oversold — fail-closed)")
                             return
+                    else:
+                        print(f"[TRADER] ENTRY BLOCKED: SHORT RSI flat series — fail-closed")
+                        return
                 else:
                     print(f"[TRADER] ENTRY BLOCKED: SHORT RSI check failed (only {len(_rsi_closes)} candles) — fail-closed")
                     return
             except Exception as _rsi_e:
                 print(f"[TRADER] ENTRY BLOCKED: SHORT RSI check error ({_rsi_e}) — fail-closed")
                 return
+            finally:
+                if _rsi_conn:
+                    try:
+                        _rsi_conn.close()
+                    except Exception:
+                        pass
 
         # Check rate limits
         can_trade, reason = self._can_trade()
