@@ -3983,3 +3983,7 @@ DB-verified: 0T last hour | 24h 30T 50.0%WR -$0.97 atr_sl_hit 1/30=3.3% | open 3
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 2/3, 10:00+12:00+14:00 0T do not extend)
 WATCH: 24h deteriorated to -$0.97 | bb-bounce-v3-long+ 6T -$0.50 worst + 3 open | hard_max_loss family 11T -$1.81 | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+DB-verified: 2T last hour CFX hard_max_loss -$0.26 + DOT trail +$0.04 (bb-bounce-v3-long+) | 24h 30T 50.0%WR -$0.99 atr_sl_hit 1/30=3.3% | open 1 NXPC bb-bounce-v3-long+
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1 after 15:00 positive reset)
+WATCH: bb-bounce-v3-long+ 8T 25%WR -$0.72 worst + 1 open | hard_max_loss family 11T -$1.84 | pnl_pct nonsense | signal_version.py still missing
+BY: auto_1hr

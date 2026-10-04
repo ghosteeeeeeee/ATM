@@ -3387,3 +3387,29 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 16:13 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.22 last hour | 24h: 30T 15W 15L -$0.99 (WR: 50.0%) | Open: 1 (NXPC bb-bounce-v3-long+ LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** Winners avg MAE 0.15% (<0.5% threshold OK). Only LDO (bb-squeeze+) had MAE 0.59% among winners. Entry quality for winners is healthy; losses are exit/structure issues, not bad adverse on winners.
+- **atr_sl_hit >40%:** 1/30 (3.3%) of 24h closes. tpsl_utils.py fix deployed (FIX markers through 2026-10-03 present: SL capped below entry for LONG, BRAND-NEW TRADE GUARD, min-SL-distance). Dominant exits: profit-monster-trail 16T +$1.00 (53% of closes), hard_max_loss 11T -$1.84 (37%). Not a tight-SL problem.
+- **Kill rule:** Last hour only bb-bounce-v3-long+ closed (2T, 1W 1L = 50% WR). No signal with 0% WR + 3+ trades in last hour. 24h worst: bb-bounce-v3-long+ 8T 25%WR -$0.72 (NOT 0% WR, 1 open remains); doji-bottom-long 1T 0W -$0.25; pump-chain- 1T 0W -$0.24; volume-breakout-long+ 1T 0W -$0.11 — all under 3-trade threshold. bb-squeeze+ 15T 66.7%WR +$0.30 (star, keep). No kill.
+- **Negative PnL streak:** Hourly with trade activity: 13:-$0.25, 15:+$0.04, 16:-$0.26. Positive hour 15:00 resets streak. Current consecutive negative = 1. Max in window (08-09) = 2. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Regime:** Open exposure now only NXPC (previous 3 correlated bb-bounce-v3 LONGs closed this hour — CFX hard_max_loss, DOT trail win). 5m regime snapshot SHORT_BIAS overall but not an SOP trigger. No NEUTRAL streak size check.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (8T -$0.72 25%WR) with 1 open (NXPC) — kill threshold not met (last hour 50% WR, not 0%+3T). Watch: if next hour brings 3+ 0% WR closes, kill per SOP.
+- hard_max_loss family 11T -$1.84/24h sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter). CFX held 10:13→16:03 (~6h) then hard_max_loss — long hold then hard stop, not quick SL.
+- 24h PnL deteriorated to -$0.99 (was -$0.44 at 14:12). WR 50.0%. Not a 3h negative streak.
+- pnl_pct data-path nonsense continues (CFX -585%, DOT +92% — impossible for live positions) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
