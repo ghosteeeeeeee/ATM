@@ -1,88 +1,60 @@
 # Signal Performance Report
-**Generated:** 2026-10-03 23:13 UTC | **Period:** Last 6h + 24h
-**Source:** PostgreSQL brain DB (queried live, not cached)
+**Generated:** 2026-10-04 05:15 UTC | **Period:** Last 6h + 24h
 
----
-
-## 6h Performance (≥2 trades)
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-bounce-v3-long+ | LONG | 2 | 0.0% | -$0.14 |
-| bb-squeeze+ | LONG | 2 | 50.0% | -$0.04 |
-
-## 24h Performance (≥3 trades)
-
-| Signal | Dir | Trades | WR | PnL | Avg Win | Avg Loss |
-|--------|-----|--------|-----|-----|---------|----------|
-| bb-squeeze+ | LONG | 10 | 70.0% | +$0.33 | $0.099 | -$0.120 |
-| pump-chain+ | LONG | 8 | 62.5% | +$0.95 | $0.302 | -$0.187 |
-| pump-chain- | SHORT | 5 | 60.0% | +$0.18 | $0.167 | -$0.160 |
-| bb-bounce-v3-long+ | LONG | 5 | 60.0% | -$0.02 | $0.040 | -$0.070 |
-
-7d context: bb-squeeze+ 36T 61.1% +$0.27 | pump-chain+ 8T 62.5% +$0.95 (re-enabled 10-02) | pump-chain- 34T 50.0% +$0.02 | bb-bounce-v3-long+ 10T 60.0% +$0.09
+## Overall Stats
+- **24h closed:** 35 trades | **PnL:** +$0.23
+- **6h closed:** 8 trades | **PnL:** +$0.18
 
 ---
 
 ## KILLED (executed)
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met kill criteria (WR<30% + 5T + PnL<-$0.10) |
-
-Kill-path re-verified: no flag changes. MTF_REGIME_TREND_PLUS, PUMP_CHAIN_V5, ACCEL_300_* all already False.
+None. No signal met kill criteria (WR < 30% + 5T + PnL < -$0.10).
 
 ---
 
 ## BOOSTED (executed)
+None this cycle. bb-squeeze+ already at 1.2 (boosted 2026-10-03), confirming with 24h 12T 83.3% WR +$0.76.
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 70.0% | +$0.33 | 10 | Weight 1.0→1.2 in signal_compactor.py + combo_weights.json 1.02→1.2 |
-| pump-chain+ | LONG | 62.5% | +$0.95 | 8 | Weight (new static 1.2) + combo_weights.json 0.6→1.2 |
+---
 
-Multi-token consistency: bb-squeeze+ winners on SYRUP/SEI/XPL/ARB/MON; pump-chain+ winners on ME/LDO/ENS/DYDX/GMT.
+## REGIME BLOCK (executed)
+| Signal | Dir | Regime | 24h WR | 24h PnL | All-time | Action |
+|--------|-----|--------|--------|---------|----------|--------|
+| pump-chain- | SHORT | EXTREME | 40.0% (5T) | -$0.10 | 90T 52.2% -$0.20 | v2 mult 1.0→0.0 (revert 10-03 overfit boost) |
 
-Note: combo_weights.json (self_learner auto-tune) takes priority over static SIGNAL_SOURCE_WEIGHTS in `_get_source_weight()`. Both updated. **RESTART PIPELINE** to load signal_compactor.py static change.
+- NORMAL kept at 1.0 — 8T all-time 75% WR +$0.03 (the actual edge).
+- HIGH already 0.0 (25T 48% -$0.36).
+- Root cause: 2026-10-03 boost to 1.0 was based on a transient 5T 60%WR +$0.18 window that reversed within 24h. Lifetime EXTREME has always bled.
 
 ---
 
 ## LOSERS (watch list)
-
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 60.0% | -$0.02 | 5 | WATCH — WR ok, PnL slightly negative, R:R inverted (win 0.04 vs loss 0.07). 7d +$0.09. No change. |
-| pump-chain- | SHORT | 60.0% | +$0.18 | 5 | WATCH — meets boost letter on 24h but 7d 34T 50% breakeven. EXTREME mult already boosted 0.5→1.0 earlier today (12:05). No additional boost. |
-| volume-breakout-long+ | LONG | 0.0% | -$0.11 | 1 | Below threshold. Weight already 1.25 from earlier today. |
+| pump-chain+ | LONG | 50.0% | -$0.24 | 4 | WATCH — all 4 in EXTREME; all-time EXTREME 56T 48.2% +$2.14 (edge). NORMAL/HIGH already blocked. 24h = noise. |
+| bb-bounce-v3-long+ | LONG | 57.1% | -$0.02 | 7 | WATCH — NORMAL 5T 40% -$0.07 is weak but sample too small to block (all-time NORMAL 8T 50% -$0.01). |
 
 ---
 
 ## WINNERS
-
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 70.0% | +$0.33 | 10 | ENABLED — BOOSTED this cycle. EXTREME regime-blocked (bb-squeeze 0.0). HIGH 63.6%WR kept. |
-| pump-chain+ | LONG | 62.5% | +$0.95 | 8 | ENABLED — BOOSTED this cycle. HIGH blocked, dead-hours blocked, EXTREME 1.0. |
-| pump-chain- | SHORT | 60.0% | +$0.18 | 5 | ENABLED — EXTREME mult 1.0 (boosted 12:05). NORMAL 1.0. HIGH blocked. |
-| bb-bounce-v2-long+ | LONG | 100.0% | +$0.01 | 1 | ENABLED — 30d 73T 74%WR +$2.08 lifetime winner. |
-| pump-chain-v5 | LONG | 100.0% | +$0.16 | 1 | FLAG=False (killed 10-01 10:18) — this trade is pre-kill close aging out. |
+| bb-squeeze+ | LONG | 83.3% | +$0.76 | 12 | ENABLED @1.2 — HIGH 10T 90% +$0.58, NORMAL 2T 50% +$0.18. EXTREME blocked (correct). Multi-token: SYRUP/BLUR/SEI/XPL/CHIP/LDO/MON/ARB winners. |
 
----
-
-## SIGNAL INVERSIONS (24h)
-
-**None.** Query: signal LIKE '%long%' AND direction='SHORT' OR signal LIKE '%short%' AND direction='LONG' → 0 rows.
+6h detail: bb-squeeze+ 3T 100% +$0.42 | bb-bounce-v3-long+ 2T 50% $0.00
 
 ---
 
 ## ISSUES
-
-1. **Prior report numbers were wrong** — signal_report.md from 23:03 listed pump-chain+ +5.43 and bb-squeeze+ +2.50 (percent units presented as USD). Actual PG: +$0.95 and +$0.33. This report uses PG USDT values only.
-2. **combo_weights.json is the live authority** for source weights (checked before static map). Any static-only boost is inert if a combo_weights entry exists. Future boosts must update both.
-3. **bb-bounce-v3-long+ R:R inverted** — avg win $0.04 vs avg loss $0.07. WR 60% keeps it net near-zero. Monitor; if 7d turns negative, tune SL or kill.
-4. **ACE coin-level bleed** — blacklisted 2026-10-03 (7d 3T 0W -$0.55 across bb-squeeze+/pump-chain+). Not a signal-logic issue; blacklist handles it.
-5. **self_learner may overwrite** manual combo_weights boosts on next run. Re-verify weights after next self_learner pass.
+- **No inversions found.** All signal/direction pairs consistent.
+- 24h sample is thin (35 closed trades total). pump-chain+ -$0.24 is within noise for a historically profitable EXTREME edge — no action.
+- Prior signal_report.md (2026-10-04 05:03) used percent-as-USD (bb-squeeze +5.08 vs actual +$0.76) — overwritten with PG numbers this cycle.
 
 ---
 
-*Report auto-generated. Next report: ~6h from now.*
+## Changes Applied
+1. `scripts/volatility_gate_v2.py` — SIGNAL_TYPE_OVERRIDES: `('EXTREME','pump-chain-')` and `('EXTREME','pump_chain-')` 1.0 → 0.0.
+2. No hermes_constants.py flag changes.
+3. Pipeline timers pick up gate change on next run (no long-lived process).
+
+*Report auto-generated by signal_reporter. Next report: ~6h.*
