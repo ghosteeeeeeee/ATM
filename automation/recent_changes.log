@@ -4003,3 +4003,7 @@ DB-verified: 3T last hour ALL WINS GMT+IMX pump-chain+ pump_exit_dead_money +$0.
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 10T -$0.56 worst (ETC combo just trail-won) | hard_max_loss family 11T -$1.74 | freeze until Oct 6
 BY: auto_1hr
+BY: auto_1hr
+DB-verified: 2T last hour BOTH WINS SAGA+USELESS bb-squeeze+ profit-monster-trail +$0.07 | 24h 34T ~flat atr_sl_hit 1/34=2.9% not dominant | open 4 flat
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 10T -$1.73 | freeze until Oct 6

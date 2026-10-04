@@ -3604,3 +3604,28 @@ BY: auto_1hr
 - 24h PnL -$0.70 with 59.4% WR — R:R still negative (avg loss >> avg win). Post-freeze: review hard_max_loss stop placement vs trail exits.
 - doji-bottom-long / pump-chain- / volume-breakout-long+ 0%WR n=1 — below kill, watch sample growth.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
+
+## [2026-10-04 23:11] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses) — SAGA bb-squeeze+ +$0.01 (0.52%) + USELESS bb-squeeze+ +$0.06 (1.59%), both profit-monster-trail
+**PnL:** +$0.07 last hour (100% WR) | 24h: 34T 20W 14L ~+$0.00 flat | Open: 4 (BABY/SUPER/LDO/ARB mostly flat)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** Both winners exited via profit-monster-trail — clean exits, no adverse-excursion concern at this sample size.
+- **atr_sl_hit >40%:** 1/34 (2.9%) of 24h closes. Dominant exits: profit-monster-trail 19T +$1.24 (56%), hard_max_loss 10T -$1.73 (29%). tpsl_utils.py fix deployed and stable. hard_max_loss is intentional hard-stop family, not a tight-SL bug.
+- **Kill rule:** Last hour 0 losers. 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long / pump-chain- / continuation+ all 1T 0%WR — n=1 each, below kill threshold. No kill.
+- **Negative PnL streak:** Activity hours: 17:+$0.01, 18:+$0.06, 19:+$0.36, 21:-$0.24, 22:+$0.06, 23:+$0.01. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates git-clean, no violations.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (9T -$0.42) — below kill threshold (has wins), monitor sample growth.
+- hard_max_loss family 10T -$1.73 remains sole loss concentration — post-freeze review stop placement.
+- 4 open trades flat — no urgency.
+- doji-bottom-long / pump-chain- / continuation+ 0%WR n=1 — below kill, watch.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
