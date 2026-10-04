@@ -2410,5 +2410,32 @@
     "category": "entry model",
     "status": "applied_this_run",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-04T11:37:13Z",
+    "idea": "RR floor enforcement — ATR_TP_MIN aligned to ATR_SL_MIN (1.30%)",
+    "rationale": "30d DB: RR<1 trades = 161T 14.9%WR -$18.47 vs RR>=1 = 785T 59.4%WR +$16.91. Config mismatch: ATR_TP_MIN=0.80% < ATR_SL_MIN=1.30% gave low-vol tokens TP closer than SL — negative EV at any win rate below 100%. Applied as single config change.",
+    "expected_impact": "Eliminates structurally negative RR trades. 7d RR<1 bleed was -$1.09; trailing dominates exits (1 hard_tp/7d) so real gain is modest but structural.",
+    "category": "exit quality",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T11:37:13Z",
+    "idea": "bb-bounce-v3-long+ RSI_MAX 55→40 — block mid-RSI bounce entries",
+    "rationale": "30d RSI bands: rsi<=40 = 6T 83.3%WR +$0.33 vs rsi>40 = 10T 40%WR -$0.45. Sample 16T < 20T threshold — monitor, apply if 20T confirms.",
+    "expected_impact": "Would have blocked -$0.45 losers, preserved +$0.33 winners in 30d sample.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T11:37:13Z",
+    "idea": "Cluster risk limiter — max 2 positions per signal family within 15 minutes",
+    "rationale": "Watchdog flagged 3 bb-bounce-v3-long+ trades within 8 minutes (SUSHI/ME/CFX). One BTC dump hits all three. Correlation risk exceeds individual trade thesis risk.",
+    "expected_impact": "Reduces correlated drawdown. Unknown PnL impact — needs backtest before deploy.",
+    "category": "portfolio protection",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

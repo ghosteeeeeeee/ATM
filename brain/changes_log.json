@@ -792,5 +792,16 @@
     "after": "1.0 / 1.0 — HIGH remains 0.0",
     "rationale": "MoE model A habitat EXTREME; 30d EXTREME RSI>=40 pump-chain- = 18T +$0.96 72.2%WR. signal_reporter 05:15 overblock used 24h mixed-oversold sample. RSI floors unchanged (b960ffe8 monitor).",
     "impact": "Restores only profitable SHORT cell when exec RSI>=40. Multiplier verified EXTREME=1.0 HIGH=0.0 NORMAL=1.0."
+  },
+  {
+    "timestamp": "2026-10-04T11:36:16Z",
+    "agent": "brain_auditor",
+    "change": "Raise ATR_TP_MIN from 0.80% to 1.30% to match ATR_SL_MIN — enforce minimum RR 1.0 on all trades",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "ATR_TP_MIN = 0.008 (0.80%)",
+    "after": "ATR_TP_MIN = 0.013 (1.30%)",
+    "rationale": "ATR_TP_MIN < ATR_SL_MIN created structurally negative RR for low-vol tokens. 30d DB evidence: RR<1 trades = 161T 14.9%WR -$18.47 vs RR>=1 = 785T 59.4%WR +$16.91. 7d: RR<1 = 16T 3 winners -$1.09 vs RR>=1 = 195T +$2.95. TP floor below SL floor is a config mismatch, not a signal quality issue. Only 1 hard_tp exit/7d — trailing (profit-monster-trail 104T +$4.92) dominates exits, so practical exit-path impact is minimal.",
+    "impact": "Low-vol trades get TP at 1.30% instead of 0.80% — realistic target matching SL distance. Blocks structurally negative-EV TP levels. Minimal winner impact (only 3 tiny trail-exit winners $0.04 in RR<1 band/7d; hard TP rarely hit)."
   }
 ]
