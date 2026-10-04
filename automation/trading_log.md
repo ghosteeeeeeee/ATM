@@ -3360,3 +3360,30 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 15:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h: 30T 15W 15L -$0.97 (WR: 50.0%) | Open: 3 (NXPC/DOT/CFX bb-bounce-v3-long+ LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** No closes last hour. 24h winners all exit via profit-monster-trail (15T +$0.96) — trail engine working.
+- **atr_sl_hit >40%:** 1/30 (3.3%) of 24h closes. tpsl_utils.py fix still stable. Dominant exits: profit-monster-trail 15T +$0.96. hard_max_loss family 11T -$1.81 remains sole loss concentration (intentional hard stops).
+- **Kill rule:** 0T last hour — no signal with 0% WR + 3+ trades in last hour. 24h: bb-bounce-v3-long+ 6T 16.7%WR -$0.50 (worst, NOT 0% WR), doji-bottom-long 1T 0W -$0.25, pump-chain- 1T 0W -$0.24, volume-breakout-long+ 1T 0W -$0.11 — all under 3 trades. bb-squeeze+ 16T 62.5%WR +$0.07 (star, keep). No kill.
+- **Negative PnL streak:** 08:-$0.31, 09:-$0.13, 10:0T, 11:-$0.36, 12:0T, 13:-$0.25, 14:0T. Max consecutive negative-closing hours = 2 (08–09). 10:00, 12:00, 14:00 zero-trade hours do not extend the streak. NOT 3. No size-reduction trigger.
+- **Overtrading:** 0T last hour. Fine.
+- **Regime:** No NEUTRAL streak trigger. Open exposure: 3 correlated bb-bounce-v3-long+ LONGs (CFX -$0.12, DOT -$0.05, NXPC flat) — all flat/negative, same bleeding signal. Watch, not SOP trigger.
+- **24h trend:** -$0.97 vs -$0.44 at 14:12 — deterioration driven by hard_max_loss accumulation (11T -$1.81). WR dropped 55.6%→50.0%. Still not a 3h negative streak.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (6T -$0.50) with 3 open LONGs — kill threshold not met (not 0% WR, not 3+ last-hour closes). Watch: if next hour brings 3+ more 0% WR closes, kill per SOP.
+- hard_max_loss family 11T -$1.81/24h sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- 24h WR dropped to 50.0% — monitor; 3 consecutive negative-closing hours would trigger regime/size check per SOP.
+- pnl_pct data-path nonsense continues (avg -70.97% — impossible for live positions) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
