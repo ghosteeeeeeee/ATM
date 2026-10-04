@@ -1,32 +1,28 @@
-=== Health Report ===
-Time: 2026-10-04 12:48 UTC
+# Health Report — 2026-10-04 13:46 UTC
 
-PIPELINE: OK
-- Status: running (timer-triggered every 1min, last LIVE cycle 12:46:46 rc=0)
-- Signals (1h): 87 generated (signals table)
-- Trades: 3 open, 34 closed today (brain trades source of truth)
-- PnL: -7.73% today | +86.80% last 7d (212 closed)
-- Errors: 0 Traceback/CRASH/exception in 30 min
-- Position manager: rc=0 every cycle
+## Pipeline: OK
+- Status: **active** (hermes-pipeline.service), LIVE run 13:46:00 rc=0
+- Position manager: healthy, rc=0 every cycle, 3/6 slots used
+- Signals (1h): **82** generated
+- Trades: **3 open** | **34–35 closed today** | PnL **-12.8% → -15.4%** (source of truth = position_manager)
+- Errors in 30m: **0** (no Traceback/CRASH/exception)
 
-MARKET:
-- Regime: SHORT_BIAS — 14 LONG / 26 SHORT / 77 NEUTRAL (regime_5m.json ts 12:45)
-- Speed: 53.5% tokens >= 50th percentile (129/241)
+## Market
+- Regime: **LONG_BIAS** (34 LONG / 6 SHORT / 77 NEUTRAL, 117 tokens, ts 13:45)
+- Speed: **53.5%** tokens ≥ 50th percentile (129/241, updated 13:46:22)
 
-SYSTEM:
-- Timers: core active (pipeline 1m, price-collector 30s, signal-compactor 1m, pump-hunter, 1m-candle, watchdog, 15m-regime, 4h-regime)
-- Services: hermes-pipeline active, hermes-hl-sync-guardian active (long-running daemon since 2026-10-03)
-- Disk: 80% used (under 85% threshold)
-- Prices: fresh (regime 1.4m, candles 1.3m, coin_tracker 0.2m)
-- Phantom trades: 0
-- Hot signals top: SYRUP hmacd_mtf SHORT 85.2, WCT doji_bottom_long 80.0, ADA bb_bounce_v2_long 77.0
+## System
+- Services: pipeline **active**, hl-sync-guardian **active**, price-collector **active**
+- Core timers firing: pipeline (1m), price-collector, signal-compactor, pump-hunter, 1m-candle, watchdog, coin-tracker, regime scanners
+- Disk: **81%** used (under 85% threshold)
+- Prices: fresh — regime_5m 1.7m, token_speeds 13:46:22
+- Logs: 150M, no files >7d needing compression
 
-AUTO-FIXES APPLIED:
-- none — pipeline healthy, no restarts or cleanups forced
+## Auto-fixes applied
+- None required. Pipeline healthy, prices fresh, disk under threshold, no crashes, signals flowing.
 
-ALERTS:
-- WARN: hermes-price-collector crash-loops on candles.db "database is locked" during candle agg (known; systemd auto-restarts; prices still collected; needs PRAGMA busy_timeout + serialize vs _aggregate_1m)
-- WARN: dead timer refs — atr-sl-updater.timer not-found; regime-24h-check + regime-transition-check enabled but inactive (OnBootSec-only by design)
-- WARN: signal_outcomes partial (17 closed today) vs portfolio 34 — brain trades table is source of truth
-- INFO: decisions table stale (latest 2026-04-13) — unused post-signal_compactor migration
-- INFO: today PnL -7.73% — performance, not system health; 7d still +86.80%
+## Alerts
+- **WARN** (known): `signal_outcomes` partial vs portfolio — use position_manager/trades.json for trade counts.
+- **WARN** (known, non-trading-path): dead timers `hermes-atr-sl-updater.timer` (not-found), `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` (OnBootSec by design).
+- **INFO**: 113/241 token_speeds have `is_stale=1` but updated_at is fresh — flag = no recent price move, not staleness.
+- **INFO**: today's PnL -15.4% — trading performance, not system health.

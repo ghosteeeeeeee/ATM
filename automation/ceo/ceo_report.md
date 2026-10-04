@@ -1,3 +1,27 @@
+## CEO Report — 2026-10-04 13:50 UTC
+
+### Diagnosis
+PG-verified: 24h **34T -$0.65 55.9%** (FLIPPED NEGATIVE from 09:50 +$0.49) | 7d **217T +$1.57 52.1%** | 30d **946T -$0.80 51.6%** (improved from -$1.19 — window recovery). LONG 7d +$2.95/163T 54.0%. SHORT 7d **-$1.38/54T 46.3%** unchanged. **Worst signal: bb-bounce-v3-long+** 24h 7T -$0.48 **28.6%WR** + **3 correlated open** (CFX -0.74%, DOT -0.34%, NXPC -0.39%). 30d NEUTRAL-only 17T 52.9% -$0.24. b960ffe8: **0 SHORT since fix 01:50 (~12h)** — untestable n=0. Post-brain_auditor ATR_TP_MIN 11:35: 2 closed both hard_max_loss -$0.37 (SUSHI bb-bounce-v3, SYRUP doji) — TP floor unjudgeable (hard_max_loss ≠ TP exits). volume-breakout post-boost: 1 trade CRV -$0.11 hard_max_loss conf 99. bb-squeeze+ still best 24h 19T +$0.37 68.4%. Disk 81%. Pipeline healthy. Sunday — MoE skipped.
+
+### Root Cause
+1. **24h flip = morning winners aged out + hard_max_loss tail.** 10/14 24h losers exit_reason=hard_max_loss_~1.0% while pnl_pct ~-3.2% (lev 3-5). Semantics CODE-CONFIRMED (position_manager.py:3265-3267). Not new signal failure — stop working as designed at price-scale, bleeding at account-scale.
+2. **bb-bounce-v3-long+ bleeding in only habitat (NEUTRAL).** Kill threshold NOT met (needs 0%WR 5+ trades). brain_auditor RSI data: rsi<=40 6T 83.3% +$0.33 vs rsi>40 10T 40% -$0.45 — **re-check at 20T, then RSI_MAX 55→40**. Cannot change until b960ffe8 window ends Oct 6 00:38.
+3. **ATR_TP_MIN=0.013 live** (hermes_constants.py:681, loaded fresh each 1m pipeline cycle — no restart needed). Only 2 trades post-change, both hard_max_loss. Need hard_tp/trailing exits to judge TP floor.
+4. **SHORT drought continues** — NEUTRAL regime + RSI floors correctly filtering. Monitor, not failure.
+
+### Fix Applied
+**0 trading config changes** — b960ffe8 48h freeze standing until Oct 6 00:38. Regime memory updated 13:50 (bb-bounce-v3-long+ added as bleeding candidate; system metrics refreshed). CURRENT.md refreshed. Protected flags untouched. brain_auditor ATR_TP_MIN change NOT reverted (standing no-revert; 1 hard_tp exit/7d means minimal exit-path impact anyway). OpenMemory stored.
+
+### Verification
+- All numbers re-queried from PG brain this run — CEO-verified, not from prior reports.
+- ATR_TP_MIN=0.013 confirmed live via python import of hermes_constants.
+- b960ffe8: 0 SHORTs since fix; continue to Oct 6 00:38.
+- **NEXT CONFIG (post-freeze):** bb-bounce-v3-long+ RSI_MAX 55→40 if 30d rsi>40 sample reaches 20T.
+- Goals: SHORT 7d ≥$0 by Oct 7; 24h back ≥$0; 7d →+$3.00; 30d →≥$0 by Oct 11; volume-breakout post-boost ≥10T; doji →20T.
+- Delegated (standing): bug_hunter (hard_max_loss fix path + RR_ENGINE shadow), self_learner (oversold verify n=0), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker, scanner retune).
+
+Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+
 ## CEO Report — 2026-10-04 09:50 UTC
 
 ### Diagnosis

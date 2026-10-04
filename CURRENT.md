@@ -1,13 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 09:50 UTC**
-**Updated by: CEO (DB verification + hard_max_loss code confirm + brain_auditor EXTREME gate note)**
+**Last Updated: 2026-10-04 13:50 UTC**
+**Updated by: CEO (DB verification + 24h flip diagnosis + ATR_TP_MIN live confirm)**
 
 ## Current Status
 
-**PIPELINE ACTIVE. 0 trading config changes this run.** 24h +$0.49/60.5% | 7d +$2.18/52.8% | 30d -$1.19/51.7% (window-edge roll from -$0.48, NOT new bleed). SHORT 7d -$1.38 still bleeding; SHORT monitor window ACTIVE (b960ffe8 48h, ends Oct 6 00:38). LONG 7d +$3.56/160T carries system. Regime ~100% NEUTRAL (210/214 7d). Disk 81%. 0 open positions. Pipeline healthy, timers firing. **b960ffe8 post-fix: 0 SHORT trades since restart 01:50 (~8h) — oversold filter untestable (n=0), not failing.**
+**PIPELINE ACTIVE. 0 trading config changes this run.** 24h **-$0.65/55.9% FLIPPED NEGATIVE** (from 09:50 +$0.49 — morning winners aged out, hard_max_loss tail) | 7d +$1.57/52.1% | 30d -$0.80/51.6% (improved from -$1.19). SHORT 7d -$1.38 still bleeding; SHORT monitor window ACTIVE (b960ffe8 48h, ends Oct 6 00:38). LONG 7d +$2.95/163T carries system. Regime ~100% NEUTRAL. Disk 81%. **3 open ALL bb-bounce-v3-long+ LONG (CFX/DOT/NXPC all negative).** Pipeline healthy, timers firing. **b960ffe8: 0 SHORT since restart 01:50 (~12h) — n=0 untestable.**
 
-**PG live (CEO-verified 09:50 UTC):** 30d **954T -$1.19 51.7%WR**. 7d **214T +$2.18 52.8%** (LONG 160T +$3.56 55.0%, SHORT 54T -$1.38 46.3%). 24h **38T +$0.49 60.5%**. Last close 09:37. Post-reopen (brain_auditor 06:39 EXTREME pump-chain-): 5 LONG -$0.13, 0 SHORT.
+**PG live (CEO-verified 13:50 UTC):** 30d **946T -$0.80 51.6%WR**. 7d **217T +$1.57 52.1%** (LONG 163T +$2.95 54.0%, SHORT 54T -$1.38 46.3%). 24h **34T -$0.65 55.9%**. Last close 13:13 (SYRUP doji hard_max_loss).
+
+**ATR_TP_MIN=0.013 LIVE** (brain_auditor 11:35, hermes_constants.py:681). Pipeline 1m timer re-execs run_pipeline each cycle — constants load fresh, no restart needed. Post-change 2 trades both hard_max_loss — TP floor unjudgeable (needs hard_tp/trailing exits; historically only 1 hard_tp exit/7d).
+
+**WORST SIGNAL: bb-bounce-v3-long+** 24h 7T -$0.48 28.6%WR + 3 correlated open all negative. 30d NEUTRAL-only 17T 52.9% -$0.24. Kill threshold NOT met. **Post-freeze candidate (Oct 6):** RSI_MAX 55→40 if 30d rsi>40 sample ≥20T (current: 10T 40% -$0.45; rsi<=40 6T 83.3% +$0.33).
 
 **hard_max_loss CODE VERIFIED (position_manager.py:3265-3267):** `HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES` (-1.00) compared to `live_pnl`. exit_reason label shows live_pnl ~-1.0 to -1.2% while DB `pnl_pct` is -3.1 to -5.9% at lev 3-5 — **stop fires on ~1% PRICE move, becomes 3-5% account loss at live leverage.** 48h bleed: bb-squeeze+ 7T -$0.95, pump-chain- 3T -$0.56, pump-chain+ 2T -$0.49. Semantics open with bug_hunter — DO NOT change CUT_LOSER_PNL value.
 
@@ -31,25 +35,27 @@
 
 **Metric checkpoint 2026-10-07:** SHORT 7d ≥ $0, oversold SHORT entries = 0.
 
-## Measurable Goals (CEO 2026-10-04 09:50 UTC)
+## Measurable Goals (CEO 2026-10-04 13:50 UTC)
 
 | Metric | Current | Target | Deadline |
 |--------|---------|--------|----------|
+| 24h PnL | -$0.65 | ≥ $0 | 24h |
 | SHORT 7d PnL | -$1.38 | ≥ $0 | 2026-10-07 |
-| Oversold SHORT entries (exec RSI<40) post-fix | n=0 SHORTs since fix (~8h) | 0 (monitor) | Oct 6 00:38 |
-| 7d PnL | +$2.18 | +$3.00 | 48h |
-| 30d PnL | -$1.19 | ≥ $0 | 2026-10-11 |
-| volume-breakout post-boost trades | 0 opened post-boost (~11h) | ≥10 with ≥60% WR | 2026-10-11 |
-| doji-bottom-long trades | 8T/7d, 14T/30d | 20T (conf boost) | 2026-10-11 |
+| Oversold SHORT entries (exec RSI<40) post-fix | n=0 SHORTs since fix (~12h) | 0 (monitor) | Oct 6 00:38 |
+| 7d PnL | +$1.57 | +$3.00 | 48h |
+| 30d PnL | -$0.80 | ≥ $0 | 2026-10-11 |
+| volume-breakout post-boost trades | 1T CRV -$0.11 post-boost | ≥10 with ≥60% WR | 2026-10-11 |
+| doji-bottom-long trades | 9T/7d, 14T/30d | 20T (conf boost) | 2026-10-11 |
 | ema_reclaim_long trades | 0 EVER | >0 in shadow | 2026-10-11 |
+| bb-bounce-v3 RSI sample | rsi>40 10T 40%WR | 20T then RSI_MAX 55→40 | post-freeze Oct 6 |
 
 ## Automation Actions Today (verified in code/logs)
 
-- **🟢 CEO 09:50 0 CONFIG** — DB verification, hard_max_loss code path confirmed (price-vs-leveraged), brain_auditor EXTREME pump-chain- gate reopen noted MoE-consistent (DO NOT revert), regime memory updated, CURRENT.md refreshed. Protected flags untouched. Sunday MoE skipped.
-- **🟡 brain_auditor 06:39 GATE** — EXTREME pump-chain- SHORT 0.0→1.0 (volatility_gate_v2.py:310,325). MoE-consistent: EXTREME RSI>=40 is only profitable SHORT cell (30d 18T +$0.96 72.2%WR). HIGH stays blocked. RSI floors are oversold defense. Post-reopen 0 SHORTs (NEUTRAL regime).
-- **🟢 CEO 05:50 0 CONFIG** — DB verification, b960ffe8 monitor checkpoint (0 SHORTs since fix), regime memory updated, CURRENT.md refreshed.
-- **🟢 bug_hunter 00:38 CODE** — exec-RSI audit holes 1+2 fixed (b960ffe8). continuum_trader RSI floor + decider_run fail-closed.
-- **🟢 auto_1hr (prior) 22:11 CONFIG** — volume-breakout boost 1.15→1.25 APPLIED at signal_compactor.py:709-710 (re-verified 09:50).
+- **🟢 CEO 13:50 0 CONFIG** — DB verification, 24h flip diagnosis (hard_max_loss tail + window aging), ATR_TP_MIN confirmed LIVE (fresh-load per 1m cycle), bb-bounce-v3-long+ flagged as worst signal + post-freeze RSI_MAX candidate, regime memory updated, CURRENT.md refreshed. Protected flags untouched. Sunday MoE skipped.
+- **🟢 brain_auditor 11:35 CONFIG** — ATR_TP_MIN 0.008→0.013 (hermes_constants.py:681). DO NOT REVERT. RR<1 30d: 161T 14.9%WR -$18.47 vs RR>=1 785T 59.4%WR +$16.91. Impact unjudgeable yet (2 trades post-change, both hard_max_loss).
+- **🟡 brain_auditor 06:39 GATE** — EXTREME pump-chain- SHORT 0.0→1.0 (volatility_gate_v2.py:310,325). MoE-consistent. DO NOT revert. HIGH stays blocked.
+- **🟢 bug_hunter 00:38 CODE** — exec-RSI audit holes 1+2 fixed (b960ffe8). continuum_trader RSI floor + decider_run fail-closed. Pipeline restarted 01:50 — fix LIVE.
+- **🟢 auto_1hr (prior) 22:11 CONFIG** — volume-breakout boost 1.15→1.25 APPLIED (signal_compactor.py:710).
 
 ## Standing Decisions (do not re-litigate)
 
@@ -75,45 +81,46 @@
 
 ## Monitor List (next 48h)
 
-1. **ZERO oversold SHORT entries** 48h post b960ffe8 (self_learner) — query entry_rsi_14 AND exec RSI. **Status 09:50: n=0 SHORTs since fix 01:50 (~8h) — cannot pass/fail yet.**
+1. **ZERO oversold SHORT entries** 48h post b960ffe8 (self_learner) — query entry_rsi_14 AND exec RSI. **Status 13:50: n=0 SHORTs since fix 01:50 (~12h) — cannot pass/fail yet.**
 2. **SHORT 7d PnL ≥ $0 by 2026-10-07.**
-3. volume-breakout-long+ post-boost live performance (conf 1.25) — STILL 0 post-boost trades ~11h; need first trade, then 10+.
-4. **RR_ENGINE shadow would-have-blocked analysis** (bug_hunter) — FORCE on/off with numbers.
-5. 15m/5m scanner retune (signal_analyst).
-6. doji-bottom-long → 20T for conf boost — detection live, execution path needs work.
-7. hard_max_loss semantics — **CODE CONFIRMED price-vs-leveraged gap** (bug_hunter owns fix path). 48h bleed continues.
-8. mover+ entry quality (signal_analyst) — not firing since Sep 24.
-9. ema_reclaim_long 0 signals executed — coverage + partners (signal_analyst) — OVERDUE.
-10. Disk 81% — prune at 88%.
-11. ORPHAN_PAPER BTC amount=0 hygiene.
-12. DRIFT-002 — exec-time RSI timeframe (bug_hunter owns; holes 1+2 closed).
-13. HL API key reminder in AGENTS.md STALE — T: verify/correct.
-14. Coin tracker intelligence — Wyckoff/Elliott/Volume unbuilt (signal_analyst).
-15. pnl_usdt vs fees.net_pnl inconsistency — accounting audit (bug_hunter, non-trading-path).
-16. OpenMemory service inactive — HTTP API works.
-17. 30d window-edge: -$0.48→-$1.19 is aging-out of older winners, not new bleed — re-check Oct 5 before alarm.
+3. **24h PnL back ≥ $0** — flipped -$0.65 this run.
+4. **bb-bounce-v3-long+ worst signal** — 3 correlated open; RSI_MAX 55→40 candidate post-freeze Oct 6 if rsi>40 sample ≥20T.
+5. ATR_TP_MIN 0.013 impact — need hard_tp/trailing exits to judge (historically 1 hard_tp/7d).
+6. volume-breakout-long+ post-boost — 1T CRV -$0.11 so far; need 10+ by Oct 11.
+7. doji-bottom-long → 20T for conf boost — SYRUP hard_max_loss -$0.25 today.
+8. hard_max_loss semantics — CODE CONFIRMED price-vs-leveraged gap (bug_hunter owns fix path). 24h 10/14 losers this exit.
+9. mover+ entry quality (signal_analyst) — not firing since Sep 24.
+10. ema_reclaim_long 0 signals executed — coverage + partners (signal_analyst) — OVERDUE.
+11. Disk 81% — prune at 88%.
+12. ORPHAN_PAPER BTC amount=0 hygiene.
+13. DRIFT-002 — exec-time RSI timeframe (bug_hunter owns; holes 1+2 closed).
+14. HL API key reminder in AGENTS.md STALE — T: verify/correct.
+15. Coin tracker intelligence — Wyckoff/Elliott/Volume unbuilt (signal_analyst).
+16. pnl_usdt vs fees.net_pnl inconsistency — accounting audit (bug_hunter, non-trading-path).
+17. OpenMemory service inactive — HTTP API works.
+18. 30d -$0.80 — improved from -$1.19 (window recovery); re-check Oct 5.
 
 ## Backlog / Delegated (not orchestrator's call)
 
 - **DELEGATE bug_hunter:** RR_ENGINE shadow-block 7d would-have-blocked analysis → FORCE recommendation with numbers. (holes 1+2 DONE)
-- **DELEGATE bug_hunter:** hard_max_loss semantics — CODE NOW CONFIRMED: stop on ~1% price, pnl_pct leveraged -3 to -6% at lev 3-5. Fix path = compare live_pnl to price-normalized threshold OR raise CUT_LOSER_PNL to account for leverage. Needs numbers, not blind change.
+- **DELEGATE bug_hunter:** hard_max_loss semantics — CODE NOW CONFIRMED: stop on ~1% price, pnl_pct leveraged -3 to -6% at lev 3-5. Fix path = compare live_pnl to price-normalized threshold OR raise CUT_LOSER_PNL to account for leverage. Needs numbers, not blind change. **24h: 10/14 losers this exit.**
 - **DELEGATE bug_hunter:** fees JSON vs pnl_usdt accounting gap.
-- **DELEGATE self_learner:** 48h verification — zero SHORT entries with entry_rsi_14<40 post b960ffe8. **Status: n=0 SHORTs since fix 01:50 (~8h).**
+- **DELEGATE self_learner:** 48h verification — zero SHORT entries with entry_rsi_14<40 post b960ffe8. **Status: n=0 SHORTs since fix 01:50 (~12h).**
 - **DELEGATE signal_analyst:** retune 15m/5m scanner thresholds; snapshot EXTREME+RSI>=40 SHORT habitat.
 - **DELEGATE signal_analyst:** ema_reclaim_long detection coverage + confluence partners — 0 trades EVER, OVERDUE.
-- **DELEGATE signal_analyst:** doji-bottom execution path — detection works, 0 executed (starvation).
+- **DELEGATE signal_analyst:** doji-bottom execution path — detection works, SYRUP hard_max_loss today.
 - **DELEGATE signal_analyst:** mover+ entry quality — deep atr_sl_hit at high conf.
 - **DELEGATE signal_analyst:** coin_tracker Wyckoff/phase-transition signal (1/week min).
 - **T ack required:** AGENTS.md philosophy amendment (conditioned SHORT rule).
 - **bollinger_squeeze SHORT side** — research PASS historically but OFF until SHORT R:R fixed.
 - **bugs.json OPEN** — coin_tracker/backfill — not trading-path.
 
-## Orchestrator / CEO Report (2026-10-04 09:50 UTC)
+## Orchestrator / CEO Report (2026-10-04 13:50 UTC)
 
-- **0 trading config changes** — b960ffe8 48h monitor active (~8h in). Sunday MoE skipped.
-- **VERIFIED all numbers from PG directly.** 24h **38T +$0.49 60.5%**. 7d **214T +$2.18 52.8%**. 30d **954T -$1.19 51.7%** — worse than 05:50 (-$0.48) due to window-edge roll of older winners, NOT new bleed (24h still positive, last close 09:37).
-- **b960ffe8 checkpoint:** 0 SHORT trades since pipeline restart 01:50 (~8h). Filter untestable without SHORTs — monitor continues, not a failure signal.
-- **brain_auditor 06:39:** EXTREME pump-chain- SHORT gate 0.0→1.0 — MoE-consistent (EXTREME RSI>=40 only profitable SHORT cell). DO NOT revert. HIGH stays blocked. RSI floors remain oversold defense. Post-reopen: 0 SHORTs (NEUTRAL regime).
-- **hard_max_loss CODE CONFIRMED:** position_manager.py:3265-3267 fires on live_pnl ~-1% (price-scale) while trades.pnl_pct is leveraged -3 to -6% at lev 3-5. Semantics open with bug_hunter. CUT_LOSER_PNL value untouched.
-- **volume-breakout boost re-verified** 1.25 in code (signal_compactor.py:710); 0 post-boost trades ~11h after apply.
-- **Protected flags untouched.** MoE decisions standing. Session lock absent.
+- **0 trading config changes** — b960ffe8 48h freeze standing until Oct 6 00:38. Sunday MoE skipped.
+- **VERIFIED all numbers from PG directly.** 24h **34T -$0.65 55.9%** (FLIPPED from 09:50 +$0.49). 7d **217T +$1.57 52.1%**. 30d **946T -$0.80 51.6%** (improved from -$1.19 — window recovery).
+- **24h flip root cause:** morning bb-squeeze+ trail winners aged out; 10/14 losers = hard_max_loss (~1.0% price exit, pnl_pct ~-3.2% leveraged). Signal quality not degraded — exit semantics bleed.
+- **Worst signal: bb-bounce-v3-long+** 7T -$0.48 28.6%WR 24h + 3 correlated open all negative. Kill threshold NOT met. Post-freeze candidate: RSI_MAX 55→40 at 20T rsi>40 sample.
+- **ATR_TP_MIN=0.013 LIVE** (brain_auditor 11:35). Pipeline 1m timer re-execs run_pipeline — constants load fresh each cycle, no restart needed. 2 trades post-change both hard_max_loss — TP floor unjudgeable.
+- **b960ffe8 checkpoint:** 0 SHORT trades since restart 01:50 (~12h). Filter untestable without SHORTs — monitor continues.
+- **Protected flags untouched.** MoE decisions standing. Session lock absent. Regime memory UPDATED 13:50.
