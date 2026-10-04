@@ -112,10 +112,13 @@
 18. 30d -$0.95 — re-check Oct 5.
 19. BTC_CHOP_GATE hit-rate 0.20 vs 0.05 on _btc_30m data — bug_hunter post-freeze.
 20. exit_optimizer_shadow has no timer — training-system observation; CEO decision pending (add weekly timer vs keep manual).
+21. **🔴 regime_15m.json STALE since 2026-05-05** (~152 days) — 15m regime scanner dead/writing elsewhere; regime_5m + regime_4h fresh. DELEGATE bug_hunter write-path audit.
+22. Concurrent git add -A theft — cf866402 swept CEO constants reverts (values correct); agents must commit own files only.
 
 ## Backlog / Delegated (not orchestrator's call)
 
 - **DELEGATE bug_hunter:** BTC_CHOP_GATE hit-rate analysis post-freeze — 0.20 vs 0.05 on real _btc_30m series; recommendation before any re-tune.
+- **DELEGATE bug_hunter:** regime_15m.json stale since 2026-05-05 — 15m regime scanner write-path audit (timer, script, output path). HIGH — gates reading 15m regime are on May data.
 - **DELEGATE bug_hunter:** RR_ENGINE shadow-block 7d would-have-blocked analysis → FORCE recommendation with numbers. (holes 1+2 DONE)
 - **DELEGATE bug_hunter:** hard_max_loss semantics — CODE CONFIRMED: stop on ~1% price, pnl_pct leveraged -3 to -6% at lev 3-5. Fix path = compare live_pnl to price-normalized threshold OR raise CUT_LOSER_PNL to account for leverage. Needs numbers, not blind change. **24h: 12T -$1.86 this exit.**
 - **DELEGATE bug_hunter:** fees JSON vs pnl_usdt accounting gap.
