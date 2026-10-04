@@ -1,81 +1,74 @@
 # Signal Performance Report
-**Generated:** 2026-10-04 (verified via brain DB live query)
-**Period:** Last 6h + 24h
+**Generated:** 2026-10-04 17:13 UTC | **Period:** Last 6h + 24h
+**Source:** PostgreSQL brain DB (queried live, not cached)
 
-## Verified Numbers (queried live, not from prior reports)
+## Overall Stats
+- **6h closed:** 6 trades | WR 33.3% | PnL **-$0.77**
+- **24h closed:** 29 trades | WR 48.3% | PnL **-$1.04**
+- **Kill switch:** live_trading=true | LIVE_TRADING_ENABLED=True
 
-### 24h (closed trades, HAVING >= 3)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-bounce-v3-long+ | LONG | 6 | 50.0% | -$0.05 |
-| bb-squeeze+ | LONG | 19 | 68.4% | +$0.37 |
-
-### 6h (closed trades, HAVING >= 2)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-squeeze+ | LONG | 8 | 50.0% | -$0.19 |
-
-### Single-trade losers (24h, too thin to act on)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| pump-chain- | SHORT | 1 | 0% | -$0.24 |
-| volume-breakout-long+ | LONG | 1 | 0% | -$0.11 |
-| bb-squeeze+,rs-s102,rs-s114 | LONG | 1 | 0% | -$0.11 |
-| continuation+ | LONG | 1 | 0% | -$0.02 |
+---
 
 ## KILLED (executed)
-None. No signal meets kill criteria (WR < 30% AND PnL < -$0.10 AND 5+ trades 24h).
+None. Freeze b960ffe8 (until 2026-10-06 00:38) blocks trading config changes.
+
+## REGIME-BLOCK (PENDING freeze lift — HIGH wins, not a kill)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-v3-long+ | LONG | 25.0% | -$0.72 | 8 (24h) | Block NORMAL only (0.0x). HIGH 6T 66.7% +$0.09 kept. Flag stays True. |
+
+**Evidence (all-time regime):**
+- NORMAL: 13T, 46.2% WR, -$0.55 ← losing habitat
+- HIGH: 6T, 66.7% WR, +$0.09 ← winning (≥55% → no blanket kill)
+- 7d overall: 18T, 55.6% WR, -$0.44 (exits bleed more than entries)
+- Active since 2026-09-21 (>24h)
+- 24h tokens: CFX/ME/COMP/SUSHI/ENS losses; DOT/WCT only winners
+
+**Planned edit (post-freeze, Oct 6):** `scripts/volatility_gate_v2.py` SIGNAL_TYPE_OVERRIDES
+```
+('NORMAL', 'bb_bounce_v3_long'): 0.0,   # signal_type form
+('NORMAL', 'bb-bounce-v3-long'): 0.0,   # source form
+('HIGH', 'bb_bounce_v3_long'): 1.0,     # keep winner
+('HIGH', 'bb-bounce-v3-long'): 1.0,
+```
+- `BB_BOUNCE_V3_LONG_ENABLED` remains **True** (verified)
+- FAMILY_MAP already has `bb-bounce-v3-long` (hyphen); underscore form maps to `Other` — see ISSUES
+- CEO already tracking this signal for post-freeze RSI_MAX 55→40 (kanban 13:50)
 
 ## BOOSTED (executed)
-None new. bb-squeeze+ already boosted to 1.2x on 2026-10-03 23:13 (signal_compactor.py). Auto-tuned combo_weights.json has it at 1.14. EXTREME regime already blocked (0.0x in volatility_gate_v2.py, BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True). 6h dip (-$0.19, 50% WR) is short-term noise — 7d still 47T 61.7% +$0.50 across 31 tokens.
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-squeeze+ | LONG | 61.5% | +$0.19 | 13 (24h) | Already at 1.2x (boosted 2026-10-03). No further change. |
+
+**bb-squeeze+ detail:**
+- 24h: 13T 61.5% +$0.19 | 7d: 47T 61.7% +$0.50
+- Multi-token winners: BLUR +0.49 (2T), SYRUP +0.08, ALT +0.06 (2T), NEAR/LDO +0.05
+- Regime: NORMAL 66.7% +$0.27, HIGH 65.4% +$0.38, EXTREME 50% -$0.15 (already blocked)
+- Meets boost criteria; weight already raised yesterday — maintain
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 50.0% | -$0.05 | 6 (24h) | WATCH — does NOT meet kill criteria. 7d: 12T 58.3% +$0.09. Regime: HIGH 60% WR +$0.08, NORMAL 50% -$0.01 (break-even, not losing). Signal active since 2026-09-21. Not a kill, not a boost. Monitor next cycle. |
-| pump-chain- | SHORT | 0% | -$0.24 | 1 (24h) | WATCH — single trade, too thin. Signal has 123 total trades since 2026-09-09. |
-| volume-breakout-long+ | LONG | 0% | -$0.11 | 1 (24h) | WATCH — single trade, too thin. |
+| bb-bounce-v3-long+ | LONG | 25.0% | -$0.72 | 8 | REGIME-BLOCK pending freeze (see above) |
+| doji-bottom-long | LONG | 0% | -$0.25 | 1 | n<5 — watch |
+| pump-chain- | SHORT | 0% | -$0.24 | 1 | n<5 — watch |
+| volume-breakout-long+ | LONG | 0% | -$0.11 | 1 | n<5 — watch |
+| continuation+ | LONG | 0% | -$0.02 | 1 | n<5 — watch |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 68.4% | +$0.37 | 19 (24h) | ACTIVE + ALREADY BOOSTED. Multi-token consistent: SYRUP 3T/100%/+$0.38, BLUR 2T/100%/+$0.49, ALT 2T/100%/+$0.06. 7d: 47T 61.7% +$0.50 / 31 tokens. EXTREME regime blocked (50% WR -$0.15). HIGH 65.4% +$0.38, NORMAL 66.7% +$0.27 kept. No action needed. |
-
-## Regime Breakdown (full history, HAVING >= 3)
-
-### bb-bounce-v3-long+
-| Regime | Trades | Wins | WR | PnL |
-|--------|--------|------|-----|-----|
-| HIGH | 5 | 3 | 60.0% | +$0.08 |
-| NORMAL | 8 | 4 | 50.0% | -$0.01 |
-
-No regime < 50% WR. HIGH wins (60% >= 55% threshold). NORMAL is break-even. No regime block warranted — signal overall not in kill territory.
-
-### bb-squeeze+
-| Regime | Trades | Wins | WR | PnL |
-|--------|--------|------|-----|-----|
-| EXTREME | 12 | 6 | 50.0% | -$0.15 |
-| HIGH | 26 | 17 | 65.4% | +$0.38 |
-| NORMAL | 9 | 6 | 66.7% | +$0.27 |
-
-EXTREME losing — already blocked via volatility_gate_v2.py 0.0x multiplier (line 328) and BB_SQUEEZE_LONG_EXTREME_BLOCK_ENABLED=True. HIGH/NORMAL winning, correctly kept enabled.
+| bb-squeeze+ | LONG | 61.5% | +$0.19 | 13 | Maintained at 1.2x |
+| bb-bounce-v2-long+ | LONG | 100% | +$0.03 | 2 | Healthy |
+| mtf-regime-trend- | SHORT | 100% | +$0.06 | 1 | Healthy |
 
 ## ISSUES
-- **No inversions found** (24h): zero trades where signal name says long but direction=SHORT or vice versa.
-- **Thin sample overall**: only 2 signals have >= 3 closed trades in 24h. Pipeline may be undertrading or many signals blocked by gates. Not necessarily a bug — could be regime/filters doing their job.
-- **bb-squeeze+ 6h cool-off**: 8T 50% WR -$0.19 in last 6h. 3 hard_max_loss exits (CHIP/USELESS/AIXBT ~-1.0% each) + 1 atr_sl_hit (PURR). 24h and 7d still firmly positive. Not actionable — normal variance for a 68% WR signal.
-- **bb-bounce-v3-long+ NORMAL regime at 50%**: break-even, not losing. No action per regime-blocking rules (need < 50% WR to block; HIGH 60% wins so blanket kill inappropriate anyway).
+- **Direction inversions (24h):** none found. Clean.
+- **Freeze conflict:** regime-block for bb-bounce-v3-long+ is the correct action per SOP (HIGH wins ≥55%) but cannot execute until freeze lifts Oct 6 00:38. Already on CEO post-freeze list.
+- **FAMILY_MAP gap (sideways):** `signal_family('bb_bounce_v3_long')` → `'Other'` (underscore form missing from Bollinger list; only hyphen `bb-bounce-v3-long` present). Family-level Bollinger blocks therefore do not apply to the signal_type form. Post-freeze: add `'bb_bounce_v3_long'` to FAMILY_MAP **and** the HIGH:1.0 override together, or the HIGH family Bollinger:0.0 block could kill the winner.
+- **psycopg2 gotcha:** `LIKE '%...%'` inside parameterized queries needs `%%` (or pass pattern as a bound param). `%` is a format placeholder. Hit this during this run; training-system flagged the same class earlier today.
+- **System bleed:** 24h -$1.04 driven almost entirely by bb-bounce-v3-long+ NORMAL losses (-$0.72 of -$1.04).
 
-## Actions Taken This Cycle
-1. Queried brain DB directly for 6h/24h numbers (did not trust prior report).
-2. Checked regime breakdown before any kill consideration.
-3. Checked inversions — clean.
-4. Verified bb-squeeze+ already boosted + EXTREME-blocked (no double-boost).
-5. No kills executed — no signal met criteria.
-6. No boosts executed — only boost candidate already boosted.
-7. No code changes to hermes_constants.py, volatility_gate_v2.py, or signal_compactor.py.
+---
 
-## Recommendation for Next Cycle
-- Monitor bb-bounce-v3-long+ — if 24h WR drops below 30% with 5+ trades AND PnL < -$0.10, re-evaluate. Currently 50% WR -$0.05, far from kill threshold.
-- Watch pump-chain- — 1 trade -$0.24 this cycle but 123 total trades historically. Needs more 24h data before any action.
-- No OpenMemory store performed (task instruction: skip all OpenMemory calls).
+*signal_reporter | DB-verified 2026-10-04 17:13 UTC | OpenMemory skipped (tenant_mismatch per task instructions)*
