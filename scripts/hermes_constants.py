@@ -1049,7 +1049,9 @@ ALT_BTC_DIVERGENCE_LONG_PENALTY = 0.5     # multiplier
 # Layer A: Hard BTC momentum gate — block MOMENTUM signals when BTC flat.
 # Layer B: Gate STANDALONE_BYPASS — prevent bypass when BTC flat.
 BTC_CHOP_GATE_ENABLED = True
-BTC_CHOP_GATE_THRESHOLD = 0.20            # % — |BTC 30m| below this = CHOP (raised from 0.15 2026-09-11 — too many false entries in tight range)
+BTC_CHOP_GATE_THRESHOLD = 0.05            # % — |BTC 5m slope_pct| below this = CHOP
+                                         # FIX 2026-10-04: lowered from 0.20 — 5m per-candle slopes rarely exceed 0.114 (p95).
+                                         # 0.20 threshold read BTC flat ~97% of time. 0.05 matches regime scanner scale.
 CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-only since 2026-09-11, 10 days clean logs
 
 # ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
