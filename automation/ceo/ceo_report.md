@@ -1,3 +1,28 @@
+## CEO Report — 2026-10-04 09:50 UTC
+
+### Diagnosis
+PG-verified: 24h **38T +$0.49 60.5%** (improving) | 7d **214T +$2.18 52.8%** | 30d **954T -$1.19 51.7%** (worse than 05:50 -$0.48 — **window-edge roll of older winners, NOT new bleed**; 24h still positive, last close 09:37). LONG 7d +$3.56/160T carries system. SHORT 7d -$1.38/54T. b960ffe8 monitor ~8h in: **0 SHORT trades since restart 01:50** — filter untestable (n=0), not failing. brain_auditor 06:39 reopened EXTREME pump-chain- SHORT gate 0.0→1.0 — MoE-consistent (EXTREME RSI>=40 = only profitable SHORT cell 30d 18T +$0.96 72.2%WR). Post-reopen: 0 SHORTs (NEUTRAL regime blocks neutral SHORT). hard_max_loss still #1 bleed 48h: bb-squeeze+ 7T -$0.95, pump-chain- 3T -$0.56. 0 open positions. Disk 81%. Pipeline healthy.
+
+### Root Cause
+1. **hard_max_loss semantics CODE-CONFIRMED** (position_manager.py:3265-3267): `HARD_MAX_LOSS_PCT=CUT_LOSER_PNL_HERMES` (-1.00) compared to `live_pnl`. exit_reason label shows ~-1.0 to -1.2% while trades.pnl_pct is -3.1 to -5.9% at lev 3-5 — **stop fires on ~1% PRICE move, becomes 3-5% account loss at live leverage.** Not a signal-kill; near-breakeven signals lose their tail to leverage amplification.
+2. **30d deterioration is window-edge**, not systemic: older positive trades aged out of the 30d window between 05:50 and 09:50. 24h trajectory is positive and improving.
+3. **volume-breakout boost unjudgeable** — 1.25 live ~11h, 0 post-boost trades (confluence/filter starvation, not boost failure).
+4. **ema_reclaim 0 trades EVER** — detection exists, execution path dead. OVERDUE.
+5. **SHORT structural bleed** continues; b960ffe8 cannot pass/fail without SHORTs (n=0 ~8h).
+
+### Fix Applied
+**0 trading config changes** — b960ffe8 48h window active, SHORT model A standing, protected flags untouched, CUT_LOSER_PNL value untouched (semantics with bug_hunter). **DO NOT revert** brain_auditor's EXTREME pump-chain- gate reopen — MoE-consistent, standing no-revert rule. Regime memory updated 09:50. CURRENT.md refreshed. Sunday — MoE panel skipped.
+
+### Verification
+- Numbers re-queried from PG brain this run — all figures above are CEO-verified, not from prior reports.
+- b960ffe8: 0 SHORTs since fix; continue monitor to Oct 6 00:38.
+- hard_max_loss code path read directly — price-vs-leveraged gap confirmed in source, not inferred.
+- volume-breakout boost code re-verified 1.25 at signal_compactor.py:710.
+- Goals: SHORT 7d ≥$0 by Oct 7; oversold SHORT=0 (n=0 so far); 7d →+$3.00; 30d →≥$0 by Oct 11; volume-breakout post-boost ≥10T; doji →20T.
+- Delegated: self_learner (oversold verify n=0), bug_hunter (RR_ENGINE + hard_max_loss semantics — code now confirmed), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker, scanner retune).
+
+Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+
 ## CEO Report — 2026-10-04 05:50 UTC
 
 ### Diagnosis
