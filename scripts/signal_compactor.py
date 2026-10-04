@@ -1607,7 +1607,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     leaderboard_mult = _get_leaderboard_mult(token, direction)
 
     # Token+Signal+Direction combo bonus — winning combos get huge boost
+    # FIX 2026-10-04: also try signal_type — cache keyed by trades.signal (signal_type), not source
     combo_mult = _get_combo_mult(token, source, direction)
+    if combo_mult == 1.0 and signal_type:
+        combo_mult = _get_combo_mult(token, signal_type, direction)
     if combo_mult >= 2.0:
         log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
 
