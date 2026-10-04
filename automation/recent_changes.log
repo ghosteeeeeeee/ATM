@@ -3959,3 +3959,7 @@ DB-verified: 2T last hour bb-squeeze+ +$0.20 (BLUR/ALT trail wins) | 24h 33T 66.
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family 7T -$1.06 | 5 correlated bb-squeeze LONGs | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+DB-verified: 4T last hour bb-squeeze+ -$0.31 (ALT trail +$0.05, AIXBT/USELESS/CHIP hard_max_loss) | 24h 37T 62.2%WR +$0.62 atr_sl_hit 0% | open 1 PURR
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+WATCH: hard_max_loss family 10T -$1.42 | pnl_pct nonsense | signal_version.py still missing
+BY: auto_1hr
