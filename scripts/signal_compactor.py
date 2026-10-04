@@ -1895,6 +1895,23 @@ def _score_signal(token, direction, conf, source, signal_type,
         short_normal_mult = SHORT_NORMAL_PENALTY
         log(f"  📉 [SHORT-NORMAL] {token}: SHORT penalty {SHORT_NORMAL_PENALTY:.2f}x in NORMAL regime")
 
+    # ── SHORT regime gate (CEO 2026-10-04) ──────────────────────────────────
+    # SHORT only fires in EXTREME habitat; NORMAL/HIGH require quality gates.
+    # 30d data: EXTREME +$4.47 (377T 52.5%), NORMAL -$4.49 (232T), HIGH -$2.94 (341T).
+    # Quality gate: confidence >= 75 OR proven SHORT family.
+    if direction.upper() == 'SHORT' and regime in ('NORMAL', 'HIGH'):
+        _short_quality_ok = False
+        # Quality gate: high confidence
+        if conf >= 75:
+            _short_quality_ok = True
+        # Proven SHORT families that work in NORMAL/HIGH
+        _proven_short = ('pump-chain-', 'mover-', 'accel-300-', 'continuum-osc-')
+        if any(p in (source or '') for p in _proven_short):
+            _short_quality_ok = True
+        if not _short_quality_ok:
+            log(f"  🚫 [SHORT-REGIME-GATE] {token} SHORT blocked — {regime} vol regime, no quality gate (conf={conf:.0f}, need>=75 or proven family)")
+            short_normal_mult = 0.0  # Kill score
+
     # ── Continuum Oscillator Multiplier (SHADOW MODE) ──────────────────────
     oscillator_mult = 1.0
     try:
