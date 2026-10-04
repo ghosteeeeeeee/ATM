@@ -2844,14 +2844,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
-            # ── pump-chain+ LONG RSI_MIN filter ────────────────────────────
-            # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers, ZERO winners).
+            # ── pump-chain+ LONG RSI_MIN/MAX filter ─────────────────────────
+            # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers). RSI>=70 = 17T 23.5%WR -$0.58 (dead zone).
+            # RSI 60-70 = 15T 60%WR +$0.72 (sweet spot preserved). MIN was wired; MAX was dead code.
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'LONG':
                 try:
-                    from hermes_constants import PUMP_CHAIN_LONG_RSI_MIN
+                    from hermes_constants import PUMP_CHAIN_LONG_RSI_MIN, PUMP_CHAIN_LONG_RSI_MAX
                     _rsi_val = row[8] if len(row) > 8 else None
                     if _rsi_val is not None and _rsi_val < PUMP_CHAIN_LONG_RSI_MIN:
                         log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
+                        continue
+                    if _rsi_val is not None and _rsi_val > PUMP_CHAIN_LONG_RSI_MAX:
+                        log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
                         continue
                 except ImportError:
                     pass

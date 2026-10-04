@@ -1,171 +1,310 @@
 {
-  "timestamp": "2026-10-04T03:38:53Z",
+  "timestamp": "2026-10-04T04:37:10Z",
   "agent": "brain_auditor",
+  "session_lock": false,
   "session_brain_stats": {
-    "queries_run": [
-      "STANDALONE_BYPASS RSI gate bypass bb-bounce execution",
-      "short signal RSI floor oversold losing filter",
-      "pipeline not running volume-breakout starved scanner",
-      "regime_15m scanner timer stale broken"
-    ],
-    "note": "Session brain hits were mostly historical (b900ffe8 SHORT floors, DRIFT-002, ema_reclaim starvation). No new unimplemented idea surfaced that isn't already delegated."
+    "queries_run": 4,
+    "top_insights": [
+      "exit system = #1 profit leak (recurring, still true)",
+      "SHORT R:R structural disadvantage — RSI floors improving it",
+      "DRIFT-002 exec-time RSI drift still partially open",
+      "signal diversity improving: volume-breakout, bb-squeeze, doji all green",
+      "PUMP_CHAIN_LONG_RSI_MAX was discussed but never wired — dead constant"
+    ]
   },
   "trade_summary_24h": {
-    "closed_24h": "33T -$0.28 60.6%WR",
-    "closed_7d": "203T +$2.13 53.2%",
-    "long_7d": "149T +$3.51 55.7%",
-    "short_7d": "54T -$1.38 46.3%",
-    "hard_max_loss_7d": "33T -$4.35 0%WR (dominant bleed; many from already-killed signals aging out)",
-    "short_post_fix_opens": 0,
-    "short_post_fix_note": "0 SHORT opened since b960ffe8 (2026-10-04 00:38). Oversold-SHORT floor holding.",
-    "open_trades": "2 (ENS LONG bb-bounce-v3 entry_rsi=86.34 pnl~-0.4%; CHIP LONG continuation+ entry_rsi=44.29)",
-    "regime_live": "BTC continuum AT/STRONG_DOWN state_score=28.6 declining, volume DEAD. 15m/4h labels LONG_BIAS lag.",
-    "disk": "76.1% (prune threshold 88%)",
-    "pipeline": "healthy — hermes-pipeline.timer running, signals_runner + decider active. Watchdog 'pipeline not running' was mid-startup false alarm."
+    "trades": 35,
+    "pnl": 0.23,
+    "wr": 60.0,
+    "note": "PG verified. 0 open. Improving from -$0.78 low. bb-squeeze+ 12T +$0.76 83.3%WR dominant."
   },
+  "trade_summary_7d": {
+    "trades": 206,
+    "pnl": 2.37,
+    "wr": 52.9,
+    "long_pnl_note": "LONG carries system. SHORT still negative but improving with RSI floors.",
+    "by_regime": {
+      "EXTREME": {
+        "trades": 89,
+        "wr": 53.9,
+        "pnl": 1.83
+      },
+      "HIGH": {
+        "trades": 58,
+        "wr": 58.6,
+        "pnl": 0.33
+      },
+      "NORMAL": {
+        "trades": 50,
+        "wr": 48.0,
+        "pnl": -0.14
+      },
+      "FLAT": {
+        "trades": 5,
+        "wr": 40.0,
+        "pnl": 0.27
+      }
+    }
+  },
+  "watchdog_steer_audit": [
+    {
+      "steer": "Pipeline down — no signal execution",
+      "verdict": "FALSE / STALE",
+      "evidence": "pipeline.log shows LIVE cycles at 04:31 and 04:35 post-restart. hermes-pipeline.service active. Watchdog snapshot was pre-restart or misread compaction-only cycle."
+    },
+    {
+      "steer": "regime_15m.json 5 months stale — scanner timer broken",
+      "verdict": "TRUE but WRONG FILE",
+      "evidence": "Scanner writes /var/www/hermes/data/regime_5m.json (OUTPUT_FILE line 21) — FRESH 04:30, 117 tokens, LONG_BIAS. regime_15m.json (2026-05-05) is an orphaned legacy path. Timer is healthy (ran 04:30, next 04:45). No fix needed for scanner; optional: delete or redirect stale regime_15m.json."
+    },
+    {
+      "steer": "Verify signal_compactor.py RSI override fix",
+      "verdict": "PARTIALLY ADDRESSED",
+      "evidence": "b960ffe8 fixed continuum_trader + decider_run fail-closed. Post-fix 0 oversold SHORT entries (last was IO Oct 3 21:17 pre-fix). signal_compactor bearish override path not independently re-audited this run — defer to bug_hunter if SHORT RSI<40 appears again."
+    },
+    {
+      "steer": "Do NOT execute pending GOAT LONG RSI 85.11",
+      "verdict": "STALE",
+      "evidence": "0 open trades. GOAT pending signal no longer exists."
+    },
+    {
+      "steer": "Losing signals still funded (pullback-entry-, mover-, pump-chain-, mtf-regime-trend+)",
+      "verdict": "AGING OUT",
+      "evidence": "pullback-entry- last trade Sep 22. mover- last Sep 29. accel-300- killed Oct 1 (ACCEL_300_MINUS_ENABLED=False). mtf-regime-trend+ killed Oct 2. pump-chain- SHORT still live but improving (7d -$0.22 48.6%WR, was worse). Not active bleeds."
+    }
+  ],
   "drift_findings": [
     {
-      "finding": "Watchdog ENS 'skipped then executed anyway' narrative is PARTIALLY WRONG — real failure is detect→entry RSI drift + standalone bypass of conf filter, not a missing RSI check",
-      "evidence": "Log: 19:38:00 CONFLUENCE-GATE-PASS ENS {bb-bounce-v3-long+,rs-s56}; compaction logged LONG RSI 41.0 (sweet spot). 19:38:28 CTX-GATE LLM NAY blocked. 19:39:00 SAFETY-FILTER-BYPASS + PENDING-APPROVE-BYPASS (standalone bb-bounce-v3). 19:39:32 CHASE-BLOCK z=2.70>2.5 fired AFTER mark_signal_executed. 19:40:22 CHASE-BLOCK did NOT fire; CTX-GATE rule-based GO (Hebbian exit_quality profit dominant); ENTERED trade #15887 at entry_rsi_14=86.34, metadata rsi_14=80.81. CONF-FILTER would have blocked conf=98 outside [70,92) but STANDALONE_BYPASS overrode it.",
-      "impact": "ENS open LONG against live continuum STRONG_DOWN. One trade; bb-bounce-v3-long+ 7d 11T 63.6% +$0.13 still ~breakeven.",
-      "severity": "medium"
+      "id": "DRIFT-PUMP-MAX",
+      "severity": "high",
+      "finding": "PUMP_CHAIN_LONG_RSI_MAX=70 defined in hermes_constants.py:1321 but had ZERO enforcement code (0 refs in signal_compactor.py and decider_run.py). Only MIN was wired.",
+      "evidence": "14d pump-chain+ LONG by entry_rsi: RSI>=70 = 17T -$0.58 23.5%WR vs RSI 60-70 = 15T +$0.72 60%WR. Constants comment already documented this dead zone.",
+      "impact": "13 losers +$2.17 avoidable; 4 winners +$1.59 would also be blocked. Net expected +$0.58/14d.",
+      "action": "FIXED this run — MAX check added next to MIN in signal_compactor.py:2857. Pipeline restarted 04:35."
     },
     {
-      "finding": "entry_rsi_14 (DB) ≠ detect/meta rsi_14 — they measure different moments; high ENTRY rsi often = momentum continuation WIN",
-      "evidence": "7d LONG winners with entry_rsi>70 (excl volume-breakout): 22T +$2.64 100%WR. Raw examples: NEO doji entry_rsi=80.80 but meta_rsi=29.17 (won); AIXBT pump-chain-v5 entry=81.82 meta=50.46 (won); ME bb-bounce+vol-breakout meta_rsi=86.36 (won +$0.36). ENS meta_rsi=80.81 (detect already overbought) is the different pattern.",
-      "impact": "Blanket exec-RSI>70 LONG block would kill ~22 winners/7d (+$2.64) to save 13 losers (-$1.28). NET NEGATIVE. Do not apply.",
-      "severity": "high_insight"
+      "id": "DRIFT-002",
+      "severity": "medium",
+      "finding": "Exec-time RSI uses different timeframe (5m) than signal detection (1m). LONG_RSI_CEILING=70 enforced at exec in decider_run.py:1094-1119, but 64 LONG trades with entry_rsi_14>=70 in 14d still exist (mixed: bb-squeeze+ RSI>=80 is 80%WR profitable; pump-chain+/mover+ are not).",
+      "evidence": "ENS bb-bounce-v3 entry_rsi=86.34, NEAR bb-squeeze entry_rsi=87.51 — both post ceiling=70 live date.",
+      "impact": "Signal-specific leak, not universal. bb-squeeze high-RSI is the setup (momentum). pump-chain+/mover+ high-RSI is overbought chase.",
+      "action": "MONITOR. pump-chain+ MAX now enforced at detection. Remaining gap is exec-time vs detect RSI drift on other STANDALONE_BYPASS LONG signals — bug_hunter owns DRIFT-002."
     },
     {
-      "finding": "LONG entry_rsi buckets 7d/30d: 55-70 is BEST band; 40-55 is dead zone — current LONG_RSI_SWEET_SPOT 40-60 is misaligned",
-      "evidence": "7d: 40-55=35T 45.7% -$0.23 | 55-70=42T 64.3% +$2.08 | 70-80=23T 52.2% +$0.50 | 80+=14T 78.6% +$1.22. 30d: 40-55=64T 46.9% -$0.33 | 55-70=87T 59.8% +$3.66 | 80+=41T 51.2% +$1.65. Constants: LONG_RSI_SWEET_SPOT_MIN=40, MAX=60, BOOST=10.",
-      "impact": "Boost window wastes +10 conf on dead 40-55 band and misses best 55-70 band. Suggest shift to 55-70 (boost only, blocks nothing). Needs CEO/T — values in hermes_constants.py.",
-      "severity": "medium"
-    },
-    {
-      "finding": "NULL final_confidence bleed is ALREADY FIXED — not a current hole",
-      "evidence": "NULL conf weekly: Sep21 wk=125T -$5.25 36%WR (peak) → Sep28 wk=3T +$0.08 → 7d only 11T +$0.89 54.5%. Ponytail conf-injection fix worked.",
-      "impact": "Do not re-open NULL-conf as a live problem. Prior creative ideas on this are stale.",
-      "severity": "info"
-    },
-    {
-      "finding": "regime_15m.json 5-month-stale = ORPHAN RED HERRING (watchdog false steer)",
-      "evidence": "15m_regime_scanner.py OUTPUT_FILE=/var/www/hermes/data/regime_5m.json (line 21). regime_5m.json timestamp 2026-10-04T03:30:05 FRESH. Scanner timer runs every 15min, last run 03:30 success. trade_watchdog.py:244 reads regime_5m.json (variable misnamed regime_15m_path). Orphan /var/www/hermes/data/regime_15m.json dated May 5 is legacy nobody reads.",
-      "impact": "No scanner fix needed. Optional hygiene: delete orphan file. Watchdog agent_steers item is a false alarm.",
-      "severity": "low"
-    },
-    {
-      "finding": "Prior run delegated 'pump-chain+ STANDALONE_BYPASS skips PUMP_CHAIN_LONG_RSI_MAX=70' — DATA DOES NOT SUPPORT blocking RSI>70 pump-chain+",
-      "evidence": "7d LONG entry_rsi 80+ = 14T 78.6%WR +$1.22. pump-chain+ ME entered RSI=88.24 won +$0.88. 30d 80+ = 41T 51.2% +$1.65. Blocking would kill winners.",
-      "impact": "Do NOT implement PUMP_CHAIN_LONG_RSI_MAX hard block based on current data. Observability logging (prior creative idea) is still valid; hard block is not.",
-      "severity": "high_insight"
+      "id": "DRIFT-HARD-MAX-LOSS",
+      "severity": "high",
+      "finding": "hard_max_loss family 7d: 33T ALL LOSSES -$4.35, 0% WR. Exit never saves a winner — fires only on already-dead trades at avg -3.89% leveraged PnL.",
+      "evidence": "By signal: pump-chain- SHORT 7T -$0.96, bb-squeeze+ 6T -$0.83, pump-chain-v5 5T -$0.51. CUT_LOSER_PNL=-1.00 is price %; at ~4x lev = -4% account. Semantics bug open with bug_hunter.",
+      "impact": "Dominant 7d bleed concentration. Root cause is ENTRY quality, not exit threshold.",
+      "action": "NO config change this run (semantics owned by bug_hunter; one-change limit used on DRIFT-PUMP-MAX). Creative idea logged: pre-entry MAE budget."
     }
   ],
   "recurring_problems": [
     {
-      "topic": "hard_max_loss dominant bleed",
-      "status": "OPEN — bug_hunter owns semantics (price vs leveraged PnL)",
-      "data": "7d 33T -$4.35 0%WR avg_pct=-3.89. Clusters: pump-chain- SHORT 7T -$0.96 (avg entry_rsi 26.2 — oversold, post-fix should shrink), bb-squeeze+ LONG 6T -$0.83 (avg RSI 72.4 but signal net +$0.39/7d), pump-chain-v5 5T -$0.51 (V5 disabled — aging out), accel-300- 5T (killed).",
-      "note": "Many hard_max_loss losers are pre-kill opens aging out. Active bleed is pump-chain- SHORT (floor now live) + normal SL tail of bb-squeeze+."
+      "topic": "exit system = #1 profit leak",
+      "frequency": "5+ sessions",
+      "current_status": "STILL TRUE — hard_max_loss 33T all-loss 7d. cut-loser/atr paths improved (atr_sl_hit 0% 24h) but hard_max_loss unchanged.",
+      "recommendation": "bug_hunter completes hard_max_loss semantics (price vs leveraged PnL) before any threshold change."
     },
     {
-      "topic": "SHORT bleeding / oversold entries",
-      "status": "IMPROVING — b960ffe8 live 01:50, 0 SHORT opened post-fix",
-      "data": "SHORT 7d -$1.38/54T 46.3%. CEO 30d entry_rsi buckets: <25=24T -$2.86 8.3%WR, >=50=34T +$0.17. Post-floor: 0 oversold SHORT entries. IO RSI=13.46 was pre-fix hole bypass.",
-      "note": "self_learner 48h verification on track. Metric checkpoint 2026-10-07: SHORT 7d >= $0."
+      "topic": "SHORT structural R:R disadvantage",
+      "frequency": "10+ sessions",
+      "current_status": "IMPROVING — SHORT RSI floors live, post-fix 0 oversold SHORT entries. SHORT 7d still -$1.38 but trend positive. SHORT <25 RSI 7d: 14T -$1.75 (pre-fix aging out).",
+      "recommendation": "Hold. Do not re-litigate floors. Metric checkpoint 2026-10-07: SHORT 7d >= $0."
     },
     {
-      "topic": "STANDALONE_BYPASS over-override of safety filters",
-      "status": "RECURRING — ENS case confirms bypass overrides CONF_FILTER ceiling and allowed conf=98 through",
-      "data": "Logs: HOTSET-FINAL-BYPASS, PENDING-APPROVE-BYPASS, SAFETY-FILTER-BYPASS all fired for bb-bounce-v3-long+. CONF-FILTER-PRESERVE correctly blocked conf=98 outside [70,92) then was overridden.",
-      "note": "Conf 92+ is +$1.08/14d (150T 52%WR) so conf-ceiling bypass is not clearly net-negative on PnL. Bypass philosophy is intentional for backtested standalone signals. Monitor, don't rip out."
+      "topic": "exec-time RSI drift (DRIFT-002)",
+      "frequency": "4+ sessions",
+      "current_status": "HOLES 1+2 FIXED (b960ffe8). Timeframe mismatch still open. LONG ceiling enforced at exec but detect stored RSI can differ.",
+      "recommendation": "bug_hunter: align exec RSI timeframe to 1m or store both. brain_auditor: monitor RSI>=70 LONG entries weekly."
     },
     {
-      "topic": "ema_reclaim_long still 0 signals",
-      "status": "DELEGATED signal_analyst (4th time) — NEUTRAL diversity gap",
-      "data": "Built+registered+enabled, shadow never fires. Pipeline logs show Signal ema_reclaim_long: 0 every cycle."
+      "topic": "signal diversity / winning signals starved",
+      "frequency": "6+ sessions",
+      "current_status": "IMPROVING — volume-breakout-long+ 5T 7d +$1.85 80%WR (post-boost), bb-squeeze+ 39T +$0.69 64.1%WR, doji-bottom 8T +$0.39 75%WR, pump-chain+ 8T +$0.95 62.5%WR.",
+      "recommendation": "volume-breakout conf boost already applied 1.25. Monitor to 10T+. doji to 20T for boost. No new boosts this run."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "LONG_RSI_SWEET_SPOT shift 40-60 → 55-70",
-      "status": "suggested this run (see creative_improvements)",
-      "blocker": "hermes_constants.py values need CEO/T"
+      "item": "ema_reclaim_long detection coverage",
+      "status": "BUILT but 0 signals — delegated to signal_analyst",
+      "note": "Registered + ENABLED but never fires. Needs confluence partners or detection fix."
     },
     {
-      "idea": "Exec-time RSI observability logging for STANDALONE_BYPASS LONG",
-      "status": "suggested prior run 02:34, still valid",
-      "blocker": "not built yet"
+      "item": "entry_regime_4h / signal_momentum_state metadata",
+      "status": "STILL ALL NULL",
+      "note": "Would enable regime-conditional blocks. Prior creative idea, unimplemented."
     },
     {
-      "idea": "ema_reclaim_long detection coverage",
-      "status": "delegated signal_analyst",
-      "blocker": "0 signals since deploy"
+      "item": "pump-chain- SHORT velocity filter (mirror of LONG)",
+      "status": "NOT BUILT",
+      "note": "Prior creative idea. pump-chain- SHORT improving with RSI floors — lower priority now."
     },
     {
-      "idea": "hard_max_loss semantics (price vs leveraged PnL)",
-      "status": "delegated bug_hunter",
-      "blocker": "non-trading-path, open"
+      "item": "15m/5m scanner misname",
+      "status": "CONFIRMED this run — file is regime_5m.json (5m data). Name says 15m.",
+      "note": "Cosmetic. Data is fresh and functional. Optional rename."
     }
   ],
   "losing_trade_autopsy": [
     {
-      "losing_trade": "ENS LONG open pnl~-0.4% (trade #15887)",
-      "signal": "bb-bounce-v3-long+ (+rs-s56 confluence)",
-      "regime": "NORMAL entry / live continuum STRONG_DOWN",
-      "root_cause": "Detect RSI was 41 (sweet spot) at compaction; entry RSI 86.34. STANDALONE_BYPASS overrode CONF_FILTER (conf=98). CHASE-BLOCK fired once (z=2.70) then failed to fire next cycle. CTX-GATE GO via Hebbian exit_quality path. Exec-time LONG RSI ceiling either used different TF RSI or fail-opened on stale candles (LONG is fail-open; SHORT fail-closed post b960ffe8).",
-      "entry_check": "Detect meta rsi_14=80.81 stored; compaction logged 41.0 — two RSI sources disagree. Entry chased after RSI spike.",
-      "regime_check": "Continuum AT EMA300, volume dead, state_score 28.6 declining, trend_quality=STRONG_DOWN. Long in dying tape.",
-      "recommended_change": "NO new block. Data: LONG entry_rsi 80+ = 78.6%WR 7d. Observability: log detect vs exec RSI drift for bb-bounce family (prior creative idea). Optional: do not open new bb-bounce longs while continuum state_score<40 (watchdog rec) — that's a regime guard, not RSI.",
-      "impact_on_winners": "Blanket RSI>70 exec block would kill 22 winners/7d +$2.64 vs save 13 losers -$1.28. BAD IDEA. Not applied.",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "24h hard_max_loss cluster (ACE, NEAR, INJ, SUSHI, STX, CRV, etc.)",
-      "signal": "mixed — pump-chain+, bb-squeeze+, pump-chain-, volume-breakout",
-      "regime": "EXTREME/HIGH/NORMAL mixed",
-      "root_cause": "Hard SL exits at ~1% price move (pnl_pct 3-6% at lev 3-5). Several LONG entries at RSI 72-88 (overbought) that dumped. SHORT cluster pre-fix was oversold (IO RSI=13.46). Many trades from signals already killed (accel-300-, pump-chain-v5, mtf-regime-trend+) aging out.",
-      "entry_check": "ACE RSI=73.68 EXTREME, NEAR RSI=87.51 HIGH, SUSHI RSI=73.08 — overbought longs. But same RSI band has winners this week (momentum continuation).",
-      "regime_check": "hard_max_loss 7d concentrated in EXTREME/HIGH vol where 1% wicks are normal.",
-      "recommended_change": "bug_hunter owns hard_max_loss semantics. Creative (prior): volatility-regime-aware hard threshold — in LOW vol 1% is large, in EXTREME it's noise. Not applied this run.",
-      "impact_on_winners": "n/a — no filter change proposed this run",
-      "confidence": "HIGH"
-    },
-    {
-      "losing_trade": "IO pump-chain- SHORT RSI=13.46 -$0.24 (closed 23:16 Oct 3)",
+      "losing_trade": "IO pump-chain- SHORT pnl=-$0.24",
       "signal": "pump-chain-",
       "regime": "EXTREME",
-      "root_cause": "Pre-fix hole bypass (continuum_trader direct HL / decider fail-open). Fixed b960ffe8 committed 00:38 Oct 4, pipeline restarted 01:50.",
-      "entry_check": "RSI 13.46 extreme oversold — shorting falling knife. HARD_FLOOR=25 and FLOOR=40 now live on all paths.",
-      "regime_check": "EXTREME — correct habitat for SHORT per MoE model A, but only when exec RSI>=40.",
-      "recommended_change": "NONE — fix already live. 0 SHORT opens post-fix verifies.",
-      "impact_on_winners": "n/a",
+      "root_cause": "Entered at RSI=13.46 (deep oversold SHORT) — slipped through pre-b960ffe8 hole (continuum_trader direct-HL bypass). NOT a new floor gap.",
+      "entry_check": "entry_rsi_14=13.46, price moved against SHORT to hard_max_loss_-1.03% (entry 0.1672 -> exit 0.1690).",
+      "regime_check": "EXTREME — high volatility, correct habitat but RSI floor should have blocked.",
+      "recommended_change": "NONE — already fixed by b960ffe8 (continuum_trader RSI floor fail-closed).",
+      "impact_on_winners": "Post-fix: 0 SHORT entries with entry_rsi_14<40 in ~3h. Monitor 48h (self_learner).",
       "confidence": "HIGH"
+    },
+    {
+      "losing_trade": "NEAR bb-squeeze+ LONG pnl=-$0.23 + SUSHI bb-squeeze+ LONG pnl=-$0.12",
+      "signal": "bb-squeeze+",
+      "regime": "HIGH/NORMAL",
+      "root_cause": "Entered at RSI 87.51 / 73.08. bb-squeeze RSI>=80 is 80%WR overall — these are variance, not systematic. hard_max_loss at ~-1.15% price (-5% lev) = SL too tight for HIGH-vol squeeze continuation.",
+      "entry_check": "RSI 87.51 and 73.08 — within bb-squeeze's working band (>=80 = 80%WR/14d). Not an overbought-chase pattern for this signal.",
+      "regime_check": "HIGH/NORMAL — squeeze breakouts in HIGH vol have larger initial drawdowns.",
+      "recommended_change": "MONITOR only. Do NOT add RSI ceiling to bb-squeeze — would kill the >=80 band edge (10T 80%WR +$0.25/14d). Consider regime-aware ATR_SL_MULT for bb-squeeze in HIGH if hard_max_loss cluster grows.",
+      "impact_on_winners": "Blanket RSI ceiling=70 on bb-squeeze would block the profitable >=80 band. BAD IDEA.",
+      "confidence": "MEDIUM — sample small for SL-widen suggestion (6T hard_max_loss/7d)"
+    },
+    {
+      "losing_trade": "CRV volume-breakout-long+ LONG pnl=-$0.11",
+      "signal": "volume-breakout-long+",
+      "regime": "HIGH",
+      "root_cause": "RSI=55.70 entry, hard_max_loss_-1.01%. Signal is best-in-class (5T 7d +$1.85 80%WR). Single loss within normal variance post-boost.",
+      "entry_check": "RSI 55.70 — inside sweet spot. Not an entry-quality failure.",
+      "regime_check": "HIGH — acceptable habitat.",
+      "recommended_change": "NONE. Monitor post-boost performance to 10T+.",
+      "impact_on_winners": "N/A — no filter change.",
+      "confidence": "HIGH"
+    },
+    {
+      "losing_trade": "ACE pump-chain+ LONG pnl=-$0.27",
+      "signal": "pump-chain+",
+      "regime": "EXTREME",
+      "root_cause": "RSI=73.68 — overbought chase. PUMP_CHAIN_LONG_RSI_MAX=70 existed but was dead code. hard_max_loss_-1.15%.",
+      "entry_check": "RSI 73.68 > MAX=70. Should have been blocked at detection.",
+      "regime_check": "EXTREME — habitat correct, RSI wrong.",
+      "recommended_change": "FIXED this run — PUMP-CHAIN-RSI-MAX enforcement added to signal_compactor.py.",
+      "impact_on_winners": "14d: blocks 4 winners (+$1.59) and 13 losers (-$2.17). Net +$0.58. 60-70 sweet spot preserved.",
+      "confidence": "HIGH"
+    },
+    {
+      "losing_trade": "ENS bb-bounce-v3-long+ LONG pnl=-$0.04",
+      "signal": "bb-bounce-v3-long+",
+      "regime": "NORMAL",
+      "root_cause": "RSI=86.34 at entry — extreme overbought LONG. LONG_RSI_CEILING=70 should block at exec (decider_run.py:1110-1117) but entry_rsi_14=86.34 stored means exec-time check did not fire or used different RSI value. Exit UNIVERSAL_MAX_HOLD (timeout), small loss.",
+      "entry_check": "RSI 86.34 stored. bb-bounce v3 7d 12T 58.3% +$0.09 — signal itself is marginal-positive.",
+      "regime_check": "NORMAL.",
+      "recommended_change": "No new filter. DRIFT-002 (exec RSI timeframe) remains the root cause — bug_hunter owns. bb-bounce-v3 is not in STANDALONE_BYPASS with a dedicated ceiling exemption, so global LONG_RSI_CEILING=70 should apply.",
+      "impact_on_winners": "Would need exec-RSI fix first before any additional bb-bounce ceiling.",
+      "confidence": "MEDIUM"
     }
   ],
+  "signal_quality_deep_dive": {
+    "signals_under_50wr_14d": [
+      {
+        "signal": "pullback-entry- SHORT",
+        "trades_14d": 16,
+        "wr": 31.3,
+        "pnl": -1.54,
+        "exit_reason": "ALL atr_sl_hit",
+        "entry_rsi_range": "21-69 (mixed)",
+        "status": "AGING OUT — last trade Sep 22. Not currently firing.",
+        "recommendation": "No action. If it re-enforces, require RSI_MIN=40 like pump-chain-."
+      },
+      {
+        "signal": "mover+ LONG",
+        "trades_14d": 8,
+        "wr": 25.0,
+        "pnl": -1.19,
+        "exit_reason": "ALL atr_sl_hit",
+        "entry_rsi_range": "65-83 (overbought)",
+        "status": "Last trade Sep 24. Delegated to signal_analyst (entry quality).",
+        "recommendation": "If re-enabled: RSI_MAX=70 for mover+ LONG. All 8 losers entered at RSI>=65."
+      },
+      {
+        "signal": "mtf-regime-trend+ LONG",
+        "trades_14d": 9,
+        "wr": 44.4,
+        "pnl": -0.46,
+        "exit_reason": "mixed hard_sl / hard_max_loss / trail",
+        "entry_rsi_range": "10-52 (many oversold)",
+        "status": "KILLED Oct 2 15:11. Aging out.",
+        "recommendation": "Do not re-enable without oversold LONG floor (LONG_RSI_FLOOR=20 exists globally)."
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "trades_14d": 68,
+        "wr": 47.1,
+        "pnl": -1.15,
+        "exit_reason": "hard_max_loss dominant (7T -$0.96/7d)",
+        "entry_rsi_range": "7-42 (many oversold — pre-fix)",
+        "status": "ACTIVE but improving. RSI floors live. 7d -$0.22 48.6%WR.",
+        "recommendation": "HOLD. Post-fix oversold entries = 0. Monitor to 2026-10-07."
+      }
+    ],
+    "winner_dna": [
+      "volume-breakout-long+: RSI 46-77, conf 74-102, EXTREME/EXTREME habitat, exits hard_tp/atr_trail/trail_sl. Post-boost 5T 7d +$1.85 80%WR.",
+      "bb-squeeze+ RSI>=80: 10T 14d 80%WR +$0.25. Momentum continuation at high RSI is the setup — do not ceiling-block.",
+      "pump-chain+ RSI<70 EXTREME: 7d 6T 66.7% +$0.34. RSI>=70 was the dead zone (now filtered).",
+      "doji-bottom-long: 8T 7d 75% +$0.39. HIGH habitat historically 88.9%WR."
+    ]
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-04T03:38:53Z",
-      "idea": "Shift LONG_RSI_SWEET_SPOT from 40-60 to 55-70 (boost only — blocks nothing)",
-      "rationale": "7d LONG by entry_rsi: 40-55=35T 45.7%WR -$0.23 (dead) vs 55-70=42T 64.3%WR +$2.08 (best). 30d confirms: 55-70=87T 59.8% +$3.66 best; 40-55=64T 46.9% -$0.33 dead. Current constants LONG_RSI_SWEET_SPOT_MIN=40 MAX=60 BOOST=10 waste the +10 confidence boost on the dead band and miss the winning band. Sample sizes large (42T/87T).",
-      "expected_impact": "Concentrate conf boost on 55-70. Estimated +5-8% WR on boosted LONG entries. No entries blocked.",
+      "date": "2026-10-04T04:37:10Z",
+      "idea": "Pre-entry MAE budget: skip/reduce pump-chain+ LONG when historical MAE(signal, regime, RSI-band) exceeds SL distance",
+      "rationale": "hard_max_loss 7d is 0% WR on 33T — exit never saves a winner. Avg leveraged loss -3.89% vs CUT_LOSER_PNL=-1.00 price %. If we know a signal+regime+RSI-band historically MAEs -1.2% before continuing, entering with 1% hard stop is -EV by construction. Would have blocked ACE RSI=73.68 pump-chain+ (MAE exceeded SL before any win).",
+      "expected_impact": "Convert hard_max_loss exits into either winners (wider initial room) or non-entries (skip). Est. +$0.50-1.00/7d on pump-chain+ / bb-squeeze+ clusters.",
+      "category": "entry sniper / exit quality",
+      "status": "suggested",
+      "risk": "medium — needs MFE/MAE booked per signal+regime (columns exist, may be sparse)"
+    },
+    {
+      "date": "2026-10-04T04:37:10Z",
+      "idea": "volume-percentile gate for pump-chain+ LONG when entry RSI>65",
+      "rationale": "pump-chain+ winners cluster in EXTREME with real volume (ME +$0.88 RSI=88 conf=79). Losers at RSI 70-85 often dead-cat (ATR_SL small losses). A relative-volume gate (e.g. vol >= 1.5x 20-bar avg) at high RSI would separate real pumps from overbought noise. Complements the new RSI_MAX=70 block — catches the 60-70 zone where volume distinguishes.",
+      "expected_impact": "Improve pump-chain+ WR in 60-70 band (currently 60%WR 15T). Est. +3-5% WR.",
       "category": "entry sniper",
       "status": "suggested",
-      "risk": "low — boost only; needs CEO/T for constants change",
-      "impact_on_winners": "n/a — does not block any trade"
+      "risk": "low — additive filter, does not block existing winners below RSI 65"
+    },
+    {
+      "date": "2026-10-04T04:37:10Z",
+      "idea": "Delete or redirect orphaned regime_15m.json (2026-05-05) — scanner writes regime_5m.json",
+      "rationale": "Watchdog (and possibly other agents) read regime_15m.json which is 5 months stale. Scanner has always written regime_5m.json (OUTPUT_FILE line 21). Stale file causes false 'regime stale' alarms and wrong per-coin regime reads.",
+      "expected_impact": "0 PnL. Eliminates false watchdog alarms and prevents agents from acting on May regime data.",
+      "category": "infra/data hygiene",
+      "status": "suggested",
+      "risk": "low — no trading path reads regime_15m.json (verified scanner writes regime_5m.json)"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "timestamp": "2026-10-04T04:37:10Z",
+      "agent": "brain_auditor",
+      "change": "Enforce PUMP_CHAIN_LONG_RSI_MAX=70 in signal_compactor.py pump-chain LONG filter (was dead code — constant defined, zero enforcement)",
+      "type": "code",
+      "file": "scripts/signal_compactor.py",
+      "before": "Only PUMP_CHAIN_LONG_RSI_MIN=35 checked. MAX=70 imported nowhere.",
+      "after": "Both MIN and MAX checked at detection. RSI>70 pump-chain+ LONG blocked with log line PUMP-CHAIN-RSI-MAX.",
+      "rationale": "14d: RSI>=70 = 17T 23.5%WR -$0.58 vs RSI 60-70 = 15T 60%WR +$0.72. Constant already existed with this exact rationale in hermes_constants.py:1321. Wiring dead code = bug fix, not new config value.",
+      "impact": "Expected +$0.58/14d net (blocks 13 losers -$2.17, 4 winners +$1.59). 60-70 sweet spot preserved. Pipeline restarted 04:35 UTC to load."
+    }
+  ],
   "next_actions": [
-    "0 config changes this run — data does not support any. Standing: hermes_constants values need CEO/T.",
-    "SUGGEST to CEO/T: LONG_RSI_SWEET_SPOT 40-60 → 55-70 (boost only). Data: 7d 55-70=64.3%WR +$2.08 vs 40-55=45.7% -$0.23.",
-    "Monitor: oversold SHORT 48h post b960ffe8 — currently 0 opens, fix holding (self_learner).",
-    "DO NOT implement prior delegation 'block pump-chain+ RSI>70' — 7d 80+ LONG = 78.6%WR. Observability logging only.",
-    "Monitor: hard_max_loss 7d — 33T -$4.35. Many pre-kill trades aging out. bug_hunter owns semantics.",
-    "Optional hygiene: delete orphan /var/www/hermes/data/regime_15m.json (May 5). Actual regime source regime_5m.json is fresh.",
-    "Open: ENS LONG 15887 — watchdog recommends exit if price breaks 6.81; live continuum STRONG_DOWN. No config action from auditor.",
-    "DELEGATE signal_analyst: ema_reclaim_long still 0 signals (recurring).",
-    "Metric checkpoint 2026-10-07: SHORT 7d >= $0, oversold SHORT entries = 0.",
-    "Watchdog false steers this run: (1) pipeline not running — false, healthy; (2) regime_15m.json stale — orphan file, real source fresh; (3) 'add RSI floor >50 to all SHORT' — SHORT_RSI_FLOOR=40 already live and working."
+    "MONITOR 48h: zero SHORT entries with entry_rsi_14<40 post b960ffe8 (self_learner). Last oversold SHORT = IO Oct 3 21:17 pre-fix.",
+    "MONITOR: PUMP-CHAIN-RSI-MAX blocks in pipeline.log — expect skip lines when pump-chain+ fires at RSI>70.",
+    "MONITOR: volume-breakout-long+ post-boost conf 1.25 to 10T+ closed (currently 5T 7d +$1.85 80%WR).",
+    "MONITOR: doji-bottom-long to 20T for conf boost (currently 14T/30d, 8T/7d 75%WR).",
+    "DELEGATE bug_hunter: hard_max_loss semantics (price vs leveraged PnL) + RR_ENGINE shadow would-have-blocked → FORCE.",
+    "DELEGATE bug_hunter: DRIFT-002 exec-time RSI timeframe alignment (5m vs 1m).",
+    "DELEGATE signal_analyst: ema_reclaim_long 0-signal coverage + confluence partners.",
+    "OPTIONAL: delete or redirect /var/www/hermes/data/regime_15m.json (orphaned 2026-05-05) to stop false watchdog stale alarms.",
+    "METRIC 2026-10-07: SHORT 7d >= $0. Oversold SHORT entries = 0."
   ]
 }

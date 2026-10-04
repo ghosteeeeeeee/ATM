@@ -770,5 +770,16 @@
     "after": "ACCEL_300_V3_LONG_ENABLED = False",
     "rationale": "CEO post-window monitor item. 39T all-time -$1.41 43.6%WR (EXTREME 34T -$1.49 38.2%). Last trade Sep 7 (26d). EXTRENE/FLAT blocks never covered active NEUTRAL regime.",
     "impact": "Zero live (signal not firing). Prevents future noise when market heats up."
+  },
+  {
+    "timestamp": "2026-10-04T04:37:10Z",
+    "agent": "brain_auditor",
+    "change": "Enforce PUMP_CHAIN_LONG_RSI_MAX=70 in signal_compactor.py pump-chain LONG filter (dead constant wired)",
+    "type": "code",
+    "file": "scripts/signal_compactor.py",
+    "before": "Only PUMP_CHAIN_LONG_RSI_MIN=35 checked; MAX=70 zero enforcement refs",
+    "after": "MIN and MAX both checked at detection; RSI>70 pump-chain+ LONG blocked",
+    "rationale": "14d RSI>=70 = 17T 23.5%WR -$0.58 vs 60-70 = 15T 60%WR +$0.72. Constant existed with this rationale; wiring = bug fix.",
+    "impact": "Net +$0.58/14d expected (13 losers blocked, 4 winners blocked). Pipeline restarted 04:35."
   }
 ]

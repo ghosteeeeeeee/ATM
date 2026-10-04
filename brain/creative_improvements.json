@@ -2354,5 +2354,32 @@
     "risk": "low — boost only; needs CEO/T for constants",
     "impact_on_winners": "n/a — does not block any trade",
     "sample": "7d n=42 (55-70) + n=35 (40-55); 30d n=87 + n=64"
+  },
+  {
+    "date": "2026-10-04T04:37:10Z",
+    "idea": "Pre-entry MAE budget for pump-chain+ / bb-squeeze+ when historical MAE(signal,regime,RSI-band) exceeds SL distance",
+    "rationale": "hard_max_loss 7d = 33T ALL LOSSES -$4.35 0%WR. Exit never saves a winner — entries that MAE past SL before thesis develops are -EV by construction.",
+    "expected_impact": "Est. +$0.50-1.00/7d converting dead hard_max_loss exits into non-entries or wider-room winners.",
+    "category": "entry sniper / exit quality",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-04T04:37:10Z",
+    "idea": "volume-percentile gate for pump-chain+ LONG when entry RSI>65",
+    "rationale": "pump-chain+ winners cluster EXTREME with real volume; RSI 70-85 losers often dead-cat. Relative volume (>=1.5x 20-bar avg) separates real pumps from overbought noise in the 60-70 band.",
+    "expected_impact": "+3-5% WR on pump-chain+ 60-70 band (15T 60%WR currently).",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T04:37:10Z",
+    "idea": "Delete/redirect orphaned regime_15m.json (2026-05-05) — scanner writes regime_5m.json",
+    "rationale": "Stale file causes false watchdog 'regime stale' alarms and wrong per-coin regime reads. Scanner OUTPUT_FILE = regime_5m.json (fresh 04:30, 117 tokens).",
+    "expected_impact": "0 PnL. Eliminates false alarms.",
+    "category": "infra/data hygiene",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
