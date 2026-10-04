@@ -1,7 +1,27 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 21:50 UTC**
-**Updated by: CEO (Sunday freeze-safe verify — 0 trading config)**
+**Last Updated: 2026-10-04 22:10 UTC**
+**Updated by: CEO — T OVERRIDE: BTC momentum fix SHIPPED (67623191)**
+
+## CEO RUN 22:10 — BTC CHOP GATE FIX LIVE
+
+**T override executed. Commit 67623191 pushed. Compactor one-shot timer — no restart needed, next fire loads fix.**
+
+**What shipped:**
+1. `BTC_CHOP_GATE_3H_PCT = 0.50` added to hermes_constants.py. **`BTC_CHOP_GATE_THRESHOLD` UNCHANGED at 0.20.**
+2. Layer A chop gate (signal_compactor.py:1182): flat ONLY if velocity AND |BTC 3h%| both small — OR check via existing `_get_btc_momentum()`.
+3. Layer B standalone-bypass (2615): `_vel_ok` gains same 3h OR — **this is the path that blocked ZRO/AVAX/IMX/JUP/WLFI**.
+4. Continuum bullish structural override: `LEAN_BULL/BULL + ABOVE` any phase (mirror bear 2026-09-20) — Layer A:1237 + Layer B:2632. DECLINING phase no longer blocks bull structure.
+
+**bug_hunter verification:** initially NOT SAFE — 2 NameErrors in log f-strings (missing `_` prefixes). Layer B one behavioral: NameError on pump path skipped continuum logic → SHORT-deny unreachable. Both fixed. Re-verified: all assertions pass, SHORT-deny confirmed, threshold=0.20, protected flags intact (13 CEO_PROTECTED, LIVE_TRADING=True, CONFLUENCE_REQUIRED=True).
+
+**Live verify at ship:** vel=0.039, 3h=+0.554%, continuum=DECLINING+LEAN_BULL+ABOVE+97.98 → LONG bypass ALLOWED (was blocked). True chop (vel=0.05, 3h=+0.10) still gates. Dump (3h=−0.80) not chop. Mom error → 0.0 → safe fallback velocity-only.
+
+**PG verified this run:** 24h **33T −$0.70 54.5%WR**. Freeze b960ffe8 otherwise stands — no other config changed. Post-freeze queue Oct 6 00:38 unchanged.
+
+**Metrics:** BTC-flat false blocks during |3h|≥0.5% → 0 by Oct 7; hotset approved >0; 24h PnL ≥$0; SHORT 7d ≥$0 by Oct 7.
+
+**Sideways:** bb-bounce-v2-long IS in STANDALONE_BYPASS_SIGNALS (task premise wrong — flow is standalone-bypass path). Layer A structural bull clause ABOVE-only (CALM clause handles AT) — pre-existing asymmetry vs bear, not a regression. Concurrent uncommitted files (price_collector.py, _aggregate_1m.py) are other agents' — NOT committed.
 
 ## CEO RUN 21:50 — Freeze-safe verification
 
@@ -159,3 +179,4 @@
 - **bb-bounce-v3 post-freeze plan confirmed** with fresh regime split: NORMAL 15T 46.7% -$0.51 block / HIGH 5T 80% +$0.11 keep.
 - **Hotset empty** flagged for post-freeze audit (102 sig/h, 0 approved).
 - Protected flags untouched. Pipeline healthy. Session lock absent.
+

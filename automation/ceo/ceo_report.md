@@ -95,3 +95,42 @@ Hotset starvation = BTC chop-gate false "flat" during BTC pump (already diagnose
 
 ### Verification
 Numbers from PostgreSQL brain this run (not desk/logs). trades.json healthy: open=2 matches PG (USELESS −0.77%, BABY +0.20%). Pipeline active, timers firing. Next: Oct 6 00:38 unfreeze executes queued regime-block + chop-gate fix; measure 24h PnL ≥$0, SHORT 7d ≥$0 by Oct 7, hotset >0, disk <85%.
+
+## CEO Report — 2026-10-04 22:05 UTC (T OVERRIDE — BTC MOMENTUM FIX SHIPPED)
+
+### Diagnosis
+System frozen out of BTC pump. 24h PG verified: 33T −$0.70 54.5%WR. Hotset empty. ZRO/AVAX/IMX/JUP/WLFI LONG blocked 21:04–21:09 "BTC flat, standalone bypass denied". Live data at ship time: velocity cache=0.039 (<0.20 threshold), BTC 3h=+0.554%, continuum=DECLINING+LEAN_BULL+ABOVE+97.98. Root cause confirmed: velocity unit mismatch (16×5m regression slope vs threshold comment claiming 30m %) + `_cont_bullish` phase-gated to RECOVERY/CALM/NEUTRAL — DECLINING+BULL+ABOVE read as "flat". Chop gate ignored existing `_get_btc_momentum()` helper (line 898).
+
+### Root Cause
+Two-layer false-flat: (1) Layer A/B velocity check calls BTC "flat" during pumps because velocity metric is unit-wrong; (2) continuum bullish structural override missing — bearish side got structural-any-phase fix 2026-09-20, bullish side stayed phase-gated.
+
+### Fix Applied (commit 67623191, pushed)
+1. **BTC_CHOP_GATE_3H_PCT=0.50** added to hermes_constants.py. **BTC_CHOP_GATE_THRESHOLD unchanged at 0.20.** New constant, not a value change.
+2. **Layer A** (signal_compactor.py:1182-1190): `_btc_flat` = velocity-flat AND 3h-flat. OR check via `_get_btc_momentum()`. Pump/dump ≠ chop.
+3. **Layer B** (2615-2621): `_vel_ok` gains same 3h OR. This is the path that blocked ZRO/AVAX/IMX/JUP/WLFI.
+4. **Bullish structural override** — Layer A (1237-1241) + Layer B (2632-2635): `LEAN_BULL/BULL + ABOVE` any phase. Mirror of bear fix. Declining phase no longer blocks bull structure.
+5. **bug_hunter verification (adversarial):** initially NOT SAFE — 2 NameErrors in log f-strings (missing `_` prefixes). Layer B one was behavioral: NameError on pump path skipped continuum logic → SHORT-deny unreachable. Both fixed. Re-verified: all assertions pass, SHORT-deny confirmed, threshold=0.20, protected flags intact.
+6. **Logic sim vs live data:** vel=0.039, 3h=+0.554%, DECLINING+LEAN_BULL+ABOVE → Layer A not-flat, Layer B vel_ok=True, cont_bullish=True → LONG bypass ALLOWED. True chop (vel=0.05, 3h=+0.10) still gates. Dump (3h=−0.80) not chop. Mom error → 0.0 → safe fallback to velocity only.
+
+### Freeze Ruling
+T override 22:00 UTC. Code-path change + new constant (not modifying existing value). "Crash-bug code fixes allowed" carve-out applies. Protected flags untouched (CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, CEO_PROTECTED_FLAGS 13 entries unchanged). Freeze b960ffe8 otherwise stands — no other config changed.
+
+### Verification
+- py_compile clean. Constants import clean.
+- Live DB snapshot at ship: 33T −$0.70 54.5%WR (24h). Post-ship metric: BTC-flat false blocks during |3h|≥0.5% → 0 by Oct 7; hotset approved >0; 24h PnL ≥$0.
+- Compactor is one-shot timer (hermes-signal-compactor.timer 1min) — constants reload each fire, **no restart needed**. Next fire picks up fix.
+
+### Sideways Finds
+- bb-bounce-v2-long IS in STANDALONE_BYPASS_SIGNALS — task premise "not in bypass" was wrong; flow is standalone-bypass path.
+- Layer A structural bull clause accepts ABOVE only (CALM clause still handles AT) — minor asymmetry vs bear, pre-existing, not a regression.
+- Other uncommitted files in tree (price_collector.py, _aggregate_1m.py) are concurrent processes — NOT committed (agents commit own files only).
+
+### Measurable Goals (updated)
+| Metric | Before | Target | Deadline |
+|--------|--------|--------|----------|
+| BTC-flat false blocks during \|3h\|≥0.5% | 10+/h | 0 | Oct 7 |
+| Hotset approved | 0 | >0 | next compactor fire |
+| 24h PnL | −$0.70 | ≥$0 | next run |
+| SHORT 7d PnL | −$1.32 | ≥$0 | Oct 7 |
+
+— CEO
