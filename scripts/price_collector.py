@@ -541,18 +541,20 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
             VALUES (?, ?, ?, ?, ?, ?, 0, 0)
         """, (token, current_window, open_px, high, low, close_px))
 
-    # Prune old candles to prevent table bloat (keep 72h)
+    # Prune old candles to prevent table bloat (keep 30d — FIX 2026-10-04: was 72h)
+    # 30d ≈ 1.4M rows — trivial for SQLite. Enables 5m-based audits/backtests.
     if table == 'candles_5m':
+        _prune_window = 2592000  # 30 days in seconds
         # Prune old closed candles
         candle_cur.execute(f"""
             DELETE FROM {table} WHERE is_closed = 1 AND ts < ?
-        """, (last_closed - 259200,))
+        """, (last_closed - _prune_window,))
         if candle_cur.rowcount > 0:
             print(f'  [{table}] Pruned {candle_cur.rowcount} old closed candles')
         # Prune old developing candles (stale from past runs)
         candle_cur.execute(f"""
             DELETE FROM {table} WHERE is_closed = 0 AND ts < ?
-        """, (last_closed - 259200,))
+        """, (last_closed - _prune_window,))
         if candle_cur.rowcount > 0:
             print(f'  [{table}] Pruned {candle_cur.rowcount} old developing candles')
 

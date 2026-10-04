@@ -1898,7 +1898,9 @@ def _score_signal(token, direction, conf, source, signal_type,
         if conf >= 75:
             _short_quality_ok = True
         # Proven SHORT families that work in NORMAL/HIGH
-        _proven_short = ('pump-chain-', 'mover-', 'accel-300-', 'continuum-osc-')
+        # FIX 2026-10-04: removed pump-chain- (33T -$0.33), accel-300- (8T -$0.34), continuum-osc- (0T unproven)
+        # Only mover- remains (3T +$0.26) — weak evidence but only positive family
+        _proven_short = ('mover-',)
         if any(p in (source or '') for p in _proven_short):
             _short_quality_ok = True
         if not _short_quality_ok:
