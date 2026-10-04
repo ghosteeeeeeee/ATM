@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 01:55 UTC**
-**Updated by: CEO (verified numbers + audit-fix confirmation)**
+**Last Updated: 2026-10-04 05:50 UTC**
+**Updated by: CEO (DB verification + b960ffe8 monitor checkpoint)**
 
 ## Current Status
 
-**PIPELINE ACTIVE. 0 trading config changes this run.** 24h +$0.84/57.6% | 7d +$2.00/52.2% | **30d -$1.72/51.7% (improved from -$2.22)**. SHORT 7d -$1.38 still bleeding; SHORT 30d -$4.02. LONG 7d +$3.38/147T carries system. Regime 100% NEUTRAL (196/201 7d). Disk 82%. Pipeline restarted 01:50 UTC — exec-RSI audit fixes LOADED.
+**PIPELINE ACTIVE. 0 trading config changes this run.** 24h +$0.23/58.8% | 7d +$2.42/53.1% | **30d -$0.48/52.1% (improved from -$1.72)**. SHORT 7d -$1.38 still bleeding; SHORT monitor window ACTIVE (b960ffe8 48h, ends Oct 6 00:38). LONG 7d +$3.80/153T carries system. Regime ~100% NEUTRAL (203/207 7d). Disk 80%. 0 open positions. Pipeline restarted 01:50 UTC — exec-RSI audit fixes LOADED. **b960ffe8 post-fix: 0 SHORT trades since restart — oversold filter untestable (n=0), not failing.**
 
-**PG live (CEO-verified this session):** 30d **959T -$1.72 51.7%WR**. SHORT 30d by entry_rsi_14: **<25=24T -$2.86 8.3%WR**, 25-40=62T -$2.18 41.9%, 40-50=36T -$0.77, **>=50=34T +$0.17 55.9%**, NULL=211T +$1.62 56.4%. Post-floor (since Oct 3 22:11): 1 SHORT closed — IO pump-chain- RSI=13.46 -$0.24 (hole bypass, now fixed). **0 oversold SHORT entries post b960ffe8.**
+**PG live (CEO-verified 05:50 UTC):** 30d **956T -$0.48 52.1%WR**. 7d **207T +$2.42 53.1%** (LONG 153T +$3.80 55.6%, SHORT 54T -$1.38 46.3%). 24h **34T +$0.23 58.8%** (LONG 30T +$0.34 63.3%, SHORT 4T -$0.11 25%). Daily: Oct2 +$0.73, Oct3 +$1.15, Oct4 +$0.47 (8T 75% so far). hard_max_loss 48h **18T -$3.08** avg_pct -4.56 avg_lev 4.3 — dominant bleed, stop working, semantics open with bug_hunter. PRE_FIX Oct3-4 SHORT: 6T -$0.06, 5/6 entry_rsi<40.
 
 ## Bug-Hunter Audit Result (landed this session)
 
@@ -25,32 +25,34 @@
 3. **Frequency = B:** fix edge first; raise entry bar only if fee drag still dominates after 48h; reject size-up.
 4. **Philosophy = A (amended):** "every dump is a SHORT opportunity **only when not oversold** (exec RSI>=40, regime habitat)". **T must acknowledge before AGENTS.md rewrite.**
 
-**Delegated:** bug_hunter (RR_ENGINE shadow analysis — holes 1+2 DONE), self_learner (48h zero-oversold-SHORT verification post b960ffe8), signal_analyst (scanner retune + EXTREME SHORT habitat memory + ema_reclaim coverage).
+**Delegated:** bug_hunter (RR_ENGINE shadow analysis — holes 1+2 DONE, shadow numbers still pending), self_learner (48h zero-oversold-SHORT verification post b960ffe8 — n=0 SHORTs so far), signal_analyst (scanner retune + EXTREME SHORT habitat memory + ema_reclaim coverage + doji execution path + coin_tracker Wyckoff).
 
 **Metric checkpoint 2026-10-07:** SHORT 7d ≥ $0, oversold SHORT entries = 0.
 
-## Measurable Goals (CEO 2026-10-04 01:55 UTC)
+## Measurable Goals (CEO 2026-10-04 05:50 UTC)
 
 | Metric | Current | Target | Deadline |
 |--------|---------|--------|----------|
 | SHORT 7d PnL | -$1.38 | ≥ $0 | 2026-10-07 |
-| Oversold SHORT entries (exec RSI<40) post-fix | 1 pre-fix (IO) | 0 | 48h |
-| 7d PnL | +$2.00 | +$3.00 | 48h |
-| 30d PnL | -$1.72 | ≥ $0 | 7d |
-| volume-breakout post-boost WR | 1T closed (pre-boost open) | ≥60% | 7d |
-| doji-bottom-long trades | 14T/30d | 20T (conf boost) | 7d |
+| Oversold SHORT entries (exec RSI<40) post-fix | n=0 SHORTs since fix | 0 (monitor) | Oct 6 00:38 |
+| 7d PnL | +$2.42 | +$3.00 | 48h |
+| 30d PnL | -$0.48 | ≥ $0 | 7d |
+| volume-breakout post-boost trades | 0 opened post-boost | ≥10 with ≥60% WR | 7d |
+| doji-bottom-long trades | 14T/30d (detection live, 0 exec) | 20T (conf boost) | 7d |
+| ema_reclaim_long trades | 0 EVER | >0 in shadow | 7d |
 
 ## Automation Actions Today (verified in code/logs)
 
-- **🟢 CEO 01:55 0 CONFIG** — verified DB numbers, confirmed b960ffe8 loaded (pipeline restart 01:50), regime memory updated, CURRENT.md refreshed. Protected flags untouched.
+- **🟢 CEO 05:50 0 CONFIG** — DB verification, b960ffe8 monitor checkpoint (0 SHORTs since fix), regime memory updated (doji regime corrected NEUTRAL), CURRENT.md refreshed. Protected flags untouched. Sunday MoE skipped.
+- **🟢 CEO 01:55 0 CONFIG** — verified DB numbers, confirmed b960ffe8 loaded, regime memory updated.
 - **🟢 bug_hunter 00:38 CODE** — exec-RSI audit holes 1+2 fixed (b960ffe8). continuum_trader RSI floor + decider_run fail-closed.
-- **🟢 auto_1hr (prior) 22:11 CONFIG** — volume-breakout boost 1.15→1.25 APPLIED at signal_compactor.py:709.
+- **🟢 auto_1hr (prior) 22:11 CONFIG** — volume-breakout boost 1.15→1.25 APPLIED at signal_compactor.py:709 (re-verified 05:50).
 
 ## Standing Decisions (do not re-litigate)
 
 - **SIGNAL KILL POLICY:** regime-block via volatility_gate_v2 if wins in ANY regime. Blanket-kill ONLY if loses in ALL regimes.
 - **SHORT ENTRY MODEL (2026-10-04):** exec RSI>=40 all paths; EXTREME habitat; NEUTRAL blocked. MoE panel + DB-verified.
-- **0 config changes when monitor windows active.** None active now.
+- **0 config changes when b960ffe8 48h monitor active** (until Oct 6 00:38).
 - **volume-breakout conf boost 1.15→1.25 APPLIED** 22:11 Oct 3.
 - **RR_ENGINE_SHADOW=True stays until shadow audit numbers exist** — do not blind-force.
 - **STANDALONE_BYPASS shrink-to-6 REJECTED** — incremental prune only.
@@ -68,16 +70,16 @@
 
 ## Monitor List (next 48h)
 
-1. **ZERO oversold SHORT entries** 48h post b960ffe8 (self_learner) — query entry_rsi_14 AND exec RSI.
+1. **ZERO oversold SHORT entries** 48h post b960ffe8 (self_learner) — query entry_rsi_14 AND exec RSI. **Status 05:50: n=0 SHORTs since fix — cannot pass/fail yet.**
 2. **SHORT 7d PnL ≥ $0 by 2026-10-07.**
-3. volume-breakout-long+ post-boost live performance (conf 1.25) — need 10+ trades.
+3. volume-breakout-long+ post-boost live performance (conf 1.25) — need first post-boost trade, then 10+.
 4. **RR_ENGINE shadow would-have-blocked analysis** (bug_hunter) — FORCE on/off with numbers.
 5. 15m/5m scanner retune (signal_analyst).
-6. doji-bottom-long → 20T for conf boost.
-7. hard_max_loss semantics — price vs leveraged PnL (bug_hunter, non-trading-path).
-8. mover+ entry quality (signal_analyst).
-9. ema_reclaim_long 0 signals — coverage + partners (signal_analyst).
-10. Disk 82% — prune at 88%.
+6. doji-bottom-long → 20T for conf boost — detection live, execution path needs work.
+7. hard_max_loss semantics — price vs leveraged PnL (bug_hunter, non-trading-path). 48h 18T -$3.08 confirmed.
+8. mover+ entry quality (signal_analyst) — not firing since Sep 24.
+9. ema_reclaim_long 0 signals executed — coverage + partners (signal_analyst) — OVERDUE.
+10. Disk 80% — prune at 88%.
 11. ORPHAN_PAPER BTC amount=0 hygiene.
 12. DRIFT-002 — exec-time RSI timeframe (bug_hunter owns; holes 1+2 closed).
 13. HL API key reminder in AGENTS.md STALE — T: verify/correct.
@@ -88,21 +90,23 @@
 ## Backlog / Delegated (not orchestrator's call)
 
 - **DELEGATE bug_hunter:** RR_ENGINE shadow-block 7d would-have-blocked analysis → FORCE recommendation with numbers. (holes 1+2 DONE)
-- **DELEGATE bug_hunter:** fees JSON vs pnl_usdt accounting gap.
-- **DELEGATE self_learner:** 48h verification — zero SHORT entries with entry_rsi_14<40 post b960ffe8.
+- **DELEGATE bug_hunter:** fees JSON vs pnl_usdt accounting gap + hard_max_loss semantics (48h 18T -$3.08).
+- **DELEGATE self_learner:** 48h verification — zero SHORT entries with entry_rsi_14<40 post b960ffe8. **Status: n=0 SHORTs since fix 01:50.**
 - **DELEGATE signal_analyst:** retune 15m/5m scanner thresholds; snapshot EXTREME+RSI>=40 SHORT habitat.
-- **DELEGATE signal_analyst:** ema_reclaim_long detection coverage + confluence partners.
+- **DELEGATE signal_analyst:** ema_reclaim_long detection coverage + confluence partners — 0 trades EVER, OVERDUE.
+- **DELEGATE signal_analyst:** doji-bottom execution path — detection works (10 signals/24h), 0 executed (starvation).
 - **DELEGATE signal_analyst:** mover+ entry quality — deep atr_sl_hit at high conf.
 - **DELEGATE signal_analyst:** coin_tracker Wyckoff/phase-transition signal (1/week min).
 - **T ack required:** AGENTS.md philosophy amendment (conditioned SHORT rule).
 - **bollinger_squeeze SHORT side** — research PASS historically but OFF until SHORT R:R fixed.
 - **bugs.json OPEN** — coin_tracker/backfill — not trading-path.
 
-## Orchestrator / CEO Report (2026-10-04 01:55 UTC)
+## Orchestrator / CEO Report (2026-10-04 05:50 UTC)
 
-- **0 trading config changes** — verification + memory run.
-- **VERIFIED all numbers from PG directly.** 30d **-$1.72/51.7%** (improved +$0.50 from -$2.22). 7d +$2.00/52.2%. 24h +$0.84/57.6%. SHORT 7d -$1.38, SHORT 30d -$4.02.
-- **Daily trend improving:** Sep 29 -$1.13 → Oct 2 +$0.73 → Oct 3 +$1.15.
-- **bug_hunter delivered:** b960ffe8 exec-RSI holes 1+2 (continuum_trader + decider_run fail-closed). Pipeline restarted 01:50 — LIVE. IO RSI=13.46 root-caused to pre-fix hole.
-- **accel_300_v3_long already ENABLED=False** (Oct 3 post-window) — stale monitor item removed.
-- **Protected flags untouched.** MoE decisions standing.
+- **0 trading config changes** — b960ffe8 48h monitor active. Sunday MoE skipped.
+- **VERIFIED all numbers from PG directly.** 30d **-$0.48/52.1%** (improved +$1.24 from -$1.72). 7d +$2.42/53.1%. 24h +$0.23/58.8%. SHORT 7d -$1.38, LONG 7d +$3.80.
+- **b960ffe8 checkpoint:** 0 SHORT trades since pipeline restart 01:50. PRE_FIX 6T SHORT Oct3-4, 5/6 oversold. Filter untestable without SHORTs — monitor continues, not a failure signal.
+- **hard_max_loss 48h 18T -$3.08** — bb-squeeze+ 5T, pump-chain- 4T, pump-chain+ 2T; stop cutting ~1% price at lev 3-5. Semantics open with bug_hunter.
+- **Regime memory corrected:** doji-bottom all NEUTRAL (prior HIGH claim stale — no HIGH regime in market).
+- **volume-breakout boost re-verified** 1.25 in code; 0 post-boost trades yet.
+- **Protected flags untouched.** MoE decisions standing. Session lock absent.

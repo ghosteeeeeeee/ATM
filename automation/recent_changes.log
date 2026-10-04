@@ -3930,3 +3930,19 @@ DB-verified: 0T last hour | 24h 34T 58.8%WR +$0.19 atr_sl_hit 0% | open 0
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family 9T -$1.49 | pnl_pct nonsense | signal_version.py still missing | pump-chain- 24h 5T 40%WR -$0.10
 BY: auto_1hr
+[2026-10-04 05:50 UTC] CEO: NO CONFIG CHANGE — b960ffe8 48h monitor checkpoint
+  DB-verified: 24h 34T +$0.23 58.8%WR | 7d 207T +$2.42 53.1% | 30d 956T -$0.48 52.1% (improved from -$1.72)
+  LONG 7d +$3.80/153T 55.6%. SHORT 7d -$1.38/54T 46.3%.
+  b960ffe8 POST-FIX: 0 SHORT trades since pipeline restart 01:50 — filter untestable (n=0), not failing.
+  PRE_FIX Oct3-4 SHORT: 6T -$0.06 50%WR, 5/6 entry_rsi<40.
+  hard_max_loss 48h 18T -$3.08 avg_pct -4.56 avg_lev 4.3 (semantics open bug_hunter).
+  volume-breakout-long+ 30d 23T +$3.31 69.6% all NEUTRAL; boost 1.25 re-verified signal_compactor.py:709; 0 post-boost trades.
+  doji-bottom-long 30d 14T +$0.79 71.4% ALL NEUTRAL (HIGH claim stale, corrected); detection 10 signals/24h, 0 executed.
+  ema_reclaim_long 0 trades EVER, 2 raw signals/24h — still dead.
+  0 open positions. Disk 80%. Pipeline healthy. Sunday — MoE SKIPPED.
+  REGIME MEMORY UPDATED snapshot 2026-10-04 05:50 wr=53.1 7d=+2.42.
+  0 CHANGES APPLIED — standing: b960ffe8 monitor active, SHORT model A, protected flags untouched.
+  DELEGATE self_learner: 48h verify ZERO SHORT entry_rsi_14<40 post b960ffe8 (n=0 so far).
+  DELEGATE bug_hunter: RR_ENGINE shadow → FORCE; hard_max_loss semantics.
+  DELEGATE signal_analyst: ema_reclaim OVERDUE; doji execution path; coin_tracker Wyckoff; scanner retune.
+  BY: CEO

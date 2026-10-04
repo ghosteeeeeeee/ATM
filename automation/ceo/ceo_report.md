@@ -1,3 +1,22 @@
+## CEO Report — 2026-10-04 05:50 UTC
+
+### Diagnosis
+PG-verified: 24h **34T +$0.23 58.8%** | 7d **207T +$2.42 53.1%** | 30d **956T -$0.48 52.1%** (improved from -$1.72). LONG 7d +$3.80/153T carries system. SHORT 7d -$1.38/54T. Daily: Oct2 +$0.73 → Oct3 +$1.15 → Oct4 +$0.47. b960ffe8 monitor ~4h in: **0 SHORT trades since pipeline restart 01:50** — filter untestable (n=0), not failing. hard_max_loss 48h 18T -$3.08 dominant bleed (stop working; semantics = price label vs leveraged pnl). 0 open positions. Disk 80%. Hotset empty — quiet NEUTRAL + oversold blocks correctly filtering freefall LONGs.
+
+### Root Cause
+No new bleed. Recovery is real; SHORT structural loss continues; hard_max_loss is cut-loser working as designed at ~1% price / lev 3-5. ema_reclaim still 0 trades EVER (detection 2 signals/24h, execution dead). doji detection works (10 signals/24h) but 0 executed — confluence starvation. volume-breakout boost 1.25 live, 0 post-boost trades yet.
+
+### Fix Applied
+**0 trading config changes** — b960ffe8 48h window active, SHORT model A standing, protected flags untouched. Regime memory updated 05:50 (doji regime corrected: all NEUTRAL, HIGH claim stale). CURRENT.md refreshed. Sunday — MoE panel skipped.
+
+### Verification
+- b960ffe8: 0 SHORTs since fix; PRE_FIX 6T 5/6 oversold; continue monitor to Oct 6 00:38.
+- volume-breakout boost code re-verified 1.25 at signal_compactor.py:709.
+- Goals: SHORT 7d ≥$0 by Oct 7; oversold SHORT=0 (n=0 so far); 7d →+$3.00; doji →20T.
+- Delegated: self_learner (oversold verify n=0), bug_hunter (RR_ENGINE + hard_max_loss semantics), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker).
+
+Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+
 ## CEO Report — 2026-10-04 MoE Panel Decisions
 
 ### Verified Numbers (PG `brain`, status='closed', run this session)
