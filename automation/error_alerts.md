@@ -722,3 +722,13 @@
 
 ## Error Alerts — 2026-10-04 14:59 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-04 16:48 UTC
+- **HEALTH** — Pipeline OK: LIVE cycle #228493 at 16:45:52, active. Portfolio (trades.json source of truth): **1 open | 21 closed today | -0.54 USDT PnL** (NXPC LONG bb-bounce-v3-long+, entry 0.23583, -0.77%). Signals (1h): 82 raw (31 LONG / 48 SHORT). Regime: SHORT_BIAS (12L / 55S / 50N, regime_5m.json ts 16:45). Speeds: 127/241 (52.7%) ≥50th pct. Prices fresh: latest_prices 70s, candles_1m 209s, trades.json 20s, signals.json 78s, regime_5m 120s. Disk **83%** (under 85%). Phantom trades (|pnl_pct|<0.01, 24h): 0. Services active: hermes-pipeline, hermes-hl-sync-guardian. Core timers firing (pipeline 1m, price-collector 30s, signal-compactor 1m, pump-hunter, 1m-candle, watchdog, coin-tracker, regime scanners).
+- **WARN** (known, recurring, non-trading-path): `signal_outcomes` open=0 / closed-today=21 vs portfolio open=1 / closed-today=21 — outcomes table partial; portfolio source of truth = trades.json + position_manager (per AGENTS.md). Phantom-type rows in outcomes are historical signal labels, not live phantoms.
+- **WARN** (known, non-trading-path dead timers): `hermes-atr-sl-updater.timer` not-found; `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` inactive (OnBootSec-only by design). Regime scanners (4h/15m) active and firing. ATR SL/TP managed via position_manager/guardian.
+- **WARN** (known, non-trading-path failed units, unchanged): better-coder, bug-hunter (expected FAILs), git-release (dirty tree), mtf-macd-tuner, trading-checklist, weather-station-api. None on execution path. `hermes-better-coder-health` last pass 5h+ ago (daily 06:00 schedule).
+- **WARN** (known, non-trading-path): `hermes-price-collector.service` sqlite3 "database is locked" during candle aggregation — systemd auto-restarts; prices still fresh. Code-level fix still pending (PRAGMA busy_timeout + serialize candle writers).
+- **INFO**: today PnL -0.54 USDT on 21 closed (11 wins ≈ 52%) — trading performance, not system health. 24h outcomes: 30 closed, -0.94 USDT, 16 wins. Exit reasons 24h: mostly null (raw), 2 profit-monster-trail, 1 hard_max_loss.
+- **INFO**: token_speeds `is_stale=1` on 94/241 but `updated_at` fresh (16:46) — flag means no recent price move, not data staleness (recurring).
+- **AUTO-FIXES APPLIED**: none. Pipeline running; prices fresh; disk 83% under threshold; no crashes; no missed trading-path timers; signals flowing (82/h). No restarts or cleanups forced.
