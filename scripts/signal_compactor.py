@@ -32,6 +32,7 @@ from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, STATIC_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
+from rsi_utils import compute_rsi
 
 from hermes_log import log
 # ── Market Phase Gate & Confluence Scorer ──────────────────────────────────────
@@ -3582,60 +3583,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Catches pump-chain+, doji-bottom-long, mover+ entering LONG when RSI is oversold.
             # Blocks 7 losers ($1.45), 0 winners ($0). Net: +$1.32/14d = +$0.66/7d.
             if direction == 'LONG' and LONG_RSI_FLOOR > 0:
-                _conn_lrf = None
                 try:
-                    _conn_lrf = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_lrf = _conn_lrf.cursor()
-                    _cur_lrf.execute("""
-                        SELECT close FROM candles_5m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 15
-                    """, (tkn.upper(),))
-                    _lrf_closes = [r[0] for r in _cur_lrf.fetchall()]
-                    if len(_lrf_closes) >= 15:
-                        _lrf_deltas = [_lrf_closes[i] - _lrf_closes[i+1] for i in range(len(_lrf_closes)-1)]
-                        _lrf_gains = [d if d > 0 else 0 for d in _lrf_deltas[-14:]]
-                        _lrf_losses = [-d if d < 0 else 0 for d in _lrf_deltas[-14:]]
-                        _lrf_ag = sum(_lrf_gains) / 14
-                        _lrf_al = sum(_lrf_losses) / 14
-                        if _lrf_al > 0:
-                            _lrf_rsi = 100 - (100 / (1 + _lrf_ag / _lrf_al))
-                            if _lrf_rsi < LONG_RSI_FLOOR:
-                                log(f"  🚫 [LONG-RSI-FLOOR] {tkn}: LONG blocked — RSI {_lrf_rsi:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)")
-                                continue
+                    _lrf_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lrf_rsi is not None and _lrf_rsi < LONG_RSI_FLOOR:
+                        log(f"  🚫 [LONG-RSI-FLOOR] {tkn}: LONG blocked — RSI {_lrf_rsi:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)")
+                        continue
                 except Exception:
                     pass  # non-fatal
-                finally:
-                    if _conn_lrf:
-                        try:
-                            _conn_lrf.close()
-                        except Exception:
-                            pass
             # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
             # 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
             # Does NOT block — only boosts. Trades already pass MIN_EXEC_CONFIDENCE.
             if direction == 'LONG' and LONG_RSI_SWEET_SPOT_BOOST > 0:
                 try:
-                    _conn_lss = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_lss = _conn_lss.cursor()
-                    _cur_lss.execute("""
-                        SELECT close FROM candles_5m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 15
-                    """, (tkn.upper(),))
-                    _lss_closes = [r[0] for r in _cur_lss.fetchall()]
-                    _conn_lss.close()
-                    if len(_lss_closes) >= 15:
-                        _lss_deltas = [_lss_closes[i] - _lss_closes[i+1] for i in range(len(_lss_closes)-1)]
-                        _lss_gains = [d if d > 0 else 0 for d in _lss_deltas[-14:]]
-                        _lss_losses = [-d if d < 0 else 0 for d in _lss_deltas[-14:]]
-                        _lss_ag = sum(_lss_gains) / 14
-                        _lss_al = sum(_lss_losses) / 14
-                        if _lss_al > 0:
-                            _lss_rsi = 100 - (100 / (1 + _lss_ag / _lss_al))
-                            if LONG_RSI_SWEET_SPOT_MIN <= _lss_rsi <= LONG_RSI_SWEET_SPOT_MAX:
-                                entry['confidence'] = min(entry.get('confidence', 50) + LONG_RSI_SWEET_SPOT_BOOST, 100)
-                                log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {_lss_rsi:.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence")
+                    _lss_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lss_rsi is not None and LONG_RSI_SWEET_SPOT_MIN <= _lss_rsi <= LONG_RSI_SWEET_SPOT_MAX:
+                        entry['confidence'] = min(entry.get('confidence', 50) + LONG_RSI_SWEET_SPOT_BOOST, 100)
+                        log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {_lss_rsi:.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence")
                 except Exception:
                     pass  # non-fatal
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──
@@ -3645,62 +3608,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # = short per philosophy). RSI>75 (HARD_CEILING) always blocked — no exemption.
             if direction == 'SHORT' and SHORT_RSI_CEILING > 0:
                 from hermes_constants import SHORT_RSI_HARD_CEILING
-                _conn_rsc = None
                 try:
-                    _conn_rsc = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_rsc = _conn_rsc.cursor()
-                    _cur_rsc.execute("""
-                        SELECT close FROM candles_1m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 15
-                    """, (tkn.upper(),))
-                    _rsc_closes = [r[0] for r in _cur_rsc.fetchall()]
-                    if len(_rsc_closes) >= 15:
-                        _rsc_deltas = [_rsc_closes[i] - _rsc_closes[i+1] for i in range(len(_rsc_closes)-1)]
-                        _rsc_gains = [d if d > 0 else 0 for d in _rsc_deltas[-14:]]
-                        _rsc_losses = [-d if d < 0 else 0 for d in _rsc_deltas[-14:]]
-                        _rsc_ag = sum(_rsc_gains) / 14
-                        _rsc_al = sum(_rsc_losses) / 14
-                        if _rsc_al > 0:
-                            _rsc_rsi = 100 - (100 / (1 + _rsc_ag / _rsc_al))
-                            if _rsc_rsi > SHORT_RSI_CEILING:
-                                # Hard ceiling: RSI>75 always blocked
-                                if SHORT_RSI_HARD_CEILING > 0 and _rsc_rsi > SHORT_RSI_HARD_CEILING:
-                                    log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_HARD_CEILING} (hard ceiling — no bear exemption)")
-                                    continue
-                                # RSI 65-75: bear-structure-gated exemption
-                                _rsc_bearish = False
-                                try:
-                                    import os as _rsc_os
-                                    _rsc_cont = sqlite3.connect(_rsc_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                                    try:
-                                        _rsc_row = _rsc_cont.execute(
-                                            "SELECT market_phase, linreg_direction, ema300_position "
-                                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                                        ).fetchone()
-                                    finally:
-                                        _rsc_cont.close()
-                                    if _rsc_row:
-                                        _rsc_phase, _rsc_linreg, _rsc_ema = _rsc_row
-                                        if (_rsc_linreg in ('BEAR', 'LEAN_BEAR') or
-                                                _rsc_phase in ('DECLINING', 'STORMY') or
-                                                _rsc_ema == 'BELOW'):
-                                            _rsc_bearish = True
-                                except Exception:
-                                    pass
-                                if _rsc_bearish:
-                                    log(f"  ✅ [SHORT-RSI-CEILING-OVERRIDE] {tkn}: SHORT allowed — RSI {_rsc_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)")
-                                else:
-                                    log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_CEILING} (overbought)")
-                                    continue
-                except Exception:
-                    pass  # non-fatal
-                finally:
-                    if _conn_rsc:
+                    _rsc_rsi = compute_rsi(tkn, tf='1m', max_age_s=900)
+                    if _rsc_rsi is not None and _rsc_rsi > SHORT_RSI_CEILING:
+                        # Hard ceiling: RSI>75 always blocked
+                        if SHORT_RSI_HARD_CEILING > 0 and _rsc_rsi > SHORT_RSI_HARD_CEILING:
+                            log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_HARD_CEILING} (hard ceiling — no bear exemption)")
+                            continue
+                        # RSI 65-75: bear-structure-gated exemption
+                        _rsc_bearish = False
                         try:
-                            _conn_rsc.close()
+                            import os as _rsc_os
+                            _rsc_cont = sqlite3.connect(_rsc_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _rsc_row = _rsc_cont.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position "
+                                    "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _rsc_cont.close()
+                            if _rsc_row:
+                                _rsc_phase, _rsc_linreg, _rsc_ema = _rsc_row
+                                if (_rsc_linreg in ('BEAR', 'LEAN_BEAR') or
+                                        _rsc_phase in ('DECLINING', 'STORMY') or
+                                        _rsc_ema == 'BELOW'):
+                                    _rsc_bearish = True
                         except Exception:
                             pass
+                        if _rsc_bearish:
+                            log(f"  ✅ [SHORT-RSI-CEILING-OVERRIDE] {tkn}: SHORT allowed — RSI {_rsc_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)")
+                        else:
+                            log(f"  🚫 [SHORT-RSI-CEILING] {tkn}: SHORT blocked — RSI {_rsc_rsi:.1f} > {SHORT_RSI_CEILING} (overbought)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
             # ── LONG RSI ceiling: block LONG at extreme overbought (pullback risk) ──
             # Mirror of SHORT_RSI_CEILING — prevents LONGing into overextension.
             # 30d: RSI>80 LONG = 4T 50%WR -$0.22. WCT RSI=98.86 -$0.15 (caught).
@@ -3747,38 +3688,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _lrc_bullish_override = True
                 except Exception:
                     pass
-                _conn_lrc = None
                 try:
-                    _conn_lrc = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_lrc = _conn_lrc.cursor()
-                    _cur_lrc.execute("""
-                        SELECT close FROM candles_1m
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 15
-                    """, (tkn.upper(),))
-                    _lrc_closes = [r[0] for r in _cur_lrc.fetchall()]
-                    if len(_lrc_closes) >= 15:
-                        _lrc_deltas = [_lrc_closes[i] - _lrc_closes[i+1] for i in range(len(_lrc_closes)-1)]
-                        _lrc_gains = [d if d > 0 else 0 for d in _lrc_deltas[-14:]]
-                        _lrc_losses = [-d if d < 0 else 0 for d in _lrc_deltas[-14:]]
-                        _lrc_ag = sum(_lrc_gains) / 14
-                        _lrc_al = sum(_lrc_losses) / 14
-                        if _lrc_al > 0:
-                            _lrc_rsi = 100 - (100 / (1 + _lrc_ag / _lrc_al))
-                            if _lrc_rsi > _dynamic_ceiling:
-                                if _lrc_bullish_override:
-                                    log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
-                                else:
-                                    log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
-                                    continue
+                    _lrc_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lrc_rsi is not None and _lrc_rsi > _dynamic_ceiling:
+                        if _lrc_bullish_override:
+                            log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
+                        else:
+                            log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
+                            continue
                 except Exception:
                     pass  # non-fatal
-                finally:
-                    if _conn_lrc:
-                        try:
-                            _conn_lrc.close()
-                        except Exception:
-                            pass
             # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──
             # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
             # 7d: 17T 41.2%WR -$1.05. Other zones: 162T 57.8%WR +$3.77.
