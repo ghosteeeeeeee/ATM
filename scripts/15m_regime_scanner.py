@@ -156,13 +156,15 @@ def calculate_r2(candles, slope):
 def determine_regime(slope_pct, r2):
     """Determine regime based on slope and confidence.
     Symmetric thresholds — asset-agnostic.
+    FIX 2026-10-03: lowered from 0.35 to 0.05 — 5m candles rarely exceed 0.35%/candle
+    (max observed 0.122%). 0.05% per 5m candle = 0.6%/hour, reachable in trending markets.
     """
-    if slope_pct > 0.35 and r2 > 0.5:
+    if slope_pct > 0.05 and r2 > 0.5:
         return "LONG_BIAS", min(95, 50 + r2 * 45 + slope_pct * 20)
-    elif slope_pct < -0.35 and r2 > 0.5:
+    elif slope_pct < -0.05 and r2 > 0.5:
         return "SHORT_BIAS", min(95, 50 + r2 * 45 + abs(slope_pct) * 20)
-    elif abs(slope_pct) < 0.20:
-        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.20) * 20)
+    elif abs(slope_pct) < 0.02:
+        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.02) * 20)
     elif slope_pct > 0 and r2 > 0.4:
         return "LONG_BIAS", 45 + r2 * 20
     elif slope_pct < 0 and r2 > 0.4:
@@ -245,7 +247,7 @@ def scan_token(token):
     regime, confidence = determine_regime(slope_pct, r2)
 
     # Range-bound detection: low slope + low R² = choppy/ranging market
-    is_ranging = abs(slope_pct) < 0.20 and r2 < 0.30
+    is_ranging = abs(slope_pct) < 0.02 and r2 < 0.30
 
     # Use last closed candle for current_price (candles are already closed-only from DB)
     current_price = candles[-1]['close']
