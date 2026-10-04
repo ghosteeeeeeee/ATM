@@ -41,6 +41,7 @@ CANDLE_TOKENS_FILE = '/root/.hermes/data/candle_universe_tokens.json'
 def _init_candles_db():
     """Ensure candles.db has all required tables."""
     conn = sqlite3.connect(CANDLES_DB, timeout=30)
+    conn.execute("PRAGMA busy_timeout=30000")
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS candles_1m (
@@ -112,6 +113,7 @@ def _store_candles(token: str, interval: str, candles: list):
         return
     table = {'1m': 'candles_1m', '15m': 'candles_15m', '1h': 'candles_1h', '4h': 'candles_4h', '5m': 'candles_5m'}[interval]
     conn = sqlite3.connect(CANDLES_DB, timeout=30)
+    conn.execute("PRAGMA busy_timeout=30000")
     conn.execute("PRAGMA journal_mode=WAL")
     c = conn.cursor()
     rows = [(token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume']) for cd in candles]
@@ -176,6 +178,7 @@ def _seed_universe_candles(universe: list):
 
         # Check if we already have recent candles (1m within 5 min, 4h within 2 hours)
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        conn.execute("PRAGMA busy_timeout=30000")
         conn.execute("PRAGMA journal_mode=WAL")
         c = conn.cursor()
         c.execute("SELECT MAX(ts) FROM candles_1m WHERE token=?", (token,))
@@ -585,6 +588,7 @@ def main():
     ph_conn = sqlite3.connect(STATIC_DB, timeout=30)
     ph_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn = sqlite3.connect(CANDLES_DB, timeout=60)
+    candle_conn.execute("PRAGMA busy_timeout=60000")
     candle_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn.execute("PRAGMA synchronous=NORMAL")
 
@@ -596,6 +600,11 @@ def main():
         except Exception as e:
             print(f'  {table}: aggregation error: {e}')
 
+    # ponytail: truncate WAL after writers release so disk doesn't balloon
+    try:
+        candle_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    except Exception as e:
+        print(f'  wal_checkpoint: {e}')
     ph_conn.close()
     candle_conn.close()
 

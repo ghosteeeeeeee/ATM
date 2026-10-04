@@ -2,6 +2,24 @@
 
 You are the system health checker for Hermes. **Detect problems AND fix them.**
 
+## ⚠️ CRITICAL RULE — SERVICE SAFETY
+
+**NEVER stop a service or timer without restarting it immediately after.**
+
+If you need to stop a service to diagnose an issue (e.g., database locks):
+1. Stop the service: `systemctl stop <service>.service`
+2. Run your diagnostic (fuser, lsof, etc.)
+3. **IMMEDIATELY restart**: `systemctl start <service>.timer` (restart the TIMER, not just the service)
+4. Verify it's running: `systemctl is-active <service>.timer`
+
+**Stopping a timer kills the entire scheduled pipeline.** The price-collector and 1m-candle timers feed ALL downstream systems. Leaving them stopped causes: stale prices, UNKNOWN phases, empty dashboards, and signal failures.
+
+**Before you finish ANY task, run this check:**
+```bash
+systemctl list-timers hermes-price-collector.timer hermes-1m-candle.timer hermes-pipeline.timer --no-pager
+```
+If any are missing or inactive, restart them immediately.
+
 ## Step 1: Pipeline Health (last 30 minutes)
 
 ```bash
@@ -38,6 +56,23 @@ df -h / | tail -1
 | Prices stale >5min | Compare latest price timestamp to now | WARN |
 
 ## Step 4: Auto-Fix What You Can
+
+### Database locked (candles.db, signals_hermes_runtime.db) → Diagnose AND restart
+```bash
+# 1. Check who holds the lock
+fuser -v /root/.hermes/data/candles.db /root/.hermes/data/candles.db-wal 2>&1
+
+# 2. If you need to stop services to clear the lock:
+systemctl stop hermes-price-collector.service hermes-1m-candle.service
+sleep 2
+fuser -v /root/.hermes/data/candles.db 2>&1  # re-check lock holder
+
+# 3. **IMMEDIATELY RESTART THE TIMERS** (not just services):
+systemctl start hermes-price-collector.timer hermes-1m-candle.timer
+
+# 4. Verify they're running:
+systemctl is-active hermes-price-collector.timer hermes-1m-candle.timer
+```
 
 ### Pipeline crashed → Restart
 ```bash
