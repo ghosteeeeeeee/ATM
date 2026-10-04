@@ -3020,3 +3020,31 @@ BY: auto_1hr
 - hard_max_loss family growing (10T) — worth a dedicated stop-structure review when not mid-monitor-window.
 
 BY: auto_1hr
+
+## [2026-10-04 00:11] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.19 (WR: 50.0%) | 24h: 34T ~65%WR +$1.20
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** LDO bb-squeeze+ LONG won +$0.05 (profit-monster-trail). IO pump-chain- SHORT lost -$0.24 (hard_max_loss_-1.03% on ~$22 size). Single hard-stop loss, not signal death.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 13T +$0.87, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70. Loss concentration = hard_max_loss family 11T -$1.77 — intentional hard stops, working as designed.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (2T). 24h: pump-chain- 6T -$0.06 (near flat, not 0%WR), bb-bounce-v3-long+ 5T -$0.02 (near flat). No kill needed.
+- **Negative PnL streak:** 22:00 -$0.11, 23:00 -$0.24, 00:00 +$0.05 — NOT 3 consecutive negative hours. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Open (1):** ENS bb-bounce-v3-long+ LONG (19:40). LDO and IO closed.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (IO -$0.24 shows -322.97%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — audit script referenced by SOP not deployed (flagged 22:11, still absent). No config change this hour so nothing to log.
+- hard_max_loss family 11T -$1.77 sole 24h loss concentration (up from 10T -$1.53) — intentional hard stops. Stop-placement vs signal-structure review still open.
+- 24h PnL: +$1.39 (23:12) → +$1.20 (now) on 34T — slight dip, still net positive.
+
+**Open Questions:**
+- accel_300_v3_long: signal_reporter 7T/7d vs brain DB 0 executions 14d — discrepancy still unexplained, left ENABLED.
+- hard_max_loss family growing (11T) — worth a dedicated stop-structure review when not mid-monitor-window.
+
+BY: auto_1hr
