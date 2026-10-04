@@ -2509,5 +2509,24 @@
     "category": "data pipeline",
     "status": "suggested — escalate to price_collector owner",
     "risk": "low — infra fix"
+  },
+  {
+    "date": "2026-10-04T14:34:18Z",
+    "idea": "Conflicting-signal execution veto — block LONG if SHORT fired on same coin within 15min (and vice versa)",
+    "rationale": "Watchdog deep analysis: all 3 open bb-bounce-v3-long+ trades had contradictory SHORT signals at entry (DOT: pump-chain- zscore -3.0; CFX: rs-r40 SHORT; NXPC: rs-r45/rs-r47). Watchdog steer-002: 10 recent losses look wrong-side. This is an entry-quality check using actual signal conflict data, not a time-based filter.",
+    "expected_impact": "Blocks wrong-side entries where opposite signal fired moments before. Could have blocked DOT/CFX/NXPC opens (3 current open losers). Need backtest: how many 14d winners had a conflicting opposite signal within 15min of entry?",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest before implementation",
+    "risk": "medium — must not block valid contrarian setups (CONTRARIAN_ZONE_ENABLED exists for strong-zone flips). Veto should be soft (confidence reduction) not hard block, OR exempt coins in contrarian zones.",
+    "sample_note": "3 open trades all had conflicts (small n). Pattern matches broader wrong-side steer (10 losses). Backtest on 14d closed trades required before any implementation."
+  },
+  {
+    "date": "2026-10-04T14:34:18Z",
+    "idea": "Per-signal-family position cap (max 2 same-family opens within 15min window)",
+    "rationale": "3 correlated bb-bounce-v3-long+ opens (CFX/DOT/NXPC) all negative — one BTC dump hits all. PORTFOLIO_HEAT_ENABLED=True exists but may not count same-signal correlation. Previously suggested at 11:35, never built.",
+    "expected_impact": "Caps correlation risk. 3rd same-family signal within 15min gets confidence penalty or block.",
+    "category": "risk control",
+    "status": "suggested — needs backtest (repeated from 11:35 run)",
+    "risk": "low — conservative cap at 2, not 1"
   }
 ]
