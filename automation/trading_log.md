@@ -3251,3 +3251,57 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 11:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet; last closes were 10:0x window)
+**PnL:** $0.00 last hour | 24h: 34T 20W 14L -$0.08 (WR: 58.8%) | Open: 3 (SUSHI/ME/CFX all bb-bounce-v3-long+ LONG, opened 10:05–10:13)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** No winners this hour to compare adverse excursion. 24h winners all exit via profit-monster-trail (20T +$1.35, avg +$0.068) — trail working.
+- **atr_sl_hit >40%:** 1/34 (2.9%) of 24h closes. tpsl_utils.py fix still stable. Dominant exits: profit-monster-trail 20T +$1.35. hard_max_loss family 9T -$1.31 remains sole loss concentration (intentional hard stops, CUT_LOSER_PNL fires before ATR SL).
+- **Kill rule:** 0T last hour — no signal with 0% WR + 3+ trades in last hour. 24h n>=2: bb-squeeze+ 19T 68.4%WR +$0.37 (star, keep), pump-chain+ 2T 100% +$0.05, bb-bounce-v2-long+ 2T 100% +$0.03, bb-bounce-v3-long+ 6T 50%WR -$0.05 (noise, small sample). No kill.
+- **Negative PnL streak:** 07:00 +$0.20, 08:00 -$0.31, 09:00 -$0.13, 10:00 0T (no closes). Two consecutive negative hours, NOT 3 — 10:00 zero-trade hour does not continue the streak. No size-reduction trigger. Watch: if11:00 closes negative, streak is 2 real hours still; need3 consecutive negative PnL hours.
+- **Overtrading:** 0T last hour. Fine — actually quiet.
+- **Regime:** No NEUTRAL streak trigger. Open exposure: 3 correlated bb-bounce-v3-long+ LONGs (same signal family pile, similar to morning bb-squeeze cluster). Flagged as watch — not a SOP trigger.
+- **24h trend:** +$0.49 (10:00 report) → -$0.08 on 34T, WR ~63%→58.8% — flipped net negative as losses aged in and quiet hour skipped. Still not a 3h streak.
+
+**Open Questions:**
+- 24h PnL flipped positive→negative (-$0.08) — monitor; if next hours stay negative and streak hits 3, apply size-reduction per SOP.
+- hard_max_loss family 9T -$1.31/24h still sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- 3 correlated bb-bounce-v3-long+ LONGs open (SUSHI/ME/CFX) — watch if they cluster into same-direction losses like morning bb-squeeze pile.
+- pnl_pct data-path nonsense continues — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
+
+## [2026-10-04 12:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W 2L, -$0.36) — SUSHI + ME both bb-bounce-v3-long+ LONG, both hard_max_loss (~-1.0%)
+**PnL:** -$0.36 last hour | 24h: 36T 20W 16L -$0.44 (WR: 55.6%) | Open: 2 (DOT, CFX — both bb-bounce-v3-long+ LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** No winners this hour to compare adverse excursion. 24h winners all exit via profit-monster-trail (20T +$1.35) — trail engine working.
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. tpsl_utils.py fix still stable. Dominant exits: profit-monster-trail 20T +$1.35. hard_max_loss family 11T -$1.67 remains sole loss concentration (intentional hard stops; CUT_LOSER_PNL=-1.00 fires before ATR SL by design).
+- **Kill rule:** Last hour bb-bounce-v3-long+ was 2T 0W — below the 3+ trade kill threshold. 24h: bb-bounce-v3-long+ 8T 3W -$0.41 (worst signal, avg -$0.051) but NOT 0% WR. bb-squeeze+ 19T 68%WR +$0.37 (star, keep), pump-chain+ 2T 100%, bb-bounce-v2-long+ 2T 100%. No kill.
+- **Negative PnL streak:** 08:00 -$0.31, 09:00 -$0.13, 10:00 0T (no closes), 11:00 -$0.36. Max consecutive negative-closing hours = 2 (10:00 zero-trade hour does not extend the streak). NOT 3. No size-reduction trigger. Watch: if 12:00 closes negative, streak becomes 09+10-skip+11+12 — still not 3 consecutive negative; need three back-to-back negative-closing hours.
+- **Overtrading:** 2T last hour. Fine.
+- **Regime:** No NEUTRAL streak trigger (streak not met). Open exposure: 2 correlated bb-bounce-v3-long+ LONGs (DOT/CFX) — same signal family as the two losers this hour. Flagged as watch, not a SOP trigger.
+- **24h trend:** -$0.08 (11:13 report) → -$0.44 on 36T, WR 58.8%→55.6% — drift continues as hard_max_loss exits accumulate. Still not a 3h negative streak.
+
+**Open Questions:**
+- bb-bounce-v3-long+ is the bleeding signal: 8T -$0.41/24h, both closes this hour were its hard_max_loss. Two more open (DOT/CFX) same signal. Kill rule not met yet — if next hour brings 3+ more 0% WR closes from it, kill per SOP.
+- hard_max_loss family 11T -$1.67/24h still sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- 24h PnL more negative (-$0.44) — monitor; 3 consecutive negative-closing hours would trigger regime/size check per SOP.
+- pnl_pct data-path nonsense continues (SUSHI -$0.12 → -323.96%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
