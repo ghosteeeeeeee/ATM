@@ -1,5 +1,12 @@
 # Error Alerts
 
+## Error Alerts — 2026-10-04 08:48 UTC
+- **INFO** — Pipeline healthy: last run 08:46:44 rc=0. Portfolio: 1 open | 36 closed today | +19.21% PnL. Position Manager clean (no Traceback/CRASH in 30m). Signals (1h): 130 generated. Hotset empty (0 approved) — no signals survived compaction; 130 raw signals still generated. Regime: LONG_BIAS (28L/17S/72N @ 08:45). Speeds: 129/241 (53.5%) ≥50th pct. Prices fresh: 160 tokens updated <5m, latest 08:46:24. Phantom trades: 0. Open via signal_outcomes=0 (portfolio source of truth = position_manager: 1 open).
+- **INFO** (recurring): Non-trading failed units — `better-coder` (ModuleNotFoundError dispatcher.dispatcher), `bug-hunter` (exit-1 by design — found 9 CRITICAL: sqlite/cursor/connection leaks, sql_injection, bare_except, hardcoded passwords, dead signal_gen imports), `git-release` (dry-run exit-1), `mtf-macd-tuner` (PrecomputedMACD.warmup AttributeError), `trading-checklist` (exit-1). All known; none on trading execution path.
+- **INFO** (known): `hermes-atr-sl-updater.timer` not-found (dead ref). `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` inactive dead — regime scanners themselves (4h/15m) active. `list-timers hermes-*` without `--all` shows 0 — cosmetic quirk.
+- **INFO**: Disk 81% (91G/118G) — under 85% threshold. No log cleanup needed.
+- **AUTO-FIXES APPLIED**: none required. Trading path healthy; failed units are known non-trading code bugs, not restartable crashes.
+
 ## Error Alerts — 2026-10-02 22:49 UTC
 - **WARN** (1x): disk `/` **88%** used (98G/118G, 15G free) — up from 87% an hour ago.
   - **AUTO-FIX**: WAL checkpoint on `session_brain.db` (freed 73.8MB) and `signals_hermes.db` (freed 4.6MB). `candles.db` WAL is 3.2GB but locked by active `price_collector` — cannot checkpoint mid-run. No logs >7d to compress. Remaining bulk is active DBs (coin_tracker 3.3G, candles 2.3G, signals_hermes 905M, session_brain 866M, mtf_macd_tuner 529M). **CEO DB-retention decision still open.**
