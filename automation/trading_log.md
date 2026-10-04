@@ -3454,3 +3454,27 @@ BY: auto_1hr
 **Verified:** live PG last-24h old-vs-new pnl display table; prompt asserts pass.
 
 BY: upgrade_implementer
+
+## [2026-10-04 18:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.01 last hour | 24h: 29T 14W 15L -$1.05 (WR: 48.3%) | Open: 5 (DOT+HBAR bb-bounce-v3-long+, GMT+IMX pump-chain+, ETC bb-bounce-v2+v3 combo)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** GMX bb-squeeze+ LONG trail win +$0.03; NXPC bb-bounce-v3-long+ hard_max_loss -$0.02 (opened 13:04, closed ~4.5h — small residual after trail/stop dance). No MFE/MAE pulled this hour (2T sample, not actionable).
+- **atr_sl_hit >40%:** 1/29 (3.4%) of 24h closes. Dominant exits: profit-monster-trail 15T +$0.98 (52%), hard_max_loss 12T -$1.86 (41%). tpsl_utils.py fix still stable. Not a tight-SL problem — hard_max_loss is the intentional hard-stop family.
+- **Kill rule:** Last hour max 1 trade/signal (bb-bounce-v3-long+ 0W1T, bb-squeeze+ 1W1T). No 0% WR + 3+ trades. 24h worst: bb-bounce-v3-long+ 8T 2W 25%WR -$0.74 (has wins, not 0%); 1T losers doji-bottom-long/pump-chain-/volume-breakout-long+/continuation+ under threshold. bb-squeeze+ 14T 64.3%WR +$0.22 star. No kill.
+- **Negative PnL streak:** Hours with activity: 13:-$0.25, 15:+$0.04, 16:-$0.20, 17:+$0.01, 18:+$0.01. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h (8T -$0.74 25%WR) but NXPC closed this hour — remaining open: DOT (18:05), HBAR (17:11), ETC combo (16:57). Kill threshold still not met. Watch.
+- hard_max_loss family 12T -$1.86/24h sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- Open exposure 3/5 LONGs on bounce family (DOT/HBAR/ETC) — correlated alt-long pile, treat as one position.
+- 24h PnL -$1.05 (was -$1.06 at 17:11). WR 48.3% dipped below 50%. Not a streak.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
