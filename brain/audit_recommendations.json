@@ -1,153 +1,249 @@
 {
-  "timestamp": "2026-10-04T11:37:13Z",
+  "timestamp": "2026-10-04T13:37:37Z",
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing",
-      "pullback-entry",
-      "bb-bounce-v3",
-      "mover signal quality"
-    ],
-    "key_insights": [
-      "Prior sessions established RSI sweet-spot pattern for signal filters — same method applied this run",
-      "Stale-signal execution documented: signals detected then filled after the move (pump_catcher session)",
-      "Regime-specific signal efficacy discussed — signals as \"species of fish\" needing correct environment"
+    "queries_run": 4,
+    "top_insights": [
+      "Recurring: hard_max_loss bleed + bb-bounce entry quality + ema_reclaim unbuilt",
+      "Sessions repeatedly: fix entry quality, not time-of-day (standing)",
+      "New this run: bb-bounce-v3 RSI_MAX=55 filter hole — high-RSI entries still fire",
+      "Watchdog RSI>60 bb-squeeze claim REFUTED by 14d DB (RSI>60 = winning zone)"
     ]
   },
   "trade_summary_24h": {
-    "trades": 34,
-    "winrate": 58.8,
-    "pnl": -0.08,
-    "note": "Slightly negative despite 58.8% WR — R:R structural issue, not entry-side"
+    "trades": 35,
+    "pnl": -0.58,
+    "wr": 57.1,
+    "long": {
+      "trades": 34,
+      "pnl": -0.34,
+      "wr": 58.8
+    },
+    "short": {
+      "trades": 1,
+      "pnl": -0.24,
+      "wr": 0.0
+    },
+    "note": "LIVE PG ~13:45 UTC. Window flipped negative after continuum bear flip + SYRUP/SUSHI/ME hard_max_loss. bb-squeeze+ 19T 68.4% +$0.37 still carries 24h; bb-bounce-v3 8T 37.5% -$0.41 is the bleed."
   },
   "trade_summary_7d": {
-    "trades": 214,
-    "winrate": 52.8,
-    "pnl": 2.18,
-    "regimes": {
-      "EXTREME": "89T 53.9%WR +$1.83",
-      "HIGH": "62T 56.5%WR $0.00",
-      "NORMAL": "54T 50.0%WR $0.00",
-      "FLAT": "5T 40.0%WR +$0.27"
-    }
+    "trades": 217,
+    "pnl": 1.57,
+    "wr": 52.1,
+    "long": {
+      "trades": 162,
+      "pnl": 3.56,
+      "wr": 55.0
+    },
+    "short": {
+      "trades": 54,
+      "pnl": -1.38,
+      "wr": 46.3
+    },
+    "note": "LIVE PG ~13:45. LONG carries; SHORT still bleeding. 7d target +$3.00 in 48h — gap $1.43."
+  },
+  "trade_summary_30d": {
+    "trades": 946,
+    "pnl": -0.8,
+    "wr": 51.6,
+    "note": "LIVE PG ~13:45. Window-edge improving from -$1.19 at 09:50. Re-check Oct 5."
+  },
+  "b960ffe8_monitor": {
+    "fix_committed": "2026-10-04 00:38",
+    "pipeline_restarted": "2026-10-04 01:50",
+    "monitor_until": "2026-10-06 00:38",
+    "short_opens_post_fix": 0,
+    "status": "n=0 SHORT opens (~11.5h) — oversold filter untestable, not failing"
+  },
+  "atr_tp_min_fix": {
+    "applied": "2026-10-04 11:35 UTC by prior brain_auditor",
+    "value": "ATR_TP_MIN 0.008→0.013 (hermes_constants.py:681)",
+    "live": "YES — pipeline restarted 13:31, constant loaded",
+    "trades_since": 3,
+    "status": "Too early to evaluate. Only hard_tp path affected; trailing dominates exits."
   },
   "drift_findings": [
     {
-      "finding": "ATR_TP_MIN (0.80%) < ATR_SL_MIN (1.30%) — structurally negative RR for low-vol tokens",
-      "evidence": "30d: RR<1 = 161T 14.9%WR -$18.47 vs RR>=1 = 785T 59.4%WR +$16.91. 7d: RR<1 = 16T -$1.09 vs RR>=1 = 195T +$2.95. Open SUSHI/CFX RR=0.67 (TP 0.87% vs SL 1.30%).",
-      "resolution": "FIXED — ATR_TP_MIN raised 0.008→0.013 to match ATR_SL_MIN. Restart required.",
-      "impact": "Was leaking ~$1-2/7d on low-vol trades with unreachable TP targets"
+      "id": "DRIFT-005",
+      "finding": "bb-bounce-v3 RSI_MAX=55 filter hole — high-RSI entries still fire",
+      "detail": "BB_BOUNCE_V3_RSI_MAX=55 exists (hermes_constants.py:2609) and filter exists (bb_bounce_v3_long.py:349). But 14d DB shows entries at entry_rsi_14=55.43 (SUSHI), 59.09 (ME), 76.92 (KAS), 86.34 (ENS). ME signal-time meta rsi_14=40.0 vs entry_rsi=59.09 = execution drift (DRIFT-002 class). ENS signal-time meta rsi_14=80.81 still fired = possible STANDALONE_BYPASS/combopath that skips module filter. bb-bounce-v3-long IS in STANDALONE_BYPASS_SIGNALS (hermes_constants.py:2662).",
+      "impact": "RSI>55 entries: 4T all losers -$0.42. RSI<45: 8T +$0.24. Entry quality leak is the #1 bb-bounce-v3 bleed.",
+      "status": "OPEN — code audit for bug_hunter. DO NOT change RSI_MAX value (filter exists; path is broken)."
     },
     {
-      "finding": "bb-bounce-v3-long+ RSI_MAX=55 allows losing 40-55 band",
-      "evidence": "30d: rsi<=40 = 6T 83.3%WR +$0.33 vs rsi>40 = 10T 40%WR -$0.45",
-      "resolution": "MONITOR — sample 16T < 20T threshold",
-      "impact": "Potential +$0.45/30d if confirmed at 20T"
+      "id": "DRIFT-003-CONFIRMED",
+      "finding": "Watchdog bb-squeeze RSI>60 steer is WRONG — do NOT gate",
+      "detail": "14d bb-squeeze by entry_rsi_14: <40=3T 33%-$0.06 | 40-55=12T 58%-$0.07 | 55-60=12T 41.7%-$0.38 | 60-70=10T 70%+$0.45 | 70+=12T 75%+$0.35. RSI_MAX=60 would block 16/29 7d winners. Actual bad bucket is RSI 55-60 premature entries.",
+      "impact": "Following watchdog would kill +$0.80 edge. Correct target is 55-60, and n=12<20 = monitor only.",
+      "status": "CORRECTED — do NOT implement RSI_MAX=60 on bb-squeeze"
     },
     {
-      "finding": "DRIFT-002 open — exec-time LONG RSI uses 5m vs signal 1m",
-      "evidence": "ME trade entry_rsi_14=59.09 passed BB_BOUNCE_V3_RSI_MAX=55 at detection. bug_hunter owns.",
-      "resolution": "OPEN — not addressed this run",
-      "impact": "RSI filters unreliable at execution time"
+      "id": "DRIFT-006",
+      "finding": "Alt candle volume=0 CONFIRMED in candles_1m",
+      "detail": "SYRUP/SUSHI/DOT/CFX/NXPC/PURR/BLUR all volume=0.0 on latest 1m candles. price_collector volume ingestion broken for alts. Prior creative idea 12:38 still open.",
+      "impact": "Volume-dependent signals (bb-squeeze, volume-breakout, pump-chain volume checks) partially blind.",
+      "status": "OPEN — infra, price_collector audit. Already flagged twice; escalate."
+    },
+    {
+      "id": "DRIFT-007",
+      "finding": "regime_15m.json stale May 5 — 15m scanner path broken",
+      "detail": "/var/www/hermes/data/regime_15m.json timestamp=2026-05-05. /root/.hermes/data/regime_15m.json MISSING. Watchdog automated btc_15m LONG_BIAS untrustworthy during continuum flips.",
+      "impact": "Regime misalignment risk on all signals. Live continuum_data.json is fresh (13:33) and should be trusted over scanners.",
+      "status": "OPEN — already delegated signal_analyst (15m/5m scanner retune)."
     }
   ],
-  "recurring_problems": [
+  "losing_trade_autopsy": {
+    "window": "24h",
+    "losers": 15,
+    "clusters": [
+      {
+        "signal": "bb-bounce-v3-long+",
+        "losers_24h": "8T -$0.41 37.5%WR",
+        "losers_14d_detail": "SUSHI rsi=55.43 hard_max_loss | ME rsi=59.09 hard_max_loss | ENS rsi=86.34 MAX_HOLD | COMP rsi=46.67 hard_max_loss | KAS rsi=76.92 trail-scratch",
+        "root_cause": "Entries at RSI>55 despite RSI_MAX=55 filter — filter path broken (DRIFT-005). Plus continuum bear flip misalignment (all open longs into STRONG_DOWN tape).",
+        "recommended_change": "NO config change. Delegate bug_hunter: audit why bb-bounce-v3 entries fire at entry_rsi>55 (STANDALONE_BYPASS path vs execution drift).",
+        "impact_on_winners": "RSI_MAX=45 would block 1/7 7d winners (HYPER +$0.04). n=15<20 — insufficient. Monitor only.",
+        "confidence": "HIGH on root cause, MEDIUM on fix path"
+      },
+      {
+        "signal": "bb-squeeze+ hard_max_loss cluster",
+        "losers_24h": "PURR/AIXBT/USELESS/CHIP/SUSHI/NEAR all hard_max_loss or atr_sl_hit",
+        "root_cause": "Not RSI>60 (that's the winning zone). Losers are RSI 55-60 premature entries + hard_max_loss semantics (price vs leveraged) still open with bug_hunter.",
+        "recommended_change": "NO config change. Monitor RSI 55-60 bucket until n>=20. CUT_LOSER_PNL DO NOT CHANGE.",
+        "impact_on_winners": "N/A — no filter proposed",
+        "confidence": "HIGH"
+      },
+      {
+        "signal": "doji-bottom-long SYRUP",
+        "losers_24h": "SYRUP -3.34% hard_max_loss at RSI-band entry during continuum bear flip",
+        "root_cause": "Wrong-side mean-reversion long into fresh bear flip (state_score 94→8.6, BTC lost EMA300). Stop worked correctly.",
+        "recommended_change": "NO config change. Standing rule already: no new bb-bounce/doji longs until continuum recovers above EMA300. Continuum has since recovered (AT/STRONG_UP, state 46.9).",
+        "impact_on_winners": "N/A",
+        "confidence": "HIGH"
+      }
+    ]
+  },
+  "signal_quality_deep_dive": [
     {
-      "topic": "hard_max_loss / hard_sl exits dominate 7d losses",
-      "data": "7d: hard_sl 41T -$2.36 + hard_max_loss family ~30T ~-$3.5. profit-monster-trail 104T +$4.92 is sole strong positive exit.",
-      "analysis": "SL working as designed (~1% stops). Entry quality determines whether trades reach trailing zone. RR floor fix addresses structural half.",
-      "status": "partially addressed via ATR_TP_MIN"
+      "signal": "bb-bounce-v3-long+",
+      "window_14d": "15T 46.7%WR -$0.29",
+      "rsi_split_14d": "<35=4T 100%+$0.17 | 35-45=4T 50%+$0.07 | 45-55=3T 33%-$0.11 | 55-65=2T 0%-$0.36 | 65+=2T 0%-$0.06",
+      "verdict": "Clear quality gradient. Winners oversold-recovery (RSI<45). Losers mid/overbought bounces. Filter EXISTS but path broken (DRIFT-005).",
+      "action": "Bug-hunter code audit, not param change. Monitor RSI_MAX=45 candidate at n>=20.",
+      "mean_rev_rsi55_14d": "bb-bounce-v3+doji-bottom entry_rsi>55: 8T 25%WR -$0.77 (vs RSI<=55 positive). Strongest quality signal this run."
     },
     {
-      "topic": "mover+ enters overbought (chasing)",
-      "data": "30d 21T 57.1%WR -$0.85. Losers at RSI 68-95 (BABY 94.74 -$0.30, BABY 79.17 -$0.45, ADA 77.26 -$0.22). Avg entry RSI 73.1.",
-      "analysis": "Momentum entry after move completed. 21T borderline for action.",
-      "status": "monitor — suggest MOVER RSI_MAX=80 if sample grows"
+      "signal": "bb-squeeze+",
+      "window_14d": "47T 61.7%WR +$0.50 (7d 19T 68.4% +$0.37)",
+      "rsi_split_14d": "55-60=12T 41.7%-$0.38 (bad) | 60-70=10T 70%+$0.45 | 70+=12T 75%+$0.35",
+      "verdict": "Healthy overall. Bad bucket is 55-60 premature entries, NOT RSI>60. Watchdog steer rejected.",
+      "action": "Monitor 55-60 until n>=20. No filter now."
     },
     {
-      "topic": "mover- enters oversold (falling knife)",
-      "data": "30d 12T 58.3%WR -$0.20. Losers at RSI 14-28 (BLUR 14.01 -$0.47, AVAX 17.77 -$0.21). Avg entry RSI 24.9.",
-      "analysis": "Same problem inverted. 12T too small.",
-      "status": "monitor — suggest MOVER RSI_MIN=25 if sample grows"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "idea": "Entry-time RR gate (skip trades where TP/SL < 1.0)",
-      "status": "largely addressed by ATR_TP_MIN fix — TP floor now = SL floor, new trades get RR>=1 by construction",
-      "note": "Code-level gate would be belt-and-suspenders; unnecessary if floor stays aligned"
+      "signal": "pump-chain+ LONG",
+      "window_14d": "33T 39.4%WR +$0.53 | 7d 8T 62.5% +$0.95",
+      "verdict": "Low WR but net positive — big winners carry. Not a kill candidate.",
+      "action": "No change. 30d winner-DNA study when n grows."
     },
     {
-      "idea": "NEUTRAL volume-dry-up / EMA-reclaim continuation signal",
-      "status": "still unbuilt — delegated to signal_analyst Sep 30 + Oct 1. ema_reclaim_long.py exists, 0 signals (shadow).",
-      "note": "#1 signal-diversity gap per prior CEO audits"
-    }
-  ],
-  "watchdog_steers_addressed": [
-    {
-      "steer": "pullback-entry- 23.1% WR worst signal (-$1.54)",
-      "finding": "ALREADY DISABLED — PULLBACK_ENTRY_MINUS_ENABLED=False, 0 trades since Sep 30. Watchdog window shows historical trades only.",
-      "action": "None — signal killed, no live exposure"
+      "signal": "pump-chain- SHORT",
+      "window_14d": "68T 47.1%WR -$1.15",
+      "verdict": "RSI floors + b960ffe8 live. 0 SHORTs since fix. Monitor to Oct 6/7.",
+      "action": "No change during monitor window."
     },
     {
-      "steer": "bb-squeeze+ losing streak 4 losses (-$0.49)",
-      "finding": "VARIANCE within net-positive signal. 24h 19T 68.4%WR +$0.37. 14d 47T 61.7%WR +$0.50. HIGH 26T 65.4% +$0.38, NORMAL 9T 66.7% +$0.27.",
-      "action": "None — profitable, streak is noise"
-    },
-    {
-      "steer": "3 correlated bb-bounce-v3 longs in 8min + all RR<1",
-      "finding": "VALID. Cluster + negative RR. ATR_TP_MIN fix improves RR on future trades; existing 3 positions keep old TP (0.87%).",
-      "action": "Creative improvement: cluster risk limiter suggested (needs backtest). Existing positions: watchdog advises tighten ME first, lock CFX at breakeven, no 4th long."
-    },
-    {
-      "steer": "regime_15m.json stale (2026-05-05)",
-      "finding": "FALSE ALARM — trade_watchdog.py:244 reads regime_5m.json (fresh Oct 4 11:30). Stale regime_15m.json is unused leftover. Watchdog narrative read wrong path.",
-      "action": "None for trading. Optional cleanup of stale file."
-    },
-    {
-      "steer": "7 recent losses look like wrong-side trades",
-      "finding": "PARTIALLY VALID — 15m SHORT_BIAS + STRONG_DOWN vs 4h LONG_BIAS + continuum ABOVE = genuinely mixed. Open longs are mean-reversion by design.",
-      "action": "No blanket direction change. RR floor fix improves EV regardless of side."
-    },
-    {
-      "steer": "coin_tracker_data.json missing",
-      "finding": "Watchdog falls back to coin_tracker.db which exists (3.4GB, fresh Oct 4 11:32). Per-coin heat still available via DB.",
-      "action": "None — fallback working"
+      "signal": "pullback-entry- SHORT",
+      "window_14d": "13T 23.1%WR -$1.54, last trade Sep 22",
+      "verdict": "Already DISABLED. Historical noise.",
+      "action": "None."
     }
   ],
   "creative_improvements": [
     {
-      "idea": "RR floor via ATR_TP_MIN=ATR_SL_MIN=1.30%",
-      "status": "APPLIED",
-      "evidence": "30d RR<1 -$18.47 vs RR>=1 +$16.91"
+      "date": "2026-10-04T13:37:20Z",
+      "idea": "bb-bounce-v3 RSI filter path audit (DRIFT-005) — bug_hunter code fix, not config",
+      "rationale": "RSI_MAX=55 exists in constants AND signal module, yet 4 entries at RSI 55-86 fired in 14d, all losers. ME shows execution drift (signal RSI 40 → entry RSI 59). ENS shows signal-time RSI 80.81 still fired — possible STANDALONE_BYPASS/combopath skipping module filter. bb-bounce-v3-long is in STANDALONE_BYPASS_SIGNALS.",
+      "expected_impact": "If hole closed: block ~$0.42/14d of losers without touching winners (6/7 7d winners are RSI<45).",
+      "category": "entry sniper / bug fix",
+      "status": "suggested — delegated to bug_hunter",
+      "risk": "low — no value change, path repair"
     },
     {
-      "idea": "bb-bounce-v3 RSI_MAX 55→40",
-      "status": "SUGGESTED — monitor to 20T",
-      "evidence": "30d rsi<=40 83.3%WR +$0.33 vs rsi>40 40%WR -$0.45"
+      "date": "2026-10-04T13:37:20Z",
+      "idea": "bb-squeeze RSI 55-60 premature-entry guard (MONITOR, not implement)",
+      "rationale": "14d: RSI 55-60 = 12T 41.7%WR -$0.38 vs RSI>=60 = 22T 72.7%WR +$0.80. But n=12<20 threshold. bb-squeeze has NO per-signal RSI filter (unlike pump-chain PUMP_CHAIN_LONG_RSI_MAX, volume-breakout ceiling).",
+      "expected_impact": "If n>=20 confirms: add narrow guard that blocks only 55-60, preserves 60+ edge.",
+      "category": "entry sniper",
+      "status": "monitor until n>=20",
+      "risk": "low — no change yet"
     },
     {
-      "idea": "Cluster risk limiter max 2/signal-family/15min",
-      "status": "SUGGESTED — needs backtest",
-      "evidence": "3 bb-bounce-v3 longs in 8min correlation"
-    }
-  ],
-  "config_changes_applied": [
+      "date": "2026-10-04T13:37:20Z",
+      "idea": "Cluster risk limiter — max 2 trades/signal-family/15min",
+      "rationale": "Watchdog flagged 3x bb-bounce-v3-long+ open simultaneously (CFX/DOT/NXPC) into continuum bear flip. All same failure mode. Suggested prior run, still unbuilt. Needs backtest against last 14d before implement.",
+      "expected_impact": "Caps correlated drawdown. Would not block any single winners — only simultaneous clusters.",
+      "category": "risk",
+      "status": "suggested — needs backtest",
+      "risk": "medium — could delay valid sequential entries"
+    },
     {
-      "file": "scripts/hermes_constants.py",
-      "change": "ATR_TP_MIN 0.008 → 0.013",
-      "rationale": "Match ATR_SL_MIN; enforce min RR 1.0. 30d: RR<1 161T -$18.47 vs RR>=1 785T +$16.91.",
-      "restart_required": true
+      "date": "2026-10-04T13:37:20Z",
+      "idea": "Continuum-below-EMA300 gate for mean-reversion LONGs (bb-bounce, doji-bottom)",
+      "rationale": "Watchdog agent-steer: 3/3 open longs misaligned during continuum crash 94→8.6, BTC below EMA300, STRONG_DOWN, DISTRIBUTION. Philosophy: every dump is SHORT only when not oversold; symmetric rule — mean-reversion LONGs need tape to stop rejecting. Live continuum is now AT/STRONG_UP (recovered), so gate would be inactive today.",
+      "expected_impact": "Blocks wrong-side bounce longs into fresh bear flips. Need backtest: how many 14d mean-rev LONG losers had continuum below EMA300 at entry?",
+      "category": "regime alignment",
+      "status": "suggested — needs backtest",
+      "risk": "medium — must not block EXTREME/HIGH habitat winners (bb-squeeze HIGH 26T 65% +$0.38)"
+    },
+    {
+      "date": "2026-10-04T13:37:20Z",
+      "idea": "price_collector alt volume ingestion fix — ESCALATE",
+      "rationale": "Third audit run flagging volume=0 on alt candles (SYRUP/SUSHI/DOT/CFX/NXPC/PURR/BLUR). Volume signals partially blind. Prior creative idea 12:38 still open.",
+      "expected_impact": "Restores volume confirmation for bb-squeeze, volume-breakout, pump-chain.",
+      "category": "data pipeline",
+      "status": "suggested — escalate to price_collector owner",
+      "risk": "low — infra fix"
     }
   ],
+  "config_changes_applied": [],
+  "config_change_rationale": "ZERO trading config changes this run. Standing: 0 config changes while b960ffe8 48h monitor active (until Oct 6 00:38). Prior brain_auditor already applied ATR_TP_MIN=0.013 at 11:35 (live, 3 trades since — too early to evaluate). Max 1/run and monitor window both point to monitor-only.",
   "next_actions": [
-    "RESTART pipeline — load new ATR_TP_MIN",
-    "Monitor bb-bounce-v3 RSI bands; apply RSI_MAX=40 at 20T if pattern holds",
-    "Backtest cluster risk limiter before any deploy",
-    "bug_hunter: DRIFT-002 exec-time RSI timeframe still open",
-    "signal_analyst: NEUTRAL diversity signal still unbuilt (#1 gap)",
-    "Optional: delete stale regime_15m.json (watchdog reads regime_5m.json)",
-    "Monitor mover+/- RSI entry quality; filters only if samples >20T"
+    "DELEGATE bug_hunter: DRIFT-005 audit — why bb-bounce-v3 fires at entry_rsi>55 despite RSI_MAX=55 (STANDALONE_BYPASS path vs execution drift). Trace ENS meta_rsi_14=80.81 path.",
+    "DELEGATE bug_hunter: RR_ENGINE shadow would-have-blocked → FORCE; hard_max_loss semantics (price vs leveraged) — DO NOT change CUT_LOSER_PNL.",
+    "DELEGATE self_learner: continue 48h zero-oversold SHORT verify — n=0 SHORTs since fix 01:50 (~11.5h), cannot pass/fail yet.",
+    "DELEGATE signal_analyst: ema_reclaim coverage OVERDUE; doji execution path; 15m/5m scanner retune; price_collector alt volume audit.",
+    "MONITOR: bb-bounce-v3 RSI quality at n>=20 for RSI_MAX=45 candidate; bb-squeeze RSI 55-60 at n>=20; ATR_TP_MIN post-fix trades; SHORT 7d PnL by Oct 7; 30d window-edge re-check Oct 5; disk 88%.",
+    "DO NOT: gate bb-squeeze at RSI>60 (refuted); change CUT_LOSER_PNL; touch CEO_PROTECTED_FLAGS; re-enable pullback-entry-/V5/accel-300_v3."
+  ],
+  "watchdog_steer_evaluation": [
+    {
+      "steer": "bb-bounce-v3-long+ 4-loss streak",
+      "verdict": "VALID — 8T -$0.41 24h, RSI quality hole confirmed. Action: code audit not disable.",
+      "auto_action": false
+    },
+    {
+      "steer": "bb-squeeze+ 4-loss streak",
+      "verdict": "VARIANCE — 19T 68.4% +$0.37 24h still net positive. Losers = RSI 55-60, not RSI>60.",
+      "auto_action": false
+    },
+    {
+      "steer": "Portfolio 100% long into continuum bear flip",
+      "verdict": "VALID — misalignment confirmed. Continuum has since recovered to AT/STRONG_UP.",
+      "auto_action": false
+    },
+    {
+      "steer": "Do not short oversold alts (WLFI RSI 21.6)",
+      "verdict": "VALID — standing BANANA lesson. SHORT RSI floors already live (40).",
+      "auto_action": false
+    },
+    {
+      "steer": "Hotset empty while positive edges unused",
+      "verdict": "INFO — volume-breakout/pump-chain+ positive but not firing (BTC chop gate / confluence). Monitor.",
+      "auto_action": false
+    },
+    {
+      "steer": "NEAR EXECUTED no PG row",
+      "verdict": "INFRA — verify executor handoff. Do not chase fill.",
+      "auto_action": false
+    }
   ]
 }

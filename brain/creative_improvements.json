@@ -2437,5 +2437,77 @@
     "category": "portfolio protection",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-04T12:38:33Z",
+    "idea": "bb-squeeze RSI_MIN=60 'breakout confirmation' gate",
+    "rationale": "bb-squeeze+ is a breakout signal. DB 14d: RSI>=60 = 22T 72.7%WR +$0.80; RSI 55-60 = 12T 41.7%WR -$0.38. Watchdog RSI>60 recommendation was wrong direction.",
+    "expected_impact": "+$0.38/14d surgical 55-60 block. Kills 17% of winners.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — n=12 < 20T, monitor first"
+  },
+  {
+    "date": "2026-10-04T12:38:33Z",
+    "idea": "price_collector volume ingestion audit — 50-70% alt candles volume=0",
+    "rationale": "candles_1m 8.1M/16.4M zero volume. ADA/AIXBT/ALGO/ALT/APT all 0.0. Volume signals partially blind.",
+    "expected_impact": "Unlocks volume confirmation for volume-dependent signals",
+    "category": "data pipeline",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T12:38:33Z",
+    "idea": "RR engine shadow re-eval post ATR_TP_MIN fix (structural RR now >=1.0)",
+    "rationale": "ATR_TP_MIN=ATR_SL_MIN=1.3% kills the RR<1 structural hole. Shadow may be redundant — need would-have-blocked numbers to confirm.",
+    "expected_impact": "Clean retirement path for RR_ENGINE_SHADOW if numbers support it",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-04T13:37:20Z",
+    "idea": "bb-bounce-v3 RSI filter path audit (DRIFT-005) — bug_hunter code fix, not config",
+    "rationale": "RSI_MAX=55 exists in constants AND signal module, yet 4 entries at RSI 55-86 fired in 14d, all losers. ME shows execution drift (signal RSI 40 → entry RSI 59). ENS shows signal-time RSI 80.81 still fired — possible STANDALONE_BYPASS/combopath skipping module filter. bb-bounce-v3-long is in STANDALONE_BYPASS_SIGNALS.",
+    "expected_impact": "If hole closed: block ~$0.42/14d of losers without touching winners (6/7 7d winners are RSI<45).",
+    "category": "entry sniper / bug fix",
+    "status": "suggested — delegated to bug_hunter",
+    "risk": "low — no value change, path repair"
+  },
+  {
+    "date": "2026-10-04T13:37:20Z",
+    "idea": "bb-squeeze RSI 55-60 premature-entry guard (MONITOR, not implement)",
+    "rationale": "14d: RSI 55-60 = 12T 41.7%WR -$0.38 vs RSI>=60 = 22T 72.7%WR +$0.80. But n=12<20 threshold. bb-squeeze has NO per-signal RSI filter (unlike pump-chain PUMP_CHAIN_LONG_RSI_MAX, volume-breakout ceiling).",
+    "expected_impact": "If n>=20 confirms: add narrow guard that blocks only 55-60, preserves 60+ edge.",
+    "category": "entry sniper",
+    "status": "monitor until n>=20",
+    "risk": "low — no change yet"
+  },
+  {
+    "date": "2026-10-04T13:37:20Z",
+    "idea": "Cluster risk limiter — max 2 trades/signal-family/15min",
+    "rationale": "Watchdog flagged 3x bb-bounce-v3-long+ open simultaneously (CFX/DOT/NXPC) into continuum bear flip. All same failure mode. Suggested prior run, still unbuilt. Needs backtest against last 14d before implement.",
+    "expected_impact": "Caps correlated drawdown. Would not block any single winners — only simultaneous clusters.",
+    "category": "risk",
+    "status": "suggested — needs backtest",
+    "risk": "medium — could delay valid sequential entries"
+  },
+  {
+    "date": "2026-10-04T13:37:20Z",
+    "idea": "Continuum-below-EMA300 gate for mean-reversion LONGs (bb-bounce, doji-bottom)",
+    "rationale": "Watchdog agent-steer: 3/3 open longs misaligned during continuum crash 94→8.6, BTC below EMA300, STRONG_DOWN, DISTRIBUTION. Philosophy: every dump is SHORT only when not oversold; symmetric rule — mean-reversion LONGs need tape to stop rejecting. Live continuum is now AT/STRONG_UP (recovered), so gate would be inactive today.",
+    "expected_impact": "Blocks wrong-side bounce longs into fresh bear flips. Need backtest: how many 14d mean-rev LONG losers had continuum below EMA300 at entry?",
+    "category": "regime alignment",
+    "status": "suggested — needs backtest",
+    "risk": "medium — must not block EXTREME/HIGH habitat winners (bb-squeeze HIGH 26T 65% +$0.38)"
+  },
+  {
+    "date": "2026-10-04T13:37:20Z",
+    "idea": "price_collector alt volume ingestion fix — ESCALATE",
+    "rationale": "Third audit run flagging volume=0 on alt candles (SYRUP/SUSHI/DOT/CFX/NXPC/PURR/BLUR). Volume signals partially blind. Prior creative idea 12:38 still open.",
+    "expected_impact": "Restores volume confirmation for bb-squeeze, volume-breakout, pump-chain.",
+    "category": "data pipeline",
+    "status": "suggested — escalate to price_collector owner",
+    "risk": "low — infra fix"
   }
 ]
