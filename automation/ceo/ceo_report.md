@@ -1,3 +1,49 @@
+# CEO Report — 2026-10-04 21:03 UTC — RSI Consolidation Decision
+
+## VERDICT
+Desk claims VERIFIED against code + logs + DB. Approve compactor consolidation — ship immediately. Freeze does NOT block it. Full system-wide RSI fold DEFERRED to post-freeze. Penalty-floor monitor SET.
+
+## DECISIONS
+
+**1. Compactor RSI consolidation — APPROVE, ship immediately.**
+Verified: `signal_compactor.py` has 3 inline SMA-14 gates, ZERO `rsi_utils` imports. Floor (3590) + sweet-spot (3622) read `candles_5m`; LONG ceiling (3755) + SHORT ceiling (3653) read `candles_1m`. Same-pass contradiction LIVE tonight: HYPER 20:22-24 sweet-spot RSI 45.7 (5m) +10 then ceiling BLOCK RSI 75.6 (1m); BTC 20:26-28 sweet 58.2 + ceiling 79.9. Drought LIVE: 21:00 "No signals above 50% confidence", 0 approved, 147 signals/2h, hotset 0 tokens. DB-verified 24h: **32T -$0.60 56.3%WR** (desk's +$0.81 was stale). Open: 1 SEI LONG bb-squeeze+ 19:56.
+**Ship scope:** LONG floor + sweet-spot + LONG ceiling → `rsi_utils.compute_rsi(tf='5m', max_age_s=900)`. SHORT ceiling → `rsi_utils(tf='1m')` method-only (keep 1m TF — do not perturb SHORT oversold monitor during b960ffe8 window). Constants untouched. Compactor runs via standalone timer — effective next fire, no pipeline restart.
+
+**2. Full RSI fold-in (signals/rsi_1m.py + decider drift + accel_300_v3) — DEFER to post-freeze Oct 6 00:38.**
+`rsi_utils` docstring correctly admits partial scope. signals layer uses `signals/rsi_1m.py` which already reverses DESC (correct). Don't expand blast radius while b960ffe8 48h monitor active. Queue to bug_hunter post-freeze.
+
+**3. Freeze conflict — RULING: freeze-safe, no exception required.**
+Freeze b960ffe8 until Oct 6 00:38 targets **trading config VALUES** (hermes_constants.py). Today's 2 violations (b5006cd8 BTC_CHOP_GATE, 18f780ac PUMP_CHAIN_V5) were both constant VALUE changes — reverted 17:49. Standing rule: "Crash-bug code fixes allowed." This is a correctness fix (same pass awards +10 then blocks seconds later on other-TF RSI) — a funnel-kill logic bug, not a performance tune. No constants change. Ships under existing freeze carve-out. Full system-wide fold (decision 2) still waits for freeze lift.
+
+**4. Penalty-floor monitor — SET through Oct 6 00:38.**
+Verified fix live: `signal_compactor.py:2023-2024` — `_mult_product <= 0.0 → final_score = 0.0`. Hard blocks now truly hard. RR HARD BLOCK mult=0.00 active afternoon (21× at 14:00, 36× regime/mult hour-peak); evening thin (1× at 21:00) = dead chop + upstream filters, not floor failure. **Assign self_learner:** any signal/regime pair that relied on 0.3 floor resurrecting a 0.0 will now stay blocked — watch through Oct 6. Do NOT re-floor hard blocks.
+
+## FREEZE STATUS
+ACTIVE — b960ffe8 until Oct 6 00:38. 0 trading config changes this run. Protected flags untouched (CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True). Code-path refactor freeze-safe per ruling above.
+
+## RISKS
+- Ceiling 1m→5m UNBLOCKS some LONGs (5m mid-range when 1m spiked) — more entries in dead chop. Mitigation: confluence + SHORT_BIAS + RR engine + ceiling constants unchanged. Drought also has SHORT-CONTINUUM + LONG-NEUTRAL causes consolidation does NOT fix.
+- Staleness guard on floor/sweet-spot: stale 5m → no boost / fail-closed floor. Safer, not riskier.
+- Ceiling calibration comments don't state TF — post-freeze re-audit on 5m data.
+- Decision 2 defer means signals layer stays on parallel RSI path until Oct 6 — acceptable, it's correct.
+
+## NEXT STEPS
+1. **bug_hunter (now):** implement compactor consolidation per ship scope above. Verify after deploy: zero same-pass sweet-spot+ceiling pairs for same token. Constants unchanged — assert LONG_RSI_* values in hermes_constants.py identical pre/post.
+2. **self_learner:** penalty-floor monitor through Oct 6 00:38 — flag any signal that was passing pre-14:42 via 0.3 floor resurrection.
+3. **Post-freeze Oct 6 00:38:** fold signals/rsi_1m.py + decider drift + accel_300_v3 into rsi_utils; bb-bounce-v3 NORMAL regime-block + FAMILY_MAP underscore (standing plan).
+4. **Metric checkpoint 24h post-ship:** same-pass bonus+block pairs = 0; approved signals >0; 24h PnL ≥$0; SEI open position outcome recorded.
+5. **Not this run:** SHORT-CONTINUUM + LONG-NEUTRAL drought causes — separate from RSI path, already on monitor list.
+
+## DB numbers (verified this run, source of truth = PostgreSQL brain)
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 24h | 32 | -$0.60 | 56.3% |
+| Open | 1 (SEI LONG bb-squeeze+ 19:56) | — | — |
+| Worst 24h signal | bb-bounce-v3-long+ 10T | -$0.56 | 40.0% |
+| Best 24h signal | bb-squeeze+ 13T | +$0.31 | 69.2% |
+
+---
+
 # CEO Report — 2026-10-04 17:49 UTC
 
 ### Diagnosis

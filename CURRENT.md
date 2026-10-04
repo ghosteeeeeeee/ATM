@@ -1,7 +1,18 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 18:45 UTC**
-**Updated by: Daily Orchestrator (freeze-safe run)**
+**Last Updated: 2026-10-04 21:05 UTC**
+**Updated by: CEO (RSI consolidation decision)**
+
+## CEO DECISIONS 21:03 — RSI Consolidation Gap
+
+**Verified:** compactor has 3 inline RSI gates, 0 rsi_utils imports. Floor+sweet-spot=5m, ceiling=1m. Same-pass bonus+block LIVE (HYPER 45.7/75.6, BTC 58.2/79.9). Drought LIVE: 0 approved, 147 sig/2h. 24h DB: 32T -$0.60 56.3%. Open: SEI LONG only.
+
+1. **Compactor consolidation APPROVE — SHIP NOW (bug_hunter).** LONG gates → rsi_utils tf=5m; SHORT ceiling → rsi_utils tf=1m method-only. Constants untouched. Freeze-safe (correctness fix, no VALUE changes).
+2. **Full RSI fold-in DEFER** to post-freeze Oct 6 00:38 (signals layer, decider drift, accel_300_v3).
+3. **Freeze ruling:** code-path refactor freeze-safe under "crash-bug code fixes allowed." Freeze targets constant VALUES.
+4. **Penalty-floor monitor SET** through Oct 6 — hard blocks now truly hard (compactor.py:2023-2024). self_learner owns.
+
+**Post-freeze queue Oct 6 00:38:** full RSI fold + bb-bounce-v3 NORMAL regime-block + FAMILY_MAP underscore + hotset-empty audit + DRIFT-005.
 
 ## Current Status
 
