@@ -46,3 +46,6 @@
 
 ## TEAM UPDATES
 - [2026-10-03 19:47] health_monitor: No auto-fixes required — pipeline OK, 3 open positions, 68 signals/1h, 28 trades closed today (+1.81 USDT, 67.9% WR). Disk 84% (watch). Known failed maintenance units unchanged.
+
+## TEAM UPDATES
+- [2026-10-04 08:11 UTC] auto_1hr: NO CHANGE — 2T closed last hour (2W 0L +$0.20, both bb-squeeze+ profit-monster-trail). 24h: 33T 66.7%WR +$0.93, atr_sl_hit 0% (fix stable). bb-squeeze+ 15T 86.7%WR +$1.01 star. No kill/size/overtrade/negative-streak triggers. 5 open bb-squeeze+ LONGs (correlated exposure). WATCH: hard_max_loss family 7T -$1.06 | pnl_pct nonsense | signal_version.py still missing.
