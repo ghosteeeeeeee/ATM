@@ -3579,3 +3579,28 @@ BY: auto_1hr
 - Flat book right now (0 open) — clean slate.
 - doji-bottom-long and volume-breakout-long+ both 0%WR 24h but n=1 each — below kill threshold, monitor for sample growth.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
+
+## [2026-10-04 22:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 0 losses, $0) — BTC continuum_engine LONG ORPHAN_PAPER (orphan paper record, not live PnL)
+**PnL:** $0.00 last hour (no live closes) | 24h: 32T 19W 13L -$0.70 (WR: 59.4%) | Open: 2 (USELESS bb-squeeze+ LONG, BABY bb-bounce-v2-long+ LONG — both ~48min old)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** Last real close was SEI bb-squeeze+ at 21:04 (previous hour) hard_max_loss -$0.24/-5.42%. This hour: only ORPHAN_PAPER $0.00 record — not live trade data.
+- **atr_sl_hit >40%:** 1/32 (3.1%) of 24h closes. Dominant exits: profit-monster-trail 17T +$1.17 (53%), hard_max_loss 11T -$1.84 (34%). tpsl_utils.py fix stable. hard_max_loss is intentional hard-stop family, not a tight-SL bug.
+- **Kill rule:** Last hour 0 live trades. 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long / pump-chain- / volume-breakout-long+ all 1T 0%WR — n=1 each, below kill threshold. No kill.
+- **Negative PnL streak:** Activity hours: 15:+$0.04, 16:-$0.20, 17:+$0.01, 18:+$0.06, 19:+$0.36, 21:-$0.24, 22:$0. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 0 live trades last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates git-clean, no violations.
+
+**Open Questions:**
+- Two opens ~48min (USELESS bb-squeeze+, BABY bb-bounce-v2-long+) — monitor hard_max_loss family (11T -$1.84/24h) as sole loss concentration.
+- ORPHAN_PAPER close on continuum_engine — paper-trade record cleanup, not live money. If recurring, check orphan sweep logic.
+- 24h PnL -$0.70 with 59.4% WR — R:R still negative (avg loss >> avg win). Post-freeze: review hard_max_loss stop placement vs trail exits.
+- doji-bottom-long / pump-chain- / volume-breakout-long+ 0%WR n=1 — below kill, watch sample growth.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
