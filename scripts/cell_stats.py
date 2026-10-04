@@ -157,6 +157,43 @@ def compute_outcome_cells(rows):
     return out
 
 
+def backfill_mfe_mae(days=7):
+    """Nightly repair: fill NULL mfe_pct/mae_pct on recently closed brain trades
+    from highest_price/lowest_price (direction-aware). Brain-CLI-routed closes
+    (profit_monster/cut_loser) don't compute MFE/MAE live — P0's backfill was
+    one-time, so coverage decayed from 97% (RESOLV 16:33 close = NULL with all
+    three prices present). One mechanism repairs every writer's gaps within 24h.
+    Returns rows updated."""
+    import psycopg2
+    from _secrets import BRAIN_DB_DICT
+    conn = None
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE trades SET
+              mfe_pct = CASE direction
+                WHEN 'LONG' THEN ROUND(((highest_price - entry_price) / entry_price * 100)::numeric, 4)
+                ELSE ROUND(((entry_price - lowest_price) / entry_price * 100)::numeric, 4) END,
+              mae_pct = CASE direction
+                WHEN 'LONG' THEN ROUND(((entry_price - lowest_price) / entry_price * 100)::numeric, 4)
+                ELSE ROUND(((highest_price - entry_price) / entry_price * 100)::numeric, 4) END
+            WHERE status='closed'
+              AND close_time > NOW() - (%s || ' days')::interval
+              AND mfe_pct IS NULL
+              AND entry_price > 0
+              AND ((direction='LONG' AND highest_price > 0 AND lowest_price > 0)
+                OR (direction='SHORT' AND highest_price > 0 AND lowest_price > 0))
+        """, (str(days),))
+        n = cur.rowcount
+        conn.commit()
+        cur.close()
+        return n
+    finally:
+        if conn:
+            conn.close()
+
+
 def compute_cells(rows):
     """Aggregate rows into cell / signal-level / global stats with backoff."""
     K = CELL_STATS_SHRINK_K
@@ -339,6 +376,10 @@ def main():
     args = ap.parse_args()
 
     log(f'fetching {args.days}d closed trades from brain DB...')
+    # nightly MFE/MAE repair first — cell quantiles need complete data
+    n_rep = backfill_mfe_mae(days=7)
+    if n_rep:
+        log(f'MFE/MAE backfill: {n_rep} recent closes repaired (brain-CLI gap)')
     rows = fetch_trades(args.days)
     log(f'{len(rows)} trades fetched')
     if not rows:
