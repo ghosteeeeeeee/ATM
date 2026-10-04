@@ -239,18 +239,21 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 # (hl_notional_usdt is actual fill notional which varies; amount_usdt
                 #  is the margin we risk per trade, matching dashboard convention)
                 notional = PM_DEFAULT_NOTIONAL
+                _entry_rsi = None  # P0: learning band source; None → band NULL
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
                     _conn = psycopg2.connect(**BRAIN_DB_DICT)
                     try:
                         _cur = _conn.cursor()
-                        _cur.execute("SELECT amount_usdt, signal, confidence FROM trades WHERE id=%s", (trade_id,))
+                        # P0: also fetch entry_rsi_14 for the learning band label
+                        _cur.execute("SELECT amount_usdt, signal, confidence, entry_rsi_14 FROM trades WHERE id=%s", (trade_id,))
                         _row = _cur.fetchone()
                         if _row:
                             notional = float(_row[0]) if _row[0] else 11.0
                             _signal_type = _row[1] or 'unknown'
                             _confidence = float(_row[2]) if _row[2] else 80
+                            _entry_rsi = _row[3]
                         else:
                             _signal_type = 'unknown'
                             _confidence = 80
@@ -262,6 +265,10 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                     _confidence = 80
                 # PnL = pnl% × margin (matches dashboard convention)
                 actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
+                try:
+                    from signal_schema import rsi_band_label as _rsi_band
+                except ImportError:
+                    _rsi_band = lambda r: None  # noqa: E731
                 record_signal_outcome(
                     token=token,
                     direction=direction,
@@ -269,7 +276,10 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                     pnl_usdt=round(actual_pnl_usdt, 4),
                     signal_type=_signal_type,
                     confidence=_confidence,
-                    trade_id=trade_id
+                    trade_id=trade_id,
+                    # P0: profit-monster is the largest close family — was writing NULL
+                    exit_reason=f"profit-monster-{tier}",  # matches brain CLI close-reason
+                    entry_rsi_band=_rsi_band(_entry_rsi),
                 )
             except Exception as sig_err:
                 log(f"  [{tier}] Signal outcome record error: {sig_err}", "WARN")

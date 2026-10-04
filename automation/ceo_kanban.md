@@ -194,3 +194,6 @@
 
 ## TEAM UPDATES
 - [2026-10-04 12:11 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour both losses -$0.36 (SUSHI/ME bb-bounce-v3-long+ LONG hard_max_loss ~-1.0%). 24h: 36T 20W 16L -$0.44 55.6%WR; atr_sl_hit 1/36=2.8% (tpsl fix stable — no CEO alert); profit-monster-trail 20T +$1.35 dominant. Kill rule NOT met: bb-bounce-v3-long+ 2T 0W this hour (<3T threshold); 24h 8T 3W -$0.41 worst signal but not 0% WR — watch, will kill if next hour brings 3+ more 0% WR closes. No 3h negative streak (08:00 -$0.31, 09:00 -$0.13, 10:00 0T reset, 11:00 -$0.36 — max 2 consecutive). Not overtrading (2/hr). Open 2: DOT/CFX both bb-bounce-v3-long+ LONG (same losing family — correlated exposure watch). hard_max_loss family 11T -$1.67 sole 24h loss concentration (stops working as designed; CUT_LOSER_PNL fires before ATR SL). 0 CHANGES APPLIED.
+
+## TEAM UPDATES
+- [2026-10-04 14:12] auto_1hr: No change — 1T last hour (SYRUP doji-bottom-long hard_max_loss -$0.25). 24h 32T 43.8%WR -$0.44. No kill/size/overtrade/streak trigger met. Watch: bb-bounce-v3-long+ 6T -$0.50 with 3 open LONGs (kill threshold not met), hard_max_loss family 10T -$1.46, WR dropped to 43.8%.

@@ -719,3 +719,6 @@
 - **INFO**: today's PnL swung -12.8% → -15.4% between 13:45:46 and 13:46:40 while open stayed 3 — a close or mark-to-market update, not a system fault. Trading performance, not system health. Watch streak/risk separately.
 - **INFO** (recurring, non-trading-path failed units, unchanged): better-coder, bug-hunter (expected FAILs), git-release (dirty tree), mtf-macd-tuner, trading-checklist. None on execution path.
 - **AUTO-FIXES APPLIED**: none. Pipeline running rc=0; prices fresh; disk 81% under threshold; no crashes; no missed trading-path timers; signals flowing (82/h). No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 14:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

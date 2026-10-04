@@ -3042,7 +3042,9 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         cur = conn.cursor()
         # Look up entry price, direction, amount, leverage, paper flag, and open_time for PnL calc
         cur.execute(
-            "SELECT entry_price, direction, amount_usdt, leverage, paper, open_time, hl_notional_usdt FROM trades WHERE id=%s AND status='open'",
+            "SELECT entry_price, direction, amount_usdt, leverage, paper, open_time, hl_notional_usdt, "
+            "signal, confidence, entry_rsi_14, highest_price, lowest_price "
+            "FROM trades WHERE id=%s AND status='open'",
             (trade_id,))
         row = cur.fetchone()
         if not row:
@@ -3050,7 +3052,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             cur.close(); conn.close()
             return
 
-        entry_price, direction, amount_usdt, leverage, is_paper, open_time, hl_notional_usdt = row
+        (entry_price, direction, amount_usdt, leverage, is_paper, open_time, hl_notional_usdt,
+         _signal_type, _confidence, _entry_rsi, _hp_raw, _lp_raw) = row
 
         # FIX (2026-04-05): Sanity-check entry_price against current market price.
         # If entry_price is <10% or >10x current market, the entry was corrupted (e.g.
@@ -3134,16 +3137,40 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             final_pnl_pct = 0.0
             exit_price = entry_price  # close at entry = no loss/no win
 
-        # Compute MFE/MAE from price history
+        # Compute MFE/MAE from price history, with tracked-extremes fallback
+        # P0 (2026-10-04): _compute_mfe_mae returns None when price_history has no
+        # rows (common case). Fallback: compute from highest_price/lowest_price
+        # maintained by trailing logic — direction-aware, same formulas as the
+        # brain-DB backfill. MFE/MAE now get written on EVERY guardian close.
         from datetime import datetime, timezone
         _close_time = datetime.now(timezone.utc)
         mfe_pct, mae_pct, mfe_price, mae_price = _compute_mfe_mae(
             token, direction, float(entry_price), open_time, _close_time
         )
+        try:
+            _hp = float(_hp_raw or 0)
+            _lp = float(_lp_raw or 0)
+            _ep = float(entry_price or 0)
+            if _ep > 0 and (mfe_pct is None or mae_pct is None):
+                if str(direction).upper() == 'LONG':
+                    if mfe_pct is None and _hp > 0:
+                        mfe_pct = (_hp - _ep) / _ep * 100
+                        mfe_price = _hp
+                    if mae_pct is None and _lp > 0:
+                        mae_pct = (_ep - _lp) / _ep * 100
+                        mae_price = _lp
+                else:  # SHORT
+                    if mfe_pct is None and _lp > 0:
+                        mfe_pct = (_ep - _lp) / _ep * 100
+                        mfe_price = _lp
+                    if mae_pct is None and _hp > 0:
+                        mae_pct = (_hp - _ep) / _ep * 100
+                        mae_price = _hp
+        except Exception:
+            pass  # non-fatal
 
         # Commit IMMEDIATELY to release row lock — prevents deadlocks with position_manager
-        # exit_reason is VARCHAR(20) — truncate to prevent overflow
-        _exit_reason_short = reason[:20] if reason else reason
+        # P0 (2026-10-04): exit_reason column widened to TEXT — no more [:20] truncation
         cur.execute("""
             UPDATE trades SET status = 'closed', exit_price = %s,
                 pnl_pct = %s, pnl_usdt = %s,
@@ -3153,7 +3180,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s,
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id = %s AND status = 'open'
-        """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, _exit_reason_short, reason,
+        """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
               mfe_pct, mae_pct, mfe_price, mae_price,
               trade_id))
@@ -3169,6 +3196,27 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 _record_loss_cooldown(token, direction)
             # FIX (2026-04-01): Clear reconciled state so token can be re-reconciled on next open.
             _clear_reconciled_token(token)
+            # ── P0 (2026-10-04): signal_outcomes write — was MISSING on ALL guardian ──
+            # exit paths (hard_sl, trail_sl, hard_tp, HL_CLOSED, ORPHAN_PAPER,
+            # PHANTOM_CLOSE, CUT_LOSER…). 54/217 closes in the prior 7 days had no
+            # outcome row. Single funnel: every guardian close passes through here.
+            try:
+                from signal_schema import record_signal_outcome as _rso, rsi_band_label as _rsi_band
+                _rso(
+                    token=token,
+                    direction=direction,
+                    pnl_pct=round(float(final_pnl_pct or 0), 4),
+                    pnl_usdt=round(float(final_pnl_usdt or 0), 4),
+                    signal_type=_signal_type or 'unknown',
+                    confidence=float(_confidence) if _confidence is not None else None,
+                    trade_id=trade_id,
+                    exit_reason=reason,
+                    mfe_pct=mfe_pct,
+                    mae_pct=mae_pct,
+                    entry_rsi_band=_rsi_band(_entry_rsi),
+                )
+            except Exception as _rso_err:
+                log(f'  Signal outcome record error (non-fatal): {_rso_err}', 'WARN')
         cur.close()
         conn.close()
     except Exception as e:
@@ -3256,6 +3304,53 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
 
     is_win = float(computed_pnl_pct or 0) > 0
 
+    # ── P0 (2026-10-04): MFE/MAE + learning fields for this close ─────────────
+    _orphan_mfe, _orphan_mae, _orphan_mfe_px, _orphan_mae_px = None, None, None, None
+    _orphan_signal, _orphan_conf, _orphan_rsi = None, None, None
+    try:
+        _conn_m = get_db_connection()
+        if _conn_m is not None:
+            try:
+                _cur_m = _conn_m.cursor()
+                _cur_m.execute(
+                    "SELECT signal, confidence, entry_rsi_14, highest_price, lowest_price, open_time "
+                    "FROM trades WHERE id=%s", (trade_id,))
+                _rm = _cur_m.fetchone()
+                _cur_m.close()
+                if _rm:
+                    _orphan_signal, _orphan_conf, _orphan_rsi = _rm[0], _rm[1], _rm[2]
+                    _ohp = float(_rm[3] or 0)
+                    _olp = float(_rm[4] or 0)
+                    _oep = float(entry_px or 0)
+                    _otm = _rm[5]
+                    if _oep > 0 and _otm is not None:
+                        try:
+                            from datetime import datetime as _dtm, timezone as _tzm
+                            _oct = _dtm.now(_tzm.utc)
+                            _orphan_mfe, _orphan_mae, _orphan_mfe_px, _orphan_mae_px = _compute_mfe_mae(
+                                token, direction, _oep, _otm, _oct)
+                        except Exception:
+                            pass
+                    if _oep > 0 and (_orphan_mfe is None or _orphan_mae is None):
+                        if str(direction).upper() == 'LONG':
+                            if _orphan_mfe is None and _ohp > 0:
+                                _orphan_mfe = (_ohp - _oep) / _oep * 100
+                                _orphan_mfe_px = _ohp
+                            if _orphan_mae is None and _olp > 0:
+                                _orphan_mae = (_oep - _olp) / _oep * 100
+                                _orphan_mae_px = _olp
+                        else:  # SHORT
+                            if _orphan_mfe is None and _olp > 0:
+                                _orphan_mfe = (_oep - _olp) / _oep * 100
+                                _orphan_mfe_px = _olp
+                            if _orphan_mae is None and _ohp > 0:
+                                _orphan_mae = (_ohp - _oep) / _oep * 100
+                                _orphan_mae_px = _ohp
+            finally:
+                _conn_m.close()
+    except Exception:
+        pass  # non-fatal — learning fields must never block an orphan close
+
     # ── Position closed event log ───────────────────────────────────────────────
     try:
         log_event(EVENT_POSITION_CLOSED, {'token': token, 'close_reason': reason})
@@ -3269,8 +3364,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
     close_success = False
     try:
         cur = conn.cursor()
-        # exit_reason is VARCHAR(20) — truncate to prevent overflow
-        _exit_reason_short = reason[:20] if reason else reason
+        # P0 (2026-10-04): exit_reason column widened to TEXT — no [:20] truncation
         cur.execute("""
             UPDATE trades SET status='closed', exit_price=%s,
                 pnl_pct=%s, pnl_usdt=%s,
@@ -3278,12 +3372,14 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 last_updated=NOW(), updated_at=NOW(),
                 is_guardian_close=TRUE, guardian_closed=TRUE, guardian_reason=%s,
                 hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s,
+                mfe_pct=%s, mae_pct=%s, mfe_price=%s, mae_price=%s,
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
-              reason, _exit_reason_short, reason,
+              reason, reason, reason,
               realized_pnl if realized_pnl else None,
               computed_pnl_pct if realized_pnl else None,
+              _orphan_mfe, _orphan_mae, _orphan_mfe_px, _orphan_mae_px,
               trade_id))
         if cur.rowcount == 0:
             log(f'  Dedup: orphan trade #{trade_id} ({token}) already closed, skipping', 'WARN')
@@ -3297,6 +3393,24 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 _record_loss_cooldown(token, direction)
             _clear_reconciled_token(token)  # must be inside success path before return
             close_success = True
+            # ── P0 (2026-10-04): signal_outcomes write — was MISSING on orphan closes ──
+            try:
+                from signal_schema import record_signal_outcome as _rso, rsi_band_label as _rsi_band
+                _rso(
+                    token=token,
+                    direction=direction,
+                    pnl_pct=round(float(computed_pnl_pct or 0), 4),
+                    pnl_usdt=round(float(computed_pnl_usdt or 0), 4),
+                    signal_type=_orphan_signal or 'unknown',
+                    confidence=float(_orphan_conf) if _orphan_conf is not None else None,
+                    trade_id=trade_id,
+                    exit_reason=reason,
+                    mfe_pct=_orphan_mfe,
+                    mae_pct=_orphan_mae,
+                    entry_rsi_band=_rsi_band(_orphan_rsi),
+                )
+            except Exception as _rso_err:
+                log(f'  Signal outcome record error (non-fatal): {_rso_err}', 'WARN')
         cur.close()
         conn.close()
 

@@ -85,6 +85,78 @@ def fetch_trades(days):
             conn.close()
 
 
+def fetch_signal_outcomes(days):
+    """signal_type-keyed outcomes from runtime SQLite — covers live families
+    (support_resistance, hmacd_mtf, ichimoku, ...) that trades.signal source-form
+    keys miss. Percent units (pnl_pct)."""
+    from paths import RUNTIME_DB
+    if not os.path.exists(RUNTIME_DB):
+        return []
+    conn = sqlite3.connect(RUNTIME_DB)
+    try:
+        rows = conn.execute("""
+            SELECT signal_type, direction, COALESCE(regime, 'UNKNOWN'),
+                   is_win, pnl_pct
+            FROM signal_outcomes
+            WHERE closed_at > datetime('now', ?)
+              AND signal_type IS NOT NULL
+        """, (f'-{days} days',)).fetchall()
+        return rows
+    finally:
+        conn.close()
+
+
+def compute_outcome_cells(rows):
+    """Signal_type-keyed cells from signal_outcomes (percent units, same backoff)."""
+    K = CELL_STATS_SHRINK_K
+    MIN_N = CELL_STATS_MIN_N_CELL
+    cells, signals = {}, {}
+    glob = {'n': 0, 'wins': 0, 'pnl': 0.0}
+    for stype, direction, regime, is_win, pnl_pct in rows:
+        stype = (stype or 'UNKNOWN').strip()
+        direction = (direction or 'UNKNOWN').strip().upper()
+        regime = (regime or 'UNKNOWN').strip().upper()
+        win = int(is_win or 0)
+        pnl = float(pnl_pct or 0)
+        for store, key in ((cells, (stype, direction, regime)),
+                           (signals, (stype, direction)),
+                           (glob, None)):
+            agg = store if key is None else store.setdefault(
+                key, {'n': 0, 'wins': 0, 'pnl': 0.0})
+            agg['n'] += 1
+            agg['wins'] += win
+            agg['pnl'] += pnl
+    glob_wr = (glob['wins'] / glob['n']) if glob['n'] else 0.0
+    glob_avg = (glob['pnl'] / glob['n']) if glob['n'] else 0.0
+    sig_f = {k: {'n': v['n'], 'wr': (v['wins'] / v['n']) if v['n'] else 0.0,
+                 'avg': (v['pnl'] / v['n']) if v['n'] else 0.0}
+             for k, v in signals.items()}
+    out = []
+    for (stype, direction, regime), agg in cells.items():
+        n = agg['n']
+        wr = (agg['wins'] / n) if n else 0.0
+        avg = (agg['pnl'] / n) if n else 0.0
+        sig = sig_f.get((stype, direction))
+        if n >= MIN_N:
+            admission, wr_b, avg_b = 'cell', wr, avg
+        elif sig and sig['n'] >= 5:
+            wr_b = (n * wr + K * sig['wr']) / (n + K)
+            avg_b = (n * avg + K * sig['avg']) / (n + K)
+            admission = 'blend' if n >= 10 else 'signal'
+            if n < 10:
+                wr_b, avg_b = sig['wr'], sig['avg']
+        else:
+            wr_b = (n * wr + K * glob_wr) / (n + K) if n else glob_wr
+            avg_b = (n * avg + K * glob_avg) / (n + K) if n else glob_avg
+            admission = 'global'
+        out.append({'signal': stype, 'direction': direction, 'regime': regime,
+                    'n': n, 'wins': agg['wins'], 'wr_raw': round(wr, 4),
+                    'wr_blended': round(wr_b, 4), 'avg_pnl_pct': round(avg_b, 4),
+                    'total_pnl_pct': round(agg['pnl'], 2), 'admission': admission,
+                    'tradeable': bool(n >= MIN_N and wr_b >= 0.60)})
+    return out
+
+
 def compute_cells(rows):
     """Aggregate rows into cell / signal-level / global stats with backoff."""
     K = CELL_STATS_SHRINK_K

@@ -119,9 +119,14 @@ def _get_db_connection():
         return None
 
 
-def _close_paper_position(trade_id: int, reason: str) -> bool:
-    """Close paper trade in DB. Returns True on success."""
-    reason = reason[:20]
+def _close_paper_position(trade_id: int, reason: str, exit_detail: str = None) -> bool:
+    """Close paper trade in DB. Returns True on success.
+
+    P0 (2026-10-04): `reason` = canonical exit label; numeric detail goes in
+    `exit_detail` (appended into close_reason). No [:20] truncation.
+    NOTE: this v1 path writes to the SQLite runtime DB (legacy — v1 is disabled
+    via CASCADE_FLIP_ENABLED=False; v2 uses position_manager.close_paper_position).
+    """
     conn = _get_db_connection()
     if conn is None:
         return False
@@ -152,6 +157,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
         exit_fee = notional * TAKER_FEE
         fee_total = entry_fee + exit_fee
         pnl_pct, pnl_usdt_val, net_pnl = compute_close_pnl(entry_price, current_price, direction, notional, leverage)
+        _close_reason_full = f"{reason} {exit_detail}" if exit_detail else reason
         cur.execute("""
             UPDATE trades
             SET status = 'closed',
@@ -166,7 +172,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
                 hype_realized_pnl_usdt = ?,
                 hype_realized_pnl_pct = ?
             WHERE id = ? AND status = 'open'
-        """, (now, reason, reason, current_price,
+        """, (now, _close_reason_full, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee, 6), 'exit_fee': round(exit_fee, 6),
                           'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
@@ -283,7 +289,9 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
     close_pnl_usdt = compute_pnl_usdt(live_pnl, old_amount * old_lev)   # pnl_utils — use notional
 
     # ── 1. Close the losing position ────────────────────────────────────────
-    close_ok = _close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
+    # P0: canonical label; pnl detail moved to exit_detail (close_reason)
+    close_ok = _close_paper_position(trade_id, "cascade_flip",
+                                     exit_detail=f"cascade_flip_pct={live_pnl:+.2f}%")
     if not close_ok:
         print(f"  [CASCADE FLIP] ❌ Failed to close {token} #{trade_id}")
         return False

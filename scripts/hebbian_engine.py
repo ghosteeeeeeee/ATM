@@ -403,19 +403,42 @@ class HebbianEngine:
         return {'strengthened': strengthened, 'weakened': weakened}
 
     def wr_estimate(self, token: str, signal: str, k: int = 50):
-        """Estimate historical win rate for a (token, signal) pair from Hebbian memory.
+        """Estimate historical win rate for a (token, signal) pair.
 
-        Weight dynamics:
-        - New synapse starts at 1.0 (1st trade win) or 0.5 (1st trade loss)
-        - WIN → +1, LOSS → -1 (floor 0.5)
+        P0 FIX (2026-10-04): PRIMARY source is now trade_log — plain WR over the
+        last k recorded trades, NO time decay (decayed_wr_estimate covers that).
+        The old synapse/concept-network estimate is kept ONLY as a fallback for
+        pairs with no trade_log rows.
+
+        Weight convention (preserved for downstream consumers, e.g.
+        decider_run.py hebbian penalty and combo_part_wr):
         - After N trades with W wins: weight = max(0.5, 1 + 2W - N)
+          (identical to the old synapse-weight formula)
 
-        Calibrated WR:
-        - weight > 1.0: WR = (weight + N - 1) / (2N)
-        - weight == 0.5: WR < 0.5 (cannot distinguish 0% from 49%)
-
-        Returns (estimated_wr, count, weight) or None if pair not found.
+        Returns (estimated_wr, count, weight) or None only when the pair has
+        no trade_log rows AND no synapse/concept data.
         """
+        # ── PRIMARY: trade_log (has the actual per-trade outcomes) ──────────
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT won FROM trade_log
+                    WHERE token = ? AND signal = ?
+                    ORDER BY close_time DESC
+                    LIMIT ?
+                """, (token, signal, k))
+                rows = cur.fetchall()
+            if rows:
+                wins = sum(1 for (won,) in rows if won)
+                n = len(rows)
+                wr = wins / n
+                weight = max(0.5, 1 + 2 * wins - n)
+                return (min(max(wr, 0.0), 1.0), int(n), float(weight))
+        except Exception:
+            pass  # fall through to synapse-based estimate
+
+        # ── FALLBACK: synapse/concept network (old logic, unchanged) ─────────
         results = self.recall(token, k=k)
         match = next((r for r in results if r[0] == signal), None)
         if not match:

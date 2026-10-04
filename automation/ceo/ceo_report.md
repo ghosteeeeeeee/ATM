@@ -1,195 +1,76 @@
-## CEO Report — 2026-10-04 13:50 UTC
+# CEO Report — 2026-10-04 — Plan Review: Trade Learning System
 
-### Diagnosis
-PG-verified: 24h **34T -$0.65 55.9%** (FLIPPED NEGATIVE from 09:50 +$0.49) | 7d **217T +$1.57 52.1%** | 30d **946T -$0.80 51.6%** (improved from -$1.19 — window recovery). LONG 7d +$2.95/163T 54.0%. SHORT 7d **-$1.38/54T 46.3%** unchanged. **Worst signal: bb-bounce-v3-long+** 24h 7T -$0.48 **28.6%WR** + **3 correlated open** (CFX -0.74%, DOT -0.34%, NXPC -0.39%). 30d NEUTRAL-only 17T 52.9% -$0.24. b960ffe8: **0 SHORT since fix 01:50 (~12h)** — untestable n=0. Post-brain_auditor ATR_TP_MIN 11:35: 2 closed both hard_max_loss -$0.37 (SUSHI bb-bounce-v3, SYRUP doji) — TP floor unjudgeable (hard_max_loss ≠ TP exits). volume-breakout post-boost: 1 trade CRV -$0.11 hard_max_loss conf 99. bb-squeeze+ still best 24h 19T +$0.37 68.4%. Disk 81%. Pipeline healthy. Sunday — MoE skipped.
+## VERDICT
 
-### Root Cause
-1. **24h flip = morning winners aged out + hard_max_loss tail.** 10/14 24h losers exit_reason=hard_max_loss_~1.0% while pnl_pct ~-3.2% (lev 3-5). Semantics CODE-CONFIRMED (position_manager.py:3265-3267). Not new signal failure — stop working as designed at price-scale, bleeding at account-scale.
-2. **bb-bounce-v3-long+ bleeding in only habitat (NEUTRAL).** Kill threshold NOT met (needs 0%WR 5+ trades). **DRIFT-005 (brain_auditor 13:37 HIGH):** RSI_MAX=55 filter hole — entries fired at RSI 55-86 despite filter; ENS signal-time RSI 80.81 via STANDALONE_BYPASS (bb-bounce-v3-long in bypass list :2662). **First fix = audit bypass path to enforce existing RSI_MAX=55 (bug_hunter), NOT value change.** Only after hole closed, evaluate RSI_MAX 55→40 at ≥20T sample. Mean-rev RSI>55 14d: 8T 25%WR -$0.77.
-3. **ATR_TP_MIN=0.013 live** (hermes_constants.py:681, loaded fresh each 1m pipeline cycle — no restart needed). Only 2 trades post-change, both hard_max_loss. Need hard_tp/trailing exits to judge TP floor.
-4. **SHORT drought continues** — NEUTRAL regime + RSI floors correctly filtering. Monitor, not failure.
+**APPROVE P0 with corrections. APPROVE architecture in principle. MODIFY decisions 2–5. DO NOT adopt plan's numbers or T3 timeline as written.** Plan's diagnosis is directionally right (brain learns at wrong granularity, gates unlearnable, exits static) but three evidence claims are wrong and two component recommendations collide with reality on this box. Auditor/watchdog are NOT redundant — assign them ownership, don't replace them.
 
-### Fix Applied
-**0 trading config changes** — b960ffe8 48h freeze standing until Oct 6 00:38. Regime memory updated 13:50 (bb-bounce-v3-long+ added as bleeding candidate; system metrics refreshed). CURRENT.md refreshed. Protected flags untouched. brain_auditor ATR_TP_MIN change NOT reverted (standing no-revert; 1 hard_tp exit/7d means minimal exit-path impact anyway). OpenMemory stored.
+## EVIDENCE CHECKS
 
-### Verification
-- All numbers re-queried from PG brain this run — CEO-verified, not from prior reports.
-- ATR_TP_MIN=0.013 confirmed live via python import of hermes_constants.
-- b960ffe8: 0 SHORTs since fix; continue to Oct 6 00:38.
-- **NEXT CONFIG (post-freeze):** bb-bounce-v3-long+ RSI_MAX 55→40 if 30d rsi>40 sample reaches 20T.
-- Goals: SHORT 7d ≥$0 by Oct 7; 24h back ≥$0; 7d →+$3.00; 30d →≥$0 by Oct 11; volume-breakout post-boost ≥10T; doji →20T.
-- Delegated (standing): bug_hunter (hard_max_loss fix path + RR_ENGINE shadow), self_learner (oversold verify n=0), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker, scanner retune).
+| Claim | Verdict | Verified fact |
+|---|---|---|
+| wr_estimate None for recorded pair | **CONFIRMED but root cause WRONG** | None returned for SUSHI/doji-bottom-long AND SUSHI/bb-squeeze+. trade_log HAS both pairs. `wr_estimate()` reads synapse/concept network via `recall(token,k=50)`; `decay ed_wr_estimate()` reads trade_log directly and returns numbers. 144/304 pairs with n≥3 return None from wr_estimate. **One-line fix, not schema fix.** |
+| Cell census 10/31/40/78/493 → 81 cells n≥10 | **DISPROVED** | Live 90d signal×regime×direction: **18/24/30/51/302 → 72 cells n≥10** (15 at WR≥60%, 28 profitable, 23 at WR≥55%). Plan overcounted both ends. Thesis survives; success metric must be restated ≥60, not 81. |
+| Exit-path 30d table | **CONFIRMED** | pm-trail 292T 81.2% +$17.69; atr_sl_hit 355T 46.5% −$3.90; CL-T1 83T 0% −$11.73. CL-T1 all pre-fix (c6cd1246 Oct 2, dead since Sep 29) — **0 valid CL-T1 trades in 30d window**. |
+| signal_outcomes 2,842 rows w/ regime+thesis_mfe | **HALF-TRUE** | Rows=2,842 ✓ regime=2,776 (98%) ✓ **thesis_mfe=56 (2%) — effectively empty**. DB at `data/signals_hermes_runtime.db` (AGENTS.md path stale). Live writes partial (18 closed-today vs ~34 portfolio; 163/7d vs 217 brain). decider_run already queries it for 24h WR — table is load-bearing. |
+| "5k MFE/MAE pairs for T3 calibration" | **DISPROVED** | Brain 90d: 3,384 closed, **only 233 have mfe_pct/mae_pct (6.9%)**. 30d: 118/946. T3 quantile calibration cannot run on 5k pairs — ~233 is the real corpus. |
 
-Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+**Findings the plan missed:**
+1. **hard_max_loss family = 39T 0%WR −$5.32/30d** — fragmented across ~25 exit_reason labels (`hard_max_loss_-1.04%` etc.). Plan's exit table never aggregated it. Second-biggest bleed after dead CL-T1; dominates current 24h flip negative. **Normalize exit_reason families before any T2/T3 stats run.**
+2. **trail_sl / atr_trail_hit** just landed (Oct 1–3): 3T +$0.45 / 8T +$1.58, both 100%WR, separate labels from profit-monster-trail. Learner sees 3 trail labels; T3 would miscalibrate unless grouped.
+3. **b960ffe8 48h trading-config freeze live until Oct 6 00:38.** P0 is non-trading code/schema — safe. P1–P6 live changes wait.
+4. **T3 candidate grid collides with CEO_PROTECTED `PM_TRAIL_ACTIVATE_PCT=0.40` / `PM_TRAIL_DISTANCE_PCT=0.20`.** Plan proposes tuning "trail activation 0.3/0.4/0.6%" — that IS the protected constant. Search space must be bounded by protected values or T3 violates the hard rule.
 
-## CEO Report — 2026-10-04 09:50 UTC
+## AUDITOR-WATCHDOG RECOMMENDATION (T directive)
 
-### Diagnosis
-PG-verified: 24h **38T +$0.49 60.5%** (improving) | 7d **214T +$2.18 52.8%** | 30d **954T -$1.19 51.7%** (worse than 05:50 -$0.48 — **window-edge roll of older winners, NOT new bleed**; 24h still positive, last close 09:37). LONG 7d +$3.56/160T carries system. SHORT 7d -$1.38/54T. b960ffe8 monitor ~8h in: **0 SHORT trades since restart 01:50** — filter untestable (n=0), not failing. brain_auditor 06:39 reopened EXTREME pump-chain- SHORT gate 0.0→1.0 — MoE-consistent (EXTREME RSI>=40 = only profitable SHORT cell 30d 18T +$0.96 72.2%WR). Post-reopen: 0 SHORTs (NEUTRAL regime blocks neutral SHORT). hard_max_loss still #1 bleed 48h: bb-squeeze+ 7T -$0.95, pump-chain- 3T -$0.56. 0 open positions. Disk 81%. Pipeline healthy.
+**Do not build parallel infrastructure. Do not overload existing components. Assign ownership:**
 
-### Root Cause
-1. **hard_max_loss semantics CODE-CONFIRMED** (position_manager.py:3265-3267): `HARD_MAX_LOSS_PCT=CUT_LOSER_PNL_HERMES` (-1.00) compared to `live_pnl`. exit_reason label shows ~-1.0 to -1.2% while trades.pnl_pct is -3.1 to -5.9% at lev 3-5 — **stop fires on ~1% PRICE move, becomes 3-5% account loss at live leverage.** Not a signal-kill; near-breakeven signals lose their tail to leverage amplification.
-2. **30d deterioration is window-edge**, not systemic: older positive trades aged out of the 30d window between 05:50 and 09:50. 24h trajectory is positive and improving.
-3. **volume-breakout boost unjudgeable** — 1.25 live ~11h, 0 post-boost trades (confluence/filter starvation, not boost failure).
-4. **ema_reclaim 0 trades EVER** — detection exists, execution path dead. OVERDUE.
-5. **SHORT structural bleed** continues; b960ffe8 cannot pass/fail without SHORTs (n=0 ~8h).
+| Component | Cadence | Owns (repurpose/add) | Does NOT own |
+|---|---|---|---|
+| `pipeline_watchdog.py` (hermes-watchdog.timer) | 1min | **Unchanged** — liveness only: heartbeat, signal rate, trade recency, crashes, syntax, DB-leak. Verified: zero trade context today. | Outcomes, MFE/MAE, gates |
+| `trade_watchdog.py` (hermes-trade-watchdog.timer) | 30min | **REPURPOSE — T1 live layer.** Already computes MFE giveback on open positions + reads regime_5m.json/continuum/volatility_gate. ADD: write live MFE/MAE snapshots to signal_outcomes for open positions. 30min cadence is right (1min overkill). | Cell stats, exit configs, gate changes |
+| signal_outcomes write path | at close | **FIX in P0** — position_manager `_ensure_signal_outcomes_table` + hl-sync-guardian + cut_loser already write; coverage ~75%. Close the gap; join on trade_id (verified). | Historical backfill (nightly job) |
+| **T2 cell-stats job (NEW)** | nightly | Compute n/WR/expectancy from signal_outcomes + brain trades → `brain/cell_stats`. Deterministic code. | Proposals, live changes |
+| **T4 gate shadow (NEW, folds into T2 or small hourly)** | nightly | Forward-close shadow records; per-gate context-band shadow WR. | Gate changes — CEO approves |
+| `brain_auditor` (opencode agent prompt, hourly :30) | hourly | **REPURPOSE as consumer, not computer.** Reads cell stats + gate shadow + watchdog steers → proposes deltas to kanban. Already has CEO-approval workflow (verified: EXTREME pump-chain- gate revert 06:39, ATR_TP_MIN 11:35). It is an LLM reviewer — "0 config changes" lines prove it judges, it cannot compute nightly stats. | Computing cell stats, replaying exits |
+| **P6 training timer (NEW)** | weekly | Recompute cells, propose exit configs + gate changes w/ shadow eval + rollback plan → kanban. **Auditor does NOT cover this** — auditor is reviewer, not tuner. | Applying changes; touching protected flags |
 
-### Fix Applied
-**0 trading config changes** — b960ffe8 48h window active, SHORT model A standing, protected flags untouched, CUT_LOSER_PNL value untouched (semantics with bug_hunter). **DO NOT revert** brain_auditor's EXTREME pump-chain- gate reopen — MoE-consistent, standing no-revert rule. Regime memory updated 09:50. CURRENT.md refreshed. Sunday — MoE panel skipped.
+**Net:** existing cadence covers *review and live open-position sensing*. New deterministic jobs cover *computation* (T2 nightly, T4 shadow, P6 weekly proposals). brain_auditor remains the hourly CEO-facing loop that consumes their output. Pipeline watchdog stays pure liveness. **Delta to plan:** T1 live-stream rides trade_watchdog (no new job); T4 audit feeds brain_auditor hourly (no new weekly report channel); P6 is the only new periodic compute job besides T2 — and its output lands in the existing kanban approval path, not a parallel one.
 
-### Verification
-- Numbers re-queried from PG brain this run — all figures above are CEO-verified, not from prior reports.
-- b960ffe8: 0 SHORTs since fix; continue monitor to Oct 6 00:38.
-- hard_max_loss code path read directly — price-vs-leveraged gap confirmed in source, not inferred.
-- volume-breakout boost code re-verified 1.25 at signal_compactor.py:710.
-- Goals: SHORT 7d ≥$0 by Oct 7; oversold SHORT=0 (n=0 so far); 7d →+$3.00; 30d →≥$0 by Oct 11; volume-breakout post-boost ≥10T; doji →20T.
-- Delegated: self_learner (oversold verify n=0), bug_hunter (RR_ENGINE + hard_max_loss semantics — code now confirmed), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker, scanner retune).
+## DECISIONS
 
-Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+1. **P0 — APPROVE with scope correction.** Fix = point `wr_estimate` at trade_log (same logic as `decayed_wr_estimate`), NOT synapse schema. Add to P0: signal_outcomes write-path fix, exit_reason family normalization (hard_max_loss ×25, trail ×3), MFE/MAE write reliability. Backfill joins `trade_id` → `trades.id` (verified). Exclude pre-fix CL-T1 (all 83 trades) from any calibration. Dead 0-byte DB cleanup: fine, marginal. **No trading behavior change — safe under freeze.**
+2. **Selection philosophy — CONFIRM with two guardrails.** Fewer trades, positive-expectancy cells only is correct (28/72 n≥10 cells profitable today). Modify: (a) require n≥15 OR strict Bayesian backoff for live selection — n≥10 at 60% over 90d is still thin; (b) **trade-count floor: 7d ≥ ~150** (currently 217). System is already signal-starved (ema_reclaim 0 trades EVER, 100% NEUTRAL regime). Do not cut below viable flow. Metric = PnL, not WR alone.
+3. **Shadow-first — APPROVE.** 1-week lag right for exit configs and gate relaxations. Tighten P5: live-on-3-cells requires ≥15 shadow trades per cell AND shadow WR ≥ 90d baseline, compared within same regime.
+4. **Guardrails — CONFIRM + 3 additions.** 5 changes/cycle, 10% magnitude, −5pp auto-rollback: keep. Add: (a) **no proposal may touch CEO_PROTECTED_FLAGS or PM_TRAIL_*** — T3 search space bounded by protected values (0.40/0.20 are floors/ceilings, not search bounds); (b) define rollback baseline window explicitly (7d pre-change WR, same query); (c) exit_reason normalization + MFE/MAE collection are prerequisites, not parallel work.
+5. **P6 weekly timer — APPROVE with dependency fix.** New timer yes; live changes still CEO-only via kanban. **Re-sequence:** P6 cannot run meaningfully until normalization + reliable MFE/MAE collection land (currently 6.9% coverage). Move from "week 4" to "after P0 cleanup + 2wk MFE/MAE collection".
 
-## CEO Report — 2026-10-04 05:50 UTC
+## PLAN DELTAS
 
-### Diagnosis
-PG-verified: 24h **34T +$0.23 58.8%** | 7d **207T +$2.42 53.1%** | 30d **956T -$0.48 52.1%** (improved from -$1.72). LONG 7d +$3.80/153T carries system. SHORT 7d -$1.38/54T. Daily: Oct2 +$0.73 → Oct3 +$1.15 → Oct4 +$0.47. b960ffe8 monitor ~4h in: **0 SHORT trades since pipeline restart 01:50** — filter untestable (n=0), not failing. hard_max_loss 48h 18T -$3.08 dominant bleed (stop working; semantics = price label vs leveraged pnl). 0 open positions. Disk 80%. Hotset empty — quiet NEUTRAL + oversold blocks correctly filtering freefall LONGs.
+| Phase | Plan said | Change to |
+|---|---|---|
+| P0 | wr_estimate fix + schema + backfill + dead DBs | + signal_outcomes write-path fix + exit_reason normalization + MFE/MAE write fix. wr_estimate = one-line trade_log redirect. Cell census restated **72 n≥10** not 81. |
+| P1 | T2 cell store live, 81 cells success metric | T2 = new **nightly deterministic job**; brain_auditor reviews hourly (existing). Metric: ≥60 n≥10 cells published w/ backoff. |
+| P2 | T3 exit optimizer, calibrate from 5k MFE/MAE pairs | **Blocked on data**: real corpus ~233 pairs/90d. Insert **P2a: 2 weeks reliable MFE/MAE collection** before quantile calibration. Bound search space by PM_TRAIL_* protected constants. |
+| P3 | T4 shadow outcomes + first automated gate audit | Shadow records computed in T2/nightly; audit report **feeds brain_auditor existing hourly loop** (kanban), not a new weekly report. |
+| P4–P5 | T5 shadow then live on 3 cells | Safety claim holds for gates (T5 adds layer, never removes). **Fails for exit constants** until PM_TRAIL bounded. P5 requires ≥15 shadow trades/cell same-regime. |
+| P6 | Weekly training timer | Yes, but depends on P0 normalization + P2a MFE/MAE collection. Proposals→kanban→CEO only. |
+| — | (not in plan) | Note b960ffe8 freeze until Oct 6 00:38. P0 non-trading OK; live changes wait. |
 
-### Root Cause
-No new bleed. Recovery is real; SHORT structural loss continues; hard_max_loss is cut-loser working as designed at ~1% price / lev 3-5. ema_reclaim still 0 trades EVER (detection 2 signals/24h, execution dead). doji detection works (10 signals/24h) but 0 executed — confluence starvation. volume-breakout boost 1.25 live, 0 post-boost trades yet.
+## RISKS
 
-### Fix Applied
-**0 trading config changes** — b960ffe8 48h window active, SHORT model A standing, protected flags untouched. Regime memory updated 05:50 (doji regime corrected: all NEUTRAL, HIGH claim stale). CURRENT.md refreshed. Sunday — MoE panel skipped.
+1. **T3 vs CEO_PROTECTED PM_TRAIL_*** — highest severity. Unbounded search = hard-rule violation. Mitigation: protected constants are immutable bounds; per-cell exit_config_id resolves *within* them.
+2. **MFE/MAE sparsity** — T3 v1 would overfit 233 pairs. Mitigation: P2a collection period first; backoff on n<20.
+3. **exit_reason fragmentation** — hard_max_loss ×25 labels poisons cell stats and exit optimizer. Mitigation: normalization is P0 prerequisite, not optional.
+4. **Starvation feedback loop** — selection philosophy + already-starved NEUTRAL regime could drop trade count below signal-detection viability. Mitigation: 7d trade-count floor ≥150; selection must not block fail-open to signal-level stats when cell empty.
+5. **SQLite migration under load** — signal_outcomes ALTER TABLE is metadata-only (safe with busy_timeout); batch backfill UPDATEs or run during low activity. Known "database is locked" pattern on price_collector — don't add another heavy writer without busy_timeout.
+6. **Decider already queries signal_outcomes** (24h WR at :108) — schema extension must not break that query path. Additive columns only; verify decider_run import after P0.
 
-### Verification
-- b960ffe8: 0 SHORTs since fix; PRE_FIX 6T 5/6 oversold; continue monitor to Oct 6 00:38.
-- volume-breakout boost code re-verified 1.25 at signal_compactor.py:709.
-- Goals: SHORT 7d ≥$0 by Oct 7; oversold SHORT=0 (n=0 so far); 7d →+$3.00; doji →20T.
-- Delegated: self_learner (oversold verify n=0), bug_hunter (RR_ENGINE + hard_max_loss semantics), signal_analyst (ema_reclaim OVERDUE, doji execution, coin_tracker).
+## NEXT STEPS
 
-Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
+1. **bug_hunter:** P0 — `wr_estimate` → trade_log redirect (one-liner); signal_outcomes write-path coverage gap; exit_reason family normalization map; verify decider_run signal_outcomes query unaffected. Non-trading, freeze-safe.
+2. **self_learner:** snapshot 72 n≥10 cells (regime×signal×direction) to `data/signal_regime_memory.json` with WR/expectancy — baseline before any selection logic.
+3. **signal_analyst:** start MFE/MAE write-reliability audit — where position_manager should write mfe_pct/mae_pct on close; target ≥90% of new closes within 2wk (P2a gate).
+4. **CEO (me):** restate P1–P6 success metrics per deltas above; update plan file with corrected census + component ownership table. Live changes wait for freeze end Oct 6 00:38.
+5. **Do NOT:** start T3 calibration, enable T5 live, or add a second weekly report channel. Do not touch PM_TRAIL_* or any CEO_PROTECTED flag.
 
-## CEO Report — 2026-10-04 MoE Panel Decisions
-
-### Verified Numbers (PG `brain`, status='closed', run this session)
-| Window | Trades | PnL | WR |
-|--------|--------|-----|-----|
-| 30d | 966 | **-$2.22** | 51.4% |
-| 7d | 200 | +$1.95 | 52.0% |
-| 24h | 34 | +$1.15 | 58.8% |
-| LONG 30d | 598 | **+$1.90** | 52.5% |
-| SHORT 30d | 368 | **-$4.12** | 49.7% |
-
-**SHORT RSI bands 30d (entry_rsi_14):** RSI<40 **86T -$5.04 32.6%WR** | RSI>=40 70T -$0.60 51.4% | NULL 212T +$1.52 56.1%
-**SHORT regime x RSI 30d:** EXTREME RSI>=40 **40T +$0.98 62.5%WR** (only positive SHORT cell) | EXTREME RSI<40 60T -$3.02 36.7% | NORMAL RSI>=40 9T -$0.87 22% | HIGH RSI>=40 20T -$0.73 40% | EXTREME SHORT all-band **-$0.91** (MoE "+$4.71 EXTREME" is all-directions; LONG EXTREME is +$5.38)
-**Exits 30d:** profit-monster* **307T +$18.83 82.1%** (only big winner) | cut-loser* 91T -$12.64 | atr_sl* 367T -$5.42 | hard_max_loss* 33T -$4.35 | hard_sl 46T -$3.24 | rr_engine* 59T -$1.38
-**Regimes 30d:** EXTREME +$4.47 | FLAT +$0.66 | NULL +$0.08 | HIGH -$2.94 | NORMAL -$4.49
-**Flags verified:** STANDALONE_BYPASS 123 entries / 115 unique | RR_ENGINE_SHADOW=True FORCE=False | CONFLUENCE_REQUIRED=True | SHORT_RSI_FLOOR=40 HARD_FLOOR=25 CEILING=65 HARD_CEILING=75
-**Post-fix (Oct 3):** SHORT entry_rsi_14<40 only pump-chain- 5T **+$0.05** — exec-RSI floor (bf96d7cd) live today; 30d -$5.04 is pre-fix history. **Caveat:** entry_rsi_14 is detection-time, not exec-time (DRIFT-002). Oct 3 SHORT still entered with stored RSI 13-42 — either drift or a bypass path. Audit required before claiming the leak is closed.
-**15m scanner:** `scripts/15m_regime_scanner.py` is a **5m scanner** (CANDLE_TF=5m, candles_5m, Binance interval=5m), thresholds slope_pct>0.35 per 5m candle with n=16 — noisy, NEUTRAL-biased. Misnamed, not "4h thresholds" as MoE claimed. Still a real defect.
-**Fees:** `fees` column is JSON text; samples show ~$0.005-0.02/trade. pnl_usdt vs fees.net_pnl inconsistent — accounting gap confirmed, not the primary bleed.
-**System state:** bollinger window ENDED 21:55 UTC Oct 3; volume-breakout boost 1.15→1.25 already applied 22:11 by auto_1hr. Config changes allowed now.
-
----
-
-### Decision 1 — SHORT Entry Model: **A (follow the data)**
-
-**A — SHORT only where edge exists, not during falls.**
-
-Precise model:
-1. **Block all SHORT with execution-time RSI < 40** (all paths, no bear override, fail-closed on stale candles).
-2. **Primary habitat: EXTREME vol + RSI>=40** — only positive SHORT cell (40T +$0.98 62.5%WR).
-3. **NEUTRAL SHORT stays blocked** (SHORT_NEUTRAL_BLOCK already on).
-4. **NORMAL/HIGH SHORT:** block unless RSI>=40 AND quality gates pass — those cells still bleed.
-
-**Rejected B** (keep SHORTing dumps): oversold SHORT is the entire net loss (-$5.04 vs month -$2.22).
-**Rejected C** as stated: "bottoms in other regimes" = RSI<40 = losing everywhere (32.6%WR). EXTREME oversold also loses (-$3.02). MoE's "wave bottoms 94%WR" **not reproducible in DB** — rejected.
-
-**Philosophy amendment (Decision 4 = A):** "Every pump is a LONG opportunity. Every dump is a SHORT opportunity **only when not oversold (exec RSI>=40)** — we short structure after the move, not into the bottom. Every trade *targets* a winner via profit-monster-trail; losers are cut." Keeps both-directions spirit; conditions it on edge.
-
-**Metric before → target:** SHORT 30d -$4.12/49.7% → SHORT 7d ≥ $0 / ≥52% by 2026-10-07. Expected: close remaining oversold paths → +$3-5/30d if leak fully closed.
-
----
-
-### Decision 2 — Implementation Priority
-
-| # | Action | Call | Reason |
-|---|--------|------|--------|
-| 1 | Close remaining exec-time RSI>=40 holes on ALL SHORT paths + audit bypass/fail-open | **FIRST** | Targets -$5.04 historical leak. Floor already live (bf96d7cd) but Oct 3 still shows stored RSI<40 entries — **audit, don't re-add filters**. Close: STANDALONE_BYPASS paths that skip decider_run, stale-candle fail-open, DRIFT-002 entry_rsi vs exec_rsi. |
-| 2 | Fix 15m/5m regime scanner | **SECOND** | Confirmed 5m data + noisy 0.35%/candle thresholds, n=16. Retune for 5m or switch to true 15m. Regime detection quality gates every SHORT decision. |
-| 3 | RR_ENGINE_SHADOW audit → then enable FORCE | **THIRD — audit first** | Do NOT blind-kill. Pull shadow-block would-have-blocked logs 7d: if would-blocks saved money without killing volume-breakout/doji winners, set FORCE=True. If thresholds would block winners, retune then enable. |
-| 4 | Shrink STANDALONE_BYPASS 124→~6 | **SKIP as stated** | Confluence already expires 92.5%; shrink-to-6 freezes NEUTRAL. Instead: **incremental prune** — remove only losing signals from bypass (keep volume-breakout, doji, bb-bounce-v2, pump-chain+). |
-| 5 | Gate SHORT to EXTREME vol | **DO — as RSI>=40 + EXTREME, not EXTREME-only** | EXTREME alone insufficient (oversold still -$3.02). Gate = RSI>=40 everywhere + EXTREME preferred + NORMAL/HIGH blocked unless quality. |
-
-**Skip list:** blind RR_ENGINE force, bypass shrink-to-6, any protected-flag touch.
-
----
-
-### Decision 3 — Trade Frequency: **B (fix the edge first), A as conditional follow-up**
-
-- **B primary:** The -$5.04 oversold SHORT leak is larger than fee drag. Frequency without edge just loses slower.
-- **A conditional:** After 48h post-fix SHORT data, if fee drag still dominates net (fees ~$10/30d vs PnL), raise entry bar (MIN_EXEC_CONFIDENCE, confluence quality) — cut low-quality trades, not winners.
-- **Reject C (size up):** multiplies negative expectancy. Absolute PnL is tiny; sizing up a 51%WR / R:R 0.83 system is how accounts die.
-
-**Metric:** trades/day 32 → 20-25 after quality bar IF fee/edge ratio still bad post-fix; otherwise keep frequency.
-
----
-
-### Decision 4 — Philosophy: **A (modify to match reality)**
-
-New standing philosophy:
-> **Every pump is a LONG opportunity. Every dump is a SHORT opportunity — but only when entry conditions confirm edge (exec RSI>=40, regime habitat, quality gates). We do not short oversold bottoms. Every trade targets a winner via profit-monster-trail; cut losers fast.**
-
-- **Reject B** ("keep philosophy, build systems to achieve it"): building systems to force "every dump = SHORT" means trading negative-expectancy cells = guaranteed bleed. The philosophy as absolute is what produced the -$5.04 leak.
-- **A** keeps the spirit (both directions, never fade momentum into a known losing cell) and binds it to data.
-
-AGENTS.md philosophy line will be updated to the conditioned form after T acknowledges — **not** a silent rewrite of trading doctrine.
-
----
-
-### Diagnosis (MoE claims vs DB)
-| MoE Claim | DB Verified | Verdict |
-|-----------|-------------|---------|
-| 30d -$1.90 to -$3.10, 960T, 51.9%WR | 966T **-$2.22**, 51.4% | ✓ |
-| SHORT -$3.88 entire net loss | SHORT **-$4.12**, LONG +$1.90 | ✓ (SHORT worse) |
-| SHORT RSI<40 n=86, 34%WR, -$5.04 | n=86, **32.6%WR, -$5.04** | ✓ exact |
-| profit-monster-trail only profitable exit | +$18.83, 82.1% | ✓ |
-| EXTREME only profitable regime +$4.71 | EXTREME +$4.47 all-dir; **SHORT EXTREME -$0.91** | ⚠ partial — EXTREME is LONG-driven |
-| Wave bottoms 94%WR SHORT edge | RSI<40 = 32.6%WR | ✗ **rejected** |
-| 15m scanner dead, 5m w/ 4h thresholds | 5m scanner, 0.35%/5m thresholds | ✓ defect, different root |
-| RR_ENGINE_SHADOW logs never blocks | SHADOW=True FORCE=False | ✓ |
-| STANDALONE_BYPASS 124 entries | 123 entries / 115 unique | ✓ |
-| Fees gross, ~double the loss | fees JSON ~$0.01/trade; pnl vs net_pnl inconsistent | ⚠ accounting gap, not primary bleed |
-| Exec-time RSI>=40 needed | Floor LIVE today (bf96d7cd); leak is pre-fix + possible drift/bypass | ✓ but **audit first** |
-
-### Root Cause
-The system's own philosophy forced SHORT entries into oversold cells where edge does not exist. Filters existed at detection but exec-time enforcement was incomplete until today; STANDALONE_BYPASS still lets some paths skip gates; regime detection (5m misnamed scanner) is noisy. LONG is already profitable. The fix is entry-model discipline, not more signals or more size.
-
-### Fix Applied (this run)
-- **0 trading config changes** — this run is decision + delegation only.
-- Decisions written: SHORT model A, priority 1-5 with skip list, frequency B, philosophy A.
-- Delegations queued (kanban).
-
-### Verification / Next Run
-1. bug_hunter: audit SHORT exec-RSI paths — bypass, fail-open on stale candles, DRIFT-002. Report which Oct 3 stored-RSI<40 trades bypassed the floor.
-2. self_learner: after audit, confirm ZERO new SHORT entries with exec RSI<40 over 48h (query exec RSI, not entry_rsi_14).
-3. signal_analyst: retune 15m/5m scanner thresholds; build EXTREME+RSI>=40 SHORT habitat params into signal_regime_memory.json.
-4. bug_hunter: RR_ENGINE shadow-block would-have-blocked analysis 7d → recommend FORCE on/off with numbers.
-5. Metric checkpoint 2026-10-07: SHORT 7d ≥ $0, oversold SHORT entries = 0.
-
-Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.
-
-## CEO Report — 2026-10-04 01:55 UTC
-
-### Diagnosis
-PG-verified: 24h **33T +$0.84 57.6%** | 7d **201T +$2.00 52.2%** | 30d **959T -$1.72 51.7%** (improved +$0.50 from -$2.22). LONG 7d +$3.38/147T carries system. SHORT 7d **-$1.38/54T**, SHORT 30d **-$4.02/367T** — entire net loss. SHORT 30d by entry_rsi_14: RSI<25 = 24T -$2.86 8.3%WR (catastrophic), RSI>=50 = 34T +$0.17 55.9%, NULL = 211T +$1.62 56.4%. Regime 100% NEUTRAL. hard_max_loss family 48h ~18T ~-$3.11 dominant bleed. Daily trend improving: Sep 29 -$1.13 → Oct 2 +$0.73 → Oct 3 +$1.15. Open: 2 LONG (ENS -0.47%, CHIP -0.01%).
-
-### Root Cause
-SHORT bleed = oversold entries (RSI<40 = -$5.04 across 86T). IO pump-chain- SHORT at RSI=13.46 (Oct 3 21:17) bypassed floor via exec-RSI audit holes. bug_hunter landed **b960ffe8** 00:38 UTC: Hole 1 continuum_trader direct-HL orders skipped all RSI checks; Hole 2 decider_run swallowed exceptions (silent fail-open). Both fail-closed now. Pipeline restarted 01:50 — fix LIVE.
-
-### Fix Applied
-**0 trading config changes** (standing: floor live, SHORT model A, monitor windows, protected flags). **Verified b960ffe8 loaded** (pipeline restart 01:50). **Regime memory updated** (data/signal_regime_memory.json snapshot 01:55). **CURRENT.md refreshed** — removed stale accel_300_v3_long monitor (already ENABLED=False Oct 3). io bypass root-caused to pre-fix holes.
-
-### Verification
-- 0 oversold SHORT entries post b960ffe8 (1 SHORT since floor = IO pre-fix).
-- Pipeline active, 01:50 start, continuum_trader 01:28 (post-fix).
-- volume-breakout boost 1.25 live; 7d 5T +$1.85 80%WR; post-boost sample too small (1 closed, pre-boost open).
-- Goals: SHORT 7d ≥$0 by Oct 7; oversold SHORT = 0 in 48h; 7d PnL +$2.00→+$3.00.
-- Delegated: self_learner (48h oversold-SHORT verify), bug_hunter (RR_ENGINE shadow → FORCE), signal_analyst (scanner retune, ema_reclaim, coin_tracker).
+*All numbers DB-verified 2026-10-04 via psql brain + associative_memory.db + data/signals_hermes_runtime.db + systemd unit inspection.*

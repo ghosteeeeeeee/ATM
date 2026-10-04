@@ -611,6 +611,14 @@ def _ensure_signal_outcomes_table():
             c.execute("SELECT thesis_mfe FROM signal_outcomes LIMIT 1")
         except Exception:
             c.execute("ALTER TABLE signal_outcomes ADD COLUMN thesis_mfe REAL DEFAULT NULL")
+        # P0 learning columns (2026-10-04): exit_reason, mfe/mae, entry RSI band.
+        # PRAGMA table_info guard — same pattern as the trade_id/regime additions above.
+        c.execute("PRAGMA table_info(signal_outcomes)")
+        _sigout_cols = {row[1] for row in c.fetchall()}
+        for _col, _coltype in (('exit_reason', 'TEXT'), ('mfe_pct', 'REAL'),
+                               ('mae_pct', 'REAL'), ('entry_rsi_band', 'TEXT')):
+            if _col not in _sigout_cols:
+                c.execute(f"ALTER TABLE signal_outcomes ADD COLUMN {_col} {_coltype}")
         c.execute("""
             CREATE INDEX IF NOT EXISTS idx_sigout_token ON signal_outcomes(token, direction)
         """)
@@ -960,9 +968,14 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     # Loss cooldown handled there too — avoid double-recording to signal_outcomes
 
 
-def close_paper_position(trade_id: int, reason: str) -> bool:
-    """Close a paper position via direct SQL UPDATE."""
-    reason = reason[:20]  # DB column is VARCHAR(20) — truncate if needed
+def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) -> bool:
+    """Close a paper position via direct SQL UPDATE.
+
+    P0 (2026-10-04): `reason` should be a CANONICAL exit label (e.g. 'hard_max_loss')
+    — no per-trade numbers. Numeric detail goes in `exit_detail` (e.g.
+    'hard_max_loss_pct=-1.04%') and is stored in exit_conditions, keeping
+    exit_reason GROUP BY-able. No more [:20] truncation — column widened to TEXT.
+    """
     conn = get_db_connection()
     if conn is None:
         return False
@@ -975,7 +988,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
                    pnl_pct, experiment, sl_distance, amount_usdt, signal,
-                   hl_notional_usdt, leverage, open_time
+                   hl_notional_usdt, leverage, open_time,
+                   highest_price, lowest_price, entry_rsi_14
             FROM trades WHERE id = %s
         """, (trade_id,))
         row = cur.fetchone()
@@ -1005,6 +1019,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         experiment = row['experiment']
         sl_dist = row['sl_distance']
         signal_type = row['signal']  # fallback for record_signal_outcome
+        # P0 (review fix #4): capture entry RSI NOW — the HL-realized-pnl backfill
+        # below rebinds `row` to a 2-column fetch, which would shadow this value
+        # and null entry_rsi_band on exactly the live (HL-confirmed) closes.
+        try:
+            _entry_rsi_raw = row['entry_rsi_14']
+        except Exception:
+            _entry_rsi_raw = None
 
         # BUG-FIX (2026-04-19): 'confidence' was never fetched in this function scope
         # causing "name 'confidence' is not defined" errors in record_signal_outcome.
@@ -1059,7 +1080,19 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # Bug-20 fix: use tolerance instead of strict == 0 (float comparison).
         if abs(pnl_usdt_val) < 0.01 and reason:
             import re
-            m = re.search(r'([+-]?\d+(?:\.\d+)?)%', reason)
+            # P0 (review fix #2): search ONLY exit_detail — canonical labels carry no
+            # number, and legacy reason strings (macd indicator %, rr_engine levels)
+            # are NOT pnl. exit_detail is written only by canonicalized call sites
+            # and holds the genuine exit pnl% — identical extraction to the old
+            # truncated-reason behavior for those sites; legacy sites with
+            # exit_detail=None get no override (hype_realized fallback), same as before.
+            # P0 (review fix #2/#3, final): extract ONLY from LABELED fields
+            # (pnl=, _pct=, now=, profit=) — never from arbitrary %-numbers, so
+            # macd indicator distance %, rr_engine price levels, candles=, h=
+            # can never override the recorded pnl. Canonicalized sites label their
+            # pnl field explicitly (hard_max_loss_pct=, time_exit pnl=, peak_exit
+            # now=, ride_it profit=…).
+            m = re.search(r'(?:pnl=|_pct=|now=|profit=)([+-]?\d+(?:\.\d+)?)%', exit_detail) if exit_detail else None
             if m:
                 pnl_pct_from_reason = float(m.group(1))
                 # pnl_pct_from_reason is the realized pnl% at time of exit
@@ -1114,7 +1147,12 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         if is_win and LOSS_STREAK_RESET_WIN:
             clear_loss_streak(token, direction)
 
-        # ── Compute MFE/MAE from price history ──────────────────────────────
+        # ── Compute MFE/MAE — price history first, tracked extremes fallback ──
+        # P0 (2026-10-04): _compute_mfe_mae reads signals_hermes.db price_history
+        # and returns None when no rows exist (the common case — only ~7% coverage).
+        # Fallback: compute from highest_price/lowest_price maintained by the
+        # trailing logic on every cycle — direction-aware, same formulas as the
+        # brain-DB backfill. MFE/MAE now get written on EVERY close.
         mfe_pct_val, mae_pct_val, mfe_price_val, mae_price_val = None, None, None, None
         try:
             trade_open_time = row['open_time']
@@ -1125,7 +1163,29 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 )
         except Exception as _mfe_e:
             pass  # non-fatal — MFE is nice-to-have, don't block trade close
+        try:
+            _hp = float(row['highest_price'] or 0)
+            _lp = float(row['lowest_price'] or 0)
+            if entry_price > 0 and (mfe_pct_val is None or mae_pct_val is None):
+                if str(direction).upper() == 'LONG':
+                    if mfe_pct_val is None and _hp > 0:
+                        mfe_pct_val = (_hp - entry_price) / entry_price * 100
+                        mfe_price_val = _hp
+                    if mae_pct_val is None and _lp > 0:
+                        mae_pct_val = (entry_price - _lp) / entry_price * 100
+                        mae_price_val = _lp
+                else:  # SHORT
+                    if mfe_pct_val is None and _lp > 0:
+                        mfe_pct_val = (entry_price - _lp) / entry_price * 100
+                        mfe_price_val = _lp
+                    if mae_pct_val is None and _hp > 0:
+                        mae_pct_val = (_hp - entry_price) / entry_price * 100
+                        mae_price_val = _hp
+        except Exception:
+            pass  # non-fatal
 
+        # exit_conditions carries the numeric detail; exit_reason stays canonical
+        _exit_conditions = f"{reason} {exit_detail}" if exit_detail else reason
         cur.execute("""
             UPDATE trades
             SET status = 'closed',
@@ -1143,11 +1203,11 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 trade_duration = EXTRACT(EPOCH FROM (%s::timestamp - open_time)),
                 mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s
             WHERE id = %s AND status = 'open'
-        """, (now, reason, reason[:20] if reason else reason, current_price,
+        """, (now, reason, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
-              reason,  # exit_conditions: reuse close reason for exit path tracking
+              _exit_conditions,
               now, mfe_pct_val, mae_pct_val, mfe_price_val, mae_price_val,
               trade_id))
         if cur.rowcount == 0:
@@ -1241,11 +1301,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                         cur2.execute(
                             "SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id=%s",
                             (trade_id,))
-                        row = cur2.fetchone()
+                        # P0 (review fix #4): renamed row → hl_row; the outer `row`
+                        # (full trade fetch) must survive for entry_rsi_14 reads below
+                        hl_row = cur2.fetchone()
                         # Bug-fix (2026-05-20): same 0.0-falsy issue — use explicit None check.
-                        amt = float(row[0]) if row and row[0] is not None else DEFAULT_TRADE_SIZE_USDT
+                        amt = float(hl_row[0]) if hl_row and hl_row[0] is not None else DEFAULT_TRADE_SIZE_USDT
                         # Bug-fix (2026-08-21): fallback must include leverage (amt alone = margin, not notional)
-                        calc_notional = float(row[1]) if row and row[1] is not None else amt * leverage
+                        calc_notional = float(hl_row[1]) if hl_row and hl_row[1] is not None else amt * leverage
                         hype_pct = round(hl_rp / calc_notional * 100, 4) if calc_notional else 0
                         cur2.execute("""
                             UPDATE trades SET
@@ -1303,6 +1365,15 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             actual_pnl_pct = (actual_pnl_usdt / calc_notional * 100) if calc_notional > 0 else pnl_pct
         
         try:
+            # P0 (2026-10-04): populate learning columns — exit_reason (canonical),
+            # mfe/mae (price-history or tracked-extremes), entry RSI band.
+            try:
+                from signal_schema import rsi_band_label as _rsi_band
+            except ImportError:
+                _rsi_band = lambda r: None  # noqa: E731
+            # P0 (review fix #4): use the value captured BEFORE the HL-backfill
+            # rebinds `row` — live (HL-confirmed) closes previously nulled the band
+            _entry_rsi = _entry_rsi_raw
             record_signal_outcome(
                 token=token,
                 direction=direction,
@@ -1312,6 +1383,9 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 confidence=confidence,
                 trade_id=trade_id,
                 mfe_pct=mfe_pct_val,  # Thesis Validation System: pass MFE for thesis validation
+                mae_pct=mae_pct_val,
+                exit_reason=reason,
+                entry_rsi_band=_rsi_band(_entry_rsi),
             )
         except Exception as rso_err:
             log(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
@@ -2778,10 +2852,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         exit_momentum = pos_count >= momentum_candles
                     
                     if exit_momentum:
-                        reason = f"pump_exit_momentum: dir={direction}, candles={momentum_candles}"
-                        close_paper_position(trade_id, reason)
+                        # P0: canonical label; numeric/detail moved to exit_detail
+                        # (stored in exit_conditions, keeps exit_reason GROUP BY-able)
+                        _detail = f"dir={direction}, candles={momentum_candles}"
+                        close_paper_position(trade_id, "pump_exit_momentum", exit_detail=_detail)
                         closed_count += 1
-                        log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
+                        log(f"  [PUMP-EXIT] {token} {direction}: pump_exit_momentum {_detail}")
                         continue
                 
                 # Check time exit (DIRECTION-AWARE profit calculation)
@@ -2811,10 +2887,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 # Direction-aware: LONG exits on negative vel, SHORT on positive vel
                                 vel_fading = (direction == 'LONG' and vel_check < 0) or (direction == 'SHORT' and vel_check > 0)
                                 if vel_fading:
-                                    reason = f"pump_exit_dead_money: {hold_hours:.1f}h, {profit_pct:+.2f}%, vel={vel_check:.2f}%"
-                                    close_paper_position(trade_id, reason)
+                                    # P0: canonical label; hold/pnl/vel detail → exit_detail
+                                    _detail = f"hold={hold_hours:.1f}h,pnl={profit_pct:+.2f}%,vel={vel_check:.2f}%"
+                                    close_paper_position(trade_id, "pump_exit_dead_money", exit_detail=_detail)
                                     closed_count += 1
-                                    log(f"  [PUMP-EXIT] {token} {direction}: {reason}")
+                                    log(f"  [PUMP-EXIT] {token} {direction}: pump_exit_dead_money {_detail}")
                                     continue
                     except Exception:
                         pass
@@ -2835,10 +2912,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 ride_result = manage_ride_it_exit(token, direction, cur, pos, trade_id)
                 ride_action = ride_result.get('action', 'HOLD')
                 if ride_action == 'EXIT':
-                    reason = ride_result.get('reason', 'ride_it_exit')
-                    close_paper_position(trade_id, reason)
+                    # P0: canonical label; full engine reason (may embed numbers/%)
+                    # preserved in exit_detail → exit_conditions
+                    _rr_ride_reason = ride_result.get('reason', 'ride_it_exit')
+                    close_paper_position(trade_id, "ride_it_exit", exit_detail=_rr_ride_reason)
                     closed_count += 1
-                    log(f"  [RIDE-IT] {token} {direction}: {reason}")
+                    log(f"  [RIDE-IT] {token} {direction}: {_rr_ride_reason}")
                     continue
                 elif ride_action == 'TRAIL_SL':
                     new_sl = ride_result.get('new_sl')
@@ -2866,10 +2945,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 rr_result = manage_exit(token, direction, cur, entry_price, current_sl if current_sl > 0 else None)
                 rr_action = rr_result.get('action', 'HOLD')
                 if rr_action in ('TAKE_PROFIT', 'CUT_LOSS', 'EXIT'):
-                    reason = f"rr_engine_{rr_result.get('reason', rr_action).replace(' ', '_')}"
-                    close_paper_position(trade_id, reason)
+                    # P0: canonical family label — engine reasons embed per-trade
+                    # numbers after the colon ('support_break: 123.4567 broken
+                    # (touches=3)'), which fragmented exit_reason. Family = text
+                    # before the first ':'; full string preserved in exit_detail.
+                    _rr_raw = rr_result.get('reason', rr_action) or rr_action
+                    _rr_family = 'rr_engine_' + _rr_raw.split(':')[0].replace(' ', '_').strip('_')
+                    close_paper_position(trade_id, _rr_family, exit_detail=f"rr_engine {_rr_raw}")
                     closed_count += 1
-                    log(f"  [RR-ENGINE] {token} {direction}: {rr_action} — {rr_result.get('reason', '')}")
+                    log(f"  [RR-ENGINE] {token} {direction}: {rr_action} — {_rr_raw}")
                     continue  # skip other exit checks
                 elif rr_action == 'TRAIL_SL':
                     # Update SL in memory AND persist to DB
@@ -2942,7 +3026,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
                 if wave_turn:
                     # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
-                    close_paper_position(trade_id, f"wave_turn_{reason}")
+                    # P0: canonical label 'wave_turn'; z/accel detail kept in exit_detail
+                    close_paper_position(trade_id, "wave_turn", exit_detail=reason)
                     closed_count += 1
                     wave_turn_fired = True
                     log(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
@@ -3081,7 +3166,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     if reason.startswith('FLIP:'):
                         continue
                     log(f"  [MACD EXIT] {token} {direction} → exiting: {reason}")
-                    close_paper_position(trade_id, reason)
+                    # P0 (review fix #2/#5): macd reasons embed indicator distance %
+                    # (NOT pnl — e.g. 'macd_diverging_bear_52.3%'). Strip the trailing
+                    # numeric-% token for the label; full string → exit_detail so the
+                    # pnl-extraction regex never sees the indicator value.
+                    _macd_family = reason
+                    if _macd_family.endswith('%'):
+                        _macd_parts = _macd_family.rsplit('_', 1)
+                        if len(_macd_parts) == 2:
+                            _macd_family = _macd_parts[0]
+                    close_paper_position(trade_id, _macd_family, exit_detail=reason)
                     closed_count += 1
                     break
                 if closed_count > original_closed:
@@ -3161,8 +3255,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Probabilistic cutting is handled by cut_loser.py (two-tier + trailing).
         # Race prevention: check guardian markers before closing.
         if should_cut_loser(live_pnl, pos):
-            reason = f"cut_loser_{live_pnl:+.2f}%"
-            close_paper_position(trade_id, reason)
+            # P0: canonical label; pnl detail moved to exit_detail (exit_conditions)
+            close_paper_position(trade_id, "cut_loser", exit_detail=f"cut_loser_pct={live_pnl:+.2f}%")
             closed_count += 1
             log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
@@ -3173,7 +3267,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
         stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
         if stale_close:
-            close_paper_position(trade_id, f"stale_exit_{stale_reason}")
+            # P0: canonical label; stalled_* detail moved to exit_detail.
+            # (Old f"stale_exit_{stale_reason}" produced 55-char close_reasons that
+            # overflowed varchar(50) — likely why no stale_exit rows ever landed.)
+            close_paper_position(trade_id, "stale_exit", exit_detail=stale_reason)
             closed_count += 1
             log(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
             continue  # Skip trailing SL update for closed position
@@ -3264,7 +3361,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Covers the gap between stale loser (-0.6%) and guardian cut_loser (-5%).
         HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES
         if live_pnl <= HARD_MAX_LOSS_PCT:
-            close_paper_position(trade_id, f"hard_max_loss_{live_pnl:+.2f}%")
+            # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.
+            # (Old f-string produced ~25 fragmented per-trade labels like
+            # 'hard_max_loss_-1.04%', each with 1-4 rows, invisible in GROUP BY.)
+            close_paper_position(trade_id, "hard_max_loss",
+                                 exit_detail=f"hard_max_loss_pct={live_pnl:+.2f}%")
             closed_count += 1
             log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
             continue
@@ -3287,7 +3388,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
                 # (a) Time exit: 2h in loss → move to next setup
                 if TIME_EXIT_ENABLED and live_pnl < 0 and _age_h >= 2.0:  # 2 hours
-                    close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
+                    # P0: canonical label; age/pnl detail moved to exit_detail
+                    close_paper_position(trade_id, "time_exit",
+                                         exit_detail=f"time_exit_h={_age_h:.1f},pnl={live_pnl:+.2f}%")
                     closed_count += 1
                     log(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
                     continue
@@ -3301,8 +3404,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         if direction == 'LONG' and peak_high > 0:
                             peak_pnl_pct = (peak_high - entry_f) / entry_f * 100
                             if peak_pnl_pct >= 0.3:
-                                close_paper_position(trade_id,
-                                    f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
+                                # P0 (review fix #3): now= (realized exit pnl) FIRST —
+                                # the pnl-extraction regex takes the first %-suffixed
+                                # number, which must be the realized pnl, not the peak.
+                                close_paper_position(trade_id, "peak_exit",
+                                                     exit_detail=f"now={live_pnl:+.2f}%,peak={peak_pnl_pct:+.2f}%,h={_age_h:.1f}")
                                 closed_count += 1
                                 log(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
                                       f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")
@@ -3310,8 +3416,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         elif direction == 'SHORT' and peak_low > 0:
                             peak_pnl_pct = (entry_f - peak_low) / entry_f * 100
                             if peak_pnl_pct >= 0.3:
-                                close_paper_position(trade_id,
-                                    f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
+                                close_paper_position(trade_id, "peak_exit",
+                                                     exit_detail=f"now={live_pnl:+.2f}%,peak={peak_pnl_pct:+.2f}%,h={_age_h:.1f}")
                                 closed_count += 1
                                 log(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
                                       f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")

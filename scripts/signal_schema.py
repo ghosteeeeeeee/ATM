@@ -4064,6 +4064,62 @@ def _get_volatility_regime(token: str) -> str:
                 pass
 
 
+# ─── P0: signal_outcomes learning columns (2026-10-04) ────────────────────────
+# exit_reason, mfe_pct, mae_pct, entry_rsi_band — needed by the Trade Learning
+# System. Guarded ALTERs (PRAGMA table_info) so existing DBs upgrade in place.
+
+SIGNAL_OUTCOME_LEARNING_COLUMNS = (
+    ('exit_reason', 'TEXT'),
+    ('mfe_pct', 'REAL'),
+    ('mae_pct', 'REAL'),
+    ('entry_rsi_band', 'TEXT'),
+)
+
+
+def rsi_band_label(rsi) -> str | None:
+    """Bucket an RSI value into the learning-system band label.
+    Returns None when RSI is unavailable — callers write NULL, never guess.
+    """
+    if rsi is None:
+        return None
+    try:
+        r = float(rsi)
+    except (TypeError, ValueError):
+        return None
+    if r < 25:
+        return '<25'
+    if r < 30:
+        return '25-30'
+    if r < 40:
+        return '30-40'
+    if r < 55:
+        return '40-55'
+    if r < 65:
+        return '55-65'
+    if r < 75:
+        return '65-75'
+    return '75+'
+
+
+def ensure_signal_outcomes_columns(conn) -> None:
+    """Add learning columns to signal_outcomes if missing (idempotent).
+    Uses PRAGMA table_info — safe to call on every write.
+    """
+    try:
+        cur = conn.cursor()
+        try:
+            cur.execute("PRAGMA table_info(signal_outcomes)")
+            existing = {row[1] for row in cur.fetchall()}
+            for col, coltype in SIGNAL_OUTCOME_LEARNING_COLUMNS:
+                if col not in existing:
+                    cur.execute(f"ALTER TABLE signal_outcomes ADD COLUMN {col} {coltype}")
+            conn.commit()
+        finally:
+            cur.close()
+    except Exception as e:
+        print(f"[signal_schema] ensure_signal_outcomes_columns error: {e}")
+
+
 def record_signal_outcome(token: str, direction: str,
                           pnl_pct: float, pnl_usdt: float,
                           signal_type: str = 'unknown',
@@ -4071,7 +4127,10 @@ def record_signal_outcome(token: str, direction: str,
                           is_win: bool = None,
                           trade_id: int = None,
                           regime: str = None,
-                          mfe_pct: float = None) -> bool:
+                          mfe_pct: float = None,
+                          mae_pct: float = None,
+                          exit_reason: str = None,
+                          entry_rsi_band: str = None) -> bool:
     """
     Write one row to signal_outcomes when a trade closes.
     is_win is computed from pnl_usdt sign if not provided.
@@ -4079,14 +4138,16 @@ def record_signal_outcome(token: str, direction: str,
     regime: volatility regime at trade entry ('FLAT','NORMAL','HIGH','EXTREME').
             If None, computed from current ATR (best-effort fallback).
     mfe_pct: max favorable excursion % (thesis validation). If provided, writes thesis_validated.
+    mae_pct/exit_reason/entry_rsi_band: P0 learning columns (2026-10-04).
     """
     # Auto-detect regime if not provided
     if regime is None:
         regime = _get_volatility_regime(token)
 
     conn = _get_conn(_runtime())
-    c = conn.cursor()
     try:
+        ensure_signal_outcomes_columns(conn)
+        c = conn.cursor()
         if is_win is None:
             # Use pnl_pct (the value being stored) for consistency
             is_win = float(pnl_pct or 0) > 0
@@ -4118,8 +4179,8 @@ def record_signal_outcome(token: str, direction: str,
         c.execute("""
             INSERT INTO signal_outcomes
                 (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id, regime,
-                 thesis_validated, thesis_mfe)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 thesis_validated, thesis_mfe, exit_reason, mfe_pct, mae_pct, entry_rsi_band)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             token.upper(), direction.upper(),
             signal_type, 1 if is_win else 0,
@@ -4130,6 +4191,10 @@ def record_signal_outcome(token: str, direction: str,
             regime,
             thesis_validated,
             thesis_mfe,
+            exit_reason,
+            round(float(mfe_pct), 4) if mfe_pct is not None else None,
+            round(float(mae_pct), 4) if mae_pct is not None else None,
+            entry_rsi_band,
         ))
         conn.commit()
         

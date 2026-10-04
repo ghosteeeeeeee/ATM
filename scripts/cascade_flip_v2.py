@@ -509,7 +509,10 @@ def cascade_flip_v2(
         close_fn = getattr(pm, 'close_paper_position', None)
         if close_fn is None:
             raise AttributeError("close_paper_position not found in position_manager")
-        close_fn(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
+        # P0: canonical label 'cascade_flip'; pnl detail moved to exit_detail
+        # (stored in exit_conditions by close_paper_position — keeps exit_reason
+        # GROUP BY-able; detail still visible per trade)
+        close_fn(trade_id, "cascade_flip", exit_detail=f"cascade_flip_pct={live_pnl:+.2f}%")
         close_ok = True
     except Exception as e:
         print(f"  [CFV2] ❌ close_paper_position failed for {token} #{trade_id}: {e}")
