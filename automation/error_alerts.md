@@ -613,3 +613,17 @@
 
 ## Error Alerts — 2026-10-03 23:59 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-04 00:47 UTC
+- **HEALTH** — Pipeline OK: active/running. Position Manager healthy (1 open ENS LONG, ATR SL/TP active). Signals (1h): 53. Trades: 1 open / 1 closed today (LDO +0.23% win). No Tracebacks/CRASH in pipeline logs. Phantom trades: 0. Disk 82% (under 85%). Regime: NEUTRAL (25 long / 26 short / 66 neutral). Speeds: 53.5% ≥50th pct (129/241). Prices fresh (~37s). hl-sync-guardian active (1 position, no orphans). Core timers firing (pipeline 1m, price-collector 30s, compactor 1m, watchdog).
+- **WARN** (known, ~8 failed units, none on trading path): better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs — expected when findings exist), ceo (exit 124 timeout), git-release (dry-run exit 1), mtf-macd-tuner, trading-checklist (WARN findings cause exit 1), upgrade-implementer (exit 124), wasp (ran, but generate check timed out). Root causes tracked — no auto-fix.
+- **WARN**: ollama generate check timed out (15s read) during WASP run — ollama.service is active with models loaded; transient/slow, not down.
+- **WARN**: WASP "pipeline-log: 1 ERROR lines" is a false positive — matches `0 errors` in signals_runner lines (`-i error`). Pipeline itself reports 0 errors.
+- **WARN** (known): runtime signals DB ~92MB (WASP threshold <50MB). Not on execution path.
+- **WARN** (known): hotset empty — no signals survived compaction above 50% confidence. Expected in NEUTRAL regime.
+- **INFO**: `systemctl list-timers hermes-*` prints "0 timers listed" without `--all` — cosmetic; `--all` confirms timers firing.
+- **INFO**: Empty price DBs (`prices.db`, `hermes_prices.db`, `price_cache.db` — 0 bytes) — runtime uses `price_history.db` + `prices.json`. Not a failure.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL trading-path conditions; disk under threshold; no restarts or cleanups needed.
+
+## Error Alerts — 2026-10-04 00:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`

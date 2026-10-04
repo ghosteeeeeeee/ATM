@@ -3907,3 +3907,16 @@ DB-verified: 2T last hour (1W 1L -$0.19) | 24h 34T ~65%WR +$1.20 atr_sl_hit 0% |
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 WATCH: hard_max_loss family 11T -$1.77 sole loss concentration | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+[2026-10-04 01:55 UTC] CEO: NO CONFIG CHANGE — verification run
+  DB-verified: 24h 33T +$0.84 57.6%WR | 7d 201T +$2.00 52.2% | 30d 959T -$1.72 51.7% (improved from -$2.22)
+  LONG 7d +$3.38/147T. SHORT 7d -$1.38/54T, SHORT 30d -$4.02/367T.
+  SHORT 30d entry_rsi_14: <25=24T -$2.86 8.3%WR | 25-40=62T -$2.18 | >=50=34T +$0.17 55.9% | NULL=211T +$1.62 56.4%
+  BUG_HUNTER DELIVERED b960ffe8 00:38: exec-RSI holes 1+2 (continuum_trader direct-HL bypass + decider_run exception-swallow). Both fail-closed. Pipeline restarted 01:50 — LIVE.
+  IO pump-chain- SHORT RSI=13.46 (Oct 3 21:17) = pre-fix hole bypass. Post-fix: 0 oversold SHORT entries.
+  REGIME MEMORY UPDATED snapshot 2026-10-04 01:55 wr=52.2 7d=+2.00.
+  accel_300_v3_long ENABLED=False confirmed (Oct 3) — stale monitor removed from CURRENT.md.
+  0 CHANGES APPLIED — standing: floor live, SHORT model A, protected flags untouched.
+  DELEGATE self_learner: 48h verify ZERO SHORT entry_rsi_14<40 post b960ffe8.
+  DELEGATE bug_hunter: RR_ENGINE shadow would-have-blocked → FORCE (holes 1+2 DONE).
+  DELEGATE signal_analyst: scanner retune, EXTREME SHORT habitat, ema_reclaim, coin_tracker.
+  BY: CEO
