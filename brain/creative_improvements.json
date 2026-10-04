@@ -2574,5 +2574,25 @@
     "category": "entry sniper / regime gate",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-04T20:37:33Z",
+    "idea": "BB_SQUEEZE_MAX_ENTRY_GAP=1.5 — block bb-squeeze+ entries where gap_at_entry>=1.5% at detection",
+    "rationale": "14d gap bands (n=49, PG-verified this run): gap<0.9 15T 73.3%WR +$0.35 | 0.9-1.2 7T 100%WR +$0.42 | 1.2-1.5 13T 53.8%WR +$0.05 | >=1.5 14T 42.9%WR -$0.24. 30d confirms gap<1.2 24T 75% +$0.56 vs gap>=1.2 27T 48.1% -$0.19. Watchdog 'overbought chase' steer WRONG — entry_rsi>=75 is BEST band (16T 75% +$0.39). Chase variable is EMA gap, not RSI. Losers PURR 1.34/AIXBT 1.39/USELESS 1.75; winners DOT 0.88/GMX 1.07/ALT 0.86.",
+    "expected_impact": "Kept book 35T 71.4%WR +$0.82 vs current 49T 63.3%WR +$0.58 (+$0.24 PnL, +8pp WR). Blocks 6/31 winners (19% < 20% rule). One variable, signal-specific. Post-freeze in bb-squeeze signal module (STANDALONE_BYPASS path — compactor cannot enforce).",
+    "category": "entry sniper / chase filter",
+    "status": "suggested — post-freeze",
+    "risk": "medium — 19% winner-kill; blocked cohort net negative so EV positive. Start at 1.5 (not 1.2); tighten only if +PnL over 7d.",
+    "impact_on_winners": "Would have blocked 6/31 winners in last 14d (19%); blocked cohort net -$0.24 — expected net +$0.24"
+  },
+  {
+    "date": "2026-10-04T20:37:33Z",
+    "idea": "REVERSE bb-bounce-v3 NORMAL 0.0x plan → HIGH-only enable + NORMAL conf penalty ~0.85",
+    "rationale": "18:38 counterfactual (correct volatility_regime vocab): NORMAL 0.0x kills 7 NORMAL winners +$0.32 while catching 7 losers -$0.83 = 64% winner-kill > 20% rule. This run confirms HIGH edge (6T 66.7% +$0.09) and NORMAL bleed (16T 50% -$0.39) but bimodal split means hard block overshoots. RSI split NOT clean (winners 52.9 vs losers 53.7) — do not pivot to RSI_MAX 55→40 on this signal.",
+    "expected_impact": "Keeps HIGH edge, reduces NORMAL bleed without deleting only current winners. Monitor 7d; escalate to NORMAL 0.0x only if penalty fails to flip NORMAL PnL >=$0.",
+    "category": "regime gate",
+    "status": "suggested — REVISE standing Oct 6 queue item",
+    "risk": "low — penalty reversible, less aggressive than 0.0x",
+    "impact_on_winners": "0.0x block would kill 7/14 NORMAL winners (64%); HIGH-only + penalty keeps HIGH winners and most NORMAL winners"
   }
 ]
