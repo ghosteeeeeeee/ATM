@@ -93,7 +93,9 @@ def _lookup_cell(cell_cur, key_signal, direction, regime):
     Tries: exact (signal x dir x regime) -> substring combo match (brain DB keys
     are combo strings like 'accel-300-,rs-r79', source is a component) ->
     any row for signal x dir (regime-agnostic, uses signal-level stats).
-    Regime alias: live gate vocabulary FLAT ~ store NEUTRAL (brain DB regime col).
+    Regime alias: legacy FLAT~NEUTRAL mapping kept as harmless fallback (post
+    2026-10-04 regime fix the store uses volatility_regime vocabulary — NEUTRAL
+    residue is ~3 cells; alias only matters for pre-fix DB states).
     Returns (row_tuple, which_key) or (None, None)."""
     if not key_signal:
         return None, None

@@ -43,6 +43,14 @@ BLOCK_RE = re.compile(
     r'.*?(?:blocked|BLOCKED)',
     re.IGNORECASE,
 )
+# FIX 2026-10-04 (bug-hunter F1 HIGH): CONFLUENCE-GATE-BLOCK lines have NO
+# 'blocked' word — reason follows a colon or is empty ('🔒 [CONFLUENCE-GATE-BLOCK]
+# APT LONG:'). Confluence is the highest-frequency gate (~473 blocks/6h) — without
+# this alternative the shadow analysis was blind to the majority of all blocks.
+CONF_RE = re.compile(
+    r'🔒\s+\[CONFLUENCE-GATE-BLOCK\]\s+([A-Za-z0-9]+)\s+(LONG|SHORT)\b',
+    re.IGNORECASE,
+)
 
 
 def log(msg):
@@ -104,9 +112,15 @@ def record(since_hours):
                 f.seek(max(0, size - 20_000_000))
             for line in f:
                 m = BLOCK_RE.search(line)
-                if not m:
-                    continue
-                gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
+                if m:
+                    gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
+                else:
+                    # FIX 2026-10-04 (bug-hunter F1): confluence lines lack the
+                    # 'blocked' word — try the dedicated alternative.
+                    mc = CONF_RE.search(line)
+                    if not mc:
+                        continue
+                    gate, token, direction = 'CONFLUENCE-GATE-BLOCK', mc.group(1).upper(), mc.group(2).upper()
                 # timestamp: leading 'YYYY-MM-DD HH:MM:SS'
                 ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
                 if not ts_m:
@@ -215,14 +229,18 @@ def report():
         log(f'{"gate":28} {"blocks":>6} {"closed":>6} {"traded":>6} {"wins":>5} {"wr":>6} {"pnl":>8}')
         proposals = []
         for gate, blocks, closed_n, traded_n, wins, pnl in rows:
-            wr = (wins / traded_n * 100) if traded_n else 0.0
+            # FIX 2026-10-04 (bug-hunter F3): display n/a when no would-be trades —
+            # 0.0 pct WR for zero outcomes is the same misleading class the t5
+            # report just fixed (no outcome is not a loss).
+            wr = (wins / traded_n * 100) if traded_n else None
+            wr_s = f'{wr:5.1f}%' if wr is not None else '  n/a '
             flag = ''
-            if traded_n >= 15 and wr >= 55:
+            if traded_n >= 15 and wr is not None and wr >= 55:
                 flag = ' ← PROPOSE RELAX (shadow WR>=55, n>=15)'
                 proposals.append((gate, wr, traded_n, 'relax'))
             elif traded_n >= 15 and wr <= 35:
                 flag = ' ← gate working (shadow WR<=35)'
-            log(f'{gate:28} {blocks:6} {closed_n:6} {traded_n:6} {wins:5} {wr:5.1f}% {pnl:+8.2f}{flag}')
+            log(f'{gate:28} {blocks:6} {closed_n:6} {traded_n:6} {wins:5} {wr_s} {pnl:+8.2f}{flag}')
         if proposals:
             log('KANBAN PROPOSALS: ' + '; '.join(f'{g} relax (wr={w:.0f}%,n={n})' for g, w, n, _ in proposals))
         else:
