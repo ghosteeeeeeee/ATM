@@ -2318,5 +2318,41 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "medium — needs backtest"
+  },
+  {
+    "date": "2026-10-04T02:34:07Z",
+    "idea": "Volatility-regime-aware hard_max_loss threshold",
+    "rationale": "hard_max_loss triggers at ~1% price move regardless of regime. In LOW vol (current: volatility=LOW), 1% is a significant move — wick-outs hit it before thesis develops. In EXTREME, 1% is noise. Data: 7 of 11 24h losers exit via hard_max_loss; ENS stop 0.24% below price in LOW vol. Session brain recurring: 'exit system = #1 profit leak'.",
+    "expected_impact": "Reduce hard_max_loss false-stops in LOW/NORMAL by ~20-30%. Estimated +$0.50-1.00/7d based on 48h bleed of ~$3.11 in this exit path.",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium — needs backtest against last 7d winners before any change. Wider SL = larger max loss per trade when stop does hit.",
+    "proposed_params": {
+      "LOW": "hard_max_loss threshold 1.0% -> 1.3%",
+      "NORMAL": "1.0% -> 1.1%",
+      "HIGH": "unchanged (1.0%)",
+      "EXTREME": "unchanged or tighter (0.9%)"
+    },
+    "verification_required": "Backtest: how many hard_max_loss exits in last 7d LOW/NORMAL recovered past -1.0% without hitting -1.3%? How many winners would have been stopped at wider threshold?"
+  },
+  {
+    "date": "2026-10-04T02:34:07Z",
+    "idea": "Exec-time RSI observability for STANDALONE_BYPASS LONG signals",
+    "rationale": "DRIFT-002: signal-time RSI filters pass but exec-time RSI drifts past them. ENS bb-bounce RSI_MAX=55, entered at 86.34. pump-chain+ RSI_MAX=70, 19 trades entered >70. Not proposing a BLOCK (data shows RSI>80 bb-squeeze is profitable) — proposing LOGGING for pattern detection.",
+    "expected_impact": "0 direct PnL. Enables future filter design with real exec-time RSI data per signal.",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "none — logging only, no behavior change"
+  },
+  {
+    "date": "2026-10-04T03:38:53Z",
+    "idea": "Shift LONG_RSI_SWEET_SPOT from 40-60 to 55-70 (boost only — blocks nothing)",
+    "rationale": "7d LONG by entry_rsi: 40-55=35T 45.7%WR -$0.23 (dead) vs 55-70=42T 64.3%WR +$2.08 (best). 30d: 55-70=87T 59.8% +$3.66 best; 40-55=64T 46.9% -$0.33 dead. Current LONG_RSI_SWEET_SPOT_MIN=40 MAX=60 wastes +10 conf boost on dead band.",
+    "expected_impact": "Concentrate conf boost on 55-70 band. Estimated +5-8% WR on boosted LONG entries. Blocks nothing.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — boost only; needs CEO/T for constants",
+    "impact_on_winners": "n/a — does not block any trade",
+    "sample": "7d n=42 (55-70) + n=35 (40-55); 30d n=87 + n=64"
   }
 ]
