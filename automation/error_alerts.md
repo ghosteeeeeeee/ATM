@@ -685,3 +685,19 @@
 - **INFO**: `/var/www/hermes/data/coin_tracker_data.json` missing; coin_tracker service itself runs clean (86 coins, 0 errors at 09:30). Dashboard data path may differ — coin tracker not broken.
 - **INFO**: logs 143M total, 0 files older than 7d — no compression needed. Disk 81%.
 - **AUTO-FIXES APPLIED**: none. Pipeline running; price-collector lock contention self-heals via systemd restarts with prices still collected; disk under threshold; no missed trading-path timers; no stale prices; no phantom trades; no crashes to restart. No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 10:47 UTC
+- **HEALTH** — Pipeline OK: active, last run 10:46:00 rc=0 LIVE. Portfolio: 3 open | 34 closed today | -3.26% PnL. Position Manager healthy (rc=0, 3/6 slots, ATR updates running). Signals (1h): 120 raw. Regime: SHORT_BIAS (11L/39S/67N, 117 tokens, ts 10:45). Speeds: 53.5% ≥50th pct (129/241, updated 10:46). Prices fresh (token_speeds 10:46:22, price-collector finished 10:46:18). Disk 82% (under 85%). Phantom trades: 0. No Traceback/CRASH/exception in 30m window (only "0 errors" lines from coin_tracker).
+- **WARN** (recurring, non-trading-path): dead timer refs — `hermes-atr-sl-updater.timer` not-found; `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` enabled but inactive. Regime scanners (4h/15m) active; ATR SL/TP managed in position_manager.
+- **WARN** (known): `signal_outcomes` closed-today=15 vs portfolio 34 — outcomes partial; portfolio source of truth = position_manager + trades.json.
+- **INFO**: `hermes-hl-sync-guardian.service` is a long-running daemon (started once 2026-10-03 00:16, still active) — timer shows last-passed 1d ago because service never exits; not a missed timer.
+- **INFO**: 98/241 token_speeds have `is_stale=1` flag but `updated_at` is fresh (10:46) — flag likely means no recent price move, not data staleness.
+- **AUTO-FIXES APPLIED**: none. Pipeline running; prices fresh; disk under threshold; no crashes; signals flowing. No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 11:47 UTC
+- **HEALTH** — Pipeline OK: last run 11:45:27–11:45:46 rc=0 LIVE. Portfolio: 1 open | 35 closed today | -13.35% PnL. Position Manager healthy (CFX LONG, 0 Traceback/CRASH/exception in 30m). Services active: hermes-pipeline, hermes-hl-sync-guardian. Signals (1h): 74 raw (`signals` table). Regime: SHORT_BIAS (14L / 34S / 69N, 117 tokens, ts 11:45). Speeds: 53.5% ≥50th pct (129/241). Prices fresh: continuum 23s, hl_cache 22s, regime_5m 98s. Disk 81% (under 85%). Phantom trades (|pnl_pct|<0.01): 0. Core timers firing (price-collector 11:45:52, 1m-candle 11:45:20, compactor, pump-hunter, watchdog, coin-tracker, regime scanners).
+- **WARN** (known, recurring): `signal_outcomes` trades-today=17 vs portfolio closed-today=35 — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md). Open-trade DB query returns 0 while position manager reports 1 (CFX) — same partial-outcomes cause.
+- **WARN** (known, non-trading-path dead timers): `hermes-atr-sl-updater.timer` not-found (unit absent); `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` enabled but inactive. Regime scanners (4h/15m) active; ATR SL/TP managed via position_manager/guardian.
+- **WARN** (known, non-trading-path failed units, unchanged): better-coder, bug-hunter (expected FAILs), git-release (dirty tree), mtf-macd-tuner, trading-checklist, weather-station-api missing. None on execution path.
+- **INFO**: today's portfolio PnL -13.35% (35 closed) — trading performance, not system health. Watch for streak/risk issues separately.
+- **AUTO-FIXES APPLIED**: none. Pipeline running rc=0; prices fresh; disk 81% under threshold; no crashes; no missed trading-path timers; signals flowing (74/h). No restarts or cleanups forced.
