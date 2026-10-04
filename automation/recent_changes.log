@@ -3995,3 +3995,7 @@ DB-verified: 2T last hour GMX bb-squeeze+ trail +$0.03 + NXPC bb-bounce-v3-long+
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 0)
 WATCH: 24h -$1.05 WR 48.3% | bb-bounce-v3-long+ 8T -$0.74 worst (2 open DOT/HBAR + ETC combo) | hard_max_loss family 12T -$1.86 | correlated alt-long exposure
 BY: auto_1hr
+DB-verified: 3T last hour ALL WINS DOT bb-squeeze+ +$0.05 + HBAR bb-bounce-v3-long+ +$0.12 + DOT bb-bounce-v3-long+ +$0.06 (all profit-monster-trail) | 24h 31T 54.8%WR +$0.17 POSITIVE atr_sl_hit 1/31=3.2% | open 3 (GMT+IMX pump-chain+ + ETC combo)
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1, 24h PnL flipped positive) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: bb-bounce-v3-long+ 10T -$0.56 worst but 2 trail winners this hour | hard_max_loss family 11T -$1.74 | freeze until Oct 6
+BY: auto_1hr
