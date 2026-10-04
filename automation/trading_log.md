@@ -3078,3 +3078,34 @@ BY: auto_1hr
 - 24h regime mix EXTREME 10 / HIGH 16 / NORMAL 8 — no NEUTRAL streak, no size change required.
 
 BY: auto_1hr
+
+## [2026-10-04 05:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (window 04:13–05:13 UTC). Session-start catch: BLUR bb-squeeze+ LONG +$0.30 (open 03:42 / close 04:11, profit-monster-trail) — already outside window at audit time. Open: 0.
+**PnL:** $0.00 last hour (empty) | 24h: 34T 20W 14L +$0.19 (WR: 58.8%)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** Empty hour. Last real fill BLUR +$0.30 on $22.10 size via profit-monster-trail — clean trail exit, not SL chop.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. Dominant exits: profit-monster-trail 18T +$1.28, atr_trail_hit 3T +$0.48. Loss concentration = hard_max_loss family 9T -$1.49 (3+2+2+1+1) — intentional hard stops, working as designed.
+- **Kill rule:** 0 trades last hour. 24h worst nets: pump-chain+ LONG 4T 50%WR -$0.24, pump-chain- SHORT 5T 40%WR -$0.10, volume-breakout-long+ 1T 0%WR -$0.11. No 0%WR signal with 3+ trades in last hour. No kill.
+- **Negative PnL streak:** 23:00 -$0.24, 00:00 +$0.05, 02:00 +$0.13, 03:00 -$0.06, 04:00 +$0.30 — NOT 3 consecutive negative hours. No size-reduction trigger.
+- **Overtrading:** 0T last hour. Fine.
+- **Regime:** 24h HIGH 16 / EXTREME 9 / NORMAL 8 / None 1. No NEUTRAL streak. No size change.
+- **Flags re-verified:** PUMP_FLOW_PLUS_ENABLED=True (CEO 2026-09-22 — pump_chain_long still the live pump-chain+ path). PUMP_CHAIN_V4_ENABLED=False, PUMP_CHAIN_V5_ENABLED=False, PUMP_CHAIN_V5_SHORT_ENABLED=True. Volume-breakout master True.
+- **Star signal:** bb-squeeze+ LONG 12T 83.3%WR +$0.76 (24h). Leave enabled.
+- **Pump-chain context:** pump-chain+ LONG 24h -$0.24 but 7d 8T 62.5%WR +$0.95 / 30d 88T +$1.90 — variance, not death. pump-chain- SHORT 24h -$0.10, 7d 35T -$0.22 breakeven-ish — watch only.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (BLUR +$0.30 shows +404.46%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — audit script referenced by SOP not deployed (flagged 22:11, still absent). No config change this hour so nothing to log.
+- hard_max_loss family 9T -$1.49 sole 24h loss concentration — intentional hard stops. Stop-placement vs signal-structure review still open.
+- 24h PnL +$0.23 (04:11) → +$0.19 (now) on 34T — slight dip as trades age out of window, still net positive 58.8%WR.
+
+**Open Questions:**
+- hard_max_loss family (9T) — worth a dedicated stop-structure review when not mid-monitor-window.
+- accel_300_v3_long: prior discrepancy (signal_reporter 7T/7d vs brain DB 0 executions) — left ENABLED=False per CEO Oct 3, not re-audited this hour.
+
+BY: auto_1hr
