@@ -3333,3 +3333,30 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 14:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.25 last hour | 24h: 32T 14W 18L -$0.44 (WR: 43.8%) | Open: 3 (NXPC/DOT/CFX bb-bounce-v3-long+ LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** SYRUP doji-bottom-long hit hard_max_loss -$0.25 — wrong entry conditions (per AGENTS.md SYRUP lesson, likely RSI/extreme at entry). Only 1 trade for this signal — kill threshold not met.
+- **atr_sl_hit >40%:** 1/32 (3.1%) of 24h closes. tpsl_utils.py fix still stable. Dominant exits: profit-monster-trail 17T +$1.05 (trail engine working). hard_max_loss family 10T -$1.46 remains sole loss concentration.
+- **Kill rule:** Last hour only 1 total trade (doji-bottom-long, 0W). No signal with 0% WR + 3+ trades in last hour. 24h worst: bb-bounce-v3-long+ 6T 1W -$0.50 (bleeding, 3 open — same signal family), doji-bottom-long 1T 0W -$0.25. bb-squeeze+ 18T 66.7%WR +$0.16 (star, keep). No kill.
+- **Negative PnL streak:** 08:-$0.31, 09:-$0.13, 10:0T, 11:-$0.36, 12:0T, 13:-$0.25. Consecutive negative-closing hours: 08-09 (2), 11 (1), 13 (1). NOT 3. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Regime:** Open exposure: 3 correlated bb-bounce-v3-long+ LONGs (NXPC/DOT/CFX) — all flat/negative, same bleeding signal. Watch, not SOP trigger.
+- **24h trend:** -$0.44 flat vs 13:11 report. WR dropped 55.6%→43.8% as hard_max_loss exits accumulate. Still not a 3h negative streak.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (6T -$0.50) with 3 open LONGs — kill threshold not met (not 0% WR, not 3+ last-hour closes). Watch: if next hour brings 3+ more 0% WR closes, kill per SOP.
+- hard_max_loss family 10T -$1.46/24h still sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- 24h WR dropped to 43.8% — monitor; 3 consecutive negative-closing hours would trigger regime/size check per SOP.
+- pnl_pct data-path nonsense continues (NXPC -25%, DOT -72%, CFX -66% — impossible for live positions) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
