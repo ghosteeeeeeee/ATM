@@ -1894,8 +1894,14 @@ def execute_trade(token, direction, price, confidence, source,
                     return False, f'RSI hard floor: stale candles age={_age}s — SHORT blocked (fail-closed)'
         finally:
             _rsi_conn.close()
-    except Exception:
-        pass  # non-fatal — don't block trade if RSI check fails
+    except Exception as _rsi_exc:
+        # FIX 2026-10-03: fail-closed for SHORT on any exception
+        # Loss-prevention guardrail should never fail-open
+        if direction.upper() == 'SHORT':
+            log(f'  🚫 [EXEC-RSI-EXCEPTION] {token} SHORT BLOCKED — RSI check error: {type(_rsi_exc).__name__}: {_rsi_exc} — fail-closed')
+            return False, f'RSI check exception: {type(_rsi_exc).__name__} — SHORT blocked (fail-closed)'
+        # LONG can fail-open (not a loss-prevention guardrail)
+        pass
 
     # ── Pump Mode ─────────────────────────────────────────────
     # Spike/pump trades: tight SL/TP, NO trailing. Enter fast, exit fast.

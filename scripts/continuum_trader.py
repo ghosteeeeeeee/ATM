@@ -394,7 +394,40 @@ class ContinuumTrader:
     def _handle_entry(self, state: ContinuumState):
         """Handle entry signal."""
         side = 'LONG' if state.ema300_position == 'ABOVE' else 'SHORT'
-        
+
+        # RSI floor check for SHORT (2026-10-03 audit: Hole 1)
+        # Block SHORT when RSI < 40 — oversold = bounce risk, not SHORT entry
+        if side == 'SHORT':
+            try:
+                import sqlite3 as _rsi_sqlite
+                from paths import CANDLES_DB as _rsi_cdb
+                _rsi_conn = _rsi_sqlite.connect(_rsi_cdb, timeout=5)
+                _rsi_cur = _rsi_conn.cursor()
+                _rsi_cur.execute("""
+                    SELECT close FROM candles_1m
+                    WHERE token = 'BTC' AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 15
+                """)
+                _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
+                _rsi_conn.close()
+                if len(_rsi_closes) >= 15:
+                    _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
+                    _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
+                    _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
+                    _rsi_ag = sum(_rsi_gains) / 14
+                    _rsi_al = sum(_rsi_losses) / 14
+                    if _rsi_al > 0:
+                        _rsi_val = 100 - (100 / (1 + _rsi_ag / _rsi_al))
+                        if _rsi_val < 40:
+                            print(f"[TRADER] ENTRY BLOCKED: SHORT RSI {_rsi_val:.1f} < 40 (oversold — fail-closed)")
+                            return
+                else:
+                    print(f"[TRADER] ENTRY BLOCKED: SHORT RSI check failed (only {len(_rsi_closes)} candles) — fail-closed")
+                    return
+            except Exception as _rsi_e:
+                print(f"[TRADER] ENTRY BLOCKED: SHORT RSI check error ({_rsi_e}) — fail-closed")
+                return
+
         # Check rate limits
         can_trade, reason = self._can_trade()
         if not can_trade:
