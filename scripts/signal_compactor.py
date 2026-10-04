@@ -1501,29 +1501,17 @@ def _score_signal(token, direction, conf, source, signal_type,
                 if not _coin_momentum_ok:
                     trend_alignment_mult = 1.4 if direction == 'SHORT' else 0.6
                     log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bearish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
-            # Neutral/mixed: fallback to token 1m regime
+            # Neutral/mixed: BTC is ranging — do NOT boost/penalize based on token regime
+            # FIX 2026-10-04: Token regime is too noisy to trust when BTC is ranging.
+            # LONG signals were getting 1.2x boost in ranging market, causing wrong-side trades.
+            # Stay neutral (1.0x) — let signal quality (confluence, RSI, etc.) decide.
             else:
-                if regime_conf > 0:
-                    if (regime == 'LONG_BIAS' and direction == 'LONG') or \
-                       (regime == 'SHORT_BIAS' and direction == 'SHORT'):
-                        trend_alignment_mult = 1.2
-                        log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC neutral, regime {regime} aligned → {trend_alignment_mult:.2f}x")
-                    elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-                         (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                        trend_alignment_mult = 0.7
-                        log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC neutral, regime {regime} counter → {trend_alignment_mult:.2f}x")
+                trend_alignment_mult = 1.0
+                log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC neutral (score={_score:.0f}, bias={_bias:.2f}) → 1.0x neutral")
         else:
-            # Continuum unavailable — still try regime fallback
-            log(f"  ⚠️ [TREND-ALIGN] {token}: continuum unavailable, trying regime fallback", 'WARN')
-            if regime_conf > 0:
-                if (regime == 'LONG_BIAS' and direction == 'LONG') or \
-                   (regime == 'SHORT_BIAS' and direction == 'SHORT'):
-                    trend_alignment_mult = 1.2
-                    log(f"  📊 [TREND-ALIGN] {token} {direction}: regime {regime} aligned (no continuum) → {trend_alignment_mult:.2f}x")
-                elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-                     (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                    trend_alignment_mult = 0.7
-                    log(f"  📊 [TREND-ALIGN] {token} {direction}: regime {regime} counter (no continuum) → {trend_alignment_mult:.2f}x")
+            # Continuum unavailable — stay neutral (don't guess from token regime)
+            log(f"  ⚠️ [TREND-ALIGN] {token}: continuum unavailable → 1.0x neutral", 'WARN')
+            trend_alignment_mult = 1.0
     except Exception as e:
         trend_alignment_mult = 1.0
         log(f"  ⚠️ [TREND-ALIGN] {token} {direction}: exception → {e} → 1.0x", 'WARN')
