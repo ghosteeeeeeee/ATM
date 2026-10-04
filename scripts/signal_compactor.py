@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED, LONG_NEUTRAL_BLOCK_ENABLED, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_MULT, AMPLITUDE_COMPACTOR_MULT, ACCEL_300_V3_SHORT_EXTREME_BLOCK, ACCEL_300_V3_SHORT_FLAT_BLOCK, ACCEL_300_V3_LONG_EXTREME_BLOCK, ACCEL_300_V3_LONG_FLAT_BLOCK, ACCEL_300_MINUS_FLAT_BLOCK, BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, BTC_CHOP_GATE_3H_PCT
 try:
     from amplitude_cache import get_cached as _get_amp_cache
 except ImportError:
@@ -1169,7 +1169,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     # momentum signals have no tailwind and fail in chop.
     # Layer A of chop regime signal gating plan.
     # OVERRIDE: When BTC 4h is LONG_BIAS/SHORT_BIAS with strong slope, allow through (2026-09-21)
-    from hermes_constants import BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, CHOP_GATE_LOG_ONLY
+    from hermes_constants import BTC_CHOP_GATE_ENABLED, BTC_CHOP_GATE_THRESHOLD, BTC_CHOP_GATE_3H_PCT, CHOP_GATE_LOG_ONLY
     if BTC_CHOP_GATE_ENABLED:
         _gate_conn = None
         try:
@@ -1179,7 +1179,15 @@ def _score_signal(token, direction, conf, source, signal_type,
             ).fetchone()
             if _gate_row and _gate_row[0] is not None:
                 _btc_30m = _gate_row[0]
-                if abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD:
+                _btc_3h_mom = _get_btc_momentum()
+                # FIX T 2026-10-04: flat ONLY if BOTH velocity AND 3h % are small.
+                # velocity=16×5m regression slope (unit-mismatched vs threshold);
+                # 3h % is pump/dump truth. Either signal moving → not chop.
+                _btc_flat = (abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD and
+                             abs(_btc_3h_mom) < BTC_CHOP_GATE_3H_PCT)
+                if (not _btc_flat and abs(_btc_30m) < BTC_CHOP_GATE_THRESHOLD):
+                    log(f"  ✅ [BTC-CHOP-3H] {token} {direction} {signal_type} — BTC 3h={_btc_3h_mom:+.3f}% >= {BTC_CHOP_GATE_3H_PCT}%, not flat despite velocity {_btc_30m:+.3f}")
+                if _btc_flat:
                     # BTC is flat — check if continuum oscillator overrides (fast indicator)
                     # CONTINUUM OVERRIDE: allow signal if BTC structure is clear
                     # Uses market_phase + linreg_direction (same as continuum authority)
@@ -1225,9 +1233,11 @@ def _score_signal(token, direction, conf, source, signal_type,
                                     log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} SHORT — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
                                 # Allow LONG when BTC is bullish structure
                                 # FIX: accept AT (hysteresis considers AT→ABOVE after 55 min) (2026-09-23)
+                                # FIX T 2026-10-04: structural bull any phase — mirror bear 2026-09-20 (line above)
                                 elif direction.upper() == 'LONG' and (
                                     _p2 in ('RECOVERY', 'NEUTRAL') or
-                                    (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))
+                                    (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT')) or
+                                    (_l2 in ('LEAN_BULL', 'BULL') and _e2 == 'ABOVE')  # structural bull regardless of phase
                                 ):
                                     _override = True
                                     log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
@@ -2602,7 +2612,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     ).fetchone()
                     if _bypass_row and _bypass_row[0] is not None:
                         _velocity = _bypass_row[0]
-                        _vel_ok = abs(_velocity) >= BTC_CHOP_GATE_THRESHOLD
+                        # FIX T 2026-10-04: velocity OR 3h % — either moving = not flat
+                        _btc_3h_mom_b = _get_btc_momentum()
+                        _vel_ok = (abs(_velocity) >= BTC_CHOP_GATE_THRESHOLD or
+                                   abs(_btc_3h_mom_b) >= BTC_CHOP_GATE_3H_PCT)
+                        if (abs(_velocity) < BTC_CHOP_GATE_THRESHOLD
+                                and abs(_btc_3h_mom_b) >= BTC_CHOP_GATE_3H_PCT):
+                            log(f"  ✅ [BTC-CHOP-3H] {token} {direction} — BTC 3h={_btc_3h_mom_b:+.3f}% >= {BTC_CHOP_GATE_3H_PCT}%, bypass not flat despite velocity {_velocity:+.3f}")
 
                         # Continuum-aware logic:
                         # Uses market_phase + structural indicators for robust regime detection
@@ -2613,9 +2629,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _cont_bearish = ((_continuum_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
-                        _cont_bullish = ((_continuum_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
-                                          _cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
-                                          _cont_row_data.get('ema300_position') == 'ABOVE'))
+                        # FIX T 2026-10-04: structural bull any phase — mirror bear 2026-09-20.
+                        # Was phase-gated RECOVERY/CALM/NEUTRAL; DECLINING+BULL+ABOVE blocked LONGs during pump.
+                        _cont_bullish = (_cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
+                                         _cont_row_data.get('ema300_position') == 'ABOVE')
 
                         if direction.upper() == 'SHORT' and _cont_bearish:
                             _btc_mom_ok_for_bypass = True

@@ -1053,6 +1053,8 @@ BTC_CHOP_GATE_THRESHOLD = 0.20            # % — |BTC 30m| below this = CHOP (r
                                          # CEO 2026-10-04 17:5x: REVERTED b5006cd8 freeze-violation 0.05→0.20.
                                          # Rationale mismatch: comment claimed 5m scale but signal_compactor.py:1181 compares _btc_30m.
                                          # 0.05 on 30m metric ≈ gate OFF. Post-freeze: bug_hunter measure gate hit-rate 0.20 vs 0.05 on 30m data before any re-tune.
+BTC_CHOP_GATE_3H_PCT = 0.50              # % — |BTC 3h momentum| from _get_btc_momentum() >= this = NOT flat (T override 2026-10-04).
+                                         # OR check with velocity: either moving = not chop. BTC_CHOP_GATE_THRESHOLD value unchanged.
 CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-only since 2026-09-11, 10 days clean logs
 
 # ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
