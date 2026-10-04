@@ -598,6 +598,13 @@ def run(dry_run=False):
     for pos in positions:
         pnl = pos.get('live_pnl_pct', 0)
         if pnl is not None and pnl <= HARD_STOP_PCT:
+            # MEDIUM fix (bug-hunter 2026-10-04): run_trail does not remove closed
+            # positions from the in-memory list — skip any the trail tier already
+            # closed (guards inside close_position prevent actual double-closes;
+            # this avoids redundant HL queries + double-counted totals).
+            if not effective_dry_run and not is_position_on_hl(pos['token']):
+                log(f"  [HARD-STOP] {pos['token']} already closed (trail tier) — skipping", "WARN")
+                continue
             log(f"  [HARD-STOP] {pos['token']} {pos['direction']}: pnl={pnl:.2f}% <= {HARD_STOP_PCT}% — closing immediately")
             if not effective_dry_run:
                 # FIX 2026-10-04 (T-approved safety-net repair): was

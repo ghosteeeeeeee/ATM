@@ -146,7 +146,11 @@ def close_events():
     pg = None
     try:
         cur = conn.cursor()
-        cutoff = (datetime.now(timezone.utc) - timedelta(hours=CLOSE_AFTER_HOURS)).isoformat()
+        # FIX 2026-10-04 (bug-hunter LOW, same class as t5_shadow HIGH): blocked_at
+        # is stored 'YYYY-MM-DD HH:MM:SS+00:00' (space + tz) — isoformat 'T' cutoff
+        # could close events sharing the cutoff's calendar date up to ~23h early.
+        # Match blocked_at's exact format.
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=CLOSE_AFTER_HOURS)).strftime('%Y-%m-%d %H:%M:%S') + '+00:00'
         pending = cur.execute(
             "SELECT id, token, direction, blocked_at FROM events "
             "WHERE closed=0 AND blocked_at < ?", (cutoff,)).fetchall()

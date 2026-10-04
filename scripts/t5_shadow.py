@@ -222,7 +222,13 @@ def close_events():
         pending = cur.execute(
             "SELECT id, token, direction, created_at FROM decisions WHERE closed=0 "
             "AND created_at < ?",
-            ((datetime.now(timezone.utc) - timedelta(minutes=TRADE_WINDOW_MIN + 5)).isoformat(),)
+            # FIX 2026-10-04 (bug-hunter HIGH): decisions.created_at is SPACE-format
+            # ('YYYY-MM-DD HH:MM:SS', from signals.created_at) — isoformat 'T' cutoff
+            # compares space(0x20) < 'T'(0x54) so EVERY same-day row matched: the
+            # 65-min age gate was bypassed and all decisions closed premature with
+            # NULL outcomes, destroying the P4 gate metric. Same class as the
+            # decide-mode fix; mirror its strftime format exactly.
+            ((datetime.now(timezone.utc) - timedelta(minutes=TRADE_WINDOW_MIN + 5)).strftime('%Y-%m-%d %H:%M:%S'),)
         ).fetchall()
         if not pending:
             log('close: 0 pending decisions')
