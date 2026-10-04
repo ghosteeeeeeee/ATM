@@ -3975,3 +3975,7 @@ DB-verified: 2T last hour bb-bounce-v3-long+ -$0.36 (SUSHI/ME hard_max_loss) | 2
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 2/3, 10:00 0T does not extend)
 WATCH: bb-bounce-v3-long+ 8T -$0.41 worst signal (2 open, kill threshold not met) | hard_max_loss family 11T -$1.67 | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+DB-verified: 0T last hour | 24h 36T 55.6%WR -$0.44 atr_sl_hit 2.8% | open 4 (3 bb-bounce-v3 LONG + 1 doji)
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 2/3, 10:00+12:00 0T do not extend)
+WATCH: bb-bounce-v3-long+ 8T -$0.41 worst + 3 open | mtf-regime-trend+ 9T -$0.46/48h | hard_max_loss family 11T -$1.67 | pnl_pct nonsense | signal_version.py still missing
+BY: auto_1hr

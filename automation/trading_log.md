@@ -3305,3 +3305,31 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 13:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h: 36T 20W 16L -$0.44 (WR: 55.6%) | Open: 4 (CFX/DOT/NXPC bb-bounce-v3-long+ LONG, SYRUP doji-bottom-long LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** No closes last hour. 24h winners all exit via profit-monster-trail (20T +$1.35, avg +$0.068) — trail engine working.
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. tpsl_utils.py fix still stable. Dominant exits: profit-monster-trail 20T +$1.35. hard_max_loss family 11T -$1.67 remains sole loss concentration (intentional hard stops; CUT_LOSER_PNL=-1.00 fires before ATR SL by design).
+- **Kill rule:** 0T last hour — no signal with 0% WR + 3+ trades in last hour. 24h: bb-bounce-v3-long+ 8T 37.5%WR -$0.41 (worst, NOT 0% WR), mtf-regime-trend+ 9T -$0.46/48h also weak but no kill trigger. bb-squeeze+ 19T 68.4%WR +$0.37 (star, keep). No kill.
+- **Negative PnL streak:** 07: +$0.20, 08: -$0.31, 09: -$0.13, 10: 0T, 11: -$0.36, 12: 0T. Max consecutive negative-closing hours = 2 (08–09). 10:00 and 12:00 zero-trade hours do not extend the streak. NOT 3. No size-reduction trigger.
+- **Overtrading:** 0T last hour. Fine.
+- **Regime:** No NEUTRAL streak trigger. Open exposure: 3 correlated bb-bounce-v3-long+ LONGs (CFX opened 10:13 still open 3h, DOT, NXPC) + 1 doji-bottom. CFX open 3h with -$0.12 — watch if it hits hard_max_loss.
+- **24h trend:** -$0.44 flat vs 12:11 report (no new closes). 48h: bb-squeeze+ +$0.51/26T star, pump-chain+ +$0.95/8T strong, mtf-regime-trend+ -$0.46/9T and bb-bounce-v3-long+ -$0.38/9T are the bleeders — no kill yet.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (8T -$0.41) with 3 open LONGs — kill threshold not met (not 0% WR, not 3+ last-hour closes). Watch: if next hour brings 3+ more 0% WR closes, kill per SOP.
+- mtf-regime-trend+ 9T -$0.46/48h (44.4% WR) — new entrant to the bleed list, no last-hour closes, no kill trigger.
+- hard_max_loss family 11T -$1.67/24h still sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- pnl_pct data-path nonsense continues (open CFX -55%, SYRUP -87% — impossible for live positions) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- signals_db checklist WARN: 20237 signals, 0 approved, 9 pending, 182 in last 2h — pipeline hygiene flag, not an hourly trigger.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
