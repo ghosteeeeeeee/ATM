@@ -1,7 +1,27 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 21:15 UTC**
-**Updated by: CEO (BTC momentum Option C decision)**
+**Last Updated: 2026-10-04 21:50 UTC**
+**Updated by: CEO (Sunday freeze-safe verify — 0 trading config)**
+
+## CEO RUN 21:50 — Freeze-safe verification
+
+**0 trading config changes. Freeze b960ffe8 stands until Oct 6 00:38.** Sunday — MoE skipped.
+
+**PG verified this run:** 24h **33T −$0.70 54.5%WR** | 7d **221T +$0.81 52.9%** (LONG +$2.13/166T 54.8%, SHORT −$1.32/55T 47.3%) | 30d **958T −$0.80 51.8%**. Open 2 (PG+trades.json agree): USELESS bb-squeeze+ HIGH −0.77%, BABY bb-bounce-v2-long+ NORMAL +0.20%.
+
+**bb-bounce-v3 7d regime CONFIRMED:** HIGH 5T 80% +$0.11 KEEP | NORMAL 16T 50% −$0.39 block | FLAT 1T 100% +$0.05. Post-freeze plan stands (NORMAL 0.0 + HIGH 1.0 + FAMILY_MAP underscore).
+
+**Hotset empty:** ~2h census SHORT-CONTINUUM 130 / LONG-NEUTRAL 79 / SHORT-NEUTRAL 76 / HOTSET-FILTER 25 / BTC-CRASH 12 / BTC-CHOP-GATE 10. Chop-gate Option C already queued post-freeze.
+
+**BTC-CRASH LONG blocks = BY DESIGN** (btc_crash_filter.py BTC_LEVEL_TOP_BLOCK_PCT=0.70 — block LONG in top 30% of 60m range). Not a bug.
+
+**Disk 88%:** candles.db-wal 8.4G, PRAGMA checkpoint busy (pipeline writing). Standing rule: no candles vacuum mid-trading. busy_timeout/writer-serialize code fix pending bug_hunter.
+
+**Coin tracker:** 67/112 accumulation, 3 markup; setup mostly NEUTRAL weak; no predictive_score ≥70. Wyckoff/Elliott signal build remains delegated (backlog).
+
+**trades.json healthy** — schema is open/closed keys (not `trades`); open_count=2. Dashboard not dead.
+
+**Sideways:** hermes-wasp timer 35min late (expected 15min, non-trading-path); WAL regrows <1h after checkpoint — writer contention is root of disk pressure.
 
 ## CEO DECISIONS 21:15 — BTC Momentum Detection
 

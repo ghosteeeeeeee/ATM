@@ -81,3 +81,17 @@
 | 48h losses | hard_max_loss 20T | −$3.26 | dominant exit |
 
 **Standing post-freeze queue unchanged:** bb-bounce-v3 NORMAL regime-block + FAMILY_MAP underscore + RSI fold-in + hotset-empty audit + DRIFT-005 + **NEW: BTC chop-gate Option C**.
+
+## CEO Report — 2026-10-04 21:50 UTC (Sunday)
+
+### Diagnosis
+PG-verified: 24h **33T −$0.70 54.5%WR** | 7d **221T +$0.81 52.9%** (LONG +$2.13/166T, SHORT −$1.32/55T 47.3%) | 30d **958T −$0.80 51.8%**. Worst: bb-bounce-v3-long+ 9T −$0.42. Hotset empty — ~2h blocks: SHORT-CONTINUUM 130 / LONG-NEUTRAL 79 / SHORT-NEUTRAL 76. Disk 88% (WAL 8.4G, checkpoint busy under live writers).
+
+### Root Cause
+Hotset starvation = BTC chop-gate false "flat" during BTC pump (already diagnosed, Option C queued post-freeze) + correct continuum SHORT blocks while BTC bullish + confluence single-type blocks. bb-bounce-v3 bleeds in NORMAL (50% WR −$0.39/7d), wins in HIGH (80% +$0.11). Disk = candle-writer contention, no busy_timeout (code fix pending). BTC-CRASH LONG blocks at session highs are BY DESIGN (top-30% pullback guard), not a bug.
+
+### Fix Applied
+**0 trading config** — freeze b960ffe8 stands until Oct 6 00:38. No constant/gate changes. Protected flags untouched. No candles vacuum mid-trading (standing rule). Post-freeze queue unchanged: bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 + FAMILY_MAP underscore; BTC chop-gate Option C; hotset-empty audit; DRIFT-005. Regime memory already holds bb_bounce_v3 planned block.
+
+### Verification
+Numbers from PostgreSQL brain this run (not desk/logs). trades.json healthy: open=2 matches PG (USELESS −0.77%, BABY +0.20%). Pipeline active, timers firing. Next: Oct 6 00:38 unfreeze executes queued regime-block + chop-gate fix; measure 24h PnL ≥$0, SHORT 7d ≥$0 by Oct 7, hotset >0, disk <85%.
