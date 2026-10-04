@@ -2594,5 +2594,34 @@
     "status": "suggested — REVISE standing Oct 6 queue item",
     "risk": "low — penalty reversible, less aggressive than 0.0x",
     "impact_on_winners": "0.0x block would kill 7/14 NORMAL winners (64%); HIGH-only + penalty keeps HIGH winners and most NORMAL winners"
+  },
+  {
+    "date": "2026-10-04T21:37:09Z",
+    "idea": "Bypass hard-floor guardrail enforcement (LONG_RSI_FLOOR / SHORT_RSI_HARD_FLOOR on ALL execution paths incl. STANDALONE_BYPASS)",
+    "rationale": "Live proof this run: ENS bb-bounce-v3 LONG entry_rsi=86.34 (RSI_MAX=55, bb_pos=1.19), DOT mtf-regime-trend+ LONG RSI=12.97, accel-300- SHORT RSI 25-31. These floors are documented loss-prevention guardrails, not tunable signal filters — bypass skipping them is a hole, not a policy choice. Post-fix primary path: 1 SHORT RSI=82 won — floors do not starve winners when applied correctly.",
+    "expected_impact": "Blocks known knife-catch class on bypass path. 7d evidence: RSI<25 SHORT 14T 14.3%WR -$1.75; mtf-regime-trend RSI<20 LONG 3T -$0.38. Would not block post-b960ffe8 winning SHORT (RSI 82).",
+    "category": "path integrity / guardrail",
+    "status": "suggested — post-freeze Oct 6 (correctness class like RSI consolidation ship-now, but freeze ruling was strict 0 config; queue for CEO)",
+    "risk": "low — floors already exist as constants; enforcement only",
+    "impact_on_winners": "Post-fix oversold SHORT n=0 blocked; bb-bounce-v3 7d winners none with RSI<20 on either clock for the hard floor"
+  },
+  {
+    "date": "2026-10-04T21:37:09Z",
+    "idea": "Desaturate bb-bounce-v3 confidence scoring (final_confidence=99 on 20/22 trades; meta exceeds CONF_CAP=88)",
+    "rationale": "Confidence cannot rank setups when nearly every fill is 99 — position sizing, confidence gates, and learning signals are blind. Discriminative features available in _signal_metadata: momentum_state (rising vs falling), bb_position (bounce zone 0.0-0.3 vs chase >0.65), volume_spike, btc_regime alignment. Prior sessions: winners trail when entry has room; confidence should proxy 'room + fuel'.",
+    "expected_impact": "Enables confidence-based sizing/filters to actually fire. Shadow-test first (t5/gate shadow pattern). Not a value change on live gates until shadow numbers exist.",
+    "category": "confidence engineering",
+    "status": "suggested",
+    "risk": "medium — scoring rebuild; shadow-first required",
+    "impact_on_winners": "Unknown until shadow — do not ship live without counterfactual"
+  },
+  {
+    "date": "2026-10-04T21:37:09Z",
+    "idea": "Do NOT ship bb-bounce-v3 RSI_MAX 55→40 — replace with path-enforcement + NORMAL penalty/HIGH-only (align 20:37 reverse plan)",
+    "rationale": "Fresh 7d bands: <40 LONG = 7T 71.4% +$0.07 (best); 40-50 = 5T 20% -$0.26 (worst); >=60 = 3T 66.7% +$0.05. Lowering ceiling fights the data. NORMAL hard 0.0x also overshoots (kills 7 NORMAL winners +$0.32). Winning move is mechanism (regime penalty) + guardrail paths, not RSI ceiling.",
+    "expected_impact": "Avoids blocking current winners; keeps Oct 6 focused on penalty/HIGH-only + bypass floors + FAMILY_MAP underscore.",
+    "category": "anti-regression",
+    "status": "suggested — revise standing queue",
+    "risk": "low"
   }
 ]
