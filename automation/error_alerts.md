@@ -627,3 +627,26 @@
 
 ## Error Alerts — 2026-10-04 00:59 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+
+## Error Alerts — 2026-10-04 02:47 UTC
+- **HEALTH** — Pipeline OK: active/running. Position Manager healthy (2 open: ENS LONG + CHIP LONG, ATR SL/TP active, decider entered CHIP this cycle). Signals (1h): 116. Trades: 2 open / 32 closed today (+19.31% PnL). No Tracebacks/CRASH in pipeline logs. Phantom trades: 0. Disk 80% (under 85%). Regime: SHORT_BIAS (19 long / 24 short / 74 neutral, 117 tokens). Speeds: 53.5% ≥50th pct (129/241). Prices fresh (~80 tokens in prices.json, ~1min old). Core trading timers firing (pipeline 1m, price-collector 30s, compactor 1m, watchdog, pump-hunter, 1m-candle, hl-sync-guardian active).
+- **WARN** (known, ~7 failed units, none on trading path): better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer, wasp. Same set as prior reports; root causes tracked — no auto-fix.
+- **INFO**: `signal_outcomes` open-query (pnl_usdt NULL / trade_id logic) returns 0 while pipeline + trades.json report 2 open — outcomes table appears closed-only. Portfolio source of truth remains position_manager + trades.json. Not a trading-path failure.
+- **INFO**: `systemctl list-timers hermes-*` without `--all` still prints "0 timers listed" — cosmetic; explicit unit listing confirms timers firing.
+- **INFO**: hotset empty (0 tokens) — no signals survived compaction above threshold. Expected under SHORT_BIAS/neutral-heavy regime.
+- **AUTO-FIXES APPLIED**: none. No CRITICAL trading-path conditions; disk under threshold; no restarts or cleanups needed.
+
+## Error Alerts — 2026-10-04 03:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-04 04:48 UTC
+- **HEALTH** — Pipeline OK: timer-active (1m), last full run rc=0 at 04:45:48; new runs 04:47/04:48. Position Manager healthy (0 open / 0 closed this cycle, all gates loaded). Signals (1h): 68. Trades: 0 open | 34 closed today | +14.53% PnL (portfolio; signal_outcomes shows 7 today / +0.17 USDT / 5 wins). Pipeline errors/Tracebacks: 0. Phantom trades: 0. Disk 80% (under 85%). Regime: LONG_BIAS (41 long / 8 short / 68 neutral, 117 tokens, ts 04:45). Speeds: 53.5% ≥50th pct (129/241). Prices fresh (prices.json ~2min, token_speeds 04:47). hl-sync-guardian active. Core timers firing (pipeline, price-collector 30s, compactor 1m, watchdog, pump-hunter, 1m-candle).
+- **WARN** (known, ~7 failed units, none on trading path): better-coder (`ModuleNotFoundError: dispatcher.dispatcher`), bug-hunter (audit FAILs — expected when findings exist), git-release (dry-run exit 1), mtf-macd-tuner (multiprocessing error), trading-checklist (WARN findings → exit 1), upgrade-implementer (exit 124 timeout). Root causes tracked — no auto-fix.
+- **WARN** (new): `weather-station-api.service` failed — `/root/.hermes/scripts/weather_station_api.py` missing; `weather_station.json` stale (Aug 27). coin_tracker enricher skips gracefully. Not on execution path.
+- **WARN**: `hermes-atr-sl-updater.timer` not-found (dead unit reference).
+- **INFO**: `decisions` table stale since 2026-04-13 (4 rows) — compactor path now uses hotset/signal_compactor, not this table.
+- **INFO**: hotset empty (0 tokens) — no signals survived compaction above threshold this cycle. 68 raw signals still generated. Expected under current filters.
+- **INFO**: `systemctl list-timers hermes-*` without `--all` prints "0 timers listed" — cosmetic; `--all` + `list-units` confirm timers firing.
+- **INFO**: `signal_outcomes` open-query returns 0; portfolio source of truth remains position_manager + trades.json (0 open, consistent).
+- **AUTO-FIXES APPLIED**: none. Pipeline running, disk under threshold, prices fresh, no crashes — no restarts or cleanups needed.
