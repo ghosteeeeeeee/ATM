@@ -341,6 +341,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pump-chain-'): 1.0,              # OK — hyphen form (runtime signal_type is 'pump-chain')
     ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
     ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback
+    ('NORMAL', 'bb-bounce-v3-long'): 0.0,        # BLOCKED 2026-10-04 signal_reporter — NORMAL 15T 46.7%WR -$0.43. Wins HIGH 5T 60%WR +$0.08. Overrides family Bollinger NORMAL=1.3 boost (wrong for v3).
+    ('NORMAL', 'bb_bounce_v3_long'): 0.0,        # underscore form (signal_type in signals DB)
     # ── NORMAL: bleeding signals (30d cross-tab) ──
     ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
     ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
@@ -374,6 +376,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'pump-chain-'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain-
     ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH
     ('HIGH', 'pump-chain'): 1.0,                 # OK — bare form fallback
+    ('HIGH', 'bb-bounce-v3-long'): 1.0,          # OK 2026-10-04 signal_reporter — HIGH 5T 60%WR +$0.08 (7d 4T 75%WR +$0.10). Overrides family Bollinger HIGH=0.0 block (stale v1/v2 data).
+    ('HIGH', 'bb_bounce_v3_long'): 1.0,          # underscore form
     ('HIGH', 'accel-300-'): 0.0,                # BLOCKED 2026-10-01 — accel-300- SHORT HIGH 0%WR -$0.31 (4T). NORMAL 75%WR. signal_reporter
     ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH

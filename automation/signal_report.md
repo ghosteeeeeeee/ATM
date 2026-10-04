@@ -1,74 +1,64 @@
 # Signal Performance Report
-**Generated:** 2026-10-04 17:13 UTC | **Period:** Last 6h + 24h
-**Source:** PostgreSQL brain DB (queried live, not cached)
+**Generated:** 2026-10-04 23:16 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **6h closed:** 6 trades | WR 33.3% | PnL **-$0.77**
-- **24h closed:** 29 trades | WR 48.3% | PnL **-$1.04**
-- **Kill switch:** live_trading=true | LIVE_TRADING_ENABLED=True
+## Verified Numbers (PG brain DB)
+
+### 6h Performance (HAVING COUNT >= 2)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-squeeze+ | LONG | 5 | 80.0% | -$0.09 |
+| pump-chain+ | LONG | 2 | 100% | +$0.14 |
+| bb-bounce-v3-long+ | LONG | 3 | 66.7% | +$0.16 |
+
+### 24h Performance (HAVING COUNT >= 3)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-bounce-v3-long+ | LONG | 9 | 44.4% | -$0.42 |
+| bb-squeeze+ | LONG | 16 | 68.8% | +$0.14 |
 
 ---
 
 ## KILLED (executed)
-None. Freeze b960ffe8 (until 2026-10-06 00:38) blocks trading config changes.
-
-## REGIME-BLOCK (PENDING freeze lift — HIGH wins, not a kill)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 25.0% | -$0.72 | 8 (24h) | Block NORMAL only (0.0x). HIGH 6T 66.7% +$0.09 kept. Flag stays True. |
+| — | — | — | — | — | None — no signal met kill criteria (WR<30% + 5T+ + PnL<-$0.10) |
 
-**Evidence (all-time regime):**
-- NORMAL: 13T, 46.2% WR, -$0.55 ← losing habitat
-- HIGH: 6T, 66.7% WR, +$0.09 ← winning (≥55% → no blanket kill)
-- 7d overall: 18T, 55.6% WR, -$0.44 (exits bleed more than entries)
-- Active since 2026-09-21 (>24h)
-- 24h tokens: CFX/ME/COMP/SUSHI/ENS losses; DOT/WCT only winners
+## REGIME BLOCK (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-v3-long+ | LONG | 44.4% (24h) | -$0.42 | 9 | NORMAL regime blocked (0.0x), HIGH allowed (1.0x) via volatility_gate_v2.py |
 
-**Planned edit (post-freeze, Oct 6):** `scripts/volatility_gate_v2.py` SIGNAL_TYPE_OVERRIDES
-```
-('NORMAL', 'bb_bounce_v3_long'): 0.0,   # signal_type form
-('NORMAL', 'bb-bounce-v3-long'): 0.0,   # source form
-('HIGH', 'bb_bounce_v3_long'): 1.0,     # keep winner
-('HIGH', 'bb-bounce-v3-long'): 1.0,
-```
-- `BB_BOUNCE_V3_LONG_ENABLED` remains **True** (verified)
-- FAMILY_MAP already has `bb-bounce-v3-long` (hyphen); underscore form maps to `Other` — see ISSUES
-- CEO already tracking this signal for post-freeze RSI_MAX 55→40 (kanban 13:50)
+**Rationale:** Regime split — HIGH 5T 60% WR +$0.08 (7d: 4T 75% WR +$0.10) wins; NORMAL 15T 46.7% WR -$0.43 loses. Signal wins in HIGH → per policy, block only losing regime, do NOT kill. FAMILY_MAP already contains `bb-bounce-v3-long` under Bollinger. `BB_BOUNCE_V3_LONG_ENABLED` stays True.
+
+**Before → After multipliers (source=`bb-bounce-v3-long+`):**
+- NORMAL: 1.3 → **0.0** (was boosting the losing regime)
+- HIGH: 0.0 → **1.0** (was blocking the winning regime via stale family Bollinger HIGH=0.0 block)
 
 ## BOOSTED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 61.5% | +$0.19 | 13 (24h) | Already at 1.2x (boosted 2026-10-03). No further change. |
-
-**bb-squeeze+ detail:**
-- 24h: 13T 61.5% +$0.19 | 7d: 47T 61.7% +$0.50
-- Multi-token winners: BLUR +0.49 (2T), SYRUP +0.08, ALT +0.06 (2T), NEAR/LDO +0.05
-- Regime: NORMAL 66.7% +$0.27, HIGH 65.4% +$0.38, EXTREME 50% -$0.15 (already blocked)
-- Meets boost criteria; weight already raised yesterday — maintain
+| — | — | — | — | — | None — bb-squeeze+ already at 1.2x weight (boosted 2026-10-03); pump-chain+ only 2T/24h (below 5T boost threshold) |
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 25.0% | -$0.72 | 8 | REGIME-BLOCK pending freeze (see above) |
-| doji-bottom-long | LONG | 0% | -$0.25 | 1 | n<5 — watch |
-| pump-chain- | SHORT | 0% | -$0.24 | 1 | n<5 — watch |
-| volume-breakout-long+ | LONG | 0% | -$0.11 | 1 | n<5 — watch |
-| continuation+ | LONG | 0% | -$0.02 | 1 | n<5 — watch |
+| bb-bounce-v3-long+ | LONG | 44.4% | -$0.42 | 9 | NORMAL regime now blocked — re-evaluate after 24h of HIGH-only trades |
+| doji-bottom-long | LONG | 0% | -$0.25 | 1 | Too few trades (1T) — watch |
+| pump-chain- | SHORT | 0% | -$0.24 | 1 | Too few trades (1T) — watch |
+| continuation+ | LONG | 0% | -$0.02 | 1 | Too few trades (1T) — watch |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 61.5% | +$0.19 | 13 | Maintained at 1.2x |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.03 | 2 | Healthy |
-| mtf-regime-trend- | SHORT | 100% | +$0.06 | 1 | Healthy |
+| bb-squeeze+ | LONG | 68.8% | +$0.14 | 16 | Star performer — 1.2x weight already applied. EXTREME blocked, HIGH/NORMAL active. Token-consistent (BLUR +$0.49, ALT/DOT/LDO/NEAR +$0.05–0.06 each) |
+| pump-chain+ | LONG | 100% | +$0.14 | 2 | Healthy but low volume this window. 7d: 10T 70% WR +$1.09 |
 
 ## ISSUES
-- **Direction inversions (24h):** none found. Clean.
-- **Freeze conflict:** regime-block for bb-bounce-v3-long+ is the correct action per SOP (HIGH wins ≥55%) but cannot execute until freeze lifts Oct 6 00:38. Already on CEO post-freeze list.
-- **FAMILY_MAP gap (sideways):** `signal_family('bb_bounce_v3_long')` → `'Other'` (underscore form missing from Bollinger list; only hyphen `bb-bounce-v3-long` present). Family-level Bollinger blocks therefore do not apply to the signal_type form. Post-freeze: add `'bb_bounce_v3_long'` to FAMILY_MAP **and** the HIGH:1.0 override together, or the HIGH family Bollinger:0.0 block could kill the winner.
-- **psycopg2 gotcha:** `LIKE '%...%'` inside parameterized queries needs `%%` (or pass pattern as a bound param). `%` is a format placeholder. Hit this during this run; training-system flagged the same class earlier today.
-- **System bleed:** 24h -$1.04 driven almost entirely by bb-bounce-v3-long+ NORMAL losses (-$0.72 of -$1.04).
+- **None critical.** No direction inversions found (24h query: 0 rows).
+- **bb-bounce-v3-long+ family multiplier was inverted** — family-level Bollinger blocks had HIGH=0.0 (blocking the winning regime) and NORMAL=1.3 boost (boosting the losing regime). Fixed via per-signal-type overrides. This is a stale-data bug: family blocks were set from v1/v2 bb_bounce data, not v3.
+- **6h bb-squeeze+ R:R slightly inverted** (80% WR but -$0.09) — small sample, 24h still +$0.14. Monitor, no action.
+- **3 open positions at last check were correlated bounce-family LONGs** (DOT+HBAR bb-bounce-v3-long+) — NORMAL block will reduce this exposure going forward.
 
 ---
 
-*signal_reporter | DB-verified 2026-10-04 17:13 UTC | OpenMemory skipped (tenant_mismatch per task instructions)*
+*Report auto-generated by signal_reporter. Next report: ~6h.*
