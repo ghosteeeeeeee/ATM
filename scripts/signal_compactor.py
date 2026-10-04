@@ -2014,10 +2014,17 @@ def _score_signal(token, direction, conf, source, signal_type,
                      lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult *
                      oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
     _mult_floor = 0.3  # Score can't drop below 30% of base regardless of penalty stacking
-    _mult_adjusted = max(_mult_product, _mult_floor)
-    if _mult_product < _mult_floor:
-        log(f"  ⚖️ [SCORE-FLOOR] {token} {direction}: multiplier product {_mult_product:.4f} floored to {_mult_floor}")
-    final_score = score * _mult_adjusted
+    # FIX 2026-10-04 (bug_hunter): preserve hard blocks — a 0.0 multiplier is an
+    # intentional kill (Volatility Gate V2 regime bans via get_combined_multiplier,
+    # staleness_mult=0 at 10min). The floor applies ONLY to soft penalty stacking
+    # (product > 0 but < 0.3); flooring a 0.0 resurrects hard-blocked signals.
+    if _mult_product <= 0.0:
+        final_score = 0.0
+    else:
+        _mult_adjusted = max(_mult_product, _mult_floor)
+        if _mult_product < _mult_floor:
+            log(f"  ⚖️ [SCORE-FLOOR] {token} {direction}: multiplier product {_mult_product:.4f} floored to {_mult_floor}")
+        final_score = score * _mult_adjusted
     return final_score
 
 

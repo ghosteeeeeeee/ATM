@@ -2,70 +2,98 @@
 """
 rsi_utils.py — Authoritative RSI computation for Hermes Trading System.
 
-Consolidates all RSI checks into one function with consistent methodology.
-Replaces 6+ scattered RSI implementations with inconsistent candle sources.
+Consolidates the decider_run.py RSI checks (ctx-gate + exec-time) into one
+function with consistent methodology. NOTE: the signals layer still uses
+signals/rsi_1m.py (correct, reverses DESC) and decider_run's RSI-drift check
+plus accel_300_v3 exec-RSI still use their own inline implementations.
 
 Usage:
     from rsi_utils import compute_rsi
     rsi = compute_rsi(token)           # defaults to 1m, 15 candles
     rsi = compute_rsi(token, tf='5m')  # 5m candles
     rsi = compute_rsi(token, period=14, limit=20)  # custom params
+    rsi = compute_rsi(token, tf='5m', max_age_s=900)  # fail-closed if candles stale
 
 Returns:
     float: RSI value (0-100)
-    None: Insufficient data or error (caller should fail-closed for SHORT)
+    None: Insufficient data, stale data (with max_age_s), or error (caller should fail-closed for SHORT)
 
 Method:
     Uses Wilder's RSI (same as industry standard) on closed candles only.
     Consistent across all callers — no more 1m vs 5m drift bugs.
+
+BUG FIX 2026-10-04 (bug_hunter): candles are fetched ORDER BY ts DESC (newest
+first). The delta sequence MUST be reversed to chronological order before
+Wilder smoothing — otherwise the recursion weights the series backwards and
+the result is effectively the RSI of the time-reversed series (inverted).
+The signals layer (signals/rsi_1m.py) always reversed; this module originally
+omitted it.
 """
 
 import sqlite3
 from typing import Optional
 from paths import CANDLES_DB
 
-# Cache: {(token, tf, period): (rsi_value, timestamp)}
+# Cache: {(token, tf, period): (rsi_value, cached_ts, latest_candle_ts)}
+# latest_candle_ts lets max_age_s staleness checks work on cache hits too.
 _rsi_cache = {}
 _CACHE_TTL = 30  # seconds — RSI doesn't change fast enough to need faster
 
 
-def compute_rsi(token: str, tf: str = '1m', period: int = 14, limit: int = 20) -> Optional[float]:
+def compute_rsi(token: str, tf: str = '1m', period: int = 14, limit: int = 20,
+                max_age_s: Optional[float] = None) -> Optional[float]:
     """
     Compute RSI using Wilder's smoothing method.
-    
+
     Args:
         token: Token symbol (e.g., 'BTC')
         tf: Timeframe — '1m', '5m', '15m', '1h' (default '1m')
         period: RSI period (default 14)
         limit: Number of candles to fetch (default 20, need period+1 minimum)
-    
+        max_age_s: If set, return None when the latest closed candle is older
+                   than this (stale data → caller fail-closed). None = no check.
+
     Returns:
-        RSI value (0-100) or None if insufficient data
+        RSI value (0-100) or None if insufficient data / stale
     """
     import time
-    
-    # Check cache first
+
+    # Check cache first (but never serve a cached value that fails the staleness check)
     cache_key = (token.upper(), tf, period)
     if cache_key in _rsi_cache:
-        cached_rsi, cached_ts = _rsi_cache[cache_key]
+        cached_rsi, cached_ts, cached_candle_ts = _rsi_cache[cache_key]
         if time.time() - cached_ts < _CACHE_TTL:
-            return cached_rsi
-    
+            if max_age_s is None or (time.time() - cached_candle_ts) <= max_age_s:
+                return cached_rsi
+
     conn = None
     try:
         conn = sqlite3.connect(f'file:{CANDLES_DB}?mode=ro', uri=True, timeout=5)
         cur = conn.cursor()
         cur.execute(
-            f"SELECT close FROM candles_{tf} WHERE token = ? AND is_closed = 1 "
+            f"SELECT ts, close FROM candles_{tf} WHERE token = ? AND is_closed = 1 "
             f"ORDER BY ts DESC LIMIT ?",
             (token.upper(), limit)
         )
-        closes = [row[0] for row in cur.fetchall()]
-        
+        rows = cur.fetchall()
+        if not rows:
+            return None  # No data
+
+        # Staleness guard — restore exec-time fail-closed (HYPER SHORT lesson:
+        # stale candles let RSI-gated shorts through). Caller opts in via max_age_s.
+        if max_age_s is not None and (time.time() - rows[0][0]) > max_age_s:
+            return None  # Stale — caller fail-closed
+
+        # CRITICAL: rows are DESC (newest first). Reverse to chronological order
+        # BEFORE computing deltas — Wilder smoothing weights the sequence by
+        # position, so a reversed/negated delta list yields an inverted RSI.
+        closes = [row[1] for row in rows]
+        closes.reverse()
+
         if len(closes) < period + 1:
             return None  # Insufficient data
-        
-        # Calculate gains and losses
+
+        # Calculate gains and losses (chronological order)
         deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
         gains = [max(d, 0) for d in deltas]
         losses = [max(-d, 0) for d in deltas]
@@ -85,7 +113,7 @@ def compute_rsi(token: str, tf: str = '1m', period: int = 14, limit: int = 20) -
             rsi = 100 - (100 / (1 + rs))
         
         # Cache the result
-        _rsi_cache[cache_key] = (rsi, time.time())
+        _rsi_cache[cache_key] = (rsi, time.time(), rows[0][0])
         return rsi
         
     except Exception:
@@ -98,14 +126,14 @@ def compute_rsi(token: str, tf: str = '1m', period: int = 14, limit: int = 20) -
                 pass
 
 
-def compute_rsi_1m(token: str, period: int = 14) -> Optional[float]:
+def compute_rsi_1m(token: str, period: int = 14, max_age_s: Optional[float] = None) -> Optional[float]:
     """Compute RSI from 1m candles (backwards-compatible wrapper)."""
-    return compute_rsi(token, tf='1m', period=period)
+    return compute_rsi(token, tf='1m', period=period, max_age_s=max_age_s)
 
 
-def compute_rsi_5m(token: str, period: int = 14) -> Optional[float]:
+def compute_rsi_5m(token: str, period: int = 14, max_age_s: Optional[float] = None) -> Optional[float]:
     """Compute RSI from 5m candles (backwards-compatible wrapper)."""
-    return compute_rsi(token, tf='5m', period=period)
+    return compute_rsi(token, tf='5m', period=period, max_age_s=max_age_s)
 
 
 def is_oversold(rsi: Optional[float], threshold: float = 30.0) -> bool:

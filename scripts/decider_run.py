@@ -1821,8 +1821,11 @@ def execute_trade(token, direction, price, confidence, source,
     try:
         from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, SHORT_RSI_HARD_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
         # FIX 2026-10-04: consolidated RSI to rsi_utils for consistent methodology
+        # FIX 2026-10-04 (bug_hunter): max_age_s=900 restores the pre-refactor
+        # staleness fail-closed — rsi_utils otherwise returns an RSI computed
+        # from arbitrarily old candles (HYPER SHORT lesson: 900s threshold).
         from rsi_utils import compute_rsi
-        _exec_rsi = compute_rsi(token, tf='5m')
+        _exec_rsi = compute_rsi(token, tf='5m', max_age_s=900)
         if _exec_rsi is not None:
             # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
             _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
