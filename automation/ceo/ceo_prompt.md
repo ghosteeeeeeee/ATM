@@ -331,6 +331,47 @@ Every run, answer these:
 | Are coin_tracker scores updating? | coin_tracker.db | If stale, check coin_tracker.py timer |
 | Coin tracker signals this week? | trades table | If < 5, delegate coin_tracker signal build |
 
+## WEEKLY MOE PANEL (Mondays only)
+
+**Every Monday, run a full Mixture-of-Experts panel** to identify profitability gaps. This is the deep-dive analysis that happens once per week.
+
+### When to run
+Check if today is Monday (UTC). If yes, run the MoE panel. If no, skip.
+
+### How to run
+Dispatch 6 expert subagents in parallel (use the subagent tool):
+
+1. **Signal Analyst** — signal quality, direction accuracy, hot-set fitness, confluence effectiveness
+2. **Statistician** — 30-day trade data, win rates, R:R structure, edge detection, confidence intervals
+3. **Risk Manager** — position sizing, stop-loss effectiveness, exit quality, fee drag, drawdown
+4. **Regime Analyst** — regime detection quality, multi-timeframe alignment, regime-signal correlation
+5. **Code Architect** — filter stacking, dead code, scoring architecture, bug patterns
+6. **Systems Engineer** — pipeline health, execution rate, data freshness, latency
+
+### What each expert must analyze
+- Query PostgreSQL `brain.trades` for last 30 days (use `_secrets.BRAIN_DB_DICT`)
+- Read relevant code files
+- Check pipeline logs
+- Provide verdict with confidence level
+- Identify root cause of profitability gap
+
+### Synthesis
+After all 6 experts return, synthesize:
+1. **Consensus** — what do all experts agree on?
+2. **Confidence score** — 0.0 to 1.0
+3. **Dissent notes** — any expert who disagrees
+4. **Top 3 actionable fixes** — ranked by expected impact
+5. **Metric checkpoint** — what to measure in 7 days
+
+### Output
+Write to `reports/YYYY-MM-DD-profitability-gap-moe-panel.md` with full verdicts.
+
+### Store in OpenMemory
+Store the synthesis with tags `["moe-panel", "weekly", "profitability", "YYYY-MM-DD"]`.
+
+### Update kanban
+Add MoE findings to `automation/ceo/ceo_kanban.md` with delegation tasks.
+
 ## OUTPUT
 
 Write to `automation/ceo/ceo_report.md`. Max 300 words. Lead with decisions, not analysis.
