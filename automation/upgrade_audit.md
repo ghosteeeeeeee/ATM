@@ -534,3 +534,26 @@
 4. **oscillator-matrix-lifecycle.md** — Level 1 — MEDIUM VALUE — flip OSCILLATOR_MULT_ENABLED to True
 
 ### Success Rate: 17/25 fully or mostly implemented (68%)
+
+---
+
+## Plan: short-signal-drought-2026-10-02.md (Fix 1 completion — v2 REGIME_SIGNALS sync)
+- **Date scanned:** 2026-10-04 06:05
+- **Core request:** Complete Fix 1 from the SHORT-drought plan: keep v1/v2 REGIME_SIGNALS consistent so no table-divergence kill can recur.
+- **Difficulty:** Level 1 (6 additive dict entries)
+- **Value:** HIGH (insurance against the #1 blocker class from 2026-10-02)
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** Prior sessions synced v1 (continuum-trend± all regimes + mtf-regime-trend± in NORMAL/HIGH/EXTREME). Reverse gap remained: v2 REGIME_SIGNALS had ZERO mtf-regime-trend entries. Live path today is decider→v1 (correct), and should_trade_v2 is only called from volatility_gate_v2 `__main__` self-test — so this was latent, not bleeding money. Still, the plan explicitly required consistency ("add mtf-regime-trend± to v2 or v1 consistently"), and MTF_REGIME_TREND_MINUS_ENABLED=True (the SHORT side) would die the same way continuum-trend- did if anyone repoints decider to v2. Added mtf-regime-trend± to v2 NORMAL/HIGH/EXTREME (matching v1; FLAT stays out in both). Verified: all 16 regime×signal cells match between v1 and v2; module imports clean.
+
+## Plan: recent-20 reconfirm (short-signal-drought, mtf-regime-trend, TVS, chop-v2, regime-fixes, winrate-fix, continuum-*, pump-chain-v5, trade-watchdog, structural-awareness, pump-catching, system-overhaul, thesis-validation, oscillator-matrix, regime-direction-filter, tier2-merge, btc theses)
+- **Date scanned:** 2026-10-04 06:05
+- **Core request:** Re-scan the 20 most recent plans/ files.
+- **Difficulty:** N/A (evaluation only)
+- **Value:** N/A
+- **Status:** ⏭️ NO NEW ACTION — all previously audited (2026-10-01/02/03 entries in this file)
+- **Reason:** Statuses unchanged. Key reconfirms: TVS fully live; oscillator mult live + retuned; continuum SHORT filter live (SCORE_MAX=30); VEL-FILTER + RSI-CEILING bear exemptions live; PUMP-CHAIN-SHORT-RSI-MIN + SHORT-RSI-FLOOR deliberately NO bear override (bf96d7cd 2026-10-03, data-backed); regime-direction-filter skipped (redundant, spec buggy); tier2 chop-regime merge + system-overhaul pending CEO; mtf-regime-trend PLUS auto-killed, MINUS still enabled; chop_exit.py deferred.
+
+## Sideways finding (this session)
+- **Severity:** LOW (latent)
+- **Finding:** `should_trade_v2` in volatility_gate_v2.py is dead code in production — only caller is the module's `__main__` self-test (line 819). Decider imports v1 `should_trade` (decider_run.py:1549). Compactor imports v2 for multipliers/classification but not REGIME_SIGNALS membership. Two large v1-only REGIRE_SIGNALS sets remain (52 signals in v1 NORMAL not in v2; 40 in v1 EXTREME not in v2) — many are deliberate v2 exclusions (comments show data-backed removals). Do NOT blind-sync those. Only the mtf-regime-trend± asymmetry was unsafe to leave (enabled SHORT signal, same kill class as the Oct 2 incident).
+- **Suggested fix:** None required now. If decider is ever repointed to v2, run a full REGIME_SIGNALS diff and reconcile deliberately — not mechanically.

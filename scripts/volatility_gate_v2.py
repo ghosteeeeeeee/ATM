@@ -103,6 +103,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 NORMAL
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
@@ -142,6 +143,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 HIGH
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
     },
     'EXTREME': {
@@ -166,6 +168,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 EXTREME
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
