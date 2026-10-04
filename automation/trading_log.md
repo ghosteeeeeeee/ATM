@@ -3413,3 +3413,29 @@ BY: auto_1hr
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 17:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.06 last hour | 24h: 28T 15W 13L -$1.06 (WR: 53.6%) | Open: 2 (ETC bb-bounce-v2+v3 LONG, NXPC bb-bounce-v3-long+ LONG)
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** Only close was RESOLV mtf-regime-trend- SHORT via profit-monster-trail +$0.06. No adverse-excursion data needed for a trail win.
+- **atr_sl_hit >40%:** 1/28 (3.6%) of 24h closes. Dominant exits: profit-monster-trail 15T +$0.95 (54%), hard_max_loss 11T -$1.84 (39%). tpsl_utils.py fix still stable. Not a tight-SL problem.
+- **Kill rule:** Last hour only 1 trade (RESOLV win). No signal with 0% WR + 3+ trades in last hour. 24h worst: bb-bounce-v3-long+ 8T 25%WR -$0.72 (NOT 0% WR, 1 open remains); doji-bottom-long / pump-chain- / volume-breakout-long+ / continuation+ all 1T 0W — under 3-trade threshold. bb-squeeze+ 13T 61.5%WR +$0.19 (star, keep). No kill.
+- **Negative PnL streak:** Hours with activity: 15:+$0.04, 16:-$0.20. Current consecutive negative = 1 (16:00). Max in window (08–09) = 2. NOT 3. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Regime:** Open exposure 2 LONGs (ETC combo, NXPC since 13:04). No NEUTRAL streak size check.
+
+**Open Questions:**
+- bb-bounce-v3-long+ still worst 24h signal (8T -$0.72 25%WR) with 1 open (NXPC) — kill threshold not met (last hour 1T win, not 0%+3T). Watch.
+- hard_max_loss family 11T -$1.84/24h sole loss concentration — stop-placement vs signal-structure review still open (delegated to bug_hunter).
+- 24h PnL -$1.06 (was -$0.99 at 16:13). WR 53.6%. Not a 3h negative streak.
+- pnl_pct data-path nonsense continues — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — no config change this hour so nothing to log, SOP reference still dead.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr

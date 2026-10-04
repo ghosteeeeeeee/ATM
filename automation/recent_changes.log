@@ -3987,3 +3987,7 @@ DB-verified: 2T last hour CFX hard_max_loss -$0.26 + DOT trail +$0.04 (bb-bounce
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1 after 15:00 positive reset)
 WATCH: bb-bounce-v3-long+ 8T 25%WR -$0.72 worst + 1 open | hard_max_loss family 11T -$1.84 | pnl_pct nonsense | signal_version.py still missing
 BY: auto_1hr
+DB-verified: 1T last hour RESOLV mtf-regime-trend- trail +$0.06 | 24h 28T 53.6%WR -$1.06 atr_sl_hit 1/28=3.6% | open 2 ETC combo + NXPC bb-bounce-v3-long+
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1/3)
+WATCH: 24h -$1.06 | bb-bounce-v3-long+ 8T -$0.72 worst + 1 open | hard_max_loss family 11T -$1.84 | signal_version.py still missing
+BY: auto_1hr

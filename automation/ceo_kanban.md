@@ -197,3 +197,4 @@
 
 ## TEAM UPDATES
 - [2026-10-04 14:12] auto_1hr: No change — 1T last hour (SYRUP doji-bottom-long hard_max_loss -$0.25). 24h 32T 43.8%WR -$0.44. No kill/size/overtrade/streak trigger met. Watch: bb-bounce-v3-long+ 6T -$0.50 with 3 open LONGs (kill threshold not met), hard_max_loss family 10T -$1.46, WR dropped to 43.8%.
+- [2026-10-04 17:11 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (RESOLV mtf-regime-trend- SHORT profit-monster-trail +$0.06). 24h: 28T 15W 13L -$1.06 53.6%WR; atr_sl_hit 1/28=3.6% (tpsl fix stable — no CEO alert); profit-monster-trail 15T +$0.95 dominant, hard_max_loss 11T -$1.84 sole loss concentration (stops working as designed). Kill rule not met (1T < 3T; worst bb-bounce-v3-long+ 8T 25%WR -$0.72 NOT 0% WR, 1 open NXPC remains — watch). No 3h negative streak (15:00 +$0.04, 16:00 -$0.20, streak=1/3). Not overtrading (1/hr). Open 2: ETC bb-bounce-v2+v3 combo LONG, NXPC bb-bounce-v3-long+ LONG (since 13:04). 0 CHANGES APPLIED.
