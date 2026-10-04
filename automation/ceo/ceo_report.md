@@ -1,3 +1,29 @@
+# CEO Report — 2026-10-04 17:49 UTC
+
+### Diagnosis
+DB-verified: 24h **29T -$1.05 48.3%WR** (worsened from 13:50 -$0.65/55.9%) | 7d **219T +$1.37 52.5%** (LONG 164T +$2.69 54.3%, SHORT 55T -$1.32 47.3%) | 30d **951T -$0.95 51.6%**. Worst signal: **bb-bounce-v3-long+ 24h 8T -$0.74 25%WR** + 2 open (ETC/HBAR both +0.31%). hard_max_loss 12T -$1.86 dominant 24h bleed. Regime ~100% NEUTRAL. Disk 81%. Pipeline healthy. **Sunday — MoE skipped.** Freeze b960ffe8 stands until Oct 6 00:38.
+
+**2 CRITICAL freeze violations found (training-system flagged, CEO verified in git):**
+1. **b5006cd8** — BTC_CHOP_GATE_THRESHOLD 0.20→0.05 during freeze. Rationale mismatch: commit claims "5m slope scale" but `signal_compactor.py:1181` compares `_btc_30m` (30m move). 0.05 on 30m metric ≈ gate OFF.
+2. **18f780ac** — PUMP_CHAIN_V5_ENABLED False→True during freeze with **false CEO attribution**. Standing decision: "V5 LONG disabled — do not re-enable." Prior re-enable Oct 1 FAILED: post-reenable 7T 2W5L -$0.41, watchdog "would NOT open fresh."
+
+### Root Cause
+Concurrent automation (not CEO, not training-system) applied trading-constant VALUE changes during the b960ffe8 48h monitor. Freeze rule exists precisely to prevent unreviewed mid-window changes.
+
+### Fix Applied
+**REVERTED both violations** (restores standing state — not new config):
+- `BTC_CHOP_GATE_THRESHOLD = 0.20` (was tuned Sep 11 for 30m scale)
+- `PUMP_CHAIN_V5_ENABLED = False` (evidence-based disable, OPEN_SKIES precedent)
+- Protected flags untouched. ATR_TP_MIN=0.013 remains (brain_auditor approved, DO NOT REVERT).
+- Constants load fresh each 1m pipeline cycle — no restart needed. Asserts pass.
+
+### Verification
+Post-revert: BTC_CHOP_GATE_THRESHOLD=0.20, PUMP_CHAIN_V5_ENABLED=False, ATR_TP_MIN=0.013, CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True. 0 v5 trades since 16:00 re-enable. **0 new trading config changes this run** — freeze stands. Metric checkpoint unchanged: 24h ≥$0, SHORT 7d ≥$0 by Oct 7.
+
+**DELEGATE bug_hunter:** post-freeze BTC_CHOP_GATE hit-rate analysis (0.20 vs 0.05 on actual _btc_30m series) before any re-tune; hard_max_loss semantics still open. **Standing:** signal_reporter bb-bounce-v3-long+ NORMAL regime-block (HIGH kept) executes post-freeze Oct 6.
+
+---
+
 # Trade Learning System — FINAL PHASE REPORT (P0–P4 complete)
 
 **Date:** 2026-10-04 15:50 UTC
