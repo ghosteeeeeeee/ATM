@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Cell Stats — Trade Learning System P1 nightly cell store
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/cell_stats.py --quiet
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
+TimeoutStartSec=300

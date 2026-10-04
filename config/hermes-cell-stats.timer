@@ -1,0 +1,9 @@
+[Unit]
+Description=Hermes Cell Stats — nightly at 00:20 UTC (T2 cell store for trade learning)
+
+[Timer]
+OnCalendar=*-*-* 00:20:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
