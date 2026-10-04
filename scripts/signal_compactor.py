@@ -3738,8 +3738,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _lrc_phase, _lrc_linreg, _lrc_ema, _lrc_ts = _lrc_row
                         _lrc_age = _lrc_time.time() - (_lrc_ts or 0)
                         if _lrc_age < 600:
-                            _lrc_bullish = (_lrc_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
-                                            _lrc_linreg in ('LEAN_BULL', 'BULL') and
+                            # FIX 2026-10-04: relaxed — phase can lag behind momentum
+                            # When linreg=LEAN_BULL + ema=ABOVE, phase may still say DECLINING
+                            # Trust momentum indicators over lagging phase
+                            _lrc_bullish = (_lrc_linreg in ('LEAN_BULL', 'BULL') and
                                             _lrc_ema == 'ABOVE')
                             if _lrc_bullish:
                                 _lrc_bullish_override = True
