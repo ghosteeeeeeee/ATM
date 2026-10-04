@@ -861,31 +861,37 @@ def _ctx_gate_get_zscore(token):
         return None
 
 def _ctx_gate_get_rsi(token):
-    """Compute RSI from live 1m candles. Returns float or None."""
+    """Compute RSI from live 1m candles. Returns float or None.
+    FIX 2026-10-04: consolidated to rsi_utils for consistent methodology."""
     try:
-        import sqlite3
-        from paths import CANDLES_DB
-        conn = sqlite3.connect(CANDLES_DB, timeout=5)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT close FROM candles_1m
-            WHERE token = ? AND is_closed = 1
-            ORDER BY ts DESC LIMIT 15
-        """, (token.upper(),))
-        closes = [r[0] for r in cur.fetchall()]
-        conn.close()
-        if len(closes) < 15:
+        from rsi_utils import compute_rsi_1m
+        return compute_rsi_1m(token)
+    except ImportError:
+        # Fallback to inline calculation if rsi_utils not available
+        try:
+            import sqlite3
+            from paths import CANDLES_DB
+            conn = sqlite3.connect(CANDLES_DB, timeout=5)
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT close FROM candles_1m
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT 15
+            """, (token.upper(),))
+            closes = [r[0] for r in cur.fetchall()]
+            conn.close()
+            if len(closes) < 15:
+                return None
+            deltas = [closes[i] - closes[i+1] for i in range(len(closes)-1)]
+            gains = [d if d > 0 else 0 for d in deltas[-14:]]
+            losses = [-d if d < 0 else 0 for d in deltas[-14:]]
+            avg_gain = sum(gains) / 14
+            avg_loss = sum(losses) / 14
+            if avg_loss == 0:
+                return 100.0
+            return 100 - (100 / (1 + avg_gain / avg_loss))
+        except Exception:
             return None
-        deltas = [closes[i] - closes[i+1] for i in range(len(closes)-1)]
-        gains = [d if d > 0 else 0 for d in deltas[-14:]]
-        losses = [-d if d < 0 else 0 for d in deltas[-14:]]
-        avg_gain = sum(gains) / 14
-        avg_loss = sum(losses) / 14
-        if avg_loss == 0:
-            return 100.0
-        return 100 - (100 / (1 + avg_gain / avg_loss))
-    except Exception:
-        return None
 
 def _ctx_gate_get_phase(token):
     """Get current market phase from token_speeds. Returns phase string or None."""
@@ -1814,86 +1820,58 @@ def execute_trade(token, direction, price, confidence, source,
     # CASHCAT教训: RSI 15.5 and 33.4 at entry → -6.4% loss (price bounced from oversold)
     try:
         from hermes_constants import SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, SHORT_RSI_HARD_CEILING, LONG_RSI_FLOOR, LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
-        import sqlite3 as _rsi_sqlite
-        from paths import CANDLES_DB as _rsi_candles_db
-        _rsi_conn = _rsi_sqlite.connect(f"file:{_rsi_candles_db}?mode=ro", uri=True, timeout=5)
-        try:
-            _rsi_cur = _rsi_conn.cursor()
-            _rsi_cur.execute("""
-                SELECT close, ts FROM candles_5m
-                WHERE token = ? AND is_closed = 1
-                ORDER BY ts DESC LIMIT 15
-            """, (token.upper(),))
-            _rsi_rows = _rsi_cur.fetchall()
-            _rsi_closes = [r[0] for r in _rsi_rows]
-            _rsi_cur.close()
-            # brain_auditor 2026-10-02 — HYPER SHORT opened at exec RSI 19.63 (candles_5m stale).
-            # HARD_FLOOR=25 must fail-closed when candle data is stale/insufficient for SHORT.
-            _rsi_max_ts = _rsi_rows[0][1] if _rsi_rows else None
-            _rsi_stale = (_rsi_max_ts is None) or ((time.time() - _rsi_max_ts) > 900)
-            if len(_rsi_closes) >= 15 and not _rsi_stale:
-                _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
-                _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
-                _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
-                _rsi_ag = sum(_rsi_gains) / 14
-                _rsi_al = sum(_rsi_losses) / 14
-                if _rsi_al > 0:
-                    _exec_rsi = 100 - (100 / (1 + _rsi_ag / _rsi_al))
-                    # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
-                    _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
-                    # HARD FLOOR first — no bearish override. Catches STANDALONE_BYPASS + override hole at exec time.
-                    if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
-                        log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
-                        return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
-                    # bf96d7cd completion 2026-10-03: SHORT_RSI_FLOOR blocks ALL shorts below floor at exec
-                    # time too — no bearish override. Data: 77 RSI<40 shorts = 31%WR -$4.66/14d.
-                    # Oversold coins bounce regardless of BTC regime (detection-time override already removed).
-                    if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
-                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — no bearish override)')
-                        return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
-                    if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
-                        log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
-                        return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
-                    # CEO Fix5 2026-10-02: RSI 65-75 bear-structure-gated exemption; RSI>75 always blocked.
-                    if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
-                        if SHORT_RSI_HARD_CEILING > 0 and _exec_rsi > SHORT_RSI_HARD_CEILING:
-                            log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING} at execution time (hard ceiling — no bear exemption)')
-                            return False, f'RSI hard ceiling: {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING}'
-                        _exec_ceiling_bearish = False
-                        try:
-                            import os as _ec_os
-                            _ec_cont = sqlite3.connect(_ec_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                            try:
-                                _ec_row = _ec_cont.execute(
-                                    "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
-                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                                ).fetchone()
-                            finally:
-                                _ec_cont.close()
-                            if _ec_row and (_ec_row[1] in ('LEAN_BEAR', 'BEAR') or
-                                            _ec_row[0] in ('DECLINING', 'STORMY') or
-                                            _ec_row[2] == 'BELOW'):
-                                _exec_ceiling_bearish = True
-                        except Exception:
-                            pass
-                        if not _exec_ceiling_bearish:
-                            log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
-                            return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
-                        log(f'  ✅ [EXEC-RSI-CEILING-OVERRIDE] {token} SHORT allowed — RSI {_exec_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)')
-                    if direction.upper() == 'LONG' and _exec_rsi > _long_ceiling:
-                        log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
-                        return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'
-                else:
-                    if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
-                        log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — flat candle series, cannot verify RSI floor (fail-closed)')
-                        return False, 'RSI hard floor: flat candles — SHORT blocked (fail-closed)'
-            else:
-                if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
-                    _age = int(time.time() - _rsi_max_ts) if _rsi_max_ts else -1
-                    log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — candle data stale/insufficient (age={_age}s, n={len(_rsi_closes)}) — fail-closed')
-                    return False, f'RSI hard floor: stale candles age={_age}s — SHORT blocked (fail-closed)'
-        finally:
-            _rsi_conn.close()
+        # FIX 2026-10-04: consolidated RSI to rsi_utils for consistent methodology
+        from rsi_utils import compute_rsi
+        _exec_rsi = compute_rsi(token, tf='5m')
+        if _exec_rsi is not None:
+            # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
+            _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
+            # HARD FLOOR first — no bearish override. Catches STANDALONE_BYPASS + override hole at exec time.
+            if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
+                log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
+                return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
+            # bf96d7cd completion 2026-10-03: SHORT_RSI_FLOOR blocks ALL shorts below floor at exec
+            # time too — no bearish override. Data: 77 RSI<40 shorts = 31%WR -$4.66/14d.
+            if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
+                log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — no bearish override)')
+                return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+            if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
+                log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
+                return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+            # CEO Fix5 2026-10-02: RSI 65-75 bear-structure-gated exemption; RSI>75 always blocked.
+            if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
+                if SHORT_RSI_HARD_CEILING > 0 and _exec_rsi > SHORT_RSI_HARD_CEILING:
+                    log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING} at execution time (hard ceiling — no bear exemption)')
+                    return False, f'RSI hard ceiling: {_exec_rsi:.1f} > {SHORT_RSI_HARD_CEILING}'
+                _exec_ceiling_bearish = False
+                try:
+                    import os as _ec_os
+                    _ec_cont = sqlite3.connect(_ec_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _ec_row = _ec_cont.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _ec_cont.close()
+                    if _ec_row and (_ec_row[1] in ('LEAN_BEAR', 'BEAR') or
+                                    _ec_row[0] in ('DECLINING', 'STORMY') or
+                                    _ec_row[2] == 'BELOW'):
+                        _exec_ceiling_bearish = True
+                except Exception:
+                    pass
+                if not _exec_ceiling_bearish:
+                    log(f'  🚫 [EXEC-RSI-CEILING] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} > {SHORT_RSI_CEILING} at execution time (overbought — bounce risk)')
+                    return False, f'RSI ceiling: {_exec_rsi:.1f} > {SHORT_RSI_CEILING}'
+                log(f'  ✅ [EXEC-RSI-CEILING-OVERRIDE] {token} SHORT allowed — RSI {_exec_rsi:.1f} in 65-75 but BTC bearish (overbought pump = short)')
+            if direction.upper() == 'LONG' and _exec_rsi > _long_ceiling:
+                log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
+                return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'
+        else:
+            # rsi_utils returned None — stale/insufficient data
+            if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+                log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — candle data stale/insufficient — fail-closed')
+                return False, 'RSI hard floor: stale candles — SHORT blocked (fail-closed)'
     except Exception as _rsi_exc:
         # FIX 2026-10-03: fail-closed for SHORT on any exception
         # Loss-prevention guardrail should never fail-open
