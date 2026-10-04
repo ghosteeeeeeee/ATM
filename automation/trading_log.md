@@ -2991,3 +2991,32 @@ BY: auto_1hr
 - accel_300_v3_long: is signal_reporter tracking a different data source than brain DB? If signal-level (pre-execution) tracking shows 7 detections that never become trades, the filters are working — but the -$0.37 suggests some execution path exists.
 
 BY: auto_1hr
+
+## [2026-10-03 23:12] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 (WR: 0.0%) | 24h: 33T 22W ~67%WR +$1.39
+
+**Changes:**
+1. None — no trigger met.
+
+**No Change Needed:**
+- **Entry quality:** 1 trade only (CRV volume-breakout-long+ LONG hard_max_loss -$0.11 on ~$11 size). Signal all-history healthy: 23T 16W +$3.31. Single hard-stop loss is noise, not signal death.
+- **atr_sl_hit >40%:** 0 atr_sl_hit exits in 24h. tpsl_utils.py fix deployed and stable. 24h exits: profit-monster-trail 12T +$0.82, atr_trail_hit 5T +$1.40, pump_exit_dead_money 5T +$0.70, hard_max_loss family 10T -$1.53, ORPHAN_PAPER 1T $0.
+- **Kill rule:** No signal has 0% WR with 3+ trades last hour (1T total). 24h all signals flat-or-positive except bb-bounce-v3-long+ 5T 3W -$0.02 (near-zero, below kill bar). No kill.
+- **Negative PnL streak:** 18:00 -$0.12, 21:00 -$0.05, 22:00 -$0.11 — NOT 3 consecutive hours (19:00/20:00 had 0 closes; 17:00 was $0.00 breakeven). No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Volume-breakout 1.25 boost DEPLOYED:** signal_compactor.py:709 has 1.25; pipeline restarted 23:10:59 UTC (after 22:11 change); hermes-signal-compactor.timer runs fresh every minute. CRV loss closed 22:56 was an entry from 20:30 (pre-boost) — irrelevant to new weight. Prior open question resolved.
+- **Open (3):** LDO bb-squeeze+ LONG (21:20), IO pump-chain- SHORT (21:17), ENS bb-bounce-v3-long+ LONG (19:40). CRV closed.
+
+**Sideways:**
+- pnl_pct data-path nonsense continues (CRV -$0.11 shows -476%) — known bug class, owned by bug_hunter.
+- scripts/signal_version.py still missing — audit script referenced by SOP not deployed (flagged 22:11, still absent). Change was NO config change this hour so nothing to log.
+- hard_max_loss family 10T -$1.53 sole 24h loss concentration (up from 9T -$1.42) — intentional hard stops, working as designed. Stop-placement vs signal-structure review still open.
+- 24h PnL improved: +$0.78 (22:11) → +$1.39 (now) on 33T.
+
+**Open Questions:**
+- accel_300_v3_long: signal_reporter 7T/7d vs brain DB 0 executions 14d — discrepancy still unexplained, left ENABLED.
+- hard_max_loss family growing (10T) — worth a dedicated stop-structure review when not mid-monitor-window.
+
+BY: auto_1hr

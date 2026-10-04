@@ -3895,3 +3895,9 @@ REVIEWED: accel_300_v3_long — 0 DB executions 14d vs signal_reporter 7T/7d -$0
 FINDING: scripts/signal_version.py MISSING (SOP references it, file absent); change logged manually
 ACTION: restart pipeline to load new weight
 BY: auto_1hr
+2026-10-03 23:12 UTC auto_1hr: NO CONFIG CHANGE - hourly audit
+DB-verified: 1T last hour (CRV volume-breakout-long+ hard_max_loss -$0.11) | 24h 33T ~67%WR +$1.39 atr_sl_hit 0% | open 3
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met
+DEPLOYED: volume-breakout boost 1.25 confirmed live (pipeline restarted 23:10:59 UTC + compactor timer runs fresh)
+WATCH: hard_max_loss family 10T -$1.53 sole loss concentration | pnl_pct nonsense (CRV -476%) | signal_version.py still missing
+BY: auto_1hr

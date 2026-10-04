@@ -2291,5 +2291,32 @@
     "category": "signal diversity",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-03T23:35:33Z",
+    "idea": "Same-coin opposite-direction guard: block pump-chain- SHORT on coin X if pump-chain+ LONG fired on coin X within 30min",
+    "rationale": "IO SHORT case: engine fired pump-chain+ LONG on IO same night, then pump-chain- SHORT fired. Watchdog flagged: shorted while engine fired longs on same coin. Follows philosophy: every pump is a LONG opportunity.",
+    "expected_impact": "Prevents contradictory entries. Estimated -1 to -2 hard_max_loss losses/7d.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T23:35:33Z",
+    "idea": "Populate entry_regime_4h and signal_momentum_state metadata at trade open",
+    "rationale": "Both columns exist in trades table but are ALL NULL. Would unlock regime-conditional filtering (block pump-chain- SHORT when 4h=LONG_BIAS, block LONGs in LOW volume).",
+    "expected_impact": "Enables 3-4 currently-impossible conditional blocks.",
+    "category": "infra/data quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-03T23:35:33Z",
+    "idea": "pump-chain- SHORT velocity filter in signal_compactor (mirror of existing LONG filter)",
+    "rationale": "Session brain confirms: compactor only checks LONG velocity for pump-chain. SHORT filter never built. pump-chain- SHORT atr_sl_hit 22T 40.9% -$1.51/14d suggests knife-catch entries.",
+    "expected_impact": "Blocks knife-catch SHORT entries. Estimated +$0.30-0.50/7d.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest"
   }
 ]

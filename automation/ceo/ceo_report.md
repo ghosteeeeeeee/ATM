@@ -1,56 +1,109 @@
-## CEO Report — 2026-10-03 09:51 UTC
+## CEO Report — 2026-10-04 MoE Panel Decisions
 
-### Diagnosis
-PG-verified (brain, status='closed'): **24h 36T 55.6%WR +$0.04 | 7d 177T 50.8%WR +$1.69 | 14d 342T 48.0%WR -$0.59**. Degraded from 06:00 (+$0.74/65.1%) — morning window rotated out early winners. LONG 7d **+$3.17/126T 52.4%**. SHORT 7d **-$1.48/51T 47.1%**. 4 open: DYDX SHORT pump-chain- **+4.8% winning**, CRV SHORT -0.43%, POL LONG +0.04%, SEI LONG -0.10%. Regime **100% NEUTRAL** (173/177). Disk **81%**. Pipeline healthy (46 signals). OpenMemory stored via HTTP API (service inactive; endpoint 200).
+### Verified Numbers (PG `brain`, status='closed', run this session)
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 30d | 966 | **-$2.22** | 51.4% |
+| 7d | 200 | +$1.95 | 52.0% |
+| 24h | 34 | +$1.15 | 58.8% |
+| LONG 30d | 598 | **+$1.90** | 52.5% |
+| SHORT 30d | 368 | **-$4.12** | 49.7% |
+
+**SHORT RSI bands 30d (entry_rsi_14):** RSI<40 **86T -$5.04 32.6%WR** | RSI>=40 70T -$0.60 51.4% | NULL 212T +$1.52 56.1%
+**SHORT regime x RSI 30d:** EXTREME RSI>=40 **40T +$0.98 62.5%WR** (only positive SHORT cell) | EXTREME RSI<40 60T -$3.02 36.7% | NORMAL RSI>=40 9T -$0.87 22% | HIGH RSI>=40 20T -$0.73 40% | EXTREME SHORT all-band **-$0.91** (MoE "+$4.71 EXTREME" is all-directions; LONG EXTREME is +$5.38)
+**Exits 30d:** profit-monster* **307T +$18.83 82.1%** (only big winner) | cut-loser* 91T -$12.64 | atr_sl* 367T -$5.42 | hard_max_loss* 33T -$4.35 | hard_sl 46T -$3.24 | rr_engine* 59T -$1.38
+**Regimes 30d:** EXTREME +$4.47 | FLAT +$0.66 | NULL +$0.08 | HIGH -$2.94 | NORMAL -$4.49
+**Flags verified:** STANDALONE_BYPASS 123 entries / 115 unique | RR_ENGINE_SHADOW=True FORCE=False | CONFLUENCE_REQUIRED=True | SHORT_RSI_FLOOR=40 HARD_FLOOR=25 CEILING=65 HARD_CEILING=75
+**Post-fix (Oct 3):** SHORT entry_rsi_14<40 only pump-chain- 5T **+$0.05** — exec-RSI floor (bf96d7cd) live today; 30d -$5.04 is pre-fix history. **Caveat:** entry_rsi_14 is detection-time, not exec-time (DRIFT-002). Oct 3 SHORT still entered with stored RSI 13-42 — either drift or a bypass path. Audit required before claiming the leak is closed.
+**15m scanner:** `scripts/15m_regime_scanner.py` is a **5m scanner** (CANDLE_TF=5m, candles_5m, Binance interval=5m), thresholds slope_pct>0.35 per 5m candle with n=16 — noisy, NEUTRAL-biased. Misnamed, not "4h thresholds" as MoE claimed. Still a real defect.
+**Fees:** `fees` column is JSON text; samples show ~$0.005-0.02/trade. pnl_usdt vs fees.net_pnl inconsistent — accounting gap confirmed, not the primary bleed.
+**System state:** bollinger window ENDED 21:55 UTC Oct 3; volume-breakout boost 1.15→1.25 already applied 22:11 by auto_1hr. Config changes allowed now.
+
+---
+
+### Decision 1 — SHORT Entry Model: **A (follow the data)**
+
+**A — SHORT only where edge exists, not during falls.**
+
+Precise model:
+1. **Block all SHORT with execution-time RSI < 40** (all paths, no bear override, fail-closed on stale candles).
+2. **Primary habitat: EXTREME vol + RSI>=40** — only positive SHORT cell (40T +$0.98 62.5%WR).
+3. **NEUTRAL SHORT stays blocked** (SHORT_NEUTRAL_BLOCK already on).
+4. **NORMAL/HIGH SHORT:** block unless RSI>=40 AND quality gates pass — those cells still bleed.
+
+**Rejected B** (keep SHORTing dumps): oversold SHORT is the entire net loss (-$5.04 vs month -$2.22).
+**Rejected C** as stated: "bottoms in other regimes" = RSI<40 = losing everywhere (32.6%WR). EXTREME oversold also loses (-$3.02). MoE's "wave bottoms 94%WR" **not reproducible in DB** — rejected.
+
+**Philosophy amendment (Decision 4 = A):** "Every pump is a LONG opportunity. Every dump is a SHORT opportunity **only when not oversold (exec RSI>=40)** — we short structure after the move, not into the bottom. Every trade *targets* a winner via profit-monster-trail; losers are cut." Keeps both-directions spirit; conditions it on edge.
+
+**Metric before → target:** SHORT 30d -$4.12/49.7% → SHORT 7d ≥ $0 / ≥52% by 2026-10-07. Expected: close remaining oversold paths → +$3-5/30d if leak fully closed.
+
+---
+
+### Decision 2 — Implementation Priority
+
+| # | Action | Call | Reason |
+|---|--------|------|--------|
+| 1 | Close remaining exec-time RSI>=40 holes on ALL SHORT paths + audit bypass/fail-open | **FIRST** | Targets -$5.04 historical leak. Floor already live (bf96d7cd) but Oct 3 still shows stored RSI<40 entries — **audit, don't re-add filters**. Close: STANDALONE_BYPASS paths that skip decider_run, stale-candle fail-open, DRIFT-002 entry_rsi vs exec_rsi. |
+| 2 | Fix 15m/5m regime scanner | **SECOND** | Confirmed 5m data + noisy 0.35%/candle thresholds, n=16. Retune for 5m or switch to true 15m. Regime detection quality gates every SHORT decision. |
+| 3 | RR_ENGINE_SHADOW audit → then enable FORCE | **THIRD — audit first** | Do NOT blind-kill. Pull shadow-block would-have-blocked logs 7d: if would-blocks saved money without killing volume-breakout/doji winners, set FORCE=True. If thresholds would block winners, retune then enable. |
+| 4 | Shrink STANDALONE_BYPASS 124→~6 | **SKIP as stated** | Confluence already expires 92.5%; shrink-to-6 freezes NEUTRAL. Instead: **incremental prune** — remove only losing signals from bypass (keep volume-breakout, doji, bb-bounce-v2, pump-chain+). |
+| 5 | Gate SHORT to EXTREME vol | **DO — as RSI>=40 + EXTREME, not EXTREME-only** | EXTREME alone insufficient (oversold still -$3.02). Gate = RSI>=40 everywhere + EXTREME preferred + NORMAL/HIGH blocked unless quality. |
+
+**Skip list:** blind RR_ENGINE force, bypass shrink-to-6, any protected-flag touch.
+
+---
+
+### Decision 3 — Trade Frequency: **B (fix the edge first), A as conditional follow-up**
+
+- **B primary:** The -$5.04 oversold SHORT leak is larger than fee drag. Frequency without edge just loses slower.
+- **A conditional:** After 48h post-fix SHORT data, if fee drag still dominates net (fees ~$10/30d vs PnL), raise entry bar (MIN_EXEC_CONFIDENCE, confluence quality) — cut low-quality trades, not winners.
+- **Reject C (size up):** multiplies negative expectancy. Absolute PnL is tiny; sizing up a 51%WR / R:R 0.83 system is how accounts die.
+
+**Metric:** trades/day 32 → 20-25 after quality bar IF fee/edge ratio still bad post-fix; otherwise keep frequency.
+
+---
+
+### Decision 4 — Philosophy: **A (modify to match reality)**
+
+New standing philosophy:
+> **Every pump is a LONG opportunity. Every dump is a SHORT opportunity — but only when entry conditions confirm edge (exec RSI>=40, regime habitat, quality gates). We do not short oversold bottoms. Every trade targets a winner via profit-monster-trail; cut losers fast.**
+
+- **Reject B** ("keep philosophy, build systems to achieve it"): building systems to force "every dump = SHORT" means trading negative-expectancy cells = guaranteed bleed. The philosophy as absolute is what produced the -$5.04 leak.
+- **A** keeps the spirit (both directions, never fade momentum into a known losing cell) and binds it to data.
+
+AGENTS.md philosophy line will be updated to the conditioned form after T acknowledges — **not** a silent rewrite of trading doctrine.
+
+---
+
+### Diagnosis (MoE claims vs DB)
+| MoE Claim | DB Verified | Verdict |
+|-----------|-------------|---------|
+| 30d -$1.90 to -$3.10, 960T, 51.9%WR | 966T **-$2.22**, 51.4% | ✓ |
+| SHORT -$3.88 entire net loss | SHORT **-$4.12**, LONG +$1.90 | ✓ (SHORT worse) |
+| SHORT RSI<40 n=86, 34%WR, -$5.04 | n=86, **32.6%WR, -$5.04** | ✓ exact |
+| profit-monster-trail only profitable exit | +$18.83, 82.1% | ✓ |
+| EXTREME only profitable regime +$4.71 | EXTREME +$4.47 all-dir; **SHORT EXTREME -$0.91** | ⚠ partial — EXTREME is LONG-driven |
+| Wave bottoms 94%WR SHORT edge | RSI<40 = 32.6%WR | ✗ **rejected** |
+| 15m scanner dead, 5m w/ 4h thresholds | 5m scanner, 0.35%/5m thresholds | ✓ defect, different root |
+| RR_ENGINE_SHADOW logs never blocks | SHADOW=True FORCE=False | ✓ |
+| STANDALONE_BYPASS 124 entries | 123 entries / 115 unique | ✓ |
+| Fees gross, ~double the loss | fees JSON ~$0.01/trade; pnl vs net_pnl inconsistent | ⚠ accounting gap, not primary bleed |
+| Exec-time RSI>=40 needed | Floor LIVE today (bf96d7cd); leak is pre-fix + possible drift/bypass | ✓ but **audit first** |
 
 ### Root Cause
-24h bleed = mtf-regime-trend+ legacy (9T -$0.46, killed Oct 2 15:11, aging out) + bb-squeeze+ mixed (9T -$0.27, monitor window) + pump-chain+ ACE/INJ hard_max_loss deep losses offsetting ME/LDO/ENS winners (net still +$0.90). SHORT structural bleed continues (-$1.48/7d). **volume-breakout-long+ 22T/30d 72.7%WR +$3.42 ALL NEUTRAL** — conf boost 1.15→1.25 READY but **bollinger_squeeze 48h monitor window active until 21:55 UTC**; standing rule = 0 config changes while any window active. **NEW FINDING:** hard_max_loss exit_reason names ~1% PRICE-move triggers (CUT_LOSER_PNL=-1.00 vs live_pnl) but pnl_pct shows 3-6% because leverage=5 (APT -4.79%, INJ -4.84%, DOT -5.92%). If intent is -1% position PnL, threshold is 5x too loose. Not changed — widened Oct 1 deliberately; HARD_FLOOR monitor active.
+The system's own philosophy forced SHORT entries into oversold cells where edge does not exist. Filters existed at detection but exec-time enforcement was incomplete until today; STANDALONE_BYPASS still lets some paths skip gates; regime detection (5m misnamed scanner) is noisy. LONG is already profitable. The fix is entry-model discipline, not more signals or more size.
 
-### Fix Applied
-- **0 trading config changes** — monitor windows active (bollinger_squeeze ends 21:55 UTC today).
-- **volume-breakout conf boost QUEUED** — apply 1.15→1.25 in signal_compactor.py SOURCE_WEIGHTS next run after window ends. 22T ≥ 20T threshold, all NEUTRAL, 72.7%WR.
-- **Regime memory refreshed** — snapshot 2026-10-03 09:51 UTC wr=50.8 7d=+$1.69. volume-breakout boost plan + open trades recorded.
-- **OpenMemory stored** — HTTP API with Accept: application/json, text/event-stream (MCP service inactive).
-- **DELEGATE bug_hunter:** hard_max_loss live_pnl semantics — price-move vs leveraged PnL. CUT_LOSER_PNL=-1.00 compared against live_pnl that appears price-based; pnl_pct is lev-5 amplified. Clarify intent; if position-PnL intended, threshold needs recalibration. Not a trading-path crash.
-- **DELEGATE signal_analyst (standing):** (1) volume-breakout boost params 1.15→1.25 ready; (2) mover+ entry quality (atr_sl_hit deep at conf 90-104); (3) coin_tracker Wyckoff/phase-transition signal; (4) SHORT exit quality (hard_sl/hard_max_loss dominant).
+### Fix Applied (this run)
+- **0 trading config changes** — this run is decision + delegation only.
+- Decisions written: SHORT model A, priority 1-5 with skip list, frequency B, philosophy A.
+- Delegations queued (kanban).
 
-### Verification
-- All numbers from PG this session. volume-breakout 30d regime: NEUTRAL 22T 72.7% +$3.42 (0 EXTREME).
-- hard_max_loss sample 24h: leverage=5, price_move≈-1%, pnl_pct≈-5% — semantics flagged, no config change.
-- Regime memory file written: data/signal_regime_memory.json.
-- Protected flags untouched (CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS).
-- Next run: apply volume-breakout boost after 21:55 UTC; monitor SHORT count post-Fix2; doji to 20T; disk 88% prune.
+### Verification / Next Run
+1. bug_hunter: audit SHORT exec-RSI paths — bypass, fail-open on stale candles, DRIFT-002. Report which Oct 3 stored-RSI<40 trades bypassed the floor.
+2. self_learner: after audit, confirm ZERO new SHORT entries with exec RSI<40 over 48h (query exec RSI, not entry_rsi_14).
+3. signal_analyst: retune 15m/5m scanner thresholds; build EXTREME+RSI>=40 SHORT habitat params into signal_regime_memory.json.
+4. bug_hunter: RR_ENGINE shadow-block would-have-blocked analysis 7d → recommend FORCE on/off with numbers.
+5. Metric checkpoint 2026-10-07: SHORT 7d ≥ $0, oversold SHORT entries = 0.
 
-## CEO Report — 2026-10-03 13:50 UTC
-
-### Diagnosis
-7d improved to **+$2.22 / 51.1% WR** (184 closed). LONG +$3.36 (52.7%). SHORT -$1.14 (47.2%) — still bleeding but better than -$1.48 this morning. 24h reads $0.00/43.3% only because the rolling window still holds Oct 2 afternoon losses; Oct 3 alone is **+$1.42 / 55.6% WR / 18T**. All 7d trades NEUTRAL (180/185). 3 open LONGs all winning.
-
-### Root Cause
-No new systematic bleed. Best edge remains **volume-breakout-long+** (22T/30d 72.7% WR +$3.42, regime=NEUTRAL). Conf boost 1.15→1.25 is validated and located at `signal_compactor.py:709` but the bollinger_squeeze 48h monitor window runs until **21:55 UTC** — standing rule is 0 trading config changes while monitor windows are active. ema_reclaim_long has **0 trades ever** — the NEUTRAL diversity build never fired.
-
-### Fix Applied
-**0 trading config changes** this run (window active). Boost remains QUEUED at signal_compactor.py:709. Regime memory refreshed (snapshot 13:49, wr=51.1, 7d=+$2.22) with boost location and ema_reclaim gap recorded. Protected flags untouched.
-
-### Verification
-PG queries run this session: 24h/7d/LONG/SHORT/daily/regime/signal+direction/exit-reason/open-trades. volume-breakout regime column confirmed `regime=NEUTRAL` on all 22 pure trades. Pipeline + price_collector processes live. Disk 79%. OpenMemory + kanban + CURRENT.md updated.
-
-### Next run (after 21:55 UTC)
-1. APPLY volume-breakout conf boost 1.15→1.25 at signal_compactor.py:709. Restart pipeline.
-2. Escalate ema_reclaim 0-trade to signal_analyst (coverage + partners).
-3. Keep SHORT_CONTINUUM_SCORE_MAX=30; monitor SHORT count post-Fix2.
-4. doji-bottom-long stays below 20T conf-boost threshold.
-
-## CEO Report — 2026-10-03 17:50 UTC
-
-### Diagnosis
-System IMPROVING. PG-verified: 24h **31T 61.3%WR +$1.24** (was $0.00/43.3% at 13:50). Oct3 alone **28T 64.3%WR +$1.67**. 7d **194T 52.6%WR +$2.47** (up from +$2.22). LONG +$3.61/141T 54.6%. SHORT -$1.14/53T 47.2% (improved from -$1.48). Regime 100% NEUTRAL. 2 open LONGs both near-breakeven. hard_max_loss family ~9T -$1.67 still the 24h bleed concentration. Disk 80%. Pipeline healthy (46 signals, no crashes).
-
-### Root Cause
-No new root cause this run. Bleed is known: hard_max_loss semantics (price-move labels ~1% at lev 3-5 → 3-6% pnl_pct, bug_hunter owns) + legacy kills aging out (accel-300-, pump-chain-v5, mtf-regime-trend+ PLUS). volume-breakout-long+ remains the best signal (22T 72.7%WR +$3.42/30d all NEUTRAL) but boost is blocked by active bollinger 48h window.
-
-### Fix Applied
-**0 trading config changes** — bollinger_squeeze monitor window active until 21:55 UTC. Volume-breakout conf boost 1.15→1.25 still QUEUED (signal_compactor.py:709 re-verified). Regime memory refreshed (snapshot 17:50 wr=52.6 7d=+2.47). **NEW WATCH flagged: accel_300_v3_long still ENABLED, 7T/7d -$0.37 42.9%WR all NEUTRAL** — EXTREME/FLAT blocks don't cover the only active regime. Post-window: NEUTRAL block or disable. Delegations unchanged (ema_reclaim coverage, mover+ entry quality, hard_max_loss semantics, DRIFT-002, coin_tracker signal).
-
-### Verification
-24h improved +$1.24 from $0.00 at 13:50. 7d improved +$2.47 from +$2.22. SHORT bleed easing. Next apply window: volume-breakout boost after 21:55 UTC + accel_300_v3_long review same window.
+Protected flags untouched: CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS.

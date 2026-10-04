@@ -610,3 +610,6 @@
 - **INFO**: `decisions` table last row 2026-04-13 — decider path migrated to signal_compactor; table not written by current runtime. Not a pipeline failure.
 - **INFO**: Inactive/dead timers: `hermes-atr-sl-updater` (DEFUNCT; ATR runs in Position Manager), `hermes-regime-24h-check`, `hermes-regime-transition-check`, `hermes-hl-copy` (last 2026-08-15). No trading-path gap.
 - **AUTO-FIXES APPLIED**: none. No CRITICAL conditions; pipeline healthy, disk under threshold, timers firing. No restarts or cleanups needed.
+
+## Error Alerts — 2026-10-03 23:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
