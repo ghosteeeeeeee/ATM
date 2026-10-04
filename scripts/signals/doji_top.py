@@ -214,8 +214,8 @@ def scan_signals() -> int:
         )
         if sid:
             added += 1
-            from hermes_constants import DOJI_TOP_COOLDOWN_HOURS
-            set_cooldown(token, direction='SHORT', hours=DOJI_TOP_COOLDOWN_HOURS)
+            from hermes_constants import DOJI_COOLDOWN_HOURS
+            set_cooldown(token, direction='SHORT', hours=DOJI_COOLDOWN_HOURS)
     return added
 
 
