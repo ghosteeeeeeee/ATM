@@ -2528,5 +2528,24 @@
     "category": "risk control",
     "status": "suggested — needs backtest (repeated from 11:35 run)",
     "risk": "low — conservative cap at 2, not 1"
+  },
+  {
+    "date": "2026-10-04T15:36:01Z",
+    "idea": "Execution-time filter revalidation for STANDALONE_BYPASS signals (one shared gate)",
+    "rationale": "0/17 bb-bounce-v3 30d trades passed all intended filters. ENS rsi=80.81 bb=1.19 still executed at conf=99. Per-signal value tweaks (RSI_MAX 55→40) treat symptoms; the root cause is bypass path skipping the signal's own hard filters. A single pre-open re-check (RSI band, BB position, volume ratio, staleness) against fresh data closes every bypassed signal's hole at once.",
+    "expected_impact": "Blocks invalid bb-bounce-v3 entries (and any other bypassed signal with hard filters). After enforcement, measure the REAL signal quality — current 16.7%WR is contaminated by invalid entries.",
+    "category": "entry sniper / filter enforcement",
+    "status": "suggested — bug_hunter owns path audit (DRIFT-005), this is the systemic version",
+    "risk": "low — enforces existing constants, no value changes",
+    "impact_on_winners": "Would have blocked 1/9 rsi>55 winners, 2/9 bb>0.65 winners, 7/9 vol<1.2 winners, 8/9 stale winners in 30d — BUT 0 clean trades exist. Invalid-entry wins are variance, not edge. Enforce, then re-measure."
+  },
+  {
+    "date": "2026-10-04T15:36:01Z",
+    "idea": "Resolve bypass inversion: volume-breakout-long+ not in STANDALONE_BYPASS despite comment claiming it is",
+    "rationale": "hermes_constants.py:887 comment says volume-breakout is STANDALONE_BYPASS; tuple does not contain it. Pipeline log shows LONG-NEUTRAL standalone bypass denied; ARB volume-breakout conf=76-86 SKIPPED; hotset empty. Meanwhile worst signal bb-bounce-v3-long+ IS bypassed. Edge data: volume-breakout EXTREME 14d 85.7%WR +$2.75; rsi>70 30d 80%WR +$1.59; NEUTRAL NORMAL 8T 62.5% -$0.05 (marginal — edge is EXTREME/RSI>70 not NEUTRAL).",
+    "expected_impact": "Post-freeze decision needed: either add volume-breakout-long+ to bypass (frees it in NEUTRAL when BTC not flat) or accept NEUTRAL block as correct habitat filter. Do NOT silently add during freeze.",
+    "category": "capital efficiency",
+    "status": "suggested — CEO/signal_analyst decision post-freeze",
+    "risk": "medium — NEUTRAL volume-breakout is marginal (-$0.05/8T); EXTREME is the real edge. Adding bypass may fire low-quality NEUTRAL entries."
   }
 ]

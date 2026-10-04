@@ -1,264 +1,179 @@
 {
-  "timestamp": "2026-10-04T14:34:18Z",
+  "timestamp": "2026-10-04T15:36:01Z",
   "agent": "brain_auditor",
-  "session_lock": "absent — report only, 0 config changes (b960ffe8 freeze until Oct 6 00:38)",
+  "session_lock": "absent",
+  "config_freeze": "b960ffe8 48h monitor ACTIVE until 2026-10-06 00:38 UTC — 0 trading config changes this run",
   "session_brain_stats": {
-    "queries_run": 4,
-    "topics": [
-      "bb-bounce-v3 RSI filter losing",
-      "new signal idea improvement",
-      "hard_max_loss leverage CUT_LOSER",
-      "bb-squeeze overbought RSI hole"
+    "queries_run": [
+      "signal performance winrate regime",
+      "bb-bounce RSI filter hole",
+      "losing trade root cause hard_max_loss"
     ],
-    "key_insights": [
-      "DRIFT-005 RSI_MAX=55 bypass via STANDALONE_BYPASS still open — ENS entry_rsi=86.3 executed despite BB_BOUNCE_V3_RSI_MAX=55",
-      "hard_max_loss semantics recurring since Oct 1 — stop fires on ~1% price, pnl_pct -3 to -6% at lev 3-5x",
-      "ema_reclaim_long 0 trades EVER — overdue, signal_analyst owns",
-      "r2_trend signals missing RSI floor (sessions repeatedly flag oversold LONG entries)"
-    ]
+    "top_insight": "Session history repeatedly flags bb-bounce filter enforcement + hard_max_loss semantics; RSI_MAX hole already known (DRIFT-005). New this run: filter hole is MULTI-FILTER, not just RSI.",
+    "note": "session_brain embeddings loaded; results used as corroboration not as primary numbers"
   },
   "trade_summary_24h": {
-    "trades": 32,
-    "pnl_usdt": -0.88,
-    "win_rate": 53.1,
-    "by_exit_reason": {
-      "hard_max_loss_variants": {
-        "trades": 12,
-        "pnl": -1.96,
-        "wr": 0.0
-      },
-      "profit_monster_trail": {
-        "trades": 17,
-        "pnl": 1.05,
-        "wr": 88.2
-      },
-      "other": {
-        "trades": 3,
-        "pnl": -0.03
-      }
-    },
-    "worst_signals": [
-      {
-        "signal": "bb-bounce-v3-long+",
-        "trades": 6,
-        "pnl": -0.5,
-        "wr": 16.7
-      },
-      {
-        "signal": "doji-bottom-long",
-        "trades": 1,
-        "pnl": -0.25,
-        "wr": 0.0
-      },
-      {
-        "signal": "pump-chain-",
-        "trades": 1,
-        "pnl": -0.24,
-        "wr": 0.0
-      }
-    ],
-    "note": "hard_max_loss = 12/32 trades = 37.5% of volume, 0%WR, -$1.96. Exit semantics dominate bleed, not signal detection."
+    "closed": 29,
+    "pnl_usdt": -1.0,
+    "winrate_pct": 48.3,
+    "losers": 14,
+    "hard_max_loss_exits": 11,
+    "worst_signal": "bb-bounce-v3-long+ 6T -$0.50 16.7%WR",
+    "open": [
+      "CFX LONG bb-bounce-v3-long+ rsi=43.8 bb=-0.088 vol=0.01 — bb+vol VIOLATE",
+      "DOT LONG bb-bounce-v3-long+ rsi=62.4 bb=0.888 vol=1.0 — rsi+bb+vol VIOLATE",
+      "NXPC LONG bb-bounce-v3-long+ rsi=44.0 bb=0.722 vol=0.32 stale=true — bb+vol+stale VIOLATE"
+    ]
   },
   "trade_summary_7d": {
-    "trades": 217,
+    "closed": 217,
     "pnl_usdt": 1.57,
-    "win_rate": 52.1,
-    "long": {
-      "trades": 163,
-      "pnl": 2.95,
-      "wr": 54.0
-    },
-    "short": {
-      "trades": 54,
-      "pnl": -1.38,
-      "wr": 46.3
-    },
-    "note": "SHORT still bleeding. b960ffe8 untestable — 0 SHORTs since fix 01:50 (~13h)."
+    "winrate_pct": 52.1,
+    "hard_max_loss_7d": "39T -$5.32 avg_pct=-3.79 avg_lev=4.08 (label backfill — all 30d hard_max_loss labels are within 7d)",
+    "regime": "EXTREME 89T +$1.83 53.9% | NORMAL 56T -$0.36 48.2% | HIGH 63T -$0.25 55.6% | FLAT 5T +$0.27"
+  },
+  "trade_summary_30d": {
+    "closed": 946,
+    "pnl_usdt": -0.8,
+    "winrate_pct": 51.6
   },
   "drift_findings": [
     {
-      "id": "DRIFT-005-RECONFIRM",
+      "id": "DRIFT-005-EXPANDED",
       "severity": "HIGH",
-      "finding": "bb-bounce-v3-long+ RSI_MAX=55 filter HOLE via STANDALONE_BYPASS — ENS trade entry_rsi_14=86.3 executed despite BB_BOUNCE_V3_RSI_MAX=55 in constants",
-      "code_state": "hermes_constants.py BB_BOUNCE_V3_RSI_MAX=55 exists; bb-bounce-v3-long IS in STANDALONE_BYPASS_SIGNALS (:2662); bypass skips signal_compactor RSI check",
-      "evidence": "30d RSI split: rsi<=40 = 6T 83.3%WR +$0.33 vs rsi>40 = 9T 22.2%WR -$0.62. ENS RSI=86.3 lost (UNIVERSAL_MAX_HOLD). 3 open trades (CFX RSI 46.7, DOT RSI ?, NXPC RSI ?) all negative.",
-      "impact": "rsi>40 entries are 22% WR vs 83% for rsi<=40 — the filter works when enforced; hole lets 40% of entries through at bad quality",
-      "owner": "bug_hunter (path audit, not value change)",
-      "status": "OPEN — post-freeze Oct 6: FIRST close hole (enforce existing RSI_MAX=55), THEN evaluate 55→40 if rsi>40 sample >=20T (currently 9T)",
-      "action_this_run": "none — freeze active, hole owner is bug_hunter"
+      "finding": "bb-bounce-v3-long+ filter hole is MULTI-FILTER on STANDALONE_BYPASS path — not just RSI_MAX=55. Evidence: ENS executed rsi_14=80.81 bb=1.19 (ABOVE upper band) conf=99; ME rsi=40 bb=0.91 vol=0.0 stale=true conf=99; open DOT rsi=62.4 bb=0.888. 30d violation matrix: 0/17 trades passed ALL intended filters (rsi<=55, bb<=0.65, vol>=1.2, not stale).",
+      "data": "bb-bounce-v3 30d: bb>0.65 = 6T 33.3%WR -$0.36 vs bb OK = 10T 60%WR +$0.05. rsi>55 14d = 4T 25%WR -$0.14. CLEAN (all filters pass) = 0 trades.",
+      "impact": "Every open and recent losing bb-bounce-v3 entry violates the signal's own quality filters. The signal never actually ran its filters on the bypass path.",
+      "owner": "bug_hunter (path audit — NOT a value change). Post-freeze or as freeze-safe code fix per CEO.",
+      "status": "OPEN — reconfirmed and expanded"
     },
     {
-      "id": "DRIFT-008-NEW",
-      "severity": "INFO",
-      "finding": "bb-squeeze+ high-RSI entries are NOT a hole — they are the signal's momentum edge",
-      "evidence": "7d RSI>80 bb-squeeze+: LDO RSI=100 +$0.05, XPL 93.3 +$0.08, SEI 88.2 +$0.20, MON 84.2 +$0.02, CHIP 83.7 +$0.07, BLUR 83.1 +$0.19 (all profit-monster-trail). Losers: NEAR 87.5 -$0.23, USELESS 86.3 -$0.13, HYPE 84.6 -$0.11 (all hard_max_loss).",
-      "conclusion": "Blocking RSI>72 for bb-squeeze+ would KILL winners. The edge IS overbought breakout momentum. Losers are hard_max_loss semantics, not bad RSI entries. DO NOT add RSI ceiling to bb-squeeze+.",
-      "status": "CLOSED — no action"
-    },
-    {
-      "id": "DRIFT-007-FLAG",
+      "id": "DRIFT-009-NEW",
       "severity": "MEDIUM",
-      "finding": "DRIFT-007 — alt candles ~50% zero volume, ~70% zero for some pairs — price_collector alt volume ingestion broken",
-      "impact": "volume signals partially blind (volume-breakout-long+ detection degrades)",
-      "owner": "signal_analyst / bug_hunter",
-      "status": "OPEN — not trading-path immediate, flagged prior run"
+      "finding": "Comment/code drift: hermes_constants.py:887 claims volume-breakout-long+ 'is STANDALONE_BYPASS momentum signal' but volume-breakout is NOT in STANDALONE_BYPASS_SIGNALS tuple. Meanwhile bb-bounce-v3-long+ (worst signal) IS in bypass.",
+      "evidence": "pipeline.log 15:33: 'LONG-NEUTRAL blocked — standalone bypass denied' for SAGA/IMX; volume-breakout ARB LONG conf=76/86 rsi=60.87 SKIPPED in signals.json; hot_set=[] while volume-breakout-long+ EXTREME 14d 85.7%WR +$2.75 and rsi>70 30d 10T 80%WR +$1.59 sit idle.",
+      "impact": "Capital-efficiency inversion: best-performing signal starves in NEUTRAL (~100% current regime), worst signal keeps firing via bypass.",
+      "owner": "signal_analyst / CEO post-freeze",
+      "status": "NEW — needs decision, not silent fix"
+    },
+    {
+      "id": "DRIFT-007-RECHECK",
+      "severity": "MEDIUM",
+      "finding": "Alt candle zero-volume issue still likely live — bb-bounce-v3 volume_spike metadata shows 0.0-1.0 on most trades (below VOL_RATIO_MIN=1.2) while signal still fires. Either volume data broken (DRIFT-007) or vol filter not enforced on bypass path (subset of DRIFT-005).",
+      "impact": "Volume-based bounce confirmation is unreliable; may explain both false bounces and starved volume-breakout.",
+      "owner": "bug_hunter / price_collector",
+      "status": "OPEN"
     }
   ],
-  "losing_trade_autopsy": {
-    "mandate": "How can we avoid entries like this?",
-    "cluster_1": {
-      "signal": "bb-bounce-v3-long+",
-      "trades_24h": "6T -$0.50 16.7%WR",
-      "trades_30d": "15T -$0.29 46.7%WR",
-      "open": "3 correlated (CFX/DOT/NXPC) all negative",
-      "root_cause": "RSI_MAX=55 filter bypassed via STANDALONE_BYPASS — entries fired at RSI 46-86 when filter should cap at 55. rsi>40 bucket = 9T 22.2%WR vs rsi<=40 = 6T 83.3%WR. Additionally: 3 open trades all had contradictory SHORT signals at entry (DOT: pump-chain- at zscore -3.0; CFX: rs-r40 SHORT; NXPC: rs-r45/rs-r47 SHORT).",
-      "entry_check": "ME RSI=59.1 (above MAX=55), COMP RSI=46.7 (under MAX, but hard_max_loss), ENS RSI=86.3 (way over, bypassed). Winners WCT RSI=32.9, ZEN RSI=23.4, POL RSI=31.7 — all rsi<=40.",
-      "regime_check": "All NORMAL regime. Not a regime issue — entry quality issue.",
-      "recommended_change": "POST-FREEZE: (1) bug_hunter closes DRIFT-005 hole — enforce existing BB_BOUNCE_V3_RSI_MAX=55 on STANDALONE_BYPASS path. (2) THEN evaluate RSI_MAX 55→40 if rsi>40 sample reaches 20T (currently 9T).",
-      "impact_on_winners": "rsi<=40 winners (6T, all profit-monster-trail) unaffected by enforcing RSI_MAX=55. rsi 40-55 winners: ZORA 39.4 $0.00, HYPER 52.9 +$0.04, WLFI 47.8 -$0.01 — mixed, small. Enforcing 55 blocks ENS RSI=86.3 (loser) and SUSHI RSI=55.4 (borderline loser). No rsi>55 winners in 30d sample.",
-      "confidence": "HIGH for hole-closure (enforce existing filter). MEDIUM for 55→40 value change (sample 9T < 20T threshold)."
+  "losing_trade_autopsy": [
+    {
+      "cluster": "bb-bounce-v3-long+ LONG",
+      "n_24h": "6T -$0.50 16.7%WR",
+      "root_cause": "Entries executed despite violating the signal's own filters (RSI band, BB position, volume ratio, staleness). Not a regime or clock problem — entry quality hole on bypass path.",
+      "examples": [
+        "ENS rsi=80.81 bb=1.19 conf=99 — RSI_MAX=55 and BB_POS_MAX=0.65 both violated",
+        "ME rsi=40 bb=0.91 vol=0.0 stale=true conf=99 — triple violation, zero volume 'bounce'",
+        "SUSHI rsi=61.86 bb=0.30 vol=1.0 — RSI and volume violated",
+        "COMP rsi=49.12 bb=0.54 vol=0.02 stale=true — volume+stale"
+      ],
+      "impact_on_winners": "30d winners with rsi>55: 1; with bb>0.65: 2; with vol<1.2: 7; with stale=true: 8. Enforcing existing filters would block most 'winners' too — BUT those winners are winning DESPITE invalid entries (noise/variance), not because invalid entries are good. 0 clean trades exist to prove the edge. Proper fix is enforce filters then measure the real signal.",
+      "recommended_change": "Post-freeze: bug_hunter closes bypass path so existing BB_BOUNCE_V3 filters (RSI_MIN/MAX, BB_POS_MIN/MAX, VOL_RATIO_MIN, STALE_MAX_AGE) actually run. No constant value changes.",
+      "confidence": "HIGH"
     },
-    "cluster_2": {
-      "signal": "hard_max_loss exit (cross-signal)",
-      "trades_24h": "12T -$1.96 0%WR",
-      "pattern": "All exits at ~-1.0% to -1.15% price move, but pnl_pct -2.96 to -6.34% account at leverage 3-5x",
-      "root_cause": "CUT_LOSER_PNL=-1.00 compared to live_pnl (price move). At lev 3-5x, 1% price = 3-5% account loss. Stop fires correctly on price but labels/account impact are 3-5x larger.",
-      "affected_signals_24h": "SYRUP doji, IO pump-chain-, ME/COMP/SUSHI bb-bounce-v3, NEAR/USELESS/CHIP/AIXBT bb-squeeze, CRV volume-breakout",
-      "recommended_change": "bug_hunter owns: price-normalized threshold OR leverage-aware CUT_LOSER_PNL. DO NOT change value mid-freeze. Needs numbers (would-have-blocked analysis).",
-      "impact_on_winners": "unknown until bug_hunter runs shadow numbers",
-      "confidence": "HIGH that semantics gap is real (CODE VERIFIED position_manager.py:3265-3267). Confidence on fix path: pending bug_hunter numbers."
+    {
+      "cluster": "hard_max_loss family",
+      "n_7d": "39T -$5.32 0%WR avg_pct=-3.79 avg_lev=4.08",
+      "root_cause": "Stop fires on ~1% price move (CUT_LOSER_PNL=-1.00 vs live_pnl) but becomes 3-5% account loss at lev 3-5. Semantics bug, not value.",
+      "recommended_change": "bug_hunter shadow numbers for price-normalized vs leverage-aware. DO NOT change CUT_LOSER_PNL value mid-freeze.",
+      "confidence": "HIGH (code path confirmed prior sessions)"
     },
-    "single_trade_IO": {
-      "trade": "IO pump-chain- SHORT RSI=13.46 hard_max_loss -$0.24",
-      "root_cause": "PRE-FIX — b960ffe8 (holes 1+2) closed Oct 4 00:38, pipeline restarted 01:50. This trade is legacy aging, not a new leak.",
-      "status": "FIXED — do not re-add filters"
+    {
+      "cluster": "bb-squeeze+ recent hard_max_loss",
+      "n_24h": "5T -$0.71 hard_max_loss + 1 atr_sl_hit",
+      "root_cause": "High-RSI breakouts without volume confirmation (DRIFT-008 said RSI>80 is the edge WITH volume; losers have volume_spike 0.01-0.7). profit-monster-trail remains the money path (20T HIGH +85% +$1.27/7d).",
+      "recommended_change": "Monitor only — do not block high RSI (DRIFT-008). Watch volume_regime before squeeze entries (watchdog steer).",
+      "confidence": "MEDIUM"
     }
-  },
+  ],
   "recurring_problems": [
-    {
-      "topic": "hard_max_loss semantics (price vs leveraged)",
-      "sessions": "5+",
-      "status": "OPEN — bug_hunter owns, needs shadow numbers"
-    },
-    {
-      "topic": "DRIFT-005 bb-bounce-v3 RSI_MAX=55 bypass",
-      "sessions": "4+",
-      "status": "OPEN — bug_hunter path audit, post-freeze"
-    },
-    {
-      "topic": "ema_reclaim_long 0 signals EVER",
-      "sessions": "6+",
-      "status": "OVERDUE — signal_analyst owns"
-    },
-    {
-      "topic": "SHORT bleeding -$1.38/7d",
-      "sessions": "4+",
-      "status": "MONITOR — b960ffe8 untestable (n=0 SHORTs ~13h)"
-    },
-    {
-      "topic": "rr_engine shadow→FORCE",
-      "sessions": "3+",
-      "status": "OPEN — bug_hunter, numbers pending"
-    }
+    "bb-bounce-v3-long+ quality/filter enforcement — recurring across brain_auditor runs (06:39, 11:35, 13:50 CEO, 14:34, this run)",
+    "hard_max_loss semantics price-vs-leverage — recurring since Oct 1-3",
+    "SHORT bleed / oversold SHORT — b960ffe8 fix live, 0 SHORTs since 01:50, n=0 untestable (monitor to Oct 6)",
+    "Hotset starvation in NEUTRAL — volume-breakout and other good signals blocked by LONG-NEUTRAL gate"
   ],
   "missing_implementations": [
-    {
-      "item": "ema_reclaim_long detection coverage + confluence partners",
-      "owner": "signal_analyst",
-      "priority": "HIGH — 0 trades EVER, overdue since Oct 1"
-    },
-    {
-      "item": "RR_ENGINE shadow would-have-blocked → FORCE with numbers",
-      "owner": "bug_hunter",
-      "priority": "HIGH — shadow=True standing, no numbers"
-    },
-    {
-      "item": "doji-bottom execution path (detection works, 0 executed)",
-      "owner": "signal_analyst",
-      "priority": "MEDIUM — SYRUP hard_max_loss today"
-    },
-    {
-      "item": "15m/5m scanner threshold retune",
-      "owner": "signal_analyst",
-      "priority": "MEDIUM — misnamed file, 0.35%/candle thresholds"
-    },
-    {
-      "item": "Coin tracker Wyckoff/phase-transition signal (1/week min)",
-      "owner": "signal_analyst",
-      "priority": "LOW — long-term diversity"
-    }
+    "Execution-time revalidation of signal-level filters for STANDALONE_BYPASS path (creative idea this run — closes all holes at once)",
+    "ema_reclaim_long — 0 trades EVER, still OVERDUE for signal_analyst",
+    "RR_ENGINE shadow→FORCE numbers still pending bug_hunter"
   ],
   "watchdog_steers_evaluation": [
     {
-      "steer": "Pipeline DOWN (running=false)",
-      "verdict": "FALSE ALARM",
-      "evidence": "run_pipeline.py PID 2292030 active since 14:31, lock exists, logs show 14:30 activity. Watchdog checked at 14:12 during between-cycle window."
+      "steer": "3 correlated bb-bounce-v3 longs",
+      "verdict": "VALID — and worse: all 3 violate entry filters. Cluster risk real + entry quality hole."
     },
     {
-      "steer": "3 open all bb-bounce-v3-long+ (CFX/DOT/NXPC)",
-      "verdict": "VALID — cluster + wrong-side",
-      "evidence": "All3 negative, all had contradictory SHORT signals at entry. Correlation risk real. DRIFT-005 hole lets bad entries through."
-    },
-    {
-      "steer": "10 recent losses look wrong-side",
-      "verdict": "VALID",
-      "evidence": "bb-bounce-v3 rsi>40 = 22%WR; pump-chain- RSI<40 = 27.8%WR (known); entries at RSI extremes in wrong direction."
+      "steer": "wrong-side / fading momentum",
+      "verdict": "PARTIALLY VALID for DOT (RSI 62, shorts fired after). CFX was oversold RSI~31-44 (bounce thesis valid, tape failed). NXPC mid-RSI + shorts. Not a single root cause."
     },
     {
       "steer": "bb-squeeze+ 4-loss streak",
-      "verdict": "VARIANCE — do not act",
-      "evidence": "24h bb-squeeze+ 18T +$0.16 66.7%WR. 7d 47T +$0.50 61.7%WR. 4-loss streak inside normal variance for a 62% WR signal."
+      "verdict": "VARIANCE + no-volume — overall 7d still positive via profit-monster-trail. Do not disable."
     },
     {
-      "steer": "regime_15m.json stale (5 months)",
-      "verdict": "FALSE ALARM for trading",
-      "evidence": "watchdog.py reads regime_5m.json (fresh 14:30), not regime_15m.json. Prior audit confirmed same."
+      "steer": "hotset empty while volume-breakout 66.7% WR idle",
+      "verdict": "VALID — DRIFT-009 bypass inversion + LONG-NEUTRAL gate. Real capital-efficiency bug."
     },
     {
-      "steer": "volume-breakout-long+ best (66.7% WR)",
-      "verdict": "VALID — favor over bb-bounce family",
-      "evidence": "9T +$2.47 66.7%WR in watchdog window. 30d historically 20T+ 70%WR. Boost 1.25 already applied, awaiting 10T sample."
+      "steer": "pipeline running:false in watchdog.json",
+      "verdict": "FALSE NEGATIVE — systemd confirms active. Infra bug in watchdog field, not trading path."
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-04T14:34:18Z",
-      "idea": "Conflicting-signal execution veto — block LONG if SHORT fired on same coin within 15min (and vice versa)",
-      "rationale": "Watchdog deep analysis: all 3 open bb-bounce-v3-long+ trades had contradictory SHORT signals at entry (DOT: pump-chain- zscore -3.0; CFX: rs-r40 SHORT; NXPC: rs-r45/rs-r47). Watchdog steer-002: 10 recent losses look wrong-side. This is an entry-quality check using actual signal conflict data, not a time-based filter.",
-      "expected_impact": "Blocks wrong-side entries where opposite signal fired moments before. Could have blocked DOT/CFX/NXPC opens (3 current open losers). Need backtest: how many 14d winners had a conflicting opposite signal within 15min of entry?",
-      "category": "entry sniper",
-      "status": "suggested — needs backtest before implementation",
-      "risk": "medium — must not block valid contrarian setups (CONTRARIAN_ZONE_ENABLED exists for strong-zone flips). Veto should be soft (confidence reduction) not hard block, OR exempt coins in contrarian zones.",
-      "sample_note": "3 open trades all had conflicts (small n). Pattern matches broader wrong-side steer (10 losses). Backtest on 14d closed trades required before any implementation."
+      "date": "2026-10-04T15:36:01Z",
+      "idea": "Execution-time filter revalidation for STANDALONE_BYPASS signals (one shared gate)",
+      "rationale": "0/17 bb-bounce-v3 30d trades passed all intended filters. ENS rsi=80.81 bb=1.19 still executed at conf=99. Per-signal value tweaks (RSI_MAX 55→40) treat symptoms; the root cause is bypass path skipping the signal's own hard filters. A single pre-open re-check (RSI band, BB position, volume ratio, staleness) against fresh data closes every bypassed signal's hole at once.",
+      "expected_impact": "Blocks invalid bb-bounce-v3 entries (and any other bypassed signal with hard filters). After enforcement, measure the REAL signal quality — current 16.7%WR is contaminated by invalid entries.",
+      "category": "entry sniper / filter enforcement",
+      "status": "suggested — bug_hunter owns path audit (DRIFT-005), this is the systemic version",
+      "risk": "low — enforces existing constants, no value changes",
+      "impact_on_winners": "Would have blocked 1/9 rsi>55 winners, 2/9 bb>0.65 winners, 7/9 vol<1.2 winners, 8/9 stale winners in 30d — BUT 0 clean trades exist. Invalid-entry wins are variance, not edge. Enforce, then re-measure."
     },
     {
-      "date": "2026-10-04T14:34:18Z",
-      "idea": "Per-signal-family position cap (max 2 same-family opens within 15min window)",
-      "rationale": "3 correlated bb-bounce-v3-long+ opens (CFX/DOT/NXPC) all negative — one BTC dump hits all. PORTFOLIO_HEAT_ENABLED=True exists but may not count same-signal correlation. Previously suggested at 11:35, never built.",
-      "expected_impact": "Caps correlation risk. 3rd same-family signal within 15min gets confidence penalty or block.",
-      "category": "risk control",
-      "status": "suggested — needs backtest (repeated from 11:35 run)",
-      "risk": "low — conservative cap at 2, not 1"
+      "date": "2026-10-04T15:36:01Z",
+      "idea": "Resolve bypass inversion: volume-breakout-long+ not in STANDALONE_BYPASS despite comment claiming it is",
+      "rationale": "hermes_constants.py:887 comment says volume-breakout is STANDALONE_BYPASS; tuple does not contain it. Pipeline log shows LONG-NEUTRAL standalone bypass denied; ARB volume-breakout conf=76-86 SKIPPED; hotset empty. Meanwhile worst signal bb-bounce-v3-long+ IS bypassed. Edge data: volume-breakout EXTREME 14d 85.7%WR +$2.75; rsi>70 30d 80%WR +$1.59; NEUTRAL NORMAL 8T 62.5% -$0.05 (marginal — edge is EXTREME/RSI>70 not NEUTRAL).",
+      "expected_impact": "Post-freeze decision needed: either add volume-breakout-long+ to bypass (frees it in NEUTRAL when BTC not flat) or accept NEUTRAL block as correct habitat filter. Do NOT silently add during freeze.",
+      "category": "capital efficiency",
+      "status": "suggested — CEO/signal_analyst decision post-freeze",
+      "risk": "medium — NEUTRAL volume-breakout is marginal (-$0.05/8T); EXTREME is the real edge. Adding bypass may fire low-quality NEUTRAL entries."
     }
   ],
   "config_changes_applied": [],
-  "config_change_note": "0 trading config changes — b960ffe8 48h freeze active until Oct 6 00:38. Session lock absent. ATR_TP_MIN=0.013 from 11:35 run remains live, not reverted.",
+  "config_change_note": "0 changes — b960ffe8 48h freeze active until Oct 6 00:38. ATR_TP_MIN=0.013 from 11:35 run still live, impact unjudgeable (post-change trades all hard_max_loss). Protected flags untouched.",
   "next_actions": [
-    "bug_hunter: close DRIFT-005 — audit STANDALONE_BYPASS path for bb-bounce-v3-long+, enforce existing BB_BOUNCE_V3_RSI_MAX=55 (not a value change)",
-    "bug_hunter: hard_max_loss shadow numbers — would-have-blocked analysis for price-normalized vs leverage-aware fix",
-    "bug_hunter: RR_ENGINE shadow → FORCE with numbers",
-    "signal_analyst: ema_reclaim_long detection coverage — 0 trades EVER, OVERDUE",
-    "self_learner: continue 48h zero-oversold SHORT verify (n=0 SHORTs since b960ffe8, ~13h in)",
-    "brain_auditor next run: re-check bb-bounce-v3 rsi>40 sample (need 20T for RSI_MAX 55→40 evaluation)",
-    "MONITOR: 24h PnL back >= $0; SHORT 7d >= $0 by Oct 7; 3 open bb-bounce-v3 trades outcome; disk 88%"
+    "bug_hunter: close DRIFT-005 expanded — enforce bb-bounce-v3 existing filters on bypass path (RSI, BB_POS, VOL_RATIO, STALE). Multi-filter hole, not just RSI_MAX.",
+    "bug_hunter: hard_max_loss shadow numbers (price-normalized vs leverage-aware) — 7d 39T -$5.32",
+    "bug_hunter: RR_ENGINE shadow→FORCE with numbers",
+    "CEO/signal_analyst post-freeze: decide volume-breakout bypass inversion (DRIFT-009) — comment says bypassed, code says not",
+    "signal_analyst: ema_reclaim_long detection coverage — 0 trades EVER",
+    "self_learner: continue 48h zero-oversold SHORT verify (n=0 SHORTs since b960ffe8 ~14h)",
+    "brain_auditor next run: after any bypass-path fix, re-measure bb-bounce-v3 on CLEAN entries only"
   ],
   "monitor_list_48h": [
-    "bb-bounce-v3-long+ 3 open (CFX/DOT/NXPC) — all negative, wrong-side pattern",
-    "bb-bounce-v3 rsi>40 sample: 9T now, need 20T for value-change evaluation",
-    "b960ffe8 oversold SHORT verify: 0 SHORTs since 01:50 (~13h)",
-    "hard_max_loss 24h share: 12/32 = 37.5% of trades, 0%WR",
-    "volume-breakout-long+ post-boost: need 10T+ by Oct 11",
-    "ATR_TP_MIN=0.013 impact: unjudgeable (2 trades post-change, both hard_max_loss)",
-    "disk 81% — prune at 88%"
+    "3 open bb-bounce-v3 (CFX/DOT/NXPC) — all violate entry filters; DOT rsi=62.4 live",
+    "24h PnL back >= $0 (now -$1.00/29T 48.3%)",
+    "SHORT 7d >= $0 by Oct 7; oversold SHORT=0 post b960ffe8 (n=0)",
+    "b960ffe8 freeze ends Oct 6 00:38",
+    "hard_max_loss share 11/29 of 24h exits",
+    "hotset repopulation — volume-breakout and good LONGs starved by LONG-NEUTRAL",
+    "disk 84% — prune threshold 88%",
+    "ATR_TP_MIN=0.013 impact once hard_tp/trailing exits appear"
+  ],
+  "sideways_finds": [
+    "watchdog.json pipeline_status.running=false is FALSE NEGATIVE (systemd active) — fix watchdog field",
+    "regime_15m.json stale since 2026-05-05 — silent landmine for any per-token 15m regime consumer",
+    "7d trade metadata missing rsi/rsi_1m/confidence keys (has rsi_14, bb_position, final_confidence) — audit queries must use rsi_14",
+    "ZZTESTCOIN p0-test-signal SHORT -$0.03 time_exit appeared in 24h closed — test artifact in production trades table, low severity hygiene"
   ]
 }
