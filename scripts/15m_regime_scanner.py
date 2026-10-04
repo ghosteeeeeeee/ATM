@@ -158,16 +158,21 @@ def determine_regime(slope_pct, r2):
     Symmetric thresholds — asset-agnostic.
     FIX 2026-10-03: lowered from 0.35 to 0.05 — 5m candles rarely exceed 0.35%/candle
     (max observed 0.122%). 0.05% per 5m candle = 0.6%/hour, reachable in trending markets.
+    Thresholds now in hermes_constants.py.
     """
-    if slope_pct > 0.05 and r2 > 0.5:
+    from hermes_constants import (
+        REGIME_SCANNER_TREND_THRESHOLD, REGIME_SCANNER_NEUTRAL_THRESHOLD,
+        REGIME_SCANNER_R2_TREND, REGIME_SCANNER_R2_WEAK,
+    )
+    if slope_pct > REGIME_SCANNER_TREND_THRESHOLD and r2 > REGIME_SCANNER_R2_TREND:
         return "LONG_BIAS", min(95, 50 + r2 * 45 + slope_pct * 20)
-    elif slope_pct < -0.05 and r2 > 0.5:
+    elif slope_pct < -REGIME_SCANNER_TREND_THRESHOLD and r2 > REGIME_SCANNER_R2_TREND:
         return "SHORT_BIAS", min(95, 50 + r2 * 45 + abs(slope_pct) * 20)
-    elif abs(slope_pct) < 0.02:
-        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.02) * 20)
-    elif slope_pct > 0 and r2 > 0.4:
+    elif abs(slope_pct) < REGIME_SCANNER_NEUTRAL_THRESHOLD:
+        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/REGIME_SCANNER_NEUTRAL_THRESHOLD) * 20)
+    elif slope_pct > 0 and r2 > REGIME_SCANNER_R2_WEAK:
         return "LONG_BIAS", 45 + r2 * 20
-    elif slope_pct < 0 and r2 > 0.4:
+    elif slope_pct < 0 and r2 > REGIME_SCANNER_R2_WEAK:
         return "SHORT_BIAS", 45 + r2 * 20
     else:
         return "NEUTRAL", 40 + r2 * 15
@@ -346,7 +351,7 @@ def main():
             regime = r.get('regime', 'NEUTRAL')
             _phase = regime
             _vel = slope
-            _state = 'trending' if abs(slope) > 0.05 else 'ranging'
+            _state = 'trending' if abs(slope) > MOMENTUM_STATE_TREND_THRESHOLD else 'ranging'
             _sc.execute("""
                 INSERT INTO momentum_cache (token, velocity, phase, momentum_state, updated_at)
                 VALUES (?, ?, ?, ?, ?)

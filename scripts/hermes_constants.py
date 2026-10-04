@@ -4268,3 +4268,13 @@ MTF_REGIME_TREND_CONF_BASE = 70           # base confidence
 MTF_REGIME_TREND_CONF_CAP = 95            # max confidence
 MTF_REGIME_TREND_SLOPE_BONUS_MAX = 20     # max bonus from slope
 MTF_REGIME_TREND_PULLBACK_BONUS_MAX = 10  # max bonus from pullback quality
+
+# ── 15m Regime Scanner Thresholds ────────────────────────────────────────────
+# 5m candle slope thresholds for regime detection.
+# FIX 2026-10-03: lowered from 0.35 to 0.05 — 5m candles rarely exceed 0.35%/candle
+# (max observed 0.122%). 0.05% per 5m candle = 0.6%/hour, reachable in trending markets.
+REGIME_SCANNER_TREND_THRESHOLD = 0.05   # slope_pct threshold for LONG_BIAS/SHORT_BIAS
+REGIME_SCANNER_NEUTRAL_THRESHOLD = 0.02  # slope_pct below this = NEUTRAL
+REGIME_SCANNER_R2_TREND = 0.5            # min r2 for confident trend
+REGIME_SCANNER_R2_WEAK = 0.4             # min r2 for weak trend signal
+MOMENTUM_STATE_TREND_THRESHOLD = 0.05    # abs(slope) above this = 'trending' (aligned with regime scale)
