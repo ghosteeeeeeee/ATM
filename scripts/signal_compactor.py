@@ -2004,7 +2004,20 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # 2026-10-01: 5 trend multipliers consolidated into 1 (trend_alignment_mult)
     # Removed: reg_mult, continuum_mult, trend_filter_mult, dir_bias_mult, alt_btc_div_mult
-    final_score = score * survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * leaderboard_mult * combo_mult * penalty_mult * amplitude_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult * oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult
+    # FIX 2026-10-04: penalty compounding floor — 26 multiplicative factors can compound
+    # to near-zero (0.5 × 0.3 × 0.3 × 0.5 = 0.0225x). Floor prevents this while preserving
+    # individual penalty signals.
+    _mult_product = (survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult *
+                     source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult *
+                     leaderboard_mult * combo_mult * penalty_mult * amplitude_mult *
+                     time_block_mult * phase_mult * confluence_mult * inverse_mult *
+                     lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult *
+                     oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
+    _mult_floor = 0.3  # Score can't drop below 30% of base regardless of penalty stacking
+    _mult_adjusted = max(_mult_product, _mult_floor)
+    if _mult_product < _mult_floor:
+        log(f"  ⚖️ [SCORE-FLOOR] {token} {direction}: multiplier product {_mult_product:.4f} floored to {_mult_floor}")
+    final_score = score * _mult_adjusted
     return final_score
 
 
