@@ -3531,3 +3531,51 @@ BY: daily_orchestrator
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
 
 BY: auto_1hr
+
+## [2026-10-04 20:11 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses) — GMT pump-chain+ +$0.05 pump_exit_dead_money, IMX pump-chain+ +$0.09 pump_exit_dead_money, ETC bb-bounce-v2+v3 combo +$0.05 profit-monster-trail
+**PnL:** +$0.19 last hour | 24h exits: profit-monster-trail 19T +$1.26 (63%) | hard_max_loss 11T -$1.74 | atr_sl_hit 1T -$0.13 (3.3%) | Open: 1 (SEI bb-squeeze+ LONG $22.10)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** 3/3 last-hour exits profitable via pump-exit or profit-monster-trail. SEI bb-squeeze+ open.
+- **atr_sl_hit >40%:** 1/30 (3.3%) of 24h closes. Dominant exits: profit-monster-trail 19T +$1.26, hard_max_loss 11T -$1.74. tpsl_utils.py fix stable. hard_max_loss is intentional hard-stop family, not a tight-SL bug.
+- **Kill rule:** Last hour: pump-chain+ 2W, bb-bounce combo 1W — no 0% WR + 3T signal. 24h worst bb-bounce-v3-long+ 10T -$0.56 but has wins (not 0%). bb-squeeze+ 14T +$0.39 star. No kill.
+- **Negative PnL streak:** 6h activity: 15:+$0.04, 16:-$0.20, 17:+$0.01, 18:+$0.06, 19:+$0.36. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 3T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates git-clean, no violations.
+
+**Open Questions:**
+- bb-bounce-v3-long+ 24h still worst (-$0.56 10T) but ETC combo just trail-won this hour. Post-freeze queue still has NORMAL-regime block candidate from orchestrator.
+- hard_max_loss family 11T -$1.74/24h sole loss concentration — stop-placement review deferred post-freeze.
+- Open exposure reduced to 1: SEI bb-squeeze+. Bounce/pump pile cleared cleanly this hour.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+BY: auto_1hr
+
+BY: auto_1hr
+
+## [2026-10-04 22:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — SEI bb-squeeze+ LONG hard_max_loss -$0.24 (-5.42% account)
+**PnL:** -$0.24 last hour | 24h: 32T 19W 13L -$0.70 (WR: 59.4%) | Open: 0 (flat)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** Only 1 trade — SEI bb-squeeze+ LONG, exited hard_max_loss -$0.24/-5.42% (leverage-amplified ~1% price move, expected). No MFE/MAE pulled — n=1.
+- **atr_sl_hit >40%:** 1/32 (3.1%) of 24h closes. Dominant exits: profit-monster-trail 17T +$1.17 (53%), hard_max_loss 11T -$1.84 (34%). tpsl_utils.py fix stable. hard_max_loss is intentional hard-stop family, not a tight-SL bug.
+- **Kill rule:** Last hour: 1T bb-squeeze+ (0% WR but only 1T, needs 3+). 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long 1T 0%WR and volume-breakout-long+ 1T 0%WR — n=1 each, below kill threshold. No kill.
+- **Negative PnL streak:** Activity hours: 15:+$0.04, 16:-$0.20, 17:+$0.01, 18:+$0.06, 19:+$0.36, 21:-$0.24. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates git-clean, no violations.
+
+**Open Questions:**
+- 24h PnL flipped from +$0.17 (19:11) back to -$0.70 — SEI hard_max_loss single-handedly erased the morning recovery. Watch if hard_max_loss family (11T -$1.84/24h) keeps dominating losses post-freeze.
+- Flat book right now (0 open) — clean slate.
+- doji-bottom-long and volume-breakout-long+ both 0%WR 24h but n=1 each — below kill threshold, monitor for sample growth.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
