@@ -2877,5 +2877,41 @@
     "category": "portfolio risk",
     "status": "suggested",
     "risk": "medium — backtest first"
+  },
+  {
+    "date": "2026-10-05T14:37:11Z",
+    "idea": "Leverage-scaled hard_max_loss (risk-normalized stops)",
+    "rationale": "7d hard_max_loss 48T 0%WR -$6.90 avg lev 4.1. Stop fires on ~1% price = 3-5% account loss. At lev 5, -1% price = -5%+ account. Cap leverage at 3x for signals/cells with high hard_max_loss rates (bb-squeeze+ HIGH: 7T 0%WR -$1.10 at avg lev 3.9).",
+    "expected_impact": "Reduce hard_max_loss account loss ~25% on capped cells. bb-squeeze+ HIGH is already net negative - reducing leverage improves net PnL without changing win/loss logic.",
+    "category": "exit improvement",
+    "status": "suggested - needs backtest + CEO/risk",
+    "risk": "medium - leverage changes affect all exits on that cell, not just hard_max_loss"
+  },
+  {
+    "date": "2026-10-05T14:37:11Z",
+    "idea": "bb-squeeze+ NORMAL regime confidence boost",
+    "rationale": "7d NORMAL 17T 70.6% +$0.37 (BEST regime) but fires more in HIGH (36T 61.1% -$0.13). Boost confidence in NORMAL to increase frequency where edge exists.",
+    "expected_impact": "+$0.10-0.20/7d from more NORMAL entries",
+    "category": "entry sniper",
+    "status": "suggested - low priority (signal already net positive)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-05T14:37:11Z",
+    "idea": "hard_max_loss recovery window",
+    "rationale": "profit-monster-trail makes +$5.48/7d at 81.6% WR. hard_max_loss kills 48T at 0% WR. Many hard_max_loss trades might recover if given more room. Add recovery window: if trade hits -0.8% price but open <30min, wait before hard_max_loss.",
+    "expected_impact": "Potentially recover 20-30% of hard_max_loss trades ($1.5-2.0/7d). Risk: genuinely dumping trades lose more.",
+    "category": "exit improvement",
+    "status": "suggested - needs backtest + bug_hunter",
+    "risk": "high - changes exit structure for all trades"
+  },
+  {
+    "date": "2026-10-05T14:37:11Z",
+    "idea": "pump-chain- SHORT 40-45 band monitor",
+    "rationale": "7d 40-45 band: 12T 33.3% -$0.80 (bleeding). But 14d data showed this band as sweet spot (8T 75% +$0.47). Band flipped - too early to change PUMP_CHAIN_SHORT_RSI_MIN.",
+    "expected_impact": "If 14d confirms bleed, raising floor 40->45 would block ~12T/7d including ~4 winners.",
+    "category": "entry sniper",
+    "status": "MONITOR - do not change yet (band flipped, n=12 < 20)",
+    "risk": "low (monitoring only)"
   }
 ]

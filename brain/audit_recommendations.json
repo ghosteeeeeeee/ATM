@@ -1,207 +1,544 @@
 {
-  "timestamp": "2026-10-05T13:36:10Z",
+  "timestamp": "2026-10-05T14:37:11Z",
   "run_type": "FREEZE-SAFE REPORT-ONLY",
-  "freeze": "b960ffe8 until 2026-10-06 00:38 — 0 trading config changes this run",
-  "session_lock": "absent (freeze standing blocks config anyway)",
+  "freeze": "b960ffe8 until Oct 6 00:38",
+  "session_lock": "absent",
+  "config_changes_applied": [],
   "session_brain_stats": {
-    "queries_run": ["signal performance winrate regime", "new signal idea improvement strategy", "loss money bleeding losing"],
-    "top_themes": [
-      "exit system is #1 profit leak (hard_max_loss / cut-loser / R:R asymmetry)",
-      "SHORT EXTREME RSI>=40 only profitable SHORT cell — standing MoE model",
-      "signal decay / regime species — signals need regime-habitat preservation",
-      "new signal ideas discussed: trend-following, grind-to-spike, amplitude breakout — not built"
-    ],
-    "recurring_topic_count": {
-      "exit_path_bleed": "5+ sessions (train-to-trade, ceo, CL-T1, continuum-integration, hard_max_loss)",
-      "oversold_SHORT": "4+ sessions (BANANA lesson, MoE D1, b960ffe8, mtf inverted filter)",
-      "hotset_empty_capital_efficiency": "3+ sessions (CEO kanban items 12, drought 147sig/2h 0 approved)"
-    }
+    "queries_run": 9,
+    "top_insights": [
+      "exit system is #1 profit leak — hard_max_loss/hard_sl bleed dominates (7d: 48T -$6.90 0%WR + 43T -$2.74)",
+      "hard_max_loss semantics (price vs leverage) open with bug_hunter — avg lev 4.1, -1% price = -4%+ account",
+      "entry_rsi_14 unreliable — DRIFT-E confirmed, all prior stored-RSI band audits suspect",
+      "signals discussed but not built: trend-following, amplitude breakout, frequency change detector",
+      "CL-T1 cut-loser still bleeding, queued post-freeze MFE audit",
+      "60-70 meta-RSI band for bb-squeeze+ is BEST (18T 77.8% +$0.54) — watchdog mid-RSI killer claim BACKWARDS"
+    ]
   },
   "trade_summary_24h": {
-    "source": "PostgreSQL brain (verified this run)",
-    "trades": 35,
-    "pnl_usdt": -0.35,
-    "winrate_pct": 62.9,
-    "open_trades": 4,
-    "open_direction": "4 LONG / 0 SHORT (watchdog: portfolio heavily long into SHORT_BIAS)",
-    "worst_signals": [
-      {"signal": "mtf-regime-trend-", "direction": "SHORT", "trades": 5, "pnl": -0.42, "wr": 40.0},
-      {"signal": "bb-squeeze+", "direction": "LONG", "trades": 16, "pnl": -0.32, "wr": 62.5},
-      {"signal": "bb-bounce-v3-long+", "direction": "LONG", "trades": 5, "pnl": -0.06, "wr": 60.0}
-    ],
-    "exit_reason_24h": {
-      "hard_max_loss": {"trades": 10, "wr": 0.0, "pnl": -1.70, "note": "sole loss concentration"},
-      "profit-monster-trail": {"trades": 21, "wr": 90.5, "pnl": 1.15}
-    }
+    "trades": 40,
+    "pnl_usdt": -0.69,
+    "win_rate": 60.0,
+    "by_signal_direction": [
+      {
+        "signal": "mtf-regime-trend-",
+        "direction": "SHORT",
+        "trades": 5,
+        "pnl": -0.42,
+        "wr": 40.0
+      },
+      {
+        "signal": "bb-squeeze+",
+        "direction": "LONG",
+        "trades": 17,
+        "pnl": -0.3,
+        "wr": 64.7
+      },
+      {
+        "signal": "volume-breakout-long+",
+        "direction": "LONG",
+        "trades": 1,
+        "pnl": -0.27,
+        "wr": 0.0
+      },
+      {
+        "signal": "bb-bounce-v3-long+",
+        "direction": "LONG",
+        "trades": 5,
+        "pnl": -0.06,
+        "wr": 60.0
+      },
+      {
+        "signal": "bb-bounce-v2-long+",
+        "direction": "LONG",
+        "trades": 5,
+        "pnl": 0.12,
+        "wr": 80.0
+      },
+      {
+        "signal": "pump-chain+",
+        "direction": "LONG",
+        "trades": 2,
+        "pnl": 0.14,
+        "wr": 100.0
+      }
+    ]
   },
   "trade_summary_7d": {
-    "long": {"trades": 179, "wr": 57.0, "pnl": 2.38},
-    "short": {"trades": 58, "wr": 48.3, "pnl": -1.67},
-    "by_regime": {
-      "EXTREME": {"trades": 93, "wr": 53.8, "pnl": 1.74},
-      "FLAT": {"trades": 7, "wr": 71.4, "pnl": 0.42},
-      "NORMAL": {"trades": 62, "wr": 56.5, "pnl": -0.56},
-      "HIGH": {"trades": 70, "wr": 55.7, "pnl": -0.97}
+    "trades": 242,
+    "pnl_usdt": 0.37,
+    "long": {
+      "trades": 184,
+      "pnl": 2.04,
+      "wr": 56.5
     },
-    "hard_max_loss": {"trades": 48, "wr": 0.0, "pnl": -6.90, "avg_leverage": 4.13, "avg_pnl": -0.144}
+    "short": {
+      "trades": 58,
+      "pnl": -1.67,
+      "wr": 48.3
+    },
+    "by_regime": [
+      {
+        "regime": "EXTREME",
+        "trades": 93,
+        "wr": 53.8,
+        "pnl": 1.74
+      },
+      {
+        "regime": "FLAT",
+        "trades": 8,
+        "wr": 75.0,
+        "pnl": 0.44
+      },
+      {
+        "regime": "NORMAL",
+        "trades": 64,
+        "wr": 56.3,
+        "pnl": -0.65
+      },
+      {
+        "regime": "HIGH",
+        "trades": 71,
+        "wr": 54.9,
+        "pnl": -1.24
+      }
+    ],
+    "by_exit_reason_bleed": [
+      {
+        "exit": "hard_max_loss",
+        "trades": 48,
+        "wr": 0.0,
+        "pnl": -6.9,
+        "avg_lev": 4.1
+      },
+      {
+        "exit": "hard_sl",
+        "trades": 43,
+        "wr": 34.9,
+        "pnl": -2.74,
+        "avg_lev": 4.1
+      },
+      {
+        "exit": "profit-monster-trail",
+        "trades": 114,
+        "wr": 81.6,
+        "pnl": 5.48,
+        "avg_lev": 4.2
+      }
+    ]
   },
+  "trade_summary_30d": {
+    "trades": 959,
+    "pnl_usdt": -2.08,
+    "win_rate": 51.5
+  },
+  "losing_trade_autopsy": [
+    {
+      "cluster": "bb-squeeze+ LONG overbought chase",
+      "trades_24h": 5,
+      "total_pnl": -0.89,
+      "examples": [
+        {
+          "coin": "INJ",
+          "meta_rsi": 78.73,
+          "regime": "HIGH",
+          "lev": 5,
+          "pnl_pct": -5.67,
+          "exit": "hard_max_loss"
+        },
+        {
+          "coin": "SEI",
+          "meta_rsi": 68.58,
+          "regime": "HIGH",
+          "lev": 5,
+          "pnl_pct": -5.42,
+          "exit": "hard_max_loss"
+        },
+        {
+          "coin": "ZORA",
+          "meta_rsi": 71.43,
+          "regime": "NORMAL",
+          "lev": 3,
+          "pnl_pct": -3.14,
+          "exit": "hard_max_loss"
+        }
+      ],
+      "root_cause": "Overbought entries + hard_max_loss fires at ~1% price before trail can save. At lev 5, -1% price = -5%+ account loss.",
+      "meta_rsi_bands_7d": {
+        "<40": {
+          "n": 5,
+          "wr": 20.0,
+          "pnl": -0.23
+        },
+        "40-50": {
+          "n": 6,
+          "wr": 50.0,
+          "pnl": 0.18
+        },
+        "50-60": {
+          "n": 21,
+          "wr": 52.4,
+          "pnl": -0.59
+        },
+        "60-70": {
+          "n": 18,
+          "wr": 77.8,
+          "pnl": 0.54,
+          "note": "BEST band - DRIFT-F confirmed, mid-RSI killer claim BACKWARDS"
+        },
+        "70-80": {
+          "n": 14,
+          "wr": 64.3,
+          "pnl": -0.06
+        },
+        "80-90": {
+          "n": 1,
+          "wr": 100.0,
+          "pnl": 0.08
+        },
+        "90+": {
+          "n": 1,
+          "wr": 100.0,
+          "pnl": 0.07
+        }
+      },
+      "regime_bands_7d": {
+        "NORMAL": {
+          "n": 17,
+          "wr": 70.6,
+          "pnl": 0.37,
+          "note": "BEST regime"
+        },
+        "HIGH": {
+          "n": 36,
+          "wr": 61.1,
+          "pnl": -0.13
+        },
+        "EXTREME": {
+          "n": 13,
+          "wr": 46.2,
+          "pnl": -0.25
+        }
+      },
+      "recommended_change": "NONE now - freeze active. Post-freeze: leverage cap 3x on bb-squeeze+ HIGH (7T hard_max_loss 0%WR -$1.10 at avg lev 3.9). 60-70 RSI band is BEST - do NOT block it.",
+      "impact_on_winners": "RSI<60 block would kill 15/39=38% of winners (REJECTED per DRIFT-F). Leverage cap does not affect win/loss, only position size - and HIGH cell is already net negative.",
+      "confidence": "HIGH on diagnosis, MEDIUM on leverage-cap fix (needs backtest)"
+    },
+    {
+      "cluster": "mtf-regime-trend- SHORT",
+      "trades_24h": 3,
+      "total_pnl": -0.53,
+      "examples": [
+        {
+          "coin": "IMX",
+          "meta_rsi": 43.17,
+          "regime": "NORMAL",
+          "lev": 5,
+          "pnl_pct": -6.89,
+          "exit": "hard_max_loss",
+          "note": "PRE-FIX - opened 05:27Z, fix d15b3d88 landed 11:22Z"
+        },
+        {
+          "coin": "WLD",
+          "meta_rsi": 52.01,
+          "regime": "EXTREME",
+          "lev": 5,
+          "pnl_pct": -5.89,
+          "exit": "hard_max_loss",
+          "note": "PRE-FIX"
+        },
+        {
+          "coin": "SAND",
+          "meta_rsi": 28.95,
+          "regime": "EXTREME",
+          "lev": 5,
+          "pnl_pct": -4.33,
+          "exit": "hard_max_loss",
+          "note": "PRE-FIX - oversold SHORT, exactly what fix blocks"
+        }
+      ],
+      "root_cause": "Inverted SHORT RSI filter (blocked RSI>70, allowed oversold). Fix d15b3d88 landed 11:22Z - now uses SHORT_RSI_FLOOR=40.",
+      "post_fix_status": "n=0 - all 3 losses pre-fix. Monitor to n>=10.",
+      "winner_comparison": "RESOLV RSI 72.9 HIGH +$0.06 (won - old inverted filter would have BLOCKED this). MET RSI 37.7 NORMAL +$0.05 (won - pre-fix, now blocked by floor=40).",
+      "recommended_change": "NONE - fix already landed. Monitor post-fix n>=10.",
+      "confidence": "HIGH"
+    },
+    {
+      "cluster": "bb-bounce-v3-long+ NORMAL regime (DRIFT-A)",
+      "trades_24h": 2,
+      "total_pnl": -0.28,
+      "examples": [
+        {
+          "coin": "CFX",
+          "meta_rsi": 43.77,
+          "regime": "NORMAL",
+          "lev": 5,
+          "pnl_pct": -5.85,
+          "exit": "hard_max_loss",
+          "note": "Opened Oct 4 10:13 - AFTER gate 0cb0784b landed"
+        },
+        {
+          "coin": "NXPC",
+          "meta_rsi": 44.0,
+          "regime": "NORMAL",
+          "lev": 3,
+          "pnl_pct": -3.22,
+          "exit": "hard_max_loss",
+          "note": "Opened Oct 4 13:04 - AFTER gate landed"
+        }
+      ],
+      "root_cause": "DRIFT-A: STANDALONE_BYPASS path (signal_compactor.py:2943) sets pass_gate=True without consulting volatility_gate_v2. NORMAL regime block (0.0) is LIVE but bypass ignores it.",
+      "gate_data_7d": {
+        "NORMAL": {
+          "n": 16,
+          "wr": 50.0,
+          "pnl": -0.39
+        },
+        "HIGH": {
+          "n": 5,
+          "wr": 80.0,
+          "pnl": 0.11
+        },
+        "FLAT": {
+          "n": 1,
+          "wr": 100.0,
+          "pnl": 0.05
+        }
+      },
+      "winner_note": "HBAR NORMAL winner +$0.12 also slipped through bypass - confirms gate not consulted on bypass path.",
+      "recommended_change": "POST-FREEZE: bypass branch hard-skip when combined_mult==0.0 (signal_compactor.py bypass path). Also flip BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1->0.0 (DRIFT-B).",
+      "impact_on_winners": "Blocking NORMAL only - HIGH (80%WR +$0.11) and FLAT (100%) preserved. NORMAL cell is net negative (-$0.39/7d).",
+      "confidence": "HIGH"
+    }
+  ],
   "drift_findings": [
+    {
+      "id": "DRIFT-A",
+      "severity": "HIGH",
+      "status": "OPEN - post-freeze queued",
+      "finding": "STANDALONE_BYPASS path sets pass_gate=True without consulting volatility_gate_v2. bb-bounce-v3 NORMAL 0.0 gate LIVE (0cb0784b) but CFX/NXPC/HBAR NORMAL trades still opened Oct 4-5.",
+      "impact": "bb-bounce-v3 NORMAL trades bypass the regime block. 7d NORMAL 16T 50% -$0.39 bleeding.",
+      "fix": "Post-freeze: bypass branch hard-skip when combined_mult==0.0",
+      "owner": "bug_hunter / signal_compactor"
+    },
+    {
+      "id": "DRIFT-B",
+      "severity": "MEDIUM",
+      "status": "OPEN - post-freeze queued",
+      "finding": "BB_BOUNCE_V3_REGIME_NORMAL_MULT=1.1 still BOOSTS NORMAL in hermes_constants despite NORMAL being worst regime (16T 50% -$0.39).",
+      "impact": "Constant boosts confidence in losing regime. Vol gate block (0.0) should override but DRIFT-A means bypass skips it too.",
+      "fix": "Post-freeze: flip 1.1 -> 0.0 after DRIFT-A fix lands (one variable at a time).",
+      "owner": "brain_auditor / CEO"
+    },
+    {
+      "id": "DRIFT-C",
+      "severity": "MEDIUM",
+      "status": "OPEN - post-freeze queued",
+      "finding": "Bypass skips per-signal RSI ceilings. pump-chain+ 16T atr_sl_hit avg RSI 73.9 despite PUMP_CHAIN_LONG_RSI_MAX=70.",
+      "impact": "Overbought LONG entries slip through bypass path. 14d LONG 70-80 band: 25T 44% -$0.78.",
+      "fix": "Post-freeze: path audit - enforce existing RSI ceilings on bypass executors. Not a value change.",
+      "owner": "bug_hunter"
+    },
     {
       "id": "DRIFT-E",
       "severity": "HIGH",
-      "title": "entry_rsi_14 column is NOT signal-time RSI — analytics poisoned",
-      "evidence": "7d n=234: entry_rsi_14 vs _signal_metadata.rsi_14 median abs diff 12.6 RSI pts, mean 16.7, p90 35.5, max 86; 59% of trades differ by >10 pts. entry_rsi_14 written by hl-sync-guardian/feature_recorder from momentum_cache (different TF, late capture); meta.rsi_14 captured at signal detection.",
-      "examples": [
-        "HBAR pump-chain- SHORT: stored entry_rsi_14=24.30 vs meta.rsi_14=56.63 (trade WON — not oversold at signal)",
-        "SUPER bb-squeeze+: stored=100 vs meta=28.42",
-        "ZORA bb-bounce-v2: stored=78 vs meta=55.81 (watchdog 'RSI 78 chase' claim DISPROVED on signal-time data)"
-      ],
-      "impact": "All RSI-band audits using entry_rsi_14 are unreliable (past brain_auditor RSI_MAX candidates, watchdog wrong-side claims, cell_stats/exit_optimizer_shadow/study_winning_combos learning features).",
-      "recommendation": "bug_hunter: snapshot signal-time rsi_14 from _signal_metadata at trade open into entry_rsi_14, or stop writing momentum_cache RSI. Until fixed: analytics MUST use meta.rsi_14.",
-      "status": "open"
+      "status": "OPEN - data fix queued",
+      "finding": "entry_rsi_14 is NOT signal-time RSI. Written from momentum_cache (late, different TF) by hl-sync-guardian/feature_recorder. 7d n=234 median abs diff vs _signal_metadata.rsi_14 = 12.6 pts, 59% >10 apart.",
+      "impact": "All prior entry_rsi_14-based RSI band audits unreliable (incl. past auditor RSI_MAX candidates, cell_stats, exit_optimizer_shadow features).",
+      "fix": "Post-freeze: snapshot signal-time RSI at write path. Use _signal_metadata.rsi_14 (meta RSI) for all audits until fixed.",
+      "owner": "bug_hunter"
     },
     {
       "id": "DRIFT-F",
-      "severity": "HIGH",
-      "title": "bb-squeeze+ real bleed band = signal-time RSI<60 (not mid-band, not 90+)",
-      "evidence": "7d meta.rsi_14 bands: <60 = 32T 46.9%WR -$0.64 | 60-75 = 27T 74.1%WR +$0.71 | 75-90 = 5T 60% -$0.17 | 90+ = 1T 100% +$0.07. Watchdog 'mid-RSI 60-75 killer zone' narrative was BACKWARDS on signal-time data. entry_rsi_14-based band table (90+ best) was an artifact.",
-      "winner_impact_check": "Hard block RSI<60 would block 15W+17L (band pnl -$0.64) = 15/39 = 38% of winners → REJECT hard block per >20% winners rule. KEEP RSI>=60: 24W+9L +$0.61.",
-      "recommendation": "Monitor 48h on meta RSI. Post data-fix: evaluate confidence dampen (not block) for bb-squeeze+ when signal RSI<60, re-check winner impact. No config change now (freeze + 38% winner kill).",
-      "status": "monitor"
+      "severity": "RESOLVED-CONFIRMED",
+      "status": "CONFIRMED this run",
+      "finding": "bb-squeeze+ re-diagnosed on META RSI: 60-70 = 18T 77.8% +$0.54 BEST band. Watchdog 'mid-RSI killer' claim BACKWARDS.",
+      "impact": "Hard block RSI<60 correctly REJECTED (would kill 15/39=38% of winners).",
+      "fix": "No RSI block. Monitor meta-RSI<60 48h. Confidence dampen candidate post data-fix.",
+      "owner": "brain_auditor"
     },
     {
       "id": "DRIFT-G",
-      "severity": "MED",
-      "title": "SHORT loses across ALL signal-time RSI bands — RSI floor alone insufficient",
-      "evidence": "7d meta.rsi_14 SHORT: <40 = 13T 30.8% -$0.77 | 40-55 = 29T 51.7% -$0.20 | 55+ = 16T 56.2% -$0.70. Oversold band still worst but even 55+ is negative. Standing MoE SHORT model (exec RSI>=40, EXTREME habitat, NEUTRAL blocked) is directionally right but habitat enforcement still incomplete.",
-      "recommendation": "Do not add more RSI bands. Post-freeze: verify EXTREME habitat gate actually fires on STANDALONE_BYPASS SHORT paths. Monitor SHORT 7d PnL >= $0 by Oct 7 (standing metric).",
-      "status": "open"
+      "severity": "MEDIUM",
+      "status": "CONFIRMED this run",
+      "finding": "SHORT loses ALL meta-RSI bands on 14d (<25 30% -$0.63, 25-35 20% -$0.79, 35-40 14.3% -$0.74, 40-45 50% -$0.94, 45-55 47.2% -$0.31, 55-65 50% -$0.27, 65+ 43.8% -$0.93). RSI floor alone insufficient.",
+      "impact": "SHORT structural bleed -$1.67/7d. 7d shows 45-55 (+$0.69) and 55-65 (+$0.35) positive - possible recovery signal.",
+      "fix": "Verify EXTREME habitat on bypass paths. Monitor 7d 45-55 band recovery.",
+      "owner": "signal_analyst / brain_auditor"
     },
     {
       "id": "DRIFT-H",
       "severity": "RESOLVED",
-      "title": "mtf-regime-trend- inverted SHORT RSI filter — FIXED today",
-      "evidence": "Commit d15b3d88 (2026-10-05 11:22Z): old check blocked RSI>70 SHORT (inverted); now uses SHORT_RSI_FLOOR=40. Losses SAND/WLD/IMX (entry_rsi stored 34.7/39.4/14.5) were pre-fix. Post-fix: only HBAR pump-chain- SHORT closed (won +$0.06, meta RSI 56.63 — not oversold).",
-      "recommendation": "Monitor mtf-regime-trend- SHORT n>=10 post-fix before judging. Note stored entry_rsi on those losses also unreliable per DRIFT-E.",
-      "status": "closed"
-    },
-    {
-      "id": "DRIFT-A",
-      "severity": "HIGH",
-      "title": "bb-bounce-v3 NORMAL regime-block — standing, still queued",
-      "evidence": "14d meta-fresh: NORMAL 15T 46.7% -$0.43 | HIGH 4T 75% +$0.10. Confirmed again this run. Post-freeze plan stands: NORMAL 0.0x + HIGH 1.0x + FAMILY_MAP underscore fix.",
-      "recommendation": "Post-freeze Oct 6: implement bypass-path hard-skip when combined_mult==0.0 FIRST, then flip NORMAL mult 1.1→0.0 (one variable).",
-      "status": "queued"
-    },
-    {
-      "id": "DRIFT-I",
-      "severity": "MED",
-      "title": "hard_max_loss remains sole bleed — exit semantics, not entry filters",
-      "evidence": "7d: 48T 0%WR -$6.90 avg lev 4.13. 24h: 10T -$1.70 all losers. Winners trail +$0.05 avg vs losers -$0.14-0.17. System posts 62.9% WR and still loses = R:R inversion. CUT_LOSER_PNL=-1.00 DO NOT CHANGE standing (semantics with bug_hunter).",
-      "recommendation": "bug_hunter: leverage-aware or price-normalized hard_max_loss path with numbers. Creative option: cap leverage on high-frequency squeeze signals at 3x (avg lev 4.13 → shrinks tails ~25%) — CEO/risk decision, not auditor config.",
-      "status": "open"
+      "status": "FIXED d15b3d88",
+      "finding": "mtf-regime-trend- inverted SHORT filter (blocked RSI>70, allowed oversold). Fixed 2026-10-05 11:22Z - now uses SHORT_RSI_FLOOR=40.",
+      "impact": "Pre-fix: 3 losses -$0.53 (IMX RSI 43, WLD RSI 52, SAND RSI 29). Post-fix n=0.",
+      "fix": "Monitor post-fix n>=10. No further action.",
+      "owner": "self_learner"
     }
   ],
   "recurring_problems": [
-    {"topic": "exit_path_bleed", "count": "5+ sessions", "status": "OPEN — hard_max_loss 48T/7d -$6.90", "owner": "bug_hunter"},
-    {"topic": "oversold_SHORT_wrong_side", "count": "4+ sessions", "status": "PARTIAL — b960ffe8 + mtf fix d15b3d88; bypass paths need audit", "owner": "bug_hunter"},
-    {"topic": "hotset_empty_capital_efficiency", "count": "3+ sessions", "status": "OPEN — 147 sig/2h 0 approved; 4/4 long book in SHORT_BIAS", "owner": "signal_analyst/post-freeze"},
-    {"topic": "rsi_analytics_wrong_column", "count": "new this run but poisons all prior", "status": "OPEN — DRIFT-E", "owner": "bug_hunter"}
+    {
+      "problem": "hard_max_loss exit bleed",
+      "frequency": "Every run for 2+ weeks",
+      "data": "7d: 48T 0%WR -$6.90 avg lev 4.1. 48h: 21T -$3.51. 30d: 39T 0%WR -$5.32.",
+      "root_cause": "Stop fires on ~1% PRICE move but becomes 3-5% ACCOUNT loss at lev 3-5. Semantics (price vs leveraged) open with bug_hunter.",
+      "status": "QUEUED post-freeze - bug_hunter owns"
+    },
+    {
+      "problem": "STANDALONE_BYPASS skips gates",
+      "frequency": "Every run since Oct 4",
+      "data": "DRIFT-A (vol gate), DRIFT-C (RSI ceilings) - bypass path ignores both.",
+      "root_cause": "signal_compactor.py bypass branch sets pass_gate=True without consulting downstream gates.",
+      "status": "QUEUED post-freeze"
+    },
+    {
+      "problem": "SHORT structural bleed",
+      "frequency": "Persistent 30d+",
+      "data": "7d SHORT -$1.67/58T 48.3%. 30d SHORT -$4.02/367T. 14d all meta-RSI bands negative.",
+      "root_cause": "Entry quality + exit structure. EXTREME habitat is only profitable SHORT cell (30d 40T +$0.98 62.5%).",
+      "status": "MoE SHORT model A: exec RSI>=40, EXTREME habitat, NEUTRAL blocked. Monitor 7d 45-55 band recovery."
+    },
+    {
+      "problem": "Hotset empty (102 sig/h, 0 approved)",
+      "frequency": "Recurring since Oct 4",
+      "data": "102 signals/hour generated, 0 approved by hotset filter.",
+      "root_cause": "signal_compactor filters too aggressive vs SHORT_BIAS regime. Capital-efficiency bug.",
+      "status": "QUEUED post-freeze audit"
+    }
   ],
   "missing_implementations": [
-    {"idea": "bb-bounce-v3 NORMAL 0.0 regime-block + bypass hard-skip", "why_missing": "freeze b960ffe8", "when": "post-freeze Oct 6 00:38"},
-    {"idea": "hotset-empty audit (signal_compactor filters vs SHORT_BIAS)", "why_missing": "freeze + backlog", "when": "post-freeze Oct 6"},
-    {"idea": "Universal exec-RSI guardrail verification on ALL STANDALONE_BYPASS SHORT executors", "why_missing": "decider_run has floor; path coverage unverified post-b960ffe8", "when": "bug_hunter post-freeze"},
-    {"idea": "signal-time RSI as single source of truth for entry features", "why_missing": "never built — entry_rsi_14 writes from momentum_cache", "when": "bug_hunter post-freeze or freeze-safe analytics fix"}
-  ],
-  "losing_trade_autopsy": {
-    "cluster_1": {
-      "signal": "bb-squeeze+ LONG",
-      "sample": "16T/24h -$0.32 62.5%WR; 7d hard_max_loss family 48T -$6.90",
-      "root_cause": "NOT overbought chase on signal-time data. Bleed = (a) entries at signal RSI<60 without momentum confirmation (32T 46.9% -$0.64) + (b) exit asymmetry hard_max_loss avg lev 4.13 turning 1% price stop into 4-5% account loss while winners trail small",
-      "entry_check": "Watchdog RSI>75 chase claim DISPROVED: meta.rsi_14 60-75 is BEST band 27T 74.1% +$0.71. Stored entry_rsi_14 unreliable (DRIFT-E).",
-      "recommended_change": "NO hard RSI_MIN=60 block (38% winners killed). Monitor meta-RSI<60 band 48h; confidence dampen candidate after data fix. Exit path = bug_hunter leverage-aware SL.",
-      "impact_on_winners": "Hard block would kill 15/39 winners (38%) — REJECTED",
-      "confidence": "HIGH on diagnosis, LOW on entry-filter fix"
+    {
+      "idea": "trend-following signal",
+      "status": "DISCUSSED in sessions, NOT built",
+      "note": "User requested 'really solid new trend following signal'. Not in scripts/signals/."
     },
-    "cluster_2": {
-      "signal": "mtf-regime-trend- SHORT",
-      "sample": "5T/24h -$0.42 40%WR; losses SAND/WLD/IMX pre-fix",
-      "root_cause": "Inverted SHORT RSI filter (blocked RSI>70, allowed oversold) — FIXED d15b3d88 today 11:22Z. Stored entry_rsi_14 on losses also unreliable.",
-      "recommended_change": "Monitor post-fix n>=10. No further config.",
-      "impact_on_winners": "n/a — fix already shipped",
-      "confidence": "HIGH"
+    {
+      "idea": "amplitude breakout signal",
+      "status": "DISCUSSED in wave periods session, NOT built",
+      "note": "Phase 4 of amplitude compactor plan. Not implemented."
     },
-    "cluster_3": {
-      "signal": "SHORT book all signals",
-      "sample": "7d 58T 48.3% -$1.67; meta-RSI bands all negative",
-      "root_cause": "Habitat gap — SHORT profitable only in EXTREME+RSI>=40 per standing MoE; NEUTRAL SHORT still leaking; RSI floor paths partially closed",
-      "recommended_change": "Verify EXTREME habitat gate on bypass paths post-freeze. Do not add time blocks or more RSI bands.",
-      "impact_on_winners": "n/a — no filter proposed this run",
-      "confidence": "MED"
+    {
+      "idea": "ema_reclaim_long",
+      "status": "0 trades EVER",
+      "note": "Detection live but 0 executions. OVERDUE - signal_analyst owns."
+    },
+    {
+      "idea": "cluster risk limiter (max 2/signal-family/15min)",
+      "status": "SUGGESTED Sep 4, NOT built",
+      "note": "Needs backtest before implementation."
+    },
+    {
+      "idea": "Wyckoff/Elliott signals from coin_tracker",
+      "status": "BACKLOG",
+      "note": "67/112 accumulation phase data available but no predictive_score >=70 signals built."
     }
-  },
-  "watchdog_steers_evaluation": [
-    {"steer": "DYDX LONG wrong-side (SHORT_BIAS regime)", "verdict": "AGREE — 4/4 long book into SHORT_BIAS; risk steer valid. Not an auditor config change; execution/risk layer."},
-    {"steer": "ZORA entered RSI 78 bounce-long", "verdict": "DISPROVED on signal-time data — meta.rsi_14=55.81 (in bb-bounce-v2 sweet spot 35-60). Stored entry_rsi_14=78 is momentum_cache artifact."},
-    {"steer": "bb-squeeze+ mid-RSI 60-75 killer zone", "verdict": "DISPROVED — meta 60-75 is BEST band 27T 74.1% +$0.71. Real bleed: signal RSI<60 + hard_max_loss exit asymmetry."},
-    {"steer": "mtf-regime-trend- 3-loss streak", "verdict": "CONFIRMED pre-fix; inverted filter FIXED d15b3d88. Monitor post-fix."},
-    {"steer": "9 recent losses wrong-side", "verdict": "HALF — shorts (oversold) wrong-side confirmed pre-fix; bb-squeeze longs are correctly sided (pump=LONG) but exited by tight leveraged stops, not wrong-side entries."}
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-05T13:36:10Z",
-      "idea": "Re-baseline ALL RSI analytics on signal-time _signal_metadata.rsi_14; treat entry_rsi_14 as untrusted until write-path fixed",
-      "rationale": "59% of trades differ by >10 RSI pts (median 12.6, max 86). Every prior RSI-band conclusion (bb-squeeze 90+ best, ZORA chase, oversold SHORT counts) was computed on the wrong column. First finding after re-baseline: bb-squeeze+ money band is signal RSI 60-75 (74.1%WR +$0.71), bleed is <60 (46.9% -$0.64) — watchdog narrative was backwards.",
-      "expected_impact": "Unblocks trustworthy signal-quality work; prevents wrong config changes based on poisoned RSI bands (e.g. would have blocked wrong band on bb-squeeze+)",
-      "category": "data integrity / analytics",
-      "status": "suggested",
-      "risk": "low"
+      "date": "2026-10-05T14:37:11Z",
+      "idea": "Leverage-scaled hard_max_loss (risk-normalized stops)",
+      "rationale": "7d hard_max_loss 48T 0%WR -$6.90 avg lev 4.1. Stop fires on ~1% price = 3-5% account loss. At lev 5, -1% price = -5%+ account. Cap leverage at 3x for signals/cells with high hard_max_loss rates (bb-squeeze+ HIGH: 7T 0%WR -$1.10 at avg lev 3.9).",
+      "expected_impact": "Reduce hard_max_loss account loss ~25% on capped cells. bb-squeeze+ HIGH is already net negative - reducing leverage improves net PnL without changing win/loss logic.",
+      "category": "exit improvement",
+      "status": "suggested - needs backtest + CEO/risk",
+      "risk": "medium - leverage changes affect all exits on that cell, not just hard_max_loss"
     },
     {
-      "date": "2026-10-05T13:36:10Z",
-      "idea": "bb-squeeze+ confidence dampen (not block) when signal-time RSI < 60 — pending data fix + 48h meta-RSI monitor",
-      "rationale": "Signal RSI<60 = 32T 46.9% -$0.64 (only clearly bad band). Hard block rejected (38% winners killed). Confidence dampen preserves winners proportionally while reducing size/frequency on low-quality band.",
-      "expected_impact": "+$0.30-0.50/7d if band stays negative on meta RSI; needs n>=20 re-check after entry_rsi_14 fix",
+      "date": "2026-10-05T14:37:11Z",
+      "idea": "bb-squeeze+ NORMAL regime confidence boost",
+      "rationale": "7d NORMAL 17T 70.6% +$0.37 (BEST regime) but fires more in HIGH (36T 61.1% -$0.13). Boost confidence in NORMAL to increase frequency where edge exists.",
+      "expected_impact": "+$0.10-0.20/7d from more NORMAL entries",
       "category": "entry sniper",
-      "status": "deferred_pending_data_fix",
+      "status": "suggested - low priority (signal already net positive)",
       "risk": "low"
     },
     {
-      "date": "2026-10-05T13:36:10Z",
-      "idea": "Leverage-aware hard_max_loss study: cap concurrent high-frequency squeeze/pump leverage at 3x while semantics fix is pending",
-      "rationale": "7d hard_max_loss 48T -$6.90 avg lev 4.13. Stop fires ~1% price → 4-5% account loss. Winners trail +$0.05 avg. 62.9% WR system loses on R:R inversion. Leverage cap shrinks loss tails ~25% without touching CUT_LOSER_PNL (protected).",
-      "expected_impact": "hard_max_loss family -$6.90 → ~-$5.2/7d if avg lev drops 4.1→3.0; needs backtest on last 30d",
-      "category": "risk / exits",
-      "status": "suggested",
-      "risk": "medium — CEO/risk decision, not auditor unilateral"
+      "date": "2026-10-05T14:37:11Z",
+      "idea": "hard_max_loss recovery window",
+      "rationale": "profit-monster-trail makes +$5.48/7d at 81.6% WR. hard_max_loss kills 48T at 0% WR. Many hard_max_loss trades might recover if given more room. Add recovery window: if trade hits -0.8% price but open <30min, wait before hard_max_loss.",
+      "expected_impact": "Potentially recover 20-30% of hard_max_loss trades ($1.5-2.0/7d). Risk: genuinely dumping trades lose more.",
+      "category": "exit improvement",
+      "status": "suggested - needs backtest + bug_hunter",
+      "risk": "high - changes exit structure for all trades"
     },
     {
-      "date": "2026-10-05T13:36:10Z",
-      "idea": "Regime-aware concurrent-alt-LONG cap: max 2 alt-LONGs when btc_15m aggregate = SHORT_BIAS",
-      "rationale": "Watchdog: 4/4 long book, DYDX+BANANA cluster 11min apart, SHORT_BIAS 12L/62S/43N. PORTFOLIO_HEAT_ENABLED exists but allowed 4 correlated longs. Regime-aware heat is quality-based, NOT time-based (time blocks banned).",
-      "expected_impact": "Reduces single BTC-dump beta on correlated alt-long clusters; needs gate_shadow backtest before live",
-      "category": "portfolio risk",
-      "status": "suggested",
-      "risk": "medium — backtest first via gate_shadow/training-system"
+      "date": "2026-10-05T14:37:11Z",
+      "idea": "pump-chain- SHORT 40-45 band monitor",
+      "rationale": "7d 40-45 band: 12T 33.3% -$0.80 (bleeding). But 14d data showed this band as sweet spot (8T 75% +$0.47). Band flipped - too early to change PUMP_CHAIN_SHORT_RSI_MIN.",
+      "expected_impact": "If 14d confirms bleed, raising floor 40->45 would block ~12T/7d including ~4 winners.",
+      "category": "entry sniper",
+      "status": "MONITOR - do not change yet (band flipped, n=12 < 20)",
+      "risk": "low (monitoring only)"
     }
   ],
-  "config_changes_applied": [],
-  "config_change_note": "0 changes — freeze b960ffe8 until Oct 6 00:38. Session lock absent but freeze standing. Protected flags untouched. ATR_TP_MIN=0.013 and EXTREME pump-chain- SHORT 0.0→1.0 standing (do not revert).",
-  "next_actions": [
-    {"action": "bug_hunter: fix entry_rsi_14 write path — snapshot signal-time rsi from _signal_metadata at open (DRIFT-E)", "priority": "HIGH", "when": "post-freeze Oct 6 or freeze-safe analytics correctness if CEO allows"},
-    {"action": "bug_hunter: verify EXEC-RSI-FLOOR covers ALL STANDALONE_BYPASS SHORT executors post-b960ffe8 (DRIFT-G)", "priority": "HIGH", "when": "post-freeze Oct 6"},
-    {"action": "bug_hunter: hard_max_loss leverage-aware semantics with numbers (DRIFT-I)", "priority": "MED", "when": "post-freeze — already delegated"},
-    {"action": "self_learner: re-run all RSI band analyses on meta.rsi_14; flag any config candidates that flip", "priority": "HIGH", "when": "now (read-only)"},
-    {"action": "signal_reporter: bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 + FAMILY_MAP underscore (standing)", "priority": "MED", "when": "post-freeze Oct 6"},
-    {"action": "Monitor: mtf-regime-trend- SHORT post-d15b3d88 n>=10; bb-squeeze+ meta-RSI<60 band 48h; SHORT 7d PnL>=0 by Oct 7; 24h PnL>=0", "priority": "MED", "when": "ongoing"},
-    {"action": "signal_analyst: hotset-empty audit + confidence dampen backtest for bb-squeeze+ meta-RSI<60 after data fix", "priority": "MED", "when": "post-freeze"}
+  "watchdog_steers_evaluation": [
+    {
+      "steer": "10 recent losses look like wrong-side trades",
+      "verdict": "PARTIALLY VALID",
+      "detail": "bb-squeeze+ overbought chase (INJ RSI 78.7, SEI RSI 68.6) + mtf-regime-trend- oversold SHORT (SAND RSI 29.0) confirm wrong-side pattern. But 60-70 meta-RSI band is BEST for bb-squeeze+ (77.8% WR) - not all high-RSI entries are wrong-side. Root cause is exit structure (hard_max_loss), not just entry side."
+    },
+    {
+      "steer": "Signal mtf-regime-trend- losing streak: 3 losses",
+      "verdict": "VALID but PRE-FIX",
+      "detail": "All 3 losses pre-date fix d15b3d88 (landed 11:22Z). Post-fix n=0. Monitor to n>=10 before judging."
+    },
+    {
+      "steer": "Signal bb-squeeze+ losing streak: 4 losses",
+      "verdict": "VALID - but not a kill candidate",
+      "detail": "7d 64T 62.5% +$0.20 overall. Losing streak is variance + hard_max_loss tail. 60-70 RSI band is BEST (77.8%). Do NOT disable. Monitor meta-RSI<60 48h."
+    },
+    {
+      "steer": "pump-chain- firing shorts at RSI 9-18",
+      "verdict": "DISPROVED",
+      "detail": "Stored entry_rsi_14 is unreliable (DRIFT-E). Meta RSI for pump-chain- 7d: 40-45=12T, 45-55=17T 70.6% +$1.36 BEST. No shorts at RSI 9-18 in meta data. Watchdog used wrong field."
+    }
   ],
-  "protected_flags_verified": {
-    "LIVE_TRADING_ENABLED": true,
-    "CONFLUENCE_REQUIRED": true,
-    "CEO_PROTECTED": "untouched",
-    "ATR_TP_MIN": "0.013 standing",
-    "CUT_LOSER_PNL": "-1.00 DO NOT CHANGE"
-  }
+  "post_freeze_queue_validation": {
+    "freeze_lifts": "2026-10-06 00:38 UTC",
+    "queue_status": "ALL 10 ITEMS STILL VALID",
+    "priority_order": [
+      "1. decider_run v1->v2 + fail-open removal (bug_hunter)",
+      "2. DRIFT-A: bypass ignores vol gate - hard-skip when combined_mult==0.0",
+      "3. DRIFT-E: entry_rsi_14 write-path fix (signal-time RSI snapshot)",
+      "4. DRIFT-C: bypass RSI ceiling path audit",
+      "5. cut-loser-CL-T1 MFE audit (bug_hunter)",
+      "6. DRIFT-B: BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1->0.0 (after DRIFT-A)",
+      "7. bb-bounce-v3 FAMILY_MAP underscore fix",
+      "8. hotset empty audit (signal_compactor vs SHORT_BIAS)",
+      "9. STANDALONE_BYPASS expectancy demotion (self_learner)",
+      "10. HIGH-regime LONG throttle (signal_analyst)"
+    ],
+    "new_additions_this_run": [
+      "Leverage-scaled hard_max_loss (creative - needs backtest)",
+      "hard_max_loss recovery window (creative - needs backtest + bug_hunter)"
+    ]
+  },
+  "next_actions": [
+    "WAIT for freeze lift Oct 6 00:38 - 0 config changes this run",
+    "Execute post-freeze queue in priority order (DRIFT-A + DRIFT-E are highest)",
+    "Monitor mtf-regime-trend- post-fix n>=10 (self_learner)",
+    "Monitor pump-chain- 40-45 band on 14d (do not change yet)",
+    "Monitor 7d SHORT 45-55 band recovery (+$0.69/7d)",
+    "Monitor bb-squeeze+ meta-RSI<60 48h",
+    "Monitor hard_max_loss semantics with bug_hunter",
+    "T: verify/correct HL API key reminder (stale per CURRENT.md)"
+  ],
+  "open_trades": [
+    {
+      "coin": "BANANA",
+      "direction": "long",
+      "signal": "bb-squeeze+",
+      "pnl_pct": 0.36,
+      "hours_open": 1.6,
+      "leverage": 3
+    },
+    {
+      "coin": "ETH",
+      "direction": "long",
+      "signal": "bb-bounce-v2-long+",
+      "pnl_pct": 0.4,
+      "hours_open": 4.9,
+      "leverage": 5
+    }
+  ]
 }
