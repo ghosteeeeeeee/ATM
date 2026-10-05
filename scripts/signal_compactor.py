@@ -2633,8 +2633,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                           _cont_row_data.get('ema300_position') == 'BELOW'))
                         # FIX T 2026-10-04: structural bull any phase — mirror bear 2026-09-20.
                         # Was phase-gated RECOVERY/CALM/NEUTRAL; DECLINING+BULL+ABOVE blocked LONGs during pump.
+                        # FIX 2026-10-05: ema AT counts as bullish — BTC can be LEAN_BULL + ema=AT
+                        # (recovered to EMA, not yet crossed above). Requiring ABOVE only missed this
+                        # transitional state, blocking LONGs during live pumps (score 77, 22min AT).
                         _cont_bullish = (_cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
-                                         _cont_row_data.get('ema300_position') == 'ABOVE')
+                                         _cont_row_data.get('ema300_position') in ('ABOVE', 'AT'))
 
                         if direction.upper() == 'SHORT' and _cont_bearish:
                             _btc_mom_ok_for_bypass = True
@@ -3701,8 +3704,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             # FIX 2026-10-04: relaxed — phase can lag behind momentum
                             # When linreg=LEAN_BULL + ema=ABOVE, phase may still say DECLINING
                             # Trust momentum indicators over lagging phase
+                            # FIX 2026-10-05: ema AT counts — same transitional-state fix as _cont_bullish
                             _lrc_bullish = (_lrc_linreg in ('LEAN_BULL', 'BULL') and
-                                            _lrc_ema == 'ABOVE')
+                                            _lrc_ema in ('ABOVE', 'AT'))
                             if _lrc_bullish:
                                 _lrc_bullish_override = True
                 except Exception:
