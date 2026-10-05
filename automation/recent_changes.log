@@ -4007,3 +4007,7 @@ BY: auto_1hr
 DB-verified: 2T last hour BOTH WINS SAGA+USELESS bb-squeeze+ profit-monster-trail +$0.07 | 24h 34T ~flat atr_sl_hit 1/34=2.9% not dominant | open 4 flat
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 10T -$1.73 | freeze until Oct 6
+BY: auto_1hr
+DB-verified: 2T last hour BABY bb-bounce-v2-long+ trail +$0.11 + SUPER bb-squeeze+ trail -$0.01 | 24h 34T 58.8%WR -$0.23 atr_sl_hit 1/34=2.9% not dominant | open 4 flat LONG LDO/ARB/HYPE/MNT
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: 24h -$0.23 | bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 9T -$1.49 | 0cb0784b freeze-violation candidate awaiting CEO ratify/revert

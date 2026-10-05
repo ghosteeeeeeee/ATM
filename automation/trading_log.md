@@ -3629,3 +3629,26 @@ BY: auto_1hr
 - 4 open trades flat — no urgency.
 - doji-bottom-long / pump-chain- / continuation+ 0%WR n=1 — below kill, watch.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 00:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — BABY bb-bounce-v2-long+ +$0.11 (2.95%) profit-monster-trail | SUPER bb-squeeze+ -$0.01 (-0.24%) profit-monster-trail
+**PnL:** +$0.10 last hour (50% WR) | 24h: 34T 20W 14L -$0.23 (WR: 58.8%) | Open: 4 (LDO/ARB/HYPE/MNT all flat LONG)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** BABY winner exited trail with +2.95% — clean. SUPER tiny loss -$0.01 (-0.24%) on trail, negligible adverse excursion.
+- **atr_sl_hit >40%:** 1/34 (2.9%) of 24h closes. Dominant exits: profit-monster-trail 20T +$1.29 (59%), hard_max_loss 9T -$1.49 (26%). tpsl_utils.py fix deployed and stable. hard_max_loss is intentional hard-stop family, not a tight-SL bug.
+- **Kill rule:** Last hour 1T/signal max (bb-squeeze+ 0W n=1, bb-bounce-v2-long+ 1W n=1). 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long / continuation+ 1T 0%WR — n=1, below kill threshold. No kill.
+- **Negative PnL streak:** 12h hours: 13:-$0.25, 15:+$0.04, 16:-$0.20, 17:+$0.01, 18:+$0.06, 19:+$0.36, 21:-$0.24, 22:+$0.06, 23:+$0.11. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- hard_max_loss family 9T -$1.49 remains sole 24h loss concentration — post-freeze review stop placement (bug_hunter still owns semantics; DO NOT change CUT_LOSER_PNL).
+- bb-bounce-v3-long+ 24h worst (9T -$0.42) — has wins, below kill threshold. Regime-block 0cb0784b (NORMAL 0.0x) shipped during freeze — CEO ratify/revert pending (brain_auditor 23:38 flagged).
+- 4 open trades flat LONG (LDO/ARB/HYPE/MNT) — no urgency.
+- doji-bottom-long / continuation+ 0%WR n=1 — below kill, watch.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
