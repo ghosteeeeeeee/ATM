@@ -1,28 +1,34 @@
-# Health Report — 2026-10-04 13:46 UTC
+# Health Report — 2026-10-05 09:47 UTC
 
 ## Pipeline: OK
-- Status: **active** (hermes-pipeline.service), LIVE run 13:46:00 rc=0
-- Position manager: healthy, rc=0 every cycle, 3/6 slots used
-- Signals (1h): **82** generated
-- Trades: **3 open** | **34–35 closed today** | PnL **-12.8% → -15.4%** (source of truth = position_manager)
-- Errors in 30m: **0** (no Traceback/CRASH/exception)
+- Status: **active** (hermes-pipeline.service), LIVE cycle every 1m, all steps rc=0
+- Position manager: healthy — 3/6 open slots, rc=0 every cycle, 1 ATR adjust in last cycle
+- Signals (1h): **110** in `signals` table
+- Trades: **3 open** | **35 closed today** | PnL **-13.07%**
+  - Open: SAND SHORT -0.65% (mtf-regime-trend-), ETH LONG +0.01% (bb-bounce-v2-long+), HBAR SHORT +0.60% (pump-chain-)
+  - Closed page (200 rolling): 55.5% WR (111/200), +1.13 USDT
+- Errors in 30m: **0** Traceback/CRASH in pipeline (position_manager rc=0 all cycles)
 
 ## Market
-- Regime: **LONG_BIAS** (34 LONG / 6 SHORT / 77 NEUTRAL, 117 tokens, ts 13:45)
-- Speed: **53.5%** tokens ≥ 50th percentile (129/241, updated 13:46:22)
+- Regime: **SHORT_BIAS** (3 LONG / 67 SHORT / 47 NEUTRAL, 117 tokens, ts 09:45)
+- Macro gate: LONG=REDUCE, SHORT=FULL (wr=65%)
+- Speed: **52.7%** tokens ≥ 50th percentile (127/241)
 
 ## System
-- Services: pipeline **active**, hl-sync-guardian **active**, price-collector **active**
-- Core timers firing: pipeline (1m), price-collector, signal-compactor, pump-hunter, 1m-candle, watchdog, coin-tracker, regime scanners
-- Disk: **81%** used (under 85% threshold)
-- Prices: fresh — regime_5m 1.7m, token_speeds 13:46:22
-- Logs: 150M, no files >7d needing compression
+- Core timers: **all 3 active** — price-collector (last 09:43:38→next ~09:46), 1m-candle (09:43:49), pipeline (09:46:00)
+- Services: pipeline **active**, hl-sync-guardian **active**
+- Disk: **82%** used (91G/118G, 21G free) — under 85% threshold
+- Prices: trades.json 0.1min, signals.json 0.9min, coin_tracker_data.json 09:46 (~1min, at /var/www/html/ by design)
+- Coins collected: 85 prices most cycles (one zero-price cycle at 09:43:38, recovered next run)
+- Phantom atr_sl_hit (<0.01% PnL, 24h): **0**
 
 ## Auto-fixes applied
-- None required. Pipeline healthy, prices fresh, disk under threshold, no crashes, signals flowing.
+- **None required.** No crashes, no stuck timers, prices fresh, disk under threshold. Recurring candles.db lock contention is write contention (pipeline + 1m-candle + price-collector write concurrently) — not a stuck lock; stopping services would not fix it and risks the timer path (same call as 06:49 report). Code-level fix still pending: serialize candle writers / raise busy_timeout beyond 30–60s.
 
 ## Alerts
-- **WARN** (known): `signal_outcomes` partial vs portfolio — use position_manager/trades.json for trade counts.
-- **WARN** (known, non-trading-path): dead timers `hermes-atr-sl-updater.timer` (not-found), `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` (OnBootSec by design).
-- **INFO**: 113/241 token_speeds have `is_stale=1` but updated_at is fresh — flag = no recent price move, not staleness.
-- **INFO**: today's PnL -15.4% — trading performance, not system health.
+- **WARN** (recurring): `hermes-price-collector.service` — 46 lock-related events in last 60m (`database is locked` / `database table is locked` on candles.db). Aggregation (5m/15m/1h/4h) + wal_checkpoint + `_store_candles` + seeder all contend. Services self-recover; raw prices still collected. One cycle collected 0 prices (09:43:38) — recovered. **Root-cause fix still pending in code, not systemd.**
+- **WARN** (known): `signals` table has 22,174 rows total — cleanup needed, not a runtime failure.
+- **INFO**: `signal_outcomes` open=0 vs portfolio open=3 — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md).
+- **INFO**: `systemctl list-timers hermes-*` glob returns 0 (systemd glob quirk); explicit unit names confirm all timers healthy.
+- **INFO**: hotset.json empty this cycle — no signals survived compaction / none above 50% confidence to execute. Not an error.
+- **INFO**: today PnL -13.07% is trading performance, not system health.

@@ -2791,5 +2791,14 @@
     "category": "monitoring",
     "status": "suggested_prior_run_reconfirmed",
     "risk": "none (read-only monitor)"
+  },
+  {
+    "date": "2026-10-05T10:37:10Z",
+    "idea": "MFE proof-of-life filter for STANDALONE_BYPASS entries — require net 1m price movement in trade direction >= 0.05% over last 3 candles before standalone bypass can open a trade",
+    "rationale": "hard_max_loss is #1 loss family (14d ≈ -$6.22 across top signals, all 0% WR). Watchdog confirms MFE~0.125% on losers = price never moved in trade direction before stop. Winners in same signals trail via profit-monster (bb-squeeze+ 46T 82.6% +$2.63/7d). A pre-entry directional movement check catches 'entries that never worked' at detection time without blocking momentum already in motion. STANDALONE_BYPASS is the common path for all these bleeding signals.",
+    "expected_impact": "Reduce hard_max_loss bleed without touching exit configs (P2 verdict: configs near-optimal). Estimated: block 30-50% of hard_max_loss entries if pre-entry momentum is as weak as MFE suggests. Needs backtest against 7d profit-monster winners before any implementation.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]
