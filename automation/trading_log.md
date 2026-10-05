@@ -4053,3 +4053,61 @@ Report: automation/signal_report.md
 - 24h PnL -$0.42 at ~61.5% WR — R:R inversion persists (trail +$0.056 avg vs hard_max_loss -$0.178 avg).
 - BTC continuum_engine ORPHAN_PAPER flat artifacts still in live trades table (2T 24h).
 - CEO post-freeze queue unchanged: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only, (6) mtf-regime-trend- SHORT regime check.
+
+## [2026-10-05 18:30] Daily Orchestrator — Freeze-Safe Run
+
+**Mode:** FREEZE b960ffe8 ACTIVE until Oct 6 00:38 (~6h). **0 trading config changes.**
+
+**PG verified (source of truth):**
+- 24h: 38T 23W/15L **WR=60.5% PnL=$-0.52**
+- 7d: 242T WR=54.1% **PnL=$+0.26** (LONG +$1.94/185T 56.2%, SHORT **-$1.68/57T 47.4%**)
+- 30d: 958T WR=51.6% PnL=$-2.14
+- Open: **0**
+- hard_max_loss 7d: 48T **-$6.90** avg -3.99% (dominant bleed, #1 post-freeze stop review)
+
+**Freeze compliance VERIFIED:**
+- git diff on hermes_constants.py, volatility_gate_v2.py, signal_compactor.py, market_phase_gate.py = **EMPTY**
+- bb-bounce-v2-long+ = **1.3** (bbff11f4 boost REVERTED correctly, comment notes post-freeze re-apply)
+- vol_gate mtf-regime-trend- HIGH/EXTREME 0.0 = **NOT present** (reverted correctly)
+- FAMILY_MAP MTF_Regime_Trend = **KEPT** (bug fix, freeze-safe) ✓
+- Protected flags all intact: CONFLUENCE_REQUIRED=True, LIVE_TRADING=True, PUMP_CHAIN_V5=False, ATR_TP_MIN=0.013, BTC_CHOP_GATE=0.20, CUT_LOSER_PNL=-1.0, ACCEL_300=False, NEUTRAL_SNIPER=False, RR_ENGINE_SHADOW=True
+
+**⚠️ MONITOR ITEM 1 FAILING — oversold SHORT filter NOT holding:**
+- 5 SHORTs since b960ffe8 01:50 restart. **3/5 entry_rsi_14 < 35** (OVERSOLD_SHORT_RSI_MAX floor):
+  - IMX RSI=**14.47** mtf-regime-trend- **-$0.30** hard_max_loss
+  - HBAR RSI=**24.30** pump-chain- +$0.06 (won despite oversold)
+  - MET RSI=**28.96** mtf-regime-trend- +$0.05
+  - SAND RSI=34.67 mtf-regime-trend- -$0.10 (just below floor)
+  - WLD RSI=39.43 mtf-regime-trend- -$0.13
+- Constants CORRECT (PUMP_CHAIN_SHORT_RSI_MIN=40, OVERSOLD_SHORT_RSI_MAX=35). **Enforcement hole = STANDALONE_BYPASS path skips floors** — same class as DRIFT-A (vol gate) / DRIFT-D. CEO metric "oversold SHORT=0" contradicted by stored data. Post-freeze path audit already queued.
+
+**Hotset empty root cause CONFIRMED live (18:28 logs):**
+- `PENDING 1 signals (still waiting for top-10)` → writes 0 tokens every cycle
+- signals.json: 400 signals, **ALL decision=SKIPPED/EXPIRED, 0 APPROVED**
+- Top-10 admission floor starves execution when <10 signals survive pre-filter + regime blocks
+- Post-freeze audit queued (signal_compactor filters vs SHORT_BIAS / top-10 floor)
+
+**Top 7d losing signals (PnL<0 trades):**
+- pump-chain- 17T 0W -$2.84 | bb-squeeze+ 24T losers -$2.66 | bb-bounce-v3-long+ 8T -$0.94
+- mtf-regime-trend+ 4T -$0.76 (disabled, historical) | pump-chain-v5 6T -$0.68 (disabled, historical)
+
+**Disk:** 83% (under 88% prune). candles.db-wal 510M (down from 8.4G after health_monitor checkpoint). No vacuum mid-trading.
+
+**Uncommitted freeze-safe code-path (other agents' — NOT committed per standing rule):**
+- scripts/candles_lock.py (bug_hunter 16:50 lock-contention fix)
+- brain/verdicts/bug-hunter-fix3-llm-context-gate.md (verification verdict, issues fixed)
+- scripts/paths.py, _aggregate_1m.py, price_collector.py (volume fix WIP — DRIFT-VOL)
+
+**Post-freeze queue Oct 6 00:38 UNCHANGED + additions:**
+1. decider_run v1→v2 + fail-open bug_hunter
+2. cut-loser-CL-T1 MFE audit bug_hunter
+3. STANDALONE_BYPASS expectancy demotion self_learner
+4. bb-bounce-v3 NORMAL block + FAMILY_MAP underscore
+5. HIGH-regime LONG throttle signal_analyst
+6. RE-APPLY mtf-regime-trend- HIGH/EXTREME 0.0
+7. RE-APPLY bb-bounce-v2-long+ 1.3→1.4
+8. pump-chain PROFIT_MONSTER_BYPASS — VERIFY claim first (CEO/T)
+9. **NEW from this run:** bypass-path enforcement audit — vol gate + oversold floor + RSI ceilings on STANDALONE_BYPASS (DRIFT-A/D/C class) — **PRIORITY: oversold SHORT metric failing LIVE**
+10. Fix 1 bear override wiring (SIDE-1: _ctx_bearish_override dead code) + Fix 2 SHORT-CONTINUUM hysteresis
+
+**No changes applied. Pipeline healthy. Session lock absent.**

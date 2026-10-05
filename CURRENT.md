@@ -1,7 +1,21 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-05 17:55 UTC**
-**Updated by: CEO — freeze violation revert (bbff11f4 + uncommitted hermes_constants)**
+**Last Updated: 2026-10-05 18:30 UTC**
+**Updated by: daily_orchestrator — freeze-safe run, oversold SHORT metric FAILING**
+
+## ORCHESTRATOR RUN 18:30 — FREEZE-SAFE, 0 CONFIG CHANGES
+
+**Freeze b960ffe8 until Oct 6 00:38 (~6h). Freeze compliance VERIFIED:** git diff on constants/vol_gate/compactor/market_phase_gate = EMPTY; bb-bounce-v2-long+ = 1.3 (revert OK); mtf-regime-trend- HIGH/EXTREME 0.0 absent (revert OK); FAMILY_MAP MTF_Regime_Trend KEPT; 9 protected flags intact.
+
+**PG verified 18:30:** 24h **38T 60.5%WR −$0.52** | 7d **242T 54.1%WR +$0.26** (LONG +$1.94/185T 56.2%, SHORT **−$1.68/57T 47.4%**) | 30d **958T 51.6%WR −$2.14**. Open **0**. hard_max_loss 7d **48T −$6.90 avg −3.99%** dominant bleed.
+
+**⚠️ MONITOR #1 FAILING — oversold SHORT filter NOT holding.** 5 SHORTs since b960ffe8 01:50. **3/5 entry_rsi_14 < 35** (OVERSOLD_SHORT_RSI_MAX floor): IMX RSI=**14.47** mtf-regime-trend- −$0.30 hard_max_loss, HBAR RSI=**24.30** pump-chain- +$0.06, MET RSI=**28.96** mtf-regime-trend- +$0.05, SAND 34.67 −$0.10, WLD 39.43 −$0.13. **Constants CORRECT; STANDALONE_BYPASS skips floors** — DRIFT-A/D enforcement hole, not value bug. CEO metric "oversold SHORT=0" contradicted by PG.
+
+**Hotset empty root cause CONFIRMED live:** `PENDING 1 signals (still waiting for top-10)` → writes 0 every cycle; signals.json 400/400 SKIPPED/EXPIRED.
+
+**Post-freeze queue Oct 6 00:38 (orchestrator-updated):** (1) decider_run v1→v2 + fail-open bug_hunter (2) cut-loser-CL-T1 MFE audit bug_hunter (3) STANDALONE_BYPASS expectancy demotion self_learner (4) bb-bounce-v3 NORMAL block + FAMILY_MAP underscore (5) HIGH-regime LONG throttle signal_analyst (6) RE-APPLY mtf-regime-trend- HIGH/EXTREME 0.0 (7) RE-APPLY bb-bounce-v2-long+ 1.3→1.4 (8) pump-chain PROFIT_MONSTER_BYPASS — VERIFY claim first (9) **NEW PRIORITY: bypass-path enforcement audit** — vol gate + oversold floor + RSI ceilings on STANDALONE_BYPASS (DRIFT-A/D/C; oversold metric failing LIVE) (10) Fix 1 bear override wiring (SIDE-1 dead code) + Fix 2 SHORT-CONTINUUM hysteresis.
+
+**Disk 83%.** Uncommitted freeze-safe code-path (other agents', NOT committed): candles_lock.py, paths.py, _aggregate_1m.py, price_collector.py (DRIFT-VOL WIP), bug-hunter-fix3 verdict.
 
 ## CEO RUN 17:55 — FREEZE VIOLATION REVERT
 
@@ -100,7 +114,7 @@
 
 **FREEZE VIOLATIONS:** 2 reverted by CEO 17:49 (b5006cd8 BTC_CHOP_GATE, 18f780ac PUMP_CHAIN_V5). No new violations since — constants/gates clean. ATR_TP_MIN=0.013 remains live.
 
-**b960ffe8 checkpoint:** 1 SHORT since restart 01:50 (RESOLV mtf-regime-trend-, entry_rsi=82.02, closed +1.51%). **Oversold SHORT filter HOLDING** — n=1, RSI well above floor=40. 48h monitor continues to Oct 6 00:38.
+**b960ffe8 checkpoint (18:30):** 5 SHORTs since restart 01:50 — **3/5 oversold (RSI<35)**: IMX 14.47 −$0.30, HBAR 24.30 +$0.06, MET 28.96 +$0.05, SAND 34.67 −$0.10, WLD 39.43 −$0.13. **Oversold SHORT filter FAILING** — bypass path skips OVERSOLD_SHORT_RSI_MAX=35 (DRIFT-A/D class). Constants correct. Post-freeze path audit PRIORITY #9. Monitor continues to Oct 6 00:38.
 
 **WORST SIGNAL: bb-bounce-v3-long+** 24h 9T -$0.68 33.3%WR. 7d by regime: HIGH 5T 80% +$0.11 (KEEP), NORMAL 15T 46.7% -$0.51 (block candidate). Post-freeze plan stands: NORMAL 0.0x + HIGH 1.0x regime-block + FAMILY_MAP underscore fix. Kill threshold NOT met.
 
@@ -126,7 +140,7 @@
 |--------|---------|--------|----------|
 | 24h PnL | −$0.46 | ≥ $0 | next run |
 | SHORT 7d PnL | −$1.67 | ≥ $0 | 2026-10-07 |
-| Oversold SHORT entries post-fix | 0 new (monitor to Oct 6) | 0 oversold | Oct 6 00:38 |
+| Oversold SHORT entries post-fix | **FAILING: 3/5 <35 since b960ffe8** | 0 oversold | post-freeze bypass audit |
 | 7d PnL | +$0.29 | +$3.00 | 2026-10-06 |
 | 30d PnL | −$2.01 | ≥ $0 | 2026-10-11 |
 | cut-loser-CL-T1 7d bleed | queued post-freeze | reduced ≥50% | 2026-10-11 |
@@ -163,7 +177,7 @@
 
 ## Monitor List (next 48h)
 
-1. **ZERO oversold SHORT entries** 48h post b960ffe8 — Status: 1 SHORT (RSI 82, not oversold) — filter holding. (self_learner)
+1. **ZERO oversold SHORT entries** 48h post b960ffe8 — **Status: FAILING (18:30).** 5 SHORTs since 01:50, **3/5 entry_rsi_14<35** (IMX 14.47, HBAR 24.30, MET 28.96). Bypass-path enforcement hole (DRIFT-A/D). Post-freeze path audit PRIORITY. (self_learner + bug_hunter)
 2. **SHORT 7d PnL ≥ $0 by 2026-10-07.**
 3. **24h PnL back ≥ $0** — -$0.87 this run.
 4. **bb-bounce-v3-long+** — post-freeze NORMAL regime-block + DRIFT-005 path audit.
@@ -192,7 +206,8 @@
 - **DELEGATE bug_hunter:** hard_max_loss semantics fix path (needs numbers).
 - **DELEGATE bug_hunter:** fees JSON vs pnl_usdt accounting gap.
 - **DELEGATE bug_hunter:** DRIFT-005 path audit (enforce existing RSI_MAX=55).
-- **DELEGATE self_learner:** 48h zero-oversold SHORT verification (n=1 RSI 82 so far).
+- **DELEGATE self_learner:** 48h oversold SHORT verify — **FAILING n=5, 3/5 <35** (see Monitor #1). Post-freeze bypass audit is the fix path.
+- **DELEGATE bug_hunter (NEW PRIORITY):** bypass-path enforcement audit — vol gate + oversold floor + RSI ceilings on STANDALONE_BYPASS (DRIFT-A/D/C). Oversold metric failing LIVE.
 - **DELEGATE signal_analyst:** scanner retune; EXTREME+RSI>=40 SHORT habitat; ema_reclaim coverage; doji execution path; mover+ entry quality; coin_tracker Wyckoff.
 - **DELEGATE signal_reporter plan (post-freeze Oct 6):** bb-bounce-v3-long+ NORMAL 0.0x + HIGH 1.0x + FAMILY_MAP underscore fix.
 - **T ack required:** AGENTS.md philosophy amendment.
