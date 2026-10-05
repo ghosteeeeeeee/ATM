@@ -1,438 +1,329 @@
 {
-  "timestamp": "2026-10-05T01:37:23Z",
+  "timestamp": "2026-10-05T04:45:00Z",
   "agent": "brain_auditor",
-  "mode": "report_only_freeze_b960ffe8",
-  "freeze": "b960ffe8 until 2026-10-06 00:38 UTC — 0 trading config changes this run",
+  "freeze_status": "ACTIVE b960ffe8 until Oct 6 00:38 — 0 trading config VALUES changed this run",
   "session_lock": "absent",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_hits": [
-      "exit system is #1 profit leak (train-to-trade, 0.991)",
-      "chasing entries root cause recurring (multiple sessions)",
-      "bb-bounce-v3 regime split confirmed NORMAL worst",
-      "trend following / new signal ideas discussed but deferred"
+    "queries_run": ["signal performance winrate regime", "new signal idea improvement strategy edge", "loss money bleeding losing exit hard_max_loss"],
+    "top_insights": [
+      "exit system is #1 profit leak (30d): hard_max_loss/atr_sl_hit dominate losses, profit-monster-trail is the only big winner",
+      "trend following + grind-to-spike signals still discussed but unbuilt (backlog)",
+      "signal decay / regime memory pattern: high-WR signals lose when market regime shifts — species-of-fish problem",
+      "RR engine already computes grade D (R:R<1) but runs in SHADOW mode — not blocking live"
     ]
   },
   "trade_summary_24h": {
     "trades": 37,
-    "pnl_usdt": -0.04,
-    "wr_pct": 62.2,
-    "by_signal_direction": [
-      [
-        "bb-bounce-v3-long+",
-        "LONG",
-        9,
-        -0.42,
-        44.4
-      ],
-      [
-        "doji-bottom-long",
-        "LONG",
-        1,
-        -0.25,
-        0.0
-      ],
-      [
-        "continuation+",
-        "LONG",
-        1,
-        -0.02,
-        0.0
-      ],
-      [
-        "bb-squeeze+",
-        "LONG",
-        19,
-        0.27,
-        68.4
-      ],
-      [
-        "pump-chain+",
-        "LONG",
-        2,
-        0.14,
-        100.0
-      ],
-      [
-        "bb-bounce-v2-long+",
-        "LONG",
-        2,
-        0.13,
-        100.0
-      ],
-      [
-        "mtf-regime-trend-",
-        "SHORT",
-        1,
-        0.06,
-        100.0
-      ]
+    "win_rate": 59.5,
+    "pnl_usdt": -0.48,
+    "trades_7d": 229,
+    "wr_7d": 55.0,
+    "pnl_7d": 1.38,
+    "open": 3,
+    "regime_7d": {"EXTREME": 1.97, "FLAT": 0.36, "NORMAL": -0.32, "HIGH": -0.71},
+    "worst_signals_7d": [
+      {"signal": "mtf-regime-trend+", "n": 9, "wr": 44.4, "pnl": -0.46},
+      {"signal": "accel-300-", "n": 8, "wr": 37.5, "pnl": -0.34},
+      {"signal": "bb-bounce-v3-long+", "n": 19, "wr": 52.6, "pnl": -0.33},
+      {"signal": "pump-chain-", "n": 35, "wr": 48.6, "pnl": -0.22},
+      {"signal": "pump-chain-v5", "n": 10, "wr": 40.0, "pnl": -0.21}
     ],
-    "seven_day": {
-      "trades": 225,
-      "pnl_usdt": 1.31,
-      "wr_pct": 54.7,
-      "long": {
-        "trades": 172,
-        "pnl": 2.56,
-        "wr": 56.4
-      },
-      "short": {
-        "trades": 53,
-        "pnl": -1.25,
-        "wr": 49.1
-      }
+    "best_signals_7d": [
+      {"signal": "volume-breakout-long+", "n": 5, "wr": 80.0, "pnl": 1.85},
+      {"signal": "pump-chain+", "n": 10, "wr": 70.0, "pnl": 1.09},
+      {"signal": "bb-squeeze+", "n": 59, "wr": 62.7, "pnl": 0.44}
+    ],
+    "exit_paths_14d": {
+      "profit-monster-trail": {"n": 141, "wr": 70.9, "pnl": 6.13},
+      "atr_trail_hit": {"n": 8, "wr": 100.0, "pnl": 1.58},
+      "pump_exit_dead_money": {"n": 25, "wr": 60.0, "pnl": 1.29},
+      "atr_sl_hit": {"n": 62, "wr": 33.9, "pnl": -5.60},
+      "hard_sl": {"n": 41, "wr": 36.6, "pnl": -2.36},
+      "hard_max_loss": {"n": 44, "wr": 0.0, "pnl": -6.12}
     },
-    "fourteen_day_exits": {
-      "atr_sl_hit": {
-        "trades": 67,
-        "pnl": -5.98,
-        "wr": 32.8,
-        "avg_lev": 3.8
-      },
-      "hard_max_loss": {
-        "trades": 42,
-        "pnl": -5.84,
-        "wr": 0.0,
-        "avg_lev": 4.1
-      },
-      "hard_sl": {
-        "trades": 41,
-        "pnl": -2.36,
-        "wr": 36.6,
-        "avg_lev": 4.1
-      },
-      "profit_monster_trail": {
-        "trades": 138,
-        "pnl": 6.09,
-        "wr": 71.0,
-        "avg_lev": 4.1
-      }
-    },
-    "seven_day_regime": {
-      "EXTREME": {
-        "trades": 91,
-        "wr": 54.9,
-        "pnl": 1.97
-      },
-      "HIGH": {
-        "trades": 66,
-        "wr": 56.1,
-        "pnl": -0.71
-      },
-      "NORMAL": {
-        "trades": 57,
-        "wr": 56.1,
-        "pnl": -0.35
-      },
-      "FLAT": {
-        "trades": 6,
-        "wr": 50.0,
-        "pnl": 0.32
-      }
+    "hard_max_loss_leverage_14d": {
+      "lev_3": {"n": 22, "avg_price_move_pct": 1.03, "avg_account_loss_pct": 3.10, "pnl": -2.98},
+      "lev_5": {"n": 23, "avg_price_move_pct": 0.90, "avg_account_loss_pct": 4.51, "pnl": -3.26}
     }
   },
-  "losing_trade_autopsy_24h": {
-    "total_losers": 13,
-    "by_exit": {
-      "hard_max_loss": 9,
-      "atr_sl_hit": 1,
-      "profit_monster_trail": 2,
-      "UNIVERSAL_MAX_HOLD": 1
-    },
-    "cluster_analysis": {
-      "signal": "bb-bounce-v3-long+",
-      "losers": [
-        "NXPC RSI=43.79 NORMAL hard_max_loss -$0.02",
-        "CFX RSI=30.81 NORMAL hard_max_loss -$0.26",
-        "SUSHI RSI=55.43 NORMAL hard_max_loss -$0.12",
-        "ME RSI=59.09 NORMAL hard_max_loss -$0.24"
+  "watchdog_input": {
+    "steers_received": [
+      "cluster HBAR+SAGA (11min), SAGA+HYPE (23min)",
+      "5-9 recent losses wrong-side",
+      "bb-squeeze+ losing streak 4",
+      "bb-bounce-v3-long+ losing streak 4",
+      "HBAR SHORT entered oversold RSI 24.3 — BANANA lesson repeat",
+      "net-long book vs SHORT_BIAS breadth 79/117",
+      "loser signals: pullback-entry- 0/7, mover- 0/3, pump-chain- 47%WR",
+      "continuum_data BTC feed stuck ~84784 vs exchange ~86k",
+      "post-expansion squeeze gate: SUPER/LDO entered bb_position>1.0 with volume_spike<0.5",
+      "execution desync: CC/ZEN EXECUTED with no PG rows"
+    ],
+    "audit_response": "HBAR root-caused (see losing_trade_autopsy). pullback-entry- 30d actually 119T +$0.35 52.1% — watchdog 0/7 is 24h window noise, do NOT disable. mover- 30d 12T -$0.20 below sample floor. bb-squeeze+/bb-bounce-v3 streaks investigated below. continuum feed + CC/ZEN desync = systems fixes, not signal kills."
+  },
+  "losing_trade_autopsy": [
+    {
+      "losing_trade": "HBAR SHORT pump-chain- trade 15935 (still OPEN, now +0.80% — watchdog data stale)",
+      "signal": "pump-chain-",
+      "regime": "NORMAL",
+      "root_cause": "PRESERVE-APPROVED-UPSERT re-injected signal after EXEC-RSI-HARD-FLOOR fail-closed block. Detection RSI=56.63 (valid) → execution entry_rsi_14=24.30 (invalid). BANANA lesson repeat via preserve-path hole, NOT via missing constant.",
+      "entry_check": "metadata rsi_14=56.63 detect / 24.30 stored at entry. is_stale=True. gap_at_entry=-0.521%. signal-analyst at 03:21:02: rsi=20 wr=25% deploy=REDUCE — IGNORED (conf still 99). Spike+vel filters SKIPPED (bearish override). RR engine: R:R=0.90 grade=D → 0.70x penalty only (shadow mode).",
+      "log_chain": [
+        "03:21:00 CONFLUENCE-GATE-PASS pump-chain- standalone",
+        "03:21:00 SPIKE-FILTER SKIPPED + VEL-FILTER SKIPPED (bearish override)",
+        "03:21:00 RR PENALTY R:R=0.90 grade=D → mult=0.70 (not a block)",
+        "03:21:02 signal-analyst PASS deploy=REDUCE rsi=20 wr=25% — ignored",
+        "03:21:22 EXEC: conf=99 [pump-chain-]",
+        "03:21:22 mark_signal_executed signal_id=1656734",
+        "03:21:22 EXEC-RSI-HARD-FLOOR BLOCKED — candle data stale/insufficient — fail-closed",
+        "03:21:22 TRADE FAILED — signal NOT rolled back (prevents retry loop)",
+        "03:22:00 PRESERVE-APPROVED-UPSERT — APPROVED row re-upserted",
+        "03:22:28 trade opened PG trade_id=15935 entry_rsi_14=24.30 lev=5"
       ],
-      "root_cause": "All 4 opened in NORMAL regime where ('NORMAL','bb-bounce-v3-long'):0.0 gate is LIVE but STANDALONE_BYPASS path (signal_compactor.py:2943) sets pass_gate=True without consulting vol gate. DRIFT-A. Not an entry-condition problem — the regime block that should have stopped them is theater.",
-      "entry_check": "RSI range 30.8-59.1 — within BB_BOUNCE_V3_RSI_MIN=25..MAX=55 band for most. CFX RSI=30.81 near oversold floor. Entries were signal-valid; regime was wrong.",
-      "regime_check": "ALL 4 NORMAL. 14d NORMAL: 15T 46.7% -$0.43. HIGH: 6T 66.7% +$0.09. Gate correct, enforcement broken.",
-      "recommended_change": "Post-freeze: standalone-bypass branch hard-skip when combined_mult==0.0 (DRIFT-A fix). Then flip BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1→0.0 (DRIFT-B).",
-      "impact_on_winners": "14d NORMAL bb-bounce-v3 winners: 8T +$0.44 would also be blocked. Net: block 15T -$0.43, lose 8T +$0.44 → wash on PnL but removes 46.7% WR cell. HIGH 6T +$0.09 preserved.",
-      "confidence": "HIGH"
-    },
-    "other_losers": {
-      "SUPER bb-squeeze+ RSI=100": "NOT wrong-side per data — bb-squeeze RSI>=85 band 14d 10T 70% +$0.21 is BEST band. Momentum continuation at high RSI is the edge. Trail exit -$0.01 = noise.",
-      "SEI bb-squeeze+ RSI=60.54": "hard_max_loss -$0.24 lev=5 — leverage geometry issue (DRIFT hard_max_loss semantics), not entry.",
-      "SYRUP doji-bottom RSI=61.91": "hard_max_loss -$0.25 — doji-bottom 7d 8T below 20T sample floor. Monitor, no action.",
-      "ENS bb-bounce-v3 RSI=86.34": "UNIVERSAL_MAX_HOLD -$0.04 — RSI=86.34 exceeds BB_BOUNCE_V3_RSI_MAX=55. Bypass may have skipped RSI ceiling (DRIFT-C class). Small loss."
+      "regime_check": "NORMAL — vol gate allows pump_chain- NORMAL at 1.0x. HIGH is blocked. Regime not the issue; entry RSI + preserve path are.",
+      "recommended_change": "BUG_HUNTER (post-freeze, top priority): trace mark_signal_executed status vs preserve source query. When exec-RSI fail-closed blocks a trade, signal must be marked blocked/expired so PRESERVE-APPROVED-UPSERT cannot re-inject it. Do NOT change SHORT_RSI_FLOOR / SHORT_RSI_HARD_FLOOR / PUMP_CHAIN_SHORT_RSI_MIN values — they are correct (14d pump-chain- RSI<25: 15T 13.3%WR -$1.63; RSI>=60: 9T 66.7% +$0.54).",
+      "impact_on_winners": "This is a path-correctness fix, not an RSI value change. Existing floors already block RSI<40; the hole is preserve re-approval after fail-closed. No winner impact from enforcing the block that already fired.",
+      "confidence": "HIGH",
+      "status": "queued_post_freeze"
     }
-  },
-  "signal_quality_deep_dive": {
-    "bb_bounce_v3_long_plus": {
-      "fourteen_day": {
-        "total": 23,
-        "pnl": -0.29
-      },
-      "by_regime": {
-        "NORMAL": {
-          "trades": 15,
-          "wr": 46.7,
-          "pnl": -0.43,
-          "verdict": "BLOCK — gate coded 0cb0784b, bypass ignores it"
-        },
-        "HIGH": {
-          "trades": 6,
-          "wr": 66.7,
-          "pnl": 0.09,
-          "verdict": "KEEP — 1.0x"
-        },
-        "FLAT": {
-          "trades": 1,
-          "wr": 100.0,
-          "pnl": 0.05,
-          "verdict": "KEEP — n=1 noise"
-        }
-      },
-      "by_rsi_band_14d": {
-        "<35": {
-          "trades": 5,
-          "wr": 80.0,
-          "pnl": -0.09
-        },
-        "35-45": {
-          "trades": 5,
-          "wr": 40.0,
-          "pnl": 0.05
-        },
-        "45-55": {
-          "trades": 3,
-          "wr": 33.3,
-          "pnl": -0.11
-        },
-        "55-65": {
-          "trades": 6,
-          "wr": 66.7,
-          "pnl": -0.13
-        },
-        ">=65": {
-          "trades": 4,
-          "wr": 50.0,
-          "pnl": 0.03
-        }
-      },
-      "note": "RSI bands too small (n=3-6) for filter suggestions. Regime split is the actionable cut."
-    },
-    "theater_quantification": {
-      "definition": "Trades opened in cells where volatility_gate_v2 SIGNAL_TYPE_OVERRIDES returns 0.0 (hard block) but signal is ALSO in STANDALONE_BYPASS_SIGNALS — bypass path ignores the block.",
-      "fourteen_day_total": {
-        "trades": 45,
-        "pnl": -1.92
-      },
-      "cells": [
-        {
-          "regime": "EXTREME",
-          "signal": "bb-squeeze+",
-          "trades": 13,
-          "wr": 46.2,
-          "pnl": -0.25,
-          "note": "gate says block, 13 opened"
-        },
-        {
-          "regime": "HIGH",
-          "signal": "pump-chain+/-",
-          "trades": 11,
-          "wr": 18.2,
-          "pnl": -0.96,
-          "note": "gate says block, 11 opened, 18.2% WR"
-        },
-        {
-          "regime": "HIGH",
-          "signal": "accel-300-",
-          "trades": 5,
-          "wr": 0.0,
-          "pnl": -0.32,
-          "note": "gate says block, 5 opened, 0% WR"
-        },
-        {
-          "regime": "NORMAL",
-          "signal": "bb-bounce-v3-long+",
-          "trades": 16,
-          "wr": 46.9,
-          "pnl": -0.39,
-          "note": "gate says block, 16 opened"
-        }
-      ],
-      "every_cell_losing": true,
-      "verdict": "GATES ARE CORRECT. ALL 0.0 blocks in these cells are justified by data. The bleed is enforcement theater — bypass path opens what the gate says kill."
-    },
-    "atr_sl_hit_bleed_14d": {
-      "total": {
-        "trades": 67,
-        "pnl": -5.98,
-        "wr": 32.8
-      },
-      "worst_signals": [
-        {
-          "signal": "pullback-entry-",
-          "trades": 7,
-          "pnl": -1.69,
-          "avg_rsi": 44.1,
-          "note": "signal DISABLED since Sep 30 — legacy trades only"
-        },
-        {
-          "signal": "pump-chain+",
-          "trades": 16,
-          "pnl": -1.38,
-          "avg_rsi": 73.9,
-          "note": "overbought entries — DRIFT-C bypass skips RSI_MAX=70"
-        },
-        {
-          "signal": "mover+",
-          "trades": 7,
-          "pnl": -1.35,
-          "avg_rsi": 72.9,
-          "note": "same pattern — overbought momentum entries"
-        },
-        {
-          "signal": "pump-chain-",
-          "trades": 21,
-          "pnl": -1.18,
-          "avg_rsi": 38.5,
-          "note": "oversold shorts — b960ffe8 floor should block future"
-        }
-      ]
-    }
-  },
+  ],
   "drift_findings": [
     {
       "id": "DRIFT-A",
       "severity": "HIGH",
-      "finding": "13 signal×regime 0.0 overrides are on signals in STANDALONE_BYPASS_SIGNALS — bypass path (signal_compactor.py:2943) sets pass_gate=True without consulting vol gate. EXPANDED from prior run: not just bb-bounce-v3.",
-      "evidence": "45T opened in 0.0-blocked cells over 14d, -$1.92. Every cell losing: EXTREME bb-squeeze+ 13T -$0.25, HIGH pump-chain 11T -$0.96 18.2%WR, HIGH accel-300- 5T -$0.32 0%WR, NORMAL bb-bounce-v3 16T -$0.39. get_combined_multiplier returns 0.0 correctly (verified live). Score path zeroes final_score on 0.0 product (2026-10-04 fix), but execution appears to key off raw conf not final_score.",
-      "impact": "Every future regime-block is theater for bypass signals. 14d bleed -$1.92 direct + unknown opportunity cost. 13 blocks currently unenforced.",
-      "fix_direction": "Post-freeze bug_hunter: (1) standalone-bypass branch hard-skip when combined_mult==0.0; (2) TRACE whether any execution path checks final_score>threshold — if not, fix is broader than bypass.",
-      "confidence": "HIGH"
+      "finding": "bb-bounce-v3 NORMAL regime-block LIVE in volatility_gate_v2 (0cb0784b) but STANDALONE_BYPASS path sets pass_gate=True without consulting vol gate",
+      "evidence": "7d bb-bounce-v3-long+ NORMAL 16T 50%WR -$0.39 (worst) vs HIGH 5T 80%WR +$0.11. NXPC/HBAR/DOT NORMAL trades opened Oct 4 after gate landed. Bypass branch at signal_compactor.py:2943.",
+      "impact": "NORMAL bleed continues despite gate in tree",
+      "fix": "Post-freeze: bypass branch hard-skip when combined_mult==0.0. THEN flip BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1→0.0 (one variable).",
+      "status": "queued"
     },
     {
       "id": "DRIFT-B",
       "severity": "MED",
-      "finding": "BB_BOUNCE_V3_REGIME_NORMAL_MULT=1.1 BOOSTS confidence in NORMAL while gate tries to block NORMAL — contradictory code.",
-      "evidence": "hermes_constants.py:2635 comment says 'boost in NORMAL (best regime)' but 14d DB: NORMAL 15T 46.7% -$0.43 WORST, HIGH 6T 66.7% +$0.09 best. Signal module inflates NORMAL confidence even if bypass enforced the 0.0 gate.",
-      "impact": "If bypass fix lands without this flip, NORMAL confidence is still inflated — gate zeros score but signal module boosts conf.",
-      "fix_direction": "Post-freeze, AFTER bypass fix: flip to 0.0, fix comment. One variable at a time.",
-      "confidence": "HIGH"
+      "finding": "BB_BOUNCE_V3_REGIME_NORMAL_MULT=1.1 still BOOSTS NORMAL (DB says worst regime)",
+      "evidence": "NORMAL 16T 50% -$0.39 vs HIGH 5T 80% +$0.11",
+      "impact": "Wrong-regime boost amplifies bleed",
+      "fix": "After DRIFT-A lands, flip 1.1→0.0 + add HIGH 1.0 override + FAMILY_MAP underscore for bb_bounce_v3_long",
+      "status": "queued"
     },
     {
       "id": "DRIFT-C",
+      "severity": "CRITICAL",
+      "finding": "PRESERVE-APPROVED-UPSERT re-injects signals that failed EXEC-RSI fail-closed block",
+      "evidence": "HBAR 15935 log chain above. b960ffe8 exec-RSI holes 1+2 fixed decider_run gates, but preserve path bypasses the block after 'signal NOT rolled back'. Oversold SHORT filter NOT holding — CURRENT.md claim stale.",
+      "impact": "BANANA-lesson oversold SHORTs can still open via preserve path despite SHORT_RSI_FLOOR=40 / SHORT_RSI_HARD_FLOOR=25 / PUMP_CHAIN_SHORT_RSI_MIN=40 all live",
+      "fix": "bug_hunter: mark signal blocked/expired on exec-RSI fail-closed so preserve skips it. Values unchanged.",
+      "status": "queued_top_priority"
+    },
+    {
+      "id": "DRIFT-D",
       "severity": "MED",
-      "finding": "STANDALONE_BYPASS skips per-signal RSI ceilings — pump-chain+ fires at RSI>=70 despite PUMP_CHAIN_LONG_RSI_MAX=70; mover+ same.",
-      "evidence": "14d atr_sl_hit: pump-chain+ 16T avg RSI 73.9 -$1.38; mover+ 7T avg RSI 72.9 -$1.35. Overbought momentum entries die on ATR SL. 5 winners exist in pump-chain+ RSI>=70 band (+$1.57) — RSI_MAX would block them too.",
-      "impact": "Overbought entries are the atr_sl_hit bleed. But winners exist in band — enforcement must be path-traced, not value-changed.",
-      "fix_direction": "Post-freeze bug_hunter: does standalone bypass enforce SIGNAL_FILTER_RSI_MAX / per-signal RSI_MAX? Path audit, not value change.",
-      "confidence": "MED — winners exist in band"
+      "finding": "RR_ENGINE runs in SHADOW mode — grade D (R:R<1) trades execute live with only confidence penalty",
+      "evidence": "30d stop/target RR: RR<1 151T 13.9%WR -$17.56 | RR1-1.5 177T 36.7% -$12.96 | trailing-exit UNKNOWN 278T 94.6% +$47.00. Log: 'SHADOW BLOCK HBAR SHORT R:R 1.97 < 2.0'. HBAR had R:R=0.90 grade=D → mult=0.70, still conf=99 executed.",
+      "impact": "RR<1 cohort bleeds ~-$17.56/30d while engine correctly identifies them but cannot block",
+      "fix": "Post-freeze: promote RR_ENGINE shadow→FORCE scoped to grade D (R:R<1) only first — single variable, ~3.8% of all winners in that bucket, net +$17.56/30d if fully blocked. Do NOT full-FORCE all grades in one step.",
+      "status": "queued"
     },
     {
       "id": "DRIFT-E",
       "severity": "MED",
-      "finding": "signal_rsi_14 column is 0/225 populated (7d), 0/959 (30d) — chase/slippage analysis via RSI delta impossible.",
-      "evidence": "entry_rsi_14 populated 220/225. signal_rsi_14 fully NULL. Watchdog claims 'fill 1.7-2.5% above signal' cannot be verified from DB. DRIFT-009 from prior audit still open.",
-      "impact": "Cannot quantify chasing pattern. Cannot build MAX_ENTRY_GAP filter without signal price or signal RSI at detection time.",
-      "fix_direction": "Write signal_rsi_14 at signal detection time (signals_runner or compactor). Non-trading-path data fix.",
-      "confidence": "HIGH"
+      "finding": "continuum_data.json BTC price stuck ~85702 vs exchange ~86k; volume_ratio capped 60.0",
+      "evidence": "watchdog agent-steer-007 + direct file read: current.price=85702.5. BELOW/continuum regime labels unverified.",
+      "impact": "Continuum gates reading stale BTC — SHORT-CONTINUUM / LONG-NEUTRAL labels unreliable",
+      "fix": "systems: fix continuum BTC feed write path. Do not trust continuum BELOW until verified.",
+      "status": "queued"
     },
     {
-      "id": "DRIFT-D",
+      "id": "DRIFT-F",
       "severity": "LOW",
-      "finding": "hard_max_loss 14d 42T same as prior 7d count — exit_reason normalization landed today; longer-window undercount may persist until backfill settles.",
-      "evidence": "14d hard_max_loss 42T -$5.84; training-system normalized fragmented labels Oct 4.",
-      "impact": "Longer-window bleed analysis incomplete until backfill settles.",
-      "fix_direction": "Monitor — re-query 30d after 48h.",
-      "confidence": "MED"
+      "finding": "signal-analyst deploy=REDUCE recommendations ignored — HBAR rsi=20 wr=25% deploy=REDUCE still conf=99",
+      "evidence": "pipeline.log 03:21:02 vs 03:21:22 EXEC conf=99",
+      "impact": "Analyst layer has no teeth on standalone-bypass path",
+      "fix": "Monitor — standalone bypass intentionally ignores many gates. Wire deploy=REJECT (not REDUCE) into hotset add as a follow-up after DRIFT-C lands.",
+      "status": "monitor"
     }
   ],
   "recurring_problems": [
-    "exit system bleed: atr_sl_hit 67T -$5.98 + hard_max_loss 42T -$5.84 = -$11.82 over 14d from stops alone. profit-monster-trail 138T +$6.09 pays for it but net is thin.",
-    "chasing entries: session brain + watchdog both flag fill 1.7-2.5% above signal as root cause. Cannot verify — signal_rsi_14 NULL (DRIFT-E).",
-    "standalone-bypass skips gates: third consecutive audit finding this class. DRIFT-005 (RSI_MAX), DRIFT-A (vol gate 0.0), DRIFT-C (RSI ceilings) — all same root: bypass path is a gate-free zone.",
-    "bb-bounce-v3-long+ bleeding in NORMAL: 4 consecutive audits flagged. Gate coded (0cb0784b) but unenforced. CEO ratify/revert still pending.",
-    "hotset empty: 102 sig/h generated, 0 approved. Prior run root-caused top-10 admission floor starvation. Post-freeze audit queued.",
-    "SHORT 7d -$1.25: 53T 49.1% WR. b960ffe8 oversold filter holding (n=1 RSI 82). EXTREME SHORT habitat is the only positive SHORT cell historically."
+    {
+      "problem": "oversold SHORT entries (BANANA lesson)",
+      "occurrences": "30d pump-chain- RSI<25: 15T 13.3%WR -$1.63; HBAR 15935 preserve-path leak; IO RSI=13.5 Oct 3 pre-b960ffe8; watchdog flags weekly",
+      "status": "values correct (floor=40), enforcement hole = DRIFT-C preserve path",
+      "action": "DRIFT-C fix post-freeze"
+    },
+    {
+      "problem": "hard_max_loss dominant bleed, price-vs-leverage semantics",
+      "occurrences": "14d 44T 0%WR -$6.12; lev5 23T avg -4.51% account on 0.90% price; CEO + bug_hunter open since Oct 4",
+      "status": "semantics still open — DO NOT change CUT_LOSER_PNL value",
+      "action": "bug_hunter backtest leverage-aware secondary stop (see creative_improvements)"
+    },
+    {
+      "problem": "bb-bounce-v3-long+ NORMAL regime bleed",
+      "occurrences": "7d NORMAL 16T 50% -$0.39; HIGH 5T 80% +$0.11; watchdog losing streak 4",
+      "status": "gate in tree but bypass ignores it (DRIFT-A)",
+      "action": "DRIFT-A + DRIFT-B post-freeze"
+    },
+    {
+      "problem": "standalone-bypass skips per-signal RSI ceilings/floors in compactor",
+      "occurrences": "DRIFT-C + prior audit DRIFT-C; pump-chain- 47%WR -1.15 over 68T (watchdog); many RSI<40 shorts still opening",
+      "status": "compactor filters live but bypass path incomplete",
+      "action": "covered by DRIFT-C preserve fix + path audit"
+    },
+    {
+      "problem": "thin-RR bounce entries (HYPE RR 1.16, BABY RR 1.18)",
+      "occurrences": "watchdog pattern alert; RR engine flags grade D in shadow only",
+      "status": "shadow engine correct, not enforcing",
+      "action": "DRIFT-D RR engine FORCE scoped to grade D"
+    }
   ],
   "missing_implementations": [
-    "STANDALONE_BYPASS vol-gate enforcement (DRIFT-A) — code fix queued post-freeze Oct 6, not built",
-    "BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1→0.0 flip (DRIFT-B) — queued after bypass fix",
-    "signal_rsi_14 write path (DRIFT-E) — never built, chase analysis impossible",
-    "ema_reclaim_long: 0 trades EVER — signal dead, coverage overdue (signal_analyst)",
-    "hotset top-10 admission floor fix — root-caused prior run, not built",
-    "hard_max_loss leverage geometry — creative idea from prior run, needs bug_hunter numbers"
+    {
+      "idea": "trend following signal (session brain: 'please make a really solid new trend following signal')",
+      "exists": "not in scripts/signals/ as dedicated trend_following; accel-300 / mtf-regime-trend partially cover",
+      "status": "backlog — Wyckoff/Elliott build delegated, not this run"
+    },
+    {
+      "idea": "grind-to-spike signal (session brain)",
+      "exists": "not found",
+      "status": "backlog"
+    },
+    {
+      "idea": "post-expansion squeeze gate (bb_position>1.0 AND volume_spike<0.5)",
+      "exists": "COIN_TRACKER_HOT_MAX_BB_POSITION=0.75 exists for coin tracker only; bb-squeeze+ entry path has no bb_position gate. Watchdog: SUPER bb_position=1.1345 vol_spike=0.35, LDO 1.1692/0.04 entered above upper BB.",
+      "status": "suggested — needs bb_position at entry logged + backtest before implementing (sample: 2 live examples, insufficient)",
+      "sample_note": "Only 2 confirmed examples this run — below 20T threshold. Monitor, don't change yet."
+    },
+    {
+      "idea": "ema_reclaim_long coverage",
+      "exists": "0 trades EVER; detection ~2 signals/24h",
+      "status": "still dead — signal_analyst delegation open"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-05T01:37:23Z",
-      "idea": "Execution-path score gate audit — does final_score=0.0 actually block, or does execution key off raw conf?",
-      "rationale": "bb-squeeze+ opened 12 EXTREME trades 7d despite ('EXTREME','bb-squeeze'):0.0. Score path zeroes final_score on 0.0 product (2026-10-04 fix verified in code at signal_compactor.py:2035). But CONF_FILTER at line 1151 checks conf < CONF_FILTER_MIN — raw signal confidence, not regime-adjusted final_score. If execution keys off conf (e.g., 72) not final_score (0), hard blocks are cosmetic on ALL paths, not just bypass. This would explain why 13 0.0-blocked cells keep opening trades even where bypass isn't the path.",
-      "expected_impact": "If confirmed: fixes 13 theater cells at once, not just bypass signals. If refuted: bypass-only fix suffices. Either way, answers the root question.",
-      "category": "path audit / gate enforcement",
+      "date": "2026-10-05T04:45:00Z",
+      "idea": "Leverage-aware secondary hard stop: when leverage>=5 and pnl_pct<=-3.0, force-close regardless of price-distance SL",
+      "rationale": "hard_max_loss 14d: lev3 22T avg -3.10% account on 1.03% price move; lev5 23T avg -4.51% account on 0.90% price move. Stop fires on ~1% PRICE — account loss scales with leverage. A -3% account stop for lev>=5 would cut lev5 losses ~1.5% earlier without touching CUT_LOSER_PNL value or lev3 behavior. Single variable, leverage-gated.",
+      "expected_impact": "~$0.30-0.50/14d saved on lev5 hard_max_loss cohort alone (23T avg -$0.142 → cut earlier); no impact on lev3 (22T) or trailing winners (profit-monster-trail 141T +$6.13 untouched)",
+      "category": "exit sniper",
       "status": "suggested",
-      "risk": "low — audit only, no code change",
-      "blocked_on": "freeze lift Oct 6 00:38 + bug_hunter",
-      "sample_size": "45T in 0.0-blocked cells 14d; 12T bb-squeeze+ EXTREME 7d"
+      "risk": "medium — may cut trades that would recover; bug_hunter must backtest last 30d before live",
+      "implementation_note": "position_manager.py secondary check, NOT a hermes_constants value change to CUT_LOSER_PNL. Post-freeze + bug_hunter."
     },
     {
-      "date": "2026-10-05T01:37:23Z",
-      "idea": "Extend gate_shadow.py to monitor 0.0-cell breaches — alert when trades open in hard-blocked cells",
-      "rationale": "gate_shadow already parses pipeline.log blocks. Add counter for 'trade opened in 0.0-blocked signal×regime cell'. When >0, flag in shadow report. Turns theater into a monitored metric so future gate-enforcement bugs surface automatically instead of waiting for auditor discovery.",
-      "expected_impact": "Early detection of any future gate-enforcement regression. Zero trading-path impact (shadow only).",
-      "category": "monitoring / observability",
-      "status": "suggested",
-      "risk": "low — shadow only, freeze-safe",
-      "blocked_on": "freeze lift (shadow scripts are freeze-safe per prior precedent — could ship now if CEO approves)",
-      "sample_size": "n/a — monitoring infrastructure"
-    },
-    {
-      "date": "2026-10-05T01:37:23Z",
-      "idea": "Prior creative ideas still open: (1) STANDALONE_BYPASS vol-gate enforcement fix — DRIFT-A, queued post-freeze; (2) leverage-scaled hard_max_loss — 14d 3x avg -3.09% vs 5x avg -4.51%, needs bug_hunter numbers",
-      "rationale": "Carry-forward from prior runs. Not re-litigated.",
-      "expected_impact": "See prior entries",
-      "category": "carry-forward",
-      "status": "queued_post_freeze",
-      "risk": "medium",
-      "blocked_on": "freeze + bug_hunter"
+      "date": "2026-10-05T04:45:00Z",
+      "idea": "PRESERVE path must respect EXEC-RSI fail-closed blocks (mark signal blocked/expired on RSI floor hit)",
+      "rationale": "HBAR 15935: EXEC-RSI-HARD-FLOOR correctly blocked at 03:21:22, but PRESERVE-APPROVED-UPSERT re-injected at 03:22:00 and trade opened 03:22:28 at RSI 24.3. b960ffe8 fixed decider gates; preserve path is the remaining hole. This is the #1 root-cause fix — more bug-fix than creative, but it is the edge that makes oversold SHORT filter actually hold.",
+      "expected_impact": "0 oversold SHORT entries via preserve path; restores b960ffe8 metric 'oversold SHORT=0 post-fix'",
+      "category": "root-cause enforcement",
+      "status": "queued_top_priority",
+      "risk": "low — enforcing an existing block that already fired; no constant value change"
     }
   ],
-  "config_changes_applied": [],
-  "config_change_note": "FREEZE b960ffe8 until Oct 2026-10-06 00:38 UTC — 0 trading config changes. All findings report-only. 0cb0784b (bb-bounce-v3 NORMAL gate) remains in tree, CEO ratify/revert still pending — auditor will not revert under freeze. ATR_TP_MIN=0.013 stands.",
-  "watchdog_input_summary": {
-    "steers_received": 3,
-    "steer_verification": [
-      {
-        "steer": "Cluster RESOLV+ZORA (bb-squeeze+ within 10min)",
-        "verdict": "VALID — correlation risk real, both same signal same direction"
-      },
-      {
-        "steer": "Portfolio 4/4 long concentration",
-        "verdict": "VALID — aligned with BTC LONG_BIAS/STRONG_UP but one BTC dump hits all 4"
-      },
-      {
-        "steer": "5 recent losses look like wrong-side",
-        "verdict": "PARTIALLY VALID, MISLABELED — BTC macro direction correct (LONG_BIAS). Coin-level: entries were in blocked regimes (bb-bounce-v3 NORMAL) or chasing (RSI 100), not wrong-side. Entry-quality issue, not direction issue."
-      },
-      {
-        "steer": "bb-bounce-v3-long+ toxic (4W/11L -0.56)",
-        "verdict": "CONFIRMED — 14d NORMAL 15T 46.7% -$0.43. Gate coded, bypass ignores it."
-      },
-      {
-        "steer": "28% hard_max_loss rate",
-        "verdict": "CONFIRMED — 14d hard_max_loss 42T -$5.84 0%WR. MFE autopsy prior run: 37/42 losers never had MFE>0.5 → entries are the bug, not stops."
-      }
-    ],
-    "regime_context": "BTC 15m/4h LONG_BIAS, continuum ABOVE EMA300 ~20h, STRONG_UP, ACCUMULATION, CALM. Volatility PARABOLIC but velocity SLOW — grind not launch. 4/4 long book correctly directioned at BTC level."
+  "signal_quality_deep_dive": {
+    "bb-bounce-v3-long+": {
+      "sample_7d": 19,
+      "by_regime": {"NORMAL": "16T 50% -$0.39", "HIGH": "5T 80% +$0.11", "FLAT": "1T 100% +$0.05"},
+      "rsi_bands_30d": {"40-50": "5T 20% -$0.26", "50-60": "7T 71.4% -$0.09", "30-40": "6T 66.7% $0", "60+": "4T 50% +$0.03", "<30": "1T 100% +$0.07"},
+      "verdict": "RSI bands are noise (all n<10). Regime split is real: block NORMAL, keep HIGH. Post-freeze plan stands.",
+      "action": "DRIFT-A + DRIFT-B"
+    },
+    "pump-chain-": {
+      "sample_14d": 73,
+      "rsi_bands": {"<25": "15T 13.3% -$1.63", "25-35": "26T 53.8% -$0.29", "35-40": "12T 41.7% +$0.04", "40-50": "16T 56.3% -$0.04", "50-60": "5T 60% +$0.14", "60+": "9T 66.7% +$0.54"},
+      "verdict": "RSI_MIN=40 value is correct — <25 is disaster, >=60 is the edge. Problem is ENFORCEMENT (DRIFT-C), not the constant.",
+      "action": "DRIFT-C preserve-path fix; DO NOT change PUMP_CHAIN_SHORT_RSI_MIN"
+    },
+    "bb-squeeze+": {
+      "sample_7d": 59,
+      "rsi_bands": {"40-60": "8T 25% -$0.35", "60-80": "33T 60.6% +$0.05", "80-95": "14T 78.6% +$0.32", "95+": "6T 66.7% +$0.21"},
+      "rsi_min_65_filter_test": "would block 9/37 winners (24.3% > 20% threshold) — REJECTED",
+      "watchdog_note": "post-expansion gate (bb_position>1.0 + vol_spike<0.5) — only 2 examples, insufficient sample",
+      "verdict": "60%WR +$0.44/7d — not a kill. RSI_MIN=65 would kill 24% of winners. Post-expansion gate needs more data.",
+      "action": "monitor; do not block hours or blanket-disable"
+    },
+    "pullback-entry-": {
+      "watchdog_claim": "0/7 WR -1.69",
+      "db_30d": "119T 52.1% +$0.35",
+      "verdict": "24h window noise. Signal is breakeven-positive over 30d with n=119. DO NOT disable.",
+      "action": "none — watchdog false-positive on short window"
+    },
+    "mover-": {
+      "db_30d": "12T 58.3% -$0.20",
+      "verdict": "n=12 < 20T floor. Insufficient data — monitor, don't change.",
+      "action": "monitor"
+    }
   },
+  "config_changes_applied": [],
+  "config_change_note": "FREEZE-SAFE REPORT-ONLY RUN. Freeze b960ffe8 until Oct 6 00:38. Session lock absent but 0 trading config VALUES changed. Preserve-path fix (DRIFT-C) is code-path correctness but interacts with deliberate 'signal NOT rolled back' design — queued for bug_hunter, not blind-patched.",
+  "rejected_suggestions": [
+    {
+      "suggestion": "bb-squeeze+ RSI_MIN=65 (block squeeze LONG when RSI<65)",
+      "reason": "Would block 9/37 winners = 24.3% > 20% threshold. Net +$0.22/7d too thin. BAD IDEA per quality rules."
+    },
+    {
+      "suggestion": "Disable pullback-entry- (watchdog 0/7)",
+      "reason": "30d DB: 119T 52.1% +$0.35. 24h window is noise. Disabling a breakeven+ signal on 7-trade sample violates minimum-n rule."
+    },
+    {
+      "suggestion": "Disable mover- (watchdog 0/3)",
+      "reason": "30d n=12 < 20T. Insufficient data — monitor."
+    },
+    {
+      "suggestion": "Change PUMP_CHAIN_SHORT_RSI_MIN value",
+      "reason": "Value is correct (RSI<25 13.3%WR -$1.63; RSI>=60 66.7% +$0.54). Problem is preserve-path enforcement hole, not the floor."
+    },
+    {
+      "suggestion": "Any time-of-day blocks",
+      "reason": "BANNED by audit rules. Hourly samples too small; microstructure edges decay first."
+    }
+  ],
   "next_actions": [
-    "CEO: RATIFY or REVERT 0cb0784b — still pending, gate in tree but bypass ignores it",
-    "bug_hunter (post-freeze Oct 6): DRIFT-A — standalone-bypass hard-skip when combined_mult==0.0. ALSO trace whether execution keys off final_score or raw conf (new creative idea).",
-    "bug_hunter (post-freeze): DRIFT-C — standalone bypass vs per-signal RSI_MAX/MIN enforcement path audit",
-    "signal_reporter (post-freeze, after bypass fix): BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1→0.0 + fix comment (DRIFT-B). One variable.",
-    "data fix (non-trading-path, could ship anytime): write signal_rsi_14 at detection time (DRIFT-E) — enables chase analysis",
-    "self_learner: continue 48h oversold-SHORT verify (b960ffe8) — n=1 RSI 82 so far, filter holding",
-    "signal_analyst: ema_reclaim_long 0 trades EVER — coverage OVERDUE",
-    "Post-freeze queue unchanged: hotset top-10 admission floor audit, RSI fold-in, FAMILY_MAP underscore",
-    "Monitor: hard_max_loss 30d after backfill settles (48h); theater bleed re-query post bypass-fix",
-    "Do NOT implement: volume_spike filter, RSI_MAX 55→40, time-based blocks — all refuted by winner-impact tests"
-  ]
+    {
+      "priority": 1,
+      "action": "bug_hunter: DRIFT-C — trace mark_signal_executed vs PRESERVE-APPROVED-UPSERT; mark signal blocked/expired when EXEC-RSI fail-closed fires. Evidence: HBAR 15935 log chain 03:21:22→03:22:28.",
+      "when": "post-freeze Oct 6 00:38 (or CEO crash-bug carve-out now if T wants)"
+    },
+    {
+      "priority": 2,
+      "action": "bug_hunter: DRIFT-A — standalone-bypass hard-skip when vol gate combined_mult==0.0. Then DRIFT-B: BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1→0.0 + HIGH 1.0 + FAMILY_MAP underscore.",
+      "when": "post-freeze Oct 6 00:38"
+    },
+    {
+      "priority": 3,
+      "action": "bug_hunter: DRIFT-D — RR_ENGINE shadow→FORCE scoped to grade D (R:R<1) only. Backtest 30d first.",
+      "when": "post-freeze Oct 6 00:38"
+    },
+    {
+      "priority": 4,
+      "action": "bug_hunter: hard_max_loss leverage-aware secondary stop backtest (creative idea 1) — lev>=5 pnl_pct<=-3.0 force-close. 30d simulation before any live change.",
+      "when": "post-freeze"
+    },
+    {
+      "priority": 5,
+      "action": "systems: fix continuum_data BTC feed (price stuck 85702 vs ~86k, volume_ratio=60 cap). Do not trust continuum BELOW until verified.",
+      "when": "now (non-trading path)"
+    },
+    {
+      "priority": 6,
+      "action": "signal_analyst: CC/ZEN execution desync — signals.json shows EXECUTED but no PG rows. Trace write path.",
+      "when": "now"
+    },
+    {
+      "priority": 7,
+      "action": "monitor: bb-squeeze+ post-expansion examples (bb_position>1.0 + vol_spike<0.5) — collect to n>=20 before any gate.",
+      "when": "ongoing"
+    },
+    {
+      "priority": 8,
+      "action": "monitor: HBAR 15935 currently +0.80% — let TP/SL work. Audit finding is about entry path, not this trade's current state. Do not manually close a green position.",
+      "when": "ongoing"
+    }
+  ],
+  "metrics_for_oct_7": {
+    "oversold_short_entries_post_b960ffe8": "MUST be 0 — but DRIFT-C preserve hole means metric is unreliable until fix lands. Re-verify after DRIFT-C.",
+    "short_7d_pnl": ">= $0",
+    "24h_pnl": ">= $0",
+    "bb_bounce_v3_normal": "0 trades after DRIFT-A+B land",
+    "hard_max_loss_lev5_avg_account_loss": "monitor toward -3% if creative idea 4 ships"
+  }
 }

@@ -2733,5 +2733,34 @@
     "risk": "low — shadow only",
     "blocked_on": "CEO approval (shadow scripts freeze-safe per precedent)",
     "sample_size": "n/a"
+  },
+  {
+    "date": "2026-10-05T02:39:15Z",
+    "idea": "Repair alt candle volume pipeline — root-cause the symbol-mapping gap between HL tickers and Binance USDT pairs",
+    "rationale": "volume-breakout-long+ is the system's BEST signal (75% WR, +$2.64 lifetime, RSI 55-70 EXTREME 100% +$3.16) but has been silent since Oct 3 because candles_1m writes volume=0 for alts. Binance seed path exists but only runs for stale tokens and uses {token}USDT symbols that don't exist for HL-only alts (HYPE, ZORA, NIL, etc.). Session brain shows volume=0 discussed across many sessions — this run root-caused it to the symbol-mapping gap. Fixing volume data unblocks: volume-breakout firing, hotset approvals, all vol_ratio checks (bb-bounce-v3 VOL_RATIO_MIN=1.2, volume_climax, wyckoff volume states), and watchdog volume_regime accuracy.",
+    "expected_impact": "volume-breakout-long+ resumes firing (target ≥10T ≥60% WR by Oct 11 per standing metric). Hotset >0. Volume-based entry filters become meaningful again. Estimated +$1-2/week based on historical volume-breakout PnL rate (~$0.10/trade × ~15 trades/week when unstarved).",
+    "category": "data pipeline repair (highest leverage)",
+    "status": "suggested",
+    "risk": "low — data fix, no trading config change. price_collector.py is other agents' uncommitted file; coordinate before editing.",
+    "sample_size_check": "volume-breakout 27T lifetime, 8T 7d — signal quality already proven. The starvation is data, not signal."
+  },
+  {
+    "date": "2026-10-05T02:39:15Z",
+    "idea": "Treat avg_vol=0 as UNKNOWN in vol_ratio checks — prevent silent 0/0 pass",
+    "rationale": "When all candle volumes are 0, vol_ratio = 0/0. Signals with VOL_RATIO_MIN checks either crash or silently pass. This lets mid-quality entries through WITHOUT volume confirmation while simultaneously blocking volume-breakout (which needs vol_ratio>=2.0 and 0/avg=0 fails). Double-wrong: bad entries pass, good entries starve.",
+    "expected_impact": "Until volume data is fixed: prevents false volume-confirmations. After volume data is fixed: no behavior change (avg_vol>0 path unchanged).",
+    "category": "defensive filter fix",
+    "status": "suggested",
+    "risk": "low — fail-closed on unknown data, consistent with system philosophy.",
+    "sample_size_check": "N/A — correctness fix, not a performance tune."
+  },
+  {
+    "date": "2026-10-05T02:39:15Z",
+    "idea": "Extend gate_shadow.py to monitor 0.0-cell breaches — alert when trades open in hard-blocked cells",
+    "rationale": "DRIFT-A (NORMAL bb-bounce-v3 opening despite 0.0 gate) went undetected for hours because nothing watches for gate breaches. gate_shadow already parses pipeline.log for block reasons. Add counter: trades opening in signal×regime cells where volatility_gate_v2 returns 0.0. Turns the vol gate from set-and-forget into monitored infrastructure.",
+    "expected_impact": "Early detection of future bypass-path bugs. Would have caught DRIFT-A same-day.",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "none — shadow/monitoring only, freeze-safe."
   }
 ]

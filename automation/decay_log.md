@@ -1463,3 +1463,13 @@
 [2026-10-04 17:08 UTC]   🟢 OK: bb-squeeze+: 13 trades, 61.5% WR, PnL=-2.01
 [2026-10-04 17:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-04 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-04 23:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-04 23:08 UTC]   🟢 OK: bb-bounce-v3-long+: 9 trades, 44.4% WR, PnL=-2.57
+[2026-10-04 23:08 UTC]   🟢 OK: bb-squeeze+: 16 trades, 68.8% WR, PnL=-0.94
+[2026-10-04 23:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-04 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-05 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-05 05:08 UTC]   🟢 OK: bb-bounce-v3-long+: 7 trades, 42.9% WR, PnL=-2.7
+[2026-10-05 05:08 UTC]   🟢 OK: bb-squeeze+: 21 trades, 57.1% WR, PnL=-3.91
+[2026-10-05 05:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-05 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

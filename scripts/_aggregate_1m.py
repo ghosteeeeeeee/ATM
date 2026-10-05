@@ -28,6 +28,7 @@ MIN_BARS_FOR_DEVELOPING = 1
 def migrate_is_closed():
     """Add is_closed=1 to all existing candles_1m rows that lack the column."""
     conn = sqlite3.connect(CANDLES_DB, timeout=30)
+    conn.execute("PRAGMA busy_timeout=30000")
     conn.execute("PRAGMA journal_mode=WAL")
     try:
         conn.execute(f"ALTER TABLE {TABLE} ADD COLUMN is_closed INTEGER DEFAULT 1")
@@ -44,6 +45,7 @@ def aggregate_1m():
     ph_conn = sqlite3.connect(STATIC_DB, timeout=30)
     ph_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn = sqlite3.connect(CANDLES_DB, timeout=60)
+    candle_conn.execute("PRAGMA busy_timeout=60000")
     candle_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn.execute("PRAGMA synchronous=NORMAL")
 
@@ -195,6 +197,11 @@ def aggregate_1m():
         dev_written += 1
 
     candle_conn.commit()
+    # ponytail: truncate WAL every minute so candles.db-wal cannot balloon
+    try:
+        candle_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    except Exception as e:
+        print(f"[1m] wal_checkpoint: {e}")
     ph_conn.close()
     candle_conn.close()
 

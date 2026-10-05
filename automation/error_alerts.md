@@ -808,3 +808,13 @@
 - **INFO**: `coin_tracker_api.py` writes to `/var/www/html/coin_tracker_data.json` (not WWW_DATA) — by design; nginx aliases `/coin_tracker_data.json` → `/var/www/html/`. Fresh at 03:48. Not a bug.
 - **INFO**: `systemctl list-timers hermes-*` glob returns 0 (systemd glob quirk); full `list-timers --all` + `systemctl status` confirm all hermes timers healthy and firing.
 - **AUTO-FIXES APPLIED**: none required. Pipeline running rc=0; timers active; prices fresh; disk 81% under 85% threshold; no crashes; price-collector lock errors are contention self-recovered by systemd restarts — manual stop/restart would be unsafe and ineffective.
+
+## Error Alerts — 2026-10-05 03:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] TOK TOK BLOCKED — candle data stale/insufficient — TOK-closed`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: stale candles — TOK blocked (TOK-closed)`
+
+## Error Alerts — 2026-10-05 04:59 UTC
+- **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (13x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`

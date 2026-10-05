@@ -254,6 +254,7 @@ class PrecomputedMACD:
             self.ema_slow = [0.0] * n
             self.macd = [0.0] * n
             self.sig_ema = [0.0] * n
+            self.warmup = n  # no valid histogram; callers must skip
             return
 
         k_f = 2.0 / (fast + 1)
