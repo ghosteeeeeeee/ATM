@@ -2430,7 +2430,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
                     _rsi_conn.close()
                     if len(_rsi_closes) >= 14:
-                        _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i-1] for i in range(1, len(_rsi_closes))]
+                        # FIX 2026-10-05 (bug_hunter): closes are DESC (newest first) — delta
+                        # must be closes[i]-closes[i+1] (i+1 = older). The previous i-1 formula
+                        # inverted RSI (100-true): rising pump tokens computed RSI 0.0 and were
+                        # blocked as "oversold freefall" — the exact FIL conf=88 failure.
+                        _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i+1] for i in range(len(_rsi_closes)-1)]
                         _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
                         _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
                         _rsi_ag = sum(_rsi_gains) / 14
@@ -3805,7 +3809,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         """, (tkn.upper(),))
                         _closes_l = [r[0] for r in _cur_sf2.fetchall()]
                         if len(_closes_l) >= 15:
-                            _deltas_l = [_closes_l[i] - _closes_l[i-1] for i in range(1, len(_closes_l))]
+                            # FIX 2026-10-05 (bug_hunter): DESC-ordered closes — i+1 is older (was i-1, RSI inverted)
+                            _deltas_l = [_closes_l[i] - _closes_l[i+1] for i in range(len(_closes_l)-1)]
                             _gains_l = [d if d > 0 else 0 for d in _deltas_l[-14:]]
                             _losses_l = [-d if d < 0 else 0 for d in _deltas_l[-14:]]
                             _ag_l = sum(_gains_l) / 14
@@ -4220,7 +4225,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _sf_closes = [r[0] for r in _sf_cur.fetchall()]
                                 _sf_conn.close()
                                 if len(_sf_closes) >= 15:
-                                    _sf_deltas = [_sf_closes[i] - _sf_closes[i-1] for i in range(1, len(_sf_closes))]
+                                    # FIX 2026-10-05 (bug_hunter): DESC-ordered closes — i+1 is older (was i-1, RSI inverted)
+                                    _sf_deltas = [_sf_closes[i] - _sf_closes[i+1] for i in range(len(_sf_closes)-1)]
                                     _sf_gains = [d if d > 0 else 0 for d in _sf_deltas[-14:]]
                                     _sf_losses = [-d if d < 0 else 0 for d in _sf_deltas[-14:]]
                                     _sf_ag = sum(_sf_gains) / 14
