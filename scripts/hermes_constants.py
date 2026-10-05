@@ -2239,8 +2239,10 @@ SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for
 TREND_RIDE_LONG_ENABLED = True              # master kill-switch
 TREND_RIDE_LONG_PLUS_ENABLED = True         # LONG direction
 TREND_RIDE_RSI_MIN = 50                     # RSI floor — momentum zone start
-TREND_RIDE_RSI_MAX = 70                     # RSI ceiling — don't chase overbought
+TREND_RIDE_RSI_MAX = 65                     # RSI ceiling — tightened 70->65 (backtest: 65-70 loses in NORMAL/HIGH)
 TREND_RIDE_VOL_MULT = 1.2                   # volume must be >= 1.2x 20-period average
+TREND_RIDE_ATR_MIN = 0.10                   # min ATR% — filter quiet tokens (backtest: ATR>=0.10 helps)
+TREND_RIDE_MOM_1H_MIN = 0.0                 # min 1h momentum % — require positive short-term trend
 TREND_RIDE_CONF_BASE = 75                   # base confidence
 TREND_RIDE_CONF_CAP = 88                    # max confidence (system ceiling)
 TREND_RIDE_COOLDOWN_HOURS = 3               # per token cooldown
@@ -2248,6 +2250,7 @@ TREND_RIDE_EMA_FAST = 20                    # fast EMA period (5m)
 TREND_RIDE_EMA_SLOW = 50                    # slow EMA period (5m)
 TREND_RIDE_RSI_PERIOD = 14                  # RSI lookback period
 TREND_RIDE_VOL_PERIOD = 20                  # volume average period
+TREND_RIDE_ATR_PERIOD = 24                  # ATR lookback period (5m candles)
 TREND_RIDE_MAX_AGE_5M = 600                 # max staleness for 5m candles (seconds)
 TREND_RIDE_MAX_AGE_1H = 5400                # max staleness for 1h candles (seconds)
 TREND_RIDE_HTF_BONUS = 5                    # confidence bonus for 1h EMA alignment

@@ -43,6 +43,9 @@ from hermes_constants import (
     TREND_RIDE_RSI_MIN,
     TREND_RIDE_RSI_MAX,
     TREND_RIDE_VOL_MULT,
+    TREND_RIDE_ATR_MIN,
+    TREND_RIDE_MOM_1H_MIN,
+    TREND_RIDE_ATR_PERIOD,
     TREND_RIDE_CONF_BASE,
     TREND_RIDE_CONF_CAP,
     TREND_RIDE_COOLDOWN_HOURS,
@@ -198,6 +201,21 @@ def detect(token):
     if avg_vol is not None and avg_vol > 0:
         last_vol = candles_5m[-1]['volume']
         if last_vol > 0 and last_vol < avg_vol * TREND_RIDE_VOL_MULT:
+            return None
+
+    # Condition 5: ATR minimum — filter quiet tokens (backtest: ATR>=0.10 helps)
+    if len(candles_5m) >= TREND_RIDE_ATR_PERIOD:
+        atr_highs = [c['high'] for c in candles_5m[-TREND_RIDE_ATR_PERIOD:]]
+        atr_lows = [c['low'] for c in candles_5m[-TREND_RIDE_ATR_PERIOD:]]
+        atr_pcts = [(h - l) / l * 100 for h, l in zip(atr_highs, atr_lows) if l > 0]
+        avg_atr = sum(atr_pcts) / len(atr_pcts) if atr_pcts else 0
+        if avg_atr < TREND_RIDE_ATR_MIN:
+            return None
+
+    # Condition 6: 1h momentum positive — require short-term uptrend (backtest: 1h>0 helps)
+    if len(closes_5m) >= 13:  # need 12 candles for 1h
+        mom_1h = (closes_5m[-1] - closes_5m[-13]) / closes_5m[-13] * 100
+        if mom_1h < TREND_RIDE_MOM_1H_MIN:
             return None
 
     # Optional boost: 1h EMA alignment
