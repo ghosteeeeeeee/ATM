@@ -93,6 +93,7 @@ REGIME_SIGNALS = {
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-short',  # R² downtrend SHORT detector — works in all regimes
         'ema300-dip-long',  # EMA300 dip buyer — trend following
+        'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05
         'slow-grind-',  # slow grinding downtrend detector
         'slow-grind+',  # slow grinding uptrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
@@ -144,6 +145,7 @@ REGIME_SIGNALS = {
         'bb-bounce-v3-long',  # V3 LONG bounce — calibrated from v2 losses, 7 new filters
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
+        'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05
         'breakout-long+',  # Volume-confirmed breakout LONG — ATR compression + volume spike
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
@@ -207,6 +209,7 @@ REGIME_SIGNALS = {
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
         'accel-300-v2-long',  # V2 LONG momentum
         'accel-300-v3-long+',  # V3 pullback LONG — enters on dip, not spike
+        'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05 (best regime: 58.6% WR)
         'breakout-long+',  # Volume-confirmed breakout LONG — continuation in storms
         'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — works in extreme vol (SHORT added 2026-10-02: asymmetry fix)
         'r2-trend-short',  # R² downtrend SHORT — works in all regimes

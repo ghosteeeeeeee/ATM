@@ -72,6 +72,8 @@ SIGNAL_OVERRIDES = {
     'bb_bounce_v2_long': 'MEAN_REVERSION',
     'bb_bounce_long': 'MEAN_REVERSION',
     'bb_bounce_short': 'MEAN_REVERSION',
+    'trend_ride_long': 'MEAN_REVERSION',     # EMA alignment already filters chop — gate redundant (T 2026-10-05)
+    'trend-ride+': 'MEAN_REVERSION',         # source string variant
     'range_reversion_long': 'MEAN_REVERSION',
     'return_exhaustion_long': 'MEAN_REVERSION',
     'return_exhaustion_short': 'MEAN_REVERSION',

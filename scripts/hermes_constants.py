@@ -2715,7 +2715,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'accel-30',  # regex-stripped variant of accel-300 (trailing digits removed)
     'accel-300-',  # trailing-dash variant — re-enabled 2026-09-22 (CEO: ZEN SHORT +8.92%)
-    'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05
+    'trend-ride', 'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05 (bare form for confluence gate matching)
     'accel-300-breakout',  # ATR breakout signal — works solo (2026-09-13)
     'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
