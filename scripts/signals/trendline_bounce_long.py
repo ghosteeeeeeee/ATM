@@ -54,10 +54,11 @@ SIGNAL_TYPE = 'trendline_bounce_long'
 SOURCE_PREFIX = 'tl-bounce+'
 LOOKBACK = TRENDLINE_BOUNCE_LONG_LOOKBACK_CANDLES  # 1h candles to analyze
 MIN_CONFIDENCE = 50
-MAX_CONFIDENCE = 88
-BASE_CONFIDENCE = 70
-R2_BONUS_MAX = 10
-TOUCH_BONUS_MAX = 8
+MAX_CONFIDENCE = 92
+BASE_CONFIDENCE = 75
+R2_BONUS_MAX = 12
+TOUCH_BONUS_MAX = 10
+DISTANCE_BONUS_MAX = 5  # closer to trendline = better entry = higher confidence
 
 
 # ── Swing Low Detection ─────────────────────────────────────────────────
@@ -233,8 +234,16 @@ def detect_trendline_bounce(candles):
     r2_bonus = min((r2 - TRENDLINE_BOUNCE_LONG_MIN_R2) / (1.0 - TRENDLINE_BOUNCE_LONG_MIN_R2) * R2_BONUS_MAX, R2_BONUS_MAX)
     touch_bonus = min((touches - TRENDLINE_BOUNCE_LONG_MIN_TOUCHES) * 2, TOUCH_BONUS_MAX)
 
+    # Distance bonus: closer to trendline = better entry = higher confidence
+    # dist_pct is how far price is above trendline (0% = touching, max_dev = at threshold)
+    distance_bonus = 0
+    if dev_from_tl <= max_dev * 0.5:  # very close to trendline (within 50% of max deviation)
+        distance_bonus = DISTANCE_BONUS_MAX
+    elif dev_from_tl <= max_dev * 0.75:  # close to trendline
+        distance_bonus = DISTANCE_BONUS_MAX // 2
+
     confidence = int(min(
-        BASE_CONFIDENCE + r2_bonus + touch_bonus,
+        BASE_CONFIDENCE + r2_bonus + touch_bonus + distance_bonus,
         MAX_CONFIDENCE
     ))
 
