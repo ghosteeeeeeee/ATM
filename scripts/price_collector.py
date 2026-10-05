@@ -240,9 +240,11 @@ def _seed_universe_candles(universe: list):
             cursor += 1
             continue  # Already fresh with volume, skip
 
-        # Fetch 1m, 5m, 1h, 4h candles — Binance first, HL fallback.
+        # Fetch 1m, 5m, 15m, 1h, 4h candles — Binance first, HL fallback.
         # DRIFT-007: Binance fails for HL-only alts; HL candleSnapshot has volume for all.
-        for tf, limit in [('1m', 200), ('5m', 100), ('1h', 100), ('4h', 100)]:
+        # FIX 2026-10-05 (bug_hunter HIGH): added 15m — was never fetched, so candles_15m
+        # was 100% zero-volume from _aggregate_tf, breaking 15m volume signals.
+        for tf, limit in [('1m', 200), ('5m', 100), ('15m', 100), ('1h', 100), ('4h', 100)]:
             candles = _fetch_binance_candles(token, tf, limit)
             if not candles or (candles and all(cd.get('volume', 0) == 0 for cd in candles)):
                 _hl = _fetch_hl_candles(token, tf, limit)
