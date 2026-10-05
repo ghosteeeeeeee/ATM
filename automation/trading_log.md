@@ -3786,3 +3786,26 @@ BY: auto_1hr
 - bb-squeeze+ 20T 55%WR -$0.42 worst by volume — has wins, below kill; research shows bollinger_squeeze pattern lifetime 70% WR — keep.
 - bb-bounce-v3-long+ NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 07:11] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — WLD mtf-regime-trend- SHORT hard_max_loss -$0.13 (-5.89%)
+**PnL:** -$0.13 last hour (0% WR) | 24h: ~40T 22W ~-$0.89 (~55% WR) | Open: 2
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** Winners avg price move 0.453% vs losers 0.960% — hard_max_loss family exits at ~1% price stop, expected. Not entry failure.
+- **atr_sl_hit >40%:** 1/40 (2.5%) of 24h closes. Dominant exits: profit-monster-trail 22T +$1.29 (55%), hard_max_loss 14T -$2.32 (35%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** Last hour only 1 trade (mtf-regime-trend- 0W n=1). 24h worst bb-squeeze+ 20T 55%WR -$0.42 and bb-bounce-v3-long+ 7T 43%WR -$0.42 — both have wins, below kill. No 0%WR n≥3 signal last hour. No kill.
+- **Negative PnL streak:** Hours with closes: 03:-$0.15, 04:-$0.01, 06:-$0.30, 07:-$0.13. Max consecutive negative = 2 (06-07). NOT 3. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- hard_max_loss family 14T -$2.32 sole 24h loss concentration — post-freeze review stop placement (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL ~-$0.89 at ~55% WR — R:R inversion persists (small trail wins ~+$0.06, large hard-stop losses ~-$0.17).
+- bb-squeeze+ 20T 55%WR -$0.42 and bb-bounce-v3-long+ 7T 43%WR -$0.42 — both have wins, below kill threshold.
+- NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.

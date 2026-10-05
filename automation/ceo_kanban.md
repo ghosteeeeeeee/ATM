@@ -211,3 +211,6 @@
 
 ## TEAM UPDATES
 - [2026-10-05 06:13] auto_1hr: No change — freeze b960ffe8 active until Oct 6 00:38. 1T IMX mtf-regime-trend- hard_max_loss -$0.30 (RSI43 entry, not extreme). 24h 39T 56.4%WR -$0.89. atr_sl_hit 2.6% not dominant. hard_max_loss family 13T -$2.19 sole loss concentration — post-freeze stop placement review queued.
+
+## TEAM UPDATES
+- [2026-10-05 07:11] auto_1hr: No change — 1 close WLD mtf-regime-trend- hard_max_loss -$0.13; 24h ~40T ~-$0.89 55%WR; atr_sl_hit 2.5% not dominant; neg streak max 2; freeze b960ffe8 until Oct 6 00:38. Watch: hard_max_loss 14T -$2.32.
