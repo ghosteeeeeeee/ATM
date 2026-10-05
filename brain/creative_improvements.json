@@ -3037,5 +3037,55 @@
     "risk": "low — only increases allocation to winning signals",
     "owner": "signal_reporter",
     "when": "Oct 6 00:38+"
+  },
+  {
+    "date": "2026-10-05T22:33:43Z",
+    "idea": "Cross-signal meta-RSI band map — nightly analysis script that queries PG for meta.rsi_14 bands × signal × direction × regime, outputs which RSI bands are profitable for which signals",
+    "rationale": "System currently has 5+ independent RSI band analyses (SHORT, bb-squeeze+, pump-chain-, etc.) that don't talk to each other. A unified map would reveal: 'pump-chain- wins at 45-55, bb-squeeze+ wins at 60-70, SHORT wins at 45-65' at a glance. Enables per-signal-per-band confidence multipliers. Also fixes DRIFT-E permanently by making meta.rsi_14 the standard.",
+    "expected_impact": "Capital efficiency: route capital to proven bands per signal. Prevents future DRIFT-E-class audits on unreliable data.",
+    "category": "analytics infrastructure",
+    "status": "suggested",
+    "risk": "zero — analysis only, no trading path changes",
+    "owner": "brain_auditor + training-system",
+    "when": "post-freeze Oct 6"
+  },
+  {
+    "date": "2026-10-05T22:33:43Z",
+    "idea": "bb-squeeze+ meta-RSI 60-70 confidence BOOST (complement to existing <60 dampen proposal)",
+    "rationale": "19T 78.9% WR +$0.57 in 60-70 band is the single best cell for the highest-volume signal. Existing dampen proposal blocks <60; boost reinforces 60-70. Together = rotate capital from losing band to winning band.",
+    "expected_impact": "+2-4% WR for bb-squeeze+ by increasing allocation to proven band",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — only increases allocation to winning band. Sample 19T just below 20T threshold — monitor until 20T before applying.",
+    "owner": "signal_reporter",
+    "when": "post-freeze Oct 6, after n>=20"
+  },
+  {
+    "date": "2026-10-05T23:35:31Z",
+    "idea": "Habitat confidence dampener — signal×regime multipliers from rolling 14d cell PnL, dampener (0.5x) not hard block for n>=15 cells with WR 40-50%",
+    "rationale": "7d matrix: volume-breakout-long+ EXTREME 100%WR +$1.96, pump-chain+ EXTREME 70% +$1.09, doji HIGH 85.7% +$0.24 vs bleeders bb-bounce-v3 NORMAL 46.7% -0.43, mtf-regime-trend+ HIGH 33.3% -0.40. First cells: pump-chain- EXTREME SHORT 1.0→0.5 (31T 45.2% -0.49 flipped); mtf-regime-trend+ HIGH dampen.",
+    "expected_impact": "Cut bleed on losing habitats without killing winners. Low risk — dampener not blocker.",
+    "category": "regime habitat",
+    "status": "suggested",
+    "risk": "low",
+    "constraints": "POST-FREEZE. pump-chain- EXTREME 1.0 standing no-revert — dampen≠revert, CEO/T must approve."
+  },
+  {
+    "date": "2026-10-05T23:35:31Z",
+    "idea": "Meta-RSI write-path fix as master enabler — re-baseline ALL RSI analytics on signal-time meta RSI",
+    "rationale": "DRIFT-E contaminates entry_rsi_14 everywhere. This run: watchdog 'RSI>80 collapse' DISPROVED (SUSHI 82/XPL 77/MON 76 all won); monitor '3/5 oversold' overstated (meta: only SAND oversold). Without this fix every RSI proposal is built on sand.",
+    "expected_impact": "Accurate oversold monitoring, honest watchdog alerts, reliable confidence dampeners.",
+    "category": "data integrity",
+    "status": "suggested — delegated bug_hunter",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-05T23:35:31Z",
+    "idea": "Trend-ride+ habitat gate — require coin LONG_BIAS conf>=70 + positive slope",
+    "rationale": "trend_ride+ LIVE since 21:32. Open book 3/4 coins NEUTRAL, IO slope -0.008. Thesis is 'established uptrend' — NEUTRAL entries violate it. n=3 too small to change now; 48h habitat data accruing.",
+    "expected_impact": "Blocks weak-thesis entries before hard_max_loss.",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "n/a"
   }
 ]
