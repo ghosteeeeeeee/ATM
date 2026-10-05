@@ -917,11 +917,38 @@ def _ctx_gate_get_momentum(token):
     except Exception:
         return None
 
+def _ctx_gate_get_btc_continuum():
+    """BTC continuum state for LLM context. Returns dict or None."""
+    try:
+        import os as _bc_os
+        import time as _bc_time
+        _bc_conn = sqlite3.connect(_bc_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+        try:
+            _bc_row = _bc_conn.execute(
+                "SELECT market_phase, linreg_direction, ema300_position, state_score, zscore_tier, ts "
+                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+            ).fetchone()
+        finally:
+            _bc_conn.close()
+        if not _bc_row:
+            return None
+        _bc_ts = _bc_row[5] or 0
+        if _bc_time.time() - _bc_ts > 600:
+            return None
+        _phase, _linreg, _ema, _score, _z, _ = _bc_row
+        _bearish = (_phase in ('DECLINING', 'CALM', 'RECOVERY') and
+                    _linreg in ('LEAN_BEAR', 'BEAR') and _ema == 'BELOW')
+        return {'phase': _phase, 'linreg': _linreg, 'ema': _ema,
+                'score': _score, 'z': _z, 'bearish': _bearish}
+    except Exception:
+        return None
+
 def _ctx_gate_get_market_context():
-    """Get BTC and ETH z-scores for market context. Returns dict."""
+    """Get BTC/ETH z-scores + BTC continuum for market context. Returns dict."""
     btc_z = _ctx_gate_get_zscore('BTC')
     eth_z = _ctx_gate_get_zscore('ETH')
-    return {'btc_z': btc_z, 'eth_z': eth_z}
+    btc_cont = _ctx_gate_get_btc_continuum()
+    return {'btc_z': btc_z, 'eth_z': eth_z, 'btc_continuum': btc_cont}
 
 def rule_based_context_gate(token, direction, source, sig):
     """
@@ -1249,6 +1276,16 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     # Build prompt with Hebbian recall data + market context
     ctx = rule_result if isinstance(rule_result, dict) else {}
     market = ctx.get('market', {})
+    _prompt_rsi = _ctx_gate_get_rsi(token)
+    _prompt_cont = market.get('btc_continuum')
+    _cont_str = 'N/A'
+    if _prompt_cont:
+        _cont_str = (f"{_prompt_cont.get('phase','?')}+{_prompt_cont.get('linreg','?')}"
+                     f"+{_prompt_cont.get('ema','?')} score={_prompt_cont.get('score',0):.1f}"
+                     f" z={_prompt_cont.get('z','?')}")
+        if _prompt_cont.get('bearish'):
+            _cont_str += ' [BEAR STRUCTURE]'
+    _rsi_str = f"{_prompt_rsi:.1f}" if _prompt_rsi is not None else 'N/A'
 
     heb_section = ""
     if setup:
@@ -1294,6 +1331,7 @@ FLIP = reverse direction (e.g., LONG→SHORT or SHORT→LONG)
 Token: {token}
 Direction: {direction}
 Signal: {source}
+Live RSI: {_rsi_str}
 
 === MARKET STATE ===
 Speed: {ctx.get('speed', 'N/A')}%
@@ -1305,6 +1343,7 @@ Acceleration: {ctx.get('acceleration', 'N/A')}
 === MARKET CONTEXT ===
 BTC Z-Score: {market.get('btc_z', 'N/A')}
 ETH Z-Score: {market.get('eth_z', 'N/A')}
+BTC Continuum: {_cont_str}
 {heb_section}
 
 CRITERIA (be decisive!):
@@ -1312,6 +1351,7 @@ CRITERIA (be decisive!):
 GO (strong confidence):
 - Speed > 70% AND z confirms direction (LONG: z < -0.5, SHORT: z > 0.5)
 - Clear trend signal with strong momentum
+- SHORT with BTC bear structure (LEAN_BEAR/BEAR + BELOW) AND live RSI 40-60 = valid continuation short during confirmed downtrend. Oversold RSI in a bear trend means the dump is IN PROGRESS, not bounce risk.
 
 WARN (cautious):
 - Speed 20-70% (moderate momentum)
@@ -1322,14 +1362,17 @@ NAY (hard block):
 - Historical WR < 30% with 5+ trades for this setup
 - Z-score extreme AND speed low: |z| > 1.5 AND speed < 30
 - LONG with z > 1.5 AND speed < 40 (overbought + no momentum)
-- SHORT with z < -1.5 AND speed < 40 (oversold + no momentum)
+- SHORT with live RSI < 40 (oversold — bounce risk regardless of BTC regime)
+- SHORT with z < -1.5 AND speed < 40 AND live RSI < 40 (true falling knife)
 
 FLIP (reverse direction):
 - LONG with z > 0.7 (overbought → flip to SHORT)
-- SHORT with z < -0.7 (oversold → flip to LONG)
+- SHORT with z < -0.7 AND live RSI >= 40 (momentum fading, but NOT when already oversold)
 - Momentum < 25 with acceleration opposing direction
 
-DEFAULT: If uncertain, reply NAY (better to miss a trade than lose money).
+DEFAULT:
+- If uncertain AND BTC has bear structure AND live RSI >= 40: reply GO (continuation short is valid)
+- If uncertain otherwise: reply NAY (better to miss a trade than lose money)
 
 Reply only GO, WARN, NAY, or FLIP:"""
 
