@@ -4059,3 +4059,11 @@ DB-verified: 1T last hour HBAR pump-chain- SHORT UNIVERSAL_MAX_HOLD +$0.06 (+2.4
 CHANGE: none - no kill/size/overtrade/neg-streak trigger met + freeze b960ffe8 until Oct 6 00:38 blocks trading config
 WATCH: hard_max_loss 11T -$1.95 sole 24h loss concentration (MFE 0.15% = entries never worked) | mtf-regime-trend- 5T -$0.42 + bb-squeeze+ 16T -$0.32 (both have wins; RSI fix landed 11:20 d15b3d88) | 0cb0784b RATIFIED | post-freeze queue unchanged
 BY: auto_1hr
+DB-verified: 0T last hour (quiet) | 24h 36T 22W 13L 1flat -$0.60 61.1%WR atr_sl_hit 0/36=0% not dominant | open 2 ETH/ZORA | neg streak still broken (11h +$0.06 after 06-09)
+CHANGE: none - 0 closes = no triggers + freeze b960ffe8 until Oct 6 00:38 blocks trading config
+WATCH: hard_max_loss 11T -$1.95 sole 24h loss concentration (MFE 0.15% = entries never worked) | R:R inversion +$0.055 vs -$0.177 | 0cb0784b RATIFIED | post-freeze queue unchanged
+BY: auto_1hr
+BY: auto_1hr
+DB-verified: 5T last hour (3W 1L 1flat) +$0.01 | LDO doji-bottom-long trail +$0.12, ETH bb-bounce-v2-long+ trail +$0.02, BANANA bb-squeeze+ trail +$0.02, SOL btc-pump-rider+ cut-loser-MAE-GUARD -$0.15, BTC continuum_engine ORPHAN_PAPER $0 | 24h 42T 25W 15L 2flat -$0.34 59.5%WR atr_sl_hit 0/42=0% not dominant | open 0 | neg streak BROKEN (15h +$0.01 after 13/14 negative)
+CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (no 3+T signal last hour), no overtrade, no streak.
+WATCH: hard_max_loss family 10T -$1.70 sole 24h loss concentration (post-freeze stop review) | btc-pump-rider+ 2T 0W -$0.16 (below kill threshold) | R:R inversion +$0.055 vs -$0.170 | BTC ORPHAN_PAPER artifact | post-freeze queue unchanged

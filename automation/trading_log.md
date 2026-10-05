@@ -3941,3 +3941,47 @@ Report: automation/signal_report.md
 - 24h PnL -$0.60 at 61.1% WR — R:R inversion persists (avg trail +$0.055 vs avg hard-stop -$0.177).
 - CEO post-freeze queue: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only.
 - candles.db lock contention still pending code-level serialization fix.
+
+## [2026-10-05 13:00] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h: 36T 22W 13L 1 flat -$0.60 (61.1% WR) | Open: 2 (ETH/ZORA bb-bounce-v2-long+)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No triggers met this hour (0 closes).
+
+**No Change Needed:**
+- **Entry quality:** N/A — 0 closes last hour.
+- **atr_sl_hit >40%:** 0/36 (0%) of 24h closes. Dominant: profit-monster-trail 21T +$1.15 (58%), hard_max_loss 11T -$1.95 (31%). tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 0T last hour. No 0%WR n>=3. No kill.
+- **Overtrading:** 0T last hour. Fine.
+- **Negative PnL streak:** 06-09 negative (4h), hour 11 closed +$0.06 → streak still broken. No streak trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. signal_reporter 11:20 already landed bb-squeeze+ conf 1.2→1.0 + mtf-regime SHORT RSI floor fix — not duplicated.
+
+**Open Questions:**
+- hard_max_loss family 11T -$1.95 sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL -$0.60 at 61.1% WR — R:R inversion persists (avg trail +$0.055 vs avg hard-stop -$0.177).
+- CEO post-freeze queue: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only.
+- candles.db lock contention still pending code-level serialization fix.
+
+## [2026-10-05 15:12] Hourly Analysis
+
+**Trades:** 5 closed (3 wins, 1 loss, 1 flat)
+**PnL:** $0.01 last hour | 24h: 42T 25W 15L 2 flat -$0.34 (59.5% WR) | Open: 0
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No triggers met this hour.
+
+**No Change Needed:**
+- **Entry quality:** Winners closed via profit-monster-trail (LDO +$0.12, ETH +$0.02, BANANA +$0.02). Sole loss SOL btc-pump-rider+ cut-loser-MAE-GUARD -$0.15 (-6.28%) — MAE guard working as designed.
+- **atr_sl_hit >40%:** 0/42 (0%) of 24h closes — not in close-reason list. Dominant: profit-monster-trail 24T +$1.31 (57%), hard_max_loss 10T -$1.70 (24%). tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 5T last hour but no signal had 3+ trades (each signal 1T). 24h 0%-WR signals below threshold: btc-pump-rider+ 2T 0W -$0.16, continuum_engine 2T paper $0, volume-breakout-long+ 1T -$0.27. No kill. Watch btc-pump-rider+ (2/2 losses).
+- **Overtrading:** 5T last hour. Fine.
+- **Negative PnL streak:** Hours with closes 13:-$0.38, 14:-$0.11, 15:+$0.01 → streak BROKEN at 15:00. No streak trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. No config edits.
+
+**Open Questions:**
+- hard_max_loss family 10T -$1.70 still #2 loss bucket — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL -$0.34 at 59.5% WR — R:R inversion persists (trail +$0.055 avg vs hard_max_loss -$0.170 avg).
+- BTC continuum_engine ORPHAN_PAPER flat in live trades table — paper/orphan artifact, check if should be excluded from live stats.
+- CEO post-freeze queue unchanged: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only.
