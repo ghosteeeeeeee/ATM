@@ -3002,5 +3002,40 @@
     "status": "idea only — signal-lab post-freeze",
     "risk": "high if deployed without independent backtest (AGENTS.md rule).",
     "freeze_handling": "POST-FREEZE. Do not build during freeze."
+  },
+  {
+    "date": "2026-10-05T21:36:41Z",
+    "idea": "Leverage-scaled hard_max_loss: effective_price_stop_pct = -3.0% / leverage",
+    "rationale": "CUT_LOSER_PNL=-1.00 fires at -1% price regardless of leverage. At lev 5 = -5% account loss. MAE data: lev-5 winners MAE <0.6%, losers MAE 0.78-1.08%. Scaling stop equalizes account risk.",
+    "expected_impact": "7d: block 5/5 lev-5 bb-squeeze+ losers (saved ~$0.96), lose 1 winner ZRO (MAE 0.74%, -$0.10). Net +$0.86 on bb-squeeze+. All lev-5 hard_max_loss 27T -$4.04: ~$3.23 saved est.",
+    "category": "exit structure",
+    "status": "suggested",
+    "risk": "medium",
+    "owner": "CEO/risk",
+    "when": "Oct 6 00:38+",
+    "sample_size": "7d n=27 lev-5 hard_max_loss + n=64 lev-5 winners MAE check"
+  },
+  {
+    "date": "2026-10-05T21:36:41Z",
+    "idea": "Evaluate OVERSOLD_SHORT_RSI_MAX 35→45 based on 30d meta_rsi band data",
+    "rationale": "30d SHORT meta_rsi: <25 -$1.48, 25-35 -$1.06, 35-45 -$2.58 (BIGGEST BLEEDER), 45-55 +$0.02 (breakeven+). Current floor 35 misses 35-45 band.",
+    "expected_impact": "30d: block 135T net -$5.12. ~61 winners blocked but losers outweigh winners.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — conflicts with MoE model A (exec RSI>=40). CEO ruling needed.",
+    "owner": "CEO",
+    "when": "Oct 6 00:38+",
+    "sample_size": "30d n=135 for <45 band"
+  },
+  {
+    "date": "2026-10-05T21:36:41Z",
+    "idea": "Hotset scoring boost for bb-bounce-v2-long+ and doji-bottom-long when coin conf≥85 + LONG_BIAS",
+    "rationale": "bb-bounce-v2-long+ 14T/7d 71.4%WR +$0.31; doji 9T/7d 77.8%WR +$0.27. Opportunity cost: conf 92-95 LONG_BIAS alts ripping without us. Addresses hotset-empty problem.",
+    "expected_impact": "Increase hotset approvals for highest-WR signals. Capital-efficiency fix.",
+    "category": "capital efficiency",
+    "status": "suggested",
+    "risk": "low — only increases allocation to winning signals",
+    "owner": "signal_reporter",
+    "when": "Oct 6 00:38+"
   }
 ]
