@@ -4007,3 +4007,26 @@ Report: automation/signal_report.md
 - 24h ≈ -$0.04 at ~61% WR — R:R inversion persists (trail +$0.056 avg vs hard_max -$0.160 avg).
 - BTC ORPHAN_PAPER flat artifacts still in live trades table.
 - CEO post-freeze queue unchanged.
+
+## [2026-10-05 17:12] Hourly Analysis
+
+**Trades:** 1 closed (1 win)
+**PnL:** $0.03 last hour | 24h: 41T 25W 16L -$0.45 (61.0% WR) | Open: 0
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No triggers met.
+
+**No Change Needed:**
+- **Entry quality:** Sole close GMX bb-squeeze+ LONG profit-monster-trail +$0.03 (+0.74%) — winner via trail, low adverse excursion consistent with trail exits.
+- **atr_sl_hit >40%:** 0/41 (0%) of 24h closes. Dominant: profit-monster-trail 24T +$1.32 (59%), hard_max_loss 9T -$1.44 (22%). tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 1T last hour, no signal 3+ trades in hour. 24h 0%-WR candidates below threshold: btc-pump-rider+ 2T 0W -$0.16, volume-breakout-long+ 1T -$0.27, mtf-regime-trend- 4T 1W -$0.48 (3 hard_max_loss SHORT losses SAND/WLD/IMX). No kill — rule is last-hour only. Watch mtf-regime-trend-.
+- **Overtrading:** 1T. Fine.
+- **Negative PnL streak:** 13h -$0.38, 14h -$0.11, then 15h +$0.12, 16h +$0.11 — streak broken. No trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. No config edits.
+
+**Open Questions:**
+- hard_max_loss family 9T -$1.44 still sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze).
+- mtf-regime-trend- SHORTs 3/4 hard_max_loss with -4.3% to -6.9% moves — regime mismatch post-freeze? Add to post-freeze queue.
+- 24h PnL -$0.45 at 61% WR — R:R inversion persists (trail +$0.055 avg vs hard_max_loss -$0.160 avg).
+- BTC continuum_engine ORPHAN_PAPER flat artifacts still in live trades table.
+- CEO post-freeze queue: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only, (6) NEW: mtf-regime-trend- SHORT regime check.

@@ -4071,3 +4071,7 @@ BY: auto_1hr
 DB-verified: 1T last hour GMX bb-squeeze+ LONG profit-monster-trail +$0.08 (+2.11%) | 24h 41T ~25W 15L 1flat ~-$0.04 61%non-orphanWR trail 24T +$1.35 hard_max_loss 9T -$1.44 atr_sl_hit 0/41=0% not dominant | open 0 | neg streak broken (16h +$0.08)
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill/overtrade/streak trigger.
 WATCH: hard_max_loss 9T -$1.44 sole 24h loss concentration (post-freeze stop review) | R:R inversion +$0.056 vs -$0.160 | BTC ORPHAN_PAPER artifacts | post-freeze queue unchanged
+DB-verified: 1T last hour GMX bb-squeeze+ LONG profit-monster-trail +$0.03 | 24h 41T 25W 16L -$0.45 61.0%WR atr_sl_hit 0/41=0% not dominant | open 0 | neg streak broken (15/16h positive)
+CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (1T last hour, no 3+T signal), no overtrade, no streak.
+WATCH: hard_max_loss 9T -$1.44 sole loss concentration | mtf-regime-trend- 4T 1W 3L -$0.48 (SHORT hard_max_loss SAND/WLD/IMX) added to post-freeze queue as #6 | R:R inversion +$0.055 vs -$0.160 | BTC ORPHAN_PAPER artifacts
+BY: auto_1hr
