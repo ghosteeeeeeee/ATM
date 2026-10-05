@@ -2841,5 +2841,41 @@
     "risk": "low-medium",
     "implementation": "Post-freeze: RSI_MIN=35 on pump-chain- SHORT path. Verify winner impact first.",
     "winner_impact": "7d: block ~3-4 RSI<25 winners (~+$0.20) vs ~15 losers (~-$1.24). Net positive."
+  },
+  {
+    "date": "2026-10-05T13:36:10Z",
+    "idea": "Re-baseline ALL RSI analytics on signal-time _signal_metadata.rsi_14; treat entry_rsi_14 as untrusted until write-path fixed",
+    "rationale": "59% of 7d trades differ by >10 RSI pts (median 12.6, max 86) between entry_rsi_14 and meta.rsi_14. Prior RSI-band conclusions were computed on wrong column. Re-baseline flipped bb-squeeze+ diagnosis: money band is signal RSI 60-75 (74.1%WR +$0.71), bleed is <60 (46.9% -$0.64).",
+    "expected_impact": "Unblocks trustworthy signal-quality work; prevents wrong config changes",
+    "category": "data integrity / analytics",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-05T13:36:10Z",
+    "idea": "bb-squeeze+ confidence dampen (not block) when signal-time RSI < 60 — pending entry_rsi_14 fix + 48h meta-RSI monitor",
+    "rationale": "Signal RSI<60 = 32T 46.9% -$0.64 only bad band. Hard block rejected: 15/39 winners (38%) killed. Dampen preserves winners proportionally.",
+    "expected_impact": "+$0.30-0.50/7d if band stays negative; needs n>=20 re-check after data fix",
+    "category": "entry sniper",
+    "status": "deferred_pending_data_fix",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-05T13:36:10Z",
+    "idea": "Leverage-aware hard_max_loss: cap high-frequency squeeze/pump leverage at 3x while CUT_LOSER_PNL semantics fix pending",
+    "rationale": "7d hard_max_loss 48T -$6.90 avg lev 4.13. Stop ~1% price = 4-5% account loss. Winners trail +$0.05. 62.9% WR loses on R:R inversion.",
+    "expected_impact": "hard_max_loss ~-$5.2/7d if avg lev 4.1→3.0; backtest 30d first",
+    "category": "risk / exits",
+    "status": "suggested",
+    "risk": "medium — CEO/risk decision"
+  },
+  {
+    "date": "2026-10-05T13:36:10Z",
+    "idea": "Regime-aware concurrent-alt-LONG cap: max 2 alt-LONGs when btc_15m aggregate = SHORT_BIAS",
+    "rationale": "Watchdog 4/4 long book + DYDX/BANANA 11min cluster into SHORT_BIAS. PORTFOLIO_HEAT allowed it. Quality-based heat, not time blocks.",
+    "expected_impact": "Reduces correlated BTC-dump beta; gate_shadow backtest before live",
+    "category": "portfolio risk",
+    "status": "suggested",
+    "risk": "medium — backtest first"
   }
 ]
