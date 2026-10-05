@@ -615,7 +615,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ema300_breakthrough_long', 'ema300-breakthrough+'):  1.1,  # NEW — 61% WR backtest, reversal LONG
     ('ema300_breakthrough_short', 'ema300-breakthrough-'):  1.2,  # NEW — 80% WR backtest, trend continuation SHORT
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
-    ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.4,  # SIGNAL REPORTER 2026-10-05 — 24h 5T 80%WR +$0.12 (BABY/ETC/ETH/HYPE 4 tokens). Boosted from 1.3.
+    ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # REVERTED 2026-10-05 CEO — freeze b960ffe8. Was boosted 1.3→1.4 by bbff11f4 during freeze. Post-freeze Oct 6 re-apply: 7d 14T 71.4%WR +$0.31 justifies 1.4.
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
     ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # REVERTED 2026-10-05 signal_reporter — was 1.2 (BOOSTED 10-03 on 24h 10T 70%WR +$0.33). Now 24h 16T 62.5%WR -$0.32 — WR holds but R:R negative (HIGH regime -$0.40 9T). EXTREME still blocked. 7d +$0.18 keep enabled.
     ('pump-chain', 'pump-chain+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 8T 62.5%WR +$0.95 (ME/LDO/ENS/DYDX/GMT). Re-enabled 10-02 post-kill. Static fallback; combo_weights.json is authoritative.

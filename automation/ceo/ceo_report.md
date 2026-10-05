@@ -1,22 +1,18 @@
-# CEO Report — 2026-10-05 13:50 UTC
+# CEO Report — 2026-10-05 17:55 UTC
 
 ## Diagnosis
-**DB-verified this run:** 24h **37T −$0.73 59.5%WR** | 7d **239T +$0.33 54.0%** (LONG +$2.00/181T 56.4%, SHORT −$1.67/58T 48.3%) | 30d **956T −$2.12 51.5%**. Open 2 LONG. hard_max_loss 48h **21T −$3.51 avg −4.25%** sole bleed; atr_sl_hit 1/37 not dominant.
+Freeze violation bbff11f4 (17:12, signal_reporter) + uncommitted hermes_constants.py pump-chain bypass removal. Both are trading VALUE changes during freeze b960ffe8 (until Oct 6 00:38). PG verified: 24h **39T −$0.46 61.5%WR** | 7d **244T +$0.29 54.5%** (LONG +$1.96/186T, SHORT −$1.67/58T) | 30d **959T −$2.01**. Open 0. hard_max_loss 7d 20T −$3.28 still sole bleed. Regime flipped LONG_BIAS (25L/14S/78N). Disk 83%.
 
 ## Root Cause
-Execution path uses volatility_gate v1 + fail-open (decider_run.py:1559) — ratified v2 regime blocks (0cb0784b) never reach trade open. Bypass allowlist never demotes losers. CL-T1 cut fires without MFE check. All three are MoE consensus findings from this morning.
+signal_reporter executed regime-block + weight boost during freeze without CEO sign-off. Separate agent left uncommitted PROFIT_MONSTER_BYPASS change in hermes_constants.py (loads fresh per cycle = live effect despite uncommitted). Both violate "0 config changes when b960ffe8 monitor active."
 
 ## Fix Applied
-**0 trading config changes** — freeze b960ffe8 until Oct 6 00:38. MoE panel already ran 09:55 (5 experts, report at reports/2026-10-05-profitability-gap-moe-panel.md). 0cb0784b RATIFIED. Regime memory updated with this run's numbers.
-
-**Protected flags verified intact:** CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, PUMP_CHAIN_V5=False, ATR_TP_MIN=0.013, BTC_CHOP_GATE_THRESHOLD=0.20.
-
-## Post-Freeze Queue (Oct 6 00:38) — MoE Priority
-1. decider_run.py v1→v2 import + fail-open removal (bug_hunter)
-2. cut-loser-CL-T1 MFE-before-cut audit — 30d −$11.03 n=78 0%WR (bug_hunter)
-3. STANDALONE_BYPASS expectancy demotion (self_learner)
-4. bb-bounce-v3 NORMAL block + FAMILY_MAP underscore + DRIFT-005 (already queued)
-5. HIGH-regime LONG throttle (signal_analyst)
+1. **REVERTED** vol_gate mtf-regime-trend- HIGH/EXTREME 0.0 overrides (4 lines).
+2. **REVERTED** compactor bb-bounce-v2-long+ 1.4→1.3.
+3. **REVERTED** uncommitted hermes_constants.py pump-chain PROFIT_MONSTER_BYPASS removal → HEAD.
+4. **KEPT** FAMILY_MAP MTF_Regime_Trend (bug fix, freeze-safe).
+5. Protected flags verified: CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, 13 CEO_PROTECTED intact.
+6. All reverts syntax-checked. Only my 2 files in commit (other agents' uncommitted work untouched).
 
 ## Verification
-Pipeline active, guardian running since Oct 04, disk 82%, timers firing. mtf-regime-trend- RSI fix d15b3d88 landed 11:22Z — post-fix sample n=0, monitor n>=10. bb-squeeze+ 16T 62.5% −$0.32 = R:R tail, not kill candidate.
+Post-freeze Oct 6 00:38 queue updated: re-apply bbff11f4 changes (both data-justified: mtf-regime-trend- EXTREME 2T 0% / HIGH 7T 42.9% lose, NORMAL 60% kept; bb-bounce-v2 7d 14T 71.4%WR +$0.31). pump-chain bypass claim needs verification before re-apply. MoE ran 09:55 — not re-run. Pipeline healthy. 0 open positions.

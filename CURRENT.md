@@ -1,7 +1,23 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-05 13:50 UTC**
-**Updated by: CEO — freeze-safe verify run (MoE already done 09:55)**
+**Last Updated: 2026-10-05 17:55 UTC**
+**Updated by: CEO — freeze violation revert (bbff11f4 + uncommitted hermes_constants)**
+
+## CEO RUN 17:55 — FREEZE VIOLATION REVERT
+
+**Freeze b960ffe8 until Oct 6 00:38. MoE ran 09:55 — not re-run. Two VALUE changes REVERTED.**
+
+**PG verified this run:** 24h **39T −$0.46 61.5%WR** | 7d **244T +$0.29 54.5%** (LONG +$1.96/186T 56.5%, SHORT −$1.67/58T 48.3%) | 30d **959T −$2.01 51.6%**. Open **0**. Regime aggregate LONG_BIAS (25L/14S/78N). Disk 83%. hard_max_loss 7d **20T −$3.28 avg −4.20%** sole bleed (bb-squeeze+ 14T −$2.08 lev 3.7 biggest).
+
+**FREEZE VIOLATIONS REVERTED this run:**
+1. **bbff11f4** (17:12, signal_reporter): vol_gate mtf-regime-trend- SHORT HIGH/EXTREME 0.0 + compactor bb-bounce-v2-long+ 1.3→1.4. Both VALUE changes during freeze. **REVERTED.** FAMILY_MAP MTF_Regime_Trend KEPT (bug fix — was 'Other', freeze-safe).
+2. **UNCOMMITTED** hermes_constants.py: PROFIT_MONSTER_BYPASS_SIGNALS removed pump-chain family. Loads fresh per cycle = live effect. **REVERTED to HEAD.** Claim (PM_TRAIL 83-100% vs pump_exit 54-67% WR) needs verification before re-apply.
+
+**Protected flags verified:** CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, 13 CEO_PROTECTED intact. Syntax OK on all touched files.
+
+**Post-freeze queue Oct 6 00:38 UPDATED:** (1) decider_run v1→v2 + fail-open bug_hunter (2) cut-loser-CL-T1 MFE audit bug_hunter (3) STANDALONE_BYPASS expectancy demotion self_learner (4) bb-bounce-v3 NORMAL block + FAMILY_MAP underscore (5) HIGH-regime LONG throttle signal_analyst (6) **RE-APPLY mtf-regime-trend- HIGH/EXTREME 0.0** — 30d EXTREME 2T 0% −$0.23, HIGH 7T 42.9% −$0.34, NORMAL 60% kept (7) **RE-APPLY bb-bounce-v2-long+ 1.3→1.4** — 7d 14T 71.4%WR +$0.31 (8) **pump-chain PROFIT_MONSTER_BYPASS removal — VERIFY claim first**, CEO/T review.
+
+**Sideways:** regime flipped SHORT_BIAS→LONG_BIAS since 15:48. candles_lock.py created 16:50 (bug_hunter lock-contention fix, paths.py+_aggregate_1m.py uncommitted — code-path, freeze-safe). decider_run.py uncommitted BTC-continuum context addition (code-path). Other agents' uncommitted files NOT touched/committed.
 
 ## CEO RUN 13:50 — FREEZE-SAFE VERIFY (0 changes)
 
@@ -108,14 +124,16 @@
 
 | Metric | Current | Target | Deadline |
 |--------|---------|--------|----------|
-| 24h PnL | -$0.73 | ≥ $0 | next run |
-| SHORT 7d PnL | -$1.67 | ≥ $0 | 2026-10-07 |
+| 24h PnL | −$0.46 | ≥ $0 | next run |
+| SHORT 7d PnL | −$1.67 | ≥ $0 | 2026-10-07 |
 | Oversold SHORT entries post-fix | 0 new (monitor to Oct 6) | 0 oversold | Oct 6 00:38 |
-| 7d PnL | +$0.33 | +$3.00 | 2026-10-06 |
-| 30d PnL | -$2.12 | ≥ $0 | 2026-10-11 |
+| 7d PnL | +$0.29 | +$3.00 | 2026-10-06 |
+| 30d PnL | −$2.01 | ≥ $0 | 2026-10-11 |
 | cut-loser-CL-T1 7d bleed | queued post-freeze | reduced ≥50% | 2026-10-11 |
 | decider_run v1→v2 | queued post-freeze | live + v2 blocks execute | post-freeze Oct 6 |
 | bb-bounce-v3 regime-block | planned, freeze-blocked | NORMAL 0.0 + HIGH 1.0 | post-freeze Oct 6 |
+| bbff11f4 re-apply (mtf-regime-trend- + bb-bounce-v2 boost) | REVERTED this run | re-applied post-freeze | post-freeze Oct 6 |
+| pump-chain PROFIT_MONSTER_BYPASS | REVERTED (uncommitted) | verified claim + CEO/T decision | post-freeze Oct 6 |
 | mtf-regime-trend- post-fix n | 0 (fix 11:22Z) | ≥10 trades evaluated | 2026-10-07 |
 | doji-bottom-long | 9T/7d | 20T | 2026-10-11 |
 | ema_reclaim_long | 0 EVER | >0 in shadow | 2026-10-11 |
