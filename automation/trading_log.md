@@ -4111,3 +4111,30 @@ Report: automation/signal_report.md
 10. Fix 1 bear override wiring (SIDE-1: _ctx_bearish_override dead code) + Fix 2 SHORT-CONTINUUM hysteresis
 
 **No changes applied. Pipeline healthy. Session lock absent.**
+
+## 2026-10-05 20:12 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet hour) | 0 opened | 0 open
+**PnL:** $0.00 (last trade close 16:xx)
+
+**24h (rolling):** 33T 18W 15L 0flat -$0.88 WR=54.5%
+- Close reasons: profit-monster-trail 19T +$1.01 | hard_max_loss 8T -$1.42 | hard_sl 2T -$0.38 | ORPHAN_PAPER 2T $0 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06
+- atr_sl_hit: **0/33 = 0%** — not dominant, no SL-tightness trigger
+- hard_max_loss = 24% of closes (not >40%); sole 24h loss concentration, already queue#2 post-freeze
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — 0 trades last hour; 24h none meet 3+T at 0% WR (btc-pump-rider+ 2T 0W -$0.16 below threshold; volume-breakout-long+ 1T -$0.27 1T only)
+- Negative avg_pnl streak: NOT triggered — last 3 trade-bearing hours +$0.12/+$0.11/$0 (14h -$0.11, 15h +$0.12, 16h +$0.11). Current neg-streak = 0
+- Overtrading: 0 trades/hour — quiet, not overtraded
+- freeze b960ffe8 until Oct 6 00:38 still ACTIVE (~4.4h remaining) — trading-config changes blocked regardless
+- Pipeline: active, lock file present, signal_analyst ran rc=0 at 20:12 (regime=LONG_BIAS)
+
+**Watch:**
+- hard_max_loss family 8T -$1.42 — post-freeze stop review queue#2 (unchanged)
+- mtf-regime-trend- 4T 1W 3L -$0.48 — queue#6 (unchanged)
+- Hotset starvation (0 APPROVED, top-10 floor) — execution still starved when signals <10 survive pre-filter; post-freeze queue
+- STANDALONE_BYPASS oversold-SHORT enforcement hole — queue#9 PRIORITY (unchanged)
+- BTC ORPHAN_PAPER artifacts (2T $0) — known noise
+BY: auto_1hr
