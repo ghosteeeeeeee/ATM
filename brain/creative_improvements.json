@@ -2913,5 +2913,14 @@
     "category": "entry sniper",
     "status": "MONITOR - do not change yet (band flipped, n=12 < 20)",
     "risk": "low (monitoring only)"
+  },
+  {
+    "date": "2026-10-05T16:34:06Z",
+    "idea": "Regime-scaled leverage (EXTREME 1.0x, HIGH/NORMAL 0.7x)",
+    "rationale": "7d regime PnL: EXTREME 93T +$1.74 53.8%WR best; HIGH 74T -$1.01, NORMAL 65T -$0.80 bleed. All n>=50T. Full leverage in every regime ignores where edge lives.",
+    "expected_impact": "Save ~30% of HIGH+NORMAL losses (~$0.55/7d) while full size on EXTREME winners. Net +$0.5-0.8/7d.",
+    "category": "position sizing",
+    "status": "suggested - needs backtest + CEO",
+    "risk": "medium"
   }
 ]
