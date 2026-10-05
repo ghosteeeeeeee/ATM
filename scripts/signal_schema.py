@@ -752,6 +752,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED, R2_TREND_V2_LONG_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
+            TREND_RIDE_LONG_ENABLED, TREND_RIDE_LONG_PLUS_ENABLED,
             GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
             GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
             GRIND_ACCUM_ENABLED, GRIND_ACCUM_PLUS_ENABLED, GRIND_ACCUM_MINUS_ENABLED,
@@ -947,6 +948,10 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # slow_grind_long — slow grinding uptrend detector
             if _comp == 'slow-grind+' and not SLOW_GRIND_LONG_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_LONG_ENABLED=False', flush=True)
+                return None
+            # trend_ride_long — established uptrend + momentum
+            if _comp == 'trend-ride+' and not TREND_RIDE_LONG_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TREND_RIDE_LONG_PLUS_ENABLED=False', flush=True)
                 return None
             # grind_breakout — steady grind + late breakout
             if _comp == 'grind-breakout+' and not GRIND_BREAKOUT_PLUS_ENABLED:
@@ -2662,6 +2667,7 @@ def is_component_disabled(component: str) -> bool:
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
             SLOW_GRIND_LONG_ENABLED,
+            TREND_RIDE_LONG_ENABLED, TREND_RIDE_LONG_PLUS_ENABLED,
             GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
             GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
             GRIND_ACCUM_ENABLED, GRIND_ACCUM_PLUS_ENABLED, GRIND_ACCUM_MINUS_ENABLED,
@@ -2840,6 +2846,8 @@ def is_component_disabled(component: str) -> bool:
     if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # slow-grind-long
     if c == 'slow-grind+': return not SLOW_GRIND_LONG_ENABLED
+    # trend-ride-long
+    if c == 'trend-ride+': return not TREND_RIDE_LONG_PLUS_ENABLED
     # grind-breakout
     if c == 'grind-breakout+': return not GRIND_BREAKOUT_PLUS_ENABLED
     if c == 'grind-breakout-': return not GRIND_BREAKOUT_MINUS_ENABLED

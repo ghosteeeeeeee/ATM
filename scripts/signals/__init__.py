@@ -39,6 +39,7 @@ from hermes_constants import (
     OPEN_SKIES_ENABLED, OPEN_SKIES_PLUS_ENABLED, OPEN_SKIES_MINUS_ENABLED,
     NEUTRAL_SNIPER_ENABLED, NEUTRAL_SNIPER_PLUS_ENABLED, NEUTRAL_SNIPER_MINUS_ENABLED,
     SLOW_GRIND_LONG_ENABLED,
+    TREND_RIDE_LONG_ENABLED, TREND_RIDE_LONG_PLUS_ENABLED,
     PULLBACK_ENTRY_ENABLED, PULLBACK_ENTRY_PLUS_ENABLED, PULLBACK_ENTRY_MINUS_ENABLED,
     OVERSOLD_BOUNCE_ENABLED,
     CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
@@ -176,6 +177,11 @@ try:
     from signals.slow_grind_long import run as _slow_grind_long_run
 except Exception:
     _slow_grind_long_run = None
+
+try:
+    from signals.trend_ride_long import run as _trend_ride_long_run
+except Exception:
+    _trend_ride_long_run = None
 
 try:
     from signals.signal_confluence import run as _signal_confluence_run
@@ -486,6 +492,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'chain_fire',               'enabled': 'CHAIN_FIRE_ENABLED',           'run': _chain_fire_run},
     {'name': 'slow_grind_short',         'enabled': 'SLOW_GRIND_SHORT_ENABLED',     'run': _slow_grind_short_run},
     {'name': 'slow_grind_long',          'enabled': 'SLOW_GRIND_LONG_ENABLED',      'run': _slow_grind_long_run},
+    {'name': 'trend_ride_long',          'enabled': 'TREND_RIDE_LONG_ENABLED',      'run': _trend_ride_long_run},
     {'name': 'signal_confluence',        'enabled': 'SIGNAL_CONFLUENCE_ENABLED',    'run': _signal_confluence_run},
     {'name': 'accel_300_v2_short',       'enabled': ACCEL_300_V2_ENABLED,           'run': _accel_300_v2_short_run},
     {'name': 'accel_300_v2_long',        'enabled': ACCEL_300_V2_LONG_ENABLED,      'run': _accel_300_v2_long_run},

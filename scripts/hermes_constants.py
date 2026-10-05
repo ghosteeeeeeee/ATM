@@ -2229,6 +2229,32 @@ SLOW_GRIND_LONG_CONF_CAP = 88              # max confidence (system ceiling)
 SLOW_GRIND_LONG_COOLDOWN_HOURS = 0.25      # 15min cooldown
 SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for steady trends)
 
+# ── trend_ride_long (established uptrend + momentum) ──────────────────────
+# trend_ride_long.py — rides established uptrends with RSI 50-70 momentum zone
+# Backtested 30d (signal-time RSI): RSI 50-70 LONG = 274T 52.9% WR +$2.10
+#   EXTREME regime: 99T 58.6% WR +$5.69 (strong edge)
+#   HIGH regime: 91T 51.6% WR -$2.38 (no edge)
+#   NORMAL regime: 79T 45.6% WR -$1.38 (no edge)
+# FREEZE: ENABLED=False until Oct 6 00:38 — CEO review pending
+TREND_RIDE_LONG_ENABLED = False             # master kill-switch (freeze: False until Oct 6)
+TREND_RIDE_LONG_PLUS_ENABLED = False        # LONG direction (freeze: False until Oct 6)
+TREND_RIDE_RSI_MIN = 50                     # RSI floor — momentum zone start
+TREND_RIDE_RSI_MAX = 70                     # RSI ceiling — don't chase overbought
+TREND_RIDE_VOL_MULT = 1.2                   # volume must be >= 1.2x 20-period average
+TREND_RIDE_CONF_BASE = 75                   # base confidence
+TREND_RIDE_CONF_CAP = 88                    # max confidence (system ceiling)
+TREND_RIDE_COOLDOWN_HOURS = 3               # per token cooldown
+TREND_RIDE_EMA_FAST = 20                    # fast EMA period (5m)
+TREND_RIDE_EMA_SLOW = 50                    # slow EMA period (5m)
+TREND_RIDE_RSI_PERIOD = 14                  # RSI lookback period
+TREND_RIDE_VOL_PERIOD = 20                  # volume average period
+TREND_RIDE_MAX_AGE_5M = 600                 # max staleness for 5m candles (seconds)
+TREND_RIDE_MAX_AGE_1H = 5400                # max staleness for 1h candles (seconds)
+TREND_RIDE_HTF_BONUS = 5                    # confidence bonus for 1h EMA alignment
+TREND_RIDE_RSI_SWEET_MIN = 55               # RSI sweet spot lower bound
+TREND_RIDE_RSI_SWEET_MAX = 65               # RSI sweet spot upper bound
+TREND_RIDE_SWEET_BONUS = 3                  # confidence bonus for RSI in sweet spot
+
 # ── grind_breakout (steady grind + late breakout) ──────────────────────────
 # grind_breakout.py — catches grind→breakout patterns with RSI 35-65 quality filter
 GRIND_BREAKOUT_ENABLED = True               # master kill-switch
