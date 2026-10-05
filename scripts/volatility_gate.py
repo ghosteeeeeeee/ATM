@@ -60,6 +60,7 @@ REGIME_SIGNALS = {
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
+        'tl-bounce+',  # trendline bounce LONG — dynamic support, works in low-vol FLAT
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in all regimes
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — mean-reversion, works in range-bound
     },
