@@ -197,7 +197,7 @@ def detect(token):
     avg_vol = _compute_avg_volume(candles_5m, TREND_RIDE_VOL_PERIOD)
     if avg_vol is not None and avg_vol > 0:
         last_vol = candles_5m[-1]['volume']
-        if last_vol < avg_vol * TREND_RIDE_VOL_MULT:
+        if last_vol > 0 and last_vol < avg_vol * TREND_RIDE_VOL_MULT:
             return None
 
     # Optional boost: 1h EMA alignment
