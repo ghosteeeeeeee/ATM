@@ -2982,5 +2982,25 @@
     "status": "suggested — CEO/risk review post-freeze",
     "risk": "medium (sizing change, not kill)",
     "freeze_handling": "post-freeze CEO decision; do not apply unilaterally"
+  },
+  {
+    "date": "2026-10-05T20:36:36Z",
+    "idea": "Leverage-aware account-PnL stop — close at -2.5% account PnL regardless of price distance (bounds hard_max_loss bleed)",
+    "rationale": "30d hard_max_loss 49T 0%WR -$7.02. lev5 trades lose avg -4.68% vs lev3 -3.10%. SL distance is fixed 1.30% PRICE; at lev5 that becomes -6.5% account. CUT_LOSER T1/T2 fire on account PnL but 2-4min windows are too slow — price blows through to hard stop first. hard_max_loss is 0% WR by definition — no winners to kill.",
+    "expected_impact": "Cap worst-case account loss at ~-2.5% instead of -3% to -6.5%. Conservative 50-70% catch rate on lev5 hard_max_loss (27T/30d) ≈ +$8-11/30d.",
+    "category": "exit structure",
+    "status": "suggested — post-freeze CEO/risk",
+    "risk": "medium — might close trades that would recover. Mitigation: 0% WR on hard_max_loss means they don't. Start lev>=5 only.",
+    "freeze_handling": "POST-FREEZE Oct 6 00:38. Reuse CL_TIER2_MAX_PCT=-2.5, no new constant."
+  },
+  {
+    "date": "2026-10-05T20:36:36Z",
+    "idea": "NEUTRAL-regime trend-following signal (session brain idea, never built)",
+    "rationale": "Sessions discussed 'really solid trend following' signal. NEUTRAL works for mean-reversion (bb-bounce-v2 73T 74%, volume-breakout 23T 69.6%) but no trend family exists. 7d NORMAL 64T 54.7% -$0.87 losing. Gap between mean-reversion edge and no trend coverage.",
+    "expected_impact": "Unknown — needs signal-lab backtest before any live claim.",
+    "category": "new signal",
+    "status": "idea only — signal-lab post-freeze",
+    "risk": "high if deployed without independent backtest (AGENTS.md rule).",
+    "freeze_handling": "POST-FREEZE. Do not build during freeze."
   }
 ]
