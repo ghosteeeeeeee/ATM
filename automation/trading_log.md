@@ -3985,3 +3985,25 @@ Report: automation/signal_report.md
 - 24h PnL -$0.34 at 59.5% WR — R:R inversion persists (trail +$0.055 avg vs hard_max_loss -$0.170 avg).
 - BTC continuum_engine ORPHAN_PAPER flat in live trades table — paper/orphan artifact, check if should be excluded from live stats.
 - CEO post-freeze queue unchanged: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only.
+
+## [2026-10-05 16:05] Hourly Analysis
+
+**Trades:** 1 closed (1 win)
+**PnL:** $0.08 last hour | 24h: 41T ~25W 15L 1 flat ≈ -$0.04 (61% non-orphan WR)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No triggers met.
+
+**No Change Needed:**
+- **Entry quality:** Sole close GMX bb-squeeze+ trail +$0.08 — winners via trail as usual.
+- **atr_sl_hit >40%:** 0/41 (0%). Dominant: profit-monster-trail 24T +$1.35, hard_max_loss 9T -$1.44. tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 1T last hour, no signal 3+ trades. No kill.
+- **Overtrading:** 1T. Fine.
+- **Negative PnL streak:** 15h +$0.01 broke streak; 16h +$0.08. No trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. No config edits.
+
+**Open Questions:**
+- hard_max_loss 9T -$1.44 still sole 24h loss concentration — post-freeze stop review.
+- 24h ≈ -$0.04 at ~61% WR — R:R inversion persists (trail +$0.056 avg vs hard_max -$0.160 avg).
+- BTC ORPHAN_PAPER flat artifacts still in live trades table.
+- CEO post-freeze queue unchanged.

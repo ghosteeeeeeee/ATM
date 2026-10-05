@@ -4067,3 +4067,7 @@ BY: auto_1hr
 DB-verified: 5T last hour (3W 1L 1flat) +$0.01 | LDO doji-bottom-long trail +$0.12, ETH bb-bounce-v2-long+ trail +$0.02, BANANA bb-squeeze+ trail +$0.02, SOL btc-pump-rider+ cut-loser-MAE-GUARD -$0.15, BTC continuum_engine ORPHAN_PAPER $0 | 24h 42T 25W 15L 2flat -$0.34 59.5%WR atr_sl_hit 0/42=0% not dominant | open 0 | neg streak BROKEN (15h +$0.01 after 13/14 negative)
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (no 3+T signal last hour), no overtrade, no streak.
 WATCH: hard_max_loss family 10T -$1.70 sole 24h loss concentration (post-freeze stop review) | btc-pump-rider+ 2T 0W -$0.16 (below kill threshold) | R:R inversion +$0.055 vs -$0.170 | BTC ORPHAN_PAPER artifact | post-freeze queue unchanged
+BY: auto_1hr
+DB-verified: 1T last hour GMX bb-squeeze+ LONG profit-monster-trail +$0.08 (+2.11%) | 24h 41T ~25W 15L 1flat ~-$0.04 61%non-orphanWR trail 24T +$1.35 hard_max_loss 9T -$1.44 atr_sl_hit 0/41=0% not dominant | open 0 | neg streak broken (16h +$0.08)
+CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill/overtrade/streak trigger.
+WATCH: hard_max_loss 9T -$1.44 sole 24h loss concentration (post-freeze stop review) | R:R inversion +$0.056 vs -$0.160 | BTC ORPHAN_PAPER artifacts | post-freeze queue unchanged
