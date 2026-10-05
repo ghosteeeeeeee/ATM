@@ -225,3 +225,6 @@
 
 ## TEAM UPDATES
 - [2026-10-05 11:12] auto_1hr: No change — 0 trades closed last hour; 24h -$1.02 at 56.8% WR; freeze b960ffe8 (until Oct 6 00:38) blocks trading config; neg-streak 4h (06-09) still MET but regime MIXED not NEUTRAL + freeze blocks size review
+
+## TEAM UPDATES
+- [2026-10-05 12:12] auto_1hr: No change — freeze b960ffe8 until Oct 6 00:38 active. 1T last hour HBAR SHORT +$0.06. 24h 36T -$0.60 61.1%WR. Neg-streak broken (11h win). No kill/size/overtrade triggers. hard_max_loss 11T -$1.95 still sole bleed; post-freeze stop review queued.

@@ -4055,3 +4055,7 @@ DB-verified: 0T last hour (quiet) | 24h 37T 21W 16L -$1.02 56.8%WR atr_sl_hit 1/
 CHANGE: none - 0 closes = no triggers + freeze b960ffe8 until Oct 6 00:38 blocks trading config
 WATCH: hard_max_loss family 13T -$2.31 sole 24h loss concentration | R:R inversion +$0.055 vs -$0.178 | 0cb0784b RATIFIED | post-freeze queue: decider_run, CL-T1 MFE, bypass demotion, bb-bounce-v3, HIGH throttle
 BY: auto_1hr
+DB-verified: 1T last hour HBAR pump-chain- SHORT UNIVERSAL_MAX_HOLD +$0.06 (+2.46% WIN) | 24h 36T 22W 13L 1flat -$0.60 61.1%WR atr_sl_hit 1/36=2.8% not dominant | open 2 ETH/ZORA | neg streak BROKEN (11h +$0.06 after 06-09 negative)
+CHANGE: none - no kill/size/overtrade/neg-streak trigger met + freeze b960ffe8 until Oct 6 00:38 blocks trading config
+WATCH: hard_max_loss 11T -$1.95 sole 24h loss concentration (MFE 0.15% = entries never worked) | mtf-regime-trend- 5T -$0.42 + bb-squeeze+ 16T -$0.32 (both have wins; RSI fix landed 11:20 d15b3d88) | 0cb0784b RATIFIED | post-freeze queue unchanged
+BY: auto_1hr

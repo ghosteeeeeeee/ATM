@@ -3919,3 +3919,25 @@ BY: auto_1hr
 **Watch next cycle:** mtf-regime-trend- (signal <24h active, RSI floor just fixed — re-evaluate before any regime block). bb-squeeze+ HIGH (all-time 62.9%WR but -$0.02 — R:R issue, not regime).
 
 Report: automation/signal_report.md
+
+## [2026-10-05 12:12] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.06 last hour | 24h: 36T 22W 13L 1 flat -$0.60 (61.1% WR) | Open: 2 (ETH bb-bounce-v2-long+ -0.08%, ZORA bb-bounce-v2-long+ -0.09%)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No triggers met this hour.
+
+**No Change Needed:**
+- **Entry quality:** Trail winners MFE 0.74% / MAE 0.27% — winners had room. hard_max_loss MFE 0.15% / MAE 0.91% — entries never worked (pre-existing, post-freeze stop review).
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. Dominant: profit-monster-trail 21T +$1.15 (58%), hard_max_loss 11T -$1.95 (31%). tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 0T last hour. 24h worst n>=3 all have wins (mtf-regime-trend- 5T 2W -$0.42, bb-squeeze+ 16T 10W -$0.32). No 0%WR n>=3. No kill.
+- **Overtrading:** 1T last hour. Fine.
+- **Negative PnL streak:** 06-09 negative (4h), hour 11 closed +$0.06 → streak BROKEN. No streak trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. signal_reporter 11:20 already landed bb-squeeze+ conf 1.2→1.0 + mtf-regime SHORT RSI floor fix (d15b3d88) — not duplicated.
+
+**Open Questions:**
+- hard_max_loss family 11T -$1.95 sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL -$0.60 at 61.1% WR — R:R inversion persists (avg trail +$0.055 vs avg hard-stop -$0.177).
+- CEO post-freeze queue: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only.
+- candles.db lock contention still pending code-level serialization fix.
