@@ -17,6 +17,7 @@ Timer: hermes-1m-candle.timer (every 1 min)
 import sys, os, time, sqlite3
 sys.path.insert(0, os.path.dirname(__file__))
 from paths import STATIC_DB, CANDLES_DB
+from candles_lock import acquire as _candles_lock_acquire, release as _candles_lock_release
 
 TF_SECONDS = 60
 TABLE = 'candles_1m'
@@ -133,8 +134,14 @@ def aggregate_1m():
                 (token, last_ts)
             ).fetchone()
             if open_row and close_row:
+                # FIX 2026-10-05: INSERT OR IGNORE instead of REPLACE — the aggregator
+                # was overwriting API-fetched OHLC candles (from price_collector) with
+                # flat tick-aggregated data (O=H=L=C, volume=0). This broke ALL RSI
+                # calculations for alt coins for 69+ days. price_history ticks are ~155s
+                # apart, so 1 tick per 1m window = no range. Only fill GAPS, never
+                # overwrite existing candles.
                 candle_cur.execute(f"""
-                    INSERT OR REPLACE INTO {TABLE}
+                    INSERT OR IGNORE INTO {TABLE}
                         (token, ts, open, high, low, close, volume, is_closed)
                     VALUES (?, ?, ?, ?, ?, ?, 0, 1)
                 """, (token, window_ts, open_row[0], high, low, close_row[0]))
