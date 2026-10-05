@@ -926,7 +926,7 @@ def _ctx_gate_get_btc_continuum():
         try:
             _bc_row = _bc_conn.execute(
                 "SELECT market_phase, linreg_direction, ema300_position, state_score, zscore_tier, ts "
-                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                "FROM continuum_states WHERE token='BTC' AND timeframe='1m' ORDER BY ts DESC LIMIT 1"
             ).fetchone()
         finally:
             _bc_conn.close()
@@ -1277,11 +1277,15 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     ctx = rule_result if isinstance(rule_result, dict) else {}
     market = ctx.get('market', {})
     _prompt_rsi = _ctx_gate_get_rsi(token)
-    _prompt_cont = market.get('btc_continuum')
+    # bug_hunter F3-1 fix: rule_based_context_gate returns STRING on most paths → market={}
+    # Fetch fresh as fallback (mirrors _prompt_rsi pattern) so continuum always reaches LLM.
+    _prompt_cont = market.get('btc_continuum') or _ctx_gate_get_btc_continuum()
     _cont_str = 'N/A'
     if _prompt_cont:
+        _score_val = _prompt_cont.get('score')
+        _score_str = f"{_score_val:.1f}" if _score_val is not None else '?'
         _cont_str = (f"{_prompt_cont.get('phase','?')}+{_prompt_cont.get('linreg','?')}"
-                     f"+{_prompt_cont.get('ema','?')} score={_prompt_cont.get('score',0):.1f}"
+                     f"+{_prompt_cont.get('ema','?')} score={_score_str}"
                      f" z={_prompt_cont.get('z','?')}")
         if _prompt_cont.get('bearish'):
             _cont_str += ' [BEAR STRUCTURE]'
@@ -4530,13 +4534,15 @@ def run(dry_run=False):
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
             live_trading=not paper, flipped=bool(flipped_direction), regime=_regime,
-            # Signal indicator fields captured from hotset at entry time
-            signal_z_score=sig.get('z_score'),
-            signal_rsi_14=sig.get('rsi') or sig.get('rsi_14'),  # FIX: signals store as 'rsi', not 'rsi_14'
-            signal_macd_hist=sig.get('macd_hist'),
-            signal_momentum_state=sig.get('momentum_state'),
-            signal_z_score_tier=sig.get('z_score_tier'),
-            signal_decision=sig.get('decision'),
+            # Signal indicator fields — hotset top-level first, then _exec_meta
+            # (signal_metadata) fallback. DRIFT-009: dedicated columns were 100% NULL
+            # because sig dict lacks top-level rsi/z_score keys; data lives in metadata.
+            signal_z_score=sig.get('z_score') or (_exec_meta or {}).get('z_score'),
+            signal_rsi_14=sig.get('rsi') or sig.get('rsi_14') or (_exec_meta or {}).get('rsi_14') or (_exec_meta or {}).get('rsi'),
+            signal_macd_hist=sig.get('macd_hist') or (_exec_meta or {}).get('macd_hist'),
+            signal_momentum_state=sig.get('momentum_state') or (_exec_meta or {}).get('momentum_state'),
+            signal_z_score_tier=sig.get('z_score_tier') or (_exec_meta or {}).get('z_score_tier'),
+            signal_decision=sig.get('decision') or (_exec_meta or {}).get('decision'),
             # A/B test variant tags
             test_sl_variant=ab.get('sl_variant'),
             test_timing_variant=ab.get('entry_variant'),
