@@ -21,6 +21,7 @@ from signal_schema import (
 import hype_cache as hc
 from hyperliquid_exchange import is_delisted as _is_delisted, _info_rate_limit
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, BROAD_MARKET_TOKENS
+from candles_lock import acquire as _candles_lock_acquire, release as _candles_lock_release
 
 # Combined blacklist — tokens that should never be stored (not tradeable or systematically losing)
 # EXCEPT broad market tokens — they must always have fresh data for speed/volatility calculations
@@ -107,6 +108,31 @@ def _fetch_binance_candles(token: str, interval: str, limit: int = 500) -> list:
         return []
 
 
+def _fetch_hl_candles(token: str, interval: str, limit: int = 200) -> list:
+    """Fetch candles from Hyperliquid candleSnapshot — has volume for ALL HL tokens.
+    DRIFT-007 fix: Binance fails for HL-only alts; HL API returns real volume in 'v'."""
+    iv_ms = {'1m': 60000, '5m': 300000, '15m': 900000, '1h': 3600000, '4h': 14400000}.get(interval, 60000)
+    now_ms = int(time.time() * 1000)
+    start_ms = now_ms - limit * iv_ms
+    payload = {'type': 'candleSnapshot', 'req': {'coin': token, 'interval': interval,
+              'startTime': start_ms, 'endTime': now_ms}}
+    try:
+        resp = requests.post('https://api.hyperliquid.xyz/info', json=payload, timeout=10)
+        if resp.status_code != 200:
+            return []
+        data = resp.json()
+        if not isinstance(data, list):
+            return []
+        return [
+            {'ts': int(c['t'] / 1000), 'open': float(c['o']), 'high': float(c['h']),
+             'low': float(c['l']), 'close': float(c['c']), 'volume': float(c.get('v') or 0)}
+            for c in data if c.get('o')
+        ]
+    except Exception as e:
+        print(f'[_fetch_hl_candles] {token} {interval}: {e}')
+        return []
+
+
 def _store_candles(token: str, interval: str, candles: list):
     """Store candles to candles.db."""
     if not candles:
@@ -180,7 +206,10 @@ def _seed_universe_candles(universe: list):
         return
 
     # How many tokens to seed this run (rate-limit friendly)
-    TOKENS_PER_RUN = 2
+    # FIX 2026-10-05: raised 2->10 — 76/82 tokens had flat 1m candles (O=H=L=C) from
+    # aggregator overwrite bug. Need faster cycling to re-fetch real OHLC. ~40 API
+    # calls per run (10 tokens x 4 TFs) is well within Binance/HL rate limits.
+    TOKENS_PER_RUN = 10
 
     seeded = 0
     for _ in range(TOKENS_PER_RUN):
@@ -188,6 +217,7 @@ def _seed_universe_candles(universe: list):
         token = saved_tokens[idx]
 
         # Check if we already have recent candles (1m within 5 min, 4h within 2 hours)
+        # DRIFT-007: also require non-zero volume — zero-vol "fresh" candles block HL backfill
         conn = sqlite3.connect(CANDLES_DB, timeout=10)
         conn.execute("PRAGMA busy_timeout=30000")
         conn.execute("PRAGMA journal_mode=WAL")
@@ -196,19 +226,28 @@ def _seed_universe_candles(universe: list):
         row_1m = c.fetchone()
         c.execute("SELECT MAX(ts) FROM candles_4h WHERE token=?", (token,))
         row_4h = c.fetchone()
+        _has_vol = True
+        if row_1m and row_1m[0] and (int(time.time()) - row_1m[0]) < 300:
+            c.execute("SELECT volume FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 1", (token,))
+            _vol_row = c.fetchone()
+            _has_vol = bool(_vol_row and _vol_row[0] and _vol_row[0] > 0)
         conn.close()
         now = int(time.time())
-        # Skip if 1m is fresh (<5 min) AND 4h is fresh (<2 hours)
+        # Skip if 1m is fresh (<5 min) AND 4h is fresh (<2 hours) AND has real volume
         if (row_1m and row_1m[0] and (now - row_1m[0]) < 300 and
-            row_4h and row_4h[0] and (now - row_4h[0]) < 7200):
+            row_4h and row_4h[0] and (now - row_4h[0]) < 7200 and
+            _has_vol):
             cursor += 1
-            continue  # Already fresh, skip
+            continue  # Already fresh with volume, skip
 
-        # Fetch 1m, 5m, 1h, 4h candles from Binance (volume data for Wyckoff/analysis).
-        # 1m candles from HL have volume=0; Binance has real volume.
-        # Binance candles enable Wyckoff climax detection and continuum engine volume states.
+        # Fetch 1m, 5m, 1h, 4h candles — Binance first, HL fallback.
+        # DRIFT-007: Binance fails for HL-only alts; HL candleSnapshot has volume for all.
         for tf, limit in [('1m', 200), ('5m', 100), ('1h', 100), ('4h', 100)]:
             candles = _fetch_binance_candles(token, tf, limit)
+            if not candles or (candles and all(cd.get('volume', 0) == 0 for cd in candles)):
+                _hl = _fetch_hl_candles(token, tf, limit)
+                if _hl:
+                    candles = _hl
             if candles:
                 _store_candles(token, tf, candles)
 
@@ -222,6 +261,8 @@ def _seed_universe_candles(universe: list):
 
     # Always fetch BTC 1m candles (needed for continuum engine)
     btc_1m = _fetch_binance_candles('BTC', '1m', 200)
+    if not btc_1m:
+        btc_1m = _fetch_hl_candles('BTC', '1m', 200)
     if btc_1m:
         _store_candles('BTC', '1m', btc_1m)
 
@@ -596,36 +637,41 @@ def main():
 
     # Aggregate candles from price_history (signals_hermes.db) into candles.db
     # THEN update prices.json so the timestamp reflects post-aggregation freshness
-    ph_conn = sqlite3.connect(STATIC_DB, timeout=30)
-    ph_conn.execute("PRAGMA journal_mode=WAL")
-    candle_conn = sqlite3.connect(CANDLES_DB, timeout=60)
-    candle_conn.execute("PRAGMA busy_timeout=60000")
-    candle_conn.execute("PRAGMA journal_mode=WAL")
-    candle_conn.execute("PRAGMA synchronous=NORMAL")
+    # ponytail: serialize vs _aggregate_1m — both hold long write txns on candles.db
+    _lock_fd = _candles_lock_acquire(timeout_s=90)
+    try:
+        ph_conn = sqlite3.connect(STATIC_DB, timeout=30)
+        ph_conn.execute("PRAGMA journal_mode=WAL")
+        candle_conn = sqlite3.connect(CANDLES_DB, timeout=60)
+        candle_conn.execute("PRAGMA busy_timeout=60000")
+        candle_conn.execute("PRAGMA journal_mode=WAL")
+        candle_conn.execute("PRAGMA synchronous=NORMAL")
 
-    for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'), (14400, 'candles_4h')]:
+        for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'), (14400, 'candles_4h')]:
+            try:
+                last = _aggregate_tf(ph_conn, candle_conn, tf_sec, table)
+                dt = time.strftime('%H:%M:%S', time.localtime(last)) if last else 'N/A'
+                print(f'  {table}: last closed window {last} ({dt})')
+            except Exception as e:
+                print(f'  {table}: aggregation error: {e}')
+
+        # ponytail: truncate WAL after writers release so disk doesn't balloon
         try:
-            last = _aggregate_tf(ph_conn, candle_conn, tf_sec, table)
-            dt = time.strftime('%H:%M:%S', time.localtime(last)) if last else 'N/A'
-            print(f'  {table}: last closed window {last} ({dt})')
+            candle_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         except Exception as e:
-            print(f'  {table}: aggregation error: {e}')
+            print(f'  wal_checkpoint: {e}')
+        ph_conn.close()
+        candle_conn.close()
 
-    # ponytail: truncate WAL after writers release so disk doesn't balloon
-    try:
-        candle_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-    except Exception as e:
-        print(f'  wal_checkpoint: {e}')
-    ph_conn.close()
-    candle_conn.close()
-
-    # candles now updated — timestamp already reflects post-aggregation freshness
-    # save_prices() removed — was redundant second write, doubled DB time
-    # ponytail: seeder is best-effort — never fail the cycle after prices are saved
-    try:
-        _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
-    except Exception as e:
-        print(f'  [candle_seed] skipped (non-fatal): {e}')
+        # candles now updated — timestamp already reflects post-aggregation freshness
+        # save_prices() removed — was redundant second write, doubled DB time
+        # ponytail: seeder is best-effort — never fail the cycle after prices are saved
+        try:
+            _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
+        except Exception as e:
+            print(f'  [candle_seed] skipped (non-fatal): {e}')
+    finally:
+        _candles_lock_release(_lock_fd)
 
 if __name__ == '__main__':
     main()
