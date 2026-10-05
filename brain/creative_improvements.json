@@ -2922,5 +2922,35 @@
     "category": "position sizing",
     "status": "suggested - needs backtest + CEO",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-05T17:33:26Z",
+    "idea": "Meta-RSI-band confidence for pump-chain- (post-freeze)",
+    "rationale": "14d bands: meta<40 = 8T 0%WR -$1.03 (all losers) | 50-60 = 29T 51.7% +$0.27 (only profitable band). dampen confidence outside 45-60.",
+    "expected_impact": "Cut ~$1/14d bleed; preserve 50-60 winners",
+    "category": "entry sniper",
+    "status": "suggested post-freeze",
+    "risk": "low",
+    "sample": "69T 14d — passes n>=20"
+  },
+  {
+    "date": "2026-10-05T17:33:26Z",
+    "idea": "Leverage-aware hard_max_loss: normalize stop to account % not price %",
+    "rationale": "7d hard_max_loss lev5 avg pnl_pct -4.68% vs lev3 -3.09% on SAME ~1% price stop. Stop fires correctly; account loss scales with leverage. Semantics already flagged to bug_hunter — this is the fix shape.",
+    "expected_impact": "Reduce hard_max_loss tail at lev5; 48T/7d -$6.90 is #1 bleed",
+    "category": "risk management",
+    "status": "suggested post-freeze (bug_hunter owns)",
+    "risk": "medium — changes exit behavior",
+    "sample": "48T 7d — passes"
+  },
+  {
+    "date": "2026-10-05T17:33:26Z",
+    "idea": "Doji-bottom-long execution path — detection works, 0 trades executed",
+    "rationale": "7d 8T +$0.39 75% WR, 10 signals/24h detected, 0 executed (starvation). Signal is good; funnel is broken.",
+    "expected_impact": "Restore a 70%+ WR signal to the book",
+    "category": "execution",
+    "status": "suggested — signal_analyst owns",
+    "risk": "low",
+    "sample": "10T+ historical, signal quality proven"
   }
 ]
