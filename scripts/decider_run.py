@@ -3334,7 +3334,7 @@ def run(dry_run=False):
                             # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
                             # Bullish: RECOVERY with bullish structure, or NEUTRAL/CALM with bullish structure
                             if (_p in ('RECOVERY', 'NEUTRAL') or
-                                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e == 'ABOVE')):
+                                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT'))):  # AT = transitional (bug_hunter F2 2026-10-05)
                                 _continuum_override = True
                                 log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} LONG — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
                         elif _cont_row and direction.upper() == 'SHORT':

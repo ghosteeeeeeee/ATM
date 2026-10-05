@@ -586,6 +586,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('slow_grind_short', 'slow-grind-'):   0.5,
     # slow_grind_long — slow grinding uptrend detector (low volatility, high R²)
     ('slow_grind_long', 'slow-grind+'):    1.0,
+    # trend_ride_long — established uptrend + RSI 50-70 momentum zone
+    ('trend_ride_long', 'trend-ride+'):    1.0,
     # grind_breakout — steady grind + late breakout (RSI 35-65 quality filter)
     ('grind_breakout_long',  'grind-breakout+'):  1.0,
     ('grind_breakout_short', 'grind-breakout-'):  1.0,
@@ -1239,7 +1241,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                                 elif direction.upper() == 'LONG' and (
                                     _p2 in ('RECOVERY', 'NEUTRAL') or
                                     (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT')) or
-                                    (_l2 in ('LEAN_BULL', 'BULL') and _e2 == 'ABOVE')  # structural bull regardless of phase
+                                    (_l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))  # structural bull regardless of phase; AT = transitional (bug_hunter F1 2026-10-05)
                                 ):
                                     _override = True
                                     log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
@@ -2679,8 +2681,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")
                         elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
+                            log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")
                         elif direction.upper() == 'SHORT' and _cont_bullish:
                             _btc_mom_ok_for_bypass = False
+                            log(f"  🚫 [CONTINUUM-BULL] {token} SHORT — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
                         else:
                             # Fallback to velocity check
                             _btc_mom_ok_for_bypass = _vel_ok
