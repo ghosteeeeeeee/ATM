@@ -3832,3 +3832,26 @@ BY: auto_1hr
 - bb-squeeze+ 19T 52.6%WR -$0.60 worst by volume — has wins, below kill; keep.
 - bb-bounce-v3-long+ NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 09:13] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — both bb-squeeze+ LONG: INJ hard_max_loss -$0.25 (-5.67%) | WLD profit-monster-trail +$0.09 (+4.15%)
+**PnL:** -$0.16 last hour (50% WR) | 24h: 37T 21W 15L 1 flat -$1.05 (56.8% WR excl. flat) | Open: 1 (HBAR pump-chain- SHORT +0.17% NORMAL)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. Negative-streak trigger MET but not actionable this hour.
+
+**No Change Needed:**
+- **Entry quality:** Winners trail +$0.09 vs loser hard_max_loss -$0.25. INJ SL 7.546 / entry 7.645 (~1.3% price adverse) → -5.67% account at leverage. Same hard-stop family pattern.
+- **atr_sl_hit >40%:** 1/37 (2.7%) of 24h closes. Dominant exits: profit-monster-trail 21T +$1.15 (56.8%), hard_max_loss 12T -$2.21 (32.4%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** Last hour bb-squeeze+ 2T 1W 1L (50% WR) — not 0%. 24h worst n>=3: bb-squeeze+ 17T 10W -$0.45 (has wins via trail), bb-bounce-v3-long+ 7T 3W -$0.42 (has wins), mtf-regime-trend- 4T 2W -$0.32 (has wins). No 0%WR n>=3 last hour. No kill.
+- **Overtrading:** 2T last hour. Fine.
+- **Negative PnL streak:** TRIGGER MET — hours with closes Oct 5: 03:-$0.15, 04:-$0.01, 05:0T gap, 06:-$0.30, 07:-$0.11, 08:-$0.16 → consecutive negative = 3 (06-08). Rule says "consider reducing position size if NEUTRAL". Regime 24h is MIXED (NORMAL 18T -$0.49, HIGH 12T -$0.72, EXTREME 3T +$0.01, FLAT 3T +$0.15) — not cleanly NEUTRAL; both NORMAL and HIGH bleeding. Plus freeze blocks any size constant change. Queue post-freeze size review.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- hard_max_loss family 12T -$2.21 sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze). bb-squeeze+ hard_max_loss subset 5T 0W -$0.89 — all squeeze hard-stop exits lose; trail side still +$0.57 (11T 10W).
+- 24h PnL -$1.05 at 56.8% WR — R:R inversion persists (avg trail win ~+$0.05, avg hard-stop loss ~-$0.18).
+- Negative streak 3h MET — freeze-blocked; post-freeze: check if size reduction warranted when regime re-assessed.
+- bb-bounce-v3-long+ NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
