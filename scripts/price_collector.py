@@ -112,14 +112,25 @@ def _store_candles(token: str, interval: str, candles: list):
     if not candles:
         return
     table = {'1m': 'candles_1m', '15m': 'candles_15m', '1h': 'candles_1h', '4h': 'candles_4h', '5m': 'candles_5m'}[interval]
-    conn = sqlite3.connect(CANDLES_DB, timeout=30)
-    conn.execute("PRAGMA busy_timeout=30000")
-    conn.execute("PRAGMA journal_mode=WAL")
-    c = conn.cursor()
     rows = [(token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume']) for cd in candles]
-    c.executemany(f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
-    conn.commit()
-    conn.close()
+    # ponytail: one retry — pipeline/1m-candle hold short write locks on candles.db
+    for attempt in range(2):
+        conn = sqlite3.connect(CANDLES_DB, timeout=30)
+        try:
+            conn.execute("PRAGMA busy_timeout=30000")
+            conn.execute("PRAGMA journal_mode=WAL")
+            c = conn.cursor()
+            c.executemany(f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
+            conn.commit()
+            return
+        except sqlite3.OperationalError as e:
+            if attempt == 0:
+                time.sleep(2)
+                continue
+            print(f'  [_store_candles] {token} {interval}: {e}')
+            return
+        finally:
+            conn.close()
 
 
 def _get_candle_progress():
@@ -610,7 +621,11 @@ def main():
 
     # candles now updated — timestamp already reflects post-aggregation freshness
     # save_prices() removed — was redundant second write, doubled DB time
-    _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
+    # ponytail: seeder is best-effort — never fail the cycle after prices are saved
+    try:
+        _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
+    except Exception as e:
+        print(f'  [candle_seed] skipped (non-fatal): {e}')
 
 if __name__ == '__main__':
     main()

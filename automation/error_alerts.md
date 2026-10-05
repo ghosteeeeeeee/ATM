@@ -818,3 +818,12 @@
 ## Error Alerts — 2026-10-05 04:59 UTC
 - **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (13x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-05 05:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-05 06:49 UTC
+- **WARN** (recurring): `hermes-price-collector.service` — uncaught `sqlite3.OperationalError: database is locked` in `_store_candles` via `_seed_universe_candles` (line ~120). Occurred 2x in 30m (06:43:44, 06:46:56). Aggregation path already had busy_timeout + try/except; the universe seeder did not. **Root cause:** concurrent writes to candles.db from pipeline + 1m-candle timer hold write locks >30s busy_timeout during seed INSERTs. Raw prices still collected (85 tokens) — seeder is best-effort enrichment only.
+- **AUTO-FIX**: `price_collector.py` — (1) `_store_candles` now retries once on OperationalError then logs and returns; (2) `_seed_universe_candles` call wrapped in try/except in `main()` so a seed lock error can no longer kill an otherwise successful collection cycle. Prices + candle aggregation complete before seeder runs. No services stopped (nothing stuck; prices fresh; timers active). Full candle-writer serialization still pending if lock errors continue.
+- **INFO**: Pipeline healthy — LIVE every 1m, all steps rc=0, 0 Traceback/CRASH in 30m. Signals (1h): 82. Open: 2 (WLD SHORT +0.05%, HBAR SHORT +0.43%). Closed today (signal_outcomes): 12 trades, net ~-0.23 USDT. Regime: LONG_BIAS (80L/7S/30N, ts 06:45). Speeds: 52.7% >=50th (127/241). Disk 82%. Phantom atr_sl_hit (<0.01%): 0. Core timers all active.
