@@ -1,80 +1,39 @@
-# Signal Performance Report
-**Generated:** 2026-10-05 11:20 UTC | **Period:** Last 6h + 24h (PostgreSQL brain.trades, verified live)
+=== Signal Performance Report ===
+Period: Last 6h | 24h
+Generated: 2026-10-05 ~10:00 UTC
 
-## 6h Performance (close_time > now-6h, status=closed, n>=2)
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| mtf-regime-trend- | SHORT | 3 | 0.0% | -$0.53 |
-| bb-squeeze+ | LONG | 3 | 66.7% | -$0.14 |
-
-## 24h Performance (close_time > now-24h, status=closed, n>=3)
-
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-bounce-v3-long+ | LONG | 7 | 42.9% | -$0.42 |
-| mtf-regime-trend- | SHORT | 5 | 40.0% | -$0.42 |
-| bb-squeeze+ | LONG | 16 | 62.5% | -$0.32 |
-| bb-bounce-v2-long+ | LONG | 3 | 100.0% | +$0.21 |
-
----
-
-## KILLED (executed)
-
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None. No signal met kill criteria (WR<30% + 5T + PnL<-$0.10 + active>24h). |
+| (none) | — | — | — | — | No blanket kills — mtf-regime-trend- wins in NORMAL (66.7% WR) |
 
-## BOOSTED (executed)
+REGIME BLOCKS (executed):
+| Signal | Dir | Regime | WR | PnL | Action |
+|--------|-----|--------|-----|-----|--------|
+| mtf-regime-trend- | SHORT | HIGH | 33.3% | -$0.40 | SIGNAL_TYPE_OVERRIDES → 0.0 (all-time 6T) |
+| mtf-regime-trend- | SHORT | EXTREME | 0% | -$0.23 | SIGNAL_TYPE_OVERRIDES → 0.0 (24h 2T) |
 
+BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None met boost criteria (WR>55% + 5T + PnL>$0.05). |
+| bb-bounce-v2-long+ | LONG | 80% | +$0.12 | 5 | signal_compactor weight 1.3→1.4 (BABY/ETC/ETH/HYPE) |
 
-## TUNED / REGIME ACTIONS (executed)
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 62.5% | -$0.32 | 16 | Confidence 1.2→1.0 (signal_compactor.py) — WR holds, R:R negative; EXTREME block kept |
-| mtf-regime-trend- | SHORT | 40.0% | -$0.42 | 5 | Fixed inverted SHORT RSI filter — was blocking RSI>70 (wrong), now blocks RSI<SHORT_RSI_FLOOR(40). IMX entered RSI=14.47. No regime kill (signal <24h active, sample too thin) |
-
-## LOSERS (watch list)
-
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v3-long+ | LONG | 42.9% | -$0.42 | 7 | NORMAL already 0.0x-blocked (commit 0cb0784b, 2026-10-04 23:16). 0 trades opened since block. HIGH allowed 1.0x (all-time 5T 60%WR +$0.08). Watch post-block. |
-| mtf-regime-trend- | SHORT | 40.0% | -$0.42 | 5 | ACTIVE <24h (first trade 2026-10-04 16:33). EXTREME 2T 0%WR, HIGH 1T 100%, NORMAL 2T 50% — sample too thin to regime-block. RSI floor now fixed. Re-evaluate next cycle. |
-| bb-squeeze+ | LONG | 62.5% | -$0.32 | 16 | HIGH 24h -$0.40 (9T 55.6%) but all-time HIGH 62.9%WR (≥55% → no HIGH block per rules). NORMAL 24h +$0.08. EXTREME blocked. 7d +$0.18 — keep enabled, confidence reverted. |
+| bb-squeeze+ | LONG | 68.4% | -$0.19 | 19 | Watch — high WR but R:R inverted (avg loss > avg win). EXTREME already blocked. |
+| bb-bounce-v3-long+ | LONG | 66.7% | +$0.16 | 3 | Watch — below 5T boost threshold. NORMAL already blocked (46.7% WR). |
 
-## WINNERS
-
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 100% | +$0.21 | 3 | 24h thin (3T) — below boost threshold (5T). 7d 12T 75%WR +$0.40. Compactor 1.3 kept. Open: ETH, ZORA. |
-| bb-squeeze+ NORMAL | LONG | 71.4% | +$0.08 | 7 | Winning regime — no action. |
-| volume-breakout-long+ | LONG | 80% | +$1.85 | 5 | 7d winner — no action. |
+| bb-bounce-v2-long+ | LONG | 80% | +$0.12 | 5 | BOOSTED 1.3→1.4 — 4 winning tokens |
+| bb-bounce-v3-long+ | LONG | 66.7% | +$0.16 | 3 | Active, small sample |
+| bb-squeeze+ | LONG | 100% (6h) | +$0.13 | 3 | 6h clean, 24h R:R inverted |
 
-## ISSUES
-
-1. **mtf_regime_trend.py SHORT RSI filter was inverted** — blocked SHORT when RSI>70 (overbought, which is actually a *good* short entry zone) and allowed SHORT at any oversold RSI. IMX entered SHORT at RSI=14.47 → hard_max_loss -$0.30. Fixed: now uses SHORT_RSI_FLOOR=40 from hermes_constants (no hardcoded constant).
-2. **No signal inversions** in 24h — all long signals closed LONG, all short signals closed SHORT.
-3. **mtf-regime-trend- regime sample too thin** for volatility_gate blocking (all regimes n<3). Signal only ~17h old at analysis time. Do NOT blanket-kill.
-4. **bb-bounce-v3-long+ NORMAL block confirmed working** — 0 trades opened after commit 0cb0784b (2026-10-04 23:16 UTC). All 24h NORMAL losses predate the block.
-5. **hard_max_loss family** remains the 24h loss concentration (13T -$2.31 across signals) — stop-placement review is a CEO post-freeze item, not a signal-kill item.
-
----
-
-## PARAM CHANGE LOG (this run)
-
-| File | Change |
-|------|--------|
-| scripts/signal_compactor.py | bb-squeeze+ confidence 1.2 → 1.0 |
-| scripts/signals/mtf_regime_trend.py | SHORT RSI filter: rsi>70 block → rsi<SHORT_RSI_FLOOR(40) block |
-
-## NEXT CYCLE
-
-- Re-check mtf-regime-trend- after 24h+ active with fixed RSI floor — if still WR<30% with 5T+, regime-block EXTREME (0%WR) via volatility_gate_v2 SIGNAL_TYPE_OVERRIDES.
-- Re-check bb-bounce-v3-long+ post-NORMAL-block — if HIGH-only trades still bleed, revisit.
-- Re-check bb-squeeze+ HIGH regime (all-time 62.9%WR -$0.02) — if HIGH PnL stays negative with WR≥55%, it's an R:R/exit problem, not a regime problem.
-
-*Report auto-generated by signal_reporter. Next: ~6h.*
+ISSUES:
+- No direction inversions found (24h).
+- mtf-regime-trend SHORT active >24h (first trade 2026-10-02), losing in HIGH/EXTREME, winning in NORMAL — regime-blocked, not killed.
+- bb-squeeze+ has 68.4% WR but negative PnL ($-0.19/24h) — wins are small, losses are large. Watch R:R.
+- FAMILY_MAP: mtf-regime-trend added (was returning 'Other' — prior sideways issue from 2026-10-03).
+- Pipeline restart needed to load volatility_gate_v2.py and signal_compactor.py changes.

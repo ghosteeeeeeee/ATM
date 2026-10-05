@@ -326,6 +326,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
+    ('EXTREME', 'mtf_regime_trend_short'): 0.0,  # BLOCKED 2026-10-05 signal_reporter — 24h 2T 0%WR -$0.23 EXTREME. NORMAL 66.7%WR all-time kept. SHORT loses in storms.
+    ('EXTREME', 'mtf-regime-trend-'): 0.0,       # hyphen variant (source string)
     # ── NORMAL regime: per-signal overrides ──
     # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
     # Entries use BOTH underscore and hyphen forms — substring matching means
@@ -383,6 +385,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH (legacy underscore form)
     ('HIGH', 'pullback-entry-'): 1.0,            # OK — 30d HIGH: 58T +$0.43. Works in HIGH, bleeds NORMAL.
+    ('HIGH', 'mtf_regime_trend_short'): 0.0,     # BLOCKED 2026-10-05 signal_reporter — all-time HIGH 6T 33.3%WR -$0.40. NORMAL 66.7%WR kept. SHORT loses in HIGH.
+    ('HIGH', 'mtf-regime-trend-'): 0.0,          # hyphen variant (source string)
     # ── HIGH: bleeding signals (30d cross-tab) ──
     ('HIGH', 'ema300_dip_short'): 0.3,           # PENALIZED — 30d HIGH: 12T -$0.64. Bleeds BOTH regimes.
     ('HIGH', 'ema300_dip'): 0.5,                 # PENALIZED — 30d HIGH: 28T -$0.17. Bleeds less than NORMAL.

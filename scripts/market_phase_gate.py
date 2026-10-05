@@ -93,6 +93,8 @@ FAMILY_MAP = {
     'Grind_Trend': ['grind_trend_long', 'grind_trend_short', 'grind-trend+', 'grind-trend-'],
     'R2_Structural': ['rr_structural', 'rr_structural_long', 'rr_structural_short',
                        'rr-struct', 'rr-struct+', 'rr-struct-'],
+    'MTF_Regime_Trend': ['mtf-regime-trend', 'mtf-regime-trend+', 'mtf-regime-trend-',
+                          'mtf_regime_trend', 'mtf_regime_trend_long', 'mtf_regime_trend_short'],
 }
 
 # Reverse lookup: signal_type → family
