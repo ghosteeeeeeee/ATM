@@ -2661,5 +2661,55 @@
     "category": "rejected",
     "status": "rejected",
     "risk": "would deepen bleed — FAILS evidence test"
+  },
+  {
+    "timestamp": "2026-10-05T00:37:51Z",
+    "idea": "STANDALONE_BYPASS must honor volatility_gate hard blocks (mult==0.0 -> skip, not pass_gate=True)",
+    "rationale": "bb-bounce-v3 NORMAL block already coded (0cb0784b) but bypass path opens trade anyway — 3 NORMAL trades on Oct 4 after gate landed. Same class as DRIFT-005. Without this, every future regime-block is theater for bypass signals.",
+    "expected_impact": "NORMAL bb-bounce-v3: block 8 losers -$0.83, lose 8 winners +$0.44 -> net +$0.39 per 14d. Makes ALL per-signal regime blocks work for bypass signals.",
+    "category": "path fix / gate enforcement",
+    "status": "suggested",
+    "risk": "medium — path change; bug_hunter verify HIGH 1.0 and non-zero mults still pass",
+    "blocked_on": "freeze lift Oct 6 00:38 + bug_hunter",
+    "sample_size": "bb-bounce-v3 n=20 14d; pump-chain+/mover+ n=38 combined"
+  },
+  {
+    "timestamp": "2026-10-05T00:37:51Z",
+    "idea": "Leverage-scaled hard_max_loss: stop distance inversely scaled to leverage (5x wider price stop, account loss caps near 1%)",
+    "rationale": "14d hard_max_loss 42T: 3x avg pnl_pct -3.09%, 5x avg -4.51%. Stop fires on ~1% price move but becomes 3-4.5% account loss. Widening CUT_LOSER_PNL rejected (MFE 0-0.5% on 32/42).",
+    "expected_impact": "Cap hard_max_loss account bleed variance; does NOT change entry quality.",
+    "category": "risk geometry",
+    "status": "suggested",
+    "risk": "medium — needs bug_hunter numbers on which 5x trades would survive wider price stops",
+    "blocked_on": "bug_hunter hard_max_loss semantics + freeze",
+    "sample_size": "n=42 14d hard_max_loss"
+  },
+  {
+    "timestamp": "2026-10-05T00:37:51Z",
+    "idea": "REJECTED: blanket volume_spike<0.5 @ RSI>80 entry filter (watchdog PATTERN 1)",
+    "rationale": "14d data REFUTES: volume_spike<0.3 is BEST band (91T 56% +$0.57). RSI>80 + vol<0.3 still 66.7% WR +$0.22. Would kill winners.",
+    "expected_impact": "N/A — rejected",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "would kill >20% of winners — FAILS impact test"
+  },
+  {
+    "timestamp": "2026-10-05T00:37:51Z",
+    "idea": "REJECTED: bb-bounce-v3 RSI_MAX 55->40",
+    "rationale": "14d winners RSI>40: 8/13 blocked (61.5% of winners). Issue is NORMAL regime + bypass path, not RSI ceiling.",
+    "expected_impact": "N/A — rejected",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "would kill 61.5% of winners — FAILS impact test"
+  },
+  {
+    "timestamp": "2026-10-05T00:37:51Z",
+    "idea": "Watch: BB_BOUNCE_V3_REGIME_NORMAL_MULT 1.1->0.0 post-bypass-fix (stale 'best regime' comment)",
+    "rationale": "Data says NORMAL is worst regime for this signal. Boost is wrong. One variable at a time after bypass enforcement lands.",
+    "expected_impact": "Removes false confidence boost in losing regime",
+    "category": "entry sniper",
+    "status": "queued_post_freeze",
+    "risk": "low — single constant + comment",
+    "blocked_on": "DRIFT-A bypass fix first"
   }
 ]
