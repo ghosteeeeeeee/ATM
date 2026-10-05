@@ -4047,3 +4047,7 @@ BY: auto_1hr
 DB-verified: 2T last hour INJ bb-squeeze+ LONG hard_max_loss -$0.25 (-5.67%) + WLD bb-squeeze+ LONG trail +$0.09 (+4.15%) net -$0.16 | 24h 37T 21W 15L 1 flat -$1.05 56.8%WR atr_sl_hit 1/37=2.7% not dominant | open 1 HBAR pump-chain- SHORT +0.17%
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. NEG-STREAK TRIGGER MET (06-08 = 3 consecutive negative hours with closes) but regime mixed not cleanly NEUTRAL + freeze blocks size change.
 WATCH: hard_max_loss family 12T -$2.21 sole 24h loss concentration (bb-squeeze+ subset 5T 0W -$0.89) | bb-squeeze+ 17T 10W -$0.45 has wins | bb-bounce-v3-long+ 7T 3W -$0.42 | 0cb0784b awaiting CEO
+BY: auto_1hr
+DB-verified: 1T last hour SAND mtf-regime-trend- SHORT hard_max_loss -$0.10 (-4.33%, price +0.867% against SHORT) | 24h 37T 21W 16L -$1.02 56.8%WR atr_sl_hit 1/37=2.7% not dominant | open 2 ETH/HBAR | NEG-STREAK TRIGGER MET 06-09=4 consecutive negative hours with closes
+CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. Neg-streak met but regime mixed (NORMAL -$0.49, HIGH -$0.59) not cleanly NEUTRAL + freeze blocks size change. Queue post-freeze size review.
+WATCH: hard_max_loss family 13T -$2.31 sole 24h loss concentration | mtf-regime-trend- SHORT 3T 0W -$0.53 (LONG side has trail wins) | R:R inversion avg win +$0.062 vs avg loss -$0.178 | 0cb0784b RATIFIED by CEO 09:55 | post-freeze queue updated by CEO (CL-T1 #1, decider_run v1->v2 #2)

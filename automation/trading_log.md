@@ -3855,3 +3855,26 @@ BY: auto_1hr
 - Negative streak 3h MET — freeze-blocked; post-freeze: check if size reduction warranted when regime re-assessed.
 - bb-bounce-v3-long+ NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 10:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — SAND mtf-regime-trend- SHORT hard_max_loss -$0.10 (-4.33% account; price +0.867% against SHORT)
+**PnL:** -$0.10 last hour (0% WR) | 24h: 37T 21W 16L -$1.02 (56.8% WR) | Open: 2 (ETH bb-bounce-v2-long+ LONG flat +0.06%, HBAR pump-chain- SHORT flat +0.42%)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. Negative-streak trigger MET (06-09 = 4 consecutive negative hours with closes) but regime mixed not cleanly NEUTRAL + freeze blocks size change.
+
+**No Change Needed:**
+- **Entry quality:** SAND SHORT entered 0.072451, price ran to +0.867% against before hard stop at SL 0.073392 (~1.3% adverse). Same hard_max_loss family — entry went adverse immediately, never worked. 24h hard_max_loss 13T -$2.31 avg -$0.178 (vs trail wins avg +$0.062) — R:R inversion persists (avg win 0.062 / avg loss 0.178 = 2.9:1 against).
+- **atr_sl_hit >40%:** 1/37 (2.7%) of 24h closes. Dominant exits: profit-monster-trail 21T +$1.15 (56.8%), hard_max_loss 13T -$2.31 (35.1%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** Last hour mtf-regime-trend- 1T 0W — n=1 < 3T threshold. 24h by signal worst n>=3: bb-bounce-v3-long+ 7T 42.9%WR -$0.42 (has wins), mtf-regime-trend- 5T 40.0%WR -$0.42 (has wins: MET/RESOLV trail +$0.11; 3 SHORT hard_max_loss -$0.53), bb-squeeze+ 16T 62.5%WR -$0.32 (has wins). doji-bottom/btc-pump-rider n=1 below threshold. No kill.
+- **Negative PnL streak:** TRIGGER MET — hours with closes Oct 5: 03:-$0.15, 04:-$0.01, 05:0T gap, 06:-$0.30, 07:-$0.11, 08:-$0.16, 09:-$0.10 → consecutive negative = 4 (06-09). Rule: consider size reduction if NEUTRAL. Regime 24h is MIXED (NORMAL 18T -$0.49, HIGH 11T -$0.59, EXTREME 4T -$0.09, FLAT 3T +$0.15) — not cleanly NEUTRAL; both NORMAL and HIGH bleeding. Plus freeze blocks any size constant change. Queue post-freeze size review.
+- **Overtrading:** 1T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run. 0cb0784b RATIFIED by CEO 09:55 (NORMAL 0.0x + HIGH 1.0x DB-correct; execution-path fix queued post-freeze).
+
+**Open Questions:**
+- hard_max_loss family 13T -$2.31 sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze). mtf-regime-trend- SHORT subset 3T 0W -$0.53 — SHORT entries keep getting run over in this regime (SAND/WLD/IMX all +0.8-1.4% adverse before stop). LONG side of same signal has trail wins.
+- 24h PnL -$1.02 at 56.8% WR — R:R inversion persists; exit-quality issue if it survives freeze.
+- Negative streak 4h MET — freeze-blocked; post-freeze: check if size reduction warranted when regime re-assessed.
+- CEO 09:55 updated post-freeze queue: (1) decider_run v1->v2 import + fail-open, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only. auto_1hr will not duplicate these.
+- candles.db lock contention in price_collector (health_monitor 09:47: 46 events/60m) — concurrent-writer issue, code-level serialization fix pending.
