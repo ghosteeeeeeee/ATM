@@ -2800,5 +2800,46 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-05T11:40:00Z",
+    "idea": "Never-worked entry detector — shadow MFE monitor tagging signal×regime cells where hard_max_loss losers never showed positive MFE, feeding self_learner entry-quality filters",
+    "rationale": "7d hard_max_loss 48T -$6.90 with MFE 0.11-0.60% — entries wrong-side from bar 1. Exit_reason learning exists; entry-filter conversion does not.",
+    "expected_impact": "2-4 filterable cells/week; ~$2-3/week recovery if 30% filterable at +$0.15 avg",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Shadow-only: on hard_max_loss close, if mfe_pct < ATR_SL_MIN/2 increment cell in brain/never_worked_cells.json. Zero live path changes."
+  },
+  {
+    "date": "2026-10-05T11:40:00Z",
+    "idea": "pump-chain- SHORT RSI-band confidence matrix — suppress EXTREME RSI<35, boost EXTREME RSI>=40",
+    "rationale": "14d: EXTREME RSI<35 = 33T 39.4% -$1.30 vs RSI>=40 = 17T ~70% +$0.77. Same signal, opposite edges by RSI band. Not time-based.",
+    "expected_impact": "~$0.65/14d if suppress cuts 50% of bleed band",
+    "category": "entry sniper",
+    "status": "suggested_post_freeze",
+    "risk": "medium",
+    "implementation": "Post-freeze only. VOL_PHASE_MULTS-style per-band multipliers. One variable: suppress-first, monitor 7d, then boost."
+  },
+  {
+    "date": "2026-10-05T12:30:00Z",
+    "idea": "Soft-trigger pnl>=+2% guard — stop noise-stopping losing trades",
+    "rationale": "position_manager.py:3305 fires soft-trigger when live_pnl<=0 and age>=2h. Sets SL 0.3% from current price on trades that havent developed. ETH 15944: ATR wrote SL -1.30%, soft-trigger pulled to -0.30% at pnl=-0.08%. Watchdog flagged URGENT.",
+    "expected_impact": "Preserve losing trades that would have recovered. Reduce hard_max_loss noise exits. 0% winner impact.",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "position_manager.py:3305 — change live_pnl<=0 to live_pnl>=2.0. Code-only fix."
+  },
+  {
+    "date": "2026-10-05T12:30:00Z",
+    "idea": "pump-chain- SHORT RSI_MIN=35 (not 40) — block only toxic oversold band",
+    "rationale": "30d: RSI<25 15T 20%WR -$1.24 (toxic), 25-40 35T 51.4% -$0.21 (breakeven), 40-55 16T 62.5% +$0.29, >=55 58T 60.3% +$0.69. RSI_MIN=35 blocks <25 while preserving 25-40 winners.",
+    "expected_impact": "Block ~15 toxic trades/30d (-$1.24) while preserving 25-40 band winners. Net +$0.5-1.0/30d.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low-medium",
+    "implementation": "Post-freeze: RSI_MIN=35 on pump-chain- SHORT path. Verify winner impact first.",
+    "winner_impact": "7d: block ~3-4 RSI<25 winners (~+$0.20) vs ~15 losers (~-$1.24). Net positive."
   }
 ]
