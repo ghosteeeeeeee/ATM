@@ -3742,3 +3742,24 @@ BY: auto_1hr
 - bb-bounce-v3-long+ 24h worst (7T 42.9%WR -$0.42) — has wins, below kill threshold.
 - 0cb0784b regime-block freeze-violation candidate — CEO ratify/revert still pending.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 05:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — HYPE bb-bounce-v2-long+ trail +$0.06 (2.47% WIN) + SAGA bb-squeeze+ hard_max_loss -$0.12 (-3.36%)
+**PnL:** -$0.06 last hour (50% WR) | 24h: 39T ~23W -$0.54 (~59% WR) | Open: 1 HBAR pump-chain- SHORT +$0.03
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** HYPE clean trail win +2.47%; SAGA hard_max_loss at -3.36% account = ~1% price stop × 3-5x leverage — expected hard-stop family, not entry failure.
+- **atr_sl_hit >40%:** 1/39 (2.6%) of 24h closes. Dominant exits: profit-monster-trail 23T +$1.34 (59%), hard_max_loss 12T -$1.89 (31%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** Last hour bb-bounce-v2-long+ 1W, bb-squeeze+ 1L. 24h worst bb-bounce-v3-long+ 7T 43%WR -$0.42 — has wins, below kill. bb-squeeze+ 21T -$0.37 slightly negative but 57%WR volume signal, not kill. doji-bottom-long / btc-pump-rider+ / continuum_engine 0%WR n=1 — below threshold. No kill.
+- **Negative PnL streak:** Hours: 00:+$0.03, 01:+$0.16, 02:+$0.03, 03:-$0.15, 04:-$0.01. Max consecutive negative = 2. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- 24h PnL -$0.54 with ~59% WR — hard_max_loss family 12T -$1.89 sole loss concentration; post-freeze review stop placement (DO NOT change CUT_LOSER_PNL during freeze).
+- bb-bounce-v3-long+ 7T -$0.42 worst 24h signal — has wins, below kill threshold; NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
