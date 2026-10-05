@@ -2762,5 +2762,34 @@
     "category": "monitoring",
     "status": "suggested",
     "risk": "none — shadow/monitoring only, freeze-safe."
+  },
+  {
+    "date": "2026-10-05T05:38:10Z",
+    "idea": "BB_SQUEEZE_LONG_RSI_MIN=60 — entry sniper for bb-squeeze+ LONG",
+    "rationale": "14d RSI bands: <60 = 8T 25%WR -$0.35 (hard_max_loss cluster); 60-69 = 18T 66.7% -$0.06; 80-89 = 12T 75% +$0.22; 90+ = 8T 75% +$0.31. Weak-RSI squeeze longs die before trail pays; strong-RSI momentum longs win. Every pump is a LONG opportunity — we only skip the pumps that aren't actually pumping (RSI not confirming momentum).",
+    "expected_impact": "Saves ~$0.35/14d on blocked cohort; preserves 94.6% of winners (35/37). Reduces hard_max_loss tail on this family without regime-kill.",
+    "category": "entry sniper",
+    "status": "suggested_post_freeze",
+    "risk": "low",
+    "winner_impact_check": "14d: blocked_n=8, blocked_winners=2, kept_winners=35 — 5.4% winner kill (<20% threshold). Blocked cohort net pnl=-0.35 (negative → blocking adds to system)."
+  },
+  {
+    "date": "2026-10-05T05:38:10Z",
+    "idea": "Leverage-aware secondary hard stop (lev>=5, account pnl<=-3% → force close) — shadow only",
+    "rationale": "hard_max_loss 14d all fire at 1.30% PRICE. bb-squeeze+ lev5 4T avg -5.31% account vs lev3 9T avg -3.24%. A -3% account trip for lev>=5 cuts the worst tail without touching CUT_LOSER_PNL or ATR_SL_MIN. Shadow-first so we see would-have-closed list before live.",
+    "expected_impact": "Would have cut lev5 hard_max_loss ~2-3pp earlier on bleeding families; preserve trail winners that never hit -3% account.",
+    "category": "exit protector",
+    "status": "suggested_shadow",
+    "risk": "low (shadow only)",
+    "winner_impact_check": "pending bug_hunter backtest — not applied this run"
+  },
+  {
+    "date": "2026-10-05T05:38:10Z",
+    "idea": "gate_shadow.py: 0.0-cell breach counter — alert when trades open in hard-blocked signal×regime cells",
+    "rationale": "DRIFT-A went undetected for hours because vol-gate 0.0 blocks are set-and-forget. gate_shadow already parses pipeline.log. Add counter for trades opening where volatility_gate_v2 returns 0.0.",
+    "expected_impact": "Turns vol gate into monitored invariant; catches bypass/breach classes in <30min instead of next audit.",
+    "category": "monitoring",
+    "status": "suggested_prior_run_reconfirmed",
+    "risk": "none (read-only monitor)"
   }
 ]
