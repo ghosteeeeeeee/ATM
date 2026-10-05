@@ -21,9 +21,13 @@ from candles_lock import acquire as _candles_lock_acquire, release as _candles_l
 
 TF_SECONDS = 60
 TABLE = 'candles_1m'
-# price_history ticks are ~155s apart; 1 tick is sufficient for a valid 1m candle
-MIN_BARS_FOR_CLOSED = 1
-MIN_BARS_FOR_DEVELOPING = 1
+# FIX 2026-10-05: raised from 1 to 3 — 1 tick per 1m window = O=H=L=C (flat candle).
+# Flat candles broke ALL RSI calculations for alt coins for 69+ days. price_history
+# ticks are ~155s apart, so most 1m windows only have 1 tick. Require 3+ ticks for
+# a meaningful candle with real OHLC range. price_collector.py is the primary OHLC
+# source; aggregator only fills gaps when enough tick data exists.
+MIN_BARS_FOR_CLOSED = 3
+MIN_BARS_FOR_DEVELOPING = 2
 
 
 def migrate_is_closed():
