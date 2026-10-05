@@ -2235,9 +2235,9 @@ SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for
 #   EXTREME regime: 99T 58.6% WR +$5.69 (strong edge)
 #   HIGH regime: 91T 51.6% WR -$2.38 (no edge)
 #   NORMAL regime: 79T 45.6% WR -$1.38 (no edge)
-# FREEZE: ENABLED=False until Oct 6 00:38 — CEO review pending
-TREND_RIDE_LONG_ENABLED = False             # master kill-switch (freeze: False until Oct 6)
-TREND_RIDE_LONG_PLUS_ENABLED = False        # LONG direction (freeze: False until Oct 6)
+# T directive 2026-10-05: make live + standalone bypass (overrides freeze for this signal)
+TREND_RIDE_LONG_ENABLED = True              # master kill-switch
+TREND_RIDE_LONG_PLUS_ENABLED = True         # LONG direction
 TREND_RIDE_RSI_MIN = 50                     # RSI floor — momentum zone start
 TREND_RIDE_RSI_MAX = 70                     # RSI ceiling — don't chase overbought
 TREND_RIDE_VOL_MULT = 1.2                   # volume must be >= 1.2x 20-period average
@@ -2715,6 +2715,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'accel-30',  # regex-stripped variant of accel-300 (trailing digits removed)
     'accel-300-',  # trailing-dash variant — re-enabled 2026-09-22 (CEO: ZEN SHORT +8.92%)
+    'trend-ride+',  # established uptrend + RSI 50-70 momentum — T directive 2026-10-05
     'accel-300-breakout',  # ATR breakout signal — works solo (2026-09-13)
     'accel-300-v2-short',  # strong trend momentum SHORT — structural breakout signal, works solo
     'accel-300-v2-long',   # strong trend momentum LONG — structural breakout signal, works solo
