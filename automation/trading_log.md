@@ -4138,3 +4138,39 @@ Report: automation/signal_report.md
 - STANDALONE_BYPASS oversold-SHORT enforcement hole — queue#9 PRIORITY (unchanged)
 - BTC ORPHAN_PAPER artifacts (2T $0) — known noise
 BY: auto_1hr
+
+## [2026-10-05 21:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour, last close 16:23 UTC ~5h ago) | 3 open LONG
+**PnL:** $0.00 this hour (WR: N/A) | 24h: 32T 18W 12L 2flat -$0.64 (56.3% WR)
+
+**24h close reasons:**
+- profit-monster-trail 19T +$1.01 (avg +0.053) — dominant winner
+- hard_max_loss 7T -$1.18 (avg -0.169) — sole 24h loss concentration (22% of closes)
+- hard_sl 2T -$0.38 | ORPHAN_PAPER 2T $0 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06
+- atr_sl_hit: **0/32 = 0%** — not dominant, no SL-tightness trigger
+
+**24h by signal (worst):**
+- mtf-regime-trend- 4T 1W 3L -$0.48 — queue#6 (unchanged)
+- volume-breakout-long+ 1T 0W -$0.27 — 1T only, below kill threshold
+- btc-pump-rider+ 2T 0W -$0.16 — below 3T kill threshold
+- bb-squeeze+ 16T 11W -$0.03 — flat despite good WR (trail winners vs hard_max_loss losers)
+- bb-bounce-v2-long+ 5T 4W +$0.12 — positive
+
+**Open positions:** MERL bb-squeeze+, CRV mover+, TURBO bb-squeeze+ — all LONG opened 20:21-20:36 UTC, unrealized ≈ $0 (flat, ~35-50 min old). Pipeline MAE guard active.
+
+**Changes:** none — freeze b960ffe8 until Oct 6 00:38 still ACTIVE (~3.4h remaining); trading-config changes blocked. No trigger met.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — 0 trades last hour; 24h 0%-WR signals all below 3T threshold (btc-pump-rider+ 2T, volume-breakout-long+ 1T)
+- Negative avg_pnl streak: NOT triggered — last 3 trade-bearing hours +$0.06/+0.12/+0.11 (9h -, 11h +, 13h -, 14h -, 15h +, 16h +). Max consecutive neg = 2
+- Overtrading: 0 trades/hour — quiet market, not overtraded. 3 young open positions being managed
+- atr_sl_hit 0% — tpsl_utils fix stable, no CEO alert
+- Live trading: enabled (CEO re-enable prior). Pipeline healthy, signal_analyst rc=0 at 21:11 (regime=LONG_BIAS)
+
+**Open Questions / Sideways:**
+- ⚠️ **Freeze violation candidate:** commit `45da8fcf` @ 21:10:45 UTC modified `scripts/signals/trendline_bounce_long.py` (BASE_CONFIDENCE 70→75, R2_BONUS_MAX 10→12, TOUCH_BONUS_MAX 8→10, MAX_CONFIDENCE 88→92, +distance bonus) DURING freeze b960ffe8. Same class as 0cb0784b. CEO must RATIFY or REVERT.
+- hard_max_loss family 7T -$1.18 — post-freeze stop/entry review queue#2 (unchanged; prior audits: MFE 0.212 avg on hard_max_loss losers = entries never worked, not stops)
+- signal_versions.json has `pump-chain-` as non-dict (list) — audit store data corruption, minor
+- Hotset starvation + STANDALONE_BYPASS oversold-SHORT enforcement hole — post-freeze queue #9 PRIORITY (unchanged)
+BY: auto_1hr
