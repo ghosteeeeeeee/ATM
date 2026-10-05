@@ -578,6 +578,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('r2_trend_long', 'r2l-long'):          1.0,
     # r2_trend_v2_long — R² trend confirmation v2 for LONG (independent copy)
     ('r2_trend_v2_long', 'r2v2-long'):      1.0,
+    # trendline_bounce_long — ascending trendline bounce LONG (dynamic support)
+    ('trendline_bounce_long', 'tl-bounce+'): 1.0,
     # r2_trend_short — R² downtrend detector (SHORT only, R²>0.6, slope<0)
     ('r2_trend_short', 'r2-trend-short'):  1.0,
     # slow_grind_short — slow grinding downtrend detector (low volatility, high R²)

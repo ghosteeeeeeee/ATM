@@ -2124,6 +2124,22 @@ R2_TREND_V2_LONG_MAX_ACCEL     = 0.005   # block LONG when price_acceleration > 
 R2_TREND_V2_LONG_MIN_PRE_MOVE  = 0.3     # min pre-entry move % — block LONG when price dropping
 R2_TREND_V2_LONG_MAX_GAP300    = 0.50    # max gap from EMA300 (%) — don't LONG when extended
 R2_TREND_V2_LONG_MIN_R2_RISE   = 0.05    # min R² rise for transition detector
+
+# ── Trendline Bounce LONG (buys bounces off ascending trendlines) ──────────
+# trendline_bounce_long.py — ascending trendline acts as dynamic support
+# Thesis: price pulls back to validated trendline, buyers defend, price bounces
+# Backtest (BTC 1H Sep 20-Oct 5): 4T/100% WR, R:R=18.57:1, MFE=+1.04%, MAE=-0.06%
+TRENDLINE_BOUNCE_LONG_ENABLED = True           # master kill-switch
+TRENDLINE_BOUNCE_LONG_MIN_R2 = 0.50            # min R² for valid trendline (linear regression)
+TRENDLINE_BOUNCE_LONG_MIN_TOUCHES = 2          # min swing low touches to validate trendline
+TRENDLINE_BOUNCE_LONG_MAX_DEVIATION_PCT = 0.3  # max deviation from trendline (%)
+TRENDLINE_BOUNCE_LONG_MAX_DEVIATION_ATR_K = 0.5  # max deviation as multiple of ATR%
+TRENDLINE_BOUNCE_LONG_MIN_VOLUME_RATIO = 1.0   # min volume/avg volume for bounce confirmation
+TRENDLINE_BOUNCE_LONG_SWING_WINDOW = 3         # swing low detection window (candles each side)
+TRENDLINE_BOUNCE_LONG_LOOKBACK_CANDLES = 100   # 1h candles to analyze (~4 days)
+TRENDLINE_BOUNCE_LONG_MIN_CANDLES = 50         # minimum candles required
+TRENDLINE_BOUNCE_LONG_STALENESS_SEC = 5400     # 90 min — 1h candles update hourly
+
 # ── EMA300 Dip LONG (buys dips to EMA300 during confirmed uptrends) ──────────
 # ema300_dip_long.py — catches shallow pullbacks in strong uptrends
 EMA300_DIP_LONG_ENABLED = False          # DISABLED 2026-09-15 — 20% WR, 5T/7d, -$0.55. Catches falling knives in HIGH volatility.
@@ -2685,7 +2701,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'inv-accel-300-v2',  # mean reversion — structural exhaustion signal, works solo
     'return_exhaustion_short', 'return-exhaustion-short',  # underscore + hyphen variants (2026-09-23: hyphen variant was missing, blocking GOAT SHORT)
     'hzscore', 'return_exhaustion_long',
-    'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long',
+    'r2l-long', 'r2-trend-long', 'r2-trend-short', 'r2v2-long', 'tl-bounce+',
     # ponytail: ema300-dip-long removed — dead (2T/7d 0%WR -$0.40)
     # ponytail: ema300-dip-short removed — killed Sep 8
     'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo

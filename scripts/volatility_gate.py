@@ -82,6 +82,7 @@ REGIME_SIGNALS = {
         'bb-bounce-short',  # standalone SHORT bounce signal
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
+        'tl-bounce+',  # trendline bounce LONG — dynamic support
         'trend_momentum_near_sma',
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
@@ -155,7 +156,7 @@ REGIME_SIGNALS = {
         'accel-300-v2-long-5m+', 'accel-300-v2-long-5m-',  # V2 strong trend momentum LONG 5m
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
-        'r2-trend-long', 'r2-trend-short',  # R² trend detectors (v2 removed EXTREME — too risky for trend-following)
+        'r2-trend-long', 'r2-trend-short', 'tl-bounce+',  # R² trend detectors + trendline bounce
         'ema300-dip-long',  # EMA300 dip buyer — trend following
         'ema300-dip-short',  # EMA300 rally seller — trend following
         'slow-grind-',  # slow grinding downtrend detector

@@ -931,6 +931,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # trendline_bounce_long — ascending trendline bounce LONG
+            if _comp.startswith('tl-bounce+'):
+                try:
+                    from hermes_constants import TRENDLINE_BOUNCE_LONG_ENABLED
+                    if not TRENDLINE_BOUNCE_LONG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TRENDLINE_BOUNCE_LONG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # slow_grind_short — slow grinding downtrend detector
             if _comp == 'slow-grind-' and not SLOW_GRIND_SHORT_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_SHORT_ENABLED=False', flush=True)
@@ -2811,6 +2820,13 @@ def is_component_disabled(component: str) -> bool:
         try:
             from hermes_constants import R2_TREND_V2_LONG_ENABLED
             return not R2_TREND_V2_LONG_ENABLED
+        except ImportError:
+            return False
+    # trendline-bounce-long
+    if c.startswith('tl-bounce+'):
+        try:
+            from hermes_constants import TRENDLINE_BOUNCE_LONG_ENABLED
+            return not TRENDLINE_BOUNCE_LONG_ENABLED
         except ImportError:
             return False
     # ema300-dip-long
