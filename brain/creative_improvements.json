@@ -2952,5 +2952,35 @@
     "status": "suggested — signal_analyst owns",
     "risk": "low",
     "sample": "10T+ historical, signal quality proven"
+  },
+  {
+    "date": "2026-10-05T18:35:50Z",
+    "idea": "Fix trade_watchdog wrong-side detection to use meta _signal_metadata.rsi_14 instead of stored entry_rsi_14",
+    "rationale": "Watchdog's #1 steer ('8 wrong-side losses') is largely a telemetry bug. TURBO stored=100 meta=33.33 flips the conclusion from 'chasing overbought' to 'oversold LONG = correct side'. Fixing the source stops false disable-signal recommendations and saves audit cycles. Code-path telemetry fix, not a trading constant.",
+    "expected_impact": "Eliminates false wrong-side steers; prevents bad config decisions from bad data; aligns watchdog with DRIFT-E findings",
+    "category": "telemetry honesty",
+    "status": "suggested",
+    "risk": "low",
+    "freeze_handling": "queue post-freeze with bug_hunter (confirm no trading-path side effects); may qualify for crash-bug carve-out but conservative = queue"
+  },
+  {
+    "date": "2026-10-05T18:35:50Z",
+    "idea": "bb-squeeze+ confidence dampen for meta-RSI 40-59 band (soft, not hard block) — post-freeze monitor first",
+    "rationale": "7d meta RSI: 60-74 = 29T 75.9% +$0.76 BEST vs 40-59 = 27T 51.9% -$0.41. Hard block REJECTED (75+ ceiling kills 4/6 winners; <40 n=6). Soft confidence dampen = one variable, preserves sample, re-baselines as data accumulates.",
+    "expected_impact": "Reduce churn in 40-59 band; preserve 60-74 edge; n=27 is above 20T threshold but freeze blocks execution — monitor 48h first per conservative default",
+    "category": "entry sniper",
+    "status": "suggested — deferred post-freeze",
+    "risk": "low-medium",
+    "freeze_handling": "monitor only until Oct 6 00:38; implement one-variable dampen after"
+  },
+  {
+    "date": "2026-10-05T18:35:50Z",
+    "idea": "Leverage-scaled hard_max_loss cap on high-bleed signals (bb-squeeze+ HIGH lev<=3) — CEO/risk decision",
+    "rationale": "30d: hard_max_loss lev>=5 27T -$4.04 vs PM-trail lev>=5 166T +$9.47. The exit works; leverage amplifies the stop into 3-5% account losses. 7d bb-squeeze+ hard_max_loss 14T -$2.08 avg lev 3.71 is the top bleed signal. Cap reduces size on the loss side without killing entries (PM-trail winners at lev>=5 still exist).",
+    "expected_impact": "Reduce hard_max_loss account impact ~40-50% on capped signals; entries still fire, size smaller",
+    "category": "risk structure",
+    "status": "suggested — CEO/risk review post-freeze",
+    "risk": "medium (sizing change, not kill)",
+    "freeze_handling": "post-freeze CEO decision; do not apply unilaterally"
   }
 ]
