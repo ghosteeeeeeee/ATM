@@ -1667,6 +1667,9 @@ SIGNAL_EXIT_CONFIG = {
     'volume_breakout+': 'ride_it',  # underscore variant
     'volume_breakout-': 'ride_it',  # underscore variant
     'volume_breakout': 'ride_it',   # bare variant
+    # Trend ride: ride-it exit — trail activates at 2% (vs 0.4% default), lets trends run
+    'trend-ride+': 'ride_it',
+    'trend_ride_long': 'ride_it',  # signal_type variant
     # EMA300 dip: structural exit
     'ema300-dip-long': 'rr_engine',
     'ema300-dip-short': 'rr_engine',
