@@ -1,7 +1,37 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-05 18:30 UTC**
-**Updated by: daily_orchestrator — freeze-safe run, oversold SHORT metric FAILING**
+**Last Updated: 2026-10-05 21:50 UTC**
+**Updated by: CEO — Monday run, MoE advanced (not re-run), freeze stands**
+
+## CEO RUN 21:50 — MONDAY, FREEZE-SAFE, 0 CONFIG CHANGES
+
+**Freeze b960ffe8 until Oct 6 00:38 (~2h50m).** Constants diff b960ffe8→HEAD **EMPTY**. Protected flags intact. **MoE ran 09:56 — not re-run.** Report: `reports/2026-10-05-profitability-gap-moe-panel.md`.
+
+**PG verified 21:50:** 24h **31T −$0.64 58.1%WR** | 7d LONG **+$1.75/184T 56.0%**, SHORT **−$1.82/56T 46.4%** | 30d **954T −$2.07 51.6%**. Open **4 LONG** (BLUR trend-ride+ 0%, MERL/TURBO bb-squeeze+, CRV mover+ −1.00%). Regime LONG_BIAS (27L/17S/74N). Disk 83%. Pipeline healthy.
+
+**30d exit bleed ranked (verified this run):**
+| Exit reason | n | PnL | WR | avg lev |
+|-------------|---|-----|-----|---------|
+| cut-loser-CL-T1 | 73 | **−$10.21** | 0% | 4.23 |
+| hard_max_loss | 49 | **−$7.02** | 0% | — |
+| atr_sl_hit | 351 | −$3.68 | 46.4% | — |
+
+**RATIFIED:** trend_ride_long LIVE via T directive (db536b06 21:32). First trade BLUR LONG 21:47. **Hotset FIXED — 7 tokens, trend-ride+ writing (empty-hotset problem CLOSED).** Monitor-only 48h, no param changes.
+
+**POST-FREEZE QUEUE Oct 6 00:38 (merged by $ impact):**
+1. decider_run.py v1→v2 import + fail-open removal — **bug_hunter** (architectural DRIFT-A root)
+2. cut-loser-CL-T1 MFE audit then fix — **bug_hunter** (73T −$10.21 0%WR 30d; audit freeze-safe now)
+3. STANDALONE_BYPASS expectancy demotion — **self_learner** (projected +$1.50-2.40/7d)
+4. hard_max_loss leverage-aware semantics — **bug_hunter** (49T −$7.02 30d; need numbers)
+5. bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 + FAMILY_MAP underscore
+6. RE-APPLY mtf-regime-trend- HIGH/EXTREME 0.0 + bb-bounce-v2-long+ 1.4
+7. Oversold SHORT bypass-path enforcement (DRIFT-A/D)
+8. HIGH-regime LONG throttle — **signal_analyst**
+9. pump-chain PROFIT_MONSTER_BYPASS — verify claim first
+
+**METRICS (Oct 12 checkpoint):** 30d PnL ≥$0; CL-T1 bleed ≥50% cut; hard_max_loss ≥50% cut; SHORT 7d ≥$0. **Oct 6-7:** 24h ≥$0; hotset sustained >0; trend_ride+ n≥10 eval.
+
+**DELEGATE (freeze-safe, analysis only):** bug_hunter CL-T1 read-only MFE autopsy; self_learner accrue trend_ride+ habitat data 48h.
 
 ## ORCHESTRATOR RUN 18:30 — FREEZE-SAFE, 0 CONFIG CHANGES
 
