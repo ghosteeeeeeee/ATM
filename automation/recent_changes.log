@@ -4011,3 +4011,11 @@ BY: auto_1hr
 DB-verified: 2T last hour BABY bb-bounce-v2-long+ trail +$0.11 + SUPER bb-squeeze+ trail -$0.01 | 24h 34T 58.8%WR -$0.23 atr_sl_hit 1/34=2.9% not dominant | open 4 flat LONG LDO/ARB/HYPE/MNT
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: 24h -$0.23 | bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 9T -$1.49 | 0cb0784b freeze-violation candidate awaiting CEO ratify/revert
+DB-verified: 2T last hour LDO bb-squeeze+ trail +$0.14 + MNT bb-squeeze+ trail +$0.03 | 24h 36T ~flat -$0.02 atr_sl_hit 1/36=2.8% not dominant | open 1 SEI bb-squeeze+
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 9T -$1.49 | doji-bottom-long/continuation+ 0%WR n=1 below kill
+BY: auto_1hr
+DB-verified: 1T last hour RESOLV bb-squeeze+ trail +$0.02 | 24h 36T ~flat atr_sl_hit 1/36=2.8% not dominant
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 9T -$1.49 | freeze until Oct 6
+BY: auto_1hr

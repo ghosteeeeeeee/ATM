@@ -3652,3 +3652,48 @@ BY: auto_1hr
 - 4 open trades flat LONG (LDO/ARB/HYPE/MNT) — no urgency.
 - doji-bottom-long / continuation+ 0%WR n=1 — below kill, watch.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 01:08 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses) — LDO bb-squeeze+ +$0.14 (3.06%) + MNT bb-squeeze+ +$0.03 (1.51%), both profit-monster-trail
+**PnL:** +$0.17 last hour (100% WR) | 24h: 36T 20W 16L ~-$0.02 flat | Open: 1 SEI bb-squeeze+
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** Both winners exited trail with +1.5–3.1% — clean, no adverse-excursion concern.
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. Dominant exits: profit-monster-trail 22T +$1.46 (61%), hard_max_loss 9T -$1.49 (25%). tpsl_utils.py fix deployed and stable. hard_max_loss is intentional hard-stop family.
+- **Kill rule:** Last hour only bb-squeeze+ fired (2W). 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long 1T 0%WR -$0.25, continuation+ 1T 0%WR — n=1 each, below kill threshold. No kill.
+- **Negative PnL streak:** Hours: 19:+$0.19, 21:-$0.24, 22:+$0.06, 23:+$0.11, 00:+$0.03, 01:+$0.14. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates git-clean, no violations.
+
+**Open Questions:**
+- 24h PnL ~flat (-$0.02) with 48–59% WR band — sample noise, no structural signal.
+- hard_max_loss family 9T -$1.49 remains sole loss concentration — post-freeze review stop placement.
+- bb-bounce-v3-long+ 9T -$0.42 worst 24h signal — has wins, below kill threshold.
+- doji-bottom-long / continuation+ 0%WR n=1 — below kill, watch.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 02:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses) — RESOLV bb-squeeze+ +$0.02 (0.65%) profit-monster-trail
+**PnL:** +$0.02 last hour (100% WR) | 24h: 36T 20W 16L ~flat | Open: prior 1 SEI bb-squeeze+ (no new closes beyond RESOLV)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** RESOLV trail winner +0.65% — clean exit, no adverse-excursion concern.
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. Dominant exits: profit-monster-trail 22T +$1.46 (61%), hard_max_loss 9T -$1.49 (25%). tpsl_utils.py fix deployed and stable. hard_max_loss is intentional hard-stop family.
+- **Kill rule:** Last hour only RESOLV bb-squeeze+ fired (1W). 24h worst bb-bounce-v3-long+ 9T 44.4%WR -$0.42 — has wins, not 0%. doji-bottom-long 1T 0%WR -$0.25, continuation+ 1T 0%WR — n=1 each, below kill threshold. No kill.
+- **Negative PnL streak:** Max consecutive negative hours = 1 (not 3). No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- hard_max_loss family 9T -$1.49 remains sole 24h loss concentration — post-freeze review stop placement (DO NOT change CUT_LOSER_PNL during freeze).
+- bb-bounce-v3-long+ 24h worst (9T -$0.42) — has wins, below kill threshold.
+- 0cb0784b regime-block freeze-violation candidate — CEO ratify/revert still pending.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
