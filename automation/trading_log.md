@@ -4174,3 +4174,37 @@ BY: auto_1hr
 - signal_versions.json has `pump-chain-` as non-dict (list) — audit store data corruption, minor
 - Hotset starvation + STANDALONE_BYPASS oversold-SHORT enforcement hole — post-freeze queue #9 PRIORITY (unchanged)
 BY: auto_1hr
+
+## [2026-10-05 22:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.09 this hour (WR: 50.0%) | 24h: ~33T 19W 13L 1flat -$0.73 (~57.6% WR)
+
+**This hour:**
+- BLUR trend-ride+ LONG profit-monster-trail +$0.05 (+0.30%) — trail working
+- CRV mover+ LONG hard_max_loss -$0.14 (-6.15% account) — leverage-scaled, ~1% price move expected
+
+**24h close reasons:**
+- profit-monster-trail 20T +$1.06 (avg +0.053) — dominant winner
+- hard_max_loss 8T -$1.32 (avg -0.165) — sole 24h loss concentration (~24% of closes)
+- hard_sl 2T -$0.38 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06 | ORPHAN_PAPER 1T $0
+- atr_sl_hit: **0/33 = 0%** — tpsl_utils fix stable, not dominant, no CEO alert
+
+**Hourly PnL streak:** 22h -$0.09 | 16h +$0.11 | 15h +$0.12 | 14h -$0.11 — no 3h negative streak
+
+**Changes:** none — freeze b960ffe8 until Oct 6 00:38 (~2.4h remaining) blocks trading-config changes. No trigger met.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — last hour trend-ride+ 1T 1W, mover+ 1T 0W (below 3T). 24h 0%-WR signals all <3T (btc-pump-rider+ 2T, volume-breakout-long+ 1T, mover+ 1T)
+- Negative avg_pnl streak: NOT triggered — 22h is first negative trade-bearing hour after 15h/16h positive
+- Overtrading: 2 trades/hour — well under 20. Quiet market
+- atr_sl_hit 0% — no SL-tightness issue
+- Live trading: enabled. Pipeline healthy. CEO commit 79208f88: ratified trend_ride_long LIVE + hotset FIXED 7 tokens, freeze-safe 0 config
+
+**Open Questions / Sideways:**
+- ⚠️ **Freeze violation candidate 45da8fcf** (trendline_bounce_long confidence boost @21:10 during freeze) — still unratified in logs. CEO ratified trend_ride_live + hotset fix but not explicitly this one. CEO must RATIFY or REVERT.
+- hard_max_loss family 8T -$1.32 — post-freeze stop/entry review queue#2 (prior audits: MFE ~0.21 avg on losers = entries never worked)
+- Open positions: IO trend-ride+ (opened 21:53), MERL bb-squeeze+, TURBO bb-squeeze+ — all LONG ~$11.10 each, MAE guard active
+- mtf-regime-trend- 4T 1W 3L -$0.48 — queue#6 (has 1 win, not kill-eligible)
+- signal_versions.json pump-chain- non-dict corruption — minor, post-freeze
+BY: auto_1hr

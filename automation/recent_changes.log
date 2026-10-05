@@ -4087,3 +4087,8 @@ DB-verified: 0T last hour (quiet, last close 16:23 UTC) | 24h 32T 18W 12L 2flat 
 CHANGE: none - freeze blocks trading config. No kill (0T last hour; 24h 0%-WR all <3T), no overtrade (0/hr), no streak.
 WATCH: hard_max_loss 7T -$1.18 sole 24h loss concentration (post-freeze entry review — MFE audit shows entries never worked) | mtf-regime-trend- 4T 1W 3L -$0.48 queue#6 | btc-pump-rider+ 2T 0W -$0.16 below threshold | ⚠️ freeze violation candidate 45da8fcf trendline_bounce_long.py confidence boost @21:10 during freeze — CEO RATIFY/REVERT | signal_versions.json pump-chain- non-dict corruption minor | post-freeze queue unchanged
 BY: auto_1hr
+BY: auto_1hr
+DB-verified: 2T last hour BLUR trend-ride+ +$0.05 trail / CRV mover+ -$0.14 hard_max_loss | 24h ~33T 19W 13L -$0.73 ~58%WR atr_sl_hit 0/33=0% not dominant | hard_max_loss 8T -$1.32 sole loss concentration | open 3 LONG IO/MERL/TURBO | no 3h neg streak (22h -, 16h +, 15h +)
+CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (last hour both signals <3T), no overtrade (2/hr), no streak.
+WATCH: hard_max_loss 8T -$1.32 queue#2 post-freeze | ⚠️ 45da8fcf freeze-violation trendline_bounce_long still unratified | CEO ratified trend_ride_live+hotset (79208f88) freeze-safe | pump-chain- signal_versions corruption minor
+BY: auto_1hr
