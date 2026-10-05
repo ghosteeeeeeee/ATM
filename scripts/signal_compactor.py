@@ -617,7 +617,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # SIGNAL REPORTER 2026-09-03 — 20T/24h 85%WR +$0.74, 13 tokens
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
-    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 10T 70%WR +$0.33 (SYRUP/SEI/XPL/ARB/MON). Was 1.0 (reverted 10-02 on R:R). EXTREME still blocked. R:R avg_win 0.099 vs avg_loss 0.120 — WR compensates.
+    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # REVERTED 2026-10-05 signal_reporter — was 1.2 (BOOSTED 10-03 on 24h 10T 70%WR +$0.33). Now 24h 16T 62.5%WR -$0.32 — WR holds but R:R negative (HIGH regime -$0.40 9T). EXTREME still blocked. 7d +$0.18 keep enabled.
     ('pump-chain', 'pump-chain+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 8T 62.5%WR +$0.95 (ME/LDO/ENS/DYDX/GMT). Re-enabled 10-02 post-kill. Static fallback; combo_weights.json is authoritative.
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)

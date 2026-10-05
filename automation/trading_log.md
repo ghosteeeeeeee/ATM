@@ -3901,3 +3901,21 @@ BY: auto_1hr
 - Negative streak 4h MET (06-09) — freeze-blocked; post-freeze size review when regime re-assessed.
 - CEO post-freeze queue unchanged: (1) decider_run v1->v2 import + fail-open, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only. auto_1hr will not duplicate.
 - candles.db lock contention in price_collector still pending code-level serialization fix.
+
+---
+
+## signal_reporter — 2026-10-05 11:20 UTC
+
+**Verified numbers (PostgreSQL live query, not stale report):**
+- 24h: bb-bounce-v3-long+ 7T 42.9%WR -$0.42 | mtf-regime-trend- 5T 40%WR -$0.42 | bb-squeeze+ 16T 62.5%WR -$0.32 | bb-bounce-v2-long+ 3T 100%WR +$0.21
+- 6h: mtf-regime-trend- 3T 0%WR -$0.53 | bb-squeeze+ 3T 66.7%WR -$0.14
+- No inversions. No kills (no signal met WR<30%+5T+PnL<-$0.10+active>24h). No boosts (none met WR>55%+5T+PnL>$0.05).
+
+**Actions executed:**
+1. bb-squeeze+ confidence 1.2→1.0 (signal_compactor.py) — WR holds, R:R negative; EXTREME block kept.
+2. mtf_regime_trend.py SHORT RSI filter fixed — was inverted (blocked RSI>70, allowed oversold). IMX entered RSI=14.47 → hard_max_loss -$0.30. Now uses SHORT_RSI_FLOOR=40 from constants.
+3. bb-bounce-v3-long+ NORMAL 0.0x block confirmed live (0 trades since commit 0cb0784b). No change.
+
+**Watch next cycle:** mtf-regime-trend- (signal <24h active, RSI floor just fixed — re-evaluate before any regime block). bb-squeeze+ HIGH (all-time 62.9%WR but -$0.02 — R:R issue, not regime).
+
+Report: automation/signal_report.md

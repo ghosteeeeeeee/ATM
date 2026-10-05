@@ -33,6 +33,7 @@ from hermes_constants import (
     MTF_REGIME_TREND_CONF_CAP,
     MTF_REGIME_TREND_SLOPE_BONUS_MAX,
     MTF_REGIME_TREND_PULLBACK_BONUS_MAX,
+    SHORT_RSI_FLOOR,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -167,10 +168,12 @@ def detect(token):
     if direction == 'SHORT' and price > ema300:
         return None  # price above EMA300 — not in downtrend
 
-    # RSI filter (2026-10-02)
+    # RSI filter (2026-10-02, SHORT floor fixed 2026-10-05 signal_reporter)
     # LONG: block when RSI < 30 (oversold = catching falling knife)
-    # SHORT: block when RSI > 70 (overbought = catching rising knife)
+    # SHORT: block when RSI < SHORT_RSI_FLOOR (oversold SHORT = bounce risk)
     # Backtest: RSI <30 LONG = 3T 0%WR -$0.70 (all losers), RSI >=40 = 3T 100%WR +$0.29
+    # IMX SHORT entered RSI=14.47 and hit hard_max_loss -$0.30 — old check only
+    # blocked RSI>70 SHORT (inverted). System-wide: RSI<40 SHORT = 72T 27.8%WR -$5.34.
     if len(closes) >= 14:
         deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
         gains = [d if d > 0 else 0 for d in deltas[-14:]]
@@ -184,8 +187,8 @@ def detect(token):
             rsi = 100
         if direction == 'LONG' and rsi < 30:
             return None  # oversold — catching falling knife
-        if direction == 'SHORT' and rsi > 70:
-            return None  # overbought — catching rising knife
+        if direction == 'SHORT' and rsi < SHORT_RSI_FLOOR:
+            return None  # oversold SHORT — bounce risk (BANANA lesson)
 
     # Momentum entry (2026-10-01)
     # Enter when price is moving in the trend direction
