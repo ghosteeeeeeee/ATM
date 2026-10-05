@@ -4023,3 +4023,7 @@ DB-verified: 2T last hour HYPE bb-bounce-v2-long+ trail +$0.04 (1.64% WIN) + ARB
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 8T -$0.46 worst (has wins) | hard_max_loss family 9T -$1.49 | 0cb0784b regime-block awaiting CEO ratify/revert
 BY: auto_1hr
+BY: auto_1hr
+DB-verified: 4T last hour 2W 2L -$0.10 MET mtf-regime-trend- +$0.05 + LDO bb-squeeze+ +$0.13 WINS | TURBO/ZORA bb-squeeze+ hard_max_loss -$0.16/-$0.12 | 24h 37T 22W 15L -$0.48 59.5%WR atr_sl_hit 1/37=2.7% not dominant | open 3 HYPE/SAGA/HBAR
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: hard_max_loss family 11T -$1.77 sole 24h loss concentration | bb-bounce-v3-long+ 7T -$0.42 worst (has wins) | 0cb0784b freeze-violation candidate awaiting CEO ratify/revert
