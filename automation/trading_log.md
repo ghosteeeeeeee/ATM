@@ -3878,3 +3878,26 @@ BY: auto_1hr
 - Negative streak 4h MET — freeze-blocked; post-freeze: check if size reduction warranted when regime re-assessed.
 - CEO 09:55 updated post-freeze queue: (1) decider_run v1->v2 import + fail-open, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only. auto_1hr will not duplicate these.
 - candles.db lock contention in price_collector (health_monitor 09:47: 46 events/60m) — concurrent-writer issue, code-level serialization fix pending.
+
+## [2026-10-05 11:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour — last close still 09h SAND mtf-regime-trend- -$0.10)
+**PnL:** $0.00 last hour | 24h: 37T 21W 16L -$1.02 (56.8% WR) | Open: 3 (ZORA bb-bounce-v2-long+ -0.22%, ETH bb-bounce-v2-long+ -0.17%, HBAR pump-chain- +0.58%)
+
+**Changes:**
+1. None — freeze b960ffe8 until Oct 6 00:38 blocks trading config. No closes = no new triggers.
+
+**No Change Needed:**
+- **Entry quality:** N/A (0 closes). 3 open trades all small adverse/flat; HBAR SHORT still +0.58%.
+- **atr_sl_hit >40%:** 1/37 (2.7%) of 24h closes. Dominant exits: profit-monster-trail 21T +$1.15 (56.8%), hard_max_loss 13T -$2.31 (35.1%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** 0T last hour. 24h worst n>=3 still: bb-bounce-v3-long+ 7T 42.9% -$0.42 (has wins), mtf-regime-trend- 5T 40.0% -$0.42 (has wins), bb-squeeze+ 16T 62.5% -$0.32 (has wins). No 0%WR n>=3. No kill.
+- **Overtrading:** 0T last hour. Fine.
+- **Negative PnL streak:** Hours with closes Oct 5: 06:-$0.30, 07:-$0.11, 08:-$0.16, 09:-$0.10 → consecutive negative = 4 (unchanged; 10-11 no closes break nothing — streak of *hours with closes* still 4). Rule requires NEUTRAL for size review; regime MIXED (NORMAL and HIGH both bleeding). Freeze blocks size change. Queue post-freeze.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run. 0cb0784b RATIFIED by CEO 09:55.
+
+**Open Questions:**
+- hard_max_loss family 13T -$2.31 sole 24h loss concentration — post-freeze stop placement review (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL -$1.02 at 56.8% WR — R:R inversion persists (avg trail win +$0.055 vs avg hard-stop loss -$0.178).
+- Negative streak 4h MET (06-09) — freeze-blocked; post-freeze size review when regime re-assessed.
+- CEO post-freeze queue unchanged: (1) decider_run v1->v2 import + fail-open, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only. auto_1hr will not duplicate.
+- candles.db lock contention in price_collector still pending code-level serialization fix.

@@ -4051,3 +4051,7 @@ BY: auto_1hr
 DB-verified: 1T last hour SAND mtf-regime-trend- SHORT hard_max_loss -$0.10 (-4.33%, price +0.867% against SHORT) | 24h 37T 21W 16L -$1.02 56.8%WR atr_sl_hit 1/37=2.7% not dominant | open 2 ETH/HBAR | NEG-STREAK TRIGGER MET 06-09=4 consecutive negative hours with closes
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. Neg-streak met but regime mixed (NORMAL -$0.49, HIGH -$0.59) not cleanly NEUTRAL + freeze blocks size change. Queue post-freeze size review.
 WATCH: hard_max_loss family 13T -$2.31 sole 24h loss concentration | mtf-regime-trend- SHORT 3T 0W -$0.53 (LONG side has trail wins) | R:R inversion avg win +$0.062 vs avg loss -$0.178 | 0cb0784b RATIFIED by CEO 09:55 | post-freeze queue updated by CEO (CL-T1 #1, decider_run v1->v2 #2)
+DB-verified: 0T last hour (quiet) | 24h 37T 21W 16L -$1.02 56.8%WR atr_sl_hit 1/37=2.7% not dominant | open 3 ZORA/ETH/HBAR | neg streak still 4 (06-09, hours with closes)
+CHANGE: none - 0 closes = no triggers + freeze b960ffe8 until Oct 6 00:38 blocks trading config
+WATCH: hard_max_loss family 13T -$2.31 sole 24h loss concentration | R:R inversion +$0.055 vs -$0.178 | 0cb0784b RATIFIED | post-freeze queue: decider_run, CL-T1 MFE, bypass demotion, bb-bounce-v3, HIGH throttle
+BY: auto_1hr
