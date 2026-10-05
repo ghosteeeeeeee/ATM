@@ -193,13 +193,12 @@ def detect(token):
     if rsi is None or not (TREND_RIDE_RSI_MIN <= rsi <= TREND_RIDE_RSI_MAX):
         return None
 
-    # Condition 4: Volume confirmation
+    # Condition 4: Volume confirmation (skip if volume data unavailable)
     avg_vol = _compute_avg_volume(candles_5m, TREND_RIDE_VOL_PERIOD)
-    if avg_vol is None or avg_vol <= 0:
-        return None
-    last_vol = candles_5m[-1]['volume']
-    if last_vol < avg_vol * TREND_RIDE_VOL_MULT:
-        return None
+    if avg_vol is not None and avg_vol > 0:
+        last_vol = candles_5m[-1]['volume']
+        if last_vol < avg_vol * TREND_RIDE_VOL_MULT:
+            return None
 
     # Optional boost: 1h EMA alignment
     conf = TREND_RIDE_CONF_BASE
