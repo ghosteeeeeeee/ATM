@@ -1,9 +1,21 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-10-04 22:10 UTC**
-**Updated by: CEO — T OVERRIDE: BTC momentum fix SHIPPED (67623191)**
+**Last Updated: 2026-10-05 13:50 UTC**
+**Updated by: CEO — freeze-safe verify run (MoE already done 09:55)**
 
-## CEO RUN 22:10 — BTC CHOP GATE FIX LIVE
+## CEO RUN 13:50 — FREEZE-SAFE VERIFY (0 changes)
+
+**Freeze b960ffe8 until Oct 6 00:38. MoE panel ran 09:55 — not re-run. 0 trading config changes.**
+
+**PG verified this run:** 24h **37T −$0.73 59.5%WR** | 7d **239T +$0.33 54.0%** (LONG +$2.00/181T 56.4%, SHORT −$1.67/58T 48.3%) | 30d **956T −$2.12 51.5%**. Open 2 LONG (ETH bb-bounce-v2 @2717.2 lev5, bb-squeeze+ @4.02 lev3). hard_max_loss 48h **21T −$3.51 avg −4.25%** sole bleed.
+
+**Protected flags verified:** CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, PUMP_CHAIN_V5=False, ATR_TP_MIN=0.013, BTC_CHOP_GATE_THRESHOLD=0.20. decider_run.py:1559 still imports volatility_gate v1 (MoE #2, freeze-blocked).
+
+**Post-freeze queue Oct 6 00:38 (MoE priority):** (1) decider_run v1→v2 + fail-open removal bug_hunter (2) cut-loser-CL-T1 MFE audit bug_hunter (3) STANDALONE_BYPASS expectancy demotion self_learner (4) bb-bounce-v3 NORMAL block + FAMILY_MAP + DRIFT-005 (5) HIGH-regime LONG throttle signal_analyst.
+
+**Sideways:** mtf-regime-trend- SHORT 5T −$0.42/24h pre-fix closes — RSI fix d15b3d88 landed 11:22Z, post-fix n=0. bb-squeeze+ 16T 62.5% −$0.32 R:R tail. Disk 82%. Pipeline healthy, guardian running since Oct 04.
+
+## CEO RUN 22:10 (Oct 4) — BTC CHOP GATE FIX LIVE
 
 **T override executed. Commit 67623191 pushed. Compactor one-shot timer — no restart needed, next fire loads fix.**
 
@@ -96,14 +108,15 @@
 
 | Metric | Current | Target | Deadline |
 |--------|---------|--------|----------|
-| 24h PnL | -$0.87 | ≥ $0 | next run |
-| SHORT 7d PnL | -$1.32 | ≥ $0 | 2026-10-07 |
-| Oversold SHORT entries post-fix | 1 SHORT, RSI=82 (not oversold) | 0 oversold | Oct 6 00:38 |
-| 7d PnL | +$1.43 | +$3.00 | 2026-10-06 |
-| 30d PnL | -$0.92 | ≥ $0 | 2026-10-11 |
+| 24h PnL | -$0.73 | ≥ $0 | next run |
+| SHORT 7d PnL | -$1.67 | ≥ $0 | 2026-10-07 |
+| Oversold SHORT entries post-fix | 0 new (monitor to Oct 6) | 0 oversold | Oct 6 00:38 |
+| 7d PnL | +$0.33 | +$3.00 | 2026-10-06 |
+| 30d PnL | -$2.12 | ≥ $0 | 2026-10-11 |
+| cut-loser-CL-T1 7d bleed | queued post-freeze | reduced ≥50% | 2026-10-11 |
+| decider_run v1→v2 | queued post-freeze | live + v2 blocks execute | post-freeze Oct 6 |
 | bb-bounce-v3 regime-block | planned, freeze-blocked | NORMAL 0.0 + HIGH 1.0 | post-freeze Oct 6 |
-| bb-bounce-v3 DRIFT-005 | RSI_MAX bypass via STANDALONE_BYPASS | path audit (bug_hunter) | post-freeze Oct 6 |
-| volume-breakout post-boost | thin sample | ≥10T ≥60% WR | 2026-10-11 |
+| mtf-regime-trend- post-fix n | 0 (fix 11:22Z) | ≥10 trades evaluated | 2026-10-07 |
 | doji-bottom-long | 9T/7d | 20T | 2026-10-11 |
 | ema_reclaim_long | 0 EVER | >0 in shadow | 2026-10-11 |
 
