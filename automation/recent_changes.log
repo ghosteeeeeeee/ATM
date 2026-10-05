@@ -4031,3 +4031,7 @@ BY: auto_1hr
 DB-verified: 2T last hour HYPE bb-bounce-v2-long+ trail +$0.06 (2.47% WIN) + SAGA bb-squeeze+ hard_max_loss -$0.12 (-3.36%) | 24h 39T ~23W -$0.54 (~59% WR) atr_sl_hit 1/39=2.6% not dominant | open 1 HBAR pump-chain- SHORT +$0.03
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 2) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: hard_max_loss family 12T -$1.89 sole 24h loss concentration | bb-bounce-v3-long+ 7T -$0.42 worst (has wins) | bb-squeeze+ 21T -$0.37 57%WR volume | 0cb0784b freeze-violation candidate awaiting CEO ratify/revert
+DB-verified: 1T last hour IMX mtf-regime-trend- SHORT hard_max_loss -$0.30 (-6.89%) RSI43 entry not extreme | 24h 39T 22W 17L -$0.89 56.4%WR atr_sl_hit 1/39=2.6% not dominant | open 2 WLD/HBAR
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 2) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: hard_max_loss family 13T -$2.19 sole 24h loss concentration (post-freeze stop review) | bb-squeeze+ 20T 55%WR -$0.42 (has wins, lifetime +) | 0cb0784b awaiting CEO
+BY: auto_1hr

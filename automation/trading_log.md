@@ -3763,3 +3763,26 @@ BY: auto_1hr
 - 24h PnL -$0.54 with ~59% WR — hard_max_loss family 12T -$1.89 sole loss concentration; post-freeze review stop placement (DO NOT change CUT_LOSER_PNL during freeze).
 - bb-bounce-v3-long+ 7T -$0.42 worst 24h signal — has wins, below kill threshold; NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 06:13 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — IMX mtf-regime-trend- SHORT hard_max_loss -$0.30 (-6.89%)
+**PnL:** -$0.30 last hour (0% WR) | 24h: 39T 22W 17L -$0.89 (56.4% WR) | Open: 2 (WLD mtf-regime-trend- SHORT -$0.06, HBAR pump-chain- SHORT +$0.01)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** IMX entry RSI_14=43.17, momentum=flat, final_confidence=98.0 — not an extreme entry. hard_max_loss at -6.89% account = ~1% price stop × 3-5x leverage — expected hard-stop family, not entry failure. Signal has 2 prior wins (MET +1.38%, RESOLV +1.51%) — not kill-worthy.
+- **atr_sl_hit >40%:** 1/39 (2.6%) of 24h closes. Dominant exits: profit-monster-trail 22T +$1.29 (56.4%), hard_max_loss 13T -$2.19 (33.3%). tpsl_utils.py fix deployed and stable. No CEO alert.
+- **Kill rule:** Last hour mtf-regime-trend- 1T 0W — below 3-trade kill threshold. 24h worst bb-squeeze+ 20T 55%WR -$0.42 and bb-bounce-v3-long+ 7T 43%WR -$0.42 — both have wins, below kill. doji-bottom-long / btc-pump-rider+ / continuum_engine 0%WR n=1 — below threshold. No kill.
+- **Negative PnL streak:** Hours: 22:+$0.06, 23:+$0.11, 00:+$0.03, 01:+$0.16, 02:+$0.03, 03:-$0.15, 04:-$0.01, 05:(no closes), 06:-$0.30. Max consecutive negative = 2 (03-04). NOT 3. No size-reduction trigger.
+- **Overtrading:** 1T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- hard_max_loss family 13T -$2.19 sole 24h loss concentration — post-freeze review stop placement (DO NOT change CUT_LOSER_PNL during freeze).
+- 24h PnL -$0.89 at 56.4% WR — R:R inversion persists (small trail wins, large hard-stop losses); exit-quality issue if it survives freeze.
+- bb-squeeze+ 20T 55%WR -$0.42 worst by volume — has wins, below kill; research shows bollinger_squeeze pattern lifetime 70% WR — keep.
+- bb-bounce-v3-long+ NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
