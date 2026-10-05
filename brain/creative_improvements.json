@@ -2711,5 +2711,27 @@
     "status": "queued_post_freeze",
     "risk": "low — single constant + comment",
     "blocked_on": "DRIFT-A bypass fix first"
+  },
+  {
+    "date": "2026-10-05T01:37:36Z",
+    "idea": "Execution-path score gate audit — does final_score=0.0 actually block, or does execution key off raw conf?",
+    "rationale": "bb-squeeze+ opened 12 EXTREME trades 7d despite ('EXTREME','bb-squeeze'):0.0. Score path zeroes final_score on 0.0 product but CONF_FILTER checks conf < CONF_FILTER_MIN (raw confidence). If execution keys off conf not final_score, hard blocks are cosmetic on ALL paths. Explains why 13 0.0-blocked cells keep opening trades.",
+    "expected_impact": "If confirmed: fixes 13 theater cells at once. If refuted: bypass-only fix suffices. Answers root question.",
+    "category": "path audit / gate enforcement",
+    "status": "suggested",
+    "risk": "low — audit only",
+    "blocked_on": "freeze lift Oct 6 + bug_hunter",
+    "sample_size": "45T in 0.0-blocked cells 14d"
+  },
+  {
+    "date": "2026-10-05T01:37:36Z",
+    "idea": "Extend gate_shadow.py to monitor 0.0-cell breaches — alert when trades open in hard-blocked cells",
+    "rationale": "gate_shadow already parses pipeline.log. Add counter for trades opening in 0.0-blocked signal×regime cells. Turns theater into monitored metric. Shadow-only, freeze-safe.",
+    "expected_impact": "Early detection of future gate-enforcement regressions.",
+    "category": "monitoring / observability",
+    "status": "suggested",
+    "risk": "low — shadow only",
+    "blocked_on": "CEO approval (shadow scripts freeze-safe per precedent)",
+    "sample_size": "n/a"
   }
 ]
