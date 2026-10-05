@@ -4019,3 +4019,7 @@ DB-verified: 1T last hour RESOLV bb-squeeze+ trail +$0.02 | 24h 36T ~flat atr_sl
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 9T -$1.49 | freeze until Oct 6
 BY: auto_1hr
+DB-verified: 2T last hour HYPE bb-bounce-v2-long+ trail +$0.04 (1.64% WIN) + ARB btc-pump-rider+ trail -$0.01 (-0.32% loss) | 24h 36T 21W 15L ~-$0.14 atr_sl_hit 1/36=2.8% not dominant | open 3 bb-squeeze+ LDO/TURBO/ZORA
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: bb-bounce-v3-long+ 8T -$0.46 worst (has wins) | hard_max_loss family 9T -$1.49 | 0cb0784b regime-block awaiting CEO ratify/revert
+BY: auto_1hr

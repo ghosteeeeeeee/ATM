@@ -3697,3 +3697,26 @@ BY: auto_1hr
 - bb-bounce-v3-long+ 24h worst (9T -$0.42) — has wins, below kill threshold.
 - 0cb0784b regime-block freeze-violation candidate — CEO ratify/revert still pending.
 - accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
+
+## [2026-10-05 03:11 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — HYPE bb-bounce-v2-long+ +$0.04 (1.64%) trail WIN + ARB btc-pump-rider+ -$0.01 (-0.32%) trail small loss
+**PnL:** +$0.03 last hour (50% WR) | 24h: 36T 21W 15L ≈-$0.14 | Open: 3 bb-squeeze+ LONG (LDO/TURBO/ZORA)
+
+**Changes:**
+1. None — no trigger met. Freeze b960ffe8 active until Oct 6 00:38 (0 trading config changes).
+
+**No Change Needed:**
+- **Entry quality:** HYPE clean trail win +1.64%; ARB trail loss only -0.32% — no adverse-excursion concern.
+- **atr_sl_hit >40%:** 1/36 (2.8%) of 24h closes. Dominant exits: profit-monster-trail 22T +$1.38 (61%), hard_max_loss 9T -$1.49 (25%). tpsl_utils.py fix deployed and stable. hard_max_loss is intentional hard-stop family.
+- **Kill rule:** Last hour bb-bounce-v2-long+ 1W and btc-pump-rider+ 1L. 24h worst bb-bounce-v3-long+ 8T 37.5%WR -$0.46 — has wins, not 0%. doji-bottom-long / continuation+ / btc-pump-rider+ all 0%WR n=1 — below kill threshold. No kill.
+- **Negative PnL streak:** Hours: 19:+$0.19, 21:-$0.24, 22:+$0.06, 23:+$0.11, 00:+$0.03, 01:+$0.16, 02:+$0.03. Max consecutive negative = 1. NOT 3. No size-reduction trigger.
+- **Overtrading:** 2T last hour. Fine.
+- **Freeze:** b960ffe8 until Oct 6 00:38 — constants/gates untouched this run.
+
+**Open Questions:**
+- 24h PnL ≈-$0.14 with ~58% WR — sample noise, no structural signal.
+- hard_max_loss family 9T -$1.49 remains sole 24h loss concentration — post-freeze review stop placement.
+- bb-bounce-v3-long+ 8T -$0.46 worst 24h signal — has wins, below kill threshold; NORMAL-regime block 0cb0784b still awaiting CEO ratify/revert.
+- doji-bottom-long / continuation+ / btc-pump-rider+ 0%WR n=1 — below kill, watch.
+- accel_300_v3_long left ENABLED=False per CEO Oct 3 — not re-audited.
