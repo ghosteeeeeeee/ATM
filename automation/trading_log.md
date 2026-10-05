@@ -4030,3 +4030,26 @@ Report: automation/signal_report.md
 - 24h PnL -$0.45 at 61% WR — R:R inversion persists (trail +$0.055 avg vs hard_max_loss -$0.160 avg).
 - BTC continuum_engine ORPHAN_PAPER flat artifacts still in live trades table.
 - CEO post-freeze queue: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only, (6) NEW: mtf-regime-trend- SHORT regime check.
+
+## [2026-10-05 18:12] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 last hour | 24h: ~39T 24W 15L -$0.42 (61.5% WR) | Open: 0
+
+**Changes:**
+1. None — quiet hour (0 closes), freeze b960ffe8 until Oct 6 00:38 still blocks trading config. No triggers met.
+
+**No Change Needed:**
+- **Entry quality:** N/A — no closes last hour.
+- **atr_sl_hit >40%:** 0/39 (0%) of 24h closes. Dominant: profit-monster-trail 23T +$1.29 (59%), hard_max_loss 8T -$1.42 (21%). tpsl_utils.py deployed. No CEO alert.
+- **Kill rule:** 0T last hour. 24h 0%-WR candidates below threshold (need 3+T last hour): none qualify. Watch: mtf-regime-trend- 4T 1W -$0.48, bb-squeeze+ 18T 12W -$0.22 (has wins, not killable).
+- **Overtrading:** 0T. Fine.
+- **Negative PnL streak:** 15h +$0.01, 16h +$0.03 — streak broken. No trigger.
+- **Freeze:** b960ffe8 until Oct 6 00:38. CEO reverted freeze violations bbff11f4 (38a02ed3). No config edits.
+
+**Open Questions:**
+- hard_max_loss 8T -$1.42 still sole 24h loss concentration — post-freeze stop placement review.
+- mtf-regime-trend- 4T 1W -$0.48 (SHORT hard_max_loss SAND/WLD/IMX) — regime mismatch post-freeze? Queue #6.
+- 24h PnL -$0.42 at ~61.5% WR — R:R inversion persists (trail +$0.056 avg vs hard_max_loss -$0.178 avg).
+- BTC continuum_engine ORPHAN_PAPER flat artifacts still in live trades table (2T 24h).
+- CEO post-freeze queue unchanged: (1) decider_run v1->v2, (2) CL-T1 MFE audit, (3) bypass expectancy demotion, (4) bb-bounce-v3 block + FAMILY_MAP, (5) HIGH LONG throttle + SHORT EXTREME-only, (6) mtf-regime-trend- SHORT regime check.

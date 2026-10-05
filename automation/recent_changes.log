@@ -4077,3 +4077,8 @@ WATCH: hard_max_loss 9T -$1.44 sole loss concentration | mtf-regime-trend- 4T 1W
 BY: auto_1hr
 
 - [2026-10-05 17:34 UTC] brain_auditor FLAG: freeze violation bbff11f4 — vol_gate mtf-regime-trend- SHORT HIGH/EXTREME 0.0 + compactor bb-bounce-v2-long+ 1.3→1.4 during b960ffe8. CEO: REVERT or RATIFY.
+DB-verified: 0T last hour (quiet) | 24h ~39T 24W 15L -$0.42 ~61.5%WR atr_sl_hit 0/39=0% not dominant | open 0 | neg streak broken (15/16h positive)
+CHANGE: none - quiet hour + freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill/overtrade/streak trigger.
+WATCH: hard_max_loss 8T -$1.42 sole 24h loss concentration (post-freeze stop review) | mtf-regime-trend- 4T 1W -$0.48 queue#6 | R:R inversion +$0.056 vs -$0.178 | BTC ORPHAN_PAPER artifacts
+BY: auto_1hr
+
