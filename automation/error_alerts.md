@@ -1,5 +1,14 @@
 # Error Alerts
 
+
+## Error Alerts — 2026-10-04 18:50 UTC
+- **WARN** (1): Disk `/` **85%** used (95G/118G, 18G free).
+  - **AUTO-FIX**: `journalctl --vacuum-size=400M` freed **442.6M** (journals 783.4M→340.7M). `session_brain.db` WAL checkpointed **63MB→0**. `signals_hermes.db` WAL trimmed **6MB→2.3MB**. `candles.db-wal` is **5.1G and growing** — locked by active `price_collector`/candle processes; cannot checkpoint mid-run. No logs >7d to gzip. Remaining bulk is active DBs (candles.db 2.5G + WAL 5.1G, coin_tracker.db 3.3G, signals_hermes.db 923M). **CEO DB-retention decision still open.**
+- **WARN** (recurring): `hotset.json` empty — `no signals survived compaction` + `[hotset] fallback DB query returned 0 tokens` every cycle. Signals (1h): **117 generated**, **0 approved**. Regime overall LONG_BIAS (48L/11S/58N @ 18:45) is not the blocker this cycle — compaction/filter gate still rejecting all. `decisions` table stale (last row 2026-04-13) — signal_compactor may no longer write there. Signal-compactor filter audit still open.
+- **INFO**: Pipeline healthy — LIVE every 1m via `hermes-pipeline.timer` (active). Last cycles rc=0, 0 Tracebacks/CRASH in 30m. Position Manager clean: **5 open | 29 closed today | -28.85% PnL** (portfolio log). `signal_outcomes` today: 24 closed, -0.64 USDT (DB view lags portfolio). Phantom `atr_sl_hit` <0.01%: **0**. Prices fresh (~2 min, 88 tokens <5m, 1m/5m candles current). Speeds **127/241 (52.7%) ≥50th pct**. Kill switch LIVE.
+- **INFO** (recurring): Non-trading failed units — `better-coder` (`ModuleNotFoundError: dispatcher.dispatcher` — **dispatcher package on disk is an empty dir**, module file deleted, not a sys.path issue), `bug-hunter` (exit-1 by design — found 9 CRITICAL: sqlite/cursor/connection leaks, sql_injection, bare_except, hardcoded passwords, dead signal_gen imports), `git-release` (`update-git.py --dry-run` exit-1 on uncommitted-changes gate). None on trading execution path.
+- **INFO** (known): `list-timers hermes-*` without `--all` shows 0 — cosmetic glob quirk; timers firing (pipeline, signal-compactor, 1m-candle, hl-sync-guardian all recent). `hermes-1m-candle.service` in `activating start` — normal for oneshot/timer churn.
+- **AUTO-FIXES APPLIED**: journal vacuum 442.6M; session_brain WAL 63MB→0; signals_hermes WAL trimmed. No pipeline restart required.
 ## Error Alerts — 2026-10-04 17:47 UTC
 - **INFO** — Pipeline healthy: active (running), last run 17:46:37 rc=0. Position Manager clean (2 open: HBAR LONG, ETC LONG; 0 closed this cycle; no Traceback/CRASH in 30m). Signals (1h): 102 generated (18 in last 15m). Closed today: 23 | WR 52.2% | PnL -0.70. Phantom trades: 0.
 - **WARN** (recurring): `hotset.json` empty — `no signals survived compaction` / `No signals above 50% confidence — skipping execution`. 102 signals generated in last hour but 0 approved. Regime SHORT_BIAS (13L/29S/75N @ 17:45) may be suppressing approvals. Same pattern as 08:48 and 10-02 entries — signal_compactor filter audit still open.
@@ -741,3 +750,61 @@
 - **INFO**: today PnL -0.54 USDT on 21 closed (11 wins ≈ 52%) — trading performance, not system health. 24h outcomes: 30 closed, -0.94 USDT, 16 wins. Exit reasons 24h: mostly null (raw), 2 profit-monster-trail, 1 hard_max_loss.
 - **INFO**: token_speeds `is_stale=1` on 94/241 but `updated_at` fresh (16:46) — flag means no recent price move, not data staleness (recurring).
 - **AUTO-FIXES APPLIED**: none. Pipeline running; prices fresh; disk 83% under threshold; no crashes; no missed trading-path timers; signals flowing (82/h). No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 19:48 UTC
+- **HEALTH** — Pipeline OK: active, LIVE cycle every 1m, position_manager rc=0 every cycle, 0 Traceback/CRASH in 30m window. Portfolio (position_manager): **2 open | 32 closed today | -20.09% PnL**. Signals (1h): 67 in `signals` table; 3 outcomes closed in last hour. Regime: LONG_BIAS (59L / 9S / 49N, regime_5m.json ts 19:45). Speeds: 127/241 (52.7%) ≥50th pct. Prices fresh: prices.json 32s old, 85 tokens. Disk **84%** (under 85%). Phantom trades: 0 (|pnl_pct|<0.01). Services active: hermes-pipeline, hermes-hl-sync-guardian. Core timers firing (pipeline 1m, price-collector 30s, health-monitor, 69 hermes timers active).
+- **WARN** (recurring, non-trading-path): `hermes-price-collector.service` intermittent `sqlite3.OperationalError: database is locked` during candle aggregation (candles.db contention; WAL 3.6G). 17 Failed-to-start vs 43 successful collects in last hour — systemd auto-restarts; prices stay fresh. **Code-level fix still pending:** PRAGMA busy_timeout on candle writers + serialize price_collector candle agg vs 1m-candle / pipeline candle writes.
+- **WARN** (known, non-trading-path dead timers): `hermes-atr-sl-updater.timer` not-found (DEFUNCT); `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` inactive (OnBootSec-only by design). Regime scanners (4h/15m) active. ATR SL/TP managed via position_manager.
+- **WARN** (known): `signal_outcomes` open=0 / closed-today=27 vs portfolio 2 open / 32 closed — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md).
+- **INFO**: today PnL **-20.09%** (32 closed, ~59% winrate on outcomes subset) — trading performance, not system health. Deteriorated from -7.73% at 12:48 and -12.8% at 13:46. Worst outcomes today: bb-bounce-v3-long+ 9T -0.51 USDT (44% WR); bb-squeeze+ 13T +0.29 USDT (69% WR).
+- **INFO**: `hermes-wasp.timer` last fired 42m ago (15min cadence expected — possible miss, non-trading-path).
+- **INFO**: disk 84% (19G free), candles.db 2.5G + WAL 3.6G is the bulk; no files >7d to gzip. Under 85% threshold — no cleanup forced.
+- **AUTO-FIXES APPLIED**: none. Pipeline running rc=0; prices fresh (32s); disk 84% under threshold; no crashes; no missed trading-path timers; signals flowing (67/h). No restarts or cleanups forced.
+
+## Error Alerts — 2026-10-04 20:48 UTC
+- **HEALTH** — Pipeline OK: active, LIVE cycle, position_manager rc=0 (SEI LONG trade_id=15921, pnl -0.78%), 0 Traceback/CRASH in 30m. Portfolio (trades.json): **1 open | 29 closed today | -0.11 USDT | 62.1% WR**. Signals (1h): 69 raw (BLUR/RESOLV/KFLOKI/ZRO/XPL recent). Regime: SHORT_BIAS (19L / 27S / 71N, regime_5m.json ts 20:45). Speeds: 127/241 (52.7%) ≥50th pct. Prices fresh (token_speeds 20:46, regime 20:45). Phantom trades (|pnl_pct|<0.01, 24h): 0. Services active: hermes-pipeline, hermes-hl-sync-guardian. ~69 hermes timers firing on cadence.
+- **WARN** (recurring, non-trading-path): `hermes-price-collector.service` — 37× `sqlite3.OperationalError: database is locked` in 30m on candle_1h/4h aggregation; unit stuck `activating`/failing, systemd auto-restarts; prices still fresh via other writers. **Code-level fix still pending:** PRAGMA busy_timeout + serialize candle writers (known, matches 16:48/19:48 alerts).
+- **WARN** (known, non-trading-path): `hermes-5m-candle.timer` inactive/disabled (price_collector owns cadence — by design). `hermes-atr-sl-updater.timer` DEFUNCT/not-found. Signal_outcomes open=0 vs portfolio open=1 — outcomes table partial; portfolio source of truth = position_manager + trades.json (AGENTS.md).
+- **WARN**: disk was **87%** at start (candles.db-wal 7.1G + journal bloat) — over 85% threshold.
+- **INFO**: 19:48 note said -20.09% PnL on 32 closed — current trades.json window shows today -0.11 USDT on 29 closed (rolling 200 page vs full day count differ; source of truth for today = trades.json closed filtered by date).
+- **AUTO-FIXES APPLIED**:
+  1. `journalctl --vacuum-size=200M` — freed **260.7M** archived journals.
+  2. `PRAGMA wal_checkpoint(TRUNCATE)` on `candles.db` — WAL **7.7G → 0**, disk **87% → 81%** (16G→23G free). Root cause: WAL not checkpointing under continuous candle writers; no code change yet — recommend checkpoint interval in price_collector/1m-candle or busy_timeout fix to stop lock thrash.
+- No pipeline restarts forced (no crashes). Timers firing. Prices fresh.
+
+## Error Alerts — 2026-10-04 21:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-04 22:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-10-04 23:47 UTC
+- **HEALTH** — Pipeline OK: active, LIVE cycle every 1m, all steps rc=0, 0 Traceback/CRASH in 30m. Portfolio (trades.json): **4 open | LONG MNT/HYPE/ARB/LDO**. Closed today: 35 (LONG 34 net -0.36 USDT 58.8% WR, SHORT 1 +0.06). Signals (1h): 49 in `signals` (pump-chain, support_resistance, ichimoku, continuum — conf 74–88). Regime: **LONG_BIAS** (40L/10S/67N, regime_5m.json ts 23:45). Speeds: 52.7% ≥50th pct. Prices fresh: prices.json 85 tokens ~1min old; open-position tokens (MNT/HYPE/ARB/LDO) candles ~4min. Phantom trades (|pnl_pct|<0.01): 0. Disk **81%** (23G free). Core timers all active: price-collector, 1m-candle, pipeline.
+- **WARN** (recurring, non-trading-path, 3x+): `hermes-price-collector.service` — 83 lock/fail events vs 30 successful collects in last 60m. Aggregation (candles_5m/15m/1h/4h) + `wal_checkpoint` hit `database is locked` / `database table is locked`; unit fails then systemd auto-restarts. Raw prices still collected (85 tokens) so downstream stays fed. **Code-level fix still pending:** PRAGMA busy_timeout on candle writers + serialize price_collector candle agg vs 1m-candle/pipeline writes. WAL now only 9MB (post-20:48 checkpoint) — contention is write-parallelism, not WAL bloat.
+- **WARN** (info): `hotset.json` empty / Approved signals: 0 — decider reports "No signals above 50% confidence" while raw `signals` table has 49 signals at conf 74–88 in last hour. Compactor is filtering hard (by design?) — not a crash; execution correctly blocked. Worth a signal-quality review, not a system fault.
+- **WARN** (known): `signal_outcomes` open=0 vs portfolio open=4 — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md).
+- **INFO**: `hermes-atr-sl-updater.timer` not-found (DEFUNCT); `hermes-regime-24h-check.timer` + `hermes-regime-transition-check.timer` inactive (OnBootSec-only by design). Regime scanners (4h/15m) active. ATR SL/TP managed via position_manager.
+- **INFO**: today PnL on outcomes subset **-0.30 USDT** (35 closed, 58.8% LONG WR) — much improved from -20% at 19:48. Trading performance, not system health.
+- **AUTO-FIXES APPLIED**: none forced. Pipeline running rc=0; timers active; prices fresh; disk 81% under threshold; no crashes; price-collector self-restarts on lock (systemd) — stopping/restarting it manually would not fix write contention and risks the timer path. Code fix (busy_timeout + writer serialization) remains the real remediation.
+
+## Error Alerts — 2026-10-05 00:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-05 01:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-05 02:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-05 03:48 UTC
+- **HEALTH** — Pipeline OK: active, LIVE cycle every 1m, all steps rc=0, 0 Traceback/CRASH in 30m. Portfolio (trades.json ts 03:47): **3 open | MET SHORT +0.02%, SAGA LONG -0.39%, HBAR SHORT -0.87%**. Closed page (200 rolling): 54.0% WR, +0.64 USDT. Pipeline log snapshot 03:45: "2 open | 36 closed today | -5.37% PnL". Signals (1h): 102 in `signals` (recent: PONS LONG, MET SHORT, DOT LONG, GMT SHORT; pending: COMP/BTC/KFLOKI pump-chain etc). Regime: **SHORT_BIAS** (6L/69S/42N, 117 tokens, regime_5m.json ts 03:45). Coin tracker: NEUTRAL, 0 hot / 79 warm / 7 cold. Speeds: 52.7% ≥50th pct (127/241). Prices fresh: trades.json/signals.json ~1min, BTC 1m candle 03:45 (~2min), 85 tokens collected. Phantom trades (|pnl_pct|<0.01): 0. Disk **81%** (22G free), WAL 17M (post prior checkpoint). Core timers all active: price-collector (last 03:45:57), 1m-candle (03:46:25), pipeline (03:47:00). No auto-fixes forced — nothing crashed, nothing stuck.
+- **WARN** (recurring, code-fix pending): `hermes-price-collector.service` — 82 `database is locked` / `database table is locked` events in last 60m vs 15 successful finishes. Aggregation (candles_5m/15m/1h/4h) + `wal_checkpoint` hit write contention while 1m-candle + pipeline write concurrently. Not a stuck lock — fuser shows active holders only. Raw prices still collected (85 tokens) so downstream stays fed. **Code-level fix still pending (from prior reports): PRAGMA busy_timeout on candle writers + serialize price_collector candle agg vs 1m-candle/pipeline writes.** Stopping services would not fix write contention and risks the timer path — deliberately not done.
+- **INFO** (fail-closed working): MET SHORT blocked at 03:45:26 — `EXEC-RSI-HARD-FLOOR` — candle data stale/insufficient, trade failed, signal NOT rolled back (prevents retry loop). Safety filter behaved correctly. MET remains open in trades.json from prior execution at 03:44:17.
+- **INFO** (known): `signal_outcomes` today=8 closed / open=0 vs portfolio open=3 — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md).
+- **INFO**: `coin_tracker_api.py` writes to `/var/www/html/coin_tracker_data.json` (not WWW_DATA) — by design; nginx aliases `/coin_tracker_data.json` → `/var/www/html/`. Fresh at 03:48. Not a bug.
+- **INFO**: `systemctl list-timers hermes-*` glob returns 0 (systemd glob quirk); full `list-timers --all` + `systemctl status` confirm all hermes timers healthy and firing.
+- **AUTO-FIXES APPLIED**: none required. Pipeline running rc=0; timers active; prices fresh; disk 81% under 85% threshold; no crashes; price-collector lock errors are contention self-recovered by systemd restarts — manual stop/restart would be unsafe and ineffective.
