@@ -1028,6 +1028,10 @@ def rule_based_context_gate(token, direction, source, sig):
             return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
         if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_HARD_FLOOR:
             return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
+        # FIX 2026-10-05 CEO: b960ffe8 fail-closed gap — both RSI sources None = allow.
+        # IMX mtf-regime-trend- SHORT entry_rsi=14.47 + HBAR pump-chain- SHORT entry_rsi=24.30 leaked 2026-10-05.
+        if _live_rsi_floor is None and _detect_rsi_floor is None:
+            return ('SKIP', f'{source or "SHORT"}: no RSI data (live+detect both None) — SHORT hard floor fail-closed', 0)
         # Block if EITHER live or detection-time RSI < floor
         # Detection-time RSI can be below floor even when live RSI recovered — signal was detected in oversold
         _sig_label = source or 'SHORT'
@@ -1826,6 +1830,11 @@ def execute_trade(token, direction, price, confidence, source,
         # from arbitrarily old candles (HYPER SHORT lesson: 900s threshold).
         from rsi_utils import compute_rsi
         _exec_rsi = compute_rsi(token, tf='5m', max_age_s=900)
+        # FIX 2026-10-05 CEO: fail-closed — missing exec RSI must not skip SHORT hard floor.
+        # Wrapping everything in `if _exec_rsi is not None` let oversold SHORTs through when 5m data stale/absent.
+        if _exec_rsi is None and direction.upper() == 'SHORT':
+            log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — exec RSI unavailable (fail-closed, SHORT_RSI_HARD_FLOOR)')
+            return False, 'RSI hard floor: exec RSI unavailable for SHORT (fail-closed)'
         if _exec_rsi is not None:
             # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
             _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING

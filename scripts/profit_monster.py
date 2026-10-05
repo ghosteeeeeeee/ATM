@@ -233,27 +233,33 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
             log(f"  [{tier}] Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% profit", "INFO")
             # Record to signal_outcomes for WR tracking
             try:
-                from signal_schema import record_signal_outcome
+                from signal_schema import record_signal_outcome, compute_mfe_mae_from_extremes
                 actual_pnl_pct = float(pnl_pct or 0)
                 # Fetch amount_usdt (margin) for PnL calc — NOT hl_notional_usdt
                 # (hl_notional_usdt is actual fill notional which varies; amount_usdt
                 #  is the margin we risk per trade, matching dashboard convention)
                 notional = PM_DEFAULT_NOTIONAL
                 _entry_rsi = None  # P0: learning band source; None → band NULL
+                _mfe_pct = _mae_pct = None
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
                     _conn = psycopg2.connect(**BRAIN_DB_DICT)
                     try:
                         _cur = _conn.cursor()
-                        # P0: also fetch entry_rsi_14 for the learning band label
-                        _cur.execute("SELECT amount_usdt, signal, confidence, entry_rsi_14 FROM trades WHERE id=%s", (trade_id,))
+                        # P0: also fetch entry_rsi_14 + extremes for learning columns
+                        _cur.execute(
+                            "SELECT amount_usdt, signal, confidence, entry_rsi_14, "
+                            "entry_price, highest_price, lowest_price, direction "
+                            "FROM trades WHERE id=%s", (trade_id,))
                         _row = _cur.fetchone()
                         if _row:
                             notional = float(_row[0]) if _row[0] else 11.0
                             _signal_type = _row[1] or 'unknown'
                             _confidence = float(_row[2]) if _row[2] else 80
                             _entry_rsi = _row[3]
+                            _mfe_pct, _mae_pct = compute_mfe_mae_from_extremes(
+                                _row[7] or direction, _row[4], _row[5], _row[6])
                         else:
                             _signal_type = 'unknown'
                             _confidence = 80
@@ -280,6 +286,8 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                     # P0: profit-monster is the largest close family — was writing NULL
                     exit_reason=f"profit-monster-{tier}",  # matches brain CLI close-reason
                     entry_rsi_band=_rsi_band(_entry_rsi),
+                    mfe_pct=_mfe_pct,
+                    mae_pct=_mae_pct,
                 )
             except Exception as sig_err:
                 log(f"  [{tier}] Signal outcome record error: {sig_err}", "WARN")

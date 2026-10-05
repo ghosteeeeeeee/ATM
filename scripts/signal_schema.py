@@ -4076,6 +4076,28 @@ SIGNAL_OUTCOME_LEARNING_COLUMNS = (
 )
 
 
+def compute_mfe_mae_from_extremes(direction, entry_price, highest_price, lowest_price):
+    """Direction-aware MFE/MAE from tracked extremes (same formulas as
+    position_manager / cell_stats.backfill_mfe_mae). Unleveraged price-move %.
+    Returns (mfe_pct, mae_pct) or (None, None) when inputs are unusable.
+    """
+    try:
+        ep = float(entry_price or 0)
+        hp = float(highest_price or 0)
+        lp = float(lowest_price or 0)
+        if ep <= 0 or hp <= 0 or lp <= 0:
+            return None, None
+        if str(direction).upper() == 'LONG':
+            mfe = (hp - ep) / ep * 100
+            mae = (ep - lp) / ep * 100
+        else:
+            mfe = (ep - lp) / ep * 100
+            mae = (hp - ep) / ep * 100
+        return round(mfe, 4), round(mae, 4)
+    except Exception:
+        return None, None
+
+
 def rsi_band_label(rsi) -> str | None:
     """Bucket an RSI value into the learning-system band label.
     Returns None when RSI is unavailable — callers write NULL, never guess.
