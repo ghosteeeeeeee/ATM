@@ -4039,3 +4039,7 @@ DB-verified: 1T last hour WLD mtf-regime-trend- SHORT hard_max_loss -$0.13 (-5.8
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met + freeze blocks trading config
 WATCH: hard_max_loss family 14T -$2.32 sole 24h loss concentration | bb-squeeze+ 20T 55%WR -$0.42 | bb-bounce-v3-long+ 7T 43%WR -$0.42 | 0cb0784b awaiting CEO
 BY: auto_1hr
+DB-verified: 1T last hour RESOLV bb-squeeze+ LONG profit-monster-trail +$0.02 (+0.43% WIN) | 24h 39T 21W 17L 1 flat -$1.20 53.8%WR atr_sl_hit 1/39=2.6% not dominant | open 3 HBAR/INJ/WLD
+CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 2 06-07, hour 05 gap) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
+WATCH: hard_max_loss family 14T -$2.32 sole 24h loss concentration (losers MFE 0.125% = entries never worked, post-freeze stop review) | bb-squeeze+ 19T 52.6%WR -$0.60 (has wins, just closed winner) | bb-bounce-v3-long+ 7T 42.9%WR -$0.42 | 0cb0784b awaiting CEO
+BY: auto_1hr
