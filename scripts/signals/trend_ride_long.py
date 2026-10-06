@@ -46,6 +46,8 @@ from hermes_constants import (
     TREND_RIDE_ATR_MIN,
     TREND_RIDE_MOM_1H_MIN,
     TREND_RIDE_ATR_PERIOD,
+    TREND_RIDE_BB_POS_MIN,
+    TREND_RIDE_MOMENTUM_MIN,
     TREND_RIDE_CONF_BASE,
     TREND_RIDE_CONF_CAP,
     TREND_RIDE_COOLDOWN_HOURS,
@@ -168,6 +170,21 @@ def _compute_avg_volume(candles, period):
     return sum(vols) / len(vols)
 
 
+def _compute_bb_position(closes, period=20, std_mult=2.0):
+    """Bollinger Band position: 0=lower band, 1=upper band. Returns None if insufficient data."""
+    if not closes or len(closes) < period:
+        return None
+    window = closes[-period:]
+    sma = sum(window) / period
+    variance = sum((c - sma) ** 2 for c in window) / period
+    std = variance ** 0.5
+    upper = sma + std_mult * std
+    lower = sma - std_mult * std
+    if upper == lower:
+        return 0.5
+    return (closes[-1] - lower) / (upper - lower)
+
+
 def detect(token):
     """Return {direction, confidence, value, price} or None."""
     # Staleness checks
@@ -216,6 +233,18 @@ def detect(token):
     if len(closes_5m) >= 13:  # need 12 candles for 1h
         mom_1h = (closes_5m[-1] - closes_5m[-13]) / closes_5m[-13] * 100
         if mom_1h < TREND_RIDE_MOM_1H_MIN:
+            return None
+
+    # Condition 7: BB position — avoid lower-band entries (win avg=0.73, loss avg=0.35)
+    bb_pos = _compute_bb_position(closes_5m, period=20)
+    if bb_pos is not None and bb_pos < TREND_RIDE_BB_POS_MIN:
+        return None
+
+    # Condition 8: Momentum score — avoid weak moves (loss avg=26, HBAR loss had 19)
+    # Momentum = rate of change over 12 candles (1h) scaled to score
+    if len(closes_5m) >= 13:
+        momentum_score = ((closes_5m[-1] - closes_5m[-13]) / closes_5m[-13] * 100) * 10
+        if momentum_score < TREND_RIDE_MOMENTUM_MIN:
             return None
 
     # Optional boost: 1h EMA alignment

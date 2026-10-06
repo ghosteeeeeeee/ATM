@@ -2244,6 +2244,8 @@ SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for
 # T directive 2026-10-05: make live + standalone bypass (overrides freeze for this signal)
 TREND_RIDE_LONG_ENABLED = True              # master kill-switch
 TREND_RIDE_LONG_PLUS_ENABLED = True         # LONG direction
+TREND_RIDE_BB_POS_MIN = 0.30                # min BB position — avoid lower-band entries (win avg=0.73, loss avg=0.35)
+TREND_RIDE_MOMENTUM_MIN = 20                # min momentum score — avoid weak moves (HBAR loss had momentum=19)
 TREND_RIDE_RSI_MIN = 50                     # RSI floor — momentum zone start
 TREND_RIDE_RSI_MAX = 65                     # RSI ceiling — tightened 70->65 (backtest: 65-70 loses in NORMAL/HIGH)
 TREND_RIDE_VOL_MULT = 1.2                   # volume must be >= 1.2x 20-period average
@@ -2683,7 +2685,7 @@ BB_BOUNCE_V3_SPEED_MIN = -1.0      # absolute speed floor — block free-falling
 # ── Regime-aware confidence ──
 BB_BOUNCE_V3_CONF_BASE = 72
 BB_BOUNCE_V3_CONF_CAP = 88
-BB_BOUNCE_V3_REGIME_NORMAL_MULT = 1.1   # DRIFT-B STILL WRONG — DB says NORMAL is WORST (16T 50%WR −$0.39: 8W+$0.44/8L−$0.83), HIGH is best (6T 66.7% +$0.09). NOT changed this run: conf clamp min=50 in bb_bounce_v3_long.py:471 defeats mult=0.0 (conf*=0 → max(0,50)=50, signal still emits); STANDALONE_BYPASS also skips vol-gate NORMAL 0.0 (DRIFT-A). Fix path: remove bb-bounce-v3-long from STANDALONE_BYPASS_SIGNALS OR lower conf clamp + set 0.0. Owner: bug_hunter post-freeze queue #5/#7.
+BB_BOUNCE_V3_REGIME_NORMAL_MULT = 0.0   # CEO 2026-10-06 post-freeze — NORMAL is WORST habitat (30d 16T 50%WR −$0.39; HIGH 6T 66.7% +$0.09). Was 1.1 (DRIFT-B). conf-clamp root fix shipped with this: bb_bounce_v3_long.py returns conf=0 when regime mult=0.0 so NORMAL never emits. STANDALONE_BYPASS removal (brain_auditor) + vol_gate NORMAL 0.0 already live.
 BB_BOUNCE_V3_REGIME_HIGH_MULT = 1.0     # full confidence in HIGH
 BB_BOUNCE_V3_REGIME_EXTREME_MULT = 0.7  # penalty in EXTREME (weakest regime)
 BB_BOUNCE_V3_REGIME_FLAT_MULT = 0.9     # mild penalty in FLAT (low energy)
