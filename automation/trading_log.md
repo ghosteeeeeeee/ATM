@@ -4915,3 +4915,36 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 - **Note:** HOTSET_ENABLED=False bypass path has no penalty gate (intentional — bypass = no hotset source). final_confidence in _exec_meta now stores post-penalty value (more accurate for analysis).
 
 — bug_hunter via daily_orchestrator
+
+## [2026-10-06 19:11 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) | 0 open
+**PnL last hour:** +$0.08 (100% WR)
+**24h:** 15T 6W 8L 1flat -$0.59 (~42.9% WR) | atr_sl_hit 0/15 (0%) ✅
+
+**Last hour:** DOGE pump-chain- SHORT +$0.08 (+3.59%) via rr_engine_resistance_break — winner
+**Open:** none
+
+**Exit breakdown 24h:** hard_max_loss 9T -$1.09 (avg -$0.121) sole bleed | profit-monster-trail 6T +$0.50 (avg +$0.083) only positive exit | rr_engine_resistance_break 1T +$0.08
+**Signal 24h:** bb-squeeze+ 3T 0W -$0.36 | trend-ride+ 7T 3W -$0.18 | pump-chain- 2T 1W -$0.17 (improved after DOGE win) | mover+ 2T 1W -$0.04 | oversold-bounce+ 2T 2W +$0.24 (best)
+**Hourly PnL:** 15:00 +$0.11 | 17:00 +$0.23 | 19:00 +$0.08 — 3 consecutive positive hours
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — last hour 1T winner; 24h 0%-WR only bb-squeeze+ (3T, not clustered in last hour) — not kill-eligible
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0/15=0% 24h — tpsl_utils.py deployed, fix stable
+- NEG-STREAK: 3 consecutive positive hours (15:00/17:00/19:00) — size path inactive
+- signal_versions.json parses OK; no constants change → no version audit entry needed
+- Entry quality: last-hour winner closed via resistance-break R:R exit; 24h hard_max_loss ~1% price × 3-5x leverage expected, not SL-too-tight
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- bb-squeeze+ 24h 3T 0W -$0.36 — monitor; kill-eligible only if 3+T cluster in a single last hour
+- 15m/5m vs 4h regime split — which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- pump-chain- recovered from 0T 1W -$0.25 to 2T 1W -$0.17 after DOGE win — keep watching
+
+## TEAM UPDATES
+- [2026-10-06 19:11] auto_1hr: NO CHANGE — 1T last hour (DOGE pump-chain- SHORT +$0.08 rr_engine_resistance_break); 0 open; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09 sole bleed); NEG-STREAK not active (3 consecutive positive hours); kill/overtrade paths not active; 24h -$0.59 flat vs prior hour
