@@ -4801,3 +4801,37 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 16:12] auto_1hr: NO CHANGE — 2T last hour both winners +$0.11 (ENS oversold-bounce+ / AVAX mover+ via profit-monster-trail); 0 open; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09); NEG-STREAK path not active (positive hour); kill/overtrade paths not active
+
+## [2026-10-06 17:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 14T 5W 9L 1flat -$0.82 (35.7% WR) | atr_sl_hit 0/14 (0%) ✅
+
+**Exit breakdown 24h:** hard_max_loss 9T -$1.09 (avg -$0.121) sole bleed | profit-monster-trail 5T +$0.27 (avg +$0.054) only positive exit
+**Signal 24h:** bb-squeeze+ 3T 0W -$0.36 (7d 69T 60.9%WR -$0.05 breakeven) | pump-chain- 1T 0W -$0.25 | trend-ride+ 7T 3W -$0.18 | mover+ 2T 1W -$0.04 | oversold-bounce+ 1T 1W +$0.01
+**Regime 5m @ 17:00:** SHORT_BIAS (2L/79S/40N) — flipped from NEUTRAL @ 15:00
+**Pipeline:** healthy — 47 signals scanning, sync clean (0 HL / 0 DB), lock present
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour (16:12-17:13): 0T closed — quiet, no opens
+- Kill: none — 0T last hour; 24h 0%-WR signals all ≤3T and bb-squeeze+ 7d still breakeven (69T 60.9%WR -$0.05) — not kill-eligible under 3+T/last-hour rule
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/14=0% 24h — tpsl_utils.py deployed (49KB), fix stable, not dominant
+- NEG-STREAK: last close hour 15:00 was +$0.11 (positive); only 1 negative hour (09:00 -$0.25) in 8h → 3+ consecutive negative-close hours NOT met → size path inactive
+- REGIME: 5m flipped SHORT_BIAS (2L/79S/40N) but NEG-STREAK path not active → no size reduction triggered
+- Entry quality: 0 trades last hour; 24h winners all small trail exits (avg +$0.054), losers all hard_max_loss ~3-6% account (expected at 3-5x leverage on ~1% price move)
+- signal_versions.json parses OK (18 keys); no constants change this hour → no version audit entry needed
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- 15m/5m vs 4h regime split — 5m now SHORT_BIAS; which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- bb-squeeze+ 24h 3T 0W -$0.36 — monitor; 7d breakeven so not a kill, but if it degrades further watch HARD
+- signal_versions.json pump-chain- legacy format still unfixed (no constants change this hour)
+- Trading quiet 16-17h (0 closes) — third quiet stretch today; pipeline scanning 47 signals, no entries firing
+
+## TEAM UPDATES
+- [2026-10-06 17:13] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0% 24h; hard_max_loss unchanged (9T -$1.09); regime 5m flipped SHORT_BIAS (2L/79S/40N) but NEG-STREAK path not active (only 1 negative hour/8h); kill/overtrade paths not active; 0 open; pipeline healthy
+
