@@ -4343,3 +4343,41 @@ BY: auto_1hr
 - signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
 - Working tree has uncommitted non-auto_1hr changes — NOT staged/committed by this run
 BY: auto_1hr
+
+## [2026-10-06 04:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour (WR: N/A) | 24h: 28T ~16W 11L 1flat -$1.08 (~57% WR among closes, net negative)
+
+**This hour:**
+- Quiet hour — 0 closes (23h/00h/01h/02h streak of negative hours ENDED by no-trade hour)
+- Open now: 2 — LTC pump-chain- SHORT (03:29, LTC=SHORT_BIAS ✓), POL bb-squeeze+ LONG (00:20, POL=NEUTRAL, stale overnight)
+
+**24h close reasons:**
+- hard_max_loss 12T -$1.61 (avg -0.134) — ~43% of closes, sole loss concentration
+- profit-monster-trail 11T +$0.60 (avg +0.055) — sole winner
+- hard_sl 2T -$0.38 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06 | ORPHAN_PAPER 1T $0
+- atr_sl_hit: **0/28 = 0%** — tpsl_utils fix stable, not dominant, no CEO alert
+
+**Hourly PnL streak:** 22h +$0.10 | 23h -$0.10 | 00h -$0.23 | 01h -$0.12 | 02h -$0.11 | 03h $0.00 (no trades)
+- Prior 4h streak (23/00/01/02) broken by quiet 03h. Even if continued, regime SHORT_BIAS ≠ NEUTRAL + size at HL floor → no action.
+
+**Changes:** none — no trigger met with actionable param path this hour.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — 0 trades last hour. 24h 0%-WR signals all ≤3T over full 24h window: mtf-regime-trend- 3T -$0.53 (queue #6, has prior wins on longer window), volume-breakout-long+ 1T, btc-pump-rider+ 1T, mover+ 1T (CEO re-enabled 2026-09-22). None meet "3+ trades in last hour".
+- Negative avg_pnl streak: BROKEN by no-trade 03h. Prior4h streak would not have triggered action anyway (SHORT_BIAS ≠ NEUTRAL, size at HL floor $11.10).
+- Overtrading: 0 trades/hour — well under 20
+- atr_sl_hit 0% — no SL-tightness issue; hard_max_loss remains entry-quality problem (LONG into SHORT_BIAS overnight pattern)
+- Live trading: enabled. Pipeline healthy (2 open positions).
+
+**Open Questions / Sideways:**
+- ⚠️ **hard_max_loss 12T -$1.61** with low MFE — entries never worked. Pattern: LONG into SHORT_BIAS. Queue#2 entry/regime gate review still the real fix, not stop-width.
+- ⚠️ **mtf-regime-trend- 3T 0W -$0.53** in 24h — at kill threshold for 24h window but not "last hour". Queue #6, watch next hour for last-hour kill eligibility.
+- ⚠️ **IO pnl_usdt=0.00 vs pnl_pct=-3.57** accounting anomaly — still open, prior hours flagged. Verify position_manager close path.
+- ⚠️ **45da8fcf** trendline_bounce_long confidence boost during freeze — still unratified. CEO: RATIFY or REVERT.
+- bb-squeeze+ 9T 5W -$0.36 — R:R inverted, not kill-eligible
+- Open POL bb-squeeze+ LONG into NEUTRAL — stale from 00:20; MAE guard active
+- signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
+- Working tree has uncommitted non-auto_1hr changes — NOT staged/committed by this run
+BY: auto_1hr
