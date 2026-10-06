@@ -3323,7 +3323,7 @@ def run(dry_run=False):
             confidence = confidence * _exec_mult
             sig['final_confidence'] = confidence
             if _pp < 1.0:
-                log(f"  ⚖️ [PENALTY-GATE] {token} {direction}: conf {_raw_conf:.0f}×penalty {_pp:.3f}→exec {confidence:.1f}%")
+                log(f"  ⚖️ [PENALTY-GATE] {token} {direction}: conf {_raw_conf:.0f}×penalty_raw {_pp:.3f}×mult {_exec_mult:.3f}→exec {confidence:.1f}%")
         # CEO Fix 1: re-check AFTER penalty multiplication (initial filter at :3227 used raw conf)
         if confidence is not None and confidence < MIN_EXEC_CONFIDENCE:
             log(f'  🚫 [PENALTY-BLOCK] {token} {direction} exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')

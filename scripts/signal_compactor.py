@@ -4079,6 +4079,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     f"hits={_slz_zone.hit_count}, dist={_cz_dist:.2f}%)")
                                 direction = _contrarian_dir
                                 entry['direction'] = _contrarian_dir
+                                # Fix 1: drop stale penalty_product (computed for old direction)
+                                entry.pop('penalty_product', None)
                                 entry['contrarian'] = True
                                 entry['zone_center'] = _slz_zone.center
                                 entry['zone_strength'] = _slz_zone.strength
@@ -4208,6 +4210,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         original_dir = direction
                         direction = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
                         entry['direction'] = direction
+                        # Fix 1: drop stale penalty_product (computed for old direction)
+                        entry.pop('penalty_product', None)
                         log(f"  🔄 [CONTRARIAN-FLIP-FINAL] {tkn}: {original_dir}→{direction} (trend_momentum_near_sma always wrong)")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
@@ -4265,6 +4269,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 if bare_pe == 'trend_momentum_near_sma':
                                     original_dir = pe['direction']
                                     pe['direction'] = 'SHORT' if pe['direction'].upper() == 'LONG' else 'LONG'
+                                    # Fix 1: drop stale penalty_product (computed for old direction)
+                                    pe.pop('penalty_product', None)
                                     key = f"{pe['token']}:{pe['direction']}"
                                     log(f"  🔄 [CONTRARIAN-FLIP-PRESERVE] {pe['token']}: {original_dir}→{pe['direction']} (trend_momentum_near_sma always wrong)")
                             elif ACCEL_300_STANDALONE_BYPASS_ENABLED and pe_src.startswith('accel-300'):
@@ -4559,6 +4565,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         'direction': l_direction.upper(),
                         'confidence': l_conf,
                         'final_confidence': l_conf,
+                        'penalty_product': _penalty_product_tracker.get((l_token.upper(), l_direction.upper()), 1.0),
                         'source': l_source,
                         'signal_type': l_stype,
                         'z_score': row[7] if len(row) > 7 else 0,
