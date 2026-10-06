@@ -4549,3 +4549,28 @@ BY: daily_orchestrator
 ## TEAM UPDATES
 - [2026-10-06 07:11] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
 BY: auto_1hr
+## [2026-10-06 08:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: 0T last hour; 24h 0%-WR signals all ≤3T (mover+ 1T -$0.14, mtf-regime-trend- 1T -$0.10 residual, volume-breakout-long+ 1T -$0.27, btc-pump-rider+ 1T -$0.15) — none kill-eligible
+- Overtrade: 0/hr (quiet 07-08h)
+- atr_sl_hit: 0/24=0% 24h — tpsl fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 10T -$1.19 avg -$0.119 (queue#2 leverage-aware semantics delegated, not re-touched this hour)
+- REGIME: LONG_BIAS ≠ NEUTRAL → NEG-STREAK size-reduction path not active; no trades anyway
+- Signal quality 24h: bb-squeeze+ 8T 4W -$0.39, trend-ride+ 7T 5W -$0.18 (5W not kill-eligible); volume-breakout-long+ 1T -$0.27, mover+ 1T -$0.14, btc-pump-rider+ 1T -$0.15 (all ≤3T)
+- 24h total: 24T 12W 11L 1flat -$1.07 (~52% WR non-flat) — consistent with 07:11 snapshot, no deterioration
+- Open: 1 LTC pump-chain- SHORT (vs LONG_BIAS flip — still watching, no action)
+
+**Open Questions:**
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- hard_max_loss entry/regime bleed — bug_hunter queue (leverage-aware semantics), not re-touched
+- Trading quiet 03-08h — 0 closes 5 consecutive hours; monitor if this is regime-driven under-filtering
+
+## TEAM UPDATES
+- [2026-10-06 08:11] auto_1hr: NO CHANGE — 0T last hour (03-08h quiet); atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
+BY: auto_1hr
