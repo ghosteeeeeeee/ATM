@@ -1596,6 +1596,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     # 'doji' REMOVED 2026-09-25 — 66.7% WR LONG in NEUTRAL, pm_trail should book profits (was: ATR SL)
     'continuum-osc',      # continuum oscillator — manage via ATR SL, not PM Trail
     'volume-breakout',    # volume breakout — manage via ATR SL, not PM Trail
+    'trend-ride', 'trend_ride_long',  # ride_it exit — exempt from PM trail/cut_loser (independent audit 2026-10-05)
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
     # REMOVED: 'slow-grind', 'slow-grind+' — moved to PM_TRAIL_BYPASS (T1/T2 still active)
@@ -1658,12 +1659,14 @@ SIGNAL_EXIT_CONFIG = {
     'pump_chain-': 'rr_engine',  # underscore variant — SHORT needs tighter SL
     'pump_chain': 'pump_exit',    # bare variant
     # Mover: ride-it exit — volume spike override catches explosive moves
-    'mover+': 'ride_it',
+    # BUG FIX: mover+ REMOVED from ride_it (independent audit 2026-10-05: ride_it hurts mover+,
+    # was already removed from PM bypass 2026-09-25 for PM trail to manage). Keep mover- on ride_it.
     'mover-': 'ride_it',
     'mover': 'ride_it',    # bare variant
     # Volume breakout: ride-it exit — designed for delayed spikes
     'volume-breakout+': 'ride_it',
     'volume-breakout-': 'ride_it',
+    'volume-breakout-long+': 'ride_it',  # FIX: was matching no exit config (audit 2026-10-05)
     'volume_breakout+': 'ride_it',  # underscore variant
     'volume_breakout-': 'ride_it',  # underscore variant
     'volume_breakout': 'ride_it',   # bare variant
@@ -2680,7 +2683,7 @@ BB_BOUNCE_V3_SPEED_MIN = -1.0      # absolute speed floor — block free-falling
 # ── Regime-aware confidence ──
 BB_BOUNCE_V3_CONF_BASE = 72
 BB_BOUNCE_V3_CONF_CAP = 88
-BB_BOUNCE_V3_REGIME_NORMAL_MULT = 1.1   # boost in NORMAL (best regime)
+BB_BOUNCE_V3_REGIME_NORMAL_MULT = 1.1   # DRIFT-B STILL WRONG — DB says NORMAL is WORST (16T 50%WR −$0.39: 8W+$0.44/8L−$0.83), HIGH is best (6T 66.7% +$0.09). NOT changed this run: conf clamp min=50 in bb_bounce_v3_long.py:471 defeats mult=0.0 (conf*=0 → max(0,50)=50, signal still emits); STANDALONE_BYPASS also skips vol-gate NORMAL 0.0 (DRIFT-A). Fix path: remove bb-bounce-v3-long from STANDALONE_BYPASS_SIGNALS OR lower conf clamp + set 0.0. Owner: bug_hunter post-freeze queue #5/#7.
 BB_BOUNCE_V3_REGIME_HIGH_MULT = 1.0     # full confidence in HIGH
 BB_BOUNCE_V3_REGIME_EXTREME_MULT = 0.7  # penalty in EXTREME (weakest regime)
 BB_BOUNCE_V3_REGIME_FLAT_MULT = 0.9     # mild penalty in FLAT (low energy)
@@ -2712,7 +2715,12 @@ STANDALONE_BYPASS_SIGNALS = (
     'mtf-regime-trend+', 'mtf-regime-trend-',  # regime alignment + momentum entry — works solo (2026-10-01)
     # open-skies+ KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-bounce-v3-long', 'bb-v2-short',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short', 'bb-bounce-long', 'bb-bounce-v2-long', 'bb-v2-short',
+    # bb-bounce-v3-long REMOVED from bypass 2026-10-06 brain_auditor — DRIFT-A root cause.
+    # Vol gate NORMAL 0.0 was already correct but STANDALONE_BYPASS skipped it (bb-bounce-v3-long+
+    # source rstrips to bb-bounce-v3-long). NORMAL habitat 14d 15T 46.7%WR -$0.43; HIGH kept via
+    # confluence path + ('HIGH','bb-bounce-v3-long')=1.0 override. Zero trades opened after Oct 5
+    # so near-term impact ~0; closes the hole for future NORMAL slips.
     'bb-squeeze',  # bollinger squeeze breakout — works solo (2026-10-01)
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long'). 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.

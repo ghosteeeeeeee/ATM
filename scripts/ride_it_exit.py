@@ -57,6 +57,10 @@ def _get_atr(token: str, period: int = 14) -> float:
             ORDER BY ts DESC LIMIT ?
         """, (token.upper(), period + 5))
         rows = cur.fetchall()
+        # BUG FIX: query returns DESC (newest first), but ATR needs chronological order.
+        # Original code used rows[i-1] as "previous close" — but rows[i-1] is NEWER,
+        # not older. This inflated ATR 14-103%. Reverse to ASC before computing TR.
+        rows.reverse()
 
         if len(rows) < period + 1:
             return 0
@@ -349,10 +353,13 @@ def manage_ride_it_exit(token: str, direction: str, current_price: float,
         
         if direction == 'LONG':
             phase1_sl = entry_price - sl_distance
-            should_update = phase1_sl > current_sl  # LONG: higher SL = tighter
+            # BUG FIX: original only tightened (phase1_sl > current_sl), never widened.
+            # Phase 1 design is WIDE SL to survive noise — must allow widening too.
+            # Only skip if phase1_sl is essentially the same (within 0.05%).
+            should_update = phase1_sl > current_sl * 1.0005 or phase1_sl < current_sl * 0.9995
         else:
             phase1_sl = entry_price + sl_distance
-            should_update = phase1_sl < current_sl  # SHORT: lower SL = tighter
+            should_update = phase1_sl < current_sl * 0.9995 or phase1_sl > current_sl * 1.0005
         
         if should_update:
             _persist_sl(trade_id, phase1_sl)

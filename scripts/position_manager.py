@@ -2678,6 +2678,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _conn_slz_exit.close()
             _atr_slz = 0
             if len(_atr_rows_slz) >= 15:
+                # BUG FIX: query returns DESC, reverse to ASC for correct TR computation
+                _atr_rows_slz.reverse()
                 _trs_slz = []
                 for i in range(1, len(_atr_rows_slz)):
                     _h, _l, _pc = _atr_rows_slz[i][1], _atr_rows_slz[i][2], _atr_rows_slz[i-1][3]
@@ -2784,9 +2786,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _atr_rows = _cur_atr.fetchall()
                 _cur_atr.close()
                 _conn_atr.close()
-                
+
                 atr = 0
                 if len(_atr_rows) >= 15:
+                    # BUG FIX: query returns DESC, reverse to ASC for correct TR computation
+                    _atr_rows.reverse()
                     trs = []
                     for i in range(1, len(_atr_rows)):
                         h, l, pc = _atr_rows[i][1], _atr_rows[i][2], _atr_rows[i-1][3]
@@ -3278,7 +3282,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 6a. UNIVERSAL MAX HOLD — Safety Net ─────────────────────────────
         # Force-close any position held longer than UNIVERSAL_MAX_HOLD_MINUTES.
         # Prevents stale positions from locking capital (WLFI 678min, SEI 1161min).
-        if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time:
+        # BUG FIX: exempt ride_it signals — their 24h max hold is longer than 8h universal.
+        _pos_signal = str(pos.get('signal', '') or '')
+        _is_ride_it = 'ride_it' in _pos_signal or 'trend-ride' in _pos_signal or 'volume-breakout' in _pos_signal
+        if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it:
             try:
                 if isinstance(open_time, str):
                     _open_dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
