@@ -4948,3 +4948,69 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-06 19:11] auto_1hr: NO CHANGE — 1T last hour (DOGE pump-chain- SHORT +$0.08 rr_engine_resistance_break); 0 open; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09 sole bleed); NEG-STREAK not active (3 consecutive positive hours); kill/overtrade paths not active; 24h -$0.59 flat vs prior hour
+
+## [2026-10-06 20:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 2 open
+**PnL last hour:** $0.00
+**24h:** 16T 7W 9L ~-$1.09 (hard_max_loss sole bleed) | atr_sl_hit 0/16 = 0% ✅
+
+**Last hour:** no closed trades
+**Open:** LTC pump-chain- SHORT @69.32 (flat -0.04%) · IO pump-chain- SHORT @0.1715 (flat -0.01%) — both ~flat, SL/TP intact
+
+**Exit breakdown 24h:** hard_max_loss 9T -$1.09 (avg -$0.121) sole bleed | profit-monster-trail 6T +$0.50 (avg +$0.083) only positive exit | rr_engine_resistance_break 1T +$0.08
+**Signal 24h:** bb-squeeze+ 3T 0W -$0.36 (all hard_max_loss — not last-hour clustered) | trend-ride+ 7T 3W -$0.18 | pump-chain- 2T 1W -$0.17 (2 open) | mover+ 2T 1W -$0.04 | oversold-bounce+ 2T 2W +$0.24 (best)
+**Hourly PnL:** 15:00 +$0.11 | 17:00 +$0.23 | 19:00 +$0.08 — 3 consecutive positive hours
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — last hour 0T; bb-squeeze+ 3T 0W 24h but trades closed 23:06/00:36/06:09, NOT 3+T in last hour — not kill-eligible per hourly rule
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/16 = 0% — tpsl_utils.py deployed, fix stable
+- NEG-STREAK: 3 consecutive positive hours (15:00/17:00/19:00) — size path inactive
+- signal_versions.json parses OK; no constants change → no version audit entry needed
+- Entry quality: last hour no fills; 24h hard_max_loss ~1% price × 3-5x leverage expected, not SL-too-tight
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- bb-squeeze+ 24h 3T 0W -$0.36 — monitor; kill-eligible only if 3+T cluster in a single last hour
+- regime_state table missing in brain Postgres — where does regime gate read from? Systems check
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- LTC/IO pump-chain- SHORTs both open ~flat — watch for hard_max_loss pattern repeating
+
+## TEAM UPDATES
+- [2026-10-06 20:12] auto_1hr: NO CHANGE — 0T last hour; 2 open pump-chain- SHORTs (LTC/IO) flat; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09 sole bleed); NEG-STREAK not active (3 consecutive positive hours); kill/overtrade paths not active; bb-squeeze+ not last-hour-kill-eligible
+
+## [2026-10-06 21:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 2 open
+**PnL last hour:** $0.00
+**24h:** 16T 7W 9L ~-$1.09 (hard_max_loss sole bleed) | atr_sl_hit 0/16 = 0% ✅
+
+**Last hour:** no closed trades
+**Open:** IO pump-chain- SHORT @0.1715 (flat -0.01%) · LTC pump-chain- SHORT @69.32 (+0.33%)
+
+**Exit breakdown 24h:** hard_max_loss 9T -$1.09 (avg -$0.121) sole bleed | profit-monster-trail 6T +$0.50 (avg +$0.083) only positive exit | rr_engine_resistance_break 1T +$0.08
+**Signal 24h:** bb-squeeze+ 3T 0W -$0.36 (not last-hour clustered) | trend-ride+ 7T 3W -$0.18 | pump-chain- 2T 1W -$0.17 (2 open) | mover+ 2T 1W -$0.04 | oversold-bounce+ 2T 2W +$0.24 (best)
+**Hourly PnL:** 15:00 +$0.11 | 17:00 +$0.23 | 19:00 +$0.08 — 3 consecutive positive hours
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — last hour 0T; bb-squeeze+ 3T 0W 24h but trades closed 23:06/00:36/06:09, NOT 3+T in last hour — not kill-eligible
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/16 = 0% — tpsl_utils.py deployed, fix stable
+- NEG-STREAK: 3 consecutive positive hours (15:00/17:00/19:00) — size path inactive
+- signal_versions.json parses OK; no constants change → no version audit entry needed
+- Entry quality: last hour no fills; 24h hard_max_loss ~1% price × 3-5x leverage expected, not SL-too-tight
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- bb-squeeze+ 24h 3T 0W -$0.36 — monitor; kill-eligible only if 3+T cluster in a single last hour
+- regime_state table missing in brain Postgres — where does regime gate read from? Systems check
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- LTC pump-chain- SHORT now +0.33% — watch if it continues to hard_max_loss pattern
+
+## TEAM UPDATES
+- [2026-10-06 21:12] auto_1hr: NO CHANGE — 0T last hour; 2 open pump-chain- SHORTs (IO flat, LTC +0.33%); atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09 sole bleed); NEG-STREAK not active (3 consecutive positive hours); kill/overtrade paths not active; bb-squeeze+ not last-hour-kill-eligible

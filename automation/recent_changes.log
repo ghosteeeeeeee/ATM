@@ -4201,3 +4201,27 @@ BY: auto_1hr
   Overtrade: 2/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
 BY: auto_1hr
+[2026-10-06 18:14 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour 1W +$0.23 (ZRO oversold-bounce+ LONG profit-monster-trail) | 1 open DOGE pump-chain- SHORT @0.09465 -0.29% | 24h 15T 6W 9L -$0.59 | atr_sl_hit 0/15=0% (tpsl fix stable) | hard_max_loss 9T -$1.09 sole bleed | profit-monster-trail 6T +$0.50 only positive exit
+  Entry quality: last hour winner small trail exit; 24h losers all hard_max_loss ~1% price at 3-5x leverage (expected)
+  NEG-STREAK: n/a — 15:00 +$0.11, 17:00 +$0.23 both positive; 3+ consecutive negative hours not met
+  Kill: none (0T last hour; 24h 0%-WR all not 3+T/last-hour)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | bb-squeeze+ 3T 0W -$0.36 | DOGE pump-chain- SHORT open | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
+BY: auto_1hr
+[2026-10-06 20:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 2 open pump-chain- SHORT (LTC flat -0.04%, IO flat -0.01%) | 24h ~16T 7W 9L hard_max_loss 9T -$1.09 sole bleed | atr_sl_hit 0/16=0% (tpsl fix stable) | profit-monster-trail 6T +$0.50 only positive exit | bb-squeeze+ 3T 0W -$0.36 not last-hour clustered
+  Entry quality: n/a last hour; 24h hard_max_loss ~1% price at leverage expected
+  NEG-STREAK: n/a — 15:00 +$0.11, 17:00 +$0.23, 19:00 +$0.08 all positive
+  Kill: none (0T last hour)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | bb-squeeze+ 3T 0W 24h monitor | LTC/IO pump-chain- SHORTs open | regime_state table missing in brain PG | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
+BY: auto_1hr
+[2026-10-06 21:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 2 open pump-chain- SHORT (IO flat -0.01%, LTC +0.33%) | 24h ~16T 7W 9L hard_max_loss 9T -$1.09 sole bleed | atr_sl_hit 0/16=0% (tpsl fix stable) | profit-monster-trail 6T +$0.50 only positive exit | bb-squeeze+ 3T 0W -$0.36 not last-hour clustered
+  Entry quality: n/a last hour; 24h hard_max_loss ~1% price at leverage expected
+  NEG-STREAK: n/a — 15:00 +$0.11, 17:00 +$0.23, 19:00 +$0.08 all positive
+  Kill: none (0T last hour)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | bb-squeeze+ 3T 0W 24h monitor | LTC pump-chain- SHORT open +0.33% | regime_state table missing in brain PG | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
+BY: auto_1hr
