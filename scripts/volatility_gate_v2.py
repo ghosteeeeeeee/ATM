@@ -326,6 +326,10 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
+    ('EXTREME', 'mtf-regime-trend-'): 0.0,       # BLOCKED CEO 2026-10-06 — EXTREME 30d 2T 0%WR -$0.23. SHORT model A: EXTREME habitat only profitable with RSI>=40; this signal's oversold leaks make EXTREME a bleed zone.
+    ('EXTREME', 'mtf_regime_trend_short'): 0.0,  # underscore form
+    ('EXTREME', 'mtf-regime-trend+'): 0.0,       # BLOCKED — signal already disabled (MTF_REGIME_TREND_PLUS_ENABLED=False); gate defense-in-depth
+    ('EXTREME', 'mtf_regime_trend_long'): 0.0,   # underscore form
     # ── NORMAL regime: per-signal overrides ──
     # 30d data (2026-10-01): NORMAL LONG -$2.39, NORMAL SHORT -$2.16. Bleed zone.
     # Entries use BOTH underscore and hyphen forms — substring matching means
@@ -343,6 +347,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback
     ('NORMAL', 'bb-bounce-v3-long'): 0.0,        # BLOCKED 2026-10-04 signal_reporter — NORMAL 15T 46.7%WR -$0.43. Wins HIGH 5T 60%WR +$0.08. Overrides family Bollinger NORMAL=1.3 boost (wrong for v3).
     ('NORMAL', 'bb_bounce_v3_long'): 0.0,        # underscore form (signal_type in signals DB)
+    ('NORMAL', 'mtf-regime-trend-'): 0.0,        # BLOCKED CEO 2026-10-06 — NORMAL 30d 2T 50%WR -$0.25; 7d overall SHORT bleeding. Habitat kept in HIGH.
+    ('NORMAL', 'mtf_regime_trend_short'): 0.0,   # underscore form
     # ── NORMAL: bleeding signals (30d cross-tab) ──
     ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
     ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
@@ -378,6 +384,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'pump-chain'): 1.0,                 # OK — bare form fallback
     ('HIGH', 'bb-bounce-v3-long'): 1.0,          # OK 2026-10-04 signal_reporter — HIGH 5T 60%WR +$0.08 (7d 4T 75%WR +$0.10). Overrides family Bollinger HIGH=0.0 block (stale v1/v2 data).
     ('HIGH', 'bb_bounce_v3_long'): 1.0,          # underscore form
+    ('HIGH', 'mtf-regime-trend-'): 0.0,          # BLOCKED CEO 2026-10-06 — HIGH 30d 7T 42.9%WR -$0.34 (queue evidence). Fresh n=1 +$0.06 is noise. EXTREME also blocked below.
+    ('HIGH', 'mtf_regime_trend_short'): 0.0,     # underscore form
     ('HIGH', 'accel-300-'): 0.0,                # BLOCKED 2026-10-01 — accel-300- SHORT HIGH 0%WR -$0.31 (4T). NORMAL 75%WR. signal_reporter
     ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH

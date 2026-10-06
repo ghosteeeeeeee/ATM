@@ -365,7 +365,31 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # ── Normalize direction ──────────────────────────────────────────────
     side_type = side_type.lower() if side_type else 'long'
     direction = 'LONG' if side_type == 'long' else 'SHORT'
-    
+
+    # ── SHORT oversold hard floor (defense-in-depth, all entry paths) ────
+    # Root cause 2026-10-06: LTC pump-chain- SHORT entered with entry_rsi_14=9.90
+    # via brain.py trade add. decider_run CTX-GATE/EXEC floors exist, but this
+    # path is the final money gate — reject extreme oversold SHORTs here too.
+    # No bearish override (mirror SHORT_RSI_HARD_FLOOR semantics).
+    if direction == 'SHORT':
+        try:
+            from hermes_constants import SHORT_RSI_HARD_FLOOR
+            _rsi_chk = signal_rsi_14
+            if _rsi_chk is None and signal_metadata:
+                if isinstance(signal_metadata, str):
+                    import json as _j
+                    try:
+                        signal_metadata = _j.loads(signal_metadata)
+                    except Exception:
+                        signal_metadata = None
+                if isinstance(signal_metadata, dict):
+                    _rsi_chk = signal_metadata.get('rsi_14', signal_metadata.get('rsi'))
+            if _rsi_chk is not None and float(_rsi_chk) < SHORT_RSI_HARD_FLOOR:
+                print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < HARD_FLOOR {SHORT_RSI_HARD_FLOOR} (extreme oversold)")
+                return None
+        except Exception:
+            pass  # non-fatal — other gates still apply
+
     # ── Auto-compute volatility regime if not provided ───────────────────
     if volatility_regime is None:
         try:

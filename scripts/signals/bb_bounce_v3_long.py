@@ -468,6 +468,12 @@ def _compute_confidence(sig, token):
         conf *= REGIME_FLAT_MULT
     # UNKNOWN keeps 1.0x
 
+    # Root-cause fix (CEO 2026-10-06): regime mult 0.0 = habitat block.
+    # Old clamp min=50 turned conf*=0 into conf=50 and the signal still emitted.
+    # Caller skips when conf <= 0.
+    if conf <= 0:
+        return 0, regime
+
     # Clamp
     conf = int(min(max(conf, 50), CONF_CAP))
 
@@ -512,6 +518,8 @@ def scan_bb_bounce_v3_long_signals(prices_dict):
             continue
 
         conf, regime = _compute_confidence(sig, token)
+        if conf <= 0:
+            continue  # habitat-blocked (regime mult 0.0)
 
         sid = add_signal(
             token=token,

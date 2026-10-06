@@ -273,7 +273,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 FAVORITES_LONG = {
     'BLUR',
     'COMP',
-    'DYDX',
     'HBAR',
     'LDO',
     'SYRUP'
@@ -308,8 +307,11 @@ LOSERS = {
     'ADA',
     'BTC',
     'CHIP',
-    'JUP'
+    'CRV',
+    'JUP',
+    'TURBO'
 }
+
 
 
 

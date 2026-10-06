@@ -4476,3 +4476,52 @@ Final set: ['ADA', 'BTC', 'CHIP', 'CRV', 'JUP', 'TURBO']
 - ⚠️ **45da8fcf** trendline_bounce_long confidence boost during freeze — still unratified. CEO: RATIFY or REVERT.
 - signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor.
 BY: auto_1hr
+
+## Orchestrator Run 2026-10-06 06:40 UTC — POST-FREEZE IMPLEMENTATION
+
+**Freeze b960ffe8 ended 00:38.** This run implements the post-freeze queue items that were data-backed and code-complete. PG verified from source of truth.
+
+### PG SNAPSHOT (06:35 UTC)
+| Window | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| 24h | 26T 11W 2flat | 45.8% | **-$1.25** |
+| 7d | 237T 124W 12flat | 55.1% | **-$0.66** |
+| 30d | 955T 490W 43flat | 53.7% | **-$2.81** |
+
+- 24h LONG 23T -$1.08 | SHORT 3T -$0.17
+- 7d LONG +$1.22/191T | SHORT **-$1.88/46T**
+- Open: **1** LTC pump-chain- SHORT (entry_rsi_14=9.90, opened 03:29, still open)
+- 30d exit bleed: cut-loser-CL-T1 69T -$9.62 | hard_max_loss 57T -$7.86 | atr_sl_hit 350T -$3.68
+
+### ALREADY LIVE (verified, not re-done)
+1. **bb-bounce-v3 regime-block** — NORMAL 0.0 + HIGH 1.0 in volatility_gate_v2 + constants (BB_BOUNCE_V3_REGIME_NORMAL_MULT=0.0). CEO-ratified 0cb0784b. 7d: HIGH 5T 4W +$0.11 KEEP | NORMAL 16T 8W -$0.39 blocked.
+2. **bb-bounce-v2-long+ 1.4** — RE-APPLIED post-freeze (brain_auditor). 7d all-regime wins: NORMAL +$0.50, HIGH +$0.10, FLAT +$0.17.
+3. **mtf-regime-trend- killed** — flag False + NEVER_REENABLE (bd1728f4). Vol-gate 0.0 all regimes as defense-in-depth (working tree). Post-kill trades: 0.
+4. **bb-bounce-v3-long removed from STANDALONE_BYPASS** — DRIFT-A root cause (brain_auditor).
+5. **DRIFT-A VOL-GATE-BYPASS** — compactor bypass path now denies single-source signals when vol-gate override=0.0 (working tree).
+6. **bb_bounce_v3_long.py conf<=0** — habitat mult 0.0 no longer clamps to conf=50 and still emits.
+7. **Oversold SHORT floors in decider_run** — SHORT_RSI_HARD_FLOOR=25 + fail-closed when live+detect both None. CTX-GATE live: CC SHORT blocked LIVE RSI 36.5 < 40; vol-gate blocks pump-chain- in HIGH.
+
+### IMPLEMENTED THIS RUN
+1. **FAMILY_MAP underscore fix** (market_phase_gate.py) — `bb_bounce_v2_long`, `bb_bounce_v3_long`, `bb_bounce_v2`, `bb_bounce_v3`, `bb-bounce-v2-long+`, `bb-bounce-v3-long+` now map to Bollinger (were 'Other'). Verified: signal_family('bb_bounce_v3_long') → Bollinger.
+2. **brain.py SHORT RSI hard floor** — add_trade rejects SHORT when signal_rsi_14 or signal_metadata.rsi < SHORT_RSI_HARD_FLOOR=25. Root cause: LTC pump-chain- entered 03:29 with entry_rsi_14=9.90 via brain.py path. Defense-in-depth for all entry paths; no bear override.
+3. **Commit completed post-freeze queue work** sitting uncommitted (vol-gate mtf 0.0, DRIFT-A bypass, v2-long 1.4, v3 conf fix, position_manager pnl_pct fix, FAVORITES/LOSERS automation updates).
+
+### VERIFIED, NO CHANGE
+- **PROFIT_MONSTER_BYPASS pump-chain** — claim to REMOVE pump-chain from bypass **NOT supported**. 7d exits: PUMP_EXIT 9T +$0.94 (8W) | TRAIL 8T +$1.52 (8W) | HARD_MAX 14T -$1.96 (0W) | hard_sl 20T -$0.63. pump_exit/trail are winning; bleed is hard_max/hard_sl. **Keep pump-chain in PROFIT_MONSTER_BYPASS.**
+- **Protected flags** — CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, ATR_TP_MIN=0.013, BTC_CHOP_GATE_THRESHOLD=0.2, CUT_LOSER_PNL=-1.0, PUMP_CHAIN_V5_ENABLED=False, MTF_REGIME_TREND_MINUS_ENABLED=False, NEUTRAL_SNIPER_ENABLED=False, ACCEL_300_V3_LONG_ENABLED=False, RR_ENGINE_SHADOW=True.
+
+### CRITICAL ISSUES / OPEN
+1. **Oversold SHORT still leaking at margin** — since freeze end 1/1 SHORT oversold (LTC RSI 9.90). Since b960ffe8: 5/6 oversold. Filters work in CTX-GATE (CC blocked) but LTC entered via brain.py without CTX-GATE log line. brain.py guard now added; monitor next 24h.
+2. **Hotset empty intermittent** — 06:07-06:31 cycles mostly `hotset.json is empty — no signals survived compaction` + `fallback DB query returned 0`. FIL pump-chain- SHORT appears briefly (r1 sc=79) then vanishes. Approval rate 0/3. Root cause multi-factor: regime flip LONG_BIAS + pump-chain- HIGH blocked + oversold SHORTs filtered + confluence gate. **DELEGATE deep audit** — not a single-line fix.
+3. **cut-loser-CL-T1 30d 69T -$9.62** — top bleed: bb-squeeze+ hard_max 17T -$2.44 (avg MFE 0.14%), sma20_dip CL-T1 9T -$1.27, bb_bounce_v2_long CL-T1 7T -$1.02, slow_grind CL-T1 6T -$0.97. Losers never worked (MFE ~0.1-0.2%). **DELEGATE bug_hunter MFE audit + fix.**
+4. **hard_max_loss 30d 57T -$7.86** — bb-squeeze+ LONG 17T -$2.44 avg lev 3.7 dominant. **DELEGATE bug_hunter leverage-aware semantics.**
+5. **decider_run v1→v2 import + fail-open removal** — architectural, assigned bug_hunter. Not implemented this run (needs independent audit).
+6. **SHORT 7d -$1.88** — target ≥$0 by Oct 7. mtf-regime-trend- killed; pump-chain- still bleeding via hard_sl/hard_max.
+
+### PIPELINE HEALTH
+- Healthy, cycle running, disk 83%, 1 open (LTC SHORT), timers active, 0 real errors.
+- signal_reporter 05:13 killed mtf-regime-trend- (bd1728f4) — confirmed 0 post-kill trades.
+- auto_1hr: 0 config changes all hours (freeze then quiet). FAVORITES/LOSERS updated 06:00/06:05 — committed with constants.
+
+BY: daily_orchestrator

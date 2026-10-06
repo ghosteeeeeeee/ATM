@@ -1016,6 +1016,18 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             calc_notional = float(row['hl_notional_usdt'])
         else:
             calc_notional = amount_usdt * leverage
+        # FIX 2026-10-06: capture STORED pnl_pct before current_price recompute.
+        # current_price reverts at close → raw_move≈0 → pnl_pct overwritten to ~0,
+        # losing the real leveraged % (IO: stored -3.5731 became ~0 at close).
+        try:
+            _pnl_pct_stored = float(row['pnl_pct']) if row['pnl_pct'] is not None else 0.0
+        except Exception:
+            _pnl_pct_stored = 0.0
+        # Dust guard: hl_notional <$1 is not a real position size — use margin basis.
+        _hl_notional = float(row['hl_notional_usdt']) if row['hl_notional_usdt'] is not None else None
+        _notional_for_pnl = calc_notional
+        if _hl_notional is not None and 0 < _hl_notional < 1.0 and amount_usdt > 0:
+            _notional_for_pnl = amount_usdt * leverage  # paper margin×lev, not HL dust
         experiment = row['experiment']
         sl_dist = row['sl_distance']
         signal_type = row['signal']  # fallback for record_signal_outcome

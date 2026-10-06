@@ -3017,6 +3017,25 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction}: {gate_msg}")
                 continue
 
+            # ── DRIFT-A enforcement (2026-10-06): bypass must respect vol-gate 0.0 ──
+            # Vol gate SIGNAL_TYPE_OVERRIDES marks dead habitats as 0.0 — mtf-regime-trend-
+            # NORMAL/HIGH/EXTREME, bb-squeeze EXTREME, pump-chain+ NORMAL/HIGH, accel-300- HIGH.
+            # STANDALONE_BYPASS previously set pass_gate=True without consulting them
+            # (combined_mult from _score_signal is a different function — out of scope).
+            # ONLY explicit per-signal 0.0 overrides: family-fallback 0.0s are sometimes stale
+            # (volume-breakout-long NORMAL family=0.0 but DB 30d 66.7%WR +$0.31 — bypass correctly ignored it).
+            # Single-source only: confluence (2+ types) lets scoring handle mult.
+            # Fail-open: import/vol-gate error must not block trades.
+            if pass_gate and unique_signal_types == 1:
+                try:
+                    from volatility_gate_v2 import _get_signal_type_mult
+                    _bypass_sig_mult = _get_signal_type_mult(source, _vol_regime, source=source or '')
+                    if _bypass_sig_mult == 0.0:
+                        log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction}: bypass denied — vol gate override=0.0 for '{source}' in {_vol_regime}")
+                        continue
+                except Exception:
+                    pass  # fail-open
+
             # ── Contrarian flip: trend_momentum_near_sma ────────────────────────
             # This signal is consistently wrong — LONG loses, SHORT wins.
             # Flip: LONG→SHORT, SHORT→LONG

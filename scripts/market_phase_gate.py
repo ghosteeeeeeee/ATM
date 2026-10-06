@@ -35,7 +35,10 @@ FAMILY_MAP = {
     'Momentum': ['momentum', 'fast_momentum', 'mtf_momentum', 'velocity', 'phase_accel'],
     'MACD': ['hmacd', 'macd_accel', 'macd_1m', 'mtf_macd', 'macd_divergence_short', 'macd_divergence_long'],
     'Bollinger': ['bb_bounce', 'bb_bounce_short', 'bb-bounce-v2-long', 'bb-bounce-v3-long',
-                   'bbbouncev2long', 'bbbouncev3long'],
+                   'bbbouncev2long', 'bbbouncev3long',
+                   # underscore + source forms (signal_type in signals DB / hotset source)
+                   'bb_bounce_v2_long', 'bb_bounce_v3_long', 'bb_bounce_v2', 'bb_bounce_v3',
+                   'bb-bounce-v2-long+', 'bb-bounce-v3-long+'],
     'Trend_MA': ['ma_cross', 'ma_cross_5m', 'ema9_sma20', 'ema20_50', 'ema_angle',
                   'ma_100_cross', 'ma_100_cross_long', 'ma_100_cross_short', 'ma_100_bounce'],
     'Range': ['range_finder', 'range_finder_short', 'range_breakout', 'range_breakout_short',
