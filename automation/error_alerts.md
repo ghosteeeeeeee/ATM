@@ -1,6 +1,15 @@
 # Error Alerts
 
 
+## Error Alerts — 2026-10-05 17:47 UTC
+- **INFO** — Pipeline healthy: `hermes-pipeline.service` active/running, last cycle 17:47:03 rc=0, breakout 0 signals, position_manager clean (0 open | 0 closed this cycle | 0 Traceback/CRASH in 30m). Kill switch path intact.
+- **WARN** (recurring): `hotset.json` empty — `no signals survived compaction` / `No signals above 50% confidence — skipping execution`. Signals (1h): **80 generated** (pump-chain 51, support_resistance 12, mtf_regime_trend_short 9, others 8), **0 approved**. `decisions` table empty in last 1h. Same pattern as 10-04 entries — signal_compactor filter audit still open.
+- **INFO**: `signal_outcomes` open trades = 0; closed today = 27 | PnL **-0.79 USDT** | wins 16 (~59% WR). Phantom `atr_sl_hit` <0.01%: **0**. Regime fresh 17:45: **LONG_BIAS** (25L/14S/78N, 117 tokens). Speeds **126/241 (52.3%) ≥50th pct**. Prices fresh: candles_1m max ts age **~2.8 min**. token_speeds updated_at 17:46:14.
+- **INFO**: Disk `/` **82%** (92G/118G, 21G free) — under 85% threshold, no cleanup needed. Runtime DB 92MB (warn >50MB) — known, collectors active.
+- **INFO** (recurring): Non-trading failed units — `better-coder`, `bug-hunter` (exit-1 by design), `git-release` (uncommitted-changes gate), `trading-checklist`, `upgrade-implementer`, `wasp` (exit-1 by design when findings exist — wasp.log shows report: ollama generate 500/15s timeout, hotset empty, db-integrity). None on trading execution path. `hermes-atr-sl-updater.timer` not-found (dead ref). Ollama `/api/tags` 200; `/api/generate` 500 timeout — local LLM slow, not trading-blocking (deterministic pipeline).
+- **INFO**: Core timers firing — `hermes-pipeline.timer`, `hermes-price-collector.timer`, `hermes-1m-candle.timer`, `hermes-hl-sync-guardian.timer` all active/running. No service stopped this session.
+- **AUTO-FIXES APPLIED**: none required — trading path healthy. No restarts, no DB locks.
+
 ## Error Alerts — 2026-10-04 18:50 UTC
 - **WARN** (1): Disk `/` **85%** used (95G/118G, 18G free).
   - **AUTO-FIX**: `journalctl --vacuum-size=400M` freed **442.6M** (journals 783.4M→340.7M). `session_brain.db` WAL checkpointed **63MB→0**. `signals_hermes.db` WAL trimmed **6MB→2.3MB**. `candles.db-wal` is **5.1G and growing** — locked by active `price_collector`/candle processes; cannot checkpoint mid-run. No logs >7d to gzip. Remaining bulk is active DBs (candles.db 2.5G + WAL 5.1G, coin_tracker.db 3.3G, signals_hermes.db 923M). **CEO DB-retention decision still open.**
@@ -834,3 +843,80 @@
 - **INFO**: Pipeline healthy — LIVE every 1m, rc=0, 0 Traceback/CRASH. Signals (1h): 110. Open: 3 (SAND SHORT -0.65%, ETH LONG +0.01%, HBAR SHORT +0.60%). Closed today: 35, portfolio PnL -13.07%. Closed page: 55.5% WR (111/200) +$1.13. Regime: SHORT_BIAS (3L/67S/47N, 117 tokens, ts 09:45). Speeds: 52.7% ≥50th (127/241). Disk 82% (under 85%). Phantom atr_sl_hit 0. Core timers all active. No CRITICAL issues.
 - **INFO**: `signals` table total 22,174 rows — cleanup flagged, not blocking.
 - **INFO**: `coin_tracker_data.json` at `/var/www/html/` (nginx alias) not `/var/www/hermes/data/` — by design, fresh at 09:46.
+
+## Error Alerts — 2026-10-05 12:47 UTC
+- **WARN** (recurring): `candles.db` write contention — `database is locked` / `database table is locked` events from `_aggregate_1m.py` + `price_collector.py` concurrent writers (PIDs active at check: 443477, 443480). Occurred 12:26–12:45 across `_store_candles`, candles_5m/15m/1h/4h aggregation, wal_checkpoint. Same pattern as 06:49 and 09:47. Not a stuck lock — transient WAL contention, self-recovered (price collector completed, 85 prices collected, pipeline rc=0).
+- **AUTO-FIX**: none — deliberately. Stopping price-collector/1m-candle would not fix concurrency and risks killing the timer path. **Root-cause fix still pending:** serialize candle-writer path vs price_collector aggregation, or raise busy_timeout / single-writer lock.
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #229678), position_manager rc=0, 4 open positions (ATR updated 3 SL/TP). Signals (1h): 83. Closed today (signal_outcomes): 18, net -0.55 USDT, 61% WR (11/18). Open positions: 4/6 (portfolio source of truth). Regime: SHORT_BIAS (19L/43S/55N, ts 12:45). Disk 82% (under 85%). Prices fresh (latest candle 2.5min). Phantom atr_sl_hit: 0. Core timers all active. No CRITICAL issues.
+- **INFO**: `signal_outcomes` open=0 vs portfolio open=4 — known discrepancy; outcomes table partial, portfolio source of truth = position_manager (per prior notes).
+- **INFO**: Non-critical systemd units in failed state at check: `hermes-better-coder`, `hermes-bug-hunter`, `hermes-ceo`, `hermes-git-release` — not on trading path; no auto-restart (out of scope for health monitor).
+
+## Error Alerts — 2026-10-05 12:59 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] TOK TOK BLOCKED — exec TOK unavailable (TOK-closed, SHORT_RSI_HARD_FLOOR)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: exec TOK unavailable for TOK (TOK-closed)`
+
+## Error Alerts — 2026-10-05 13:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-05 14:48 UTC
+- **WARN** (recurring): `candles.db` write contention — 10 `database is locked` events in price-collector last 15m (14:36–14:47:24). Writers at check: `_aggregate_1m.py` (PID 659948, state Ds = uninterruptible I/O wait) + `price_collector.py` (PID 659971). Hits: `_store_candles` (W 1m, WIF 1h), aggregation candles_1h/4h/5m/15m, wal_checkpoint. Same pattern as 06:49 / 09:47 / 12:47. Not a stuck lock — self-recovered, candles_1m fresh (latest ts ~14:47), pipeline rc=0.
+- **AUTO-FIX**: none — deliberately. Stopping price-collector/1m-candle would not fix concurrency and risks killing the timer path. **Root-cause fix still pending (open since 06:49):** serialize candle-writer path vs price_collector aggregation, or raise busy_timeout / single-writer lock.
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #229797+), all steps rc=0, 0 Traceback/CRASH in 30m. Signals today: 1,539; outcomes last 1h: 4. Closed today: 24, net -1.00 USDT, 13/24 wins (54%). signal_outcomes open=0 (known: portfolio/position_manager is source of truth for open positions). Regime: SHORT_BIAS (11L/32S/74N, ts 14:45). Speeds: 52.7% ≥50th (241 tokens). Disk 82% (under 85%). Phantom (|pnl_pct|<0.01): 1 (BTC LONG 0.0%). Core timers all active (pipeline fired 34s ago, price-collector + 1m-candle 1min 10s ago). No CRITICAL issues. No auto-fixes applied.
+
+## Error Alerts — 2026-10-05 15:48 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #229857+), position_manager rc=0 every cycle. Open positions: 1/6 (portfolio source of truth). Signals (1h): 101. Closed today: 25, net -0.92 USDT, 56% WR. Regime: SHORT_BIAS (7L/29S/81N, ts 15:45). Speeds: 52.7% ≥50th (241 tokens). Disk 82% (under 85%). Prices fresh (86 tokens <5min, latest 0.9min). Phantom atr_sl_hit: 0. Core timers all active (pipeline fired 15s ago, price-collector + 1m-candle ~3min). **0** `database is locked` events in last 60m (self-recovered contention from earlier today). 0 Traceback/CRASH. No CRITICAL issues. No auto-fixes needed.
+- **INFO** (recurring, non-trading): Failed units unchanged: better-coder, bug-hunter, git-release, mtf-macd-tuner, trading-checklist, upgrade-implementer, wasp, weather-station-api. Not on trading path; no auto-restart.
+- **INFO**: `hermes-atr-sl-updater.timer` unit not-found; `hermes-hl-copy.timer` last fired 2026-08-15; `hermes-ma-cross-5m-tuner.timer` never fired — stale/enabled units, not trading-critical.
+
+## Error Alerts — 2026-10-05 15:59 UTC
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-05 20:59 UTC
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: BIGTIME TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-05 22:48 UTC
+- **WARN** (1x): `hermes-coding-mcp.service` crash-looping — restart counter reached 743,336; `/root/.hermes/scripts/run_mcp_server.py` missing (`can't open file` → exit 2). Non-trading path.
+- **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service` — stopped the restart storm until the missing script is restored. Service left inactive.
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #230259+), position_manager rc=0 every cycle. Open positions: 5/6 (portfolio source of truth). Signals last 1h: 80 (signals table). Outcomes last 1h: 2; closed today: 29, net -0.85 USDT, 17/29 wins (58.6% WR). Regime: LONG_BIAS (45L/13S/64N, ts 22:45). Speeds: 53.1% ≥50th (128/241). Prices fresh (latest candle 1.3 min; prices.json 1.8 min; 85 tokens). Phantom atr_sl_hit: 0. Disk 83% (under 85%). Core timers all active (pipeline 15s ago, price-collector 3s, 1m-candle 1m43s). 0 Traceback/CRASH, 0 `database is locked` in 30m. candles.db held by 3 normal writers (pipeline path) — no stuck lock.
+- **INFO** (recurring, non-trading): Failed units unchanged: `hermes-better-coder`, `hermes-bug-hunter`, `hermes-git-release`. Not on trading path; no auto-restart.
+- **NOTE**: `/root/.hermes/data/trades.json` is a 0-byte file from Apr 27 — stale artifact. Dashboard uses `/var/www/hermes/data/trades.json` (healthy, 104KB, updated 22:46). Safe to delete the stale local copy when convenient.
+
+## Error Alerts — 2026-10-05 22:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-05 23:47 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle fired 2s ago at 23:47:22), all steps rc=0. Open positions: 3/6 (portfolio = source of truth). Signals last 1h: 71. Closed today: 32, net -0.90 USDT, 19/32 wins (59.4% WR). Regime: SHORT_BIAS (8L/67S/46N, ts 23:45). Speeds: 53.1% ≥50th (128/241). Prices fresh (85 tokens, prices.json 1.8min old). Phantom atr_sl_hit: 0. Disk 83% (under 85% warn). Core timers all active (pipeline 2s ago, price-collector 1m37s, 1m-candle 1m18s). 0 Traceback/CRASH, 0 `database is locked` in 30m. candles.db held by 2 normal writers — no stuck lock. **No CRITICAL/WARN issues. No auto-fixes needed.**
+- **NOTE** (recurring, non-trading): `hermes-hl-sync-guardian.timer` active but last fired 2026-10-04 15:33 UTC (>24h ago) — verify expected cadence if guardian is supposed to run more often. Not on critical trading path.
+- **NOTE**: Worst signal today: `mtf-regime-trend-` SHORT — 4 trades, 25% WR, -0.47 USDT. Trading performance observation, not a system fault.
+- **INFO** (recurring, non-trading): Failed units unchanged: better-coder, bug-hunter, git-release. Not on trading path; no auto-restart.
+
+## Error Alerts — 2026-10-05 23:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: W TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: usage: brain.py trade add [-h] [--exchange EXCHANGE] [--strategy STRATEGY]`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-06 01:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-06 02:59 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: TOK get_sl_multiplier_v2() got an unexpected keyword argument 'signal' (TOK-closed — loss prevention)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK blocked: volatility gate TOK (TOK-closed): get_sl_multiplier_v2() got an unexpected keyword argument 'signal'`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK floor: N.N < N`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] TOK TOK BLOCKED — exec TOK unavailable (TOK-closed, SHORT_RSI_HARD_FLOOR)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: exec TOK unavailable for TOK (TOK-closed)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-06 03:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: usage: brain.py trade add [-h] [--exchange EXCHANGE] [--strategy STRATEGY]`
+
+## Error Alerts — 2026-10-06 06:48 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #230731 active, signal_analyst/breakout_engine running). Open trades: 0. Signals last 1h: 99. Closed today: 2 (bb-squeeze+ LONG, trend-ride+ LONG — both hard_max_loss/losses, 0% WR on tiny sample; trading perf, not system fault). Regime: SHORT_BIAS (4L/64S/54N, ts 06:45). Prices fresh (85 tokens, prices.json 9s old). Disk 83% (under 85% warn). Core timers all active (pipeline 25s ago, price-collector 1m27s, 1m-candle 1m16s, hl-sync-guardian active). candles.db held by 2 normal writers — no stuck lock. 0 Traceback/CRASH in 30m. **No CRITICAL/WARN issues. No auto-fixes needed.**
+- **NOTE** (recurring, non-trading): `hermes-hl-sync-guardian.timer` active but last fired 02:50 UTC (~4h ago) — verify expected cadence if guardian is supposed to run more often. Not on critical trading path.
+- **NOTE** (recurring, non-trading): Dead/disabled units unchanged: hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check, atr-sl-updater (no last-fire). Not on trading path; no auto-restart.
+- **NOTE**: 1 near-zero PnL trade (BTC continuum_engine 0.0%) — single noise sample, not a phantom atr_sl_hit pattern.

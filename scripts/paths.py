@@ -22,7 +22,7 @@ __all__ = [
     # Base dirs
     'HERMES_DATA', 'WWW_DATA',
     # DB paths
-    'RUNTIME_DB', 'STATIC_DB', 'SIGNALS_DB', 'CANDLES_DB',
+    'RUNTIME_DB', 'STATIC_DB', 'SIGNALS_DB', 'CANDLES_DB', 'CANDLES_LOCK',
     # JSON/state files
     'TRADES_JSON', 'HOTSET_FILE', 'HOTSET_META_FILE', 'HOTSET_FAILURES_FILE',
     'HOTSET_APPROVAL_FILE', 'HOTSET_FAIL_FILE', 'SIGNALS_JSON', 'LIVESWITCH_FILE',
@@ -62,6 +62,7 @@ WWW_DATA = os.environ.get('WWW_DATA_DIR', '/var/www/hermes/data')
 RUNTIME_DB     = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
 STATIC_DB      = os.path.join(HERMES_DATA, 'signals_hermes.db')
 CANDLES_DB     = os.path.join(HERMES_DATA, 'candles.db')
+CANDLES_LOCK   = os.path.join(HERMES_DATA, 'candles.db.lock')
 
 # ── Derived: JSON / state files ───────────────────────────────────────────────
 TRADES_JSON          = os.path.join(WWW_DATA, 'trades.json')

@@ -4525,3 +4525,27 @@ BY: auto_1hr
 - auto_1hr: 0 config changes all hours (freeze then quiet). FAVORITES/LOSERS updated 06:00/06:05 — committed with constants.
 
 BY: daily_orchestrator
+## [2026-10-06 07:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: 0T last hour; 24h 0%-WR signals all ≤2T (mtf-regime-trend- already NEVER_REENABLE, 1T -$0.10 residual); no kill trigger
+- Overtrade: 0/hr (quiet 03-05h, 07h)
+- atr_sl_hit: 0/25=0% 24h — tpsl fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 10T -$1.19 avg -$0.119 (queue#2, monitored, not changed this hour — prior hour already logged)
+- REGIME: LONG_BIAS ≠ NEUTRAL → NEG-STREAK size-reduction path not active; no trades anyway
+- Signal quality 24h: bb-squeeze+ 9T 5W -$0.37, trend-ride+ 7T 3W -$0.18 (5W not kill-eligible); volume-breakout-long+ 1T -$0.27, mover+ 1T -$0.14, btc-pump-rider+ 1T -$0.15 (all ≤3T)
+- 24h total: 25T 11W 12L 2flat -$1.12 (~44% WR non-flat) — consistent with 06:40 snapshot drift -$0.13, no deterioration
+- Open: 1 LTC pump-chain- SHORT (vs LONG_BIAS flip — still watching, no action)
+
+**Open Questions:**
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- hard_max_loss entry/regime bleed — bug_hunter queue (leverage-aware semantics), not re-touched
+
+## TEAM UPDATES
+- [2026-10-06 07:11] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
+BY: auto_1hr

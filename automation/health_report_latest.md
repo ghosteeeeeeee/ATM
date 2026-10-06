@@ -1,34 +1,27 @@
-# Health Report — 2026-10-05 09:47 UTC
+# Health Report — 2026-10-05 22:48 UTC
 
-## Pipeline: OK
-- Status: **active** (hermes-pipeline.service), LIVE cycle every 1m, all steps rc=0
-- Position manager: healthy — 3/6 open slots, rc=0 every cycle, 1 ATR adjust in last cycle
-- Signals (1h): **110** in `signals` table
-- Trades: **3 open** | **35 closed today** | PnL **-13.07%**
-  - Open: SAND SHORT -0.65% (mtf-regime-trend-), ETH LONG +0.01% (bb-bounce-v2-long+), HBAR SHORT +0.60% (pump-chain-)
-  - Closed page (200 rolling): 55.5% WR (111/200), +1.13 USDT
-- Errors in 30m: **0** Traceback/CRASH in pipeline (position_manager rc=0 all cycles)
+PIPELINE: OK
+- Status: running (cycle #230259+, rc=0 every step)
+- Signals (1h): 80 generated (signals table); 2 outcomes logged
+- Trades: 5 open / 6 max (portfolio source of truth); 29 closed today, net -$0.85, 58.6% WR (17/29)
+- Errors: 0 Traceback/CRASH, 0 `database is locked` in last 30m
 
-## Market
-- Regime: **SHORT_BIAS** (3 LONG / 67 SHORT / 47 NEUTRAL, 117 tokens, ts 09:45)
-- Macro gate: LONG=REDUCE, SHORT=FULL (wr=65%)
-- Speed: **52.7%** tokens ≥ 50th percentile (127/241)
+MARKET:
+- Regime: LONG_BIAS — 45 LONG / 13 SHORT / 64 NEUTRAL (ts 22:45)
+- Speed: 53.1% tokens ≥ 50th percentile (128/241)
 
-## System
-- Core timers: **all 3 active** — price-collector (last 09:43:38→next ~09:46), 1m-candle (09:43:49), pipeline (09:46:00)
-- Services: pipeline **active**, hl-sync-guardian **active**
-- Disk: **82%** used (91G/118G, 21G free) — under 85% threshold
-- Prices: trades.json 0.1min, signals.json 0.9min, coin_tracker_data.json 09:46 (~1min, at /var/www/html/ by design)
-- Coins collected: 85 prices most cycles (one zero-price cycle at 09:43:38, recovered next run)
-- Phantom atr_sl_hit (<0.01% PnL, 24h): **0**
+SYSTEM:
+- Timers: 3/3 active (pipeline 15s, price-collector 3s, 1m-candle 1m43s ago)
+- Disk: 83% used (under 85% WARN)
+- Prices: 85 tokens, latest candle 1.3 min old, prices.json 1.8 min
+- Phantom atr_sl_hit (|pnl|<0.01%): 0
+- hl-sync-guardian: active
+- candles.db writers: 3 normal pipeline processes, no stuck lock
 
-## Auto-fixes applied
-- **None required.** No crashes, no stuck timers, prices fresh, disk under threshold. Recurring candles.db lock contention is write contention (pipeline + 1m-candle + price-collector write concurrently) — not a stuck lock; stopping services would not fix it and risks the timer path (same call as 06:49 report). Code-level fix still pending: serialize candle writers / raise busy_timeout beyond 30–60s.
+AUTO-FIXES APPLIED:
+- Disabled `hermes-coding-mcp.service` — crash-looping (restart #743,336) on missing `run_mcp_server.py`. Non-trading path; left inactive.
 
-## Alerts
-- **WARN** (recurring): `hermes-price-collector.service` — 46 lock-related events in last 60m (`database is locked` / `database table is locked` on candles.db). Aggregation (5m/15m/1h/4h) + wal_checkpoint + `_store_candles` + seeder all contend. Services self-recover; raw prices still collected. One cycle collected 0 prices (09:43:38) — recovered. **Root-cause fix still pending in code, not systemd.**
-- **WARN** (known): `signals` table has 22,174 rows total — cleanup needed, not a runtime failure.
-- **INFO**: `signal_outcomes` open=0 vs portfolio open=3 — outcomes table partial; portfolio source of truth = position_manager + trades.json (per AGENTS.md).
-- **INFO**: `systemctl list-timers hermes-*` glob returns 0 (systemd glob quirk); explicit unit names confirm all timers healthy.
-- **INFO**: hotset.json empty this cycle — no signals survived compaction / none above 50% confidence to execute. Not an error.
-- **INFO**: today PnL -13.07% is trading performance, not system health.
+ALERTS:
+- Non-critical failed units: better-coder, bug-hunter, git-release (unchanged, not on trading path)
+- Stale 0-byte `/root/.hermes/data/trades.json` (Apr 27) — dashboard uses `/var/www/hermes/data/trades.json` (healthy)
+- Disk 83% approaching 85% threshold — compress old logs if it climbs
