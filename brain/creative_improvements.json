@@ -3220,5 +3220,35 @@
     "status": "suggested",
     "risk": "low",
     "owner": "CEO/T decision on RR_ENGINE_SHADOW flip; bug_hunter for universal entry-gate implementation"
+  },
+  {
+    "date": "2026-10-06T20:38:04.768448+00:00",
+    "idea": "Regime-aware leverage cap for hard_max_loss-prone signals",
+    "rationale": "57T −$7.99 7d via hard_max_loss. All losses ~1% price × 3-5x lev. In EXTREME/HIGH vol, 1% moves are noise. Cap leverage at 3x for signals in EXTREME/HIGH regime → each hit costs ~3% instead of ~5%.",
+    "expected_impact": "Reduce hard_max_loss bleed ~40% (−$7.99 → ~−$4.80 in 7d) without changing exit logic",
+    "category": "risk management",
+    "status": "suggested",
+    "risk": "medium",
+    "note": "Needs backtest first — per standing 'portfolio caps: backtest before live'. CUT_LOSER_PNL value untouched; this is leverage sizing, not exit threshold."
+  },
+  {
+    "date": "2026-10-06T20:38:04.768448+00:00",
+    "idea": "LONG RSI sweet-spot confidence boost (55-65) + mid-chop dampen (35-45)",
+    "rationale": "14d meta RSI: LONG 55-65 = 80T 60% +$1.99 (BEST, biggest sample). LONG 35-45 = 30T 43.3% −$0.35 (worst). Boost confidence for sweet spot, dampen mid-chop. Doesn't block — just ranks better.",
+    "expected_impact": "+2-4% WR for LONGs by prioritizing 55-65 band entries over 35-45",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "note": "Uses meta.rsi_14 (signal-time), not unreliable entry_rsi_14 (DRIFT-E). Confidence system already exists — this is a multiplier tweak."
+  },
+  {
+    "date": "2026-10-06T20:38:04.768448+00:00",
+    "idea": "Trend-quality direction gate — dampen SHORT when trend_quality=STRONG_UP",
+    "rationale": "Current regime: macro SHORT_BIAS but trend_quality=STRONG_UP (contradiction). SHORT loses in ALL meta RSI bands 14d. When higher-TF trend is STRONG_UP, SHORT signals are fighting the tide. Dampen (not block) SHORT confidence when trend_quality=STRONG_UP.",
+    "expected_impact": "Reduce wrong-side SHORT entries by ~30-50% in STRONG_UP regimes",
+    "category": "regime alignment",
+    "status": "suggested",
+    "risk": "medium",
+    "note": "Watchdog data: 5m scanner shows 80 SHORT_BIAS / 7 LONG_BIAS — system is heavily SHORT-biased while trend is UP. This contradiction is the root of wrong-side trades."
   }
 ]
