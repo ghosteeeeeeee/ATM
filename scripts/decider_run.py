@@ -1906,11 +1906,39 @@ def execute_trade(token, direction, price, confidence, source,
             if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
                 log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
                 return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
-            # bf96d7cd completion 2026-10-03: SHORT_RSI_FLOOR blocks ALL shorts below floor at exec
-            # time too — no bearish override. Data: 77 RSI<40 shorts = 31%WR -$4.66/14d.
+            # FIX 2026-10-06 (post-freeze Fix 1): bear structure override RESTORED for exec-time floor.
+            # HARD FLOOR (line above) stays unconditional — extreme oversold is always risky.
+            # But SHORT_RSI_FLOOR during confirmed bear trend = dump continuation, not bounce.
             if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
-                log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — no bearish override)')
-                return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+                # Bear structure override check
+                _exec_bear_override = False
+                try:
+                    import os as _eb_os
+                    import time as _eb_time
+                    _eb_conn = sqlite3.connect(_eb_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _eb_row = _eb_conn.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position, state_score, ts "
+                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _eb_conn.close()
+                    if _eb_row:
+                        _eb_p, _eb_l, _eb_e, _eb_s, _eb_ts = _eb_row
+                        if _eb_ts and (_eb_time.time() - _eb_ts) < 600:
+                            _exec_bear_override = (
+                                _eb_p in ('DECLINING', 'CALM', 'RECOVERY') and
+                                _eb_l in ('LEAN_BEAR', 'BEAR') and
+                                _eb_e == 'BELOW' and
+                                _eb_s is not None and _eb_s < 30
+                            )
+                except Exception:
+                    pass
+                if _exec_bear_override:
+                    log(f'  ✅ [EXEC-RSI-FLOOR-OVERRIDE] {token} SHORT — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bear structure — oversold = continuation')
+                else:
+                    log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — no bearish override)')
+                    return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
             if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                 log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                 return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
