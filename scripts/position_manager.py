@@ -3283,8 +3283,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Force-close any position held longer than UNIVERSAL_MAX_HOLD_MINUTES.
         # Prevents stale positions from locking capital (WLFI 678min, SEI 1161min).
         # BUG FIX: exempt ride_it signals — their 24h max hold is longer than 8h universal.
+        # bug_hunter fix: align with _match_exit_config — add underscore variants + mover.
         _pos_signal = str(pos.get('signal', '') or '')
-        _is_ride_it = 'ride_it' in _pos_signal or 'trend-ride' in _pos_signal or 'volume-breakout' in _pos_signal
+        _is_ride_it = any(s in _pos_signal for s in (
+            'ride_it', 'trend-ride', 'trend_ride',
+            'volume-breakout', 'volume_breakout',
+            'mover',  # bare/mover- map to ride_it; mover+ was removed
+        ))
         if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it:
             try:
                 if isinstance(open_time, str):
