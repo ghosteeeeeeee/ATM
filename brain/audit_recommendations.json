@@ -1,157 +1,280 @@
 {
-  "timestamp": "2026-10-06T06:39:27Z",
+  "timestamp": "2026-10-06T07:38:59Z",
+  "agent": "brain_auditor",
+  "run_type": "post-freeze report-only (no config change)",
+  "session_lock": "absent",
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing",
-      "hard_max_loss wrong side regime gate",
-      "BTC expansion filter regime routing chop",
-      "continuum EMA300 gate long block dump",
-      "wrong side long overnight BTC below"
-    ],
-    "key_insights": [
-      "exit system is #1 profit leak (CL-T1, hard_max_loss leverage amplification)",
-      "BTC expansion filter NO-GO: 9+ BTC/momentum layers already exist — do not add a 10th",
-      "session consensus: regime routing + chop mechanics, not raw signal quality",
-      "trend following signal + grind to spike ideas discussed but not fully built"
+    "queries_run": 6,
+    "top_themes": [
+      "exit system is #1 profit leak (CL-T1, hard_max_loss) — confirmed, delegated",
+      "hotset empty — signal-to-trade blocking, delegated signal_analyst",
+      "DRIFT-E entry_rsi_14 unreliable — re-confirmed with meta-RSI cross-check",
+      "wider exits / trail activation noise — sessions agree quick-loss% high on pump-chain+/bb-bounce-v2+",
+      "signal decay / regime species — signals need regime-habitat tracking"
     ]
   },
   "trade_summary_24h": {
-    "n": 26,
-    "pnl": -1.25,
-    "wr": 42.3,
-    "7d": {
-      "n": 237,
-      "long_pnl": 1.22,
-      "long_wr": 55.0,
-      "short_pnl": -1.88,
-      "short_wr": 41.3
-    },
-    "worst_signals_14d": [
+    "pg_verified": true,
+    "closed_24h": "26T -$1.25 ~45.8%WR",
+    "closed_today_utc": "6T -$0.59 avg -3.97% pnl_pct",
+    "long_24h": "10 losses all hard_max_loss/cut-loser; 0 long winners in PG 24h sample (wins aged out)",
+    "short_24h": "1 closed (pump-chain- +$0.06); 1 open LTC pump-chain- SHORT",
+    "open_trades": [
       {
+        "token": "LTC",
         "signal": "pump-chain-",
-        "n": 63,
-        "pnl": -0.71,
-        "wr": 49.2
-      },
-      {
-        "signal": "bb-bounce-v3-long+",
-        "n": 19,
-        "pnl": -0.33,
-        "wr": 52.6
-      },
-      {
-        "signal": "bb-squeeze+",
-        "n": 69,
-        "pnl": -0.05,
-        "wr": 60.9
+        "direction": "SHORT",
+        "entry": 69.246,
+        "open_time": "2026-10-06 03:29:41",
+        "regime": "NORMAL",
+        "watchdog_verdict": "thesis broken — meta rsi 50.0, bb_pos 0.055, LTC ranging, is_stale=true. Standing: watch, do not auto-close."
       }
     ],
-    "overnight_pattern": "8 LONG hard_max_loss after 20:20 Oct5 — but continuum was LEAN_BULL+ABOVE score 80-100 at entry; dump followed. NOT a missing BELOW+STRONG_NEG entry gate."
+    "7d": "237T -$0.66 | LONG +$1.11/190T 54.7% | SHORT -$1.88/46T 41.3%",
+    "7d_by_regime": {
+      "EXTREME": "79T 49.4% +$1.14",
+      "HIGH": "76T 53.9% -$1.38",
+      "NORMAL": "67T 53.7% -$1.05",
+      "FLAT": "8T 75.0% +$0.44"
+    },
+    "7d_short_by_regime": {
+      "EXTREME": "32T 40.6% -$1.27 (the 'profitable habitat' is losing)",
+      "NORMAL": "8T 62.5% -$0.35",
+      "HIGH": "5T 20% -$0.25",
+      "FLAT": "1T 0% -$0.01"
+    },
+    "regime_now": "BTC SHORT_BIAS 15m+4h, continuum BELOW EMA300 672min, LOW vol, ACCUMULATION/CALM"
+  },
+  "meta_rsi_truth_table": {
+    "note": "DRIFT-E re-confirmed: stored entry_rsi_14 is garbage (written late from momentum_cache). All RSI audits MUST use _signal_metadata.rsi_14.",
+    "examples_24h": [
+      "USELESS trend-ride+ stored=16.83 meta=54.08",
+      "TURBO bb-squeeze+ stored=100.00 meta=75.00",
+      "HBAR trend-ride+ stored=41.53 meta=68.00",
+      "SOL btc-pump-rider+ stored=82.35 meta=60.77"
+    ],
+    "7d_long_meta_rsi_bands": {
+      "meta 50-72": "112T 61.6% +$1.83 ← THE EDGE",
+      "meta>80": "5T 60.0% +$0.24",
+      "meta 72-80": "13T 46.2% -$0.38",
+      "meta 40-50": "30T 43.3% -$0.28",
+      "meta 25-40": "20T 45.0% -$0.56",
+      "meta<25": "3T 66.7% +$0.11"
+    },
+    "7d_short_meta_rsi_bands": {
+      "meta 72-80": "1T 100% +$0.06 ← only profitable band",
+      "meta 40-50": "17T 47.1% -$0.65",
+      "meta 50-72": "15T 40.0% -$0.52",
+      "meta 25-40": "5T 20.0% -$0.43",
+      "meta<25": "8T 37.5% -$0.34"
+    }
   },
   "drift_findings": [
     {
-      "id": "DRIFT-RECOVERY-OVERRIDE",
+      "id": "DRIFT-E-RECONFIRMED",
       "severity": "HIGH",
-      "finding": "BTC-CHOP-OVERRIDE and BTC-CRASH-OVERRIDE allowed LONG when market_phase in (RECOVERY, NEUTRAL) regardless of linreg/ema structure. SUPER trend-ride+ opened RECOVERY+LEAN_BEAR+BELOW at 01:48 after CONTINUUM-BLOCK correctly fired, then both overrides reopened it. Hard-max-loss -$0.11.",
-      "in_code": "FIXED this run — signal_compactor.py:1247 + decider_run.py:3390 now require non-bear linreg for bare RECOVERY/NEUTRAL clause; structural bull still allows any phase.",
-      "impact": "SUPER-class 7d: 22T 45.5%WR -$0.57. Fix blocks 11 losses (-$1.30) vs 10 wins (+$0.73) = net +$0.57. RECOVERY+non-bear cohort 47T 78.7% +$3.07 preserved."
+      "finding": "Watchdog overnight narrative ('TURBO long @ RSI 100', 'USELESS long @ RSI 16.83') was DRIFT-E stored garbage. Meta RSI shows 75.0 and 54.08 — normal momentum values, not extremes.",
+      "impact": "Any filter tuned on stored entry_rsi_14 is tuning on noise. Prior auditor RSI band audits unreliable.",
+      "code_ref": "trades.entry_rsi_14 written from momentum_cache by hl-sync-guardian/feature_recorder",
+      "status": "delegated bug_hunter (write-path snapshot fix)"
     },
     {
-      "id": "DRIFT-CONTINUUM-BLOCK-WORKING",
-      "severity": "INFO",
-      "finding": "Watchdog rec 'gate trend-ride+/bb-squeeze+ LONG when BELOW+STRONG_NEG' is ALREADY implemented as CONTINUUM-BLOCK (signal_compactor.py:2685). Verified live 06:29-06:33 — JUP/HYPE LONG blocked. Overnight losses were NOT under that condition.",
-      "in_code": "yes — no new gate needed",
-      "impact": "Session brain NO-GO on 10th BTC filter confirmed. Do not add another."
+      "id": "DRIFT-A-CLASS-SQUEEZE",
+      "severity": "MED",
+      "finding": "bb-squeeze+ maps to FAMILY 'Squeeze' (market_phase_gate.py:63-66), NOT 'Bollinger'. VOL_PHASE_MULTS HIGH/NORMAL have no 'Squeeze' entry (defaults 1.0). Per-signal ('EXTREME','bb-squeeze')=0.0 exists. Additionally bb-squeeze is in STANDALONE_BYPASS_SIGNALS — same bypass-skips-vol-gate class as DRIFT-A (bb-bounce-v3-long).",
+      "impact": "bb-squeeze+ fires full-mult in HIGH (39T 14d 61.5%WR -$0.15) and NORMAL (18T 66.7% +$0.25). HIGH is WR-positive — exit structure (hard_max_loss), not entry. Vol-gate Squeeze entries moot until bypass consults gate.",
+      "code_ref": "volatility_gate_v2.py VOL_PHASE_MULTS; hermes_constants.py STANDALONE_BYPASS_SIGNALS 'bb-squeeze'",
+      "status": "bug_hunter owns bypass-path audit (delegated)"
     },
     {
-      "id": "DRIFT-POST-FREEZE-QUEUE",
-      "severity": "INFO",
-      "finding": "Several post-freeze queue items already landed by other agents: bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 in vol_gate + constants; STANDALONE_BYPASS removal for bb-bounce-v3; decider_run v1→v2 import; mtf-regime-trend- killed NEVER_REENABLE.",
-      "in_code": "yes partial",
-      "impact": "Remaining queue: hard_max_loss leverage-aware, CL-T1 MFE audit, STANDALONE_BYPASS expectancy demotion, HIGH-regime LONG throttle, pump-chain PM_BYPASS verify."
+      "id": "DRIFT-SHORT-EDGE-DEAD",
+      "severity": "HIGH",
+      "finding": "SHORT loses in ALL 7d volatility regimes (EXTREME 32T 40.6% -$1.27, NORMAL 8T -$0.35, HIGH 5T -$0.25) and ALL meta-RSI bands except meta>80 (n=1). Standing SHORT model (exec RSI>=40, EXTREME habitat, HARD_FLOOR=25) is not producing edge in current tape.",
+      "impact": "SHORT 7d PnL -$1.88 — fails Oct 7 metric (>= $0). Pump-chain- is main SHORT family (14d 63T 49.2% -$0.71).",
+      "status": "monitor — do not stack filters; SHORT model standing; pump-chain- hard_sl/hard_max is the lever (CEO)"
+    },
+    {
+      "id": "DRIFT-PIPELINE-PNL-METRIC",
+      "severity": "LOW",
+      "finding": "pipeline.log '24 closed today | -34.77% PnL' vs PG today 6T -$0.59 avg -3.97%. Different counters or paper-vs-live.",
+      "impact": "Misleading dashboards; not a trading-path bug.",
+      "status": "flag for self_learner/ops"
+    },
+    {
+      "id": "DRIFT-ALGO-INTEGRITY-STALE",
+      "severity": "LOW",
+      "finding": "Watchdog flagged signals.json ALGO SHORT pump-chain- EXECUTED 06:00:28 with no PG trade. Re-check: signals.json now has 0 ALGO pump-chain entries; PG has 0 ALGO trades 48h. Transient or cleared — not a live breach.",
+      "impact": "None current. Watchdog memory may be stale.",
+      "status": "closed — re-verified clean"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "hard_max_loss leverage amplification",
-      "evidence": "24h 11T -$1.32; 7d dominant bleed; stop fires ~1% price → 3-5% account at lev 3-5",
-      "status": "open — bug_hunter owns semantics"
+      "topic": "exit-path bleed (CL-T1, hard_max_loss)",
+      "sessions": "multiple (train-to-trade, wider-exits, CEO posts)",
+      "code_state": "CUT_LOSER_PNL=-1.00 standing; hard_max_loss semantics delegated bug_hunter; position_manager pnl_pct fix committed",
+      "audit_verdict": "Still #1 bleed. 30d: CL-T1 69T -$9.62, hard_max_loss 57T -$7.86. Overnight 24h losers 9/12 hard_max_loss. Not an entry-filter problem — exit structure at lev 3-5."
     },
     {
-      "topic": "SHORT bleed7d -$1.88 41.3%WR",
-      "evidence": "46T SHORT; oversold filter was failing via bypass (partially addressed); mtf-regime-trend- killed",
-      "status": "monitor post bypass fixes"
+      "topic": "hotset empty / signals blocked",
+      "sessions": "recurring across signal-lab, train-to-trade, chop-v2",
+      "code_state": "hotset fixed Oct 5 (7 tokens) then intermittent empty again; deep audit delegated signal_analyst",
+      "audit_verdict": "Multi-factor (LONG_BIAS + pump-chain- HIGH blocked + oversold filtered + confluence). Not single-cause."
     },
     {
-      "topic": "pump-chain- worst n>=15 signal",
-      "evidence": "14d 63T 49.2% -$0.71; loses in ALL regimes (HIGH -$0.36, NORMAL -$0.22, EXTREME -$0.16)",
-      "status": "monitor — EXTREME 0.0→1.0 standing decision, do not re-litigate"
+      "topic": "entry_rsi_14 data corruption (DRIFT-E)",
+      "sessions": "brain_auditor 2026-10-05 13:36, training-system, watchdog",
+      "code_state": "write-path fix delegated bug_hunter; brain.py SHORT RSI guard added 06:45 as defense-in-depth",
+      "audit_verdict": "Root cause open. All stored-RSI analytics unreliable until fix lands."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "Regime-flip proactive exit for open LONGs when BTC continuum collapses",
-      "status": "not built — SNIPER_HYSTERESIS exists but overnight cohort still hit hard_max_loss",
-      "note": "score collapse 8.7→3.7 in 3min was visible; no fast exit fired"
+      "idea": "meta-RSI sourced execution filter (re-read _signal_metadata.rsi_14 at decider, not stored entry_rsi_14)",
+      "discussed_in": "brain_auditor 2026-10-05, DRIFT-E threads",
+      "exists_in_code": "No — decider_run.py:1016 uses sig.get('rsi') or sig.get('rsi_14') from live signal dict",
+      "blocker": "Depends on DRIFT-E write-path fix first (bug_hunter). Otherwise filter reads garbage."
     },
     {
-      "idea": "trend following / grind-to-spike signals from session brain",
-      "status": "discussed, not fully built",
-      "note": "backlog — signal_analyst"
+      "idea": "continuum-below LONG confidence dampener for STANDALONE_BYPASS signals",
+      "discussed_in": "watchdog deep_analysis 2026-10-06 07:15, brain_auditor creative threads",
+      "exists_in_code": "No — chop gate blocks BTC-flat, not BTC-bear. LONGs fire freely when BTC clearly below EMA300.",
+      "blocker": "Needs backtest + signal_analyst HIGH-regime LONG throttle research (already delegated)"
+    },
+    {
+      "idea": "Squeeze family VOL_PHASE_MULTS entries (HIGH/NORMAL)",
+      "discussed_in": "this run — discovered via FAMILY_MAP audit",
+      "exists_in_code": "No — Squeeze family missing from HIGH/NORMAL dicts; defaults 1.0",
+      "blocker": "Moot until DRIFT-A bypass consults vol gate. bb-squeeze+ HIGH is WR-positive — dampen would kill winners."
     }
   ],
-  "losing_trade_autopsy": {
-    "cluster": "overnight LONG hard_max_loss cohort",
-    "trades": "POL bb-squeeze+ -$0.13, SUPER trend-ride+ -$0.11, USELESS trend-ride+ -$0.12, HBAR trend-ride+ -$0.11, TURBO bb-squeeze+ -$0.12, MERL bb-squeeze+ -$0.11, CRV mover+ -$0.14, INJ bb-squeeze+ -$0.25",
-    "root_cause": "Regime flip after entry (continuum BULL score 80-100 at open, dumped overnight) + SUPER-class override bug reopening CONTINUUM-BLOCK. Not a missing BELOW+STRONG_NEG gate.",
-    "recommended_change": "Fix bare RECOVERY/NEUTRAL LONG override in chop-gate + crash-filter (DONE this run).",
-    "impact_on_winners": "SUPER-class 7d blocks 10 wins +$0.73 vs 11 losses -$1.30 = net +$0.57. RECOVERY+non-bear +$3.07 untouched.",
-    "confidence": "HIGH"
+  "losing_trade_autopsy": [
+    {
+      "cluster": "overnight LONG cohort Oct 5 22:00 - Oct 6 06:10",
+      "trades": "POL bb-squeeze+ -$0.13, SUPER trend-ride+ -$0.11, USELESS trend-ride+ -$0.12, HBAR trend-ride+ -$0.11, TURBO bb-squeeze+ -$0.12, MERL bb-squeeze+ -$0.11, CRV mover+ -$0.14, SOL btc-pump-rider+ -$0.15",
+      "exit_reason": "7/8 hard_max_loss, 1 cut-loser-MAE-GUARD",
+      "meta_rsi_at_entry": "54.08-78.73 — normal momentum band, NOT extremes",
+      "regime_context": "BTC continuum BELOW EMA300 for 600+ min entire window; btc_15m/4h SHORT_BIAS; volume LOW; ACCUMULATION/CALM",
+      "root_cause": "REGIME MISALIGNMENT — momentum LONG signals fired into bear tape. Entry RSI was fine (meta 54-79 = the 61.6% WR band). The edge died because BTC was below EMA300, not because entries were overbought/oversold.",
+      "rejected_filters": [
+        "Global LONG RSI_MIN=50 — would block 14d doji-bottom-long winners (+$0.41/7T 85.7%), mtf-regime-trend+ (+$0.29/4T 75%), trend-ride+ (+$0.05). Mean-reversion signals WIN at low RSI. BAD IDEA.",
+        "SIGNAL_FILTER_RSI_MAX tighten 72→65 — 7d meta 72-80 LONG is 13T 46.2% -$0.38 but meta>80 is 60% +$0.24 and meta 50-72 (the edge) top overlaps. Tightening kills winners in the sweet spot. BAD IDEA.",
+        "bb-squeeze+ HIGH dampen — 39T 61.5% WR. SIGNAL KILL POLICY: regime-block only if loses in ALL regimes. NORMAL is +$0.25. HIGH is WR-positive (exit structure). BAD IDEA."
+      ],
+      "safe_change_direction": "Continuum-below confidence dampener for bypass LONGs (not block, not RSI filter). Monitored, backtested, signal_analyst owns research. NOT implemented this run.",
+      "confidence": "HIGH on root cause (regime misalignment); filter fix deferred pending backtest"
+    },
+    {
+      "cluster": "SAND mtf-regime-trend- SHORT",
+      "trades": "SAND -$0.10 hard_max_loss EXTREME meta_rsi=28.95",
+      "root_cause": "Shorted at meta RSI 28.95 — oversold SHORT class. mtf-regime-trend- already KILLED (bd1728f4) + NEVER_REENABLE. This trade predates or slipped the kill.",
+      "recommended_change": "None — signal already killed. Confirm post-kill trade count stays 0.",
+      "confidence": "HIGH"
+    }
+  ],
+  "signal_quality_deep_dive": {
+    "method": "meta-RSI bands + regime splits, n>=20 threshold enforced",
+    "signals_reviewed": [
+      {
+        "signal": "bb-squeeze+",
+        "14d": "69T 60.9% -$0.05",
+        "by_regime": "EXTREME 12T 50% -$0.15 (blocked) | HIGH 39T 61.5% -$0.15 | NORMAL 18T 66.7% +$0.25",
+        "verdict": "NOT an entry problem. HIGH WR-positive, PnL-negative = hard_max_loss at lev 3-5 (wins small, losses full stop). Exit structure. bug_hunter owns. Do NOT dampen HIGH (would kill 61.5% WR winners).",
+        "action": "monitor — hard_max_loss semantics fix will address"
+      },
+      {
+        "signal": "trend-ride+",
+        "14d": "7T 42.9% -$0.18",
+        "by_regime": "EXTREME 2T 50% -$0.11 | NORMAL 2T 50% -$0.06 | HIGH 3T 33.3% -$0.01",
+        "verdict": "n=7 < 20 threshold. Insufficient data. Docstring claims 30d EXTREME 99T 58.6% +$5.69 strong edge — DB sample too thin to confirm or deny. STANDALONE_BYPASS fires without confluence.",
+        "action": "monitor to n>=10 (CEO deadline 2026-10-07). Do NOT stack filters."
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "14d": "63T 49.2% -$0.71",
+        "verdict": "Net negative family. Meta RSI bands all negative except >80. EXTREME habitat 30d RSI>=40 was +$0.96 72.2% (only profitable SHORT cell) but 7d EXTREME SHORT overall -$1.27. Current tape doesn't support SHORT edge.",
+        "action": "monitor — CEO: pump-chain- hard_sl/hard_max is the lever for SHORT 7d >=$0 metric"
+      },
+      {
+        "signal": "doji-bottom-long",
+        "14d": "10T 70% +$0.26",
+        "meta_rsi_low_band": "7T 85.7% +$0.41 at meta RSI<50",
+        "verdict": "Mean-reversion winner — intentionally fires oversold. Do NOT apply momentum RSI floors to this family.",
+        "action": "keep — protect from any global LONG RSI_MIN"
+      },
+      {
+        "signal": "volume-breakout-long+",
+        "14d": "8T 62.5% +$1.63",
+        "verdict": "Best 14d signal. EXTREME 6T 83.3% +$2.01. NORMAL blocked 0.0 in vol gate (correct — 0 winners 7d NORMAL). HIGH 2T 0% -$0.38 (n too small).",
+        "action": "keep feeding — no change"
+      }
+    ]
   },
   "creative_improvements": [
     {
-      "date": "2026-10-06T06:39:27Z",
-      "idea": "Score-collapse fast exit: close LONGs when BTC continuum state_score drops >5 points in <5 min while position open",
-      "rationale": "Overnight dump was visible in continuum: score 99.9 at 21:53 → 5.8 at 01:48. SNIPER_HYSTERESIS exists but didn't fire in time — all overnight losers hit hard_max_loss. A score-velocity exit would cut before -3% account loss.",
-      "expected_impact": "Reduce hard_max_loss bleed on wrong-side LONGs; targeted at flip events not blanket gates",
-      "category": "exit sniper",
-      "status": "suggested",
-      "risk": "medium — needs backtest on score-collapse vs trade outcomes before live"
+      "date": "2026-10-06T07:38:59Z",
+      "idea": "Continuum-below LONG confidence dampener for STANDALONE_BYPASS signals",
+      "rationale": "Overnight cohort (8 LONGs -$0.97) fired while BTC continuum BELOW EMA300 600+ min. Meta RSI was normal (54-79) — entry quality fine, regime alignment dead. Chop gate blocks BTC-flat, not BTC-bear. A 0.85x confidence dampener (not block) on bypass LONGs when _cont_bullish=False drops marginal trades, keeps high-conviction ones.",
+      "expected_impact": "Would have dampened ~4-6 of 8 overnight losers' confidence; winners with conf>=90 (ZRO, INJ, BLUR trail exits) likely survive. Needs backtest before deploy.",
+      "category": "regime alignment",
+      "status": "suggested — pending signal_analyst backtest (already delegated HIGH-regime LONG throttle research)",
+      "risk": "medium — must verify 0-20% winner impact before live",
+      "sample_basis": "24h overnight cohort n=8 losers + 7d LONG meta 50-72 edge n=112"
     },
     {
-      "date": "2026-10-06T06:39:27Z",
-      "idea": "pump-chain- family confidence demotion in HIGH regime (highest-bleed habitat 26T -$0.36 46.2% WR)",
-      "rationale": "14d worst n>=15 signal. HIGH regime is worst habitat. One-variable demotion, not kill — EXTREME 0.0→1.0 standing decision stays.",
-      "expected_impact": "Cut ~$0.20-0.30/7d if HIGH trades reduce; monitor48h",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low — HIGH n=26/14d, below strong threshold but direction clear"
-    }
-  ],
-  "config_changes_applied": [
+      "date": "2026-10-06T07:38:59Z",
+      "idea": "Re-baseline ALL RSI analytics on _signal_metadata.rsi_14 (meta) — stop using stored entry_rsi_14",
+      "rationale": "DRIFT-E: stored entry_rsi_14 median abs diff vs meta = 12.6 pts, 59% >10 apart, max 86. Watchdog 'RSI 100 chase' and 'RSI 16 oversold long' were both garbage. Any filter tuned on stored RSI tunes on noise. Meta RSI shows the real edge: LONG meta 50-72 = 112T 61.6% +$1.83.",
+      "expected_impact": "Unblocks correct signal-quality tuning. Prevents future false filters (e.g. would have blocked doji/momentum winners on garbage RSI).",
+      "category": "data integrity",
+      "status": "suggested — bug_hunter owns write-path fix; analytics scripts need meta-RSI switch after fix lands",
+      "risk": "low — read-path change only after write-path is correct",
+      "sample_basis": "7d n=234 meta-vs-stored comparison (prior audit) + 24h re-verify this run"
+    },
     {
-      "timestamp": "2026-10-06T06:39:27Z",
-      "agent": "brain_auditor",
-      "change": "BTC-CHOP-OVERRIDE + BTC-CRASH-OVERRIDE LONG: bare RECOVERY/NEUTRAL now requires non-bear linreg; structural bull still allows any phase",
-      "type": "code-path correctness",
-      "files": [
-        "scripts/signal_compactor.py:1241-1247",
-        "scripts/decider_run.py:3388-3391"
-      ],
-      "before": "_p in ('RECOVERY', 'NEUTRAL') alone allowed LONG override even with LEAN_BEAR/BEAR + BELOW",
-      "after": "(_p in ('RECOVERY','NEUTRAL') and _l not in ('LEAN_BEAR','BEAR')) or structural bull (LEAN_BULL/BULL + ABOVE/AT)",
-      "rationale": "SUPER opened RECOVERY+LEAN_BEAR+BELOW after CONTINUUM-BLOCK; overrides reopened it. Root cause, not symptom.",
-      "impact": "SUPER-class 7d net +$0.57 if blocked; RECOVERY+non-bear +$3.07 preserved. Protected flags untouched."
+      "date": "2026-10-06T07:38:59Z",
+      "idea": "Squeeze family VOL_PHASE_MULTS HIGH entry — but ONLY after DRIFT-A bypass fix, and ONLY as dampen 0.7 not block",
+      "rationale": "bb-squeeze+ is family 'Squeeze', missing from VOL_PHASE_MULTS HIGH/NORMAL (defaults 1.0). EXTREME per-signal 0.0 exists. HIGH 39T 61.5% WR-positive PnL-negative — dampen not block. But STANDALONE_BYPASS currently skips vol gate, so this is moot until DRIFT-A lands.",
+      "expected_impact": "Deferred — sequence: (1) bug_hunter bypass audit, (2) verify bypass consults gate, (3) evaluate 0.7 dampen on HIGH with winner-impact check",
+      "category": "exit-adjacent frequency control",
+      "status": "deferred — blocked on DRIFT-A",
+      "risk": "low if sequenced correctly",
+      "sample_basis": "30d bb-squeeze+ HIGH n=39 (61.5% WR — not a kill candidate per policy)"
     }
   ],
+  "config_changes_applied": [],
+  "config_change_rationale": "0 changes. Every candidate either (a) kills winners (global LONG RSI_MIN, RSI_MAX tighten, bb-squeeze HIGH dampen), (b) insufficient n (trend-ride+ n=7), (c) already delegated (hard_max_loss, CL-T1, DRIFT-A bypass, DRIFT-E write-path), (d) just deployed pending eval (brain.py SHORT guard, bb-bounce-v2 1.4, FAMILY_MAP), or (e) banned class (time blocks). hermes_constants.py values need CEO/T. Session lock absent but evidence does not support a safe change this run.",
   "next_actions": [
-    "bug_hunter verify the two override fixes (mandatory)",
-    "monitor 24h: no LONG opens under RECOVERY+LEAN_BEAR/BELOW via chop/crash override",
-    "bug_hunter: hard_max_loss leverage-aware semantics (post-freeze queue #4)",
-    "self_learner: STANDALONE_BYPASS expectancy demotion (queue #3)",
-    "signal_analyst: HIGH-regime LONG throttle + pump-chain- HIGH demotion eval",
-    "metric Oct 7: SHORT 7d >=$0, 24h >=$0"
+    "MONITOR 24h: brain.py SHORT RSI guard — expect 0 SHORT entries with meta RSI<25 (self_learner)",
+    "MONITOR: SHORT 7d PnL >= $0 by 2026-10-07 (CEO metric) — pump-chain- hard_sl/hard_max lever",
+    "MONITOR: trend-ride+ to n>=10 (CEO 2026-10-07) — do not stack filters",
+    "MONITOR: bb-bounce-v2-long+ 1.4 — 24h n>=5 eval",
+    "MONITOR: LTC pump-chain- SHORT open — thesis broken per watchdog; standing: watch, do not auto-close",
+    "DELEGATE bug_hunter (already owns): DRIFT-E entry_rsi write-path, DRIFT-A bypass audit, hard_max_loss semantics, CL-T1 MFE, decider v1→v2",
+    "DELEGATE signal_analyst (already owns): hotset empty multi-factor, HIGH-regime LONG throttle / continuum-dampener backtest",
+    "FLAG ops: pipeline.log daily PnL metric (-34.77%) vs PG (-$0.59/6T) mismatch",
+    "FLAG: scripts/signal_version.py missing (SOP references it); signal_versions.json pump-chain- non-dict corruption"
+  ],
+  "watchdog_steers_evaluated": [
+    {
+      "steer": "9 recent losses wrong-side",
+      "verdict": "CONFIRMED as regime misalignment, DISPROVED as RSI-extreme story. Meta RSI 54-79 normal. Fix direction: continuum dampener, not RSI filter."
+    },
+    {
+      "steer": "bb-squeeze+ losing streak 3",
+      "verdict": "Variance + exit structure. 14d 69T 60.9%. Not kill-eligible (NORMAL +$0.25). hard_max_loss semantics is the fix path."
+    },
+    {
+      "steer": "trend-ride+ losing streak 3",
+      "verdict": "n=7 total — insufficient. Monitor to n>=10. Do not disable."
+    },
+    {
+      "steer": "BANANA SHORT pending @ RSI 33",
+      "verdict": "Correct skip — oversold SHORT class. HARD_FLOOR=25 + SIGNAL_FILTER_RSI_MIN=42 should catch. Verify no fill."
+    },
+    {
+      "steer": "ALGO integrity breach",
+      "verdict": "STALE — re-verified signals.json 0 ALGO pump-chain, PG 0 ALGO 48h. Closed."
+    }
   ]
 }

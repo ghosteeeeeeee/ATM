@@ -3135,5 +3135,35 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low — HIGH n=26/14d, below strong threshold but direction clear"
+  },
+  {
+    "date": "2026-10-06T07:38:59Z",
+    "idea": "Continuum-below LONG confidence dampener for STANDALONE_BYPASS signals",
+    "rationale": "Overnight cohort (8 LONGs -$0.97) fired while BTC continuum BELOW EMA300 600+ min. Meta RSI was normal (54-79) — entry quality fine, regime alignment dead. Chop gate blocks BTC-flat, not BTC-bear. A 0.85x confidence dampener (not block) on bypass LONGs when _cont_bullish=False drops marginal trades, keeps high-conviction ones.",
+    "expected_impact": "Would have dampened ~4-6 of 8 overnight losers' confidence; winners with conf>=90 (ZRO, INJ, BLUR trail exits) likely survive. Needs backtest before deploy.",
+    "category": "regime alignment",
+    "status": "suggested — pending signal_analyst backtest (already delegated HIGH-regime LONG throttle research)",
+    "risk": "medium — must verify 0-20% winner impact before live",
+    "sample_basis": "24h overnight cohort n=8 losers + 7d LONG meta 50-72 edge n=112"
+  },
+  {
+    "date": "2026-10-06T07:38:59Z",
+    "idea": "Re-baseline ALL RSI analytics on _signal_metadata.rsi_14 (meta) — stop using stored entry_rsi_14",
+    "rationale": "DRIFT-E: stored entry_rsi_14 median abs diff vs meta = 12.6 pts, 59% >10 apart, max 86. Watchdog 'RSI 100 chase' and 'RSI 16 oversold long' were both garbage. Any filter tuned on stored RSI tunes on noise. Meta RSI shows the real edge: LONG meta 50-72 = 112T 61.6% +$1.83.",
+    "expected_impact": "Unblocks correct signal-quality tuning. Prevents future false filters (e.g. would have blocked doji/momentum winners on garbage RSI).",
+    "category": "data integrity",
+    "status": "suggested — bug_hunter owns write-path fix; analytics scripts need meta-RSI switch after fix lands",
+    "risk": "low — read-path change only after write-path is correct",
+    "sample_basis": "7d n=234 meta-vs-stored comparison (prior audit) + 24h re-verify this run"
+  },
+  {
+    "date": "2026-10-06T07:38:59Z",
+    "idea": "Squeeze family VOL_PHASE_MULTS HIGH entry — but ONLY after DRIFT-A bypass fix, and ONLY as dampen 0.7 not block",
+    "rationale": "bb-squeeze+ is family 'Squeeze', missing from VOL_PHASE_MULTS HIGH/NORMAL (defaults 1.0). EXTREME per-signal 0.0 exists. HIGH 39T 61.5% WR-positive PnL-negative — dampen not block. But STANDALONE_BYPASS currently skips vol gate, so this is moot until DRIFT-A lands.",
+    "expected_impact": "Deferred — sequence: (1) bug_hunter bypass audit, (2) verify bypass consults gate, (3) evaluate 0.7 dampen on HIGH with winner-impact check",
+    "category": "exit-adjacent frequency control",
+    "status": "deferred — blocked on DRIFT-A",
+    "risk": "low if sequenced correctly",
+    "sample_basis": "30d bb-squeeze+ HIGH n=39 (61.5% WR — not a kill candidate per policy)"
   }
 ]
