@@ -4741,3 +4741,33 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 14:13] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime 5m LONG_BIAS (not NEUTRAL, no size path); kill/overtrade/neg-streak paths not active; 1 open (ENS oversold-bounce+ LONG -0.67%)
+
+## [2026-10-06 15:17 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour (14:17-15:17): 0T closed — sixth consecutive quiet hour
+- 2 open: AVAX mover+ LONG @ 11.464 (14:22) now +1.15% price, SL 11.483 ABOVE entry (trailing locked profit); ENS oversold-bounce+ LONG @ 6.8751 (12:57) now +0.24%, SL 6.786, TP 6.964
+- 24h rolling window now 14T 5W 8L 1flat -$0.82 (earlier 22T figure aged out of window — not data loss)
+- Kill: none — 0T last hour; 24h 0%-WR all ≤1T (pump-chain- 1T -$0.25, mover+ 1T -$0.14) — none kill-eligible
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/14=0% 24h — tpsl_utils.py fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 9T -$1.09 avg -$0.121 (queue#2 leverage-aware semantics delegated, not re-touched); profit-monster-trail 5T +$0.27 avg +$0.054 is the only positive exit
+- REGIME: 5m aggregate flipped to NEUTRAL (20L/18S/85N @ 15:00) — previous hour was LONG_BIAS. NEG-STREAK size path requires 3+ consecutive negative-close hours; only 1 close in last 8h → path not active
+- Entry quality 24h: winners avg MAE 0.071% (<0.5% threshold) — OK; losers avg MAE 0.967% (hard_max_loss ~1% price move at 3-5x leverage = expected, not a bug)
+- signal_versions.json parses OK; pump-chain- still legacy list format (known); no constants change this hour
+- No signals fired/closes in last 1h except AVAX open 14:22
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- 15m/5m vs 4h regime split — 5m now NEUTRAL; which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- Trading quiet 14-15h (0 closes) — sixth quiet hour; AVAX +1.15% trailing locked, ENS +0.24% — monitor
+- signal_versions.json pump-chain- legacy format still unfixed (no constants change this hour)
+
+## TEAM UPDATES
+- [2026-10-06 15:17] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime 5m flipped to NEUTRAL (20L/18S/85N) but NEG-STREAK path not active (1 close/8h); kill/overtrade paths not active; 2 open (AVAX +1.15% trailing SL locked above entry, ENS +0.24%)
