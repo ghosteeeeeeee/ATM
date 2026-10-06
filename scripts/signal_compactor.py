@@ -1112,6 +1112,12 @@ def _check_directional_cap(direction: str) -> str | None:
 # Used by the RSI ceiling check to allow high-RR signals at higher RSI levels
 _rr_mult_tracker = {}  # {(token, direction): rr_mult}
 
+# ── Penalty Product Tracker (CEO Fix 1 — penalty-gated execution) ────────────
+# Stores the raw 26-factor multiplier product from _score_signal() per token:direction.
+# decider_run reads this via hotset entry penalty_product and multiplies
+# final_confidence × max(product, 0.3) before MIN_EXEC_CONFIDENCE check.
+_penalty_product_tracker = {}  # {(token, direction): raw_mult_product}
+
 # ── TVS Cooldown Override Rate Limiter ──────────────────────────────────────
 # Max 1 thesis override per token:direction per 4 hours
 _thesis_override_tracker = {}  # {(token, direction): (count, first_time_ts)}
@@ -2036,6 +2042,11 @@ def _score_signal(token, direction, conf, source, signal_type,
                      lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult *
                      oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
     _mult_floor = 0.3  # Score can't drop below 30% of base regardless of penalty stacking
+    # CEO Fix 1: store raw product for decider penalty-gated execution
+    try:
+        _penalty_product_tracker[(token.upper(), direction.upper())] = _mult_product
+    except Exception:
+        pass
     # FIX 2026-10-04 (bug_hunter): preserve hard blocks — a 0.0 multiplier is an
     # intentional kill (Volatility Gate V2 regime bans via get_combined_multiplier,
     # staleness_mult=0 at 10min). The floor applies ONLY to soft penalty stacking
@@ -3439,6 +3450,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'direction': direction.upper(),
                 'confidence': conf,
                 'final_confidence': conf,  # decider_run reads this field
+                'penalty_product': _penalty_product_tracker.get((token.upper(), direction.upper()), 1.0),
                 'volume_spike': _volume_spike,  # BTC 1m volume spike ratio
                 'source': source,
                 'signal_type': stype,
@@ -4895,6 +4907,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'direction': e['direction'],
                 'confidence': e['confidence'],
                 'final_confidence': e.get('final_confidence', e['confidence']),  # decider_run reads this
+                'penalty_product': e.get('penalty_product', _penalty_product_tracker.get((e['token'].upper(), e['direction'].upper()), 1.0)),
                 'reason': e.get('reason', ''),
                 'source': src,
                 'signal_type': e.get('signal_type', ''),  # actual signal_type from DB (not merged source)

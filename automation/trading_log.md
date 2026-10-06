@@ -4835,3 +4835,73 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-06 17:13] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0% 24h; hard_max_loss unchanged (9T -$1.09); regime 5m flipped SHORT_BIAS (2L/79S/40N) but NEG-STREAK path not active (only 1 negative hour/8h); kill/overtrade paths not active; 0 open; pipeline healthy
 
+
+## [2026-10-06 18:14 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour | 1 open
+**24h:** 15T 6W 9L 1flat -$0.59 (40.0% WR) | atr_sl_hit 0/15 (0%) ✅
+
+**Last hour:** ZRO oversold-bounce+ LONG +$0.23 (+5.09%) via profit-monster-trail — winner
+**Open:** DOGE pump-chain- SHORT @0.09465, SL 0.09509, -0.29% unrealized
+
+**Exit breakdown 24h:** hard_max_loss 9T -$1.09 (avg -$0.121) sole bleed | profit-monster-trail 6T +$0.50 (avg +$0.083) only positive exit
+**Signal 24h:** oversold-bounce+ 2T 2W +$0.24 (best) | mover+ 2T 1W -$0.04 | trend-ride+ 7T 3W -$0.18 | pump-chain- 1T 0W -$0.25 | bb-squeeze+ 3T 0W -$0.36 (watch)
+**Hourly PnL:** 15:00 +$0.11 | 17:00 +$0.23 — both positive
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — last hour 1T winner; 24h 0%-WR signals (bb-squeeze+ 3T, pump-chain- 1T) not kill-eligible (rule is 3+T in last hour)
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0/15=0% 24h — tpsl_utils.py deployed, fix stable
+- NEG-STREAK: last 2 close-hours both positive (+$0.11, +$0.23); 3+ consecutive negative hours NOT met → size path inactive
+- signal_versions.json parses OK (18 keys); pump-chain- still legacy list format (known); no constants change → no version audit entry needed
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- bb-squeeze+ 24h 3T 0W -$0.36 — monitor; if degrades further, kill-eligible under 3T/last-hour rule if it clusters
+- 15m/5m vs 4h regime split — which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- signal_versions.json pump-chain- legacy format still unfixed (no constants change this hour)
+- DOGE pump-chain- SHORT open — signal has -$0.25 24h track record; watch if it hits SL
+
+## TEAM UPDATES
+- [2026-10-06 18:14] auto_1hr: NO CHANGE — 1T last hour (ZRO oversold-bounce+ +$0.23 trail win); 1 open DOGE pump-chain- SHORT -0.29%; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09); NEG-STREAK not active (2 consecutive positive hours); kill/overtrade paths not active; 24h -$0.59 (improved from -$0.79)
+
+## [2026-10-06 18:35 UTC] Daily Orchestrator Run
+
+**PG-verified:** 24h **15T 6W 8L 1flat −$0.59 ~42.9%WR** | 1 open | atr_sl_hit 0/15=0% | hard_max_loss 9T −$1.09 sole bleed | profit-monster-trail 6T +$0.50 only positive exit
+**Signals 24h:** oversold-bounce+ 2T 2W +$0.24 best | bb-squeeze+ 3T 0W −$0.36 (watch) | pump-chain- 1T 0W −$0.25 | trend-ride+ 7T 3W −$0.18 | mover+ 2T 1W −$0.04
+
+### IMPLEMENTED TODAY
+1. **Fix 1 penalty-gated execution — SHIPPED** (CEO-approved 16:40, was delegated bug_hunter, not landed → orchestrator implemented)
+   - signal_compactor.py: `_penalty_product_tracker` stores raw 26-factor product per token:direction; written as `penalty_product` on hotset entries (both intermediate + final write paths)
+   - decider_run.py: merges `penalty_product` from hotset.json; multiplies `final_confidence × max(product, 0.3)` before MIN_EXEC_CONFIDENCE=50; post-penalty re-check blocks below-floor signals
+   - **LIVE PROOF:** RESOLV LONG conf 99 × penalty 0.294 → exec 29.7% → PENALTY-BLOCK at 18:32:05. Exactly the CEO scenario (conf~93×0.3=28→blocked).
+   - Syntax verified both files. Pipeline runs subprocess-per-step — no restart needed, code live next cycle.
+2. **Service timeouts — FIXED**
+   - hermes-health-monitor: TimeoutStartSec 300→600 (timed out at 300s mid-run, 1G memory peak)
+   - hermes-signal-reporter: TimeoutStartSec 900→1200 (timed out at 900s mid-run)
+   - Both are LLM-agent services (opencode run) — needed more headroom
+3. **signal_versions.json pump-chain- format — FIXED**
+   - Was raw list (legacy); every other key is `{versions, current_version}` dict
+   - Converted to standard dict format, version 1, changed_by preserved
+   - Flagged by brain_auditor 3+ times, never fixed — now done
+
+### CRITICAL ISSUES
+- **hard_max_loss 9T −$1.09 24h** — still #1 bleed; semantics delegated bug_hunter (queue#2), not re-touched
+- **Disk 84%** — approaching 85% threshold; next lever is DB retention (candles/coin_tracker NEVER vacuum mid-trading)
+- **DRIFT-J local SQLite mirrors 0 bytes** (brain.db, trades.db at /root/.hermes/data/) — pre-existing, delegated; PG is source of truth, dashboards read trades.json
+
+### MONITOR (next 48h per CEO CURRENT.md)
+1. Fix 1 blocked-vs-passed cohorts (WR/PnL/win-loss) — first block already logged (RESOLV)
+2. SCORE-FLOOR events → now PENALTY-BLOCK events (not just floored ranking)
+3. Fix 2/3 in production — POL-type bear LONGs and CHOP-mislabel counts
+4. SHORT 7d PnL ≥$0 by Oct 7
+5. hard_max_loss bleed reduction post Fix 1
+6. Disk 85%
+
+### PROTECTED FLAGS (verified untouched)
+CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0.40 · PM_TRAIL_DISTANCE_PCT=0.20 · CUT_LOSER_PNL=-1.00 · ATR_TP_MIN=0.013
+
+— daily_orchestrator

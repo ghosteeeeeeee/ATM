@@ -3303,15 +3303,34 @@ def run(dry_run=False):
         sig_id = sig.get('signal_id')
         token = sig.get('token', '').upper()
         direction = sig['direction']
-        # ponytail: merge final_confidence + volume_spike from hotset.json into sig dict (was 100% NULL)
+        # ponytail: merge final_confidence + volume_spike + penalty_product from hotset.json into sig dict (was 100% NULL)
         for _hs in _current_hotset:
             if _hs.get('token', '').upper() == token and _hs.get('direction', '').upper() == direction.upper():
                 if sig.get('final_confidence') is None and _hs.get('final_confidence') is not None:
                     sig['final_confidence'] = _hs['final_confidence']
                 if _hs.get('volume_spike') is not None:
                     sig['volume_spike'] = _hs['volume_spike']
+                if _hs.get('penalty_product') is not None:
+                    sig['penalty_product'] = _hs['penalty_product']
                 break
         confidence = sig.get('final_confidence')
+        # CEO Fix 1: penalty-gated execution — multiply confidence by max(product, 0.3)
+        # Floor preserves mixed-signal trades; heavy penalty stacks (conf 93 × 0.3 = 28) block.
+        _pp = sig.get('penalty_product')
+        if _pp is not None and confidence is not None:
+            _raw_conf = confidence
+            _exec_mult = max(_pp, 0.3)  # floor at 0.3, same as compactor SCORE-FLOOR
+            confidence = confidence * _exec_mult
+            sig['final_confidence'] = confidence
+            if _pp < 1.0:
+                log(f"  ⚖️ [PENALTY-GATE] {token} {direction}: conf {_raw_conf:.0f}×penalty {_pp:.3f}→exec {confidence:.1f}%")
+        # CEO Fix 1: re-check AFTER penalty multiplication (initial filter at :3227 used raw conf)
+        if confidence is not None and confidence < MIN_EXEC_CONFIDENCE:
+            log(f'  🚫 [PENALTY-BLOCK] {token} {direction} exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
         source = sig.get('source', '')
         in_hotset = token in _hot_tokens
         log(f"[DECIDER-LOOP] #{i+1} {token} {direction} conf={confidence} hotset={'YES' if in_hotset else 'NO'} src={source[:60]}")
