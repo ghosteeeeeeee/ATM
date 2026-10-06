@@ -1345,7 +1345,7 @@ PUMP_CHAIN_SHORT_RSI_MIN = 45        # CEO/T 2026-10-06: raised 40→45, align S
 # neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
 # Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
 SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
-SHORT_CONTINUUM_SCORE_MAX = 40         # CEO/T 2026-10-06: raised 30→40 — documented revisit path, T directive broader SHORT market. 14.6k SHORT-CONTINUUM blocks in pipeline.log; BTC score currently 39-50 z=NEUTRAL mass-blocking. score<=40 now allowed regardless of z; >40 still needs z=STRONG_NEG. Keep SHORT_NEUTRAL_BLOCK. 48h monitor new SHORT volume + hard_max_loss interaction.
+SHORT_CONTINUUM_SCORE_MAX = 60         # CEO 2026-10-06: raised 40→60 — every dump is a SHORT opportunity. Allows SHORTs in neutral zones.
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 SHORT_CONTINUUM_TOKEN_Z_ENABLED = False  # DISABLED 2026-10-01 — avg_z has no live writer, reads 4-month-old stale data (bug_hunter HIGH)
 
