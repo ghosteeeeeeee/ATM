@@ -4127,3 +4127,10 @@ BY: auto_1hr
   trend-ride+ post-fix sample tiny (BB+momentum 885021c5 + ride_it 1b6f8f54) — monitor, don't stack
   WATCH: hard_max_loss queue#2 entry/regime (LONG into BEAR) | mtf-regime-trend- 3T 0W next-hour kill watch | IO pnl_usdt anomaly | 45da8fcf unratified | bb-squeeze+ R:R invert
 BY: auto_1hr
+[2026-10-06 06:14 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour (POL bb-squeeze+ LONG hard_max_loss -$0.13, MFE 0.17%/MAE 0.99%, entry never worked) | 24h 26T 11W 14L 1flat -$1.25 ~44%WR | atr_sl_hit 0/26=0% not dominant (tpsl fix stable) | hard_max_loss 11T -$1.32 sole loss concentration (MFE 0.20%/MAE 0.92%) | regime FLIPPED BEAR→LONG_BIAS (58L/14S/49N) 06:00 scan | open 1 LTC pump-chain- SHORT (watch vs LONG_BIAS flip)
+  NEG-STREAK: prior 3h (00/01/02) broken by no-trade 03-05h; 06h -$0.13 single loss. Even if continued: regime LONG_BIAS ≠ NEUTRAL + size at HL floor $11.10 → no action
+  Kill: none (1T last hour; mtf-regime-trend- already NEVER_REENABLE @ hermes_constants.py:4327, aged to 2T; bb-squeeze+ 5W not eligible)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 (recheck post regime flip) | bb-squeeze+ R:R invert | LTC SHORT vs LONG_BIAS | IO pnl_usdt anomaly | 45da8fcf unratified | signal_versions.json pump-chain- corruption
+BY: auto_1hr

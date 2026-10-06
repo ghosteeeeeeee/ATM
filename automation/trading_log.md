@@ -4423,3 +4423,56 @@ BY: auto_1hr
 - Open POL bb-squeeze+ LONG into BEAR — stale from 00:20; MAE guard active
 - signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
 BY: auto_1hr
+
+## FAVORITES Update — 2026-10-06 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE DYDX (WR=57.1%, PnL=$0.01, 1 consecutive bad days, regime=LONG_BIAS)
+
+Final set: ['BLUR', 'COMP', 'HBAR', 'LDO', 'SYRUP']
+
+## LOSERS Update — 2026-10-06 06:05 UTC
+- ADD TURBO (WR=20.0%, PnL=$-0.52, wr_collapse (45.5% → 20.0%))
+- ADD CRV (WR=20.0%, PnL=$0.17, low_wr (20.0%))
+
+Final set: ['ADA', 'BTC', 'CHIP', 'CRV', 'JUP', 'TURBO']
+
+## [2026-10-06 06:14] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.13 (WR: 0.0%) | 24h: 26T 11W 14L 1flat -$1.25 (~44% WR non-flat)
+
+**This hour:**
+- 1 close: POL bb-squeeze+ LONG hard_max_loss -$0.13 (-5.98% pnl_pct @ 5x). Opened 00:20, closed 06:09 (~6h hold). Entry MFE 0.17% / MAE 0.99% — entry never worked. Classic entry-quality loss, not stop-width.
+- Open now: 1 — LTC pump-chain- SHORT (03:29). Regime aggregate flipped LONG_BIAS (58L/14S/49N); LTC itself NEUTRAL (68.3). Watch, don't auto-close.
+- Regime flip: overnight BEAR/SHORT_BIAS → LONG_BIAS as of 06:00 scan. FAVORITES/LOSERS automations already updated 06:00/06:05.
+
+**24h close reasons:**
+- hard_max_loss 11T -$1.32 (~42% of closes) — sole loss concentration; avg MFE 0.20% / MAE 0.92% (losers never worked)
+- profit-monster-trail 10T +$0.54 — sole winner; winners avg MFE 0.68% / MAE 0.28%
+- atr_sl_hit: **0/26 = 0%** — tpsl_utils fix deployed and stable, NOT dominant, no CEO alert
+
+**24h by signal (≥2 trades):**
+- bb-squeeze+ 9T 5W -$0.37 — has wins, NOT kill-eligible; R:R inverted (4 hard_max_loss LONGs -$0.61, avg MFE 0.28%). Queue#2 entry/regime.
+- trend-ride+ 7T 3W -$0.18 — post-fix (885021c5 + 1b6f8f54) sample tiny; monitor, don't stack
+- mtf-regime-trend- 2T 0W -$0.23 — already NEVER_REENABLE (hermes_constants.py:4327); trades aged below 3T. No action.
+
+**Hourly PnL streak:** 00h -$0.23 | 01h -$0.12 | 02h -$0.11 | 03h/04h/05h $0.00 (no trades) | 06h -$0.13
+- Negative streak BROKEN by no-trade 03-05h. Even if 06h counted as continuation: regime LONG_BIAS ≠ NEUTRAL + size at HL floor $11.10 → size-cut rule does not apply.
+
+**Changes:** none — no trigger met with actionable param path this hour.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — 1T last hour. 24h 0%-WR signals all ≤2T now (mtf-regime-trend- already killed, aged out).
+- atr_sl_hit >40%: 0% — tpsl fix stable.
+- Negative avg_pnl streak: BROKEN by no-trade 03-05h; regime LONG_BIAS ≠ NEUTRAL anyway.
+- Overtrading: 1/hr — well under 20.
+- Live trading: enabled. Pipeline healthy (1 open position). Working tree clean of auto_1hr-owned edits.
+
+**Open Questions / Sideways:**
+- ⚠️ **hard_max_loss 11T -$1.32** with MFE 0.20% on losers — entries never worked. Queue#2 entry/regime gate remains the real fix, not stop-width. Regime flip to LONG_BIAS may reduce LONG-into-bear frequency; recheck next hour.
+- ⚠️ **bb-squeeze+ R:R inverted** (5W but -$0.37) — not kill-eligible; queue with #2.
+- ⚠️ **LTC pump-chain- SHORT** open against aggregate LONG_BIAS flip — watch next hour.
+- ⚠️ **IO pnl_usdt=0.00 vs pnl_pct=-3.57** accounting anomaly — still open from prior hours. Verify position_manager close path.
+- ⚠️ **45da8fcf** trendline_bounce_long confidence boost during freeze — still unratified. CEO: RATIFY or REVERT.
+- signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor.
+BY: auto_1hr
