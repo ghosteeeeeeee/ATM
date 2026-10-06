@@ -4177,3 +4177,11 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format | ENS open trade
 BY: auto_1hr
+[2026-10-06 14:13 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 24h 22T 8W 11L 3flat -$1.13 | atr_sl_hit 0/22=0% (tpsl fix stable) | hard_max_loss 9T -$1.09 sole loss concentration | regime 5m LONG_BIAS (22L/18S/83N, not NEUTRAL) | open 1 ENS oversold-bounce+ LONG @6.875 -0.67% (SL 6.786)
+  Entry quality: winners MAE 0.155% (<0.5%) — OK
+  NEG-STREAK: n/a — 0T last hour; regime not NEUTRAL; size at HL floor → no action
+  Kill: none (0T last hour; 24h 0%-WR all ≤1T)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format | ENS open trade
+BY: auto_1hr

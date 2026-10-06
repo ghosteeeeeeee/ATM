@@ -4711,3 +4711,33 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 13:12] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime mixed (not NEUTRAL, no size path); kill/overtrade/neg-streak paths not active; 1 open (ENS oversold-bounce+ LONG)
+
+## [2026-10-06 14:13 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour (13:12-14:12): 0T closed — fifth consecutive quiet hour; 1 open: ENS oversold-bounce+ LONG @ 6.875 opened 12:57, now -0.67% price (SL 6.786, target 6.964, size $11.10)
+- Kill: none — 0T last hour; 24h 0%-WR signals all ≤1T (pump-chain- 1T -$0.25, btc-pump-rider+ 1T -$0.15, mover+ 1T -$0.14) — none kill-eligible
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/22=0% 24h — tpsl_utils.py present, fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 9T -$1.09 avg -$0.121 (queue#2 leverage-aware semantics delegated, not re-touched)
+- REGIME: 5m aggregate LONG_BIAS (22L/18S/83N) — NOT NEUTRAL → NEG-STREAK size-reduction path not active
+- Entry quality 24h: winners avg MAE 0.155% (<0.5% threshold); 1/8 winners MAE>0.5% — OK
+- Signal quality 24h: bb-squeeze+ 6T 3W -$0.23 MAE 0.62, trend-ride+ 7T 3W -$0.18 MAE 0.56 (not kill-eligible); doji-bottom-long 1T 1W +$0.12, bb-bounce-v2-long+ 1T 1W +$0.02
+- 24h total: 22T 8W 11L 3flat -$1.13 (~42% WR non-flat)
+- signal_versions.json parses OK (18 signals); no constants change this hour
+- No signals fired/opens in last 2h except ENS
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- 15m LONG_BIAS vs 4h SHORT_BIAS split — which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- Trading quiet 13-14h (0 closes) — fifth quiet hour; ENS open at -0.67%, monitor SL
+- signal_versions.json pump-chain- legacy format still unfixed (no constants change this hour)
+
+## TEAM UPDATES
+- [2026-10-06 14:13] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime 5m LONG_BIAS (not NEUTRAL, no size path); kill/overtrade/neg-streak paths not active; 1 open (ENS oversold-bounce+ LONG -0.67%)
