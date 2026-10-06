@@ -1,0 +1,2348 @@
+{
+ "isolated__current": {
+  "n": 57,
+  "WR%": 24.6,
+  "avg%": 0.033,
+  "total%": 1.9,
+  "max_loss%": -2.5,
+  "avg_hold_h": 4.36,
+  "reasons": {
+   "hard_stop": 32,
+   "no_data": 2,
+   "sl_hit": 21,
+   "data_end": 2
+  },
+  "avg_leveraged%": 0.099,
+  "trades": [
+   {
+    "pnl": -1.0594439117929122,
+    "reason": "hard_stop",
+    "hold_h": 2.109722222222222,
+    "token": "SOL",
+    "signal": "rs_s,volume_breakout_long",
+    "id": 15115,
+    "db_pnl_pct": -5.3691,
+    "db_reason": "cut-loser-CL-T1"
+   },
+   {
+    "pnl": -1.0214492190346536,
+    "reason": "hard_stop",
+    "hold_h": 3.1461111111111113,
+    "token": "BANANA",
+    "signal": "mover+",
+    "id": 15153,
+    "db_pnl_pct": 3.1482,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.0657193605683735,
+    "reason": "hard_stop",
+    "hold_h": 5.625,
+    "token": "USUAL",
+    "signal": "mover+",
+    "id": 15224,
+    "db_pnl_pct": 1.0657,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15232,
+    "db_pnl_pct": 0.3119,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 0.6388888888888888,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15234,
+    "db_pnl_pct": -3.959,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15242,
+    "db_pnl_pct": 0.7961,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 1.0394444444444444,
+    "token": "LDO",
+    "signal": "mover+",
+    "id": 15257,
+    "db_pnl_pct": 0.9048,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 10.675277777777778,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15277,
+    "db_pnl_pct": 4.6325,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 1.9106241331483975,
+    "reason": "sl_hit",
+    "hold_h": 14.390555555555556,
+    "token": "BIGTIME",
+    "signal": "trend_purity+,volume-breakout-long+",
+    "id": 15293,
+    "db_pnl_pct": 3.9528,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.2097882870497734,
+    "reason": "hard_stop",
+    "hold_h": 2.171666666666667,
+    "token": "BIGTIME",
+    "signal": "rs-s36,volume-breakout-long+",
+    "id": 15446,
+    "db_pnl_pct": -4.0418,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.010489318468888,
+    "reason": "hard_stop",
+    "hold_h": 0.6055555555555555,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15463,
+    "db_pnl_pct": -4.1847,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 6.64068554396422,
+    "reason": "sl_hit",
+    "hold_h": 7.858888888888889,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15465,
+    "db_pnl_pct": 0.1118,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0964912280701733,
+    "reason": "hard_stop",
+    "hold_h": 0.9061111111111111,
+    "token": "NOT",
+    "signal": "volume-breakout-long+",
+    "id": 15466,
+    "db_pnl_pct": -3.9474,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0094185370863373,
+    "reason": "hard_stop",
+    "hold_h": 2.1233333333333335,
+    "token": "GMX",
+    "signal": "volume-breakout-long+",
+    "id": 15467,
+    "db_pnl_pct": 5.0309,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.504609091573129,
+    "reason": "sl_hit",
+    "hold_h": 2.5091666666666668,
+    "token": "WLD",
+    "signal": "volume-breakout-long+",
+    "id": 15474,
+    "db_pnl_pct": 11.7966,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 3.279670865674178,
+    "reason": "sl_hit",
+    "hold_h": 19.04111111111111,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15475,
+    "db_pnl_pct": 1.5778,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.8139250384931804,
+    "reason": "data_end",
+    "hold_h": 25.958333333333332,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15476,
+    "db_pnl_pct": 1.4026,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.866945606694558,
+    "reason": "sl_hit",
+    "hold_h": 3.2241666666666666,
+    "token": "ME",
+    "signal": "volume-breakout-long+",
+    "id": 15478,
+    "db_pnl_pct": 2.3245,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.277593019427051,
+    "reason": "sl_hit",
+    "hold_h": 2.1422222222222222,
+    "token": "SUSHI",
+    "signal": "volume-breakout-long+",
+    "id": 15479,
+    "db_pnl_pct": 0.1729,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.300623052959482,
+    "reason": "hard_stop",
+    "hold_h": 0.9627777777777777,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15481,
+    "db_pnl_pct": 5.6075,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0893028461784415,
+    "reason": "hard_stop",
+    "hold_h": 15.95861111111111,
+    "token": "BCH",
+    "signal": "mover+",
+    "id": 15483,
+    "db_pnl_pct": 5.3965,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.412167909140949,
+    "reason": "hard_stop",
+    "hold_h": 0.2997222222222222,
+    "token": "ONDO",
+    "signal": "volume-breakout-long+",
+    "id": 15484,
+    "db_pnl_pct": -7.4548,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 7.624732514922861,
+    "reason": "data_end",
+    "hold_h": 25.991944444444446,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15485,
+    "db_pnl_pct": 2.8551,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -2.500000000000002,
+    "reason": "sl_hit",
+    "hold_h": 0.9413888888888889,
+    "token": "SUPER",
+    "signal": "volume-breakout-long+",
+    "id": 15487,
+    "db_pnl_pct": 8.485,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.227560521415263,
+    "reason": "sl_hit",
+    "hold_h": 2.1352777777777776,
+    "token": "W",
+    "signal": "volume-breakout-long+",
+    "id": 15489,
+    "db_pnl_pct": 2.7933,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 4.9425,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15494,
+    "db_pnl_pct": -4.0494,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.046717918391482,
+    "reason": "hard_stop",
+    "hold_h": 10.709166666666667,
+    "token": "ATOM",
+    "signal": "mover+",
+    "id": 15495,
+    "db_pnl_pct": 7.1851,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.070234113712376,
+    "reason": "hard_stop",
+    "hold_h": 1.0477777777777777,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15496,
+    "db_pnl_pct": -6.5217,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0884144780627714,
+    "reason": "hard_stop",
+    "hold_h": 0.4747222222222222,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15516,
+    "db_pnl_pct": -7.5667,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.358742095368326,
+    "reason": "hard_stop",
+    "hold_h": 3.725,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15548,
+    "db_pnl_pct": 1.0921,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0171262061192565,
+    "reason": "hard_stop",
+    "hold_h": 1.1375,
+    "token": "HYPER",
+    "signal": "volume-breakout-long+",
+    "id": 15578,
+    "db_pnl_pct": -4.4905,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.7569496619083385,
+    "reason": "sl_hit",
+    "hold_h": 4.456388888888889,
+    "token": "FIL",
+    "signal": "volume-breakout-long+",
+    "id": 15583,
+    "db_pnl_pct": 22.1116,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.016275990966431,
+    "reason": "hard_stop",
+    "hold_h": 2.5091666666666668,
+    "token": "CAKE",
+    "signal": "mover+",
+    "id": 15593,
+    "db_pnl_pct": 3.4577,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.29999999999999,
+    "reason": "sl_hit",
+    "hold_h": 0.9733333333333334,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15596,
+    "db_pnl_pct": -5.0387,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 17.70888888888889,
+    "token": "CFX",
+    "signal": "mover+",
+    "id": 15623,
+    "db_pnl_pct": 7.3554,
+    "db_reason": "UNIVERSAL_MAX_HOLD"
+   },
+   {
+    "pnl": -1.2111567873403173,
+    "reason": "hard_stop",
+    "hold_h": 0.08972222222222222,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15625,
+    "db_pnl_pct": -4.0843,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.118982063908569,
+    "reason": "sl_hit",
+    "hold_h": 2.79,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15631,
+    "db_pnl_pct": 2.6976,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000123,
+    "reason": "sl_hit",
+    "hold_h": 1.941111111111111,
+    "token": "ADA",
+    "signal": "mover+",
+    "id": 15632,
+    "db_pnl_pct": -6.4665,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 1.5744444444444445,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15635,
+    "db_pnl_pct": -3.8058,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.00227181611654,
+    "reason": "hard_stop",
+    "hold_h": 4.490555555555556,
+    "token": "ALT",
+    "signal": "mover+",
+    "id": 15667,
+    "db_pnl_pct": -0.2005,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.042074747316457,
+    "reason": "hard_stop",
+    "hold_h": 3.6233333333333335,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15668,
+    "db_pnl_pct": -6.0727,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1753371868978957,
+    "reason": "hard_stop",
+    "hold_h": 0.3038888888888889,
+    "token": "AVAX",
+    "signal": "mover+",
+    "id": 15669,
+    "db_pnl_pct": -6.6956,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1024702653248064,
+    "reason": "hard_stop",
+    "hold_h": 1.0875,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15731,
+    "db_pnl_pct": 0.7014,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -1.117498090605773,
+    "reason": "hard_stop",
+    "hold_h": 3.812222222222222,
+    "token": "COMP",
+    "signal": "volume-breakout-long+",
+    "id": 15757,
+    "db_pnl_pct": 42.117,
+    "db_reason": "HARD_SL_FAILED"
+   },
+   {
+    "pnl": 4.273427230046956,
+    "reason": "sl_hit",
+    "hold_h": 2.1530555555555555,
+    "token": "IMX",
+    "signal": "volume-breakout-long+",
+    "id": 15804,
+    "db_pnl_pct": 3.7031,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 3.4775946575174688,
+    "reason": "sl_hit",
+    "hold_h": 5.155277777777778,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15805,
+    "db_pnl_pct": 5.1617,
+    "db_reason": "atr_trail_hit"
+   },
+   {
+    "pnl": 3.3248956158663967,
+    "reason": "sl_hit",
+    "hold_h": 4.073888888888889,
+    "token": "ME",
+    "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+    "id": 15823,
+    "db_pnl_pct": 3.1968,
+    "db_reason": "trail_sl"
+   },
+   {
+    "pnl": -1.1711923207345376,
+    "reason": "hard_stop",
+    "hold_h": 2.403888888888889,
+    "token": "CRV",
+    "signal": "volume-breakout-long+",
+    "id": 15889,
+    "db_pnl_pct": -4.7604,
+    "db_reason": "hard_max_loss_-1.01%"
+   },
+   {
+    "pnl": -1.0141987829614618,
+    "reason": "hard_stop",
+    "hold_h": 0.4041666666666667,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15947,
+    "db_pnl_pct": -1.2167,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -1.0711371950417048,
+    "reason": "hard_stop",
+    "hold_h": 1.3680555555555556,
+    "token": "CRV",
+    "signal": "mover+",
+    "id": 15955,
+    "db_pnl_pct": -6.1452,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.0451306413301609,
+    "reason": "hard_stop",
+    "hold_h": 2.9547222222222222,
+    "token": "BLUR",
+    "signal": "trend-ride+",
+    "id": 15957,
+    "db_pnl_pct": 0.8979,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.0753931544865813,
+    "reason": "hard_stop",
+    "hold_h": 2.7736111111111112,
+    "token": "IO",
+    "signal": "trend-ride+",
+    "id": 15958,
+    "db_pnl_pct": -3.5731,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.1456071979703442,
+    "reason": "hard_stop",
+    "hold_h": 3.858888888888889,
+    "token": "INJ",
+    "signal": "trend-ride+",
+    "id": 15959,
+    "db_pnl_pct": 2.2886,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.0159226335840543,
+    "reason": "hard_stop",
+    "hold_h": 2.272777777777778,
+    "token": "HBAR",
+    "signal": "trend-ride+",
+    "id": 15960,
+    "db_pnl_pct": -5.0796,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.2170289340341922,
+    "reason": "hard_stop",
+    "hold_h": 1.871388888888889,
+    "token": "ZRO",
+    "signal": "trend-ride+",
+    "id": 15961,
+    "db_pnl_pct": 0.2131,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.0794237473224388,
+    "reason": "hard_stop",
+    "hold_h": 0.5402777777777777,
+    "token": "USELESS",
+    "signal": "trend-ride+",
+    "id": 15963,
+    "db_pnl_pct": -3.1123,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.260766446136552,
+    "reason": "hard_stop",
+    "hold_h": 1.0194444444444444,
+    "token": "SUPER",
+    "signal": "trend-ride+",
+    "id": 15964,
+    "db_pnl_pct": -2.9459,
+    "db_reason": "hard_max_loss"
+   }
+  ]
+ },
+ "isolated__optionB": {
+  "n": 57,
+  "WR%": 38.6,
+  "avg%": 0.28,
+  "total%": 16.0,
+  "max_loss%": -2.5,
+  "avg_hold_h": 7.37,
+  "reasons": {
+   "sl_hit": 52,
+   "no_data": 2,
+   "data_end": 3
+  },
+  "avg_leveraged%": 0.84,
+  "trades": [
+   {
+    "pnl": -1.5271880564306284,
+    "reason": "sl_hit",
+    "hold_h": 22.35972222222222,
+    "token": "SOL",
+    "signal": "rs_s,volume_breakout_long",
+    "id": 15115,
+    "db_pnl_pct": -5.3691,
+    "db_reason": "cut-loser-CL-T1"
+   },
+   {
+    "pnl": -1.19999999999999,
+    "reason": "sl_hit",
+    "hold_h": 3.2294444444444443,
+    "token": "BANANA",
+    "signal": "mover+",
+    "id": 15153,
+    "db_pnl_pct": 3.1482,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 5.708333333333333,
+    "token": "USUAL",
+    "signal": "mover+",
+    "id": 15224,
+    "db_pnl_pct": 1.0657,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15232,
+    "db_pnl_pct": 0.3119,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 0.6388888888888888,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15234,
+    "db_pnl_pct": -3.959,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15242,
+    "db_pnl_pct": 0.7961,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 1.0394444444444444,
+    "token": "LDO",
+    "signal": "mover+",
+    "id": 15257,
+    "db_pnl_pct": 0.9048,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 10.675277777777778,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15277,
+    "db_pnl_pct": 4.6325,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 1.9106241331483975,
+    "reason": "sl_hit",
+    "hold_h": 14.390555555555556,
+    "token": "BIGTIME",
+    "signal": "trend_purity+,volume-breakout-long+",
+    "id": 15293,
+    "db_pnl_pct": 3.9528,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -2.500000000000002,
+    "reason": "sl_hit",
+    "hold_h": 19.671666666666667,
+    "token": "BIGTIME",
+    "signal": "rs-s36,volume-breakout-long+",
+    "id": 15446,
+    "db_pnl_pct": -4.0418,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.4906286530208757,
+    "reason": "sl_hit",
+    "hold_h": 4.772222222222222,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15463,
+    "db_pnl_pct": -4.1847,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 6.64068554396422,
+    "reason": "sl_hit",
+    "hold_h": 7.858888888888889,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15465,
+    "db_pnl_pct": 0.1118,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 3.1333333333333213,
+    "reason": "sl_hit",
+    "hold_h": 11.489444444444445,
+    "token": "NOT",
+    "signal": "volume-breakout-long+",
+    "id": 15466,
+    "db_pnl_pct": -3.9474,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.731837898463584,
+    "reason": "sl_hit",
+    "hold_h": 17.956666666666667,
+    "token": "GMX",
+    "signal": "volume-breakout-long+",
+    "id": 15467,
+    "db_pnl_pct": 5.0309,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.504609091573129,
+    "reason": "sl_hit",
+    "hold_h": 2.5091666666666668,
+    "token": "WLD",
+    "signal": "volume-breakout-long+",
+    "id": 15474,
+    "db_pnl_pct": 11.7966,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 3.279670865674178,
+    "reason": "sl_hit",
+    "hold_h": 19.04111111111111,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15475,
+    "db_pnl_pct": 1.5778,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.8139250384931804,
+    "reason": "data_end",
+    "hold_h": 25.958333333333332,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15476,
+    "db_pnl_pct": 1.4026,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.866945606694558,
+    "reason": "sl_hit",
+    "hold_h": 3.2241666666666666,
+    "token": "ME",
+    "signal": "volume-breakout-long+",
+    "id": 15478,
+    "db_pnl_pct": 2.3245,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.277593019427051,
+    "reason": "sl_hit",
+    "hold_h": 2.1422222222222222,
+    "token": "SUSHI",
+    "signal": "volume-breakout-long+",
+    "id": 15479,
+    "db_pnl_pct": 0.1729,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -2.499999999999991,
+    "reason": "sl_hit",
+    "hold_h": 1.2961111111111112,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15481,
+    "db_pnl_pct": 5.6075,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 16.12527777777778,
+    "token": "BCH",
+    "signal": "mover+",
+    "id": 15483,
+    "db_pnl_pct": 5.3965,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 2.8027667984189764,
+    "reason": "sl_hit",
+    "hold_h": 13.966388888888888,
+    "token": "ONDO",
+    "signal": "volume-breakout-long+",
+    "id": 15484,
+    "db_pnl_pct": -7.4548,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 7.624732514922861,
+    "reason": "data_end",
+    "hold_h": 25.991944444444446,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15485,
+    "db_pnl_pct": 2.8551,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -2.500000000000002,
+    "reason": "sl_hit",
+    "hold_h": 0.9413888888888889,
+    "token": "SUPER",
+    "signal": "volume-breakout-long+",
+    "id": 15487,
+    "db_pnl_pct": 8.485,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.227560521415263,
+    "reason": "sl_hit",
+    "hold_h": 2.1352777777777776,
+    "token": "W",
+    "signal": "volume-breakout-long+",
+    "id": 15489,
+    "db_pnl_pct": 2.7933,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 4.9425,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15494,
+    "db_pnl_pct": -4.0494,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.0106445890005986,
+    "reason": "data_end",
+    "hold_h": 25.95916666666667,
+    "token": "ATOM",
+    "signal": "mover+",
+    "id": 15495,
+    "db_pnl_pct": 7.1851,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.1227053140096652,
+    "reason": "sl_hit",
+    "hold_h": 7.131111111111111,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15496,
+    "db_pnl_pct": -6.5217,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 1.9747222222222223,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15516,
+    "db_pnl_pct": -7.5667,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -2.2096344947139746,
+    "reason": "sl_hit",
+    "hold_h": 11.141666666666667,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15548,
+    "db_pnl_pct": 1.0921,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -2.1795561559698307,
+    "reason": "sl_hit",
+    "hold_h": 1.9708333333333334,
+    "token": "HYPER",
+    "signal": "volume-breakout-long+",
+    "id": 15578,
+    "db_pnl_pct": -4.4905,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 4.7569496619083385,
+    "reason": "sl_hit",
+    "hold_h": 4.456388888888889,
+    "token": "FIL",
+    "signal": "volume-breakout-long+",
+    "id": 15583,
+    "db_pnl_pct": 22.1116,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 3.5091666666666668,
+    "token": "CAKE",
+    "signal": "mover+",
+    "id": 15593,
+    "db_pnl_pct": 3.4577,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.29999999999999,
+    "reason": "sl_hit",
+    "hold_h": 0.9733333333333334,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15596,
+    "db_pnl_pct": -5.0387,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 17.70888888888889,
+    "token": "CFX",
+    "signal": "mover+",
+    "id": 15623,
+    "db_pnl_pct": 7.3554,
+    "db_reason": "UNIVERSAL_MAX_HOLD"
+   },
+   {
+    "pnl": -2.499999999999991,
+    "reason": "sl_hit",
+    "hold_h": 13.673055555555555,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15625,
+    "db_pnl_pct": -4.0843,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.118982063908569,
+    "reason": "sl_hit",
+    "hold_h": 2.79,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15631,
+    "db_pnl_pct": 2.6976,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000123,
+    "reason": "sl_hit",
+    "hold_h": 1.941111111111111,
+    "token": "ADA",
+    "signal": "mover+",
+    "id": 15632,
+    "db_pnl_pct": -6.4665,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 1.5744444444444445,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15635,
+    "db_pnl_pct": -3.8058,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 4.573888888888889,
+    "token": "ALT",
+    "signal": "mover+",
+    "id": 15667,
+    "db_pnl_pct": -0.2005,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 4.373333333333333,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15668,
+    "db_pnl_pct": -6.0727,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 0.7205555555555555,
+    "token": "AVAX",
+    "signal": "mover+",
+    "id": 15669,
+    "db_pnl_pct": -6.6956,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.3325221103995144,
+    "reason": "sl_hit",
+    "hold_h": 8.920833333333333,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15731,
+    "db_pnl_pct": 0.7014,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": 6.7808095831491055,
+    "reason": "sl_hit",
+    "hold_h": 5.812222222222222,
+    "token": "COMP",
+    "signal": "volume-breakout-long+",
+    "id": 15757,
+    "db_pnl_pct": 42.117,
+    "db_reason": "HARD_SL_FAILED"
+   },
+   {
+    "pnl": 4.273427230046956,
+    "reason": "sl_hit",
+    "hold_h": 2.1530555555555555,
+    "token": "IMX",
+    "signal": "volume-breakout-long+",
+    "id": 15804,
+    "db_pnl_pct": 3.7031,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 3.4775946575174688,
+    "reason": "sl_hit",
+    "hold_h": 5.155277777777778,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15805,
+    "db_pnl_pct": 5.1617,
+    "db_reason": "atr_trail_hit"
+   },
+   {
+    "pnl": 3.3248956158663967,
+    "reason": "sl_hit",
+    "hold_h": 4.073888888888889,
+    "token": "ME",
+    "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+    "id": 15823,
+    "db_pnl_pct": 3.1968,
+    "db_reason": "trail_sl"
+   },
+   {
+    "pnl": -2.2730745009483577,
+    "reason": "sl_hit",
+    "hold_h": 9.737222222222222,
+    "token": "CRV",
+    "signal": "volume-breakout-long+",
+    "id": 15889,
+    "db_pnl_pct": -4.7604,
+    "db_reason": "hard_max_loss_-1.01%"
+   },
+   {
+    "pnl": -2.462088283589303,
+    "reason": "sl_hit",
+    "hold_h": 2.0708333333333333,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15947,
+    "db_pnl_pct": -1.2167,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -1.3000000000000012,
+    "reason": "sl_hit",
+    "hold_h": 1.7013888888888888,
+    "token": "CRV",
+    "signal": "mover+",
+    "id": 15955,
+    "db_pnl_pct": -6.1452,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.8052256532066435,
+    "reason": "sl_hit",
+    "hold_h": 3.9547222222222222,
+    "token": "BLUR",
+    "signal": "trend-ride+",
+    "id": 15957,
+    "db_pnl_pct": 0.8979,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -2.453085767146812,
+    "reason": "sl_hit",
+    "hold_h": 4.190277777777778,
+    "token": "IO",
+    "signal": "trend-ride+",
+    "id": 15958,
+    "db_pnl_pct": -3.5731,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 2.5370753014411607,
+    "reason": "sl_hit",
+    "hold_h": 14.108888888888888,
+    "token": "INJ",
+    "signal": "trend-ride+",
+    "id": 15959,
+    "db_pnl_pct": 2.2886,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.5266749466221974,
+    "reason": "sl_hit",
+    "hold_h": 3.6894444444444443,
+    "token": "HBAR",
+    "signal": "trend-ride+",
+    "id": 15960,
+    "db_pnl_pct": -5.0796,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -2.499999999999991,
+    "reason": "sl_hit",
+    "hold_h": 2.2047222222222222,
+    "token": "ZRO",
+    "signal": "trend-ride+",
+    "id": 15961,
+    "db_pnl_pct": 0.2131,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -2.500000000000002,
+    "reason": "sl_hit",
+    "hold_h": 1.9569444444444444,
+    "token": "USELESS",
+    "signal": "trend-ride+",
+    "id": 15963,
+    "db_pnl_pct": -3.1123,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -2.056695852726309,
+    "reason": "sl_hit",
+    "hold_h": 7.602777777777778,
+    "token": "SUPER",
+    "signal": "trend-ride+",
+    "id": 15964,
+    "db_pnl_pct": -2.9459,
+    "db_reason": "hard_max_loss"
+   }
+  ]
+ },
+ "production__current": {
+  "n": 57,
+  "WR%": 54.4,
+  "avg%": 0.121,
+  "total%": 6.9,
+  "max_loss%": -1.41,
+  "avg_hold_h": 1.02,
+  "reasons": {
+   "hard_stop": 15,
+   "sl_hit": 40,
+   "no_data": 2
+  },
+  "avg_leveraged%": 0.363,
+  "trades": [
+   {
+    "pnl": -1.0594439117929122,
+    "reason": "hard_stop",
+    "hold_h": 2.109722222222222,
+    "token": "SOL",
+    "signal": "rs_s,volume_breakout_long",
+    "id": 15115,
+    "db_pnl_pct": -5.3691,
+    "db_reason": "cut-loser-CL-T1"
+   },
+   {
+    "pnl": 1.2422292127189483,
+    "reason": "sl_hit",
+    "hold_h": 0.22944444444444445,
+    "token": "BANANA",
+    "signal": "mover+",
+    "id": 15153,
+    "db_pnl_pct": 3.1482,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.4707371225577406,
+    "reason": "sl_hit",
+    "hold_h": 1.625,
+    "token": "USUAL",
+    "signal": "mover+",
+    "id": 15224,
+    "db_pnl_pct": 1.0657,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15232,
+    "db_pnl_pct": 0.3119,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 0.6388888888888888,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15234,
+    "db_pnl_pct": -3.959,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15242,
+    "db_pnl_pct": 0.7961,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.3946982611660266,
+    "reason": "sl_hit",
+    "hold_h": 0.5394444444444444,
+    "token": "LDO",
+    "signal": "mover+",
+    "id": 15257,
+    "db_pnl_pct": 0.9048,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.7134342186535081,
+    "reason": "sl_hit",
+    "hold_h": 1.3419444444444444,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15277,
+    "db_pnl_pct": 4.6325,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.777871012482656,
+    "reason": "sl_hit",
+    "hold_h": 0.30722222222222223,
+    "token": "BIGTIME",
+    "signal": "trend_purity+,volume-breakout-long+",
+    "id": 15293,
+    "db_pnl_pct": 3.9528,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1635001374759368,
+    "reason": "sl_hit",
+    "hold_h": 2.171666666666667,
+    "token": "BIGTIME",
+    "signal": "rs-s36,volume-breakout-long+",
+    "id": 15446,
+    "db_pnl_pct": -4.0418,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.010489318468888,
+    "reason": "hard_stop",
+    "hold_h": 0.6055555555555555,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15463,
+    "db_pnl_pct": -4.1847,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5475363263785393,
+    "reason": "sl_hit",
+    "hold_h": 0.9422222222222222,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15465,
+    "db_pnl_pct": 0.1118,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0964912280701733,
+    "reason": "hard_stop",
+    "hold_h": 0.9061111111111111,
+    "token": "NOT",
+    "signal": "volume-breakout-long+",
+    "id": 15466,
+    "db_pnl_pct": -3.9474,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0094185370863373,
+    "reason": "hard_stop",
+    "hold_h": 2.1233333333333335,
+    "token": "GMX",
+    "signal": "volume-breakout-long+",
+    "id": 15467,
+    "db_pnl_pct": 5.0309,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.3143507584427052,
+    "reason": "sl_hit",
+    "hold_h": 0.7591666666666667,
+    "token": "WLD",
+    "signal": "volume-breakout-long+",
+    "id": 15474,
+    "db_pnl_pct": 11.7966,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5021991771641865,
+    "reason": "sl_hit",
+    "hold_h": 3.457777777777778,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15475,
+    "db_pnl_pct": 1.5778,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.9314573622155153,
+    "reason": "sl_hit",
+    "hold_h": 0.4583333333333333,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15476,
+    "db_pnl_pct": 1.4026,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 1.2890283589028328,
+    "reason": "sl_hit",
+    "hold_h": 1.6408333333333334,
+    "token": "ME",
+    "signal": "volume-breakout-long+",
+    "id": 15478,
+    "db_pnl_pct": 2.3245,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.07058980902206,
+    "reason": "sl_hit",
+    "hold_h": 0.5588888888888889,
+    "token": "SUSHI",
+    "signal": "volume-breakout-long+",
+    "id": 15479,
+    "db_pnl_pct": 0.1729,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.9729789719626245,
+    "reason": "sl_hit",
+    "hold_h": 0.3794444444444444,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15481,
+    "db_pnl_pct": 5.6075,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.574304445155117,
+    "reason": "sl_hit",
+    "hold_h": 1.3752777777777778,
+    "token": "BCH",
+    "signal": "mover+",
+    "id": 15483,
+    "db_pnl_pct": 5.3965,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.412167909140949,
+    "reason": "hard_stop",
+    "hold_h": 0.2997222222222222,
+    "token": "ONDO",
+    "signal": "volume-breakout-long+",
+    "id": 15484,
+    "db_pnl_pct": -7.4548,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.4300118256560523,
+    "reason": "sl_hit",
+    "hold_h": 0.49194444444444446,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15485,
+    "db_pnl_pct": 2.8551,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.7840641672148152,
+    "reason": "sl_hit",
+    "hold_h": 0.10805555555555556,
+    "token": "SUPER",
+    "signal": "volume-breakout-long+",
+    "id": 15487,
+    "db_pnl_pct": 8.485,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 3.568808193668538,
+    "reason": "sl_hit",
+    "hold_h": 0.30194444444444446,
+    "token": "W",
+    "signal": "volume-breakout-long+",
+    "id": 15489,
+    "db_pnl_pct": 2.7933,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 0.9765481009387678,
+    "reason": "sl_hit",
+    "hold_h": 1.8591666666666666,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15494,
+    "db_pnl_pct": -4.0494,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.1608633944411695,
+    "reason": "sl_hit",
+    "hold_h": 1.0425,
+    "token": "ATOM",
+    "signal": "mover+",
+    "id": 15495,
+    "db_pnl_pct": 7.1851,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.070234113712376,
+    "reason": "hard_stop",
+    "hold_h": 1.0477777777777777,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15496,
+    "db_pnl_pct": -6.5217,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0884144780627714,
+    "reason": "hard_stop",
+    "hold_h": 0.4747222222222222,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15516,
+    "db_pnl_pct": -7.5667,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5411510852845858,
+    "reason": "sl_hit",
+    "hold_h": 0.225,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15548,
+    "db_pnl_pct": 1.0921,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0171262061192565,
+    "reason": "hard_stop",
+    "hold_h": 1.1375,
+    "token": "HYPER",
+    "signal": "volume-breakout-long+",
+    "id": 15578,
+    "db_pnl_pct": -4.4905,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5428818140078562,
+    "reason": "sl_hit",
+    "hold_h": 1.2897222222222222,
+    "token": "FIL",
+    "signal": "volume-breakout-long+",
+    "id": 15583,
+    "db_pnl_pct": 22.1116,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.274128767229966,
+    "reason": "sl_hit",
+    "hold_h": 0.5925,
+    "token": "CAKE",
+    "signal": "mover+",
+    "id": 15593,
+    "db_pnl_pct": 3.4577,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.29999999999999,
+    "reason": "sl_hit",
+    "hold_h": 0.9733333333333334,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15596,
+    "db_pnl_pct": -5.0387,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.3982624566526649,
+    "reason": "sl_hit",
+    "hold_h": 2.792222222222222,
+    "token": "CFX",
+    "signal": "mover+",
+    "id": 15623,
+    "db_pnl_pct": 7.3554,
+    "db_reason": "UNIVERSAL_MAX_HOLD"
+   },
+   {
+    "pnl": -1.2111567873403173,
+    "reason": "hard_stop",
+    "hold_h": 0.08972222222222222,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15625,
+    "db_pnl_pct": -4.0843,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.8728694151899585,
+    "reason": "sl_hit",
+    "hold_h": 0.29,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15631,
+    "db_pnl_pct": 2.6976,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.6013731716705273,
+    "reason": "sl_hit",
+    "hold_h": 0.6077777777777778,
+    "token": "ADA",
+    "signal": "mover+",
+    "id": 15632,
+    "db_pnl_pct": -6.4665,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.676116933259796,
+    "reason": "sl_hit",
+    "hold_h": 0.9911111111111112,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15635,
+    "db_pnl_pct": -3.8058,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.8641119871709346,
+    "reason": "sl_hit",
+    "hold_h": 0.5738888888888889,
+    "token": "ALT",
+    "signal": "mover+",
+    "id": 15667,
+    "db_pnl_pct": -0.2005,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.30000000000000027,
+    "reason": "sl_hit",
+    "hold_h": 3.2066666666666666,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15668,
+    "db_pnl_pct": -6.0727,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1753371868978957,
+    "reason": "hard_stop",
+    "hold_h": 0.3038888888888889,
+    "token": "AVAX",
+    "signal": "mover+",
+    "id": 15669,
+    "db_pnl_pct": -6.6956,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1024702653248064,
+    "reason": "hard_stop",
+    "hold_h": 1.0875,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15731,
+    "db_pnl_pct": 0.7014,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -0.3340656027655986,
+    "reason": "sl_hit",
+    "hold_h": 2.4788888888888887,
+    "token": "COMP",
+    "signal": "volume-breakout-long+",
+    "id": 15757,
+    "db_pnl_pct": 42.117,
+    "db_reason": "HARD_SL_FAILED"
+   },
+   {
+    "pnl": 1.174301643192499,
+    "reason": "sl_hit",
+    "hold_h": 0.48638888888888887,
+    "token": "IMX",
+    "signal": "volume-breakout-long+",
+    "id": 15804,
+    "db_pnl_pct": 3.7031,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 1.1683234285014166,
+    "reason": "sl_hit",
+    "hold_h": 0.3219444444444444,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15805,
+    "db_pnl_pct": 5.1617,
+    "db_reason": "atr_trail_hit"
+   },
+   {
+    "pnl": 0.46233689979122694,
+    "reason": "sl_hit",
+    "hold_h": 1.073888888888889,
+    "token": "ME",
+    "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+    "id": 15823,
+    "db_pnl_pct": 3.1968,
+    "db_reason": "trail_sl"
+   },
+   {
+    "pnl": -0.8071210579857602,
+    "reason": "sl_hit",
+    "hold_h": 2.3205555555555555,
+    "token": "CRV",
+    "signal": "volume-breakout-long+",
+    "id": 15889,
+    "db_pnl_pct": -4.7604,
+    "db_reason": "hard_max_loss_-1.01%"
+   },
+   {
+    "pnl": -1.0141987829614618,
+    "reason": "hard_stop",
+    "hold_h": 0.4041666666666667,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15947,
+    "db_pnl_pct": -1.2167,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -1.0711371950417048,
+    "reason": "hard_stop",
+    "hold_h": 1.3680555555555556,
+    "token": "CRV",
+    "signal": "mover+",
+    "id": 15955,
+    "db_pnl_pct": -6.1452,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.5615201900237565,
+    "reason": "sl_hit",
+    "hold_h": 0.28805555555555556,
+    "token": "BLUR",
+    "signal": "trend-ride+",
+    "id": 15957,
+    "db_pnl_pct": 0.8979,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -0.6228029602220131,
+    "reason": "sl_hit",
+    "hold_h": 2.5236111111111112,
+    "token": "IO",
+    "signal": "trend-ride+",
+    "id": 15958,
+    "db_pnl_pct": -3.5731,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.6778829806711517,
+    "reason": "sl_hit",
+    "hold_h": 0.6088888888888889,
+    "token": "INJ",
+    "signal": "trend-ride+",
+    "id": 15959,
+    "db_pnl_pct": 2.2886,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -0.7187848002344399,
+    "reason": "sl_hit",
+    "hold_h": 2.1894444444444443,
+    "token": "HBAR",
+    "signal": "trend-ride+",
+    "id": 15960,
+    "db_pnl_pct": -5.0796,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.2897428612018915,
+    "reason": "sl_hit",
+    "hold_h": 0.28805555555555556,
+    "token": "ZRO",
+    "signal": "trend-ride+",
+    "id": 15961,
+    "db_pnl_pct": 0.2131,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -1.0794237473224388,
+    "reason": "hard_stop",
+    "hold_h": 0.5402777777777777,
+    "token": "USELESS",
+    "signal": "trend-ride+",
+    "id": 15963,
+    "db_pnl_pct": -3.1123,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -1.260766446136552,
+    "reason": "hard_stop",
+    "hold_h": 1.0194444444444444,
+    "token": "SUPER",
+    "signal": "trend-ride+",
+    "id": 15964,
+    "db_pnl_pct": -2.9459,
+    "db_reason": "hard_max_loss"
+   }
+  ]
+ },
+ "production__optionB": {
+  "n": 57,
+  "WR%": 57.9,
+  "avg%": 0.142,
+  "total%": 8.1,
+  "max_loss%": -2.5,
+  "avg_hold_h": 1.28,
+  "reasons": {
+   "cut_loser_T1": 4,
+   "sl_hit": 50,
+   "no_data": 2,
+   "stale_exit": 1
+  },
+  "avg_leveraged%": 0.425,
+  "trades": [
+   {
+    "pnl": -1.0594439117929122,
+    "reason": "cut_loser_T1",
+    "hold_h": 2.109722222222222,
+    "token": "SOL",
+    "signal": "rs_s,volume_breakout_long",
+    "id": 15115,
+    "db_pnl_pct": -5.3691,
+    "db_reason": "cut-loser-CL-T1"
+   },
+   {
+    "pnl": 1.2422292127189483,
+    "reason": "sl_hit",
+    "hold_h": 0.22944444444444445,
+    "token": "BANANA",
+    "signal": "mover+",
+    "id": 15153,
+    "db_pnl_pct": 3.1482,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.4707371225577406,
+    "reason": "sl_hit",
+    "hold_h": 1.625,
+    "token": "USUAL",
+    "signal": "mover+",
+    "id": 15224,
+    "db_pnl_pct": 1.0657,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15232,
+    "db_pnl_pct": 0.3119,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.200000000000001,
+    "reason": "sl_hit",
+    "hold_h": 0.6388888888888888,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15234,
+    "db_pnl_pct": -3.959,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.0,
+    "reason": "no_data",
+    "hold_h": 0.0,
+    "token": "PONS",
+    "signal": "mover+",
+    "id": 15242,
+    "db_pnl_pct": 0.7961,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.3946982611660266,
+    "reason": "sl_hit",
+    "hold_h": 0.5394444444444444,
+    "token": "LDO",
+    "signal": "mover+",
+    "id": 15257,
+    "db_pnl_pct": 0.9048,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.7134342186535081,
+    "reason": "sl_hit",
+    "hold_h": 1.3419444444444444,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15277,
+    "db_pnl_pct": 4.6325,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.777871012482656,
+    "reason": "sl_hit",
+    "hold_h": 0.30722222222222223,
+    "token": "BIGTIME",
+    "signal": "trend_purity+,volume-breakout-long+",
+    "id": 15293,
+    "db_pnl_pct": 3.9528,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1635001374759368,
+    "reason": "sl_hit",
+    "hold_h": 2.171666666666667,
+    "token": "BIGTIME",
+    "signal": "rs-s36,volume-breakout-long+",
+    "id": 15446,
+    "db_pnl_pct": -4.0418,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.3821297160744752,
+    "reason": "sl_hit",
+    "hold_h": 2.522222222222222,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15463,
+    "db_pnl_pct": -4.1847,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5475363263785393,
+    "reason": "sl_hit",
+    "hold_h": 0.9422222222222222,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15465,
+    "db_pnl_pct": 0.1118,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.7543859649122862,
+    "reason": "stale_exit",
+    "hold_h": 2.156111111111111,
+    "token": "NOT",
+    "signal": "volume-breakout-long+",
+    "id": 15466,
+    "db_pnl_pct": -3.9474,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.7189924732781017,
+    "reason": "sl_hit",
+    "hold_h": 3.54,
+    "token": "GMX",
+    "signal": "volume-breakout-long+",
+    "id": 15467,
+    "db_pnl_pct": 5.0309,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.3143507584427052,
+    "reason": "sl_hit",
+    "hold_h": 0.7591666666666667,
+    "token": "WLD",
+    "signal": "volume-breakout-long+",
+    "id": 15474,
+    "db_pnl_pct": 11.7966,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5021991771641865,
+    "reason": "sl_hit",
+    "hold_h": 3.457777777777778,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15475,
+    "db_pnl_pct": 1.5778,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.9314573622155153,
+    "reason": "sl_hit",
+    "hold_h": 0.4583333333333333,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15476,
+    "db_pnl_pct": 1.4026,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 1.2890283589028328,
+    "reason": "sl_hit",
+    "hold_h": 1.6408333333333334,
+    "token": "ME",
+    "signal": "volume-breakout-long+",
+    "id": 15478,
+    "db_pnl_pct": 2.3245,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.07058980902206,
+    "reason": "sl_hit",
+    "hold_h": 0.5588888888888889,
+    "token": "SUSHI",
+    "signal": "volume-breakout-long+",
+    "id": 15479,
+    "db_pnl_pct": 0.1729,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.9729789719626245,
+    "reason": "sl_hit",
+    "hold_h": 0.3794444444444444,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15481,
+    "db_pnl_pct": 5.6075,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.574304445155117,
+    "reason": "sl_hit",
+    "hold_h": 1.3752777777777778,
+    "token": "BCH",
+    "signal": "mover+",
+    "id": 15483,
+    "db_pnl_pct": 5.3965,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -0.3037411817681468,
+    "reason": "sl_hit",
+    "hold_h": 2.299722222222222,
+    "token": "ONDO",
+    "signal": "volume-breakout-long+",
+    "id": 15484,
+    "db_pnl_pct": -7.4548,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.4300118256560523,
+    "reason": "sl_hit",
+    "hold_h": 0.49194444444444446,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15485,
+    "db_pnl_pct": 2.8551,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": 0.7840641672148152,
+    "reason": "sl_hit",
+    "hold_h": 0.10805555555555556,
+    "token": "SUPER",
+    "signal": "volume-breakout-long+",
+    "id": 15487,
+    "db_pnl_pct": 8.485,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 3.568808193668538,
+    "reason": "sl_hit",
+    "hold_h": 0.30194444444444446,
+    "token": "W",
+    "signal": "volume-breakout-long+",
+    "id": 15489,
+    "db_pnl_pct": 2.7933,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 0.9765481009387678,
+    "reason": "sl_hit",
+    "hold_h": 1.8591666666666666,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15494,
+    "db_pnl_pct": -4.0494,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 1.1608633944411695,
+    "reason": "sl_hit",
+    "hold_h": 1.0425,
+    "token": "ATOM",
+    "signal": "mover+",
+    "id": 15495,
+    "db_pnl_pct": 7.1851,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.6875009290226672,
+    "reason": "sl_hit",
+    "hold_h": 2.2144444444444447,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15496,
+    "db_pnl_pct": -6.5217,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.0884144780627714,
+    "reason": "cut_loser_T1",
+    "hold_h": 0.4747222222222222,
+    "token": "ALGO",
+    "signal": "mover+",
+    "id": 15516,
+    "db_pnl_pct": -7.5667,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5411510852845858,
+    "reason": "sl_hit",
+    "hold_h": 0.225,
+    "token": "BABY",
+    "signal": "volume-breakout-long+",
+    "id": 15548,
+    "db_pnl_pct": 1.0921,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -2.1795561559698307,
+    "reason": "sl_hit",
+    "hold_h": 1.9708333333333334,
+    "token": "HYPER",
+    "signal": "volume-breakout-long+",
+    "id": 15578,
+    "db_pnl_pct": -4.4905,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.5428818140078562,
+    "reason": "sl_hit",
+    "hold_h": 1.2897222222222222,
+    "token": "FIL",
+    "signal": "volume-breakout-long+",
+    "id": 15583,
+    "db_pnl_pct": 22.1116,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 2.274128767229966,
+    "reason": "sl_hit",
+    "hold_h": 0.5925,
+    "token": "CAKE",
+    "signal": "mover+",
+    "id": 15593,
+    "db_pnl_pct": 3.4577,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.29999999999999,
+    "reason": "sl_hit",
+    "hold_h": 0.9733333333333334,
+    "token": "BLUR",
+    "signal": "mover+",
+    "id": 15596,
+    "db_pnl_pct": -5.0387,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.3982624566526649,
+    "reason": "sl_hit",
+    "hold_h": 2.792222222222222,
+    "token": "CFX",
+    "signal": "mover+",
+    "id": 15623,
+    "db_pnl_pct": 7.3554,
+    "db_reason": "UNIVERSAL_MAX_HOLD"
+   },
+   {
+    "pnl": 0.6356296689210117,
+    "reason": "sl_hit",
+    "hold_h": 1.3397222222222223,
+    "token": "WCT",
+    "signal": "volume-breakout-long+",
+    "id": 15625,
+    "db_pnl_pct": -4.0843,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.8728694151899585,
+    "reason": "sl_hit",
+    "hold_h": 0.29,
+    "token": "YGG",
+    "signal": "volume-breakout-long+",
+    "id": 15631,
+    "db_pnl_pct": 2.6976,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.6013731716705273,
+    "reason": "sl_hit",
+    "hold_h": 0.6077777777777778,
+    "token": "ADA",
+    "signal": "mover+",
+    "id": 15632,
+    "db_pnl_pct": -6.4665,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.676116933259796,
+    "reason": "sl_hit",
+    "hold_h": 0.9911111111111112,
+    "token": "ACE",
+    "signal": "mover+",
+    "id": 15635,
+    "db_pnl_pct": -3.8058,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.8641119871709346,
+    "reason": "sl_hit",
+    "hold_h": 0.5738888888888889,
+    "token": "ALT",
+    "signal": "mover+",
+    "id": 15667,
+    "db_pnl_pct": -0.2005,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -0.30000000000000027,
+    "reason": "sl_hit",
+    "hold_h": 3.2066666666666666,
+    "token": "BABY",
+    "signal": "mover+",
+    "id": 15668,
+    "db_pnl_pct": -6.0727,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": -1.1753371868978957,
+    "reason": "cut_loser_T1",
+    "hold_h": 0.3038888888888889,
+    "token": "AVAX",
+    "signal": "mover+",
+    "id": 15669,
+    "db_pnl_pct": -6.6956,
+    "db_reason": "atr_sl_hit"
+   },
+   {
+    "pnl": 0.9234103385178605,
+    "reason": "sl_hit",
+    "hold_h": 2.004166666666667,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15731,
+    "db_pnl_pct": 0.7014,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -0.3340656027655986,
+    "reason": "sl_hit",
+    "hold_h": 2.4788888888888887,
+    "token": "COMP",
+    "signal": "volume-breakout-long+",
+    "id": 15757,
+    "db_pnl_pct": 42.117,
+    "db_reason": "HARD_SL_FAILED"
+   },
+   {
+    "pnl": 1.174301643192499,
+    "reason": "sl_hit",
+    "hold_h": 0.48638888888888887,
+    "token": "IMX",
+    "signal": "volume-breakout-long+",
+    "id": 15804,
+    "db_pnl_pct": 3.7031,
+    "db_reason": "hard_tp"
+   },
+   {
+    "pnl": 1.1683234285014166,
+    "reason": "sl_hit",
+    "hold_h": 0.3219444444444444,
+    "token": "JUP",
+    "signal": "volume-breakout-long+",
+    "id": 15805,
+    "db_pnl_pct": 5.1617,
+    "db_reason": "atr_trail_hit"
+   },
+   {
+    "pnl": 0.46233689979122694,
+    "reason": "sl_hit",
+    "hold_h": 1.073888888888889,
+    "token": "ME",
+    "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+    "id": 15823,
+    "db_pnl_pct": 3.1968,
+    "db_reason": "trail_sl"
+   },
+   {
+    "pnl": -0.8071210579857602,
+    "reason": "sl_hit",
+    "hold_h": 2.3205555555555555,
+    "token": "CRV",
+    "signal": "volume-breakout-long+",
+    "id": 15889,
+    "db_pnl_pct": -4.7604,
+    "db_reason": "hard_max_loss_-1.01%"
+   },
+   {
+    "pnl": -2.462088283589303,
+    "reason": "sl_hit",
+    "hold_h": 2.0708333333333333,
+    "token": "DYDX",
+    "signal": "volume-breakout-long+",
+    "id": 15947,
+    "db_pnl_pct": -1.2167,
+    "db_reason": "hard_sl"
+   },
+   {
+    "pnl": -1.0711371950417048,
+    "reason": "cut_loser_T1",
+    "hold_h": 1.3680555555555556,
+    "token": "CRV",
+    "signal": "mover+",
+    "id": 15955,
+    "db_pnl_pct": -6.1452,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.5615201900237565,
+    "reason": "sl_hit",
+    "hold_h": 0.28805555555555556,
+    "token": "BLUR",
+    "signal": "trend-ride+",
+    "id": 15957,
+    "db_pnl_pct": 0.8979,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -0.6228029602220131,
+    "reason": "sl_hit",
+    "hold_h": 2.5236111111111112,
+    "token": "IO",
+    "signal": "trend-ride+",
+    "id": 15958,
+    "db_pnl_pct": -3.5731,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.6778829806711517,
+    "reason": "sl_hit",
+    "hold_h": 0.6088888888888889,
+    "token": "INJ",
+    "signal": "trend-ride+",
+    "id": 15959,
+    "db_pnl_pct": 2.2886,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -0.7187848002344399,
+    "reason": "sl_hit",
+    "hold_h": 2.1894444444444443,
+    "token": "HBAR",
+    "signal": "trend-ride+",
+    "id": 15960,
+    "db_pnl_pct": -5.0796,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": 0.2897428612018915,
+    "reason": "sl_hit",
+    "hold_h": 0.28805555555555556,
+    "token": "ZRO",
+    "signal": "trend-ride+",
+    "id": 15961,
+    "db_pnl_pct": 0.2131,
+    "db_reason": "profit-monster-trail"
+   },
+   {
+    "pnl": -2.500000000000002,
+    "reason": "sl_hit",
+    "hold_h": 1.9569444444444444,
+    "token": "USELESS",
+    "signal": "trend-ride+",
+    "id": 15963,
+    "db_pnl_pct": -3.1123,
+    "db_reason": "hard_max_loss"
+   },
+   {
+    "pnl": -0.6858070153538787,
+    "reason": "sl_hit",
+    "hold_h": 2.2694444444444444,
+    "token": "SUPER",
+    "signal": "trend-ride+",
+    "id": 15964,
+    "db_pnl_pct": -2.9459,
+    "db_reason": "hard_max_loss"
+   }
+  ]
+ }
+}
