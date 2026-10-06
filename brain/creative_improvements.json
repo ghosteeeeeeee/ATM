@@ -3165,5 +3165,50 @@
     "status": "deferred — blocked on DRIFT-A",
     "risk": "low if sequenced correctly",
     "sample_basis": "30d bb-squeeze+ HIGH n=39 (61.5% WR — not a kill candidate per policy)"
+  },
+  {
+    "date": "2026-10-06T11:30:00Z",
+    "idea": "Meta-RSI rebaseline: rebase ALL RSI-based analytics on _signal_metadata.rsi_14 instead of entry_rsi_14",
+    "rationale": "DRIFT-E root cause: entry_rsi_14 median 12.6pt diff vs meta RSI. Watchdog RSI claims, past audits, cell_stats, exit_optimizer_shadow all calibrated on corrupted data. Explains why bb-squeeze+ 'mid-RSI killer' (watchdog) contradicts meta-RSI (60-70 = BEST).",
+    "expected_impact": "Prevents wrong filter changes. Unlocks legitimate RSI filters incorrectly rejected. Prerequisite for all pending RSI decisions.",
+    "category": "data quality / infrastructure",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-06T11:30:00Z",
+    "idea": "Regime-aware hotset confidence floor: raise approval threshold to 85+ when regime layers disagree",
+    "rationale": "Watchdog: 'Do not treat 88 alt LONG_BIAS as a long mandate — continuum state_score falling.' Conflicted regime currently produces empty hotset (correct) but also missed opportunities (SKY 94.4, ONDO 93.6 ripping). Raise bar during conflict, normal when aligned.",
+    "expected_impact": "Fewer marginal entries during conflicted regimes. Signals that fire at 85+ conf during conflict should have stronger edge. Reduces overbought-long bleed.",
+    "category": "regime routing",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-06T12:40:00Z",
+    "idea": "bb-squeeze+ regime-aware confidence dampener (NOT hard block)",
+    "rationale": "Works in NORMAL (+$0.25/18T 66.7%WR) but bleeds in HIGH (-$0.26/40T) and EXTREME (-$0.25/13T). Dampen confidence in HIGH/EXTREME rather than blocking. Meta-RSI 60-70 = sweet spot (75%WR +$0.44).",
+    "expected_impact": "Reduce HIGH/EXTREME bleed ~50% while preserving NORMAL winners",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-06T12:40:00Z",
+    "idea": "Momentum floor for bb-squeeze+ entries (mirror bb-bounce-short V2 pattern)",
+    "rationale": "bb-bounce-short V2 momentum filter took WR 70%→96.3% in backtest. bb-squeeze+ hard_max_loss losers avg_mfe=0.133% — never had momentum. Min momentum score could filter immediate-fail trades.",
+    "expected_impact": "Block ~40% of hard_max_loss losers while preserving trail winners",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-06T12:40:00Z",
+    "idea": "Local SQLite mirror health check + auto-rebuild timer",
+    "rationale": "brain.db/trades.db/hermes.db all 0 bytes while PostgreSQL healthy. Dashboards blind. Systemd timer to check mirror health and rebuild from PG.",
+    "expected_impact": "Eliminate dashboard blindness from empty local mirrors",
+    "category": "infra",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

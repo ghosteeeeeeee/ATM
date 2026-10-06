@@ -4169,3 +4169,4 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
 BY: auto_1hr
+[2026-10-06 12:40 UTC] brain_auditor: 0 config changes. PG: 24h 22T 8W 11L 3flat -$1.13 36.4%WR | 7d 225T -$0.14 52.9% (SHORT -$1.49/43T) | 30d 949T -$3.37 51.0%. Exit bleed: CL-T1 69T -$9.62, hard_max_loss 58T -$8.11 (bug_hunter owns). Autopsy: bb-squeeze+ overbought chase rejected RSI_MAX=70 (11W/7L blocked). DRIFT-I: bb-squeeze+ EXTREME block path gap. DRIFT-J: SQLite mirrors 0 bytes. Oversold guard holding n=0. Creative: regime-dampener, momentum floor, mirror timer. brain/audit_recommendations.json — brain_auditor
