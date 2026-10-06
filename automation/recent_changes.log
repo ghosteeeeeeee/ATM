@@ -4162,3 +4162,10 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split (systems check) | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
 BY: auto_1hr
+[2026-10-06 12:11 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 24h 22T 8W 11L 3flat -$1.13 | atr_sl_hit 0/22=0% (tpsl fix stable) | hard_max_loss 9T -$1.09 sole loss concentration | regime mixed (15m LONG_BIAS / 4h SHORT_BIAS, not NEUTRAL) | open 0
+  NEG-STREAK: n/a — 0T last hour; regime not NEUTRAL; size at HL floor → no action
+  Kill: none (0T last hour; 24h 0%-WR all ≤1T)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
+BY: auto_1hr

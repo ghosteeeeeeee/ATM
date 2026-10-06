@@ -4654,3 +4654,31 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 11:12] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime 15m LONG_BIAS / 4h SHORT_BIAS (not NEUTRAL, no size path); kill/overtrade/neg-streak paths not active; 0 open trades
+
+## [2026-10-06 12:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour (11:12-12:11): 0T closed, 0 open — quiet window continues
+- Kill: none — 0T last hour; 24h 0%-WR signals all ≤1T (volume-breakout-long+ 1T -$0.27, pump-chain- 1T -$0.25, btc-pump-rider+ 1T -$0.15, mover+ 1T -$0.14) — none kill-eligible
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0/22=0% 24h — tpsl fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 9T -$1.09 avg -$0.121 (queue#2 leverage-aware semantics delegated, not re-touched)
+- REGIME: mixed — 15m LONG_BIAS / 4h SHORT_BIAS, NOT NEUTRAL → NEG-STREAK size-reduction path not active
+- Signal quality 24h: bb-squeeze+ 6T 3W -$0.23, trend-ride+ 7T 3W -$0.18 (not kill-eligible); volume-breakout-long+/pump-chain-/btc-pump-rider+/mover+ all 1T 0W
+- 24h total: 22T 8W 11L 3flat -$1.13 (~42% WR non-flat)
+- Open: 0
+- signal_versions.json parses OK; no constants change this hour
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- 15m LONG_BIAS vs 4h SHORT_BIAS split — which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- Trading quiet 11-12h (0 closes) — third quiet hour; monitor if regime split is suppressing execution
+
+## TEAM UPDATES
+- [2026-10-06 12:11] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime mixed (not NEUTRAL, no size path); kill/overtrade/neg-streak paths not active; 0 open trades
