@@ -2246,8 +2246,8 @@ SLOW_GRIND_LONG_R2_WINDOW = 20             # bars for R² regression (longer for
 #   HIGH regime: 91T 51.6% WR -$2.38 (no edge)
 #   NORMAL regime: 79T 45.6% WR -$1.38 (no edge)
 # T directive 2026-10-05: make live + standalone bypass (overrides freeze for this signal)
-TREND_RIDE_LONG_ENABLED = True              # master kill-switch
-TREND_RIDE_LONG_PLUS_ENABLED = True         # LONG direction
+TREND_RIDE_LONG_ENABLED = False             # SIGNAL REPORTER 2026-10-06 — 24h 5T 20%WR -$0.33, age 25.4h. ALL regimes lose (EXTREME 50% -$0.11, HIGH 33% -$0.01, NORMAL 50% -$0.06). Backtest EXTREME edge (99T 58.6%) did not materialize live.
+TREND_RIDE_LONG_PLUS_ENABLED = False        # LONG direction — killed with master
 TREND_RIDE_BB_POS_MIN = 0.30                # min BB position — avoid lower-band entries (win avg=0.73, loss avg=0.35)
 TREND_RIDE_MOMENTUM_MIN = 20                # min momentum score — avoid weak moves (HBAR loss had momentum=19)
 TREND_RIDE_RSI_MIN = 50                     # RSI floor — momentum zone start

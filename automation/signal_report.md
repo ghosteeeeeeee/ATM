@@ -1,70 +1,54 @@
 # Signal Performance Report
-**Generated:** 2026-10-06 23:03 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-06 23:10 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 2,903 | **WR:** 52.3% | **PnL:** -112.86%
-- **Date range:** 2026-07-29 → 2026-10-06
-
----
-
-## WINNERS (WR > 55%, PnL > 0)
-
-None found.
-
----
-
-## LOSERS (WR < 30%, PnL < -2%)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| trend-ride+ | LONG | — | —% | — | 5 | 20.0% | -4.16 | ❓ | **DISABLE** |
+## Overall Stats (24h)
+- **Total closed trades:** 13
+- **Trades by signal:**
+  - trend-ride+ LONG: 5T, 20.0% WR, -$0.33
+  - pump-chain- SHORT: 3T, 33.3% WR, -$0.29
+  - bb-squeeze+ LONG: 2T, 0.0% WR, -$0.25
+  - oversold-bounce+ LONG: 2T, 100% WR, +$0.24
+  - mover+ LONG: 1T, 100% WR, +$0.10
 
 ---
 
-## MARGINAL (30-50% WR)
+## KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| trend-ride+ | LONG | 20.0% | -$0.33 | 5 | **DISABLED** — TREND_RIDE_LONG_ENABLED=False, TREND_RIDE_LONG_PLUS_ENABLED=False |
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| pump-chain- | SHORT | 3 | 33.3% | -1.45 | ❓ | Needs more data |
+**Kill rationale:** Meets all criteria — WR 20% < 30%, 5 trades, PnL -$0.33 < -$0.10, age 25.4h > 24h. Regime breakdown: EXTREME 50% WR -$0.11 (2T), HIGH 33.3% WR -$0.01 (3T), NORMAL 50% WR -$0.06 (2T). No regime ≥55% WR → blanket kill appropriate. Backtest cited EXTREME 99T 58.6% +$5.69 edge did not materialize live (only 7 total live trades, all negative).
 
 ---
 
-## DISABLED BUT GOOD (candidates for re-enabling)
+## BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None qualified (need 5+ trades, WR>55%, PnL>$0.05) |
 
-None found. Top performers are already enabled.
+---
+
+## LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain- | SHORT | 33.3% | -$0.29 | 3 | WATCH — all-time 127T 52.8% WR -$0.76. NORMAL regime 72.7% WR (11T). Not enough 24h volume to kill. HIGH regime already re-allowed by CEO 2026-10-06. |
+| bb-squeeze+ | LONG | 0.0% | -$0.25 | 2 | WATCH — all-time 69T 60.9% WR -$0.05. Only 2 trades in 24h. EXTREME block already active. |
+
+---
+
+## WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| oversold-bounce+ | LONG | 100% | +$0.24 | 2 | Healthy — below boost threshold (needs 5+ trades) |
+| mover+ | LONG | 100% | +$0.10 | 1 | Healthy — below boost threshold |
 
 ---
 
 ## SIGNAL INVERSIONS (24h)
-
 **No inversions found.** All signals respect their direction labels.
 
 ---
 
-## RECOMMENDATIONS
-
-1. **[DISABLE] trend-ride+ LONG** — WR=20.0%, PnL=-4.16% over 5 trades (24h).
-2. **[WATCH] pump-chain- SHORT** — WR=33.3%, PnL=-1.45% over 3 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-06 | b18891d | CEO: raise SHORT_CONTINUUM_SCORE_MAX 40→60 — every dump is a... |
-| 2026-10-06 | dbfe2dd | CEO: T directive — broaden SHORT market (floor 45, HIGH open... |
-| 2026-10-06 | 61bec3b | fix: bypass gaps + _is_ride_it over-match (own-conclusions f... |
-| 2026-10-06 | 26d3c99 | orchestrator: post-freeze queue 2026-10-06 — FAMILY_MAP unde... |
-| 2026-10-06 | bd1728f | signals: kill mtf-regime-trend- SHORT — 0% WR, $-0.53 (24h) ... |
-| 2026-10-06 | 5b62627 | Config: add tl-bounce to STANDALONE_BYPASS_SIGNALS |
-| 2026-10-06 | 885021c | signals: trend_ride_long — add BB position + momentum filter... |
-| 2026-10-06 | 1b6f8f5 | fix: ride_it exit bugs — ATR off-by-one, SL widen, overlay c... |
-| 2026-10-05 | 9dde1ca | signals: trend_ride+ mapped to ride_it exit — let trends run |
-| 2026-10-05 | 800d5e8 | signals: trend_ride_long tightened — RSI 50-65, ATR>=0.10, 1... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+## ISSUES
+- None. No inversions, no bugs detected this cycle.
+- Low trade volume (13 trades/24h) — most signals under-sampled for statistical action.
