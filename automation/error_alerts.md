@@ -920,3 +920,12 @@
 - **NOTE** (recurring, non-trading): `hermes-hl-sync-guardian.timer` active but last fired 02:50 UTC (~4h ago) — verify expected cadence if guardian is supposed to run more often. Not on critical trading path.
 - **NOTE** (recurring, non-trading): Dead/disabled units unchanged: hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check, atr-sl-updater (no last-fire). Not on trading path; no auto-restart.
 - **NOTE**: 1 near-zero PnL trade (BTC continuum_engine 0.0%) — single noise sample, not a phantom atr_sl_hit pattern.
+
+## Error Alerts — 2026-10-06 07:48 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #230792 active, signal_analyst PASS GOAT LONG, breakout_engine running, signals_runner 47 signals). Open: 0 (signal_outcomes) + 1 paper HL LTC. Signals 76 last 1h. Closed today: 6 (bb-squeeze+ LONG 2x, trend-ride+ LONG 4x — 0% WR tiny sample; trading perf, not system). Regime: LONG_BIAS 33L/12S/75N (shifted from SHORT_BIAS at 06:48). Speed: 50.3% >= 50th pct (89/177). Prices fresh (85 tokens, 07:46:58). Disk 84% (up from 83%; growth in DBs not logs — coin_tracker 3.4G, candles 2.6G, mtf_macd_tuner 1.1G; logs 225M, nothing >7d to compress). Core timers all active (pipeline 58s ago, price-collector 1m59s, 1m-candle 1m12s, hl-sync-guardian active). candles.db held by 2 normal concurrent writers — NOT a stuck lock. 0 Traceback/CRASH in 30m. **No CRITICAL issues. No auto-fixes needed.**
+- **WARN** (approaching threshold): Disk 84% — 1pt below 85% warn. No log cleanup available; next step is DB retention (mtf_macd_tuner, coin_tracker) if it crosses 85%.
+- **NOTE** (recurring, non-trading): `hermes-hl-sync-guardian.timer` active but last fired 02:50 UTC (~5h ago) — verify expected cadence. Not on critical trading path.
+- **NOTE** (legacy, non-trading): `decisions` table in signals_hermes_runtime.db stale since Apr 13 2026 — live path uses `signals.decision` column + decision-log. Dead table.
+- **NOTE** (dead file): `/root/.hermes/data/price_signals.db` is 0 bytes, unreferenced by scripts — safe to delete later.
+- **NOTE**: Prior `get_sl_multiplier_v2() got unexpected keyword argument 'signal'` errors (02:59 UTC) — no recurrence in last 30m logs. Consider resolved.
+- **NOTE** (unchanged, non-trading): Dead/disabled units: hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check, atr-sl-updater.
