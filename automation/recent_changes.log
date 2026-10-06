@@ -4104,3 +4104,11 @@ BY: auto_1hr
   trend-ride+ just modified (BB+momentum 885021c5, ride_it exit 1b6f8f54) — monitor, don't stack
   WATCH: hard_max_loss queue#2 entry/regime | IO pnl_usdt anomaly | 45da8fcf unratified | bb-squeeze+ R:R invert | mtf-regime-trend- queue#6
 BY: auto_1hr
+[2026-10-06 03:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour SUPER trend-ride+ LONG hard_max_loss -$0.11 (-2.95%) opened 01:48 into SHORT_BIAS | 24h 32T ~13W 18L -$1.03 ~41%WR atr_sl_hit 0/32=0% not dominant | hard_max_loss 14T -$1.89 sole loss concentration (~44% closes) MFE low = entries never worked | open 1 POL bb-squeeze+ LONG into SHORT_BIAS
+  NEG-STREAK TRIGGERED: 23h/00h/01h/02h 4 consecutive neg hours — rule = size cut IF NEUTRAL; actual SHORT_BIAS + size already HL floor $11.10 → no action
+  Kill: none (1T last hour; 24h 0%-WR all <3T; mover+ CEO re-enabled 2026-09-22)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  trend-ride+ just modified (BB+momentum 885021c5, ride_it exit 1b6f8f54) — monitor, don't stack
+  WATCH: hard_max_loss queue#2 entry/regime (LONG into SHORT_BIAS) | IO pnl_usdt anomaly | 45da8fcf unratified | bb-squeeze+ R:R invert | mtf-regime-trend- queue#6
+BY: auto_1hr

@@ -4299,3 +4299,47 @@ BY: auto_1hr
 - signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
 - Working tree has uncommitted non-auto_1hr changes — NOT staged/committed by this run
 BY: auto_1hr
+
+## [2026-10-06 03:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 this hour (WR: 0.0%) | 24h: 32T ~13W 18L 1flat -$1.03 (~41% WR)
+
+**This hour:**
+- SUPER trend-ride+ LONG hard_max_loss -$0.11 (-2.95% account) — opened 01:48 UTC into SHORT_BIAS regime
+- Open now: 1 — POL bb-squeeze+ LONG (00:20) still into SHORT_BIAS
+
+**24h close reasons:**
+- hard_max_loss 14T -$1.89 (avg -0.135) — ~44% of closes, sole loss concentration
+- profit-monster-trail 13T +$0.78 (avg +0.060) — sole winner
+- hard_sl 2T -$0.38 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06 | ORPHAN_PAPER 1T $0
+- atr_sl_hit: **0/32 = 0%** — tpsl_utils fix stable, not dominant, no CEO alert
+
+**Hourly PnL streak:** 22h +$0.01 | 23h -$0.10 | 00h -$0.23 | 01h -$0.12 | 02h -$0.11 — **4 consecutive negative hours → STREAK TRIGGER FIRED (again)**
+
+**Streak action check:** Rule = "if avg_pnl negative 3+ consecutive hours, check market regime; if NEUTRAL, consider reducing position size."
+- Regime = **SHORT_BIAS** (overnight LONGs into dump), NOT NEUTRAL → size-reduce mandate does not apply
+- Position size already at Hyperliquid floor: `MIN_TRADE_USDT = 11.0`. All trades $11.10. Cannot reduce below HL min.
+- Precedent 2026-10-06 02:13 + 2026-10-05 09:13: streak fired, regime not cleanly NEUTRAL → NO CHANGE, queue review.
+
+**Changes:** none — no trigger met with an actionable param path this hour.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — only 1 trade last hour (trend-ride+). 24h 0%-WR signals all <3T (volume-breakout-long+ 1T, btc-pump-rider+ 1T, mover+ 1T, continuum_engine 1T). mover+ was CEO RE-ENABLED 2026-09-22 — do not re-kill on 1T noise.
+- Negative avg_pnl streak: TRIGGERED (4h: 23/00/01/02) but regime SHORT_BIAS ≠ NEUTRAL + size at HL floor → no size change possible/mandated.
+- Overtrading: 1 trade/hour — well under 20
+- atr_sl_hit 0% — no SL-tightness issue; hard_max_loss is intentional ~1% price cap at 3–5x lev (14T -$1.89 = 44% of closes, but that's entry-quality queue#2, not stop-width)
+- trend-ride+ 7T 3W -$0.18 — has wins, and BB position + momentum filters just landed (commit 885021c5) + ride_it exit fix (1b6f8f54). Overnight 4 hard_max_loss LONGs predate/overlap that deploy — post-fix sample is trail wins (ZRO/INJ/BLUR). Stack another change this hour = destabilize. Monitor 24-48h.
+- Live trading: enabled. Pipeline healthy (rc=0, 1 open position).
+
+**Open Questions / Sideways:**
+- ⚠️ **hard_max_loss 14T -$1.89** with low MFE on losers — entries never worked. Pattern: LONG into SHORT_BIAS overnight. Queue#2 entry/regime gate review still the real fix, not stop-width.
+- ⚠️ **IO pnl_usdt=0.00 vs pnl_pct=-3.57** accounting anomaly — still open, prior hours flagged. Verify position_manager close path.
+- ⚠️ **45da8fcf** trendline_bounce_long confidence boost during freeze — still unratified. CEO: RATIFY or REVERT.
+- trend-ride+ post-fix sample tiny (3 trail wins after deploy vs 4 pre-deploy hard_max_loss). Do not kill; wait for post-fix sample.
+- Open LONG POL bb-squeeze+ into SHORT_BIAS — MAE guard active; watch for hard_max_loss.
+- bb-squeeze+ 12T 6W -$0.51 — R:R inverted (prior watch), not kill-eligible
+- mtf-regime-trend- 4T 1W -$0.48 — queue #6 (has 1 win)
+- signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
+- Working tree has uncommitted non-auto_1hr changes — NOT staged/committed by this run
+BY: auto_1hr
