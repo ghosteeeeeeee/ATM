@@ -1602,8 +1602,11 @@ def context_gate(token, direction, source, sig):
     # EXTREME (>1.5% ATR): storm — skip
     # NORMAL (0.48-1.0%): sweet spot — standard SL
     # HIGH (1.0-1.5%): big waves — wider SL
+    # CEO 2026-10-06 post-freeze: v1→v2 (MoE #1). v2 enforces regime mult 0.0 as hard SKIP
+    # (bb-bounce-v3 NORMAL, mtf-regime-trend- HIGH/EXTREME) and returns combined_mult.
+    # Fail-open on vol-gate ERROR removed — loss-prevention gate must fail-closed.
     try:
-        from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
+        from volatility_gate_v2 import should_trade_v2, get_atr_pct as _v2_get_atr_pct, get_sl_multiplier_v2
         # FIX 2026-09-04: Extract clean signal name from source string
         # Source may contain chain correlation data (e.g., "APEX(1.75x),TAO(1.71x)),chain(STBL(1.97x),pump-chain+")
         # volatility gate needs just the signal name part
@@ -1614,16 +1617,27 @@ def context_gate(token, direction, source, sig):
             _vol_source = _re_vol.sub(r',?chain\(.*\)$', '', source).strip(',').strip()
             if not _vol_source:
                 _vol_source = source
-        vol_result, vol_regime = should_trade(token, signal=_vol_source)
-        atr_pct = get_atr_pct(token)
+        _v2_result = should_trade_v2(token, signal=_vol_source)
+        if isinstance(_v2_result, tuple) and len(_v2_result) == 2:
+            _v2_verdict, _v2_info = _v2_result
+        else:
+            _v2_verdict, _v2_info = ('SKIP', f'bad v2 result: {_v2_result!r}')
+        atr_pct = None
+        vol_regime = None
+        if isinstance(_v2_info, dict):
+            atr_pct = _v2_info.get('atr_pct')
+            vol_regime = _v2_info.get('regime')
+        if _v2_verdict == 'SKIP':
+            _v2_reason = _v2_info if isinstance(_v2_info, str) else str(_v2_info)
+            log(f'  [VOL-GATE-v2] {token}: SKIP — {_v2_reason}')
+            return ('SKIP', f'volatility gate v2: {_v2_reason}', 0)
         atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'
-        log(f'  [VOL-GATE] {token}: ATR={atr_str} regime={vol_regime}')
-        if vol_result == 'SKIP':
-            return ('SKIP', f'volatility gate: {vol_regime} (ATR={atr_str})', 0)
+        _v2_mult = _v2_info.get('combined_mult') if isinstance(_v2_info, dict) else None
+        log(f'  [VOL-GATE-v2] {token}: ATR={atr_str} regime={vol_regime} mult={_v2_mult}')
         # Store regime in sig for downstream use (SL/TP adjustment)
         if isinstance(sig, dict):
             sig['volatility_regime'] = vol_regime
-            sig['sl_multiplier'] = get_sl_multiplier(atr_pct) if atr_pct else 1.0
+            sig['sl_multiplier'] = get_sl_multiplier_v2(atr_pct, signal_type=_vol_source) if atr_pct else 1.0
         # ── pump-chain+ HIGH regime block (mirrors signal_compactor.py) ──
         # STANDALONE_BYPASS signals skip signal_compactor, so this catch is needed.
         if vol_regime == 'HIGH' and direction.upper() == 'LONG' and source and ('pump-chain' in source or 'pump_chain' in source):
@@ -1668,7 +1682,10 @@ def context_gate(token, direction, source, sig):
             except ImportError:
                 pass
     except Exception as e:
-        log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
+        # CEO 2026-10-06 post-freeze: fail-open REMOVED — vol gate is loss-prevention.
+        # Unknown regime must not let trades through (DRIFT-A/D class).
+        log(f'  [VOL-GATE] {token}: error {e} (fail-closed — loss prevention)')
+        return ('SKIP', f'volatility gate error (fail-closed): {e}', 0)
 
     verdict, ctx, _ = rule_based_context_gate(token, direction, source, sig)
 
