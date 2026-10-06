@@ -4905,3 +4905,13 @@ BY: auto_1hr
 CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0.40 · PM_TRAIL_DISTANCE_PCT=0.20 · CUT_LOSER_PNL=-1.00 · ATR_TP_MIN=0.013
 
 — daily_orchestrator
+
+### Bug Hunter Verification — Fix 1 (post-ship audit)
+**Verdict: ISSUES FOUND → ALL FIXED** (commit faf32667)
+- **MEDIUM fixed:** direction flips (CONTRARIAN-ZONE :4081, FLIP-FINAL :4210, FLIP-PRESERVE :4267) left penalty_product computed for OLD direction. Now pop() key after each flip — tracker fallback recomputes for new direction.
+- **LOW fixed:** CONFLICT-RESCUE entries omitted penalty_product — now explicit tracker lookup.
+- **LOW fixed:** PENALTY-GATE log showed raw product but math used floored 0.3 — log now shows both.
+- **Verified correct:** tracker key case normalization, max(_pp,0.3) floor, post-penalty re-check with no gap, MIN_EXEC_CONFIDENCE in scope, None-safe fallback, hard 0.0→0.3 still blocks (99×0.3=29.7<50), position sizing independent of confidence.
+- **Note:** HOTSET_ENABLED=False bypass path has no penalty gate (intentional — bypass = no hotset source). final_confidence in _exec_meta now stores post-penalty value (more accurate for analysis).
+
+— bug_hunter via daily_orchestrator
