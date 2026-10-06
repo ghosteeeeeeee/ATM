@@ -1,0 +1,804 @@
+{
+  "current": [
+    {
+      "pnl": -1.0000000000000016,
+      "reason": "hard_stop",
+      "hold": 3.8333333333333335,
+      "signal": "volume-breakout-long+",
+      "token": "COMP"
+    },
+    {
+      "pnl": -1.0000000000000053,
+      "reason": "hard_stop",
+      "hold": 0.3333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "DYDX"
+    },
+    {
+      "pnl": -0.9999999999999947,
+      "reason": "hard_stop",
+      "hold": 2.9166666666666665,
+      "signal": "trend-ride+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -0.9999999999999987,
+      "reason": "hard_stop",
+      "hold": 2.6666666666666665,
+      "signal": "trend-ride+",
+      "token": "IO"
+    },
+    {
+      "pnl": -1.0000000000000044,
+      "reason": "hard_stop",
+      "hold": 1.3333333333333333,
+      "signal": "mover+",
+      "token": "CRV"
+    },
+    {
+      "pnl": -0.999999999999999,
+      "reason": "hard_stop",
+      "hold": 3.75,
+      "signal": "trend-ride+",
+      "token": "INJ"
+    },
+    {
+      "pnl": -1.0000000000000022,
+      "reason": "hard_stop",
+      "hold": 2.25,
+      "signal": "trend-ride+",
+      "token": "HBAR"
+    },
+    {
+      "pnl": 2.0423355590282846,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "trend-ride+",
+      "token": "ZRO"
+    },
+    {
+      "pnl": -0.9999999999999963,
+      "reason": "hard_stop",
+      "hold": 0.3333333333333333,
+      "signal": "trend-ride+",
+      "token": "USELESS"
+    },
+    {
+      "pnl": -0.9999999999999988,
+      "reason": "hard_stop",
+      "hold": 0.9166666666666666,
+      "signal": "trend-ride+",
+      "token": "SUPER"
+    },
+    {
+      "pnl": 28.461080074487903,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "W"
+    },
+    {
+      "pnl": 4.273427230046947,
+      "reason": "trail_hit",
+      "hold": 1.8333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "IMX"
+    },
+    {
+      "pnl": 1.2559092023036367,
+      "reason": "trail_hit",
+      "hold": 2.5,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": 3.324895615866389,
+      "reason": "trail_hit",
+      "hold": 4.083333333333333,
+      "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+      "token": "ME"
+    },
+    {
+      "pnl": -0.9999999999999988,
+      "reason": "hard_stop",
+      "hold": 2.4166666666666665,
+      "signal": "volume-breakout-long+",
+      "token": "CRV"
+    },
+    {
+      "pnl": -0.9999999999999928,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": 22.835661259279625,
+      "reason": "trail_hit",
+      "hold": 1.25,
+      "signal": "rs-s36,volume-breakout-long+",
+      "token": "BIGTIME"
+    },
+    {
+      "pnl": 11.126621371216801,
+      "reason": "trail_hit",
+      "hold": 0.3333333333333333,
+      "signal": "mover+",
+      "token": "ACE"
+    },
+    {
+      "pnl": 13.82498215168322,
+      "reason": "trail_hit",
+      "hold": 0.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "WCT"
+    },
+    {
+      "pnl": 7.24736842105264,
+      "reason": "trail_hit",
+      "hold": 0.5833333333333334,
+      "signal": "volume-breakout-long+",
+      "token": "NOT"
+    },
+    {
+      "pnl": 30.10752608047688,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 22.76944315940687,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "WLD"
+    },
+    {
+      "pnl": 11.824473003350716,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "YGG"
+    },
+    {
+      "pnl": 35.28052561641812,
+      "reason": "trail_hit",
+      "hold": 0.9166666666666666,
+      "signal": "mover+",
+      "token": "ALGO"
+    },
+    {
+      "pnl": 19.57883155121649,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "ME"
+    },
+    {
+      "pnl": 8.49884754692129,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "SUSHI"
+    },
+    {
+      "pnl": 7.164657320872285,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "DYDX"
+    },
+    {
+      "pnl": 6.164298744645488,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "GMX"
+    },
+    {
+      "pnl": 21.959705788295494,
+      "reason": "trail_hit",
+      "hold": 2.4166666666666665,
+      "signal": "mover+",
+      "token": "BCH"
+    },
+    {
+      "pnl": 23.92601941747573,
+      "reason": "trail_hit",
+      "hold": 1.25,
+      "signal": "trend_purity+,volume-breakout-long+",
+      "token": "BIGTIME"
+    },
+    {
+      "pnl": 26.964141692099876,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "ONDO"
+    },
+    {
+      "pnl": 11.658475053497023,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": 42.36218665497333,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "SUPER"
+    },
+    {
+      "pnl": 25.618294849023098,
+      "reason": "trail_hit",
+      "hold": 0.3333333333333333,
+      "signal": "mover+",
+      "token": "USUAL"
+    },
+    {
+      "pnl": 20.30267849453104,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "mover+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 2.9386635127143754,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "ATOM"
+    },
+    {
+      "pnl": 19.026975102192477,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": -0.9999999999999984,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "PONS"
+    },
+    {
+      "pnl": 14.264461476401777,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -0.9999999999999936,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "BANANA"
+    },
+    {
+      "pnl": 21.306113456948776,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "LDO"
+    },
+    {
+      "pnl": -0.9999999999999983,
+      "reason": "hard_stop",
+      "hold": 1.5,
+      "signal": "volume-breakout-long+",
+      "token": "HYPER"
+    },
+    {
+      "pnl": 13.084199432339929,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "FIL"
+    },
+    {
+      "pnl": 12.994832214765106,
+      "reason": "trail_hit",
+      "hold": 1.5,
+      "signal": "rs_s,volume_breakout_long",
+      "token": "SOL"
+    },
+    {
+      "pnl": -1.000000000000005,
+      "reason": "hard_stop",
+      "hold": 0.5833333333333334,
+      "signal": "mover+",
+      "token": "ACE"
+    },
+    {
+      "pnl": 31.342548507653706,
+      "reason": "trail_hit",
+      "hold": 0.9166666666666666,
+      "signal": "mover+",
+      "token": "ALGO"
+    },
+    {
+      "pnl": -1.000000000000007,
+      "reason": "hard_stop",
+      "hold": 1.5,
+      "signal": "mover+",
+      "token": "CFX"
+    },
+    {
+      "pnl": 2.5747427502338636,
+      "reason": "trail_hit",
+      "hold": 0.4166666666666667,
+      "signal": "mover+",
+      "token": "ALT"
+    },
+    {
+      "pnl": 9.444049204732421,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "mover+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 7.726425818882457,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "AVAX"
+    },
+    {
+      "pnl": 19.367150914373596,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "BABY"
+    },
+    {
+      "pnl": -1.000000000000008,
+      "reason": "hard_stop",
+      "hold": 0.6666666666666666,
+      "signal": "mover+",
+      "token": "CAKE"
+    },
+    {
+      "pnl": -1.0000000000000013,
+      "reason": "hard_stop",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -1.0000000000000038,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "WCT"
+    },
+    {
+      "pnl": -0.9999999999999959,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "ADA"
+    },
+    {
+      "pnl": -1.0000000000000036,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "YGG"
+    },
+    {
+      "pnl": -0.9999999999999928,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "PONS"
+    }
+  ],
+  "option_b": [
+    {
+      "pnl": 6.7808095831491,
+      "reason": "trail_hit",
+      "hold": 5.833333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "COMP"
+    },
+    {
+      "pnl": -2.499999999999995,
+      "reason": "hard_stop",
+      "hold": 2.0833333333333335,
+      "signal": "volume-breakout-long+",
+      "token": "DYDX"
+    },
+    {
+      "pnl": -1.9138106549032892,
+      "reason": "sl_hit",
+      "hold": 4.166666666666667,
+      "signal": "trend-ride+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -2.4999999999999964,
+      "reason": "hard_stop",
+      "hold": 4.166666666666667,
+      "signal": "trend-ride+",
+      "token": "IO"
+    },
+    {
+      "pnl": -2.334770790175168,
+      "reason": "sl_hit",
+      "hold": 2.9166666666666665,
+      "signal": "mover+",
+      "token": "CRV"
+    },
+    {
+      "pnl": 2.5005100306018235,
+      "reason": "trail_hit",
+      "hold": 15.25,
+      "signal": "trend-ride+",
+      "token": "INJ"
+    },
+    {
+      "pnl": -1.513417714453171,
+      "reason": "sl_hit",
+      "hold": 3.6666666666666665,
+      "signal": "trend-ride+",
+      "token": "HBAR"
+    },
+    {
+      "pnl": 2.0423355590282846,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "trend-ride+",
+      "token": "ZRO"
+    },
+    {
+      "pnl": -2.4999999999999964,
+      "reason": "hard_stop",
+      "hold": 1.9166666666666667,
+      "signal": "trend-ride+",
+      "token": "USELESS"
+    },
+    {
+      "pnl": -2.499999999999997,
+      "reason": "hard_stop",
+      "hold": 7.583333333333333,
+      "signal": "trend-ride+",
+      "token": "SUPER"
+    },
+    {
+      "pnl": 28.461080074487903,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "W"
+    },
+    {
+      "pnl": 4.273427230046947,
+      "reason": "trail_hit",
+      "hold": 1.8333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "IMX"
+    },
+    {
+      "pnl": 1.2559092023036367,
+      "reason": "trail_hit",
+      "hold": 2.5,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": 3.324895615866389,
+      "reason": "trail_hit",
+      "hold": 4.083333333333333,
+      "signal": "bb-bounce-v2-long+,volume-breakout-long+",
+      "token": "ME"
+    },
+    {
+      "pnl": -2.2246319296166734,
+      "reason": "sl_hit",
+      "hold": 9.75,
+      "signal": "volume-breakout-long+",
+      "token": "CRV"
+    },
+    {
+      "pnl": 1.9479017993290628,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": 22.835661259279625,
+      "reason": "trail_hit",
+      "hold": 1.25,
+      "signal": "rs-s36,volume-breakout-long+",
+      "token": "BIGTIME"
+    },
+    {
+      "pnl": 11.126621371216801,
+      "reason": "trail_hit",
+      "hold": 0.3333333333333333,
+      "signal": "mover+",
+      "token": "ACE"
+    },
+    {
+      "pnl": 13.82498215168322,
+      "reason": "trail_hit",
+      "hold": 0.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "WCT"
+    },
+    {
+      "pnl": 7.24736842105264,
+      "reason": "trail_hit",
+      "hold": 0.5833333333333334,
+      "signal": "volume-breakout-long+",
+      "token": "NOT"
+    },
+    {
+      "pnl": 30.10752608047688,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 22.76944315940687,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "WLD"
+    },
+    {
+      "pnl": 11.824473003350716,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "YGG"
+    },
+    {
+      "pnl": 35.28052561641812,
+      "reason": "trail_hit",
+      "hold": 0.9166666666666666,
+      "signal": "mover+",
+      "token": "ALGO"
+    },
+    {
+      "pnl": 19.57883155121649,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "ME"
+    },
+    {
+      "pnl": 8.49884754692129,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "SUSHI"
+    },
+    {
+      "pnl": 7.164657320872285,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "DYDX"
+    },
+    {
+      "pnl": 6.164298744645488,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "GMX"
+    },
+    {
+      "pnl": 21.959705788295494,
+      "reason": "trail_hit",
+      "hold": 2.4166666666666665,
+      "signal": "mover+",
+      "token": "BCH"
+    },
+    {
+      "pnl": 23.92601941747573,
+      "reason": "trail_hit",
+      "hold": 1.25,
+      "signal": "trend_purity+,volume-breakout-long+",
+      "token": "BIGTIME"
+    },
+    {
+      "pnl": 26.964141692099876,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "ONDO"
+    },
+    {
+      "pnl": 11.658475053497023,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": 42.36218665497333,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "SUPER"
+    },
+    {
+      "pnl": 25.618294849023098,
+      "reason": "trail_hit",
+      "hold": 0.3333333333333333,
+      "signal": "mover+",
+      "token": "USUAL"
+    },
+    {
+      "pnl": 20.30267849453104,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "mover+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 2.9386635127143754,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "ATOM"
+    },
+    {
+      "pnl": 19.026975102192477,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "JUP"
+    },
+    {
+      "pnl": -2.4999999999999964,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "PONS"
+    },
+    {
+      "pnl": 14.264461476401777,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -2.5000000000000053,
+      "reason": "hard_stop",
+      "hold": 1.4166666666666667,
+      "signal": "mover+",
+      "token": "BANANA"
+    },
+    {
+      "pnl": 21.306113456948776,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "LDO"
+    },
+    {
+      "pnl": 1.3250432965885157,
+      "reason": "trail_hit",
+      "hold": 22.333333333333332,
+      "signal": "volume-breakout-long+",
+      "token": "HYPER"
+    },
+    {
+      "pnl": 13.084199432339929,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "volume-breakout-long+",
+      "token": "FIL"
+    },
+    {
+      "pnl": 12.994832214765106,
+      "reason": "trail_hit",
+      "hold": 1.5,
+      "signal": "rs_s,volume_breakout_long",
+      "token": "SOL"
+    },
+    {
+      "pnl": -2.4999999999999973,
+      "reason": "hard_stop",
+      "hold": 2.5833333333333335,
+      "signal": "mover+",
+      "token": "ACE"
+    },
+    {
+      "pnl": 31.342548507653706,
+      "reason": "trail_hit",
+      "hold": 0.9166666666666666,
+      "signal": "mover+",
+      "token": "ALGO"
+    },
+    {
+      "pnl": 1.497214820222676,
+      "reason": "trail_hit",
+      "hold": 21.0,
+      "signal": "mover+",
+      "token": "CFX"
+    },
+    {
+      "pnl": 2.5747427502338636,
+      "reason": "trail_hit",
+      "hold": 0.4166666666666667,
+      "signal": "mover+",
+      "token": "ALT"
+    },
+    {
+      "pnl": 9.444049204732421,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "mover+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 7.726425818882457,
+      "reason": "trail_hit",
+      "hold": 0.16666666666666666,
+      "signal": "mover+",
+      "token": "AVAX"
+    },
+    {
+      "pnl": 19.367150914373596,
+      "reason": "trail_hit",
+      "hold": 1.4166666666666667,
+      "signal": "volume-breakout-long+",
+      "token": "BABY"
+    },
+    {
+      "pnl": 1.4706720660384691,
+      "reason": "trail_hit",
+      "hold": 14.0,
+      "signal": "mover+",
+      "token": "CAKE"
+    },
+    {
+      "pnl": -2.500000000000003,
+      "reason": "hard_stop",
+      "hold": 1.5,
+      "signal": "mover+",
+      "token": "BLUR"
+    },
+    {
+      "pnl": -2.5000000000000093,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "WCT"
+    },
+    {
+      "pnl": -2.500000000000011,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "ADA"
+    },
+    {
+      "pnl": -2.4999999999999964,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "volume-breakout-long+",
+      "token": "YGG"
+    },
+    {
+      "pnl": -2.5000000000000004,
+      "reason": "hard_stop",
+      "hold": 0.08333333333333333,
+      "signal": "mover+",
+      "token": "PONS"
+    }
+  ]
+}

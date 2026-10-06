@@ -36,3 +36,4 @@ Disabled signals (mtf-regime-trend+/-, accel-300-, pump-chain-v5): **0 post-kill
 | hard_max_loss 7d | −$7.99 | −$7.99 | −50% | bug_hunter |
 | Hotset approved | intermittent 0 | 0 | sustained >0 | post audit |
 | trendline_bounce_long trades | 0 all-time | 0 | n≥1 in 7d | 2026-10-13 |
+DECISION: E — SHORTs unprofitable across all regimes; blocking prevents further losses in bullish market.
