@@ -4600,3 +4600,29 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 09:11] auto_1hr: NO CHANGE — 0T last hour (03-09h quiet); atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
+
+## [2026-10-06 10:13 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.25 (WR: 0.0%)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour: LTC pump-chain- SHORT hard_max_loss -$0.25 (-5.57%) — the regime-misaligned LTC SHORT from prior hours finally closed at a loss; 0 open trades now
+- Kill: none — 24h 0%-WR signals all ≤1T (volume-breakout-long+ 1T -$0.27, btc-pump-rider+ 1T -$0.15, mover+ 1T -$0.14) — none kill-eligible
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0/22=0% 24h — tpsl fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 9T -$1.09 avg -$0.121 (queue#2 leverage-aware semantics delegated, not re-touched)
+- REGIME: 15m/4h now NEUTRAL (flipped from LONG_BIAS); NEG-STREAK size-reduction path not active — hourly trades 02h -$0.11, 06h -$0.13, 09h -$0.25 are not 3 consecutive hours (03-05, 07-08 had 0 trades)
+- Signal quality 24h: bb-squeeze+ 6T 3W -$0.23, trend-ride+ 7T 3W -$0.18 (not kill-eligible); pump-chain- 2T 1W -$0.19 (incl. LTC loss)
+- 24h total: 22T 9W 11L 2flat -$1.13 (~45% WR non-flat) — consistent with 09:11 snapshot
+- Open: 0 — LTC SHORT closed via hard_max_loss
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue (leverage-aware semantics), not re-touched
+- Trading quiet 03-09h broke; 09-10h produced 1 loss — monitor if regime NEUTRAL suppresses signals or improves quality
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+
+## TEAM UPDATES
+- [2026-10-06 10:13] auto_1hr: NO CHANGE — 1T last hour (LTC pump-chain- SHORT hard_max_loss -$0.25, regime-misaligned entry finally closed); atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime now NEUTRAL but no 3h neg-streak; 0 open trades

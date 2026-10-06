@@ -929,3 +929,20 @@
 - **NOTE** (dead file): `/root/.hermes/data/price_signals.db` is 0 bytes, unreferenced by scripts — safe to delete later.
 - **NOTE**: Prior `get_sl_multiplier_v2() got unexpected keyword argument 'signal'` errors (02:59 UTC) — no recurrence in last 30m logs. Consider resolved.
 - **NOTE** (unchanged, non-trading): Dead/disabled units: hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check, atr-sl-updater.
+
+## Error Alerts — 2026-10-06 07:59 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: usage: brain.py trade add [-h] [--exchange EXCHANGE] [--strategy STRATEGY]`
+
+## Error Alerts — 2026-10-06 08:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-06 09:47 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #230912 active, signals_runner rc=0, Position Manager Open:0). Signals 95 last 1h. Closed today: 7 (bb-squeeze+ LONG 2x, pump-chain- SHORT 1x, trend-ride+ LONG 4x — 0% WR tiny sample; trading perf, not system fault). Regime: SHORT_BIAS 11L/50S/62N (ts 09:45). Speed: 53.1% >= 50th pct (128/241). Prices fresh (84 tokens, prices.json 09:46:56). Disk 84% (under 85% warn; growth in DBs not logs). Core timers all active (pipeline 30s ago, price-collector 1m44s, 1m-candle 1m35s, hl-sync-guardian active). candles.db held by 3 normal concurrent writers — no stuck lock. 0 Traceback/CRASH in 30m. **No CRITICAL issues. No auto-fixes needed.**
+- **WARN** (approaching threshold): Disk 84% — 1pt below 85% warn. DB growth: coin_tracker 3.3G, candles 2.5G, mtf_macd_tuner 1.1G, session_brain 1.0G. Logs fine (pipeline.log 75M largest). If crosses 85%: DB retention on tuner/tracker.
+- **INFO** (non-fatal): CTX-GATE LLM timeout @ 09:38:07 for CRV LONG (opencode run timed out 35s) — trade allowed via BTC-CRASH-OVERRIDE (RECOVERY+LEAN_BULL+ABOVE). No recurrence in last 9m.
+- **NOTE** (recurring, non-trading): Dead/disabled units unchanged: atr-sl-updater (inactive, no last-fire), hl-copy, ma-cross-5m-tuner, regime-24h-check, regime-transition-check. Not on trading path; no auto-restart.
+- **NOTE** (recurring, non-trading): hermes-hl-sync-guardian.timer active but last fired 02:50 UTC (~7h ago) — verify expected cadence. Not on critical trading path.
+
+## Error Alerts — 2026-10-06 09:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
