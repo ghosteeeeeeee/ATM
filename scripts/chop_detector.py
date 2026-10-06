@@ -520,8 +520,12 @@ def get_regime() -> dict:
                 # Require structural confirmation (linreg BEAR + BELOW EMA300) for ALL phases.
                 _bearish = ((_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                              _linreg in ('LEAN_BEAR', 'BEAR') and _ema_pos == 'BELOW'))
-                # Bullish structure: RECOVERY/CALM/NEUTRAL + LEAN_BULL + ABOVE EMA300
-                _bullish = ((_phase in ('RECOVERY', 'CALM', 'NEUTRAL') and
+                # Bullish structure: any phase + LEAN_BULL/BULL + ABOVE EMA300
+                # FIX 2026-10-06: DECLINING included — mirror of 2026-09-20 bear fix.
+                # DECLINING alone is not bearish; DECLINING+LEAN_BULL+ABOVE is a healthy
+                # pullback in uptrend. Excluding it mislabeled BTC as CHOP (score 81-98)
+                # and disagreed with compactor structural-bull override.
+                _bullish = ((_phase in ('RECOVERY', 'CALM', 'NEUTRAL', 'DECLINING') and
                              _linreg in ('LEAN_BULL', 'BULL') and _ema_pos == 'ABOVE'))
                 if _bearish or _bullish:
                     votes['TREND'] += 5

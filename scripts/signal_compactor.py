@@ -2641,7 +2641,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # and blocking LONG signals during healthy BTC pullbacks (score 80-95, STRONG_UP).
                         _cont_bearish = ((_continuum_phase in ('DECLINING', 'CALM', 'RECOVERY') and
                                           _cont_row_data.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
-                                          _cont_row_data.get('ema300_position') == 'BELOW'))
+                                          _cont_row_data.get('ema300_position') in ('BELOW', 'AT')))  # AT = transitional bear (mirror bullish fix; POL hole)
                         # FIX T 2026-10-04: structural bull any phase — mirror bear 2026-09-20.
                         # Was phase-gated RECOVERY/CALM/NEUTRAL; DECLINING+BULL+ABOVE blocked LONGs during pump.
                         # FIX 2026-10-05: ema AT counts as bullish — BTC can be LEAN_BULL + ema=AT

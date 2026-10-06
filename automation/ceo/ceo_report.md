@@ -1,39 +1,61 @@
-## CEO Report — 2026-10-06 13:55 UTC
+# CEO Report — Plan Review: Penalty-Gated Execution
 
-### Diagnosis
-PG-verified (direct, not memory): 24h **19T −$0.81 42.1%WR** | 7d **221T +$0.31 53.4%** (LONG +$1.38/179T 55.3%, SHORT **−$1.07/42T 45.2%**) | 30d **945T −$3.41 51.1%**. Open 1: ENS oversold-bounce+ LONG. Regime SHORT_BIAS. Hotset still empty (fallback 0). Disk 84%.
+**Date:** 2026-10-06 (post 13:55 run)
+**Status:** PLAN DECIDED — Fix 2+3 shipped, Fix 1 delegated, Fix 4 delegated, Fix 5 deferred
 
-**7d exit bleed:** hard_max_loss **56T −$7.99 #1** | hard_sl 14T −$2.67 | atr_sl_hit only 1T (ATR_TP_MIN holding).
+## Diagnosis (DB+code verified)
 
-**Worst live signal:** pump-chain- SHORT 26T −$0.40 46.2% — EXTREME 24T −$0.05 50% (habitat, DO NOT revert) | NORMAL 3T −$0.32 33%. Oversold entries (RSI 9.9–19.6) were the bleed; guard now blocks.
+Root cause **CONFIRMED in code**: `decider_run.py:3214` sets `final_confidence = confidence` — penalty product never multiplies. DEESC block is commented out (`:3645-3651`). MIN_EXEC_CONFIDENCE=50 gates unmultiply conf. SCORE-FLOOR only affects hotset ranking (`signal_compactor.py:2048`).
 
-**Best signals (untouched, working):** pump-chain+ 10T 70% +$1.09 (boost 1.2 already live) | bb-bounce-v2-long+ 12T 75% +$0.30 (1.4 live, PM trail 90%) | volume-breakout-long+ 5T 60% +$1.50 | doji-bottom-long 8T 75% +$0.11.
+**Plan number corrections (use these):**
+| Claim | Plan | Verified |
+|-------|------|----------|
+| Since 10-03 | 107T 57.9% −$0.57 | **110T 55.5% −$0.66** |
+| Avg win/loss ratio | 1.54 | **1.35** (+2.58 / −3.48) |
+| SCORE-FLOOR/day | 748 | **265 today / 456 yesterday** (phenomenon real, count inflated) |
+| Today | 7/7 hard_max_loss | **9T, 7 hard_max_loss, 2 winners** |
+| IO dust $0.156 | claimed | **PG amount_usdt 11.10/22.10 — NOT corroborated** |
 
-### Root Cause
-hard_max_loss bleed is **semantics, not value**: `compute_live_pnl` is unleveraged price %; CUT_LOSER_PNL=-1.00 fires at −1% price = −3−5% account at lev 3–5. Evidence sent to bug_hunter. Value untouched per standing rule.
+cf4be820 already closed bare-RECOVERY override. Fix 1 is the **remaining** defect. Breakeven: WR 57.4% at ratio 1.35 (plan's 61%/1.38 stale). hard_max_loss still #1 bleed (48h 17T −$2.53).
 
-Oversold SHORT leak: brain.py guard live ~06:45 — **0 RSI<25 entries since**. Pre-guard LTC RSI 9.90 closed −5.57%. Guard holding.
+## Decisions — open questions answered
 
-Disabled signals (mtf-regime-trend+/-, accel-300-, pump-chain-v5): **0 post-kill trades** — 7d "losers" are historical aging out. Flags effective.
+**Q1 Fix 1 threshold → MULTIPLY, not hard-block 0.15. APPROVE P0.**
+Store raw `_mult_product` on hotset entry; in `decider_run.py` multiply `final_confidence` by `max(product, 0.3)` **before** MIN_EXEC_CONFIDENCE. conf~93×0.3=28→blocked; mixed product 0.55×93=51→passes. Hard-block 0.15 leaves 0.15-0.3 products executing at full conf — too weak. **DELEGATE bug_hunter** (precise spec: compactor write + decider multiply, protected flags untouched).
 
-### Fix Applied
-1. **RATIFY 45da8fcf** trendline_bounce_long confidence boost — 0 trades all-time, boost cannot cause bleed. Monitor 7d: if still 0 trades, blocker is detection not confidence.
-2. **No trading config changes** — best signals already tuned; bleed path is delegated; regime habitats correct.
-3. Regime memory updated with verified PG numbers + signal habitats.
-4. Re-delegated bug_hunter with confirmed hard_max_loss root cause (unleveraged live_pnl).
+**Q2 Fix 5 priority → DEFER 48h until Fix 1 cohort data.**
+PM_TRAIL_ACTIVATE/DISTANCE are CEO_PROTECTED (untouched). TRAILING_ACTIVATION_PCT CEO-set Oct 1. "Giveback" is a trail-distance problem, not activation. Loss/win driven by leveraged −1% price stops — Fix 1 blocking bad entries is the real lever. Don't ship two changes at once.
 
-### Verification
-- 7d PnL **flipped positive** (+$0.31 vs morning −$0.66) — metric moving.
-- Oversold guard metric: **0 entries RSI<25** post-fix — PASS at first checkpoint.
-- Protected flags intact. Pipeline healthy. No param change to reverse.
+**Q3 Fix 4 urgency → DELEGATE bug_hunter live HL fill audit (read-only).**
+PG paper DB does not corroborate $0.156 dust. Audit actual Hyperliquid order fills. If live fills are dust-sized → escalate to P0.
 
-### Goals
-| Metric | Before | Now | Target | Deadline |
-|--------|--------|-----|--------|----------|
-| 7d PnL | −$0.66 | **+$0.31** | +$3.00 | 2026-10-06 |
-| SHORT 7d PnL | −$1.88 | −$1.07 | ≥ $0 | 2026-10-07 |
-| Oversold SHORT RSI<25 | leaking | **0 since guard** | 0 | HOLDING |
-| hard_max_loss 7d | −$7.99 | −$7.99 | −50% | bug_hunter |
-| Hotset approved | intermittent 0 | 0 | sustained >0 | post audit |
-| trendline_bounce_long trades | 0 all-time | 0 | n≥1 in 7d | 2026-10-13 |
-DECISION: E — SHORTs unprofitable across all regimes; blocking prevents further losses in bullish market.
+**Q4 portfolio cap → BACKTEST FIRST, no blind cap.**
+6 correlated LONGs on one BTC flip = real concentration risk. MAX_OPEN_POSITIONS=6 exists; pump-chain capped at 4. **DELEGATE self_learner:** backtest max 2 alt-LONGs in SHORT_BIAS or max 3 same-dir opens/30min. No live cap until numbers exist.
+
+## Shipped now (non-protected, one-liners)
+
+| Fix | File:line | Change |
+|-----|-----------|--------|
+| Fix 2 | `signal_compactor.py:2642` | `_cont_bearish` ema `BELOW` → `BELOW,AT` — POL bear-structure LONG hole closed (mirror bullish AT fix) |
+| Fix 3 | `chop_detector.py:528` | bullish phases + `DECLINING` — aligns chop detector with compactor structural-bull override |
+
+AST parse OK both files. Protected flags verified untouched. Pipeline restart required to load Fix 2/3.
+
+## Measurable goals
+
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| SCORE-FLOOR trades that execute | all at conf 83-99 | 0 (blocked by multiply) | 48h |
+| 7d PnL | −$0.66 (since 10-03) | ≥ $0 | 2026-10-10 |
+| loss/win ratio | 1.35 | ≤ 1.25 | 2026-10-13 |
+| SHORT 7d PnL | −$1.07 | ≥ $0 | 2026-10-07 (standing) |
+| hard_max_loss 7d bleed | −$7.99 (56T) | ≥50% cut | 2026-10-11 (standing) |
+
+## Verification / monitoring
+
+After Fix 1 lands: track blocked-vs-passed cohorts 48h (WR, PnL, avg win/loss). Verify SCORE-FLOOR events now block execution, not just floor ranking. Mixed-signal (product 0.3-0.5) must still execute. Restart pipeline after every commit touching signal paths.
+
+## Sideways finds
+- Dead DEESC block in decider_run.py:3645-3651 (commented out) — Fix 1 supersedes; leave until Fix 1 verified, then delete dead code.
+- Plan "748 SCORE-FLOOR/day" and "1.54 loss/win" were stale — corrected above, direction still valid.
+- IO dust claim needs live HL evidence before any sizing change.
