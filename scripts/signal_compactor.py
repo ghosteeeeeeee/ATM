@@ -619,7 +619,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ema300_breakthrough_long', 'ema300-breakthrough+'):  1.1,  # NEW — 61% WR backtest, reversal LONG
     ('ema300_breakthrough_short', 'ema300-breakthrough-'):  1.2,  # NEW — 80% WR backtest, trend continuation SHORT
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
-    ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.3,  # REVERTED 2026-10-05 CEO — freeze b960ffe8. Was boosted 1.3→1.4 by bbff11f4 during freeze. Post-freeze Oct 6 re-apply: 7d 14T 71.4%WR +$0.31 justifies 1.4.
+    ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.4,  # RE-APPLIED 2026-10-06 00:38Z brain_auditor post-freeze (queue #6). Was 1.3 (reverted freeze b960ffe8). Fresh evidence: 7d 18T 77.8%WR +$0.77 (NORMAL 9T 66.7% +$0.50, HIGH 5T 80% +$0.10, FLAT 4T 100% +$0.17). Boosts winner, blocks nothing.
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
     ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # REVERTED 2026-10-05 signal_reporter — was 1.2 (BOOSTED 10-03 on 24h 10T 70%WR +$0.33). Now 24h 16T 62.5%WR -$0.32 — WR holds but R:R negative (HIGH regime -$0.40 9T). EXTREME still blocked. 7d +$0.18 keep enabled.
     ('pump-chain', 'pump-chain+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 8T 62.5%WR +$0.95 (ME/LDO/ENS/DYDX/GMT). Re-enabled 10-02 post-kill. Static fallback; combo_weights.json is authoritative.
@@ -2876,16 +2876,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass
             # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
-            # bf96d7cd completion 2026-10-03: NO bearish override — oversold = bounce risk even in bear
-            # (77 RSI<40 shorts = 31%WR -$4.66/14d; same data that killed SHORT_RSI_FLOOR override).
-            # Decider blocks all RSI<40 unconditionally — compactor override was dead/confusing path.
+            # FIX 2026-10-06 (post-freeze Fix 1): bear structure override RESTORED.
+            # Same condition as SHORT-RSI-FLOOR: all 3 continuum components agree + score < 30.
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
                 try:
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
                     if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
-                        log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, 22% WR in 14d — no bearish override)")
-                        continue
+                        # Bear structure override check
+                        _pcs_bear_override = False
+                        try:
+                            _pcs_bc = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _pcs_br = _pcs_bc.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position, state_score, ts "
+                                    "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _pcs_bc.close()
+                            if _pcs_br:
+                                _pcs_bp, _pcs_bl, _pcs_be, _pcs_bsc, _pcs_bts = _pcs_br
+                                if _pcs_bts and (time.time() - _pcs_bts) < 600:
+                                    _pcs_bear_override = (
+                                        _pcs_bp in ('DECLINING', 'CALM', 'RECOVERY') and
+                                        _pcs_bl in ('LEAN_BEAR', 'BEAR') and
+                                        _pcs_be == 'BELOW' and
+                                        _pcs_bsc is not None and _pcs_bsc < 30
+                                    )
+                        except Exception:
+                            pass
+                        if _pcs_bear_override:
+                            log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-OVERRIDE] {token} SHORT — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bear structure — oversold = continuation")
+                        else:
+                            log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT, no bearish override)")
+                            continue
                 except ImportError:
                     pass
             # ── pump-chain+ LONG RSI_MIN/MAX filter ─────────────────────────
@@ -3541,10 +3565,35 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Differs from spike filter: runs independently, catches stale signals where
             # RSI was OK at detection but dipped to oversold by execution time.
             # Backtest 7d: blocks 5 losers ($-1.00), 7 tiny winners ($+0.29). Net: +$0.71/7d.
-            # bf96d7cd completion 2026-10-03: NO bearish override — blocks ALL RSI<SHORT_RSI_FLOOR.
-            # Data: 77 RSI<40 shorts = 31%WR -$4.66/14d. Oversold bounces regardless of BTC regime.
-            # (Decider detection+exec already unconditional; this removes the leftover compactor override.)
+            # FIX 2026-10-06 (post-freeze Fix 1): bear structure override RESTORED.
+            # bf96d7cd removed it because "oversold = bounce risk even in bear." But during
+            # CONFIRMED bear trends (all 3 continuum components agree + score < 30), oversold
+            # = dump continuation, not bounce. BANANA lesson applies to chop, not trending bear.
+            # Condition: phase in (DECLINING,CALM,RECOVERY) AND linreg in (LEAN_BEAR,BEAR)
+            # AND ema == BELOW AND score < 30. All 4 must agree.
             if direction == 'SHORT' and SHORT_RSI_FLOOR > 0:
+                # Check BTC bear structure for override
+                _rsf_bear_override = False
+                try:
+                    _rsf_bc = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _rsf_br = _rsf_bc.execute(
+                            "SELECT market_phase, linreg_direction, ema300_position, state_score, ts "
+                            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _rsf_bc.close()
+                    if _rsf_br:
+                        _rsf_bp, _rsf_bl, _rsf_be, _rsf_bsc, _rsf_bts = _rsf_br
+                        if _rsf_bts and (time.time() - _rsf_bts) < 600:
+                            _rsf_bear_override = (
+                                _rsf_bp in ('DECLINING', 'CALM', 'RECOVERY') and
+                                _rsf_bl in ('LEAN_BEAR', 'BEAR') and
+                                _rsf_be == 'BELOW' and
+                                _rsf_bsc is not None and _rsf_bsc < 30
+                            )
+                except Exception:
+                    pass
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -3564,8 +3613,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
                             if _rsf_rsi < SHORT_RSI_FLOOR:
-                                log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold — no bearish override)")
-                                continue
+                                if _rsf_bear_override:
+                                    log(f"  ✅ [SHORT-RSI-FLOOR-OVERRIDE] {tkn}: SHORT RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bear structure ({_rsf_bp}+{_rsf_bl}+{_rsf_be} score={_rsf_bsc:.0f}) — oversold = continuation")
+                                else:
+                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold — no bearish override)")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:
