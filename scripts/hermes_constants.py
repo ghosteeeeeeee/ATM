@@ -2725,6 +2725,7 @@ STANDALONE_BYPASS_SIGNALS = (
     # so near-term impact ~0; closes the hole for future NORMAL slips.
     'bb-squeeze',  # bollinger squeeze breakout — works solo (2026-10-01)
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
+    'tl-bounce',  # trendline bounce — works solo (2026-10-06)
     # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long'). 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
