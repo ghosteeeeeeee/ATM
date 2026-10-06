@@ -4096,3 +4096,11 @@ DB-verified: 3T last hour ALL hard_max_loss LONG HBAR/IO trend-ride+ + TURBO bb-
 CHANGE: none - freeze expired but no trigger fired (kill <3T last hour; streak 2h not 3h; atr_sl_hit 0%; 3/hr not overtrade). Queue#2 entry/regime review now unblocked. IO pnl_usdt=0.00 vs pnl_pct=-3.57 accounting anomaly flagged.
 WATCH: hard_max_loss 12T -$1.66 queue#2 entry quality (LONG into SHORT_BIAS) | 45da8fcf freeze violation still unratified | bb-squeeze+ 13T 7W -$0.49 R:R invert | mtf-regime-trend- 4T 1W -$0.48 queue#6 | signal_versions pump-chain- list corruption minor
 BY: auto_1hr
+[2026-10-06 02:13 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour USELESS trend-ride+ LONG hard_max_loss -$0.12 (MAE 1.0% MFE 0.08%) | 24h 34T ~16W -$1.42 ~47%WR atr_sl_hit 0/34=0% not dominant | hard_max_loss 13T -$1.78 sole loss concentration | open 2 LONG SUPER/POL into SHORT_BIAS 86S/8L/27N
+  NEG-STREAK TRIGGERED: 23h/00h/01h 3 consecutive neg hours — rule = size cut IF NEUTRAL; actual SHORT_BIAS + size already HL floor $11.10 → no action
+  Kill: none (1T last hour; 24h 0%-WR all <3T; mover+ CEO re-enabled 2026-09-22)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  trend-ride+ just modified (BB+momentum 885021c5, ride_it exit 1b6f8f54) — monitor, don't stack
+  WATCH: hard_max_loss queue#2 entry/regime | IO pnl_usdt anomaly | 45da8fcf unratified | bb-squeeze+ R:R invert | mtf-regime-trend- queue#6
+BY: auto_1hr
