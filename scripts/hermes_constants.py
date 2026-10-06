@@ -867,7 +867,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 40           # LOWERED 50→40 (CEO 2026-09-29). 14d: RSI 45-55 SHORT = 26T 69.2%WR +$1.07 (BEST BAND). RSI <40 SHORT = 72T 27.8%WR -$5.34 (losers). Floor at 40 allows the 69% WR sweet spot while blocking deep oversold.
+SHORT_RSI_FLOOR = 45           # RAISED 40→45 (CEO/T 2026-10-06). 30d meta-RSI SHORT: 40-45=37T -$2.28 43.2%WR (BLEED BAND — cut). 45-50=20T -$0.50 50%; 50-55=57T +$0.27 50.9% (only global positive band). EXTREME 55-65=17T +$0.98 64.7% BEST cell. T directive: broader SHORT market but not the 40-45 losers. Prior40 came from stale 14d claim (26T 69%WR) — current 30d does not reproduce it.
 SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
 SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocked — NO bear exemption. RSI 65-75 SHORT: bear-structure-gated exemption only (overbought+pump in bear = short per philosophy). DYDX RSI=75.3 blocked by this.
 # Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:
@@ -1337,7 +1337,7 @@ PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers
 
 # pump-chain- SHORT entry quality (replaced dead hours)
 PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
-PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI bands: 25-30=2T 0%WR -$0.17, 35-40=3T 0%WR -$0.50 (both losing). 40-45=8T 75%WR +$0.47 (SWEET SPOT preserved). Blocks confirmed losers, keeps edge. Was 25 (brain_auditor Sep 30).
+PUMP_CHAIN_SHORT_RSI_MIN = 45        # CEO/T 2026-10-06: raised 40→45, align SHORT_RSI_FLOOR. 30d EXTREME pump-chain- meta-RSI: 40-45=15T -$0.35 53.3%WR (neg PnL); 45-50=7T +$0.13 57.1%; 55-65=7T +$0.76 71.4% (best). Old "40-45=75%WR" was stale 14d. Blocks confirmed 40-45 bleed, keeps 45+ edge.
 
 # ── SHORT Continuum Phase Filter ─────────────────────────────────────────────
 # plans/continuum-filter-analysis.md 2026-10-01 — 338T/14d
@@ -1345,7 +1345,7 @@ PUMP_CHAIN_SHORT_RSI_MIN = 40        # CEO 2026-10-01: raised 25→40. 14d RSI b
 # neutral (score 10-30, z=NEUTRAL) 22T 40.9% -$0.61 (worst); other 88T 38.6% -$3.91.
 # Block SHORT when score>10 AND z!=STRONG_NEG — only allow SHORT in extreme bearish / low score.
 SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
-SHORT_CONTINUUM_SCORE_MAX = 30         # CEO 2026-10-02 REVERT: working-tree 40 undocumented, SHORT_CONTINUUM monitor window active at 30. Data: score 10-30 = breakeven noise; bear-structure bypass (SHORT-NEUTRAL-BYPASS + pump-chain RSI override) already live via Fix1/Fix2. Revisit 40 only with 24h post-Fix2 SHORT data.
+SHORT_CONTINUUM_SCORE_MAX = 40         # CEO/T 2026-10-06: raised 30→40 — documented revisit path, T directive broader SHORT market. 14.6k SHORT-CONTINUUM blocks in pipeline.log; BTC score currently 39-50 z=NEUTRAL mass-blocking. score<=40 now allowed regardless of z; >40 still needs z=STRONG_NEG. Keep SHORT_NEUTRAL_BLOCK. 48h monitor new SHORT volume + hard_max_loss interaction.
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 SHORT_CONTINUUM_TOKEN_Z_ENABLED = False  # DISABLED 2026-10-01 — avg_z has no live writer, reads 4-month-old stale data (bug_hunter HIGH)
 

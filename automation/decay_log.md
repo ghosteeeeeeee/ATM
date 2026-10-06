@@ -1499,3 +1499,7 @@
 [2026-10-06 11:08 UTC]   🟢 OK: bb-squeeze+: 6 trades, 50.0% WR, PnL=-1.9
 [2026-10-06 11:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-06 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-06 17:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-06 17:08 UTC]   🟢 OK: trend-ride+: 7 trades, 42.9% WR, PnL=-3.57
+[2026-10-06 17:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-06 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

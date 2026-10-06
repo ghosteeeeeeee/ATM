@@ -307,7 +307,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
     ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
-    ('EXTREME', 'pump_chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor — MoE model A habitat. 30d EXTREME RSI>=40: 18T +$0.96 72.2%WR (ONLY profitable SHORT cell). 0.0 block used 24h 5T mixed-oversold sample; RSI floors (>=40) are the oversold defense. HIGH stays blocked.
+    ('EXTREME', 'pump_chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor, reconfirmed 2026-10-06 CEO/T. EXTREME 55-65 meta-RSI 17T +$0.98 64.7%WR BEST cell. RSI_FLOOR=45 now cuts40-45 bleed. HIGH also opened 2026-10-06 (see HIGH overrides). Oversold blocked by RSI floors.
     ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -322,7 +322,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
     ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
-    ('EXTREME', 'pump-chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor — hyphen variant. MoE habitat EXTREME+RSI>=40: 30d 18T +$0.96 72.2%WR. HIGH remains blocked (26T -$0.36). Oversold blocked by RSI floors not regime kill.
+    ('EXTREME', 'pump-chain-'): 1.0,             # ALLOWED 2026-10-04 brain_auditor, reconfirmed 2026-10-06 — hyphen variant. EXTREME 55-65 meta-RSI best SHORT cell. HIGH opened same day via HIGH overrides. Oversold blocked by RSI floors not regime kill.
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
@@ -349,6 +349,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'bb_bounce_v3_long'): 0.0,        # underscore form (signal_type in signals DB)
     ('NORMAL', 'mtf-regime-trend-'): 0.0,        # BLOCKED CEO 2026-10-06 — NORMAL 30d 2T 50%WR -$0.25; 7d overall SHORT bleeding. Habitat kept in HIGH.
     ('NORMAL', 'mtf_regime_trend_short'): 0.0,   # underscore form
+    ('NORMAL', 'trend-ride'): 0.0,               # BLOCKED 2026-10-06 signal_reporter — backtest NORMAL 79T 45.6%WR -$1.38 no edge; 24h 7T 42.9%WR -$0.18. EXTREME habitat kept (58.6%WR +$5.69).
+    ('NORMAL', 'trend_ride'): 0.0,               # underscore form (signal_type 'trend_ride_long')
     # ── NORMAL: bleeding signals (30d cross-tab) ──
     ('NORMAL', 'ema300_dip_short'): 0.3,         # PENALIZED — 30d NORMAL: 12T -$0.84. Bleeds BOTH regimes.
     ('NORMAL', 'ema300_dip'): 0.3,               # PENALIZED — 30d NORMAL: 27T -$0.55. 64% WR but exits bleed (atr_sl_hit -$1.18, cut-loser -$1.07).
@@ -378,8 +380,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'mover-'): 1.0,                     # OK 2026-09-22 — 66.7% WR, +$0.26 (3T)
     ('HIGH', 'pump_chain+'): 0.0,                # BLOCKED 2026-09-22 — 37% WR (27T) in HIGH
     ('HIGH', 'pump-chain+'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain+
-    ('HIGH', 'pump_chain-'): 0.0,                # BLOCKED 2026-09-22 — 48% WR (25T) in HIGH
-    ('HIGH', 'pump-chain-'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain-
+    ('HIGH', 'pump_chain-'): 1.0,                # ALLOWED 2026-10-06 CEO/T — was 0.0 block citing stale "48%WR HIGH". 30d meta-RSI HIGH: 50-55=20T +$0.59 55%WR (ONLY profitable HIGH band); 40-45=7T 14.3%WR cut by SHORT_RSI_FLOOR=45. PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED already False. Monitor48h.
+    ('HIGH', 'pump-chain-'): 1.0,                # hyphen variant — same as underscore
     ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH
     ('HIGH', 'pump-chain'): 1.0,                 # OK — bare form fallback
     ('HIGH', 'bb-bounce-v3-long'): 1.0,          # OK 2026-10-04 signal_reporter — HIGH 5T 60%WR +$0.08 (7d 4T 75%WR +$0.10). Overrides family Bollinger HIGH=0.0 block (stale v1/v2 data).
@@ -388,6 +390,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'mtf_regime_trend_short'): 0.0,     # underscore form
     ('HIGH', 'accel-300-'): 0.0,                # BLOCKED 2026-10-01 — accel-300- SHORT HIGH 0%WR -$0.31 (4T). NORMAL 75%WR. signal_reporter
     ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
+    ('HIGH', 'trend-ride'): 0.0,                # BLOCKED 2026-10-06 signal_reporter — backtest HIGH 91T 51.6%WR -$2.38 no edge; 24h 7T 42.9%WR -$0.18. EXTREME 58.6%WR kept via Momentum family (no EXTREME block).
+    ('HIGH', 'trend_ride'): 0.0,                # underscore form (signal_type 'trend_ride_long' in trades DB)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH (legacy underscore form)
     ('HIGH', 'pullback-entry-'): 1.0,            # OK — 30d HIGH: 58T +$0.43. Works in HIGH, bleeds NORMAL.

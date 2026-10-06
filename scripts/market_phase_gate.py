@@ -32,7 +32,12 @@ _PHASE_CACHE_TTL = 300  # 5 min cache
 
 # ── Signal family definitions ─────────────────────────────────────────────────
 FAMILY_MAP = {
-    'Momentum': ['momentum', 'fast_momentum', 'mtf_momentum', 'velocity', 'phase_accel'],
+    'Momentum': ['momentum', 'fast_momentum', 'mtf_momentum', 'velocity', 'phase_accel',
+                 # trend-ride+ added 2026-10-06 signal_reporter — was 'Other' (ungated).
+                 # Backtest hermes_constants.py: EXTREME 99T 58.6%WR +$5.69 (keep);
+                 # HIGH 91T 51.6%WR -$2.38 / NORMAL 79T 45.6%WR -$1.38 (no edge → gated).
+                 # NORMAL inherits ('NORMAL','*')['Momentum']=0.0; HIGH explicit 0.0 in v2.
+                 'trend-ride', 'trend-ride+', 'trend_ride', 'trend_ride_long'],
     'MACD': ['hmacd', 'macd_accel', 'macd_1m', 'mtf_macd', 'macd_divergence_short', 'macd_divergence_long'],
     'Bollinger': ['bb_bounce', 'bb_bounce_short', 'bb-bounce-v2-long', 'bb-bounce-v3-long',
                    'bbbouncev2long', 'bbbouncev3long',

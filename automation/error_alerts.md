@@ -970,3 +970,29 @@
 ## Error Alerts — 2026-10-06 15:59 UTC
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — MOMENTUM`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-06 16:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] TOK TOK BLOCKED — exec TOK unavailable (TOK-closed, SHORT_RSI_HARD_FLOOR)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: exec TOK unavailable for TOK (TOK-closed)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-06 17:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2411s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-10-06 18:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-06 19:49 UTC
+- **WARN** (85%): Disk usage at threshold — coin_tracker.db 3.5G, candles.db 2.7G, mtf_macd_tuner.db 1.3G, session_brain.db 1G, signals_hermes.db 986M. No logs >7d to gzip. CEO DB-pruning decision still open (recurring since Oct 1).
+- **INFO**: Pipeline OK — running every 1m, rc=0, position_manager clean (1 open IO SHORT +0.32%, 16 closed today -21.43% PnL). All key timers active (price-collector, 1m-candle, pipeline, health-monitor) fired <2min ago. Prices fresh (85 tokens, price_history ts=19:47 UTC). Regime SHORT_BIAS (7L/78S/37N). 1m candle filled=0 is BY DESIGN (MIN_BARS_FOR_CLOSED=3, ~155s tick spacing — price_collector is primary OHLC source). BTC-CRASH BLOCKED on ADA SHORT = safety filter working. 1 outcome last hour (DOGE SHORT win +$0.08).
+- **AUTO-FIX**: None required — no crashes, no stuck locks, timers all firing. Log compression skipped (nothing >7d old).
+- **SIDE FINDINGS**: (1) error_alerts.md historical entries heavily redacted (TOK placeholders) — sanitization over-redaction, alert history unreadable. (2) Open IO trade confidence=211.1 (>100%) — data anomaly in signal confidence field. (3) signals table has 25310 rows — possible unbounded growth despite signal-purge timer.
+
+## Error Alerts — 2026-10-06 19:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — BTC_LEVEL`

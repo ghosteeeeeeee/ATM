@@ -1,56 +1,69 @@
 # Signal Performance Report
-**Generated:** 2026-10-06 11:12 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-06 17:03 UTC | **Period:** Last 6h + 24h
+
+## Overall Stats
+- **Total trades (all time):** 2,900 | **WR:** 52.3% | **PnL:** -113.67%
+- **Date range:** 2026-07-29 → 2026-10-06
 
 ---
 
-## Actions Executed
+## WINNERS (WR > 55%, PnL > 0)
 
-**KILLED (executed):** None
-**BOOSTED (executed):** None
-
-Kill criteria not met by any signal:
-- `bb-squeeze+` LONG: 6 trades, 50.0% WR, -$0.23 — WR not <30%
-- `trend-ride+` LONG: 7 trades, 42.9% WR, -$0.18 — WR not <30%, active <24h
+None found.
 
 ---
 
-## 24h Performance (verified, live DB)
+## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | Trades | WR | PnL | Verdict |
-|--------|-----|--------|-----|-----|---------|
-| bb-squeeze+ | LONG | 6 | 50.0% | -$0.23 | Watch |
-| trend-ride+ | LONG | 7 | 42.9% | -$0.18 | Watch |
-| pump-chain- | SHORT | 2 | 50.0% | -$0.19 | Too few trades |
-| volume-breakout-long+ | LONG | 1 | 0.0% | -$0.27 | Too few trades |
-| btc-pump-rider+ | LONG | 1 | 0.0% | -$0.15 | Too few trades |
-| mover+ | LONG | 1 | 0.0% | -$0.14 | Too few trades |
-| bb-bounce-v2-long+ | LONG | 2 | 50.0% | -$0.09 | Too few trades |
-| continuum_engine | LONG | 1 | 0.0% | $0.00 | Too few trades |
-| doji-bottom-long | LONG | 1 | 100.0% | $0.12 | Too few trades |
-
-## 6h Performance (verified, live DB)
-
-Only two closed trades total:
-- `pump-chain-` SHORT: 1 trade, -$0.25
-- `bb-squeeze+` LONG: 1 trade, -$0.13
-
-No signal had ≥2 trades in 6h — nothing actionable.
+None found.
 
 ---
 
-## LOSERS (watch list)
+## MARGINAL (30-50% WR)
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 50.0% (24h) / 63.4% (72h) | -$0.23 (24h) / -$0.18 (72h) | 6 / 41 | Watch — 72h WR healthy; loss driven by exits not entries. NORMAL regime 7d: 66.7% WR, +$0.25. HIGH 61.5% WR but -$0.15, EXTREME 50% WR -$0.15 — if losses continue, gate EXTREME regime via volatility_gate_v2.py, do NOT kill. |
-| trend-ride+ | LONG | 42.9% | -$0.18 | 7 | Watch — first trade ever 2026-10-05 22:10 (~13h old). Not active >24h, too early to kill. Only HIGH regime data (3 trades, 33.3% WR, -$0.01). |
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| trend-ride+ | LONG | 7 | 42.9% | -3.57 | ❓ | Borderline |
+| mover+ | LONG | 2 | 50.0% | -0.37 | ENABLED | Needs more data |
 
-## WINNERS
+---
 
-None in 24h. No signal met boost criteria (WR >55% with 5+ trades AND PnL > +$0.05).
+## DISABLED BUT GOOD (candidates for re-enabling)
 
-## ISSUES
+None found. Top performers are already enabled.
 
-- No direction inversions found in last 24h (0 mismatches between signal name direction and trade direction).
-- Low trade volume overall in 6h (2 closed trades) — sample too small for regime-gated actions.
-- `bb-squeeze+` LONG high-WR-but-negative-PnL pattern (63.4% WR over 72h with -$0.18) suggests exit quality / R:R problem rather than signal quality. Candidate for exit-side review, not a kill.
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] trend-ride+ LONG** — WR=42.9%, PnL=-3.57% over 7 trades. Monitor next cycle.
+2. **[WATCH] mover+ LONG** — WR=50.0%, PnL=-0.37% over 2 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-10-06 | 61bec3b | fix: bypass gaps + _is_ride_it over-match (own-conclusions f... |
+| 2026-10-06 | 26d3c99 | orchestrator: post-freeze queue 2026-10-06 — FAMILY_MAP unde... |
+| 2026-10-06 | bd1728f | signals: kill mtf-regime-trend- SHORT — 0% WR, $-0.53 (24h) ... |
+| 2026-10-06 | 5b62627 | Config: add tl-bounce to STANDALONE_BYPASS_SIGNALS |
+| 2026-10-06 | 885021c | signals: trend_ride_long — add BB position + momentum filter... |
+| 2026-10-06 | 1b6f8f5 | fix: ride_it exit bugs — ATR off-by-one, SL widen, overlay c... |
+| 2026-10-05 | 9dde1ca | signals: trend_ride+ mapped to ride_it exit — let trends run |
+| 2026-10-05 | 800d5e8 | signals: trend_ride_long tightened — RSI 50-65, ATR>=0.10, 1... |
+| 2026-10-05 | c285e79 | signals: trend_ride_long — bypass list bare form + chop over... |
+| 2026-10-05 | db536b0 | signals: trend_ride_long LIVE — enable flags + standalone by... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

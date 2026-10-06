@@ -1,4 +1,39 @@
-# Current State — CEO Run 22:00 UTC (Fix 1 live, 0 config changes)
+# Current State — CEO Run 22:30 UTC (T SHORT broadening LIVE)
+
+**Last Updated: 2026-10-06 22:30 UTC**
+**Updated by: CEO — T directive: broaden SHORT market**
+
+## CEO RUN 22:30 UTC — 3 TRADING CONFIG CHANGES (T DIRECTIVE)
+
+**T asked to broaden SHORT market. Data-driven decisions (meta-RSI 30d PG-verified):**
+- SHORT_RSI_FLOOR **40→45** (40-45 band 37T −$2.28 43.2% cut)
+- PUMP_CHAIN_SHORT_RSI_MIN **40→45** (align floor)
+- SHORT_CONTINUUM_SCORE_MAX **30→40** (14.6k blocks; BTC score 39-50 z=NEUTRAL mass-block)
+- volatility_gate HIGH pump_chain- **0.0→1.0** (HIGH 50-55 = only positive HIGH band +$0.59 55%)
+- KEPT: SHORT_NEUTRAL_BLOCK, RSI_CEILING 65, HARD_FLOOR 25, continuum filter ON
+- Protected flags verified intact
+
+**T's claimed cells NOT reproduced on current 30d meta-RSI** — used live DB (see ceo_report.md).
+
+**Verified PG 22:30:** 24h 16T −$0.49 43.8% | 7d SHORT −$1.85/39T 41.0% | hard_max_loss 7d SHORT 17T 0%WR −$2.23 still #1.
+
+### DECISIONS THIS RUN
+1. Broaden SHORT per T — floor 45, HIGH opened for pump-chain-, continuum 40.
+2. 48h monitor: SHORT volume, continuum 30-40 WR, HIGH 40-45 leak, hard_max_loss interaction.
+3. bug_hunter #1 (hard_max_loss leverage-aware) remains critical path for SHORT 7d ≥$0.
+4. signal_analyst: if continuum 30-40 shows edge, snapshot + build HIGH 50-55 confluence partner.
+
+### GOALS (updated Oct 6 22:30)
+| Metric | Current | Target | Deadline | Status |
+|--------|---------|--------|----------|--------|
+| SHORT 7d PnL | −$1.85 | ≥$0 | Oct 7 | AT RISK — needs hard_max_loss fix + new SHORT volume |
+| SHORT-CONTINUUM blocks | mass (score>30) | down | 48h | New SCORE_MAX=40 live |
+| HIGH pump-chain- trades | 0 (blocked) | n>0 RSI≥45 | 48h | Gate opened |
+| hard_max_loss SHORT 7d | 17T 0%WR −$2.23 | ≥50% cut | Oct 11 | Open (bug_hunter #1) |
+| New signals this week | 0 | ≥1 | Oct 10 | signal_analyst overdue |
+| 24h PnL | −$0.49 | ≥$0 | next run | Monitor |
+
+## PRIOR STATE (22:00 UTC — pre-T-directive)
 
 **Last Updated: 2026-10-06 22:00 UTC**
 **Updated by: CEO — DB-verified run post Fix 1 ship**
@@ -114,4 +149,3 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 - signal_versions.json pump-chain- legacy list → standard dict.
 - PG 24h: 15T 6W 8L −$0.59 | 1 open | hard_max_loss 9T −$1.09 sole bleed | atr_sl_hit 0%.
 - Protected flags intact. Full detail: automation/trading_log.md.
-
