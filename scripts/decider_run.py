@@ -1894,6 +1894,13 @@ def execute_trade(token, direction, price, confidence, source,
         # from arbitrarily old candles (HYPER SHORT lesson: 900s threshold).
         from rsi_utils import compute_rsi
         _exec_rsi = compute_rsi(token, tf='5m', max_age_s=900)
+        # FIX 2026-10-06: fall back to 1m RSI when 5m candles are stale.
+        # 5m candles age faster than 1m (fewer updates per token in seeder cycle).
+        # BABY: 5m=1015s stale, 1m=775s fresh — 1m fallback unblocks execution.
+        if _exec_rsi is None:
+            _exec_rsi = compute_rsi(token, tf='1m', max_age_s=900)
+            if _exec_rsi is not None:
+                log(f'  ℹ️ [EXEC-RSI] {token}: 5m stale, using 1m fallback RSI={_exec_rsi:.1f}')
         # FIX 2026-10-05 CEO: fail-closed — missing exec RSI must not skip SHORT hard floor.
         # Wrapping everything in `if _exec_rsi is not None` let oversold SHORTs through when 5m data stale/absent.
         if _exec_rsi is None and direction.upper() == 'SHORT':
