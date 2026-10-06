@@ -4574,3 +4574,29 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-06 08:11] auto_1hr: NO CHANGE — 0T last hour (03-08h quiet); atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
 BY: auto_1hr
+
+## [2026-10-06 09:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: 0T last hour; 24h 0%-WR signals all ≤1T (mover+, mtf-regime-trend-, volume-breakout-long+, btc-pump-rider+) — none kill-eligible
+- Overtrade: 0/hr (quiet 03-09h, 6 consecutive hours 0 closes)
+- atr_sl_hit: 0/22=0% 24h — tpsl fix stable, not dominant
+- hard_max_loss still sole 24h bleed: 9T -$0.94 avg -$0.104 (queue#2 leverage-aware semantics, not re-touched)
+- REGIME: LONG_BIAS (15m) ≠ NEUTRAL → NEG-STREAK size-reduction path not active; no trades anyway
+- Signal quality 24h: trend-ride+ 7T 3W -$0.18, bb-squeeze+ 6T 3W -$0.23 (not kill-eligible); volume-breakout-long+ 1T -$0.27, mover+ 1T -$0.14, btc-pump-rider+ 1T -$0.15, mtf-regime-trend- 1T -$0.10 (all ≤1T)
+- 24h total: 22T 9W 11L 2flat -$1.06 (~45% WR non-flat) — consistent with 08:11 snapshot, no deterioration
+- Open: 1 LTC pump-chain- SHORT (vs LONG_BIAS flip + RSI 9.9 oversold-entry pattern — watchdog flagged, no action from auto_1hr)
+
+**Open Questions:**
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- hard_max_loss entry/regime bleed — bug_hunter queue (leverage-aware semantics), not re-touched
+- Trading quiet 03-09h — 0 closes 6 consecutive hours; monitor if regime-driven under-filtering
+- LTC SHORT regime-misaligned open — close or breakeven-stop decision belongs to watchdog/CEO, not auto_1hr
+
+## TEAM UPDATES
+- [2026-10-06 09:11] auto_1hr: NO CHANGE — 0T last hour (03-09h quiet); atr_sl_hit 0%; hard_max_loss bleed unchanged; regime LONG_BIAS ≠ NEUTRAL
