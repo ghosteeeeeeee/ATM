@@ -1846,6 +1846,7 @@ NEVER_REENABLE_FLAGS = {
     # PUMP_FLOW_MINUS_ENABLED — RE-ENABLED 2026-09-22 (CEO)
     # PUMP_FLOW_PLUS_ENABLED — RE-ENABLED 2026-09-22 (CEO)
     'PUMP_CHAIN_V4_ENABLED',       # SIGNAL REPORTER 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
+    'MTF_REGIME_TREND_MINUS_ENABLED',  # SIGNAL REPORTER 2026-10-06 — 24h 3T 0%WR -$0.53, 7d 5T 40%WR -$0.42. ALL regimes 0.0 in vol gate. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -4321,7 +4322,7 @@ TVS_MIN_CONFIDENCE_FOR_OVERRIDE = 80  # min signal confidence to allow cooldown 
 # Spec: plans/mtf-regime-trend-signal-spec.md
 MTF_REGIME_TREND_ENABLED = True
 MTF_REGIME_TREND_PLUS_ENABLED = False  # KILLED auto_1hr 2026-10-02 15:11 — 4T 0%WR -$0.70 last hour (hard_sl/hard_max_loss). 48h 7T 3W -$0.41. Flip from 3W +$0.29 prior hour.
-MTF_REGIME_TREND_MINUS_ENABLED = True
+MTF_REGIME_TREND_MINUS_ENABLED = False  # SIGNAL REPORTER 2026-10-06 — 24h 3T 0%WR -$0.53, 7d 5T 40%WR -$0.42. All regimes already 0.0 in vol gate (CEO 2026-10-06). Flag False matches regime blocks. NEVER_REENABLE.
 
 MTF_REGIME_TREND_SLOPE_THRESHOLD = 0.5    # min 4h slope % for trend confirmation
 MTF_REGIME_TREND_PULLBACK_PCT = 0.1       # min 1m pullback % from recent high/low (lowered from 0.2)
