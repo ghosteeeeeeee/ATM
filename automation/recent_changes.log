@@ -4193,3 +4193,11 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | 15m/5m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format | AVAX/ENS open trades
 BY: auto_1hr
+[2026-10-06 16:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 2T last hour 2W +$0.11 (ENS oversold-bounce+ +$0.01, AVAX mover+ +$0.10, both profit-monster-trail) | 0 open | 24h 15T 6W 8L 1flat -$0.79 | atr_sl_hit 0/15=0% (tpsl_utils.py deployed, fix stable) | hard_max_loss 9T -$1.09 sole loss concentration | profit-monster-trail 6T +$0.30 only positive exit
+  Entry quality: 24h winners avg MAE 0.022% (<0.5%) — OK
+  NEG-STREAK: n/a — last hour avg +$0.055 positive; quiet prior hours → 3+ consecutive negative hours not met
+  Kill: none (0T kill-eligible; 24h 0%-WR all ≤1T)
+  Overtrade: 2/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss queue#2 leverage-aware | 15m vs 4h regime split | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
+BY: auto_1hr

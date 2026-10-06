@@ -4771,3 +4771,33 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-06 15:17] auto_1hr: NO CHANGE — 0T last hour; atr_sl_hit 0%; hard_max_loss bleed unchanged (9T -$1.09); regime 5m flipped to NEUTRAL (20L/18S/85N) but NEG-STREAK path not active (1 close/8h); kill/overtrade paths not active; 2 open (AVAX +1.15% trailing SL locked above entry, ENS +0.24%)
+
+## [2026-10-06 16:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.11 (WR: 100%)
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Last hour (15:12-16:12): 2T closed — trading resumed after quiet stretch
+  - ENS oversold-bounce+ LONG +$0.01 (+0.40%) via profit-monster-trail
+  - AVAX mover+ LONG +$0.10 (+4.41%) via profit-monster-trail
+- 0 open trades now — both prior opens (AVAX/ENS) closed as winners
+- 24h: 15T 6W 8L 1flat -$0.79 — hard_max_loss 9T -$1.09 sole bleed; profit-monster-trail 6T +$0.30 only positive exit
+- Kill: none — 0T kill-eligible last hour; 24h 0%-WR all ≤1T (pump-chain- 1T -$0.25, bb-squeeze+ 4T 1W, trend-ride+ 7T 3W)
+- Overtrade: 2/hr — fine
+- atr_sl_hit: 0/15=0% 24h — tpsl_utils.py present (49KB, deployed), fix stable, not dominant
+- NEG-STREAK: last hour avg +$0.055 (positive); prior hours quiet (0-1 closes/8h) → 3+ consecutive negative-close hours NOT met → size path inactive
+- Entry quality: 24h winners avg MAE 0.022% (<0.5% threshold) — OK; last hour MAE columns NULL (not populated on recent trail exits, not a bug)
+- REGIME: last logged 5m NEUTRAL (20L/18S/85N @ 15:00) — not consulted further this hour since no size path active
+- signal_versions.json parses OK (18 keys); pump-chain- still legacy list format (known); no constants change this hour → no version audit entry needed
+
+**Open Questions:**
+- hard_max_loss entry/regime bleed — bug_hunter queue#2 (leverage-aware semantics), not re-touched
+- 15m/5m vs 4h regime split — which regime gates signals? Systems check when not in auto_1hr mode
+- hotset empty intermittent (06:07-06:31) still open — deep audit delegated 06:40
+- signal_versions.json pump-chain- legacy format still unfixed (no constants change this hour)
+
+## TEAM UPDATES
+- [2026-10-06 16:12] auto_1hr: NO CHANGE — 2T last hour both winners +$0.11 (ENS oversold-bounce+ / AVAX mover+ via profit-monster-trail); 0 open; atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09); NEG-STREAK path not active (positive hour); kill/overtrade paths not active
