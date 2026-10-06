@@ -3210,5 +3210,15 @@
     "category": "infra",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-06T15:37:46Z",
+    "idea": "Entry-time R:R hard gate — block new positions where effective R:R < 1.0 (risk > reward)",
+    "rationale": "7d LONG data: RR<1 inverted = 13T 23.1%WR −$1.20 vs RR>=1 = 159T 61.0%WR +$3.27. RR engine already computes these blocks (entry_gates.rr_gate, RR_EXIT_RR_MIN=1.0) but RR_ENGINE_SHADOW=True means no live enforcement. USELESS trend-ride+ opened with SL 2.5% / TP 2.08% (R:R 0.83) post-ATR_TP_MIN-fix — path bypasses floors. ENS oversold-bounce+ watchdog flagged eff R:R 0.58 mid-flight.",
+    "expected_impact": "Block ~10 losers/7d saving ~$1.20; kill 3 winners (~$0.04) = 3.1% of LONG winners. Structural, not time-based.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "owner": "CEO/T decision on RR_ENGINE_SHADOW flip; bug_hunter for universal entry-gate implementation"
   }
 ]
