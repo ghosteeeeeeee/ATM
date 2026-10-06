@@ -5043,3 +5043,33 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-06 22:12] auto_1hr: NO CHANGE — 1T last hour (IO pump-chain- SHORT -$0.12 hard_max_loss); atr_sl_hit 0%; no kill/overtrade/streak triggers; hard_max_loss 9T -$1.07 remains sole 24h bleed (queue#2 open)
+
+## [2026-10-06 23:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Open:** 1 — LTC pump-chain- SHORT @69.315 (from 20:07, SL 69.227 / TP 67.392)
+**24h:** 13 closed | hard_max_loss 8T -$0.96 (sole negative exit) | profit-monster-trail 4T +$0.35 | rr_engine_resistance_break 1T +$0.08
+**24h by signal:** trend-ride+ LONG 5T 1W -$0.33 | pump-chain- SHORT 3T 1W -$0.29 | bb-squeeze+ LONG 2T 0W -$0.25 | oversold-bounce+ LONG 2T 2W +$0.24 | mover+ LONG 1T 1W +$0.10
+**Hourly streak:** 21:00 -$0.12 | 19:00 +$0.08 | 17:00 +$0.23 | 15:00 +$0.11 — 1 negative hour only, NEG-STREAK not active
+**atr_sl_hit:** 0/13 = 0% — tpsl_utils.py fix stable
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — 0T last hour; 24h 0%-WR signals all ≤2T (bb-squeeze+ 2T) or have wins (trend-ride+ 1W, pump-chain- 1W) — not kill-eligible
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: not active (1 consecutive negative hour; 15/17/19 all positive)
+- hard_max_loss: 8/13 = 62% of 24h closes still sole bleed -$0.96 — queue#2 leverage-aware semantics still open, not a constants change this hour
+- signal_versions.json parses OK (18 signals); no constants edit → no version audit entry needed
+
+**Open Questions:**
+- LTC pump-chain- SHORT still open since 20:07 (~3h) — stop69.227 is BELOW entry 69.315 for a SHORT (inverted SL column vs direction); verify how position_manager interprets stop_loss for shorts — possible data/model mismatch worth bug_hunter
+- hard_max_loss ~62% of closes persists — if another 24h at this rate, demand queue#2 or SL structure review
+- trend-ride+ 5T 1W -$0.33 worst 24h signal — monitor; kill-eligible only if 0% WR + 3+T cluster in one last hour
+- bb-squeeze+ 2T 0W -$0.25 — continues weak streak from prior days, still under kill threshold
+
+## TEAM UPDATES
+- [2026-10-06 23:12] auto_1hr: NO CHANGE — 0T last hour; 1 open LTC pump-chain- SHORT (SL column below entry for SHORT — flagged); atr_sl_hit 0%; hard_max_loss 8T -$0.96 sole 24h bleed (queue#2 open); NEG-STREAK not active (1 neg hour); kill/overtrade paths not active; bb-squeeze+/trend-ride+ not last-hour-kill-eligible

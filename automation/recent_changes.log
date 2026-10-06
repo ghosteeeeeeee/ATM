@@ -4231,3 +4231,9 @@ BY: auto_1hr
   Overtrade: 1/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 60% of closes (9/15) queue#2 leverage-aware | IO post-pump SHORT entry timing | LTC open SHORT pattern | signal_versions.json pump-chain- legacy format
 BY: auto_1hr
+[2026-10-06 23:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 1 open LTC pump-chain- SHORT @69.315 from 20:07 | 24h 13T hard_max_loss 8T -$0.96 sole bleed | profit-monster-trail 4T +$0.35 | rr_engine 1T +$0.08 | atr_sl_hit 0/13=0% (tpsl fix stable) | hourly 21:00 -$0.12 only 1 negative hour (streak inactive) | 15:00/17:00/19:00 positive
+  Kill: none (0T last hour; 24h 0%-WR all ≤2T or have wins)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 62% of closes (8/13) queue#2 leverage-aware | LTC SHORT stop_loss column below entry (inverted vs direction — bug_hunter candidate) | trend-ride+ 5T 1W -$0.33 monitor | bb-squeeze+ 2T 0W -$0.25 under threshold
+BY: auto_1hr
