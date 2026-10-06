@@ -5014,3 +5014,32 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-06 21:12] auto_1hr: NO CHANGE — 0T last hour; 2 open pump-chain- SHORTs (IO flat, LTC +0.33%); atr_sl_hit 0%; hard_max_loss unchanged (9T -$1.09 sole bleed); NEG-STREAK not active (3 consecutive positive hours); kill/overtrade paths not active; bb-squeeze+ not last-hour-kill-eligible
+
+## [2026-10-06 22:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.12 (WR: 0%)
+
+**Last hour:** IO pump-chain- SHORT @0.17154 — hard_max_loss -$0.12 (-3.15%). Opened 19:25, closed 21:32 (2h07m).
+**Open:** 1 — LTC pump-chain- SHORT @69.315 (from 20:07)
+**24h:** 15 closed | hard_max_loss 9T -$1.07 (sole negative exit) | profit-monster-trail 5T +$0.45 | rr_engine_resistance_break 1T +$0.08
+**Hourly streak:** 21:00 -$0.12 | 19:00 +$0.08 | 17:00 +$0.23 | 15:00 +$0.11 — 1 negative hour only, NEG-STREAK not active
+**atr_sl_hit:** 0/15 = 0% — tpsl_utils.py fix stable
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — pump-chain- 1T in last hour (not 3+); bb-squeeze+ 3T 0W 24h but trades not clustered in last hour
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action
+- NEG-STREAK: not active (1 consecutive negative hour)
+- hard_max_loss: 9T -$1.07 still sole bleed — leverage-aware semantics remain in bug_hunter queue#2, not a constants change this hour
+- signal_versions.json untouched — no constants edit
+
+**Open Questions:**
+- IO pattern: SHORT entered 19:25 after pump-chain- SHORTs LTC/IO opened ~20:07 (prior cycle); IO reversed up and hit hard_max_loss — entry timing after pump exhaustion?
+- hard_max_loss 9/15 closes = 60% of all closes — if this persists another 24h, demand queue#2 fix or SL widening review
+- LTC open SHORT — watch if same hard_max_loss reversal pattern repeats
+
+## TEAM UPDATES
+- [2026-10-06 22:12] auto_1hr: NO CHANGE — 1T last hour (IO pump-chain- SHORT -$0.12 hard_max_loss); atr_sl_hit 0%; no kill/overtrade/streak triggers; hard_max_loss 9T -$1.07 remains sole 24h bleed (queue#2 open)

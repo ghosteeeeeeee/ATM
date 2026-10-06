@@ -4225,3 +4225,9 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss queue#2 leverage-aware | bb-squeeze+ 3T 0W 24h monitor | LTC pump-chain- SHORT open +0.33% | regime_state table missing in brain PG | hotset empty intermittent audit | signal_versions.json pump-chain- legacy format
 BY: auto_1hr
+[2026-10-06 22:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour (IO pump-chain- SHORT -$0.12 hard_max_loss, opened 19:25 closed 21:32) | 1 open LTC pump-chain- SHORT @69.315 | 24h 15T hard_max_loss 9T -$1.07 sole bleed | profit-monster-trail 5T +$0.45 | atr_sl_hit 0/15=0% | hourly 21:00 -$0.12 only 1 negative hour (streak inactive) | 15:00/17:00/19:00 all positive
+  Kill: none (pump-chain- 1T/last hour; bb-squeeze+ not clustered)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 60% of closes (9/15) queue#2 leverage-aware | IO post-pump SHORT entry timing | LTC open SHORT pattern | signal_versions.json pump-chain- legacy format
+BY: auto_1hr
