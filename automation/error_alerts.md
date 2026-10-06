@@ -996,3 +996,10 @@
 
 ## Error Alerts — 2026-10-06 19:59 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-06 22:50 UTC
+- **WARN**: Disk usage at 85% (18G free of 118G) — approaching threshold
+- **WARN**: 0 signals generated in last hour (hotset empty, no signals survived compaction)
+- **INFO**: candle.db held by 2 python3 processes (price-collector + 1m-candle) — normal concurrent access
+- **INFO**: Market regime STORMY (76% coins hot), aggregate SHORT_BIAS (12L/33S/79N)
+- **AUTO-FIX**: None required — all timers active, pipeline running, no crashes
