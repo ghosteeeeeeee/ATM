@@ -4208,3 +4208,44 @@ BY: auto_1hr
 - mtf-regime-trend- 4T 1W 3L -$0.48 — queue#6 (has 1 win, not kill-eligible)
 - signal_versions.json pump-chain- non-dict corruption — minor, post-freeze
 BY: auto_1hr
+
+## [2026-10-06 01:17 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.23 this hour (WR: 0.0%) | 24h: 33T 16W -$1.30 (~48.5% WR)
+
+**This hour:**
+- HBAR trend-ride+ LONG hard_max_loss -$0.11 (-5.08% account) — MAE 0.95%
+- IO trend-ride+ LONG hard_max_loss pnl_usdt=$0.00 pnl_pct=-3.57 — **data anomaly** (see sideways)
+- TURBO bb-squeeze+ LONG hard_max_loss -$0.12 (-3.11%) — MAE 0.94%
+- All 3 opened overnight (20:21–22:18 UTC) LONG into SHORT_BIAS dump (regime_5m 01:00: 59 short / 8 long / 53 neutral)
+
+**24h close reasons:**
+- profit-monster-trail 16T +$0.83 (avg +0.052) — dominant winner
+- hard_max_loss 12T -$1.66 (avg -0.138) — sole loss concentration (~36% of closes)
+- hard_sl 2T -$0.38 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06 | ORPHAN_PAPER 1T $0
+- atr_sl_hit: **0/33 = 0%** — tpsl_utils fix stable, not dominant, no CEO alert
+
+**Hourly PnL streak:** 00h -$0.23 | 23h -$0.10 | 22h +$0.01 — only 2 consecutive negative (NOT 3h)
+
+**Freeze:** b960ffe8 expired Oct 6 00:38 UTC (~39m before this run). Config changes now allowed.
+
+**Changes:** none — no trigger met this hour.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — trend-ride+ 2T 0W, bb-squeeze+ 1T 0W (both <3T). 24h 0%-WR signals all below threshold (volume-breakout-long+ 1T, btc-pump-rider+ 2T, mover+ 1T)
+- Negative avg_pnl streak: NOT triggered — only 2 consecutive neg hours (23h, 00h); 22h +$0.01 breaks it
+- Overtrading: 3 trades/hour — well under 20
+- atr_sl_hit 0% — no SL-tightness issue; hard_max_loss is intentional ~1% price cap at 3–5x lev (3–5% account expected)
+- Live trading: enabled (constants True + kill_switch True). Pipeline healthy, timers firing.
+
+**Open Questions / Sideways:**
+- ⚠️ **hard_max_loss 12T -$1.66** with MFE avg ~0.17% on losers — entries never worked (consistent with prior MFE audits). Overnight LONG cluster in SHORT_BIAS regime. **Post-freeze queue #2 now actionable: entry/regime gate review, not stop-width.**
+- ⚠️ **IO trade data anomaly:** pnl_usdt=0.00 but pnl_pct=-3.57 on $11.10 size — should be ~-$0.40. pnl_usdt write path bug candidate; verify position_manager close accounting.
+- ⚠️ **45da8fcf** trendline_bounce_long confidence boost @21:10 during freeze — still unratified. CEO: RATIFY or REVERT.
+- 24h WR degraded 58%→48.5% overnight as hard_max_loss losses aged in — monitor, not yet a signal kill
+- bb-squeeze+ 13T 7W -$0.49 — has wins, R:R inverted (prior watch), not kill-eligible
+- mtf-regime-trend- 4T 1W -$0.48 — queue #6 unchanged (has 1 win)
+- signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
+- Working tree has uncommitted non-auto_1hr changes (hermes_constants.py comment drift, signal_compactor, paths.py, etc.) — NOT staged/committed by this run
+BY: auto_1hr
