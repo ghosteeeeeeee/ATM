@@ -803,5 +803,16 @@
     "after": "ATR_TP_MIN = 0.013 (1.30%)",
     "rationale": "ATR_TP_MIN < ATR_SL_MIN created structurally negative RR for low-vol tokens. 30d DB evidence: RR<1 trades = 161T 14.9%WR -$18.47 vs RR>=1 = 785T 59.4%WR +$16.91. 7d: RR<1 = 16T 3 winners -$1.09 vs RR>=1 = 195T +$2.95. TP floor below SL floor is a config mismatch, not a signal quality issue. Only 1 hard_tp exit/7d — trailing (profit-monster-trail 104T +$4.92) dominates exits, so practical exit-path impact is minimal.",
     "impact": "Low-vol trades get TP at 1.30% instead of 0.80% — realistic target matching SL distance. Blocks structurally negative-EV TP levels. Minimal winner impact (only 3 tiny trail-exit winners $0.04 in RR<1 band/7d; hard TP rarely hit)."
+  },
+  {
+    "timestamp": "2026-10-06T06:39:27Z",
+    "agent": "brain_auditor",
+    "change": "BTC override LONG: bare RECOVERY/NEUTRAL requires non-bear linreg (chop-gate + crash-filter)",
+    "type": "config",
+    "file": "signal_compactor.py + decider_run.py",
+    "before": "_p in ('RECOVERY','NEUTRAL') alone = LONG override",
+    "after": "(_p in ('RECOVERY','NEUTRAL') and _l not in ('LEAN_BEAR','BEAR')) or structural bull",
+    "rationale": "SUPER RECOVERY+LEAN_BEAR+BELOW reopened after CONTINUUM-BLOCK; net +$0.57/7d SUPER-class, +$3.07 RECOVERY+non-bear preserved",
+    "impact": "Block wrong-side LONGs into bear structure during RECOVERY/NEUTRAL phase"
   }
 ]

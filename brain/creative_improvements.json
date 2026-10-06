@@ -3117,5 +3117,23 @@
     "status": "suggested",
     "risk": "low",
     "sample_size": "n=1; check Hyperliquid orders + executor logs"
+  },
+  {
+    "date": "2026-10-06T06:39:27Z",
+    "idea": "Score-collapse fast exit: close LONGs when BTC continuum state_score drops >5 points in <5 min while position open",
+    "rationale": "Overnight dump was visible in continuum: score 99.9 at 21:53 → 5.8 at 01:48. SNIPER_HYSTERESIS exists but didn't fire in time — all overnight losers hit hard_max_loss. A score-velocity exit would cut before -3% account loss.",
+    "expected_impact": "Reduce hard_max_loss bleed on wrong-side LONGs; targeted at flip events not blanket gates",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest on score-collapse vs trade outcomes before live"
+  },
+  {
+    "date": "2026-10-06T06:39:27Z",
+    "idea": "pump-chain- family confidence demotion in HIGH regime (highest-bleed habitat 26T -$0.36 46.2% WR)",
+    "rationale": "14d worst n>=15 signal. HIGH regime is worst habitat. One-variable demotion, not kill — EXTREME 0.0→1.0 standing decision stays.",
+    "expected_impact": "Cut ~$0.20-0.30/7d if HIGH trades reduce; monitor48h",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — HIGH n=26/14d, below strong threshold but direction clear"
   }
 ]

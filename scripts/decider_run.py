@@ -3384,9 +3384,12 @@ def run(dry_run=False):
                         if _cont_row and direction.upper() == 'LONG':
                             _p, _l, _e = _cont_row[0], _cont_row[1], _cont_row[2]
                             # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
-                            # Bullish: RECOVERY with bullish structure, or NEUTRAL/CALM with bullish structure
-                            if (_p in ('RECOVERY', 'NEUTRAL') or
-                                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT'))):  # AT = transitional (bug_hunter F2 2026-10-05)
+                            # FIX brain_auditor 2026-10-06: bare RECOVERY/NEUTRAL allowed LONG crash-filter
+                            # override even in full bear structure (SUPER RECOVERY+LEAN_BEAR+BELOW).
+                            # Require non-bear linreg for bare phase; structural bull allows any phase.
+                            if ((_p in ('RECOVERY', 'NEUTRAL') and _l not in ('LEAN_BEAR', 'BEAR')) or
+                                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT')) or  # AT = transitional (bug_hunter F2 2026-10-05)
+                                (_l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT'))):  # structural bull any phase
                                 _continuum_override = True
                                 log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} LONG — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
                         elif _cont_row and direction.upper() == 'SHORT':

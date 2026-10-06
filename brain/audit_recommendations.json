@@ -1,385 +1,157 @@
 {
-  "timestamp": "2026-10-06T03:37:49Z",
-  "agent": "brain_auditor",
-  "run_type": "POST-FREEZE REPORT-ONLY (b960ffe8 expired Oct 6 00:38; no session lock)",
-  "config_changes_applied": [],
-  "config_change_note": "0 trading config changes. Freeze expired 00:38; queue items 5-7 (bb-bounce-v3 NORMAL 0.0, bb-bounce-v2 1.4, mtf-regime-trend- NORMAL/HIGH/EXTREME 0.0) already landed by CEO/brain_auditor. Overnight bleed root-cause = regime-misaligned LONGs via STANDALONE_BYPASS/confluence path — fix is path-enforcement audit (bug_hunter), not a new constant. trend-ride+ modified last hours (885021c5, 1b6f8f54) — auto_1hr: monitor don't stack. pump-chain- oversold floor: 7d <35 sample n=1; all-time <35 n=17 47.1% would kill ~8 winners — insufficient evidence. Conservative default: monitor.",
+  "timestamp": "2026-10-06T06:39:27Z",
   "session_brain_stats": {
     "queries_run": [
-      "signal performance winrate regime hard_max_loss",
-      "trend-ride long wrong-side SHORT_BIAS"
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing",
+      "hard_max_loss wrong side regime gate",
+      "BTC expansion filter regime routing chop",
+      "continuum EMA300 gate long block dump",
+      "wrong side long overnight BTC below"
     ],
-    "insights": [
-      "Session brain repeatedly flags LONGs into SHORT_BIAS tape — matches overnight bleed exactly (trend-ride+ 0-for-4)",
-      "RR/exit-structure sessions confirm hard_max_loss + CL-T1 as #1/#2 bleed — unchanged",
-      "train-to-trade sessions: 'short generators return 0 while market is 95S' — generator starvation under SHORT_BIAS confirmed recurring"
+    "key_insights": [
+      "exit system is #1 profit leak (CL-T1, hard_max_loss leverage amplification)",
+      "BTC expansion filter NO-GO: 9+ BTC/momentum layers already exist — do not add a 10th",
+      "session consensus: regime routing + chop mechanics, not raw signal quality",
+      "trend following signal + grind to spike ideas discussed but not fully built"
     ]
   },
   "trade_summary_24h": {
-    "verified_from": "PostgreSQL brain (live query this run)",
-    "all": {
-      "n": 30,
-      "pnl": -1.59,
-      "wr": 43.3
-    },
+    "n": 26,
+    "pnl": -1.25,
+    "wr": 42.3,
     "7d": {
-      "n": 241,
-      "pnl": -0.99,
-      "wr": 52.3,
-      "long": {
-        "n": 191,
-        "pnl": 1.31,
-        "wr": 55.0
+      "n": 237,
+      "long_pnl": 1.22,
+      "long_wr": 55.0,
+      "short_pnl": -1.88,
+      "short_wr": 41.3
+    },
+    "worst_signals_14d": [
+      {
+        "signal": "pump-chain-",
+        "n": 63,
+        "pnl": -0.71,
+        "wr": 49.2
       },
-      "short": {
-        "n": 50,
-        "pnl": -2.3,
-        "wr": 42.0
-      }
-    },
-    "30d": {
-      "n": 958,
-      "pnl": -2.65,
-      "wr": 51.4
-    },
-    "open": {
-      "n": 1,
-      "detail": "POL bb-squeeze+ LONG — watchdog REGIME MISALIGNED (macro STRONG_DOWN, continuum BELOW EMA300, aggregate 72/5 short)"
-    },
-    "by_signal_worst_24h": [
+      {
+        "signal": "bb-bounce-v3-long+",
+        "n": 19,
+        "pnl": -0.33,
+        "wr": 52.6
+      },
       {
         "signal": "bb-squeeze+",
-        "dir": "LONG",
-        "n": 10,
-        "pnl": -0.52,
-        "wr": 50.0
-      },
-      {
-        "signal": "mtf-regime-trend-",
-        "dir": "SHORT",
-        "n": 4,
-        "pnl": -0.48,
-        "wr": 25.0
-      },
-      {
-        "signal": "trend-ride+",
-        "dir": "LONG",
-        "n": 7,
-        "pnl": -0.18,
-        "wr": 42.9
-      },
-      {
-        "signal": "volume-breakout-long+",
-        "dir": "LONG",
-        "n": 1,
-        "pnl": -0.27,
-        "wr": 0.0
+        "n": 69,
+        "pnl": -0.05,
+        "wr": 60.9
       }
     ],
-    "by_signal_best_7d": [
-      {
-        "signal": "pump-chain+",
-        "dir": "LONG",
-        "n": 10,
-        "pnl": 1.09,
-        "wr": 70.0
-      },
-      {
-        "signal": "bb-bounce-v2-long+",
-        "dir": "LONG",
-        "n": 14,
-        "pnl": 0.31,
-        "wr": 71.4
-      },
-      {
-        "signal": "doji-bottom-long",
-        "dir": "LONG",
-        "n": 8,
-        "pnl": 0.11,
-        "wr": 75.0
-      }
-    ],
-    "exit_bleed_30d": [
-      {
-        "exit": "cut-loser-CL-T1",
-        "n": 71,
-        "pnl": -9.94,
-        "wr": 0.0,
-        "avg_lev": 4.21,
-        "rank": 1
-      },
-      {
-        "exit": "hard_max_loss",
-        "n": 56,
-        "pnl": -7.73,
-        "wr": 0.0,
-        "avg_lev": 4.04,
-        "rank": 2
-      },
-      {
-        "exit": "atr_sl_hit",
-        "n": 350,
-        "pnl": -3.68,
-        "wr": 46.6,
-        "avg_lev": 3.97,
-        "rank": 3
-      }
-    ],
-    "regime_7d": [
-      {
-        "regime": "HIGH",
-        "n": 75,
-        "wr": 54.7,
-        "pnl": -1.25
-      },
-      {
-        "regime": "NORMAL",
-        "n": 67,
-        "wr": 53.7,
-        "pnl": -1.05
-      },
-      {
-        "regime": "EXTREME",
-        "n": 85,
-        "wr": 49.4,
-        "pnl": 0.79
-      },
-      {
-        "regime": "FLAT",
-        "n": 8,
-        "wr": 75.0,
-        "pnl": 0.44
-      }
-    ]
-  },
-  "losing_trade_autopsy": {
-    "cluster": "Overnight LONGs into SHORT_BIAS (Oct 5 21:53 – Oct 6 01:48)",
-    "trades": [
-      {
-        "token": "SUPER",
-        "signal": "trend-ride+",
-        "pnl": -0.11,
-        "exit": "hard_max_loss",
-        "meta_rsi": 58.82,
-        "vol": "HIGH",
-        "coin_vel5": -0.78,
-        "above_sma": false,
-        "opened": "2026-10-06 01:48",
-        "note": "post continuum-cross (~00:29), coin NOT rising — should fail coin-rising exception"
-      },
-      {
-        "token": "USELESS",
-        "signal": "trend-ride+",
-        "pnl": -0.12,
-        "exit": "hard_max_loss",
-        "meta_rsi": 54.08,
-        "vol": "EXTREME",
-        "coin_vel5": -1.45,
-        "above_sma": false,
-        "opened": "2026-10-06 01:27",
-        "note": "post cross, vel -1.45% — strongest wrong-side evidence"
-      },
-      {
-        "token": "HBAR",
-        "signal": "trend-ride+",
-        "pnl": -0.11,
-        "exit": "hard_max_loss",
-        "meta_rsi": 68.0,
-        "vol": "NORMAL",
-        "coin_vel5": 0.28,
-        "above_sma": false,
-        "opened": "2026-10-05 22:18",
-        "note": "PRE-cross (~00:29) — opened into emerging downtrend, meta RSI 68 > TREND_RIDE_RSI_MAX=65"
-      },
-      {
-        "token": "IO",
-        "signal": "trend-ride+",
-        "pnl": 0.0,
-        "pnl_pct": -3.57,
-        "exit": "hard_max_loss",
-        "meta_rsi": 62.5,
-        "vol": "HIGH",
-        "coin_vel5": -0.24,
-        "above_sma": false,
-        "opened": "2026-10-05 21:53",
-        "note": "PRE-cross; pnl_usdt=0.00 vs pnl_pct=-3.57 DATA ANOMALY"
-      }
-    ],
-    "root_cause": "trend-ride+ LONGs opened into BTC SHORT_BIAS / STRONG_DOWN / continuum BELOW EMA300. Post-cross entries (SUPER, USELESS) had coin_vel5 < 0.5% and below SMA — the existing coin-rising exception (signal_compactor.py:2675) should have hard-blocked via CONTINUUM-BLOCK, but trades opened anyway. Pre-cross entries (HBAR, IO) hit no filter — system catches established bear structure, not the roll-over into it. Same failure class as USELESS/HBAR/IO pattern flagged by watchdog.",
-    "winner_comparison": "24h trend-ride+ winners ZRO/INJ/BLUR all exit via profit-monster-trail. ZRO coin_vel5=+1.99% above SMA (would pass exception). INJ/BLUR pre-cross, below SMA — opened before bear structure existed. If CONTINUUM-BLOCK had fired post-cross: blocks SUPER+USELESS (2 losers), 0 winners killed in this cluster (INJ/BLUR pre-cross unaffected; ZRO coin-rising exception).",
-    "evidence_quality": "HIGH for SUPER/USELESS (post-cross + coin falling — enforcement hole). MEDIUM for HBAR/IO (pre-cross, no filter exists for roll-over yet).",
-    "recommended_change": "NONE this run. DELEGATE bug_hunter: audit which path SUPER/USELESS took (standalone bypass vs confluence) and why CONTINUUM-BLOCK did not fire. If bypass path: enforcement hole (DRIFT-A class). If confluence path: trend_alignment_mult 0.6x is too weak — candidate hard-block 0.0 when cont_bearish + LONG + not coin-rising. Do NOT stack config on trend-ride+ (just modified).",
-    "confidence": "HIGH (path audit needed to confirm bypass vs confluence)"
+    "overnight_pattern": "8 LONG hard_max_loss after 20:20 Oct5 — but continuum was LEAN_BULL+ABOVE score 80-100 at entry; dump followed. NOT a missing BELOW+STRONG_NEG entry gate."
   },
   "drift_findings": [
     {
-      "id": "DRIFT-A/D",
-      "status": "PARTIAL — bb-bounce-v3 removed from STANDALONE_BYPASS (2026-10-06); pump-chain-, trend-ride+, mtf-regime-trend- still bypass",
-      "impact": "Bypass path skips OVERSOLD_SHORT_RSI_MAX, per-signal RSI ceilings, vol-gate regime blocks, and (possibly) trend_alignment hard-block. Overnight trend-ride+ LONGs into SHORT_BIAS are this class.",
-      "action": "bug_hunter bypass-path enforcement audit (queue #7) — highest leverage remaining item"
+      "id": "DRIFT-RECOVERY-OVERRIDE",
+      "severity": "HIGH",
+      "finding": "BTC-CHOP-OVERRIDE and BTC-CRASH-OVERRIDE allowed LONG when market_phase in (RECOVERY, NEUTRAL) regardless of linreg/ema structure. SUPER trend-ride+ opened RECOVERY+LEAN_BEAR+BELOW at 01:48 after CONTINUUM-BLOCK correctly fired, then both overrides reopened it. Hard-max-loss -$0.11.",
+      "in_code": "FIXED this run — signal_compactor.py:1247 + decider_run.py:3390 now require non-bear linreg for bare RECOVERY/NEUTRAL clause; structural bull still allows any phase.",
+      "impact": "SUPER-class 7d: 22T 45.5%WR -$0.57. Fix blocks 11 losses (-$1.30) vs 10 wins (+$0.73) = net +$0.57. RECOVERY+non-bear cohort 47T 78.7% +$3.07 preserved."
     },
     {
-      "id": "DRIFT-E",
-      "status": "OPEN — entry_rsi_14 unreliable",
-      "evidence": "This run: USELESS stored 16.83 vs meta 54.08; HBAR stored 41.53 vs meta 68.0; TURBO stored 100 vs meta 75/33. Median abs diff 7d n=234 = 12.6 pts (prior run).",
-      "impact": "All stored-RSI audits contaminated. Meta RSI (_signal_metadata.rsi_14) is the only trustworthy RSI.",
-      "action": "bug_hunter write-path fix (snapshot signal-time RSI) — still open"
+      "id": "DRIFT-CONTINUUM-BLOCK-WORKING",
+      "severity": "INFO",
+      "finding": "Watchdog rec 'gate trend-ride+/bb-squeeze+ LONG when BELOW+STRONG_NEG' is ALREADY implemented as CONTINUUM-BLOCK (signal_compactor.py:2685). Verified live 06:29-06:33 — JUP/HYPE LONG blocked. Overnight losses were NOT under that condition.",
+      "in_code": "yes — no new gate needed",
+      "impact": "Session brain NO-GO on 10th BTC filter confirmed. Do not add another."
     },
     {
-      "id": "DRIFT-F",
-      "status": "CONFIRMED this run — bb-squeeze+ meta-RSI band",
-      "evidence": "14d meta-RSI: <60 = 32T 50%WR -$0.46 | 60-70 = 19T 78.9%WR +$0.57 BEST | 70-80 = 15T 60% -$0.18 | 80+ = 2T 100% +$0.15",
-      "impact": "bb-squeeze+ wants mid-RSI 60-70. <60 is bleed zone. Hard block <60 would kill 16/32 winners — REJECTED per winner-impact rule.",
-      "action": "Monitor meta-RSI<60 48h; confidence dampen candidate post data-fix (DRIFT-E)"
-    },
-    {
-      "id": "DRIFT-G",
-      "status": "STANDING — SHORT loses all meta-RSI bands except mid",
-      "evidence": "pump-chain- all-time meta-RSI: <35 = 17T 47.1% -$0.80 | 35-45 = 23T 43.5% -$1.05 | 45-55 = 32T 56.3% +$0.15 ONLY PROFITABLE | 55+ = 27T 48.1% -$0.01. 7d: 45-55 = 11T 63.6% +$0.66.",
-      "impact": "pump-chain- is a mid-RSI (45-55) signal. Oversold AND high-RSI shorts bleed. MoE model A habitat EXTREME+RSI>=40 still correct.",
-      "action": "RSI sweet-spot dampen (not block) post DRIFT-E fix — blocking bands would kill >20% of winners"
-    },
-    {
-      "id": "QUEUE-STATUS",
-      "status": "POST-FREEZE QUEUE ITEMS LANDED",
-      "landed": [
-        "bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 + removed from STANDALONE_BYPASS (constants + vol_gate)",
-        "bb-bounce-v2-long+ confidence 1.3→1.4 (compactor:622 RE-APPLIED)",
-        "mtf-regime-trend- NORMAL 0.0 + HIGH 0.0 + EXTREME 0.0 (vol_gate:350,387,329)"
-      ],
-      "still_open": [
-        "decider_run v1→v2 import + fail-open removal — bug_hunter",
-        "cut-loser-CL-T1 MFE audit → fix — bug_hunter (71T -$9.94 0%WR #1 bleed)",
-        "STANDALONE_BYPASS expectancy demotion — self_learner",
-        "hard_max_loss leverage-aware semantics — bug_hunter (56T -$7.73 0%WR #2)",
-        "oversold SHORT bypass-path enforcement — bug_hunter (DRIFT-A/D)",
-        "HIGH-regime LONG throttle — signal_analyst",
-        "pump-chain PM_BYPASS verify — CEO/T"
-      ]
+      "id": "DRIFT-POST-FREEZE-QUEUE",
+      "severity": "INFO",
+      "finding": "Several post-freeze queue items already landed by other agents: bb-bounce-v3 NORMAL 0.0 + HIGH 1.0 in vol_gate + constants; STANDALONE_BYPASS removal for bb-bounce-v3; decider_run v1→v2 import; mtf-regime-trend- killed NEVER_REENABLE.",
+      "in_code": "yes partial",
+      "impact": "Remaining queue: hard_max_loss leverage-aware, CL-T1 MFE audit, STANDALONE_BYPASS expectancy demotion, HIGH-regime LONG throttle, pump-chain PM_BYPASS verify."
     }
   ],
   "recurring_problems": [
     {
-      "topic": "LONGs into SHORT_BIAS / wrong-side entries",
-      "frequency": "4th+ session (train-to-trade, watchdog, brain_auditor, auto_1hr all flag)",
-      "pattern": "BTC SHORT_BIAS + continuum BELOW + STRONG_DOWN → system still opens LONGs via STANDALONE_BYPASS/confluence. Overnight: 10 LONGs opened, 30% WR, -$0.55.",
-      "root_cause": "Bypass path skips trend_alignment hard-block; confluence path only damps 0.6x; pre-cross roll-over has no filter.",
-      "status": "OPEN — path audit delegated"
+      "topic": "hard_max_loss leverage amplification",
+      "evidence": "24h 11T -$1.32; 7d dominant bleed; stop fires ~1% price → 3-5% account at lev 3-5",
+      "status": "open — bug_hunter owns semantics"
     },
     {
-      "topic": "hard_max_loss = wrong-side entries (not exit-structure)",
-      "frequency": "Every run since Oct 4",
-      "pattern": "56T -$7.73/30d 0%WR lev 4.04. Overnight all 10 hard_max_loss LONGs MFE~0.17% — entries never worked. Exit is working (capping damage); entry is wrong.",
-      "root_cause": "Entries fire into macro-opposed tape. Exit optimizer P2 verdict: exits near-optimal. Fix entry quality, not exits.",
-      "status": "OPEN — entry-quality path audit"
+      "topic": "SHORT bleed7d -$1.88 41.3%WR",
+      "evidence": "46T SHORT; oversold filter was failing via bypass (partially addressed); mtf-regime-trend- killed",
+      "status": "monitor post bypass fixes"
     },
     {
-      "topic": "cut-loser-CL-T1 bleed",
-      "frequency": "Standing since Oct 4",
-      "pattern": "71T -$9.94 0%WR lev 4.21/30d #1 bleed. All exits at 0% WR.",
-      "root_cause": "MFE audit pending (which of 71 trades had median MFE>0 before cut?).",
-      "status": "QUEUED bug_hunter — freeze-safe analysis already delegated"
-    },
-    {
-      "topic": "SHORT side persistent bleed",
-      "frequency": "7d -$2.30/50T 42%WR — all sessions since Oct 4",
-      "pattern": "SHORT 7d target ≥$0 by Oct 7 — currently -$2.30. pump-chain- 31T -$0.97 worst. Oversold shorts (RSI<35) via bypass are part of it (DRIFT-A/D).",
-      "root_cause": "Bypass skips oversold floor; mid-RSI (45-55) is only profitable band; oversold/high-RSI both bleed.",
-      "status": "OPEN — bypass enforcement + RSI sweet-spot dampen post data-fix"
+      "topic": "pump-chain- worst n>=15 signal",
+      "evidence": "14d 63T 49.2% -$0.71; loses in ALL regimes (HIGH -$0.36, NORMAL -$0.22, EXTREME -$0.16)",
+      "status": "monitor — EXTREME 0.0→1.0 standing decision, do not re-litigate"
     }
   ],
   "missing_implementations": [
     {
-      "idea": "STANDALONE_BYPASS regime-alignment dampener/hard-block",
-      "discussed": "Continuously (watchdog deep_analysis, session brain train-to-trade, prior brain_auditor runs)",
-      "exists_in_code": "PARTIAL — trend_alignment_mult 0.6x in confluence path (compactor:1480/1517); CONTINUUM-BLOCK in bypass Layer B (compactor:2684) with coin-rising exception",
-      "gap": "Confluence path dampens 0.6x but does not hard-block when cont_bearish + not coin-rising. SUPER/USELESS opened post-cross with falling coins — either bypass enforcement hole or 0.6x too weak. Path audit will tell which.",
-      "status": "DELEGATED bug_hunter path audit"
+      "idea": "Regime-flip proactive exit for open LONGs when BTC continuum collapses",
+      "status": "not built — SNIPER_HYSTERESIS exists but overnight cohort still hit hard_max_loss",
+      "note": "score collapse 8.7→3.7 in 3min was visible; no fast exit fired"
     },
     {
-      "idea": "pump-chain- RSI sweet-spot (45-55) dampen",
-      "discussed": "brain_auditor Oct 5, MoE model A",
-      "exists_in_code": "NO — only oversold floor (skipped by bypass) and EXTREME regime allow",
-      "gap": "45-55 is only profitable band all-time (32T 56.3% +$0.15) and 7d (11T 63.6% +$0.66). Other bands bleed. Hard block would kill >20% winners — need confidence dampen, and DRIFT-E fix first so we trust RSI.",
-      "status": "MONITOR — post DRIFT-E"
-    },
-    {
-      "idea": "Roll-over regime detection (pre-cross)",
-      "discussed": "NEW this run",
-      "exists_in_code": "NO — continuum bear structure requires BELOW EMA300 + LEAN_BEAR/BEAR. HBAR/IO opened 2-3h BEFORE the cross (~00:29).",
-      "gap": "System catches established bear structure, not the turn into it. HBAR meta RSI 68 + falling coin + emerging SHORT_BIAS = no filter fired.",
-      "status": "SUGGESTED — needs backtest before any gate"
+      "idea": "trend following / grind-to-spike signals from session brain",
+      "status": "discussed, not fully built",
+      "note": "backlog — signal_analyst"
     }
   ],
+  "losing_trade_autopsy": {
+    "cluster": "overnight LONG hard_max_loss cohort",
+    "trades": "POL bb-squeeze+ -$0.13, SUPER trend-ride+ -$0.11, USELESS trend-ride+ -$0.12, HBAR trend-ride+ -$0.11, TURBO bb-squeeze+ -$0.12, MERL bb-squeeze+ -$0.11, CRV mover+ -$0.14, INJ bb-squeeze+ -$0.25",
+    "root_cause": "Regime flip after entry (continuum BULL score 80-100 at open, dumped overnight) + SUPER-class override bug reopening CONTINUUM-BLOCK. Not a missing BELOW+STRONG_NEG gate.",
+    "recommended_change": "Fix bare RECOVERY/NEUTRAL LONG override in chop-gate + crash-filter (DONE this run).",
+    "impact_on_winners": "SUPER-class 7d blocks 10 wins +$0.73 vs 11 losses -$1.30 = net +$0.57. RECOVERY+non-bear +$3.07 untouched.",
+    "confidence": "HIGH"
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-06T03:37:49Z",
-      "idea": "STANDALONE_BYPASS path audit then hard-block: CONTINUUM-BLOCK should fire when BTC bearish + LONG + coin not rising — verify why SUPER/USELESS slipped through",
-      "rationale": "SUPER opened 01:48 post-cross (BELOW+LEAN_BEAR) with coin_vel5=-0.78% below SMA. USELESS 01:27 vel=-1.45% below SMA. Both should fail the existing coin-rising exception (TREND_ALIGN_VELOCITY_THRESHOLD=0.5%) and hit CONTINUUM-BLOCK at compactor:2684. They opened anyway. Either bypass path skipped the check (DRIFT-A class) or confluence path only applied 0.6x dampen (75*0.6=45 still passes). Path audit distinguishes: bypass= enforcement bug; confluence= dampen too weak → raise to 0.0 when cont_bearish+not-rising. Winner impact in this cluster: 0 (INJ/BLUR pre-cross; ZRO vel+1.99% above SMA passes exception).",
-      "expected_impact": "Blocks SUPER/USELESS-class wrong-side LONGs. 30d hard_max_loss LONG bleed -$7.73 partially addressed at entry. Not a time block, not a blanket kill — regime+momentum quality gate reusing existing logic.",
-      "category": "entry sniper / path enforcement",
+      "date": "2026-10-06T06:39:27Z",
+      "idea": "Score-collapse fast exit: close LONGs when BTC continuum state_score drops >5 points in <5 min while position open",
+      "rationale": "Overnight dump was visible in continuum: score 99.9 at 21:53 → 5.8 at 01:48. SNIPER_HYSTERESIS exists but didn't fire in time — all overnight losers hit hard_max_loss. A score-velocity exit would cut before -3% account loss.",
+      "expected_impact": "Reduce hard_max_loss bleed on wrong-side LONGs; targeted at flip events not blanket gates",
+      "category": "exit sniper",
       "status": "suggested",
-      "risk": "low (reuse existing CONTINUUM-BLOCK; audit first)",
-      "sample_size": "n=2 post-cross losers blocked, 0 winners in cluster — small; audit + 48h monitor before config"
+      "risk": "medium — needs backtest on score-collapse vs trade outcomes before live"
     },
     {
-      "date": "2026-10-06T03:37:49Z",
-      "idea": "IO pnl_usdt=0.00 vs pnl_pct=-3.57 accounting anomaly — data integrity fix",
-      "rationale": "IO trend-ride+ hard_max_loss closed 00:37: pnl_usdt=0.00 but pnl_pct=-3.5731 at lev 3. Entry 0.17296 exit 0.17090 = -1.19% price move × 3 lev ≈ -3.57% account. pnl_usdt should be ~-$0.11 not $0.00. Silent accounting corruption — poisons PnL aggregates, cell stats, exit-optimizer training data.",
-      "expected_impact": "Corrects PnL book; prevents false zeros in analytics. Non-trading-path but feeds every metric.",
-      "category": "data integrity",
+      "date": "2026-10-06T06:39:27Z",
+      "idea": "pump-chain- family confidence demotion in HIGH regime (highest-bleed habitat 26T -$0.36 46.2% WR)",
+      "rationale": "14d worst n>=15 signal. HIGH regime is worst habitat. One-variable demotion, not kill — EXTREME 0.0→1.0 standing decision stays.",
+      "expected_impact": "Cut ~$0.20-0.30/7d if HIGH trades reduce; monitor48h",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low",
-      "sample_size": "n=1 observed; audit write-path for hard_max_loss closes"
-    },
+      "risk": "low — HIGH n=26/14d, below strong threshold but direction clear"
+    }
+  ],
+  "config_changes_applied": [
     {
-      "date": "2026-10-06T03:37:49Z",
-      "idea": "BABY SHORT fill failure — signal EXECUTED 02:26 but 0 trades in DB last 6h",
-      "rationale": "Watchdog deep_analysis: 'BABY SHORT signal executed 02:26 but NO open/closed trade on books — possible fill failure.' Execution path dropped a signal the engine thought succeeded. Silent trade loss = missed opportunity + trust erosion in signal_performance metrics.",
-      "expected_impact": "Recovers failed fills; makes execution accounting honest.",
-      "category": "execution reliability",
-      "status": "suggested",
-      "risk": "low",
-      "sample_size": "n=1; check Hyperliquid orders + executor logs"
+      "timestamp": "2026-10-06T06:39:27Z",
+      "agent": "brain_auditor",
+      "change": "BTC-CHOP-OVERRIDE + BTC-CRASH-OVERRIDE LONG: bare RECOVERY/NEUTRAL now requires non-bear linreg; structural bull still allows any phase",
+      "type": "code-path correctness",
+      "files": [
+        "scripts/signal_compactor.py:1241-1247",
+        "scripts/decider_run.py:3388-3391"
+      ],
+      "before": "_p in ('RECOVERY', 'NEUTRAL') alone allowed LONG override even with LEAN_BEAR/BEAR + BELOW",
+      "after": "(_p in ('RECOVERY','NEUTRAL') and _l not in ('LEAN_BEAR','BEAR')) or structural bull (LEAN_BULL/BULL + ABOVE/AT)",
+      "rationale": "SUPER opened RECOVERY+LEAN_BEAR+BELOW after CONTINUUM-BLOCK; overrides reopened it. Root cause, not symptom.",
+      "impact": "SUPER-class 7d net +$0.57 if blocked; RECOVERY+non-bear +$3.07 preserved. Protected flags untouched."
     }
   ],
   "next_actions": [
-    "bug_hunter: SUPER/USELESS path audit — bypass vs confluence; why CONTINUUM-BLOCK didn't fire (DRIFT-A class, queue #7)",
-    "bug_hunter: IO pnl_usdt=0.00 anomaly write-path audit",
-    "bug_hunter: BABY SHORT fill-failure executor log check",
-    "bug_hunter: cut-loser-CL-T1 MFE autopsy (queue #2, freeze-safe analysis already delegated)",
-    "self_learner: trend-ride+ habitat data accrual continues 48h (meta RSI, coin_vel, BTC bias at entry)",
-    "signal_analyst: HIGH-regime LONG throttle (queue #8) — overnight bleed feeds this",
-    "MONITOR: POL bb-squeeze+ open into SHORT_BIAS — watchdog recommends close or hard-accept SL",
-    "MONITOR: SHORT 7d ≥$0 by Oct 7 (currently -$2.30/50T)",
-    "MONITOR: mtf-regime-trend- post-fix n (NORMAL/HIGH/EXTREME all 0.0 now live — need n≥10 eval)",
-    "NO new config this run — path audit first, then one variable"
-  ],
-  "sideways_findings": [
-    {
-      "severity": "MED",
-      "finding": "IO pnl_usdt=0.00 vs pnl_pct=-3.57 — hard_max_loss accounting anomaly",
-      "fix": "bug_hunter write-path audit"
-    },
-    {
-      "severity": "MED",
-      "finding": "BABY SHORT executed 02:26, 0 trades in DB — possible fill failure",
-      "fix": "check HL orders + executor"
-    },
-    {
-      "severity": "LOW",
-      "finding": "coin_tracker POL price frozen 0.110595 since 02:54 vs trade feed 0.108905 (~1.5% stale); coin_tracker_data.json missing",
-      "fix": "price_collector/coin_tracker pipeline check"
-    },
-    {
-      "severity": "LOW",
-      "finding": "bb-squeeze+ 7d 68T +$0.08 flat edge — R:R invert flagged by auto_1hr; meta-RSI 60-70 is the only strong band",
-      "fix": "monitor; DRIFT-F"
-    },
-    {
-      "severity": "INFO",
-      "finding": "30d exit bleed unchanged: CL-T1 #1 -$9.94, hard_max_loss #2 -$7.73, atr_sl_hit #3 -$3.68",
-      "fix": "queue items #2/#4"
-    }
+    "bug_hunter verify the two override fixes (mandatory)",
+    "monitor 24h: no LONG opens under RECOVERY+LEAN_BEAR/BELOW via chop/crash override",
+    "bug_hunter: hard_max_loss leverage-aware semantics (post-freeze queue #4)",
+    "self_learner: STANDALONE_BYPASS expectancy demotion (queue #3)",
+    "signal_analyst: HIGH-regime LONG throttle + pump-chain- HIGH demotion eval",
+    "metric Oct 7: SHORT 7d >=$0, 24h >=$0"
   ]
 }

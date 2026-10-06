@@ -1239,7 +1239,12 @@ def _score_signal(token, direction, conf, source, signal_type,
                                 # FIX: accept AT (hysteresis considers AT→ABOVE after 55 min) (2026-09-23)
                                 # FIX T 2026-10-04: structural bull any phase — mirror bear 2026-09-20 (line above)
                                 elif direction.upper() == 'LONG' and (
-                                    _p2 in ('RECOVERY', 'NEUTRAL') or
+                                    # FIX brain_auditor 2026-10-06: bare RECOVERY/NEUTRAL allowed LONG
+                                    # override even in full bear structure. SUPER trend-ride+ opened
+                                    # RECOVERY+LEAN_BEAR+BELOW after CONTINUUM-BLOCK, then this clause
+                                    # reopened it via chop-gate override. Require non-bear linreg for
+                                    # bare phase clause; structural bull still allows any phase.
+                                    (_p2 in ('RECOVERY', 'NEUTRAL') and _l2 not in ('LEAN_BEAR', 'BEAR')) or
                                     (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT')) or
                                     (_l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))  # structural bull regardless of phase; AT = transitional (bug_hunter F1 2026-10-05)
                                 ):
