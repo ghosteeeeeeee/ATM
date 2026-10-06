@@ -1598,6 +1598,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     # 'doji' REMOVED 2026-09-25 — 66.7% WR LONG in NEUTRAL, pm_trail should book profits (was: ATR SL)
     'continuum-osc',      # continuum oscillator — manage via ATR SL, not PM Trail
     'volume-breakout',    # volume breakout — manage via ATR SL, not PM Trail
+    'volume_breakout',    # underscore variant — cut_loser LIKE doesn't match hyphen form (own-conclusions 2026-10-06)
     'trend-ride', 'trend_ride_long',  # ride_it exit — exempt from PM trail/cut_loser (independent audit 2026-10-05)
     # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (39% WR, -5.32 PnL).
     # PM Trail + cut_loser should manage these for quick profit/loss exits.
