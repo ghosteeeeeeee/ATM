@@ -3087,5 +3087,35 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-06T03:37:49Z",
+    "idea": "STANDALONE_BYPASS path audit then hard-block: CONTINUUM-BLOCK should fire when BTC bearish + LONG + coin not rising — verify why SUPER/USELESS slipped through",
+    "rationale": "SUPER opened 01:48 post-cross (BELOW+LEAN_BEAR) with coin_vel5=-0.78% below SMA. USELESS 01:27 vel=-1.45% below SMA. Both should fail the existing coin-rising exception (TREND_ALIGN_VELOCITY_THRESHOLD=0.5%) and hit CONTINUUM-BLOCK at compactor:2684. They opened anyway. Either bypass path skipped the check (DRIFT-A class) or confluence path only applied 0.6x dampen (75*0.6=45 still passes). Path audit distinguishes: bypass= enforcement bug; confluence= dampen too weak → raise to 0.0 when cont_bearish+not-rising. Winner impact in this cluster: 0 (INJ/BLUR pre-cross; ZRO vel+1.99% above SMA passes exception).",
+    "expected_impact": "Blocks SUPER/USELESS-class wrong-side LONGs. 30d hard_max_loss LONG bleed -$7.73 partially addressed at entry. Not a time block, not a blanket kill — regime+momentum quality gate reusing existing logic.",
+    "category": "entry sniper / path enforcement",
+    "status": "suggested",
+    "risk": "low (reuse existing CONTINUUM-BLOCK; audit first)",
+    "sample_size": "n=2 post-cross losers blocked, 0 winners in cluster — small; audit + 48h monitor before config"
+  },
+  {
+    "date": "2026-10-06T03:37:49Z",
+    "idea": "IO pnl_usdt=0.00 vs pnl_pct=-3.57 accounting anomaly — data integrity fix",
+    "rationale": "IO trend-ride+ hard_max_loss closed 00:37: pnl_usdt=0.00 but pnl_pct=-3.5731 at lev 3. Entry 0.17296 exit 0.17090 = -1.19% price move × 3 lev ≈ -3.57% account. pnl_usdt should be ~-$0.11 not $0.00. Silent accounting corruption — poisons PnL aggregates, cell stats, exit-optimizer training data.",
+    "expected_impact": "Corrects PnL book; prevents false zeros in analytics. Non-trading-path but feeds every metric.",
+    "category": "data integrity",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "n=1 observed; audit write-path for hard_max_loss closes"
+  },
+  {
+    "date": "2026-10-06T03:37:49Z",
+    "idea": "BABY SHORT fill failure — signal EXECUTED 02:26 but 0 trades in DB last 6h",
+    "rationale": "Watchdog deep_analysis: 'BABY SHORT signal executed 02:26 but NO open/closed trade on books — possible fill failure.' Execution path dropped a signal the engine thought succeeded. Silent trade loss = missed opportunity + trust erosion in signal_performance metrics.",
+    "expected_impact": "Recovers failed fills; makes execution accounting honest.",
+    "category": "execution reliability",
+    "status": "suggested",
+    "risk": "low",
+    "sample_size": "n=1; check Hyperliquid orders + executor logs"
   }
 ]
