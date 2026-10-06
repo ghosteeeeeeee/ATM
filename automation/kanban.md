@@ -58,3 +58,6 @@
 
 ## TEAM UPDATES
 - [2026-10-04 18:50 UTC] health_monitor: Pipeline OK — LIVE 1m timer, 0 Tracebacks/30m, PM clean **5 open / 29 closed today / -28.85% PnL**, 117 signals/1h, regime LONG_BIAS (48L/11S/58N), speed 52.7% ≥50pct, prices fresh, phantom 0, kill switch LIVE. **AUTO-FIX: journal vacuum +442.6M; session_brain WAL 63MB→0; signals_hermes WAL trimmed.** Disk still **85% WARN** — candles.db-wal **5.1G growing** (locked by price_collector; CEO DB-retention decision open). WARN: hotset EMPTY again (117 sig/hr, 0 approved; decisions table stale since April). better-coder dispatcher module deleted on disk (empty pkg). Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-06 12:48 UTC] health_monitor: Pipeline OK — LIVE 12:47 cycle all rc=0, 0 Tracebacks/30m, 0 open / 7 closed today (0% WR tiny sample, all trend-ride+/bb-squeeze+/pump-chain- losses), 147 signals/1h, regime SHORT_BIAS (16L/41S/65N), speed 53.1% >=50pct, prices fresh (85 tokens), phantom 0, kill switch untouched. **NO AUTO-FIXES — system healthy.** Disk 84% (1pt below warn; DBs not logs). Recurring NOTE: hl-sync-guardian.timer last fired 02:50 UTC (~9h) but service active. BTC-CRASH filter correctly blocking DOT LONGs. Details: automation/error_alerts.md

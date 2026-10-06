@@ -946,3 +946,11 @@
 
 ## Error Alerts — 2026-10-06 09:59 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-10-06 10:59 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-06 12:48 UTC
+- **INFO**: Pipeline healthy — LIVE every 1m (cycle #231091+, all steps rc=0, 0 Traceback/CRASH in 30m). Signals 147 last 1h. Open: 0. Closed today: 7 (bb-squeeze+ LONG 2x, pump-chain- SHORT 1x, trend-ride+ LONG 4x — 0% WR tiny sample; trading perf, not system fault). Regime: SHORT_BIAS 16L/41S/65N (ts 12:45). Speed: 53.1% >= 50th pct (128/241). Prices fresh (85 tokens, 12:47:14). Disk 84% (1pt below 85% warn; growth in DBs not logs). Core timers all active (pipeline 2s ago, price-collector 57s, 1m-candle 39s). candles.db held by 3 normal concurrent writers — NOT a stuck lock. Phantom trades 0. BTC-CRASH filter correctly blocking DOT LONGs (BTC 30m mom -0.15%) — working as designed. **No CRITICAL issues. No auto-fixes needed.**
+- **WARN** (approaching threshold): Disk 84% — 1pt below 85% warn. No logs >7d to compress. If crosses 85%: DB retention on coin_tracker / mtf_macd_tuner.
+- **NOTE** (recurring, non-trading): hermes-hl-sync-guardian.timer last fired 02:50 UTC (~9h ago) — service itself active (running) since Oct 4. Verify expected cadence. Not on critical trading path.
