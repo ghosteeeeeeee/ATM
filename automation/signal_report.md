@@ -1,32 +1,56 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h
-Generated: 2026-10-06 05:12 UTC
+# Signal Performance Report
+**Generated:** 2026-10-06 11:12 UTC | **Period:** Last 6h + 24h
 
-KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| mtf-regime-trend- | SHORT | 0.0% | -$0.53 | 3 (24h) | MTF_REGIME_TREND_MINUS_ENABLED=False + NEVER_REENABLE |
+---
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No candidates met WR>55% + PnL>$0.05 + 5T |
+## Actions Executed
 
-LOSERS (watch list):
+**KILLED (executed):** None
+**BOOSTED (executed):** None
+
+Kill criteria not met by any signal:
+- `bb-squeeze+` LONG: 6 trades, 50.0% WR, -$0.23 — WR not <30%
+- `trend-ride+` LONG: 7 trades, 42.9% WR, -$0.18 — WR not <30%, active <24h
+
+---
+
+## 24h Performance (verified, live DB)
+
+| Signal | Dir | Trades | WR | PnL | Verdict |
+|--------|-----|--------|-----|-----|---------|
+| bb-squeeze+ | LONG | 6 | 50.0% | -$0.23 | Watch |
+| trend-ride+ | LONG | 7 | 42.9% | -$0.18 | Watch |
+| pump-chain- | SHORT | 2 | 50.0% | -$0.19 | Too few trades |
+| volume-breakout-long+ | LONG | 1 | 0.0% | -$0.27 | Too few trades |
+| btc-pump-rider+ | LONG | 1 | 0.0% | -$0.15 | Too few trades |
+| mover+ | LONG | 1 | 0.0% | -$0.14 | Too few trades |
+| bb-bounce-v2-long+ | LONG | 2 | 50.0% | -$0.09 | Too few trades |
+| continuum_engine | LONG | 1 | 0.0% | $0.00 | Too few trades |
+| doji-bottom-long | LONG | 1 | 100.0% | $0.12 | Too few trades |
+
+## 6h Performance (verified, live DB)
+
+Only two closed trades total:
+- `pump-chain-` SHORT: 1 trade, -$0.25
+- `bb-squeeze+` LONG: 1 trade, -$0.13
+
+No signal had ≥2 trades in 6h — nothing actionable.
+
+---
+
+## LOSERS (watch list)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 62.5% | -$0.24 | 8 (24h) | Watch — 72h 41T 65.9% +$0.15 still positive. HIGH regime 26T 65.4% WR but -$0.15 (R:R bleed). EXTREME already blocked. No kill. |
-| trend-ride+ | LONG | 42.9% | -$0.18 | 7 (24h) | Watch — new signal (T directive 2026-10-05). 6h deteriorated 20%WR -$0.33. All regimes <50% WR but n too small. R:R: losers bigger than winners. |
-| bb-bounce-v2-long+ | LONG | 50.0% | -$0.09 | 2 (24h) | Watch — below volume threshold. |
+| bb-squeeze+ | LONG | 50.0% (24h) / 63.4% (72h) | -$0.23 (24h) / -$0.18 (72h) | 6 / 41 | Watch — 72h WR healthy; loss driven by exits not entries. NORMAL regime 7d: 66.7% WR, +$0.25. HIGH 61.5% WR but -$0.15, EXTREME 50% WR -$0.15 — if losses continue, gate EXTREME regime via volatility_gate_v2.py, do NOT kill. |
+| trend-ride+ | LONG | 42.9% | -$0.18 | 7 | Watch — first trade ever 2026-10-05 22:10 (~13h old). Not active >24h, too early to kill. Only HIGH regime data (3 trades, 33.3% WR, -$0.01). |
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 100% | +$0.06 | 1 (24h) | n=1, too small to boost |
-| doji-bottom-long | LONG | 100% | +$0.12 | 1 (24h) | n=1, too small to boost |
+## WINNERS
 
-ISSUES:
-- Inversions: 0 found (24h). Clean.
-- mtf-regime-trend- SHORT: all 3 regimes already at 0.0 in volatility_gate_v2 (CEO 2026-10-06). Flag was still True — inconsistent. Now aligned False + NEVER_REENABLE.
-- bb-squeeze+ HIGH regime: 65.4% WR but negative PnL over 72h — R:R problem (oversold chase / hard_max_loss per prior audits), not win-rate. Left enabled.
-- trend-ride+ is 1 day old — premature to kill at 7T despite negative PnL. Monitor 48h.
+None in 24h. No signal met boost criteria (WR >55% with 5+ trades AND PnL > +$0.05).
+
+## ISSUES
+
+- No direction inversions found in last 24h (0 mismatches between signal name direction and trade direction).
+- Low trade volume overall in 6h (2 closed trades) — sample too small for regime-gated actions.
+- `bb-squeeze+` LONG high-WR-but-negative-PnL pattern (63.4% WR over 72h with -$0.18) suggests exit quality / R:R problem rather than signal quality. Candidate for exit-side review, not a kill.
