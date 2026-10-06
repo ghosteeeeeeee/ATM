@@ -4381,3 +4381,45 @@ BY: auto_1hr
 - signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
 - Working tree has uncommitted non-auto_1hr changes — NOT staged/committed by this run
 BY: auto_1hr
+
+## [2026-10-06 05:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour (WR: N/A) | 24h: 26T ~11W 14L 1flat -$1.42 (~44% WR among non-flat closes)
+
+**This hour:**
+- Quiet hour — 0 closes (03h/04h/05h quiet streak continues)
+- Open now: 2 — LTC pump-chain- SHORT (03:29, LTC SHORT_BIAS ✓), POL bb-squeeze+ LONG (00:20, stale overnight into BEAR/SHORT_BIAS)
+- Regime: BEAR/SHORT_BIAS (SUPER `_signal_metadata`: btc_regime=BEAR_TREND, btc_trend_bias=-0.83) — NOT NEUTRAL → size-cut rule does not apply
+
+**24h close reasons:**
+- hard_max_loss 11T -$1.49 (avg -0.135) — ~42% of closes, sole loss concentration
+- profit-monster-trail 10T +$0.54 (avg +0.054) — sole winner
+- hard_sl 2T -$0.38 | cut-loser-MAE-GUARD 1T -$0.15 | UNIVERSAL_MAX_HOLD 1T +$0.06 | ORPHAN_PAPER 1T $0
+- atr_sl_hit: **0/26 = 0%** — tpsl_utils fix deployed and stable, not dominant, NO CEO alert
+
+**24h by signal (3+ trades):**
+- mtf-regime-trend- 3T 0W -$0.53 — kill-eligible on 24h window but rule is last-hour (0T) → queue #6 watch
+- bb-squeeze+ 8T 5W -$0.24 — R:R inverted, has wins, not kill-eligible
+- trend-ride+ 7T 3W -$0.18 — BB+momentum filters (885021c5) + ride_it exit (1b6f8f54) just deployed; overnight hard_max_loss LONGs predate fix. Do not stack.
+
+**Hourly PnL streak:** 22h +$0.10 | 23h -$0.10 | 00h -$0.23 | 01h -$0.12 | 02h -$0.11 | 03h/04h/05h $0.00 (no trades)
+- Negative streak (23/00/01/02) was broken by no-trade 03h; still broken now. Even if continued: regime BEAR ≠ NEUTRAL + size at HL floor → no action.
+
+**Changes:** none — no trigger met with actionable param path this hour.
+
+**No Change Needed:**
+- Kill trigger (0% WR, 3+T last hour): N/A — 0 trades last hour. 24h 0%-WR signals all ≤3T over full 24h: mtf-regime-trend- 3T -$0.53 (queue #6, has wins on longer window), volume-breakout-long+ 1T, btc-pump-rider+ 1T, mover+ 1T. None meet "3+ trades in last hour".
+- Negative avg_pnl streak: BROKEN by no-trade 03h-05h. Regime BEAR ≠ NEUTRAL anyway.
+- Overtrading: 0 trades/hour — well under 20
+- atr_sl_hit 0% — tpsl fix deployed; hard_max_loss remains entry-quality problem (LONG into SHORT_BIAS/BEAR pattern), queue#2, not stop-width
+- Live trading: enabled. Pipeline healthy (2 open positions). Working tree clean of auto_1hr-owned edits.
+
+**Open Questions / Sideways:**
+- ⚠️ **hard_max_loss 11T -$1.49** with low MFE on losers — entries never worked. Pattern: LONG into BEAR/SHORT_BIAS. Queue#2 entry/regime gate review still the real fix, not stop-width.
+- ⚠️ **mtf-regime-trend- 3T 0W -$0.53** in 24h — at kill threshold for 24h window but not "last hour". Queue #6, watch next hour for last-hour kill eligibility.
+- ⚠️ **IO pnl_usdt=0.00 vs pnl_pct=-3.57** accounting anomaly — still open, prior hours flagged. Verify position_manager close path.
+- ⚠️ **45da8fcf** trendline_bounce_long confidence boost during freeze — still unratified. CEO: RATIFY or REVERT.
+- Open POL bb-squeeze+ LONG into BEAR — stale from 00:20; MAE guard active
+- signal_versions.json `pump-chain-` still non-dict (list) — audit store corruption, minor
+BY: auto_1hr
