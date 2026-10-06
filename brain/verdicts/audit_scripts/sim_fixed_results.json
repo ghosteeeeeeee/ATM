@@ -1,0 +1,796 @@
+{
+  "generated_at": "2026-10-06T02:49:40.378791+00:00",
+  "n_trades_classified": 380,
+  "n_excluded": {
+    "no_candles": 2,
+    "insufficient_coverage": 1
+  },
+  "params": {
+    "ride_it": {
+      "sl_phase1_mult": 2.0,
+      "sl_phase1_floor": 0.013,
+      "sl_phase1_cap": 0.025,
+      "trail_activate": 0.02,
+      "trail_distance": 0.012,
+      "max_hold_h": 24,
+      "hard_max_loss_pct": -1.0,
+      "soft_peak_exit": "2.0h+ pnl<=0, 0.3% trail",
+      "stale_winner": "+0.6%/60min",
+      "stale_loser": "-1.0%/8min",
+      "momentum_exit": "2x5m ret<-0.5% & pnl>1% @2h+",
+      "spike_override": "vol>=5.0x & |pnl|>=3.0% -> 0.5% trail"
+    },
+    "current": {
+      "initial_sl_pct": 1.5,
+      "pm_trail_activate": 0.4,
+      "pm_trail_distance": 1.2,
+      "hard_max_loss_pct": -1.0,
+      "max_hold_h": 8.0
+    }
+  },
+  "families": {
+    "volume-breakout-long+": {
+      "role": "ride_it_candidate",
+      "stacks": {
+        "current": {
+          "n": 27,
+          "win_rate": 44.4,
+          "avg_pnl_pct": 0.146,
+          "total_pnl_pct": 3.94,
+          "avg_hold_h": 1.35,
+          "exit_reasons": {
+            "hard_max_loss": 13,
+            "unmodeled_close": 4,
+            "stale_winner": 4,
+            "pm_trail": 4,
+            "soft_peak_exit": 2
+          }
+        },
+        "current_tiered": {
+          "n": 27,
+          "win_rate": 44.4,
+          "avg_pnl_pct": -0.164,
+          "total_pnl_pct": -4.43,
+          "avg_hold_h": 0.97,
+          "exit_reasons": {
+            "hard_max_loss": 13,
+            "pm_trail": 9,
+            "soft_peak_exit": 2,
+            "stale_winner": 2,
+            "unmodeled_close": 1
+          }
+        },
+        "current_pump": {
+          "n": 27,
+          "win_rate": 37.0,
+          "avg_pnl_pct": -0.078,
+          "total_pnl_pct": -2.11,
+          "avg_hold_h": 1.13,
+          "exit_reasons": {
+            "hard_max_loss": 10,
+            "pump_exit_dead_money": 8,
+            "unmodeled_close": 6,
+            "stale_winner": 3
+          }
+        },
+        "ride_it": {
+          "n": 27,
+          "win_rate": 40.7,
+          "avg_pnl_pct": 0.104,
+          "total_pnl_pct": 2.82,
+          "avg_hold_h": 1.35,
+          "exit_reasons": {
+            "hard_max_loss": 13,
+            "unmodeled_close": 6,
+            "stale_winner": 4,
+            "soft_peak_exit": 2,
+            "ride_it_trail": 2
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 27,
+          "win_rate": 48.1,
+          "avg_pnl_pct": 0.292,
+          "total_pnl_pct": 7.89,
+          "avg_hold_h": 1.54,
+          "exit_reasons": {
+            "unmodeled_close": 11,
+            "stale_loser": 6,
+            "soft_peak_exit": 4,
+            "stale_winner": 4,
+            "ride_it_trail": 2
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": -3.7,
+        "avg_pnl_pct": -0.042,
+        "total_pnl_pct": -1.12,
+        "avg_hold_h": 0.0
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 7.4,
+        "avg_pnl_pct": 0.188,
+        "total_pnl_pct": 5.07
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.146,
+        "actual_avg": 2.717
+      }
+    },
+    "doji-bottom-long": {
+      "role": "ride_it_candidate",
+      "stacks": {
+        "current": {
+          "n": 16,
+          "win_rate": 56.2,
+          "avg_pnl_pct": 0.166,
+          "total_pnl_pct": 2.66,
+          "avg_hold_h": 1.36,
+          "exit_reasons": {
+            "unmodeled_close": 5,
+            "stale_winner": 5,
+            "hard_max_loss": 3,
+            "soft_peak_exit": 2,
+            "pm_trail": 1
+          }
+        },
+        "current_tiered": {
+          "n": 16,
+          "win_rate": 68.8,
+          "avg_pnl_pct": 0.243,
+          "total_pnl_pct": 3.9,
+          "avg_hold_h": 1.23,
+          "exit_reasons": {
+            "stale_winner": 5,
+            "pm_trail": 4,
+            "hard_max_loss": 3,
+            "unmodeled_close": 2,
+            "soft_peak_exit": 2
+          }
+        },
+        "current_pump": {
+          "n": 16,
+          "win_rate": 62.5,
+          "avg_pnl_pct": 0.203,
+          "total_pnl_pct": 3.24,
+          "avg_hold_h": 1.08,
+          "exit_reasons": {
+            "stale_winner": 5,
+            "unmodeled_close": 4,
+            "pump_exit_dead_money": 4,
+            "hard_max_loss": 3
+          }
+        },
+        "ride_it": {
+          "n": 16,
+          "win_rate": 56.2,
+          "avg_pnl_pct": 0.18,
+          "total_pnl_pct": 2.87,
+          "avg_hold_h": 1.37,
+          "exit_reasons": {
+            "unmodeled_close": 6,
+            "stale_winner": 5,
+            "hard_max_loss": 3,
+            "soft_peak_exit": 2
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 16,
+          "win_rate": 62.5,
+          "avg_pnl_pct": 0.327,
+          "total_pnl_pct": 5.24,
+          "avg_hold_h": 1.49,
+          "exit_reasons": {
+            "unmodeled_close": 8,
+            "stale_winner": 5,
+            "soft_peak_exit": 2,
+            "stale_loser": 1
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": 0.014,
+        "total_pnl_pct": 0.21,
+        "avg_hold_h": 0.01
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 6.3,
+        "avg_pnl_pct": 0.147,
+        "total_pnl_pct": 2.37
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.166,
+        "actual_avg": 1.194
+      }
+    },
+    "bb_bounce_v2_long": {
+      "role": "ride_it_candidate",
+      "stacks": {
+        "current": {
+          "n": 67,
+          "win_rate": 50.7,
+          "avg_pnl_pct": 0.042,
+          "total_pnl_pct": 2.79,
+          "avg_hold_h": 1.41,
+          "exit_reasons": {
+            "unmodeled_close": 38,
+            "hard_max_loss": 17,
+            "stale_winner": 6,
+            "soft_peak_exit": 4,
+            "pm_trail": 2
+          }
+        },
+        "current_tiered": {
+          "n": 67,
+          "win_rate": 62.7,
+          "avg_pnl_pct": 0.068,
+          "total_pnl_pct": 4.58,
+          "avg_hold_h": 1.25,
+          "exit_reasons": {
+            "pm_trail": 34,
+            "hard_max_loss": 17,
+            "unmodeled_close": 9,
+            "soft_peak_exit": 4,
+            "stale_winner": 3
+          }
+        },
+        "current_pump": {
+          "n": 67,
+          "win_rate": 52.2,
+          "avg_pnl_pct": -0.014,
+          "total_pnl_pct": -0.97,
+          "avg_hold_h": 1.2,
+          "exit_reasons": {
+            "unmodeled_close": 32,
+            "hard_max_loss": 17,
+            "pump_exit_dead_money": 14,
+            "stale_winner": 3,
+            "soft_peak_exit": 1
+          }
+        },
+        "ride_it": {
+          "n": 67,
+          "win_rate": 50.7,
+          "avg_pnl_pct": 0.041,
+          "total_pnl_pct": 2.73,
+          "avg_hold_h": 1.41,
+          "exit_reasons": {
+            "unmodeled_close": 39,
+            "hard_max_loss": 17,
+            "stale_winner": 6,
+            "soft_peak_exit": 4,
+            "ride_it_trail": 1
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 67,
+          "win_rate": 53.7,
+          "avg_pnl_pct": 0.057,
+          "total_pnl_pct": 3.82,
+          "avg_hold_h": 1.48,
+          "exit_reasons": {
+            "unmodeled_close": 50,
+            "stale_winner": 6,
+            "soft_peak_exit": 4,
+            "stale_loser": 4,
+            "ride_it_phase1_sl": 2,
+            "ride_it_trail": 1
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": -0.001,
+        "total_pnl_pct": -0.06,
+        "avg_hold_h": 0.0
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 3.0,
+        "avg_pnl_pct": 0.016,
+        "total_pnl_pct": 1.09
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.042,
+        "actual_avg": 0.373
+      }
+    },
+    "grind-trend+": {
+      "role": "ride_it_candidate",
+      "stacks": {
+        "current": {
+          "n": 18,
+          "win_rate": 44.4,
+          "avg_pnl_pct": 0.186,
+          "total_pnl_pct": 3.34,
+          "avg_hold_h": 0.93,
+          "exit_reasons": {
+            "unmodeled_close": 13,
+            "stale_winner": 3,
+            "hard_max_loss": 2
+          }
+        },
+        "current_tiered": {
+          "n": 18,
+          "win_rate": 55.6,
+          "avg_pnl_pct": 0.209,
+          "total_pnl_pct": 3.77,
+          "avg_hold_h": 0.84,
+          "exit_reasons": {
+            "unmodeled_close": 7,
+            "pm_trail": 7,
+            "hard_max_loss": 2,
+            "stale_winner": 2
+          }
+        },
+        "current_pump": {
+          "n": 18,
+          "win_rate": 44.4,
+          "avg_pnl_pct": 0.155,
+          "total_pnl_pct": 2.8,
+          "avg_hold_h": 0.91,
+          "exit_reasons": {
+            "unmodeled_close": 13,
+            "hard_max_loss": 2,
+            "stale_winner": 2,
+            "pump_exit_dead_money": 1
+          }
+        },
+        "ride_it": {
+          "n": 18,
+          "win_rate": 44.4,
+          "avg_pnl_pct": 0.186,
+          "total_pnl_pct": 3.34,
+          "avg_hold_h": 0.93,
+          "exit_reasons": {
+            "unmodeled_close": 13,
+            "stale_winner": 3,
+            "hard_max_loss": 2
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 18,
+          "win_rate": 44.4,
+          "avg_pnl_pct": 0.142,
+          "total_pnl_pct": 2.56,
+          "avg_hold_h": 0.94,
+          "exit_reasons": {
+            "unmodeled_close": 13,
+            "stale_winner": 3,
+            "stale_loser": 2
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": 0.0,
+        "total_pnl_pct": 0.0,
+        "avg_hold_h": 0.0
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": -0.044,
+        "total_pnl_pct": -0.78
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.186,
+        "actual_avg": 0.767
+      }
+    },
+    "pump-chain+": {
+      "role": "ride_it_candidate",
+      "stacks": {
+        "current": {
+          "n": 144,
+          "win_rate": 46.5,
+          "avg_pnl_pct": 0.183,
+          "total_pnl_pct": 26.32,
+          "avg_hold_h": 1.17,
+          "exit_reasons": {
+            "unmodeled_close": 45,
+            "pm_trail": 41,
+            "hard_max_loss": 40,
+            "stale_winner": 11,
+            "soft_peak_exit": 7
+          }
+        },
+        "current_tiered": {
+          "n": 144,
+          "win_rate": 64.6,
+          "avg_pnl_pct": 0.135,
+          "total_pnl_pct": 19.38,
+          "avg_hold_h": 0.71,
+          "exit_reasons": {
+            "pm_trail": 69,
+            "hard_max_loss": 40,
+            "unmodeled_close": 22,
+            "stale_winner": 9,
+            "soft_peak_exit": 4
+          }
+        },
+        "current_pump": {
+          "n": 144,
+          "win_rate": 46.5,
+          "avg_pnl_pct": 0.076,
+          "total_pnl_pct": 10.98,
+          "avg_hold_h": 1.05,
+          "exit_reasons": {
+            "unmodeled_close": 56,
+            "hard_max_loss": 49,
+            "pump_exit_dead_money": 29,
+            "stale_winner": 9,
+            "pump_exit_momentum": 1
+          }
+        },
+        "ride_it": {
+          "n": 144,
+          "win_rate": 45.1,
+          "avg_pnl_pct": 0.157,
+          "total_pnl_pct": 22.59,
+          "avg_hold_h": 1.26,
+          "exit_reasons": {
+            "unmodeled_close": 60,
+            "hard_max_loss": 51,
+            "stale_winner": 12,
+            "soft_peak_exit": 12,
+            "ride_it_trail": 9
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 144,
+          "win_rate": 47.2,
+          "avg_pnl_pct": 0.107,
+          "total_pnl_pct": 15.37,
+          "avg_hold_h": 1.37,
+          "exit_reasons": {
+            "unmodeled_close": 92,
+            "stale_loser": 16,
+            "soft_peak_exit": 14,
+            "stale_winner": 12,
+            "ride_it_trail": 9,
+            "ride_it_phase1_sl": 1
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": -1.4,
+        "avg_pnl_pct": -0.026,
+        "total_pnl_pct": -3.73,
+        "avg_hold_h": 0.09
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 2.1,
+        "avg_pnl_pct": -0.05,
+        "total_pnl_pct": -7.22
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.183,
+        "actual_avg": 0.696
+      }
+    },
+    "bb-squeeze+": {
+      "role": "control",
+      "stacks": {
+        "current": {
+          "n": 70,
+          "win_rate": 57.1,
+          "avg_pnl_pct": -0.005,
+          "total_pnl_pct": -0.38,
+          "avg_hold_h": 0.8,
+          "exit_reasons": {
+            "unmodeled_close": 45,
+            "hard_max_loss": 18,
+            "soft_peak_exit": 4,
+            "pm_trail": 2,
+            "stale_winner": 1
+          }
+        },
+        "current_tiered": {
+          "n": 70,
+          "win_rate": 62.9,
+          "avg_pnl_pct": 0.054,
+          "total_pnl_pct": 3.8,
+          "avg_hold_h": 0.73,
+          "exit_reasons": {
+            "pm_trail": 30,
+            "hard_max_loss": 18,
+            "unmodeled_close": 17,
+            "soft_peak_exit": 4,
+            "stale_winner": 1
+          }
+        },
+        "current_pump": {
+          "n": 70,
+          "win_rate": 57.1,
+          "avg_pnl_pct": -0.011,
+          "total_pnl_pct": -0.75,
+          "avg_hold_h": 0.76,
+          "exit_reasons": {
+            "unmodeled_close": 45,
+            "hard_max_loss": 18,
+            "pump_exit_dead_money": 5,
+            "soft_peak_exit": 1,
+            "stale_winner": 1
+          }
+        },
+        "ride_it": {
+          "n": 70,
+          "win_rate": 58.6,
+          "avg_pnl_pct": -0.002,
+          "total_pnl_pct": -0.12,
+          "avg_hold_h": 0.8,
+          "exit_reasons": {
+            "unmodeled_close": 47,
+            "hard_max_loss": 18,
+            "soft_peak_exit": 4,
+            "stale_winner": 1
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 70,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.033,
+          "total_pnl_pct": 2.32,
+          "avg_hold_h": 0.86,
+          "exit_reasons": {
+            "unmodeled_close": 60,
+            "soft_peak_exit": 5,
+            "stale_loser": 4,
+            "stale_winner": 1
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 1.5,
+        "avg_pnl_pct": 0.003,
+        "total_pnl_pct": 0.26,
+        "avg_hold_h": 0.0
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 1.4,
+        "avg_pnl_pct": 0.035,
+        "total_pnl_pct": 2.44
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": -0.005,
+        "actual_avg": -0.007
+      }
+    },
+    "mover+": {
+      "role": "control",
+      "stacks": {
+        "current": {
+          "n": 20,
+          "win_rate": 45.0,
+          "avg_pnl_pct": 0.025,
+          "total_pnl_pct": 0.49,
+          "avg_hold_h": 1.35,
+          "exit_reasons": {
+            "unmodeled_close": 8,
+            "hard_max_loss": 5,
+            "pm_trail": 5,
+            "soft_peak_exit": 2
+          }
+        },
+        "current_tiered": {
+          "n": 20,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.21,
+          "total_pnl_pct": 4.2,
+          "avg_hold_h": 1.09,
+          "exit_reasons": {
+            "pm_trail": 11,
+            "hard_max_loss": 5,
+            "unmodeled_close": 2,
+            "soft_peak_exit": 2
+          }
+        },
+        "current_pump": {
+          "n": 20,
+          "win_rate": 55.0,
+          "avg_pnl_pct": 0.07,
+          "total_pnl_pct": 1.41,
+          "avg_hold_h": 1.2,
+          "exit_reasons": {
+            "unmodeled_close": 9,
+            "hard_max_loss": 7,
+            "pump_exit_dead_money": 4
+          }
+        },
+        "ride_it": {
+          "n": 20,
+          "win_rate": 45.0,
+          "avg_pnl_pct": -0.044,
+          "total_pnl_pct": -0.87,
+          "avg_hold_h": 1.45,
+          "exit_reasons": {
+            "unmodeled_close": 9,
+            "hard_max_loss": 7,
+            "soft_peak_exit": 3,
+            "ride_it_trail": 1
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 20,
+          "win_rate": 45.0,
+          "avg_pnl_pct": -0.04,
+          "total_pnl_pct": -0.8,
+          "avg_hold_h": 1.57,
+          "exit_reasons": {
+            "unmodeled_close": 14,
+            "soft_peak_exit": 3,
+            "stale_loser": 2,
+            "ride_it_trail": 1
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": -0.069,
+        "total_pnl_pct": -1.36,
+        "avg_hold_h": 0.1
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": 0.004,
+        "total_pnl_pct": 0.07
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.025,
+        "actual_avg": -0.63
+      }
+    },
+    "rr-struct+": {
+      "role": "control",
+      "stacks": {
+        "current": {
+          "n": 15,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.131,
+          "total_pnl_pct": 1.96,
+          "avg_hold_h": 1.4,
+          "exit_reasons": {
+            "stale_winner": 5,
+            "unmodeled_close": 4,
+            "pm_trail": 2,
+            "soft_peak_exit": 2,
+            "hard_max_loss": 2
+          }
+        },
+        "current_tiered": {
+          "n": 15,
+          "win_rate": 73.3,
+          "avg_pnl_pct": 0.203,
+          "total_pnl_pct": 3.05,
+          "avg_hold_h": 1.2,
+          "exit_reasons": {
+            "pm_trail": 5,
+            "stale_winner": 4,
+            "soft_peak_exit": 2,
+            "unmodeled_close": 2,
+            "hard_max_loss": 2
+          }
+        },
+        "current_pump": {
+          "n": 15,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.074,
+          "total_pnl_pct": 1.11,
+          "avg_hold_h": 1.26,
+          "exit_reasons": {
+            "unmodeled_close": 5,
+            "stale_winner": 4,
+            "pump_exit_dead_money": 3,
+            "hard_max_loss": 3
+          }
+        },
+        "ride_it": {
+          "n": 15,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.109,
+          "total_pnl_pct": 1.64,
+          "avg_hold_h": 1.42,
+          "exit_reasons": {
+            "stale_winner": 5,
+            "unmodeled_close": 5,
+            "hard_max_loss": 3,
+            "soft_peak_exit": 2
+          }
+        },
+        "ride_it_nohardmax": {
+          "n": 15,
+          "win_rate": 60.0,
+          "avg_pnl_pct": 0.095,
+          "total_pnl_pct": 1.43,
+          "avg_hold_h": 1.43,
+          "exit_reasons": {
+            "stale_winner": 5,
+            "unmodeled_close": 5,
+            "stale_loser": 3,
+            "soft_peak_exit": 2
+          }
+        }
+      },
+      "delta": {
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": -0.022,
+        "total_pnl_pct": -0.32,
+        "avg_hold_h": 0.02
+      },
+      "delta_hardmax_probe": {
+        "note": "ride_it_nohardmax minus ride_it (hard stop removed)",
+        "win_rate_pp": 0.0,
+        "avg_pnl_pct": -0.014,
+        "total_pnl_pct": -0.21
+      },
+      "validation_sim_vs_actual_current": {
+        "sim_avg": 0.131,
+        "actual_avg": 2.09
+      }
+    }
+  },
+  "aggregate_all": {
+    "current": {
+      "n": 377,
+      "win_rate": 49.9,
+      "avg_pnl_pct": 0.109,
+      "total_pnl_pct": 41.12,
+      "avg_hold_h": 1.17,
+      "exit_reasons": {
+        "unmodeled_close": 162,
+        "hard_max_loss": 100,
+        "pm_trail": 57,
+        "stale_winner": 35,
+        "soft_peak_exit": 23
+      }
+    },
+    "ride_it": {
+      "n": 377,
+      "win_rate": 49.3,
+      "avg_pnl_pct": 0.093,
+      "total_pnl_pct": 35.01,
+      "avg_hold_h": 1.21,
+      "exit_reasons": {
+        "unmodeled_close": 185,
+        "hard_max_loss": 114,
+        "stale_winner": 36,
+        "soft_peak_exit": 29,
+        "ride_it_trail": 13
+      }
+    },
+    "ride_it_nohardmax": {
+      "n": 377,
+      "win_rate": 51.7,
+      "avg_pnl_pct": 0.1,
+      "total_pnl_pct": 37.83,
+      "avg_hold_h": 1.31,
+      "exit_reasons": {
+        "unmodeled_close": 253,
+        "stale_loser": 38,
+        "stale_winner": 36,
+        "soft_peak_exit": 34,
+        "ride_it_trail": 13,
+        "ride_it_phase1_sl": 3
+      }
+    },
+    "delta": {
+      "win_rate_pp": -0.6,
+      "avg_pnl_pct": -0.016,
+      "total_pnl_pct": -6.11
+    },
+    "delta_hardmax_probe": {
+      "note": "ride_it_nohardmax minus ride_it",
+      "win_rate_pp": 2.4,
+      "avg_pnl_pct": 0.007,
+      "total_pnl_pct": 2.82
+    }
+  }
+}
