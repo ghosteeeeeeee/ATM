@@ -3250,5 +3250,42 @@
     "status": "suggested",
     "risk": "medium",
     "note": "Watchdog data: 5m scanner shows 80 SHORT_BIAS / 7 LONG_BIAS — system is heavily SHORT-biased while trend is UP. This contradiction is the root of wrong-side trades."
+  },
+  {
+    "date": "2026-10-06T21:37:35Z",
+    "idea": "Fix 1 blocked-cohort counterfactual tracker — verify penalty-gated execution blocks losers, not winners",
+    "rationale": "Fix 1 shipped 18:35 today. 56 PENALTY-BLOCK events in 3.5h (AVAX LONG x20 conf~28%, W LONG x10, TURBO SHORT x10, ADA SHORT x10). Without counterfactual tracking we cannot know if the gate is blocking bad trades or good ones. CEO goal: track blocked-vs-passed cohorts (WR/PnL) over 48h.",
+    "expected_impact": "Validates or refutes Fix 1 within 48h. If blocked cohort would have lost >50%, Fix 1 is working. If blocked cohort would have won >50%, Fix 1 is blocking edge — needs penalty_product floor raised.",
+    "category": "verification/monitoring",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Parse pipeline.log PENALTY-BLOCK lines (signal, coin, direction, conf). For each, sample prices.db at +1h and +4h post-block. Would-have-won = price moved in trade direction. Compare blocked vs passed cohort WR after 48h.",
+    "config_change": "NONE — analysis only",
+    "agent": "brain_auditor",
+    "run_date": "2026-10-06"
+  },
+  {
+    "date": "2026-10-06T21:37:35Z",
+    "idea": "pump-chain- SHORT EXTREME meta-RSI>=50 entry floor (MONITOR, not change now)",
+    "rationale": "14d EXTREME pump-chain- SHORT meta RSI bands: <50 = 25T 36% -$0.97 | 50-60 = 19T 52.6% +$0.30 | 60+ = 13T 61.5% +$0.15. Current exec RSI>=40 floor lets through a net-negative band. BUT winner-impact: ~10/28 EXTREME winners (36%) sit in RSI 40-50 — exceeds 20% kill threshold per suggestion quality rules.",
+    "expected_impact": "If pattern holds at larger n: remove -$0.97/14d bleed band while keeping RSI>=50 winners. Re-check when EXTREME pump-chain- SHORT n reaches 80+ (currently 57).",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "medium (winner-impact >20% — do not implement without larger n)",
+    "config_change": "NONE — session lock + insufficient winner-impact margin",
+    "agent": "brain_auditor",
+    "run_date": "2026-10-06"
+  },
+  {
+    "date": "2026-10-06T21:37:35Z",
+    "idea": "hard_max_loss near-miss recovery window (REPORT — already delegated)",
+    "rationale": "All 24h losers exited hard_max_loss at ~1% adverse price move. 7d: 57T 0%WR -$7.99. Winners from same signals ride PM_TRAIL +0.2% to +5%. The stop is not wrong — the leverage amplification is. CEO already delegated leverage-aware fix to bug_hunter.",
+    "expected_impact": "If hard_max_loss becomes leverage-aware (e.g. -1% account not -1% price), 57T/7d bleed could cut 50%+ per CEO goal.",
+    "category": "exit structure",
+    "status": "delegated (bug_hunter queue#2) — do not re-propose",
+    "risk": "n/a",
+    "config_change": "NONE",
+    "agent": "brain_auditor",
+    "run_date": "2026-10-06"
   }
 ]
