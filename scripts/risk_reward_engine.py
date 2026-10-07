@@ -227,8 +227,8 @@ def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
         all_levels.append(level)
 
     for level in liq_levels:
-        # Normalize type to lowercase (book levels may be UPPERCASE)
-        level['type'] = level.get('type', '').lower()
+        # Normalize type to lowercase and recompute vs eval price
+        level['type'] = 'resistance' if level['price'] > price else 'support'
         # Normalize distance_pct to absolute vs eval price
         level['distance_pct'] = abs(level['price'] - price) / price * 100 if price > 0 else 999
         all_levels.append(level)
