@@ -1,154 +1,143 @@
 {
-    "timestamp": "2026-10-07T06:30:00Z",
-    "session_brain_stats": {
-        "queries_run": 4,
-        "top_insights": [
-            "shorting into oversold RSI is coin flip with negative EV (session: perfect long)",
-            "hard_max_loss is exit-structure problem, not entry problem (session: RR + k for SL)",
-            "signals with high WR need regime-specific preservation, not blanket blocks (session: signal decay)"
-        ]
-    },
-    "trade_summary_24h": {
-        "total": 10,
-        "wins": 6,
-        "pnl": 1.09,
-        "wr": 60.0,
-        "open_trades": 0,
-        "losers": [
-            {"token": "IMX", "signal": "pump-chain+", "dir": "LONG", "pnl": -0.07, "exit": "hard_max_loss", "regime": "EXTREME", "meta_rsi": 65.52},
-            {"token": "INJ", "signal": "pump-chain-", "dir": "SHORT", "pnl": -0.03, "exit": "hard_max_loss", "regime": "EXTREME", "meta_rsi": 57.14},
-            {"token": "IO", "signal": "pump-chain-", "dir": "SHORT", "pnl": -0.12, "exit": "hard_max_loss", "regime": "EXTREME", "meta_rsi": 41.03},
-            {"token": "LTC", "signal": "pump-chain-", "dir": "SHORT", "pnl": -0.25, "exit": "hard_max_loss", "regime": "NORMAL", "meta_rsi": 50.0}
-        ],
-        "winners": [
-            {"token": "LTC", "signal": "pump-chain-", "dir": "SHORT", "pnl": 0.61, "exit": "atr_trail_hit", "meta_rsi": 49.15},
-            {"token": "APT", "signal": "pump-chain-", "dir": "SHORT", "pnl": 0.53, "exit": "trail_sl", "meta_rsi": 42.31},
-            {"token": "ZRO", "signal": "oversold-bounce+", "dir": "LONG", "pnl": 0.23, "exit": "profit-monster-trail", "meta_rsi": 58.7},
-            {"token": "AVAX", "signal": "mover+", "dir": "LONG", "pnl": 0.10, "exit": "profit-monster-trail", "meta_rsi": 62.63},
-            {"token": "DOGE", "signal": "pump-chain-", "dir": "SHORT", "pnl": 0.08, "exit": "rr_engine_resistance_break", "meta_rsi": 43.31},
-            {"token": "ENS", "signal": "oversold-bounce+", "dir": "LONG", "pnl": 0.01, "exit": "profit-monster-trail", "meta_rsi": 28.57}
-        ]
-    },
-    "trade_summary_7d": {
-        "total": 210,
-        "wins": 114,
-        "pnl": 0.75,
-        "wr": 54.3,
-        "long_pnl": 1.35,
-        "short_pnl": -0.55,
-        "by_regime": {
-            "EXTREME_LONG": {"trades": 38, "pnl": 2.16, "wr": 57.9},
-            "FLAT_LONG": {"trades": 7, "pnl": 0.45, "wr": 85.7},
-            "NORMAL_SHORT": {"trades": 11, "pnl": 0.09, "wr": 63.6},
-            "EXTREME_SHORT": {"trades": 24, "pnl": -0.38, "wr": 41.7},
-            "NORMAL_LONG": {"trades": 53, "pnl": -0.43, "wr": 56.6},
-            "HIGH_LONG": {"trades": 65, "pnl": -0.96, "wr": 56.9}
-        }
-    },
-    "changes_from_last_run": [
-        {
-            "change": "MOVER_PLUS/MINUS kill (True/True -> False/False)",
-            "timestamp": "2026-10-07T03:00:00Z",
-            "status": "WORKING",
-            "evidence": "0 mover trades in 24h post-kill. Historical AVAX +0.10 was pre-kill."
-        },
-        {
-            "change": "SHORT_RSI_HARD_FLOOR 25->45",
-            "timestamp": "2026-10-07T04:38:00Z",
-            "status": "WORKING",
-            "evidence": "0 SHORT trades with meta RSI<45 since floor change. INJ at RSI 57.14 correctly passed floor."
-        },
-        {
-            "change": "BB_SQUEEZE_LONG_RSI_MIN=60 + wire filter",
-            "timestamp": "2026-10-07T04:38:00Z",
-            "status": "IN_PLACE_UNTESTED",
-            "evidence": "Filter live in bollinger_squeeze.py:33. 0 bb-squeeze trades since apply. Will block RSI<60 entries (TURBO 33, SAGA 48, SUPER 28, RESOLV 50 historical losers)."
-        },
-        {
-            "change": "hard_max_loss leverage-aware fix (aed0aa36)",
-            "timestamp": "2026-10-07T00:00:00Z",
-            "status": "WORKING",
-            "evidence": "Post-fix Oct 7+: 2T -$0.10 avg -1.55% lev 5.0. Pre-fix 7d: 58T -$8.11 0%WR. Bleed cut ~98%."
-        },
-        {
-            "change": "ATR_TP_MIN 0.80%->1.30% (Oct 4)",
-            "timestamp": "2026-10-04T11:35:00Z",
-            "status": "WORKING",
-            "evidence": "atr_sl_hit exits down to 0/10 in 24h (was dominant bleed). Min RR now 1.0."
-        }
-    ],
-    "drift_findings": [
-        {
-            "id": "DRIFT-VERIFY-1",
-            "severity": "info",
-            "finding": "mtf-regime-trend+/- 7d losses (-$0.46/-$0.42) are HISTORICAL — both flags already False since Oct 2/Oct 6. No trades since kill. Watchdog steer is backward-looking.",
-            "action": "None — already disabled."
-        },
-        {
-            "id": "DRIFT-VERIFY-2",
-            "severity": "info",
-            "finding": "pump-chain- 7d is +$0.12/25T 44% WR — net POSITIVE despite watchdog 'losing streak' flag. 24h losses were hard_max_loss exits, not oversold shorts. Floor=45 is blocking toxic RSI<45 entries.",
-            "action": "None — signal is net positive. Monitor hard_max_loss exits."
-        },
-        {
-            "id": "DRIFT-VERIFY-3",
-            "severity": "med",
-            "finding": "bb-squeeze+ RSI 65-78 losers (POL 65.08, TURBO 75, MERL 77.96, INJ 78.73, ZORA 71.43, SEI 68.58) won't be caught by BB_SQUEEZE_LONG_RSI_MIN=60. Winners overlap at same RSI (GMX 67.5, WLD 71.82, RESOLV 72.82). This is EXIT STRUCTURE (hard_max_loss), not entry RSI.",
-            "action": "bug_hunter owns hard_max_loss exit fix. No entry filter can separate these winners/losers."
-        },
-        {
-            "id": "DRIFT-VERIFY-4",
-            "severity": "low",
-            "finding": "signal_versions.json exists at /root/.hermes/data/ (not /var/www/hermes/data/). auto_1hr flagged 'missing' — wrong path, not actually missing.",
-            "action": "None — false alarm."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "hard_max_loss is #1 bleed across all signals (7d: bb-squeeze+ -$2.44/17T, pump-chain- -$1.36/10T, bb-bounce-v3 -$0.89/6T)",
-            "root_cause": "Stop fires on ~1% price move but becomes 3-5% account loss at leverage 3-5. Leverage-aware fix (aed0aa36) reduced24h bleed to 1T -$0.03, but HIGH regime still dangerous (17T -$2.43 0%WR pre-fix).",
-            "status": "FIX LIVE — monitor. bug_hunter owns exit-structure deep fix.",
-            "trend": "IMPROVING — 24h hard_max_loss down from 4T to 2T, bleed from -$0.47 to -$0.10."
-        },
-        {
-            "problem": "HIGH regime LONG loses -$0.96/65T despite 56.9% WR — losses larger than wins",
-            "root_cause": "hard_max_loss exits avg -4.31% at lev 3.7. profit-monster-trail winners avg +1.65%. Asymmetric exit structure.",
-            "status": "MONITOR — exit-structure fix will help. No entry filter can fix this.",
-            "trend": "STABLE — consistent bleed pattern across 7d."
-        }
-    ],
-    "missing_implementations": [],
-    "creative_improvements": [
-        {
-            "date": "2026-10-07T06:30:00Z",
-            "idea": "EXTREME LONG confidence boost for pump-chain+/volume-breakout-long+ at RSI 55-70",
-            "rationale": "EXTREME LONG is our best habitat: +$2.16/38T 57.9% WR. Winning pattern: pump-chain+ entering at RSI 59-67 (ME 64.7 +$0.88, IMX 66.7 +$0.82, LDO 59.6 +$0.38, ENS 65.1 +$0.20). Currently no regime-specific confidence boost for this sweet spot.",
-            "expected_impact": "+0.3-0.5 USDT/7d if boost increases sizing on best-habitat trades",
-            "category": "confidence tuning",
-            "status": "monitor",
-            "risk": "low",
-            "sample_size": "38 EXTREME LONG trades 7d; pump-chain+ subset ~8T — below 20T threshold for signal-level change. Monitor 48h to accumulate data."
-        },
-        {
-            "date": "2026-10-07T06:30:00Z",
-            "idea": "Volatility-scaled ATR_SL_MIN — widen stops in HIGH regime",
-            "rationale": "HIGH LONG: 17 hard_max_loss exits avg -4.31% at lev 3.7 (0%WR). ATR is larger in HIGH regime but ATR_SL_MIN=1.3% is fixed. Widening SL to ~1.9% in HIGH would give trades room to breathe, reducing hard_max_loss triggers.",
-            "expected_impact": "Could cut HIGH regime hard_max_loss bleed by 30-50% without affecting winners (trail exits dominate winners)",
-            "category": "exit structure",
-            "status": "deferred",
-            "risk": "medium",
-            "note": "CONFLICTS with bug_hunter hard_max_loss fix (aed0aa36). Do not implement until bug_hunter's exit-structure work lands. Needs backtest first."
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "MONITOR: hard_max_loss post-fix — target ≤50% bleed reduction vs pre-fix -$8.11/7d by Oct 11",
-        "MONITOR: BB_SQUEEZE_LONG_RSI_MIN=60 — first bb-squeeze trades after filter will validate",
-        "MONITOR: SHORT_RSI_HARD_FLOOR=45 — zero SHORT with meta RSI<45 since change",
-        "MONITOR: EXTREME LONG boost idea — accumulate 48h data before proposing confidence change",
-        "DELEGATE bug_hunter: hard_max_loss exit-structure deep fix (volatility-scaled SL or leverage-aware trail)",
-        "METRIC Oct 9: SHORT 7d PnL ≥ $0 (current -$0.55, improving from -$1.66)",
-        "METRIC Oct 10: 7d PnL ≥ $0 (current +$0.75 — MET, hold)",
-        "NO config changes this run — all last run's changes working, system healthy"
+  "timestamp": "2026-10-07T07:35:37Z",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "top_insights": [
+      "pump-chain BTC-pumping winrate question unresolved in sessions",
+      "oversold short filter work is current (HARD_FLOOR=45 live)",
+      "mover kill discussed and executed 2026-10-07"
     ]
+  },
+  "trade_summary_24h": {
+    "trades": 10,
+    "pnl": 1.09,
+    "wr": 60.0,
+    "longs_short": "6 pump-chain- SHORT +0.82 (50%WR), 1 pump-chain+ LONG -0.07, 1 mover+ LONG +0.10 (pre-kill), 2 oversold-bounce+ +0.24",
+    "losers": [
+      "IMX pump-chain+ LONG RSI 65.5 EXTREME hard_max_loss -0.07",
+      "INJ pump-chain- SHORT RSI 57.1 EXTREME hard_max_loss -0.03",
+      "IO pump-chain- SHORT RSI 41.0 EXTREME hard_max_loss -0.12 (PRE floor-raise)",
+      "LTC pump-chain- SHORT RSI 50.0 NORMAL hard_max_loss -0.25 (PRE floor-raise)"
+    ],
+    "post_fix_0438Z": "2 trades, both small hard_max_loss (-0.10 total), no oversold shorts"
+  },
+  "trade_summary_7d": {
+    "trades": 210,
+    "pnl": 0.75,
+    "wr": 54.3,
+    "long": "+1.30 / 169T",
+    "short": "-0.55 / 41T",
+    "hard_max_loss_7d": "60T -8.21 (window includes pre-fix; post Oct6: 10T -1.06 avg -0.106)"
+  },
+  "last_run_changes_verification": [
+    {
+      "change": "SHORT_RSI_HARD_FLOOR 25→45",
+      "status": "WORKING",
+      "evidence": "0 SHORT entries with meta-RSI<45 since 04:38Z. 45-50 band is WINNING (14d 9T +0.75 66.7%WR; 30d 21T +0.11) — floor placement CORRECT at 45. Raising to 50 would have blocked 10 winners incl LTC +0.61, DYDX +0.45.",
+      "verdict": "KEEP. Do not raise."
+    },
+    {
+      "change": "BB_SQUEEZE_LONG_RSI_MIN=60",
+      "status": "WIRED, AWAITING SAMPLES",
+      "evidence": "bollinger_squeeze.py:194 enforces filter. Targets HIGH regime <60 bleed: 18T -0.28 50%WR 4 HML. 0 bb-squeeze+ trades post-change yet.",
+      "verdict": "MONITOR 48h. Expected to cut ~50% of HIGH bleed."
+    },
+    {
+      "change": "MOVER_PLUS/MINUS_ENABLED False",
+      "status": "WORKING",
+      "evidence": "0 mover trades since Oct 7 03:00. Watchdog still shows historical 3-loss streak — STALE, signal is dead.",
+      "verdict": "KEEP. Watchdog should stop flagging disabled signals."
+    },
+    {
+      "change": "hard_max_loss leverage-aware fix (CEO aed0aa36)",
+      "status": "WORKING",
+      "evidence": "Post-fix losses -1.43%/-1.67% account (was -3 to -6%). Magnitude correct. Still entry-quality problem (2 trades, both valid-RSI entries that just lost).",
+      "verdict": "KEEP. Entry quality is separate issue."
+    }
+  ],
+  "drift_findings": [
+    {
+      "id": "DRIFT-W1",
+      "severity": "LOW",
+      "finding": "Watchdog signal_performance/streak steers include DISABLED signals (trend-ride+, mover+, accel-300-). Creates false 'wrong-side' alarms.",
+      "impact": "Auditor/CEO time wasted re-investigating killed signals. 24h is actually +$1.09.",
+      "fix": "Automation: filter watchdog performance stats by *_ENABLED flags. Not a trading config change."
+    },
+    {
+      "id": "DRIFT-W2",
+      "severity": "INFO",
+      "finding": "accel-300- is DEAD (NEVER_REENABLE + SIGNAL_SOURCE_BLACKLIST). 0 trades after Oct 1. Watchdog deep_analysis still describes it as live.",
+      "impact": "None on trading. Stale analysis.",
+      "fix": "None needed. Module is blacklisted."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "problem": "hard_max_loss still #1 exit bleed (7d 60T -8.21 window, post-fix 10T -1.06)",
+      "status": "MITIGATED by leverage-aware fix",
+      "note": "Per-trade loss now ~-1.5% account. Root remaining: wrong-side entries at valid RSI (INJ RSI 57, IMX RSI 65). Not a floor problem."
+    },
+    {
+      "problem": "SHORT book negative 7d (-0.55/41T)",
+      "status": "IMPROVING",
+      "note": "Was -1.66 earlier. Floor + oversold guard holding. 45-50 band winning. Do not over-tighten."
+    },
+    {
+      "problem": "bb-squeeze+ HIGH regime bleed at RSI<60",
+      "status": "JUST ADDRESSED",
+      "note": "BB_SQUEEZE_LONG_RSI_MIN=60 live. 0 samples yet. Monitor."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "idea": "Watchdog exclude disabled signals from performance/streak steers",
+      "reason": "DRIFT-W1 — false alarms on trend-ride+/mover+/accel-300-",
+      "owner": "automation",
+      "priority": "low"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-07T07:35:37Z",
+      "idea": "Monitor BB_SQUEEZE_LONG_RSI_MIN=60 impact on HIGH regime <60 entries (expected: block ~18T/14d 50%WR 4 HML bleed without touching 60-70 sweet spot 20T 75%WR)",
+      "rationale": "bb-squeeze+ edge is RSI-defined: <60 bleeds, 60-70 wins 75%. Filter just landed. One variable — wait for samples before any further squeeze change.",
+      "expected_impact": "Cut ~50% of bb-squeeze+ HIGH bleed (-0.28/14d)",
+      "category": "entry sniper",
+      "status": "monitoring",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-07T07:35:37Z",
+      "idea": "REJECTED: SHORT_RSI_HARD_FLOOR 45→50",
+      "rationale": "14d 45-50 band is WINNING 9T +0.75 66.7%WR. Raising floor would block 10 winners (LTC +0.61, DYDX +0.45, etc). Constants comment claiming 45-50 bleed was stale/wrong — live DB disproves it.",
+      "expected_impact": "N/A — would HURT winners",
+      "category": "rejected",
+      "status": "rejected",
+      "risk": "n/a"
+    }
+  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    "SHORT_RSI_HARD_FLOOR=45: VERIFIED WORKING — 0 oversold shorts, band placement correct",
+    "BB_SQUEEZE_LONG_RSI_MIN=60: WIRED — awaiting samples, targets correct bleed",
+    "MOVER± kill: VERIFIED — 0 trades since",
+    "hard_max_loss leverage-aware: VERIFIED — losses now ~-1.5% not -4%"
+  ],
+  "next_actions": [
+    "MONITOR BB_SQUEEZE_LONG_RSI_MIN 48h — check if HIGH <60 entries stop firing",
+    "MONITOR SHORT book 7d — target ≥$0 by Oct 9 (currently -0.55)",
+    "MONITOR wyckoff 48h shadow — 0 trades since wire-up",
+    "AUTOMATION: filter watchdog steers by ENABLED flags (DRIFT-W1)",
+    "NO config changes this run — last run's changes need sample time",
+    "Next audit: check squeeze RSI_MIN samples + SHORT 7d PnL + hard_max_loss cohort n≥10"
+  ],
+  "system_health": {
+    "24h": "+$1.09 60%WR 10T — GOAL MET",
+    "7d": "+$0.75 54.3%WR 210T — GOAL MET (flipped positive)",
+    "30d": "still negative (window aging)",
+    "open_trades": 0,
+    "portfolio_health": "warning (watchdog) but DB shows healthy 24h/7d",
+    "pipeline": "active, signals_enabled=true",
+    "disk": "85% WARN"
+  }
 }

@@ -3355,5 +3355,32 @@
     "status": "deferred",
     "risk": "medium",
     "note": "CONFLICTS with bug_hunter hard_max_loss fix (aed0aa36). Do not implement until bug_hunter's work lands. Needs backtest."
+  },
+  {
+    "date": "2026-10-07T07:35:37Z",
+    "idea": "Monitor BB_SQUEEZE_LONG_RSI_MIN=60 impact on HIGH <60 entries",
+    "rationale": "bb-squeeze+ edge is RSI-defined: <60 bleeds -0.28/14d, 60-70 wins 75%. Filter landed, awaiting samples.",
+    "expected_impact": "Cut ~50% of HIGH bleed",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-07T07:35:37Z",
+    "idea": "REJECTED SHORT_RSI_HARD_FLOOR 45→50 — 45-50 band is WINNING (+0.75/14d 66.7%WR)",
+    "rationale": "Live DB disproves stale constants comment. Raising would block 10 winners.",
+    "expected_impact": "N/A — would hurt winners",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-07T07:35:37Z",
+    "idea": "Watchdog: filter performance/streak steers by *_ENABLED flags",
+    "rationale": "trend-ride+/mover+/accel-300- still flagged after kill — false wrong-side alarms.",
+    "expected_impact": "Cleaner steers, less wasted audit time",
+    "category": "systems",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
