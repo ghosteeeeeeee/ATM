@@ -890,7 +890,7 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # RSI 35-45 LONG = 18T 44.4%WR -$0.30 (dead zone).
 # Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
 LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
-LONG_RSI_CEILING = 70          # RAISED 65→70 (CEO 2026-09-30). 30d backtest: RSI<70 LONG = 133T 51.1%WR +$2.43 (optimal). RSI>=70 = 58T 36.2%WR -$0.68 (correctly blocked). RSI 65-70 adds 24T +$2.09 while blocking overbought entries.
+LONG_RSI_CEILING = 85            # CEO 2026-10-07: raised 70→85 — watchdog verified RSI≥70 still prints (+$0.85, pump-chain LONG). DOT entry RSI 75.3 was correct.
 VOLUME_BREAKOUT_LONG_RSI_CEILING = 95  # brain_auditor 2026-09-30 — volume-breakout-long+ is STANDALONE_BYPASS momentum signal. 14d RSI>70: 9T 77.8%WR +$1.23 (BEST band). Blanket LONG_RSI_CEILING=65 kills its edge. 95 blocks only exhausted zone (RSI>95: 2L -$0.32, 0W). Same pattern as existing vol-breakout RSI<20 exclusion in signal_compactor.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────
@@ -1337,7 +1337,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone — 
 # Fix entry conditions, not the clock.
 PUMP_CHAIN_LONG_DEAD_HOURS = []         # DISABLED 2026-09-30 — use entry quality filters instead
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries.
-PUMP_CHAIN_LONG_RSI_MAX = 70          # 14d: RSI 65-75 = 15T 41.7%WR (dead zone). RSI 50-60 = 19T 63.2%WR (sweet spot).
+PUMP_CHAIN_LONG_RSI_MAX = 85          # CEO 2026-10-07: raised 70→85 — watchdog verified 14d: RSI 60-70 best (+$1.26, 64.4%WR), RSI ≥70 still prints (+$0.85). Old 70 threshold blocked profitable trades.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers). Oversold LONG = catching falling knife.
 
 # pump-chain- SHORT entry quality (replaced dead hours)
@@ -2873,7 +2873,7 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
 PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-10-07 — HIGH is the bleed regime. 14d HIGH 7T 14.3%WR -$0.66 | NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 | NORMAL 12T 75% +$0.53. Block HIGH, keep NORMAL+EXTREME. ADA 2026-10-07 HIGH RSI 56 SHORT lost — shorted bullish coin. Prior False from Sep 22 re-enable.
-PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True  # SIGNAL REPORTER 2026-10-07 — 7d EXTREME 22T 27.3%WR -$0.60 bleed vs NORMAL 5T 60%WR +$0.37. 24h EXTREME 7T 14.3%WR +$0.09 (one APT +$0.53 outlier saved it; without it -$0.44). RSI_FLOOR=45 did not fix EXTREME. HIGH already blocked. Prior False from Sep 22 CEO re-enable — fresh data overrides.
+PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # brain_auditor 2026-10-07 20:30 UTC REVERT of signal_reporter a907babd True. CEO re-enabled vol_gate ('EXTREME','pump-chain-'):1.0 same day ("every dump is a SHORT"). 30d meta-RSI EXTREME: >=60 n=18 61.1%WR +$0.37 (PAYS); <45 n=33 42.4% -$1.18 (blocked by SHORT_RSI_HARD_FLOOR=45). Block killed 26/32 14d EXTREME winners incl APT +0.53 trail. HIGH_BLOCK=True + HARD_FLOOR=45 + CUT_LOSER_PNL=-1.50 are the real defenses. signal_reporter 7d -$0.60 was one noisy window.
 
 # bb-squeeze+ LONG EXTREME regime block — 12T 50%WR -$0.15 EXTREME (hard_sl/hard_max_loss).
 # HIGH 63.6%WR +$0.14, NORMAL 66.7%WR kept. signal_reporter 2026-10-02.
