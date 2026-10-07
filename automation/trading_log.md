@@ -5572,3 +5572,35 @@ BY: auto_1hr
 - pump-chain+ 0% WR on 2T 24h — one more loss hits kill threshold; monitor only
 
 BY: auto_1hr
+
+## [2026-10-07 16:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+**Open:** 0
+
+**24h:** 13 closed | 6W 7L | +$0.71 (WR 46.2%)
+**24h by signal:** pump-chain- 10T 3W +$0.72 | pump-chain+ 2T 0W -$0.21 | oversold-bounce+ 1T 1W +$0.23
+**24h by close reason:** hard_max_loss 7T -$0.61 (46.2% of closes) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | profit-monster-trail 1T +$0.23 | rr_engine_resistance_break 1T +$0.08 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/13 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** 08h -$0.13 | 10h -$0.14 | 12h $0.00 | 13h -$0.22 | 14h-16h 0T — NEG-STREAK inactive (0T gaps, not 3 consecutive negative hours)
+**Pipeline:** live_trading True; 0 open
+
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — last hour 0T; 24h 0%-WR only pump-chain+ 2T (need 3+ in last hour)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — fix deployed and stable
+- NEG-STREAK: inactive — 14:00-16:00 are 0T gaps, not consecutive loss hours
+- hard_max_loss: 7/13 = 46.2% of 24h closes — still above watch threshold but tpsl fix IS deployed; queue#2 leverage-aware SL review remains open (max 1 change/hr, none this hour)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Quiet volume continues: 0T/hr since 13:00 (13:00 was last closes). Market vs filter starvation — leave min confidence alone.
+- hard_max_loss still 46.2% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain+ 0% WR on 2T 24h — one more loss hits kill threshold; monitor only
+- 24h PnL drifted slightly lower ($0.85→$0.71) because older wins aged out; still net positive
+
+BY: auto_1hr
