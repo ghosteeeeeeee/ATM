@@ -1270,7 +1270,7 @@ MULTI_ALT_REFERENCE_ALTS = ['ETH', 'SOL', 'XRP', 'DOGE', 'AVAX', 'DOT', 'LINK', 
 BTC_MOMENTUM_FILTER_ENABLED = True
 BTC_MOMENTUM_WINDOW = 30                    # minutes — momentum lookback
 BTC_MOMENTUM_RISING_THRESHOLD = 0.12        # % — block SHORT if BTC 30m momentum > this (tightened from 0.15 per crash-protection plan)
-BTC_MOMENTUM_FALLING_THRESHOLD = -0.12      # % — block LONG if BTC 30m momentum < this (tightened from -0.15 per crash-protection plan)
+BTC_MOMENTUM_FALLING_THRESHOLD = -0.30      # % — block LONG if BTC 30m momentum < this (widened from -0.12, 2026-10-07 — -0.15% isn't a crash)
 BTC_MOMENTUM_BLOCK_DURATION_MIN = 10        # minutes to block entries after trigger
 
 # ── BTC Level Filter (Layer 8) ───────────────────────────────────────────────
