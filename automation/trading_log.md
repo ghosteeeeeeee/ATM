@@ -5376,3 +5376,36 @@ Final set: ['ALGO', 'BTC', 'CHIP', 'INJ', 'JUP', 'TURBO']
 - hard_max_loss now 50% of 24h closes (up from 40%) — dominant bleed -$0.60. If queue#2 fix lands next window, expect this to drop. If still >40% after that fix, demand SL structure review
 - pump-chain- fired 2 hard_max_loss SHORTs in last hour — RSI_MIN=45 filter (raised 2026-10-06) active; watch whether this cohort keeps bleeding or is variance
 - Volume quiet-ish: 2T/hr this hour, 0 open — market vs filter starvation; leave min confidence alone
+
+## [2026-10-07 10:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+
+**Last hour closes:** none
+
+**24h:** 11 closed | 6W 5L | +$1.21 (WR 54.5%)
+**24h by signal:** pump-chain- 7T 3W +$0.94 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 1T 0W -$0.07
+**24h by close reason:** hard_max_loss 5T -$0.35 (45%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine_resistance_break 1T +$0.08
+**atr_sl_hit:** 0/11 = 0% — tpsl_utils.py fix deployed and stable
+**Hourly streak:** 05:00 -$0.10 | 08:00 -$0.13 | 09:00/10:00 no trades — NEG-STREAK needs 3 consecutive neg hours; zero-trade hours are not negative; only 2 neg hours — NOT triggered
+**Pipeline:** timers active; live_trading True; 0 open
+
+**Entry quality:** no closes last hour — N/A
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — 0 trades last hour; 24h 0%-WR only pump-chain+ 1T (need 3+ trades)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: inactive — 2 consecutive neg hours (05:00, 08:00) with 0-trade gaps; needs 3
+- hard_max_loss: 5/11 = 45% of 24h closes — still above 40% watch threshold. Fix IS deployed (leverage-aware path live). queue#2 SL review already open — not adding a second SL change this hour (max 1 change/hr)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+
+**Sideways find (LOW):** data/signal_versions.json still missing pump-chain+ / oversold-bounce+ / mover+ audit entries — seed when those constants next change.
+
+**Open Questions:**
+- quiet stretch: 0 closes in 5 of last 6 hours, 0 open — market vs filter starvation; leave min confidence alone
+- hard_max_loss still ~45% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain- still net positive (+$0.94, 3W/7T) despite hard_max_loss being the dominant bleed mechanism
