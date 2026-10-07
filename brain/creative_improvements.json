@@ -3412,5 +3412,53 @@
     "status": "suggested",
     "risk": "medium — needs backtest on 7d data before implementation. Must verify it wouldn't block the 24h winners.",
     "implementation_note": "Add PUMP_CHAIN_MAX_PREMOVE_PCT=0.8 to hermes_constants.py. In pump-chain detection, check |price_now - price_5min_ago| / price_5min_ago > 0.8% in trade direction → block. Backtest first: run against 7d pump-chain trades, count winners blocked."
+  },
+  {
+    "date": "2026-10-07T12:39:14Z",
+    "idea": "Wrong-side ledger — for every closed losing trade, compute reverse-direction PnL (entry->exit flipped) and persist to a table",
+    "rationale": "Fundamental truth: every losing trade means someone else gained what we lost. Currently we only know OUR pnl. A reverse-PnL column would quantify how often losses were (a) wrong-side (reverse would have won big) vs (b) right-side bad-exit (reverse would have lost too). LDO pump-chain+ LONG lost -$0.14 in STRONG_DOWN — reverse SHORT would have gained. IO pump-chain- SHORT at meta RSI 41 lost — reverse LONG (the oversold bounce) was the winning side. Without this metric we cannot systematically separate \"wrong direction\" from \"right direction, bad exit.\"",
+    "expected_impact": "Enables wrong-side ratio as first-class KPI. Targets signal-quality fixes at direction errors, not just exit tuning. Feeds the fundamental-truth mandate directly.",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "On trade close, lookup same coin price path entry->exit; reverse_pnl = -pnl_usdt * (direction==LONG ? 1 : 1) wait — reverse means if we were LONG, hypothetical SHORT entry at our entry price closed at our exit price. Store reverse_pnl_usdt. Shadow-only, no trading path impact."
+  },
+  {
+    "date": "2026-10-07T14:39:47Z",
+    "idea": "Exit-regime alignment KPI: track trail_family vs hard_max_loss ratio as primary health metric",
+    "rationale": "7d data shows trail_family 120T 87.5% +$9.47 vs hard_max_loss 64T 0%WR -$8.60. The system is profitable on trails, bled entirely on HML. WR and raw PnL hide this — pump-chain- can be +$0.72 at 30% WR when winners trail big. A trailing-exit share metric (>60% target) would surface exit-structure problems before PnL does.",
+    "expected_impact": "Earlier detection of exit-regime breakdown; guides signal/exit tuning decisions",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "Compute in trade_watchdog: trail_share = (trail_sl+atr_trail_hit+profit-monster-trail+pump_exit_dead_money)/total_closes. Alert when <50%."
+  },
+  {
+    "date": "2026-10-07T14:39:47Z",
+    "idea": "MFE-triggered HML grace: if trade MFE > 0.3% before hitting HML threshold, allow deeper cut (-2.0% acct) since trail should have engaged",
+    "rationale": "87.5% of 7d HML trades had positive MFE — they were in profit then reversed through the stop. Trades that reached +0.3% MFE have earned trail protection; cutting them at the same threshold as never-in-profit trades is mis-calibrated. Code change in position_manager HML path, not a constant — needs bug_hunter + backtest before ship.",
+    "expected_impact": "Convert ~20-30% of HML trades to trail exits or smaller losses",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "implementation": "position_manager HML check: if trade.mfe_pct >= 0.3, use CUT_LOSER_PNL_MFE_GRACE (-2.0) else CUT_LOSER_PNL. Requires MFE tracking on open trades. Backtest on 7d HML cohort first."
+  },
+  {
+    "date": "2026-10-07T16:38:34Z",
+    "idea": "REJECTED: PUMP_CHAIN_MAX_PREMOVE_PCT move-freshness guard — backtest disproved (winners/losers identical pre-move +0.09%)",
+    "rationale": "50 pump-chain trades 7d, candles_1m backtest. Pre-move does not distinguish winners from losers.",
+    "expected_impact": "N/A — rejected",
+    "category": "rejected",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-07T16:38:34Z",
+    "idea": "MFE-grace HML: conditional deeper cut (-2.00% acct) for trades with MFE>=0.3%, vs uniform CUT_LOSER_PNL",
+    "rationale": "87.5% of 7d HML trades (64T -$8.60) had positive MFE. Uniform threshold mis-calibrates: never-in-profit trades deserve tighter cut, trail-earned trades deserve deeper cut.",
+    "expected_impact": "Convert ~20-30% of HML to trail exits or smaller losses. Targets #1 bleed.",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium — needs bug_hunter + backtest"
   }
 ]
