@@ -5341,3 +5341,38 @@ Final set: ['ALGO', 'BTC', 'CHIP', 'INJ', 'JUP', 'TURBO']
 - Quiet stretch: 0 closes in 4 of last 5 hours, 3 opens/24h — market vs filter starvation; leave min confidence alone
 - ADA pump-chain- SHORT is the only live position — no action until it closes
 - hard_max_loss exactly 40% of 24h closes — if next window pushes >40%, demand queue#2 fix or SL structure review
+
+## [2026-10-07 09:13 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.13 (WR: 0.0%)
+**Open:** 0
+
+**Last hour closes (both pump-chain- SHORT, both hard_max_loss):**
+- LDO SHORT hard_max_loss -$0.07 (-1.61%) SL_dist 1.156%
+- ADA SHORT hard_max_loss -$0.06 (-1.42%) SL_dist 0.833%
+
+**24h:** 12 closed | 6W 6L | +$0.96 (WR 50.0%)
+**24h by signal:** pump-chain- 8T 3W +$0.69 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 1T 0W -$0.07
+**24h by close reason:** hard_max_loss 6T -$0.60 (50%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine_resistance_break 1T +$0.08
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix deployed and stable (md5 5750dc0e, CUT_LOSER_PNL=-1.00 leverage-aware path live in position_manager.py:3400)
+**Hourly streak:** 21:00 -$0.12 | 02:00 +$1.14 | 05:00 -$0.10 | 08:00 -$0.13 — NEG-STREAK needs 3 consecutive neg hours; only 2 (05:00, 08:00) — NOT triggered
+**Pipeline:** timers active; live_trading True; 0 open; portfolio +36.17% today
+
+**Entry quality:** both last-hour losers hard_max_loss at modest SL distances (0.83-1.16% price); account losses -1.4% to -1.6% at leverage — expected, not a bug
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — last hour 2T 0W but need 3+ for kill rule; 24h 0%-WR only pump-chain+ 1T (pump-chain- still 3W/8T net +$0.69)
+- Overtrade: 2/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert; leverage-aware fix confirmed deployed
+- NEG-STREAK: inactive — only 2 consecutive neg hours (needs 3)
+- hard_max_loss: 6/12 = 50% of 24h closes (UP from 40% last hour) — crossed watch threshold. Fix IS deployed (HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES / _hml_lev). Losses modest ($0.03-0.12 each). queue#2 leverage-aware SL review already open — not adding a second SL change this hour (max 1 change/hr)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+
+**Sideways find (LOW):** data/signal_versions.json has pump-chain- (v1) but NOT pump-chain+ — audit trail incomplete for the LONG variant that still trades (PUMP_FLOW_PLUS_ENABLED=True). Seed when that constant next changes.
+
+**Open Questions:**
+- hard_max_loss now 50% of 24h closes (up from 40%) — dominant bleed -$0.60. If queue#2 fix lands next window, expect this to drop. If still >40% after that fix, demand SL structure review
+- pump-chain- fired 2 hard_max_loss SHORTs in last hour — RSI_MIN=45 filter (raised 2026-10-06) active; watch whether this cohort keeps bleeding or is variance
+- Volume quiet-ish: 2T/hr this hour, 0 open — market vs filter starvation; leave min confidence alone

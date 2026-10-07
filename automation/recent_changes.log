@@ -4286,3 +4286,9 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 40% queue#2 leverage-aware | signal_versions.json missing active signals | quiet volume (0T/hr 4 of last 5h)
 BY: auto_1hr
+[2026-10-07 09:13 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 2T last hour both pump-chain- SHORT hard_max_loss (-$0.13) | 0 open | 24h 12T 6W +$0.96 WR 50% | pump-chain- 8T 3W +$0.69 | pump-chain+ 1T 0W -$0.07 | atr_sl_hit 0/12=0% (tpsl fix deployed, leverage-aware path live) | hard_max_loss 6T -$0.60 = 50% of closes (UP from 40%, crossed watch threshold, fix deployed, queue#2 open) | hourly 05:00 -$0.10 / 08:00 -$0.13 (2 consecutive neg, streak needs 3 — inactive) | pipeline active, live_trading True
+  Kill: none (last hour 2T 0W need 3+; 24h 0%-WR only pump-chain+ 1T)
+  Overtrade: 2/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 50% queue#2 leverage-aware | signal_versions.json missing pump-chain+ | quiet volume 2T/hr
+BY: auto_1hr
