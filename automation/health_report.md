@@ -1,39 +1,44 @@
-=== Health Report ===
-Time: 2026-10-01 16:47 UTC
 
-PIPELINE: OK
-- Status: running (last cycle 16:45:39, all steps rc=0)
-- Signals (1h): 54 generated
-- Trades: 2 open (BTC LONG, ETH LONG), 21 closed today
-- Today PnL: -$0.84 USDT | WR 33.3% (7W/21)
-- Errors: 0 real (grep hits were coin_tracker "0 errors")
+# Hermes Health Report — 2026-10-07 05:50 UTC
+
+## Status: OK (WARN: disk 85%)
+
+PIPELINE:
+- Status: active (cycle #232066)
+- Signals (1h): 77 generated
+- Trades: 1 open (IMX LONG -0.15%), 3 closed today (+1.11 USDT, 2 wins)
+- Errors: 0 Tracebacks/CRASH in 30min window
+- position_manager: rc=0
+- Phantom trades (atr_sl_hit <0.01%): 0 today
+- Hotset: empty (COOL_OFF, 67% coins hot — expected under current regime)
 
 MARKET:
-- Regime: 2 LONG_BIAS (ZRO, PUMP) / 0 SHORT / 114 NEUTRAL — overall NEUTRAL
-- Speed: 50.3% tokens >= 50th percentile (81/161)
-- Hotset: empty — 5 signals pending top-10, 0 survived compaction (confidence <50%)
+- Regime: LONG_BIAS 72 / SHORT 2 / NEUTRAL 49 (123 tokens, 5m)
+- coin_tracker: STORMY, COOL_OFF strength 54
+- Speeds: 178 fresh / 90 tokens >= 50th percentile
+- Predictive: MOMENTUM_SURGE wind gust 0.32 vs sustained 0.09
 
 SYSTEM:
-- Timers: ~50+ hermes timers active and firing on schedule
-- Disk: 86% used (118G, 17G free) — WARN
-- Prices: fresh (token_speeds.updated_at = 16:46 UTC)
-- Guardian: active | Pipeline: active | Key timers (price-collector, 1m-candle, signal-compactor, trade-watchdog, watchdog): all active
-- Journal: vacuumed, freed 84MB
-
-DB DISK BREAKDOWN (growth root cause):
-- coin_tracker.db 3.3G
-- candles.db 2.3G (+961M WAL)
-- mtf_macd_tuner.db 1.3G
-- signals_hermes.db 893M
-- session_brain.db 835M
+- Timers: 3/3 active — price-collector (50s), pipeline (28s), 1m-candle (3m)
+- Services: pipeline + hl-sync-guardian active
+- Disk: 85% used (18G free of 118G) — WARN, recurring
+- Prices: fresh — collector ran 50s ago, 87 prices, candle_seed 10/10
+- DB locks: normal concurrent access (price-collector, 1m-candle, trades-api) — not stuck
+- OpenMemory MCP: functional (with Accept header)
 
 AUTO-FIXES APPLIED:
-- journalctl --vacuum-size=50M → freed 84MB archived journals
-- systemctl daemon-reload → cleared stale hermes-atr-sl-updater.timer ghost reference (unit file does not exist; ATR SL managed locally by guardian via DB — not a functional gap)
+- None required — no crashes, no stuck locks, no missed critical timers
+- Log compression skipped (nothing >7d old)
+- Failed aux services (better-coder, bug-hunter, git-release) not restarted — root-cause fixes required, restart-only is a bandaids (per prior decision)
 
 ALERTS:
-- WARN: Disk 86% — DB growth not logs (no .log files >7d). Needs CEO pruning decision for coin_tracker.db / candles.db / mtf_macd_tuner.db. Recurring since 2026-10-01 15:48.
-- WARN: hermes-atr-sl-updater.timer unit file missing (not-found). Inert ghost entry — SL/TP path healthy via guardian. Delete stale reference or recreate unit if local ATR updater desired.
-- INFO: Hotset empty — signal starvation continues (54 sig/hr raw, 0 pass confidence gate). Same as 15:48 report.
-- INFO: 53/241 token_speeds is_stale=1 but updated_at fresh — flag means "no recent price move", not data staleness.
-- INFO: Today red day (-$0.84, 33.3% WR) — within normal variance, no kill triggers.
+- WARN: Disk 85% (recurring since Oct 1). Largest: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.4G, session_brain.db 1.0G, signals_hermes.db 949M. CEO DB-pruning decision still open.
+- WARN: 3 non-trading systemd services failed (better-coder exit 1, bug-hunter exit 1 by design, git-release exit 1). Auxiliary only.
+- INFO: safety filters working as designed — RSI hard-floor blocks, BTC-CRASH momentum blocks, loss cooldowns.
+
+SIDE FINDINGS:
+1. signals table 26,121 rows — unbounded growth despite signal-purge timer (recurring). signal_history still empty — purge may target wrong table.
+2. decisions table stale since 2026-04-13 — dead table, compactor logs to journal only.
+3. coin_tracker_data.json lives at /var/www/html/ (not data/) — path quirk, not missing.
+4. Empty legacy prices.db files at /root/.hermes/data/prices.db and scripts/data/prices.db — unused; real price_history is in signals_hermes.db static DB (13M rows).
+5. BTC-CRASH / RSI-hard-floor blocks firing correctly — not errors.

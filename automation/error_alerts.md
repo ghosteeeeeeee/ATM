@@ -1014,3 +1014,42 @@
 
 ## Error Alerts — 2026-10-06 23:59 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-07 00:47 UTC
+- **WARN**: Disk usage at 85% (18G free of 118G) — recurring since Oct 1. Largest: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.3G, session_brain.db 1.0G, signals_hermes.db 947M. No logs >7d to gzip. CEO DB-pruning decision still open.
+- **INFO**: Pipeline OK — active, cycle #231770, position_manager rc=0. 1 open (LTC SHORT trade_id=15971, trailing SL active), 9 closed today, portfolio -6.90% PnL. Signals: 79 in last hour. No crashes/Tracebacks in 30min window.
+- **INFO**: All critical timers active & enabled — price-collector, 1m-candle, pipeline all fired <2min ago. hl-sync-guardian active. Prices fresh (87 tokens, 35s old). Regime SHORT_BIAS (11L/45S/67N), coin_tracker STORMY. Speeds: 128/241 tokens >=50th pct.
+- **INFO**: candles.db held by price-collector + 1m-candle (normal concurrent access, not stuck). signals_hermes_runtime.db held by trades-api (normal).
+- **AUTO-FIX**: None required — no crashes, no stuck locks, timers all firing. Log compression skipped (nothing >7d old). DB pruning not auto-applied (CEO decision).
+- **SIDE FINDINGS**: (1) signal_outcomes shows 0 rows created today but portfolio reports 9 closed today — timestamp/created_at semantics differ from wall-clock "today"; not a pipeline failure. (2) signals table 25691 rows — unbounded growth despite signal-purge timer (recurring). (3) BTC-CRASH filter repeatedly blocking MERL LONG — safety filter working as designed.
+
+## Error Alerts — 2026-10-07 01:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: IO TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-07 02:48 UTC
+- **WARN (recurring)**: Disk `/` 84% used (94G/118G, 19G free) — improved from 85% after journal vacuum. Largest DBs: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.3G. CEO DB-retention/pruning decision still open (since Oct 1).
+- **INFO**: Pipeline OK — running every 1m, cycle #231885+, position_manager rc=0 (0 open, 0 closed today). 137 signals in last hour. All key timers active (price-collector, 1m-candle, pipeline fired <35s ago). Prices fresh (87 tokens, ~70s old). Regime SHORT_BIAS (2L/111S/11N). Speeds 128/241 >=50th pct. Phantom trades 0.
+- **AUTO-FIX**: Journal vacuum freed 790.5M (disk 85% → 84%). No service restarts. No log compression needed.
+- **SIDE FINDINGS**: (1) `decisions` table stale since 2026-04-13 — signal_compactor logs to journal, never writes DB. Dead table. (2) `signals` table 25,942 rows — unbounded growth (recurring). (3) GOAT SHORT repeatedly blocked by CTX-GATE (RSI 40.3 < 45) — safety filter working as designed.
+
+## Error Alerts — 2026-10-07 02:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-10-07 03:50 UTC
+- **WARN (recurring)**: Disk `/` 84% used (94G/118G, 18G free) — no logs >7d to gzip; largest: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.3G. CEO DB-retention decision still open.
+- **INFO**: Pipeline OK — active, position_manager rc=0. 65 signals in last hour, 2 closed today (both wins, +1.14 USDT), 0 open. All critical timers active (price-collector, 1m-candle, pipeline fired <2min ago). Prices fresh (candles_1m current). Regime SHORT_BIAS (16L/40S/67N, 123 tokens). Token speeds: 241 in DB. No Tracebacks/CRASH in 30min window.
+- **WARN**: 8 non-critical systemd services failed (auxiliary only, not trading-critical): better-coder (exit 1), brain-auditor (exit 124 + SQL syntax error near "2026"), bug-hunter (exit 1, by design when findings exist), ceo (exit 124 + MCP Accept-header error), git-release (exit 1, skills/shared/ponytail-audit path), trading-checklist (exit 1, flags 26001 signals), upgrade-implementer (exit 124, stale 9h), wasp (exit 1). None auto-fixed — root-cause fixes required, restart-only is a bandaids.
+- **WARN**: OpenMemory MCP HTTP endpoint returns "Client must accept both application/json and text/event-stream" — same error hitting CEO service. Memory store via HTTP blocked.
+- **INFO**: No auto-fixes required for trading path — no crashes, no stuck DB locks, no missed critical timers. Disk compression skipped (nothing >7d). Failed aux services logged, not restarted (no bandaids).
+- **SIDE FINDINGS**: (1) `signals` table 26,001 rows — unbounded growth despite signal-purge timer (recurring since 02:48). (2) `signal_history` table empty (0 rows) while `signals` grows — purge may target wrong table. (3) `decisions` table stale since 2026-04-13 (recurring dead table). (4) Brain auditor SQL bug: `syntax error at or near "2026"` — needs code fix in brain-auditor. (5) git-release fails on `skills/shared/ponytail-audit` path — likely broken symlink. (6) hermes-atr-sl-updater.timer is not-found (DEFUNCT service file still referenced by timer name).
+
+## Error Alerts — 2026-10-07 03:59 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3521s left, N failures)`
+
+## Error Alerts — 2026-10-07 05:50 UTC
+- **WARN** (recurring): Disk `/` 85% used (94G/118G, 18G free) — no logs >7d to gzip; largest DBs: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.4G. CEO DB-retention decision still open.
+- **WARN** (3x): Non-critical systemd services failed — better-coder (exit 1), bug-hunter (exit 1, by design when findings exist), git-release (exit 1, skills/shared/ponytail-audit path). Not restarted — root-cause fixes required.
+- **INFO**: Pipeline OK — active, cycle #232066, position_manager rc=0. 77 signals/1h, 3 closed today (+1.11 USDT, 2 wins), 1 open (IMX LONG). All critical timers active. Prices fresh (87 tokens, <1min). Regime LONG_BIAS (72/2/49). Speeds 90/178 >=50th pct. Phantom trades 0.
+- **AUTO-FIX**: None required — no crashes, no stuck DB locks, no missed critical timers. Log compression skipped (nothing >7d). Failed aux services logged, not restarted (no bandaids).
+- **SIDE FINDINGS**: (1) signals table 26,121 rows unbounded growth; signal_history empty (recurring). (2) decisions table stale since 2026-04-13 (recurring dead table). (3) coin_tracker_data.json at /var/www/html/ path quirk. (4) Empty legacy prices.db files unused — real data in signals_hermes.db.
