@@ -5541,3 +5541,34 @@ BY: auto_1hr
 - 13:00 hour 2/2 losses both SHORT pump-chain- — not enough data for signal-specific fix
 
 BY: auto_1hr
+
+## [2026-10-07 15:11 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+**Open:** 0
+
+**24h:** 15 closed | 6W 9L | +$0.85 (WR 40.0%)
+**24h by signal:** pump-chain- 10T 3W +$0.72 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 2T 0W -$0.21
+**24h by close reason:** hard_max_loss 7T -$0.61 (46.7%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | rr_engine_resistance_break 1T +$0.08 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/15 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** 13:00 -$0.22 | 14:00 0T | 15:00 0T — NEG-STREAK inactive (not 3 consecutive negative hours)
+**Pipeline:** live_trading True; 0 open
+
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — last hour 0T (need 3+); 24h 0%-WR only pump-chain+ 2T (need 3+)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — fix stable, no CEO alert
+- NEG-STREAK: not triggered — 14:00/15:00 0T, not consecutive losses
+- hard_max_loss: 7/15 = 46.7% — above watch threshold but fix IS deployed; queue#2 SL review already open (max 1 change/hr, none this hour)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Quiet volume: 0T/hr continuing — market vs filter starvation; leave min confidence alone
+- hard_max_loss still 46.7% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain+ 0% WR on 2T 24h — one more loss hits kill threshold; monitor only
+
+BY: auto_1hr
