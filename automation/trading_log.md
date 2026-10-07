@@ -5168,3 +5168,66 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-07 03:12] auto_1hr: NO CHANGE — 0T last hour; 0 open; 24h 9T 6W +$1.06; atr_sl_hit 0% (tpsl fix stable); hard_max_loss 3T -$0.50 sole bleed but 33% <40% threshold (queue#2 open); NEG-STREAK inactive; kill/overtrade paths not active; no constants edit
+
+## [2026-10-07 04:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+**Opened last hour:** 0
+
+**24h:** 9 closed | 6W 3L | +$1.06 (WR 66.7%)
+**24h by signal:** pump-chain- 5T 3W +$0.85 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | bb-squeeze+ 1T 0W -$0.13
+**24h by close reason:** hard_max_loss 3T -$0.50 (33%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine 1T +$0.08
+**atr_sl_hit:** 0/9 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** last non-zero hour 02:00 +$1.14 — NEG-STREAK not active
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — 0T last hour; 24h 0%-WR only bb-squeeze+ 1T (not 3+T clustered in last hour)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: not active
+- hard_max_loss: 3/9 = 33% of 24h closes, sole bleed -$0.50 (all other exits +$1.56) — under 40% threshold; queue#2 leverage-aware semantics still open, not a constants change this hour
+- signal_versions.json parses OK (18 signals); no constants edit → no version audit entry
+- hermes_constants.py uncommitted diff (mtime 03:39): brain_auditor KILL of MOVER_PLUS_ENABLED / MOVER_MINUS_ENABLED — not reverted, not double-counted as this hour's change
+
+**Open Questions:**
+- Volume very low (0T last hour, 0-2T/hr for ~11h) — quiet market vs filter starvation; pump-chain- only signal still firing; leave min confidence alone
+- hard_max_loss still sole bleed (33%) — if share climbs back >40%, demand queue#2 fix or SL structure review
+- mover+ kill (brain_auditor) not yet reflected in 24h close-reason rollup; watch next window for effect
+
+## [2026-10-07 05:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+**Opened last hour:** 0
+
+**24h:** 9 closed | 6W 3L | +$1.06 (WR 66.7%)
+**24h opened:** 7 (last open 01:00 UTC — ~4h gap)
+**24h by signal:** pump-chain- 5T 3W +$0.85 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | bb-squeeze+ 1T 0W -$0.13
+**24h by close reason:** hard_max_loss 3T -$0.50 (33%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine 1T +$0.08
+**atr_sl_hit:** 0/9 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** last non-zero hour 02:00 +$1.14 — NEG-STREAK not active
+**Pipeline:** healthy; log "No signals above 50% confidence — skipping execution" — market quiet, not a code fault
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — 0T last hour; 24h 0%-WR only bb-squeeze+ 1T (not 3+T clustered in last hour)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: not active
+- hard_max_loss: 3/9 = 33% of 24h closes, sole bleed -$0.50 (all other exits +$1.56) — under 40% threshold; queue#2 leverage-aware semantics still open
+- signal_versions.json parses OK (18 signals); no constants edit → no version audit entry
+- uncommitted brain_auditor MOVER_PLUS/MINUS kill in constants — not reverted, not double-counted
+
+**Open Questions:**
+- Volume very low (0T last hour; 7 opens in 24h, none since 01:00 UTC) — quiet market vs filter starvation; leave min confidence alone
+- hard_max_loss still sole bleed (33%) — if share climbs >40%, demand queue#2 fix or SL structure review
+- mover+ kill (brain_auditor) not yet reflected in 24h close-reason rollup; watch next window
+
+## TEAM UPDATES
+- [2026-10-07 05:12] auto_1hr: NO CHANGE — 0T last hour; 0 open; 24h 9T 6W +$1.06; atr_sl_hit 0% (tpsl fix stable); hard_max_loss 3T -$0.50 sole bleed 33% <40% threshold; NEG-STREAK inactive; kill/overtrade paths not active; pipeline healthy (no signals >50% conf); no constants edit
