@@ -52,3 +52,40 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] CC TOK BLOCKED — exec TOK unavailable (TOK-closed, SHORT_RSI_HARD_FLOOR)`
+
+## Error Alerts — 2026-10-07 09:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+
+## Error Alerts — 2026-10-07 10:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-07 11:47 UTC
+- **WARN** (5x): `TRADE FAILED: IO SHORT — RSI hard floor: 26.8 < 45` — signal re-generated each minute but blocked by RSI filter. Signal generator producing oversold short signals that trade executor correctly rejects. No auto-fix: signal quality issue, not system health.
+- **WARN**: Disk at 85% (95G/118G). No uncompressed logs >7d found. Monitor.
+- **WARN** (5 services failed): `hermes-bug-hunter`, `hermes-better-coder`, `hermes-git-release`, `hermes-trading-checklist`, `hermes-upgrade-implementer` — all failed on code-quality checks (bare excepts, connection leaks, defunct imports). Non-critical maintenance services. No auto-fix: restarting won't help until code issues resolved.
+- **INFO**: 0-byte legacy DBs: `prices.db`, `signals.db` — likely defunct, no active references found.
+
+## Error Alerts — 2026-10-07 11:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3538s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3483s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3422s left, N failures)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3305s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3243s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3062s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2996s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2939s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2870s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2826s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2768s left, N failures)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: IO TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-07 12:48 UTC
+- **WARN**: Disk at 85% (94G/118G). Auto-fix: vacuumed journald → freed ~453MB. Remaining hogs are active DBs (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G, session_brain 1.0G, signals_hermes 952M) + docker 2.4G + cache 5.3G. No uncompressed logs >7d. Do not delete active DBs without a retention plan.
+- **REPEATED** (filter OK): `TRADE FAILED: GRASS SHORT — RSI hard floor: 39.5/44.8 < 45` and `exec RSI unavailable (fail-closed)`. Executor correctly rejecting oversold shorts. Not a system-health issue; signal-quality issue (see prior 11:47 alert re IO SHORT same pattern).
+- **INFO**: `data/speed_history.json` is dead — all 567 token series last ts ~2026-05-10 (~151 days stale). No script references found. Live speed data is `token_speeds` in signals_hermes_runtime.db (180 live rows, updated 12:47 UTC). Safe to ignore/delete; not wired into pipeline.
+- **INFO**: `decisions` table last write 2026-04-13 (4 rows). Expected — ai_decider defunct, signal_compactor does not write here. No action.
+- **OK**: Pipeline running, position manager rc=0, all 3 timers active (fired within last ~90s), prices fresh (18s), 94 signals last 1h, 0 open trades, 7 closed today (+0.50 USDT, 2 wins), regime SHORT_BIAS (18L/23S/83N), 70.6% tokens >= 50th speed percentile.

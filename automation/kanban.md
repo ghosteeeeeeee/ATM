@@ -68,3 +68,6 @@
 
 ## TEAM UPDATES
 - [2026-10-06 19:49 UTC] health_monitor: Pipeline OK — LIVE every 1m, rc=0, 1 open (IO SHORT +0.32%) / 16 closed today / -21.43% PnL, 0 Tracebacks. All key timers active (<2min). Prices fresh (85 tokens). Regime SHORT_BIAS (7L/78S/37N). Disk WARN 85% — DB growth recurring, CEO pruning decision still open (coin_tracker 3.5G, candles 2.7G). 1m candle filled=0 = by design (MIN_BARS=3, price_collector primary OHLC). BTC-CRASH BLOCKED = safety filter OK. Side finds: error_alerts.md over-redacted (TOK), IO trade confidence=211.1 anomaly, signals table 25k rows. No auto-fixes needed. Report: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-07 12:48] health_monitor: Auto-fixed disk WARN — vacuumed journald (freed ~453MB). Pipeline/timers/position manager all healthy. Disk still 85% due to active DBs; no unsafe deletions performed. speed_history.json confirmed dead (unused, 151d stale) — token_speeds DB is live source.
