@@ -1,4 +1,12 @@
-# Error Alerts — 2026-10-07 06:05 UTC (CEO run)
+# Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
+
+## Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
+- **WARN** (recurring): Disk 85% used (95G/118G) — at threshold, goal <80% by Oct 14
+  - **AUTO-FIX**: None safe — no *.log older than 7d to gzip; DB prune still delegated to bug_hunter (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.4G, session_brain 1.0G)
+- **INFO**: Pipeline healthy — LIVE run 09:46:42 rc=0, 132 signals/hr, 0 open / 6 closed today +$0.64. Timers 3/3 active. 0 Tracebacks. FOGO SHORT correctly rejected at RSI floor (not a bug).
+- **INFO**: Recurring side findings unchanged — signals_hermes_runtime.db unbounded 92MB; decisions table dead since April.
+
+## Error Alerts — 2026-10-07 06:05 UTC (CEO run)
 
 ## Error Alerts — 2026-10-07 06:50 UTC (health_monitor)
 - **WARN** (1x): Disk 85% used (/dev/vda2 94G/118G) — at alert threshold, goal <80% by Oct 14
