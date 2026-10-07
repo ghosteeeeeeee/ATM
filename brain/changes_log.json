@@ -847,5 +847,16 @@
     "after": "BB_SQUEEZE_LONG_RSI_MIN=60; detection skips LONG when compute_rsi(token,tf=5m)<60 (fail-open if RSI unavailable)",
     "rationale": "bb-squeeze+ 30d RSI<60=10T 30%WR -$0.44 vs >=60=61T 63.9%WR +$0.18. 14d winners avg entry RSI 76.2 vs losers 71.4. Watchdog rec to cap at RSI<=70 REJECTED — >=80 band is best (+$0.33, 70.8%WR). Problem is low-RSI entries, not overbought.",
     "impact": "Blocks ~10T/14d toxic low-RSI squeeze LONGs (-$0.44), preserves 61T winners (+$0.18). Expected +$0.40-0.50/14d on this signal."
+  },
+  {
+    "timestamp": "2026-10-07T09:39:19Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED False→True — HIGH regime pump-chain- SHORT hard block",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = False",
+    "after": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True",
+    "rationale": "HIGH is the bleed regime for pump-chain- SHORT. 14d HIGH 7T 14.3%WR -$0.66 vs NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 vs NORMAL 12T 75% +$0.53. ADA 2026-10-07 HIGH RSI 56 SHORT lost (shorted bullish coin). Block wired in signal_compactor.py:2891 + decider_run.py:1656. EXTREME stays 1.0 (reopened Oct 4, 30d 51% breakeven). NORMAL preserved (the edge).",
+    "impact": "Blocks HIGH-regime pump-chain- SHORT entries. 30d: kills 12 HIGH winners (~+$1.24) but eliminates 15 HIGH losers (~-$1.66) = net +$0.42 improvement. NORMAL winners (75%WR +$0.53/30d) unaffected. Constants load fresh per 1m cycle — no restart."
   }
 ]

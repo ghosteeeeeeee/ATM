@@ -2872,7 +2872,7 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 # pump-chain+ HIGH regime block — 14T/7d 35.7%WR +$0.19 (noise). EXTREME 57.1%WR +$1.65 (edge).
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
 PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
-PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
+PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-10-07 — HIGH is the bleed regime. 14d HIGH 7T 14.3%WR -$0.66 | NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 | NORMAL 12T 75% +$0.53. Block HIGH, keep NORMAL+EXTREME. ADA 2026-10-07 HIGH RSI 56 SHORT lost — shorted bullish coin. Prior False from Sep 22 re-enable.
 PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 
 # bb-squeeze+ LONG EXTREME regime block — 12T 50%WR -$0.15 EXTREME (hard_sl/hard_max_loss).

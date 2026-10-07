@@ -3382,5 +3382,25 @@
     "category": "systems",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-07T09:30:00Z",
+    "idea": "Coin-local regime alignment filter for direction signals — block SHORT when coin_tracker shows coin is hot/BULL/LONG-at-support",
+    "rationale": "ADA pump-chain- SHORT 2026-10-07 lost while coin_tracker showed ADA health=hot, trend=BULL, setup=LONG at_support, clustering_bullish=3. We shorted the bid. BTC bearish + coin locally bullish = wrong side. Watchdog identified this as the systemic wrong-side pattern. Would also apply to other SHORT signals (mover-, accel-300-, continuum SHORT).",
+    "expected_impact": "Blocks wrong-side entries where local coin structure opposes signal direction. ADA-type losses eliminated. Need coin_tracker/regime_5m data availability check at signal detection time first.",
+    "category": "wrong-side defense",
+    "status": "suggested",
+    "risk": "medium — data availability in signal_compactor path unknown; needs feasibility check + backtest before implementation",
+    "evidence": "ADA SHORT 2026-10-07 08:08 RSI 56.25 HIGH hard_max_loss -0.06. coin_tracker at entry: hot/BULL/LONG-at-support. Watchdog deep_analysis confirmed pattern."
+  },
+  {
+    "date": "2026-10-07T09:30:00Z",
+    "idea": "Backfill signal_rsi_14 from signal metadata JSON — 90% of trades have null RSI making filter tuning unreliable",
+    "rationale": "signal_rsi_14 is null for ~90% of pump-chain+ trades (90/91 null in 30d) and ~95% of bb-squeeze trades (68/71 null in 14d). RSI-based analysis (watchdog bands, filter tuning) relies on computed RSI at analysis time, not stored data. Cannot verify winner-impact of RSI filter changes when data is missing.",
+    "expected_impact": "Enables reliable RSI band analysis per signal. Future filter changes (bb-squeeze MAX, pump-chain+ ceiling) can be verified against stored data instead of recomputed values.",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low — data fix, not trading change. Backfill from signal metadata where available; ensure new trades write RSI at close.",
+    "evidence": "PG query: pump-chain+ 30d 90/91 null signal_rsi_14. bb-squeeze 14d 68/71 null. Watchdog uses computed RSI (avg_rsi=72.7) not stored column."
   }
 ]

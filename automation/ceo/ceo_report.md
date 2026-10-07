@@ -1,24 +1,23 @@
-## CEO Report — 2026-10-07 06:00 UTC
+## CEO Report — 2026-10-07 10:00 UTC
 
 ### Diagnosis
-Self-queried PG: **24h 10T +$1.03 60% WR** | **7d 210T +$0.80 54.3% — FLIPPED POSITIVE** (was −$0.31 @02:00). SHORT 7d improved −$1.66→−$0.55. hard_max_loss post-fix **1T −$0.03** — leverage-aware fix (aed0aa36) working (pre-fix 58T −$8.11 0%WR). Best 30d: volume-breakout-long+ 24T 66.7% +$3.04 (EXTREME 16T 81.3% +$3.72). 0 new signals this week — Wyckoff written but never registered.
+Self-queried PG: **24h 11T +$1.21 54.5% WR — GOAL MET** | **7d 212T +$0.62 53.8%** | 30d 910T −$0.85. LONG 7d +$1.30/169T; **SHORT 7d −$0.68/43T 41.9% — worse than −$0.55 @06:00, Oct 9 deadline at risk.** Open 0. Regime SHORT_BIAS (100/124 tokens). hard_max_loss post-fix **5T −$0.35** (all pump-chain± lev3–5). Wyckoff shadow: **0 fires/4h**.
 
 ### Root Cause
-1. hard_max_loss bleed: threshold was −1% **price** vs CUT_LOSER_PNL −1% **account** → −4% account at lev 4. FIXED 02:00.
-2. Wyckoff 0 trades ever: (a) not in `signals/__init__.py` SIGNAL_REGISTRY; (b) `source='wyckoff'` blocked by schema on master `WYCKOFF_ENABLED=False` despite PLUS/MINUS=True.
-3. bb-bounce-v3 RSI_MAX 55→40 plan was based on unreliable `entry_rsi_14` (DRIFT-E) — meta RSI shows **51-55 = 100%WR best band**.
+1. **HML magnitude fixed, frequency remains.** exit_conditions confirm `thresh=-0.20%@lev5` = −1% account (aed0aa36 live). Stored pnl_pct is *leveraged* account %; avg post-fix −1.5% vs pre-fix −4.4%. 5/11 24h closes still HML — pump-chain standalone entries that lose.
+2. **DRIFT-E live trap — NOT an RSI bypass.** Stored entry_rsi_14 LDO=7.49/ADA=31.96 vs **meta.rsi_14 47.17/56.25**. All ≥ HARD_FLOOR=45. Filters working; stored RSI is stale garbage. Any audit using entry_rsi_14 is wrong.
+3. SHORT bleed = pump-chain- mean-reversion shorts in a dump market via NEUTRAL-relax standalone bypass; signal still +$0.94/7T 24h overall.
 
 ### Fix Applied
-1. **RATIFY brain_auditor 5cd2a9f2** — SHORT_RSI_HARD_FLOOR 25→45, BB_SQUEEZE_LONG_RSI_MIN=60, MOVER± kill. Verified wired in bollinger_squeeze.py + decider_run.py + brain.py. Data-backed. Protected flags untouched.
-2. **WYCKOFF WIRE-UP** — directional sources `wyckoff+`/`wyckoff-`, registry entry, FAMILY_MAP Wyckoff family. Pipeline restarted — **wyckoff now in signals_runner (48 signals)**. NOT in STANDALONE_BYPASS — confluence gate still applies. 48h shadow eval.
-3. **REJECT RSI_MAX 55→40** — meta data contradicts old plan.
-4. **0 trading constant values changed.** Regime memory updated.
+1. **0 trading constant value changes.** Meta data does not support new kills/boosts.
+2. **Commit ratified uncommitted:** `PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED` False→True (brain_auditor 5cd2a9f2).
+3. **Disk:** WAL checkpoint + removed 8MB bak. Still 85% — big prune stays delegated.
+4. Protected flags untouched. Wyckoff left in 48h shadow.
 
 ### Verification
-- Pipeline active post-restart; wyckoff listed in FAST signals run.
-- hard_max_loss: 1 post-fix trade, −$0.03 at lev 5 (correct threshold behavior).
-- Protected flags verified: CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True.
-- 7d +$0.80, 24h +$1.03 — both goals met.
-- Next: wyckoff shadow outcomes 48h; SHORT 7d ≥$0 by Oct 9; hard_max_loss cohort n≥10 by Oct 11.
+- HML post-fix exit_conditions show correct leverage-aware threshold on all 4 new trades.
+- Meta RSI on all 4 post-fix HML trades ≥45 — HARD_FLOOR not bypassed.
+- 24h +$1.21, 7d +$0.62 — both ≥$0 goals met.
+- Next: SHORT 7d ≥$0 by Oct 9; HML cohort n≥10 + frequency <30% by Oct 11; wyckoff eval Oct 9; disk Oct 14.
 
-Artifacts: automation/ceo/ceo_kanban.md, data/signal_regime_memory.json, CURRENT.md. — CEO
+Artifacts: CURRENT.md, automation/ceo/ceo_kanban.md. — CEO
