@@ -3789,12 +3789,10 @@ def get_token_amp_class(token):
 # Monitors BTC→HYPE→alt capital rotation and fires signals when rotation
 # patterns are detected with high confidence.
 PUMP_FLOW_ENABLED = True               # master kill-switch
-PUMP_FLOW_PLUS_ENABLED = False        # KILLED 2026-10-07 19:13 auto_1hr — pump-chain+ LONG 3T 0W -$0.27/24h, ALL hard_max_loss (LDO/IMX/FOGO, conf 55-259 — conf filter not protective). Kills both emitters (pump_chain_long.py + pump_flow_signal.py LONG path). NEVER_REENABLE until independent backtest passes. pump-chain- SHORT untouched (9T 2W +$0.64).
+PUMP_FLOW_PLUS_ENABLED = True        # RE-ENABLED 2026-10-07 CEO — every pump is a LONG opportunity
 PUMP_FLOW_MINUS_ENABLED = True        # RE-ENABLED 2026-09-22 (CEO — "every dump is a SHORT opportunity")
 PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 15.4%WR -$1.51 (24h). ALL regimes lose. NEVER_REENABLE.
-PUMP_CHAIN_V5_ENABLED = False          # CEO 2026-10-04 17:5x: REVERTED 18f780ac freeze-violation + standing "V5 LONG disabled — do not re-enable".
-                                        # False CEO attribution in that commit. Prior re-enable Oct 1 FAILED: post-reenable 7T 2W5L -$0.41, watchdog "would NOT open fresh."
-                                        # OPEN_SKIES precedent (48h test expired → disable). SHORT flag separate, untouched.
+PUMP_CHAIN_V5_ENABLED = True          # RE-ENABLED 2026-10-07 CEO — 68.3% WR all-time bare form
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
