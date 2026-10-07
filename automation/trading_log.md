@@ -5277,3 +5277,35 @@ Final set: ['ALGO', 'BTC', 'CHIP', 'INJ', 'JUP', 'TURBO']
 - Volume thin again (2T/hr, 0 open) — quiet market vs filter starvation; leave min confidence alone
 - hard_max_loss exactly 40% — if next window pushes >40%, demand queue#2 fix or SL structure review
 - mover+ 1T 1W still in 24h stats; brain_auditor kill may still be uncommitted — verify at next constants audit
+
+## [2026-10-07 07:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+**Open:** 0
+**Last-hour closes:** none
+
+**24h:** 10 closed | 6W 4L | +$1.09 (WR 60.0%)
+**24h by signal:** pump-chain- 6T 3W +$0.82 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 1T 0W -$0.07
+**24h by close reason:** hard_max_loss 4T -$0.47 (40%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine_resistance_break 1T +$0.08
+**atr_sl_hit:** 0/10 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** 02:00 +$1.14 | 05:00 -$0.10 — NEG-STREAK inactive (needs 3 consecutive neg hours)
+**Pipeline:** timer active; lock free; 0 open
+
+**Entry quality:** no last-hour trades to assess; 24h losers all hard_max_loss (leverage-aware SL band), no extreme adverse excursion pattern
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — 24h 0%-WR only pump-chain+ 1T (not 3+); pump-chain- still netting +$0.82
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: inactive (only 1 neg hour in last 5h window; 05:00 was -$0.10 on 2 trades)
+- hard_max_loss: 4/10 = 40% of closes, sole bleed -$0.47 (all other exits +$1.56, net +$1.09) — at watch threshold, not >40%; queue#2 leverage-aware SL semantics already open — not adding a second SL change this hour
+- signal_versions.json parses OK (18 keys); no constants edit → no version audit entry
+
+**Sideways find (LOW):** data/signal_versions.json missing several active signals — has pump-chain-/pump-chain-v5 but NOT pump-chain+, oversold-bounce+, mover+, bb-squeeze+, trend-ride+, ct-hot+ etc. Audit trail incomplete for signals that actually trade. Fix when constants next change those signals.
+
+**Open Questions:**
+- Volume thin again (0T/hr this hour, 0 open) — quiet market vs filter starvation; leave min confidence alone
+- hard_max_loss exactly 40% — if next window pushes >40%, demand queue#2 fix or SL structure review
+- pump-chain+ still 0% WR on 1T in 24h — watch, not kill (need 3+)
