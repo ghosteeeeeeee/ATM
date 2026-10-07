@@ -220,11 +220,17 @@ def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
     all_levels = []
 
     for level in candle_levels:
+        # Normalize distance_pct to absolute vs eval price
+        level['distance_pct'] = abs(level['price'] - price) / price * 100 if price > 0 else 999
+        # Recompute type vs eval price (not candle close)
+        level['type'] = 'resistance' if level['price'] > price else 'support'
         all_levels.append(level)
 
     for level in liq_levels:
         # Normalize type to lowercase (book levels may be UPPERCASE)
         level['type'] = level.get('type', '').lower()
+        # Normalize distance_pct to absolute vs eval price
+        level['distance_pct'] = abs(level['price'] - price) / price * 100 if price > 0 else 999
         all_levels.append(level)
 
     # Sort by proximity to current price
@@ -238,13 +244,13 @@ def build_sr_map(token, price, candles_5m=None, atr_pct=None):
 
     Returns list of levels sorted by proximity, with candle + liq + book sources.
     """
-    # Check cache
+    # Check cache — key includes price bucket so S/R distances stay fresh
     now = time.time()
-    cache_key = token.upper()
+    cache_key = (token.upper(), round(price, 1))  # bucket to 0.1 to avoid cache thrash
     if cache_key in _sr_cache:
         cached_ts, cached_map = _sr_cache[cache_key]
         if now - cached_ts < _CACHE_TTL:
-            return cached_map
+            return list(cached_map)  # return copy to avoid cache corruption
 
     # Fetch candles if not provided
     if candles_5m is None:
@@ -342,13 +348,16 @@ def compute_vol_width(token, candles_5m=None):
     # Energy score: 0-1 composite
     # Higher ATR% = more energy, wider BB = more energy
     atr_score = min(1.0, atr_pct / 2.0)  # normalize: 2% ATR = 1.0
-    bb_score = min(1.0, (bb_width or 0) / 0.08) if bb_width else 0.3  # 8% BB = 1.0
+    if bb_width is not None:
+        bb_score = min(1.0, bb_width / 0.08)  # 8% BB = 1.0
+    else:
+        bb_score = 0.3  # no BB data — neutral
     energy_score = 0.6 * atr_score + 0.4 * bb_score
 
     result = {
         'atr_pct': round(atr_pct, 4),
         'atr_regime': regime,
-        'bb_width': round(bb_width, 4) if bb_width else None,
+        'bb_width': round(bb_width, 4) if bb_width is not None else None,
         'bb_position': round(bb_position, 3) if bb_position is not None else None,
         'bb_squeeze': bb_squeeze,
         'energy_score': round(energy_score, 3),
@@ -494,9 +503,16 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
     # Look for structural levels between entry and SL that could cause stop hunts
     for level in sr_map:
         level_price = level['price']
-        level_touches = level.get('touches', level.get('strength', 0))
-        if level_touches < 5:
-            continue  # weak level, don't adjust
+        # Only apply touches filter to candle levels; book/liq levels use different semantics
+        if level.get('source') == 'CANDLE':
+            level_touches = level.get('touches', 0)
+            if level_touches < 5:
+                continue  # weak candle level, don't adjust
+        else:
+            # Book/liq levels: skip if strength is negligible
+            strength = level.get('strength', level.get('total_size', 0))
+            if strength <= 0:
+                continue
 
         if direction == 'LONG':
             # Support level between entry and SL — extend SL below it
@@ -926,9 +942,9 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         R:R >= 2.0 + Grade C  → 1.00x (standard — no adjustment)
         R:R >= 1.5            → 0.85x (mediocre — reduce confidence)
         R:R >= 1.0            → 0.70x (poor — significant penalty)
-        R:R < 1.0             → 0.00x (hard block — risk > reward)
+        R:R < 0.70            → 0.00x (hard block — risk > reward)
         Grade F               → 0.00x (hard block — structural garbage)
-        Fail-open (rr=999)    → 1.00x (engine couldn't evaluate, don't boost)
+        Fail-open (rr>=999)   → 1.00x (engine couldn't evaluate, don't boost)
     """
     try:
         result = evaluate_rr(token, direction, price, candles_5m=candles_5m,
@@ -939,16 +955,16 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         grade = result['grade']
 
         # Fail-open detection: engine couldn't evaluate → return neutral
-        # Fail-open signature: rr_ratio=999, score=0, grade='A'
-        if rr >= 999 and score == 0:
+        # Covers both _result() signature (rr=999, score=0) and structural path (rr=999, any score)
+        if rr >= 999:
             return 1.0, "RR FAIL-OPEN: engine could not evaluate (no data)"
 
         # Hard block conditions
         if grade == 'F':
             return 0.0, f"RR HARD BLOCK: grade=F (score={score})"
-        if rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 1.0):
-            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 1.0)} (risk > reward)"
-        if not result['pass'] and result.get('block_reason', '').startswith('Score'):
+        if rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70):
+            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70)} (risk > reward)"
+        if not result['pass'] and result.get('block_reason', ''):
             return 0.0, f"RR HARD BLOCK: {result['block_reason']}"
 
         # Graded multiplier (using hermes_constants for all thresholds)

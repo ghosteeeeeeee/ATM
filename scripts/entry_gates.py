@@ -171,8 +171,10 @@ def rr_gate(token, direction, price, candles_5m=None, signal_type=None):
         rr = tp_distance / sl_distance
 
         if rr < ENTRY_RR_MIN_RATIO:
-            _log(f"RR BLOCKED: {token} {direction} rr={rr:.2f} < {ENTRY_RR_MIN_RATIO}")
-            return False, 0, 0, rr
+            # Legacy path can't reach its own threshold (ATR_SL_MIN ≈ ATR_TP_MIN → rr ≈ 1.0)
+            # Don't block — fail-open. The RR engine is the primary gate.
+            _log(f"RR LEGACY PASS: {token} {direction} rr={rr:.2f} < {ENTRY_RR_MIN_RATIO} (legacy can't reach threshold, fail-open)")
+            return True, 0, 0, rr
 
         sl = price - sl_distance if direction == 'LONG' else price + sl_distance
         tp = price + tp_distance if direction == 'LONG' else price - tp_distance
