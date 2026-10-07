@@ -5309,3 +5309,35 @@ Final set: ['ALGO', 'BTC', 'CHIP', 'INJ', 'JUP', 'TURBO']
 - Volume thin again (0T/hr this hour, 0 open) — quiet market vs filter starvation; leave min confidence alone
 - hard_max_loss exactly 40% — if next window pushes >40%, demand queue#2 fix or SL structure review
 - pump-chain+ still 0% WR on 1T in 24h — watch, not kill (need 3+)
+
+## [2026-10-07 08:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+**Open:** 1 — ADA pump-chain- SHORT, opened 08:08, unrealized -$0.07
+**Last-hour closes:** none
+
+**24h:** 10 closed | 6W 4L | +$1.09 (WR 60.0%)
+**24h by signal:** pump-chain- 6T 3W +$0.82 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 1T 0W -$0.07
+**24h by close reason:** hard_max_loss 4T -$0.47 (40%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine_resistance_break 1T +$0.08
+**atr_sl_hit:** 0/10 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** 02:00 +$1.14 | 05:00 -$0.10 — NEG-STREAK inactive (needs 3 consecutive neg hours)
+**Pipeline:** timer active; live_trading True; 1 open position (fresh, 08:08)
+
+**Entry quality:** no last-hour closes; ADA open only ~4min old, flat — nothing to assess
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — 0 trades last hour; 24h 0%-WR only pump-chain+ 1T (need 3+)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: inactive (only 1 neg hour in window; 05:00 was -$0.10 on 2 trades)
+- hard_max_loss: 4/10 = 40% of closes, sole bleed -$0.47 — at watch threshold, not >40%; queue#2 leverage-aware SL already open
+- signal_versions.json parses OK; no constants edit → no version audit entry
+
+**Sideways find (LOW):** data/signal_versions.json still missing active signals (pump-chain+, oversold-bounce+, mover+, bb-squeeze+, trend-ride+, ct-hot+) — seed when those constants next change.
+
+**Open Questions:**
+- Quiet stretch: 0 closes in 4 of last 5 hours, 3 opens/24h — market vs filter starvation; leave min confidence alone
+- ADA pump-chain- SHORT is the only live position — no action until it closes
+- hard_max_loss exactly 40% of 24h closes — if next window pushes >40%, demand queue#2 fix or SL structure review

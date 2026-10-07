@@ -4280,3 +4280,9 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 40% queue#2 leverage-aware | signal_versions.json missing active signals (pump-chain+, oversold-bounce+, mover+) | low volume 0T/hr
 BY: auto_1hr
+[2026-10-07 08:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 1 open ADA pump-chain- SHORT (08:08, -$0.07) | 24h 10T 6W +$0.109 wait +$1.09 WR 60% | pump-chain- 6T 3W +$0.82 | pump-chain+ 1T 0W -$0.07 | atr_sl_hit 0/10=0% (tpsl fix stable) | hard_max_loss 4T -$0.47 sole bleed 40% of closes (at threshold, not >40%) | hourly 02:00 +$1.14 / 05:00 -$0.10 (streak inactive) | pipeline active, live_trading True
+  Kill: none (0T last hour; 24h 0%-WR only pump-chain+ 1T)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 40% queue#2 leverage-aware | signal_versions.json missing active signals | quiet volume (0T/hr 4 of last 5h)
+BY: auto_1hr
