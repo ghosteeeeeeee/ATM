@@ -4250,3 +4250,10 @@ BY: auto_1hr
   Kill: none (0T/last-hour losers; 24h 0%-WR all ≤1T)
   Overtrade: 2/hr | atr_sl_hit 10%
   WATCH: hard_max_loss 40% of closes queue#2 leverage-aware | bb-squeeze+/trend-ride+ 1T 0W each monitor | low volume 0-2T/hr
+
+BY: auto_1hr
+[2026-10-07 03:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 0 open | 24h 9T 6W +$1.06 WR 66.7% | pump-chain- 5T 3W +$0.85 | atr_sl_hit 0/9=0% (tpsl_utils.py fix stable) | hard_max_loss 3T -$0.50 sole bleed 33% of closes (down from 40-56%, under threshold) | hourly 21:00 -$0.12 then 02:00 +$1.14 (streak inactive)
+  Kill: none (0T last hour; 24h 0%-WR only bb-squeeze+ 1T)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss sole bleed queue#2 leverage-aware | bb-squeeze+ 1T 0W monitor | low volume 0-2T/hr
