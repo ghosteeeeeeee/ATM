@@ -4268,3 +4268,9 @@ BY: auto_1hr
   Kill: none (0T last hour; 24h 0%-WR only bb-squeeze+ 1T)
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: low volume 0T/hr ~4h since last open | hard_max_loss queue#2 leverage-aware | mover kill effect next window
+[2026-10-07 06:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 2T last hour both hard_max_loss (-$0.10) | 0 open | 24h 10T 6W +$1.09 WR 60% | pump-chain- 6T 3W +$0.82 | pump-chain+ 1T 0W -$0.07 | atr_sl_hit 0/10=0% (tpsl fix stable) | hard_max_loss 4T -$0.47 sole bleed 40% of closes (at threshold, not >40%) | hourly 02:00 +$1.14 / 05:00 -$0.10 (streak inactive) | pipeline active
+  Kill: none (24h 0%-WR only pump-chain+ 1T)
+  Overtrade: 2/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 40% queue#2 leverage-aware | signal_versions.json missing active signals (pump-chain+, oversold-bounce+, mover+) | low volume 2T/hr
+BY: auto_1hr
