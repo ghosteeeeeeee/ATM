@@ -2154,6 +2154,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # ai-trader (AI-driven signal from trade-watchdog)
+            if _comp == 'ai-trader':
+                try:
+                    from hermes_constants import AI_TRADER_ENABLED
+                    if not AI_TRADER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" AI_TRADER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ai-trader+':
+                try:
+                    from hermes_constants import AI_TRADER_ENABLED
+                    if not AI_TRADER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" AI_TRADER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ai-trader-':
+                try:
+                    from hermes_constants import AI_TRADER_ENABLED
+                    if not AI_TRADER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" AI_TRADER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2712,6 +2737,7 @@ def is_component_disabled(component: str) -> bool:
             OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_MTF_RSI_ENABLED, OC_PENDING_ENABLED,
             RR_STRUCTURAL_ENABLED, RR_STRUCTURAL_PLUS_ENABLED, RR_STRUCTURAL_MINUS_ENABLED,
             RR_STRUCTURAL_V2_LONG_ENABLED,
+            AI_TRADER_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -3067,6 +3093,9 @@ def is_component_disabled(component: str) -> bool:
         except ImportError:
             pass
         return False  # V5 SHORT enabled or old flag enabled
+    # ai-trader (AI-driven signal from trade-watchdog)
+    if c in ('ai-trader', 'ai-trader+', 'ai-trader-'):
+        return not AI_TRADER_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

@@ -63,6 +63,7 @@ REGIME_SIGNALS = {
         'tl-bounce+',  # trendline bounce LONG — dynamic support, works in low-vol FLAT
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in all regimes
         'volume-climax+', 'volume-climax-',  # volume rejection reversal — mean-reversion, works in range-bound
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
         # pump_catcher — momentum breakout (velocity + acceleration)
@@ -131,6 +132,7 @@ REGIME_SIGNALS = {
         'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
         'rr-struct-v2+',  # v2 LONG with falling-knife filter
         'trend-ignition+',  # early-stage breakout — volume spike + compression, catches start of move
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'HIGH': {
         # Breakout works in big moves
@@ -200,6 +202,7 @@ REGIME_SIGNALS = {
         'rr-struct', 'rr-struct+', 'rr-struct-',  # structural R:R quality — Grade A/B, R:R ≥ 3.0
         'rr-struct-v2+',  # v2 LONG with falling-knife filter
         'trend-ignition+',  # early-stage breakout — volume spike + compression, catches start of move
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'EXTREME': {
         # Continuation works in storms
@@ -247,6 +250,7 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in extreme vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in extreme vol
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
 }
 

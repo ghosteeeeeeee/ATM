@@ -34,6 +34,7 @@ from hermes_constants import (
     AI_TRADER_MIN_CONFIDENCE,
     AI_TRADER_STATE_TTL_MINUTES,
     AI_TRADER_COOLDOWN_HOURS,
+    AI_TRADER_PRICE_MAX_AGE_MINUTES,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -96,11 +97,31 @@ def run():
     if not state:
         return None
 
-    token = state.get('coin', state.get('token', ''))
+    # BUG 5 fix: check if already fired (file-local dedupe, PG-independent)
+    if state.get('fired_at'):
+        return None
+
+    # BUG 6 fix: uppercase token for blacklist consistency
+    token = (state.get('coin', state.get('token', '')) or '').upper()
     direction = (state.get('direction', '') or '').upper()
-    confidence = state.get('confidence', 0)
+
+    # BUG 2 fix: validate confidence type
+    confidence = state.get('confidence') or 0
+    try:
+        confidence = float(confidence)
+    except (TypeError, ValueError):
+        return None
+
+    # BUG 4 fix: validate price type
     price = state.get('price')
-    reasoning = state.get('reasoning', '')
+    if price is not None:
+        try:
+            price = float(price)
+        except (TypeError, ValueError):
+            price = None
+
+    # BUG 3 fix: reasoning None-safe
+    reasoning = state.get('reasoning') or ''
 
     # Validate
     if not token or direction not in ('LONG', 'SHORT'):
@@ -110,7 +131,7 @@ def run():
         _log(f"  [AI-TRADER] {token} {direction} rejected: conf {confidence} < {AI_TRADER_MIN_CONFIDENCE}")
         return None
 
-    # Blacklist check
+    # Blacklist check (BUG 6: token already uppercased above)
     blacklist = LONG_BLACKLIST if direction == 'LONG' else SHORT_BLACKLIST
     if token in blacklist:
         _log(f"  [AI-TRADER] {token} {direction} rejected: blacklisted")
@@ -121,10 +142,13 @@ def run():
         _log(f"  [AI-TRADER] {token} {direction} rejected: cooldown active")
         return None
 
-    # Price freshness
+    # Price freshness (BUG 7: use constant, handle 999 = no data)
     if token:
         age = price_age_minutes(token)
-        if age is not None and age > 5:
+        if age is not None and age >= 999:
+            _log(f"  [AI-TRADER] {token} {direction} rejected: no price data")
+            return None
+        if age is not None and age > AI_TRADER_PRICE_MAX_AGE_MINUTES:
             _log(f"  [AI-TRADER] {token} {direction} rejected: price {age:.0f} min old")
             return None
 
@@ -138,7 +162,7 @@ def run():
         signal_type=SIGNAL_TYPE,
         source=source,
         confidence=confidence,
-        value=state.get('conviction', 0),
+        value=state.get('conviction') or 0,
         price=price,
         exchange='hyperliquid',
         timeframe='1h',
@@ -152,11 +176,14 @@ def run():
             f"reasoning={reasoning[:80]}"
         )
         # Mark as fired so next hourly cycle picks a fresh pick
+        # BUG 7 fix: atomic write to prevent corruption
         state['fired_at'] = datetime.now(timezone.utc).isoformat()
         state['fired_signal_id'] = sid
         try:
-            with open(STATE_FILE, 'w') as f:
+            tmp_path = STATE_FILE + '.tmp'
+            with open(tmp_path, 'w') as f:
                 json.dump(state, f, indent=2)
+            os.replace(tmp_path, STATE_FILE)
         except Exception:
             pass
         return sid

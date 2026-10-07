@@ -154,16 +154,20 @@ SHORT_BLACKLIST = {
     # 2026-08-24: extra fees — eats into margins
     'GRAM', 'ASTER',
     # 2026-09-10: ICP — persistent SHORT losses, all entries at local peaks
-    'ICP',
+    # REMOVED from SHORT_BLACKLIST 2026-10-06 — ICP LONG now profitable (5T 100%WR +$0.23)
+    # 'ICP',
     # 2026-09-21: NOT — 30d WR=30.8% LONG, -$1.10 total PnL, 18 trades, 2 wins last 10
     'NOT',
     # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), 50% WR SHORT (-$0.09), $0.006 micro-price noise
     'HEMI',
     # 2026-09-27: pump-chain v5 evidence — 0% WR, consistent losers
-    'GRASS',   # 3T pump-chain, 0% WR, -$4.26
+    # REMOVED 2026-10-06 — GRASS SHORT now profitable (3T 33%WR +$1.29)
+    # 'GRASS',
     'AZTEC',   # 3T pump-chain, 0% WR, -$3.63
-    'BCH',     # 2T pump-chain, 0% WR, -$2.59
-    'ATOM',    # 2T pump-chain, 0% WR, -$2.56
+    # REMOVED 2026-10-06 — BCH SHORT now profitable (3T 67%WR +$0.14)
+    # 'BCH',
+    # REMOVED 2026-10-06 — ATOM SHORT now profitable (6T 83%WR +$0.15)
+    # 'ATOM',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -259,10 +263,11 @@ LONG_BLACKLIST = {
     # 2026-09-22: HEMI — 7T all-time, 0% WR LONG (-$0.44), $0.006 micro-price noise, both sides lose
     'HEMI',
     # 2026-09-27: pump-chain v5 evidence — 0% WR, consistent losers
-    'GRASS',   # 3T pump-chain, 0% WR, -$4.26
+    # REMOVED 2026-10-06 — GRASS LONG now profitable (2T 50%WR +$1.43 pump_chain)
+    # 'GRASS',
     'AZTEC',   # 3T pump-chain, 0% WR, -$3.63
-    'BCH',     # 2T pump-chain, 0% WR, -$2.59
-    'ATOM',    # 2T pump-chain, 0% WR, -$2.56
+    'BCH',     # 2T pump-chain, 0% WR, -$2.59 (LONG still losing)
+    'ATOM',    # 2T pump-chain, 0% WR, -$2.56 (LONG still losing)
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
@@ -2809,6 +2814,7 @@ AI_TRADER_ENABLED = True            # CEO 2026-10-02 — pure AI signal, watchdo
 AI_TRADER_MIN_CONFIDENCE = 60       # minimum confidence for AI trader to fire
 AI_TRADER_STATE_TTL_MINUTES = 45    # state file older than this = stale, don't fire
 AI_TRADER_COOLDOWN_HOURS = 2        # per coin+direction cooldown
+AI_TRADER_PRICE_MAX_AGE_MINUTES = 5 # reject if price data older than this
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = False  # CEO 2026-08-16: DISABLED. 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos (hzscore+,range_finder+ and bb_bounce+,range_finder+ both bleeding). Re-enable when R:R >1:1.
