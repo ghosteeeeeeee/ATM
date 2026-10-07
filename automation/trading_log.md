@@ -5409,3 +5409,41 @@ Final set: ['ALGO', 'BTC', 'CHIP', 'INJ', 'JUP', 'TURBO']
 - quiet stretch: 0 closes in 5 of last 6 hours, 0 open — market vs filter starvation; leave min confidence alone
 - hard_max_loss still ~45% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
 - pump-chain- still net positive (+$0.94, 3W/7T) despite hard_max_loss being the dominant bleed mechanism
+
+## [2026-10-07 11:14 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.14 (WR: 0.0%)
+**Open:** 0
+
+**Last hour close:**
+- LDO pump-chain+ LONG hard_max_loss -$0.14 (-3.15%)
+
+**24h:** 12 closed | 6W 6L | +$1.07 (WR 50.0%)
+**24h by signal:** pump-chain- 7T 3W +$0.94 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | pump-chain+ 2T 0W -$0.21
+**24h by close reason:** hard_max_loss 6T -$0.49 (50%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine_resistance_break 1T +$0.08
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix deployed and stable (file present, prior md5-verified)
+**7d:** 213T 114W +$0.48 (53.5% WR)
+**Hourly streak:** 05:00 -$0.10 | 08:00 -$0.13 | 09:00/10:00 no trades | 11:00 -$0.14 — 3 neg hours NOT consecutive (09/10 gaps) — NEG-STREAK not triggered
+**Pipeline:** live_trading True; 0 open
+
+**Entry quality:** 1 last-hour loser LDO LONG hard_max_loss at modest ~1% price move; account -3.15% at leverage — expected, not a bug. No winners this hour to assess.
+
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — last hour 1T 0W (need 3+); 24h 0%-WR only pump-chain+ 2T -$0.21 (need 3+). pump-chain- still 3W/7T net +$0.94 — keep.
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert; fix confirmed stable
+- NEG-STREAK: not triggered — neg hours 05/08/11 not consecutive (09/10 gaps)
+- hard_max_loss: 6/12 = 50% of 24h closes — still above 40% watch threshold. Fix IS deployed (leverage-aware). queue#2 SL review already open — not adding a second SL change this hour (max 1 change/hr)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+
+**Sideways find (LOW):** data/signal_versions.json still missing pump-chain+ / oversold-bounce+ / mover+ audit entries — seed when those constants next change.
+
+**Open Questions:**
+- Quiet stretch continues: 1T this hour, 0 open — market vs filter starvation; leave min confidence alone
+- hard_max_loss still ~50% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain+ 0% WR on 2T 24h — one more loss hits kill threshold; monitor, don't stack changes
+
+BY: auto_1hr
