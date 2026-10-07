@@ -307,7 +307,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
     ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
-    ('EXTREME', 'pump_chain-'): 0.0,             # BLOCKED 2026-10-07 signal_reporter — 7d EXTREME 22T 27.3%WR -$0.60. NORMAL 60%WR +$0.37 kept. Reverts 10-06 reconfirm (RSI_FLOOR=45 insufficient).
+    ('EXTREME', 'pump_chain-'): 1.0,             # RE-ENABLED 2026-10-07 CEO — every dump is a SHORT
     ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -322,7 +322,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
     ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
-    ('EXTREME', 'pump-chain-'): 0.0,             # BLOCKED 2026-10-07 signal_reporter — hyphen variant. 7d EXTREME 22T 27.3%WR -$0.60. NORMAL kept. PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED=True for STANDALONE_BYPASS path.
+    ('EXTREME', 'pump-chain-'): 1.0,             # RE-ENABLED 2026-10-07 CEO — hyphen variant
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
@@ -339,8 +339,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
     ('NORMAL', 'pullback-entry+'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.57. Structurally weak LONG variant.
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
-    ('NORMAL', 'pump_chain+'): 0.0,              # BLOCKED 2026-09-22 — 20% WR (5T) in NORMAL
-    ('NORMAL', 'pump-chain+'): 0.0,              # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain+
+    ('NORMAL', 'pump_chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
+    ('NORMAL', 'pump-chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — hyphen variant
     ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 75% WR in NORMAL (8T)
     ('NORMAL', 'pump-chain-'): 1.0,              # OK — hyphen form (runtime signal_type is 'pump-chain')
     ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
@@ -378,8 +378,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
     ('HIGH', 'mover+'): 0.5,                     # PENALIZED 2026-09-22 — 54.5% WR but -$0.07 (11T)
     ('HIGH', 'mover-'): 1.0,                     # OK 2026-09-22 — 66.7% WR, +$0.26 (3T)
-    ('HIGH', 'pump_chain+'): 0.0,                # BLOCKED 2026-09-22 — 37% WR (27T) in HIGH
-    ('HIGH', 'pump-chain+'): 0.0,                # BLOCKED 2026-09-22 — hyphen variant, same as pump_chain+
+    ('HIGH', 'pump_chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
+    ('HIGH', 'pump-chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — hyphen variant
     ('HIGH', 'pump_chain-'): 1.0,                # ALLOWED 2026-10-06 CEO/T — was 0.0 block citing stale "48%WR HIGH". 30d meta-RSI HIGH: 50-55=20T +$0.59 55%WR (ONLY profitable HIGH band); 40-45=7T 14.3%WR cut by SHORT_RSI_FLOOR=45. PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED already False. Monitor48h.
     ('HIGH', 'pump-chain-'): 1.0,                # hyphen variant — same as underscore
     ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH
