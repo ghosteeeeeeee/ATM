@@ -155,7 +155,7 @@ def run():
     # Determine source
     source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
-    # Fire signal
+    # Fire signal — pass reasoning in metadata for post-op analysis
     sid = add_signal(
         token=token,
         direction=direction,
@@ -166,6 +166,11 @@ def run():
         price=price,
         exchange='hyperliquid',
         timeframe='1h',
+        signal_metadata={
+            'ai_reasoning': reasoning,
+            'ai_conviction': state.get('conviction') or 0,
+            'ai_pick_timestamp': state.get('timestamp'),
+        },
     )
 
     if sid:
