@@ -2725,14 +2725,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     _cur_sl_zone = float(pos.get('stop_loss') or 0)
                     if _zone_sl > _cur_sl_zone:
                         pos['stop_loss'] = _zone_sl
-                        _persist_sl(trade_id, _zone_sl)
+                        _persist_sl(trade_id, _zone_sl, token, direction, entry)
                         log(f"  [SL-ZONE-EXIT] {token} {direction}: trail tightened → {_zone_sl:.6f} ({_exit_check['reason']})")
                 else:
                     _zone_sl = round(cur * (1 + _new_trail_pct), 8)
                     _cur_sl_zone = float(pos.get('stop_loss') or 0)
                     if _zone_sl < _cur_sl_zone:
                         pos['stop_loss'] = _zone_sl
-                        _persist_sl(trade_id, _zone_sl)
+                        _persist_sl(trade_id, _zone_sl, token, direction, entry)
                         log(f"  [SL-ZONE-EXIT] {token} {direction}: trail tightened → {_zone_sl:.6f} ({_exit_check['reason']})")
             elif _exit_check['action'] == 'watch':
                 log(f"  [SL-ZONE-WATCH] {token} {direction}: {_exit_check['reason']}")
