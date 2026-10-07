@@ -1,32 +1,84 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h
-Generated: 2026-10-07 ~11:00 UTC
+# Signal Performance Report
+**Generated:** 2026-10-07 18:05 UTC | **Period:** Last 6h + 24h
 
-KILLED (executed):
+## Verified Numbers (PG brain DB, queried this run)
+
+### 6h (closed, HAVING >=2)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain- | SHORT | 3 | 0.0% | -$0.22 |
+
+### 24h (closed, HAVING >=3)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain- | SHORT | 10 | 30.0% | +$0.72 |
+| pump-chain+ | LONG | 2 | 0.0% | -$0.21 |
+| oversold-bounce+ | LONG | 1 | 100.0% | +$0.23 |
+
+---
+
+## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signal met kill criteria (WR<30% + 5+ trades + PnL<-$0.10) |
+| — | — | — | — | — | None — no signal met ALL kill criteria (WR<30% + 5T + PnL<-$0.10 + active>24h) |
 
-BOOSTED (executed):
+pump-chain- SHORT: WR=30.0% (not <30%), PnL=+$0.72 (positive). High R:R — winners outweigh 7 small losers. NOT a kill.
+
+---
+
+## BOOSTED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signal met boost floor (WR>55% + 5+ trades + multi-token) |
+| — | — | — | — | — | None — no signal met boost criteria (WR>55% + 5T + PnL>$0.05 + multi-token) |
 
-LOSERS (watch list):
+oversold-bounce+ LONG 1T 100% +$0.23 — sample too small.
+
+---
+
+## REGIME BLOCK (executed)
+| Signal | Dir | Regime | 7d WR | 7d PnL | Action |
+|--------|-----|--------|-------|--------|--------|
+| pump-chain- | SHORT | EXTREME | 27.3% (22T) | -$0.60 | **BLOCKED** — PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED=True; volatility_gate_v2 EXTREME mult 1.0→0.0 (hyphen+underscore) |
+
+Regime split (pump-chain- SHORT):
+- **NORMAL:** 5T 60% WR +$0.37 (7d) / 2T 100% +$0.69 (24h) — KEPT
+- **EXTREME:** 22T 27.3% WR -$0.60 (7d) — BLOCKED. 24h EXTREME +$0.09 was one APT +$0.53 outlier; without it -$0.44
+- **HIGH:** already blocked (PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True, set today by brain_auditor)
+
+NOT a blanket kill — NORMAL has edge. Flag verified True after edit. STANDALONE_BYPASS path covered by decider_run.py check.
+
+---
+
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 0.0% | -$0.21 | 2 | WATCH — 0/2 last 24h, both hard_max_loss (LDO, IMX). Below 5-trade kill floor. Regime all-time: EXTREME 48.3% (60t, +$2.07), HIGH 37.0% (27t, +$0.11), NORMAL 20% (5t, -$0.35). NORMAL regime is weakest — candidate for volatility_gate multiplier if it recurs. |
-| pump-chain- | SHORT | 42.9% | +$0.94 | 7 | WATCH 6h only — 0/3 last 6h (-$0.16), but 24h still net positive from APT +$0.53 / LTC +$0.61. Regime: EXTREME 51.1%, NORMAL 75%, HIGH 46.2% (-$0.42 all-time). HIGH regime is the drag — if negative streak continues, gate HIGH only, do NOT blanket-kill (wins in EXTREME + NORMAL). |
+| pump-chain+ | LONG | 0.0% | -$0.21 | 2 (24h) | Below kill threshold. 7d: 12T 58.3% +$0.88 — healthy, 24h noise |
+| bb-bounce-v3-long+ | LONG | 52.6% | -$0.33 | 19 (7d) | NORMAL already gated 0.0 in vol gate. HIGH 4T 75% +$0.10 kept |
+| bb-squeeze+ | LONG | 60.9% | -$0.05 | 69 (7d) | High WR, slight bleed. EXTREME already blocked. R:R inverted — monitor |
+| accel-300- | SHORT | 37.5% | -$0.34 | 8 (7d) | HIGH 4T 0% -$0.31 bleed; NORMAL 4T 75% -$0.03. Constants claim HIGH 0.3x block — verify gate is live |
+| mtf-regime-trend+ | LONG | 44.4% | -$0.46 | 9 (7d) | PRE-KILL trades (MTF_REGIME_TREND_PLUS_ENABLED=False since Oct 2). No post-kill opens |
+| pump-chain-v5 | LONG | 33.3% | -$0.42 | 9 (7d) | PRE-KILL trades (PUMP_CHAIN_V5_ENABLED=False since Oct 4). Last close Oct 3 |
+| mtf-regime-trend- | SHORT | 40.0% | -$0.42 | 5 (7d) | PRE-KILL trades (flag False + NEVER_REENABLE since Oct 6). Last close Oct 5 |
+| trend-ride+ | LONG | 42.9% | -$0.18 | 7 (7d) | PRE-KILL trades (TREND_RIDE_LONG_ENABLED=False since Oct 6) |
 
-WINNERS:
+---
+
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| oversold-bounce+ | LONG | 100.0% | +$0.24 | 2 | Healthy — ZRO +$0.23, ENS +$0.01. Too few trades to boost. |
-| mover+ | LONG | 100.0% | +$0.10 | 1 | Healthy — AVAX +$0.10. Too few trades to boost. |
-| pump-chain- | SHORT | 42.9% | +$0.94 | 7 | Net positive despite mid WR — trail exits working (APT trail_sl, LTC atr_trail_hit). |
+| pump-chain- | SHORT (NORMAL only) | 100% (24h) / 60% (7d) | +$0.69 / +$0.37 | 2 / 5 | Healthy in NORMAL. EXTREME now blocked |
+| oversold-bounce+ | LONG | 100% | +$0.23 | 1 (24h) | Too few trades to boost |
+| pump-chain+ | LONG | 58.3% (7d) | +$0.88 | 12 (7d) | Healthy. 24h 2T noise |
 
-ISSUES:
-- Direction inversions last 24h: 0 found. Clean.
-- 24h closed volume is low (12 trades total) — most signals below statistical floors. No action justified.
-- pump-chain+ NORMAL-regime trades are the structural weak spot (20% WR, 5 trades all-time). If NORMAL-regime losses repeat next cycle, add 0.0x multiplier in volatility_gate_v2.py for pump-chain+ NORMAL rather than disabling the signal.
-- 6h window showed both pump-chain variants at 0% WR with hard_max_loss exits — execution/stop behavior worth a look, but 24h aggregate does not support a kill.
+---
+
+## ISSUES
+- **No signal inversions (24h).** Direction labels consistent.
+- **6h bleed on pump-chain- SHORT** (3T 0% -$0.22) was all EXTREME-regime hard_max_loss/hard_sl. Regime block addresses root cause.
+- **SIDWAYS:** `ACCEL_300_ENABLED` is listed in `NEVER_REENABLE_FLAGS` (comment: "permanently dead") but the live flag is `True` (re-enabled 2026-09-11). Contradiction — NEVER_REENABLE entry is stale. Not changed this run (no 24h kill criteria; watch only). Suggest cleanup next constants pass.
+- **SIDWAYS:** Historical 7d losers (mtf-regime-trend±, pump-chain-v5, trend-ride+) are pre-kill trades — flags already False. No post-kill opens found. Not bugs.
+- **Restart pipeline** to load volatility_gate_v2.py + hermes_constants.py changes.
+
+---
+
+*Report auto-generated by signal_reporter. Next report: ~6h.*

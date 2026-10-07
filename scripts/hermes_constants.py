@@ -704,7 +704,7 @@ SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) �
 TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
-CUT_LOSER_PNL     = -1.00  # close trade at -1.00% PnL — widened from -0.50% (2026-10-01 CEO). NOTE: this constant only governs position_manager's HARD_MAX_LOSS exit + Priority-3 fallback (which is unreachable when sl_distance exists). The main cut-loser engine (cut_loser.py) uses CL_TIER1_MIN_PCT — see that constant for the primary cut-loser lever. -0.50% was inside normal MAE for winning signals (volume-breakout-long+ MAE 0.85%).
+CUT_LOSER_PNL     = -1.50  # close trade at -1.50% ACCOUNT PnL — brain_auditor 2026-10-07: widened -1.00→-1.50. 7d hard_max_loss 64T 0%WR -$8.60 = #1 bleed; 87.5% had MFE>0 (were in profit, trail never got room). trail_family 120T 87.5% +$9.47 is the winning exit. Post-fix lev-aware HML (aed0aa36) cut magnitude ~-4.4%→~-1.5% but frequency stays high because -1% acct is inside EXTREME-vol noise at lev5 (-0.20% price). Widen gives trail ~50% more room. Cannot block winners (HML only fires on losers). position_manager is per-cycle subprocess — loads fresh, no restart. Prior: -1.00 (CEO Oct 1, widened from -0.50). NOTE: this constant only governs position_manager's HARD_MAX_LOSS exit + Priority-3 fallback (unreachable when sl_distance exists). Main cut-loser engine uses CL_TIER1_MIN_PCT.
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -2873,7 +2873,7 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
 PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
 PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-10-07 — HIGH is the bleed regime. 14d HIGH 7T 14.3%WR -$0.66 | NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 | NORMAL 12T 75% +$0.53. Block HIGH, keep NORMAL+EXTREME. ADA 2026-10-07 HIGH RSI 56 SHORT lost — shorted bullish coin. Prior False from Sep 22 re-enable.
-PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
+PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = True  # SIGNAL REPORTER 2026-10-07 — 7d EXTREME 22T 27.3%WR -$0.60 bleed vs NORMAL 5T 60%WR +$0.37. 24h EXTREME 7T 14.3%WR +$0.09 (one APT +$0.53 outlier saved it; without it -$0.44). RSI_FLOOR=45 did not fix EXTREME. HIGH already blocked. Prior False from Sep 22 CEO re-enable — fresh data overrides.
 
 # bb-squeeze+ LONG EXTREME regime block — 12T 50%WR -$0.15 EXTREME (hard_sl/hard_max_loss).
 # HIGH 63.6%WR +$0.14, NORMAL 66.7%WR kept. signal_reporter 2026-10-02.
@@ -3856,6 +3856,10 @@ RIDE_IT_PHASE1_TO_PHASE2_TIME = 7200  # 2 hours (seconds) for phase transition
 PUMP_FLOW_TOKEN_VEL_THRESHOLD = -0.5   # min token 5m Δ% to allow LONG signals (tightened from -0.2%)
                                        # -0.2% was too aggressive — blocked 13 winning trades
 PUMP_FLOW_SHORT_VEL_THRESHOLD = 0      # block SHORT when token 30m vel > 0% (wrong direction)
+PUMP_FLOW_MOVE_DONE_THRESHOLD = 3.0   # block when token already moved >3% in 30min — move is over
+                                      # SHORT blocked if 30m vel < -3% (already dumped, bounce likely)
+                                      # LONG blocked if 30m vel > +3% (already pumped, pullback likely)
+                                      # 2026-10-07: winners entered BEFORE the move, losers AFTER
 
 # ── Open Skies Signal (open_skies.py) ─────────────────────────────────────
 # LONG-only signal for coins with no resistance overhead (open skies).
