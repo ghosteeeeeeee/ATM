@@ -1,162 +1,216 @@
 {
-  "timestamp": "2026-10-07T22:35:31Z",
-  "session_lock": "absent — config changes permitted",
+  "timestamp": "2026-10-07T23:50:00Z",
+  "session_lock": false,
   "trade_summary_24h": {
-    "trades": 12,
-    "wins": 2,
-    "wr": 16.7,
-    "pnl": 0.37,
-    "note": "CRITICAL WR but net positive — 2 big winners (LTC +0.61, APT +0.53) offset 10 small losses",
-    "by_signal": {
-      "pump-chain- SHORT": "8T 25%WR +$0.76 (2 winners carry)",
-      "pump-chain+ LONG": "4T 25%WR -$0.20 (killed by auto_1hr 19:13, CEO re-enabled)",
-      "pump-chain-v5 LONG": "1T 0%WR -$0.06"
-    }
+    "trades": 13,
+    "pnl": 0.5,
+    "wr": 23.1,
+    "long": "n/a (all winners/losers mixed signals)",
+    "short": {
+      "trades": 8,
+      "pnl": 0.76,
+      "wr": 25.0,
+      "note": "PnL positive from 2 continuation winners (APT/LTC-style) despite low WR"
+    },
+    "by_signal": [
+      {
+        "signal": "pump-chain+ LONG",
+        "n": 4,
+        "pnl": -0.2,
+        "wr": 25.0
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "n": 8,
+        "pnl": 0.76,
+        "wr": 25.0
+      },
+      {
+        "signal": "pump-chain-v5 LONG",
+        "n": 1,
+        "pnl": -0.06,
+        "wr": 0.0
+      }
+    ],
+    "open": [
+      {
+        "coin": "CRV",
+        "signal": "pump-chain+",
+        "direction": "LONG",
+        "pnl_pct": 3.41,
+        "hours_open": 0.9,
+        "status": "healthy — SL in profit"
+      }
+    ]
   },
   "trade_summary_7d": {
-    "trades": 212,
-    "wr": 53.8,
-    "pnl": 0.62,
-    "long": "+$1.30/169T 56.8%",
-    "short": "-$0.68/43T 41.9% AT RISK",
-    "regime_split": {
-      "HIGH": "73T 53.4% -$1.26",
-      "NORMAL": "63T 58.7% -$0.34",
-      "FLAT": "8T 75% +$0.44",
-      "EXTREME": "61T 44.3% +$1.06"
+    "trades": 209,
+    "pnl": -0.02,
+    "wr": 52.6,
+    "long": {
+      "trades": 168,
+      "pnl": 0.84,
+      "wr": 56.5
+    },
+    "short": {
+      "trades": 41,
+      "pnl": -0.86,
+      "wr": 36.6,
+      "goal": ">=0 by Oct 9 — AT RISK"
+    },
+    "thirty_day": {
+      "trades": 886,
+      "pnl": -2.47,
+      "wr": 49.9
+    },
+    "hml_7d": {
+      "trades": 65,
+      "pnl": -8.72,
+      "wr": 0.0,
+      "avg_lev": 4.14,
+      "note": "#1 bleed. Post-aed0aa36 magnitude cut ~52% (-4.02%→-1.92%). Frequency still high."
     }
   },
   "losing_trade_autopsy": [
     {
-      "cluster": "pump-chain+ LONG hard_max_loss (FOGO/LDO/IMX)",
-      "meta_rsi": "60-70 (within CEO's new RSI_MAX=85)",
-      "regime": "EXTREME all three",
-      "root_cause": "Entered in EXTREME regime after pump peaked. RSI 60-70 is mid-range, not exhausted — but EXTREME whipsaw stopped them out.",
-      "winning_side": "SHORT the spike top — but EXTREME pump-chain+ is net +$0.82/14d (7W 6L). Winners exist (ME +0.88 at RSI 64.7).",
-      "recommended_change": "None — EXTREME block would kill +$0.82 net profit",
-      "confidence": "HIGH — data clear, no safe change"
+      "cluster": "pump-chain+ LONG EXTREME whipsaw (3 trades)",
+      "trades": "FOGO -0.06 mrsi=70.0 | IMX -0.07 mrsi=65.52 | LDO -0.14 mrsi=60.56 — ALL hard_max_loss EXTREME",
+      "root_cause": "NOT overbought entry. Meta RSI 60-70 is the SAME band as winners (ME +0.88 @64.7, LDO +0.38 @59.6, ENS +0.20 @65.1). Entry timing is mid-pump — correct side. Bleed is EXTREME-vol HML noise: at lev3-5, threshold -1.50/lev = -0.30% price = candle wick in EXTREME. Trail never gets room (87.5% HML had MFE>0).",
+      "winning_side_note": "Same meta-RSI band produced winners. Wrong-side claim via stored-RSI (GOAT@97.6 etc) is DRIFT-E artifact — meta shows 60-70.",
+      "recommended_change": "NO RSI filter (would kill winners). HML whipsaw recovery window — code change, already delegated to bug_hunter.",
+      "impact_on_winners": "Any RSI_MAX on pump-chain+ EXTREME would block +$1.65 of 7d winners. REJECTED.",
+      "confidence": "HIGH"
     },
     {
-      "cluster": "pump-chain- SHORT hard_max_loss (FIL/LDO/ADA/INJ/APT)",
-      "meta_rsi": "47-63 (all above HARD_FLOOR=45)",
-      "regime": "EXTREME 4/5, HIGH 1/5 (ADA pre-HIGH_BLOCK)",
-      "root_cause": "Mid-range RSI shorts in EXTREME regime — not oversold (floor holds) but not exhausted either. Whipsaw zone.",
-      "winning_side": "LONG the oversold bounce. oversold-bounce+ 100%WR, bb-bounce-v2-long+ 88.9%WR — the winning signal exists.",
-      "recommended_change": "None — RSI_MIN raise to 50 blocks 8 winners +$1.60; EXTREME RSI_MAX=55 blocks 8 winners +$1.26",
-      "confidence": "HIGH — all filter candidates rejected on winner-impact"
-    },
-    {
-      "cluster": "bb-squeeze+ hard_max_loss (17T -$2.44/7d)",
-      "meta_rsi": "various",
-      "regime": "various",
-      "root_cause": "#1 hard_max_loss bleeder. SL too tight for volatility. BB_SQUEEZE_LONG_RSI_MIN=60 landed today 04:38 — too early to judge.",
-      "winning_side": "bb-squeeze+ itself is 69T 60.9% -$0.05/7d — breakeven outside hard_max_loss. Issue is exit structure, not entry side.",
-      "recommended_change": "MONITOR post-BSR_MIN fix. Delegate whipsaw recovery window to bug_hunter.",
-      "confidence": "MEDIUM — need n>=10 post-fix"
-    }
-  ],
-  "drift_findings": [
-    {
-      "id": "DRIFT-E",
-      "status": "CONFIRMED LIVE TRAP",
-      "detail": "Stored entry_rsi_14 is NOT signal-time RSI. LDO stored 7.49 vs meta 47.17. Any audit using stored RSI is wrong.",
-      "action": "bug_hunter write-path fix still open. All my analysis used _signal_metadata->>'rsi_14' (meta)."
-    },
-    {
-      "id": "HARD_MAX_LOSS_FREQ",
-      "status": "OPEN — #1 BLEED",
-      "detail": "67% of 24h closes exit via hard_max_loss. CUT_LOSER_PNL widened -1.00→-1.50 today 14:39. Post-fix avg account loss ~-1.5% (was ~-4.4%). Magnitude WORKING, frequency still high.",
-      "action": "MONITOR n>=10 post-fix by Oct 11. Delegate whipsaw recovery window to bug_hunter."
-    },
-    {
-      "id": "PUMP_CHAIN_PLUS_STATUS",
-      "status": "CEO KEEP",
-      "detail": "auto_1hr killed at 19:13 (3T 0%WR), CEO re-enabled. Current: True. 7d still +$0.89 57.1%WR. Don't fight CEO.",
-      "action": "MONITOR. If 7d flips negative, recommend kill again."
+      "cluster": "pump-chain- SHORT mid-RSI into recovery bounce (5 trades)",
+      "trades": "FIL -0.12 mrsi=63.5 | ADA -0.06 mrsi=56.3 | INJ -0.03 mrsi=57.1 | APT -0.10 mrsi=47.6 | LDO -0.07 mrsi=47.2 — EXTREME/HIGH",
+      "root_cause": "SHORTing strength (meta RSI 47-63) during ACCUMULATION/RECOVERY — alts bouncing. Winning side: LONG the bounce (oversold-bounce+ 2/2 +0.24). HARD_FLOOR=45 passed (all >=45). Signal fires on dump after move — by exec, bounce underway.",
+      "band_data_7d": "RSI 45-50 = only profitable band (+$0.89, 4T/2W — APT+0.53, LTC+0.61 continuation). RSI>=55 = 11T net -$0.43. n=11 < 20 threshold.",
+      "recommended_change": "MONITOR PUMP_CHAIN_SHORT_RSI_MAX=55 candidate. Would block ~-$0.71 losers vs +$0.28 winners = net +$0.43. DO NOT change now — n=11<20.",
+      "impact_on_winners": "At n>=20, re-check: current 7d winners at RSI>=55 = CC+0.03, GMT+0.16, ALGO+0.03, HBAR+0.06.",
+      "confidence": "MEDIUM — pattern clear, sample insufficient"
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "CUT_LOSER_PNL -1.00→-1.50",
-      "landed": "2026-10-07T14:39",
-      "impact": "TOO EARLY — ~8h, need n>=10",
+      "change": "Last run 22:35Z was REPORT-ONLY (0 config)",
+      "impact": "N/A — no changes to verify",
+      "status": "N/A"
+    },
+    {
+      "change": "SHORT_RSI_HARD_FLOOR 25→45 (04:38Z)",
+      "impact": "WORKING — 0 SHORT meta-RSI<45 post-fix (6 SHORTs after, all >=45). Enforced brain.py + decider_run.py LIVE/DETECT/EXEC.",
+      "status": "HOLD"
+    },
+    {
+      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK True (09:39Z)",
+      "impact": "WORKING — 0 true pump-chain- HIGH trades post-fix (GOAT row was pump-chain-v5 via LIKE artifact)",
+      "status": "HOLD"
+    },
+    {
+      "change": "Bear-structure RSI-floor overrides killed (12:39Z)",
+      "impact": "WORKING — consistent with 0 RSI<45 SHORTs",
+      "status": "HOLD"
+    },
+    {
+      "change": "CUT_LOSER_PNL -1.00→-1.50 (14:39Z)",
+      "impact": "TOO EARLY — 2T post-fix HML -$0.12 avg -1.69% lev3. Magnitude consistent with threshold. Need n>=10.",
       "status": "MONITOR"
     },
     {
-      "change": "Killed bear-structure RSI-floor overrides",
-      "landed": "2026-10-07T12:39",
-      "impact": "WORKING — all SHORT meta RSI >=45 since",
-      "status": "HOLD"
-    },
-    {
-      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK True",
-      "landed": "2026-10-07T09:39",
-      "impact": "WORKING — 0 HIGH pump-chain- trades since (ADA 08:23 pre-fix)",
-      "status": "HOLD"
-    },
-    {
-      "change": "SHORT_RSI_HARD_FLOOR 25→45",
-      "landed": "2026-10-07T04:38",
-      "impact": "WORKING — all SHORT meta RSI >=45 post-fix",
-      "status": "HOLD"
-    },
-    {
-      "change": "BB_SQUEEZE_LONG_RSI_MIN=60",
-      "landed": "2026-10-07T04:38",
-      "impact": "TOO EARLY — ~18h",
+      "change": "BB_SQUEEZE_LONG_RSI_MIN=60 (04:38Z)",
+      "impact": "TOO EARLY — 0 bb-squeeze trades since. EXTREME already vol-gated 0.0.",
       "status": "MONITOR"
     },
     {
-      "change": "Killed MOVER±",
-      "landed": "2026-10-07T03:00",
+      "change": "Killed MOVER± (03:00Z)",
       "impact": "CLEAN — 0 post-kill trades",
+      "status": "HOLD"
+    },
+    {
+      "change": "aed0aa36 hard_max_loss leverage-aware (02:00Z)",
+      "impact": "WORKING — PRE 58T avg -4.02% / POST 8T avg -1.92% = 52% magnitude cut. Frequency remains (entry quality).",
       "status": "HOLD"
     }
   ],
   "config_changes_applied": [],
-  "config_change_rationale": "NO CHANGE THIS RUN. Every candidate filter rejected on winner-impact: pump-chain+ EXTREME block would kill +$0.82 net; pump-chain- RSI_MIN=50 would kill 8 winners +$1.60; pump-chain- EXTREME RSI_MAX=55 would kill 8 winners +$1.26. Multiple fixes landed today (CUT_LOSER_PNL, SHORT_RSI_HARD_FLOOR, HIGH_BLOCK, BB_SQUEEZE_RSI_MIN) need n>=10 before new changes. Market in capitulation RECOVERY — flat is correct position.",
-  "creative_improvements": [
+  "config_change_rationale": "0 CHANGES THIS RUN. Independently verified all of today's brain_auditor/CEO changes are working (HARD_FLOOR, HIGH_BLOCK, override kill, mover kill, HML magnitude). CUT_LOSER=-1.50 and BB_SQUEEZE RSI_MIN=60 need n>=10. Every new candidate rejected on winner-impact or n<20: pump-chain+ EXTREME block kills +$1.65 winners; pump-chain- RSI ceiling n=11<20; volume_spike has no winners/losers separation. Session lock absent. One-variable-at-a-time: multiple same-day fixes need data before stacking. Last report-only run was 40min ago — same conclusion.",
+  "drift_findings": [
     {
-      "date": "2026-10-07T22:35:31Z",
-      "idea": "Whipsaw recovery window for hard_max_loss",
-      "rationale": "67% of 24h closes exit hard_max_loss, but signals are profitable outside that exit (bb-squeeze+ 60.9%WR breakeven, pump-chain- +$0.76/24h). Many hard_max_loss exits are whipsaws that would recover. Currently fires immediately on threshold.",
-      "expected_impact": "Reduce hard_max_loss frequency from 67% to ~40%. Preserve magnitude fix (CUT_LOSER_PNL=-1.50).",
-      "category": "exit structure",
-      "status": "suggested",
-      "risk": "medium — some trades that should exit will drag longer",
-      "implementation": "position_manager.py code change — wait N minutes after threshold unless PnL worsens by X%. Delegate to bug_hunter.",
-      "sample_size": "67% of 12 24h closes; 49 hard_max_loss exits/7d across all signals"
+      "id": "DRIFT-E-WATCHDOG",
+      "severity": "HIGH",
+      "finding": "Watchdog deep_analysis pattern alerts contaminated by DRIFT-E. Claims pump-chain+ losses at 'GOAT@97.6, IMX@89.7, FOGO@82.4' — those are stored entry_rsi_14. Meta RSI shows FOGO=70.0, IMX=65.52, LDO=60.56. 'Buying tops at RSI>80' narrative DISPROVEN.",
+      "impact": "Misdirected fixes — CEO/auto_1hr may act on false RSI exhaustion story. Real issue: EXTREME HML frequency, not overbought entry.",
+      "action": "Flag to bug_hunter (DRIFT-E write-path standing). All audits must use _signal_metadata.rsi_14."
     },
     {
-      "date": "2026-10-07T22:35:31Z",
-      "idea": "Capitulation confidence boost for oversold-bounce+ and bb-bounce-v2-long+",
-      "rationale": "These are the verified winners (100%/88.9% WR). Market is in RECOVERY after BTC -2.7% flush with RSI 8.29 — ideal habitat. Confidence boost doesn't create trades, just ranks them higher when competing signals fire.",
-      "expected_impact": "More high-WR signals fire during capitulation. Marginal PnL improvement.",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low — confidence boost only, no new trades created",
-      "implementation": "signal_compactor.py confidence multiplier when BTC RSI < 20. Code change, not config constant.",
-      "sample_size": "oversold-bounce+ 2T 100% (n<20 — monitor); bb-bounce-v2-long+ 19T 63.2% 14d"
+      "id": "DRIFT-I",
+      "severity": "MED",
+      "finding": "STANDALONE_BYPASS still contains pump-chain/bb-squeeze/accel-300. Compactor-side PUMP_CHAIN_LONG_RSI_MIN/MAX (signal_compactor.py:2926-2932) skipped on bypass path. SHORT side covered by SHORT_RSI_HARD_FLOOR at decider_run exec-time (brain.py + decider_run.py:1907-1921) — verified working. LONG RSI_MIN/MAX has NO exec-time equivalent.",
+      "impact": "pump-chain+ LONG can bypass RSI_MIN=35/MAX=85 on bypass path. GOAT v5 meta RSI 43.97 passed (above 35). Latent hole if MAX ever binds.",
+      "action": "DELEGATE bug_hunter: exec-time LONG RSI floor/ceiling mirror for STANDALONE_BYPASS pump-chain+ path."
     }
   ],
   "recurring_problems": [
-    "hard_max_loss frequency — recurring across 5+ runs. CUT_LOSER_PNL widened today. Whipsaw recovery window is the next lever.",
-    "DRIFT-E stored entry_rsi_14 — recurring across 5+ runs. bug_hunter write-path fix still open.",
-    "SHORT bleed — 7d -$0.68, AT RISK for Oct 9 deadline. All RSI bands lose; no safe filter found.",
-    "bb-squeeze+ hard_max_loss — 17T -$2.44/7d, #1 bleeder. BB_SQUEEZE_LONG_RSI_MIN=60 landed today."
+    {
+      "problem": "hard_max_loss frequency — 65T/7d 0%WR -$8.72 #1 bleed",
+      "status": "Magnitude FIXED (aed0aa36 + CUT_LOSER=-1.50). Frequency OPEN — entry quality + EXTREME vol noise at lev3-5.",
+      "next": "bug_hunter whipsaw recovery window (position_manager.py). Re-check n>=10 post CUT_LOSER widen by Oct 11."
+    },
+    {
+      "problem": "SHORT 7d PnL at risk (Oct 9 goal >=$0)",
+      "status": "Currently -$0.86/41T/36.6%. Today SHORT +$0.76 (2 big continuation winners). ACCUMULATION/RECOVERY regime = alt bounce = hard SHORT habitat.",
+      "next": "No time-based fix (banned). No safe RSI filter (would kill 45-50 band winners). Wait regime shift or signal-quality edge. oversold-bounce+ is the correct SHORT-regime expression (LONG the bounce)."
+    },
+    {
+      "problem": "DRIFT-E — stored entry_rsi_14 unreliable",
+      "status": "STANDING bug_hunter item. Meta RSI is authoritative. Watchdog still uses stored RSI in pattern alerts.",
+      "next": "Fix write-path to snapshot signal-time RSI. Until then all RSI audits use _signal_metadata."
+    },
+    {
+      "problem": "pump-chain family fires late (post-move)",
+      "status": "ROOT CAUSE of wrong-side pattern. Signal detects pump/dump after it happened — LONG enters top, SHORT enters bounce. RSI filters don't separate winners/losers in same band.",
+      "next": "Creative: reverse-expectancy shadow at detection. Structural: earlier detection (lower timeframe) or entry-condition tightening — needs signal file work + backtest."
+    }
   ],
   "missing_implementations": [
-    "Whipsaw recovery window for hard_max_loss (discussed in creative improvements, not built)",
-    "BTC RSI exhaustion guard for pump-chain- SHORT (watchdog recommended, not implemented)",
-    "entry_rsi_14 write-path fix (DRIFT-E, delegated to bug_hunter, still open)"
+    "Whipsaw recovery window for HML (proposed 22:35Z run, delegated, not built) — position_manager.py: wait N min after threshold unless PnL worsens",
+    "Reverse-expectancy shadow score (proposed THIS run) — detection-time opposite-side band expectancy to data/wrong_side_shadow.json",
+    "Exec-time LONG RSI_MIN/MAX enforcement on STANDALONE_BYPASS pump-chain+ path (DRIFT-I)",
+    "DRIFT-E entry_rsi_14 write-path fix (standing bug_hunter)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-07T23:50:00Z",
+      "idea": "Detection-time reverse-expectancy shadow score",
+      "rationale": "Fundamental truth: every losing trade means someone else was on the right side. Tonight's pump-chain+ EXTREME cluster (3T all HML, meta RSI 60-70 — same band as winners) was discovered post-hoc. A shadow score at signal-fire time — opposite-direction expectancy from the same vol-regime × RSI-band cell — flags wrong-side risk BEFORE capital deploys. Zero live impact.",
+      "expected_impact": "Earlier wrong-side detection; auditor priority queue fed automatically",
+      "category": "monitoring / wrong-side detection",
+      "status": "suggested",
+      "risk": "none — shadow only",
+      "implementation": "decider_run.py or signal_compactor.py: on signal fire, lookup opposite-direction expectancy in trades table/cell_stats for (volatility_regime, rsi_band, direction), append to data/wrong_side_shadow.json. Auditor reviews weekly.",
+      "sample_size": "n/a — monitoring infrastructure"
+    },
+    {
+      "date": "2026-10-07T23:50:00Z",
+      "idea": "PUMP_CHAIN_SHORT_RSI_MAX=55 (ceiling) — DEFERRED n<20",
+      "rationale": "pump-chain- 7d meta RSI>=55 = 11T net -$0.43 (COMP -0.24, HYPER -0.13, FIL -0.12...). Winners at same band +$0.28. Only profitable band is RSI 45-50 (+$0.89 from APT/LTC continuation). Pattern clear but n=11<20.",
+      "expected_impact": "If holds at n>=20: ~+$0.43 net per 7d window",
+      "category": "entry sniper",
+      "status": "monitor — re-check when n>=20",
+      "risk": "low — kills some winners (+$0.28) but less than losers (-$0.71)",
+      "implementation": "New constant PUMP_CHAIN_SHORT_RSI_MAX + compactor filter beside PUMP_CHAIN_SHORT_RSI_MIN",
+      "sample_size": "11T (need 20)"
+    }
   ],
   "next_actions": [
-    "MONITOR CUT_LOSER_PNL=-1.50 — n>=10 post-fix trades by Oct 11",
-    "MONITOR BB_SQUEEZE_LONG_RSI_MIN=60 — first post-fix trades this week",
-    "MONITOR PUMP_CHAIN_SHORT_HIGH_BLOCK — 0 HIGH trades expected",
-    "DELEGATE bug_hunter: whipsaw recovery window for hard_max_loss (position_manager.py)",
-    "DELEGATE bug_hunter: entry_rsi_14 write-path fix (DRIFT-E, standing)",
-    "SHORT 7d PnL >=$0 by Oct 9 — currently -$0.68, AT RISK. No safe filter found; wait for market regime shift.",
-    "When BTC reclaims EMA300, oversold-bounce+ / bb-bounce-v2-long+ are the verified winners — ensure they fire."
+    "MONITOR CUT_LOSER_PNL=-1.50 — n>=10 post-fix by Oct 11",
+    "MONITOR BB_SQUEEZE_LONG_RSI_MIN=60 — first post-fix bb-squeeze trades",
+    "MONITOR pump-chain- RSI>=55 ceiling — re-check at n>=20",
+    "DELEGATE bug_hunter: HML whipsaw recovery window (position_manager.py) — reaffirm from 22:35Z queue",
+    "DELEGATE bug_hunter: DRIFT-E write-path fix + DRIFT-I exec-time LONG RSI enforcement on bypass paths",
+    "SHORT 7d >=$0 by Oct 9 — AT RISK. No safe filter. Today +$0.76. Regime-dependent.",
+    "When BTC reclaims EMA300: prioritize oversold-bounce+ / bb-bounce-v2-long+ (verified winners)",
+    "Watchdog deep_analysis must switch to meta.rsi_14 — DRIFT-E contamination flagged"
   ]
 }

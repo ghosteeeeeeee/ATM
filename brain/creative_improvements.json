@@ -3480,5 +3480,27 @@
     "status": "suggested",
     "risk": "low",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-07T23:50:00Z",
+    "idea": "Detection-time reverse-expectancy shadow score",
+    "rationale": "Fundamental truth: every losing trade means someone else was on the right side. Tonight's pump-chain+ EXTREME cluster (3T all HML, meta RSI 60-70 — same band as winners) was discovered post-hoc. A shadow score at signal-fire time — opposite-direction expectancy from the same vol-regime × RSI-band cell — flags wrong-side risk BEFORE capital deploys. Zero live impact.",
+    "expected_impact": "Earlier wrong-side detection; auditor priority queue fed automatically",
+    "category": "monitoring / wrong-side detection",
+    "status": "suggested",
+    "risk": "none — shadow only",
+    "implementation": "decider_run.py or signal_compactor.py: on signal fire, lookup opposite-direction expectancy in trades table/cell_stats for (volatility_regime, rsi_band, direction), append to data/wrong_side_shadow.json. Auditor reviews weekly.",
+    "sample_size": "n/a — monitoring infrastructure"
+  },
+  {
+    "date": "2026-10-07T23:50:00Z",
+    "idea": "PUMP_CHAIN_SHORT_RSI_MAX=55 (ceiling) — DEFERRED n<20",
+    "rationale": "pump-chain- 7d meta RSI>=55 = 11T net -$0.43 (COMP -0.24, HYPER -0.13, FIL -0.12...). Winners at same band +$0.28. Only profitable band is RSI 45-50 (+$0.89 from APT/LTC continuation). Pattern clear but n=11<20.",
+    "expected_impact": "If holds at n>=20: ~+$0.43 net per 7d window",
+    "category": "entry sniper",
+    "status": "monitor — re-check when n>=20",
+    "risk": "low — kills some winners (+$0.28) but less than losers (-$0.71)",
+    "implementation": "New constant PUMP_CHAIN_SHORT_RSI_MAX + compactor filter beside PUMP_CHAIN_SHORT_RSI_MIN",
+    "sample_size": "11T (need 20)"
   }
 ]
