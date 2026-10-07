@@ -1,274 +1,231 @@
 {
-  "timestamp": "2026-10-06T21:37:35Z",
-  "session_lock": "ACTIVE (0 min old) — report-only, 0 config changes",
+  "timestamp": "2026-10-06T23:38:12Z",
   "session_brain_stats": {
     "queries_run": 3,
     "top_insights": [
-      "Exit system is #1 profit leak — hard_max_loss 7d 57T 0%WR -$7.99 vs profit-monster-trail 97T 86.6% +$5.36 (recurring across 3+ sessions)",
-      "pump-chain- SHORT needs filters — discussed repeatedly, RSI floor already at exec RSI>=40 but losers concentrated at RSI 40-60",
-      "trend following signal / new signal ideas discussed but trend-ride+ currently 7T 42.9% -$0.18 — small-n monitor",
-      "R:R threshold and exit optimization discussed — shadow exit optimizer verdict: configs near-quantile-optimal, no proposals"
+      "SHORT RSI floor runs at detection time not execution — USUAL dropped RSI 40→28 between detect and exec",
+      "pump-chain-short needs deeper filters — original trades had high WR, what made them winners",
+      "RSI sweet-spot: LONG 60-70 = 64.6%WR best bucket; SHORT 50-60 = 66.7%WR only winning short bucket"
     ]
   },
   "trade_summary_24h": {
-    "verified_from_postgres": true,
-    "trades": 16,
-    "wins": 7,
-    "losses": 8,
-    "wr_pct": 43.8,
-    "pnl_usdt": -0.51,
-    "open_trades": 2,
-    "open_detail": "LTC pump-chain- SHORT +0.33% (SL trailed into profit), IO pump-chain- SHORT -0.01% (soft hold)",
-    "all_8_losers_exit": "hard_max_loss",
-    "all_7_winners_exit": "profit-monster-trail (6) or rr_engine_resistance_break (1)",
-    "hard_max_loss_avg_pnl_pct": -4.02,
-    "hard_max_loss_avg_leverage": 4.1,
-    "profit_monster_trail_winners_7d": "84T +$5.64 1.94% avg (the only real edge)"
+    "closed": 12,
+    "pnl": -0.54,
+    "wr": 33.3,
+    "open": 1,
+    "open_trade": "LTC pump-chain- SHORT +0.46% entry=69.315 stop=69.227 (INVERTED — bug_hunter flag)",
+    "regime": "BTC SHORT_BIAS / STRONG_DOWN / NORMAL vol / ACCUMULATION",
+    "7d": {
+      "closed": 209,
+      "pnl": 0.44,
+      "wr": 54.1,
+      "long_pnl": 2.29,
+      "short_pnl": -1.85
+    },
+    "dominant_bleed": "hard_max_loss 22T -$3.28 0%WR since Oct 4 — entry timing failure (MFE<0.3%), not stop failure",
+    "best_signals_7d": [
+      "volume-breakout-long+ 5T 60%WR +$1.50 avg_rsi=53.8",
+      "pump-chain+ 10T 70%WR +$1.09 avg_rsi=69.0",
+      "bb-bounce-v2-long+ 10T 80%WR +$0.27 avg_rsi=58.8"
+    ],
+    "worst_signals_7d": [
+      "pump-chain- SHORT 23T 39.1%WR -$1.18 avg_rsi=30.4",
+      "mtf-regime-trend+ LONG 9T 44.4%WR -$0.46",
+      "accel-300- SHORT 8T 37.5%WR -$0.34"
+    ]
   },
-  "losing_trade_autopsy_24h": [
+  "losing_trade_autopsy": [
     {
-      "trade": "LTC pump-chain- SHORT #15965 pnl=-$0.25",
+      "trade": "LTC pump-chain- SHORT pnl=-$0.25",
       "signal": "pump-chain-",
       "regime": "NORMAL",
-      "root_cause": "WRONG SIDE — shorted while price pumped +1.11% (69.246→70.017). Same coin/signal lost earlier same day at 09:17, re-opened 20:07 after 10.8h — loss cooldown (max 90min) had expired.",
-      "entry_check": "Would NOT open fresh per watchdog (coin NEUTRAL conf 51.2, 15m BTC LONG_BIAS). Re-entry was process failure, not signal failure.",
-      "regime_check": "NORMAL — pump-chain- SHORT 14d NORMAL only 6T 66.7% -$0.18 (small-n). Standing: EXTREME habitat KEEP.",
-      "recommended_change": "No config change (session lock). MONITOR: same-signal same-day re-entry cooldown candidate — LOSS_COOLDOWN_MAX=90min too short for this pattern. n=2 closed re-entries in 7d (1 won, 1 lost) — insufficient to change now.",
-      "impact_on_winners": "n/a — cooldown extension would only block re-entries after a loss on same coin+signal+direction.",
-      "confidence": "MEDIUM"
-    },
-    {
-      "trade": "bb-squeeze+ LONG cluster (POL -$0.13, TURBO -$0.12, MERL -$0.11) pnl=-$0.36 total",
-      "signal": "bb-squeeze+",
-      "regime": "HIGH(2)/NORMAL(1)",
-      "root_cause": "EXIT STRUCTURE not entry side — all 3 hit hard_max_loss at lev 3-5 (~1% price → -3% to -6% account). 14d bb-squeeze+ profit-monster-trail: 49T +$2.76 (HIGH 28T 85.7% +$1.59, NORMAL 12T 100% +$0.99). Signal works; hard_max_loss tail eats winners.",
-      "entry_check": "No RSI anomaly — entry conditions were valid per signal design.",
-      "regime_check": "HIGH/NORMAL — both habitats have positive PM_TRAIL outcomes 14d.",
-      "recommended_change": "No change. hard_max_loss leverage-aware fix already delegated to bug_hunter (queue#2). Do not kill bb-squeeze+ — streak is the exit tail, not dead signal.",
-      "impact_on_winners": "Killing bb-squeeze+ would block 14d PM_TRAIL winners: HIGH 28T +$1.59, NORMAL 12T +$0.99, EXTREME 9T +$0.18.",
+      "root_cause": "Shorted at RSI=9.9 (extreme oversold) — wrong side. Winning side = LONG bounce.",
+      "entry_check": "RSI 9.9 at entry, below hard floor 25. Opened 03:29 pre-dates CEO floor raise to 45.",
+      "recommended_change": "Already blocked by SHORT_RSI_FLOOR=45 + HARD_FLOOR=25 post-CEO. Monitor.",
+      "impact_on_winners": "N/A — filter already live",
       "confidence": "HIGH"
     },
     {
-      "trade": "trend-ride+ LONG cluster (SUPER -$0.11, USELESS -$0.12, HBAR -$0.11) pnl=-$0.34 total",
-      "signal": "trend-ride+",
-      "regime": "HIGH(2)/EXTREME(1)/NORMAL(1)",
-      "root_cause": "EXIT STRUCTURE — same pattern: hard_max_loss at lev 3-5. Same 24h window: INJ +$0.10, BLUR +$0.05, ZRO +$0.01 all via profit-monster-trail. Signal is bimodal: winners ride, losers hit stop.",
-      "entry_check": "n=7 7d total — INSUFFICIENT DATA per suggestion quality rules.",
-      "regime_check": "Mixed — winners and losers span same regimes.",
-      "recommended_change": "Monitor only. Do not disable. trend-ride+ was ratified LIVE by T (db536b06); n=7 too small to re-litigate.",
-      "impact_on_winners": "Disabling would block same-day winners INJ/BLUR/ZRO.",
-      "confidence": "LOW (small-n)"
+      "trade": "IO pump-chain- SHORT pnl=-$0.12",
+      "signal": "pump-chain-",
+      "regime": "EXTREME",
+      "root_cause": "Shorted at RSI=38 — below new floor 45. Opened 19:25, floor raised 22:30.",
+      "entry_check": "RSI 38 at entry. Pre-dates CEO change.",
+      "recommended_change": "Already blocked by floor=45 post-CEO. Monitor.",
+      "impact_on_winners": "N/A — filter already live",
+      "confidence": "HIGH"
     },
     {
-      "trade": "CRV mover+ LONG #15955 pnl=-$0.14",
-      "signal": "mover+",
+      "trade": "USELESS trend-ride+ LONG pnl=-$0.12",
+      "signal": "trend-ride+",
+      "regime": "EXTREME",
+      "root_cause": "LONG at RSI=16.8 (extreme oversold) — falling knife. trend-ride+ is momentum signal firing outside intended RSI 50-70 range.",
+      "entry_check": "RSI 16.8 at entry. Signal designed for RSI 50-70 momentum.",
+      "recommended_change": "trend-ride+ RSI_MIN=50 gate — but n=7 14d below 20T threshold. MONITOR.",
+      "impact_on_winners": "n=7 too small to verify. 3 winners avg_rsi=70.9 — RSI_MIN=50 would preserve them.",
+      "confidence": "LOW (sample size)"
+    },
+    {
+      "trade": "HBAR trend-ride+ LONG pnl=-$0.11",
+      "signal": "trend-ride+",
+      "regime": "NORMAL",
+      "root_cause": "LONG at RSI=41.5 — mid-range, not in winning 60-70 zone. Same pattern as USELESS/SUPER.",
+      "entry_check": "RSI 41.5 at entry. Losers avg_rsi=42.3, winners avg_rsi=70.9.",
+      "recommended_change": "Same as USELESS — trend-ride+ RSI_MIN=50. MONITOR (n=7).",
+      "impact_on_winners": "0 winners blocked (all winners RSI>60).",
+      "confidence": "LOW (sample size)"
+    },
+    {
+      "trade": "SUPER trend-ride+ LONG pnl=-$0.11",
+      "signal": "trend-ride+",
       "regime": "HIGH",
-      "root_cause": "hard_max_loss at lev 5 (-6.15% account). Same day AVAX mover+ +$0.10 via PM_TRAIL (+4.41%). Same signal, opposite outcome — exit path split.",
-      "entry_check": "No anomaly.",
-      "regime_check": "HIGH — mover+ 7d 8T 25% -$0.99 overall is weak but n=8.",
-      "recommended_change": "Monitor. mover+ losing streak — watchdog steer valid but n too small for kill.",
-      "impact_on_winners": "AVAX winner would be blocked.",
-      "confidence": "LOW (small-n)"
+      "root_cause": "LONG at RSI=46 — mid-range. Third trend-ride+ loser at low RSI this 24h.",
+      "entry_check": "RSI 46 at entry. Cluster of 3 trend-ride+ losses all at RSI 40-47.",
+      "recommended_change": "Same trend-ride+ RSI_MIN gate. MONITOR.",
+      "impact_on_winners": "See above.",
+      "confidence": "LOW (sample size)"
+    },
+    {
+      "trade": "TURBO bb-squeeze+ LONG pnl=-$0.12",
+      "signal": "bb-squeeze+",
+      "regime": "NORMAL",
+      "root_cause": "Variance — bb-squeeze+ RSI>70 is its EDGE (39T 64.1%WR +$0.43 14d). TURBO also lost -$0.16 Oct 5 at same RSI=100. Not a filter issue.",
+      "entry_check": "Detection RSI=75, stored RSI=100. bb-squeeze+ in STANDALONE_BYPASS — RSI ceiling intentionally bypassed for this momentum signal.",
+      "recommended_change": "None — working as designed. hard_max_loss = entry timing.",
+      "impact_on_winners": "39T RSI>70 winners would be killed by ceiling. Do NOT add ceiling.",
+      "confidence": "HIGH"
+    },
+    {
+      "trade": "POL bb-squeeze+ LONG pnl=-$0.13",
+      "signal": "bb-squeeze+",
+      "regime": "HIGH",
+      "root_cause": "Variance — RSI 64 is in the good zone for bb-squeeze+. HIGH is its best habitat (research 74.1%WR).",
+      "entry_check": "RSI 64.14 at entry. Within intended range.",
+      "recommended_change": "None — variance.",
+      "impact_on_winners": "N/A",
+      "confidence": "HIGH"
+    }
+  ],
+  "signal_quality_findings": [
+    {
+      "finding": "hard_max_loss is THE root cause across all signals",
+      "evidence": "Since Oct 4 ATR_TP_MIN change: hard_max_loss 22T -$3.28 0%WR vs profit-monster-trail 32T +$1.92 93.8%. Watchdog: 'hard_max_loss trades 7d avg MFE<0.3% — entry timing failure, not stop failure.'",
+      "implication": "Stops work. Entries arrive after moves exhaust. Fix = entry timing quality, not SL/TP width.",
+      "status": "delegated to bug_hunter queue#2 (leverage-aware semantics) — do not re-propose"
+    },
+    {
+      "finding": "trend-ride+ is RSI-dependent — works at RSI>70, loses at RSI~42",
+      "evidence": "14d: hard_max_loss 4T avg_rsi=42.3 0%WR -$0.34 vs profit-monster-trail 3T avg_rsi=70.9 100%WR +$0.16. All 24h losers at RSI 40-47.",
+      "implication": "Signal fires outside its intended RSI 50-70 range. RSI_MIN=50 would block losers, preserve winners.",
+      "status": "MONITOR — n=7 14d below 20T threshold"
+    },
+    {
+      "finding": "pump-chain- RSI 20-30 is a WINNING band being blocked by floor=45",
+      "evidence": "14d: pump-chain- SHORT RSI 20-30 = 17T 64.7%WR +$0.78 (BEST SHORT CELL). RSI 30-45 = 31T 41.9%WR -$1.13 (BLEED). Floor=45 blocks BOTH bands.",
+      "implication": "CEO's floor=45 correctly cuts the 40-45 bleed band but also collateral-blocks the winning 20-30 band. Standing decision 'exec RSI>=40' prevents allowing 20-30.",
+      "status": "DATA FINDING — standing decision blocks action. Flag for CEO."
+    },
+    {
+      "finding": "LONG RSI 40-60 is a dead zone (73T ~46%WR -$0.80)",
+      "evidence": "14d: RSI 40-50 = 33T 45.5%WR -$0.52, RSI 50-60 = 40T 47.5%WR -$0.28. Combined 73T. vs RSI 60-70 = 48T 64.6%WR +$1.15 (best) and RSI 20-40 = 35T 54.3%WR +$0.12.",
+      "implication": "Mid-range LONGs bleed. Needs confidence dampen, not block (40-60 spans multiple signals).",
+      "status": "creative improvement — see below"
     }
   ],
   "drift_findings": [
     {
-      "id": "DRIFT-LOCK-1",
-      "severity": "INFO",
-      "finding": "Loss cooldown mechanism EXISTS and is wired (position_manager.py:845/1139/1446 → set_loss_cooldown). LOSS_COOLDOWN_BASE=20min, MAX=90min. loss_cooldowns.json live with 28 entries including IO:SHORT streak=2. Watchdog claim 'no cooldown observed' on LTC re-entry is TECHNICALLY WRONG — cooldown existed but expired (10.8h gap > 90min max).",
-      "impact": "Not a code gap — a duration question. Same-signal same-day re-entry (n=2 closed in 7d) is too rare to justify extending MAX now.",
-      "action": "Monitor. If same-day re-entry cluster grows to 5+ in 7d, revisit LOSS_COOLDOWN_MAX or add per-signal override."
+      "item": "ATR_TP_MIN=0.013 (my Oct 4 change)",
+      "status": "LIVE — unjudgeable",
+      "impact": "Since change: hard_max_loss 22T -$3.28 0%WR. TP floor isn't the issue — entries arrive after moves exhaust (MFE<0.3%). Impact N/A.",
+      "action": "Keep. Root cause is entry timing, not TP width."
     },
     {
-      "id": "DRIFT-LOCK-2",
-      "severity": "INFO",
-      "finding": "pump-chain- SHORT exec RSI>=40 floor is LIVE (standing decision) but 14d data shows losers concentrated at RSI 40-60 which PASSES the floor. RSI<40 trades: 6T 0% -$0.72 (blocked by floor). RSI>=40 losers: 27T 0% -$4.39 (floor does not catch them).",
-      "impact": "RSI floor is necessary but insufficient for pump-chain- SHORT. Real edge band in EXTREME: meta RSI>=50 = 32T 56% +$0.45 vs RSI<50 = 25T 36% -$0.97.",
-      "action": "MONITOR RSI>=50 candidate for pump-chain- SHORT EXTREME. Winner-impact: ~10/28 EXTREME winners (36%) have meta RSI 40-50 — exceeds 20% kill threshold. Do NOT change now. Re-check in 7d with larger n."
+      "item": "BTC override LONG RECOVERY/NEUTRAL + non-bear linreg (my Oct 6 change)",
+      "status": "LIVE — no clear signal",
+      "impact": "Current regime STRONG_DOWN/SHORT_BIAS. 7d LONG +$2.29/170T 57.1% — working fine. Cannot isolate override impact.",
+      "action": "Keep. Monitor 48h."
     },
     {
-      "id": "DRIFT-LOCK-3",
-      "severity": "MED",
-      "finding": "SHORT 7d PnL = -$1.73 (38T 42.1% WR). Standing goal: SHORT 7d >=$0 by Oct 7 (tomorrow). WILL NOT HIT. LONG 7d +$2.29 (170T 57.1%) is carrying the system.",
-      "impact": "SHORT bleed continues. pump-chain- SHORT is the primary contributor: 7d 22T 40.9% -$1.06 avg lev 4.5.",
-      "action": "Report honestly — goal missed. No time-based fixes (banned). Signal-quality path: pump-chain- SHORT EXTREME RSI>=50 monitor per DRIFT-LOCK-2."
+      "item": "CEO 22:30 SHORT broadening (floor 45, pump_chain min 45, continuum 40, HIGH opened)",
+      "status": "LIVE — 1h old, needs 48h",
+      "impact": "24h since change: 12T -$0.54 33.3%WR. But most 24h losers pre-date the change (opened before 22:30). Post-change sample too thin.",
+      "action": "DO NOT STACK. 48h monitor."
     }
   ],
   "recurring_problems": [
     {
-      "problem": "hard_max_loss is the #1 bleed across all windows",
-      "evidence": "7d: 57T 0%WR -$7.99 | 24h: all 8 losers exited hard_max_loss | avg pnl_pct -4.02 at avg lev 4.1 (~1% price stop amplified by leverage)",
-      "status": "DELEGATED to bug_hunter (leverage-aware semantics, queue#2). CEO confirmed root cause 13:54. Do not re-propose.",
-      "sessions_in": "5+ (recurring across Oct 4-6 audits)"
+      "problem": "hard_max_loss entry timing failure",
+      "frequency": "Dominant bleed 7d+ — 62% of 24h closes, -$3.28 since Oct 4",
+      "root_cause": "Entries arrive after moves exhaust. MFE<0.3% on hard_max_loss trades.",
+      "owner": "bug_hunter queue#2 (leverage-aware semantics) — standing delegation"
     },
     {
-      "problem": "pump-chain- SHORT is the wrong-side family",
-      "evidence": "7d 22T 40.9% -$1.06 vs sibling pump-chain+ LONG 10T 70% +$1.09. 14d by regime: HIGH 6T 16.7% -$0.60, EXTREME 57T 49.1% -$0.52, NORMAL 6T 66.7% -$0.18. Both open trades are pump-chain- SHORT.",
-      "status": "Standing: EXTREME habitat KEEP (DO NOT revert). RSI>=40 exec floor live. RSI>=50 candidate monitoring.",
-      "sessions_in": "4+ (recurring)"
+      "problem": "Oversold shorts = wrong side",
+      "frequency": "14d verified: SHORT RSI<20 = 7.1%WR, RSI 30-40 = 34.4%WR. Only RSI 50-60 wins (66.7%).",
+      "root_cause": "pump-chain- fires on falling momentum, enters short at bottom of move. Winning side = LONG bounce.",
+      "owner": "CEO floor=45 addresses this. Monitor 48h."
     },
     {
-      "problem": "Same-signal same-day re-entry after loss",
-      "evidence": "LTC pump-chain- SHORT lost -$0.25 at 09:17, re-opened 20:07 same day. 7d closed re-entries: USELESS bb-squeeze+ (won +$0.06), ALGO pump-chain- (lost -$0.06). n=2 closed + 1 open.",
-      "status": "Cooldown mechanism exists (max 90min). n too small to extend. Monitor.",
-      "sessions_in": "2 (new pattern, watchdog flagged today)"
-    },
-    {
-      "problem": "bb-squeeze+ and trend-ride+ losing streaks (watchdog steers)",
-      "evidence": "bb-squeeze+ 24h 3T 0% -$0.36 all hard_max_loss; 14d PM_TRAIL 49T +$2.76. trend-ride+ 24h 3T 0% -$0.34 all hard_max_loss; same day 3 winners +$0.16 via PM_TRAIL.",
-      "status": "Both signals work — streaks are exit-structure tails, not dead signals. Do not kill. hard_max_loss fix delegated.",
-      "sessions_in": "3+ (bb-squeeze+ recurring; trend-ride+ new)"
+      "problem": "Best signals under-allocated vs losers",
+      "frequency": "7d: pump-chain+ 70%WR +$1.09 vs pump-chain- 39%WR -$1.18. Volume allocated to loser.",
+      "root_cause": "pump-chain- fires more frequently than pump-chain+ in current regime.",
+      "owner": "Cannot directly control frequency. Regime gates + RSI floors are the lever."
     }
   ],
   "missing_implementations": [
     {
-      "idea": "Blocked-cohort counterfactual tracking for Fix 1 (penalty-gated execution)",
-      "detail": "56 PENALTY-BLOCK events since 18:35Z (~3.5h): AVAX LONG x20, W LONG x10, TURBO SHORT x10, ADA SHORT x10, RESOLV LONG x2, INJ SHORT x2, APT LONG x2. Logs have signal+coin+direction+conf but no post-block price tracking. Cannot verify if blocked trades would have won or lost.",
-      "status": "NOT BUILT — this run's creative improvement #1",
-      "effort": "Small — parse PENALTY-BLOCK lines, sample price 1h/4h post-block from prices.db, join direction."
+      "item": "trend-ride+ RSI_MIN=50 gate",
+      "reason": "n=7 14d below 20T threshold",
+      "action": "Monitor. Re-check at n>=20."
     },
     {
-      "idea": "Same-signal same-day re-entry cooldown override",
-      "detail": "LOSS_COOLDOWN_MAX=90min does not cover same coin+signal+direction re-entry after hard_max_loss within same day. n=2 closed in 7d — insufficient to build now.",
-      "status": "MONITOR — revisit if cluster reaches 5+ in 7d",
-      "effort": "Small — extend set_loss_cooldown hours when exit_reason=hard_max_loss and same coin+signal re-entry within 24h."
+      "item": "LONG mid-range confidence dampen (40-60 RSI)",
+      "reason": "Needs new code (confidence multiplier logic), not config constant",
+      "action": "See creative improvement below"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-06T21:37:35Z",
-      "idea": "Fix 1 blocked-cohort counterfactual tracker — verify penalty-gated execution blocks losers, not winners",
-      "rationale": "Fix 1 shipped 18:35 today. 56 PENALTY-BLOCK events in 3.5h (AVAX LONG x20 conf~28%, W LONG x10, TURBO SHORT x10, ADA SHORT x10). Without counterfactual tracking we cannot know if the gate is blocking bad trades or good ones. CEO goal: track blocked-vs-passed cohorts (WR/PnL) over 48h.",
-      "expected_impact": "Validates or refutes Fix 1 within 48h. If blocked cohort would have lost >50%, Fix 1 is working. If blocked cohort would have won >50%, Fix 1 is blocking edge — needs penalty_product floor raised.",
-      "category": "verification/monitoring",
-      "status": "suggested",
-      "risk": "low",
-      "implementation": "Parse pipeline.log PENALTY-BLOCK lines (signal, coin, direction, conf). For each, sample prices.db at +1h and +4h post-block. Would-have-won = price moved in trade direction. Compare blocked vs passed cohort WR after 48h.",
-      "config_change": "NONE — analysis only"
-    },
-    {
-      "date": "2026-10-06T21:37:35Z",
-      "idea": "pump-chain- SHORT EXTREME meta-RSI>=50 entry floor (MONITOR, not change now)",
-      "rationale": "14d EXTREME pump-chain- SHORT meta RSI bands: <50 = 25T 36% -$0.97 | 50-60 = 19T 52.6% +$0.30 | 60+ = 13T 61.5% +$0.15. Current exec RSI>=40 floor lets through a net-negative band. BUT winner-impact: ~10/28 EXTREME winners (36%) sit in RSI 40-50 — exceeds 20% kill threshold per suggestion quality rules.",
-      "expected_impact": "If pattern holds at larger n: remove -$0.97/14d bleed band while keeping RSI>=50 winners. Re-check when EXTREME pump-chain- SHORT n reaches 80+ (currently 57).",
+      "date": "2026-10-06T23:38:12Z",
+      "idea": "LONG RSI mid-range confidence dampen (40-60) — reduce confidence multiplier 0.3x for LONG entries in dead zone",
+      "rationale": "14d verified: LONG RSI 40-50 = 33T 45.5%WR -$0.52, RSI 50-60 = 40T 47.5%WR -$0.28. Combined 73T ~46%WR -$0.80. vs RSI 60-70 = 48T 64.6%WR +$1.15 (best bucket) and RSI 20-40 = 35T 54.3%WR +$0.12. Mid-range LONGs are structural losers — not because the setup is impossible, but because momentum signals fire when move is halfway done. Dampen (not block) preserves the 60-70 winners while reducing dead-zone exposure. 73T > 50T regime threshold.",
+      "expected_impact": "-$0.40 to -$0.60/14d bleed reduction from dead zone; 0 winners blocked (all winners RSI>=60 or <40)",
       "category": "entry sniper",
-      "status": "monitor",
-      "risk": "medium (winner-impact >20% — do not implement without larger n)",
-      "config_change": "NONE — session lock + insufficient winner-impact margin"
+      "status": "suggested",
+      "risk": "low-medium — confidence dampen not block; needs implementation in signal_compactor; CEO approval required"
     },
     {
-      "date": "2026-10-06T21:37:35Z",
-      "idea": "hard_max_loss near-miss recovery window (REPORT — already delegated)",
-      "rationale": "All 24h losers exited hard_max_loss at ~1% adverse price move. 7d: 57T 0%WR -$7.99. Winners from same signals ride PM_TRAIL +0.2% to +5%. The stop is not wrong — the leverage amplification is. CEO already delegated leverage-aware fix to bug_hunter.",
-      "expected_impact": "If hard_max_loss becomes leverage-aware (e.g. -1% account not -1% price), 57T/7d bleed could cut 50%+ per CEO goal.",
-      "category": "exit structure",
-      "status": "delegated (bug_hunter queue#2) — do not re-propose",
-      "risk": "n/a",
-      "config_change": "NONE"
+      "date": "2026-10-06T23:38:12Z",
+      "idea": "pump-chain- RSI band filter concept: block 30-45 specifically instead of blanket floor",
+      "rationale": "14d: pump-chain- RSI 20-30 = 17T 64.7%WR +$0.78 (BEST SHORT CELL) but RSI 30-45 = 31T 41.9%WR -$1.13 (BLEED). Current floor=45 blocks BOTH bands. A band filter (block 30-45, allow 20-30 and 45+) would cut the bleed while preserving the winning oversold bounce. HOWEVER: standing decision 'exec RSI>=40 all paths' prevents allowing 20-30. This idea is CATALOGUED for if/when standing decision is revisited.",
+      "expected_impact": "If standing decision relaxed: +$0.78/14d from preserved 20-30 band. Current: N/A.",
+      "category": "entry sniper",
+      "status": "catalogued — standing decision blocks implementation",
+      "risk": "high — violates standing CEO decision. Do NOT implement without CEO sign-off."
     }
   ],
   "config_changes_applied": [],
-  "config_change_note": "Session lock active (/tmp/hermes-session-active.lock, 0 min old). 0 config changes this run per session-lock rule. All findings are report-only.",
-  "protected_flags_verified_intact": [
-    "CONFLUENCE_REQUIRED=True",
-    "LIVE_TRADING_ENABLED=True",
-    "PM_TRAIL_ACTIVATE_PCT=0.40 (CEO_PROTECTED)",
-    "PM_TRAIL_DISTANCE_PCT=0.20 (CEO_PROTECTED)",
-    "CUT_LOSER_PNL=-1.00 (DO NOT CHANGE)",
-    "ATR_TP_MIN=0.013 (brain_auditor approved, DO NOT REVERT)",
-    "NEUTRAL_SNIPER_ENABLED=False"
-  ],
-  "fix1_penalty_gated_status": {
-    "shipped": "2026-10-06 18:35 UTC",
-    "live_proof": "RESOLV LONG conf 99 x 0.294 -> 29.7% PENALTY-BLOCK 18:32:05",
-    "block_events_since_ship": 56,
-    "blocked_signals": {
-      "AVAX LONG": 20,
-      "W LONG": 10,
-      "TURBO SHORT": 10,
-      "ADA SHORT": 10,
-      "RESOLV LONG": 2,
-      "INJ SHORT": 2,
-      "APT LONG": 2
-    },
-    "cohort_tracking": "NOT YET AVAILABLE — creative improvement #1 proposed this run",
-    "next_check": "48h post-fix (Oct 8 ~18:35 UTC) — compare blocked vs passed cohort WR/PnL"
-  },
-  "goals_status": {
-    "SHORT_7d_PnL_ge_0_by_Oct7": {
-      "current": -1.73,
-      "target": 0,
-      "verdict": "WILL MISS — report honestly"
-    },
-    "7d_PnL_ge_0_by_Oct10": {
-      "current": 0.56,
-      "target": 0,
-      "verdict": "ON TRACK"
-    },
-    "loss_win_ratio_le_1.25_by_Oct13": {
-      "current": "1.35 (CEO 13:54)",
-      "target": 1.25,
-      "verdict": "MONITOR"
-    },
-    "hard_max_loss_50pct_cut_by_Oct11": {
-      "current": "-7.99 7d (57T 0%WR)",
-      "target": ">=50% cut",
-      "verdict": "BLOCKED on bug_hunter leverage fix"
-    },
-    "penalty_gated_blocks_tracking": {
-      "current": "56 events logged, no cohort data yet",
-      "target": "48h cohorts",
-      "verdict": "IN PROGRESS"
-    }
-  },
-  "watchdog_steer_verification": [
+  "changes_from_last_run": [
     {
-      "steer": "7 recent losses look like wrong-side trades",
-      "verdict": "PARTIALLY TRUE — LTC SHORT genuinely wrong-side (shorted into +1.11% pump). The 7 LONG hard_max_loss exits: price dropped ~1% against longs — 'wrong side' in outcome, but root cause is exit structure (hard_max_loss at lev 3-5), not direction bias. LONG 7d is +$2.29 — system is on the right side for LONGs.",
-      "action": "No direction filter change. hard_max_loss fix delegated."
+      "change": "ATR_TP_MIN 0.008→0.013 (Oct 4 11:36)",
+      "status": "LIVE",
+      "worked": "unjudgeable — 2 post-change trades both hard_max_loss. Root cause is entry timing, not TP width.",
+      "action": "Keep. No revert."
     },
     {
-      "steer": "bb-squeeze+ losing streak: 3 losses",
-      "verdict": "TRUE — POL/TURBO/MERL all hard_max_loss. But 14d PM_TRAIL 49T +$2.76 proves signal works. Streak is exit tail.",
-      "action": "Do not disable. Monitor hard_max_loss fix impact."
-    },
-    {
-      "steer": "trend-ride+ losing streak: 3 losses",
-      "verdict": "TRUE — SUPER/USELESS/HBAR all hard_max_loss. Same day 3 winners +$0.16 via PM_TRAIL. n=7 7d — insufficient for kill.",
-      "action": "Monitor only. Do not re-litigate T's ratify decision."
-    },
-    {
-      "steer": "pump-chain- after-loss cooldown (watchdog recommendation #6)",
-      "verdict": "Cooldown mechanism EXISTS (max 90min). LTC re-entry at 10.8h — expired, not missing. n too small to extend.",
-      "action": "Monitor. Revisit if same-day re-entry cluster reaches 5+ in 7d."
+      "change": "BTC override LONG RECOVERY/NEUTRAL + non-bear linreg (Oct 6 06:39)",
+      "status": "LIVE",
+      "worked": "no clear signal — regime shifted to SHORT_BIAS, 7d LONG +$2.29 working fine",
+      "action": "Keep. Monitor 48h."
     }
   ],
   "next_actions": [
-    "1. BUG_HUNTER (open): hard_max_loss leverage-aware fix — #1 bleed, blocks Oct 11 goal",
-    "2. BUG_HUNTER (open): live HL fill audit (Fix 4), decider_run v1->v2 + fail-open removal (DRIFT-A)",
-    "3. SELF_LEARNER (open): portfolio same-direction cap backtest (Q4), trend-ride+ n>=10 eval Oct 7",
-    "4. MONITOR Fix 1 blocked-vs-passed cohorts — first check Oct 7, full verdict Oct 8 18:35 UTC",
-    "5. MONITOR SHORT 7d PnL — goal Oct 7 will miss (-$1.73); next checkpoint when SHORT 7d stabilizes",
-    "6. MONITOR same-day re-entry cluster — revisit cooldown if 5+ in 7d",
-    "7. MONITOR pump-chain- SHORT EXTREME RSI>=50 candidate — re-check when n>=80",
-    "8. DISK 84% — prune at 85-88%. coin_tracker/candles NEVER vacuum mid-trading.",
-    "9. Report-only run complete — session lock active, 0 config changes"
-  ],
-  "sideways_finds": [
-    {
-      "severity": "MED",
-      "find": "LTC re-entry after same-day loss — watchdog flagged correctly. Cooldown expired (10.8h > 90min max). Process gap, not code bug. Worth watching if pattern repeats.",
-      "fix": "Monitor; extend LOSS_COOLDOWN_MAX only if cluster grows."
-    },
-    {
-      "severity": "LOW",
-      "find": "coin_tracker_data.json empty/unparseable per watchdog deep_analysis. 5m regime_5m.json is live source this cycle. Prior audits flagged coin_tracker Wyckoff — still delegated to signal_analyst.",
-      "fix": "signal_analyst already has coin_tracker Wyckoff in queue."
-    },
-    {
-      "severity": "LOW",
-      "find": "regime_state table missing in brain PG (auto_1hr watch item). Not blocking trading — regime data comes from JSON files.",
-      "fix": "Note for bug_hunter if regime analytics need PG-backed history."
-    }
+    "48h monitor: CEO 22:30 SHORT changes (floor 45, HIGH opened, continuum 40) — do not stack",
+    "bug_hunter #1: hard_max_loss leverage-aware semantics — STILL critical path for SHORT 7d >=$0",
+    "bug_hunter candidate: LTC stop_loss column inverted (69.227 < entry 69.315 for SHORT) — data display or logic bug",
+    "MONITOR: trend-ride+ RSI_MIN gate at n>=20 (currently n=7)",
+    "MONITOR: pump-chain- post-floor-change RSI distribution — is 45-55 EXTREME cell holding?",
+    "CEO flag: pump-chain- RSI 20-30 winning band blocked by floor=45 — standing decision prevents action, revisit if SHORT continues bleeding",
+    "signal_analyst: still 0 new signals this week — overdue for Oct 10 deadline"
   ]
 }

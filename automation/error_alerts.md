@@ -1,6 +1,14 @@
 # Error Alerts
 
 
+## Error Alerts — 2026-10-06 23:49 UTC
+- **WARN** (recurring): Disk `/` **85%** used (95G/118G, 18G free). Largest DBs: coin_tracker.db 3.5G, candles.db 2.7G, mtf_macd_tuner.db 1.3G. No logs >7d to gzip. CEO DB-retention/pruning decision still open (recurring since Oct 1).
+- **WARN** (recurring, by design): `hotset.json` empty — `no signals survived compaction` + `No signals above 50% confidence — skipping execution`. Signals (1h): **43 generated**, **0 approved**. Compactor filter blocks this cycle: CONFLUENCE-GATE (LINK SHORT 1 source), SHORT-NEUTRAL (ETC/BIGTIME 4h NEUTRAL), LONG-NEUTRAL + CONTINUUM-BLOCK (ME/TRX LONG, BTC bearish structure), LONG-RSI-BLOCK (NXPC/BIGTIME RSI 0.0). Safety filters working as intended — not a crash. `decisions` table stale (last row 2026-04-13) — compactor no longer writes there.
+- **INFO**: Pipeline healthy — cycle #231712, position_manager rc=0, **1 open** (LTC SHORT pump-chain- +0.63%), 12 closed today via signal_outcomes (-0.52 USDT mixed). 181 rc=0 in 30m, 0 Traceback/CRASH. BTC-CRASH BLOCKED STX LONG = safety filter working.
+- **INFO**: Core timers firing — pipeline/price-collector/1m-candle all active, last fire <1min ago. hl-sync-guardian active (running since Oct 4). signal-compactor timer active (oneshot churn normal). Prices/dashboard data fresh (<2min). Regime **LONG_BIAS** (35L/8S/80N). Speed **128/241 (53%) ≥50th pct**. Phantom `atr_sl_hit` <0.01%: **0**. Open via outcomes: 0 (portfolio view shows 1 open LTC).
+- **SIDE FINDINGS**: (1) signals table **25611 rows** — unbounded growth despite signal-purge timer (was 25310 @ 19:49). (2) Compactor logs show `RSI 0.0` on some LONG blocks (NXPC, BIGTIME) — possible indicator data gap for those tokens. (3) signal-compactor.log **29MB** / err.log **5MB** — rotating OK but growing.
+- **AUTO-FIXES APPLIED**: none required — no crashes, no stuck DB locks, timers all firing. Log compression skipped (nothing >7d old). Hotset empty is filter behavior, not a fault to restart away.
+
 ## Error Alerts — 2026-10-05 17:47 UTC
 - **INFO** — Pipeline healthy: `hermes-pipeline.service` active/running, last cycle 17:47:03 rc=0, breakout 0 signals, position_manager clean (0 open | 0 closed this cycle | 0 Traceback/CRASH in 30m). Kill switch path intact.
 - **WARN** (recurring): `hotset.json` empty — `no signals survived compaction` / `No signals above 50% confidence — skipping execution`. Signals (1h): **80 generated** (pump-chain 51, support_resistance 12, mtf_regime_trend_short 9, others 8), **0 approved**. `decisions` table empty in last 1h. Same pattern as 10-04 entries — signal_compactor filter audit still open.
@@ -1003,3 +1011,6 @@
 - **INFO**: candle.db held by 2 python3 processes (price-collector + 1m-candle) — normal concurrent access
 - **INFO**: Market regime STORMY (76% coins hot), aggregate SHORT_BIAS (12L/33S/79N)
 - **AUTO-FIX**: None required — all timers active, pipeline running, no crashes
+
+## Error Alerts — 2026-10-06 23:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

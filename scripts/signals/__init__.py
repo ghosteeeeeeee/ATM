@@ -269,6 +269,11 @@ except Exception:
     _pump_flow_signal_run = None
 
 try:
+    from signals.ai_trader_signal import run as _ai_trader_signal_run
+except Exception:
+    _ai_trader_signal_run = None
+
+try:
     from signals.pump_chain_long import run as _pump_chain_long_run
 except Exception:
     _pump_chain_long_run = None
@@ -510,6 +515,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'coiled_spring_trigger',     'enabled': 'COILED_SPRING_TRIGGER_LONG_ENABLED', 'run': _coiled_spring_trigger_run},
     {'name': 'btc_wave_detector',         'enabled': 'BTC_WAVE_DETECTOR_ENABLED',     'run': _btc_wave_detector_run},
     {'name': 'pump_flow_signal',          'enabled': 'PUMP_FLOW_ENABLED',             'run': _pump_flow_signal_run},
+    {'name': 'ai_trader',                 'enabled': 'AI_TRADER_ENABLED',             'run': _ai_trader_signal_run},
     {'name': 'pump_chain_long',           'enabled': 'PUMP_FLOW_PLUS_ENABLED',        'run': _pump_chain_long_run},
     {'name': 'pump_chain_v4',            'enabled': 'PUMP_CHAIN_V4_ENABLED',          'run': _pump_chain_v4_run},
     {'name': 'pump_chain_v5',            'enabled': 'PUMP_CHAIN_V5_ENABLED',          'run': _pump_chain_v5_run},

@@ -130,7 +130,48 @@ print("Analysis merged into watchdog_recommendations.json")
 3. Obvious — "price went down" ← not helpful
 4. Unactionable — "hope for the best" ← useless
 
-## Step 6: Print Summary
+## Step 6: AI Trader Signal (Hourly Pick)
+
+Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pick ONE coin that "makes sense right now" and write it to the AI trader state file. This becomes a live signal (`ai-trader`) that the pipeline executes.
+
+**When to fire:**
+- Check the open trades count from watchdog.json
+- If open_trades < MAX_POSITIONS (check hermes_constants.py for MAX_POSITIONS), you may fire
+- Only fire once per hour — check if ai_trader_state.json was written in the last 45 minutes
+
+**How to pick the coin:**
+This is where your brain shines. Consider:
+1. **Regime alignment** — LONG in bull, SHORT in bear. Don't fight the trend.
+2. **Coin-tracker momentum** — coins trending up for LONG, fading for SHORT
+3. **RSI sweet spot** — LONG at RSI 40-65, SHORT at RSI 40-60 (NOT oversold, NOT overbought)
+4. **Volume** — prefer coins with above-average volume right now
+5. **Avoid the crap** — skip coins with recent losses on similar signals, skip extreme RSI zones, skip coins we're already in
+6. **What would you trade if you had one shot?** — the best setup you can find
+
+**Write the signal file:**
+```python
+import json
+from datetime import datetime, timezone
+
+signal = {
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+    "coin": "COIN_NAME",
+    "direction": "LONG" or "SHORT",
+    "confidence": 75,  # 60-90 range
+    "price": 123.45,   # current price
+    "conviction": 80,  # how sure are you
+    "reasoning": "Why this coin right now — regime alignment, momentum, RSI, etc."
+}
+
+with open("/root/.hermes/data/ai_trader_state.json", "w") as f:
+    json.dump(signal, f, indent=2)
+
+print(f"AI Trader pick: {signal['coin']} {signal['direction']} conf={signal['confidence']}")
+```
+
+**If no slot is open or nothing looks good:** Don't force it. Write nothing — the system will pick up the next hourly cycle.
+
+## Step 7: Print Summary
 
 ```
 ═══════════════════════════════════════════════════

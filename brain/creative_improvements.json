@@ -3287,5 +3287,23 @@
     "config_change": "NONE",
     "agent": "brain_auditor",
     "run_date": "2026-10-06"
+  },
+  {
+    "date": "2026-10-06",
+    "idea": "LONG RSI mid-range confidence dampen (40-60) — reduce confidence 0.3x in dead zone",
+    "rationale": "14d: RSI 40-50=33T 45.5%WR -$0.52, 50-60=40T 47.5%WR -$0.28. Combined 73T ~46%WR -$0.80. vs 60-70=48T 64.6%WR +$1.15. Dampen not block preserves winners.",
+    "expected_impact": "-$0.40-0.60/14d bleed reduction, 0 winners blocked",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low-medium"
+  },
+  {
+    "date": "2026-10-06",
+    "idea": "pump-chain- RSI band filter: block 30-45 specifically (20-30=64.7%WR +$0.78 blocked by floor=45)",
+    "rationale": "14d: RSI 20-30=17T 64.7%WR +$0.78 BEST SHORT CELL, RSI 30-45=31T 41.9%WR -$1.13 BLEED. Floor=45 blocks both. Standing decision 'RSI>=40' prevents allowing 20-30.",
+    "expected_impact": "N/A currently — standing decision blocks. +$0.78/14d if ever relaxed.",
+    "category": "entry sniper",
+    "status": "catalogued — standing decision blocks",
+    "risk": "high — violates standing CEO decision"
   }
 ]

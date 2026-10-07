@@ -2798,7 +2798,17 @@ STANDALONE_BYPASS_SIGNALS = (
     'trend-ignition',  # early-stage breakout — volume spike + compression, works solo
     # rs/rs-r/rs-s REMOVED 2026-09-29 — poor performance, requires confluence (2+ signal types)
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
+    'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal from trade-watchdog — full market context, standalone bypass
 )
+
+# ── AI Trader Signal ──────────────────────────────────────────────────────────
+# The trade-watchdog opencode agent runs every 30 min with full market context.
+# Every hour, if < max positions, it picks ONE coin and writes to ai_trader_state.json.
+# ai_trader_signal.py reads that file and fires via add_signal().
+AI_TRADER_ENABLED = True            # CEO 2026-10-02 — pure AI signal, watchdog picks the trade
+AI_TRADER_MIN_CONFIDENCE = 60       # minimum confidence for AI trader to fire
+AI_TRADER_STATE_TTL_MINUTES = 45    # state file older than this = stale, don't fire
+AI_TRADER_COOLDOWN_HOURS = 2        # per coin+direction cooldown
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = False  # CEO 2026-08-16: DISABLED. 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos (hzscore+,range_finder+ and bb_bounce+,range_finder+ both bleeding). Re-enable when R:R >1:1.
