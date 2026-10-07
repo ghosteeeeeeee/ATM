@@ -5073,3 +5073,34 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-06 23:12] auto_1hr: NO CHANGE — 0T last hour; 1 open LTC pump-chain- SHORT (SL column below entry for SHORT — flagged); atr_sl_hit 0%; hard_max_loss 8T -$0.96 sole 24h bleed (queue#2 open); NEG-STREAK not active (1 neg hour); kill/overtrade paths not active; bb-squeeze+/trend-ride+ not last-hour-kill-eligible
+
+## [2026-10-07 01:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+
+**Open:** 1 — LTC pump-chain- SHORT @69.315 (opened 20:07, SL 69.3427 ABOVE entry, TP 67.392 below — SHORT structure CORRECT; prior inverted-SL flag was wrong)
+**24h:** 9 closed | hard_max_loss 5T -$0.73 (56%) | profit-monster-trail 3T +$0.34 | rr_engine 1T +$0.08
+**24h by signal:** pump-chain- 3T 1W -$0.29 | oversold-bounce+ 2T 2W +$0.24 | trend-ride+ 2T 0W -$0.23 | bb-squeeze+ 1T 0W -$0.13 | mover+ 1T 1W +$0.10
+**Hourly streak:** 21:00 -$0.12 only trade in last 6h — NEG-STREAK not active
+**atr_sl_hit:** 0/9 = 0% — tpsl_utils.py fix stable
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — 0T last hour; 24h 0%-WR signals all ≤2T (trend-ride+ 2T, bb-squeeze+ 1T) — not kill-eligible (need 3+T clustered)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — no SL-tightness action, no CEO alert
+- NEG-STREAK: not active (1 consecutive hour with closes, and it's negative; not 3+)
+- hard_max_loss: 5/9 = 56% of 24h closes sole bleed — queue#2 leverage-aware semantics still open, not a constants change this hour
+- LTC SHORT: SL 69.3427 > entry 69.315, TP < entry — correct for SHORT; previous "inverted SL" open-question retracted
+- regime_state table still missing in brain PG — noted, not blocking this hour
+- signal_versions.json parses OK (18 signals); no constants edit → no version audit entry
+
+**Open Questions:**
+- hard_max_loss still ~56% of 24h closes — if another 24h at this rate, demand queue#2 fix or SL structure review
+- trend-ride+ 2T 0W / bb-squeeze+ 1T 0W — weak 24h, kill-eligible only if 0% WR + 3+T cluster in one last hour
+- Volume very low (0-1T/hr for several hours) — may be regime/quiet market, not filter starvation; monitor before raising min confidence
+
+## TEAM UPDATES
+- [2026-10-07 01:12] auto_1hr: NO CHANGE — 0T last hour; 1 open LTC pump-chain- SHORT (SL correctly above entry); atr_sl_hit 0%; hard_max_loss 5T -$0.73 sole 24h bleed (queue#2 open); NEG-STREAK not active; kill/overtrade paths not active; no constants edit
