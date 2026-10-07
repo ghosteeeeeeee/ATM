@@ -22,7 +22,9 @@ os.makedirs(ARCHIVE_DIR, exist_ok=True)
 # (WASP flagged: "5 WAIT signals never re-reviewed" — same root cause)
 ARCHIVABLE_DECISIONS = {'SKIPPED', 'EXPIRED', 'EXECUTED', 'COMPACTED', 'WAIT'}
 CUTOFF_HOURS_APPROVED = 720   # archive APPROVED signals older than 30 days (was 6h — too aggressive for analysis)
-CUTOFF_HOURS_OTHERS   = 720   # archive SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT older than 30 days
+# EXPIRED/SKIPPED are the bulk of runtime DB growth (~24k EXPIRED in 14d).
+# 30d retention kept DB at ~92MB / 26k rows (disk 85%). 14d still covers weekly analysis.
+CUTOFF_HOURS_OTHERS   = 336   # archive SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT older than 14 days
 CUTOFF_HOURS_PENDING  = 24    # archive PENDING signals older than 24 hours (stale, not worth keeping)
 
 

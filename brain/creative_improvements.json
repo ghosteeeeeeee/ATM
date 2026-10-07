@@ -3335,5 +3335,25 @@
     "status": "rejected",
     "risk": "n/a",
     "implementation": "n/a"
+  },
+  {
+    "date": "2026-10-07T06:30:00Z",
+    "idea": "EXTREME LONG confidence boost for pump-chain+/volume-breakout-long+ at RSI 55-70",
+    "rationale": "EXTREME LONG is best habitat: +$2.16/38T 57.9% WR. Winners: pump-chain+ at RSI 59-67 (ME +$0.88, IMX +$0.82, LDO +$0.38). No regime-specific confidence boost exists for this sweet spot.",
+    "expected_impact": "+0.3-0.5 USDT/7d if boost increases sizing on best-habitat trades",
+    "category": "confidence tuning",
+    "status": "monitor",
+    "risk": "low",
+    "sample_size": "38 EXTREME LONG 7d; pump-chain+ subset ~8T < 20T threshold. Monitor 48h."
+  },
+  {
+    "date": "2026-10-07T06:30:00Z",
+    "idea": "Volatility-scaled ATR_SL_MIN — widen stops in HIGH regime",
+    "rationale": "HIGH LONG: 17 hard_max_loss exits avg -4.31% at lev 3.7 (0%WR). ATR larger in HIGH but ATR_SL_MIN=1.3% fixed. Widen to ~1.9% in HIGH to reduce hard_max_loss triggers.",
+    "expected_impact": "Could cut HIGH regime hard_max_loss bleed by 30-50%",
+    "category": "exit structure",
+    "status": "deferred",
+    "risk": "medium",
+    "note": "CONFLICTS with bug_hunter hard_max_loss fix (aed0aa36). Do not implement until bug_hunter's work lands. Needs backtest."
   }
 ]

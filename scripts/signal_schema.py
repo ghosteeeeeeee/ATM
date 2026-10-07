@@ -274,8 +274,8 @@ def init_db():
         rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
 
         # ── Signal History (compaction tracking for self-learning) ───────────────
-        # ai-decider.py writes to this table during signal compaction.
-        # Without it, all INSERT INTO signal_history calls silently fail.
+        # Written by signal_compactor on hotset survival (replaces defunct ai_decider).
+        # position_manager bridges survived rows → brain.trade_patterns on close.
         rc.execute("""
             CREATE TABLE IF NOT EXISTS signal_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -287,11 +287,18 @@ def init_db():
                 score_before REAL,
                 score_after REAL,
                 reason TEXT,
+                trade_id INTEGER,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # Idempotent migration: older DBs lack trade_id (schema created before bridge).
+        try:
+            rc.execute("ALTER TABLE signal_history ADD COLUMN trade_id INTEGER")
+        except sqlite3.OperationalError:
+            pass  # column already exists
         rc.execute("CREATE INDEX IF NOT EXISTS idx_sighist_token ON signal_history(token, direction)")
         rc.execute("CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)")
+        rc.execute("CREATE INDEX IF NOT EXISTS idx_sh_trade ON signal_history(trade_id)")
 
         # ── Token Speeds (speed_tracker.py persistence) ───────────────────────────
         # Updated every pipeline run from speed_tracker.py

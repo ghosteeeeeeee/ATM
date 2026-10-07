@@ -730,7 +730,8 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
     except ImportError:
         return
 
-    # Read signals from signal_history for this trade_id
+    # Read signals from signal_history for this trade (trade_id when linked;
+    # else recent survived rows for token+direction — trade_id set at open).
     sig_db = RUNTIME_DB
     try:
         conn_sig = _sqlite3.connect(sig_db, timeout=5)
@@ -738,10 +739,11 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
         c_sig.execute("""
             SELECT signal_type, compact_round, survived, score_before, score_after, reason
             FROM signal_history
-            WHERE trade_id=? AND survived=1
-            ORDER BY compact_round DESC
+            WHERE token=? AND direction=? AND survived=1
+              AND (trade_id IS NULL OR trade_id=?)
+            ORDER BY CASE WHEN trade_id=? THEN 0 ELSE 1 END, id DESC
             LIMIT 10
-        """, (trade_id,))
+        """, (token.upper(), direction.upper(), trade_id, trade_id))
         rows = c_sig.fetchall()
         conn_sig.close()
     except Exception as e:
@@ -1460,7 +1462,8 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             c_s = conn_s.cursor()
             c_s.execute("""
                 SELECT MAX(compact_round) FROM signal_history
-                WHERE token=? AND direction=? AND trade_id=? AND survived=1
+                WHERE token=? AND direction=? AND survived=1
+                  AND (trade_id IS NULL OR trade_id=?)
             """, (token.upper(), direction.upper(), trade_id))
             row_cr = c_s.fetchone()
             conn_s.close()

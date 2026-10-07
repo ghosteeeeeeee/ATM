@@ -277,7 +277,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'BLUR',
-    'COMP',
     'HBAR',
     'LDO',
     'SYRUP'
@@ -309,13 +308,14 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'ADA',
+    'ALGO',
     'BTC',
     'CHIP',
-    'CRV',
+    'INJ',
     'JUP',
     'TURBO'
 }
+
 
 
 
@@ -1353,6 +1353,10 @@ SHORT_CONTINUUM_FILTER_ENABLED = True  # plan recommendation 2026-10-01
 SHORT_CONTINUUM_SCORE_MAX = 60         # CEO 2026-10-06: raised 40→60 — every dump is a SHORT opportunity. Allows SHORTs in neutral zones.
 SHORT_CONTINUUM_ALLOW_Z = ('STRONG_NEG',)  # zscore_tier values that permit SHORT regardless of score
 SHORT_CONTINUUM_TOKEN_Z_ENABLED = False  # DISABLED 2026-10-01 — avg_z has no live writer, reads 4-month-old stale data (bug_hunter HIGH)
+# short-drought-dump-day-2026-10-05 Fix 2: only BLOCK when score has been >SCORE_MAX
+# for this many consecutive minutes. Brief bounces (score 61 for 2min) do not close
+# the SHORT window. Fail-open: insufficient history → shorts pass.
+SHORT_CONTINUUM_HYSTERESIS_MIN = 30    # minutes of sustained score>MAX before filter blocks
 
 # pullback-entry- SHORT entry quality (replaced dead hours)
 PULLBACK_ENTRY_SHORT_DEAD_HOURS = []  # DISABLED 2026-09-30 — use entry quality filters instead

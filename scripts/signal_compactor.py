@@ -4235,6 +4235,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             
             log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
             hotset_final.append(entry)
+            # ── signal_history write (replaces defunct ai_decider path) ─────────
+            # Survived final guard → record for trade_patterns bridge on close.
+            try:
+                _sh_conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+                try:
+                    _sh_cur = _sh_conn.cursor()
+                    _sh_cur.execute("""
+                        INSERT INTO signal_history
+                            (token, direction, signal_type, compact_round, survived,
+                             score_before, score_after, reason, trade_id)
+                        VALUES (?, ?, ?, ?, 1, ?, ?, ?, NULL)
+                    """, (
+                        tkn.upper(), direction.upper(),
+                        (entry.get('signal_type') or src or 'unknown')[:80],
+                        int(entry.get('compact_rounds') or entry.get('compact_round') or 0),
+                        float(entry.get('score') or 0),
+                        float(entry.get('score') or 0),
+                        f"hotset_final:{(src or '')[:60]}",
+                    ))
+                    _sh_conn.commit()
+                finally:
+                    _sh_conn.close()
+            except Exception as _sh_err:
+                log(f"  ⚠️ [SIGNAL-HISTORY] write failed for {tkn}:{direction}: {_sh_err}", "WARN")
 
         # ── Step 12: Preserve previous hotset entries that didn't make it from DB ──
         # FIX (2026-04-27): Always run _filter_safe_prev_hotset and merge with DB entries.
