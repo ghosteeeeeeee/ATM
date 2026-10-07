@@ -5671,3 +5671,34 @@ BY: auto_1hr
 - Quiet volume continues but 1T this hour broke the 14-18h drought
 
 BY: auto_1hr
+
+## [2026-10-07 20:14 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00
+**Open:** 1 — DOT pump-chain+ LONG @18:51 (81min, +0.29%, SL 1.0909, TP 1.1323). CEO re-enabled PUMP_FLOW_PLUS today (hermes_constants.py:3792) — kill from 19:13 reverted by CEO. Do NOT re-kill.
+
+**24h:** 12 closed | 2W 10L | +$0.37 (WR 16.7%)
+**24h by signal:** pump-chain- 9T 2W +$0.64 | pump-chain+ 3T 0W -$0.27
+**24h by close reason:** hard_max_loss 8T -$0.67 (66.7%) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**Regime 20:00:** LONG_BIAS (44L/8S/72N) — BTC NEUTRAL ranging
+
+**Changes:**
+1. **BUGFIX signal_compactor.py:1505 — SyntaxError broke position_manager** (commit 0857d82f). Commit 6ba423ce (TREND-ALIGN boost) inserted `_bearish_structure = ...` assignment BETWEEN the if-block and its elif — illegal Python. position_manager imports signal_compactor → FATAL every cycle 20:04–20:12 UTC (rc=1). DOT open 81min with NO exit management (SL/TP/trail not running). Fix: moved both `_bullish_structure` and `_bearish_structure` computations ABOVE the if/elif chain (same pattern as bullish side). py_compile OK + 6-assertion self-check OK. Pipeline restarted; position_manager rc=0 at 20:13:48. No FATAL after restart.
+
+**No Change Needed:**
+- Kill: pump-chain+ already killed 19:13 then CEO RE-ENABLED today (line 3792 "every pump is a LONG opportunity"). Do not fight CEO. pump-chain- SHORT 9T 2W +$0.64 keep.
+- atr_sl_hit: 0% — fix deployed, stable
+- hard_max_loss: 8/12 = 67% of 24h closes. Leverage-aware fix live (aed0aa36); CUT_LOSER_PNL already widened -1.00→-1.50 today by brain_auditor. Queue#2 SL review remains open — max 1 change/hr, syntax bugfix took this slot (correct priority: broken position_manager > SL tuning)
+- NEG-STREAK: inactive — 18:00 -$0.06 only; prior hours with trades: 13:00 -$0.22, 12:00 $0.00 (not 3 consecutive)
+- Overtrade: 0/hr — fine
+- No constants edit → no signal_versions.json entry
+
+**Open Questions:**
+- DOT pump-chain+ LONG still open — 4th pump-chain+ trade. CEO re-enabled flag; if it hard_max_losses, signal is 4T 0W. CEO owns the re-enable.
+- hard_max_loss 67% of 24h closes — volume very low (12T/24h) so ratio is noisy; absolute count 8T. Queue#2 leverage-aware SL review remains the live watch item.
+- TREND-ALIGN code from 6ba423ce is now syntactically valid but UNVERIFIED for logic correctness — the bullish/bearish mult mapping (1.4 boost vs 0.6 penalty) was only syntax-broken, not logic-reviewed this hour. Worth a separate audit when volume returns.
+- position_manager had been failing since ~20:04 — any trades opened/exited in that window had no exit management. Check 20:04–20:13 window for anomalies next cycle.
+
+BY: auto_1hr

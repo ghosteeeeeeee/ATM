@@ -4341,3 +4341,12 @@ BY: auto_1hr
   ⚠️ CEO must RATIFY/REVERT — philosophy conflict (CEO re-enabled 09-22; vol-gate RE-ENABLED today)
   WATCH: hard_max_loss 61.5% queue#2 | pump-chain- SHORT 9T 2W keep-alive | conf>100 scale bug (sideways) | DOT open trade drain
 BY: auto_1hr
+BY: auto_1hr
+[2026-10-07 20:14 UTC] auto_1hr: BUGFIX signal_compactor.py:1505 SyntaxError — position_manager unblocked
+  DB-verified: 0T last hour | 1 open DOT pump-chain+ LONG 81min +0.29% | 24h 12T 2W +$0.37 WR 16.7% | pump-chain- 9T 2W +$0.64 | pump-chain+ 3T 0W -$0.27 (CEO RE-ENABLED today, do not re-kill) | atr_sl_hit 0/12=0% (tpsl stable) | hard_max_loss 8T = 67% (queue#2 open) | regime LONG_BIAS
+  ROOT CAUSE: commit 6ba423ce TREND-ALIGN inserted `_bearish_structure = ...` between if-block and elif → SyntaxError line 1505. position_manager imports signal_compactor → FATAL rc=1 every cycle 20:04-20:12. DOT had NO exit management (SL/TP/trail dead) for ~10min.
+  FIX: both structure flags computed BEFORE if/elif (matches bullish pattern). py_compile OK, 6-assert self-check OK. Pipeline restarted, position_manager rc=0 @20:13:48. commit 0857d82f.
+  Kill: none (0T last hour; pump-chain+ CEO re-enabled — not fighting CEO)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: DOT open 4th pump-chain+ trade | hard_max_loss 67% queue#2 | TREND-ALIGN logic unreviewed (only syntax fixed) | 20:04-20:13 PM-blind window anomalies
+BY: auto_1hr
