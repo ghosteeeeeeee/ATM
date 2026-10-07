@@ -5702,3 +5702,37 @@ BY: auto_1hr
 - position_manager had been failing since ~20:04 — any trades opened/exited in that window had no exit management. Check 20:04–20:13 window for anomalies next cycle.
 
 BY: auto_1hr
+
+## [2026-10-07 21:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00
+**Open:** 2 — DOT pump-chain+ LONG @18:51 (+0.60%, 141min, CEO re-enabled — keep) | GOAT pump-chain-v5 LONG @20:29 (-0.33%, 43min, $11.10, first v5 trade since CEO re-enable today)
+
+**24h:** 12 closed | 2W 10L | +$0.37 (WR 16.7%)
+**24h by signal:** pump-chain- 9T 2W +$0.64 | pump-chain+ 3T 0W -$0.27
+**24h by close reason:** hard_max_loss 8T -$0.67 (66.7%) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**7d by signal (context):** pump-chain-v5 8T 3W -$0.25 (37.5% WR — negative, monitor) | pump-chain+ 13T 7W +$0.82 | pump-chain- 28T 9W -$0.29
+**Pipeline:** healthy post-20:14 syntax fix — position_manager rc=0, both opens TPSL-managed, VOL-GATE HIGH active on GOAT+DOT
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal can hit 3T-0%WR this cycle. pump-chain+ CEO RE-ENABLED today (do not re-kill). pump-chain-v5 CEO RE-ENABLED today (7d has 3 wins, not 0% WR — monitor only)
+- atr_sl_hit: 0% — fix deployed, stable
+- hard_max_loss: 8/12 = 67% of 24h closes — queue#2 leverage-aware SL review remains open (max 1 change/hr; no rule forced a change this hour)
+- NEG-STREAK: inactive — only 18:00 -$0.06 in last 6h; hours 19-21 have 0T (gaps don't count as loss hours)
+- Overtrade: 0/hr — fine
+- Position sizes: $11.10/$22.10 both in normal band (24h avg $17.52)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions / Sideways:**
+- ⚠️ VOL-GATE log vs final SL mismatch: tpsl_utils.py:524 logs intermediate SL AFTER HIGH-widen (GOAT 1.95%, DOT 0.49%) but final TPSL log shows eff_sl=1.300% for BOTH — established-trade trailing cap (tpsl_utils.py:545+) runs AFTER VOL-GATE and overrides the widen. Final SLs are consistent (1.30% both) so positions are OK; the "widened to X%" log line is misleading. Worth a log-order fix when queue#2 SL work happens.
+- pump-chain-v5 7d -$0.25 on 8T — CEO re-enabled today citing "68.3% WR all-time bare form"; live 7d disagrees. GOAT is the first test trade. If it hard_max_losses → v5 is 9T 3W, still not kill-eligible (has wins), but flag for CEO.
+- hard_max_loss 67% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- DOT pump-chain+ still open +0.60% — CEO owns the re-enable; if it closes red, signal is 4T 0W
+- 20:04-20:13 PM-blind window (yesterday's syntax bug): no trades opened/exited in that window per DB — no anomalies to chase
+
+BY: auto_1hr
