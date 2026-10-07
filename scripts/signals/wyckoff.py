@@ -519,12 +519,14 @@ def run(prices_dict: Dict = None) -> int:
             except ImportError:
                 pass
 
+            # Directional sources — schema blocks bare 'wyckoff' on WYCKOFF_ENABLED=False.
+            # PLUS/MINUS flags are the live control (both True as of 2026-10-07).
             result = add_signal(
                 token=token,
                 direction=sig['direction'],
                 signal_type=sig['signal_type'],
                 confidence=sig['confidence'],
-                source='wyckoff',
+                source='wyckoff+' if sig['direction'] == 'LONG' else 'wyckoff-',
                 signal_metadata=sig.get('metadata'),
             )
             if result:

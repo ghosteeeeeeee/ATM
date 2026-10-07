@@ -103,6 +103,7 @@ FAMILY_MAP = {
                        'rr-struct', 'rr-struct+', 'rr-struct-'],
     'MTF_Regime_Trend': ['mtf-regime-trend', 'mtf-regime-trend+', 'mtf-regime-trend-',
                           'mtf_regime_trend', 'mtf_regime_trend_long', 'mtf_regime_trend_short'],
+    'Wyckoff': ['wyckoff', 'wyckoff+', 'wyckoff-', 'wyckoff_accumulation', 'wyckoff_distribution'],
 }
 
 # Reverse lookup: signal_type → family

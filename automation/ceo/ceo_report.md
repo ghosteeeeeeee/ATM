@@ -1,58 +1,24 @@
-## CEO Report — 2026-10-06 22:30 UTC — T DIRECTIVE: Broaden SHORT Market
-
-### Verified Numbers (self-queried PG brain, meta-RSI from _signal_metadata.rsi_14)
-
-- **24h:** 16T −$0.49 43.8% WR | **7d:** LONG +$2.29/170T 57.1% · SHORT −$1.85/39T 41.0%
-- **30d SHORT meta-RSI bands:** <40=100T −$2.88 46% | **40-45=37T −$2.28 43.2%** | 45-50=20T −$0.50 50% | **50-55=57T +$0.27 50.9%** | 55-65=37T +$0.06 51% | 65+=43T −$1.63 49%
-- **30d regime×RSI:** EXTREME 55-65=**17T +$0.98 64.7% BEST** | HIGH 50-55=**20T +$0.59 55% ONLY HIGH POSITIVE** | HIGH 40-45=7T −$1.07 **14.3%**
-- **30d pump-chain- EXTREME meta-RSI:** <40=16T −$1.55 25% | 40-45=15T −$0.35 | 45-50=7T +$0.13 | 55-65=7T +$0.76 71.4%
-- **7d SHORT exit bleed:** hard_max_loss **17T −$2.23 0%WR** (sole #1) | hard_sl 7T −$0.58
-- **Gate volume:** pipeline.log **14,601 SHORT-CONTINUUM blocks**; BTC score 39-50 z=NEUTRAL mass-blocking (score>30)
-- **T's claimed cells NOT reproduced on current 30d meta-RSI:** EXTREME+HIGH 45-55 = 66T +$0.11 51.5% (not 24T +$1.71 79.2%); EXTREME+HIGH 45-65 = 95T +$0.29 51.6% (not 38T +$1.45 65.8%); pump-chain- EXTREME RSI>=40 = 64T +$0.17 54.7% (not 18T +$0.96 72.2%). Prior figures were stale/narrow MoE snapshots. Decisions use current 30d.
-
-### Decisions (one per line — EXECUTED)
-
-1. **SHORT_RSI_FLOOR: RAISE 40→45.** 40-45 band = 37T −$2.28 43.2% — confirmed bleed, cut it. Keeps 45-55 open per T while removing the losing 40-45 slice. `hermes_constants.py`
-2. **SHORT regime: ALLOW HIGH + keep EXTREME.** HIGH only profitable band is RSI 50-55 (+$0.59 55%). With floor=45 the 14.3% HIGH 40-45 band is cut. `PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED` already False; volatility_gate HIGH pump_chain- multiplier **0.0→1.0** (was stale block). Keep HIGH blocks on accel-300-/mtf-regime-trend-/trend-ride- (0%WR losers). `volatility_gate_v2.py`
-3. **SHORT_CONTINUUM: RELAX SCORE_MAX 30→40.** 14.6k blocks, BTC ranging score 39-50 z=NEUTRAL. Documented revisit path. score<=40 allowed regardless of z; >40 still needs STRONG_NEG. `hermes_constants.py`
-4. **PUMP_CHAIN_SHORT_RSI_MIN: RAISE 40→45.** Align with floor. 30d EXTREME 40-45 = 15T −$0.35 (stale 14d "75%WR" not reproducible). `hermes_constants.py`
-5. **SHORT_NEUTRAL_BLOCK: KEEP True.** NORMAL SHORT 30d = 74T −$2.19. No flat-market SHORT edge.
-6. **SHORT_RSI_CEILING=65: KEEP.** 65+ SHORT = 43T −$1.63 — correctly blocked.
-7. **SHORT_RSI_HARD_FLOOR=25: KEEP.** Oversold defense — philosophy (BANANA lesson). Not relaxed.
-8. **hard_max_loss: STILL #1 SHORT blocker.** 7d 17T 0%WR −$2.23. Broadening entries without exit fix = more volume into broken exit. bug_hunter leverage-aware fix remains critical path for SHORT 7d ≥$0 (Oct 7).
-
-### Root Cause
-Prior SHORT market was over-narrow on RSI (floor 40 left a losing 40-45 slice) while the real volume bottleneck was SHORT_CONTINUUM score=30 blocking ranging-BTC SHORTs. HIGH was blocked on a stale48%WR claim despite HIGH 50-55 being the only positive HIGH cell. T's "broader market" intent is correct; the specific claimed WR numbers were stale.
-
-### Fix Applied
-- `SHORT_RSI_FLOOR` 40→45, `PUMP_CHAIN_SHORT_RSI_MIN` 40→45, `SHORT_CONTINUUM_SCORE_MAX` 30→40
-- volatility_gate HIGH pump_chain- / pump-chain- 0.0→1.0
-- Protected flags untouched (CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, PM_TRAIL_*, CEO_PROTECTED_FLAGS all verified)
-- NEUTRAL block, RSI ceiling, hard floor, continuum filter enabled — all kept
-
-### Verification / Monitor (48h)
-| Metric | Before | Target | Deadline |
-|--------|--------|--------|----------|
-| SHORT 7d PnL | −$1.85 | ≥$0 (needs hard_max_loss fix too) | Oct 7 |
-| SHORT-CONTINUUM blocks | 14.6k all-time, mass fire | Down meaningfully | 48h |
-| SHORT trades opened | drought (regime NEUTRAL + continuum block) | Volume up in EXTREME/HIGH | 48h |
-| HIGH pump-chain- trades | n=0 blocked | n>0 with RSI≥45, WR tracked | 48h |
-| hard_max_loss SHORT | 17T 0%WR −$2.23 7d | ≥50% cut via bug_hunter #1 | Oct 11 |
-
-**DELEGATE self_learner:** 48h monitor — SHORT volume by regime×RSI band; flag if HIGH 40-45 leaks (floor failure) or continuum 30-40 band WR <40%.
-**DELEGATE bug_hunter:** hard_max_loss leverage-aware fix remains #1 — broadened SHORT market depends on exit fix to convert to PnL.
-**DELEGATE signal_analyst:** if continuum 30-40 band shows edge, snapshot params to signal_regime_memory.json; build pump-chain- HIGH RSI 50-55 confluence partner.
-
-## CEO Report — 2026-10-07 02:00 UTC
+## CEO Report — 2026-10-07 06:00 UTC
 
 ### Diagnosis
-PG-verified: 24h **8T −$0.19 50.0%WR** | 7d **207T −$0.31 54.1%WR** (LONG +$1.35/169T 56.8%, SHORT −$1.66/38T 42.1%). 7d flipped NEGATIVE vs +$0.44 @22:00. **Sole bleed: hard_max_loss 58T −$8.11 0%WR avg_lev 4.07.** Regime SHORT_BIAS. Open 2 pump-chain- SHORT. Disk 85%.
+Self-queried PG: **24h 10T +$1.03 60% WR** | **7d 210T +$0.80 54.3% — FLIPPED POSITIVE** (was −$0.31 @02:00). SHORT 7d improved −$1.66→−$0.55. hard_max_loss post-fix **1T −$0.03** — leverage-aware fix (aed0aa36) working (pre-fix 58T −$8.11 0%WR). Best 30d: volume-breakout-long+ 24T 66.7% +$3.04 (EXTREME 16T 81.3% +$3.72). 0 new signals this week — Wyckoff written but never registered.
 
 ### Root Cause
-`compute_live_pnl` returns unleveraged price-move %. `HARD_MAX_LOSS_PCT = CUT_LOSER_PNL (-1.00)` applied to that unleveraged value. At avg lev 4.07 → **−4.02% account per exit** instead of intended −1% account. Every hard_max_loss trade bled 4× the designed risk. 0% WR cohort — entries don't recover past −1% price.
+1. hard_max_loss bleed: threshold was −1% **price** vs CUT_LOSER_PNL −1% **account** → −4% account at lev 4. FIXED 02:00.
+2. Wyckoff 0 trades ever: (a) not in `signals/__init__.py` SIGNAL_REGISTRY; (b) `source='wyckoff'` blocked by schema on master `WYCKOFF_ENABLED=False` despite PLUS/MINUS=True.
+3. bb-bounce-v3 RSI_MAX 55→40 plan was based on unreliable `entry_rsi_14` (DRIFT-E) — meta RSI shows **51-55 = 100%WR best band**.
 
 ### Fix Applied
-`position_manager.py` leverage-aware hard_max_loss: threshold = `CUT_LOSER_PNL / max(lev,1)`. Same fix in `should_cut_loser` Priority 3. exit_detail now logs lev+threshold. Deleted 16 empty 0-byte DBs. Regime memory updated. **0 constants changed** — protected flags intact. SHORT_CONTINUUM_SCORE_MAX already 60 (b18891d7, do not revert).
+1. **RATIFY brain_auditor 5cd2a9f2** — SHORT_RSI_HARD_FLOOR 25→45, BB_SQUEEZE_LONG_RSI_MIN=60, MOVER± kill. Verified wired in bollinger_squeeze.py + decider_run.py + brain.py. Data-backed. Protected flags untouched.
+2. **WYCKOFF WIRE-UP** — directional sources `wyckoff+`/`wyckoff-`, registry entry, FAMILY_MAP Wyckoff family. Pipeline restarted — **wyckoff now in signals_runner (48 signals)**. NOT in STANDALONE_BYPASS — confluence gate still applies. 48h shadow eval.
+3. **REJECT RSI_MAX 55→40** — meta data contradicts old plan.
+4. **0 trading constant values changed.** Regime memory updated.
 
 ### Verification
-Compile OK. Next pipeline cycle will load fresh position_manager. **48h cohort monitor:** hard_max_loss $ bleed target ≥50% cut (was −$8.11/7d). bug_hunter delegated to verify live + audit should_cut_loser P2 units + cut_loser.py HARD_STOP same-class + disk prune plan. signal_analyst: 0 new signals this week — build 1.
+- Pipeline active post-restart; wyckoff listed in FAST signals run.
+- hard_max_loss: 1 post-fix trade, −$0.03 at lev 5 (correct threshold behavior).
+- Protected flags verified: CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True.
+- 7d +$0.80, 24h +$1.03 — both goals met.
+- Next: wyckoff shadow outcomes 48h; SHORT 7d ≥$0 by Oct 9; hard_max_loss cohort n≥10 by Oct 11.
+
+Artifacts: automation/ceo/ceo_kanban.md, data/signal_regime_memory.json, CURRENT.md. — CEO

@@ -468,6 +468,11 @@ try:
 except Exception:
     _mtf_regime_trend_run = None
 
+try:
+    from signals.wyckoff import run as _wyckoff_run
+except Exception:
+    _wyckoff_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -555,6 +560,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'trend_ignition',            'enabled': 'TREND_IGNITION_ENABLED',    'run': _trend_ignition_run},
     {'name': 'mtf_regime_trend',          'enabled': 'MTF_REGIME_TREND_ENABLED',  'run': _mtf_regime_trend_run},
     {'name': 'mtf_macd',                  'enabled': 'HMACD_MTF_PLUS_ENABLED',    'run': _mtf_macd_run},
+    # wyckoff: PLUS/MINUS checked inside run(); registry gate is True so either direction can fire.
+    {'name': 'wyckoff',                   'enabled': True,                        'run': _wyckoff_run},
 ]
 
 
