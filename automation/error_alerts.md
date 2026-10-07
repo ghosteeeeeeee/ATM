@@ -1,5 +1,11 @@
 # Error Alerts — 2026-10-07 06:05 UTC (CEO run)
 
+## Error Alerts — 2026-10-07 06:50 UTC (health_monitor)
+- **WARN** (1x): Disk 85% used (/dev/vda2 94G/118G) — at alert threshold, goal <80% by Oct 14
+  - **AUTO-FIX**: None safe — no uncompressed *.log older than 7d (all rotations already .gz); live logs (pipeline.log 93M) cannot be compressed in place. DB prune delegated to bug_hunter per CEO run 06:00.
+- **INFO**: `data/prices.db` and `data/signals.db` are 0 bytes (created 02:00/03:32 today). Regime scanners fall back to candles.db; pipeline unaffected. Flag for bug_hunter — confirm no live writer expects them.
+- **INFO**: token_speeds 79/241 stale; avg speed_percentile 48.6 — below 50, market momentum weak (matches low signal volume).
+
 ## CEO RUN 06:00 UTC — Wyckoff registered, 7d positive again
 
 ### VERIFIED NUMBERS (self-queried PostgreSQL brain)
@@ -33,3 +39,8 @@
 - signals_hermes_runtime.db 26k rows / 92MB unbounded (purge only removes executed>1h)
 - session_brain.db 1.0G, mtf_macd_tuner 1.4G — prune candidates
 - volume low 0-2T/hr ~11h (market, not filter failure — confluence working)
+
+## Error Alerts — 2026-10-07 05:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK-TOK-TOK] CC TOK BLOCKED — exec TOK unavailable (TOK-closed, SHORT_RSI_HARD_FLOOR)`
