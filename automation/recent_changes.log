@@ -4334,3 +4334,10 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 58.3% queue#2 leverage-aware | pump-chain+ FOGO open (3rd trade — loss = kill) | quiet volume 0T/hr
 BY: auto_1hr
+[2026-10-07 19:13 UTC] auto_1hr: KILL pump-chain+ LONG — PUMP_FLOW_PLUS_ENABLED True→False (hermes_constants.py:3792)
+  DB-verified: 1T last hour FOGO pump-chain+ LONG hard_max_loss -$0.06 | 24h 13T 3W 10L +$0.37 WR 23.1% | pump-chain+ 3T 0W -$0.27 ALL hard_max_loss (LDO/IMX/FOGO, conf 55/259/107) | pump-chain- 9T 2W +$0.64 KEPT | atr_sl_hit 0/13=0% (tpsl stable) | hard_max_loss 8T -$0.67 = 61.5% (queue#2 open) | 1 open DOT pump-chain+ (trade continues, no new emissions)
+  Kill rule met: 0% WR on 3 closed trades 24h. Flag gates both emitters (pump_chain_long + pump_flow_signal:276). MINUS + V5_SHORT untouched.
+  Pipeline restarted; flags verified live. signal_versions.json: pump-chain+ v1.
+  ⚠️ CEO must RATIFY/REVERT — philosophy conflict (CEO re-enabled 09-22; vol-gate RE-ENABLED today)
+  WATCH: hard_max_loss 61.5% queue#2 | pump-chain- SHORT 9T 2W keep-alive | conf>100 scale bug (sideways) | DOT open trade drain
+BY: auto_1hr

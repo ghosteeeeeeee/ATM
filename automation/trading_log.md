@@ -5636,3 +5636,38 @@ BY: auto_1hr
 - pump-chain- still carrying the 24h PnL (+$0.72 on 10T)
 
 BY: auto_1hr
+
+## [2026-10-07 19:13 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.06 (WR: 0.0%)
+**Open:** 1 — DOT pump-chain+ LONG @18:51, PnL $0.00 (trade continues under position manager; flag only stops NEW emissions)
+
+**24h:** 13 closed | 3W 10L | +$0.37 (WR 23.1%)
+**24h by signal:** pump-chain- 9T 2W +$0.64 | pump-chain+ 3T 0W -$0.27
+**24h by close reason:** hard_max_loss 8T -$0.67 (61.5% of closes) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/13 = 0% — tpsl_utils.py fix stable
+**Kill trigger:** pump-chain+ LONG — FOGO closed hard_max_loss this hour → 3rd consecutive 0% WR trade (LDO -$0.14, IMX -$0.07, FOGO -$0.06, ALL hard_max_loss). Confidence 55/259/107 — conf filter NOT protective.
+
+**Changes:**
+1. `PUMP_FLOW_PLUS_ENABLED = True → False` in `scripts/hermes_constants.py` — kill pump-chain+ LONG per 0% WR / 3T kill rule. This flag gates BOTH emitters (`pump_chain_long.py` and `pump_flow_signal.py` LONG path at line 276). `PUMP_FLOW_MINUS_ENABLED` and `PUMP_CHAIN_V5_SHORT_ENABLED` untouched — pump-chain- SHORT still profitable (9T 2W +$0.64).
+2. Pipeline restarted (`systemctl restart hermes-pipeline`) — constants verified live: PUMP_FLOW_PLUS_ENABLED=False, MINUS=True, V5_SHORT=True.
+3. signal_versions.json: pump-chain+ v1 audit entry logged.
+
+**No Change Needed:**
+- Kill: DONE this hour (pump-chain+). No other 24h signal at 0% WR with 3+ trades.
+- Overtrade: 1/hr — fine
+- atr_sl_hit: 0% — fix deployed and stable
+- NEG-STREAK: inactive — 19:00 hour has the FOGO loss but prior hours 14-18h were 0T gaps, not consecutive loss hours
+- hard_max_loss: 8/13 = 61.5% of 24h closes — still above watch threshold; tpsl fix IS deployed; queue#2 leverage-aware SL review remains open (max 1 change/hr, kill took this slot)
+- signal_versions.json: entry appended (pump-chain+ v1)
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- ⚠️ PHILOSOPHY CONFLICT: CEO re-enabled PUMP_FLOW_PLUS 2026-09-22 ("every pump is a LONG opportunity") and volatility_gate_v2 RE-ENABLED pump-chain+ NORMAL/HIGH TODAY. Kill rule is data-driven (3T 0W, all hard_max_loss, 24h). CEO must RATIFY or REVERT the kill.
+- SIDWAYS: final_confidence values (55, 259, 107) exceed the 0-100 scale — confidence computation in pump-chain LONG path appears to double-count; not protective at any level. Worth a separate audit.
+- hard_max_loss 61.5% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain- SHORT carrying the 24h PnL (+$0.64 on 9T) — keep watching; if it bleeds, its own kill rule applies
+- Quiet volume continues but 1T this hour broke the 14-18h drought
+
+BY: auto_1hr
