@@ -389,8 +389,11 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
             except (TypeError, ValueError):
                 pass
 
-    # Priority 3: global hard stop
-    return pnl_pct <= CUT_LOSER_PNL
+        # Priority 3: global hard stop — leverage-aware (CEO 2026-10-07).
+        # pnl_pct param is unleveraged live_pnl; CUT_LOSER_PNL is ACCOUNT %.
+        # Same unit fix as HARD_MAX_LOSS exit above.
+        _p3_lev = max(float(trade.get('leverage') or 1), 1.0)
+        return pnl_pct <= (CUT_LOSER_PNL / _p3_lev)
 
 
 # Guardian closing marker path (same as hl-sync-guardian.py)
@@ -3384,15 +3387,22 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Safety net: if trade is losing >= HARD_MAX_LOSS_PCT, close immediately.
         # No stall/speed/SL checks — this is a hard stop to prevent deep bleeding.
         # Covers the gap between stale loser (-0.6%) and guardian cut_loser (-5%).
-        HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES
+        #
+        # LEVERAGE-AWARE (CEO 2026-10-07): live_pnl is unleveraged price-move %;
+        # CUT_LOSER_PNL is ACCOUNT %. Account loss = price_move × leverage.
+        # Was: -1% price at lev 4 = -4% account bleed (hard_max_loss 7d 0%WR).
+        # Now: fire when account loss exceeds CUT_LOSER_PNL (-1% account).
+        # ponytail: no price floor — hard_max_loss cohort is 0% WR, tighter cut = less bleed.
+        _hml_lev = max(float(pos.get('leverage') or 1), 1.0)
+        HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES / _hml_lev
         if live_pnl <= HARD_MAX_LOSS_PCT:
             # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.
             # (Old f-string produced ~25 fragmented per-trade labels like
             # 'hard_max_loss_-1.04%', each with 1-4 rows, invisible in GROUP BY.)
             close_paper_position(trade_id, "hard_max_loss",
-                                 exit_detail=f"hard_max_loss_pct={live_pnl:+.2f}%")
+                                 exit_detail=f"hard_max_loss_pct={live_pnl:+.2f}%,lev={_hml_lev:.1f},thresh={HARD_MAX_LOSS_PCT:+.2f}%")
             closed_count += 1
-            log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
+            log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}% @ lev {_hml_lev:.1f}]")
             continue
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────

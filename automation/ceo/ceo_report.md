@@ -42,3 +42,17 @@ Prior SHORT market was over-narrow on RSI (floor 40 left a losing 40-45 slice) w
 **DELEGATE self_learner:** 48h monitor — SHORT volume by regime×RSI band; flag if HIGH 40-45 leaks (floor failure) or continuum 30-40 band WR <40%.
 **DELEGATE bug_hunter:** hard_max_loss leverage-aware fix remains #1 — broadened SHORT market depends on exit fix to convert to PnL.
 **DELEGATE signal_analyst:** if continuum 30-40 band shows edge, snapshot params to signal_regime_memory.json; build pump-chain- HIGH RSI 50-55 confluence partner.
+
+## CEO Report — 2026-10-07 02:00 UTC
+
+### Diagnosis
+PG-verified: 24h **8T −$0.19 50.0%WR** | 7d **207T −$0.31 54.1%WR** (LONG +$1.35/169T 56.8%, SHORT −$1.66/38T 42.1%). 7d flipped NEGATIVE vs +$0.44 @22:00. **Sole bleed: hard_max_loss 58T −$8.11 0%WR avg_lev 4.07.** Regime SHORT_BIAS. Open 2 pump-chain- SHORT. Disk 85%.
+
+### Root Cause
+`compute_live_pnl` returns unleveraged price-move %. `HARD_MAX_LOSS_PCT = CUT_LOSER_PNL (-1.00)` applied to that unleveraged value. At avg lev 4.07 → **−4.02% account per exit** instead of intended −1% account. Every hard_max_loss trade bled 4× the designed risk. 0% WR cohort — entries don't recover past −1% price.
+
+### Fix Applied
+`position_manager.py` leverage-aware hard_max_loss: threshold = `CUT_LOSER_PNL / max(lev,1)`. Same fix in `should_cut_loser` Priority 3. exit_detail now logs lev+threshold. Deleted 16 empty 0-byte DBs. Regime memory updated. **0 constants changed** — protected flags intact. SHORT_CONTINUUM_SCORE_MAX already 60 (b18891d7, do not revert).
+
+### Verification
+Compile OK. Next pipeline cycle will load fresh position_manager. **48h cohort monitor:** hard_max_loss $ bleed target ≥50% cut (was −$8.11/7d). bug_hunter delegated to verify live + audit should_cut_loser P2 units + cut_loser.py HARD_STOP same-class + disk prune plan. signal_analyst: 0 new signals this week — build 1.
