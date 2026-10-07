@@ -2105,13 +2105,20 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     return updates
 
 
-def _persist_sl(trade_id, new_sl):
+def _persist_sl(trade_id, new_sl, token=None, direction=None, entry_price=None):
     """Persist trailing SL to brain DB for pump-exit."""
     if not trade_id or new_sl is None or new_sl <= 0:
         return
+    # Phantom-SL guard: block writes where SL is <0.15% from entry (instant-close risk)
+    if entry_price and entry_price > 0:
+        dist = abs(new_sl - entry_price) / entry_price * 100
+        if dist < 0.15:
+            log(f"  ⚠️ [PUMP-EXIT-PHANTOM] {token} {direction}: BLOCKED tight SL={new_sl:.6f} entry={entry_price:.6f} dist={dist:.3f}%")
+            return
     conn = get_db_connection()
     if conn is None:
         return
+    cur = None
     try:
         cur = get_cursor(conn)
         cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s AND status = 'open'",
@@ -2120,8 +2127,15 @@ def _persist_sl(trade_id, new_sl):
     except Exception as e:
         log(f"  [PUMP-EXIT] DB persist failed: {e}", "WARN")
     finally:
-        close_cursor(cur)
-        close_connection(conn)
+        try:
+            if cur:
+                cur.close()
+        except Exception:
+            pass
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def _persist_atr_levels(updates: List[Dict]) -> None:
@@ -2816,25 +2830,28 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     atr = sum(trs[-14:]) / 14
                 
                 # Calculate trailing stop (DIRECTION-AWARE)
-                trail_distance = atr * PUMP_EXIT_TRAIL_MULT
-                
-                if direction == 'LONG':
-                    peak_price = max(cur, highest_price)
-                    trailing_sl = peak_price - trail_distance
-                    new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
-                    if new_sl > current_sl:
-                        pos['stop_loss'] = new_sl
-                        _persist_sl(trade_id, new_sl)
-                        log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                # Skip trailing if ATR is 0 (insufficient candle data)
+                if atr <= 0:
+                    log(f"  [PUMP-EXIT] {token} {direction}: ATR=0, skipping trailing SL")
                 else:
-                    lowest_price = float(pos.get("lowest_price", cur))
-                    trough_price = min(cur, lowest_price)
-                    trailing_sl = trough_price + trail_distance
-                    new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
-                    if new_sl < current_sl:
-                        pos['stop_loss'] = new_sl
-                        _persist_sl(trade_id, new_sl)
-                        log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                    trail_distance = atr * PUMP_EXIT_TRAIL_MULT
+                    if direction == 'LONG':
+                        peak_price = max(cur, highest_price)
+                        trailing_sl = peak_price - trail_distance
+                        new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                        if new_sl > current_sl:
+                            pos['stop_loss'] = new_sl
+                            _persist_sl(trade_id, new_sl, token, direction, entry_price)
+                            log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                    else:
+                        lowest_price = float(pos.get("lowest_price") or cur)
+                        trough_price = min(cur, lowest_price)
+                        trailing_sl = trough_price + trail_distance
+                        new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                        if new_sl < current_sl:
+                            pos['stop_loss'] = new_sl
+                            _persist_sl(trade_id, new_sl, token, direction, entry_price)
+                            log(f"  [PUMP-EXIT] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
                 
                 # Check momentum exit (DIRECTION-AWARE)
                 momentum_candles = PUMP_EXIT_MOMENTUM_CANDLES
