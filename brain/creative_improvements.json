@@ -3460,5 +3460,25 @@
     "category": "exit sniper",
     "status": "suggested",
     "risk": "medium — needs bug_hunter + backtest"
+  },
+  {
+    "date": "2026-10-07T22:35:36Z",
+    "idea": "Whipsaw recovery window for hard_max_loss",
+    "rationale": "67% of 24h closes exit hard_max_loss, but signals are profitable outside that exit. Many exits are whipsaws that would recover.",
+    "expected_impact": "Reduce hard_max_loss frequency from 67% to ~40%. Preserve magnitude fix.",
+    "category": "exit structure",
+    "status": "suggested",
+    "risk": "medium",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-07T22:35:36Z",
+    "idea": "Capitulation confidence boost for oversold-bounce+ and bb-bounce-v2-long+",
+    "rationale": "Verified winners (100%/88.9% WR). Market in RECOVERY after BTC -2.7% flush RSI 8.29 — ideal habitat.",
+    "expected_impact": "More high-WR signals fire during capitulation.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor"
   }
 ]
